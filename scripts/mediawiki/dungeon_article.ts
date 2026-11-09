@@ -14,15 +14,19 @@ export function dungeonDetails(dungeon: DungeonDef, { section, bullets, table, m
     [
       'Entrance',
       dungeon.overworldDoor === false
-        ? 'Enter from a connected instance.'
-        : 'Overworld entrance at (' + dungeon.doorPos.x + ', ' + dungeon.doorPos.z + ').',
+        ? 'Enter it from a connected dungeon area.'
+        : 'Entrance in the outside world at (' +
+          dungeon.doorPos.x +
+          ', ' +
+          dungeon.doorPos.z +
+          ').',
     ],
   ];
   let text = section('Entry', table(rows));
   if (dungeon.bossChainPull)
     text += section(
       'Pulling the final boss',
-      'Engaging the final boss while other enemies are alive and idle pulls those enemies into the fight.',
+      'If you attack the final boss while other enemies are still alive and not fighting, they join the fight too.',
     );
   if (dungeon.gates?.length)
     text += section(
@@ -35,10 +39,12 @@ export function dungeonDetails(dungeon: DungeonDef, { section, bullets, table, m
           return [
             g.name + '.',
             enemies.size
-              ? 'Clear the required groups and bosses: ' + [...enemies].map(mob).join(', ') + '.'
+              ? 'Defeat these enemies and bosses to open it: ' +
+                [...enemies].map(mob).join(', ') +
+                '.'
               : '',
             g.sealWhileEngaged
-              ? 'Seals during the fight with ' + mob(g.sealWhileEngaged) + '.'
+              ? 'It closes while you are fighting ' + mob(g.sealWhileEngaged) + '.'
               : '',
           ]
             .filter(Boolean)
@@ -52,7 +58,10 @@ export function dungeonDetails(dungeon: DungeonDef, { section, bullets, table, m
       'Heroic difficulty',
       table([
         ['Final boss', mob(h.finalBossId)],
-        ['Heroic Marks', h.marksPerParticipant + ' per eligible participant at the final boss.'],
+        [
+          'Heroic Marks',
+          h.marksPerParticipant + ' for each player who can get them, given at the final boss.',
+        ],
         ['Enemy level', String(h.level)],
         ['Default health', h.healthMultiplier + ' × base'],
         ['Default melee damage', h.damageMultiplier + ' × base'],

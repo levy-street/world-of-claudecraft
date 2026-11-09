@@ -58,15 +58,18 @@ export function specializationExamples(base: ResolvedAbility): [string, string][
     const lines = [
       `${ab.def.name}. Cost ${ab.cost}. ${ab.def.channel ? ab.def.channel.duration + ' sec channel' : ab.castTime ? ab.castTime + ' sec cast' : 'Instant'}. ${ab.cooldown} sec cooldown.`,
     ];
-    if (ab.charges && ab.charges > 1) lines.push(`Stores ${ab.charges} charges.`);
+    if (ab.charges && ab.charges > 1) lines.push(`Holds ${ab.charges} charges.`);
     for (const e of ab.effects) {
       if (e.type === 'gainResource')
         lines.push(
-          `Grants ${e.amount} ${CLASSES[cls].resourceType} before resource-generation modifiers.`,
+          `Gives ${e.amount} ${CLASSES[cls].resourceType}, before any bonuses that change how much you gain.`,
         );
     }
     lines.push(baseText);
-    if (baseText !== powered) lines.push('With 100 in each power rating: ' + powered);
+    if (baseText !== powered)
+      lines.push(
+        'With 100 Spell Power, Attack Power, Healing Power and Ranged Attack Power: ' + powered,
+      );
     return lines.join(' ');
   }
   const neutral = text(base);

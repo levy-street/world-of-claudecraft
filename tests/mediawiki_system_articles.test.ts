@@ -115,9 +115,11 @@ describe('system encyclopedia', () => {
     }
   });
   it('publishes verifiable progression, crafting and collection details', () => {
-    expect(pages.get('Dungeon Finder')).toContain('moderated note of up to 120 characters');
+    expect(pages.get('Dungeon Finder')).toContain(
+      'note of up to 120 characters, which moderators can check',
+    );
     expect(pages.get('Dungeon Finder')).not.toContain('no free-form advertisement text');
-    expect(pages.get('Death and recovery')).toContain('plus 24 seconds per further level');
+    expect(pages.get('Death and recovery')).toContain('plus 24 seconds for each level above that');
     expect(pages.get('Lockpicking')).toContain(
       '3 page(s) in a row, 1 attempt(s), 3 seconds per move',
     );
@@ -125,12 +127,12 @@ describe('system encyclopedia', () => {
     expect(pages.get('Water Elemental (Combat pet)')).toContain('10 Frost damage');
     const cave = pages.get('Mother of Mushrooms (Hoard encounter)');
     expect(cave).toContain(
-      'Initial nature damage before target modifiers: 51 on common, 42 on rare.',
+      'First hit of nature damage, before anything on you lowers it: 51 on common, 42 on rare.',
     );
     expect(cave).not.toMatch(/common: \./);
     expect(pages.get('Leveling and prestige')).toContain('Level 1 to 2:');
     expect(pages.get('Ashes at the Gate (Clue hunt)')).toContain('x 350, z 2085');
-    expect(pages.get('Mounts and riding')).toContain('increases movement speed by 70%');
+    expect(pages.get('Mounts and riding')).toContain('makes you move 70% faster');
     for (const t of byCategory.get('Crafting recipes') ?? []) {
       expect(pages.get(t)).toMatch(/Base material cost/);
       expect(pages.get(t)).toMatch(/Makes \d+ x \[\[/);

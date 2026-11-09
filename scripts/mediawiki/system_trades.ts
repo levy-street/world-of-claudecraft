@@ -76,11 +76,11 @@ export function addTradeSkills(w: SystemWriter) {
         item(r.resultItemId) +
         '. Each craft takes ' +
         craftCastDurationSec(r) +
-        ' seconds before speed modifiers.',
+        ' seconds, not counting anything that makes crafting faster.',
       heading(
         'Requirements',
         list([
-          `This is a tier ${tier} ${words(r.professionId)} recipe. Once learned, you can attempt it below its listed skill of ${r.skillReq} if you meet the other requirements below.`,
+          `This is a tier ${tier} ${words(r.professionId)} recipe. Once you learn it, you can attempt it below its listed skill of ${r.skillReq}, as long as you meet the other rules below.`,
           ...(combo
             ? [
                 'Choose ' +
@@ -93,14 +93,14 @@ export function addTradeSkills(w: SystemWriter) {
               ]
             : []),
           r.stationType
-            ? 'Work within ' +
+            ? 'Stand within ' +
               STATION_RADIUS +
               ' yards of a ' +
               words(r.stationType) +
-              ' station or a matching mobile station.'
-            : 'Can be crafted in the field.',
+              ' station, or a mobile station of the same kind.'
+            : 'You can craft it anywhere, with no station.',
           r.acquisition?.length
-            ? 'Learn from ' +
+            ? 'Learn it from ' +
               r.acquisition
                 .map(
                   (a) =>
@@ -112,32 +112,34 @@ export function addTradeSkills(w: SystemWriter) {
                 )
                 .join(' or ') +
               '.'
-            : 'Known automatically.',
-          ...(r.oncePerDay ? ['Limited to one successful craft per character per reset day.'] : []),
-          ...(r.consumeOnCraft
-            ? ['A successful craft consumes your knowledge of this recipe.']
+            : 'You know it automatically.',
+          ...(r.oncePerDay
+            ? [
+                'Each character can make it only once per day. The count starts again at the daily reset.',
+              ]
             : []),
+          ...(r.consumeOnCraft ? ['When you make it, you forget this recipe.'] : []),
         ]),
       ),
       trainer
-        ? `Speak to ${w.entity('npc', trainer.masterNpcId)} at ${stationLocation(trainer)}. At ${words(r.professionId)} skill ${tier * TIER_SKILL_STEP} or higher, choose Training and learn the recipe for ${trainingFeeFor(r)} copper.`
+        ? `Talk to ${w.entity('npc', trainer.masterNpcId)} at ${stationLocation(trainer)}. Once your ${words(r.professionId)} skill is ${tier * TIER_SKILL_STEP} or higher, choose Training and learn the recipe for ${trainingFeeFor(r)} copper.`
         : '',
       patternNames?.length
-        ? `Use ${patternNames.join(' or ')} to learn this recipe. Follow the item link for its source.`
+        ? `Use ${patternNames.join(' or ')} to learn this recipe. Follow the item link to see where to get it.`
         : '',
       heading(
         'Skill gain',
         gains.length
           ? list([
               ...gains,
-              `At the profession cap of ${cap}, skill stops increasing. A recipe above the tier your crafting archetype allows gives no skill progress.`,
+              `At ${cap}, the highest skill for this profession, your skill stops going up. A recipe above the tier your crafting archetype allows gives no skill at all.`,
             ])
-          : `Skill stops increasing at ${cap}.`,
+          : `Your skill stops going up at ${cap}.`,
       ),
       heading('Base material cost', reagents(r.reagents)),
-      'The craft also deducts up to ' +
+      'Each craft also costs up to ' +
         Math.ceil(r.itemLevelBudget * CRAFT_GOLD_SINK_COPPER_PER_BUDGET) +
-        ' copper. If you have less, the craft uses your remaining copper.',
+        ' copper. If you have less than that, it takes all the copper you have left.',
     );
     recipeTitles.set(r.id, articleTitle);
     w.registerArt('recipe', r.id, articleTitle);
@@ -149,18 +151,18 @@ export function addTradeSkills(w: SystemWriter) {
     w.describe(
       c.name,
       c.name +
-        ' is a crafting profession. Its maximum skill is ' +
+        ' is a crafting profession. The highest skill you can reach is ' +
         c.maxSkill +
         '. ' +
-        (c.station ? `Station recipes use the ${words(c.station)}.` : ''),
+        (c.station ? `Recipes that need a station use the ${words(c.station)}.` : ''),
       c.masters.length
         ? heading('Trainers', list(c.masters.map((m) => `${m.name}, ${m.title} in ${m.hub}`)))
         : '',
-      'Specialization begins at skill ' +
+      'At skill ' +
         c.specialization.at +
-        ' and gives a ' +
+        ' you become specialized. Then you need ' +
         c.specialization.materialDiscountPct +
-        '% material discount on eligible inputs. Raid cores always cost the full amount.',
+        '% fewer of the materials the discount covers. The amount is rounded down, but you always need at least 1 of each material. Raid cores always cost the full amount.',
       craftRecipes.length
         ? heading(
             'Recipes by listed skill',
@@ -177,23 +179,24 @@ export function addTradeSkills(w: SystemWriter) {
   const mw = GUIDE_PROF_MASTERWORK;
   w.describe(
     'Masterwork crafting',
-    'Eligible equipment has a ' +
+    'Equipment that can become a masterwork starts with a ' +
       mw.basePct +
-      '% base chance to become a masterwork. Add ' +
-      mw.perTierAbovePct +
-      ' percentage points per skill tier above the recipe, ' +
-      mw.signedReagentPct +
-      ' for a signed reagent and ' +
-      mw.specializedPct +
-      ' for specialization. Higher-tier materials add a further 1 to 2 points. The final chance caps at ' +
+      '% chance. Then add these percentage points:\n' +
+      list([
+        `+${mw.perTierAbovePct} for each skill tier you are above the recipe.`,
+        `+${mw.signedReagentPct} for a signed reagent.`,
+        `+${mw.specializedPct} if you are specialized.`,
+        '+1 to 2 for higher-tier materials.',
+      ]) +
+      '\nThe chance can never go above ' +
       mw.capPct +
       '%.',
-    'A masterwork improves ordinary gear by one quality tier. An apex Masterwrought craft gains its first Perfecting rank instead. Tools, consumables and other statless outputs cannot become masterworks.',
+    'A masterwork makes normal gear one quality tier better. Top-tier (apex) Masterwrought gear gets its first Perfecting rank instead. Tools, consumables and other items without stats can never become masterworks.',
   );
   w.describe(
     'Crafting stations',
     `Stand within ${GUIDE_PROF_STATIONS.radius} yards to use a station.`,
-    'For a recipe taught by a master, speak to the master at the station and choose Training. A mobile station lets you craft eligible recipes in the field. To learn one from a master, visit the permanent station.',
+    'To learn a recipe from a master, talk to the master at the station and choose Training. A mobile station lets you craft some station recipes away from town. To learn a recipe from a master, you still have to visit the real station.',
     list(
       STATIONS.map(
         (s) =>
@@ -204,8 +207,10 @@ export function addTradeSkills(w: SystemWriter) {
   for (const p of GUIDE_PROF_GATHERING) {
     w.describe(
       p.name,
-      `${p.name} is a gathering profession. Its maximum proficiency is ${p.maxSkill}.`,
-      ...(p.respawnSeconds ? [`Nodes respawn after ${p.respawnSeconds} seconds.`] : []),
+      `${p.name} is a gathering profession. The highest proficiency (skill) you can reach is ${p.maxSkill}.`,
+      ...(p.respawnSeconds
+        ? [`After you gather a node, it comes back for you after ${p.respawnSeconds} seconds.`]
+        : []),
       heading(
         'Tools',
         list(
@@ -214,7 +219,7 @@ export function addTradeSkills(w: SystemWriter) {
               t.name +
               ', tier ' +
               t.tier +
-              (t.wieldProficiency ? `, requires proficiency ${t.wieldProficiency}` : '') +
+              (t.wieldProficiency ? `, needs proficiency ${t.wieldProficiency}` : '') +
               (t.priceCopper ? `, costs ${t.priceCopper} copper` : '') +
               (t.craftedBy ? `, crafted by ${t.craftedBy}` : '') +
               (t.priceMarks ? `, costs ${t.priceMarks} Delve Marks` : ''),
@@ -229,15 +234,15 @@ export function addTradeSkills(w: SystemWriter) {
                 p.nodes.map(
                   (n) =>
                     n.zone +
-                    ', ' +
+                    ': ' +
                     n.count +
                     ' tier ' +
                     n.tier +
-                    ' nodes yielding ' +
+                    ' nodes that give ' +
                     n.material +
-                    ' (tool tier ' +
+                    ' (needs a tier ' +
                     n.toolTier +
-                    ').',
+                    ' tool or better).',
                 ),
               ),
             ),
@@ -248,30 +253,30 @@ export function addTradeSkills(w: SystemWriter) {
       const f = p.fishing;
       w.describe(
         p.name,
-        'A bite takes ' +
+        'With a basic rod, a fish bites after ' +
           f.biteMinSec +
           ' to ' +
           f.biteMaxSec +
-          ' seconds with a basic rod. Reel in within ' +
+          ' seconds. After the bite, you have ' +
           f.reelWindowSec +
-          ' seconds of the bite. Each rod tier above the first cuts the maximum wait by ' +
+          ' seconds to reel it in. Each rod tier above the first makes the longest wait ' +
           f.rodBiteReductionSec +
-          ' seconds and increases the reel window by ' +
+          ' seconds shorter. It also gives you ' +
           f.reelRodBonusSec +
-          ' seconds before rarity bonuses. A session ends after ' +
+          ' more seconds to reel in. A rod of better rarity can add a little more time on top of that. Each cast ends after ' +
           f.sessionCapSec +
-          ' seconds.',
+          ' seconds at most.',
       );
       for (const band of f.bandTables) {
         w.describe(
           p.name,
           heading(
             `Band ${band.band}`,
-            'Requires proficiency ' +
+            'You need proficiency ' +
               band.minProficiency +
-              ' and rod tier ' +
+              ' and a rod of tier ' +
               band.rodTierRequired +
-              '.\n' +
+              ' or better.\n' +
               list(
                 band.zones.map(
                   (z) =>
@@ -293,26 +298,28 @@ export function addTradeSkills(w: SystemWriter) {
       'Crop',
       'Plant ' +
         item(crop.seedItemId) +
-        ' at farming skill ' +
+        ' once your farming skill is ' +
         skill +
-        ' or higher. The crop grows for ' +
+        ' or higher. The crop takes ' +
         crop.durationMs / 60000 +
-        ' minutes, including time spent offline. A successful harvest gives ' +
+        ' minutes to grow, and it keeps growing while you are logged off. If it survives, you get ' +
         item(crop.produceItemId) +
-        ' or the fine grade, ' +
+        ', or the better fine grade, ' +
         item(crop.fineProduceItemId) +
         '.',
-      'Without compost or a watch, survival rises linearly from ' +
+      'Without compost or a watch, the chance that the crop survives is ' +
         percent(farmSurvivalChance(skill, crop.tier, false, false)) +
         ' at skill ' +
         skill +
-        ' to 100% at skill ' +
+        '. The chance goes up evenly with your skill, until it reaches 100% at skill ' +
         (skill + FARM_SURVIVAL_BAND_SPAN) +
-        '. At the gate compost alone gives ' +
+        '. At skill ' +
+        skill +
+        ', compost alone makes it ' +
         percent(farmSurvivalChance(skill, crop.tier, true, false)) +
-        ' and a watch alone gives ' +
+        ' and a watch alone makes it ' +
         percent(farmSurvivalChance(skill, crop.tier, false, true)) +
-        '. They stack up to 100%.',
+        '. Using both adds their bonuses together, up to 100%.',
     );
   }
   const statNames: Record<string, string> = {
@@ -327,26 +334,26 @@ export function addTradeSkills(w: SystemWriter) {
       'Equipment enchants',
       e.name,
       'Enchant',
-      'Apply to ' +
+      'Put this on ' +
         words(e.itemSlot) +
         (e.weaponHand ? ' (two-handed weapons only)' : '') +
         '. ' +
         (e.skillReq
-          ? `The enchanter needs skill ${e.skillReq}. `
-          : 'Any skill level can apply it. ') +
-        (e.requiresPerfected ? 'The target item must be Perfected. ' : '') +
-        (e.acquisition ? 'Learn the formula first.' : 'Known automatically.'),
+          ? `You need Enchanting skill ${e.skillReq}. `
+          : 'You can apply it at any skill level. ') +
+        (e.requiresPerfected ? 'The item must be Perfected. ' : '') +
+        (e.acquisition ? 'Learn the formula first.' : 'You know it automatically.'),
       e.description ?? '',
       list(
         Object.entries(e.statBonus).map(([stat, v]) => `+${v} ${statNames[stat] ?? words(stat)}`),
       ),
       ...(e.weaponProc
         ? [
-            'On eligible melee hits, triggers at ' +
+            'Each melee hit that lands with the enchanted weapon can trigger it. On average, it triggers ' +
               e.weaponProc.ppm +
-              ' procs per minute on average. The buff lasts ' +
+              ' times per minute. The buff lasts ' +
               e.weaponProc.duration +
-              ' seconds.',
+              ' seconds. A new trigger restarts the timer. The buff does not stack, even with two enchanted weapons.',
           ]
         : []),
       heading('Reagents', reagents(e.reagents)),
@@ -355,7 +362,7 @@ export function addTradeSkills(w: SystemWriter) {
   const orders = GUIDE_PROF_ECONOMY.workOrders;
   w.describe(
     'Profession work orders',
-    `You can repeat each station master's order ${orders.cadenceMinutes} minutes after completing it.`,
+    `You can do each station master's order again ${orders.cadenceMinutes} minutes after you finish it.`,
   );
   for (const o of orders.orders) {
     const quest = QUESTS[o.id];
@@ -363,7 +370,7 @@ export function addTradeSkills(w: SystemWriter) {
       'Profession work orders',
       o.name,
       'Work order',
-      'Deliver ' +
+      'Bring ' +
         o.count +
         ' x ' +
         o.material +
@@ -378,9 +385,9 @@ export function addTradeSkills(w: SystemWriter) {
         ' quest XP.',
       'Talk to ' +
         w.entity('npc', quest.giverNpcId, o.master) +
-        ', accept the work order and return with the full quantity. See ' +
+        ' and accept the work order. Come back when you have all of it. See ' +
         w.entity('quest', quest.id, quest.name) +
-        ' for the quest route and hand-in.',
+        ' for the route and where to hand it in.',
     );
   }
 }

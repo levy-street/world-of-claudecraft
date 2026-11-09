@@ -41,26 +41,22 @@ const farm: SystemRoute = {
     pin('Reward', bed, 'Pick the produce at this bed'),
   ],
   notes: [
-    'This example marks one Eastbrook bed. If it is occupied, use another free bed and collect from the one you planted. You can check the journal anywhere while the crop grows.',
+    'This example marks one Eastbrook bed. If someone is using it, plant in another empty bed, and pick from the bed you planted. You can check the journal anywhere while the crop grows.',
   ],
 };
 
 export const tradeRoutes: Record<string, SystemRoute> = {
   'Harvesting and gathering': {
     points: [
-      npcPin(
-        'Start',
-        'trader_wilkes',
-        'buy a Field Kit for a corpse or a tool for a gathering node',
-      ),
-      pin(1, wolfCamp.center, 'Example corpse: defeat a Forest Wolf in this camp', wolfCamp.radius),
-      pin(2, wolfCamp.center, 'At the body, choose your material preference and Harvest'),
-      pin('Reward', wolfCamp.center, 'Corpse route: collect the materials where the wolf fell'),
-      pin(3, firstOre.pos, 'Alternative node route: use a mining pick on this ore vein'),
-      pin('Reward', firstOre.pos, 'Node route: receive the ore here when the cast finishes'),
+      npcPin('Start', 'trader_wilkes', 'buy a Field Kit for bodies, or a tool for gathering nodes'),
+      pin(1, wolfCamp.center, 'Example body: defeat a Forest Wolf in this camp', wolfCamp.radius),
+      pin(2, wolfCamp.center, 'At the body, pick which materials you want and Harvest'),
+      pin('Reward', wolfCamp.center, 'Body route: collect the materials where the wolf fell'),
+      pin(3, firstOre.pos, 'Or, node route: use a mining pick on this ore vein'),
+      pin('Reward', firstOre.pos, 'Node route: you get the ore here when the cast finishes'),
     ],
     notes: [
-      'The wolf pin marks a camp. The exact corpse location depends on where you fight. The ore vein is an alternative gathering activity, not a required stop after harvesting a corpse.',
+      'The wolf pin marks a camp. The body ends up wherever you fight. The ore vein is a different way to gather. You do not have to go there after harvesting a body.',
     ],
   },
   Fishing: {
@@ -69,10 +65,10 @@ export const tradeRoutes: Record<string, SystemRoute> = {
       pin(1, shore, 'Stand on this shore and use the pole'),
       pin(2, shore, 'Reel in at the bite'),
       pin(3, shore, 'Cast again here for another attempt'),
-      pin('Reward', shore, 'The catch goes into your bags here if the reel succeeds'),
+      pin('Reward', shore, 'If you reel in a catch, it goes into your bags here'),
     ],
     notes: [
-      `Face the centre of Mirror Lake at x ${LAKE.x}, z ${LAKE.z} from the shore pin. You stay on land to cast and reel.`,
+      `From the shore pin, face the middle of Mirror Lake at x ${LAKE.x}, z ${LAKE.z}. You stay on land to cast and reel in.`,
     ],
   },
   Farming: {
@@ -83,7 +79,7 @@ export const tradeRoutes: Record<string, SystemRoute> = {
       pin('Reward', bed, 'Harvest the produce here'),
     ],
     notes: [
-      'Step 2 is a journal check. Open it anywhere. The pin shows one starting bed; if you plant in a different bed, harvest there instead. First Furrow has its own quest hand-in with Farmer Jessica.',
+      'Step 2 is checking the journal, which you can open anywhere. The pin shows one starting bed. If you plant in a different bed, harvest there instead. You hand in First Furrow to Farmer Jessica.',
     ],
   },
   'Farm crops': farm,
@@ -92,31 +88,35 @@ export const tradeRoutes: Record<string, SystemRoute> = {
       npcPin('Start', 'foreman_odell', 'accept A Trade for Every Hand'),
       ...veins.map((v) => pin(1, v.pos, 'Copper Dig: mine an ore vein here for the quest')),
       npcPin(1, 'foreman_odell', 'return after five ore harvests'),
-      npcPin('Reward', 'foreman_odell', 'Collect the introductory quest reward here'),
+      npcPin('Reward', 'foreman_odell', 'Get the first quest’s reward here'),
       npcPin(2, forge.masterNpcId, 'Example crafting trainer: speak to Forgemistress Darva'),
       forgePin(3, 'create the selected forge recipe'),
       forgePin('Reward', 'the completed craft is added to your bags here'),
     ],
     notes: [
-      'The ore pins are choices, not an ordered circuit. The quest counts successful harvests. The forge is a separate example for the crafting steps. Other crafts use their own station or can be done in the field.',
+      'You can mine at any of the ore pins, in any order. The quest counts each time you mine ore. The forge is a separate example for the crafting steps. Other crafts use their own station, or can be done anywhere.',
     ],
   },
   'Crafting recipes': {
     points: [
-      npcPin('Start', forge.masterNpcId, 'start here if the selected forge recipe needs training'),
+      npcPin(
+        'Start',
+        forge.masterNpcId,
+        'start here if your forge recipe must be learned from a trainer',
+      ),
       npcPin(1, forge.masterNpcId, 'Open Training and learn the forge recipe'),
-      forgePin(2, 'stay in range with the listed ingredients'),
+      forgePin(2, 'stay close with the listed materials'),
       forgePin(3, 'choose Create or Create All'),
-      forgePin('Reward', 'receive the crafted output at the end of the cast'),
+      forgePin('Reward', 'you get the crafted item when the cast ends'),
     ],
     notes: [
-      'Example for a forge recipe. You may open the recipe list anywhere. Field recipes need no fixed bench. Follow your recipe page for its actual ingredients, training and station.',
+      'This is an example for a forge recipe. You can open the recipe list anywhere. Field recipes do not need a bench. Your recipe’s page shows its real materials, training and station.',
     ],
   },
   'Crafting stations': {
     points: [
       npcPin('Start', forge.masterNpcId, 'Eastbrook forge master'),
-      pin(1, forge.pos, 'Eastbrook forge: enter station range', STATION_RADIUS),
+      pin(1, forge.pos, 'Eastbrook forge: get close enough to use it', STATION_RADIUS),
       npcPin(2, forge.masterNpcId, 'Open Training here to learn a forge recipe'),
       forgePin(3, 'select the known recipe and create it'),
       forgePin('Reward', 'the output goes into your bags when the cast finishes'),
@@ -125,7 +125,7 @@ export const tradeRoutes: Record<string, SystemRoute> = {
       ),
     ],
     notes: [
-      'The numbered walkthrough uses the Eastbrook forge. Other station pins identify alternative destinations for different recipes. Each town station works within the same range.',
+      'The numbered steps use the Eastbrook forge. The other station pins show where to go for other kinds of recipes. You use every town station from the same distance.',
     ],
   },
   'Profession work orders': {
@@ -136,11 +136,11 @@ export const tradeRoutes: Record<string, SystemRoute> = {
       npcPin(
         'Reward',
         forge.masterNpcId,
-        'Return with eight Copper Ore and complete the quest for coin and XP',
+        'Come back with eight Copper Ore and complete the quest for coin and XP',
       ),
     ],
     notes: [
-      'Forge Work Order example. You can supply ore you already own or buy it instead. Step 3 is a personal repeat timer after delivery. For another order, use its quest page and the indicated master.',
+      'This is the Forge Work Order example. You can bring ore you already have, or buy it. Step 3 is the wait before you can take the order again. Only your own wait counts. For another order, use its quest page and the master it names.',
     ],
   },
   'Masterwork crafting': {
@@ -148,14 +148,14 @@ export const tradeRoutes: Record<string, SystemRoute> = {
       npcPin(
         'Start',
         forge.masterNpcId,
-        'Forge example: find the master here if your recipe needs training',
+        'Forge example: find the master here if your recipe must be learned from a trainer',
       ),
-      forgePin(1, 'choose an eligible stat-bearing equipment recipe and Create'),
-      forgePin(2, 'finish the cast; masterwork is checked automatically'),
-      forgePin('Reward', 'receive the equipment here and inspect it in your bags'),
+      forgePin(1, 'pick an equipment recipe that has stats and choose Create'),
+      forgePin(2, 'finish the cast; the game checks for a masterwork by itself'),
+      forgePin('Reward', 'you get the equipment here; look at it in your bags'),
     ],
     notes: [
-      'The pin is an example for a forge recipe. Follow the station requirement on your equipment recipe. Step 3 is an inspection in your bags and can be done anywhere.',
+      'The pin is an example for a forge recipe. Use the station your equipment recipe names. Step 3 is just looking at the item in your bags, which you can do anywhere.',
     ],
   },
   Enchanting: {
@@ -168,19 +168,23 @@ export const tradeRoutes: Record<string, SystemRoute> = {
       'Inspect the enchanted item in your bags',
     ],
     notes: [
-      'Start with the eligible item in your bags wherever you are. Steps 1 and 2 are bag actions. Disenchant gives reagents immediately; Apply Enchant puts the effect directly on the target item. There is no reward chest or NPC. For the optional crafted charm in step 3, follow its recipe to the specified station.',
+      'Start with the item in your bags, wherever you are. You do steps 1 and 2 from your bags. Disenchant gives reagents right away. Apply Enchant puts the effect straight onto the item. There is no NPC or chest to visit. In step 3, crafting a charm is optional; its recipe tells you which station to use.',
     ],
   },
   'Vendors and currencies': {
     points: [
-      npcPin('Start', 'trader_wilkes', 'ordinary purchase example'),
+      npcPin('Start', 'trader_wilkes', 'example of normal shopping'),
       npcPin(1, 'trader_wilkes', 'Open the shop and check the price'),
       npcPin(2, 'trader_wilkes', 'Buy the Field Kit here'),
-      npcPin(3, 'trader_wilkes', 'Use the open vendor window to sell or buy back'),
-      npcPin('Reward', 'trader_wilkes', 'Your purchase or sale proceeds go to the character here'),
+      npcPin(3, 'trader_wilkes', 'With the shop open, sell items or buy them back'),
+      npcPin(
+        'Reward',
+        'trader_wilkes',
+        'What you buy, or the coin from what you sell, goes to you here',
+      ),
     ],
     notes: [
-      'The map shows the 20-copper Field Kit example. Follow the Honor and Warfare gear route for the Honor quartermasters instead.',
+      'The map shows the example of buying a Field Kit for 20 copper. For the Honor quartermasters, follow the Honor and Warfare gear route instead.',
     ],
   },
   Trading: {
@@ -190,10 +194,10 @@ export const tradeRoutes: Record<string, SystemRoute> = {
       'Choose Trade and accept the invitation',
       'Set both offers',
       'Both choose Accept Trade',
-      'Items and coin transfer directly to the two players',
+      'The items and coin go straight to the two players',
     ],
     notes: [
-      'The meeting point is wherever the two players agree. Start and steps 1 to 3 take place within 10 yards of one another. Both players receive their agreed items or coin when both accept the final offer. No vendor or collection trip is involved.',
+      'You can meet anywhere the two of you agree on. For the start and steps 1 to 3, stay within 10 yards of each other. When both players accept the final offer, both get the items or coin they agreed on. You do not need to visit a vendor or pick anything up.',
     ],
   },
   'World Market': {
@@ -202,10 +206,10 @@ export const tradeRoutes: Record<string, SystemRoute> = {
       npcPin(1, id, 'Browse and buy at this keeper'),
       npcPin(2, id, 'List a stack for sale here'),
       npcPin(3, id, 'Open Collect at either market keeper'),
-      npcPin('Reward', id, 'Buyers receive goods; sellers collect proceeds or returned goods'),
+      npcPin('Reward', id, 'Buyers get items; sellers collect coin or items returned to them'),
     ]),
     notes: [
-      'The two keepers are interchangeable. Choose either one to buy, list or collect. You do not need to visit both.',
+      'Both market keepers work the same way. Use either one to buy, sell or collect. You do not need to visit both.',
     ],
   },
   Mail: {
@@ -213,7 +217,7 @@ export const tradeRoutes: Record<string, SystemRoute> = {
       pin('Start', eastbrookMailbox, 'Eastbrook Ravenpost mailbox'),
       pin(1, eastbrookMailbox, 'Sender: open Send and enter the recipient'),
       pin(2, eastbrookMailbox, 'Sender: attach goods or coin and send the letter'),
-      pin(3, eastbrookMailbox, 'Recipient: open Inbox and read the delivered letter'),
+      pin(3, eastbrookMailbox, 'Recipient: open Inbox and read the letter'),
       pin(
         'Reward',
         eastbrookMailbox,
@@ -221,7 +225,7 @@ export const tradeRoutes: Record<string, SystemRoute> = {
       ),
     ],
     notes: [
-      'The map shows the Eastbrook example for both players. The sender and recipient may use different mailboxes. The mailbox list below gives the other locations.',
+      'The map shows the Eastbrook mailbox as the example for both players. The sender and the recipient can use different mailboxes. The mailbox list below shows where the others are.',
     ],
   },
   Banking: {
@@ -230,25 +234,25 @@ export const tradeRoutes: Record<string, SystemRoute> = {
       bank(1, 'choose Personal'),
       bank(2, 'deposit or withdraw items'),
       bank(3, 'buy a storage expansion if wanted'),
-      bank('Reward', 'withdrawn goods go to your bags; a bought expansion appears in the bank'),
+      bank('Reward', 'items you take out go to your bags; space you buy shows up in the bank'),
     ],
     notes: [
-      'Eastbrook branch example. You can access the same personal storage at another banker.',
+      'This uses the Eastbrook banker as the example. You can reach the same bank space at any other banker.',
     ],
   },
   'Bank courier': {
     points: [
-      bank('Start', 'optional stop to unlock the Materials Vault before using that destination'),
+      bank('Start', 'optional: unlock the Materials Vault here before sending things there'),
     ],
     flow: [
-      'Summon Courier at your open-world location',
+      'Summon Courier where you are in the open world',
       'Choose the destination and cargo',
       'Send courier',
       'Stay online for return travel',
       'Collect the returned items in bags or overflow',
     ],
     notes: [
-      'The banker pin is optional. Summon the courier at your own open-world position to start a normal delivery. Select the cargo there, send it and stay logged in. On its return, goods enter your bags or overflow at your character, so the travel and payout have no fixed map coordinates.',
+      'You do not have to visit the banker pin. For a normal trip, summon the courier wherever you are in the open world. Pick the cargo there, send it, and stay logged in. When it comes back, the items go into your bags, or into overflow. This happens wherever you are, so there is no fixed spot on the map.',
     ],
   },
   'Materials Vault': {
@@ -257,13 +261,10 @@ export const tradeRoutes: Record<string, SystemRoute> = {
       bank(1, 'unlock the vault'),
       bank(2, 'deposit or withdraw materials'),
       bank(3, 'buy the next capacity increase'),
-      bank(
-        'Reward',
-        'withdrawn materials enter your bags; purchased capacity applies to the vault',
-      ),
+      bank('Reward', 'materials you take out go to your bags; space you buy is added to the vault'),
     ],
     notes: [
-      'Eastbrook branch example. Once unlocked, the same vault can be accessed from any banker.',
+      'This uses the Eastbrook banker as the example. Once it is unlocked, you can reach the same vault from any banker.',
     ],
   },
 };
@@ -277,17 +278,17 @@ for (const craft of GUIDE_PROF_CRAFTS.filter((c) => c.name !== 'Enchanting')) {
   tradeRoutes[craft.name] = {
     points: [
       npcPin('Start', station.masterNpcId),
-      npcPin(1, station.masterNpcId, `Learn ${recipe.name} from the resident master`),
+      npcPin(1, station.masterNpcId, `Learn ${recipe.name} from the master here`),
       pin(2, station.pos, `Use the ${station.type} with the listed ingredients`, STATION_RADIUS),
       pin(3, station.pos, `Choose Create for ${recipe.name}`),
       pin(
         'Reward',
         station.pos,
-        `Receive ${recipe.output.count} x ${recipe.output.name} when the cast finishes`,
+        `You get ${recipe.output.count} x ${recipe.output.name} when the cast finishes`,
       ),
     ],
     notes: [
-      'This route matches the first recipe in the walkthrough. Obtain its ingredients before arriving. Other recipes can have different requirements.',
+      'This route follows the first recipe in the steps above. Get its materials before you go. Other recipes can need different things.',
     ],
   };
 }
@@ -302,11 +303,11 @@ for (const [trade, type, tool, target] of [
     points: [
       npcPin('Start', 'trader_wilkes', 'buy the ' + tool),
       pin(1, node.pos, 'Click this tier 1 ' + target),
-      pin(2, node.pos, 'Remain here until the cast finishes'),
-      pin('Reward', node.pos, 'Receive the materials at this node'),
+      pin(2, node.pos, 'Stay here until the cast finishes'),
+      pin('Reward', node.pos, 'You get the materials at this node'),
     ],
     notes: [
-      'The pin shows the first Eastbrook node from the walkthrough. Step 3 is ongoing progression: use the tables below to choose a later zone and tool tier.',
+      'The pin shows the first Eastbrook node from the steps above. Step 3 is something you keep doing as you get better: use the tables below to pick a later zone and tool tier.',
     ],
   };
 }

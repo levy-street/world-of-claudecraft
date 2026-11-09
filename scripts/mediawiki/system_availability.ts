@@ -5,11 +5,14 @@ import { DEFAULT_SEASONAL_WINDOWS } from '../../server/seasonal_calendar';
 const retired = new Map<string, string>([
   [
     'Protect Yumi',
-    'The PvP menu no longer offers either team size, and offline practice is closed.',
+    'The PvP menu no longer offers either team size. You cannot practice it offline anymore either.',
   ],
-  ['Fiesta arena', 'Fiesta is closed to new matches. Its 2v2 queue and offline practice are gone.'],
-  ['Fiesta augments', 'These upgrades were available only during a [[Fiesta arena|Fiesta match]].'],
-  ['Fiesta power-ups', 'These pickups appeared only during a [[Fiesta arena|Fiesta match]].'],
+  [
+    'Fiesta arena',
+    'You can no longer start a Fiesta match. Its 2v2 queue and offline practice are gone.',
+  ],
+  ['Fiesta augments', 'You could only get these upgrades during a [[Fiesta arena|Fiesta match]].'],
+  ['Fiesta power-ups', 'These pickups only showed up during a [[Fiesta arena|Fiesta match]].'],
   [
     'Vale Cup',
     'The Sowfield in Eastbrook was removed. Players can no longer enter a Vale Cup match or earn its deeds.',
@@ -20,7 +23,7 @@ export function activityNotice(owner: string): string {
   const reason = retired.get(owner);
   if (reason) return "'''Retired.''' " + reason;
   if (owner === 'Mount racing')
-    return "'''Retired from live play.''' Mount racing is no longer offered as a live activity. The game still contains the solo jumping course used by the Galecrest riding lesson.";
+    return "'''Retired from live play.''' You can no longer join Mount racing. The game still has the solo jumping course that the Galecrest riding lesson uses.";
   if (owner === 'Gourdlight Eve') {
     const utc = new Intl.DateTimeFormat('en-GB', {
       timeZone: 'UTC',
@@ -29,10 +32,10 @@ export function activityNotice(owner: string): string {
     });
     const windows = DEFAULT_SEASONAL_WINDOWS.filter((s) => s.eventId === 'gourdlight_eve');
     return [
-      "'''Seasonal event.''' Gourdlight Eve activities appear only while the event is active on your realm.",
+      "'''Seasonal event.''' Gourdlight Eve activities only appear while the event is running on your realm.",
       ...windows.map(
         (s) =>
-          `The default event window runs from ${utc.format(s.startMs)} to ${utc.format(s.endMs)} UTC. Realm operators can change these dates.`,
+          `The default event window runs from ${utc.format(s.startMs)} to ${utc.format(s.endMs)} UTC. The people who run a realm can change these dates.`,
       ),
     ].join(' ');
   }

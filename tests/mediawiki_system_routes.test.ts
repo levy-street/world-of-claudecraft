@@ -14,7 +14,7 @@ describe('system guide navigation', () => {
     );
     expect(contract.points.some((p) => p.frame !== 'Overworld' && p.step === 2)).toBe(true);
     const map = systemRouteMap('Guild contracts', '');
-    expect(map).toContain('R = reward or arrival');
+    expect(map).toContain('R marks where you get your reward or arrive');
     expect(map).toContain('only when your contract');
   });
   it('distinguishes geography-free activities from retired content', () => {

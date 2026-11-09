@@ -70,7 +70,7 @@ import { questMap, type RoutePoint } from './quest_map';
 export function worldRouteData(quest: WorldQuestDef) {
   const obj = quest.objective;
   const points: RoutePoint[] = [
-    { step: 'Start', frame: 'Overworld', label: 'Enter the active quest area', ...quest.area },
+    { step: 'Start', frame: 'Overworld', label: 'Walk into the active quest area', ...quest.area },
   ];
   const instructions: string[] = [];
   const alternatives: string[] = [];
@@ -87,9 +87,7 @@ export function worldRouteData(quest: WorldQuestDef) {
   if ('instructorNpcId' in obj) {
     const npc = NPCS[obj.instructorNpcId];
     point(npc.name, npc.pos);
-    instructions.push(
-      'Speak with ' + npc.name + ' at ' + coords(npc.pos) + ' to start the activity.',
-    );
+    instructions.push('Talk to ' + npc.name + ' at ' + coords(npc.pos) + ' to start the activity.');
   }
   switch (obj.type) {
     case 'kill':
@@ -98,7 +96,7 @@ export function worldRouteData(quest: WorldQuestDef) {
           quest.count +
           ' ' +
           MOBS[obj.targetMobId].name +
-          ' while both you and the enemy are inside the marked area. You must receive kill credit. A released group member is checked at their corpse. Camp pins show possible spawns.',
+          '. You and the enemy must both be inside the marked area. You must get credit for the kill. If a group member has died and released their spirit, the game checks where their body is. Camp pins show where the enemies can appear.',
       );
       for (const c of BUILTIN_WORLD.camps)
         if (
@@ -112,7 +110,7 @@ export function worldRouteData(quest: WorldQuestDef) {
       objects(obj.pickupObjectItemId, 1);
       objects(obj.deliveryObjectItemId, 2);
       instructions.push(
-        'Pick up cargo at marker 1, carry it to marker 2, then interact to unload. Each pickup location counts once. Cargo slows movement by 25% and is lost on death, disconnect or leaving the area. Repeat with different pickups until you have delivered ' +
+        'Pick up cargo at marker 1. Carry it to marker 2, then interact to unload it. Each pickup spot only counts once. Cargo makes you move 25% slower. You lose it if you die, disconnect or leave the area. Keep going with different pickup spots until you have delivered ' +
           quest.count +
           '.',
       );
@@ -124,7 +122,7 @@ export function worldRouteData(quest: WorldQuestDef) {
       instructions.push(
         'Gather from ' +
           obj.nodeType +
-          ' nodes inside the area until the counter reaches ' +
+          ' nodes inside the area until the counter gets to ' +
           quest.count +
           '.',
       );
@@ -132,20 +130,18 @@ export function worldRouteData(quest: WorldQuestDef) {
     case 'interact':
       objects(obj.targetObjectItemId, 1);
       instructions.push(
-        'Interact with the marked objects inside the ring until you reach ' +
-          quest.count +
-          ' credits.',
+        'Use the marked objects inside the ring until you have ' + quest.count + ' credits.',
       );
       break;
     case 'salvage':
       instructions.push(
         'Recover ' +
           quest.count +
-          ' different pieces from the visible arrangement around the shipwreck. Each location counts once. After ' +
+          ' different pieces from around the shipwreck. Only one arrangement of pieces is out each week, so collect the ones you can see. Each spot only counts once. After ' +
           FARSHORE_SALVAGE_AMBUSH.triggerCount +
-          ' pickups, the optional raider ambush can open at ' +
+          ' pickups, an optional raider ambush can open at ' +
           coords(FARSHORE_SALVAGE_AMBUSH.portal) +
-          '. The collection counter is separate from the ambush.',
+          '. The ambush does not change your piece counter.',
       );
       obj.layouts.forEach((ids, index) => {
         const locations = ids.map(
@@ -184,11 +180,11 @@ export function worldRouteData(quest: WorldQuestDef) {
         );
       });
       instructions.push(
-        'Interact with the caravan to set it moving. Follow it along the numbered waypoints. Keep it alive through ' +
+        'Use the caravan to start it moving. Follow it along the numbered waypoints. Keep it alive through ' +
           escort.ambushes.length +
-          ' ambushes and stay alive within ' +
+          ' ambushes. At the final waypoint, you must be alive and within ' +
           escort.creditRadius +
-          ' yd at the final waypoint for credit.',
+          ' yd of it to get credit.',
       );
       break;
     }
@@ -201,11 +197,11 @@ export function worldRouteData(quest: WorldQuestDef) {
         2,
       );
       instructions.push(
-        'Board the cannon and aim ahead of the incoming enemies. Hold the line through ' +
+        'Climb into the cannon. Aim a little ahead of the enemies coming toward you, because shots take time to land. Hold the line through ' +
           CANNON_WAVES.length +
-          ' waves, kill the final commander (' +
+          ' waves. Then kill the final commander (' +
           CANNON_ENEMIES.commander.hp +
-          ' health) and finish with integrity above zero. Letting the commander through fails the encounter even if the wall survives. Endless waves start after the reward.',
+          ' health). The wall’s integrity must still be above zero at the end. If the commander gets through, you fail, even if the wall is still standing. After you get the reward, endless waves begin.',
       );
       for (const [action, shot] of Object.entries(CANNON_ACTIONS))
         instructions.push(
@@ -213,11 +209,11 @@ export function worldRouteData(quest: WorldQuestDef) {
             action.slice(1) +
             ' deals ' +
             shot.damage +
-            ' base damage within ' +
+            ' base damage to enemies within ' +
             shot.radius +
-            ' yd after ' +
+            ' yd. It lands after ' +
             shot.flightTicks / TICK_RATE +
-            ' sec. It recharges in ' +
+            ' sec. It is ready again after ' +
             shot.cooldownTicks / TICK_RATE +
             ' sec.' +
             (shot.slowTicks
@@ -242,9 +238,9 @@ export function worldRouteData(quest: WorldQuestDef) {
       for (const n of INVESTIGATION_NPCS.slice(1)) point(n.name, n.pos, 2);
       point('Make your accusation to ' + INVESTIGATION_NPCS[0].name, INVESTIGATION_NPCS[0].pos, 3);
       instructions.push(
-        'Read both the Standing Orders and Watch Ledger, then speak with all four suspects. Return to ' +
+        'Read both the Standing Orders and the Watch Ledger. Then talk to all four suspects. Go back to ' +
           INVESTIGATION_NPCS[0].name +
-          ' to accuse the guard whose statement conflicts with the evidence. A wrong guess rules that guard out. Defeat your own revealed infiltrator within 180 sec while you and the target are inside the objective area.',
+          ' and blame the guard whose story does not match the clues. If you guess wrong, that guard is crossed off the list. Then defeat your own unmasked spy (infiltrator) within 180 sec. You and the spy must both be inside the quest area.',
       );
       for (const v of INVESTIGATION_VARIANTS)
         alternatives.push(
@@ -260,15 +256,15 @@ export function worldRouteData(quest: WorldQuestDef) {
       instructions.push(
         'Interact with the board to start the ' +
           WORLD_QUEST_LEY_TIMER_SECONDS +
-          ' sec timer. Each press rotates one tile clockwise a quarter turn. Connect the source through adjoining tiles so the beam exits the marked side of the target tile. If time expires, restart the board. Solving the base board pays the quest. Charged bonus boards are optional.',
+          ' sec timer. Each press turns one tile a quarter turn clockwise. Link the source through tiles that touch, so the beam leaves the target tile on its marked side. If time runs out, start the board again. Solving the first board finishes the quest. The charged bonus boards after it are optional.',
       );
       break;
     case 'match3':
       objects(obj.activationObjectItemId, 1);
       instructions.push(
-        'Open the confection board and swap two pieces next to one another horizontally or vertically. Make a straight line of three or more matching pieces. Each cleared piece, including cascades, counts toward the ' +
+        'Open the sweets board. Swap two pieces that sit side by side or one above the other. Make a straight line of three or more matching pieces. Every piece you clear counts toward the ' +
           quest.count +
-          ' required. Only an accepted swap uses a move. If the daily move limit runs out, restart the board: this resets its tiles, moves and cleared-piece count.',
+          ' you need. This includes pieces cleared by a chain reaction (cascade). A move is only used when the swap works. If you run out of moves for the day, restart the board. Restarting resets its tiles, your moves and your cleared-piece count.',
       );
       break;
     case 'forging':
@@ -276,35 +272,35 @@ export function worldRouteData(quest: WorldQuestDef) {
         if (station.id === 'tools' || station.id === 'fuel')
           point(station.name, station, station.id === 'fuel' ? 2 : 3);
       instructions.push(
-        'Stoke the firewood and strike the anvil ' +
+        'Feed the fire with firewood and strike the anvil ' +
           FORGE_STRIKES +
-          ' times while the moving needle is in the target band and heat is at least ' +
+          ' times. Each strike must happen while the moving needle is in the target band and the heat is at least ' +
           FORGE_HEAT_FLOOR +
           '. Firewood adds ' +
           FORGE_STOKE_HEAT +
-          ' heat, up to 100, every ' +
+          ' heat, up to 100. You can add firewood once every ' +
           FORGE_STOKE_COOLDOWN +
           ' sec. Heat falls by ' +
           FORGE_HEAT_DECAY +
-          ' per sec. The ingot crate and well are scenery.',
+          ' each second. The ingot crate and the well are just for show.',
       );
       instructions.push(
-        'A cold or mistimed strike counts as one mistake. ' +
+        'A strike that is too cold or at the wrong time counts as one mistake. ' +
           FORGE_MAX_MISTAKES +
-          ' mistakes end the run. For medals, add ' +
+          ' mistakes end the run. For medals, ' +
           FORGE_WRONG_PENALTY +
-          ' sec per mistake to elapsed time. Gold requires at most ' +
+          ' sec is added to your time for each mistake. Gold needs a time of ' +
           FORGE_GOLD_SECONDS +
-          ' sec, Silver at most ' +
+          ' sec or less, and Silver needs ' +
           FORGE_SILVER_SECONDS +
-          ' sec. Any successful run earns credit.',
+          ' sec or less. Any successful run earns credit, with or without a medal.',
       );
       break;
     case 'glider': {
       point('Launch position', GLIDER_LAUNCH_SITE.playerLaunch);
       const names = ['Windrider Slalom', 'Valleys', 'Switchbacks'];
       instructions.push(
-        'Choose one course and wait for the countdown. Fly through its rings in the listed order. Descend onto the landing pad within its radius and within 3 yd of the ground before time runs out. Only a winning flight on an active, unpaid quest grants the reward. Later flights are practice.',
+        'Pick one course and wait for the countdown. Fly through its rings in the order listed. Before time runs out, glide down onto the landing pad. You must be inside the pad’s circle and within 3 yd of the ground. You only get the reward for a winning flight while the quest is active and you have not been paid for it yet. Flights after that are just practice.',
       );
       GLIDER_COURSES.forEach((course, i) => {
         const pad = course.landingPad;
@@ -312,13 +308,13 @@ export function worldRouteData(quest: WorldQuestDef) {
           names[i] +
             ' · ' +
             course.minRings +
-            ' required rings. Gold ' +
+            ' rings needed. Gold ' +
             course.medals?.goldSeconds +
             ' sec, Silver ' +
             course.medals?.silverSeconds +
             ' sec, timeout ' +
             course.medals?.timeoutSeconds +
-            ' sec. The course map lists ring heights beside their ground coordinates.',
+            ' sec. The course map shows how high each ring is, next to its spot on the ground.',
         );
         const rings: RoutePoint[] = course.rings.map((r) => ({
           step: r.id,
@@ -363,14 +359,14 @@ export function worldRouteData(quest: WorldQuestDef) {
     }
     case 'tracing': {
       instructions.push(
-        'Talk to the instructor to start each round. Memorize the preview, move to the starting mark, then walk its connected edges clockwise or counterclockwise and return to the start. Keep within ' +
+        'Talk to the instructor to start each round. Remember the shape you are shown. Go to the starting mark. Then walk along the lines of the shape, either way around, and come back to the start. Stay within ' +
           WORLD_QUEST_TRACE_TOLERANCE +
-          ' yd of each edge. Combat or leaving the ground can fail the run. Each drawing allows ' +
+          ' yd of each line. Fighting or leaving the ground can make you fail. You have ' +
           WORLD_QUEST_TRACE_RUN_SECONDS +
-          ' sec.',
+          ' sec for each drawing.',
       );
       instructions.push(
-        'Complete the triangle, then the square, then the assigned advanced figure. The last figure varies by student and rotation. Completing all three strokes earns credit regardless of medal.',
+        'Draw the triangle, then the square, then the harder shape you are given. The last shape depends on the student and the quest rotation. Finishing all three shapes earns credit, with or without a medal.',
       );
       for (const shape of [
         ...obj.shapes.slice(0, -1),
@@ -382,11 +378,11 @@ export function worldRouteData(quest: WorldQuestDef) {
     }
     case 'shadow': {
       instructions.push(
-        'Borrow the cloak. Approach a dispatch carrier from behind, within 2.5 yd. At under ' +
+        'Borrow the cloak. Sneak up behind a dispatch carrier, within 2.5 yd. When you are under ' +
           100 * SHADOW_STEAL_SUSPICION_LIMIT +
-          '% suspicion, use Pickpocket and stay still for 1 sec out of lantern beams. Each carrier gives one dispatch. Collect ' +
+          '% suspicion, use Pickpocket. Then stay still for 1 sec, out of the lantern beams. Each carrier gives one dispatch. Collect ' +
           quest.count +
-          ' different dispatches. If caught, return to the scout from the safe spot and re-cloak.',
+          ' different dispatches. If you are caught, go from the safe spot back to the scout and put the cloak on again.',
       );
       for (const g of SHADOW_GUARDS)
         if (!g.sentry) point('Dispatch carrier ' + coords(g.npc.pos), g.npc.pos, 2);
@@ -396,20 +392,20 @@ export function worldRouteData(quest: WorldQuestDef) {
     case 'wisp_maze': {
       const maze = WISP_MAZE_LAYOUT;
       instructions.push(
-        'Start a maze run with the keeper. Walk through the center of each of its ' +
+        'Talk to the keeper to start a maze run. Walk through the middle of each of its ' +
           maze.openCells.length +
-          ' open cells to collect every coin purse and radiant wisp. Normal has ' +
+          ' open squares to pick up every coin purse and radiant wisp. Normal has ' +
           WISP_MAZE_PROFILES.normal.enemyCount +
           ' guardians and ' +
           WISP_MAZE_PROFILES.normal.powerSeconds +
-          ' sec of power per wisp. Hard has ' +
+          ' sec of power for each wisp. Hard has ' +
           WISP_MAZE_PROFILES.hard.enemyCount +
           ' guardians and ' +
           WISP_MAZE_PROFILES.hard.powerSeconds +
-          ' sec of power. Touch a guardian while powered to banish it.',
+          ' sec of power. While you have power, touch a guardian to send it away.',
       );
       instructions.push(
-        'Unprotected contact costs a life and returns you to the entrance. After three lost lives the lives reset, but your collected purses remain. The last pickup completes the quest.',
+        'Touching a guardian without power costs a life and sends you back to the entrance. After you lose three lives, your lives refill, and you keep the purses you picked up. Picking up the last purse or wisp finishes the quest.',
       );
       for (const cell of [maze.spawnCell, ...maze.powerCells]) {
         const p = wispMazeCellCenter(cell);
@@ -427,8 +423,8 @@ export function worldRouteData(quest: WorldQuestDef) {
     }
   }
   if (points.length === 1)
-    point('Complete the activity inside this circle', quest.area, 1, quest.area.radius);
-  instructions.push('Completion pays automatically. There is no hand-in NPC.');
+    point('Do the activity inside this circle', quest.area, 1, quest.area.radius);
+  instructions.push('You get paid as soon as you finish. You do not need to go back to anyone.');
   return { instructions, alternatives, points, extraMaps };
 }
 
@@ -504,28 +500,29 @@ export function weeklyRoute(quest: WeeklyQuestDef) {
       quest.count +
       ' final-boss clear' +
       (quest.count === 1 ? '' : 's') +
-      '. Each listed kill gives one credit to its eligible clear roster. Normal and Heroic both count. ' +
+      '. Each kill listed here gives one credit to every player on the clear list who can get it. Normal and Heroic both count. ' +
       (quest.kind === 'raid'
-        ? 'For Nythraxis, credit uses the room roster. Either Crucible boss room also qualifies independently. '
+        ? 'For Nythraxis, credit goes to the players in the room. Each Crucible boss room also counts on its own. '
         : '') +
-      'Choose any listed route:\n' +
+      'Pick any route below:\n' +
       routes.map((r) => '* ' + r).join('\n') +
       '\n';
   } else if (quest.kind === 'worldboss') {
     for (const boss of WORLD_BOSSES)
       points.push({ step: 1, frame: 'Overworld', label: MOBS[boss.templateId].name, ...boss.pos });
-    detail = 'Contribute to defeating a scheduled world boss at one of the marked spawns.';
+    detail = 'Help defeat a world boss when it appears at one of the marked spots.';
   } else
     detail =
       'Join the battleground queue and finish ' +
       quest.count +
-      ' matches. Wins and losses both count. The queue takes you into the match.';
+      ' matches. Wins and losses both count. The queue takes you to the match.';
   return (
-    'Speak to ' +
+    'Talk to ' +
     npc.name +
-    ' beside the Weekly Vault to choose one charge for the week. ' +
+    ' next to the Weekly Vault and choose one charge for the week. ' +
     detail +
-    ' The purse and cache are awarded on completion. If your bags are full, Ravenpost delivers the cache. Choose a faction with standing headroom in the weekly window to claim the commendation. A finished, unclaimed commendation carries over at reset and blocks a new charge until you claim it. No return trip is required.\n\n' +
+    (detail.endsWith('\n') ? '' : ' ') +
+    'You get the purse and cache when you finish. If your bags are full, Ravenpost sends you the cache. To claim the commendation, pick a faction in the weekly window that can still give you more standing. If you finish but do not claim the commendation, it waits for you after the reset. You cannot pick a new charge until you claim it. You do not need to go back to anyone.\n\n' +
     questMap({ points })
   );
 }

@@ -90,11 +90,11 @@ export function addQuestArticles(w: ArticleTools, itemSources: Map<string, Set<s
       quest.gatedWithDungeon && DUNGEONS[quest.gatedWithDungeon]?.guideVisible === false;
     const closed = quest.retired || dungeonClosed;
     const availability = quest.retired
-      ? "'''Retired quest.''' You can finish it if it is already in your quest log. The quest giver no longer offers it."
+      ? "'''Retired quest.''' The quest giver does not offer it anymore. If it is already in your quest log, you can still finish it."
       : dungeonClosed
-        ? `'''Unavailable for new starts.''' The quest giver can offer this quest only when ${ref(w, 'dungeon', quest.gatedWithDungeon!)} is open for this quest.`
+        ? `'''Unavailable for new starts.''' The quest giver only offers this quest while ${ref(w, 'dungeon', quest.gatedWithDungeon!)} is open for it.`
         : quest.seasonalEvent
-          ? "'''Seasonal quest.''' The quest giver offers it only during " +
+          ? "'''Seasonal quest.''' The quest giver only offers it during " +
             words(quest.seasonalEvent) +
             '.'
           : '';
@@ -113,10 +113,11 @@ export function addQuestArticles(w: ArticleTools, itemSources: Map<string, Set<s
 
     if (quest.requiresQuest) facts.push(['First complete', ref(w, 'quest', quest.requiresQuest)]);
 
-    if (quest.requiresRidingTrained) facts.push(['Training', 'Learn riding before accepting.']);
+    if (quest.requiresRidingTrained)
+      facts.push(['Training', 'Learn to ride before you take this quest.']);
 
     if (quest.requiresUsableHealAbility)
-      facts.push(['Ability required', 'Learn a usable healing ability.']);
+      facts.push(['Ability required', 'You must know a healing spell you can use.']);
 
     if (quest.suggestedPlayers)
       facts.push(['Suggested group size', String(quest.suggestedPlayers)]);
@@ -126,28 +127,34 @@ export function addQuestArticles(w: ArticleTools, itemSources: Map<string, Set<s
         'Dungeon gate',
         ref(w, 'dungeon', quest.gatedWithDungeon) +
           (DUNGEONS[quest.gatedWithDungeon]?.guideVisible === false
-            ? ' is unlisted in the public guide, so new players cannot accept this quest.'
-            : ' is currently listed in the public guide. Its visibility is required to accept this quest.'),
+            ? ' is not listed in the public guide right now, so new players cannot take this quest.'
+            : ' is listed in the public guide right now. You can only take this quest while it stays listed.'),
       ]);
 
     if (quest.retired)
-      facts.push(['Retired', 'Finishable if already in your log. Closed to new players.']);
+      facts.push([
+        'Retired',
+        'New players cannot take it. You can finish it if it is already in your log.',
+      ]);
 
     if (quest.seasonalEvent) facts.push(['Event', words(quest.seasonalEvent)]);
 
     if (quest.shareable === false)
-      facts.push(['Sharing', 'Each player must accept it independently.']);
+      facts.push([
+        'Sharing',
+        'It cannot be shared. Each player must take it from the quest giver.',
+      ]);
 
     if (quest.repeatable)
       facts.push([
         'Repeatable',
         quest.weeklyReset
-          ? 'After the weekly reset.'
+          ? 'Again after the weekly reset.'
           : quest.dailyReset
-            ? 'After the daily reset.'
+            ? 'Again after the daily reset.'
             : quest.repeatCadenceTicks
-              ? quest.repeatCadenceTicks / TICK_RATE / 3600 + ' hours after turn-in.'
-              : 'Immediately after turn-in.',
+              ? quest.repeatCadenceTicks / TICK_RATE / 3600 + ' hours after you turn it in.'
+              : 'Right after you turn it in.',
       ]);
 
     const objectives = quest.objectives.map((o, i) => {
@@ -167,8 +174,8 @@ export function addQuestArticles(w: ArticleTools, itemSources: Map<string, Set<s
     if (quest.objectives.some((o) => o.type === 'collect'))
       objectives.push(
         quest.keepsCollectedItems
-          ? 'Keep the collected items after turn-in. Equipped copies count.'
-          : 'Hand over the requested items at turn-in.',
+          ? 'You keep the items when you turn in the quest. Items you are wearing count too.'
+          : 'You give the items to the quest giver when you turn in the quest.',
       );
 
     const byReward = new Map<string, string[]>();
@@ -201,9 +208,9 @@ export function addQuestArticles(w: ArticleTools, itemSources: Map<string, Set<s
         append(
           itemSources,
           itemId,
-          (closed ? 'Only if you already hold the quest. Reward from ' : 'Quest reward from ') +
+          (closed ? 'Only if you already have the quest. Reward from ' : 'Quest reward from ') +
             ref(w, 'quest', quest.id) +
-            '. See the class reward list.',
+            '. The reward depends on your class, so check the list there.',
         );
     }
 
@@ -219,7 +226,7 @@ export function addQuestArticles(w: ArticleTools, itemSources: Map<string, Set<s
       rewards.push(
         'Learn to make ' +
           recipeLabel(w, quest.recipeReward) +
-          '. Meet the recipe skill requirement to turn in.',
+          '. You need enough skill for the recipe before you can turn in the quest.',
       );
 
     const markers: [string, string][] = route.points.map((p) => [
@@ -258,16 +265,16 @@ export function addQuestArticles(w: ArticleTools, itemSources: Map<string, Set<s
             what +
             '. ' +
             (quest.keepsCollectedItems
-              ? 'Equipped copies count. You keep them at turn-in.'
-              : 'Keep the required items in your bags for turn-in.');
+              ? 'Items you are wearing count too. You keep them when you turn in the quest.'
+              : 'Keep the items in your bags until you turn in the quest.');
           break;
 
         case 'gather':
           action =
             o.nodeType === 'ore' && !o.itemId
               ? 'Mine ore veins ' + n + ' ' + (n === 1 ? 'time.' : 'times.')
-              : 'Harvest ' + what + ' until you earn ' + n + ' gathering credits.';
-          action += ' Credit comes from gathering the material yourself.';
+              : 'Gather ' + what + ' until you earn ' + n + ' gathering credits.';
+          action += ' You only get credit for what you gather yourself.';
           break;
 
         case 'craft':
@@ -287,7 +294,7 @@ export function addQuestArticles(w: ArticleTools, itemSources: Map<string, Set<s
           break;
 
         case 'escort':
-          action = 'Start the escort and follow the waypoints below.';
+          action = 'Start the escort and follow the numbered stops below.';
           break;
 
         case 'interact':
@@ -313,7 +320,7 @@ export function addQuestArticles(w: ArticleTools, itemSources: Map<string, Set<s
               Math.hypot(a.x - spot.x, a.z - spot.z) - Math.hypot(b.x - spot.x, b.z - spot.z),
           )[0];
         action +=
-          ' ' +
+          ' Where: ' +
           spot.label.charAt(0).toUpperCase() +
           spot.label.slice(1) +
           ' (' +
@@ -351,7 +358,7 @@ export function addQuestArticles(w: ArticleTools, itemSources: Map<string, Set<s
       w.questMap?.(route) ??
       w.section(
         'Coordinates',
-        'Coordinates are X, Z in yards. Instance coordinates are measured from the room origin.\n\n' +
+        'Coordinates are written (X, Z) and measured in yards. Inside a dungeon or building, they start from that room.\n\n' +
           w.table(markers),
       );
 
@@ -360,8 +367,8 @@ export function addQuestArticles(w: ArticleTools, itemSources: Map<string, Set<s
     if (e)
       rewards.push(
         e.type === 'switchHobby'
-          ? 'Switch to the selected hobby.'
-          : 'Attune the ' + (e.pairId ? words(e.pairId) : 'selected') + ' profession pair.',
+          ? 'Your hobby changes to the one you picked.'
+          : 'You attune to the ' + (e.pairId ? words(e.pairId) : 'selected') + ' profession pair.',
       );
 
     const next = Object.values(QUESTS)

@@ -46,18 +46,18 @@ export function abilityArticle(
         'How it works',
         'Use ' +
           bomb +
-          ' from your bags or action bar to detonate it at the aimed position. Every living mob within 5 yd of the impact takes the same base roll of 120 to 160 Nature damage. The roll depends on simulation time and has no Spell Power or Attack Power coefficient.',
+          ' from your bags or action bar. It explodes at the spot you aim at. Every living mob within 5 yd of the blast takes 120 to 160 Nature damage. All of them take the same roll. The roll is based on the game clock. Spell Power and Attack Power do not add to it.',
       ) +
       section(
         'Item use',
         table([
           ['Source', bomb],
           ['Who can use it', 'Any class carrying the item'],
-          ['Cost', 'One bomb per successful use'],
+          ['Cost', 'Uses up one bomb each time it works'],
           ['Cooldown', getItemCooldownDuration(item.id) + ' sec'],
           [
             'Range',
-            'Up to 30 yd. An aim beyond the limit lands at 30 yd. Without a ground point, the blast lands 8 yd straight ahead.',
+            'Up to 30 yd. If you aim farther, it lands at 30 yd. If you do not aim at the ground, it lands 8 yd straight ahead.',
           ],
         ]),
       )
@@ -136,7 +136,7 @@ export function abilityArticle(
       def.passive
         ? 'Passive'
         : def.onNextSwing
-          ? 'Queued for your next weapon swing'
+          ? 'Happens on your next weapon swing'
           : def.channel
             ? `Channel for ${def.channel.duration} sec, ${def.channel.ticks} pulses`
             : def.castTime > 0
@@ -148,7 +148,7 @@ export function abilityArticle(
     details.push([
       'Base cost',
       def.spendsAllResource
-        ? `Spend your available ${resource(def)}${def.spendResourceCap ? ' up to ' + def.spendResourceCap : ''}. Requires at least ${def.cost}.`
+        ? `Uses all your ${resource(def)}${def.spendResourceCap ? ', up to ' + def.spendResourceCap : ''}. You need at least ${def.cost}.`
         : def.cost
           ? def.cost + ' ' + resource(def)
           : 'Free',
@@ -162,21 +162,21 @@ export function abilityArticle(
       'Global cooldown',
       def.offGcd
         ? 'Off the global cooldown'
-        : `${def.class === 'rogue' ? 1 : GCD} sec before haste, minimum ${MIN_GCD} sec`,
+        : `${def.class === 'rogue' ? 1 : GCD} sec. Haste can make it shorter, but never below ${MIN_GCD} sec.`,
     ]);
     const target = def.targetsDead
       ? 'Dead ally'
       : def.selfCentered
-        ? 'Centered on the caster'
+        ? 'The area around you'
         : def.targetMode === 'position'
-          ? 'Aimed ground position'
+          ? 'A spot on the ground that you aim at'
           : def.targetType === 'friendly'
-            ? 'Friendly target or self'
+            ? 'An ally or yourself'
             : def.targetType === 'any'
-              ? 'Friendly or hostile target'
+              ? 'An ally or an enemy'
               : def.requiresTarget
-                ? 'Enemy target'
-                : 'No selected target required';
+                ? 'An enemy'
+                : 'You do not need a target';
     details.push(['Target', target + (def.partyOnlyTarget ? ' (your group or raid only)' : '')]);
     if (def.range > 0 || def.requiresTarget)
       details.push([
@@ -187,41 +187,46 @@ export function abilityArticle(
   const requirements: string[] = [];
   if (requiredForms(def).length)
     requirements.push(
-      'Requires ' +
+      'You must be in ' +
         requiredForms(def)
           .map((f) => (f === 'bear' ? 'Bruin Form' : 'Cat Form'))
           .join(' or ') +
         '.',
     );
-  if (def.requiresShield) requirements.push('Equip a shield.');
-  if (def.requiresStealth) requirements.push('Start from stealth.');
-  if (def.requiresOutOfCombat) requirements.push('Use outside combat.');
-  if (def.requiresOutsideInstance) requirements.push('Use outside dungeons and raids.');
-  if (def.requiresDodgeProc) requirements.push('Requires the dodge reaction window.');
+  if (def.requiresShield) requirements.push('You must have a shield equipped.');
+  if (def.requiresStealth) requirements.push('You must be in stealth.');
+  if (def.requiresOutOfCombat) requirements.push('You can only use it out of combat.');
+  if (def.requiresOutsideInstance) requirements.push('You cannot use it in dungeons or raids.');
+  if (def.requiresDodgeProc)
+    requirements.push('You can only use it for 5 sec after an enemy dodges your attack.');
   if (def.executeThreshold !== undefined)
-    requirements.push(`Target health must be below ${def.executeThreshold * 100}%.`);
+    requirements.push(
+      `Only works on a target with less than ${def.executeThreshold * 100}% health.`,
+    );
   if (def.requiresTargetHpBelow !== undefined)
-    requirements.push(`Target health must be at or below ${def.requiresTargetHpBelow * 100}%.`);
+    requirements.push(
+      `Only works on a target with ${def.requiresTargetHpBelow * 100}% health or less.`,
+    );
   if (def.requiresAuraKind)
     requirements.push(
-      `Requires ${def.requiresAuraStacks ?? 1} stack(s) of ${clean(def.requiresAuraKind)}${def.requiresOwnAura ? ' from the caster' : ''}.`,
+      `You need ${def.requiresAuraStacks ?? 1} stack(s) of ${clean(def.requiresAuraKind)} on you${def.requiresOwnAura ? ', put there by you' : ''}.`,
     );
   if (def.spendsCombo)
     requirements.push(
-      `Spends the combo points on the target.${def.comboOptional ? ' Can be used at zero points.' : ''}`,
+      `Uses up your combo points on the target.${def.comboOptional ? ' You can still use it with zero points.' : ''}`,
     );
-  if (def.awardsCombo)
-    requirements.push(`Awards ${def.awardsCombo} combo point(s) on a successful hit.`);
-  if (def.ruinCost) requirements.push(`Also spends ${def.ruinCost} Ruin.`);
-  if (def.devotionCost) requirements.push(`Also spends ${def.devotionCost} Devotion.`);
-  if (def.soulFragmentCost)
-    requirements.push(`Also spends ${def.soulFragmentCost} Soul Fragments.`);
+  if (def.awardsCombo) requirements.push(`Gives ${def.awardsCombo} combo point(s) when it hits.`);
+  if (def.ruinCost) requirements.push(`Also costs ${def.ruinCost} Ruin.`);
+  if (def.devotionCost) requirements.push(`Also costs ${def.devotionCost} Devotion.`);
+  if (def.soulFragmentCost) requirements.push(`Also costs ${def.soulFragmentCost} Soul Fragments.`);
   if (def.castWhileMoving) requirements.push('You can cast while moving.');
-  if (def.usableWhileCasting) requirements.push('Can be used during another cast.');
-  if (def.uninterruptible) requirements.push('Interrupt effects cannot stop this cast.');
-  if (def.usableWhileControlled) requirements.push('Can be used while crowd controlled.');
+  if (def.usableWhileCasting) requirements.push('You can use it while casting something else.');
+  if (def.uninterruptible) requirements.push('Interrupts cannot stop this cast.');
+  if (def.usableWhileControlled) requirements.push('You can use it even while crowd controlled.');
   if (def.empowerStages)
-    requirements.push(`Hold to charge through up to ${def.empowerStages} stages.`);
+    requirements.push(
+      `Hold the button to charge it up, through up to ${def.empowerStages} stages.`,
+    );
   for (const r of replacementRules(def)) {
     const gates = [
       r.auraKind ? `${r.minStacks ?? 1} stack(s) of ${clean(r.auraKind)}` : '',
@@ -229,7 +234,11 @@ export function abilityArticle(
       r.absentAuraKind ? 'no ' + clean(r.absentAuraKind) : '',
     ].filter(Boolean);
     requirements.push(
-      'This action becomes ' + abilityLink(r.abilityId) + ' with ' + gates.join(' and ') + '.',
+      'This button turns into ' +
+        abilityLink(r.abilityId) +
+        ' while you have ' +
+        gates.join(' and ') +
+        '.',
     );
   }
   const rankSections = [
@@ -244,7 +253,7 @@ export function abilityArticle(
   if (scaling.length)
     text += section(
       'Base scaling',
-      'These are rank 1 values before specialization, talents, buffs, critical hits and target defenses.\n' +
+      "These are rank 1 numbers. They do not include your specialization, talents, buffs or critical hits. They also do not include the target's defenses.\n" +
         bullets(scaling),
     );
   if (rankSections.length > 1)
@@ -268,7 +277,7 @@ export function abilityArticle(
   if (base.threatFlat || base.threatMult !== 1)
     text += section(
       'Threat',
-      `Rank 1 adds ${base.threatFlat} threat and applies a ×${base.threatMult} multiplier to damage threat before stance and form modifiers.`,
+      `Rank 1 adds ${base.threatFlat} threat. The threat from its damage is also multiplied by ${base.threatMult}. Stance and form bonuses to threat are applied after that.`,
     );
   const buildRules = Object.entries(def.specNotes ?? {}).map(
     ([id, note]) => specLink(id) + ': ' + note,
@@ -297,7 +306,7 @@ export function abilityArticle(
       'What changes with specialization',
       'Level ' +
         MAX_LEVEL +
-        ' spellbook values with no row talents, equipment bonuses or active buffs. The first example uses zero power ratings.' +
+        ' spellbook numbers. They assume no talent choices, no gear bonuses and no buffs. Each row first shows the numbers with 0 power.' +
         '\n' +
         table(examples.map(([spec, value]) => [specLink(spec), value])),
     );

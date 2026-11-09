@@ -111,17 +111,17 @@ function procEffect(e: WeaponProcEffect) {
         e.jumps +
         ' more targets within ' +
         e.radius +
-        ' yd. Each jump retains ' +
+        ' yd. Each jump does ' +
         pct(e.falloff) +
-        ' of the previous hit.'
+        ' of the damage of the hit before it.'
       );
 
     case 'attackSlow':
       return (
         e.name +
-        ' multiplies the time between the target’s swings by ' +
+        ' makes the time between the target’s swings ' +
         e.mult +
-        ' for ' +
+        ' times as long for ' +
         e.duration +
         ' sec.'
       );
@@ -157,20 +157,20 @@ function effects(w: ArticleTools, item: ItemDef): string[] {
 
   if (item.foodHp || item.drinkMana)
     out.push(
-      'Sit to recover ' +
+      'Sit down to get back ' +
         [item.foodHp && item.foodHp + ' health', item.drinkMana && item.drinkMana + ' mana']
           .filter(Boolean)
           .join(' and ') +
         ' over ' +
         CONSUME_DURATION +
-        ' sec in ' +
+        ' sec, in ' +
         CONSUME_TICKS +
-        ' ticks. Movement or combat interrupts recovery.',
+        ' small amounts. Moving or fighting stops it.',
     );
 
   if (item.potionHp || item.potionMana || item.potionHpPctMax)
     out.push(
-      'Use in or out of combat for ' +
+      'Use it in or out of combat to get ' +
         [
           item.potionHp && item.potionHp + ' health',
           item.potionHpPctMax && pct(item.potionHpPctMax) + ' of maximum health',
@@ -178,9 +178,12 @@ function effects(w: ArticleTools, item: ItemDef): string[] {
         ]
           .filter(Boolean)
           .join(' plus ') +
-        '. Shared potion cooldown: ' +
+        '. All potions share one cooldown of ' +
         POTION_COOLDOWN +
-        ' sec. Healing is modified by healing received and capped at missing health.',
+        ' sec.' +
+        (item.potionHp || item.potionHpPctMax
+          ? ' Effects that change the healing you receive also change this healing. It cannot heal more than the health you are missing.'
+          : ''),
     );
 
   const buff = item.kind === 'food' ? item.wellFed : item.elixir;
@@ -195,25 +198,25 @@ function effects(w: ArticleTools, item: ItemDef): string[] {
         buff.duration +
         ' sec. ' +
         (item.kind === 'food'
-          ? 'Replaces the previous Well Fed buff.'
+          ? 'It replaces any Well Fed buff you already have.'
           : item.kind === 'flask'
-            ? 'Only one flask at a time. It survives death.'
-            : 'Replaces other consumable buffs of the same stat family.'),
+            ? 'You can only have one flask at a time. It stays on when you die.'
+            : 'It replaces any other consumable buff for the same kind of stat.'),
     );
 
   if (item.kind === 'bag' && item.bagSlots)
     out.push(
-      'Equip for ' +
+      'Equip it to get ' +
         item.bagSlots +
-        (item.materialsOnly ? ' material-only' : ' general') +
-        ' bag slots.',
+        ' more bag slots' +
+        (item.materialsOnly ? ' that only hold materials.' : ' that hold any item.'),
     );
 
   if (item.kind === 'mount')
     out.push(
       'Keep these reins to own ' +
         MOUNTS[item.mount].name +
-        '. Use them to summon this mount. Riding training determines speed.',
+        '. Use them to call this mount. How fast it goes depends on your riding training.',
     );
 
   if (item.kind === 'buddy') out.push('Unlocks the companion ' + BUDDIES[item.buddy].name + '.');
@@ -237,19 +240,21 @@ function effects(w: ArticleTools, item: ItemDef): string[] {
         p.name +
           '. ' +
           pct(p.chance) +
-          ' chance per ' +
-          { weaponHit: 'landed weapon hit', heal: 'heal', spellDamage: 'damaging spell' }[
-            p.trigger
-          ] +
+          ' chance ' +
+          {
+            weaponHit: 'each time your weapon hits',
+            heal: 'each time you heal',
+            spellDamage: 'each time you deal spell damage',
+          }[p.trigger] +
           '. ' +
           p.effects.map(procEffect).join(' '),
       );
 
   if ('feast' in item && item.feast)
     out.push(
-      'Place a feast for ' +
+      'Set out a feast that lasts ' +
         item.feast.durationTicks / TICK_RATE +
-        ' sec. Up to ' +
+        ' sec. It has up to ' +
         item.feast.charges +
         ' servings of ' +
         ref(w, 'item', item.feast.dishItemId) +
@@ -258,7 +263,7 @@ function effects(w: ArticleTools, item: ItemDef): string[] {
 
   if (item.teachesRiding) out.push('Teaches the next riding rank.');
 
-  if (item.questId) out.push('Associated quest: ' + ref(w, 'quest', item.questId) + '.');
+  if (item.questId) out.push('Linked quest: ' + ref(w, 'quest', item.questId) + '.');
 
   if (item.set && ITEM_SETS[item.set])
     for (const b of ITEM_SETS[item.set].bonuses)
@@ -281,14 +286,14 @@ function effects(w: ArticleTools, item: ItemDef): string[] {
             use.tier +
             ' ' +
             words(use.professionId) +
-            ' tool. Requires ' +
+            ' tool. To use it, you need ' +
             wieldRequirementFor(use.professionId, use.tier) +
             ' ' +
             words(use.professionId) +
-            ' proficiency to wield. ' +
+            ' proficiency (your skill level in it). ' +
             (use.professionId === 'fishing'
-              ? 'Cast in fishable water and reel on a bite.'
-              : 'Use to gather a matching node within reach.'),
+              ? 'Cast into water you can fish in, and reel in when a fish bites.'
+              : 'Use it on a matching node close to you to gather from it.'),
         );
         break;
 
@@ -297,12 +302,14 @@ function effects(w: ArticleTools, item: ItemDef): string[] {
         break;
 
       case 'throw':
-        out.push('Throw at a nearby murloc hut on the purge quest to burn it. Reusable.');
+        out.push(
+          'During the purge quest, throw it at a nearby murloc hut to burn it. You can use it again.',
+        );
         break;
 
       case 'summon':
         out.push(
-          'Use the Briny Lure at the Proving Shore tide pool to summon Mister Crabs during the quest. Reusable.',
+          'During the quest, use the Briny Lure at the Proving Shore tide pool to summon Mister Crabs. You can use it again.',
         );
         break;
 
@@ -314,31 +321,31 @@ function effects(w: ArticleTools, item: ItemDef): string[] {
 
       case 'clueScroll':
         out.push(
-          'With no hunt active, consume the scroll to start one. During a dig step, use a scroll on the marked spot to advance.',
+          'If you are not on a hunt, use up the scroll to start one. During a dig step, use a scroll on the marked spot to move to the next step.',
         );
         break;
 
       case 'clueCasket':
         out.push(
-          'Open for ' +
+          'Open it to get ' +
             w.money(CASKET_COPPER_BASE) +
-            ' plus ' +
+            ', plus ' +
             w.money(CASKET_COPPER_PER_LEVEL) +
-            ' per character level, and ' +
+            ' for each of your character levels. You also get ' +
             CASKET_MATERIAL_COUNT +
-            ' of one randomly chosen material: ' +
+            ' of one material, picked at random from: ' +
             CASKET_MATERIAL_POOL.map((id) => ref(w, 'item', id)).join(', ') +
-            '. Separate rolls give a ' +
+            '. Then each of these extras is rolled on its own: ' +
             pct(CASKET_GEAR_CHANCE) +
             ' chance of a low-tier delve gear piece, ' +
             pct(CASKET_HEROIC_MARK_CHANCE) +
-            ' for ' +
+            ' chance of ' +
             CASKET_HEROIC_MARKS +
             ' Heroic Marks, and ' +
             pct(CASKET_MOUNT_CHANCE) +
-            ' for ' +
+            ' chance of ' +
             ref(w, 'item', CASKET_MOUNT_REINS_ITEM_ID) +
-            ' if unowned.',
+            ' if you do not have it yet.',
         );
         break;
 
@@ -346,28 +353,30 @@ function effects(w: ArticleTools, item: ItemDef): string[] {
         out.push(
           'Read this ' +
             use.rarity +
-            ' treasure map, then travel within ' +
+            ' treasure map. Then go within ' +
             TREASURE_DIG_RADIUS +
-            ' yd of the X and dig. The hoard requires level ' +
+            ' yd of the X and dig. You must be level ' +
             HOARD_MIN_LEVEL +
-            '.',
+            ' or higher for the hoard.',
         );
         break;
 
       case 'cartographersInk':
         out.push(
-          'Redraw a map one rarity higher. A common map costs ' +
+          'Use ink to redraw a map one rarity higher. A common map costs ' +
             TREASURE_MAP_UPGRADE_INKS.common +
             ' ink, a rare costs ' +
             TREASURE_MAP_UPGRADE_INKS.rare +
             ' and an epic costs ' +
             TREASURE_MAP_UPGRADE_INKS.epic +
-            '. Legendary maps are already at the top.',
+            '. Legendary maps are already the highest rarity.',
         );
         break;
 
       case 'forgebreakerEmber':
-        out.push('Starts the one-time hammer quest. Crafting consumes the Ember.');
+        out.push(
+          'Starts the hammer quest, which you can only do once. Crafting uses up the Ember.',
+        );
         break;
 
       case 'mechChroma': {
@@ -375,18 +384,18 @@ function effects(w: ArticleTools, item: ItemDef): string[] {
         const chroma = MECH_CHROMAS.find((c) => c.id === use.chromaId);
         if (chroma)
           out.push(
-            'To unlock the appearance directly, use ' +
+            'You can also unlock the look another way: use ' +
               ref(w, 'item', 'alien_armor_plate') +
-              ', roll ' +
+              ', roll rank ' +
               chroma.rank +
-              ' or higher and choose this color. That choice grants the appearance directly rather than a plate item.',
+              ' or higher, and pick this color. That unlocks the look straight away, but you do not get a plate item.',
           );
         break;
       }
 
       case 'skinSelect':
         out.push(
-          'Roll a reward rank and choose a skin of that rank or lower. Rank odds: ' +
+          'Use it to roll a reward rank, then pick a skin of that rank or lower. Chance of each rank: ' +
             SKIN_RANKS.map(
               (rank) =>
                 rank +
@@ -396,35 +405,34 @@ function effects(w: ArticleTools, item: ItemDef): string[] {
                     Object.values(SKIN_RANK_ROLL_WEIGHTS).reduce((a, b) => a + b, 0),
                 ),
             ).join(', ') +
-            '. Claiming your choice consumes the token.',
+            '. The token is used up when you claim your pick.',
         );
         break;
 
       case 'harvestPreference':
-        out.push('Opens the harvest preference picker. Reusable.');
+        out.push('Opens the harvest preference picker. You can use it again.');
         break;
 
       case 'placeMobileStation':
         out.push(
-          'Place a party-shared ' +
+          'Set down a ' +
             words(use.stationCraftId) +
-            ' workstation at your position for ' +
+            ' workstation where you stand, for ' +
             MOBILE_CRAFTING_STATION_DURATION_TICKS / TICK_RATE / 60 +
-            ' minutes. Reusable.',
+            ' minutes. Your party can use it too. You can use this item again.',
         );
         break;
 
       case 'container':
         if (use.container === 'emissary_cache') {
           out.push(
-            'Open for ' +
+            'Open it to get ' +
               EMISSARY_CACHE_MARKS +
-              ' Heroic Marks and one epic Normal raid gear piece. Every eligible piece in your class pool is equally likely.',
+              ' Heroic Marks and one piece of epic gear from a Normal raid. Every piece your class can get from it is equally likely.',
           );
           break;
         }
-        if (!seasonal)
-          out.push('Open the container to receive its contents. One container is consumed.');
+        if (!seasonal) out.push('Open it to get what is inside. This uses up one container.');
         break;
 
       case 'seasonal':
@@ -446,7 +454,7 @@ function effects(w: ArticleTools, item: ItemDef): string[] {
 
   if (trinket.length)
     out.push(
-      'Trinket examples use 100 attack, ranged, spell and healing power and 1,000 maximum health.',
+      'The trinket numbers below are for a character with 100 attack power, 100 ranged power, 100 spell power, 100 healing power and 1,000 maximum health.',
       ...trinket.map((t) => t.text),
     );
 
@@ -487,7 +495,7 @@ export function addItemArticles(w: ArticleTools, sources: Map<string, Set<string
     append(
       sources,
       row.itemId,
-      'Exchange ' +
+      'Trade in ' +
         ref(w, 'item', row.sigilId) +
         ' at ' +
         ref(w, 'npc', CRUCIBLE_VENDOR_NPC_ID) +
@@ -499,18 +507,19 @@ export function addItemArticles(w: ArticleTools, sources: Map<string, Set<string
       append(
         sources,
         id,
-        ref(w, 'item', EMISSARY_CACHE_ITEM_ID) +
-          ' opened by ' +
+        'When a ' +
           ref(w, 'class', cls) +
-          ' gives a 1 in ' +
+          ' opens ' +
+          ref(w, 'item', EMISSARY_CACHE_ITEM_ID) +
+          ', there is a 1 in ' +
           pool.length +
-          ' chance.',
+          ' chance of getting this.',
       );
   }
   for (const q of Object.values(QUESTS))
     for (const o of q.objectives)
       if (o.type === 'collect')
-        append(uses, o.itemId, ref(w, 'quest', q.id) + ' requires ' + o.count + '.');
+        append(uses, o.itemId, ref(w, 'quest', q.id) + ' needs ' + o.count + '.');
 
   for (const obj of getActiveWorldContent().groundObjects)
     for (const p of obj.positions) {
@@ -541,17 +550,17 @@ export function addItemArticles(w: ArticleTools, sources: Map<string, Set<string
         r.resultCount +
         ' with ' +
         words(r.professionId) +
-        ' (listed skill ' +
+        ' (needs skill ' +
         r.skillReq +
         ')' +
-        '. Base ingredients: ' +
+        '. Ingredients, before any discounts: ' +
         r.reagents.map((a) => a.count + ' ' + ref(w, 'item', a.itemId)).join(', ') +
         '.' +
         (r.stationType ? ' Station: ' + words(r.stationType) + '.' : ''),
     );
 
     for (const a of r.reagents)
-      append(uses, a.itemId, a.count + ' per craft of ' + recipe + ' before discounts.');
+      append(uses, a.itemId, a.count + ' for each craft of ' + recipe + ', before any discounts.');
   }
 
   for (const p of RELIQUARY_PAGES)
@@ -668,13 +677,13 @@ export function addItemArticles(w: ArticleTools, sources: Map<string, Set<string
     if (item.seasonalEvent) facts.push(['Event', words(item.seasonalEvent)]);
 
     const availability = RETIRED_HEROIC_ITEMS[item.id]
-      ? "'''Retired gear.''' This former Heroic drop was removed from loot tables. Existing copies still work."
+      ? "'''Retired gear.''' This used to drop on Heroic, but it no longer drops. Copies people already have still work."
       : RETIRED_ZONE1_ITEM_IDS.some((id) => id === item.id)
-        ? "'''Retired drop.''' Existing copies still work and may be traded by their owners."
+        ? "'''Retired drop.''' This no longer drops. Copies people already have still work, and their owners can trade them."
         : item.id === 'chunk_of_ore'
-          ? "'''Retired tutorial item.''' Existing copies remain in older characters’ bags."
+          ? "'''Retired tutorial item.''' Older characters who already have copies keep them in their bags."
           : item.kind === 'mount' && isDeveloperMount(item.mount)
-            ? "'''Developer grant.''' Developers can grant these reins. They have no ordinary gameplay source."
+            ? "'''Developer grant.''' Only developers can give out these reins. There is no ordinary way to get them in the game."
             : '';
 
     if (item.heroicOf || item.relicOf)
@@ -685,10 +694,10 @@ export function addItemArticles(w: ArticleTools, sources: Map<string, Set<string
     for (const h of gatheringSupplyHintsForItem(item.id))
       ways.push(
         h.corpsePreferenceItemId
-          ? 'Harvest creature corpses. Set harvest preference to ' +
+          ? 'Harvest the bodies of defeated creatures. Set your harvest preference to ' +
               ref(w, 'item', h.corpsePreferenceItemId) +
               '.'
-          : 'Gather through ' + words(h.familyId) + '.',
+          : 'Gather it with ' + words(h.familyId) + '.',
       );
 
     const season = seasonalItemSourceText(item);

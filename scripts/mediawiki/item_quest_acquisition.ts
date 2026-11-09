@@ -28,22 +28,30 @@ export function questAcquisitions(w: ArticleTools): Map<string, ItemAcquisition[
     if (!rewards.size && !q.requiredItems?.length) continue;
     const route = questRoute(q);
     const conditions = [
-      'Requires character level ' +
+      'You need to be level ' +
         (q.minLevel ?? 1) +
-        (q.maxLevel ? ' through ' + q.maxLevel : ' or above') +
+        (q.maxLevel ? ' to ' + q.maxLevel : ' or higher') +
         '.',
-      ...(q.requiresQuest ? ['First complete ' + ref(w, 'quest', q.requiresQuest) + '.'] : []),
-      ...(q.requiredClass?.length
-        ? ['Accepting classes: ' + q.requiredClass.map((c) => ref(w, 'class', c)).join(', ') + '.']
+      ...(q.requiresQuest
+        ? ['You must finish ' + ref(w, 'quest', q.requiresQuest) + ' first.']
         : []),
-      ...(q.requiresRidingTrained ? ['Learn riding before accepting.'] : []),
-      ...(q.seasonalEvent ? ['The quest is offered only during its seasonal event.'] : []),
+      ...(q.requiredClass?.length
+        ? [
+            'Only these classes can accept it: ' +
+              q.requiredClass.map((c) => ref(w, 'class', c)).join(', ') +
+              '.',
+          ]
+        : []),
+      ...(q.requiresRidingTrained ? ['You must learn riding before you can accept it.'] : []),
+      ...(q.seasonalEvent ? ['You can only get this quest during its seasonal event.'] : []),
       ...(q.retired
-        ? ['Closed to new acceptance. This route works only if the quest is already in your log.']
+        ? [
+            'Nobody can accept this quest anymore. This only works if the quest is already in your quest log.',
+          ]
         : []),
       ...(q.gatedWithDungeon && DUNGEONS[q.gatedWithDungeon]?.guideVisible === false
         ? [
-            'The linked dungeon is currently hidden from the public guide, so new characters cannot accept this quest.',
+            'The dungeon for this quest is hidden from the public guide right now, so new characters cannot accept this quest.',
           ]
         : []),
     ];
@@ -52,11 +60,11 @@ export function questAcquisitions(w: ArticleTools): Map<string, ItemAcquisition[
       return (
         'Quest objective ' +
         (i + 1) +
-        '. ' +
+        ': ' +
         o.label +
-        ' (' +
+        ' (you need ' +
         o.count +
-        ' required). ' +
+        '). ' +
         notes.join(' ')
       );
     });
@@ -70,40 +78,41 @@ export function questAcquisitions(w: ArticleTools): Map<string, ItemAcquisition[
           ...conditions,
           ...(row.fixed.length
             ? [
-                'Guaranteed one copy on turn-in for ' +
+                'You always get one when you hand in the quest' +
                   (row.fixed.length === Object.keys(CLASSES).length
-                    ? 'every class'
-                    : row.fixed.map((c) => ref(w, 'class', c)).join(', ')) +
-                  '.',
+                    ? ', whatever your class.'
+                    : ', if you play one of these classes: ' +
+                      row.fixed.map((c) => ref(w, 'class', c)).join(', ') +
+                      '.'),
               ]
             : []),
           ...(row.choice.length
             ? [
-                'Choose one copy from the reward cards. It is offered to ' +
+                'When you hand in the quest, you can pick this item as your reward. It is offered to ' +
                   (row.choice.length === Object.keys(CLASSES).length
                     ? 'every class'
                     : row.choice.map((c) => ref(w, 'class', c)).join(', ')) +
-                  '. Selecting another reward gives no copy of this item.',
+                  '. If you pick a different reward, you do not get this item.',
               ]
             : []),
           ...route.notes.filter((n) => typeof n.step !== 'number').map((n) => n.text),
         ],
         steps: [
           q.retired
-            ? 'Continue the quest already in your log.'
-            : 'Speak to ' +
+            ? 'Keep going with the quest already in your quest log.'
+            : 'Talk to ' +
               ref(w, 'npc', q.giverNpcId) +
-              ', select ' +
+              ', pick ' +
               ref(w, 'quest', q.id) +
               ' and click Accept.',
           ...objectives,
-          'Return to ' +
+          'Go back to ' +
             turnins +
             '. ' +
             (row.choice.length
-              ? 'Select ' + ref(w, 'item', id) + ' if shown among your reward choices. '
+              ? 'If ' + ref(w, 'item', id) + ' is one of your reward choices, pick it. '
               : '') +
-            'Click Complete Quest. The reward goes to your bags.',
+            'Click Complete Quest. The reward goes into your bags.',
         ],
         points: route.points.map((p) => ({
           ...p,
@@ -116,12 +125,12 @@ export function questAcquisitions(w: ArticleTools): Map<string, ItemAcquisition[
         title: 'Supplied for ' + ref(w, 'quest', q.id),
         details: conditions,
         steps: [
-          'Speak to ' + ref(w, 'npc', q.giverNpcId) + ' and accept ' + ref(w, 'quest', q.id) + '.',
-          'The quest supplies the required item if you no longer carry it. Check your bags before travelling to its objective.',
+          'Talk to ' + ref(w, 'npc', q.giverNpcId) + ' and accept ' + ref(w, 'quest', q.id) + '.',
+          'If you no longer have the item the quest needs, the quest gives it to you. Check your bags before you travel to the objective.',
         ],
         points: [
           ...itemNpcPoints('Start', q.giverNpcId),
-          ...itemNpcPoints('Reward', q.giverNpcId, 'Required quest supply'),
+          ...itemNpcPoints('Reward', q.giverNpcId, 'The quest gives you this item'),
         ],
       });
     }
@@ -138,9 +147,9 @@ export function questAcquisitions(w: ArticleTools): Map<string, ItemAcquisition[
       addAcquisition(result, item.id, {
         title: 'Rotating world-quest interaction · ' + reference,
         details: [
-          'This catalog entry is an activity object, not a permanent bag item. Its interactions work while this world quest is active on your board. Minimum level ' +
+          'This is something you use out in the world, not an item you keep in your bags. You can use it while this world quest is on your board. You need to be level ' +
             worldQuest.minLevel +
-            '.',
+            ' or higher.',
         ],
         steps: route.instructions,
         points: route.points,
@@ -155,18 +164,18 @@ export function questAcquisitions(w: ArticleTools): Map<string, ItemAcquisition[
       addAcquisition(result, item.id, {
         title: 'World interaction in ' + ref(w, 'quest', quest.id),
         details: [
-          'This catalog entry describes a world object. Interacting with it advances the quest rather than placing the object in your bags.',
+          'This is an object in the world. Using it moves your quest forward. It does not go into your bags.',
         ],
         steps: [
-          'Speak to ' +
+          'Talk to ' +
             ref(w, 'npc', quest.giverNpcId) +
             ' and accept ' +
             ref(w, 'quest', quest.id) +
             '.',
           ...route.notes.filter((n) => typeof n.step === 'number').map((n) => n.text),
-          'Follow the quest instructions for ' +
+          'Find ' +
             object.name +
-            ' at the mapped objective locations. Check the quest log for credited progress.',
+            ' at the places on the map and do what the quest asks. Check your quest log to see your progress.',
         ],
         points: route.points,
       });
@@ -175,7 +184,7 @@ export function questAcquisitions(w: ArticleTools): Map<string, ItemAcquisition[
     if (item.id === 'ps_ferry_bell') {
       addAcquisition(result, item.id, {
         title: 'Ferry bell world interaction',
-        details: ['This bell is a travel object. It is not added to your bags.'],
+        details: ['This bell is used for travel. It does not go into your bags.'],
         steps: [
           'Walk to one of the two bells marked on the map.',
           'Click the ferry bell to cross between Eastbrook and The Proving Shore.',
@@ -194,19 +203,19 @@ export function questAcquisitions(w: ArticleTools): Map<string, ItemAcquisition[
       title: 'World pickup · ' + object.name,
       steps: [
         quest
-          ? 'Accept ' + ref(w, 'quest', quest.id) + ' and leave its item collection incomplete.'
-          : 'Make room in your bags and visit one of the marked pickup sites.',
-        'Move beside ' +
+          ? 'Accept ' + ref(w, 'quest', quest.id) + '. Do not finish collecting its items yet.'
+          : 'Make room in your bags. Then go to one of the pickup spots on the map.',
+        'Stand next to ' +
           object.name +
-          ' and interact with it. Each successful pickup gives one copy of ' +
+          ' and use it. Each pickup gives you one ' +
           ref(w, 'item', item.id) +
           '.',
         quest
-          ? 'Repeat at available objects until you have the required quantity. Keep the items for your quest.'
-          : 'Collect the item in your bags.',
+          ? 'Do this again at other objects until you have as many as the quest needs. Keep the items for your quest.'
+          : 'The item goes into your bags.',
       ],
       details: [
-        'The object pickup is guaranteed when it is available and you meet its interaction requirements. A depleted object must respawn before another pickup.',
+        'If the object is there and you meet its requirements, you always get the item. Once an object is used up, you must wait for it to come back before you can pick it up again.',
       ],
       points: object.positions.map((p) => ({
         step: 'Reward',
@@ -226,15 +235,16 @@ export function questAcquisitions(w: ArticleTools): Map<string, ItemAcquisition[
     addAcquisition(result, reward.itemId, {
       title: 'Complete the world quest ' + (title ? w.link(title, name) : name),
       details: [
-        'When this quest is on your active world-quest board, completion guarantees ' +
+        'If this quest is on your world-quest board, finishing it always gives you ' +
           reward.count +
-          ' copy. Requires level ' +
+          (reward.count === 1 ? ' copy' : ' copies') +
+          '. You need to be level ' +
           quest.minLevel +
-          '. The reward is credited at completion with no hand-in.',
+          ' or higher. You get the reward as soon as you finish, with no hand-in.',
       ],
       steps: [
         ...route.instructions,
-        'Check your bags for the item reward. If the reward was mailed because your bags were full, collect it from your mailbox.',
+        'Look in your bags for the item. If your bags were full, it was sent to your mailbox instead, so pick it up there.',
       ],
       points: route.points,
     });
@@ -244,20 +254,21 @@ export function questAcquisitions(w: ArticleTools): Map<string, ItemAcquisition[
       addAcquisition(result, id, {
         title: 'Starting equipment · ' + ref(w, 'class', cls),
         steps: [
-          'At character creation choose ' + ref(w, 'class', cls) + '.',
-          'Enter the world on the new character. The item is supplied as part of that character’s starting equipment.',
+          'When you make a new character, choose ' + ref(w, 'class', cls) + '.',
+          'Enter the world with the new character. It starts with this item.',
         ],
-        details: ['Guaranteed starting equipment. No vendor payment or drop roll is required.'],
+        details: [
+          'Every new character of this class starts with it. You do not need to buy it or wait for it to drop.',
+        ],
       });
   addAcquisition(result, 'wardens_seal', {
     title: 'Current availability',
     steps: [
-      'Continue [[The Waking Warden]] and then [[The Seal Restored]] through their quest objectives. Neither requires you to collect this item.',
+      'Do [[The Waking Warden]], then [[The Seal Restored]]. Neither quest asks you to collect this item.',
     ],
     details: [
-      'This item record has an authored drop on ' +
-        ref(w, 'mob', 'waking_warden') +
-        ', but the linked quest has no collect objective for it. The current loot rules therefore award no bag copy. There is no verified vendor or crafting source.',
+      ref(w, 'mob', 'waking_warden') +
+        ' is set up to drop this item for a quest. But that quest never asks you to collect it, so the loot rules never give you a copy. No shop or crafting recipe that we know of gives it either.',
     ],
   });
   return result;

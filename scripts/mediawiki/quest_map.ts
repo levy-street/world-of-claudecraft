@@ -42,12 +42,32 @@ export function questMap(
   const blocks = [
     kind === 'item' ? '== Acquisition map ==' : '== Route map ==',
     ...notes.map((note) => note + '\n'),
-    (kind === 'item'
-      ? 'Numbers match the source sections above. Each location names its starting, objective or collection action. Choose one available source.'
-      : kind === 'system'
-        ? 'S = start · Numbers = walkthrough steps · R = reward or arrival.'
-        : 'S = start · Numbers = objective steps · H = hand-in.') +
-      ' Overworld maps show the full zone. Pins with multiple labels share one location. A + on a pin means more source numbers are listed below. Circles show search areas. Coordinates are (X, Z) in yards. Each instance map uses its own room origin.',
+    [
+      ...(kind === 'item'
+        ? [
+            'This map shows where to get the item. You only need one of the ways listed above.',
+            '* A number on the map matches a numbered way to get it above.',
+            '* Each spot in the list below the map says what to do there: start, do a step, or get the item.',
+          ]
+        : kind === 'system'
+          ? [
+              'This map shows where to go.',
+              '* S marks where you start.',
+              '* A number on the map matches a numbered step in the walkthrough.',
+              '* R marks where you get your reward or arrive.',
+            ]
+          : [
+              'This map shows where to go for this quest.',
+              '* S marks where you start the quest.',
+              '* A number on the map matches a numbered quest objective.',
+              '* H marks where you hand in the quest.',
+            ]),
+      '* A pin showing more than one number or letter (like 1/2) is one spot used for all of them.',
+      '* A + on a pin means there are more numbers for that spot in the list below the map.',
+      '* A circle is an area to search, not one exact spot.',
+      '* Coordinates are written (X, Z) and measured in yards.',
+      '* Maps of the outside world show the whole zone. Maps inside a dungeon or building use their own coordinates, starting from that room.',
+    ].join('\n'),
   ];
   for (const [name, points] of groups) {
     const zone = points[0].frame === 'Overworld' ? zoneContaining(points[0].x, points[0].z) : null;
@@ -131,7 +151,20 @@ export function questMap(
           esc(badge) +
           '</span>',
       );
-      rows.push('* ' + label + (radius ? ' · ' + fmt(radius) + ' yd radius' : ''));
+      // One line per thing to do at this spot: its number, where, then what to do there.
+      const where =
+        ' (' +
+        fmt(p.x) +
+        ', ' +
+        fmt(p.z) +
+        ')' +
+        (radius ? ', search within ' + fmt(radius) + ' yards' : '');
+      for (const text of new Set(same.map((q) => q.label))) {
+        const marks = [...new Set(same.filter((q) => q.label === text).map((q) => marker(q.step)))];
+        rows.push(
+          "* '''" + marks.join('/') + "'''" + where + ': ' + text.replaceAll(' · ', ', ') + '.',
+        );
+      }
     }
     blocks.push(
       "'''" + name + "'''",

@@ -43,11 +43,11 @@ export function addExpeditionCollections(w: SystemWriter) {
   const riding =
     'Basic riding costs ' +
     BASIC_RIDING_FEE_COPPER / 10000 +
-    ' gold and increases movement speed by ' +
+    ' gold and makes you move ' +
     percent(ridingMoveSpeedPct(1)) +
-    '. Advanced training costs ' +
+    ' faster. Advanced training costs ' +
     ADVANCED_RIDING_FEE_COPPER / 10000 +
-    ' gold and raises that bonus to ' +
+    ' gold and raises that to ' +
     percent(ridingMoveSpeedPct(2)) +
     '.';
   w.describe('Mounts and riding', riding);
@@ -57,7 +57,7 @@ export function addExpeditionCollections(w: SystemWriter) {
       'Mounts and riding',
       m.name,
       'Mount',
-      `A ${m.rarity} mount appearance. Its speed depends entirely on your riding training.`,
+      `A ${m.rarity} mount look. How fast it goes depends only on your riding training.`,
       riding,
       list(reins.map((r) => `Reins: ${item(r.id)}`)),
     );
@@ -71,7 +71,7 @@ export function addExpeditionCollections(w: SystemWriter) {
         m.rarity +
         ' Season ' +
         m.season +
-        ' store appearance. Equipping it changes how your mount looks. Your riding tier still sets its speed.',
+        ' store look for your mount. Wearing it changes how your mount looks. Your riding training still sets how fast it goes.',
     );
   for (const s of WEAPON_SKIN_LIST.filter((s) => isGrantableWeaponSkin(s.id))) {
     const copy = armorySkinStrings[s.id as keyof typeof armorySkinStrings];
@@ -86,9 +86,9 @@ export function addExpeditionCollections(w: SystemWriter) {
         s.rarity +
         ' ' +
         words(s.collection) +
-        ' appearance for weapons of type ' +
+        ' look for weapons of type ' +
         s.weaponType +
-        '. It changes the equipped weapon model and preserves the weapon statistics.',
+        '. It changes how your equipped weapon looks. The weapon keeps all its stats.',
       offer
         ? `Buy from the Lantern Hall quartermaster for ${offer.seals} Lantern Seals.`
         : `Available from the Season ${s.season} Armory.`,
@@ -101,9 +101,9 @@ export function addExpeditionCollections(w: SystemWriter) {
       'Companions',
       b.name,
       'Companion',
-      'A cosmetic companion that follows its owner.',
+      'A companion that follows its owner around. It is just for looks.',
       b.key === 'sprites'
-        ? 'Earned when five friends complete referral cards. See [[Referral cards]].'
+        ? 'You earn it when five friends finish referral cards. See [[Referral cards]].'
         : '',
       b.key === TUG_HONOR_OFFER.buddy
         ? 'Buy this account unlock for ' +
@@ -126,7 +126,7 @@ export function addExpeditionCollections(w: SystemWriter) {
     'The Reliquary',
     heading(
       'Curator ranks',
-      'Curator rank counts distinct catalogued entries, not duplicate copies. Rank rewards are cosmetic and award no Renown.\n\n' +
+      'Curator rank counts how many different entries you have collected. Extra copies of the same entry do not count. Rank rewards are just for looks and give no Renown.\n\n' +
         '{| class="wikitable"\n! Rank !! Distinct entries !! Seal and reward\n' +
         CURATOR_RANK_DEFS.map(
           (rank) =>
@@ -154,15 +154,15 @@ export function addExpeditionCollections(w: SystemWriter) {
       d.name,
       'Deed',
       retiredActivity
-        ? `'''Retired deed.''' [[${retiredActivity}]] is closed. Existing earners keep the deed. New players cannot earn it.`
+        ? `'''Retired deed.''' [[${retiredActivity}]] is closed. Players who already earned this deed keep it. Nobody can earn it now.`
         : deedLead(d),
       heading(retiredActivity ? 'Original requirement' : 'How to earn', deedRequirements(w, d)),
       heading(
         'Reward',
-        'Awards ' +
+        'Gives ' +
           d.renown +
           ' Renown.' +
-          (d.feat ? ' This feat sits outside completion percentages.' : ''),
+          (d.feat ? ' This is a feat, so it does not count toward completion percentages.' : ''),
       ),
       d.reward?.kind === 'title'
         ? `Unlocks the title "${d.reward.text}".`
@@ -184,9 +184,9 @@ export function addExpeditionCollections(w: SystemWriter) {
       'Equipment set',
       heading('Equipped bonuses', list(set.bonuses.map((b) => `${b.pieces} pieces: ${b.text}`))),
       related.length
-        ? 'Pieces also count toward the same thresholds when mixed with ' +
+        ? 'You can mix these pieces with pieces from ' +
             related.join(', ') +
-            '. Each threshold pays once.'
+            '. They all count toward the same bonuses. Each bonus only works once, even if you mix sets.'
         : '',
       heading('Pieces', list(pieces.map((i) => item(i.id)))),
     );
@@ -202,7 +202,7 @@ export function addExpeditionCollections(w: SystemWriter) {
         words(page.shelf) +
         '.' +
         (page.excludeFromCompletion
-          ? ` This ${page.excludeFromCompletion} page sits outside completion percentages.`
+          ? ` This ${page.excludeFromCompletion} page does not count toward completion percentages.`
           : ''),
       heading(
         'Collect these entries',
@@ -236,18 +236,18 @@ export function addExpeditionCollections(w: SystemWriter) {
   }
   w.describe(
     'Delves',
-    'Across your first three clears of each reset day, Normal pays 1 base Delve Mark per clear and Heroic pays 2. Later Normal clears have a 50% chance to pay 1, and Heroic pays 1. The Drowned Litany doubles these base payouts. Chest and rite bonus Marks apply only in the first three clears.',
+    'For your first three clears each reset day, a Normal clear gives 1 base Delve Mark and a Heroic clear gives 2. After that, a Normal clear has a 50% chance to give 1, and a Heroic clear gives 1. The Drowned Litany gives twice these base amounts. Bonus Marks from the chest and the rite only come in your first three clears.',
   );
   for (const d of DELVE_LIST) {
     w.article(
       'Delves',
       d.name,
       'Delve',
-      'Requires level ' +
+      'You need level ' +
         d.minLevel +
-        '. Suggested party size: ' +
+        '. Best party size: ' +
         d.suggestedPlayers +
-        '. Maximum: ' +
+        '. Most players allowed: ' +
         d.maxPlayers +
         '. The entrance is at x ' +
         d.doorPos.x +
@@ -260,7 +260,7 @@ export function addExpeditionCollections(w: SystemWriter) {
         list(
           d.tiers.map(
             (t) =>
-              `${t.label}: ${t.firstClearXp ?? d.baseRewards.firstClearXp} XP for the first clear of this tier per reset day, then ${t.repeatClearXp ?? d.baseRewards.repeatClearXp} XP. Each clear pays ${t.copperMin ?? d.baseRewards.copperMin} to ${t.copperMax ?? d.baseRewards.copperMax} copper.`,
+              `${t.label}: ${t.firstClearXp ?? d.baseRewards.firstClearXp} XP for your first clear of this tier each reset day, then ${t.repeatClearXp ?? d.baseRewards.repeatClearXp} XP for later clears. Each clear gives ${t.copperMin ?? d.baseRewards.copperMin} to ${t.copperMax ?? d.baseRewards.copperMax} copper.`,
           ),
         ),
       ),
@@ -270,15 +270,15 @@ export function addExpeditionCollections(w: SystemWriter) {
           d.tiers.map(
             (t) =>
               t.label +
-              ': minimum level ' +
+              ': you need level ' +
               Math.max(d.minLevel, t.minPlayerLevel ?? d.minLevel) +
-              ', enemy level bonus +' +
+              '. Enemy level bonus: +' +
               t.enemyLevelBonus +
-              ', ' +
+              '. Affixes (extra rules that make it harder): ' +
               t.affixCount +
-              ' affixes.' +
+              '.' +
               (t.unlock
-                ? ' Requires ' +
+                ? ' To unlock this tier, you need ' +
                   t.unlock.clears +
                   ' clear(s) of ' +
                   words(t.unlock.delveId) +
@@ -307,7 +307,7 @@ export function addExpeditionCollections(w: SystemWriter) {
         (c.kind === 'heroic' ? ' on Heroic' : '') +
         '. ' +
         (c.taskDeedId ? `${DEEDS[c.taskDeedId].desc} ` : '') +
-        'The contract pays ' +
+        'The contract gives ' +
         c.seals +
         ' Lantern Seals.',
     );
@@ -318,12 +318,12 @@ export function addExpeditionCollections(w: SystemWriter) {
       'Clue hunts',
       copy.title,
       'Clue hunt',
-      `Follow these steps in order. The last dig awards a ${item('treasure_casket')}.`,
+      `Do these steps in order. The last dig gives you a ${item('treasure_casket')}.`,
       c.steps
         .map((s) => {
           switch (s.kind) {
             case 'npc':
-              return `# Speak to ${w.entity('npc', s.npcId)}.`;
+              return `# Talk to ${w.entity('npc', s.npcId)}.`;
             case 'deliver':
               return (
                 '# Give ' +
@@ -367,11 +367,11 @@ export function addExpeditionCollections(w: SystemWriter) {
   }
   w.describe(
     'Buried hoards',
-    'Read a treasure map, travel within ' +
+    'Read a treasure map. Go to within ' +
       TREASURE_DIG_RADIUS +
-      ' yards of its marked spot and dig. The portal lasts up to ' +
+      ' yards of its marked spot and dig there. The portal stays open for up to ' +
       VAULT_PORTAL_LIFETIME / 3600 +
-      ' hours. Entry requires level ' +
+      ' hours. You need level ' +
       HOARD_MIN_LEVEL +
       '.',
   );
@@ -383,26 +383,26 @@ export function addExpeditionCollections(w: SystemWriter) {
       'Hoard',
       'Opened with ' +
         item(TREASURE_MAP_ITEM_IDS[rarity]) +
-        '. Recommended group size: ' +
+        '. Best group size: ' +
         HOARD_SUGGESTED_PLAYERS[rarity] +
         '.',
       list([
-        'Owner gear chance: ' +
+        'Chance of gear for the map owner: ' +
           percent(v.gearChance) +
-          '. Guest gear chance: ' +
+          '. Chance of gear for a guest: ' +
           percent(VAULT_GUEST_GEAR_CHANCE[rarity]) +
           '.',
-        'Pays ' +
+        'Gives ' +
           v.materials +
           ' materials and ' +
           percent(v.copperMult) +
-          ' of level-scaled casket copper before the owner bonus.',
+          ' of the casket copper for your level, before the owner bonus is added.',
         `${percent(v.markChance)} chance for ${v.marks} Heroic Marks.`,
         `${percent(v.mountChance)} mount chance.`,
-        `${percent(v.nextMapChance)} chance of a higher-rarity map.`,
+        `${percent(v.nextMapChance)} chance of a rarer map.`,
       ]),
       TREASURE_MAP_UPGRADE_INKS[rarity]
-        ? 'To upgrade this map before digging, spend ' +
+        ? 'To upgrade this map before you dig, spend ' +
             TREASURE_MAP_UPGRADE_INKS[rarity] +
             ' x ' +
             item('cartographers_ink') +
@@ -420,7 +420,7 @@ export function addExpeditionCollections(w: SystemWriter) {
       'Ferry',
       'The ferry waits ' +
         route.timings.docked +
-        ' seconds at each berth and cruises at ' +
+        ' seconds at each dock and sails at ' +
         route.timings.cruise +
         ' yards per second.',
       list(route.berths.map((b, i) => `${berths[i]}: x ${b.x}, z ${b.z}.`)),
@@ -434,7 +434,7 @@ export function addExpeditionCollections(w: SystemWriter) {
       a.description.replace(/\s*[\u2014\u2013]\s*/g, ', '),
       `Tier: ${a.tier}.`,
       a.classes ? `Available to ${a.classes.join(', ')}.` : '',
-      a.roles ? `Eligible roles: ${a.roles.join(', ')}.` : '',
+      a.roles ? `Roles that can get it: ${a.roles.join(', ')}.` : '',
     );
   for (const p of POWERUPS) {
     const effects = p.buffs.map((b) => {

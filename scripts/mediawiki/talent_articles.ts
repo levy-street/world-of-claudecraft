@@ -87,10 +87,14 @@ export function addTalentPages({
           spec.description +
             ' ' +
             classLink +
-            ' characters can select this specialization from level ' +
+            ' characters can choose this specialization from level ' +
             SPEC_UNLOCK_LEVEL +
-            '. Its role is ' +
-            (spec.role === 'dps' ? 'damage' : spec.role) +
+            '. Its job in a group is ' +
+            (spec.role === 'dps'
+              ? 'dealing damage'
+              : spec.role === 'tank'
+                ? 'tanking'
+                : 'healing') +
             '.',
         ) +
           section('Signature abilities', bullets(signatureIds.map(abilityLink))) +
@@ -113,7 +117,7 @@ export function addTalentPages({
               classLink +
                 ' characters can choose this talent at level ' +
                 row.level +
-                '. Choose one talent from this row.',
+                '. You can pick only one talent from each row, so taking this one means you do not get the other choices below.',
             ) +
             (related.length ? section('Affected abilities', bullets(related)) : '') +
             section('Other choices at level ' + row.level, bullets(alternatives)),

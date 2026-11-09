@@ -82,9 +82,9 @@ export function addDungeonCatalog(w: Writer): Map<string, string> {
     const zoneLink = zone ? w.link(w.titleBy.zone.get(zone.id)!, zone.name) : 'the overworld';
     const location = zoneLink + ' at (' + entrance.doorPos.x + ', ' + entrance.doorPos.z + ')';
     const steps = [
-      'Form a raid group. In [[Dungeon Finder]], choose this raid and your difficulty. Automatic matching forms a group of ' +
+      'Form a raid group. Open the [[Dungeon Finder]] and choose this raid and a difficulty. The Finder puts together a group of ' +
         activity.size +
-        ' players; the Finder level requirement is ' +
+        ' players. To join through the Finder, your level must be ' +
         band(activity) +
         '.',
       activity.attunementQuestId
@@ -93,13 +93,13 @@ export function addDungeonCatalog(w: Writer): Map<string, string> {
             w.titleBy.quest.get(activity.attunementQuestId)!,
             QUESTS[activity.attunementQuestId].name,
           ) +
-          ' on your character before crossing the sealed raid door. Queue eligibility does not replace this entry requirement.'
-        : 'This raid has no attunement quest listed by the Dungeon Finder. Entry still requires a raid group and an eligible lockout.',
-      'Travel to ' +
+          ' on this character before you go through the sealed raid door. Being allowed to join the queue does not count as finishing it.'
+        : 'The Dungeon Finder lists no attunement quest for this raid. To enter, you still need a raid group, and you must not be locked out.',
+      'Go to ' +
         location +
         ' and enter ' +
         roomLink(entrance) +
-        '. Follow the room route below.',
+        '. Then go through the rooms in the order below.',
     ];
     const points: RoutePoint[] = [
       { step: 'Start', frame: 'Overworld', label: 'Entrance to ' + name, ...entrance.doorPos },
@@ -130,7 +130,7 @@ export function addDungeonCatalog(w: Writer): Map<string, string> {
         });
       const unlock =
         room.id === IGNIVAR_LIFT_ROOM_ID
-          ? 'On a fresh run, wait ' +
+          ? 'On a new run, wait ' +
             IGNIVAR_LIFT_RIDE_SECONDS +
             ' seconds for the forge-lift to arrive and its gate to open'
           : room.id === IGNIVAR_FORGE_APPROACH_ID || room.id === IGNIVAR_MOLTEN_ASSEMBLY_ID
@@ -147,13 +147,7 @@ export function addDungeonCatalog(w: Writer): Map<string, string> {
         (bosses.length ? ' · ' + bosses.map((b) => mobLink(b.mobId)).join(', ') : '') +
         (unlock ? '. ' + unlock : '') +
         (door
-          ? '. Continue through ' +
-            door.name +
-            ' at room coordinates (' +
-            door.x +
-            ', ' +
-            door.z +
-            ').'
+          ? '. Go through ' + door.name + ' at (' + door.x + ', ' + door.z + ') in this room.'
           : '.')
       );
     });
@@ -169,14 +163,14 @@ export function addDungeonCatalog(w: Writer): Map<string, string> {
         activity.encounters.length +
         ' boss encounter' +
         (activity.encounters.length === 1 ? '' : 's') +
-        '. This guide covers the whole raid, including its approach and connected rooms.\n\n' +
+        '. This guide covers the whole raid, including the way in and every connected room.\n\n' +
         w.section(
           'Entry',
           w.table([
             [
               'Group',
               activity.size +
-                ' players. Finder composition: ' +
+                ' players. A Finder group has ' +
                 activity.composition!.tank +
                 ' tanks, ' +
                 activity.composition!.healer +
@@ -205,19 +199,19 @@ export function addDungeonCatalog(w: Writer): Map<string, string> {
                 mobLink(encounter.mobId) +
                 ' · Encounter ' +
                 (i + 1) +
-                '. Open the boss guide for Normal and Heroic mechanics, role advice and loot.',
+                '. Open the boss page to see how the fight works on Normal and Heroic, tips for each role, and loot.',
             ),
           ),
         ) +
         w.section(
           'Rewards and repeat runs',
-          'Open each boss guide for its drops and follow an item link for exact acquisition conditions. Normal and Heroic rewards can differ. See [[Party loot]] for distribution rules and [[Weekly Vault]] for weekly reward progress.\n\n' +
+          'Each boss page lists what it drops. Click an item to see exactly how to get it. Normal and Heroic rewards can be different. See [[Party loot]] for how loot is shared, and [[Weekly Vault]] for weekly rewards.\n\n' +
             (activity.lockout === 'weekly'
-              ? 'Crucible boss-room lockouts last until the weekly reset. Clearing the first boss does not by itself mean the second boss is cleared.'
-              : 'Nythraxis uses a daily final-boss lockout. Check your saved run before arranging another clear.'),
+              ? 'In the Crucible, each boss room has its own lockout. It lasts until the weekly reset. Beating the first boss does not count as beating the second.'
+              : 'Nythraxis has a daily lockout that starts when you defeat the final boss. Check your saved run before you plan another clear.'),
         ) +
         questMap({ points }, 'system', [
-          'Boss markers show their starting areas. Collect loot from the actual corpse after the fight.',
+          'Boss markers show where each boss starts. After the fight, loot the boss where its body lies.',
         ]) +
         w.section('Room reference', w.bullets(rooms.map(roomLink))),
       ['Raids'],
@@ -235,7 +229,7 @@ export function addDungeonCatalog(w: Writer): Map<string, string> {
   );
   w.add(
     'Raids',
-    'Raids are larger group adventures. Each entry below covers one complete raid; its connected rooms are described inside the guide.\n\n' +
+    'Raids are adventures for big groups. Each entry below is one whole raid. Its connected rooms are covered inside its guide.\n\n' +
       w.bullets(raidRows),
     ['Portals'],
   );
@@ -244,10 +238,10 @@ export function addDungeonCatalog(w: Writer): Map<string, string> {
   );
   w.add(
     'Dungeons',
-    'Entrances, boss strategies, routes and rewards for every dungeon and raid.\n\n' +
+    'Find the entrance, route, boss tips and rewards for every dungeon and raid.\n\n' +
       w.section(
         'Five-player dungeons',
-        'The levels below apply to [[Dungeon Finder]]. Heroic matching requires level 20; individual entrance requirements are listed in each guide.\n\n' +
+        'The levels below are for the [[Dungeon Finder]]. You must be level 20 to be matched for Heroic. Each guide lists its own entrance rules.\n\n' +
           w.bullets(
             fivePlayer.map(
               (a) =>
@@ -262,7 +256,7 @@ export function addDungeonCatalog(w: Writer): Map<string, string> {
       ) +
       w.section(
         'Raids',
-        'Ten-player encounters with Normal and Heroic difficulties. Each guide covers the full raid from entrance to final boss.\n\n' +
+        'Raids for ten players, on Normal or Heroic. Each guide covers the whole raid, from the entrance to the final boss.\n\n' +
           w.bullets(raidRows),
       ) +
       w.section(
@@ -271,9 +265,9 @@ export function addDungeonCatalog(w: Writer): Map<string, string> {
           FINDER_ACTIVITIES.filter((a) => a.kind === 'solo').map(
             (a) =>
               roomLink(DUNGEONS[a.dungeonId]) +
-              ' · Attunement adventure leading to ' +
+              ' · Attunement adventure for ' +
               w.link(parentByRoom.get(a.dungeonId)!) +
-              '. Designed for solo play; social listings allow up to ' +
+              '. Made to be played alone, but social listings allow up to ' +
               a.size +
               ' players.',
           ),
@@ -281,7 +275,7 @@ export function addDungeonCatalog(w: Writer): Map<string, string> {
       ) +
       w.section(
         'Delves',
-        'Short instanced runs for a small party or a solo player with a companion. See [[Delves]] for rewards and [[Delve companions]] for hired help.\n\n' +
+        'Short runs in your own private copy, for a small group or for one player with a companion. See [[Delves]] for rewards and [[Delve companions]] for helpers you can hire.\n\n' +
           w.bullets(
             DELVE_LIST.map(
               (d) =>
@@ -296,9 +290,9 @@ export function addDungeonCatalog(w: Writer): Map<string, string> {
       ) +
       w.section(
         'Rifts',
-        'Ranked portals for level ' +
+        'Portals with ranks, for level ' +
           RIFT_MIN_LEVEL +
-          ' characters, cleared floor by floor. See [[Rifts]] for how to open one.\n\n' +
+          ' characters. You clear them one floor at a time. See [[Rifts]] to learn how to open one.\n\n' +
           w.bullets(
             (['C', 'B', 'A', 'S'] as const).map(
               (rank) =>
@@ -310,7 +304,7 @@ export function addDungeonCatalog(w: Writer): Map<string, string> {
       ) +
       w.section(
         'Before you enter',
-        'Use [[Dungeon Finder]] to form a group, check [[Heroic difficulty]] before a Heroic run, and read [[Party loot]] and [[Death and recovery]] for loot and recovery rules.',
+        'Use the [[Dungeon Finder]] to form a group. Read [[Heroic difficulty]] before a Heroic run. See [[Party loot]] for how loot works, and [[Death and recovery]] for what happens when you die.',
       ),
     ['Portals'],
   );

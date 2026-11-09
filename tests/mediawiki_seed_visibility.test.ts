@@ -77,7 +77,7 @@ describe('MediaWiki ability visibility', () => {
     expect(article).toBeDefined();
     expect(article).toContain('85 Physical damage at zero Ranged Attack Power over 15 sec');
     expect(article).toContain('5 times, once every 3 sec');
-    expect(article).toContain('each tick is rounded to a whole number');
+    expect(article).toContain('Each tick is rounded to a whole number');
     expect(article).not.toMatch(/\$d|\{damage\}/);
   });
 

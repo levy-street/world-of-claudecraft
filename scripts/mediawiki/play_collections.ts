@@ -3,96 +3,96 @@ import type { PlayPath } from './play_path';
 
 export const collectionPaths: Record<string, PlayPath> = {
   'Book of Deeds': {
-    where: 'Open the Book of Deeds anywhere (Shift+Z by default).',
-    need: 'Choose an available deed. Check the named quest, activity, item or count on its page. A deed marked retired cannot be newly earned.',
+    where: 'Open the Book of Deeds from anywhere (Shift+Z by default).',
+    need: 'Pick a deed you can still earn. Its page names the quest, activity, item or number you need. A deed marked retired cannot be earned any more.',
     steps: [
-      'Select a deed category and open a deed. Read its requirement and progress. Add it to your watchlist if you want the objective visible while playing.',
-      'Use one character to complete the stated requirement. For a multi-part deed, finish each listed part on that character. Use the linked deed article below for the exact checklist.',
-      'Reopen the Book to see the earned date, character and reward. Use the Book to wear an unlocked title or border.',
+      'Pick a deed category and open a deed. Read what it asks for and how far along you are. Add it to your watchlist if you want to see the goal while you play.',
+      'Do what the deed asks on one character. If the deed has several parts, finish every part on that same character. The deed pages below give the exact checklist.',
+      'Open the Book again to see the date you earned it, the character who earned it and the reward. You can wear an unlocked title or border from the Book.',
     ],
     result:
-      'The game records the deed automatically. Renown and any title or border are shared across the account. Earning the same deed on another character does not add its Renown twice.',
+      'The game saves the deed for you. Renown and any title or border are shared by every character on your account. Earning the same deed on another character does not give its Renown a second time.',
   },
   'The Reliquary': {
-    where: 'Open The Reliquary anywhere (Shift+X by default).',
-    need: 'Choose a shelf, then a page with a missing relic. Check the source shown for the missing piece.',
+    where: 'Open The Reliquary from anywhere (Shift+X by default).',
+    need: 'Pick a shelf, then a page with a missing relic. Look at where the missing piece comes from.',
     steps: [
-      'Select the shelf and page. Inspect the missing silhouette to identify the relic you need. You can pin up to ' +
+      'Pick the shelf and the page. Look at the empty outline (silhouette) to see which relic you need. You can pin up to ' +
         RELIQUARY_TRACK_CAP +
         ' pages to follow them on this character.',
-      "Follow the relic's source: for example, defeat its named boss at the stated difficulty or obtain its required crafted piece. The first qualifying acquisition on any character fills that silhouette.",
-      'Reopen the page to see the fill. Collect every required piece on the page to illuminate it. Check your Curator rank for cosmetic rewards.',
+      'Get the relic from its source. For example, defeat its named boss on the right difficulty, or get the crafted piece it needs. The first time any of your characters gets it the right way, its outline fills in.',
+      'Open the page again to see it filled in. Collect every piece the page needs to light up the whole page. Check your Curator rank for look-only (cosmetic) rewards.',
     ],
     result:
-      'Collection progress is account-wide. Retired and Personal pages do not gate completion. Account weapon skins can fill their pages but do not score Curator rank.',
+      'Your collection is shared by every character on your account. Retired and Personal pages do not count toward completion. Account weapon skins can fill their pages, but they do not raise your Curator rank.',
   },
   Companions: {
-    where: 'Open Cosmetics (Shift+Y by default) and select the companion collection.',
-    need: 'An unlocked companion. Each entry below gives its own source. For example, Tug, the Warhorse is bought from an Honor quartermaster, while Crystal Lich comes from Heroic Nythraxis.',
+    where: 'Open Cosmetics (Shift+Y by default) and pick the companion collection.',
+    need: 'A companion you have unlocked. Each entry below says where to get it. For example, you buy Tug, the Warhorse from an Honor quartermaster. Crystal Lich comes from Heroic Nythraxis.',
     steps: [
-      'Meet the listed unlock condition. If you won a boss companion, leave the instance to reveal it.',
-      'In Cosmetics, select the collected companion and choose Summon. To put it away, choose Dismiss.',
-      "For automatic corpse looting, right-click the summoned companion's target frame (double-tap on touch) and choose Enable Autoloot.",
+      'Do what the entry says to unlock it. If you won a companion from a boss, leave the instance to see it.',
+      'In Cosmetics, pick the companion you collected and choose Summon. To send it away, choose Dismiss.',
+      "To have it loot bodies for you, right-click the summoned companion's target frame (double-tap on a touch screen) and choose Enable Autoloot.",
     ],
     result:
-      'The companion follows this character. Online, it is collected for your account. Auto-loot picks up eligible loot you can carry within 30 yards of you, outside raid instances.',
+      'The companion follows this character. When you play online, it is saved for your whole account. Autoloot picks up loot you are allowed to take and have room for, within 30 yards of you. It does not work inside raids.',
   },
   'Mount appearances': {
     where: 'Open Cosmetics (Shift+Y by default), then Mounts.',
-    need: 'Learn riding from Stablemaster Marla Hitchen before summoning a mount. You also need the appearance you want to wear. See [[Mounts and riding]] for training and collectible reins.',
+    need: 'Learn riding from Stablemaster Marla Hitchen before you can summon a mount. You also need the look (appearance) you want to use. See [[Mounts and riding]] for training and reins you can collect.',
     steps: [
-      'Find the appearance in Mounts. Choose Preview to inspect it. The card indicates whether you own it.',
-      'On an owned appearance select Wear, then summon your mount. Use Take off on the worn skin to remove it.',
-      'For appearances shared through collectible mount items, keep the item in the bags or bank of a character on the account.',
+      'Find the look in Mounts. Choose Preview to see it. The card shows whether you own it.',
+      'On a look you own, choose Wear, then summon your mount. To remove it, choose Take off on the look you are wearing.',
+      'Some looks come from mount items that are shared with your account. Keep that item in the bags or bank of any character on the account.',
     ],
     result:
-      "Your mount uses the chosen look. This choice belongs to the character. Speed comes from that character's riding training.",
+      "Your mount uses the look you picked. This choice is only for this character. Your mount's speed comes from that character's riding training.",
   },
   'Weapon appearances': {
-    where: 'Open Cosmetics (Shift+Y by default) and select Skins.',
-    need: 'Own the skin and equip a weapon of the matching type. For example, a sword skin requires a compatible sword.',
+    where: 'Open Cosmetics (Shift+Y by default) and pick Skins.',
+    need: 'Own the skin and hold a weapon of the same type. For example, a sword skin needs a sword it fits.',
     steps: [
-      'Choose an appearance from the list below to identify the type and source. Obtain it, then equip the compatible weapon.',
-      'Open Skins, find the owned skin under its weapon type, and choose Apply.',
-      'To restore the underlying weapon appearance, choose Detach on the applied skin.',
+      'Pick a look from the list below to see its weapon type and where to get it. Get it, then equip a weapon it fits.',
+      'Open Skins, find the skin you own under its weapon type, and choose Apply.',
+      'To get your weapon’s normal look back, choose Detach on the skin you applied.',
     ],
     result:
-      'Your equipped weapon changes appearance. Its damage and stats stay the same. Skin ownership is shared across your account.',
+      'Your weapon looks different. Its damage and stats stay the same. Every character on your account owns the skins you have.',
   },
   Membership: {
     where:
-      'Online, open the WOC Store and select Membership. For gear and account storage, visit a banker and select the Account bank.',
-    need: 'An active membership for the benefits. To add 30 days with an item, obtain a [[Membership Token (30 Days)]] from another player or from a supported store purchase.',
+      'Online, open the WOC Store and pick Membership. For gear and account storage, visit a banker and pick the Account bank.',
+    need: 'An active membership for the benefits. To add 30 days with an item, get a [[Membership Token (30 Days)]] from another player or from a store purchase that includes one.',
     steps: [
-      'For a purchased token, select Buy membership token, complete the purchase, then return on the purchasing character and select Collect purchased token. Take the delivered token from the purchase parcel or your mailbox.',
-      'Open your bags and use the token to add 30 days to your account. A token still in your bags can be traded instead.',
-      'With membership active, open the Account bank at a banker and choose Claim membership gear. Equip all seven membership armor pieces to activate the XP bonus. The staff is separate.',
+      'To buy a token, choose Buy membership token and finish the purchase. Then go back to the character you bought it on and choose Collect purchased token. Take the token from the purchase parcel or your mailbox.',
+      'Open your bags and use the token to add 30 days to your account. You can trade a token instead, as long as it is still in your bags.',
+      'While your membership is active, open the Account bank at a banker and choose Claim membership gear. Wear all seven membership armor pieces to turn on the XP bonus. The staff does not count as part of the set.',
     ],
     result:
-      'Membership grants access to the account bank, 10 extra character slots, an extra bag slot and half the usual auction tax. The full armor set gives 20% more XP while membership is active. The matching referral-set bonus does not stack with it.',
+      'Membership gives you the account bank, 10 more character slots, one more bag slot and half the normal auction tax. The full armor set gives 20% more XP while membership is active. The matching referral set gives the same bonus, but the two do not add together.',
   },
   'Mobile Play': {
     where:
-      'Enter the game on a phone or tablet. Your movement stick appears at the left and Quick Actions at the bottom of the game screen.',
-    need: 'A touchscreen for the touch layout. A supported connected controller can also operate the game.',
+      'Start the game on a phone or tablet. Your movement stick is on the left, and Quick Actions is at the bottom of the screen.',
+    need: 'A touch screen for the touch controls. A connected game controller that the game supports also works.',
     steps: [
       'Drag the left stick to move. Drag on the world to turn the camera. Pinch with two fingers to zoom.',
-      'Select a target, then tap an ability on the on-screen action bar. Tap Quick Actions to open a window. Tap More in that menu for additional windows.',
-      'With a controller, use the left stick to move and right stick to look. In a window such as Bags, use the on-screen pointer. Adjust bindings, deadzone and camera speed in the controller settings.',
+      'Pick a target, then tap an ability on the action bar on the screen. Tap Quick Actions to open a window. Tap More in that menu for more windows.',
+      'With a controller, use the left stick to move and the right stick to look around. In a window such as Bags, use the pointer on the screen. Change buttons, deadzone and camera speed in the controller settings.',
     ],
     result:
-      'These controls perform the same actions and open the same character windows as desktop controls. Rewards come from the activity you complete.',
+      'These controls do the same things and open the same character windows as the desktop controls. Rewards come from the activity you finish.',
   },
   'Agents and Bots': {
     where:
-      'For a local practice agent, open a terminal in a checkout of the game. The example runs outside the browser.',
-    need: 'The game source, its Node dependencies, and Python with gymnasium and numpy installed.',
+      'For a practice agent on your own computer, open a terminal in a copy of the game’s code. The example runs outside the browser.',
+    need: 'The game’s source code, its Node packages, and Python with gymnasium and numpy installed.',
     steps: [
-      'From the repository root, run npm ci, then npm run build:env. This builds the local simulation used by the example.',
-      'Install the Python dependencies with python -m pip install gymnasium numpy. Run python python/example_random_agent.py from the repository root.',
-      'The example starts a Warrior, samples actions, and resets the episode after completion. To control your own agent, use the observation returned by reset, pass an action to step, and call close when finished.',
+      'From the main folder of the code, run npm ci, then npm run build:env. This builds the local game that the example uses.',
+      'Install the Python packages with python -m pip install gymnasium numpy. Then run python python/example_random_agent.py from the main folder.',
+      'The example starts a Warrior, tries random actions, and starts the episode over when it ends. To control your own agent, use the observation that reset gives back, pass an action to step, and call close when you are done.',
     ],
     result:
-      'The example prints the available actions, observation shape, step rate and total training reward. This local simulation has its own character and does not award items or experience to your online character.',
+      'The example prints the actions you can use, the shape of the observation, how fast it steps and the total training reward. This local game has its own character. It does not give items or experience to your online character.',
   },
 };

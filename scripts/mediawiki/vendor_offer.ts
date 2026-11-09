@@ -12,15 +12,15 @@ import { type ArticleTools, ref } from './entity_format';
 export function vendorOfferText(w: ArticleTools, npc: NpcDef, item: ItemDef): string {
   if (item.teachesRiding)
     return (
-      'Riding service at level ' +
+      'Riding lessons from level ' +
       MOUNT_TRAIN_MIN_LEVEL +
       '. Basic training costs ' +
       w.money(ridingTrainingFee(0)) +
       '. Advanced training costs ' +
       w.money(ridingTrainingFee(1)) +
-      ' after basic training.'
+      ', and you need basic training first.'
     );
-  if (npc.devVendor) return 'Free on a development realm with developer commands enabled.';
+  if (npc.devVendor) return 'Free, but only on a test realm with developer commands turned on.';
   const costs: string[] = [];
   const conditions: string[] = [];
   const totals = buyPurchaseTotals(item, item.buyValue ?? 0, item.priceHonor ?? 0, 1);
@@ -34,7 +34,7 @@ export function vendorOfferText(w: ArticleTools, npc: NpcDef, item: ItemDef): st
     const faction = gate.factionId ?? vendorFactionForNpc(npc.id) ?? 'church_order';
     if (gate.currencyCost) costs.push(gate.currencyCost + ' ' + factionCurrencyName(faction));
     conditions.push(
-      'Requires ' +
+      'You need ' +
         gate.standingTier +
         ' standing (' +
         gate.requiredStanding +
@@ -45,16 +45,18 @@ export function vendorOfferText(w: ArticleTools, npc: NpcDef, item: ItemDef): st
   }
   if (npc.vendorQuestGates?.[item.id])
     conditions.push(
-      'Have ' + ref(w, 'quest', npc.vendorQuestGates[item.id]) + ' active or completed.',
+      'You must have ' +
+        ref(w, 'quest', npc.vendorQuestGates[item.id]) +
+        ' in your quest log, or have finished it.',
     );
   if (item.kind === 'mount' && !item.seasonalEvent && item.id !== GOURDLIGHT_BROOM_ID)
-    conditions.push('Requires riding training and level ' + MOUNT_TRAIN_MIN_LEVEL + '.');
+    conditions.push('You need riding training and level ' + MOUNT_TRAIN_MIN_LEVEL + '.');
   if (item.kind === 'mount') conditions.push('You can only buy a mount you do not already own.');
   const price = costs.length
     ? (totals.units === 1 ? 'One' : 'Stack of ' + totals.units) +
       ' for ' +
       costs.join(' and ') +
       '.'
-    : 'No purchase price is configured.';
+    : 'This item has no price set.';
   return [price, ...conditions].join(' ');
 }

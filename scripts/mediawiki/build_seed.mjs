@@ -123,16 +123,16 @@ const dungeonWriter = {section, bullets, table, mob: id => link(titleBy.mob.get(
 const zoneForQuest = id => questZoneName(QUESTS[id]);
 const reserve = title => unique(title, usedTitles);
 add('MediaWiki:Common.css', css, []);
-add('Main Page', section('World of ClaudeCraft', 'Look up a reward, plan a build, or read an encounter before you enter. Each article describes the rules in this edition of the game.') +
+add('Main Page', section('World of ClaudeCraft', 'Look up a reward, plan your character, or read about a boss fight before you go in. Every page explains how things work in this version of the game.') +
   subjects.map(([name,entries])=>section(name,bullets(entries.map(([title,label,description])=>link(title,label)+' · '+description)))).join('')+
   section('Reference', link('Quick Start') + ' · ' + link('All Pages','A to Z index')), ['Wiki']);
 
 add('Quick Start', section('First hour route', bullets([
-  'Create an online character for persistence, or use offline play for a quick solo test.',
+  'Make an online character if you want to keep your progress. Or play offline for a quick try on your own.',
   'Speak to ' + link(titleBy.npc.get('marshal_redbrook'), 'Marshal Redbrook') + ' for ' + link(titleBy.quest.get('q_wolves'), 'Wolves at the Door') + '.',
-  'Collect nearby Eastbrook quests before leaving town so wolf, boar, spider, lake, mine, bandit, and chapel objectives overlap.',
-  'Sell poor-quality junk, buy food and water, and keep your action bar filled.',
-  'Follow ' + link(titleBy.npc.get('brother_aldric'), 'Brother Aldric') + ' into the Gravecaller story once the Fallen Chapel quests open.',
+  'Pick up the other Eastbrook quests before you leave town. That way you can do the wolf, boar, spider, lake, mine, bandit and chapel quests on the same trip.',
+  'Sell your gray (poor-quality) junk, buy food and water, and keep your action bar full.',
+  'Follow ' + link(titleBy.npc.get('brother_aldric'), 'Brother Aldric') + ' into the Gravecaller story once the Fallen Chapel quests unlock.',
 ])) + section('Controls', table([
   ['WASD', 'Move and turn'], ['Q / E', 'Strafe'], ['Space', 'Jump'], ['Tab', 'Target nearest enemy'],
   ['F', 'Interact, loot, talk'], ['1-0, -, =', 'Action bar'], ['C / P / L / M / B / G', 'Character, spellbook, quest log, map, bags, arena'], ['Enter', 'Open chat'],
@@ -200,11 +200,11 @@ for (const zone of ZONES) {
   const quests = Object.keys(QUESTS).filter((id) => !QUESTS[id].seasonalEvent && zoneForQuest(id) === zone.name).map((id) => titleBy.quest.get(id));
   add(titleBy.zone.get(zone.id), section('Overview', zone.welcome) + section('Facts', table([
     ['Level range', zone.levelRange[0] + '-' + zone.levelRange[1]], ['Hub', zone.hub.name], ['Biome', zone.biome], ['Graveyard', zone.graveyard.x + ', ' + zone.graveyard.z],
-  ])) + section('Points of interest', bullets(zone.pois.map((poi) => poi.label))) + section('NPCs', bullets(npcs.map((title) => link(title)))) + section('Quests starting here', (zoneDirectories.has(zone.name) ? link(zoneDirectories.get(zone.name), 'Browse quests in ' + zone.name) + '\\n\\n' : '') + bullets(quests.map((title) => link(title)))), ['Zones', zone.biome]);
+  ])) + section('Points of interest', bullets(zone.pois.map((poi) => poi.label))) + section('NPCs', bullets(npcs.map((title) => link(title)))) + section('Quests starting here', (zoneDirectories.has(zone.name) ? link(zoneDirectories.get(zone.name), 'See all quests in ' + zone.name) + '\\n\\n' : '') + bullets(quests.map((title) => link(title)))), ['Zones', zone.biome]);
 }
 
 for (const [id, cls] of Object.entries(CLASSES)) {
-  add(titleBy.class.get(id), section('Overview', cls.name + ' is a playable class that uses ' + cls.resourceType + ' to power its abilities. New characters start with ' + link(titleBy.item.get(cls.startWeapon), ITEMS[cls.startWeapon]?.name ?? cls.startWeapon) + '.') + section('Build choices', link('Specializations') + ' · ' + link('Talent choices')) + section('Starting statistics', table(Object.entries(cls.baseStats).map(([k, v]) => [({ str: 'Strength', agi: 'Agility', sta: 'Stamina', int: 'Intellect', spi: 'Spirit', armor: 'Armor' })[k] ?? k, String(v)]))) + classAbilitySections(id, writer), ['Classes']);
+  add(titleBy.class.get(id), section('Overview', cls.name + ' is a class you can play. It uses ' + cls.resourceType + ' to power its abilities. A new character of this class starts with ' + link(titleBy.item.get(cls.startWeapon), ITEMS[cls.startWeapon]?.name ?? cls.startWeapon) + '.') + section('Build choices', link('Specializations') + ' · ' + link('Talent choices')) + section('Starting statistics', table(Object.entries(cls.baseStats).map(([k, v]) => [({ str: 'Strength', agi: 'Agility', sta: 'Stamina', int: 'Intellect', spi: 'Spirit', armor: 'Armor' })[k] ?? k, String(v)]))) + classAbilitySections(id, writer), ['Classes']);
 }
 
 for (const dungeon of DUNGEON_LIST) {

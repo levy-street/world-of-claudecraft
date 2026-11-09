@@ -63,29 +63,32 @@ import { type ArticleTools, append, pct, ref, words } from './entity_format';
 
 export function indexSpecialItemSources(w: ArticleTools, sources: Map<string, Set<string>>) {
   const add = (id: string, s: string) => append(sources, id, s);
+  add(MEMBERSHIP_TOKEN_ID, 'Buy the 30-day membership token in the membership token shop.');
   add(
-    MEMBERSHIP_TOKEN_ID,
-    'Purchase the 30-day membership token through the membership token shop.',
+    MEMBERSHIP_WEAPON_ID,
+    'While your membership is active, claim the weapon. It grows stronger as you level up.',
   );
-  add(MEMBERSHIP_WEAPON_ID, 'Claim the scaling weapon with an active membership.');
-  add(MEMBERSHIP_ANNUAL_REINS, 'Reward for the paid annual game membership bundle.');
+  add(
+    MEMBERSHIP_ANNUAL_REINS,
+    'You get this when you buy the paid annual (yearly) membership bundle.',
+  );
   add(
     MAKERS_EMBER_ITEM_ID,
-    'Complete the first eligible raid boss, Heroic final boss or rank A/S rift of the reset week. Missed weekly grants can accumulate.',
+    'Each reset week, finish your first raid boss, Heroic final boss or rank A or S rift that counts. Weeks you miss are saved up for later.',
   );
   add(
     SUNDERED_ESSENCE_ITEM_ID,
-    'Sunder an eligible epic piece of raid gear, Normal or Heroic. The piece is consumed and yields ' +
+    'Sunder an epic piece of raid gear from Normal or Heroic. The piece is used up and gives you ' +
       SUNDERED_ESSENCE_YIELD +
       ' Sundered Essence.',
   );
   add(
     WORLD_PVP_SKULL_ITEM_ID,
-    'In world PvP, land a flagged killing blow on a flagged player. Loot the trophy from their body.',
+    'In world PvP, with your flag on, land the killing blow on another player whose flag is on. Loot the trophy from their body.',
   );
   add(
     'clue_scroll',
-    'Existing scrolls can start a clue hunt. The current rotating quest slate pays treasure maps. A developer command can grant a scroll.',
+    'Scrolls you already have can start a clue hunt. The quests on offer right now give treasure maps instead. A developer command can give a scroll.',
   );
   for (const id of [
     'reins_mech_bird',
@@ -96,12 +99,12 @@ export function indexSpecialItemSources(w: ArticleTools, sources: Map<string, Se
   ])
     add(
       id,
-      'Legacy souvenir retained for existing inventories. The separate mount skin is an account entitlement; these reins do not unlock it.',
+      'Legacy souvenir: players who already have it can keep it. The mount skin is a separate unlock on your account. These reins do not unlock it.',
     );
   for (const id of RIFT_GEM_IDS)
     add(
       id,
-      'Personal corpse loot for the first group to clear a natural rank A or S rift, or a natural rift with crafting material bias of at least 0.5. Gem colors cycle in participant order. Socket in a Riftbound ring for ' +
+      'Personal loot on the body for the first group to clear a natural rift that is rank A or S, or that has a crafting material bias of at least 0.5. Each player in turn gets the next gem color. Put it in a Riftbound ring socket for ' +
         RIFT_GEM_RATING +
         ' ' +
         words(RIFT_GEM_RATING_STAT[id]) +
@@ -118,17 +121,17 @@ export function indexSpecialItemSources(w: ArticleTools, sources: Map<string, Se
         piece,
         'Open the Drowned Litany chest as ' +
           ref(w, 'class', cls) +
-          '. A medium, premium or bountiful chest grants one of two uncommon pieces with equal odds; a low chest grants the uncommon slot half the time.',
+          '. A medium, premium or bountiful chest gives one of two uncommon pieces, with equal odds for each. A low chest gives an uncommon piece only half the time.',
       );
     }
   }
   add(
     EVENT_SKIN_TOKEN_ID,
-    'Developer-grantable on realms with developer commands enabled. An ordinary gameplay source is unverified for this release.',
+    'A developer can give this out on realms where developer commands are turned on. We have not confirmed an ordinary way to get it in this release.',
   );
   add(
     'chunk_of_ore',
-    'Retired profession tutorial item. Existing copies are retained for older saves.',
+    'An old profession tutorial item that is no longer used. Characters who already have copies keep them.',
   );
   for (const [boss, items] of Object.entries(HOARD_BOSS_LOOT_TABLES))
     for (const rarity of TREASURE_MAP_RARITIES) {
@@ -143,13 +146,13 @@ export function indexSpecialItemSources(w: ArticleTools, sources: Map<string, Se
             ref(w, 'mob', boss) +
             ' in a ' +
             ref(w, 'item', TREASURE_MAP_ITEM_IDS[rarity]) +
-            ' hoard. The owner has a ' +
+            ' hoard. The map owner has a ' +
             pct(VAULT_PAYOUTS[rarity].gearChance) +
-            ' chance to receive gear, an eligible guest ' +
+            ' chance to get gear. A guest who can get loot has a ' +
             pct(VAULT_GUEST_GEAR_CHANCE[rarity]) +
-            '. When a piece drops, ' +
+            ' chance. When a piece drops, ' +
             pct(HOARD_LOOT_CLASS_BIAS) +
-            ' of rolls select uniformly among this boss’s class-targeted pieces if any qualify. Other rolls select uniformly from all ' +
+            ' of the time it is picked at random from this boss’s pieces made for your class, if there are any. The rest of the time, or if there are none, it is picked at random from all ' +
             items.length +
             '.',
         );
@@ -161,15 +164,15 @@ export function indexSpecialItemSources(w: ArticleTools, sources: Map<string, Se
         hoardLootVariantId(base, 'rare'),
         'Open a ' +
           ref(w, 'item', TREASURE_MAP_ITEM_IDS[rarity]) +
-          ' cave hoard reward chest. Its cave guardian uses the shared pool of all ' +
+          ' cave hoard reward chest. Its cave guardian shares one pool of all ' +
           HOARD_BASE_ITEM_IDS.length +
-          ' hoard pieces. Owner gear chance ' +
+          ' hoard pieces. The map owner has a ' +
           pct(VAULT_PAYOUTS[rarity].gearChance) +
-          ', guest gear chance ' +
+          ' chance to get gear, and a guest has a ' +
           pct(VAULT_GUEST_GEAR_CHANCE[rarity]) +
-          '; successful selections favor class-appropriate pieces ' +
+          ' chance. When gear drops, it is a piece made for your class ' +
           pct(HOARD_LOOT_CLASS_BIAS) +
-          ' of the time when available.',
+          ' of the time, if there is one.',
       );
   for (const row of MARKET_HOUSE_STOCK)
     add(
@@ -178,7 +181,7 @@ export function indexSpecialItemSources(w: ArticleTools, sources: Map<string, Se
         row.count +
         ' for ' +
         w.money(row.price) +
-        ' on the built-in world market.',
+        ' on the world market that comes with the game.',
     );
   for (const d of DUNGEON_LIST)
     for (const o of d.objects ?? [])
@@ -188,41 +191,45 @@ export function indexSpecialItemSources(w: ArticleTools, sources: Map<string, Se
           o.name +
           ' inside ' +
           ref(w, 'dungeon', d.id) +
-          ' at room coordinates (' +
+          ' at (' +
           o.x +
           ', ' +
           o.z +
-          ').',
+          '). These coordinates are measured inside that room.',
       );
   for (const item of Object.values(ITEMS)) {
-    if (isMembershipArmour(item.id)) add(item.id, 'Claim scaling armor with an active membership.');
+    if (isMembershipArmour(item.id))
+      add(
+        item.id,
+        'While your membership is active, claim this armor. It grows stronger as you level up.',
+      );
     if (isReferralArmour(item.id))
       add(
         item.id,
-        'Claim scaling armor on a character with a verified referral armor entitlement.',
+        'Claim this armor on a character whose account has earned the referral armor. It grows stronger as you level up.',
       );
     if (item.kind === 'mount' && DEVELOPER_MOUNTS.includes(item.mount))
-      add(item.id, 'Developer mount. Granted by a developer.');
+      add(item.id, 'Developer mount. Only a developer can give it out.');
     const key = materialHintKey(item.id);
     if (key) add(item.id, t(key));
   }
   for (const id of [...RETIRED_ZONE1_ITEM_IDS, ...Object.keys(RETIRED_HEROIC_ITEMS)])
-    add(id, 'Retired. Existing copies remain valid.');
+    add(id, 'Retired. You cannot get new copies, but copies people already have still work.');
   for (const [id, stage] of [
     [REFERRAL_BAG, 'tutorial'],
     [REFERRAL_HOLLOW_TRINKET, 'Hollow Crypt'],
     [REFERRAL_FOG_TRINKET, 'Fogbinder (upgrades the Hollow charm)'],
     [REFERRAL_SLIME_REINS, 'raid'],
   ])
-    add(id, 'Redeem the ' + stage + ' milestone on the recruited character’s referral card.');
+    add(id, 'Redeem the ' + stage + ' stamp on the invited friend’s referral card.');
   add(
     REFERRAL_RAPTOR_REINS,
-    'Inviter reward for the first friend who completes their referral card.',
+    'The inviting player gets this when the first friend they invited finishes their referral card.',
   );
   add(FARM_WITHERED_HUSK_ITEM_ID, 'Harvest a failed crop from your farm bed.');
   add(
     LANTERN_SEAL_ITEM_ID,
-    'Claim guild contract rewards. Seals per contract type: ' +
+    'Finish guild contracts. Seals for each type of contract: ' +
       Object.entries(GUILD_CONTRACT_SEALS)
         .map(([kind, count]) => words(kind) + ' ' + count)
         .join(', ') +
@@ -234,13 +241,13 @@ export function indexSpecialItemSources(w: ArticleTools, sources: Map<string, Se
       LANTERN_HALL_DESTRIER_SEALS +
       ' ' +
       ref(w, 'item', LANTERN_SEAL_ITEM_ID) +
-      ' at the guild hall quartermaster.',
+      ' at the guild hall quartermaster to buy it.',
   );
   add(
     HEROIC_MARK_CURRENCY_ID,
-    'Awarded by heroic dungeon clears and as a currency reward in ' +
+    'You get these for clearing Heroic dungeons, and as a currency reward in ' +
       ref(w, 'item', 'emissary_cache') +
-      '. Credited to your currency balance.',
+      '. They are added to your currency total.',
   );
   add(
     GOURDLIGHT_SWEET_ID,
@@ -252,13 +259,13 @@ export function indexSpecialItemSources(w: ArticleTools, sources: Map<string, Se
   );
   add(
     CURSED_CANDLE_ID,
-    'Snuff the marked candles on Hester’s Gourdlight daily: ' +
+    'Put out the candles shown on the map during Hester’s Gourdlight daily quest: ' +
       ref(w, 'quest', 'q_gourdlight_daily_wicks') +
       '.',
   );
   add(
     PATCH_PUMPKIN_ID,
-    'Pick up pumpkins on Hester’s Gourdlight daily: ' +
+    'Pick up pumpkins during Hester’s Gourdlight daily quest: ' +
       ref(w, 'quest', 'q_gourdlight_daily_patch') +
       '.',
   );
@@ -268,15 +275,15 @@ export function indexSpecialItemSources(w: ArticleTools, sources: Map<string, Se
       MUSTER_RACK.x +
       ', ' +
       MUSTER_RACK.z +
-      ') during the drill. This is loaned gear.',
+      ') during the drill. You only borrow it.',
   );
   add(
     'the_codfather',
     'Land a catch at Deepfen Shallows during ' +
       ref(w, 'quest', 'q_the_codfather') +
-      ' when you are not carrying the quest fish.',
+      ' while you are not already carrying the quest fish.',
   );
-  add('soul_stone', 'Take a Soul Stone from a warlock’s conjured Soulwell.');
+  add('soul_stone', 'Take a Soul Stone from a Soulwell that a Warlock makes.');
   for (const [band, zones] of FISHING_TABLES_BY_BAND.entries())
     for (const [zone, entries] of Object.entries(zones)) {
       const weight = entries.reduce((n, e) => n + e.weight, 0);

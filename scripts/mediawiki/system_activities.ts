@@ -105,29 +105,29 @@ export function addActivityRules(w: SystemWriter) {
     'Banking',
     'Your personal bank starts with ' +
       BANK_BASE_SLOTS +
-      ' slots. Each purchased expansion adds ' +
+      ' slots. Each expansion you buy adds ' +
       BANK_EXPANSION_SLOTS +
-      ' slots. The default prices in purchase order are ' +
+      ' slots. The normal prices, in the order you buy them, are ' +
       BANK_EXPANSION_PRICES.join(', ') +
-      ' copper. A bag socket accepts a bag to extend storage. Socket prices in order are ' +
+      ' copper. You can put a bag in a bag socket to get more space. Socket prices, in order, are ' +
       BANK_SOCKET_PRICES.join(', ') +
       ' copper.',
   );
   w.describe(
     'Materials Vault',
-    'Unlock the Materials Vault at a banker to store up to ' +
+    'Unlock the Materials Vault at a banker. It holds up to ' +
       VAULT_BASE_CAP +
-      ' units of each material separately. Each upgrade adds ' +
+      ' of each material, and each material has its own space. Each upgrade adds ' +
       VAULT_UPGRADE_STEP +
-      ' more units per material. In eligible areas a craft can draw from this vault after it exhausts eligible materials in your bags.',
+      ' more space for every material. In places where it works, crafting uses the materials in your bags first. When those run out, it takes the rest from this vault.',
     heading(
-      'Default banker prices',
+      'Normal banker prices',
       list(
         VAULT_UPGRADE_PRICES.map(
           (p, i) =>
             VAULT_BASE_CAP +
             i * VAULT_UPGRADE_STEP +
-            ' units per material: ' +
+            ' of each material: ' +
             p / 10000 +
             ' gold for this step.',
         ),
@@ -136,63 +136,67 @@ export function addActivityRules(w: SystemWriter) {
   );
   w.describe(
     'Weekly Vault',
-    'Complete activities during the week. At reset, each threshold reached unlocks another candidate. Visit the Vault Keeper to open your choices. You can keep one reward across all rows for the earned week. Opening fixes each roll and reconnecting preserves the choices.',
+    'Do activities during the week. Each goal you reach adds one more item to choose from at the reset. Visit the Vault Keeper to open your choices. You can keep only one reward from all the rows for that week. Once you open a choice, its item is set. It stays the same even if you log out and back in.',
     list([
       'Raid final-boss clears: ' +
         WEEKLY_THRESHOLDS.raid.join(', ') +
-        '. Repeat clears count. Difficulty is based on your best clears.',
+        '. Clearing the same raid again counts. The difficulty of the rewards depends on your best clears.',
       'Dungeon clears: ' +
         WEEKLY_THRESHOLDS.dungeon.join(', ') +
-        '. Sorted best to worst, the clear at each threshold sets the difficulty of that choice.',
+        '. Your clears are put in order from best to worst. For each goal, the clear at that place in the order sets the difficulty of that choice. For example, for the goal of ' +
+        WEEKLY_THRESHOLDS.dungeon[1] +
+        ' clears, clear number ' +
+        WEEKLY_THRESHOLDS.dungeon[1] +
+        ' in that order is used.',
       'World quest completions: ' +
         WEEKLY_THRESHOLDS.world.join(', ') +
-        '. This row uses normal gear from the previous raid tier.',
+        '. This row gives Normal gear from the raid tier before the current one.',
       'PvP wins: ' +
         WEEKLY_THRESHOLDS.pvp.join(', ') +
-        '. Ranked arena and rated battleground wins count. [[King of the Hill]] also credits eligible winners.',
+        '. Ranked arena wins and rated battleground wins count. Winners of [[King of the Hill]] who meet its rules also get credit.',
     ]),
   );
   w.describe(
     'Bank courier',
-    'The courier moves whole stacks between your bags and personal storage. An active membership is required to dispatch a new delivery. Select up to ' +
+    'The courier carries whole stacks between your bags and your own storage. You need an active membership to send a new delivery. Pick up to ' +
       COURIER_CAPACITY +
-      ' cargo slots. Each leg of the route takes at most ' +
+      ' slots of cargo. Each part of the trip takes at most ' +
       COURIER_MAX_LEG_SECONDS +
-      ' seconds of active travel. Logging out freezes the delivery. Death or entering a private instance pauses return travel. Once the courier returns, items that do not fit go to overflow.',
+      ' seconds of travel time. If you log out, the delivery stops until you come back. If you die or go into a private instance, the trip back waits. When the courier gets back, anything that does not fit goes to overflow.',
   );
   w.describe(
     'Membership',
     'One ' +
       item('membership_token') +
-      ' grants ' +
+      ' gives you ' +
       MEMBERSHIP_DURATION_SECONDS / 86400 +
-      ' days. With an active membership, wear all ' +
+      ' days. While your membership is active, wear all ' +
       MEMBERSHIP_ARMOUR_SLOTS.length +
-      ' membership armor pieces to multiply an XP award by ' +
+      ' membership armor pieces. Then every time you get XP, it is multiplied by ' +
       MEMBERSHIP_XP_MULTIPLIER +
-      ', rounding down. The weapon is separate from the armor set. A qualifying referral set uses the same bonus; the two bonuses do not stack.',
+      ' and rounded down. The weapon is not part of the armor set. A referral set that counts gives the same bonus, but the two bonuses do not add together.',
   );
   addReferralGuide(w);
   w.describe(
     'Gourdlight Eve',
-    'Talk to a participating townsperson within ' +
+    'Talk to a townsperson who takes part, from within ' +
       TRICK_OR_TREAT.range +
-      ' yards. Each can be visited once per reset day during the event. A treat (' +
+      ' yards. During the event, you can visit each one once per reset day. A treat (' +
       percent(TRICK_OR_TREAT.treatChance) +
-      ') pays ' +
+      ' chance) gives ' +
       TRICK_OR_TREAT.treatSweets +
-      ' sweets; a trick pays ' +
+      ' sweets. A trick gives ' +
       TRICK_OR_TREAT.trickSweets +
-      ' and applies a temporary cosmetic effect.',
+      ' and changes how you look for a short time.',
     'Trade ' +
       GOURDLIGHT_BROOM_SHEAVES +
       ' x ' +
       item(GOURDLIGHT_SHEAF_ID) +
       ' for ' +
       item(GOURDLIGHT_BROOM_ID) +
-      '. Thatchgrin also has a ' +
+      '. When Thatchgrin is defeated, each helper who meets the rules also gets a ' +
       percent(GOURDLIGHT_BROOM_DROP_CHANCE) +
-      ' eligible contributor roll for a broom you do not own.',
+      ' chance at the broom, if they do not own it yet.',
     heading(
       'Keeper locations',
       list(
@@ -212,9 +216,9 @@ export function addActivityRules(w: SystemWriter) {
   );
   w.describe(
     'Rifts',
-    'Natural rifts require level ' +
+    'You need level ' +
       RIFT_MIN_LEVEL +
-      '. An open portal lasts up to ' +
+      ' for natural rifts. An open portal stays open for up to ' +
       RIFT_PORTAL_LIFETIME / 3600 +
       ' hours.',
   );
@@ -225,19 +229,19 @@ export function addActivityRules(w: SystemWriter) {
       'Rifts',
       `Rank ${rank}`,
       'Rift',
-      'Enemies on the first three floors, where present, are level ' +
+      'Enemies on the first three floors (if the rift has that many) are level ' +
         [0, 1, 2].map((f) => riftFloorLevel(base, f)).join(', ') +
-        ', respectively. A boss with a ranked kit can use the first ' +
+        ', in that order. A boss with a ranked set of attacks can use the first ' +
         RIFT_RANK_MECHANIC_BUDGET[rank] +
-        ' mechanics from that kit.',
+        ' attacks from that set.',
       heading(
         'Enemy scaling',
         list([
           'Ordinary enemies: ' +
             t.healthMultiplier +
-            ' times base health and ' +
+            ' times their base health and ' +
             t.damageMultiplier +
-            ' times base damage.',
+            ' times their base damage.',
           'Bosses: ' +
             t.bossHealthMultiplier +
             ' times health and ' +
@@ -253,7 +257,7 @@ export function addActivityRules(w: SystemWriter) {
       ),
       'A rank ' +
         rank +
-        ' band begins at item level ' +
+        ' band starts at item level ' +
         RIFT_BAND_TIER_BASE_ILVL[rank] +
         ' and can reach ' +
         riftBandItemLevel(rank, RIFT_BAND_MAX_UPGRADE) +
@@ -271,34 +275,34 @@ export function addActivityRules(w: SystemWriter) {
     heading(
       'Flag and payouts',
       list([
-        'Flagging opens at level ' +
+        'You can turn on your flag at level ' +
           WORLD_PVP_MIN_LEVEL +
-          '. Disarming takes ' +
+          '. Turning it off takes ' +
           WORLD_PVP_DISARM_SECONDS +
-          ' seconds. While fully flagged, gain ' +
+          ' seconds. While your flag is fully on, you get ' +
           percent(WORLD_PVP_XP_BONUS) +
-          ' extra XP, rounded down.',
-        'A qualifying kill stakes ' +
+          ' more XP, rounded down.',
+        'A kill that counts wins a stake of ' +
           percent(WORLD_PVP_STAKE_FRACTION) +
-          " of the victim's purse rounded down, up to " +
+          " of the other player's gold, rounded down, up to " +
           WORLD_PVP_STAKE_CAP_COPPER / 10000 +
           ' gold. Base Honor is ' +
           WORLD_PVP_KILL_HONOR +
-          '. Credit considers assists from the last ' +
+          '. Players who helped in the last ' +
           WORLD_PVP_ASSIST_WINDOW +
-          ' seconds. A victim more than ' +
+          ' seconds before the kill also get credit. A player more than ' +
           WORLD_PVP_GREY_LEVEL_GAP +
-          ' levels below you pays nothing.',
-        'For repeated kills of the same opponent inside ' +
+          ' levels below you gives nothing.',
+        'If you kill the same player more than once within ' +
           WORLD_PVP_DR_WINDOW_SECONDS / 3600 +
-          ' hour, ordinary payout multipliers are ' +
+          ' hour, the normal rewards are scaled to ' +
           [0, 1, 2, 3].map((k) => percent(worldPvpPairMultiplier(k))).join(', ') +
-          ' in kill order.',
+          ' for the first, second, third and fourth kill.',
         'A streak of ' +
           WORLD_PVP_BOUNTY_STREAK +
-          ' earns a bounty. Defeating its holder pays ' +
+          ' kills puts a bounty on that player. Defeating the player with the bounty gives ' +
           WORLD_PVP_BOUNTY_KILL_HONOR_MULT +
-          ' times kill Honor.',
+          ' times the normal kill Honor.',
       ]),
     ),
   );
@@ -306,11 +310,11 @@ export function addActivityRules(w: SystemWriter) {
     'Honor and Warfare gear',
     'Every ' +
       PVP_RATING_PER_PCT +
-      ' eligible offense or defense rating gives 1 percentage point on its PvP scale, capped at ' +
+      ' offense or defense rating that counts gives 1 percentage point on its PvP scale. The most you can get is ' +
       percent(PVP_OFFENSE_CAP) +
       ' offense and ' +
       percent(PVP_DEFENSE_CAP) +
-      ' defense. Defense rating also grants a PvP vitality bonus of 1% per ' +
+      ' defense. Defense rating also gives a PvP vitality bonus of 1% for every ' +
       PVP_VITALITY_RATING_PER_PCT +
       ' rating up to ' +
       percent(PVP_VITALITY_CAP) +
@@ -318,69 +322,69 @@ export function addActivityRules(w: SystemWriter) {
   );
   w.describe(
     'Fiesta arena',
-    'Two teams of two fight for takedowns. First to ' +
+    'Two teams of two players fight to defeat each other. Each defeat scores a point. The first team to ' +
       FIESTA_SCORE_LIMIT +
-      ' wins. At ' +
+      ' points wins. At ' +
       FIESTA_MAX_DURATION +
-      ' seconds the higher score wins, with equal scores a draw. The first augment wave opens at ' +
+      ' seconds, the team with the higher score wins. If the scores are equal, it is a draw. The first augment wave opens at ' +
       FIESTA_FIRST_WAVE_AT +
-      ' seconds. Further waves are ' +
+      ' seconds. More waves come every ' +
       FIESTA_WAVE_INTERVAL +
-      ' seconds apart.',
-    'Respawn wait starts at ' +
+      ' seconds.',
+    'The wait to come back to life starts at ' +
       FIESTA_RESPAWN_BASE +
       ' seconds. Add ' +
       FIESTA_RESPAWN_PER_DEATH +
       ' seconds for each previous death and ' +
       FIESTA_RESPAWN_PER_MINUTE +
-      ' seconds for each full minute of the fight, capped at ' +
+      ' seconds for each full minute of the fight. The wait is never longer than ' +
       FIESTA_RESPAWN_MAX +
-      ' seconds. Standing outside the shrinking ring costs ' +
+      ' seconds. If you stand outside the shrinking ring, you lose ' +
       percent(FIESTA_RING_DPS_PCT) +
       ' of maximum health per second.',
-    'Power-ups announce their location ' +
+    'Power-ups show where they will appear ' +
       FIESTA_POWERUP_TELEGRAPH +
-      ' seconds before pickup. Move within ' +
+      ' seconds before you can pick them up. Once one is ready, get within ' +
       FIESTA_POWERUP_RADIUS +
-      ' yards within ' +
+      ' yards of it within ' +
       FIESTA_POWERUP_TTL +
-      ' seconds once ready. See [[Fiesta augments]] and [[Fiesta power-ups]].',
+      ' seconds. See [[Fiesta augments]] and [[Fiesta power-ups]].',
   );
 
   w.describe(
     'The Card Master',
-    `Each player starts with ${STARTING_HAND_SIZE} cards from a personal deck of ${DECK_SIZE}. There are two copies of each number from 1 to ${DECK_SIZE / 2}. Both players choose a card facedown. The higher number wins the round. Tied cards score nothing. Each player draws one replacement, reshuffling the discard pile if needed. First to ${CARD_DUEL_ROUNDS_TO_WIN} round wins takes the match. After ${CARD_DUEL_ROUND_DEADLINE_S} seconds the side that has not played forfeits the match. If both stay idle, neither earns a win.`,
+    `Each player has their own deck of ${DECK_SIZE} cards and starts with ${STARTING_HAND_SIZE} in their hand. The deck has two of each number from 1 to ${DECK_SIZE / 2}. Both players pick a card face down. The higher number wins the round. If the cards are the same, nobody scores. Then each player draws one new card. If the deck is empty, the used cards are shuffled back in. The first player to win ${CARD_DUEL_ROUNDS_TO_WIN} rounds wins the match. If a player has not played a card after ${CARD_DUEL_ROUND_DEADLINE_S} seconds, they lose the match. If neither player plays, nobody wins.`,
   );
   w.describe(
     'Protect Yumi',
     heading(
-      'Former match rules',
-      `Teams of three or five tried to destroy the enemy team's ${YUMI_HP}-health cat while defending their own. Both cats relocate every ${YUMI_TELEPORT_EVERY} seconds. A defeated player returns after ${YUMI_RESPAWN_SECONDS} seconds.`,
+      'Old match rules',
+      `Teams of three or five tried to defeat the other team's cat while keeping their own cat safe. Each cat had ${YUMI_HP} health. Both cats moved to a new spot every ${YUMI_TELEPORT_EVERY} seconds. A defeated player came back after ${YUMI_RESPAWN_SECONDS} seconds.`,
     ),
-    `After ${YUMI_SUDDEN_AT / 60} minutes, teleporting stops. Sudden death starts at step 1 and advances every ${YUMI_SUDDEN_STEP} seconds. Each step adds ${percent(YUMI_SUDDEN_RAMP)} of normal damage taken. Every ${YUMI_SUDDEN_BLEED_EVERY} seconds both cats also lose ${percent(YUMI_SUDDEN_BLEED_PCT)} of their maximum health per step, rounded up. A simultaneous lethal pulse compares health immediately before the pulse, then total enemy-cat damage, then breaks a remaining tie at random.`,
+    `After ${YUMI_SUDDEN_AT / 60} minutes, the cats stopped moving and sudden death began. Sudden death started at step 1 and went up one step every ${YUMI_SUDDEN_STEP} seconds. Each step made the cats take ${percent(YUMI_SUDDEN_RAMP)} more of their normal damage. Every ${YUMI_SUDDEN_BLEED_EVERY} seconds, both cats also lost ${percent(YUMI_SUDDEN_BLEED_PCT)} of their maximum health for each step, rounded up. If that loss defeated both cats at the same moment, the game picked a winner like this:\n* First, the cat with more health just before that moment won.\n* If that was equal, the team that did more damage to the enemy cat won.\n* If that was equal too, the winner was picked at random.`,
   );
   w.describe(
     'Vale Cup',
-    'Eastbrook’s boarball matches tracked goals, keeper saves, wins and guild victories. Previously earned deeds remain in the [[Book of Deeds]]. They award zero Renown and are excluded from completion totals.',
+    'Eastbrook’s boarball matches kept track of goals, keeper saves, wins and guild wins. Deeds you already earned stay in your [[Book of Deeds]]. They give no Renown and do not count toward completion totals.',
   );
   w.describe(
     'Mount racing',
     heading(
       'Stable course rules',
-      `The course attached to ${w.entity('quest', 'q_riding_lessons', 'Riding Lessons')} at the Galecrest stables used the glowing square at (x ${Math.round(MOUNT_RACE_START_PLATFORM.x)}, z ${Math.round(MOUNT_RACE_START_PLATFORM.z)}). The Start Race button began a countdown. Riders had to jump all ${MOUNT_RACE_COURSE.jumps.length} bars in any order, then cross the finish arch at (x ${MOUNT_RACE_COURSE.arch.x}, z ${MOUNT_RACE_COURSE.arch.z}) within ${MOUNT_RACE_COURSE.timeLimitSeconds} seconds. Crossing a bar counted in either direction while airborne. Riders could retry a missed bar. Dying, dismounting or leaving the paddock ended the attempt.`,
+      `The course attached to ${w.entity('quest', 'q_riding_lessons', 'Riding Lessons')} at the Galecrest stables started at the glowing square at (x ${Math.round(MOUNT_RACE_START_PLATFORM.x)}, z ${Math.round(MOUNT_RACE_START_PLATFORM.z)}). The Start Race button began a countdown. Riders had to jump over all ${MOUNT_RACE_COURSE.jumps.length} bars in any order. Then they had to ride through the finish arch at (x ${MOUNT_RACE_COURSE.arch.x}, z ${MOUNT_RACE_COURSE.arch.z}) within ${MOUNT_RACE_COURSE.timeLimitSeconds} seconds. A bar counted if you jumped over it from either side while in the air. Riders could try a missed bar again. Dying, getting off the mount or leaving the paddock ended the try.`,
     ),
   );
   w.describe(
     'Guild contracts',
-    'Each week the board offers one named-boss contract, one Heroic contract and one encounter-task contract. Every realm uses the same weekly rotation. Rewards go to eligible contributors who have yet to complete that contract for the week.',
+    'Each week the board has three contracts: one for a named boss, one Heroic contract and one for a task during a boss fight. Every realm gets the same contracts each week. Rewards go to players who helped, met the rules and have not finished that contract yet this week.',
   );
   for (const c of Object.values(DELVE_COMPANIONS)) {
     w.article(
       'Delve companions',
       c.name,
       'Delve companion',
-      `A ${c.role} who follows you in a delve. Every ${DELVE_COMPANION_HEAL_INTERVAL} seconds the companion checks the owner's health percentage and looks for a lower-health party member within 22 yards. If the selected player is hurt and within 22 yards, the heal restores 6%, 8% or 10% of their maximum health at rank 1, 2 or 3, rounded to the nearest whole health and capped at the amount missing.`,
-      `Rank 2 costs ${COMPANION_UPGRADE_COSTS[2].marks} Delve Marks. Rank 3 costs ${COMPANION_UPGRADE_COSTS[3].marks} more and revives one fallen ally per run at half health.`,
+      `A ${c.role} who follows you in a delve. Every ${DELVE_COMPANION_HEAL_INTERVAL} seconds, the companion picks who to heal:\n* First it looks at you, its owner.\n* If a party member within 22 yards has a lower health percentage than you, it picks them instead.\n* If the player it picked is hurt and within 22 yards, it heals them.\nThe heal gives back 6% of their maximum health at rank 1, 8% at rank 2 or 10% at rank 3. It is rounded to the nearest whole number, and never heals more than the health they are missing.`,
+      `Rank 2 costs ${COMPANION_UPGRADE_COSTS[2].marks} Delve Marks. Rank 3 costs ${COMPANION_UPGRADE_COSTS[3].marks} more. At rank 3, the companion brings one fallen ally back to life per run, with half their health.`,
     );
   }
 }

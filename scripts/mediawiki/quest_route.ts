@@ -93,7 +93,7 @@ export function questRoute(quest: QuestDef): QuestRoute {
   }
   function inDungeon(d: (typeof DUNGEON_LIST)[number], pos: Position, label: string) {
     point(pos, label, d.name);
-    if (d.guideVisible === false) note(d.name + ' is unlisted in the public guide.');
+    if (d.guideVisible === false) note(d.name + ' is not listed in the public guide right now.');
   }
   function npc(id: string) {
     const n = world.npcs[id] ?? NPCS[id];
@@ -138,8 +138,8 @@ export function questRoute(quest: QuestDef): QuestRoute {
       const heal = id === HUB_HEALING_DRILL_OBJECT_ITEM_ID;
       note(
         heal
-          ? 'Target the injured dummy and cast a direct heal that actually restores health. Overhealing alone gives no credit.'
-          : 'Target the training dummy and land damaging swings or spells.',
+          ? 'Target the hurt dummy and cast a direct heal that really restores some of its missing health. Extra healing past full health gives no credit.'
+          : 'Target the training dummy and hit it with attacks or spells that do damage.',
       );
       point(
         practiceDummyPos(
@@ -157,11 +157,11 @@ export function questRoute(quest: QuestDef): QuestRoute {
       note(
         'Use the Firebottle within ' +
           HUT_BURN_RANGE +
-          ' yd of each hut. The bottle recharges in ' +
+          ' yards of each hut. The bottle is ready again after ' +
           FIREBOTTLE_COOLDOWN_SECS +
-          ' sec. A burned hut cannot be burned again for ' +
+          ' seconds. After you burn a hut, it cannot be burned again for ' +
           HUT_REBURN_COOLDOWN_SECS +
-          ' sec.',
+          ' seconds.',
       );
     if (id === 'ps_ability_drill')
       point(
@@ -179,12 +179,12 @@ export function questRoute(quest: QuestDef): QuestRoute {
       point(MOUNT_RACE_COURSE.arch, 'Start and finish arch');
       for (const [i, j] of MOUNT_RACE_COURSE.jumps.entries()) point(j, 'Clear jump ' + (i + 1));
       note(
-        `The quest records a solo training course. Stand on the glowing square and choose Start Race to borrow the training Valorsteed. After the countdown, jump all ${MOUNT_RACE_COURSE.jumps.length} bars in any order and ride through the finish arch within ${MOUNT_RACE_COURSE.timeLimitSeconds} seconds. The separate [[Mount racing]] activity is retired from live play.`,
+        `This quest is a training course you ride alone. Stand on the glowing square and choose Start Race to borrow the training Valorsteed. After the countdown, jump all ${MOUNT_RACE_COURSE.jumps.length} bars in any order. Then ride through the finish arch within ${MOUNT_RACE_COURSE.timeLimitSeconds} seconds. This is not the same as [[Mount racing]], which is no longer part of the live game.`,
       );
     }
     if (id === 'ps_passing_stone')
       note(
-        'Use the Passing Stone from your bags in a safe spot. Release your spirit, then walk into your corpse where you fell.',
+        'Use the Passing Stone from your bags in a safe spot. Release your spirit. Then walk your ghost back to your corpse where you fell.',
       );
   }
   function gather(id?: string, type?: string) {
@@ -207,7 +207,7 @@ export function questRoute(quest: QuestDef): QuestRoute {
         r.reagents
           .map((a) => a.count + ' ' + (ITEMS[a.itemId]?.name ?? words(a.itemId)))
           .join(', ') +
-        ' (base ingredient amounts).',
+        ' (amounts before any bonuses).',
     );
     for (const s of world.services?.stations ?? [])
       if (s.type === type) point(s.pos, words(s.type) + ' station');
@@ -235,7 +235,7 @@ export function questRoute(quest: QuestDef): QuestRoute {
             DEEPFEN_SHALLOWS_LAKE.radius + 10,
           );
           note(
-            'Face the lake with a fishing pole and reel when a fish bites. With the quest active, the first landed catch here is the Codfather if you are not carrying one.',
+            'Face the lake with a fishing pole and reel in when a fish bites. While you have the quest, the first fish you catch here is the Codfather, as long as you are not already carrying one.',
           );
         }
         const crop = Object.values(FARM_CROPS).find(
@@ -247,9 +247,9 @@ export function questRoute(quest: QuestDef): QuestRoute {
               ITEMS[crop.seedItemId].name +
               ' in a free bed with Farming skill ' +
               farmCropSkillThreshold(crop.tier) +
-              ' or higher. Allow ' +
+              ' or higher. Wait ' +
               crop.durationMs / 60000 +
-              ' minutes for growth, then harvest.',
+              ' minutes for it to grow, then harvest it.',
           );
           for (const patch of farmPatchesInActiveWorld())
             for (const bed of patch.beds) point(bed, words(patch.id) + ' farm bed');
@@ -270,7 +270,7 @@ export function questRoute(quest: QuestDef): QuestRoute {
           note(
             'Set your harvest preference to ' +
               ITEMS[o.itemId].name +
-              '. Kill a creature with that component, loot it, then harvest its corpse. The map shows nearby eligible camps.',
+              '. Kill a creature that has this part, loot it, then harvest its body. The map shows nearby camps of creatures that have it.',
           );
         }
         if (o.itemId === 'thatchgrin_patch_pumpkin' || o.itemId === 'cursed_candle_stub') {
@@ -281,12 +281,16 @@ export function questRoute(quest: QuestDef): QuestRoute {
           const field = resolveScarecrowField(WORLD_SEED);
           if (field) point(field, 'Old Thatchgrin’s field');
           note(
-            'Fight Old Thatchgrin during Gourdlight Eve. Kill the crows summoned by Crowcall and loot their feathers.',
+            'Fight Old Thatchgrin during Gourdlight Eve. When it uses Crowcall, crows appear. Kill them and loot their feathers.',
           );
         }
         for (const r of recipes.values()) if (r.resultItemId === o.itemId) craft(r.id);
         if (quest.requiredItems?.includes(o.itemId))
-          note('Accept this quest to replace a missing ' + ITEMS[o.itemId].name + '.');
+          note(
+            'If you do not have a ' +
+              ITEMS[o.itemId].name +
+              ', you get one when you take this quest.',
+          );
         break;
       }
       case 'interact':
@@ -310,9 +314,9 @@ export function questRoute(quest: QuestDef): QuestRoute {
           point(e.start, 'Speak to ' + MOBS[e.npcMobId].name + ' to begin');
           for (const [i, p] of e.waypoints.entries()) point(p, 'Escort waypoint ' + (i + 1));
           note(
-            'Protect the escort through each ambush. Be within ' +
+            'Keep the person you are guarding safe through each ambush. Be within ' +
               e.creditRadius +
-              ' yd at the last waypoint for credit.',
+              ' yards of them at the last stop to get credit.',
           );
         }
         break;

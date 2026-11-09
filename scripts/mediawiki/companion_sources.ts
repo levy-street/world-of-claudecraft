@@ -18,18 +18,18 @@ export const companionByCreature = new Map(
 export function companionRollText(fullGroupChance: number): string {
   const solo = fullGroupChance * 10;
   return (
-    'Heroic only. Every player who receives kill credit gets a separate roll. ' +
-    'With 10 or more eligible players, your chance is ' +
+    'Heroic only. Every player who gets credit for the kill rolls on their own. ' +
+    'With 10 or more players who can roll, your chance is ' +
     pct(fullGroupChance) +
     ' per kill. ' +
-    'With fewer than 10, divide ' +
+    'With fewer than 10, take ' +
     pct(solo) +
-    ' by the number of eligible players. ' +
+    ' and divide it by the number of those players. ' +
     'For example, your chance is ' +
     pct(solo / 5) +
-    ' with five players or ' +
+    ' with five players, or ' +
     pct(solo) +
     ' alone. ' +
-    'If you win, leave the instance to reveal your companion and add it to your collection.'
+    'If you win, leave the instance. Your companion is then shown and added to your collection.'
   );
 }

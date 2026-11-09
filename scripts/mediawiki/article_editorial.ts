@@ -2,27 +2,27 @@ import type { QuestObjective } from '../../src/sim/types';
 
 const introductions: Record<string, string> = {
   Combat:
-    'Combat uses attacks and abilities to deal damage, heal allies and control enemies. Your stats, resources, positioning and timing affect the outcome.',
+    'In a fight, you use attacks and abilities to hurt enemies, heal friends and stop enemies from acting. Your stats, your resources, where you stand and when you act all change how the fight goes.',
   'Crafting recipes':
-    'Crafting recipes describe what you can make, the materials you need and the requirements for making it.',
+    'A crafting recipe tells you what you can make, which materials you need and what else you need to make it.',
   'Delve companions':
-    'Delve companions accompany you in delves. Each companion has its own combat role and abilities.',
+    'Delve companions go into delves with you and fight at your side. Each companion has its own job in a fight and its own abilities.',
   'Equipment enchants':
-    'Equipment enchants add bonuses to eligible gear. Check the enchant and equipment requirements before applying one.',
+    'Equipment enchants add bonuses to gear. Each enchant only works on some kinds of gear, so check what it needs before you use it.',
   'Equipment sets':
-    'Equipment sets are groups of related items that grant bonuses when you equip enough pieces together.',
+    'An equipment set is a group of items that belong together. Wear enough pieces of the same set at once to get extra bonuses.',
   'Farm crops':
-    'Farm crops grow in farming plots and provide materials when harvested. Each crop has its own seeds, growing requirements and harvest rewards.',
+    'Crops grow in farm plots. When you harvest them, you get materials. Each crop has its own seeds, its own needs for growing and its own harvest rewards.',
   Ferries:
-    'Ferries carry you between fixed stops in the world. The routes below list where to board and where each ferry goes.',
+    'Ferries carry you between set stops around the world. The routes below show where to get on and where each ferry goes.',
   'Hoard encounters':
-    'Hoard encounters guard buried treasure. The encounter and rewards depend on the hoard you uncover.',
+    'Hoard encounters are fights that guard buried treasure. Which fight you get, and what you win, depends on the hoard you dig up.',
   'Mount appearances':
-    'Mount appearances change the look of your mount. This page lists the available appearances and how to unlock them.',
+    'Mount appearances change how your mount looks. This page lists each look and how to unlock it.',
   'Rift floors':
-    'Rifts contain floors with different enemies and objectives. Complete the current floor objective to progress through the rift.',
+    'A rift has several floors, each with its own enemies and goal. Finish the goal on your floor to move on through the rift.',
   'Weapon appearances':
-    'Weapon appearances change how your weapon looks. This page lists the appearances you can collect and their unlock requirements.',
+    'Weapon appearances change how your weapon looks. This page lists the looks you can collect and what you need to unlock each one.',
 };
 
 /** Keep the explanation ahead of the walkthrough without duplicating it. */
@@ -47,8 +47,8 @@ export function questObjectiveText(o: QuestObjective, target: string, count: str
     case 'gather':
       if (o.nodeType === 'ore' && !o.itemId)
         return 'Mine ore veins ' + count + (count === '1' ? ' time.' : ' times.');
-      return 'Gather ' + target + ' for ' + count + ' gathering credits.';
+      return 'Gather ' + target + ' until you earn ' + count + ' gathering credits.';
     default:
-      return o.label.replace(/[.!]$/, '') + (count === '1' ? '.' : ': ' + count + ' required.');
+      return o.label.replace(/[.!]$/, '') + (count === '1' ? '.' : ' (' + count + ' needed).');
   }
 }

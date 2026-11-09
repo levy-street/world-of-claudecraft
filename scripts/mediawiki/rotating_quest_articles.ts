@@ -78,7 +78,7 @@ export function addRotatingQuests({
       [
         'Base experience',
         100 * (quest.reward?.xpRate ?? WORLD_QUEST_XP_RATE) +
-          '% of the XP needed for your current level, rounded to the nearest whole XP (at least 1).',
+          '% of the XP you need to finish your current level. It is rounded to the nearest whole XP, and is always at least 1.',
       ],
       ['Base purse', copper.base + ' copper + ' + copper.perLevel + ' copper per character level.'],
       ...Array.from({ length: MAX_LEVEL - quest.minLevel + 1 }, (_, i) => {
@@ -97,14 +97,14 @@ export function addRotatingQuests({
       title,
       section(
         'How to start',
-        'When this quest is active, enter its marked area at or above the minimum level. The reward is paid when you finish the objective.',
+        'When this quest is active, go into its marked area. You must be at least the minimum level. You get the reward as soon as you finish the goal.',
       ) +
         section('Walkthrough', worldRoute(quest)) +
         section('Objective', table(rows)) +
         section('Base rewards by character level', table(rewards)) +
         section(
           'Rotation',
-          'The daily rotation can also assign gear or honor to this quest. Gear depends on your class and level. See ' +
+          'On some days, this quest can also give gear or Honor. The gear depends on your class and level. See ' +
             link('World quests') +
             '.',
         ),
@@ -128,7 +128,7 @@ export function addRotatingQuests({
           'How it works',
           'Choose one charge from ' +
             link(titleBy.npc.get(WEEKLY_EMISSARY_NPC_DEF.id)!, WEEKLY_EMISSARY_NPC_DEF.name) +
-            ' for the week. The week resets on Tuesday.',
+            ' for the week. A new week starts each Tuesday.',
         ) +
         section(
           'Rewards',
@@ -142,7 +142,7 @@ export function addRotatingQuests({
               link(titleBy.item.get(reward.cacheItemId)!, ITEMS[reward.cacheItemId].name),
             'Claim ' +
               reward.commendationStanding +
-              ' standing with one faction of your choice, subject to its level cap.',
+              ' standing with one faction you choose, as long as your standing with it is below the most your level allows.',
           ]),
         ),
       ['Weekly quests'],
@@ -152,7 +152,7 @@ export function addRotatingQuests({
     'World quests',
     section(
       'Daily rotation',
-      'World quests start when you enter an active objective area. The selection changes each UTC day. Each article lists the level requirement, objective and base reward schedule.',
+      'A world quest starts when you walk into its area while it is active. The list of quests changes every day (on UTC time). Each quest page lists the level you need, the goal and the base rewards.',
     ) + section('Quest list', bullets(world.sort().map((name) => link(name)))),
     ['Quests'],
   );

@@ -27,11 +27,11 @@ const room = (step: SystemStep, frame: string, p: { x: number; z: number }, labe
 });
 const crypt = DUNGEONS.hollow_crypt;
 const morthen = crypt.spawns.find((s) => s.mobId === 'morthen')!;
-const riftEntrance = 'Follow the realm announcement to the portal in the named zone';
-const riftDescent = 'Clear the enemies and puzzle on your current floor, then take its descent';
-const hoardDig = 'Read your map and walk to its own X. Use it there to dig';
-const hoardBoss = 'Enter the portal and follow the private hoard to its guardian';
-const hoardChest = 'Open your reward chest inside the cleared hoard';
+const riftEntrance = 'Follow the realm message to the portal in the zone it names';
+const riftDescent = 'Beat the enemies and solve the puzzle on your floor, then take the way down';
+const hoardDig = 'Read your map and walk to its X. Use the map there to dig';
+const hoardBoss = 'Go through the portal and follow your private hoard to its guardian';
+const hoardChest = 'Open your reward chest inside the hoard after the guardian falls';
 const halven = (step: SystemStep) => [
   npcPin(step, 'brother_halven', 'Brother Halven: Collapsed Reliquary board'),
   npcPin(step, 'brother_halven_marsh', 'Brother Halven: Drowned Litany board'),
@@ -82,7 +82,7 @@ export const activityRoutes: Record<string, SystemRoute> = {
       return worldPin(3, d.doorPos.x, d.doorPos.z, 'Entrance for ' + d.name);
     }),
     notes: [
-      'Start steps 1 and 2 from the Finder anywhere. These doors are alternatives. Use the entrance for your selected activity. The Finder rewards you with a group when the proposal is accepted; encounter loot comes from bosses inside your chosen run.',
+      'You can do steps 1 and 2 from the Finder anywhere. You only need one of these doors: use the entrance for the activity you picked. The Finder gives you a group when everyone accepts. Loot comes from the bosses inside your run.',
     ],
   },
   'Heroic difficulty': {
@@ -93,7 +93,7 @@ export const activityRoutes: Record<string, SystemRoute> = {
       npcPin(3, 'heroic_quartermaster', 'Quartermaster Vex: spend your Heroic Marks here'),
     ],
     notes: [
-      'Example route through the Hollow Crypt. Start step 1 from your portrait outside the instance. The boss pin marks its starting position; loot the corpse if it moved during combat. Other Heroic runs have their own dungeon articles.',
+      'This example route goes through the Hollow Crypt. Do step 1 from your portrait, outside the dungeon. The boss pin shows where the boss starts. If it moved during the fight, loot its body where it fell. Other Heroic runs are on their own dungeon pages.',
     ],
   },
   Delves: {
@@ -111,27 +111,27 @@ export const activityRoutes: Record<string, SystemRoute> = {
       room('Reward', litany, rite.reliquary, 'Collect your loot at the open reliquary'),
     ],
     notes: [
-      'Choose one board. The order of the earlier chambers changes by run. Instance pins use the final chamber as their local frame. At the Litany shrines use the order shown in your own rite.',
+      'Pick one board. The earlier chambers come in a different order each run. Pins inside the delve use coordinates that start from the final chamber. At the Litany shrines, use the order your own rite shows you.',
     ],
   },
   'Delve companions': {
     points: [...halven('Start'), ...halven(1), ...halven(2)],
     notes: [
-      'Use either board to select or upgrade your healer. Step 3 follows your character inside the delve. The healer joins you when you enter, and a purchased upgrade takes effect without a hand-in.',
+      'Use either board to pick or upgrade your healer. Step 3 happens with you inside the delve. The healer joins you when you go in. An upgrade you buy works right away, with nothing to hand in.',
     ],
   },
   'Buried hoards': {
     points: [],
     flow: [hoardDig, hoardBoss, hoardChest],
     notes: [
-      'Use the X on your own map. Digging creates the entrance at that site, and the chest is inside the private room. These positions depend on your map and run.',
+      'Use the X on your own map. Digging opens the entrance at that spot. The chest is inside your private room. These places depend on your map and your run.',
     ],
   },
   'Hoard encounters': {
     points: [],
     flow: [hoardBoss, 'Defeat the guardian using its encounter instructions', hoardChest],
     notes: [
-      'The map rarity and seed select the room and guardian. Your reward chest is placed inside your own hoard after the kill.',
+      'The map’s rarity and its random seed pick the room and the guardian. After the kill, your reward chest appears inside your own hoard.',
     ],
   },
   Lockpicking: {
@@ -141,13 +141,13 @@ export const activityRoutes: Record<string, SystemRoute> = {
       room('Reward', reliquary, reliquaryChest, 'Chest reward'),
     ],
     notes: [
-      'This is the fixed delve chest. Steps 2 and 3 take place on its lock board. For a rift cache, use the cache you find on the current floor; its position changes each run.',
+      'This is the delve chest, which is always in the same place. Steps 2 and 3 happen on its lock board. For a rift cache, use the cache you find on your floor. It is in a different place each run.',
     ],
   },
   'Clue hunts': {
     points: cluePoints,
     notes: [
-      'Example route for Ashes at the Gate. Start step 1 anywhere by using a scroll in your bags. Follow the clue numbers printed beside the pins. If you drew a different hunt, its linked article gives its own sequence and dig coordinates.',
+      'This example route is for Ashes at the Gate. Do step 1 anywhere by using a scroll in your bags. Follow the clue numbers next to the pins. If you got a different hunt, its own page lists its steps and dig coordinates.',
     ],
   },
   'Weekly Vault': {
@@ -158,25 +158,25 @@ export const activityRoutes: Record<string, SystemRoute> = {
       npcPin('Reward', 'eastbrook_vault_keeper', 'Receive your selected item'),
     ],
     notes: [
-      'Earn your weekly milestones in the qualifying activities before visiting the keeper after reset. All claim steps use the same window.',
+      'Reach your weekly goals in activities that count. Then visit the Keeper after the reset. Every claim step happens in the same window.',
     ],
   },
   Rifts: {
     points: [],
     flow: [riftEntrance, riftDescent, 'Loot the final boss and take the exit'],
     notes: [
-      'A live portal chooses its own site, and each run generates its own rooms. Use your live map, tracker and opened descents for this run.',
+      'Each portal picks its own spot, and each run makes its own rooms. Use your map, your tracker and the ways down that open in this run.',
     ],
   },
   'Rift floors': {
     points: [],
     flow: [
-      'Enter the open rift and read your current floor tracker',
+      'Go into the open rift and read the tracker for your floor',
       riftDescent,
-      'Follow the next floor until the final boss; loot it where it falls',
+      'Keep going floor by floor to the final boss. Loot it where it falls',
     ],
     notes: [
-      'The enemies, puzzle, descent and boss belong to the generated instance. Completing an ordinary floor opens its descent.',
+      'The enemies, puzzle, way down and boss are made fresh for each run. Finishing a normal floor opens its way down.',
     ],
   },
   'Rift first-clear rewards': {
@@ -184,16 +184,16 @@ export const activityRoutes: Record<string, SystemRoute> = {
       npcPin(
         2,
         'riftwright_maelis',
-        'Optional stop after winning: improve your band at the Rift Forge',
+        'Optional stop after you win: make your band better at the Rift Forge',
       ),
     ],
     flow: [
       riftEntrance,
-      'Clear the floors and defeat the final boss first',
-      'Loot the final corpse for shared items and your personal band, Essence and any gem',
+      'Clear the floors and defeat the final boss before any other group',
+      'Loot the final boss for shared items, plus your own band, Essence and any gem',
     ],
     notes: [
-      'The reward is collected inside the changing rift. Maelis is an optional stop afterward.',
+      'You pick up the reward inside the rift, which is different every time. Visiting Maelis afterward is optional.',
     ],
   },
   'Rift Forge': {
@@ -204,27 +204,27 @@ export const activityRoutes: Record<string, SystemRoute> = {
       npcPin('Reward', 'riftwright_maelis', 'The band in your bag gains the upgrade or socket'),
     ],
     notes: [
-      'The forging actions take place in one window. Equip the band from your bags in step 3.',
+      'Everything at the forge happens in one window. In step 3, put the band on from your bags.',
     ],
   },
   Duels: {
     points: [],
     flow: [
-      'Meet your chosen opponent within 30 yards',
-      'Challenge and accept at the meeting spot',
-      'Finish the fight there; the game announces the winner',
+      'Meet the player you want to fight, within 30 yards',
+      'Send the challenge and accept it where you meet',
+      'Finish the fight there. The game says who won',
     ],
-    notes: ['You choose the meeting point. A duel gives no item or coin to collect.'],
+    notes: ['You pick where to meet. A duel gives no item or coin to collect.'],
   },
   'World PvP': {
     points: [],
     flow: [
-      'In an eligible overworld zone, enable World PvP',
-      'Find and fight another eligible flagged player',
-      'Receive any kill payout at the fight; disarm outside combat and the active hill',
+      'In an outdoor zone that allows it, turn on World PvP',
+      'Find and fight another flagged player who counts for rewards',
+      'Get any kill reward where the fight happens. Turn your flag off when you are out of combat and out of the active hill',
     ],
     notes: [
-      'Both players move. The reward is credited where the fight happens. The Proving Shore is excluded.',
+      'Both players move around, so there is no fixed spot. The reward is given where the fight happens. The Proving Shore does not count.',
     ],
   },
   'Ashen Coliseum': {
@@ -235,7 +235,7 @@ export const activityRoutes: Record<string, SystemRoute> = {
       ...ARENA_SPAWNS_B_2v2.map((p) => room(2, 'Ashen Coliseum', p, '2v2: side B arrives')),
     ],
     notes: [
-      'Queue from PvP anywhere. The map shows the Ashen Coliseum floor when assigned. Opponents move after the start. Any rating, Honor and match credit are awarded at the result; there is no turn-in.',
+      'You can join the queue from the PvP window anywhere. The map shows the Ashen Coliseum floor once you are placed in a match. Your opponents move once the fight starts. Rating, Honor and match credit are given at the result. There is nothing to hand in.',
     ],
   },
   'Thornhollow battleground': {
@@ -244,35 +244,35 @@ export const activityRoutes: Record<string, SystemRoute> = {
         1,
         'Thornhollow Fields',
         b.spawns[0],
-        BG_TEAM_NAMES[b.team] + ' keep: one arrival position',
+        BG_TEAM_NAMES[b.team] + ' keep: one place where you arrive',
       ),
       room(
         2,
         'Thornhollow Fields',
         b.flag,
         BG_TEAM_NAMES[b.team] +
-          ' flag stand: steal here if this is the enemy keep; score here if it is yours',
+          ' flag stand: grab the flag here if this is the enemy keep, or score here if it is yours',
       ),
     ]),
     notes: [
-      'Queue from PvP anywhere. On assignment, use your team name to identify your home keep. Return the enemy flag to your own stand. Stay until the result for automatic match credit and Honor.',
+      'You can join the queue from the PvP window anywhere. When you are placed in a match, your team name tells you which keep is yours. Bring the enemy flag back to your own stand. Stay until the result. Match credit and Honor are then given to you automatically.',
     ],
   },
   'King of the Hill': {
     points: [],
     flow: [
-      'Read the zone announcement and use /hill for the live location',
+      'Read the realm message for the zone, and type /hill to see where the hill is now',
       'Enter the active 50-yard circle and capture it',
-      'Remain inside while holding for Honor; weekly credit is awarded when the hill ends',
+      'Stay inside while your party holds it to earn Honor. Weekly credit is given when the hill ends',
     ],
     notes: [
-      'A site is selected in The Drakelands, The Frostveil Reach or The Amberfall. The exact hill changes between events.',
+      'The hill is in The Drakelands, The Frostveil Reach or The Amberfall. Its exact spot changes each time.',
     ],
   },
   'Honor and Warfare gear': {
     points: [...vendors('Start'), ...vendors(1), ...vendors('Reward')],
     notes: [
-      'Choose either quartermaster. Buy at the same counter in step 2. Equip your purchase from your bags in step 3.',
+      'Go to either quartermaster. In step 2, buy at the same counter. In step 3, put on what you bought from your bags.',
     ],
   },
   'Gourdlight Eve': {
@@ -283,12 +283,19 @@ export const activityRoutes: Record<string, SystemRoute> = {
       ),
       ...hester(2, 'exchange sweets'),
       ...(field
-        ? [worldPin(3, field.x, field.z, 'Old Thatchgrin: earn a sheaf at the seasonal field')]
+        ? [
+            worldPin(
+              3,
+              field.x,
+              field.z,
+              'Old Thatchgrin: fight him at the seasonal field to earn a sheaf',
+            ),
+          ]
         : []),
-      ...hester('Reward', 'exchange five sheaves for the broom or collect purchases'),
+      ...hester('Reward', 'trade five sheaves for the broom, or pick up what you bought'),
     ],
     notes: [
-      'Visit the matching counter and eligible townspeople in any of the three towns. The field and stalls appear only during the event. Sweets come from the townsperson; the broom exchange takes place with Hester.',
+      'Visit the counter and the townspeople who take part in any of the three towns. The field and stalls only show up during the event. Sweets come from the townspeople. You trade for the broom with Hester.',
     ],
   },
   'The Card Master': {
@@ -298,7 +305,7 @@ export const activityRoutes: Record<string, SystemRoute> = {
       npcPin('Reward', 'card_master', 'The match records the win at the card table'),
     ],
     notes: [
-      'Play steps 2 and 3 on the card board. A qualifying deed is recorded as soon as the match ends.',
+      'Play steps 2 and 3 on the card board. If you earn a deed, it is saved as soon as the match ends.',
     ],
   },
 };

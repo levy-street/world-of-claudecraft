@@ -37,12 +37,20 @@ export function indexActivityItems(
   uses: Map<string, Set<string>>,
 ) {
   for (const [cls, def] of Object.entries(CLASSES))
-    append(sources, def.startChest, 'Starting chest armor for ' + ref(w, 'class', cls) + '.');
+    append(
+      sources,
+      def.startChest,
+      'The chest armor a new ' + ref(w, 'class', cls) + ' starts with.',
+    );
   for (const q of Object.values(QUESTS))
     for (const id of q.requiredItems ?? [])
-      append(sources, id, 'Supplied if missing when accepting ' + ref(w, 'quest', q.id) + '.');
+      append(
+        sources,
+        id,
+        'Given to you when you accept ' + ref(w, 'quest', q.id) + ', if you do not have it.',
+      );
   append(sources, WEEKLY_QUEST_REWARD.cacheItemId, 'Finish a weekly charge from the emissary.');
-  append(sources, TREASURE_CASKET_ITEM_ID, 'Complete every step of an active clue hunt.');
+  append(sources, TREASURE_CASKET_ITEM_ID, 'Finish every step of a clue hunt you have started.');
   append(
     sources,
     CASKET_MOUNT_REINS_ITEM_ID,
@@ -56,24 +64,24 @@ export function indexActivityItems(
     append(
       sources,
       TREASURE_MAP_ITEM_IDS[r],
-      'Complete the rotating world quest slate at level ' +
+      'Finish the rotating world quest slate at level ' +
         CLUE_SCROLL_MIN_LEVEL +
-        ' or above. One map per cycle, ' +
+        ' or higher. You get one map per cycle. The chance that it is this rarity is ' +
         pct(TREASURE_MAP_DROP_WEIGHTS[r] / total) +
-        ' chance of this rarity.',
+        '.',
     );
   for (const [cls, ids] of Object.entries(WORLD_QUEST_CLASS_LOOT))
     for (const id of ids)
       append(
         sources,
         id,
-        'Rotating world quest reward for ' +
+        'A rotating world quest reward for ' +
           ref(w, 'class', cls) +
           ' at level ' +
           WORLD_QUEST_ITEM_MIN_LEVEL +
-          ' or above. ' +
+          ' or higher. Each cycle, ' +
           WORLD_QUEST_ITEM_SLOTS_PER_CYCLE +
-          ' zones carry gear each cycle. The piece is fixed for the zone, class and cycle.',
+          ' zones give gear. The piece is set by the zone, the class and the cycle.',
       );
   for (const [delve, entries] of Object.entries(DELVE_SHOPS))
     for (const row of entries) {
@@ -87,9 +95,9 @@ export function indexActivityItems(
           row.marks +
           ' Delve Marks.' +
           (row.gate === 'heroicClear'
-            ? ' First clear the delve on Heroic.'
+            ? ' You must clear the delve on Heroic first.'
             : count !== null
-              ? ' First finish ' + count + ' clears.'
+              ? ' You must clear it ' + count + ' times first.'
               : ''),
       );
     }
@@ -99,24 +107,25 @@ export function indexActivityItems(
     append(
       sources,
       id,
-      'First group to clear a rank C natural rift: 1 in ' +
+      'Be the first group to clear a rank C natural rift. The final boss always drops one shared gear piece, and this item has a 1 in ' +
         normal.length +
-        ' chance in its guaranteed shared final-boss gear slot.',
+        ' chance to be it.',
     );
   for (const id of heroic)
     append(
       sources,
       id,
-      'First group to clear a rank B, A or S natural rift: 1 in ' +
+      'Be the first group to clear a rank B, A or S natural rift. Each shared Heroic gear piece has a 1 in ' +
         heroic.length +
-        ' chance per shared Heroic gear slot. S may roll a second slot. Loot the final corpse.',
+        ' chance to be this item. Rank S may drop a second piece. Loot the final boss.',
     );
   for (const id of RIFT_LEGENDARY_ITEM_IDS)
     append(
       sources,
       id,
-      pct(RIFT_LEGENDARY_CHANCE_S) +
-        ' independent shared chance from the final boss for the first group to clear a rank S natural rift.',
+      'Be the first group to clear a rank S natural rift. The final boss drops this as shared loot ' +
+        pct(RIFT_LEGENDARY_CHANCE_S) +
+        ' of the time, rolled on its own.',
     );
   const pools: readonly [readonly string[], number, string][] = [
     [RIFT_BLUE_MOUNT_REINS, RIFT_BLUE_MOUNT_CHANCE, 'A'],
@@ -130,25 +139,25 @@ export function indexActivityItems(
       append(
         sources,
         id,
-        'For the first group to finish the natural rift, the rank ' +
+        'Be the first group to finish a rank ' +
           rank +
-          ' rift final boss has a ' +
+          ' natural rift. Its final boss has a ' +
           pct(chance) +
-          ' chance to select one of ' +
+          ' chance to drop one of these ' +
           ids.length +
-          ' items equally from this pool.',
+          ' items, each equally likely.',
       );
   for (const crop of Object.values(FARM_CROPS)) {
     append(
       uses,
       crop.seedItemId,
-      'Plant at Farming skill ' +
+      'Plant it at Farming skill ' +
         farmCropSkillThreshold(crop.tier) +
         ' to grow ' +
         ref(w, 'item', crop.produceItemId) +
-        '. Base growing time ' +
+        '. It takes ' +
         crop.durationMs / 60000 +
-        ' minutes. A fine-grade harvest yields ' +
+        ' minutes to grow (base time). A fine-grade harvest gives ' +
         ref(w, 'item', crop.fineProduceItemId) +
         '.',
     );
@@ -174,7 +183,7 @@ export function indexActivityItems(
           ref(w, 'ability', ability) +
           ' at rank ' +
           rank +
-          ' with room in your bags. Each cast creates two.',
+          '. Each cast makes two, so leave room in your bags.',
       );
     }
   }

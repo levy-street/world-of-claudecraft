@@ -43,25 +43,25 @@ export function vendorCraftAcquisitions(w: ArticleTools): Map<string, ItemAcquis
     addAcquisition(index, stock.itemId, {
       title: 'Buy standing stock on the World Market',
       steps: [
-        'Visit ' +
+        'Go to ' +
           marketKeepers
             .map((npc) => ref(w, 'npc', npc.id) + ' at ' + location(itemNpcPoints('Start', npc.id)))
             .join(' or ') +
-          '. Both open the same [[World Market]].',
-        'Speak to the keeper, choose Show me the World Market, then open Browse. Search for ' +
+          '. Both of them open the same [[World Market]].',
+        'Talk to the keeper and choose Show me the World Market. Then open Browse. Search for ' +
           itemLink(stock.itemId) +
-          ' and select the standing-stock listing sold by The Merchant.',
+          '. Pick the listing sold by The Merchant. That listing is always there.',
         'Choose the full stack of ' +
           stock.count +
           ' for ' +
           w.money(stock.price) +
-          ', click Buy and confirm. Carry that amount and leave enough bag space. The purchased items arrive directly in your bags.',
+          '. Click Buy, then confirm. Bring enough money and leave room in your bags. The items go straight into your bags.',
       ],
       details: [
-        'The listed price is for the entire ' +
+        'The price is for the whole stack of ' +
           stock.count +
-          '-item stack, not for each item. This built-in stock never expires or sells out.',
-        'Other players may list the same item at different prices. Their prices and availability are set by those players; check the actual listing before confirming.',
+          ' items, not for each one. This stock never runs out and never goes away.',
+        'Other players may sell the same item for a different price. They choose their own prices and how many to sell. Check the listing before you confirm.',
       ],
       points: marketKeepers.flatMap((npc) => [
         ...itemNpcPoints('Start', npc.id, 'Open World Market Browse'),
@@ -82,26 +82,26 @@ export function vendorCraftAcquisitions(w: ArticleTools): Map<string, ItemAcquis
       addAcquisition(index, id, {
         title: 'Buy from ' + ref(w, 'npc', npc.id),
         steps: [
-          'Travel to ' +
+          'Go to ' +
             ref(w, 'npc', npc.id) +
             (where
               ? ' in ' + where
-              : '. Follow the NPC article for its activity-dependent location') +
+              : '. Where it stands depends on an activity, so check its NPC page') +
             '.',
-          'Carry the required currency and leave enough room in your bags. ' +
+          'Bring what you need to pay and leave room in your bags. ' +
             vendorOfferText(w, npc, item),
-          'Speak to the vendor, open the stock and click ' +
+          'Talk to the vendor, open the shop and click ' +
             itemLink(id) +
             ' once. ' +
             (item.teachesRiding
-              ? 'The purchased riding training is applied to this character.'
-              : 'Receive ' + units + ' in your bags.'),
+              ? 'This character learns the riding training you paid for.'
+              : 'You get ' + units + ' in your bags.'),
         ],
         details: [
           ...(npc.id === GOURDLIGHT_KEEPER_NPC_ID || item.seasonalEvent
-            ? ['Available only while its seasonal event is active.']
+            ? ['You can only buy this while its seasonal event is on.']
             : []),
-          'This is a purchase at the listed price. It does not use a random drop roll.',
+          'You buy this for the listed price. There is no random drop roll.',
         ],
         points: [
           ...itemNpcPoints('Start', npc.id, 'Open the vendor'),
@@ -121,19 +121,21 @@ export function vendorCraftAcquisitions(w: ArticleTools): Map<string, ItemAcquis
       steps: [
         'Earn ' +
           offer.marks +
-          ' Heroic Marks through eligible Heroic activities. See [[Heroic difficulty]] for the clear and reset rules.',
-        'Visit ' +
+          ' Heroic Marks from Heroic activities that give them. See [[Heroic difficulty]] for which clears count and when they reset.',
+        'Go to ' +
           ref(w, 'npc', HEROIC_VENDOR_NPC_ID) +
           ' in ' +
           where +
-          '. Speak to the quartermaster to open the Heroic shop.',
+          '. Talk to the quartermaster to open the Heroic shop.',
         'Click ' +
           itemLink(offer.itemId) +
-          '. The purchase spends ' +
+          '. This spends ' +
           offer.marks +
-          ' Heroic Marks and gives one item. Leave bag space before buying.',
+          ' Heroic Marks and gives you one item. Make room in your bags first.',
       ],
-      details: ['Guaranteed purchase. Heroic Marks are taken from your character balance.'],
+      details: [
+        "You always get the item when you buy it. The Heroic Marks come out of this character's total.",
+      ],
       points: [
         ...itemNpcPoints('Start', HEROIC_VENDOR_NPC_ID, 'Open Heroic stock'),
         ...itemNpcPoints('Reward', HEROIC_VENDOR_NPC_ID, 'Collect ' + ITEMS[offer.itemId].name),
@@ -146,20 +148,20 @@ export function vendorCraftAcquisitions(w: ArticleTools): Map<string, ItemAcquis
     addAcquisition(index, offer.itemId, {
       title: 'Exchange a Crucible sigil',
       steps: [
-        'Obtain 1 ' +
+        'Get 1 ' +
           itemLink(offer.sigilId) +
-          '. Its article identifies the exact boss, difficulty and loot chance.',
-        'Travel to ' +
+          '. Its page tells you which boss drops it, on which difficulty, and how often.',
+        'Go to ' +
           ref(w, 'npc', CRUCIBLE_VENDOR_NPC_ID) +
           ' at ' +
           where +
-          ', on the landing court outside the Crucible keep.',
-        'Speak to the quartermaster and click ' +
+          '. The quartermaster stands on the landing court outside the Crucible keep.',
+        'Talk to the quartermaster and click ' +
           itemLink(offer.itemId) +
-          '. One sigil is consumed and one piece goes to your bags. Have bag space and choose a piece your class is allowed to wear.',
+          '. You hand over one sigil and get one piece in your bags. Make room in your bags first, and pick a piece your class can wear.',
       ],
       details: [
-        'The exchange itself is guaranteed. The chance to get the sigil is a separate boss drop.',
+        'The trade always works. The only luck is in getting the sigil, which is a separate boss drop.',
       ],
       points: [
         ...itemNpcPoints('Start', CRUCIBLE_VENDOR_NPC_ID, 'Open the sigil shop'),
@@ -189,34 +191,35 @@ export function vendorCraftAcquisitions(w: ArticleTools): Map<string, ItemAcquis
     const names = patterns.get(recipe.id) ?? [];
     const quest = recipeQuests.get(recipe.id);
     const learned: string[] = [];
-    if (!recipe.acquisition?.length) learned.push('This recipe is known automatically.');
+    if (!recipe.acquisition?.length)
+      learned.push('This recipe is known automatically. You do not need to learn it.');
     if (trainer)
       learned.push(
-        'At ' +
+        'When your ' +
           words(recipe.professionId) +
-          ' skill ' +
+          ' skill is ' +
           tierForSkill(recipe.skillReq) * TIER_SKILL_STEP +
-          ' or above, speak to ' +
+          ' or higher, talk to ' +
           ref(w, 'npc', trainer.masterNpcId) +
           ' at ' +
           location(itemNpcPoints(1, trainer.masterNpcId)) +
-          ', choose Training and learn this recipe for ' +
+          '. Choose Training and learn this recipe for ' +
           w.money(trainingFeeFor(recipe)) +
           '.',
       );
     if (names.length)
-      learned.push('Obtain and use ' + names.map(itemLink).join(' or ') + ' to learn it.');
+      learned.push('Get and use ' + names.map(itemLink).join(' or ') + ' to learn it.');
     if (quest)
       learned.push(
-        'Complete ' +
+        'Finish ' +
           ref(w, 'quest', quest.id) +
-          ' to learn it. Follow that quest page for the full route.',
+          ' to learn it. The quest page shows the whole route.',
       );
     if (!learned.length)
       learned.push(
         'Learn this recipe through its ' +
           (recipe.acquisition ?? []).map(words).join(' or ') +
-          ' source before crafting.',
+          ' source before you craft it.',
       );
     const ingredients = recipe.reagents
       .map(
@@ -224,7 +227,7 @@ export function vendorCraftAcquisitions(w: ArticleTools): Map<string, ItemAcquis
           r.count +
           ' × ' +
           itemLink(r.itemId) +
-          (r.noDiscount ? ' (full quantity always required)' : ''),
+          (r.noDiscount ? ' (you always need the full amount)' : ''),
       )
       .join(', ');
     const fee = Math.ceil(recipe.itemLevelBudget * CRAFT_GOLD_SINK_COPPER_PER_BUDGET);
@@ -250,56 +253,62 @@ export function vendorCraftAcquisitions(w: ArticleTools): Map<string, ItemAcquis
       title: 'Craft with ' + words(recipe.professionId) + ' (recipe skill ' + recipe.skillReq + ')',
       steps: [
         learned.join(' '),
-        'Gather the base material bill for one craft: ' +
+        'Collect the ingredients for one craft: ' +
           ingredients +
-          '. Click each ingredient for its sources and map.',
+          '. Click an ingredient to see where to get it.',
         (benches.length
           ? 'Stand within ' +
             STATION_RADIUS +
             ' yards of a ' +
             words(recipe.stationType!) +
-            ' station shown on the map, or a matching mobile station. '
-          : 'This recipe can be crafted in the field. ') +
-          'Open Crafting (T), select ' +
+            ' station. Use one shown on the map, or a matching mobile station. '
+          : 'You do not need a station for this recipe. ') +
+          'Open Crafting (T). Pick ' +
           words(recipe.professionId) +
-          ' and the recipe for ' +
+          ', then the recipe for ' +
           itemLink(recipe.resultItemId) +
-          ', then choose Craft. Complete the ' +
+          ', and choose Craft. Wait for the cast to finish. Its base time is ' +
           craftCastDurationSec(recipe) +
-          '-second base cast. One craft yields ' +
+          ' seconds. One craft makes ' +
           recipe.resultCount +
           ' × ' +
           itemLink(recipe.resultItemId) +
           '.',
       ],
       details: [
-        'Once learned, the listed recipe skill of ' +
+        'Once you learn this recipe, you can craft it even with less than ' +
           recipe.skillReq +
-          ' sets its progression tier. It does not by itself block crafting below that skill.',
+          ' skill. The recipe skill of ' +
+          recipe.skillReq +
+          ' sets how advanced the recipe is (its tier).',
         ...(combo
           ? [
-              'Choose ' +
+              'You need ' +
                 words(combo.craftA) +
                 ' and ' +
                 words(combo.craftB) +
-                ' as your major pair and raise both to tier ' +
+                ' as your major pair, with both at tier ' +
                 combo.minTier +
                 ' (skill ' +
                 combo.minTier * TIER_SKILL_STEP +
-                ').',
+                ') or higher.',
             ]
           : []),
-        'The craft takes up to ' +
+        'Each craft also costs ' +
           w.money(fee) +
-          ' from your purse. If you have less, it takes your remaining copper.',
-        'The ingredient list above is the base bill. Your displayed cost can be lower with qualifying specialization, signed-material or Jack of All Trades discounts. The crafting window shows your exact current bill.',
+          ' in coins. If you have less than that, it takes all the copper you have.',
+        'The ingredient list above is the normal amount. Some discounts can lower it if they apply to you: specialization, signed materials or Jack of All Trades. The crafting window shows exactly what you will use.',
         ...(recipe.oncePerDay
-          ? ['Limited to one successful craft of this recipe per character per reset day.']
+          ? [
+              'Each character can craft this only once per day. The day starts over at the daily reset.',
+            ]
           : []),
-        ...(recipe.consumeOnCraft ? ['A successful craft consumes this one-use recipe.'] : []),
-        'Crafting is not an item-drop roll. Eligible equipment can receive a masterwork improvement. See [[Masterwork crafting]] for its chance and restrictions.',
+        ...(recipe.consumeOnCraft
+          ? ['You can use this recipe only once. It is used up when the craft works.']
+          : []),
+        'Crafting is not a random drop. Some equipment can come out as a better masterwork version. See [[Masterwork crafting]] for the chance and the rules.',
         ...(!benches.length
-          ? ['Receive the output at your current position when the cast finishes.']
+          ? ['You get the item right where you are when the cast finishes.']
           : []),
       ],
       points,

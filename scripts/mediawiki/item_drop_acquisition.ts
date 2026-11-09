@@ -33,11 +33,16 @@ export function dropAcquisitions(w: ArticleTools): Map<string, ItemAcquisition[]
           x: c.center.x,
           z: c.center.z,
           radius: c.radius,
-          label: name + ' camp; loot its corpse where defeated',
+          label: name + ' camp: loot its body where it falls',
         });
       const boss = WORLD_BOSSES.find((b) => b.templateId === id);
       if (boss)
-        points.push({ step: 2, frame: 'Overworld', ...boss.pos, label: name + ' scheduled spawn' });
+        points.push({
+          step: 2,
+          frame: 'Overworld',
+          ...boss.pos,
+          label: name + ': appears here at set times',
+        });
       if (id === THATCHGRIN_ID) {
         const field = resolveScarecrowField(WORLD_SEED);
         if (field)
@@ -46,7 +51,7 @@ export function dropAcquisitions(w: ArticleTools): Map<string, ItemAcquisition[]
             frame: 'Overworld',
             x: field.x,
             z: field.z,
-            label: name + ' seasonal encounter',
+            label: name + ': seasonal event fight',
           });
       }
     }
@@ -80,7 +85,7 @@ export function dropAcquisitions(w: ArticleTools): Map<string, ItemAcquisition[]
           frame: d.name,
           x: s.x,
           z: s.z,
-          label: name + '; loot its corpse here',
+          label: name + ': loot its body here',
         });
       for (const o of d.objects?.filter((o) => o.itemId === relicSummons[id]) ?? [])
         points.push({
@@ -88,8 +93,7 @@ export function dropAcquisitions(w: ArticleTools): Map<string, ItemAcquisition[]
           frame: d.name,
           x: o.x,
           z: o.z,
-          label:
-            'Activate ' + o.name + ' to summon ' + name + '; defeat and loot the guardian nearby',
+          label: 'Use ' + o.name + ' to summon ' + name + ', then defeat and loot it nearby',
         });
     }
     if (!points.length) {
@@ -155,28 +159,41 @@ export function dropAcquisitions(w: ArticleTools): Map<string, ItemAcquisition[]
         const where = ref(w, 'mob', mob.id);
         const row = mode.entries.filter((e) => e.rollGroup === entry.rollGroup);
         const rules = [
-          `Base chance is ${pct(entry.chance)} ${entry.rollGroup ? 'for this entry in one shared loot slot' : 'per eligible kill'}. Each successful entry supplies one item.`,
+          `${entry.rollGroup ? `Base chance: ${pct(entry.chance)}. This item shares one loot slot with other items.` : `Drop chance: ${pct(entry.chance)} each time you defeat it and can loot it.`} Each drop gives one item.`,
         ];
         if (entry.rollGroup) {
           const total = row.reduce((n, e) => n + e.chance, 0);
+          // The class-lock reweight (src/sim/loot/class_locked_drop.ts) only touches
+          // soulbound, class-restricted rows; say so only where such a row exists.
+          const locked = row.some((e) =>
+            [e.itemId, e.itemId && heroicLootItemId(e.itemId, mode.heroic)].some((rowId) => {
+              const def = rowId ? ITEMS[rowId] : undefined;
+              return !!def?.soulbound && !!def.requiredClass?.length;
+            }),
+          );
           rules.push(
-            `This slot shares one roll across ${row.length} entries, with a total drop chance of ${pct(Math.min(1, total))}. Soulbound class-locked entries unusable by the eligible group are removed. For a retained entry, multiply its base chance by ${Number(total.toFixed(8))} divided by the sum of retained chances.`,
-            'If another slot on this kill already awarded the selected item, the roll moves forward through this pool to the next item not already awarded. This can increase that next item’s final odds. These are per-slot chances, not your chance of winning a party loot roll.',
+            `The game rolls once for this slot, so at most one of its ${row.length} entries drops. Added together, the chances of everything in the slot come to ${pct(Math.min(1, total))}.`,
+            ...(locked
+              ? [
+                  `Some items in this slot are soulbound and only for certain classes. An item like that is taken out of the slot first if nobody who can loot this kill plays a class that can use it. The chances of the entries left then grow to fill the gap. To work out this item's new chance, multiply its base chance by ${Number(total.toFixed(8))}, then divide by the base chances of the entries left, added together.`,
+                ]
+              : []),
+            'Sometimes another slot on the same kill has already given out the item this slot picked. Then this slot moves on through its list and gives the next item that has not dropped yet. This can make that next item a little more likely. These chances are for the slot, not your chance of winning a party loot roll.',
           );
         }
         if (mob.worldBoss)
           rules.push(
-            'This world boss rolls personal loot separately for each eligible contributor. Loot your own corpse allocation before it despawns. Taking a personal reward uses the boss loot lockout.',
+            'This world boss rolls loot separately for each player who helped and can get its loot. Each of you gets your own loot on its body. Take yours before the body disappears. Taking your loot uses up your loot lockout for this boss.',
           );
         else if (!entry.questId)
           rules.push(
-            'A successful roll puts the item on the corpse. Party loot rules decide who receives it when more than one player is eligible.',
+            'When the item drops, it appears on the body. If more than one player can loot it, your party loot rules decide who gets it.',
           );
         if (entry.questId)
           rules.push(
-            'Have ' +
+            'It only drops while ' +
               ref(w, 'quest', entry.questId) +
-              ' active and still need this item for its collect objective. The successful roll supplies a personal copy to each eligible player who still needs it.',
+              ' is in your quest log and you still need more of this item for it. When it drops, every player who can loot it and still needs it gets their own copy.',
           );
         if (entry.questId) {
           const q = QUESTS[entry.questId];
@@ -188,18 +205,20 @@ export function dropAcquisitions(w: ArticleTools): Map<string, ItemAcquisition[]
           rules.push(...route.notes.filter((n) => n.step === objective + 1).map((n) => n.text));
         }
         if (mob.worldBoss && entry.unlessOwned)
-          rules.push('No award if you already keep this item in bags, bank or courier cargo.');
+          rules.push(
+            'You do not get it if you already have one in your bags, bank or courier cargo.',
+          );
         if (mob.worldBoss && entry.unlessOwnedItem)
           rules.push(
-            'No award while you keep ' +
+            'You do not get it while you have ' +
               ref(w, 'item', entry.unlessOwnedItem) +
-              ' in bags, bank or courier cargo.',
+              ' in your bags, bank or courier cargo.',
           );
         if (mob.worldBoss && entry.maxPlayerLevel !== undefined)
-          rules.push('Only characters at level ' + entry.maxPlayerLevel + ' or below qualify.');
+          rules.push('Only characters at level ' + entry.maxPlayerLevel + ' or lower can get it.');
         if (ITEMS[id].requiredClass?.length)
           rules.push(
-            'Class-locked to ' +
+            'Only these classes can use it: ' +
               ITEMS[id].requiredClass!.map((c) => ref(w, 'class', c)).join(', ') +
               '.',
           );
@@ -211,21 +230,23 @@ export function dropAcquisitions(w: ArticleTools): Map<string, ItemAcquisition[]
         const riftThemes = RIFT_THEMES.filter((t) => t.boss === mob.id || t.trash.includes(mob.id));
         if (riftThemes.length)
           rules.push(
-            'Appears on generated rift floors with these themes: ' +
+            'This creature shows up on rift floors with these themes: ' +
               riftThemes.map((t) => t.name).join(', ') +
-              '. The active portal and floor positions change between runs.',
+              '. Rift floors are made fresh for each run, so the portal you use and where things are on each floor change every time.',
           );
         const conditions = [
           ...(mode.heroic
-            ? ['Set the instance to Heroic before entering and meet its entry requirements.']
+            ? [
+                'Before you go in, set the difficulty to Heroic. You also need to meet its entry requirements.',
+              ]
             : shifted || entry.normalOnly
-              ? ['Use Normal difficulty for this version.']
+              ? ['Play on Normal difficulty to get this version.']
               : []),
           ...(entry.questId
             ? [
                 'Accept ' +
                   ref(w, 'quest', entry.questId) +
-                  ' and leave its collect objective unfinished.',
+                  '. Do not finish collecting its items yet.',
               ]
             : []),
         ].join(' ');
@@ -234,23 +255,23 @@ export function dropAcquisitions(w: ArticleTools): Map<string, ItemAcquisition[]
           steps: [
             (conditions ||
               (riftThemes.length
-                ? 'Follow a realm rift announcement to its portal, enter the rift and find this creature on a matching floor. See [[Rifts]] and [[Rift floors]].'
-                : 'Find ' + where + ' at one of the mapped locations.')) +
+                ? 'When your realm announces a rift, go to its portal and enter the rift. Find this creature on a floor with a matching theme. See [[Rifts]] and [[Rift floors]].'
+                : 'Find ' + where + ' at one of the places on the map.')) +
               (points.length
-                ? ' The map shows alternative spawn sites and any approach doors.'
-                : ' Follow the creature page for its spawn or encounter trigger.'),
+                ? ' The map shows each place it can appear, and any doors you go through to get there.'
+                : ' See the creature page to learn where it appears or what makes it show up.'),
             (relicSummons[mob.id]
-              ? 'Click the mapped relic while The Sealed Crypt is active to summon its guardian. '
+              ? 'While The Sealed Crypt is active, click the relic shown on the map to summon its guardian. '
               : '') +
               'Defeat ' +
               where +
-              ' while eligible for its loot. ' +
-              (mob.worldBoss ? 'Wait for its scheduled appearance if it is absent.' : ''),
-            'Open the corpse and take ' +
+              ', and make sure you are allowed to loot it. ' +
+              (mob.worldBoss ? 'If it is not there, wait for the time it is set to appear.' : ''),
+            'Open its body and take ' +
               ref(w, 'item', id) +
               '. ' +
               (!mob.worldBoss && !entry.questId
-                ? 'If a party roll appears, choose Need, Greed or Pass according to your group’s loot rules.'
+                ? 'If a party loot roll pops up, choose Need, Greed or Pass, following your group’s loot rules.'
                 : ''),
           ],
           details: rules,

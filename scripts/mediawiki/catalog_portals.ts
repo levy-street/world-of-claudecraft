@@ -105,7 +105,7 @@ function itemPortal(w: Writer) {
   const c = catalog(
     w,
     'Items',
-    'Browse gear by the slot you want to fill, find supplies for a profession, or look up an item you can use. Materials also appear under the crafts that consume them.',
+    'Find gear by the slot you want to fill, find supplies for a profession, or look up an item you can use. Materials are also listed under each craft that uses them.',
     [
       'Weapons',
       'Armor, jewelry and off-hands',
@@ -174,7 +174,7 @@ function enemyPortal(w: Writer) {
   const c = catalog(
     w,
     'Mobs',
-    'Find an enemy by family, encounter rank, dungeon or raid. An enemy can appear in more than one list. Companions, pets, practice targets and escorts are listed with the friendly characters under NPCs.',
+    'Find an enemy by its family, how tough it is, or the dungeon or raid it is in. One enemy can be in more than one list. Companions, pets, practice targets and people you escort are not here. They are listed with the friendly characters under NPCs.',
     ['Creature families', 'Encounter rank', 'Dungeon spawn lists', 'Raid spawn lists'],
   );
   for (const [id, title] of w.titleBy.mob) {
@@ -231,7 +231,7 @@ function abilityPortal(w: Writer) {
   const c = catalog(
     w,
     'Abilities',
-    'Choose a class for its spellbook, including granted actions. The spell school index groups abilities across all classes. Open an ability for its unlock conditions, ranks, costs and scaling.',
+    'Pick a class to see its spellbook, including its extra class actions. The spell school lists group abilities from every class by school. Open an ability to see how to unlock it, its ranks, its cost and how it grows stronger with your stats.',
     ['Class spellbooks', 'Other sources', 'Schools'],
   );
   for (const [id, title] of w.titleBy.ability) {
@@ -257,7 +257,7 @@ function npcPortal(w: Writer) {
   const c = catalog(
     w,
     'NPCs',
-    'Look for the service you need or browse by location. Quest contacts can appear in both the starting and hand-in lists. Friendly creatures covers companions, pets, practice targets and escorts.',
+    'Look for the service you need, or look by place. A quest contact can be in both the quest givers list and the hand-in list. Friendly creatures lists companions, pets, practice targets and people you escort.',
     // Breadcrumbs follow the first section that lists a page, so place comes first.
     [
       'Zones',

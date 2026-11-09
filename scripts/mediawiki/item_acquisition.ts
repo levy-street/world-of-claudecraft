@@ -31,10 +31,10 @@ export function itemAcquisitionArticle(
   if (!entries.length) {
     return w.section(
       'How to get',
-      'No complete, verified acquisition route was found in this edition. ' +
+      'We could not find a full, checked way to get this item in this version of the game. ' +
         (fallback.length
-          ? 'The recorded source notes are listed below.'
-          : 'A drop chance, shop price or map location cannot be confirmed.'),
+          ? 'The notes we have about where it comes from are listed below.'
+          : 'We cannot confirm a drop chance, shop price or map location for it.'),
     );
   }
   const points: RoutePoint[] = [];
@@ -43,11 +43,15 @@ export function itemAcquisitionArticle(
       for (const p of source.points ?? []) {
         const action =
           p.step === 'Start'
-            ? 'start'
+            ? 'Start here'
             : p.step === 'Hand-in' || p.step === 'Reward'
-              ? 'collect'
-              : 'step ' + p.step;
-        points.push({ ...p, step: i + 1, label: source.title + ' · ' + action + ' · ' + p.label });
+              ? 'Get the item here'
+              : 'Step ' + p.step;
+        points.push({
+          ...p,
+          step: i + 1,
+          label: source.title + '. ' + action + ' (' + p.label + ')',
+        });
       }
       return (
         '=== Source ' +
@@ -66,9 +70,9 @@ export function itemAcquisitionArticle(
     w.section(
       'How to get',
       (entries.length > 1
-        ? 'These are alternative ways to obtain ' +
+        ? 'There is more than one way to get ' +
           item.name +
-          '. Choose a source you can access.\n\n'
+          '. You only need one. Pick a way you can do.\n\n'
         : '') + text,
     ) + questMap({ points: [...unique.values()] }, 'item')
   );

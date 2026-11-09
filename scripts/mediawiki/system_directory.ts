@@ -3,8 +3,7 @@
 const sections = [
   {
     title: 'Character progression and combat',
-    intro:
-      'Choose a build, learn how combat resolves, and see what happens when you level up or die.',
+    intro: 'Pick a build, learn how fights work, and see what happens when you level up or die.',
     topics: [
       'Leveling and prestige',
       'Level experience',
@@ -17,12 +16,12 @@ const sections = [
   {
     title: 'Pets and companions',
     intro:
-      'Tame or summon a pet that fights for you, hire a delve companion, or collect a cosmetic companion that follows you.',
+      'Tame or summon a pet that fights for you. Take a companion into delves to fight beside you. Or collect a companion that just follows you around for fun.',
     topics: ['Combat pets', 'Hunter pets', 'Delve companions', 'Companions'],
   },
   {
     title: 'Equipment and upgrades',
-    intro: 'Manage your gear, compare set bonuses, and improve pieces you already own.',
+    intro: 'Look after your gear, compare set bonuses, and make the pieces you own better.',
     topics: [
       'Equipment and inventory',
       'Equipment sets',
@@ -33,7 +32,7 @@ const sections = [
   },
   {
     title: 'Questing and travel',
-    intro: 'Pick up quests, earn faction standing, and find your way between settlements.',
+    intro: 'Pick up quests, earn standing with factions, and find your way from town to town.',
     topics: [
       'Questing',
       'Faction standing',
@@ -46,7 +45,7 @@ const sections = [
   },
   {
     title: 'Dungeons, delves and treasure',
-    intro: 'Find a group, choose a difficulty, or follow a clue to a reward chest.',
+    intro: 'Find a group, pick a difficulty, or follow a clue to a treasure chest.',
     topics: [
       'Dungeon Finder',
       'Heroic difficulty',
@@ -60,12 +59,12 @@ const sections = [
   },
   {
     title: 'Rifts',
-    intro: 'Prepare for a rift, learn its floor objectives, and spend your rewards.',
+    intro: 'Get ready for a rift, learn the goal on each floor, and spend your rewards.',
     topics: ['Rifts', 'Rift floors', 'Rift first-clear rewards', 'Rift Forge'],
   },
   {
     title: 'Gathering and farming',
-    intro: 'Find raw materials in the world or grow a crop at a farm patch.',
+    intro: 'Find materials out in the world, or grow crops at a farm patch.',
     topics: [
       'Harvesting and gathering',
       'Mining',
@@ -78,7 +77,7 @@ const sections = [
   },
   {
     title: 'Crafting professions',
-    intro: 'Choose a trade, check a recipe and its workstation, or take a work order.',
+    intro: 'Pick a craft, check a recipe and where to make it, or take a work order.',
     topics: [
       'Professions',
       'Crafting recipes',
@@ -99,7 +98,7 @@ const sections = [
   },
   {
     title: 'Trade, currency and storage',
-    intro: 'Buy or sell an item, send it to another player, or put it in storage.',
+    intro: 'Buy or sell items, send them to other players, or store them safely.',
     topics: [
       'Vendors and currencies',
       'Trading',
@@ -112,13 +111,13 @@ const sections = [
   },
   {
     title: 'Parties, guilds and communication',
-    intro: 'Coordinate with other players, share loot, or work together on a guild contract.',
+    intro: 'Team up with other players, share loot, or work together on a guild contract.',
     topics: ['Friends and chat', 'Parties', 'Party loot', 'Guilds', 'Guild contracts', 'Calendar'],
   },
   {
     title: 'Player versus player',
     intro:
-      'Compare duels, battles in the open world and queued matches, then check what Honor buys.',
+      'Fight other players in duels, out in the open world or in matches you queue for. Then see what you can buy with Honor.',
     topics: [
       'Duels',
       'World PvP',
@@ -130,19 +129,19 @@ const sections = [
   },
   {
     title: 'Collections and appearances',
-    intro: 'Track deeds and relics, or change how your mount or weapon looks.',
+    intro: 'Keep track of deeds and relics, or change how your mount or weapon looks.',
     topics: ['Book of Deeds', 'The Reliquary', 'Mount appearances', 'Weapon appearances'],
   },
   {
     title: 'Events and minigames',
     intro:
-      'Visit the Card Master for a duel, or check the activities offered while Gourdlight Eve is active.',
+      'Visit the Card Master for a card duel, or see what you can do while Gourdlight Eve is on.',
     topics: ['Gourdlight Eve', 'The Card Master'],
   },
   {
     title: 'Retired and unavailable activities',
     intro:
-      'Look up former rules and deeds. The Mount racing entry also explains the stable course retained in the riding lesson data.',
+      'Read the old rules and deeds for activities you can no longer play. The Mount racing page also explains the jumping course that is still used in the riding lesson.',
     topics: [
       'Protect Yumi',
       'Fiesta arena',
@@ -154,7 +153,8 @@ const sections = [
   },
   {
     title: 'Account and play options',
-    intro: 'Check membership benefits, referrals, mobile controls and ways to play with agents.',
+    intro:
+      'See what membership gives you, how inviting friends works, how to play on a phone or tablet, and how computer programs (agents) can play.',
     topics: ['Membership', 'Referral cards', 'Mobile Play', 'Agents and Bots'],
   },
 ] as const;
@@ -170,7 +170,7 @@ export function directoryTopics(title: string, skip: readonly string[] = []): st
 export function systemDirectory(groups: ReadonlyMap<string, { title: string }>): string {
   const remaining = new Set(groups.keys());
   const body = [
-    'Choose a system for its starting point, requirements, steps and rewards. Retired activities are listed separately with their former rules.',
+    'Pick a topic to learn where to start, what you need, what to do and what you get. Activities you can no longer play have their own list, with their old rules.',
   ];
   for (const section of sections) {
     const links: string[] = [];

@@ -26,7 +26,7 @@ export function npcArticle(template: NpcDef, w: ArticleTools) {
             ', ' +
             Number(p.z.toFixed(2)) +
             ')' +
-            (p.frame === 'Overworld' ? '' : ', instance-local coordinates')
+            (p.frame === 'Overworld' ? '' : ', measured inside this area')
           );
         })
         .join('; ')

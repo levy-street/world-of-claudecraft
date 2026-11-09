@@ -93,16 +93,16 @@ export function addSystemArticles(ctx: SystemWikiContext): string[] {
     heading(
       'Send a letter',
       list([
-        'Click a Ravenpost mailbox and open the Send tab. In To, enter the name of the character you are writing to.',
-        `Enter your message. To send goods, click an item in your bags and set its quantity under Parcels. A letter holds up to ${MAIL_MAX_ATTACHMENTS} item stacks. Use Attach coin to send money as well.`,
-        `Choose Send letter. You pay ${MAIL_POSTAGE} copper in postage plus any coin you attached. The items leave your bags when you send. Delivery takes ${MAIL_DELIVERY_SECONDS} seconds.`,
+        'Click a Ravenpost mailbox and open the Send tab. In the To box, type the name of the character you are writing to.',
+        `Enter your message. To send items, click an item in your bags and set how many under Parcels. A letter can carry up to ${MAIL_MAX_ATTACHMENTS} stacks of items. Use Attach coin to send money too.`,
+        `Choose Send letter. You pay ${MAIL_POSTAGE} copper for postage, plus any coin you attached. The items leave your bags as soon as you send. The letter arrives after ${MAIL_DELIVERY_SECONDS} seconds.`,
       ]),
     ),
     heading(
       'Collect a parcel',
-      `At any Ravenpost mailbox, open Inbox, choose the letter, then select Take attachments. A player letter with goods or at least ${MAIL_ESCROW_COPPER_MIN} copper attached returns to its sender if left unclaimed for ${MAIL_ATTACHMENT_EXPIRY_SECONDS / 86400} days.`,
+      `At any Ravenpost mailbox, open Inbox, pick the letter, then choose Take attachments. Some letters from players go back to the sender if nobody collects them. This happens to a letter with items, or with at least ${MAIL_ESCROW_COPPER_MIN} copper, that sits unclaimed for ${MAIL_ATTACHMENT_EXPIRY_SECONDS / 86400} days.`,
     ),
-    'Purchased membership tokens and annual membership mount reins can be collected directly from their delivery window, wherever you are. If your bags are full, the purchased reward goes into inventory overflow.',
+    'Membership tokens you buy, and the mount reins from a yearly membership, come in their own delivery window. You can collect them there, wherever you are. If your bags are full, the reward goes into your inventory overflow instead.',
     heading(
       'Where to find a mailbox',
       list(
@@ -134,7 +134,7 @@ export function addSystemArticles(ctx: SystemWikiContext): string[] {
   w.describe('Ashen Coliseum', arena.coliseumBody, arena.ladderBody, arena.rewardsBodyLossShare);
   w.describe(
     'Honor and Warfare gear',
-    'Honor is a currency earned in eligible PvP activities. Your character sheet tracks it separately from gold. Both quartermasters sell the same stock. Check the price on the offer: Season 1 entry gear costs gold, while other goods, including the two Warfare trinkets, cost Honor.',
+    'Honor is a currency you earn from PvP activities that give it. Your character sheet counts it apart from your gold. Both quartermasters sell the same things. Check the price on each item: Season 1 starter gear costs gold, but everything else costs Honor, including the two Warfare trinkets.',
     arena.warfareBodyStatsStay,
     arena.warfareTradeBodyRatingSpent,
   );
@@ -160,7 +160,7 @@ export function addSystemArticles(ctx: SystemWikiContext): string[] {
   w.describe('Mobile Play', guide.controls.mobileBody, guide.controls.controllerBody);
   w.describe(
     'Agents and Bots',
-    'The headless environment runs the same deterministic simulation used by the game. It lets an external agent step through a world, observe it and choose actions.',
+    'The headless environment is a copy of the game with no graphics. It runs the exact same game rules. With the same starting seed and the same actions, it always plays out the same way. A computer program (an agent) can use it to move through the world one step at a time, see what is around it and choose what to do.',
   );
   w.describe(
     'Equipment and inventory',
@@ -175,7 +175,7 @@ export function addSystemArticles(ctx: SystemWikiContext): string[] {
   );
   w.describe(
     'Dungeon Finder',
-    'Roles are determined by class. You can select any role your class supports, regardless of which talents you have chosen. Every queued member must meet the activity level range.',
+    'Your class decides which roles you can pick. You can choose any role your class allows, no matter which talents you have. Everyone in the queue must be inside the level range for the activity.',
     heading(
       'Who can queue for each role',
       list(
@@ -246,15 +246,15 @@ export function addSystemArticles(ctx: SystemWikiContext): string[] {
     mounts.whereBody,
     mounts.rideBody,
     mounts.breaksBody,
-    '[[Mount racing]] is retired from live play. See its historical rules for the solo jumping course used in [[Riding Lessons]].',
+    '[[Mount racing]] is no longer part of the live game. Its page keeps the old rules, including the solo jumping course used in [[Riding Lessons]].',
   );
   w.describe(
     'Professions',
-    'Every character can gather and try the ten crafts. For example, a new engineer can learn Bronze Hoe from Tinker Gizzel at skill 0. Your crafting archetype sets which recipe tiers can raise your skill. You keep the skills and recipes you already earned when you change archetype.',
-    'Each craft has its own skill bar and reaches 125. You can keep making items at the cap. Open [[Crafting recipes]] to compare recipes by profession.',
+    'Every character can gather and try all ten crafts. For example, a new engineer can learn Bronze Hoe from Tinker Gizzel at skill 0. Your crafting archetype decides which levels of recipes can still raise your skill. If you change archetype, you keep the skills and recipes you already earned.',
+    'Each craft has its own skill bar, which goes up to 125. You can keep making items after you reach 125. Open [[Crafting recipes]] to compare recipes for each profession.',
     trades.archetypeChooseBody,
     trades.archetypeSwitchBody,
-    'Eastbrook has the forge, kitchens, loom and toolworks. Fenbridge has the tannery and Highwatch has the apothecary. Use [[Crafting stations]] for their coordinates. The recipe determines whether you need a bench. You can apply equipment enchants in the field, while Enchanting recipes for gathering-tool charms use the toolworks.',
+    'Eastbrook has the forge, kitchens, loom and toolworks. Fenbridge has the tannery. Highwatch has the apothecary. See [[Crafting stations]] for where they are. Each recipe says whether you need a work station. You can put equipment enchants on anywhere. But Enchanting recipes for gathering-tool charms need the toolworks.',
     trades.provenanceBody,
     heading(
       'Crafting professions',
@@ -296,7 +296,7 @@ export function addSystemArticles(ctx: SystemWikiContext): string[] {
     stats.agiBody,
     stats.intBody,
     stats.spiBody,
-    'The first 20 Stamina give 1 maximum health apiece. Every additional point gives 10. Intellect follows the same breakpoint for mana users: 1 maximum mana per point through 20, then 15 per point. Both contributions are added to class and level base values before multipliers.',
+    'Each of your first 20 points of Stamina gives 1 maximum health. Every point after that gives 10. Intellect works the same way for classes that use mana: each of the first 20 points gives 1 maximum mana, and every point after that gives 15. These amounts are added to the base health and mana from your class and level. Any percent bonuses are applied after that.',
     stats.apBody,
     stats.spBody,
     stats.critBody,
@@ -313,9 +313,9 @@ export function addSystemArticles(ctx: SystemWikiContext): string[] {
     levels.prestigeBody,
     'The playable level cap is ' +
       MAX_LEVEL +
-      '. Each prestige rank requires another ' +
+      '. After that, each prestige rank needs another ' +
       PRESTIGE_XP_PER_RANK +
-      ' lifetime XP beyond the cap.',
+      ' XP, counted from when you reach the cap.',
     heading(
       'XP to the next level',
       list(
@@ -337,9 +337,9 @@ export function addSystemArticles(ctx: SystemWikiContext): string[] {
     guide.factionsPage.earningBody,
     guide.factionsPage.weeklyBody,
     guide.factionsPage.quartermastersBody,
-    'At level 15 the standing cap is ' +
+    'At level 15, the most standing you can have is ' +
       maxStandingForLevel(15) +
-      '. From level 16 the cap is ' +
+      '. From level 16, the most is ' +
       maxStandingForLevel(16) +
       '.',
   );
@@ -356,7 +356,7 @@ export function addSystemArticles(ctx: SystemWikiContext): string[] {
             const row = FACTION_VENDOR_GATES[id];
             const item = w.entity('item', id, ITEMS[id]?.name);
             return row
-              ? `${item}: ${row.currencyCost} ${factionCurrencyName(f.id)}. Requires ${row.requiredStanding} standing ${row.factionId ? 'with this faction' : 'with any allied faction'}.`
+              ? `${item}: ${row.currencyCost} ${factionCurrencyName(f.id)}. Needs ${row.requiredStanding} standing ${row.factionId ? 'with this faction' : 'with any allied faction'}.`
               : item;
           }),
         ),
@@ -381,6 +381,6 @@ export function addSystemArticles(ctx: SystemWikiContext): string[] {
   addActivityRules(w);
   addTradeSkills(w);
   addExpeditionCollections(w);
-  w.describe('Level experience', 'Experience needed to reach the next character level.');
+  w.describe('Level experience', 'How much experience (XP) you need to reach each next level.');
   return w.finish();
 }

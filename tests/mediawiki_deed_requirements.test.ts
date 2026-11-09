@@ -31,7 +31,7 @@ describe('deed requirements in the player encyclopedia', () => {
   it('explains the full Chapter I checklist on its page, including the unmapped landmark and forward references', () => {
     const article = pages.get('Vale Chronicle, Chapter I (Deed)')!;
     expect(
-      article.startsWith('Earn 3 prerequisite deeds and turn in 4 quests on the same character.'),
+      article.startsWith('Earn 3 other deeds and turn in 4 quests on the same character.'),
     ).toBe(true);
     expect(article).toContain('== How to earn ==');
     expect(article).toContain('=== [[Wayfarer of the Vale (Deed) (2)|Wayfarer of the Vale]] ===');
@@ -55,7 +55,7 @@ describe('deed requirements in the player encyclopedia', () => {
     expect(article).toContain('[[Wolves at the Door (2)|Wolves at the Door]]');
     for (const id of ['q_boars', 'q_spiders', 'q_greyjaw'])
       expect(article).toContain('[[' + QUESTS[id].name + ']]');
-    expect(article).toContain('Awards 5 Renown.');
+    expect(article).toContain('Gives 5 Renown.');
   });
   it('publishes the earned condition on every public deed while retaining hidden deed visibility', () => {
     const deeds = [...pages].filter(([title]) => title.includes('(Deed)'));
@@ -64,7 +64,7 @@ describe('deed requirements in the player encyclopedia', () => {
     expect(archived).toHaveLength(18);
     for (const [, body] of deeds) {
       if (body.startsWith("'''Retired deed.'''")) {
-        expect(body).toContain('New players cannot earn it.');
+        expect(body).toContain('Nobody can earn it now.');
         expect(body).toContain('== Original requirement ==');
       } else {
         expect(body).toContain('== How to earn ==');

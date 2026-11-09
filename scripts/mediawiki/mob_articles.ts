@@ -41,7 +41,7 @@ function lootLine(w: ArticleTools, entry: LootEntry, heroicOnly: boolean, upgrad
       item,
       upgrades && !entry.questId && !entry.normalOnly && !heroicOnly,
     );
-    if (heroic !== item) reward.push('on Heroic receive ' + ref(w, 'item', heroic));
+    if (heroic !== item) reward.push('on Heroic you get ' + ref(w, 'item', heroic));
   }
   if (entry.copper)
     reward.push(
@@ -50,18 +50,18 @@ function lootLine(w: ArticleTools, entry: LootEntry, heroicOnly: boolean, upgrad
     );
   const conditions = [];
   if (entry.questId)
-    conditions.push('while you need this drop for ' + ref(w, 'quest', entry.questId));
+    conditions.push('only while you need it for ' + ref(w, 'quest', entry.questId));
   if (entry.normalOnly) conditions.push('Normal only');
   if (heroicOnly) conditions.push('Heroic only');
   if (entry.rollGroup)
     conditions.push('shares one roll with the ' + words(entry.rollGroup) + ' pool');
-  if (entry.unlessOwned) conditions.push('only if you do not already own it');
+  if (entry.unlessOwned) conditions.push('only if you do not already have it');
   if (entry.unlessOwnedItem)
-    conditions.push('only if you do not own ' + ref(w, 'item', entry.unlessOwnedItem));
+    conditions.push('only if you do not have ' + ref(w, 'item', entry.unlessOwnedItem));
   if (entry.maxPlayerLevel !== undefined)
-    conditions.push('player level ' + entry.maxPlayerLevel + ' or lower');
+    conditions.push('only if you are level ' + entry.maxPlayerLevel + ' or lower');
   return (
-    reward.join(', ') + ' (' + [pct(entry.chance) + ' base roll', ...conditions].join(', ') + ').'
+    reward.join(', ') + ' (' + [pct(entry.chance) + ' base chance', ...conditions].join(', ') + ').'
   );
 }
 export function addMobArticles(w: ArticleTools, itemSources: Map<string, Set<string>>) {
@@ -74,7 +74,7 @@ export function addMobArticles(w: ArticleTools, itemSources: Map<string, Set<str
     const min = c.respawnSeconds ?? resolveRespawnSeconds(m, c.center, undefined, null);
     const max = c.respawnSeconds ?? resolveRespawnSeconds(m, c.center, undefined, (_lo, hi) => hi);
     const level = [c.levelMin ?? m.minLevel, c.levelMax ?? m.maxLevel];
-    const respawn = min === max ? min + ' sec' : min + ' to under ' + max + ' sec';
+    const respawn = min === max ? min + ' sec' : min + ' to just under ' + max + ' sec';
     append(
       locations,
       m.id,
@@ -87,11 +87,11 @@ export function addMobArticles(w: ArticleTools, itemSources: Map<string, Set<str
         c.radius +
         ' yd. ' +
         c.count +
-        ' per camp, level ' +
+        ' in this camp. Level ' +
         (level[0] === level[1] ? level[0] : level.join(' to ')) +
-        ', respawn ' +
+        '. Comes back ' +
         respawn +
-        '.',
+        ' after it dies.',
     );
   }
   const instanceMobs = new Set<string>();
@@ -102,7 +102,7 @@ export function addMobArticles(w: ArticleTools, itemSources: Map<string, Set<str
         locations,
         s.mobId,
         ref(w, 'dungeon', d.id) +
-          (d.guideVisible === false ? ' (unlisted in the public guide)' : '') +
+          (d.guideVisible === false ? ' (this dungeon is unlisted in the public guide)' : '') +
           '.',
       );
     }
@@ -111,7 +111,7 @@ export function addMobArticles(w: ArticleTools, itemSources: Map<string, Set<str
   for (const q of Object.values(QUESTS))
     for (const o of q.objectives)
       if (o.type === 'kill')
-        append(hunted, o.targetMobId, ref(w, 'quest', q.id) + ' (required: ' + o.count + ').');
+        append(hunted, o.targetMobId, ref(w, 'quest', q.id) + ' (kill ' + o.count + ').');
   for (const m of Object.values(MOBS)) {
     const companion = companionByCreature.get(m.id);
     if (companion) {
@@ -154,21 +154,21 @@ export function addMobArticles(w: ArticleTools, itemSources: Map<string, Set<str
         [
           'World boss health',
           schedule.hpScale.base +
-            ' health for one participant. Add ' +
+            ' health when one player is fighting it. It gains ' +
             schedule.hpScale.perPlayer +
-            ' for each additional participant, up to ' +
+            ' more health for each extra player who joins, up to ' +
             schedule.hpScale.max +
-            '. Health only scales up during this spawn.',
+            '. During a spawn, its health can only go up, never down.',
         ],
         [
           'Spawn schedule',
           m.slumber
-            ? 'Sleeps at night and wakes at dawn. After a kill the corpse remains for ' +
+            ? 'Sleeps at night and wakes at dawn. After it is killed, its body stays for ' +
               WORLD_BOSS_CORPSE_SECONDS +
-              ' sec. Once the corpse clears, the boss returns at the next dawn. On hosts without a day/night clock, its interval is ' +
+              ' sec. When the body is gone, the boss comes back at the next dawn. On servers without a day and night clock, it comes back every ' +
               schedule.intervalSeconds +
-              ' sec.'
-            : schedule.intervalSeconds + ' seconds between scheduled spawns.',
+              ' sec instead.'
+            : 'Spawns on a schedule, ' + schedule.intervalSeconds + ' seconds apart.',
         ],
       );
       append(
@@ -180,7 +180,7 @@ export function addMobArticles(w: ArticleTools, itemSources: Map<string, Set<str
     if (m.aggroRadius > 0 && !m.dummy)
       facts.push([
         'Ordinary detection',
-        'Add 1.5 yd per level the creature exceeds the player. Subtract 1.5 yd per level the player exceeds it. The final distance cannot be less than 4 yd or more than ' +
+        'For each level it is above you, it notices you 1.5 yd farther away. For each level you are above it, it notices you 1.5 yd closer. This distance is never less than 4 yd or more than ' +
           MAX_AGGRO_RADIUS +
           ' yd.',
       ]);
@@ -202,19 +202,19 @@ export function addMobArticles(w: ArticleTools, itemSources: Map<string, Set<str
           [
             'Participant scaling',
             base +
-              ' health for one participant. Add ' +
+              ' health when one player is fighting it. It gains ' +
               Math.round(base * THATCHGRIN_HP_STEP_RATIO) +
-              ' per extra participant, up to ' +
+              ' more health for each extra player, up to ' +
               Math.round(base * THATCHGRIN_HP_CAP_RATIO) +
               '.',
           ],
           [
             'Spawn schedule',
-            'Active during Gourdlight Eve. Sleeps by day, wakes at night. The corpse lingers for up to ' +
+            'Only appears during Gourdlight Eve. Sleeps by day and wakes at night. After it is killed, its body stays for up to ' +
               THATCHGRIN_CORPSE_SECONDS +
-              ' sec, then the respawn delay is ' +
+              ' sec. When the body is gone, it comes back ' +
               THATCHGRIN_RESPAWN_SECONDS +
-              ' sec.',
+              ' sec later.',
           ],
         );
         const field = resolveScarecrowField(WORLD_SEED);
@@ -232,10 +232,10 @@ export function addMobArticles(w: ArticleTools, itemSources: Map<string, Set<str
           entity.weapon.max +
           ' base weapon damage.' +
           (entity.mechanicDamageMult
-            ? ' Mechanic damage × ' + Number(entity.mechanicDamageMult.toFixed(5)) + '.'
+            ? ' Special attack damage × ' + Number(entity.mechanicDamageMult.toFixed(5)) + '.'
             : '') +
           (entity.mechanicHealMult
-            ? ' Mechanic healing × ' + Number(entity.mechanicHealMult.toFixed(5)) + '.'
+            ? ' Special ability healing × ' + Number(entity.mechanicHealMult.toFixed(5)) + '.'
             : ''),
       ]);
     }
@@ -264,11 +264,11 @@ export function addMobArticles(w: ArticleTools, itemSources: Map<string, Set<str
       }
     if (m.loot.some((e) => e.rollGroup) || HEROIC_BOSS_LOOT[m.id]?.some((e) => e.rollGroup))
       drops.unshift(
-        'At most one item wins each shared roll. Class eligibility and duplicate protection can change the final odds.',
+        'Some items share one roll. Only one of them can drop from that roll. Your class, and items you already have, can change the final odds.',
       );
     if (m.worldBoss)
       drops.unshift(
-        'Each eligible contributor rolls personally. Across all shared gear pools a player can win at most one gear item on the kill.',
+        'Each player who helped and can get loot rolls for themselves. Each player can win at most one gear item per kill, across all the shared gear pools.',
       );
     for (const row of companionBossSources.filter((s) => s.bossId === m.id)) {
       const name = BUDDIES[row.key].name;
@@ -284,7 +284,7 @@ export function addMobArticles(w: ArticleTools, itemSources: Map<string, Set<str
       w.section('Facts', w.table(facts)) +
       w.section(
         'Base stats by level',
-        'Overworld camp values include level scaling. Instance values precede room and difficulty modifiers. Weapon damage is before mitigation.\n\n' +
+        'For creatures in the outside world, these numbers already include level scaling. For creatures in dungeons, these numbers come before room and difficulty changes. Weapon damage is shown before armor and other damage reduction lower it.\n\n' +
           w.table(stats),
       ) +
       lines(w, 'Locations', Array.from(locations.get(m.id) ?? [])) +

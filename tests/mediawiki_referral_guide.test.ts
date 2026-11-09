@@ -31,7 +31,7 @@ describe('Referral cards wiki guide', () => {
     const instructions = start.split('\n').filter((line) => line.startsWith('# '));
     expect(instructions).toHaveLength(5);
     expect(instructions[0]).toMatch(/Social.*Refer a Friend.*Your invitation link/);
-    expect(instructions[1]).toMatch(/Create Account.*existing account cannot be linked/i);
+    expect(instructions[1]).toMatch(/Create Account.*account you already have cannot be linked/i);
     expect(instructions[2]).toMatch(/level 1 to 4.*\[\[Set Sail \(Quest\)\|Set Sail\]\]/);
     expect(instructions[3]).toMatch(/\/invite.*accepts the party invitation/);
     expect(instructions[4]).toMatch(/each player chooses “Accept”.*either player.*Start a card/);
@@ -50,9 +50,11 @@ describe('Referral cards wiki guide', () => {
       const row = body.split('\n').find((line) => line.includes(`[[${MOBS[id].name} (Enemy)|`));
       expect(row).toContain(`level ${level} or higher`);
     }
-    expect(body).toContain('finish it on both assigned characters and form a party together again');
+    expect(body).toContain(
+      'finish it on both characters on the card. Then join a party together again',
+    );
     expect(body).toContain('Yes, lock this card');
-    expect(body).toContain('invited friends who have personally redeemed all five stamps');
+    expect(body).toContain('friends you invited have claimed all five stamps themselves');
     expect(body).toContain('[[Jelly Saddle: Wobbles (Item)|');
   });
 });

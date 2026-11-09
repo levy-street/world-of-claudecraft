@@ -69,17 +69,17 @@ export function addSpecialAcquisitions(w: ArticleTools, index: Map<string, ItemA
     add(id, {
       title: 'Collect inside ' + dungeon.name,
       steps: [
-        'Travel to the marked door and enter ' +
+        'Go to the door marked on the map and enter ' +
           ref(w, 'dungeon', dungeonId) +
-          '. This sightseeing interior is not queued through Dungeon Finder.',
+          '. This is a place to explore, so you cannot queue for it with Dungeon Finder.',
         'Inside the entrance hall, walk to room x ' +
           object.x +
           ', z ' +
           object.z +
-          ' and interact with ' +
+          '. Use ' +
           object.name +
           ' on the floor.',
-        'Collect the item with room in your bags. No boss kill or crafting materials are required.',
+        'Make sure you have room in your bags, then pick up the item. You do not need to defeat a boss or bring crafting materials.',
       ],
       points: [
         worldPin('Start', dungeon.doorPos.x, dungeon.doorPos.z, 'Enter ' + dungeon.name),
@@ -92,7 +92,7 @@ export function addSpecialAcquisitions(w: ArticleTools, index: Map<string, ItemA
         },
       ],
       details: [
-        "A fixed placed pickup, not a percentage enemy drop. The interior coordinates use this room's frame, not the overworld.",
+        'The item always sits in the same spot. It is not a random drop from an enemy. The coordinates inside are measured from this room, not from the outside world map.',
       ],
     });
   }
@@ -105,17 +105,17 @@ export function addSpecialAcquisitions(w: ArticleTools, index: Map<string, ItemA
     add(id, {
       title: 'Gourdlight seasonal quest collection',
       steps: [
-        'While [[Gourdlight Eve]] is active, visit Hester at any marked seasonal counter and accept ' +
+        'While [[Gourdlight Eve]] is on, visit Hester at any seasonal counter on the map. Accept ' +
           ref(w, 'quest', questId) +
-          ' when it is the offered rotating daily.',
-        'Travel to the marked collection sites and interact with ' +
+          ' on a day when it is the daily quest she offers.',
+        'Go to the collection spots on the map and use ' +
           (id === PATCH_PUMPKIN_ID
             ? "the pumpkins around Old Thatchgrin's patch"
             : 'the cursed candle stubs at town lamp posts') +
           '. Collect ' +
           count +
-          ' in total. The objects are quest-gated and appear to you only while you need them.',
-        'Return to a marked Hester counter and turn in the quest. The collected items are quest materials; the reward is ' +
+          ' in total. You can only see them while you have the quest and still need them.',
+        'Go back to a Hester counter on the map and hand in the quest. The items you collected are for the quest. Your reward is ' +
           item(GOURDLIGHT_TREAT_POUCH_ID) +
           '.',
       ],
@@ -127,7 +127,7 @@ export function addSpecialAcquisitions(w: ArticleTools, index: Map<string, ItemA
         ),
       ],
       details: [
-        'One of six rotating errands is offered each reset day. Coordinates are resolved from the shipped world seed; no purchase or random drop roll is required.',
+        'Each reset day, Hester offers one daily errand from a rotating set of six. The map spots come from this version of the game world. You do not need to buy anything or wait for a random drop.',
       ],
     });
   const membershipPoints = [
@@ -137,22 +137,22 @@ export function addSpecialAcquisitions(w: ArticleTools, index: Map<string, ItemA
   add(MEMBERSHIP_TOKEN_ID, {
     title: 'Membership purchase delivery',
     steps: [
-      'In the online game, open WOC Store and select Membership. Choose Buy membership token and complete the supported purchase.',
-      'Return on the purchasing character and select Collect purchased token. Take the token from its purchase parcel or mailbox.',
-      'Use the token from Bags to add 30 days of account membership, or keep the unused token to trade.',
+      'In the online game, open WOC Store and select Membership. Choose Buy membership token and finish paying.',
+      'Come back on the same character you bought it with and select Collect purchased token. Take the token from its parcel or your mailbox.',
+      'Use the token from your bags to add 30 days of membership to your account. Or keep the token unused so you can trade it.',
     ],
     details: [
-      "Purchase and collection use the store interface wherever you stand. The checkout shows the current real-money price. An invited friend's first paid membership purchase also rewards their inviter with a token; see [[Referral cards]].",
+      'You can buy and collect it from the store wherever you are standing. The checkout shows the current real-money price. When a friend you invited buys membership for the first time, you get a token too. See [[Referral cards]].',
     ],
   });
   add(MEMBERSHIP_ANNUAL_REINS, {
     title: 'Annual membership bundle',
     steps: [
-      'Open WOC Store, then Membership, and complete the paid annual bundle purchase.',
-      'Return to the store and choose Collect bundle mount. Collect its delivered parcel and use the reins from your bags.',
+      'Open WOC Store, then Membership, and buy the yearly (annual) bundle.',
+      'Go back to the store and choose Collect bundle mount. Collect the parcel it sends you, then use the reins from your bags.',
     ],
     details: [
-      'The mount belongs to the annual bundle entitlement. Ordinary 30-day token redemption does not substitute for the paid annual bundle. Collection is through the store, without a fixed NPC destination.',
+      'The mount comes only with the paid annual bundle. Using ordinary 30-day tokens does not give you the mount. You collect it from the store, so you do not need to visit any NPC.',
     ],
   });
   for (const def of Object.values(ITEMS)) {
@@ -161,74 +161,74 @@ export function addSpecialAcquisitions(w: ArticleTools, index: Map<string, ItemA
         title: 'Claim membership equipment',
         points: membershipPoints,
         steps: [
-          'Activate [[Membership]] on your account. A token in your bags must be used before its time and benefits are active.',
+          'Turn on [[Membership]] for your account. A token sitting in your bags does nothing until you use it.',
           'Visit a banker, open the Account bank and choose Claim membership gear.',
-          'Collect the scaling equipment. Equip the complete seven-piece armor set for its membership XP bonus; the weapon is separate.',
+          'Take the gear. It grows stronger as you level up. Wear all seven armor pieces to get the membership XP bonus. The weapon is not part of the set.',
         ],
         details: [
-          'This is an entitlement claim, not a random drop or a gold purchase. The marked banker is one verified place to claim it.',
+          'You get this for having membership. It is not a random drop, and you do not buy it with gold. The banker on the map is one place we checked where you can claim it.',
         ],
       });
     if (isReferralArmour(def.id))
       add(def.id, {
         title: 'Referral armor entitlement',
         steps: [
-          "Create your account using your inviter's referral link, as described in [[Referral cards]]. The online account service must verify the referral armor entitlement.",
-          'Enter the game on that account. When the verified entitlement is applied, the game automatically claims the referral armor for the character. Check your equipment and bags.',
-          'For its XP bonus, equip the complete referral armor set and party with the inviting account while that inviter has active [[Membership]].',
+          'Make your account using the referral link from the player who invited you, as [[Referral cards]] explains. The online account service must then confirm that your account has earned the referral armor.',
+          'Enter the game on that account. Once it is confirmed, the game gives the referral armor to your character by itself. Check your equipment and bags.',
+          'To get its XP bonus, wear the whole referral armor set and join a party with the player who invited you. That player must have active [[Membership]].',
         ],
         details: [
-          'Referral armor is distinct from the five stamp-card rewards. No NPC sells this entitlement, and simply grouping with another player does not create it.',
+          'Referral armor is not one of the five stamp-card rewards. No NPC sells it, and just grouping with another player does not give it to you.',
         ],
       });
     if (def.kind === 'mount' && DEVELOPER_MOUNTS.includes(def.mount))
       add(def.id, {
         title: 'Developer-only item',
         steps: [
-          'This mount is granted by a developer. There is no ordinary gameplay drop, vendor, crafting recipe or map route for it.',
+          'Only a game developer can give out this mount. You cannot get it from a drop, a shop, a crafting recipe or a place on the map.',
         ],
       });
   }
   const referralStart = [
-    'Before creating the invited account, the inviter opens Social → Refer a Friend and shares their invitation link. The friend creates their account through that link.',
-    'On the same realm, each player uses a level 1-4 character who has not turned in Set Sail. Party together with /invite. Both accept the stamp-card prompt; if needed, reopen Social → Refer a Friend, select Start, and both accept.',
+    'First, the player doing the inviting opens Social → Refer a Friend and shares their invite link. The friend then makes their account using that link.',
+    'Both players use a character on the same realm. Each character must be level 1 to 4 and must not have handed in Set Sail yet. Join a party with /invite. You both accept the stamp-card prompt. If it does not show, open Social → Refer a Friend again, select Start, and both accept.',
   ];
   const stamps = [
     {
       id: REFERRAL_BAG,
       stamp: 1,
       objective:
-        'Both assigned characters turn in [[Set Sail]] to ' +
+        'While in a party, both of those characters hand in [[Set Sail]] to ' +
         ref(w, 'npc', 'ferryman_odo') +
-        ' while grouped.',
+        '.',
     },
     {
       id: REFERRAL_HOLLOW_TRINKET,
       stamp: 2,
       objective:
-        'With both assigned characters level 5 or higher, defeat ' +
+        'Once both of those characters are level 5 or higher, defeat ' +
         ref(w, 'mob', 'morthen') +
         ' together in ' +
         ref(w, 'dungeon', 'hollow_crypt') +
-        '. Both must be inside and eligible for the kill. The corresponding quest turn-in while grouped is also a route.',
+        '. You must both be inside and both get credit for the kill. Handing in the matching quest while in a party also works.',
     },
     {
       id: REFERRAL_FOG_TRINKET,
       stamp: 3,
       objective:
-        'With both assigned characters level 12 or higher, defeat ' +
+        'Once both of those characters are level 12 or higher, defeat ' +
         ref(w, 'mob', 'vael_the_mistcaller') +
-        ' together in the Fogbinder. Both must be inside and eligible for the kill. The corresponding quest turn-in while grouped is also a route.',
+        ' together in the Fogbinder. You must both be inside and both get credit for the kill. Handing in the matching quest while in a party also works.',
     },
     {
       id: REFERRAL_SLIME_REINS,
       stamp: 5,
       objective:
-        'Defeat a raid boss together on your assigned characters, meeting its entry level. The map shows ' +
-        ref(w, 'mob', 'nythraxis_scourge_of_thornpeak') +
-        ' as one qualifying level-20 route. Complete stamp 4 first by defeating ' +
+        'First finish stamp 4: defeat ' +
         ref(w, 'mob', 'korzul_the_gravewyrm') +
-        ' together at level 18 or above, or its qualifying quest turn-in.',
+        ' together at level 18 or higher, or hand in its matching quest. Then, on those same characters, defeat a raid boss together. You must be high enough level to enter its raid. The map shows ' +
+        ref(w, 'mob', 'nythraxis_scourge_of_thornpeak') +
+        ' as one level 20 boss that counts.',
     },
   ];
   for (const row of stamps)
@@ -237,15 +237,15 @@ export function addSpecialAcquisitions(w: ArticleTools, index: Map<string, ItemA
       steps: [
         ...referralStart,
         row.objective,
-        'Each player opens their own card in Social → Refer a Friend. Redeem all earlier stamps in order, then select Redeem for this stamp. The item is received wherever you stand.',
+        'Each player opens their own card in Social → Refer a Friend. Redeem all earlier stamps in order, then select Redeem for this stamp. You get the item wherever you are standing.',
       ],
       points: systemRoutes['Referral cards'].points
         .filter((p) => typeof p.step === 'number' && p.step <= row.stamp)
         .map((p) => ({ ...p, step: 3, label: 'Referral ' + p.label })),
       details: [
-        'Map labels retain the stamp numbers; all are part of step 3. The current v0.45.7 dungeon kill route does not require the dungeon quest. See [[Referral cards]] for every earlier stamp and its exact requirements.' +
+        'The map labels still show the stamp numbers, but they are all part of step 3. In v0.45.7, a dungeon boss kill counts even if you do not have the dungeon quest. See [[Referral cards]] for every earlier stamp and exactly what it needs.' +
           (row.id === REFERRAL_FOG_TRINKET
-            ? ' Redeeming this stamp replaces the Hollow charm and permanently locks this card to this character.'
+            ? ' Redeeming this stamp replaces the Hollow charm. It also locks this card to this character for good.'
             : ''),
       ],
     });
@@ -253,27 +253,27 @@ export function addSpecialAcquisitions(w: ArticleTools, index: Map<string, ItemA
     title: 'Invite one friend who completes their card',
     steps: [
       ...referralStart,
-      'Help your invited friend finish the five stamps in [[Referral cards]]. The friend must personally redeem all five; earning the stamps without redeeming them does not count.',
-      'Open Social → Refer a Friend and inspect your inviter rewards. The first completed invited friend earns these reins once. Collect the reward and use the reins from Bags.',
+      'Help the friend you invited finish the five stamps in [[Referral cards]]. Your friend must redeem all five stamps themselves. Earning the stamps without redeeming them does not count.',
+      'Open Social → Refer a Friend and look at your inviter rewards. You get these reins one time, for the first invited friend who finishes their card. Collect the reward and use the reins from your bags.',
     ],
     details: [
-      'The reward counts completed friends on the inviting account. The full [[Referral cards]] guide maps all five milestones.',
+      'The reward counts the friends who finished their card on the account that invited them. The full [[Referral cards]] guide maps all five stamps.',
     ],
   });
 
   add(SUNDERED_ESSENCE_ITEM_ID, {
     title: 'Sunder raid equipment',
     steps: [
-      'Put an eligible epic raid weapon, armor piece or held offhand in your bags. Normal and Heroic raid gear qualify; dungeon-only epics, crafted gear, recipes and materials do not.',
-      "Open that item's bag context menu and select Sunder. Select the copy you intend to consume and let the cast finish.",
-      'The selected gear is destroyed and you receive ' +
+      'Put an epic raid weapon, armor piece or held offhand in your bags. Gear from Normal and Heroic raids counts. Epics that only come from dungeons, crafted gear, recipes and materials do not count.',
+      'Open the menu for that item in your bags and select Sunder. Pick the copy you want to use up, then wait for the cast to finish.',
+      'The gear you picked is destroyed and you get ' +
         SUNDERED_ESSENCE_YIELD +
         ' ' +
         item(SUNDERED_ESSENCE_ITEM_ID) +
         '.',
     ],
     details: [
-      'Guaranteed yield, with no profession or crafting-station requirement. This can be done where you are; the expensive input is the consumed epic.',
+      'You always get this amount. You do not need a profession or a crafting station, and you can do it wherever you are. The costly part is the epic you give up.',
     ],
   });
   const heroicExample = systemRoutes['Heroic difficulty'].points
@@ -284,17 +284,17 @@ export function addSpecialAcquisitions(w: ArticleTools, index: Map<string, ItemA
       title: 'Eligible endgame completion',
       points: heroicExample,
       steps: [
-        'One mapped example is the Hollow Crypt on Heroic. Before entering, open your portrait menu, Set Dungeon Difficulty → Heroic; meet its entry rules and daily lockout. Other eligible raids and Heroic dungeons are alternatives.',
-        'Enter, clear the route and defeat its final boss with eligible kill credit. A qualifying natural rank A or S rift is an alternative; developer portals do not qualify. Cores require winning the first-clear race, while an Ember can also be earned by finishing after another group.',
-        'Check your bags for the personal material grant after completion. Overflow follows the normal item-delivery rules.',
+        'One example on the map is the Hollow Crypt on Heroic. Before you go in, open your portrait menu and choose Set Dungeon Difficulty → Heroic. You must meet its entry rules, and its daily lockout must allow you in. Other raids and Heroic dungeons that count work too.',
+        'Go in, fight your way through and defeat its final boss. You must get credit for the kill. A natural rank A or S rift that counts also works, but portals opened by developers do not. For Cores, your group must be the first to clear it. You can still earn an Ember if another group finished first.',
+        'After you finish, look in your bags for your own materials. If they do not fit, the usual item-delivery rules apply.',
       ],
       details:
         id === MAKERS_EMBER_ITEM_ID
           ? [
-              'One weekly Ember grant per character, with missed grants accruing from the saved weekly anchor. A completion can pay up to 20 accrued Embers; further backlog remains for a later completion. Eligible raid bosses, Heroic final bosses and qualifying A/S rifts can trigger the grant.',
+              'Each character can get one Ember each week. If you miss weeks, the Embers you missed are saved up, counted from the week the game last recorded for you. One completion can pay up to 20 saved Embers. Any more stay saved for a later completion. Raid bosses that count, Heroic final bosses and rank A or S rifts that count can all give Embers.',
             ]
           : [
-              'An eligible final boss awards 1-3 Cores, one shared quantity roll for each credited participant, once per character per source per reset day. Raid Normal and Heroic are separate sources. Qualifying rift first clears give 1 at rank A or 2 at S, limited to one rift material grant per reset day.',
+              'A final boss that counts gives 1 to 3 Cores. The game rolls the amount once, and every player with kill credit gets that same amount. Each character can get Cores from each source once per reset day. Raid Normal and Raid Heroic count as different sources. The first clear of a rift that counts gives 1 Core at rank A or 2 at rank S. You can only get rift materials once per reset day.',
             ],
     });
 
@@ -304,16 +304,16 @@ export function addSpecialAcquisitions(w: ArticleTools, index: Map<string, ItemA
     steps: [
       'Visit ' +
         ref(w, 'npc', CONTRACT_CLERK_NPC_ID) +
-        ' in Lantern Hall, Highwatch, and open Contracts. No sign-up, fee or player-guild membership is required.',
-      "Read this week's three notices. Complete the named boss bounty at either difficulty, the specified Heroic clear, or the encounter task exactly as the notice says. Follow the named dungeon article for its entrance and boss map.",
-      'An eligible first completion of each contract that week grants Lantern Seals directly to your bags. No return hand-in is needed.',
+        ' in Lantern Hall, Highwatch, and open Contracts. You do not need to sign up, pay a fee or be in a player guild.',
+      "Read this week's three notices. Do each one exactly as it says: defeat the named boss on either difficulty, do the Heroic clear it names, or do the encounter task. The dungeon's own page shows its entrance and boss map.",
+      'The first time you finish each contract in a week, Lantern Seals go straight into your bags. You do not need to go back and hand anything in.',
     ],
     details: [
-      'Seals per contract: ' +
+      'Seals for each contract: ' +
         Object.entries(GUILD_CONTRACT_SEALS)
           .map(([kind, n]) => words(kind) + ' ' + n)
           .join(', ') +
-        '. The board changes at weekly reset.',
+        '. The notices change at the weekly reset.',
     ],
   });
   add(LANTERN_HALL_DESTRIER_REINS_ID, {
@@ -330,10 +330,10 @@ export function addSpecialAcquisitions(w: ArticleTools, index: Map<string, ItemA
         ' through [[Guild contracts]].',
       'Visit ' +
         ref(w, 'npc', GUILD_QUARTERMASTER_NPC_ID) +
-        ' in Lantern Hall and open Quartermaster. Bring riding training and bag space.',
+        ' in Lantern Hall and open Quartermaster. You need riding training and a free bag space.',
       'Select the reins and press Buy. The price is ' +
         LANTERN_HALL_DESTRIER_SEALS +
-        ' Lantern Seals. Use the reins in Bags to learn the mount.',
+        ' Lantern Seals. Use the reins in your bags to learn the mount.',
     ],
   });
 
@@ -343,20 +343,20 @@ export function addSpecialAcquisitions(w: ArticleTools, index: Map<string, ItemA
       .flat()
       .map((id) => npcPin('Reward', id, 'Trick-or-treat: sweets')),
     steps: [
-      'Wait until [[Gourdlight Eve]] is active. Visit a participating townsperson shown on the map in Eastbrook, Fenbridge or Highwatch.',
-      'Talk within ' +
+      'Wait until [[Gourdlight Eve]] is on. Visit one of the townspeople shown on the map in Eastbrook, Fenbridge or Highwatch.',
+      'Stand within ' +
         TRICK_OR_TREAT.range +
-        ' yards and choose the trick-or-treat interaction. Each townsperson can reward you once per reset day.',
-      'Receive ' +
-        TRICK_OR_TREAT.treatSweets +
-        ' sweets on a treat (' +
+        ' yards, talk to them and choose trick-or-treat. Each townsperson can give you a reward once per reset day.',
+      'A treat (' +
         pct(TRICK_OR_TREAT.treatChance) +
-        ') or ' +
+        ' chance) gives you ' +
+        TRICK_OR_TREAT.treatSweets +
+        ' sweets. A trick gives you ' +
         TRICK_OR_TREAT.trickSweets +
-        ' sweet on a trick. A trick also applies a harmless cosmetic effect.',
+        ' sweet and a harmless effect that is just for show.',
     ],
     details: [
-      "These visits are seasonal. Existing sweets remain usable for the event's purchases when the keeper is present.",
+      "You can only do these visits during the event. Sweets you already have can still be spent on the event's items while the keeper is there.",
     ],
   });
   add(GOURDLIGHT_SWEET_ID, {
@@ -364,10 +364,10 @@ export function addSpecialAcquisitions(w: ArticleTools, index: Map<string, ItemA
     steps: [
       'Complete a [[Gourdlight Eve]] daily quest that shows ' +
         item(GOURDLIGHT_TREAT_POUCH_ID) +
-        ' as its reward. Its quest page maps the objectives and hand-in.',
-      'Use the awarded pouch from your bags to receive ' + GOURDLIGHT_POUCH_SWEETS + ' sweets.',
+        ' as its reward. The quest page has a map of what to do and where to hand it in.',
+      'Use the pouch from your bags to get ' + GOURDLIGHT_POUCH_SWEETS + ' sweets.',
     ],
-    details: ['Guaranteed contents: ' + GOURDLIGHT_POUCH_SWEETS + ' sweets per pouch.'],
+    details: ['Every pouch always has ' + GOURDLIGHT_POUCH_SWEETS + ' sweets inside.'],
   });
   add(MUSTER_SHARDPIKE_ID, {
     title: 'Borrow the muster drill weapon',
@@ -382,32 +382,32 @@ export function addSpecialAcquisitions(w: ArticleTools, index: Map<string, ItemA
         MUSTER_RACK.z +
         ' at level ' +
         MUSTER_PIKE_MAX_LEVEL +
-        ' or lower. No quest is required.',
-      'Interact with the rack to borrow and equip its pike. Keep bag room for your own equipment.',
+        ' or lower. You do not need a quest.',
+      'Use the rack to borrow its pike and equip it. Keep room in your bags for the gear it replaces.',
     ],
     details: [
-      'This is loaned drill gear, not a permanent dungeon drop. It is reclaimed when the drill ends, the muster pull ends, you die, or you leave the muster area.',
+      'You only borrow this weapon for the drill. It is not a dungeon drop you keep. It is taken back when the drill ends, when the muster pull ends, when you die, or when you leave the muster area.',
     ],
   });
   add(WORLD_PVP_SKULL_ITEM_ID, {
     title: 'World PvP trophy',
     steps: [
-      'Enable your world PvP flag and fight another flagged player in the overworld.',
-      "Land the qualifying killing blow. Loot the defeated player's body where they fell to take the trophy.",
+      'Turn on your world PvP flag. Fight another player who also has their flag on, out in the open world.',
+      "Land the killing blow in a way that counts. Then loot the other player's body where they fell to take the trophy.",
     ],
     details: [
-      'The location is determined by the player fight, not a fixed creature spawn. See [[World PvP]] for the flag and trophy rules.',
+      'Where you get it depends on where the fight happens. It does not come from a creature in a set place. See [[World PvP]] for the flag and trophy rules.',
     ],
   });
   add('soul_stone', {
     title: 'Take stones from a Soulwell',
     steps: [
-      'Have a party Warlock cast ' + ref(w, 'ability', 'soulwell') + '.',
-      "Interact with the resulting Soulwell while eligible for that party's well. Make space in your bags.",
-      'The well refills your carried Soul Stones up to three.',
+      'Ask a Warlock in your party to cast ' + ref(w, 'ability', 'soulwell') + '.',
+      "Make space in your bags. Then use the Soulwell. You must be allowed to use that party's well.",
+      'The well tops up the Soul Stones you carry until you have three.',
     ],
     details: [
-      "The well is conjured at the caster's location and lasts three minutes, so it has no permanent map pin.",
+      'The well appears where the Warlock is standing and lasts three minutes, so it has no fixed spot on the map.',
     ],
   });
   for (const [base, ability] of [
@@ -424,11 +424,11 @@ export function addSpecialAcquisitions(w: ArticleTools, index: Map<string, ItemA
             ref(w, 'ability', ability) +
             ' at rank ' +
             (Number(id.slice(base.length)) || 1) +
-            ' and have its required mana and bag space.',
-          'Cast that rank from your spellbook or action bar to create two. A Mage can also conjure them for another player to receive through a trade.',
+            '. Have enough mana and bag space for it.',
+          'Cast that rank from your spellbook or action bar to make two. A Mage can also make them and trade them to another player.',
         ],
         details: [
-          "The creation happens at the caster's position. See the linked ability for its rank, learning and mana requirements.",
+          'They are made wherever the Mage is standing. See the linked ability for its ranks, how to learn it and how much mana it costs.',
         ],
       });
 
@@ -437,23 +437,23 @@ export function addSpecialAcquisitions(w: ArticleTools, index: Map<string, ItemA
       title: 'Availability',
       steps: [text],
       details: [
-        'There is no verified current farming location, purchase price or crafting route for this item record.',
+        'We know of no place to farm it, no shop price and no crafting recipe for it right now.',
       ],
     });
   unavailable(
     'clue_scroll',
-    'Existing scrolls can still start [[Clue hunts]]. The current rotating world-quest slate awards treasure maps instead. Developer-enabled realms can grant a scroll; an ordinary new-scroll source is not present in this snapshot.',
+    'Scrolls you already have can still start [[Clue hunts]]. The world quests on offer right now give treasure maps instead. On realms where developer commands are turned on, a developer can give you a scroll. There is no ordinary way to get a new scroll in this version.',
   );
   unavailable(
     EVENT_SKIN_TOKEN_ID,
-    'This skin-selection token is developer-grantable on realms with developer commands enabled. No ordinary gameplay source is defined in this snapshot.',
+    'Only a developer can give out this skin-choice token, on realms where developer commands are turned on. There is no ordinary way to get it in this version.',
   );
   for (const chroma of MECH_CHROMAS)
     unavailable(
       chroma.id + '_armor_plate',
-      'This individual armor-plate item has no ordinary loot, shop or recipe source in the current content tables. The appearance can instead be selected from ' +
+      'No loot, shop or recipe gives this armor-plate item right now. Instead, you can pick the look from ' +
         item('alien_armor_plate') +
-        ' when its rolled rank permits it; selecting an appearance unlocks it for the account and does not award this separate plate item.',
+        ' if the rank you roll is high enough. Picking a look unlocks it for your whole account. It does not give you this separate plate item.',
     );
   for (const id of [
     'valeborn_spellblade',
@@ -466,11 +466,11 @@ export function addSpecialAcquisitions(w: ArticleTools, index: Map<string, ItemA
   ])
     unavailable(
       id,
-      'This item has no confirmed way to obtain it in this edition of the game. No current quest reward, creature drop, vendor or crafting recipe provides it.',
+      'We know of no way to get this item in this version of the game. No quest reward, creature drop, shop or crafting recipe gives it right now.',
     );
   unavailable(
     'ancient_crypt_door',
-    'This door is a world object, not a collectible reward. It has no confirmed location or interaction in this edition of the game.',
+    'This door is an object in the world, not a reward you can collect. We have not confirmed where it is or how to use it in this version of the game.',
   );
   for (const id of [
     ...RETIRED_ZONE1_ITEM_IDS,
@@ -479,7 +479,7 @@ export function addSpecialAcquisitions(w: ArticleTools, index: Map<string, ItemA
   ])
     unavailable(
       id,
-      'Retired content: no new reward route is active for this legacy item. Existing saved copies remain valid; do not farm its former source.',
+      'This is an old item that is no longer in the game. You cannot earn new copies. Copies people already have still work. Do not try to farm the place it used to come from.',
     );
   for (const id of [
     'reins_mech_bird',
@@ -490,6 +490,6 @@ export function addSpecialAcquisitions(w: ArticleTools, index: Map<string, ItemA
   ])
     unavailable(
       id,
-      'Legacy souvenir retained for existing inventories. The separate mount skin is an account entitlement; these reins do not unlock that skin.',
+      'Legacy souvenir: an old keepsake that players who already have it can keep. The mount skin is a separate unlock on your account. These reins do not unlock that skin.',
     );
 }

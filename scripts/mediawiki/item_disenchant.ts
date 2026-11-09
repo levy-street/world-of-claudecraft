@@ -46,44 +46,46 @@ export function addDisenchantAcquisitions(
       (example.yield!.primary.itemId === id ? example.yield!.primary : example.yield!.secondary!);
     const exampleText =
       example && line
-        ? 'One obtainable example is ' +
+        ? 'One item you can get is ' +
           ref(w, 'item', example.item.id) +
-          '. Follow that item’s purchase instructions and price; its seller is shown on this map. Disenchanting one yields ' +
-          (line.min === line.max ? line.min : line.min + ' or ' + line.max + ' (50% each)') +
+          '. See that item’s page for how to buy it and its price. Its seller is shown on this map. Disenchanting one gives you ' +
+          (line.min === line.max
+            ? line.min
+            : line.min + ' or ' + line.max + ' (50% chance of each)') +
           ' × ' +
           ref(w, 'item', id) +
           '.'
-        : 'Follow the equipment item pages for their acquisition routes. There is no fixed disenchanting location.';
+        : 'See each equipment item’s page for how to get it. You can disenchant anywhere, so there is no set place on the map.';
     addAcquisition(index, id, {
       title: 'Disenchant equipment',
       steps: [
-        'Obtain one of the following: ' +
+        'Get one of these: ' +
           inputs +
-          '. Borrowed equipment and pieces that cannot be salvaged are excluded. ' +
+          '. Borrowed gear and pieces that cannot be salvaged do not work. ' +
           exampleText,
-        'Put the piece in your bags and unlock it if it is locked. Open its item action menu and choose Disenchant. Check the displayed material yield, then confirm Disenchant. This consumes the selected piece, including any enchantment on it.',
+        'Put the piece in your bags. If it is locked, unlock it. Open its item menu and choose Disenchant. Check which materials it will give, then confirm Disenchant. This destroys the piece, along with any enchantment on it.',
         'Finish the ' +
           ENCHANT_FAMILY_CAST_DURATION_SEC +
-          '-second cast. The materials arrive in your bags where you are standing. Leave enough bag space for the maximum possible yield and do not move the selected item during the cast.',
+          '-second cast. The materials go straight into your bags, wherever you are standing. Leave enough bag space for the most it could give you. Do not move the item while you cast.',
       ],
       details: [
-        'Any character can disenchant, regardless of Enchanting skill or chosen major professions. No trainer, recipe, station, hand-in or coin fee is required.',
+        'Any character can disenchant, regardless of Enchanting skill or which main professions you picked. You do not need a trainer, recipe, station, hand-in or coins.',
         id === 'arcane_dust'
-          ? 'A common piece gives 2 + floor(required equipment level ÷ 10) dust, with a 50% chance of one extra. An uncommon piece gives 3 + floor(required equipment level ÷ 10), with the same 50% chance of one extra. The confirmation shows the exact two possible quantities for your piece.'
+          ? 'To work out the dust, take the level needed to equip the piece, divide by 10 and drop any remainder. A common piece gives 2 plus that number. An uncommon piece gives 3 plus that number. Either way, there is a 50% chance of 1 extra. For example, a common piece that needs level 25 gives 4 or 5 dust. The confirm box shows the two amounts your piece can give.'
           : id === 'arcane_essence' || id === 'arcane_shard'
-            ? 'Each eligible piece always gives exactly 1 of this material. Rare-or-better cloth, leather, mail and weapons also give their matching Resonant material. Jewelry without an armor type and held offhands do not give a Resonant material.'
-            : 'A rare piece always gives exactly 1 of this material. An epic or legendary piece gives 1 or 2, with a 50% chance of each. You also receive 1 ' +
+            ? 'Each piece that works always gives exactly 1 of this material. Rare or better cloth, leather, mail and weapons also give their matching Resonant material. Jewelry with no armor type and held offhands do not give a Resonant material.'
+            : 'A rare piece always gives exactly 1 of this material. An epic or legendary piece gives 1 or 2, with a 50% chance of each. You also get 1 ' +
               ref(w, 'item', 'arcane_essence') +
               ' from rare gear or 1 ' +
               ref(w, 'item', 'arcane_shard') +
-              ' from epic or legendary gear. The Resonant material binds when traded; the primary arcane material does not.',
-        'Crafted equipment can be disenchanted for these materials, but does not award Enchanting skill from that disenchant.',
+              ' from epic or legendary gear. The Resonant material becomes bound to you when traded. The main arcane material does not.',
+        'You can disenchant crafted gear for these materials, but it does not raise your Enchanting skill.',
       ],
       points: source?.points
         ?.filter((point) => point.step !== 'Reward')
         .map((point) => ({
           ...point,
-          label: point.label + ' · optional example equipment source',
+          label: point.label + ' · one place to buy gear you can disenchant (optional)',
         })),
     });
   }

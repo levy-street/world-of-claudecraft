@@ -35,12 +35,12 @@ export const characterRoutes: Record<string, SystemRoute> = {
       marshal(1, 'Complete [[Wolves at the Door]] for quest XP'),
     ],
     notes: [
-      'One Eastbrook XP route is shown. For step 2, rest at an inn of your choice, then spend rested XP on kills. At the level cap the Prestige claim is on your character sheet wherever you are.',
+      'This map shows one way to earn XP in Eastbrook. For step 2, rest at any inn, then kill enemies to use up your rested XP. At the top level, you can claim Prestige on your character sheet wherever you are.',
     ],
     flow: [
       'Accept a quest',
       'Earn XP and turn in',
-      'At the cap, open Character',
+      'At the top level, open Character',
       'Confirm Prestige on the sheet',
     ],
   },
@@ -51,16 +51,16 @@ export const characterRoutes: Record<string, SystemRoute> = {
       marshal('Reward', 'Complete the quest for its XP'),
     ],
     notes: [
-      'Example XP sources in Eastbrook Vale. The experience bar advances where you earn the XP. Learn new abilities in the spellbook from any location.',
+      'These are example ways to earn XP in Eastbrook Vale. Your experience bar fills up wherever you earn the XP. You can find new abilities in the spellbook anywhere.',
     ],
   },
   'Character stats': anywhere(
     ['Character sheet', 'Compare an item in Bags', 'Equip it', 'Read your updated stats'],
-    'You can do every step where you are standing. The updated totals appear on the sheet.',
+    'You can do every step right where you are standing. Your new totals show on the sheet.',
   ),
   'Specialization and talents': anywhere(
     ['Talents', 'View talents', 'Select choices', 'Find granted abilities in the spellbook'],
-    'Choose your build out of combat. The choices take effect here, with no trainer or hand-in.',
+    'Pick your build while out of combat. Your choices work right away, with no trainer to visit.',
   ),
   Combat: {
     points: [
@@ -70,7 +70,7 @@ export const characterRoutes: Record<string, SystemRoute> = {
       wolf('Reward', 'Loot the defeated wolf'),
     ],
     notes: [
-      'The circle is the camp area. The wolf and its corpse may be anywhere inside or where the fight ends. XP is credited on an eligible kill.',
+      'The circle is the camp area. The wolf can be anywhere inside it, and its body stays where the fight ends. You get XP when you kill it, if the kill counts for you.',
     ],
   },
   'Combat pets': anywhere(
@@ -80,16 +80,16 @@ export const characterRoutes: Record<string, SystemRoute> = {
       'Choose a target and command',
       'The pet acts beside you',
     ],
-    'A summon works at your position. For the route to a tameable creature, see [[Hunter pets]].',
+    'You summon your pet right where you are. To find a creature you can tame, see [[Hunter pets]].',
   ),
   'Hunter pets': {
     points: [
       wolf('Start', 'Example tameable Forest Wolf camp'),
-      wolf(2, 'Use Wildbond on a live eligible wolf'),
+      wolf(2, 'Use Wildbond on a living wolf you can tame'),
       wolf('Reward', 'The tamed pet joins you here'),
     ],
     notes: [
-      'Prepare Wildbond in the spellbook before the tame. Step 3 uses the pet bar or Patch Up at your current position.',
+      'Put Wildbond on your action bar from the spellbook before you tame. Step 3 uses the pet bar or Patch Up wherever you are.',
     ],
   },
   'Death and recovery': {
@@ -103,7 +103,7 @@ export const characterRoutes: Record<string, SystemRoute> = {
       worldPin(3, ZONE1_ZONE.graveyard.x, ZONE1_ZONE.graveyard.z, 'Graveyard revival option'),
     ],
     notes: [
-      'Your starting point is the place where you died. On the corpse route follow your own corpse marker. In a dungeon follow the entrance for that instance. The reward is revival where the chosen method resolves.',
+      'You start where you died. To run back to your body, follow your body marker. In a dungeon, head for that dungeon’s entrance. You come back to life wherever the way you chose brings you back.',
     ],
     flow: [
       'Death screen',
@@ -114,16 +114,16 @@ export const characterRoutes: Record<string, SystemRoute> = {
   },
   'Equipment and inventory': anywhere(
     ['Bags', 'Inspect the item', 'Drag to its equipment slot', 'Check the equipped item and stats'],
-    'Gear is equipped on your character. Consumables are used from your bags or action bar.',
+    'You put gear on from your character sheet. You use consumables from your bags or action bar.',
   ),
   'Equipment sets': anywhere(
     [
-      'Choose a set and threshold',
+      'Choose a set and a bonus',
       'Follow each piece to its source',
       'Equip enough matching pieces',
       'Read the active bonus',
     ],
-    'There is no shared destination for all sets. Each set lists the pieces, and their item articles identify the vendors, recipes or enemies that supply them.',
+    'Each set comes from different places, so there is no one place to go. Each set lists its pieces. Each piece’s item page shows the vendors, recipes or enemies that give it.',
   ),
   'Vanguard equipment': {
     points: ['fury', 'warmarshal_draven_kole'].flatMap((id) => [
@@ -131,7 +131,7 @@ export const characterRoutes: Record<string, SystemRoute> = {
       npcPin('Reward', id, 'Purchase goes to your bags'),
     ]),
     notes: [
-      'Choose either quartermaster for steps 1 and 2. Equip enough matching pieces for step 3 wherever you are.',
+      'Use either quartermaster for steps 1 and 2. For step 3, put on enough matching pieces wherever you are.',
     ],
   },
   'Equipment enchants': anywhere(
@@ -141,7 +141,7 @@ export const characterRoutes: Record<string, SystemRoute> = {
       'Choose formula and item',
       'Finish cast on the chosen item',
     ],
-    'The map location of a formula depends on the enchant. Applying it through the bag picker has no common hand-in location.',
+    'Where you get a formula depends on the enchant. You apply the enchant from your bags, so there is no place you have to go.',
   ),
   'Perfecting and promotion': {
     points: STATIONS.map((s) =>
@@ -153,7 +153,7 @@ export const characterRoutes: Record<string, SystemRoute> = {
       ),
     ),
     notes: [
-      'Pins show station alternatives for the optional rank exchange in step 3. The ordinary attempt and promotion are completed in the Perfecting window. The benefit is applied to the selected item.',
+      'The pins show the stations you can use for a rank swap in step 3. A rank swap is optional. Normal tries and promotion happen in the Perfecting window. The result goes on the item you picked.',
     ],
     flow: [
       'Perfecting window',
@@ -169,16 +169,18 @@ export const characterRoutes: Record<string, SystemRoute> = {
       marshal('Reward', 'Speak to the marshal and complete the quest'),
     ],
     notes: [
-      'Worked example in Eastbrook Vale. Each other quest has its own map showing its actual objectives and hand-in.',
+      'This is one example quest in Eastbrook Vale. Every other quest has its own map that shows where to do it and where to hand it in.',
     ],
   },
   'Faction standing': {
     points: [
       npcPin('Start', 'npc_wq_taskmaster', 'Open the world quest board'),
-      ...quartermasters.map((id) => npcPin(3, id, 'Optional purchase once eligible')),
+      ...quartermasters.map((id) =>
+        npcPin(3, id, 'Optional: buy here once your standing is high enough'),
+      ),
     ],
     notes: [
-      'Step 2 uses the location of the assignment selected on the board. Standing is credited on completion. Spend faction currency at the appropriate quartermaster.',
+      'For step 2, go wherever the quest you picked on the board takes you. You get standing when you finish it. Spend faction currency at that faction’s quartermaster.',
     ],
   },
   'Overworld passages': {
@@ -194,7 +196,7 @@ export const characterRoutes: Record<string, SystemRoute> = {
       worldPin('Reward', passage.b.landing.x, passage.b.landing.z, 'Arrival in The Veiled Hollow'),
       worldPin(3, passage.b.x, passage.b.z, 'Return entrance', passage.radius),
     ],
-    notes: ['Outbound route from Thornpeak. For the reverse journey enter on the Hollow side.'],
+    notes: ['This shows the trip from Thornpeak. To go the other way, enter on the Hollow side.'],
   },
   'Swimming and climbing': {
     points: [
@@ -202,7 +204,7 @@ export const characterRoutes: Record<string, SystemRoute> = {
       worldPin(1, LAKE.x, LAKE.z, 'Swim out into Mirror Lake'),
     ],
     notes: [
-      'Swimming can begin at any reachable shore. Surface to restore breath. Climb at a reachable lip in the terrain. Reaching the surface or the ledge completes the movement.',
+      'You can start swimming from any shore you can reach. Come up for air to fill your breath bar. Climb at any edge in the ground you can reach. You are done when you reach the surface or the top of the ledge.',
     ],
   },
   Ferries: {
@@ -210,12 +212,12 @@ export const characterRoutes: Record<string, SystemRoute> = {
       const [a, b] = r.berths;
       return [
         worldPin('Start', a.x, a.z, 'Example outbound berth for ' + zoneContaining(b.x, b.z)?.name),
-        worldPin(2, a.x, a.z, 'Board the ferry while docked'),
-        worldPin('Reward', b.x, b.z, 'Disembark here · return trips start at this berth'),
+        worldPin(2, a.x, a.z, 'Get on the ferry while it is stopped here'),
+        worldPin('Reward', b.x, b.z, 'Get off here · trips back start at this dock'),
       ];
     }),
     notes: [
-      'These are two separate crossings. Choose one pair of ports from the walkthrough. For the return trip, swap the departure and arrival berths.',
+      'These are two different ferry trips. Pick one pair of ports from the steps above. To come back, start from the dock you arrived at.',
     ],
   },
   'Mounts and riding': {
@@ -223,21 +225,23 @@ export const characterRoutes: Record<string, SystemRoute> = {
       npcPin('Start', 'stablemaster_marla', 'Speak to the stablemaster'),
       npcPin(1, 'stablemaster_marla', 'Buy basic training'),
       npcPin(3, 'stablemaster_marla', 'Return for optional advanced training'),
-      npcPin('Reward', 'stablemaster_marla', 'Training applies at purchase'),
+      npcPin('Reward', 'stablemaster_marla', 'You learn the training as soon as you buy it'),
     ],
-    notes: ['Step 2 can be done on land outside combat. The mount is summoned to you.'],
+    notes: [
+      'You can do step 2 anywhere on land while out of combat. Your mount appears next to you.',
+    ],
   },
   'Allied Hearthstone': {
     points: [
       ...quartermasters.map((id) =>
-        npcPin('Start', id, 'Choose a selling quartermaster; attune at the hub you want'),
+        npcPin('Start', id, 'Buy from any of these quartermasters; attune at the place you want'),
       ),
       ...destinations.map((d) =>
-        worldPin('Reward', d.x, d.z, d.name + ' · arrival if attuned here'),
+        worldPin('Reward', d.x, d.z, d.name + ' · you arrive here if you attuned here'),
       ),
     ],
     notes: [
-      'Choose one hub. Step 2 starts at your current position out of combat. To change your destination in step 3, speak to the other hub’s quartermaster.',
+      'Pick one home. Step 2 starts wherever you are, while out of combat. To change your home in step 3, talk to the quartermaster at a different place.',
     ],
   },
 };

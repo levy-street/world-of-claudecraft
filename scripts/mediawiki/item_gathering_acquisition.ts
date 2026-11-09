@@ -102,17 +102,17 @@ export function gatheringAcquisitions(w: ArticleTools): Map<string, ItemAcquisit
     addAcquisition(out, id, {
       title: `${title} in ${ZONES.find((z) => z.id === zoneId)?.name ?? zoneId}`,
       steps: [
-        `Carry a tier ${minimumTier} or better ${title.toLowerCase()} tool${tools.length ? ` such as ${item(tools[0].id)}` : ''}. The minimum tool needs ${wieldRequirementFor(profession, minimumTier)} ${title.toLowerCase()} proficiency to use. Follow the tool's item page to obtain it.`,
-        `Go to the sample node in ${zone(zoneId)} at ${coords(first.pos)}. Click the node and stay still until the gathering cast completes.`,
-        `The material goes into your bags at the node. Leave room before gathering. The same node becomes available to you again after ${NODE_HARVEST_TABLE[first.type].respawnSeconds / 60} minutes.`,
+        `Carry a tier ${minimumTier} or better ${title.toLowerCase()} tool${tools.length ? ` such as ${item(tools[0].id)}` : ''}. To use a tier ${minimumTier} tool, you need ${wieldRequirementFor(profession, minimumTier)} ${title.toLowerCase()} proficiency (your ${title.toLowerCase()} skill). The tool's item page shows where to get it.`,
+        `Go to the example node in ${zone(zoneId)} at ${coords(first.pos)}. Click the node and stand still until the gathering cast finishes.`,
+        `The material goes straight into your bags. Make room before you gather. You can gather the same node again after ${NODE_HARVEST_TABLE[first.type].respawnSeconds / 60} minutes.`,
       ],
       details: [
         fine
-          ? `This fine grade is a guaranteed upgrade when your usable tool tier is strictly above material tier ${gatherMaterialTier(base)} and the node is at least that material tier. It replaces ${item(base)} for that harvest. It is not a random fine-material drop.`
-          : `A completed harvest gives this material unless a higher usable tool or quality tool effect upgrades it to ${fineMaterialFor(base) ? item(fineMaterialFor(base)!) : 'a fine grade'}. To keep the ordinary grade, use a tool no higher than material tier ${gatherMaterialTier(base)} on a node that tool can work, or use a lower-tier node that cannot produce the fine grade.`,
-        'Without tool effects, each harvest gives 1, 2, 2, 3 or 4 units on a common, uncommon, rare, epic or legendary material roll. With proficiency P capped between 0 and 100, their probabilities are (100 − P)%, (0.60 × P)%, (0.30 × P)%, (0.08 × P)% and (0.02 × P)%. These rolls change quantity, separately from the base/fine grade.',
-        `A separate rare-event roll has a ${pct(GATHER_RARE_EVENT_CHANCE)} chance per completed harvest and multiplies the yield by ${GATHER_RARE_EVENT_YIELD_MULT}. Charged tool effects can further change quantity or grade. See ${w.link(title)} and ${w.link('Professions')}.`,
-        `All ${sites.length} eligible nodes in this zone are at ${sites.map((n) => `${coords(n.pos)} (node tier ${n.tier})`).join(' / ')}. The map marks the sample node and its collection point.`,
+          ? `You always get this fine grade when both of these are true: the best tool you can use is higher than tier ${gatherMaterialTier(base)} (the material's tier), and the node is tier ${gatherMaterialTier(base)} or higher. You then get it instead of ${item(base)}. It is not a random drop.`
+          : `Each harvest gives this material, unless it is upgraded to ${fineMaterialFor(base) ? item(fineMaterialFor(base)!) : 'a fine grade'}. A higher-tier tool you can use, or a quality effect on your tool, can cause that upgrade. To keep the normal grade, use a tool of tier ${gatherMaterialTier(base)} or lower on a node that tool can work. Or gather a lower-tier node that cannot give the fine grade.`,
+        'Each harvest also rolls how many you get. Without tool effects, a common roll gives 1, uncommon gives 2, rare gives 2, epic gives 3 and legendary gives 4. Let P be your proficiency (if it is over 100, use 100). The chances are: common (100 − P)%, uncommon (0.60 × P)%, rare (0.30 × P)%, epic (0.08 × P)% and legendary (0.02 × P)%. This roll only changes how many you get, not the normal or fine grade.',
+        `Each harvest also has a separate ${pct(GATHER_RARE_EVENT_CHANCE)} chance of a rare event. A rare event multiplies how many you get by ${GATHER_RARE_EVENT_YIELD_MULT}. Charged tool effects can change the amount or grade even more. See ${w.link(title)} and ${w.link('Professions')}.`,
+        `All ${sites.length} nodes in this zone that can give it are at ${sites.map((n) => `${coords(n.pos)} (node tier ${n.tier})`).join(' / ')}. The map marks the example node, where you also collect the item.`,
       ],
       points: [
         pin('Start', first.pos, firstLabel),
@@ -171,7 +171,7 @@ export function gatheringAcquisitions(w: ArticleTools): Map<string, ItemAcquisit
         );
         catches.set(id, [
           ...(catches.get(id) ?? []),
-          `Catch band ${band + 1} requires at least ${skill} fishing proficiency and a usable tier ${minimumTier} rod. At this exact band, ${weight} of ${total} catch-table weight gives this item, or ${pct(weight / total)} per successfully reeled ordinary catch.`,
+          `Catch band ${band + 1}: you need at least ${skill} fishing proficiency and a tier ${minimumTier} rod you can use. In this band, this item has ${weight} of the ${total} catch-table weight. That is ${pct(weight / total)} for each normal catch you reel in.`,
         ]);
       }
     });
@@ -179,14 +179,14 @@ export function gatheringAcquisitions(w: ArticleTools): Map<string, ItemAcquisit
       addAcquisition(out, id, {
         title: `Fishing in ${ZONES.find((z) => z.id === zoneId)?.name ?? zoneId}`,
         steps: [
-          `Obtain a fishing pole and meet one of the proficiency/rod combinations below. The ${w.link('Fishing')} guide lists the rods and their acquisition routes. Carry the usable rod in your bags.`,
-          `Go to the sample shore in ${zone(zoneId)} at ${coords(shore)}. Face the water at ${coords(shore.target)}. Use your pole from your bags or action bar.`,
-          'Wait for the bite, then use the pole again within the displayed reel window. A successful roll puts 1 caught item into your bags at this shore. Cast again until this item appears.',
+          `Get a fishing rod and match one of the skill and rod pairs below. The ${w.link('Fishing')} guide lists the rods and how to get them. Keep the rod you can use in your bags.`,
+          `Go to the example shore in ${zone(zoneId)} at ${coords(shore)}. Face the water at ${coords(shore.target)}. Use your rod from your bags or action bar.`,
+          'Wait for a bite. Then use the rod again before the reel timer runs out. If you reel in on time, you get 1 caught item in your bags. Keep casting until you get this item.',
         ],
         details: [
           ...rates,
-          `The effective catch band is the lower of your proficiency band and your usable rod tier minus 1. The six skill thresholds are ${FISHING_CATCH_BAND_THRESHOLDS.join(', ')}. Higher skill with the same rod can change the table. These percentages include empty-hook and junk weight, but assume you successfully reel in time. They are not chances per attempted cast.`,
-          `This is a verified sample casting position. Other fishable water in ${zone(zoneId)} uses the same tables. See ${w.link('Fishing')} for all zone tables. A quest-specific guaranteed catch can override these ordinary tables.`,
+          `Your catch band is the lower of two numbers: the band your fishing proficiency reaches, and the tier of your rod. Bands 1 to ${FISHING_CATCH_BAND_THRESHOLDS.length} need at least ${FISHING_CATCH_BAND_THRESHOLDS.slice(0, -1).join(', ')} and ${FISHING_CATCH_BAND_THRESHOLDS[FISHING_CATCH_BAND_THRESHOLDS.length - 1]} proficiency. With the same rod, more skill can move you to a different table. These percentages count empty hooks and junk too. They assume you reel in on time. They are not the chance for each cast you try.`,
+          `This example spot has been checked, and casting works from it. Any other water you can fish in ${zone(zoneId)} uses the same tables. See ${w.link('Fishing')} for the tables of every zone. Some quests give a set catch that replaces these normal tables.`,
         ],
         points: [
           pin('Start', shore, 'Stand here and face the marked water'),
@@ -209,14 +209,14 @@ export function gatheringAcquisitions(w: ArticleTools): Map<string, ItemAcquisit
     addAcquisition(out, 'the_codfather', {
       title: 'Guaranteed quest catch at Deepfen Shallows',
       steps: [
-        `At character level 6 or higher, speak to ${ref(w, 'npc', hale.id)} in ${zone('mirefen_marsh')} at ${coords(hale.pos)} and accept ${ref(w, 'quest', 'q_the_codfather')}. Buy an ${item('ironreel_fishing_rod')} from his counter, or carry a stronger fishing rod. The marsh requires a tier 2 rod or higher. Fishing proficiency is not required for this quest catch.`,
-        `Go to the marked Deepfen Shallows shore at ${coords(codfatherShore)}. Face the marked water at ${coords(codfatherShore.target)}. Activate your fishing rod from your bags or action bar.`,
-        `Wait for the bite, then activate the rod again before the reel window closes. If the quest is active and you are not carrying ${item('the_codfather')}, this successful catch gives 1 quest fish directly into your bags. Leave one free bag slot.`,
-        `Return to ${ref(w, 'npc', hale.id)} at ${coords(hale.pos)} to turn in ${ref(w, 'quest', 'q_the_codfather')}. Turning it in consumes the fish. Follow the quest page for its rewards.`,
+        `At level 6 or higher, talk to ${ref(w, 'npc', hale.id)} in ${zone('mirefen_marsh')} at ${coords(hale.pos)} and accept ${ref(w, 'quest', 'q_the_codfather')}. Buy an ${item('ironreel_fishing_rod')} from him, or bring a stronger fishing rod. You need a tier 2 rod or better to fish in the marsh. You do not need any fishing proficiency for this quest catch.`,
+        `Go to the marked Deepfen Shallows shore at ${coords(codfatherShore)}. Face the marked water at ${coords(codfatherShore.target)}. Use your fishing rod from your bags or action bar.`,
+        `Wait for a bite. Then use the rod again before the reel timer runs out. If you have the quest and are not carrying ${item('the_codfather')}, this catch puts 1 quest fish straight into your bags. Keep one bag slot free.`,
+        `Go back to ${ref(w, 'npc', hale.id)} at ${coords(hale.pos)} and turn in ${ref(w, 'quest', 'q_the_codfather')}. You hand over the fish when you turn it in. See the quest page for its rewards.`,
       ],
       details: [
-        'The chance is 100% per successfully reeled catch while the quest is active, you have no copy of the quest fish, and you stand within 45 yards of the Deepfen Shallows lake centre (x -110, z 310). It replaces the ordinary fishing-table result. A missed bite or an early reel is not a successful catch.',
-        'This is a quest-only acquisition. Normal fishing after the quest, fishing elsewhere, or fishing while already carrying the quest fish does not give another copy through this special catch.',
+        'You always get it (100%) when you reel in on time and all of these are true: you have the quest, you are not carrying the quest fish, and you stand within 45 yards of the middle of the Deepfen Shallows lake (x -110, z 310). You get it instead of a normal catch. A missed bite or reeling in too early does not count as a catch.',
+        'You can only get this fish from the quest. This special catch does not give you another one after the quest, when you fish somewhere else, or when you already carry the fish.',
       ],
       points: [
         pin('Start', hale.pos, 'Accept The Codfather and obtain a tier 2 rod'),
@@ -234,11 +234,11 @@ export function gatheringAcquisitions(w: ArticleTools): Map<string, ItemAcquisit
     addAcquisition(out, id, {
       title: 'Unavailable through current gameplay',
       steps: [
-        'There is no current gameplay route to obtain this item. Its item record remains in the game data, but no active creature drop, corpse-harvest component, gathering node, vendor, quest reward or recipe awards it.',
+        'You cannot get this item in the game right now. It is still in the game data, but nothing gives it: no creature drop, corpse harvest, gathering node, vendor, quest reward or recipe.',
       ],
       details: [
-        `This is a retained Brightwood wildlife-pack junk item. It is not one of the materials produced by ${w.link('Harvesting and gathering')}. No drop chance, vendor purchase price or acquisition map applies to the current source tables.`,
-        `The listed ${w.money(ITEMS[id].sellValue)} is its vendor sale value if a copy already exists. A sale value does not mean a vendor stocks it. The retained definition does not establish whether players could obtain it in an earlier version.`,
+        `This is an old junk item from the Brightwood wildlife pack that was kept in the game data. It is not one of the materials you get from ${w.link('Harvesting and gathering')}. It has no drop chance, no shop price and no map, because nothing gives it now.`,
+        `The ${w.money(ITEMS[id].sellValue)} shown is what a vendor pays you if you already have one. That does not mean any vendor sells it. The game data does not show whether players could get it in an older version.`,
       ],
     });
   }
@@ -253,16 +253,16 @@ export function gatheringAcquisitions(w: ArticleTools): Map<string, ItemAcquisit
   for (const crop of Object.values(FARM_CROPS)) {
     const skill = farmCropSkillThreshold(crop.tier);
     const steps = [
-      `Obtain 1 ${item(crop.seedItemId)}. Carry a tier ${crop.tier} or better hoe and reach ${skill} farming proficiency. Follow the seed's item page for its vendors and price.`,
-      `At the sample Eastbrook bed (${coords(bed)}) beside ${ref(w, 'npc', farmer.id)}, click an empty bed, select ${item(crop.seedItemId)} in Plant a Crop, and click Plant. This spends 1 seed. Any farming patch can grow this crop when you meet the crop requirements.`,
-      `Wait ${crop.durationMs / 60000} minutes. Growth continues offline. Use the Harvest Journal (Shift+K by default) to check readiness, then return to the same bed and interact to harvest. The completed harvest puts its produce in your bags. Leave room for both grades.`,
+      `Get 1 ${item(crop.seedItemId)}. Carry a tier ${crop.tier} or better hoe and reach ${skill} farming proficiency. The seed's item page shows who sells it and the price.`,
+      `Go to the example Eastbrook bed (${coords(bed)}) next to ${ref(w, 'npc', farmer.id)}. Click an empty bed, pick ${item(crop.seedItemId)} in Plant a Crop, and click Plant. This uses 1 seed. You can grow this crop at any farming patch if you meet its needs.`,
+      `Wait ${crop.durationMs / 60000} minutes. The crop keeps growing while you are offline. Check the Harvest Journal (Shift+K by default) to see if it is ready. Then go back to the same bed and click it to harvest. The produce goes into your bags. Leave room for both the normal and the fine grade.`,
     ];
     const details = [
-      `At the minimum skill, survival is ${pct(farmSurvivalChance(skill, crop.tier, false, false))}. It rises linearly to 100% at farming skill ${skill + 25}. Spending 1 ${item('compost')} adds 10 percentage points and a watch costing ${w.money(watchFeeAmount(crop.tier))} adds 10 points, capped at 100%. Choose these in Plant a Crop before planting. A failed crop yields 2 ${item('withered_husks')} instead of produce. Late collection does not cause decay.`,
-      `A surviving crop starts with 3 harvest lives and produces up to 12 normal picks. Each pick gives 1 produce and has a (15 + 0.35 × current farming skill)% chance to preserve its life. Otherwise it spends a life. The whole yield is resolved when you harvest the bed.`,
-      `Each normal pick has a (2 + 0.08 × current farming skill)% chance to become ${item(crop.fineProduceItemId)} instead of ${item(crop.produceItemId)}. That is 2% at skill 0 and 10% at skill 100, per pick of a surviving crop, not per seed planted. A charged quality effect adds 10 percentage points per effect bonus point.`,
-      `${item('growth_tonic')} used at planting gives a 50% chance for 2 extra ordinary-grade produce. Quantity tool effects can add at most 1 extra ordinary-grade pick. A golden harvest has a ${pct(GATHER_RARE_EVENT_CHANCE)} chance on a surviving harvest and multiplies both grades by ${GATHER_RARE_EVENT_YIELD_MULT}, then awards one bonus seed or pattern.`,
-      `Other planting sites are ${patches.map((p) => `${zone(p.zoneId)} (${coords(p.beds[0])}, first bed)`).join(' / ')}. The map shows a sample route. See ${w.link('Farming')} and ${w.link('Farm crops')} for the controls and crop list.`,
+      `At the lowest skill you need, the chance that your crop survives is ${pct(farmSurvivalChance(skill, crop.tier, false, false))}. This rises evenly to 100% at farming skill ${skill + 25}. Using 1 ${item('compost')} adds 10 to that percent, and paying ${w.money(watchFeeAmount(crop.tier))} for a watch adds another 10. The total cannot go over 100%. Choose these in Plant a Crop before you plant. A crop that fails gives 2 ${item('withered_husks')} instead of produce. The crop does not spoil if you collect it late.`,
+      `A crop that survives starts with 3 lives and can give up to 12 normal picks. Each pick gives 1 produce. Each pick also has a (15 + 0.35 × your farming skill)% chance to keep its life. If not, the crop loses a life. All the picks are worked out at once when you harvest the bed.`,
+      `Each normal pick has a (2 + 0.08 × your farming skill)% chance to be ${item(crop.fineProduceItemId)} instead of ${item(crop.produceItemId)}. That is 2% at skill 0 and 10% at skill 100. This chance is for each pick of a crop that survived, not for each seed you plant. A charged quality effect adds 10 to that percent for each bonus point it has.`,
+      `Using ${item('growth_tonic')} when you plant gives a 50% chance of 2 extra normal-grade produce. Quantity effects on your tool can add at most 1 extra normal-grade pick. When you harvest a crop that survived, there is a ${pct(GATHER_RARE_EVENT_CHANCE)} chance of a golden harvest. A golden harvest multiplies both grades by ${GATHER_RARE_EVENT_YIELD_MULT}, then also gives one bonus seed or pattern.`,
+      `You can also plant at ${patches.map((p) => `${zone(p.zoneId)} (${coords(p.beds[0])}, first bed)`).join(' / ')}. The map shows an example route. See ${w.link('Farming')} and ${w.link('Farm crops')} for the controls and the list of crops.`,
     ];
     for (const id of [crop.produceItemId, crop.fineProduceItemId])
       addAcquisition(out, id, {
@@ -276,7 +276,7 @@ export function gatheringAcquisitions(w: ArticleTools): Map<string, ItemAcquisit
         title: `Seed returned by harvesting ${ITEMS[crop.produceItemId].name}`,
         steps,
         details: [
-          `Per completed harvest of this crop, ${pct(FARM_SEED_BACK_TWO_CHANCE[crop.tier])} gives 2 seeds, ${pct(FARM_SEED_BACK_ONE_CHANCE[crop.tier] - FARM_SEED_BACK_TWO_CHANCE[crop.tier])} gives 1 seed, and ${pct(1 - FARM_SEED_BACK_ONE_CHANCE[crop.tier])} gives none. This seed return also rolls for a withered crop. You must plant a seed first, so use the vendor source to begin.`,
+          `Each time you harvest this crop, you get seeds back. The chance of 2 seeds is ${pct(FARM_SEED_BACK_TWO_CHANCE[crop.tier])}, of 1 seed is ${pct(FARM_SEED_BACK_ONE_CHANCE[crop.tier] - FARM_SEED_BACK_TWO_CHANCE[crop.tier])}, and of none is ${pct(1 - FARM_SEED_BACK_ONE_CHANCE[crop.tier])}. You get this roll even if the crop withered. You need a seed to start, so buy your first one from a vendor.`,
         ],
         points: farmPoints,
       });
@@ -296,12 +296,12 @@ export function gatheringAcquisitions(w: ArticleTools): Map<string, ItemAcquisit
       addAcquisition(out, id, {
         title: `Golden harvest bonus from tier ${tier} crops`,
         steps: [
-          `Plant ${crops.map((c) => item(c.seedItemId)).join(' or ')} at the mapped bed or any farming patch. Follow the produce page for tool, skill and growth requirements.`,
-          'Return when ready and harvest the crop. A surviving crop can trigger a golden harvest, which gives one random bonus item straight to your bags.',
+          `Plant ${crops.map((c) => item(c.seedItemId)).join(' or ')} at the bed on the map or at any farming patch. The produce page lists the tool, skill and growing time you need.`,
+          'Come back when it is ready and harvest it. A crop that survives can turn into a golden harvest. A golden harvest gives one random bonus item straight to your bags.',
         ],
         details: [
-          `This item has a ${pct(rate)} chance conditional on a golden harvest. Golden harvests occur at ${pct(GATHER_RARE_EVENT_CHANCE)} per surviving crop harvest, so this item has a ${pct(rate * GATHER_RARE_EVENT_CHANCE)} chance per surviving harvest. A withered crop cannot award this bonus.`,
-          `Eligible crops are ${crops.map((c) => item(c.produceItemId)).join(', ')}. See ${w.link('Farming')}.`,
+          `When you get a golden harvest, the chance that its bonus is this item is ${pct(rate)}. A golden harvest happens ${pct(GATHER_RARE_EVENT_CHANCE)} of the time when you harvest a crop that survived. So for each harvest of a surviving crop, the chance of this item is ${pct(rate * GATHER_RARE_EVENT_CHANCE)}. A withered crop can never give this bonus.`,
+          `Crops that can give it: ${crops.map((c) => item(c.produceItemId)).join(', ')}. See ${w.link('Farming')}.`,
         ],
         points: farmPoints,
       });
@@ -309,11 +309,11 @@ export function gatheringAcquisitions(w: ArticleTools): Map<string, ItemAcquisit
   addAcquisition(out, 'withered_husks', {
     title: 'Clear a failed crop',
     steps: [
-      `Plant a crop following ${w.link('Farming')} at the mapped bed.`,
-      'When its growth timer ends, return to the bed. If the journal says Withered, interact with it to clear the bed and collect 2 Withered Husks.',
+      `Plant a crop at the bed on the map. See ${w.link('Farming')} for how.`,
+      'When it has finished growing, go back to the bed. If the journal says Withered, click the bed. This clears it and gives you 2 Withered Husks.',
     ],
     details: [
-      'Withering is the complement of the crop survival chance. At the crop minimum skill with no compost or watch, it is 15%. It falls as skill and survival bonuses improve, reaching 0%.',
+      'The chance to wither is 100% minus the chance to survive. At the lowest skill for the crop, with no compost or watch, it is 15%. It goes down as your skill and survival bonuses go up, and it can reach 0%.',
     ],
     points: farmPoints,
   });
@@ -321,11 +321,11 @@ export function gatheringAcquisitions(w: ArticleTools): Map<string, ItemAcquisit
   addAcquisition(out, 'compost', {
     title: 'Trade Withered Husks to a farmer',
     steps: [
-      `Obtain at least 2 unlocked ${item('withered_husks')} from a failed crop or by trading with another player.`,
-      `Speak to ${ref(w, 'npc', farmer.id)} at ${coords(farmer.pos)}, or another farmer, and click Trade husks for compost.`,
-      'The trade converts every complete pair of unlocked husks in your bags. Each 2 husks gives 1 Compost immediately. An unmatched leftover husk stays in your bags.',
+      `Get at least 2 unlocked ${item('withered_husks')}. You get them from a failed crop or by trading with another player.`,
+      `Talk to ${ref(w, 'npc', farmer.id)} at ${coords(farmer.pos)}, or another farmer, and click Trade husks for compost.`,
+      'Every 2 unlocked husks in your bags turn into 1 Compost right away. If you have an odd number, the last husk stays in your bags.',
     ],
-    details: ['This exchange is guaranteed and costs no coins. Locked husk stacks are excluded.'],
+    details: ['This trade always works and is free. Locked stacks of husks are not traded.'],
     points: [
       pin('Start', bed, 'Collect husks from a failed crop'),
       pin('Reward', farmer.pos, 'Trade husks for compost'),
@@ -354,16 +354,16 @@ export function gatheringAcquisitions(w: ArticleTools): Map<string, ItemAcquisit
     addAcquisition(out, id, {
       title: 'Harvest a defeated creature',
       steps: [
-        `Buy and carry ${item('field_kit')} from ${ref(w, 'npc', vendor.id)} at ${coords(vendor.pos)} for ${w.money(20)}. It is reusable. ${specimen ? `For this premium specimen, also carry a usable gathering tool of tier ${Math.min(...tags.map(monsterMaterialTierFor))} or higher in any gathering profession, and meet that tool's own proficiency requirement.` : 'Ordinary components do not need a higher-tier gathering tool.'}`,
-        `For the sample route, defeat ${ref(w, 'mob', example.mobId)} in ${zone(example.zoneId)}${camp ? ` around ${coords(camp.center)} (spawn area radius ${camp.radius})` : ''}.${example.questGated ? ' This example is quest-gated. Follow the creature page for the required quest.' : ''}`,
-        `Open the corpse's loot window. Choose Change under harvest preference, select ${item(base)}, then Apply. Choose Harvest and allow its 1.5-second cast to complete. Take Loot handles ordinary drops separately.`,
-        `Collect the harvested material directly into your bags at the corpse. Each corpse can be harvested once. ${specimen ? 'Leave an extra bag slot for the specimen, which is a separate bonus item. Repeat with another matching creature if it does not appear.' : 'Leave sufficient bag space before harvesting.'}`,
+        `Buy ${item('field_kit')} from ${ref(w, 'npc', vendor.id)} at ${coords(vendor.pos)} for ${w.money(20)} and carry it. You can use it again and again. ${specimen ? `For this premium specimen, also carry a gathering tool of tier ${Math.min(...tags.map(monsterMaterialTierFor))} or higher, from any gathering profession. You must have enough proficiency to use that tool.` : 'Normal components do not need a higher-tier gathering tool.'}`,
+        `For the example route, defeat ${ref(w, 'mob', example.mobId)} in ${zone(example.zoneId)}${camp ? ` around ${coords(camp.center)} (spawn area radius ${camp.radius})` : ''}.${example.questGated ? ' You need a quest before this creature counts. The creature page says which quest.' : ''}`,
+        `Open the corpse's loot window. Under harvest preference, choose Change, pick ${item(base)}, then Apply. Choose Harvest and wait for its 1.5-second cast to finish. Take Loot is a separate button for the normal drops.`,
+        `The material goes straight into your bags. You can harvest each corpse only once. ${specimen ? 'Keep one extra bag slot free for the specimen, which is a separate bonus item. If it does not show up, try again on another matching creature.' : 'Make room in your bags before you harvest.'}`,
       ],
       details: [
         specimen
-          ? `This specimen has a 16% chance per extracted matching component when the tool-tier requirement is met and the specimen fits in your bags. It is awarded in addition to the ordinary material on a rare, epic or legendary material-rarity roll. It is not a 16% ordinary loot drop on every kill. The matching families are ${tags.join(', ')}.`
-          : 'Each matching component extracted from the corpse supplies this material. Without concentration or town-focus bonuses, quantities 1, 2, 3, 4, 5 and 6 have probabilities 40%, 30%, 15%, 10%, 4% and 1%. Selecting fewer component families raises the rolled quantity tier by the number of omitted families, capped at 6 units before town-focus quantity bonuses.',
-        `All supported overworld creature sources are ${source.examples.map((e) => `${ref(w, 'mob', e.mobId)} in ${zone(e.zoneId)}${e.questGated ? ' (quest-gated)' : e.rare ? ' (rare)' : e.elite ? ' (elite)' : ''}`).join(' / ')}. Follow each creature link for its locations. The map is the sample route above. See ${w.link('Harvesting and gathering')} for preferences and focus.`,
+          ? `For each matching component you take from the corpse, there is a 16% chance of this specimen. You need the tool tier above, and the specimen must fit in your bags. It comes when the material roll is rare, epic or legendary, on top of the normal material. It is not a 16% drop on every kill. The matching families are ${tags.join(', ')}.`
+          : 'Each matching component you take from the corpse gives this material. Without concentration or town-focus bonuses, you get 1 (40%), 2 (30%), 3 (15%), 4 (10%), 5 (4%) or 6 (1%). If you pick fewer component families, the amount goes up one step for each family you leave out. It cannot go over 6 before town-focus bonuses are added.',
+        `Every creature in the outside world that gives it: ${source.examples.map((e) => `${ref(w, 'mob', e.mobId)} in ${zone(e.zoneId)}${e.questGated ? ' (needs a quest)' : e.rare ? ' (rare)' : e.elite ? ' (elite)' : ''}`).join(' / ')}. Click a creature to see where it lives. The map shows the example route above. See ${w.link('Harvesting and gathering')} for harvest preferences and focus.`,
       ],
       points: [
         pin('Start', vendor.pos, `Buy ${ITEMS.field_kit.name}`),

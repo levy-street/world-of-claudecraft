@@ -12,8 +12,8 @@ export function dungeonRecovery(
   return (
     w.section(
       'Recovery checkpoints',
-      'After dying in this dungeon, release your spirit and return through the entrance to the same run. You revive at the latest unlocked, safe checkpoint below. A normal living entrance still uses the doorway.\n\n' +
-        'A checkpoint requires every listed boss to be defeated and every listed gate to be open. During an active fight, or if enemies, hazards or obstacles make a checkpoint unsafe, you return to an earlier safe point or the entrance. The coordinates below are local to this dungeon.\n\n' +
+      'If you die in this dungeon, release your spirit. Then walk back in through the entrance to the same run. You come back to life at the latest safe checkpoint you have unlocked (listed below). If you walk in while alive, you start at the doorway as usual.\n\n' +
+        'A checkpoint unlocks when every boss listed for it is defeated and every gate listed for it is open. A checkpoint is not safe while a fight is going on, or when enemies, hazards or obstacles are in the way. Then you come back at an earlier safe point or at the entrance instead. The coordinates below are measured inside this dungeon, not on the world map.\n\n' +
         w.bullets(
           checkpoints.map(
             (checkpoint, i) =>
@@ -25,7 +25,7 @@ export function dungeonRecovery(
               checkpoint.pos.z +
               '). Defeat ' +
               checkpoint.bosses.map((id) => w.link(w.titleBy.mob.get(id)!)).join(', ') +
-              '. Open gates: ' +
+              '. These gates must be open: ' +
               checkpoint.gates
                 .map((id) => dungeon.gates?.find((g) => g.id === id)?.name ?? id)
                 .join(', ') +
@@ -43,7 +43,7 @@ export function dungeonRecovery(
         })),
       },
       'system',
-      ['The numbered points below are recovery checkpoints, not quest objectives.'],
+      ['The numbers on this map are recovery checkpoints, not quest steps.'],
     )
   );
 }

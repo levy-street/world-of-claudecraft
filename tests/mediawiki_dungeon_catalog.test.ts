@@ -74,7 +74,7 @@ describe('dungeon and raid guides', () => {
     for (const [id, checkpoints] of Object.entries(DUNGEON_CHECKPOINTS)) {
       const body = dungeonRecovery(DUNGEONS[id], w);
       expect(body).toContain('same run');
-      expect(body).toContain('During an active fight');
+      expect(body).toContain('while a fight is going on');
       for (const checkpoint of checkpoints) {
         expect(body).toContain('(' + checkpoint.pos.x + ', ' + checkpoint.pos.z + ')');
         for (const boss of checkpoint.bosses) expect(body).toContain(MOBS[boss].name);

@@ -41,13 +41,13 @@ describe('complete item acquisition routes', () => {
     expect(
       entries
         .get('hollow_sealstone')
-        ?.some((s) => s.details?.some((x) => x.includes('rather than placing the object'))),
+        ?.some((s) => s.details?.some((x) => x.includes('It does not go into your bags'))),
     ).toBe(true);
     expect(entries.get('wardens_seal')?.some((s) => s.title.startsWith('Defeat'))).toBe(false);
     expect(
       entries
         .get('wardens_seal')
-        ?.some((s) => s.details?.some((x) => x.includes('no collect objective'))),
+        ?.some((s) => s.details?.some((x) => x.includes('never asks you to collect it'))),
     ).toBe(true);
   });
   it('explains the denominator of a shared loot roll', () => {
@@ -55,7 +55,11 @@ describe('complete item acquisition routes', () => {
       m.loot.filter((e) => e.rollGroup && e.itemId).map((e) => e.itemId!),
     );
     const item = grouped.find((id) =>
-      entries.get(id)?.some((s) => s.details?.some((x) => x.includes('sum of retained chances'))),
+      entries
+        .get(id)
+        ?.some((s) =>
+          s.details?.some((x) => x.includes('divide by the base chances of the entries left')),
+        ),
     );
     expect(item).toBeDefined();
   });

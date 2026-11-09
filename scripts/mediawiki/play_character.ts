@@ -13,232 +13,233 @@ const wolfCamp = getActiveWorldContent().camps.find((camp) => camp.mobId === 'fo
 export const characterPaths: Record<string, PlayPath> = {
   'Leveling and prestige': {
     where:
-      'Earn experience in the world. Once you reach the level cap, press C to open your character sheet.',
-    need: `Reach level ${MAX_LEVEL}, then earn ${PRESTIGE_XP_PER_RANK.toLocaleString('en-US')} more lifetime XP for each Prestige rank.`,
+      'Earn experience (XP) out in the world. When you reach the top level, press C to open your character sheet.',
+    need: `Reach level ${MAX_LEVEL}. Then earn ${PRESTIGE_XP_PER_RANK.toLocaleString('en-US')} more lifetime XP for each Prestige rank.`,
     steps: [
-      'Take quests from NPCs with a gold exclamation mark and finish their objectives. Speak to the turn-in NPC and choose Complete Quest for the XP. Enemy kills, delve completions and profession actions that teach skill also give XP.',
-      'Before the cap, stand inside a town inn out of combat to build rested XP. Kill enemies to spend that pool for extra kill XP.',
-      'At the cap, keep earning XP. When you qualify, open your character sheet, click Prestige and confirm Prestige in the dialog.',
+      'Get quests from NPCs with a gold exclamation mark and do what they ask. Then talk to the NPC who takes the quest back and choose Complete Quest to get the XP. You also get XP from killing enemies, finishing delves, and profession actions that raise your skill.',
+      'Before the top level, stand inside a town inn while out of combat. This builds up rested XP. Rested XP gives you extra XP when you kill enemies, until it runs out.',
+      'At the top level, keep earning XP. When you have enough, open your character sheet, click Prestige, and confirm in the box that pops up.',
     ],
     result:
-      'Normal level-ups increase your level and unlock the abilities listed in your class spellbook. Claiming Prestige adds one cosmetic rank and resets the level XP bar. You keep your level, gear, talents and lifetime XP.',
+      'Each normal level-up raises your level and unlocks the abilities listed in your class spellbook. Each Prestige gives you one rank, which is only for show, and empties the level XP bar. You keep your level, gear, talents and lifetime XP.',
   },
   'Level experience': {
     where:
-      'Check the experience bar on the HUD. The table below shows the XP needed to advance from each playable level.',
-    need: 'Use the row for the level you have now. Each row gives the cost of one level.',
+      'Look at the experience bar on your screen. The table below shows how much XP you need to go up from each level.',
+    need: 'Find the row for the level you are now. Each row shows the XP for one level.',
     steps: [
-      `For example, a new level 1 character needs ${xpForLevel(1)} XP to reach level 2. Follow a quest to its turn-in NPC, choose Complete Quest, then check your bar again.`,
-      'Defeat enemies between turn-ins, clear a delve, or do gathering or crafting that still awards skill progress. XP is credited as you complete the action.',
-      'When the bar fills, use the next row to plan your next level. Open your spellbook with P to see the abilities you can now use.',
+      `For example, a new level 1 character needs ${xpForLevel(1)} XP to reach level 2. Take a quest to the NPC who takes it back, choose Complete Quest, then look at your bar again.`,
+      'Between quests, defeat enemies, clear a delve, or gather and craft things that still raise your skill. You get the XP as soon as you finish each action.',
+      'When the bar fills up, use the next row to plan your next level. Press P to open your spellbook and see the abilities you can now use.',
     ],
-    result: `Levels advance automatically through ${MAX_LEVEL}. Further XP counts toward virtual levels and [[Leveling and prestige|Prestige]].`,
+    result: `You go up levels on your own until level ${MAX_LEVEL}. After that, XP counts toward extra "virtual" levels and [[Leveling and prestige|Prestige]].`,
   },
   'Character stats': {
     where:
-      'Press C anywhere to open your character sheet. Press B beside it to compare an item in your bags with your equipped gear.',
-    need: 'A character is enough to inspect stats. To change a stat through gear, the piece must fit your class, level and equipment slot.',
+      'Press C anywhere to open your character sheet. Press B to open your bags next to it, so you can compare an item in your bags with what you are wearing.',
+    need: 'Any character can look at their stats. To change a stat with gear, the item must suit your class, your level and the equipment slot.',
     steps: [
-      'Read your attributes and combat values on the sheet. For more health look at Stamina. For weapon damage compare attack power and the weapon itself. For casting compare your spell or healing power.',
-      'Hover an item to read its bonuses and requirements. Equip a usable piece from your bags, then check the same values on the sheet.',
-      'Use the descriptions below to see which attributes your class converts into health, mana, damage or avoidance. Your class page shows how its abilities use those values.',
+      'Read your stats on the sheet. Stamina gives more health. For weapon damage, compare your attack power and the weapon itself. For spells, compare your spell power or healing power.',
+      'Hover over an item to see its bonuses and what you need to use it. Put on an item from your bags that you can use. Then look at the same numbers on the sheet again.',
+      'The descriptions below show which stats your class turns into health, mana, damage or dodging hits. Your class page shows how its abilities use those stats.',
     ],
     result:
-      'Equipped gear and active effects update your character totals automatically. Items sitting in bags contribute no worn stats.',
+      'The gear you wear and the effects on you change your totals by themselves. Items that are only in your bags do not give you their stats.',
   },
   'Specialization and talents': {
-    where: 'Open Talents with N. You can change your choices away from town.',
-    need: `Reach level ${ROW_LEVELS[0]}. Leave combat and finish any arena match before changing your build. The six rows open at levels ${ROW_LEVELS.join(', ')}.`,
+    where: 'Press N to open Talents. You do not need to be in a town to change your choices.',
+    need: `Reach level ${ROW_LEVELS[0]}. Leave combat and finish any arena match before you change your build. The six rows open at levels ${ROW_LEVELS.join(', ')}.`,
     steps: [
-      'On the Specialization tab, read the role and signature ability on each of your three specialization panels. Click View talents on the one you want to select it and open Choices.',
-      'On Choices, hover the options to read their effects. Click one available option in each unlocked row. The choice applies immediately. Clicking your selected option again clears that row.',
-      'Press P to find any newly granted abilities. Drag the ones you want to an action bar. To change your choices later, reopen N out of combat.',
+      'On the Specialization tab, you see three specialization panels. Read the role and main ability on each one. Click View talents on the one you want. This picks it and opens Choices.',
+      'On Choices, hover over the options to read what they do. Click one option you can pick in each open row. It works right away. Click the option you picked again to clear that row.',
+      'Press P to find any new abilities you got. Drag the ones you want onto an action bar. To change your choices later, press N again while out of combat.',
     ],
     result:
-      'Your character gains the selected specialization and the effects of the chosen rows. Only one option in each row is active at a time.',
+      'Your character gets the specialization you picked and the effects of the rows you chose. Only one option in each row can be on at a time.',
   },
   Combat: {
-    where: `For an early outdoor fight, look for Forest Wolves near x ${wolfCamp.center.x}, z ${wolfCamp.center.z} in Eastbrook Vale. Press P anywhere to review your class abilities first.`,
-    need: 'A living character, a hostile target, and enough of the resource shown on the ability. Check the range and cooldown on its tooltip.',
+    where: `For an easy first fight outdoors, look for Forest Wolves near x ${wolfCamp.center.x}, z ${wolfCamp.center.z} in Eastbrook Vale. You can press P anywhere to look at your class abilities first.`,
+    need: 'You need to be alive, an enemy to fight, and enough of the resource the ability uses (shown on it). Check the range and cooldown on its tooltip.',
     steps: [
-      'Drag a learned ability from the spellbook to an action-bar slot. Click the enemy or press Tab to target it. Right-click an attackable enemy to start auto-attacking.',
-      'Move within the range shown on the tooltip and face the target. Click the ability or press its assigned key. Let a cast finish before moving unless the tooltip says you can cast while moving.',
-      'When the enemy dies, move to the body and interact with it to collect loot you are entitled to. In a party, your loot settings determine how a contested drop is awarded.',
+      'Drag an ability you have learned from the spellbook to a slot on an action bar. Click the enemy or press Tab to target it. Right-click an enemy you can attack to start auto-attacking.',
+      'Get within the range shown on the tooltip and face the target. Click the ability or press its key. Stand still until a cast finishes, unless the tooltip says you can cast while moving.',
+      'When the enemy dies, walk to the body and click it to pick up loot that is yours. In a party, your loot settings decide who gets a drop that more than one player wants.',
     ],
     result:
-      'Your attacks spend their listed resources and apply their effects if they connect. Eligible kills grant XP, can drop loot and can advance a matching quest objective.',
+      'Your attacks use up the resource they list and do their effects when they hit. A kill can give XP, drop loot and count toward a quest that asks for it, if you are allowed to get credit for it.',
   },
   'Combat pets': {
     where:
-      'Open the spellbook with P on a character who has learned a pet summon. A Hunter can instead follow [[Hunter pets]] to tame a beast.',
-    need: 'Meet the summon ability’s class, specialization and level requirements. Its tooltip gives the cost and cast time. A cosmetic companion occupies a separate slot.',
+      'Press P to open the spellbook on a character who has learned a pet summon. A Hunter can follow [[Hunter pets]] to tame a beast instead.',
+    need: 'You need the class, specialization and level that the summon ability asks for. Its tooltip shows the cost and cast time. A cosmetic companion (one that is only for show) uses a different slot.',
     steps: [
-      'Drag your summon to an action bar and use it. For example, a Frost mage who has learned Summon Water Elemental can cast it this way.',
-      'For a controllable pet, select an enemy. Use Attack on the pet bar to send the pet, or choose Assist and attack the enemy yourself. Choose Passive when you want to prevent new automatic pulls.',
-      'Use the commands offered for that pet. For example, click Water Jet on the elemental’s bar to channel it at one enemy. Right-click Water Jet to toggle automatic use.',
+      'Drag your summon ability to an action bar and use it. For example, a Frost mage who has learned Summon Water Elemental can cast it this way.',
+      'If you can control the pet, target an enemy. Click Attack on the pet bar to send the pet. Or choose Assist and attack the enemy yourself. Choose Passive to stop the pet from starting new fights on its own.',
+      'Use the commands that pet has. For example, click Water Jet on the elemental’s bar to aim it at one enemy. Right-click Water Jet to turn automatic use on or off.',
     ],
     result:
-      'Your summoned pet fights using its own attacks. The entries below give its damage and abilities. Replacing a primary demon dismisses the previous one.',
+      'Your pet fights with its own attacks. The entries below list its damage and abilities. If you summon a new main demon, the old one goes away.',
   },
   'Hunter pets': {
-    where: `Try a Forest Wolf camp in Eastbrook Vale near x ${wolfCamp.center.x}, z ${wolfCamp.center.z}. The family pages below list other eligible creatures by zone.`,
-    need: 'A level 10 Hunter with Wildbond and an empty combat-pet slot. Pick an outdoor hostile beast or spider at or below your level. Rare, elite, boss and tame-protected creatures cannot be tamed.',
+    where: `Try a Forest Wolf camp in Eastbrook Vale near x ${wolfCamp.center.x}, z ${wolfCamp.center.z}. The family pages below list, by zone, other creatures you can tame.`,
+    need: 'You need to be a level 10 Hunter with Wildbond and have an empty combat-pet slot. Pick an enemy beast or spider outdoors that is your level or lower. You cannot tame rare, elite, boss or tame-protected creatures.',
     steps: [
-      'Open P and place Wildbond on an action bar. If you already own a pet, including a dead pet, the slot is occupied. Use Release Companion only if you want to give up that pet.',
-      'Select the creature while it is alive and within 20 yards. Use Wildbond and finish the six-second cast.',
-      'After the tame, use the pet bar to choose a stance and send your pet to attack a selected enemy. Use Patch Up to heal 10% of its maximum health each second for eight seconds, or to revive a dead pet with 50% health.',
+      'Press P and put Wildbond on an action bar. If you already have a pet, even a dead one, your pet slot is full. Use Release Companion only if you want to give that pet up for good.',
+      'Target the creature while it is alive and no more than 20 yards away. Use Wildbond and wait for the six-second cast to finish.',
+      'After taming, use the pet bar to pick a stance and send your pet to attack an enemy you target. Use Patch Up to heal your pet for 10% of its maximum health each second for eight seconds. Patch Up can also bring a dead pet back with 50% health.',
     ],
     result:
-      'You gain one full-health combat pet at your level. It starts in Defensive stance and scales with your health, armor, ranged attack power and melee haste.',
+      'You get one combat pet at your level with full health. It starts in Defensive stance. It gets stronger as your health, armor, ranged attack power and melee haste go up.',
   },
   'Death and recovery': {
     where:
-      'Start on the death screen. Releasing sends your spirit to a graveyard. Your corpse marker shows the way back.',
-    need: 'Your character must be dead. You can wait for an available ally resurrection before releasing, or choose the graveyard route immediately.',
+      'You start on the death screen. If you release, your spirit goes to a graveyard. A marker on your screen shows the way back to your body.',
+    need: 'Your character must be dead. You can wait to see if an ally can bring you back before you release. Or you can go the graveyard way right away.',
     steps: [
-      'For an ally resurrection, accept the offered prompt before it expires. To take the graveyard route instead, choose Release Spirit.',
-      'Run your ghost to your corpse to return to life. If you died in a dungeon, return through its entrance to revive at the entry or the last safe boss checkpoint.',
-      'For a quicker graveyard revival, speak to the Pale Keeper and accept the resurrection there. Read the Keeper’s Toll before accepting. Delves and battlegrounds have their own recovery rules.',
+      'If an ally offers to bring you back to life, accept the offer before it runs out. To use the graveyard way instead, choose Release Spirit.',
+      'Run your ghost back to your body to come back to life. If you died in a dungeon, go back in through its entrance. You come back to life at the entrance or at the last safe boss checkpoint.',
+      'To come back faster, talk to the Pale Keeper at the graveyard and accept the offer there. Read the Keeper’s Toll first. Delves and battlegrounds have their own rules.',
     ],
     result:
-      'You regain life with part of your health and mana. Returning to the corpse avoids the Keeper’s Toll. Death costs no gear, coin or XP.',
+      'You come back to life with some of your health and mana. Running back to your body means you do not pay the Keeper’s Toll. Dying never costs you gear, coin or XP.',
   },
   'Equipment and inventory': {
     where:
-      'Press B for bags and C for your character and equipment slots. You can manage equipment in the field.',
-    need: 'An item in your bags that fits the slot and your class. Check its required level, allowed armor or weapon type and any unique-equipped restriction.',
+      'Press B for your bags and C for your character and equipment slots. You can change your gear anywhere.',
+    need: 'An item in your bags that fits the slot and your class. Check its level, the kinds of armor or weapon you are allowed to use, and whether it says Unique-Equipped (you can only wear one).',
     steps: [
-      'Hover a piece in your bags to compare its tooltip with the item you wear. Check the slot as well as the stats.',
-      'Drag the piece onto its matching equipment slot on the character sheet. Check the slot and your totals afterward.',
-      'To remove a piece, move it from the equipment slot to space in your bags. To use a consumable instead, use the item from your bags or put it on an action bar.',
+      'Hover over an item in your bags to compare it with what you are wearing. Check the slot as well as the stats.',
+      'Drag the item onto the matching equipment slot on the character sheet. Then check the slot and your totals.',
+      'To take an item off, drag it from the equipment slot to an empty space in your bags. To use a consumable (an item that gets used up), use it from your bags or put it on an action bar.',
     ],
     result:
-      'Your worn items supply their stats and set bonuses. Swapping gear returns the displaced piece to your inventory. Consumables give the effect described on their tooltip.',
+      'The items you wear give their stats and set bonuses. When you swap gear, the item you took off goes back into your bags. Consumables do what their tooltip says.',
   },
   'Equipment sets': {
     where:
-      'Inspect a set item in your bags (B) or on your character sheet (C). Each set entry below links its pieces and lists the bonuses.',
-    need: 'Obtain enough different wearable pieces of the same named set to meet the particular bonus threshold. Each item page lists its own acquisition sources.',
+      'Look at a set item in your bags (B) or on your character sheet (C). Each set below links to its pieces and lists its bonuses.',
+    need: 'Get enough different wearable pieces of the same set to reach the bonus you want. Each item page says where to get that item.',
     steps: [
-      'Choose a set below. Pick a bonus you want and check how many pieces it requires.',
-      'Follow the item links for the bosses, vendors or crafting recipes that supply those pieces. Check your class and level before spending currency.',
-      'Equip the pieces in their matching slots. Hover any piece to check the set count and the active bonus. For a four-piece bonus, keep four qualifying pieces equipped at the same time.',
+      'Pick a set below. Pick a bonus you want and see how many pieces it needs.',
+      'Follow the item links to find the bosses, vendors or crafting recipes that give those pieces. Check your class and level before you spend any money.',
+      'Wear the pieces in their matching slots. Hover over any piece to see your set count and which bonus is on. For a four-piece bonus, wear four pieces of the set at the same time.',
     ],
     result:
-      'Meeting a threshold activates that bonus automatically. Dropping below it removes the bonus. Read the set’s effect for any additional combat or specialization conditions.',
+      'When you wear enough pieces, the bonus turns on by itself. If you drop below that number, the bonus turns off. Read the set’s effect for any extra rules about combat or specialization.',
   },
   'Vanguard equipment': {
-    where: `Trade with ${atNpc('fury')} in Eastbrook Vale or ${atNpc('warmarshal_draven_kole')} in Highwatch, Thornpeak Heights. They carry the same Honor stock.`,
-    need: 'Earn Honor from PvP, such as [[Ashen Coliseum]] or the [[Thornhollow battleground]]. Check the Honor price and equip requirements on the piece you want.',
+    where: `Shop with ${atNpc('fury')} in Eastbrook Vale or ${atNpc('warmarshal_draven_kole')} in Highwatch, Thornpeak Heights. Both sell the same Honor items.`,
+    need: 'Earn Honor by fighting other players, for example in the [[Ashen Coliseum]] or the [[Thornhollow battleground]]. Check the Honor price and what you need to wear the item you want.',
     steps: [
-      'Speak to either quartermaster and open the shop. Find the Vanguard armor for your specialization, or a weapon or accessory you can equip.',
-      'Select the piece, check its cost and buy it with Honor. Open B and equip it in its named slot.',
-      'For the armor bonus, collect and wear two pieces from the same specialization set, then four for its second bonus. Check any piece’s tooltip for the exact ability it changes.',
+      'Talk to either quartermaster and open the shop. Find the Vanguard armor for your specialization, or a weapon or accessory you can use.',
+      'Pick the item, check the price and buy it with Honor. Press B and put it on in its slot.',
+      'For the armor bonus, wear two pieces from the same specialization set. Wear four for the second bonus. Check any piece’s tooltip to see exactly which ability it changes.',
     ],
     result:
-      'You own the purchased gear. Its ordinary stats and Vanguard set bonuses work in PvE and PvP. Warfare Offense and Defense affect fights against players.',
+      'The gear is yours. Its normal stats and Vanguard set bonuses work against monsters and players. Warfare Offense and Defense change fights against players.',
   },
   'Equipment enchants': {
-    where: 'Open B. Begin from a reagent in your bags that the enchant uses.',
-    need: 'The formula if the enchant must be learned, its minimum Enchanting skill, the listed reagents and an eligible item in the stated slot. Some enchants require a Perfected item.',
+    where:
+      'Press B. Start with a reagent (an enchanting material) in your bags that the enchant uses.',
+    need: 'You need the formula, if the enchant must be learned. You also need its minimum Enchanting skill, the listed reagents, and an item that fits the slot it names. Some enchants only work on a Perfected item.',
     steps: [
-      'Choose an enchant from the list below and check its requirements and reagent quantities. If a formula is required, acquire it and use it to learn the enchant.',
-      'Right-click a required reagent and choose Apply Enchant. Pick the enchant, then pick the exact bagged or equipped item you intend to enchant.',
-      'Check the target and finish the enchanting cast. If a choice is disabled, check the missing reagent count, skill, learned formula and target restrictions in the picker.',
+      'Pick an enchant from the list below. Check what it needs and how many reagents. If it needs a formula, get the formula and use it to learn the enchant.',
+      'Right-click one of the reagents and choose Apply Enchant. Pick the enchant. Then pick the exact item in your bags or on your character that you want to enchant.',
+      'Make sure you picked the right item, then let the enchanting cast finish. If a choice is greyed out, check the picker to see what is missing: reagents, skill, the formula, or the right kind of item.',
     ],
     result:
-      'The successful cast spends the reagents and applies the chosen stat bonus or effect to that copy of the item. Check its tooltip to see the enchant.',
+      'When the cast works, it uses up the reagents and puts the bonus or effect on that one item. Look at the item’s tooltip to see the enchant.',
   },
   'Perfecting and promotion': {
     where:
-      'Press Shift+T to open Perfecting. The window lists eligible Masterwrought copies you wear or carry. A rank exchange between Crucible pieces additionally requires the matching crafting station.',
-    need: "Skill 125 in the craft that makes the piece. Each rank attempt needs one Maker's Ember, one Sundered Essence and one Prismglass Setting. For legendary promotion, bring a fully Perfected piece and one Deed of Making.",
+      'Press Shift+T to open Perfecting. The window lists the Masterwrought items you wear or carry that you can perfect. To swap ranks between two Crucible pieces, you also need to be at the right crafting station.',
+    need: "Skill 125 in the craft that makes the piece. Each try needs one Maker's Ember, one Sundered Essence and one Prismglass Setting. To make an item legendary, bring a fully Perfected piece and one Deed of Making.",
     steps: [
-      'Select the exact worn or bagged copy. Check its rank and material counts. Choose Attempt Perfecting. For the first attempt, choose Bind and Attempt if you wish to bind that copy permanently.',
-      'Each attempt has an 80% chance of gaining one rank. A failure spends the materials and keeps the existing rank. Repeat until rank four.',
-      'For a legendary name, select the eligible Perfected piece, choose Name and Promote, enter a permanent name and choose Forge the Legend. For an exchange instead, select another piece of the same Crucible collection at its station, choose Review rank exchange and then Bind and exchange ranks.',
+      'Pick the exact item, worn or in your bags. Check its rank and how many materials you have. Choose Attempt Perfecting. The first time, choose Bind and Attempt if you are happy to bind that item to you forever.',
+      'Each try has an 80% chance (4 in 5) to add one rank. If it fails, you still lose the materials, but the item keeps the rank it had. Keep trying until rank four.',
+      'To make it legendary, pick a Perfected piece that can be promoted and choose Name and Promote. Type a name (you cannot change it later) and choose Forge the Legend. To swap ranks instead, pick another piece from the same Crucible collection at its station. Choose Review rank exchange, then Bind and exchange ranks.',
     ],
     result:
-      'Rank four grants the item’s Perfected bonus. Promotion spends the deed and gives the copy a legendary name and quality with the same stats. A rank exchange swaps the two ranks and binds both copies.',
+      'At rank four the item gets its Perfected bonus. Promoting uses up the deed and gives the item a legendary name and quality, with the same stats. A rank swap trades the ranks of the two items and binds both to you.',
   },
   Questing: {
-    where: `Look for a gold exclamation mark over an NPC or on the map (M). For example, ${atNpc('marshal_redbrook')} in Eastbrook Vale offers [[Wolves at the Door]].`,
-    need: 'Meet the quest’s minimum level and prerequisite quests. Its wiki page lists the giver, objectives, coordinates, map and turn-in NPC.',
+    where: `Look for a gold exclamation mark over an NPC or on the map (M). For example, ${atNpc('marshal_redbrook')} in Eastbrook Vale gives you [[Wolves at the Door]].`,
+    need: 'Be at least the quest’s level and finish any quests that must come before it. Its wiki page shows who gives it, what to do, where to go, a map, and who to take it back to.',
     steps: [
-      'Stand near the giver, interact, choose the quest by name and click Accept. Open L to read your quest log and check the objective counts.',
-      'Travel to each objective marker. Kill the named enemy, collect the stated items or interact with the specified object until each counter is complete. For an escort, speak to the escort at the starting point and protect them along the route.',
-      'Go to the gold question mark at the named turn-in NPC. Open the quest, choose a reward when one is offered, then click Complete Quest. The turn-in can be a different NPC from the giver.',
+      'Stand near the quest giver and click them. Pick the quest by name and click Accept. Press L to open your quest log and see how much you still need to do.',
+      'Go to each objective marker. Kill the named enemy, collect the items, or click the object until each counter is full. For an escort quest, talk to the person at the start and keep them safe along the way.',
+      'Go to the gold question mark over the NPC who takes the quest back. This can be a different NPC from the one who gave it. Open the quest, pick a reward if you are offered one, then click Complete Quest.',
     ],
     result:
-      'The quest leaves your active log, awards its stated XP, coin and items, and can unlock a follow-up quest. Repeatable quests have their own reset.',
+      'The quest leaves your log. You get its XP, coin and items, and it can open the next quest in the chain. Repeatable quests reset on their own schedule.',
   },
   'Faction standing': {
-    where: `In Eastbrook Vale, talk to ${atNpc('npc_wq_taskmaster')} for world quests. [[Rift Watch (Faction)|Rift Watch]], [[Church Order (Faction)|Church Order]] and [[Automatons (Faction)|Automatons]] list their zones and quartermasters.`,
-    need: 'Be eligible for the chosen world quest. The first world quests open at level 5 and individual quests can require a higher level. For a purchase, meet the standing gate and bring the currency shown for the item.',
+    where: `In Eastbrook Vale, talk to ${atNpc('npc_wq_taskmaster')} for world quests. The [[Rift Watch (Faction)|Rift Watch]], [[Church Order (Faction)|Church Order]] and [[Automatons (Faction)|Automatons]] pages list their zones and quartermasters.`,
+    need: 'You must be allowed to take the world quest you pick. The first world quests open at level 5, and some need a higher level. To buy something, you need high enough standing and the currency shown for the item.',
     steps: [
-      'In Kaelen’s dialogue, select “Show me the world quest board.” Select an available assignment and inspect its objective and location on the map.',
-      'Travel to the marked area and complete the displayed objective. The zone determines which faction gains standing. For a weekly commendation, complete the weekly emissary charge and choose the faction at turn-in.',
-      'Visit the quartermaster for the faction you want to buy from. Inspect the specific item’s price and standing requirement. For example, Church Order stock is available from Templar Althea at the Eastbrook chapel.',
+      'In Kaelen’s menu, pick “Show me the world quest board.” Pick a quest you can take and look at its goal and place on the map.',
+      'Go to the marked area and do the task. The zone decides which faction you gain standing with. For a weekly commendation, finish the weekly emissary task and pick the faction when you hand it in.',
+      'Visit the quartermaster of the faction you want to buy from. Check the item’s price and the standing you need. For example, Templar Althea at the Eastbrook chapel sells Church Order items.',
     ],
     result:
-      'World quest completion credits standing to the associated faction. Crossing tiers opens more quartermaster stock. A purchase spends the currency shown on the row.',
+      'Finishing a world quest gives standing with that zone’s faction. Reaching a new standing tier opens more items at the quartermaster. Buying an item costs the currency shown next to it.',
   },
   'Overworld passages': {
     where:
-      'The Duskfall Passage joins Thornpeak Heights (x 10, z 770) and The Veiled Hollow (x -122, z 959). Either end can be your starting point.',
-    need: 'Reach the entrance on foot or as a released spirit. Travel works in both directions.',
+      'The Duskfall Passage joins Thornpeak Heights (x 10, z 770) and The Veiled Hollow (x -122, z 959). You can start from either end.',
+    need: 'Get to the entrance on foot, or as a spirit after you release. You can travel either way.',
     steps: [
-      'Open M and head to the coordinates on your current side of the passage.',
-      'Walk to within 2 yards of the entrance. Crossing the trigger moves you automatically.',
-      'Leave the landing to continue in the new zone. To return, approach the entrance on this side.',
+      'Press M and go to the coordinates on your side of the passage.',
+      'Walk to within 2 yards of the entrance. When you step in, you move across by yourself.',
+      'Walk away from the landing to keep going in the new zone. To go back, walk into the entrance on that side.',
     ],
     result:
-      'You arrive at the opposite landing. A released spirit remains a spirit after the crossing.',
+      'You arrive at the landing on the other side. If you were a spirit, you are still a spirit.',
   },
   'Swimming and climbing': {
     where:
-      'Enter deep water for swimming or approach a reachable ledge for climbing. Use the movement controls in the world.',
-    need: 'A ledge within jumping reach for a climb. A stun or root stops you from starting one. For a long swim, plan a route back to shore.',
+      'Go into deep water to swim, or walk up to a ledge you can reach to climb. Use your normal movement keys.',
+    need: 'To climb, you need a ledge you can reach with a jump. You cannot start a climb while stunned or rooted. For a long swim, plan a way back to shore.',
     steps: [
-      'Walk into deep water and move forward to swim. Hold Left Ctrl to dive and Space to rise. Watch the blue breath bar underwater and surface before it empties.',
-      'If the open-sea fatigue warning appears, turn back toward shore. Reaching the surface restores breath but does not make open sea safe.',
-      'To climb, face the ledge, move toward it and press Space to jump. At a reachable high lip your character pulls up automatically. Let the movement finish.',
+      'Walk into deep water and move forward to swim. Hold Left Ctrl to dive and Space to go up. Watch the blue breath bar underwater and come up for air before it runs out.',
+      'If the open-sea fatigue warning shows up, turn back toward shore. Coming up for air fills your breath bar, but it does not make the open sea safe.',
+      'To climb, face the ledge, move toward it and press Space to jump. At a high edge you can reach, your character pulls up by itself. Wait for the movement to finish.',
     ],
     result:
-      'You cross the water or reach the top of the ledge. Staying submerged with no breath or continuing into open-sea fatigue costs health.',
+      'You get across the water or up onto the ledge. You lose health if you stay underwater with no breath left, or keep going into open-sea fatigue.',
   },
   Ferries: {
     where:
-      'The Eastbrook Vale berth (x -125, z -54.8) connects to The Nightbloom (x -520, z 1505.2). Wickharbor in The Galecrest (x 487.3, z 385.27) connects to The Drakelands (x 515, z 1900).',
-    need: 'Reach a pier while the ferry is docked. The crossing is free.',
+      'The Eastbrook Vale dock (x -125, z -54.8) goes to The Nightbloom (x -520, z 1505.2). Wickharbor in The Galecrest (x 487.3, z 385.27) goes to The Drakelands (x 515, z 1900).',
+    need: 'Get to a pier while the ferry is there. The trip is free.',
     steps: [
-      'Open the world map with M. Inspect the ferry port marker for its destination and arrival time, then head to the pier.',
-      'When the ship docks, walk onto its deck. Stay on the deck when the departure countdown ends. Each scheduled stop lasts 60 seconds.',
-      'Ride to the opposite berth and walk off onto the pier while the ship is docked.',
+      'Press M to open the world map. Look at the ferry port marker to see where it goes and when it arrives. Then go to the pier.',
+      'When the ship arrives, walk onto its deck. Stay on the deck when the countdown ends. The ship waits at each stop for 60 seconds.',
+      'Ride to the other dock. Walk off onto the pier while the ship is stopped.',
     ],
     result:
-      'You reach the paired port with no fare or consumable spent. The return ship runs on the same route.',
+      'You reach the other port without paying or using up any item. The ship comes back the same way.',
   },
   'Mounts and riding': {
-    where: `Go to the Galecrest Stables in The Galecrest. Speak to ${atNpc('stablemaster_marla')} beside the barn.`,
-    need: 'For the ordinary purchase, reach level 20 and bring 80 gold for basic Riding Training. Advanced Riding Training requires basic riding and 1,000 gold. A referral card can award basic training separately.',
+    where: `Go to the Galecrest Stables in The Galecrest. Talk to ${atNpc('stablemaster_marla')} beside the barn.`,
+    need: 'To buy basic Riding Training, reach level 20 and bring 80 gold. Advanced Riding Training needs basic riding first and costs 1,000 gold. A referral card can also give you basic training.',
     steps: [
-      'Speak to Marla and purchase Riding Training. Open Cosmetics with Shift+Y and choose an available appearance under Mounts.',
-      'Stand on land out of combat and press Mount / Dismount (backquote by default), or tap Mount on mobile. Let the summon channel finish. Press the same control again to dismount.',
-      'For greater speed, return to Marla after learning basic riding and purchase Advanced Riding Training. See [[Mount racing]] for the distinction between the retired activity and the solo course in Riding Lessons.',
+      'Talk to Marla and buy Riding Training. Press Shift+Y to open Cosmetics and pick a look you own under Mounts.',
+      'Stand on land, out of combat. Press Mount / Dismount (the backquote key ` unless you changed it), or tap Mount on mobile. Wait for the summon to finish. Press the same key again to get off.',
+      'To go faster, go back to Marla after you learn basic riding and buy Advanced Riding Training. See [[Mount racing]] to learn how the old, retired race is different from the solo course in Riding Lessons.',
     ],
     result:
-      'Basic riding increases ground movement speed by 70%. Advanced riding raises it to 110%. All mount appearances use your character’s trained speed.',
+      'Basic riding makes you move 70% faster on the ground. Advanced riding makes it 110%. Every mount look uses the speed you have trained.',
   },
   'Allied Hearthstone': {
     where: `Visit ${atNpc('npc_church_order_quartermaster')} at the Eastbrook chapel, ${atNpc('npc_rift_watch_quartermaster')} in Drifthaven, or ${atNpc('npc_automaton_quartermaster')} at Wyrmwatch.`,
-    need: 'Reach Vanguard standing (13,000) with an allied faction. Bring 100 of the selling faction’s currency: Order Crests, Rift Watch Marks or Automaton Cogs. You can carry one Allied Hearthstone.',
+    need: 'Reach Vanguard standing (13,000) with an allied faction. Bring 100 of that faction’s currency: Order Crests, Rift Watch Marks or Automaton Cogs. You can only carry one Allied Hearthstone.',
     steps: [
-      'Open the quartermaster’s stock and buy [[Allied Hearthstone]]. At the destination you want as your home, speak to its quartermaster and choose Attune my Allied Hearthstone here.',
-      'When you want to return, leave combat and use the stone from your bags or action bar. Complete the 10-second cast.',
-      'Visit another listed quartermaster and repeat the attunement step whenever you want to change your destination.',
+      'Open the quartermaster’s shop and buy an [[Allied Hearthstone]]. Then pick the place you want as your home. Talk to that place’s quartermaster and choose Attune my Allied Hearthstone here.',
+      'When you want to go back, leave combat and use the stone from your bags or action bar. Wait for the 10-second cast to finish.',
+      'To change where the stone takes you, visit another quartermaster from the list and attune the stone there.',
     ],
     result:
-      'You arrive at the attuned hub. The reusable stone begins its 15-minute cooldown on arrival.',
+      'You arrive at the place you attuned. You can use the stone again and again. Its 15-minute cooldown starts when you arrive.',
   },
 };

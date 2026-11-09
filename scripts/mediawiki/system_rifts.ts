@@ -75,34 +75,34 @@ import { heading, list, percent, type SystemWriter, words } from './system_write
 function hoardKitGuide(boss: string) {
   switch (hoardBossKit(boss)) {
     case 'frost':
-      return 'Step out of Treacherous Ice and Blizzard. For the Ring of Frost, move into the safe eye or beyond its outer edge.';
+      return 'Step out of Treacherous Ice and Blizzard. For the Ring of Frost, move into the safe middle (the eye) or past its outer edge.';
     case 'ember':
-      return 'Move outside the frontal attack and leave Emberfall marks before impact. The impact leaves a second, ticking fire hazard.';
+      return 'Get out of the attack in front of the boss. Leave Emberfall marks before they hit. Each hit leaves a patch of fire that keeps hurting you while you stand in it.';
     case 'brood':
-      return `Cut a trapped ally out of silk. You have ${COCOON.warningSec} seconds of warning and ${COCOON.drainSec} seconds before devour. The boss drains every ${COCOON.drainEverySec} second and heals for ${percent(COCOON.drainHealShare)} of the drain; devour heals another ${percent(COCOON.devourHealFraction)} of boss maximum health. Solo players get a hatchable cocoon instead of being trapped without a rescuer.`;
+      return `Cut a trapped ally out of the silk. You get ${COCOON.warningSec} seconds of warning. Then you have ${COCOON.drainSec} seconds before the boss eats (devours) them. While they are trapped, the boss drains them every ${COCOON.drainEverySec} second and heals for ${percent(COCOON.drainHealShare)} of what it drains. If it devours them, it heals another ${percent(COCOON.devourHealFraction)} of its maximum health. If you are alone, you are not trapped, because nobody could cut you free. A cocoon that can hatch appears instead.`;
     case 'bone-legion':
-      return `The scythe spins for ${BONE_SCYTHE.activeSec} seconds. Stand inside ${BONE_SCYTHE.bladeInner} yards of its moving pivot or beyond ${BONE_SCYTHE.reach} yards. Walk within ${SOUL_HARVEST.interactionRadius} yards of a soul to release it before it comes within ${SOUL_HARVEST.absorbRadius} yards of the boss. Each absorbed soul grants ${percent(SOUL_HARVEST.damagePerStack)} more boss damage for ${SOUL_HARVEST.stackDurationSec} seconds, up to ${SOUL_HARVEST.maxStacks} stacks. Each rescue increases your own damage taken by ${percent(SOUL_HARVEST.burdenPerStack)} in a party or ${percent(SOUL_HARVEST.soloBurdenPerStack)} alone for ${SOUL_HARVEST.burdenDurationSec} seconds, up to ${SOUL_HARVEST.burdenMaxStacks} stacks.`;
+      return `The scythe spins for ${BONE_SCYTHE.activeSec} seconds. To stay safe, stand within ${BONE_SCYTHE.bladeInner} yards of the point it spins around (which moves), or more than ${BONE_SCYTHE.reach} yards away. Souls float toward the boss. Walk within ${SOUL_HARVEST.interactionRadius} yards of a soul to set it free before it gets within ${SOUL_HARVEST.absorbRadius} yards of the boss. Each soul the boss takes in makes it deal ${percent(SOUL_HARVEST.damagePerStack)} more damage for ${SOUL_HARVEST.stackDurationSec} seconds. This stacks up to ${SOUL_HARVEST.maxStacks} times. Each soul you save makes you take more damage for ${SOUL_HARVEST.burdenDurationSec} seconds: ${percent(SOUL_HARVEST.burdenPerStack)} more in a party, or ${percent(SOUL_HARVEST.soloBurdenPerStack)} more alone. This stacks up to ${SOUL_HARVEST.burdenMaxStacks} times.`;
     case 'brute':
       return list(
         HOARD_BRUTE_COMBO.map(
           (s) =>
-            `${s.ability}: move out of the ${Math.round((2 * s.halfAngle * 180) / Math.PI)}-degree arc, ${s.radius} yards long, within ${s.windup} seconds. Base damage coefficient: ${percent(s.damageFraction)} of the hoard reference.`,
+            `${s.ability}: you have ${s.windup} seconds to get out of the ${Math.round((2 * s.halfAngle * 180) / Math.PI)}-degree arc. The arc reaches ${s.radius} yards. Base damage: ${percent(s.damageFraction)} of the hoard reference health.`,
         ),
       );
     case 'arcane':
-      return 'Move into the safe eye of Event Horizon, then get back out before Singularity Collapse hits the eye.';
+      return 'Move into the safe middle (the eye) of Event Horizon. Then get back out before Singularity Collapse hits the eye.';
     case 'storm':
-      return `Pull the boss out of Charged Ground. While inside it gains ${percent(HOARD_STORM_SURGE_DAMAGE_PER_STACK)} damage every ${HOARD_STORM_SURGE_EVERY_SEC} seconds, up to ${HOARD_STORM_SURGE_MAX_STACKS} stacks. Outside the ground one stack falls off every ${HOARD_STORM_SURGE_DECAY_SEC} seconds.`;
+      return `Pull the boss out of Charged Ground. While the boss stands in it, it gets ${percent(HOARD_STORM_SURGE_DAMAGE_PER_STACK)} more damage every ${HOARD_STORM_SURGE_EVERY_SEC} seconds. This stacks up to ${HOARD_STORM_SURGE_MAX_STACKS} times. When it is out of the ground, it loses one stack every ${HOARD_STORM_SURGE_DECAY_SEC} seconds.`;
     case 'tide':
-      return `Follow the gaps between the moving crests of Crashing Tide. Each lane is ${HOARD_TIDE_LANE_HALF_SPAN * 2} yards wide. The positioning rule leaves a ${HOARD_TIDE_LANE_CORRIDOR}-yard corridor between parallel lanes. Each volley aims its lanes at a living player and sends crests across them in sequence.`;
+      return `Crashing Tide sends waves (crests) along lanes. Stand in the gaps between the moving crests. Each lane is ${HOARD_TIDE_LANE_HALF_SPAN * 2} yards wide. Lanes that run side by side always leave a gap ${HOARD_TIDE_LANE_CORRIDOR} yards wide between them. Each attack aims its lanes at a living player and sends crests down them one after another.`;
     case 'mushroom':
-      return `Keep out of spore clouds and kill the sporelings. Rare maps add a Bloated Cap. Kill it before the ${MUSHROOM.bloatFuseSec}-second fuse (${MUSHROOM.bloatDoubleFuseSec} under double pressure), or leave the ${MUSHROOM.bloatRadius}-yard burst. Its explosion leaves a ${MUSHROOM.bloatCloudRadius}-yard cloud.`;
+      return `Stay out of spore clouds and kill the sporelings. Rare maps add a Bloated Cap. Kill it before its ${MUSHROOM.bloatFuseSec}-second fuse runs out (${MUSHROOM.bloatDoubleFuseSec} seconds under double pressure). If you cannot, get out of its ${MUSHROOM.bloatRadius}-yard blast. When it blows up, it leaves a cloud that reaches ${MUSHROOM.bloatCloudRadius} yards from where it burst.`;
     case 'mole':
-      return `Sidestep the ${MOLE.swipeRadius}-yard Claw Rake. After the ${MOLE.burrowSec}-second burrow cast, leave the ${MOLE.eruptRadius}-yard eruption circle. A hit pushes you ${MOLE.eruptKnockback} yards. Rare maps also drop rocks, each with a ${MOLE.rockRadius}-yard impact radius.`;
+      return `Step aside from the ${MOLE.swipeRadius}-yard Claw Rake. The boss digs underground for ${MOLE.burrowSec} seconds. Then leave the ${MOLE.eruptRadius}-yard circle where it bursts out. If it hits you, you are pushed ${MOLE.eruptKnockback} yards. Rare maps also drop rocks. Each rock hits anyone within ${MOLE.rockRadius} yards of where it lands.`;
     case 'bat':
-      return `Leave the dive lane during the ${BAT.diveAimSec}-second aim or be pushed ${BAT.diveKnockback} yards. Leave the ${BAT.screechRadius}-yard screech before the ${BAT.screechCastSec}-second cast (${BAT.screechDoubleCastSec} under double pressure). Screech slows you to ${percent(BAT.screechSlow)} speed for ${BAT.screechSlowSec} seconds. Rare maps also summon bats.`;
+      return `The boss aims a dive for ${BAT.diveAimSec} seconds. Get out of its path, or you are pushed ${BAT.diveKnockback} yards. Get out of the ${BAT.screechRadius}-yard screech before its ${BAT.screechCastSec}-second cast ends (${BAT.screechDoubleCastSec} seconds under double pressure). Screech slows you to ${percent(BAT.screechSlow)} speed for ${BAT.screechSlowSec} seconds. Rare maps also call in more bats.`;
     case 'mimic':
-      return `Sidestep the ${MIMIC.biteRadius}-yard frontal bite. The mimic crouches for ${MIMIC.leapCrouchSec} seconds and travels for ${MIMIC.leapFlightSec} seconds before striking its ${MIMIC.leapRadius}-yard landing circle. Rare maps add burning coins.`;
+      return `Step aside from the ${MIMIC.biteRadius}-yard bite in front of it. When it leaps, the mimic crouches for ${MIMIC.leapCrouchSec} seconds, then flies through the air for ${MIMIC.leapFlightSec} seconds. Then it hits anyone in its ${MIMIC.leapRadius}-yard landing circle. Rare maps add burning coins.`;
   }
 }
 
@@ -122,15 +122,15 @@ export function addRiftAndHoardRules(w: SystemWriter) {
   const ranks = ['C', 'B', 'A', 'S'] as const;
   w.describe(
     'Rifts',
-    'Procedural rifts roll 3 to 6 floors. A C-rank seed has a 15% chance to open the two-floor Infernal Citadel instead. Clear non-boss enemies and solve the floor puzzle to open the descent. Using it takes everyone currently on the floor to the next floor together.',
+    'A randomly built rift has 3 to 6 floors. A C-rank rift has a 15% chance to be the two-floor Infernal Citadel instead. On each floor, defeat the enemies that are not bosses and solve the puzzle. This opens the way down (the descent). Using it takes everyone on that floor down to the next floor together.',
     heading(
-      'Puzzles on a procedural non-boss floor',
+      'Puzzles on a random floor without a boss',
       list([
-        '18% rune pylons: activate all 3 or 4.',
+        '18% rune pylons: turn on all 3 or 4 pylons.',
         '18% ice slide: slide to the goal tile at the far end.',
         '18% strength boulders: push them onto the marked pads.',
-        '18% rune sequence: step on 3 to 5 runes in order. Stepping ahead resets progress.',
-        '28% no puzzle. The final boss floor has no puzzle roll.',
+        '18% rune sequence: step on 3 to 5 runes in order. If you step on a rune too early, you have to start over.',
+        '28% no puzzle. The final boss floor never has a puzzle.',
       ]),
     ),
     heading(
@@ -154,7 +154,7 @@ export function addRiftAndHoardRules(w: SystemWriter) {
     'Rift floors',
     'Infernal Citadel',
     'Rift floor',
-    `On the first floor, defeat ${mob('rift_boss_ritualist')} to arm the Blood Orb. Take the orb to open the Temple Gate. Descend to the pit and defeat ${mob('rift_boss_pitlord')} to open the exit.`,
+    `On the first floor, defeat ${mob('rift_boss_ritualist')}. This powers up the Blood Orb. Take the orb to open the Temple Gate. Go down to the pit and defeat ${mob('rift_boss_pitlord')} to open the exit.`,
   );
   for (const t of RIFT_THEMES) {
     const boss = MOBS[t.boss],
@@ -163,7 +163,7 @@ export function addRiftAndHoardRules(w: SystemWriter) {
       'Rift floors',
       t.name,
       'Rift floor',
-      `This theme can be selected for a procedural floor. Ordinary enemies are ${t.trash.map(mob).join(' and ')}. Its final-floor boss is ${mob(t.boss)}.`,
+      `A randomly built rift floor can use this theme. Its normal enemies are ${t.trash.map(mob).join(' and ')}. Its boss on the final floor is ${mob(t.boss)}.`,
       heading(
         'Boss mechanics by minimum rank',
         list(
@@ -181,21 +181,21 @@ export function addRiftAndHoardRules(w: SystemWriter) {
   }
   w.describe(
     'Rift Forge',
-    `Bring a Riftbound band in your bags within ${RIFT_FORGE_RANGE} yards of the Riftwright. There are ${RIFT_BAND_MAX_UPGRADE} upgrades costing ${Array.from({ length: RIFT_BAND_MAX_UPGRADE }, (_, i) => riftUpgradeCost(i)).join(', ')} Rift Essence respectively. Each increases item level by one up to the band cap. A gem socket adds ${RIFT_GEM_RATING} rating. If all sockets are filled, socketing again consumes the new gem and destroys the oldest socketed gem.`,
+    `Carry a Riftbound band in your bags and stand within ${RIFT_FORGE_RANGE} yards of the Riftwright. There are ${RIFT_BAND_MAX_UPGRADE} upgrades. In order, they cost ${Array.from({ length: RIFT_BAND_MAX_UPGRADE }, (_, i) => riftUpgradeCost(i)).join(', ')} Rift Essence. Each upgrade raises the item level by one, up to the band's limit. A gem in a socket adds ${RIFT_GEM_RATING} rating. If every socket is full, adding a new gem destroys the oldest gem in the band. The new gem takes its place.`,
     list(
       Object.entries(RIFT_GEM_RATING_STAT).map(([id, stat]) => `${item(id)} adds ${words(stat)}.`),
     ),
   );
   w.describe(
     'Rift first-clear rewards',
-    "The first group to finish the same natural rift wins its completion rewards. Other groups can finish their own run and keep ordinary enemy or mid-run chest drops, but receive none of the completion gear, mounts, bands, Essence or gems listed here. The winning group loots shared gear and each winner's reserved class band and Rift Essence from the final corpse. At the standard loot multiplier, ranks C, B, A and S pay 1, 2, 3 and 4 personal Essence respectively. With a custom loot multiplier, clamp it to 0.5 to 2, multiply by that base, round to the nearest integer and clamp the result to 1 to 8. A and S also place a personal gem on the corpse for each winner; so can other ranks when the crafting-material bias is at least 0.5.",
+    "The first group to finish a natural rift wins its completion rewards. Other groups in the same rift can still finish their own run. They keep drops from normal enemies and chests along the way. But they get none of the completion gear, mounts, bands, Essence or gems listed here. The winning group loots the final boss's body. It holds shared gear, plus a class band and Rift Essence saved for each winner. With normal loot settings, each winner gets 1 Essence for rank C, 2 for B, 3 for A and 4 for S. Some rifts use a custom loot multiplier. Then the Essence is worked out like this:\n* The multiplier is kept between 0.5 and 2.\n* The amount above is multiplied by it and rounded to the nearest whole number.\n* The result is kept between 1 and 8.\nRanks A and S also leave a gem on the body for each winner. Other ranks can too, when the rift's crafting-material bias is at least 0.5.",
     heading(
       'Gear and bonus copper',
       list([
-        `C: one piece from the normal-dungeon pool and ${RIFT_COIN_BONUS_C} bonus copper.`,
+        `C: one piece of gear from the normal dungeon loot and ${RIFT_COIN_BONUS_C} bonus copper.`,
         `B: one Heroic epic and ${RIFT_COIN_BONUS_B} bonus copper.`,
         `A: one Heroic epic and ${RIFT_COIN_BONUS_A} bonus copper.`,
-        `S: one Heroic epic, a 35% chance of a second and ${RIFT_COIN_BONUS_S} bonus copper. Each of ${RIFT_LEGENDARY_ITEM_IDS.map(item).join(' and ')} rolls separately at ${percent(RIFT_LEGENDARY_CHANCE_S)}.`,
+        `S: one Heroic epic, a 35% chance of a second one, and ${RIFT_COIN_BONUS_S} bonus copper. ${RIFT_LEGENDARY_ITEM_IDS.map(item).join(' and ')} each have their own ${percent(RIFT_LEGENDARY_CHANCE_S)} chance to drop.`,
       ]),
     ),
     heading(
@@ -204,17 +204,17 @@ export function addRiftAndHoardRules(w: SystemWriter) {
         `B: ${percent(RIFT_GREEN_MOUNT_CHANCE)} chance for one of ${RIFT_GREEN_MOUNT_REINS.map(item).join(', ')}.`,
         `A: ${percent(RIFT_BLUE_MOUNT_CHANCE)} chance for one of ${RIFT_BLUE_MOUNT_REINS.map(item).join(', ')}.`,
         `S: ${percent(RIFT_EPIC_MOUNT_CHANCE)} chance for one of ${RIFT_EPIC_MOUNT_REINS.map(item).join(', ')}.`,
-        `B, A and S also roll separately for a pattern (${percent(RIFT_PATTERN_CHANCE)}, equal chances among ${RIFT_PATTERN_ITEM_IDS.map(item).join(', ')}) and a farming drop (${percent(FARM_RIFT_DROP_CHANCE)}, equal chances among ${FARM_RIFT_DROP_ITEM_IDS.map(item).join(', ')}).`,
+        `B, A and S also have two more separate chances:\n** A ${percent(RIFT_PATTERN_CHANCE)} chance for a pattern. Each of ${RIFT_PATTERN_ITEM_IDS.map(item).join(', ')} is equally likely.\n** A ${percent(FARM_RIFT_DROP_CHANCE)} chance for a farming drop. Each of ${FARM_RIFT_DROP_ITEM_IDS.map(item).join(', ')} is equally likely.`,
       ]),
     ),
   );
   w.describe(
     'Clue hunts',
-    `Each treasure casket pays ${CASKET_COPPER_BASE} + ${CASKET_COPPER_PER_LEVEL} copper per character level and ${CASKET_MATERIAL_COUNT} of one of ${CASKET_MATERIAL_POOL.map(item).join(', ')}. It rolls ${percent(CASKET_GEAR_CHANCE)} for class gear from the low delve-chest tier, ${percent(CASKET_HEROIC_MARK_CHANCE)} for ${CASKET_HEROIC_MARKS} Heroic Marks and ${percent(CASKET_MOUNT_CHANCE)} for ${item(CASKET_MOUNT_REINS_ITEM_ID)} if unowned.`,
+    `Each treasure casket gives ${CASKET_COPPER_BASE} copper, plus ${CASKET_COPPER_PER_LEVEL} copper for each character level. It also gives ${CASKET_MATERIAL_COUNT} of one of these: ${CASKET_MATERIAL_POOL.map(item).join(', ')}. It also has these separate chances:\n* ${percent(CASKET_GEAR_CHANCE)} for gear for your class, from the low delve-chest tier.\n* ${percent(CASKET_HEROIC_MARK_CHANCE)} for ${CASKET_HEROIC_MARKS} Heroic Marks.\n* ${percent(CASKET_MOUNT_CHANCE)} for ${item(CASKET_MOUNT_REINS_ITEM_ID)}, if you do not own it yet.`,
   );
   w.describe(
     'Buried hoards',
-    `The map owner's copper payout is ${percent(VAULT_OWNER_COPPER_BONUS)} higher than a guest's. If the gear roll succeeds, a ${percent(HOARD_LOOT_CLASS_BIAS)} roll favors the wearer's usable items when available; otherwise the game chooses uniformly from that boss's table. Each map opens a private hoard. Common and rare maps lead into a cave. Epic and legendary maps lead into an open valley. Its rarity fixes the encounter budget even when the number of living players changes.`,
+    `The map owner gets ${percent(VAULT_OWNER_COPPER_BONUS)} more copper than a guest. If you win gear, there is a ${percent(HOARD_LOOT_CLASS_BIAS)} chance it is picked from items you can use, if the boss has any. Otherwise, every item on that boss's list has the same chance. Each map opens a private hoard. Common and rare maps lead into a cave. Epic and legendary maps lead into an open valley. The map's rarity sets how hard the fight is. This stays the same even if the number of living players changes.`,
   );
   for (const theme of [...RIFT_THEMES, ...CAVE_THEMES]) {
     const small = CAVE_THEMES.includes(theme),
@@ -234,7 +234,7 @@ export function addRiftAndHoardRules(w: SystemWriter) {
       'Hoard encounters',
       boss.name,
       'Hoard encounter',
-      `Found in ${theme.name} on ${tierList.join(' and ')} maps. See ${mob(boss.id)} for its creature record.`,
+      `Found in ${theme.name} on ${tierList.join(' and ')} maps. See ${mob(boss.id)} for its creature page.`,
       hoardKitGuide(boss.id),
       rows.length
         ? heading(
@@ -242,13 +242,13 @@ export function addRiftAndHoardRules(w: SystemWriter) {
             list(
               rows.map((v) => {
                 const a = hoardMarkSpec(v);
-                return `${a.ability}: ${a.windup}-second warning, ${a.radius}-yard radius${a.innerRadius ? ` (safe inside ${a.innerRadius} yards)` : ''}.${a.impactFraction ? ` Initial ${a.school} damage before target modifiers: ${amounts(a.impactFraction)}.` : ''}${a.hazardDuration ? ` Ground effect lasts ${a.hazardDuration} seconds.` : ''}${a.pulseFraction ? ` It deals ${amounts(a.pulseFraction)} every ${a.pulseEvery} seconds.` : ''}`;
+                return `${a.ability}: ${a.windup}-second warning, hits within ${a.radius} yards${a.innerRadius ? ` (safe within ${a.innerRadius} yards of the middle)` : ''}.${a.impactFraction ? ` First hit of ${a.school} damage, before anything on you lowers it: ${amounts(a.impactFraction)}.` : ''}${a.hazardDuration ? ` It leaves an effect on the ground for ${a.hazardDuration} seconds.` : ''}${a.pulseFraction ? ` It deals ${amounts(a.pulseFraction)} every ${a.pulseEvery} seconds.` : ''}`;
               }),
             ),
           )
         : '',
       heading(
-        'Gear table by map',
+        'Gear by map rarity',
         list(
           tierList.map(
             (r) =>

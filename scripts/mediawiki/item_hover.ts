@@ -182,7 +182,9 @@ function card(item: ItemDef, mode: 'full' | 'embedded' | 'noset'): string {
   if (adaptive)
     html += tooltipLine(
       'tt-sub',
-      'Scaling example at level ' + MAX_LEVEL + ' with the account benefit active.',
+      'Example at level ' +
+        MAX_LEVEL +
+        ' with the account bonus active. The stats change with your level.',
     );
   html += membershipItemTooltipLines(item, {
     level: MAX_LEVEL,
@@ -264,7 +266,7 @@ function card(item: ItemDef, mode: 'full' | 'embedded' | 'noset'): string {
     ) {
       html += tooltipLine(
         'tt-sub',
-        'These trinket values use 1,000 maximum health and zero Attack Power, Ranged Attack Power, Spell Power and Healing Power.',
+        'These trinket numbers are for a character with 1,000 maximum health and 0 Attack Power, Ranged Attack Power, Spell Power and Healing Power.',
       );
     }
   }

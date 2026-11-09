@@ -27,7 +27,7 @@ describe('Player encyclopedia ability mechanics', () => {
     expect(article).toContain('reserved bomb item');
     expect(article).toContain('Any class carrying');
     expect(article).toContain('120 to 160');
-    expect(article).toContain('One bomb per successful use');
+    expect(article).toContain('Uses up one bomb each time it works');
     expect(article).not.toMatch(/Warrior|First rank|Global cooldown|Level 1/);
   });
   it('renders every visible ability without leaking a spellbook token', () => {
@@ -40,14 +40,14 @@ describe('Player encyclopedia ability mechanics', () => {
   });
   it('resolves a specialization that replaces a resource cost with a gain', () => {
     const article = abilityArticle(ABILITIES.execute, tools);
-    expect(article).toContain('Grants 20 rage');
+    expect(article).toContain('Gives 20 rage');
     expect(article).toContain('6 sec cooldown');
   });
   it('describes rank-specific direct hits, hybrid burns and the exact power fraction', () => {
     const fireball = ABILITIES.fireball,
       article = abilityArticle(fireball, tools);
     expect(article).toContain('Higher ranks');
-    expect(article).toContain('periodic effect gains no separate power bonus');
+    expect(article).toContain('The ticks over time do not get one of their own');
     const match = article.match(/Spell Power × ([\d.]+) \/ ([\d.]+)/);
     expect(match).not.toBeNull();
     for (const power of [40, 137])

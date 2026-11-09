@@ -2,84 +2,84 @@ import type { MobTemplate } from '../../src/sim/types';
 import { pct, words } from './entity_format';
 
 const traits: Record<string, string> = {
-  slumber: 'Remains asleep until awakened.',
+  slumber: 'Stays asleep until something wakes it.',
   warpath: 'Charges along its attack path.',
-  slams: 'Telegraphs a series of ground slams.',
+  slams: 'Shows a warning, then slams the ground several times.',
   rangedMechanics: 'Uses ranged attacks against distant targets.',
   starwake: 'Leaves dangerous ground behind its attack.',
   launch: 'Launches its target.',
-  eyeWard: 'Shields its eye until the encounter condition is met.',
+  eyeWard: 'Shields its eye until a condition in the fight is met.',
   collateral: 'Can hit nearby creatures with its attacks.',
-  aoePulse: 'Deals damage to targets in range.',
-  infernoChannel: 'Channels a series of damaging pulses.',
-  breathCone: 'Breathes damage in a frontal cone.',
+  aoePulse: 'Damages targets in range.',
+  infernoChannel: 'Keeps casting while it sends out damaging pulses.',
+  breathCone: 'Breathes in a cone in front of it, damaging targets there.',
   engageShout: 'Roots nearby players when the fight begins.',
-  counterStun: 'Counters its attacker with a stun.',
+  counterStun: 'Hits back at its attacker with a stun.',
   broodEgg: 'Can hatch a creature and trigger nearby eggs.',
-  broodWhelp: 'Leaps to an enemy and applies a burn.',
-  bigCast: 'Winds up an area attack.',
-  deathZoneCast: 'Marks the ground under a player. Leave before the cast finishes or die.',
-  deathZoneStrike: 'Marks a lethal area. Leave before the cast finishes.',
-  summonAdds: 'Summons reinforcements at the listed health thresholds.',
-  enrage: 'Enrages below the health threshold.',
-  desperateHeal: 'Heals itself once on crossing its health threshold.',
-  rampage: 'Each landed melee swing adds attack power and refreshes the buff.',
+  broodWhelp: 'Leaps at an enemy and sets it burning.',
+  bigCast: 'Slowly charges up an attack that hits an area.',
+  deathZoneCast: 'Marks the ground under a player. Get out before the cast ends, or you die.',
+  deathZoneStrike: 'Marks an area that kills anyone inside. Get out before the cast ends.',
+  summonAdds: 'Calls in helpers when its health drops to the listed amounts.',
+  enrage: 'Becomes enraged when its health drops below the listed amount.',
+  desperateHeal: 'Heals itself once when its health drops past the listed amount.',
+  rampage: 'Each melee hit that lands gives it more attack power and restarts the buff timer.',
   mendAlly: 'Heals wounded allies in range, including itself.',
   wardAllies: 'Shields allies in range.',
-  channelHeal: 'Channels a heal that grows with each tick.',
+  channelHeal: 'Keeps casting a heal that gets stronger with each tick.',
   rally: 'Grants attack power to nearby allies.',
   warcry: 'Increases nearby allies’ attack speed.',
   stomp: 'Stuns nearby enemies.',
   charge: 'Charges a target within the listed distance and stuns it.',
-  stoneskin: 'Gains a damage absorption shield.',
-  terrify: 'Fears enemies in range.',
+  stoneskin: 'Gets a shield that absorbs damage.',
+  terrify: 'Makes enemies in range run away in fear.',
   aoeSlow: 'Slows the movement of nearby enemies.',
   cleave: 'Its swing can also hit nearby targets.',
-  arcCleave: 'Sweeps a frontal arc.',
-  deathThroes: 'Explodes after death.',
-  packFrenzy: 'On death, grants attack speed to nearby allies.',
-  mortalStrike: 'Reduces the healing the victim receives.',
-  healAbsorb: 'Absorbs incoming healing until the amount is spent or the effect expires.',
-  lifeleech: 'Heals itself for a fraction of damage dealt.',
-  concuss: 'Stuns the victim on a landed melee swing.',
-  expose: 'Increases damage taken by the victim.',
-  corrode: 'Reduces armor with each stack.',
-  spellVuln: 'Increases spell damage taken.',
-  staggerHit: 'Reduces the victim’s chance to dodge.',
-  ensnare: 'Roots the victim in place.',
-  stunOnHit: 'Stuns the victim.',
-  slowStrike: 'Slows the victim’s weapon swings.',
-  knockback: 'Knocks the victim back.',
-  tongues: 'Increases spell cast time.',
+  arcCleave: 'Swings in an arc in front of it.',
+  deathThroes: 'Explodes after it dies.',
+  packFrenzy: 'When it dies, nearby allies attack faster.',
+  mortalStrike: 'Lowers the healing the target gets.',
+  healAbsorb: 'Soaks up healing the target gets, until the amount is used up or the effect ends.',
+  lifeleech: 'Heals itself for part of the damage it deals.',
+  concuss: 'Stuns the target when its melee hit lands.',
+  expose: 'Makes the target take more damage.',
+  corrode: 'Each stack lowers armor.',
+  spellVuln: 'Makes the target take more spell damage.',
+  staggerHit: 'Lowers the target’s chance to dodge.',
+  ensnare: 'Roots the target in place.',
+  stunOnHit: 'Stuns the target.',
+  slowStrike: 'Slows the target’s weapon swings.',
+  knockback: 'Knocks the target back.',
+  tongues: 'Makes spells take longer to cast.',
   manaBurn: 'Drains mana.',
-  sapVigor: 'Drains rage or energy from a melee target. Mana users are unaffected.',
+  sapVigor: 'Drains Rage or Energy from a melee target. It does not affect mana users.',
   enfeeble: 'Lowers Intellect.',
   enervate: 'Lowers Stamina.',
   plague: 'Lowers Stamina.',
   wither: 'Lowers Agility.',
-  dread: 'Fears the victim.',
-  polymorphHex: 'Polymorphs the victim.',
-  vulnerability: 'Increases damage taken.',
-  silence: 'Blocks nonphysical spell casts.',
-  blind: 'Raises the chance the victim misses a weapon attack.',
+  dread: 'Makes the target run away in fear.',
+  polymorphHex: 'Polymorphs the target.',
+  vulnerability: 'Makes the target take more damage.',
+  silence: 'Stops non-physical spells from being cast.',
+  blind: 'Makes the target more likely to miss with weapon attacks.',
   disarm: 'Stops melee and ranged auto-attacks.',
-  lockout: 'Blocks spells of one school.',
-  costTax: 'Raises the resource cost of abilities.',
+  lockout: 'Stops spells of one school from being cast.',
+  costTax: 'Makes abilities cost more to use.',
   chillOnHit: 'Slows movement.',
   demoralize: 'Lowers attack power.',
   siphonSpirit: 'Lowers a mana user’s Spirit.',
-  thorns: 'A landed melee swing against this creature damages the attacker.',
-  frenzyOnHit: 'Can gain attack speed when struck.',
-  spellReflect: 'A surviving hit from a nonphysical spell deals damage back to the caster.',
-  hex: 'Lowers damage and healing dealt by the victim.',
-  critVuln: 'Increases critical damage taken.',
-  purgeOnHit: 'Removes one eligible beneficial effect.',
+  thorns: 'If you hit it in melee, you take damage back.',
+  frenzyOnHit: 'Can start attacking faster after it is hit.',
+  spellReflect: 'When a non-physical spell hits it and it survives, the caster takes damage back.',
+  hex: 'Lowers the damage and healing the target deals.',
+  critVuln: 'Makes the target take more damage from critical hits.',
+  purgeOnHit: 'Removes one helpful effect that can be removed.',
   petRanged: 'Can attack from range as a companion.',
   petChainPull: 'Pulls an enemy toward its companion.',
   petCleave: 'Can hit additional enemies.',
   petSpell: 'Uses a spell at the listed range and interval.',
-  mechanicLevelScale: 'Mechanic damage scales with creature level.',
-  trashKit: 'This encounter uses the following special attacks.',
+  mechanicLevelScale: 'Its special attacks deal more damage at higher creature levels.',
+  trashKit: 'This fight uses these special attacks.',
 };
 const omitted = new Set([
   'name',
@@ -177,7 +177,7 @@ export function mobMechanicLines(m: MobTemplate): string[] {
     if (periodic) {
       out.push(
         v.name +
-          '. On a landed hit, ' +
+          '. When its attack hits, it has a ' +
           pct(v.chance) +
           ' chance to deal ' +
           v.perTick +
@@ -185,9 +185,8 @@ export function mobMechanicLines(m: MobTemplate): string[] {
           v.interval +
           ' sec for ' +
           v.duration +
-          ' sec' +
-          (v.maxStacks ? ', stacking up to ' + v.maxStacks + ' times' : '') +
-          '.',
+          ' sec.' +
+          (v.maxStacks ? ' Stacks up to ' + v.maxStacks + ' times.' : ''),
       );
     } else if (traits[k]) {
       const params = Object.entries(v)
@@ -202,11 +201,11 @@ export function mobMechanicLines(m: MobTemplate): string[] {
   if (m.ignoreTaunt) out.push('Ignores taunts.');
   if (m.damageFloorPct !== undefined)
     out.push(
-      'Damage cannot lower its health below ' + pct(m.damageFloorPct) + ' of maximum health.',
+      'Damage cannot bring its health below ' + pct(m.damageFloorPct) + ' of its maximum health.',
     );
   if (m.rankMechanics?.length)
     out.push(
-      'Rift ranks unlock these attacks in order, one each at C, B, A and S: ' +
+      'In Rifts, each rank adds the next attack on this list. Rank C uses the first one, B the first two, A the first three and S the first four: ' +
         m.rankMechanics.map(words).join(', ') +
         '.',
     );

@@ -46,9 +46,7 @@ export const socialRoutes: Record<string, SystemRoute> = {
       'Add Friend or Whisper',
       'Read the Friends list or conversation',
     ],
-    notes: [
-      'The message is delivered to the named character. Both players can stay where they are.',
-    ],
+    notes: ['The message goes straight to the character you named. Neither of you has to move.'],
   },
   Parties: {
     points: [],
@@ -59,7 +57,7 @@ export const socialRoutes: Record<string, SystemRoute> = {
       'Group up at the activity you chose',
     ],
     notes: [
-      'Invitations work across locations. The meeting place and kill-credit area depend on the activity you choose.',
+      'You can invite someone from anywhere. Where you meet, and where you must stand to share kill credit, depend on what you plan to do.',
     ],
   },
   'Party loot': {
@@ -72,7 +70,7 @@ export const socialRoutes: Record<string, SystemRoute> = {
       'Winner receives the item',
     ],
     notes: [
-      'The corpse is where your group defeated the creature. The roll prompt and master-loot assignment use that drop.',
+      'The body lies where your group defeated the creature. The roll window and the Master Looter both use what that body drops.',
     ],
   },
   Guilds: {
@@ -84,7 +82,7 @@ export const socialRoutes: Record<string, SystemRoute> = {
       'Use guild chat or visit the guild bank',
     ],
     notes: [
-      'Steps 1 and 2 happen in Social or the invite prompt. You gain membership when you found the guild or accept. Only the optional storage visit needs the banker shown.',
+      'Steps 1 and 2 happen in Social or in the invite window. You join when you start the guild or accept an invite. You only need to visit the banker shown if you want to use the guild bank.',
     ],
   },
   'Guild contracts': {
@@ -95,7 +93,7 @@ export const socialRoutes: Record<string, SystemRoute> = {
       npcPin('Reward', GUILD_QUARTERMASTER_NPC_ID, 'Collect your chosen purchase'),
     ],
     notes: [
-      'The Hollow Crypt entrance and final boss illustrate step 2 only when your contract calls for that objective. Follow the current notice for other targets. Seals go directly to you on completion. The quartermaster is where you redeem them.',
+      'The map shows The Hollow Crypt entrance and final boss as an example for step 2. Follow it only when your contract names that goal. For other targets, follow the current notice. Seals go straight to you when you finish. You spend them at the quartermaster.',
     ],
   },
   Calendar: {
@@ -107,7 +105,7 @@ export const socialRoutes: Record<string, SystemRoute> = {
       'Check the selected date',
     ],
     notes: [
-      'A calendar booking appears on that day in the guild calendar. Participating in a realm event can require travel to its own activity.',
+      'A booking shows on that day in the guild calendar. To take part in a realm event, you may need to travel to where its activity happens.',
     ],
   },
   'Book of Deeds': {
@@ -119,7 +117,7 @@ export const socialRoutes: Record<string, SystemRoute> = {
       'Check Renown and cosmetics in the Book',
     ],
     notes: [
-      'The selected deed determines the locations. Its individual article gives the targets, landmarks or counts. Credit is automatic.',
+      'Where you go depends on the deed you pick. Its own page lists the targets, landmarks or counts. Your progress counts by itself as you play.',
     ],
   },
   'The Reliquary': {
@@ -131,7 +129,7 @@ export const socialRoutes: Record<string, SystemRoute> = {
       'See the filled silhouette on the page',
     ],
     notes: [
-      'Every relic has a different source. The collection updates where you acquire the piece.',
+      'Every relic comes from a different place. Your collection updates as soon as you get the piece, wherever you are.',
     ],
   },
   Companions: {
@@ -145,7 +143,7 @@ export const socialRoutes: Record<string, SystemRoute> = {
       'The companion appears next to you',
     ],
     notes: [
-      'The pins show the Tug purchase option. For a boss drop, use that companion’s source page. Steps 2 and 3 use your collection and the summoned companion’s target frame.',
+      'The pins show where to buy Tug. For a companion that drops from a boss, see that companion’s own page. Steps 2 and 3 happen in your collection, and the summoned companion then shows its own target frame.',
     ],
   },
   'Mount appearances': {
@@ -154,7 +152,7 @@ export const socialRoutes: Record<string, SystemRoute> = {
     ],
     flow: ['Cosmetics → Mounts', 'Preview a skin', 'Choose Wear', 'Summon your mount'],
     notes: [
-      'Only riding training requires this visit. If you already know how to ride, all appearance selections happen on the current character.',
+      'You only need this visit to learn riding. If you can already ride, you pick every appearance from your current character, wherever you are.',
     ],
   },
   'Weapon appearances': {
@@ -166,7 +164,7 @@ export const socialRoutes: Record<string, SystemRoute> = {
       'Apply to your weapon',
     ],
     notes: [
-      'Acquisition varies by skin. For a Lantern Hall purchase, follow [[Guild contracts]]. The appearance applies on your equipment at your current location.',
+      'Each skin is earned a different way. To buy one in Lantern Hall, follow [[Guild contracts]]. You apply the look to your weapon wherever you are.',
     ],
   },
   Membership: {
@@ -181,7 +179,7 @@ export const socialRoutes: Record<string, SystemRoute> = {
       'Claim gear at a banker',
     ],
     notes: [
-      'Steps 1 and 2 happen in the store, parcel window and bags. Account time is credited when the token is redeemed. The map shows the separate gear pickup.',
+      'Steps 1 and 2 happen in the store, the parcel window and your bags. Your account gets its membership time when you use the token. The map shows where to pick up the gear, which is a separate step.',
     ],
   },
   'Mobile Play': {
@@ -193,7 +191,7 @@ export const socialRoutes: Record<string, SystemRoute> = {
       'Use the selected window',
     ],
     notes: [
-      'Controls travel with your character. The activity you open determines its own reward or destination.',
+      'The controls work wherever your character is. Each activity you open has its own reward or place to go.',
     ],
   },
   'Agents and Bots': {
@@ -204,7 +202,9 @@ export const socialRoutes: Record<string, SystemRoute> = {
       'Run the Python example',
       'Read the episode reward in the terminal',
     ],
-    notes: ['This is a local training procedure. There is no realm NPC or in-game claim.'],
+    notes: [
+      'You do this on your own computer to train an agent. There is no NPC to visit and nothing to claim in the game.',
+    ],
   },
   'Referral cards': {
     points: [
@@ -222,7 +222,7 @@ export const socialRoutes: Record<string, SystemRoute> = {
       'Each player opens the card and selects Redeem',
     ],
     notes: [
-      'Map numbers refer to stamps 1 through 5 in “How to earn and redeem each stamp”. The first four show the tutorial hand-in and the three dungeon boss routes. Stamp 5 shows one qualifying raid boss. Starting a card and claiming each reward take place in Social, wherever you stand.',
+      'Map numbers refer to stamps 1 to 5 in “How to earn and redeem each stamp”. Number 1 is the tutorial hand-in. Numbers 2 to 4 are the routes to the three dungeon bosses. Number 5 shows one raid boss that counts. You start the card and claim each reward in Social, wherever you are.',
     ],
   },
 };

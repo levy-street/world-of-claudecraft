@@ -34,31 +34,31 @@ import { heading, list, percent, type SystemWriter } from './system_writer';
 export function addRecoveryAndFinder(w: SystemWriter) {
   w.describe(
     'Dungeon Finder',
-    'Join the automatic queue on your own, or have your party leader enter your group. Choose the activities and roles you can fill. Once enough players fit a run, every member must accept the same proposal.',
-    `A proposal expires after ${FINDER_PROPOSAL_SECONDS} seconds. Declining or failing to answer removes your queued unit (you and any party queued with you). The player who declined or timed out must wait ${FINDER_DECLINE_COOLDOWN_SECONDS} seconds before queueing again. Other intact units keep their original place in the queue.`,
+    'Join the queue by yourself, or have your party leader sign up your whole group. Pick the activities you want and the roles you can play. When the game finds enough players for a run, it offers that group a spot. Every member must accept it.',
+    `You have ${FINDER_PROPOSAL_SECONDS} seconds to accept. If you say no, or do not answer in time, you are taken out of the queue. If you queued with a party, your whole party is taken out too. The player who said no or ran out of time must wait ${FINDER_DECLINE_COOLDOWN_SECONDS} seconds before joining the queue again. Everyone else who was offered the spot keeps their place in the queue.`,
     heading(
       'Expedition listings',
-      `A leader posts an expedition with a purpose and an optional moderated note of up to ${EXPEDITION_NOTE_MAX} characters. Players can apply for the leader to accept. You may have up to ${FINDER_PLAYER_APPLICATION_CAP} pending applications; a listing takes up to ${FINDER_EXPEDITION_APPLICATION_CAP}. An expedition application expires after ${FINDER_EXPEDITION_APPLICATION_SECONDS} seconds. Requests to the same listing have a ${FINDER_EXPEDITION_APPLICATION_COOLDOWN}-second retry cooldown.`,
+      `A leader posts an expedition and says what it is for. They can add a note of up to ${EXPEDITION_NOTE_MAX} characters, which moderators can check. Other players apply to join, and the leader picks who to accept. You can have up to ${FINDER_PLAYER_APPLICATION_CAP} applications waiting at once. A listing can hold up to ${FINDER_EXPEDITION_APPLICATION_CAP}. An application runs out after ${FINDER_EXPEDITION_APPLICATION_SECONDS} seconds. After you apply to a listing, you must wait ${FINDER_EXPEDITION_APPLICATION_COOLDOWN} seconds before you can apply to it again.`,
     ),
   );
   w.describe(
     'Death and recovery',
     heading(
       'Using /unstuck',
-      `Stand still and undisturbed for ${UNSTUCK_COUNTDOWN_SECONDS} seconds. Movement, entering combat, taking damage, casting, eating, drinking, sitting, or a change between living and dead cancels the countdown. The retry timer starts when you begin an attempt and lasts ${UNSTUCK_RETRY_SECONDS} seconds. A completed move starts a ${UNSTUCK_SUCCESS_COOLDOWN_SECONDS / 60}-minute cooldown. In the ordinary world you move to a graveyard; if already dead, you revive there with 20% health and, for a mana user, 20% mana. Other resource bars start at zero. Battlegrounds use their own recovery point and preserve a dead player's resurrection queue.`,
+      `Stand still, with nothing bothering you, for ${UNSTUCK_COUNTDOWN_SECONDS} seconds. The countdown stops if you move, enter combat, take damage, cast, eat, drink, sit, die or come back to life. You can try again ${UNSTUCK_RETRY_SECONDS} seconds after you start a try. When the move works, a ${UNSTUCK_SUCCESS_COOLDOWN_SECONDS / 60} minute cooldown starts. In the normal world, you are moved to a graveyard. If you were already dead, you come back to life there with 20% health. If your class uses mana, you also get 20% mana. Other resource bars start empty. Battlegrounds send you to their own safe spot instead. If you are dead there, you keep your place in the line to come back to life.`,
     ),
-    `The first completion after ${UNSTUCK_SICKNESS_WINDOW_SECONDS / 3600} hour without one is free of Unstuck Sickness. Each completion restarts that window. A repeat can reduce all attributes by ${percent(-UNSTUCK_SICKNESS_STAT_MULT)}. Below level ${UNSTUCK_SICKNESS_MIN_LEVEL} there is no sickness. It lasts ${unstuckSicknessDuration(UNSTUCK_SICKNESS_MIN_LEVEL)} seconds at level ${UNSTUCK_SICKNESS_MIN_LEVEL}, plus ${unstuckSicknessDuration(UNSTUCK_SICKNESS_MIN_LEVEL + 1) - unstuckSicknessDuration(UNSTUCK_SICKNESS_MIN_LEVEL)} seconds per further level, up to ${unstuckSicknessDuration(MAX_LEVEL)} seconds at level ${MAX_LEVEL}.`,
+    `Using /unstuck can make you sick with Unstuck Sickness. The first time you use it after ${UNSTUCK_SICKNESS_WINDOW_SECONDS / 3600} hour without using it, you do not get sick. Each use starts that hour over. Using it again sooner can lower all your attributes by ${percent(-UNSTUCK_SICKNESS_STAT_MULT)}. Characters below level ${UNSTUCK_SICKNESS_MIN_LEVEL} never get sick. The sickness lasts ${unstuckSicknessDuration(UNSTUCK_SICKNESS_MIN_LEVEL)} seconds at level ${UNSTUCK_SICKNESS_MIN_LEVEL}, plus ${unstuckSicknessDuration(UNSTUCK_SICKNESS_MIN_LEVEL + 1) - unstuckSicknessDuration(UNSTUCK_SICKNESS_MIN_LEVEL)} seconds for each level above that, up to ${unstuckSicknessDuration(MAX_LEVEL)} seconds at level ${MAX_LEVEL}.`,
   );
   w.describe(
     'Lockpicking',
-    'Choose an ante before starting. It fixes the highest loot tier and determines how many consecutive pages, attempts and seconds you get. Each move goes forward one column. Hard Set moves up two rows, Set up one, Steady holds the row, Ease moves down one and Drop down two. At the edge the row is clamped. Pass every gate through its single opening and reach the final seat.',
+    'Pick an ante before you start. The ante sets the best loot you can win. It also sets how many pages you must solve in a row, how many tries you get and how many seconds you have for each move. Each move takes you one column forward. Hard Set also moves you up two rows and Set up one. Steady keeps your row. Ease moves you down one and Drop down two. You cannot move past the top or bottom row. Pass each gate through its one opening and reach the last seat to win.',
     heading(
       'Ante, attempts and clock',
       list(
         ([1, 2, 3] as const).map((a) => {
           const tier = ANTE_TO_TIER[a],
             reward = LOCKPICK_TIER_REWARD[tier];
-          return `Ante ${a}, ${tier} loot: ${ANTE_TO_PAGES[a]} page(s) in a row, ${ANTE_TO_TRIES[a]} attempt(s), ${ANTE_TO_STEP_TIMEOUT_MS[a] / 1000} seconds per move. Solved delve reward: ${reward.bonusMarks} bonus Marks within the daily full-reward window and extra copper equal to ${percent(reward.copperMult - 1)} of the rounded midpoint of the delve's base copper range, rounded to a whole copper.`;
+          return `Ante ${a}, ${tier} loot: ${ANTE_TO_PAGES[a]} page(s) in a row, ${ANTE_TO_TRIES[a]} attempt(s), ${ANTE_TO_STEP_TIMEOUT_MS[a] / 1000} seconds per move. Reward for solving a delve chest: ${reward.bonusMarks} bonus Marks, if you still get full rewards today. You also get extra copper equal to ${percent(reward.copperMult - 1)} of the middle of the delve's normal copper range (that middle is rounded), then rounded to a whole copper.`;
         }),
       ),
     ),
@@ -67,10 +67,10 @@ export function addRecoveryAndFinder(w: SystemWriter) {
       list(
         Object.entries(LOCKPICK_TIER_PRESETS).map(
           ([k, p]) =>
-            `${k}: ${p.cols} columns, ${p.rows} rows, ${p.gateCount} gates, ${p.trapCount ?? 0} traps, ${p.visibilityWindow} columns visible ahead.`,
+            `${k}: ${p.cols} columns, ${p.rows} rows, ${p.gateCount} gates, ${p.trapCount ?? 0} traps, ${p.visibilityWindow} columns you can see ahead.`,
         ),
       ),
     ),
-    'A solved rift cache pays the picker (rift base level + floor count) x 90 copper, multiplied by 2.2 for premium, 1.5 for medium or 1 for low and rounded to a whole copper. The clock resets after each legal advance. A blocked cell, missed gate, trap or missed deadline costs one attempt. If attempts remain, restart at the first page on a newly generated board. Choosing to abort preserves the chest for a fresh attempt. Exhausting all attempts at a delve reward chest gives the low-tier consolation and ends the run. At a rift cache the same failure jams the cache and gives no cache loot.',
+    'If you solve a rift cache, you get (rift base level + number of floors) x 90 copper. That is multiplied by 2.2 for premium, 1.5 for medium or 1 for low, then rounded to a whole copper. The clock starts over after each allowed move. You lose one try if you hit a blocked square, miss a gate, hit a trap or run out of time. If you have tries left, you start again from the first page on a brand new board. If you choose to quit, the chest stays so you can try again later. If you use up every try on a delve reward chest, you get the low-tier prize instead and the run ends. If you use up every try on a rift cache, the cache jams and gives no loot.',
   );
 }

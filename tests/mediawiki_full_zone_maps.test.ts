@@ -33,6 +33,22 @@ describe('full-zone wiki maps', () => {
       'item',
     );
     expect(map).toContain('== Acquisition map ==');
-    expect(map).toContain('Numbers match the source sections above');
+    expect(map).toContain('A number on the map matches a numbered way to get it above');
+    // Each location line reads as a sentence: number, coordinates, then what to do there.
+    expect(map).toContain("* '''2''' (0, 0): Buy here.");
+    expect(map).not.toMatch(/^\* 2 · /m);
+  });
+  it('gives each thing to do at a shared spot its own line with its own number', () => {
+    const at = { frame: 'Overworld', x: 10, z: 20 };
+    const map = questMap({
+      points: [
+        { ...at, step: 'Start' as const, label: 'Talk to the captain' },
+        { ...at, step: 1, label: 'Search the crates · east dock', radius: 8 },
+      ],
+    });
+    expect(map).toContain("* '''S''' (10, 20), search within 8 yards: Talk to the captain.");
+    expect(map).toContain(
+      "* '''1''' (10, 20), search within 8 yards: Search the crates, east dock.",
+    );
   });
 });

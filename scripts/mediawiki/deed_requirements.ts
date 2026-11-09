@@ -46,7 +46,7 @@ const stats: Record<DeedStatKey, string> = {
   thunzharrKills: 'Thunzharr kills',
   balgathKills: 'Balgath kills',
   bloatCleanKills: 'Bog Bloat kills without being caught in Caustic Spores',
-  hubCraftsPerformed: 'station-bound crafts completed at a crafting station',
+  hubCraftsPerformed: 'crafts that need a crafting station, made at one',
   attunementsCompleted: 'profession attunements completed',
   masterworksCrafted: 'masterworks crafted',
   salvagesPerformed: 'items salvaged',
@@ -54,7 +54,7 @@ const stats: Record<DeedStatKey, string> = {
   riftSRankClears: 'S-rank Rifts cleared',
   tutorialGraduations: 'graduation rides home after completing the Proving Shore quests',
   legendariesForged: 'legendary promotions completed',
-  hoardGoblinKills: 'rewarded Coinsack Scurrier kills',
+  hoardGoblinKills: 'Coinsack Scurrier kills that gave a reward',
   thatchgrinKills: 'Old Thatchgrin kills',
 };
 const meters: Record<DeedMeterId, string> = {
@@ -82,11 +82,11 @@ const meters: Record<DeedMeterId, string> = {
 const flags: Record<DeedFlagId, string> = {
   talentSpecChosen: 'Choose a specialization.',
   talentCapstone: 'Choose a level 20 talent.',
-  hasRestedXp: 'Accumulate a positive amount of rested experience.',
+  hasRestedXp: 'Have some rested experience (any amount above 0).',
   guildMember: 'Join a guild on the online realm.',
   nonDefaultSkin: 'Equip a mech skin or a non-default character skin.',
   allEquipSlotsFilled:
-    'Equip every one of the following slots at the same time: ' +
+    'Wear an item in every one of these slots at the same time: ' +
     LAUNCH_PAPERDOLL_SLOTS.map((s) =>
       s === 'ring1'
         ? 'first ring'
@@ -98,7 +98,7 @@ const flags: Record<DeedFlagId, string> = {
     ).join(', ') +
     '.',
   heroicMarkCircuit:
-    'Earn the daily Heroic Mark from Hollow Crypt, Sunken Bastion, Drowned Temple and Gravewyrm Sanctum in the same reward window.',
+    'Earn the daily Heroic Mark from Hollow Crypt, Sunken Bastion, Drowned Temple and Gravewyrm Sanctum, all in the same reward window.',
   companionsBothMax: 'Upgrade both Tessa and Edda to rank 3.',
   firstEraCap: 'Reach level ' + MAX_LEVEL + ' during the First Era.',
 };
@@ -111,7 +111,7 @@ function visitInstruction(w: SystemWriter, mark: string): string {
       const poi = zone?.pois.find((p) => p.id === detail);
       if (!poi) throw Error('Unknown deed landmark ' + mark);
       return (
-        'Come within ' +
+        'Go within ' +
         POI_VISIT_RADIUS +
         ' yd of ' +
         poi.label +
@@ -125,11 +125,11 @@ function visitInstruction(w: SystemWriter, mark: string): string {
     }
     case 'fish':
       return (
-        'Land one qualifying fish in ' +
+        'Catch one fish in ' +
         place +
-        '. Any of these catches counts: ' +
+        '. Any of these counts: ' +
         ZONE_FISH[id].map((f) => w.entity('item', f, ITEMS[f].name)).join(', ') +
-        '. Weeds, boots and empty hooks give no credit.'
+        '. Weeds, boots and empty hooks do not count.'
       );
     case 'gather': {
       const node = gatherNodesInActiveWorld()
@@ -142,7 +142,7 @@ function visitInstruction(w: SystemWriter, mark: string): string {
         ' in ' +
         place +
         '.' +
-        (node ? ' One eligible node is at ' + coord(node.pos) + '.' : '')
+        (node ? ' One that counts is at ' + coord(node.pos) + '.' : '')
       );
     }
     case 'slain':
@@ -150,9 +150,9 @@ function visitInstruction(w: SystemWriter, mark: string): string {
     case 'dungeon':
       return 'Enter ' + w.entity('dungeon', id, DUNGEONS[id].name) + '.';
     case 'quality':
-      return 'Acquire an item of ' + id + ' quality.';
+      return 'Get an item of ' + id + ' quality.';
     case 'craft_rare':
-      return 'Craft a rare-or-better item using ' + words(id) + '.';
+      return 'Use ' + words(id) + ' to craft an item of rare quality or better.';
     case 'npc':
       return (
         (NPCS[id].banker ? 'Open the bank or complete a bank transaction with ' : 'Talk to ') +
@@ -178,7 +178,7 @@ function visitInstruction(w: SystemWriter, mark: string): string {
               name(from.poi) +
               ' to ' +
               name(to.poi) +
-              ' and disembark alive.'
+              ' and get off alive.'
             );
           }
       throw Error('Unknown deed ferry ' + mark);
@@ -186,19 +186,19 @@ function visitInstruction(w: SystemWriter, mark: string): string {
     case 'farm':
       return id === 'planted'
         ? 'Plant a crop in a farm bed.'
-        : 'Harvest a surviving crop in ' + place + '.';
+        : 'Harvest a crop in ' + place + ' before it dies.';
     case 'farm_crop': {
       const item = FARM_CROPS[id].produceItemId;
-      return 'Harvest a surviving ' + w.entity('item', item, ITEMS[item].name) + ' crop.';
+      return 'Harvest a ' + w.entity('item', item, ITEMS[item].name) + ' crop before it dies.';
     }
     case 'witness':
       return (
-        'Come within 100 yd of ' +
+        'Go within 100 yd of ' +
         w.entity('mob', id, MOBS[id].name) +
-        ' while the scheduled world boss is alive.'
+        ' while the world boss is alive.'
       );
     case 'gather_event':
-      return 'Trigger the ' + words(id) + ' gathering event.';
+      return 'Start the ' + words(id) + ' gathering event.';
     case 'apex_feast':
       return 'Craft an apex feast.';
     case 'gourdlight': {
@@ -220,8 +220,8 @@ function visitInstruction(w: SystemWriter, mark: string): string {
 
 const checkedList = (lines: string[], need = lines.length) =>
   (need === lines.length
-    ? 'Complete all ' + need + ' listed requirements.'
-    : 'Complete any ' + need + ' of these ' + lines.length + ' requirements.') +
+    ? 'Do all ' + need + ' of these.'
+    : 'Do any ' + need + ' of these ' + lines.length + '.') +
   '\n' +
   list(lines);
 
@@ -234,7 +234,7 @@ export function deedLead(deed: DeedDef): string {
   return (
     'Earn ' +
     deeds +
-    ' prerequisite ' +
+    ' other ' +
     (deeds === 1 ? 'deed' : 'deeds') +
     (quests ? ' and turn in ' + quests + ' ' + (quests === 1 ? 'quest' : 'quests') : '') +
     ' on the same character.'
@@ -256,7 +256,7 @@ export function deedRequirements(w: SystemWriter, deed: DeedDef): string {
     case 'quests':
       return checkedList(t.questIds.map((id) => 'Turn in ' + quest(id) + '.'));
     case 'stat':
-      return 'Required lifetime total: ' + fmt(t.count) + ' ' + stats[t.stat] + '.';
+      return 'Reach a lifetime total of ' + fmt(t.count) + ' ' + stats[t.stat] + '.';
     case 'meter':
       return meters[t.meter] + ' must reach ' + fmt(t.amount) + '.';
     case 'flag':
@@ -270,7 +270,7 @@ export function deedRequirements(w: SystemWriter, deed: DeedDef): string {
         (t.count === 1 ? ' time' : ' times') +
         '. ' +
         (t.difficulty
-          ? 'Required difficulty: ' + t.difficulty + '.'
+          ? 'It must be on ' + t.difficulty + ' difficulty.'
           : 'Normal and Heroic clears both count.')
       );
     case 'delveClears':
@@ -283,14 +283,14 @@ export function deedRequirements(w: SystemWriter, deed: DeedDef): string {
           : 'Delve') +
         (t.count === 1 ? ' clear.' : ' clears.') +
         ' ' +
-        (t.tier ? 'Required tier: ' + t.tier + '.' : 'Clears at any tier count.')
+        (t.tier ? 'It must be on tier ' + t.tier + '.' : 'Clears at any tier count.')
       );
     case 'arenaRating':
       return 'Reach a ' + t.bracket + ' arena rating of ' + fmt(t.rating) + '.';
     case 'craftSkill':
       return t.craftId
         ? 'Raise ' + words(t.craftId) + ' to skill ' + t.level + '.'
-        : 'Raise ' + (t.count ?? 1) + ' distinct crafting profession(s) to skill ' + t.level + '.';
+        : 'Raise ' + (t.count ?? 1) + ' different crafting profession(s) to skill ' + t.level + '.';
     case 'gathering':
       return t.professionId
         ? 'Reach ' + t.amount + ' proficiency in ' + words(t.professionId) + '.'
@@ -298,14 +298,14 @@ export function deedRequirements(w: SystemWriter, deed: DeedDef): string {
             t.amount +
             ' proficiency in ' +
             (t.count ?? 1) +
-            ' distinct gathering profession(s).';
+            ' different gathering profession(s).';
     case 'collectItems':
       return (
         'Discover ' +
         (t.count === undefined || t.count === t.itemIds.length
           ? 'every listed item'
           : t.count + ' different items from this list') +
-        '. Discoveries remain credited after an item leaves your bags.\n' +
+        '. An item still counts after it leaves your bags.\n' +
         list(t.itemIds.map((id) => w.entity('item', id, ITEMS[id].name)))
       );
     case 'visit':
@@ -317,7 +317,7 @@ export function deedRequirements(w: SystemWriter, deed: DeedDef): string {
           t.count,
         ) +
         (t.markIds.some((m) => m.startsWith('poi:'))
-          ? '\n\nLandmark visits are checked once a second while you are alive.'
+          ? '\n\nThe game checks landmark visits once a second while you are alive.'
           : '')
       );
     case 'meta': {

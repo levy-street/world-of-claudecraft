@@ -132,7 +132,7 @@ export function addQuestDirectory(w: Writer) {
     const title = page(
       name === 'Other locations' ? 'Raid quests' : name + ' quests',
       items,
-      'Quests are grouped by the earliest level allowed by the quest and its prerequisites. Within a level, prerequisite quests appear before their follow-ups. Each entry names the quest giver.',
+      'Quests are grouped by the lowest level you can start them at. That level also counts any quests you must finish first. In each group, a quest you must do first comes before the quests that follow it. Each entry names the quest giver.',
       'level',
     );
     zoneTitles.set(name, title);
@@ -145,23 +145,23 @@ export function addQuestDirectory(w: Writer) {
     );
   }
   const activities: [string, string, (q: QuestDef) => boolean][] = [
-    ['Profession quests', 'Crafting, gathering, farming and profession training.', professionQuest],
-    ['Class quests', 'Quests restricted to specific classes.', (q) => !!q.requiredClass?.length],
+    [
+      'Profession quests',
+      'Quests about crafting, gathering, farming and learning a profession.',
+      professionQuest,
+    ],
+    ['Class quests', 'Quests that only some classes can take.', (q) => !!q.requiredClass?.length],
     [
       'Group quests',
-      'Quests with a recommended group size above one player.',
+      'Quests that are best done with more than one player.',
       (q) => (q.suggestedPlayers ?? 1) > 1,
     ],
     [
       'Repeatable quests',
-      'Quest-giver assignments that can be accepted again. Each quest explains its reset or cooldown.',
+      'Quests you can take again after you finish them. Each quest says when you can take it again.',
       (q) => !!q.repeatable,
     ],
-    [
-      'Seasonal quests',
-      'Quest-giver assignments offered during an event.',
-      (q) => !!q.seasonalEvent,
-    ],
+    ['Seasonal quests', 'Quests that are only offered during an event.', (q) => !!q.seasonalEvent],
   ];
   const activityLinks: string[] = [];
   for (const [label, intro, match] of activities) {
@@ -171,7 +171,7 @@ export function addQuestDirectory(w: Writer) {
   }
   w.add(
     'Quests',
-    'Choose a zone to follow its quest chains, or browse by activity. Open a quest for its objectives, route map, turn-in and rewards.\n\n' +
+    'Pick a zone to follow its quest chains, or look at quests by type. Open a quest to see what to do, a map of where to go, who to turn it in to and what you get.\n\n' +
       w.section('Quests by zone', w.bullets(zoneLinks)) +
       w.section('Quest activities', w.bullets(activityLinks)) +
       w.section(

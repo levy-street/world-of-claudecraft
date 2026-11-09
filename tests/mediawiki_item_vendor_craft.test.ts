@@ -100,7 +100,7 @@ describe('item vendor and crafting acquisition routes', () => {
       .get('eastbrook_arming_sword')!
       .find((m) => m.title.startsWith('Craft with'))!;
     expect(field.steps[0]).toContain('known automatically');
-    expect(field.steps[2]).toContain('crafted in the field');
+    expect(field.steps[2]).toContain('You do not need a station for this recipe');
   });
   it('locates every live vendor and gives finite pins in the correct world or room frame', () => {
     for (const n of Object.values(NPCS).filter((n) => n.vendorItems?.length && !n.devVendor))

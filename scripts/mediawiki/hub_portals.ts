@@ -57,7 +57,7 @@ export function interiorRows(w: Pick<Writer, 'link' | 'titleBy'>): string[] {
     return [
       w.link(w.titleBy.dungeon.get(d.id)!, d.name),
       ...(zone ? ['Zone: ' + zone.name] : []),
-      d.guideVisible === false ? 'Unlisted in the in-game Guide' : 'Quest and exploration interior',
+      d.guideVisible === false ? 'Not listed in the in-game Guide' : 'Quest and exploring location',
     ].join(' · ');
   });
 }

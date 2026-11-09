@@ -18,6 +18,6 @@ export function mediawikiAbilityDescription(ability: AbilityDef): string {
       'bleeds for $d Physical damage',
       `bleeds for ${total} Physical damage at zero Ranged Attack Power`,
     ) +
-    ` The bleed deals damage ${ticks} times, once every ${effect.bleedInterval} sec; each tick is rounded to a whole number.`
+    ` The bleed deals damage ${ticks} times, once every ${effect.bleedInterval} sec. Each tick is rounded to a whole number.`
   );
 }

@@ -12,7 +12,7 @@ describe('Weekly and world quest walkthroughs', () => {
   it('builds a finite route and states the automatic payment for every rotating offer', () => {
     for (const q of WORLD_QUESTS) {
       const text = worldRoute(q);
-      expect(text, q.id).toContain('Completion pays automatically');
+      expect(text, q.id).toContain('You get paid as soon as you finish');
       expect(text, q.id).toContain('woc-pin');
       expect(text, q.id).not.toMatch(/undefined|NaN/);
     }
@@ -20,7 +20,7 @@ describe('Weekly and world quest walkthroughs', () => {
   it('places actual ore nodes inside the Willowfen gathering area', () => {
     const route = find('gather');
     expect(route).toContain('ore node (');
-    expect(route).not.toContain('Complete the activity inside this circle');
+    expect(route).not.toContain('Do the activity inside this circle');
   });
   it('plots every ring on its own course and names the landing condition', () => {
     const flight = find('glider');
