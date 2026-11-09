@@ -79,6 +79,8 @@ uniform vec3 uHorizon;
 uniform vec3 uCoreHorizon;
 uniform float uDetail;
 uniform float uCore;
+uniform float uFlare;
+uniform vec3 uFlareDir;
 uniform float uBreath;
 uniform vec3 uBreathHorizon;
 uniform float uQuench;
@@ -364,6 +366,10 @@ void main() {
     if (uHammer > 0.001) col = mix(col, hammerSky(d, up), uHammer);
   }
   if (uCore > 0.001) col = mix(col, coreSky(d, up), uCore);
+  // The Masterless Strength's arrival: the sky blazing round its beam.
+  if (uFlare > 0.001) {
+    col += vec3(1.0, 0.86, 0.62) * uFlare * (0.08 + 0.5 * pow(max(dot(d, uFlareDir), 0.0), 6.0) + 1.3 * pow(max(dot(d, uFlareDir), 0.0), 48.0));
+  }
   gl_FragColor = vec4(col, 1.0);
   #include <colorspace_fragment>
 }
@@ -382,6 +388,9 @@ export interface HeartSky {
   /** Blend the main map's storm toward the Hammer's painted dusk (no-op with no
    *  painting: the painted kit has not landed). */
   setHammer(k: number): void;
+  /** The final boss's arrival: the sky flaring (0 to 1) round the beam, seen
+   *  from the camera along `dir` (a unit vector; read only when `k` > 0). */
+  setFlare(k: number, dir: { x: number; y: number; z: number }): void;
 }
 
 /** The dome (and the slot's frame driver). */
@@ -396,6 +405,8 @@ export function buildHeartSky(opts: HeartSkyOptions): HeartSky {
       uCoreHorizon: { value: new THREE.Color(HEART_CORE_FOG_COLOR) },
       uDetail: { value: opts.lowGfx ? 0.4 : 1 },
       uCore: { value: 0 },
+      uFlare: { value: 0 },
+      uFlareDir: { value: new THREE.Vector3(0, 1, 0) },
       uBreath: { value: 0 },
       uBreathHorizon: { value: new THREE.Color(SMITH_HEART_BREATH_FOG.color) },
       uQuench: { value: 0 },
@@ -438,8 +449,16 @@ export function buildHeartSky(opts: HeartSkyOptions): HeartSky {
   let quench = -1;
   let heat = -1;
   let hammer = -1;
+  let flare = 0;
   return {
     mesh,
+    setFlare(k, dir) {
+      const q = Math.round(k * 200) / 200;
+      if (q > 0) (material.uniforms.uFlareDir.value as THREE.Vector3).set(dir.x, dir.y, dir.z);
+      if (q === flare) return;
+      flare = q;
+      material.uniforms.uFlare.value = q;
+    },
     setHammer(k) {
       const q = opts.hammerSky ? Math.round(k * 200) / 200 : 0;
       if (q === hammer) return;

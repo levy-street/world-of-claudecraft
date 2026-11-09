@@ -590,6 +590,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/smith_heart_breath_guardian.glb": "/media/models/creatures/smith_heart_breath_guardian.7531ca1c57ae.glb",
   "models/creatures/smith_heart_heat_guardian.glb": "/media/models/creatures/smith_heart_heat_guardian.1779c45fcacd.glb",
   "models/creatures/smith_heart_masterless_strength.glb": "/media/models/creatures/smith_heart_masterless_strength.fe2c92391de1.glb",
+  "models/creatures/smith_heart_masterless_strength_arrival_anims.glb": "/media/models/creatures/smith_heart_masterless_strength_arrival_anims.d5381bf4b7ba.glb",
   "models/creatures/smith_heart_quench_guardian.glb": "/media/models/creatures/smith_heart_quench_guardian.f65bfcbd8669.glb",
   "models/creatures/spider.glb": "/media/models/creatures/spider.5becf8b6510f.glb",
   "models/creatures/spider_egg_sac.glb": "/media/models/creatures/spider_egg_sac.4a0b3718097e.glb",

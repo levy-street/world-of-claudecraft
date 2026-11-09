@@ -5,10 +5,10 @@
 // renders it through t(), with the English as the fallback and as the key its
 // voice clip is found by (scripts/voices/smith_heart_voice_pack.mjs).
 //
-//   the arrival  the heart wakes as the raid first stands in the Heart: three
-//                lines over the rebuild (ARRIVAL_LINE_AT, the renderer's
-//                arrival timeline: the heart rising, the stones tearing free,
-//                the shockwave), once a claim (a dev replay hears them again)
+//   the arrival  the heart wakes as the raid first stands in the Heart: two
+//                lines over the scene (ARRIVAL_LINE_AT, the renderer's
+//                arrival timeline: the whisper over the dormant statue, the
+//                roar), once a claim (a dev replay hears them again)
 //   pull         the pull
 //   drink*       it drinks a NEW quarter after the first (each at most once
 //                in DRINK_EVERY)
@@ -253,13 +253,17 @@ export function stepFinalVoice(s: FinalScope): void {
 
 // ---- the arrival -----------------------------------------------------------------------------
 
-/** Seconds after the heart wakes each arrival line is said: the heart rising
- *  out of its bed, the stones tearing free, the shockwave of the last lock
- *  (src/render/smith_heart_fx/final_fx_core.ts ARRIVAL, ARRIVAL_WAVE_AT). */
+/** Seconds after the heart wakes each arrival line is said: the waking
+ *  whisper over the dormant statue as the scene opens, the roar's line on
+ *  the roar (src/render/smith_heart_fx/final_arrival_core.ts ARRIVAL_VOICE,
+ *  pinned equal by tests/smith_heart_final_arrival.test.ts). The scene runs
+ *  about 11.5 s and the whisper alone fills 8.7 of it, so the rising line
+ *  (`arrivalRise`, 9 s of its own) is no longer said over it: one voice
+ *  queues behind another and a queued line stale past six seconds is
+ *  dropped (src/game/voice.ts), which would cost the roar its beat. */
 export const ARRIVAL_LINE_AT: readonly { at: number; moment: FinalMoment }[] = [
-  { at: 1.2, moment: 'arrivalWake' },
-  { at: 6.4, moment: 'arrivalRise' },
-  { at: 11.75, moment: 'arrivalRoar' },
+  { at: 0.3, moment: 'arrivalWake' },
+  { at: 9.45, moment: 'arrivalRoar' },
 ];
 
 /** A claim's arrival in progress: the claim time the heart woke and the next
@@ -267,8 +271,8 @@ export const ARRIVAL_LINE_AT: readonly { at: number; moment: FinalMoment }[] = [
  *  never inherits it). */
 const arrivals = new WeakMap<InstanceSlot, { exitId: number | null; from: number; next: number }>();
 
-/** The heart woke in this claim (the seal's arrival bit rose): its three
- *  lines follow over the rebuild. */
+/** The heart woke in this claim (the seal's arrival bit rose): its lines
+ *  follow over the scene. */
 export function beginArrivalVoice(ctx: SimContext, inst: InstanceSlot): void {
   arrivals.set(inst, { exitId: inst.exitId, from: ctx.time, next: 0 });
 }

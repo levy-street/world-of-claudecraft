@@ -852,26 +852,30 @@ reaches its quarter; the core's light rises from the bed, the shafts climb out o
 seal markers take the arrival bit (`SMITH_HEART_AWAKE_BIT`, 32) and keep it for the claim's
 life (`tickSmithHeartSeal`; no rng, no clock, no mob touched; `/dev heart arrival` replays it).
 The renderer's seal memory reads it (`awakeSince`): seen waking, the scene plays from there;
-first seen awake (a late arrival, a reconnect) it is long past and the body is whole. Online it
-rides the markers' template id like the veins (no wire change). The timeline (`ARRIVAL`,
-`final_fx_core.ts`): a breath while the hop's wash clears; a pillar of the heart's light stands
-up out of the chasm and the heart rides it up past the platform's far rim, swollen with light,
-and glides in over the platform; one by one the room's rocks (eleven resting on the walk
-between the altars and the channels, off the bridge's line, and ten shards under the lip)
-tremble, tear free of the paving with a burst of dust and broken stone (leaving a socket,
-carved into its quarter since phase 2L), lift, spiral in round the heart tumbling with a trail of light and lock into
-the body with a flash and a thread of a vein's light; as the last locks, the four-colour
-shockwave races over the platform and the chasm and the camera thuds (reduced motion drops
-the shakes). A pull during the scene runs it on to its end in under a second. Nothing is
-attached later than the interior and the effects' own gated root; the kit's pieces draw with
-the kit's own linked slot materials.
+first seen awake (a late arrival, a reconnect) it is long past and the boss stands. Online it
+rides the markers' template id like the veins (no wire change). The scene (Jose's approved
+concept of 2026-11-09, which replaced the flying-rock rebuild; `final_arrival_core.ts`, painted
+by `final_arrival_beam.ts`, the body by `final_body_fx.ts`), `ARRIVAL_END` long (inside the
+approved eight to twelve seconds, pinned) with no camera takeover: the boss kneels on the Anvil dormant, a cracked stone statue (its
+still `Dormant` clip, its colour dulled and its cracks black through a glow pulse); the four
+altars' veins light in their element colours one after another and their light runs down the
+channels across the floor to it; the four streams meet under it and fuse into one giant beam
+of light, a white-hot core in a swirl of the four colours, shooting far up into the sky
+(`ARRIVAL_BEAM`, many times the room's width) (the floor's shockwave in the four colours, the camera's thud, the sky flaring round the
+beam, `heart_arrival_light_core.ts`); the beam falls back down into the boss, its cracks fill
+with light and its eyes ignite; it pushes up off its knee (its `Rise` clip,
+`scripts/build_masterless_strength_arrival_anims.mjs`) and roars (its `Shift` clip) with a
+four-colour shockwave out over the raid. The sim says the waking whisper as it opens and the
+roar's line on the roar (`final_voice.ts` `ARRIVAL_LINE_AT`, pinned to `ARRIVAL_VOICE`); the
+rising line is no longer said over it (the whisper alone fills most of the scene and a queued
+line goes stale). There is no sim hold: a pull during the scene runs it on to its end in under
+a second, so the fight never waits on a show and the boss is never fought while it reads
+dormant. Every material is built under the effects' root before its gated attach.
 
-**The body.** A bodyless target (`smith_heart_colossus` in the manifest, its nameplate over the
-head) with a colossus of the kit's rock pieces bound to the crystal heart, some twenty yards
-tall: torso, hip, head with a crown of peaks and a cleft of light for eyes, shoulders, two arms
-on a two-bone reach, fists, a skirt of shards and more over its back; it hovers and breathes.
-Its joints and timeline are its own (`COLOSSUS_SLOTS`, `colossusArmIk`), so the final creature
-model (the official pipeline) replaces the pieces and keeps them.
+**The body.** (Replaced by its own rigged model in phase 2O, `final_body_fx.ts`; the rock
+pieces' body and their joints are gone since the 2026-11-09 arrival.) As first built: a
+bodyless target with a colossus of the kit's rock pieces bound to the crystal heart, some
+twenty yards tall, hovering and breathing.
 
 | Moment | Look |
 |---|---|
@@ -2310,7 +2314,7 @@ Every line is a boss yell with a stable key (`hudChrome.<boss>.say.<moment>`, En
 catalog, the five non-Latin locales filled); the client finds its clip by the English
 (`src/ui/hud_voice_cues.ts` `yellVoiceKey`). The Masterless Strength's voice is an observer
 (`final_voice.ts` `stepFinalVoice`): it reads the fight after each tick and changes nothing;
-its three arrival lines follow the renderer's rebuild (`ARRIVAL_LINE_AT`). A player's fall
+its two arrival lines follow the renderer's arrival scene (`ARRIVAL_LINE_AT`). A player's fall
 gets a kill line (`voice_slain.ts`: two or three variants in turn, at most one in
 `SLAY_EVERY` seconds a boss); signature barks repeat at most once in their boss's
 `SAY_EVERY`. In the client (`src/ui/voice_events.ts` `voicedYellMix`) a raid line is mastered
@@ -2428,10 +2432,13 @@ on both difficulties (dungeon rework README, goal 4).
 - `tests/smith_heart_arrival.test.ts`: the arrival bit (asleep on a fresh claim, set by the
   first living player in the Heart and kept, never by a corpse, no rng, the boss untouched,
   the dev replay, the readout).
-- `tests/smith_heart_final_fx.test.ts`: the boss's numbers read, the rest spots, the arrival's
-  order and timeline, the heart's rise, the arm's reach, the fist and the pour inside their
-  areas, the fall, the seal memory's arrival (live and late), the room's darkness, FinalFx
+- `tests/smith_heart_final_fx.test.ts`: the boss's numbers read, the arm's reach, the
+  heart going dark, the seal memory's arrival (live and late), the room's darkness, FinalFx
   over a fake world.
+- `tests/smith_heart_final_arrival.test.ts`: the arrival scene: its beats in order and
+  length, the veins' colours, paths and fronts, the beam's phases, the sky and the altars,
+  the body's stance and dark stone, the sim's lines on its beats, FinalFx playing it live,
+  a late arrival standing, a pull running it to its end, the old rebuild gone.
 - `tests/smith_heart_council.test.ts` (on `tests/helpers/council_fight.ts`): the Hammer
   Council over a real claim: two members and no Slabwright, one pull for both (and nothing
   else), the energy bar, the five columns as round walls, Wake the Stone's two pillars at the

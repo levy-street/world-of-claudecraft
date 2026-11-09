@@ -1165,6 +1165,7 @@ const RENDER_PURE_CORES = [
   // rock, the final boss's memory, its body and effects.
   'src/render/smith_heart/heart_room_kit_plan_core.ts',
   'src/render/smith_heart/heart_crown_core.ts',
+  'src/render/smith_heart/heart_arrival_light_core.ts',
   'src/render/smith_heart/heart_final_core.ts',
   // The Anvil of the World's quarters awake (phase 2K): the boss memory, the
   // floods, drains and shocks, the air's seeds.

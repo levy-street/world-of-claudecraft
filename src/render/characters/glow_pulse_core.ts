@@ -23,6 +23,11 @@ export interface GlowPulseDef {
   fall: number;
   /** The emissive multiplier at the top of the envelope (1 = authored). */
   peak: number;
+  /** The body's own colour multiplied by this at the top of the envelope (1 or
+   *  absent = authored): a body dimmed to dark stone (the Masterless
+   *  Strength's dormant statue). A uniform on the pulse's own clones, never a
+   *  program change. */
+  shade?: number;
 }
 
 export interface GlowPulseSet {
@@ -58,6 +63,21 @@ export function glowPulseEnvelope(p: GlowPulseDef, age: number): number {
 /** Seconds from a pulse's gesture until it is spent. */
 export function glowPulseSpan(p: GlowPulseDef): number {
   return (p.delay ?? 0) + p.rise + p.hold + p.fall;
+}
+
+/**
+ * The base-colour multiplier: 1 plus every live shading pulse's dip (0 to 1).
+ * `ages` as for glowPulseLevel.
+ */
+export function glowPulseShade(set: GlowPulseSet, ages: ArrayLike<number>): number {
+  let shade = 1;
+  for (let i = 0; i < set.pulses.length; i++) {
+    const p = set.pulses[i];
+    const age = ages[i];
+    if (p.shade === undefined || age === undefined || age < 0) continue;
+    shade += (p.shade - 1) * glowPulseEnvelope(p, age);
+  }
+  return Math.max(0, Math.min(1, shade));
 }
 
 /** Every pulse a gesture starts (indices into `set.pulses`). */

@@ -69,6 +69,12 @@ export const MASTERLESS_STRENGTH_CLIPS = [
   'Death',
 ] as const;
 
+/** The arrival's two authored clips (scripts/build_masterless_strength_
+ *  arrival_anims.mjs, sampled from Kneel, KneelIdle and Idle): the still
+ *  knee it waits dormant on and the heavy push back to its feet. */
+export const MASTERLESS_STRENGTH_ARRIVAL_URL = `${CREATURES}/smith_heart_masterless_strength_arrival_anims.glb`;
+export const MASTERLESS_STRENGTH_ARRIVAL_CLIPS = ['Dormant', 'Rise'] as const;
+
 /** A bar's clip rate so its contact beat lands on the bar's end. */
 const onBarEnd = (contact: number, bar: number) => (bar > 0 ? contact / bar : 1);
 
@@ -107,6 +113,15 @@ const KNEELING: ClipMap = {
   idle: 'KneelIdle',
   walk: 'KneelIdle',
   run: 'KneelIdle',
+};
+
+/** The arrival's opening (final_arrival_core.ts): on one knee, perfectly
+ *  still, a statue of cracked stone until the beam wakes it. */
+const DORMANT: ClipMap = {
+  ...BASE,
+  idle: 'Dormant',
+  walk: 'Dormant',
+  run: 'Dormant',
 };
 
 const TOGGLES: readonly MeshToggleDef[] = [
@@ -402,21 +417,38 @@ export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
   },
   smith_heart_masterless_strength: {
     url: MASTERLESS_STRENGTH_URL,
+    animUrls: [MASTERLESS_STRENGTH_ARRIVAL_URL],
     height: FINAL_BODY_HEIGHT,
     clips: BASE,
     phaseClips: {
       [FINAL_BODY_GESTURES.kneel]: { clips: KNEELING, enter: 'Kneel' },
       [FINAL_BODY_GESTURES.stand]: { clips: BASE },
+      // The arrival: dormant on its knee, then the push back to its feet.
+      [FINAL_BODY_GESTURES.dormant]: { clips: DORMANT },
+      [FINAL_BODY_GESTURES.rise]: { clips: BASE, enter: 'Rise' },
     },
     castClipSync: [FINAL_CASTS.fist, FINAL_CASTS.anvil, FINAL_CASTS.bolt],
     meshToggles: TOGGLES,
     glowPulses: {
       // The shell cracking before the element bursts out (final_body_core
       // FINAL_SHIFT.burst), the new body still white-hot after it.
-      pulses: [{ gesture: FINAL_BODY_GESTURES.charge, rise: 0.6, hold: 0.1, fall: 0.6, peak: 1.8 }],
+      // The arrival's dormant stone: the cracks black and the body dulled to
+      // dark stone while the gesture is re-sent (final_body_fx.ts), its
+      // colour and light filling back over the fall once it stops.
+      pulses: [
+        { gesture: FINAL_BODY_GESTURES.charge, rise: 0.6, hold: 0.1, fall: 0.6, peak: 1.8 },
+        {
+          gesture: FINAL_BODY_GESTURES.dark,
+          rise: 0,
+          hold: 1.0,
+          fall: 1.4,
+          peak: 0,
+          shade: 0.1,
+        },
+      ],
       deathFade: 3,
     },
-    oneShotsHoldAttacks: ['Shift'],
+    oneShotsHoldAttacks: ['Shift', 'Rise'],
     // Its stride: 4.8 model yards a cycle over 1.6 s at the drawn height.
     walkRef: 10,
     runRef: 10,
