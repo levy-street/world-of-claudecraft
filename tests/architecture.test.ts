@@ -1187,6 +1187,8 @@ const RENDER_PURE_CORES = [
   // The final boss's rebuild drawn into its own model.
   'src/render/smith_heart_fx/final_arrival_core.ts',
   'src/render/smith_heart_fx/quench_frost_fx_core.ts',
+  // Living Rime's crust and ring on its carrier.
+  'src/render/smith_heart_fx/quench_rime_core.ts',
   // The Quench's frost glaze painted on a body's own material.
   'src/render/smith_heart_fx/quench_glaze_core.ts',
   // A character drawn sunk into water it stands in.

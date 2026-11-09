@@ -19198,19 +19198,29 @@
   }
   #heart-quench-alert.is-freezing,
   #heart-quench-alert.is-frozen,
-  #heart-quench-alert.is-marked {
+  #heart-quench-alert.is-marked,
+  #heart-quench-alert.is-rime {
     border-color: var(--color-hostile);
   }
   #heart-quench-alert.is-freezing .fa-title,
   #heart-quench-alert.is-frozen .fa-title,
   #heart-quench-alert.is-marked .fa-title,
+  #heart-quench-alert.is-rime .fa-title,
   #heart-quench-alert.is-freezing .fa-fill,
   #heart-quench-alert.is-frozen .fa-fill,
   #heart-quench-alert.is-marked .fa-fill {
     color: var(--color-hostile);
     --bar-color: var(--color-hostile);
   }
-  #heart-quench-alert.is-freezing {
+  /* Living Rime: the bar is the crust's healing left, drawn in the frost
+     tone as it drains; the title in the hostile tone tells its carrier to
+     leave the group. */
+  #heart-quench-alert.is-rime .fa-fill {
+    color: var(--color-debuff-frost);
+    --bar-color: var(--color-debuff-frost);
+  }
+  #heart-quench-alert.is-freezing,
+  #heart-quench-alert.is-rime {
     animation: bce-throb 0.9s ease-in-out infinite alternate;
   }
   #heart-quench-alert.is-water {

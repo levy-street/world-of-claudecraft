@@ -105,6 +105,10 @@ const CLAIMED: ReadonlySet<string> = new Set([
   QUENCH_CUES.strikeReady,
   // ...and its avoided swing: the body brings her fists down itself.
   QUENCH_CUES.strikeSpent,
+  // Living Rime: its crust, its fall and its burst (quench_rime_fx.ts).
+  QUENCH_CUES.rime,
+  QUENCH_CUES.rimeBreak,
+  QUENCH_CUES.rimeBurst,
 ]);
 
 export function quenchFightClaims(ability: string | null | undefined): boolean {

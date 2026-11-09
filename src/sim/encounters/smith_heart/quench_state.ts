@@ -101,6 +101,14 @@ export interface QuenchFlurry {
   gap: number;
 }
 
+/** A player Living Rime holds (quench_rime.ts). */
+export interface QuenchRimeMark {
+  /** Its carrier's entity id. */
+  id: number;
+  /** Seconds left to heal it through before it bursts. */
+  remaining: number;
+}
+
 export interface QuenchFightState {
   kind: 'quench';
   difficulty: QuenchDifficulty;
@@ -135,6 +143,17 @@ export interface QuenchFightState {
   flurry: QuenchFlurry | null;
   /** The interphase has come (it comes once). */
   flurryDone: boolean;
+  /** Seconds to the next Living Rime. */
+  rimeTimer: number;
+  /** Living Rime casts so far (the salt of its picks). */
+  rimeCasts: number;
+  /** A dev run with Living Rime switched off (`/dev heart quench rime off`). */
+  rimeOff?: boolean;
+  /** The players Living Rime holds now. */
+  rimes: QuenchRimeMark[];
+  /** Living Rimes healed through and burst this pull (the readout, the tests). */
+  rimeBreaks: number;
+  rimeBursts: number;
   /** Mechanic casts started (the deterministic salt of every pick). */
   casts: number;
   /** Tempering Strike's wind-up already cued for the swing under way

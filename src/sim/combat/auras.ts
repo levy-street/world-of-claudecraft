@@ -62,6 +62,7 @@ import { secondBloomOnHotExpired } from './druid_second_bloom';
 import { sporemenderHealingDoneMult } from './druid_sporemender';
 import { applyGreaterInvisibilityAftereffect } from './greater_invisibility';
 import { consumeHealAbsorb } from './heal';
+import { noteHealTaken } from './heal_taken';
 import { isColdsightInternalMarkerAuraId } from './hunter_coldsight_read';
 import { hunterFocusRegenMult } from './hunter_fieldcraft';
 import {
@@ -455,6 +456,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
               const overheal = landing - healed;
               if (healed > 0 || absorbed > 0 || overheal > 0) {
                 if (healed > 0) src.hp += healed;
+                noteHealTaken(ctx, src, healed);
                 // A tick that landed as pure overheal still reports it for the
                 // meters and the parse, flagged hot so the client treats it as a
                 // silent passive tick; every other leech tick keeps its shape.
@@ -500,6 +502,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
           // overheal) so overheal totals cover the at-full-health case.
           if (healed > 0 || absorbed > 0 || overheal > 0) {
             if (healed > 0) e.hp += healed;
+            noteHealTaken(ctx, e, healed);
             ctx.emit({
               type: 'heal2',
               sourceId: a.sourceId,

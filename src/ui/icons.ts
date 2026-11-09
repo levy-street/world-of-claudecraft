@@ -2817,6 +2817,10 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   dgn_crypt_lantern: r('holy', 'holyGold', ['candle', { p: 'shield', ...BR }], ['glow']),
   dgn_crypt_embrace: r('frost', 'ice', ['hand', { p: 'snowflake', ...BR }], ['sparkle']),
   dgn_crypt_rime_path: r('frost', 'ice', ['snowflake', { p: 'boot', ...BR }], ['motion']),
+  // The Guardian of the Quench's Living Rime (encounters/smith_heart/quench_rime.ts):
+  // the crust that drinks healing (a frozen heart, cracking) and its slow.
+  heart_quench_rime: r('frost', 'ice', ['heart', { p: 'snowflake', ...BR }], ['crack']),
+  heart_quench_rime_slow: r('frost', 'ice', ['snowflake', { p: 'boot', ...BR }], ['motion']),
   dgn_crypt_bridal_freeze: r(
     'frost',
     'silverWhite',

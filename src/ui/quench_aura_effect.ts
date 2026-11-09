@@ -20,6 +20,11 @@ import type { AuraEffectDescriptor, AuraEffectInput } from './aura_effect';
 import { tierRange } from './heart_tier_damage';
 
 const KEY = 'hudChrome.auraEffect.quenchGuardian';
+const N = QUENCH_DIFFICULTY.normal;
+const H = QUENCH_DIFFICULTY.heroic;
+const M = QUENCH_DIFFICULTY.mythic;
+/** Living Warmth as "1 cold per X% of health healed" (whole percent). */
+const warmthPer = (rate: number): number => Math.round(1 / rate);
 
 const pct = (frac: number): number => Math.round(Math.abs(frac) * 100);
 /** Heroic's damage factor; Mythic shares it (pinned), so one range names both. */
@@ -44,6 +49,8 @@ export function quenchAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
           others: T.warmNeed,
           fall: T.coldFall,
           freeze: T.freezeSeconds,
+          healPct: warmthPer(N.lifeWarmth),
+          heroicHealPct: warmthPer(H.lifeWarmth),
         },
       };
     case QUENCH_AURAS.warmth:
@@ -108,6 +115,38 @@ export function quenchAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
           cold: T.crossCold,
           ...tierRange('heroic', T.crossMin, T.crossMax, HM),
         },
+      };
+    case QUENCH_AURAS.rime:
+      // On a raid frame the row carries no value, only the crust's left as a
+      // percent of its carrier's health (party_frame_info.ts).
+      if (a.poolPct !== undefined)
+        return {
+          key: `${KEY}.rimePool`,
+          nums: { pct: Math.round(a.poolPct), seconds: T.rimeSeconds, radius: T.rimeBurstR },
+        };
+      // The crust's left rides `value`, its whole `value2`; the burst's cold
+      // is the tier's splash, named per tier (Mythic shares Heroic's).
+      return {
+        key: `${KEY}.rime`,
+        nums: {
+          left: Math.max(0, Math.round(a.value ?? 0)),
+          whole: Math.max(0, Math.round(a.value2 ?? a.value ?? 0)),
+          seconds: T.rimeSeconds,
+          slow: pct(1 - T.rimeSlow),
+          mult: T.rimeColdMult,
+          radius: T.rimeBurstR,
+          cold: N.splashCold,
+          heroicCold: H.splashCold,
+          normalAbsorb: N.rimeAbsorb,
+          heroicAbsorb: H.rimeAbsorb,
+          heroicTargets: H.rimeTargets,
+          mythicTargets: M.rimeTargets,
+        },
+      };
+    case QUENCH_AURAS.rimeSlow:
+      return {
+        key: `${KEY}.rimeSlow`,
+        nums: { slow: pct(1 - T.rimeSlow), mult: T.rimeColdMult },
       };
     case QUENCH_AURAS.deepening:
       return {

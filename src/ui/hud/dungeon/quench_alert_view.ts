@@ -12,17 +12,20 @@
 //    until their slash has landed, the line how to lead it;
 //  - encased in rime (the freeze): the bar is the time to the shatter and
 //    the line tells the raid to step away;
-//  - under the ice (the water): the bar is the time to the climb out.
+//  - under the ice (the water): the bar is the time to the climb out;
+//  - Living Rime on them: the bar is the healing left to break it (it drains
+//    as the healers land), the label the number, the line the seconds before
+//    it bursts and its reach: leave the group.
 // It is a live gauge the player steers by (never advisory: the hints setting
 // does not hide it), shown the whole fight on every graphics tier. Priority:
-// the freeze over the water over the mark over the bar. The painter is the shared encounter
+// the freeze over the water over Living Rime over the mark over the bar. The painter is the shared encounter
 // alert's (encounter_alert_painter.ts); every decision is here.
 
 import { QUENCH_AURAS, QUENCH_TUNING as T } from '../../../sim/encounters/smith_heart/quench_ids';
 import { formatNumber, t } from '../../i18n';
 import type { EncounterAlertHidden, EncounterAlertLive } from './encounter_alert_view';
 
-export type QuenchAlertKind = 'cold' | 'freezing' | 'warm' | 'frozen' | 'water' | 'marked';
+export type QuenchAlertKind = 'cold' | 'freezing' | 'warm' | 'frozen' | 'water' | 'marked' | 'rime';
 
 /** Every kind class the painter toggles (the CSS keys on them). */
 export const QUENCH_ALERT_KINDS: readonly QuenchAlertKind[] = [
@@ -32,6 +35,7 @@ export const QUENCH_ALERT_KINDS: readonly QuenchAlertKind[] = [
   'frozen',
   'water',
   'marked',
+  'rime',
 ];
 
 /** Past this much cold (of 100) a rising bar is urgent. */
@@ -113,12 +117,39 @@ function markedView(mark: AlertAura): QuenchAlertLive {
   };
 }
 
+/** Living Rime on the player: the healing left to break it, the seconds to
+ *  its burst. */
+function rimeView(rime: AlertAura): QuenchAlertLive {
+  const full = Math.max(1, rime.value2 ?? rime.value ?? 1);
+  const left = Math.max(0, Math.min(full, rime.value ?? 0));
+  const title = t('hudChrome.quenchAlert.rimeTitle');
+  const nums = { left: whole(left), whole: whole(full) };
+  return {
+    visible: true,
+    kind: 'rime',
+    title,
+    line: t('hudChrome.quenchAlert.rimeLine', {
+      seconds: whole(Math.max(0, rime.remaining ?? 0)),
+      radius: whole(T.rimeBurstR),
+    }),
+    hint: '',
+    key: '',
+    progress: left / full,
+    progressAria: t('hudChrome.quenchAlert.rimeAria', nums),
+    barLabel: t('hudChrome.quenchAlert.rimeBar', nums),
+    pressable: false,
+    buttonAria: title,
+  };
+}
+
 export function buildQuenchAlertView(input: QuenchAlertInput): QuenchAlertView {
   if (input.dead) return HIDDEN;
   const frozen = auraOf(input.auras, QUENCH_AURAS.frozen);
   if (frozen) return timed('frozen', t('hudChrome.quenchAlert.frozenTitle'), frozen);
   const water = auraOf(input.auras, QUENCH_AURAS.trapped);
   if (water) return timed('water', t('hudChrome.quenchAlert.waterTitle'), water);
+  const rime = auraOf(input.auras, QUENCH_AURAS.rime);
+  if (rime) return rimeView(rime);
   const marked = auraOf(input.auras, QUENCH_AURAS.marked);
   if (marked) return markedView(marked);
   const cold = auraOf(input.auras, QUENCH_AURAS.cold);

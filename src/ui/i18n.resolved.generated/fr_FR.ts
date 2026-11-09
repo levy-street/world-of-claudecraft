@@ -4779,7 +4779,7 @@ export const fr_FR: EnTranslations = {
         "swell": "Every {every} sec the swelling storm deals {min} to {max} damage to everyone on the Cornice, {growth}% more for every pulse before it: {stacks} so far. Heroic and Mythic: {heroicMin} to {heroicMax} damage."
       },
       "quenchGuardian": {
-        "cold": "Your cold: {cold} of {max}. Alone it fills in about {fill} sec. Standing within {radius} yd of {others} or more other players lowers it by {fall} every second instead. Immunities such as Cold Coffin do not stop it: while one lasts you neither give nor take warmth. At {max} you are Encased in Rime for {freeze} sec, then the ice shatters.",
+        "cold": "Your cold: {cold} of {max}. Alone it fills in about {fill} sec. Standing within {radius} yd of {others} or more other players lowers it by {fall} every second instead. Living Warmth: healing you receive lowers it by 1 for every {healPct}% of your maximum health healed ({heroicHealPct}% on Heroic and Mythic). Immunities such as Cold Coffin do not stop it: while one lasts you neither give nor take warmth. At {max} you are Encased in Rime for {freeze} sec, then the ice shatters.",
         "warmth": "Huddled with the raid: your cold falls by {fall} every second. A huddle that stays on one spot for {linger} sec cracks the ice beneath it into a hole of freezing water, so keep moving.",
         "frozen": "Encased in rime: you cannot act and take {pct}% more damage from all sources, and the rime cracks immunities such as Cold Coffin. When it ends the ice shatters: you take {min} to {max} Frost damage, then take {brittle}% more damage for {seconds} sec, and everyone within {radius} yd of you gains {cold} cold ({heroicRadius} yd and {heroicCold} cold on Heroic). Heroic: {heroicMin} to {heroicMax} damage. Mythic: {mythicMin} to {mythicMax} damage.",
         "brittle": "Takes {pct}% more damage from all sources. While this lasts, a shattering ally's splash cannot take your cold past {cap}.",
@@ -4787,7 +4787,10 @@ export const fr_FR: EnTranslations = {
         "trapped": "Fallen through the ice into freezing water: you cannot move, you take {min} to {max} Frost damage every second and your cold rises. After {seconds} sec you climb out on the edge. The water alone never kills you. Heroic and Mythic: {heroicMin} to {heroicMax} damage.",
         "awake": "The Smith's four blades are awake. Each round more players are marked, and a blade flies across the lake down a line through each in turn. It locks {lock} sec before the blade flies, then strikes anyone on it for {min} to {max} Frost damage and adds {cold} cold. Heroic and Mythic: {heroicMin} to {heroicMax} damage.",
         "marked": "You are number {order} of {count}: a blade will fly across the lake down the line through you. Lead the line away from the raid. It locks {lock} sec before the blade flies, so step off then, or take {min} to {max} Frost damage and {cold} cold. Heroic and Mythic: {heroicMin} to {heroicMax} damage.",
-        "deepening": "The lake's cold rises {total}% faster: {step}% more every {every} sec since the blades woke ({stacks} so far)."
+        "deepening": "The lake's cold rises {total}% faster: {step}% more every {every} sec since the blades woke ({stacks} so far).",
+        "rime": "Living Rime absorbs the next {left} healing you receive ({whole} in all). While it holds you move {slow}% slower and your cold rises {mult} times as fast, so leave the group. Heal it through within {seconds} sec and it falls away. If not, you are Encased in Rime at once and the cold bursts on everyone within {radius} yd, adding {cold} cold ({heroicCold} on Heroic and Mythic). Normal: {normalAbsorb} on one player. Heroic: {heroicAbsorb} on {heroicTargets} players, and a burst leaps to the nearest other player with a fresh crust. Mythic: as Heroic, on {mythicTargets} players.",
+        "rimePool": "Living Rime: {pct}% of their maximum health in healing still to break it. Not healed through within {seconds} sec of landing, they freeze and the cold bursts on everyone within {radius} yd.",
+        "rimeSlow": "Slowed by Living Rime: you move {slow}% slower and your cold rises {mult} times as fast until the crust is healed through or bursts."
       },
       "heatGuardian": {
         "statePhase1": "Half sunk in its wellspring: it never moves. Basalt Fist slams a spot on the shore and three Molten Swells roll out from it, and Hearth Flare strikes everyone farther than {reach} yd from the wellspring. At 70% health it sinks and the Hearth overflows. Heroic deals {heroicPct}% more damage.",
@@ -7420,7 +7423,11 @@ export const fr_FR: EnTranslations = {
       "waterLine": "Climbing out in {seconds} sec",
       "coldBar": "Cold {cold} / {max}",
       "coldAria": "Cold {cold} of {max}",
-      "timeAria": "{seconds} seconds left"
+      "timeAria": "{seconds} seconds left",
+      "rimeTitle": "Living Rime! Leave the group",
+      "rimeLine": "Healers must break it in {seconds} sec or you freeze and burst within {radius} yd",
+      "rimeBar": "Rime {left} / {whole}",
+      "rimeAria": "Living Rime: {left} of {whole} healing left to break it"
     },
     "heatGuardian": {
       "warn": {

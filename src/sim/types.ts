@@ -8454,6 +8454,11 @@ export interface Entity extends ClientMirroredEntityFields {
    *  guardian: encounters/smith_heart/quench.ts). Server-local sim state:
    *  the client reads the fight from auras, bars and the fight's objects. */
   smithHeartQuench?: QuenchFightState;
+  /** Effective healing this body received and the tick it was last noted
+   *  (combat/heal_taken.ts: what the Guardian of the Quench's Living Warmth
+   *  reads once a tick). Transient sim state: never persisted, never wired. */
+  healTakenTick?: number;
+  healTakenAmount?: number;
   /** The Smith's Heart's Guardian of the Heat's fight state (on the guardian:
    *  encounters/smith_heart/heat.ts). Server-local sim state: the client
    *  reads the fight from its resource, auras, bars and the fight's objects. */

@@ -19,7 +19,11 @@
 //   the hunt     (mythic) The Blades Hunt: the blades waking to it, then a loop
 //                of circling blades while its bar runs; its own lines skip
 //                the slash's warning (the loop is the warning)
-//   the marks    a slash's mark on the local player, in their own ear
+//   the marks    a slash's mark and Living Rime on the local player, in
+//                their own ear
+//   the rime     Living Rime closing on a player (the rime's bite, brighter),
+//                healed through (a crust cracking off, light and high) and
+//                bursting (a shatter: the carrier frozen, the cold thrown)
 //
 // Every sample is the fight's own (`heart_quench_*`, scripts/sfx/
 // sfx_prompts.mjs and smith_heart_mechanic_sfx.mjs). Readable, punchy, never
@@ -63,6 +67,12 @@ export const QUENCH_CUE_SOUNDS: Readonly<Record<string, QuenchSound>> = {
   [QUENCH_CUES.thaw]: S('rim', 0.7, 'source', 0.85, 1),
   // The rime cracking an immunity (an Ice Block's stasis): its own take.
   [QUENCH_CUES.bite]: S('bite', 0.9, 'target', 1, 0.3),
+  // Living Rime: the crust closing (the bite's crack, brighter), falling away
+  // healed through (the same crack, light and high, cooled so a raid breaking
+  // three at once stays one voice), its burst (a shatter, a breath heavier).
+  [QUENCH_CUES.rime]: S('bite', 0.75, 'target', 1.18, 0.25),
+  [QUENCH_CUES.rimeBreak]: S('bite', 0.55, 'target', 1.45, 0.3),
+  [QUENCH_CUES.rimeBurst]: S('shatter', 1, 'point', 0.9, 0.12),
 };
 
 /** Is this event's ability one the fight's sound plays (the HUD's generic
@@ -132,6 +142,7 @@ export const QUENCH_HUNT_SOUNDS = {
 /** A slash's mark on the local player, in their own ear. */
 export const QUENCH_MARK_SOUNDS: Readonly<Record<string, HeartMarkSound>> = {
   [QUENCH_AURAS.marked]: HEART_MARK.frost,
+  [QUENCH_AURAS.rime]: HEART_MARK.frost,
 };
 
 /** Every sample the fight plays, for preloading once. */

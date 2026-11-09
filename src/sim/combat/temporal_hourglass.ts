@@ -4,6 +4,7 @@ import type { SimContext } from '../sim_context';
 import { type AbilityEffect, DT, type Entity, type Vec3 } from '../types';
 import { onCraftedCollectionHeal } from './crafted_collection_effects';
 import { consumeHealAbsorb, healingTakenMult } from './heal';
+import { noteHealTaken } from './heal_taken';
 
 export const TEMPORAL_HOURGLASS_ID = 'temporal_hourglass';
 
@@ -56,6 +57,7 @@ export function tickTemporalHourglassHealing(
   if (healed <= 0 && absorbed <= 0) return;
 
   if (healed > 0) target.hp += healed;
+  noteHealTaken(ctx, target, healed);
   const overheal = landing - healed;
   ctx.emit({
     type: 'heal2',

@@ -4779,7 +4779,7 @@ export const zh_CN: EnTranslations = {
         "swell": "每{every}秒，膨胀的风暴对崖台上的所有人造成{min}到{max}点伤害，之前每次脉动使其增强{growth}%：目前已有{stacks}次。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。"
       },
       "quenchGuardian": {
-        "cold": "你的寒意：{cold}/{max}。独自一人时约{fill}秒充满。若{radius}码内有{others}名或更多其他玩家，则改为每秒下降{fall}。寒冰棺等免疫效果无法阻止它：免疫期间你既不提供也不获得温暖。达到{max}时你会被冰霜封住{freeze}秒，随后冰层碎裂。",
+        "cold": "你的寒意：{cold}/{max}。独自一人时约{fill}秒充满。若{radius}码内有{others}名或更多其他玩家，则改为每秒下降{fall}。生命之暖：你受到的治疗每达到最大生命值的{healPct}%，寒意降低1（英雄和史诗难度为每{heroicHealPct}%）。寒冰棺等免疫效果无法阻止它：免疫期间你既不提供也不获得温暖。达到{max}时你会被冰霜封住{freeze}秒，随后冰层碎裂。",
         "warmth": "与团队相拥取暖：寒意每秒下降{fall}。在同一处停留{linger}秒的人群，脚下冰面会裂成冰冷的水洞，所以要不断移动。",
         "frozen": "被冰霜封住：你无法行动，受到的所有伤害提高{pct}%，冰霜会击碎寒冰棺等免疫效果。效果结束时冰层碎裂：你受到{min}到{max}点冰霜伤害，随后{seconds}秒内受到的伤害提高{brittle}%，{radius}码内的所有人获得{cold}点寒意（英雄难度为{heroicRadius}码、{heroicCold}点寒意）。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。",
         "brittle": "受到的所有伤害提高{pct}%。此效果持续期间，队友碎冰的溅射无法让你的寒意超过{cap}。",
@@ -4787,7 +4787,10 @@ export const zh_CN: EnTranslations = {
         "trapped": "踏穿冰面掉进冰冷的水中：无法移动，每秒受到{min}到{max}点冰霜伤害，寒意不断上升。{seconds}秒后你会爬上岸边。仅凭冰水绝不会致死。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。",
         "awake": "铸匠的四把利刃已苏醒。每一轮会有更多玩家被标记，利刃依次沿穿过他们的直线飞出。直线在利刃飞出前{lock}秒锁定，随后对线上的目标造成{min}到{max}点冰霜伤害，增加{cold}点寒冷。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。",
         "marked": "你是{count}人中的第{order}个：利刃将沿穿过你的直线飞来。把直线引离团队。直线在利刃飞出前{lock}秒锁定，届时请离开，否则将受到{min}到{max}点冰霜伤害和{cold}点寒冷。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。",
-        "deepening": "湖的寒意上升快了{total}%：自刃苏醒后每{every}秒再快{step}%（目前{stacks}次）。"
+        "deepening": "湖的寒意上升快了{total}%：自刃苏醒后每{every}秒再快{step}%（目前{stacks}次）。",
+        "rime": "活体霜壳吸收你受到的接下来{left}点治疗（共{whole}点）。存在期间你的移动速度降低{slow}%，寒意上升速度变为{mult}倍，所以请离开队伍。在{seconds}秒内用治疗将其击碎即可消失。否则你会立刻被冰霜封住，寒意在{radius}码内爆发，使所有人获得{cold}点寒意（英雄和史诗难度为{heroicCold}点）。普通难度：1名玩家，{normalAbsorb}点。英雄难度：{heroicTargets}名玩家，各{heroicAbsorb}点，爆发后会以新的霜壳跳到最近的另一名玩家身上。史诗难度：同英雄难度，{mythicTargets}名玩家。",
+        "rimePool": "活体霜壳：还需要相当于其最大生命值{pct}%的治疗才能击碎。施加后{seconds}秒内未被击碎，其将被冰霜封住，寒意在{radius}码内对所有人爆发。",
+        "rimeSlow": "被活体霜壳减速：在霜壳被治疗击碎或爆发前，你的移动速度降低{slow}%，寒意上升速度变为{mult}倍。"
       },
       "heatGuardian": {
         "statePhase1": "半身沉在涌泉之中，从不移动。玄武岩之拳砸向岸上的一点，三道熔岩涌浪从那里滚滚而出；炉心闪焰会击中所有距离涌泉超过{reach}码的人。生命值降到70%时它会沉下，炉心随之满溢。英雄难度下伤害提高{heroicPct}%。",
@@ -7420,7 +7423,11 @@ export const zh_CN: EnTranslations = {
       "waterLine": "{seconds}秒后爬上岸",
       "coldBar": "寒意 {cold} / {max}",
       "coldAria": "寒意 {cold}/{max}",
-      "timeAria": "剩余{seconds}秒"
+      "timeAria": "剩余{seconds}秒",
+      "rimeTitle": "活体霜壳！离开队伍",
+      "rimeLine": "治疗者须在{seconds}秒内将其击碎，否则你会冻结并在{radius}码内爆发",
+      "rimeBar": "霜壳 {left} / {whole}",
+      "rimeAria": "活体霜壳：还需{left}/{whole}点治疗才能击碎"
     },
     "heatGuardian": {
       "warn": {

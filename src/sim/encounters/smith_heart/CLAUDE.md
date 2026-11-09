@@ -54,6 +54,8 @@ Quench's, then the Heat's, then the Masterless Strength's, then the seal and the
 | `quench_state.ts` | Type-only: `QuenchFightState` (`Entity.smithHeartQuench` on the guardian). |
 | `quench_scope.ts` | The per-tick scope: the players on the lake and its listeners, the bar, the planted hold, the rolls, the frost hit and the never-lethal hit (`survivableHit`), the tick's splashed set. The fight calls NO raid warning banner (the owner's rule of 2026-11-04). |
 | `quench_cold.ts` | The cold bar (an aura: `value` the bar, `value2` its trend), the huddle's warmth, Encased in Rime (the freeze with its double damage, the shatter and its bounded splash with the Rime Splash mark, Frost-Brittle) and Deepening Cold. |
+| `quench_rime.ts` | Living Rime (the review of 2026-11-09): the cast every 25 s on the row's `rimeTargets` (never the active tank, the frozen, the trapped, the rimed or a slash's mark), the `heal_absorb` crust of `rimeAbsorb` and its slow, its clock (the auras never lapse first), healed through (it falls), not healed through or frozen first (the freeze, the 6 yd burst through `quench_cold.ts` `splashRound`, the row's `rimeLeap` to the nearest other player). The doubled cold rise is the cold's own (`quench_cold.ts`). |
+| `quench_life_warmth.ts` | Living Warmth: healing a player received this tick (`combat/heal_taken.ts`, effective healing only) lowers their cold by the row's `lifeWarmth` per 1% of their maximum health; runs before the cold's tick. |
 | `quench_bite.ts` | Immunities are no warmth: `warded` (a stasis or a damage immunity: no warmth given or taken) and `biteThrough` (the rime cracks a breakable stasis as its wearer freezes, stays frozen or shatters). |
 | `quench_cold_dev.ts` | The cold's dev verbs (`/dev heart quench immune|splash|chain|huddle`), routed by `quenchDevTrigger`. |
 | `quench_ice.ts` | The ice under a huddle: the strain, the cracks, the holes (they stay; capped), Under the Ice (the trap, the climb out, the grace). |
@@ -134,7 +136,8 @@ Rules:
   `tests/smith_heart_breath_wire.test.ts`, `tests/smith_heart_breath_void.test.ts`, `tests/smith_heart_breath_heart.test.ts`, `tests/smith_heart_breath_isles.test.ts` (the isles, the rides, the channeled cradle, the Summit Roar), `tests/wind_drift.test.ts`,
   `tests/wind_drift_online.test.ts`; the Quench: `tests/smith_heart_quench.test.ts` (on
   `tests/helpers/quench_fight.ts`), `tests/smith_heart_quench_ui.test.ts`,
-  `tests/smith_heart_quench_wire.test.ts`, `tests/quench_water_online.test.ts`; the Heat:
+  `tests/smith_heart_quench_wire.test.ts`, `tests/quench_water_online.test.ts`,
+  `tests/smith_heart_quench_rime.test.ts` (Living Rime and Living Warmth); the Heat:
   `tests/smith_heart_heat.test.ts` (on `tests/helpers/heat_fight.ts`),
   `tests/smith_heart_heat_ui.test.ts`, `tests/smith_heart_heat_wire.test.ts`; the Masterless Strength: `tests/smith_heart_final.test.ts` (on `tests/helpers/final_fight.ts`: the rules, the kits per tier, determinism, the headless full fight), `tests/smith_heart_final_ui.test.ts` (warnings, tooltips, the Overload HUD, the alert), `tests/smith_heart_final_wire.test.ts` (the online mirror), `tests/smith_heart_final_dev.test.ts`; part 2: `tests/smith_heart_final_phase.test.ts` (the intermissions, each Splinter, the final phase, the poured elements, determinism, the full fight 100 to 0 per tier), `tests/smith_heart_final_phase_ui.test.ts`, `tests/smith_heart_final_phase_wire.test.ts`; the tier pools: `tests/smith_heart_tier_health.test.ts`; the voices: `tests/smith_heart_voice.test.ts`. A live raid of bots fights every boss over a dev server:
   `scripts/heart_raid.mjs` (`BOSS=council|breath|quench|heat|final`; the shared raid

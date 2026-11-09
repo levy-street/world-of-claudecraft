@@ -23220,7 +23220,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchGuardian.say.wipe': '靜止。無聲。淬火已成。',
   'hudChrome.quenchGuardian.say.death': '寒意……放手了……淬火歸你們了。',
   'hudChrome.auraEffect.quenchGuardian.cold':
-    '你的寒意：{cold}/{max}。獨自一人時約{fill}秒充滿。若{radius}碼內有{others}名或更多其他玩家，則改為每秒下降{fall}。寒冰棺等免疫效果無法阻止它：免疫期間你既不提供也不獲得溫暖。達到{max}時你會被冰霜封住{freeze}秒，隨後冰層碎裂。',
+    '你的寒意：{cold}/{max}。獨自一人時約{fill}秒充滿。若{radius}碼內有{others}名或更多其他玩家，則改為每秒下降{fall}。生命之暖：你受到的治療每達到最大生命值的{healPct}%，寒意降低1（英雄和傳奇難度為每{heroicHealPct}%）。寒冰棺等免疫效果無法阻止它：免疫期間你既不提供也不獲得溫暖。達到{max}時你會被冰霜封住{freeze}秒，隨後冰層碎裂。',
   'hudChrome.auraEffect.quenchGuardian.warmth':
     '與團隊相擁取暖：寒意每秒下降{fall}。在同一處停留{linger}秒的人群，腳下冰面會裂成冰冷的水洞，所以要不斷移動。',
   'hudChrome.auraEffect.quenchGuardian.frozen':
@@ -23251,6 +23251,20 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchAlert.coldBar': '寒意 {cold} / {max}',
   'hudChrome.quenchAlert.coldAria': '寒意 {cold}/{max}',
   'hudChrome.quenchAlert.timeAria': '剩餘{seconds}秒',
+  'hudChrome.auraEffect.quenchGuardian.rime':
+    '活體霜殼吸收你受到的接下來{left}點治療（共{whole}點）。存在期間你的移動速度降低{slow}%，寒意上升速度變為{mult}倍，所以請離開隊伍。在{seconds}秒內用治療將其擊碎即可消失。否則你會立刻被冰霜封住，寒意在{radius}碼內爆發，使所有人獲得{cold}點寒意（英雄和傳奇難度為{heroicCold}點）。普通難度：1名玩家，{normalAbsorb}點。英雄難度：{heroicTargets}名玩家，各{heroicAbsorb}點，爆發後會以新的霜殼跳到最近的另一名玩家身上。傳奇難度：同英雄難度，{mythicTargets}名玩家。',
+  'hudChrome.auraEffect.quenchGuardian.rimePool':
+    '活體霜殼：還需要相當於其最大生命值{pct}%的治療才能擊碎。施加後{seconds}秒內未被擊碎，其將被冰霜封住，寒意在{radius}碼內對所有人爆發。',
+  'hudChrome.auraEffect.quenchGuardian.rimeSlow':
+    '被活體霜殼減速：在霜殼被治療擊碎或爆發前，你的移動速度降低{slow}%，寒意上升速度變為{mult}倍。',
+  'hudChrome.quenchAlert.rimeTitle':
+    '活體霜殼！離開隊伍',
+  'hudChrome.quenchAlert.rimeLine':
+    '治療者須在{seconds}秒內將其擊碎，否則你會凍結並在{radius}碼內爆發',
+  'hudChrome.quenchAlert.rimeBar':
+    '霜殼 {left} / {whole}',
+  'hudChrome.quenchAlert.rimeAria':
+    '活體霜殼：還需{left}/{whole}點治療才能擊碎',
   'hudChrome.heatGuardian.say.pull': '你們走進了最初的火焰。沒有什麼能毫無改變地離開。',
   'hudChrome.heatGuardian.say.wipe': '都化為灰燼吧。爐心依舊燃燒。',
   'hudChrome.heatGuardian.say.death': '火焰……沉回……岩石之中。好好帶著它。',

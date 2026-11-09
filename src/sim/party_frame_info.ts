@@ -6,6 +6,7 @@ import { isPlayingDead } from './combat/hunter_play_dead';
 import { rewindHealAmount } from './combat/rewind';
 import { MENDING_CURRENT_ID } from './combat/shaman_spiritmend';
 import type { Role } from './content/talents';
+import { QUENCH_AURAS } from './encounters/smith_heart/quench_ids';
 import type { SimContext } from './sim_context';
 import type { AbilityEffect, Aura, Entity, PlayerClass } from './types';
 import { PARTY_MEMBER_AURA_CAP } from './types';
@@ -27,10 +28,15 @@ export interface PreparedPartyFrameAura {
   sourceId: number;
 }
 
+/** A pool a raid frame badges as a whole percent of the member's maximum
+ * health: Mending Current's banked healing, and the healing Living Rime still
+ * needs before it breaks (the Guardian of the Quench's heal absorb). */
+const POOL_BADGE_IDS: ReadonlySet<string> = new Set([MENDING_CURRENT_ID, QUENCH_AURAS.rime]);
+
 /** Perform the relevance, priority, and summary work once before applying a
  * viewer-specific Temporal Echo visibility filter. */
 function mendingPoolPct(aura: Aura, maxHp: number | undefined): number | undefined {
-  if (aura.id !== MENDING_CURRENT_ID || aura.value <= 0 || !maxHp || maxHp <= 0) return undefined;
+  if (!POOL_BADGE_IDS.has(aura.id) || aura.value <= 0 || !maxHp || maxHp <= 0) return undefined;
   return Math.max(1, Math.min(100, Math.round((aura.value / maxHp) * 100)));
 }
 

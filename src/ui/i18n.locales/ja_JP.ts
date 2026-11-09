@@ -22703,7 +22703,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchGuardian.say.wipe': '静まり、黙し、焼き入れられた。',
   'hudChrome.quenchGuardian.say.death': '冷気が……離れていく……焼き入れはお前たちのものだ。',
   'hudChrome.auraEffect.quenchGuardian.cold':
-    'あなたの冷気：{max}中{cold}。ひとりでいると約{fill}秒で満ちる。{radius}ヤード以内に他のプレイヤーが{others}人以上いれば、代わりに毎秒{fall}ずつ下がる。冷たき棺などの無敵効果では止められない：効果中は温もりを与えることも受けることもできない。{max}に達すると{freeze}秒間霜に閉ざされ、その後氷が砕ける。',
+    'あなたの冷気：{max}中{cold}。ひとりでいると約{fill}秒で満ちる。{radius}ヤード以内に他のプレイヤーが{others}人以上いれば、代わりに毎秒{fall}ずつ下がる。命の温もり：受けた回復は、最大体力の{healPct}%ごとに冷気を1下げる（ヒロイックとミシックでは{heroicHealPct}%ごと）。冷たき棺などの無敵効果では止められない：効果中は温もりを与えることも受けることもできない。{max}に達すると{freeze}秒間霜に閉ざされ、その後氷が砕ける。',
   'hudChrome.auraEffect.quenchGuardian.warmth':
     'レイドと身を寄せ合っている：冷気が毎秒{fall}ずつ下がる。同じ場所に{linger}秒とどまった集団の下では氷が割れ、凍てつく水の穴が開く。動き続けよう。',
   'hudChrome.auraEffect.quenchGuardian.frozen':
@@ -22735,6 +22735,20 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchAlert.coldBar': '冷気 {cold} / {max}',
   'hudChrome.quenchAlert.coldAria': '冷気 {max}中{cold}',
   'hudChrome.quenchAlert.timeAria': '残り{seconds}秒',
+  'hudChrome.auraEffect.quenchGuardian.rime':
+    '生ける霧氷が、次に受ける回復を{left}吸収する（全体で{whole}）。残っている間、移動速度が{slow}%低下し、冷気が{mult}倍の速さで上がるので、グループから離れろ。{seconds}秒以内に回復で砕けば消える。砕けなければ即座に霜に閉ざされ、{radius}ヤード以内の全員に冷気が弾けて{cold}を加える（ヒロイックとミシックでは{heroicCold}）。ノーマル：1人に{normalAbsorb}。ヒロイック：{heroicTargets}人に{heroicAbsorb}、弾けると最も近い別のプレイヤーに新たな霧氷が移る。ミシック：ヒロイックと同じで{mythicTargets}人。',
+  'hudChrome.auraEffect.quenchGuardian.rimePool':
+    '生ける霧氷：砕くにはあと最大体力の{pct}%分の回復が必要。付与から{seconds}秒以内に砕けなければ、霜に閉ざされ、{radius}ヤード以内の全員に冷気が弾ける。',
+  'hudChrome.auraEffect.quenchGuardian.rimeSlow':
+    '生ける霧氷で鈍っている：霧氷が回復で砕けるか弾けるまで、移動速度が{slow}%低下し、冷気が{mult}倍の速さで上がる。',
+  'hudChrome.quenchAlert.rimeTitle':
+    '生ける霧氷！グループから離れろ',
+  'hudChrome.quenchAlert.rimeLine':
+    '{seconds}秒以内にヒーラーが砕かなければ、凍りついて{radius}ヤード内に弾ける',
+  'hudChrome.quenchAlert.rimeBar':
+    '霧氷 {left} / {whole}',
+  'hudChrome.quenchAlert.rimeAria':
+    '生ける霧氷：砕くまで残り{left}/{whole}の回復',
   'hudChrome.heatGuardian.say.pull':
     'お前たちは最初の炎へ踏み込んだ。何ものも変わらずには出られぬ。',
   'hudChrome.heatGuardian.say.wipe': '灰だ、一人残らず。炉床は燃え続ける。',

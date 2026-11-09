@@ -80,6 +80,8 @@ import {
   warmthLinks,
 } from './quench_fight_fx_core';
 import { QuenchFrostFx } from './quench_frost_fx';
+import { QUENCH_RIME_POOLS as RIME_POOLS } from './quench_rime_core';
+import { QuenchRimeFx } from './quench_rime_fx';
 
 const SCAN_SEC = 0.1;
 
@@ -307,6 +309,8 @@ export class QuenchFightFx {
   private readonly audio = new QuenchAudio(sfx);
   /** The frost pass on the bodies (quench_frost_fx.ts). */
   private readonly frost: QuenchFrostFx;
+  /** Living Rime on its carriers (quench_rime_fx.ts). */
+  readonly rime: QuenchRimeFx;
   // The footprints (every tier).
   private readonly crackFans: FanSlot[] = [];
   private readonly splashFans: FanSlot[] = [];
@@ -331,6 +335,7 @@ export class QuenchFightFx {
   readonly warmIds: number[] = [];
   readonly frozenIds: number[] = [];
   private readonly trappedIds: number[] = [];
+  private readonly rimeIds: number[] = [];
   private readonly warmBodies: WarmBody[] = [];
   private readonly linkPairs = new Int16Array(P.links * 2);
   /** When each frozen player was first seen frozen (id to clock). */
@@ -401,6 +406,19 @@ export class QuenchFightFx {
     };
     fans(P.cracks, 8, this.crackFans, 360, C.danger, 'crack');
     fans(P.frozen, 10, this.splashFans, 360, C.danger, 'splash');
+    // Living Rime's ring is the shatter's (one language: cold about to burst).
+    this.rime = new QuenchRimeFx(
+      this.root,
+      this.kit,
+      () => {
+        const fan = this.kit.fan(10);
+        this.kit.layOutFan(fan, 360, { color: C.danger, accent: C.accent });
+        paints.dress(fan, 'splash');
+        return fan;
+      },
+      this.particles,
+      (x, z) => this.groundY(x, z),
+    );
     for (let i = 0; i < P.lanes; i++) {
       const lane = this.kit.lane(11);
       lane.group.visible = false;
@@ -646,6 +664,7 @@ export class QuenchFightFx {
     if (!this.world || this.disposed) return false;
     this.audio.event(ev, this.lookup, this.groundAt);
     this.frost.event(ev, this.world, this.clock);
+    this.rime.event(ev, this.world);
     if (ev.type === 'spellfxAt') {
       if (!quenchFightClaims(ev.ability)) return false;
       const r = ev.radius ?? 3;
@@ -688,6 +707,7 @@ export class QuenchFightFx {
     this.paintObjects(world);
     this.paintBodies(world, dt);
     this.frost.frame(world, this, dt, this.clock);
+    this.rime.frame(world, this.rimeIds, this.clock);
     this.paintRim(world);
     this.particles.update(this.clock);
     const guardian = this.guardianId >= 0 ? (world.entities.get(this.guardianId) ?? null) : null;
@@ -727,6 +747,7 @@ export class QuenchFightFx {
     this.warmIds.length = 0;
     this.frozenIds.length = 0;
     this.trappedIds.length = 0;
+    this.rimeIds.length = 0;
     this.guardianId = -1;
     for (let i = 0; i < this.candidateIds.length; i++) {
       const e = world.entities.get(this.candidateIds[i]);
@@ -745,6 +766,8 @@ export class QuenchFightFx {
             this.frozenIds.push(e.id);
           else if (a.id === QUENCH_AURAS.trapped && this.trappedIds.length < P.trapped)
             this.trappedIds.push(e.id);
+          else if (a.id === QUENCH_AURAS.rime && this.rimeIds.length < RIME_POOLS.carriers)
+            this.rimeIds.push(e.id);
         }
       }
     }
@@ -854,6 +877,7 @@ export class QuenchFightFx {
     }
     this.rimFalling = -1;
     this.frost.clear();
+    this.rime.clear();
     for (const mesh of [
       this.holes,
       this.cracks,
@@ -1345,6 +1369,7 @@ export class QuenchFightFx {
     this.root.removeFromParent();
     this.particles.dispose();
     this.frost.dispose();
+    this.rime.dispose();
     this.kit.dispose();
     for (const g of this.geometries) g.dispose();
     for (const m of this.materials) m.dispose();

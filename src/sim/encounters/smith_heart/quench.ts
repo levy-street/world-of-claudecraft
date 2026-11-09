@@ -21,6 +21,12 @@
 //                      awake, and on heroic.
 //   Phase 2 (50-0)     all four blades awake; the cold deepens every 20 s (the
 //                      soft enrage).
+//   Living Rime        every 25 s a crust of living ice drinks the healing of
+//                      1 (Heroic 2, Mythic 3) players (quench_rime.ts): heal
+//                      it through in 10 s or its carrier freezes and the cold
+//                      bursts round them (Heroic: it leaps on).
+//   Living Warmth      healing a player receives lowers their cold
+//                      (quench_life_warmth.ts; half on Heroic).
 //   Heroic             a shatter splashes further and harder (contagious cold).
 //   Mythic             one blade makes a whole round, each slash from where the
 //                      last one ended; at a quarter health, The Blades Hunt
@@ -79,7 +85,9 @@ import {
   type QuenchDifficulty,
   QUENCH_TUNING as T,
 } from './quench_ids';
+import { stepLifeWarmth } from './quench_life_warmth';
 import { dropRim, raiseRim, stepRim } from './quench_rim';
+import { castRime, clearRime, clearRimeMarks, setRime, stepRime } from './quench_rime';
 import {
   at,
   dropAura,
@@ -109,6 +117,10 @@ export function setQuenchDevTier(inst: InstanceSlot, tier: 'heroic' | 'mythic', 
   if (on && inst.exitId !== null) devTier.set(inst, { exitId: inst.exitId, tier });
   else if (devTier.get(inst)?.tier === tier) devTier.delete(inst);
 }
+
+/** Claims a dev run switched Living Rime off in (`/dev heart quench rime
+ *  off`: a bot raid's comparison run without it). Dev-gated by its caller. */
+const devRimeOff = new WeakSet<InstanceSlot>();
 
 /** The fight's difficulty in a claim. */
 export function quenchDifficulty(inst: InstanceSlot): QuenchDifficulty {
@@ -166,6 +178,12 @@ function freshState(
     slash: null,
     flurry: null,
     flurryDone: false,
+    rimeTimer: T.rimeFirst,
+    rimeCasts: 0,
+    ...(devRimeOff.has(inst) ? { rimeOff: true } : {}),
+    rimes: [],
+    rimeBreaks: 0,
+    rimeBursts: 0,
     casts: 0,
     said: {},
     slain: freshSlainWatch(),
@@ -265,6 +283,7 @@ function clearFight(
       clearColdMarks(p);
       dropAura(p, QUENCH_AURAS.trapped);
     }
+    clearRime({ ctx, st });
     clearIce({ ctx, inst, st });
     clearSlashes({ ctx, inst }, st);
     clearFlurry({ ctx, inst }, st);
@@ -277,6 +296,7 @@ function clearFight(
   }
   for (const p of lakeListeners(ctx, inst)) {
     clearColdMarks(p);
+    clearRimeMarks(p);
     dropAura(p, QUENCH_AURAS.trapped);
   }
   clearCastIf(boss, QUENCH_CASTS.breath, QUENCH_CASTS.wake, QUENCH_CASTS.flurry);
@@ -359,7 +379,9 @@ export function tickQuenchGuardian(ctx: SimContext, inst: InstanceSlot): void {
   st.clock += DT;
   stepRim(s);
   stepBar(s);
+  stepLifeWarmth(s);
   stepCold(s);
+  stepRime(s);
   stepIce(s);
   stepSlashes(s);
   stepFlurry(s);
@@ -436,6 +458,13 @@ export function quenchDevTrigger(
       ? `The Guardian of the Quench fights on ${verb} for this run.`
       : `The Guardian of the Quench fights on ${quenchDifficulty(inst)}.`;
   }
+  if (verb === 'rime' && (arg === 'off' || arg === 'on')) {
+    if (arg === 'off') devRimeOff.add(inst);
+    else devRimeOff.delete(inst);
+    const live = quenchGuardian(ctx, inst)?.smithHeartQuench;
+    if (live) live.rimeOff = arg === 'off' ? true : undefined;
+    return `Living Rime is ${arg} for this run.`;
+  }
   const s = quenchScopeForDev(ctx, inst);
   if (!s) return 'This run holds no living Guardian of the Quench.';
   const me = ctx.entities.get(pid);
@@ -470,6 +499,19 @@ export function quenchDevTrigger(
     cutBar(s);
     s.boss.castingAbility = null;
     return startFlurry(s) ? 'The Blades Hunt.' : 'It is under way, or a blade is in flight.';
+  }
+  if (verb === 'rime') {
+    // `rime`: Living Rime on you; `rime cast`: her own cast, her own picks.
+    if (arg === 'cast') {
+      const took = castRime(s);
+      return took.length > 0
+        ? `Living Rime takes ${took.map((p) => p.name).join(', ')}.`
+        : 'Nobody she may take stands on the lake.';
+    }
+    if (!me || me.dead) return 'You are not standing on the lake.';
+    return setRime(s, me, s.boss)
+      ? `Living Rime closes on you: heal through ${s.rules.rimeAbsorb} in ${T.rimeSeconds} s.`
+      : 'It does not take (an immunity holds it off).';
   }
   if (verb === 'slash') {
     if (!s.st.blades.some((b) => b.awake)) wakeNow(s);
@@ -510,5 +552,5 @@ export function quenchReadout(ctx: SimContext, inst: InstanceSlot, pid: number):
   if (!st)
     return `${head}; not fighting (${claimBlades(ctx, inst).filter(Boolean).length} blades).`;
   const mine = st.chill[pid];
-  return `${head}; ${st.half}, your cold ${mine ? Math.round(mine.cold) : 0}, holes ${st.holes.length}, cracks ${st.cracks.length}, breath in ${Math.max(0, st.breathTimer).toFixed(0)} s, deepening ${st.deepenStacks}.`;
+  return `${head}; ${st.half}, your cold ${mine ? Math.round(mine.cold) : 0}, holes ${st.holes.length}, cracks ${st.cracks.length}, breath in ${Math.max(0, st.breathTimer).toFixed(0)} s, deepening ${st.deepenStacks}, rime in ${Math.max(0, st.rimeTimer).toFixed(0)} s (on ${st.rimes.length}, healed ${st.rimeBreaks}, burst ${st.rimeBursts}).`;
 }

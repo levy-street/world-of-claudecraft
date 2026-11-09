@@ -22,7 +22,10 @@
 //     round's count);
 //   - the shore ice raised round the lake (objects, combat walls once up);
 //   - the guardian's bars (cast ids below), its awake marker and the
-//     deepening cold's stacks (auras on it), the moments as `spellfx` cues.
+//     deepening cold's stacks (auras on it), the moments as `spellfx` cues;
+//   - Living Rime on its carrier: a heal absorb whose `value` is what is left
+//     to heal through and `value2` its whole, `remaining` the seconds before
+//     it bursts; its slow is its own aura.
 
 /** The guardian (template id, frozen: its death lights the Quench vein). */
 export const QUENCH_GUARDIAN = 'heart_quench_guardian';
@@ -72,6 +75,11 @@ export const QUENCH_AURAS = {
   marked: 'heart_quench_slash_mark',
   /** On the guardian: one stack per deepening of the cold (phase 2). */
   deepening: 'heart_quench_deepening',
+  /** Living Rime: a heal absorb (`value` left to heal through, `value2` its
+   *  whole), `remaining` the seconds before it bursts (quench_rime.ts). */
+  rime: 'heart_quench_rime',
+  /** Living Rime's slow on its carrier (`value` the speed multiplier). */
+  rimeSlow: 'heart_quench_rime_slow',
 } as const;
 
 /** The fight's object templates (a radius or a reach rides `scale`). */
@@ -125,6 +133,15 @@ export const QUENCH_CUES = {
   /** The rime cracks a player's immunity (an Ice Block's stasis) as they
    *  freeze or shatter: the cold bites through (spellfx 'nova' on them). */
   bite: 'heart_quench_bite',
+  /** Living Rime closes on a player (spellfx 'nova' on them, from the
+   *  guardian; also when it leaps to a new carrier on Heroic and Mythic). */
+  rime: 'heart_quench_rime',
+  /** Living Rime healed through in time: the crust falls away (spellfx 'nova'
+   *  on its carrier). */
+  rimeBreak: 'heart_quench_rime_break',
+  /** Living Rime not healed through: its carrier freezes and the cold bursts
+   *  round them (spellfxAt 'burst', radius = the burst's). */
+  rimeBurst: 'heart_quench_rime_burst',
 } as const;
 
 /** The damage and aura names (combat log, floating text, the buff bar;
@@ -147,6 +164,10 @@ export const QUENCH_NAMES = {
   hole: 'Open Water',
   blade: "Smith's Blade",
   rim: 'Shore Ice',
+  rime: 'Living Rime',
+  /** Healing received lowers the receiver's cold (quench_life_warmth.ts):
+   *  a fight rule, named on the cold's tooltip and in the guide. */
+  lifeWarmth: 'Living Warmth',
 } as const;
 
 // ---- difficulty -----------------------------------------------------------------------
@@ -179,6 +200,15 @@ export interface QuenchDifficultyRules {
   slashChain: boolean;
   /** The Blades Hunt, the interphase at a quarter health (quench_flurry.ts). */
   flurry: boolean;
+  /** Living Rime (quench_rime.ts): how many players it takes at once, the
+   *  healing each must take to break it, and whether a burst leaps to the
+   *  nearest other player with a fresh one. */
+  rimeTargets: number;
+  rimeAbsorb: number;
+  rimeLeap: boolean;
+  /** Living Warmth (quench_life_warmth.ts): cold taken off per 1% of the
+   *  receiver's maximum health healed (effective healing only). */
+  lifeWarmth: number;
 }
 
 export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficultyRules>> = {
@@ -193,6 +223,10 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
     slashAim: 3,
     slashChain: false,
     flurry: false,
+    rimeTargets: 1,
+    rimeAbsorb: 600,
+    rimeLeap: false,
+    lifeWarmth: 0.5,
   },
   // Contagious cold: a shatter splashes further and harder.
   heroic: {
@@ -206,6 +240,10 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
     slashAim: 2.5,
     slashChain: false,
     flurry: false,
+    rimeTargets: 2,
+    rimeAbsorb: 900,
+    rimeLeap: true,
+    lifeWarmth: 0.25,
   },
   // Every round one blade, slash after slash from where the last one ended.
   mythic: {
@@ -219,6 +257,11 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
     slashAim: 2,
     slashChain: true,
     flurry: true,
+    // Heroic's rime, one more carrier (the decisions of 2026-11-09).
+    rimeTargets: 3,
+    rimeAbsorb: 900,
+    rimeLeap: true,
+    lifeWarmth: 0.25,
   },
 };
 
@@ -323,6 +366,16 @@ export const QUENCH_TUNING = {
   flurryAim: 1,
   flurryGapStart: 1.5,
   flurryGapEnd: 1,
+  // Living Rime (the owner's review of 2026-11-09): its first, its every, how
+  // long the raid has to heal it through, its slow (a speed multiplier), how
+  // much faster its carrier's cold rises while it holds, and its burst's reach
+  // (the cold it adds is the tier's splashCold).
+  rimeFirst: 12,
+  rimeEvery: 25,
+  rimeSeconds: 10,
+  rimeSlow: 0.7,
+  rimeColdMult: 2,
+  rimeBurstR: 6,
   // The shore ice.
   rimRise: 2.5,
   /** Seconds of plain melee after a bar lands before the next begins. */

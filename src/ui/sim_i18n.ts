@@ -1667,6 +1667,9 @@ const baseEnTable = {
   'aura.heartBladesAwake': 'The Blades Awake',
   'mechanic.heartCrossingBlade': 'Crossing Blade',
   'aura.heartDeepeningCold': 'Deepening Cold',
+  // Living Rime (quench_rime.ts) and Living Warmth (quench_life_warmth.ts).
+  'aura.heartLivingRime': 'Living Rime',
+  'mechanic.heartLivingWarmth': 'Living Warmth',
   // The Guardian of the Heat (encounters/smith_heart/heat_ids.ts HEAT_NAMES):
   // its damage, aura and object names. EXACT through the mechanic reverse map.
   'mechanic.heartFirstWellspring': 'The First Wellspring',
@@ -27195,6 +27198,8 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'The Blades Awake': 'aura.heartBladesAwake',
   'Crossing Blade': 'mechanic.heartCrossingBlade',
   'Deepening Cold': 'aura.heartDeepeningCold',
+  'Living Rime': 'aura.heartLivingRime',
+  'Living Warmth': 'mechanic.heartLivingWarmth',
   'The First Wellspring': 'mechanic.heartFirstWellspring',
   'Wellspring Fire': 'mechanic.heartWellspringFire',
   'The First Flame': 'aura.heartFirstFlame',

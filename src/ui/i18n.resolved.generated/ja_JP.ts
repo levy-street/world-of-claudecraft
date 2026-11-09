@@ -4779,7 +4779,7 @@ export const ja_JP: EnTranslations = {
         "swell": "{every}秒ごとに膨れ上がる嵐が岩棚の全員に{min}から{max}のダメージを与え、前の脈動ごとに{growth}%ずつ強くなる：これまでに{stacks}回。ヒロイック・ミシック：{heroicMin}から{heroicMax}のダメージ。"
       },
       "quenchGuardian": {
-        "cold": "あなたの冷気：{max}中{cold}。ひとりでいると約{fill}秒で満ちる。{radius}ヤード以内に他のプレイヤーが{others}人以上いれば、代わりに毎秒{fall}ずつ下がる。冷たき棺などの無敵効果では止められない：効果中は温もりを与えることも受けることもできない。{max}に達すると{freeze}秒間霜に閉ざされ、その後氷が砕ける。",
+        "cold": "あなたの冷気：{max}中{cold}。ひとりでいると約{fill}秒で満ちる。{radius}ヤード以内に他のプレイヤーが{others}人以上いれば、代わりに毎秒{fall}ずつ下がる。命の温もり：受けた回復は、最大体力の{healPct}%ごとに冷気を1下げる（ヒロイックとミシックでは{heroicHealPct}%ごと）。冷たき棺などの無敵効果では止められない：効果中は温もりを与えることも受けることもできない。{max}に達すると{freeze}秒間霜に閉ざされ、その後氷が砕ける。",
         "warmth": "レイドと身を寄せ合っている：冷気が毎秒{fall}ずつ下がる。同じ場所に{linger}秒とどまった集団の下では氷が割れ、凍てつく水の穴が開く。動き続けよう。",
         "frozen": "霜に閉ざされている：行動できず、あらゆる攻撃から受けるダメージが{pct}%増加し、冷たき棺などの無敵効果は霜に砕かれる。効果が切れると氷が砕け、あなたは{min}から{max}の冷気ダメージを受け、その後{seconds}秒間受けるダメージが{brittle}%増加する。{radius}ヤード以内の全員の冷気が{cold}上がる（ヒロイックでは{heroicRadius}ヤード、冷気{heroicCold}）。ヒロイック：{heroicMin}から{heroicMax}のダメージ。ミシック：{mythicMin}から{mythicMax}のダメージ。",
         "brittle": "あらゆる攻撃から受けるダメージが{pct}%増加する。この効果中は、味方の砕けた氷の飛沫であなたの冷気が{cap}を超えることはない。",
@@ -4787,7 +4787,10 @@ export const ja_JP: EnTranslations = {
         "trapped": "氷を踏み抜き凍てつく水に落ちた：移動できず、毎秒{min}から{max}の冷気ダメージを受け、冷気が上がっていく。{seconds}秒後に縁へ這い上がる。水だけで死ぬことはない。ヒロイック・ミシック：{heroicMin}から{heroicMax}のダメージ。",
         "awake": "鍛冶師の四本の剣が目覚めている。戦いの中で複数のプレイヤーが印を受け、剣がそれぞれを貫く線を順に飛ぶ。線は剣が飛ぶ{lock}秒前に固定され、線上の者に{min}から{max}の冷気ダメージを与え、冷え{cold}を加える。ヒロイック・ミシック：{heroicMin}から{heroicMax}のダメージ。",
         "marked": "あなたは{count}人中{order}番目だ。剣があなたを貫く線を飛んでくる。線をレイドから離せ。線は剣が飛ぶ{lock}秒前に固定されるので、その時に線から外れないと{min}から{max}の冷気ダメージと冷え{cold}を受ける。ヒロイック・ミシック：{heroicMin}から{heroicMax}のダメージ。",
-        "deepening": "湖の冷気の上昇が{total}%速くなっている：剣が目覚めてから{every}秒ごとに{step}%ずつ（これまでに{stacks}回）。"
+        "deepening": "湖の冷気の上昇が{total}%速くなっている：剣が目覚めてから{every}秒ごとに{step}%ずつ（これまでに{stacks}回）。",
+        "rime": "生ける霧氷が、次に受ける回復を{left}吸収する（全体で{whole}）。残っている間、移動速度が{slow}%低下し、冷気が{mult}倍の速さで上がるので、グループから離れろ。{seconds}秒以内に回復で砕けば消える。砕けなければ即座に霜に閉ざされ、{radius}ヤード以内の全員に冷気が弾けて{cold}を加える（ヒロイックとミシックでは{heroicCold}）。ノーマル：1人に{normalAbsorb}。ヒロイック：{heroicTargets}人に{heroicAbsorb}、弾けると最も近い別のプレイヤーに新たな霧氷が移る。ミシック：ヒロイックと同じで{mythicTargets}人。",
+        "rimePool": "生ける霧氷：砕くにはあと最大体力の{pct}%分の回復が必要。付与から{seconds}秒以内に砕けなければ、霜に閉ざされ、{radius}ヤード以内の全員に冷気が弾ける。",
+        "rimeSlow": "生ける霧氷で鈍っている：霧氷が回復で砕けるか弾けるまで、移動速度が{slow}%低下し、冷気が{mult}倍の速さで上がる。"
       },
       "heatGuardian": {
         "statePhase1": "湧泉に半身を沈め、決して動かない。玄武岩の拳が岸の一点を打ち砕き、そこから溶岩のうねりが三方へ広がる。炉床の閃火は湧泉から{reach}ヤードより遠くにいる全員を撃つ。体力70%で沈み、炉床があふれ出す。ヒロイックでは与えるダメージが{heroicPct}%増える。",
@@ -7420,7 +7423,11 @@ export const ja_JP: EnTranslations = {
       "waterLine": "{seconds}秒後に這い上がる",
       "coldBar": "冷気 {cold} / {max}",
       "coldAria": "冷気 {max}中{cold}",
-      "timeAria": "残り{seconds}秒"
+      "timeAria": "残り{seconds}秒",
+      "rimeTitle": "生ける霧氷！グループから離れろ",
+      "rimeLine": "{seconds}秒以内にヒーラーが砕かなければ、凍りついて{radius}ヤード内に弾ける",
+      "rimeBar": "霧氷 {left} / {whole}",
+      "rimeAria": "生ける霧氷：砕くまで残り{left}/{whole}の回復"
     },
     "heatGuardian": {
       "warn": {

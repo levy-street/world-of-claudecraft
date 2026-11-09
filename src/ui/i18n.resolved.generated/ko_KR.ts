@@ -4779,7 +4779,7 @@ export const ko_KR: EnTranslations = {
         "swell": "{every}초마다 부풀어 오르는 폭풍이 벼랑 위의 모두에게 {min}~{max}의 피해를 주며, 앞선 맥동마다 {growth}%씩 강해집니다: 지금까지 {stacks}번. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해."
       },
       "quenchGuardian": {
-        "cold": "당신의 냉기: {max} 중 {cold}. 혼자 있으면 약 {fill}초 만에 가득 찹니다. {radius}미터 안에 다른 플레이어가 {others}명 이상 있으면 대신 매초 {fall}씩 내려갑니다. 차가운 관 같은 무적 효과로는 막을 수 없습니다: 효과가 지속되는 동안에는 온기를 주지도 받지도 못합니다. {max}에 이르면 {freeze}초 동안 서리에 갇히고, 그 뒤 얼음이 부서집니다.",
+        "cold": "당신의 냉기: {max} 중 {cold}. 혼자 있으면 약 {fill}초 만에 가득 찹니다. {radius}미터 안에 다른 플레이어가 {others}명 이상 있으면 대신 매초 {fall}씩 내려갑니다. 생명의 온기: 받은 치유는 최대 생명력의 {healPct}%마다 냉기를 1씩 낮춥니다(영웅과 신화에서는 {heroicHealPct}%마다). 차가운 관 같은 무적 효과로는 막을 수 없습니다: 효과가 지속되는 동안에는 온기를 주지도 받지도 못합니다. {max}에 이르면 {freeze}초 동안 서리에 갇히고, 그 뒤 얼음이 부서집니다.",
         "warmth": "공격대와 함께 모여 있음: 냉기가 매초 {fall}씩 내려갑니다. 한 자리에 {linger}초 동안 머문 무리 아래의 얼음은 갈라져 얼어붙은 물웅덩이가 되니 계속 움직이세요.",
         "frozen": "서리에 갇힘: 행동할 수 없고 모든 공격으로부터 받는 피해가 {pct}% 증가하며, 서리가 차가운 관 같은 무적 효과를 깨뜨립니다. 효과가 끝나면 얼음이 부서져 {min}~{max}의 냉기 피해를 입고, 이후 {seconds}초 동안 받는 피해가 {brittle}% 증가하며, {radius}미터 안의 모두가 냉기 {cold}을 얻습니다(영웅 난이도에서는 {heroicRadius}미터, 냉기 {heroicCold}). 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.",
         "brittle": "모든 공격으로부터 받는 피해가 {pct}% 증가합니다. 이 효과가 지속되는 동안에는 아군의 얼음 파편이 당신의 냉기를 {cap} 넘게 올리지 못합니다.",
@@ -4787,7 +4787,10 @@ export const ko_KR: EnTranslations = {
         "trapped": "얼음을 뚫고 얼어붙은 물에 빠졌습니다: 움직일 수 없고, 매초 {min}~{max}의 냉기 피해를 입으며 냉기가 올라갑니다. {seconds}초 뒤 가장자리로 기어 올라옵니다. 물만으로는 절대 죽지 않습니다. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.",
         "awake": "대장장이의 네 칼날이 깨어 있습니다. 라운드마다 더 많은 플레이어가 표식을 받고, 칼날이 각자를 지나는 선을 따라 차례로 날아갑니다. 선은 칼날이 날아가기 {lock}초 전에 고정되며, 선 위의 대상에게 {min}~{max}의 냉기 피해를 주고 냉기를 {cold} 더합니다. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.",
         "marked": "{count}명 중 {order}번째입니다. 칼날이 당신을 지나는 선을 따라 날아옵니다. 선을 공격대에서 멀리 유도하세요. 선은 칼날이 날아가기 {lock}초 전에 고정되니 그때 비켜서세요. 그렇지 않으면 {min}~{max}의 냉기 피해와 냉기 {cold}를 받습니다. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.",
-        "deepening": "호수의 냉기가 {total}% 더 빠르게 오릅니다: 검이 깨어난 뒤 {every}초마다 {step}%씩(지금까지 {stacks}회)."
+        "deepening": "호수의 냉기가 {total}% 더 빠르게 오릅니다: 검이 깨어난 뒤 {every}초마다 {step}%씩(지금까지 {stacks}회).",
+        "rime": "살아 있는 서리가 다음에 받는 치유를 {left}만큼 흡수합니다(전체 {whole}). 남아 있는 동안 이동 속도가 {slow}% 느려지고 냉기가 {mult}배 빠르게 오르니 무리에서 벗어나십시오. {seconds}초 안에 치유로 깨뜨리면 사라집니다. 깨뜨리지 못하면 즉시 서리에 갇히고, {radius}미터 안의 모두에게 냉기가 터져 냉기 {cold}을 더합니다(영웅과 신화에서는 {heroicCold}). 일반: 1명에게 {normalAbsorb}. 영웅: {heroicTargets}명에게 {heroicAbsorb}, 터지면 가장 가까운 다른 플레이어에게 새 서리가 옮겨 갑니다. 신화: 영웅과 같으며 {mythicTargets}명.",
+        "rimePool": "살아 있는 서리: 깨뜨리려면 최대 생명력의 {pct}%만큼 치유가 더 필요합니다. 걸린 뒤 {seconds}초 안에 깨지 못하면 서리에 갇히고 {radius}미터 안의 모두에게 냉기가 터집니다.",
+        "rimeSlow": "살아 있는 서리로 느려짐: 서리가 치유로 깨지거나 터질 때까지 이동 속도가 {slow}% 느려지고 냉기가 {mult}배 빠르게 오릅니다."
       },
       "heatGuardian": {
         "statePhase1": "샘에 몸을 반쯤 담근 채 결코 움직이지 않습니다. 현무암 주먹이 물가의 한 지점을 내리찍고, 그곳에서 용암 너울 세 줄기가 퍼져 나갑니다. 화로의 섬광은 샘에서 {reach}미터보다 멀리 있는 모두를 칩니다. 생명력 70%에서 가라앉고 화로가 넘쳐흐릅니다. 영웅 난이도에서는 피해가 {heroicPct}% 더 큽니다.",
@@ -7420,7 +7423,11 @@ export const ko_KR: EnTranslations = {
       "waterLine": "{seconds}초 뒤 기어 올라옵니다",
       "coldBar": "냉기 {cold} / {max}",
       "coldAria": "냉기 {max} 중 {cold}",
-      "timeAria": "{seconds}초 남음"
+      "timeAria": "{seconds}초 남음",
+      "rimeTitle": "살아 있는 서리! 무리에서 벗어나십시오",
+      "rimeLine": "{seconds}초 안에 치유사가 깨뜨리지 못하면 얼어붙어 {radius}미터 안에 터집니다",
+      "rimeBar": "서리 {left} / {whole}",
+      "rimeAria": "살아 있는 서리: 깨뜨리기까지 치유 {whole} 중 {left} 남음"
     },
     "heatGuardian": {
       "warn": {

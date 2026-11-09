@@ -20,6 +20,9 @@
 //                 as its wearer freezes, stays frozen or shatters.
 //   Deepening     through phase 2 the cold rises faster every 20 s, without
 //                 end (a stack on the guardian): the soft enrage.
+//   Living Rime   while it holds (quench_rime.ts), its carrier's bar rises
+//                 twice as fast (alone, as the rime sends them); a burst of
+//                 it splashes like a shatter (`splashRound`).
 //
 // A player in the water (quench_ice.ts) takes no warmth and gives none, and
 // their bar stops one short of full (the water never freezes them solid). A
@@ -214,12 +217,20 @@ export function shatter(s: QuenchScope, p: Entity): Entity[] {
   frostHit(s, p, roll(s, T.shatterMin, T.shatterMax, s.rules.shatterMult), QUENCH_NAMES.shatter);
   if (!p.dead) brittle(s, p, T.brittlePct, T.brittleSeconds);
   quenchSay(s, s.boss, 'shatter');
+  return splashRound(s, p, s.rules.splashR);
+}
+
+/** Cold splashed from `from` onto every other living player within `radius`
+ *  (the tier's splashCold each, one splash a tick, bounded by Frost-Brittle):
+ *  a shatter's, and a Living Rime's burst. Returns the players it reached. */
+export function splashRound(s: QuenchScope, from: Entity, radius: number): Entity[] {
+  const here = at(s, from);
   const splashed: Entity[] = [];
   for (const q of livePlayers(s)) {
-    if (q.id === p.id) continue;
+    if (q.id === from.id) continue;
     const there = at(s, q);
-    if (Math.hypot(there.x - here.x, there.z - here.z) > s.rules.splashR) continue;
-    if (splash(s, q, p)) splashed.push(q);
+    if (Math.hypot(there.x - here.x, there.z - here.z) > radius) continue;
+    if (splash(s, q, from)) splashed.push(q);
   }
   return splashed;
 }
@@ -255,7 +266,10 @@ export function stepCold(s: QuenchScope): void {
       others = warmNeighbours({ id: p.id, x: here.x, z: here.z }, donors);
     }
     // The interphase holds the cold: a huddle still warms, nothing else moves it.
-    const raw = coldStep(others, mult);
+    const rising = coldStep(others, mult);
+    // Living Rime's carrier: the bar rises twice as fast while it holds.
+    const raw =
+      rising > 0 && auraOf(p, QUENCH_AURAS.rime) !== undefined ? rising * T.rimeColdMult : rising;
     const step = st.flurry && raw > 0 ? 0 : raw;
     setWarm(s, p, !trapped && !sealed && others >= T.warmNeed);
     const cap = trapped ? T.coldMax - 1 : T.coldMax;
