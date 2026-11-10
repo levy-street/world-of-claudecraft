@@ -27,11 +27,18 @@ const look = (): BondTetherLook => ({ core: 0, halo: 0, glow: 0, sigil: 0, flow:
 
 describe('Bond of the Stone: the tether', () => {
   it("reads each member's real body: the Guardian towers over the Singer", () => {
+    // The Guardian drawn at 4.6 times its 3.2 scale (about 14.7 yd), the Singer at 5.5 times
+    // her 2.0 (11 yd): she reaches about its shoulder.
     expect(BOND_BODY.guardian.height).toBeCloseTo(
-      3.4 * (SMITH_HEART_MOBS.heart_hammer_guardian?.scale ?? 0),
+      4.6 * (SMITH_HEART_MOBS.heart_hammer_guardian?.scale ?? 0),
       6,
     );
-    expect(BOND_BODY.guardian.height).toBeGreaterThan(BOND_BODY.singer.height * 1.5);
+    expect(BOND_BODY.singer.height).toBeCloseTo(
+      5.5 * (SMITH_HEART_MOBS.heart_seam_singer?.scale ?? 0),
+      6,
+    );
+    expect(BOND_BODY.guardian.height).toBeGreaterThan(BOND_BODY.singer.height * 1.25);
+    expect(BOND_BODY.singer.height).toBeGreaterThan(BOND_BODY.guardian.height * 0.65);
     for (const role of ['guardian', 'singer'] as const) {
       expect(bondAnchorY(role)).toBeGreaterThan(BOND_BODY[role].height * 0.5);
       expect(bondAnchorY(role)).toBeLessThan(BOND_BODY[role].height);

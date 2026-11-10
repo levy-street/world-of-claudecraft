@@ -70,12 +70,13 @@ const SPOT = {
  *  is read from). */
 const GALLERY = { x: -98, z: -232 };
 /** Camera holds per view: [yaw off the player's facing, pitch (positive
- *  looks down), distance]. */
+ *  looks down), distance], held back far enough to frame the Guardian's
+ *  14.7 yd and its spur. */
 const VIEWS = {
-  raid: [0.12, 0.3, 17],
-  high: [0.3, 0.78, 44],
-  side: [1.0, 0.22, 22],
-  close: [0.25, 0.16, 10],
+  raid: [0.12, 0.24, 24],
+  high: [0.3, 0.74, 54],
+  side: [1.0, 0.18, 30],
+  close: [0.25, 0.14, 15],
 };
 /** One still per beat (the key into B below). */
 const STILLS = [

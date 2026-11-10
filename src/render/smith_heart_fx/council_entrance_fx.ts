@@ -49,6 +49,7 @@ import {
   COUNCIL_ENTRANCE,
   COUNCIL_ENTRANCE_GESTURE_AT,
   COUNCIL_ENTRANCE_GESTURES,
+  COUNCIL_ENTRANCE_GROW,
   COUNCIL_ENTRANCE_LOW_SHARE,
   COUNCIL_ENTRANCE_POOLS,
   COUNCIL_ENTRANCE_SOUNDS,
@@ -622,7 +623,7 @@ export class CouncilEntranceFx {
     const flash = councilEntranceFlash(L, reduced);
     this.flash.visible = flash > 0.002 && s !== null;
     if (this.flash.visible && s) {
-      _p.set(s.pos.x, this.ground(s.pos.x, s.pos.z) + 3.2, s.pos.z);
+      _p.set(s.pos.x, this.ground(s.pos.x, s.pos.z) + 3.2 * COUNCIL_ENTRANCE_GROW.singer, s.pos.z);
       _q.identity();
       _s.setScalar(E.flashSize * (0.7 + 0.3 * flash));
       _m.compose(_p, _q, _s);

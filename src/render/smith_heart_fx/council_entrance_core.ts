@@ -42,9 +42,11 @@
 // Node-only (RENDER_PURE_CORES): no three.js, no DOM, deterministic (a hash,
 // never rng).
 
+import { SMITH_HEART_COUNCIL_FACING } from '../../sim/content/smith_heart';
 import {
   HAMMER_PIT,
   QUARRY_PILLAR_SPOTS,
+  SMITH_HEART_BOSS_SPOTS,
   SMITH_HEART_FIELD,
 } from '../../sim/content/smith_heart_layout';
 import { COUNCIL_AURAS } from '../../sim/encounters/smith_heart/council_ids';
@@ -52,6 +54,37 @@ import {
   COUNCIL_INTRO,
   COUNCIL_INTRO_STAGES,
 } from '../../sim/encounters/smith_heart/council_intro_plan';
+import { COUNCIL_GROW } from './council_bodies_core';
+
+/** How much bigger each member is drawn than the set pieces were first
+ *  authored for (council_bodies_core.ts `COUNCIL_GROW`): the rock, the vein,
+ *  her shards and the anchors on their bodies grow by it. */
+export const COUNCIL_ENTRANCE_GROW = COUNCIL_GROW;
+const GG = COUNCIL_GROW.guardian;
+const SG = COUNCIL_GROW.singer;
+
+/** Where the Singer stands off the Guardian (yards, world axes) and each
+ *  one's bearing to the other in its own frame (radians, 0 its front, as the
+ *  plans' angles: x = sin, z = cos), at their spawn facing. The two stand
+ *  some 9.5 yd apart, so the rock and the vein lean away from each other. */
+export const COUNCIL_PAIR = (() => {
+  const dx = SMITH_HEART_BOSS_SPOTS.seamSinger.x - SMITH_HEART_BOSS_SPOTS.hammer.x;
+  const dz = SMITH_HEART_BOSS_SPOTS.seamSinger.z - SMITH_HEART_BOSS_SPOTS.hammer.z;
+  const toSinger = Math.atan2(dx, dz);
+  return {
+    dx,
+    dz,
+    apart: Math.hypot(dx, dz),
+    guardianToSinger: toSinger - SMITH_HEART_COUNCIL_FACING,
+    singerToGuardian: toSinger + Math.PI - SMITH_HEART_COUNCIL_FACING,
+  } as const;
+})();
+
+/** How squarely a plan angle `a` faces bearing `b` (0 off to the side or
+ *  behind, 1 straight at it). */
+export function councilFacingShare(a: number, b: number): number {
+  return Math.max(0, Math.cos(a - b));
+}
 
 // ---- the clock -----------------------------------------------------------------------------
 
@@ -107,7 +140,7 @@ export const COUNCIL_ENTRANCE = {
   /** It punches the ground on "flesh". */
   punchAt: G + VG.flesh,
   /** The punch's ring of stone and dust: from its fists out past the raid. */
-  ringFrom: 4,
+  ringFrom: 4 * GG,
   ringTo: 66,
   ringFor: 2.2,
   /** The crystal begins to ring, a breath before her line. */
@@ -118,7 +151,7 @@ export const COUNCIL_ENTRANCE = {
   orbitFor: 0.9,
   /** The high note: the wave of light, on "voices". */
   noteAt: S + VS.voices,
-  waveFrom: 3,
+  waveFrom: 3 * SG,
   waveTo: 74,
   /** Done by the hand-back: no light over the fight's first telegraphs. */
   waveFor: 1.15,
@@ -585,11 +618,15 @@ export function councilEntranceHash(a: number, b: number): number {
 const hash = councilEntranceHash;
 
 /** The Guardian's spur of rock: its height and its radius at the foot and
- *  the crown (yards; the Guardian stands about 11 yd, crouched some 8). */
+ *  the crown (yards; the Guardian stands about 14.7 yd, crouched some 11).
+ *  Its foot grows less than its height (the Singer's vein stands 9.5 yd
+ *  off), and the slabs toward her are drawn in by `singerSide`. */
 export const COUNCIL_ROCK = {
-  height: 12.5,
-  footR: 6.4,
-  crownR: 3.2,
+  height: 12.5 * GG,
+  footR: 7.6,
+  crownR: 3.2 * GG,
+  /** How far in the slabs facing the Singer sit (a share of their ring). */
+  singerSide: 0.14,
   /** Rings of slabs, bottom to top: how many in each. */
   rings: [8, 8, 7, 6, 4, 2],
 } as const;
@@ -634,19 +671,20 @@ export const ROCK_SLABS: readonly RockSlab[] = (() => {
       // through the gap (its face toward the raid).
       const front = Math.cos(a);
       if (ring >= 3 && ring <= 4 && front > 0.9) continue;
-      const rr = r * (0.92 + hash(n, 5) * 0.16);
+      const toHer = councilFacingShare(a, COUNCIL_PAIR.guardianToSinger) ** 2;
+      const rr = r * (0.92 + hash(n, 5) * 0.16) * (1 - R.singerSide * toHer);
       const x = Math.sin(a) * rr;
       const z = Math.cos(a) * rr;
       const out1 = 0.55 + 0.45 * hash(n, 7);
       // Thrown outward and up, harder toward the raid.
-      const speed = (7 + 7 * hash(n, 11)) * (1 + 0.35 * Math.max(0, front));
+      const speed = (7 + 7 * hash(n, 11)) * (1 + 0.35 * Math.max(0, front)) * Math.sqrt(GG);
       out.push({
         x,
         y,
         z,
         sx: ((2 * Math.PI * r) / count) * (0.75 + 0.3 * hash(n, 13)),
         sy: (R.height / rings) * (1.05 + 0.35 * hash(n, 17)),
-        sz: 1.3 + 1.4 * hash(n, 19),
+        sz: (1.3 + 1.4 * hash(n, 19)) * GG * (1 - 0.2 * toHer),
         yaw: a,
         tilt: (hash(n, 23) - 0.5) * 0.5,
         vx: Math.sin(a) * speed * out1,
@@ -737,7 +775,7 @@ export const ROCK_CHUNKS: readonly RockChunk[] = (() => {
     const a = hash(i, 101) * Math.PI * 2;
     const h = hash(i, 103);
     const r = R.footR + (R.crownR - R.footR) * h;
-    const speed = 10 + 12 * hash(i, 107);
+    const speed = (10 + 12 * hash(i, 107)) * Math.sqrt(GG);
     out.push({
       x: Math.sin(a) * r,
       y: h * R.height,
@@ -745,7 +783,7 @@ export const ROCK_CHUNKS: readonly RockChunk[] = (() => {
       vx: Math.sin(a) * speed,
       vy: 6 + 14 * hash(i, 109),
       vz: Math.cos(a) * speed,
-      size: 0.35 + 0.9 * hash(i, 113) ** 2,
+      size: (0.35 + 0.9 * hash(i, 113) ** 2) * GG,
       spin: (hash(i, 127) - 0.5) * 14,
       delay: hash(i, 131) * 0.1,
     });
@@ -792,12 +830,25 @@ export function councilEntrancePicks(total: number, detail: boolean): number[] {
 }
 
 /** The Singer's vein of crystal (her frame, yards): the cocoon she sleeps
- *  in (its radius and height) and the prisms round it. */
-export const COUNCIL_VEIN = {
-  cocoonR: 2.3,
-  cocoonH: 6.6,
-  prisms: 13,
-} as const;
+ *  in (its radius and height: she stands 11 yd, curled in it some 8; its
+ *  middle `cocoonX`, `cocoonZ`, nudged `shift` away from the Guardian's rock),
+ *  the prisms round it, the wedge toward the rock they leave bare (`gap`,
+ *  radians either side) and how far they reach off her (the pebbles keep
+ *  off it). */
+export const COUNCIL_VEIN = (() => {
+  const shift = 1.4;
+  const away = COUNCIL_PAIR.singerToGuardian + Math.PI;
+  return {
+    cocoonR: 4.2,
+    cocoonH: 6.6 * SG * 0.9,
+    shift,
+    cocoonX: Math.sin(away) * shift,
+    cocoonZ: Math.cos(away) * shift,
+    prisms: 13,
+    gap: (65 * Math.PI) / 180,
+    reach: 8.5,
+  } as const;
+})();
 
 /** One crystal prism of the vein: its foot, its lean (radians off upright,
  *  toward `bearing`), its radius and its length. */
@@ -813,15 +864,24 @@ export interface VeinPrism {
 export const VEIN_PRISMS: readonly VeinPrism[] = (() => {
   const out: VeinPrism[] = [];
   for (let i = 0; i < COUNCIL_VEIN.prisms; i++) {
-    const a = (i / COUNCIL_VEIN.prisms) * Math.PI * 2 + (hash(i, 201) - 0.5) * 0.5;
-    const r = 1.9 + hash(i, 203) * 1.6;
+    // Round her, all but the wedge toward the Guardian's rock (the two stand
+    // 9.5 yd apart); the ones at its edges drawn in, cut short and stood up.
+    const V = COUNCIL_VEIN;
+    const arc = Math.PI * 2 - 2 * V.gap;
+    const a =
+      COUNCIL_PAIR.singerToGuardian +
+      V.gap +
+      ((i + 0.5) / V.prisms) * arc +
+      (hash(i, 201) - 0.5) * 0.35;
+    const near = councilFacingShare(a, COUNCIL_PAIR.singerToGuardian) ** 2;
+    const r = (1.9 + hash(i, 203) * 1.6) * SG * 0.85 * (1 - 0.3 * near);
     out.push({
       x: Math.sin(a) * r,
       z: Math.cos(a) * r,
       bearing: a,
-      lean: 0.25 + 0.45 * hash(i, 207),
-      r: 0.55 + 0.5 * hash(i, 211),
-      len: 2.8 + 4.2 * hash(i, 213),
+      lean: (0.25 + 0.45 * hash(i, 207)) * (1 - 0.65 * near),
+      r: (0.55 + 0.5 * hash(i, 211)) * SG * 0.85,
+      len: (2.8 + 4.2 * hash(i, 213)) * SG * 0.9 * (1 - 0.45 * near),
     });
   }
   return out;
@@ -846,15 +906,15 @@ export const CRYSTAL_SHARDS: readonly CrystalShard[] = (() => {
   for (let i = 0; i < 64; i++) {
     const a = hash(i, 301) * Math.PI * 2;
     const h = hash(i, 303);
-    const speed = 8 + 14 * hash(i, 307);
+    const speed = (8 + 14 * hash(i, 307)) * Math.sqrt(SG);
     out.push({
-      x: Math.sin(a) * V.cocoonR * 0.8,
+      x: V.cocoonX + Math.sin(a) * V.cocoonR * 0.8,
       y: 0.5 + h * V.cocoonH,
-      z: Math.cos(a) * V.cocoonR * 0.8,
+      z: V.cocoonZ + Math.cos(a) * V.cocoonR * 0.8,
       vx: Math.sin(a) * speed,
       vy: 3 + 10 * hash(i, 309),
       vz: Math.cos(a) * speed,
-      size: 0.25 + 0.75 * hash(i, 311) ** 1.5,
+      size: (0.25 + 0.75 * hash(i, 311) ** 1.5) * SG * 0.8,
       spin: (hash(i, 313) - 0.5) * 16,
     });
   }
@@ -883,12 +943,14 @@ export function shardAt(c: CrystalShard, since: number, out: FlyingStone): Flyin
  *  turn (radians a second), and how fast they fly out with the note. */
 export const ORBIT_SHARDS = {
   count: 9,
-  r: 3.2,
-  yLow: 1.4,
-  yHigh: 5.2,
+  r: 3.2 * SG * 0.9,
+  yLow: 1.4 * SG,
+  yHigh: 5.2 * SG,
   spin: 0.9,
-  flingSpeed: 30,
+  flingSpeed: 45,
   flingFor: 1.3,
+  /** The smallest shard's width (yards; each 3.2 times as long). */
+  size: 0.48 * SG * 0.8,
 } as const;
 
 /** Orbiting shard `i` at scene look `look` (her frame): place, turn, size. */
@@ -935,7 +997,7 @@ export const QUARRY_PEBBLES: readonly Pebble[] = (() => {
     const z = Math.cos(a) * r * (P.rz - 4);
     // Off the Guardian's spur and the Singer's vein (their own stone).
     if (Math.hypot(x, z) < COUNCIL_ROCK.footR + 2) continue;
-    if (Math.hypot(x - 3, z - 9) < 4.5) continue;
+    if (Math.hypot(x - COUNCIL_PAIR.dx, z - COUNCIL_PAIR.dz) < COUNCIL_VEIN.reach) continue;
     out.push({ x, z, size: 0.07 + 0.15 * hash(i, 507) ** 2, seed: hash(i, 509) });
   }
   return out;

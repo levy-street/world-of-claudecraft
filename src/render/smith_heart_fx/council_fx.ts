@@ -66,6 +66,7 @@ import {
 } from '../smith_heart/heart_kit';
 import { radialGlowTexture } from '../textures';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
+import { COUNCIL_GROW } from './council_bodies_core';
 import { CouncilBondFx } from './council_bond_fx';
 import {
   BOLT_SECONDS,
@@ -1455,7 +1456,8 @@ export class CouncilFx {
     b.sourceId = sourceId;
     b.targetId = targetId;
     const at = fxAnchor(src);
-    b.from.set(at.x, this.groundY(at.x, at.z) + 4, at.z);
+    // Off her raised hand (4 yd up her body as first authored, grown with her).
+    b.from.set(at.x, this.groundY(at.x, at.z) + 4 * COUNCIL_GROW.singer, at.z);
     b.mesh.visible = true;
   }
 

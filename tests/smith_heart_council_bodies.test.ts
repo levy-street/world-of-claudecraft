@@ -14,6 +14,7 @@ import {
   COUNCIL_BODY_HEIGHTS,
   COUNCIL_BODY_PLANS,
   COUNCIL_FALL,
+  COUNCIL_GROW,
   COUNCIL_KIT_NODES,
   COUNCIL_THREAD_PAIRS,
   type CouncilBodyAction,
@@ -40,17 +41,20 @@ const finite = (p: { x: number; y: number; z: number }) =>
   Number.isFinite(p.x) && Number.isFinite(p.y) && Number.isFinite(p.z);
 
 describe('council_bodies_core: the plans', () => {
-  it('stand 2 to 2.5 times a player, matching the manifest and the template', () => {
+  it('stand some 5.8 times a player, matching the manifest and the template', () => {
     expect(COUNCIL_BODY_HEIGHTS.singer).toBeCloseTo(
       (VISUALS.smith_heart_seam_singer?.height ?? 0) *
         (SMITH_HEART_MOBS.heart_seam_singer?.scale ?? 0),
     );
     for (const kind of KINDS) {
       const plan = COUNCIL_BODY_PLANS[kind];
-      expect(plan.height / PLAYER, kind).toBeGreaterThanOrEqual(2);
-      expect(plan.height / PLAYER, kind).toBeLessThanOrEqual(2.75);
-      // Its crown is its height (never a toy, never a giant).
-      expect(Math.abs(councilPlanTop(plan) - plan.height), kind).toBeLessThan(0.25);
+      // 11 yd: the raid small round her (she reaches the Guardian's shoulder).
+      expect(plan.height, kind).toBeCloseTo(11, 6);
+      expect(plan.height / PLAYER, kind).toBeGreaterThanOrEqual(5.5);
+      // Its crown is its height: the plan grew whole with her (COUNCIL_GROW).
+      expect(Math.abs(councilPlanTop(plan) - plan.height), kind).toBeLessThan(
+        0.25 * COUNCIL_GROW[kind],
+      );
     }
   });
 

@@ -25,6 +25,7 @@ import * as THREE from 'three';
 import type { EngineParticles } from '../trash_engine_fx/engine_particles';
 import {
   COUNCIL_ENTRANCE,
+  COUNCIL_ENTRANCE_GROW,
   COUNCIL_ENTRANCE_POOLS,
   COUNCIL_ROCK,
   type CouncilEntranceLook,
@@ -48,6 +49,9 @@ import {
 
 const E = COUNCIL_ENTRANCE;
 const P = COUNCIL_ENTRANCE_POOLS;
+/** Its growth over the size these were authored at (the light inside, the
+ *  punch's reach and its wall of dust). */
+const GG = COUNCIL_ENTRANCE_GROW.guardian;
 
 const _m = new THREE.Matrix4();
 const _q = new THREE.Quaternion();
@@ -215,9 +219,9 @@ export class CouncilEntranceStone {
     const k = councilEntranceLight(level, this.h.reducedMotion());
     this.core.visible = k > 0.01;
     if (!this.core.visible) return;
-    _p.set(0, COUNCIL_ROCK.height * 0.48, 0.8);
+    _p.set(0, COUNCIL_ROCK.height * 0.48, 0.8 * GG);
     _q.identity();
-    _s.setScalar(5 + 5.5 * Math.min(1.6, k));
+    _s.setScalar((5 + 5.5 * Math.min(1.6, k)) * GG);
     _m.compose(_p, _q, _s);
     this.core.setMatrixAt(0, _m);
     this.core.setColorAt(0, _c.setRGB(1.0 * k, 0.62 * k, 0.24 * k));
@@ -330,7 +334,7 @@ export class CouncilEntranceStone {
     const ringOn = look.ring > 0.01;
     this.dustWall.visible = ringOn;
     if (ringOn) {
-      const hgt = 3.4 * (0.4 + 0.6 * look.ring);
+      const hgt = 3.4 * GG * (0.4 + 0.6 * look.ring);
       this.dustWall.scale.set(look.ringR, hgt, look.ringR);
       this.dustWall.position.set(0, 0.05, 0);
       this.dustWallMat.uniforms.uAlpha.value = look.ring * 0.85;
@@ -370,7 +374,7 @@ export class CouncilEntranceStone {
   /** The punch: stone thrown up out of the floor, the floor's wave racing
    *  out under the wall of dust. */
   private punch(): void {
-    _v.set(0, 0, 3.2).applyMatrix4(this.stage.matrixWorld);
+    _v.set(0, 0, 3.2 * GG).applyMatrix4(this.stage.matrixWorld);
     const y = this.h.groundY(_v.x, _v.z) + 0.5;
     this.h.particles.puff(_v.x, y, _v.z, P.punchDebris, DEBRIS);
     this.h.particles.puff(_v.x, y, _v.z, 24, CLOUD);

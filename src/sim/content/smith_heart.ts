@@ -654,9 +654,14 @@ function guardian(mobId: string, at: { x: number; z: number }, facing: number): 
   return { mobId, x: at.x, z: at.z, facing, idleStationary: true };
 }
 
+/** The Hammer Council's facing at its spots: toward the Pit Mouth (the
+ *  entrance's rock and vein are shaped off it, render smith_heart_fx/
+ *  council_entrance_core.ts). */
+export const SMITH_HEART_COUNCIL_FACING = toward(HAMMER_PIT.x, HAMMER_PIT.z, -35, -179);
+
 /** The Hammer Council's two, facing the Pit Mouth, held as one pack. */
 function councilSpawns(): DungeonSpawn[] {
-  const facing = toward(HAMMER_PIT.x, HAMMER_PIT.z, -35, -179);
+  const facing = SMITH_HEART_COUNCIL_FACING;
   return [
     { ...guardian(SMITH_HEART_GUARDIANS.hammer, SMITH_HEART_BOSS_SPOTS.hammer, facing) },
     { ...guardian('heart_seam_singer', SMITH_HEART_BOSS_SPOTS.seamSinger, facing) },

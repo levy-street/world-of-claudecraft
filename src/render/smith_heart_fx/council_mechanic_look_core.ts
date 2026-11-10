@@ -24,11 +24,11 @@ import {
   type CouncilRole,
   COUNCIL_TUNING as T,
 } from '../../sim/encounters/smith_heart/council_ids';
-import { COUNCIL_BODY_HEIGHTS } from './council_bodies_core';
+import { COUNCIL_BODY_HEIGHTS, COUNCIL_MODEL_HEIGHTS } from './council_bodies_core';
 
 /** The Guardian's model height before its template's scale
- *  (characters/manifest.ts smith_heart_hammer_guardian). */
-const GUARDIAN_MODEL_HEIGHT = 3.4;
+ *  (characters/smith_heart_boss_looks.ts smith_heart_hammer_guardian). */
+const GUARDIAN_MODEL_HEIGHT = COUNCIL_MODEL_HEIGHTS.guardian;
 
 /** Each member's height feet to crown (yards: the model's height times the
  *  template's scale) and the share of it where the tether is anchored (the

@@ -26,6 +26,7 @@ import * as THREE from 'three';
 import type { EngineParticles } from '../trash_engine_fx/engine_particles';
 import {
   COUNCIL_ENTRANCE,
+  COUNCIL_ENTRANCE_GROW,
   COUNCIL_ENTRANCE_POOLS,
   COUNCIL_VEIN,
   type CouncilEntranceLook,
@@ -56,7 +57,10 @@ const P = COUNCIL_ENTRANCE_POOLS;
 const RING_SLOTS = 6;
 /** How long a resonance ring takes to spread and fade, and how far. */
 const RING_FOR = 0.95;
-const RING_TO = 15;
+/** Her growth over the size these were authored at (her rings, glints, light). */
+const SG = COUNCIL_ENTRANCE_GROW.singer;
+const RING_FROM = 1.8 * SG;
+const RING_TO = 15 * Math.sqrt(SG);
 
 const _m = new THREE.Matrix4();
 const _q = new THREE.Quaternion();
@@ -288,7 +292,7 @@ export class CouncilEntranceCrystal {
    *  out of the floor round it). */
   private layVein(trembleX = 0, trembleZ = 0): void {
     const V = COUNCIL_VEIN;
-    _p.set(trembleX, -0.4, trembleZ);
+    _p.set(V.cocoonX + trembleX, -0.4, V.cocoonZ + trembleZ);
     _q.setFromAxisAngle(_up, 0.3);
     _s.set(V.cocoonR, V.cocoonH, V.cocoonR * 0.86);
     _m.compose(_p, _q, _s);
@@ -349,8 +353,8 @@ export class CouncilEntranceCrystal {
       while (this.glints >= 1) {
         this.glints -= 1;
         const a = this.h.rand() * Math.PI * 2;
-        const r = 1.2 + this.h.rand() * 2.4;
-        _v.set(Math.sin(a) * r, 0.8 + this.h.rand() * 4, Math.cos(a) * r).applyMatrix4(
+        const r = (1.2 + this.h.rand() * 2.4) * SG;
+        _v.set(Math.sin(a) * r, (0.8 + this.h.rand() * 4) * SG, Math.cos(a) * r).applyMatrix4(
           this.stage.matrixWorld,
         );
         this.h.particles.puff(_v.x, _v.y, _v.z, 1, GLINT);
@@ -364,9 +368,9 @@ export class CouncilEntranceCrystal {
       const age = look.t - VEIN_RINGS[k];
       if (look.dormant || age < 0 || age > RING_FOR) continue;
       const kk = age / RING_FOR;
-      const r = 1.8 + (RING_TO - 1.8) * (1 - (1 - kk) * (1 - kk));
+      const r = RING_FROM + (RING_TO - RING_FROM) * (1 - (1 - kk) * (1 - kk));
       const a = councilEntranceLight((1 - kk) * (0.6 + 0.08 * k), reduced);
-      _p.set(0, 1.2 + (k % 3) * 1.3, 0);
+      _p.set(0, (1.2 + (k % 3) * 1.3) * SG, 0);
       _q.setFromAxisAngle(_axis.set(1, 0, 0), ((k % 2) - 0.5) * 0.18);
       _s.set(r, 1, r);
       _m.compose(_p, _q, _s);
@@ -426,7 +430,7 @@ export class CouncilEntranceCrystal {
         _q2.setFromAxisAngle(_axis.set(0, 0, 1), 0.35 + (i % 3) * 0.2);
         _q.multiply(_q2);
         _p.set(_st.x, _st.y, _st.z);
-        const sz = (0.48 + 0.16 * (i % 3)) * _st.size;
+        const sz = ORBIT_SHARDS.size * (1 + 0.33 * (i % 3)) * _st.size;
         _s.set(sz, sz * 3.2, sz);
         _m.compose(_p, _q, _s);
         this.orbit.setMatrixAt(i, _m);
@@ -438,9 +442,9 @@ export class CouncilEntranceCrystal {
       const note = look.sinceNote >= 0 ? 1.6 * Math.exp(-look.sinceNote * 1.8) : 0;
       const k = councilEntranceLight((0.45 * look.orbit + note) * tail, reduced);
       this.halo.visible = k > 0.01;
-      _p.set(0, 2.8, 0);
+      _p.set(0, 2.8 * SG, 0);
       _q.identity();
-      _s.setScalar(8 + 6 * Math.min(1, note));
+      _s.setScalar((8 + 6 * Math.min(1, note)) * Math.sqrt(SG));
       _m.compose(_p, _q, _s);
       this.halo.setMatrixAt(0, _m);
       this.halo.setColorAt(0, _c.setRGB(k, 0.68 * k, 0.32 * k));
@@ -451,7 +455,7 @@ export class CouncilEntranceCrystal {
     const waveOn = look.wave > 0.01;
     this.wall.visible = waveOn;
     if (waveOn) {
-      const hgt = 4.5 * (0.45 + 0.55 * look.wave);
+      const hgt = 4.5 * Math.sqrt(SG) * (0.45 + 0.55 * look.wave);
       _v.set(her.x, 0, her.z);
       this.stage.worldToLocal(_v);
       this.wall.position.set(_v.x, 0.05, _v.z);
@@ -484,7 +488,7 @@ export class CouncilEntranceCrystal {
       crest: 0.05,
       strength: 0.7,
     });
-    this.h.particles.puff(her.x, her.y + 3, her.z, 30, SPARK);
+    this.h.particles.puff(her.x, her.y + 3 * SG, her.z, 30, SPARK);
   }
 }
 

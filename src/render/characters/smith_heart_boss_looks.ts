@@ -28,6 +28,7 @@ import {
   BREATH_BODY_URL,
 } from '../smith_heart_fx/breath_body_core';
 import { BREATH_ENTRANCE_GESTURES } from '../smith_heart_fx/breath_entrance_core';
+import { COUNCIL_MODEL_HEIGHTS } from '../smith_heart_fx/council_bodies_core';
 import {
   COUNCIL_AWAKEN_CLIP,
   COUNCIL_ENTRANCE_GESTURES,
@@ -448,8 +449,9 @@ export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
   // The Guardian of the Hammer, the Hammer Council's main boss, wears the model first built for the
   // Slabwright (heart_slabwright.glb): Tripo P2, one UV island per rock on a painted 1024 atlas in
   // ETC1S, a stone rig built in Blender (every rock rigid to one bone; the tracks that only hold the
-  // rest pose are dropped at build, see the spec), drawn at the Guardian's height (3.4 at its scale
-  // of 3.2). Its melee lands at 1.0 s, inside its 2.6 s swing; Hammerfall (the template's
+  // rest pose are dropped at build, see the spec), drawn at the Guardian's height (4.6 at its scale
+  // of 3.2: about 14.7 yd, the raid small round its feet; COUNCIL_MODEL_HEIGHTS, which the
+  // entrance's rock and the bond's tether read too). Its melee lands at 1.0 s, inside its 2.6 s swing; Hammerfall (the template's
   // arcCleave, through its brood_cleave cue) swings the wide Attack2, and Mountain's Rush's wind-up
   // slams Attack down as the run starts (its 1.0 s contact at the 0.8 s wind-up). Hammer's Weight
   // slams through CastWake (authored to land at 0.94 s) at the end of its 1.5 s bar, Mountain's
@@ -461,7 +463,7 @@ export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
   smith_heart_hammer_guardian: {
     url: `${CREATURES}/heart_slabwright.glb`,
     animUrls: [COUNCIL_GUARDIAN_ENTRANCE_URL],
-    height: 3.4,
+    height: COUNCIL_MODEL_HEIGHTS.guardian,
     clips: COUNCIL_GUARDIAN_CLIPS,
     phaseClips: councilStances(
       COUNCIL_GUARDIAN_CLIPS,
@@ -479,7 +481,7 @@ export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
     runRef: 7,
     gaitWindDown: true,
     authoredAtlas: true,
-    clickRadius: 2.2,
+    clickRadius: 2.8,
   },
   // The Seam Singer, the Hammer Council's second boss beside the Guardian: Tripo P2 from the
   // concept sheet, a painted 1024 atlas in ETC1S, a stone rig built in Blender (every piece rigid
@@ -489,11 +491,12 @@ export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
   // the bar. It floats, so no foot can slide: runRef is the template's 7 yd/s at 1x.
   // smith_heart_fx/council_bodies.ts still plays its dust and rings (COUNCIL_MODELLED).
   // Her entrance: asleep in her crystal on Dormant, held dark, then floating out on Awaken
-  // and singing the high note (CastSong).
+  // and singing the high note (CastSong). Drawn at 5.5 at her scale of 2.0 (11 yd, about the
+  // Guardian's shoulder; COUNCIL_MODEL_HEIGHTS).
   smith_heart_seam_singer: {
     url: `${CREATURES}/heart_seam_singer.glb`,
     animUrls: [COUNCIL_SINGER_ENTRANCE_URL],
-    height: 2.5,
+    height: COUNCIL_MODEL_HEIGHTS.singer,
     clips: COUNCIL_SINGER_CLIPS,
     phaseClips: councilStances(
       COUNCIL_SINGER_CLIPS,
@@ -510,7 +513,7 @@ export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
     runRef: 7,
     gaitWindDown: true,
     authoredAtlas: true,
-    clickRadius: 1.0,
+    clickRadius: 2.0,
   },
   smith_heart_breath_guardian: {
     url: BREATH_BODY_URL,

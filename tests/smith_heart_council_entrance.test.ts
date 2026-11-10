@@ -35,7 +35,9 @@ import {
   COUNCIL_ENTRANCE_LOW_SHARE,
   COUNCIL_ENTRANCE_SOUNDS,
   COUNCIL_INTRO_VOICE,
+  COUNCIL_PAIR,
   COUNCIL_ROCK,
+  COUNCIL_VEIN,
   CRYSTAL_SHARDS,
   chunkAt,
   columnLightAt,
@@ -45,6 +47,7 @@ import {
   councilEntranceLook,
   councilEntrancePicks,
   councilEntranceShake,
+  councilFacingShare,
   crossedCouncilBeat,
   crystalFlare,
   DORMANT,
@@ -59,8 +62,10 @@ import {
   shardAt,
   slabAt,
   stepCouncilEntranceTime,
+  VEIN_PRISMS,
   VEIN_RINGS,
 } from '../src/render/smith_heart_fx/council_entrance_core';
+import { SMITH_HEART_COUNCIL_FACING } from '../src/sim/content/smith_heart';
 import {
   HAMMER_PIT,
   QUARRY_PILLAR_SPOTS,
@@ -350,7 +355,7 @@ describe('the plans', () => {
     expect(ROCK_SLABS.length).toBeGreaterThan(25);
     for (const s of ROCK_SLABS) {
       const r = Math.hypot(s.x, s.z);
-      expect(r).toBeGreaterThan(COUNCIL_ROCK.crownR * 0.85);
+      expect(r).toBeGreaterThan(COUNCIL_ROCK.crownR * 0.85 * (1 - COUNCIL_ROCK.singerSide));
       expect(r).toBeLessThan(COUNCIL_ROCK.footR * 1.1);
       slabAt(s, -1, st);
       expect(st.x).toBe(s.x);
@@ -366,6 +371,45 @@ describe('the plans', () => {
       (s) => Math.abs(s.y - mid) < 1.6 && s.z > 0 && Math.abs(Math.atan2(s.x, s.z)) < 0.3,
     );
     expect(front).toHaveLength(0);
+  });
+
+  it('the rock and the vein grow with the bodies and stand clear of each other', () => {
+    // The Guardian drawn some 14.7 yd, the Singer 11: the spur stands over its crouch, the
+    // cocoon over hers.
+    expect(COUNCIL_ROCK.height).toBeGreaterThan(14.7 * 0.75 + 4);
+    expect(COUNCIL_VEIN.cocoonH).toBeGreaterThan(11 * 0.75 + 2);
+    // The two stand 9.5 yd apart, each set piece facing the other: the spur's foot slabs and
+    // the vein's prisms never meet (world axes, at the spawn facing).
+    expect(COUNCIL_PAIR.apart).toBeCloseTo(Math.hypot(3, 9), 6);
+    const f = SMITH_HEART_COUNCIL_FACING;
+    const world = (x: number, z: number) => ({
+      x: x * Math.cos(f) + z * Math.sin(f),
+      z: -x * Math.sin(f) + z * Math.cos(f),
+    });
+    let prisms = Number.POSITIVE_INFINITY;
+    let cocoon = Number.POSITIVE_INFINITY;
+    const c = world(COUNCIL_VEIN.cocoonX, COUNCIL_VEIN.cocoonZ);
+    for (const s of ROCK_SLABS) {
+      if (s.y > COUNCIL_ROCK.height * 0.4) continue;
+      const a = world(s.x, s.z);
+      const reach = s.sz / 2;
+      for (const pr of VEIN_PRISMS) {
+        const b = world(pr.x, pr.z);
+        const d = Math.hypot(COUNCIL_PAIR.dx + b.x - a.x, COUNCIL_PAIR.dz + b.z - a.z);
+        prisms = Math.min(prisms, d - pr.r - reach);
+      }
+      const d = Math.hypot(COUNCIL_PAIR.dx + c.x - a.x, COUNCIL_PAIR.dz + c.z - a.z);
+      cocoon = Math.min(cocoon, d - COUNCIL_VEIN.cocoonR - reach);
+    }
+    expect(prisms).toBeGreaterThan(0.3);
+    // The cocoon at most leans on the spur's foot (the vein runs out of the quarry's rock).
+    expect(cocoon).toBeGreaterThan(-1.5);
+    // No prism grows toward the Guardian.
+    for (const p of VEIN_PRISMS)
+      expect(councilFacingShare(p.bearing, COUNCIL_PAIR.singerToGuardian)).toBeLessThan(0.5);
+    // Her shards ring her body, not her feet.
+    expect(ORBIT_SHARDS.r).toBeGreaterThan(COUNCIL_VEIN.cocoonR);
+    expect(ORBIT_SHARDS.yHigh).toBeGreaterThan(11 * 0.75);
   });
 
   it('the rubble flies, lies a breath and is gone', () => {
