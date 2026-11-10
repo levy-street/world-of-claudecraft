@@ -31,6 +31,66 @@ interface TapTarget {
   addEventListener(type: string, listener: (e: PointerEvent & MouseEvent) => void): void;
 }
 
+/** The event root the ghost-click guard listens on (the document in the
+ *  browser; a fake in tests). Capture-phase listeners only. */
+export interface GhostClickRoot {
+  addEventListener(type: string, listener: (e: Event) => void, capture: boolean): void;
+}
+
+const guardedRoots = new WeakSet<GhostClickRoot>();
+let ghostArmed = false;
+let ghostGeneration = 0;
+
+/**
+ * Install the document-level ghost-click guard on `root` (idempotent).
+ *
+ * The problem it solves: a touch tap acted on at POINTERUP (see bindTouchTap)
+ * usually opens a window, and the browser then synthesizes the compatibility
+ * `click` for that same tap. That click is hit-tested AFTER the handler ran, so
+ * on a phone it lands on whatever the new window put under the finger (the
+ * Talents button pressed the talents window's first "View talents" button; the
+ * Deeds button pressed the Collection tab). The per-button `suppressClick`
+ * below cannot catch it, because it never reaches the tapped button.
+ *
+ * While armed, the FIRST pointer-generated click anywhere is swallowed in the
+ * capture phase before any window handler sees it. The next pointerdown (a new,
+ * real tap) disarms it, as does the timeout, so a genuine tap on the new window
+ * always works. Keyboard activation (`detail === 0`) is never swallowed.
+ */
+export function installGhostClickGuard(root: GhostClickRoot): void {
+  if (guardedRoots.has(root)) return;
+  guardedRoots.add(root);
+  root.addEventListener(
+    'pointerdown',
+    () => {
+      ghostArmed = false;
+    },
+    true,
+  );
+  root.addEventListener(
+    'click',
+    (e) => {
+      if (!ghostArmed || (e as MouseEvent).detail === 0) return;
+      ghostArmed = false;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    },
+    true,
+  );
+}
+
+/** Arm the guard: the next pointer-generated click (before any new pointerdown,
+ *  within CLICK_SUPPRESS_MS) is the ghost of a touch tap already handled.
+ *  Lazily installs on the document in the browser. */
+export function armGhostClickGuard(): void {
+  if (typeof document !== 'undefined') installGhostClickGuard(document);
+  ghostArmed = true;
+  const generation = ++ghostGeneration;
+  globalThis.setTimeout(() => {
+    if (generation === ghostGeneration) ghostArmed = false;
+  }, CLICK_SUPPRESS_MS);
+}
+
 /** Bind `onTap` so it fires for ANY touch pointer (primary or not), plus the
  *  regular click path for mouse and keyboard. Use this instead of a bare
  *  `addEventListener('click', ...)` for every touch-facing HUD button. */
@@ -53,6 +113,11 @@ export function bindTouchTap(el: TapTarget, onTap: (e: Event) => void): void {
     globalThis.setTimeout(() => {
       suppressClick = false;
     }, CLICK_SUPPRESS_MS);
+    // Armed BEFORE onTap: the handler may open a window under the finger,
+    // and the synthesized click that follows must not press it.
+    // Only the primary pointer gets a synthesized click; arming for a second
+    // finger would wait to swallow a click that is not a ghost.
+    if (e.isPrimary !== false) armGhostClickGuard();
     onTap(e);
   });
   el.addEventListener('pointercancel', (e) => {

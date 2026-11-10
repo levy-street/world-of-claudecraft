@@ -1,10 +1,11 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   bindMobileFrameLongPress,
   bindTouchDoubleTap,
   bindTouchTap,
   CLICK_SUPPRESS_MS,
   DOUBLE_TAP_MS,
+  installGhostClickGuard,
   MOBILE_CONTEXT_LONG_PRESS_MS,
   TAP_SLOP_PX,
 } from '../src/ui/touch_tap';
@@ -384,5 +385,166 @@ describe('bindMobileFrameLongPress stopBubble (a frame nested in another bound f
       stopPropagation: desktopStopped,
     });
     expect(desktopStopped).not.toHaveBeenCalled();
+  });
+});
+
+// The ghost click: a touch tap acted on at pointerup opens a window, then the
+// browser's synthesized click for that SAME tap is hit-tested against the new
+// window and presses whatever sits under the finger (Talents -> the first
+// "View talents" button; Deeds -> the Collection tab). The document guard must
+// swallow exactly that one click and nothing a real later tap produces.
+describe('ghost-click guard (the click that lands on a window a tap just opened)', () => {
+  function fakeRoot() {
+    const capture = new Map<string, Array<(e: Event) => void>>();
+    return {
+      addEventListener(type: string, fn: (e: Event) => void, useCapture: boolean) {
+        expect(useCapture).toBe(true);
+        const arr = capture.get(type) ?? [];
+        arr.push(fn);
+        capture.set(type, arr);
+      },
+      /** Dispatch through the capture listeners, then to `target` unless stopped. */
+      dispatch(type: string, e: Record<string, unknown>, target?: () => void) {
+        let stopped = false;
+        const prevented = vi.fn();
+        const event = {
+          preventDefault: prevented,
+          stopImmediatePropagation: () => {
+            stopped = true;
+          },
+          ...e,
+        } as unknown as Event;
+        for (const fn of capture.get(type) ?? []) fn(event);
+        if (!stopped) target?.();
+        return { stopped, prevented };
+      },
+      count(type: string) {
+        return capture.get(type)?.length ?? 0;
+      },
+    };
+  }
+
+  const root = fakeRoot();
+  installGhostClickGuard(root);
+  // A real tap's pointerdown disarms, which also resets module state per test.
+  const freshTap = () => root.dispatch('pointerdown', { pointerType: 'touch' });
+  beforeEach(freshTap);
+
+  it('installs once per root', () => {
+    installGhostClickGuard(root);
+    expect(root.count('click')).toBe(1);
+    expect(root.count('pointerdown')).toBe(1);
+  });
+
+  it('swallows the synthesized click that would press the newly opened window', () => {
+    freshTap();
+    const opener = fakeButton();
+    const windowButton = vi.fn();
+    bindTouchTap(opener, () => {});
+    opener.dispatch('pointerdown', touch(1));
+    opener.dispatch('pointerup', touch(1));
+    // The compat click is hit-tested AFTER the open, onto the new window.
+    const r = root.dispatch('click', { detail: 1 }, windowButton);
+    expect(r.stopped).toBe(true);
+    expect(r.prevented).toHaveBeenCalled();
+    expect(windowButton).not.toHaveBeenCalled();
+  });
+
+  it('swallows only ONE click: a second click passes', () => {
+    freshTap();
+    const opener = fakeButton();
+    bindTouchTap(opener, () => {});
+    opener.dispatch('pointerdown', touch(1));
+    opener.dispatch('pointerup', touch(1));
+    root.dispatch('click', { detail: 1 });
+    const windowButton = vi.fn();
+    root.dispatch('click', { detail: 1 }, windowButton);
+    expect(windowButton).toHaveBeenCalledTimes(1);
+  });
+
+  it('a genuine follow-up tap on the new window still works (pointerdown disarms)', () => {
+    freshTap();
+    const opener = fakeButton();
+    bindTouchTap(opener, () => {});
+    opener.dispatch('pointerdown', touch(2));
+    opener.dispatch('pointerup', touch(2));
+    // Non-primary finger: no ghost click was ever synthesized. The next real
+    // tap starts with a pointerdown, which must disarm before its own click.
+    freshTap();
+    const windowButton = vi.fn();
+    root.dispatch('click', { detail: 1 }, windowButton);
+    expect(windowButton).toHaveBeenCalledTimes(1);
+  });
+
+  it('never swallows keyboard activation (detail 0)', () => {
+    freshTap();
+    const opener = fakeButton();
+    bindTouchTap(opener, () => {});
+    opener.dispatch('pointerdown', touch(3));
+    opener.dispatch('pointerup', touch(3));
+    const windowButton = vi.fn();
+    root.dispatch('click', { detail: 0 }, windowButton);
+    expect(windowButton).toHaveBeenCalledTimes(1);
+  });
+
+  it('expires after CLICK_SUPPRESS_MS', () => {
+    vi.useFakeTimers();
+    freshTap();
+    const opener = fakeButton();
+    bindTouchTap(opener, () => {});
+    opener.dispatch('pointerdown', touch(4));
+    opener.dispatch('pointerup', touch(4));
+    vi.advanceTimersByTime(CLICK_SUPPRESS_MS + 1);
+    const windowButton = vi.fn();
+    root.dispatch('click', { detail: 1 }, windowButton);
+    expect(windowButton).toHaveBeenCalledTimes(1);
+  });
+
+  it('a mouse click on a bound button does not arm the guard', () => {
+    freshTap();
+    const opener = fakeButton();
+    bindTouchTap(opener, () => {});
+    opener.dispatch('click', { detail: 1 });
+    const windowButton = vi.fn();
+    root.dispatch('click', { detail: 1 }, windowButton);
+    expect(windowButton).toHaveBeenCalledTimes(1);
+  });
+
+  it('a slide off the button (no tap) does not arm the guard', () => {
+    freshTap();
+    const opener = fakeButton();
+    bindTouchTap(opener, () => {});
+    opener.dispatch('pointerdown', touch(5, 100, 100));
+    opener.dispatch('pointerup', touch(5, 100 + TAP_SLOP_PX + 5, 100));
+    const windowButton = vi.fn();
+    root.dispatch('click', { detail: 1 }, windowButton);
+    expect(windowButton).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('ghost-click guard: second finger', () => {
+  it('a NON-PRIMARY finger tap does not arm (it gets no synthesized click to swallow)', () => {
+    const root = {
+      fns: [] as Array<(e: Event) => void>,
+      addEventListener(type: string, fn: (e: Event) => void) {
+        if (type === 'click') this.fns.push(fn);
+      },
+    };
+    installGhostClickGuard(root);
+    const opener = fakeButton();
+    bindTouchTap(opener, () => {});
+    opener.dispatch('pointerdown', { ...touch(9), isPrimary: false });
+    opener.dispatch('pointerup', { ...touch(9), isPrimary: false });
+    // The joystick finger (primary) lifting on a real control must not be eaten.
+    let stopped = false;
+    const event = {
+      detail: 1,
+      preventDefault() {},
+      stopImmediatePropagation() {
+        stopped = true;
+      },
+    } as unknown as Event;
+    for (const fn of root.fns) fn(event);
+    expect(stopped).toBe(false);
   });
 });
