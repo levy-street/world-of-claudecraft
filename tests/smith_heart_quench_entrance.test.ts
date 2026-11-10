@@ -27,12 +27,17 @@ import {
 } from '../src/render/smith_heart_fx/quench_body_core';
 import {
   AWAKE,
+  BLADE_SHARDS,
+  BLADE_SHARDS_LOW,
+  bladeShard,
+  bladeShardSize,
   CHUNK_LIFE,
   crossedQuenchBeat,
   ENTRANCE_BLADE_PROFILE,
   ENTRANCE_WEB,
   FROZEN,
   heavedSlabAt,
+  newBladeShard,
   newChunkState,
   newSlabState,
   QUENCH_EMERGE_CLIP,
@@ -162,12 +167,18 @@ describe('the beats ride the voiced line', () => {
     // Her Emerge clip has played out by the hand-back (a swing is never held
     // by it in the fight).
     expect(E.breachAt + QUENCH_EMERGE_CLIP.end).toBeLessThanOrEqual(QUENCH_INTRO.seconds + 1e-9);
-    // The last blade is up before they turn; they plunge after the hand-back.
+    // The last blade is up before they turn; they burst a breath before the
+    // hand-back, every one gone as the fight begins.
     expect(
       E.bladesAt + (QUENCH_ENTRANCE_BLADES.count - 1) * E.bladeStep + E.bladeRise,
     ).toBeLessThan(E.pointAt + 0.01);
-    expect(E.plungeAt).toBeGreaterThan(QUENCH_INTRO.seconds);
-    expect(E.end).toBeGreaterThan(E.plungeAt + E.plungeFor);
+    expect(E.shatterAt).toBeGreaterThan(E.pointAt + 0.5);
+    expect(E.shatterAt + (QUENCH_ENTRANCE_BLADES.count - 1) * E.shatterStep).toBeLessThan(
+      QUENCH_INTRO.seconds,
+    );
+    expect(E.end).toBeGreaterThan(
+      E.shatterAt + E.shatterStep * (QUENCH_ENTRANCE_BLADES.count - 1) + E.shardLife,
+    );
   });
 
   it('every sound plays on a beat of the scene, of the Quench own samples', () => {
@@ -236,7 +247,7 @@ describe('the look', () => {
     expect(quenchEntranceLook(E.breachAt + QUENCH_EMERGE_CLIP.stood).ambient).toBeCloseTo(1, 6);
   });
 
-  it('the blades rise one by one, circle her, turn on the raid on "forgive", then plunge', () => {
+  it('the blades rise one by one, circle her, turn on the raid on "forgive", then shatter', () => {
     const B = QUENCH_ENTRANCE_BLADES;
     const first = quenchEntranceLook(E.bladesAt + 0.01);
     expect(first.blades[0].shown).toBe(true);
@@ -267,10 +278,37 @@ describe('the look', () => {
     expect(rising.reach).toBeLessThan(0.6);
     expect(up.blades[0].reach).toBeCloseTo(1, 6);
     expect(aimed.blades[0].glow).toBeGreaterThan(1);
-    // Handed back still pointing; then into the lake.
-    expect(quenchEntranceLook(QUENCH_INTRO.seconds).blades.every((b) => b.shown)).toBe(true);
-    const gone = quenchEntranceLook(E.plungeAt + 2);
-    expect(gone.blades.every((b) => !b.shown)).toBe(true);
+    // Whole and pointing until they burst, one a breath after the other;
+    // every one gone as she is handed back, their shards flying.
+    const whole = quenchEntranceLook(E.shatterAt - 0.01);
+    expect(whole.blades.every((b) => b.shown && b.shatter < 0)).toBe(true);
+    const burst = quenchEntranceLook(E.shatterAt + 0.01);
+    expect(burst.blades[0].shown).toBe(false);
+    expect(burst.blades[0].shatter).toBeCloseTo(0.01, 6);
+    expect(burst.blades[5].shown).toBe(true);
+    const gone = quenchEntranceLook(QUENCH_INTRO.seconds);
+    expect(gone.blades.every((b) => !b.shown && b.shatter > 0)).toBe(true);
+  });
+
+  it('a sword bursts into small shards that fly, fall and fade', () => {
+    const sh = newBladeShard();
+    for (let j = 0; j < BLADE_SHARDS; j++) {
+      bladeShard(2, j, sh);
+      expect(sh.size).toBeLessThan(0.5);
+      expect(sh.up).toBeGreaterThan(0);
+      expect(sh.out).toBeGreaterThan(0);
+      expect(sh.u).toBeGreaterThanOrEqual(0);
+      expect(sh.u).toBeLessThanOrEqual(1);
+    }
+    expect(BLADE_SHARDS_LOW).toBeLessThan(BLADE_SHARDS);
+    expect(bladeShardSize(0.3, -0.1)).toBe(0);
+    expect(bladeShardSize(0.3, 0.2)).toBeCloseTo(0.3, 9);
+    expect(bladeShardSize(0.3, E.shardLife - 0.1)).toBeLessThan(0.3);
+    expect(bladeShardSize(0.3, E.shardLife)).toBe(0);
+    // The burst's sound: the ice shattering, on the first sword's beat.
+    expect(
+      QUENCH_ENTRANCE_SOUNDS.some((s) => s.at === E.shatterAt && s.key === 'heart_quench_shatter'),
+    ).toBe(true);
   });
 
   it('awake once the scene is over (the fight look)', () => {
@@ -516,6 +554,7 @@ describe('QuenchEntranceFx over a fake world', () => {
       'smithHeartQuenchEntranceShockEdge',
       'smithHeartQuenchEntranceGeyserCore',
       'smithHeartQuenchEntranceBladeCracks',
+      'smithHeartQuenchEntranceBladeShards',
     ];
     r.aura(frozen);
     r.fx.update(0.3);
@@ -563,6 +602,7 @@ describe('QuenchEntranceFx over a fake world', () => {
       'smithHeartQuenchEntranceShockEdge',
       'smithHeartQuenchEntranceGeyserCore',
       'smithHeartQuenchEntranceBladeCracks',
+      'smithHeartQuenchEntranceBladeShards',
     ])
       expect(seen.has(n), n).toBe(true);
     expect(quenchEntranceFor(r.boss.id)).toBeNull();
@@ -625,12 +665,16 @@ describe('QuenchEntranceFx over a fake world', () => {
     }
     r.aura(null);
     let blades = false;
+    let shardsSeen = false;
     for (let s = 0; s < E.end; s += 1 / 20) {
       r.fx.update(1 / 20);
       blades ||= visible(r.scene, 'smithHeartQuenchEntranceBlades');
+      shardsSeen ||= visible(r.scene, 'smithHeartQuenchEntranceBladeShards');
     }
     expect(r.sent.filter((g) => g === QUENCH_BODY_GESTURES.emerge)).toHaveLength(1);
     expect(blades).toBe(false);
+    // Swords never seen whole burst into nothing.
+    expect(shardsSeen).toBe(false);
     r.fx.dispose();
   });
 
@@ -663,6 +707,7 @@ describe('QuenchEntranceFx over a fake world', () => {
       'smithHeartQuenchEntranceSlabs',
       'smithHeartQuenchEntranceShockEdge',
       'smithHeartQuenchEntranceBladeCracks',
+      'smithHeartQuenchEntranceBladeShards',
       'smithHeartQuenchEntranceBlades',
     ])
       expect(seen.has(n), n).toBe(true);
@@ -706,6 +751,10 @@ describe('QuenchEntranceFx over a fake world', () => {
       const chunks = (
         r.scene.getObjectByName('smithHeartQuenchEntranceChunks') as THREE.InstancedMesh
       ).count;
+      const shards = (
+        r.scene.getObjectByName('smithHeartQuenchEntranceBladeShards') as THREE.InstancedMesh
+      ).count;
+      expect(shards).toBe(QUENCH_ENTRANCE_BLADES.count * BLADE_SHARDS_LOW);
       const seen = play(r);
       for (const n of [
         'smithHeartQuenchEntranceSheet',
@@ -717,6 +766,7 @@ describe('QuenchEntranceFx over a fake world', () => {
         'smithHeartQuenchEntranceShockEdge',
         'smithHeartQuenchEntranceGeyserCore',
         'smithHeartQuenchEntranceBladeCracks',
+        'smithHeartQuenchEntranceBladeShards',
         'smithHeartQuenchEntranceBlades',
         'smithHeartQuenchEntranceBurst',
       ])
@@ -729,6 +779,10 @@ describe('QuenchEntranceFx over a fake world', () => {
         full.scene.getObjectByName('smithHeartQuenchEntranceChunks') as THREE.InstancedMesh
       ).count;
       expect(chunks).toBeLessThan(fullChunks);
+      expect(
+        (full.scene.getObjectByName('smithHeartQuenchEntranceBladeShards') as THREE.InstancedMesh)
+          .count,
+      ).toBe(QUENCH_ENTRANCE_BLADES.count * BLADE_SHARDS);
       full.fx.dispose();
     } finally {
       activateGfxProfile(original);

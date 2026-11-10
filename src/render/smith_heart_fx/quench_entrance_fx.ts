@@ -23,7 +23,8 @@
 //  - the blades: her conjured swords of ice (the Smith's blades' own section,
 //    quench_blade_tip_core.ts) rising out of the lake one by one round her,
 //    circling her, then turning to point each at one of the raid; after she
-//    is handed back they plunge back under the ice.
+//    is handed back they burst into small shards of ice that scatter,
+//    fall and fade, with a puff of frost and the ice shattering.
 // No camera is taken, no control: the player plays through it.
 //
 // Rules (src/render/CLAUDE.md): every geometry and material is built in the
@@ -56,6 +57,11 @@ import {
 import { quenchBodySockets } from './quench_body_sockets';
 import {
   AWAKE,
+  BLADE_SHARDS,
+  BLADE_SHARDS_LOW,
+  bladeShard,
+  bladeShardSize,
+  CHUNK_GRAVITY,
   CHUNK_LIFE,
   type ChunkState,
   crossedQuenchBeat,
@@ -63,6 +69,7 @@ import {
   ENTRANCE_WEB,
   FROST_REACH,
   heavedSlabAt,
+  newBladeShard,
   newChunkState,
   newQuenchEntranceLook,
   newSlabState,
@@ -587,6 +594,30 @@ const POWDER = {
   drag: 1.1,
   floor: -1e6,
 };
+const SHATTER_MIST = {
+  speed: 2.2,
+  up: 0.4,
+  life: 1.8,
+  size: [1.2, 4] as [number, number],
+  color: C.mist as readonly [number, number, number],
+  alpha: 0.24,
+  radius: 1.2,
+  drag: 1,
+  floor: -1e6,
+};
+const SHATTER_MOTES = {
+  speed: 5,
+  up: 2,
+  life: 1.1,
+  size: [0.32, 0.05] as [number, number],
+  color: C.glitter as readonly [number, number, number],
+  alpha: 1,
+  pool: 'glow' as const,
+  radius: 1.5,
+  drag: 0.8,
+  gravity: 5,
+  floor: -1e6,
+};
 const ROLL = {
   speed: 13,
   up: 0.4,
@@ -702,6 +733,7 @@ const _c = new THREE.Color();
 const _zero = new THREE.Matrix4().makeScale(0, 0, 0);
 const _chunk: ChunkState = newChunkState();
 const _slab = newSlabState();
+const _shard = newBladeShard();
 
 /** A strip pair per point of each line (`aReveal`, `aSide`), its places laid
  *  on the floor at the placing (layWeb). */
@@ -851,6 +883,12 @@ export class QuenchEntranceFx {
   private readonly blades: THREE.InstancedMesh;
   private readonly slabs: THREE.InstancedMesh;
   private readonly stars: THREE.InstancedMesh;
+  /** The small shards the swords burst into, and how many a sword. */
+  private readonly shards: THREE.InstancedMesh;
+  private readonly shardsPer: number;
+  /** Each sword's last drawn pose (her frame: its middle and its axis; NaN
+   *  until seen), so its shards burst from where it was. */
+  private readonly pose = new Float32Array(B.count * 6).fill(Number.NaN);
   private readonly band: THREE.Mesh;
   private readonly bandMat: THREE.ShaderMaterial;
   private readonly geyserCore: THREE.Mesh;
@@ -1070,6 +1108,31 @@ export class QuenchEntranceFx {
     });
     this.materials.push(bladeMat);
     this.blades = new THREE.InstancedMesh(bladeGeo, bladeMat, B.count);
+    // The small shards the swords burst into: their own crystal.
+    const shardGeo = new THREE.OctahedronGeometry(1, 0).toNonIndexed();
+    shardGeo.scale(0.45, 1, 0.3);
+    shardGeo.computeVertexNormals();
+    {
+      const n = shardGeo.getAttribute('position').count;
+      const hh = new Float32Array(n).fill(0.5);
+      const cc = new Float32Array(n);
+      for (let v = 0; v < n; v++) cc[v] = v % 3 === 0 ? 0 : 1;
+      shardGeo.setAttribute('aH', new THREE.BufferAttribute(hh, 1));
+      shardGeo.setAttribute('aCore', new THREE.BufferAttribute(cc, 1));
+    }
+    this.geometries.push(shardGeo);
+    this.shardsPer = this.density < 1 ? BLADE_SHARDS_LOW : BLADE_SHARDS;
+    this.shards = new THREE.InstancedMesh(shardGeo, bladeMat, B.count * this.shardsPer);
+    this.shards.name = 'smithHeartQuenchEntranceBladeShards';
+    this.shards.frustumCulled = false;
+    this.shards.visible = false;
+    this.shards.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    for (let i = 0; i < B.count * this.shardsPer; i++) {
+      this.shards.setMatrixAt(i, _zero);
+      this.shards.setColorAt(i, _c.setRGB(2.2, 2.2, 2.2));
+    }
+    if (this.shards.instanceColor) this.shards.instanceColor.setUsage(THREE.DynamicDrawUsage);
+    this.stage.add(this.shards);
     // Each blade's star of cracks where it breaks out of the ice.
     const starGeo = new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2);
     this.geometries.push(starGeo);
@@ -1264,8 +1327,10 @@ export class QuenchEntranceFx {
     const read = e.dead ? null : quenchEntranceClock(e.auras, this.clockRead);
     // Cut short before the breach (a forced pull): she breaks out, but her
     // blades stay under the ice (never pointed at players in a live fight).
-    if (read?.stage === 'frozen') this.cut = false;
-    else if (read?.stage === 'none' && prev >= 0 && prev < E.breachAt) this.cut = true;
+    if (read?.stage === 'frozen') {
+      this.cut = false;
+      this.pose.fill(Number.NaN);
+    } else if (read?.stage === 'none' && prev >= 0 && prev < E.breachAt) this.cut = true;
     this.time = e.dead ? AWAKE : stepQuenchEntranceTime(prev, dt, this.clockRead);
     const look = quenchEntranceLook(this.time, this.look);
     holdQuenchEntrance(e.id, look);
@@ -1312,6 +1377,7 @@ export class QuenchEntranceFx {
       this.playGesture?.(this.entityId, QUENCH_BODY_GESTURES.stand);
     if (this.entityId >= 0) holdQuenchEntrance(this.entityId, null);
     this.placedX = Number.NaN;
+    this.pose.fill(Number.NaN);
     this.entityId = -1;
     this.rosterSeen = Number.NaN;
     this.time = AWAKE;
@@ -1328,6 +1394,7 @@ export class QuenchEntranceFx {
     this.band.visible = false;
     this.slabs.visible = false;
     this.stars.visible = false;
+    this.shards.visible = false;
     this.particles.hideRings();
   }
 
@@ -1644,6 +1711,75 @@ export class QuenchEntranceFx {
     }
   }
 
+  /** The swords bursting: each into small shards of its own crystal flung
+   *  out from her, tumbling, falling to the ice and fading, with a puff of
+   *  frost and a glitter of motes on the burst (a sword never seen whole
+   *  bursts into nothing). */
+  private paintShards(prev: number, t: number): void {
+    const L = this.look;
+    let any = false;
+    const per = this.shardsPer;
+    for (let i = 0; i < B.count; i++) {
+      const b = L.blades[i];
+      const o = i * 6;
+      const seen = !Number.isNaN(this.pose[o]) && !this.cut;
+      if (seen && crossedQuenchBeat(prev, t, E.shatterAt + i * E.shatterStep)) {
+        const cx = this.pose[o];
+        const cy = this.pose[o + 1];
+        const cz = this.pose[o + 2];
+        this.particles.puff(cx, cy, cz, Math.round(8 * this.density) + 2, SHATTER_MIST);
+        const calm = this.reducedMotion() ? 0.5 : 1;
+        this.particles.puff(cx, cy, cz, Math.round(40 * this.density * calm) + 6, SHATTER_MOTES);
+      }
+      const since = b.shatter;
+      for (let j = 0; j < per; j++) {
+        const slot = i * per + j;
+        const size = seen && since >= 0 ? bladeShardSize(1, since) : 0;
+        if (size <= 0) {
+          this.shards.setMatrixAt(slot, _zero);
+          continue;
+        }
+        any = true;
+        // The low tier keeps every k-th shard (the burst stays whole).
+        bladeShard(i, Math.floor((j * BLADE_SHARDS) / per), _shard);
+        const len = B.length * (_shard.u - 0.5);
+        const x0 = this.pose[o] + this.pose[o + 3] * len;
+        const y0 = this.pose[o + 1] + this.pose[o + 4] * len;
+        const z0 = this.pose[o + 2] + this.pose[o + 5] * len;
+        // Out from her (her frame's middle), across, up, falling.
+        const r = Math.hypot(x0, z0) || 1;
+        const ox = x0 / r;
+        const oz = z0 / r;
+        const g = CHUNK_GRAVITY;
+        const floor = this.floorAt(x0, z0) + 0.08;
+        const land =
+          (_shard.up + Math.sqrt(_shard.up * _shard.up + 2 * g * Math.max(0, y0 - floor))) / g;
+        const tf = Math.min(since, land);
+        const sx = x0 + (ox * _shard.out - oz * _shard.side) * tf;
+        const sz = z0 + (oz * _shard.out + ox * _shard.side) * tf;
+        // Resting on the ice where it lands (sampled under it, not at the burst).
+        _p.set(
+          sx,
+          Math.max(this.floorAt(sx, sz) + 0.08, y0 + _shard.up * tf - 0.5 * g * tf * tf),
+          sz,
+        );
+        _axis.set(_shard.ax, _shard.ay, _shard.az);
+        _q.setFromAxisAngle(_axis, _shard.spin * tf);
+        _s.setScalar(bladeShardSize(_shard.size, since));
+        _m.compose(_p, _q, _s);
+        this.shards.setMatrixAt(slot, _m);
+        // Their light: the crystal's own, held down under reduced motion.
+        const k = this.reducedMotion() ? 1 : 2.2;
+        this.shards.setColorAt(slot, _c.setRGB(k, k, k));
+      }
+    }
+    this.shards.visible = any;
+    if (any) {
+      this.shards.instanceMatrix.needsUpdate = true;
+      if (this.shards.instanceColor) this.shards.instanceColor.needsUpdate = true;
+    }
+  }
+
   private paintChunks(since: number): void {
     const live = since >= 0 && since < CHUNK_LIFE + 0.1;
     this.chunks.visible = live;
@@ -1712,7 +1848,7 @@ export class QuenchEntranceFx {
       const bz = Math.cos(b.bearing) * ringR;
       const floor = this.floorAt(bx, bz);
       let foot = floor - B.length + (B.length + B.hover) * b.lift;
-      foot += 0.3 * Math.sin(this.clock * 1.7 + i * 1.3) * b.lift * (1 - b.plunge);
+      foot += 0.3 * Math.sin(this.clock * 1.7 + i * 1.3) * b.lift;
       // Its aim: upright, then its point snapped onto its mark (or ahead).
       _d.set(0, 1, 0);
       if (b.aim > 0) {
@@ -1736,17 +1872,6 @@ export class QuenchEntranceFx {
         _v.set(tx - bx, ty - mid, tz - bz).normalize();
         _d.lerp(_v, b.aim).normalize();
       }
-      // The plunge: turned point down and driven under the ice.
-      if (b.plunge > 0) {
-        const k = Math.min(1, b.plunge * 2);
-        _d.lerp(_down, k).normalize();
-        if (_d.lengthSq() < 1e-6) _d.copy(_down);
-        foot =
-          floor +
-          B.length +
-          (foot - floor - B.length) * (1 - b.plunge) -
-          (B.length * 2 + 2) * b.plunge;
-      }
       _q.setFromUnitVectors(_up, _d);
       // Its spin about its own length: fast up out of the ice, then lazy.
       _q2.setFromAxisAngle(_up, b.spin);
@@ -1768,12 +1893,11 @@ export class QuenchEntranceFx {
       _m.compose(_p, _q2.identity(), _s);
       this.halos.setMatrixAt(i, _m);
       // Out of the ice only (never a glow through it before it breaks out
-      // or after it plunges).
+      // or after it bursts).
       const hk =
         (this.reducedMotion() ? 0.6 : 1) *
         (0.05 + 0.04 * Math.min(2, b.glow)) *
-        Math.min(1, b.lift * 3) *
-        (1 - b.plunge);
+        Math.min(1, b.lift * 3);
       this.halos.setColorAt(i, _c.setRGB(hk * 0.15, hk * 0.9, hk * 2));
       if (b.glint > 0.01) {
         _p.set(bx, mid, bz).addScaledVector(_d, B.length * 0.5);
@@ -1788,7 +1912,7 @@ export class QuenchEntranceFx {
       if (b.lift < 1 && b.lift > 0.05 && this.rand() < dt * 34 * this.density)
         this.particles.puff(bx, floor + 0.3, bz, 2, BURST);
       // The frost trail: thick while it spins up into the circle.
-      if (b.plunge === 0 && b.lift > 0.3) {
+      if (b.lift > 0.3) {
         let n = dt * (b.lift < 1 ? 70 : 14) * this.density * (this.reducedMotion() ? 0.35 : 1);
         while (n > 0) {
           if (n < 1 && this.rand() > n) break;
@@ -1798,7 +1922,7 @@ export class QuenchEntranceFx {
         }
       }
       // Each blade's own star of cracks and burst of ice where it breaks
-      // out, and the splash as it plunges back.
+      // out.
       const start = E.bladesAt + i * E.bladeStep;
       const sinceUp = t - start;
       const sx0 = Math.sin(b.bearing) * B.ring * 0.35;
@@ -1815,10 +1939,16 @@ export class QuenchEntranceFx {
       } else this.stars.setMatrixAt(i, _zero);
       if (crossedQuenchBeat(prev, t, start + 0.05))
         this.particles.puff(sx0, floor + 0.4, sz0, Math.round(22 * this.density) + 4, BURST);
-      const pl = E.plungeAt + i * E.plungeStep + E.plungeFor * 0.6;
-      if (crossedQuenchBeat(prev, t, pl))
-        this.particles.puff(bx, floor + 0.4, bz, Math.round(16 * this.density) + 3, BURST);
+      // Its pose this frame, for the shards it bursts into.
+      const o = i * 6;
+      this.pose[o] = bx;
+      this.pose[o + 1] = mid;
+      this.pose[o + 2] = bz;
+      this.pose[o + 3] = _d.x;
+      this.pose[o + 4] = _d.y;
+      this.pose[o + 5] = _d.z;
     }
+    this.paintShards(prev, t);
     this.stars.visible = stars;
     if (stars) {
       this.stars.instanceMatrix.needsUpdate = true;
@@ -1876,6 +2006,7 @@ export class QuenchEntranceFx {
     this.blades.dispose();
     this.slabs.dispose();
     this.stars.dispose();
+    this.shards.dispose();
     this.halos.dispose();
     this.root.removeFromParent();
     this.particles.dispose();

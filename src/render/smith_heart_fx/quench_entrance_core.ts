@@ -28,7 +28,8 @@
 //   the blades her conjured ice blades rise out of the lake one by one round
 //              her ("and the cold..."), circle her, then turn and point at
 //              the raid as she throws her arms down ("...forgive"); the fight
-//              is hers to begin; then they plunge back under the ice
+//              is hers to begin; then they burst into small shards of
+//              ice that scatter, fall and fade
 //
 // The beats ride the voice clip's own words (QUENCH_INTRO_VOICE, measured on
 // the shipped clip), counted from the sim's QUENCH_INTRO.speakAt.
@@ -122,10 +123,12 @@ export const QUENCH_ENTRANCE = {
   /** They turn and point at the raid on "forgive" (and her arms come down). */
   pointAt: SPEAK + V.forgive,
   pointFor: 0.16,
-  /** After she is handed back they plunge back under the ice. */
-  plungeAt: QUENCH_INTRO.seconds + 0.35,
-  plungeStep: 0.07,
-  plungeFor: 0.5,
+  /** A breath before she is handed back they burst into small shards of
+   *  ice, one a moment after the other (the fight starts with them gone). */
+  shatterAt: QUENCH_INTRO.seconds - 0.4,
+  shatterStep: 0.05,
+  /** How long a shard flies, lies and fades. */
+  shardLife: 1.7,
   /** The scene's tail: the snow thins, the mist and the frost fade. */
   end: QUENCH_INTRO.seconds + 2.6,
 } as const;
@@ -234,8 +237,8 @@ export interface QuenchEntranceBlade {
   bearing: number;
   /** Upright (0) to pointing at its mark (1). */
   aim: number;
-  /** The plunge back under the ice: 0 none, 1 gone. */
-  plunge: number;
+  /** Seconds since it burst into shards (-1: whole). */
+  shatter: number;
   /** Its light (0..1, past 1 flaring). */
   glow: number;
   /** Its turn about its own length (radians): spun fast up out of the ice,
@@ -304,7 +307,7 @@ function newBlade(): QuenchEntranceBlade {
     lift: 0,
     bearing: 0,
     aim: 0,
-    plunge: 0,
+    shatter: -1,
     glow: 0,
     spin: 0,
     reach: 0,
@@ -377,7 +380,7 @@ function awake(out: QuenchEntranceLook): QuenchEntranceLook {
     b.shown = false;
     b.lift = 0;
     b.aim = 0;
-    b.plunge = 0;
+    b.shatter = -1;
     b.glow = 0;
   }
   return out;
@@ -496,9 +499,9 @@ export function quenchEntranceLook(
   for (let i = 0; i < out.blades.length; i++) {
     const b = out.blades[i];
     const start = E.bladesAt + i * E.bladeStep;
-    const plungeFrom = E.plungeAt + i * E.plungeStep;
-    b.plunge = smooth(plungeFrom, plungeFrom + E.plungeFor, t);
-    b.shown = !frozen && t >= start && b.plunge < 1;
+    const burst = E.shatterAt + i * E.shatterStep;
+    b.shatter = !frozen && t >= burst ? t - burst : -1;
+    b.shown = !frozen && t >= start && t < burst;
     b.lift = frozen ? 0 : rise(start, start + E.bladeRise, t);
     b.bearing = entranceBladeBearing0(i) + B.orbit * orbitT;
     // The snap: past the mark a breath, then settling on it.
@@ -573,7 +576,8 @@ export const QUENCH_ENTRANCE_POOLS = {
  *  the ice cracking deep as the web runs (three groans, the later ones
  *  lower), the cold gathering under her, the breach (the ice shattering and
  *  the lake breaking), the blades waking, their lock as they point, the
- *  plunge. Each plays once, on its beat, for a scene seen crossing it. */
+ *  swords bursting. Each plays once, on its beat, for a scene seen
+ *  crossing it. */
 export const QUENCH_ENTRANCE_SOUNDS: readonly {
   at: number;
   key: string;
@@ -588,7 +592,13 @@ export const QUENCH_ENTRANCE_SOUNDS: readonly {
   { at: QUENCH_ENTRANCE.breachAt, key: 'heart_quench_shatter', gain: 1, rate: 0.8 },
   { at: QUENCH_ENTRANCE.bladesAt, key: 'heart_quench_wake', gain: 0.9, rate: 1.05 },
   { at: QUENCH_ENTRANCE.pointAt, key: 'heart_quench_slash_lock', gain: 1, rate: 0.9 },
-  { at: QUENCH_ENTRANCE.plungeAt, key: 'heart_quench_plunge', gain: 0.8, rate: 1.1 },
+  { at: QUENCH_ENTRANCE.shatterAt, key: 'heart_quench_shatter', gain: 1, rate: 1.2 },
+  {
+    at: QUENCH_ENTRANCE.shatterAt + 0.15,
+    key: 'heart_quench_bite',
+    gain: 0.7,
+    rate: 1.4,
+  },
 ];
 
 // ---- the web of cracks across the lake -----------------------------------------------------
@@ -893,6 +903,58 @@ export const CHUNK_LIFE = (() => {
   }
   return longest;
 })();
+
+// ---- the swords bursting into shards ----------------------------------------------------
+
+/** Small shards a sword bursts into (the low tier keeps fewer). */
+export const BLADE_SHARDS = 18;
+export const BLADE_SHARDS_LOW = 8;
+
+/** Shard `j` of sword `i` (deterministic): where along the sword it starts
+ *  (0 pommel, 1 point), how it is flung (yards a second: out from her, up,
+ *  across), how it tumbles and its size (yards). */
+export interface BladeShard {
+  u: number;
+  out: number;
+  up: number;
+  side: number;
+  spin: number;
+  ax: number;
+  ay: number;
+  az: number;
+  size: number;
+}
+
+export function newBladeShard(): BladeShard {
+  return { u: 0, out: 0, up: 0, side: 0, spin: 0, ax: 0, ay: 1, az: 0, size: 0 };
+}
+
+export function bladeShard(i: number, j: number, out: BladeShard): BladeShard {
+  // (Hashed inline: the painter asks every frame, so no closure.)
+  const key = i * 97 + j + 501;
+  out.u = 0.08 + 0.9 * quenchEntranceHash(key, 1);
+  out.out = 2 + 6 * quenchEntranceHash(key, 2);
+  out.up = 2.5 + 6 * quenchEntranceHash(key, 3);
+  out.side = (quenchEntranceHash(key, 4) - 0.5) * 7;
+  out.spin = 5 + 9 * quenchEntranceHash(key, 5);
+  const ax = quenchEntranceHash(key, 6) - 0.5;
+  const ay = quenchEntranceHash(key, 7) - 0.5;
+  const az = quenchEntranceHash(key, 8) - 0.5;
+  const al = Math.hypot(ax, ay, az) || 1;
+  out.ax = ax / al;
+  out.ay = ay / al;
+  out.az = az / al;
+  out.size = 0.22 + 0.26 * quenchEntranceHash(key, 9);
+  return out;
+}
+
+/** A shard's size `since` seconds after its sword burst: whole while it
+ *  flies and lies, shrinking away over the last of its life (0 gone). */
+export function bladeShardSize(size: number, since: number): number {
+  const L = QUENCH_ENTRANCE.shardLife;
+  if (since < 0 || since >= L) return 0;
+  return size * Math.min(1, (L - since) / 0.6);
+}
 
 // ---- the conjured blades --------------------------------------------------------------------
 
