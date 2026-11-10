@@ -23086,10 +23086,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.alert.resonanceTitle': '共鳴',
   'hudChrome.council.alert.weightTitle': '重錘之壓',
   'hudChrome.council.alert.timeAria': '剩餘{seconds}秒',
-  'hudChrome.auraEffect.breathGuardian.intro':
-    '沉睡中：在風暴將它放下之前，無法被攻擊或傷害。',
-  'hudChrome.auraEffect.council.intro':
-    '沉睡中：在議會甦醒之前，無法被攻擊或傷害。',
+  'hudChrome.auraEffect.breathGuardian.intro': '沉睡中：在風暴將它放下之前，無法被攻擊或傷害。',
+  'hudChrome.auraEffect.council.intro': '沉睡中：在議會甦醒之前，無法被攻擊或傷害。',
   'hudChrome.auraEffect.council.wakeMark':
     '結束時，一根石柱會從你腳下的地面衝出，對{radius}碼內的所有人造成{min}到{max}點傷害並將其擊退。站到團隊需要掩體的位置。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。',
   'hudChrome.auraEffect.council.rockMark':
