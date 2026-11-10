@@ -7,7 +7,9 @@
 //  1. dormant: the boss kneels on the Anvil like a cracked stone statue, its
 //     cracks black (a still clip, its glow held at nothing);
 //  2. the veins: each altar's vein lights in its element's colour and the
-//     light runs down its channel across the floor toward the boss;
+//     light runs down its carved groove, spiralling in across the floor
+//     (the four grooves one four-armed spiral, swept like the room's ridges:
+//     ../smith_heart/heart_vein_groove_core.ts) to the boss;
 //  3. the beam: the four streams meet under its heart and fuse into one giant
 //     column of light shooting up into the sky, swirling with the four
 //     colours round a white core; the floor's shockwave, the camera's thud,
@@ -28,7 +30,13 @@
 // Node-only (RENDER_PURE_CORES): no three.js, no DOM, deterministic.
 
 import type { SmithHeartVein } from '../../sim/content/smith_heart_layout';
-import { HEART_ALTARS, HEART_ROOM } from '../../sim/content/smith_heart_layout';
+import { HEART_RING_LOOK } from '../smith_heart/heart_quarters_core';
+import {
+  HEART_VEIN_GROOVE,
+  type HeartVeinGroovePolyline,
+  heartVeinGrooveLeaveR,
+  heartVeinGroovePath,
+} from '../smith_heart/heart_vein_groove_core';
 import { FINAL_BODY_CLIP, FINAL_ELEMENT_LOOK } from './final_body_core';
 
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
@@ -43,10 +51,13 @@ const easeIn = (v: number) => clamp01(v) ** 2;
 export const ARRIVAL = {
   /** The statue alone while the hop's wash clears. */
   hold: 0.9,
-  /** Each vein lights this long after the one before. */
-  veinStep: 0.25,
-  /** A vein's light runs from its altar to the boss in this long. */
-  veinRun: 2.0,
+  /** Each vein lights this long after the one before (close together: the
+   *  four arms of one spiral, not four separate runs). */
+  veinStep: 0.1,
+  /** A vein's light runs down its spiral from its altar to the boss in this
+   *  long (the spiral is longer than the old straight run; the convergence
+   *  and every beat after it stand where they stood). */
+  veinRun: 2.45,
   /** The beam shoots up, stands, then falls back into the boss. */
   beamRise: 0.4,
   beamHold: 2.0,
@@ -107,25 +118,84 @@ export const ARRIVAL_SHAKES = {
 
 // ---- the veins --------------------------------------------------------------------------------
 
-/** Where vein `vein`'s stream runs (room-local yards): from its altar's foot
- *  down its channel to the boss's feet at the platform's centre. */
-export function arrivalStreamPath(vein: SmithHeartVein): {
-  from: { x: number; z: number };
-  to: { x: number; z: number };
-} {
-  const a = HEART_ALTARS.find((q) => q.vein === vein) ?? HEART_ALTARS[0];
-  const dx = a.x - HEART_ROOM.x;
-  const dz = a.z - HEART_ROOM.z;
-  const d = Math.hypot(dx, dz) || 1;
-  const ux = dx / d;
-  const uz = dz / d;
-  // Off the altar's collider (r 3) and short of the boss's own footprint.
-  const start = d - 3.5;
-  const end = 2.4;
-  return {
-    from: { x: HEART_ROOM.x + ux * start, z: HEART_ROOM.z + uz * start },
-    to: { x: HEART_ROOM.x + ux * end, z: HEART_ROOM.z + uz * end },
+/** Where a stream starts: where its groove clears the altar's collider
+ *  (r 3), the same radius for all four (one symmetric spiral). */
+export const ARRIVAL_STREAM_FROM_R = heartVeinGrooveLeaveR(ARRIVAL_VEINS[0], 3.5);
+/** Spans down each stream's spiral. */
+export const ARRIVAL_STREAM_STEPS = 128;
+
+/** A stream's run (instance-local yards): down its altar's groove from the
+ *  altar's foot, spiralling in across the floor and the central ring to the
+ *  boss's feet; `from` and `to` its ends. Laid once per vein. */
+export interface ArrivalStreamPath extends HeartVeinGroovePolyline {
+  readonly from: { x: number; z: number };
+  readonly to: { x: number; z: number };
+}
+
+const streamPaths = new Map<SmithHeartVein, ArrivalStreamPath>();
+
+export function arrivalStreamPath(vein: SmithHeartVein): ArrivalStreamPath {
+  const hit = streamPaths.get(vein);
+  if (hit) return hit;
+  const line = heartVeinGroovePath(
+    vein,
+    ARRIVAL_STREAM_FROM_R,
+    HEART_VEIN_GROOVE.endR,
+    ARRIVAL_STREAM_STEPS,
+  );
+  const n = line.x.length - 1;
+  const path: ArrivalStreamPath = {
+    ...line,
+    from: { x: line.x[0], z: line.z[0] },
+    to: { x: line.x[n], z: line.z[n] },
   };
+  streamPaths.set(vein, path);
+  return path;
+}
+
+/** The central ring's kerb the streams leap (yards from the room's centre:
+ *  its inner foot over the well, its outer foot on the walk; its crest's
+ *  height over the walk, quarter_pieces.py Kit_HeartDais, with a hair of
+ *  air). */
+export const ARRIVAL_KERB = {
+  /** Past the well's lip inward (the kerb's crystal leans over the well). */
+  inner: HEART_RING_LOOK.wellR - 1.2,
+  /** Past the rim's outer foot (its rock spurs reach onto the walk). */
+  outer: HEART_RING_LOOK.rimOut + 1.4,
+  height: 1.45,
+} as const;
+
+/** How high a stream rides over the walk at radius `r` from the room's
+ *  centre: flat in its groove, arching over the ring's kerb (a leap of
+ *  light), down onto the well's face to the boss. */
+export function arrivalStreamLift(r: number): number {
+  const { inner, outer, height } = ARRIVAL_KERB;
+  if (r <= inner || r >= outer) return 0;
+  const u = (r - inner) / (outer - inner);
+  return height * Math.sin(Math.PI * u) ** 2 * (1 + 0.15 * Math.sin(Math.PI * u));
+}
+
+/** The point `k` of the way down `path` by length (0 its altar's foot, 1 the
+ *  boss), written into `out` (no allocation). */
+export function arrivalStreamPointAt(
+  path: ArrivalStreamPath,
+  k: number,
+  out: { x: number; z: number },
+): { x: number; z: number } {
+  const s = clamp01(k) * path.length;
+  const a = path.along;
+  let lo = 0;
+  let hi = a.length - 1;
+  while (hi - lo > 1) {
+    const mid = (lo + hi) >> 1;
+    if (a[mid] <= s) lo = mid;
+    else hi = mid;
+  }
+  const span = a[hi] - a[lo] || 1;
+  const f = Math.max(0, Math.min(1, (s - a[lo]) / span));
+  out.x = path.x[lo] + (path.x[hi] - path.x[lo]) * f;
+  out.z = path.z[lo] + (path.z[hi] - path.z[lo]) * f;
+  return out;
 }
 
 /** How far vein `i`'s light has run down its channel at `t` (0 at its altar,

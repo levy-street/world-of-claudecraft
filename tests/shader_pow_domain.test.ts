@@ -300,7 +300,7 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/smith_heart/env_rock_paint_core.ts': 1,
   'src/render/smith_heart/hammer_air.ts': 1,
   'src/render/smith_heart/hammer_env_rock_paint.ts': 1,
-  'src/render/smith_heart/heart_floor_glsl.ts': 1,
+  'src/render/smith_heart/heart_floor_glsl.ts': 3,
   'src/render/smith_heart/heart_fx_materials.ts': 8,
   'src/render/smith_heart/heart_ice_sheen.ts': 1,
   'src/render/smith_heart/heart_rock_cutaway.ts': 1,

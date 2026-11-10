@@ -11,7 +11,7 @@
 //   node scripts/smith_heart_final_arrival_shot.mjs <outDir>
 //
 // Env: SHOT_URL (http://127.0.0.1:5197/), SHOT_W / SHOT_H (1600x900),
-// SHOT_PRESET (4), SHOT_SECONDS (14), SHOT_VIEW (terrace | low | wide).
+// SHOT_PRESET (4), SHOT_SECONDS (14), SHOT_VIEW (terrace | high | top | bridge | close | low).
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
@@ -38,6 +38,7 @@ const BOSS = { x: 188, z: 172 };
 const VIEWS = {
   terrace: [0.18, -0.2, 0.04, 17],
   high: [0.3, 0.15, 0.5, 48],
+  top: [0.78, 0.1, 1.2, 88],
   bridge: [0.3, 0.1, 0.12, 22],
   close: [0.55, 0.2, 0.22, 26],
   low: [0.12, 0.25, -0.08, 14],

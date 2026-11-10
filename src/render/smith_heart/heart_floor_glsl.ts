@@ -14,8 +14,12 @@
 //     it, a pale worn arris on its lit side and a darker one away from it,
 //     brush strokes along its grain, now and then a hairline crack, a slab
 //     broken in two or a patch of small mended stones;
-//   - wear paths polished pale (round the circle, in from the bridge, out to
-//     each altar), soot smudges, dust settled in the joints toward the wall.
+//   - the four vein grooves carved from each altar to the central ring, swept
+//     like the ridges (heart_vein_groove_core.ts, the arrival's light runs
+//     down them): a dark bed, walls shaded by the painted light, a rolled
+//     lip worn pale, on every tier;
+//   - wear paths polished pale (round the circle, in from the bridge, along
+//     each groove), soot smudges, dust settled in the joints toward the wall.
 // The arris and the cracks bend the lit normal too (the standard tier), so a
 // point light rakes them. Close up it holds detail; from the raid camera the
 // fine detail fades with the pixel's footprint (`fwidth`), the floor calm.
@@ -32,6 +36,7 @@
 // crack has no outline (`heartFloorScar`).
 
 import { HEART_QUARTERS } from '../../sim/content/smith_heart_quarters';
+import { HEART_VEIN_GROOVE, heartVeinGrooveFlatPhaseDeg } from './heart_vein_groove_core';
 
 /** The look's numbers (yards, shares). */
 export const HEART_FLOOR_LOOK = {
@@ -64,6 +69,7 @@ export const HEART_FLOOR_LOOK = {
 const f = (v: number) => (Number.isInteger(v) ? `${v}.0` : `${v}`);
 const L = HEART_FLOOR_LOOK;
 const Q = HEART_QUARTERS;
+const G = HEART_VEIN_GROOVE;
 /** The height of a crackle's scar (quarter_pieces.py `_rim_crackle`, SKIN less a
  *  hair): the flat band of one colour laid under each crack's light. */
 const SCAR_Y = 0.036;
@@ -126,7 +132,30 @@ void hfCells(vec2 q, float jit, float wgt, out vec2 g1, out vec2 c1, out float d
   }
 }
 float hfBand(float d, float w) { return exp(-(d * d) / (w * w)); }
-float hfArc(float a, float b) { return abs(mod(a - b + 3.14159265, 6.2831853) - 3.14159265); }`;
+float hfArc(float a, float b) { return abs(mod(a - b + 3.14159265, 6.2831853) - 3.14159265); }
+${heartVeinGrooveGlsl()}`;
+}
+
+/** The vein grooves' distance (heart_vein_groove_core.ts
+ *  `heartVeinGrooveOffset`, mirrored): the signed yards across the nearest
+ *  groove's centreline at room-local `p`, and `gn` the plan direction that
+ *  offset grows along (square to the groove). */
+export function heartVeinGrooveGlsl(): string {
+  const { ringR, rimR, sweepDeg, power } = Q;
+  return /* glsl */ `
+float hfGroove(vec2 p, out vec2 gn) {
+  float r = max(length(p), 1e-3);
+  vec2 er = p / r;
+  float u = clamp((r - ${f(ringR)}) / ${f(rimR - ringR)}, 0.0, 1.0);
+  float sh = pow(max(1.0 - u, 0.0), ${f(power)});
+  float slope = ${f(sweepDeg * power)} * pow(max(1.0 - u, 0.0), ${f(power - 1)}) / ${f(rimR - ringR)};
+  float gflat = degrees(atan(p.x, p.y + 1e-6)) + ${f(sweepDeg)} * sh;
+  float d = mod(gflat - ${f(heartVeinGrooveFlatPhaseDeg())} + 45.0, 90.0) - 45.0;
+  float k = r * radians(slope);
+  float inv = inversesqrt(1.0 + k * k);
+  gn = (vec2(er.y, -er.x) - k * er) * inv;
+  return radians(d) * r * inv;
+}`;
 }
 
 /** The paint (after `#include <color_fragment>`: `diffuseColor.rgb` is the
@@ -154,15 +183,17 @@ export function heartFloorPaint(lowGfx: boolean): string {
     float hs = hfHash(g1 + 3.7);
     float hs2 = hfHash(g1 + 9.1);
     float hs3 = hfHash(g1 + 5.3);
-    // Wear paths: round the circle, in from the bridge, out to each altar.
+    // Wear paths: round the circle, in from the bridge, along each groove.
     float r = length(p);
     float b = atan(p.x, p.y);
+    // The vein groove nearest (signed yards across it) and its carved stretch.
+    vec2 gn;
+    float gs = hfGroove(p, gn);
+    float gK = smoothstep(${f(G.ringR - 0.4)}, ${f(G.ringR + 0.2)}, r) * (1.0 - smoothstep(${f(G.outerR - 2)}, ${f(G.outerR)}, r));
     float wear = hfBand(r - 21.0, 3.6);
     wear = max(wear, hfBand(r * hfArc(b, radians(${f(L.bridgeDeg)})), 3.8) * smoothstep(15.0, 22.0, r));
-    for (int k = 0; k < 4; k++) {
-      float ab = hfArc(b, radians(90.0 * float(k)));
-      wear = max(wear, 0.75 * hfBand(r * ab, 2.9) * smoothstep(18.0, 26.0, r) * (1.0 - smoothstep(49.0, 55.0, r)));
-    }
+    // Worn along each groove (the feet that walked the rite).
+    wear = max(wear, 0.75 * hfBand(gs, ${f(G.halfWidth + 2.2)}) * gK);
     wear *= 0.55 + 0.45 * hfNoise(p * 0.16 + 4.0);
     hfWear = wear;
     // Each slab's own value, a touch of hue, a light painted across it.
@@ -262,6 +293,29 @@ export function heartFloorPaint(lowGfx: boolean): string {
     vec3 grit = mix(base * 0.42, base * 0.85 + vec3(0.03, 0.025, 0.02), dust * 0.6);
     grit = mix(grit, base * 0.2, deepK);
     col = mix(col, grit, clamp(joint, 0.0, 1.0));
+    // The vein groove carved through the slabs: its bed dark and gritty, its
+    // walls shaded by the painted light (the wall facing it lit), a crease
+    // where each wall meets the top, the lip rolled and worn.
+    float ga = abs(gs);
+    float gfw = max(fwidth(ga), 1e-4);
+    float gin = (1.0 - smoothstep(${f(G.halfWidth)} - gfw, ${f(G.halfWidth)} + gfw, ga)) * gK;
+    float glip = (1.0 - smoothstep(${f(G.halfWidth)}, ${f(G.halfWidth + G.lip)}, ga)) * gK * (1.0 - gin);
+    float gwall = smoothstep(${f(G.halfWidth * 0.3)}, ${f(G.halfWidth)}, ga);
+    vec2 gwn = gs > 0.0 ? -gn : gn;
+    float gface = dot(gwn, normalize(ld));
+    vec3 gbed = base * (0.2 + 0.07 * hfNoise(p * 1.4 + 2.0)) * vec3(0.96, 0.95, 1.0);
+    gbed *= 1.0 + gwall * (1.5 * max(gface, 0.0) - 0.3 * max(-gface, 0.0));
+    gbed *= 1.0 - 0.3 * (1.0 - gwall) * smoothstep(0.55, 0.8, hfNoise(p * 0.9 + 7.0));
+    float gcrease = hfBand(ga - ${f(G.halfWidth)}, max(0.07, gfw * 1.5)) * gK;
+    col = mix(col, gbed, gin);
+    col *= 1.0 + glip * (0.1 + 0.16 * max(gface, 0.0) - 0.12 * max(-gface, 0.0)) * (0.5 + 0.5 * near);
+    // The dressed chamfer along each edge: a pale cut band that reads from the
+    // terrace and from high above, marking the groove apart from the ridges.
+    float gcham = smoothstep(${f(G.halfWidth + 0.04)}, ${f(G.halfWidth + 0.12)}, ga)
+      * (1.0 - smoothstep(${f(G.halfWidth + 0.34)}, ${f(G.halfWidth + 0.5)}, ga)) * gK;
+    col = mix(col, base * (1.18 + 0.3 * max(gface, 0.0)) + vec3(0.02, 0.018, 0.012), gcham * 0.75);
+    col *= 1.0 - 0.45 * gcrease;
+    hfTilt = hfTilt * (1.0 - gin) + gwn * (glip * 0.6 + gin * gwall * 1.1);
     diffuseColor.rgb = col;
   }
   ${heartFloorScar()}`;

@@ -55,6 +55,7 @@ import {
   arrivalStance,
   arrivalStreamLevel,
   arrivalStreamPath,
+  arrivalStreamPointAt,
   arrivalVeinArrive,
   arrivalVeinColor,
   arrivalVeinFront,
@@ -113,7 +114,7 @@ describe("the arrival's timeline", () => {
     expect(ARRIVAL.riseSeconds).toBe(2.4);
   });
 
-  it('lights the four veins in their element colours, each down its channel to the boss', () => {
+  it('lights the four veins in their element colours, each down its groove to the boss', () => {
     expect([...ARRIVAL_VEINS].sort()).toEqual(['breath', 'hammer', 'heat', 'quench']);
     const colours = new Set(ARRIVAL_VEINS.map(arrivalVeinColor));
     expect(colours.size).toBe(4);
@@ -126,7 +127,32 @@ describe("the arrival's timeline", () => {
       const boss = SMITH_HEART_BOSS_SPOTS.final;
       expect(Math.hypot(p.to.x - boss.x, p.to.z - boss.z)).toBeLessThan(3);
       expect(Math.hypot(p.to.x - p.from.x, p.to.z - p.from.z)).toBeGreaterThan(40);
+      // It spirals in (the grooves' curl), so its run is well past the chord.
+      expect(p.length).toBeGreaterThan(Math.hypot(p.to.x - p.from.x, p.to.z - p.from.z) * 1.1);
+      // The point at a share of the run walks from its altar's foot to the boss.
+      const at = { x: 0, z: 0 };
+      expect(arrivalStreamPointAt(p, 0, at)).toEqual(p.from);
+      arrivalStreamPointAt(p, 1, at);
+      expect(Math.hypot(at.x - p.to.x, at.z - p.to.z)).toBeLessThan(1e-9);
+      let last = Number.POSITIVE_INFINITY;
+      for (let k = 0; k <= 1; k += 0.02) {
+        arrivalStreamPointAt(p, k, at);
+        const r = Math.hypot(at.x - boss.x, at.z - boss.z);
+        expect(r).toBeLessThanOrEqual(last + 1e-6);
+        last = r;
+      }
     }
+    // The four arms run the same length (one symmetric spiral).
+    const lengths = ARRIVAL_VEINS.map((v) => arrivalStreamPath(v).length);
+    for (const l of lengths) expect(l).toBeCloseTo(lengths[0], 6);
+  });
+
+  it('keeps the convergence and the voice beats where they stood with the longer spiral', () => {
+    // The spiral's run took its time from the veins' stagger, not from the
+    // scene: the streams still meet 3.65 s in and the roar lands on 9.45.
+    expect(ARRIVAL_CONVERGE).toBeCloseTo(3.65, 9);
+    expect(ARRIVAL_ROAR_AT).toBeCloseTo(9.45, 9);
+    expect(ARRIVAL.veinRun).toBeGreaterThan(2);
   });
 
   it("runs each vein's front from its altar to the boss, never back", () => {

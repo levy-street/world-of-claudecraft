@@ -4,26 +4,36 @@
 // running over the floor, the beam's swirl and its white core, the pool of
 // light at its foot.
 
-/** A ribbon on the floor: `aAlong` 0 at the altar to 1 at the boss, `aSide`
- *  -1 to 1 across it, `aVein` the vein's index. */
+import { HEART_VEIN_GROOVE } from '../smith_heart/heart_vein_groove_core';
+
+/** A ribbon down a vein's groove: `aAlong` 0 at the altar to 1 at the boss
+ *  (by length), `aSide` the signed yards across the groove's centreline,
+ *  `aVein` the vein's index, `aRise` -1 on the floor's ribbon and 0 to 1 up
+ *  the veil standing on its centreline. */
 export const ARRIVAL_STREAM_VERT = /* glsl */ `
 attribute float aAlong;
 attribute float aSide;
 attribute float aVein;
+attribute float aRise;
 varying float vAlong;
 varying float vSide;
 varying float vVein;
+varying float vRise;
 void main() {
   vAlong = aAlong;
   vSide = aSide;
   vVein = aVein;
+  vRise = aRise;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }
 `;
 
-/** Each vein's light running down its channel: a white-hot head at its
- *  front, a body of flowing light behind it in the vein's colour, a hot core
- *  line down its middle. */
+const GROOVE_HALF = HEART_VEIN_GROOVE.halfWidth.toFixed(3);
+
+/** Each vein's light running down its groove: a white-hot head at its front
+ *  flaring past the groove's lips, the groove's bed filled behind it with
+ *  flowing light in the vein's colour and a hot line down its middle, a soft
+ *  glow spilt over the floor either side. */
 export const ARRIVAL_STREAM_FRAG = /* glsl */ `
 uniform vec4 uFront;
 uniform vec4 uLevel;
@@ -36,6 +46,7 @@ uniform float uLength;
 varying float vAlong;
 varying float vSide;
 varying float vVein;
+varying float vRise;
 float h1(float p) { return fract(sin(p * 127.1) * 43758.5453); }
 float n1(float p) {
   float i = floor(p);
@@ -51,16 +62,36 @@ void main() {
   if (front < 0.0 || level < 0.002) discard;
   // Yards behind the front (negative: ahead of it, still dark).
   float behind = (front - vAlong) * uLength;
-  if (behind < -2.5) discard;
-  float lit = smoothstep(-0.6, 1.2, behind);
-  float head = exp(-behind * behind * 0.18);
+  if (behind < -3.5) discard;
+  float lit = smoothstep(-0.8, 1.6, behind);
+  float head = exp(-behind * behind * 0.1);
+  // The head's glare reaches a little ahead of it, licking down the groove.
+  float lead = exp(-max(-behind, 0.0) * 1.6) * (1.0 - lit);
   float yd = vAlong * uLength;
-  float flow = 0.55 + 0.45 * n1(yd * 0.55 - uTime * 9.0) + 0.25 * sin(yd * 0.9 - uTime * 14.0);
-  float s2 = vSide * vSide;
-  float edge = exp(-s2 * 2.2);
-  float core = exp(-s2 * 22.0);
-  vec3 col = c * (lit * (1.1 * edge + 2.2 * core) * flow + head * 5.0 * edge);
-  col += vec3(1.0, 0.96, 0.88) * (lit * core * 0.8 * flow + head * core * 5.0);
+  float flow = 0.55 + 0.45 * n1(yd * 0.5 - uTime * 10.0) + 0.3 * sin(yd * 0.8 - uTime * 15.0);
+  // Packets of brighter light racing down behind the head.
+  float packet = smoothstep(0.78, 1.0, sin(yd * 0.32 - uTime * 11.0)) * lit;
+  // Far behind the head the trail settles a little (it never goes out).
+  float settle = 0.72 + 0.28 * exp(-max(behind, 0.0) * 0.06);
+  if (vRise >= 0.0) {
+    // The veil standing on the groove: soft, fading up, flickering, taller
+    // and white at the head.
+    float up = clamp(vRise, 0.0, 1.0);
+    float fadeUp = (1.0 - up) * (1.0 - up);
+    float flick = 0.6 + 0.4 * n1(yd * 0.7 - uTime * 6.0 + up * 3.0);
+    vec3 veil = c * (lit * settle * 0.45 * fadeUp * flick + head * 1.5 * (1.0 - up))
+      + vec3(1.0, 0.96, 0.88) * head * 0.8 * fadeUp;
+    gl_FragColor = vec4(veil * level, 1.0);
+    #include <colorspace_fragment>
+    return;
+  }
+  float s = abs(vSide);
+  float chan = 1.0 - smoothstep(${GROOVE_HALF} - 0.3, ${GROOVE_HALF} + 0.12, s);
+  float core = exp(-s * s * 5.0);
+  float spill = exp(-s * s * 0.3);
+  vec3 col = c * (lit * settle * ((1.3 * chan + 0.42 * spill) * flow + 1.2 * packet * chan)
+    + head * (4.5 * chan + 2.4 * spill) + lead * 1.4 * chan);
+  col += vec3(1.0, 0.96, 0.88) * (lit * settle * core * 0.9 * flow + head * (6.0 * core + 1.2 * chan));
   gl_FragColor = vec4(col * level, 1.0);
   #include <colorspace_fragment>
 }

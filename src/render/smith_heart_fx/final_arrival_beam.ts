@@ -2,9 +2,12 @@
 // shaders: final_arrival_glsl.ts), hosted by final_fx.ts (the scene's clock
 // with a pull's skip, the boss's drawn body, the shared particles, flashes
 // and camera thud are its):
-//  - the four veins' light running down their channels from the altars to
-//    the boss's feet (one draw: four ribbons on the floor), sparks riding
-//    each front;
+//  - the four veins' light running down their carved grooves from the
+//    altars, spiralling in to the boss's feet (one draw: four ribbons laid on
+//    the grooves' own polylines, ../smith_heart/heart_vein_groove_core.ts,
+//    arching over the central ring's kerb, each with a low veil of light
+//    standing on its centreline so it reads from the terrace), sparks riding
+//    each front and motes rising off each lit trail (thinned by density);
 //  - the giant beam where they meet: a white-hot core and a swirl of the
 //    four colours (two draws on one cylinder), a pool of light at its foot,
 //    a crown of light in the sky at its top, sparks spiralling up it; its
@@ -23,8 +26,8 @@
 // meshes and pools, no per-frame allocation; disposed with the host.
 
 import * as THREE from 'three';
-import { HEART_ROOM } from '../../sim/content/smith_heart_layout';
 import { sharedUniforms } from '../gfx';
+import type { SanctumPuffOptions } from '../gravewyrm_sanctum_fx/sanctum_fx_core';
 import { radialGlowTexture } from '../textures';
 import type { EngineParticles } from '../trash_engine_fx/engine_particles';
 import {
@@ -39,7 +42,9 @@ import {
   type ArrivalBeamLook,
   arrivalBeam,
   arrivalStreamLevel,
+  arrivalStreamLift,
   arrivalStreamPath,
+  arrivalStreamPointAt,
   arrivalVeinColor,
   arrivalVeinFront,
   arrivalVeinStart,
@@ -84,19 +89,21 @@ export interface FinalArrivalFrame {
   dt: number;
 }
 
-/** Segments down each stream. */
-const STREAM_SEGS = 64;
-/** A stream's half width (yards). */
+/** A stream's half width (yards): the groove's bed and the glow spilt either
+ *  side of it, a little narrower where it curls in over the ring. */
 const STREAM_HALF = 3.4;
+const STREAM_HALF_END = 2.3;
 /** How far a stream floats over the floor (yards), clear of its paint. */
 const STREAM_LIFT = 0.12;
+/** The veil of light standing on a stream's centreline (yards tall). */
+const STREAM_VEIL = 3.6;
 
 const VEIN_RGB = ARRIVAL_VEINS.map((v) => {
   const c = new THREE.Color(arrivalVeinColor(v));
   return [c.r, c.g, c.b] as const;
 });
 const WHITE: readonly [number, number, number] = [1, 0.96, 0.88];
-/** Each vein's stream path (room-local), laid once. */
+/** Each vein's stream path (instance-local), laid once. */
 const PATHS = ARRIVAL_VEINS.map((v) => arrivalStreamPath(v));
 
 export class FinalArrivalBeam {
@@ -106,6 +113,8 @@ export class FinalArrivalBeam {
   private readonly streams: THREE.Mesh;
   private readonly streamMat: THREE.ShaderMaterial;
   private readonly streamPos: THREE.BufferAttribute;
+  /** Each stream vertex's height over the walk (the leap over the kerb). */
+  private readonly streamLift: Float32Array;
   private readonly swirl: THREE.Mesh;
   private readonly swirlMat: THREE.ShaderMaterial;
   private readonly core: THREE.Mesh;
@@ -121,6 +130,32 @@ export class FinalArrivalBeam {
   private readonly beamLook: ArrivalBeamLook = { phase: 'off', k: 0, top: 0, width: 0, glow: 0 };
   private sparkDebt = 0;
   private readonly streamDebt = [0, 0, 0, 0];
+  private readonly moteDebt = [0, 0, 0, 0];
+  /** A point down a stream (reused; no per-frame allocation). */
+  private readonly at = { x: 0, z: 0 };
+  /** A running front's spark puff (reused; its colour set per vein). */
+  private readonly spark: SanctumPuffOptions = {
+    speed: 3,
+    up: 5,
+    life: 1.1,
+    size: [1.2, 0.15],
+    color: WHITE,
+    alpha: 1,
+    pool: 'glow',
+    radius: 0.8,
+    drag: 1.4,
+  };
+  /** A trail mote's puff (reused; its rise, life and colour set per mote). */
+  private readonly mote: SanctumPuffOptions = {
+    speed: 0.6,
+    up: 2.4,
+    life: 1.4,
+    size: [0.7, 0.1],
+    color: WHITE,
+    alpha: 0.9,
+    pool: 'glow',
+    drag: 0.6,
+  };
   /** The low tier sheds the sky billboards (cosmetic only; the beam stays). */
   private readonly rich: boolean;
 
@@ -161,48 +196,75 @@ export class FinalArrivalBeam {
       this.materials.push(m);
       return m;
     };
-    // ---- the four streams: one draw ----
-    const n = ARRIVAL_VEINS.length * (STREAM_SEGS + 1) * 2;
+    // ---- the four streams: one draw, each a ribbon laid down its groove ----
+    // Two strips per vein: the ribbon flat in the groove, then a low veil of
+    // light standing on its centreline (`aRise` 0 at its foot, 1 at its top;
+    // the ribbon's -1), so a stream still reads from the terrace, where the
+    // floor is seen almost edge on.
+    const pts = PATHS[0].x.length;
+    const strip = ARRIVAL_VEINS.length * pts * 2;
+    const n = strip * 2;
     const pos = new Float32Array(n * 3);
     const along = new Float32Array(n);
     const side = new Float32Array(n);
     const vein = new Float32Array(n);
+    const rise = new Float32Array(n).fill(-1);
     const index: number[] = [];
     let length = 0;
-    ARRIVAL_VEINS.forEach((v, i) => {
+    const lift = new Float32Array(n);
+    ARRIVAL_VEINS.forEach((_, i) => {
       const path = PATHS[i];
-      const dx = path.to.x - path.from.x;
-      const dz = path.to.z - path.from.z;
-      const l = Math.hypot(dx, dz) || 1;
-      length = Math.max(length, l);
-      const px = -dz / l;
-      const pz = dx / l;
-      for (let s = 0; s <= STREAM_SEGS; s++) {
-        const k = s / STREAM_SEGS;
+      length = Math.max(length, path.length);
+      for (let s = 0; s < pts; s++) {
+        // Square to the run here (its neighbours' chord), in the plan.
+        const a0 = Math.max(0, s - 1);
+        const a1 = Math.min(pts - 1, s + 1);
+        const tx = path.x[a1] - path.x[a0];
+        const tz = path.z[a1] - path.z[a0];
+        const tl = Math.hypot(tx, tz) || 1;
+        const px = -tz / tl;
+        const pz = tx / tl;
+        const k = path.along[s] / path.length;
+        const half = STREAM_HALF + (STREAM_HALF_END - STREAM_HALF) * k * k;
         for (let e = 0; e < 2; e++) {
-          const j = (i * (STREAM_SEGS + 1) + s) * 2 + e;
-          const sd = e === 0 ? -1 : 1;
-          // A ribbon narrowing a little as it nears the boss.
-          const half = STREAM_HALF * (1 - 0.3 * k);
-          pos[j * 3] = path.from.x + dx * k + px * sd * half;
-          pos[j * 3 + 1] = HEART_ROOM.h + STREAM_LIFT;
-          pos[j * 3 + 2] = path.from.z + dz * k + pz * sd * half;
+          const j = (i * pts + s) * 2 + e;
+          const sd = e === 0 ? -half : half;
+          // Instance-local (the mesh stands at the slot's origin).
+          pos[j * 3] = path.x[s] + px * sd;
+          pos[j * 3 + 1] = STREAM_LIFT;
+          lift[j] = STREAM_LIFT + arrivalStreamLift(path.r[s]);
+          pos[j * 3 + 2] = path.z[s] + pz * sd;
           along[j] = k;
           side[j] = sd;
           vein[j] = i;
         }
-        if (s < STREAM_SEGS) {
-          const a = (i * (STREAM_SEGS + 1) + s) * 2;
+        for (let e = 0; e < 2; e++) {
+          const j = strip + (i * pts + s) * 2 + e;
+          pos[j * 3] = path.x[s];
+          pos[j * 3 + 1] = STREAM_LIFT;
+          pos[j * 3 + 2] = path.z[s];
+          lift[j] = STREAM_LIFT + arrivalStreamLift(path.r[s]) + e * STREAM_VEIL;
+          along[j] = k;
+          side[j] = 0;
+          vein[j] = i;
+          rise[j] = e;
+        }
+        if (s < pts - 1) {
+          const a = (i * pts + s) * 2;
           index.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
+          const b = strip + a;
+          index.push(b, b + 1, b + 2, b + 1, b + 3, b + 2);
         }
       }
     });
+    this.streamLift = lift;
     const streamGeo = new THREE.BufferGeometry();
     this.streamPos = new THREE.BufferAttribute(pos, 3);
     streamGeo.setAttribute('position', this.streamPos);
     streamGeo.setAttribute('aAlong', new THREE.BufferAttribute(along, 1));
     streamGeo.setAttribute('aSide', new THREE.BufferAttribute(side, 1));
     streamGeo.setAttribute('aVein', new THREE.BufferAttribute(vein, 1));
+    streamGeo.setAttribute('aRise', new THREE.BufferAttribute(rise, 1));
     streamGeo.setIndex(index);
     this.geometries.push(streamGeo);
     this.streamMat = additive(
@@ -331,13 +393,15 @@ export class FinalArrivalBeam {
     this.streams.position.set(ox, 0, oz);
     const a = this.streamPos.array as Float32Array;
     for (let j = 0; j < a.length; j += 3)
-      a[j + 1] = this.host.groundY(ox + a[j], oz + a[j + 2]) + STREAM_LIFT;
+      a[j + 1] = this.host.groundY(ox + a[j], oz + a[j + 2]) + this.streamLift[j / 3];
+
     this.streamPos.needsUpdate = true;
   }
 
   private paintStreams(f: FinalArrivalFrame): void {
     const front = this.streamMat.uniforms.uFront.value as THREE.Vector4;
     const level = this.streamMat.uniforms.uLevel.value as THREE.Vector4;
+    const h = this.host;
     let any = false;
     for (let i = 0; i < ARRIVAL_VEINS.length; i++) {
       const fr = arrivalVeinFront(f.t, i);
@@ -345,26 +409,32 @@ export class FinalArrivalBeam {
       front.setComponent(i, fr);
       level.setComponent(i, lv);
       if (fr >= 0 && lv > 0.002) any = true;
-      // Sparks off the running front, and its light lifting off the floor.
-      if (fr >= 0 && fr < 1 && lv > 0.2) {
-        const path = PATHS[i];
-        const x = f.ox + path.from.x + (path.to.x - path.from.x) * fr;
-        const z = f.oz + path.from.z + (path.to.z - path.from.z) * fr;
+      if (fr < 0 || lv <= 0.2) continue;
+      const path = PATHS[i];
+      // Sparks off the running front, its light lifting off the floor.
+      if (fr < 1) {
+        const p = arrivalStreamPointAt(path, fr, this.at);
+        const x = f.ox + p.x;
+        const z = f.oz + p.z;
         this.streamDebt[i] += f.dt * 50;
         while (this.streamDebt[i] >= 1) {
           this.streamDebt[i] -= 1;
-          this.host.particles.puff(x, this.host.groundY(x, z) + 0.4, z, 4, {
-            speed: 3,
-            up: 5,
-            life: 1.1,
-            size: [1.2, 0.15],
-            color: VEIN_RGB[i],
-            alpha: 1,
-            pool: 'glow',
-            radius: 0.8,
-            drag: 1.4,
-          });
+          this.spark.color = VEIN_RGB[i];
+          h.particles.puff(x, h.groundY(x, z) + 0.4, z, 4, this.spark);
         }
+      }
+      // Motes rising off the lit groove behind it (fewer on the low tier).
+      this.moteDebt[i] += f.dt * 26 * h.density * lv;
+      while (this.moteDebt[i] >= 1) {
+        this.moteDebt[i] -= 1;
+        const p = arrivalStreamPointAt(path, h.rand() * fr, this.at);
+        const x = f.ox + p.x + (h.rand() - 0.5) * 1.6;
+        const z = f.oz + p.z + (h.rand() - 0.5) * 1.6;
+        const m = this.mote;
+        m.up = 2.4 + h.rand() * 2;
+        m.life = 1.4 + h.rand() * 0.8;
+        m.color = h.rand() < 0.2 ? WHITE : VEIN_RGB[i];
+        h.particles.puff(x, h.groundY(x, z) + 0.2, z, 1, m);
       }
     }
     this.streams.visible = any;
