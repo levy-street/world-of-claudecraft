@@ -385,6 +385,8 @@ export class BreathEntranceFx {
     _frame.burst = L.burst;
     _frame.flash = flick;
     _frame.flashY = L.flickerY;
+    _frame.skirt = cut || L.sinceTouch < 0 ? 0 : Math.min(1, L.sinceTouch * 2.5) * L.funnel * 0.85;
+    _frame.spin = this.clock * 2.4;
     _frame.ringR = L.ringR;
     _frame.ring = L.ring;
     this.storm.paint(_frame);
@@ -742,6 +744,8 @@ const _frame = {
   burst: 0,
   flash: 0,
   flashY: 0.5,
+  skirt: 0,
+  spin: 0,
   ringR: 0,
   ring: 0,
 };
@@ -772,9 +776,9 @@ const GRIT = {
   floor: 0,
 };
 const SKIRT = {
-  speed: 9,
-  life: 1.7,
-  size: [1.6, 5.2] as [number, number],
+  speed: 11,
+  life: 1.9,
+  size: [2.4, 7.5] as [number, number],
   color: [0.5, 0.48, 0.46] as [number, number, number],
   alpha: 0.34,
   dir: _out as readonly [number, number, number],

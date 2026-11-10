@@ -66,7 +66,7 @@ const CE = core.BREATH_ENTRANCE;
 const BOSS = { x: 0, z: 198 };
 /** Each view's witness spot: the raid's a few strides in off the climb, the
  *  high view's nearer the middle so the eye and the funnel fill the frame. */
-const SPOTS = { raid: { x: -32, z: 190 }, high: { x: -6, z: 188 }, side: { x: -30, z: 170 } };
+const SPOTS = { raid: { x: -42, z: 192 }, high: { x: -6, z: 188 }, side: { x: -30, z: 170 } };
 const SPOT = {
   x: Number(process.env.SHOT_SPOT_X ?? (SPOTS[VIEW] ?? SPOTS.raid).x),
   z: Number(process.env.SHOT_SPOT_Z ?? (SPOTS[VIEW] ?? SPOTS.raid).z),
@@ -77,7 +77,7 @@ const LANDING = { x: 0, z: 100 };
 /** Camera holds per view: [yaw off the player's facing, pitch (positive
  *  looks down), distance]. */
 const VIEWS = {
-  raid: [0.24, -0.2, 12],
+  raid: [0.38, -0.3, 13],
   high: [0.25, 1.0, 96],
   side: [1.0, 0.1, 30],
 };
@@ -263,7 +263,9 @@ try {
         const id = w.addPlayer(c, `Raider${i + 1}`);
         const e = w.entities.get(id);
         e.devGod = true;
-        move(e, sx - 4 - (i % 2) * 2.4, sz + (i - 2) * 3.4);
+        // Spread wide either side of the witness, a stride behind it, so
+        // nobody stands between the camera and the storm.
+        move(e, sx + 5 - (i % 2) * 2, sz + (i < 2 ? -7 - i * 3.5 : 7 + (i - 2) * 3.5));
       });
     },
     [O.x, O.z, SPOT.x, SPOT.z, BOSS.x, BOSS.z],
@@ -282,7 +284,30 @@ try {
     else await sleep(40);
   }
   console.log('scene start', t0);
-  await sleep(SECONDS * 1000);
+  // The guardian's drawn height once its Form has ended (its fight size):
+  // the skinned body's skinned bounds, in yards.
+  const measureAt = core.BREATH_INTRO.seconds + 0.5;
+  await sleep(measureAt * 1000);
+  const size = await page.evaluate(() => {
+    const g = window.__game;
+    let id = -1;
+    for (const e of g.world.entities.values())
+      if (e.templateId === 'heart_breath_guardian') id = e.id;
+    let best = null;
+    g.renderer.scene.traverse((o) => {
+      if (!o.isSkinnedMesh) return;
+      let p = o;
+      while (p && p.userData?.entityId !== id) p = p.parent;
+      if (!p) return;
+      o.computeBoundingBox();
+      const box = o.boundingBox.clone().applyMatrix4(o.matrixWorld);
+      const h = box.max.y - box.min.y;
+      if (!best || h > best.h) best = { h, minY: box.min.y, maxY: box.max.y };
+    });
+    return best;
+  });
+  console.log('GUARDIAN', JSON.stringify(size));
+  await sleep(Math.max(0, SECONDS - measureAt) * 1000);
   await cdp.send('Page.stopScreencast');
   console.log('frames', frames.length);
   const dir = path.join(OUT, `fotogramas_${VIEW === 'high' ? 'alta' : VIEW}`);

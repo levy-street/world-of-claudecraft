@@ -112,8 +112,8 @@ export const BREATH_STORM_SHAPE = {
   /** The funnel: its height (to under the eye), its radius at the foot and
    *  the top, and how far its foot snakes about. */
   funnelH: 39,
-  rBot: 5.6,
-  rTop: 20,
+  rBot: 7,
+  rTop: 30,
   sway: 2.6,
   /** The guardian's heart height (where the great bolt lands, yards). */
   heartY: 9,
@@ -122,10 +122,11 @@ export const BREATH_STORM_SHAPE = {
 const S = BREATH_STORM_SHAPE;
 
 /** The funnel's radius at height share `y` (0 the foot, 1 the eye),
- *  before the burst (its shader runs the same curve). */
+ *  before the burst (its shader runs the same curve): a heavy column,
+ *  some 18 yd across at the foot and 60 under the eye. */
 export function funnelRadius(y: number): number {
   const c = Math.min(1, Math.max(0, y));
-  return S.rBot + (S.rTop - S.rBot) * c * c * (0.6 + 0.4 * c);
+  return S.rBot + (S.rTop - S.rBot) * c * (0.55 + 0.45 * c);
 }
 
 /** One strike of lightning: when, where it lands (stage-local: angle off the
@@ -618,13 +619,13 @@ export interface OrbitPiece {
 
 export const ORBIT_STONE: readonly OrbitPiece[] = (() => {
   const out: OrbitPiece[] = [];
-  for (let i = 0; i < 72; i++) {
-    const h = 0.03 + 0.72 * hash(i, 101) ** 1.4;
+  for (let i = 0; i < 110; i++) {
+    const h = 0.03 + 0.82 * hash(i, 101) ** 1.3;
     out.push({
       h,
       a: hash(i, 103) * Math.PI * 2,
-      out: 1.5 + 4.5 * hash(i, 107),
-      size: 0.3 + 1.2 * hash(i, 109) ** 2,
+      out: 1.5 + 6 * hash(i, 107),
+      size: 0.35 + 1.6 * hash(i, 109) ** 2,
       rate: 0.8 + 0.6 * hash(i, 113),
       vOut: 12 + 9 * hash(i, 127),
       vUp: 4 + 9 * hash(i, 131),
@@ -782,7 +783,7 @@ export const BREATH_ENTRANCE_POOLS = {
   /** Grit streaming up to the eye with the pull, a second. */
   pullGrit: 70,
   /** The funnel's foot: the dust skirt torn off it, a second. */
-  skirt: 60,
+  skirt: 150,
   /** The touch's dust, a strike's sparks and dust, the burst's dust front. */
   touchDust: 70,
   strikeSparks: 26,

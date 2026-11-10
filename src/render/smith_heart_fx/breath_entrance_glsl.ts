@@ -90,7 +90,7 @@ export const FUNNEL_VERT = /* glsl */ `
     float tip = 1.0 - uReach;
     float yy = max(y, tip);
     float rope = smoothstep(tip, tip + 0.16, y);
-    float r = ${f(S.rBot)} + ${f(S.rTop - S.rBot)} * yy * yy * (0.6 + 0.4 * yy);
+    float r = ${f(S.rBot)} + ${f(S.rTop - S.rBot)} * yy * (0.55 + 0.45 * yy);
     r *= mix(0.18, 1.0, rope) * uScale * (1.0 + 2.8 * uBurst);
     float low = (1.0 - yy) * (1.0 - yy);
     vec2 sway = vec2(sin(uTime * 1.3 + yy * 5.0), cos(uTime * 1.07 + yy * 4.3)) * ${f(S.sway)} * low;
@@ -114,14 +114,19 @@ export const FUNNEL_SHELL_FRAG = /* glsl */ `
   uniform float uFlash;
   uniform float uFlashY;
   uniform float uBurst;
+  uniform float uLayer;
   varying vec2 vUv;
   varying float vFace;
   varying float vTip;
   ${NOISE2}
   void main() {
     float y = vUv.y;
-    float sp = vUv.x * 7.0 + y * 4.5 - uTime * 1.9;
+    // The outer layer (uLayer 1) turns slower, its own masses only.
+    float sp = vUv.x * 7.0 + y * 4.5 - uTime * (3.2 - 1.2 * uLayer) + uLayer * 3.7;
     float mass = bfbm(vec2(sp * 1.4, y * 4.0 - uTime * 0.6));
+    // The spiral bands wound up the column, racing round it.
+    float helix = sin((vUv.x * 4.0 + y * 2.6) * 6.2832 - uTime * (6.0 - 2.0 * uLayer) + mass * 2.5);
+    float bands = smoothstep(-0.3, 0.7, helix);
     float fine = bn(vec2(sp * 5.0, y * 16.0 - uTime * 2.4));
     float ragged = 0.04 + 0.08 * bn(vec2(vUv.x * 13.0, uTime * 2.0));
     if (vTip < -ragged) discard;
@@ -129,7 +134,9 @@ export const FUNNEL_SHELL_FRAG = /* glsl */ `
     float torn = smoothstep(0.34, 0.62, mass);
     float edge = 1.0 - vFace;
     float thick = 0.88 + 0.12 * edge;
-    float body = (0.8 + 0.2 * torn) * thick;
+    float body = (0.92 + 0.08 * torn) * thick;
+    // The outer layer shows only its torn masses: a ragged, churning edge.
+    body *= mix(1.0, 0.7 * torn * (0.5 + 0.5 * bands), uLayer);
     float top = 1.0 - smoothstep(0.88, 1.0, y);
     float a1 = body * top * tipFade * uAlpha * (1.0 - uBurst);
     // Linear colours (the colour-space pass lifts them): near-black storm
@@ -138,7 +145,10 @@ export const FUNNEL_SHELL_FRAG = /* glsl */ `
     vec3 grey = vec3(0.085, 0.095, 0.125);
     vec3 dust = vec3(0.07, 0.06, 0.05);
     float lift = smoothstep(0.3, 0.85, mass) * (0.45 + 0.55 * y);
-    vec3 col = mix(shade, grey, lift);
+    vec3 col = mix(shade, grey, lift * (0.35 + 0.65 * bands));
+    // The bands' leading edges catch the light: the spiral reads turning.
+    float lip = smoothstep(0.55, 0.95, helix) * (1.0 - smoothstep(0.95, 1.0, helix));
+    col += vec3(0.07, 0.08, 0.1) * lip;
     // The silhouette's rim catches the sky: the column reads round.
     col += vec3(0.05, 0.06, 0.08) * edge * edge * (0.4 + 0.6 * torn);
     col = mix(col, dust, (1.0 - smoothstep(0.0, 0.22, y)) * 0.6);
@@ -152,7 +162,8 @@ export const FUNNEL_SHELL_FRAG = /* glsl */ `
     float band = (y - uFlashY) * 3.2;
     float near = 0.2 + 0.8 * exp(-band * band);
     col += vec3(0.16, 0.24, 0.62) * uFlash * near * (0.05 + 0.5 * thin * (0.3 + 0.7 * fine));
-    gl_FragColor = vec4(col, clamp(a1, 0.0, 0.95));
+    col += vec3(0.1, 0.16, 0.42) * uFlash * near * bands * lip;
+    gl_FragColor = vec4(col, clamp(a1, 0.0, 0.97));
     #include <colorspace_fragment>
   }
 `;
