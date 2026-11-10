@@ -380,6 +380,20 @@ describe('the plans', () => {
     const widest = P.reduce((a, b) => (b.w > a.w ? b : a));
     expect(widest.y).toBeLessThan(QUENCH_ENTRANCE_BLADES.length * 0.25);
     expect(P[P.length - 1].w).toBeLessThan(0.05);
+    // A full sword: a pommel gem, a banded grip, a guard flung wider than the
+    // blade, the blade some ten yards long.
+    const L = QUENCH_ENTRANCE_BLADES.length;
+    const grip = P.filter((r) => r.y > 0.05 * L && r.y < 0.16 * L);
+    expect(new Set(grip.map((r) => r.w)).size).toBeGreaterThan(1);
+    const bladeW = Math.max(...P.filter((r) => r.y > 0.209 * L).map((r) => r.w));
+    expect(widest.w).toBeGreaterThan(bladeW * 1.5);
+    const pommel = Math.max(...P.filter((r) => r.y < 0.05 * L).map((r) => r.w));
+    expect(pommel).toBeGreaterThan(Math.min(...grip.map((r) => r.w)));
+    // Past its broad middle (the great blade swells a little up its length,
+    // as theirs do) the blade only narrows to its point.
+    const edge = P.filter((r) => r.y >= 0.66 * L);
+    for (let i = 1; i < edge.length; i++) expect(edge[i].w).toBeLessThanOrEqual(edge[i - 1].w);
+    expect(L).toBeGreaterThanOrEqual(9);
   });
 
   it('the sheet covers her lying body', () => {

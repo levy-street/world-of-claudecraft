@@ -364,19 +364,21 @@ const BLADE_FRAG = /* glsl */ `
     float along = sin(vH * 3.14159);
     float inner = 0.5 + 0.5 * sin(dot(n, vec3(11.0, 7.0, 13.0)) * 1.7 + vH * 21.0 - uTime * 1.3);
     inner = inner * inner;
-    float core = 1.0 - smoothstep(0.0, 0.5, vCore);
+    float core = 1.0 - smoothstep(0.0, 0.32, vCore);
     float edge = smoothstep(0.72, 1.0, vCore);
     // A step deeper and more saturated than it should read: the Quench's
     // grade lifts it to clear blue ice on screen (quench_breath_core.ts).
-    vec3 deep = vec3(0.0, 0.025, 0.12);
-    vec3 cyan = vec3(0.03, 0.34, 0.95);
-    vec3 pale = vec3(0.32, 0.66, 1.0);
-    vec3 col = deep * (0.7 + 0.6 * nv);
-    col += cyan * core * (0.3 + 0.32 * light) * (0.45 + 0.55 * along);
-    col += pale * edge * (0.2 + 0.25 * light);
-    col += pale * rim * 0.42;
-    col += cyan * inner * 0.22 * (1.0 - edge);
-    float a = clamp(0.8 + 0.2 * rim + 0.2 * core, 0.0, 0.97);
+    vec3 deep = vec3(0.0, 0.03, 0.2);
+    vec3 cyan = vec3(0.0, 0.45, 1.0);
+    vec3 pale = vec3(0.25, 0.7, 1.0);
+    // A saturated deep-blue body, solid enough to stand dark against the
+    // pale lake, its ridge burning cyan, its keen edges lit.
+    vec3 col = deep * (0.55 + 0.6 * nv);
+    col += cyan * core * (0.45 + 0.4 * light) * (0.5 + 0.5 * along);
+    col += cyan * edge * (0.35 + 0.35 * light);
+    col += pale * rim * 0.28;
+    col += cyan * inner * 0.18 * (1.0 - edge);
+    float a = clamp(0.93 + 0.07 * rim, 0.0, 0.99);
     gl_FragColor = vec4(col, a);
   }
 `;
@@ -1759,17 +1761,23 @@ export class QuenchEntranceFx {
       // Its halo round its middle, and the glint off its point on the snap.
       // (A soft cold light round its heart only as it is born: a wash over
       // the whole blade would pale its crystal.)
-      const born = Math.max(0, b.glow - 1.2);
-      if (born > 0.01) {
-        _p.set(bx, mid, bz);
-        _s.setScalar(2.4 * born);
-        _m.compose(_p, _q2.identity(), _s);
-        this.halos.setMatrixAt(i, _m);
-        this.halos.setColorAt(i, _c.setRGB(0.12, 0.3, 0.5));
-      } else this.halos.setMatrixAt(i, _zero);
+      // A soft deep-cyan glow behind it (dim, so it never pales the
+      // crystal; brighter as it is born and as it snaps).
+      _p.set(bx, mid, bz);
+      _s.setScalar(B.length * 0.75);
+      _m.compose(_p, _q2.identity(), _s);
+      this.halos.setMatrixAt(i, _m);
+      // Out of the ice only (never a glow through it before it breaks out
+      // or after it plunges).
+      const hk =
+        (this.reducedMotion() ? 0.6 : 1) *
+        (0.05 + 0.04 * Math.min(2, b.glow)) *
+        Math.min(1, b.lift * 3) *
+        (1 - b.plunge);
+      this.halos.setColorAt(i, _c.setRGB(hk * 0.15, hk * 0.9, hk * 2));
       if (b.glint > 0.01) {
         _p.set(bx, mid, bz).addScaledVector(_d, B.length * 0.5);
-        _s.setScalar(0.8 + (this.reducedMotion() ? 1.4 : 3.6) * b.glint);
+        _s.setScalar(this.reducedMotion() ? 0.8 + 1.4 * b.glint : 1 + 9 * b.glint);
         _m.compose(_p, _q2.identity(), _s);
         this.halos.setMatrixAt(TIP0 + i, _m);
         const g = (this.reducedMotion() ? 0.5 : 1.1) * b.glint;
@@ -1779,8 +1787,9 @@ export class QuenchEntranceFx {
       // breaks out.
       if (b.lift < 1 && b.lift > 0.05 && this.rand() < dt * 34 * this.density)
         this.particles.puff(bx, floor + 0.3, bz, 2, BURST);
+      // The frost trail: thick while it spins up into the circle.
       if (b.plunge === 0 && b.lift > 0.3) {
-        let n = dt * 16 * this.density;
+        let n = dt * (b.lift < 1 ? 70 : 14) * this.density * (this.reducedMotion() ? 0.35 : 1);
         while (n > 0) {
           if (n < 1 && this.rand() > n) break;
           n -= 1;

@@ -218,9 +218,9 @@ export type QuenchEntranceStance = 'frozen' | 'emerge' | 'stand';
  *  length and how fast they circle (radians a second). */
 export const QUENCH_ENTRANCE_BLADES = {
   count: 6,
-  ring: 8.5,
-  hover: 3,
-  length: 7,
+  ring: 12,
+  hover: 1.2,
+  length: 10,
   orbit: 0.55,
 } as const;
 
@@ -909,24 +909,38 @@ export interface BladeRing {
 
 export const ENTRANCE_BLADE_PROFILE: readonly BladeRing[] = (() => {
   const L = QUENCH_ENTRANCE_BLADES.length;
-  // The great blade's section, shrunk to a conjured sword (its widest about
-  // half a yard).
-  const k = 0.62 / bladeHalfWidth(0);
+  // A conjured likeness of the Smith's great swords standing in the lake
+  // (their faceted crystal, their winged guard, their banded grip): the
+  // great blade's own section, scaled to a sword some ten yards long, about
+  // a yard and a half across, its guard's wings flung wide of it.
+  const k = 0.8 / bladeHalfWidth(0);
   const w = (s: number) => bladeHalfWidth(s * 9) * k;
-  const d = (s: number) => bladeHalfThick(s * 9) * k * 1.0;
+  const d = (s: number) => bladeHalfThick(s * 9) * k * 1.1;
   return [
-    // The pommel, the grip, the guard.
-    { y: 0, w: 0.05, d: 0.05 },
-    { y: 0.03, w: 0.16, d: 0.16 },
-    { y: 0.06, w: 0.1, d: 0.1 },
-    { y: 0.17, w: 0.09, d: 0.09 },
-    { y: 0.18, w: 0.9, d: 0.2 },
-    { y: 0.205, w: 0.95, d: 0.21 },
-    { y: 0.22, w: w(0) * 1.05, d: d(0) * 1.2 },
+    // The pommel: a faceted gem.
+    { y: 0, w: 0.08, d: 0.08 },
+    { y: 0.025, w: 0.55, d: 0.55 },
+    { y: 0.05, w: 0.24, d: 0.24 },
+    // The grip, bound in three raised bands of ice.
+    { y: 0.06, w: 0.26, d: 0.26 },
+    { y: 0.07, w: 0.4, d: 0.4 },
+    { y: 0.085, w: 0.26, d: 0.26 },
+    { y: 0.1, w: 0.26, d: 0.26 },
+    { y: 0.11, w: 0.4, d: 0.4 },
+    { y: 0.125, w: 0.26, d: 0.26 },
+    { y: 0.14, w: 0.26, d: 0.26 },
+    { y: 0.15, w: 0.4, d: 0.4 },
+    { y: 0.16, w: 0.3, d: 0.3 },
+    // The guard: its wings flung wide, swept up at their tips.
+    { y: 0.168, w: 1.2, d: 0.42 },
+    { y: 0.185, w: 2.1, d: 0.5 },
+    { y: 0.2, w: 2.3, d: 0.36 },
+    { y: 0.212, w: w(0) * 1.2, d: d(0) * 1.4 },
     // The blade, tapering to its point.
-    { y: 0.4, w: w(0.2), d: d(0.2) },
-    { y: 0.65, w: w(0.55), d: d(0.55) },
-    { y: 0.86, w: w(0.85) * 0.78, d: d(0.85) * 0.8 },
-    { y: 1, w: 0.01, d: 0.01 },
+    { y: 0.23, w: w(0), d: d(0) },
+    { y: 0.42, w: w(0.2), d: d(0.2) },
+    { y: 0.66, w: w(0.55), d: d(0.55) },
+    { y: 0.87, w: w(0.85) * 0.75, d: d(0.85) * 0.8 },
+    { y: 1, w: 0.02, d: 0.02 },
   ].map((r) => ({ y: r.y * L, w: r.w, d: r.d }));
 })();
