@@ -4779,6 +4779,7 @@ export const zh_TW: EnTranslations = {
         "swell": "每{every}秒，膨脹的風暴對崖台上的所有人造成{min}到{max}點傷害，之前每次脈動使其增強{growth}%：目前已有{stacks}次。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。"
       },
       "quenchGuardian": {
+        "intro": "被凍結在湖冰之下：在她破冰而出之前，無法攻擊或傷害她。",
         "cold": "你的寒意：{cold}/{max}。獨自一人時約{fill}秒充滿。若{radius}碼內有{others}名或更多其他玩家，則改為每秒下降{fall}。生命之暖：你受到的治療每達到最大生命值的{healPct}%，寒意降低1（英雄和傳奇難度為每{heroicHealPct}%）。寒冰棺等免疫效果無法阻止它：免疫期間你既不提供也不獲得溫暖。達到{max}時你會被冰霜封住{freeze}秒，隨後冰層碎裂。",
         "warmth": "與團隊相擁取暖：寒意每秒下降{fall}。在同一處停留{linger}秒的人群，腳下冰面會裂成冰冷的水洞，所以要不斷移動。",
         "frozen": "被冰霜封住：你無法行動，受到的所有傷害提高{pct}%，冰霜會擊碎寒冰棺等免疫效果。效果結束時冰層碎裂：你受到{min}到{max}點冰霜傷害，隨後{seconds}秒內受到的傷害提高{brittle}%，{radius}碼內的所有人獲得{cold}點寒意（英雄難度為{heroicRadius}碼、{heroicCold}點寒意）。英雄難度：{heroicMin}到{heroicMax}點傷害。傳奇難度：{mythicMin}到{mythicMax}點傷害。",
@@ -7381,6 +7382,7 @@ export const zh_TW: EnTranslations = {
     },
     "quenchGuardian": {
       "say": {
+        "intro": "噓……湖本在沉睡。你們喚醒了寒冷，而寒冷從不寬恕。",
         "pull": "我的湖上來了溫熱的血。它不會溫熱太久。",
         "shatter": "凍透了。現在，碎裂吧。",
         "hole": "冰記得每一步。聚在一起，它便會崩塌。",

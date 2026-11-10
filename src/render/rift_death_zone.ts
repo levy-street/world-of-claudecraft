@@ -74,6 +74,7 @@ import {
   HeatFx,
   QuenchBladesFx,
   QuenchBody,
+  QuenchEntranceFx,
   QuenchFightFx,
   QuenchFx,
   SealShake,
@@ -214,6 +215,9 @@ export class RiftDeathZoneVisuals {
   private readonly quenchFight: QuenchFightFx;
   private readonly quenchBlades: QuenchBladesFx;
   private readonly quenchBody: QuenchBody;
+  /** Her entrance (frozen under the lake's ice, the breach, her blades),
+   *  updated before her body: it reads its look. */
+  private readonly quenchEntrance: QuenchEntranceFx;
   // Its Heat guardian (Basalt Fist's spot and lanes, the falling fist and
   // the rolling Molten Swells).
   private readonly heatFx: HeatFx;
@@ -269,6 +273,15 @@ export class RiftDeathZoneVisuals {
     );
     this.quenchFight = new QuenchFightFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.quenchBlades = new QuenchBladesFx(scene, groundY, world, compileGate, reducedMotion);
+    this.quenchEntrance = new QuenchEntranceFx(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+      shake,
+      playGesture,
+    );
     this.quenchBody = new QuenchBody(
       scene,
       groundY,
@@ -660,6 +673,7 @@ export class RiftDeathZoneVisuals {
     this.quenchFx.update(dt);
     this.quenchFight.update(dt);
     this.quenchBlades.update(dt);
+    this.quenchEntrance.update(dt);
     this.quenchBody.update(dt);
     this.heatFx.update(dt);
     this.heatEntrance.update(dt);
@@ -700,6 +714,7 @@ export class RiftDeathZoneVisuals {
     this.quenchFx.dispose();
     this.quenchFight.dispose();
     this.quenchBlades.dispose();
+    this.quenchEntrance.dispose();
     this.quenchBody.dispose();
     this.heatFx.dispose();
     this.heatEntrance.dispose();

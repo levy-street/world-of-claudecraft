@@ -577,6 +577,7 @@ export const VOICE_LINES: Record<string, string> =
   "yell__hold_my_storm_if_your_arms_can_bear_it": "/audio/voice/heart_breath_guardian/yell__hold_my_storm_if_your_arms_can_bear_it.mp3?v=abc1d4e4cb36",
   "yell__hold_on_to_the_stone": "/audio/voice/captain_thessaly/yell__hold_on_to_the_stone.mp3?v=a53f9de83fbe",
   "yell__hush_now_the_seam_is_still": "/audio/voice/heart_seam_singer/yell__hush_now_the_seam_is_still.mp3?v=dca2ba4f34d5",
+  "yell__hush_the_lake_was_sleeping_you_have_woken_the_cold_and_the_c": "/audio/voice/heart_quench_guardian/yell__hush_the_lake_was_sleeping_you_have_woken_the_cold_and_the_c.mp3?v=2464789f04f8",
   "yell__i_am_the_seal_i_will_not_break": "/audio/voice/ignivar/yell__i_am_the_seal_i_will_not_break.mp3?v=5cc2a9af3399",
   "yell__i_am_the_stone_now_my_wrath_has_no_body_left_to_fail": "/audio/voice/heart_hammer_guardian/yell__i_am_the_stone_now_my_wrath_has_no_body_left_to_fail.mp3?v=2f614afff472",
   "yell__i_am_varkhul_forgefather_of_the_last_flame_raise_your_weapon": "/audio/voice/varkhul/yell__i_am_varkhul_forgefather_of_the_last_flame_raise_your_weapon.mp3?v=7e90a48c790f",

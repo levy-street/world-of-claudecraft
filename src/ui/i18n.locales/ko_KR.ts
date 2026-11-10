@@ -22658,6 +22658,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchGuardian.say.flurry':
     '모든 칼날아! 모든 날이여! 내 호수 위에 서 있는 것을 남기지 마라!',
   'hudChrome.quenchGuardian.say.pull': '내 호수에 따뜻한 피라. 그 온기도 오래가지 않으리라.',
+  'hudChrome.quenchGuardian.say.intro':
+    '쉿… 호수는 잠들어 있었다. 너희가 냉기를 깨웠으니, 냉기는 결코 용서하지 않으리라.',
   'hudChrome.quenchGuardian.say.shatter': '속까지 얼었구나. 이제 부서져라.',
   'hudChrome.quenchGuardian.say.hole': '얼음은 모든 발걸음을 기억한다. 함께 서면, 꺼진다.',
   'hudChrome.quenchGuardian.say.wake':
@@ -22668,6 +22670,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchGuardian.say.death': '냉기가... 물러난다... 담금질은 너희의 것이다.',
   'hudChrome.auraEffect.quenchGuardian.cold':
     '당신의 냉기: {max} 중 {cold}. 혼자 있으면 약 {fill}초 만에 가득 찹니다. {radius}미터 안에 다른 플레이어가 {others}명 이상 있으면 대신 매초 {fall}씩 내려갑니다. 생명의 온기: 받은 치유는 최대 생명력의 {healPct}%마다 냉기를 1씩 낮춥니다(영웅과 신화에서는 {heroicHealPct}%마다). 차가운 관 같은 무적 효과로는 막을 수 없습니다: 효과가 지속되는 동안에는 온기를 주지도 받지도 못합니다. {max}에 이르면 {freeze}초 동안 서리에 갇히고, 그 뒤 얼음이 부서집니다.',
+  'hudChrome.auraEffect.quenchGuardian.intro':
+    '호수의 얼음 아래 얼어붙어 있습니다: 그녀가 얼음을 깨고 나올 때까지 그녀를 공격하거나 피해를 줄 수 없습니다.',
   'hudChrome.auraEffect.quenchGuardian.warmth':
     '공격대와 함께 모여 있음: 냉기가 매초 {fall}씩 내려갑니다. 한 자리에 {linger}초 동안 머문 무리 아래의 얼음은 갈라져 얼어붙은 물웅덩이가 되니 계속 움직이세요.',
   'hudChrome.auraEffect.quenchGuardian.frozen':

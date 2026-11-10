@@ -38,6 +38,11 @@
 //    (quench_wake_fx.ts); thrown down, a frost shockwave and ice spikes race
 //    out over the lake and a line races to each blade, crystals sprouting
 //    along it, each blade flaring as it arrives (quench_wake_throw.ts);
+//  - her entrance (quench_entrance_fx.ts, read through
+//    quench_entrance_state.ts): lying frozen under the lake's ice her light
+//    is out and her cold still (no mist, no snow, no rime), her heart a slow
+//    beat; her eyes open sharp under the ice; once she breaks out her light
+//    blazes back and her cold rolls off her again;
 //  - the death: frost climbs her from the feet up into an ice statue (her own
 //    material, quench_statue_glaze.ts), glints climbing with it, her light
 //    dying, a burst of crystals as the last of her freezes, mist off the
@@ -115,6 +120,7 @@ import {
   quenchBreathMistAt,
 } from './quench_breath_core';
 import { QuenchBreathStreaks } from './quench_breath_streaks';
+import { quenchEntranceFor } from './quench_entrance_state';
 import { QuenchRimeSteps } from './quench_rime_steps';
 import { holdQuenchStatueGlaze } from './quench_statue_glaze';
 import {
@@ -805,8 +811,21 @@ export class QuenchBody {
     const falling = this.windPending && this.windFallen;
     const bracers = falling ? look.bracers * QUENCH_WINDUP.fallFist : look.bracers;
     const crown = falling ? Math.min(look.crown, 0.9) : look.crown;
-    this.lights(look.heart, look.eyes, crown, bracers, look.gather, 1);
-    this.ambient(e, dt, look.plume, 1);
+    // Her entrance: under the ice her light is out and her cold still, her
+    // eyes shut until they open sharp (1 throughout once she is awake).
+    const ent = quenchEntranceFor(e.id);
+    const cold = ent ? ent.ambient : 1;
+    const dim = ent ? 0.1 + 0.9 * ent.ambient : 1;
+    this.lights(
+      ent ? ent.heart : look.heart,
+      ent ? Math.max(look.eyes, ent.eyes) : look.eyes,
+      crown * dim,
+      bracers * dim,
+      look.gather,
+      1,
+      ent ? Math.min(1, ent.eyes) : 1,
+    );
+    this.ambient(e, dt, look.plume * cold, cold);
     this.gatherFx(dt, look.gather);
     this.exhaleFx(e, dt);
     this.windFx(dt);
@@ -825,7 +844,8 @@ export class QuenchBody {
     this.strikeFx(e);
     this.wakeFx(e, dt, look.column);
     const gy = this.groundY(eAt.x, eAt.z);
-    this.rime.step(eAt.x, gy, eAt.z, this.clock);
+    // No rime under her while she lies under the ice or bursts out of it.
+    if (cold > 0.5) this.rime.step(eAt.x, gy, eAt.z, this.clock);
   }
 
   /** Her light: the heart (core and the halo bleeding round the wrap), the
@@ -837,6 +857,7 @@ export class QuenchBody {
     bracers: number,
     gather: number,
     life: number,
+    eyesOpen = 1,
   ): void {
     const h = this.sock[S_HEART];
     this.heartCore.visible = life > 0.01;
@@ -852,14 +873,14 @@ export class QuenchBody {
     this.haloMat.opacity = Math.min(0.85, 0.22 + 0.2 * hc) * life;
     for (let i = 0; i < 2; i++) {
       const s = this.eyes[i];
-      s.visible = life > 0.01;
+      s.visible = life > 0.01 && eyesOpen > 0.01;
       s.position.copy(this.sock[S_EYES[i]]);
       // Round 4: a tight glint on each eye, never a glow wider than her face
       // (it washed her painted features into a pale blur at any distance);
       // the eyes' own light is painted in her emissive map.
       s.scale.setScalar(quenchEyeGlintSize(eyes) * U);
     }
-    this.eyeMat.opacity = Math.min(1, 0.6 + 0.3 * eyes) * life;
+    this.eyeMat.opacity = Math.min(1, 0.6 + 0.3 * eyes) * life * eyesOpen;
     for (let i = 0; i < this.crown.length; i++) {
       const s = this.crown[i];
       s.visible = life > 0.01;

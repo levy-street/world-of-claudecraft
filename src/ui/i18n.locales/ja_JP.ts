@@ -22679,6 +22679,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_quench_blades_hunt': '剣の狩り',
   'hudChrome.quenchGuardian.say.flurry': 'すべての剣よ！すべての刃よ！我が湖に立つものを残すな！',
   'hudChrome.quenchGuardian.say.pull': '我が湖に温かい血か。その温もりも長くは続かぬ。',
+  'hudChrome.quenchGuardian.say.intro':
+    'しっ……湖は眠っていたのに。お前たちは冷気を目覚めさせた。そして冷気は決して赦さぬ。',
   'hudChrome.quenchGuardian.say.shatter': '芯まで凍った。さあ、砕けよ。',
   'hudChrome.quenchGuardian.say.hole': '氷はすべての足音を覚えている。寄り集まれば、崩れる。',
   'hudChrome.quenchGuardian.say.wake': '鍛冶師の剣よ、目覚めよ！氷の上で奴らを狩れ！',
@@ -22688,6 +22690,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchGuardian.say.death': '冷気が……離れていく……焼き入れはお前たちのものだ。',
   'hudChrome.auraEffect.quenchGuardian.cold':
     'あなたの冷気：{max}中{cold}。ひとりでいると約{fill}秒で満ちる。{radius}ヤード以内に他のプレイヤーが{others}人以上いれば、代わりに毎秒{fall}ずつ下がる。命の温もり：受けた回復は、最大体力の{healPct}%ごとに冷気を1下げる（ヒロイックとミシックでは{heroicHealPct}%ごと）。冷たき棺などの無敵効果では止められない：効果中は温もりを与えることも受けることもできない。{max}に達すると{freeze}秒間霜に閉ざされ、その後氷が砕ける。',
+  'hudChrome.auraEffect.quenchGuardian.intro':
+    '湖の氷の下に凍りついている：氷を破って現れるまで、攻撃もダメージも受けない。',
   'hudChrome.auraEffect.quenchGuardian.warmth':
     'レイドと身を寄せ合っている：冷気が毎秒{fall}ずつ下がる。同じ場所に{linger}秒とどまった集団の下では氷が割れ、凍てつく水の穴が開く。動き続けよう。',
   'hudChrome.auraEffect.quenchGuardian.frozen':

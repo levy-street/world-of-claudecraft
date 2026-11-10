@@ -206,8 +206,11 @@ describe('the Guardian of the Quench model', () => {
       expect(def.oneShotsHoldAttacks, one).toContain(one);
     expect(c.castPlayOut).toEqual(['Breath', 'Wake']);
     expect(def.glowPulses?.deathFade).toBeGreaterThan(0);
+    // The flare, her entrance's dim under the ice (quench_entrance_fx.ts),
+    // the strike's wind-up.
     expect(def.glowPulses?.pulses.map((p) => p.gesture)).toEqual([
       QUENCH_BODY_GESTURES.flare,
+      QUENCH_BODY_GESTURES.frozenDim,
       QUENCH_BODY_GESTURES.strikeRaise,
     ]);
     for (const g of Object.values(QUENCH_BODY_GESTURES))

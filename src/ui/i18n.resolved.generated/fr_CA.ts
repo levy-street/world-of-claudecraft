@@ -4779,6 +4779,7 @@ export const fr_CA: EnTranslations = {
         "swell": "Every {every} sec the swelling storm deals {min} to {max} damage to everyone on the Cornice, {growth}% more for every pulse before it: {stacks} so far. Heroic and Mythic: {heroicMin} to {heroicMax} damage."
       },
       "quenchGuardian": {
+        "intro": "Frozen under the lake: she cannot be attacked or harmed until she breaks free of the ice.",
         "cold": "Your cold: {cold} of {max}. Alone it fills in about {fill} sec. Standing within {radius} yd of {others} or more other players lowers it by {fall} every second instead. Living Warmth: healing you receive lowers it by 1 for every {healPct}% of your maximum health healed ({heroicHealPct}% on Heroic and Mythic). Immunities such as Cold Coffin do not stop it: while one lasts you neither give nor take warmth. At {max} you are Encased in Rime for {freeze} sec, then the ice shatters.",
         "warmth": "Huddled with the raid: your cold falls by {fall} every second. A huddle that stays on one spot for {linger} sec cracks the ice beneath it into a hole of freezing water, so keep moving.",
         "frozen": "Encased in rime: you cannot act and take {pct}% more damage from all sources, and the rime cracks immunities such as Cold Coffin. When it ends the ice shatters: you take {min} to {max} Frost damage, then take {brittle}% more damage for {seconds} sec, and everyone within {radius} yd of you gains {cold} cold ({heroicRadius} yd and {heroicCold} cold on Heroic). Heroic: {heroicMin} to {heroicMax} damage. Mythic: {mythicMin} to {mythicMax} damage.",
@@ -7381,6 +7382,7 @@ export const fr_CA: EnTranslations = {
     },
     "quenchGuardian": {
       "say": {
+        "intro": "Hush... the lake was sleeping. You have woken the cold, and the cold does not forgive.",
         "pull": "Warm blood on my lake. It will not stay warm for long.",
         "shatter": "Frozen through. Now break.",
         "hole": "The ice remembers every step. Stand together, and it gives.",

@@ -2,6 +2,10 @@
 // the Frozen Lake's boss. "Together, but not for too long": warmth comes from
 // huddling, and huddling breaks the ice.
 //
+//   The entrance       before all of it, the first time the raid steps onto
+//                      the lake: she wakes under the ice, breaks out of it
+//                      and calls her blades, held out of reach until her
+//                      scene ends (quench_intro.ts).
 //   The pull           the shore ice heaves up round the lake (quench_rim.ts):
 //                      the whole fight is on the ice.
 //   All fight          frostbite (quench_cold.ts): a cold bar on every
@@ -85,6 +89,13 @@ import {
   type QuenchDifficulty,
   QUENCH_TUNING as T,
 } from './quench_ids';
+import {
+  quenchIntroJustSpoke,
+  quenchIntroReadout,
+  replayQuenchIntro,
+  spendQuenchIntro,
+  stepQuenchIntro,
+} from './quench_intro';
 import { stepLifeWarmth } from './quench_life_warmth';
 import { dropRim, raiseRim, stepRim } from './quench_rim';
 import { castRime, clearRime, clearRimeMarks, setRime, stepRime } from './quench_rime';
@@ -344,7 +355,8 @@ function beginQuench(ctx: SimContext, inst: InstanceSlot, boss: Entity): QuenchF
   boss.smithHeartQuench = st;
   const s = scopeOf(ctx, inst, st, boss);
   raiseRim(s);
-  quenchSay(s, boss, 'pull');
+  // Straight after her entrance the line would follow the entrance's own.
+  if (!quenchIntroJustSpoke(ctx, boss)) quenchSay(s, boss, 'pull');
   return st;
 }
 
@@ -366,6 +378,8 @@ export function tickQuenchGuardian(ctx: SimContext, inst: InstanceSlot): void {
     if (st0 && !st0.finished) finishQuench(ctx, inst, boss, st0);
     return;
   }
+  // Her entrance holds her out of reach until the scene ends.
+  if (stepQuenchIntro(ctx, inst, boss, fighting(boss))) return;
   if (!fighting(boss)) {
     if (st0) {
       if (!st0.finished && lakePlayers(ctx, inst).length === 0)
@@ -398,6 +412,8 @@ export function tickQuenchGuardian(ctx: SimContext, inst: InstanceSlot): void {
 export function quenchScopeForDev(ctx: SimContext, inst: InstanceSlot): QuenchScope | null {
   const boss = quenchGuardian(ctx, inst);
   if (!boss || !living(boss)) return null;
+  // A mechanic forced from the dev line starts the fight: no entrance left.
+  spendQuenchIntro(ctx, boss);
   const st = boss.smithHeartQuench ?? beginQuench(ctx, inst, boss);
   return scopeOf(ctx, inst, st, boss);
 }
@@ -433,7 +449,7 @@ export function quenchDevTrigger(
   pid: number,
 ): string | null {
   const [verb, arg] = what.trim().split(/\s+/);
-  if (verb === 'reset') {
+  if (verb === 'reset' || verb === 'intro') {
     const boss = quenchGuardian(ctx, inst);
     if (!boss) return 'This run holds no Guardian of the Quench.';
     resetQuench(ctx, inst, boss);
@@ -447,6 +463,10 @@ export function quenchDevTrigger(
     boss.pos = { ...boss.spawnPos, y: ctx.groundPos(boss.spawnPos.x, boss.spawnPos.z).y };
     boss.prevPos = { ...boss.pos };
     ctx.rebucket(boss);
+    if (verb === 'intro') {
+      replayQuenchIntro(boss);
+      return 'The Guardian of the Quench sinks under the ice; she wakes again as the raid steps onto the lake.';
+    }
     return 'The Guardian of the Quench stands whole again; the lake is whole.';
   }
   if (verb === 'heroic' || verb === 'mythic') {
@@ -550,7 +570,7 @@ export function quenchReadout(ctx: SimContext, inst: InstanceSlot, pid: number):
   const head = `[dev] Guardian of the Quench (${quenchDifficulty(inst)}): ${boss.dead ? 'dead' : `${Math.round((boss.hp / boss.maxHp) * 100)}%`}`;
   const st = boss.smithHeartQuench;
   if (!st)
-    return `${head}; not fighting (${claimBlades(ctx, inst).filter(Boolean).length} blades).`;
+    return `${head}; not fighting (${claimBlades(ctx, inst).filter(Boolean).length} blades; ${quenchIntroReadout(boss)}).`;
   const mine = st.chill[pid];
   return `${head}; ${st.half}, your cold ${mine ? Math.round(mine.cold) : 0}, holes ${st.holes.length}, cracks ${st.cracks.length}, breath in ${Math.max(0, st.breathTimer).toFixed(0)} s, deepening ${st.deepenStacks}, rime in ${Math.max(0, st.rimeTimer).toFixed(0)} s (on ${st.rimes.length}, healed ${st.rimeBreaks}, burst ${st.rimeBursts}).`;
 }

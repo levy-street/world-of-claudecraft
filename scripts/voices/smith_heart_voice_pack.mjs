@@ -104,6 +104,7 @@ export const SMITH_HEART_DIRECTIONS = {
   'thessaly.victory': '[relieved, proud]',
   'thessaly.wipe': '[steady, encouraging]',
   // The Guardian of the Quench: the frozen lake's keeper.
+  'quench.intro': '[soft, menacing whisper]',
   'quench.pull': '[regal, cold, elegant]',
   'quench.shatter': '[icy whisper, then sharp]',
   'quench.hole': '[calm, knowing, regal]',
@@ -172,6 +173,12 @@ export const SMITH_HEART_INLINE_DIRECTIONS = {
     'We will return': '[low, menacing threat]',
   },
   'heat.sinkAgain': { 'Again you burn': '[roaring]' },
+  // The Quench's entrance (quench_intro.ts): a soft, menacing whisper that
+  // hardens (the fx beats ride these turns).
+  'quench.intro': {
+    'You have woken the cold': '[hardening, cold]',
+    'and the cold does not forgive': '[hard, final, menacing]',
+  },
   // The entrance (heat_intro.ts): contempt, then anger, then the fury it
   // explodes on (the fx beats ride these three turns).
   'heat.intro': {

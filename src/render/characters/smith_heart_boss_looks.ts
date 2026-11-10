@@ -75,6 +75,13 @@ export const MASTERLESS_STRENGTH_CLIPS = [
 export const MASTERLESS_STRENGTH_ARRIVAL_URL = `${CREATURES}/smith_heart_masterless_strength_arrival_anims.glb`;
 export const MASTERLESS_STRENGTH_ARRIVAL_CLIPS = ['Dormant', 'Rise'] as const;
 
+/** The Guardian of the Quench's two entrance clips (scripts/build_quench_
+ *  guardian_entrance_anims.mjs, sampled from Idle and Wake and laid down and
+ *  lifted on the root): lying frozen under the lake's ice, and the burst out
+ *  of it, the rise and the blades' call. */
+export const QUENCH_ENTRANCE_ANIMS_URL = `${CREATURES}/smith_heart_quench_guardian_entrance_anims.glb`;
+export const QUENCH_ENTRANCE_CLIPS = ['Frozen', 'Emerge'] as const;
+
 /** A bar's clip rate so its contact beat lands on the bar's end. */
 const onBarEnd = (contact: number, bar: number) => (bar > 0 ? contact / bar : 1);
 
@@ -301,6 +308,9 @@ const QUENCH_CLIPS: ClipMap = {
   },
   castPlayOut: ['Breath', 'Wake'],
 };
+
+/** Her entrance's first stance: lying frozen under the lake's ice, still. */
+const QUENCH_FROZEN: ClipMap = { ...QUENCH_CLIPS, idle: 'Frozen', walk: 'Frozen', run: 'Frozen' };
 const BREATH_STORM = breathClips(true);
 
 export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
@@ -341,14 +351,33 @@ export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
   },
   smith_heart_quench_guardian: {
     url: QUENCH_BODY_URL,
+    animUrls: [QUENCH_ENTRANCE_ANIMS_URL],
     height: QUENCH_BODY_HEIGHT,
     clips: QUENCH_CLIPS,
+    phaseClips: {
+      // Her entrance (smith_heart_fx/quench_entrance_core.ts): frozen under
+      // the ice, then the burst and the rise (the Emerge one-shot).
+      [QUENCH_BODY_GESTURES.frozen]: { clips: QUENCH_FROZEN },
+      [QUENCH_BODY_GESTURES.emerge]: { clips: QUENCH_CLIPS, enter: 'Emerge' },
+      [QUENCH_BODY_GESTURES.stand]: { clips: QUENCH_CLIPS },
+    },
     castClipSync: [QUENCH_CASTS.breath, QUENCH_CASTS.wake],
     glowPulses: {
       // Her eyes, crown, heart and frost cracks flare as the breath is loosed
       // and the blades are thrown awake.
       pulses: [
         { gesture: QUENCH_BODY_GESTURES.flare, rise: 0.12, hold: 0.3, fall: 1.0, peak: 2.0 },
+        // Frozen under the ice: her light out and her colour dulled to grey
+        // while it is re-sent (smith_heart_fx/quench_entrance_fx.ts), filling
+        // back over the fall once she breaks out.
+        {
+          gesture: QUENCH_BODY_GESTURES.frozenDim,
+          rise: 0,
+          hold: 1.0,
+          fall: 1.2,
+          peak: 0.03,
+          shade: 0.62,
+        },
         // Tempering Strike's wind-up: the cold gathers on her raised bracers
         // and her cracks, blazing to the slam a second on.
         {
@@ -365,6 +394,7 @@ export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
     // A swing never cuts the breath, the wake, the strike (its wind-up held
     // through the swing it slams on), the taunt or a slash's command.
     oneShotsHoldAttacks: [
+      'Emerge',
       'Breath',
       'Wake',
       'Strike',

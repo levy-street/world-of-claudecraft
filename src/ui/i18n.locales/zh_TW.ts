@@ -23201,6 +23201,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_quench_blades_hunt': '利刃狩獵',
   'hudChrome.quenchGuardian.say.flurry': '所有利刃！所有鋒刃！別讓任何人站在我的湖上！',
   'hudChrome.quenchGuardian.say.pull': '我的湖上來了溫熱的血。它不會溫熱太久。',
+  'hudChrome.quenchGuardian.say.intro': '噓……湖本在沉睡。你們喚醒了寒冷，而寒冷從不寬恕。',
   'hudChrome.quenchGuardian.say.shatter': '凍透了。現在，碎裂吧。',
   'hudChrome.quenchGuardian.say.hole': '冰記得每一步。聚在一起，它便會崩塌。',
   'hudChrome.quenchGuardian.say.wake': '鑄匠之刃，醒來！在冰面上獵殺他們！',
@@ -23210,6 +23211,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchGuardian.say.death': '寒意……放手了……淬火歸你們了。',
   'hudChrome.auraEffect.quenchGuardian.cold':
     '你的寒意：{cold}/{max}。獨自一人時約{fill}秒充滿。若{radius}碼內有{others}名或更多其他玩家，則改為每秒下降{fall}。生命之暖：你受到的治療每達到最大生命值的{healPct}%，寒意降低1（英雄和傳奇難度為每{heroicHealPct}%）。寒冰棺等免疫效果無法阻止它：免疫期間你既不提供也不獲得溫暖。達到{max}時你會被冰霜封住{freeze}秒，隨後冰層碎裂。',
+  'hudChrome.auraEffect.quenchGuardian.intro':
+    '被凍結在湖冰之下：在她破冰而出之前，無法攻擊或傷害她。',
   'hudChrome.auraEffect.quenchGuardian.warmth':
     '與團隊相擁取暖：寒意每秒下降{fall}。在同一處停留{linger}秒的人群，腳下冰面會裂成冰冷的水洞，所以要不斷移動。',
   'hudChrome.auraEffect.quenchGuardian.frozen':

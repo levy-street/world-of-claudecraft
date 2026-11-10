@@ -91,6 +91,14 @@ export {
 export { claimBlades } from './quench_blades';
 export * from './quench_geometry';
 export * from './quench_ids';
+export {
+  onQuenchIntroIce,
+  type QuenchIntroStage,
+  quenchIntroState,
+  quenchIntroWaker,
+  spendQuenchIntro,
+} from './quench_intro';
+export * from './quench_intro_plan';
 export type { QuenchFightState } from './quench_state';
 export { strikeSpentDue, strikeWindupDue } from './quench_strike_windup';
 export { QUENCH_LINES, quenchLineKey } from './quench_voice';

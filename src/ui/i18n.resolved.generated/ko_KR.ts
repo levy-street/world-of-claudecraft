@@ -4779,6 +4779,7 @@ export const ko_KR: EnTranslations = {
         "swell": "{every}초마다 부풀어 오르는 폭풍이 벼랑 위의 모두에게 {min}~{max}의 피해를 주며, 앞선 맥동마다 {growth}%씩 강해집니다: 지금까지 {stacks}번. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해."
       },
       "quenchGuardian": {
+        "intro": "호수의 얼음 아래 얼어붙어 있습니다: 그녀가 얼음을 깨고 나올 때까지 그녀를 공격하거나 피해를 줄 수 없습니다.",
         "cold": "당신의 냉기: {max} 중 {cold}. 혼자 있으면 약 {fill}초 만에 가득 찹니다. {radius}미터 안에 다른 플레이어가 {others}명 이상 있으면 대신 매초 {fall}씩 내려갑니다. 생명의 온기: 받은 치유는 최대 생명력의 {healPct}%마다 냉기를 1씩 낮춥니다(영웅과 신화에서는 {heroicHealPct}%마다). 차가운 관 같은 무적 효과로는 막을 수 없습니다: 효과가 지속되는 동안에는 온기를 주지도 받지도 못합니다. {max}에 이르면 {freeze}초 동안 서리에 갇히고, 그 뒤 얼음이 부서집니다.",
         "warmth": "공격대와 함께 모여 있음: 냉기가 매초 {fall}씩 내려갑니다. 한 자리에 {linger}초 동안 머문 무리 아래의 얼음은 갈라져 얼어붙은 물웅덩이가 되니 계속 움직이세요.",
         "frozen": "서리에 갇힘: 행동할 수 없고 모든 공격으로부터 받는 피해가 {pct}% 증가하며, 서리가 차가운 관 같은 무적 효과를 깨뜨립니다. 효과가 끝나면 얼음이 부서져 {min}~{max}의 냉기 피해를 입고, 이후 {seconds}초 동안 받는 피해가 {brittle}% 증가하며, {radius}미터 안의 모두가 냉기 {cold}을 얻습니다(영웅 난이도에서는 {heroicRadius}미터, 냉기 {heroicCold}). 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.",
@@ -7381,6 +7382,7 @@ export const ko_KR: EnTranslations = {
     },
     "quenchGuardian": {
       "say": {
+        "intro": "쉿… 호수는 잠들어 있었다. 너희가 냉기를 깨웠으니, 냉기는 결코 용서하지 않으리라.",
         "pull": "내 호수에 따뜻한 피라. 그 온기도 오래가지 않으리라.",
         "shatter": "속까지 얼었구나. 이제 부서져라.",
         "hole": "얼음은 모든 발걸음을 기억한다. 함께 서면, 꺼진다.",

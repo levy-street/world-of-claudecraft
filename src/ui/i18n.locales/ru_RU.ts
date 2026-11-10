@@ -24836,6 +24836,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchGuardian.say.flurry':
     'Все клинки! Все лезвия! Не оставьте на моём озере ни одного стоящего!',
   'hudChrome.quenchGuardian.say.pull': 'Тёплая кровь на моём озере. Тёплой она пробудет недолго.',
+  'hudChrome.quenchGuardian.say.intro':
+    'Тише... озеро спало. Вы разбудили холод, а холод не прощает.',
   'hudChrome.quenchGuardian.say.shatter': 'Промёрз насквозь. Теперь разбейся.',
   'hudChrome.quenchGuardian.say.hole': 'Лёд помнит каждый шаг. Встаньте вместе, и он не выдержит.',
   'hudChrome.quenchGuardian.say.wake':
@@ -24847,6 +24849,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchGuardian.say.death': 'Холод... отпускает... Закалка ваша.',
   'hudChrome.auraEffect.quenchGuardian.cold':
     'Ваш холод: {cold} из {max}. В одиночку шкала заполняется примерно за {fill} сек. Если в пределах {radius} м стоят {others} или больше других игроков, она вместо этого падает на {fall} в секунду. Живое тепло: полученное исцеление снижает её на 1 за каждые {healPct}% вашего максимального здоровья ({heroicHealPct}% в героическом и мифическом режимах). Неуязвимость вроде Холодного гроба её не останавливает: пока она действует, вы не даёте и не получаете тепла. На {max} вас сковывает изморозь на {freeze} сек., затем лёд разлетается.',
+  'hudChrome.auraEffect.quenchGuardian.intro':
+    'Скована льдом под озером: её нельзя атаковать или ранить, пока она не вырвется изо льда.',
   'hudChrome.auraEffect.quenchGuardian.warmth':
     'Вы греетесь вместе с рейдом: холод падает на {fall} в секунду. Если группа простоит на одном месте {linger} сек, лёд под ней треснет и откроется прорубь с ледяной водой, так что не стойте на месте.',
   'hudChrome.auraEffect.quenchGuardian.frozen':

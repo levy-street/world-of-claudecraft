@@ -5990,6 +5990,8 @@ export const hudChromeStrings = {
     },
     // The Smith's Heart's Guardian of the Quench (src/ui/quench_aura_effect.ts).
     quenchGuardian: {
+      intro:
+        'Frozen under the lake: she cannot be attacked or harmed until she breaks free of the ice.',
       cold: 'Your cold: {cold} of {max}. Alone it fills in about {fill} sec. Standing within {radius} yd of {others} or more other players lowers it by {fall} every second instead. Living Warmth: healing you receive lowers it by 1 for every {healPct}% of your maximum health healed ({heroicHealPct}% on Heroic and Mythic). Immunities such as Cold Coffin do not stop it: while one lasts you neither give nor take warmth. At {max} you are Encased in Rime for {freeze} sec, then the ice shatters.',
       warmth:
         'Huddled with the raid: your cold falls by {fall} every second. A huddle that stays on one spot for {linger} sec cracks the ice beneath it into a hole of freezing water, so keep moving.',
@@ -10368,9 +10370,12 @@ export const hudChromeStrings = {
   // The Smith's Heart's Guardian of the Quench (encounters/smith_heart/
   // quench*.ts): what the guardian SAYS (quench_voice.ts QUENCH_LINES, the
   // same English). Its fight calls no raid warning banner (the owner's rule
-  // of 2026-11-04: its mechanics read in the world).
+  // of 2026-11-04: its mechanics read in the world). The entrance's line is
+  // wordy (M16): non-Latin fills in the overlays.
   quenchGuardian: {
     say: {
+      intro:
+        'Hush... the lake was sleeping. You have woken the cold, and the cold does not forgive.',
       pull: 'Warm blood on my lake. It will not stay warm for long.',
       shatter: 'Frozen through. Now break.',
       hole: 'The ice remembers every step. Stand together, and it gives.',

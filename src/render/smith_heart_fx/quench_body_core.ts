@@ -141,6 +141,17 @@ export const QUENCH_BODY_GESTURES = {
   strikeSlamHigh: 'smith_heart_quench_body_strike_slam_high',
   /** An avoided swing told before the downswing began (StrikeSpentHigh). */
   strikeSpentHigh: 'smith_heart_quench_body_strike_spent_high',
+  /** Her entrance's stances (quench_entrance_core.ts, the entrance anims'
+   *  clips): lying frozen under the lake's ice (Frozen), the burst out of it
+   *  and the rise (its Emerge one-shot, entered once on the breach), and
+   *  standing (a scene cut short, or a rebuilt view after it). */
+  frozen: 'smith_heart_quench_body_frozen',
+  emerge: 'smith_heart_quench_body_emerge',
+  stand: 'smith_heart_quench_body_stand',
+  /** Her body held dim and grey under the ice (a glow pulse that dulls her
+   *  light and her colour, re-sent while she lies there; it fills back over
+   *  its fall once it stops). */
+  frozenDim: 'smith_heart_quench_body_frozen_dim',
 } as const;
 
 /** The bars that play a clip timed onto the bar's end, and the beat that lands
