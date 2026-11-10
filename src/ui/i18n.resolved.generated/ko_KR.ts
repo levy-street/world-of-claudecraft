@@ -4747,6 +4747,7 @@ export const ko_KR: EnTranslations = {
         "icedOver": "스며드는 서리에 얼어붙었습니다: 이동하거나 행동할 수 없습니다."
       },
       "council": {
+        "intro": "잠들어 있다: 의회가 깨어날 때까지 공격할 수도, 피해를 줄 수도 없다.",
         "wakeMark": "효과가 끝나면 서 있는 자리의 바닥에서 기둥이 솟구쳐 {radius}야드 안의 모두에게 {min}에서 {max}의 피해를 주고 밀쳐냅니다. 공격대에 엄폐물이 필요한 곳에 서세요. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.",
         "rockMark": "효과가 끝나면 바위가 떨어집니다: {total}의 피해를 {radius}야드 안의 모두가 나눠 받습니다. {soakers}명 미만이면 각자 {penalty}% 더 받고 공격대 전체가 {tremorMin}에서 {tremorMax}의 피해를 받습니다. {radius}야드 안의 모든 기둥이 한 조각씩 깨지니 엄폐물에서 떨어져 나눠 맞으세요. 신화: {soulReach}야드 안의 영혼의 기둥은 대신 영혼 표식을 하나 잃고, 표식이 없어지면 부서집니다. 영웅·신화: 나눠 받는 피해 {heroicTotal}, 공격대 전체 피해 {heroicTremorMin}에서 {heroicTremorMax}.",
         "resonance": "{every}초마다 울려 퍼져 자신의 {radius}야드 안에 있는 모든 아군에게 {min}에서 {max}의 자연 피해를 줍니다. 효과가 끝날 때까지 모두에게서 떨어지세요. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.",

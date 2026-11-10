@@ -37,7 +37,10 @@
 //   /dev heart reset                 free the run and claim a fresh one
 //   /dev heart council               the Hammer Council's readout
 //   /dev heart council <what>        pull (both onto you), reset (whole
-//                                    again, the five columns too), heroic
+//                                    again, the five columns too), intro
+//                                    (reset and asleep again: the quarry's
+//                                    entrance replays as the raid comes
+//                                    down), heroic
 //                                    [on|off] or mythic [on|off] (this run's
 //                                    council; one tier at a time), energy <n>,
 //                                    wrath, weight, rush, wake, rock, bolt,
@@ -134,6 +137,7 @@ import {
   setSmithHeartPortalDevOpen,
   smithHeartProgress,
   smithHeartSealMaskOf,
+  spendCouncilIntro,
   spendHeatIntro,
   spendQuenchIntro,
 } from '../encounters/smith_heart';
@@ -193,7 +197,7 @@ const GUARDIAN_IDS: ReadonlySet<string> = new Set([
 const COUNCIL_IDS: ReadonlySet<string> = new Set(COUNCIL_TEMPLATE_IDS);
 
 const HELP =
-  '[dev] /dev heart enter [normal] | tp <cleft|gallery|pit|hammer|balcony|ring|ringse|ringsw|breath|bridge|cornice|breathboss|quench|ice|lake|quenchboss|heat|forge|anvil|heatboss|heart|portal|heartroom|final> | kill <hammer|guardian|singer|council|breath|quench|heat|final|guardians|pack <id>|trash|all> | gates | portal | seal | pool <k> | arrival | final [pull|reset|normal|heroic|mythic|quarter <breath|quench|hammer|heat|ring>|fill [vein|all] [pct]|burst|shock|root|unroot|fist|whirl|embers|freeze|cold <n>|ice|wind [deg]|bolt|drawn|orbs|tremor|anvil|shell] | reset | council [pull|reset|heroic [on|off]|mythic [on|off]|energy <n>|wrath|weight|rush|wake|rock|bolt|song|resonance [n]|soul <guardian|singer>|soulpip <n>] | breath [pull|reset|heroic [on|off]|mythic [on|off]|phase2|blow [deg|n|e|s|w]|calm|circle|inhale|roar|chain|eye|conductor|tornado|gust [deg]|isles [0|1]|ride [0|1]|home|killisle|bulwark|windworn|heart [2|portal a|b|c|d|carry|burst]] | quench [pull|reset|intro|heroic [on|off]|mythic [on|off]|phase2|blades|cold <n>|burst|splash|chain [n]|immune|huddle|hole|crack|breath|slash|flurry] | heat [pull|reset|intro|heroic [on|off]|mythic [on|off]|phase <1-3>|intermission|fist|flare|seeds|zones|ember]';
+  '[dev] /dev heart enter [normal] | tp <cleft|gallery|pit|hammer|balcony|ring|ringse|ringsw|breath|bridge|cornice|breathboss|quench|ice|lake|quenchboss|heat|forge|anvil|heatboss|heart|portal|heartroom|final> | kill <hammer|guardian|singer|council|breath|quench|heat|final|guardians|pack <id>|trash|all> | gates | portal | seal | pool <k> | arrival | final [pull|reset|normal|heroic|mythic|quarter <breath|quench|hammer|heat|ring>|fill [vein|all] [pct]|burst|shock|root|unroot|fist|whirl|embers|freeze|cold <n>|ice|wind [deg]|bolt|drawn|orbs|tremor|anvil|shell] | reset | council [pull|reset|intro|heroic [on|off]|mythic [on|off]|energy <n>|wrath|weight|rush|wake|rock|bolt|song|resonance [n]|soul <guardian|singer>|soulpip <n>] | breath [pull|reset|heroic [on|off]|mythic [on|off]|phase2|blow [deg|n|e|s|w]|calm|circle|inhale|roar|chain|eye|conductor|tornado|gust [deg]|isles [0|1]|ride [0|1]|home|killisle|bulwark|windworn|heart [2|portal a|b|c|d|carry|burst]] | quench [pull|reset|intro|heroic [on|off]|mythic [on|off]|phase2|blades|cold <n>|burst|splash|chain [n]|immune|huddle|hole|crack|breath|slash|flurry] | heat [pull|reset|intro|heroic [on|off]|mythic [on|off]|phase <1-3>|intermission|fist|flare|seeds|zones|ember]';
 
 /** Where `/dev heart breath pull` sets the player down: on the Cornice, a
  *  few strides west of the guardian. */
@@ -408,6 +412,8 @@ export function handleSmithHeartDevChat(ctx: SimContext, raw: string, pid: numbe
       const me = ctx.entities.get(pid);
       const bodies = councilBodies(ctx, inst);
       if (!me || !bodies) return 0;
+      // A dev pull skips the entrance (the encounter would hold them asleep).
+      spendCouncilIntro(ctx, bodies);
       let n = 0;
       for (const b of [bodies.guardian, bodies.singer]) {
         if (b && !b.dead && ctx.aggroMob(b, me, false)) n++;
@@ -424,6 +430,7 @@ export function handleSmithHeartDevChat(ctx: SimContext, raw: string, pid: numbe
     const bodies = councilBodies(ctx, inst);
     if (
       verbName !== 'reset' &&
+      verbName !== 'intro' &&
       verbName !== 'heroic' &&
       verbName !== 'mythic' &&
       bodies &&

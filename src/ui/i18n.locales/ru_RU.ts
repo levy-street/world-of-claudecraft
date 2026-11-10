@@ -24718,6 +24718,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.alert.resonanceTitle': 'Резонанс',
   'hudChrome.council.alert.weightTitle': 'Тяжесть Молота',
   'hudChrome.council.alert.timeAria': 'Осталось {seconds} с',
+  'hudChrome.auraEffect.council.intro':
+    'Спит: нельзя атаковать или ранить, пока совет не пробудится.',
   'hudChrome.auraEffect.council.wakeMark':
     'Когда эффект закончится, из пола под вами вырвется колонна: от {min} до {max} урона всем в пределах {radius} м и отбрасывание. Встаньте там, где рейду нужно укрытие. Героический и мифический режимы: от {heroicMin} до {heroicMax} урона.',
   'hudChrome.auraEffect.council.rockMark':

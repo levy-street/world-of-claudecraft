@@ -4747,6 +4747,7 @@ export const ja_JP: EnTranslations = {
         "icedOver": "忍び寄る霧氷で凍りついた：移動も行動もできない。"
       },
       "council": {
+        "intro": "眠っている：評議会が目覚めるまで、攻撃もダメージも受けない。",
         "wakeMark": "効果が切れると、立っている場所の床から柱が突き出し、{radius}ヤード以内の全員に{min}から{max}のダメージを与えて吹き飛ばす。レイドが遮蔽物を必要とする場所に立とう。ヒロイック・ミシック：{heroicMin}から{heroicMax}のダメージ。",
         "rockMark": "効果が切れると岩が落ちてくる：{total}のダメージを{radius}ヤード以内の全員で分け合う。{soakers}人未満だと各自が{penalty}%多く受け、レイド全体が{tremorMin}から{tremorMax}を受ける。{radius}ヤード以内の柱はすべて欠けるので、遮蔽物から離れて受けよう。ミシック：{soulReach}ヤード以内の魂の柱は代わりに魂の印を一つ失い、印がなくなると砕ける。ヒロイック・ミシック：分け合うダメージは{heroicTotal}、レイド全体へは{heroicTremorMin}から{heroicTremorMax}。",
         "resonance": "{every}秒ごとに共鳴し、自分の{radius}ヤード以内の味方全員に{min}から{max}の自然ダメージを与える。効果が切れるまで全員から離れよう。ヒロイック・ミシック：{heroicMin}から{heroicMax}のダメージ。",

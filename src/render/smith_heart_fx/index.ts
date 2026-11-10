@@ -3,6 +3,7 @@ export { BreathBody } from './breath_body';
 export { BreathFightFx } from './breath_fight_fx';
 export { BreathFx } from './breath_fx';
 export { CouncilBodies } from './council_bodies';
+export { CouncilEntranceFx } from './council_entrance_fx';
 export { CouncilFx } from './council_fx';
 export { FinalFx } from './final_fx';
 export { FinalKitFx } from './final_kit_fx';

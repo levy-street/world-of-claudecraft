@@ -41,7 +41,7 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   heart_heat_caller: 'mob_glimmerwisp',
   // ---- the four guardians -----------------------------------------------------
   // The Guardian of the Hammer, the Hammer Council's main boss: its own model now, the one first
-  // built for the Slabwright (manifest.ts smith_heart_hammer_guardian).
+  // built for the Slabwright (smith_heart_boss_looks.ts smith_heart_hammer_guardian).
   heart_hammer_guardian: 'smith_heart_hammer_guardian',
   // The Hammer Council's other member, the Seam Singer: its own model now
   // (manifest.ts); smith_heart_fx/council_bodies.ts keeps only its dust and

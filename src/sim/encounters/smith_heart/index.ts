@@ -28,6 +28,14 @@ export {
   tickHammerCouncil,
 } from './council';
 export * from './council_ids';
+export {
+  type CouncilIntroStage,
+  councilIntroState,
+  councilIntroWaker,
+  inCouncilIntroReach,
+  spendCouncilIntro,
+} from './council_intro';
+export * from './council_intro_plan';
 export { councilPillars, nearestRiseSpot, onQuarryFloor, pillarBetween } from './council_pillars';
 export {
   landEcho,

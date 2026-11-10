@@ -23070,6 +23070,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.alert.resonanceTitle': '共鸣',
   'hudChrome.council.alert.weightTitle': '重锤之压',
   'hudChrome.council.alert.timeAria': '剩余{seconds}秒',
+  'hudChrome.auraEffect.council.intro':
+    '沉睡中：在议会苏醒之前，无法被攻击或伤害。',
   'hudChrome.auraEffect.council.wakeMark':
     '结束时，一根石柱会从你脚下的地面冲出，对{radius}码内的所有人造成{min}到{max}点伤害并将其击退。站到团队需要掩体的位置。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。',
   'hudChrome.auraEffect.council.rockMark':

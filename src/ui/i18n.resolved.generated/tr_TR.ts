@@ -4747,6 +4747,7 @@ export const tr_TR: EnTranslations = {
         "icedOver": "İlerleyen Kırağıyla tamamen donmuş: hareket edemez veya eylem yapamaz."
       },
       "council": {
+        "intro": "Dormant: cannot be attacked or harmed until the council wakes.",
         "wakeMark": "When this ends, a pillar bursts out of the floor where you stand, dealing {min} to {max} damage to everyone within {radius} yd and throwing them back. Stand where the raid needs cover. Heroic and Mythic: {heroicMin} to {heroicMax} damage.",
         "rockMark": "When this ends, a rock falls on you: {total} damage shared between everyone within {radius} yd. With fewer than {soakers} under it, each takes {penalty}% more and the whole raid takes {tremorMin} to {tremorMax}. Every pillar within {radius} yd loses a piece, so share it away from cover. Mythic: a soul pillar within {soulReach} yd loses a soul pip instead, and breaks at none. Heroic and Mythic: {heroicTotal} damage shared, and {heroicTremorMin} to {heroicTremorMax} to the raid.",
         "resonance": "Every {every} sec you ring, dealing {min} to {max} Nature damage to each ally within {radius} yd of you. Move away from everyone until it ends. Heroic and Mythic: {heroicMin} to {heroicMax} damage.",

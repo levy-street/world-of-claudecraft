@@ -5935,7 +5935,9 @@ export const hudChromeStrings = {
       icedOver: 'Frozen solid by Creeping Rime: unable to move or act.',
     },
     // The Smith's Heart's Hammer Council (src/ui/council_aura_effect.ts).
+    // The entrance's marker is wordy (M16): non-Latin fills in the overlays.
     council: {
+      intro: 'Dormant: cannot be attacked or harmed until the council wakes.',
       wakeMark:
         'When this ends, a pillar bursts out of the floor where you stand, dealing {min} to {max} damage to everyone within {radius} yd and throwing them back. Stand where the raid needs cover. Heroic and Mythic: {heroicMin} to {heroicMax} damage.',
       rockMark:

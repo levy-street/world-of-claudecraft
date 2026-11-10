@@ -4747,6 +4747,7 @@ export const zh_CN: EnTranslations = {
         "icedOver": "被蔓延霜凇冻结：无法移动或行动。"
       },
       "council": {
+        "intro": "沉睡中：在议会苏醒之前，无法被攻击或伤害。",
         "wakeMark": "结束时，一根石柱会从你脚下的地面冲出，对{radius}码内的所有人造成{min}到{max}点伤害并将其击退。站到团队需要掩体的位置。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。",
         "rockMark": "结束时，一块巨石砸向你：{total}点伤害由{radius}码内的所有人分担。若不足{soakers}人分担，每人多受{penalty}%伤害，且全团受到{tremorMin}到{tremorMax}点伤害。{radius}码内的每根石柱都会损失一块，所以要远离掩体分担。史诗难度：{soulReach}码内的灵魂石柱改为失去一个灵魂印记，印记耗尽时碎裂。英雄和史诗难度：分担{heroicTotal}点伤害，全团受到{heroicTremorMin}到{heroicTremorMax}点伤害。",
         "resonance": "每{every}秒你会发出共鸣，对你{radius}码内的每名盟友造成{min}到{max}点自然伤害。在效果结束前远离所有人。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。",

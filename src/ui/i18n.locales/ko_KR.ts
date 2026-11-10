@@ -22528,6 +22528,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.alert.resonanceTitle': '공명',
   'hudChrome.council.alert.weightTitle': '망치의 무게',
   'hudChrome.council.alert.timeAria': '{seconds}초 남음',
+  'hudChrome.auraEffect.council.intro':
+    '잠들어 있다: 의회가 깨어날 때까지 공격할 수도, 피해를 줄 수도 없다.',
   'hudChrome.auraEffect.council.wakeMark':
     '효과가 끝나면 서 있는 자리의 바닥에서 기둥이 솟구쳐 {radius}야드 안의 모두에게 {min}에서 {max}의 피해를 주고 밀쳐냅니다. 공격대에 엄폐물이 필요한 곳에 서세요. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
   'hudChrome.auraEffect.council.rockMark':

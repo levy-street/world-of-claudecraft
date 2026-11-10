@@ -22557,6 +22557,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.alert.resonanceTitle': '共鳴',
   'hudChrome.council.alert.weightTitle': '槌の重み',
   'hudChrome.council.alert.timeAria': '残り{seconds}秒',
+  'hudChrome.auraEffect.council.intro':
+    '眠っている：評議会が目覚めるまで、攻撃もダメージも受けない。',
   'hudChrome.auraEffect.council.wakeMark':
     '効果が切れると、立っている場所の床から柱が突き出し、{radius}ヤード以内の全員に{min}から{max}のダメージを与えて吹き飛ばす。レイドが遮蔽物を必要とする場所に立とう。ヒロイック・ミシック：{heroicMin}から{heroicMax}のダメージ。',
   'hudChrome.auraEffect.council.rockMark':

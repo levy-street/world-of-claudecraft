@@ -63,6 +63,7 @@ import {
   BreathFightFx,
   BreathFx,
   CouncilBodies,
+  CouncilEntranceFx,
   CouncilFx,
   FinalFx,
   FinalKitFx,
@@ -233,6 +234,9 @@ export class RiftDeathZoneVisuals {
   private readonly finalPhase: FinalPhaseFx;
   private readonly councilFx: CouncilFx;
   private readonly councilBodies: CouncilBodies;
+  /** The council's entrance (the quarry waking), updated before the fight
+   *  and the bodies. */
+  private readonly councilEntrance: CouncilEntranceFx;
   // The Smith's Heart's seal moments felt in the camera.
   private readonly sealShake: SealShake;
   private uninstallDrawnPositions: (() => void) | null = null;
@@ -322,6 +326,15 @@ export class RiftDeathZoneVisuals {
     );
     this.finalKit = new FinalKitFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.finalPhase = new FinalPhaseFx(scene, groundY, world, compileGate, reducedMotion, shake);
+    this.councilEntrance = new CouncilEntranceFx(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+      shake,
+      playGesture,
+    );
     this.councilFx = new CouncilFx(
       scene,
       groundY,
@@ -682,6 +695,7 @@ export class RiftDeathZoneVisuals {
     this.finalFx.update(dt);
     this.finalKit.update(dt);
     this.finalPhase.update(dt);
+    this.councilEntrance.update(dt);
     this.councilFx.update(dt);
     this.councilBodies.update(dt);
     this.sealShake.update();
@@ -723,6 +737,7 @@ export class RiftDeathZoneVisuals {
     this.finalFx.dispose();
     this.finalKit.dispose();
     this.finalPhase.dispose();
+    this.councilEntrance.dispose();
     this.councilFx.dispose();
     this.councilBodies.dispose();
     this.hoardPresentation.dispose();

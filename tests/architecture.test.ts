@@ -1212,6 +1212,7 @@ const RENDER_PURE_CORES = [
   // The Quench guardian's entrance ("Under the ice"): its clock, beats, web,
   // chunks and blades.
   'src/render/smith_heart_fx/quench_entrance_core.ts',
+  'src/render/smith_heart_fx/council_entrance_core.ts',
   'src/render/smith_heart_fx/heat_fight_fx_core.ts',
   // The Heat's floor ladder (every floor layer's unique rung) and its molten
   // telegraphs' looks.

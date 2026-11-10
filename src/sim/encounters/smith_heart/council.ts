@@ -10,6 +10,10 @@
 //   One pull       the two share one authored pack: pulling one pulls both,
 //                  and a member whose foe fell is put back on the fight with
 //                  its sibling's hate while the other fights.
+//   The entrance   before all of it, the first time the raid comes down
+//                  into the Quarry: the Guardian tears itself out of the
+//                  rock, the Singer out of her crystal, both held out of
+//                  reach until the scene ends (council_intro.ts).
 //   One wipe       the fight ends when no living member is fighting: a fallen
 //                  member stands up whole at its place (no reward twice,
 //                  Entity.regrown), the five columns stand whole again, the
@@ -62,6 +66,13 @@ import {
   type CouncilRole,
   COUNCIL_TUNING as T,
 } from './council_ids';
+import {
+  councilIntroJustSpoke,
+  councilIntroReadout,
+  replayCouncilIntro,
+  spendCouncilIntro,
+  stepCouncilIntro,
+} from './council_intro';
 import {
   clearRubble,
   ensurePillarWalls,
@@ -530,6 +541,9 @@ function beginCouncil(
   }
   // A member already down when the pull began (a dev kill) has fallen.
   for (const r of COUNCIL_ROLES) if (bodies[r] && !living(bodies[r])) st.fallen.push(r);
+  // Straight after the entrance a pull line it has just said would repeat.
+  for (const r of COUNCIL_ROLES)
+    if (councilIntroJustSpoke(ctx, bodies, r)) st.said[`${r}_pull`] = 0;
   attach(bodies, st);
   return st;
 }
@@ -542,10 +556,14 @@ export function tickHammerCouncil(ctx: SimContext, inst: InstanceSlot): void {
   const st0 = councilState(bodies);
   const alive = COUNCIL_ROLES.filter((r) => living(bodies[r]));
   if (alive.length === 0) {
+    // Both down before the quarry woke (a dev kill): nothing left asleep.
+    spendCouncilIntro(ctx, bodies);
     if (st0 && !st0.finished) finishCouncil(ctx, inst, bodies, st0);
     return;
   }
   const engaged = alive.some((r) => fighting(bodies[r]));
+  // The entrance holds both out of reach until the scene ends.
+  if (stepCouncilIntro(ctx, inst, bodies, engaged)) return;
   if (!engaged) {
     if (st0) {
       // The raid lies dead on the floor: a survivor says so.
@@ -597,10 +615,13 @@ export function tickHammerCouncil(ctx: SimContext, inst: InstanceSlot): void {
 // ---- dev ------------------------------------------------------------------------------------
 
 /** The council's fight scope for a dev command or a test (starting the fight
- *  state if none runs yet), or null when the claim holds no council. */
+ *  state if none runs yet, the entrance spent), or null when the claim holds
+ *  no council. */
 export function councilScopeForDev(ctx: SimContext, inst: InstanceSlot): CouncilScope | null {
   const bodies = councilBodies(ctx, inst);
   if (!bodies) return null;
+  // A mechanic forced from the dev line starts the fight: no entrance left.
+  spendCouncilIntro(ctx, bodies);
   const st = councilState(bodies) ?? beginCouncil(ctx, inst, bodies);
   return scopeOf(ctx, inst, st, bodies);
 }
@@ -612,7 +633,7 @@ export function councilDevTrigger(
   what: string,
 ): string | null {
   const [verb, arg] = what.trim().split(/\s+/);
-  if (verb === 'reset') {
+  if (verb === 'reset' || verb === 'intro') {
     const bodies = councilBodies(ctx, inst);
     if (!bodies) return 'This run holds no council.';
     resetCouncil(ctx, inst, bodies);
@@ -629,6 +650,10 @@ export function councilDevTrigger(
       b.pos = { ...b.spawnPos, y: ctx.groundPos(b.spawnPos.x, b.spawnPos.z).y };
       b.prevPos = { ...b.pos };
       ctx.rebucket(b);
+    }
+    if (verb === 'intro') {
+      replayCouncilIntro(bodies);
+      return 'The Hammer Council sleeps again in the rock and the crystal; the quarry wakes as the raid comes down.';
     }
     return 'The Hammer Council stands whole again, the five columns with it.';
   }
@@ -724,7 +749,7 @@ export function councilReadout(ctx: SimContext, inst: InstanceSlot): string {
     return `${r} ${b.dead ? 'dead' : `${Math.round((b.hp / b.maxHp) * 100)}%`}`;
   };
   const head = `[dev] Council (${councilDifficulty(inst)}): ${COUNCIL_ROLES.map(part).join(', ')}`;
-  if (!st) return `${head}; not fighting.`;
+  if (!st) return `${head}; not fighting (${councilIntroReadout(bodies)}).`;
   const souls = st.souls.length > 0 ? `, souls ${soulReadout({ ctx, inst, st })}` : '';
   return `${head}; energy ${Math.round(st.energy)}, wraths ${st.wraths}, fallen ${st.fallen.join(' > ') || 'none'}${souls}.`;
 }
