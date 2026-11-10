@@ -96,23 +96,23 @@ export const QUENCH_ENTRANCE = {
   breachAt: SPEAK + V.woken,
   /** The shockwave: from the breach's lip out past the raid. */
   ringFrom: 3,
-  ringTo: 54,
-  ringFor: 1.7,
+  ringTo: 72,
+  ringFor: 2.1,
   /** The burst of cold light at the breach (a flash on its point, never a
    *  white-out: the Quench's own rule), its size (yards) and peak. */
   flashFor: 0.55,
-  flashSize: 16,
-  flashPeak: 0.85,
+  flashSize: 30,
+  flashPeak: 1.25,
   /** The geyser of ice and cold light the breach throws up: its climb, how
    *  long it stands, its fall, its height and its radius at the root. */
   geyserRise: 0.22,
-  geyserHold: 0.35,
-  geyserFall: 0.9,
-  geyserHeight: 34,
-  geyserRadius: 3.2,
+  geyserHold: 0.45,
+  geyserFall: 1.1,
+  geyserHeight: 50,
+  geyserRadius: 5.4,
   /** The camera's thud at the breach (the shake sink's amount at her; it
    *  falls off over `shakeReach`). */
-  shake: 1.0,
+  shake: 1.6,
   shakeReach: 110,
   /** Her blades rise one by one from "and the cold", each `bladeStep`
    *  after the one before, each up out of the ice in `bladeRise`. */
@@ -121,7 +121,7 @@ export const QUENCH_ENTRANCE = {
   bladeRise: 0.85,
   /** They turn and point at the raid on "forgive" (and her arms come down). */
   pointAt: SPEAK + V.forgive,
-  pointFor: 0.32,
+  pointFor: 0.16,
   /** After she is handed back they plunge back under the ice. */
   plungeAt: QUENCH_INTRO.seconds + 0.35,
   plungeStep: 0.07,
@@ -238,6 +238,14 @@ export interface QuenchEntranceBlade {
   plunge: number;
   /** Its light (0..1, past 1 flaring). */
   glow: number;
+  /** Its turn about its own length (radians): spun fast up out of the ice,
+   *  slowing to a lazy turn as it settles. */
+  spin: number;
+  /** Its distance out on the ring (share): spiralling out to the ring as it
+   *  rises. */
+  reach: number;
+  /** The glint off its point as it snaps onto its mark (0..1). */
+  glint: number;
 }
 
 export interface QuenchEntranceLook {
@@ -291,7 +299,17 @@ export interface QuenchEntranceLook {
 }
 
 function newBlade(): QuenchEntranceBlade {
-  return { shown: false, lift: 0, bearing: 0, aim: 0, plunge: 0, glow: 0 };
+  return {
+    shown: false,
+    lift: 0,
+    bearing: 0,
+    aim: 0,
+    plunge: 0,
+    glow: 0,
+    spin: 0,
+    reach: 0,
+    glint: 0,
+  };
 }
 
 export function newQuenchEntranceLook(): QuenchEntranceLook {
@@ -483,7 +501,16 @@ export function quenchEntranceLook(
     b.shown = !frozen && t >= start && b.plunge < 1;
     b.lift = frozen ? 0 : rise(start, start + E.bladeRise, t);
     b.bearing = entranceBladeBearing0(i) + B.orbit * orbitT;
-    b.aim = aimK;
+    // The snap: past the mark a breath, then settling on it.
+    const snap = t >= E.pointAt ? t - E.pointAt : -1;
+    b.aim =
+      snap < 0
+        ? 0
+        : aimK + 0.12 * Math.sin(Math.min(1, snap / 0.5) * Math.PI) * Math.exp(-snap * 4);
+    const up = 1 - b.lift;
+    b.spin = 14 * up * up + 0.6 * Math.max(0, t - start) + i;
+    b.reach = 0.35 + 0.65 * b.lift;
+    b.glint = snap < 0 ? 0 : Math.exp(-snap * 3.2) * Math.min(1, snap / 0.04);
     const born = t >= start ? Math.exp(-(t - start) * 2.2) : 0;
     const pointFlare = t >= E.pointAt ? Math.exp(-(t - E.pointAt) * 2.6) : 0;
     b.glow = b.shown ? 0.7 + 0.8 * born + 0.9 * pointFlare : 0;
@@ -530,11 +557,16 @@ export const QUENCH_ENTRANCE_POOLS = {
   snowHeight: 22,
   /** Light motes rising off the cracks a second at full glow. */
   moteRate: 70,
-  /** The breach: shards flung up, the instanced chunks of the sheet. */
-  shardBurst: 170,
-  chunks: 36,
+  /** The breach: shards flung up, the instanced chunks of the sheet, the
+   *  frost mist rolling out, the powder snow blasted up to rain down. */
+  shardBurst: 260,
+  mistBurst: 56,
+  debrisBurst: 100,
+  /** The great plates of lake ice heaved up round her. */
+  slabs: 16,
+  chunks: 56,
   /** The shockwave's spray thrown up along its front a second. */
-  sprayRate: 380,
+  sprayRate: 300,
 } as const;
 
 /** The sounds of the scene (the Quench's own samples, `heart_quench_*`):
@@ -779,6 +811,73 @@ export function sheetChunkAt(i: number, since: number, out: ChunkState): ChunkSt
   return out;
 }
 
+// ---- the great plates heaved up round her at the breach ---------------------------------
+
+/** A heaved plate `since` seconds after the breach, in her frame: where its
+ *  foot is, its bearing (turned out from her), how far it has tipped up
+ *  (radians from lying flat), its tumble once flung, its size (yards; 0
+ *  gone). */
+export interface SlabState {
+  x: number;
+  y: number;
+  z: number;
+  yaw: number;
+  tilt: number;
+  tumble: number;
+  w: number;
+  d: number;
+  t: number;
+}
+
+export function newSlabState(): SlabState {
+  return { x: 0, y: 0, z: 0, yaw: 0, tilt: 0, tumble: 0, w: 0, d: 0, t: 0 };
+}
+
+/** The plates' clock: the heave, how long the wreck stands, the sinking. */
+export const SLAB = { heave: 0.32, stand: 4.2, sink: 1.4 } as const;
+
+/** Plate `i` (deterministic): burst up out of the lake round her and tipped
+ *  outward; the outer ones flung up and tumbling, landing; all of them
+ *  sinking back under the ice as the scene ends. */
+export function heavedSlabAt(i: number, since: number, out: SlabState): SlabState {
+  const h = (k: number) => quenchEntranceHash(i + 101, k);
+  const n = QUENCH_ENTRANCE_POOLS.slabs;
+  const bearing = ((i + 0.5 * h(1)) / n) * Math.PI * 2;
+  const r = 3.2 + 5.8 * h(2);
+  const flung = h(3) > 0.78;
+  out.yaw = bearing;
+  out.w = 1.6 + 2.6 * h(4);
+  out.d = 1.2 + 2 * h(5);
+  out.t = 0.35 + 0.35 * h(6);
+  if (since < 0) {
+    out.w = 0;
+    return out;
+  }
+  const heave = rise(0, SLAB.heave * (0.7 + 0.6 * h(7)), since);
+  const sink = clamp01((since - SLAB.stand - h(8)) / SLAB.sink);
+  let rr = r;
+  let y = -1.5 + (1.5 + 0.6 * h(9)) * heave;
+  let tumble = 0;
+  if (flung) {
+    // Thrown up and out, landing a few yards on.
+    const up = 10 + 8 * h(10);
+    const g = CHUNK_GRAVITY;
+    const land = (2 * up) / g;
+    const tf = Math.min(since, land);
+    y = up * tf - 0.5 * g * tf * tf;
+    rr = r + (1.5 + 3 * h(11)) * (tf / land);
+    tumble = tf * (3 + 5 * h(12));
+  }
+  y -= 3 * sink * sink;
+  out.x = Math.sin(bearing) * rr;
+  out.z = Math.cos(bearing) * rr;
+  out.y = y;
+  out.tilt = (0.6 + 0.65 * h(13)) * heave;
+  out.tumble = tumble;
+  if (sink >= 1) out.w = 0;
+  return out;
+}
+
 /** The longest a chunk lives after the breach (its flight and its melt). */
 export const CHUNK_LIFE = (() => {
   const c = newChunkState();
@@ -814,7 +913,7 @@ export const ENTRANCE_BLADE_PROFILE: readonly BladeRing[] = (() => {
   // half a yard).
   const k = 0.62 / bladeHalfWidth(0);
   const w = (s: number) => bladeHalfWidth(s * 9) * k;
-  const d = (s: number) => bladeHalfThick(s * 9) * k * 0.55;
+  const d = (s: number) => bladeHalfThick(s * 9) * k * 1.0;
   return [
     // The pommel, the grip, the guard.
     { y: 0, w: 0.05, d: 0.05 },

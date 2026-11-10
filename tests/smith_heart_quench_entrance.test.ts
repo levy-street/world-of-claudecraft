@@ -32,7 +32,9 @@ import {
   ENTRANCE_BLADE_PROFILE,
   ENTRANCE_WEB,
   FROZEN,
+  heavedSlabAt,
   newChunkState,
+  newSlabState,
   QUENCH_EMERGE_CLIP,
   QUENCH_ENTRANCE,
   QUENCH_ENTRANCE_BLADES,
@@ -45,6 +47,7 @@ import {
   quenchEntranceFlash,
   quenchEntranceLook,
   quenchEntranceShake,
+  SLAB,
   sheetChunkAt,
   stepQuenchEntranceTime,
   WEB,
@@ -245,7 +248,24 @@ describe('the look', () => {
     const a1 = quenchEntranceLook(E.bladesAt + 2).blades[0].bearing;
     expect(a1 - a0).toBeCloseTo(B.orbit, 6);
     const aimed = quenchEntranceLook(E.pointAt + E.pointFor);
-    expect(aimed.blades.every((b) => b.aim === 1)).toBe(true);
+    // The snap: just past the mark, then settled on it, its point glinting.
+    expect(aimed.blades.every((b) => b.aim >= 1)).toBe(true);
+    expect(aimed.blades[0].glint).toBeGreaterThan(0.5);
+    const settled = quenchEntranceLook(E.pointAt + 1);
+    expect(settled.blades.every((b) => Math.abs(b.aim - 1) < 0.01)).toBe(true);
+    // No aim and no glint before the snap.
+    const before = quenchEntranceLook(E.pointAt - 0.01);
+    expect(before.blades.every((b) => b.aim === 0 && b.glint === 0)).toBe(true);
+    // The spin: fast as it rises out of the ice, lazy once it hovers.
+    const r0 = quenchEntranceLook(E.bladesAt + 0.05).blades[0].spin;
+    const r1 = quenchEntranceLook(E.bladesAt + 0.15).blades[0].spin;
+    const h0 = quenchEntranceLook(E.bladesAt + 2).blades[0].spin;
+    const h1 = quenchEntranceLook(E.bladesAt + 2.1).blades[0].spin;
+    expect(Math.abs(r1 - r0)).toBeGreaterThan(Math.abs(h1 - h0) * 5);
+    // They spun up out of the ice and spiralled out to the ring.
+    const rising = quenchEntranceLook(E.bladesAt + 0.1).blades[0];
+    expect(rising.reach).toBeLessThan(0.6);
+    expect(up.blades[0].reach).toBeCloseTo(1, 6);
     expect(aimed.blades[0].glow).toBeGreaterThan(1);
     // Handed back still pointing; then into the lake.
     expect(quenchEntranceLook(QUENCH_INTRO.seconds).blades.every((b) => b.shown)).toBe(true);
@@ -321,7 +341,7 @@ describe('the plans', () => {
   it('the chunks fly up out of the sheet, land and melt away', () => {
     const c = newChunkState();
     let rose = 0;
-    for (let i = 0; i < 36; i++) {
+    for (let i = 0; i < QUENCH_ENTRANCE_POOLS.chunks; i++) {
       sheetChunkAt(i, 0, c);
       expect(c.size).toBeGreaterThan(0);
       const y0 = c.y;
@@ -330,8 +350,25 @@ describe('the plans', () => {
       sheetChunkAt(i, CHUNK_LIFE + 0.01, c);
       expect(c.size).toBe(0);
     }
-    expect(rose).toBe(36);
+    expect(rose).toBe(QUENCH_ENTRANCE_POOLS.chunks);
     expect(sheetChunkAt(3, -1, c).size).toBe(0);
+  });
+
+  it('the great plates heave up round her, the outer ones flung, all sinking back', () => {
+    const st = newSlabState();
+    let flung = 0;
+    for (let i = 0; i < QUENCH_ENTRANCE_POOLS.slabs; i++) {
+      heavedSlabAt(i, -0.1, st);
+      expect(st.w).toBe(0);
+      heavedSlabAt(i, SLAB.heave + 0.3, st);
+      expect(st.w).toBeGreaterThan(1.5);
+      expect(st.tilt).toBeGreaterThan(0.3);
+      if (st.tumble > 0) flung++;
+      heavedSlabAt(i, SLAB.stand + SLAB.sink + 1.1, st);
+      expect(st.w).toBe(0);
+    }
+    expect(flung).toBeGreaterThan(0);
+    expect(flung).toBeLessThan(QUENCH_ENTRANCE_POOLS.slabs);
   });
 
   it('a blade is the Smith blade section, pommel to point', () => {
@@ -461,6 +498,10 @@ describe('QuenchEntranceFx over a fake world', () => {
       'smithHeartQuenchEntranceBlades',
       'smithHeartQuenchEntranceHalos',
       'smithHeartQuenchEntranceBurst',
+      'smithHeartQuenchEntranceSlabs',
+      'smithHeartQuenchEntranceShockEdge',
+      'smithHeartQuenchEntranceGeyserCore',
+      'smithHeartQuenchEntranceBladeCracks',
     ];
     r.aura(frozen);
     r.fx.update(0.3);
@@ -504,6 +545,10 @@ describe('QuenchEntranceFx over a fake world', () => {
       'smithHeartQuenchEntranceGeyser',
       'smithHeartQuenchEntranceBlades',
       'smithHeartQuenchEntranceBurst',
+      'smithHeartQuenchEntranceSlabs',
+      'smithHeartQuenchEntranceShockEdge',
+      'smithHeartQuenchEntranceGeyserCore',
+      'smithHeartQuenchEntranceBladeCracks',
     ])
       expect(seen.has(n), n).toBe(true);
     expect(quenchEntranceFor(r.boss.id)).toBeNull();
@@ -601,6 +646,9 @@ describe('QuenchEntranceFx over a fake world', () => {
     for (const n of [
       'smithHeartQuenchEntranceWeb',
       'smithHeartQuenchEntranceGeyser',
+      'smithHeartQuenchEntranceSlabs',
+      'smithHeartQuenchEntranceShockEdge',
+      'smithHeartQuenchEntranceBladeCracks',
       'smithHeartQuenchEntranceBlades',
     ])
       expect(seen.has(n), n).toBe(true);
@@ -617,15 +665,22 @@ describe('QuenchEntranceFx over a fake world', () => {
     let t = E.breachAt - 0.2;
     let under = 0;
     let geyser = 0;
+    let edge = 0;
     while (t < E.breachAt + 0.6) {
       calm.aura(waking(t));
       calm.fx.update(1 / 20);
       t += 1 / 20;
       under = Math.max(under, uniforms('smithHeartQuenchEntranceUnder').uUnder.value);
-      geyser = Math.max(geyser, uniforms('smithHeartQuenchEntranceGeyser').uAlpha.value);
+      geyser = Math.max(
+        geyser,
+        uniforms('smithHeartQuenchEntranceGeyser').uAlpha.value +
+          uniforms('smithHeartQuenchEntranceGeyserCore').uAlpha.value,
+      );
+      edge = Math.max(edge, uniforms('smithHeartQuenchEntranceShockEdge').uAlpha.value);
     }
     expect(under).toBeLessThanOrEqual(1);
     expect(geyser).toBeLessThanOrEqual(0.7);
+    expect(edge).toBeLessThanOrEqual(0.5);
     calm.fx.dispose();
   });
 
@@ -644,6 +699,10 @@ describe('QuenchEntranceFx over a fake world', () => {
         'smithHeartQuenchEntranceFrost',
         'smithHeartQuenchEntranceChunks',
         'smithHeartQuenchEntranceGeyser',
+        'smithHeartQuenchEntranceSlabs',
+        'smithHeartQuenchEntranceShockEdge',
+        'smithHeartQuenchEntranceGeyserCore',
+        'smithHeartQuenchEntranceBladeCracks',
         'smithHeartQuenchEntranceBlades',
         'smithHeartQuenchEntranceBurst',
       ])

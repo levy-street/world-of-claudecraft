@@ -62,8 +62,10 @@ import {
   ENTRANCE_BLADE_PROFILE,
   ENTRANCE_WEB,
   FROST_REACH,
+  heavedSlabAt,
   newChunkState,
   newQuenchEntranceLook,
+  newSlabState,
   QUENCH_ENTRANCE,
   QUENCH_ENTRANCE_BLADES,
   QUENCH_ENTRANCE_LOW_SHARE,
@@ -79,6 +81,7 @@ import {
   quenchEntranceHash,
   quenchEntranceLook,
   quenchEntranceShake,
+  SLAB,
   sheetChunkAt,
   stepQuenchEntranceTime,
   WEB_VERTICES,
@@ -97,9 +100,12 @@ const B = QUENCH_ENTRANCE_BLADES;
 const C = QUENCH_BODY_COLORS;
 const S_MOUTH = quenchSocketIndex('mouth');
 const S_EYES = [quenchSocketIndex('eyeL'), quenchSocketIndex('eyeR')] as const;
-/** The halos' instances: one per blade, then her two eyes' glints under the
- *  ice (bigger than her body's own, so they read through the sheet). */
-const HALOS = B.count + 2;
+/** The halos' instances: one per blade, one glint per blade's point (the
+ *  snap onto its mark), then her two eyes' glints under the ice (bigger than
+ *  her body's own, so they read through the sheet). */
+const HALOS = B.count * 2 + 2;
+const TIP0 = B.count;
+const EYE0 = B.count * 2;
 
 // ---- the floor: frost, the web, the light under her -------------------------------------------
 
@@ -300,14 +306,135 @@ const ICE_FRAG = /* glsl */ `
     vec3 n = normalize(vN);
     float fr = 1.0 - abs(dot(n, normalize(vV)));
     float rim = fr * fr;
-    vec3 deep = vec3(0.02, 0.08, 0.22);
-    vec3 pale = vec3(0.55, 0.88, 1.0);
+    vec3 deep = vec3(0.0, 0.035, 0.14);
+    vec3 pale = vec3(0.32, 0.66, 1.0);
     float light = vGlow.r;
     float fuller = uCore * (0.25 + 0.75 * sin(vH * 3.14159)) * light;
     // Deep blue crystal, its edges and its fuller burning cyan.
-    vec3 col = deep + pale * rim * (0.6 + 0.5 * light) + vec3(0.1, 0.5, 1.0) * fuller * 0.6;
+    vec3 col = deep + pale * rim * (0.25 + 0.6 * light) + vec3(0.1, 0.5, 1.0) * fuller * 0.6;
     float a = clamp(0.6 + 0.35 * rim + 0.1 * fuller, 0.0, 0.96);
     gl_FragColor = vec4(col, a);
+  }
+`;
+
+// ---- the conjured blades: crystal swords with a burning heart ----------------------------------
+
+const BLADE_VERT = /* glsl */ `
+  attribute float aH;
+  attribute float aCore;
+  varying vec3 vN;
+  varying vec3 vV;
+  varying float vH;
+  varying float vCore;
+  varying vec3 vGlow;
+  void main() {
+    vH = aH;
+    vCore = aCore;
+    #ifdef USE_INSTANCING_COLOR
+    vGlow = instanceColor;
+    #else
+    vGlow = vec3(1.0);
+    #endif
+    vec4 mv = modelViewMatrix * instanceMatrix * vec4(position, 1.0);
+    vN = normalize(normalMatrix * mat3(instanceMatrix) * normal);
+    vV = normalize(-mv.xyz);
+    gl_Position = projectionMatrix * mv;
+  }
+`;
+
+/** A sword of lake ice: deep and clear through its flats, its facets
+ *  catching a cold sheen and a play of light inside (a refraction's look:
+ *  bands that slide as the view turns over the facets), a burning blue core
+ *  down its ridge, its keen edges lit white, its rim pale; the instance's
+ *  colour its light. */
+const BLADE_FRAG = /* glsl */ `
+  uniform float uTime;
+  varying vec3 vN;
+  varying vec3 vV;
+  varying float vH;
+  varying float vCore;
+  varying vec3 vGlow;
+  void main() {
+    vec3 n = normalize(vN);
+    vec3 v = normalize(vV);
+    float nv = abs(dot(n, v));
+    float fr = 1.0 - nv;
+    float rim = fr * fr;
+    float light = vGlow.r;
+    float along = sin(vH * 3.14159);
+    float inner = 0.5 + 0.5 * sin(dot(n, vec3(11.0, 7.0, 13.0)) * 1.7 + vH * 21.0 - uTime * 1.3);
+    inner = inner * inner;
+    float core = 1.0 - smoothstep(0.0, 0.5, vCore);
+    float edge = smoothstep(0.72, 1.0, vCore);
+    // A step deeper and more saturated than it should read: the Quench's
+    // grade lifts it to clear blue ice on screen (quench_breath_core.ts).
+    vec3 deep = vec3(0.0, 0.025, 0.12);
+    vec3 cyan = vec3(0.03, 0.34, 0.95);
+    vec3 pale = vec3(0.32, 0.66, 1.0);
+    vec3 col = deep * (0.7 + 0.6 * nv);
+    col += cyan * core * (0.3 + 0.32 * light) * (0.45 + 0.55 * along);
+    col += pale * edge * (0.2 + 0.25 * light);
+    col += pale * rim * 0.42;
+    col += cyan * inner * 0.22 * (1.0 - edge);
+    float a = clamp(0.8 + 0.2 * rim + 0.2 * core, 0.0, 0.97);
+    gl_FragColor = vec4(col, a);
+  }
+`;
+
+/** A blade's own crack in the ice where it broke out: a star of cracks
+ *  running out with cold light in them (the instance's colour: red its
+ *  reveal, green its strength). */
+const STAR_VERT = /* glsl */ `
+  varying vec2 vUv;
+  varying vec2 vK;
+  void main() {
+    vUv = uv;
+    #ifdef USE_INSTANCING_COLOR
+    vK = instanceColor.rg;
+    #else
+    vK = vec2(1.0);
+    #endif
+    gl_Position = projectionMatrix * modelViewMatrix * instanceMatrix * vec4(position, 1.0);
+  }
+`;
+const STAR_FRAG = /* glsl */ `
+  varying vec2 vUv;
+  varying vec2 vK;
+  ${HEAT_NOISE_GLSL}
+  void main() {
+    vec2 p = (vUv - 0.5) * 2.0;
+    float r = length(p);
+    if (r > 1.0 || r < 0.0001 || vK.y <= 0.001) discard;
+    float a = atan(p.y, p.x);
+    float jag = vn(vec2(a * 3.0, r * 6.0)) - 0.5;
+    float spokes = abs(sin(a * 4.5 + jag * 1.6 + r * 1.3));
+    float line = 1.0 - smoothstep(0.0, 0.09 + 0.05 * (1.0 - r), spokes);
+    float ringy = 1.0 - smoothstep(0.0, 0.05, abs(r - 0.45 + jag * 0.1));
+    float shown = 1.0 - smoothstep(vK.x - 0.08, vK.x, r);
+    float k = max(line, ringy * 0.6) * shown * (1.0 - r * 0.6);
+    vec3 col = mix(vec3(0.2, 0.6, 1.0), vec3(0.85, 0.97, 1.0), line * (1.0 - r));
+    gl_FragColor = vec4(col * k * vK.y, 1.0);
+  }
+`;
+
+/** The shockwave's frosted edge on the floor: a crisp bright lip of frozen
+ *  crystals racing out, a band of rime behind it fading (the ring's own
+ *  local frame, its outer edge at 1). */
+const BAND_FRAG = /* glsl */ `
+  uniform float uAlpha;
+  uniform float uTime;
+  varying vec2 vLocal;
+  ${HEAT_NOISE_GLSL}
+  void main() {
+    float r = length(vLocal);
+    float a = atan(vLocal.y, vLocal.x);
+    float n = vn(vec2(a * 40.0, r * 18.0 - uTime * 2.0));
+    float lip = 1.0 - smoothstep(0.0, 0.035 + 0.02 * n, 1.0 - r);
+    float wake = smoothstep(0.86, 0.99, r) * (0.2 + 0.5 * n);
+    float crystals = step(0.82, vn(vec2(a * 90.0, r * 40.0))) * smoothstep(0.75, 0.97, r);
+    float k = (lip * 1.4 + wake * 0.45 + crystals * 0.9) * uAlpha;
+    vec3 col = mix(vec3(0.35, 0.72, 1.0), vec3(0.95, 1.0, 1.0), lip + crystals * 0.5);
+    gl_FragColor = vec4(col * k, 1.0);
   }
 `;
 
@@ -458,6 +585,53 @@ const POWDER = {
   drag: 1.1,
   floor: -1e6,
 };
+const ROLL = {
+  speed: 13,
+  up: 0.4,
+  life: 3.4,
+  size: [5, 17] as [number, number],
+  color: C.mist as readonly [number, number, number],
+  alpha: 0.5,
+  dir: _dir,
+  spread: 0.18,
+  drag: 1.3,
+  floor: -1e6,
+};
+const DEBRIS = {
+  speed: 15,
+  up: 20,
+  life: 3,
+  size: [0.42, 0.3] as [number, number],
+  color: C.snow as readonly [number, number, number],
+  alpha: 0.95,
+  radius: 3,
+  drag: 0.35,
+  gravity: 14,
+  floor: -1e6,
+};
+const VAPOR = {
+  speed: 0.5,
+  up: 1.1,
+  life: 1.6,
+  size: [0.7, 3] as [number, number],
+  color: C.mist as readonly [number, number, number],
+  alpha: 0.32,
+  radius: 0.3,
+  drag: 0.6,
+  floor: -1e6,
+};
+const VAPOR_GLINT = {
+  speed: 0.6,
+  up: 1.6,
+  life: 1.1,
+  size: [0.3, 0.05] as [number, number],
+  color: C.glitter as readonly [number, number, number],
+  alpha: 1,
+  pool: 'glow' as const,
+  radius: 0.25,
+  drag: 0.5,
+  floor: -1e6,
+};
 const SPRAY = {
   speed: 3.5,
   up: 3.2,
@@ -486,8 +660,8 @@ const SPRAY_GLINT = {
 };
 const BLADE_TRAIL = {
   speed: 0.5,
-  up: 0.3,
-  life: 0.9,
+  up: -0.4,
+  life: 1.2,
   size: [0.32, 0.05] as [number, number],
   color: C.glitter as readonly [number, number, number],
   alpha: 1,
@@ -525,6 +699,7 @@ const _down = new THREE.Vector3(0, -1, 0);
 const _c = new THREE.Color();
 const _zero = new THREE.Matrix4().makeScale(0, 0, 0);
 const _chunk: ChunkState = newChunkState();
+const _slab = newSlabState();
 
 /** A strip pair per point of each line (`aReveal`, `aSide`), its places laid
  *  on the floor at the placing (layWeb). */
@@ -558,28 +733,74 @@ function bladeGeometry(): THREE.BufferGeometry {
   const L = B.length;
   const pos: number[] = [];
   const h: number[] = [];
+  const core: number[] = [];
+  // Eight corners a ring: the keen edges, the bevels, the raised ridge down
+  // each face (a fuller in crystal), so every facet catches the light. Each
+  // corner's share out from the ridge (0) to the edge (1).
+  const SHARE = [1, 0.62, 0, 0.62, 1, 0.62, 0, 0.62];
   const ring = (r: (typeof prof)[number]): [number, number, number][] => [
     [r.w, r.y, 0],
+    [r.w * 0.55, r.y, r.d * 0.62],
     [0, r.y, r.d],
+    [-r.w * 0.55, r.y, r.d * 0.62],
     [-r.w, r.y, 0],
+    [-r.w * 0.55, r.y, -r.d * 0.62],
     [0, r.y, -r.d],
+    [r.w * 0.55, r.y, -r.d * 0.62],
+  ];
+  const TRI: readonly [number, number][] = [
+    [0, 0],
+    [1, 0],
+    [1, 1],
+    [0, 0],
+    [1, 1],
+    [0, 1],
   ];
   for (let i = 1; i < prof.length; i++) {
     const a = ring(prof[i - 1]);
     const b = ring(prof[i]);
-    for (let k = 0; k < 4; k++) {
-      const k2 = (k + 1) % 4;
-      for (const p of [a[k], b[k], b[k2], a[k], b[k2], a[k2]]) {
+    for (let k = 0; k < 8; k++) {
+      for (const [row, step] of TRI) {
+        const c = (k + step) % 8;
+        const p = row === 0 ? a[c] : b[c];
         pos.push(p[0], p[1], p[2]);
         h.push(p[1] / L);
+        core.push(SHARE[c]);
       }
     }
   }
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
   geo.setAttribute('aH', new THREE.Float32BufferAttribute(h, 1));
+  geo.setAttribute('aCore', new THREE.Float32BufferAttribute(core, 1));
   geo.computeVertexNormals();
   return geo;
+}
+
+/** A plate of lake ice heaved up at the breach: a ragged seven-sided slab,
+ *  flat shaded, its inner edge at its origin (the painter tips it up about
+ *  that edge). */
+function slabGeometry(): THREE.BufferGeometry {
+  const g = new THREE.CylinderGeometry(1, 0.88, 1, 7, 1);
+  const pos = g.getAttribute('position') as THREE.BufferAttribute;
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i);
+    const z = pos.getZ(i);
+    const k = 1 + (quenchEntranceHash(Math.round(Math.atan2(z, x) * 100), 9) - 0.5) * 0.45;
+    pos.setX(i, x * k);
+    pos.setZ(i, z * k + 1);
+  }
+  const flat = g.toNonIndexed();
+  g.dispose();
+  flat.computeVertexNormals();
+  flat.setAttribute(
+    'aH',
+    new THREE.Float32BufferAttribute(
+      new Float32Array(flat.getAttribute('position').count).fill(0.5),
+      1,
+    ),
+  );
+  return flat;
 }
 
 /** The sheet over her: a flattened ball of faceted lake ice (its lower half
@@ -626,6 +847,12 @@ export class QuenchEntranceFx {
   private readonly chunks: THREE.InstancedMesh;
   private readonly chunkCount: number;
   private readonly blades: THREE.InstancedMesh;
+  private readonly slabs: THREE.InstancedMesh;
+  private readonly stars: THREE.InstancedMesh;
+  private readonly band: THREE.Mesh;
+  private readonly bandMat: THREE.ShaderMaterial;
+  private readonly geyserCore: THREE.Mesh;
+  private readonly geyserCoreMat: THREE.ShaderMaterial;
   private readonly halos: THREE.InstancedMesh;
   private readonly flash: THREE.Mesh;
   private readonly flashMat: THREE.ShaderMaterial;
@@ -814,13 +1041,84 @@ export class QuenchEntranceFx {
       this.chunks.setColorAt(i, _c.setRGB(0.6, 0.6, 0.6));
     }
     this.stage.add(this.chunks);
+    // The great plates heaved up round her (the chunks' ice; every tier
+    // heaves every plate: they are the breach itself, not a particle).
+    const slabGeo = slabGeometry();
+    this.geometries.push(slabGeo);
+    this.slabs = new THREE.InstancedMesh(slabGeo, this.chunks.material, P.slabs);
+    this.slabs.name = 'smithHeartQuenchEntranceSlabs';
+    this.slabs.frustumCulled = false;
+    this.slabs.visible = false;
+    this.slabs.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    for (let i = 0; i < P.slabs; i++) {
+      this.slabs.setMatrixAt(i, _zero);
+      this.slabs.setColorAt(i, _c.setRGB(0.4, 0.4, 0.4));
+    }
+    this.stage.add(this.slabs);
     const bladeGeo = bladeGeometry();
     this.geometries.push(bladeGeo);
-    this.blades = new THREE.InstancedMesh(
-      bladeGeo,
-      iceMat('smithHeartQuenchEntranceBlades', 1),
-      B.count,
-    );
+    const bladeMat = new THREE.ShaderMaterial({
+      name: 'smithHeartQuenchEntranceBlades',
+      uniforms: { uTime: this.uTime },
+      vertexShader: BLADE_VERT,
+      fragmentShader: BLADE_FRAG,
+      transparent: true,
+      depthWrite: false,
+      toneMapped: false,
+    });
+    this.materials.push(bladeMat);
+    this.blades = new THREE.InstancedMesh(bladeGeo, bladeMat, B.count);
+    // Each blade's star of cracks where it breaks out of the ice.
+    const starGeo = new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2);
+    this.geometries.push(starGeo);
+    const starMat = new THREE.ShaderMaterial({
+      name: 'smithHeartQuenchEntranceBladeCracks',
+      vertexShader: STAR_VERT,
+      fragmentShader: STAR_FRAG,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      toneMapped: false,
+      polygonOffset: true,
+      polygonOffsetFactor: -3,
+      polygonOffsetUnits: -3,
+    });
+    this.materials.push(starMat);
+    this.stars = new THREE.InstancedMesh(starGeo, starMat, B.count);
+    this.stars.name = 'smithHeartQuenchEntranceBladeCracks';
+    this.stars.frustumCulled = false;
+    this.stars.visible = false;
+    this.stars.renderOrder = floorVfxRenderOrder('encounter', 12);
+    this.stars.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    for (let i = 0; i < B.count; i++) {
+      this.stars.setMatrixAt(i, _zero);
+      this.stars.setColorAt(i, _c.setRGB(0, 0, 0));
+    }
+    if (this.stars.instanceColor) this.stars.instanceColor.setUsage(THREE.DynamicDrawUsage);
+    this.stage.add(this.stars);
+    // The shockwave's frosted edge on the floor.
+    const bandGeo = new THREE.RingGeometry(0.84, 1, 160, 1).rotateX(-Math.PI / 2);
+    this.geometries.push(bandGeo);
+    this.bandMat = new THREE.ShaderMaterial({
+      name: 'smithHeartQuenchEntranceShockEdge',
+      uniforms: { uAlpha: { value: 0 }, uTime: this.uTime },
+      vertexShader: FLOOR_VERT,
+      fragmentShader: BAND_FRAG,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      toneMapped: false,
+      polygonOffset: true,
+      polygonOffsetFactor: -3,
+      polygonOffsetUnits: -3,
+    });
+    this.materials.push(this.bandMat);
+    this.band = new THREE.Mesh(bandGeo, this.bandMat);
+    this.band.name = 'smithHeartQuenchEntranceShockEdge';
+    this.band.frustumCulled = false;
+    this.band.visible = false;
+    this.band.renderOrder = floorVfxRenderOrder('encounter', 13);
+    this.stage.add(this.band);
     this.blades.name = 'smithHeartQuenchEntranceBlades';
     this.blades.frustumCulled = false;
     this.blades.visible = false;
@@ -894,6 +1192,26 @@ export class QuenchEntranceFx {
     this.geyser.frustumCulled = false;
     this.geyser.visible = false;
     this.stage.add(this.geyser);
+    // Its white-hot core: the same streaks, narrower and brighter (its own
+    // material on the same program).
+    this.geyserCoreMat = new THREE.ShaderMaterial({
+      name: 'smithHeartQuenchEntranceGeyserCore',
+      uniforms: { uTime: this.uTime, uAlpha: { value: 0 }, uTop: { value: 1 } },
+      vertexShader: GEYSER_VERT,
+      fragmentShader: GEYSER_FRAG,
+      transparent: true,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+      blending: THREE.AdditiveBlending,
+      toneMapped: false,
+      fog: false,
+    });
+    this.materials.push(this.geyserCoreMat);
+    this.geyserCore = new THREE.Mesh(tube, this.geyserCoreMat);
+    this.geyserCore.name = 'smithHeartQuenchEntranceGeyserCore';
+    this.geyserCore.frustumCulled = false;
+    this.geyserCore.visible = false;
+    this.stage.add(this.geyserCore);
 
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})
@@ -1004,6 +1322,10 @@ export class QuenchEntranceFx {
     this.stage.visible = false;
     this.flash.visible = false;
     this.geyser.visible = false;
+    this.geyserCore.visible = false;
+    this.band.visible = false;
+    this.slabs.visible = false;
+    this.stars.visible = false;
     this.particles.hideRings();
   }
 
@@ -1148,6 +1470,23 @@ export class QuenchEntranceFx {
       this.geyserMat.uniforms.uAlpha.value = (this.reducedMotion() ? 0.7 : 1.6) * L.geyser;
       this.geyserMat.uniforms.uTop.value = 0.9 + 0.1 * L.geyserH;
     }
+    // Reduced motion: the white-hot core goes (the outer geyser is capped).
+    this.geyserCore.visible = this.geyser.visible && !this.reducedMotion();
+    if (this.geyserCore.visible) {
+      const r = E.geyserRadius * 0.42;
+      this.geyserCore.scale.set(r, Math.max(0.2, E.geyserHeight * 0.85 * L.geyserH), r);
+      this.geyserCore.position.copy(this.geyser.position);
+      this.geyserCoreMat.uniforms.uAlpha.value = 2.4 * L.geyser * L.geyser;
+      this.geyserCoreMat.uniforms.uTop.value = 0.85 + 0.15 * L.geyserH;
+    }
+    this.band.visible = L.ring > 0.01;
+    if (this.band.visible) {
+      this.band.scale.setScalar(L.ringR);
+      this.band.position.set(0, this.floorAt(0, 0) + 0.1, 0);
+      this.bandMat.uniforms.uAlpha.value = (this.reducedMotion() ? 0.4 : 1) * L.ring;
+    }
+    this.paintSlabs(L.sinceBreach);
+    if (L.sinceBreach >= 0 && L.sinceBreach < 4.5) this.vapor(L.sinceBreach, dt);
     const flash = quenchEntranceFlash(L, this.reducedMotion());
     this.flash.visible = flash > 0.002;
     if (this.flash.visible) {
@@ -1238,6 +1577,16 @@ export class QuenchEntranceFx {
     const z = QUENCH_SHEET.z;
     p.puff(0, 1.2, z, Math.round(P.shardBurst * this.density) + 12, SHARDS);
     p.puff(0, 0.8, z, Math.round(26 * this.density) + 6, POWDER);
+    p.puff(0, 2, z, Math.round(P.debrisBurst * this.density) + 10, DEBRIS);
+    // A thick frost mist rolling out over the lake from the hole.
+    const n = Math.round(P.mistBurst * this.density * (this.reducedMotion() ? 0.5 : 1)) + 8;
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * Math.PI * 2 + this.rand() * 0.3;
+      _dir[0] = Math.sin(a);
+      _dir[1] = 0.05;
+      _dir[2] = Math.cos(a);
+      p.puff(Math.sin(a) * 3, 0.6, z + Math.cos(a) * 3, 1, ROLL);
+    }
     p.shockRing(0, 0, C.ring, E.ringTo, E.ringFor, { wake: 0.08, crest: 0.07, strength: 1 });
     const me = this.world?.entities.get(this.world.playerId);
     if (!this.shakeSink || !me) return;
@@ -1246,6 +1595,51 @@ export class QuenchEntranceFx {
       this.reducedMotion(),
     );
     if (amount > 0) this.shakeSink(amount);
+  }
+
+  /** The great plates heaved up round her: tipped up out of the lake,
+   *  turned outward, the outer ones flung and tumbling, all sinking back. */
+  private paintSlabs(since: number): void {
+    const live = since >= 0 && since < SLAB.stand + SLAB.sink + 1.2;
+    this.slabs.visible = live;
+    if (!live) return;
+    for (let i = 0; i < P.slabs; i++) {
+      heavedSlabAt(i, since, _slab);
+      if (_slab.w <= 0) {
+        this.slabs.setMatrixAt(i, _zero);
+        continue;
+      }
+      // Turned to its bearing, then tipped up outward about its inner edge,
+      // then its tumble.
+      _q.setFromAxisAngle(_up, _slab.yaw);
+      _axis.set(1, 0, 0);
+      _q2.setFromAxisAngle(_axis, -_slab.tilt - _slab.tumble);
+      _q.multiply(_q2);
+      _p.set(_slab.x, this.floorAt(_slab.x, _slab.z) + _slab.y, _slab.z);
+      _s.set(_slab.w, _slab.t, _slab.d);
+      _m.compose(_p, _q, _s);
+      this.slabs.setMatrixAt(i, _m);
+    }
+    this.slabs.instanceMatrix.needsUpdate = true;
+  }
+
+  /** Frost streaming off her as she rises through the wreck: cold vapour
+   *  and glints off her body's points. */
+  private vapor(since: number, dt: number): void {
+    const set = quenchBodySockets();
+    const pts = set?.points;
+    const k = 1 - since / 4.5;
+    let n = dt * 46 * k * this.density * (this.reducedMotion() ? 0.5 : 1);
+    while (n > 0) {
+      if (n < 1 && this.rand() > n) break;
+      n -= 1;
+      const pt = pts ? pts[Math.floor(this.rand() * pts.length)] : null;
+      if (pt) {
+        pt.getWorldPosition(_v);
+        this.stage.worldToLocal(_v);
+      } else _v.set((this.rand() - 0.5) * 3, 1 + this.rand() * 9, (this.rand() - 0.5) * 3);
+      this.particles.puff(_v.x, _v.y, _v.z, 1, this.rand() < 0.3 ? VAPOR_GLINT : VAPOR);
+    }
   }
 
   private paintChunks(since: number): void {
@@ -1294,6 +1688,7 @@ export class QuenchEntranceFx {
   private paintBlades(e: Entity, prev: number, t: number, dt: number): void {
     const L = this.look;
     let any = false;
+    let stars = false;
     const world = this.world;
     const yaw = this.stage.rotation.y;
     const cy = Math.cos(yaw);
@@ -1303,16 +1698,20 @@ export class QuenchEntranceFx {
       if (!b.shown || this.cut) {
         this.blades.setMatrixAt(i, _zero);
         this.halos.setMatrixAt(i, _zero);
+        this.halos.setMatrixAt(TIP0 + i, _zero);
+        this.stars.setMatrixAt(i, _zero);
         continue;
       }
       any = true;
-      // Its place round her: up out of the ice point first, then hovering.
-      const bx = Math.sin(b.bearing) * B.ring;
-      const bz = Math.cos(b.bearing) * B.ring;
+      // Its place round her: spiralling out to the ring as it bursts up out
+      // of the ice point first, then hovering with a slow bob.
+      const ringR = B.ring * b.reach;
+      const bx = Math.sin(b.bearing) * ringR;
+      const bz = Math.cos(b.bearing) * ringR;
       const floor = this.floorAt(bx, bz);
       let foot = floor - B.length + (B.length + B.hover) * b.lift;
-      foot += 0.25 * Math.sin(this.clock * 1.7 + i * 1.3) * b.lift * (1 - b.plunge);
-      // Its aim: upright, then its point on its mark (or ahead of her).
+      foot += 0.3 * Math.sin(this.clock * 1.7 + i * 1.3) * b.lift * (1 - b.plunge);
+      // Its aim: upright, then its point snapped onto its mark (or ahead).
       _d.set(0, 1, 0);
       if (b.aim > 0) {
         const mark = this.marks[i] >= 0 ? world?.entities.get(this.marks[i]) : undefined;
@@ -1347,8 +1746,8 @@ export class QuenchEntranceFx {
           (B.length * 2 + 2) * b.plunge;
       }
       _q.setFromUnitVectors(_up, _d);
-      // A slow spin about its own length while it circles.
-      _q2.setFromAxisAngle(_up, this.clock * 0.6 + i);
+      // Its spin about its own length: fast up out of the ice, then lazy.
+      _q2.setFromAxisAngle(_up, b.spin);
       _q.multiply(_q2);
       // The blade's middle stays on its ring; it turns about its middle.
       const mid = foot + B.length * 0.5;
@@ -1357,29 +1756,64 @@ export class QuenchEntranceFx {
       _m.compose(_p, _q, _s);
       this.blades.setMatrixAt(i, _m);
       this.blades.setColorAt(i, _c.setRGB(b.glow, b.glow, b.glow));
-      // Its halo round its middle.
-      _p.set(bx, mid, bz);
-      _s.setScalar(2 + 2.4 * Math.min(1.8, b.glow - 0.7));
-      _m.compose(_p, _q.identity(), _s);
-      this.halos.setMatrixAt(i, _m);
-      const hk = 0.16 * b.glow;
-      this.halos.setColorAt(i, _c.setRGB(hk * 0.6, hk * 1.0, hk * 1.3));
-      // Frost trailing off it while it circles; a burst as it breaks the ice.
-      if (b.lift < 1 && b.lift > 0.05 && this.rand() < dt * 30 * this.density) {
+      // Its halo round its middle, and the glint off its point on the snap.
+      // (A soft cold light round its heart only as it is born: a wash over
+      // the whole blade would pale its crystal.)
+      const born = Math.max(0, b.glow - 1.2);
+      if (born > 0.01) {
+        _p.set(bx, mid, bz);
+        _s.setScalar(2.4 * born);
+        _m.compose(_p, _q2.identity(), _s);
+        this.halos.setMatrixAt(i, _m);
+        this.halos.setColorAt(i, _c.setRGB(0.12, 0.3, 0.5));
+      } else this.halos.setMatrixAt(i, _zero);
+      if (b.glint > 0.01) {
+        _p.set(bx, mid, bz).addScaledVector(_d, B.length * 0.5);
+        _s.setScalar(0.8 + (this.reducedMotion() ? 1.4 : 3.6) * b.glint);
+        _m.compose(_p, _q2.identity(), _s);
+        this.halos.setMatrixAt(TIP0 + i, _m);
+        const g = (this.reducedMotion() ? 0.5 : 1.1) * b.glint;
+        this.halos.setColorAt(TIP0 + i, _c.setRGB(g * 0.9, g * 1.1, g * 1.3));
+      } else this.halos.setMatrixAt(TIP0 + i, _zero);
+      // Frost trailing off it as it spins up and circles; ice bursting as it
+      // breaks out.
+      if (b.lift < 1 && b.lift > 0.05 && this.rand() < dt * 34 * this.density)
         this.particles.puff(bx, floor + 0.3, bz, 2, BURST);
+      if (b.plunge === 0 && b.lift > 0.3) {
+        let n = dt * 16 * this.density;
+        while (n > 0) {
+          if (n < 1 && this.rand() > n) break;
+          n -= 1;
+          _p.set(bx, mid, bz).addScaledVector(_d, B.length * (this.rand() - 0.5));
+          this.particles.puff(_p.x, _p.y, _p.z, 1, BLADE_TRAIL);
+        }
       }
-      if (b.aim < 1 && b.lift > 0.95 && this.rand() < dt * 10 * this.density) {
-        _p.set(bx, mid, bz).addScaledVector(_d, B.length * (this.rand() - 0.5));
-        this.particles.puff(_p.x, _p.y, _p.z, 1, BLADE_TRAIL);
-      }
-      // Each blade's own crack of the ice as it breaks out, and the splash as
-      // it plunges back.
+      // Each blade's own star of cracks and burst of ice where it breaks
+      // out, and the splash as it plunges back.
       const start = E.bladesAt + i * E.bladeStep;
-      if (crossedQuenchBeat(prev, t, start + 0.1))
-        this.particles.puff(bx, floor + 0.4, bz, Math.round(14 * this.density) + 3, BURST);
+      const sinceUp = t - start;
+      const sx0 = Math.sin(b.bearing) * B.ring * 0.35;
+      const sz0 = Math.cos(b.bearing) * B.ring * 0.35;
+      if (sinceUp >= 0 && sinceUp < 2.6) {
+        _p.set(sx0, this.floorAt(sx0, sz0) + 0.08, sz0);
+        _s.setScalar(5.5);
+        _m.compose(_p, _q2.identity(), _s);
+        this.stars.setMatrixAt(i, _m);
+        const reveal = Math.min(1, sinceUp / 0.35);
+        const fade = 1 - Math.max(0, (sinceUp - 1.2) / 1.4);
+        this.stars.setColorAt(i, _c.setRGB(reveal, fade, 0));
+        stars = true;
+      } else this.stars.setMatrixAt(i, _zero);
+      if (crossedQuenchBeat(prev, t, start + 0.05))
+        this.particles.puff(sx0, floor + 0.4, sz0, Math.round(22 * this.density) + 4, BURST);
       const pl = E.plungeAt + i * E.plungeStep + E.plungeFor * 0.6;
       if (crossedQuenchBeat(prev, t, pl))
         this.particles.puff(bx, floor + 0.4, bz, Math.round(16 * this.density) + 3, BURST);
+    }
+    this.stars.visible = stars;
+    if (stars) {
+      this.stars.instanceMatrix.needsUpdate = true;
+      if (this.stars.instanceColor) this.stars.instanceColor.needsUpdate = true;
     }
     const eyes = this.paintEyes();
     this.blades.visible = any;
@@ -1404,7 +1838,7 @@ export class QuenchEntranceFx {
     const set = quenchBodySockets();
     let shown = false;
     for (let j = 0; j < 2; j++) {
-      const slot = B.count + j;
+      const slot = EYE0 + j;
       const pt = set?.points[S_EYES[j]];
       if (k <= 0.02) {
         this.halos.setMatrixAt(slot, _zero);
@@ -1431,6 +1865,8 @@ export class QuenchEntranceFx {
     this.release();
     this.chunks.dispose();
     this.blades.dispose();
+    this.slabs.dispose();
+    this.stars.dispose();
     this.halos.dispose();
     this.root.removeFromParent();
     this.particles.dispose();
