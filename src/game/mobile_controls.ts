@@ -1,7 +1,7 @@
 import { canTakeFocus } from '../ui/focus_manager';
 import { buildMobileMenuControl, type MobileMenuControl } from '../ui/hud/menu';
 import { t } from '../ui/i18n';
-import { bindTouchTap } from '../ui/touch_tap';
+import { armGhostClickGuard, bindTouchTap } from '../ui/touch_tap';
 import type { Input, TouchMoveInput } from './input';
 import { type ChromeFadeHandle, startChromeFade } from './mobile_chrome_fade';
 import type { TouchOwner, TouchRouterTarget } from './touch_router';
@@ -734,7 +734,11 @@ export class MobileControls {
       if (!this.active) return;
       e.preventDefault();
       this.cancelChatPress();
-      if (!this.chatLongFired) this.tapChat();
+      if (!this.chatLongFired) {
+        // The composer opens under the finger; swallow this tap's ghost click.
+        if (e.pointerType === 'touch' && e.isPrimary) armGhostClickGuard();
+        this.tapChat();
+      }
     });
     button.addEventListener('pointercancel', () => this.cancelChatPress());
     button.addEventListener('pointerleave', () => this.cancelChatPress());
