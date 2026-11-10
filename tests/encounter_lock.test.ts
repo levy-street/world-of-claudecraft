@@ -21,6 +21,7 @@ import {
 } from '../src/sim/content/smith_heart';
 import { SMITH_HEART_CHECKPOINTS } from '../src/sim/content/smith_heart_checkpoints';
 import { BUILTIN_WORLD, DUNGEONS, instanceOrigin } from '../src/sim/data';
+import { spendHeatIntro } from '../src/sim/encounters/smith_heart';
 import { clearDungeonGateStateForTest } from '../src/sim/instances/dungeon_gate_state';
 import { enterDungeon, heroicLockoutId } from '../src/sim/instances/dungeons';
 import {
@@ -226,6 +227,11 @@ describe("the Smith's Heart: encounter in progress", () => {
     tank.pos = sim.ctx.groundPos(mob.pos.x + 2, mob.pos.z);
     tank.prevPos = { ...tank.pos };
     sim.ctx.rebucket(tank);
+    // Since its entrance (heat_intro.ts) the guardian waits as cold coal,
+    // held by the encounter, and a pull is undone until its scene has
+    // played: spend it the way the dev pull does, so the fight is the
+    // ordinary one this test reads the door through.
+    spendHeatIntro(sim.ctx, mob);
     expect(sim.ctx.aggroMob(mob, tank, false)).toBe(true);
     // A raid-level tank: a level-1 body dies to one critical swing, and which
     // swing crits follows the claim's ids (the test reads the door).
