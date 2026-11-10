@@ -33,6 +33,10 @@ const HM = BREATH_DIFFICULTY.heroic.damageMult;
 /** The fight's aura's descriptor, or null when `a` is not one of them. */
 export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor | null {
   switch (a.id) {
+    // The entrance's marker (gathered, or waking): out of reach until the
+    // storm has set it down.
+    case BREATH_AURAS.intro:
+      return { key: `${KEY}.intro`, nums: {} };
     case WIND_DRIFT_AURA:
       return {
         key: `${KEY}.wind`,

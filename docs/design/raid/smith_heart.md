@@ -1773,6 +1773,30 @@ Stone, Echo of Wrath and Endless Song returned no game use (CLEAR; the nearest w
 **The rework of 2026-11-03 (the team's feedback, approved by the owner).** Where it and the
 table below disagree, this block wins. Every number stays a SKETCH (unmeasured).
 
+- **The entrance, "Calm before the storm"** (the owner's ask of 2026-11-10: "AAA, powerful
+  VFX", no voice, wind and thunder only). Until the raid first climbs onto the Cornice the
+  guardian is not yet a body: held by the encounter (`encounterHeld`), not hostile, nothing
+  harms it, its rig gathered into a speck (`Gathered`, `scripts/build_breath_entrance_anims.mjs`,
+  sampled off its Idle). The first living player within `BREATH_INTRO.reach` (58 yd) of its
+  spot and `band` (12 yd) of the Cornice's floor (the climb's flat top, some 50 yd west of it,
+  far past its aggro reach) wakes it: a scene of `BREATH_INTRO.seconds` (12 s) in which it
+  stays untargetable and unpullable. The dead calm: the Cornice's loose stone and dust hang
+  still in the air, a dark smudge of cloud high over the middle. The pull: everything drifts,
+  then races up into it in tightening spirals, the smudge swelling into a turning eye of storm
+  cloud 40 yd up, a rising howl. The funnel: a tornado comes down out of the eye onto the floor
+  (a bolt down its heart, a thud and a ring of dust as it touches), torn storm cloud lit from
+  within, lightning crawling over it, stone orbiting it, bolts striking the floor at its foot.
+  The guardian forms inside it (`Form`, its root grown back about its heart). The burst: the
+  funnel blown apart, a ring of gust sweeping the whole Cornice past the raid (cosmetic: no
+  damage, no knockback), the stone flung out, the guardian floating where it stood. The finale:
+  four strikes round it, then one great bolt onto it and a thunderclap; the fight is its.
+  It plays once per guardian (a wipe sends it home awake); a fight begun before it woke, a dev
+  pull or a forced mechanic spends it; `/dev heart breath intro` replays it. The clock rides one
+  aura (`BREATH_AURAS.intro`, the shared `Dormant` name), so a late joiner starts where it is
+  and one who joins after sees it floating; the pull keeps its own lines (the scene said none).
+  `breath_intro.ts`, `breath_intro_plan.ts`; the look `render/smith_heart_fx/breath_entrance_*`.
+  Every tier plays every beat (the low tier thins particles and the flying stone); reduced
+  motion drops the thuds and the flash and caps the added light.
 - **The open Cornice.** No wall, rail, rod, horn or cheek stone stands round the Cornice any
   more: the whole rim is an open lip (the layout's `CORNICE_OPEN_RIM`, plus the six channel
   throats `CORNICE_GAPS`), so a body blown or thrown off ANY edge falls and dies, on every

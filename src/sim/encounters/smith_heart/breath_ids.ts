@@ -98,6 +98,11 @@ export const BREATH_AURAS = {
    *  slides (breath_shove.ts; Jose's playtest of 2026-11-04 read the old
    *  one-tick toss as a sideways teleport). */
   tossed: 'heart_breath_gale_tossed',
+  /** On the guardian until its entrance has played (breath_intro.ts):
+   *  `value` breath_intro_plan.ts BREATH_INTRO_STAGES (gathered into the
+   *  still air, or waking with the scene's clock in `remaining` and
+   *  `duration`). */
+  intro: 'heart_breath_intro',
 } as const;
 
 /** The fight's object templates (their radius rides `scale`). */
@@ -205,6 +210,9 @@ export const BREATH_NAMES = {
   portalB: 'Portal B',
   portalC: 'Portal C',
   portalD: 'Portal D',
+  /** The entrance's marker (the Hammer Vein Warder's sleep and the council's
+   *  share the name and its catalog row). */
+  intro: 'Dormant',
 } as const;
 
 /** The English line the carrier reads crossing the portals (re-localized by

@@ -5955,7 +5955,9 @@ export const hudChromeStrings = {
         "Each pillar shields at most {limit} players from Mountain's Wrath. With more behind it, each of them takes {share}% of the blast. Anyone it finds unhidden takes {min} to {max} damage on Normal, {heroicMin} to {heroicMax} on Heroic and {mythicMin} to {mythicMax} on Mythic.",
     },
     // The Smith's Heart's Guardian of the Breath (src/ui/breath_aura_effect.ts).
+    // The entrance's marker is wordy (M16): non-Latin fills in the overlays.
     breathGuardian: {
+      intro: 'Dormant: cannot be attacked or harmed until the storm sets it down.',
       portalA:
         'When this ends, Portal A opens exactly where you stand. Stand near the Knotted Gale. You cannot carry it this round.',
       portalB:

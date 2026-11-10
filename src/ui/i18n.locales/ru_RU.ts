@@ -24718,6 +24718,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.alert.resonanceTitle': 'Резонанс',
   'hudChrome.council.alert.weightTitle': 'Тяжесть Молота',
   'hudChrome.council.alert.timeAria': 'Осталось {seconds} с',
+  'hudChrome.auraEffect.breathGuardian.intro':
+    'Спит: нельзя атаковать или ранить, пока буря не опустит его на землю.',
   'hudChrome.auraEffect.council.intro':
     'Спит: нельзя атаковать или ранить, пока совет не пробудится.',
   'hudChrome.auraEffect.council.wakeMark':

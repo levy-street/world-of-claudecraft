@@ -55,7 +55,9 @@
 //   /dev heart breath                the Guardian of the Breath's readout
 //   /dev heart breath <what>         pull (onto the Cornice and pull it),
 //                                    reset (whole again, the wind still),
-//                                    heroic [on|off] or mythic [on|off] (this
+//                                    intro (reset and gathered into the still
+//                                    air again: its entrance replays as the
+//                                    raid climbs onto the Cornice), heroic [on|off] or mythic [on|off] (this
 //                                    run's fight), phase2 (the storm breaks
 //                                    now), blow [deg|n|ne|e|se|s|sw|w|nw],
 //                                    calm, circle (Thessaly's), inhale (or roar),
@@ -137,6 +139,7 @@ import {
   setSmithHeartPortalDevOpen,
   smithHeartProgress,
   smithHeartSealMaskOf,
+  spendBreathIntro,
   spendCouncilIntro,
   spendHeatIntro,
   spendQuenchIntro,
@@ -197,7 +200,7 @@ const GUARDIAN_IDS: ReadonlySet<string> = new Set([
 const COUNCIL_IDS: ReadonlySet<string> = new Set(COUNCIL_TEMPLATE_IDS);
 
 const HELP =
-  '[dev] /dev heart enter [normal] | tp <cleft|gallery|pit|hammer|balcony|ring|ringse|ringsw|breath|bridge|cornice|breathboss|quench|ice|lake|quenchboss|heat|forge|anvil|heatboss|heart|portal|heartroom|final> | kill <hammer|guardian|singer|council|breath|quench|heat|final|guardians|pack <id>|trash|all> | gates | portal | seal | pool <k> | arrival | final [pull|reset|normal|heroic|mythic|quarter <breath|quench|hammer|heat|ring>|fill [vein|all] [pct]|burst|shock|root|unroot|fist|whirl|embers|freeze|cold <n>|ice|wind [deg]|bolt|drawn|orbs|tremor|anvil|shell] | reset | council [pull|reset|intro|heroic [on|off]|mythic [on|off]|energy <n>|wrath|weight|rush|wake|rock|bolt|song|resonance [n]|soul <guardian|singer>|soulpip <n>] | breath [pull|reset|heroic [on|off]|mythic [on|off]|phase2|blow [deg|n|e|s|w]|calm|circle|inhale|roar|chain|eye|conductor|tornado|gust [deg]|isles [0|1]|ride [0|1]|home|killisle|bulwark|windworn|heart [2|portal a|b|c|d|carry|burst]] | quench [pull|reset|intro|heroic [on|off]|mythic [on|off]|phase2|blades|cold <n>|burst|splash|chain [n]|immune|huddle|hole|crack|breath|slash|flurry] | heat [pull|reset|intro|heroic [on|off]|mythic [on|off]|phase <1-3>|intermission|fist|flare|seeds|zones|ember]';
+  '[dev] /dev heart enter [normal] | tp <cleft|gallery|pit|hammer|balcony|ring|ringse|ringsw|breath|bridge|cornice|breathboss|quench|ice|lake|quenchboss|heat|forge|anvil|heatboss|heart|portal|heartroom|final> | kill <hammer|guardian|singer|council|breath|quench|heat|final|guardians|pack <id>|trash|all> | gates | portal | seal | pool <k> | arrival | final [pull|reset|normal|heroic|mythic|quarter <breath|quench|hammer|heat|ring>|fill [vein|all] [pct]|burst|shock|root|unroot|fist|whirl|embers|freeze|cold <n>|ice|wind [deg]|bolt|drawn|orbs|tremor|anvil|shell] | reset | council [pull|reset|intro|heroic [on|off]|mythic [on|off]|energy <n>|wrath|weight|rush|wake|rock|bolt|song|resonance [n]|soul <guardian|singer>|soulpip <n>] | breath [pull|reset|intro|heroic [on|off]|mythic [on|off]|phase2|blow [deg|n|e|s|w]|calm|circle|inhale|roar|chain|eye|conductor|tornado|gust [deg]|isles [0|1]|ride [0|1]|home|killisle|bulwark|windworn|heart [2|portal a|b|c|d|carry|burst]] | quench [pull|reset|intro|heroic [on|off]|mythic [on|off]|phase2|blades|cold <n>|burst|splash|chain [n]|immune|huddle|hole|crack|breath|slash|flurry] | heat [pull|reset|intro|heroic [on|off]|mythic [on|off]|phase <1-3>|intermission|fist|flare|seeds|zones|ember]';
 
 /** Where `/dev heart breath pull` sets the player down: on the Cornice, a
  *  few strides west of the guardian. */
@@ -456,6 +459,8 @@ export function handleSmithHeartDevChat(ctx: SimContext, raw: string, pid: numbe
     const boss = breathGuardian(ctx, inst);
     const pull = (): boolean => {
       if (!me || !boss || boss.dead) return false;
+      // A dev pull skips its entrance (the encounter would hold it gathered).
+      spendBreathIntro(boss);
       return ctx.aggroMob(boss, me, false);
     };
     const verbName = arg.split(' ')[0];
@@ -475,6 +480,7 @@ export function handleSmithHeartDevChat(ctx: SimContext, raw: string, pid: numbe
     // unpulled guardian resets its fight on the next tick).
     if (
       verbName !== 'reset' &&
+      verbName !== 'intro' &&
       verbName !== 'heroic' &&
       verbName !== 'mythic' &&
       boss &&

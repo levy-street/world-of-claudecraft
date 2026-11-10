@@ -22557,6 +22557,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.alert.resonanceTitle': '共鳴',
   'hudChrome.council.alert.weightTitle': '槌の重み',
   'hudChrome.council.alert.timeAria': '残り{seconds}秒',
+  'hudChrome.auraEffect.breathGuardian.intro':
+    '眠っている：嵐がその身を降ろすまで、攻撃もダメージも受けない。',
   'hudChrome.auraEffect.council.intro':
     '眠っている：評議会が目覚めるまで、攻撃もダメージも受けない。',
   'hudChrome.auraEffect.council.wakeMark':

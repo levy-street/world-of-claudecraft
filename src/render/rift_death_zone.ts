@@ -60,6 +60,7 @@ import {
 import { setHeartKitCompileGate } from './smith_heart/heart_kit';
 import {
   BreathBody,
+  BreathEntranceFx,
   BreathFightFx,
   BreathFx,
   CouncilBodies,
@@ -208,6 +209,9 @@ export class RiftDeathZoneVisuals {
   /** The Guardian of the Breath's fight on the Storm Cornice, and its body. */
   private readonly breathFight: BreathFightFx;
   private readonly breathBody: BreathBody;
+  /** The Breath guardian's entrance (the calm before the storm), updated
+   *  before its body. */
+  private readonly breathEntrance: BreathEntranceFx;
   // Its Quench guardian (Quenching Breath's cone telegraph and its frost,
   // Tempering Strike's ice).
   private readonly quenchFx: QuenchFx;
@@ -261,6 +265,15 @@ export class RiftDeathZoneVisuals {
     this.hammerFx = new HammerFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.breathFx = new BreathFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.breathFight = new BreathFightFx(scene, groundY, world, compileGate, reducedMotion, shake);
+    this.breathEntrance = new BreathEntranceFx(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+      shake,
+      playGesture,
+    );
     this.breathBody = new BreathBody(
       scene,
       groundY,
@@ -682,6 +695,7 @@ export class RiftDeathZoneVisuals {
     this.hammerFx.update(dt);
     this.breathFx.update(dt);
     this.breathFight.update(dt);
+    this.breathEntrance.update(dt);
     this.breathBody.update(dt);
     this.quenchFx.update(dt);
     this.quenchFight.update(dt);
@@ -724,6 +738,7 @@ export class RiftDeathZoneVisuals {
     this.hammerFx.dispose();
     this.breathFx.dispose();
     this.breathFight.dispose();
+    this.breathEntrance.dispose();
     this.breathBody.dispose();
     this.quenchFx.dispose();
     this.quenchFight.dispose();

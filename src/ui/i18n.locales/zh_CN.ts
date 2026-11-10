@@ -23070,6 +23070,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.alert.resonanceTitle': '共鸣',
   'hudChrome.council.alert.weightTitle': '重锤之压',
   'hudChrome.council.alert.timeAria': '剩余{seconds}秒',
+  'hudChrome.auraEffect.breathGuardian.intro':
+    '沉睡中：在风暴将它放下之前，无法被攻击或伤害。',
   'hudChrome.auraEffect.council.intro':
     '沉睡中：在议会苏醒之前，无法被攻击或伤害。',
   'hudChrome.auraEffect.council.wakeMark':

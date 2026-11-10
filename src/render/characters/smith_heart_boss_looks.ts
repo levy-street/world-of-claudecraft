@@ -27,6 +27,7 @@ import {
   BREATH_BODY_HEIGHT,
   BREATH_BODY_URL,
 } from '../smith_heart_fx/breath_body_core';
+import { BREATH_ENTRANCE_GESTURES } from '../smith_heart_fx/breath_entrance_core';
 import {
   COUNCIL_AWAKEN_CLIP,
   COUNCIL_ENTRANCE_GESTURES,
@@ -251,6 +252,21 @@ function breathClips(storm: boolean): ClipMap {
 }
 
 const BREATH_CALM = breathClips(false);
+
+/** The Guardian of the Breath's two entrance clips (scripts/build_breath_
+ *  entrance_anims.mjs, sampled off its Idle): gathered into a speck of the
+ *  still air (nothing of it shows), and forming out of the wind inside the
+ *  funnel (smith_heart_fx/breath_entrance_core.ts BREATH_FORM_CLIP). */
+export const BREATH_ENTRANCE_ANIMS_URL = `${CREATURES}/smith_heart_breath_guardian_entrance_anims.glb`;
+export const BREATH_ENTRANCE_CLIPS = ['Gathered', 'Form'] as const;
+
+/** Its entrance's first stance: gathered into nothing, still. */
+const BREATH_GATHERED: ClipMap = {
+  ...BREATH_CALM,
+  idle: 'Gathered',
+  walk: 'Gathered',
+  run: 'Gathered',
+};
 
 // The Guardian of the Quench (the Frozen Lake, design doc 7.3): an ice queen,
 // one rigged mesh, her gown and her hair on their own bone chains (their sway
@@ -498,11 +514,17 @@ export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
   },
   smith_heart_breath_guardian: {
     url: BREATH_BODY_URL,
+    animUrls: [BREATH_ENTRANCE_ANIMS_URL],
     height: BREATH_BODY_HEIGHT,
     clips: BREATH_CALM,
     phaseClips: {
       [BREATH_BODY_GESTURES.calm]: { clips: BREATH_CALM },
       [BREATH_BODY_GESTURES.storm]: { clips: BREATH_STORM },
+      // Its entrance (smith_heart_fx/breath_entrance_fx.ts): gathered into
+      // the still air, then forming inside the funnel (the Form one-shot);
+      // it floats on its calm stance after.
+      [BREATH_ENTRANCE_GESTURES.gathered]: { clips: BREATH_GATHERED },
+      [BREATH_ENTRANCE_GESTURES.form]: { clips: BREATH_CALM, enter: 'Form' },
     },
     castClipSync: [
       BREATH_CASTS.inhale,
@@ -520,7 +542,7 @@ export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
       deathFade: 3,
     },
     // A swing never cuts the roar, the storm breaking or a bolt's cast.
-    oneShotsHoldAttacks: ['Roar', 'StormBreaks', 'Cast', 'StormCast'],
+    oneShotsHoldAttacks: ['Form', 'Roar', 'StormBreaks', 'Cast', 'StormCast'],
     castPlayOutHoldsAttacks: true,
     // It glides: its Move loop read at its own pace (the template's speed).
     walkRef: 7,

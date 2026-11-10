@@ -22528,6 +22528,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.alert.resonanceTitle': '공명',
   'hudChrome.council.alert.weightTitle': '망치의 무게',
   'hudChrome.council.alert.timeAria': '{seconds}초 남음',
+  'hudChrome.auraEffect.breathGuardian.intro':
+    '잠들어 있다: 폭풍이 그를 내려놓을 때까지 공격할 수도, 피해를 줄 수도 없다.',
   'hudChrome.auraEffect.council.intro':
     '잠들어 있다: 의회가 깨어날 때까지 공격할 수도, 피해를 줄 수도 없다.',
   'hudChrome.auraEffect.council.wakeMark':

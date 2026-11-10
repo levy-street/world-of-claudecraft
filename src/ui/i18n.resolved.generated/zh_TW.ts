@@ -4759,6 +4759,7 @@ export const zh_TW: EnTranslations = {
         "pillarLimit": "每根石柱最多只能為{limit}名玩家擋住山岳之怒。躲在後面的人更多時，每人承受衝擊的{share}%。未躲藏者在普通難度受到{min}到{max}點傷害，英雄難度{heroicMin}到{heroicMax}點，傳奇難度{mythicMin}到{mythicMax}點。"
       },
       "breathGuardian": {
+        "intro": "沉睡中：在風暴將它放下之前，無法被攻擊或傷害。",
         "portalA": "效果結束時，傳送門A會在你所站的位置打開。站在結風附近。本輪你無法攜帶它。",
         "portalB": "效果結束時，傳送門B會在你所站的位置打開。站在崖台邊緣。本輪你無法攜帶結風。",
         "portalC": "效果結束時，傳送門C會在你所站的位置打開。它只與傳送門D相連。站在另一團結風附近。本輪你無法攜帶它。",

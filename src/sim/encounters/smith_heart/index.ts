@@ -12,6 +12,14 @@ export {
 export * from './breath_geometry';
 export { heartDevTrigger, startHeart, tryThrowKnot } from './breath_heart';
 export * from './breath_ids';
+export {
+  type BreathIntroStage,
+  breathIntroState,
+  breathIntroWaker,
+  inBreathIntroReach,
+  spendBreathIntro,
+} from './breath_intro';
+export * from './breath_intro_plan';
 export * from './breath_isle_geometry';
 export * from './breath_isle_ids';
 export type { BreathFightState } from './breath_state';

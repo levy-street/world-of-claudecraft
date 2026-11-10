@@ -13,7 +13,11 @@ import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
-import { SMITH_HEART_BOSS_LOOKS } from '../src/render/characters/smith_heart_boss_looks';
+import {
+  BREATH_ENTRANCE_ANIMS_URL,
+  BREATH_ENTRANCE_CLIPS,
+  SMITH_HEART_BOSS_LOOKS,
+} from '../src/render/characters/smith_heart_boss_looks';
 import { SMITH_HEART_PLACEHOLDER_LOOKS } from '../src/render/characters/smith_heart_placeholder_looks';
 import { gateObjectPlan } from '../src/render/gate_objects';
 import { BreathBody } from '../src/render/smith_heart_fx/breath_body';
@@ -122,7 +126,9 @@ describe('the Guardian of the Breath model', () => {
   });
 
   it('ships every clip it binds, one mesh, and KTX2 textures', () => {
-    const names = glb.animations.map((a) => a.name);
+    // Its own clips, and its entrance's (Gathered, Form) from their own GLB
+    // (tests/smith_heart_breath_entrance.test.ts reads that one).
+    const names = [...glb.animations.map((a) => a.name), ...BREATH_ENTRANCE_CLIPS];
     for (const c of BREATH_BODY_CLIPS) expect(names, c).toContain(c);
     expect(glb.meshes?.length).toBe(1);
     expect(glb.extensionsUsed).toContain('KHR_texture_basisu');
@@ -141,6 +147,7 @@ describe('the Guardian of the Breath model', () => {
     const stances = Object.values(def.phaseClips ?? {}).map((p) => p.clips);
     for (const c of [def.clips, ...stances])
       for (const n of named(c)) expect(names, n).toContain(n);
+    expect(def.animUrls).toEqual([BREATH_ENTRANCE_ANIMS_URL]);
   });
 
   it('plays its own clips: the breath, the roar, the bolts on the bar end, the channels', () => {
