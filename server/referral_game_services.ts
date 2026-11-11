@@ -885,8 +885,9 @@ export class ReferralGameServices {
           },
           context,
         );
-        if (move.error) this.notice(session, { type: 'reason', reason: move.error });
-        else this.notice(session, { type: 'move', linkId: row.card.linkId });
+        // Nobody asked to move here, so a character the card cannot move to is not
+        // an error to raise: the card window's Move button still explains why.
+        if (!move.error) this.notice(session, { type: 'move', linkId: row.card.linkId });
       }
     }
   }

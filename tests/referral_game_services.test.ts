@@ -234,6 +234,54 @@ describe('referral game host', () => {
     });
     expect(h.card().status).toBe('active');
   });
+  async function activeCardOnAlt(locked: boolean) {
+    const h = setup();
+    await flush();
+    const party = () =>
+      h.service.observe({
+        type: 'referralEvidence',
+        kind: 'party',
+        participants: h.context.characters.map((c, i) => ({ ...c, pid: i + 1 })),
+      });
+    party();
+    await flush();
+    for (const session of [h.a, h.b])
+      await h.service.command(session, {
+        type: 'respond',
+        linkId: 20,
+        expectedRevision: h.card().revision,
+        accept: true,
+      });
+    expect(h.card().status).toBe('active');
+    await h.store.mutate(20, 10, (card) => {
+      const state = structuredClone(card);
+      state.participants[0].locked = locked;
+      return { state, intents: [] };
+    });
+    // The inviter logs in on another character and groups with the bound friend again.
+    h.service.detach(h.a);
+    h.a.characterId = 101;
+    h.a.name = 'Alt';
+    h.context.characters[0].characterId = 101;
+    h.context.characters[0].name = 'Alt';
+    h.service.attach(h.a);
+    await flush();
+    h.frames.clear();
+    party();
+    await flush();
+    return h;
+  }
+  it('offers the card move when a bound friend groups on an eligible other character', async () => {
+    const h = await activeCardOnAlt(false);
+    expect(h.frames.get(101)?.notices.map((n) => n.type)).toEqual(['move']);
+  });
+  it('stays silent when a bound friend groups on a character the card cannot move to', async () => {
+    const h = await activeCardOnAlt(true);
+    expect(h.frames.get(101)?.links[0].moveReason).toBe('locked');
+    expect(h.frames.get(101)?.notices).toEqual([]);
+    // The friend never acknowledged the original start prompt; nothing new joins it.
+    expect(h.frames.get(200)?.notices.map((n) => n.type)).toEqual(['start']);
+  });
   it('explains unbound accounts only when new characters accept an invite together', async () => {
     const h = setup();
     await flush();
