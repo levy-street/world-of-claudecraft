@@ -148,8 +148,8 @@ export const MOUNTS: Record<MountKey, MountDef> = {
   },
   // The Smith's Heart raid's reward: a war-steed of the Heart, floating quarry-stone plates over a
   // body of living fire, ice-crystal horns and a mane of wind. RESERVED: the raid's
-  // meta-achievement (built in a later step) is its only door, so nothing grants the reins yet
-  // (SMITHS_HEART_RAID_MOUNTS below). Placed before the two referral mounts, which the catalog
+  // meta-achievement is its only door (src/sim/smith_heart_feat_rewards.ts;
+  // SMITHS_HEART_RAID_MOUNTS below). Placed before the two referral mounts, which the catalog
   // pins last.
   quarryheart_charger: {
     key: 'quarryheart_charger',
@@ -184,8 +184,8 @@ export const MOUNT_KEYS = Object.keys(MOUNTS) as readonly MountKey[];
 export const DEVELOPER_MOUNTS: readonly MountKey[] = ['terrorspark_groundshaker', 'referral_tank'];
 
 /** The Smith's Heart raid's reward mount: the one mount its meta-achievement grants. The
- *  achievement step reads this constant to deliver the reins (mountItemId of it); until then it
- *  is RESERVED, like the raid's weapon appearances (content/weapon_skins.ts
+ *  meta's reward (src/sim/smith_heart_feat_rewards.ts) reads this constant to deliver the reins
+ *  (mountItemId of it); otherwise it is RESERVED, like the raid's weapon appearances (content/weapon_skins.ts
  *  RESERVED_WEAPON_SKIN_IDS): in the catalog so the renderer, previews and prewarm carry it, on no
  *  vendor, loot table, rift pool or store. Its reins are soulbound, a raid achievement's reward
  *  belonging to the character who earned it. */

@@ -10977,6 +10977,10 @@ export const hudChromeStrings = {
     hiddenBadge: 'Hidden',
     titleChip: 'Title reward',
     borderChip: 'Border reward',
+    // A deed paying a cosmetic beyond the Book (the Smith's Heart's feats and meta).
+    cosmeticChip: 'Cosmetic reward',
+    rewardAppearance: 'Reward: the {name} weapon appearance, for every character on your account',
+    rewardMount: 'Reward: the {name} mount',
     watch: 'Watch',
     unwatch: 'Unwatch',
     watchFull: 'Watchlist full ({cap} max)',

@@ -439,8 +439,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     buyValue: 0,
   },
   // The Smith's Heart raid's reward mount (content/mounts.ts SMITHS_HEART_META_MOUNT): granted
-  // only by the raid's meta-achievement, which a later step builds, so nothing carries these
-  // reins yet. Soulbound like every achievement reward: it stays with the character who cleared
+  // only by the raid's meta-achievement (src/sim/smith_heart_feat_rewards.ts). Soulbound like every achievement reward: it stays with the character who cleared
   // the raid, never traded, mailed, listed, sold or destroyed.
   reins_quarryheart_charger: {
     id: 'reins_quarryheart_charger',

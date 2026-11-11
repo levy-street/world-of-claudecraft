@@ -7825,6 +7825,9 @@ export const ja_JP: EnTranslations = {
       "hiddenBadge": "隠し",
       "titleChip": "称号報酬",
       "borderChip": "枠飾り報酬",
+      "cosmeticChip": "外見報酬",
+      "rewardAppearance": "報酬：武器の外見「{name}」（アカウントの全キャラクター共通）",
+      "rewardMount": "報酬：マウント「{name}」",
       "watch": "追跡",
       "unwatch": "追跡解除",
       "watchFull": "追跡リストが満杯です（最大 {cap} 件）",
@@ -25424,6 +25427,12 @@ export const ja_JP: EnTranslations = {
       "reins_quarryheart_charger": {
         "name": "石心の突撃馬の手綱"
       },
+      "remnant_of_the_masterless_strength": {
+        "name": "主なき力の残滓"
+      },
+      "coffer_of_the_highwatch_vigil": {
+        "name": "ハイウォッチ不寝番の宝箱"
+      },
       "wyrmfall_core": {
         "name": "竜墜の核"
       },
@@ -27359,6 +27368,11 @@ export const ja_JP: EnTranslations = {
         "title": "ハイウォッチ隊長",
         "greeting": "足を踏ん張れ、{className}。ふいごが息をしたら、私の凪の中へ入り、風を我らで受け止めろ。"
       },
+      "heart_warden_ada_collier": {
+        "name": "番人エイダ・コリアー",
+        "title": "ハイウォッチ不寝番",
+        "greeting": "不寝番は四十世代にわたり、理由も知らずにこの山を見張ってきた。今ならわかる、{className}。中で何を目覚めさせるか、気をつけて。"
+      },
       "brother_aldric_highwatch": {
         "name": "アルドリック修道士",
         "title": "谷の司祭",
@@ -28816,6 +28830,16 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "フォージブレイカーを鍛えて所持する"
+          }
+        }
+      },
+      "q_heart_what_the_heart_let_go": {
+        "title": "心臓が手放したもの",
+        "text": "心臓に宿る力には主も心もない、{playerName}。だが形はある。倒れても死にはしない。その精髄は引きはがれ、岩の中へ逃げ戻る。それでも必ず何かが残る。残ったものを持ってきてくれれば、不寝番が自らの金庫から報いよう。",
+        "completion": "まだ温かい。四つの力がひとつの欠片に宿り、握られるのを嫌がっている。不寝番は約束を守る。この宝箱を持っていきなさい。登ってきた甲斐のあるものが入っていますように。",
+        "objectives": {
+          "0": {
+            "label": "主なき力の残滓"
           }
         }
       },

@@ -75,6 +75,7 @@ import {
   RIFT_LEGENDARY_ITEM_IDS,
   RIFT_RARE_ITEM_IDS,
 } from '../src/sim/content/rift/items';
+import { SMITH_HEART_PLAYABLE } from '../src/sim/content/smith_heart';
 import { VAULT_MATERIAL_POOL } from '../src/sim/content/treasure_maps';
 import {
   RESERVED_WEAPON_SKIN_IDS,
@@ -2290,7 +2291,12 @@ describe('Reliquary growth sweeps (new content must page or opt out)', () => {
     // drops deliberately stay out of the museum. Empty since the Crucible
     // raid pages landed (the PRD obligations closeout); the mechanism stays
     // for the next deliberate opt-out.
-    const EXCLUDED_DUNGEONS: Record<string, string> = {};
+    const EXCLUDED_DUNGEONS: Record<string, string> = {
+      // Dev-gated only: its one drop is the essence quest's personal remnant (a quest item,
+      // no spoils). The opt-out lifts with SMITH_HEART_PLAYABLE, so the raid's real loot
+      // must page here the day it ships.
+      ...(SMITH_HEART_PLAYABLE ? {} : { smith_heart: 'dev-gated raid, quest remnant only' }),
+    };
     const pageByDungeon = new Map<string, string>();
     for (const page of RELIQUARY_PAGES) {
       const src = page.clearSource;

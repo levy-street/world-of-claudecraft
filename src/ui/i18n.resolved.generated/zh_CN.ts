@@ -7825,6 +7825,9 @@ export const zh_CN: EnTranslations = {
       "hiddenBadge": "隐藏",
       "titleChip": "头衔奖励",
       "borderChip": "边框奖励",
+      "cosmeticChip": "外观奖励",
+      "rewardAppearance": "奖励：{name}武器外观，账号内所有角色可用",
+      "rewardMount": "奖励：{name}坐骑",
       "watch": "追踪",
       "unwatch": "取消追踪",
       "watchFull": "追踪列表已满（最多 {cap} 项）",
@@ -25424,6 +25427,12 @@ export const zh_CN: EnTranslations = {
       "reins_quarryheart_charger": {
         "name": "石心战驹的缰绳"
       },
+      "remnant_of_the_masterless_strength": {
+        "name": "无主之力的残余"
+      },
+      "coffer_of_the_highwatch_vigil": {
+        "name": "高望守夜会的宝匣"
+      },
       "wyrmfall_core": {
         "name": "坠龙核心"
       },
@@ -27359,6 +27368,11 @@ export const zh_CN: EnTranslations = {
         "title": "高望队长",
         "greeting": "站稳脚跟，{className}。当风箱呼吸时，进入我的宁静之中，让风撞碎在我们身上。"
       },
+      "heart_warden_ada_collier": {
+        "name": "守望者艾达·科利尔",
+        "title": "高望守夜会",
+        "greeting": "守夜会四十代人守望这座山，却不知为何。如今我们知道了，{className}。当心你在里面唤醒的东西。"
+      },
       "brother_aldric_highwatch": {
         "name": "奥德里克修士",
         "title": "山谷牧师",
@@ -28816,6 +28830,16 @@ export const zh_CN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "锻造并携带碎炉者"
+          }
+        }
+      },
+      "q_heart_what_the_heart_let_go": {
+        "title": "心脏放走之物",
+        "text": "心脏中的力量没有主人，也没有心智，{playerName}，但它有形体。它倒下时不会死去：它的精华会挣脱出来，逃回岩石之中。总有些东西会留下。把它留下的残余带给我，守夜会将从自己的宝库中付你报酬。",
+        "completion": "还是温热的。四股力量凝在一块碎片里，它不愿被握住。守夜会信守承诺：拿走这个宝匣，愿它装着值得这番攀登的东西。",
+        "objectives": {
+          "0": {
+            "label": "无主之力的残余"
           }
         }
       },

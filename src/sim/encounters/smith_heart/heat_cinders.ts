@@ -22,6 +22,7 @@
 
 import { displaceAlong } from '../../knockback';
 import { DT, type Entity } from '../../types';
+import { breakFeat } from './feat_attempt';
 import { type HPoint, SHORE_POINTS } from './heat_geometry';
 import {
   HEAT_AURAS,
@@ -169,6 +170,8 @@ function landCinder(s: HeatScope, x: number, z: number, quarry: number | null): 
 /** The cinder reaches its quarry: they die, those beside them burn, the
  *  cinder is spent. Returns who it struck. */
 function burstCinder(s: HeatScope, cinder: Entity, quarry: Entity): Entity[] {
+  // A cinder that reaches its quarry breaks the encounter's feat (feats.ts).
+  breakFeat(s.st);
   const here = at(s, quarry);
   cueAt(s, HEAT_CUES.cinderBurst, here.x, here.z, T.cinderSplashR);
   const hit: Entity[] = [quarry];

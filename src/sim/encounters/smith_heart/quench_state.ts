@@ -4,6 +4,7 @@
 // fight from the players' auras, the guardian's bars and auras, and the
 // fight's objects (quench_ids.ts says which).
 
+import type { SmithHeartFeatAttempt } from './feat_attempt';
 import type { QuenchDifficulty } from './quench_ids';
 import type { SlainWatch } from './voice_slain';
 
@@ -116,6 +117,8 @@ export interface QuenchFightState {
   basePool?: number;
   /** The guardian has fallen and the end was resolved. */
   finished: boolean;
+  /** This pull's watch on the encounter's feat (feat_attempt.ts), created on first touch. */
+  feat?: SmithHeartFeatAttempt;
   /** Seconds since the pull. */
   clock: number;
   /** The fight's half: two blades awake, the others waking, all four. */

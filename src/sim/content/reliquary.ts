@@ -424,8 +424,9 @@ export const RELIQUARY_HORIZON_WEAPON_SKINS = [
   'meteorlatch_crossbow',
   'lantern_hall_sword',
   // The Smith's Heart arms (seamcaller_maul, squallcrest_sword, rimelight_staff,
-  // hearthbrand_sword, duskwick_staff) are obtainable nowhere until the achievements step wires
-  // the raid's grants, so they get no Reliquary row until then.
+  // hearthbrand_sword, duskwick_staff) are earned only through the raid's encounter feats, and
+  // the raid is dev-gated, so they get no Reliquary row until it ships
+  // (tests/smith_heart_launch_guard.test.ts demands the rows in the change that flips it).
 ] as const;
 
 // The skins NOT sold by the store (WeaponSkinDef.earnedFrom), each naming where it is earned.

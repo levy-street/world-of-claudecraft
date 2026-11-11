@@ -844,7 +844,8 @@ describe('Masterwrought art completion evidence', () => {
     // Restored feral staff and eight Season 2 jewelry paintings add nine owners.
     // Halloween adds 27 item-art owners outside the sealed historical set.
     // + the Smith's Heart's Quarryheart Charger reins (quarryheart-charger-reins-2026-11-11): 2,192.
-    expect(currentOwnerIds).toHaveLength(2192);
+    // + the Smith's Heart essence quest's remnant and coffer (smith-heart-quest-icons-2026-11-11): 2,194.
+    expect(currentOwnerIds).toHaveLength(2194);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -1265,6 +1266,17 @@ describe('Masterwrought art completion evidence', () => {
       'reins_quarryheart_charger',
     ]);
     expect(datedIds).not.toContain('reins_quarryheart_charger');
+    // ...and its essence quest's remnant and coffer, one more additive batch.
+    const smithsHeartQuestIds = new Set(
+      mapping.generatedBatches
+        .filter(({ batchId }) => batchId === 'smith-heart-quest-icons-2026-11-11')
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect([...smithsHeartQuestIds]).toEqual([
+      'remnant_of_the_masterless_strength',
+      'coffer_of_the_highwatch_vigil',
+    ]);
+    for (const id of smithsHeartQuestIds) expect(datedIds).not.toContain(id);
 
     const completionOwnerIds = currentOwnerIds.filter(
       (id) =>
@@ -1286,6 +1298,7 @@ describe('Masterwrought art completion evidence', () => {
         id !== 'reins_wobbles_slime' &&
         // The Smith's Heart's Quarryheart Charger reins, additive the same way.
         id !== 'reins_quarryheart_charger' &&
+        !smithsHeartQuestIds.has(id) &&
         // The World PvP trophy skull, additive the same way.
         id !== 'pvp_trophy_skull' &&
         id !== 'pvp_skull_bag' &&

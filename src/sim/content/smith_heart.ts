@@ -68,6 +68,12 @@ import {
   SMITH_HEART_BOSS_SPOTS,
   type SmithHeartVein,
 } from './smith_heart_layout';
+import {
+  SMITH_HEART_ESSENCE_ITEM,
+  SMITH_HEART_ESSENCE_NPC,
+  SMITH_HEART_ESSENCE_NPC_SPOT,
+  SMITH_HEART_ESSENCE_QUEST,
+} from './smith_heart_rewards';
 
 export const SMITH_HEART_DUNGEON = 'smith_heart';
 
@@ -603,6 +609,9 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   },
   heart_masterless_strength: {
     ...boss('heart_masterless_strength', 'The Masterless Strength', 72000, 0xd8c8a0, 3.6),
+    // Its essence flees at its fall; the remnant it leaves is a personal quest drop for
+    // everyone on the entrance's essence quest (content/smith_heart_rewards.ts).
+    loot: [{ itemId: SMITH_HEART_ESSENCE_ITEM, chance: 1, questId: SMITH_HEART_ESSENCE_QUEST }],
     ccImmune: true,
     slowImmune: true,
     arcCleave: { every: 3, arcDeg: 110, range: 9, mult: 0.7, name: 'Forge Fist' },
@@ -970,6 +979,13 @@ export const SMITH_HEART_DUNGEON_DEFS: Record<string, DungeonDef> = {
         x: THESSALY_POST.x,
         z: THESSALY_POST.z,
         facing: Math.atan2(BREATH.cornice.x - THESSALY_POST.x, BREATH.cornice.z - THESSALY_POST.z),
+      },
+      // Warden Collier at the Cleft (appended: Thessaly's spawn order unchanged), the essence quest's giver and turn-in.
+      {
+        npcId: SMITH_HEART_ESSENCE_NPC,
+        x: SMITH_HEART_ESSENCE_NPC_SPOT.x,
+        z: SMITH_HEART_ESSENCE_NPC_SPOT.z,
+        facing: SMITH_HEART_ESSENCE_NPC_SPOT.facing,
       },
     ],
     gates: SMITH_HEART_GATES,

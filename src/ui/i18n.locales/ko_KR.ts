@@ -346,6 +346,18 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.lantern_seal.name': '등불 인장',
   'entities.items.reins_lantern_hall_destrier.name': '등불 회관 군마의 고삐',
   'entities.items.reins_quarryheart_charger.name': '채석심장 돌격마의 고삐',
+  'entities.items.remnant_of_the_masterless_strength.name': '주인 없는 힘의 잔해',
+  'entities.items.coffer_of_the_highwatch_vigil.name': '하이워치 파수대의 금고',
+  'entities.npcs.heart_warden_ada_collier.name': '파수꾼 에이다 콜리어',
+  'entities.npcs.heart_warden_ada_collier.title': '하이워치 파수대',
+  'entities.npcs.heart_warden_ada_collier.greeting':
+    '파수대는 마흔 세대 동안 이유도 모른 채 이 산을 지켜보았습니다. 이제 우리는 압니다, {className}. 그 안에서 무엇을 깨우는지 조심하세요.',
+  'entities.quests.q_heart_what_the_heart_let_go.title': '심장이 놓아준 것',
+  'entities.quests.q_heart_what_the_heart_let_go.text':
+    '심장 속의 힘에는 주인도 정신도 없습니다, {playerName}. 하지만 형체는 있지요. 쓰러져도 죽지 않습니다. 그 정수는 떨어져 나와 바위 속으로 달아날 겁니다. 그래도 언제나 무언가는 남습니다. 남은 것을 가져오면 파수대가 자신의 금고에서 보상하겠습니다.',
+  'entities.quests.q_heart_what_the_heart_let_go.completion':
+    '아직 따뜻하군요. 네 가지 힘이 하나의 조각에 묶여 있고, 붙잡히길 원하지 않습니다. 파수대는 약속을 지킵니다. 이 금고를 가져가세요. 이 등반에 걸맞은 것이 들어 있기를.',
+  'entities.quests.q_heart_what_the_heart_let_go.objectives.0.label': '주인 없는 힘의 잔해',
   'entities.items.membership_staff.name': '변화의 지팡이',
   'hudChrome.bags.membershipSlot': '멤버십 가방 칸',
   'hudChrome.bags.membershipSlotLocked': '멤버십으로 이 가방 칸을 잠금 해제하세요.',
@@ -2649,10 +2661,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.rimelight_staff.name': '서리빛 지팡이',
   'hudChrome.wocStore.collections.lantern_hall': '등불 회관',
   // The Smith's Heart raid arms (M16 fills).
-  'hudChrome.wocStore.collections.smiths_heart':
-    '대장장이의 심장',
-  'hudChrome.wocStore.skins.seamcaller_maul.name':
-    '광맥을 부르는 자',
+  'hudChrome.wocStore.collections.smiths_heart': '대장장이의 심장',
+  'hudChrome.wocStore.skins.seamcaller_maul.name': '광맥을 부르는 자',
   'hudChrome.wocStore.skins.seamcaller_maul.look':
     '띠무늬 채석장 돌 한 덩어리를 깎아 만든 양손 대형 망치. 타오르는 호박을 두른 금테 타격면, 금빛 관 날개, 양 볼에 새겨져 타오르는 금빛 룬, 머리에서 자라난 호박 광맥 결정, 금으로 감은 현무암 자루.',
   'hudChrome.wocStore.skins.seamcaller_maul.lore':
@@ -2669,8 +2679,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '식어 굳은 용암 껍질로 된 넓은 검. 날은 아직 녹아 있고 양면에는 잔불 같은 균열이 그물처럼 퍼져 있으며, 칼등에는 흑요석 이빨이, 검은 쇠 코등이는 녹은 쇳물이 떨어지는 두 뿔로 휘어 용암의 심장을 감싼다.',
   'hudChrome.wocStore.skins.hearthbrand_sword.lore':
     '열기의 수호자는 심장이라는 이름이 비롯된 바로 그 불이었다. 그것이 꺼질 때 마지막 용암이 대장간 바닥의 검 모양 틈으로 흘러들어 그곳에서 식었다. 겉은 껍질, 속은 불이다. 그 날은 한 번도 타오르기를 멈춘 적이 없다. 불꽃은 외형일 뿐이다.',
-  'hudChrome.wocStore.skins.duskwick_staff.name':
-    '심장융합 지팡이',
+  'hudChrome.wocStore.skins.duskwick_staff.name': '심장융합 지팡이',
   'hudChrome.wocStore.skins.duskwick_staff.look':
     '채석장 돌을 층층이 박은 용광로 청동 지팡이. 꼭대기에는 거대한 금빛 고리가 있고, 네 보석(채석장의 호박, 돌풍, 서리, 불)이 차례로 빛나며 백금빛 핵을 품은 모루의 심장을 둘러싼다.',
   'hudChrome.wocStore.skins.duskwick_staff.lore':
@@ -14369,6 +14378,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.hiddenBadge': '숨김',
   'hudChrome.deeds.titleChip': '칭호 보상',
   'hudChrome.deeds.borderChip': '테두리 보상',
+  'hudChrome.deeds.cosmeticChip': '외형 보상',
+  'hudChrome.deeds.rewardAppearance': '보상: {name} 무기 외형, 계정의 모든 캐릭터 공용',
+  'hudChrome.deeds.rewardMount': '보상: {name} 탈것',
   'hudChrome.deeds.watch': '추적',
   'hudChrome.deeds.unwatch': '추적 해제',
   'hudChrome.deeds.watchFull': '추적 목록이 가득 찼습니다 (최대 {cap}개)',

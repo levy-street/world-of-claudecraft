@@ -2035,6 +2035,10 @@ export const en = {
       reins_lantern_hall_destrier: { name: 'Reins of the Lantern Hall Destrier' },
       // ...and the Smith's Heart raid's reward mount (content/mounts.ts SMITHS_HEART_META_MOUNT).
       reins_quarryheart_charger: { name: 'Reins of the Quarryheart Charger' },
+      // ...and its entrance's essence quest (content/smith_heart_rewards.ts): the final boss's
+      // remnant and the Vigil's reward coffer.
+      remnant_of_the_masterless_strength: { name: 'Remnant of the Masterless Strength' },
+      coffer_of_the_highwatch_vigil: { name: 'Coffer of the Highwatch Vigil' },
       wyrmfall_core: { name: 'Wyrmfall Core' },
       sundered_essence: { name: 'Sundered Essence' },
       makers_ember: { name: "Maker's Ember" },

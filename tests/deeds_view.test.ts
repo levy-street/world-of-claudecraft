@@ -397,6 +397,8 @@ describe('buildDeedsView', () => {
       hiddenBadge: false,
       titleReward: true,
       borderReward: false,
+      rewardSkinId: null,
+      rewardMountKey: null,
       crestId: 'deed_cat_combat',
       missingPoiMarkIds: [],
     });
@@ -415,6 +417,8 @@ describe('buildDeedsView', () => {
       hiddenBadge: false,
       titleReward: false,
       borderReward: false,
+      rewardSkinId: null,
+      rewardMountKey: null,
       crestId: 'deed_cat_combat',
       missingPoiMarkIds: [],
     });

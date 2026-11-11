@@ -28,7 +28,7 @@ export type WeaponSkinCollection =
 /** The Smith's Heart encounter that awards a raid skin: the Hammer Council, the three guardians
  *  of the Breath, the Quench and the Heat, and the Masterless Strength on the Anvil. Each names
  *  the boss templates of content/smith_heart.ts (pinned in tests/smith_heart_raid_arms.test.ts),
- *  for the achievements step that wires the grant. */
+ *  for the encounter feats that grant them (content/smith_heart_rewards.ts). */
 export type SmithsHeartEncounter = 'hammer_council' | 'breath' | 'quench' | 'heat' | 'masterless';
 
 export interface WeaponSkinDef {
@@ -51,9 +51,9 @@ export interface WeaponSkinDef {
   /** Earned in the world instead of sold in the Claudium Armory: the skin has no economy SKU
    *  and stays out of the store (STORE_WEAPON_SKIN_LIST). 'lantern_hall': Lantern Hall's
    *  quartermaster sells it for Lantern Seals (content/guild_contracts.ts). 'smiths_heart':
-   *  earned in the Smith's Heart raid from the encounter `raidEncounter` names. Until the
-   *  achievements step wires that grant, nothing grants it: no store, vendor, drop or Reliquary
-   *  page (RESERVED_WEAPON_SKIN_IDS, isGrantableWeaponSkin). */
+   *  earned in the Smith's Heart raid by the feat of the encounter `raidEncounter` names
+   *  (src/sim/smith_heart_feat_rewards.ts): no store, vendor or drop, and no Reliquary row
+   *  while the raid is dev-gated (RESERVED_WEAPON_SKIN_IDS, isGrantableWeaponSkin). */
   earnedFrom?: 'lantern_hall' | 'smiths_heart';
   /** For a Smith's Heart skin: the encounter whose defeat awards it. */
   raidEncounter?: SmithsHeartEncounter;
@@ -403,9 +403,9 @@ export const WEAPON_SKINS: Record<string, WeaponSkinDef> = {
 
 export const WEAPON_SKIN_LIST: readonly WeaponSkinDef[] = Object.values(WEAPON_SKINS);
 
-/** The Smith's Heart skins: in the catalog (so the renderer, previews and VFX carry them) but
- *  obtainable nowhere until the achievements step wires each encounter's grant. Every
- *  player-facing list leaves them out. */
+/** The Smith's Heart skins: in the catalog (so the renderer, previews and VFX carry them),
+ *  earned ONLY through the raid's encounter feats (src/sim/smith_heart_feat_rewards.ts, the
+ *  server's AccountCosmeticsService.grantDeedRewardSkins). Every store list leaves them out. */
 export const RESERVED_WEAPON_SKIN_IDS: readonly string[] = WEAPON_SKIN_LIST.filter(
   (skin) => skin.earnedFrom === 'smiths_heart',
 ).map((skin) => skin.id);
@@ -419,9 +419,9 @@ export const SMITHS_HEART_WEAPON_SKINS: Readonly<Record<SmithsHeartEncounter, st
   masterless: 'duskwick_staff',
 };
 
-/** A catalog skin that something may grant today: every skin but the raid's, which wait on the
- *  achievements step. The server's grant and store-mirror paths gate on this, so a reserved skin
- *  can never reach an account ledger, whatever an outside catalog says. */
+/** A catalog skin the economy and store paths may grant: every skin but the raid's, whose one
+ *  lane is the deed-earned grant (the encounter feats). The server's economy grant and
+ *  store-mirror paths gate on this, so an outside catalog can never hand one out. */
 export function isGrantableWeaponSkin(skinId: string): boolean {
   return Object.hasOwn(WEAPON_SKINS, skinId) && WEAPON_SKINS[skinId].earnedFrom !== 'smiths_heart';
 }

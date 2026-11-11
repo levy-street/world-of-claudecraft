@@ -358,6 +358,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.lantern_seal.name': '燈火の印章',
   'entities.items.reins_lantern_hall_destrier.name': '燈火の館の軍馬の手綱',
   'entities.items.reins_quarryheart_charger.name': '石心の突撃馬の手綱',
+  'entities.items.remnant_of_the_masterless_strength.name': '主なき力の残滓',
+  'entities.items.coffer_of_the_highwatch_vigil.name': 'ハイウォッチ不寝番の宝箱',
+  'entities.npcs.heart_warden_ada_collier.name': '番人エイダ・コリアー',
+  'entities.npcs.heart_warden_ada_collier.title': 'ハイウォッチ不寝番',
+  'entities.npcs.heart_warden_ada_collier.greeting':
+    '不寝番は四十世代にわたり、理由も知らずにこの山を見張ってきた。今ならわかる、{className}。中で何を目覚めさせるか、気をつけて。',
+  'entities.quests.q_heart_what_the_heart_let_go.title': '心臓が手放したもの',
+  'entities.quests.q_heart_what_the_heart_let_go.text':
+    '心臓に宿る力には主も心もない、{playerName}。だが形はある。倒れても死にはしない。その精髄は引きはがれ、岩の中へ逃げ戻る。それでも必ず何かが残る。残ったものを持ってきてくれれば、不寝番が自らの金庫から報いよう。',
+  'entities.quests.q_heart_what_the_heart_let_go.completion':
+    'まだ温かい。四つの力がひとつの欠片に宿り、握られるのを嫌がっている。不寝番は約束を守る。この宝箱を持っていきなさい。登ってきた甲斐のあるものが入っていますように。',
+  'entities.quests.q_heart_what_the_heart_let_go.objectives.0.label': '主なき力の残滓',
   'entities.items.membership_staff.name': '変化の杖',
   'hudChrome.bags.membershipSlot': 'メンバーシップバッグ枠',
   'hudChrome.bags.membershipSlotLocked': 'メンバーシップでこのバッグ枠を解放。',
@@ -2661,10 +2673,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.rimelight_staff.name': '霧氷灯の杖',
   'hudChrome.wocStore.collections.lantern_hall': '燈火の館',
   // The Smith's Heart raid arms (M16 fills).
-  'hudChrome.wocStore.collections.smiths_heart':
-    '鍛冶師の心臓',
-  'hudChrome.wocStore.skins.seamcaller_maul.name':
-    '鉱脈呼び',
+  'hudChrome.wocStore.collections.smiths_heart': '鍛冶師の心臓',
+  'hudChrome.wocStore.skins.seamcaller_maul.name': '鉱脈呼び',
   'hudChrome.wocStore.skins.seamcaller_maul.look':
     '縞模様の石切り場の岩一塊から削り出した両手持ちの大槌。燃える琥珀を囲む金縁の打撃面、金の冠翼、両頬に刻まれ燃える金のルーン、頭頂から伸びる琥珀の鉱脈結晶、金で締めた玄武岩の柄。',
   'hudChrome.wocStore.skins.seamcaller_maul.lore':
@@ -2681,8 +2691,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '冷え固まった溶岩の殻でできた幅広の刃。刃は今も溶けたまま、両面には残り火の葉脈のようなひびが走り、峰には黒曜石の牙、黒鉄の鍔は溶岩を滴らせる二本の角となって溶岩の心臓を抱く。',
   'hudChrome.wocStore.skins.hearthbrand_sword.lore':
     '熱の守護者こそ、心臓の名の由来となった炎だった。それが燃え尽きたとき、最後の溶岩は炉の床にできた剣の形の割れ目に流れ込み、そこで冷えた。外は殻、内は炎。その刃が燃えるのをやめたことは一度もない。炎は見た目だけのもの。',
-  'hudChrome.wocStore.skins.duskwick_staff.name':
-    'ハートメルドの杖',
+  'hudChrome.wocStore.skins.duskwick_staff.name': 'ハートメルドの杖',
   'hudChrome.wocStore.skins.duskwick_staff.look':
     '石切り場の石を何段も嵌め込んだ炉の青銅の杖。頂には大きな金の光輪があり、四つの宝石（鉱脈の琥珀、疾風、霜、炎）が順に灯り、白金の核を抱く金床の心臓を囲む。',
   'hudChrome.wocStore.skins.duskwick_staff.lore':
@@ -14419,6 +14428,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.hiddenBadge': '隠し',
   'hudChrome.deeds.titleChip': '称号報酬',
   'hudChrome.deeds.borderChip': '枠飾り報酬',
+  'hudChrome.deeds.cosmeticChip': '外見報酬',
+  'hudChrome.deeds.rewardAppearance':
+    '報酬：武器の外見「{name}」（アカウントの全キャラクター共通）',
+  'hudChrome.deeds.rewardMount': '報酬：マウント「{name}」',
   'hudChrome.deeds.watch': '追跡',
   'hudChrome.deeds.unwatch': '追跡解除',
   'hudChrome.deeds.watchFull': '追跡リストが満杯です（最大 {cap} 件）',

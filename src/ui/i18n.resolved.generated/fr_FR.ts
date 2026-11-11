@@ -7825,6 +7825,9 @@ export const fr_FR: EnTranslations = {
       "hiddenBadge": "Secret",
       "titleChip": "Titre à la clé",
       "borderChip": "Récompense de bordure",
+      "cosmeticChip": "Cosmetic reward",
+      "rewardAppearance": "Reward: the {name} weapon appearance, for every character on your account",
+      "rewardMount": "Reward: the {name} mount",
       "watch": "Suivre",
       "unwatch": "Ne plus suivre",
       "watchFull": "Liste de suivi pleine ({cap} max)",
@@ -25424,6 +25427,12 @@ export const fr_FR: EnTranslations = {
       "reins_quarryheart_charger": {
         "name": "Reins of the Quarryheart Charger"
       },
+      "remnant_of_the_masterless_strength": {
+        "name": "Remnant of the Masterless Strength"
+      },
+      "coffer_of_the_highwatch_vigil": {
+        "name": "Coffer of the Highwatch Vigil"
+      },
       "wyrmfall_core": {
         "name": "Cœur de la Chute-du-wyrm"
       },
@@ -27359,6 +27368,11 @@ export const fr_FR: EnTranslations = {
         "title": "Highwatch Captain",
         "greeting": "Keep your feet, {className}. When the bellows breathes, step into my calm and let the wind break on us."
       },
+      "heart_warden_ada_collier": {
+        "name": "Warden Ada Collier",
+        "title": "Vigil of Highwatch",
+        "greeting": "Forty generations of the Vigil watched this mountain without knowing why. Now we know, {className}. Mind what you wake in there."
+      },
       "brother_aldric_highwatch": {
         "name": "Frère Aldric",
         "title": "Prêtre du Val",
@@ -28816,6 +28830,16 @@ export const fr_FR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Brise-forge forgé et porté"
+          }
+        }
+      },
+      "q_heart_what_the_heart_let_go": {
+        "title": "What the Heart Let Go",
+        "text": "The strength in the Heart has no master and no mind, {playerName}, but it has a shape. When it falls, it will not die: its essence will tear loose and flee back into the stone. Something always stays behind. Bring me what remains of it, and the Vigil will pay you from its own coffers.",
+        "completion": "Still warm. The four strengths, bound in one splinter, and it does not want to be held. The Vigil keeps its word: take this coffer, and may it hold something worth the climb.",
+        "objectives": {
+          "0": {
+            "label": "Remnant of the Masterless Strength"
           }
         }
       },

@@ -8804,6 +8804,8 @@ const NPC_KEYS: Record<string, string> = {
   // Captain Thessaly at the head of the Storm Cornice (the Smith's Heart's
   // Guardian of the Breath): the same captain, the same knight.
   heart_captain_thessaly: 'npc_knight',
+  // Warden Ada Collier at the Smith's Heart's Cleft: the same Vigil's knight.
+  heart_warden_ada_collier: 'npc_knight',
   // The two WARFARE quartermasters (one stock, two placements). Both sell the
   // game's most prestigious armor and both fell through to the tinted villager
   // body before this, which read as a townsperson selling epics; the armored

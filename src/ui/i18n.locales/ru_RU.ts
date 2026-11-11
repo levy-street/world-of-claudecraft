@@ -2120,6 +2120,18 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.lantern_seal.name': 'Печать Фонаря',
   'entities.items.reins_lantern_hall_destrier.name': 'Поводья боевого коня Зала Фонаря',
   'entities.items.reins_quarryheart_charger.name': 'Поводья скакуна Каменного Сердца',
+  'entities.items.remnant_of_the_masterless_strength.name': 'Остаток Силы без Хозяина',
+  'entities.items.coffer_of_the_highwatch_vigil.name': 'Ларец Дозора Хайвотча',
+  'entities.npcs.heart_warden_ada_collier.name': 'Стражница Ада Коллиер',
+  'entities.npcs.heart_warden_ada_collier.title': 'Дозор Хайвотча',
+  'entities.npcs.heart_warden_ada_collier.greeting':
+    'Сорок поколений Дозор стерёг эту гору, не зная зачем. Теперь мы знаем, {className}. Осторожнее с тем, что вы там пробудите.',
+  'entities.quests.q_heart_what_the_heart_let_go.title': 'То, что Сердце отпустило',
+  'entities.quests.q_heart_what_the_heart_let_go.text':
+    'У силы в Сердце нет ни хозяина, ни разума, {playerName}, но у неё есть облик. Когда она падёт, она не умрёт: её суть вырвется и сбежит обратно в камень. Но что-то всегда остаётся. Принесите мне то, что от неё останется, и Дозор заплатит вам из собственной казны.',
+  'entities.quests.q_heart_what_the_heart_let_go.completion':
+    'Ещё тёплый. Четыре силы, связанные в одном осколке, и он не хочет, чтобы его держали. Дозор держит слово: возьмите этот ларец, и пусть в нём окажется то, что стоило подъёма.',
+  'entities.quests.q_heart_what_the_heart_let_go.objectives.0.label': 'Остаток Силы без Хозяина',
   'entities.items.membership_staff.name': 'Посох перемен',
   'hudChrome.bags.membershipSlot': 'Ячейка сумки по подписке',
   'hudChrome.bags.membershipSlotLocked': 'Оформите подписку, чтобы открыть эту ячейку сумки.',
@@ -16397,6 +16409,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.hiddenBadge': 'Скрытое',
   'hudChrome.deeds.titleChip': 'Награда: звание',
   'hudChrome.deeds.borderChip': 'Награда: рамка',
+  'hudChrome.deeds.cosmeticChip': 'Косметическая награда',
+  'hudChrome.deeds.rewardAppearance':
+    'Награда: облик оружия «{name}» для всех персонажей учётной записи',
+  'hudChrome.deeds.rewardMount': 'Награда: ездовое животное «{name}»',
   'hudChrome.deeds.watch': 'Следить',
   'hudChrome.deeds.unwatch': 'Не следить',
   'hudChrome.deeds.watchFull': 'Список отслеживания полон (не более {cap})',

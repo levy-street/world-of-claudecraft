@@ -7825,6 +7825,9 @@ export const ko_KR: EnTranslations = {
       "hiddenBadge": "숨김",
       "titleChip": "칭호 보상",
       "borderChip": "테두리 보상",
+      "cosmeticChip": "외형 보상",
+      "rewardAppearance": "보상: {name} 무기 외형, 계정의 모든 캐릭터 공용",
+      "rewardMount": "보상: {name} 탈것",
       "watch": "추적",
       "unwatch": "추적 해제",
       "watchFull": "추적 목록이 가득 찼습니다 (최대 {cap}개)",
@@ -25424,6 +25427,12 @@ export const ko_KR: EnTranslations = {
       "reins_quarryheart_charger": {
         "name": "채석심장 돌격마의 고삐"
       },
+      "remnant_of_the_masterless_strength": {
+        "name": "주인 없는 힘의 잔해"
+      },
+      "coffer_of_the_highwatch_vigil": {
+        "name": "하이워치 파수대의 금고"
+      },
       "wyrmfall_core": {
         "name": "낙룡의 핵"
       },
@@ -27359,6 +27368,11 @@ export const ko_KR: EnTranslations = {
         "title": "하이워치 대장",
         "greeting": "발을 단단히 딛으세요, {className}. 풀무가 숨을 쉬면 제 고요 속으로 들어와 바람이 우리에게 부딪혀 흩어지게 하세요."
       },
+      "heart_warden_ada_collier": {
+        "name": "파수꾼 에이다 콜리어",
+        "title": "하이워치 파수대",
+        "greeting": "파수대는 마흔 세대 동안 이유도 모른 채 이 산을 지켜보았습니다. 이제 우리는 압니다, {className}. 그 안에서 무엇을 깨우는지 조심하세요."
+      },
       "brother_aldric_highwatch": {
         "name": "알드릭 수사",
         "title": "계곡의 사제",
@@ -28816,6 +28830,16 @@ export const ko_KR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "화로파괴자를 제작하여 소지"
+          }
+        }
+      },
+      "q_heart_what_the_heart_let_go": {
+        "title": "심장이 놓아준 것",
+        "text": "심장 속의 힘에는 주인도 정신도 없습니다, {playerName}. 하지만 형체는 있지요. 쓰러져도 죽지 않습니다. 그 정수는 떨어져 나와 바위 속으로 달아날 겁니다. 그래도 언제나 무언가는 남습니다. 남은 것을 가져오면 파수대가 자신의 금고에서 보상하겠습니다.",
+        "completion": "아직 따뜻하군요. 네 가지 힘이 하나의 조각에 묶여 있고, 붙잡히길 원하지 않습니다. 파수대는 약속을 지킵니다. 이 금고를 가져가세요. 이 등반에 걸맞은 것이 들어 있기를.",
+        "objectives": {
+          "0": {
+            "label": "주인 없는 힘의 잔해"
           }
         }
       },

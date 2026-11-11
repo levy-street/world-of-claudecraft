@@ -1970,6 +1970,18 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.lantern_seal.name': '灯火印章',
   'entities.items.reins_lantern_hall_destrier.name': '灯火大厅战马的缰绳',
   'entities.items.reins_quarryheart_charger.name': '石心战驹的缰绳',
+  'entities.items.remnant_of_the_masterless_strength.name': '无主之力的残余',
+  'entities.items.coffer_of_the_highwatch_vigil.name': '高望守夜会的宝匣',
+  'entities.npcs.heart_warden_ada_collier.name': '守望者艾达·科利尔',
+  'entities.npcs.heart_warden_ada_collier.title': '高望守夜会',
+  'entities.npcs.heart_warden_ada_collier.greeting':
+    '守夜会四十代人守望这座山，却不知为何。如今我们知道了，{className}。当心你在里面唤醒的东西。',
+  'entities.quests.q_heart_what_the_heart_let_go.title': '心脏放走之物',
+  'entities.quests.q_heart_what_the_heart_let_go.text':
+    '心脏中的力量没有主人，也没有心智，{playerName}，但它有形体。它倒下时不会死去：它的精华会挣脱出来，逃回岩石之中。总有些东西会留下。把它留下的残余带给我，守夜会将从自己的宝库中付你报酬。',
+  'entities.quests.q_heart_what_the_heart_let_go.completion':
+    '还是温热的。四股力量凝在一块碎片里，它不愿被握住。守夜会信守承诺：拿走这个宝匣，愿它装着值得这番攀登的东西。',
+  'entities.quests.q_heart_what_the_heart_let_go.objectives.0.label': '无主之力的残余',
   'entities.items.membership_staff.name': '万变法杖',
   'hudChrome.bags.membershipSlot': '会员背包栏位',
   'hudChrome.bags.membershipSlotLocked': '开通会员以解锁此背包栏位。',
@@ -4272,10 +4284,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.rimelight_staff.name': '霜光法杖',
   'hudChrome.wocStore.collections.lantern_hall': '灯火大厅',
   // The Smith's Heart raid arms (M16 fills).
-  'hudChrome.wocStore.collections.smiths_heart':
-    '铁匠之心',
-  'hudChrome.wocStore.skins.seamcaller_maul.name':
-    '唤脉者',
+  'hudChrome.wocStore.collections.smiths_heart': '铁匠之心',
+  'hudChrome.wocStore.skins.seamcaller_maul.name': '唤脉者',
   'hudChrome.wocStore.skins.seamcaller_maul.look':
     '以一整块带状采石场岩石凿成的双手巨锤，金边打击面环绕燃烧的琥珀，金色冠翼，两侧刻有燃烧的金色符文，锤冠长出琥珀矿脉晶体，玄武岩锤柄以黄金箍束。',
   'hudChrome.wocStore.skins.seamcaller_maul.lore':
@@ -4292,8 +4302,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '冷却的岩浆外壳铸成的宽刃，刃口仍在熔融，两面布满余烬脉络般的裂纹，剑脊长着黑曜石利齿，黑铁护手向上弯成滴落熔流的双角，环抱一颗岩浆之心。',
   'hudChrome.wocStore.skins.hearthbrand_sword.lore':
     '炽热守护者就是心脏得名的那团火。它熄灭时，最后的熔流流进锻炉地面上一道剑形的裂缝，在那里冷却：外面是硬壳，里面是火。它的刃口从未停止燃烧。火焰只是外观。',
-  'hudChrome.wocStore.skins.duskwick_staff.name':
-    '心熔法杖',
+  'hudChrome.wocStore.skins.duskwick_staff.name': '心熔法杖',
   'hudChrome.wocStore.skins.duskwick_staff.look':
     '锻炉青铜杖身镶嵌着层层采石场岩石，杖顶是一圈巨大的金色光环，四颗宝石轮流亮起（采石琥珀、狂风、寒霜与烈火），环抱一颗白金核心的铁砧之心。',
   'hudChrome.wocStore.skins.duskwick_staff.lore':
@@ -15356,6 +15365,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.hiddenBadge': '隐藏',
   'hudChrome.deeds.titleChip': '头衔奖励',
   'hudChrome.deeds.borderChip': '边框奖励',
+  'hudChrome.deeds.cosmeticChip': '外观奖励',
+  'hudChrome.deeds.rewardAppearance': '奖励：{name}武器外观，账号内所有角色可用',
+  'hudChrome.deeds.rewardMount': '奖励：{name}坐骑',
   'hudChrome.deeds.watch': '追踪',
   'hudChrome.deeds.unwatch': '取消追踪',
   'hudChrome.deeds.watchFull': '追踪列表已满（最多 {cap} 项）',

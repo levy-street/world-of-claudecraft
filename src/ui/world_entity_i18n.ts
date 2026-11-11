@@ -525,6 +525,8 @@ const NPC_IDS = [
   'captain_thessaly',
   // The same captain on the Smith's Heart's Storm Cornice (content/smith_heart.ts).
   'heart_captain_thessaly',
+  // The essence quest's giver at the Smith's Heart's Cleft (content/smith_heart_rewards.ts).
+  'heart_warden_ada_collier',
   'brother_aldric_highwatch',
   'scout_maren_highwatch',
   'quartermaster_bree',
@@ -743,6 +745,7 @@ const QUEST_IDS = [
   'q_ignivar_the_forgefather',
   'q_forgefathers_requiem',
   'q_requiem_at_the_forge',
+  'q_heart_what_the_heart_let_go',
   'q_mogger',
   'q_prof_attune_smith',
   'q_prof_attune_outfitter',
