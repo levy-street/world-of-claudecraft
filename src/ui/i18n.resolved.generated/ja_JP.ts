@@ -13810,7 +13810,8 @@ export const ja_JP: EnTranslations = {
         "bob": "ボブ",
         "crown": "クラウンブレイド",
         "twins": "ツインおさげ",
-        "curls": "カールアップ"
+        "curls": "カールアップ",
+        "mullet": "マレット"
       },
       "beard": {
         "none": "ひげなし",

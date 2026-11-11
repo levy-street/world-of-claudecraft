@@ -13810,7 +13810,8 @@ export const da_DK: EnTranslations = {
         "bob": "Page",
         "crown": "Flettet krone",
         "twins": "To fletninger",
-        "curls": "Krøllet opsætning"
+        "curls": "Krøllet opsætning",
+        "mullet": "Mullet"
       },
       "beard": {
         "none": "Glatbarberet",

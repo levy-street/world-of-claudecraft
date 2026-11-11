@@ -13810,7 +13810,8 @@ export const zh_TW: EnTranslations = {
         "bob": "波波頭",
         "crown": "皇冠辮",
         "twins": "雙辮",
-        "curls": "捲髮盤頭"
+        "curls": "捲髮盤頭",
+        "mullet": "鯔魚頭"
       },
       "beard": {
         "none": "無鬍鬚",

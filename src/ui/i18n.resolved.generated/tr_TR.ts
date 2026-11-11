@@ -13810,7 +13810,8 @@ export const tr_TR: EnTranslations = {
         "bob": "Küt Kesim",
         "crown": "Örgü Taç",
         "twins": "Çift Örgü",
-        "curls": "Kıvırcık Topuz"
+        "curls": "Kıvırcık Topuz",
+        "mullet": "Mullet"
       },
       "beard": {
         "none": "Sinekkaydı",

@@ -13810,7 +13810,8 @@ export const fr_FR: EnTranslations = {
         "bob": "Coupe au carré",
         "crown": "Couronne tressée",
         "twins": "Deux tresses",
-        "curls": "Chignon bouclé"
+        "curls": "Chignon bouclé",
+        "mullet": "Mullet"
       },
       "beard": {
         "none": "Rasé de près",

@@ -13810,7 +13810,8 @@ export const sv_SE: EnTranslations = {
         "bob": "Page",
         "crown": "Flätad krona",
         "twins": "Två flätor",
-        "curls": "Lockig uppsättning"
+        "curls": "Lockig uppsättning",
+        "mullet": "Mullet"
       },
       "beard": {
         "none": "Slätrakad",

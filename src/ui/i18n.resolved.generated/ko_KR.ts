@@ -13810,7 +13810,8 @@ export const ko_KR: EnTranslations = {
         "bob": "단발",
         "crown": "왕관 땋기",
         "twins": "양갈래 땋은 머리",
-        "curls": "곱슬 올림머리"
+        "curls": "곱슬 올림머리",
+        "mullet": "멀릿"
       },
       "beard": {
         "none": "수염 없음",

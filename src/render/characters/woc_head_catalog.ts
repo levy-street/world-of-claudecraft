@@ -182,6 +182,8 @@ export const WOC_HEAD_TYPES: Readonly<Record<WocHeadType, WocHeadTypeDef>> = {
         v('hair', 'ponytail'),
         v('hair', 'braid'),
         v('hair', 'waves'),
+        // the mohawk's top over a long tail, built by scripts/assets/woc_character/build_mullet_hair.mjs
+        v('hair', 'mullet'),
         v('hair', 'bald'),
       ],
       beard: BEARDS,
@@ -228,6 +230,8 @@ export const WOC_HEAD_TYPES: Readonly<Record<WocHeadType, WocHeadTypeDef>> = {
         v('hair', 'undercut'),
         v('hair', 'topknot'),
         v('hair', 'shoulder'),
+        // the mohawk's top over a long tail, built by scripts/assets/woc_character/build_mullet_hair.mjs
+        v('hair', 'mullet'),
         v('hair', 'bald'),
       ],
       beard: BEARDS,

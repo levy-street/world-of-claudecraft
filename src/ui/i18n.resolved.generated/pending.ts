@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "auth.wocHead.hair.mullet"
+  ],
+  "es_ES": [
+    "auth.wocHead.hair.mullet"
+  ],
+  "fr_FR": [
+    "auth.wocHead.hair.mullet"
+  ],
+  "fr_CA": [
+    "auth.wocHead.hair.mullet"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "auth.wocHead.hair.mullet"
+  ],
+  "de_DE": [
+    "auth.wocHead.hair.mullet"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "auth.wocHead.hair.mullet"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "auth.wocHead.hair.mullet"
+  ],
+  "nl_NL": [
+    "auth.wocHead.hair.mullet"
+  ],
+  "pl_PL": [
+    "auth.wocHead.hair.mullet"
+  ],
+  "id_ID": [
+    "auth.wocHead.hair.mullet"
+  ],
+  "tr_TR": [
+    "auth.wocHead.hair.mullet"
+  ],
+  "sv_SE": [
+    "auth.wocHead.hair.mullet"
+  ],
+  "vi_VN": [
+    "auth.wocHead.hair.mullet"
+  ],
+  "da_DK": [
+    "auth.wocHead.hair.mullet"
+  ]
 };

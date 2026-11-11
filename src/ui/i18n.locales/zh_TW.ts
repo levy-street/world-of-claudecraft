@@ -18058,6 +18058,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'auth.wocHead.hair.crown': '皇冠辮',
   'auth.wocHead.hair.twins': '雙辮',
   'auth.wocHead.hair.curls': '捲髮盤頭',
+  'auth.wocHead.hair.mullet': '鯔魚頭',
   'auth.wocHead.beard.none': '無鬍鬚',
   'auth.wocHead.beard.moustache': '上唇鬍',
   'auth.wocHead.beard.handlebar': '翹八字鬍',

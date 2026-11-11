@@ -13810,7 +13810,8 @@ export const cs_CZ: EnTranslations = {
         "bob": "Mikádo",
         "crown": "Koruna z copů",
         "twins": "Dva copy",
-        "curls": "Vyčesané kudrny"
+        "curls": "Vyčesané kudrny",
+        "mullet": "Mullet"
       },
       "beard": {
         "none": "Hladce oholený",

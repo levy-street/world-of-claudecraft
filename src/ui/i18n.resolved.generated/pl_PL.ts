@@ -13810,7 +13810,8 @@ export const pl_PL: EnTranslations = {
         "bob": "Krótki bob",
         "crown": "Korona z warkocza",
         "twins": "Dwa warkocze",
-        "curls": "Upięte loki"
+        "curls": "Upięte loki",
+        "mullet": "Mullet"
       },
       "beard": {
         "none": "Gładko ogolony",

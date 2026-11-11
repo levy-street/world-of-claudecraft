@@ -13810,7 +13810,8 @@ export const ru_RU: EnTranslations = {
         "bob": "Каре",
         "crown": "Коса-корона",
         "twins": "Две косы",
-        "curls": "Собранные кудри"
+        "curls": "Собранные кудри",
+        "mullet": "Маллет"
       },
       "beard": {
         "none": "Без бороды",

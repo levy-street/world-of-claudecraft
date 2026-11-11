@@ -531,6 +531,7 @@ If you are unsure whether you may use an asset, or you want permission for
 something this file marks as restricted, ask first: tony@levystreet.com.
 | Ley Beam Alignment celestial frame and crystal heart (`public/ui/minigames/ley-*-v1.webp`) | World of ClaudeCraft | Project art generated with OpenAI built-in image generation, optimized to WebP; [provenance and prompts](docs/screenshots/ley-beam-v1/art-provenance.md) | Project asset | With the project only |
 | Generated prop model (spore_burster) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D image-to-model from a project concept; cap spots baked into the texture locally) | Project asset | With the project only |
+| Generated hairstyle sculpt (the tail of the mullet, `public/models/chars/players/woc/head_type_a_hair_mullet.glb` and `head_type_b_hair_mullet.glb`) | World of ClaudeCraft | Project-generated: Tripo AI text-to-model sculpt (generation task 3d4ed81d-1d2d-48ae-9c41-b14a19ded9cc, source in `scripts/assets/woc_character/mullet_src/`); mannequin removed, back cut out and laid on the neck, joined to the project's own mohawk strands and texture by scripts/assets/woc_character/build_mullet_hair.mjs | Project asset | With the project only |
 
 ### Orbital Lightning
 

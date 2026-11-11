@@ -270,6 +270,8 @@ export const WOC_HEAD_TINT_TABLE: Readonly<
   a: {
     hair_long: { role: 'hair', ref: lum(0.0406) },
     hair_mohawk: { role: 'hair', ref: lum(0.0297) },
+    // the mullet samples the mohawk's texture (build_mullet_hair.mjs), so the mohawk's reference
+    hair_mullet: { role: 'hair', ref: lum(0.0297) },
     hair_quiff: { role: 'hair', ref: lum(0.1095) },
     hair_quiff_scalp: { role: 'hair', ref: lum(0.0796) },
     hair_shoulder: { role: 'hair', ref: lum(0.0972) },
@@ -311,6 +313,8 @@ export const WOC_HEAD_TINT_TABLE: Readonly<
     hair_crown_scalp: { role: 'hair', ref: lum(0.1145) },
     hair_curls: { role: 'hair', ref: lum(0.121) },
     hair_curls_scalp: { role: 'hair', ref: lum(0.0929) },
+    // the mohawk's texture, carried over with its strands: Type A's mohawk reference
+    hair_mullet: { role: 'hair', ref: lum(0.0297) },
     hair_ponytail: { role: 'hair', ref: lum(0.0493) },
     hair_twins: { role: 'hair', ref: lum(0.1517) },
     hair_twins_scalp: { role: 'hair', ref: lum(0.1113) },
