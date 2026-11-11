@@ -40,7 +40,6 @@ import {
   GROUND_PROPS,
   NPCS,
   PORTALS,
-  PROPS,
   ZONES,
 } from './data';
 import { GALE_HARBOR_DECKS } from './gale_harbor';

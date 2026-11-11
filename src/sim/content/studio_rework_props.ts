@@ -192,7 +192,7 @@ export const STUDIO_REWORK_PROP_EDITS: readonly StudioPropEdit[] = [
   { table: 'fences', at: { x: 475, z: 309 }, remove: true },
   { table: 'graveyards', at: { x: 15, z: 645 }, remove: true },
   { table: 'graveyards', at: { x: 309, z: 793 }, remove: true },
-  { table: 'graveyards', at: { x: 392, z: 1408 }, to: { x: 386, z: 1420, turn: 0.1239 } },
+  { table: 'graveyards', at: { x: 392, z: 1408 }, to: { x: 386, z: 1420, turn: 0 } },
   { table: 'mudHuts', at: { x: -316, z: 826 }, remove: true },
   { table: 'mudHuts', at: { x: -289.5, z: 816.5 }, remove: true },
   { table: 'mudHuts', at: { x: -273, z: 1062 }, remove: true },

@@ -83,13 +83,36 @@ describe('Studio town rework prop edits', () => {
       // gone (or moved) in the world, still where it shipped for the terrain
       expect(countAt(world), label).toBe(countAt(shipped) - 1);
       expect(countAt(ground), label).toBe(countAt(shipped));
-      // decor rows pad from their own anchor (absent terrainCalm), so the pad is there
-      if (edit.table !== 'decorProps') {
-        expect(
-          pads.some((pad) => near(pad, edit.at)),
-          label,
-        ).toBe(true);
-      }
+      expect(
+        pads.some((pad) => near(pad, edit.at)),
+        label,
+      ).toBe(true);
+    }
+  });
+
+  it('every other edit reshapes the ground: its shipped record leaves the terrain too', () => {
+    for (const edit of editsReshapingGround()) {
+      const label = `${edit.table} ${edit.at.x},${edit.at.z}`;
+      const countAt = (records: readonly unknown[]) =>
+        anchorsOf(records).filter((a) => near(a, edit.at)).length;
+      expect(countAt(GROUND_PROPS[edit.table] as unknown[]), label).toBe(
+        countAt(SHIPPED_PROPS[edit.table] as unknown[]) - 1,
+      );
+    }
+  });
+
+  it('a turn only lands on a record that can turn (a fence run or a record with rot)', () => {
+    for (const edit of STUDIO_REWORK_PROP_EDITS) {
+      if (!edit.to || edit.to.turn === 0) continue;
+      const record = (SHIPPED_PROPS[edit.table] as unknown[]).find((r) => {
+        const a = propRecordAnchor(r);
+        return a !== null && near(a, edit.at);
+      }) as Record<string, unknown> | undefined;
+      const turns =
+        !!record &&
+        !Array.isArray(record) &&
+        (typeof record.x1 === 'number' || typeof record.rot === 'number');
+      expect(turns, `${edit.table} ${edit.at.x},${edit.at.z}`).toBe(true);
     }
   });
 });
