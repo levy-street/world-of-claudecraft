@@ -406,6 +406,13 @@ function entranceOf(m) {
  *  fight's clock starts only once every body is handed back. */
 async function waitEntrance(world, bots, byKey, boss) {
   const opener = byKey[boss.opener ?? 'mt'] ?? bots[0];
+  // REPLAY_INTRO=1: put the boss back to sleep first (the dev replay), to
+  // prove the raid wakes it and waits its scene out.
+  if (process.env.REPLAY_INTRO && boss.key !== 'final') {
+    world.leader.chat(`/dev heart ${boss.key} intro`);
+    await world.leader.chatFlushed();
+    await sleep(1500);
+  }
   const t0 = Date.now();
   let logged = null;
   let woke = false;
@@ -1390,7 +1397,30 @@ function kickCoordinator(world, st, bots, boss) {
               : k.sent
                 ? 'missed (failed)'
                 : 'missed (late)';
-    } else k.lastRem = mob?.castRem ?? 0;
+    } else {
+      k.lastRem = mob?.castRem ?? 0;
+      // A bar the raid cannot let through (the boss module's `backupKick`:
+      // the council's Wake the Stone once Stone Thrum rings) gets a second
+      // interrupter when the first fumbled or none was free, as a raid
+      // assigns a backup kick.
+      // (A kick sent and refused: the bar still runs half a second on.)
+      const refused = k.sent && !k.fumble && now - (k.sentAt ?? now) > 500;
+      const stuck = (k.sent && k.fumble) || refused || !k.kicker;
+      if (stuck && !k.backup && boss.backupKick?.(k.castId) && k.lastRem > 0.7) {
+        const b = pickKicker(world, st, bots, mob, k.kicker);
+        if (b) {
+          log(`  backup kick on ${k.castId}: ${b.name} (after ${k.kicker?.name ?? 'nobody'})`);
+          Object.assign(k, {
+            backup: true,
+            kicker: b,
+            ability: KICKS[b.cls].id,
+            fumble: rand() < KICK_MISS,
+            sent: false,
+            reactAt: now + 250 + rand() * 300,
+          });
+        }
+      }
+    }
     if (k.done) {
       st.kicks.push({
         t: fightSec(),
@@ -1414,21 +1444,7 @@ function kickCoordinator(world, st, bots, boss) {
   );
   if (!bar) return;
   const s = bar.mob;
-  let kicker = null;
-  for (let i = 0; i < KICK_ORDER.length; i++) {
-    const key = KICK_ORDER[(st.kickPtr + i) % KICK_ORDER.length];
-    const b = bots.find((x) => x.spec.key === key);
-    if (!b || !b.self || b.self.dead) continue;
-    const kk = KICKS[b.cls];
-    if (!kk || !cdReady(b, kk.id) || (b.self.res ?? 0) < kk.cost) continue;
-    if (hypot(b.self, s) > kk.range + (s.reach ?? 0)) continue;
-    if (kk.range > 5 && world.blocks(b.self, s)) continue;
-    if (b.self.cast && (b.self.castRem ?? 0) > (s.castRem ?? 0) - 0.6) continue;
-    if (b.duty !== 'role' && b.moving) continue;
-    kicker = b;
-    st.kickPtr = (st.kickPtr + i + 1) % KICK_ORDER.length;
-    break;
-  }
+  const kicker = pickKicker(world, st, bots, s);
   st.kick = {
     mobId: s.id,
     castId: s.cast,
@@ -1442,10 +1458,29 @@ function kickCoordinator(world, st, bots, boss) {
   };
 }
 
+/** The next interrupter in rotation that can reach `s` now (or null). */
+function pickKicker(world, st, bots, s, exclude = null) {
+  for (let i = 0; i < KICK_ORDER.length; i++) {
+    const key = KICK_ORDER[(st.kickPtr + i) % KICK_ORDER.length];
+    const b = bots.find((x) => x.spec.key === key);
+    if (!b || b === exclude || !b.self || b.self.dead) continue;
+    const kk = KICKS[b.cls];
+    if (!kk || !cdReady(b, kk.id) || (b.self.res ?? 0) < kk.cost) continue;
+    if (hypot(b.self, s) > kk.range + (s.reach ?? 0)) continue;
+    if (kk.range > 5 && world.blocks(b.self, s)) continue;
+    if (b.self.cast && (b.self.castRem ?? 0) > (s.castRem ?? 0) - 0.6) continue;
+    if (b.duty !== 'role' && b.moving) continue;
+    st.kickPtr = (st.kickPtr + i + 1) % KICK_ORDER.length;
+    return b;
+  }
+  return null;
+}
+
 function doKick(world, st, b) {
   const k = st.kick;
   const s = world.obs.ents.get(k.mobId);
   k.sent = true;
+  k.sentAt = Date.now();
   if (k.fumble || !alive(s) || !s.cast) return;
   if (b.self.target !== s.id) b.cmd({ cmd: 'target', id: s.id });
   b.stop(b.faceTo(s));

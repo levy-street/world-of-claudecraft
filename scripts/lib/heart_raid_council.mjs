@@ -284,6 +284,11 @@ export const council = {
   tankAssign(world, st, b) {
     tankPlan(world, st, b);
   },
+  // A Wake chosen for the kick must not get through (every pillar it raises
+  // rings Stone Thrum on the raid): a fumbled kick gets a backup.
+  backupKick(castId) {
+    return castId === CAST.wake;
+  },
   kickables(world) {
     const s = world.mobs.singer;
     if (!alive(s)) return [];
@@ -791,7 +796,13 @@ function planCover(world, st, casts, key, pre = false) {
   const used = new Map();
   // A Wake the Stone carrier walks his pillar to its spot first (it rises
   // under him as his mark runs out); the plan takes him once it stands.
-  const carrying = (p) => hasAura(p, AURA.wake) && st.wakePlan.get(p.pid)?.spot;
+  // On Heroic and Mythic the Wrath kills: a carrier whose pillar would rise
+  // too late to step behind (a Wake marked as the bar begins) hides behind
+  // the standing cover with his mark instead (his pillar rises there).
+  const carrying = (p) =>
+    hasAura(p, AURA.wake) &&
+    st.wakePlan.get(p.pid)?.spot &&
+    !(WRATH_LETHAL && rem(p, AURA.wake) > remS - 1.5);
   const people = world.living().filter((p) => p.bot && !carrying(p));
   const forbidden = new Set();
   // A replan in the same bar (a pillar rose or fell under it): whoever
