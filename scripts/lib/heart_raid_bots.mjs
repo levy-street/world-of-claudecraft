@@ -1349,6 +1349,8 @@ function healerAct(world, st, b, me, stillFor) {
     mana: (b.self.res ?? 0) / Math.max(1, b.self.mres ?? 1),
     moving: !!b.moving,
     incoming: (pid) => (st.incoming.get(pid) ?? 0) > now,
+    // A raid-wide hit on its way (the boss module's `topUp`): top everyone up.
+    topUp: !!world.boss.topUp?.(world),
     since: (id) => (now - (b.lastSent[id] ?? 0)) / 1000,
     ready: (id, opts) => readyCheck(b, stillFor, id, opts),
   };

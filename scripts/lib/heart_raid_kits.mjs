@@ -323,7 +323,8 @@ export const ROTATIONS = {
       ['ruinous_brand', !!pact && pact.rem >= 6],
       ['shadowburn', c.ruin >= 2 && c.tPct < 0.25],
       ['chaos_bolt', c.ruin >= 3],
-      ['life_tap', c.manaPct < 0.3 && c.hpPct > 0.5],
+      // Life Tap spends health: only from a healthy pool (a raid-wide hit can come).
+      ['life_tap', c.manaPct < 0.3 && c.hpPct > 0.85],
       ['shadow_bolt', true],
     ]);
   },
@@ -405,6 +406,14 @@ export const HEALERS = {
         return { id: 'renew', target: crust.pid };
     }
     if (hurtBad >= 4 && h.ready('choir_of_deliverance')) return { id: 'choir_of_deliverance' };
+    // A raid-wide hit is coming: the group heal at two short, then the big
+    // heal on anyone not full.
+    if (h.topUp) {
+      const short = h.members.filter((p) => p.frac < 0.95).length;
+      if (short >= 2 && h.ready('prayer_of_healing')) return { id: 'prayer_of_healing' };
+      if (low.frac < 0.95 && h.ready('heal')) return { id: 'heal', target: low.pid };
+      if (low.frac < 0.95 && h.ready('flash_heal')) return { id: 'flash_heal', target: low.pid };
+    }
     if (
       low.frac < 0.35 &&
       low.tank &&
@@ -468,6 +477,12 @@ export const HEALERS = {
       if (h.ready('healing_wave')) return { id: 'healing_wave', target: crust.pid };
     }
     if (low.frac < 0.45 && h.ready('tidecall')) return { id: 'tidecall', target: low.pid };
+    // A raid-wide hit is coming: Cascading Mend over the hurt, then top-ups.
+    if (h.topUp && low.frac < 0.97) {
+      const short = h.members.filter((p) => p.frac < 0.95).length;
+      if (short >= 2 && h.ready('chain_heal')) return { id: 'chain_heal', target: low.pid };
+      if (h.ready('healing_wave')) return { id: 'healing_wave', target: low.pid };
+    }
     const cluster = list.find((p) => p.frac < 0.8 && p.near >= 2);
     if (hurt.length >= 3 && cluster && h.ready('chain_heal'))
       return { id: 'chain_heal', target: cluster.pid };

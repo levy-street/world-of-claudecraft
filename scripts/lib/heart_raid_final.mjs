@@ -201,6 +201,12 @@ export const final = {
   backupKick(castId) {
     return castId === FINAL_PHASE_CASTS.toll;
   },
+  // The healers top the raid up through Weight of the Anvil's bar: a share
+  // lands on everyone under it at once.
+  topUp(world) {
+    const b = world.mobs.boss;
+    return (!!b && b.cast === FINAL_CASTS.anvil) || (world.o?.anvils.length ?? 0) > 0;
+  },
   kickables(world) {
     return world.splinters
       .filter((m) => m.cast === FINAL_PHASE_CASTS.toll)
@@ -334,8 +340,9 @@ function dragSpot(world, st) {
   const shaken = world.living().some((p) => hasAura(p, FINAL_AURAS.shaken));
   // Heroic's Hammer: the Anvil's soakers stay Crushed 30 s and the next
   // Anvil falls 25 s later, so the boss leaves the Hammer once one has fallen.
-  const hammerDone =
-    z === 'hammer' && HEROIC_PLUS && (st.anvilFellAt ?? 0) > (st.zoneAt ?? Date.now());
+  // Normal too: every Anvil is a raid-wide soak and a Tremor Crack round,
+  // so one per Hammer visit is the clean rotation.
+  const hammerDone = z === 'hammer' && (st.anvilFellAt ?? 0) > (st.zoneAt ?? Date.now());
   if (
     IGNORE !== 'drag' &&
     z !== 'ring' &&
