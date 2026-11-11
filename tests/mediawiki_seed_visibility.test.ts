@@ -181,6 +181,29 @@ describe('encyclopedia organization', () => {
   });
 });
 
+describe('headline numbers', () => {
+  it('gives every ability, talent, specialization and enemy page a stat strip', () => {
+    const pages = xml.split('<page>').slice(1);
+    const has = (p: string) => p.includes('== At a glance ==') || p.includes('== Ability stats ==');
+    for (const category of ['Talent choices', 'Specializations', 'Mobs']) {
+      const group = pages.filter((p) => p.includes('[[Category:' + category + ']]'));
+      expect(group.length, category).toBeGreaterThan(20);
+      expect(group.filter((p) => !has(p)).length, category).toBe(0);
+    }
+    const abilities = pages.filter((p) => p.includes('[[Category:Abilities]]'));
+    // The one exception is the item-used bomb, which has its own layout.
+    expect(abilities.filter((p) => !has(p)).length).toBe(1);
+    // No ability page is left with a bare formula where a percent label belongs.
+    expect(abilities.filter((p) => p.includes('&lt;woc-math&gt;')).length).toBe(0);
+  });
+  it('lists a creature with several levels in level order', () => {
+    const boar = xml.split('<page>').find((p) => p.includes('<title>Wild Boar (Mob)</title>'))!;
+    const glance = boar.split('== At a glance ==')[1].split('== Facts ==')[0];
+    expect(glance).toMatch(/! Level\n\| \d+ \/ \d+/);
+    expect(glance).toMatch(/! Health\n\| \d+ \/ \d+/);
+  });
+});
+
 describe('the encyclopedia hover catalog', () => {
   it('maps every item and visible ability to its reserved article title', () => {
     const expected = xml

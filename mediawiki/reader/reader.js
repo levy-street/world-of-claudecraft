@@ -63,8 +63,9 @@ function inline(s) {
   const icon = s.match(/^<woc-art path="(\/ui\/[A-Za-z0-9_/-]+\.webp)" size="icon" \/>\s*/);
   if (icon) s = s.slice(icon[0].length);
   s = s
-    .replace(/<woc-math(?: label="([^"]*)")?>([\s\S]*?)<\/woc-math>/g, (_, label, expr) =>
-      keep(label ? renderScale(label, expr) : renderMath(expr)),
+    .replace(
+      /<woc-math(?: label="([^"]*)")?(?: note="([^"]*)")?>([\s\S]*?)<\/woc-math>/g,
+      (_, label, note, expr) => keep(label ? renderScale(label, expr, note) : renderMath(expr)),
     )
     .replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (_, title, label) =>
       keep(link(title, label || title)),

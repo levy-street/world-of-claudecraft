@@ -56,7 +56,7 @@ export function specializationExamples(base: ResolvedAbility): [string, string][
     const baseText = abilityDisplayDescription(ab, abilityEffectText(ab, zero), zero);
     const powered = abilityDisplayDescription(ab, abilityEffectText(ab, sample), sample);
     const lines = [
-      `${ab.def.name}. Cost ${ab.cost}. ${ab.def.channel ? ab.def.channel.duration + ' sec channel' : ab.castTime ? ab.castTime + ' sec cast' : 'Instant'}. ${ab.cooldown} sec cooldown.`,
+      `'''Cost''' ${ab.cost} · '''Cast''' ${ab.def.channel ? ab.def.channel.duration + ' sec channel' : ab.castTime ? ab.castTime + ' sec cast' : 'instant'} · '''Cooldown''' ${ab.cooldown ? ab.cooldown + ' sec cooldown' : 'none'}.`,
     ];
     if (ab.charges && ab.charges > 1) lines.push(`Holds ${ab.charges} charges.`);
     for (const e of ab.effects) {
@@ -66,10 +66,7 @@ export function specializationExamples(base: ResolvedAbility): [string, string][
         );
     }
     lines.push(baseText);
-    if (baseText !== powered)
-      lines.push(
-        'With 100 Spell Power, Attack Power, Healing Power and Ranged Attack Power: ' + powered,
-      );
+    if (baseText !== powered) lines.push("'''With 100 of each power:''' " + powered);
     return lines.join(' ');
   }
   const neutral = text(base);

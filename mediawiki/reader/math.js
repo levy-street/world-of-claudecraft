@@ -60,12 +60,13 @@ export function renderMath(expr) {
 
 // A power bonus: the short label "(+ 85.7% Healing Power)" on the page, with the full
 // working shown when the reader points at it, focuses it or taps it.
-export function renderScale(label, expr) {
+export function renderScale(label, expr, note = '') {
   return (
     '<span class="woc-scale" tabindex="0">(' +
     escapeHtml(label) +
     ')<span class="woc-scale-tip" role="tooltip">' +
     renderMath(expr) +
-    '<small>Rounded to the nearest whole number.</small></span></span>'
+    (note ? '<small>' + escapeHtml(note) + '</small>' : '') +
+    '</span></span>'
   );
 }

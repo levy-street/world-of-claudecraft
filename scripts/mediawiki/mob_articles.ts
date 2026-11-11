@@ -23,6 +23,7 @@ import { resolveScarecrowField } from '../../src/sim/seasonal/scarecrow_field';
 import type { LootEntry } from '../../src/sim/types';
 import { WORLD_BOSS_CORPSE_SECONDS, WORLD_BOSSES } from '../../src/sim/world_boss';
 import { WORLD_SEED } from '../../src/sim/world_seed';
+import { rankValues } from './ability_ranks';
 import { companionBossSources, companionByCreature, companionRollText } from './companion_sources';
 import { creatureRole, FRIENDLY_GROUPS } from './creature_role';
 import { journalArticles } from './encounter_articles';
@@ -189,6 +190,7 @@ export function addMobArticles(w: ArticleTools, itemSources: Map<string, Set<str
     if (m.seasonalEvent) facts.push(['Event', words(m.seasonalEvent)]);
     if (m.xpMult !== undefined) facts.push(['Experience multiplier', String(m.xpMult)]);
     const stats: [string, string][] = [];
+    const byLevel: { level: number; hp: number; armor: number; damage: string }[] = [];
     const campMob = getActiveWorldContent().camps.some((c) => c.mobId === m.id);
     for (let lvl = m.minLevel; lvl <= m.maxLevel; lvl++) {
       const pos = { x: 0, y: 0, z: 0 };
@@ -221,6 +223,12 @@ export function addMobArticles(w: ArticleTools, itemSources: Map<string, Set<str
         if (field)
           append(locations, m.id, 'Gourdlight field at (' + field.x + ', ' + field.z + ').');
       }
+      byLevel.push({
+        level: lvl,
+        hp: entity.maxHp,
+        armor: entity.stats.armor,
+        damage: entity.weapon.min + ' to ' + entity.weapon.max,
+      });
       stats.push([
         'Level ' + lvl,
         entity.maxHp +
@@ -279,12 +287,50 @@ export function addMobArticles(w: ArticleTools, itemSources: Map<string, Set<str
           companionRollText(row.fullGroupChance),
       );
     }
+    // Headline numbers. A few levels are listed in order with slashes; a long level
+    // range shows its lowest and highest level instead.
+    const shown = byLevel.length > 5 ? [byLevel[0], byLevel[byLevel.length - 1]] : byLevel;
+    const across = (value: (row: (typeof byLevel)[number]) => string | number) =>
+      rankValues(shown.map(value));
+    const rank = m.worldBoss
+      ? 'World boss'
+      : m.boss
+        ? 'Boss'
+        : m.rare
+          ? 'Rare'
+          : m.elite
+            ? 'Elite'
+            : '';
+    const glance: [string, string][] = byLevel.length
+      ? [
+          [
+            'Level',
+            byLevel.length > 5
+              ? byLevel[0].level + ' to ' + byLevel[byLevel.length - 1].level
+              : across((r) => r.level),
+          ],
+          ['Health', across((r) => r.hp)],
+          ['Armor', across((r) => r.armor)],
+          ['Weapon damage', across((r) => r.damage)],
+          ['Swing', m.attackSpeed + ' sec'],
+          ...(rank ? [['Rank', rank] as [string, string]] : []),
+        ]
+      : [];
+    const glanceNote =
+      byLevel.length > 5
+        ? 'The numbers above are for its lowest and highest level.'
+        : byLevel.length > 1
+          ? 'Numbers separated by slashes go with the levels in the same order.'
+          : '';
     const info =
       w.section('Overview', m.name + ' belongs to the ' + words(m.family) + ' family.') +
+      (glance.length ? w.section('At a glance', w.table(glance)) : '') +
       w.section('Facts', w.table(facts)) +
       w.section(
         'Base stats by level',
-        'For creatures in the outside world, these numbers already include level scaling. For creatures in dungeons, these numbers come before room and difficulty changes. Weapon damage is shown before armor and other damage reduction lower it.\n\n' +
+        'For creatures in the outside world, these numbers already include level scaling. For creatures in dungeons, these numbers come before room and difficulty changes. Weapon damage is shown before armor and other damage reduction lower it.' +
+          (glanceNote ? ' ' + glanceNote : '') +
+          '\n\n' +
           w.table(stats),
       ) +
       lines(w, 'Locations', Array.from(locations.get(m.id) ?? [])) +

@@ -18,7 +18,7 @@ function description(res: ResolvedAbility): string {
   if (res.def.id === 'bear_trap') return mediawikiAbilityDescription(res.def);
   return abilityDisplayDescription(res, abilityEffectText(res));
 }
-function resource(def: AbilityDef): string {
+export function abilityResource(def: AbilityDef): string {
   const entry = def.class === 'druid' ? druidFormEntryTarget(def.id) : null;
   if (entry) return entry === 'bear' ? 'Rage' : 'Energy';
   const forms = requiredForms(def);
@@ -147,9 +147,9 @@ export function abilityArticle(
     stats.push([
       'Cost',
       def.spendsAllResource
-        ? `Uses all your ${resource(def)}${def.spendResourceCap ? ', up to ' + def.spendResourceCap : ''}. You need at least ${costs}.`
+        ? `Uses all your ${abilityResource(def)}${def.spendResourceCap ? ', up to ' + def.spendResourceCap : ''}. You need at least ${costs}.`
         : rankSections.some((res) => res.cost)
-          ? costs + ' ' + resource(def)
+          ? costs + ' ' + abilityResource(def)
           : 'Free',
     ]);
   }

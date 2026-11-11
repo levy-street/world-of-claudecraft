@@ -133,6 +133,7 @@ $wgHooks['ParserFirstCallInit'][] = static function ( $parser ) use ( $wgScriptP
         }
         return '<span class="woc-scale" tabindex="0">(' . htmlspecialchars( $label, ENT_QUOTES )
             . ')<span class="woc-scale-tip" role="tooltip">' . $formula
-            . '<small>Rounded to the nearest whole number.</small></span></span>';
+            . ( ( $args['note'] ?? '' ) !== '' ? '<small>' . htmlspecialchars( $args['note'], ENT_QUOTES ) . '</small>' : '' )
+            . '</span></span>';
     } );
 };

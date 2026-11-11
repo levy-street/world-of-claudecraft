@@ -3,6 +3,7 @@ import { ABILITIES, CLASSES, QUESTS } from '../../src/sim/data';
 import type { AbilityDef, PlayerClass } from '../../src/sim/types';
 import { abilityIndexGroup, MEMBERSHIP_GROUP } from './ability_access';
 import { wikiAbilityArtPath } from './ability_art_path';
+import { abilityResource } from './ability_article';
 import type { AbilityPageTools } from './talent_articles';
 
 const sectionOrder = [
@@ -49,6 +50,22 @@ export function classAbilityGroup(def: AbilityDef): ClassAbilityGroup {
 }
 type Entry = { name: string; level: number; line: string; specIds: string[] };
 
+// Cost and cast time at rank 1, so a spellbook can be compared without opening each page.
+function glance(def: AbilityDef): string {
+  if (def.passive) return ' · Passive';
+  const cost = def.spendsAllResource
+    ? 'all your ' + abilityResource(def)
+    : def.cost
+      ? def.cost + ' ' + abilityResource(def)
+      : 'free';
+  const cast = def.channel
+    ? def.channel.duration + ' sec channel'
+    : def.castTime > 0
+      ? def.castTime + ' sec cast'
+      : 'instant';
+  return ' · ' + cost + ' · ' + cast + (def.cooldown ? ' · ' + def.cooldown + ' sec cooldown' : '');
+}
+
 export function classAbilitySections(
   cls: PlayerClass,
   { section, bullets, link, titleBy }: AbilityPageTools,
@@ -84,7 +101,8 @@ export function classAbilitySections(
       path +
       '" size="icon" /> ' +
       link(title, def.name) +
-      (detail ? ' · ' + detail : '');
+      (detail ? ' · ' + detail : '') +
+      glance(def);
     const entries = groups.get(group) ?? [];
     entries.push({
       name: def.name,

@@ -83,20 +83,29 @@ export function addTalentPages({
       add(
         specs.get(id + '/' + spec.id)!,
         section(
-          'Overview',
-          spec.description +
-            ' ' +
-            classLink +
-            ' characters can choose this specialization from level ' +
-            SPEC_UNLOCK_LEVEL +
-            '. Its job in a group is ' +
-            (spec.role === 'dps'
-              ? 'dealing damage'
-              : spec.role === 'tank'
-                ? 'tanking'
-                : 'healing') +
-            '.',
+          'At a glance',
+          table([
+            ['Class', classLink],
+            ['Role', spec.role === 'dps' ? 'Damage' : spec.role === 'tank' ? 'Tank' : 'Healer'],
+            ['Unlocks at', 'Level ' + SPEC_UNLOCK_LEVEL],
+            ['Mastery', spec.mastery.name],
+          ]),
         ) +
+          section(
+            'Overview',
+            spec.description +
+              ' ' +
+              classLink +
+              ' characters can choose this specialization from level ' +
+              SPEC_UNLOCK_LEVEL +
+              '. Its job in a group is ' +
+              (spec.role === 'dps'
+                ? 'dealing damage'
+                : spec.role === 'tank'
+                  ? 'tanking'
+                  : 'healing') +
+              '.',
+          ) +
           section('Signature abilities', bullets(signatureIds.map(abilityLink))) +
           section(spec.mastery.name, spec.mastery.description) +
           (baseline ? section('Specialization bonuses', baseline) : '') +
@@ -112,6 +121,17 @@ export function addTalentPages({
         add(
           talents.get(id + '/' + option.id)!,
           section('Effect', option.description) +
+            section(
+              'At a glance',
+              table([
+                ['Class', classLink],
+                ['Unlocks at', 'Level ' + row.level],
+                ['Choice', 'Pick 1 of ' + row.options.length + ' in this row'],
+                ...(option.effect.grant?.ability && abilityLink(option.effect.grant.ability)
+                  ? [['Gives you', abilityLink(option.effect.grant.ability)]]
+                  : []),
+              ]),
+            ) +
             section(
               'Unlock',
               classLink +

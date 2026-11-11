@@ -110,10 +110,12 @@ function extractLead(article, headings) {
   return first;
 }
 
-// The headline numbers of an ability (cost, cast time, cooldown, range) as one strip
+const STAT_HEADINGS = ['Ability stats', 'At a glance'];
+
+// The headline numbers of an ability, talent, specialization or creature (cost, cast time, cooldown, range) as one strip
 // under the title. Values for several ranks arrive already joined with slashes.
 function statStrip(article, headings) {
-  const heading = headings.find((el) => el.textContent === 'Ability stats');
+  const heading = headings.find((el) => STAT_HEADINGS.includes(el.textContent));
   const table = sectionBody(heading)[0]?.querySelector?.('table');
   if (!table) return null;
   const strip = element('dl', 'ability-stats');
@@ -151,7 +153,7 @@ export function layoutArticle(view, page, wide, zoneName) {
     facts.remove();
     heading.remove();
   }
-  const stats = kind === 'Abilities' ? statStrip(article, headings) : null;
+  const stats = statStrip(article, headings);
   const lead = extractLead(article, headings);
   if (lead) {
     lead.remove();

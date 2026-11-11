@@ -17,7 +17,7 @@ import {
 } from '../../src/sim/types';
 import { auraEffectDescriptor } from '../../src/ui/aura_effect';
 import { type TranslationKey, t } from '../../src/ui/i18n';
-import { type Factor, frac, math, scaledStat } from './math_markup';
+import { bonus, type Factor, frac, scaledStat, share } from './math_markup';
 
 const pct = (v: number) => `${Number((v * 100).toFixed(6))}%`;
 const range = (min: number, max: number) => (min === max ? String(min) : `${min} to ${max}`);
@@ -56,7 +56,8 @@ export function abilityScalingLines(res: ResolvedAbility): string[] {
   const tick = (s: Scaled, interval: number) =>
     scaledStat(s.stat, [...s.factors, { frac: [interval, SPELL_DOT_COEFF_DURATION] }]);
   // Attack Power turns into damage at 14 per second of swing (28 for pets).
-  const apPart = (per: number, who = 'your total Attack Power') => math(frac(who, per));
+  const apPart = (per: number, who = 'your total Attack Power') =>
+    bonus(`${Number((100 / per).toFixed(1))}% of ${who}`, frac(who, per));
   function describe(e: AbilityEffect): string[] {
     switch (e.type) {
       case 'directDamage':
@@ -166,9 +167,9 @@ export function abilityScalingLines(res: ResolvedAbility): string[] {
         const parts = [String(e.amount)];
         if (e.type === 'absorb' && e.casterMaxHpPct)
           parts.push(`${pct(e.casterMaxHpPct)} of your maximum health`);
-        if (e.spellPowerCoeff) parts.push(`${pct(e.spellPowerCoeff)} of your Healing Power`);
+        const power = e.spellPowerCoeff ? ' ' + share(e.spellPowerCoeff, 'Healing Power') : '';
         return [
-          `Each shield absorbs ${parts.join(' plus ')} damage. Each part is rounded to a whole number. The shield lasts up to ${e.duration} sec.`,
+          `Each shield absorbs ${parts.join(' plus ')}${power} damage. Each part is rounded to a whole number. The shield lasts up to ${e.duration} sec.`,
         ];
       }
       case 'absorbSpentResource':
@@ -177,13 +178,13 @@ export function abilityScalingLines(res: ResolvedAbility): string[] {
         ];
       case 'finisherDamage':
         return [
-          `Damage is ${e.base}, plus ${e.perCombo} per combo point, plus a random 0 to ${e.variance}, plus ${apPart(14)}. Armor reduces this physical hit.`,
+          `Damage is ${e.base}, plus ${e.perCombo} per combo point, plus a random 0 to ${e.variance} ${apPart(14)}. Armor reduces this physical hit.`,
         ];
       case 'weaponStrike':
       case 'weaponDamage': {
         const mult = e.type === 'weaponStrike' ? (e.weaponMult ?? 1) : 1;
         const lines = [
-          `Deals ${pct(mult)} of a weapon swing, plus ${e.bonus} extra damage. A weapon swing is your weapon's damage roll plus ${math(frac('your total Attack Power', 14) + ' × your swing speed in seconds')}.`,
+          `Deals ${pct(mult)} of a weapon swing, plus ${e.bonus} extra damage. A weapon swing is your weapon's damage roll ${bonus('7.1% of your total Attack Power for each second of swing speed', frac('your total Attack Power', 14) + ' × your swing speed in seconds')}.`,
         ];
         if (e.type === 'weaponStrike' && e.normalized)
           lines.push(
@@ -194,11 +195,11 @@ export function abilityScalingLines(res: ResolvedAbility): string[] {
       case 'hunterBearTrap':
       case 'hunterBloodhook':
         return [
-          `The bleed total is ${e.bleedTotal} plus ${pct(e.rangedPowerCoeff)} of your Ranged Attack Power${e.type === 'hunterBloodhook' && e.damageMult ? ', then multiplied by ' + e.damageMult : ''}. It is locked in when the bleed starts. The total is split into ${e.bleedDuration / e.bleedInterval} ticks, ${e.bleedInterval} sec apart.`,
+          `The bleed total is ${e.bleedTotal} ${share(e.rangedPowerCoeff, 'Ranged Attack Power')}${e.type === 'hunterBloodhook' && e.damageMult ? ', then multiplied by ' + e.damageMult : ''}. It is locked in when the bleed starts. The total is split into ${e.bleedDuration / e.bleedInterval} ticks, ${e.bleedInterval} sec apart.`,
         ];
       case 'hunterStampede':
         return [
-          `Each of the ${e.beasts} beasts attacks every ${e.attackInterval} sec for ${e.duration} sec. Each attack deals ${range(e.min, e.max)} plus ${pct(e.rangedPowerCoeff)} of your Ranged Attack Power. Your pet damage bonus and Ferocity multiply that damage. They are locked in when the beasts are summoned.`,
+          `Each of the ${e.beasts} beasts attacks every ${e.attackInterval} sec for ${e.duration} sec. Each attack deals ${range(e.min, e.max)} ${share(e.rangedPowerCoeff, 'Ranged Attack Power')}. Your pet damage bonus and Ferocity multiply that damage. They are locked in when the beasts are summoned.`,
         ];
       case 'selfBuff':
       case 'buffTarget': {
@@ -236,15 +237,15 @@ export function abilityScalingLines(res: ResolvedAbility): string[] {
         ];
       case 'hunterShrapnel':
         return [
-          `The blast fills a ${e.coneAngleDeg}-degree cone, ${e.coneRange} yd long. Your target takes ${range(e.primaryMin, e.primaryMax)} base damage if it is in the cone. If it is not, the nearest enemy in the cone takes that damage instead. Other targets in the cone take ${range(e.splashMin, e.splashMax)}. Each direct hit adds 8% of your Ranged Attack Power. This is added before damage multipliers and armor. Each of those other targets also gets a wound that deals ${e.spreadTotal} base damage over ${e.spreadDuration} sec, ticking every ${e.spreadInterval} sec.`,
+          `The blast fills a ${e.coneAngleDeg}-degree cone, ${e.coneRange} yd long. Your target takes ${range(e.primaryMin, e.primaryMax)} base damage if it is in the cone. If it is not, the nearest enemy in the cone takes that damage instead. Other targets in the cone take ${range(e.splashMin, e.splashMax)}. Each direct hit also gets ${share(0.08, 'Ranged Attack Power')}. This is added before damage multipliers and armor. Each of those other targets also gets a wound that deals ${e.spreadTotal} base damage over ${e.spreadDuration} sec, ticking every ${e.spreadInterval} sec.`,
         ];
       case 'packCommand':
         return [
-          `Your pet deals ${range(e.min, e.max)} plus ${apPart(28, 'its total Attack Power')}. If it hits, you get ${e.focus} Focus and one Ferocity stack for ${e.ferocityDuration} sec (up to 3 stacks). The strike can miss. It has a 5% chance to deal double damage. Pet damage bonuses apply first, then armor reduces the hit.`,
+          `Your pet deals ${range(e.min, e.max)} ${apPart(28, 'its total Attack Power')}. If it hits, you get ${e.focus} Focus and one Ferocity stack for ${e.ferocityDuration} sec (up to 3 stacks). The strike can miss. It has a 5% chance to deal double damage. Pet damage bonuses apply first, then armor reduces the hit.`,
         ];
       case 'unleashBeast':
         return [
-          `Pet strike: ${range(e.primaryMin, e.primaryMax)} damage. Clap: ${range(e.clapMin, e.clapMax)} damage within ${e.radius} yd. Other enemies hit by the clap take ${pct(e.secondaryClapMult ?? 1)} of the base clap roll. The empowered version multiplies these base numbers by 1.5. Each hit adds ${apPart(28, "the pet's total Attack Power")}. Each hit has a 5% chance to be a critical hit for double damage. Then pet damage bonuses and armor apply.`,
+          `Pet strike: ${range(e.primaryMin, e.primaryMax)} damage. Clap: ${range(e.clapMin, e.clapMax)} damage within ${e.radius} yd. Other enemies hit by the clap take ${pct(e.secondaryClapMult ?? 1)} of the base clap roll. The empowered version multiplies these base numbers by 1.5. Each hit also gets ${apPart(28, 'its total Attack Power')}. Each hit has a 5% chance to be a critical hit for double damage. Then pet damage bonuses and armor apply.`,
         ];
       case 'afflictionLitany':
         return [
