@@ -321,6 +321,7 @@ async function raidMain(boss) {
     console.log(`\n>>> ${JOIN}: say "pull" in raid chat (or attack the boss) to start.`);
     await waitForPullCall(world, bots);
   }
+  await waitEntrance(world, bots, byKey, boss);
   const st = await fight(world, bots, byKey, boss);
   const report = writeReport(world, st, boss);
   if (JOIN) leader.chat(`/p ${st.result === 'kill' ? 'Boss down.' : 'Wipe.'} Log: ${report}`);
@@ -386,6 +387,67 @@ async function waitForPullCall(world, bots) {
     if (world.bodies().some((m) => alive(m) && m.aggro != null)) return;
     await sleep(200);
   }
+}
+
+/** A boss body still in its entrance scene: held by the encounter (not
+ *  hostile) or wearing its `heart_<boss>_intro` aura (value 0 dormant, 1 the
+ *  scene playing). */
+function entranceOf(m) {
+  if (!alive(m)) return null;
+  const a = m.auras?.find((x) => typeof x.id === 'string' && /^heart_.*_intro$/.test(x.id));
+  if (a) return (a.value ?? 0) >= 1 ? 'waking' : 'dormant';
+  return m.h === false ? 'held' : null;
+}
+
+/** Every boss now has an entrance scene (12 to 14 s) in which it cannot be
+ *  pulled or harmed. The raid waits it out at its pre-pull spots; a boss still
+ *  dormant (nobody stood where it wakes: the Quench wakes only for a body on
+ *  the ice) is woken by the opener walking toward it, who then walks back. The
+ *  fight's clock starts only once every body is handed back. */
+async function waitEntrance(world, bots, byKey, boss) {
+  const opener = byKey[boss.opener ?? 'mt'] ?? bots[0];
+  const t0 = Date.now();
+  let logged = null;
+  let woke = false;
+  for (;;) {
+    world.read();
+    drainAll(bots);
+    const states = world.bodies().map(entranceOf).filter(Boolean);
+    if (states.length === 0) break;
+    const stage = states.includes('dormant') ? 'dormant' : 'waking';
+    if (stage !== logged) {
+      log(
+        stage === 'dormant'
+          ? 'ENTRANCE: the boss is still dormant'
+          : 'ENTRANCE: the scene is playing; the raid waits',
+      );
+      logged = stage;
+    }
+    if (stage === 'dormant' && !woke && Date.now() - t0 > 1500) {
+      // Walk the opener toward the boss until the scene starts (held: no pull).
+      const wake = boss.wakeSpot?.(world) ?? world.center;
+      world.moveTo(opener, wake, 2);
+    } else {
+      if (stage !== 'dormant') woke = true;
+      for (const b of bots) world.moveTo(b, world.prepullSpot(b), 1.5);
+    }
+    if (Date.now() - t0 > 90_000) {
+      log('ENTRANCE: still held after 90 s; pulling anyway');
+      break;
+    }
+    await sleep(150);
+  }
+  if (logged) log(`ENTRANCE: over after ${((Date.now() - t0) / 1000).toFixed(1)} s`);
+  const back = Date.now();
+  while (Date.now() - back < 6000) {
+    world.read();
+    drainAll(bots);
+    let all = true;
+    for (const b of bots) if (!world.moveTo(b, world.prepullSpot(b), 1.5)) all = false;
+    if (all) break;
+    await sleep(120);
+  }
+  for (const b of bots) b.stop();
 }
 
 async function prepullBuffs(world, bots, byKey) {
@@ -577,12 +639,24 @@ async function fight(world, bots, byKey, boss) {
   const deadline = Date.now() + MAX_SECONDS * 1000;
   while (!st.result) {
     const tick = Date.now();
+    // A tick that blocks the loop (a costly plan) freezes all ten bots: each
+    // phase is timed and a slow tick says which one held it.
+    const lap = [];
+    let mark = tick;
+    const time = (what) => {
+      const now = Date.now();
+      lap.push([what, now - mark]);
+      mark = now;
+    };
     world.read();
     processEvents(world, bots, st);
+    time('read');
     boss.track?.(world, st);
+    time('track');
     st.result ??= result(world, st, boss);
     if (st.result) break;
     boss.plan?.(world, st);
+    time('plan');
     kickCoordinator(world, st, bots, boss);
     for (const b of bots) {
       try {
@@ -590,8 +664,17 @@ async function fight(world, bots, byKey, boss) {
       } catch (err) {
         console.error(`${b.name}: ${err.stack}`);
       }
+      time(b.spec.key);
     }
     status(world, st, boss);
+    if (Date.now() - tick > 400) {
+      st.slowTicks = (st.slowTicks ?? 0) + 1;
+      const worst = lap
+        .filter(([, ms]) => ms >= 20)
+        .map(([w, ms]) => `${w} ${ms}`)
+        .join(', ');
+      log(`  slow tick ${Date.now() - tick} ms (${worst})`);
+    }
     if (Date.now() > deadline) {
       st.result = 'timeout';
       log(`TIME LIMIT (${MAX_SECONDS} s): the fight is called off`);
@@ -819,7 +902,9 @@ function act(world, st, b, mt, boss) {
   const rangeOk = b.spec.melee || role === 'tank' ? dist <= reach : dist <= 29 + (t.reach ?? 0);
   if (!rangeOk && role !== 'tank') return idle(b, 'range');
   if (b.cls === 'hunter' && dist < 8.5) return idle(b, 'dead zone');
-  if (!b.spec.melee && dist > 5.5 && world.blocks(b.self, t)) return idle(b, 'no line');
+  // A tank stands at the body's girth (center far past 5.5 yd): melee never needs the line.
+  if (!b.spec.melee && role !== 'tank' && dist > 5.5 && world.blocks(b.self, t))
+    return idle(b, 'no line');
   const c = rotationContext(world, st, b, me, t, dist, stillFor);
   const ability = rotate(b.spec.spec, c);
   if (ability) {
@@ -996,6 +1081,21 @@ function rolePosition(world, st, b, me, hazards, boss) {
     const bad = (at) => hazards.some((h) => hypot(h, at) < h.r) || boss.bad?.(world, st, at);
     const keepWithin = b.spec.melee || role === 'tank' ? 1 : 3;
     if (b.goal && hypot(b.goal, own) < keepWithin && !bad(b.goal)) return b.goal;
+    // A healer casts instead of chasing a spot that drifts with the bosses: it
+    // keeps where it stands while that is safe, near its spot and still
+    // reaches and sees everyone it must heal (a human healer stands and casts).
+    if (role === 'healer') {
+      const here = { x: b.self.x, z: b.self.z };
+      const sight = sightTargets(world, st, b, boss);
+      if (
+        hypot(here, own) < 10 &&
+        !bad(here) &&
+        sight.every((q) => hypot(here, q) <= 26 && !world.blocks(here, q))
+      ) {
+        b.goal = here;
+        return here;
+      }
+    }
     b.goal = bad(own) ? (clearSpot(world, own, hazards) ?? own) : own;
     return b.goal;
   }
