@@ -343,7 +343,10 @@ function track(world, st) {
     }
     if (cur.has(QUENCH_AURAS.trapped) && !prev.has(QUENCH_AURAS.trapped)) {
       st.plunges++;
-      log(`UNDER THE ICE: ${p.name}`);
+      const b = p.bot;
+      log(
+        `UNDER THE ICE: ${p.name}${b ? ` (duty ${b.prevDuty ?? b.duty}, ${b.prevMoving ? 'moving' : 'still'}${b.self?.cast ? `, casting ${b.self.cast}` : ''})` : ''}`,
+      );
     }
     if (cur.has(QUENCH_AURAS.marked) && !prev.has(QUENCH_AURAS.marked)) {
       st.marks++;

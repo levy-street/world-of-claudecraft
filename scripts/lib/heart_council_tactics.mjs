@@ -160,7 +160,27 @@ export function steer(from, goal, circles, clear = 0.9) {
   let hitT = Number.POSITIVE_INFINITY;
   for (const c of circles) {
     const R = c.r + clear;
-    if (Math.hypot(from.x - c.x, from.z - c.z) < R) continue; // already brushing it
+    const fromD = Math.hypot(from.x - c.x, from.z - c.z);
+    if (fromD < R) {
+      // Already brushing it (set on a hole's rim, say): walk round it along
+      // its edge when the straight way cuts through its core, never across.
+      const px0 = c.x - from.x;
+      const pz0 = c.z - from.z;
+      const t0 = (px0 * dx + pz0 * dz) / len2;
+      if (t0 <= 0 || fromD < 1e-3) continue;
+      const tc = Math.min(1, t0);
+      const cx = from.x + dx * tc - c.x;
+      const cz = from.z + dz * tc - c.z;
+      if (Math.hypot(cx, cz) >= c.r * 0.9) continue;
+      const a = Math.atan2(from.x - c.x, from.z - c.z);
+      const ga = Math.atan2(goal.x - c.x, goal.z - c.z);
+      let da = ga - a;
+      while (da > Math.PI) da -= 2 * Math.PI;
+      while (da < -Math.PI) da += 2 * Math.PI;
+      const step = a + Math.sign(da || 1) * Math.min(Math.abs(da), 0.7);
+      const rr = Math.max(R, fromD) + 0.4;
+      return { x: c.x + Math.sin(step) * rr, z: c.z + Math.cos(step) * rr };
+    }
     if (Math.hypot(goal.x - c.x, goal.z - c.z) < R) continue; // the goal is at its face
     const px = c.x - from.x;
     const pz = c.z - from.z;

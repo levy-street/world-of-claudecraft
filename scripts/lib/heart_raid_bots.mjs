@@ -876,6 +876,8 @@ function act(world, st, b, mt, boss) {
     // Melee follow a moving body, so only the ranged and healers rest loosely.
     slack = role === 'tank' || b.spec.melee ? 0.8 : 2.5;
   }
+  b.prevDuty = b.duty;
+  b.prevMoving = b.moving;
   b.duty = duty;
   const faceAt = combatTarget(world, st, b, boss);
   // A cast under way is finished before a step no mechanic asks for: the bot
