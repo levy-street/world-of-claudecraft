@@ -1,6 +1,6 @@
 // The Hammer Council's provisional bodies (src/render/smith_heart_fx/
 // council_bodies_core.ts and council_bodies.ts): the Seam Singer's plan stands
-// about 2 to 2.5 times a player, tall and slender, every piece is a real node
+// as tall as the Guardian of the Hammer, tall and slender, every piece is a real node
 // of its kit, the arms reach every pose's target and every
 // pose and fall is finite, the casts map to their motions; and CouncilBodies
 // over a fake world finds the bodies, never claims an event, falls with a dead
@@ -28,6 +28,7 @@ import {
   councilPlanWidth,
   councilWristTarget,
 } from '../src/render/smith_heart_fx/council_bodies_core';
+import { BOLT_LAUNCH_Y } from '../src/render/smith_heart_fx/council_fx_core';
 import { SMITH_HEART_MOBS } from '../src/sim/content/smith_heart';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import type { Entity, SimEvent } from '../src/sim/types';
@@ -40,18 +41,37 @@ const finite = (p: { x: number; y: number; z: number }) =>
   Number.isFinite(p.x) && Number.isFinite(p.y) && Number.isFinite(p.z);
 
 describe('council_bodies_core: the plans', () => {
-  it('stand 2 to 2.5 times a player, matching the manifest and the template', () => {
-    expect(COUNCIL_BODY_HEIGHTS.singer).toBeCloseTo(
-      (VISUALS.smith_heart_seam_singer?.height ?? 0) *
-        (SMITH_HEART_MOBS.heart_seam_singer?.scale ?? 0),
-    );
+  it('stands as tall as the Guardian of the Hammer, matching the manifest and the template', () => {
+    const drawn = (key: string, mob: string) =>
+      (VISUALS[key]?.height ?? 0) * (SMITH_HEART_MOBS[mob]?.scale ?? 0);
+    const singer = drawn('smith_heart_seam_singer', 'heart_seam_singer');
+    const guardian = drawn('smith_heart_hammer_guardian', 'heart_hammer_guardian');
+    expect(COUNCIL_BODY_HEIGHTS.singer).toBeCloseTo(singer);
+    // The two council bosses read as equals (the owner's call, 2026-11-10).
+    expect(singer).toBeCloseTo(guardian, 2);
+    // A visual size only: the sim keeps the scale-2 body (melee reach, spacing).
+    expect(SMITH_HEART_MOBS.heart_seam_singer?.scale).toBe(2);
     for (const kind of KINDS) {
       const plan = COUNCIL_BODY_PLANS[kind];
-      expect(plan.height / PLAYER, kind).toBeGreaterThanOrEqual(2);
-      expect(plan.height / PLAYER, kind).toBeLessThanOrEqual(2.75);
-      // Its crown is its height (never a toy, never a giant).
-      expect(Math.abs(councilPlanTop(plan) - plan.height), kind).toBeLessThan(0.25);
+      expect(plan.height, kind).toBeCloseTo(COUNCIL_BODY_HEIGHTS[kind]);
+      expect(plan.height / PLAYER, kind).toBeGreaterThan(5);
+      // Its crown is its height.
+      expect(Math.abs(councilPlanTop(plan) - plan.height), kind).toBeLessThan(plan.height * 0.05);
     }
+  });
+
+  it('grows the whole plan with the body, so its dust, motes and slam stay on it', () => {
+    const plan = COUNCIL_BODY_PLANS.singer;
+    // The shares of the 5 yard body the plan was authored at.
+    expect(plan.slots.torso.y / plan.height).toBeCloseTo(3.05 / 5);
+    expect(plan.slots.head.y / plan.height).toBeCloseTo(4.05 / 5);
+    expect((plan.arm.upper + plan.arm.fore) / plan.height).toBeCloseTo(2.75 / 5);
+    expect(plan.halo.r / plan.height).toBeCloseTo(1.3 / 5);
+    expect(plan.hover / plan.height).toBeCloseTo(0.35 / 5);
+    const crown = plan.pieces.find((p) => p.id === 'crown');
+    expect((crown?.size.y ?? 0) / plan.height).toBeCloseTo(0.6 / 5);
+    // The Seam Bolt leaves her hand, four fifths of her height.
+    expect(BOLT_LAUNCH_Y).toBeCloseTo(plan.height * 0.8);
   });
 
   it('the Singer reads slender', () => {

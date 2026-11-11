@@ -30,6 +30,7 @@ import {
 } from '../../sim/encounters/smith_heart/council_ids';
 import { rushReach } from '../../sim/encounters/smith_heart/council_rush_reach';
 import { TELEGRAPH_THREAT_COLORS } from '../floor_telegraph/telegraph_look_core';
+import { COUNCIL_BODY_HEIGHTS } from './council_bodies_core';
 import { fxHash } from './hammer_fx_core';
 
 export {
@@ -434,6 +435,10 @@ export function energyLook(energy: number): { glow: number; embers: number; crac
 
 /** A Seam Bolt in flight: seconds from the Singer to its mark. */
 export const BOLT_SECONDS = 0.38;
+
+/** Where a Seam Bolt leaves the Singer (yards over the floor): her casting
+ *  hand, four fifths of her drawn height, so it grows with her. */
+export const BOLT_LAUNCH_Y = COUNCIL_BODY_HEIGHTS.singer * 0.8;
 
 /** Hammer's Weight's slam: seconds the stone hammer takes to drop. */
 export const WEIGHT_DROP_SECONDS = 0.28;

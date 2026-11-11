@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "5beb163c4439a6dc3af06d487fcda24191c5983361cc21930450d3ab712ceb3b",
+  "rendererFingerprint": "556d4da2eafc0fd0f567107e1c457e77a0e29b6598dad618e68c530cf8e39658",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "darwin",
@@ -14,7 +14,7 @@
     "gpuVendor": "Google Inc. (Google)",
     "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
     "browserMajor": "157",
-    "browserVersion": "Chrome/157.0.8103.38",
+    "browserVersion": "Chrome/157.0.8103.39",
     "requestedBackend": "swiftshader",
     "fingerprint": "293ddb26a9299a15643f6c85fc437fb865f083082a0bb7a69e6e98d0f6c54bf4"
   },
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6952998,
-      "sha256": "499fd3dcc6841f1e887ef582376f6baf30e201d8abc66dab33d0875166c8fb4e",
+      "bytes": 6953645,
+      "sha256": "b7c84bc2971d14c57aedbc0e9c2745c74575c0b6d3eee41abb4a9fc4335c713f",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -5895,7 +5895,7 @@
           "sha256": "b4e6f8fcd5e4f5fea033d46b44e033c3369df3db480b1b77415d72412b45f7e0"
         },
         "idle": "Idle",
-        "height": 2.5,
+        "height": 5.44,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -5909,7 +5909,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "c59b7084d2e8a52e75f76d2deabfc39d47b405f167ba5a1081c98a79f7b26861",
+      "sourceFingerprint": "33d67b2661e37632119d43ac544004076154bfd038f048bf4dcfc0b05e2b5eba",
       "output": {
         "path": "public/ui/mobs/heart_seam_singer.webp",
         "bytes": 4006,

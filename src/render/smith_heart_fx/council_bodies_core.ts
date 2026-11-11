@@ -130,10 +130,17 @@ export interface CouncilBodyPlan {
 }
 
 /** The manifest heights times the template scales (characters/manifest.ts
- *  smith_heart_seam_singer 2.5; content smith_heart.ts scale 2.0). */
+ *  smith_heart_seam_singer 5.44; content smith_heart.ts scale 2.0): the
+ *  Singer stands as tall as the Guardian of the Hammer (3.4 x 3.2). */
 export const COUNCIL_BODY_HEIGHTS: Readonly<Record<CouncilBodyKind, number>> = {
-  singer: 2.5 * 2.0,
+  singer: 5.44 * 2.0,
 };
+
+/** The height each plan below is authored at (yards): the Singer's first
+ *  body, before it grew to the Guardian's height. The plan is carried to its
+ *  drawn height whole (`scalePlan`), so every joint, reach and orbit grows
+ *  with the model and the dust, motes and slams stay on its body. */
+const SINGER_AUTHORED_HEIGHT = 5;
 
 /** The vein's ochre (the threads) and the seam crystals' hotter amber. */
 export const COUNCIL_BODY_COLORS = {
@@ -171,9 +178,9 @@ function piece(
  *  shards trailing under it, a narrow chest with an amber heart crystal,
  *  great amber geodes breaking out of its shoulders and back, a crown of
  *  crystal, long arms ending in crystal fingers, a slow halo of shards. */
-const SINGER: CouncilBodyPlan = {
+const SINGER_AUTHORED: CouncilBodyPlan = {
   kind: 'singer',
-  height: COUNCIL_BODY_HEIGHTS.singer,
+  height: SINGER_AUTHORED_HEIGHT,
   hover: 0.35,
   slots: {
     base: v(0, 0.55, 0),
@@ -311,8 +318,39 @@ const SINGER: CouncilBodyPlan = {
   threadWidth: 0.1,
 };
 
+const scaleV3 = (p: V3, k: number): V3 => v(p.x * k, p.y * k, p.z * k);
+
+/** A plan grown uniformly by `k`: every length (height, hover, joints, the
+ *  arm, the orbits, the pieces, the threads) times `k`; counts, spins, tilts
+ *  and colours as they were. */
+function scalePlan(plan: CouncilBodyPlan, k: number): CouncilBodyPlan {
+  const s = plan.slots;
+  return {
+    ...plan,
+    height: plan.height * k,
+    hover: plan.hover * k,
+    slots: {
+      base: scaleV3(s.base, k),
+      hip: scaleV3(s.hip, k),
+      torso: scaleV3(s.torso, k),
+      head: scaleV3(s.head, k),
+      shoulder: scaleV3(s.shoulder, k),
+    },
+    arm: {
+      root: scaleV3(plan.arm.root, k),
+      upper: plan.arm.upper * k,
+      fore: plan.arm.fore * k,
+      idle: scaleV3(plan.arm.idle, k),
+    },
+    skirt: { ...plan.skirt, r: plan.skirt.r * k, y: plan.skirt.y * k },
+    halo: { ...plan.halo, r: plan.halo.r * k, y: plan.halo.y * k },
+    pieces: plan.pieces.map((p) => ({ ...p, size: scaleV3(p.size, k), at: scaleV3(p.at, k) })),
+    threadWidth: plan.threadWidth * k,
+  };
+}
+
 export const COUNCIL_BODY_PLANS: Readonly<Record<CouncilBodyKind, CouncilBodyPlan>> = {
-  singer: SINGER,
+  singer: scalePlan(SINGER_AUTHORED, COUNCIL_BODY_HEIGHTS.singer / SINGER_AUTHORED_HEIGHT),
 };
 
 // ---- the casts ------------------------------------------------------------------------

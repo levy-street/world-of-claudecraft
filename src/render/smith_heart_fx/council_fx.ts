@@ -68,6 +68,7 @@ import { radialGlowTexture } from '../textures';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
 import { CouncilBondFx } from './council_bond_fx';
 import {
+  BOLT_LAUNCH_Y,
   BOLT_SECONDS,
   COUNCIL_FX_COLORS as C,
   COUNCIL_AURAS,
@@ -1455,7 +1456,7 @@ export class CouncilFx {
     b.sourceId = sourceId;
     b.targetId = targetId;
     const at = fxAnchor(src);
-    b.from.set(at.x, this.groundY(at.x, at.z) + 4, at.z);
+    b.from.set(at.x, this.groundY(at.x, at.z) + BOLT_LAUNCH_Y, at.z);
     b.mesh.visible = true;
   }
 

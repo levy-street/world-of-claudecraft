@@ -4443,9 +4443,12 @@ export const VISUALS: Record<string, VisualDef> = {
   // Mountain's Wrath bursts at the end of the heirs' 3 s bar, and each finishes its recovery after
   // the bar. It floats, so no foot can slide: runRef is the template's 7 yd/s at 1x.
   // smith_heart_fx/council_bodies.ts still plays its dust and rings (COUNCIL_MODELLED).
+  // Drawn as tall as the Guardian of the Hammer (3.4 x its scale 3.2) at its own template scale
+  // 2.0 (5.44 x 2.0), so the two read as equals: a visual size only, the sim keeps the scale-2
+  // body's melee reach and spacing.
   smith_heart_seam_singer: {
     url: `${CREATURES}/heart_seam_singer.glb`,
-    height: 2.5,
+    height: 5.44,
     clips: {
       idle: 'Idle',
       idleVariants: ['IdleFidget'],
@@ -4480,7 +4483,8 @@ export const VISUALS: Record<string, VisualDef> = {
     runRef: 7,
     gaitWindDown: true,
     authoredAtlas: true,
-    clickRadius: 1.0,
+    // Grown with the body (1.0 at the old 2.5 height).
+    clickRadius: 2.2,
   },
   // The Guardian of the Heat's Rolling Cinder (design doc 7.4): a bodyless
   // target, its click capsule, nameplate and bars round the great ball of the

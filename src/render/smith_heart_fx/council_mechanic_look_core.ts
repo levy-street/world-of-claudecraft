@@ -64,9 +64,9 @@ const BOND_SIGILS: Readonly<Record<CouncilRole, { radius: number; column: number
 
 /** How far the tether's middle climbs over the line between its anchors
  *  (yards): `close` with the two standing together (a tall loop that rises
- *  clear of the smaller member's crown, so it reads shoulder to shoulder),
+ *  clear of both members' crowns, so it reads shoulder to shoulder),
  *  easing to `apart` (a shallow arc) as the span grows from `near` to `far`. */
-export const BOND_ARCH = { close: 4, apart: 2.4, near: 5, far: 18 } as const;
+export const BOND_ARCH = { close: 5, apart: 2.4, near: 5, far: 18 } as const;
 
 /** The arch over a span of `span` yards (xz) between the two anchors. */
 export function bondArch(span: number): number {
