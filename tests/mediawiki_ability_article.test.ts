@@ -48,8 +48,12 @@ describe('Player encyclopedia ability mechanics', () => {
       article = abilityArticle(fireball, tools);
     expect(article).toContain('Higher ranks');
     expect(article).toContain('The ticks over time do not get one of their own');
-    const match = article.match(/Spell Power × ([\d.]+) \/ ([\d.]+)/);
+    // The formula is a <woc-math> block with a stacked fraction and its combined value.
+    const match = article.match(
+      /Spell Power × frac\(([\d.]+), ([\d.]+)\) [=≈] Spell Power × ([\d.]+)<\/woc-math>/,
+    );
     expect(match).not.toBeNull();
+    expect(Number(match![3])).toBeCloseTo(Number(match![1]) / Number(match![2]), 4);
     for (const power of [40, 137])
       expect(Math.round((power * Number(match![1])) / Number(match![2]))).toBe(
         directHitBonus(power, fireball, fireball.castTime),
@@ -59,14 +63,16 @@ describe('Player encyclopedia ability mechanics', () => {
     const sting = ABILITIES.serpent_sting,
       dot = sting.effects.find((e) => e.type === 'dot')!;
     const shot = abilityArticle(sting, tools).match(
-      /Ranged Attack Power × ([\d.]+) × ([\d.]+) \/ ([\d.]+)/,
+      /Ranged Attack Power × ([\d.]+) × frac\(([\d.]+), ([\d.]+)\) [=≈] Ranged Attack Power × ([\d.]+)</,
     );
     const heal = ABILITIES.lesser_heal;
     const healing = abilityArticle(heal, tools).match(
-      /Healing Power × ([\d.]+) × ([\d.]+) \/ ([\d.]+)/,
+      /Healing Power × ([\d.]+) × frac\(([\d.]+), ([\d.]+)\) [=≈] Healing Power × ([\d.]+)</,
     );
     expect(shot).not.toBeNull();
     expect(healing).not.toBeNull();
+    for (const m of [shot!, healing!])
+      expect(Number(m[4])).toBeCloseTo((Number(m[1]) * Number(m[2])) / Number(m[3]), 4);
     for (const power of [40, 137]) {
       expect(Math.round((power * Number(shot![1]) * Number(shot![2])) / Number(shot![3]))).toBe(
         dotTickBonus(power, sting, dot.duration, dot.interval),

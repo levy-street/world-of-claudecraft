@@ -19,7 +19,7 @@ export function coreSystemRules(
       return (
         section(
           'How armor changes a hit',
-          'Armor lowers the damage from attacks that check it, such as normal physical hits. To work out how much, divide the target’s armor by (armor + 85 × attacker level + 400). Armor below zero counts as zero. The answer is the share of damage removed, and it can never be more than 75%. For example, 2,100 armor removes ' +
+          'Armor lowers the damage from attacks that check it, such as normal physical hits. The share of damage it removes is:\n\n<woc-math>Damage removed = frac(armor, armor + 85 × attacker level + 400)</woc-math>\n\nHere armor is the target’s armor. Armor below zero counts as zero. The share can never be more than 75%. For example, 2,100 armor removes ' +
             Math.round(100 * armorReduction(2100, 20)) +
             '% of a normal physical hit from a level 20 attacker. Some abilities ignore armor, and their own pages say so.',
         ) +
@@ -91,7 +91,7 @@ export function coreSystemRules(
     case 'Ashen Coliseum':
       return section(
         'Rating changes',
-        'Your rating goes up when you win and down when you lose. Beating a higher-rated opponent gains more. It works in two steps:\n# Expected win chance = 1 ÷ (1 + 10 raised to ((opponent rating − your rating) ÷ 400)).\n# Base Elo change = 32 × (match score − expected win chance), rounded to the nearest whole number. A win has a match score of 1.\nIf both ratings are the same, a win gives a base change of +16.',
+        'Your rating goes up when you win and down when you lose. Beating a higher-rated opponent gains more. It works in two steps:\n# <woc-math>Expected win chance = frac(1, 1 + pow(10, (opponent rating − your rating) ÷ 400))</woc-math>\n# <woc-math>Base Elo change = 32 × (match score − expected win chance)</woc-math>, rounded to the nearest whole number. A win has a match score of 1.\nIf both ratings are the same, a win gives a base change of +16.',
       );
     case 'Level experience':
       return section(

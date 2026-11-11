@@ -1,0 +1,45 @@
+import { describe, expect, it } from 'vitest';
+import { parseMath, renderMath } from '../mediawiki/reader/math.js';
+import { math, scaledStat } from '../scripts/mediawiki/math_markup';
+
+const inner = (s) => s.replace(/^<woc-math>|<\/woc-math>$/g, '');
+
+describe('encyclopedia formulas', () => {
+  it('writes the factors in order and states the combined multiplier', () => {
+    const heal = inner(scaledStat('Healing Power', [2, { frac: [1.5, 3.5] }]));
+    expect(heal).toBe('Healing Power × 2 × frac(1.5, 3.5) ≈ Healing Power × 0.8571');
+    expect(inner(scaledStat('Spell Power', [{ frac: [1.75, 3.5] }]))).toBe(
+      'Spell Power × frac(1.75, 3.5) = Spell Power × 0.5',
+    );
+    expect(inner(scaledStat('Spell Power', [{ frac: [3, 3.5] }, { div: 3 }]))).toBe(
+      'Spell Power × frac(3, 3.5) ÷ 3 ≈ Spell Power × 0.2857',
+    );
+    // A single plain factor needs no combined value.
+    expect(inner(scaledStat('Attack Power', [0.15]))).toBe('Attack Power × 0.15');
+    expect(math('x')).toBe('<woc-math>x</woc-math>');
+  });
+
+  it('draws fractions stacked, keeps a readable text form and nests calls', () => {
+    const html = renderMath('Healing Power × 2 × frac(1.5, 3.5)');
+    expect(html).toContain(
+      '<span class="woc-frac-top" aria-hidden="true">1.5</span><span class="woc-frac-bottom" aria-hidden="true">3.5</span>',
+    );
+    expect(html).toContain('<span class="woc-math-text">(1.5) ÷ (3.5)</span>');
+    expect(html.startsWith('<span class="woc-math">Healing Power × 2 × ')).toBe(true);
+
+    const elo = parseMath('E = frac(1, 1 + pow(10, (a − b) ÷ 400))');
+    expect(elo.text).toBe('E = (1) ÷ (1 + 10^((a − b) ÷ 400))');
+    expect(elo.html).toContain('10<sup>(a − b) ÷ 400</sup>');
+
+    // Brackets inside an argument do not end it early.
+    expect(parseMath('frac(armor, (armor + 85) × 2)').text).toBe('(armor) ÷ ((armor + 85) × 2)');
+  });
+
+  it('escapes formula text', () => {
+    const html = renderMath('frac(<b>x</b>, "y") & z');
+    expect(html).not.toContain('<b>');
+    expect(html).toContain('&lt;b&gt;x&lt;/b&gt;');
+    expect(html).toContain('&quot;y&quot;');
+    expect(html).toContain('&amp; z');
+  });
+});

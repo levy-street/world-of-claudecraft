@@ -77,4 +77,54 @@ $wgHooks['ParserFirstCallInit'][] = static function ( $parser ) use ( $wgScriptP
         $class = ( $args['size'] ?? '' ) === 'icon' ? 'woc-inline-art' : 'woc-page-art';
         return '<img class="' . $class . '" alt="" src="' . htmlspecialchars( $wgScriptPath . '/resources/assets/game' . $path, ENT_QUOTES ) . '">';
     } );
+    // Formulas: frac(top, bottom) is a stacked fraction and pow(base, exponent) a
+    // superscript, matching mediawiki/reader/math.js. All other text is escaped.
+    $parser->setHook( 'woc-math', static function ( $input ) {
+        // Walk whole UTF-8 characters so ×, ÷ and − are never split mid-byte.
+        $chars = preg_split( '//u', (string)$input, -1, PREG_SPLIT_NO_EMPTY ) ?: [];
+        $i = 0;
+        $sequence = static function ( array $stops ) use ( &$sequence, &$i, $chars ) {
+            $html = '';
+            $text = '';
+            $depth = 0;
+            $len = count( $chars );
+            while ( $i < $len ) {
+                if ( preg_match( '/^(frac|pow)\(/', implode( '', array_slice( $chars, $i, 5 ) ), $m ) ) {
+                    $i += strlen( $m[0] );
+                    $a = $sequence( [ ',' ] );
+                    $i++;
+                    while ( $i < $len && $chars[$i] === ' ' ) {
+                        $i++;
+                    }
+                    $b = $sequence( [ ')' ] );
+                    $i++;
+                    if ( $m[1] === 'frac' ) {
+                        $plain = '(' . $a[1] . ') ÷ (' . $b[1] . ')';
+                        $html .= '<span class="woc-frac"><span class="woc-frac-top" aria-hidden="true">' . $a[0]
+                            . '</span><span class="woc-frac-bottom" aria-hidden="true">' . $b[0]
+                            . '</span><span class="woc-math-text">' . htmlspecialchars( $plain, ENT_QUOTES ) . '</span></span>';
+                        $text .= $plain;
+                    } else {
+                        $html .= $a[0] . '<sup>' . $b[0] . '</sup>';
+                        $text .= $a[1] . '^(' . $b[1] . ')';
+                    }
+                    continue;
+                }
+                $ch = $chars[$i];
+                if ( $depth === 0 && in_array( $ch, $stops, true ) ) {
+                    break;
+                }
+                if ( $ch === '(' ) {
+                    $depth++;
+                } elseif ( $ch === ')' ) {
+                    $depth--;
+                }
+                $html .= htmlspecialchars( $ch, ENT_QUOTES );
+                $text .= $ch;
+                $i++;
+            }
+            return [ $html, $text ];
+        };
+        return '<span class="woc-math">' . $sequence( [] )[0] . '</span>';
+    } );
 };

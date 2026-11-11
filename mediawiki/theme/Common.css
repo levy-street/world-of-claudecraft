@@ -544,3 +544,43 @@ body {
   font: 600 11px / 16px system-ui;
   white-space: nowrap;
 }
+
+/* Formulas (<woc-math>): a set-apart chip with real stacked fractions. */
+.woc-math {
+  display: inline-block;
+  padding: 0.1em 0.4em;
+  margin: 0.15em 0;
+  background: var(--woc-parchment-2);
+  border: 1px solid var(--woc-rule);
+  border-radius: 4px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.6;
+  vertical-align: middle;
+}
+.woc-frac {
+  display: inline-flex;
+  flex-direction: column;
+  vertical-align: middle;
+  margin: 0 0.2em;
+  font-size: 0.9em;
+  line-height: 1.2;
+  text-align: center;
+}
+.woc-frac-top {
+  padding: 0 0.25em 0.1em;
+  border-bottom: 1px solid currentColor;
+}
+.woc-frac-bottom {
+  padding: 0.1em 0.25em 0;
+}
+.woc-math-text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.woc-math sup {
+  font-size: 0.75em;
+}

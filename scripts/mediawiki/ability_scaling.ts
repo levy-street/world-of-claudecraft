@@ -17,11 +17,13 @@ import {
 } from '../../src/sim/types';
 import { auraEffectDescriptor } from '../../src/ui/aura_effect';
 import { type TranslationKey, t } from '../../src/ui/i18n';
+import { type Factor, frac, math, scaledStat } from './math_markup';
 
 const pct = (v: number) => `${Number((v * 100).toFixed(6))}%`;
 const range = (min: number, max: number) => (min === max ? String(min) : `${min} to ${max}`);
 // The power bonus is rounded on its own and then added to the base roll.
-const add = (formula: string) => `Add (${formula}), rounded to the nearest whole number.`;
+const add = (formula: string) => `Add ${formula}, rounded to the nearest whole number.`;
+type Scaled = { stat: string; factors: Factor[] };
 
 // Keep the quotients intact: 1.5 / 3.5 is exact, while a truncated percentage
 // can reproduce a different rounded hit. The spellbook supplies the base prose.
@@ -30,20 +32,30 @@ export function abilityScalingLines(res: ResolvedAbility): string[] {
   const ranged = def.scalesWith === 'ranged';
   const physical = def.school === 'physical';
   const attack = ranged ? 'Ranged Attack Power' : physical ? 'Attack Power' : 'Spell Power';
-  const power = ranged
-    ? `${attack} × ${RANGED_SPELL_AP_SCALE}`
-    : physical
-      ? `${attack} × ${MELEE_SPELL_AP_SCALE}`
-      : attack;
-  const castFraction = (t: number) =>
-    `${Math.min(SPELL_COEFF_MAX_CAST, Math.max(SPELL_COEFF_MIN_CAST, t))} / ${SPELL_COEFF_DIVISOR}`;
-  const direct = (stat: string, aoe: boolean, override?: number) =>
-    `${stat} × ${override ?? castFraction(res.castTime)}${aoe ? ' × ' + SPELL_AOE_COEFF_MULT : ''}`;
-  const channel = (stat: string) =>
-    `${stat} × ${castFraction(def.channel!.duration)} / ${def.channel!.ticks}`;
-  const heal = `Healing Power × ${HEALING_SP_SCALE}`;
-  const tick = (stat: string, interval: number) =>
-    `${stat} × ${interval} / ${SPELL_DOT_COEFF_DURATION}`;
+  const power: Scaled = {
+    stat: attack,
+    factors: ranged ? [RANGED_SPELL_AP_SCALE] : physical ? [MELEE_SPELL_AP_SCALE] : [],
+  };
+  const castFraction = (t: number): Factor => ({
+    frac: [Math.min(SPELL_COEFF_MAX_CAST, Math.max(SPELL_COEFF_MIN_CAST, t)), SPELL_COEFF_DIVISOR],
+  });
+  const direct = (s: Scaled, aoe: boolean, override?: number) =>
+    scaledStat(s.stat, [
+      ...s.factors,
+      override ?? castFraction(res.castTime),
+      ...(aoe ? [SPELL_AOE_COEFF_MULT] : []),
+    ]);
+  const channel = (s: Scaled) =>
+    scaledStat(s.stat, [
+      ...s.factors,
+      castFraction(def.channel!.duration),
+      { div: def.channel!.ticks },
+    ]);
+  const heal: Scaled = { stat: 'Healing Power', factors: [HEALING_SP_SCALE] };
+  const tick = (s: Scaled, interval: number) =>
+    scaledStat(s.stat, [...s.factors, { frac: [interval, SPELL_DOT_COEFF_DURATION] }]);
+  // Attack Power turns into damage at 14 per second of swing (28 for pets).
+  const apPart = (per: number, who = 'your total Attack Power') => math(frac(who, per));
   function describe(e: AbilityEffect): string[] {
     switch (e.type) {
       case 'directDamage':
@@ -104,7 +116,9 @@ export function abilityScalingLines(res: ResolvedAbility): string[] {
           return [
             `Heals for ${pct(e.casterMaxHpPct)} of your maximum health, rounded to the nearest whole number.`,
           ];
-        const amount = def.channel ? channel('Healing Power') : direct(heal, e.type === 'aoeHeal');
+        const amount = def.channel
+          ? channel({ stat: 'Healing Power', factors: [] })
+          : direct(heal, e.type === 'aoeHeal');
         const lines = [
           `Healing${def.channel ? ' per pulse' : ''} is ${range(e.min, e.max)}. ${add(amount)}`,
         ];
@@ -142,7 +156,7 @@ export function abilityScalingLines(res: ResolvedAbility): string[] {
         lines.push(
           hybrid
             ? 'Only the instant part gets the power bonus. The ticks over time do not get one of their own.'
-            : `Add (${tick(isHeal ? heal : power, e.interval)}) to every tick, rounded to the nearest whole number.`,
+            : `Add ${tick(isHeal ? heal : power, e.interval)} to every tick, rounded to the nearest whole number.`,
         );
         return lines;
       }
@@ -162,13 +176,13 @@ export function abilityScalingLines(res: ResolvedAbility): string[] {
         ];
       case 'finisherDamage':
         return [
-          `Damage is ${e.base}, plus ${e.perCombo} per combo point, plus a random 0 to ${e.variance}, plus your total Attack Power / 14. Armor reduces this physical hit.`,
+          `Damage is ${e.base}, plus ${e.perCombo} per combo point, plus a random 0 to ${e.variance}, plus ${apPart(14)}. Armor reduces this physical hit.`,
         ];
       case 'weaponStrike':
       case 'weaponDamage': {
         const mult = e.type === 'weaponStrike' ? (e.weaponMult ?? 1) : 1;
         const lines = [
-          `Deals ${pct(mult)} of a weapon swing, plus ${e.bonus} extra damage. A weapon swing is your weapon's damage roll plus (your total Attack Power / 14 × your swing speed in seconds).`,
+          `Deals ${pct(mult)} of a weapon swing, plus ${e.bonus} extra damage. A weapon swing is your weapon's damage roll plus ${math(frac('your total Attack Power', 14) + ' × your swing speed in seconds')}.`,
         ];
         if (e.type === 'weaponStrike' && e.normalized)
           lines.push(
@@ -213,7 +227,7 @@ export function abilityScalingLines(res: ResolvedAbility): string[] {
       case 'empoweredCone':
         return e.stages.map(
           (s, i) =>
-            `Charge stage ${i + 1} reaches ${s.range} yd and deals ${range(s.min, s.max)}. ${add(`${power} × ${castFraction((res.castTime * (i + 1)) / e.stages.length)} × ${SPELL_AOE_COEFF_MULT}`)}${e.guaranteedCritLevel === i + 1 ? ' It is always a critical hit.' : ''}${s.rootDuration ? ' Roots for ' + s.rootDuration + ' sec.' : ''}${s.incapacitateDuration ? ' Incapacitates for ' + s.incapacitateDuration + ' sec. Diminishing returns can make this shorter.' : ''}`,
+            `Charge stage ${i + 1} reaches ${s.range} yd and deals ${range(s.min, s.max)}. ${add(scaledStat(power.stat, [...power.factors, castFraction((res.castTime * (i + 1)) / e.stages.length), SPELL_AOE_COEFF_MULT]))}${e.guaranteedCritLevel === i + 1 ? ' It is always a critical hit.' : ''}${s.rootDuration ? ' Roots for ' + s.rootDuration + ' sec.' : ''}${s.incapacitateDuration ? ' Incapacitates for ' + s.incapacitateDuration + ' sec. Diminishing returns can make this shorter.' : ''}`,
         );
       case 'valkyrsCalling':
         return [
@@ -225,11 +239,11 @@ export function abilityScalingLines(res: ResolvedAbility): string[] {
         ];
       case 'packCommand':
         return [
-          `Your pet deals ${range(e.min, e.max)} plus its total Attack Power / 28. If it hits, you get ${e.focus} Focus and one Ferocity stack for ${e.ferocityDuration} sec (up to 3 stacks). The strike can miss. It has a 5% chance to deal double damage. Pet damage bonuses apply first, then armor reduces the hit.`,
+          `Your pet deals ${range(e.min, e.max)} plus ${apPart(28, 'its total Attack Power')}. If it hits, you get ${e.focus} Focus and one Ferocity stack for ${e.ferocityDuration} sec (up to 3 stacks). The strike can miss. It has a 5% chance to deal double damage. Pet damage bonuses apply first, then armor reduces the hit.`,
         ];
       case 'unleashBeast':
         return [
-          `Pet strike: ${range(e.primaryMin, e.primaryMax)} damage. Clap: ${range(e.clapMin, e.clapMax)} damage within ${e.radius} yd. Other enemies hit by the clap take ${pct(e.secondaryClapMult ?? 1)} of the base clap roll. The empowered version multiplies these base numbers by 1.5. Each hit adds the pet's total Attack Power / 28. Each hit has a 5% chance to be a critical hit for double damage. Then pet damage bonuses and armor apply.`,
+          `Pet strike: ${range(e.primaryMin, e.primaryMax)} damage. Clap: ${range(e.clapMin, e.clapMax)} damage within ${e.radius} yd. Other enemies hit by the clap take ${pct(e.secondaryClapMult ?? 1)} of the base clap roll. The empowered version multiplies these base numbers by 1.5. Each hit adds ${apPart(28, "the pet's total Attack Power")}. Each hit has a 5% chance to be a critical hit for double damage. Then pet damage bonuses and armor apply.`,
         ];
       case 'afflictionLitany':
         return [
