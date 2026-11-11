@@ -24676,6 +24676,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Наполовину погружён в свой источник и никогда не двигается. Базальтовый кулак продолжается; Семена Очага падают под рейд и вскоре лопаются, а Пробуждённый огонь поджигает пол вокруг источника кольцо за кольцом. При 40% здоровья он снова погружается, и Очаг переполняется. В героическом режиме урон выше на {heroicPct}%.',
   'hudChrome.auraEffect.heatGuardian.statePhase3':
     'Наполовину погружён в свой источник и никогда не двигается. Базальтовый кулак и Пробуждённый огонь продолжаются, а Катящиеся угли падают и преследуют игроков: удар отбрасывает уголь. В героическом режиме урон выше на {heroicPct}%.',
+  'hudChrome.auraEffect.heatGuardian.intro':
+    'Остывший в своём источнике: его нельзя атаковать или ранить, пока рейд не подойдёт и он не проснётся, вспыхнув.',
   'hudChrome.auraEffect.heatGuardian.stateUnder':
     'Погружён в источник: пока Очаг переполнен, его нельзя атаковать или ранить. Когда переполнение закончится, он поднимется снова.',
   'hudChrome.auraEffect.heatGuardian.scorched':
@@ -24698,6 +24700,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.heatGuardian.say.seeds': 'Каждая искра, что я рассыпаю, пускает корни.',
   'hudChrome.heatGuardian.say.zones': 'Очаг просыпается у вас под ногами.',
   'hudChrome.heatGuardian.say.cinder': 'Беги, маленький уголёк. Пламя голодно.',
+  'hudChrome.heatGuardian.say.intro':
+    'Насекомые. Вы вползаете в первое пламя и надеетесь уйти? Я горел ещё до того, как ваш род узнал огонь. Так горите же вместе с ним!',
   'abilityUi.cast.heart_heat_fist': 'Базальтовый кулак',
   'abilityUi.cast.heart_forge_wrath': 'Гнев горна',
   'abilityUi.cast.heart_forge_pour': 'Литьё горна',
@@ -24714,6 +24718,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.alert.resonanceTitle': 'Резонанс',
   'hudChrome.council.alert.weightTitle': 'Тяжесть Молота',
   'hudChrome.council.alert.timeAria': 'Осталось {seconds} с',
+  'hudChrome.auraEffect.breathGuardian.intro':
+    'Спит: нельзя атаковать или ранить, пока буря не опустит его на землю.',
+  'hudChrome.auraEffect.council.intro':
+    'Спит: нельзя атаковать или ранить, пока совет не пробудится.',
   'hudChrome.auraEffect.council.wakeMark':
     'Когда эффект закончится, из пола под вами вырвется колонна: от {min} до {max} урона всем в пределах {radius} м и отбрасывание. Встаньте там, где рейду нужно укрытие. Героический и мифический режимы: от {heroicMin} до {heroicMax} урона.',
   'hudChrome.auraEffect.council.rockMark':
@@ -24832,6 +24840,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchGuardian.say.flurry':
     'Все клинки! Все лезвия! Не оставьте на моём озере ни одного стоящего!',
   'hudChrome.quenchGuardian.say.pull': 'Тёплая кровь на моём озере. Тёплой она пробудет недолго.',
+  'hudChrome.quenchGuardian.say.intro':
+    'Тише... озеро спало. Вы разбудили холод, а холод не прощает.',
   'hudChrome.quenchGuardian.say.shatter': 'Промёрз насквозь. Теперь разбейся.',
   'hudChrome.quenchGuardian.say.hole': 'Лёд помнит каждый шаг. Встаньте вместе, и он не выдержит.',
   'hudChrome.quenchGuardian.say.wake':
@@ -24843,6 +24853,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchGuardian.say.death': 'Холод... отпускает... Закалка ваша.',
   'hudChrome.auraEffect.quenchGuardian.cold':
     'Ваш холод: {cold} из {max}. В одиночку шкала заполняется примерно за {fill} сек. Если в пределах {radius} м стоят {others} или больше других игроков, она вместо этого падает на {fall} в секунду. Живое тепло: полученное исцеление снижает её на 1 за каждые {healPct}% вашего максимального здоровья ({heroicHealPct}% в героическом и мифическом режимах). Неуязвимость вроде Холодного гроба её не останавливает: пока она действует, вы не даёте и не получаете тепла. На {max} вас сковывает изморозь на {freeze} сек., затем лёд разлетается.',
+  'hudChrome.auraEffect.quenchGuardian.intro':
+    'Скована льдом под озером: её нельзя атаковать или ранить, пока она не вырвется изо льда.',
   'hudChrome.auraEffect.quenchGuardian.warmth':
     'Вы греетесь вместе с рейдом: холод падает на {fall} в секунду. Если группа простоит на одном месте {linger} сек, лёд под ней треснет и откроется прорубь с ледяной водой, так что не стойте на месте.',
   'hudChrome.auraEffect.quenchGuardian.frozen':

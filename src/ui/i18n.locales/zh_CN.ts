@@ -23029,6 +23029,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '半身沉在涌泉之中，从不移动。玄武岩之拳仍在继续；炉心火种落在团队脚下，片刻后爆裂，苏醒之火将涌泉周围的地面一圈接一圈地点燃。生命值降到40%时它会再次沉下，炉心再度满溢。英雄难度下伤害提高{heroicPct}%。',
   'hudChrome.auraEffect.heatGuardian.statePhase3':
     '半身沉在涌泉之中，从不移动。玄武岩之拳与苏醒之火仍在继续，滚动余烬会坠落并追逐玩家：击中它就能把它打退。英雄难度下伤害提高{heroicPct}%。',
+  'hudChrome.auraEffect.heatGuardian.intro':
+    '在涌泉中冰冷沉寂：在团队靠近、它苏醒燃起之前，无法被攻击或伤害。',
   'hudChrome.auraEffect.heatGuardian.stateUnder':
     '沉入涌泉之中：炉心满溢期间无法被攻击或伤害。满溢结束后它会再次升起。',
   'hudChrome.auraEffect.heatGuardian.scorched':
@@ -23050,6 +23052,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.heatGuardian.say.seeds': '我撒下的每一颗火星都会生根。',
   'hudChrome.heatGuardian.say.zones': '炉心在你们脚下苏醒。',
   'hudChrome.heatGuardian.say.cinder': '跑吧，小小的火星。火焰饿了。',
+  'hudChrome.heatGuardian.say.intro':
+    '虫子们。你们爬进最初之焰，还指望能离开？在你们的族类学会用火之前，我就已在燃烧。那就与它一同燃尽吧！',
   'abilityUi.cast.heart_heat_fist': '玄武岩之拳',
   'abilityUi.cast.heart_forge_wrath': '熔炉之怒',
   'abilityUi.cast.heart_forge_pour': '熔炉倾泻',
@@ -23066,6 +23070,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.alert.resonanceTitle': '共鸣',
   'hudChrome.council.alert.weightTitle': '重锤之压',
   'hudChrome.council.alert.timeAria': '剩余{seconds}秒',
+  'hudChrome.auraEffect.breathGuardian.intro': '沉睡中：在风暴将它放下之前，无法被攻击或伤害。',
+  'hudChrome.auraEffect.council.intro': '沉睡中：在议会苏醒之前，无法被攻击或伤害。',
   'hudChrome.auraEffect.council.wakeMark':
     '结束时，一根石柱会从你脚下的地面冲出，对{radius}码内的所有人造成{min}到{max}点伤害并将其击退。站到团队需要掩体的位置。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。',
   'hudChrome.auraEffect.council.rockMark':
@@ -23181,6 +23187,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_quench_blades_hunt': '利刃狩猎',
   'hudChrome.quenchGuardian.say.flurry': '所有利刃！所有锋刃！别让任何人站在我的湖上！',
   'hudChrome.quenchGuardian.say.pull': '我的湖上来了温热的血。它不会温热太久。',
+  'hudChrome.quenchGuardian.say.intro': '嘘……湖本在沉睡。你们唤醒了寒冷，而寒冷从不宽恕。',
   'hudChrome.quenchGuardian.say.shatter': '冻透了。现在，碎裂吧。',
   'hudChrome.quenchGuardian.say.hole': '冰记得每一步。聚在一起，它便会崩塌。',
   'hudChrome.quenchGuardian.say.wake': '铸匠之刃，醒来！在冰面上猎杀他们！',
@@ -23190,6 +23197,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchGuardian.say.death': '寒意……放手了……淬火归你们了。',
   'hudChrome.auraEffect.quenchGuardian.cold':
     '你的寒意：{cold}/{max}。独自一人时约{fill}秒充满。若{radius}码内有{others}名或更多其他玩家，则改为每秒下降{fall}。生命之暖：你受到的治疗每达到最大生命值的{healPct}%，寒意降低1（英雄和史诗难度为每{heroicHealPct}%）。寒冰棺等免疫效果无法阻止它：免疫期间你既不提供也不获得温暖。达到{max}时你会被冰霜封住{freeze}秒，随后冰层碎裂。',
+  'hudChrome.auraEffect.quenchGuardian.intro':
+    '被冻结在湖冰之下：在她破冰而出之前，无法攻击或伤害她。',
   'hudChrome.auraEffect.quenchGuardian.warmth':
     '与团队相拥取暖：寒意每秒下降{fall}。在同一处停留{linger}秒的人群，脚下冰面会裂成冰冷的水洞，所以要不断移动。',
   'hudChrome.auraEffect.quenchGuardian.frozen':

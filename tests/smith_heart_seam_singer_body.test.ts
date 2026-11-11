@@ -47,7 +47,8 @@ describe('the Seam Singer body', () => {
   it('draws its own painted GLB in place of the provisional pieces', () => {
     expect(def).toBe(VISUALS.smith_heart_seam_singer);
     expect(def.url).toBe(URL);
-    expect(def.animUrls ?? []).toEqual([]);
+    // Only its entrance's Dormant clip rides beside it (scripts/build_council_entrance_anims.mjs).
+    expect(def.animUrls ?? []).toEqual(['models/creatures/heart_seam_singer_entrance_anims.glb']);
     expect(def.bodyless).toBeUndefined();
     expect(def.authoredAtlas).toBe(true);
     expect(def.tint).toBeUndefined();
@@ -144,5 +145,8 @@ describe('the Seam Singer body', () => {
     expect(json.skins[0].joints.length).toBe(58);
     expect(file.length).toBeLessThanOrEqual(880 * 1024);
     expect(dungeonCharacterBodyUrls('smith_heart')).toContain(URL);
+    expect(dungeonCharacterBodyUrls('smith_heart')).toContain(
+      'models/creatures/heart_seam_singer_entrance_anims.glb',
+    );
   });
 });

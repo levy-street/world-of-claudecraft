@@ -60,6 +60,10 @@ export const HEAT_AURAS = {
   hunted: 'heart_heat_hunted',
   /** On a Rolling Cinder: struck back, no knockback moves it for a while. */
   crust: 'heart_heat_crust',
+  /** On the guardian until its entrance has played (heat_intro.ts): `value`
+   *  heat_intro_plan.ts HEAT_INTRO_STAGES (cold, or waking with the scene's
+   *  clock in `remaining` and `duration`). */
+  intro: 'heart_heat_intro',
 } as const;
 
 /** The guardian's stages (its state aura's `value2`). */

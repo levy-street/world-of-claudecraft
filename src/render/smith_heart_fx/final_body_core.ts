@@ -66,6 +66,12 @@ export const FINAL_BODY_GESTURES = {
   /** The false death's stance (it kneels) and back on its feet. */
   kneel: 'smith_heart_final_body_kneel',
   stand: 'smith_heart_final_body_stand',
+  /** The arrival (final_arrival_core.ts): the still knee it waits on, the
+   *  push back to its feet (its Rise clip), and the cracks held black while
+   *  it sleeps (a glow pulse to nothing, re-sent while dormant). */
+  dormant: 'smith_heart_final_body_dormant',
+  rise: 'smith_heart_final_body_rise',
+  dark: 'smith_heart_final_body_dark',
 } as const;
 
 /** The clips' beats, seconds at 1x (30 fps authoring, work/bl/anim.py). */

@@ -4,7 +4,11 @@
 // through t(), with the English as the fallback and as the key a future voice
 // clip is found by (scripts/voices/smith_heart_voice_pack.mjs).
 //
-//   pull     the shore ice heaves up round the lake
+//   intro    her entrance (quench_intro.ts): the first time the raid steps
+//            onto the lake she wakes under the ice, and this is the line she
+//            breaks out of it on (the fx beats ride the clip's phrases)
+//   pull     the shore ice heaves up round the lake (not on the first pull
+//            right after the entrance: the entrance has just spoken)
 //   shatter  a player's frozen ice shatters (at most once in SAY_EVERY)
 //   hole     the ice gives way under a huddle (at most once in SAY_EVERY)
 //   wake     it raises its arms and the four blades tear free
@@ -25,6 +29,7 @@ import { isSlayMoment, SLAY_EVERY, slayMoment, watchSlain } from './voice_slain'
 
 /** The moments the guardian speaks at. */
 export type QuenchMoment =
+  | 'intro'
   | 'pull'
   | 'shatter'
   | 'hole'
@@ -42,6 +47,7 @@ export type QuenchMoment =
 /** Every line (English source; the catalog's `hudChrome.quenchGuardian.say.*`
  *  rows are the same text). */
 export const QUENCH_LINES: Readonly<Record<QuenchMoment, string>> = {
+  intro: 'Hush... the lake was sleeping. You have woken the cold, and the cold does not forgive.',
   pull: 'Warm blood on my lake. It will not stay warm for long.',
   shatter: 'Frozen through. Now break.',
   hole: 'The ice remembers every step. Stand together, and it gives.',
@@ -86,8 +92,21 @@ export function quenchSay(
     if (said !== undefined && s.st.clock - said < QUENCH_SAY_EVERY - 1e-9) return false;
   } else if (said !== undefined) return false;
   s.st.said[tag] = s.st.clock;
-  for (const p of lakeListeners(s.ctx, s.inst)) {
-    s.ctx.emit({
+  quenchYell(s.ctx, s.inst, from, moment);
+  return true;
+}
+
+/** The guardian (embodied by `from`) yells her `moment` line to everyone
+ *  near the lake, ungated (the entrance's own line, said once by
+ *  quench_intro.ts before any fight state exists). */
+export function quenchYell(
+  ctx: QuenchScope['ctx'],
+  inst: QuenchScope['inst'],
+  from: Entity,
+  moment: QuenchMoment,
+): void {
+  for (const p of lakeListeners(ctx, inst)) {
+    ctx.emit({
       type: 'chat',
       fromPid: from.id,
       from: from.name,
@@ -98,7 +117,6 @@ export function quenchSay(
       pid: p.id,
     });
   }
-  return true;
 }
 
 /** Watch the lake for a player's fall (called every tick of the fight): the

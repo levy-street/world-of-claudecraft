@@ -12,6 +12,7 @@
 
 import * as THREE from 'three';
 import {
+  HEART_ROOM,
   inSmithHeartRoom,
   SMITH_HEART_FIELD,
   SMITH_HEART_FLOATING_SURFACES,
@@ -45,6 +46,7 @@ import {
 import { HAMMER_ENV_PAVED, HAMMER_ENV_STAIRS, hammerEnvPathUv } from './hammer_env_plan_core';
 import { hammerRockPaintLayer } from './hammer_env_rock_paint';
 import { dressHammerVein, ensureHammerKit, HAMMER_KIT_KINDS, hammerKitReady } from './hammer_kit';
+import { heartArrivalFlare, heartArrivalVein } from './heart_arrival_light_core';
 import { heartCliffPaint } from './heart_cliff_paint_core';
 import { heartCollapseDim, heartCollapseHeartLevel } from './heart_collapse_core';
 import { inBreathLight, inHammerSky, inHeatLight, inQuenchLight } from './heart_environment';
@@ -138,6 +140,11 @@ const ground = (x: number, z: number): number => authoredFieldHeight(SMITH_HEART
 /** A pause longer than this (the interior hidden: the player left the run)
  *  forgets the last camera, so the next frame is never read as a hop. */
 const DRIVER_GAP = 0.5;
+
+/** The sky's arrival flare centres this high over the platform (yards):
+ *  well up the final boss's beam (smith_heart_fx/final_arrival_core.ts
+ *  ARRIVAL_BEAM, far taller), where its light meets the sky in view. */
+const HEART_FLARE_Y = 150;
 
 /** Build the whole Smith's Heart for the slot anchored at (ox, oz),
  *  instance-local. Waits (capped) for the veins' Blender kits first. */
@@ -350,6 +357,7 @@ export async function buildSmithHeartInterior(
   const stage = heartPortalStage(-1);
   const hop = heartHopStage(-1);
   const local = { x: 0, y: 0, z: 0 };
+  const flareDir = { x: 0, y: 1, z: 0 };
   let prev: { x: number; z: number } | null = null;
   let lastNow = -1;
   let blend = 0;
@@ -415,9 +423,23 @@ export async function buildSmithHeartInterior(
       const heartLevel = heartCollapseHeartLevel(slot, dark);
       room.setHeart(heartLevel);
       heartKit?.setHeart(heartLevel);
+      // The final boss's arrival (heart_arrival_light_core.ts): each altar
+      // dim round the dormant statue until its vein's light runs, the sky
+      // flaring round the beam.
       for (const v of SMITH_HEART_VEINS) {
-        heartKit?.setVein(v, 1 - 0.7 * dark);
+        heartKit?.setVein(v, (1 - 0.7 * dark) * heartArrivalVein(slot, v));
       }
+      const flare = heartArrivalFlare(slot);
+      if (flare > 0) {
+        flareDir.x = HEART_ROOM.x - local.x;
+        flareDir.y = HEART_ROOM.h + HEART_FLARE_Y - local.y;
+        flareDir.z = HEART_ROOM.z - local.z;
+        const l = Math.hypot(flareDir.x, flareDir.y, flareDir.z) || 1;
+        flareDir.x /= l;
+        flareDir.y /= l;
+        flareDir.z /= l;
+      }
+      sky.setFlare(flare, flareDir);
       quarters?.update(slot, now, dt, dark);
       heartPortalStage(view.portalSince, stage);
       heartHopStage(hopAt < 0 ? -1 : now - hopAt, hop);

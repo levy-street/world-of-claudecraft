@@ -45,6 +45,9 @@ function crowdShareFor(limit: number | undefined): number {
 /** The council aura's descriptor, or null when `a` is not one of them. */
 export function councilAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor | null {
   switch (a.id) {
+    // The entrance's marker (asleep, or waking): out of reach until it ends.
+    case COUNCIL_AURAS.intro:
+      return { key: `${KEY}.intro`, nums: {} };
     case COUNCIL_AURAS.wakeMark:
       return {
         key: `${KEY}.wakeMark`,

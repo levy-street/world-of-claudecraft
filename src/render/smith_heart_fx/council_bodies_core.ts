@@ -129,18 +129,27 @@ export interface CouncilBodyPlan {
   threadWidth: number;
 }
 
-/** The manifest heights times the template scales (characters/manifest.ts
- *  smith_heart_seam_singer 5.44; content smith_heart.ts scale 2.0): the
- *  Singer stands as tall as the Guardian of the Hammer (3.4 x 3.2). */
-export const COUNCIL_BODY_HEIGHTS: Readonly<Record<CouncilBodyKind, number>> = {
-  singer: 5.44 * 2.0,
-};
+/** Each member's model height before its template's scale (the manifest's
+ *  `height`, characters/smith_heart_boss_looks.ts; drawn at the template's
+ *  scale, content smith_heart.ts: the Guardian 3.2, the Singer 2.0). Presentation
+ *  only: the sim's scale, and with it every reach, radius and spot, is untouched.
+ *  The Guardian stands some 14.7 yd, the Singer 11 (about its shoulder). */
+export const COUNCIL_MODEL_HEIGHTS = { guardian: 4.6, singer: 5.5 } as const;
 
-/** The height each plan below is authored at (yards): the Singer's first
- *  body, before it grew to the Guardian's height. The plan is carried to its
- *  drawn height whole (`scalePlan`), so every joint, reach and orbit grows
- *  with the model and the dust, motes and slams stay on its body. */
-const SINGER_AUTHORED_HEIGHT = 5;
+/** The heights the council's set pieces were first authored at (the Guardian
+ *  3.4, the Singer 2.5): the entrance's rock, vein and shards and the Singer's
+ *  body plan grow by these shares so they keep wrapping and following the
+ *  bodies (`COUNCIL_MODEL_HEIGHTS` over them). */
+export const COUNCIL_GROW = {
+  guardian: COUNCIL_MODEL_HEIGHTS.guardian / 3.4,
+  singer: COUNCIL_MODEL_HEIGHTS.singer / 2.5,
+} as const;
+
+/** The manifest heights times the template scales (content smith_heart.ts
+ *  heart_seam_singer scale 2.0). */
+export const COUNCIL_BODY_HEIGHTS: Readonly<Record<CouncilBodyKind, number>> = {
+  singer: COUNCIL_MODEL_HEIGHTS.singer * 2.0,
+};
 
 /** The vein's ochre (the threads) and the seam crystals' hotter amber. */
 export const COUNCIL_BODY_COLORS = {
@@ -180,7 +189,7 @@ function piece(
  *  crystal, long arms ending in crystal fingers, a slow halo of shards. */
 const SINGER_AUTHORED: CouncilBodyPlan = {
   kind: 'singer',
-  height: SINGER_AUTHORED_HEIGHT,
+  height: COUNCIL_BODY_HEIGHTS.singer / COUNCIL_GROW.singer,
   hover: 0.35,
   slots: {
     base: v(0, 0.55, 0),
@@ -318,39 +327,42 @@ const SINGER_AUTHORED: CouncilBodyPlan = {
   threadWidth: 0.1,
 };
 
-const scaleV3 = (p: V3, k: number): V3 => v(p.x * k, p.y * k, p.z * k);
+const grow3 = (p: V3, k: number): V3 => v(p.x * k, p.y * k, p.z * k);
 
-/** A plan grown uniformly by `k`: every length (height, hover, joints, the
- *  arm, the orbits, the pieces, the threads) times `k`; counts, spins, tilts
- *  and colours as they were. */
-function scalePlan(plan: CouncilBodyPlan, k: number): CouncilBodyPlan {
-  const s = plan.slots;
+/** A plan grown by `k` about its feet: every joint, length, orbit, piece and
+ *  the hover (the poses' and the breath's small fixed offsets stay). */
+export function growCouncilPlan(plan: CouncilBodyPlan, k: number): CouncilBodyPlan {
+  const S = plan.slots;
   return {
     ...plan,
     height: plan.height * k,
     hover: plan.hover * k,
     slots: {
-      base: scaleV3(s.base, k),
-      hip: scaleV3(s.hip, k),
-      torso: scaleV3(s.torso, k),
-      head: scaleV3(s.head, k),
-      shoulder: scaleV3(s.shoulder, k),
+      base: grow3(S.base, k),
+      hip: grow3(S.hip, k),
+      torso: grow3(S.torso, k),
+      head: grow3(S.head, k),
+      shoulder: grow3(S.shoulder, k),
     },
     arm: {
-      root: scaleV3(plan.arm.root, k),
+      root: grow3(plan.arm.root, k),
       upper: plan.arm.upper * k,
       fore: plan.arm.fore * k,
-      idle: scaleV3(plan.arm.idle, k),
+      idle: grow3(plan.arm.idle, k),
     },
     skirt: { ...plan.skirt, r: plan.skirt.r * k, y: plan.skirt.y * k },
     halo: { ...plan.halo, r: plan.halo.r * k, y: plan.halo.y * k },
-    pieces: plan.pieces.map((p) => ({ ...p, size: scaleV3(p.size, k), at: scaleV3(p.at, k) })),
+    pieces: plan.pieces.map((p) => ({ ...p, size: grow3(p.size, k), at: grow3(p.at, k) })),
     threadWidth: plan.threadWidth * k,
   };
 }
 
+/** The Singer at her drawn height (her joints drive the motes and the slam
+ *  under her shipped model). */
+const SINGER = growCouncilPlan(SINGER_AUTHORED, COUNCIL_GROW.singer);
+
 export const COUNCIL_BODY_PLANS: Readonly<Record<CouncilBodyKind, CouncilBodyPlan>> = {
-  singer: scalePlan(SINGER_AUTHORED, COUNCIL_BODY_HEIGHTS.singer / SINGER_AUTHORED_HEIGHT),
+  singer: SINGER,
 };
 
 // ---- the casts ------------------------------------------------------------------------

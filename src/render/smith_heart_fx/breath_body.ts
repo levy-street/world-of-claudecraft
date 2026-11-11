@@ -23,6 +23,10 @@
 //    light, torn apart with a flash, a ring and a burst of lightning; through
 //    phase 2 the same currents are a dark storm cloud lit by lightning arcing
 //    piece to piece, a crackling heart in its chest;
+//  - its entrance (breath_entrance_fx.ts, read through
+//    breath_entrance_state.ts): while the guardian is still the wind none of
+//    its air shows, filling in as it forms inside the funnel; the entrance
+//    owns its stance until the scene ends;
 //  - the death: the wind thrown off in one last gust and gone, the glow out,
 //    the stones and shards dropping.
 // Presentation only: the fight's telegraphs are breath_fight_fx.ts's and
@@ -45,6 +49,7 @@ import {
   type BreathWindPhase,
   breathWindOf,
 } from '../../sim/encounters/smith_heart/breath_ids';
+import { BREATH_INTRO } from '../../sim/encounters/smith_heart/breath_intro_plan';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { fxAnchor } from '../attached_fx_anchor';
@@ -98,6 +103,7 @@ import {
   clearBreathBodySockets,
   retryBreathBodySockets,
 } from './breath_body_sockets';
+import { breathEntranceFor } from './breath_entrance_state';
 import { BreathRibbonPool, boltUniforms, windUniforms } from './breath_wind_ribbons';
 import { BreathWindVolume } from './breath_wind_volume';
 import { inSmithHeartClaim } from './council_fx_core';
@@ -708,10 +714,17 @@ export class BreathBody {
     }
     this.seenAlive = true;
     const stormOn = stormFormOn(e.auras);
+    // Its entrance (breath_entrance_fx.ts): while the scene is on the
+    // entrance owns the stance, and the air is only as whole as the body
+    // that has formed (none while it is still the wind).
+    const ent = breathEntranceFor(e.id);
+    const formed = ent ? ent.body : 1;
     // The stance: the calm wind or the storm, re-sent so a rebuilt view holds it.
     const want = breathStanceGesture(stormOn);
     this.gestureTimer -= dt;
-    if (want !== this.stance || this.gestureTimer <= 0) {
+    // Past the hand-back (the scene's tail) the body's own stance is back.
+    if (ent && ent.t < BREATH_INTRO.seconds) this.stance = '';
+    else if (want !== this.stance || this.gestureTimer <= 0) {
       this.stance = want;
       this.gestureTimer = 1;
       this.send(want);
@@ -745,14 +758,14 @@ export class BreathBody {
     this.windU.uFlash.value = this.flash;
     this.windU.uStorm.value = this.storm;
     this.windU.uFlow.value = look.flow;
-    this.currents(look.density, look.radius, look.spin, 1, look.shiver);
-    this.lights(look.glow, 1);
-    this.cosmetics(dt, look.drawIn, look.shiver, 1);
+    this.currents(look.density * formed, look.radius, look.spin, 1, look.shiver);
+    this.lights(look.glow, formed);
+    this.cosmetics(dt, look.drawIn, look.shiver, formed);
     this.castFx(e, dt);
     this.stormFx(dt);
     this.slashFx();
     this.coneFx(e);
-    this.orbit.update(eAt.x, eAt.y, eAt.z, this.clock, 1, this.storm, 0, eAt.y);
+    this.orbit.update(eAt.x, eAt.y, eAt.z, this.clock, formed, this.storm, 0, eAt.y);
   }
 
   // ---- the living wind ---------------------------------------------------------------------

@@ -22486,6 +22486,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '샘에 몸을 반쯤 담근 채 결코 움직이지 않습니다. 현무암 주먹은 계속됩니다. 화로 씨앗이 공격대의 발밑에 떨어졌다가 잠시 뒤 터지고, 깨어나는 불이 샘 주위의 바닥을 띠마다 차례로 불태웁니다. 생명력 40%에서 다시 가라앉고 화로가 넘쳐흐릅니다. 영웅 난이도에서는 피해가 {heroicPct}% 더 큽니다.',
   'hudChrome.auraEffect.heatGuardian.statePhase3':
     '샘에 몸을 반쯤 담근 채 결코 움직이지 않습니다. 현무암 주먹과 깨어나는 불은 계속되고, 구르는 잉걸불이 떨어져 플레이어를 쫓습니다: 때리면 밀려납니다. 영웅 난이도에서는 피해가 {heroicPct}% 더 큽니다.',
+  'hudChrome.auraEffect.heatGuardian.intro':
+    '샘 속에서 차갑게 식어 있다: 공격대가 다가와 깨어나 불타오를 때까지 공격하거나 피해를 줄 수 없다.',
   'hudChrome.auraEffect.heatGuardian.stateUnder':
     '샘에 가라앉아 있습니다: 화로가 넘쳐흐르는 동안에는 공격하거나 피해를 줄 수 없습니다. 넘침이 끝나면 다시 떠오릅니다.',
   'hudChrome.auraEffect.heatGuardian.scorched':
@@ -22508,6 +22510,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.heatGuardian.say.seeds': '내가 흩뿌리는 불티마다 뿌리를 내린다.',
   'hudChrome.heatGuardian.say.zones': '화로가 너희 발밑에서 깨어난다.',
   'hudChrome.heatGuardian.say.cinder': '달려라, 작은 불씨야. 불꽃은 굶주렸다.',
+  'hudChrome.heatGuardian.say.intro':
+    '벌레들. 최초의 불꽃 속으로 기어들어 와 놓고 살아 나가길 바라느냐? 너희 족속이 불을 알기 전부터 나는 타오르고 있었다. 그렇다면 함께 타올라라!',
   'abilityUi.cast.heart_heat_fist': '현무암 주먹',
   'abilityUi.cast.heart_forge_wrath': '화로의 분노',
   'abilityUi.cast.heart_forge_pour': '화로 붓기',
@@ -22524,6 +22528,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.alert.resonanceTitle': '공명',
   'hudChrome.council.alert.weightTitle': '망치의 무게',
   'hudChrome.council.alert.timeAria': '{seconds}초 남음',
+  'hudChrome.auraEffect.breathGuardian.intro':
+    '잠들어 있다: 폭풍이 그를 내려놓을 때까지 공격할 수도, 피해를 줄 수도 없다.',
+  'hudChrome.auraEffect.council.intro':
+    '잠들어 있다: 의회가 깨어날 때까지 공격할 수도, 피해를 줄 수도 없다.',
   'hudChrome.auraEffect.council.wakeMark':
     '효과가 끝나면 서 있는 자리의 바닥에서 기둥이 솟구쳐 {radius}야드 안의 모두에게 {min}에서 {max}의 피해를 주고 밀쳐냅니다. 공격대에 엄폐물이 필요한 곳에 서세요. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
   'hudChrome.auraEffect.council.rockMark':
@@ -22654,6 +22662,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchGuardian.say.flurry':
     '모든 칼날아! 모든 날이여! 내 호수 위에 서 있는 것을 남기지 마라!',
   'hudChrome.quenchGuardian.say.pull': '내 호수에 따뜻한 피라. 그 온기도 오래가지 않으리라.',
+  'hudChrome.quenchGuardian.say.intro':
+    '쉿… 호수는 잠들어 있었다. 너희가 냉기를 깨웠으니, 냉기는 결코 용서하지 않으리라.',
   'hudChrome.quenchGuardian.say.shatter': '속까지 얼었구나. 이제 부서져라.',
   'hudChrome.quenchGuardian.say.hole': '얼음은 모든 발걸음을 기억한다. 함께 서면, 꺼진다.',
   'hudChrome.quenchGuardian.say.wake':
@@ -22664,6 +22674,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchGuardian.say.death': '냉기가... 물러난다... 담금질은 너희의 것이다.',
   'hudChrome.auraEffect.quenchGuardian.cold':
     '당신의 냉기: {max} 중 {cold}. 혼자 있으면 약 {fill}초 만에 가득 찹니다. {radius}미터 안에 다른 플레이어가 {others}명 이상 있으면 대신 매초 {fall}씩 내려갑니다. 생명의 온기: 받은 치유는 최대 생명력의 {healPct}%마다 냉기를 1씩 낮춥니다(영웅과 신화에서는 {heroicHealPct}%마다). 차가운 관 같은 무적 효과로는 막을 수 없습니다: 효과가 지속되는 동안에는 온기를 주지도 받지도 못합니다. {max}에 이르면 {freeze}초 동안 서리에 갇히고, 그 뒤 얼음이 부서집니다.',
+  'hudChrome.auraEffect.quenchGuardian.intro':
+    '호수의 얼음 아래 얼어붙어 있습니다: 그녀가 얼음을 깨고 나올 때까지 그녀를 공격하거나 피해를 줄 수 없습니다.',
   'hudChrome.auraEffect.quenchGuardian.warmth':
     '공격대와 함께 모여 있음: 냉기가 매초 {fall}씩 내려갑니다. 한 자리에 {linger}초 동안 머문 무리 아래의 얼음은 갈라져 얼어붙은 물웅덩이가 되니 계속 움직이세요.',
   'hudChrome.auraEffect.quenchGuardian.frozen':

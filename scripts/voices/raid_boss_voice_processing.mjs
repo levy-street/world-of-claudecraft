@@ -111,64 +111,65 @@ export const SMITH_HEART_VOICE_PROCESSING_PRESETS = [
     choir: [],
     room: ['150|300', '0.24|0.14'],
   },
-  {
-    id: 'rime-lake',
-    mainPitchSemitones: -0.8,
-    bassPitchSemitones: -12,
-    bassGain: 0.05,
-    texture: {
-      pitch: 5,
-      highpass: 3000,
-      lowpass: 10000,
-      tremolo: [38, 0.7],
-      echo: ['23|47', '0.2|0.1'],
-      gain: 0.08,
-    },
-    choir: [],
-    room: ['70|140', '0.22|0.12'],
-  },
-  {
-    id: 'hearth-fire',
-    mainPitchSemitones: -1.5,
-    bassPitchSemitones: -9,
-    bassGain: 0.26,
-    texture: {
-      pitch: -3,
-      highpass: 90,
-      lowpass: 1400,
-      tremolo: [11, 0.4],
-      echo: ['31', '0.15'],
-      gain: 0.16,
-    },
-    choir: [],
-    room: ['55|110', '0.2|0.1'],
-  },
-  {
-    id: 'masterless-heart',
-    mainPitchSemitones: -1.2,
-    bassPitchSemitones: -12,
-    bassGain: 0.26,
-    texture: {
-      pitch: 12,
-      highpass: 2200,
-      lowpass: 9000,
-      tremolo: [5, 0.3],
-      echo: ['90|180', '0.25|0.15'],
-      gain: 0.06,
-    },
-    choir: [
-      { pitch: -5, delayMs: 18, gain: 0.2 },
-      { pitch: 4, delayMs: 27, gain: 0.1 },
-      { pitch: -9, delayMs: 11, gain: 0.16 },
-    ],
-    room: ['110|220|330', '0.28|0.18|0.1'],
-  },
 ];
 
 /** The Smith's Heart's loudness: a touch over the raid's score. */
 export const SMITH_HEART_VOICE_LOUDNESS = 'loudnorm=I=-15:TP=-1.5:LRA=7';
 
+// The Smith's Heart's CLEAN treatments (chosen 2026-11-09): for a voice
+// designed to sound like its boss already (the Guardians of the Heat and the
+// Quench, the Masterless Strength), the take is kept as performed. Only a
+// light high-pass, gentle compression, a soft sub an octave down at a very
+// low level and a short, low-wet early-reflection room (wet only, so the dry
+// voice is never doubled), then the pack's loudness. No vocoder, ring
+// modulation, noise carrier, tremolo or pitch shift of the voice itself.
+
+export const SMITH_HEART_CLEAN_VOICE_PRESETS = [
+  {
+    id: 'rime-queen-clean',
+    highpass: 85,
+    compressor: { threshold: 0.18, ratio: 2, attack: 12, release: 150 },
+    sub: { gain: 0.02, lowpass: 130 },
+    room: { delays: '23|37|53|71', decays: '0.45|0.35|0.25|0.15', wet: 0.08 },
+  },
+
+  {
+    id: 'hearth-fire-clean',
+    highpass: 70,
+    compressor: { threshold: 0.16, ratio: 2.2, attack: 10, release: 140 },
+    sub: { gain: 0.06, lowpass: 150 },
+    room: { delays: '29|47|67|89|117|149', decays: '0.5|0.42|0.33|0.25|0.18|0.11', wet: 0.13 },
+  },
+  {
+    id: 'masterless-clean',
+    highpass: 65,
+    compressor: { threshold: 0.16, ratio: 2.2, attack: 10, release: 150 },
+    sub: { gain: 0.07, lowpass: 140 },
+    room: { delays: '41|61|89|127|163|211', decays: '0.5|0.43|0.35|0.27|0.2|0.13', wet: 0.18 },
+  },
+];
+
+function buildSmithHeartCleanPresetFilter(preset) {
+  const c = preset.compressor;
+  const r = preset.room;
+  return (
+    `aresample=${SAMPLE_RATE},highpass=f=${preset.highpass},` +
+    `acompressor=threshold=${c.threshold}:ratio=${c.ratio}:attack=${c.attack}:release=${c.release}:makeup=1,` +
+    'asplit=3[dry][sub_in][room_in];' +
+    `[sub_in]${pitchFilters(-12)},lowpass=f=${preset.sub.lowpass},volume=${preset.sub.gain}[sub];` +
+    `[room_in]aecho=0:1:${r.delays}:${r.decays},highpass=f=180,lowpass=f=5500,volume=${r.wet}[room];` +
+    '[dry][sub][room]amix=inputs=3:duration=longest:dropout_transition=0:normalize=0,' +
+    // Pin the mix's format: left to negotiation, the sub's rate-shifted
+    // branch makes loudnorm's 192 kHz output come out labelled 44.1 kHz
+    // (a clip four times too long and slowed down).
+    `aformat=sample_fmts=fltp:sample_rates=${SAMPLE_RATE}:channel_layouts=mono,` +
+    `alimiter=limit=0.89,${SMITH_HEART_VOICE_LOUDNESS}[out]`
+  );
+}
+
 export function buildSmithHeartVoiceFilter(presetId) {
+  const clean = SMITH_HEART_CLEAN_VOICE_PRESETS.find(({ id }) => id === presetId);
+  if (clean) return buildSmithHeartCleanPresetFilter(clean);
   const preset = SMITH_HEART_VOICE_PROCESSING_PRESETS.find(({ id }) => id === presetId);
   if (!preset) throw new Error(`Unknown voice processing preset: ${presetId}`);
   const tex = preset.texture;

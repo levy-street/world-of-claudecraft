@@ -5935,7 +5935,9 @@ export const hudChromeStrings = {
       icedOver: 'Frozen solid by Creeping Rime: unable to move or act.',
     },
     // The Smith's Heart's Hammer Council (src/ui/council_aura_effect.ts).
+    // The entrance's marker is wordy (M16): non-Latin fills in the overlays.
     council: {
+      intro: 'Dormant: cannot be attacked or harmed until the council wakes.',
       wakeMark:
         'When this ends, a pillar bursts out of the floor where you stand, dealing {min} to {max} damage to everyone within {radius} yd and throwing them back. Stand where the raid needs cover. Heroic and Mythic: {heroicMin} to {heroicMax} damage.',
       rockMark:
@@ -5953,7 +5955,9 @@ export const hudChromeStrings = {
         "Each pillar shields at most {limit} players from Mountain's Wrath. With more behind it, each of them takes {share}% of the blast. Anyone it finds unhidden takes {min} to {max} damage on Normal, {heroicMin} to {heroicMax} on Heroic and {mythicMin} to {mythicMax} on Mythic.",
     },
     // The Smith's Heart's Guardian of the Breath (src/ui/breath_aura_effect.ts).
+    // The entrance's marker is wordy (M16): non-Latin fills in the overlays.
     breathGuardian: {
+      intro: 'Dormant: cannot be attacked or harmed until the storm sets it down.',
       portalA:
         'When this ends, Portal A opens exactly where you stand. Stand near the Knotted Gale. You cannot carry it this round.',
       portalB:
@@ -5990,6 +5994,8 @@ export const hudChromeStrings = {
     },
     // The Smith's Heart's Guardian of the Quench (src/ui/quench_aura_effect.ts).
     quenchGuardian: {
+      intro:
+        'Frozen under the lake: she cannot be attacked or harmed until she breaks free of the ice.',
       cold: 'Your cold: {cold} of {max}. Alone it fills in about {fill} sec. Standing within {radius} yd of {others} or more other players lowers it by {fall} every second instead. Living Warmth: healing you receive lowers it by 1 for every {healPct}% of your maximum health healed ({heroicHealPct}% on Heroic and Mythic). Immunities such as Cold Coffin do not stop it: while one lasts you neither give nor take warmth. At {max} you are Encased in Rime for {freeze} sec, then the ice shatters.',
       warmth:
         'Huddled with the raid: your cold falls by {fall} every second. A huddle that stays on one spot for {linger} sec cracks the ice beneath it into a hole of freezing water, so keep moving.',
@@ -6021,6 +6027,8 @@ export const hudChromeStrings = {
         'Half sunk in its wellspring: it never moves. Basalt Fist goes on; Hearthseeds fall under the raid and burst after a while, and Wakefire ignites the floor round the wellspring band by band. At 40% health it sinks and the Hearth overflows again. Heroic deals {heroicPct}% more damage.',
       statePhase3:
         'Half sunk in its wellspring: it never moves. Basalt Fist and Wakefire go on, and Rolling Cinders fall and hunt players: strike one to knock it back. Heroic deals {heroicPct}% more damage.',
+      intro:
+        'Cold in its wellspring: it cannot be attacked or harmed until the raid comes near and it wakes, burning.',
       stateUnder:
         'Sunk in its wellspring: it cannot be attacked or harmed while the Hearth overflows. It rises again when the overflow ends.',
       scorched:
@@ -10366,9 +10374,12 @@ export const hudChromeStrings = {
   // The Smith's Heart's Guardian of the Quench (encounters/smith_heart/
   // quench*.ts): what the guardian SAYS (quench_voice.ts QUENCH_LINES, the
   // same English). Its fight calls no raid warning banner (the owner's rule
-  // of 2026-11-04: its mechanics read in the world).
+  // of 2026-11-04: its mechanics read in the world). The entrance's line is
+  // wordy (M16): non-Latin fills in the overlays.
   quenchGuardian: {
     say: {
+      intro:
+        'Hush... the lake was sleeping. You have woken the cold, and the cold does not forgive.',
       pull: 'Warm blood on my lake. It will not stay warm for long.',
       shatter: 'Frozen through. Now break.',
       hole: 'The ice remembers every step. Stand together, and it gives.',
@@ -10407,9 +10418,12 @@ export const hudChromeStrings = {
   },
   // The Smith's Heart's Guardian of the Heat (encounters/smith_heart/heat*.ts):
   // what the guardian SAYS (heat_voice.ts HEAT_LINES, the same English). Its
-  // fight calls no raid warning banner (the owner's rule of 2026-11-03).
+  // fight calls no raid warning banner (the owner's rule of 2026-11-03). The
+  // entrance's line is wordy (M16): non-Latin fills in the overlays.
   heatGuardian: {
     say: {
+      intro:
+        'Insects. You crawl into the first flame and expect to leave? I was burning before your kind learned fire. Then burn with it!',
       pull: 'You walk into the first flame. Nothing leaves it unchanged.',
       fist: 'Stand where the stone falls, and be part of it.',
       sink: 'The wellspring rises to meet you!',
@@ -10438,7 +10452,7 @@ export const hudChromeStrings = {
       arrivalRise:
         'Stone, rise. Bind to us. The hand that shaped us is gone, so we shape ourselves.',
       arrivalRoar: "We are the Smith's strength, and we have no master!",
-      pull: 'You carry the four veins in your blood. We will take them back, and seal the mountain over you.',
+      pull: 'You broke the Hammer, the Breath, the Quench and the Heat. You slew every one of our brothers. Good. Their strength did not die with them... it flows to us. We will wear their power, and crush you with it!',
       drinkHeat: 'The first flame fills us!',
       drinkQuench: 'Cold water, harden us!',
       drinkBreath: 'Breathe, bellows! Lift the storm!',
@@ -10460,7 +10474,7 @@ export const hudChromeStrings = {
       slay_c: 'One more warmth, sealed in.',
       wipe: 'Sealed. Silent. As he wanted.',
       death:
-        'The hand... was never coming back. One ember still burns... Take it, and let the mountain sleep.',
+        'Useless... all of them. The Guardians... Varkhul... useless, every one. But you cannot kill the elements. Stone, fire, wind and ice do not die... they wait. We will return... and the mountain will remember your names.',
     },
   },
   // The Masterless Strength's raid HUD (src/ui/hud/dungeon/heart_overload_view.ts):

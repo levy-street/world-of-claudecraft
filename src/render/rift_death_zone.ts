@@ -60,19 +60,23 @@ import {
 import { setHeartKitCompileGate } from './smith_heart/heart_kit';
 import {
   BreathBody,
+  BreathEntranceFx,
   BreathFightFx,
   BreathFx,
   CouncilBodies,
+  CouncilEntranceFx,
   CouncilFx,
   FinalFx,
   FinalKitFx,
   FinalPhaseFx,
   HammerFx,
   HeatBody,
+  HeatEntranceFx,
   HeatFightFx,
   HeatFx,
   QuenchBladesFx,
   QuenchBody,
+  QuenchEntranceFx,
   QuenchFightFx,
   QuenchFx,
   SealShake,
@@ -205,6 +209,9 @@ export class RiftDeathZoneVisuals {
   /** The Guardian of the Breath's fight on the Storm Cornice, and its body. */
   private readonly breathFight: BreathFightFx;
   private readonly breathBody: BreathBody;
+  /** The Breath guardian's entrance (the calm before the storm), updated
+   *  before its body. */
+  private readonly breathEntrance: BreathEntranceFx;
   // Its Quench guardian (Quenching Breath's cone telegraph and its frost,
   // Tempering Strike's ice).
   private readonly quenchFx: QuenchFx;
@@ -213,6 +220,9 @@ export class RiftDeathZoneVisuals {
   private readonly quenchFight: QuenchFightFx;
   private readonly quenchBlades: QuenchBladesFx;
   private readonly quenchBody: QuenchBody;
+  /** Her entrance (frozen under the lake's ice, the breach, her blades),
+   *  updated before her body: it reads its look. */
+  private readonly quenchEntrance: QuenchEntranceFx;
   // Its Heat guardian (Basalt Fist's spot and lanes, the falling fist and
   // the rolling Molten Swells).
   private readonly heatFx: HeatFx;
@@ -220,11 +230,17 @@ export class RiftDeathZoneVisuals {
    *  rivers, the seeds, Wakefire, the cinders, the marks), and its body. */
   private readonly heatFight: HeatFightFx;
   private readonly heatBody: HeatBody;
+  /** Its entrance (cold coal waking into the blast), updated before the
+   *  fight and the body: they read its look. */
+  private readonly heatEntrance: HeatEntranceFx;
   private readonly finalFx: FinalFx;
   private readonly finalKit: FinalKitFx;
   private readonly finalPhase: FinalPhaseFx;
   private readonly councilFx: CouncilFx;
   private readonly councilBodies: CouncilBodies;
+  /** The council's entrance (the quarry waking), updated before the fight
+   *  and the bodies. */
+  private readonly councilEntrance: CouncilEntranceFx;
   // The Smith's Heart's seal moments felt in the camera.
   private readonly sealShake: SealShake;
   private uninstallDrawnPositions: (() => void) | null = null;
@@ -249,6 +265,15 @@ export class RiftDeathZoneVisuals {
     this.hammerFx = new HammerFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.breathFx = new BreathFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.breathFight = new BreathFightFx(scene, groundY, world, compileGate, reducedMotion, shake);
+    this.breathEntrance = new BreathEntranceFx(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+      shake,
+      playGesture,
+    );
     this.breathBody = new BreathBody(
       scene,
       groundY,
@@ -265,6 +290,15 @@ export class RiftDeathZoneVisuals {
     );
     this.quenchFight = new QuenchFightFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.quenchBlades = new QuenchBladesFx(scene, groundY, world, compileGate, reducedMotion);
+    this.quenchEntrance = new QuenchEntranceFx(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+      shake,
+      playGesture,
+    );
     this.quenchBody = new QuenchBody(
       scene,
       groundY,
@@ -275,6 +309,15 @@ export class RiftDeathZoneVisuals {
       playGesture,
     );
     this.heatFx = new HeatFx(scene, groundY, world, compileGate, reducedMotion, shake);
+    this.heatEntrance = new HeatEntranceFx(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+      shake,
+      playGesture,
+    );
     this.heatFight = new HeatFightFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.heatBody = new HeatBody(
       scene,
@@ -296,6 +339,15 @@ export class RiftDeathZoneVisuals {
     );
     this.finalKit = new FinalKitFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.finalPhase = new FinalPhaseFx(scene, groundY, world, compileGate, reducedMotion, shake);
+    this.councilEntrance = new CouncilEntranceFx(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+      shake,
+      playGesture,
+    );
     this.councilFx = new CouncilFx(
       scene,
       groundY,
@@ -643,17 +695,21 @@ export class RiftDeathZoneVisuals {
     this.hammerFx.update(dt);
     this.breathFx.update(dt);
     this.breathFight.update(dt);
+    this.breathEntrance.update(dt);
     this.breathBody.update(dt);
     this.quenchFx.update(dt);
     this.quenchFight.update(dt);
     this.quenchBlades.update(dt);
+    this.quenchEntrance.update(dt);
     this.quenchBody.update(dt);
     this.heatFx.update(dt);
+    this.heatEntrance.update(dt);
     this.heatFight.update(dt);
     this.heatBody.update(dt);
     this.finalFx.update(dt);
     this.finalKit.update(dt);
     this.finalPhase.update(dt);
+    this.councilEntrance.update(dt);
     this.councilFx.update(dt);
     this.councilBodies.update(dt);
     this.sealShake.update();
@@ -682,17 +738,21 @@ export class RiftDeathZoneVisuals {
     this.hammerFx.dispose();
     this.breathFx.dispose();
     this.breathFight.dispose();
+    this.breathEntrance.dispose();
     this.breathBody.dispose();
     this.quenchFx.dispose();
     this.quenchFight.dispose();
     this.quenchBlades.dispose();
+    this.quenchEntrance.dispose();
     this.quenchBody.dispose();
     this.heatFx.dispose();
+    this.heatEntrance.dispose();
     this.heatFight.dispose();
     this.heatBody.dispose();
     this.finalFx.dispose();
     this.finalKit.dispose();
     this.finalPhase.dispose();
+    this.councilEntrance.dispose();
     this.councilFx.dispose();
     this.councilBodies.dispose();
     this.hoardPresentation.dispose();

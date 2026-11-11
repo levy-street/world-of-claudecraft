@@ -12,6 +12,14 @@ export {
 export * from './breath_geometry';
 export { heartDevTrigger, startHeart, tryThrowKnot } from './breath_heart';
 export * from './breath_ids';
+export {
+  type BreathIntroStage,
+  breathIntroState,
+  breathIntroWaker,
+  inBreathIntroReach,
+  spendBreathIntro,
+} from './breath_intro';
+export * from './breath_intro_plan';
 export * from './breath_isle_geometry';
 export * from './breath_isle_ids';
 export type { BreathFightState } from './breath_state';
@@ -28,6 +36,14 @@ export {
   tickHammerCouncil,
 } from './council';
 export * from './council_ids';
+export {
+  type CouncilIntroStage,
+  councilIntroState,
+  councilIntroWaker,
+  inCouncilIntroReach,
+  spendCouncilIntro,
+} from './council_intro';
+export * from './council_intro_plan';
 export { councilPillars, nearestRiseSpot, onQuarryFloor, pillarBetween } from './council_pillars';
 export {
   landEcho,
@@ -65,6 +81,13 @@ export { heatCinderHitPoints } from './heat_cinder_ward';
 export { FIST_SPAN, wakefireHoldsFist } from './heat_fist';
 export * from './heat_geometry';
 export * from './heat_ids';
+export {
+  type HeatIntroStage,
+  heatIntroState,
+  heatIntroWaker,
+  spendHeatIntro,
+} from './heat_intro';
+export * from './heat_intro_plan';
 export type { HeatFightState } from './heat_state';
 export { HEAT_LINES, heatLineKey } from './heat_voice';
 export {
@@ -84,6 +107,14 @@ export {
 export { claimBlades } from './quench_blades';
 export * from './quench_geometry';
 export * from './quench_ids';
+export {
+  onQuenchIntroIce,
+  type QuenchIntroStage,
+  quenchIntroState,
+  quenchIntroWaker,
+  spendQuenchIntro,
+} from './quench_intro';
+export * from './quench_intro_plan';
 export type { QuenchFightState } from './quench_state';
 export { strikeSpentDue, strikeWindupDue } from './quench_strike_windup';
 export { QUENCH_LINES, quenchLineKey } from './quench_voice';

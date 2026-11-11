@@ -80,6 +80,10 @@ export const QUENCH_AURAS = {
   rime: 'heart_quench_rime',
   /** Living Rime's slow on its carrier (`value` the speed multiplier). */
   rimeSlow: 'heart_quench_rime_slow',
+  /** On the guardian until her entrance has played (quench_intro.ts):
+   *  `value` quench_intro_plan.ts QUENCH_INTRO_STAGES (frozen under the ice,
+   *  or waking with the scene's clock in `remaining` and `duration`). */
+  intro: 'heart_quench_intro',
 } as const;
 
 /** The fight's object templates (a radius or a reach rides `scale`). */

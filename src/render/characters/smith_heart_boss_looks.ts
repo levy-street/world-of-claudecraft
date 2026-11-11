@@ -5,6 +5,10 @@
 // SMITH_HEART_BOSS_LOOKS into VISUALS; smith_heart_placeholder_looks.ts
 // points each boss's template at its key.
 //
+// The Hammer Council (the Guardian of the Hammer and the Seam Singer): their
+// fighting clips and their entrance's stances, gestures and dark (the ids and
+// beats in smith_heart_fx/council_entrance_core.ts).
+//
 // The Masterless Strength (the Quadrant Guardian): one rigged mesh, four
 // element bodies (Body_Hammer, Body_Breath, Body_Heat, Body_Quench plus the
 // Quench's icicles) the fight's quarter swaps through mesh toggles, the
@@ -23,6 +27,12 @@ import {
   BREATH_BODY_HEIGHT,
   BREATH_BODY_URL,
 } from '../smith_heart_fx/breath_body_core';
+import { BREATH_ENTRANCE_GESTURES } from '../smith_heart_fx/breath_entrance_core';
+import { COUNCIL_MODEL_HEIGHTS } from '../smith_heart_fx/council_bodies_core';
+import {
+  COUNCIL_AWAKEN_CLIP,
+  COUNCIL_ENTRANCE_GESTURES,
+} from '../smith_heart_fx/council_entrance_core';
 import {
   FINAL_BODY_CLIP,
   FINAL_BODY_ELEMENTS,
@@ -69,6 +79,27 @@ export const MASTERLESS_STRENGTH_CLIPS = [
   'Death',
 ] as const;
 
+/** The arrival's two authored clips (scripts/build_masterless_strength_
+ *  arrival_anims.mjs, sampled from Kneel, KneelIdle and Idle): the still
+ *  knee it waits dormant on and the heavy push back to its feet. */
+export const MASTERLESS_STRENGTH_ARRIVAL_URL = `${CREATURES}/smith_heart_masterless_strength_arrival_anims.glb`;
+export const MASTERLESS_STRENGTH_ARRIVAL_CLIPS = ['Dormant', 'Rise'] as const;
+
+/** The Guardian of the Quench's two entrance clips (scripts/build_quench_
+ *  guardian_entrance_anims.mjs, sampled from Idle and Wake and laid down and
+ *  lifted on the root): lying frozen under the lake's ice, and the burst out
+ *  of it, the rise and the blades' call. */
+export const QUENCH_ENTRANCE_ANIMS_URL = `${CREATURES}/smith_heart_quench_guardian_entrance_anims.glb`;
+export const QUENCH_ENTRANCE_CLIPS = ['Frozen', 'Emerge'] as const;
+
+/** The Hammer Council's entrance clips (scripts/build_council_entrance_
+ *  anims.mjs, sampled from each rig's own Awaken): the crouch each one sleeps
+ *  on, the Guardian in its spur of rock, the Seam Singer in her crystal. They
+ *  break out on the base GLBs' Awaken. */
+export const COUNCIL_GUARDIAN_ENTRANCE_URL = `${CREATURES}/heart_hammer_guardian_entrance_anims.glb`;
+export const COUNCIL_SINGER_ENTRANCE_URL = `${CREATURES}/heart_seam_singer_entrance_anims.glb`;
+export const COUNCIL_ENTRANCE_CLIPS = ['Dormant'] as const;
+
 /** A bar's clip rate so its contact beat lands on the bar's end. */
 const onBarEnd = (contact: number, bar: number) => (bar > 0 ? contact / bar : 1);
 
@@ -107,6 +138,15 @@ const KNEELING: ClipMap = {
   idle: 'KneelIdle',
   walk: 'KneelIdle',
   run: 'KneelIdle',
+};
+
+/** The arrival's opening (final_arrival_core.ts): on one knee, perfectly
+ *  still, a statue of cracked stone until the beam wakes it. */
+const DORMANT: ClipMap = {
+  ...BASE,
+  idle: 'Dormant',
+  walk: 'Dormant',
+  run: 'Dormant',
 };
 
 const TOGGLES: readonly MeshToggleDef[] = [
@@ -214,6 +254,21 @@ function breathClips(storm: boolean): ClipMap {
 
 const BREATH_CALM = breathClips(false);
 
+/** The Guardian of the Breath's two entrance clips (scripts/build_breath_
+ *  entrance_anims.mjs, sampled off its Idle): gathered into a speck of the
+ *  still air (nothing of it shows), and forming out of the wind inside the
+ *  funnel (smith_heart_fx/breath_entrance_core.ts BREATH_FORM_CLIP). */
+export const BREATH_ENTRANCE_ANIMS_URL = `${CREATURES}/smith_heart_breath_guardian_entrance_anims.glb`;
+export const BREATH_ENTRANCE_CLIPS = ['Gathered', 'Form'] as const;
+
+/** Its entrance's first stance: gathered into nothing, still. */
+const BREATH_GATHERED: ClipMap = {
+  ...BREATH_CALM,
+  idle: 'Gathered',
+  walk: 'Gathered',
+  run: 'Gathered',
+};
+
 // The Guardian of the Quench (the Frozen Lake, design doc 7.3): an ice queen,
 // one rigged mesh, her gown and her hair on their own bone chains (their sway
 // and follow-through baked into every clip). She walks with a slow regal step
@@ -286,16 +341,193 @@ const QUENCH_CLIPS: ClipMap = {
   },
   castPlayOut: ['Breath', 'Wake'],
 };
+
+/** Her entrance's first stance: lying frozen under the lake's ice, still. */
+const QUENCH_FROZEN: ClipMap = { ...QUENCH_CLIPS, idle: 'Frozen', walk: 'Frozen', run: 'Frozen' };
 const BREATH_STORM = breathClips(true);
 
+// ---- the Hammer Council ------------------------------------------------------------------------
+const CG = COUNCIL_ENTRANCE_GESTURES;
+
+/** The Guardian of the Hammer's fighting clips (and its entrance's punch:
+ *  CastWake, its fists landing at COUNCIL_AWAKEN_CLIP.punchContact). */
+const COUNCIL_GUARDIAN_CLIPS: ClipMap = {
+  idle: 'Idle',
+  idleVariants: ['IdleFidget'],
+  idleVariantCadence: { everySec: 18, jitterSec: 12 },
+  combatIdle: 'CombatIdle',
+  turn: 'Turn',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['Attack', 'Attack2'],
+  attackByAbility: {
+    brood_cleave: 'Attack2',
+    heart_mountains_rush_windup: 'Attack',
+    [CG.guardianPunch]: 'CastWake',
+  },
+  attackTimeScaleByAbility: { heart_mountains_rush_windup: 1.25, [CG.guardianPunch]: 1 },
+  contacts: { Attack: [1.0], Attack2: [1.0] },
+  cast: 'CastWrath',
+  castByAbility: {
+    heart_hammers_weight: 'CastWake',
+    heart_mountains_wrath: 'CastWrath',
+    heart_mountains_rush: 'CombatIdle',
+  },
+  castTimeScaleByAbility: { heart_hammers_weight: 0.62, heart_mountains_wrath: 0.75 },
+  castPlayOut: ['CastWake', 'CastWrath'],
+  hit: ['Hit', 'Hit2'],
+  death: 'Death',
+  flourish: 'Awaken',
+};
+
+/** The Seam Singer's fighting clips (and her entrance's high note: CastSong,
+ *  played at COUNCIL_AWAKEN_CLIP.noteRate). */
+const COUNCIL_SINGER_CLIPS: ClipMap = {
+  idle: 'Idle',
+  idleVariants: ['IdleFidget'],
+  idleVariantCadence: { everySec: 18, jitterSec: 12 },
+  combatIdle: 'CombatIdle',
+  turn: 'Turn',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['Attack', 'Attack2'],
+  attackByAbility: { [CG.singerNote]: 'CastSong' },
+  attackTimeScaleByAbility: { [CG.singerNote]: COUNCIL_AWAKEN_CLIP.noteRate },
+  contacts: { Attack: [0.62], Attack2: [0.66] },
+  cast: 'CastSong',
+  castByAbility: {
+    heart_seam_bolt: 'CastBolt',
+    heart_song_of_the_seam: 'CastSong',
+    heart_mountains_wrath: 'CastWrath',
+    heart_wake_the_stone: 'CastBolt',
+    heart_falling_rock: 'CastBolt',
+  },
+  // Wake the Stone and Falling Rock (the Singer's since the council became two bosses) throw
+  // through the bolt, timed so its throw (at 2.0 s at 1x) leaves the hand where
+  // smith_heart_fx/council_bodies.ts slams their dust and ring: 78 percent of each bar.
+  castTimeScaleByAbility: { heart_wake_the_stone: 1.03, heart_falling_rock: 2.14 },
+  castPlayOut: ['CastBolt', 'CastSong', 'CastWrath'],
+  hit: ['Hit', 'Hit2'],
+  death: 'Death',
+  flourish: 'Awaken',
+};
+
+/** Asleep for the entrance: the crouch held, no fidget, no turn. */
+const asleep = (base: ClipMap): ClipMap => ({
+  ...base,
+  idle: 'Dormant',
+  idleVariants: [],
+  combatIdle: 'Dormant',
+  turn: 'Dormant',
+  walk: 'Dormant',
+  run: 'Dormant',
+});
+
+/** A member's entrance stances (smith_heart_fx/council_entrance_fx.ts):
+ *  asleep, the break out (its Awaken one-shot, entered once), standing. */
+const councilStances = (
+  base: ClipMap,
+  dormant: string,
+  emerge: string,
+  stand: string,
+): Record<string, { clips: ClipMap; enter?: string }> => ({
+  [dormant]: { clips: asleep(base) },
+  [emerge]: { clips: base, enter: 'Awaken' },
+  [stand]: { clips: base },
+});
+
+/** A member held dark through its sleep (its colour dulled toward the
+ *  quarry's grey, re-sent while it sleeps; it fills back over the fall as it
+ *  breaks out). Its model has no emissive map, so the pulse takes its one
+ *  material by name. */
+const councilDark = (material: string, gesture: string, shade: number) => ({
+  materials: [material],
+  pulses: [{ gesture, rise: 0, hold: 1.0, fall: 1.1, peak: 1, shade }],
+});
+
 export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
+  // The Guardian of the Hammer, the Hammer Council's main boss, wears the model first built for the
+  // Slabwright (heart_slabwright.glb): Tripo P2, one UV island per rock on a painted 1024 atlas in
+  // ETC1S, a stone rig built in Blender (every rock rigid to one bone; the tracks that only hold the
+  // rest pose are dropped at build, see the spec), drawn at the Guardian's height (4.6 at its scale
+  // of 3.2: about 14.7 yd, the raid small round its feet; COUNCIL_MODEL_HEIGHTS, which the
+  // entrance's rock and the bond's tether read too). Its melee lands at 1.0 s, inside its 2.6 s swing; Hammerfall (the template's
+  // arcCleave, through its brood_cleave cue) swings the wide Attack2, and Mountain's Rush's wind-up
+  // slams Attack down as the run starts (its 1.0 s contact at the 0.8 s wind-up). Hammer's Weight
+  // slams through CastWake (authored to land at 0.94 s) at the end of its 1.5 s bar, Mountain's
+  // Wrath bursts through CastWrath (at 3 s) at the end of its 4 s bar, both locked to the bar; it
+  // braces through Mountain's Rush's bar. It hovers, so no foot can slide: runRef is the template's
+  // 7 yd/s at 1x. Its entrance (smith_heart_fx/council_entrance_fx.ts): asleep in its spur
+  // of rock on Dormant, held dark, then tearing out on Awaken and punching the ground
+  // (CastWake).
+  smith_heart_hammer_guardian: {
+    url: `${CREATURES}/heart_slabwright.glb`,
+    animUrls: [COUNCIL_GUARDIAN_ENTRANCE_URL],
+    height: COUNCIL_MODEL_HEIGHTS.guardian,
+    clips: COUNCIL_GUARDIAN_CLIPS,
+    phaseClips: councilStances(
+      COUNCIL_GUARDIAN_CLIPS,
+      CG.guardianDormant,
+      CG.guardianEmerge,
+      CG.guardianStand,
+    ),
+    glowPulses: councilDark('heart_slabwright', CG.guardianDim, 0.3),
+    castClipSync: ['heart_hammers_weight', 'heart_mountains_wrath'],
+    oneShotsHoldAttacks: ['Awaken'],
+    attackTimeScale: 1,
+    deathTimeScale: 1,
+    turnRate: 3,
+    walkRef: 3.5,
+    runRef: 7,
+    gaitWindDown: true,
+    authoredAtlas: true,
+    clickRadius: 2.8,
+  },
+  // The Seam Singer, the Hammer Council's second boss beside the Guardian: Tripo P2 from the
+  // concept sheet, a painted 1024 atlas in ETC1S, a stone rig built in Blender (every piece rigid
+  // to one bone; only the neck and the column, fused in the mesh, blend). Its light melee lands at 0.62 s and 0.66 s, inside its 2.2 s swing. Seam Bolt leaves
+  // its left hand at the end of its 2 s bar, the song's note comes at the end of its 3 s bar,
+  // Mountain's Wrath bursts at the end of the heirs' 3 s bar, and each finishes its recovery after
+  // the bar. It floats, so no foot can slide: runRef is the template's 7 yd/s at 1x.
+  // smith_heart_fx/council_bodies.ts still plays its dust and rings (COUNCIL_MODELLED).
+  // Her entrance: asleep in her crystal on Dormant, held dark, then floating out on Awaken
+  // and singing the high note (CastSong). Drawn at 5.5 at her scale of 2.0 (11 yd, about the
+  // Guardian's shoulder; COUNCIL_MODEL_HEIGHTS).
+  smith_heart_seam_singer: {
+    url: `${CREATURES}/heart_seam_singer.glb`,
+    animUrls: [COUNCIL_SINGER_ENTRANCE_URL],
+    height: COUNCIL_MODEL_HEIGHTS.singer,
+    clips: COUNCIL_SINGER_CLIPS,
+    phaseClips: councilStances(
+      COUNCIL_SINGER_CLIPS,
+      CG.singerDormant,
+      CG.singerEmerge,
+      CG.singerStand,
+    ),
+    glowPulses: councilDark('heart_seam_singer', CG.singerDim, 0.42),
+    oneShotsHoldAttacks: ['Awaken'],
+    attackTimeScale: 1,
+    deathTimeScale: 1,
+    turnRate: 3,
+    walkRef: 3.5,
+    runRef: 7,
+    gaitWindDown: true,
+    authoredAtlas: true,
+    clickRadius: 2.0,
+  },
   smith_heart_breath_guardian: {
     url: BREATH_BODY_URL,
+    animUrls: [BREATH_ENTRANCE_ANIMS_URL],
     height: BREATH_BODY_HEIGHT,
     clips: BREATH_CALM,
     phaseClips: {
       [BREATH_BODY_GESTURES.calm]: { clips: BREATH_CALM },
       [BREATH_BODY_GESTURES.storm]: { clips: BREATH_STORM },
+      // Its entrance (smith_heart_fx/breath_entrance_fx.ts): gathered into
+      // the still air, then forming inside the funnel (the Form one-shot);
+      // it floats on its calm stance after.
+      [BREATH_ENTRANCE_GESTURES.gathered]: { clips: BREATH_GATHERED },
+      [BREATH_ENTRANCE_GESTURES.form]: { clips: BREATH_CALM, enter: 'Form' },
     },
     castClipSync: [
       BREATH_CASTS.inhale,
@@ -313,7 +545,7 @@ export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
       deathFade: 3,
     },
     // A swing never cuts the roar, the storm breaking or a bolt's cast.
-    oneShotsHoldAttacks: ['Roar', 'StormBreaks', 'Cast', 'StormCast'],
+    oneShotsHoldAttacks: ['Form', 'Roar', 'StormBreaks', 'Cast', 'StormCast'],
     castPlayOutHoldsAttacks: true,
     // It glides: its Move loop read at its own pace (the template's speed).
     walkRef: 7,
@@ -326,14 +558,33 @@ export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
   },
   smith_heart_quench_guardian: {
     url: QUENCH_BODY_URL,
+    animUrls: [QUENCH_ENTRANCE_ANIMS_URL],
     height: QUENCH_BODY_HEIGHT,
     clips: QUENCH_CLIPS,
+    phaseClips: {
+      // Her entrance (smith_heart_fx/quench_entrance_core.ts): frozen under
+      // the ice, then the burst and the rise (the Emerge one-shot).
+      [QUENCH_BODY_GESTURES.frozen]: { clips: QUENCH_FROZEN },
+      [QUENCH_BODY_GESTURES.emerge]: { clips: QUENCH_CLIPS, enter: 'Emerge' },
+      [QUENCH_BODY_GESTURES.stand]: { clips: QUENCH_CLIPS },
+    },
     castClipSync: [QUENCH_CASTS.breath, QUENCH_CASTS.wake],
     glowPulses: {
       // Her eyes, crown, heart and frost cracks flare as the breath is loosed
       // and the blades are thrown awake.
       pulses: [
         { gesture: QUENCH_BODY_GESTURES.flare, rise: 0.12, hold: 0.3, fall: 1.0, peak: 2.0 },
+        // Frozen under the ice: her light out and her colour dulled to grey
+        // while it is re-sent (smith_heart_fx/quench_entrance_fx.ts), filling
+        // back over the fall once she breaks out.
+        {
+          gesture: QUENCH_BODY_GESTURES.frozenDim,
+          rise: 0,
+          hold: 1.0,
+          fall: 1.2,
+          peak: 0.03,
+          shade: 0.62,
+        },
         // Tempering Strike's wind-up: the cold gathers on her raised bracers
         // and her cracks, blazing to the slam a second on.
         {
@@ -350,6 +601,7 @@ export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
     // A swing never cuts the breath, the wake, the strike (its wind-up held
     // through the swing it slams on), the taunt or a slash's command.
     oneShotsHoldAttacks: [
+      'Emerge',
       'Breath',
       'Wake',
       'Strike',
@@ -402,21 +654,38 @@ export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
   },
   smith_heart_masterless_strength: {
     url: MASTERLESS_STRENGTH_URL,
+    animUrls: [MASTERLESS_STRENGTH_ARRIVAL_URL],
     height: FINAL_BODY_HEIGHT,
     clips: BASE,
     phaseClips: {
       [FINAL_BODY_GESTURES.kneel]: { clips: KNEELING, enter: 'Kneel' },
       [FINAL_BODY_GESTURES.stand]: { clips: BASE },
+      // The arrival: dormant on its knee, then the push back to its feet.
+      [FINAL_BODY_GESTURES.dormant]: { clips: DORMANT },
+      [FINAL_BODY_GESTURES.rise]: { clips: BASE, enter: 'Rise' },
     },
     castClipSync: [FINAL_CASTS.fist, FINAL_CASTS.anvil, FINAL_CASTS.bolt],
     meshToggles: TOGGLES,
     glowPulses: {
       // The shell cracking before the element bursts out (final_body_core
       // FINAL_SHIFT.burst), the new body still white-hot after it.
-      pulses: [{ gesture: FINAL_BODY_GESTURES.charge, rise: 0.6, hold: 0.1, fall: 0.6, peak: 1.8 }],
+      // The arrival's dormant stone: the cracks black and the body dulled to
+      // dark stone while the gesture is re-sent (final_body_fx.ts), its
+      // colour and light filling back over the fall once it stops.
+      pulses: [
+        { gesture: FINAL_BODY_GESTURES.charge, rise: 0.6, hold: 0.1, fall: 0.6, peak: 1.8 },
+        {
+          gesture: FINAL_BODY_GESTURES.dark,
+          rise: 0,
+          hold: 1.0,
+          fall: 1.4,
+          peak: 0,
+          shade: 0.1,
+        },
+      ],
       deathFade: 3,
     },
-    oneShotsHoldAttacks: ['Shift'],
+    oneShotsHoldAttacks: ['Shift', 'Rise'],
     // Its stride: 4.8 model yards a cycle over 1.6 s at the drawn height.
     walkRef: 10,
     runRef: 10,

@@ -4747,6 +4747,7 @@ export const zh_CN: EnTranslations = {
         "icedOver": "被蔓延霜凇冻结：无法移动或行动。"
       },
       "council": {
+        "intro": "沉睡中：在议会苏醒之前，无法被攻击或伤害。",
         "wakeMark": "结束时，一根石柱会从你脚下的地面冲出，对{radius}码内的所有人造成{min}到{max}点伤害并将其击退。站到团队需要掩体的位置。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。",
         "rockMark": "结束时，一块巨石砸向你：{total}点伤害由{radius}码内的所有人分担。若不足{soakers}人分担，每人多受{penalty}%伤害，且全团受到{tremorMin}到{tremorMax}点伤害。{radius}码内的每根石柱都会损失一块，所以要远离掩体分担。史诗难度：{soulReach}码内的灵魂石柱改为失去一个灵魂印记，印记耗尽时碎裂。英雄和史诗难度：分担{heroicTotal}点伤害，全团受到{heroicTremorMin}到{heroicTremorMax}点伤害。",
         "resonance": "每{every}秒你会发出共鸣，对你{radius}码内的每名盟友造成{min}到{max}点自然伤害。在效果结束前远离所有人。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。",
@@ -4758,6 +4759,7 @@ export const zh_CN: EnTranslations = {
         "pillarLimit": "每根石柱最多只能为{limit}名玩家挡住山岳之怒。躲在后面的人更多时，每人承受冲击的{share}%。未躲藏者在普通难度受到{min}到{max}点伤害，英雄难度{heroicMin}到{heroicMax}点，史诗难度{mythicMin}到{mythicMax}点。"
       },
       "breathGuardian": {
+        "intro": "沉睡中：在风暴将它放下之前，无法被攻击或伤害。",
         "portalA": "效果结束时，传送门A会在你所站的位置打开。站在结风附近。本轮你无法携带它。",
         "portalB": "效果结束时，传送门B会在你所站的位置打开。站在崖台边缘。本轮你无法携带结风。",
         "portalC": "效果结束时，传送门C会在你所站的位置打开。它只与传送门D相连。站在另一团结风附近。本轮你无法携带它。",
@@ -4779,6 +4781,7 @@ export const zh_CN: EnTranslations = {
         "swell": "每{every}秒，膨胀的风暴对崖台上的所有人造成{min}到{max}点伤害，之前每次脉动使其增强{growth}%：目前已有{stacks}次。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。"
       },
       "quenchGuardian": {
+        "intro": "被冻结在湖冰之下：在她破冰而出之前，无法攻击或伤害她。",
         "cold": "你的寒意：{cold}/{max}。独自一人时约{fill}秒充满。若{radius}码内有{others}名或更多其他玩家，则改为每秒下降{fall}。生命之暖：你受到的治疗每达到最大生命值的{healPct}%，寒意降低1（英雄和史诗难度为每{heroicHealPct}%）。寒冰棺等免疫效果无法阻止它：免疫期间你既不提供也不获得温暖。达到{max}时你会被冰霜封住{freeze}秒，随后冰层碎裂。",
         "warmth": "与团队相拥取暖：寒意每秒下降{fall}。在同一处停留{linger}秒的人群，脚下冰面会裂成冰冷的水洞，所以要不断移动。",
         "frozen": "被冰霜封住：你无法行动，受到的所有伤害提高{pct}%，冰霜会击碎寒冰棺等免疫效果。效果结束时冰层碎裂：你受到{min}到{max}点冰霜伤害，随后{seconds}秒内受到的伤害提高{brittle}%，{radius}码内的所有人获得{cold}点寒意（英雄难度为{heroicRadius}码、{heroicCold}点寒意）。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。",
@@ -4796,6 +4799,7 @@ export const zh_CN: EnTranslations = {
         "statePhase1": "半身沉在涌泉之中，从不移动。玄武岩之拳砸向岸上的一点，三道熔岩涌浪从那里滚滚而出；炉心闪焰会击中所有距离涌泉超过{reach}码的人。生命值降到70%时它会沉下，炉心随之满溢。英雄难度下伤害提高{heroicPct}%。",
         "statePhase2": "半身沉在涌泉之中，从不移动。玄武岩之拳仍在继续；炉心火种落在团队脚下，片刻后爆裂，苏醒之火将涌泉周围的地面一圈接一圈地点燃。生命值降到40%时它会再次沉下，炉心再度满溢。英雄难度下伤害提高{heroicPct}%。",
         "statePhase3": "半身沉在涌泉之中，从不移动。玄武岩之拳与苏醒之火仍在继续，滚动余烬会坠落并追逐玩家：击中它就能把它打退。英雄难度下伤害提高{heroicPct}%。",
+        "intro": "在涌泉中冰冷沉寂：在团队靠近、它苏醒燃起之前，无法被攻击或伤害。",
         "stateUnder": "沉入涌泉之中：炉心满溢期间无法被攻击或伤害。满溢结束后它会再次升起。",
         "scorched": "受到的火焰、冰霜、自然、暗影和奥术伤害提高{pct}%。每{every}秒，炉心闪焰会击中所有距离涌泉超过{reach}码的人并刷新此效果。",
         "grip": "每秒受到{total}点火焰伤害（{stacks}层中每层{per}点）。守护者每次命中都会叠加一层（最多{most}层），持续{seconds}秒：在灼烧过重之前换坦克。",
@@ -7380,6 +7384,7 @@ export const zh_CN: EnTranslations = {
     },
     "quenchGuardian": {
       "say": {
+        "intro": "嘘……湖本在沉睡。你们唤醒了寒冷，而寒冷从不宽恕。",
         "pull": "我的湖上来了温热的血。它不会温热太久。",
         "shatter": "冻透了。现在，碎裂吧。",
         "hole": "冰记得每一步。聚在一起，它便会崩塌。",
@@ -7413,6 +7418,7 @@ export const zh_CN: EnTranslations = {
     },
     "heatGuardian": {
       "say": {
+        "intro": "虫子们。你们爬进最初之焰，还指望能离开？在你们的族类学会用火之前，我就已在燃烧。那就与它一同燃尽吧！",
         "pull": "你们走进了最初的火焰。没有什么能毫无改变地离开。",
         "fist": "站在岩石落下的地方，成为它的一部分。",
         "sink": "涌泉升起来迎接你们了！",

@@ -4747,6 +4747,7 @@ export const pt_BR: EnTranslations = {
         "icedOver": "Congelado por completo pela Geada crescente: não pode se mover ou agir."
       },
       "council": {
+        "intro": "Dormant: cannot be attacked or harmed until the council wakes.",
         "wakeMark": "When this ends, a pillar bursts out of the floor where you stand, dealing {min} to {max} damage to everyone within {radius} yd and throwing them back. Stand where the raid needs cover. Heroic and Mythic: {heroicMin} to {heroicMax} damage.",
         "rockMark": "When this ends, a rock falls on you: {total} damage shared between everyone within {radius} yd. With fewer than {soakers} under it, each takes {penalty}% more and the whole raid takes {tremorMin} to {tremorMax}. Every pillar within {radius} yd loses a piece, so share it away from cover. Mythic: a soul pillar within {soulReach} yd loses a soul pip instead, and breaks at none. Heroic and Mythic: {heroicTotal} damage shared, and {heroicTremorMin} to {heroicTremorMax} to the raid.",
         "resonance": "Every {every} sec you ring, dealing {min} to {max} Nature damage to each ally within {radius} yd of you. Move away from everyone until it ends. Heroic and Mythic: {heroicMin} to {heroicMax} damage.",
@@ -4758,6 +4759,7 @@ export const pt_BR: EnTranslations = {
         "pillarLimit": "Each pillar shields at most {limit} players from Mountain's Wrath. With more behind it, each of them takes {share}% of the blast. Anyone it finds unhidden takes {min} to {max} damage on Normal, {heroicMin} to {heroicMax} on Heroic and {mythicMin} to {mythicMax} on Mythic."
       },
       "breathGuardian": {
+        "intro": "Dormant: cannot be attacked or harmed until the storm sets it down.",
         "portalA": "When this ends, Portal A opens exactly where you stand. Stand near the Knotted Gale. You cannot carry it this round.",
         "portalB": "When this ends, Portal B opens exactly where you stand. Stand at the edge of the Cornice. You cannot carry the Knotted Gale this round.",
         "portalC": "When this ends, Portal C opens exactly where you stand. It links to Portal D only. Stand near the other Knotted Gale. You cannot carry it this round.",
@@ -4779,6 +4781,7 @@ export const pt_BR: EnTranslations = {
         "swell": "Every {every} sec the swelling storm deals {min} to {max} damage to everyone on the Cornice, {growth}% more for every pulse before it: {stacks} so far. Heroic and Mythic: {heroicMin} to {heroicMax} damage."
       },
       "quenchGuardian": {
+        "intro": "Frozen under the lake: she cannot be attacked or harmed until she breaks free of the ice.",
         "cold": "Your cold: {cold} of {max}. Alone it fills in about {fill} sec. Standing within {radius} yd of {others} or more other players lowers it by {fall} every second instead. Living Warmth: healing you receive lowers it by 1 for every {healPct}% of your maximum health healed ({heroicHealPct}% on Heroic and Mythic). Immunities such as Cold Coffin do not stop it: while one lasts you neither give nor take warmth. At {max} you are Encased in Rime for {freeze} sec, then the ice shatters.",
         "warmth": "Huddled with the raid: your cold falls by {fall} every second. A huddle that stays on one spot for {linger} sec cracks the ice beneath it into a hole of freezing water, so keep moving.",
         "frozen": "Encased in rime: you cannot act and take {pct}% more damage from all sources, and the rime cracks immunities such as Cold Coffin. When it ends the ice shatters: you take {min} to {max} Frost damage, then take {brittle}% more damage for {seconds} sec, and everyone within {radius} yd of you gains {cold} cold ({heroicRadius} yd and {heroicCold} cold on Heroic). Heroic: {heroicMin} to {heroicMax} damage. Mythic: {mythicMin} to {mythicMax} damage.",
@@ -4796,6 +4799,7 @@ export const pt_BR: EnTranslations = {
         "statePhase1": "Half sunk in its wellspring: it never moves. Basalt Fist slams a spot on the shore and three Molten Swells roll out from it, and Hearth Flare strikes everyone farther than {reach} yd from the wellspring. At 70% health it sinks and the Hearth overflows. Heroic deals {heroicPct}% more damage.",
         "statePhase2": "Half sunk in its wellspring: it never moves. Basalt Fist goes on; Hearthseeds fall under the raid and burst after a while, and Wakefire ignites the floor round the wellspring band by band. At 40% health it sinks and the Hearth overflows again. Heroic deals {heroicPct}% more damage.",
         "statePhase3": "Half sunk in its wellspring: it never moves. Basalt Fist and Wakefire go on, and Rolling Cinders fall and hunt players: strike one to knock it back. Heroic deals {heroicPct}% more damage.",
+        "intro": "Cold in its wellspring: it cannot be attacked or harmed until the raid comes near and it wakes, burning.",
         "stateUnder": "Sunk in its wellspring: it cannot be attacked or harmed while the Hearth overflows. It rises again when the overflow ends.",
         "scorched": "Takes {pct}% more Fire, Frost, Nature, Shadow and Arcane damage. Every {every} sec, Hearth Flare strikes everyone farther than {reach} yd from the wellspring and renews this.",
         "grip": "Takes {total} Fire damage every second ({per} for each of your {stacks} stacks). Each of the guardian's landed swings adds a stack, up to {most}, and lasts {seconds} sec: swap tanks before it grows too heavy.",
@@ -7380,6 +7384,7 @@ export const pt_BR: EnTranslations = {
     },
     "quenchGuardian": {
       "say": {
+        "intro": "Hush... the lake was sleeping. You have woken the cold, and the cold does not forgive.",
         "pull": "Warm blood on my lake. It will not stay warm for long.",
         "shatter": "Frozen through. Now break.",
         "hole": "The ice remembers every step. Stand together, and it gives.",
@@ -7413,6 +7418,7 @@ export const pt_BR: EnTranslations = {
     },
     "heatGuardian": {
       "say": {
+        "intro": "Insects. You crawl into the first flame and expect to leave? I was burning before your kind learned fire. Then burn with it!",
         "pull": "You walk into the first flame. Nothing leaves it unchanged.",
         "fist": "Stand where the stone falls, and be part of it.",
         "sink": "The wellspring rises to meet you!",
@@ -7435,7 +7441,7 @@ export const pt_BR: EnTranslations = {
         "arrivalWake": "Who wakes the heart of the mountain? Warm breath... here, where nothing breathes.",
         "arrivalRise": "Stone, rise. Bind to us. The hand that shaped us is gone, so we shape ourselves.",
         "arrivalRoar": "We are the Smith's strength, and we have no master!",
-        "pull": "You carry the four veins in your blood. We will take them back, and seal the mountain over you.",
+        "pull": "You broke the Hammer, the Breath, the Quench and the Heat. You slew every one of our brothers. Good. Their strength did not die with them... it flows to us. We will wear their power, and crush you with it!",
         "drinkHeat": "The first flame fills us!",
         "drinkQuench": "Cold water, harden us!",
         "drinkBreath": "Breathe, bellows! Lift the storm!",
@@ -7456,7 +7462,7 @@ export const pt_BR: EnTranslations = {
         "slay_b": "Your blood returns to the vein.",
         "slay_c": "One more warmth, sealed in.",
         "wipe": "Sealed. Silent. As he wanted.",
-        "death": "The hand... was never coming back. One ember still burns... Take it, and let the mountain sleep."
+        "death": "Useless... all of them. The Guardians... Varkhul... useless, every one. But you cannot kill the elements. Stone, fire, wind and ice do not die... they wait. We will return... and the mountain will remember your names."
       }
     },
     "finalOverload": {

@@ -285,7 +285,7 @@ export function tickSmithHeartSeal(ctx: SimContext, inst: InstanceSlot): number 
   if (smithHeartPortalBitSet(value) && !smithHeartPortalBitSet(before)) {
     announce(ctx, inst, SMITH_HEART_PORTAL_OPEN_LOG);
   }
-  // The heart wakes: its arrival lines follow over the rebuild.
+  // The heart wakes: its arrival lines follow over the scene.
   if (smithHeartAwakeBitSet(value) && !smithHeartAwakeBitSet(before)) beginArrivalVoice(ctx, inst);
   return value;
 }

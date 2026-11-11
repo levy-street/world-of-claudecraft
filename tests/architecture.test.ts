@@ -1167,10 +1167,12 @@ const RENDER_PURE_CORES = [
   // rock, the final boss's memory, its body and effects.
   'src/render/smith_heart/heart_room_kit_plan_core.ts',
   'src/render/smith_heart/heart_crown_core.ts',
+  'src/render/smith_heart/heart_arrival_light_core.ts',
   'src/render/smith_heart/heart_final_core.ts',
   // The Anvil of the World's quarters awake (phase 2K): the boss memory, the
   // floods, drains and shocks, the air's seeds.
   'src/render/smith_heart/heart_quarters_core.ts',
+  'src/render/smith_heart/heart_vein_groove_core.ts',
   // Phase 2M: the wall landmarks' frame, spots, eruption and lightning.
   'src/render/smith_heart/heart_landmarks_core.ts',
   'src/render/smith_heart_fx/final_body_core.ts',
@@ -1208,6 +1210,14 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart_fx/heat_body_core.ts',
   // The Heat guardian's living fire: its tongues, lick, ramp and bursts' caps.
   'src/render/smith_heart_fx/heat_flame_core.ts',
+  'src/render/smith_heart_fx/heat_entrance_core.ts',
+  // The Quench guardian's entrance ("Under the ice"): its clock, beats, web,
+  // chunks and blades.
+  'src/render/smith_heart_fx/quench_entrance_core.ts',
+  'src/render/smith_heart_fx/council_entrance_core.ts',
+  // The Breath guardian's entrance ("Calm before the storm"): its clock,
+  // beats, stone, strikes and bolts.
+  'src/render/smith_heart_fx/breath_entrance_core.ts',
   'src/render/smith_heart_fx/heat_fight_fx_core.ts',
   // The Heat's floor ladder (every floor layer's unique rung) and its molten
   // telegraphs' looks.

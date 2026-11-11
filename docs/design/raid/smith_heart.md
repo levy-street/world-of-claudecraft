@@ -806,6 +806,7 @@ the sim untouched; rebuilt with the fight on 2026-10-27, section 7.4):
 | Hearthseeds | a crystal seed throbbing faster to its burst, its core and its reach on the floor (every tier) |
 | Wakefire | each band a ring on the floor at its exact radii, building over its warning, erupting in a sheet of flame, dying down |
 | Rolling Cinder | its fall's spot fills while the fireball plunges out of the smoke; the great ball of fire rolls (its own bodyless look, `smith_heart_rolling_cinder`), its track on the floor, chevrons over its quarry, a crust while it is held |
+| The entrance | `heat_entrance_fx.ts` over `heat_entrance_core.ts` (its look held for the body and the wellspring, `heat_entrance_state.ts`): cold, a spiral trail of ash and dark coals round a crusted wellspring, thin smoke, the giant's model dimmed to cold grey coal; the wake, the fire racing in along the spiral to the wellspring and the body catching fire from its foot to its crown; on the line's first sentence (contempt) a crown of flame, a heat shimmer and rising sparks; on the second (anger) fire pouring off its shoulders and arms, glowing seams cracking out across the floor and a rain of embers, its Cast gesture; on the shout ("Then burn with it!", its Throw landing on the word) a twisting column of fire to the sky, a ring of fire racing across the floor past the raid (cosmetic, no damage), a wave on the floor, the camera's thud and a brief orange flash; then full blaze. The beats ride the clip's own turns (`HEAT_INTRO_VOICE`, measured on the shipped clip). Every tier plays every beat (the low tier thins embers and particles); reduced motion drops the thud and the flash |
 
 Readability: every footprint (the fist's spot, the lanes, the rivers, a seed's reach, every
 band, a fall, every burning patch) is the shared floor telegraph or a floor mark at its exact
@@ -852,26 +853,32 @@ reaches its quarter; the core's light rises from the bed, the shafts climb out o
 seal markers take the arrival bit (`SMITH_HEART_AWAKE_BIT`, 32) and keep it for the claim's
 life (`tickSmithHeartSeal`; no rng, no clock, no mob touched; `/dev heart arrival` replays it).
 The renderer's seal memory reads it (`awakeSince`): seen waking, the scene plays from there;
-first seen awake (a late arrival, a reconnect) it is long past and the body is whole. Online it
-rides the markers' template id like the veins (no wire change). The timeline (`ARRIVAL`,
-`final_fx_core.ts`): a breath while the hop's wash clears; a pillar of the heart's light stands
-up out of the chasm and the heart rides it up past the platform's far rim, swollen with light,
-and glides in over the platform; one by one the room's rocks (eleven resting on the walk
-between the altars and the channels, off the bridge's line, and ten shards under the lip)
-tremble, tear free of the paving with a burst of dust and broken stone (leaving a socket,
-carved into its quarter since phase 2L), lift, spiral in round the heart tumbling with a trail of light and lock into
-the body with a flash and a thread of a vein's light; as the last locks, the four-colour
-shockwave races over the platform and the chasm and the camera thuds (reduced motion drops
-the shakes). A pull during the scene runs it on to its end in under a second. Nothing is
-attached later than the interior and the effects' own gated root; the kit's pieces draw with
-the kit's own linked slot materials.
+first seen awake (a late arrival, a reconnect) it is long past and the boss stands. Online it
+rides the markers' template id like the veins (no wire change). The scene (Jose's approved
+concept of 2026-11-09, which replaced the flying-rock rebuild; `final_arrival_core.ts`, painted
+by `final_arrival_beam.ts`, the body by `final_body_fx.ts`), `ARRIVAL_END` long (inside the
+approved eight to twelve seconds, pinned) with no camera takeover: the boss kneels on the Anvil dormant, a cracked stone statue (its
+still `Dormant` clip, its colour dulled and its cracks black through a glow pulse); the four
+altars' veins light in their element colours in quick succession and their light runs down
+the four vein grooves carved in the floor (`heart_vein_groove_core.ts`: swept like the ridges,
+one four-armed spiral; a playtest note of 2026-11-10 asked the light to follow the floor's
+markings), leaping the central ring's kerb and spiralling in to it; the four streams meet under it and fuse into one giant beam
+of light, a white-hot core in a swirl of the four colours, shooting far up into the sky
+(`ARRIVAL_BEAM`, many times the room's width) (the floor's shockwave in the four colours, the camera's thud, the sky flaring round the
+beam, `heart_arrival_light_core.ts`); the beam falls back down into the boss, its cracks fill
+with light and its eyes ignite; it pushes up off its knee (its `Rise` clip,
+`scripts/build_masterless_strength_arrival_anims.mjs`) and roars (its `Shift` clip) with a
+four-colour shockwave out over the raid. The sim says the waking whisper as it opens and the
+roar's line on the roar (`final_voice.ts` `ARRIVAL_LINE_AT`, pinned to `ARRIVAL_VOICE`); the
+rising line is no longer said over it (the whisper alone fills most of the scene and a queued
+line goes stale). There is no sim hold: a pull during the scene runs it on to its end in under
+a second, so the fight never waits on a show and the boss is never fought while it reads
+dormant. Every material is built under the effects' root before its gated attach.
 
-**The body.** A bodyless target (`smith_heart_colossus` in the manifest, its nameplate over the
-head) with a colossus of the kit's rock pieces bound to the crystal heart, some twenty yards
-tall: torso, hip, head with a crown of peaks and a cleft of light for eyes, shoulders, two arms
-on a two-bone reach, fists, a skirt of shards and more over its back; it hovers and breathes.
-Its joints and timeline are its own (`COLOSSUS_SLOTS`, `colossusArmIk`), so the final creature
-model (the official pipeline) replaces the pieces and keeps them.
+**The body.** (Replaced by its own rigged model in phase 2O, `final_body_fx.ts`; the rock
+pieces' body and their joints are gone since the 2026-11-09 arrival.) As first built: a
+bodyless target with a colossus of the kit's rock pieces bound to the crystal heart, some
+twenty yards tall, hovering and breathing.
 
 | Moment | Look |
 |---|---|
@@ -895,7 +902,8 @@ The council's effects are `src/render/smith_heart_fx/council_fx.ts` (pure plan
 
 | Moment | Look |
 |---|---|
-| The Seam Singer | Provisional body of the kits' own stone, floating pieces stitched by ochre threads of the vein's light like the Heart's colossus (the Slabwright's broad, blocky body left with it in the two-boss rework; its model is the Guardian's body now, and the Singer wears its own, the pieces its fallback): the Seam Singer tall and slender with glowing amber seam crystals, drawn as tall as the Guardian of the Hammer (about 11 yards since 2026-11-10: a visual size only, the sim keeps its scale-2 body's reach and spacing, and its plan grows with it, `council_bodies_core.ts` `scalePlan`). Idle breath, a swing, cast poses (the Slabwright raises its arms and slams for Wake the Stone and the rock; the Singer lifts its arms and its crystals flare with the bar), a hunch and white-gold threads when one holds the Wrath, a fall into rubble. Their joints are kept apart from the pieces, so the official pipeline's models replace the pieces only |
+| The Seam Singer | Provisional body of the kits' own stone, floating pieces stitched by ochre threads of the vein's light like the Heart's colossus (the Slabwright's broad, blocky body left with it in the two-boss rework; its model is the Guardian's body now, and the Singer wears its own, the pieces its fallback): the Seam Singer tall and slender with glowing amber seam crystals; both about 2 to 2.5 times a player. Idle breath, a swing, cast poses (the Slabwright raises its arms and slams for Wake the Stone and the rock; the Singer lifts its arms and its crystals flare with the bar), a hunch and white-gold threads when one holds the Wrath, a fall into rubble. Their joints are kept apart from the pieces, so the official pipeline's models replace the pieces only |
+| The entrance, "The quarry wakes" (2026-11-10) | `council_entrance_fx.ts` over `council_entrance_core.ts`, with its two parts `council_entrance_stone.ts` (the Guardian's rock) and `council_entrance_crystal.ts` (the Singer's vein): asleep, the Guardian is fused into a spur of the quarry's sandstone at its own spot (a crag of slabs about 12 yd high, a gap at its chest toward the raid where its dark shape shows, a slow light breathing deep inside), and the Seam Singer sleeps curled inside a vein of amber crystal glowing faintly; both rigs on their Dormant clips (`scripts/build_council_entrance_anims.mjs`, each sampled off its own Awaken) and held dark (a glow pulse on the rig's clones, never their material). The thrum: the floor's pebbles hop, dust trickles off the terraces, a low rumble and a tremor, and the five carved columns light one by one from the Pit Mouth inward (seams of light climbing each face, a ring at the foot). On "Strangers in the Quarry." burning cracks race up the spur from its foot to its crown, the light inside swelling through the gaps; in the breath after it the Guardian tears itself out on its Awaken: every slab flung out and up, tumbling, landing in a puff of dust and sinking into the floor, a hail of rubble, a cloud of dust, a thud. On "flesh" it punches the ground (CastWake): a rolling wall of dust and grit races out past the raid with the floor's wave (cosmetic: no damage, no knockback), stone thrown up, the pebbles kicked as it passes, the heavy thud. The crystal rings like a rising note, rings of resonance pulsing off it faster and faster, the vein trembling and brightening; in the breath after "Hear the seam sing?" it shatters in a bright burst (shards flung, a flash on her, never a white-out) and she floats out on her Awaken, shards of crystal gathering into an orbit round her, her own amber light about her. On "voices" she hits her high note (CastSong): a curtain of light races out across the quarry, every crystal in the room (the geodes, the columns' crowns) flaring as it passes, her shards flung out with it; then the fight is hers. The beats ride the two clips' words (`COUNCIL_INTRO_VOICE`, measured on the shipped clips). Every tier plays every beat (the low tier thins the particles, rubble, shards and pebbles; the spur's slabs never); reduced motion drops the thuds and the flash and caps the added light |
 | The pillars | The quarry's carved columns (the Hammer kit's) and the risen stone (the rock kit's needles), each drawing its integrity on the model: a network of seams cracking open and burning hotter, a growing lean, and its pips round its foot: an arc of light on the floor for each piece it started with and, on it, a carved stone socket holding a gem of the vein's light (a spent one a dark stone; the last one throbs; a flash as one is lost) |
 | A pillar rising | Bursting out of the floor in under a second with a shudder, a ring of dust, shards thrown out and a shock ring at the knockback's reach |
 | A pillar losing a piece | Its seams flash, chips and dust off its face, a short shake |
@@ -1009,6 +1017,7 @@ vein's art rule holds: living stone, ice and the cold, no metal, no machinery (t
 | The echoes | Each footprint at the echo's own arc and reach at its blade (`echoReach`: wider than the attack it repeats), in danger with a hot edge, filling to its landing; no safe ring is drawn (Jose's playtest: a mint lee beside the danger footprint read alike, so only the danger is drawn and the lee is learned, its rule unchanged); landing, the guardian's own gust or ice over the echo's whole reach |
 | The crossing | The lane between the two blades (danger) through its warning, the flight's wake, then the cracks along it |
 | The shore ice | Slabs of jagged lake ice heaving up round the lake at the pull, standing through the fight, sinking at its end; the lake refreezing in a wave of frost at the guardian's fall |
+| The entrance, "Under the ice" (2026-11-09) | `quench_entrance_fx.ts` over `quench_entrance_core.ts` (her look held for her body, `quench_entrance_state.ts`): dormant, she lies on her back under a sheet of clear faceted lake ice (her own model on its Frozen clip, `scripts/build_quench_guardian_entrance_anims.mjs`), dim and grey (a glow pulse on the rig's clones, never her material), her eyes shut, a faint light beating slow under her and a breath of frost drifting off the ice over her mouth; the wake, her eyes opening sharp under the ice before "Hush..."; on "the lake was sleeping" a web of cracks racing out from her across the lake toward the raid (a dark fracture with cold light leaking up through it, motes rising off it), frost creeping over the ice, cold mist, snow thickening into a flurry, the ice cracking deep (her own samples); in the line's held breath the sheet crazes and trembles as the light under it swells; on "woken" she bursts up through it (her Emerge clip): a fountain of chunks and shards, a geyser of ice and cold light, a frost shockwave racing out over the raid (cosmetic: no damage, no knockback), the camera's thud and a burst of light at her (never a white-out); she rises slowly to her full height, arms climbing to the sky; from "and the cold" her conjured swords of ice (the Smith's blades' own section) rise out of the lake one by one round her and circle her; on "forgive" they turn and point each at one of the raid as she throws her arms down; after she is handed back they burst into small shards of ice. The beats ride the clip's own words (`QUENCH_INTRO_VOICE`, measured on the shipped clip). Every tier plays every beat (the low tier thins particles and chunks); reduced motion drops the thud and the burst of light |
 
 Readability: the frost on bodies, the cold bar, every crack, hole, echo footprint, lane
 and the splash ring draw on every tier; the low tier sheds only particles (mist, embers,
@@ -1673,6 +1682,7 @@ harness.
 | Piece | Rule | Where |
 |---|---|---|
 | One pull | The two are one authored pack (`SMITH_HEART_COUNCIL_PACK`): pulling one pulls both; a member whose foe fell is put back on the fight with its sibling's hate while the other fights | `council.ts` (`keepTogether`) |
+| The entrance | The owner's ask of 2026-11-10 ("The quarry wakes", "AAA, powerful VFX"). Until the raid first comes down into the Quarry both members sleep (the Guardian in its spur of rock, the Singer in her crystal): held by the encounter (`encounterHeld`), not hostile, nothing harms them. The first living player within `COUNCIL_INTRO.reach` (58 yd) of the Quarry's middle and `band` (16 yd) of its floor (the Gallery's last flight and the Pit Mouth) wakes it: a scene of `COUNCIL_INTRO.seconds` (14 s) in which BOTH stay untargetable and unpullable (a raider at either one's side pulls nothing), the council's own recorded pull lines said on their beats (the Guardian's at `guardianSpeakAt` as it tears out, the Singer's at `singerSpeakAt` as her crystal shatters; no new voice), then both are handed back and the ordinary aggro takes them. No camera, no control is taken. It plays once per council (a wipe sends them home awake); a fight begun before it woke spends it, as does a dev pull or a forced mechanic; `/dev heart council intro` replays it. The scene's clock rides one aura on each member (`COUNCIL_AURAS.intro`, the shared `Dormant` name), so a late joiner starts where it is and one who joins after sees them standing. The pull's two lines stay quiet within `pullQuiet` s of the entrance (it has just said them); every later pull says them | `council_intro.ts`, `council_intro_plan.ts` |
 | One wipe | The fight ends when no living member fights: a fallen member stands up whole at its place (`Entity.regrown`: no reward twice), the five columns stand whole again, the risen and cursed pillars, marks, rubble, Weight, Bond and stacks go | `council.ts` (`resetCouncil`), `council_pillars.ts` (`restorePillars`) |
 | One kill | Complete only when both are dead: the Slab (`the_slab` waits on `SMITH_HEART_COUNCIL`), the heart seal's Hammer vein (`smithHeartVeinWon`), the death checkpoints and every credit wait on both; the risen pillars sink back into the floor and the carved columns stand in their sockets again | `content/smith_heart.ts`, `seal.ts`, `council_pillars.ts` (`settlePillars`) |
 | Pillars | The five carved columns (claim objects at `QUARRY_PILLAR_SPOTS`) plus the risen ones, at most 7 standing (the cursed pillar is outside the cap). A carved column has 2 integrity and a risen pillar 1 (`councilPillarFull`), in its template id; each stands as a round combat wall (`COMBAT_WALL_SHAPES`) that blocks bodies and the Wrath's sight line, offline and online. Cracked to 0 by the rock it falls: rubble lies 8 s and bites 90 to 110 a second. A pillar the Wrath or the Rush takes whole leaves rubble that only looks the part | `council_pillars.ts` |
@@ -1813,6 +1823,30 @@ Stone, Echo of Wrath and Endless Song returned no game use (CLEAR; the nearest w
 **The rework of 2026-11-03 (the team's feedback, approved by the owner).** Where it and the
 table below disagree, this block wins. Every number stays a SKETCH (unmeasured).
 
+- **The entrance, "Calm before the storm"** (the owner's ask of 2026-11-10: "AAA, powerful
+  VFX", no voice, wind and thunder only). Until the raid first climbs onto the Cornice the
+  guardian is not yet a body: held by the encounter (`encounterHeld`), not hostile, nothing
+  harms it, its rig gathered into a speck (`Gathered`, `scripts/build_breath_entrance_anims.mjs`,
+  sampled off its Idle). The first living player within `BREATH_INTRO.reach` (58 yd) of its
+  spot and `band` (12 yd) of the Cornice's floor (the climb's flat top, some 50 yd west of it,
+  far past its aggro reach) wakes it: a scene of `BREATH_INTRO.seconds` (12 s) in which it
+  stays untargetable and unpullable. The dead calm: the Cornice's loose stone and dust hang
+  still in the air, a dark smudge of cloud high over the middle. The pull: everything drifts,
+  then races up into it in tightening spirals, the smudge swelling into a turning eye of storm
+  cloud 40 yd up, a rising howl. The funnel: a tornado comes down out of the eye onto the floor
+  (a bolt down its heart, a thud and a ring of dust as it touches), torn storm cloud lit from
+  within, lightning crawling over it, stone orbiting it, bolts striking the floor at its foot.
+  The guardian forms inside it (`Form`, its root grown back about its heart). The burst: the
+  funnel blown apart, a ring of gust sweeping the whole Cornice past the raid (cosmetic: no
+  damage, no knockback), the stone flung out, the guardian floating where it stood. The finale:
+  four strikes round it, then one great bolt onto it and a thunderclap; the fight is its.
+  It plays once per guardian (a wipe sends it home awake); a fight begun before it woke, a dev
+  pull or a forced mechanic spends it; `/dev heart breath intro` replays it. The clock rides one
+  aura (`BREATH_AURAS.intro`, the shared `Dormant` name), so a late joiner starts where it is
+  and one who joins after sees it floating; the pull keeps its own lines (the scene said none).
+  `breath_intro.ts`, `breath_intro_plan.ts`; the look `render/smith_heart_fx/breath_entrance_*`.
+  Every tier plays every beat (the low tier thins particles and the flying stone); reduced
+  motion drops the thuds and the flash and caps the added light.
 - **The open Cornice.** No wall, rail, rod, horn or cheek stone stands round the Cornice any
   more: the whole rim is an open lip (the layout's `CORNICE_OPEN_RIM`, plus the six channel
   throats `CORNICE_GAPS`), so a body blown or thrown off ANY edge falls and dies, on every
@@ -2001,6 +2035,7 @@ no plates broken by the boss's fire (Korzul: here the RAID breaks the ice, in ro
 
 | Piece | Rule | Where |
 |---|---|---|
+| The entrance | The owner's ask of 2026-11-09 ("AAA y powerful VFX", "Under the ice"). Until the raid first steps onto the lake she lies frozen under its ice: held by the encounter (`encounterHeld`), not hostile, nothing harms her. The first living player on the ice (the lake's ellipse grown by `QUENCH_INTRO.reach`, 1 yd: off the rock shelf and onto the ice, some 35 yd from her and over twice her 16 yd aggro reach) wakes her: a scene of `QUENCH_INTRO.seconds` (11.9 s) in which she stays untargetable and unpullable (a raider at her side pulls nothing), her line ("Hush... the lake was sleeping. You have woken the cold, and the cold does not forgive.") yelled at `speakAt`, then she is handed back and the ordinary aggro takes her. No camera, no control is taken. It plays once per guardian (a wipe sends her home awake); a fight begun before she woke spends it; `/dev heart quench intro` replays it. The scene's clock rides one aura (`QUENCH_AURAS.intro`), so a late joiner starts where it is and one who joins after sees her standing. The pull line stays quiet within `pullQuiet` s of the entrance; every later pull says it | `quench_intro.ts`, `quench_intro_plan.ts` |
 | The shore ice | At the pull the lake's edge heaves up into a ring of jagged ice (28 slabs, 2.5 s rising, then oriented combat walls), so the whole fight stays on the lake's ice (the shelf's rock never cracks, and a raid could otherwise huddle on it for ever). A body still on the shelf when it closes is set down inside. It falls at a wipe and at the kill | `quench_rim.ts`, layout `QUENCH_RIMEWALL` |
 | The cold | Every player in the basin carries a cold bar (0 to 100; an aura whose `value` is the bar and `value2` its trend). Alone it rises 100 / 24 a second (full in about 24 s); within 6 yd of 2 or more other players (a huddle, the warmth aura) it falls 4 a second instead (the team's pass of 2026-11-04; it was 30 s and 6). Frozen and trapped players give no warmth | `quench_cold.ts` |
 | Immunities are no warmth | The team's pass of 2026-11-04. The cold is not damage: no damage cut, absorb or cheat-death moves the bar. A body sealed in an immunity (any stasis, such as Cold Coffin or a Temporal Hourglass, or a scripted damage immunity) gives and takes no warmth: its bar rises as if alone. Nothing a player casts clears the cold, the freeze, Frost-Brittle or a splash's mark (all undispellable; the freeze an unbreakable stun). The rime cracks a BREAKABLE stasis as its wearer freezes, every tick they stay frozen (Cold Coffin is usable while stunned) and as they shatter, so no immunity skips the freeze, its double damage or the shatter's hit. An unbreakable stasis (a trinket's death save) stays | `quench_bite.ts` |
@@ -2088,6 +2123,7 @@ guardian cannot be pushed past an overflow before it happens.
 
 | Piece | Rule | Where |
 |---|---|---|
+| The entrance | The owner's ask of 2026-11-09 ("AAA y powerful VFX"). Until the raid first comes near, the guardian stands in its wellspring as cold coal: held by the encounter (`encounterHeld`), not hostile, nothing harms it. The first living player within `HEAT_INTRO.reach` (58 yd) of the wellspring, the anvil bridge's east end, wakes it: a scene of `HEAT_INTRO.seconds` (13 s) in which it stays untargetable and unpullable (a raider at its lip pulls nothing), its line yelled at `speakAt`, then it is handed back and the ordinary aggro takes it. No camera, no control is taken. It plays once per guardian (a wipe sends it home burning); a fight begun before it woke spends it; `/dev heart heat intro` replays it. The scene's clock rides one aura (`HEAT_AURAS.intro`), so a late joiner starts where it is and one who joins after sees it burning. The pull line stays quiet within `pullQuiet` s of the entrance (the entrance has just said it); every later pull says it | `heat_intro.ts`, `heat_intro_plan.ts` |
 | Phase 1 (100 to 70) | Basalt Fist and its Molten Swells, Hearth Flare, Cinder Grip on the tank | `heat_fist.ts`, `heat_flare.ts` |
 | Basalt Fist | Every 22 s (first 8 s in; since pass 5, the owner's call of 2026-11-06, a due fist waits while Wakefire lays its bands or any band warns or burns, and while the next run would begin before its swells are done (`wakefireHoldsFist`, `FIST_SPAN`); it then comes at once and the wait comes off the next one's, never under 11 s, so it waits at most one run and that lookahead and the fight keeps its 22 s rhythm) a 3 s bar, planted, its facing locked on a spot on the shore where a hashed player (never the tank while anyone else stands) stood. The spot shows at its exact 6 yd radius; whoever is inside when the bar ends takes 2,500 to 2,700 (a kill at level 20). Phases 1 to 3 | `heat_fist.ts` |
 | Molten Swell | 0.6 s after the slam three walls of molten rock roll out of the spot, one straight away from the wellspring and one to either side: 32 yd at 10 yd a second, 11 yd wide and 5 yd deep (pass 5, 2026-11-06, the owner's call: 5 and 2.5 before), 380 to 440 to each player a wall rolls over (once). The lanes show with the spot, so the raid already knows the gaps to stand in (the side toward the guardian is clear 5.5 yd past the spot's line, which near the lip is the wellspring itself: there the gaps are the diagonals). A wave just out of the spot never strikes back past it. Fair at the size: from a lane's middle a player is out in under a second at run speed, and the lanes show 3.6 s before a wave rolls; wherever the fist lands the three lanes and the spot cover under a quarter of the Hearth's floor and under half of the melee ring (pinned in `tests/smith_heart_heat.test.ts`) | `heat_fist.ts` |
@@ -2360,7 +2396,7 @@ Every line is a boss yell with a stable key (`hudChrome.<boss>.say.<moment>`, En
 catalog, the five non-Latin locales filled); the client finds its clip by the English
 (`src/ui/hud_voice_cues.ts` `yellVoiceKey`). The Masterless Strength's voice is an observer
 (`final_voice.ts` `stepFinalVoice`): it reads the fight after each tick and changes nothing;
-its three arrival lines follow the renderer's rebuild (`ARRIVAL_LINE_AT`). A player's fall
+its two arrival lines follow the renderer's arrival scene (`ARRIVAL_LINE_AT`). A player's fall
 gets a kill line (`voice_slain.ts`: two or three variants in turn, at most one in
 `SLAY_EVERY` seconds a boss); signature barks repeat at most once in their boss's
 `SAY_EVERY`. In the client (`src/ui/voice_events.ts` `voicedYellMix`) a raid line is mastered
@@ -2478,10 +2514,13 @@ on both difficulties (dungeon rework README, goal 4).
 - `tests/smith_heart_arrival.test.ts`: the arrival bit (asleep on a fresh claim, set by the
   first living player in the Heart and kept, never by a corpse, no rng, the boss untouched,
   the dev replay, the readout).
-- `tests/smith_heart_final_fx.test.ts`: the boss's numbers read, the rest spots, the arrival's
-  order and timeline, the heart's rise, the arm's reach, the fist and the pour inside their
-  areas, the fall, the seal memory's arrival (live and late), the room's darkness, FinalFx
+- `tests/smith_heart_final_fx.test.ts`: the boss's numbers read, the arm's reach, the
+  heart going dark, the seal memory's arrival (live and late), the room's darkness, FinalFx
   over a fake world.
+- `tests/smith_heart_final_arrival.test.ts`: the arrival scene: its beats in order and
+  length, the veins' colours, paths and fronts, the beam's phases, the sky and the altars,
+  the body's stance and dark stone, the sim's lines on its beats, FinalFx playing it live,
+  a late arrival standing, a pull running it to its end, the old rebuild gone.
 - `tests/smith_heart_council.test.ts` (on `tests/helpers/council_fight.ts`): the Hammer
   Council over a real claim: two members and no Slabwright, one pull for both (and nothing
   else), the energy bar, the five columns as round walls, Wake the Stone's two pillars at the

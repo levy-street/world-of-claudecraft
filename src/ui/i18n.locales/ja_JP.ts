@@ -22515,6 +22515,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '湧泉に半身を沈め、決して動かない。玄武岩の拳は続く。炉床の種がレイドの足元に落ちてしばらくして弾け、目覚めの炎が湧泉のまわりの床を帯ごとに燃え上がらせる。体力40%で再び沈み、炉床があふれ出す。ヒロイックでは与えるダメージが{heroicPct}%増える。',
   'hudChrome.auraEffect.heatGuardian.statePhase3':
     '湧泉に半身を沈め、決して動かない。玄武岩の拳と目覚めの炎は続き、転がる燃え殻が落ちてきてプレイヤーを追う：打てば押し返せる。ヒロイックでは与えるダメージが{heroicPct}%増える。',
+  'hudChrome.auraEffect.heatGuardian.intro':
+    '湧泉の中で冷えきっている：レイドが近づいて目覚め、燃え上がるまで、攻撃もダメージも受けない。',
   'hudChrome.auraEffect.heatGuardian.stateUnder':
     '湧泉に沈んでいる：炉床があふれている間は攻撃もダメージも受けない。あふれが終わると再び浮かび上がる。',
   'hudChrome.auraEffect.heatGuardian.scorched':
@@ -22537,6 +22539,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.heatGuardian.say.seeds': '我が撒く火花はどれも根を張る。',
   'hudChrome.heatGuardian.say.zones': '炉床がお前たちの足元で目を覚ます。',
   'hudChrome.heatGuardian.say.cinder': '走れ、小さき燠火よ。炎は飢えている。',
+  'hudChrome.heatGuardian.say.intro':
+    '虫けらどもめ。最初の炎に這い入り、生きて出られると思ったか？お前たちの種族が火を知るより前から、我は燃えていた。ならば共に燃え尽きよ！',
   'abilityUi.cast.heart_heat_fist': '玄武岩の拳',
   'abilityUi.cast.heart_forge_wrath': '炉の怒り',
   'abilityUi.cast.heart_forge_pour': '炉の注ぎ',
@@ -22553,6 +22557,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.alert.resonanceTitle': '共鳴',
   'hudChrome.council.alert.weightTitle': '槌の重み',
   'hudChrome.council.alert.timeAria': '残り{seconds}秒',
+  'hudChrome.auraEffect.breathGuardian.intro':
+    '眠っている：嵐がその身を降ろすまで、攻撃もダメージも受けない。',
+  'hudChrome.auraEffect.council.intro':
+    '眠っている：評議会が目覚めるまで、攻撃もダメージも受けない。',
   'hudChrome.auraEffect.council.wakeMark':
     '効果が切れると、立っている場所の床から柱が突き出し、{radius}ヤード以内の全員に{min}から{max}のダメージを与えて吹き飛ばす。レイドが遮蔽物を必要とする場所に立とう。ヒロイック・ミシック：{heroicMin}から{heroicMax}のダメージ。',
   'hudChrome.auraEffect.council.rockMark':
@@ -22675,6 +22683,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_quench_blades_hunt': '剣の狩り',
   'hudChrome.quenchGuardian.say.flurry': 'すべての剣よ！すべての刃よ！我が湖に立つものを残すな！',
   'hudChrome.quenchGuardian.say.pull': '我が湖に温かい血か。その温もりも長くは続かぬ。',
+  'hudChrome.quenchGuardian.say.intro':
+    'しっ……湖は眠っていたのに。お前たちは冷気を目覚めさせた。そして冷気は決して赦さぬ。',
   'hudChrome.quenchGuardian.say.shatter': '芯まで凍った。さあ、砕けよ。',
   'hudChrome.quenchGuardian.say.hole': '氷はすべての足音を覚えている。寄り集まれば、崩れる。',
   'hudChrome.quenchGuardian.say.wake': '鍛冶師の剣よ、目覚めよ！氷の上で奴らを狩れ！',
@@ -22684,6 +22694,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchGuardian.say.death': '冷気が……離れていく……焼き入れはお前たちのものだ。',
   'hudChrome.auraEffect.quenchGuardian.cold':
     'あなたの冷気：{max}中{cold}。ひとりでいると約{fill}秒で満ちる。{radius}ヤード以内に他のプレイヤーが{others}人以上いれば、代わりに毎秒{fall}ずつ下がる。命の温もり：受けた回復は、最大体力の{healPct}%ごとに冷気を1下げる（ヒロイックとミシックでは{heroicHealPct}%ごと）。冷たき棺などの無敵効果では止められない：効果中は温もりを与えることも受けることもできない。{max}に達すると{freeze}秒間霜に閉ざされ、その後氷が砕ける。',
+  'hudChrome.auraEffect.quenchGuardian.intro':
+    '湖の氷の下に凍りついている：氷を破って現れるまで、攻撃もダメージも受けない。',
   'hudChrome.auraEffect.quenchGuardian.warmth':
     'レイドと身を寄せ合っている：冷気が毎秒{fall}ずつ下がる。同じ場所に{linger}秒とどまった集団の下では氷が割れ、凍てつく水の穴が開く。動き続けよう。',
   'hudChrome.auraEffect.quenchGuardian.frozen':

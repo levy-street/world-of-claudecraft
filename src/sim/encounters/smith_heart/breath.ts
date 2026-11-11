@@ -2,6 +2,12 @@
 // the Storm Cornice's boss, one body and two halves, with Captain Thessaly
 // fighting beside the raid.
 //
+//   The entrance          before all of it, the first time the raid climbs
+//                          onto the Cornice: a dead calm, everything drawn
+//                          up into the sky, a tornado down onto the floor
+//                          that bursts and leaves the guardian floating in
+//                          it, held out of reach until the scene ends
+//                          (breath_intro.ts).
 //   The Wind (100 to 50)   the bellows breathes across the Cornice in turn
 //                          (breath_gale.ts: blows, calms, the rim's wall and
 //                          its gaps, the indrawn breath and Bellows Gust,
@@ -66,6 +72,12 @@ import {
   type BreathDifficulty,
   BREATH_TUNING as T,
 } from './breath_ids';
+import {
+  breathIntroReadout,
+  replayBreathIntro,
+  spendBreathIntro,
+  stepBreathIntro,
+} from './breath_intro';
 import { ISLE_DEV_VERBS, isleDevTrigger, isleReadout } from './breath_isle_dev';
 import { clearIsles, islesDue, startIsles, stepIsles } from './breath_isles';
 import {
@@ -346,9 +358,13 @@ export function tickBreathGuardian(ctx: SimContext, inst: InstanceSlot): void {
   if (!boss) return;
   const st0 = boss.smithHeartBreath ?? null;
   if (!living(boss)) {
+    // Down before the Cornice woke (a dev kill): nothing left gathered.
+    spendBreathIntro(boss);
     if (st0 && !st0.finished) finishBreath(ctx, inst, boss, st0);
     return;
   }
+  // The entrance holds it out of reach until the scene ends.
+  if (stepBreathIntro(ctx, inst, boss, fighting(boss))) return;
   if (!fighting(boss)) {
     if (st0) {
       // The raid lies dead on the Cornice: both say so.
@@ -385,10 +401,13 @@ export function tickBreathGuardian(ctx: SimContext, inst: InstanceSlot): void {
 // ---- dev ----------------------------------------------------------------------------------
 
 /** The fight's scope for a dev command or a test (starting the fight state
- *  if none runs yet), or null when the claim holds no guardian. */
+ *  if none runs yet, the entrance spent), or null when the claim holds no
+ *  guardian. */
 export function breathScopeForDev(ctx: SimContext, inst: InstanceSlot): BreathScope | null {
   const boss = breathGuardian(ctx, inst);
   if (!boss || !living(boss)) return null;
+  // A mechanic forced from the dev line starts the fight: no entrance left.
+  spendBreathIntro(boss);
   const st = boss.smithHeartBreath ?? beginBreath(ctx, inst, boss);
   return scopeOf(ctx, inst, st, boss);
 }
@@ -422,7 +441,7 @@ export function breathDevTrigger(
   pid?: number,
 ): string | null {
   const [verb, arg] = what.trim().split(/\s+/);
-  if (verb === 'reset') {
+  if (verb === 'reset' || verb === 'intro') {
     const boss = breathGuardian(ctx, inst);
     if (!boss) return 'This run holds no Guardian of the Breath.';
     resetBreath(ctx, inst, boss);
@@ -436,6 +455,10 @@ export function breathDevTrigger(
     boss.pos = { ...boss.spawnPos, y: ctx.groundPos(boss.spawnPos.x, boss.spawnPos.z).y };
     boss.prevPos = { ...boss.pos };
     ctx.rebucket(boss);
+    if (verb === 'intro') {
+      replayBreathIntro(boss);
+      return 'The Guardian of the Breath is gathered into the still air again; the storm comes down as the raid climbs onto the Cornice.';
+    }
     return 'The Guardian of the Breath stands whole again; the wind is still.';
   }
   if (verb === 'heroic' || verb === 'mythic') {
@@ -541,6 +564,7 @@ export function breathReadout(ctx: SimContext, inst: InstanceSlot): string {
   const head = `[dev] Guardian of the Breath (${breathDifficulty(inst)}): ${boss.dead ? 'dead' : `${Math.round((boss.hp / boss.maxHp) * 100)}%`}`;
   const st = boss.smithHeartBreath;
   const obj = windObject(ctx, inst);
-  if (!st) return `${head}; not fighting (wind ${obj?.templateId ?? 'missing'}).`;
+  if (!st)
+    return `${head}; not fighting (wind ${obj?.templateId ?? 'missing'}; ${breathIntroReadout(boss)}).`;
   return `${head}; ${st.half}, wind ${st.wind.phase} toward ${st.wind.bearing} (${st.wind.remaining.toFixed(1)} s), blows ${st.wind.blows}, inhale in ${Math.max(0, st.inhaleTimer).toFixed(0)} s, swell ${st.swellPulses}; ${isleReadout(scopeOf(ctx, inst, st, boss))}`;
 }

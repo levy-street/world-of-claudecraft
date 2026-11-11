@@ -239,7 +239,7 @@ describe('the arrival', () => {
 
   // Fifty-five sim seconds of a whole world: slow on a loaded runner, so a
   // generous timeout (the assertion is the order and timing, not the speed).
-  it('the heart speaks three lines over its rebuild, in order and on time, once', () => {
+  it('the heart speaks its two lines over the arrival scene, in order and on time, once', () => {
     const { sim, dev, inst } = arrive();
     expect(finalBoss(sim.ctx, inst)).not.toBeNull();
     dev('/dev heart tp heartroom');

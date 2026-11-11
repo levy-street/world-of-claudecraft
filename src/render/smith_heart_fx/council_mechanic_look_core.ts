@@ -24,11 +24,11 @@ import {
   type CouncilRole,
   COUNCIL_TUNING as T,
 } from '../../sim/encounters/smith_heart/council_ids';
-import { COUNCIL_BODY_HEIGHTS } from './council_bodies_core';
+import { COUNCIL_BODY_HEIGHTS, COUNCIL_MODEL_HEIGHTS } from './council_bodies_core';
 
 /** The Guardian's model height before its template's scale
- *  (characters/manifest.ts smith_heart_hammer_guardian). */
-const GUARDIAN_MODEL_HEIGHT = 3.4;
+ *  (characters/smith_heart_boss_looks.ts smith_heart_hammer_guardian). */
+const GUARDIAN_MODEL_HEIGHT = COUNCIL_MODEL_HEIGHTS.guardian;
 
 /** Each member's height feet to crown (yards: the model's height times the
  *  template's scale) and the share of it where the tether is anchored (the
@@ -64,9 +64,9 @@ const BOND_SIGILS: Readonly<Record<CouncilRole, { radius: number; column: number
 
 /** How far the tether's middle climbs over the line between its anchors
  *  (yards): `close` with the two standing together (a tall loop that rises
- *  clear of both members' crowns, so it reads shoulder to shoulder),
+ *  clear of the smaller member's crown, so it reads shoulder to shoulder),
  *  easing to `apart` (a shallow arc) as the span grows from `near` to `far`. */
-export const BOND_ARCH = { close: 5, apart: 2.4, near: 5, far: 18 } as const;
+export const BOND_ARCH = { close: 4, apart: 2.4, near: 5, far: 18 } as const;
 
 /** The arch over a span of `span` yards (xz) between the two anchors. */
 export function bondArch(span: number): number {

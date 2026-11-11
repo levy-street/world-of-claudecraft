@@ -42,6 +42,8 @@ import {
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { heartKitSlotMaterial } from '../smith_heart/heart_kit';
 import { HEAT_BODY_COLORS } from './heat_body_core';
+import { kindleWellLook } from './heat_entrance_core';
+import { heatEntranceFor } from './heat_entrance_state';
 import {
   HEAT_FIGHT_COLORS as C,
   HEAT_WELL,
@@ -576,6 +578,8 @@ export class HeatWellFx {
     if (guardian && !guardian.dead)
       for (const a of guardian.auras) if (a.id === HEAT_AURAS.state) phase = Math.round(a.value);
     const look = wellLook(this.state, phase, clock, _well);
+    // Crusted over while the guardian waits cold, kindling with its entrance.
+    kindleWellLook(look, guardian ? heatEntranceFor(guardian.id) : null);
     const u = this.poolMat.uniforms;
     u.uHeat.value = look.heat;
     u.uBoil.value = look.boil;

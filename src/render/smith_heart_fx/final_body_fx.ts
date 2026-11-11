@@ -3,10 +3,12 @@
 // shared particles and flashes are its). Presentation only, read from IWorld
 // through the host (the boss's drawn position, facing, scale, its state
 // aura's zone):
-//  - which of the rig's four element bodies shows, and the whole model
-//    hidden while the heart sleeps and the Heart kit's pieces fly in (mesh
-//    toggles on the rig, sent through the renderer's gesture seam and
-//    re-sent so a rebuilt view shows the right body);
+//  - which of the rig's four element bodies shows (mesh toggles on the rig,
+//    sent through the renderer's gesture seam and re-sent so a rebuilt view
+//    shows the right body);
+//  - the arrival's body (final_arrival_core.ts): dormant on its knee, its
+//    cracks held black, then the push to its feet (its Rise clip) and the
+//    roar that opens its first element;
 //  - the transformation when the quarter changes: the shell cracks with the
 //    light bleeding through its seams (the rig's glow pulse), the strength
 //    drawn in to the heart, then on the roar's opening the burst of the new
@@ -31,6 +33,7 @@ import type { HeartQuarterZone } from '../../sim/content/smith_heart_quarters';
 import type { Entity } from '../../sim/types';
 import { fxAnchor } from '../attached_fx_anchor';
 import type { EngineParticles } from '../trash_engine_fx/engine_particles';
+import type { ArrivalStance } from './final_arrival_core';
 import {
   boltJoint,
   FINAL_AURA_RATES,
@@ -68,18 +71,24 @@ export interface FinalBodyFrame {
   zone: HeartQuarterZone;
   /** The arrival is over (or was never seen): the model stands whole. */
   whole: boolean;
-  /** The arrival is under way: the model already stands (from the first
-   *  frame, final_arrival_core.ts), dormant, the pieces drawn into it; no
-   *  aura until it roars awake as it stands whole. */
+  /** The arrival is under way (final_arrival_core.ts arrivalForming): no
+   *  element aura until it roars awake. */
   forming: boolean;
+  /** The stance the rig holds (final_arrival_core.ts arrivalStance). */
+  stance: ArrivalStance;
+  /** The stone's cracks held black (the dormant statue). */
+  dark: boolean;
   dead: boolean;
-  kneeling: boolean;
   clock: number;
   dt: number;
 }
 
 /** Seconds between re-sends of the held state (a view rebuilt mid-fight). */
 const RESEND_SEC = 0.75;
+/** Seconds between re-sends of the dark pulse (it rises at once and holds
+ *  1 s, so the stone stays dark while it is re-sent, even on a slow frame,
+ *  and fills back once it stops). */
+const DARK_EVERY = 0.35;
 const BOLT_N = FINAL_BODY_POOLS.boltArcs * FINAL_BODY_POOLS.boltSegments;
 const UP = new THREE.Vector3(0, 1, 0);
 const _m = new THREE.Matrix4();
@@ -118,7 +127,8 @@ export class FinalBodyFx {
   /** The element the rig shows now (null: never sent). */
   private shown: FinalBodyElement | null = null;
   private bodyShown: boolean | null = null;
-  private kneelSent: boolean | null = null;
+  private stanceSent: ArrivalStance | null = null;
+  private darkIn = 0;
   private wasForming = false;
   private resendIn = 0;
   private bossId = -1;
@@ -212,7 +222,8 @@ export class FinalBodyFx {
     this.bossId = -1;
     this.shown = null;
     this.bodyShown = null;
-    this.kneelSent = null;
+    this.stanceSent = null;
+    this.darkIn = 0;
     this.bolts.visible = false;
     this.rocks.visible = false;
     this.rockScale = 0;
@@ -237,9 +248,10 @@ export class FinalBodyFx {
     if (resend) this.resendIn = RESEND_SEC;
     // A corpse keeps the body it died in (its state aura is gone with it).
     const next = f.dead && this.shown ? this.shown : finalBodyElement(f.zone);
-    const showBody = f.whole || f.dead || f.forming;
-    // Formed: it roars awake as the arrival's shockwave lands.
-    const awoke = this.wasForming && !f.forming && f.whole && !f.dead;
+    // The model always shows: dormant before and through the arrival.
+    const showBody = true;
+    // Formed: it roars awake (its Shift clip, the first element bursting).
+    const awoke = this.wasForming && !f.forming && !f.dead;
     this.wasForming = f.forming;
     // The transformation starts on a quarter change of a body seen whole.
     if (
@@ -269,11 +281,33 @@ export class FinalBodyFx {
       this.send(showBody ? FINAL_BODY_GESTURES.show : FINAL_BODY_GESTURES.hide);
       this.bodyShown = showBody;
     }
-    // Forming, it kneels dormant while its stone gathers; it rises as it wakes.
-    const kneel = (f.kneeling || f.forming) && !f.dead;
-    if (kneel !== this.kneelSent || resend) {
-      this.send(kneel ? FINAL_BODY_GESTURES.kneel : FINAL_BODY_GESTURES.stand);
-      this.kneelSent = kneel;
+    // The stance: dormant on its knee, the push to its feet (once, on the
+    // change: a re-send mid-push only names the standing stance), standing,
+    // the false death's kneel.
+    if (f.stance !== this.stanceSent || resend) {
+      const fresh = f.stance !== this.stanceSent;
+      this.send(
+        f.stance === 'dormant'
+          ? FINAL_BODY_GESTURES.dormant
+          : f.stance === 'kneel'
+            ? FINAL_BODY_GESTURES.kneel
+            : f.stance === 'rise' && fresh && this.stanceSent === 'dormant'
+              ? FINAL_BODY_GESTURES.rise
+              : FINAL_BODY_GESTURES.stand,
+      );
+      this.stanceSent = f.stance;
+    }
+    // The dormant stone: its cracks black while the pulse is re-sent; lit,
+    // they fill back over the pulse's fall and flare.
+    if (f.dark) {
+      this.darkIn -= f.dt;
+      if (this.darkIn <= 0) {
+        this.darkIn = DARK_EVERY;
+        this.send(FINAL_BODY_GESTURES.dark);
+      }
+    } else if (this.darkIn !== 0) {
+      this.darkIn = 0;
+      this.send(FINAL_BODY_GESTURES.charge);
     }
     if (awoke) {
       this.send(FINAL_BODY_GESTURES.shift);
@@ -295,11 +329,6 @@ export class FinalBodyFx {
     this.rockScale += (rocksOn - this.rockScale) * Math.min(1, f.dt * 3);
     this.paintRocks(f.clock, this.rockScale);
     this.paintBolts(f.clock);
-  }
-
-  /** A piece of the arrival sank into the model: its cracks flare. */
-  pieceDrawnIn(): void {
-    this.send(FINAL_BODY_GESTURES.charge);
   }
 
   private send(gesture: string): void {

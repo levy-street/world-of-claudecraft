@@ -60,6 +60,9 @@ export function quenchFight(n = 6, seed = 29, classes: PlayerClass[] = []): Quen
   const players = pids.map((pid) => sim.ctx.entities.get(pid) as Entity);
   // Spread far apart (no huddle) south of the guardian, out of its reach
   // (a raid waits for its pull).
+  // They stand on the lake's ice, so her entrance wakes on the first tick
+  // (quench_intro.ts): pull with `/dev heart quench pull` or a dev mechanic
+  // (both spend it); a proximity pull waits out the scene first.
   players.forEach((p, i) => {
     put(p, 183 + i * 7, -27);
     p.maxHp = 50000;

@@ -5,6 +5,8 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
 import {
+  MASTERLESS_STRENGTH_ARRIVAL_CLIPS,
+  MASTERLESS_STRENGTH_ARRIVAL_URL,
   MASTERLESS_STRENGTH_CLIPS,
   MASTERLESS_STRENGTH_URL,
   SMITH_HEART_BOSS_LOOKS,
@@ -59,8 +61,19 @@ describe('the Masterless Strength model', () => {
 
   it('ships every clip it binds, KTX2 textures, and the four element bodies', () => {
     const json = glbJson(MASTERLESS_STRENGTH_URL);
-    const names = json.animations.map((a) => a.name).sort();
-    expect(names).toEqual([...MASTERLESS_STRENGTH_CLIPS].sort());
+    const own = json.animations.map((a) => a.name).sort();
+    expect(own).toEqual([...MASTERLESS_STRENGTH_CLIPS].sort());
+    // The arrival's two clips ride their own mesh-free GLB (animUrls), bound
+    // to the rig's own bones.
+    expect(def.animUrls).toEqual([MASTERLESS_STRENGTH_ARRIVAL_URL]);
+    const arrival = glbJson(MASTERLESS_STRENGTH_ARRIVAL_URL);
+    expect(arrival.animations.map((a) => a.name).sort()).toEqual(
+      [...MASTERLESS_STRENGTH_ARRIVAL_CLIPS].sort(),
+    );
+    expect(arrival.nodes.filter((n) => n.mesh !== undefined)).toEqual([]);
+    const bones = new Set(json.nodes.map((n) => n.name));
+    for (const n of arrival.nodes) expect(bones.has(n.name), n.name).toBe(true);
+    const names = [...own, ...MASTERLESS_STRENGTH_ARRIVAL_CLIPS];
     const c = def.clips;
     const bound = [
       c.idle,

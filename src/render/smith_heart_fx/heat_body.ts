@@ -13,6 +13,10 @@
 //    and crown, embers, dark smoke and a heat haze rising off it, its eyes and
 //    the ring in its chest alight, a living vortex of fire where its body
 //    meets the lava, the lava churning round it, molten rocks circling it;
+//  - its entrance (heat_entrance_fx.ts, read through heat_entrance_state.ts):
+//    cold until the raid comes near, then its fire climbing from its foot to
+//    its crown, a crown of flame, its shoulders and arms pouring fire, the
+//    blast's surge settling to the fight's full blaze;
 //  - every blow: a fist slammed on the shore throws a lava splash, a burst of
 //    flame, a shockwave and smoke; Basalt Fist's fist gathers fire through its
 //    bar and lands on the bar's end; the cast gathers fire between its hands
@@ -65,6 +69,8 @@ import {
 } from './heat_body_core';
 import { HeatBodyRocks } from './heat_body_rocks';
 import { clearHeatBodySockets, heatBodySockets, retryHeatBodySockets } from './heat_body_sockets';
+import { entranceSocketFire, type HeatEntranceLook } from './heat_entrance_core';
+import { heatEntranceFor } from './heat_entrance_state';
 import { fireRampGlsl, HEAT_BURST } from './heat_flame_core';
 import { HeatFlameTongues } from './heat_flame_tongues';
 import { heatParticleSteps } from './heat_floor_ladder_core';
@@ -290,6 +296,8 @@ export class HeatBody {
   private castGather = 0;
   /** Each socket's fire size this frame (written in place). */
   private readonly boost = new Float32Array(HEAT_SOCKETS.length).fill(1);
+  /** The entrance's look while its scene is on (or it waits cold), else null. */
+  private entrance: HeatEntranceLook | null = null;
   private readonly glowTex: THREE.Texture | null;
   private entityId = -1;
   private rosterSeen = Number.NaN;
@@ -624,6 +632,7 @@ export class HeatBody {
     this.yaw += wrapAngle(e.facing - this.yaw) * Math.min(1, dt * 5);
     this.readSockets(e);
     if (e.dead) {
+      this.entrance = null;
       this.poseDead(e, dt);
       return;
     }
@@ -673,13 +682,17 @@ export class HeatBody {
     const fill = e.castTotal > 0 ? Math.max(0, Math.min(1, 1 - e.castRemaining / e.castTotal)) : 0;
     this.fistCharge = casting ? fill : -1;
     const out = this.under ? 0 : Math.min(1, this.outFor / 1.2);
-    this.fire(dt, 0.25 + 0.75 * out, 0.84 + 0.05 * this.phase);
-    this.burn(st.stage, dt, 1);
-    this.vortex(eAt, dt, this.under ? 0.55 : 1);
-    this.lights(1, casting ? fill : -1);
+    // Its entrance: cold coal, then its fire climbing up it (1 once awake).
+    const ent = heatEntranceFor(e.id);
+    this.entrance = ent;
+    const lit = ent ? ent.fire : 1;
+    this.fire(dt, (0.25 + 0.75 * out) * lit, 0.84 + 0.05 * this.phase);
+    this.burn(st.stage, dt, lit);
+    this.vortex(eAt, dt, (this.under ? 0.55 : 1) * (ent ? ent.vortex : 1));
+    this.lights(ent ? ent.eyes : 1, casting ? fill : -1);
     this.castFx(dt);
     if (casting) this.chargeFist(fill, dt);
-    this.orbitRocks(eAt, 1, dt);
+    this.orbitRocks(eAt, lit, dt);
   }
 
   /** The living fire on the sockets: `strength` 0 out to 1 full, `heat`
@@ -688,8 +701,13 @@ export class HeatBody {
   private fire(dt: number, strength: number, heat: number): void {
     const charge = this.fistCharge;
     const gather = this.castGather;
+    this.boost.fill(1);
     this.boost[S_FIST_R] = 1 + Math.max(0, charge) * 1.1 + gather * 0.5;
     this.boost[S_FIST_L] = 1 + gather * 0.5;
+    // The entrance sizes each socket's fire (its front, its crown, its anger).
+    const ent = this.entrance;
+    for (let i = 0; i < this.boost.length; i++)
+      this.boost[i] = entranceSocketFire(ent, i, this.boost[i]);
     this.tongues.update(
       this.sock,
       this.yaw,

@@ -4,7 +4,11 @@
 // client renders them through t(), with the English as the fallback and as
 // the key its voice clip is found by (scripts/voices/smith_heart_voice_pack.mjs).
 //
-//   pull       the pull
+//   intro      its entrance (heat_intro.ts): the first time the raid comes
+//              near it wakes from cold coal, and this is the line it burns
+//              to (the fx beats ride the clip's sentences)
+//   pull       the pull (not on the first pull right after the entrance:
+//              the entrance has just said it)
 //   fist       Basalt Fist (at most once in SAY_EVERY)
 //   sink       the first overflow: it sinks into the wellspring
 //   sinkAgain  the second overflow
@@ -27,6 +31,7 @@ import { hearthListeners } from './heat_scope';
 import { isSlayMoment, SLAY_EVERY, slayMoment, watchSlain } from './voice_slain';
 
 export type HeatMoment =
+  | 'intro'
   | 'pull'
   | 'fist'
   | 'sink'
@@ -46,6 +51,8 @@ export type HeatMoment =
 /** Every line (English source; the catalog's `hudChrome.heatGuardian.say.*`
  *  rows are the same text). */
 export const HEAT_LINES: Readonly<Record<HeatMoment, string>> = {
+  intro:
+    'Insects. You crawl into the first flame and expect to leave? I was burning before your kind learned fire. Then burn with it!',
   pull: 'You walk into the first flame. Nothing leaves it unchanged.',
   fist: 'Stand where the stone falls, and be part of it.',
   sink: 'The wellspring rises to meet you!',
@@ -90,8 +97,21 @@ export function heatSay(
     if (said !== undefined && s.st.clock - said < HEAT_SAY_EVERY - 1e-9) return false;
   } else if (said !== undefined) return false;
   s.st.said[tag] = s.st.clock;
-  for (const p of hearthListeners(s.ctx, s.inst)) {
-    s.ctx.emit({
+  heatYell(s.ctx, s.inst, from, moment);
+  return true;
+}
+
+/** The guardian (embodied by `from`) yells its `moment` line to everyone
+ *  near the Hearth, ungated (the entrance's own line, said once by
+ *  heat_intro.ts before any fight state exists). */
+export function heatYell(
+  ctx: HeatScope['ctx'],
+  inst: HeatScope['inst'],
+  from: Entity,
+  moment: HeatMoment,
+): void {
+  for (const p of hearthListeners(ctx, inst)) {
+    ctx.emit({
       type: 'chat',
       fromPid: from.id,
       from: from.name,
@@ -102,7 +122,6 @@ export function heatSay(
       pid: p.id,
     });
   }
-  return true;
 }
 
 /** Watch the Hearth for a player's fall (called every tick of the fight):

@@ -46,7 +46,6 @@ import {
 } from '../src/render/smith_heart/heart_landmarks_core';
 import { HEART_QUARTER_PIECES, HEART_RIDGE_PIECES } from '../src/render/smith_heart/heart_quarters';
 import { HEART_RING_LOOK } from '../src/render/smith_heart/heart_quarters_core';
-import { COLOSSUS_PIECES, colossusRestPoint } from '../src/render/smith_heart_fx/final_fx_core';
 import {
   HEART_ROOM,
   SMITH_HEART_FIELD,
@@ -387,16 +386,6 @@ describe('the four quarters in the kit', () => {
     },
   );
 
-  it('carves a socket wherever the colossus tears a piece out (the same list)', () => {
-    const big = COLOSSUS_PIECES.filter((p) => p.joint !== 'shard');
-    expect(SOCKETS.length).toBe(big.length);
-    for (const p of big)
-      expect(
-        SOCKETS.some((s) => s.bearing === p.rest.bearing && s.r === p.rest.r && s.size === p.size),
-        p.id,
-      ).toBe(true);
-  });
-
   it.skipIf(!haveKit)(
     'carves each socket as a pit in its own quarter, no whole stone over it',
     () => {
@@ -503,18 +492,5 @@ describe('the four quarters in the kit', () => {
   it('adds no collider for the ridges or the dais (bodies walk over them)', () => {
     for (const p of SMITH_HEART_FIELD.props)
       expect(p.kind, p.kind).not.toMatch(/ridge|dais|quarter/i);
-  });
-
-  it("rests the arrival's torn rocks inside the quarters, never on a ridge", () => {
-    for (const p of COLOSSUS_PIECES) {
-      if (p.rest.chasm) continue;
-      const rest = colossusRestPoint(p);
-      const zone = heartQuarterAt(rest.x, rest.z);
-      expect(zone, p.id).not.toBe('ring');
-      for (let k = 0; k < 4; k++)
-        expect(heartRidgeDistance(k, rest.x, rest.z), `${p.id} ridge ${k}`).toBeGreaterThan(
-          p.size / 2 + ridgeHalfWidth,
-        );
-    }
   });
 });

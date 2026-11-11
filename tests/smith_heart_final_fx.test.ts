@@ -1,23 +1,16 @@
-// The Masterless Strength's body, its arrival and its effects (phase 2J,
-// presentation only: smith_heart_fx/final_fx_core.ts, final_fx.ts; the
-// arrival's view in heart_seal_core.ts; the room going dark in
-// heart_final_core.ts):
+// The Masterless Strength's effects (phase 2J, presentation only:
+// smith_heart_fx/final_fx_core.ts, final_fx.ts; the arrival's view in
+// heart_seal_core.ts; the room going dark in heart_final_core.ts; the
+// arrival scene itself is tests/smith_heart_final_arrival.test.ts):
 //   - the boss's numbers read, never tuned;
-//   - the pieces rest on the platform's walk before the heart wakes, off the
-//     bridge's line, the altars and each other, the shards out of sight in
-//     the chasm; the arrival tears them out in order and locks every one
-//     before the shockwave; the heart rises out of its bed into the body;
-//   - the arm's reach keeps its bones' lengths; Forge Fist strikes inside its
-//     arc and reach; the cupped hands reach forward;
-//   - the fall lands every piece on the platform or sends it into the chasm,
-//     and the heart goes dark; the room's memory follows it;
+//   - the arm's reach keeps its bones' lengths (the Hammer Council's bodies);
+//   - the heart goes dark after the fall; the room's memory follows it;
 //   - the seal memory reads the arrival live when it is seen waking and long
 //     past when first seen awake (a late arrival sees the body whole);
-//   - FinalFx over a fake world raises its arms over a gathering bar and
-//     slams them down when it lands, cups its hands for Leaping Bolt, burns
-//     its seams in the colour of the quarter it drinks, rides an Overload
-//     Burst's wall of light out over the Anvil, never claims an event,
-//     disposes.
+//   - FinalFx over a fake world slams the floor when a gathering bar lands,
+//     burns its heart in the colour of the quarter it drinks, rides an
+//     Overload Burst's wall of light out over the Anvil, never claims an
+//     event, disposes.
 
 import * as THREE from 'three';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -27,44 +20,24 @@ import {
   heartFinalDarkness,
   noteHeartFinalDeath,
 } from '../src/render/smith_heart/heart_final_core';
-import { HEART_CORE_BED_Y } from '../src/render/smith_heart/heart_room_kit_plan_core';
 import {
   heartSealView,
   newHeartSealView,
   observeHeartSealMask,
 } from '../src/render/smith_heart/heart_seal_core';
 import { FinalFx } from '../src/render/smith_heart_fx';
+import { ARRIVAL_END } from '../src/render/smith_heart_fx/final_arrival_core';
 import {
-  ARRIVAL,
-  ARRIVAL_END,
-  ARRIVAL_WAVE_AT,
-  arrivalWave,
-  COLOSSUS_ARM,
-  COLOSSUS_PIECES,
   colossusArmIk,
-  colossusFallPhase,
-  colossusFallPlan,
-  colossusFlyPoint,
-  colossusLockAt,
-  colossusPiecePhase,
-  colossusRestPoint,
-  colossusTearAt,
-  colossusWristTarget,
   DEATH_END,
   FINAL_BODY_CASTS,
   FINAL_BOSS,
   FORGE_FIST_CUE,
   finalBossKit,
-  heartArrivalPoint,
   heartDeathLevel,
 } from '../src/render/smith_heart_fx/final_fx_core';
 import { SMITH_HEART_MOBS } from '../src/sim/content/smith_heart';
-import {
-  HEART_ALTARS,
-  HEART_ROOM,
-  HEART_TERRACE,
-  SMITH_HEART_VEIN_COLORS,
-} from '../src/sim/content/smith_heart_layout';
+import { HEART_ROOM, SMITH_HEART_VEIN_COLORS } from '../src/sim/content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import {
   SMITH_HEART_AWAKE_BIT,
@@ -80,9 +53,6 @@ import {
 import type { Entity, SimEvent } from '../src/sim/types';
 import type { IWorld } from '../src/world_api';
 
-const bearingDeg = (x: number, z: number) =>
-  ((Math.atan2(x - HEART_ROOM.x, z - HEART_ROOM.z) * 180) / Math.PI + 360) % 360;
-
 describe("the Masterless Strength's body", () => {
   it("reads Forge Fist off the sim template, the burst's reach off the room, a pose for every bar", () => {
     const m = SMITH_HEART_MOBS[FINAL_BOSS];
@@ -95,101 +65,11 @@ describe("the Masterless Strength's body", () => {
     for (const id of Object.values(FINAL_CASTS)) expect(FINAL_BODY_CASTS[id], id).toBeDefined();
   });
 
-  it('rests its pieces on the walk before the heart wakes: off the bridge, the altars, each other', () => {
-    const big = COLOSSUS_PIECES.filter((p) => p.joint !== 'shard');
-    expect(big.length).toBe(11);
-    // The bridge lands on the platform at the terrace's bearing.
-    const bridge = bearingDeg(HEART_TERRACE.x, HEART_TERRACE.z);
-    for (const p of big) {
-      const r = colossusRestPoint(p);
-      const d = Math.hypot(r.x - HEART_ROOM.x, r.z - HEART_ROOM.z);
-      expect(d + p.size * 0.5, p.id).toBeLessThan(HEART_ROOM.r - 1);
-      let off = Math.abs(bearingDeg(r.x, r.z) - bridge);
-      off = Math.min(off, 360 - off);
-      expect(off, p.id).toBeGreaterThan(15);
-      for (const a of HEART_ALTARS)
-        expect(Math.hypot(r.x - a.x, r.z - a.z), `${p.id} by ${a.vein}`).toBeGreaterThan(
-          3 + p.size * 0.5,
-        );
-      for (const q of big) {
-        if (q === p) continue;
-        const s = colossusRestPoint(q);
-        expect(Math.hypot(r.x - s.x, r.z - s.z), `${p.id}/${q.id}`).toBeGreaterThan(
-          (p.size + q.size) * 0.4,
-        );
-      }
-    }
-    // The shards wait out of sight, in the chasm under the lip.
-    for (const p of COLOSSUS_PIECES.filter((q) => q.joint === 'shard')) {
-      const r = colossusRestPoint(p);
-      expect(r.y).toBeLessThan(HEART_ROOM.h - 10);
-      expect(Math.hypot(r.x - HEART_ROOM.x, r.z - HEART_ROOM.z)).toBeGreaterThan(HEART_ROOM.r);
-      // Phase 2M: never under a wall landmark (they stand at 0, 90, 180 and
-      // 270, their feet buttressed under the lip): a shard rises clear.
-      for (const l of [0, 90, 180, 270]) {
-        const off = Math.abs(((bearingDeg(r.x, r.z) - l + 540) % 360) - 180);
-        expect(off, `${p.id} by ${l}`).toBeGreaterThanOrEqual(13.99);
-      }
-    }
-  });
-
-  it('tears the pieces out in order and locks every one before the shockwave', () => {
-    const big = COLOSSUS_PIECES.filter((p) => p.joint !== 'shard');
-    for (let i = 1; i < big.length; i++)
-      expect(colossusTearAt(big[i])).toBeGreaterThan(colossusTearAt(big[i - 1]));
-    for (const p of COLOSSUS_PIECES) {
-      expect(colossusTearAt(p)).toBeGreaterThanOrEqual(ARRIVAL.hold);
-      expect(colossusLockAt(p), p.id).toBeLessThan(ARRIVAL_WAVE_AT);
-      // Its phases run forward and never back.
-      const order = ['rest', 'tremble', 'lift', 'fly', 'locked'];
-      let last = 0;
-      for (let t = 0; t < ARRIVAL_END + 1; t += 0.05) {
-        const ph = colossusPiecePhase(p, t);
-        const i = order.indexOf(ph.phase);
-        expect(i).toBeGreaterThanOrEqual(last);
-        last = i;
-        expect(ph.k).toBeGreaterThanOrEqual(0);
-        expect(ph.k).toBeLessThanOrEqual(1);
-      }
-      expect(colossusPiecePhase(p, ARRIVAL_END).phase).toBe('locked');
-    }
-    expect(arrivalWave(ARRIVAL_WAVE_AT - 0.01)).toBe(-1);
-    expect(arrivalWave(ARRIVAL_WAVE_AT + 0.5)).toBeGreaterThan(0);
-    expect(ARRIVAL_END).toBeGreaterThan(ARRIVAL_WAVE_AT + ARRIVAL.waveSeconds);
-  });
-
-  it('flies a piece from where it lifted into its slot', () => {
-    const from = { x: 10, y: 3, z: 4 };
-    const to = { x: 0, y: 12, z: 1 };
-    const c = { x: 0, y: 11, z: 0 };
-    const a = colossusFlyPoint(from, to, c, 0, 1.3);
-    const b = colossusFlyPoint(from, to, c, 1, 1.3);
-    expect(Math.hypot(b.x - to.x, b.y - to.y, b.z - to.z)).toBeLessThan(1e-6);
-    // It starts where it lifted, turned round the heart's axis but no
-    // nearer or farther from it.
-    expect(Math.hypot(a.x - c.x, a.z - c.z)).toBeCloseTo(Math.hypot(from.x - c.x, from.z - c.z), 6);
-    expect(a.y).toBeCloseTo(from.y, 6);
-  });
-
-  it('raises the heart out of its bed in the chasm and into the body', () => {
-    const slot = { x: HEART_ROOM.x, y: 12.6, z: HEART_ROOM.z + 2 };
-    expect(heartArrivalPoint(0, slot).p.y).toBeCloseTo(HEART_CORE_BED_Y, 6);
-    let y = -999;
-    for (let t = ARRIVAL.hold; t < ARRIVAL.riseEnd; t += 0.1) {
-      const p = heartArrivalPoint(t, slot).p;
-      expect(p.y).toBeGreaterThanOrEqual(y - 1e-9);
-      y = p.y;
-    }
-    const end = heartArrivalPoint(ARRIVAL.glideEnd + 0.01, slot);
-    expect(end.p).toEqual(slot);
-    expect(end.glow).toBe(1);
-  });
-
   it("keeps the arm's bones their lengths and reaches what it can", () => {
     const s = { x: 7, y: 14, z: 0 };
     const pole = { x: 0.6, y: -0.2, z: -1 };
-    const L1 = COLOSSUS_ARM.upper;
-    const L2 = COLOSSUS_ARM.fore;
+    const L1 = 6.8;
+    const L2 = 6.4;
     for (const w of [
       { x: 8, y: 3, z: 3 },
       { x: 2, y: 1, z: 9 },
@@ -207,39 +87,7 @@ describe("the Masterless Strength's body", () => {
     }
   });
 
-  it('strikes Forge Fist inside its arc and reach, and cups the pour forward', () => {
-    const k = finalBossKit();
-    const hit = colossusWristTarget('fist', 1, 0.45).wrist;
-    expect(Math.hypot(hit.x, hit.z)).toBeLessThanOrEqual(k.fistRange);
-    expect((Math.abs(Math.atan2(hit.x, hit.z)) * 180) / Math.PI).toBeLessThanOrEqual(
-      k.fistArcDeg / 2,
-    );
-    expect(hit.y).toBeLessThan(1.5);
-    const cup = colossusWristTarget('pour', -1, 1).wrist;
-    expect(cup.z).toBeGreaterThan(4);
-    const idle = colossusWristTarget('idle', 1, 0).wrist;
-    expect(idle).toEqual({
-      x: COLOSSUS_ARM.idle.x,
-      y: COLOSSUS_ARM.idle.y,
-      z: COLOSSUS_ARM.idle.z,
-    });
-  });
-
-  it('crumbles over the room or into the chasm, and the heart goes dark', () => {
-    const from = { x: HEART_ROOM.x, y: 12, z: HEART_ROOM.z };
-    COLOSSUS_PIECES.forEach((p, i) => {
-      const plan = colossusFallPlan(p, from, i);
-      const r = Math.hypot(plan.land.x - HEART_ROOM.x, plan.land.z - HEART_ROOM.z);
-      if (plan.chasm) {
-        expect(plan.land.y, p.id).toBeLessThan(-40);
-        expect(r, p.id).toBeGreaterThan(HEART_ROOM.r);
-      } else {
-        expect(r, p.id).toBeLessThan(HEART_ROOM.r - 1);
-        expect(plan.land.y).toBeCloseTo(HEART_ROOM.h + 0.2, 6);
-      }
-      expect(colossusFallPhase(plan, DEATH_END).phase).toBe('gone');
-      expect(colossusFallPhase(plan, 0).phase).toBe('held');
-    });
+  it('the heart goes dark after the fall', () => {
     expect(heartDeathLevel(DEATH_END)).toBeCloseTo(0, 6);
     expect(heartDeathLevel(0.1)).toBeGreaterThan(0.3);
   });
@@ -320,7 +168,7 @@ describe('FinalFx', () => {
     return n;
   }
 
-  it('raises its arms over a bar and slams them, wears its quarter, bursts, claims nothing, disposes', () => {
+  it('slams the floor as a bar lands, wears its quarter, bursts, claims nothing, disposes', () => {
     const o = instanceOrigin(DUNGEONS.smith_heart.index, 0);
     const entities = new Map<number, Entity>();
     const me = entity(1, 'player', 'warrior', o.x + HEART_ROOM.x - 10, o.z + HEART_ROOM.z - 10);
@@ -345,7 +193,7 @@ describe('FinalFx', () => {
     fx.update(1 / 30);
     // No floor telegraph of its own any more (the kits' are their own).
     expect(telegraphsShown(root)).toBe(0);
-    // The Anvil's bar: arms up; its end: the slam (a shake).
+    // The Anvil's bar: its end, the slam (a shake).
     boss.castingAbility = FINAL_CASTS.anvil;
     boss.castTotal = 6;
     boss.castRemaining = 6;
@@ -357,7 +205,7 @@ describe('FinalFx', () => {
     const before = shaken;
     for (let i = 0; i < 30; i++) fx.update(1 / 30);
     expect(shaken).toBeGreaterThan(before);
-    // It drinks the Heat: its seams burn the Heat's colour.
+    // It drinks the Heat: its heart's light burns the Heat's colour.
     boss.auras = [
       {
         id: FINAL_AURAS.state,
@@ -370,10 +218,10 @@ describe('FinalFx', () => {
       },
     ] as Entity['auras'];
     for (let i = 0; i < 90; i++) fx.update(1 / 30);
-    const seams = (root?.getObjectByName('smithHeartColossusCarrier') as THREE.Mesh | undefined)
-      ?.material as THREE.ShaderMaterial | undefined;
-    if (!seams) throw new Error('no seam carrier');
-    const tint = (seams.uniforms.uColor.value as THREE.Color).clone().multiplyScalar(1 / 1.8);
+    const halo = (root?.getObjectByName('smithHeartColossusHalo') as THREE.Sprite | undefined)
+      ?.material as THREE.SpriteMaterial | undefined;
+    if (!halo) throw new Error('no heart halo');
+    const tint = halo.color;
     const heat = new THREE.Color(SMITH_HEART_VEIN_COLORS.heat);
     expect(
       Math.abs(tint.r - heat.r) + Math.abs(tint.g - heat.g) + Math.abs(tint.b - heat.b),

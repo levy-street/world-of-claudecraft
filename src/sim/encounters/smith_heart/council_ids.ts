@@ -132,6 +132,11 @@ export const COUNCIL_AURAS = {
    *  Endless Song has sung (value = the next pulse's multiplier). The
    *  pillar is an object: the sim never ticks it, the council sets it. */
   endlessSong: 'heart_endless_song',
+  /** On both members until the entrance has played (council_intro.ts):
+   *  `value` council_intro_plan.ts COUNCIL_INTRO_STAGES (dormant in the rock
+   *  and the crystal, or waking with the scene's clock in `remaining` and
+   *  `duration`). */
+  intro: 'heart_council_intro',
 } as const;
 
 /** The council's encounter object templates. Pillars carry their integrity
@@ -248,6 +253,9 @@ export const COUNCIL_NAMES = {
   risenPulse: 'Stone Thrum',
   echo: 'Echo of Wrath',
   endlessSong: 'Endless Song',
+  /** The entrance's marker (the Hammer Vein Warder's sleep shares the name
+   *  and its catalog row). */
+  intro: 'Dormant',
 } as const;
 
 // ---- difficulty -----------------------------------------------------------------------

@@ -5,7 +5,9 @@
 // key its voice clip is found by (scripts/voices/smith_heart_voice_pack.mjs, the
 // raid's voice pack).
 //
-//   pull       each member once, a breath apart (the Guardian first)
+//   pull       each member once, a breath apart (the Guardian first); the
+//              entrance (council_intro.ts) says the same two lines on its
+//              own beats, and the first pull after it stays quiet
 //   job lines  the Guardian's Wrath, Rush and mythic Quarry Collapse, the
 //              Singer's Wake, rock, song and a kicked song: spoken by the
 //              member itself (never an heir), at most once in SAY_EVERY
@@ -97,11 +99,11 @@ const JOB_MOMENTS: ReadonlySet<CouncilMoment> = new Set([
 ]);
 
 /** The players near the Quarry (dead or alive): who hears the council. */
-function quarryListeners(s: CouncilScope): Entity[] {
-  const o = s.ctx.instanceOriginOf(s.inst);
+function quarryListeners(ctx: CouncilScope['ctx'], inst: CouncilScope['inst']): Entity[] {
+  const o = ctx.instanceOriginOf(inst);
   const out: Entity[] = [];
-  for (const meta of s.ctx.players.values()) {
-    const p = s.ctx.entities.get(meta.entityId);
+  for (const meta of ctx.players.values()) {
+    const p = ctx.entities.get(meta.entityId);
     if (!p) continue;
     if (Math.hypot(p.pos.x - o.x - HAMMER_PIT.x, p.pos.z - o.z - HAMMER_PIT.z) > 120) continue;
     out.push(p);
@@ -111,10 +113,23 @@ function quarryListeners(s: CouncilScope): Entity[] {
 
 /** Speak one line from `from` (yell range: the whole claim's Quarry). */
 function yell(s: CouncilScope, from: Entity, role: CouncilRole, moment: CouncilMoment): void {
+  councilYell(s.ctx, s.inst, from, role, moment);
+}
+
+/** `role` (embodied by `from`) yells its `moment` line to everyone near the
+ *  Quarry, ungated: the entrance's own lines, said once by council_intro.ts
+ *  before any fight state exists. */
+export function councilYell(
+  ctx: CouncilScope['ctx'],
+  inst: CouncilScope['inst'],
+  from: Entity,
+  role: CouncilRole,
+  moment: CouncilMoment,
+): void {
   const text = COUNCIL_LINES[role][moment];
   if (!text) return;
-  for (const p of quarryListeners(s)) {
-    s.ctx.emit({
+  for (const p of quarryListeners(ctx, inst)) {
+    ctx.emit({
       type: 'chat',
       fromPid: from.id,
       from: from.name,
@@ -173,7 +188,7 @@ export function sayFallen(s: CouncilScope, role: CouncilRole, soulTaken: boolean
  *  a living member says a kill line, the two in turn, each its own two in
  *  turn. */
 export function watchCouncilSlain(s: CouncilScope): void {
-  if (watchSlain(s.st.slain, quarryListeners(s)) === 0) return;
+  if (watchSlain(s.st.slain, quarryListeners(s.ctx, s.inst)) === 0) return;
   const speakers = COUNCIL_ROLES.filter((r) => living(s.bodies[r]));
   if (speakers.length === 0) return;
   const n = s.st.slain.kills - 1;

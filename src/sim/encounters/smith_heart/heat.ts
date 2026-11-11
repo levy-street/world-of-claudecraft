@@ -17,6 +17,9 @@
 //                      Seedflames), Wakefire (heat_zones.ts), the fist.
 //   Phase 3 (40-0)     the Rolling Cinders (heat_cinders.ts), Wakefire, the
 //                      fist.
+//   The entrance       before all of it, the first time the raid comes near:
+//                      it wakes from cold coal, burns up and speaks, held out
+//                      of reach until its scene ends (heat_intro.ts).
 //   One wipe           the fight ends when the guardian stops fighting:
 //                      every bar, footprint, add and mark gone, the
 //                      wellspring calm.
@@ -62,6 +65,13 @@ import {
   HEAT_TUNING as T,
   wellTemplate,
 } from './heat_ids';
+import {
+  heatIntroJustSpoke,
+  heatIntroReadout,
+  replayHeatIntro,
+  spendHeatIntro,
+  stepHeatIntro,
+} from './heat_intro';
 import { clearRivers, freshOverflow, stepFlood } from './heat_overflow';
 import {
   auraOf,
@@ -478,7 +488,8 @@ function beginHeat(ctx: SimContext, inst: InstanceSlot, boss: Entity): HeatFight
   boss.smithHeartHeat = st;
   const s = scopeOf(ctx, inst, st, boss);
   showState(s);
-  heatSay(s, boss, 'pull');
+  // Straight after its entrance the line would say the entrance's again.
+  if (!heatIntroJustSpoke(ctx, boss)) heatSay(s, boss, 'pull');
   return st;
 }
 
@@ -491,6 +502,8 @@ export function tickHeatGuardian(ctx: SimContext, inst: InstanceSlot): void {
     if (st0 && !st0.finished) finishHeat(ctx, inst, boss, st0);
     return;
   }
+  // Its entrance holds it out of reach until the scene ends.
+  if (stepHeatIntro(ctx, inst, boss, fighting(boss))) return;
   if (!fighting(boss)) {
     if (st0) {
       if (!st0.finished && hearthPlayers(ctx, inst).length === 0)
@@ -530,6 +543,8 @@ export function tickHeatGuardian(ctx: SimContext, inst: InstanceSlot): void {
 export function heatScopeForDev(ctx: SimContext, inst: InstanceSlot): HeatScope | null {
   const boss = heatGuardian(ctx, inst);
   if (!boss || !living(boss)) return null;
+  // A mechanic forced from the dev line starts the fight: no entrance left.
+  spendHeatIntro(ctx, boss);
   const st = boss.smithHeartHeat ?? beginHeat(ctx, inst, boss);
   return scopeOf(ctx, inst, st, boss);
 }
@@ -566,7 +581,7 @@ export function heatDevTrigger(
   pid: number,
 ): string | null {
   const [verb, arg] = what.trim().split(/\s+/);
-  if (verb === 'reset') {
+  if (verb === 'reset' || verb === 'intro') {
     const boss = heatGuardian(ctx, inst);
     if (!boss) return 'This run holds no Guardian of the Heat.';
     resetHeat(ctx, inst, boss);
@@ -580,6 +595,10 @@ export function heatDevTrigger(
     boss.pos = { ...boss.spawnPos, y: ctx.groundPos(boss.spawnPos.x, boss.spawnPos.z).y };
     boss.prevPos = { ...boss.pos };
     ctx.rebucket(boss);
+    if (verb === 'intro') {
+      replayHeatIntro(boss);
+      return 'The Guardian of the Heat goes cold; it wakes again as the raid comes near.';
+    }
     return 'The Guardian of the Heat stands whole again in its wellspring; the Hearth is calm.';
   }
   if (verb === 'heroic' || verb === 'mythic') {
@@ -630,7 +649,7 @@ export function heatReadout(ctx: SimContext, inst: InstanceSlot, pid: number): s
   if (!boss) return '[dev] This run holds no Guardian of the Heat.';
   const head = `[dev] Guardian of the Heat (${heatDifficulty(inst)}): ${boss.dead ? 'dead' : `${Math.round((boss.hp / boss.maxHp) * 100)}%`}`;
   const st = boss.smithHeartHeat;
-  if (!st) return `${head}; not fighting.`;
+  if (!st) return `${head}; not fighting (${heatIntroReadout(boss)}).`;
   const me = ctx.entities.get(pid);
   const grip = me ? (auraOf(me, HEAT_AURAS.grip)?.stacks ?? 0) : 0;
   const over = st.overflow ? `, overflow ${st.overflow.n} (${st.overflow.clock.toFixed(0)} s)` : '';

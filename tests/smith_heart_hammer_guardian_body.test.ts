@@ -50,7 +50,10 @@ describe('the Guardian of the Hammer body', () => {
   it('draws the painted GLB in place of the borrowed golem', () => {
     expect(def).toBe(VISUALS.smith_heart_hammer_guardian);
     expect(def.url).toBe(URL);
-    expect(def.animUrls ?? []).toEqual([]);
+    // Only its entrance's Dormant clip rides beside it (scripts/build_council_entrance_anims.mjs).
+    expect(def.animUrls ?? []).toEqual([
+      'models/creatures/heart_hammer_guardian_entrance_anims.glb',
+    ]);
     expect(def.bodyless).toBeUndefined();
     expect(def.authoredAtlas).toBe(true);
     expect(def.tint).toBeUndefined();
@@ -149,5 +152,8 @@ describe('the Guardian of the Hammer body', () => {
     expect(json.skins[0].joints.length).toBe(43);
     expect(file.length).toBeLessThanOrEqual(900 * 1024);
     expect(dungeonCharacterBodyUrls('smith_heart')).toContain(URL);
+    expect(dungeonCharacterBodyUrls('smith_heart')).toContain(
+      'models/creatures/heart_hammer_guardian_entrance_anims.glb',
+    );
   });
 });

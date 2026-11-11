@@ -13,7 +13,9 @@
 //    the floor's lasting scorch, the molten surfaces (craters, wakes, rivers,
 //    Wakefire), the warnings (every telegraph a player must react to, over
 //    the fire it warns of), then the particles over everything on the floor,
-//    then the wellspring's shimmer standing in the air over its lip;
+//    then the wellspring's shimmer standing in the air over its lip, then the
+//    entrance's (heat_entrance_fx.ts: it plays before any fight mark exists,
+//    so it simply stands on top);
 //  - a POOL that shares one rung (six lanes, three craters...)
 //    blends commutatively, so the order its pieces are drawn in cannot change
 //    the picture: a multiply (the char that darkens the basalt) or an
@@ -39,10 +41,11 @@ export type HeatFloorOwner =
   | 'heat_fight_fx'
   | 'heat_well_fx'
   | 'heat_cinder_fx'
-  | 'heat_body';
+  | 'heat_body'
+  | 'heat_entrance';
 
 /** The modules that own a particle set (EngineParticles) in the Hearth. */
-export type HeatParticleOwner = 'heat_fx' | 'heat_fight_fx' | 'heat_body';
+export type HeatParticleOwner = 'heat_fx' | 'heat_fight_fx' | 'heat_body' | 'heat_entrance';
 
 export interface HeatFloorRung {
   readonly step: number;
@@ -100,6 +103,13 @@ export const HEAT_FLOOR = {
   // The wellspring's heat shimmer standing over its lip (a sleeve of air,
   // additive, one draw): over the floor's marks and the particles' smoke.
   wellShimmer: rung(24, 'heat_well_fx', 'additive', false),
+  // The entrance (heat_entrance_fx.ts), over everything: the floor's seams
+  // (char, then their glow with the spiral's embers), then its particles
+  // (its smoke, then its sparks, flames, rain and the ring's floor wave).
+  entranceChar: rung(25, 'heat_entrance', 'multiply', true),
+  entranceGlow: rung(26, 'heat_entrance', 'additive', true),
+  entranceSmoke: rung(27, 'heat_entrance', 'normal', false),
+  entranceSparks: rung(28, 'heat_entrance', 'additive', true),
 } as const satisfies Record<string, HeatFloorRung>;
 
 export type HeatFloorLayer = keyof typeof HEAT_FLOOR;
@@ -115,6 +125,7 @@ const PARTICLE_RUNGS: Readonly<
   heat_fx: { smoke: 'fistSmoke', sparks: 'fistSparks' },
   heat_fight_fx: { smoke: 'fightSmoke', sparks: 'fightSparks' },
   heat_body: { smoke: 'bodySmoke', sparks: 'bodySparks' },
+  heat_entrance: { smoke: 'entranceSmoke', sparks: 'entranceSparks' },
 };
 
 /** A particle owner's pool steps (EngineParticles' `steps`): its smoke on

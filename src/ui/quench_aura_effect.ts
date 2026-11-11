@@ -92,6 +92,10 @@ export function quenchAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
           seconds: T.trapSeconds,
         },
       };
+    // Her entrance's marker (frozen, or waking): out of reach until she
+    // breaks out of the ice.
+    case QUENCH_AURAS.intro:
+      return { key: `${KEY}.intro`, nums: {} };
     case QUENCH_AURAS.awake:
       return {
         key: `${KEY}.awake`,
