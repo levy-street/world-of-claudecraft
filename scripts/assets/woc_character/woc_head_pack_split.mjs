@@ -33,10 +33,11 @@
 //   node scripts/assets/woc_character/woc_head_pack_split.mjs <pack.glb> \
 //     [--out-dir <dir>] [--list]
 //
-// One hairstyle is NOT in any pack: the mullet (head_type_<t>_hair_mullet.glb) is built in the
-// repo by build_mullet_hair.mjs from shipped files, so a split lists it as not written by this
-// split and its `urls` are the catalog's minus that file. Leave it in place: after a pack rebuild
-// that changes the mohawk or the undercut, re-run build_mullet_hair.mjs instead.
+// Two hairstyles are NOT in any pack: the mullet and the pompadour
+// (head_type_<t>_hair_mullet.glb, head_type_<t>_hair_pompadour.glb) are built in the repo by
+// build_mullet_hair.mjs and build_pompadour_hair.mjs from shipped files, so a split lists them
+// as not written by this split and its `urls` are the catalog's minus those files. Leave them in
+// place: after a pack rebuild that changes the mohawk or the undercut, re-run those two scripts.
 //
 // --out-dir defaults to public/models/chars/players/woc (the catalog's split directory).
 // --list prints the plan (file -> pieces, textures) and writes nothing. The pack itself is a

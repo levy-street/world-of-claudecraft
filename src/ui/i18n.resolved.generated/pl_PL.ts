@@ -13811,7 +13811,8 @@ export const pl_PL: EnTranslations = {
         "crown": "Korona z warkocza",
         "twins": "Dwa warkocze",
         "curls": "Upięte loki",
-        "mullet": "Mullet"
+        "mullet": "Mullet",
+        "pompadour": "Pompadour"
       },
       "beard": {
         "none": "Gładko ogolony",

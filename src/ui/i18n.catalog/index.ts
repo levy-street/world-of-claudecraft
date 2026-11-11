@@ -458,6 +458,7 @@ export const en = {
         twins: 'Twin Braids',
         curls: 'Curly Updo',
         mullet: 'Mullet',
+        pompadour: 'Pompadour',
       },
       beard: {
         none: 'Clean Shaven',

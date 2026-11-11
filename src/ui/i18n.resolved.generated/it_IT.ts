@@ -13811,7 +13811,8 @@ export const it_IT: EnTranslations = {
         "crown": "Corona intrecciata",
         "twins": "Due trecce",
         "curls": "Raccolto riccio",
-        "mullet": "Mullet"
+        "mullet": "Mullet",
+        "pompadour": "Pompadour"
       },
       "beard": {
         "none": "Rasatura completa",

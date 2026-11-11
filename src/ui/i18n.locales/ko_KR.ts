@@ -17181,6 +17181,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'auth.wocHead.hair.twins': '양갈래 땋은 머리',
   'auth.wocHead.hair.curls': '곱슬 올림머리',
   'auth.wocHead.hair.mullet': '멀릿',
+  'auth.wocHead.hair.pompadour': '퐁파두르',
   'auth.wocHead.beard.none': '수염 없음',
   'auth.wocHead.beard.moustache': '콧수염',
   'auth.wocHead.beard.handlebar': '카이저 수염',

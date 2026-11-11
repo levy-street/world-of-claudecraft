@@ -13811,7 +13811,8 @@ export const en_XA: EnTranslations = {
         "crown": "[Ɓŕáíðéð Çŕóŵñ]",
         "twins": "[Ţŵíñ Ɓŕáíðš]",
         "curls": "[Çúŕļý Úþðó]",
-        "mullet": "[Ɱúļļéţ]"
+        "mullet": "[Ɱúļļéţ]",
+        "pompadour": "[Þóɱþáðóúŕ]"
       },
       "beard": {
         "none": "[Çļéáñ Šĥáʋéñ]",

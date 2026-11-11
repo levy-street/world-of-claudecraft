@@ -13811,7 +13811,8 @@ export const pt_BR: EnTranslations = {
         "crown": "Coroa trançada",
         "twins": "Duas tranças",
         "curls": "Coque cacheado",
-        "mullet": "Mullet"
+        "mullet": "Mullet",
+        "pompadour": "Pompadour"
       },
       "beard": {
         "none": "Rosto barbeado",

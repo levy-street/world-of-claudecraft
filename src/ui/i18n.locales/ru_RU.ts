@@ -19272,6 +19272,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'auth.wocHead.hair.twins': 'Две косы',
   'auth.wocHead.hair.curls': 'Собранные кудри',
   'auth.wocHead.hair.mullet': 'Маллет',
+  'auth.wocHead.hair.pompadour': 'Помпадур',
   'auth.wocHead.beard.none': 'Без бороды',
   'auth.wocHead.beard.moustache': 'Усы',
   'auth.wocHead.beard.handlebar': 'Закрученные усы',

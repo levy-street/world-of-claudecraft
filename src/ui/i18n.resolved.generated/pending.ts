@@ -10,54 +10,69 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "auth.wocHead.hair.mullet"
+    "auth.wocHead.hair.mullet",
+    "auth.wocHead.hair.pompadour"
   ],
   "es_ES": [
-    "auth.wocHead.hair.mullet"
+    "auth.wocHead.hair.mullet",
+    "auth.wocHead.hair.pompadour"
   ],
   "fr_FR": [
-    "auth.wocHead.hair.mullet"
+    "auth.wocHead.hair.mullet",
+    "auth.wocHead.hair.pompadour"
   ],
   "fr_CA": [
-    "auth.wocHead.hair.mullet"
+    "auth.wocHead.hair.mullet",
+    "auth.wocHead.hair.pompadour"
   ],
   "en_CA": [],
   "it_IT": [
-    "auth.wocHead.hair.mullet"
+    "auth.wocHead.hair.mullet",
+    "auth.wocHead.hair.pompadour"
   ],
   "de_DE": [
-    "auth.wocHead.hair.mullet"
+    "auth.wocHead.hair.mullet",
+    "auth.wocHead.hair.pompadour"
   ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
-    "auth.wocHead.hair.mullet"
+    "auth.wocHead.hair.mullet",
+    "auth.wocHead.hair.pompadour"
   ],
   "ru_RU": [],
   "cs_CZ": [
-    "auth.wocHead.hair.mullet"
+    "auth.wocHead.hair.mullet",
+    "auth.wocHead.hair.pompadour"
   ],
   "nl_NL": [
-    "auth.wocHead.hair.mullet"
+    "auth.wocHead.hair.mullet",
+    "auth.wocHead.hair.pompadour"
   ],
   "pl_PL": [
-    "auth.wocHead.hair.mullet"
+    "auth.wocHead.hair.mullet",
+    "auth.wocHead.hair.pompadour"
   ],
   "id_ID": [
-    "auth.wocHead.hair.mullet"
+    "auth.wocHead.hair.mullet",
+    "auth.wocHead.hair.pompadour"
   ],
   "tr_TR": [
-    "auth.wocHead.hair.mullet"
+    "auth.wocHead.hair.mullet",
+    "auth.wocHead.hair.pompadour"
   ],
   "sv_SE": [
-    "auth.wocHead.hair.mullet"
+    "auth.wocHead.hair.mullet",
+    "auth.wocHead.hair.pompadour"
   ],
   "vi_VN": [
-    "auth.wocHead.hair.mullet"
+    "auth.wocHead.hair.mullet",
+    "auth.wocHead.hair.pompadour"
   ],
   "da_DK": [
-    "auth.wocHead.hair.mullet"
+    "auth.wocHead.hair.mullet",
+    "auth.wocHead.hair.pompadour"
   ]
 };

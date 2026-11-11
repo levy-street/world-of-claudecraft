@@ -431,23 +431,37 @@ function invertAffine(m) {
   };
 }
 
-async function buildType(io, type, sculpt, top, fit, outDir) {
-  const T = type.toUpperCase();
+/** The triangles of a head type's base head in world space (the rig's rest pose). */
+export async function readHeadTriangles(io, type) {
   const core = await io.read(path.join(HEAD_DIR, `head_type_${type}_core.glb`));
   const base = core
     .getRoot()
     .listNodes()
-    .find((n) => n.getName() === `WocHead_${T}_base`);
+    .find((n) => n.getName() === `WocHead_${type.toUpperCase()}_base`);
   if (!base) throw new Error(`head type ${type}: no base head in the core file`);
-  const headTriangles = [];
+  const triangles = [];
   for (const { corners } of worldSoup(base)) {
     for (let k = 0; k < corners.length; k += 3) {
-      headTriangles.push([corners[k].p, corners[k + 1].p, corners[k + 2].p]);
+      triangles.push([corners[k].p, corners[k + 1].p, corners[k + 2].p]);
     }
   }
-  const tail = cutTail(sculpt, fit, headTriangles);
-  const soup = [...placeTop(top.corners, fit.topPlace), ...tail.soup];
+  return triangles;
+}
 
+/** A signed-distance probe of a triangle mesh (negative inside): p -> distance. */
+export function distanceProbe(triangles) {
+  const normals = triangles.map(([a, b, c]) => cross(sub(b, a), sub(c, a)));
+  return (p) => signedDistance(p, triangles, normals);
+}
+
+/**
+ * Writes one in-repo hairstyle's file for a head type: `soup` (world-space corners of
+ * { p, n, t }) becomes the one primitive of `WocHead_<T>_hair_<id>`, hung where the template
+ * hairstyle hangs, on `top`'s texture and roughness, then finished like the pack's compress
+ * step (WOC_lod levels, meshopt, the written file read back and every level checked).
+ */
+export async function writeHairPiece(io, type, id, soup, top, outDir) {
+  const T = type.toUpperCase();
   const doc = await io.read(path.join(HEAD_DIR, `head_type_${type}_hair_${TEMPLATE_ID}.glb`));
   await doc.transform(dequantize());
   const root = doc.getRoot();
@@ -477,8 +491,8 @@ async function buildType(io, type, sculpt, top, fit, outDir) {
     .setAttribute('TEXCOORD_0', accessor('VEC2', new Float32Array(soup.flatMap((v) => v.t))))
     .setIndices(accessor('SCALAR', Uint32Array.from(soup.keys())));
 
-  node.setName(`WocHead_${T}_hair_${MULLET_ID}`);
-  mesh.setName(`WocHead_${T}_hair_${MULLET_ID}`);
+  node.setName(`WocHead_${T}_hair_${id}`);
+  mesh.setName(`WocHead_${T}_hair_${id}`);
   const paint = doc
     .createTexture(top.texture.name)
     .setImage(top.texture.image)
@@ -486,7 +500,7 @@ async function buildType(io, type, sculpt, top, fit, outDir) {
     .setURI(`${top.texture.name}.ktx2`);
   strands
     .getMaterial()
-    .setName(`hair_${MULLET_ID}`)
+    .setName(`hair_${id}`)
     .setRoughnessFactor(top.roughness)
     .setBaseColorTexture(paint);
   doc.createExtension(KHRTextureBasisu).setRequired(true);
@@ -504,22 +518,29 @@ async function buildType(io, type, sculpt, top, fit, outDir) {
   if (check.failures.length) {
     throw new Error(`WOC_lod levels fail their check:\n  ${check.failures.join('\n  ')}`);
   }
-  const file = path.join(outDir, `head_type_${type}_hair_${MULLET_ID}.glb`);
+  const file = path.join(outDir, `head_type_${type}_hair_${id}.glb`);
   fs.mkdirSync(outDir, { recursive: true });
   fs.writeFileSync(file, out);
+  return { type, file: path.relative(ROOT, file), bytes: out.length, lod: lod.totals };
+}
+
+async function buildType(io, type, sculpt, top, fit, outDir) {
+  const tail = cutTail(sculpt, fit, await readHeadTriangles(io, type));
+  const soup = [...placeTop(top.corners, fit.topPlace), ...tail.soup];
+  const written = await writeHairPiece(io, type, MULLET_ID, soup, top, outDir);
   return {
     type,
-    file: path.relative(ROOT, file),
-    bytes: out.length,
+    file: written.file,
+    bytes: written.bytes,
     mannequinTriangles: tail.mannequin,
     topTriangles: top.corners.length / 3,
     tailTriangles: tail.soup.length / 3,
-    lod: lod.totals,
+    lod: written.lod,
   };
 }
 
 /** The mohawk's Type A strands in world space, with the texture the whole style samples. */
-async function readTop(io) {
+export async function readTop(io) {
   const doc = await io.read(path.join(HEAD_DIR, `head_type_a_hair_${MULLET_TOP_ID}.glb`));
   await doc.transform(dequantize());
   const node = doc
@@ -541,13 +562,18 @@ async function readTop(io) {
   };
 }
 
-async function main() {
-  const opts = parseArgs(process.argv.slice(2));
+/** A NodeIO that reads and writes the head files (meshopt, the WOC_lod extension). */
+export async function headFileIo() {
   await MeshoptEncoder.ready;
   await MeshoptDecoder.ready;
-  const io = new NodeIO()
+  return new NodeIO()
     .registerExtensions([...ALL_EXTENSIONS, WocLodExtension])
     .registerDependencies({ 'meshopt.decoder': MeshoptDecoder, 'meshopt.encoder': MeshoptEncoder });
+}
+
+async function main() {
+  const opts = parseArgs(process.argv.slice(2));
+  const io = await headFileIo();
   const sculpt = readSculpt(await io.read(RAW));
   const top = await readTop(io);
   const built = [];

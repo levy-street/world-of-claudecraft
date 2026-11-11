@@ -13811,7 +13811,8 @@ export const zh_CN: EnTranslations = {
         "crown": "皇冠辫",
         "twins": "双辫",
         "curls": "卷发盘头",
-        "mullet": "鲻鱼头"
+        "mullet": "鲻鱼头",
+        "pompadour": "飞机头"
       },
       "beard": {
         "none": "无胡须",

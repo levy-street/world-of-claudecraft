@@ -13811,7 +13811,8 @@ export const id_ID: EnTranslations = {
         "crown": "Mahkota Kepang",
         "twins": "Kepang Ganda",
         "curls": "Sanggul Keriting",
-        "mullet": "Mullet"
+        "mullet": "Mullet",
+        "pompadour": "Pompadour"
       },
       "beard": {
         "none": "Tanpa Janggut",

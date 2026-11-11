@@ -806,6 +806,7 @@ export type TranslationKeyFlat =
   | 'auth.wocHead.hair.long'
   | 'auth.wocHead.hair.mohawk'
   | 'auth.wocHead.hair.mullet'
+  | 'auth.wocHead.hair.pompadour'
   | 'auth.wocHead.hair.ponytail'
   | 'auth.wocHead.hair.quiff'
   | 'auth.wocHead.hair.shoulder'

@@ -13811,7 +13811,8 @@ export const ja_JP: EnTranslations = {
         "crown": "クラウンブレイド",
         "twins": "ツインおさげ",
         "curls": "カールアップ",
-        "mullet": "マレット"
+        "mullet": "マレット",
+        "pompadour": "リーゼント"
       },
       "beard": {
         "none": "ひげなし",

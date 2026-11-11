@@ -13811,7 +13811,8 @@ export const cs_CZ: EnTranslations = {
         "crown": "Koruna z copů",
         "twins": "Dva copy",
         "curls": "Vyčesané kudrny",
-        "mullet": "Mullet"
+        "mullet": "Mullet",
+        "pompadour": "Pompadour"
       },
       "beard": {
         "none": "Hladce oholený",

@@ -13811,7 +13811,8 @@ export const sv_SE: EnTranslations = {
         "crown": "Flätad krona",
         "twins": "Två flätor",
         "curls": "Lockig uppsättning",
-        "mullet": "Mullet"
+        "mullet": "Mullet",
+        "pompadour": "Pompadour"
       },
       "beard": {
         "none": "Slätrakad",

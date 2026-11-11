@@ -13811,7 +13811,8 @@ export const vi_VN: EnTranslations = {
         "crown": "Tóc Tết Vương Miện",
         "twins": "Tóc Tết Đôi",
         "curls": "Tóc Xoăn Búi Cao",
-        "mullet": "Mullet"
+        "mullet": "Mullet",
+        "pompadour": "Pompadour"
       },
       "beard": {
         "none": "Cạo Nhẵn",
