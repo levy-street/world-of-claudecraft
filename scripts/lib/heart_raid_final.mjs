@@ -234,6 +234,11 @@ export const final = {
       if (hasAura(p, FINAL_AURAS.drawn)) out.push({ x: p.x, z: p.z, r: (T.drawnReach ?? 8) + 1.5 });
       if (hasAura(p, FINAL_PHASE_AURAS.coal)) out.push({ x: p.x, z: p.z, r: 9.5 });
     }
+    // The Splinter of the Breath on the hunt: its Buffeting Gale strikes
+    // everyone but its quarry within 7 yd every second (its tank too).
+    const hunter = huntingBreath(world);
+    if (hunter && !hasAura(me, FINAL_PHASE_AURAS.tether))
+      out.push({ x: hunter.x, z: hunter.z, r: BUFFET_REACH + 2 });
     // A Splinter's Shearing Blow cone: only its target stands in front.
     for (const s of world.splinters) {
       if (s.cast !== FINAL_PHASE_CASTS.shear || s.castTgt === b.pid) continue;
@@ -441,6 +446,21 @@ function duty(world, st, b, me) {
       if (p.pid === b.pid) return { goal: orb, tol: 0.6, duty: 'orb' };
     }
   }
+  // The Splinter of the Breath's hunt: its quarry leads it away from the
+  // raid; everyone else steps out of its Buffeting Gale.
+  const hunter = huntingBreath(world);
+  if (hunter) {
+    if (hasAura(me, FINAL_PHASE_AURAS.tether)) {
+      const spot = spread(world, st, me, BUFFET_REACH + 5);
+      if (spot) return { goal: spot, tol: 1, duty: 'lead the gale away' };
+    } else if (hypot(me, hunter) < BUFFET_REACH + 2) {
+      return {
+        goal: add(hunter, unit(hunter, me), BUFFET_REACH + 3.5),
+        tol: 0.8,
+        duty: 'out of the gale',
+      };
+    }
+  }
   // The Leaping Bolt's target, a Bursting Coal, Drawn Lightning: away.
   if (
     (boss?.cast === FINAL_CASTS.bolt && boss.castTgt === b.pid) ||
@@ -471,6 +491,15 @@ function duty(world, st, b, me) {
     if (spot) return { goal: spot, tol: 0.8, duty: 'dodge' };
   }
   return null;
+}
+
+/** The Buffeting Gale's reach (final_phase_ids.ts FINAL_PHASE_TUNING buffetReach). */
+const BUFFET_REACH = 7;
+/** The Splinter of the Breath while it hunts a Wind-Tethered player (null otherwise). */
+function huntingBreath(world) {
+  const s = (world.splinters ?? []).find((a) => a.tid === FINAL_ADD_MOBS.breath && alive(a));
+  if (!s) return null;
+  return world.living().some((p) => hasAura(p, FINAL_PHASE_AURAS.tether)) ? s : null;
 }
 
 /** The nearest safe spot at least `gap` from every other player. */
