@@ -1,8 +1,7 @@
 // Gibbetmere (The Wraithwood): the painted rebuild of the town's kit houses, a
 // shuttered hamlet under the eaves. The fenced square keeps every service it
 // had (the well and the fire, the stall and its crates, Sexton Marrow and
-// Widow Tansy, the mailbox, the board); the inn stands east of it between the
-// Widow's Thicket road and the Crowgate road, the chapel west of it with its
+// Widow Tansy, the mailbox, the board); the chapel stands west of it with its
 // bell tower over the Wraithwood Graves, and the sexton's house south of the
 // graves, its door on them. A pure, frozen data/geometry module: no engine
 // imports, no randomness, no clocks (sim/painted_towns/CLAUDE.md).
@@ -14,7 +13,7 @@ import type { PaintedTownLayout } from './types';
 const LOOK = 'shakes' as const;
 const EAST_FACING = Math.PI / 2; // the door looks east (-x)
 
-// The chapel: west of the square facing the inn across the well (the bells
+// The chapel: west of the square facing east across the well (the bells
 // the Sexton rings), its bell tower at the front's south corner over the
 // graves. It stands at 1.0 for the hamlet (its portal still clears 5 yd).
 const CHAPEL = paintedTownBuilding({
@@ -40,8 +39,8 @@ const SEXTON_HOUSE = paintedTownBuilding({
 // The inn was taken down in the Studio town rework (#4593).
 const BUILDINGS = [CHAPEL, SEXTON_HOUSE] as const;
 
-// Each building's pad and its apron. The inn and the chapel stand at the
-// square's own height (2.5), so the square does not move; the house at 3.2 on
+// Each building's pad and its apron. The chapel stands at the square's own
+// height (2.5), so the square does not move; the house at 3.2 on
 // the rise south of the graves.
 const GROUND: readonly TownGround[] = [
   { building: CHAPEL, height: 2.5, columns: 2, rows: 3, taper: 4, apron: 10 },

@@ -2,7 +2,7 @@
 // in the Highwatch look (Alpine slate). The plaza keeps every service it had
 // (the well and the great fire, the four stalls and their crates, Warden
 // Kaldra, the mailbox, the board, the Frostveil Barrow); the buildings ring it
-// between its four roads: the Hearth-Lodge south, the trade hall west, the
+// between its four roads: the trade hall west, the
 // chapel north behind the graves, a house on the high shelf north-east, and
 // the east side open over the sea cliff. A pure, frozen data/geometry module:
 // no engine imports, no randomness, no clocks (sim/painted_towns/CLAUDE.md).
@@ -56,8 +56,7 @@ const SHELF_HOUSE = paintedTownBuilding({
 // The hearth lodge was taken down in the Studio town rework (#4593).
 const BUILDINGS = [CHAPEL, TRADE_HALL, SHELF_HOUSE] as const;
 
-// Each building's pad and its apron. The lodge stands at the plaza's own
-// height (3.0) with a small apron that stays off the sea-cliff face; the trade
+// Each building's pad and its apron. The trade
 // hall sits on the low ground west of the plaza (1.5), the chapel in the dip
 // behind the graves (2.5), the house on the high shelf (5.5).
 const GROUND: readonly TownGround[] = [
