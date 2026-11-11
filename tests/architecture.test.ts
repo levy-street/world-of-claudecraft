@@ -1513,6 +1513,8 @@ const RENDER_PURE_CORES = [
   'src/render/vfx_screen_bounds_core.ts',
   'src/render/weapon_vfx_emissive_cache_core.ts',
   'src/render/weapon_vfx_shed_core.ts',
+  // the Heartmeld Staff's gems lighting in turn (weapon_vfx.ts coreSprite seq)
+  'src/render/weapon_vfx_seq_core.ts',
   'src/render/draw_stats_core.ts',
   'src/render/farm_patches_core.ts',
   'src/render/fishing_bobber_core.ts',

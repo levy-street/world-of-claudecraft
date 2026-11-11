@@ -5,17 +5,13 @@
 // every material, opaque shards that write depth and additive light that does not.
 import * as THREE from 'three';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import {
-  createWeaponVfx,
-  WEAPON_VFX,
-  type WeaponVfxSpec,
-  weaponVfxSeqLevel,
-} from '../src/render/weapon_vfx';
+import { createWeaponVfx, WEAPON_VFX, type WeaponVfxSpec } from '../src/render/weapon_vfx';
 import {
   makeRaidPart,
   RAID_TUNE_KEY_BY_KIND,
   type WeaponVfxRaidComponent,
 } from '../src/render/weapon_vfx_raid_parts';
+import { weaponVfxSeqLevel } from '../src/render/weapon_vfx_seq_core';
 
 const AT = new THREE.Vector3(0, 1, 0);
 const TO = new THREE.Vector3(0, 1.6, 0);
@@ -246,6 +242,44 @@ describe("the Smith's Heart rigs", () => {
       rig.setCalm(false);
       for (const m of calmMats) expect(m.uniforms.uCalm.value, model).toBe(0);
       rig.dispose();
+    }
+  });
+
+  it('reads the calm lever in every shader that carries it (no dead uniform)', () => {
+    for (const model of RAID_MODELS) {
+      const rig = rigFor(WEAPON_VFX[model]);
+      rig.group.traverse((o) => {
+        const mat = (o as THREE.Mesh).material as THREE.ShaderMaterial | undefined;
+        if (!mat?.uniforms?.uCalm) return;
+        const src = mat.vertexShader + mat.fragmentShader;
+        // declared AND used: more than the one declaration line
+        expect(src.split('uCalm').length - 1, `${model} ${o.name}`).toBeGreaterThan(1);
+      });
+      rig.dispose();
+    }
+  });
+
+  it('keeps each raid rig within a draw budget a crowded raid can carry', () => {
+    // the heaviest pre-raid rig draws 9 additive parts; a raid rig may carry its element's
+    // signature on top, but never a dozen more. Literal on purpose: a ratchet.
+    const CEILING = 11;
+    for (const model of RAID_MODELS) {
+      const rig = rigFor(WEAPON_VFX[model]);
+      let draws = 0;
+      rig.group.traverse((o) => {
+        const d = o as THREE.Mesh & THREE.Sprite & THREE.Points;
+        if (d.isMesh || d.isSprite || d.isPoints) draws++;
+      });
+      expect(draws, model).toBeLessThanOrEqual(CEILING);
+      rig.dispose();
+    }
+  });
+
+  it('turns every storm eye with whole arms (a fractional count tears at the seam)', () => {
+    for (const [key, spec] of Object.entries(WEAPON_VFX)) {
+      for (const c of spec.fx) {
+        if (c.kind === 'vortex') expect(Number.isInteger(c.arms), key).toBe(true);
+      }
     }
   });
 

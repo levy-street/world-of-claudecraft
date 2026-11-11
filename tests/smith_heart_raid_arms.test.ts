@@ -296,7 +296,7 @@ describe('the assets the raid hands out', () => {
     expect(gems.map((g) => g.seq?.slot)).toEqual([0, 1, 2, 3]);
     for (const gem of gems) expect(gem.seq?.of).toBe(4);
     expect(new Set(gems.map((g) => g.color)).size).toBe(4);
-    for (const kind of ['flames', 'aurora', 'runeRing', 'vortex', 'drift'])
+    for (const kind of ['aurora', 'runeRing', 'vortex', 'drift', 'motes'])
       expect(kinds('duskwick_staff'), kind).toContain(kind);
     // and its glow keeps each gem's own colour instead of grading all four to one tint
     expect(WEAPON_VFX.duskwick_staff.emissive?.tintMix).toBeLessThan(0.3);

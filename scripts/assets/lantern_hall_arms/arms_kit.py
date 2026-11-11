@@ -1,5 +1,5 @@
-"""Shared forge for Lantern Hall's elemental weapon appearances (Hearthbrand, Squallcrest, the
-Rimelight Staff and the Duskwick Staff), sold by the guild quartermaster for Lantern Seals.
+"""Shared forge for procedural weapon appearances: first made for Lantern Hall, now the base of
+the Smith's Heart raid arms (scripts/assets/smith_heart_arms/heart_kit.py builds on it).
 
 Each build script paints its parts with a small palette of flat surfaces, models the weapon out
 of the helpers below into ONE bmesh, then calls `finish`, which UV-unwraps, bakes the palette into

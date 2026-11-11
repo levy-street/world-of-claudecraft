@@ -43,6 +43,7 @@ import {
   RAID_TUNE_KEY_BY_KIND,
   type WeaponVfxRaidComponent,
 } from './weapon_vfx_raid_parts';
+import { weaponVfxSeqLevel } from './weapon_vfx_seq_core';
 import { applyRiggedWornDetail } from './worn_stone';
 
 // ---------------------------------------------------------------------------
@@ -391,6 +392,7 @@ export interface WeaponVfxCoreSprite {
   at: WeaponVfxAnchor;
   size: number;
   color: number;
+  /** The star flare's extra size over `size` (default 0.5); 0 draws no flare sprite at all. */
   flare?: number;
   hz?: number;
   opacity?: number;
@@ -1895,8 +1897,8 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
       // the wind: two streaking ribbons wound opposite ways round the blade
       {
         kind: 'aurora',
-        helix: { from: { yF: 0.3 }, to: { yF: 1.0 }, radius: 0.17, turns: 2.2 },
-        width: 0.09,
+        helix: { from: { yF: 0.3 }, to: { yF: 1.0 }, radius: 0.2, turns: 2.2 },
+        width: 0.13,
         amp: 0.03,
         speed: 1.4,
         opacity: 1.2,
@@ -1905,8 +1907,8 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
       },
       {
         kind: 'aurora',
-        helix: { from: { yF: 0.28 }, to: { yF: 0.95 }, radius: 0.22, turns: -1.7, phase: 2.2 },
-        width: 0.07,
+        helix: { from: { yF: 0.28 }, to: { yF: 0.95 }, radius: 0.27, turns: -1.7, phase: 2.2 },
+        width: 0.1,
         amp: 0.035,
         speed: 1.1,
         opacity: 0.9,
@@ -2118,11 +2120,11 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
       {
         kind: 'flames',
         line: [{ yF: 0.32 }, { yF: 0.86 }],
-        count: 34,
+        count: 26,
         spread: 0.122,
-        lean: 0.45,
-        height: [0.2, 0.38],
-        width: [0.1, 0.17],
+        lean: 0.5,
+        height: [0.3, 0.55],
+        width: [0.14, 0.22],
         rate: [0.9, 1.6],
         hot: 0xfff0b0,
         mid: 0xff8a1e,
@@ -2133,11 +2135,11 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
       {
         kind: 'flames',
         line: [{ yF: 0.86 }, { yF: 0.99 }],
-        count: 5,
+        count: 4,
         spread: 0,
         lean: 0,
-        height: [0.18, 0.3],
-        width: [0.09, 0.13],
+        height: [0.26, 0.42],
+        width: [0.12, 0.18],
         rate: [1.1, 1.7],
         hot: 0xfff0b0,
         mid: 0xff8a1e,
@@ -2217,24 +2219,15 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
         (g, slot): WeaponVfxCoreSprite => ({
           kind: 'coreSprite',
           at: { yF: 0.768, dx: g.dx, dy: g.dy },
-          size: 0.42,
+          size: 0.5,
           color: g.color,
-          flare: 1.0,
+          flare: 0,
           hz: 0.9,
-          opacity: 0.95,
+          opacity: 1,
           seq: { slot, of: 4, hz: 0.3 },
         }),
       ),
-      // the gathered strength in the heart
-      {
-        kind: 'coreSprite',
-        at: { yF: 0.768, dy: 0.04 },
-        size: 0.42,
-        color: 0xfff2c8,
-        flare: 0.7,
-        hz: 0.6,
-        opacity: 0.55,
-      },
+      // the gathered strength turning in the heart
       {
         kind: 'vortex',
         at: { yF: 0.768 },
@@ -2258,24 +2251,6 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
         color: 0xffc860,
         core: 0xffffff,
         opacity: 0.75,
-      },
-      // the quarry: dust sifting off the amber
-      {
-        kind: 'drift',
-        line: [
-          { yF: 0.768, dx: -0.2, dy: 0.18 },
-          { yF: 0.768, dx: -0.28, dy: 0.26 },
-        ],
-        count: 14,
-        vel: [0, -0.22, 0],
-        spread: [0.05, 0.03, 0.05],
-        life: [1.2, 2.2],
-        size: [0.04, 0.08],
-        grow: 1,
-        swirl: 0.06,
-        colorA: 0xffd28a,
-        colorB: 0xc8a060,
-        opacity: 0.35,
       },
       // the gale: a gust winding round the wind gem
       {
@@ -2311,24 +2286,7 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
         colorB: 0x9fdcff,
         opacity: 0.95,
       },
-      // the fire: flames off the fire gem, embers rising
-      {
-        kind: 'flames',
-        line: [
-          { yF: 0.768, dx: -0.24, dy: -0.22 },
-          { yF: 0.768, dx: -0.27, dy: -0.18 },
-        ],
-        count: 4,
-        spread: 0,
-        lean: 0.2,
-        height: [0.1, 0.16],
-        width: [0.06, 0.09],
-        rate: [1.0, 1.6],
-        hot: 0xfff0b0,
-        mid: 0xff7a1e,
-        tip: 0xb8260a,
-        opacity: 0.9,
-      },
+      // the fire: embers rising off the fire gem
       {
         kind: 'drift',
         line: [
@@ -3091,7 +3049,7 @@ type VfxMaterial = THREE.Material & { uniforms?: Record<string, THREE.IUniform> 
 interface VfxPart {
   node: THREE.Object3D | null;
   mats: VfxMaterial[];
-  update?: (t: number) => void;
+  update?: (t: number, calm: boolean) => void;
   extraDispose?: () => void;
   kind?: string;
   baseOpacities?: number[];
@@ -3428,6 +3386,7 @@ function makeAurora(b: THREE.Box3, c: WeaponVfxAurora): VfxPart | null {
       uColB: { value: new THREE.Color(c.colors?.[1] ?? STAR.violet) },
       uColC: { value: new THREE.Color(c.colors?.[2] ?? STAR.teal) },
       uStreak: { value: c.streak ?? 0 },
+      uCalm: { value: 0 },
     },
     vertexShader: `
       attribute vec3 aNorm;
@@ -3440,6 +3399,7 @@ function makeAurora(b: THREE.Box3, c: WeaponVfxAurora): VfxPart | null {
       }`,
     fragmentShader: `
       uniform float uTime; uniform float uOpacity; uniform float uStreak; uniform float uSpeed;
+      uniform float uCalm;
       uniform vec3 uColA; uniform vec3 uColB; uniform vec3 uColC;
       varying vec2 vUv;
       void main() {
@@ -3450,7 +3410,9 @@ function makeAurora(b: THREE.Box3, c: WeaponVfxAurora): VfxPart | null {
         float edge = pow(max(0.0, 1.0 - abs(vUv.y * 2.0 - 1.0)), 1.6);
         float shim = 0.72 + 0.28 * sin(uTime * 1.1 + vUv.x * 8.0);
         // wind streaks: dashes racing along the ribbon, thinning toward its edges
-        float dash = smoothstep(0.25, 0.85, 0.5 + 0.5 * sin(vUv.x * uStreak * 6.2831 - uTime * uSpeed * 9.0));
+        // reduced motion: the dashes drift instead of racing
+        float race = mod(uTime, 512.0) * uSpeed * mix(9.0, 1.5, uCalm);
+        float dash = smoothstep(0.25, 0.85, 0.5 + 0.5 * sin(vUv.x * uStreak * 6.2831 - race));
         float streak = mix(1.0, dash * 1.5, step(0.5, uStreak));
         float a = ends * edge * shim * streak * uOpacity;
         gl_FragColor = vec4(c * a, a);
@@ -3656,36 +3618,34 @@ function makeCoreSprite(b: THREE.Box3, c: WeaponVfxCoreSprite): VfxPart {
   };
   const op = c.opacity ?? 0.8;
   const glow = mkSprite(softDiscTex(), c.size, op);
-  const flare = mkSprite(starFlareTex(), c.size * (1 + (c.flare ?? 0.5)), op * 0.85);
-  group.add(glow, flare);
+  // `flare: 0` draws the soft glow alone: one draw instead of two, for a rig that lights several
+  const flare =
+    c.flare === 0 ? null : mkSprite(starFlareTex(), c.size * (1 + (c.flare ?? 0.5)), op * 0.85);
+  group.add(glow);
+  if (flare) group.add(flare);
   const seq = c.seq;
   const tint = new THREE.Color(c.color);
   return {
     node: group,
-    mats: [glow.material, flare.material],
-    update: (t: number) => {
+    mats: flare ? [glow.material, flare.material] : [glow.material],
+    update: (t: number, calm: boolean) => {
       const pulse = 0.86 + 0.14 * Math.sin(t * (c.hz ?? 0.7) * Math.PI * 2);
-      // in turn: a smooth lobe once a round, centred on this sprite's slot
-      const lit = seq ? weaponVfxSeqLevel(t, seq.slot, seq.of, seq.hz) : 1;
+      // in turn: a smooth lobe once a round, centred on this sprite's slot (a slower round, at
+      // a steadier swell, under reduced motion)
+      const lit = seq ? weaponVfxSeqLevel(t, seq.slot, seq.of, calm ? seq.hz * 0.4 : seq.hz) : 1;
       const swell = seq ? 0.55 + 0.75 * lit : 1;
       glow.scale.setScalar(c.size * pulse * swell);
-      flare.scale.setScalar(c.size * (1 + (c.flare ?? 0.5)) * (2 - pulse) * swell);
-      flare.material.rotation = t * 0.22;
+      if (flare) {
+        flare.scale.setScalar(c.size * (1 + (c.flare ?? 0.5)) * (2 - pulse) * swell);
+        flare.material.rotation = t * 0.22;
+      }
       if (seq) {
         const k = 0.3 + 0.7 * lit;
         glow.material.color.copy(tint).multiplyScalar(k);
-        flare.material.color.copy(tint).multiplyScalar(k);
+        flare?.material.color.copy(tint).multiplyScalar(k);
       }
     },
   };
-}
-
-/** How lit slot `slot` of `of` sprites lighting in turn is at time `t` (0..1): a smooth lobe
- *  once a round (`hz` rounds a second), the slots evenly spaced through it. */
-export function weaponVfxSeqLevel(t: number, slot: number, of: number, hz: number): number {
-  const phase = (((t * hz - slot / of) % 1) + 1) % 1;
-  const d = Math.min(phase, 1 - phase) * of; // distance in slots from this slot's moment
-  return d >= 1 ? 0 : 0.5 + 0.5 * Math.cos(d * Math.PI);
 }
 
 function makePool(tier: WeaponVfxTier): VfxScenePart {
@@ -3812,7 +3772,8 @@ export interface WeaponVfxHandle {
   setTuning(next: Partial<WeaponVfxTuning>): void;
   setBackdropVisible(v: boolean): void;
   setPixelScale(devicePxHeight: number): void;
-  /** Reduced motion: caps every flash (strike rates, blinks, the running rune light).
+  /** Reduced motion: caps every flash (strike rates, blinks, flicker, the running rune light,
+   *  wind dashes, sprites lighting in turn, the cast light's flicker).
    *  Write-elided, so a per-frame caller costs nothing while the setting holds. */
   setCalm(on: boolean): void;
   update(dt: number): void;
@@ -4060,7 +4021,7 @@ export function createWeaponVfx(
       for (const m of allMats) {
         if (m.uniforms?.uTime) m.uniforms.uTime.value = time;
       }
-      for (const p of parts) p.update?.(time);
+      for (const p of parts) p.update?.(time, calm);
       const e = eSpec;
       const glowPulse = 1 - e.pulse / 2 + (e.pulse / 2) * Math.sin(time * e.pulseHz * Math.PI * 2);
       for (const { prev } of emissives) {
@@ -4069,10 +4030,12 @@ export function createWeaponVfx(
         }
       }
       if (light) {
+        // reduced motion holds the cast light near steady
+        const flicker = calm ? lightSpec.flicker * 0.15 : lightSpec.flicker;
         const flick =
           1 -
-          lightSpec.flicker +
-          lightSpec.flicker *
+          flicker +
+          flicker *
             (0.6 * Math.sin(time * lightSpec.hz * 6.4) +
               0.4 * Math.sin(time * lightSpec.hz * 17.3));
         light.intensity = lightSpec.intensity * flick * tuning.light;

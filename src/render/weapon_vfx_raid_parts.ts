@@ -22,8 +22,14 @@
 // - Every pow() base is provably non-negative (tests/shader_pow_domain.test.ts): the additive
 //   output is bloomed, and one NaN texel becomes a black rectangle.
 // - `uOpacity` is the tuning channel each part answers to (createWeaponVfx's applyTuning and the
-//   shed lever write it); `uCalm` is the reduced-motion lever (WeaponVfxHandle.setCalm), which
-//   caps every flash.
+//   shed lever write it); `uCalm` is the reduced-motion lever (WeaponVfxHandle.setCalm): every
+//   kind reads it and slows or steadies its flicker under it (pinned in
+//   tests/weapon_vfx_raid_parts.test.ts).
+// - Time inside a noise hash is wrapped (`mod(uTime, NOISE_PERIOD)`): a raw clock grows without
+//   bound and sin-based hashes go blocky once their argument is large (makeArcs wraps its strike
+//   counter for the same reason). The wrap is a single unnoticed reseed every ~8.5 minutes.
+// - The orbiting shards are solid: the shed lever dims their glow, not their bodies (an opaque
+//   body cannot fade without going transparent); the far-LOD swap removes them with the rig.
 //
 // Weapon-local space: the GLB's canonical frame, blade or shaft along +Y, the blade's flat in XY.
 
@@ -135,6 +141,9 @@ function basisFor(axis: [number, number, number] | undefined): THREE.Matrix3 {
   const z = new THREE.Vector3().crossVectors(x, y).normalize();
   return new THREE.Matrix3().set(x.x, y.x, z.x, x.y, y.y, z.y, x.z, y.z, z.z);
 }
+
+/** Seconds after which a shader's noise clock wraps (see the header). */
+const NOISE_PERIOD = 512;
 
 const HASH_GLSL = `
   float h11(float n) { return fract(sin(n * 12.9898 + 4.1414) * 43758.5453); }
@@ -270,7 +279,7 @@ function makeOrbiters(center: THREE.Vector3, c: WeaponVfxOrbiters): WeaponVfxRai
       }`,
     fragmentShader: `
       uniform vec3 uColor; uniform vec3 uDark; uniform vec3 uGlow; uniform float uSeams;
-      uniform float uIce; uniform float uOpacity; uniform float uTime;
+      uniform float uIce; uniform float uOpacity; uniform float uTime; uniform float uCalm;
       varying vec3 vN; varying vec3 vV; varying vec3 vLocal; varying float vSeed;
       void main() {
         vec3 n = normalize(vN);
@@ -281,7 +290,7 @@ function makeOrbiters(center: THREE.Vector3, c: WeaponVfxOrbiters): WeaponVfxRai
         // glowing seams: thin bands through the shard, each shard its own phase
         float band = abs(sin(vLocal.y * 17.0 + vLocal.x * 9.0 + vSeed * 31.0));
         float seam = smoothstep(1.0 - 0.12 * uSeams, 1.0, band) * uSeams;
-        float pulse = 0.75 + 0.25 * sin(uTime * 2.2 + vSeed * 6.2831);
+        float pulse = mix(0.75 + 0.25 * sin(uTime * 2.2 + vSeed * 6.2831), 0.85, uCalm);
         float glow = (seam * (1.0 - uIce) + rim * (0.35 + 0.65 * uIce)) * pulse * uOpacity;
         gl_FragColor = vec4(c + uGlow * glow, 1.0);
       }`,
@@ -476,13 +485,15 @@ function makeFlames(a0: THREE.Vector3, a1: THREE.Vector3, c: WeaponVfxFlames): W
       }`,
     fragmentShader: `
       uniform float uTime; uniform vec3 uHot; uniform vec3 uMid; uniform vec3 uTip;
-      uniform float uOpacity;
+      uniform float uOpacity; uniform float uCalm;
       varying vec2 vUv; varying float vLife; varying float vSeed;
       ${HASH_GLSL}
       void main() {
         float y = vUv.y;
-        float n = vnoise(vec2(vUv.x * 2.5 + vSeed * 13.0, y * 3.5 - uTime * 2.6 - vSeed * 7.0));
-        float n2 = vnoise(vec2(vUv.x * 6.0 - vSeed * 5.0, y * 7.0 - uTime * 4.1));
+        // wrapped clock (see the header), slowed to a lazy lick under reduced motion
+        float t = mod(uTime, ${NOISE_PERIOD.toFixed(1)}) * (1.0 - 0.7 * uCalm);
+        float n = vnoise(vec2(vUv.x * 2.5 + vSeed * 13.0, y * 3.5 - t * 2.6 - vSeed * 7.0));
+        float n2 = vnoise(vec2(vUv.x * 6.0 - vSeed * 5.0, y * 7.0 - t * 4.1));
         float x = (vUv.x - 0.5) * 2.0 + (n - 0.5) * 0.9 * y;
         float halfW = clamp((1.0 - y) * 0.95 + 0.05, 0.05, 1.0) * (0.75 + 0.25 * n2);
         float body = 1.0 - smoothstep(0.35, 1.0, abs(x) / halfW);
@@ -547,13 +558,15 @@ function makeVortex(center: THREE.Vector3, c: WeaponVfxVortex): WeaponVfxRaidPar
       }`,
     fragmentShader: `
       uniform float uTime; uniform float uArms; uniform float uSpeed; uniform float uTwist;
-      uniform vec3 uOuter; uniform vec3 uInner; uniform float uOpacity;
+      uniform vec3 uOuter; uniform vec3 uInner; uniform float uOpacity; uniform float uCalm;
       varying vec2 vP;
       void main() {
         float r = length(vP);
         // atan(0, 0) is undefined: keep the eye's exact centre off the origin
         float ang = atan(vP.y, vP.x + 1e-4);
-        float sp = sin(uArms * ang + uTwist * log(r + 0.06) * 6.0 - uTime * uSpeed * 6.2831);
+        // the spin slows to a drift under reduced motion; the phase wraps with the clock
+        float turn = fract(mod(uTime, ${NOISE_PERIOD.toFixed(1)}) * uSpeed * (1.0 - 0.75 * uCalm));
+        float sp = sin(uArms * ang + uTwist * log(r + 0.06) * 6.0 - turn * 6.2831);
         float arms = smoothstep(0.1, 0.95, sp * 0.5 + 0.5);
         float ring = 1.0 - smoothstep(0.62, 1.0, r);
         float eye = 1.0 - smoothstep(0.0, 0.3, r);

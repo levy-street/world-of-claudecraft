@@ -1,6 +1,6 @@
 """Render the Smith's Heart raid weapons from their shipped GLBs, with the glow lit the way the
 game lights it (the skin's emissive window rebuilt as a shader mask, as
-scripts/assets/lantern_hall_arms/render_arms.py does).
+the Lantern Hall arms renderer once did).
 
   blender --background --factory-startup --python scripts/assets/smith_heart_arms/render_heart_arms.py -- \
       <out.png> <mode: hero|card|lineup|side> [--res N] [--glow S] [--bg r,g,b] [--blend out.blend] \
