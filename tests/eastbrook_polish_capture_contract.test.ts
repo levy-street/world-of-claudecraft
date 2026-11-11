@@ -745,7 +745,7 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // and again for its town fixes there (the benches follow their masters, the
   // lots' shelves stand at the map's heights, a few stands nudged).
   // No capture was retaken.
-  '581abc857a61a7bd361e0c807217c360bc8f807795f4a535c62d6d181036bfe1';
+  '3502fd5be371b7081c5d5cd23f20b2ec153c0501671f0e430cd3fc5e0500711d';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
