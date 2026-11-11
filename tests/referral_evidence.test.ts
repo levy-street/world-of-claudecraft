@@ -24,11 +24,23 @@ describe('authoritative referral evidence', () => {
     expect(joined).toMatchObject({
       kind: 'party',
       invited: true,
+      joinedPids: [a, b],
       participants: [
         { accountId: 1, characterId: 11 },
         { accountId: 2, characterId: 22 },
       ],
     });
+    // A later accept names only the newcomer, so the grouped pair is not told again.
+    const c = sim.addPlayer('mage', 'Three', { characterId: 33 });
+    sim.meta(c)!.accountId = 3;
+    sim.partyInvite(c, a);
+    sim.partyAccept(c);
+    expect(sim.events.filter((e) => e.type === 'referralEvidence').at(-1)).toMatchObject({
+      kind: 'party',
+      invited: true,
+      joinedPids: [c],
+    });
+    sim.partyLeave(c);
     sim.partyLeave(b);
     const left = sim.events.filter((e) => e.type === 'referralEvidence').at(-1);
     expect(left).not.toHaveProperty('invited');
