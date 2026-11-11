@@ -134,6 +134,7 @@ function baseSnapshot(): PerfSnapshot {
       },
       nameplates: { paints: 0, paintsSkipped: 0 },
       renderDiagnostics: {} as never,
+      drawCensus: { samples: 0, latest: null, peak: null },
       nightAmount: 0,
       prewarm: null,
       castVfx: {

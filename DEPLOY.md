@@ -969,7 +969,12 @@ For off-box safety, sync the directory to S3 occasionally:
   least diagnostic blocks one rung at a time and records them under
   `raw_summary.dropped`, so a key that is absent AND unlisted there was never
   sent, and the small diagnostic keys (`windows`, `bootPhases`, `shaderWarm`,
-  `postRevealLinks`, `rendererDrawingBuffer`, `browser`) survive on every row.
+  `postRevealLinks`, `rendererDrawingBuffer`, `rendererDrawCensus`, `browser`)
+  survive on every row. `rendererDrawCensus` is the draw attribution behind
+  `renderer_calls`: the latest and the 5-minute peak of an idle-time scene
+  census, each ranked by render category and by top-level scene node
+  (`src/render/draw_census_core.ts`). Its totals count main-camera draws only,
+  so compare its rankings, not its `draws`, with `renderer_calls`.
   `woc_client_raw_summary_shed_total{rung}` counts stored reports by the
   deepest rung reached (`none` when the blob fit), the readout for "did a
   client shape start blowing the cap" and for sizing a cap change. Size the

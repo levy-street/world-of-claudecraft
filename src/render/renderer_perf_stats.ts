@@ -9,6 +9,7 @@ import type { BackgroundGpuQueueStats } from './background_gpu_queue';
 import type { BuildLedgerSnapshot } from './build_ledger_core';
 import type { CastVfxReadinessSnapshot } from './cast_vfx_readiness_core';
 import type { LookPiecesStats } from './characters/look_pieces';
+import type { DrawCensusSnapshot } from './draw_census_core';
 import type { EntryDetailHorizonSnapshot } from './entry_detail_horizon';
 import type { FoliagePerfStats } from './foliage';
 import type { GfxBucketBands, GfxBucketLevels, GfxRuntimeBudget } from './gfx';
@@ -172,6 +173,9 @@ export interface RendererPerfStats {
    *  the same pixels (nameplate_paint_gate_core.ts). */
   nameplates: { paints: number; paintsSkipped: number };
   renderDiagnostics: RenderDiagnosticsSnapshot;
+  /** The always-on idle-time draw attribution (draw_census.ts): the beacon's
+   *  `rendererDrawCensus`. */
+  drawCensus: DrawCensusSnapshot;
   lastFrame?: RendererFrameStats;
   prewarm: RendererPrewarmStats | null;
   castVfx: CastVfxReadinessSnapshot;

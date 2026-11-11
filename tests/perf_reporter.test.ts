@@ -646,6 +646,37 @@ function snapshot(): PerfSnapshot {
       },
       nameplates: { paints: 0, paintsSkipped: 0 },
       renderDiagnostics: renderDiagnostics(),
+      drawCensus: {
+        samples: 4,
+        latest: {
+          draws: 120,
+          objects: 110,
+          walkMs: 0.8,
+          categories: [
+            ['entity:player', 80],
+            ['dungeon', 40],
+          ],
+          roots: [
+            ['characters', 80],
+            ['arena', 40],
+          ],
+          nodes: [['entity:player>characters', 80]],
+        },
+        peak: {
+          draws: 900,
+          objects: 700,
+          walkMs: 2.1,
+          categories: [
+            ['vfx', 600],
+            ['entity:player', 300],
+          ],
+          roots: [
+            ['ignivar-chains', 600],
+            ['characters', 300],
+          ],
+          nodes: [['vfx>forge-chain-links', 600]],
+        },
+      },
       prewarm: prewarmStats(),
       castVfx: {
         ready: true,
@@ -1369,6 +1400,19 @@ describe('perf reporter payload', () => {
       (body.rawSummary as { rendererDiagnostics?: { enabled?: boolean } }).rendererDiagnostics
         ?.enabled,
     ).toBe(false);
+    // The always-on draw census rides as its own key, latest and peak intact.
+    const census = (
+      body.rawSummary as {
+        rendererDrawCensus?: {
+          samples: number;
+          latest: { draws: number } | null;
+          peak: { roots: Array<[string, number]> } | null;
+        };
+      }
+    ).rendererDrawCensus;
+    expect(census?.samples).toBe(4);
+    expect(census?.latest?.draws).toBe(120);
+    expect(census?.peak?.roots[0]).toEqual(['ignivar-chains', 600]);
   });
 });
 
