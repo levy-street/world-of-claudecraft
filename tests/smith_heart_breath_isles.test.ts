@@ -122,6 +122,28 @@ describe('the Islands of the Wind: the round', () => {
     expect(b.castingAbility).toBe(ISLE_CASTS.bulwark);
   });
 
+  it('the dev pool scale (the bot raid human-equivalent check) scales the isle adds', () => {
+    const poolOf = (k: number) => {
+      const f = breathFight(4, 23);
+      if (k !== 1) f.dev(`/dev heart pool ${k}`);
+      expect(f.dev('/dev heart breath pull')).toBe(true);
+      f.tick(2);
+      stillAir(f);
+      crossMark(f, BREATH_DIFFICULTY.normal.isleAt[0]);
+      const out = addsOf(f).map((e) => [e.templateId, e.hp, e.maxHp] as const);
+      f.dev('/dev heart pool 1');
+      return out.sort((a, b) => a[0].localeCompare(b[0]));
+    };
+    const whole = poolOf(1);
+    const scaled = poolOf(0.65);
+    expect(whole).toHaveLength(2);
+    expect(scaled.map((a) => a[0])).toEqual(whole.map((a) => a[0]));
+    whole.forEach(([, , max], i) => {
+      expect(scaled[i][2]).toBe(Math.round(max * 0.65));
+      expect(scaled[i][1]).toBe(scaled[i][2]);
+    });
+  });
+
   it('heroic and mythic: both isles at 80, and again at 60; one round per mark', () => {
     for (const tier of ['heroic', 'mythic'] as const) {
       const f = pulled(4, tier);

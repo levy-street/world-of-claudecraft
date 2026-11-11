@@ -690,6 +690,30 @@ describe('Guardian of the Heat: phase 2', () => {
     }
   });
 
+  it('the dev pool scale (the bot raid human-equivalent check) scales its adds too', () => {
+    // The bots deal about 65 percent of a human raid's damage; a 0.65 pool
+    // that shrank only the giant left the Seedflames at a human raid's pool.
+    const pool = (k: number) => {
+      const f = pulled(3, 31, true);
+      if (k !== 1) f.dev(`/dev heart pool ${k}`);
+      f.dev('/dev heart heat phase 2');
+      hold(f);
+      f.dev('/dev heart heat seeds');
+      f.tick(ticks(T.seedLife + 0.3));
+      const flames = adds(f, HEAT_MOBS.seedflame);
+      f.dev('/dev heart pool 1');
+      return flames.map((e) => [e.hp, e.maxHp]);
+    };
+    const whole = pool(1);
+    const scaled = pool(0.65);
+    expect(whole.length).toBe(3);
+    expect(scaled.length).toBe(3);
+    for (let i = 0; i < 3; i++) {
+      expect(scaled[i][1]).toBe(Math.round(whole[i][1] * 0.65));
+      expect(scaled[i][0]).toBe(scaled[i][1]);
+    }
+  });
+
   it('Wakefire always runs from the giant outward, run after run', () => {
     const f = pulled(3);
     f.dev('/dev heart heat phase 2');

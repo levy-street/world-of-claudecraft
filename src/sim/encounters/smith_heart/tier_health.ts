@@ -27,6 +27,16 @@ export function tierPoolMult(inst: InstanceSlot, mult: number): number {
   return mult * (devPoolScale.get(inst) ?? 1);
 }
 
+/** DEV ONLY: an add the encounter spawns in `inst` takes the run's dev pool
+ *  scale too (the human-equivalent clock shrinks every pool the raid must
+ *  burn, not only the bosses'). No scale set: nothing changes. */
+export function applyDevAddPool(inst: InstanceSlot, e: Entity): void {
+  const k = devPoolScale.get(inst);
+  if (k === undefined || e.dead) return;
+  e.maxHp = Math.max(1, Math.round(e.maxHp * k));
+  e.hp = e.maxHp;
+}
+
 /** Scale `e`'s pool by `mult` for the fight; returns the pool to restore. */
 export function applyTierHealth(e: Entity, mult: number): number {
   const base = e.maxHp;

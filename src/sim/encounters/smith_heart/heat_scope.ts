@@ -16,8 +16,9 @@ import type { Entity } from '../../types';
 import { dropEncounterBody, pickMarkTargets, startBar } from '../sunken_bastion/claim';
 import { local } from './fight_kit';
 import { type HPoint, inHearthFloor } from './heat_geometry';
-import type { HeatDifficultyRules } from './heat_ids';
+import { HEAT_MOBS, type HeatDifficultyRules } from './heat_ids';
 import type { HeatFightState } from './heat_state';
+import { applyDevAddPool } from './tier_health';
 
 export {
   auraOf,
@@ -224,6 +225,8 @@ export function spawnHeatMob(
   const tuned = mobTemplateForDungeonDifficulty(template, inst.dungeonId, difficulty);
   const e = createMob(ctx.nextId++, tuned, tuned.maxLevel, ctx.groundPos(o.x + lx, o.z + lz));
   applyDungeonMobTuning(e, inst.dungeonId, difficulty);
+  // The Rolling Cinder is a ward (a strike lands one point): no pool to scale.
+  if (templateId !== HEAT_MOBS.cinder) applyDevAddPool(inst, e);
   e.spawnPos = { ...e.pos };
   e.prevPos = { ...e.pos };
   e.facing = facing;

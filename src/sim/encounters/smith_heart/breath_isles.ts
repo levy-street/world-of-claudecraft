@@ -75,6 +75,7 @@ import {
 } from './breath_scope';
 import type { BreathFightState, BreathIsleAdd, BreathRide } from './breath_state';
 import { breathSay } from './breath_voice';
+import { applyDevAddPool } from './tier_health';
 
 // ---- who stands where -----------------------------------------------------------------------
 
@@ -196,6 +197,7 @@ function wakeIsle(s: BreathScope, i: number): void {
     const hp = Math.round((role === 'sentinel' ? T.sentinelHealth : T.menderHealth) * hpMult);
     e.maxHp = hp;
     e.hp = hp;
+    applyDevAddPool(inst, e);
     e.spawnPos = { ...e.pos };
     e.prevPos = { ...e.pos };
     e.facing = Math.atan2(spots.land.x - at.x, spots.land.z - at.z);

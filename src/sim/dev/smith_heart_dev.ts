@@ -347,8 +347,10 @@ export function handleSmithHeartDevChat(ctx: SimContext, raw: string, pid: numbe
     return true;
   }
   if (verb === 'pool') {
-    // The bot raid's human-equivalent check: every boss pool (and the final
-    // boss's Splinters) of this run times k, until `/dev heart pool 1`.
+    // The bot raid's human-equivalent check: every boss pool (from the next
+    // pull) and every add the encounters spawn (the final boss's Splinters,
+    // the Heat's adds, the Breath's isle adds: from their next spawn) of this
+    // run times k, until `/dev heart pool 1`.
     const k = Number(arg);
     const inst = ensureInside(ctx, pid);
     if (!inst) return true;
@@ -357,7 +359,11 @@ export function handleSmithHeartDevChat(ctx: SimContext, raw: string, pid: numbe
       return true;
     }
     setTierHealthDevScale(inst, k);
-    log(ctx, pid, `[dev] Smith's Heart pools of this run times ${k} from the next pull.`);
+    log(
+      ctx,
+      pid,
+      `[dev] Smith's Heart pools of this run times ${k} (bosses from the next pull, adds from their next spawn).`,
+    );
     return true;
   }
   if (verb === 'gates') {
