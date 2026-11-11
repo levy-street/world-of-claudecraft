@@ -413,10 +413,25 @@ export const HEALERS = {
     )
       return { id: 'power_word_shield', target: low.pid };
     if (low.frac < 0.4 && h.ready('flash_heal')) return { id: 'flash_heal', target: low.pid };
-    if (hurt >= 4 && h.ready('prayer_of_healing')) return { id: 'prayer_of_healing' };
-    if (hurt >= 3 && h.moving && h.ready('holy_nova')) return { id: 'holy_nova' };
+    // Choirmend heals the whole group: the raid-wide damage's answer.
+    if (hurt >= 3 && h.ready('prayer_of_healing')) return { id: 'prayer_of_healing' };
+    // On the move a human healer rolls Lingering Grace on the hurt (instant,
+    // efficient); Sunburst Canticle (90 mana for ~55 a body) only when many
+    // are hurt together.
+    if (h.moving) {
+      const roll = list.find(
+        (p) => p.frac < 0.85 && !p.auras.some((a) => a.id === 'renew' && a.mine),
+      );
+      if (roll && h.ready('renew')) return { id: 'renew', target: roll.pid };
+      if (hurt >= 4 && low.near >= 2 && h.mana > 0.4 && h.ready('holy_nova'))
+        return { id: 'holy_nova' };
+    }
     if (h.mana < 0.25 && h.ready('inner_focus')) return { id: 'inner_focus' };
-    if (low.frac < 0.72 && h.ready('heal')) return { id: 'heal', target: low.pid };
+    // Solemn Prayer (the efficient big heal) on anyone short of a big hit;
+    // Urgent Prayer only when the cast must be short or the target is falling.
+    if (low.frac < 0.55 && h.mana > 0.3 && h.ready('flash_heal') && !h.ready('heal'))
+      return { id: 'flash_heal', target: low.pid };
+    if (low.frac < 0.75 && h.ready('heal')) return { id: 'heal', target: low.pid };
     if (low.frac < 0.55 && h.ready('flash_heal')) return { id: 'flash_heal', target: low.pid };
     const renewTank = tanks.find(
       (p) => p.frac < 0.95 && !p.auras.some((a) => a.id === 'renew' && a.mine),
@@ -427,7 +442,6 @@ export const HEALERS = {
       (p) => p.frac < 0.85 && !p.auras.some((a) => a.id === 'renew' && a.mine),
     );
     if (renewAny && h.mana > 0.45 && h.ready('renew')) return { id: 'renew', target: renewAny.pid };
-    if (hurt >= 3 && h.mana > 0.4 && h.ready('holy_nova')) return { id: 'holy_nova' };
     if (low.frac < 0.88 && h.mana > 0.35 && h.ready('heal')) return { id: 'heal', target: low.pid };
     return null;
   },
