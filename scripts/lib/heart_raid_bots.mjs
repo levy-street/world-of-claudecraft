@@ -1471,7 +1471,12 @@ function pickKicker(world, st, bots, s, exclude = null) {
     if (hypot(b.self, s) > kk.range + (s.reach ?? 0)) continue;
     if (kk.range > 5 && world.blocks(b.self, s)) continue;
     if (b.self.cast && (b.self.castRem ?? 0) > (s.castRem ?? 0) - 0.6) continue;
-    if (b.duty !== 'role' && b.moving) continue;
+    // A bot walking a mechanic is spared the kick, unless the bar is one the
+    // raid cannot let through (a kick is instant: it lands on the move).
+    if (b.duty !== 'role' && b.moving && !world.boss.backupKick?.(s.cast)) continue;
+    // A boss module may hold an interrupter's kick back for a bar that
+    // matters more (the council keeps its ranged kicks for Wake the Stone).
+    if (world.boss.reserveKick?.(world, st, b, s.cast)) continue;
     st.kickPtr = (st.kickPtr + i + 1) % KICK_ORDER.length;
     return b;
   }

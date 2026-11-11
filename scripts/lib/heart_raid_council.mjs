@@ -289,6 +289,14 @@ export const council = {
   backupKick(castId) {
     return castId === CAST.wake;
   },
+  // The ranged interrupters (Counterspell, Spell Lock, Counter Shot: 20 to
+  // 24 s) keep their kick for the next Wake once it is due within that
+  // cooldown; the bolt and the song go to the melee and the keeper then.
+  reserveKick(world, st, b, castId) {
+    if (castId === CAST.wake || !['mage', 'hunter', 'lock'].includes(b.spec.key)) return false;
+    if (!alive(world.mobs.singer)) return false;
+    return nextWakeIn(st) < 26;
+  },
   kickables(world) {
     const s = world.mobs.singer;
     if (!alive(s)) return [];
@@ -413,8 +421,32 @@ function wakeChoice(world, st) {
   // the cover is raised as LATE as it can be: a Wake whose next one (her own
   // clock, WAKE_EVERY after this bar) still rises before the Wrath's bar (its
   // bar, the marks' 5 s and a walk) is kicked, and that later one shelters.
-  return secondsToBar(world) >= WAKE_EVERY + WAKE_FLOOR + 3;
+  return nominalToBar(world, st) >= WAKE_EVERY + WAKE_FLOOR + 3;
 }
+/** Seconds to the Wrath's bar on the tier's nominal fill (55 s, two and a
+ *  half times faster after the soft enrage's Wraths; the heir's 35 s), not
+ *  the smoothed reading, whose jitter right after a Wrath let Wakes through. */
+function nominalToBar(world, st) {
+  const h = holder(world);
+  if (!h) return Number.POSITIVE_INFINITY;
+  if (h.cast === CAST.wrath) return 0;
+  const heir = world.roleOfTid[h.tid] !== 'guardian';
+  const enrageAfter = DIFF === 'heroic' ? 8 : 4;
+  let fill = heir ? (DIFF === 'mythic' ? 30 : 35) : 55;
+  if ((st.wrathsLanded ?? 0) >= enrageAfter) fill /= 2.5;
+  return (Math.max(0, 100 - (h.res ?? 0)) / 100) * fill;
+}
+/** Seconds to the Seam Singer's next Wake the Stone, as the raid times it:
+ *  her own clock 30 s after the last, or 6 s after a Wrath that landed since
+ *  (the first 20 s into the pull). */
+function nextWakeIn(st) {
+  const now = Date.now();
+  const last = st.wakeCastAt ?? (st.engagedAt ?? now) - 10000;
+  let at = last + WAKE_EVERY * 1000;
+  if ((st.wrathLandedAt ?? 0) > last) at = Math.min(at, st.wrathLandedAt + 6000);
+  return Math.max(0, (at - now) / 1000);
+}
+
 /** Wake the Stone's own clock and its floor time (council_ids.ts COUNCIL_TUNING
  *  wakeEvery; wakeCast + wakeMarkSeconds, plus the Wrath guard's pad). */
 const WAKE_EVERY = 30;
@@ -633,8 +665,10 @@ function castStarted(world, st, key, castId, e) {
     st.rushes.push({ t: fightSec(), who: t?.name ?? '?', pid: e.castTgt, outcome: null });
   } else if (castId === CAST.weight)
     log(`HAMMER'S WEIGHT cast at ${world.players.get(e.castTgt)?.name ?? '?'}`);
-  else if (castId === CAST.wake) log('WAKE THE STONE cast');
-  else if (castId === CAST.rock) log(`FALLING ROCK cast by the ${key}`);
+  else if (castId === CAST.wake) {
+    st.wakeCastAt = Date.now();
+    log('WAKE THE STONE cast');
+  } else if (castId === CAST.rock) log(`FALLING ROCK cast by the ${key}`);
 }
 
 function castEnded(world, st, key, castId, e) {
@@ -663,6 +697,7 @@ function castEnded(world, st, key, castId, e) {
   if (castId === CAST.wrath) {
     if (!alive(e)) return;
     st.wrathsLanded++;
+    st.wrathLandedAt = Date.now();
     st.wakesThrough = 0;
     // Who stood in the open the last tick before it landed, and how far
     // from his planned spot (the plan's misses, the log's evidence).
@@ -691,7 +726,10 @@ function planMechanics(world, st) {
   if (IGNORE !== 'cover' && h && !casts.some((c) => c.kind === 'wrath')) {
     const heir = world.roleOfTid[h.tid] !== 'guardian';
     const toBar = secondsToBar(world);
-    if (toBar <= (heir ? 3.2 : 1.8))
+    // Heroic and Mythic: the Wrath kills, so the raid starts for its cover a
+    // few seconds sooner (the healers and the far ranged need the walk).
+    const lead = WRATH_LETHAL ? 5 : heir ? 3.2 : 1.8;
+    if (toBar <= lead)
       coming.push({ kind: 'wrath', id: h.id, x: h.x, z: h.z, rem: toBar + (heir ? 3 : 4) });
   }
   for (const [id, at] of st.echoNext) {
