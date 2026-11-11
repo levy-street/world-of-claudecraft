@@ -21,6 +21,7 @@
 import { type AccountEarner, accountEarnedDays } from '../sim/account_ledger';
 import { countsTowardCompletion } from '../sim/deeds_completion';
 import { wearableDevBadgeTitles } from '../sim/dev_badge_titles';
+import { smithHeartDeedMount, smithHeartDeedSkin } from '../sim/smith_heart_feat_rewards';
 import type { DeedDef, DeedStats, DeedTrigger } from '../sim/types';
 import type { DeedsRarity } from '../world_api';
 import { DEED_IMAGE_IDS } from './deed_image_ids';
@@ -326,6 +327,10 @@ export interface DeedEntryModel {
   // The card's reward chip for the other worn cosmetic: a border-reward deed
   // says so before it is earned, the way a title-reward deed already does.
   borderReward: boolean;
+  // A deed that pays a cosmetic beyond the Book's own (the Smith's Heart's feats: a weapon
+  // appearance; its meta: a mount), named on the card before and after it is earned.
+  rewardSkinId: string | null;
+  rewardMountKey: string | null;
   crestId: string;
   // Unvisited poi:<zone>:<id> marks for an unearned all-poi 'visits' deed (an
   // exploration wayfarer), in trigger order; the painter resolves each to its
@@ -426,6 +431,8 @@ export function buildDeedsView(input: DeedsViewInput): DeedsViewModel {
       hiddenBadge: def.hidden === true,
       titleReward: def.reward?.kind === 'title',
       borderReward: def.reward?.kind === 'border',
+      rewardSkinId: smithHeartDeedSkin(id),
+      rewardMountKey: smithHeartDeedMount(id),
       crestId: deedCrestId(id, def.category),
       missingPoiMarkIds: earned ? [] : missingPoiVisits(def.trigger, input.deedStats),
     });

@@ -1432,7 +1432,8 @@ export const it_IT: EnTranslations = {
         "emberwrought": "Forgiato nella Brace",
         "hoarfrost": "Brina",
         "fallen_star": "Stella Caduta",
-        "lantern_hall": "Sala della Lanterna"
+        "lantern_hall": "Sala della Lanterna",
+        "smiths_heart": "Smith's Heart"
       },
       "skins": {
         "lantern_hall_sword": {
@@ -1440,25 +1441,30 @@ export const it_IT: EnTranslations = {
           "look": "Ampia lama d'acciaio con una scanalatura di fuoco di lanterna sopito, facce dorate, una lanterna ingabbiata che arde nella guardia e un'impugnatura di cuoio blu.",
           "lore": "Garrick Holt non vende questa lama a uno sconosciuto. Va ai membri che hanno portato a termine i contratti della Sala della Lanterna settimana dopo settimana, e la consegna sempre con le stesse parole: la lanterna nella guardia è accesa dal focolare della sala, così ovunque la porti, la sala viene con te. Il fuoco nella scanalatura è soltanto estetico. Ciò che conta è la promessa."
         },
-        "hearthbrand_sword": {
-          "name": "Marchio del Focolare",
-          "look": "Lama ondulata di acciaio annerito dai bordi roventi, una vena fusa che si ramifica su entrambe le facce, una guardia di fiamme bronzee attorno a una pietra ardente e un'impugnatura rosso sangue.",
-          "lore": "La Sala della Lanterna custodisce un focolare mai spento dalla sua fondazione e Garrick Holt giura che questa lama sia stata temprata nelle sue braci. I membri che la portano dicono che l'impugnatura resti calda anche durante la veglia più gelida. Il fuoco lungo i bordi è soltanto estetico."
+        "seamcaller_maul": {
+          "name": "Seamcaller",
+          "look": "Two-handed maul hewn from one block of banded quarry stone, gold-rimmed striking faces round burning amber, gold crest wings, gold runes cut into both cheeks, amber seam-crystal growing from the crown and a basalt haft bound in gold.",
+          "lore": "The Hammer Council sang the seam awake before they ever raised a hand against the raid, and the stone remembered every note. This maul was cut from the block their hammers split, and its runes still burn when it swings. Quarry shards circle the head as if the mountain wants them back. The runes and the circling stone are only a look."
         },
         "squallcrest_sword": {
           "name": "Cresta di Burrasca",
-          "look": "Lunga lama blu mare dai bordi luminosi come onde infrante, un canale tempestoso che racchiude un fulmine biforcuto, un'onda dorata sul ricasso, una pinna lungo un bordo e una guardia di frangenti dorati attorno a una perla della tempesta.",
-          "lore": "Una capitana che navigava per la gilda riportò questa lama da una burrasca che le strappò l'albero e lasciò la nave a risuonare come una campana. Garrick la vende solo per sigilli e avverte ogni acquirente che ronza prima di una tempesta. Il fulmine e la luce marina sono soltanto estetici."
+          "look": "Long storm-steel blade with lightning-bright edges, a forked bolt in a silver channel up each face, wind fins hooked off the spine and an open silver halo round a storm-eye gem, swept back in gale vanes.",
+          "lore": "The Guardian of the Breath kept the air of the Heart moving, and when it fell the storm it carried did not scatter. It settled into this blade. Wind still winds round the steel and lightning still runs its edges, and those who carry it swear the eye in the halo watches the sky. The storm is only a look."
         },
         "rimelight_staff": {
           "name": "Bastone della Luce di Brina",
-          "look": "Asta pallida legata d'argento e avvolta di brina luminosa, sormontata da un artiglio d'argento che regge un grande cristallo di luce fredda in una corona di ghiaccio scheggiato, con ghiaccioli appesi al collare.",
-          "lore": "La guardia invernale della Sala della Lanterna portava bastoni come questo lungo la strada alta, con le sommità accese per i viaggiatori persi nella neve. Garrick ne tiene uno sulla rastrelliera per i membri con sigilli da spendere. La brina e la sua luce fredda sono soltanto estetiche."
+          "look": "Pale silver shaft wound with hoarfrost and broken out in ice, crowned by four silver tines caging a great crystal of cold light inside a crown of ice shards, a splinter of ice hovering above.",
+          "lore": "The Guardian of the Quench cooled every blade the Heart ever forged. Its crystal was the last thing to stop glowing when it fell, and the raid carried it out still cold enough to frost the hand. Ice circles the crown and runes of frost turn round it. The cold is only a look."
+        },
+        "hearthbrand_sword": {
+          "name": "Marchio del Focolare",
+          "look": "Broad blade of cooled magma crust with molten edges, a net of ember veins cracked across both faces, an obsidian-toothed spine and a black iron guard swept into horns dripping melt round a magma heart.",
+          "lore": "The Guardian of the Heat was the fire the Heart was named for. When it guttered out, its last melt ran into a blade-shaped crack in the forge floor and cooled there, crust outside and fire within. The edges have never stopped burning. The flames are only a look."
         },
         "duskwick_staff": {
-          "name": "Bastone dello Stoppino Crepuscolare",
-          "look": "Due filamenti ritorti di legno nero legati nel ferro, sormontati da una lanterna di ferro aperta che arde di una fiamma crepuscolare viola tra due corna ricurve, con catene che oscillano dalla base.",
-          "lore": "Ogni lanterna nella sala brilla intensa tranne una. La fiamma crepuscolare è stata accesa per custodire la sala di notte ed emana ombra dove le altre danno luce; Garrick ne regola lo stoppino di persona. Il fumo e il bagliore viola sono soltanto estetici."
+          "name": "Heartmeld Staff",
+          "look": "Forge-bronze staff set with courses of quarry stone, crowned by a great gold halo holding four gems that light in turn (quarry amber, gale, frost and fire) round an anvil heart with a white-gold core.",
+          "lore": "The Masterless Strength was the four veins of the Heart bound into one body on the Anvil of the World. When it broke, the four did not part: they settled into this halo and take turns to burn, stone, wind, frost and fire, as they once took turns to strike. The four lights are only a look."
         },
         "guildmark_arming_sword": {
           "name": "Spada da armamento del marchio della gilda",
@@ -2598,6 +2604,7 @@ export const it_IT: EnTranslations = {
       "name_mech_bird": "Cluckwork Uccello Mech",
       "name_lanternback_troll": "Grumbol il Lanterna",
       "name_lantern_hall_destrier": "Destriero della Sala della Lanterna",
+      "name_quarryheart_charger": "Quarryheart Charger",
       "name_chimeglass_tortoise": "Tolliver il Chimeglass",
       "name_rickshaw_mount": "Risciò Vincolato alle Ossa",
       "name_emberbristle_broom": "Scopa dalle setole ardenti",
@@ -2622,6 +2629,7 @@ export const it_IT: EnTranslations = {
       "desc_mech_bird": "Un pollo da guerra a orologeria costruito a mano che scatta su servi scattanti, con la chiave di carica ancora in movimento.",
       "desc_lanternback_troll": "Un troll di collina piegato al giogo dai lampionai, che porta un trono di ferro sulle spalle con una lanterna antivento accesa su entrambi i bracci.",
       "desc_lantern_hall_destrier": "Il cavallo da guerra della Sala della Lanterna, bardato di quercia e ferro sotto l'azzurro della gilda, con due lanterne da tempesta che oscillano dalla sella per illuminare la via di casa.",
+      "desc_quarryheart_charger": "A war-steed of the Smith's Heart: quarry-stone plates hung over a body of living fire, its heart beating white-hot behind gold ribs, ice-crystal horns on its brow and a mane of wind crackling with lightning.",
       "desc_nightwing_chimera": "Una viverna crepuscolare a due teste proveniente dai rami antichi, che riposa sulle zampe posteriori artigliate e sfiora il terreno con ali incise di rune arcane.",
       "desc_chimeglass_tortoise": "Una tartaruga salata che ha superato tre generazioni di carovane. I calderai gli montarono gli occhiali di vetro anti-tempesta e gli appesero una campana di bronzo al collo, così la strada lo sentì molto prima di vederlo.",
       "desc_rickshaw_mount": "Un carro d'ossa sferragliante, con un gregario ossuto imbragato alle stanghe, che ti trascina in una corsa sfrenata.",
@@ -7817,6 +7825,9 @@ export const it_IT: EnTranslations = {
       "hiddenBadge": "Nascosta",
       "titleChip": "Titolo in premio",
       "borderChip": "Ricompensa bordo",
+      "cosmeticChip": "Cosmetic reward",
+      "rewardAppearance": "Reward: the {name} weapon appearance, for every character on your account",
+      "rewardMount": "Reward: the {name} mount",
       "watch": "Segui",
       "unwatch": "Non seguire più",
       "watchFull": "Elenco dei seguiti pieno (massimo {cap})",
@@ -25413,6 +25424,15 @@ export const it_IT: EnTranslations = {
       "reins_lantern_hall_destrier": {
         "name": "Redini del destriero della Sala della Lanterna"
       },
+      "reins_quarryheart_charger": {
+        "name": "Reins of the Quarryheart Charger"
+      },
+      "remnant_of_the_masterless_strength": {
+        "name": "Remnant of the Masterless Strength"
+      },
+      "coffer_of_the_highwatch_vigil": {
+        "name": "Coffer of the Highwatch Vigil"
+      },
       "wyrmfall_core": {
         "name": "Nucleo Caduta del Wyrm"
       },
@@ -27348,6 +27368,11 @@ export const it_IT: EnTranslations = {
         "title": "Highwatch Captain",
         "greeting": "Keep your feet, {className}. When the bellows breathes, step into my calm and let the wind break on us."
       },
+      "heart_warden_ada_collier": {
+        "name": "Warden Ada Collier",
+        "title": "Vigil of Highwatch",
+        "greeting": "Forty generations of the Vigil watched this mountain without knowing why. Now we know, {className}. Mind what you wake in there."
+      },
       "brother_aldric_highwatch": {
         "name": "Fratello Aldric",
         "title": "Sacerdote della Valle",
@@ -28805,6 +28830,16 @@ export const it_IT: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Forgiaspezza forgiato e trasportato"
+          }
+        }
+      },
+      "q_heart_what_the_heart_let_go": {
+        "title": "What the Heart Let Go",
+        "text": "The strength in the Heart has no master and no mind, {playerName}, but it has a shape. When it falls, it will not die: its essence will tear loose and flee back into the stone. Something always stays behind. Bring me what remains of it, and the Vigil will pay you from its own coffers.",
+        "completion": "Still warm. The four strengths, bound in one splinter, and it does not want to be held. The Vigil keeps its word: take this coffer, and may it hold something worth the climb.",
+        "objectives": {
+          "0": {
+            "label": "Remnant of the Masterless Strength"
           }
         }
       },

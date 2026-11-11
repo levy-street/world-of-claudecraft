@@ -112,6 +112,7 @@ import { useForgebreakerEmber } from './quests/forgebreaker_ember';
 import { openGourdlightPouch, openThatchgrinSack, useSeasonalItem } from './seasonal';
 import type { ItemUseResult, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
+import { openSmithHeartCoffer } from './smith_heart_essence_chest';
 import { isStackProvenanceItemId } from './stack_provenance_ids';
 import { usePassingStone } from './tutorial/death_lesson';
 import {
@@ -1095,6 +1096,8 @@ export function useItem(
   if (def.use?.type === 'container') {
     if (def.use.container === 'gourdlight_pouch') openGourdlightPouch(ctx, meta, consumeOneUnit);
     else if (def.use.container === 'thatchgrin_sack') openThatchgrinSack(ctx, meta, consumeOneUnit);
+    else if (def.use.container === 'smith_heart_coffer')
+      openSmithHeartCoffer(ctx, meta, consumeOneUnit);
     else openEmissaryCache(ctx, meta, consumeOneUnit);
     return;
   }

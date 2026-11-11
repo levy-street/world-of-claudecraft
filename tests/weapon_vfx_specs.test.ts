@@ -10,7 +10,19 @@ import {
   WEAPON_VFX,
 } from '../src/render/weapon_vfx';
 
-const KNOWN_FX_KINDS = ['coreSprite', 'motes', 'aurora', 'drift', 'twinkles', 'arcs'];
+const KNOWN_FX_KINDS = [
+  'coreSprite',
+  'motes',
+  'aurora',
+  'drift',
+  'twinkles',
+  'arcs',
+  // the Smith's Heart raid families (src/render/weapon_vfx_raid_parts.ts)
+  'orbiters',
+  'runeRing',
+  'flames',
+  'vortex',
+];
 
 describe('WEAPON_VFX specs', () => {
   it('has at least 20 weapons and every tier exists in TIERS', () => {

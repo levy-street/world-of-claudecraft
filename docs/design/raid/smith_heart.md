@@ -2373,6 +2373,43 @@ Squallcrest, Rimelight, Hearthbrand and Duskwick live on
 here lifts that reservation in the same change. Each guardian has its own table
 on both difficulties (dungeon rework README, goal 4).
 
+### 8.1 The encounter deeds, the meta and the essence quest (2026-11-11)
+
+The raid's rewards beyond its drops (`src/sim/content/smith_heart_rewards.ts`; names
+IP-checked in `docs/design/naming-audit.md`). Cosmetic only, like every deed reward.
+
+| Deed | Rule (any difficulty) | Pays |
+|---|---|---|
+| Charge Through the Curse | Every Mountain's Rush that lands shatters the cursed pillar (at least one) | Seamcaller (the maul) |
+| Keep Your Feet | No raider falls into the void during the fight, and the storm broke | Squallcrest |
+| No One Left in the Cold | No raider Encased in Rime (a full bar, a splash chain or an unhealed Living Rime), and the second half began | the Rimelight Staff |
+| Turn Back the Cinders | No Rolling Cinder reaches its quarry, and at least one was called | Hearthbrand |
+| Kept From the Brim | No Overload bar bursts, and both intermissions were fought | the Heartmeld Staff |
+| Heir to the Smith (meta) | All five above | the Quarryheart Charger (soulbound reins) |
+| The Heart Stills | The Masterless Strength defeated | nothing (the clear record) |
+
+- **Detection** (`encounters/smith_heart/feats.ts`; the watch `feat_attempt.ts` rides each
+  fight state, born with the pull and gone with a wipe): judged at each coordinator's
+  `finish*`, granted to every player in the claim (the encounter-task roster). Every rule needs
+  its proving mechanic to have happened, so a dev kill earns nothing. No rng.
+- **Rewards** (`src/sim/smith_heart_feat_rewards.ts`, from `grantDeed`): the appearance is
+  account-wide (offline the Sim's mirror; online `AccountCosmeticsService.grantDeedRewardSkins`
+  on every `deedUnlocked` and at every join over the earned deeds, into
+  `account_weapon_cosmetics`, so a lost write heals); the reins land in the bags, or, with the
+  bags full, at the next login (the join heal).
+- **Visibility**: the seven deeds are `hidden` while `SMITH_HEART_PLAYABLE` is false and unhide
+  with it; the launch guard demands the five appearances' Reliquary rows then.
+- **The essence quest**: Warden Ada Collier (Vigil of Highwatch) at the Cleft gives
+  "What the Heart Let Go": bring the Remnant of the Masterless Strength (the final boss's
+  personal quest drop, chance 1, for every raider on the quest). WEEKLY, on the raid lockout's
+  reset (`repeatable` plus `weeklyReset`: one kill a week, one remnant, one coffer). The turn-in
+  pays the Coffer of the Highwatch Vigil: opened, ONE item from
+  `SMITH_HEART_NORMAL_LOOT_ITEM_IDS` the opener's class can equip (`canEquipItem`), drawn once
+  through the sim's Rng. The table is EMPTY until the raid's Normal items exist: the coffer
+  then refuses to open with a line and is KEPT (never consumed, nothing drawn), and pays out
+  unchanged once the table is filled.
+- **Dev**: `/dev heart feat <council|breath|quench|heat|final|all> <grant|reset>`.
+
 ## 9. Build rules
 
 1. Every path is at least 12 yd wide (a raid of ten). Pinned: "every walkway is at
@@ -2665,8 +2702,10 @@ captures and review before the next:
 - [ ] Flip `SMITH_HEART_PLAYABLE` to true (`src/sim/content/smith_heart.ts`): this also builds the overworld door; check the door clearance, terrain calm anchor and parity goldens in the same change.
 - [ ] Set `guideVisible` true and regenerate the wiki (`npm run wiki:content`), plus
       any `guide.*` prose keys.
-- [ ] Book of Deeds records for the raid and its bosses (`src/sim/content/deeds.ts`,
-      `docs/design/deeds.md`).
+- [x] Book of Deeds records for the raid and its bosses (`src/sim/content/deeds.ts`,
+      `docs/design/deeds.md`): seven, hidden while gated; unhide them with the flag.
+- [ ] Reliquary rows for the five raid weapon appearances (the launch guard demands them).
+- [ ] Fill `SMITH_HEART_NORMAL_LOOT_ITEM_IDS` with the Normal items (the essence coffer's pool).
 - [ ] Reliquary pages for its unique loot (`docs/design/reliquary.md`).
 - [ ] i18n: English `t()` keys for every player string, entity names in
       `src/ui/world_entity_i18n.ts`, sim lines in `src/ui/sim_i18n.ts`, non-Latin

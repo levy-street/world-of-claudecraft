@@ -6,6 +6,7 @@
 
 import type { BreathDifficulty, BreathWindPhase } from './breath_ids';
 import type { BreathShove } from './breath_shove';
+import type { SmithHeartFeatAttempt } from './feat_attempt';
 import type { SlainWatch } from './voice_slain';
 
 /** The wind's clock (phase 1, and the heroic gusts of phase 2). */
@@ -190,6 +191,8 @@ export interface BreathFightState {
   basePool?: number;
   /** The guardian has fallen and the end was resolved. */
   finished: boolean;
+  /** This pull's watch on the encounter's feat (feat_attempt.ts), created on first touch. */
+  feat?: SmithHeartFeatAttempt;
   /** Seconds since the pull. */
   clock: number;
   /** The fight's half: the Wind, the storm breaking, the Storm. */

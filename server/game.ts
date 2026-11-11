@@ -3206,6 +3206,7 @@ export class GameServer {
       updateLive: (cosmetics) => this.cosmetics.updateLive(accountId, cosmetics),
     });
     this.cosmetics.applyQuestLockouts(pid, accountCosmetics);
+    this.cosmetics.grantDeedRewardSkins(accountId, this.sim.meta(pid)?.deedsEarned.keys() ?? []);
     // Seed the account-wide weapon-skin loadout onto the fresh sim entity so the
     // applied skin shows from the first snapshot (owned skins only).
     this.sim.setWeaponSkinLoadout(pid, ownedWeaponSkinLoadout(accountCosmetics));
@@ -8828,6 +8829,7 @@ export class GameServer {
           else deedUnlocks.set(s, [ev.deedId]);
           // Account ledger fan-out to sibling sessions (retro included: still a fact).
           this.ledger.noteDeedEarned(s, ev.deedId);
+          this.cosmetics.grantDeedRewardSkins(s.accountId, [ev.deedId]);
           // Marquee unlocks fan out to guildmates and followers, and
           // feed-worthy unlocks (titles, borders, the first koi) to the
           // Discord activity feed; retro unlocks NEVER fan out anywhere (a

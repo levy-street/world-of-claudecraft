@@ -23317,7 +23317,6 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'hudChrome.wocStore.referralPromo.close': 'Cerrar promoción de Invita a un amigo',
   'hudChrome.wocStore.referralPromo.cta': 'Invitar amigos',
   'hudChrome.wocStore.referralPromo.eyebrow': 'Vivid aventuras juntos',
-  'hudChrome.wocStore.skins.duskwick_staff.name': 'Bastón de Mecha Crepuscular',
   'hudChrome.wocStore.skins.hearthbrand_sword.name': 'Marca del Hogar',
   'hudChrome.wocStore.skins.lantern_hall_sword.name': 'Hoja del Salón del Farol',
   'hudChrome.wocStore.skins.rimelight_staff.name': 'Bastón de Luz de Escarcha',
@@ -24762,26 +24761,10 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
     'Mantente lejos de Zulgar: dejará al otro jugador marcado para perseguirte',
   'hudChrome.wildheartAlert.stalkedLine':
     'Huye del jaguar para evitar sus mordiscos. Aléjalo del Maestro de Bestias para romper Vínculo de la manada',
-  'hudChrome.wocStore.skins.duskwick_staff.look':
-    'Dos hebras retorcidas de madera negra atadas con hierro, coronadas por un farol de hierro abierto donde arde una llama crepuscular violeta entre dos cuernos curvos, con cadenas que cuelgan de su base.',
-  'hudChrome.wocStore.skins.duskwick_staff.lore':
-    'Todos los faroles del salón arden con fuerza salvo uno. La llama crepuscular se encendió para custodiar el salón de noche y desprende sombras donde los demás dan luz; Garrick recorta su mecha en persona. El humo y el brillo violeta son solo apariencia.',
-  'hudChrome.wocStore.skins.hearthbrand_sword.look':
-    'Hoja flamígera de acero ennegrecido con filos ardientes de forja, una veta fundida que se ramifica por ambas caras, una guarda de llamas de bronce alrededor de una piedra ardiente y empuñadura rojo sangre de buey.',
-  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
-    'El Salón del Farol conserva un hogar que no se ha apagado desde que se levantó el salón, y Garrick Holt jura que esta hoja se templó en sus brasas. Los miembros que la llevan dicen que la empuñadura sigue caliente durante la guardia más fría. El fuego de sus filos es solo apariencia.',
   'hudChrome.wocStore.skins.lantern_hall_sword.look':
     'Hoja ancha de acero con una acanaladura de fuego de farol amortiguado, caras doradas, un farol enjaulado que arde en la cruceta y empuñadura de cuero azul.',
   'hudChrome.wocStore.skins.lantern_hall_sword.lore':
     'Garrick Holt no vende esta hoja a desconocidos. Se entrega a miembros que han cumplido los contratos del Salón del Farol semana tras semana, y siempre la entrega con las mismas palabras: el farol de la guarda se enciende en el propio hogar del salón, así que adondequiera que la lleves, el salón va contigo. El fuego de la acanaladura es solo apariencia. Lo que importa es la promesa.',
-  'hudChrome.wocStore.skins.rimelight_staff.look':
-    'Vara pálida ceñida en plata y envuelta en escarcha luminosa, coronada por una garra de plata que sostiene un gran cristal de luz fría dentro de una corona de hielo astillado, con carámbanos que cuelgan de su collar.',
-  'hudChrome.wocStore.skins.rimelight_staff.lore':
-    'La guardia invernal del Salón del Farol llevaba bastones como este por el camino alto, con sus coronas encendidas para los viajeros perdidos en la nieve. Garrick conserva uno en el armero para los miembros con sellos de sobra. La escarcha y su luz fría son solo apariencia.',
-  'hudChrome.wocStore.skins.squallcrest_sword.look':
-    'Hoja larga azul marino con filos brillantes como la espuma al romper, un canal de tormenta que contiene un rayo bifurcado, una ola dorada sobre el recazo, una aleta a lo largo de un filo y una guarda de rompientes doradas alrededor de una perla de tormenta.',
-  'hudChrome.wocStore.skins.squallcrest_sword.lore':
-    'Una capitana que navegaba para la hermandad trajo esta hoja de una borrasca que le arrebató el mástil y dejó su barco resonando como una campana. Garrick solo la vende por sellos y avisa a cada comprador de que zumba antes de una tormenta. El relámpago y la luz del mar son solo apariencia.',
   'hudChrome.wocStore.subscription.annualDelivered':
     'La llave de la montura de tu paquete se ha entregado por correo.',
   'hudChrome.wocStore.subscription.annualMount':

@@ -1432,7 +1432,8 @@ export const vi_VN: EnTranslations = {
         "emberwrought": "Emberwrought",
         "hoarfrost": "Sương muối",
         "fallen_star": "Sao rơi",
-        "lantern_hall": "Sảnh Đèn Lồng"
+        "lantern_hall": "Sảnh Đèn Lồng",
+        "smiths_heart": "Smith's Heart"
       },
       "skins": {
         "lantern_hall_sword": {
@@ -1440,25 +1441,30 @@ export const vi_VN: EnTranslations = {
           "look": "Lưỡi thép rộng với rãnh lửa đèn ủ, má dát vàng, đèn lồng cháy trong chắn ngang, chuôi da xanh.",
           "lore": "Garrick Holt không bán lưỡi kiếm này cho người lạ. Nó dành cho thành viên đã hoàn thành hợp đồng Sảnh Đèn Lồng tuần này qua tuần khác, và lần nào trao ông cũng nói: đèn nơi chắn tay được thắp từ bếp sảnh, nên mang nó đi đâu, sảnh cũng theo đó. Lửa trong rãnh chỉ là diện mạo. Lời hứa mới là điều cốt yếu."
         },
-        "hearthbrand_sword": {
-          "name": "Ấn Lửa Bếp",
-          "look": "Lưỡi thép đen uốn như lửa, mép nóng như lò, đường nóng chảy phân nhánh hai mặt, chắn tay là lửa đồng quanh đá cháy, chuôi đỏ huyết bò.",
-          "lore": "Sảnh Đèn Lồng giữ bếp lửa chưa tắt từ ngày xây sảnh, Garrick Holt thề lưỡi này được tôi trong than bếp. Thành viên mang kiếm nói chuôi vẫn ấm trong ca gác lạnh nhất. Lửa dọc mép chỉ là diện mạo."
+        "seamcaller_maul": {
+          "name": "Seamcaller",
+          "look": "Two-handed maul hewn from one block of banded quarry stone, gold-rimmed striking faces round burning amber, gold crest wings, gold runes cut into both cheeks, amber seam-crystal growing from the crown and a basalt haft bound in gold.",
+          "lore": "The Hammer Council sang the seam awake before they ever raised a hand against the raid, and the stone remembered every note. This maul was cut from the block their hammers split, and its runes still burn when it swings. Quarry shards circle the head as if the mountain wants them back. The runes and the circling stone are only a look."
         },
         "squallcrest_sword": {
           "name": "Đỉnh Giông",
-          "look": "Lưỡi dài xanh biển với mép sáng như sóng vỡ, rãnh bão giữ tia sét chẻ, sóng dát vàng trên đoạn sát chuôi, vây dọc một mép, chắn tay là sóng vỡ dát vàng quanh ngọc bão.",
-          "lore": "Nữ thuyền trưởng đi biển cho bang hội mang lưỡi kiếm này về từ cơn giông đã lấy cột buồm, để tàu rung như chuông. Garrick chỉ bán lấy ấn, cảnh báo mọi người mua rằng nó ngân trước bão. Sét và ánh biển chỉ là diện mạo."
+          "look": "Long storm-steel blade with lightning-bright edges, a forked bolt in a silver channel up each face, wind fins hooked off the spine and an open silver halo round a storm-eye gem, swept back in gale vanes.",
+          "lore": "The Guardian of the Breath kept the air of the Heart moving, and when it fell the storm it carried did not scatter. It settled into this blade. Wind still winds round the steel and lightning still runs its edges, and those who carry it swear the eye in the halo watches the sky. The storm is only a look."
         },
         "rimelight_staff": {
           "name": "Trượng Ánh Sương",
-          "look": "Thân nhạt quấn bạc và sương giá phát sáng, đỉnh là vuốt bạc giữ tinh thể sáng lạnh lớn trong vương miện băng vỡ, nhũ băng rủ từ cổ.",
-          "lore": "Đội gác mùa đông Sảnh Đèn Lồng từng mang trượng thế này trên đường cao, thắp đỉnh cho lữ khách lạc trong tuyết. Garrick giữ một cây trên giá cho thành viên dư ấn. Sương giá và ánh lạnh chỉ là diện mạo."
+          "look": "Pale silver shaft wound with hoarfrost and broken out in ice, crowned by four silver tines caging a great crystal of cold light inside a crown of ice shards, a splinter of ice hovering above.",
+          "lore": "The Guardian of the Quench cooled every blade the Heart ever forged. Its crystal was the last thing to stop glowing when it fell, and the raid carried it out still cold enough to frost the hand. Ice circles the crown and runes of frost turn round it. The cold is only a look."
+        },
+        "hearthbrand_sword": {
+          "name": "Ấn Lửa Bếp",
+          "look": "Broad blade of cooled magma crust with molten edges, a net of ember veins cracked across both faces, an obsidian-toothed spine and a black iron guard swept into horns dripping melt round a magma heart.",
+          "lore": "The Guardian of the Heat was the fire the Heart was named for. When it guttered out, its last melt ran into a blade-shaped crack in the forge floor and cooled there, crust outside and fire within. The edges have never stopped burning. The flames are only a look."
         },
         "duskwick_staff": {
-          "name": "Trượng Bấc Hoàng Hôn",
-          "look": "Hai dải gỗ đen xoắn quấn sắt, đỉnh là đèn sắt hở cháy ngọn lửa hoàng hôn tím giữa hai sừng cong, xích đung đưa từ đáy.",
-          "lore": "Mọi đèn trong sảnh đều sáng trừ một. Lửa hoàng hôn được thắp để giữ sảnh ban đêm, tỏa bóng tối nơi đèn khác tỏa sáng; Garrick tự tay tỉa bấc. Khói và ánh tím chỉ là diện mạo."
+          "name": "Heartmeld Staff",
+          "look": "Forge-bronze staff set with courses of quarry stone, crowned by a great gold halo holding four gems that light in turn (quarry amber, gale, frost and fire) round an anvil heart with a white-gold core.",
+          "lore": "The Masterless Strength was the four veins of the Heart bound into one body on the Anvil of the World. When it broke, the four did not part: they settled into this halo and take turns to burn, stone, wind, frost and fire, as they once took turns to strike. The four lights are only a look."
         },
         "guildmark_arming_sword": {
           "name": "Kiếm Guildmark",
@@ -2598,6 +2604,7 @@ export const vi_VN: EnTranslations = {
       "name_mech_bird": "Chim Mech Cluckwork",
       "name_lanternback_troll": "Grumbol Lưng Đèn",
       "name_lantern_hall_destrier": "Chiến Mã Sảnh Đèn Lồng",
+      "name_quarryheart_charger": "Quarryheart Charger",
       "name_chimeglass_tortoise": "Tolliver chiếc cốc thủy tinh",
       "name_rickshaw_mount": "Xe kéo Buộc Xương",
       "name_emberbristle_broom": "Chổi Lông Than Hồng",
@@ -2622,6 +2629,7 @@ export const vi_VN: EnTranslations = {
       "desc_mech_bird": "Một con gà chiến đồng hồ được chế tạo bằng tay chạy nước rút trên các động cơ servo, phím lên dây cót vẫn quay.",
       "desc_lanternback_troll": "Một con quỷ đồi bị những người đốt đèn bẻ gãy ách, vác một chiếc ngai sắt trên vai với một chiếc đèn bão đang cháy trên hai tay.",
       "desc_lantern_hall_destrier": "Chiến mã Sảnh Đèn Lồng, giáp gỗ sồi và sắt dưới sắc xanh bang hội, hai đèn bão đung đưa trên yên soi đường về nhà.",
+      "desc_quarryheart_charger": "A war-steed of the Smith's Heart: quarry-stone plates hung over a body of living fire, its heart beating white-hot behind gold ribs, ice-crystal horns on its brow and a mane of wind crackling with lightning.",
       "desc_nightwing_chimera": "Phi long chạng vạng hai đầu từ những cành cổ thụ, nghỉ trên đôi chân sau có vuốt và lướt trên mặt đất bằng cánh khắc bí thuật.",
       "desc_chimeglass_tortoise": "Một con rùa bằng muối đã vượt qua ba thế hệ đoàn lữ hành. Những người thợ hàn mài cho anh ta một cặp kính từ kính bão và treo một chiếc chuông đồng vào cổ anh ta, để con đường nghe thấy anh ta từ rất lâu trước khi nó nhìn thấy anh ta.",
       "desc_rickshaw_mount": "Một cỗ xe xương lọc cọc, với một tên lính xương xẩu bị buộc vào càng xe, kéo bạn lao đi hết tốc lực.",
@@ -7817,6 +7825,9 @@ export const vi_VN: EnTranslations = {
       "hiddenBadge": "Ẩn",
       "titleChip": "Thưởng Danh Hiệu",
       "borderChip": "Thưởng viền",
+      "cosmeticChip": "Cosmetic reward",
+      "rewardAppearance": "Reward: the {name} weapon appearance, for every character on your account",
+      "rewardMount": "Reward: the {name} mount",
       "watch": "Theo Dõi",
       "unwatch": "Bỏ Theo Dõi",
       "watchFull": "Danh sách theo dõi đã đầy (tối đa {cap})",
@@ -25413,6 +25424,15 @@ export const vi_VN: EnTranslations = {
       "reins_lantern_hall_destrier": {
         "name": "Dây Cương Chiến Mã Sảnh Đèn Lồng"
       },
+      "reins_quarryheart_charger": {
+        "name": "Reins of the Quarryheart Charger"
+      },
+      "remnant_of_the_masterless_strength": {
+        "name": "Remnant of the Masterless Strength"
+      },
+      "coffer_of_the_highwatch_vigil": {
+        "name": "Coffer of the Highwatch Vigil"
+      },
       "wyrmfall_core": {
         "name": "Lõi Long Lạc"
       },
@@ -27348,6 +27368,11 @@ export const vi_VN: EnTranslations = {
         "title": "Highwatch Captain",
         "greeting": "Keep your feet, {className}. When the bellows breathes, step into my calm and let the wind break on us."
       },
+      "heart_warden_ada_collier": {
+        "name": "Warden Ada Collier",
+        "title": "Vigil of Highwatch",
+        "greeting": "Forty generations of the Vigil watched this mountain without knowing why. Now we know, {className}. Mind what you wake in there."
+      },
       "brother_aldric_highwatch": {
         "name": "Tu Huynh Aldric",
         "title": "Tu Sĩ Thung Lũng",
@@ -28805,6 +28830,16 @@ export const vi_VN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Kẻ Phá Lò đã rèn và mang theo"
+          }
+        }
+      },
+      "q_heart_what_the_heart_let_go": {
+        "title": "What the Heart Let Go",
+        "text": "The strength in the Heart has no master and no mind, {playerName}, but it has a shape. When it falls, it will not die: its essence will tear loose and flee back into the stone. Something always stays behind. Bring me what remains of it, and the Vigil will pay you from its own coffers.",
+        "completion": "Still warm. The four strengths, bound in one splinter, and it does not want to be held. The Vigil keeps its word: take this coffer, and may it hold something worth the climb.",
+        "objectives": {
+          "0": {
+            "label": "Remnant of the Masterless Strength"
           }
         }
       },

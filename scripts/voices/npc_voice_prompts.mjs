@@ -1174,6 +1174,9 @@ export const VOICE_ALIAS = {
   // Captain Thessaly herself, recurring inside the Smith's Heart raid
   // (content/smith_heart.ts) where she fights beside the raid on the Storm Cornice.
   heart_captain_thessaly: 'captain_thessaly',
+  // Warden Ada Collier, the Vigil's veteran at the Smith's Heart's Cleft, borrows Warden
+  // Kaldra's hard, low mountain contralto until she gets her own performance.
+  heart_warden_ada_collier: 'warden_kaldra',
   // Keeper Liora wardens a hedge maze of wisps and speaks her instructions with
   // the same unhurried, luminous calm as the keeper of the sealed hollow.
   wisp_maze_keeper: 'keeper_saelwyn',

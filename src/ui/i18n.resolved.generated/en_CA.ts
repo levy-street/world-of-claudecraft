@@ -1432,7 +1432,8 @@ export const en_CA: EnTranslations = {
         "emberwrought": "Emberwrought",
         "hoarfrost": "Hoarfrost",
         "fallen_star": "Fallen Star",
-        "lantern_hall": "Lantern Hall"
+        "lantern_hall": "Lantern Hall",
+        "smiths_heart": "Smith's Heart"
       },
       "skins": {
         "lantern_hall_sword": {
@@ -1440,25 +1441,30 @@ export const en_CA: EnTranslations = {
           "look": "Broad steel blade with a fuller of banked lantern-fire, gilt cheeks, a caged lantern burning in the crossguard, blue leather grip.",
           "lore": "Garrick Holt will not sell this blade to a stranger. It goes to members who have kept Lantern Hall's contracts week after week, and he hands it over with the same words every time: the lantern in the guard is lit from the hall's own hearth, so wherever you carry it, the hall goes with you. The fire in the fuller is only a look. The promise is the point."
         },
-        "hearthbrand_sword": {
-          "name": "Hearthbrand",
-          "look": "Flame-waved blade of blackened steel with forge-hot edges, a molten seam branching up both faces, a guard of bronze flames around a burning stone, oxblood grip.",
-          "lore": "Lantern Hall keeps a hearth that has not gone out since the hall was raised, and Garrick Holt swears this blade was quenched in its coals. Members who carry it say the grip stays warm on the coldest watch. The fire along its edges is only a look."
+        "seamcaller_maul": {
+          "name": "Seamcaller",
+          "look": "Two-handed maul hewn from one block of banded quarry stone, gold-rimmed striking faces round burning amber, gold crest wings, gold runes cut into both cheeks, amber seam-crystal growing from the crown and a basalt haft bound in gold.",
+          "lore": "The Hammer Council sang the seam awake before they ever raised a hand against the raid, and the stone remembered every note. This maul was cut from the block their hammers split, and its runes still burn when it swings. Quarry shards circle the head as if the mountain wants them back. The runes and the circling stone are only a look."
         },
         "squallcrest_sword": {
           "name": "Squallcrest",
-          "look": "Long sea-blue blade with edges bright as breaking surf, a storm channel holding a forked bolt, a gilt wave over the ricasso, a fin down one edge and a guard of gilt breakers around a storm pearl.",
-          "lore": "A captain who sailed for the guild brought this blade home from a squall that took her mast and left her ship ringing like a bell. Garrick sells it only for seals, and warns every buyer that it hums before a storm. The lightning and the sea light are only a look."
+          "look": "Long storm-steel blade with lightning-bright edges, a forked bolt in a silver channel up each face, wind fins hooked off the spine and an open silver halo round a storm-eye gem, swept back in gale vanes.",
+          "lore": "The Guardian of the Breath kept the air of the Heart moving, and when it fell the storm it carried did not scatter. It settled into this blade. Wind still winds round the steel and lightning still runs its edges, and those who carry it swear the eye in the halo watches the sky. The storm is only a look."
         },
         "rimelight_staff": {
           "name": "Rimelight Staff",
-          "look": "Pale shaft bound in silver and wound with glowing rime, crowned by a silver claw holding a great crystal of cold light inside a crown of splintered ice, icicles hanging from its collar.",
-          "lore": "Lantern Hall's winter watch carried staves like this along the high road, their crowns lit for travellers lost in the snow. Garrick keeps one on the rack for members with seals to spare. The frost and its cold light are only a look."
+          "look": "Pale silver shaft wound with hoarfrost and broken out in ice, crowned by four silver tines caging a great crystal of cold light inside a crown of ice shards, a splinter of ice hovering above.",
+          "lore": "The Guardian of the Quench cooled every blade the Heart ever forged. Its crystal was the last thing to stop glowing when it fell, and the raid carried it out still cold enough to frost the hand. Ice circles the crown and runes of frost turn round it. The cold is only a look."
+        },
+        "hearthbrand_sword": {
+          "name": "Hearthbrand",
+          "look": "Broad blade of cooled magma crust with molten edges, a net of ember veins cracked across both faces, an obsidian-toothed spine and a black iron guard swept into horns dripping melt round a magma heart.",
+          "lore": "The Guardian of the Heat was the fire the Heart was named for. When it guttered out, its last melt ran into a blade-shaped crack in the forge floor and cooled there, crust outside and fire within. The edges have never stopped burning. The flames are only a look."
         },
         "duskwick_staff": {
-          "name": "Duskwick Staff",
-          "look": "Two twisted strands of black wood bound in iron, crowned by an open iron lantern burning a violet dusk-flame between two curling horns, chains swinging from its floor.",
-          "lore": "Every lantern in the hall burns bright save one. The dusk-flame was lit to keep the hall by night, and it gives off shadow where the others give light; Garrick trims its wick himself. The smoke and the violet glow are only a look."
+          "name": "Heartmeld Staff",
+          "look": "Forge-bronze staff set with courses of quarry stone, crowned by a great gold halo holding four gems that light in turn (quarry amber, gale, frost and fire) round an anvil heart with a white-gold core.",
+          "lore": "The Masterless Strength was the four veins of the Heart bound into one body on the Anvil of the World. When it broke, the four did not part: they settled into this halo and take turns to burn, stone, wind, frost and fire, as they once took turns to strike. The four lights are only a look."
         },
         "guildmark_arming_sword": {
           "name": "Guildmark Arming Sword",
@@ -2598,6 +2604,7 @@ export const en_CA: EnTranslations = {
       "name_mech_bird": "Cluckwork Mech Bird",
       "name_lanternback_troll": "Grumbol the Lanternback",
       "name_lantern_hall_destrier": "Lantern Hall Destrier",
+      "name_quarryheart_charger": "Quarryheart Charger",
       "name_chimeglass_tortoise": "Tolliver the Chimeglass",
       "name_rickshaw_mount": "Bonebound Rickshaw",
       "name_emberbristle_broom": "Emberbristle Broom",
@@ -2622,6 +2629,7 @@ export const en_CA: EnTranslations = {
       "desc_mech_bird": "A hand-built clockwork war chicken that sprints on snapping servos, wind-up key still turning.",
       "desc_lanternback_troll": "A hill troll broken to the yoke by lamplighters, carrying an iron throne across his shoulders with a storm lantern burning on either arm.",
       "desc_lantern_hall_destrier": "Lantern Hall's war horse, barded in oak and iron under the guild's blue, with two storm lanterns swinging from his saddle to light the road home.",
+      "desc_quarryheart_charger": "A war-steed of the Smith's Heart: quarry-stone plates hung over a body of living fire, its heart beating white-hot behind gold ribs, ice-crystal horns on its brow and a mane of wind crackling with lightning.",
       "desc_nightwing_chimera": "A twin-headed dusk wyvern from the ancient boughs, perched on taloned hind legs at rest and skimming above the ground on arcane-etched wings.",
       "desc_chimeglass_tortoise": "A salt-flat tortoise who has outwalked three generations of caravans. Tinkers ground him spectacles from storm-glass and hung a bronze bell at his throat, so the road hears him long before it sees him.",
       "desc_rickshaw_mount": "A rattling bone-cart with a bony grunt harnessed to the shafts, hauling you along at a dead run.",
@@ -7817,6 +7825,9 @@ export const en_CA: EnTranslations = {
       "hiddenBadge": "Hidden",
       "titleChip": "Title reward",
       "borderChip": "Border reward",
+      "cosmeticChip": "Cosmetic reward",
+      "rewardAppearance": "Reward: the {name} weapon appearance, for every character on your account",
+      "rewardMount": "Reward: the {name} mount",
       "watch": "Watch",
       "unwatch": "Unwatch",
       "watchFull": "Watchlist full ({cap} max)",
@@ -25413,6 +25424,15 @@ export const en_CA: EnTranslations = {
       "reins_lantern_hall_destrier": {
         "name": "Reins of the Lantern Hall Destrier"
       },
+      "reins_quarryheart_charger": {
+        "name": "Reins of the Quarryheart Charger"
+      },
+      "remnant_of_the_masterless_strength": {
+        "name": "Remnant of the Masterless Strength"
+      },
+      "coffer_of_the_highwatch_vigil": {
+        "name": "Coffer of the Highwatch Vigil"
+      },
       "wyrmfall_core": {
         "name": "Wyrmfall Core"
       },
@@ -27348,6 +27368,11 @@ export const en_CA: EnTranslations = {
         "title": "Highwatch Captain",
         "greeting": "Keep your feet, {className}. When the bellows breathes, step into my calm and let the wind break on us."
       },
+      "heart_warden_ada_collier": {
+        "name": "Warden Ada Collier",
+        "title": "Vigil of Highwatch",
+        "greeting": "Forty generations of the Vigil watched this mountain without knowing why. Now we know, {className}. Mind what you wake in there."
+      },
       "brother_aldric_highwatch": {
         "name": "Brother Aldric",
         "title": "Priest of the Vale",
@@ -28805,6 +28830,16 @@ export const en_CA: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Forgebreaker forged and carried"
+          }
+        }
+      },
+      "q_heart_what_the_heart_let_go": {
+        "title": "What the Heart Let Go",
+        "text": "The strength in the Heart has no master and no mind, {playerName}, but it has a shape. When it falls, it will not die: its essence will tear loose and flee back into the stone. Something always stays behind. Bring me what remains of it, and the Vigil will pay you from its own coffers.",
+        "completion": "Still warm. The four strengths, bound in one splinter, and it does not want to be held. The Vigil keeps its word: take this coffer, and may it hold something worth the climb.",
+        "objectives": {
+          "0": {
+            "label": "Remnant of the Masterless Strength"
           }
         }
       },

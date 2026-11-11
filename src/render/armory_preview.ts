@@ -6,6 +6,7 @@
 // the panel matches the offline inspector's look, and rarity VFX render through
 // the same createWeaponVfx rig the world renderer uses. Owns its renderer,
 // composer (bloom for the emissive glow), and rAF loop; dispose() releases all.
+
 import * as THREE from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
@@ -28,6 +29,7 @@ import {
 import { disposeOwnedWeaponSkinMaterials } from './characters/weapon_skin_materials';
 import { trackWebGLContext } from './context_release';
 import { previewPixelRatio } from './preview_pixel_ratio';
+import { previewPrefersReducedMotion } from './preview_reduced_motion';
 import { shaderDebugRequested } from './shader_debug_flag';
 import {
   createWeaponVfx,
@@ -383,7 +385,7 @@ export function createArmoryPreview(
     const dt = Math.min(timer.getDelta(), 0.1);
     if (mode === 'character') {
       characterGroup.rotation.y += dt * 0.45;
-      visual.update(dt, IDLE_STATE, true);
+      visual.update(dt, IDLE_STATE, true, previewPrefersReducedMotion());
       visual.updateWeaponVfx(dt);
     } else {
       weaponGroup.rotation.y += dt * 0.55;
@@ -397,6 +399,7 @@ export function createArmoryPreview(
           rig.float.lift +
           rig.float.bob * (1 + Math.sin(rig.floatTime * 1.1)) * 0.5;
       }
+      rig?.vfx?.setCalm(previewPrefersReducedMotion());
       rig?.vfx?.update(dt);
     }
     composer.render();

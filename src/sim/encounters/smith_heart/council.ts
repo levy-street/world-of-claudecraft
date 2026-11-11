@@ -130,6 +130,8 @@ import {
   startWrath,
   syncEnergyBars,
 } from './council_wrath';
+import { breakFeat, countFeat } from './feat_attempt';
+import { settleSmithHeartFeat } from './feats';
 import { applyTierHealth, restoreTierHealth, tierPoolMult } from './tier_health';
 import { freshSlainWatch } from './voice_slain';
 
@@ -506,6 +508,7 @@ function finishCouncil(
   st: CouncilFightState,
 ): void {
   st.finished = true;
+  settleSmithHeartFeat(ctx, inst, { encounter: 'hammer_council', st });
   const s = scopeOf(ctx, inst, st, bodies);
   // The last to fall says its last line.
   const last = COUNCIL_ROLES.find((r) => !st.fallen.includes(r));
@@ -588,7 +591,10 @@ export function tickHammerCouncil(ctx: SimContext, inst: InstanceSlot): void {
   stepCouncilVoice(s);
   watchCouncilSlain(s);
   stepBars(s);
-  stepRush(s);
+  // The feat watch: a landed Rush either shatters the cursed pillar or breaks the feat.
+  const rush = stepRush(s);
+  if (rush === 'cursed') countFeat(st);
+  else if (rush) breakFeat(st);
   stepCursed(s);
   stepBond(s);
   fillEnergy(s);

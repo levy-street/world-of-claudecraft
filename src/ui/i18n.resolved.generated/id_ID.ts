@@ -1432,7 +1432,8 @@ export const id_ID: EnTranslations = {
         "emberwrought": "Emberwrought",
         "hoarfrost": "Embun beku",
         "fallen_star": "Bintang Jatuh",
-        "lantern_hall": "Balai Lentera"
+        "lantern_hall": "Balai Lentera",
+        "smiths_heart": "Smith's Heart"
       },
       "skins": {
         "lantern_hall_sword": {
@@ -1440,25 +1441,30 @@ export const id_ID: EnTranslations = {
           "look": "Bilah baja lebar dengan alur berisi api lentera terpendam, sisi bersepuh emas, lentera berkurung menyala pada pelindung silang, gagang kulit biru.",
           "lore": "Garrick Holt tak akan menjual bilah ini kepada orang asing. Bilah diberikan kepada anggota yang memenuhi kontrak Balai Lentera minggu demi minggu, dan ia selalu menyerahkannya dengan kata yang sama: lentera pada pelindung dinyalakan dari perapian balai sendiri, jadi ke mana pun dibawa, balai menyertaimu. Api di alur hanya tampilan. Janjinya yang berarti."
         },
-        "hearthbrand_sword": {
-          "name": "Cap Perapian",
-          "look": "Bilah baja menghitam bergelombang seperti api dengan tepi sepanas tungku, urat cair bercabang di kedua sisinya, pelindung tangan berupa nyala perunggu mengelilingi batu menyala, gagang merah darah.",
-          "lore": "Balai Lentera menjaga perapian yang tak pernah padam sejak balai didirikan, dan Garrick Holt bersumpah bilah ini didinginkan dalam baranya. Anggota yang membawanya mengatakan gagang tetap hangat pada penjagaan terdingin. Api di tepinya hanya tampilan."
+        "seamcaller_maul": {
+          "name": "Seamcaller",
+          "look": "Two-handed maul hewn from one block of banded quarry stone, gold-rimmed striking faces round burning amber, gold crest wings, gold runes cut into both cheeks, amber seam-crystal growing from the crown and a basalt haft bound in gold.",
+          "lore": "The Hammer Council sang the seam awake before they ever raised a hand against the raid, and the stone remembered every note. This maul was cut from the block their hammers split, and its runes still burn when it swings. Quarry shards circle the head as if the mountain wants them back. The runes and the circling stone are only a look."
         },
         "squallcrest_sword": {
           "name": "Puncak Badai",
-          "look": "Bilah panjang biru laut dengan tepi seterang ombak pecah, saluran badai berisi petir bercabang, gelombang emas di atas pangkal bilah, sirip pada satu tepi, dan pelindung berupa ombak emas mengelilingi mutiara badai.",
-          "lore": "Kapten yang berlayar untuk guild membawa bilah ini pulang dari badai yang merenggut tiangnya dan membuat kapalnya berdentang seperti lonceng. Garrick hanya menjualnya dengan segel dan memperingatkan setiap pembeli bahwa bilah berdengung sebelum badai. Petir dan cahaya laut hanya tampilan."
+          "look": "Long storm-steel blade with lightning-bright edges, a forked bolt in a silver channel up each face, wind fins hooked off the spine and an open silver halo round a storm-eye gem, swept back in gale vanes.",
+          "lore": "The Guardian of the Breath kept the air of the Heart moving, and when it fell the storm it carried did not scatter. It settled into this blade. Wind still winds round the steel and lightning still runs its edges, and those who carry it swear the eye in the halo watches the sky. The storm is only a look."
         },
         "rimelight_staff": {
           "name": "Tongkat Cahaya Beku",
-          "look": "Batang pucat terikat perak dan dililit embun beku bercahaya, bermahkota cakar perak yang memegang kristal besar bercahaya dingin dalam mahkota pecahan es, dengan es menggantung dari kerahnya.",
-          "lore": "Penjaga musim dingin Balai Lentera membawa tongkat seperti ini di jalan tinggi, mahkotanya menyala untuk pelancong yang tersesat di salju. Garrick menyimpan satu di rak untuk anggota yang memiliki segel lebih. Embun beku dan cahaya dinginnya hanya tampilan."
+          "look": "Pale silver shaft wound with hoarfrost and broken out in ice, crowned by four silver tines caging a great crystal of cold light inside a crown of ice shards, a splinter of ice hovering above.",
+          "lore": "The Guardian of the Quench cooled every blade the Heart ever forged. Its crystal was the last thing to stop glowing when it fell, and the raid carried it out still cold enough to frost the hand. Ice circles the crown and runes of frost turn round it. The cold is only a look."
+        },
+        "hearthbrand_sword": {
+          "name": "Cap Perapian",
+          "look": "Broad blade of cooled magma crust with molten edges, a net of ember veins cracked across both faces, an obsidian-toothed spine and a black iron guard swept into horns dripping melt round a magma heart.",
+          "lore": "The Guardian of the Heat was the fire the Heart was named for. When it guttered out, its last melt ran into a blade-shaped crack in the forge floor and cooled there, crust outside and fire within. The edges have never stopped burning. The flames are only a look."
         },
         "duskwick_staff": {
-          "name": "Tongkat Sumbu Senja",
-          "look": "Dua pilinan kayu hitam terikat besi, bermahkota lentera besi terbuka yang membakar nyala senja ungu di antara dua tanduk melengkung, dengan rantai berayun dari dasarnya.",
-          "lore": "Setiap lentera di balai menyala terang kecuali satu. Nyala senja dinyalakan untuk menjaga balai pada malam hari, memancarkan bayangan saat yang lain memberi cahaya; Garrick memangkas sumbunya sendiri. Asap dan pendar ungu hanya tampilan."
+          "name": "Heartmeld Staff",
+          "look": "Forge-bronze staff set with courses of quarry stone, crowned by a great gold halo holding four gems that light in turn (quarry amber, gale, frost and fire) round an anvil heart with a white-gold core.",
+          "lore": "The Masterless Strength was the four veins of the Heart bound into one body on the Anvil of the World. When it broke, the four did not part: they settled into this halo and take turns to burn, stone, wind, frost and fire, as they once took turns to strike. The four lights are only a look."
         },
         "guildmark_arming_sword": {
           "name": "Pedang Guildmark",
@@ -2598,6 +2604,7 @@ export const id_ID: EnTranslations = {
       "name_mech_bird": "Burung Mekanik Cluckwork",
       "name_lanternback_troll": "Grumbol si Punggung Lentera",
       "name_lantern_hall_destrier": "Kuda Perang Balai Lentera",
+      "name_quarryheart_charger": "Quarryheart Charger",
       "name_chimeglass_tortoise": "Tolliver si Kaca Cerobong Asap",
       "name_rickshaw_mount": "Becak Terikat Tulang",
       "name_emberbristle_broom": "Sapu Bulu Bara",
@@ -2622,6 +2629,7 @@ export const id_ID: EnTranslations = {
       "desc_mech_bird": "Ayam perang jarum jam buatan tangan yang berlari dengan kecepatan servo, kunci putaran masih berputar.",
       "desc_lanternback_troll": "Troll bukit dipatahkan oleh penyala lampu, membawa singgasana besi di bahunya dengan lentera badai menyala di kedua lengannya.",
       "desc_lantern_hall_destrier": "Kuda perang Balai Lentera, berzirah ek dan besi di bawah warna biru guild, dengan dua lentera badai berayun dari pelananya untuk menerangi jalan pulang.",
+      "desc_quarryheart_charger": "A war-steed of the Smith's Heart: quarry-stone plates hung over a body of living fire, its heart beating white-hot behind gold ribs, ice-crystal horns on its brow and a mane of wind crackling with lightning.",
       "desc_nightwing_chimera": "Wyvern senja berkepala dua dari dahan purba, bertengger pada kaki belakang bercakar saat istirahat dan melayang dekat tanah dengan sayap berukir arkana.",
       "desc_chimeglass_tortoise": "Kura-kura dataran garam yang telah melampaui tiga generasi karavan. Tinker memberinya kacamata dari kaca badai dan menggantungkan lonceng perunggu di tenggorokannya, sehingga jalan mendengarnya jauh sebelum jalan melihatnya.",
       "desc_rickshaw_mount": "Gerobak tulang yang berderak, dengan serdadu kurus bertulang diikat pada porosnya, menarikmu melaju kencang.",
@@ -7817,6 +7825,9 @@ export const id_ID: EnTranslations = {
       "hiddenBadge": "Tersembunyi",
       "titleChip": "Hadiah gelar",
       "borderChip": "Hadiah bingkai",
+      "cosmeticChip": "Cosmetic reward",
+      "rewardAppearance": "Reward: the {name} weapon appearance, for every character on your account",
+      "rewardMount": "Reward: the {name} mount",
       "watch": "Pantau",
       "unwatch": "Lepas Pantau",
       "watchFull": "Daftar pantauan penuh (maks {cap})",
@@ -25413,6 +25424,15 @@ export const id_ID: EnTranslations = {
       "reins_lantern_hall_destrier": {
         "name": "Kekang Kuda Perang Balai Lentera"
       },
+      "reins_quarryheart_charger": {
+        "name": "Reins of the Quarryheart Charger"
+      },
+      "remnant_of_the_masterless_strength": {
+        "name": "Remnant of the Masterless Strength"
+      },
+      "coffer_of_the_highwatch_vigil": {
+        "name": "Coffer of the Highwatch Vigil"
+      },
       "wyrmfall_core": {
         "name": "Inti Kejatuhan Wyrm"
       },
@@ -27348,6 +27368,11 @@ export const id_ID: EnTranslations = {
         "title": "Highwatch Captain",
         "greeting": "Keep your feet, {className}. When the bellows breathes, step into my calm and let the wind break on us."
       },
+      "heart_warden_ada_collier": {
+        "name": "Warden Ada Collier",
+        "title": "Vigil of Highwatch",
+        "greeting": "Forty generations of the Vigil watched this mountain without knowing why. Now we know, {className}. Mind what you wake in there."
+      },
       "brother_aldric_highwatch": {
         "name": "Bruder Aldric",
         "title": "Pendeta Lembah",
@@ -28805,6 +28830,16 @@ export const id_ID: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Pemecah Tempa ditempa dan dibawa"
+          }
+        }
+      },
+      "q_heart_what_the_heart_let_go": {
+        "title": "What the Heart Let Go",
+        "text": "The strength in the Heart has no master and no mind, {playerName}, but it has a shape. When it falls, it will not die: its essence will tear loose and flee back into the stone. Something always stays behind. Bring me what remains of it, and the Vigil will pay you from its own coffers.",
+        "completion": "Still warm. The four strengths, bound in one splinter, and it does not want to be held. The Vigil keeps its word: take this coffer, and may it hold something worth the climb.",
+        "objectives": {
+          "0": {
+            "label": "Remnant of the Masterless Strength"
           }
         }
       },

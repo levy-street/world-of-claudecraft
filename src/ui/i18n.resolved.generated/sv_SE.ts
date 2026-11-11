@@ -1432,7 +1432,8 @@ export const sv_SE: EnTranslations = {
         "emberwrought": "Glödsmidd",
         "hoarfrost": "Rimfrost",
         "fallen_star": "Fallen stjärna",
-        "lantern_hall": "Lykthallen"
+        "lantern_hall": "Lykthallen",
+        "smiths_heart": "Smith's Heart"
       },
       "skins": {
         "lantern_hall_sword": {
@@ -1440,25 +1441,30 @@ export const sv_SE: EnTranslations = {
           "look": "Bred stålklinga med en blodränna av pyrande lykteld, förgyllda sidor, en burlykta brinnande i parerstången och ett blått lädergrepp.",
           "lore": "Garrick Holt säljer inte denna klinga till en främling. Den går till medlemmar som fullgjort Lykthallens kontrakt vecka efter vecka, och han överlämnar den med samma ord varje gång: lyktan i parerskyddet är tänd från hallens egen härd, så vart du än bär den följer hallen med. Elden i blodrännan är bara ett utseende. Löftet är det viktiga."
         },
-        "hearthbrand_sword": {
-          "name": "Härdbrand",
-          "look": "Flamvågig klinga av svärtat stål med smidesheta eggar, en smält söm som förgrenar sig över båda sidorna, ett parerskydd av bronslågor runt en brinnande sten och ett oxblodsrött grepp.",
-          "lore": "Lykthallen håller en härd som inte slocknat sedan hallen restes, och Garrick Holt svär på att denna klinga härdades i dess kol. Medlemmar som bär den säger att greppet förblir varmt under den kallaste vakt. Elden längs eggarna är bara ett utseende."
+        "seamcaller_maul": {
+          "name": "Seamcaller",
+          "look": "Two-handed maul hewn from one block of banded quarry stone, gold-rimmed striking faces round burning amber, gold crest wings, gold runes cut into both cheeks, amber seam-crystal growing from the crown and a basalt haft bound in gold.",
+          "lore": "The Hammer Council sang the seam awake before they ever raised a hand against the raid, and the stone remembered every note. This maul was cut from the block their hammers split, and its runes still burn when it swings. Quarry shards circle the head as if the mountain wants them back. The runes and the circling stone are only a look."
         },
         "squallcrest_sword": {
           "name": "Stormkrön",
-          "look": "Lång havsblå klinga med eggar ljusa som brytande bränningar, en stormränna med en kluven blixt, en förgylld våg över klingbasen, en fena längs ena eggen och ett parerskydd av förgyllda bränningar runt en stormpärla.",
-          "lore": "En kapten som seglade för gillet tog hem denna klinga från en stormby som tog hennes mast och lämnade skeppet klingande som en klocka. Garrick säljer den bara för sigill och varnar varje köpare för att den surrar före en storm. Blixten och havsljuset är bara ett utseende."
+          "look": "Long storm-steel blade with lightning-bright edges, a forked bolt in a silver channel up each face, wind fins hooked off the spine and an open silver halo round a storm-eye gem, swept back in gale vanes.",
+          "lore": "The Guardian of the Breath kept the air of the Heart moving, and when it fell the storm it carried did not scatter. It settled into this blade. Wind still winds round the steel and lightning still runs its edges, and those who carry it swear the eye in the halo watches the sky. The storm is only a look."
         },
         "rimelight_staff": {
           "name": "Rimljusets stav",
-          "look": "Ljust skaft bundet i silver och omvirat av glödande rimfrost, krönt av en silverklo som håller en stor kristall av kallt ljus i en krona av splittrad is, med istappar hängande från kragen.",
-          "lore": "Lykthallens vintervakt bar stavar som denna längs landsvägen, med kronorna tända för resenärer vilse i snön. Garrick håller en på stället åt medlemmar med sigill över. Frosten och dess kalla ljus är bara ett utseende."
+          "look": "Pale silver shaft wound with hoarfrost and broken out in ice, crowned by four silver tines caging a great crystal of cold light inside a crown of ice shards, a splinter of ice hovering above.",
+          "lore": "The Guardian of the Quench cooled every blade the Heart ever forged. Its crystal was the last thing to stop glowing when it fell, and the raid carried it out still cold enough to frost the hand. Ice circles the crown and runes of frost turn round it. The cold is only a look."
+        },
+        "hearthbrand_sword": {
+          "name": "Härdbrand",
+          "look": "Broad blade of cooled magma crust with molten edges, a net of ember veins cracked across both faces, an obsidian-toothed spine and a black iron guard swept into horns dripping melt round a magma heart.",
+          "lore": "The Guardian of the Heat was the fire the Heart was named for. When it guttered out, its last melt ran into a blade-shaped crack in the forge floor and cooled there, crust outside and fire within. The edges have never stopped burning. The flames are only a look."
         },
         "duskwick_staff": {
-          "name": "Skymningsvekens stav",
-          "look": "Två tvinnade strängar av svart trä bundna i järn, krönta av en öppen järnlykta där en violett skymningslåga brinner mellan två böjda horn, med kedjor svängande från bottnen.",
-          "lore": "Varje lykta i hallen brinner klart utom en. Skymningslågan tändes för att vakta hallen om natten och avger skugga där de andra ger ljus; Garrick ansar själv dess veke. Röken och det violetta skenet är bara ett utseende."
+          "name": "Heartmeld Staff",
+          "look": "Forge-bronze staff set with courses of quarry stone, crowned by a great gold halo holding four gems that light in turn (quarry amber, gale, frost and fire) round an anvil heart with a white-gold core.",
+          "lore": "The Masterless Strength was the four veins of the Heart bound into one body on the Anvil of the World. When it broke, the four did not part: they settled into this halo and take turns to burn, stone, wind, frost and fire, as they once took turns to strike. The four lights are only a look."
         },
         "guildmark_arming_sword": {
           "name": "Gillesmärkt Väpnarsvärd",
@@ -2598,6 +2604,7 @@ export const sv_SE: EnTranslations = {
       "name_mech_bird": "Cluckwork-mekafågel",
       "name_lanternback_troll": "Lanternbacken Grumbol",
       "name_lantern_hall_destrier": "Lykthallens stridshäst",
+      "name_quarryheart_charger": "Quarryheart Charger",
       "name_chimeglass_tortoise": "Tolliver klockglaset",
       "name_rickshaw_mount": "Benbunden Rickshaw",
       "name_emberbristle_broom": "Glödborstkvast",
@@ -2622,6 +2629,7 @@ export const sv_SE: EnTranslations = {
       "desc_mech_bird": "En handbyggd urverkshöna som sprintar på knäppande servon medan upprullningsnyckeln fortfarande vrider sig.",
       "desc_lanternback_troll": "Ett kulletroll bröts till oket av lamptändare, bärande en järntron över sina axlar med en stormlykta som brinner på vardera arm.",
       "desc_lantern_hall_destrier": "Lykthallens stridshäst, med ek- och järnbardering under gillets blå färg, och två stormlyktor som svänger från sadeln för att lysa upp vägen hem.",
+      "desc_quarryheart_charger": "A war-steed of the Smith's Heart: quarry-stone plates hung over a body of living fire, its heart beating white-hot behind gold ribs, ice-crystal horns on its brow and a mane of wind crackling with lightning.",
       "desc_nightwing_chimera": "En tvåhövdad skymningswyvern från de uråldriga grenarna, vilande på klobeklädda bakben och glidande över marken på vingar ristade med arkana tecken.",
       "desc_chimeglass_tortoise": "En saltplattsköldpadda som har gått ur tre generationer husvagnar. Tinkers malde honom glasögon från stormglas och hängde en bronsklocka i hans hals, så vägen hör honom långt innan den ser honom.",
       "desc_rickshaw_mount": "En skramlande benkärra med en benig hantlangare fastspänd vid skalmarna, som drar dig fram i språngmarsch.",
@@ -7817,6 +7825,9 @@ export const sv_SE: EnTranslations = {
       "hiddenBadge": "Dold",
       "titleChip": "Titelbelöning",
       "borderChip": "Rambelöning",
+      "cosmeticChip": "Cosmetic reward",
+      "rewardAppearance": "Reward: the {name} weapon appearance, for every character on your account",
+      "rewardMount": "Reward: the {name} mount",
       "watch": "Bevaka",
       "unwatch": "Sluta bevaka",
       "watchFull": "Bevakningslistan är full (högst {cap})",
@@ -25413,6 +25424,15 @@ export const sv_SE: EnTranslations = {
       "reins_lantern_hall_destrier": {
         "name": "Lykthallens stridshästtyglar"
       },
+      "reins_quarryheart_charger": {
+        "name": "Reins of the Quarryheart Charger"
+      },
+      "remnant_of_the_masterless_strength": {
+        "name": "Remnant of the Masterless Strength"
+      },
+      "coffer_of_the_highwatch_vigil": {
+        "name": "Coffer of the Highwatch Vigil"
+      },
       "wyrmfall_core": {
         "name": "Wyrmfall-kärna"
       },
@@ -27348,6 +27368,11 @@ export const sv_SE: EnTranslations = {
         "title": "Highwatch Captain",
         "greeting": "Keep your feet, {className}. When the bellows breathes, step into my calm and let the wind break on us."
       },
+      "heart_warden_ada_collier": {
+        "name": "Warden Ada Collier",
+        "title": "Vigil of Highwatch",
+        "greeting": "Forty generations of the Vigil watched this mountain without knowing why. Now we know, {className}. Mind what you wake in there."
+      },
       "brother_aldric_highwatch": {
         "name": "Broder Aldric",
         "title": "Dalens präst",
@@ -28805,6 +28830,16 @@ export const sv_SE: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Forgebrytaren smidd och buren"
+          }
+        }
+      },
+      "q_heart_what_the_heart_let_go": {
+        "title": "What the Heart Let Go",
+        "text": "The strength in the Heart has no master and no mind, {playerName}, but it has a shape. When it falls, it will not die: its essence will tear loose and flee back into the stone. Something always stays behind. Bring me what remains of it, and the Vigil will pay you from its own coffers.",
+        "completion": "Still warm. The four strengths, bound in one splinter, and it does not want to be held. The Vigil keeps its word: take this coffer, and may it hold something worth the climb.",
+        "objectives": {
+          "0": {
+            "label": "Remnant of the Masterless Strength"
           }
         }
       },

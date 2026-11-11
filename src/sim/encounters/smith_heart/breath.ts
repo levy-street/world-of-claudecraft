@@ -106,6 +106,8 @@ import {
 import { clearAnchors, clearCalm, plantCalm, stepThessaly } from './breath_thessaly';
 import { breathSay, THESSALY_PULL_DELAY, watchBreathSlain } from './breath_voice';
 import { stepOverLip, stepVoidDeaths, tetherGuardian } from './breath_void';
+import { breakFeat } from './feat_attempt';
+import { settleSmithHeartFeat } from './feats';
 import { applyTierHealth, restoreTierHealth, tierPoolMult } from './tier_health';
 import { freshSlainWatch } from './voice_slain';
 
@@ -331,6 +333,7 @@ function finishBreath(
   st: BreathFightState,
 ): void {
   st.finished = true;
+  settleSmithHeartFeat(ctx, inst, { encounter: 'breath', st });
   const s = scopeOf(ctx, inst, st, boss);
   breathSay(s, boss, 'guardian', 'death');
   breathSay(s, thessalyOf(ctx, inst), 'thessaly', 'victory');
@@ -353,10 +356,12 @@ function beginBreath(ctx: SimContext, inst: InstanceSlot, boss: Entity): BreathF
 /** One tick of the claim's Guardian of the Breath. */
 export function tickBreathGuardian(ctx: SimContext, inst: InstanceSlot): void {
   // The void is the void's whether the guardian fights or not.
-  stepVoidDeaths(ctx, inst);
+  const fell = stepVoidDeaths(ctx, inst);
   const boss = breathGuardian(ctx, inst);
   if (!boss) return;
   const st0 = boss.smithHeartBreath ?? null;
+  // A raider lost to the void mid-fight breaks the feat (feats.ts).
+  if (fell > 0 && st0) breakFeat(st0);
   if (!living(boss)) {
     // Down before the Cornice woke (a dev kill): nothing left gathered.
     spendBreathIntro(boss);

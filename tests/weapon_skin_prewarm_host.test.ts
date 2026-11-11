@@ -379,8 +379,8 @@ describe('the weapon-skin prewarm host warms the program the live weapon draws',
     expect(Object.keys(WEAPON_VFX).filter((key) => skinIdFor(key) === null)).toEqual([
       'rude_awakening_sword',
     ]);
-    // +1 Lantern Hall's earned blade, +4 its elemental arms
-    expect(WORN_KEYS).toHaveLength(27);
+    // +1 Lantern Hall's earned blade, +5 the Smith's Heart raid arms
+    expect(WORN_KEYS).toHaveLength(28);
   });
 
   it('reads the host shape table off every shipped skin GLB', () => {

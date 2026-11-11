@@ -1329,6 +1329,27 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
     },
     props: 'sword_shield',
   },
+  // Warden Ada Collier, Vigil of Highwatch, at the Smith's Heart's Cleft (the essence
+  // quest's giver): a veteran of Thessaly's order, grey at the temples, sword and shield.
+  heart_warden_ada_collier: {
+    cls: 'warrior',
+    app: {
+      gender: 'female',
+      ...head('crown', 'none', 'default', 'almond', 'soft', 'default'),
+      ...skin(22, 0.36, 0.5),
+      ...hair(0, 0.12, 0.62),
+      ...eyes(120, 0.35, 0.3),
+      headShape: shape({
+        eyeSpacing: 0.2,
+        eyeSize: -0.1,
+        eyeTilt: 0.35,
+        browHeight: -0.3,
+        chinWidth: 0.6,
+      }),
+      bodyScale: 1.04,
+    },
+    props: 'sword_shield',
+  },
   // Quartermaster Bree, Highwatch Quartermaster.
   quartermaster_bree: {
     cls: 'rogue',

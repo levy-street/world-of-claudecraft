@@ -31,6 +31,7 @@
 // player order.
 
 import { DT, type Entity } from '../../types';
+import { breakFeat } from './feat_attempt';
 import { biteThrough, warded } from './quench_bite';
 import { type QBody, warmNeighbours } from './quench_geometry';
 import {
@@ -121,6 +122,8 @@ export function freezePlayer(s: QuenchScope, p: Entity): void {
   const c = chillOf(s, p.id);
   c.cold = 0;
   c.frozen = T.freezeSeconds;
+  // Every freeze breaks the encounter's feat (feats.ts).
+  breakFeat(s.st);
   setWarm(s, p, false);
   biteThrough(s, p);
   s.ctx.applyAura(p, {

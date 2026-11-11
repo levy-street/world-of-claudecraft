@@ -1969,6 +1969,19 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.membershipDormant': '未啟用：續訂會員以恢復裝備屬性和套裝加成。',
   'entities.items.lantern_seal.name': '燈火印章',
   'entities.items.reins_lantern_hall_destrier.name': '燈火大廳戰馬的韁繩',
+  'entities.items.reins_quarryheart_charger.name': '石心戰駒的韁繩',
+  'entities.items.remnant_of_the_masterless_strength.name': '無主之力的殘餘',
+  'entities.items.coffer_of_the_highwatch_vigil.name': '高望守夜會的寶匣',
+  'entities.npcs.heart_warden_ada_collier.name': '守望者艾達·科利爾',
+  'entities.npcs.heart_warden_ada_collier.title': '高望守夜會',
+  'entities.npcs.heart_warden_ada_collier.greeting':
+    '守夜會四十代人守望這座山，卻不知為何。如今我們知道了，{className}。當心你在裡面喚醒的東西。',
+  'entities.quests.q_heart_what_the_heart_let_go.title': '心臟放走之物',
+  'entities.quests.q_heart_what_the_heart_let_go.text':
+    '心臟中的力量沒有主人，也沒有心智，{playerName}，但它有形體。它倒下時不會死去：它的精華會掙脫出來，逃回岩石之中。總有些東西會留下。把它留下的殘餘帶給我，守夜會將從自己的寶庫中付你報酬。',
+  'entities.quests.q_heart_what_the_heart_let_go.completion':
+    '還是溫熱的。四股力量凝在一塊碎片裡，它不願被握住。守夜會信守承諾：拿走這個寶匣，願它裝著值得這番攀登的東西。',
+  'entities.quests.q_heart_what_the_heart_let_go.objectives.0.label': '無主之力的殘餘',
   'entities.items.membership_staff.name': '萬變法杖',
   'hudChrome.bags.membershipSlot': '會員背包欄位',
   'hudChrome.bags.membershipSlotLocked': '開通會員以解鎖此背包欄位。',
@@ -4267,26 +4280,33 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '寬闊的鋼製劍身，血槽中燃著燈火，鍍金的護頰，護手中燃著一盞籠中提燈，藍色皮革劍柄。',
   'hudChrome.wocStore.skins.lantern_hall_sword.name': '燈火大廳之劍',
   'hudChrome.wocStore.skins.hearthbrand_sword.name': '爐火之刃',
-  'hudChrome.wocStore.skins.hearthbrand_sword.look':
-    '焦黑鋼鐵鑄成的火焰波紋劍身，兩側刃口如出爐般熾熱，熔融的裂縫在兩面分叉蔓延，青銅火焰護手環繞一塊燃燒的寶石，牛血色握柄。',
-  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
-    '燈火大廳裡有一座自大廳建成以來從未熄滅的爐膛，加里克·霍爾特發誓這把劍就是在它的炭火中淬火的。佩戴它的成員說，即使在最寒冷的守夜裡，劍柄也依然溫暖。刃口上的火焰只是外觀。',
   'hudChrome.wocStore.skins.squallcrest_sword.name': '風暴浪峰',
-  'hudChrome.wocStore.skins.squallcrest_sword.look':
-    '海藍色的修長劍身，刃口如碎浪般明亮，風暴血槽中封著分叉的閃電，劍根上方是一道鍍金的浪，一側刃口生著鰭，鍍金浪濤護手環繞一顆風暴珍珠。',
-  'hudChrome.wocStore.skins.squallcrest_sword.lore':
-    '一位為公會出海的船長從一場狂風中帶回了這把劍，那場風暴折斷了她的桅桿，讓整艘船像鐘一樣鳴響。加里克只肯用印章出售它，並提醒每位買家，風暴來臨前它會嗡嗡作響。閃電與海光只是外觀。',
   'hudChrome.wocStore.skins.rimelight_staff.name': '霜光法杖',
-  'hudChrome.wocStore.skins.rimelight_staff.look':
-    '蒼白的杖身以銀箍束緊，纏繞著發光的霧凇，杖頂的銀爪在冰晶之冠中托著一顆巨大的寒光水晶，杖頸垂著冰柱。',
-  'hudChrome.wocStore.skins.rimelight_staff.lore':
-    '燈火大廳的冬季守望者曾手持這樣的法杖行走在高路上，點亮杖頂，為迷失在雪中的旅人引路。加里克在架上留了一根，給印章有餘的成員。寒霜與冷光只是外觀。',
-  'hudChrome.wocStore.skins.duskwick_staff.name': '暮芯法杖',
-  'hudChrome.wocStore.skins.duskwick_staff.look':
-    '兩股扭結的黑木以鐵箍束緊，杖頂是一盞敞開的鐵提燈，在兩隻捲曲的角之間燃著紫色的暮光火焰，燈底垂著晃動的鎖鏈。',
-  'hudChrome.wocStore.skins.duskwick_staff.lore':
-    '大廳裡的每一盞燈都明亮地燃燒，只有一盞例外。暮光之焰是為在夜裡守護大廳而點燃的，別的燈發出光的地方，它發出影子；加里克親自修剪它的燈芯。煙霧與紫色光輝只是外觀。',
   'hudChrome.wocStore.collections.lantern_hall': '燈火大廳',
+  // The Smith's Heart raid arms (M16 fills).
+  'hudChrome.wocStore.collections.smiths_heart': '鐵匠之心',
+  'hudChrome.wocStore.skins.seamcaller_maul.name': '喚脈者',
+  'hudChrome.wocStore.skins.seamcaller_maul.look':
+    '以一整塊帶狀採石場岩石鑿成的雙手巨錘，金邊打擊面環繞燃燒的琥珀，金色冠翼，兩側刻有燃燒的金色符文，錘冠長出琥珀礦脈晶體，玄武岩錘柄以黃金箍束。',
+  'hudChrome.wocStore.skins.seamcaller_maul.lore':
+    '鐵錘議會在向突襲者舉起手之前，先用歌聲喚醒了礦脈，岩石記住了每一個音符。這把巨錘取自他們的鐵錘劈開的那塊石頭，揮動時符文仍在燃燒。採石場的碎石繞著錘頭盤旋，彷彿山嶺想把它們要回去。符文和盤旋的碎石只是外觀。',
+  'hudChrome.wocStore.skins.squallcrest_sword.look':
+    '修長的風暴鋼劍身，刃口如閃電般明亮，兩面銀槽中各有一道分叉的雷霆，劍脊上勾著風之鰭，敞開的銀色光環環繞風暴之眼寶石，向後掃出狂風般的翼片。',
+  'hudChrome.wocStore.skins.squallcrest_sword.lore':
+    '吐息守護者讓心臟中的空氣永不停歇，它倒下時，所攜的風暴並未散去，而是沉入了這把劍中。風仍繞著鋼身旋轉，閃電仍沿著刃口奔走，持劍者發誓光環中的眼睛一直望著天空。風暴只是外觀。',
+  'hudChrome.wocStore.skins.rimelight_staff.look':
+    '纏繞白霜、迸出冰晶的蒼白銀杖，杖頂四根銀爪籠住一顆冷光巨晶，外圍是一圈冰片之冠，上方懸浮著一枚冰之碎片。',
+  'hudChrome.wocStore.skins.rimelight_staff.lore':
+    '淬火守護者冷卻了心臟鍛造過的每一把刀刃。它倒下時，它的晶體是最後一個停止發光的東西，突襲者把它帶出來時，它仍冷得能讓手結霜。冰片環繞杖冠，霜之符文繞著它旋轉。寒意只是外觀。',
+  'hudChrome.wocStore.skins.hearthbrand_sword.look':
+    '冷卻的岩漿外殼鑄成的寬刃，刃口仍在熔融，兩面布滿餘燼脈絡般的裂紋，劍脊長著黑曜石利齒，黑鐵護手向上彎成滴落熔流的雙角，環抱一顆岩漿之心。',
+  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
+    '熾熱守護者就是心臟得名的那團火。它熄滅時，最後的熔流流進鍛爐地面上一道劍形的裂縫，在那裡冷卻：外面是硬殼，裡面是火。它的刃口從未停止燃燒。火焰只是外觀。',
+  'hudChrome.wocStore.skins.duskwick_staff.name': '心熔法杖',
+  'hudChrome.wocStore.skins.duskwick_staff.look':
+    '鍛爐青銅杖身鑲嵌著層層採石場岩石，杖頂是一圈巨大的金色光環，四顆寶石輪流亮起（採石琥珀、狂風、寒霜與烈火），環抱一顆白金核心的鐵砧之心。',
+  'hudChrome.wocStore.skins.duskwick_staff.lore':
+    '無主之力是心臟的四條礦脈在世界之砧上結成的一具軀體。它破碎時，四者並未分離：它們沉入這圈光環，輪流燃燒，岩石、風、霜與火，就像它們曾經輪流出擊一樣。四道光只是外觀。',
   'hudChrome.wocStore.skins.guildmark_arming_sword.name': '公會印記武裝劍',
   'hudChrome.wocStore.skins.guildmark_arming_sword.look':
     '發藍鋼劍刃、青銅魚尾形十字護手、青綠色染皮握柄，以及一枚小巧的公會鋼印。',
@@ -15345,6 +15365,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.hiddenBadge': '隱藏',
   'hudChrome.deeds.titleChip': '頭銜獎勵',
   'hudChrome.deeds.borderChip': '邊框獎勵',
+  'hudChrome.deeds.cosmeticChip': '外觀獎勵',
+  'hudChrome.deeds.rewardAppearance': '獎勵：{name}武器外觀，帳號內所有角色可用',
+  'hudChrome.deeds.rewardMount': '獎勵：{name}坐騎',
   'hudChrome.deeds.watch': '追蹤',
   'hudChrome.deeds.unwatch': '取消追蹤',
   'hudChrome.deeds.watchFull': '追蹤清單已滿（最多 {cap} 項）',
@@ -15450,6 +15473,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '來自古木枝頭的雙頭暮光飛龍，駐足時以利爪後肢佇立，行進時展動奧術銘紋雙翼掠地翱翔。',
   'hudChrome.mounts.name_lanternback_troll': '提燈背者格倫博',
   'hudChrome.mounts.name_lantern_hall_destrier': '燈火大廳戰馬',
+  'hudChrome.mounts.name_quarryheart_charger': '石心戰駒',
   'hudChrome.mounts.name_chimeglass_tortoise': '鐘晶的托利弗',
   'hudChrome.mounts.desc_drakemaw_raptor':
     '來自龍喉火山口的馴服巢生迅猛龍，渾身筋肉、疾若奔雷，身上仍帶著淡淡的灰燼氣味。',
@@ -15462,6 +15486,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '被點燈人馴服的山地巨魔，肩上扛著一把鐵王座，兩側扶手各掛一盞燃燒的風燈。',
   'hudChrome.mounts.desc_lantern_hall_destrier':
     '燈火大廳的戰馬，在公會的藍色披布下披掛橡木與鐵製馬鎧，鞍邊搖曳的兩盞風燈照亮歸途。',
+  'hudChrome.mounts.desc_quarryheart_charger':
+    '鐵匠之心的戰駒：採石場的石板懸浮在活火之軀上，白熱的心臟在金色肋骨後跳動，額生冰晶之角，鬃毛是劈啪作響的雷風。',
   'hudChrome.mounts.desc_chimeglass_tortoise':
     '鹽原上的陸龜，走過了三代商隊。收留他的補鍋匠用暴風晶磨成眼鏡，又在他喉前掛上一枚青銅鈴——道路總是先聽見他，才看見他。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '雷霆闊步大火雞',

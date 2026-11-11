@@ -40,6 +40,7 @@ import type { SimContext } from '../../sim_context';
 import { clearThreat } from '../../threat';
 import { DT, type Entity } from '../../types';
 import { claimBoss, clearCastIf } from '../sunken_bastion/claim';
+import { settleSmithHeartFeat } from './feats';
 import { clearAdds, stepAdds, stepCoals, stepRings } from './final_adds';
 import {
   clearBreath,
@@ -405,6 +406,7 @@ function resetFinal(ctx: SimContext, inst: InstanceSlot, boss: Entity): void {
 
 function finishFinal(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: FinalFightState): void {
   st.finished = true;
+  settleSmithHeartFeat(ctx, inst, { encounter: 'masterless', st });
   finalSay(scopeOf(ctx, inst, st, boss), 'death');
   cueOn(scopeOf(ctx, inst, st, boss), boss, FINAL_CUES.settle, 'arcane');
   clearFight(ctx, inst, boss, st);

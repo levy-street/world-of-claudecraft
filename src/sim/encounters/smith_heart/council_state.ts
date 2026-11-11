@@ -6,6 +6,7 @@
 
 import type { FloorMechanic } from './council_floor_gap';
 import type { CouncilDifficulty, CouncilRole } from './council_ids';
+import type { SmithHeartFeatAttempt } from './feat_attempt';
 import type { SlainWatch } from './voice_slain';
 
 /** A player mark counting down (Wake the Stone, Falling Rock). */
@@ -88,6 +89,8 @@ export interface CouncilFightState {
   basePools?: Partial<Record<CouncilRole, number>>;
   /** The council has fallen and the end was resolved. */
   finished: boolean;
+  /** This pull's watch on the encounter's feat (feat_attempt.ts), created on first touch. */
+  feat?: SmithHeartFeatAttempt;
   /** Seconds since the pull. */
   clock: number;
   /** The Wrath holder's energy, 0 to 100. */

@@ -5909,6 +5909,15 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'feat_guild_writ_runner',
   'feat_guild_hallsworn',
   'feat_guild_of_lantern_hall',
+  // The Smith's Heart's seven (hidden while the raid is dev-gated): the dungeon crest until
+  // their paintings are commissioned.
+  'dgn_smith_heart',
+  'dgn_heart_council_feat',
+  'dgn_heart_breath_feat',
+  'dgn_heart_quench_feat',
+  'dgn_heart_heat_feat',
+  'dgn_heart_final_feat',
+  'dgn_heart_meta',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

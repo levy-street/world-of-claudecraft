@@ -24231,30 +24231,13 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wildheartAlert.stalkedLine':
     'Utíkej před jaguárem a vyhni se kousnutí. Veď ho dál od Pána šelem a přeruš Pouto smečky',
   'hudChrome.wildheartAlert.stalkedTitle': 'Sledován!',
-  'hudChrome.wocStore.skins.duskwick_staff.look':
-    'Dva zkroucené pruty černého dřeva spojené železem, zakončené otevřenou železnou lucernou s fialovým soumračným plamenem mezi dvěma zahnutými rohy. Z jejího dna se houpají řetězy.',
-  'hudChrome.wocStore.skins.duskwick_staff.lore':
-    'Všechny lucerny v síni jasně září, kromě jedné. Soumračný plamen byl zapálen, aby síň hlídal v noci, a vydává stín tam, kde ostatní vydávají světlo. Garrick mu sám zastřihuje knot. Kouř i fialová záře jsou pouze vzhled.',
-  'hudChrome.wocStore.skins.duskwick_staff.name': 'Hůl soumračného knotu',
-  'hudChrome.wocStore.skins.hearthbrand_sword.look':
-    'Plamenně zvlněná čepel z černěné oceli s ostřím žhavým jako výheň a roztavenou žílou větvící se po obou stranách. Záštita z bronzových plamenů obepíná hořící kámen, rukojeť je temně rudá.',
-  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
-    'V Lucernové síni hoří krb, který nevyhasl od jejího vztyčení, a Garrick Holt přísahá, že tato čepel byla kalena v jeho uhlících. Členové, kteří ji nosí, říkají, že rukojeť zůstává teplá i na nejchladnější hlídce. Oheň na ostří je pouze vzhled.',
   'hudChrome.wocStore.skins.hearthbrand_sword.name': 'Krbový cejch',
   'hudChrome.wocStore.skins.lantern_hall_sword.look':
     'Široká ocelová čepel se žlábkem plným tlumeného lucernového ohně, zlacenými plochami, hořící lucernou v kleci v záštitě a rukojetí z modré kůže.',
   'hudChrome.wocStore.skins.lantern_hall_sword.lore':
     'Garrick Holt tuto čepel cizinci neprodá. Dostávají ji členové, kteří týden za týdnem plní zakázky Lucernové síně. Předává ji vždy se stejnými slovy: lucerna v záštitě byla zapálena z vlastního krbu síně, takže kamkoli ji neseš, síň jde s tebou. Oheň ve žlábku je pouze vzhled. Důležitý je ten slib.',
   'hudChrome.wocStore.skins.lantern_hall_sword.name': 'Čepel Lucernové síně',
-  'hudChrome.wocStore.skins.rimelight_staff.look':
-    'Světlá násada obepnutá stříbrem a zářící jinovatkou, zakončená stříbrným spárem držícím velký krystal studeného světla v koruně roztříštěného ledu. Z límce visí rampouchy.',
-  'hudChrome.wocStore.skins.rimelight_staff.lore':
-    'Zimní hlídka Lucernové síně nosila takové hole po horské cestě. Jejich koruny svítily poutníkům ztraceným ve sněhu. Garrick má jednu na stojanu pro členy s přebytkem pečetí. Mráz i jeho chladné světlo jsou pouze vzhled.',
   'hudChrome.wocStore.skins.rimelight_staff.name': 'Hůl světla jinovatky',
-  'hudChrome.wocStore.skins.squallcrest_sword.look':
-    'Dlouhá mořsky modrá čepel s ostřím jasným jako příboj, bouřkovým kanálem s rozeklaným bleskem a zlacenou vlnou nad patou čepele. Po jednom ostří vede ploutev a záštitu tvoří zlacené vlny kolem bouřkové perly.',
-  'hudChrome.wocStore.skins.squallcrest_sword.lore':
-    'Kapitánka plavící se pro cech přivezla tuto čepel z vichřice, která jí vzala stěžeň a nechala loď znít jako zvon. Garrick ji prodává jen za pečeti a každého kupce varuje, že před bouří bzučí. Blesky i mořské světlo jsou pouze vzhled.',
   'hudChrome.wocStore.skins.squallcrest_sword.name': 'Hřeben vichřice',
   'bossJournal.common.enrageName': 'Rozzuřený',
   'bossJournal.common.enrageResponse':

@@ -1432,7 +1432,8 @@ export const tr_TR: EnTranslations = {
         "emberwrought": "Kordan yapılmış",
         "hoarfrost": "Kırağı",
         "fallen_star": "Düşen Yıldız",
-        "lantern_hall": "Fener Salonu"
+        "lantern_hall": "Fener Salonu",
+        "smiths_heart": "Smith's Heart"
       },
       "skins": {
         "lantern_hall_sword": {
@@ -1440,25 +1441,30 @@ export const tr_TR: EnTranslations = {
           "look": "Kor fener ateşi yivli geniş çelik bıçak, yaldızlı yanlar, çapraz siperde yanan kafesli fener, mavi deri sap.",
           "lore": "Garrick Holt bu bıçağı yabancıya satmaz. Fener Salonunun sözleşmelerini hafta hafta tutan üyelere gider; her seferinde aynı sözlerle verir: siperdeki fener salonun kendi ocağından yakılır; nereye taşırsan salon seninle gelir. Yivdeki ateş yalnızca görünümdür. Asıl olan sözdür."
         },
-        "hearthbrand_sword": {
-          "name": "Ocak Damgası",
-          "look": "Ocak sıcağı kenarlı, karartılmış çelikten alev dalgalı bıçak; iki yüzünde dallanan erimiş damar, yanan taş çevresinde bronz alev kabza siperi, koyu kan kırmızısı sap.",
-          "lore": "Fener Salonunda, kurulduğundan beri sönmemiş ocak vardır; Garrick Holt bu bıçağın onun közlerinde soğutulduğuna yemin eder. Taşıyan üyeler, en soğuk nöbette bile sapın sıcak kaldığını söyler. Kenarlarındaki ateş yalnızca görünümdür."
+        "seamcaller_maul": {
+          "name": "Seamcaller",
+          "look": "Two-handed maul hewn from one block of banded quarry stone, gold-rimmed striking faces round burning amber, gold crest wings, gold runes cut into both cheeks, amber seam-crystal growing from the crown and a basalt haft bound in gold.",
+          "lore": "The Hammer Council sang the seam awake before they ever raised a hand against the raid, and the stone remembered every note. This maul was cut from the block their hammers split, and its runes still burn when it swings. Quarry shards circle the head as if the mountain wants them back. The runes and the circling stone are only a look."
         },
         "squallcrest_sword": {
           "name": "Sağanak Tepesi",
-          "look": "Kırılan dalga kadar parlak kenarlı uzun deniz mavisi bıçak; çatallı yıldırım tutan fırtına kanalı, tabanında yaldızlı dalga, bir kenarında yüzgeç, fırtına incisi çevresinde yaldızlı dalga siperi.",
-          "lore": "Lonca için yelken açan kaptan bu bıçağı, direğini koparıp gemisini çan gibi çınlatan sağanaktan getirdi. Garrick yalnızca mühürle satar, her alıcıyı fırtına öncesi uğuldadığı konusunda uyarır. Yıldırım ve deniz ışığı yalnızca görünümdür."
+          "look": "Long storm-steel blade with lightning-bright edges, a forked bolt in a silver channel up each face, wind fins hooked off the spine and an open silver halo round a storm-eye gem, swept back in gale vanes.",
+          "lore": "The Guardian of the Breath kept the air of the Heart moving, and when it fell the storm it carried did not scatter. It settled into this blade. Wind still winds round the steel and lightning still runs its edges, and those who carry it swear the eye in the halo watches the sky. The storm is only a look."
         },
         "rimelight_staff": {
           "name": "Kırağı Işığı Asası",
-          "look": "Gümüş bağlı, parlayan kırağı sarılı soluk gövde; tepesinde parçalı buz tacı içinde büyük soğuk ışık kristali tutan gümüş pençe, yakasından sarkan buz sarkıtları.",
-          "lore": "Fener Salonunun kış nöbetçileri ana yolda böyle asalar taşırdı; taçları karda kaybolan yolcular için yanardı. Garrick, fazla mührü olan üyeler için rafta bir tane tutar. Buz ve soğuk ışığı yalnızca görünümdür."
+          "look": "Pale silver shaft wound with hoarfrost and broken out in ice, crowned by four silver tines caging a great crystal of cold light inside a crown of ice shards, a splinter of ice hovering above.",
+          "lore": "The Guardian of the Quench cooled every blade the Heart ever forged. Its crystal was the last thing to stop glowing when it fell, and the raid carried it out still cold enough to frost the hand. Ice circles the crown and runes of frost turn round it. The cold is only a look."
+        },
+        "hearthbrand_sword": {
+          "name": "Ocak Damgası",
+          "look": "Broad blade of cooled magma crust with molten edges, a net of ember veins cracked across both faces, an obsidian-toothed spine and a black iron guard swept into horns dripping melt round a magma heart.",
+          "lore": "The Guardian of the Heat was the fire the Heart was named for. When it guttered out, its last melt ran into a blade-shaped crack in the forge floor and cooled there, crust outside and fire within. The edges have never stopped burning. The flames are only a look."
         },
         "duskwick_staff": {
-          "name": "Alacakaranlık Fitili Asası",
-          "look": "Demirle bağlanmış iki bükülü kara ahşap kol; tepesinde iki kıvrık boynuz arasında mor alacakaranlık alevi yakan açık demir fener, tabanından sallanan zincirler.",
-          "lore": "Salondaki bir fener dışında hepsi parlak yanar. Alacakaranlık alevi gece salonu korumak için yakıldı; diğerlerinin ışık verdiği yerde gölge yayar. Garrick fitilini kendisi keser. Duman ve mor parıltı yalnızca görünümdür."
+          "name": "Heartmeld Staff",
+          "look": "Forge-bronze staff set with courses of quarry stone, crowned by a great gold halo holding four gems that light in turn (quarry amber, gale, frost and fire) round an anvil heart with a white-gold core.",
+          "lore": "The Masterless Strength was the four veins of the Heart bound into one body on the Anvil of the World. When it broke, the four did not part: they settled into this halo and take turns to burn, stone, wind, frost and fire, as they once took turns to strike. The four lights are only a look."
         },
         "guildmark_arming_sword": {
           "name": "Guildmark Silahlanma Kılıcı",
@@ -2598,6 +2604,7 @@ export const tr_TR: EnTranslations = {
       "name_mech_bird": "Cluckwork Makine Kuşu",
       "name_lanternback_troll": "Fener Sırtlı Grumbol",
       "name_lantern_hall_destrier": "Fener Salonu Savaş Atı",
+      "name_quarryheart_charger": "Quarryheart Charger",
       "name_chimeglass_tortoise": "Tolliver Chimeglass",
       "name_rickshaw_mount": "Kemikbağlı Çekçek",
       "name_emberbristle_broom": "Köz Kıllı Süpürge",
@@ -2622,6 +2629,7 @@ export const tr_TR: EnTranslations = {
       "desc_mech_bird": "Kapanan servolarla koşan, kurma anahtarı hâlâ dönen, el yapımı, saat mekanizmalı bir savaş tavuğu.",
       "desc_lanternback_troll": "Omuzlarında demir bir taht taşıyan, her iki kolunda da yanan bir fırtına feneri taşıyan, fener yakanlar tarafından boyunduruğa alınan bir tepe trolü.",
       "desc_lantern_hall_destrier": "Fener Salonunun savaş atı; lonca mavisi altında meşe ve demir zırhlı, eve yolu aydınlatmak için eyerinden iki fırtına feneri sallanır.",
+      "desc_quarryheart_charger": "A war-steed of the Smith's Heart: quarry-stone plates hung over a body of living fire, its heart beating white-hot behind gold ribs, ice-crystal horns on its brow and a mane of wind crackling with lightning.",
       "desc_nightwing_chimera": "Kadim dallardan iki başlı alacakaranlık wyverni; dinlenirken pençeli arka ayaklarına tüner, gizem işlemeli kanatlarıyla yerin üzerinde süzülür.",
       "desc_chimeglass_tortoise": "Üç nesildir karavanları geride bırakan, tuzla kaplı bir kaplumbağa. Tamirciler ona fırtına camından gözlük taktı ve boğazına bronz bir çan astı, böylece yol onu görmeden çok önce onu duyardı.",
       "desc_rickshaw_mount": "Sırıklarına kemikleri çıkmış bir avanenin koşulduğu, seni ölümüne bir koşuyla çeken takırdayan kemik arabası.",
@@ -7817,6 +7825,9 @@ export const tr_TR: EnTranslations = {
       "hiddenBadge": "Gizli",
       "titleChip": "Unvan ödülü",
       "borderChip": "Çerçeve ödülü",
+      "cosmeticChip": "Cosmetic reward",
+      "rewardAppearance": "Reward: the {name} weapon appearance, for every character on your account",
+      "rewardMount": "Reward: the {name} mount",
       "watch": "Takip Et",
       "unwatch": "Takibi Bırak",
       "watchFull": "Takip listesi dolu (en fazla {cap})",
@@ -25413,6 +25424,15 @@ export const tr_TR: EnTranslations = {
       "reins_lantern_hall_destrier": {
         "name": "Fener Salonu Savaş Atı Dizginleri"
       },
+      "reins_quarryheart_charger": {
+        "name": "Reins of the Quarryheart Charger"
+      },
+      "remnant_of_the_masterless_strength": {
+        "name": "Remnant of the Masterless Strength"
+      },
+      "coffer_of_the_highwatch_vigil": {
+        "name": "Coffer of the Highwatch Vigil"
+      },
       "wyrmfall_core": {
         "name": "Wyrmfall Özü"
       },
@@ -27348,6 +27368,11 @@ export const tr_TR: EnTranslations = {
         "title": "Highwatch Captain",
         "greeting": "Keep your feet, {className}. When the bellows breathes, step into my calm and let the wind break on us."
       },
+      "heart_warden_ada_collier": {
+        "name": "Warden Ada Collier",
+        "title": "Vigil of Highwatch",
+        "greeting": "Forty generations of the Vigil watched this mountain without knowing why. Now we know, {className}. Mind what you wake in there."
+      },
       "brother_aldric_highwatch": {
         "name": "Birader Aldric",
         "title": "Vadi Rahibi",
@@ -28805,6 +28830,16 @@ export const tr_TR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Dövme Kıran dövüldü ve taşınıyor"
+          }
+        }
+      },
+      "q_heart_what_the_heart_let_go": {
+        "title": "What the Heart Let Go",
+        "text": "The strength in the Heart has no master and no mind, {playerName}, but it has a shape. When it falls, it will not die: its essence will tear loose and flee back into the stone. Something always stays behind. Bring me what remains of it, and the Vigil will pay you from its own coffers.",
+        "completion": "Still warm. The four strengths, bound in one splinter, and it does not want to be held. The Vigil keeps its word: take this coffer, and may it hold something worth the climb.",
+        "objectives": {
+          "0": {
+            "label": "Remnant of the Masterless Strength"
           }
         }
       },

@@ -8443,6 +8443,35 @@
       "commonPrompt": "Not a text-to-image prompt: an EEVEE still of public/models/mounts/lantern_hall_destrier.glb (Idle, frame 0), composed at 512 and converted to 128px by npm run assets:items."
     },
     {
+      "batchId": "quarryheart-charger-reins-2026-11-11",
+      "source": "Deterministic Blender render of the charger's authoring scene (scripts/assets/quarryheart_charger/render_reins_icon.py: a three-quarter portrait of the head, the stone plates of the skull over the fire, the white-gold eye, the two ice-crystal horns and the first of the wind mane) over a painted low-key ground with the game's bloom (scripts/assets/lantern_hall_steed/compose_icon.py --bloom). No text-to-image generation, no reference art.",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "the mount reins portraits (the mount's own head on a dark vignette)",
+      "provenanceRecord": "scripts/assets/quarryheart_charger/render_reins_icon.py",
+      "itemIds": [
+        "reins_quarryheart_charger"
+      ],
+      "commonPrompt": "Not a text-to-image prompt: an EEVEE still of the Quarryheart Charger's authoring scene (build_charger.py --blend, Idle, frame 1), composed at 512 and converted to 128px by npm run assets:items."
+    },
+    {
+      "batchId": "smith-heart-quest-icons-2026-11-11",
+      "source": "Image generation (ElevenLabs creative flow: gpt-image-2 for the remnant, gpt-image-2.5-sunburst for the coffer), one painting per item and one square framing pass per painting",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "the house item-icon contract (opaque painted ground, top-left key light, centred complete subject)",
+      "commonPrompt": "Opaque dark painted ground, warm top-left light, complete centred subject with safe padding, tactile materials, no text or frame. Exact per-item prompts and framing retained in provenance.",
+      "provenanceRecord": "docs/achievements/smith-heart-quest-icons-2026-11-11/accepted-art.json",
+      "itemIds": [
+        "remnant_of_the_masterless_strength",
+        "coffer_of_the_highwatch_vigil"
+      ]
+    },
+    {
       "batchId": "quest-shield-icons-2026-10-23",
       "source": "OpenAI built-in image generation, one painting per item and one framing edit per painting",
       "owner": "World of ClaudeCraft",

@@ -56,6 +56,7 @@ import type { SimContext } from '../../sim_context';
 import { clearThreat } from '../../threat';
 import { DT, type Entity } from '../../types';
 import { claimBoss, clearCastIf } from '../sunken_bastion/claim';
+import { settleSmithHeartFeat } from './feats';
 import { landBreath, startBreath } from './quench_attacks';
 import {
   bladesAtHome,
@@ -332,6 +333,7 @@ function finishQuench(
   st: QuenchFightState,
 ): void {
   st.finished = true;
+  settleSmithHeartFeat(ctx, inst, { encounter: 'quench', st });
   const s = scopeOf(ctx, inst, st, boss);
   quenchSay(s, boss, 'death');
   ctx.emit({

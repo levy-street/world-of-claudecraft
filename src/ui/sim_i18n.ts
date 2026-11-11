@@ -438,6 +438,11 @@ const baseEnTable = {
   // only; cook before eating. EXACT-matched; English falls through per locale
   // until the release localization pass fills translations.
   'error.rawCatchCookFirst': 'That is raw. Cook it first.',
+  // The Smith's Heart's rewards (src/sim/smith_heart_essence_chest.ts: the coffer refuses
+  // to open while the raid's Normal table holds nothing for the opener; src/sim/
+  // smith_heart_feat_rewards.ts: the meta's reins wait for a login when the bags are full).
+  'error.heartCofferEmpty': 'The coffer is sealed and holds nothing for you yet. Keep it.',
+  'error.heartChargerBagsFull': 'Your bags are full. The Quarryheart Charger will wait for you until your next login.',
   // Profession-choice quest denials (src/sim/quests/quest_commands.ts): the archetype
   // pair or hobby selection fails validation on quest accept or again at turn-in.
   'error.professionChoiceUnavailable': 'That profession choice is not available.',
@@ -11557,6 +11562,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.guildBankDepositItem': '你将 {item} 存入了公会银行。',
     'log.guildBankWithdrawItem': '你从公会银行取出了 {item}。',
     'error.rawCatchCookFirst': '这是生的。请先烹饪。',
+    'error.heartCofferEmpty': '宝箱被封住了，暂时没有给你的东西。请留着它。',
+    'error.heartChargerBagsFull': '你的背包已满。石心战驹会等到你下次登录时再交给你。',
     'log.questItemRecovered': '你补回了一件缺失的任务物品。',
     'groundPickup.objectAlreadyCredited': '你已经做过这个了。',
     'error.mountTrainInProgress': '骑乘课程已在进行中。',
@@ -12842,6 +12849,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.guildBankDepositItem': '你將 {item} 存入公會銀行。',
     'log.guildBankWithdrawItem': '你從公會銀行取出了 {item}。',
     'error.rawCatchCookFirst': '這是生的，請先烹飪。',
+    'error.heartCofferEmpty': '寶箱被封住了，暫時沒有給你的東西。請留著它。',
+    'error.heartChargerBagsFull': '你的背包已滿。石心戰駒會等到你下次登入時再交給你。',
     'log.questItemRecovered': '你尋回了一件遺失的任務物品。',
     'groundPickup.objectAlreadyCredited': '你已經做過這個了。',
     'error.mountTrainInProgress': '騎乘課程已在進行中。',
@@ -14129,6 +14138,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.guildBankDepositItem': '길드 은행에 {item}을(를) 넣었습니다.',
     'log.guildBankWithdrawItem': '길드 은행에서 {item}을(를) 꺼냈습니다.',
     'error.rawCatchCookFirst': '그것은 날것입니다. 먼저 요리하세요.',
+    'error.heartCofferEmpty': '상자가 봉인되어 있어 아직 당신을 위한 것이 없습니다. 보관해 두세요.',
+    'error.heartChargerBagsFull': '가방이 가득 찼습니다. 채석심장 돌격마는 다음 접속 때까지 당신을 기다립니다.',
     'log.questItemRecovered': '잃어버렸던 퀘스트 아이템을 되찾았습니다.',
     'groundPickup.objectAlreadyCredited': '이건 이미 완료했어요.',
     'error.mountTrainInProgress': '기승 수업이 이미 진행 중입니다.',
@@ -15454,6 +15465,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.guildBankDepositItem': 'ギルド銀行に{item}を預けました。',
     'log.guildBankWithdrawItem': 'ギルド銀行から{item}を引き出しました。',
     'error.rawCatchCookFirst': 'これは生です。先に調理してください。',
+    'error.heartCofferEmpty': '宝箱は封じられていて、まだあなたに渡すものはありません。持っておいてください。',
+    'error.heartChargerBagsFull': 'バッグがいっぱいです。石心の突撃馬は次回のログインまであなたを待っています。',
     'log.questItemRecovered': '不足していたクエストアイテムを回収しました。',
     'groundPickup.objectAlreadyCredited': 'これはもう済んでいる。',
     'error.mountTrainInProgress': '騎乗レッスンはすでに進行中です。',
@@ -18219,6 +18232,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.guildBankDepositItem': 'Вы кладёте {item} в банк гильдии.',
     'log.guildBankWithdrawItem': 'Вы забираете {item} из банка гильдии.',
     'error.rawCatchCookFirst': 'Это сырое. Сначала приготовьте.',
+    'error.heartCofferEmpty': 'Сундук запечатан, и пока в нём для вас ничего нет. Сохраните его.',
+    'error.heartChargerBagsFull': 'Ваши сумки полны. Скакун Каменного Сердца дождётся вас до следующего входа в игру.',
     'log.questItemRecovered': 'Вы получаете обратно недостающий предмет задания.',
     'groundPickup.objectAlreadyCredited': 'Это уже сделано.',
     'error.mountTrainInProgress': 'Урок верховой езды уже идёт.',

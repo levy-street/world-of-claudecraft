@@ -195,6 +195,8 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/realm_builder_monument_fx.ts': 5,
   'src/render/sky.ts': 1,
   'src/render/weapon_vfx.ts': 4,
+  // the orbiting shards' fresnel rim (base clamped with clamp(x, 0, 1))
+  'src/render/weapon_vfx_raid_parts.ts': 1,
   'src/render/worn_stone.ts': 1,
   // the five-dungeon rework's interiors, skies, water and boss fx, plus the
   // shared floor-telegraph material and the Sanctum seal gate (the bases that

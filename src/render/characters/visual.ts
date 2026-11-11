@@ -1162,6 +1162,9 @@ export class CharacterVisual {
   // into so a shed step allocates nothing.
   private weaponVfxAuthored: Partial<WeaponVfxTuning> = {};
   private weaponVfxShed = 1;
+  // The reduced-motion setting update() last saw, handed to every weapon-skin rig so it caps
+  // its flashes (WeaponVfxHandle.setCalm is write-elided, so the per-frame push costs nothing).
+  private weaponVfxCalm = false;
   private readonly weaponVfxTuningScratch: WeaponVfxTuning = { ...DEFAULT_TUNING };
   /** Long-hair secondary motion (modular styles with sway morphs; empty and
    *  free on every other rig). */
@@ -1869,6 +1872,7 @@ export class CharacterVisual {
   /** `animate=false` skips mixer integration (distance throttling); state
    *  edges still latch so the pose catches up when the entity nears. */
   update(dt: number, s: AnimState, animate: boolean, reducedMotion = false): void {
+    this.weaponVfxCalm = reducedMotion;
     this.clock += dt;
     if (this.currentIsOneShot && this.currentOneShotIsAttack && this.def.clips.combatIdle) {
       this.braceUntil = extendBrace(this.braceUntil, this.clock);
@@ -3361,6 +3365,20 @@ export class CharacterVisual {
     if (this.root.rotation.x === pitch && this.root.rotation.z === roll) return;
     this.root.rotation.x = pitch;
     this.root.rotation.z = roll;
+  }
+
+  /** A rig that owns materials of its own on this visual (the Quarryheart Charger's body,
+   *  quarryheart_charger_fx.ts) swaps them in through here: the snapshot an effect overlay or a
+   *  material commit restores becomes the rig's material, not the GLB's, and a mesh that must never
+   *  cast (light-only wind) leaves the caster set, whose shadow flag this visual owns. */
+  adoptMeshMaterial(mesh: THREE.Mesh, material: THREE.Material, castsShadow: boolean): void {
+    this.originalMaterials.set(mesh, material);
+    mesh.material = material;
+    if (castsShadow) return;
+    mesh.userData.shadowCaster = false;
+    mesh.castShadow = false;
+    const at = this.casters.indexOf(mesh);
+    if (at >= 0) this.casters.splice(at, 1);
   }
 
   setShadow(on: boolean): void {
@@ -5041,7 +5059,10 @@ export class CharacterVisual {
     // A veil that drops the weapon-skin VFX hides them and holds the light at 0.
     if (this.veilDrops('weaponVfx')) return;
     this.applyWeaponVfxShed(shed);
-    for (const handle of this.weaponVfx) handle.update(dt);
+    for (const handle of this.weaponVfx) {
+      handle.setCalm(this.weaponVfxCalm);
+      handle.update(dt);
+    }
   }
 
   // Write-elided: setTuning walks every part and rewrites its materials, so the

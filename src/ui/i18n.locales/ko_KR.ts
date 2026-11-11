@@ -345,6 +345,19 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '비활성: 멤버십을 갱신하면 장비 능력치와 세트 효과가 복구됩니다.',
   'entities.items.lantern_seal.name': '등불 인장',
   'entities.items.reins_lantern_hall_destrier.name': '등불 회관 군마의 고삐',
+  'entities.items.reins_quarryheart_charger.name': '채석심장 돌격마의 고삐',
+  'entities.items.remnant_of_the_masterless_strength.name': '주인 없는 힘의 잔해',
+  'entities.items.coffer_of_the_highwatch_vigil.name': '하이워치 파수대의 금고',
+  'entities.npcs.heart_warden_ada_collier.name': '파수꾼 에이다 콜리어',
+  'entities.npcs.heart_warden_ada_collier.title': '하이워치 파수대',
+  'entities.npcs.heart_warden_ada_collier.greeting':
+    '파수대는 마흔 세대 동안 이유도 모른 채 이 산을 지켜보았습니다. 이제 우리는 압니다, {className}. 그 안에서 무엇을 깨우는지 조심하세요.',
+  'entities.quests.q_heart_what_the_heart_let_go.title': '심장이 놓아준 것',
+  'entities.quests.q_heart_what_the_heart_let_go.text':
+    '심장 속의 힘에는 주인도 정신도 없습니다, {playerName}. 하지만 형체는 있지요. 쓰러져도 죽지 않습니다. 그 정수는 떨어져 나와 바위 속으로 달아날 겁니다. 그래도 언제나 무언가는 남습니다. 남은 것을 가져오면 파수대가 자신의 금고에서 보상하겠습니다.',
+  'entities.quests.q_heart_what_the_heart_let_go.completion':
+    '아직 따뜻하군요. 네 가지 힘이 하나의 조각에 묶여 있고, 붙잡히길 원하지 않습니다. 파수대는 약속을 지킵니다. 이 금고를 가져가세요. 이 등반에 걸맞은 것이 들어 있기를.',
+  'entities.quests.q_heart_what_the_heart_let_go.objectives.0.label': '주인 없는 힘의 잔해',
   'entities.items.membership_staff.name': '변화의 지팡이',
   'hudChrome.bags.membershipSlot': '멤버십 가방 칸',
   'hudChrome.bags.membershipSlotLocked': '멤버십으로 이 가방 칸을 잠금 해제하세요.',
@@ -2644,26 +2657,33 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '홈에 등불의 불길을 담은 넓은 강철 검날, 금박 장식, 코등이에서 타오르는 새장 등불, 푸른 가죽 손잡이.',
   'hudChrome.wocStore.skins.lantern_hall_sword.name': '등불 회관의 검',
   'hudChrome.wocStore.skins.hearthbrand_sword.name': '화롯불의 검',
-  'hudChrome.wocStore.skins.hearthbrand_sword.look':
-    '양날이 대장간의 열기로 달아오르고 양면에 녹은 균열이 가지를 치며 뻗은, 검게 그을린 강철의 불꽃 물결 검날. 타오르는 돌을 감싼 청동 불꽃 코등이, 검붉은 가죽 손잡이.',
-  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
-    '등불 회관에는 회관이 세워진 이래 한 번도 꺼진 적 없는 화로가 있고, 개릭 홀트는 이 검날이 그 숯불에 담금질되었다고 맹세한다. 이 검을 지닌 이들은 가장 추운 불침번에도 손잡이가 따뜻하다고 말한다. 검날을 따라 흐르는 불은 겉모습일 뿐이다.',
   'hudChrome.wocStore.skins.squallcrest_sword.name': '폭풍 물결의 검',
-  'hudChrome.wocStore.skins.squallcrest_sword.look':
-    '부서지는 파도처럼 빛나는 날을 지닌 길고 푸른 바다빛 검날. 갈라진 번개를 품은 폭풍의 홈, 검날 밑동을 넘는 금빛 파도, 한쪽 날을 따라 난 지느러미, 폭풍 진주를 감싼 금빛 파도 코등이.',
-  'hudChrome.wocStore.skins.squallcrest_sword.lore':
-    '길드를 위해 항해하던 한 선장이 돛대를 앗아 가고 배를 종처럼 울리게 한 돌풍 속에서 이 검을 가지고 돌아왔다. 개릭은 인장을 받고서만 이 검을 팔며, 사는 이마다 폭풍 전에는 검이 웅웅거린다고 경고한다. 번개와 바다빛은 겉모습일 뿐이다.',
   'hudChrome.wocStore.skins.rimelight_staff.name': '서리빛 지팡이',
-  'hudChrome.wocStore.skins.rimelight_staff.look':
-    '은으로 감싸고 빛나는 서리를 휘감은 창백한 자루. 꼭대기에는 얼음 조각 왕관 속에서 차가운 빛의 거대한 수정을 움켜쥔 은 갈고리가 있고, 깃에는 고드름이 매달려 있다.',
-  'hudChrome.wocStore.skins.rimelight_staff.lore':
-    '등불 회관의 겨울 경비대는 이런 지팡이를 들고 높은 길을 걸으며, 눈 속에서 길을 잃은 여행자들을 위해 꼭대기를 밝혔다. 개릭은 인장에 여유가 있는 회원을 위해 하나를 진열대에 두고 있다. 서리와 그 차가운 빛은 겉모습일 뿐이다.',
-  'hudChrome.wocStore.skins.duskwick_staff.name': '황혼 심지 지팡이',
-  'hudChrome.wocStore.skins.duskwick_staff.look':
-    '쇠로 감싼 두 가닥의 꼬인 검은 나무 자루. 꼭대기에는 휘어 오른 두 뿔 사이에서 보랏빛 황혼의 불꽃을 태우는 열린 쇠 등롱이 있고, 그 바닥에서 사슬이 흔들린다.',
-  'hudChrome.wocStore.skins.duskwick_staff.lore':
-    '회관의 등불은 모두 밝게 타오른다, 단 하나만 빼고. 황혼의 불꽃은 밤의 회관을 지키려고 밝힌 것으로, 다른 등불이 빛을 내는 곳에서 그림자를 낸다. 개릭은 그 심지를 직접 다듬는다. 연기와 보랏빛 광채는 겉모습일 뿐이다.',
   'hudChrome.wocStore.collections.lantern_hall': '등불 회관',
+  // The Smith's Heart raid arms (M16 fills).
+  'hudChrome.wocStore.collections.smiths_heart': '대장장이의 심장',
+  'hudChrome.wocStore.skins.seamcaller_maul.name': '광맥을 부르는 자',
+  'hudChrome.wocStore.skins.seamcaller_maul.look':
+    '띠무늬 채석장 돌 한 덩어리를 깎아 만든 양손 대형 망치. 타오르는 호박을 두른 금테 타격면, 금빛 관 날개, 양 볼에 새겨져 타오르는 금빛 룬, 머리에서 자라난 호박 광맥 결정, 금으로 감은 현무암 자루.',
+  'hudChrome.wocStore.skins.seamcaller_maul.lore':
+    '망치 의회는 공격대에게 손을 들기 전에 노래로 광맥을 깨웠고, 돌은 그 모든 음을 기억한다. 이 망치는 그들의 망치가 쪼갠 돌덩이에서 깎아 냈으며, 휘두를 때마다 룬이 여전히 타오른다. 채석장 파편이 머리 주위를 도는 모습은 마치 산이 그것들을 되찾고 싶어 하는 듯하다. 룬과 도는 돌은 외형일 뿐이다.',
+  'hudChrome.wocStore.skins.squallcrest_sword.look':
+    '번개처럼 밝은 날을 지닌 긴 폭풍강철 검. 양면의 은빛 홈에는 갈라진 벼락이, 칼등에는 갈고리 모양의 바람 지느러미가 있고, 폭풍의 눈 보석을 두른 열린 은빛 고리가 돌풍의 날개처럼 뒤로 뻗는다.',
+  'hudChrome.wocStore.skins.squallcrest_sword.lore':
+    '숨결의 수호자는 심장의 공기를 쉼 없이 돌게 했다. 그것이 쓰러졌을 때 품고 있던 폭풍은 흩어지지 않고 이 검에 깃들었다. 바람은 여전히 강철을 감싸고 번개는 여전히 날을 따라 달리며, 이 검을 든 이들은 고리 속 눈이 하늘을 지켜본다고 맹세한다. 폭풍은 외형일 뿐이다.',
+  'hudChrome.wocStore.skins.rimelight_staff.look':
+    '서리를 감고 얼음 결정이 돋아난 창백한 은 지팡이. 꼭대기에서는 네 개의 은 발톱이 차가운 빛의 거대한 결정을 감싸고, 그 둘레를 얼음 조각의 관이 두르며, 위로는 얼음 파편 하나가 떠 있다.',
+  'hudChrome.wocStore.skins.rimelight_staff.lore':
+    '담금질의 수호자는 심장이 벼린 모든 칼날을 식혀 왔다. 그것이 쓰러졌을 때 가장 마지막까지 빛을 잃지 않은 것이 이 결정이었고, 공격대가 들고 나올 때도 손에 서리가 앉을 만큼 차가웠다. 얼음이 관을 돌고 서리의 룬이 그 둘레를 회전한다. 냉기는 외형일 뿐이다.',
+  'hudChrome.wocStore.skins.hearthbrand_sword.look':
+    '식어 굳은 용암 껍질로 된 넓은 검. 날은 아직 녹아 있고 양면에는 잔불 같은 균열이 그물처럼 퍼져 있으며, 칼등에는 흑요석 이빨이, 검은 쇠 코등이는 녹은 쇳물이 떨어지는 두 뿔로 휘어 용암의 심장을 감싼다.',
+  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
+    '열기의 수호자는 심장이라는 이름이 비롯된 바로 그 불이었다. 그것이 꺼질 때 마지막 용암이 대장간 바닥의 검 모양 틈으로 흘러들어 그곳에서 식었다. 겉은 껍질, 속은 불이다. 그 날은 한 번도 타오르기를 멈춘 적이 없다. 불꽃은 외형일 뿐이다.',
+  'hudChrome.wocStore.skins.duskwick_staff.name': '심장융합 지팡이',
+  'hudChrome.wocStore.skins.duskwick_staff.look':
+    '채석장 돌을 층층이 박은 용광로 청동 지팡이. 꼭대기에는 거대한 금빛 고리가 있고, 네 보석(채석장의 호박, 돌풍, 서리, 불)이 차례로 빛나며 백금빛 핵을 품은 모루의 심장을 둘러싼다.',
+  'hudChrome.wocStore.skins.duskwick_staff.lore':
+    '주인 없는 힘은 심장의 네 광맥이 세상의 모루 위에서 하나의 몸으로 묶인 것이었다. 그것이 부서졌을 때 넷은 흩어지지 않고 이 고리에 깃들어 돌, 바람, 서리, 불의 차례로 타오른다. 한때 차례로 공격했던 것처럼. 네 개의 빛은 외형일 뿐이다.',
   'hudChrome.wocStore.skins.guildmark_arming_sword.name': '길드마크 무장검',
   'hudChrome.wocStore.skins.guildmark_arming_sword.look':
     '푸르게 처리한 강철 칼날, 청동 물고기 꼬리형 십자 가드, 청록색으로 염색한 가죽 손잡이, 작게 찍힌 길드 문장.',
@@ -14358,6 +14378,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.hiddenBadge': '숨김',
   'hudChrome.deeds.titleChip': '칭호 보상',
   'hudChrome.deeds.borderChip': '테두리 보상',
+  'hudChrome.deeds.cosmeticChip': '외형 보상',
+  'hudChrome.deeds.rewardAppearance': '보상: {name} 무기 외형, 계정의 모든 캐릭터 공용',
+  'hudChrome.deeds.rewardMount': '보상: {name} 탈것',
   'hudChrome.deeds.watch': '추적',
   'hudChrome.deeds.unwatch': '추적 해제',
   'hudChrome.deeds.watchFull': '추적 목록이 가득 찼습니다 (최대 {cap}개)',
@@ -14469,6 +14492,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '고대의 나뭇가지에서 내려온 쌍두 황혼 와이번으로, 멈추면 발톱 달린 뒷다리로 서고 움직이면 비전 문양이 새겨진 날개로 지면 위를 활공한다.',
   'hudChrome.mounts.name_lanternback_troll': '등불지기 그룸볼',
   'hudChrome.mounts.name_lantern_hall_destrier': '등불 회관 군마',
+  'hudChrome.mounts.name_quarryheart_charger': '채석심장 돌격마',
   'hudChrome.mounts.name_chimeglass_tortoise': '종유리의 톨리버',
   'hudChrome.mounts.desc_drakemaw_raptor':
     '화산구 칼데라에서 길들여진 둥지 태생 랩터. 온몸이 힘줄과 질주로 이루어졌으며, 아직도 희미한 재 냄새가 난다.',
@@ -14481,6 +14505,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '점등인들이 멍에로 길들인 언덕 트롤. 어깨에 무쇠 왕좌를 지고, 양쪽 팔걸이마다 폭풍 등불이 타오른다.',
   'hudChrome.mounts.desc_lantern_hall_destrier':
     '등불 회관의 군마. 길드의 푸른 천 아래 참나무와 쇠로 된 마갑을 두르고, 안장에서 흔들리는 두 개의 폭풍 등불이 귀갓길을 밝힌다.',
+  'hudChrome.mounts.desc_quarryheart_charger':
+    '대장장이의 심장의 군마. 살아 있는 불길의 몸 위로 채석장 돌판이 떠 있고, 금빛 갈비뼈 너머로 백열의 심장이 고동친다. 이마에는 얼음 수정 뿔, 갈기는 번개가 튀는 바람이다.',
   'hudChrome.mounts.desc_chimeglass_tortoise':
     '소금 평원의 육지거북. 대상 세 세대를 앞질러 걸었다. 그를 거둔 땜장이들이 폭풍유리를 갈아 안경을 만들고 목에 청동 종을 달아, 길은 그를 보기 전에 먼저 듣는다.',
   'hudChrome.mounts.name_thunderstrut_gobbler': '천둥활보 대왕 칠면조',

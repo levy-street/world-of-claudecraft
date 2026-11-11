@@ -93,9 +93,12 @@ export function stepOverLip(s: Pick<BreathScope, 'ctx' | 'inst' | 'st' | 'boss'>
 /** Every body of the claim that has come down in the void dies, fighting or
  *  not. The fall's own hit first (the death recap and the deeds read it);
  *  whatever survives it (an immunity) dies anyway; a game master is set back
- *  on the floor instead. The body is laid back by the gap it fell through. */
-export function stepVoidDeaths(ctx: SimContext, inst: InstanceSlot): void {
+ *  on the floor instead. The body is laid back by the gap it fell through.
+ *  Returns how many raiders the void took this tick (a game master set back
+ *  is none), for the encounter feat (feats.ts). */
+export function stepVoidDeaths(ctx: SimContext, inst: InstanceSlot): number {
   const o = ctx.instanceOriginOf(inst);
+  let fell = 0;
   for (const p of voidCandidates(ctx, inst)) {
     if (p.ghost) continue;
     const lx = p.pos.x - o.x;
@@ -106,8 +109,10 @@ export function stepVoidDeaths(ctx: SimContext, inst: InstanceSlot): void {
       // The landing's own hit killed it first (a fall from an isle, high
       // over the Cornice): its body is laid back all the same, but only a
       // body of THIS claim's summit (never one in the next slot's void).
-      if (p.pos.y < SMITH_HEART_FIELD.voidHeight + 3 && underSummit(lx, lz))
+      if (p.pos.y < SMITH_HEART_FIELD.voidHeight + 3 && underSummit(lx, lz)) {
         layOnFloor(ctx, p, o.x + back.x, o.z + back.z);
+        fell++;
+      }
       continue;
     }
     if (p.gm || (p.profilerInvulnerable && ctx.devCommands)) {
@@ -129,7 +134,9 @@ export function stepVoidDeaths(ctx: SimContext, inst: InstanceSlot): void {
       ctx.handleDeath(p, null, 'Falling');
     }
     layOnFloor(ctx, p, o.x + back.x, o.z + back.z);
+    fell++;
   }
+  return fell;
 }
 
 /** Is claim-local (x, z) under this claim's summit: in its band, and under

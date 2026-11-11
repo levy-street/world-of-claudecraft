@@ -27081,6 +27081,12 @@ export const ASSET_CATALOG: readonly AssetEntry[] = [
     "path": "/models/weapons/rude_awakening_sword.glb"
   },
   {
+    "id": "weapons/seamcaller_maul",
+    "category": "weapons",
+    "label": "Seamcaller Maul",
+    "path": "/models/weapons/seamcaller_maul.glb"
+  },
+  {
     "id": "weapons/shard_of_everwinter",
     "category": "weapons",
     "label": "Shard Of Everwinter",

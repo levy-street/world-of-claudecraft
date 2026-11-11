@@ -132,6 +132,23 @@ export interface MountEmberSpec {
   lanterns: readonly { bone: string; offset: readonly [number, number, number] }[];
 }
 
+/** Ambient particle effect a mount carries (MountVisualSpec.fx). 'quarryheart' is the Smith's
+ *  Heart charger's whole body rig (src/render/quarryheart_charger_fx.ts): the plate float, the
+ *  heartbeat, the wind mane, its sparks, the running trail and the hoofprints. */
+export type MountAmbientFx =
+  | 'slime'
+  | 'exhaust'
+  | 'pipes'
+  | 'sparks'
+  | 'embers'
+  | 'quarryheart'
+  | null;
+
+/** The burst when a mount arrives (MountVisualSpec.summonFx). 'quarryheart' is the charger's
+ *  assembly: its plates fly in round the core, which ignites (quarryheart_charger_fx.ts plays the body and
+ *  its burst; vfx.ts mountSummonGlow throws no shimmer for it). */
+export type MountSummonFxKind = 'shimmer' | 'lanternBurst' | 'quarryheart';
+
 export interface MountVisualSpec {
   /** Tip nose-up on a jump and right itself before landing (see
    *  mount_jump_attitude). Vehicles only: a creature's legs already absorb a
@@ -160,12 +177,12 @@ export interface MountVisualSpec {
   bobShape: 'hover' | 'hop';
   /** Ambient particle effect the renderer emits for this mount: the snail's
    *  slime path while moving, the hover cycle's aether exhaust. */
-  fx: 'slime' | 'exhaust' | 'pipes' | 'sparks' | 'embers' | null;
+  fx: MountAmbientFx;
   /** The ember sources for fx 'embers' (null for every other mount). */
   embers: MountEmberSpec | null;
   /** The burst when the mount is summoned: the shared shimmer every mount throws, or the
    *  lantern-light burst of a mount that carries its own fire. */
-  summonFx: 'shimmer' | 'lanternBurst';
+  summonFx: MountSummonFxKind;
   /** Lit lamps carried on the rig (empty for every mount that carries none). */
   lamps: readonly MountLampSpec[];
   /** Seat bone the rider is anchored to, or null to sit at the fixed `seat`
@@ -187,7 +204,7 @@ const spec = (
   rigged: boolean,
   bob?: { amp: number; hz: number; idle?: boolean; shape?: 'hover' | 'hop' },
   seatFwd = 0,
-  fx: 'slime' | 'exhaust' | 'pipes' | 'sparks' | 'embers' | null = null,
+  fx: MountAmbientFx = null,
   lamps: readonly MountLampSpec[] = [],
   seatBone: MountSeatSpec | null = null,
   // Two rarely-set fields ride an options bag rather than extending an already
@@ -199,7 +216,7 @@ const spec = (
     jumpTips?: boolean;
     groundLift?: number;
     embers?: MountEmberSpec;
-    summonFx?: 'shimmer' | 'lanternBurst';
+    summonFx?: MountSummonFxKind;
     rear?: boolean;
   } = {},
 ): MountVisualSpec => ({
@@ -466,6 +483,37 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
       summonFx: 'lanternBurst',
       // a standing jump rears him onto his hind legs with a whinny (the clip is 'Rear',
       // the manifest's flourish; the take is mount_neigh_lantern_hall_destrier)
+      rear: true,
+    },
+  ),
+  // The Quarryheart Charger (the Smith's Heart raid's reward, scripts/assets/quarryheart_charger/):
+  // built at game scale (one model yard per world yard, the manifest height its Idle height), so
+  // its numbers read straight off the build's CHARGER_REPORT. The saddle bone stands up out of the
+  // seat on the spine at 2.8 over the hooves and 0.12 ahead of the origin; the seat's top sits a
+  // hair under its head. The rider straddles a barrel even broader than the destrier's, both hands
+  // on the reins. Its whole body rig is the 'quarryheart' fx (quarryheart_charger_fx.ts), its
+  // arrival the plates flying in round the core; a standing jump rears it onto its haunches and
+  // the forehooves come down in a ground strike (its 'Rear' clip, the manifest's flourish).
+  quarryheart_charger: spec(
+    'mount_quarryheart_charger',
+    2.78,
+    true,
+    undefined,
+    0.12,
+    'quarryheart',
+    [],
+    { bone: 'saddle', offset: [0, -0.02, 0] },
+    {
+      ride: {
+        spread: 0.8,
+        thigh: 0.3,
+        knee: 0.24,
+        shinSpread: 0.42,
+        ankle: 0.2,
+        hips: -0.05,
+        reins: true,
+      },
+      summonFx: 'quarryheart',
       rear: true,
     },
   ),

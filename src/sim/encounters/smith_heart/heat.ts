@@ -43,6 +43,7 @@ import type { SimContext } from '../../sim_context';
 import { clearThreat } from '../../threat';
 import { DT, type Entity } from '../../types';
 import { claimBoss, clearCastIf } from '../sunken_bastion/claim';
+import { settleSmithHeartFeat } from './feats';
 import { callCinder, clearCinders, dropStrayHunted, stepCinders, syncHunted } from './heat_cinders';
 import { clearFist, landFist, startFist, stepSwells, wakefireHoldsFist } from './heat_fist';
 import { flare, stepFlare, stepWellFire } from './heat_flare';
@@ -472,6 +473,7 @@ function resetHeat(ctx: SimContext, inst: InstanceSlot, boss: Entity): void {
 /** The guardian has fallen: the end is resolved once. */
 function finishHeat(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: HeatFightState): void {
   st.finished = true;
+  settleSmithHeartFeat(ctx, inst, { encounter: 'heat', st });
   const s = scopeOf(ctx, inst, st, boss);
   heatSay(s, boss, 'death');
   cueOnBoss(s, HEAT_CUES.settle);

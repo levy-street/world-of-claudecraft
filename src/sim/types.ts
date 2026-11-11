@@ -1134,7 +1134,10 @@ export type ItemUse =
   | { type: 'armorKit' }
   // A container: using it hands the owner its contents and consumes one unit
   // (src/sim/emissary_cache.ts owns the one container shipped so far).
-  | { type: 'container'; container: 'emissary_cache' | 'gourdlight_pouch' | 'thatchgrin_sack' }
+  | {
+      type: 'container';
+      container: 'emissary_cache' | 'gourdlight_pouch' | 'thatchgrin_sack' | 'smith_heart_coffer';
+    }
   // A seasonal event toy (src/sim/seasonal/seasonal_items.ts): the worn pumpkin
   // head toggle and the Jar of Mischief. Refused while its event is closed.
   | {

@@ -126,6 +126,23 @@ export function recordAccountDeed(
   return true;
 }
 
+/** Drop one character's entry against a deed (a dev reset: `/dev heart feat ... reset`;
+ *  earned records are otherwise append-only). @returns true when an entry went. */
+export function forgetAccountDeedEarner(
+  ledger: AccountLedger,
+  deedId: string,
+  characterId: number,
+): boolean {
+  const list = ledger.deeds.get(deedId);
+  if (!list) return false;
+  const kept = list.filter((e) => e.characterId !== characterId);
+  if (kept.length === list.length) return false;
+  if (kept.length === 0) ledger.deeds.delete(deedId);
+  else ledger.deeds.set(deedId, kept);
+  bumpRev(ledger);
+  return true;
+}
+
 /** Record a relic finder under an accountRelicKey. Same idempotence contract
  *  as recordAccountDeed. */
 export function recordAccountRelic(
