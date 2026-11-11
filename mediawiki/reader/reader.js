@@ -11,7 +11,7 @@ import {
 import { directoryArt } from './directory_art.js';
 import { layoutDirectory } from './directory_layout.js';
 import { mountWikiTooltips } from './hover_tooltip.js';
-import { renderMath } from './math.js';
+import { renderMath, renderScale } from './math.js';
 import { mountRelatedPages, relatedPageIndex } from './related_pages.js';
 import { tooltipLookup } from './tooltip_content.js';
 
@@ -63,7 +63,9 @@ function inline(s) {
   const icon = s.match(/^<woc-art path="(\/ui\/[A-Za-z0-9_/-]+\.webp)" size="icon" \/>\s*/);
   if (icon) s = s.slice(icon[0].length);
   s = s
-    .replace(/<woc-math>([\s\S]*?)<\/woc-math>/g, (_, expr) => keep(renderMath(expr)))
+    .replace(/<woc-math(?: label="([^"]*)")?>([\s\S]*?)<\/woc-math>/g, (_, label, expr) =>
+      keep(label ? renderScale(label, expr) : renderMath(expr)),
+    )
     .replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (_, title, label) =>
       keep(link(title, label || title)),
     )

@@ -1320,3 +1320,45 @@ body[data-woc-site] .searchbox #lookup {
   color: var(--gold);
   font-weight: 600;
 }
+
+/* Power bonus: a short label, with the working in a pop-up on hover, focus or tap. */
+.woc-scale {
+  position: relative;
+  color: var(--gold);
+  white-space: nowrap;
+  border-bottom: 1px dotted currentColor;
+  cursor: help;
+}
+.woc-scale-tip {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: calc(100% + 6px);
+  z-index: 20;
+  width: max-content;
+  max-width: min(420px, 80vw);
+  padding: 10px 12px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  white-space: normal;
+  font-weight: 400;
+  cursor: default;
+}
+.woc-scale:hover .woc-scale-tip,
+.woc-scale:focus .woc-scale-tip,
+.woc-scale:focus-within .woc-scale-tip {
+  display: block;
+}
+.woc-scale-tip .woc-math {
+  border: 0;
+  padding: 0;
+  background: none;
+}
+.woc-scale-tip small {
+  display: block;
+  margin-top: 6px;
+  color: var(--text-dim);
+  font-size: 13px;
+}

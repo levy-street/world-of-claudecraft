@@ -130,7 +130,7 @@ function contextCategory(before: string, after: string) {
 // Verbatim islands and markup syntax must never become part of a link.
 // Capturing a whole map also protects the SVG-style coordinates and pin badges.
 const protectedMarkup =
-  /<woc-math>[\s\S]*?<\/woc-math>|<!--[\s\S]*?-->|<(code|pre|nowiki|syntaxhighlight)\b[^>]*>[\s\S]*?<\/\1>|^```[\s\S]*?^```[^\n]*|`[^`\n]*`|<div class="woc-map"[\s\S]*?<\/div>|<[^>\n]+>|\[\[[^\]]*\]\]|\[https?:\/\/[^\]]*\]|\{\{[^{}]*\}\}|https?:\/\/[^\s)\]]+|(?<![\w])\/[\w-]+(?:\/[\w.-]+)*|^[ \t]*={2,6}[^\n]*={2,6}[ \t]*$|^[ \t]*(?:\{\||!)[^\n]*|&(?:#\d+|\w+);/gim;
+  /<woc-math[^>]*>[\s\S]*?<\/woc-math>|<!--[\s\S]*?-->|<(code|pre|nowiki|syntaxhighlight)\b[^>]*>[\s\S]*?<\/\1>|^```[\s\S]*?^```[^\n]*|`[^`\n]*`|<div class="woc-map"[\s\S]*?<\/div>|<[^>\n]+>|\[\[[^\]]*\]\]|\[https?:\/\/[^\]]*\]|\{\{[^{}]*\}\}|https?:\/\/[^\s)\]]+|(?<![\w])\/[\w-]+(?:\/[\w.-]+)*|^[ \t]*={2,6}[^\n]*={2,6}[ \t]*$|^[ \t]*(?:\{\||!)[^\n]*|&(?:#\d+|\w+);/gim;
 
 /** Link actual article names in visible wikitext, once the complete catalog
  * exists. Existing links stay authoritative for explicitly disambiguated names. */

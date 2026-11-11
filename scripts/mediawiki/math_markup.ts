@@ -14,17 +14,21 @@ const factorText = (f: Factor) =>
 const factorValue = (f: Factor) =>
   typeof f === 'number' ? f : 'frac' in f ? Number(f.frac[0]) / Number(f.frac[1]) : 1 / f.div;
 
-/** "Stat × a × frac(b, c)", followed by "= Stat × 0.4" or "≈ Stat × 0.4286" when there is
+/** A power bonus. The page shows the short label, "(+ 85.7% Healing Power)", and the
+ *  full working appears when the reader points at it. The working is
+ *  "Stat × a × frac(b, c)", followed by "= Stat × 0.4" or "≈ Stat × 0.4286" when there is
  *  more than one number to combine, so a reader never has to work out the order. */
 export function scaledStat(stat: string, factors: Factor[]): string {
-  if (!factors.length) return math(stat);
+  const labelled = (value: number, expr: string) =>
+    `<woc-math label="+ ${Number((value * 100).toFixed(1))}% ${stat}">${expr}</woc-math>`;
+  if (!factors.length) return labelled(1, stat);
   const expr = factors.reduce(
     (text, f) => text + (typeof f === 'object' && 'div' in f ? ' ' : ' × ') + factorText(f),
     stat,
   );
   const single = factors.length === 1 && typeof factors[0] === 'number';
-  if (single) return math(expr);
+  if (single) return labelled(factors[0] as number, expr);
   const value = factors.reduce<number>((v, f) => v * factorValue(f), 1);
   const shown = Number(value.toFixed(4));
-  return math(`${expr} ${shown === value ? '=' : '≈'} ${stat} × ${shown}`);
+  return labelled(value, `${expr} ${shown === value ? '=' : '≈'} ${stat} × ${shown}`);
 }

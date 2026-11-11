@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { parseMath, renderMath } from '../mediawiki/reader/math.js';
+import { parseMath, renderMath, renderScale } from '../mediawiki/reader/math.js';
 import { math, scaledStat } from '../scripts/mediawiki/math_markup';
 
-const inner = (s) => s.replace(/^<woc-math>|<\/woc-math>$/g, '');
+const inner = (s) => s.replace(/^<woc-math[^>]*>|<\/woc-math>$/g, '');
+const label = (s) => /label="([^"]*)"/.exec(s)?.[1];
 
 describe('encyclopedia formulas', () => {
   it('writes the factors in order and states the combined multiplier', () => {
@@ -17,6 +18,13 @@ describe('encyclopedia formulas', () => {
     // A single plain factor needs no combined value.
     expect(inner(scaledStat('Attack Power', [0.15]))).toBe('Attack Power × 0.15');
     expect(math('x')).toBe('<woc-math>x</woc-math>');
+    // The page shows a short percent label; the working rides along for the hover.
+    expect(label(scaledStat('Healing Power', [2, { frac: [1.5, 3.5] }]))).toBe(
+      '+ 85.7% Healing Power',
+    );
+    expect(label(scaledStat('Spell Power', [{ frac: [1.75, 3.5] }]))).toBe('+ 50% Spell Power');
+    expect(label(scaledStat('Attack Power', [0.15]))).toBe('+ 15% Attack Power');
+    expect(label(scaledStat('Spell Power', []))).toBe('+ 100% Spell Power');
   });
 
   it('draws fractions stacked, keeps a readable text form and nests calls', () => {
@@ -41,5 +49,13 @@ describe('encyclopedia formulas', () => {
     expect(html).toContain('&lt;b&gt;x&lt;/b&gt;');
     expect(html).toContain('&quot;y&quot;');
     expect(html).toContain('&amp; z');
+  });
+
+  it('shows a power bonus as a label with its working in a pop-up', () => {
+    const html = renderScale('+ 85.7% <b>', 'Healing Power × 2 × frac(1.5, 3.5)');
+    expect(html.startsWith('<span class="woc-scale" tabindex="0">(+ 85.7% &lt;b&gt;)')).toBe(true);
+    expect(html).toContain('<span class="woc-scale-tip" role="tooltip"><span class="woc-math">');
+    expect(html).toContain('<span class="woc-frac-top" aria-hidden="true">1.5</span>');
+    expect(html).toContain('Rounded to the nearest whole number.');
   });
 });

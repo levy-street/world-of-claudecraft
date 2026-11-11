@@ -22,7 +22,8 @@ import { type Factor, frac, math, scaledStat } from './math_markup';
 const pct = (v: number) => `${Number((v * 100).toFixed(6))}%`;
 const range = (min: number, max: number) => (min === max ? String(min) : `${min} to ${max}`);
 // The power bonus is rounded on its own and then added to the base roll.
-const add = (formula: string) => `Add ${formula}, rounded to the nearest whole number.`;
+// The bonus chip follows the base number: "42 to 51 (+ 85.7% Healing Power)."
+const add = (formula: string) => `${formula}.`;
 type Scaled = { stat: string; factors: Factor[] };
 
 // Keep the quotients intact: 1.5 / 3.5 is exact, while a truncated percentage
@@ -79,7 +80,7 @@ export function abilityScalingLines(res: ResolvedAbility): string[] {
             : def.channel || e.type === 'groundAoE'
               ? 'Damage per pulse'
               : 'Damage';
-        const lines = [`${label} is ${range(e.min, e.max)}. ${add(formula)}`];
+        const lines = [`${label} is ${range(e.min, e.max)} ${add(formula)}`];
         if ('damageMult' in e && e.damageMult !== undefined && e.damageMult !== 1)
           lines.push(`Then multiply that total by ${e.damageMult}.`);
         if ('radius' in e) lines.push(`Radius: ${e.radius} yd.`);
@@ -103,7 +104,7 @@ export function abilityScalingLines(res: ResolvedAbility): string[] {
           lines.push(`Each tick heals you for ${pct(e.healFrac)} of the damage it deals.`);
         if (e.type === 'sporeBurst')
           lines.push(
-            `Heals each ally for ${range(e.healMin, e.healMax)}. ${add(direct(heal, true))}`,
+            `Heals each ally for ${range(e.healMin, e.healMax)} ${add(direct(heal, true))}`,
           );
         if (e.type === 'directDamage' && e.vsRootedMult)
           lines.push(`If the target is rooted, this hit is multiplied by ${e.vsRootedMult}.`);
@@ -120,7 +121,7 @@ export function abilityScalingLines(res: ResolvedAbility): string[] {
           ? channel({ stat: 'Healing Power', factors: [] })
           : direct(heal, e.type === 'aoeHeal');
         const lines = [
-          `Healing${def.channel ? ' per pulse' : ''} is ${range(e.min, e.max)}. ${add(amount)}`,
+          `Healing${def.channel ? ' per pulse' : ''} is ${range(e.min, e.max)} ${add(amount)}`,
         ];
         if (e.type === 'chainHeal')
           lines.push(
@@ -156,7 +157,7 @@ export function abilityScalingLines(res: ResolvedAbility): string[] {
         lines.push(
           hybrid
             ? 'Only the instant part gets the power bonus. The ticks over time do not get one of their own.'
-            : `Add ${tick(isHeal ? heal : power, e.interval)} to every tick, rounded to the nearest whole number.`,
+            : `Every tick also gets ${tick(isHeal ? heal : power, e.interval)}.`,
         );
         return lines;
       }
@@ -222,12 +223,12 @@ export function abilityScalingLines(res: ResolvedAbility): string[] {
       }
       case 'frozenOrb':
         return [
-          `The orb travels for ${e.duration} sec. Every ${e.interval} sec, it hits enemies within ${e.radius} yd for ${range(e.min, e.max)}. ${add(direct(power, true))} The power bonus is locked in when you release the orb.`,
+          `The orb travels for ${e.duration} sec. Every ${e.interval} sec, it hits enemies within ${e.radius} yd for ${range(e.min, e.max)} ${add(direct(power, true))} The power bonus is locked in when you release the orb.`,
         ];
       case 'empoweredCone':
         return e.stages.map(
           (s, i) =>
-            `Charge stage ${i + 1} reaches ${s.range} yd and deals ${range(s.min, s.max)}. ${add(scaledStat(power.stat, [...power.factors, castFraction((res.castTime * (i + 1)) / e.stages.length), SPELL_AOE_COEFF_MULT]))}${e.guaranteedCritLevel === i + 1 ? ' It is always a critical hit.' : ''}${s.rootDuration ? ' Roots for ' + s.rootDuration + ' sec.' : ''}${s.incapacitateDuration ? ' Incapacitates for ' + s.incapacitateDuration + ' sec. Diminishing returns can make this shorter.' : ''}`,
+            `Charge stage ${i + 1} reaches ${s.range} yd and deals ${range(s.min, s.max)} ${add(scaledStat(power.stat, [...power.factors, castFraction((res.castTime * (i + 1)) / e.stages.length), SPELL_AOE_COEFF_MULT]))}${e.guaranteedCritLevel === i + 1 ? ' It is always a critical hit.' : ''}${s.rootDuration ? ' Roots for ' + s.rootDuration + ' sec.' : ''}${s.incapacitateDuration ? ' Incapacitates for ' + s.incapacitateDuration + ' sec. Diminishing returns can make this shorter.' : ''}`,
         );
       case 'valkyrsCalling':
         return [
@@ -251,7 +252,7 @@ export function abilityScalingLines(res: ResolvedAbility): string[] {
         ];
       case 'afflictionViolence':
         return [
-          `It ticks every ${e.interval ?? 2} sec for ${e.duration} sec. Each tick deals ${e.damage} base damage. ${add(tick(power, e.interval ?? 2))} The reactive strike deals the ${e.damage} base damage without this power bonus.`,
+          `It ticks every ${e.interval ?? 2} sec for ${e.duration} sec. Each tick deals ${e.damage} base damage ${add(tick(power, e.interval ?? 2))} The reactive strike deals the ${e.damage} base damage without this power bonus.`,
         ];
       case 'afflictionSentence':
         return [
@@ -281,12 +282,12 @@ export function abilityScalingLines(res: ResolvedAbility): string[] {
         return [
           ...(e.deal
             ? [
-                `Using up the effect deals ${range(e.deal.min, e.deal.max)}. ${add(direct(power, false))}`,
+                `Using up the effect deals ${range(e.deal.min, e.deal.max)} ${add(direct(power, false))}`,
               ]
             : []),
           ...(e.heal
             ? [
-                `Using up the effect heals for ${range(e.heal.min, e.heal.max)}. ${add(direct(heal, false))}`,
+                `Using up the effect heals for ${range(e.heal.min, e.heal.max)} ${add(direct(heal, false))}`,
               ]
             : []),
         ];

@@ -79,7 +79,7 @@ $wgHooks['ParserFirstCallInit'][] = static function ( $parser ) use ( $wgScriptP
     } );
     // Formulas: frac(top, bottom) is a stacked fraction and pow(base, exponent) a
     // superscript, matching mediawiki/reader/math.js. All other text is escaped.
-    $parser->setHook( 'woc-math', static function ( $input ) {
+    $parser->setHook( 'woc-math', static function ( $input, $args ) {
         // Walk whole UTF-8 characters so ×, ÷ and − are never split mid-byte.
         $chars = preg_split( '//u', (string)$input, -1, PREG_SPLIT_NO_EMPTY ) ?: [];
         $i = 0;
@@ -125,6 +125,14 @@ $wgHooks['ParserFirstCallInit'][] = static function ( $parser ) use ( $wgScriptP
             }
             return [ $html, $text ];
         };
-        return '<span class="woc-math">' . $sequence( [] )[0] . '</span>';
+        $formula = '<span class="woc-math">' . $sequence( [] )[0] . '</span>';
+        // A power bonus shows its short label; the working appears on hover or focus.
+        $label = $args['label'] ?? '';
+        if ( $label === '' ) {
+            return $formula;
+        }
+        return '<span class="woc-scale" tabindex="0">(' . htmlspecialchars( $label, ENT_QUOTES )
+            . ')<span class="woc-scale-tip" role="tooltip">' . $formula
+            . '<small>Rounded to the nearest whole number.</small></span></span>';
     } );
 };
