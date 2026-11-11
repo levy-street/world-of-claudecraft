@@ -80,8 +80,23 @@ export const quench = {
   tids: { guardian: 'heart_quench_guardian' },
   tp: '/dev heart tp lake',
   resetGrace: 8000,
+  // Living Warmth: healing a wounded player lowers their cold, so a healer
+  // heals the coldest wounded first (a full-health one gains nothing).
+  healUrgency(world, p) {
+    if (p.hp >= p.mhp * 0.97) return 0;
+    const cold = auraOf(p, QUENCH_AURAS.cold)?.value ?? 0;
+    return cold > 50 ? Math.min(0.3, (cold - 50) / 150) : 0;
+  },
+  // The huddle IS the healer's spot: it moves with the huddle (the ice
+  // strains under a group that stands still).
+  healerSticky: false,
   setup(diff) {
-    const out = ['/dev heart kill hammer', '/dev heart gates', '/dev heart quench reset'];
+    const out = [
+      '/dev heart kill hammer',
+      '/dev heart kill trash',
+      '/dev heart gates',
+      '/dev heart quench reset',
+    ];
     if (diff === 'mythic') out.push('/dev heart quench mythic on');
     else if (diff === 'heroic') out.push('/dev heart quench heroic on');
     else out.push('/dev heart quench heroic off', '/dev heart quench mythic off');

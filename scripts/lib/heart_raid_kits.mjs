@@ -376,7 +376,7 @@ function crusted(members, h) {
 const byNeed = (members, h) =>
   [...members].sort((x, y) => need(y, h) - need(x, h) || x.pid - y.pid);
 function need(p, h) {
-  return 1 - p.frac + (p.tank ? 0.12 : 0) - (h.incoming(p.pid) ? 0.3 : 0);
+  return 1 - p.frac + (p.tank ? 0.12 : 0) + (p.urgency ?? 0) - (h.incoming(p.pid) ? 0.3 : 0);
 }
 
 export const HEALERS = {

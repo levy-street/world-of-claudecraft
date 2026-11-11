@@ -410,7 +410,7 @@ async function waitEntrance(world, bots, byKey, boss) {
   let logged = null;
   let woke = false;
   for (;;) {
-    world.read();
+    watchPrepull(world);
     drainAll(bots);
     const states = world.bodies().map(entranceOf).filter(Boolean);
     if (states.length === 0) break;
@@ -450,6 +450,35 @@ async function waitEntrance(world, bots, byKey, boss) {
   for (const b of bots) b.stop();
 }
 
+/** Before the pull nothing should be fighting: a boss or an add that takes
+ *  someone, or a raider who dies, is logged (the early-pull hunt). */
+function watchPrepull(world) {
+  world.read();
+  world.early ??= { seen: new Set(), dead: new Set() };
+  const e = world.early;
+  for (const m of [...world.bodies(), ...(world.adds ?? [])]) {
+    if (!alive(m) || m.aggro == null || e.seen.has(m.id)) continue;
+    e.seen.add(m.id);
+    const on = world.players.get(m.aggro);
+    log(
+      `EARLY PULL: ${m.nm ?? m.tid} (#${m.id}) is on ${on?.name ?? `#${m.aggro}`} at ${on ? hypot(on, m).toFixed(1) : '?'} yd before the pull`,
+    );
+  }
+  for (const p of world.players.values())
+    if (p.dead && !e.dead.has(p.pid)) {
+      e.dead.add(p.pid);
+      log(`EARLY DEATH: ${p.name} died before the pull`);
+    }
+}
+
+async function napWatching(world, ms) {
+  const end = Date.now() + ms;
+  while (Date.now() < end) {
+    watchPrepull(world);
+    await sleep(Math.min(250, Math.max(10, end - Date.now())));
+  }
+}
+
 async function prepullBuffs(world, bots, byKey) {
   // Each spec's own buffs and imbues (PREPULL), one round per list position,
   // the cast-time ones (a summoned demon) given the time they need; a `*`
@@ -463,20 +492,20 @@ async function prepullBuffs(world, bots, byKey) {
       b.cmd({ cmd: 'cast', ability: id });
       wait = Math.max(wait, ((b.kit?.get(id)?.castTime ?? 0) + 0.8) * 1000);
     }
-    await sleep(wait);
+    await napWatching(world, wait);
   }
   for (const b of bots) {
     for (const id of PREPULL[b.spec.key] ?? []) {
       if (!id.endsWith('*')) continue;
       for (const m of b.self?.party?.members ?? []) {
         b.cmd({ cmd: 'cast', ability: id.slice(0, -1), target: m.pid });
-        await sleep(1600);
+        await napWatching(world, 1600);
       }
     }
   }
   const t0 = Date.now();
   while (Date.now() - t0 < 8000) {
-    world.read();
+    watchPrepull(world);
     let all = true;
     for (const b of bots) if (!world.moveTo(b, world.prepullSpot(b), 1.5)) all = false;
     drainAll(bots);
@@ -1084,7 +1113,9 @@ function rolePosition(world, st, b, me, hazards, boss) {
     // A healer casts instead of chasing a spot that drifts with the bosses: it
     // keeps where it stands while that is safe, near its spot and still
     // reaches and sees everyone it must heal (a human healer stands and casts).
-    if (role === 'healer') {
+    // A boss whose spots ARE the mechanic (the Quench's moving huddles) opts
+    // out with `healerSticky: false`.
+    if (role === 'healer' && boss.healerSticky !== false) {
       const here = { x: b.self.x, z: b.self.z };
       const sight = sightTargets(world, st, b, boss);
       if (
@@ -1300,6 +1331,9 @@ function healerAct(world, st, b, me, stillFor) {
       value: a.value ?? 0,
     })),
     near: living.filter((q) => q.pid !== p.pid && hypot(q, p) <= 10 && q.hp < q.mhp * 0.9).length,
+    // A boss module's extra reason to heal this one first (0 to 0.3): the
+    // Quench's Living Warmth makes healing a freezing player lower their cold.
+    urgency: world.boss.healUrgency?.(world, p) ?? 0,
   }));
   const h = {
     members,
