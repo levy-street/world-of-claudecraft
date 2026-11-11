@@ -10,6 +10,7 @@ import { abilityDisplayDescription, abilityEffectText } from '../../src/ui/abili
 import { abilityIndexGroup, itemActionSource, MEMBERSHIP_GROUP } from './ability_access';
 import { referenceAbility, specializationExamples } from './ability_builds';
 import { mediawikiAbilityDescription } from './ability_description';
+import { mergeRankText, rankValues } from './ability_ranks';
 import { abilityScalingLines } from './ability_scaling';
 import { type AbilityPageTools, affectedAbilities } from './talent_articles';
 
@@ -129,34 +130,53 @@ export function abilityArticle(
       'Required quest',
       link(titleBy.quest.get(def.requiresQuest)!, QUESTS[def.requiresQuest].name),
     ]);
-  const details: string[][] = [
-    ['School', clean(def.school)],
-    [
-      'Activation',
-      def.passive
-        ? 'Passive'
-        : def.onNextSwing
-          ? 'Happens on your next weapon swing'
-          : def.channel
-            ? `Channel for ${def.channel.duration} sec, ${def.channel.ticks} pulses`
-            : def.castTime > 0
-              ? `${def.castTime} sec cast`
-              : 'Instant',
-    ],
+  // Every rank of the ability, lowest first. Values that change with rank are written
+  // once, separated by slashes, in this order.
+  const rankSections = [
+    base,
+    ...(def.ranks ?? []).map((rank) => replaceResolvedAbility(base, def.id, rank.level)),
   ];
+  const ranked = rankSections.length > 1;
+  const perRank = (value: (res: ResolvedAbility) => string | number) =>
+    rankValues(rankSections.map(value));
+  // The headline numbers, shown as a strip under the title.
+  const stats: string[][] = [];
+  const details: string[][] = [['School', clean(def.school)]];
   if (!def.passive) {
-    details.push([
-      'Base cost',
+    const costs = perRank((res) => res.cost);
+    stats.push([
+      'Cost',
       def.spendsAllResource
-        ? `Uses all your ${resource(def)}${def.spendResourceCap ? ', up to ' + def.spendResourceCap : ''}. You need at least ${def.cost}.`
-        : def.cost
-          ? def.cost + ' ' + resource(def)
+        ? `Uses all your ${resource(def)}${def.spendResourceCap ? ', up to ' + def.spendResourceCap : ''}. You need at least ${costs}.`
+        : rankSections.some((res) => res.cost)
+          ? costs + ' ' + resource(def)
           : 'Free',
     ]);
-    details.push([
-      def.maxCharges ? 'Recharge per charge' : 'Base cooldown',
-      def.cooldown ? def.cooldown + ' sec' : 'None',
+  }
+  stats.push([
+    'Cast time',
+    def.passive
+      ? 'Passive'
+      : def.onNextSwing
+        ? 'Happens on your next weapon swing'
+        : def.channel
+          ? `Channel for ${def.channel.duration} sec, ${def.channel.ticks} pulses`
+          : rankSections.some((res) => res.castTime > 0)
+            ? perRank((res) => res.castTime) + ' sec'
+            : 'Instant',
+  ]);
+  if (!def.passive) {
+    stats.push([
+      def.maxCharges ? 'Recharge per charge' : 'Cooldown',
+      rankSections.some((res) => res.cooldown) ? perRank((res) => res.cooldown) + ' sec' : 'None',
     ]);
+    if (def.range > 0 || def.requiresTarget)
+      stats.push([
+        'Range',
+        (def.minRange ? def.minRange + ' to ' : '') + (def.range || MELEE_RANGE) + ' yd',
+      ]);
+    if (ranked)
+      stats.push(['Rank levels', [rankLevel, ...def.ranks!.map((r) => r.level)].join(' / ')]);
     if (def.maxCharges) details.push(['Maximum charges', String(def.maxCharges)]);
     details.push([
       'Global cooldown',
@@ -178,11 +198,6 @@ export function abilityArticle(
                 ? 'An enemy'
                 : 'You do not need a target';
     details.push(['Target', target + (def.partyOnlyTarget ? ' (your group or raid only)' : '')]);
-    if (def.range > 0 || def.requiresTarget)
-      details.push([
-        'Range',
-        (def.minRange ? def.minRange + ' to ' : '') + (def.range || MELEE_RANGE) + ' yd',
-      ]);
   }
   const requirements: string[] = [];
   if (requiredForms(def).length)
@@ -241,43 +256,45 @@ export function abilityArticle(
         '.',
     );
   }
-  const rankSections = [
-    base,
-    ...(def.ranks ?? []).map((rank) => replaceResolvedAbility(base, def.id, rank.level)),
-  ];
-  const scaling = abilityScalingLines(base);
+  const rankLabel = (i: number) =>
+    i === 0 ? 'Rank 1' : `Rank ${def.ranks![i - 1].rank} (level ${def.ranks![i - 1].level})`;
+  // One sentence for all ranks when they only differ by numbers; otherwise one per rank.
+  const acrossRanks = (texts: string[]): string[] => {
+    const merged = mergeRankText(texts);
+    return merged === null ? texts.map((t, i) => rankLabel(i) + ': ' + t) : [merged];
+  };
+  const perRankScaling = rankSections.map(abilityScalingLines);
+  const scaling = perRankScaling.every((lines) => lines.length === perRankScaling[0].length)
+    ? perRankScaling[0].flatMap((_, line) => acrossRanks(perRankScaling.map((l) => l[line])))
+    : perRankScaling.flatMap((lines, i) => lines.map((l) => rankLabel(i) + ': ' + l));
+  const rankKey = ranked
+    ? `Numbers separated by slashes are for ranks ${rankSections.map((_, i) => i + 1).join(' / ')}. You learn them at level ${[rankLevel, ...def.ranks!.map((r) => r.level)].join(' / ')}.`
+    : '';
+  // Min-to-max values are a fresh random roll on every use (rng.range in the sim).
+  const rolled = perRankScaling[0].join(' ').match(/\b(\d[\d,]*) to (\d[\d,]*)\b/);
+  const rollNote = rolled
+    ? `A range like ${rolled[0]} is a random roll. Each time you use the ability, the game picks a number in that range. Every number in the range is equally likely.`
+    : '';
+  const how = acrossRanks(rankSections.map(description));
   let text =
-    section('How it works', description(base)) +
+    section('How it works', how.length === 1 ? how[0] : bullets(how)) +
+    section('Ability stats', table(stats)) +
     section('Learn and use', table([...grantRows, ...details]));
   if (requirements.length) text += section('Cast rules', bullets(requirements));
   if (scaling.length)
     text += section(
-      'Base scaling',
-      "These are rank 1 numbers. They do not include your specialization, talents, buffs or critical hits. They also do not include the target's defenses.\n" +
-        bullets(scaling),
+      'Scaling',
+      "These numbers do not include your specialization, talents, buffs or critical hits. They also do not include the target's defenses." +
+        (rankKey ? ' ' + rankKey : '') +
+        '\n' +
+        bullets(scaling) +
+        (rollNote ? '\n\n' + rollNote : ''),
     );
-  if (rankSections.length > 1)
-    text += section(
-      'Higher ranks',
-      table(
-        rankSections.slice(1).map((res, i) => {
-          const rank = def.ranks![i];
-          return [
-            `Rank ${rank.rank} (level ${rank.level})`,
-            [
-              `${res.cost} ${resource(def)}, ${def.channel ? def.channel.duration + ' sec channel' : res.castTime ? res.castTime + ' sec cast' : 'instant'}.`,
-              description(res),
-              ...abilityScalingLines(res),
-              ...(res.threatFlat ? [`Adds ${res.threatFlat} threat.`] : []),
-            ].join(' '),
-          ];
-        }),
-      ),
-    );
-  if (base.threatFlat || base.threatMult !== 1)
+  else if (rankKey) text += section('Ranks', rankKey);
+  if (rankSections.some((res) => res.threatFlat) || base.threatMult !== 1)
     text += section(
       'Threat',
-      `Rank 1 adds ${base.threatFlat} threat. The threat from its damage is also multiplied by ${base.threatMult}. Stance and form bonuses to threat are applied after that.`,
+      `Adds ${perRank((res) => res.threatFlat)} threat${ranked ? ' (by rank)' : ''}. The threat from its damage is also multiplied by ${base.threatMult}. Stance and form bonuses to threat are applied after that.`,
     );
   const buildRules = Object.entries(def.specNotes ?? {}).map(
     ([id, note]) => specLink(id) + ': ' + note,

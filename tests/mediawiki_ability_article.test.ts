@@ -46,7 +46,14 @@ describe('Player encyclopedia ability mechanics', () => {
   it('describes rank-specific direct hits, hybrid burns and the exact power fraction', () => {
     const fireball = ABILITIES.fireball,
       article = abilityArticle(fireball, tools);
-    expect(article).toContain('Higher ranks');
+    // Ranks share one line: values that change are listed in rank order, in bold.
+    expect(article).not.toContain('Higher ranks');
+    const ranks = 1 + fireball.ranks!.length;
+    const merged = article.match(/'''(\d+ to \d+(?: \/ \d+ to \d+)+)'''/);
+    expect(merged).not.toBeNull();
+    expect(merged![1].split(' / ')).toHaveLength(ranks);
+    expect(article).toContain('Rank levels');
+    expect(article).toMatch(/A range like \d+ to \d+ is a random roll/);
     expect(article).toContain('The ticks over time do not get one of their own');
     // The formula is a <woc-math> block with a stacked fraction and its combined value.
     const match = article.match(

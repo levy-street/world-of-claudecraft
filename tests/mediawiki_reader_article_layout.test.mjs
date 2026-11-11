@@ -42,3 +42,20 @@ it('keeps all deed rewards together and the related article link outside the inf
   expect(view.querySelector('article > p a').textContent).toBe('Book of Deeds');
   expect([...view.querySelectorAll('h2')].map((h) => h.textContent)).toEqual(['How to earn']);
 });
+
+it('lifts ability stats into a strip of label and value pairs under the title', () => {
+  const view = document.createElement('main');
+  view.innerHTML =
+    '<div class="article-heading"><h1>Bolt</h1></div><div class="tags"></div><article><h2>How it works</h2><p>Zaps.</p><h2>Ability stats</h2><div class="scroll"><table><tr><th>Cost</th><td>25 / 35 mana</td></tr><tr><th>Range</th><td>30 yd</td></tr></table></div><h2>Scaling</h2><p>More.</p></article>';
+  layoutArticle(view, { title: 'Bolt (Ability)', categories: ['Abilities'], text: '' }, true);
+  const stats = [...view.querySelectorAll('.ability-stats div')].map((d) => [
+    d.querySelector('dt').textContent,
+    d.querySelector('dd').textContent,
+  ]);
+  expect(stats).toEqual([
+    ['Cost', '25 / 35 mana'],
+    ['Range', '30 yd'],
+  ]);
+  expect([...view.querySelectorAll('h2')].map((h) => h.textContent)).not.toContain('Ability stats');
+  expect(view.querySelector('.ability-stats').closest('.wiki-opening')).toBeTruthy();
+});

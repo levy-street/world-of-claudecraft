@@ -110,6 +110,28 @@ function extractLead(article, headings) {
   return first;
 }
 
+// The headline numbers of an ability (cost, cast time, cooldown, range) as one strip
+// under the title. Values for several ranks arrive already joined with slashes.
+function statStrip(article, headings) {
+  const heading = headings.find((el) => el.textContent === 'Ability stats');
+  const table = sectionBody(heading)[0]?.querySelector?.('table');
+  if (!table) return null;
+  const strip = element('dl', 'ability-stats');
+  for (const row of table.querySelectorAll('tr')) {
+    const label = row.querySelector('th'),
+      value = row.querySelector('td');
+    if (!label || !value) continue;
+    const stat = element('div');
+    const dd = element('dd');
+    dd.append(...value.childNodes);
+    stat.append(element('dt', null, label.textContent), dd);
+    strip.append(stat);
+  }
+  for (const node of sectionBody(heading)) node.remove();
+  heading.remove();
+  return strip;
+}
+
 export function layoutArticle(view, page, wide, zoneName) {
   const article = view.querySelector('article'),
     pageHeading = view.querySelector('.article-heading');
@@ -129,6 +151,7 @@ export function layoutArticle(view, page, wide, zoneName) {
     facts.remove();
     heading.remove();
   }
+  const stats = kind === 'Abilities' ? statStrip(article, headings) : null;
   const lead = extractLead(article, headings);
   if (lead) {
     lead.remove();
@@ -192,6 +215,7 @@ export function layoutArticle(view, page, wide, zoneName) {
   organizeReferenceDetails(article);
   const toc = contents(article, page.title, wide);
   const front = element('div', 'wiki-opening');
+  if (stats) front.append(stats);
   if (introduction) front.append(introduction);
   if (toc) front.append(toc);
   if (front.childNodes.length) article.prepend(front);
