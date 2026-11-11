@@ -205,7 +205,13 @@ export const final = {
   // lands on everyone under it at once.
   topUp(world) {
     const b = world.mobs.boss;
-    return (!!b && b.cast === FINAL_CASTS.anvil) || (world.o?.anvils.length ?? 0) > 0;
+    // The whole Hammer visit: its first Anvil falls 16 s in, too soon to
+    // lift a worn raid in the bar's 6 s alone.
+    return (
+      (!!b && b.cast === FINAL_CASTS.anvil) ||
+      (world.o?.anvils.length ?? 0) > 0 ||
+      zoneOfBoss(world) === 'hammer'
+    );
   },
   kickables(world) {
     return world.splinters
@@ -392,7 +398,13 @@ function track(world, st) {
     const a = st.anvilSeen;
     const under = world.living().filter((p) => hypot(p, a) <= T.anvilR);
     const crushed = under.filter((p) => hasAura(p, FINAL_AURAS.crushed)).length;
-    log(`ANVIL fell: ${under.length} under (${crushed} already Crushed)`);
+    const out = world
+      .living()
+      .filter((p) => hypot(p, a) > T.anvilR)
+      .map((p) => `${p.name} ${hypot(p, a).toFixed(0)} yd ${p.bot?.prevDuty ?? '?'}`);
+    log(
+      `ANVIL fell: ${under.length} under (${crushed} already Crushed)${out.length ? `; out: ${out.join(', ')}` : ''}`,
+    );
     st.anvils = (st.anvils ?? 0) + 1;
     st.anvilFellAt = Date.now();
     st.anvilUnder = [...(st.anvilUnder ?? []), under.length];
@@ -433,11 +445,12 @@ function duty(world, st, b, me) {
   const anvil = o.anvils[0];
   // The off-tank soaks too, and the main tank when the mark lies at the
   // boss's feet: 9,000 split is lethal on cloth with three bodies missing.
-  const soaks =
-    !me.tank ||
-    me.pid !== st.mainTankPid ||
-    (alive(boss) && hypot(anvil ?? me, boss) <= (anvil?.r ?? 0) + (boss.reach ?? 0) + 3);
-  if (anvil && soaks && !hasAura(me, FINAL_AURAS.crushed)) {
+  // Every body under it, the off-tank too: the share is the total over the
+  // soakers. The main tank comes only when the mark lies clear of the ring
+  // (the boss follows him, and in the ring Heart Unbound strikes the raid).
+  const mainTank = me.tank && me.pid === st.mainTankPid;
+  const ringClear = !!anvil && hypot(anvil, world.center) > HEART_QUARTERS.ringR + T.anvilR + 3;
+  if (anvil && (!mainTank || ringClear) && !hasAura(me, FINAL_AURAS.crushed)) {
     const i = world.bots.indexOf(b);
     return {
       goal: add(anvil, { x: Math.sin(i * 1.3), z: Math.cos(i * 1.3) }, Math.min(3, anvil.r - 2)),

@@ -409,6 +409,12 @@ export const HEALERS = {
     // A raid-wide hit is coming: the group heal at two short, then the big
     // heal on anyone not full.
     if (h.topUp) {
+      // Psalm of Warding (instant, 6 s cooldown) on the lowest unshielded.
+      const bare = list.find(
+        (p) => p.frac < 0.75 && !p.auras.some((a) => a.id === 'power_word_shield'),
+      );
+      if (bare && h.ready('power_word_shield'))
+        return { id: 'power_word_shield', target: bare.pid };
       const short = h.members.filter((p) => p.frac < 0.95).length;
       if (short >= 2 && h.ready('prayer_of_healing')) return { id: 'prayer_of_healing' };
       if (low.frac < 0.95 && h.ready('heal')) return { id: 'heal', target: low.pid };
@@ -451,7 +457,7 @@ export const HEALERS = {
       (p) => p.frac < 0.85 && !p.auras.some((a) => a.id === 'renew' && a.mine),
     );
     if (renewAny && h.mana > 0.45 && h.ready('renew')) return { id: 'renew', target: renewAny.pid };
-    if (low.frac < 0.88 && h.mana > 0.35 && h.ready('heal')) return { id: 'heal', target: low.pid };
+    if (low.frac < 0.9 && h.mana > 0.25 && h.ready('heal')) return { id: 'heal', target: low.pid };
     return null;
   },
   // Spiritmend (restoration shaman): Primal Exaltation on cooldown, Stoneward
