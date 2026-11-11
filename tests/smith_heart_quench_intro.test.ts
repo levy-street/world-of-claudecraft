@@ -310,6 +310,34 @@ describe('the dev pull', () => {
     expect(c.boss().inCombat).toBe(true);
   });
 
+  it('a run switch (the tier, Living Rime on or off) never pulls her', () => {
+    // The bot raid sets its run up from wherever its leader stands; a run
+    // setting pulled her onto him (the Heroic bot raid wiped before its pull).
+    const c = claim();
+    c.run(2);
+    for (const line of [
+      '/dev heart quench heroic on',
+      '/dev heart quench rime off',
+      '/dev heart quench rime on',
+      '/dev heart quench heroic off',
+    ]) {
+      expect(c.dev(line)).toBe(true);
+      c.run(2);
+      expect(quenchIntroState(c.boss()).stage).toBe('dormant');
+      expect(c.boss().inCombat).toBe(false);
+      expect(c.boss().smithHeartQuench).toBeUndefined();
+    }
+  });
+
+  it('the rime as a mechanic (rime cast) still pulls her first', () => {
+    const c = claim();
+    c.run(2);
+    c.dev('/dev heart quench rime cast');
+    c.run(2);
+    expect(quenchIntroState(c.boss()).stage).toBe('done');
+    expect(c.boss().inCombat).toBe(true);
+  });
+
   it('the readout names the entrance while she is out of her fight', () => {
     const c = claim();
     c.run(2);

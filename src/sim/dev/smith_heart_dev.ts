@@ -525,12 +525,17 @@ export function handleSmithHeartDevChat(ctx: SimContext, raw: string, pid: numbe
       return true;
     }
     // A mechanic forced on a guardian nobody pulled pulls it first (an
-    // unpulled guardian resets its fight on the next tick).
+    // unpulled guardian resets its fight on the next tick). A run setting
+    // (the tier, Living Rime on or off) is no mechanic: it pulls nothing.
+    // Tokenised as quenchDevTrigger reads it (anything past the switch ignored).
+    const switchArg = arg.split(' ')[1];
+    const runSetting = verbName === 'rime' && (switchArg === 'on' || switchArg === 'off');
     if (
       verbName !== 'reset' &&
       verbName !== 'intro' &&
       verbName !== 'heroic' &&
       verbName !== 'mythic' &&
+      !runSetting &&
       boss &&
       !boss.dead &&
       !boss.inCombat
