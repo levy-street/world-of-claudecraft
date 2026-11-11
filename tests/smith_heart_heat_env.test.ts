@@ -152,10 +152,12 @@ function faced(p: { x: number; z: number }): string | null {
 }
 
 describe('the Heat painted kit as shipped', () => {
-  it('ships in KTX2, under 6 MB', () => {
+  // The dressed pass added the seamed basalt, the thin fall, the great fall, the cliff wall
+  // and the molten shore (thirteen Tripo atlases in all), each under its own KTX2 cap.
+  it('ships in KTX2, under 9 MB', () => {
     expect(existsSync(KIT)).toBe(true);
     expect([...mimes]).toEqual(['image/ktx2']);
-    expect(readFileSync(KIT).length).toBeLessThan(6 * 1024 * 1024);
+    expect(readFileSync(KIT).length).toBeLessThan(9 * 1024 * 1024);
   });
 
   it('holds every piece the plans place and the paintings the runtime reads', () => {
@@ -349,10 +351,10 @@ describe('the basalt round the hall', () => {
   it('rings the hall with stacks on the mountain, clear of every walk, the way in open', () => {
     const ring = planHeatEnvRing();
     expect(ring.length).toBeGreaterThanOrEqual(10);
-    const m = HEAT_ENV_ROCK[HEAT_ENV_RING.piece];
     for (const p of ring) {
+      const m = HEAT_ENV_ROCK[p.piece];
       const bearing = (Math.atan2(p.x - HEAT_ENV_RING.x, p.z - HEAT_ENV_RING.z) * 180) / Math.PI;
-      expect(Math.abs(bearing - 90)).toBeGreaterThanOrEqual(HEAT_ENV_RING.eastDeg);
+      expect(Math.abs(bearing - 90)).toBeGreaterThanOrEqual(HEAT_ENV_RING.eastDeg - 1e-9);
       const k = p.scale ?? 1;
       expect(hammerEnvFrontClear(p.x, p.z, p.rot, (m.w * k) / 2)).toBe(true);
       expect(heartOpenAir(p.x, p.z, 0)).toBe(false);

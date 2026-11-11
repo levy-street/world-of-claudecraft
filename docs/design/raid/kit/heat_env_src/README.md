@@ -37,10 +37,28 @@ white-gold sun and the one far molten fall; the night (B) lent its taller column
 > a hazy white-gold sun / an ember night of smoke lit from below.] Keep the floor darker and
 > calmer than the glowing mouth and crystal.
 
+## The dressed pass (2026-11-10)
+
+`concept/fv_arena_dressed.webp`: ChatGPT's paint-over of an in-game screenshot of the hall
+(the first rebuild) with the dusk concept attached as the look, asked for a richer version of
+the same place: the background basalt dressed with molten seams and branching cracks, thin
+falls pouring down the far cliffs, small molten pools at the cliffs' feet, smoke and embers,
+the floor kept dark and calm. The owner's direction from there: procedural shader veins on
+the old rock were tried and rejected ("looks ass"), then Tripo models of the concept's own
+cliffs, the background molten a darker orange so the guardian pops, and the whole hall "as
+close as possible" to the concept. Six more sheets, each a crop of the concept's own cliff
+attached with the format sheet: a tall and a broad stack of seamed basalt (`seam_tall`,
+`seam_wide`, the molten in branching seams down the joints), a thin molten fall (`fall_thin`),
+the concept's great fall cliff (`great_fall`), its tiered cliff wall with thin falls
+(`cliff_wall`) and a low molten shore of stumps and pools (`molten_shore`). Their atlases take
+the grade's `seams` and `deep` options (`heat_grade.mjs`: the thin molten kept, grown by a
+texel and haloed, and the deep orange ramp `HEAT_DEEP_MOLTEN`).
+
 ## Rebuild
 
 Split each sheet into its three views (`hearth`, `altar`, `crystal`, `boulder`, `columns`,
-`cliff_tall`, `cliff_wide`, `fall`):
+`cliff_tall`, `cliff_wide`, `fall`, and the dressed pass's `seam_tall`, `seam_wide`,
+`fall_thin`, `great_fall`, `cliff_wall`, `molten_shore`):
 
 ```bash
 node scripts/assets/smith_heart_hammer_colossi/split_views.mjs docs/design/raid/kit/heat_env_src/sheets/fv_sheet_hearth.webp tmp/heat_env/hearth/views
@@ -82,8 +100,15 @@ wrap is continuous.
 | A tall cliff stack of columnar basalt | `sheets/fv_sheet_cliff_tall.webp` | `0cbccc68-8a2f-4a03-b9d0-c13ca0763be7` | 3000 | 110 |
 | A broad bluff of columnar basalt | `sheets/fv_sheet_cliff_wide.webp` | `d1ddbbb5-b0b4-420d-99d0-78bda1bf31bf` | 3000 | 110 |
 | A cliff with one molten fall | `sheets/fv_sheet_fall.webp` | `5887cbb5-3bfe-4829-b638-8762e249cf19` | 3000 | 110 |
+| A tall stack of seamed basalt | `sheets/fv_sheet_seam_tall.webp` | `17c494ed-687a-4c40-83c1-cc9d392f158d` | 3000 | 110 |
+| A broad bluff of seamed basalt | `sheets/fv_sheet_seam_wide.webp` | `be5f184e-3127-4b0a-b560-7d2c73299d5a` | 3000 | 110 |
+| A thin molten fall | `sheets/fv_sheet_fall_thin.webp` | `ed40c75b-40ba-4587-9052-db0791bca708` | 3000 | 110 |
+| The concept's great fall cliff | `sheets/fv_sheet_great_fall.webp` | `79df1383-a46f-4556-b597-cdf3ae91cb3a` | 3000 | 110 |
+| The concept's tiered cliff wall | `sheets/fv_sheet_cliff_wall.webp` | `eb526187-2bee-42e2-a565-b59bc970adda` | 3000 | 110 |
+| A molten shore of stumps and pools | `sheets/fv_sheet_molten_shore.webp` | `7c2fbe43-fbf2-460a-9d29-21d2d2bc68a2` | 3000 | 110 |
 
-880 credits in all, every model on its first build.
+1,540 credits in all (880 for the first eight, 660 for the dressed pass's six), every model on
+its first build.
 
 ## The prompts
 

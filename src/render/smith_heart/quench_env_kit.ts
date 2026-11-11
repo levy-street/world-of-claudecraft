@@ -16,6 +16,7 @@ import { loadGltf, releaseGltf } from '../assets/loader';
 import type { DetailPair } from '../authored_field/field_textures';
 import { GFX } from '../gfx';
 import { markSharedMaterial } from '../shared_resource';
+import { envAreaClip } from './env_area_clip';
 import {
   bakeEnvNode,
   type EnvBaked,
@@ -25,7 +26,6 @@ import {
   isEnvPieceNode,
 } from './env_kit_bake';
 import { applyEnvLook, type EnvStrokes } from './env_kit_look';
-import { envAreaClip } from './env_area_clip';
 import type { HeartKitPlacement } from './heart_kit_core';
 import { LAKE_ICE_PAINTED } from './quench_lake_ice';
 

@@ -11,7 +11,7 @@
 // less colourful", then "more aligned with the previous one": ChatGPT repainted the Heart's
 // painting as this panorama, the same four skies, and the dome takes both down to about
 // a third to a half of their saturation, the game's grade giving some back). The dome draws both (heart_sky.ts `heartFourSky`); sources and prompt
-// docs/design/raid/kit/heart_sky_src/. A standalone KTX2 like the world's skies
+// docs/design/raid/kit/heart_env_src/. A standalone KTX2 like the world's skies
 // (`public/env/`), fetched when the raid's interior is built, never at boot: nobody outside
 // the raid draws it. Until it lands (or if it never does) the Heart keeps its procedural
 // ember-violet night.

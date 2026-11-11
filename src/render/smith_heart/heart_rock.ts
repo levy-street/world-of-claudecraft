@@ -130,7 +130,12 @@ export function buildHeartRock(
   if (heatPainted) {
     group.add(
       // The band variant: their rock round the hall dissolves seen from the Heat.
-      instanceHeatEnv(rock.filter(heat).map(fitHeatEnvRock), lowGfx, 'smithHeartHeatEnvRock', 'band'),
+      instanceHeatEnv(
+        rock.filter(heat).map(fitHeatEnvRock),
+        lowGfx,
+        'smithHeartHeatEnvRock',
+        'band',
+      ),
     );
   }
   return group;

@@ -172,10 +172,10 @@ void main() {
 function smokeOpenFrag(): string {
   const anchor = '* vFade * uAlpha;';
   if (!SMOKE_FRAG.includes(anchor)) throw new Error('heat set: smoke shader changed');
-  return SMOKE_FRAG.replace('uniform float uAlpha;', 'uniform float uAlpha;\nuniform float uHeatOpen;').replace(
-    anchor,
-    '* vFade * uAlpha * uHeatOpen;',
-  );
+  return SMOKE_FRAG.replace(
+    'uniform float uAlpha;',
+    'uniform float uAlpha;\nuniform float uHeatOpen;',
+  ).replace(anchor, '* vFade * uAlpha * uHeatOpen;');
 }
 
 const col = (hex: number) => ({ value: new THREE.Color(hex) });
@@ -292,7 +292,13 @@ export function buildHeatEnvSet(lowGfx: boolean): THREE.Group {
       plan.glows.map((g) => [g.x, g.y, g.z] as HeartAirV3),
       plan.glows.map((g, i) => [heartHash(i, 4801), g.size, 0, 0] as HeartAirV4),
     ),
-    setMaterial('smithHeartHeatSetGlows', HALO_VERT, GLOW_OPEN_FRAG, { uColor: col(HEAT_SET_LOOK.glow) }, true),
+    setMaterial(
+      'smithHeartHeatSetGlows',
+      HALO_VERT,
+      GLOW_OPEN_FRAG,
+      { uColor: col(HEAT_SET_LOOK.glow) },
+      true,
+    ),
     8,
   );
   // The smoke between the tiers.
@@ -302,7 +308,12 @@ export function buildHeatEnvSet(lowGfx: boolean): THREE.Group {
     const puffs = lowGfx ? 4 : 9;
     for (let i = 0; i < puffs; i++) {
       smoke.push([s.x, s.y, s.z]);
-      smokeP.push([(i + heartHash(si, i + 4850) * 0.5) / puffs, s.rise, 1.6 + heartHash(si, i) * 1.0, s.size]);
+      smokeP.push([
+        (i + heartHash(si, i + 4850) * 0.5) / puffs,
+        s.rise,
+        1.6 + heartHash(si, i) * 1.0,
+        s.size,
+      ]);
     }
   });
   add(
@@ -312,7 +323,11 @@ export function buildHeatEnvSet(lowGfx: boolean): THREE.Group {
       'smithHeartHeatSetSmoke',
       SMOKE_VERT,
       smokeOpenFrag(),
-      { uColor: col(HEAT_SET_LOOK.smoke), uLit: col(HEAT_SET_LOOK.smokeLit), uAlpha: { value: 0.36 } },
+      {
+        uColor: col(HEAT_SET_LOOK.smoke),
+        uLit: col(HEAT_SET_LOOK.smokeLit),
+        uAlpha: { value: 0.36 },
+      },
       false,
     ),
     7,

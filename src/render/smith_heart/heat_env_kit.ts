@@ -14,6 +14,7 @@ import * as THREE from 'three';
 import { loadGltf, releaseGltf } from '../assets/loader';
 import { GFX } from '../gfx';
 import { markSharedMaterial } from '../shared_resource';
+import { envAreaClip } from './env_area_clip';
 import {
   bakeEnvNode,
   type EnvBaked,
@@ -24,7 +25,6 @@ import {
 } from './env_kit_bake';
 import { applyEnvLook, type EnvStrokes } from './env_kit_look';
 import type { HeartKitPlacement } from './heart_kit_core';
-import { envAreaClip } from './env_area_clip';
 import { QUENCH_ENV_ANTI_TILE_GLSL, QUENCH_ENV_ANTI_TILE_MAP } from './quench_env_kit';
 
 export const SMITH_HEART_HEAT_ENV_KIT_URL = '/models/props/smith_heart_heat_env_kit.glb';

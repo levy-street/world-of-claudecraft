@@ -1566,16 +1566,68 @@ goes to the basalt. Prompts and Tripo task ids: `docs/design/raid/kit/heat_env_s
 **Kept.** The fight: the wellspring the guardian stands sunk in and its pool and lip
 (`smith_heart_fx/heat_well_fx.ts`), every footprint and effect; the pour's channel, spill and
 wellspring (`heat_pour.ts`); the anvil bridge's arch under its deck; the seams of fire on the
-floor (the molten accents); the Heat's air (`heat_air.ts`); the light and fog
-(`smithHeartHeat`: already the concept's warm west key over a cool slate fill). If the kit has
-not landed, the old Heat draws as it did until the interior is next built.
+floor (the molten accents); the Heat's air (`heat_air.ts`). If the kit has not landed, the
+old Heat draws as it did until the interior is next built.
 
 **The contrast.** The guardian is red-orange molten; the hall is dark sooted basalt, its fire
 held to the crystal, the altar's crack, the seams and one far fall (`env_kit_look.ts`'s gold
 glow: the backdrop's at less than half the hall's own lit pieces'), so the guardian stands out
 against its own hall.
 
-**Budget.** The kit is 5.0 MB, fetched at the raid's door with the old Heat kit, never at boot.
+**The dressed pass (2026-11-10).** The owner's paint-over concept
+(`heat_env_src/concept/fv_arena_dressed.webp`: the hall's screenshot repainted richer) set the
+target, "as close as possible, as good as the ice". Procedural molten veins in the rock's
+shader were tried and rejected; six more Tripo models of the concept's own cliffs replaced
+them (seamed basalt stacks and bluffs, a thin fall, the great fall cliff, the tiered cliff
+wall, a molten shore; their molten graded a deep orange so the guardian pops). Round the hall:
+- **The open region** (`HEAT_ENV_OPEN`, `env_area_clip.ts` `heatBand`): from inside the Heat the
+  old mountain, the rock kit and every vein's painted rock between 54 and 150 yd of the forge
+  (further on the far bearings) dissolve on the rock's camera dither, so the new pieces stand
+  free; from anywhere else nothing changes. The tiers and the concept's pieces are drawn only
+  from the Heat (`heatRing`).
+- **The tiers and the concept's pieces** (`HEAT_ENV_TIERS`, `HEAT_ENV_CONCEPT_PIECES`): pillars,
+  a molten shore, plain cliffs behind the guardian, a crown and a far ring at natural scale,
+  each stack jittered by hand (never into the way in); two great falls and four cliff walls
+  where the concept paints them.
+- **The set** (`heat_env_set_core.ts`, `heat_env_set.ts`): a crusted magma lake round the hall
+  under every tier, the great falls' flowing ribbons laid on their painted rivers (measured off
+  the models, `HEAT_FALL_RIBBON`) and flowing down, a glow where each lands and round the
+  cliffs' feet, smoke climbing between the tiers; all drawn only from the Heat.
+- **The light**: the key low in the south-east, raking the walls a raid facing the guardian
+  looks at (from the west it backlit every one of them black), a dim ember bounce from below, a
+  mauve-grey haze (`SMITH_HEART_HEAT_FOG`), the painted sky graded to the concept's smoky mauve,
+  the shade floor lifted: the palette measured against the concept, the molten the only bright
+  warm thing in it.
+
+**Budget.** The kit is 8.4 MB (fourteen Tripo atlases), fetched at the raid's door with the old
+Heat kit, never at boot.
+
+### 5.26 The Ring's and the Heart's painted pass, and the four-way skies
+
+The owner's ask (2026-11-11): "do the rest of the environments", the Ring and the Heart, and
+"with the last environment it's all the elements combined, so we can reuse": no new model, the
+four veins' painted kits reused. Concepts and sky paintings, prompts:
+`docs/design/raid/kit/heart_env_src/`. Nothing here touches `src/sim/`.
+
+| Piece | Now | Where |
+|---|---|---|
+| The Ring's stone | The Ring kit's paving, curbs, stairs, parapets, dais and standing stones in the concept's pale grey-mauve, graded from the kit's own vertex paint so every slab's value, the joints and the wear survive | the kit's `ringStone` material (`ring_stone_look.ts`), `ring_kit.ts` |
+| The pit's mist | Three sheets of mist drifting round the pit between the dais and the Ring's wall, each its own way, every sheet under the walks (no eye's line to the seal crosses one); the low tier two | `ring_set_core.ts` `RING_MIST`, `ring_set.ts` |
+| The runes | Each vein's rune carved on the stones at its mouth (the Breath's storm bolt north, the Quench's star of ice east, the Heat's flame west, the Hammer's sun on the jambs at the Grand Stair's head), glowing low while the vein sleeps and blazing once it is lit (the seal's own memory: the runes say what the seal and the rivers already say); every tier | `ring_set_core.ts` `planRingRunes`, `ringRuneLevel` |
+| The Ring's light | The key from the north-east, low (the concept's: from the North Stair's head the Grand Stair's quarry cliffs stand lit gold), a dusk-violet shade | `SMITH_HEART_RING_LIGHT` |
+| The Heart's crown | Behind each landmark, out of the chasm, its element's great cliffs from its vein's own kit in two tiers (the Breath's storm spires north, the Quench's glacier east, the Hammer's quarry cliffs south, the Heat's seamed basalt and its great fall west), clear of every walk, no bluff grown past its cap; drawn only from the Heart, the mountain's heightfield opened round them from inside it | `heart_env_dress_core.ts`, `heart_env_dress.ts`, `env_area_clip.ts` `heart` |
+| The Heart's sky | The four-way night: one painting of the whole sky seen straight up, its middle the zenith, a quarter over each element's quarter, all four swirling together overhead, lightning walking the storm's quarter | `heart_four_sky.ts`, `heart_sky.ts` `heartFourSky` |
+| The main map's sky | Wherever no vein's own sky holds (the Ring, at the middle of the four), the same four skies as a horizon panorama, each vein's quarter over its way out, its foot pressed down behind the Ring's cliffs, all four blended into one violet overhead | `heart_sky.ts` `ringFourSky` |
+
+**Kept.** The landmarks and their eruption (which quarter is awake is read off them), the
+seal, the rivers, the portal and every walk; a vein's own sky still takes over inside it. If a
+kit or a sky has not landed, that part draws as it did.
+
+**The colour.** The owner's "less colourful": both skies at a third to a half of their
+paintings' saturation (the game's grade gives some back), the Ring's darker than the Heart's.
+
+**Budget.** The two skies are 1.1 MB and 2.3 MB of KTX2, fetched with the kits at the raid's
+door, never at boot.
 
 ## 6. Set pieces (phase 2 specs)
 

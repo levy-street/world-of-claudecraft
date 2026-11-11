@@ -10,8 +10,8 @@ import type { SmithHeartVein } from '../../sim/content/smith_heart_layout';
 import { sharedUniforms } from '../gfx';
 import type { HeartSealView } from './heart_seal_core';
 import {
-  RING_MIST,
   planRingRunes,
+  RING_MIST,
   ringMistMesh,
   ringRuneLevel,
   ringRuneVeinIndex,

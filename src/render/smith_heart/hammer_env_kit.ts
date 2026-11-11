@@ -14,6 +14,7 @@ import * as THREE from 'three';
 import { loadGltf, releaseGltf } from '../assets/loader';
 import { GFX, sharedUniforms } from '../gfx';
 import { markSharedMaterial } from '../shared_resource';
+import { envAreaClip } from './env_area_clip';
 import {
   bakeEnvNode,
   type EnvBaked,
@@ -23,7 +24,6 @@ import {
   isEnvPieceNode,
 } from './env_kit_bake';
 import { applyEnvLook } from './env_kit_look';
-import { envAreaClip } from './env_area_clip';
 import { hammerEnvFlameMesh } from './hammer_env_flames';
 import { HAMMER_ENV_BRAZIER_TOP, planHammerEnvBraziers } from './hammer_env_plan_core';
 import type { HeartKitPlacement } from './heart_kit_core';

@@ -49,8 +49,10 @@ import { dressHammerVein, ensureHammerKit, HAMMER_KIT_KINDS, hammerKitReady } fr
 import { heartArrivalFlare, heartArrivalVein } from './heart_arrival_light_core';
 import { heartCliffPaint } from './heart_cliff_paint_core';
 import { heartCollapseDim, heartCollapseHeartLevel } from './heart_collapse_core';
+import { buildHeartEnvDress, heartOpenMountainLayer } from './heart_env_dress';
 import { inBreathLight, inHammerSky, inHeatLight, inQuenchLight } from './heart_environment';
 import { heartFinalDarkness } from './heart_final_core';
+import { ensureHeartFourSky, heartFourSkyTexture, heartRingSkyTexture } from './heart_four_sky';
 import { buildHeartGates } from './heart_gates';
 import { ensureHeartKit, heartKitProgramWarmers, SMITH_HEART_GATE_KIT_URL } from './heart_kit';
 import { buildHeartLights } from './heart_lights';
@@ -69,9 +71,9 @@ import { dressHeartMountain, ensureHeartRockKit } from './heart_rock';
 import {
   setHeartRockBreathPaint,
   setHeartRockCore,
-  setHeartRockHeatOpen,
   setHeartRockHammer,
   setHeartRockHammerPaint,
+  setHeartRockHeatOpen,
   setHeartRockHeatPaint,
   setHeartRockQuenchPaint,
   setHeartRockSlot,
@@ -91,12 +93,8 @@ import {
 } from './heart_room_kit_plan_core';
 import { buildHeartSeal } from './heart_seal';
 import { heartSealSlotKey, heartSealView, newHeartSealView } from './heart_seal_core';
-import { ensureHeartFourSky, heartFourSkyTexture, heartRingSkyTexture } from './heart_four_sky';
 import { buildHeartSky } from './heart_sky';
 import { buildHeatAir } from './heat_air';
-import { buildHeatEnvSet } from './heat_env_set';
-import { buildRingSet } from './ring_set';
-import { buildHeartEnvDress, heartOpenMountainLayer } from './heart_env_dress';
 import {
   heatEnvFloorMaterial,
   heatEnvKitReady,
@@ -105,6 +103,7 @@ import {
   heatEnvSkyTexture,
 } from './heat_env_kit';
 import { heatRockPaintLayer } from './heat_env_rock_paint';
+import { buildHeatEnvSet } from './heat_env_set';
 import { hearthFloorMaterial } from './heat_hearth_floor';
 import { dressHeat, ensureHeatKit, HEAT_KIT_KINDS, heatKitReady } from './heat_kit';
 import { HEAT_KIT_SHALLOW } from './heat_kit_plan_core';
@@ -128,6 +127,7 @@ import {
   RING_KIT_OMIT_TOPS,
   ringKitReady,
 } from './ring_kit';
+import { buildRingSet } from './ring_set';
 
 export interface SmithHeartInteriorDeps {
   lowGfx: boolean;

@@ -41,7 +41,6 @@
 import * as THREE from 'three';
 import { SUNKEN_BASTION_FOG_COLOR } from '../fog_scene_state';
 import { sharedUniforms } from '../gfx';
-import { HEART_FOUR_SKY, HEART_RING_SKY } from './heart_four_sky';
 import {
   SMITH_HEART_BREATH_FOG,
   SMITH_HEART_HAMMER_FOG,
@@ -50,6 +49,7 @@ import {
   SMITH_HEART_QUENCH_FOG,
   SMITH_HEART_QUENCH_LIGHT,
 } from './heart_environment';
+import { HEART_FOUR_SKY, HEART_RING_SKY } from './heart_four_sky';
 
 export interface HeartSkyOptions {
   lowGfx: boolean;

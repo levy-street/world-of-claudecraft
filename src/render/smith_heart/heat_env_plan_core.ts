@@ -337,11 +337,58 @@ export interface HeatTier {
  *  the haze behind it, both low enough that the sky shows over them. Render only, in the sightline plan, drawn only from the
  *  Heat (env_area_clip.ts). */
 export const HEAT_ENV_TIERS: readonly HeatTier[] = [
-  { r: 72, step: 34, offset: 10, piece: 'Env_BasaltTall', seamed: 'Env_SeamTall', foot: -9, scale: 0.6, minScale: 0.35 },
-  { r: 63, step: 15, offset: 4, piece: 'Env_MoltenShore', seamed: 'Env_MoltenShore', foot: -6, scale: 1.05, minScale: 0.5, shunBackdrop: true },
-  { r: 100, step: 11, offset: 0, piece: 'Env_BasaltTall', seamed: 'Env_BasaltTall', foot: -9, scale: 1.0, minScale: 0.6, sector: [-122, -58] },
-  { r: 130, step: 10, offset: 5, piece: 'Env_BasaltTall', seamed: 'Env_SeamTall', foot: -4, scale: 0.95, minScale: 0.6 },
-  { r: 168, step: 7, offset: 3, piece: 'Env_BasaltTall', seamed: 'Env_SeamTall', foot: -4, scale: 0.8, minScale: 0.5 },
+  {
+    r: 72,
+    step: 34,
+    offset: 10,
+    piece: 'Env_BasaltTall',
+    seamed: 'Env_SeamTall',
+    foot: -9,
+    scale: 0.6,
+    minScale: 0.35,
+  },
+  {
+    r: 63,
+    step: 15,
+    offset: 4,
+    piece: 'Env_MoltenShore',
+    seamed: 'Env_MoltenShore',
+    foot: -6,
+    scale: 1.05,
+    minScale: 0.5,
+    shunBackdrop: true,
+  },
+  {
+    r: 100,
+    step: 11,
+    offset: 0,
+    piece: 'Env_BasaltTall',
+    seamed: 'Env_BasaltTall',
+    foot: -9,
+    scale: 1.0,
+    minScale: 0.6,
+    sector: [-122, -58],
+  },
+  {
+    r: 130,
+    step: 10,
+    offset: 5,
+    piece: 'Env_BasaltTall',
+    seamed: 'Env_SeamTall',
+    foot: -4,
+    scale: 0.95,
+    minScale: 0.6,
+  },
+  {
+    r: 168,
+    step: 7,
+    offset: 3,
+    piece: 'Env_BasaltTall',
+    seamed: 'Env_SeamTall',
+    foot: -4,
+    scale: 0.8,
+    minScale: 0.5,
+  },
 ];
 
 /** The tiers' hand: each stack's bearing off its grid (degrees), its scale (a share either
@@ -360,7 +407,10 @@ function planTier(T: HeatTier, ti: number): HeartKitPlacement[] {
     if (Math.abs(deg - 90) < R.eastDeg) continue;
     if (T.sector && (deg < T.sector[0] || deg > T.sector[1])) continue;
     const h = (k: number) => heartHash(ti * 131 + i, k + 4400) * 2 - 1;
-    const at = ((deg + h(1) * J.deg) * Math.PI) / 180;
+    // The hand never carries a stack into the way in.
+    let jd = deg + h(1) * J.deg;
+    if (Math.abs(jd - 90) < R.eastDeg) jd = 90 + Math.sign(deg - 90) * R.eastDeg;
+    const at = (jd * Math.PI) / 180;
     const x = R.x + Math.sin(at) * T.r;
     const z = R.z + Math.cos(at) * T.r;
     if (T.shunBackdrop && inHeatGuardianBackdrop(x, z)) continue;

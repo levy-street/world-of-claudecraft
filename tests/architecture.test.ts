@@ -1116,6 +1116,12 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart/quench_env_plan_core.ts',
   // The Heat vein's painted rebuild: what stands in for what, its fall, ring and paint.
   'src/render/smith_heart/heat_env_plan_core.ts',
+  // The Heat's set round its hall: the magma lake, the falls' ribbons, the glows and smoke.
+  'src/render/smith_heart/heat_env_set_core.ts',
+  // The Heart's crown dressed with the four veins' painted rock.
+  'src/render/smith_heart/heart_env_dress_core.ts',
+  // The Ring's set: the pit's mist and each vein's rune on its standing stones.
+  'src/render/smith_heart/ring_set_core.ts',
   // The painted rock's shader both painted veins lay over the rock they keep.
   'src/render/smith_heart/env_rock_paint_core.ts',
   // The Hammer vein's painted rebuild: what stands in for what, and the new ruins.
