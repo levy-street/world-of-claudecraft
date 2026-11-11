@@ -282,6 +282,48 @@ describe('referral game host', () => {
     // The friend never acknowledged the original start prompt; nothing new joins it.
     expect(h.frames.get(200)?.notices.map((n) => n.type)).toEqual(['start']);
   });
+  it('explains why no card started only once per invite that a new character accepts', async () => {
+    const h = setup();
+    await flush();
+    const reasons = (id: number) =>
+      (h.frames.get(id)?.notices ?? []).filter(
+        (n) => n.type === 'reason' && n.reason === 'levelTooHigh',
+      ).length;
+    // `joinedPids` names who the accepted invite brought in; omitted for other changes.
+    const party = (joinedPids?: number[]) => {
+      h.service.observe({
+        type: 'referralEvidence',
+        kind: 'party',
+        participants: h.context.characters.map((c, i) => ({ ...c, pid: i + 1 })),
+        ...(joinedPids ? { invited: true as const, joinedPids } : {}),
+      });
+      return flush();
+    };
+    // Two established characters could never start a card: grouping is not a failed start.
+    h.context.characters[0].level = 20;
+    h.context.characters[1].level = 20;
+    await party([1, 2]);
+    await party();
+    expect([reasons(100), reasons(200)]).toEqual([0, 0]);
+    // A new character grouped with an established one: a leave or a leader change
+    // (party evidence without an invite) stays silent.
+    h.context.characters[1].level = 1;
+    await party();
+    expect([reasons(100), reasons(200)]).toEqual([0, 0]);
+    // Accepting the invite is the one moment the pair is told why no card started.
+    await party([2]);
+    expect([reasons(100), reasons(200)]).toEqual([1, 1]);
+    await party();
+    expect([reasons(100), reasons(200)]).toEqual([1, 1]);
+    // Someone else accepting an invite into their party is not the pair's doing.
+    await party([3]);
+    expect([reasons(100), reasons(200)]).toEqual([1, 1]);
+    // Regrouping later through a fresh invite explains again.
+    await party([1, 2]);
+    expect([reasons(100), reasons(200)]).toEqual([2, 2]);
+    expect(h.card().status).toBe('idle');
+    expect(h.frames.get(100)?.links[0].startReason).toBe('levelTooHigh');
+  });
   it('explains unbound accounts only when new characters accept an invite together', async () => {
     const h = setup();
     await flush();

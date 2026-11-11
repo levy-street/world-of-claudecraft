@@ -722,7 +722,17 @@ export class ReferralGameServices {
             };
             const first = row.card.participants[0].accountId;
             if (evidence.kind === 'party') {
-              await this.party(row, context, signal);
+              await this.party(
+                row,
+                context,
+                signal,
+                evidence.invited === true &&
+                  evidence.participants.some(
+                    (p) =>
+                      evidence.joinedPids?.includes(p.pid) &&
+                      row.card.participants.some((c) => c.accountId === p.accountId),
+                  ),
+              );
               continue;
             }
             const events: ReferralCardEvent[] = [];
@@ -825,6 +835,7 @@ export class ReferralGameServices {
     row: StoredReferral,
     context: ReferralCardContext,
     signal: AbortSignal,
+    joinedByInvite: boolean,
   ): Promise<void> {
     const a = this.host.sessionForAccount(
       context.characters[0].accountId,
@@ -839,7 +850,12 @@ export class ReferralGameServices {
     if (row.card.status === 'idle' && !row.card.declined) {
       const reason = referralStartError(row.card, context);
       if (reason) {
-        this.notifyBoth(row.card, { type: 'reason', reason });
+        // Party evidence also fires on leaves, leader changes and other members joining,
+        // and two established characters could never start a card. Explain a refused
+        // start only when an accepted invite brings one of the pair in and one of them
+        // could start; the card window's Start button covers the rest.
+        if (joinedByInvite && context.characters.some(referralCharacterCanStart))
+          this.notifyBoth(row.card, { type: 'reason', reason });
         return;
       }
       const started = await this.host.withPermit(
