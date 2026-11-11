@@ -196,6 +196,11 @@ export const final = {
     world.leader.chat(line);
     log(`START: the leader jumps the boss (${line})`);
   },
+  // Rime Toll rung out strikes the whole raid for 650 to 720 (most of a
+  // cloth pool on top of Splintered Strength): a fumbled kick gets a backup.
+  backupKick(castId) {
+    return castId === FINAL_PHASE_CASTS.toll;
+  },
   kickables(world) {
     return world.splinters
       .filter((m) => m.cast === FINAL_PHASE_CASTS.toll)
