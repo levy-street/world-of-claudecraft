@@ -71,6 +71,8 @@ export function weaponSkinCollectionLabel(collection: WeaponSkinCollection): str
       return t('hudChrome.wocStore.collections.fallen_star');
     case 'lantern_hall':
       return t('hudChrome.wocStore.collections.lantern_hall');
+    case 'smiths_heart':
+      return t('hudChrome.wocStore.collections.smiths_heart');
   }
 }
 
@@ -121,6 +123,11 @@ const ARMORY_SKIN_KEYS = {
     name: 'hudChrome.wocStore.skins.lantern_hall_sword.name',
     look: 'hudChrome.wocStore.skins.lantern_hall_sword.look',
     lore: 'hudChrome.wocStore.skins.lantern_hall_sword.lore',
+  },
+  seamcaller_maul: {
+    name: 'hudChrome.wocStore.skins.seamcaller_maul.name',
+    look: 'hudChrome.wocStore.skins.seamcaller_maul.look',
+    lore: 'hudChrome.wocStore.skins.seamcaller_maul.lore',
   },
   hearthbrand_sword: {
     name: 'hudChrome.wocStore.skins.hearthbrand_sword.name',

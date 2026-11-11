@@ -22931,7 +22931,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.referralPromo.close': 'Fechar promoção de Indique um amigo',
   'hudChrome.wocStore.referralPromo.cta': 'Convidar amigos',
   'hudChrome.wocStore.referralPromo.eyebrow': 'Aventurem-se juntos',
-  'hudChrome.wocStore.skins.duskwick_staff.name': 'Cajado do Pavio Crepuscular',
   'hudChrome.wocStore.skins.hearthbrand_sword.name': 'Marca da Lareira',
   'hudChrome.wocStore.skins.lantern_hall_sword.name': 'Lâmina do Salão da Lanterna',
   'hudChrome.wocStore.skins.rimelight_staff.name': 'Cajado da Luz de Geada',
@@ -24637,26 +24636,10 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Fique longe de Zulgar: ele trocará o outro jogador marcado para perseguir você',
   'hudChrome.wildheartAlert.stalkedLine':
     'Corra do jaguar para evitar mordidas. Afaste-o do Mestre das Feras para romper Vínculo da matilha',
-  'hudChrome.wocStore.skins.duskwick_staff.look':
-    'Duas hastes retorcidas de madeira negra presas em ferro, coroadas por uma lanterna de ferro aberta com chama crepuscular violeta entre dois chifres curvos e correntes pendendo da base.',
-  'hudChrome.wocStore.skins.duskwick_staff.lore':
-    'Toda lanterna do salão brilha forte, menos uma. A chama crepuscular foi acesa para guardar o salão à noite e solta sombras onde as outras dão luz; Garrick apara o pavio pessoalmente. A fumaça e o brilho violeta são só aparência.',
-  'hudChrome.wocStore.skins.hearthbrand_sword.look':
-    'Lâmina ondulada como chama, de aço enegrecido com fios quentes de forja, uma veia fundida se ramificando nas duas faces, guarda de chamas de bronze ao redor de uma pedra ardente e empunhadura cor de sangue de boi.',
-  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
-    'O Salão da Lanterna mantém uma lareira que não se apaga desde sua construção, e Garrick Holt jura que esta lâmina foi temperada nas brasas dela. Membros que a levam dizem que a empunhadura fica quente na vigília mais fria. O fogo nos fios é só aparência.',
   'hudChrome.wocStore.skins.lantern_hall_sword.look':
     'Lâmina larga de aço com sulco de fogo de lanterna abafado, faces douradas, uma lanterna engaiolada ardendo na guarda e empunhadura de couro azul.',
   'hudChrome.wocStore.skins.lantern_hall_sword.lore':
     'Garrick Holt não vende esta lâmina a estranhos. Vai para membros que cumpriram os contratos do Salão da Lanterna semana após semana, e ele sempre entrega com as mesmas palavras: a lanterna da guarda é acesa na própria lareira do salão, então onde você a levar, o salão vai junto. O fogo no sulco é só aparência. A promessa é o que importa.',
-  'hudChrome.wocStore.skins.rimelight_staff.look':
-    'Haste pálida presa em prata e envolta em geada brilhante, coroada por uma garra de prata segurando um grande cristal de luz fria numa coroa de gelo estilhaçado, com pingentes de gelo pendendo do colar.',
-  'hudChrome.wocStore.skins.rimelight_staff.lore':
-    'A guarda de inverno do Salão da Lanterna levava cajados assim pela estrada alta, com as coroas acesas para viajantes perdidos na neve. Garrick mantém um no suporte para membros com selos sobrando. A geada e sua luz fria são só aparência.',
-  'hudChrome.wocStore.skins.squallcrest_sword.look':
-    'Lâmina longa azul-mar com fios brilhantes como ondas quebrando, um canal de tempestade com raio bifurcado, onda dourada sobre o ricasso, barbatana num fio e guarda de arrebentações douradas ao redor de uma pérola de tempestade.',
-  'hudChrome.wocStore.skins.squallcrest_sword.lore':
-    'Uma capitã que navegava pela guilda trouxe esta lâmina de uma borrasca que levou seu mastro e deixou o navio soando como sino. Garrick só a vende por selos e avisa cada comprador de que ela zumbe antes de uma tempestade. O relâmpago e a luz do mar são só aparência.',
   'hudChrome.wocStore.subscription.annualDelivered':
     'A chave de montaria do seu pacote foi entregue pelo correio.',
   'hudChrome.wocStore.subscription.annualMount':

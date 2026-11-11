@@ -23618,30 +23618,13 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.referralPromo.close': 'Aanbieding Vriend uitnodigen sluiten',
   'hudChrome.wocStore.referralPromo.cta': 'Vrienden uitnodigen',
   'hudChrome.wocStore.referralPromo.eyebrow': 'Samen op avontuur',
-  'hudChrome.wocStore.skins.duskwick_staff.look':
-    'Twee gedraaide strengen zwart hout, met ijzer verbonden, bekroond door een open ijzeren lantaarn waarin een paarse schemervlam brandt tussen twee krullende hoorns. Kettingen zwaaien onderaan.',
-  'hudChrome.wocStore.skins.duskwick_staff.lore':
-    "Elke lantaarn in de hal brandt helder, op één na. De schemervlam werd ontstoken om de hal 's nachts te bewaken en geeft schaduw waar de andere licht geven. Garrick knipt zelf de lont. De rook en paarse gloed zijn alleen uiterlijk.",
-  'hudChrome.wocStore.skins.duskwick_staff.name': 'Schemerlontstaf',
-  'hudChrome.wocStore.skins.hearthbrand_sword.look':
-    'Een gevlamd lemmet van zwartgeblakerd staal met smidsehete sneden, een gesmolten naad die over beide zijden vertakt, een gevest van bronzen vlammen rond een brandende steen en een ossenbloedrode greep.',
-  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
-    'In Lantaarnhal brandt een haard die sinds de bouw nooit doofde. Garrick Holt zweert dat dit lemmet in de kolen ervan is gehard. Leden die het dragen zeggen dat de greep zelfs tijdens de koudste wacht warm blijft. Het vuur langs de sneden is alleen uiterlijk.',
   'hudChrome.wocStore.skins.hearthbrand_sword.name': 'Haardbrand',
   'hudChrome.wocStore.skins.lantern_hall_sword.look':
     'Een breed stalen lemmet met smeulend lantaarnvuur in de bloedgeul, vergulde vlakken, een brandende lantaarn in een kooi in de pareerstang en een blauwe leren greep.',
   'hudChrome.wocStore.skins.lantern_hall_sword.lore':
     'Garrick Holt verkoopt dit lemmet niet aan vreemden. Het gaat naar leden die week na week de contracten van Lantaarnhal voltooiden. Hij overhandigt het telkens met dezelfde woorden: de lantaarn in het gevest is ontstoken aan de eigen haard van de hal, dus waar je het ook draagt, de hal reist mee. Het vuur in de bloedgeul is alleen uiterlijk. Het gaat om de belofte.',
   'hudChrome.wocStore.skins.lantern_hall_sword.name': 'Zwaard van Lantaarnhal',
-  'hudChrome.wocStore.skins.rimelight_staff.look':
-    'Een bleke schacht, met zilver beslagen en gloeiende rijp omwonden, bekroond door een zilveren klauw. Die houdt een groot kristal van koud licht in een kroon van versplinterd ijs. IJspegels hangen aan de kraag.',
-  'hudChrome.wocStore.skins.rimelight_staff.lore':
-    'De winterwacht van Lantaarnhal droeg zulke staven over de hoge weg, met brandende kronen voor reizigers die in de sneeuw verdwaalden. Garrick bewaart er één op het rek voor leden met zegels over. De vorst en het koude licht zijn alleen uiterlijk.',
   'hudChrome.wocStore.skins.rimelight_staff.name': 'Rijplichtstaf',
-  'hudChrome.wocStore.skins.squallcrest_sword.look':
-    'Een lang zeeblauw lemmet met sneden zo helder als brekende branding, een stormgeul met een gevorkte bliksemschicht, een vergulde golf boven de ricasso, een vin langs één snede en een gevest van vergulde brekers rond een stormparel.',
-  'hudChrome.wocStore.skins.squallcrest_sword.lore':
-    'Een kapitein die voor het gilde voer bracht dit lemmet mee uit een storm die haar mast brak en haar schip als een klok liet klinken. Garrick verkoopt het alleen voor zegels en waarschuwt elke koper dat het vóór een storm zoemt. De bliksem en het zeelicht zijn alleen uiterlijk.',
   'hudChrome.wocStore.skins.squallcrest_sword.name': 'Stormkam',
   'hudChrome.wocStore.subscription.annualClaim': 'Bundelrijdier ophalen',
   'hudChrome.wocStore.subscription.annualDelivered':

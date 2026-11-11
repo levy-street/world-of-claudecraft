@@ -1432,7 +1432,8 @@ export const pt_BR: EnTranslations = {
         "emberwrought": "Forjada em Brasa",
         "hoarfrost": "Geada",
         "fallen_star": "Estrela Caída",
-        "lantern_hall": "Salão da Lanterna"
+        "lantern_hall": "Salão da Lanterna",
+        "smiths_heart": "Smith's Heart"
       },
       "skins": {
         "lantern_hall_sword": {
@@ -1440,25 +1441,30 @@ export const pt_BR: EnTranslations = {
           "look": "Lâmina larga de aço com sulco de fogo de lanterna abafado, faces douradas, uma lanterna engaiolada ardendo na guarda e empunhadura de couro azul.",
           "lore": "Garrick Holt não vende esta lâmina a estranhos. Vai para membros que cumpriram os contratos do Salão da Lanterna semana após semana, e ele sempre entrega com as mesmas palavras: a lanterna da guarda é acesa na própria lareira do salão, então onde você a levar, o salão vai junto. O fogo no sulco é só aparência. A promessa é o que importa."
         },
-        "hearthbrand_sword": {
-          "name": "Marca da Lareira",
-          "look": "Lâmina ondulada como chama, de aço enegrecido com fios quentes de forja, uma veia fundida se ramificando nas duas faces, guarda de chamas de bronze ao redor de uma pedra ardente e empunhadura cor de sangue de boi.",
-          "lore": "O Salão da Lanterna mantém uma lareira que não se apaga desde sua construção, e Garrick Holt jura que esta lâmina foi temperada nas brasas dela. Membros que a levam dizem que a empunhadura fica quente na vigília mais fria. O fogo nos fios é só aparência."
+        "seamcaller_maul": {
+          "name": "Seamcaller",
+          "look": "Two-handed maul hewn from one block of banded quarry stone, gold-rimmed striking faces round burning amber, gold crest wings, gold runes cut into both cheeks, amber seam-crystal growing from the crown and a basalt haft bound in gold.",
+          "lore": "The Hammer Council sang the seam awake before they ever raised a hand against the raid, and the stone remembered every note. This maul was cut from the block their hammers split, and its runes still burn when it swings. Quarry shards circle the head as if the mountain wants them back. The runes and the circling stone are only a look."
         },
         "squallcrest_sword": {
           "name": "Crista da Borrasca",
-          "look": "Lâmina longa azul-mar com fios brilhantes como ondas quebrando, um canal de tempestade com raio bifurcado, onda dourada sobre o ricasso, barbatana num fio e guarda de arrebentações douradas ao redor de uma pérola de tempestade.",
-          "lore": "Uma capitã que navegava pela guilda trouxe esta lâmina de uma borrasca que levou seu mastro e deixou o navio soando como sino. Garrick só a vende por selos e avisa cada comprador de que ela zumbe antes de uma tempestade. O relâmpago e a luz do mar são só aparência."
+          "look": "Long storm-steel blade with lightning-bright edges, a forked bolt in a silver channel up each face, wind fins hooked off the spine and an open silver halo round a storm-eye gem, swept back in gale vanes.",
+          "lore": "The Guardian of the Breath kept the air of the Heart moving, and when it fell the storm it carried did not scatter. It settled into this blade. Wind still winds round the steel and lightning still runs its edges, and those who carry it swear the eye in the halo watches the sky. The storm is only a look."
         },
         "rimelight_staff": {
           "name": "Cajado da Luz de Geada",
-          "look": "Haste pálida presa em prata e envolta em geada brilhante, coroada por uma garra de prata segurando um grande cristal de luz fria numa coroa de gelo estilhaçado, com pingentes de gelo pendendo do colar.",
-          "lore": "A guarda de inverno do Salão da Lanterna levava cajados assim pela estrada alta, com as coroas acesas para viajantes perdidos na neve. Garrick mantém um no suporte para membros com selos sobrando. A geada e sua luz fria são só aparência."
+          "look": "Pale silver shaft wound with hoarfrost and broken out in ice, crowned by four silver tines caging a great crystal of cold light inside a crown of ice shards, a splinter of ice hovering above.",
+          "lore": "The Guardian of the Quench cooled every blade the Heart ever forged. Its crystal was the last thing to stop glowing when it fell, and the raid carried it out still cold enough to frost the hand. Ice circles the crown and runes of frost turn round it. The cold is only a look."
+        },
+        "hearthbrand_sword": {
+          "name": "Marca da Lareira",
+          "look": "Broad blade of cooled magma crust with molten edges, a net of ember veins cracked across both faces, an obsidian-toothed spine and a black iron guard swept into horns dripping melt round a magma heart.",
+          "lore": "The Guardian of the Heat was the fire the Heart was named for. When it guttered out, its last melt ran into a blade-shaped crack in the forge floor and cooled there, crust outside and fire within. The edges have never stopped burning. The flames are only a look."
         },
         "duskwick_staff": {
-          "name": "Cajado do Pavio Crepuscular",
-          "look": "Duas hastes retorcidas de madeira negra presas em ferro, coroadas por uma lanterna de ferro aberta com chama crepuscular violeta entre dois chifres curvos e correntes pendendo da base.",
-          "lore": "Toda lanterna do salão brilha forte, menos uma. A chama crepuscular foi acesa para guardar o salão à noite e solta sombras onde as outras dão luz; Garrick apara o pavio pessoalmente. A fumaça e o brilho violeta são só aparência."
+          "name": "Heartmeld Staff",
+          "look": "Forge-bronze staff set with courses of quarry stone, crowned by a great gold halo holding four gems that light in turn (quarry amber, gale, frost and fire) round an anvil heart with a white-gold core.",
+          "lore": "The Masterless Strength was the four veins of the Heart bound into one body on the Anvil of the World. When it broke, the four did not part: they settled into this halo and take turns to burn, stone, wind, frost and fire, as they once took turns to strike. The four lights are only a look."
         },
         "guildmark_arming_sword": {
           "name": "Espada de Armamento da Marca da Guilda",

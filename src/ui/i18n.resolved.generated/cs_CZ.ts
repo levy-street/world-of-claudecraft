@@ -1432,7 +1432,8 @@ export const cs_CZ: EnTranslations = {
         "emberwrought": "Žárem kované",
         "hoarfrost": "Jinovatka",
         "fallen_star": "Padlá hvězda",
-        "lantern_hall": "Síň luceren"
+        "lantern_hall": "Síň luceren",
+        "smiths_heart": "Smith's Heart"
       },
       "skins": {
         "lantern_hall_sword": {
@@ -1440,25 +1441,30 @@ export const cs_CZ: EnTranslations = {
           "look": "Široká ocelová čepel se žlábkem plným tlumeného lucernového ohně, zlacenými plochami, hořící lucernou v kleci v záštitě a rukojetí z modré kůže.",
           "lore": "Garrick Holt tuto čepel cizinci neprodá. Dostávají ji členové, kteří týden za týdnem plní zakázky Lucernové síně. Předává ji vždy se stejnými slovy: lucerna v záštitě byla zapálena z vlastního krbu síně, takže kamkoli ji neseš, síň jde s tebou. Oheň ve žlábku je pouze vzhled. Důležitý je ten slib."
         },
-        "hearthbrand_sword": {
-          "name": "Krbový cejch",
-          "look": "Plamenně zvlněná čepel z černěné oceli s ostřím žhavým jako výheň a roztavenou žílou větvící se po obou stranách. Záštita z bronzových plamenů obepíná hořící kámen, rukojeť je temně rudá.",
-          "lore": "V Lucernové síni hoří krb, který nevyhasl od jejího vztyčení, a Garrick Holt přísahá, že tato čepel byla kalena v jeho uhlících. Členové, kteří ji nosí, říkají, že rukojeť zůstává teplá i na nejchladnější hlídce. Oheň na ostří je pouze vzhled."
+        "seamcaller_maul": {
+          "name": "Seamcaller",
+          "look": "Two-handed maul hewn from one block of banded quarry stone, gold-rimmed striking faces round burning amber, gold crest wings, gold runes cut into both cheeks, amber seam-crystal growing from the crown and a basalt haft bound in gold.",
+          "lore": "The Hammer Council sang the seam awake before they ever raised a hand against the raid, and the stone remembered every note. This maul was cut from the block their hammers split, and its runes still burn when it swings. Quarry shards circle the head as if the mountain wants them back. The runes and the circling stone are only a look."
         },
         "squallcrest_sword": {
           "name": "Hřeben vichřice",
-          "look": "Dlouhá mořsky modrá čepel s ostřím jasným jako příboj, bouřkovým kanálem s rozeklaným bleskem a zlacenou vlnou nad patou čepele. Po jednom ostří vede ploutev a záštitu tvoří zlacené vlny kolem bouřkové perly.",
-          "lore": "Kapitánka plavící se pro cech přivezla tuto čepel z vichřice, která jí vzala stěžeň a nechala loď znít jako zvon. Garrick ji prodává jen za pečeti a každého kupce varuje, že před bouří bzučí. Blesky i mořské světlo jsou pouze vzhled."
+          "look": "Long storm-steel blade with lightning-bright edges, a forked bolt in a silver channel up each face, wind fins hooked off the spine and an open silver halo round a storm-eye gem, swept back in gale vanes.",
+          "lore": "The Guardian of the Breath kept the air of the Heart moving, and when it fell the storm it carried did not scatter. It settled into this blade. Wind still winds round the steel and lightning still runs its edges, and those who carry it swear the eye in the halo watches the sky. The storm is only a look."
         },
         "rimelight_staff": {
           "name": "Hůl světla jinovatky",
-          "look": "Světlá násada obepnutá stříbrem a zářící jinovatkou, zakončená stříbrným spárem držícím velký krystal studeného světla v koruně roztříštěného ledu. Z límce visí rampouchy.",
-          "lore": "Zimní hlídka Lucernové síně nosila takové hole po horské cestě. Jejich koruny svítily poutníkům ztraceným ve sněhu. Garrick má jednu na stojanu pro členy s přebytkem pečetí. Mráz i jeho chladné světlo jsou pouze vzhled."
+          "look": "Pale silver shaft wound with hoarfrost and broken out in ice, crowned by four silver tines caging a great crystal of cold light inside a crown of ice shards, a splinter of ice hovering above.",
+          "lore": "The Guardian of the Quench cooled every blade the Heart ever forged. Its crystal was the last thing to stop glowing when it fell, and the raid carried it out still cold enough to frost the hand. Ice circles the crown and runes of frost turn round it. The cold is only a look."
+        },
+        "hearthbrand_sword": {
+          "name": "Krbový cejch",
+          "look": "Broad blade of cooled magma crust with molten edges, a net of ember veins cracked across both faces, an obsidian-toothed spine and a black iron guard swept into horns dripping melt round a magma heart.",
+          "lore": "The Guardian of the Heat was the fire the Heart was named for. When it guttered out, its last melt ran into a blade-shaped crack in the forge floor and cooled there, crust outside and fire within. The edges have never stopped burning. The flames are only a look."
         },
         "duskwick_staff": {
-          "name": "Hůl soumračného knotu",
-          "look": "Dva zkroucené pruty černého dřeva spojené železem, zakončené otevřenou železnou lucernou s fialovým soumračným plamenem mezi dvěma zahnutými rohy. Z jejího dna se houpají řetězy.",
-          "lore": "Všechny lucerny v síni jasně září, kromě jedné. Soumračný plamen byl zapálen, aby síň hlídal v noci, a vydává stín tam, kde ostatní vydávají světlo. Garrick mu sám zastřihuje knot. Kouř i fialová záře jsou pouze vzhled."
+          "name": "Heartmeld Staff",
+          "look": "Forge-bronze staff set with courses of quarry stone, crowned by a great gold halo holding four gems that light in turn (quarry amber, gale, frost and fire) round an anvil heart with a white-gold core.",
+          "lore": "The Masterless Strength was the four veins of the Heart bound into one body on the Anvil of the World. When it broke, the four did not part: they settled into this halo and take turns to burn, stone, wind, frost and fire, as they once took turns to strike. The four lights are only a look."
         },
         "guildmark_arming_sword": {
           "name": "Poboční meč s cechovní značkou",

@@ -225,6 +225,9 @@ export const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
   cinderbrand: 'VAR_SWORD',
   lantern_hall_sword: 'VAR_SWORD',
   hearthbrand: 'VAR_SWORD',
+  // Seamcaller (the Smith's Heart's Hammer Council maul): a two-hander on the hammer family,
+  // drawn at maul length by its weapon_grip.ts scale
+  seamcaller_maul: 'VAR_HAMMER',
   squallcrest: 'VAR_SWORD',
   rimelight_staff: 'VAR_STAFF',
   duskwick_staff: 'VAR_STAFF',

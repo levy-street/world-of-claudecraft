@@ -1432,7 +1432,8 @@ export const es_ES: EnTranslations = {
         "emberwrought": "Forja de ascuas",
         "hoarfrost": "Escarcha",
         "fallen_star": "Estrella caída",
-        "lantern_hall": "Salón del Farol"
+        "lantern_hall": "Salón del Farol",
+        "smiths_heart": "Smith's Heart"
       },
       "skins": {
         "lantern_hall_sword": {
@@ -1440,25 +1441,30 @@ export const es_ES: EnTranslations = {
           "look": "Hoja ancha de acero con una acanaladura de fuego de farol amortiguado, caras doradas, un farol enjaulado que arde en la cruceta y empuñadura de cuero azul.",
           "lore": "Garrick Holt no vende esta hoja a desconocidos. Se entrega a miembros que han cumplido los contratos del Salón del Farol semana tras semana, y siempre la entrega con las mismas palabras: el farol de la guarda se enciende en el propio hogar del salón, así que adondequiera que la lleves, el salón va contigo. El fuego de la acanaladura es solo apariencia. Lo que importa es la promesa."
         },
-        "hearthbrand_sword": {
-          "name": "Marca del Hogar",
-          "look": "Hoja flamígera de acero ennegrecido con filos ardientes de forja, una veta fundida que se ramifica por ambas caras, una guarda de llamas de bronce alrededor de una piedra ardiente y empuñadura rojo sangre de buey.",
-          "lore": "El Salón del Farol conserva un hogar que no se ha apagado desde que se levantó el salón, y Garrick Holt jura que esta hoja se templó en sus brasas. Los miembros que la llevan dicen que la empuñadura sigue caliente durante la guardia más fría. El fuego de sus filos es solo apariencia."
+        "seamcaller_maul": {
+          "name": "Seamcaller",
+          "look": "Two-handed maul hewn from one block of banded quarry stone, gold-rimmed striking faces round burning amber, gold crest wings, gold runes cut into both cheeks, amber seam-crystal growing from the crown and a basalt haft bound in gold.",
+          "lore": "The Hammer Council sang the seam awake before they ever raised a hand against the raid, and the stone remembered every note. This maul was cut from the block their hammers split, and its runes still burn when it swings. Quarry shards circle the head as if the mountain wants them back. The runes and the circling stone are only a look."
         },
         "squallcrest_sword": {
           "name": "Cresta de Borrasca",
-          "look": "Hoja larga azul marino con filos brillantes como la espuma al romper, un canal de tormenta que contiene un rayo bifurcado, una ola dorada sobre el recazo, una aleta a lo largo de un filo y una guarda de rompientes doradas alrededor de una perla de tormenta.",
-          "lore": "Una capitana que navegaba para la hermandad trajo esta hoja de una borrasca que le arrebató el mástil y dejó su barco resonando como una campana. Garrick solo la vende por sellos y avisa a cada comprador de que zumba antes de una tormenta. El relámpago y la luz del mar son solo apariencia."
+          "look": "Long storm-steel blade with lightning-bright edges, a forked bolt in a silver channel up each face, wind fins hooked off the spine and an open silver halo round a storm-eye gem, swept back in gale vanes.",
+          "lore": "The Guardian of the Breath kept the air of the Heart moving, and when it fell the storm it carried did not scatter. It settled into this blade. Wind still winds round the steel and lightning still runs its edges, and those who carry it swear the eye in the halo watches the sky. The storm is only a look."
         },
         "rimelight_staff": {
           "name": "Bastón de Luz de Escarcha",
-          "look": "Vara pálida ceñida en plata y envuelta en escarcha luminosa, coronada por una garra de plata que sostiene un gran cristal de luz fría dentro de una corona de hielo astillado, con carámbanos que cuelgan de su collar.",
-          "lore": "La guardia invernal del Salón del Farol llevaba bastones como este por el camino alto, con sus coronas encendidas para los viajeros perdidos en la nieve. Garrick conserva uno en el armero para los miembros con sellos de sobra. La escarcha y su luz fría son solo apariencia."
+          "look": "Pale silver shaft wound with hoarfrost and broken out in ice, crowned by four silver tines caging a great crystal of cold light inside a crown of ice shards, a splinter of ice hovering above.",
+          "lore": "The Guardian of the Quench cooled every blade the Heart ever forged. Its crystal was the last thing to stop glowing when it fell, and the raid carried it out still cold enough to frost the hand. Ice circles the crown and runes of frost turn round it. The cold is only a look."
+        },
+        "hearthbrand_sword": {
+          "name": "Marca del Hogar",
+          "look": "Broad blade of cooled magma crust with molten edges, a net of ember veins cracked across both faces, an obsidian-toothed spine and a black iron guard swept into horns dripping melt round a magma heart.",
+          "lore": "The Guardian of the Heat was the fire the Heart was named for. When it guttered out, its last melt ran into a blade-shaped crack in the forge floor and cooled there, crust outside and fire within. The edges have never stopped burning. The flames are only a look."
         },
         "duskwick_staff": {
-          "name": "Bastón de Mecha Crepuscular",
-          "look": "Dos hebras retorcidas de madera negra atadas con hierro, coronadas por un farol de hierro abierto donde arde una llama crepuscular violeta entre dos cuernos curvos, con cadenas que cuelgan de su base.",
-          "lore": "Todos los faroles del salón arden con fuerza salvo uno. La llama crepuscular se encendió para custodiar el salón de noche y desprende sombras donde los demás dan luz; Garrick recorta su mecha en persona. El humo y el brillo violeta son solo apariencia."
+          "name": "Heartmeld Staff",
+          "look": "Forge-bronze staff set with courses of quarry stone, crowned by a great gold halo holding four gems that light in turn (quarry amber, gale, frost and fire) round an anvil heart with a white-gold core.",
+          "lore": "The Masterless Strength was the four veins of the Heart bound into one body on the Anvil of the World. When it broke, the four did not part: they settled into this halo and take turns to burn, stone, wind, frost and fire, as they once took turns to strike. The four lights are only a look."
         },
         "guildmark_arming_sword": {
           "name": "Espada de Armar con Sello Gremial",

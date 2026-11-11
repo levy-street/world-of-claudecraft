@@ -1432,7 +1432,8 @@ export const sv_SE: EnTranslations = {
         "emberwrought": "Glödsmidd",
         "hoarfrost": "Rimfrost",
         "fallen_star": "Fallen stjärna",
-        "lantern_hall": "Lykthallen"
+        "lantern_hall": "Lykthallen",
+        "smiths_heart": "Smith's Heart"
       },
       "skins": {
         "lantern_hall_sword": {
@@ -1440,25 +1441,30 @@ export const sv_SE: EnTranslations = {
           "look": "Bred stålklinga med en blodränna av pyrande lykteld, förgyllda sidor, en burlykta brinnande i parerstången och ett blått lädergrepp.",
           "lore": "Garrick Holt säljer inte denna klinga till en främling. Den går till medlemmar som fullgjort Lykthallens kontrakt vecka efter vecka, och han överlämnar den med samma ord varje gång: lyktan i parerskyddet är tänd från hallens egen härd, så vart du än bär den följer hallen med. Elden i blodrännan är bara ett utseende. Löftet är det viktiga."
         },
-        "hearthbrand_sword": {
-          "name": "Härdbrand",
-          "look": "Flamvågig klinga av svärtat stål med smidesheta eggar, en smält söm som förgrenar sig över båda sidorna, ett parerskydd av bronslågor runt en brinnande sten och ett oxblodsrött grepp.",
-          "lore": "Lykthallen håller en härd som inte slocknat sedan hallen restes, och Garrick Holt svär på att denna klinga härdades i dess kol. Medlemmar som bär den säger att greppet förblir varmt under den kallaste vakt. Elden längs eggarna är bara ett utseende."
+        "seamcaller_maul": {
+          "name": "Seamcaller",
+          "look": "Two-handed maul hewn from one block of banded quarry stone, gold-rimmed striking faces round burning amber, gold crest wings, gold runes cut into both cheeks, amber seam-crystal growing from the crown and a basalt haft bound in gold.",
+          "lore": "The Hammer Council sang the seam awake before they ever raised a hand against the raid, and the stone remembered every note. This maul was cut from the block their hammers split, and its runes still burn when it swings. Quarry shards circle the head as if the mountain wants them back. The runes and the circling stone are only a look."
         },
         "squallcrest_sword": {
           "name": "Stormkrön",
-          "look": "Lång havsblå klinga med eggar ljusa som brytande bränningar, en stormränna med en kluven blixt, en förgylld våg över klingbasen, en fena längs ena eggen och ett parerskydd av förgyllda bränningar runt en stormpärla.",
-          "lore": "En kapten som seglade för gillet tog hem denna klinga från en stormby som tog hennes mast och lämnade skeppet klingande som en klocka. Garrick säljer den bara för sigill och varnar varje köpare för att den surrar före en storm. Blixten och havsljuset är bara ett utseende."
+          "look": "Long storm-steel blade with lightning-bright edges, a forked bolt in a silver channel up each face, wind fins hooked off the spine and an open silver halo round a storm-eye gem, swept back in gale vanes.",
+          "lore": "The Guardian of the Breath kept the air of the Heart moving, and when it fell the storm it carried did not scatter. It settled into this blade. Wind still winds round the steel and lightning still runs its edges, and those who carry it swear the eye in the halo watches the sky. The storm is only a look."
         },
         "rimelight_staff": {
           "name": "Rimljusets stav",
-          "look": "Ljust skaft bundet i silver och omvirat av glödande rimfrost, krönt av en silverklo som håller en stor kristall av kallt ljus i en krona av splittrad is, med istappar hängande från kragen.",
-          "lore": "Lykthallens vintervakt bar stavar som denna längs landsvägen, med kronorna tända för resenärer vilse i snön. Garrick håller en på stället åt medlemmar med sigill över. Frosten och dess kalla ljus är bara ett utseende."
+          "look": "Pale silver shaft wound with hoarfrost and broken out in ice, crowned by four silver tines caging a great crystal of cold light inside a crown of ice shards, a splinter of ice hovering above.",
+          "lore": "The Guardian of the Quench cooled every blade the Heart ever forged. Its crystal was the last thing to stop glowing when it fell, and the raid carried it out still cold enough to frost the hand. Ice circles the crown and runes of frost turn round it. The cold is only a look."
+        },
+        "hearthbrand_sword": {
+          "name": "Härdbrand",
+          "look": "Broad blade of cooled magma crust with molten edges, a net of ember veins cracked across both faces, an obsidian-toothed spine and a black iron guard swept into horns dripping melt round a magma heart.",
+          "lore": "The Guardian of the Heat was the fire the Heart was named for. When it guttered out, its last melt ran into a blade-shaped crack in the forge floor and cooled there, crust outside and fire within. The edges have never stopped burning. The flames are only a look."
         },
         "duskwick_staff": {
-          "name": "Skymningsvekens stav",
-          "look": "Två tvinnade strängar av svart trä bundna i järn, krönta av en öppen järnlykta där en violett skymningslåga brinner mellan två böjda horn, med kedjor svängande från bottnen.",
-          "lore": "Varje lykta i hallen brinner klart utom en. Skymningslågan tändes för att vakta hallen om natten och avger skugga där de andra ger ljus; Garrick ansar själv dess veke. Röken och det violetta skenet är bara ett utseende."
+          "name": "Heartmeld Staff",
+          "look": "Forge-bronze staff set with courses of quarry stone, crowned by a great gold halo holding four gems that light in turn (quarry amber, gale, frost and fire) round an anvil heart with a white-gold core.",
+          "lore": "The Masterless Strength was the four veins of the Heart bound into one body on the Anvil of the World. When it broke, the four did not part: they settled into this halo and take turns to burn, stone, wind, frost and fire, as they once took turns to strike. The four lights are only a look."
         },
         "guildmark_arming_sword": {
           "name": "Gillesmärkt Väpnarsvärd",

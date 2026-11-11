@@ -4267,26 +4267,36 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '宽阔的钢制剑身，血槽中燃着灯火，镀金的护颊，护手中燃着一盏笼中提灯，蓝色皮革剑柄。',
   'hudChrome.wocStore.skins.lantern_hall_sword.name': '灯火大厅之剑',
   'hudChrome.wocStore.skins.hearthbrand_sword.name': '炉火之刃',
-  'hudChrome.wocStore.skins.hearthbrand_sword.look':
-    '焦黑钢铁铸成的火焰波纹剑身，两侧刃口如出炉般炽热，熔融的裂缝在两面分叉蔓延，青铜火焰护手环绕一块燃烧的宝石，牛血色握柄。',
-  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
-    '灯火大厅里有一座自大厅建成以来从未熄灭的炉膛，加里克·霍尔特发誓这把剑就是在它的炭火中淬火的。佩戴它的成员说，即使在最寒冷的守夜里，剑柄也依然温暖。刃口上的火焰只是外观。',
   'hudChrome.wocStore.skins.squallcrest_sword.name': '风暴浪峰',
-  'hudChrome.wocStore.skins.squallcrest_sword.look':
-    '海蓝色的修长剑身，刃口如碎浪般明亮，风暴血槽中封着分叉的闪电，剑根上方是一道镀金的浪，一侧刃口生着鳍，镀金浪涛护手环绕一颗风暴珍珠。',
-  'hudChrome.wocStore.skins.squallcrest_sword.lore':
-    '一位为公会出海的船长从一场狂风中带回了这把剑，那场风暴折断了她的桅杆，让整艘船像钟一样鸣响。加里克只肯用印章出售它，并提醒每位买家，风暴来临前它会嗡嗡作响。闪电与海光只是外观。',
   'hudChrome.wocStore.skins.rimelight_staff.name': '霜光法杖',
-  'hudChrome.wocStore.skins.rimelight_staff.look':
-    '苍白的杖身以银箍束紧，缠绕着发光的雾凇，杖顶的银爪在冰晶之冠中托着一颗巨大的寒光水晶，杖颈垂着冰柱。',
-  'hudChrome.wocStore.skins.rimelight_staff.lore':
-    '灯火大厅的冬季守望者曾手持这样的法杖行走在高路上，点亮杖顶，为迷失在雪中的旅人引路。加里克在架上留了一根，给印章有余的成员。寒霜与冷光只是外观。',
-  'hudChrome.wocStore.skins.duskwick_staff.name': '暮芯法杖',
-  'hudChrome.wocStore.skins.duskwick_staff.look':
-    '两股扭结的黑木以铁箍束紧，杖顶是一盏敞开的铁提灯，在两只卷曲的角之间燃着紫色的暮光火焰，灯底垂着晃动的锁链。',
-  'hudChrome.wocStore.skins.duskwick_staff.lore':
-    '大厅里的每一盏灯都明亮地燃烧，只有一盏例外。暮光之焰是为在夜里守护大厅而点燃的，别的灯发出光的地方，它发出影子；加里克亲自修剪它的灯芯。烟雾与紫色光辉只是外观。',
   'hudChrome.wocStore.collections.lantern_hall': '灯火大厅',
+  // The Smith's Heart raid arms (M16 fills).
+  'hudChrome.wocStore.collections.smiths_heart':
+    '铁匠之心',
+  'hudChrome.wocStore.skins.seamcaller_maul.name':
+    '唤脉者',
+  'hudChrome.wocStore.skins.seamcaller_maul.look':
+    '以一整块带状采石场岩石凿成的双手巨锤，金边打击面环绕燃烧的琥珀，金色冠翼，两侧刻有燃烧的金色符文，锤冠长出琥珀矿脉晶体，玄武岩锤柄以黄金箍束。',
+  'hudChrome.wocStore.skins.seamcaller_maul.lore':
+    '铁锤议会在向突袭者举起手之前，先用歌声唤醒了矿脉，岩石记住了每一个音符。这把巨锤取自他们的铁锤劈开的那块石头，挥动时符文仍在燃烧。采石场的碎石绕着锤头盘旋，仿佛山岭想把它们要回去。符文和盘旋的碎石只是外观。',
+  'hudChrome.wocStore.skins.squallcrest_sword.look':
+    '修长的风暴钢剑身，刃口如闪电般明亮，两面银槽中各有一道分叉的雷霆，剑脊上勾着风之鳍，敞开的银色光环环绕风暴之眼宝石，向后扫出狂风般的翼片。',
+  'hudChrome.wocStore.skins.squallcrest_sword.lore':
+    '吐息守护者让心脏中的空气永不停歇，它倒下时，所携的风暴并未散去，而是沉入了这把剑中。风仍绕着钢身旋转，闪电仍沿着刃口奔走，持剑者发誓光环中的眼睛一直望着天空。风暴只是外观。',
+  'hudChrome.wocStore.skins.rimelight_staff.look':
+    '缠绕白霜、迸出冰晶的苍白银杖，杖顶四根银爪笼住一颗冷光巨晶，外围是一圈冰片之冠，上方悬浮着一枚冰之碎片。',
+  'hudChrome.wocStore.skins.rimelight_staff.lore':
+    '淬火守护者冷却了心脏锻造过的每一把刀刃。它倒下时，它的晶体是最后一个停止发光的东西，突袭者把它带出来时，它仍冷得能让手结霜。冰片环绕杖冠，霜之符文绕着它旋转。寒意只是外观。',
+  'hudChrome.wocStore.skins.hearthbrand_sword.look':
+    '冷却的岩浆外壳铸成的宽刃，刃口仍在熔融，两面布满余烬脉络般的裂纹，剑脊长着黑曜石利齿，黑铁护手向上弯成滴落熔流的双角，环抱一颗岩浆之心。',
+  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
+    '炽热守护者就是心脏得名的那团火。它熄灭时，最后的熔流流进锻炉地面上一道剑形的裂缝，在那里冷却：外面是硬壳，里面是火。它的刃口从未停止燃烧。火焰只是外观。',
+  'hudChrome.wocStore.skins.duskwick_staff.name':
+    '心熔法杖',
+  'hudChrome.wocStore.skins.duskwick_staff.look':
+    '锻炉青铜杖身镶嵌着层层采石场岩石，杖顶是一圈巨大的金色光环，四颗宝石轮流亮起（采石琥珀、狂风、寒霜与烈火），环抱一颗白金核心的铁砧之心。',
+  'hudChrome.wocStore.skins.duskwick_staff.lore':
+    '无主之力是心脏的四条矿脉在世界之砧上结成的一具躯体。它破碎时，四者并未分离：它们沉入这圈光环，轮流燃烧，岩石、风、霜与火，就像它们曾经轮流出击一样。四道光只是外观。',
   'hudChrome.wocStore.skins.guildmark_arming_sword.name': '公会印记武装剑',
   'hudChrome.wocStore.skins.guildmark_arming_sword.look':
     '发蓝钢剑刃、青铜鱼尾形十字护手、青绿色染皮握柄，以及一枚小巧的公会钢印。',

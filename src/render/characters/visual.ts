@@ -1162,6 +1162,9 @@ export class CharacterVisual {
   // into so a shed step allocates nothing.
   private weaponVfxAuthored: Partial<WeaponVfxTuning> = {};
   private weaponVfxShed = 1;
+  // The reduced-motion setting update() last saw, handed to every weapon-skin rig so it caps
+  // its flashes (WeaponVfxHandle.setCalm is write-elided, so the per-frame push costs nothing).
+  private weaponVfxCalm = false;
   private readonly weaponVfxTuningScratch: WeaponVfxTuning = { ...DEFAULT_TUNING };
   /** Long-hair secondary motion (modular styles with sway morphs; empty and
    *  free on every other rig). */
@@ -1869,6 +1872,7 @@ export class CharacterVisual {
   /** `animate=false` skips mixer integration (distance throttling); state
    *  edges still latch so the pose catches up when the entity nears. */
   update(dt: number, s: AnimState, animate: boolean, reducedMotion = false): void {
+    this.weaponVfxCalm = reducedMotion;
     this.clock += dt;
     if (this.currentIsOneShot && this.currentOneShotIsAttack && this.def.clips.combatIdle) {
       this.braceUntil = extendBrace(this.braceUntil, this.clock);
@@ -5041,7 +5045,10 @@ export class CharacterVisual {
     // A veil that drops the weapon-skin VFX hides them and holds the light at 0.
     if (this.veilDrops('weaponVfx')) return;
     this.applyWeaponVfxShed(shed);
-    for (const handle of this.weaponVfx) handle.update(dt);
+    for (const handle of this.weaponVfx) {
+      handle.setCalm(this.weaponVfxCalm);
+      handle.update(dt);
+    }
   }
 
   // Write-elided: setTuning walks every part and rewrites its materials, so the

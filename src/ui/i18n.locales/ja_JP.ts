@@ -2656,26 +2656,36 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '樋に灯火の炎を宿した幅広の鋼の刃、金の鍔飾り、鍔に灯る籠入りのランタン、青い革の柄。',
   'hudChrome.wocStore.skins.lantern_hall_sword.name': '燈火の館の剣',
   'hudChrome.wocStore.skins.hearthbrand_sword.name': '炉火の剣',
-  'hudChrome.wocStore.skins.hearthbrand_sword.look':
-    '鍛冶の熱を帯びた両刃と、両面を枝分かれして走る溶けた継ぎ目を持つ、黒ずんだ鋼の炎形の刃。燃える石を囲む青銅の炎の鍔、牛血色の柄。',
-  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
-    '燈火の館には、館が建って以来一度も消えたことのない炉がある。ギャリック・ホルトは、この刃はその熾火で焼き入れされたと言い張る。これを携える者たちは、どれほど寒い夜番でも柄は温かいままだと言う。刃に沿う炎は見た目にすぎない。',
   'hudChrome.wocStore.skins.squallcrest_sword.name': '嵐波の剣',
-  'hudChrome.wocStore.skins.squallcrest_sword.look':
-    '砕ける波のように輝く刃縁を持つ海青色の長い刃。枝分かれした稲妻を宿す嵐の溝、刃元を越える金の波、片側の刃縁に沿うひれ、嵐の真珠を囲む金の砕け波の鍔。',
-  'hudChrome.wocStore.skins.squallcrest_sword.lore':
-    'ギルドのために航海したある船長が、帆柱を奪い船を鐘のように鳴り響かせた嵐からこの刃を持ち帰った。ギャリックは印章と引き換えにしか売らず、買う者には必ず、嵐の前にはうなるぞと忠告する。稲妻と海の光は見た目にすぎない。',
   'hudChrome.wocStore.skins.rimelight_staff.name': '霧氷灯の杖',
-  'hudChrome.wocStore.skins.rimelight_staff.look':
-    '銀で締められ、光る霧氷が巻きつく淡い柄。頂には氷の破片の冠の中で冷たい光の大きな結晶をつかむ銀の爪があり、襟からはつららが垂れる。',
-  'hudChrome.wocStore.skins.rimelight_staff.lore':
-    '燈火の館の冬の見張りは、このような杖を携えて高い街道を歩き、雪に迷う旅人のために頂を灯した。ギャリックは印章に余裕のある者のために一本を棚に置いている。霜とその冷たい光は見た目にすぎない。',
-  'hudChrome.wocStore.skins.duskwick_staff.name': '黄昏灯芯の杖',
-  'hudChrome.wocStore.skins.duskwick_staff.look':
-    '鉄で締められた二本のねじれた黒い木の柄。頂には二本の巻いた角の間で紫の黄昏の炎を燃やす吹き抜けの鉄のランタンがあり、その底から鎖が揺れる。',
-  'hudChrome.wocStore.skins.duskwick_staff.lore':
-    '館のランタンはどれも明るく燃える、ただ一つを除いて。黄昏の炎は夜の館を守るために灯されたもので、ほかのランタンが光を放つところで影を放つ。ギャリックはその芯を自ら切りそろえる。煙と紫の輝きは見た目にすぎない。',
   'hudChrome.wocStore.collections.lantern_hall': '燈火の館',
+  // The Smith's Heart raid arms (M16 fills).
+  'hudChrome.wocStore.collections.smiths_heart':
+    '鍛冶師の心臓',
+  'hudChrome.wocStore.skins.seamcaller_maul.name':
+    '鉱脈呼び',
+  'hudChrome.wocStore.skins.seamcaller_maul.look':
+    '縞模様の石切り場の岩一塊から削り出した両手持ちの大槌。燃える琥珀を囲む金縁の打撃面、金の冠翼、両頬に刻まれ燃える金のルーン、頭頂から伸びる琥珀の鉱脈結晶、金で締めた玄武岩の柄。',
+  'hudChrome.wocStore.skins.seamcaller_maul.lore':
+    'ハンマー評議会は襲撃隊に手を上げる前に、歌で鉱脈を目覚めさせた。岩はその一音一音を覚えている。この大槌は彼らの槌が割った岩塊から切り出され、振るうたびにルーンが今も燃える。石切り場の破片が頭を巡るのは、山がそれを取り戻したがっているかのようだ。ルーンと巡る石は見た目だけのもの。',
+  'hudChrome.wocStore.skins.squallcrest_sword.look':
+    '稲妻のように輝く刃を持つ長い嵐鋼の剣。両面の銀の溝には枝分かれした雷、峰には鉤状の風のひれ、嵐の目の宝石を囲む開いた銀の光輪が疾風の羽根となって後ろへ流れる。',
+  'hudChrome.wocStore.skins.squallcrest_sword.lore':
+    '息吹の守護者は心臓の空気を絶えず巡らせていた。それが倒れたとき、運んでいた嵐は散らなかった。この剣に宿ったのだ。風は今も鋼を巻き、稲妻は今も刃を走る。持ち主たちは、光輪の目が空を見張っていると誓う。嵐は見た目だけのもの。',
+  'hudChrome.wocStore.skins.rimelight_staff.look':
+    '霜に巻かれ氷の結晶が吹き出した淡い銀の杖。頂では四本の銀の爪が冷たい光の大結晶を囲い、その周りを氷片の冠が取り巻き、上には氷の欠片が一つ浮かんでいる。',
+  'hudChrome.wocStore.skins.rimelight_staff.lore':
+    '焼き入れの守護者は、心臓が鍛えたすべての刃を冷やしてきた。それが倒れたとき、最後まで光を失わなかったのがその結晶で、襲撃隊が持ち出したときも手が霜で覆われるほど冷たかった。氷が冠を巡り、霜のルーンがその周りを回る。冷たさは見た目だけのもの。',
+  'hudChrome.wocStore.skins.hearthbrand_sword.look':
+    '冷え固まった溶岩の殻でできた幅広の刃。刃は今も溶けたまま、両面には残り火の葉脈のようなひびが走り、峰には黒曜石の牙、黒鉄の鍔は溶岩を滴らせる二本の角となって溶岩の心臓を抱く。',
+  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
+    '熱の守護者こそ、心臓の名の由来となった炎だった。それが燃え尽きたとき、最後の溶岩は炉の床にできた剣の形の割れ目に流れ込み、そこで冷えた。外は殻、内は炎。その刃が燃えるのをやめたことは一度もない。炎は見た目だけのもの。',
+  'hudChrome.wocStore.skins.duskwick_staff.name':
+    'ハートメルドの杖',
+  'hudChrome.wocStore.skins.duskwick_staff.look':
+    '石切り場の石を何段も嵌め込んだ炉の青銅の杖。頂には大きな金の光輪があり、四つの宝石（鉱脈の琥珀、疾風、霜、炎）が順に灯り、白金の核を抱く金床の心臓を囲む。',
+  'hudChrome.wocStore.skins.duskwick_staff.lore':
+    '主なき力とは、心臓の四つの鉱脈が世界の金床の上で一つの体に結ばれたものだった。それが砕けても、四つは離れなかった。この光輪に宿り、岩、風、霜、炎と順に燃える。かつて順に打ちかかったように。四つの光は見た目だけのもの。',
   'hudChrome.wocStore.skins.guildmark_arming_sword.name': 'ギルドマーク・アーミングソード',
   'hudChrome.wocStore.skins.guildmark_arming_sword.look':
     '青焼き鋼の刀身、青銅の魚尾型クロスガード、青緑に染めた革巻きの柄、小さく刻印されたギルドの紋章。',

@@ -1432,7 +1432,8 @@ export const fr_FR: EnTranslations = {
         "emberwrought": "Forgé dans la braise",
         "hoarfrost": "Givre blanc",
         "fallen_star": "Étoile déchue",
-        "lantern_hall": "Hall de la Lanterne"
+        "lantern_hall": "Hall de la Lanterne",
+        "smiths_heart": "Smith's Heart"
       },
       "skins": {
         "lantern_hall_sword": {
@@ -1440,25 +1441,30 @@ export const fr_FR: EnTranslations = {
           "look": "Large lame d'acier dont la gouttière contient un feu de lanterne couvant, des flancs dorés, une lanterne encagée brûlant dans la garde et une poignée de cuir bleu.",
           "lore": "Garrick Holt ne vendra pas cette lame à un inconnu. Elle revient aux membres qui ont rempli les contrats du Hall de la Lanterne semaine après semaine, et il la remet toujours avec les mêmes mots : la lanterne de la garde est allumée au foyer du hall, alors partout où vous la portez, le hall vous accompagne. Le feu de la gouttière n'est qu'une apparence. La promesse est l'essentiel."
         },
-        "hearthbrand_sword": {
-          "name": "Marque du foyer",
-          "look": "Lame flamboyante d'acier noirci aux tranchants brûlants de forge, une veine de métal fondu ramifiée sur les deux faces, une garde de flammes de bronze autour d'une pierre ardente et une poignée rouge sang de bœuf.",
-          "lore": "Le Hall de la Lanterne entretient un foyer qui ne s'est pas éteint depuis sa construction, et Garrick Holt jure que cette lame a été trempée dans ses braises. Les membres qui la portent disent que sa poignée reste chaude pendant la garde la plus froide. Le feu de ses tranchants n'est qu'une apparence."
+        "seamcaller_maul": {
+          "name": "Seamcaller",
+          "look": "Two-handed maul hewn from one block of banded quarry stone, gold-rimmed striking faces round burning amber, gold crest wings, gold runes cut into both cheeks, amber seam-crystal growing from the crown and a basalt haft bound in gold.",
+          "lore": "The Hammer Council sang the seam awake before they ever raised a hand against the raid, and the stone remembered every note. This maul was cut from the block their hammers split, and its runes still burn when it swings. Quarry shards circle the head as if the mountain wants them back. The runes and the circling stone are only a look."
         },
         "squallcrest_sword": {
           "name": "Crête de bourrasque",
-          "look": "Longue lame bleu marin aux tranchants brillants comme des vagues déferlantes, un canal de tempête renfermant un éclair fourchu, une vague dorée sur le ricasso, un aileron sur un bord et une garde de déferlantes dorées autour d'une perle d'orage.",
-          "lore": "Une capitaine qui naviguait pour la guilde a rapporté cette lame d'un grain qui lui a arraché son mât et laissé son navire résonner comme une cloche. Garrick ne la vend que contre des sceaux et avertit chaque acheteur qu'elle bourdonne avant une tempête. La foudre et la lumière marine ne sont qu'une apparence."
+          "look": "Long storm-steel blade with lightning-bright edges, a forked bolt in a silver channel up each face, wind fins hooked off the spine and an open silver halo round a storm-eye gem, swept back in gale vanes.",
+          "lore": "The Guardian of the Breath kept the air of the Heart moving, and when it fell the storm it carried did not scatter. It settled into this blade. Wind still winds round the steel and lightning still runs its edges, and those who carry it swear the eye in the halo watches the sky. The storm is only a look."
         },
         "rimelight_staff": {
           "name": "Bâton de Lumière de givre",
-          "look": "Hampe pâle cerclée d'argent et enlacée de givre lumineux, surmontée d'une griffe d'argent qui tient un grand cristal de lumière froide dans une couronne de glace éclatée, des glaçons suspendus à son col.",
-          "lore": "La garde hivernale du Hall de la Lanterne portait des bâtons comme celui-ci sur la grande route, leurs couronnes éclairant les voyageurs perdus dans la neige. Garrick en garde un au râtelier pour les membres ayant des sceaux à dépenser. Le givre et sa lumière froide ne sont qu'une apparence."
+          "look": "Pale silver shaft wound with hoarfrost and broken out in ice, crowned by four silver tines caging a great crystal of cold light inside a crown of ice shards, a splinter of ice hovering above.",
+          "lore": "The Guardian of the Quench cooled every blade the Heart ever forged. Its crystal was the last thing to stop glowing when it fell, and the raid carried it out still cold enough to frost the hand. Ice circles the crown and runes of frost turn round it. The cold is only a look."
+        },
+        "hearthbrand_sword": {
+          "name": "Marque du foyer",
+          "look": "Broad blade of cooled magma crust with molten edges, a net of ember veins cracked across both faces, an obsidian-toothed spine and a black iron guard swept into horns dripping melt round a magma heart.",
+          "lore": "The Guardian of the Heat was the fire the Heart was named for. When it guttered out, its last melt ran into a blade-shaped crack in the forge floor and cooled there, crust outside and fire within. The edges have never stopped burning. The flames are only a look."
         },
         "duskwick_staff": {
-          "name": "Bâton de la Mèche crépusculaire",
-          "look": "Deux brins torsadés de bois noir cerclés de fer, surmontés d'une lanterne de fer ouverte où brûle une flamme crépusculaire violette entre deux cornes recourbées, des chaînes suspendues à sa base.",
-          "lore": "Toutes les lanternes du hall brillent vivement, sauf une. La flamme crépusculaire a été allumée pour garder le hall la nuit et répand de l'ombre là où les autres donnent de la lumière ; Garrick en taille lui-même la mèche. La fumée et la lueur violette ne sont qu'une apparence."
+          "name": "Heartmeld Staff",
+          "look": "Forge-bronze staff set with courses of quarry stone, crowned by a great gold halo holding four gems that light in turn (quarry amber, gale, frost and fire) round an anvil heart with a white-gold core.",
+          "lore": "The Masterless Strength was the four veins of the Heart bound into one body on the Anvil of the World. When it broke, the four did not part: they settled into this halo and take turns to burn, stone, wind, frost and fire, as they once took turns to strike. The four lights are only a look."
         },
         "guildmark_arming_sword": {
           "name": "Épée d’armes à la marque de guilde",

@@ -22,7 +22,14 @@ export type WeaponSkinCollection =
   | 'emberwrought'
   | 'hoarfrost'
   | 'fallen_star'
-  | 'lantern_hall';
+  | 'lantern_hall'
+  | 'smiths_heart';
+
+/** The Smith's Heart encounter that awards a raid skin: the Hammer Council, the three guardians
+ *  of the Breath, the Quench and the Heat, and the Masterless Strength on the Anvil. Each names
+ *  the boss templates of content/smith_heart.ts (pinned in tests/smith_heart_raid_arms.test.ts),
+ *  for the achievements step that wires the grant. */
+export type SmithsHeartEncounter = 'hammer_council' | 'breath' | 'quench' | 'heat' | 'masterless';
 
 export interface WeaponSkinDef {
   /** Store SKU / economy-service item id (kind 'skin'). */
@@ -43,10 +50,13 @@ export interface WeaponSkinDef {
   handling?: 'crossbow';
   /** Earned in the world instead of sold in the Claudium Armory: the skin has no economy SKU
    *  and stays out of the store (STORE_WEAPON_SKIN_LIST). 'lantern_hall': Lantern Hall's
-   *  quartermaster sells it for Lantern Seals (content/guild_contracts.ts). 'future_raid':
-   *  RESERVED as loot for a raid that does not exist yet, so nothing grants it today: no
-   *  store, vendor, drop or Reliquary page (RESERVED_WEAPON_SKIN_IDS). */
-  earnedFrom?: 'lantern_hall' | 'future_raid';
+   *  quartermaster sells it for Lantern Seals (content/guild_contracts.ts). 'smiths_heart':
+   *  earned in the Smith's Heart raid from the encounter `raidEncounter` names. Until the
+   *  achievements step wires that grant, nothing grants it: no store, vendor, drop or Reliquary
+   *  page (RESERVED_WEAPON_SKIN_IDS, isGrantableWeaponSkin). */
+  earnedFrom?: 'lantern_hall' | 'smiths_heart';
+  /** For a Smith's Heart skin: the encounter whose defeat awards it. */
+  raidEncounter?: SmithsHeartEncounter;
 }
 
 export const WEAPON_SKIN_TYPES: readonly WeaponSkinType[] = [
@@ -333,63 +343,87 @@ export const WEAPON_SKINS: Record<string, WeaponSkinDef> = {
     season: 1,
     earnedFrom: 'lantern_hall',
   },
-  // Four elemental arms RESERVED for a future raid's loot table: built and kept (models,
-  // art, VFX rows) but not obtainable anywhere yet, so they are no longer sold at Lantern
-  // Hall. Their collection stays 'lantern_hall' (where they were made) until the raid lands.
-  // Epic, so each carries the epic tier's stronger glow, rim and cast light under its own
-  // element's VFX row (src/render/weapon_vfx.ts): fire and a sea storm for sword users, frost
-  // and a dusk-flame for staff users. Built by scripts/assets/lantern_hall_arms/.
-  hearthbrand_sword: {
-    id: 'hearthbrand_sword',
-    collection: 'lantern_hall',
+  // ── Smith's Heart (earned): one appearance per encounter of the raid ──
+  // Built by scripts/assets/smith_heart_arms/, each with its element's VFX row
+  // (src/render/weapon_vfx.ts). Hearthbrand, Squallcrest, the Rimelight Staff and the
+  // duskwick_staff model were first made for Lantern Hall and held back for this raid; the raid
+  // reforged them, and the ids stay frozen (duskwick_staff is now the Heartmeld Staff).
+  seamcaller_maul: {
+    id: 'seamcaller_maul',
+    collection: 'smiths_heart',
     rarity: 'epic',
-    weaponType: 'sword',
-    model: 'hearthbrand',
+    weaponType: 'mace',
+    model: 'seamcaller_maul',
     season: 1,
-    earnedFrom: 'future_raid',
+    earnedFrom: 'smiths_heart',
+    raidEncounter: 'hammer_council',
   },
   squallcrest_sword: {
     id: 'squallcrest_sword',
-    collection: 'lantern_hall',
+    collection: 'smiths_heart',
     rarity: 'epic',
     weaponType: 'sword',
     model: 'squallcrest',
     season: 1,
-    earnedFrom: 'future_raid',
+    earnedFrom: 'smiths_heart',
+    raidEncounter: 'breath',
   },
   rimelight_staff: {
     id: 'rimelight_staff',
-    collection: 'lantern_hall',
+    collection: 'smiths_heart',
     rarity: 'epic',
     weaponType: 'staff',
     model: 'rimelight_staff',
     season: 1,
-    earnedFrom: 'future_raid',
+    earnedFrom: 'smiths_heart',
+    raidEncounter: 'quench',
   },
+  hearthbrand_sword: {
+    id: 'hearthbrand_sword',
+    collection: 'smiths_heart',
+    rarity: 'epic',
+    weaponType: 'sword',
+    model: 'hearthbrand',
+    season: 1,
+    earnedFrom: 'smiths_heart',
+    raidEncounter: 'heat',
+  },
+  // The final encounter's staff is the set's legendary: the four elements together.
   duskwick_staff: {
     id: 'duskwick_staff',
-    collection: 'lantern_hall',
-    rarity: 'epic',
+    collection: 'smiths_heart',
+    rarity: 'legendary',
     weaponType: 'staff',
     model: 'duskwick_staff',
     season: 1,
-    earnedFrom: 'future_raid',
+    earnedFrom: 'smiths_heart',
+    raidEncounter: 'masterless',
   },
 };
 
 export const WEAPON_SKIN_LIST: readonly WeaponSkinDef[] = Object.values(WEAPON_SKINS);
 
-/** The skins reserved for a future raid: in the catalog (so the renderer, previews and VFX
- *  keep them) but obtainable nowhere yet. Every player-facing list leaves them out. */
+/** The Smith's Heart skins: in the catalog (so the renderer, previews and VFX carry them) but
+ *  obtainable nowhere until the achievements step wires each encounter's grant. Every
+ *  player-facing list leaves them out. */
 export const RESERVED_WEAPON_SKIN_IDS: readonly string[] = WEAPON_SKIN_LIST.filter(
-  (skin) => skin.earnedFrom === 'future_raid',
+  (skin) => skin.earnedFrom === 'smiths_heart',
 ).map((skin) => skin.id);
 
-/** A catalog skin that something may grant today: every skin but the ones reserved for a future
- *  raid. The server's grant and store-mirror paths gate on this, so a reserved skin can never
- *  reach an account ledger, whatever an outside catalog says. */
+/** Which skin each Smith's Heart encounter awards, in encounter order. */
+export const SMITHS_HEART_WEAPON_SKINS: Readonly<Record<SmithsHeartEncounter, string>> = {
+  hammer_council: 'seamcaller_maul',
+  breath: 'squallcrest_sword',
+  quench: 'rimelight_staff',
+  heat: 'hearthbrand_sword',
+  masterless: 'duskwick_staff',
+};
+
+/** A catalog skin that something may grant today: every skin but the raid's, which wait on the
+ *  achievements step. The server's grant and store-mirror paths gate on this, so a reserved skin
+ *  can never reach an account ledger, whatever an outside catalog says. */
 export function isGrantableWeaponSkin(skinId: string): boolean {
-  return Object.hasOwn(WEAPON_SKINS, skinId) && WEAPON_SKINS[skinId].earnedFrom !== 'future_raid';
+  return Object.hasOwn(WEAPON_SKINS, skinId) && WEAPON_SKINS[skinId].earnedFrom !== 'smiths_heart';
 }
 
 /** The skins the Claudium Armory sells: every skin that is not earned in the world. */

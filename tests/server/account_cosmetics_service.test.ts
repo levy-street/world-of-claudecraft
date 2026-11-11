@@ -44,10 +44,10 @@ function setup() {
   return { service, sessions, sim };
 }
 
-describe('weapon skins reserved for a future raid', () => {
+describe("the Smith's Heart raid skins (granted nowhere until the achievements step)", () => {
   it('never mirrors one the economy ledger grants, nor grants one through the guild ledger', () => {
     const { service, sessions } = setup();
-    expect(RESERVED_WEAPON_SKIN_IDS.length).toBe(4);
+    expect(RESERVED_WEAPON_SKIN_IDS.length).toBe(5);
     service.grantWeaponSkins(7, [...RESERVED_WEAPON_SKIN_IDS, 'not_a_skin']);
     expect(persistWeapon).not.toHaveBeenCalled();
     expect(sessions.map((s) => s.accountCosmetics.weaponSkinIds)).toEqual([[], []]);

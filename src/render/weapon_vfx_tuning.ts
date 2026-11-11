@@ -9,28 +9,48 @@ import { type WeaponVfxTierName, type WeaponVfxTuning, WORLD_TUNING } from './we
 
 export const WEAPON_VFX_TUNING: Record<string, Partial<WeaponVfxTuning>> = {
   // Populated by the inspector Save VFX button, keyed by weapon model basename.
-  // The elemental arms (reserved for a future raid): dialled hot on purpose (showpieces), the
-  // painted element at full glow, its particles and rim above the epic baseline, the cast light
-  // kept near it so a wearer lights the ground at their feet without washing out a crowd.
-  hearthbrand: { glow: 2, light: 0.6, core: 1.2, mist: 1.4, sparkle: 1.6, shell: 1.5 },
-  squallcrest: { glow: 2, light: 0.6, core: 1.2, aurora: 1.3, mist: 1.3, sparkle: 1.8, shell: 1.8 },
+  // The Smith's Heart raid arms: dialled hot on purpose (raid showpieces), the painted element
+  // at full glow, its particles, rings and rim above the epic baseline, the cast light kept low
+  // so a wearer lights the ground at their feet without washing out a crowd.
+  seamcaller_maul: {
+    glow: 1.8,
+    light: 0.35,
+    core: 1.1,
+    motes: 1.1,
+    aurora: 1.0,
+    mist: 1.2,
+    sparkle: 1.5,
+    shell: 1.3,
+  },
+  squallcrest: {
+    glow: 2,
+    light: 0.4,
+    core: 1.2,
+    aurora: 1.2,
+    mist: 1.3,
+    sparkle: 1.8,
+    shell: 1.6,
+  },
   rimelight_staff: {
     glow: 2,
-    light: 0.6,
+    light: 0.4,
     core: 1.2,
-    motes: 1.2,
+    motes: 1.1,
+    aurora: 1.0,
     mist: 1.3,
     sparkle: 1.6,
     shell: 1.5,
   },
+  hearthbrand: { glow: 2, light: 0.35, core: 1.2, mist: 1.2, sparkle: 1.6, shell: 1.4 },
   duskwick_staff: {
-    glow: 2,
-    light: 0.6,
+    glow: 1.8,
+    light: 0.35,
     core: 1.2,
-    aurora: 1.3,
-    mist: 1.3,
-    sparkle: 1.5,
-    shell: 1.5,
+    motes: 1.1,
+    aurora: 1.0,
+    mist: 1.2,
+    sparkle: 1.4,
+    shell: 1.3,
   },
   winterbite: {
     glow: 2,

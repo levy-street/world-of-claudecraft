@@ -1432,7 +1432,8 @@ export const pl_PL: EnTranslations = {
         "emberwrought": "Wykuty w żarze",
         "hoarfrost": "Szron",
         "fallen_star": "Upadła Gwiazda",
-        "lantern_hall": "Sala Latarni"
+        "lantern_hall": "Sala Latarni",
+        "smiths_heart": "Smith's Heart"
       },
       "skins": {
         "lantern_hall_sword": {
@@ -1440,25 +1441,30 @@ export const pl_PL: EnTranslations = {
           "look": "Szerokie stalowe ostrze ze zbroczem przygaszonego ognia latarni, złocone płazy, latarnia w klatce płonąca w jelcu i rękojeść z niebieskiej skóry.",
           "lore": "Garrick Holt nie sprzeda tego ostrza obcemu. Trafia do członków, którzy tydzień po tygodniu wypełniali kontrakty Sali Latarni. Przekazuje je zawsze tymi samymi słowami: latarnię w jelcu zapalono z paleniska sali, więc dokądkolwiek je zaniesiesz, sala pójdzie z tobą. Ogień w zbroczu jest tylko wyglądem. Liczy się obietnica."
         },
-        "hearthbrand_sword": {
-          "name": "Piętno Paleniska",
-          "look": "Faliste niczym płomień ostrze z czernionej stali o rozżarzonych krawędziach, stopiona żyła rozgałęziona po obu stronach, jelec z brązowych płomieni wokół płonącego kamienia, rękojeść w kolorze wołowej krwi.",
-          "lore": "W Sali Latarni płonie palenisko, które nie zgasło od jej powstania, a Garrick Holt przysięga, że ostrze hartowano w jego węglach. Noszący je członkowie mówią, że rękojeść pozostaje ciepła podczas najzimniejszej warty. Ogień na krawędziach jest tylko wyglądem."
+        "seamcaller_maul": {
+          "name": "Seamcaller",
+          "look": "Two-handed maul hewn from one block of banded quarry stone, gold-rimmed striking faces round burning amber, gold crest wings, gold runes cut into both cheeks, amber seam-crystal growing from the crown and a basalt haft bound in gold.",
+          "lore": "The Hammer Council sang the seam awake before they ever raised a hand against the raid, and the stone remembered every note. This maul was cut from the block their hammers split, and its runes still burn when it swings. Quarry shards circle the head as if the mountain wants them back. The runes and the circling stone are only a look."
         },
         "squallcrest_sword": {
           "name": "Grzbiet Szkwału",
-          "look": "Długie morskobłękitne ostrze o krawędziach jasnych jak załamujące się fale, burzowy kanał z rozwidloną błyskawicą, złocona fala nad ricasso, płetwa wzdłuż jednej krawędzi i jelec ze złoconych grzywaczy wokół burzowej perły.",
-          "lore": "Kapitan żeglująca dla gildii przywiozła to ostrze ze szkwału, który zabrał jej maszt i sprawił, że statek dźwięczał jak dzwon. Garrick sprzedaje je tylko za pieczęcie i ostrzega każdego kupca, że brzęczy przed burzą. Błyskawice i morskie światło są tylko wyglądem."
+          "look": "Long storm-steel blade with lightning-bright edges, a forked bolt in a silver channel up each face, wind fins hooked off the spine and an open silver halo round a storm-eye gem, swept back in gale vanes.",
+          "lore": "The Guardian of the Breath kept the air of the Heart moving, and when it fell the storm it carried did not scatter. It settled into this blade. Wind still winds round the steel and lightning still runs its edges, and those who carry it swear the eye in the halo watches the sky. The storm is only a look."
         },
         "rimelight_staff": {
           "name": "Kostur Szronnego Światła",
-          "look": "Jasny trzon okuty srebrem i owinięty świecącym szronem, zwieńczony srebrnym szponem trzymającym wielki kryształ zimnego światła w koronie połamanego lodu, z soplami zwisającymi z kołnierza.",
-          "lore": "Zimowa straż Sali Latarni niosła takie kostury górskim traktem, z koronami rozświetlonymi dla zagubionych w śniegu podróżnych. Garrick trzyma jeden na stojaku dla członków z nadmiarem pieczęci. Mróz i zimne światło są tylko wyglądem."
+          "look": "Pale silver shaft wound with hoarfrost and broken out in ice, crowned by four silver tines caging a great crystal of cold light inside a crown of ice shards, a splinter of ice hovering above.",
+          "lore": "The Guardian of the Quench cooled every blade the Heart ever forged. Its crystal was the last thing to stop glowing when it fell, and the raid carried it out still cold enough to frost the hand. Ice circles the crown and runes of frost turn round it. The cold is only a look."
+        },
+        "hearthbrand_sword": {
+          "name": "Piętno Paleniska",
+          "look": "Broad blade of cooled magma crust with molten edges, a net of ember veins cracked across both faces, an obsidian-toothed spine and a black iron guard swept into horns dripping melt round a magma heart.",
+          "lore": "The Guardian of the Heat was the fire the Heart was named for. When it guttered out, its last melt ran into a blade-shaped crack in the forge floor and cooled there, crust outside and fire within. The edges have never stopped burning. The flames are only a look."
         },
         "duskwick_staff": {
-          "name": "Kostur Zmierzchowego Knota",
-          "look": "Dwa skręcone pasma czarnego drewna skute żelazem, zwieńczone otwartą żelazną latarnią z fioletowym płomieniem zmierzchu między dwoma zakręconymi rogami, z łańcuchami zwisającymi z dna.",
-          "lore": "Każda latarnia sali płonie jasno prócz jednej. Płomień zmierzchu zapalono, by strzegł sali nocą; daje cień tam, gdzie inne dają światło. Garrick sam przycina knot. Dym i fioletowa poświata są tylko wyglądem."
+          "name": "Heartmeld Staff",
+          "look": "Forge-bronze staff set with courses of quarry stone, crowned by a great gold halo holding four gems that light in turn (quarry amber, gale, frost and fire) round an anvil heart with a white-gold core.",
+          "lore": "The Masterless Strength was the four veins of the Heart bound into one body on the Anvil of the World. When it broke, the four did not part: they settled into this halo and take turns to burn, stone, wind, frost and fire, as they once took turns to strike. The four lights are only a look."
         },
         "guildmark_arming_sword": {
           "name": "Miecz zbrojny Guildmark",

@@ -419,9 +419,9 @@ export const RELIQUARY_HORIZON_WEAPON_SKINS = [
   'encore_bow',
   'meteorlatch_crossbow',
   'lantern_hall_sword',
-  // The four elemental arms (hearthbrand_sword, squallcrest_sword, rimelight_staff,
-  // duskwick_staff) are reserved for a future raid and obtainable nowhere yet, so they get no
-  // Reliquary row until that raid ships them.
+  // The Smith's Heart arms (seamcaller_maul, squallcrest_sword, rimelight_staff,
+  // hearthbrand_sword, duskwick_staff) are obtainable nowhere until the achievements step wires
+  // the raid's grants, so they get no Reliquary row until then.
 ] as const;
 
 // The skins NOT sold by the store (WeaponSkinDef.earnedFrom), each naming where it is earned.
