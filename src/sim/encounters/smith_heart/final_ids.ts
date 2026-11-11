@@ -481,8 +481,13 @@ export const FINAL_TUNING = {
   anvilEvery: 25,
   anvilCast: 6,
   anvilR: 6,
-  /** The whole blow, split between everyone under it. */
-  anvilTotal: 9000,
+  /** The whole blow, split between everyone under it: 660 a body with all
+   *  ten under it, about 55 percent of a fresh level-20 cloth pool (the
+   *  raid's soak band: the Cradle's full share is about 55, the council's
+   *  rock about 35). 9,000 until the bot raid of 2026-11-11: 900 a body with
+   *  the whole raid under it (70 to 77 percent of cloth) killed the cloth
+   *  wearers whenever one raider was missing or a pulse landed with it. */
+  anvilTotal: 6600,
   /** Fewer soakers than this: each takes half as much again. */
   anvilMinSoakers: 3,
   /** Nobody under it: the whole raid takes this. */
