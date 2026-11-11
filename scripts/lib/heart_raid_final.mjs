@@ -414,7 +414,13 @@ function duty(world, st, b, me) {
   const boss = world.mobs.boss;
   // Weight of the Anvil: everyone under it (the Crushed, on Heroic, aside).
   const anvil = o.anvils[0];
-  if (anvil && !me.tank && !hasAura(me, FINAL_AURAS.crushed)) {
+  // The off-tank soaks too, and the main tank when the mark lies at the
+  // boss's feet: 9,000 split is lethal on cloth with three bodies missing.
+  const soaks =
+    !me.tank ||
+    me.pid !== st.mainTankPid ||
+    (alive(boss) && hypot(anvil ?? me, boss) <= (anvil?.r ?? 0) + (boss.reach ?? 0) + 3);
+  if (anvil && soaks && !hasAura(me, FINAL_AURAS.crushed)) {
     const i = world.bots.indexOf(b);
     return {
       goal: add(anvil, { x: Math.sin(i * 1.3), z: Math.cos(i * 1.3) }, Math.min(3, anvil.r - 2)),
