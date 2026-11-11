@@ -105,12 +105,17 @@ for deg, mat in SOCKETS:
         for j, dt in enumerate((-0.025, 0.0, 0.025)):
             F.crystal(c + out * 0.05 + tang * dt, c + out * (0.12 + 0.04 * (j == 1)) + tang * dt * 1.8, 0.022, mat,
                       sides=6, seed=1 + j, mats=[mat, 'gem_core'])
-    elif mat == 'gem_wind':     # two curls of gale
-        for j, dt in enumerate((-0.02, 0.025)):
-            sg = 1 if j else -1
-            F.path_tube([c + out * 0.06 + tang * dt, c + out * 0.1 + tang * (dt + sg * 0.03),
-                         c + out * 0.14 + tang * (dt + sg * 0.01), c + out * 0.13 + tang * (dt - sg * 0.03),
-                         c + out * 0.1 + tang * (dt - sg * 0.02)], [0.016, 0.014, 0.011, 0.008, 0.003], mat, sides=6)
+    elif mat == 'gem_wind':     # three gust blades swept round the gem like a turning gale
+        for j in range(3):
+            a0 = -0.9 + j * 0.9
+            pts = []
+            for q in range(7):
+                t = q / 6
+                ang = a0 + t * 1.1
+                rr = 0.075 + 0.05 * t
+                d = out * math.cos(ang) + tang * math.sin(ang)
+                pts.append(c + d * rr)
+            F.path_tube(pts, [0.006, 0.014, 0.017, 0.016, 0.012, 0.007, 0.002], mat, sides=5, flat=0.45)
     elif mat == 'gem_frost':    # a cluster of icicles
         for j, dt in enumerate((-0.03, 0.0, 0.03)):
             F.crystal(c + out * 0.05 + tang * dt, c + out * (0.12 + 0.04 * (j == 1)) + tang * dt * 1.4,
@@ -125,12 +130,15 @@ for x in (1, -1):
     F.shard((x * (R + 0.02), 0, RZ), (x * (R + 0.13), 0, RZ), 0.03, 'gold', sides=4, mats=['gold', 'gold_dark'])
 F.shard((0, 0, RZ + R + 0.02), (0, 0, RZ + R + 0.2), 0.034, 'gold', sides=4, mats=['gold', 'gold_dark'])
 F.rock((0, 0, RZ + R + 0.02), 0.04, 'gold_dark', 3, rough=0.05)
-# the anvil heart inside the ring, holding the white-gold core
-F.block((0, 0, RZ - 0.06), (0.17, 0.07, 0.045), 'gold', bevel=0.012)
-F.block((0, 0, RZ - 0.105), (0.08, 0.055, 0.05), 'gold_dark', bevel=0.008)
-F.block((0, 0, RZ - 0.14), (0.13, 0.065, 0.03), 'gold', bevel=0.008)
-F.path_tube([(0.085, 0, RZ - 0.06), (0.12, 0, RZ - 0.055), (0.15, 0, RZ - 0.065)], [0.022, 0.015, 0.003], 'gold',
-            sides=6)
+# the anvil heart inside the ring: a broad face with a long horn to one side and a squared heel
+# to the other, a pinched waist and splayed feet, holding the white-gold core above it
+F.block((0.015, 0, RZ - 0.055), (0.17, 0.08, 0.05), 'gold', bevel=0.012)
+F.shard((-0.065, 0, RZ - 0.06), (-0.155, 0, RZ - 0.045), 0.032, 'gold', sides=6, taper=0.7,
+        mats=['gold', 'gold_dark'])
+F.block((0.1, 0, RZ - 0.06), (0.03, 0.07, 0.04), 'gold_dark', bevel=0.006)
+F.loft([F.ring(RZ - 0.08, 0.05, 0.035, 4, rot=math.pi / 4), F.ring(RZ - 0.11, 0.032, 0.026, 4, rot=math.pi / 4),
+        F.ring(RZ - 0.13, 0.06, 0.038, 4, rot=math.pi / 4)], 'gold_dark')
+F.block((0, 0, RZ - 0.145), (0.15, 0.075, 0.03), 'gold', bevel=0.01)
 F.path_tube([(0, 0, RZ - 0.15), (0, 0, RZ - R)], 0.016, 'gold_dark', sides=6)
 for side in (1, -1):
     F.gem((0, side * 0.03, RZ + 0.03), 0.06, 0.035, 'gem_core', sides=10, axis=(0, -side, 0), crown=0.6)

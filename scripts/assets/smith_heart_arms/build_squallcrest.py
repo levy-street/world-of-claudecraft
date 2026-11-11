@@ -114,19 +114,30 @@ for side in (1, -1):
 F.path_tube([(0, 0, 0.2), (0, 0, GZ + 0.135)], 0.02, 'silver', sides=6)
 F.path_tube([(0, 0, GZ - 0.135), (0, 0, 0.0)], 0.022, 'silver', sides=6)
 for s in (1, -1):
-    # a gale vane: three feathered gusts swept back from the halo toward the pommel
-    vane = [(0.12, 0.04), (0.2, 0.08), (0.29, 0.11), (0.38, 0.1), (0.45, 0.05), (0.47, -0.01),
-            (0.42, 0.01), (0.39, -0.05), (0.33, -0.1), (0.36, -0.03), (0.3, -0.02), (0.27, -0.09),
-            (0.21, -0.14), (0.23, -0.06), (0.17, -0.04), (0.13, -0.05)]
-    pts = [(s * x, GZ + z) for x, z in vane]
-    if s < 0:
-        pts = list(reversed(pts))
-    F.plate(pts, 0.0, 0.03, 'silver', 'silver_dark')
-    inner = [(s * (0.14 + (x - 0.14) * 0.86), GZ + z * 0.55 + 0.012) for x, z in vane[1:5]]
-    inner += [(s * (0.14 + (x - 0.14) * 0.7), GZ + z * 0.3 + 0.006) for x, z in reversed(vane[1:5])]
-    if s < 0:
-        inner = list(reversed(inner))
-    F.plate(inner, 0.0, 0.034, 'edge', 'edge')
+    # a gale vane: three stacked crescent blades swept out and back from the halo, the top one
+    # longest, each a smooth curve with a lit leading edge, layered like wind-torn feathers
+    for k, (ln, rise, droop, wd, y) in enumerate(((0.34, 0.08, 0.1, 0.095, 0.0),
+                                                  (0.28, 0.0, 0.12, 0.08, 0.008),
+                                                  (0.22, -0.07, 0.13, 0.065, 0.016))):
+        outer, inner = [], []
+        n = 14
+        for j in range(n + 1):
+            t = j / n
+            x = 0.11 + ln * t
+            # the spine of the blade rises a little, then sweeps down toward the pommel
+            zc = GZ + rise * math.sin(t * math.pi * 0.8) - droop * t ** 2.2
+            w = wd * math.sin(math.pi * min(1.0, 0.15 + t * 0.9)) ** 0.7
+            outer.append((s * x, zc + w * 0.55))
+            inner.append((s * x, zc - w * 0.45))
+        pts = outer + list(reversed(inner))
+        if s < 0:
+            pts = list(reversed(pts))
+        F.plate(pts, 0.0, 0.026 - 0.004 * k, 'silver', 'silver_dark')
+        # the lit leading edge along the top of each blade
+        lit = outer[1:-1] + [(xx, zz - 0.016) for xx, zz in reversed(outer[1:-1])]
+        if s < 0:
+            lit = list(reversed(lit))
+        F.plate(lit, 0.0, 0.03 - 0.004 * k, 'edge', 'edge')
     # a splinter of the blade hovering free beside the halo (the floating part): a curved crescent
     cres = []
     for k in range(9):
