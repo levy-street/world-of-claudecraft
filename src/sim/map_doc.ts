@@ -91,7 +91,7 @@ export const MAP_DOC_VERSION = 2;
 
 // Hard caps applied by the sanitizer (the server stores what the sanitizer
 // returns, so these bound document size and playtest cost).
-// Terrain stamps are spatially indexed (world.ts EDIT_INDEX_CELL), so
+// Terrain stamps are spatially indexed (terrain_edit_layer.ts EDIT_INDEX_CELL), so
 // per-sample cost tracks LOCAL stamp density, not the total; 10k stamps is
 // ~80KiB JSON, well under the 2MiB server payload cap. The cap still exists
 // so a hostile document cannot stall the editor's chunk rebuilds.

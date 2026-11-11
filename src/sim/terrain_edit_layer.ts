@@ -26,7 +26,7 @@ function lerp(a: number, b: number, t: number): number {
 // agree. `add` stamps add a falloff-weighted delta (a Noise-brush stamp scales it by
 // a seeded field, terrain_noise_brush.ts); `level` stamps pull toward `delta`.
 //
-// Stamps are looked up through a coarse spatial bucket index (cell 32yd; each
+// Stamps are looked up through a spatial bucket index (cell 8yd; each
 // stamp registered in every cell its radius's bounding box touches) instead of a
 // linear scan: the render chunk rebuilder samples the height 5x per vertex, so
 // with the 4000-stamp cap the linear scan grows editor brush cost with session
@@ -38,7 +38,11 @@ function lerp(a: number, b: number, t: number): number {
 // invalidateTerrainEditIndex() for same-length in-place mutations.
 // ---------------------------------------------------------------------------
 
-const EDIT_INDEX_CELL = 32; // yards per bucket cell
+// yards per bucket cell. 8 (was 32): the live touch-up carries thousands of
+// small sculpt dabs (median radius under 4 yd), and a 32 yd cell plus its guard
+// ring made each query in a sculpted town walk a few hundred stamps to find the
+// handful that reach it (Eastbrook height queries ran 4 to 5x slower).
+const EDIT_INDEX_CELL = 8;
 // A stamp this large would touch an unbounded number of cells; index none and
 // fall back to the (bit-identical) linear scan. The document sanitizer caps
 // stamp radius at 200, so this only guards hostile in-memory content.
