@@ -42,6 +42,7 @@ import { prepareNoticeboardProfileAssets, resetNoticeboardProfileCaches } from '
 import { preparePaintedTownProfileAssets, resetPaintedTownProfileCaches } from '../painted_towns';
 import { resetPaladinAscensionProfileCaches } from '../paladin_ascension_visual';
 import { preparePropProfileAssets, resetPropProfileCaches } from '../props';
+import { resetQuarryheartProfileCaches } from '../quarryheart_charger_fx';
 import { resetQuestObjectProfileCaches } from '../quest_objects';
 import { resetSanctumExitPortalProfileCaches } from '../sanctum_exit_portal';
 import { ensureSkyAssetsAt } from '../sky';
@@ -132,6 +133,9 @@ const RESETTERS = [
   ['paladin_ascension_visual', resetPaladinAscensionProfileCaches],
   // The shared plume pair bakes the composer's HDR colour gain at build.
   ['goblin_rocket_sled_fx', resetGoblinRocketSledProfileCaches],
+  // The charger's parked material sets are clones of the retiring profile's GLB materials and
+  // carry its HDR gain.
+  ['quarryheart_charger_fx', resetQuarryheartProfileCaches],
   // The boot twin manifest for the lazy ground-decor pools holds the LIVE
   // materials of the retiring profile: a rebuild mints new ones, and a twin
   // wearing a retired material links a program nothing will ever draw.

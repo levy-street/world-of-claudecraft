@@ -2119,6 +2119,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Неактивно: продлите подписку, чтобы восстановить характеристики снаряжения и бонусы комплекта.',
   'entities.items.lantern_seal.name': 'Печать Фонаря',
   'entities.items.reins_lantern_hall_destrier.name': 'Поводья боевого коня Зала Фонаря',
+  'entities.items.reins_quarryheart_charger.name': 'Поводья скакуна Каменного Сердца',
   'entities.items.membership_staff.name': 'Посох перемен',
   'hudChrome.bags.membershipSlot': 'Ячейка сумки по подписке',
   'hudChrome.bags.membershipSlotLocked': 'Оформите подписку, чтобы открыть эту ячейку сумки.',
@@ -16516,6 +16517,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Двуглавая сумеречная виверна с древних ветвей: в покое стоит на когтистых задних лапах, а в движении парит над землёй на крыльях с тайными рунами.',
   'hudChrome.mounts.name_lanternback_troll': 'Грумбол Фонареносец',
   'hudChrome.mounts.name_lantern_hall_destrier': 'Боевой конь Зала Фонаря',
+  'hudChrome.mounts.name_quarryheart_charger': 'Скакун Каменного Сердца',
   'hudChrome.mounts.name_chimeglass_tortoise': 'Толливер Звонкостёкл',
   'hudChrome.mounts.desc_drakemaw_raptor':
     'Приученный к седлу выводковый раптор из кальдеры Дрейкмо: сплошные жилы и бег, и от него всё ещё едва пахнет пеплом.',
@@ -16528,6 +16530,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Холмовой тролль, укрощённый фонарщиками: на плечах он несёт железный трон, а на обоих подлокотниках горит по штормовому фонарю.',
   'hudChrome.mounts.desc_lantern_hall_destrier':
     'Боевой конь Зала Фонаря в дубово-железной броне под синим сукном гильдии; два штормовых фонаря, качаясь у седла, освещают дорогу домой.',
+  'hudChrome.mounts.desc_quarryheart_charger':
+    'Боевой конь Сердца Кузнеца: плиты из каменоломни парят над телом живого огня, за золотыми рёбрами бьётся раскалённое добела сердце, на лбу ледяные хрустальные рога, а грива из ветра трещит молниями.',
   'hudChrome.mounts.desc_chimeglass_tortoise':
     'Черепаха солончаков, пережившая в пути три поколения караванов. Приютившие её лудильщики выточили ей очки из штормового стекла и подвесили к горлу бронзовый колокольчик — дорога слышит её задолго до того, как увидит.',
   'hudChrome.mounts.name_thunderstrut_gobbler': 'Громоступ, великий индюк',

@@ -2604,6 +2604,7 @@ export const pl_PL: EnTranslations = {
       "name_mech_bird": "Cluckwork Mech Ptak",
       "name_lanternback_troll": "Grumbol Latarniowy Grzbiet",
       "name_lantern_hall_destrier": "Rumak Sali Latarni",
+      "name_quarryheart_charger": "Quarryheart Charger",
       "name_chimeglass_tortoise": "Tolliver Chimeglass",
       "name_rickshaw_mount": "Spętana Kośćmi Riksza",
       "name_emberbristle_broom": "Miotła żarzącej szczeciny",
@@ -2628,6 +2629,7 @@ export const pl_PL: EnTranslations = {
       "desc_mech_bird": "Ręcznie zbudowany mechaniczny kurczak bojowy, który biegnie na pstrykających serwach, a nakręcany klucz wciąż się obraca.",
       "desc_lanternback_troll": "Hill troll złamany do jarzma przez latarników, niosący na ramionach żelazny tron z latarniami burzowymi płonącymi na obu ramionach.",
       "desc_lantern_hall_destrier": "Koń bojowy Sali Latarni, opancerzony dębem i żelazem pod błękitem gildii, z dwiema latarniami sztormowymi przy siodle, oświetlającymi drogę do domu.",
+      "desc_quarryheart_charger": "A war-steed of the Smith's Heart: quarry-stone plates hung over a body of living fire, its heart beating white-hot behind gold ribs, ice-crystal horns on its brow and a mane of wind crackling with lightning.",
       "desc_nightwing_chimera": "Dwugłowa wiwerna zmierzchu z pradawnych konarów, odpoczywająca na szponiastych tylnych nogach i sunąca nad ziemią na skrzydłach pokrytych tajemnymi rytami.",
       "desc_chimeglass_tortoise": "Żółw solny, który wyprzedził trzy pokolenia przyczep kempingowych. Druciarze zmielili mu okulary ze szkła burzowego i zawiesili mu na szyi dzwonek z brązu, tak że droga usłyszy go na długo, zanim go zobaczy.",
       "desc_rickshaw_mount": "Grzechoczący wózek z kości, z kościstym pachołkiem zaprzężonym do dyszli, ciągnącym cię w pełnym pędzie.",
@@ -25418,6 +25420,9 @@ export const pl_PL: EnTranslations = {
       },
       "reins_lantern_hall_destrier": {
         "name": "Wodze Rumaka Sali Latarni"
+      },
+      "reins_quarryheart_charger": {
+        "name": "Reins of the Quarryheart Charger"
       },
       "wyrmfall_core": {
         "name": "Rdzeń Upadku Żmija"

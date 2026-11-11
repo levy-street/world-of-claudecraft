@@ -2604,6 +2604,7 @@ export const sv_SE: EnTranslations = {
       "name_mech_bird": "Cluckwork-mekafågel",
       "name_lanternback_troll": "Lanternbacken Grumbol",
       "name_lantern_hall_destrier": "Lykthallens stridshäst",
+      "name_quarryheart_charger": "Quarryheart Charger",
       "name_chimeglass_tortoise": "Tolliver klockglaset",
       "name_rickshaw_mount": "Benbunden Rickshaw",
       "name_emberbristle_broom": "Glödborstkvast",
@@ -2628,6 +2629,7 @@ export const sv_SE: EnTranslations = {
       "desc_mech_bird": "En handbyggd urverkshöna som sprintar på knäppande servon medan upprullningsnyckeln fortfarande vrider sig.",
       "desc_lanternback_troll": "Ett kulletroll bröts till oket av lamptändare, bärande en järntron över sina axlar med en stormlykta som brinner på vardera arm.",
       "desc_lantern_hall_destrier": "Lykthallens stridshäst, med ek- och järnbardering under gillets blå färg, och två stormlyktor som svänger från sadeln för att lysa upp vägen hem.",
+      "desc_quarryheart_charger": "A war-steed of the Smith's Heart: quarry-stone plates hung over a body of living fire, its heart beating white-hot behind gold ribs, ice-crystal horns on its brow and a mane of wind crackling with lightning.",
       "desc_nightwing_chimera": "En tvåhövdad skymningswyvern från de uråldriga grenarna, vilande på klobeklädda bakben och glidande över marken på vingar ristade med arkana tecken.",
       "desc_chimeglass_tortoise": "En saltplattsköldpadda som har gått ur tre generationer husvagnar. Tinkers malde honom glasögon från stormglas och hängde en bronsklocka i hans hals, så vägen hör honom långt innan den ser honom.",
       "desc_rickshaw_mount": "En skramlande benkärra med en benig hantlangare fastspänd vid skalmarna, som drar dig fram i språngmarsch.",
@@ -25418,6 +25420,9 @@ export const sv_SE: EnTranslations = {
       },
       "reins_lantern_hall_destrier": {
         "name": "Lykthallens stridshästtyglar"
+      },
+      "reins_quarryheart_charger": {
+        "name": "Reins of the Quarryheart Charger"
       },
       "wyrmfall_core": {
         "name": "Wyrmfall-kärna"

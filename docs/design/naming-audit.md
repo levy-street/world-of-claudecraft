@@ -1102,6 +1102,8 @@ Wars 2).
 | Splinter of the Heat / Quench / Breath / Hammer | the final boss's adds | KEEP. Plain English built on the raid's own element names. |
 | Mountain's Wrath, Summit Roar, Storm Lance, Forge Fist, Tempering Strike, Bellows Wind | boss abilities | KEEP. Shared fantasy English; no distinctive match in the same role. |
 | Hammerfall | the Hammer Guardian's cleave | KEEP (borderline, recorded for the reviewer). WoW's Hammerfall is an orc town, a different role (a place, not an ability); the game already ships "Hammerfall Meteors" (Varkhul), and the word is shared English (also a band and a novel). |
+| Quarryheart Charger | the raid's reward mount (its meta-achievement's mount) | KEEP (web-checked 2026-11-11). No exact-phrase hit for "Quarryheart Charger" or "Quarryheart Steed", and no hit for the coined token "Quarryheart" on the WoW, RuneScape, FFXIV, GW2, ESO, Diablo or PoE wikis (nearest: Octopath Traveler's "Quarrycrest", a mining town, a different token and role). "Charger" is plain English for a war horse, shared across many games' mount names. "Heartwrought" was considered and dropped: it is an indie game's title. |
+| Reins of the Quarryheart Charger | its reins item | KEEP. The repo's reins pattern around the name above. |
 
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 

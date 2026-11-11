@@ -2604,6 +2604,7 @@ export const pt_BR: EnTranslations = {
       "name_mech_bird": "Pássaro Mech Cluckwork",
       "name_lanternback_troll": "Grumbol, o Lanterna Dorso",
       "name_lantern_hall_destrier": "Corcel do Salão da Lanterna",
+      "name_quarryheart_charger": "Quarryheart Charger",
       "name_chimeglass_tortoise": "Tolliver o Chimeglass",
       "name_rickshaw_mount": "Riquixá de Ossos Vinculados",
       "name_emberbristle_broom": "Vassoura de cerdas em brasa",
@@ -2628,6 +2629,7 @@ export const pt_BR: EnTranslations = {
       "desc_mech_bird": "Uma galinha de guerra mecânica construída à mão que corre em servos em movimento, com a chave de corda ainda girando.",
       "desc_lanternback_troll": "Um troll das colinas quebrado no jugo por acendedores de lampiões, carregando um trono de ferro sobre os ombros com uma lanterna de tempestade acesa em cada braço.",
       "desc_lantern_hall_destrier": "O cavalo de guerra do Salão da Lanterna, protegido em carvalho e ferro sob o azul da guilda, com duas lanternas de tempestade penduradas na sela para iluminar o caminho de casa.",
+      "desc_quarryheart_charger": "A war-steed of the Smith's Heart: quarry-stone plates hung over a body of living fire, its heart beating white-hot behind gold ribs, ice-crystal horns on its brow and a mane of wind crackling with lightning.",
       "desc_nightwing_chimera": "Uma serpe alada crepuscular de duas cabeças dos galhos antigos, que descansa nas patas traseiras com garras e raspa o chão voando com asas gravadas em magia arcana.",
       "desc_chimeglass_tortoise": "Uma tartaruga das salinas que ultrapassou três gerações de caravanas. Os funileiros moeram-lhe óculos de vidro e penduraram um sino de bronze em sua garganta, para que a estrada o ouça muito antes de vê-lo.",
       "desc_rickshaw_mount": "Uma carroça de ossos rangente, com um serviçal ossudo atrelado às varas, puxando você em disparada.",
@@ -25418,6 +25420,9 @@ export const pt_BR: EnTranslations = {
       },
       "reins_lantern_hall_destrier": {
         "name": "Rédeas do Corcel do Salão da Lanterna"
+      },
+      "reins_quarryheart_charger": {
+        "name": "Reins of the Quarryheart Charger"
       },
       "wyrmfall_core": {
         "name": "Núcleo de Wyrmfall"

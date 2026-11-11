@@ -493,7 +493,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 558.
     // Two referral reward mounts and nightwing_chimera join Horizons. Wobbles the
     // Slime (a developer mount, pending its route) takes one more slot: 567.
-    expect(full).toEqual({ owned: 581, total: 581 });
+    // The Smith's Heart's reserved Quarryheart Charger takes one more Horizons mount slot: 582.
+    expect(full).toEqual({ owned: 582, total: 582 });
     // The Warfare Season 2 Vanguard Gallery (135 set pieces and four weapons)
     // is class-personal and sits outside completion, so it moves neither pair.
     const character = catalogCharacterCompletion({
@@ -529,8 +530,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // 466 + 13 with the Mirefen world boss page's relics, staff and trinkets: 479.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 529;
     // 532 with the two referral reward mounts and nightwing_chimera; 537 with
-    // Wobbles the Slime's character-scoped mount slot.
-    expect(character).toEqual({ owned: 551, total: 551 });
+    // Wobbles the Slime's character-scoped mount slot. 552 with the Smith's Heart's reserved
+    // Quarryheart Charger.
+    expect(character).toEqual({ owned: 552, total: 552 });
     // The Warfare Season 2 page is class-personal, outside completion.
   });
 
@@ -596,7 +598,8 @@ describe('Reliquary Conqueror catalog structure', () => {
       // +32 at the 2026-09-28 merge into feature/buried-hoards: the Buried Hoards page: 682.
       // +13 the Mirefen world boss page (seven relics, his staff and five trinkets): 695.
       // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 745.
-    ).toBe(777); // plus two referral reward mounts, nightwing_chimera and wobbles_slime
+    ).toBe(778); // plus two referral reward mounts, nightwing_chimera, wobbles_slime and the
+    // Smith's Heart's reserved Quarryheart Charger
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -3246,7 +3249,14 @@ const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
   // avian_strider left this list when the Rift Watch quartermaster's Champion
   // row gave it a route (content/faction_vendors.ts), and drakemaw_raptor when
   // Balgath's table did (MOUNT_SOURCES hints both).
-  horizons_mounts: ['lanternback_troll', 'referral_tank', 'terrorspark_groundshaker'],
+  // quarryheart_charger: the Smith's Heart meta-achievement's mount, reserved until the
+  // achievement step wires its grant (content/mounts.ts SMITHS_HEART_META_MOUNT).
+  horizons_mounts: [
+    'lanternback_troll',
+    'referral_tank',
+    'terrorspark_groundshaker',
+    'quarryheart_charger',
+  ],
   // masterwork:engineering rode here as unearnable (QA ruling 2026-08-07,
   // R1 suppression on the craft's only stats-bearing output) until
   // masterwrought Phase 11o (2026-08-25) shipped copperlens_ocular, a
@@ -4383,6 +4393,8 @@ describe('Reliquary source hint coverage', () => {
       'lanternback_troll',
       'referral_tank',
       'terrorspark_groundshaker',
+      // reserved for the Smith's Heart meta-achievement until its grant lands
+      'quarryheart_charger',
     ]);
     // All are still live catalog slots, so the exclusion cannot outlive them.
     for (const mountId of SOURCE_PENDING_RULING.horizons_mounts) {

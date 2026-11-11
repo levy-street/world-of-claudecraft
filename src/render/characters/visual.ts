@@ -3367,6 +3367,20 @@ export class CharacterVisual {
     this.root.rotation.z = roll;
   }
 
+  /** A rig that owns materials of its own on this visual (the Quarryheart Charger's body,
+   *  quarryheart_charger_fx.ts) swaps them in through here: the snapshot an effect overlay or a
+   *  material commit restores becomes the rig's material, not the GLB's, and a mesh that must never
+   *  cast (light-only wind) leaves the caster set, whose shadow flag this visual owns. */
+  adoptMeshMaterial(mesh: THREE.Mesh, material: THREE.Material, castsShadow: boolean): void {
+    this.originalMaterials.set(mesh, material);
+    mesh.material = material;
+    if (castsShadow) return;
+    mesh.userData.shadowCaster = false;
+    mesh.castShadow = false;
+    const at = this.casters.indexOf(mesh);
+    if (at >= 0) this.casters.splice(at, 1);
+  }
+
   setShadow(on: boolean): void {
     if (on === this.shadowOn) return;
     this.shadowOn = on;

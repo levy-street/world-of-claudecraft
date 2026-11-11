@@ -2604,6 +2604,7 @@ export const id_ID: EnTranslations = {
       "name_mech_bird": "Burung Mekanik Cluckwork",
       "name_lanternback_troll": "Grumbol si Punggung Lentera",
       "name_lantern_hall_destrier": "Kuda Perang Balai Lentera",
+      "name_quarryheart_charger": "Quarryheart Charger",
       "name_chimeglass_tortoise": "Tolliver si Kaca Cerobong Asap",
       "name_rickshaw_mount": "Becak Terikat Tulang",
       "name_emberbristle_broom": "Sapu Bulu Bara",
@@ -2628,6 +2629,7 @@ export const id_ID: EnTranslations = {
       "desc_mech_bird": "Ayam perang jarum jam buatan tangan yang berlari dengan kecepatan servo, kunci putaran masih berputar.",
       "desc_lanternback_troll": "Troll bukit dipatahkan oleh penyala lampu, membawa singgasana besi di bahunya dengan lentera badai menyala di kedua lengannya.",
       "desc_lantern_hall_destrier": "Kuda perang Balai Lentera, berzirah ek dan besi di bawah warna biru guild, dengan dua lentera badai berayun dari pelananya untuk menerangi jalan pulang.",
+      "desc_quarryheart_charger": "A war-steed of the Smith's Heart: quarry-stone plates hung over a body of living fire, its heart beating white-hot behind gold ribs, ice-crystal horns on its brow and a mane of wind crackling with lightning.",
       "desc_nightwing_chimera": "Wyvern senja berkepala dua dari dahan purba, bertengger pada kaki belakang bercakar saat istirahat dan melayang dekat tanah dengan sayap berukir arkana.",
       "desc_chimeglass_tortoise": "Kura-kura dataran garam yang telah melampaui tiga generasi karavan. Tinker memberinya kacamata dari kaca badai dan menggantungkan lonceng perunggu di tenggorokannya, sehingga jalan mendengarnya jauh sebelum jalan melihatnya.",
       "desc_rickshaw_mount": "Gerobak tulang yang berderak, dengan serdadu kurus bertulang diikat pada porosnya, menarikmu melaju kencang.",
@@ -25418,6 +25420,9 @@ export const id_ID: EnTranslations = {
       },
       "reins_lantern_hall_destrier": {
         "name": "Kekang Kuda Perang Balai Lentera"
+      },
+      "reins_quarryheart_charger": {
+        "name": "Reins of the Quarryheart Charger"
       },
       "wyrmfall_core": {
         "name": "Inti Kejatuhan Wyrm"

@@ -2604,6 +2604,7 @@ export const zh_TW: EnTranslations = {
       "name_mech_bird": "發條機械鳥",
       "name_lanternback_troll": "提燈背者格倫博",
       "name_lantern_hall_destrier": "燈火大廳戰馬",
+      "name_quarryheart_charger": "石心戰駒",
       "name_chimeglass_tortoise": "鐘晶的托利弗",
       "name_rickshaw_mount": "白骨人力車",
       "name_emberbristle_broom": "餘燼鬃毛掃帚",
@@ -2628,6 +2629,7 @@ export const zh_TW: EnTranslations = {
       "desc_mech_bird": "一隻手工打造的發條戰鬥雞，伺服關節鏗鏘疾馳，發條鑰匙仍在轉動。",
       "desc_lanternback_troll": "被點燈人馴服的山地巨魔，肩上扛著一把鐵王座，兩側扶手各掛一盞燃燒的風燈。",
       "desc_lantern_hall_destrier": "燈火大廳的戰馬，在公會的藍色披布下披掛橡木與鐵製馬鎧，鞍邊搖曳的兩盞風燈照亮歸途。",
+      "desc_quarryheart_charger": "鐵匠之心的戰駒：採石場的石板懸浮在活火之軀上，白熱的心臟在金色肋骨後跳動，額生冰晶之角，鬃毛是劈啪作響的雷風。",
       "desc_nightwing_chimera": "來自古木枝頭的雙頭暮光飛龍，駐足時以利爪後肢佇立，行進時展動奧術銘紋雙翼掠地翱翔。",
       "desc_chimeglass_tortoise": "鹽原上的陸龜，走過了三代商隊。收留他的補鍋匠用暴風晶磨成眼鏡，又在他喉前掛上一枚青銅鈴——道路總是先聽見他，才看見他。",
       "desc_rickshaw_mount": "一輛嘎吱作響的骸骨貨車，一具瘦骨嶙峋的雜兵被套在轅木間，拖著你狂奔向前。",
@@ -25418,6 +25420,9 @@ export const zh_TW: EnTranslations = {
       },
       "reins_lantern_hall_destrier": {
         "name": "燈火大廳戰馬的韁繩"
+      },
+      "reins_quarryheart_charger": {
+        "name": "石心戰駒的韁繩"
       },
       "wyrmfall_core": {
         "name": "墜龍核心"

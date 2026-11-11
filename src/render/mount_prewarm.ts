@@ -14,6 +14,7 @@ import { DEFAULT_MOUNT, type MountKey } from '../sim/content/mounts';
 import { type CharacterVisual, createMountVisual } from './characters';
 import { mountAssetsReady, preloadMountAssets } from './characters/assets';
 import { MOUNT_SKIN_VISUAL_SPECS, MOUNT_VISUAL_SPECS, type MountVisualSpec } from './mount_visuals';
+import { QuarryheartChargerFx } from './quarryheart_charger_fx';
 import { setRenderCategory } from './renderer_diagnostics';
 import {
   attachRickshawPuller,
@@ -98,7 +99,8 @@ export function mountPrewarmSpec(key: MountPrewarmKey): MountVisualSpec {
 }
 
 function createReadyMountPrewarmVisual(key: MountPrewarmKey): CharacterVisual | null {
-  const { visualKey } = mountPrewarmSpec(key);
+  const spec = mountPrewarmSpec(key);
+  const { visualKey } = spec;
   if (!mountAssetsReady(visualKey) || (isRickshawMount(visualKey) && !rickshawPullerAssetsReady()))
     return null;
   const visual = createMountVisual(visualKey);
@@ -109,6 +111,16 @@ function createReadyMountPrewarmVisual(key: MountPrewarmKey): CharacterVisual | 
     const dispose = visual.dispose.bind(visual);
     visual.dispose = () => {
       puller.dispose();
+      dispose();
+    };
+  }
+  if (spec.fx === 'quarryheart') {
+    // the charger's spliced stone, wind and halo programs link with its prewarm rig; disposing
+    // the rig parks them for the first live charger (quarryheart_charger_fx.ts)
+    const fx = QuarryheartChargerFx.create(visual.root, null, visual);
+    const dispose = visual.dispose.bind(visual);
+    visual.dispose = () => {
+      fx.dispose();
       dispose();
     };
   }

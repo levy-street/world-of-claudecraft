@@ -302,6 +302,10 @@ export const RELIQUARY_HORIZON_MOUNTS = [
   // Gourdlight Eve's Emberbristle Broom: Hester's, for five of Old Thatchgrin's daily
   // Emberwoven Sheaves. Earned reins remain owned after the event closes.
   'emberbristle_broom',
+  // The Smith's Heart raid's reward (content/mounts.ts SMITHS_HEART_META_MOUNT). Its one door is
+  // the raid's meta-achievement, built in a later step, so it has no source hint yet and stays on
+  // the pending list (tests/reliquary_content.test.ts SOURCE_PENDING_RULING) until that lands.
+  'quarryheart_charger',
 ] as const;
 
 // Per-mount sources. A mount is owned through its reins ItemDef (kind 'mount',

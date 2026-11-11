@@ -2604,6 +2604,7 @@ export const tr_TR: EnTranslations = {
       "name_mech_bird": "Cluckwork Makine Kuşu",
       "name_lanternback_troll": "Fener Sırtlı Grumbol",
       "name_lantern_hall_destrier": "Fener Salonu Savaş Atı",
+      "name_quarryheart_charger": "Quarryheart Charger",
       "name_chimeglass_tortoise": "Tolliver Chimeglass",
       "name_rickshaw_mount": "Kemikbağlı Çekçek",
       "name_emberbristle_broom": "Köz Kıllı Süpürge",
@@ -2628,6 +2629,7 @@ export const tr_TR: EnTranslations = {
       "desc_mech_bird": "Kapanan servolarla koşan, kurma anahtarı hâlâ dönen, el yapımı, saat mekanizmalı bir savaş tavuğu.",
       "desc_lanternback_troll": "Omuzlarında demir bir taht taşıyan, her iki kolunda da yanan bir fırtına feneri taşıyan, fener yakanlar tarafından boyunduruğa alınan bir tepe trolü.",
       "desc_lantern_hall_destrier": "Fener Salonunun savaş atı; lonca mavisi altında meşe ve demir zırhlı, eve yolu aydınlatmak için eyerinden iki fırtına feneri sallanır.",
+      "desc_quarryheart_charger": "A war-steed of the Smith's Heart: quarry-stone plates hung over a body of living fire, its heart beating white-hot behind gold ribs, ice-crystal horns on its brow and a mane of wind crackling with lightning.",
       "desc_nightwing_chimera": "Kadim dallardan iki başlı alacakaranlık wyverni; dinlenirken pençeli arka ayaklarına tüner, gizem işlemeli kanatlarıyla yerin üzerinde süzülür.",
       "desc_chimeglass_tortoise": "Üç nesildir karavanları geride bırakan, tuzla kaplı bir kaplumbağa. Tamirciler ona fırtına camından gözlük taktı ve boğazına bronz bir çan astı, böylece yol onu görmeden çok önce onu duyardı.",
       "desc_rickshaw_mount": "Sırıklarına kemikleri çıkmış bir avanenin koşulduğu, seni ölümüne bir koşuyla çeken takırdayan kemik arabası.",
@@ -25418,6 +25420,9 @@ export const tr_TR: EnTranslations = {
       },
       "reins_lantern_hall_destrier": {
         "name": "Fener Salonu Savaş Atı Dizginleri"
+      },
+      "reins_quarryheart_charger": {
+        "name": "Reins of the Quarryheart Charger"
       },
       "wyrmfall_core": {
         "name": "Wyrmfall Özü"

@@ -2812,6 +2812,16 @@ function buildTintedClone(
         polygonOffsetFactor: s.polygonOffsetFactor,
         polygonOffsetUnits: s.polygonOffsetUnits,
       });
+      // The GLB's material extras survive too (a rig's own per-material data, such as the
+      // Quarryheart Charger's dequantization), and a material whose glow IS its look (extras
+      // lowTierEmissive: the charger's living fire) keeps its emissive map on this tier.
+      mat.userData = { ...s.userData };
+      if ((s.userData as { lowTierEmissive?: boolean }).lowTierEmissive === true && s.emissiveMap) {
+        const lm = mat as THREE.MeshLambertMaterial;
+        lm.emissiveMap = s.emissiveMap;
+        lm.emissive.copy(s.emissive);
+        lm.emissiveIntensity = s.emissiveIntensity;
+      }
       attachGloamClimb(mat); // the Lambert tier's only layer: same climb, no rim
     }
   }

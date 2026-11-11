@@ -930,6 +930,9 @@ const RENDER_PURE_CORES = [
   'src/render/mount_embers_core.ts',
   // the destrier's standing rear-up trigger and hop cancel (mount_presentation.ts)
   'src/render/mount_rear_core.ts',
+  // the Quarryheart Charger's heartbeat, arrival, gait rates and hoof strikes
+  // (quarryheart_charger_fx.ts)
+  'src/render/quarryheart_charger_fx_core.ts',
   // the per-skin swing trail lookup (renderer.ts triggerAttack)
   'src/render/weapon_skin_trail_core.ts',
   // the ambient motes' fade around the local player (motes.ts)

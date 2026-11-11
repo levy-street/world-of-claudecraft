@@ -3442,6 +3442,34 @@ export const VISUALS: Record<string, VisualDef> = {
     runRef: 13.4,
     lazyPreload: true,
   },
+  // The Quarryheart Charger (scripts/assets/quarryheart_charger/, ship_charger.mjs): the Smith's
+  // Heart raid's reward, floating quarry-stone plates over a body of living fire, built at game
+  // scale so `height` is its own Idle height (CHARGER_REPORT). Every clip is authored by the build
+  // (charger_rig.py): the gait refs are its planted-hoof speeds (stride / (duty x period)), so a
+  // mounted gallop plants its hooves. `land` opts it into the held jump (Jump held on its tucked
+  // airborne pose, Land on touchdown); Rear is the standing jump's flourish (mount_rear_core.ts).
+  // Death holds Idle: a ridden mount never plays one. Its plate float, heartbeat and wind mane are
+  // shader work on its own materials (quarryheart_charger_fx.ts), not clips.
+  mount_quarryheart_charger: {
+    url: `${MOUNTS_DIR}/quarryheart_charger.glb`,
+    height: 4.9338,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      walkBack: 'WalkBack',
+      jump: 'Jump',
+      land: 'Land',
+      flourish: 'Rear',
+      attack: [],
+      death: 'Idle',
+    },
+    walkRef: 2.04,
+    runRef: 12.55,
+    walkBackRef: 5.45,
+    authoredAtlas: true,
+    lazyPreload: true,
+  },
   mount_grag_bear: {
     url: `${MOUNTS_DIR}/grag_bear.glb`,
     height: 4.0,

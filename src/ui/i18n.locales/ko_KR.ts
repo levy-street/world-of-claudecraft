@@ -345,6 +345,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '비활성: 멤버십을 갱신하면 장비 능력치와 세트 효과가 복구됩니다.',
   'entities.items.lantern_seal.name': '등불 인장',
   'entities.items.reins_lantern_hall_destrier.name': '등불 회관 군마의 고삐',
+  'entities.items.reins_quarryheart_charger.name': '채석심장 돌격마의 고삐',
   'entities.items.membership_staff.name': '변화의 지팡이',
   'hudChrome.bags.membershipSlot': '멤버십 가방 칸',
   'hudChrome.bags.membershipSlotLocked': '멤버십으로 이 가방 칸을 잠금 해제하세요.',
@@ -14479,6 +14480,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '고대의 나뭇가지에서 내려온 쌍두 황혼 와이번으로, 멈추면 발톱 달린 뒷다리로 서고 움직이면 비전 문양이 새겨진 날개로 지면 위를 활공한다.',
   'hudChrome.mounts.name_lanternback_troll': '등불지기 그룸볼',
   'hudChrome.mounts.name_lantern_hall_destrier': '등불 회관 군마',
+  'hudChrome.mounts.name_quarryheart_charger': '채석심장 돌격마',
   'hudChrome.mounts.name_chimeglass_tortoise': '종유리의 톨리버',
   'hudChrome.mounts.desc_drakemaw_raptor':
     '화산구 칼데라에서 길들여진 둥지 태생 랩터. 온몸이 힘줄과 질주로 이루어졌으며, 아직도 희미한 재 냄새가 난다.',
@@ -14491,6 +14493,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '점등인들이 멍에로 길들인 언덕 트롤. 어깨에 무쇠 왕좌를 지고, 양쪽 팔걸이마다 폭풍 등불이 타오른다.',
   'hudChrome.mounts.desc_lantern_hall_destrier':
     '등불 회관의 군마. 길드의 푸른 천 아래 참나무와 쇠로 된 마갑을 두르고, 안장에서 흔들리는 두 개의 폭풍 등불이 귀갓길을 밝힌다.',
+  'hudChrome.mounts.desc_quarryheart_charger':
+    '대장장이의 심장의 군마. 살아 있는 불길의 몸 위로 채석장 돌판이 떠 있고, 금빛 갈비뼈 너머로 백열의 심장이 고동친다. 이마에는 얼음 수정 뿔, 갈기는 번개가 튀는 바람이다.',
   'hudChrome.mounts.desc_chimeglass_tortoise':
     '소금 평원의 육지거북. 대상 세 세대를 앞질러 걸었다. 그를 거둔 땜장이들이 폭풍유리를 갈아 안경을 만들고 목에 청동 종을 달아, 길은 그를 보기 전에 먼저 듣는다.',
   'hudChrome.mounts.name_thunderstrut_gobbler': '천둥활보 대왕 칠면조',

@@ -357,6 +357,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '無効：メンバーシップを更新すると装備の能力値とセット効果が復活します。',
   'entities.items.lantern_seal.name': '燈火の印章',
   'entities.items.reins_lantern_hall_destrier.name': '燈火の館の軍馬の手綱',
+  'entities.items.reins_quarryheart_charger.name': '石心の突撃馬の手綱',
   'entities.items.membership_staff.name': '変化の杖',
   'hudChrome.bags.membershipSlot': 'メンバーシップバッグ枠',
   'hudChrome.bags.membershipSlotLocked': 'メンバーシップでこのバッグ枠を解放。',
@@ -14532,6 +14533,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '古の枝より降り立った双頭の黄昏ワイバーン。休む時は鉤爪の後脚で立ち、進む時は秘術の文様が刻まれた翼で地表を滑空する。',
   'hudChrome.mounts.name_lanternback_troll': 'ランタンバックのグルンボル',
   'hudChrome.mounts.name_lantern_hall_destrier': '燈火の館の軍馬',
+  'hudChrome.mounts.name_quarryheart_charger': '石心の突撃馬',
   'hudChrome.mounts.name_chimeglass_tortoise': '鐘硝子のトリヴァー',
   'hudChrome.mounts.desc_drakemaw_raptor':
     '火口のカルデラで鞍慣らしされた巣育ちのラプトル。筋肉と疾走のかたまりで、いまなお灰の匂いをかすかに漂わせている。',
@@ -14544,6 +14546,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '点灯人に軛で馴らされた丘トロル。肩に鉄の玉座を担ぎ、その両の肘掛けには嵐提灯が灯る。',
   'hudChrome.mounts.desc_lantern_hall_destrier':
     '燈火の館の軍馬。ギルドの青の下に樫と鉄の馬鎧をまとい、鞍から揺れる二つの嵐灯が帰り道を照らす。',
+  'hudChrome.mounts.desc_quarryheart_charger':
+    '鍛冶師の心臓の軍馬。生きた炎の体の上に石切り場の石板が浮かび、金の肋骨の奥で白熱の心臓が脈打つ。額には氷晶の角、たてがみは雷の爆ぜる風。',
   'hudChrome.mounts.desc_chimeglass_tortoise':
     '塩平原の陸亀。隊商三代を歩き通した。彼を引き取った鋳掛屋たちは嵐硝子を削って眼鏡を作り、喉元に青銅の鈴を吊るした。道は姿を見るより先に、その音を聞く。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '大七面鳥サンダーストラット',

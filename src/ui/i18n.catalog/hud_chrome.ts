@@ -2624,6 +2624,7 @@ export const hudChromeStrings = {
     name_mech_bird: 'Cluckwork Mech Bird',
     name_lanternback_troll: 'Grumbol the Lanternback',
     name_lantern_hall_destrier: 'Lantern Hall Destrier',
+    name_quarryheart_charger: 'Quarryheart Charger',
     name_chimeglass_tortoise: 'Tolliver the Chimeglass',
     name_rickshaw_mount: 'Bonebound Rickshaw',
     name_emberbristle_broom: 'Emberbristle Broom',
@@ -2660,6 +2661,8 @@ export const hudChromeStrings = {
       'A hill troll broken to the yoke by lamplighters, carrying an iron throne across his shoulders with a storm lantern burning on either arm.',
     desc_lantern_hall_destrier:
       "Lantern Hall's war horse, barded in oak and iron under the guild's blue, with two storm lanterns swinging from his saddle to light the road home.",
+    desc_quarryheart_charger:
+      "A war-steed of the Smith's Heart: quarry-stone plates hung over a body of living fire, its heart beating white-hot behind gold ribs, ice-crystal horns on its brow and a mane of wind crackling with lightning.",
     desc_nightwing_chimera:
       'A twin-headed dusk wyvern from the ancient boughs, perched on taloned hind legs at rest and skimming above the ground on arcane-etched wings.',
     desc_chimeglass_tortoise:

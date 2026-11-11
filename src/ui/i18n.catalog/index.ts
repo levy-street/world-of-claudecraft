@@ -2033,6 +2033,8 @@ export const en = {
       lantern_seal: { name: 'Lantern Seal' },
       // ...and the guild's war horse its quartermaster sells for them.
       reins_lantern_hall_destrier: { name: 'Reins of the Lantern Hall Destrier' },
+      // ...and the Smith's Heart raid's reward mount (content/mounts.ts SMITHS_HEART_META_MOUNT).
+      reins_quarryheart_charger: { name: 'Reins of the Quarryheart Charger' },
       wyrmfall_core: { name: 'Wyrmfall Core' },
       sundered_essence: { name: 'Sundered Essence' },
       makers_ember: { name: "Maker's Ember" },

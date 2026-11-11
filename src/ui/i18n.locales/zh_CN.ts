@@ -1969,6 +1969,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.membershipDormant': '未激活：续订会员以恢复装备属性和套装加成。',
   'entities.items.lantern_seal.name': '灯火印章',
   'entities.items.reins_lantern_hall_destrier.name': '灯火大厅战马的缰绳',
+  'entities.items.reins_quarryheart_charger.name': '石心战驹的缰绳',
   'entities.items.membership_staff.name': '万变法杖',
   'hudChrome.bags.membershipSlot': '会员背包栏位',
   'hudChrome.bags.membershipSlotLocked': '开通会员以解锁此背包栏位。',
@@ -15461,6 +15462,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '来自古木枝头的双头暮光飞龙，驻足时以利爪后肢伫立，行进时展动奥术铭纹双翼掠地翱翔。',
   'hudChrome.mounts.name_lanternback_troll': '提灯背者格伦博',
   'hudChrome.mounts.name_lantern_hall_destrier': '灯火大厅战马',
+  'hudChrome.mounts.name_quarryheart_charger': '石心战驹',
   'hudChrome.mounts.name_chimeglass_tortoise': '钟晶的托利弗',
   'hudChrome.mounts.desc_drakemaw_raptor':
     '来自龙喉火山口的驯服巢生迅猛龙，浑身筋肉、疾若奔雷，身上仍带着淡淡的灰烬气味。',
@@ -15473,6 +15475,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '被点灯人驯服的山地巨魔，肩上扛着一把铁王座，两侧扶手各挂一盏燃烧的风灯。',
   'hudChrome.mounts.desc_lantern_hall_destrier':
     '灯火大厅的战马，在公会的蓝色披布下披挂橡木与铁制马铠，鞍边摇曳的两盏风灯照亮归途。',
+  'hudChrome.mounts.desc_quarryheart_charger':
+    '铁匠之心的战驹：采石场的石板悬浮在活火之躯上，白热的心脏在金色肋骨后跳动，额生冰晶之角，鬃毛是噼啪作响的雷风。',
   'hudChrome.mounts.desc_chimeglass_tortoise':
     '盐原上的陆龟，走过了三代商队。收留他的补锅匠用暴风晶磨成眼镜，又在他喉前挂上一枚青铜铃——道路总是先听见他，才看见他。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '雷霆阔步大火鸡',

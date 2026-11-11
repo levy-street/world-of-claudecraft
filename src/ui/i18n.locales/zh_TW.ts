@@ -1969,6 +1969,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.membershipDormant': '未啟用：續訂會員以恢復裝備屬性和套裝加成。',
   'entities.items.lantern_seal.name': '燈火印章',
   'entities.items.reins_lantern_hall_destrier.name': '燈火大廳戰馬的韁繩',
+  'entities.items.reins_quarryheart_charger.name': '石心戰駒的韁繩',
   'entities.items.membership_staff.name': '萬變法杖',
   'hudChrome.bags.membershipSlot': '會員背包欄位',
   'hudChrome.bags.membershipSlotLocked': '開通會員以解鎖此背包欄位。',
@@ -15460,6 +15461,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '來自古木枝頭的雙頭暮光飛龍，駐足時以利爪後肢佇立，行進時展動奧術銘紋雙翼掠地翱翔。',
   'hudChrome.mounts.name_lanternback_troll': '提燈背者格倫博',
   'hudChrome.mounts.name_lantern_hall_destrier': '燈火大廳戰馬',
+  'hudChrome.mounts.name_quarryheart_charger': '石心戰駒',
   'hudChrome.mounts.name_chimeglass_tortoise': '鐘晶的托利弗',
   'hudChrome.mounts.desc_drakemaw_raptor':
     '來自龍喉火山口的馴服巢生迅猛龍，渾身筋肉、疾若奔雷，身上仍帶著淡淡的灰燼氣味。',
@@ -15472,6 +15474,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '被點燈人馴服的山地巨魔，肩上扛著一把鐵王座，兩側扶手各掛一盞燃燒的風燈。',
   'hudChrome.mounts.desc_lantern_hall_destrier':
     '燈火大廳的戰馬，在公會的藍色披布下披掛橡木與鐵製馬鎧，鞍邊搖曳的兩盞風燈照亮歸途。',
+  'hudChrome.mounts.desc_quarryheart_charger':
+    '鐵匠之心的戰駒：採石場的石板懸浮在活火之軀上，白熱的心臟在金色肋骨後跳動，額生冰晶之角，鬃毛是劈啪作響的雷風。',
   'hudChrome.mounts.desc_chimeglass_tortoise':
     '鹽原上的陸龜，走過了三代商隊。收留他的補鍋匠用暴風晶磨成眼鏡，又在他喉前掛上一枚青銅鈴——道路總是先聽見他，才看見他。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '雷霆闊步大火雞',

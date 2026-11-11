@@ -2604,6 +2604,7 @@ export const zh_CN: EnTranslations = {
       "name_mech_bird": "发条机械鸟",
       "name_lanternback_troll": "提灯背者格伦博",
       "name_lantern_hall_destrier": "灯火大厅战马",
+      "name_quarryheart_charger": "石心战驹",
       "name_chimeglass_tortoise": "钟晶的托利弗",
       "name_rickshaw_mount": "白骨人力车",
       "name_emberbristle_broom": "余烬鬃毛扫帚",
@@ -2628,6 +2629,7 @@ export const zh_CN: EnTranslations = {
       "desc_mech_bird": "一只手工打造的发条战斗鸡，伺服关节铿锵疾驰，发条钥匙仍在转动。",
       "desc_lanternback_troll": "被点灯人驯服的山地巨魔，肩上扛着一把铁王座，两侧扶手各挂一盏燃烧的风灯。",
       "desc_lantern_hall_destrier": "灯火大厅的战马，在公会的蓝色披布下披挂橡木与铁制马铠，鞍边摇曳的两盏风灯照亮归途。",
+      "desc_quarryheart_charger": "铁匠之心的战驹：采石场的石板悬浮在活火之躯上，白热的心脏在金色肋骨后跳动，额生冰晶之角，鬃毛是噼啪作响的雷风。",
       "desc_nightwing_chimera": "来自古木枝头的双头暮光飞龙，驻足时以利爪后肢伫立，行进时展动奥术铭纹双翼掠地翱翔。",
       "desc_chimeglass_tortoise": "盐原上的陆龟，走过了三代商队。收留他的补锅匠用暴风晶磨成眼镜，又在他喉前挂上一枚青铜铃——道路总是先听见他，才看见他。",
       "desc_rickshaw_mount": "一辆嘎吱作响的骸骨货车，一具瘦骨嶙峋的杂兵被套在辕木间，拖着你狂奔向前。",
@@ -25418,6 +25420,9 @@ export const zh_CN: EnTranslations = {
       },
       "reins_lantern_hall_destrier": {
         "name": "灯火大厅战马的缰绳"
+      },
+      "reins_quarryheart_charger": {
+        "name": "石心战驹的缰绳"
       },
       "wyrmfall_core": {
         "name": "坠龙核心"

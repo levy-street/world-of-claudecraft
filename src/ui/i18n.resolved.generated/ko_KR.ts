@@ -2604,6 +2604,7 @@ export const ko_KR: EnTranslations = {
       "name_mech_bird": "태엽 기계새",
       "name_lanternback_troll": "등불지기 그룸볼",
       "name_lantern_hall_destrier": "등불 회관 군마",
+      "name_quarryheart_charger": "채석심장 돌격마",
       "name_chimeglass_tortoise": "종유리의 톨리버",
       "name_rickshaw_mount": "뼈에 묶인 인력거",
       "name_emberbristle_broom": "잉걸갈기 빗자루",
@@ -2628,6 +2629,7 @@ export const ko_KR: EnTranslations = {
       "desc_mech_bird": "수제 태엽 전투 닭. 서보 관절을 튕기며 질주하고, 태엽 열쇠는 지금도 돌아가고 있다.",
       "desc_lanternback_troll": "점등인들이 멍에로 길들인 언덕 트롤. 어깨에 무쇠 왕좌를 지고, 양쪽 팔걸이마다 폭풍 등불이 타오른다.",
       "desc_lantern_hall_destrier": "등불 회관의 군마. 길드의 푸른 천 아래 참나무와 쇠로 된 마갑을 두르고, 안장에서 흔들리는 두 개의 폭풍 등불이 귀갓길을 밝힌다.",
+      "desc_quarryheart_charger": "대장장이의 심장의 군마. 살아 있는 불길의 몸 위로 채석장 돌판이 떠 있고, 금빛 갈비뼈 너머로 백열의 심장이 고동친다. 이마에는 얼음 수정 뿔, 갈기는 번개가 튀는 바람이다.",
       "desc_nightwing_chimera": "고대의 나뭇가지에서 내려온 쌍두 황혼 와이번으로, 멈추면 발톱 달린 뒷다리로 서고 움직이면 비전 문양이 새겨진 날개로 지면 위를 활공한다.",
       "desc_chimeglass_tortoise": "소금 평원의 육지거북. 대상 세 세대를 앞질러 걸었다. 그를 거둔 땜장이들이 폭풍유리를 갈아 안경을 만들고 목에 청동 종을 달아, 길은 그를 보기 전에 먼저 듣는다.",
       "desc_rickshaw_mount": "덜컹거리는 뼈 수레입니다. 뼈만 앙상한 잡졸이 채에 매인 채 전속력으로 당신을 끌고 달립니다.",
@@ -25418,6 +25420,9 @@ export const ko_KR: EnTranslations = {
       },
       "reins_lantern_hall_destrier": {
         "name": "등불 회관 군마의 고삐"
+      },
+      "reins_quarryheart_charger": {
+        "name": "채석심장 돌격마의 고삐"
       },
       "wyrmfall_core": {
         "name": "낙룡의 핵"

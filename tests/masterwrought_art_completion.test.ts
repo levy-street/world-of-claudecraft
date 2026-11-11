@@ -843,7 +843,8 @@ describe('Masterwrought art completion evidence', () => {
     // + the sprite buddy's whistle render: 2,184.
     // Restored feral staff and eight Season 2 jewelry paintings add nine owners.
     // Halloween adds 27 item-art owners outside the sealed historical set.
-    expect(currentOwnerIds).toHaveLength(2191);
+    // + the Smith's Heart's Quarryheart Charger reins (quarryheart-charger-reins-2026-11-11): 2,192.
+    expect(currentOwnerIds).toHaveLength(2192);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -1255,6 +1256,16 @@ describe('Masterwrought art completion evidence', () => {
     ]);
     expect(datedIds.filter((id) => halloweenIds.has(id))).toEqual([]);
 
+    // The Smith's Heart raid's Quarryheart Charger reins: one more additive batch, pinned by
+    // identity like the waves above.
+    const smithsHeartMountBatches = mapping.generatedBatches.filter(
+      ({ batchId }) => batchId === 'quarryheart-charger-reins-2026-11-11',
+    );
+    expect(smithsHeartMountBatches.flatMap(({ itemIds }) => itemIds)).toEqual([
+      'reins_quarryheart_charger',
+    ]);
+    expect(datedIds).not.toContain('reins_quarryheart_charger');
+
     const completionOwnerIds = currentOwnerIds.filter(
       (id) =>
         !crucibleIds.has(id) &&
@@ -1273,6 +1284,8 @@ describe('Masterwrought art completion evidence', () => {
         id !== 'reins_nightwing_chimera' &&
         // Wobbles the Slime's reins, additive the same way.
         id !== 'reins_wobbles_slime' &&
+        // The Smith's Heart's Quarryheart Charger reins, additive the same way.
+        id !== 'reins_quarryheart_charger' &&
         // The World PvP trophy skull, additive the same way.
         id !== 'pvp_trophy_skull' &&
         id !== 'pvp_skull_bag' &&
