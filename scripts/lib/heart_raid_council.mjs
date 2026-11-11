@@ -261,11 +261,21 @@ export const council = {
     return null;
   },
   roleSpot(world, st, b) {
+    const g = world.mobs.guardian;
+    const s = world.mobs.singer;
+    // The ranged interrupters stand where they reach both members: they hit
+    // the Guardian and still kick the Singer's Seam Bolt, Song and Wake (from
+    // the raid's arc she is out of every ranged kick's reach).
+    const kickSlot = { mage: -6, hunter: 6, lock: 0 }[b.spec.key];
+    if (kickSlot !== undefined && alive(g) && alive(s) && st.engagedAt) {
+      const d = hypot(g, s);
+      if (d < 22 || d > 54) return null;
+      const along = Math.min(Math.max(d * 0.5, d - 25), 25);
+      return add(add(g, unit(g, s), along), perp(unit(g, s)), kickSlot);
+    }
     // Healers stand between the Guardian's tank and the Singer's keeper, so
     // both stay in reach.
     if (b.spec.role !== 'healer') return null;
-    const g = world.mobs.guardian;
-    const s = world.mobs.singer;
     if (!alive(g) || !alive(s) || hypot(g, s) < 22) return null;
     const mid = add(g, unit(g, s), hypot(g, s) * 0.45);
     const side = b.spec.key === 'h1' ? -1 : 1;
@@ -391,8 +401,19 @@ function wakeChoice(world, st) {
   const cover = coverPillars(world);
   const rising = st.wakePlan.size;
   const room = (cover.length + rising) * SHELTER;
-  return st.wakesThrough >= 1 && room >= world.living().length;
+  // Enough cover already stands (the carved columns before the first Wrath,
+  // or a Wake let through since the last one): kick it.
+  if (room >= world.living().length) return true;
+  // Every risen pillar rings Stone Thrum on the whole raid while it stands, so
+  // the cover is raised as LATE as it can be: a Wake whose next one (her own
+  // clock, WAKE_EVERY after this bar) still rises before the Wrath's bar (its
+  // bar, the marks' 5 s and a walk) is kicked, and that later one shelters.
+  return secondsToBar(world) >= WAKE_EVERY + WAKE_FLOOR + 3;
 }
+/** Wake the Stone's own clock and its floor time (council_ids.ts COUNCIL_TUNING
+ *  wakeEvery; wakeCast + wakeMarkSeconds, plus the Wrath guard's pad). */
+const WAKE_EVERY = 30;
+const WAKE_FLOOR = 2.5 + 5 + 2;
 
 // ---- reading the Quarry -----------------------------------------------------------------
 
