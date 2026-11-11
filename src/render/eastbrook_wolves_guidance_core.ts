@@ -6,6 +6,7 @@
 // his layout spot the hand-authored route below is used unchanged; anywhere
 // else the route is worked out with the player pathfinder once per position
 // and loaded world (a small cache, never per frame).
+import { campLiveArea } from '../sim/camp_scatter';
 import { lineOfSightClear } from '../sim/colliders';
 import { ZONE1_CAMPS } from '../sim/content/zone1';
 import {
@@ -49,7 +50,8 @@ const MARSHAL_POS = EASTBROOK_NPC_PLACEMENTS_BY_ID.marshal_redbrook.position;
 // A missing camp (a content rename) degrades to no guidance rather than a
 // module-load throw taking the client down; the core test pins the camp.
 const camp = ZONE1_CAMPS.find((c) => c.mobId === 'forest_wolf') ?? null;
-export const WOLF_RUN_CAMP = camp ? { ...camp.center, radius: camp.radius } : null;
+// The ground its live wolves cover (the rework pinned them, CampDef.spots).
+export const WOLF_RUN_CAMP = camp ? campLiveArea(camp) : null;
 // The trail leaves Marshal's stand by the ferry landing (the Studio town
 // rework, #4593, moved him there from the square): north-east up the flank
 // track past the quay cottage, then over the open ground below Sableweb onto

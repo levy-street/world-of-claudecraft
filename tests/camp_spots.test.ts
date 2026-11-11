@@ -9,6 +9,7 @@
 import { afterAll, describe, expect, it } from 'vitest';
 import {
   CAMP_SLOT_DRAWS,
+  campLiveArea,
   campSlotPoint,
   campSpawnedCount,
   campSpawnOffset,
@@ -16,8 +17,9 @@ import {
 } from '../src/sim/camp_scatter';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { sanitizeMapDoc } from '../src/sim/map_doc';
+import { questObjectiveAreas } from '../src/sim/quest_targets';
 import { Sim } from '../src/sim/sim';
-import type { CampDef, Entity, WorldContent } from '../src/sim/types';
+import type { CampDef, Entity, QuestProgress, WorldContent } from '../src/sim/types';
 
 const SEED = 4242;
 const CENTER = { x: 600, z: 600 };
@@ -70,6 +72,60 @@ describe('retired slots', () => {
 
   it('pins the per-slot draw count to the spawn loop (five one-next draws)', () => {
     expect(CAMP_SLOT_DRAWS).toBe(5);
+  });
+});
+
+describe('campLiveArea', () => {
+  const camp: CampDef = { mobId: 'forest_wolf', center: { x: 0, z: 0 }, radius: 5, count: 3 };
+  it('is the camp disc when no live slot is pinned', () => {
+    expect(campLiveArea(camp)).toEqual({ x: 0, z: 0, radius: 5 });
+  });
+  it('encloses the pinned spots, and nothing for a fully retired camp', () => {
+    const pinned = {
+      ...camp,
+      spots: [
+        { x: 40, z: 0 },
+        { x: 60, z: 0 },
+        { x: 500, z: 0 },
+      ],
+      retiredSlots: 1,
+    };
+    // the retired third slot's spot (500, 0) counts for nothing
+    expect(campLiveArea(pinned)).toEqual({ x: 50, z: 0, radius: 10 });
+    expect(campLiveArea({ ...camp, retiredSlots: 3 })).toBeNull();
+  });
+  it('keeps the whole disc when a live slot still scatters', () => {
+    const area = campLiveArea({ ...camp, spots: [{ x: 20, z: 0 }] });
+    // centroid of the spot and the centre, reaching the spot and the far rim
+    expect(area).toEqual({ x: 10, z: 0, radius: 15 });
+  });
+  it('every shipped live camp mob stands inside its quest area', () => {
+    let checked = 0;
+    for (const c of BUILTIN_WORLD.camps) {
+      if (!c.spots) continue;
+      const area = campLiveArea(c);
+      for (let i = 0; i < campSpawnedCount(c); i++) {
+        const spot = c.spots[i];
+        if (!spot || !area) continue;
+        expect(Math.hypot(spot.x - area.x, spot.z - area.z), c.mobId).toBeLessThanOrEqual(
+          area.radius + 1e-9,
+        );
+        checked++;
+      }
+    }
+    expect(checked).toBeGreaterThan(50);
+  });
+  it('a kill quest marks where its target camp now stands', () => {
+    // Old Cragmaw's den moved about 48 yd off his camp's centre in the rework
+    const cragmaw = BUILTIN_WORLD.camps.find((c) => c.mobId === 'old_cragmaw');
+    const spot = cragmaw?.spots?.[0];
+    expect(spot).toBeDefined();
+    if (!cragmaw || !spot) return;
+    const progress: QuestProgress = { questId: 'q_old_cragmaw', counts: [0], state: 'active' };
+    const areas = questObjectiveAreas(new Map([['q_old_cragmaw', progress]]));
+    expect(
+      areas.some((a) => Math.hypot(spot.x - a.center.x, spot.z - a.center.z) <= a.radius),
+    ).toBe(true);
   });
 });
 
@@ -129,10 +185,9 @@ describe('the map document keeps spots and retired slots', () => {
     expect(doc).not.toBeNull();
     const camps = doc?.content.camps ?? [];
     expect(camps).toHaveLength(2);
-    expect(camps[0].spots).toEqual([
-      { x: 606, z: 604 },
-      { x: 594, z: 598 },
-    ]);
+    // Spots are indexed by slot: the list stops at the malformed one, so the
+    // third spot never slides into slot 1 (slot 1 on scatters instead).
+    expect(camps[0].spots).toEqual([{ x: 606, z: 604 }]);
     expect(camps[0].retiredSlots).toBe(2);
     expect(camps[1].spots).toEqual([
       { x: 1, z: 1 },

@@ -8,6 +8,7 @@ import {
   type WolvesGuideReader,
 } from '../src/render/eastbrook_wolves_guidance_core';
 import { isBlocked, pathCrossesFence } from '../src/sim/colliders';
+import { ZONE1_CAMPS } from '../src/sim/content/zone1';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { EASTBROOK_NPC_PLACEMENTS_BY_ID } from '../src/sim/eastbrook_layout';
 import { FERRY_BELL_TOWN_LANDING } from '../src/sim/interactions/ferry_bell';
@@ -86,7 +87,17 @@ describe('wolves guidance geometry and visibility', () => {
     const outbound = eastbrookWolvesGuide(world(), () => false);
     const home = eastbrookWolvesGuide(world('ready'), () => false);
     if (!outbound.plan) throw new Error('Expected active wolves route');
-    expect(WOLF_RUN_CAMP).toEqual({ x: -10, z: 6, radius: 28.5 });
+    // The ring is where the camp's live wolves stand: the Studio town rework
+    // (#4593) pinned them (CampDef.spots) north-west of the camp's old centre.
+    const wolves = ZONE1_CAMPS.find((c) => c.mobId === 'forest_wolf');
+    expect(WOLF_RUN_CAMP?.x).toBeCloseTo(-18.33, 2);
+    expect(WOLF_RUN_CAMP?.z).toBeCloseTo(27.83, 2);
+    expect(WOLF_RUN_CAMP?.radius).toBeCloseTo(28.67, 2);
+    for (const spot of wolves?.spots ?? []) {
+      const ring = WOLF_RUN_CAMP ?? { x: 0, z: 0, radius: 0 };
+      expect(Math.hypot(spot.x - ring.x, spot.z - ring.z)).toBeLessThanOrEqual(ring.radius + 1e-9);
+    }
+    expect(wolves?.spots?.length).toBeGreaterThan(0);
     expect(outbound.plan?.points).toEqual(WOLVES_ROUTE);
     // Re-pinned 2026-10 for the Tidehold rebuild: the apothecary's shop stood
     // on the old line north-west out of the square, so the trail followed the

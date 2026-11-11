@@ -93,3 +93,37 @@ export function drawRetiredCampSlot(rng: { next(): number }): void {
 export function campSpawnedCount(camp: CampDef): number {
   return Math.max(0, camp.count - Math.max(0, Math.floor(camp.retiredSlots ?? 0)));
 }
+
+/**
+ * The ground a camp's live mobs cover, as one enclosing circle (centroid plus
+ * its farthest member; not minimal, plenty at map scale). Pinned slots
+ * (CampDef.spots) count at their spots; any live unpinned slot scatters over
+ * the camp disc, so the disc is enclosed whole. Retired slots spawn nothing
+ * and count for nothing: a fully retired camp has no area (null). A camp with
+ * no pinned live slot is exactly its own disc.
+ */
+export function campLiveArea(camp: CampDef): { x: number; z: number; radius: number } | null {
+  const live = campSpawnedCount(camp);
+  if (live === 0) return null;
+  const pins: { x: number; z: number }[] = [];
+  let scatters = false;
+  for (let i = 0; i < live; i++) {
+    const spot = camp.spots?.[i];
+    if (spot) pins.push(spot);
+    else scatters = true;
+  }
+  if (pins.length === 0) return { x: camp.center.x, z: camp.center.z, radius: camp.radius };
+  const pts = scatters ? [...pins, camp.center] : pins;
+  let cx = 0;
+  let cz = 0;
+  for (const p of pts) {
+    cx += p.x;
+    cz += p.z;
+  }
+  cx /= pts.length;
+  cz /= pts.length;
+  let r = 0;
+  for (const p of pins) r = Math.max(r, Math.hypot(p.x - cx, p.z - cz));
+  if (scatters) r = Math.max(r, Math.hypot(camp.center.x - cx, camp.center.z - cz) + camp.radius);
+  return { x: cx, z: cz, radius: r };
+}

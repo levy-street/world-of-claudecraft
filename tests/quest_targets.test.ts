@@ -5,6 +5,7 @@
 // never drift from shipped content.
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { campLiveArea } from '../src/sim/camp_scatter';
 import { FARM_PATCHES } from '../src/sim/content/farm_patches';
 import {
   activeGatherNodes,
@@ -163,10 +164,13 @@ describe('questObjectiveAreas', () => {
     const areas = questObjectiveAreas(activeLog(quest));
     const camps = CAMPS.filter((c) => c.mobId === mobId);
     for (const camp of camps) {
-      const area = areas.find((a) => a.center.x === camp.center.x && a.center.z === camp.center.z);
+      // where the camp's live mobs stand (its pinned spots, if any)
+      const live = campLiveArea(camp);
+      if (!live) continue;
+      const area = areas.find((a) => a.center.x === live.x && a.center.z === live.z);
       expect(area, `camp at ${camp.center.x},${camp.center.z} should have an area`).toBeTruthy();
       if (area) {
-        expect(area.radius).toBeGreaterThan(camp.radius);
+        expect(area.radius).toBeGreaterThan(live.radius);
         // the area knows which objective it stands for (the hover tooltip's key)
         expect(
           area.objectives.some((o) => o.questId === quest.id && o.objectiveIndex === objIndex),
