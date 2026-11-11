@@ -4,7 +4,14 @@
 //     so a colder grey shows through, and lightning walking inside the cloud;
 //   - over the Heart, the sky seen up out of the chamber inside the mountain:
 //     a deep ember-violet night full of slow stars, warm veils drifting where
-//     the heart's light catches the high air, no storm at all.
+//     the heart's light catches the high air, no storm at all; once its
+//     painting has landed (heart_four_sky.ts), the four-way night: each
+//     element's own sky over its quarter (the Breath's storm north, lightning
+//     walking it, the Quench's aurora east, the Hammer's golden dust south,
+//     the Heat's ember smoke west), all four swirling together overhead.
+//     Its twin holds over the main map wherever no vein's own sky does: a
+//     muted dusk panorama, each vein's quarter round the horizon over its
+//     way out from the Ring, all four blended into one colour overhead.
 //   - over the Breath (phase 2G), the storm seen from the summit IN it:
 //     paler and lower, a rolling deck racing in from the north-west, the
 //     key's light breaking through it in a bright rift, lightning walking
@@ -34,6 +41,7 @@
 import * as THREE from 'three';
 import { SUNKEN_BASTION_FOG_COLOR } from '../fog_scene_state';
 import { sharedUniforms } from '../gfx';
+import { HEART_FOUR_SKY, HEART_RING_SKY } from './heart_four_sky';
 import {
   SMITH_HEART_BREATH_FOG,
   SMITH_HEART_HAMMER_FOG,
@@ -53,6 +61,14 @@ export interface HeartSkyOptions {
   /** The Quench's painted aurora night, once its painted kit has landed (its ribbons
    *  ripple, stars twinkle over it, a haloed moon where its cold key light comes from). */
   quenchSky?: THREE.Texture | null;
+  /** The Heat's painted smoky dusk, once its painted kit has landed (the hazy white-gold
+   *  sun still burns where its warm key comes from). */
+  heatSky?: THREE.Texture | null;
+  /** The Heart's four-way night, once its painting has landed (heart_four_sky.ts). */
+  fourSky?: THREE.Texture | null;
+  /** The main map's four-way dusk panorama, once it has landed: wherever no vein's own sky
+   *  holds (the Ring at its middle). */
+  ringSky?: THREE.Texture | null;
   /** Called once per drawn frame (the interior's frame driver), with the
    *  camera's world position. */
   onFrame: (camera: THREE.Vector3) => void;
@@ -89,11 +105,17 @@ uniform sampler2D uQuenchSky;
 uniform float uHeat;
 uniform vec3 uHeatHorizon;
 uniform vec3 uHeatSun;
+uniform float uHeatPainted;
+uniform sampler2D uHeatSky;
 uniform float uHammer;
 uniform sampler2D uHammerSky;
 uniform vec3 uHammerHorizon;
 uniform float uBreathPainted;
 uniform sampler2D uBreathSky;
+uniform float uFourPainted;
+uniform sampler2D uFourSky;
+uniform float uRingPainted;
+uniform sampler2D uRingSky;
 float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float noise(vec2 p) {
   vec2 i = floor(p); vec2 f = fract(p);
@@ -287,7 +309,25 @@ vec3 quenchSky(vec3 d, float up) {
   col += vec3(0.13, 0.15, 0.18) * ring * (0.75 + 0.25 * sin(atan(d.x, d.z) * 3.0));
   return col;
 }
+vec3 heatPaintedSky(vec3 d, float up) {
+  // The painted smoky dusk wrapped round the dome, drifting slow with the smoke; its low
+  // haze meets the area's fog at the horizon. An explicit level: the wrap's seam has a
+  // jump in u a derivative would turn into a line of the smallest mip.
+  float u = atan(d.x, d.z) / 6.2831853 + 0.5 + uTime * 0.0007;
+  // A glTF texture reads top down: v 0 is the painting's top, the deep zenith.
+  float v = clamp(0.82 - max(up, 0.0) * 1.15, 0.005, 0.995);
+  // Graded to the dressed concept's smoky mauve (dark and nearly grey: the molten is the
+  // only bright warm thing in it).
+  vec3 painted = textureLod(uHeatSky, vec2(u, v), 0.0).rgb * vec3(0.3, 0.28, 0.44);
+  vec3 col = mix(uHeatHorizon, painted, smoothstep(-0.03, 0.09, up));
+  // The low sun behind the smoke: a faint hazy disc, a breath of glow.
+  float a = acos(clamp(dot(d, uHeatSun), -1.0, 1.0));
+  col += vec3(0.86, 0.62, 0.32) * exp(-a * a * 40.0) * 0.2;
+  col += vec3(0.3, 0.19, 0.09) * exp(-a * 3.4) * 0.12;
+  return col;
+}
 vec3 heatSky(vec3 d, float up) {
+  if (uHeatPainted > 0.5) return heatPaintedSky(d, up);
   // The smoke over the Hearth: a warm smoke-grey band low, a deep warm
   // slate overhead, the fog at the rim (linear values).
   vec3 zenith = vec3(0.045, 0.04, 0.043);
@@ -325,9 +365,88 @@ vec3 hammerSky(vec3 d, float up) {
   vec3 painted = textureLod(uHammerSky, vec2(u, v), 0.0).rgb;
   return mix(uHammerHorizon, painted, smoothstep(-0.03, 0.09, up));
 }
+vec3 ringFourSky(vec3 d, float up) {
+  // The muted dusk panorama round the horizon, a vein's quarter over its way out; an
+  // explicit level (the wrap's seam has a jump in u a derivative would turn into a line of
+  // the smallest mip). No drift: each quarter stays over its vein.
+  float u = atan(d.x, d.z) / 6.2831853 + 0.5 + ${HEART_RING_SKY.turn.toFixed(4)};
+  // A KTX2 reads top down: v 0 is the painting's top.
+  float v = clamp(${HEART_RING_SKY.horizon.toFixed(3)} - max(up, 0.0) * ${HEART_RING_SKY.stretch.toFixed(3)}, 0.005, 0.995);
+  vec3 painted = textureLod(uRingSky, vec2(u, v), 0.0).rgb;
+  // Overhead the four blend into one colour (the painting's top, all round).
+  vec3 zen = (textureLod(uRingSky, vec2(0.125, 0.03), 5.0).rgb
+    + textureLod(uRingSky, vec2(0.375, 0.03), 5.0).rgb
+    + textureLod(uRingSky, vec2(0.625, 0.03), 5.0).rgb
+    + textureLod(uRingSky, vec2(0.875, 0.03), 5.0).rgb) * 0.25;
+  painted = mix(painted, zen, smoothstep(${HEART_RING_SKY.zenith[0].toFixed(2)}, ${HEART_RING_SKY.zenith[1].toFixed(2)}, up));
+  painted *= ${HEART_RING_SKY.grade.toFixed(3)};
+  painted = mix(vec3(dot(painted, vec3(0.2126, 0.7152, 0.0722))), painted, ${HEART_RING_SKY.sat.toFixed(3)});
+  vec3 col = mix(uHorizon, painted, smoothstep(-0.03, 0.09, up));
+  // Now and then a faint flash in the storm's quarter (north).
+  float ba;
+  float fa = strike(uTime, 7.0, ba);
+  if (fa > 0.0) {
+    float aim = (ba - 0.5) * 1.3;
+    vec2 az = d.xz / max(length(d.xz), 1e-4);
+    float near = smoothstep(0.85, 1.0, dot(az, vec2(sin(aim), cos(aim)))) * smoothstep(0.02, 0.15, up) * (1.0 - smoothstep(0.4, 0.7, up));
+    col += vec3(0.5, 0.52, 0.7) * fa * near * (0.15 + dot(painted, vec3(0.3, 0.59, 0.11)) * 2.0) * ${HEART_RING_SKY.flash.toFixed(3)};
+  }
+  // A few stars twinkling high up.
+  if (up > 0.2) {
+    vec2 sp = d.xz / (up + 0.2);
+    vec2 cell = floor(sp * 34.0);
+    vec2 f = fract(sp * 34.0) - 0.5;
+    float h = hash(cell);
+    float star = step(0.99, h) * smoothstep(0.12, 0.0, length(f));
+    float twk = 0.5 + 0.5 * sin(uTime * (0.8 + h * 2.5) + h * 40.0);
+    col += vec3(0.9, 0.88, 1.0) * star * twk * ${HEART_RING_SKY.stars.toFixed(3)} * smoothstep(0.3, 0.6, up) * uDetail;
+  }
+  return col;
+}
+vec3 heartFourSky(vec3 d, float up, vec3 horizon) {
+  // The painting seen straight up: its middle the zenith, its rim \${HEART_FOUR_SKY.reach.toFixed(3)} radians down;
+  // its top the north, its right the east (each quarter over its element's quarter).
+  float th = acos(clamp(up, -1.0, 1.0));
+  float r = min(th / ${HEART_FOUR_SKY.reach.toFixed(3)}, 1.0);
+  vec2 az = d.xz / max(length(d.xz), 1e-4);
+  // The middle turns slow, back and forth, where the four mix; the rim stays still.
+  float tw = ${HEART_FOUR_SKY.swirl.toFixed(3)} * (1.0 - r) * (1.0 - r) * sin(uTime * 0.035);
+  float c = cos(tw);
+  float s = sin(tw);
+  vec2 q = vec2(c * az.x - s * az.y, s * az.x + c * az.y);
+  vec2 uv = vec2(0.5 + 0.5 * ${HEART_FOUR_SKY.disc.toFixed(3)} * r * q.x, 0.5 - 0.5 * ${HEART_FOUR_SKY.disc.toFixed(3)} * r * q.y);
+  vec3 painted = texture(uFourSky, uv).rgb * ${HEART_FOUR_SKY.grade.toFixed(3)};
+  painted = mix(vec3(dot(painted, vec3(0.2126, 0.7152, 0.0722))), painted, ${HEART_FOUR_SKY.sat.toFixed(3)});
+  vec3 col = mix(horizon, painted, smoothstep(-0.05, 0.2, up));
+  // Lightning walking the storm's clouds in the north quarter.
+  float ba;
+  float fa = strike(uTime, 6.0, ba);
+  if (fa > 0.0) {
+    float aim = (ba - 0.5) * 1.3;
+    vec2 at = vec2(sin(aim), cos(aim));
+    float near = smoothstep(0.82, 1.0, dot(az, at)) * smoothstep(0.2, 0.55, r);
+    float cloud = 0.2 + dot(painted, vec3(0.3, 0.59, 0.11)) * 3.0;
+    col += vec3(0.62, 0.55, 0.95) * fa * near * cloud * ${HEART_FOUR_SKY.flash.toFixed(3)};
+  }
+  // The painted stars twinkle.
+  if (up > 0.0) {
+    vec2 sp = d.xz / (up + 0.2);
+    for (int k = 0; k < 2; k++) {
+      float sc = 30.0 + float(k) * 37.0;
+      vec2 cell = floor(sp * sc + float(k) * 17.0);
+      vec2 f = fract(sp * sc + float(k) * 17.0) - 0.5;
+      float h = hash(cell);
+      float star = step(0.988, h) * smoothstep(0.14, 0.0, length(f));
+      float twk = 0.5 + 0.5 * sin(uTime * (0.8 + h * 2.5) + h * 40.0);
+      col += vec3(0.9, 0.86, 1.0) * star * twk * ${HEART_FOUR_SKY.stars.toFixed(3)} * smoothstep(0.1, 0.4, up) * uDetail;
+    }
+  }
+  return col;
+}
 vec3 coreSky(vec3 d, float up) {
   // Ember-violet night: warm low (the heart's light on the high air), deep
   // violet-black overhead.
+  if (uFourPainted > 0.5) return heartFourSky(d, up, uCoreHorizon);
   vec3 zenith = vec3(0.006, 0.004, 0.014);
   vec3 low = vec3(0.07, 0.03, 0.03);
   vec3 col = mix(low, zenith, smoothstep(0.02, 0.7, up));
@@ -357,7 +476,10 @@ void main() {
   float up = d.y;
   vec3 col = vec3(0.0);
   if (uCore < 0.999) {
-    col = uBreath < 0.999 && uQuench < 0.999 && uHeat < 0.999 && uHammer < 0.999 ? stormSky(d, up) : vec3(0.0);
+    // Wherever no vein's own sky holds (the Ring, at the middle of the four), the four-way
+    // dusk once it has landed, each vein's quarter over its way out; else the storm.
+    if (uBreath < 0.999 && uQuench < 0.999 && uHeat < 0.999 && uHammer < 0.999)
+      col = uRingPainted > 0.5 ? ringFourSky(d, up) : stormSky(d, up);
     if (uBreath > 0.001) col = mix(col, breathSky(d, up), uBreath);
     if (uQuench > 0.001) col = mix(col, quenchSky(d, up), uQuench);
     if (uHeat > 0.001) col = mix(col, heatSky(d, up), uHeat);
@@ -411,6 +533,12 @@ export function buildHeartSky(opts: HeartSkyOptions): HeartSky {
       uQuenchPainted: { value: opts.quenchSky ? 1 : 0 },
       uQuenchSky: { value: opts.quenchSky ?? null },
       uHammerHorizon: { value: new THREE.Color(SMITH_HEART_HAMMER_FOG.color) },
+      uRingPainted: { value: opts.ringSky ? 1 : 0 },
+      uRingSky: { value: opts.ringSky ?? null },
+      uFourPainted: { value: opts.fourSky ? 1 : 0 },
+      uFourSky: { value: opts.fourSky ?? null },
+      uHeatPainted: { value: opts.heatSky ? 1 : 0 },
+      uHeatSky: { value: opts.heatSky ?? null },
       uHeatHorizon: { value: new THREE.Color(SMITH_HEART_HEAT_FOG.color) },
       uHeatSun: {
         value: new THREE.Vector3(...SMITH_HEART_HEAT_LIGHT.keyDirection).normalize(),

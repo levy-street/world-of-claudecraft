@@ -4,8 +4,9 @@
 // boulders, the column bundles at the Forge's corners, the wellspring at the
 // Pour Channel's head and the channel itself with its spill, the clusters of
 // fire crystal, the bridge's arch, the low walls along every Heat walk over
-// the void, the seams of fire and the drifts of ash. Static: every matrix is
-// written once at build.
+// the void, the seams of fire and the drifts of ash. Its painted rebuild
+// (heat_env_plan_core.ts) stands its own pieces in the old ones' places once it
+// has landed. Static: every matrix is written once at build.
 //
 // Built only once the kit has landed; before that the layout's placeholders
 // stand in (heart_props.ts), and this swaps in for them the moment it lands.
@@ -19,6 +20,8 @@ import {
   SMITH_HEART_HEAT_KIT_URL,
   upgradeWhenHeartKitLands,
 } from './heart_kit';
+import { ensureHeatEnvKit, heatEnvHas, heatEnvKitReady, instanceHeatEnv } from './heat_env_kit';
+import { heatEnvSwap, planHeatEnvRing } from './heat_env_plan_core';
 import {
   HEARTH_CRYSTAL_PIECES,
   HEAT_KIT_KINDS,
@@ -29,9 +32,12 @@ import {
 /** The Heat's culling cell (yards): the hall, the casting floor, the Forge. */
 const HEAT_CELL = 70;
 
-/** Wait (capped) for the Heat kit before the interior is built. */
+/** Wait (capped) for the Heat kit and its painted rebuild before the interior is
+ *  built. */
 export function ensureHeatKit(): Promise<void> {
-  return ensureHeartKit(SMITH_HEART_HEAT_KIT_URL);
+  return Promise.all([ensureHeartKit(SMITH_HEART_HEAT_KIT_URL), ensureHeatEnvKit()]).then(
+    () => undefined,
+  );
 }
 
 /** Has the Heat kit landed? */
@@ -65,16 +71,34 @@ function warmHearthCrystals(): void {
   }
 }
 
-/** The Heat's kit dressing (instance-local). */
-export function buildHeatKit(lowGfx: boolean): THREE.Group {
+/** The Heat's kit dressing (instance-local), painted or old as `painted` says: the
+ *  painted rebuild's pieces in the old pieces' places (heat_env_plan_core.ts), the rest of
+ *  the old kit as it was. */
+export function buildHeatKit(lowGfx: boolean, painted = heatEnvKitReady()): THREE.Group {
   warmHearthCrystals();
-  return instanceHeartKit(
+  if (!painted) {
+    return instanceHeartKit(
+      SMITH_HEART_HEAT_KIT_URL,
+      planHeatKit(),
+      lowGfx,
+      'smithHeartHeatKit',
+      HEAT_CELL,
+    );
+  }
+  const { keep, swap } = heatEnvSwap(planHeatKit(), heatEnvHas);
+  const group = instanceHeartKit(
     SMITH_HEART_HEAT_KIT_URL,
-    planHeatKit(),
+    keep,
     lowGfx,
     'smithHeartHeatKit',
     HEAT_CELL,
   );
+  // The arena concept's ring of basalt stacks round the hall too (its molten fall is a
+  // band of the mountain's, heart_rock.ts).
+  group.add(instanceHeatEnv(swap, lowGfx, 'smithHeartHeatEnv'));
+  // The rings of basalt, drawn only from the Heat (heat_env_kit.ts `HeatEnvVariant`).
+  group.add(instanceHeatEnv(planHeatEnvRing(), lowGfx, 'smithHeartHeatEnvRing', 'ring'));
+  return group;
 }
 
 /** The kit dressing when it has landed; otherwise nothing yet, and the
@@ -84,5 +108,10 @@ export function dressHeat(parent: THREE.Group, placeholders: THREE.Group, lowGfx
     parent.add(buildHeatKit(lowGfx));
     return;
   }
-  upgradeWhenHeartKitLands(SMITH_HEART_HEAT_KIT_URL, placeholders, () => buildHeatKit(lowGfx));
+  // The late build keeps the look the interior was built with: paint that landed since
+  // was never prepared behind the curtain (the warmers carry only what had landed).
+  const painted = heatEnvKitReady();
+  upgradeWhenHeartKitLands(SMITH_HEART_HEAT_KIT_URL, placeholders, () =>
+    buildHeatKit(lowGfx, painted),
+  );
 }

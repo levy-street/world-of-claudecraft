@@ -134,8 +134,10 @@ void main() {
   float k = pourFall(s);
   if (k <= 0.001) discard;
   float across = abs(vStrip.y);
-  float runs = pourNoise(vec2(vStrip.y * 4.0, vLen * 0.35 + uTime * 6.0)) * 0.6
-    + pourNoise(vec2(vStrip.y * 9.0 + 2.0, vLen * 0.8 + uTime * 9.0)) * 0.4;
+  // Down the fall: a streak at vLen * k - clock * rate runs toward the larger vLen (vLen
+  // grows from the lip down).
+  float runs = pourNoise(vec2(vStrip.y * 4.0, vLen * 0.35 - uTime * 6.0)) * 0.6
+    + pourNoise(vec2(vStrip.y * 9.0 + 2.0, vLen * 0.8 - uTime * 9.0)) * 0.4;
   float body = (1.0 - smoothstep(0.55 + runs * 0.3, 1.0, across)) * (0.6 + 0.6 * runs);
   float down = 1.0 - smoothstep(0.55, 1.0, vStrip.x);
   float a = body * down * k;

@@ -26,9 +26,17 @@ import {
   SMITH_HEART_ROCK_KIT_URL,
   upgradeWhenHeartKitLands,
 } from './heart_kit';
+import type { HeartKitPlacement } from './heart_kit_core';
 import { planHeartGulfWalls } from './heart_rock_gulf_core';
 import { planHeartHangs, planHeartRockLips, planHeartRockUnder } from './heart_rock_hang_core';
 import { planHeartNeedles, planHeartRock } from './heart_rock_plan_core';
+import { heatEnvHas, heatEnvKitReady, instanceHeatEnv } from './heat_env_kit';
+import {
+  fitHeatEnvRock,
+  heatEnvOwnsRock,
+  heatEnvRockPiece,
+  heatEnvTakesRockPiece,
+} from './heat_env_plan_core';
 import { instanceQuenchEnv, quenchEnvKitReady } from './quench_env_kit';
 import { fitQuenchEnvNeedle, fitQuenchEnvRock, quenchEnvOwnsRock } from './quench_env_plan_core';
 
@@ -46,15 +54,16 @@ export function heartRockKitReady(): boolean {
 }
 
 /** The mountain's rock (instance-local). The Hammer vein's own rock is its painted kit's
- *  once that has landed (`painted`), and the Breath's and the Quench's bands and needles
- *  their own painted kits' (`breathPainted`, `quenchPainted`); the lips and the hung faces
- *  stay the rock kit's sculpts (the Breath's and the Quench's take their paintings on
- *  through the rock's material, heart_rock_cutaway.ts). */
+ *  once that has landed (`painted`), and the Breath's, the Quench's and the Heat's bands and
+ *  needles their own painted kits' (`breathPainted`, `quenchPainted`, `heatPainted`); the
+ *  lips and the hung faces stay the rock kit's sculpts (the Breath's, the Quench's and the
+ *  Heat's take their paintings on through the rock's material, heart_rock_cutaway.ts). */
 export function buildHeartRock(
   lowGfx: boolean,
   painted = hammerEnvKitReady(),
   breathPainted = breathEnvKitReady(),
   quenchPainted = quenchEnvKitReady(),
+  heatPainted = heatEnvKitReady(),
 ): THREE.Group {
   // The Breath's high walks hang faces from brink to mist (the lips and
   // under-walls they replace left out); the hangs are the Breath's alone.
@@ -66,7 +75,13 @@ export function buildHeartRock(
   const hammer = (p: { x: number; z: number }) => painted && hammerEnvOwnsRock(p);
   const breath = (p: { x: number; z: number }) => breathPainted && breathEnvOwnsRock(p);
   const quench = (p: { x: number; z: number }) => quenchPainted && quenchEnvOwnsRock(p);
-  const old = (p: { x: number; z: number }) => !hammer(p) && !breath(p) && !quench(p);
+  // A band whose basalt (or fall) did not bake keeps the rock kit's.
+  const heat = (p: HeartKitPlacement) =>
+    heatPainted &&
+    heatEnvTakesRockPiece(p.piece) &&
+    heatEnvOwnsRock(p) &&
+    heatEnvHas(heatEnvRockPiece(p));
+  const old = (p: HeartKitPlacement) => !hammer(p) && !breath(p) && !quench(p) && !heat(p);
   const group = instanceHeartKit(
     SMITH_HEART_ROCK_KIT_URL,
     [...rock.filter(old), ...hangs, ...lips.filter((p) => !hammer(p)), ...needles.filter(old)],
@@ -112,6 +127,12 @@ export function buildHeartRock(
       ),
     );
   }
+  if (heatPainted) {
+    group.add(
+      // The band variant: their rock round the hall dissolves seen from the Heat.
+      instanceHeatEnv(rock.filter(heat).map(fitHeatEnvRock), lowGfx, 'smithHeartHeatEnvRock', 'band'),
+    );
+  }
   return group;
 }
 
@@ -132,7 +153,8 @@ export function dressHeartMountain(
   const painted = hammerEnvKitReady();
   const breathPainted = breathEnvKitReady();
   const quenchPainted = quenchEnvKitReady();
+  const heatPainted = heatEnvKitReady();
   upgradeWhenHeartKitLands(SMITH_HEART_ROCK_KIT_URL, crags, () =>
-    buildHeartRock(lowGfx, painted, breathPainted, quenchPainted),
+    buildHeartRock(lowGfx, painted, breathPainted, quenchPainted, heatPainted),
   );
 }

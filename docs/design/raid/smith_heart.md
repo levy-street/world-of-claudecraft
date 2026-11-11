@@ -1518,6 +1518,56 @@ than the one it replaces (a bowl 2,718 from 4,694, a heap of ice 2,189 from 6,74
 4,256 from 5,204). The low tier sheds nothing new: no swapped piece is cosmetic past what it
 replaced.
 
+### 5.25 The Heat vein's painted rebuild
+
+The owner's ask (2026-11-10): the 4th section, the Heat, rebuilt the way the ice was, fire and
+molten "a mix with molten but don't overdo it", the mobs and the fight untouched. First two
+arena concepts in ChatGPT in the earth room's concept's style
+(`docs/design/raid/kit/heat_env_src/concept/`): a great hall of sooted columnar basalt over a
+chasm, the Hearth's crystal-throated mouth, the dolmen altar-stone, the first flame's white-gold
+crystal, and molten only in the wellspring's pool, the channel, a few seams and one far fall.
+The build follows the smoky dusk (`fv_arena_dusk`). This amends section 5.16's "white-gold,
+never volcanic red" for the environment: the molten accents are red-orange, under the red-orange
+guardian, and the crystal keeps the white-gold. Nothing here touches `src/sim/`.
+
+**Sources.** ChatGPT painted the floor of column heads, the basalt cliff, the stacked stumps and
+the smoky sky, and a FRONT, LEFT and BACK sheet for each of eight models; Tripo P2 built the
+eight (880 credits); Blender stands them on the old kit's frames and builds the walls. The
+atlases came back dark with the sheets' orange rim light baked onto every rock edge, which read
+as fire everywhere: the grade (`scripts/assets/smith_heart_heat_env_kit/heat_grade.mjs`) puts
+rock on a sooted basalt ramp and keeps a warm texel's fire only inside a broad warm region (a
+crystal's faces, a fall's ribbon) or as the molten's own saturated core, so a rim's thin line
+goes to the basalt. Prompts and Tripo task ids: `docs/design/raid/kit/heat_env_src/README.md`.
+
+| Piece | Now | Stands in for |
+|---|---|---|
+| The mountain | Tall basalt cliff stacks and broad bluffs of fused columns, soot down their faces, ash on the ledges, a thin molten seam in a few deep joints, on the old plan's own spots and contours (the Hammer's fit), the cliff painting's strokes over each atlas; only a band whose faced surface is a Heat walk and that stands where the basalt holds (the surface's id, never the area: the Quench's blocking finding), so the bands facing the Ring keep the rock kit | `Kit_Rock*` bands facing the Heat's walks (`heatEnvOwnsRock`, `fitHeatEnvRock`) |
+| The molten fall | The concept's far fall: one stream of molten rock down a basalt cliff into a pool at its foot, swapped in place for the band at the chasm's north head (seen from the bridge, out of the guardian's backdrop, far from the pour's own fall) | one `Kit_Rock*` band (`heatEnvFallHost`) |
+| The ring | Tall stacks round the hall on the mountain past its walls, facing it, their whole footprint off every walk, the way in from the casting floor open; in the sightline plan | new (`planHeatEnvRing`, `heatEnvSolids`) |
+| The lips | Kept as the rock kit's sculpts, wearing the cliff painting's hue and a calm share of its strokes over their own soot, ash on their ledges | painted through the rock's material (`heartRockHeatGlsl`) |
+| What the kit leaves bare | The heightfield and the field's cliff faces wear the same paint where the basalt soot held, by the painting's own dark value | `heat_env_rock_paint.ts` (`heatEnvWeight`, `HEAT_ENV_FIELD_BASE`) |
+| The floors | The hall, the casting floor and the Forge: the heads of basalt columns, six-sided, about two strides across, ash in the joints, with relief, read twice so the repeat never lines up | the `hearth` top family (`heatEnvFloorMaterial`) |
+| The Hearth's mouth | The fan of basalt columns round its pointed arch, its throat crowded with the first flame's crystal, on a basalt foot down into the mountain as the old mouth was | `Kit_HearthMouth` |
+| The altar-stone, the boulders, the crystal | The dolmen (three pairs of columns, a capstone cracked by white-gold fire, crystal out of one end); boulders split by a molten seam; clusters of white-gold prisms on column stumps; each inside the old piece's box | `Kit_AltarStone`, `Kit_EmberBoulder`, `Kit_FireCrystalA`, `B` |
+| The hall's column bundles | Bundles of fused columns with stepped heads, a crystal on one side, their shafts down into the chasm, inside the old pillars' reach | `Kit_HearthPillar` |
+| The walls | Stacked basalt stumps a knee high on two lifts of the cliff, on the old modules' lip frame | `Kit_HeatWallA`, `B` |
+| Gone | The ash drifts: the painted floor carries its own ash | `Kit_AshDriftA`, `B` |
+| The sky | The painted smoky dusk wrapped on the dome, drifting with the smoke, the hazy white-gold sun still drawn where the warm key comes from | `heart_sky.ts` `heatPaintedSky` |
+
+**Kept.** The fight: the wellspring the guardian stands sunk in and its pool and lip
+(`smith_heart_fx/heat_well_fx.ts`), every footprint and effect; the pour's channel, spill and
+wellspring (`heat_pour.ts`); the anvil bridge's arch under its deck; the seams of fire on the
+floor (the molten accents); the Heat's air (`heat_air.ts`); the light and fog
+(`smithHeartHeat`: already the concept's warm west key over a cool slate fill). If the kit has
+not landed, the old Heat draws as it did until the interior is next built.
+
+**The contrast.** The guardian is red-orange molten; the hall is dark sooted basalt, its fire
+held to the crystal, the altar's crack, the seams and one far fall (`env_kit_look.ts`'s gold
+glow: the backdrop's at less than half the hall's own lit pieces'), so the guardian stands out
+against its own hall.
+
+**Budget.** The kit is 5.0 MB, fetched at the raid's door with the old Heat kit, never at boot.
+
 ## 6. Set pieces (phase 2 specs)
 
 None of these is built in phase 1; their floors, props and anchors are. Every

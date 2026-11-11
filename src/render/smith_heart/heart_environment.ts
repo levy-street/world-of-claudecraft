@@ -101,16 +101,19 @@ export const SMITH_HEART_RING_FOG = { color: 0x686a72, near: 120, far: 700 } as 
  *  2E's shaded rock navy. */
 export const SMITH_HEART_RING_LIGHT = {
   sun: 2.55,
-  hemi: 2.35,
+  hemi: 2.6,
   // The storm sky's reflections stay a trace: at the Hammer's 0.15 they
   // washed every shaded face of the rock a saturated navy.
   env: 0.03,
   rim: 1.45,
   sunColor: 0xffdab0,
-  hemiSky: 0x989aa8,
-  hemiGround: 0x645c56,
+  // The Ring concept of 2026-11-11: a dusk violet in the shade.
+  hemiSky: 0x9c96b0,
+  hemiGround: 0x645a5c,
   rimColor: 0xffb072,
-  keyDirection: [-0.42, 0.72, -0.55] as const,
+  // From the north-east, low (the concept's light: from the North Stair's
+  // head the Grand Stair's quarry cliffs stand lit gold over the Ring).
+  keyDirection: [0.32, 0.6, 0.73] as const,
 } as const;
 
 /** The fog state of the Breath (phase 2G). */
@@ -244,7 +247,7 @@ export function smithHeartCameraInHeat(x: number, z: number): boolean {
  *  thin across the hall and the Forge so a telegraph and the guardian read
  *  crisp, the far walls going into it (never an orange wash: the warm stays
  *  in the light and the fire). */
-export const SMITH_HEART_HEAT_FOG = { color: 0x6e645c, near: 80, far: 560 } as const;
+export const SMITH_HEART_HEAT_FOG = { color: 0x3c3038, near: 70, far: 480 } as const;
 
 /** The Heat's light rig (phase 2I): the Hearth's light, a warm white-gold
  *  key low from the west down the fissure (the guardian and the altar-stone
@@ -255,18 +258,22 @@ export const SMITH_HEART_HEAT_FOG = { color: 0x6e645c, near: 80, far: 560 } as c
  *  rim off the first flame on every silhouette. The sky's reflection a
  *  trace. */
 export const SMITH_HEART_HEAT_LIGHT = {
-  sun: 2.45,
-  hemi: 2.0,
+  sun: 2.4,
+  hemi: 2.1,
   env: 0.03,
   rim: 1.7,
   sunColor: 0xffdcae,
   // The smoke's cool slate fill (the painted world's L1: warm key, cool
   // shade; a warm fill washed the whole vein one yellow).
-  hemiSky: 0x8a8c9a,
-  hemiGround: 0x5c4c42,
+  hemiSky: 0x8a8498,
+  // The molten's bounce from below (the dressed concept: every cliff lit warm from the
+  // fire under it, never a wash).
+  hemiGround: 0x5e3e36,
   rimColor: 0xffbf6a,
-  /** Low in the west (from the ground toward it): the Hearth's side. */
-  keyDirection: [-0.72, 0.56, 0.16] as const,
+  /** Low in the south-east (from the ground toward it): the dressed concept's light,
+   *  raking the walls a raid facing the guardian looks at (from the west it lit only their
+   *  backs; square on, it washed them flat). */
+  keyDirection: [0.55, 0.6, -0.58] as const,
 } as const;
 
 /** The Hammer's air: a grey quarry dust, thin near (the pit reads crisp

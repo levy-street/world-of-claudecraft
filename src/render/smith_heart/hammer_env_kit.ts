@@ -23,6 +23,7 @@ import {
   isEnvPieceNode,
 } from './env_kit_bake';
 import { applyEnvLook } from './env_kit_look';
+import { envAreaClip } from './env_area_clip';
 import { hammerEnvFlameMesh } from './hammer_env_flames';
 import { HAMMER_ENV_BRAZIER_TOP, planHammerEnvBraziers } from './hammer_env_plan_core';
 import type { HeartKitPlacement } from './heart_kit_core';
@@ -137,9 +138,17 @@ export function hammerEnvProgramWarmers(lowGfx: boolean): THREE.Group {
   }
   for (const mesh of envWarmCarriers(
     drawn,
-    hammerEnvMaterial,
+    (painting: string) => hammerEnvMaterial(painting),
     HAMMER_ENV_SHADOW,
     'smithHeartHammerEnvWarmer',
+  ))
+    group.add(mesh);
+  // The rock paintings' Heart variant (env_area_clip.ts), its own program.
+  for (const mesh of envWarmCarriers(
+    new Set([...drawn].filter((p) => ROCK_PAINTINGS.has(p))),
+    (painting: string) => hammerEnvMaterial(painting, 'heart'),
+    HAMMER_ENV_SHADOW,
+    'smithHeartHammerEnvWarmer:heart',
   ))
     group.add(mesh);
   return group;
@@ -198,9 +207,12 @@ function applyBannerSway(mat: THREE.Material): void {
 
 const materials = new Map<string, THREE.Material>();
 
-/** The shared material of one painting. */
-export function hammerEnvMaterial(painting: string): THREE.Material {
-  const have = materials.get(painting);
+/** The shared material of one painting; `area` 'heart': a rock painting's variant dressing
+ *  the Heart's crown, drawn only from the Heart (env_area_clip.ts). */
+export function hammerEnvMaterial(painting: string, area?: 'heart'): THREE.Material {
+  const heart = area === 'heart' && ROCK_PAINTINGS.has(painting);
+  const key = heart ? `${painting}|heart` : painting;
+  const have = materials.get(key);
   if (have) return have;
   let m: THREE.Material;
   if (painting === 'glow') {
@@ -228,11 +240,14 @@ export function hammerEnvMaterial(painting: string): THREE.Material {
         ? { map: () => paintings.get('cliff') ?? null, ...ROCK_STROKES }
         : null,
       shade: ENV_SHADE_FLOOR,
+      // Seen from the Heat, the rock round its hall opens; the Heart's dressing is drawn
+      // only from the Heart (env_area_clip.ts).
+      ...(ROCK_PAINTINGS.has(painting) ? { clip: envAreaClip(heart ? 'heart' : 'heatBand') } : {}),
     });
     if (banner) applyBannerSway(m);
   }
   markSharedMaterial(m);
-  materials.set(painting, m);
+  materials.set(key, m);
   return m;
 }
 
@@ -300,10 +315,11 @@ export function instanceHammerEnv(
   list: readonly HeartKitPlacement[],
   lowGfx: boolean,
   name: string,
+  area?: 'heart',
 ): THREE.Group {
   return instanceEnvPieces(
     baked,
-    hammerEnvMaterial,
+    (painting: string) => hammerEnvMaterial(painting, area),
     list,
     lowGfx,
     name,

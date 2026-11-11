@@ -51,8 +51,14 @@ For reference-image reconstruction and procedural GLB authoring, read the living
   ice realm): the ChatGPT paintings sized and the stone ones taken toward the slate, the Tripo
   atlases graded by what a texel is (`quench_grade.mjs`: rock, ice, snow, coals), then the Blender
   build, `build.mjs` and the KTX2 step. Recipe and source records, the arena concept included:
-  `docs/design/raid/kit/quench_env_src/README.md`. The three painted kits ship through one step,
-  `lib/ship_env_kit.mjs`, and build in Blender on `docs/design/raid/kit/env_kit_blender.py`.
+  `docs/design/raid/kit/quench_env_src/README.md`.
+- **`smith_heart_heat_env_kit/`** prepares and ships the Heat vein's painted kit (the Hearth): the
+  ChatGPT paintings sized and taken toward charcoal, the Tripo atlases graded onto the sooted basalt
+  ramp (`heat_grade.mjs`: a warm texel keeps its fire only inside a broad warm region or as the
+  molten's saturated core, so the sheets' baked orange rim light goes to the basalt), then the
+  Blender build, `build.mjs` and the KTX2 step. Recipe and source records, both arena concepts
+  included: `docs/design/raid/kit/heat_env_src/README.md`. The four painted kits ship through one
+  step, `lib/ship_env_kit.mjs`, and build in Blender on `docs/design/raid/kit/env_kit_blender.py`.
 - **`build_battleground_map.mjs`** (+ `battleground/`, own CLAUDE.md) builds the Thornhollow Fields
   field's map document from the combat plan plus the Thornhollow art kit, and
   `compile_thornhollow.mjs` compiles that document into `src/sim/thornhollow_field.generated.ts`.

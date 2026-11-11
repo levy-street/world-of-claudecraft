@@ -20,6 +20,7 @@ import {
   heartCrownEmissiveGlsl,
 } from './heart_crown_core';
 import { HEART_ROCK_CUT_FAR, HEART_ROCK_CUT_NEAR, HEART_ROCK_STRATA } from './heart_rock_plan_core';
+import { heatEnvOpenGlsl, heatEnvRockGlsl, heatEnvWeightGlsl } from './heat_env_plan_core';
 import { heatSootGlsl } from './heat_soot_core';
 import { quenchEnvRockGlsl, quenchEnvWeightGlsl } from './quench_env_plan_core';
 import { QUENCH_FROST_NOISE_GLSL, quenchFrostGlsl } from './quench_frost_core';
@@ -144,6 +145,36 @@ export function heartRockQuenchGlsl(): string {
         }`;
 }
 
+/** The Heat's painted rebuild (heat_env_plan_core.ts): the rock kit's sculpts it keeps (the
+ *  lips, any band its kit did not take) wear its basalt cliff painting where its weight
+ *  holds, over the soot. Unset until the kit has landed, so the vein draws its soot as it
+ *  did. */
+const HEART_ROCK_HEAT_PAINT: { value: THREE.Texture | null } = { value: null };
+const HEART_ROCK_HEAT_PAINTED = { value: 0 };
+
+/** Hand the rock's material the Heat's cliff painting (null: the kit has not landed). */
+export function setHeartRockHeatPaint(paint: THREE.Texture | null): void {
+  HEART_ROCK_HEAT_PAINT.value = paint;
+  HEART_ROCK_HEAT_PAINTED.value = paint ? 1 : 0;
+}
+
+/** The Heat's painted rock's GLSL (after the soot: slot space, the vertex normal; the
+ *  gradients taken in the uniform branch, so the per-fragment weight may gate nothing). */
+export function heartRockHeatGlsl(): string {
+  return `if ( uHeatPainted > 0.5 ) {
+          vec3 hpP = vRockCutWorld - vec3( uHeartSlot.x, 0.0, uHeartSlot.y );
+          vec3 hpDx = dFdx( hpP );
+          vec3 hpDy = dFdy( hpP );
+          float hpW = heatEnvWeight( hpP.xz );
+          // Explicit gradients: the reads may sit behind the per-fragment weight, so rock
+          // outside the Heat samples nothing.
+          if ( hpW > 0.001 ) {
+            vec3 hpRock = heatEnvRock( uHeatPaint, hpP, normalize( vRockCutN ), hpDx, hpDy, diffuseColor.rgb );
+            diffuseColor.rgb = mix( diffuseColor.rgb, hpRock, hpW );
+          }
+        }`;
+}
+
 /** The uniform holding how far the camera is in the Heart (the frame driver sets it): a
  *  paint layer on another material that hands the Heart's walls over by it shares it. */
 export function heartRockCoreUniform(): { value: number } {
@@ -153,6 +184,21 @@ export function heartRockCoreUniform(): { value: number } {
 /** Tell the rock's material how far the camera is in the Heart (the frame driver). */
 export function setHeartRockCore(k: number): void {
   HEART_ROCK_CORE.value = k;
+}
+
+/** How far the camera is in the Heat's light, its painted kit landed (the frame driver):
+ *  the rock round the Heat's hall opens by it (heat_env_plan_core.ts `HEAT_ENV_OPEN`). */
+const HEART_ROCK_HEAT_OPEN = { value: 0 };
+
+/** The Heat's open uniform, shared by every material the open region dissolves (the rock
+ *  kit's, the mountain's and the field cliffs' paint, the Heat's own bands). */
+export function heartRockHeatOpenUniform(): { value: number } {
+  return HEART_ROCK_HEAT_OPEN;
+}
+
+/** Tell the rock's materials how far the camera is in the Heat (the frame driver). */
+export function setHeartRockHeatOpen(k: number): void {
+  HEART_ROCK_HEAT_OPEN.value = k;
 }
 
 /** Tell the rock's material which slot is drawn (the interior's frame driver). */
@@ -193,7 +239,7 @@ export function heartRockBedGlsl(): string {
         }`;
 }
 
-const KEY = `smith-heart-rock-cutaway|beds2g|storm3b|breathPaint|frost2h|quenchPaint|soot2i|crownAaa|hammerSky|hammerFar|${HEART_ROCK_CUT_NEAR}|${HEART_ROCK_CUT_FAR}|${HEART_ROCK_SHADE_FLOOR.join(',')}`;
+const KEY = `smith-heart-rock-cutaway|beds2g|storm3b|breathPaint|frost2h|quenchPaint|soot2i|heatPaint|heatOpen|crownAaa|hammerSky|hammerFar|${HEART_ROCK_CUT_NEAR}|${HEART_ROCK_CUT_FAR}|${HEART_ROCK_SHADE_FLOOR.join(',')}`;
 
 /** Wire the cutaway into a rock material (before any other layer: those
  *  compose with it). */
@@ -209,6 +255,9 @@ export function applyRockCutaway(mat: THREE.Material): void {
     shader.uniforms.uBreathPainted = HEART_ROCK_BREATH_PAINTED;
     shader.uniforms.uQuenchPaint = HEART_ROCK_QUENCH_PAINT;
     shader.uniforms.uQuenchPainted = HEART_ROCK_QUENCH_PAINTED;
+    shader.uniforms.uHeatPaint = HEART_ROCK_HEAT_PAINT;
+    shader.uniforms.uHeatPainted = HEART_ROCK_HEAT_PAINTED;
+    shader.uniforms.uHeatOpen = HEART_ROCK_HEAT_OPEN;
     shader.vertexShader = shader.vertexShader
       .replace(
         '#include <common>',
@@ -231,7 +280,7 @@ export function applyRockCutaway(mat: THREE.Material): void {
     shader.fragmentShader = shader.fragmentShader
       .replace(
         '#include <common>',
-        `#include <common>\n${hammerEnvDepthGlsl()}\nvarying vec3 vRockCutWorld;\nvarying vec3 vRockCutN;\nuniform vec2 uHeartSlot;\nuniform float uHeartCore;\nuniform float uHammerCam;\nuniform sampler2D uHammerPaint;\nuniform sampler2D uBreathPaint;\nuniform float uBreathPainted;\nuniform sampler2D uQuenchPaint;\nuniform float uQuenchPainted;\n${breathEnvWeightGlsl()}\n${breathEnvRockGlsl()}\n${quenchEnvWeightGlsl()}\n${quenchEnvRockGlsl()}\n${QUENCH_FROST_NOISE_GLSL}`,
+        `#include <common>\n${hammerEnvDepthGlsl()}\nvarying vec3 vRockCutWorld;\nvarying vec3 vRockCutN;\nuniform vec2 uHeartSlot;\nuniform float uHeartCore;\nuniform float uHammerCam;\nuniform sampler2D uHammerPaint;\nuniform sampler2D uBreathPaint;\nuniform float uBreathPainted;\nuniform sampler2D uQuenchPaint;\nuniform float uQuenchPainted;\nuniform sampler2D uHeatPaint;\nuniform float uHeatPainted;\nuniform float uHeatOpen;\n${heatEnvOpenGlsl()}\n${breathEnvWeightGlsl()}\n${breathEnvRockGlsl()}\n${quenchEnvWeightGlsl()}\n${quenchEnvRockGlsl()}\n${heatEnvWeightGlsl()}\n${heatEnvRockGlsl()}\n${QUENCH_FROST_NOISE_GLSL}`,
       )
       .replace(
         '#include <clipping_planes_fragment>',
@@ -241,6 +290,10 @@ export function applyRockCutaway(mat: THREE.Material): void {
             / ${(HEART_ROCK_CUT_FAR - HEART_ROCK_CUT_NEAR).toFixed(1)};
           float rockDither = fract( 52.9829189 * fract( dot( gl_FragCoord.xy, vec2( 0.06711056, 0.00583715 ) ) ) );
           if ( rockCut < rockDither ) discard;
+          // The Heat's hall opened to its rings of basalt, seen from inside it.
+          if ( uHeatOpen > 0.0
+            && heatEnvOpen( vRockCutWorld - vec3( uHeartSlot.x, 0.0, uHeartSlot.y ) ) * uHeatOpen > rockDither )
+            discard;
         }`,
       )
       .replace(
@@ -252,6 +305,7 @@ ${heartRockBreathGlsl()}
 ${quenchFrostGlsl()}
 ${heartRockQuenchGlsl()}
 ${heatSootGlsl()}
+${heartRockHeatGlsl()}
 ${heartCrownColorGlsl()}
 ${heartRockHammerGlsl()}`,
       )

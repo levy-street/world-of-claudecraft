@@ -23,6 +23,7 @@ import {
   isEnvPieceNode,
 } from './env_kit_bake';
 import { applyEnvLook, type EnvStrokes } from './env_kit_look';
+import { envAreaClip } from './env_area_clip';
 import type { HeartKitPlacement } from './heart_kit_core';
 
 export const SMITH_HEART_BREATH_ENV_KIT_URL = '/models/props/smith_heart_breath_env_kit.glb';
@@ -105,9 +106,17 @@ export function breathEnvProgramWarmers(): THREE.Group {
     for (const painting of piece.parts.keys()) drawn.add(painting);
   for (const mesh of envWarmCarriers(
     drawn,
-    breathEnvMaterial,
+    (painting: string) => breathEnvMaterial(painting),
     BREATH_ENV_SHADOW,
     'smithHeartBreathEnvWarmer',
+  ))
+    group.add(mesh);
+  // The rock paintings' Heart variant (env_area_clip.ts), its own program.
+  for (const mesh of envWarmCarriers(
+    new Set([...drawn].filter((p) => BREATH_ENV_ROCK_PAINTINGS.has(p))),
+    (painting: string) => breathEnvMaterial(painting, 'heart'),
+    BREATH_ENV_SHADOW,
+    'smithHeartBreathEnvWarmer:heart',
   ))
     group.add(mesh);
   return group;
@@ -148,9 +157,12 @@ const ROCK_STROKES: Omit<EnvStrokes, 'map'> = { tileA: 17, tileB: 41, strength: 
 
 const materials = new Map<string, THREE.Material>();
 
-/** The shared material of one painting. */
-export function breathEnvMaterial(painting: string): THREE.Material {
-  const have = materials.get(painting);
+/** The shared material of one painting; `area` 'heart': a rock painting's variant dressing
+ *  the Heart's crown, drawn only from the Heart (env_area_clip.ts). */
+export function breathEnvMaterial(painting: string, area?: 'heart'): THREE.Material {
+  const heart = area === 'heart' && BREATH_ENV_ROCK_PAINTINGS.has(painting);
+  const key = heart ? `${painting}|heart` : painting;
+  const have = materials.get(key);
   if (have) return have;
   const opts = { map: paintings.get(painting) ?? null, name: `SmithHeartBreathEnv:${painting}` };
   const m = GFX.standardMaterials
@@ -163,9 +175,12 @@ export function breathEnvMaterial(painting: string): THREE.Material {
     strokes: rock ? { map: () => paintings.get('cliff') ?? null, ...ROCK_STROKES } : null,
     shade: BREATH_ENV_SHADE_FLOOR,
     crystal: BREATH_ENV_CRYSTAL_PAINTINGS.has(painting) ? BREATH_ENV_CRYSTAL_GLOW : 0,
+    // Seen from the Heat, the rock round its hall opens; the Heart's dressing is drawn
+    // only from the Heart (env_area_clip.ts).
+    ...(rock ? { clip: envAreaClip(heart ? 'heart' : 'heatBand') } : {}),
   });
   markSharedMaterial(m);
-  materials.set(painting, m);
+  materials.set(key, m);
   return m;
 }
 
@@ -233,10 +248,11 @@ export function instanceBreathEnv(
   list: readonly HeartKitPlacement[],
   lowGfx: boolean,
   name: string,
+  area?: 'heart',
 ): THREE.Group {
   return instanceEnvPieces(
     baked,
-    breathEnvMaterial,
+    (painting: string) => breathEnvMaterial(painting, area),
     list,
     lowGfx,
     name,

@@ -1114,6 +1114,8 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart/breath_env_plan_core.ts',
   // The Quench vein's painted rebuild: what stands in for what, its paint's share.
   'src/render/smith_heart/quench_env_plan_core.ts',
+  // The Heat vein's painted rebuild: what stands in for what, its fall, ring and paint.
+  'src/render/smith_heart/heat_env_plan_core.ts',
   // The painted rock's shader both painted veins lay over the rock they keep.
   'src/render/smith_heart/env_rock_paint_core.ts',
   // The Hammer vein's painted rebuild: what stands in for what, and the new ruins.
