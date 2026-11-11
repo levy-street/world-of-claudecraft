@@ -43,6 +43,7 @@ import {
   BREATH_INTRO,
   BREATH_INTRO_STAGES,
 } from '../../sim/encounters/smith_heart/breath_intro_plan';
+import { SMITH_HEART_ENTRANCE_LOW_SHARE } from './entrance_budget_core';
 
 // ---- the clock -----------------------------------------------------------------------------
 
@@ -497,7 +498,7 @@ export function breathEntranceShake(
 }
 
 /** The low tier's share of the particles and the flying stone. */
-export const BREATH_ENTRANCE_LOW_SHARE = 0.4;
+export const BREATH_ENTRANCE_LOW_SHARE = SMITH_HEART_ENTRANCE_LOW_SHARE;
 
 /** Every k-th of a plan for the low tier (indices), so it stays whole. */
 export function breathEntrancePicks(total: number, detail: boolean): number[] {

@@ -26,6 +26,9 @@ export interface BreathEntranceStormHost {
   readonly uTime: { value: number };
   readonly geometries: THREE.BufferGeometry[];
   readonly materials: THREE.Material[];
+  /** The tier draws the cosmetic doubles (the upper cloud disc, the funnel's
+   *  ragged outer layer): entrance_budget_core.ts. */
+  readonly secondary: boolean;
 }
 
 /** One frame of the storm (the host's look, already under the viewer's
@@ -65,7 +68,10 @@ export class BreathEntranceStorm {
   readonly wall: THREE.Mesh;
   private readonly wallMat: THREE.ShaderMaterial;
 
+  private readonly secondary: boolean;
+
   constructor(stage: THREE.Group, host: BreathEntranceStormHost) {
+    this.secondary = host.secondary;
     // ---- the eye: two discs of cloud, the upper wider and turning slower ----
     const disc = new THREE.PlaneGeometry(2, 2, 1, 1).rotateX(-Math.PI / 2);
     host.geometries.push(disc);
@@ -211,7 +217,7 @@ export class BreathEntranceStorm {
     // The eye.
     const eyeOn = f.eye > 0.005;
     this.eyeLow.visible = eyeOn;
-    this.eyeHigh.visible = eyeOn;
+    this.eyeHigh.visible = eyeOn && this.secondary;
     if (eyeOn) {
       this.eyeLow.position.set(0, S.eyeH, 0);
       this.eyeLow.scale.setScalar(f.eyeR);
@@ -229,7 +235,7 @@ export class BreathEntranceStorm {
     // The funnel.
     const funnelOn = f.funnel > 0.005 && f.reach > 0.001;
     this.shell.visible = funnelOn;
-    this.outer.visible = funnelOn;
+    this.outer.visible = funnelOn && this.secondary;
     this.core.visible = funnelOn;
     if (funnelOn) {
       for (const m of [this.shellMat, this.outerMat]) {

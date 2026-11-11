@@ -33,6 +33,7 @@
 import { FORGE_POINTS, HEARTH_WELL } from '../../sim/content/smith_heart_layout';
 import { HEAT_AURAS } from '../../sim/encounters/smith_heart/heat_ids';
 import { HEAT_INTRO, HEAT_INTRO_STAGES } from '../../sim/encounters/smith_heart/heat_intro_plan';
+import { SMITH_HEART_ENTRANCE_LOW_SHARE } from './entrance_budget_core';
 import { HEAT_BODY_CLIP, HEAT_MODEL_LAVA, HEAT_SOCKETS, type HeatSocketId } from './heat_body_core';
 
 // ---- the clock -----------------------------------------------------------------------------
@@ -404,7 +405,7 @@ export function entranceShake(distance: number, reducedMotion: boolean): number 
 }
 
 /** The low tier's share of the embers and particles (counts only). */
-export const ENTRANCE_LOW_SHARE = 0.4;
+export const ENTRANCE_LOW_SHARE = SMITH_HEART_ENTRANCE_LOW_SHARE;
 
 /** The embers a tier draws: every k-th of the plan, so the low tier's spiral
  *  stays whole (indices into ENTRANCE_EMBERS). */

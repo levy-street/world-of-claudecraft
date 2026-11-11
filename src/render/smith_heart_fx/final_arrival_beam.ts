@@ -63,6 +63,9 @@ import {
 export interface FinalArrivalHost {
   readonly particles: EngineParticles;
   readonly density: number;
+  /** The tier draws the cosmetic doubles (the sky crown, the beam's sheath):
+   *  entrance_budget_core.ts. */
+  readonly secondary: boolean;
   flash(x: number, y: number, z: number, size: number, span: number, color: number): void;
   shakeNear(x: number, z: number, amount: number, reach?: number): void;
   rand(): number;
@@ -163,7 +166,7 @@ export class FinalArrivalBeam {
     root: THREE.Group,
     private readonly host: FinalArrivalHost,
   ) {
-    this.rich = host.density >= 1;
+    this.rich = host.secondary;
     this.group.name = 'smithHeartFinalArrival';
     this.group.visible = false;
     root.add(this.group);

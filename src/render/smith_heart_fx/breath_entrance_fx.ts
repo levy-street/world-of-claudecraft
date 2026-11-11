@@ -31,13 +31,11 @@
 
 import * as THREE from 'three';
 import { sfx } from '../../game/sfx';
-import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
 import { BREATH_GUARDIAN } from '../../sim/encounters/smith_heart/breath_ids';
 import { BREATH_INTRO } from '../../sim/encounters/smith_heart/breath_intro_plan';
 import type { Entity } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { attachSceneGroupGated } from '../gated_scene_attach';
-import { GFX } from '../gfx';
 import { getFlameTex } from '../ignivar_fire_vfx';
 import { setRenderCategory } from '../renderer_diagnostics';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
@@ -51,7 +49,6 @@ import {
   BREATH_ENTRANCE_GESTURES,
   BREATH_ENTRANCE_HEARD_AT,
   BREATH_ENTRANCE_HOWL,
-  BREATH_ENTRANCE_LOW_SHARE,
   BREATH_ENTRANCE_POOLS,
   BREATH_ENTRANCE_SOUNDS,
   BREATH_STORM_SHAPE,
@@ -87,6 +84,7 @@ import { BreathEntranceStorm } from './breath_entrance_storm';
 import { GLOW_FRAG, GLOW_VERT, STONE_VERT } from './council_entrance_glsl';
 import { rockGeometry } from './council_entrance_stone';
 import { inSmithHeartClaim } from './council_fx_core';
+import { entranceBudgetNow } from './entrance_budget';
 
 const SCAN_SEC = 0.25;
 /** Seconds between re-sends of the held stance (a rebuilt view picks it up). */
@@ -117,6 +115,8 @@ export class BreathEntranceFx {
   readonly uTime = { value: 0 };
   readonly density: number;
   readonly detail: boolean;
+  /** The tier draws the cosmetic doubles (entrance_budget_core.ts). */
+  readonly secondary: boolean;
   readonly particles: EngineParticles;
   readonly geometries: THREE.BufferGeometry[] = [];
   readonly materials: THREE.Material[] = [];
@@ -165,10 +165,10 @@ export class BreathEntranceFx {
     this.stage.name = 'smithHeartBreathEntranceStage';
     this.stage.visible = false;
     this.root.add(this.stage);
-    this.detail =
-      resolveUiEffectsProfile({ presetLabel: GFX.tier, effectsQuality: 1, reduceMotion: false })
-        .tier !== 'low';
-    this.density = this.detail ? 1 : BREATH_ENTRANCE_LOW_SHARE;
+    const budget = entranceBudgetNow('breath');
+    this.detail = budget.detail;
+    this.secondary = budget.secondary;
+    this.density = budget.share;
     const hasDom = typeof document !== 'undefined';
     this.particles = new EngineParticles(
       this.root,

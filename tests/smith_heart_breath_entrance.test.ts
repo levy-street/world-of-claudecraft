@@ -61,6 +61,7 @@ import {
   strikeLight,
 } from '../src/render/smith_heart_fx/breath_entrance_core';
 import { breathEntranceFor } from '../src/render/smith_heart_fx/breath_entrance_state';
+import { ENTRANCE_SECONDARY_LAYERS } from '../src/render/smith_heart_fx/entrance_budget_core';
 import { BREATH, SMITH_HEART_BOSS_SPOTS } from '../src/sim/content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import { BREATH_AURAS, BREATH_GUARDIAN } from '../src/sim/encounters/smith_heart/breath_ids';
@@ -469,6 +470,7 @@ describe('BreathEntranceFx over a fake world', () => {
     'smithHeartBreathEntranceEye',
     'smithHeartBreathEntranceEyeHigh',
     'smithHeartBreathEntranceFunnel',
+    'smithHeartBreathEntranceFunnelOuter',
     'smithHeartBreathEntranceFunnelHeart',
     'smithHeartBreathEntranceOrbit',
     'smithHeartBreathEntranceBolts',
@@ -661,7 +663,9 @@ describe('BreathEntranceFx over a fake world', () => {
         (x) => n(low, x),
       );
       const { seen } = play(low);
-      for (const name of NAMES) expect(seen.has(name), name).toBe(true);
+      // Every beat plays; the cosmetic doubles (entrance_budget_core.ts) never draw.
+      for (const name of NAMES)
+        expect(seen.has(name), name).toBe(!ENTRANCE_SECONDARY_LAYERS.breath.includes(name));
       expect(count(low, G.form)).toBe(1);
       low.fx.dispose();
       activateGfxProfile(original);

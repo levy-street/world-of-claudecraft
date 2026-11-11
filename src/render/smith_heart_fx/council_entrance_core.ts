@@ -55,6 +55,7 @@ import {
   COUNCIL_INTRO_STAGES,
 } from '../../sim/encounters/smith_heart/council_intro_plan';
 import { COUNCIL_GROW } from './council_bodies_core';
+import { SMITH_HEART_ENTRANCE_LOW_SHARE } from './entrance_budget_core';
 
 /** How much bigger each member is drawn than the set pieces were first
  *  authored for (council_bodies_core.ts `COUNCIL_GROW`): the rock, the vein,
@@ -566,7 +567,7 @@ export function councilEntranceShake(
 }
 
 /** The low tier's share of the particles, rubble, shards and pebbles. */
-export const COUNCIL_ENTRANCE_LOW_SHARE = 0.4;
+export const COUNCIL_ENTRANCE_LOW_SHARE = SMITH_HEART_ENTRANCE_LOW_SHARE;
 
 // ---- the sounds ------------------------------------------------------------------------------
 

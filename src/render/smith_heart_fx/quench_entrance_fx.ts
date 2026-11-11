@@ -36,16 +36,15 @@
 
 import * as THREE from 'three';
 import { sfx } from '../../game/sfx';
-import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
 import type { Entity } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { fxAnchor } from '../attached_fx_anchor';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { attachSceneGroupGated } from '../gated_scene_attach';
-import { GFX } from '../gfx';
 import { setRenderCategory } from '../renderer_diagnostics';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
 import { inSmithHeartClaim } from './council_fx_core';
+import { entranceBudgetNow } from './entrance_budget';
 import { HEAT_NOISE_GLSL } from './heat_lava_glsl';
 import { moltenDecal } from './heat_molten_decal';
 import {
@@ -75,7 +74,6 @@ import {
   newSlabState,
   QUENCH_ENTRANCE,
   QUENCH_ENTRANCE_BLADES,
-  QUENCH_ENTRANCE_LOW_SHARE,
   QUENCH_ENTRANCE_POOLS,
   QUENCH_ENTRANCE_SOUNDS,
   QUENCH_SHEET,
@@ -935,10 +933,7 @@ export class QuenchEntranceFx {
     this.stage.name = 'smithHeartQuenchEntranceStage';
     this.stage.visible = false;
     this.root.add(this.stage);
-    const detail =
-      resolveUiEffectsProfile({ presetLabel: GFX.tier, effectsQuality: 1, reduceMotion: false })
-        .tier !== 'low';
-    this.density = detail ? 1 : QUENCH_ENTRANCE_LOW_SHARE;
+    this.density = entranceBudgetNow('quench').share;
     this.particles = new EngineParticles(
       this.stage,
       this.uTime,

@@ -10,7 +10,9 @@
 
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
+import { gfxInternalsForTest } from '../src/render/gfx';
 import { HeatEntranceFx } from '../src/render/smith_heart_fx';
+import { ENTRANCE_SECONDARY_LAYERS } from '../src/render/smith_heart_fx/entrance_budget_core';
 import {
   HEAT_BODY_GESTURES,
   HEAT_BODY_SCALE,
@@ -402,5 +404,35 @@ describe('HeatEntranceFx over a fake world', () => {
     expect(r.scene.getObjectByName('smith-heart-heat-entrance')).toBeDefined();
     expect(newHeatEntranceLook().socket).toHaveLength(HEAT_SOCKETS.length);
     r.fx.dispose();
+  });
+
+  it('the low tier plays every beat but sheds the heat haze (entrance_budget_core.ts)', () => {
+    const playHaze = () => {
+      const r = rig();
+      r.aura(cold);
+      r.fx.update(0.3);
+      let t = 0;
+      const dt = 1 / 20;
+      let haze = false;
+      let column = false;
+      while (t < HEAT_INTRO.seconds - 1e-6) {
+        r.aura(waking(t));
+        r.fx.update(dt);
+        t += dt;
+        haze ||= visible(r.scene, 'smithHeartHeatEntranceHaze');
+        column ||= visible(r.scene, 'smithHeartHeatEntranceColumn');
+      }
+      r.fx.dispose();
+      return { haze, column };
+    };
+    expect(ENTRANCE_SECONDARY_LAYERS.heat).toContain('smithHeartHeatEntranceHaze');
+    const full = playHaze();
+    expect(full).toEqual({ haze: true, column: true });
+    const restore = gfxInternalsForTest.overrideSettings({ tier: 'low' });
+    try {
+      expect(playHaze()).toEqual({ haze: false, column: true });
+    } finally {
+      restore();
+    }
   });
 });

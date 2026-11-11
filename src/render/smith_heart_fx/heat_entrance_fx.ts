@@ -26,18 +26,17 @@
 // embers and particles; every beat plays on every tier.
 
 import * as THREE from 'three';
-import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
 import { HEARTH_WELL } from '../../sim/content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin, instanceSlotForZ } from '../../sim/data';
 import type { Entity } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { attachSceneGroupGated } from '../gated_scene_attach';
-import { GFX } from '../gfx';
 import { getFlameTex } from '../ignivar_fire_vfx';
 import { setRenderCategory } from '../renderer_diagnostics';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
 import { inSmithHeartClaim } from './council_fx_core';
+import { entranceBudgetNow } from './entrance_budget';
 import {
   HEAT_BODY_GESTURES,
   HEAT_FX_GROW,
@@ -52,7 +51,6 @@ import {
   crossedBeat,
   ENTRANCE_CRACKS,
   ENTRANCE_EMBERS,
-  ENTRANCE_LOW_SHARE,
   ENTRANCE_SPIRAL,
   entranceEmberPicks,
   entranceFlash,
@@ -448,6 +446,9 @@ export class HeatEntranceFx {
   private readonly stage = new THREE.Group();
   private readonly uTime = { value: 0 };
   private readonly density: number;
+  /** The tier draws the cosmetic doubles (the heat haze round the body):
+   *  entrance_budget_core.ts. */
+  private readonly secondary: boolean;
   private readonly particles: EngineParticles;
   private readonly geometries: THREE.BufferGeometry[] = [];
   private readonly materials: THREE.Material[] = [];
@@ -501,10 +502,10 @@ export class HeatEntranceFx {
     this.stage.name = 'smithHeartHeatEntranceStage';
     this.stage.visible = false;
     this.root.add(this.stage);
-    const detail =
-      resolveUiEffectsProfile({ presetLabel: GFX.tier, effectsQuality: 1, reduceMotion: false })
-        .tier !== 'low';
-    this.density = detail ? 1 : ENTRANCE_LOW_SHARE;
+    const budget = entranceBudgetNow('heat');
+    const detail = budget.detail;
+    this.secondary = budget.secondary;
+    this.density = budget.share;
     const hasDom = typeof document !== 'undefined';
     this.particles = new EngineParticles(
       this.stage,
@@ -910,7 +911,7 @@ export class HeatEntranceFx {
     // The haze round it.
     const G = HEAT_FX_GROW;
     this.hazeMat.uniforms.uAlpha.value = 0.3 * L.haze;
-    this.haze.visible = L.haze > 0.01;
+    this.haze.visible = this.secondary && L.haze > 0.01;
     this.haze.scale.set(9 * G, 24 * G, 9 * G);
     this.haze.position.set(0, -1, 0);
     // The gestures, on their beats.

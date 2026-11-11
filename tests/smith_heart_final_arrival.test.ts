@@ -30,6 +30,7 @@ import {
 } from '../src/render/smith_heart/heart_arrival_light_core';
 import { heartSealSlotKey, observeHeartSealMask } from '../src/render/smith_heart/heart_seal_core';
 import { FinalFx } from '../src/render/smith_heart_fx';
+import { ENTRANCE_SECONDARY_LAYERS } from '../src/render/smith_heart_fx/entrance_budget_core';
 import {
   ARRIVAL,
   ARRIVAL_BEAM,
@@ -530,6 +531,19 @@ describe('FinalFx never fights a dormant statue', () => {
     s.fx.dispose();
   });
 
+  it('the full tier draws the sky crown and the beam sheath at the beam peak', () => {
+    const s = boot(true);
+    s.step(ARRIVAL_BEAM_PEAK + 0.3);
+    const shown = (name: string) => {
+      const o = s.scene.getObjectByName(name);
+      let v = !!o;
+      for (let p: THREE.Object3D | null | undefined = o; p; p = p.parent) v = v && p.visible;
+      return v;
+    };
+    for (const layer of ENTRANCE_SECONDARY_LAYERS.final) expect(shown(layer), layer).toBe(true);
+    s.fx.dispose();
+  });
+
   it('plays the whole scene on the low tier too (only its richness thins)', () => {
     const restore = gfxInternalsForTest.overrideSettings({ tier: 'low' });
     try {
@@ -546,7 +560,7 @@ describe('FinalFx never fights a dormant statue', () => {
       expect(shown('smithHeartArrivalSwirl')).toBe(true);
       expect(shown('smithHeartArrivalCore')).toBe(true);
       // The sky billboards are the cosmetic layer the low tier sheds.
-      expect(shown('smithHeartArrivalSheath')).toBe(false);
+      for (const layer of ENTRANCE_SECONDARY_LAYERS.final) expect(shown(layer), layer).toBe(false);
       s.step(ARRIVAL_END);
       const G = FINAL_BODY_GESTURES;
       expect(s.sent).toContain(G.rise);

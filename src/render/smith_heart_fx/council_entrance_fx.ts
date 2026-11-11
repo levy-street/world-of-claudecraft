@@ -30,7 +30,6 @@
 
 import * as THREE from 'three';
 import { sfx } from '../../game/sfx';
-import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
 import { HAMMER_PIT, QUARRY_PILLAR_SPOTS } from '../../sim/content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin, instanceSlotForZ } from '../../sim/data';
 import { COUNCIL_TEMPLATES } from '../../sim/encounters/smith_heart/council_ids';
@@ -39,7 +38,6 @@ import type { Entity } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { fxAnchor } from '../attached_fx_anchor';
 import { attachSceneGroupGated } from '../gated_scene_attach';
-import { GFX } from '../gfx';
 import { getFlameTex } from '../ignivar_fire_vfx';
 import { setRenderCategory } from '../renderer_diagnostics';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
@@ -50,7 +48,6 @@ import {
   COUNCIL_ENTRANCE_GESTURE_AT,
   COUNCIL_ENTRANCE_GESTURES,
   COUNCIL_ENTRANCE_GROW,
-  COUNCIL_ENTRANCE_LOW_SHARE,
   COUNCIL_ENTRANCE_POOLS,
   COUNCIL_ENTRANCE_SOUNDS,
   type CouncilEntranceClock,
@@ -82,6 +79,7 @@ import {
 } from './council_entrance_glsl';
 import { CouncilEntranceStone, rockGeometry } from './council_entrance_stone';
 import { inSmithHeartClaim } from './council_fx_core';
+import { entranceBudgetNow } from './entrance_budget';
 
 const SCAN_SEC = 0.25;
 /** Seconds between re-sends of a held stance and of a dark pulse (the
@@ -122,6 +120,9 @@ export class CouncilEntranceFx {
   readonly uTime = { value: 0 };
   readonly density: number;
   readonly detail: boolean;
+  /** The tier draws the cosmetic doubles (the room's crystals flaring with
+   *  the note's wave): entrance_budget_core.ts. */
+  private readonly secondary: boolean;
   readonly particles: EngineParticles;
   readonly geometries: THREE.BufferGeometry[] = [];
   readonly materials: THREE.Material[] = [];
@@ -181,10 +182,10 @@ export class CouncilEntranceFx {
     this.pit.name = 'smithHeartCouncilEntrancePit';
     this.pit.visible = false;
     this.root.add(this.pit);
-    this.detail =
-      resolveUiEffectsProfile({ presetLabel: GFX.tier, effectsQuality: 1, reduceMotion: false })
-        .tier !== 'low';
-    this.density = this.detail ? 1 : COUNCIL_ENTRANCE_LOW_SHARE;
+    const budget = entranceBudgetNow('council');
+    this.detail = budget.detail;
+    this.secondary = budget.secondary;
+    this.density = budget.share;
     const hasDom = typeof document !== 'undefined';
     this.particles = new EngineParticles(
       this.root,
@@ -579,9 +580,10 @@ export class CouncilEntranceFx {
     }
     this.sheaths.visible = anyColumn;
     if (anyColumn && this.sheaths.instanceColor) this.sheaths.instanceColor.needsUpdate = true;
-    // Every crystal in the room, as the wave passes.
+    // Every crystal in the room, as the wave passes (a cosmetic double over
+    // the note's own curtain of light: the low tier keeps the curtain only).
     let anyFlare = false;
-    for (let i = 0; i < QUARRY_CRYSTALS.length; i++) {
+    for (let i = 0; this.secondary && i < QUARRY_CRYSTALS.length; i++) {
       const k = QUARRY_CRYSTALS[i];
       const d = s ? Math.hypot(this.placedX + k.x - s.pos.x, this.placedZ + k.z - s.pos.z) : 99;
       const f = councilEntranceLight(crystalFlare(L, d), reduced);

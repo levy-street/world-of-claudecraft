@@ -65,6 +65,7 @@ import {
   VEIN_PRISMS,
   VEIN_RINGS,
 } from '../src/render/smith_heart_fx/council_entrance_core';
+import { ENTRANCE_SECONDARY_LAYERS } from '../src/render/smith_heart_fx/entrance_budget_core';
 import { SMITH_HEART_COUNCIL_FACING } from '../src/sim/content/smith_heart';
 import {
   HAMMER_PIT,
@@ -721,7 +722,9 @@ describe('CouncilEntranceFx over a fake world', () => {
       ].map((x) => n(low, x));
       const slabs = n(low, 'smithHeartCouncilEntranceSlabs');
       const seen = play(low);
-      for (const name of NAMES) expect(seen.has(name), name).toBe(true);
+      // Every beat plays; the cosmetic doubles (entrance_budget_core.ts) never draw.
+      for (const name of NAMES)
+        expect(seen.has(name), name).toBe(!ENTRANCE_SECONDARY_LAYERS.council.includes(name));
       low.fx.dispose();
       activateGfxProfile(original);
       const full = rig();

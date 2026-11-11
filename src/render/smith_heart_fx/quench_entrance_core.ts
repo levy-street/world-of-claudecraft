@@ -43,6 +43,7 @@ import {
   QUENCH_INTRO,
   QUENCH_INTRO_STAGES,
 } from '../../sim/encounters/smith_heart/quench_intro_plan';
+import { SMITH_HEART_ENTRANCE_LOW_SHARE } from './entrance_budget_core';
 import { bladeHalfThick, bladeHalfWidth } from './quench_blade_tip_core';
 import { QUENCH_YD_PER_UNIT } from './quench_body_core';
 
@@ -546,7 +547,7 @@ export function quenchEntranceShake(distance: number, reducedMotion: boolean): n
 export const QUENCH_ENTRANCE_SNOW_PEAK = 1.6;
 
 /** The low tier's share of the particles (counts only, never a beat). */
-export const QUENCH_ENTRANCE_LOW_SHARE = 0.4;
+export const QUENCH_ENTRANCE_LOW_SHARE = SMITH_HEART_ENTRANCE_LOW_SHARE;
 
 /** The pools' rates (a second, at full share and full density). */
 export const QUENCH_ENTRANCE_POOLS = {

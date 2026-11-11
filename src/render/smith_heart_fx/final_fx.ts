@@ -31,7 +31,6 @@
 // hidden carrier); no light; fixed pools, no per-frame allocation.
 
 import * as THREE from 'three';
-import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
 import {
   HEART_ROOM,
   SMITH_HEART_VEIN_COLORS,
@@ -45,7 +44,7 @@ import type { IWorld } from '../../world_api';
 import { fxAnchor } from '../attached_fx_anchor';
 import { telegraphFillOf } from '../floor_telegraph';
 import { attachSceneGroupGated } from '../gated_scene_attach';
-import { GFX, sharedUniforms } from '../gfx';
+import { sharedUniforms } from '../gfx';
 import { getFlameTex } from '../ignivar_fire_vfx';
 import { setRenderCategory } from '../renderer_diagnostics';
 import { noteHeartArrivalLight } from '../smith_heart/heart_arrival_light_core';
@@ -63,6 +62,7 @@ import { heartSealSlotKey, heartSealView, newHeartSealView } from '../smith_hear
 import { radialGlowTexture } from '../textures';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
 import { NOVA_WAVE_SECONDS, novaWave } from '../trash_engine_fx/trash_engine_fx_core';
+import { entranceBudgetNow } from './entrance_budget';
 import { FinalArrivalBeam, type FinalArrivalFrame } from './final_arrival_beam';
 import {
   ARRIVAL_END,
@@ -215,6 +215,8 @@ export class FinalFx {
   private readonly body = new THREE.Group();
   private readonly uTime = { value: 0 };
   private readonly density: number;
+  /** The tier draws the arrival's cosmetic doubles (entrance_budget_core.ts). */
+  private readonly secondary: boolean;
   private readonly particles: EngineParticles;
   private readonly sim = finalBossKit();
   private readonly geometries: THREE.BufferGeometry[] = [];
@@ -298,10 +300,12 @@ export class FinalFx {
   ) {
     this.root.name = 'smith-heart-final-fx';
     setRenderCategory(this.root, 'ui3d');
-    const detail =
-      resolveUiEffectsProfile({ presetLabel: GFX.tier, effectsQuality: 1, reduceMotion: false })
-        .tier !== 'low';
-    this.density = detail ? 1 : 0.4;
+    // The fight's richness rides the arrival's tier: one budget
+    // (entrance_budget_core.ts), the arrival's sky crown and beam sheath its
+    // cosmetic doubles (final_arrival_beam.ts `rich`).
+    const budget = entranceBudgetNow('final');
+    this.density = budget.share;
+    this.secondary = budget.secondary;
     const hasDom = typeof document !== 'undefined';
     this.particles = new EngineParticles(
       this.root,
@@ -405,6 +409,7 @@ export class FinalFx {
     const host = {
       particles: this.particles,
       density: this.density,
+      secondary: this.secondary,
       flash: (x: number, y: number, z: number, size: number, span: number, color: number) =>
         this.flash(x, y, z, size, span, color),
       shakeNear: (x: number, z: number, amount: number, reach?: number) =>

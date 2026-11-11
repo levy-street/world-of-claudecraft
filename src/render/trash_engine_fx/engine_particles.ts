@@ -32,6 +32,12 @@ import {
 import { SMOKE_FRAG, SMOKE_VERT } from './engine_smoke_glsl';
 
 const RING_SLOTS = 14;
+
+/** Each pool's authored ring at full density, and the slack every ring keeps
+ *  over its share (pinned against the Smith's Heart entrances' particle
+ *  ceiling, smith_heart_fx/entrance_budget_core.ts). */
+export const ENGINE_POOL_RINGS = { smoke: 1200, glow: 1200, soulfire: 700, pyre: 600 } as const;
+export const ENGINE_POOL_SLACK = 64;
 /** The shock ring's hot crest, as a share of its radius. */
 const RING_CREST = 0.22;
 
@@ -141,7 +147,7 @@ export class EngineParticles {
       });
       this.materials.push(m);
       const p = new ParticlePool(
-        Math.round(capacity * density) + 64,
+        Math.round(capacity * density) + ENGINE_POOL_SLACK,
         m,
         floorVfxRenderOrder('encounter', order),
       );
@@ -155,7 +161,7 @@ export class EngineParticles {
         SMOKE_VERT,
         SMOKE_FRAG,
         THREE.NormalBlending,
-        1200,
+        ENGINE_POOL_RINGS.smoke,
         steps.smoke,
       ),
       glow: pool(
@@ -163,7 +169,7 @@ export class EngineParticles {
         PARTICLE_VERT,
         GLOW_FRAG,
         THREE.AdditiveBlending,
-        1200,
+        ENGINE_POOL_RINGS.glow,
         steps.glow,
       ),
       soulfire: pool(
@@ -171,7 +177,7 @@ export class EngineParticles {
         FIRE_VERT,
         FIRE_FRAG.replace(GHOST_RAMP, rampGlsl(SOULFIRE_RAMP, 'ghostRamp')),
         THREE.AdditiveBlending,
-        700,
+        ENGINE_POOL_RINGS.soulfire,
         steps.fire,
       ),
       pyre: pool(
@@ -179,7 +185,7 @@ export class EngineParticles {
         FIRE_VERT,
         FIRE_FRAG.replace(GHOST_RAMP, rampGlsl(PYRE_RAMP, 'ghostRamp')),
         THREE.AdditiveBlending,
-        600,
+        ENGINE_POOL_RINGS.pyre,
         steps.fire,
       ),
     };
