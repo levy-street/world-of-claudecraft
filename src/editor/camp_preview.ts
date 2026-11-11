@@ -2,7 +2,7 @@
 // the frozen editor Sim so the normal character renderer supplies idle motion.
 
 import { applyCampMobTuning, resolveCampLevelRange } from '../sim/camp_authoring';
-import { campSpawnOffset } from '../sim/camp_scatter';
+import { campSlotPoint, isRetiredCampSlot } from '../sim/camp_scatter';
 import { MOBS } from '../sim/data';
 import { createMob } from '../sim/entity';
 import { Rng } from '../sim/rng';
@@ -22,12 +22,16 @@ export function buildCampPreviewEntities(
     const levels = resolveCampLevelRange(camp, template);
     const rng = new Rng((seed ^ Math.imul(campIndex + 1, 0x9e3779b1)) >>> 0);
     for (let index = 0; index < camp.count; index++) {
-      const offset = template.dummy
-        ? { x: 0, z: 0 }
-        : campSpawnOffset(index, camp.count, camp.radius, rng.range(0, Math.PI * 2), rng.next());
-      const x = camp.center.x + offset.x;
-      const z = camp.center.z + offset.z;
+      // Every slot draws, pinned or retired, so pinning (CampDef.spots) or
+      // retiring one slot never shifts another, as in the Sim.
+      const { x, z } = template.dummy
+        ? { x: camp.center.x, z: camp.center.z }
+        : campSlotPoint(camp, index, rng.range(0, Math.PI * 2), rng.next());
       const level = template.dummy ? levels.max : rng.int(levels.min, levels.max);
+      if (!template.dummy && isRetiredCampSlot(camp, index)) {
+        rng.range(-Math.PI, Math.PI);
+        continue;
+      }
       const mob = createMob(id++, template, level, { x, y: groundY(x, z), z });
       mob.authorVfx = camp.authorVfx ? { ...camp.authorVfx } : undefined;
       // Same tuning the live Sim applies at spawn, so the maker sees the
