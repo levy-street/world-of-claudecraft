@@ -175,6 +175,17 @@ export const final = {
   // its bearing, a little apart): every tank and the raid round the boss in
   // reach, and only a step when the boss changes quarter.
   roleSpot(world, st, b) {
+    // The Splinter of the Quench's Rime Toll must be kicked: two ranged
+    // interrupters stand in its reach (the main kick and its backup), on its
+    // side toward the ring, apart.
+    const toll = { mage: -0.5, hunter: 0.5 }[b.spec.key];
+    if (toll !== undefined) {
+      const q = (world.splinters ?? []).find((a) => a.tid === FINAL_ADD_MOBS.quench && alive(a));
+      if (q) {
+        const a = Math.atan2(world.center.x - q.x, world.center.z - q.z) + toll;
+        return add(q, { x: Math.sin(a), z: Math.cos(a) }, 18 + (q.reach ?? 0));
+      }
+    }
     if (b.spec.role !== 'healer') return null;
     const boss = world.mobs.boss;
     if (!alive(boss) || hypot(boss, world.center) < 4) return null;

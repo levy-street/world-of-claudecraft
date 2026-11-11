@@ -482,23 +482,26 @@ export const HEALERS = {
       if (h.ready('tidecall')) return { id: 'tidecall', target: crust.pid };
       if (h.ready('healing_wave')) return { id: 'healing_wave', target: crust.pid };
     }
-    if (low.frac < 0.45 && h.ready('tidecall')) return { id: 'tidecall', target: low.pid };
+    // Tidecall heals a fifth of a Mending Waters for the same GCD: a human
+    // shaman spends it on the move or on a dying target it cannot wait for,
+    // and stands to cast Mending Waters (39 mana, cheap) everywhere else.
+    if (low.frac < 0.35 && (h.moving || low.tank) && h.ready('tidecall'))
+      return { id: 'tidecall', target: low.pid };
     // A raid-wide hit is coming: Cascading Mend over the hurt, then top-ups.
     if (h.topUp && low.frac < 0.97) {
       const short = h.members.filter((p) => p.frac < 0.95).length;
       if (short >= 2 && h.ready('chain_heal')) return { id: 'chain_heal', target: low.pid };
       if (h.ready('healing_wave')) return { id: 'healing_wave', target: low.pid };
     }
-    const cluster = list.find((p) => p.frac < 0.8 && p.near >= 2);
-    if (hurt.length >= 3 && cluster && h.ready('chain_heal'))
-      return { id: 'chain_heal', target: cluster.pid };
-    if (h.moving && low.frac < 0.8 && h.ready('tidecall'))
+    // Three or more hurt: Cascading Mend from the lowest (it jumps on its own).
+    if (hurt.length >= 3 && h.ready('chain_heal')) return { id: 'chain_heal', target: low.pid };
+    if (h.moving && low.frac < 0.85 && h.ready('tidecall'))
       return { id: 'tidecall', target: low.pid };
-    // Mending Waters is cheap (39 mana): kept rolling on anyone short of 92 percent.
-    if (low.frac < 0.92 && h.ready('healing_wave')) return { id: 'healing_wave', target: low.pid };
-    if (hurt.length >= 2 && cluster && h.ready('chain_heal'))
-      return { id: 'chain_heal', target: cluster.pid };
-    if (low.frac < 0.92 && h.ready('tidecall')) return { id: 'tidecall', target: low.pid };
+    // Mending Waters kept rolling on anyone short of 95 percent.
+    if (low.frac < 0.95 && h.ready('healing_wave')) return { id: 'healing_wave', target: low.pid };
+    if (hurt.length >= 2 && h.ready('chain_heal')) return { id: 'chain_heal', target: low.pid };
+    if (h.moving && low.frac < 0.95 && h.ready('tidecall'))
+      return { id: 'tidecall', target: low.pid };
     return null;
   },
 };
