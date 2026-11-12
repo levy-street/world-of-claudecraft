@@ -6569,8 +6569,8 @@ export class Hud {
       if (mountDef) {
         const descKey = MOUNT_DESC_KEYS[mountDef.key];
         if (descKey) html += `<div class="tt-desc">${esc(t(descKey))}</div>`;
-        // No per-mount level gate any more: the only requirement is the riding
-        // skill, so the tooltip says how to ride instead of quoting a level.
+        // No per-mount gate: the shared Requires Level line below quotes the
+        // riding level (item_level_gate.ts), and this line says how to ride.
         html += `<div class="tt-sub">${esc(t('hudChrome.mounts.useToRide'))}</div>`;
       }
     }

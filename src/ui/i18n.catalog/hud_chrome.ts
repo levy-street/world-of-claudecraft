@@ -2591,8 +2591,9 @@ export const hudChromeStrings = {
     mount: 'Mount',
     dismount: 'Dismount',
     // Reins are usable items: the bag tooltip tells the player to use them. There
-    // is no per-mount level gate and no picker, so the old requiresLevel /
-    // pickFirst / keybindHint lines went with them.
+    // is no per-mount level gate and no picker, so the old pickFirst / keybindHint
+    // lines went with them; the riding level shows on the shared item Requires
+    // Level line (src/sim/item_level_gate.ts).
     useToRide:
       "Use to wear this appearance and summon your mount. Keep this item in any character's bags or bank to share the appearance across your account. Riding training determines speed.",
     // The empty state, shown when the player owns no mount yet: a heading plus
