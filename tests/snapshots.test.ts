@@ -6292,6 +6292,7 @@ function dirtyEveryDeltaField(): {
     participants: [],
     presence: new Map(),
     hearts: new Map(),
+    heartLostAt: new Map(),
     kills: new Map(),
     winner: null,
   };

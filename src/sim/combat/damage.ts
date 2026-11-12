@@ -71,7 +71,7 @@ import {
   worldPvpOnPlayerDamaged,
   worldPvpOnPlayerDeath,
 } from '../pvp';
-import { skillEventOnPlayerDeath } from '../pvp/skill_events';
+import { skillEventOnPlayerDeath, skillEventTakeHeart } from '../pvp/skill_events';
 import { worldPvpXpAmount } from '../pvp/world_pvp_rewards_rules';
 import { referralArmourXpActive } from '../referral_armour';
 import { emitReferralBossEvidence } from '../referral_evidence';
@@ -261,6 +261,9 @@ export function dealDamage(
   if (target.damageImmune) return 0;
   // A Tideglass Reflection never takes damage from the player it mirrors.
   if (reflectionIgnoresHit(source, target)) return 0;
+  // Hourly skill events: between two fighters on hearts a hit costs one heart,
+  // never health (pvp/skill_events.ts skillEventTakeHeart).
+  if (skillEventTakeHeart(ctx, source, target)) return 0;
   // A Nythraxis Bone Spike is a ward (nythraxis_bone_spike.ts): any player or
   // pet hit lands exactly one point, whatever it would have dealt, and the
   // spike's pool is its hit count. Resolved like an exact copy so no source

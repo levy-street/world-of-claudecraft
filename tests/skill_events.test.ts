@@ -12,6 +12,7 @@ import { pickHillSpot, spawnHill } from '../src/sim/pvp/hill';
 import {
   nextSkillEventStart,
   SKILL_EVENT_FIRST_START_SECONDS,
+  SKILL_EVENT_HEART_GRACE_SECONDS,
   SKILL_EVENT_HEARTS,
   SKILL_EVENT_KILL_HONOR,
   SKILL_EVENT_KINDS,
@@ -436,6 +437,67 @@ describe('skill event flow', () => {
     tickSeconds(sim, 1.1);
     expect(ent(sim, a).eventHearts).toBeUndefined();
     expect(sim.skillEventInfoFor(a)?.hearts).toBeNull();
+  });
+
+  /** Two fighters in a running Riposte, both on full hearts. */
+  function heartFight(): { sim: Sim; a: number; b: number } {
+    const sim = world();
+    const a = addPlayer(sim, 'Aleph');
+    const b = addPlayer(sim, 'Bet');
+    openSoon(sim, 0);
+    const ev = sim.skillEventState.active!;
+    for (const pid of [a, b]) {
+      place(sim, pid, ev.x, ev.z);
+      sim.joinSkillEvent(pid);
+    }
+    ev.startsAt = sim.time;
+    tickSeconds(sim, 1.1);
+    return { sim, a, b };
+  }
+  function hit(sim: Sim, from: number, to: number, amount = 50): void {
+    sim.ctx.dealDamage(ent(sim, from), ent(sim, to), amount, false, 'physical', null, 'hit');
+  }
+
+  it('a hit between fighters takes exactly one heart and no health', () => {
+    const { sim, a, b } = heartFight();
+    const hpBefore = ent(sim, b).hp;
+    hit(sim, a, b, 9999);
+    expect(ent(sim, b).eventHearts).toBe(SKILL_EVENT_HEARTS - 1);
+    expect(ent(sim, b).hp).toBe(hpBefore);
+    expect(ent(sim, b).dead).toBe(false);
+  });
+
+  it('loses at most one heart per grace window', () => {
+    const { sim, a, b } = heartFight();
+    hit(sim, a, b);
+    hit(sim, a, b);
+    hit(sim, a, b);
+    expect(ent(sim, b).eventHearts).toBe(SKILL_EVENT_HEARTS - 1);
+    tickSeconds(sim, SKILL_EVENT_HEART_GRACE_SECONDS + 0.05);
+    hit(sim, a, b);
+    expect(ent(sim, b).eventHearts).toBe(SKILL_EVENT_HEARTS - 2);
+  });
+
+  it('the last heart is a kill, credited to the killer', () => {
+    const { sim, a, b } = heartFight();
+    const ev = sim.skillEventState.active!;
+    for (let i = 0; i < SKILL_EVENT_HEARTS; i++) {
+      hit(sim, a, b);
+      tickSeconds(sim, SKILL_EVENT_HEART_GRACE_SECONDS + 0.05);
+    }
+    expect(ent(sim, b).dead).toBe(true);
+    expect(ent(sim, b).eventHearts).toBeUndefined();
+    expect(ev.kills.get(a)).toBe(1);
+  });
+
+  it('nobody off hearts can hurt a fighter on hearts', () => {
+    const { sim, b } = heartFight();
+    const outsider = addPlayer(sim, 'Gimel');
+    const hpBefore = ent(sim, b).hp;
+    hit(sim, outsider, b, 500);
+    sim.ctx.dealDamage(null, ent(sim, b), 500, false, 'fire', null, 'hit');
+    expect(ent(sim, b).hp).toBe(hpBefore);
+    expect(ent(sim, b).eventHearts).toBe(SKILL_EVENT_HEARTS);
   });
 
   it('runs no event on a realm whose World PvP switch is off', () => {

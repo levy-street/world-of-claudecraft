@@ -20,6 +20,10 @@ export const SKILL_EVENT_KINDS = [
 ] as const;
 export type SkillEventKind = (typeof SKILL_EVENT_KINDS)[number];
 
+/** A fighter can lose at most one heart in this window, so a multi-hit
+ *  attack or a damage-over-time tick never drains several hearts at once. */
+export const SKILL_EVENT_HEART_GRACE_SECONDS = 0.5;
+
 /** The events fought on hearts instead of health. Rite of Tongues deals no
  *  damage at all and The Common Hand keeps ordinary health bars. */
 export const SKILL_EVENT_HEART_KINDS: ReadonlySet<SkillEventKind> = new Set([

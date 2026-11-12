@@ -29,6 +29,7 @@ import { grantHonor } from './honor';
 import {
   insideSkillEventCircle,
   nextSkillEventStart,
+  SKILL_EVENT_HEART_GRACE_SECONDS,
   SKILL_EVENT_HEART_KINDS,
   SKILL_EVENT_HEARTS,
   SKILL_EVENT_KILL_HONOR,
@@ -63,6 +64,8 @@ export interface ActiveSkillEvent {
   presence: Map<number, number>;
   /** Hearts left, by pid, in a heart event once it runs (SKILL_EVENT_HEART_KINDS). */
   hearts: Map<number, number>;
+  /** When each fighter last lost a heart (the SKILL_EVENT_HEART_GRACE_SECONDS window). */
+  heartLostAt: Map<number, number>;
   /** Player killing blows landed inside the event, by pid. */
   kills: Map<number, number>;
   /** Set by the rule set the moment the event is won. */
@@ -188,6 +191,7 @@ function openEvent(ctx: SimContext, ordinal: number, startsAt: number): ActiveSk
     participants: [],
     presence: new Map(),
     hearts: new Map(),
+    heartLostAt: new Map(),
     kills: new Map(),
     winner: null,
   };
@@ -402,4 +406,70 @@ export function skillEventInfoFor(
     hearts: ev.hearts.get(pid) ?? null,
     maxHearts: SKILL_EVENT_HEARTS,
   };
+}
+
+/** The hit rule of the heart events, from the top of dealDamage (before any
+ *  amplifier, shield or health change): true when the hit was handled here
+ *  and must not touch health. A fighter on hearts (`eventHearts` set) loses
+ *  exactly one heart to a hit from another fighter on hearts (a pet's hit is
+ *  its owner's), at most one per grace window; heals and shields never matter
+ *  because health never moves. Anyone off hearts cannot hurt a fighter on
+ *  them at all, so monsters and passers-by cannot decide the fight. The last
+ *  heart is a kill: a lethal exact hit through the ordinary death path, so the
+ *  killing blow, the honor and the corpse all behave as in any other death. */
+export function skillEventTakeHeart(
+  ctx: SimContext,
+  source: Entity | null,
+  target: Entity,
+): boolean {
+  if (target.eventHearts === undefined) return false;
+  const ev = ctx.skillEventState.active;
+  if (!ev || ev.phase !== 'running' || !ev.hearts.has(target.id)) {
+    delete target.eventHearts; // stale: the fight is over for this entity
+    return false;
+  }
+  const owner =
+    source?.kind === 'mob' && source.ownerId !== null
+      ? (ctx.entities.get(source.ownerId) ?? null)
+      : source;
+  if (!owner || owner.id === target.id || owner.eventHearts === undefined) return true;
+  if (!ev.hearts.has(owner.id) || owner.dead) return true;
+  const last = ev.heartLostAt.get(target.id);
+  if (last !== undefined && ctx.time - last < SKILL_EVENT_HEART_GRACE_SECONDS) return true;
+  ev.heartLostAt.set(target.id, ctx.time);
+  const left = Math.max(0, (ev.hearts.get(target.id) ?? 0) - 1);
+  setHearts(ctx, ev, target.id, left);
+  ctx.emit({
+    type: 'damage',
+    sourceId: owner.id,
+    targetId: target.id,
+    amount: 1,
+    crit: false,
+    school: 'physical',
+    ability: null,
+    kind: 'hit',
+  });
+  if (left === 0) {
+    // Off hearts first, so the lethal hit below is not caught here again.
+    delete target.eventHearts;
+    ctx.dealDamage(
+      owner,
+      target,
+      target.hp + 1,
+      false,
+      'physical',
+      null,
+      'hit',
+      true,
+      undefined,
+      true,
+      false,
+      true,
+      null,
+      false,
+      undefined,
+      true,
+    );
+  }
+  return true;
 }
