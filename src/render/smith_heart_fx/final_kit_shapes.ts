@@ -201,6 +201,20 @@ const CHUNK_TONE = {
  *  hash, sheared flat on one side where it split from the body, faceted, and
  *  toned per vertex (dark below, lit above, a gold vein across it). Unit
  *  sized; one geometry the instanced draw scales and turns per piece. */
+/** The lit stone the colossus's chunks are drawn in: one recipe, so the
+ *  body's orbiting rocks and the death's broken stone share one program. */
+export function colossusRockMaterial(name: string): THREE.MeshStandardMaterial {
+  return new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    vertexColors: true,
+    emissive: 0x3a2410,
+    emissiveIntensity: 0.3,
+    roughness: 0.92,
+    flatShading: true,
+    name,
+  });
+}
+
 export function colossusChunk(): THREE.BufferGeometry {
   const base = new THREE.IcosahedronGeometry(1, 1);
   const geo = base.toNonIndexed();

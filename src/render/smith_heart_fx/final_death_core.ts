@@ -116,6 +116,17 @@ export const DEATH_SHAKES = {
   impact: { amount: 1.0, reach: 170 },
 } as const;
 
+/** The knee strikes the floor (the Kneel clip's drop, inside `deathKneel`'s
+ *  sink): dust and a ring at the feet. */
+export const DEATH_KNEE_STRIKE = 0.65;
+
+/** Has the beat at `at` been crossed between the last frame's clock `prev`
+ *  and this one's `t` (a moment fires once, and only for a scene seen
+ *  crossing it, never for a late sight long past it)? */
+export function deathBeatCrossed(prev: number, t: number, at: number): boolean {
+  return prev >= 0 && prev < at && t >= at && t - at < 0.5;
+}
+
 /** The struggle's rumbles (each a small shake and a flare in the chest). */
 export const DEATH_STRUGGLE_BEATS: readonly number[] = [0.35, 0.8, 1.15, 1.38];
 
@@ -268,6 +279,26 @@ export interface DeathCometLook {
 
 const _at = { x: 0, z: 0 };
 
+function setComet(
+  out: DeathCometLook,
+  phase: DeathCometPhase,
+  x: number,
+  y: number,
+  z: number,
+  grounded: boolean,
+  glow: number,
+  size: number,
+): DeathCometLook {
+  out.phase = phase;
+  out.x = x;
+  out.y = y;
+  out.z = z;
+  out.grounded = grounded;
+  out.glow = glow;
+  out.size = size;
+  return out;
+}
+
 /** Comet `i` at `t`, leaving the burst at `hover` (instance-local, absolute
  *  height). `groundAt` answers the floor's height at an instance-local
  *  point (the arc lands on it). */
@@ -287,25 +318,7 @@ export function deathComet(
   },
 ): DeathCometLook {
   const path = deathGroovePath(i);
-  const set = (
-    phase: DeathCometPhase,
-    x: number,
-    y: number,
-    z: number,
-    grounded: boolean,
-    glow: number,
-    size: number,
-  ) => {
-    out.phase = phase;
-    out.x = x;
-    out.y = y;
-    out.z = z;
-    out.grounded = grounded;
-    out.glow = glow;
-    out.size = size;
-    return out;
-  };
-  if (t < deathFlyStart(i)) return set('off', hover.x, hover.y, hover.z, false, 0, 0);
+  if (t < deathFlyStart(i)) return setComet(out, 'off', hover.x, hover.y, hover.z, false, 0, 0);
   if (t < deathLandAt(i)) {
     // A raised arc (a quadratic) from the burst to the groove's head.
     const k = smooth((t - deathFlyStart(i)) / DEATH_SCENE.fly);
@@ -318,7 +331,8 @@ export function deathComet(
     const a = (1 - k) * (1 - k);
     const b = 2 * (1 - k) * k;
     const c = k * k;
-    return set(
+    return setComet(
+      out,
       'fly',
       a * hover.x + b * mx + c * ex,
       a * hover.y + b * my + c * ey,
@@ -329,7 +343,7 @@ export function deathComet(
     );
   }
   if (t < deathRaceStart(i))
-    return set('altar', path.from.x, DEATH_LAND_LIFT, path.from.z, true, 1.3, 5);
+    return setComet(out, 'altar', path.from.x, DEATH_LAND_LIFT, path.from.z, true, 1.3, 5);
   if (t < deathRaceEnd(i)) {
     const f = deathRaceFront(t, i);
     arrivalStreamPointAt(path, f, _at);
@@ -337,13 +351,13 @@ export function deathComet(
     // It drops from its landing height into the groove in the first yards.
     const drop = 1 - smooth((t - deathRaceStart(i)) / 0.25);
     const y = DEATH_RACE_LIFT + arrivalStreamLift(r) + (DEATH_LAND_LIFT - DEATH_RACE_LIFT) * drop;
-    return set('race', _at.x, y, _at.z, true, 1, 3.2);
+    return setComet(out, 'race', _at.x, y, _at.z, true, 1, 3.2);
   }
   if (t < DEATH_MERGE) {
     const g = deathGather(t, i);
-    return set('gather', g.x, g.y, g.z, true, 1 + 0.6 * g.k, 3.2 + 1.2 * g.k);
+    return setComet(out, 'gather', g.x, g.y, g.z, true, 1 + 0.6 * g.k, 3.2 + 1.2 * g.k);
   }
-  return set('gone', HEART_ROOM.x, 0, HEART_ROOM.z, true, 0, 0);
+  return setComet(out, 'gone', HEART_ROOM.x, 0, HEART_ROOM.z, true, 0, 0);
 }
 
 /** How far comet `i` has run down its groove at `t` (0 at its altar, 1 at

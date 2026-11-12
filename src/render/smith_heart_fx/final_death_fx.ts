@@ -52,6 +52,7 @@ import {
   DEATH_GEYSER,
   DEATH_HUSK_EVERY,
   DEATH_IMPACT,
+  DEATH_KNEE_STRIKE,
   DEATH_MERGE,
   DEATH_SHAKES,
   DEATH_SOUNDS,
@@ -64,6 +65,7 @@ import {
   type DeathCoreLook,
   type DeathTrailLook,
   type DeathWellLook,
+  deathBeatCrossed,
   deathComet,
   deathCore,
   deathDebrisAt,
@@ -77,7 +79,7 @@ import {
 } from './final_death_core';
 import { DEATH_FUNNEL_FRAG, DEATH_FUNNEL_VERT, DEATH_TRAIL_FRAG } from './final_death_glsl';
 import { buildGrooveRibbon, type GrooveRibbon, layGrooveRibbon } from './final_groove_ribbon';
-import { colossusChunk } from './final_kit_shapes';
+import { colossusChunk, colossusRockMaterial } from './final_kit_shapes';
 
 /** What the host lends: the arrival's host (particles, flashes, the camera's
  *  thud, dice, the floor), the reduced-motion switch and the rig's gesture
@@ -133,6 +135,7 @@ const SIZE_CRAWL: readonly [number, number] = [0.9, 0.15];
 const SIZE_FLY: readonly [number, number] = [2.4, 0.25];
 const SIZE_RUN: readonly [number, number] = [1.7, 0.2];
 const SIZE_EMBER: readonly [number, number] = [0.45, 0.08];
+const SIZE_CHIP: readonly [number, number] = [0.5, 0.35];
 const DIR: [number, number, number] = [0, 1, 0];
 
 export class FinalDeathFx {
@@ -357,15 +360,7 @@ export class FinalDeathFx {
     // own orbiting rocks (final_body_fx.ts: the same material, one program) ----
     const rockGeo = colossusChunk();
     this.geometries.push(rockGeo);
-    const rockMat = new THREE.MeshStandardMaterial({
-      color: 0xffffff,
-      vertexColors: true,
-      emissive: 0x3a2410,
-      emissiveIntensity: 0.3,
-      roughness: 0.92,
-      flatShading: true,
-      name: 'smithHeartDeathDebris',
-    });
+    const rockMat = colossusRockMaterial('smithHeartDeathDebris');
     this.materials.push(rockMat);
     this.debris = new THREE.InstancedMesh(rockGeo, rockMat, DEATH_DEBRIS.length);
     this.debris.name = 'smithHeartDeathDebris';
@@ -479,20 +474,26 @@ export class FinalDeathFx {
     if (h.rand() < f.dt * 26 * h.density) {
       const a = h.rand() * Math.PI * 2;
       const r = H * 0.3;
+      const c = this.puffO;
+      c.speed = 3;
+      c.up = 2;
+      c.life = 1.2;
+      c.size = SIZE_CHIP;
+      c.color = STONE;
+      c.alpha = 1;
+      c.pool = undefined;
+      c.dir = undefined;
+      c.spread = undefined;
+      c.drag = undefined;
+      c.gravity = 22;
+      c.radius = undefined;
+      c.floor = undefined;
       P.puff(
         f.footX + Math.cos(a) * r,
         f.footY + H * (0.3 + 0.8 * h.rand()),
         f.footZ + Math.sin(a) * r,
         2,
-        {
-          speed: 3,
-          up: 2,
-          life: 1.2,
-          size: [0.5, 0.35],
-          color: STONE,
-          alpha: 1,
-          gravity: 22,
-        },
+        c,
       );
     }
   }
@@ -500,6 +501,7 @@ export class FinalDeathFx {
   private paintComets(f: FinalDeathFrame): void {
     const h = this.host;
     deathHoverPoint(this.chestLocal(f, _chest), _hover);
+    const calm = h.reducedMotion();
     for (let i = 0; i < DEATH_VEINS.length; i++) {
       const c = deathComet(f.t, i, _hover, this.groundLocal, this.comet);
       const head = this.heads[i];
@@ -515,7 +517,8 @@ export class FinalDeathFx {
       const x = f.ox + c.x;
       const z = f.oz + c.z;
       const y = c.grounded ? h.groundY(x, z) + c.y : c.y;
-      const flick = 0.85 + 0.15 * Math.sin(sharedUniforms.uTime.value * 31 + i * 2);
+      // A flicker (none under reduced motion: a steady glow, no pulsing).
+      const flick = calm ? 1 : 0.85 + 0.15 * Math.sin(sharedUniforms.uTime.value * 31 + i * 2);
       head.position.set(x, y, z);
       head.scale.setScalar(c.size * 1.9 * flick);
       (head.material as THREE.SpriteMaterial).opacity = Math.min(1, c.glow);
@@ -539,7 +542,7 @@ export class FinalDeathFx {
       const wx = f.ox + HEART_ROOM.x;
       const wz = f.oz + HEART_ROOM.z;
       const y = h.groundY(wx, wz) + k.y;
-      const flick = 0.9 + 0.1 * Math.sin(sharedUniforms.uTime.value * 40);
+      const flick = calm ? 1 : 0.9 + 0.1 * Math.sin(sharedUniforms.uTime.value * 40);
       this.core.position.set(wx, y, wz);
       this.core.scale.setScalar(k.size * 1.6 * flick);
       (this.core.material as THREE.SpriteMaterial).opacity = Math.min(1, k.glow);
@@ -592,7 +595,8 @@ export class FinalDeathFx {
     const h = this.host;
     const P = h.particles;
     const prev = this.cometAt[i];
-    const rate = phase === 'fly' ? 380 : phase === 'race' ? 260 : phase === 'gather' ? 220 : 60;
+    // Under the glow ring's capacity with all four flying at once.
+    const rate = phase === 'fly' ? 260 : phase === 'race' ? 220 : phase === 'gather' ? 180 : 50;
     this.emitDebt[i] += f.dt * rate * h.density;
     const o = this.puffO;
     const vein = DEATH_VEINS[i];
@@ -686,9 +690,11 @@ export class FinalDeathFx {
       const k = Math.max(0, Math.min(1, (f.t - DEATH_GATHER) / (DEATH_IMPACT - DEATH_GATHER)));
       const sx = 1 - 0.35 * k;
       this.funnel.scale.set(sx, 1 - 0.2 * k, sx);
-      this.funnel.rotation.y = -sharedUniforms.uTime.value * (1.5 + 4 * k);
+      // Reduced motion: a slow, steady turn (the whirlpool still reads).
+      const calm = h.reducedMotion();
+      this.funnel.rotation.y = -sharedUniforms.uTime.value * (calm ? 0.6 : 1.5 + 4 * k);
       this.funnelMat.uniforms.uGlow.value = w.funnel * (0.7 + 0.6 * k);
-      this.funnelMat.uniforms.uSpin.value = 2.5 + 5 * k;
+      this.funnelMat.uniforms.uSpin.value = calm ? 1.2 : 2.5 + 5 * k;
     }
     const on = w.geyserTop > 0.01;
     this.geyserCore.visible = on;
@@ -751,7 +757,6 @@ export class FinalDeathFx {
     const prev = f.prev;
     const t = f.t;
     if (prev < 0 || t <= prev) return;
-    const crossed = (at: number) => prev < at && t >= at && t - at < 0.5;
     const h = this.host;
     const P = h.particles;
     const rm = h.reducedMotion() ? 0.55 : 1;
@@ -760,7 +765,7 @@ export class FinalDeathFx {
     const wx = f.ox + HEART_ROOM.x;
     const wz = f.oz + HEART_ROOM.z;
     // The knee striking the floor.
-    if (crossed(0.65)) {
+    if (deathBeatCrossed(prev, t, DEATH_KNEE_STRIKE)) {
       P.puff(f.footX, f.footY + 0.4, f.footZ, Math.round(30 * h.density) + 6, {
         speed: 9,
         up: 1.5,
@@ -775,12 +780,12 @@ export class FinalDeathFx {
       h.shakeNear(f.footX, f.footZ, DEATH_SHAKES.struggle.amount * 2, DEATH_SHAKES.struggle.reach);
     }
     // The struggle's beats: the chest flaring in a colour, a rumble.
-    DEATH_STRUGGLE_BEATS.forEach((b, i) => {
-      if (!crossed(b)) return;
+    for (let i = 0; i < DEATH_STRUGGLE_BEATS.length; i++) {
+      if (!deathBeatCrossed(prev, t, DEATH_STRUGGLE_BEATS[i])) continue;
       h.flash(cx, f.chestY, cz, (12 + i * 4) * rm, 0.35, arrivalVeinColor(DEATH_VEINS[i % 4]));
       h.shakeNear(cx, cz, DEATH_SHAKES.struggle.amount, DEATH_SHAKES.struggle.reach);
-    });
-    if (crossed(DEATH_TEAR)) {
+    }
+    if (deathBeatCrossed(prev, t, DEATH_TEAR)) {
       // The crystal rips out: white light, the four colours, broken stone.
       h.flash(cx, f.chestY, cz, 34 * rm, 0.5, 0xffffff);
       h.flash(cx, f.chestY + 2, cz, 60 * rm, 0.8, 0xfff0d8);
@@ -836,7 +841,7 @@ export class FinalDeathFx {
       });
       h.shakeNear(cx, cz, DEATH_SHAKES.tear.amount, DEATH_SHAKES.tear.reach);
     }
-    if (crossed(DEATH_SPLIT)) {
+    if (deathBeatCrossed(prev, t, DEATH_SPLIT)) {
       // The crystal bursts into the four.
       deathHoverPoint(this.chestLocal(f, _chest), _hover);
       const x = f.ox + _hover.x;
@@ -873,7 +878,7 @@ export class FinalDeathFx {
     }
     // Each comet landing at its altar: the altar flares in its colour.
     for (let i = 0; i < DEATH_VEINS.length; i++) {
-      if (!crossed(deathLandAt(i))) continue;
+      if (!deathBeatCrossed(prev, t, deathLandAt(i))) continue;
       const p = PATHS[i];
       const x = f.ox + p.from.x;
       const z = f.oz + p.from.z;
@@ -895,17 +900,17 @@ export class FinalDeathFx {
       });
       h.shakeNear(x, z, DEATH_SHAKES.land.amount, DEATH_SHAKES.land.reach);
     }
-    if (crossed(DEATH_GATHER)) {
+    if (deathBeatCrossed(prev, t, DEATH_GATHER)) {
       h.flash(wx, h.groundY(wx, wz) + 3, wz, 24 * rm, 0.6, 0xfff0d8);
     }
-    if (crossed(DEATH_MERGE)) {
+    if (deathBeatCrossed(prev, t, DEATH_MERGE)) {
       // The four are one: a white flash over the well.
       const y = h.groundY(wx, wz) + 4.5;
       h.flash(wx, y, wz, 30 * rm, 0.4, 0xffffff);
       for (let i = 0; i < 4; i++)
         h.flash(wx, y, wz, 18 * rm, 0.6, arrivalVeinColor(DEATH_VEINS[i]));
     }
-    if (crossed(DEATH_IMPACT)) {
+    if (deathBeatCrossed(prev, t, DEATH_IMPACT)) {
       // The plunge strikes the pit: the flash, the column thrown up, the
       // four-colour shockwave over the whole floor, dust, the thud.
       const y = h.groundY(wx, wz);
@@ -948,7 +953,7 @@ export class FinalDeathFx {
       });
       h.shakeNear(wx, wz, DEATH_SHAKES.impact.amount, DEATH_SHAKES.impact.reach);
     }
-    if (crossed(DEATH_THROB)) {
+    if (deathBeatCrossed(prev, t, DEATH_THROB)) {
       // One last slow beat from deep in the pit: it is not over.
       const y = h.groundY(wx, wz);
       h.flash(wx, y + 1, wz, 34 * rm, 1.4, 0xff5a1e);
@@ -974,7 +979,7 @@ export class FinalDeathFx {
     if (prev < 0 || t <= prev) return;
     const h = this.host;
     for (const snd of DEATH_SOUNDS) {
-      if (!(prev < snd.at && t >= snd.at && t - snd.at < 0.5)) continue;
+      if (!deathBeatCrossed(prev, t, snd.at)) continue;
       let x = f.footX;
       let y = f.footY + 4;
       let z = f.footZ;

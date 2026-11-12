@@ -31,6 +31,7 @@ import {
   SMITH_HEART_BOSS_LOOKS,
 } from '../src/render/characters/smith_heart_boss_looks';
 import { gfxInternalsForTest, sharedUniforms } from '../src/render/gfx';
+import { materialProgramSignature } from '../src/render/prewarm_policy';
 import {
   clearHeartArrivalLightForTest,
   heartArrivalFlare,
@@ -53,6 +54,7 @@ import {
   DEATH_HOVER_AT,
   DEATH_HUSK_SHADE,
   DEATH_IMPACT,
+  DEATH_KNEE_STRIKE,
   DEATH_MERGE,
   DEATH_PLUNGE_DEPTH,
   DEATH_REPLAY_SECONDS,
@@ -62,6 +64,7 @@ import {
   DEATH_THROB,
   DEATH_VEINS,
   deathAltarLevel,
+  deathBeatCrossed,
   deathComet,
   deathCore,
   deathCrystal,
@@ -70,6 +73,7 @@ import {
   deathFlyStart,
   deathGroovePath,
   deathHusk,
+  deathKneel,
   deathLandAt,
   deathRaceEnd,
   deathRaceFront,
@@ -79,6 +83,7 @@ import {
   deathWell,
 } from '../src/render/smith_heart_fx/final_death_core';
 import { FINAL_BOSS } from '../src/render/smith_heart_fx/final_fx_core';
+import { colossusRockMaterial } from '../src/render/smith_heart_fx/final_kit_shapes';
 import { SMITH_HEART_DUNGEON } from '../src/sim/content/smith_heart';
 import { HEART_ROOM } from '../src/sim/content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
@@ -233,6 +238,26 @@ describe('the grooves, the well and the room', () => {
   });
 });
 
+describe('the beats and the stone', () => {
+  it('fires a beat once, only for a scene seen crossing it', () => {
+    expect(deathBeatCrossed(0.6, 0.7, 0.65)).toBe(true);
+    expect(deathBeatCrossed(0.7, 0.8, 0.65)).toBe(false);
+    expect(deathBeatCrossed(-1, 0.7, 0.65)).toBe(false);
+    expect(deathBeatCrossed(5, 6, 0.65)).toBe(false);
+    // The knee lands while the body sinks onto it.
+    expect(deathKneel(DEATH_KNEE_STRIKE)).toBeGreaterThan(0.5);
+    expect(DEATH_KNEE_STRIKE).toBeLessThan(DEATH_TEAR);
+  });
+
+  it("draws the broken stone in the body rocks' own program", () => {
+    const a = colossusRockMaterial('a');
+    const b = colossusRockMaterial('b');
+    expect(materialProgramSignature(a)).toBe(materialProgramSignature(b));
+    a.dispose();
+    b.dispose();
+  });
+});
+
 describe('the broken stone', () => {
   it('is a fixed plan that lands on the floor and sinks away by the end', () => {
     expect(DEATH_DEBRIS.length).toBeGreaterThan(10);
@@ -313,7 +338,7 @@ describe('FinalFx plays the death', () => {
     sharedUniforms.uTime.value = 0;
   });
 
-  function setup() {
+  function setup(reduced = false) {
     const o = instanceOrigin(DUNGEONS.smith_heart.index, 0);
     const key = heartSealSlotKey(o.x, o.z);
     const entities = new Map<number, Entity>();
@@ -343,13 +368,16 @@ describe('FinalFx plays the death', () => {
     const world = { entities, player: me, playerId: me.id } as unknown as IWorld;
     const scene = new THREE.Scene();
     const sent: string[] = [];
+    let shakes = 0;
     const fx = new FinalFx(
       scene,
       () => 0,
       world,
       undefined,
-      () => false,
-      () => {},
+      () => reduced,
+      () => {
+        shakes++;
+      },
       (_id, g) => sent.push(g),
     );
     // The heart long awake (no arrival in the way).
@@ -365,7 +393,7 @@ describe('FinalFx plays the death', () => {
         fx.update(0.05);
       }
     };
-    return { scene, fx, boss, sent, key, step };
+    return { scene, fx, boss, sent, key, step, entities, shakes: () => shakes };
   }
 
   const shown = (scene: THREE.Scene, name: string) => {
@@ -397,6 +425,55 @@ describe('FinalFx plays the death', () => {
     const before = s.sent.filter((g) => g === DEATH_GESTURES.husk).length;
     s.step(2);
     expect(s.sent.filter((g) => g === DEATH_GESTURES.husk).length).toBeGreaterThan(before);
+    s.fx.dispose();
+  });
+
+  it('thuds the camera at its beats, never under reduced motion', () => {
+    for (const reduced of [false, true]) {
+      const s = setup(reduced);
+      s.step(0.5);
+      s.boss.dead = true;
+      s.step(DEATH_IMPACT + 0.3);
+      if (reduced) expect(s.shakes()).toBe(0);
+      else expect(s.shakes()).toBeGreaterThan(3);
+      // The scene itself still plays in full.
+      expect(shown(s.scene, 'smithHeartDeathGeyserCore')).toBe(true);
+      s.fx.dispose();
+    }
+  });
+
+  it('a boss out of view mid-scene and back still dead resumes, never restarts', () => {
+    const s = setup();
+    s.step(0.5);
+    s.boss.dead = true;
+    s.step(DEATH_TEAR + 0.3);
+    const blazes = s.sent.filter((g) => g === DEATH_GESTURES.blaze).length;
+    expect(blazes).toBe(1);
+    s.entities.delete(s.boss.id);
+    s.step(1.5);
+    expect(shown(s.scene, 'smithHeartFinalDeath')).toBe(false);
+    s.entities.set(s.boss.id, s.boss);
+    s.step(1);
+    expect(s.sent.filter((g) => g === DEATH_GESTURES.blaze).length).toBe(blazes);
+    expect(shown(s.scene, 'smithHeartFinalDeath')).toBe(true);
+    s.fx.dispose();
+  });
+
+  it('claims a replay cue from a dead or unseen boss and plays nothing', () => {
+    const s = setup();
+    s.step(0.5);
+    const cue = (sourceId: number): SimEvent => ({
+      type: 'spellfx',
+      sourceId,
+      targetId: sourceId,
+      school: 'arcane',
+      fx: 'nova',
+      ability: FINAL_DEV_CUES.deathReplay,
+    });
+    expect(s.fx.handleEvent(cue(999))).toBe(true);
+    s.step(1);
+    expect(shown(s.scene, 'smithHeartFinalDeath')).toBe(false);
+    expect(s.sent).not.toContain(FINAL_BODY_GESTURES.kneel);
     s.fx.dispose();
   });
 

@@ -53,7 +53,7 @@ import {
   finalShiftStage,
   finalShiftStarts,
 } from './final_body_core';
-import { colossusChunk } from './final_kit_shapes';
+import { colossusChunk, colossusRockMaterial } from './final_kit_shapes';
 
 /** What the host lends: its particles, flashes, camera thud and dice. */
 export interface FinalBodyHost {
@@ -195,15 +195,7 @@ export class FinalBodyFx {
     // polyhedron, which read as a placeholder cube in front of the hammer.
     const rockGeo = colossusChunk();
     this.geometries.push(rockGeo);
-    const rockMat = new THREE.MeshStandardMaterial({
-      color: 0xffffff,
-      vertexColors: true,
-      emissive: 0x3a2410,
-      emissiveIntensity: 0.3,
-      roughness: 0.92,
-      flatShading: true,
-      name: 'smithHeartFinalBodyRocks',
-    });
+    const rockMat = colossusRockMaterial('smithHeartFinalBodyRocks');
     this.materials.push(rockMat);
     this.rocks = new THREE.InstancedMesh(rockGeo, rockMat, FINAL_BODY_POOLS.rocks);
     this.rocks.name = 'smithHeartFinalBodyRocks';
