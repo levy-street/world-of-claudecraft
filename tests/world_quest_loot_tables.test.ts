@@ -1,8 +1,9 @@
 // The nine world-quest class loot tables (src/sim/content/world_quest_loot.ts).
 // Every entry must be something the class can wear AND would want: legal under
 // the equipment rules, the class's own armor weight, scoring for at least one of
-// its specs, and for a necklace or ring a lead stat one of its specs values. The slot coverage matrix is pinned so a thin cell is a visible
-// authoring decision (docs/prd/world-quests/rewards-brief.md, section 9).
+// its specs, and for a necklace or ring a lead stat one of its specs values.
+// The slot coverage matrix is pinned so a thin cell is a visible authoring
+// decision (docs/prd/world-quests/rewards-brief.md, section 9).
 import { describe, expect, it } from 'vitest';
 import { DEV_KIT_ROLES } from '../src/sim/content/dev_kit_roles';
 import { WORLD_QUEST_CLASS_LOOT } from '../src/sim/content/world_quest_loot';
@@ -106,8 +107,9 @@ describe('world quest class loot tables', () => {
     // Measured at the first cut: the closest pair (hunter and rogue, who share
     // the leather shelf) differed by nine entries; every other pair by sixteen
     // or more. The jewelry fix (2026-11-12) left hunter and rogue at exactly six,
-    // so the next shared edit to the leather tables needs a distinct piece. Identity or a one-entry difference would make the nine tables a
-    // fiction, so the bound is a symmetric difference, not a mere inequality.
+    // so the next shared edit to the leather tables needs a distinct piece.
+    // Identity or a one-entry difference would make the nine tables a fiction,
+    // so the bound is a symmetric difference, not a mere inequality.
     const MIN_SYMMETRIC_DIFFERENCE = 6;
     const trios: PlayerClass[][] = [
       ['priest', 'mage', 'warlock'],

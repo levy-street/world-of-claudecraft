@@ -2,6 +2,8 @@
 
 Cell = appropriate / legal. Legal: canEquipItem plus the explicit class lock. Appropriate: legal, armor weight equals the class maximum, and the piece scores above zero for at least one of the class specs (DEV_KIT_ROLES weights). Jewelry and offhands count as appropriate when legal and scoring.
 
+Note (2026-11-12): this matrix predates the jewelry lead-stat rule. Every class weights stamina, so "scoring" never narrowed jewelry; `tests/world_quest_loot_tables.test.ts` now also requires a necklace or ring to lead with a stat one of the class's specs values, so the neck and ring cells below overstate what a class can draw.
+
 | class | chest | feet | gloves | helmet | legs | mainhand | neck | offhand | ring | shoulder | waist | total appropriate |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | warrior | 6 / 7 | 4 / 10 | 3 / 11 | 2 / 4 | 5 / 9 | 10 / 10 | 4 / 4 | 0 / 0 | 7 / 7 | 2 / 13 | 3 / 3 | 46 |
