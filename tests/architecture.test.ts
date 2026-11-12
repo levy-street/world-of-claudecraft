@@ -1231,6 +1231,9 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart_fx/heat_telegraph_core.ts',
   'src/render/smith_heart_fx/final_telegraph_core.ts',
   'src/render/smith_heart_fx/painted_telegraph_core.ts',
+  // Which of the raid's own trash and add bodies a fight cue moves (their rises, their
+  // claimed cues).
+  'src/render/smith_heart_fx/trash_gestures_core.ts',
   // The wellspring's bounded flow and its bubbles; the Hearthseeds' one field.
   'src/render/smith_heart_fx/heat_well_core.ts',
   'src/render/smith_heart_fx/heat_meteor_core.ts',

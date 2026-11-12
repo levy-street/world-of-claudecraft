@@ -20,3 +20,4 @@ export { QuenchEntranceFx } from './quench_entrance_fx';
 export { QuenchFightFx } from './quench_fight_fx';
 export { QuenchFx } from './quench_fx';
 export { SealShake } from './seal_shake';
+export { SmithHeartTrashGestures } from './trash_gestures';

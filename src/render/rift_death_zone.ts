@@ -80,6 +80,7 @@ import {
   QuenchFightFx,
   QuenchFx,
   SealShake,
+  SmithHeartTrashGestures,
 } from './smith_heart_fx';
 import { SummonRiseFx } from './summon_rise_fx';
 import { BastionFx } from './sunken_bastion/bastion_fx';
@@ -200,6 +201,8 @@ export class RiftDeathZoneVisuals {
   private trashEngine: TrashEngineFx = NOOP_FX;
   // A boss's summoned dead rising as they land, in any zone (summon_rise_fx.ts).
   private readonly summonRise: SummonRiseFx;
+  // The Smith's Heart's own trash and adds: their rises and claimed cues through the gesture seam.
+  private readonly heartTrash: SmithHeartTrashGestures;
   // The Smith's Heart's Hammer guardian (Mountain's Wrath, Hammerfall) and the
   // Slab breaking.
   private readonly hammerFx: HammerFx;
@@ -262,6 +265,7 @@ export class RiftDeathZoneVisuals {
     this.hoardGestures = new HoardBossGestures(world, playGesture);
     this.hoardPresentation = new HoardBossPresentation(world, shake);
     this.summonRise = new SummonRiseFx(playGesture);
+    this.heartTrash = new SmithHeartTrashGestures(world, playGesture);
     this.hammerFx = new HammerFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.breathFx = new BreathFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.breathFight = new BreathFightFx(scene, groundY, world, compileGate, reducedMotion, shake);
@@ -692,6 +696,7 @@ export class RiftDeathZoneVisuals {
     this.sanctumBosses.update(dt);
     this.trashEngine.update(dt);
     this.summonRise.update(dt);
+    this.heartTrash.update(dt);
     this.hammerFx.update(dt);
     this.breathFx.update(dt);
     this.breathFight.update(dt);
@@ -781,6 +786,7 @@ export class RiftDeathZoneVisuals {
     const sanctumBoss = this.sanctumBosses.handleEvent(event);
     const engine = this.trashEngine.handleEvent(event);
     this.summonRise.handleEvent(event);
+    this.heartTrash.handleEvent(event);
     this.hammerFx.handleEvent(event);
     this.breathFx.handleEvent(event);
     this.breathBody.handleEvent(event);
