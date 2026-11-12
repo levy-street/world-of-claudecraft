@@ -10,54 +10,99 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "itemUi.tooltip.noStatChanges"
+    "itemUi.tooltip.compareRingColumn",
+    "itemUi.tooltip.noStatChanges",
+    "itemUi.tooltip.setBonusGained",
+    "itemUi.tooltip.setBonusLost"
   ],
   "es_ES": [
-    "itemUi.tooltip.noStatChanges"
+    "itemUi.tooltip.compareRingColumn",
+    "itemUi.tooltip.noStatChanges",
+    "itemUi.tooltip.setBonusGained",
+    "itemUi.tooltip.setBonusLost"
   ],
   "fr_FR": [
-    "itemUi.tooltip.noStatChanges"
+    "itemUi.tooltip.compareRingColumn",
+    "itemUi.tooltip.noStatChanges",
+    "itemUi.tooltip.setBonusGained",
+    "itemUi.tooltip.setBonusLost"
   ],
   "fr_CA": [
-    "itemUi.tooltip.noStatChanges"
+    "itemUi.tooltip.compareRingColumn",
+    "itemUi.tooltip.noStatChanges",
+    "itemUi.tooltip.setBonusGained",
+    "itemUi.tooltip.setBonusLost"
   ],
   "en_CA": [],
   "it_IT": [
-    "itemUi.tooltip.noStatChanges"
+    "itemUi.tooltip.compareRingColumn",
+    "itemUi.tooltip.noStatChanges",
+    "itemUi.tooltip.setBonusGained",
+    "itemUi.tooltip.setBonusLost"
   ],
   "de_DE": [
-    "itemUi.tooltip.noStatChanges"
+    "itemUi.tooltip.compareRingColumn",
+    "itemUi.tooltip.noStatChanges",
+    "itemUi.tooltip.setBonusGained",
+    "itemUi.tooltip.setBonusLost"
   ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
-    "itemUi.tooltip.noStatChanges"
+    "itemUi.tooltip.compareRingColumn",
+    "itemUi.tooltip.noStatChanges",
+    "itemUi.tooltip.setBonusGained",
+    "itemUi.tooltip.setBonusLost"
   ],
   "ru_RU": [],
   "cs_CZ": [
-    "itemUi.tooltip.noStatChanges"
+    "itemUi.tooltip.compareRingColumn",
+    "itemUi.tooltip.noStatChanges",
+    "itemUi.tooltip.setBonusGained",
+    "itemUi.tooltip.setBonusLost"
   ],
   "nl_NL": [
-    "itemUi.tooltip.noStatChanges"
+    "itemUi.tooltip.compareRingColumn",
+    "itemUi.tooltip.noStatChanges",
+    "itemUi.tooltip.setBonusGained",
+    "itemUi.tooltip.setBonusLost"
   ],
   "pl_PL": [
-    "itemUi.tooltip.noStatChanges"
+    "itemUi.tooltip.compareRingColumn",
+    "itemUi.tooltip.noStatChanges",
+    "itemUi.tooltip.setBonusGained",
+    "itemUi.tooltip.setBonusLost"
   ],
   "id_ID": [
-    "itemUi.tooltip.noStatChanges"
+    "itemUi.tooltip.compareRingColumn",
+    "itemUi.tooltip.noStatChanges",
+    "itemUi.tooltip.setBonusGained",
+    "itemUi.tooltip.setBonusLost"
   ],
   "tr_TR": [
-    "itemUi.tooltip.noStatChanges"
+    "itemUi.tooltip.compareRingColumn",
+    "itemUi.tooltip.noStatChanges",
+    "itemUi.tooltip.setBonusGained",
+    "itemUi.tooltip.setBonusLost"
   ],
   "sv_SE": [
-    "itemUi.tooltip.noStatChanges"
+    "itemUi.tooltip.compareRingColumn",
+    "itemUi.tooltip.noStatChanges",
+    "itemUi.tooltip.setBonusGained",
+    "itemUi.tooltip.setBonusLost"
   ],
   "vi_VN": [
-    "itemUi.tooltip.noStatChanges"
+    "itemUi.tooltip.compareRingColumn",
+    "itemUi.tooltip.noStatChanges",
+    "itemUi.tooltip.setBonusGained",
+    "itemUi.tooltip.setBonusLost"
   ],
   "da_DK": [
-    "itemUi.tooltip.noStatChanges"
+    "itemUi.tooltip.compareRingColumn",
+    "itemUi.tooltip.noStatChanges",
+    "itemUi.tooltip.setBonusGained",
+    "itemUi.tooltip.setBonusLost"
   ]
 };

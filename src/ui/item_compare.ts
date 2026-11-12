@@ -1,6 +1,6 @@
 // Pure item-comparison helper (no DOM), so the stat-delta math can be unit
 // tested directly the way xp_bar.ts / player_context_menu.ts are. The HUD turns
-// these deltas into coloured tooltip lines; see Hud.itemCompareBlock.
+// these deltas into change cells on the hovered card; see item_compare_view.ts.
 
 import { activeItemInstanceStats } from '../sim/item_instance_stats';
 import { lootQualityWeapon } from '../sim/loot_quality';
@@ -99,7 +99,7 @@ function effectiveStat(
 
 // Ordered, human-readable stat lines. Only changes worth showing are returned:
 // integer stats need a full point of difference, DPS a tenth, so a same-for-
-// same swap yields an empty list (the HUD then shows no "If you equip" section).
+// same swap yields an empty list (the card then says "No stat changes").
 // `itemInstance` / `equippedInstance` are the per-copy payloads of the two
 // sides (the hovered candidate copy and the worn copy); the core-stat rows
 // compare MERGED def + rolled stats per side, so a worn copy whose bake makes

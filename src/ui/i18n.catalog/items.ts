@@ -98,6 +98,12 @@ const itemStringsEn = {
       currentlyEquipped: 'Currently equipped',
       ifYouEquip: 'If you equip this',
       noStatChanges: 'No stat changes',
+      // The comparison's set-tier lines; the set name and new count follow on
+      // the next line (hudChrome.itemSet.header).
+      setBonusLost: 'Breaks ({pieces}) set bonus',
+      setBonusGained: 'Activates ({pieces}) set bonus',
+      // Column header when a hovered ring compares against both worn rings.
+      compareRingColumn: 'Ring {n}',
       damageSpeed: '{min} - {max} Damage Speed {speed}',
       dps: '({dps} damage per second)',
       armorStat: '{value} Armor',

@@ -52,8 +52,8 @@ describe('paintTooltipAt', () => {
   it('measures the box at the left edge, not at the previous tooltip spot', () => {
     // An absolutely positioned #tooltip shrinks to the room between its left
     // and the viewport edge, so measuring while it still sits where the LAST
-    // tooltip was (a bag cell near the right edge) wraps a wide card such as
-    // the side-by-side item compare. The fake records left at measure time.
+    // tooltip was (a bag cell near the right edge) wraps a wide card. The fake
+    // records left at measure time.
     const el = fakeTooltipEl({ w: 200, h: 100 });
     el.style.left = '1200px';
     let leftAtMeasure = '';

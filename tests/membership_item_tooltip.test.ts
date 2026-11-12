@@ -157,9 +157,10 @@ describe('membership armour tooltip matches live stats', () => {
       sellValue: 0,
     };
     const html = harness(sim).itemTooltip(replacement, true);
-    expect(html).toContain('Currently equipped');
-    expect(html).toContain('Inactive: renew your membership');
+    // The dormant armour contributes nothing, so the probe's whole +2 is the
+    // change: the cell sits on the probe's own Strength line.
     expect(html).toContain('+2 Strength');
+    expect(html).toContain('<span class="tt-delta tt-green">+2</span>');
     expect(html).not.toContain('999');
     expect(html).not.toContain('997');
     expect(meta.equipmentInstance.chest.rolled?.stats?.str).toBe(999);

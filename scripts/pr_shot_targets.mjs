@@ -6991,44 +6991,68 @@ export const TARGETS = [
   },
   {
     key: 'item-compare-tooltip',
-    label: 'A gated off-hand hovered in the bags beside the worn off-hand it would replace',
-    when: ['item_compare_view', 'item_level_gate', 'item_instance_tooltip'],
+    label: 'Gear hovered in the bags, with the stat changes on its own card',
+    when: [
+      'item_compare_view',
+      'item_set_swap_view',
+      'item_combat_tooltip_view',
+      'item_affix_tooltip',
+      'item_level_gate',
+      'item_instance_tooltip',
+    ],
     // Desktop only, the stack-size-tooltip precedent: the synthetic hover path
-    // does not raise #tooltip on the touch layout. A level-1 mage wears the
-    // Valefire Lantern and hovers the Sunpetal Grimoire (a rare held off-hand,
-    // equip-gated at 15), so one shot shows the compare layout, the leading
-    // stat-change summary, and the held off-hand's red Requires Level line.
+    // does not raise #tooltip on the touch layout. Two shots. 'offhand': a
+    // level-1 mage wears the Valefire Lantern and hovers the Sunpetal Grimoire
+    // (a rare held off-hand, equip-gated at 15), so the card shows the change
+    // cells and the red Requires Level line. 'set': a level-60 warrior wears
+    // four Strength-lineage pieces and hovers a non-set chest, so the card
+    // also names the 4-piece tier the swap would break.
     variants: [
       { key: 'offhand', charClass: 'mage', charName: 'Aldwin', beforeLoad: lowGraphicsSeed },
+      { key: 'set', charClass: 'warrior', charName: 'Thorgar', beforeLoad: lowGraphicsSeed },
     ],
-    async capture(page) {
+    async capture(page, variant) {
       await page.waitForFunction(() => window.__game?.sim?.player, { timeout: 90000 });
       await dismissEntryOverlays(page);
-      await page.evaluate(() => {
-        const sim = window.__game?.sim;
-        for (const id of ['valefire_lantern', 'sunpetal_grimoire']) {
+      const breaksSet = variant?.key === 'set';
+      const hoverId = breaksSet ? 'morthens_cryptforged_hauberk' : 'sunpetal_grimoire';
+      await page.evaluate(
+        (worn, hovered, level) => {
+          const sim = window.__game?.sim;
+          const p = sim?.entities.get(sim.playerId);
+          if (p && level) p.level = level;
+          for (const id of worn) {
+            try {
+              sim?.addItem(id, 1);
+              sim?.equipItem(id);
+            } catch {}
+          }
           try {
-            sim?.addItem(id, 1);
+            sim?.addItem(hovered, 1);
           } catch {}
-        }
-        try {
-          sim?.equipItem('valefire_lantern');
-        } catch {}
-        const el = document.querySelector('#bags');
-        if (el) el.style.display = 'none';
-        window.__game?.hud?.toggleBags?.();
-      });
+          const el = document.querySelector('#bags');
+          if (el) el.style.display = 'none';
+          window.__game?.hud?.toggleBags?.();
+        },
+        breaksSet
+          ? [
+              'deathlords_dread_visage',
+              'deathlord_warplate',
+              'deathlord_legguards',
+              'deathlord_sabatons',
+            ]
+          : ['valefire_lantern'],
+        hoverId,
+        breaksSet ? 60 : 0,
+      );
       await pollForSize(page, '#bags');
       // Hover through the REAL pointer path so the tooltip is the one a player sees.
-      await page.evaluate(() => {
+      await page.evaluate((id) => {
         const cells = [...document.querySelectorAll('#bags *')];
         const el = cells.find((c) => {
           const bg = c instanceof HTMLElement ? c.style.backgroundImage : '';
           const img = c.querySelector?.('img');
-          return (
-            bg?.includes('sunpetal_grimoire') ||
-            img?.getAttribute('src')?.includes('sunpetal_grimoire')
-          );
+          return bg?.includes(id) || img?.getAttribute('src')?.includes(id);
         });
         if (!el) return;
         const r = el.getBoundingClientRect();
@@ -7048,7 +7072,7 @@ export const TARGETS = [
             }),
           );
         }
-      });
+      }, hoverId);
       await wait(600);
       return { clip: '#ui' };
     },

@@ -44,7 +44,7 @@
 // stats, use effect, and set bonuses are on the pattern itself, not only in
 // the crafting window after learning it), then that recipe's materials. The
 // card is rendered by the HOST through `productCard` (Hud.itemTooltip with
-// compare off, the itemCompareBlock precedent), since the card builder owns
+// compare off), since the card builder owns
 // Hud state; a caller that passes none gets the materials line alone. A
 // collection manual teaches several pieces of ONE set, so every card but the
 // last of a set is asked to omit its set block (the `omitSet` flag): the
