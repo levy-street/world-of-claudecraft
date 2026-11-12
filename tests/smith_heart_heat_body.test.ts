@@ -156,8 +156,9 @@ describe('the Guardian of the Heat model', () => {
     for (const one of ['Sink', 'Rise', 'Slam', 'Cast'])
       expect(def.oneShotsHoldAttacks, one).toContain(one);
     expect(def.castPlayOutHoldsAttacks).toBe(true);
-    // Dead, the lava in it cools.
-    expect(def.glowPulses?.deathFade).toBeGreaterThan(0);
+    // Dead, the lava in it cools through its death scene (heat_death_fx.ts
+    // writes its skin), never a fade of the rig's own that would hide it.
+    expect(def.glowPulses?.deathFade).toBeUndefined();
   });
 
   it('hangs every socket on a real bone, at the offset the rest pose gives', () => {

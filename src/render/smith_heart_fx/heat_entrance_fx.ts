@@ -44,6 +44,7 @@ import {
   HEAT_MODEL_COLORS,
 } from './heat_body_core';
 import { heatBodySockets } from './heat_body_sockets';
+import { HeatCoalSkin } from './heat_coal_skin';
 import {
   AWAKE,
   CRACK_VERTICES,
@@ -429,15 +430,6 @@ function layStrip(
   geo.computeBoundingSphere();
 }
 
-/** The model's authored look, kept per material while the scene dims it. */
-interface CoalMaterial {
-  mat: THREE.Material & { emissiveIntensity?: number; color?: THREE.Color };
-  emissive: number;
-  r: number;
-  g: number;
-  b: number;
-}
-
 export class HeatEntranceFx {
   readonly readyForEntry: Promise<void>;
   private readonly root = new THREE.Group();
@@ -484,8 +476,8 @@ export class HeatEntranceFx {
   private scanTimer = 0;
   private clock = 0;
   private seed = 0x3e17;
-  private coal: CoalMaterial[] = [];
-  private coalRoot: THREE.Object3D | null = null;
+  /** The model's own skin, dimmed to cold coal (heat_coal_skin.ts). */
+  private readonly coal = new HeatCoalSkin();
   private disposed = false;
 
   constructor(
@@ -987,59 +979,15 @@ export class HeatEntranceFx {
    *  emissive and its colour, from the values it was authored with), and
    *  give them back the moment it is awake. */
   private coalBody(look: ReturnType<typeof heatEntranceLook>): void {
-    const set = heatBodySockets();
-    const root = set?.root ?? null;
     if (!look.active || look.glow >= 0.999) {
       this.restoreCoal();
       return;
     }
-    if (root !== this.coalRoot) {
-      this.restoreCoal();
-      this.coalRoot = root;
-      if (root) {
-        const seen = new Set<THREE.Material>();
-        root.traverse((o) => {
-          const mesh = o as THREE.Mesh;
-          if (!mesh.isMesh) return;
-          const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
-          for (const m of mats) {
-            const mm = m as CoalMaterial['mat'];
-            // Only the guardian's own skin (never a prop or a weapon on the rig).
-            if (!/heat_guardian/.test(mm.name)) continue;
-            if (seen.has(mm) || mm.emissiveIntensity === undefined || !mm.color) continue;
-            seen.add(mm);
-            this.coal.push({
-              mat: mm,
-              emissive: mm.emissiveIntensity,
-              r: mm.color.r,
-              g: mm.color.g,
-              b: mm.color.b,
-            });
-          }
-        });
-      }
-    }
-    for (const c of this.coal) {
-      c.mat.emissiveIntensity = c.emissive * look.glow;
-      // Cold coal is grey, its painted lava gone dull: a cool tint over the
-      // dim (none left once it burns).
-      const k = look.coal;
-      const cool = 1 - k;
-      c.mat.color?.setRGB(
-        c.r * k * (1 - 0.45 * cool),
-        c.g * k * (1 - 0.3 * cool),
-        c.b * k * (1 - 0.1 * cool),
-      );
-    }
+    this.coal.apply(look.glow, look.coal);
   }
 
   private restoreCoal(): void {
-    for (const c of this.coal) {
-      c.mat.emissiveIntensity = c.emissive;
-      c.mat.color?.setRGB(c.r, c.g, c.b);
-    }
-    this.coal = [];
-    this.coalRoot = null;
+    if (this.coal.holding) this.coal.restore();
   }
 
   dispose(): void {

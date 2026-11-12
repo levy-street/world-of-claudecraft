@@ -632,7 +632,8 @@ export class HeatBody {
     this.yaw += wrapAngle(e.facing - this.yaw) * Math.min(1, dt * 5);
     this.readSockets(e);
     if (e.dead) {
-      this.entrance = null;
+      // Its death scene (heat_death_fx.ts) holds the look its fire rides.
+      this.entrance = heatEntranceFor(e.id);
       this.poseDead(e, dt);
       return;
     }
@@ -1123,21 +1124,26 @@ export class HeatBody {
       this.impact(h.x, this.lavaY, h.z, 1.4);
     }
     const look = heatDeathLook(t);
+    // The death scene's look, when it plays (its flames guttering crown
+    // first, its glow cooling): else the plain fall's.
+    const ent = this.entrance;
+    const flame = ent ? ent.fire : look.flame;
+    const glow = ent ? Math.min(1, ent.glow) : look.glow;
     this.under = false;
     this.fistCharge = -1;
     this.castGather = 0;
-    this.fire(dt, look.flame, 0.75);
-    this.stones.material.uniforms.uGlow.value = look.glow;
-    this.burn(HEAT_STAGES.fight, dt, look.flame);
+    this.fire(dt, flame, 0.75);
+    this.stones.material.uniforms.uGlow.value = glow;
+    this.burn(HEAT_STAGES.fight, dt, flame);
     // The flame sinking out of it in smoke.
     if (look.smoke > 0 && this.rand() < dt * 20 * look.smoke * this.density) {
       const p = this.sock[Math.floor(this.rand() * this.sock.length)];
       this.particles.puff(p.x, p.y + 1, p.z, 1, SMOKE);
     }
-    this.vortex(eAt, dt, look.glow * 0.8);
-    this.lights(look.glow, -1);
+    this.vortex(eAt, dt, (ent ? ent.vortex : look.glow) * 0.8);
+    this.lights(ent ? ent.eyes : look.glow, -1);
     this.gather.visible = false;
-    this.orbitRocks(eAt, look.glow, dt);
+    this.orbitRocks(eAt, glow, dt);
   }
 
   dispose(): void {

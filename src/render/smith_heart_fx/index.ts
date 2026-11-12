@@ -12,6 +12,7 @@ export { FinalKitFx } from './final_kit_fx';
 export { FinalPhaseFx } from './final_phase_fx';
 export { HammerFx } from './hammer_fx';
 export { HeatBody } from './heat_body';
+export { HeatDeathFx } from './heat_death_fx';
 export { HeatEntranceFx } from './heat_entrance_fx';
 export { HeatFightFx } from './heat_fight_fx';
 export { HeatFx } from './heat_fx';

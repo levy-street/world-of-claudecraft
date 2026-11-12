@@ -129,3 +129,10 @@ export const DEATH_SECONDARY_LAYERS = Object.freeze([
 export const COUNCIL_DEATH_SECONDARY_LAYERS = Object.freeze([
   'smithHeartCouncilDeathFlares',
 ] as const);
+
+/** The Guardian of the Heat's death (heat_death_core.ts, painted with its
+ *  entrance's budget): the cosmetic double the low tier never draws, the
+ *  white-hot halo round its body (its skin's own blaze, the heart, the
+ *  cracks, the ring closing in, the spiral and every beat stay on every
+ *  tier). */
+export const HEAT_DEATH_SECONDARY_LAYERS = Object.freeze(['smithHeartHeatDeathHalo'] as const);

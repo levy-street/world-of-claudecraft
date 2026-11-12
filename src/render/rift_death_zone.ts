@@ -72,6 +72,7 @@ import {
   FinalPhaseFx,
   HammerFx,
   HeatBody,
+  HeatDeathFx,
   HeatEntranceFx,
   HeatFightFx,
   HeatFx,
@@ -234,6 +235,9 @@ export class RiftDeathZoneVisuals {
   /** Its entrance (cold coal waking into the blast), updated before the
    *  fight and the body: they read its look. */
   private readonly heatEntrance: HeatEntranceFx;
+  /** Its death (the fire going home), updated right after the entrance and
+   *  before the fight and the body: they read its held look. */
+  private readonly heatDeath: HeatDeathFx;
   private readonly finalFx: FinalFx;
   private readonly finalKit: FinalKitFx;
   private readonly finalPhase: FinalPhaseFx;
@@ -314,6 +318,15 @@ export class RiftDeathZoneVisuals {
     );
     this.heatFx = new HeatFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.heatEntrance = new HeatEntranceFx(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+      shake,
+      playGesture,
+    );
+    this.heatDeath = new HeatDeathFx(
       scene,
       groundY,
       world,
@@ -717,6 +730,7 @@ export class RiftDeathZoneVisuals {
     this.quenchBody.update(dt);
     this.heatFx.update(dt);
     this.heatEntrance.update(dt);
+    this.heatDeath.update(dt);
     this.heatFight.update(dt);
     this.heatBody.update(dt);
     this.finalFx.update(dt);
@@ -761,6 +775,7 @@ export class RiftDeathZoneVisuals {
     this.quenchBody.dispose();
     this.heatFx.dispose();
     this.heatEntrance.dispose();
+    this.heatDeath.dispose();
     this.heatFight.dispose();
     this.heatBody.dispose();
     this.finalFx.dispose();
@@ -805,7 +820,7 @@ export class RiftDeathZoneVisuals {
     const quench = this.quenchFight.handleEvent(event) || quenchBody;
     this.heatFx.handleEvent(event);
     this.heatBody.handleEvent(event);
-    const heat = this.heatFight.handleEvent(event);
+    const heat = this.heatFight.handleEvent(event) || this.heatDeath.handleEvent(event);
     const finalBoss = this.finalFx.handleEvent(event);
     const finalKit = this.finalKit.handleEvent(event);
     const finalPhase = this.finalPhase.handleEvent(event);

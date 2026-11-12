@@ -27,7 +27,12 @@
 // charge, a band or a slice heating, a mark) swells with no hit; an IMPACT
 // (the fist, an ignition, an eruption, a burst) is a hard transient.
 
-import { HEAT_AURAS, HEAT_CASTS, HEAT_CUES } from '../sim/encounters/smith_heart/heat_ids';
+import {
+  HEAT_AURAS,
+  HEAT_CASTS,
+  HEAT_CUES,
+  HEAT_DEV_CUES,
+} from '../sim/encounters/smith_heart/heat_ids';
 import { HEART_MARK, type HeartMarkSound, markSound } from './smith_heart_mark_audio';
 
 export interface HeatSound {
@@ -92,6 +97,9 @@ export const HEAT_CUE_SOUNDS: Readonly<Record<string, readonly HeatSound[]>> = {
 /** Is this event's ability one the fight's sound plays (the HUD's generic
  *  nova, beam or burst sound skipped for it)? */
 export function heatSoundClaims(ability: string | undefined): boolean {
+  // The death's dev replay cue is silent here: the death scene's own sounds
+  // play off its beats (render/smith_heart_fx/heat_death_fx.ts).
+  if (ability === HEAT_DEV_CUES.deathReplay) return true;
   return ability !== undefined && Object.hasOwn(HEAT_CUE_SOUNDS, ability);
 }
 

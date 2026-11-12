@@ -9,8 +9,11 @@
 //                         Guardian, so the encounter's end beat follows
 //                         her), or one (render/smith_heart_fx/
 //                         council_death_core.ts)
+//   /dev heart heat death  the Guardian of the Heat (render/smith_heart_fx/
+//                         heat_death_core.ts)
 
 import { COUNCIL_DEV_CUES, councilRoleOf } from '../encounters/smith_heart/council_ids';
+import { HEAT_DEV_CUES } from '../encounters/smith_heart/heat_ids';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 
@@ -46,4 +49,12 @@ export function councilDeathReplayForDev(
   return n === 2
     ? 'The Hammer Council plays its deaths (presentation only: both still stand).'
     : `The ${which === 'singer' ? 'Seam Singer' : 'Guardian of the Hammer'} plays its death (presentation only: it still stands).`;
+}
+
+/** `/dev heart heat death` on the run's guardian. */
+export function heatDeathReplayForDev(ctx: SimContext, boss: Entity | null): string {
+  if (!boss || boss.dead)
+    return 'No living Guardian of the Heat to play a death on (/dev heart reset).';
+  cue(ctx, boss, HEAT_DEV_CUES.deathReplay);
+  return 'The Guardian of the Heat plays its death (presentation only: it still burns).';
 }

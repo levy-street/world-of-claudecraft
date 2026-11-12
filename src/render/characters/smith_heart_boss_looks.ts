@@ -51,6 +51,7 @@ import {
   HEAT_BODY_HOVER,
   HEAT_BODY_URL,
 } from '../smith_heart_fx/heat_body_core';
+import { HEAT_DEATH_GESTURES } from '../smith_heart_fx/heat_death_core';
 import {
   QUENCH_BODY_CLIP,
   QUENCH_BODY_GESTURES,
@@ -670,13 +671,18 @@ export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
       [HEAT_BODY_GESTURES.under]: { clips: HEAT_UNDER },
       [HEAT_BODY_GESTURES.rise]: { clips: HEAT_BASE, enter: 'Rise' },
       [HEAT_BODY_GESTURES.stand]: { clips: HEAT_BASE },
+      // A dev replay of its death (smith_heart_fx/heat_death_fx.ts): its Death
+      // clip on the living body; the replay's end stands it (the stance's
+      // re-send in heat_body.ts).
+      [HEAT_DEATH_GESTURES.fall]: { clips: { ...HEAT_BASE }, enter: 'Death' },
     },
     castClipSync: [HEAT_CASTS.fist],
     glowPulses: {
       // The fire flares through its cracks as it gathers and throws it.
       pulses: [{ gesture: HEAT_BODY_GESTURES.cast, rise: 0.4, hold: 0.2, fall: 0.6, peak: 1.7 }],
-      // Dead, the lava in it cools to dark stone.
-      deathFade: 4,
+      // Dead, the lava in it cools to dark stone through its death scene
+      // (smith_heart_fx/heat_death_fx.ts writes its skin: white-hot, red,
+      // black coal), never a fade of its own.
     },
     // A swing never cuts the plunge, the breach, the cast, the meteor throw or
     // Basalt Fist's slam.
