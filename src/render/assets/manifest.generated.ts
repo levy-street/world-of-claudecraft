@@ -2362,7 +2362,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/weapons/redskull_sword.glb": "/media/models/weapons/redskull_sword.cafe0ed5b9be.glb",
   "models/weapons/redskull_wand.glb": "/media/models/weapons/redskull_wand.51d02e5bf2be.glb",
   "models/weapons/rimecrusher.glb": "/media/models/weapons/rimecrusher.b93d489a4f29.glb",
-  "models/weapons/rimelight_staff.glb": "/media/models/weapons/rimelight_staff.5d3f43da7fb6.glb",
+  "models/weapons/rimelight_staff.glb": "/media/models/weapons/rimelight_staff.d11f742cfc0d.glb",
   "models/weapons/rude_awakening_sword.glb": "/media/models/weapons/rude_awakening_sword.1bd7c966a698.glb",
   "models/weapons/seamcaller_maul.glb": "/media/models/weapons/seamcaller_maul.caf480f204ab.glb",
   "models/weapons/shard_of_everwinter.glb": "/media/models/weapons/shard_of_everwinter.09e8c27da951.glb",

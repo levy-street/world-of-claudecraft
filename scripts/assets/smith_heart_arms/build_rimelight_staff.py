@@ -49,17 +49,17 @@ F.loft([F.ring(FOOT + 0.14, 0.033, 0.033, 10), F.ring(0.3, 0.036, 0.036, 10),
 for phase in (0.0, math.pi):
     for z0, z1, turns in ((0.24, 0.88, 3.0), (FOOT + 0.22, -0.16, 2.5)):
         pts = []
-        for k in range(60):
-            t = k / 59
+        for k in range(28):
+            t = k / 27
             a = phase + t * turns * 2 * math.pi
             pts.append((math.cos(a) * 0.039, math.sin(a) * 0.039, z0 + (z1 - z0) * t))
-        F.path_tube(pts, 0.0055, 'silver', sides=5)
+        F.path_tube(pts, 0.0055, 'silver', sides=4)
 # layered silver collars, the high one set with frost gems
 for z, big in ((-0.6, False), (0.2, False), (0.55, True)):
     r = 0.046 if big else 0.043
     F.ring_band(z, r, r, 0.04 if big else 0.03, 'silver', sides=12, flare=0.16)
-    F.torus((0, 0, z - 0.024), (0, 0, 1), r * 0.98, 0.006, 'silver_dark', seg=16, sides=5)
-    F.torus((0, 0, z + 0.024), (0, 0, 1), r * 0.98, 0.006, 'silver_dark', seg=16, sides=5)
+    F.torus((0, 0, z - 0.024), (0, 0, 1), r * 0.98, 0.006, 'silver_dark', seg=12, sides=4)
+    F.torus((0, 0, z + 0.024), (0, 0, 1), r * 0.98, 0.006, 'silver_dark', seg=12, sides=4)
     if big:
         for k in range(4):
             a = k * math.pi / 2 + math.pi / 4
@@ -68,7 +68,7 @@ for z, big in ((-0.6, False), (0.2, False), (0.55, True)):
 # the grip: wrapped leather between the collars, crossed with silver cord
 F.loft([F.ring(-0.12, 0.039, 0.039, 10), F.ring(0.16, 0.039, 0.039, 10)], 'leather', smooth=True)
 for k in range(7):
-    F.torus((0, 0, -0.1 + k * 0.04), (0.3, 0, 1), 0.0395, 0.0055, 'silver_dark', seg=12, sides=5)
+    F.torus((0, 0, -0.1 + k * 0.04), (0.3, 0, 1), 0.0395, 0.0055, 'silver_dark', seg=10, sides=4)
 # a clutch of ice breaking out under the high collar
 for k in range(3):
     a = k * 2 * math.pi / 3 + 0.5
@@ -93,8 +93,8 @@ for k in range(8):
     d = Vector((math.cos(a), math.sin(a), 0))
     F.gem(Vector((0, 0, 0.962)) + d * 0.074, 0.011, 0.007, 'ice', sides=6, axis=-d, crown=0.6)
 # icicles hanging beneath it
-for k in range(10):
-    a = 2 * math.pi * k / 10 + 0.15
+for k in range(8):
+    a = 2 * math.pi * k / 8 + 0.15
     d = Vector((math.cos(a), math.sin(a), 0))
     ln = 0.05 + 0.05 * ((k * 7) % 4) / 3
     F.crystal_banded(Vector((0, 0, 0.94)) + d * 0.06, Vector((0, 0, 0.94 - ln)) + d * 0.056, 0.011,
@@ -129,9 +129,10 @@ for k in range(6):
     d = Vector((math.cos(a), math.sin(a), 0))
     ln = 0.17 + 0.06 * (k % 3) / 2
     base = Vector((0, 0, 1.02)) + d * 0.05
-    F.crystal_banded(base, base + d * (ln * 0.75) + Vector((0, 0, ln)), 0.03, ICE, sides=6,
+    F.crystal_banded(base, base + d * (ln * 0.75) + Vector((0, 0, ln)), 0.03, ICE, sides=5,
                      seed=60 + k, bands=3)
-# the whole crown is modelled at hand scale, then sized up to a heroic head
+# the whole crown is modelled at hand scale, then sized up to a heroic head (the splinter's
+# point below sits at the VAR_STAFF 2.4 clamp: tests/smith_heart_raid_arms.test.ts)
 F.scale_since(CROWN, (0, 0, 0.9), 1.55, 1.12)
 # a splinter of ice hovering free above the point (the floating part): a double point
 F.crystal_banded((0, 0, TOP - 0.02), (0, 0, TOP + 0.015), 0.028, ICE_SMALL, sides=6, seed=70, bands=2)

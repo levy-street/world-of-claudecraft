@@ -2006,7 +2006,7 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
         kind: 'orbiters',
         at: { yF: 0.878 },
         count: 6,
-        radius: [0.36, 0.46],
+        radius: [0.48, 0.58],
         size: [0.17, 0.26],
         speed: [0.42, 0.62],
         spin: [0.25, 0.7],
