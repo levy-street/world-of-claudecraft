@@ -93,16 +93,14 @@ describe('the rack lends a Shardpike to anyone', () => {
     }
   });
 
-  it('refuses a second pike while one is in hand', () => {
-    const { sim, takePike } = atTheRack('warrior');
+  it('never lends a second pike: a second use hands the first back', () => {
+    const { sim, takePike, meta } = atTheRack('warrior');
     takePike();
+    expect(meta().equipment.mainhand).toBe(MUSTER_SHARDPIKE_ID);
     takePike();
+    expect(meta().equipment.mainhand).not.toBe(MUSTER_SHARDPIKE_ID);
     expect(sim.countItem(MUSTER_SHARDPIKE_ID)).toBe(0);
-    const errors = sim
-      .tick()
-      .filter((e) => e.type === 'error')
-      .map((e) => (e as { text: string }).text);
-    expect(errors.length + 1).toBeGreaterThan(0);
+    expect(inner(sim).musterArmy.lent.has(sim.playerId)).toBe(false);
   });
 
   it('is never the player’s: soulbound, unsellable, unlistable, undiscardable, unbankable', () => {

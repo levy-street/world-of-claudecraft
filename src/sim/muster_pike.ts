@@ -18,6 +18,8 @@
 //   - It is never saved: savedGearFor folds a lent pike back out of every character save,
 //     autosave and logout alike, with the displaced weapons back in their slots, so a relog
 //     (or a crash) always comes back holding what the player walked up with.
+//   - It can be handed back on purpose: using the rack again while carrying a lent pike (in
+//     hand or in the bags) returns it, the same reclaim the muster runs on its own.
 //   - Every other exit is closed on the item itself (content/zone2.ts muster_shardpike):
 //     soulbound (trade, mail, market, vendor, guild bank), lentGear (the personal bank),
 //     noDiscard, noVendorSell, noMarketList.
@@ -29,7 +31,12 @@ import { MUSTER_PIKE_LEASH } from './content/mirefen_muster';
 import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
 import { equipItem } from './items';
-import { isShardpikeItem, MUSTER_PIKE_MAX_LEVEL, MUSTER_SHARDPIKE_ID } from './lance_balance_core';
+import {
+  isShardpikeItem,
+  MUSTER_PIKE_MAX_LEVEL,
+  MUSTER_SHARDPIKE_ID,
+  SKERRITS_SHARDPIKE_ID,
+} from './lance_balance_core';
 import { savedMaterialSlot } from './material_slot_load';
 import { refreshModsForEquipmentChange } from './progression/talents';
 import type { PlayerMeta } from './sim';
@@ -60,8 +67,13 @@ export type LentPikes = Map<number, LentPikeRecord>;
 
 /** The reasons a loan ends. Only the log line cares. `drill`: a thrust put the Straw
  *  Foreman's lantern out (muster_effigy.ts), and the pike goes back so the player's own
- *  weapon can finish the lesson. */
-export type PikeReclaimReason = 'pullEnded' | 'leash' | 'death' | 'drill';
+ *  weapon can finish the lesson. `handedBack`: the player used the rack again with the
+ *  pike still on them. */
+export type PikeReclaimReason = 'pullEnded' | 'leash' | 'death' | 'drill' | 'handedBack';
+
+/** The rack's refusal to a player already carrying Skerrit's own pike in the bags (English;
+ *  re-localized by the client's EXACT matcher, sim_i18n.ts 'error.shardpikeCarried'). */
+export const SHARDPIKE_CARRIED_REFUSAL = 'You already carry a Shardpike. Wield it instead.';
 
 /** Is this item one the muster only ever lends? */
 export function isLentGear(itemId: string | null | undefined): boolean {
@@ -69,11 +81,13 @@ export function isLentGear(itemId: string | null | undefined): boolean {
 }
 
 /**
- * Take a pike from the rack. Any class, level 19 or lower (MUSTER_PIKE_MAX_LEVEL), no quest.
+ * Use the rack: take a pike, or hand a lent one back. Any class, level 19 or lower
+ * (MUSTER_PIKE_MAX_LEVEL), no quest. True when the rack did something (lent or took back).
  *
- * Refuses (with the player's own line) over the level cap, while dead, while a Shardpike is
- * already in hand
- * (either one: Skerrit's quest pike drives the same trial, so a second would be clutter),
+ * A player already carrying a lent pike (in hand or in the bags) hands it back: the rack
+ * never lends a second one, and a pike sitting in the bags is never stuck there. Otherwise
+ * refuses (with the player's own line) while dead, over the level cap, while Skerrit's own
+ * pike is in hand or in the bags (it drives the same trial, so a second would be clutter),
  * and when the bags cannot take the pike or the weapons it would displace.
  */
 export function takeMusterPike(ctx: SimContext, lent: LentPikes, pid: number): boolean {
@@ -84,6 +98,10 @@ export function takeMusterPike(ctx: SimContext, lent: LentPikes, pid: number): b
     ctx.error(pid, "You can't do that while dead.");
     return false;
   }
+  if (isLentGear(meta.equipment.mainhand) || ctx.countItem(MUSTER_SHARDPIKE_ID, pid) > 0) {
+    reclaimMusterPike(ctx, lent, pid, 'handedBack');
+    return true;
+  }
   if (p.level > MUSTER_PIKE_MAX_LEVEL) {
     ctx.error(pid, MUSTER_PIKE_LEVEL_REFUSAL);
     return false;
@@ -92,28 +110,27 @@ export function takeMusterPike(ctx: SimContext, lent: LentPikes, pid: number): b
     ctx.error(pid, 'You already hold a Shardpike.');
     return false;
   }
+  if (ctx.countItem(SKERRITS_SHARDPIKE_ID, pid) > 0) {
+    ctx.error(pid, SHARDPIKE_CARRIED_REFUSAL);
+    return false;
+  }
   const record: LentPikeRecord = {
     mainhand: meta.equipment.mainhand ?? null,
     offhand: meta.equipment.offhand ?? null,
   };
-  // A pike already in the bags (taken, then swapped out by hand) is re-equipped rather
-  // than joined by a second one.
-  const minted = ctx.countItem(MUSTER_SHARDPIKE_ID, pid) <= 0;
-  if (minted) {
-    if (!ctx.canAddItem(MUSTER_SHARDPIKE_ID, 1, pid)) {
-      ctx.error(pid, 'Your bags are full.');
-      return false;
-    }
-    // movement: a loan is not an acquisition, so no Reliquary obtain count moves (the
-    // item still counts as SEEN in the discovered-items ledger, like any item held); the
-    // take line below is the caller-owned log for it.
-    ctx.addItem(MUSTER_SHARDPIKE_ID, 1, pid, { silent: true, callerLogs: true, movement: true });
+  if (!ctx.canAddItem(MUSTER_SHARDPIKE_ID, 1, pid)) {
+    ctx.error(pid, 'Your bags are full.');
+    return false;
   }
+  // movement: a loan is not an acquisition, so no Reliquary obtain count moves (the
+  // item still counts as SEEN in the discovered-items ledger, like any item held); the
+  // take line below is the caller-owned log for it.
+  ctx.addItem(MUSTER_SHARDPIKE_ID, 1, pid, { silent: true, callerLogs: true, movement: true });
   equipItem(ctx, MUSTER_SHARDPIKE_ID, pid, 'mainhand');
   if (meta.equipment.mainhand !== MUSTER_SHARDPIKE_ID) {
     // The swap refused (it has already said why, e.g. no room for the benched off hand):
     // hand nothing out rather than leave a pike loose in the bags.
-    if (minted) ctx.removeItem(MUSTER_SHARDPIKE_ID, 1, pid);
+    ctx.removeItem(MUSTER_SHARDPIKE_ID, 1, pid);
     return false;
   }
   lent.set(pid, record);
@@ -169,6 +186,7 @@ export function reclaimMusterPike(
   // just happened, and one row localizes once), and its own for the drill yard, where the
   // hand-back IS the next instruction.
   if (reason === 'drill') ctx.notice(pid, 'The drillmaster takes the pike back to the rack.');
+  else if (reason === 'handedBack') ctx.notice(pid, 'You return the Shardpike to the muster rack.');
   else ctx.notice(pid, 'The muster reclaims its Shardpike.');
 }
 

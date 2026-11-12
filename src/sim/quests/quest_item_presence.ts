@@ -35,7 +35,8 @@
 // item either store could hold must widen this predicate first.
 //
 // A traded-away copy is genuinely gone and DOES re-grant: direct trade stays
-// an open transfer route by ruling (R10). The quest cadence bounds only the
+// an open transfer route by ruling (R10). (Skerrit's Shardpike is soulbound, so
+// it never leaves by trade; see quests/quest_tool_return.ts.) The quest cadence bounds only the
 // turn-in loop, so the trade route's real bound is the granted items' zero
 // value, not this predicate.
 //

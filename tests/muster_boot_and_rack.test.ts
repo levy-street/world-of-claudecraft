@@ -235,19 +235,23 @@ describe('the weapon rack lends a Shardpike through the real command path', () =
     expect(army(sim).lent.has(j.session.pid)).toBe(false);
   });
 
-  it('the interact key reaches the rack too, and a second take is refused politely', () => {
+  it('the interact key reaches the rack too, and a second use hands the pike back', () => {
     const server = new GameServer();
     const sim: Sim = server.sim;
     sim.tick();
     const rack = expectFullMuster(sim);
     const j = join(server, 8, 'warrior');
     const meta = metaOf(sim, j.session.pid);
+    const before = meta.equipment.mainhand;
     stand(server, j.e, MUSTER_RACK.x + 1, MUSTER_RACK.z + 2.5);
     send(server, j, { cmd: 'interact' });
     expect(meta.equipment.mainhand).toBe(MUSTER_SHARDPIKE_ID);
     send(server, j, { cmd: 'pickup', id: rack.id, rid: 12 });
-    expect(j.frames.find((f) => f.t === 'commandOutcome' && f.rid === 12)?.ok).toBe(false);
+    // The rack did something (took the pike back), so the command resolves true.
+    expect(j.frames.find((f) => f.t === 'commandOutcome' && f.rid === 12)?.ok).toBe(true);
+    expect(meta.equipment.mainhand).toBe(before);
     expect(sim.countItem(MUSTER_SHARDPIKE_ID, j.session.pid)).toBe(0);
+    expect(army(sim).lent.has(j.session.pid)).toBe(false);
   });
 
   it('refuses from out of reach, and nothing moves', () => {

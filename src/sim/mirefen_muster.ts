@@ -46,17 +46,22 @@ import {
   MUSTER_RACK_NAME,
   MUSTER_RACK_TEMPLATE_ID,
 } from './content/mirefen_muster';
-import { MUSTER_PIKE_DRAWN_EVENT } from './content/mirefen_muster_quests';
-import { MOBS } from './data';
+import {
+  MUSTER_PIKE_DRAWN_EVENT,
+  MUSTER_PIKE_DRILL_QUEST_ID,
+} from './content/mirefen_muster_quests';
+import { MOBS, QUESTS } from './data';
 import { createGroundObject, createMob, createNpc } from './entity';
+import { equipItem } from './items';
 import { isShardpikeItem } from './lance_balance_core';
 import { eyeWardBlinded } from './mob/eye_ward';
 import { tickMusterDrill } from './muster_drill';
 import { raiseMusterEffigy, tickMusterEffigy } from './muster_effigy';
-import { type LentPikes, takeMusterPike, tickLentPikes } from './muster_pike';
+import { type LentPikes, MUSTER_SHARDPIKE_ID, takeMusterPike, tickLentPikes } from './muster_pike';
 import { onQuestEventForQuests } from './quests/quest_credit';
+import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import { angleTo, dist2d, type Entity, normAngle } from './types';
+import { angleTo, dist2d, type Entity, normAngle, questObjectiveRequired } from './types';
 
 export { MUSTER_BOSS_TEMPLATE_ID };
 /** Seconds after he FALLS before the fallen stand back up (time for the raid to see what
@@ -201,9 +206,26 @@ export function tickMusterArmy(
   tickMusterDrill(ctx, army);
 }
 
-/** The rack was used: lend a pike (interaction.ts routes both the interact key and the
- *  rack click here). True when a pike went into the player's hands. */
+/** The rack was used: lend a pike, or take a lent one back (interaction.ts routes both the
+ *  interact key and the rack click here). True when the rack did either. */
 export function useMusterRack(ctx: SimContext, army: MusterArmyState, pid: number): boolean {
+  // A player already wielding a Shardpike whose drill still wants the draw step gets the
+  // credit and KEEPS the pike: handing it back here would strand the drill's next step.
+  // A lent pike swapped into the bags goes back into the hand for that step instead.
+  const holder = ctx.players.get(pid);
+  if (holder && drillAwaitsDraw(holder)) {
+    if (
+      !isShardpikeItem(holder.equipment.mainhand) &&
+      army.lent.has(pid) &&
+      ctx.countItem(MUSTER_SHARDPIKE_ID, pid) > 0
+    ) {
+      equipItem(ctx, MUSTER_SHARDPIKE_ID, pid, 'mainhand');
+    }
+    if (isShardpikeItem(holder.equipment.mainhand)) {
+      onQuestEventForQuests(ctx, holder, MUSTER_PIKE_DRAWN_EVENT);
+      return true;
+    }
+  }
   const took = takeMusterPike(ctx, army.lent, pid);
   // The pike drill's first step (content/mirefen_muster_quests.ts): a player who leaves the
   // rack with a Shardpike in hand has done it, including one already carrying Skerrit's.
@@ -212,6 +234,19 @@ export function useMusterRack(ctx: SimContext, army: MusterArmyState, pid: numbe
     onQuestEventForQuests(ctx, meta, MUSTER_PIKE_DRAWN_EVENT);
   }
   return took;
+}
+
+/** Does this player's pike drill still want its "take a pike" step? */
+function drillAwaitsDraw(meta: PlayerMeta): boolean {
+  const qp = meta.questLog.get(MUSTER_PIKE_DRILL_QUEST_ID);
+  if (!qp || qp.state !== 'active') return false;
+  const quest = QUESTS[MUSTER_PIKE_DRILL_QUEST_ID];
+  return quest.objectives.some(
+    (o, i) =>
+      o.type === 'event' &&
+      o.eventId === MUSTER_PIKE_DRAWN_EVENT &&
+      qp.counts[i] < questObjectiveRequired(quest, qp, i),
+  );
 }
 
 /** Is this entity the muster's weapon rack? */
