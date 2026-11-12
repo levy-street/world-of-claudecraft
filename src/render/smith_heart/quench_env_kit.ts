@@ -16,6 +16,7 @@ import { loadGltf, releaseGltf } from '../assets/loader';
 import type { DetailPair } from '../authored_field/field_textures';
 import { GFX } from '../gfx';
 import { markSharedMaterial } from '../shared_resource';
+import { envAreaClip } from './env_area_clip';
 import {
   bakeEnvNode,
   type EnvBaked,
@@ -140,9 +141,17 @@ export function quenchEnvProgramWarmers(): THREE.Group {
     for (const painting of piece.parts.keys()) if (painting !== 'glow') drawn.add(painting);
   for (const mesh of envWarmCarriers(
     drawn,
-    quenchEnvMaterial,
+    (painting: string) => quenchEnvMaterial(painting),
     QUENCH_ENV_SHADOW,
     'smithHeartQuenchEnvWarmer',
+  ))
+    group.add(mesh);
+  // The rock paintings' Heart variant (env_area_clip.ts), its own program.
+  for (const mesh of envWarmCarriers(
+    new Set([...drawn].filter((p) => QUENCH_ENV_ROCK_PAINTINGS.has(p))),
+    (painting: string) => quenchEnvMaterial(painting, 'heart'),
+    QUENCH_ENV_SHADOW,
+    'smithHeartQuenchEnvWarmer:heart',
   ))
     group.add(mesh);
   return group;
@@ -238,9 +247,12 @@ const ROCK_STROKES: Omit<EnvStrokes, 'map'> = { tileA: 17, tileB: 41, strength: 
 
 const materials = new Map<string, THREE.Material>();
 
-/** The shared material of one painting. */
-export function quenchEnvMaterial(painting: string): THREE.Material {
-  const have = materials.get(painting);
+/** The shared material of one painting; `area` 'heart': a rock painting's variant dressing
+ *  the Heart's crown, drawn only from the Heart (env_area_clip.ts). */
+export function quenchEnvMaterial(painting: string, area?: 'heart'): THREE.Material {
+  const heart = area === 'heart' && QUENCH_ENV_ROCK_PAINTINGS.has(painting);
+  const key = heart ? `${painting}|heart` : painting;
+  const have = materials.get(key);
   if (have) return have;
   const opts = { map: paintings.get(painting) ?? null, name: `SmithHeartQuenchEnv:${painting}` };
   const m = GFX.standardMaterials
@@ -257,9 +269,12 @@ export function quenchEnvMaterial(painting: string): THREE.Material {
     crystalHue: 'cyan',
     ice: glow.ice,
     snow: glow.snow,
+    // Seen from the Heat, the rock round its hall opens; the Heart's dressing is drawn
+    // only from the Heart (env_area_clip.ts).
+    ...(rock ? { clip: envAreaClip(heart ? 'heart' : 'heatBand') } : {}),
   });
   markSharedMaterial(m);
-  materials.set(painting, m);
+  materials.set(key, m);
   return m;
 }
 
@@ -368,10 +383,11 @@ export function instanceQuenchEnv(
   list: readonly HeartKitPlacement[],
   lowGfx: boolean,
   name: string,
+  area?: 'heart',
 ): THREE.Group {
   return instanceEnvPieces(
     baked,
-    quenchEnvMaterial,
+    (painting: string) => quenchEnvMaterial(painting, area),
     list,
     lowGfx,
     name,

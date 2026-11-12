@@ -42,6 +42,7 @@ Sources of truth, in order:
 | The Guardian of the Hammer's own body, the model first built for the Slabwright (Tripo P2, a painted 1024 ETC1S atlas, a stone rig and 16 clips built in Blender, the tracks that only hold the rest pose dropped at build), worn by the Council's main boss since the two-boss rework at the borrowed golem's height: Hammerfall and the Rush's wind-up on its swings, Hammer's Weight and Mountain's Wrath striking on their bars' ends | `public/models/creatures/heart_slabwright.glb` from `scripts/assets/specs/heart_slabwright.json`, `smith_heart_hammer_guardian` in `src/render/characters/manifest.ts`, pinned by `tests/smith_heart_hammer_guardian_body.test.ts` |
 | The Seam Singer's own body, the Council's second (Tripo P2 from the concept sheet, a painted 1024 ETC1S atlas, a stone rig and 15 clips built in Blender, Seam Bolt leaving its hand at the end of the bar and the song's note and the Wrath's burst at the end of theirs, the tracks that only hold the rest pose dropped at build), its provisional pieces no longer drawn while their dust and rings still play | `public/models/creatures/heart_seam_singer.glb` from `scripts/assets/specs/heart_seam_singer.json`, `smith_heart_seam_singer` in `src/render/characters/manifest.ts`, `COUNCIL_MODELLED` in `src/render/smith_heart_fx/council_bodies_core.ts`, pinned by `tests/smith_heart_seam_singer_body.test.ts` |
 | The Quench's trash, both its own bodies of bright glacier ice that pop against the Quench's night (ChatGPT turnaround sheets, Tripo P2, the atlases repainted in ChatGPT, a glow map each: the crack lines, eyes, heart crystal and orbs hot, the rest of the ice softly lit, going out as they die). Both rigs are rigid ice plates on one welded skin: every plate on one bone, only the seam vertices shared by the bones either side, so no seam opens into a gap and no plate stretches (pinned on the shipped GLBs). The Quench Vein Warder is the Hammer Warder's body plan and body language on its own joints, with an ice creak in its idle, a death that drops it on its face, Rime Sweep flaring its cracks, and a skating chase (looks only: the template keeps its 7.2 yd/s, the gliding foot slides by design). The Quench Vein Caller floats on a robe of ice shards with a frost orb over each palm (modelled in Blender); Rime Bolt draws both orbs into one point of cold between its hands and flings them at the end of the 2 s bar, locked to it | `public/models/creatures/heart_quench_warder.glb` and `heart_quench_caller.glb` from `scripts/assets/specs/heart_quench_warder.json` and `heart_quench_caller.json`, `smith_heart_quench_warder` and `smith_heart_quench_caller` in `src/render/characters/manifest.ts`, pinned by `tests/smith_heart_quench_warder_body.test.ts` and `tests/smith_heart_quench_caller_body.test.ts` |
+| The rest of the raid's trash and adds, each its own body in its vein's paint (the Quench's pipeline: ChatGPT turnaround sheets, Tripo P2 kept low at the Quench bodies' face limits, the atlases repainted in ChatGPT, a glow map each going out as it dies, rigid plates on one welded skin): the Ring Forge Warder in grey-mauve masonry with its four element runes; the Breath Vein Warder and Caller, the Gale Sentinel and the Gale Mender in storm slate and cyan lightning; the Heat Vein Warder and Caller, the Wellspawn, the Wellkeeper and the Seedflame in sooted basalt over molten seams with white-gold cores; the four Splinters of the Masterless Strength, one shard-brute body plan in each vein's stone and crystal. The warders and the Sentinel swing their template's arc cleave at 1.0 s; the casters' bolts, the Mender's Mending Gale and the Splinters' Shearing Blow, Gale Pounce and Rime Toll are cast clips locked to their bars, each key pose on the bar's end; the Wellkeeper's Kindling Mark and the Heat Splinter's coal throw from their bellies. Every body that arrives mid-fight climbs out of the floor on its fight's cue (the Splinters out of their quarters over the rise, the Wellspawn and Wellkeepers over the Hearth's rim, the Seedflame out of its seed, the Sentinel and Mender onto their isle), through a presentation module that moves nothing in the fight. Looks only: every template keeps its scale, reach, speed and abilities | `public/models/creatures/heart_<name>.glb` from `scripts/assets/specs/heart_<name>.json` (sources `docs/design/raid/kit/raid_mobs_src/`), `src/render/characters/smith_heart_trash_looks.ts`, `src/render/smith_heart_fx/trash_gestures_core.ts` and `trash_gestures.ts`, pinned by `tests/smith_heart_trash_bodies.test.ts` and `tests/smith_heart_trash_gestures.test.ts` |
 | The Hammer vein's Blender kit (sources, build, plan, painter) | `docs/design/raid/kit/build_smith_heart_hammer_kit.py` (the sculpted quarry rock: `hammer_cliff.py`), `scripts/assets/smith_heart_hammer_kit/build.mjs`, `src/render/smith_heart/hammer_kit_plan_core.ts`, `src/render/smith_heart/heart_kit.ts` |
 | The Hammer vein's painted rebuild (the owner's style guide: the mountain, the risers, the walk, the arena's ruins, the floors and the sky, section 5.22) | `docs/design/raid/kit/build_smith_heart_hammer_env_kit.py` (sources `docs/design/raid/kit/hammer_env_src/`; the Quarry's statues `hammer_colossi_src/`), `scripts/assets/smith_heart_hammer_env_kit/`, `scripts/assets/smith_heart_hammer_colossi/`, `src/render/smith_heart/hammer_env_plan_core.ts`, `hammer_env_kit.ts`, `hammer_env_rock_paint.ts`, pinned by `tests/smith_heart_hammer_env.test.ts` and `tests/smith_heart_hammer_colossi.test.ts` |
 | The Quench vein's painted rebuild (the ice realm from the owner's arena concept: the glacier, the floors, the props, the fight's four swords, the aurora night, section 5.24) | `docs/design/raid/kit/build_smith_heart_quench_env_kit.py` (sources `docs/design/raid/kit/quench_env_src/`), `scripts/assets/smith_heart_quench_env_kit/`, `src/render/smith_heart/quench_env_plan_core.ts`, `quench_env_kit.ts`, `quench_env_rock_paint.ts`, `smith_heart_fx/quench_blades_fx.ts`, pinned by `tests/smith_heart_quench_env.test.ts` and `tests/smith_heart_quench_sword.test.ts` |
@@ -1526,6 +1527,108 @@ boot. A glacier piece is under 3,200 triangles near and 1,600 far; every swapped
 than the one it replaces (a bowl 2,718 from 4,694, a heap of ice 2,189 from 6,749, the sword
 4,256 from 5,204). The low tier sheds nothing new: no swapped piece is cosmetic past what it
 replaced.
+
+### 5.25 The Heat vein's painted rebuild
+
+The owner's ask (2026-11-10): the 4th section, the Heat, rebuilt the way the ice was, fire and
+molten "a mix with molten but don't overdo it", the mobs and the fight untouched. First two
+arena concepts in ChatGPT in the earth room's concept's style
+(`docs/design/raid/kit/heat_env_src/concept/`): a great hall of sooted columnar basalt over a
+chasm, the Hearth's crystal-throated mouth, the dolmen altar-stone, the first flame's white-gold
+crystal, and molten only in the wellspring's pool, the channel, a few seams and one far fall.
+The build follows the smoky dusk (`fv_arena_dusk`). This amends section 5.16's "white-gold,
+never volcanic red" for the environment: the molten accents are red-orange, under the red-orange
+guardian, and the crystal keeps the white-gold. Nothing here touches `src/sim/`.
+
+**Sources.** ChatGPT painted the floor of column heads, the basalt cliff, the stacked stumps and
+the smoky sky, and a FRONT, LEFT and BACK sheet for each of eight models; Tripo P2 built the
+eight (880 credits); Blender stands them on the old kit's frames and builds the walls. The
+atlases came back dark with the sheets' orange rim light baked onto every rock edge, which read
+as fire everywhere: the grade (`scripts/assets/smith_heart_heat_env_kit/heat_grade.mjs`) puts
+rock on a sooted basalt ramp and keeps a warm texel's fire only inside a broad warm region (a
+crystal's faces, a fall's ribbon) or as the molten's own saturated core, so a rim's thin line
+goes to the basalt. Prompts and Tripo task ids: `docs/design/raid/kit/heat_env_src/README.md`.
+
+| Piece | Now | Stands in for |
+|---|---|---|
+| The mountain | Tall basalt cliff stacks and broad bluffs of fused columns, soot down their faces, ash on the ledges, a thin molten seam in a few deep joints, on the old plan's own spots and contours (the Hammer's fit), the cliff painting's strokes over each atlas; only a band whose faced surface is a Heat walk and that stands where the basalt holds (the surface's id, never the area: the Quench's blocking finding), so the bands facing the Ring keep the rock kit | `Kit_Rock*` bands facing the Heat's walks (`heatEnvOwnsRock`, `fitHeatEnvRock`) |
+| The molten fall | The concept's far fall: one stream of molten rock down a basalt cliff into a pool at its foot, swapped in place for the band at the chasm's north head (seen from the bridge, out of the guardian's backdrop, far from the pour's own fall) | one `Kit_Rock*` band (`heatEnvFallHost`) |
+| The ring | Tall stacks round the hall on the mountain past its walls, facing it, their whole footprint off every walk, the way in from the casting floor open; in the sightline plan | new (`planHeatEnvRing`, `heatEnvSolids`) |
+| The lips | Kept as the rock kit's sculpts, wearing the cliff painting's hue and a calm share of its strokes over their own soot, ash on their ledges | painted through the rock's material (`heartRockHeatGlsl`) |
+| What the kit leaves bare | The heightfield and the field's cliff faces wear the same paint where the basalt soot held, by the painting's own dark value | `heat_env_rock_paint.ts` (`heatEnvWeight`, `HEAT_ENV_FIELD_BASE`) |
+| The floors | The hall, the casting floor and the Forge: the heads of basalt columns, six-sided, about two strides across, ash in the joints, with relief, read twice so the repeat never lines up | the `hearth` top family (`heatEnvFloorMaterial`) |
+| The Hearth's mouth | The fan of basalt columns round its pointed arch, its throat crowded with the first flame's crystal, on a basalt foot down into the mountain as the old mouth was | `Kit_HearthMouth` |
+| The altar-stone, the boulders, the crystal | The dolmen (three pairs of columns, a capstone cracked by white-gold fire, crystal out of one end); boulders split by a molten seam; clusters of white-gold prisms on column stumps; each inside the old piece's box | `Kit_AltarStone`, `Kit_EmberBoulder`, `Kit_FireCrystalA`, `B` |
+| The hall's column bundles | Bundles of fused columns with stepped heads, a crystal on one side, their shafts down into the chasm, inside the old pillars' reach | `Kit_HearthPillar` |
+| The walls | Stacked basalt stumps a knee high on two lifts of the cliff, on the old modules' lip frame | `Kit_HeatWallA`, `B` |
+| Gone | The ash drifts: the painted floor carries its own ash | `Kit_AshDriftA`, `B` |
+| The sky | The painted smoky dusk wrapped on the dome, drifting with the smoke, the hazy white-gold sun still drawn where the warm key comes from | `heart_sky.ts` `heatPaintedSky` |
+
+**Kept.** The fight: the wellspring the guardian stands sunk in and its pool and lip
+(`smith_heart_fx/heat_well_fx.ts`), every footprint and effect; the pour's channel, spill and
+wellspring (`heat_pour.ts`); the anvil bridge's arch under its deck; the seams of fire on the
+floor (the molten accents); the Heat's air (`heat_air.ts`). If the kit has not landed, the
+old Heat draws as it did until the interior is next built.
+
+**The contrast.** The guardian is red-orange molten; the hall is dark sooted basalt, its fire
+held to the crystal, the altar's crack, the seams and one far fall (`env_kit_look.ts`'s gold
+glow: the backdrop's at less than half the hall's own lit pieces'), so the guardian stands out
+against its own hall.
+
+**The dressed pass (2026-11-10).** The owner's paint-over concept
+(`heat_env_src/concept/fv_arena_dressed.webp`: the hall's screenshot repainted richer) set the
+target, "as close as possible, as good as the ice". Procedural molten veins in the rock's
+shader were tried and rejected; six more Tripo models of the concept's own cliffs replaced
+them (seamed basalt stacks and bluffs, a thin fall, the great fall cliff, the tiered cliff
+wall, a molten shore; their molten graded a deep orange so the guardian pops). Round the hall:
+- **The open region** (`HEAT_ENV_OPEN`, `env_area_clip.ts` `heatBand`): from inside the Heat the
+  old mountain, the rock kit and every vein's painted rock between 54 and 150 yd of the forge
+  (further on the far bearings) dissolve on the rock's camera dither, so the new pieces stand
+  free; from anywhere else nothing changes. The tiers and the concept's pieces are drawn only
+  from the Heat (`heatRing`).
+- **The tiers and the concept's pieces** (`HEAT_ENV_TIERS`, `HEAT_ENV_CONCEPT_PIECES`): pillars,
+  a molten shore, plain cliffs behind the guardian, a crown and a far ring at natural scale,
+  each stack jittered by hand (never into the way in); two great falls and four cliff walls
+  where the concept paints them.
+- **The set** (`heat_env_set_core.ts`, `heat_env_set.ts`): a crusted magma lake round the hall
+  under every tier, the great falls' flowing ribbons laid on their painted rivers (measured off
+  the models, `HEAT_FALL_RIBBON`) and flowing down, a glow where each lands and round the
+  cliffs' feet, smoke climbing between the tiers; all drawn only from the Heat.
+- **The light**: the key low in the south-east, raking the walls a raid facing the guardian
+  looks at (from the west it backlit every one of them black), a dim ember bounce from below, a
+  mauve-grey haze (`SMITH_HEART_HEAT_FOG`), the painted sky graded to the concept's smoky mauve,
+  the shade floor lifted: the palette measured against the concept, the molten the only bright
+  warm thing in it.
+
+**Budget.** The kit is 8.4 MB (fourteen Tripo atlases), fetched at the raid's door with the old
+Heat kit, never at boot.
+
+### 5.26 The Ring's and the Heart's painted pass, and the four-way skies
+
+The owner's ask (2026-11-11): "do the rest of the environments", the Ring and the Heart, and
+"with the last environment it's all the elements combined, so we can reuse": no new model, the
+four veins' painted kits reused. Concepts and sky paintings, prompts:
+`docs/design/raid/kit/heart_env_src/`. Nothing here touches `src/sim/`.
+
+| Piece | Now | Where |
+|---|---|---|
+| The Ring's stone | The Ring kit's paving, curbs, stairs, parapets, dais and standing stones in the concept's pale grey-mauve, graded from the kit's own vertex paint so every slab's value, the joints and the wear survive | the kit's `ringStone` material (`ring_stone_look.ts`), `ring_kit.ts` |
+| The pit's mist | Three sheets of mist drifting round the pit between the dais and the Ring's wall, each its own way, every sheet under the walks (no eye's line to the seal crosses one); the low tier two | `ring_set_core.ts` `RING_MIST`, `ring_set.ts` |
+| The runes | Each vein's rune carved on the stones at its mouth (the Breath's storm bolt north, the Quench's star of ice east, the Heat's flame west, the Hammer's sun on the jambs at the Grand Stair's head), glowing low while the vein sleeps and blazing once it is lit (the seal's own memory: the runes say what the seal and the rivers already say); every tier | `ring_set_core.ts` `planRingRunes`, `ringRuneLevel` |
+| The Ring's light | The key from the north-east, low (the concept's: from the North Stair's head the Grand Stair's quarry cliffs stand lit gold), a dusk-violet shade | `SMITH_HEART_RING_LIGHT` |
+| The Heart's crown | Behind each landmark, out of the chasm, its element's great cliffs from its vein's own kit in two tiers (the Breath's storm spires north, the Quench's glacier east, the Hammer's quarry cliffs south, the Heat's seamed basalt and its great fall west), clear of every walk, no bluff grown past its cap; drawn only from the Heart, the mountain's heightfield opened round them from inside it | `heart_env_dress_core.ts`, `heart_env_dress.ts`, `env_area_clip.ts` `heart` |
+| The Heart's sky | The four-way night: one painting of the whole sky seen straight up, its middle the zenith, a quarter over each element's quarter, all four swirling together overhead, lightning walking the storm's quarter | `heart_four_sky.ts`, `heart_sky.ts` `heartFourSky` |
+| The main map's sky | Wherever no vein's own sky holds (the Ring, at the middle of the four), the same four skies as a horizon panorama, each vein's quarter over its way out, its foot pressed down behind the Ring's cliffs, all four blended into one violet overhead | `heart_sky.ts` `ringFourSky` |
+
+**Kept.** The landmarks and their eruption (which quarter is awake is read off them), the
+seal, the rivers, the portal and every walk; a vein's own sky still takes over inside it. If a
+kit or a sky has not landed, that part draws as it did.
+
+**The colour.** The owner's "less colourful": both skies at a third to a half of their
+paintings' saturation (the game's grade gives some back), the Ring's darker than the Heart's.
+
+**Budget.** The two skies are 1.1 MB and 2.3 MB of KTX2, fetched with the kits at the raid's
+door, never at boot.
 
 ## 6. Set pieces (phase 2 specs)
 

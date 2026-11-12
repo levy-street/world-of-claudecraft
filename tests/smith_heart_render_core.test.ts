@@ -93,6 +93,7 @@ import {
   heartRockSolids,
   heartSightlineHits,
   heartWallSolids,
+  heatEnvSolids,
   quenchEnvSolids,
 } from '../src/render/smith_heart/heart_sightline_core';
 import {
@@ -731,6 +732,8 @@ describe('heart_sightline_core: the raid sees the seal and the portal', () => {
     ...breathEnvSolids(),
     // The Quench vein's painted spires on the crest needles and its great frozen fall.
     ...quenchEnvSolids(),
+    // The Heat vein's painted ring of basalt stacks round the hall.
+    ...heatEnvSolids(),
   ];
   const seal = { x: HEART_SEAL.x, y: SEAL_DAIS.h + 0.5, z: HEART_SEAL.z };
   const portalEye = { x: HEART_SEAL.x, y: SEAL_DAIS.h + 9, z: HEART_SEAL.z };

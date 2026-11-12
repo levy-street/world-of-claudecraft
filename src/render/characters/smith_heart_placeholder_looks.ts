@@ -15,30 +15,25 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   // ---- trash ---------------------------------------------------------------
   // Its own model now, the first row phase 2 replaced (manifest.ts).
   heart_hammer_warder: 'smith_heart_hammer_warder',
-  // Final: a bronze-and-granite forge construct, the Ring's sentinel.
-  heart_ring_warder: 'skel_golem',
-  // Final: a wind-scoured stone warder trailing storm-blue gusts.
-  heart_breath_warder: 'mob_elemental',
-  // Final: a hovering storm caller of slate and lightning. (The hooded stone
-  // cantor, tinted storm-blue: the Buried Hoard's storm caller is a Rift-lane
-  // body, and borrowing it pulled it into the iOS entry stream.)
-  heart_breath_caller: 'mob_reedbound_acolyte',
+  // Its own model now: a golem of pale granite blocks bound in bronze (smith_heart_trash_looks.ts).
+  heart_ring_warder: 'smith_heart_ring_warder',
+  // Its own model now: storm slate split by lightning (smith_heart_trash_looks.ts).
+  heart_breath_warder: 'smith_heart_breath_warder',
+  // Its own model now: a hovering hooded storm caller (smith_heart_trash_looks.ts).
+  heart_breath_caller: 'smith_heart_breath_caller',
   // The Islands of the Wind's adds (encounters/smith_heart/breath_isles.ts).
-  // Final: a storm-blue stone warden of a floating isle.
-  heart_gale_sentinel: 'mob_elemental',
-  // Final: a hovering wind caller who mends the guardian's shield.
-  heart_gale_mender: 'mob_reedbound_acolyte',
+  // Its own model now: a slate isle warden with a shield of island rock (smith_heart_trash_looks.ts).
+  heart_gale_sentinel: 'smith_heart_gale_sentinel',
+  // Its own model now: a floating wind caller of pale storm feathers (smith_heart_trash_looks.ts).
+  heart_gale_mender: 'smith_heart_gale_mender',
   // Its own model now: a golem of bright glacier ice over slate joints (manifest.ts).
   heart_quench_warder: 'smith_heart_quench_warder',
   // Its own model now: a floating hooded frost caster with an orb over each palm (manifest.ts).
   heart_quench_caller: 'smith_heart_quench_caller',
-  // Final: a smith-fire warder of dark iron with a white-gold core. (The
-  // stone goleling, tinted gold by its entity colour: the lava-cracked
-  // brute read volcanic, which the Heat must never do.)
-  heart_heat_warder: 'mob_elemental',
-  // Final: a small white-gold ember spirit thrown off the Smith's forge. (A
-  // drifting pale light; the fel-green emberkin read wrong.)
-  heart_heat_caller: 'mob_glimmerwisp',
+  // Its own model now: sooted basalt over molten seams, a white-gold crown (smith_heart_trash_looks.ts).
+  heart_heat_warder: 'smith_heart_heat_warder',
+  // Its own model now: a hovering caster of cracked basalt and fire (smith_heart_trash_looks.ts).
+  heart_heat_caller: 'smith_heart_heat_caller',
   // ---- the four guardians -----------------------------------------------------
   // The Guardian of the Hammer, the Hammer Council's main boss: its own model now, the one first
   // built for the Slabwright (smith_heart_boss_looks.ts smith_heart_hammer_guardian).
@@ -60,14 +55,14 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   // giant of basalt and lava in the first wellspring; its fire is drawn by
   // smith_heart_fx/heat_body.ts.
   heart_heat_guardian: 'smith_heart_heat_guardian',
-  // Its adds (encounters/smith_heart/heat*.ts). Final: their own models.
-  // The Wellspawn: a child of the first flame, the stone goleling tinted
-  // white-gold by its entity colour (its fire is heat_cinder_fx.ts's glow).
-  heart_heat_wellspawn: 'mob_elemental',
-  // The Wellkeeper: the same, bigger (scale 2.2), its fire the same glow.
-  heart_heat_wellkeeper: 'mob_elemental',
-  // The Seedflame: a small pale light hatched from a seed.
-  heart_heat_seedflame: 'mob_glimmerwisp',
+  // Its adds (encounters/smith_heart/heat*.ts), their own models now (smith_heart_trash_looks.ts):
+  // the Wellspawn, a squat basalt imp climbing over the Hearth's rim (its fire is also
+  // heat_cinder_fx.ts's glow);
+  heart_heat_wellspawn: 'smith_heart_wellspawn',
+  // the Wellkeeper, a hulking basalt brute with a burning belly, clawing up by the wellspring;
+  heart_heat_wellkeeper: 'smith_heart_wellkeeper',
+  // the Seedflame, a white-gold flame cracking out of its basalt seed.
+  heart_heat_seedflame: 'smith_heart_seedflame',
   // The Rolling Cinder: a bodyless target under the ball of the first flame
   // smith_heart_fx/heat_cinder_fx.ts draws.
   heart_heat_rolling_cinder: 'smith_heart_rolling_cinder',
@@ -78,12 +73,11 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   // still fly in for the arrival (smith_heart_fx/final_fx.ts) and lock into
   // it under the shockwave.
   heart_masterless_strength: 'smith_heart_masterless_strength',
-  // Its Splinters (part 2, encounters/smith_heart/final_adds.ts): the
-  // nearest existing bodies of each element, tinted by their entity colour
-  // and drawn two and a half times a player's size; their element's light is
-  // smith_heart_fx/final_phase_fx.ts's. Final: their own models.
-  heart_final_splinter_heat: 'mob_elemental',
-  heart_final_splinter_quench: 'mob_water_elemental',
-  heart_final_splinter_breath: 'mob_reedbound_acolyte',
-  heart_final_splinter_hammer: 'skel_golem',
+  // Its Splinters (part 2, encounters/smith_heart/final_adds.ts): their own models now
+  // (smith_heart_trash_looks.ts), one hunched shard-brute in each vein's stone and crystal,
+  // climbing out of its quarter; their element's light is still smith_heart_fx/final_phase_fx.ts's.
+  heart_final_splinter_heat: 'smith_heart_splinter_heat',
+  heart_final_splinter_quench: 'smith_heart_splinter_quench',
+  heart_final_splinter_breath: 'smith_heart_splinter_breath',
+  heart_final_splinter_hammer: 'smith_heart_splinter_hammer',
 };

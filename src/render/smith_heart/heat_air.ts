@@ -58,7 +58,7 @@ void main() {
 
 /** A plume of smoke: puffs rising off its foot, swelling, leaning east with
  *  the draught, thinning away high up (normal blend: smoke darkens). */
-const SMOKE_VERT = /* glsl */ `
+export const SMOKE_VERT = /* glsl */ `
 uniform float uTime;
 attribute vec2 aCorner;
 attribute vec4 aParams; // seed, rise, speed, size
@@ -83,7 +83,7 @@ void main() {
   gl_Position = projectionMatrix * mv;
 }
 `;
-const SMOKE_FRAG = /* glsl */ `
+export const SMOKE_FRAG = /* glsl */ `
 uniform vec3 uColor;
 uniform vec3 uLit;
 uniform float uAlpha;

@@ -1,10 +1,12 @@
 // The painted kits' shared material look (the Hammer vein's, hammer_env_kit.ts, the
-// Breath's, breath_env_kit.ts, and the Quench's, quench_env_kit.ts): a painting carries its
+// Breath's, breath_env_kit.ts, the Quench's, quench_env_kit.ts, and the Heat's,
+// heat_env_kit.ts): a painting carries its
 // own light, so a turned face keeps a floor of the art's own colour no shadow takes away; a
 // rock the camera can stand in is cut away round it (heart_rock_cutaway.ts's rule, the same
 // dither); a Tripo atlas spread over a sixty yard stack takes the kit's cliff painting
 // faintly over it in two turned scales, so it stays painted up close; the painted crystal
-// glows (the Breath's sky-blue, the Quench's cyan); and the Quench's ice shines from within
+// glows (the Breath's sky-blue, the Quench's cyan, the Heat's gold over its crystal and its
+// molten); and the Quench's ice shines from within
 // and its snow stays bright. Each kit hands its own numbers; the program key carries every
 // number baked in.
 
@@ -32,9 +34,11 @@ export interface EnvLook {
   /** The painted crystal lit from within: how far a saturated sky-blue past the rest
    *  of its texel glows (0: no glow layer at all). */
   crystal?: number;
-  /** Which painted crystal glows: the Breath's sky-blue (the default) or the Quench's
-   *  cyan (bright green and blue alike, well past their red). */
-  crystalHue?: 'blue' | 'cyan';
+  /** Which painted crystal glows: the Breath's sky-blue (the default), the Quench's
+   *  cyan (bright green and blue alike, well past their red) or the Heat's gold (the first
+   *  flame's white-gold crystal and the molten's red-orange: red well past blue, and
+   *  bright; the sooted basalt is near grey). */
+  crystalHue?: 'blue' | 'cyan' | 'gold';
   /** The painted ice lit from within (the Quench's): how far the teal and cyan body of its
    *  ice shines past its own colour, so a frozen fall or a sword of ice stays luminous
    *  under the night while its rock stays dark (0 or absent: no ice layer). */
@@ -43,6 +47,16 @@ export interface EnvLook {
    *  every ledge lifts past its own colour, so the arena concept's snow caps read white
    *  under the night (0 or absent: no snow layer). */
   snow?: number;
+  /** A further discard in the cut-away rock's clip (the Heat's rock opened round its hall,
+   *  seen from inside it): `head` declares its uniforms and functions, `body` runs in the
+   *  cutaway's block (`vEnvLocal`, slot space, and `envDither` in scope), `key` names it in
+   *  the program key, `uniforms` are bound by name (cut-away looks only). */
+  clip?: {
+    head: string;
+    body: string;
+    key: string;
+    uniforms: Readonly<Record<string, { value: unknown }>>;
+  };
 }
 
 /** The program key of a look (every number its GLSL bakes in). */
@@ -54,20 +68,25 @@ export function envLookKey(look: EnvLook): string {
       : 'smith-heart-env-stone',
     look.shade.join(','),
     s ? `strokes:${s.tileA},${s.tileB},${s.strength},${s.mean}` : '',
-    look.crystal ? `crystal:${look.crystal}${look.crystalHue === 'cyan' ? ':cyan' : ''}` : '',
+    look.crystal
+      ? `crystal:${look.crystal}${look.crystalHue === 'cyan' ? ':cyan' : look.crystalHue === 'gold' ? ':gold' : ''}`
+      : '',
     // The ice and snow layers only when a look carries them: the kits that never do keep
     // their keys byte for byte.
     ...(look.ice ? [`ice:${look.ice}`] : []),
     ...(look.snow ? [`snow:${look.snow}`] : []),
+    ...(look.cutaway && look.clip ? [`clip:${look.clip.key}`] : []),
   ].join('|');
 }
 
 /** Wire a look into a painting's material (its first layer). */
 export function applyEnvLook(mat: THREE.Material, look: EnvLook): void {
   const strokes = look.cutaway ? look.strokes : null;
+  const clip = look.cutaway ? look.clip : undefined;
   mat.onBeforeCompile = (shader) => {
     if (look.cutaway) {
       if (strokes) shader.uniforms.uEnvStrokes = { value: strokes.map() };
+      if (clip) Object.assign(shader.uniforms, clip.uniforms);
       shader.vertexShader = shader.vertexShader
         .replace(
           '#include <common>',
@@ -88,7 +107,7 @@ export function applyEnvLook(mat: THREE.Material, look: EnvLook): void {
       shader.fragmentShader = shader.fragmentShader
         .replace(
           '#include <common>',
-          '#include <common>\nvarying vec3 vEnvCutWorld;\nvarying vec3 vEnvLocal;',
+          `#include <common>\nvarying vec3 vEnvCutWorld;\nvarying vec3 vEnvLocal;${clip ? `\n${clip.head}` : ''}`,
         )
         .replace(
           '#include <clipping_planes_fragment>',
@@ -97,7 +116,7 @@ export function applyEnvLook(mat: THREE.Material, look: EnvLook): void {
             float envCut = ( distance( vEnvCutWorld, cameraPosition ) - ${HEART_ROCK_CUT_NEAR.toFixed(1)} )
               / ${(HEART_ROCK_CUT_FAR - HEART_ROCK_CUT_NEAR).toFixed(1)};
             float envDither = fract( 52.9829189 * fract( dot( gl_FragCoord.xy, vec2( 0.06711056, 0.00583715 ) ) ) );
-            if ( envCut < envDither ) discard;
+            if ( envCut < envDither ) discard;${clip ? `\n            ${clip.body}` : ''}
           }`,
         );
       if (strokes) {
@@ -131,8 +150,18 @@ export function applyEnvLook(mat: THREE.Material, look: EnvLook): void {
     }
     const crystal = !look.crystal
       ? ''
-      : look.crystalHue === 'cyan'
+      : look.crystalHue === 'gold'
         ? `
+      {
+        // The painted fire: the first flame's white-gold crystal and the molten's
+        // red-orange, its red well past its blue and bright (the sooted basalt is near grey,
+        // its warm umber shade dark).
+        float envWarm = ( diffuseColor.r - diffuseColor.b ) / max( diffuseColor.r, 1e-3 );
+        float envFire = smoothstep( 0.45, 0.7, envWarm ) * smoothstep( 0.12, 0.3, diffuseColor.r );
+        totalEmissiveRadiance += diffuseColor.rgb * envFire * ${look.crystal.toFixed(2)};
+      }`
+        : look.crystalHue === 'cyan'
+          ? `
       {
         // The painted crystal: a bright cyan, its green and blue alike and well past its
         // red (the ice's teal body is as saturated, but darker; the snow is pale).
@@ -141,7 +170,7 @@ export function applyEnvLook(mat: THREE.Material, look: EnvLook): void {
         float envCrystal = smoothstep( 0.5, 0.7, envSat ) * smoothstep( 0.4, 0.6, envHi );
         totalEmissiveRadiance += diffuseColor.rgb * envCrystal * ${look.crystal.toFixed(2)};
       }`
-        : `
+          : `
       {
         // The painted crystal: a bright sky-blue well past its own red and green (the
         // rock's deep shade is as blue, but dark; its body is blue-grey).

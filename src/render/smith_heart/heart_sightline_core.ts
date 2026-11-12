@@ -36,6 +36,7 @@ import {
   planHeartUnderCliffs,
 } from './heart_rock_plan_core';
 import { heartWallReach, planHeartWalls } from './heart_walls_core';
+import { HEAT_ENV_ROCK, planHeatEnvRing } from './heat_env_plan_core';
 import {
   fitQuenchEnvNeedle,
   planQuenchEnvGreatFall,
@@ -407,6 +408,30 @@ export function quenchEnvSolids(): HeartSolid[] {
       hd,
       yaw: p.rot,
       what: `quench env ring stack (${p.x.toFixed(1)}, ${p.z.toFixed(1)})`,
+    });
+  }
+  return out;
+}
+
+/** The Heat's painted rebuild's solids past the old volumes: the ring of basalt stacks
+ *  round the hall (heat_env_plan_core.ts planHeatEnvRing). Its molten fall stands in its
+ *  host band's own volume, and every other swapped piece in its old one. */
+export function heatEnvSolids(): HeartSolid[] {
+  const out: HeartSolid[] = [];
+  for (const p of planHeatEnvRing()) {
+    const W = HEAT_ENV_ROCK[p.piece];
+    const k = p.scale ?? 1;
+    const hd = (W.d * k) / 2;
+    out.push({
+      kind: 'box',
+      x: p.x - Math.sin(p.rot) * hd,
+      y: p.y + (W.h * k) / 2,
+      z: p.z - Math.cos(p.rot) * hd,
+      hw: (W.w * k) / 2,
+      hh: (W.h * k) / 2,
+      hd,
+      yaw: p.rot,
+      what: `heat env ring stack (${p.x.toFixed(1)}, ${p.z.toFixed(1)})`,
     });
   }
   return out;

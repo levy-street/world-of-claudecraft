@@ -43,6 +43,8 @@ export function buildRingKit(lowGfx: boolean): THREE.Group {
     lowGfx,
     'smithHeartRingKit',
     RING_CELL,
+    // The concept's cool pale grey-mauve stone (ring_stone_look.ts).
+    'ringStone',
   );
 }
 

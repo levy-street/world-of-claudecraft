@@ -217,6 +217,7 @@ import { seasonalTrickLooks } from './seasonal_trick_looks';
 import type { SeatClipSet } from './seat_clips';
 import { SMITH_HEART_BOSS_LOOKS } from './smith_heart_boss_looks';
 import { SMITH_HEART_PLACEHOLDER_LOOKS } from './smith_heart_placeholder_looks';
+import { SMITH_HEART_TRASH_LOOKS } from './smith_heart_trash_looks';
 import type { WeaponLoadout } from './weapon_loadout_core';
 import { WILDHEART_MOB_KEYS, wildheartPlaceholderLooks } from './wildheart_creature_looks';
 import { type WocFit, wocAnimsUrl, wocBaseUrl } from './woc_armor_core';
@@ -8373,6 +8374,8 @@ Object.assign(VISUALS, sanctumCreatureLooks(VISUALS));
 Object.assign(VISUALS, SANCTUM_BOSS_LOOKS);
 // The Smith's Heart's own boss models (smith_heart_boss_looks.ts).
 Object.assign(VISUALS, SMITH_HEART_BOSS_LOOKS);
+// The Smith's Heart's own trash and add bodies (smith_heart_trash_looks.ts).
+Object.assign(VISUALS, SMITH_HEART_TRASH_LOOKS);
 // Gourdlight Eve's trick bodies, the bat and the skeleton (seasonal_trick_looks.ts).
 Object.assign(VISUALS, seasonalTrickLooks(VISUALS));
 

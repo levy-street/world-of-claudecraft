@@ -1,0 +1,28 @@
+{
+  "items": [
+    {
+      "rigSource": "tmp/asset_src/heart_seedflame_woc.glb",
+      "src": "tmp/asset_src/heart_seedflame_woc.slim.glb",
+      "out": "models/creatures/heart_seedflame.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "IdleFidget",
+        "CombatIdle",
+        "Walk",
+        "Run",
+        "Turn",
+        "Attack",
+        "Attack2",
+        "Entrance",
+        "Hit",
+        "Hit2",
+        "Stunned",
+        "Death"
+      ],
+      "dropStillChannels": true,
+      "materialName": "heart_seedflame",
+      "maxTex": 1024
+    }
+  ]
+}

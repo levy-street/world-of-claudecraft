@@ -49,8 +49,10 @@ import { dressHammerVein, ensureHammerKit, HAMMER_KIT_KINDS, hammerKitReady } fr
 import { heartArrivalFlare, heartArrivalVein } from './heart_arrival_light_core';
 import { heartCliffPaint } from './heart_cliff_paint_core';
 import { heartCollapseDim, heartCollapseHeartLevel } from './heart_collapse_core';
+import { buildHeartEnvDress, heartOpenMountainLayer } from './heart_env_dress';
 import { inBreathLight, inHammerSky, inHeatLight, inQuenchLight } from './heart_environment';
 import { heartFinalDarkness } from './heart_final_core';
+import { ensureHeartFourSky, heartFourSkyTexture, heartRingSkyTexture } from './heart_four_sky';
 import { buildHeartGates } from './heart_gates';
 import { ensureHeartKit, heartKitProgramWarmers, SMITH_HEART_GATE_KIT_URL } from './heart_kit';
 import { buildHeartLights } from './heart_lights';
@@ -71,6 +73,8 @@ import {
   setHeartRockCore,
   setHeartRockHammer,
   setHeartRockHammerPaint,
+  setHeartRockHeatOpen,
+  setHeartRockHeatPaint,
   setHeartRockQuenchPaint,
   setHeartRockSlot,
 } from './heart_rock_cutaway';
@@ -91,6 +95,15 @@ import { buildHeartSeal } from './heart_seal';
 import { heartSealSlotKey, heartSealView, newHeartSealView } from './heart_seal_core';
 import { buildHeartSky } from './heart_sky';
 import { buildHeatAir } from './heat_air';
+import {
+  heatEnvFloorMaterial,
+  heatEnvKitReady,
+  heatEnvPainting,
+  heatEnvProgramWarmers,
+  heatEnvSkyTexture,
+} from './heat_env_kit';
+import { heatRockPaintLayer } from './heat_env_rock_paint';
+import { buildHeatEnvSet } from './heat_env_set';
 import { hearthFloorMaterial } from './heat_hearth_floor';
 import { dressHeat, ensureHeatKit, HEAT_KIT_KINDS, heatKitReady } from './heat_kit';
 import { HEAT_KIT_SHALLOW } from './heat_kit_plan_core';
@@ -114,6 +127,7 @@ import {
   RING_KIT_OMIT_TOPS,
   ringKitReady,
 } from './ring_kit';
+import { buildRingSet } from './ring_set';
 
 export interface SmithHeartInteriorDeps {
   lowGfx: boolean;
@@ -148,6 +162,7 @@ export async function buildSmithHeartInterior(
     ensureHeatKit(),
     ensureHeartKit(SMITH_HEART_GATE_KIT_URL),
     ensureHeartRoomKit(),
+    ensureHeartFourSky(),
   ]);
   // The Ring kit draws the two stairs tread by tread and the dais's keel
   // (phase 2F); without it the field's own ramps and keel stand.
@@ -167,15 +182,19 @@ export async function buildSmithHeartInterior(
   const breathEnvReady = breathEnvKitReady();
   // The Quench's painted rebuild (its kit fetched with the old Quench kit's).
   const quenchEnvReady = quenchEnvKitReady();
+  // The Heat's painted rebuild (its kit fetched with the old Heat kit's).
+  const heatEnvReady = heatEnvKitReady();
   // Each painted vein's rock on the heightfield and the field's cliff faces, one clone.
   const rockPaint = composeRockPaints(
     hammerEnvReady ? hammerRockPaintLayer() : null,
     breathEnvReady ? breathRockPaintLayer() : null,
     quenchEnvReady ? quenchRockPaintLayer() : null,
+    heatEnvReady ? heatRockPaintLayer() : null,
   );
   setHeartRockHammerPaint(hammerEnvReady ? hammerEnvPainting('cliff') : null);
   setHeartRockBreathPaint(breathEnvReady ? breathEnvPainting('cliff') : null);
   setHeartRockQuenchPaint(quenchEnvReady ? quenchEnvPainting('cliff') : null);
+  setHeartRockHeatPaint(heatEnvReady ? heatEnvPainting('cliff') : null);
   const group = new THREE.Group();
   group.name = 'smithHeartField';
   // The rock's regional paint (the Quench's frost) reads this slot from its
@@ -220,7 +239,11 @@ export async function buildSmithHeartInterior(
         // kit has landed.
         lake_ice: (pair) =>
           lakeIceMaterial(pair, deps.lowGfx, quenchEnvReady ? quenchEnvLakePair() : null),
-        hearth: (pair) => hearthFloorMaterial(pair, deps.lowGfx),
+        // The Heat's painted basalt floors once its painted kit has landed (the molten an
+        // accent: the seams of fire, the channel and the route's thread stay the old kit's).
+        hearth: heatEnvReady
+          ? () => heatEnvFloorMaterial()
+          : (pair) => hearthFloorMaterial(pair, deps.lowGfx),
         // The Hammer vein's painted floors, once the painted kit has landed.
         ...(hammerEnvReady
           ? {
@@ -242,7 +265,20 @@ export async function buildSmithHeartInterior(
       ...(rockPaint ? { cliffMaterial: rockPaint } : {}),
     }),
   );
-  group.add(buildHeartMountain(deps.lowGfx, rockPaint));
+  // The mountain alone opens round the Heart to the four elements' cliffs, seen from inside
+  // it (heart_env_dress.ts): its own clone, never the field cliffs'.
+  group.add(
+    buildHeartMountain(
+      deps.lowGfx,
+      composeRockPaints(
+        hammerEnvReady ? hammerRockPaintLayer() : null,
+        breathEnvReady ? breathRockPaintLayer() : null,
+        quenchEnvReady ? quenchRockPaintLayer() : null,
+        heatEnvReady ? heatRockPaintLayer() : null,
+        heartOpenMountainLayer(),
+      ),
+    ),
+  );
   // The mountain's rock (phase 2E), the loose crags until its kit lands.
   dressHeartMountain(group, () => buildHeartWalls(deps.lowGfx), deps.lowGfx);
   const kitReady = hammerKitReady();
@@ -277,12 +313,20 @@ export async function buildSmithHeartInterior(
   if (hammerEnvReady) group.add(hammerEnvProgramWarmers(deps.lowGfx));
   if (breathEnvReady) group.add(breathEnvProgramWarmers());
   if (quenchEnvReady) group.add(quenchEnvProgramWarmers());
+  if (heatEnvReady) group.add(heatEnvProgramWarmers());
   group.add(buildHammerAir(deps.lowGfx));
   group.add(buildBreathAir(deps.lowGfx));
   // The Cornice's open sky: the cloud sea under the summit, the far peaks.
   group.add(buildBreathSummit(deps.lowGfx));
   group.add(buildQuenchAir(deps.lowGfx));
   group.add(buildHeatAir(deps.lowGfx));
+  // The Heat's set round its hall (its lake, falls, glows and smoke), drawn only from the
+  // Heat once its painted kit is in (shown by the frame driver).
+  const heatSet = buildHeatEnvSet(deps.lowGfx);
+  heatSet.visible = false;
+  group.add(heatSet);
+  // The Heart's crown dressed with the four veins' painted rock, drawn only from the Heart.
+  group.add(buildHeartEnvDress(deps.lowGfx));
   group.add(buildHeatPour(deps.lowGfx));
   const heartKit = heartReady ? buildHeartRoomKit(deps.lowGfx) : null;
   if (heartKit) group.add(heartKit.group);
@@ -298,6 +342,9 @@ export async function buildSmithHeartInterior(
   group.add(room.group);
   buildHeartLights(group, deps, ground);
   const rivers = buildHeartRivers();
+  // The Ring's set: the pit's mist and each vein's rune on its standing stones.
+  const ringSet = buildRingSet(deps.lowGfx);
+  group.add(ringSet.group);
   group.add(rivers.group);
   const seal = buildHeartSeal(deps.lowGfx);
   group.add(seal.group);
@@ -325,6 +372,9 @@ export async function buildSmithHeartInterior(
     hammerSky: hammerEnvReady ? hammerEnvSkyTexture() : null,
     breathSky: breathEnvReady ? breathEnvSkyTexture() : null,
     quenchSky: quenchEnvReady ? quenchEnvSkyTexture() : null,
+    heatSky: heatEnvReady ? heatEnvSkyTexture() : null,
+    fourSky: heartFourSkyTexture(),
+    ringSky: heartRingSkyTexture(),
     onFrame: (camera) => {
       const now = sharedUniforms.uTime.value;
       const dt = lastNow < 0 ? 999 : now - lastNow;
@@ -356,6 +406,11 @@ export async function buildSmithHeartInterior(
       sky.setQuench(quenchBlend);
       heatBlend = heartAreaBlend(heatBlend, inHeatLight(local.x, local.z), dt);
       sky.setHeat(heatBlend);
+      // The rock round the Heat's hall opens to its tiers of basalt and its set (the painted
+      // kit's, read each frame: it can land after the interior is built).
+      const heatOpen = heatEnvKitReady() ? heatBlend : 0;
+      setHeartRockHeatOpen(heatOpen);
+      heatSet.visible = heatOpen > 0.001;
       hammerBlend = heartAreaBlend(hammerBlend, inHammerSky(local.x, local.z), dt);
       sky.setHammer(hammerBlend);
       setHeartRockHammer(hammerBlend);
@@ -389,6 +444,7 @@ export async function buildSmithHeartInterior(
       heartPortalStage(view.portalSince, stage);
       heartHopStage(hopAt < 0 ? -1 : now - hopAt, hop);
       rivers.update(view);
+      ringSet.update(view);
       seal.update(view, stage, view.portalSince);
       portals.update(stage, hop, hopSide);
       portals.wash(hop.flash, local);

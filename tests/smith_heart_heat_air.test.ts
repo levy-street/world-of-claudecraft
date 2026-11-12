@@ -151,7 +151,7 @@ describe("the Heat's basalt and light", () => {
       }
   });
 
-  it('holds its own light past the Ring west of its mouth, a warm key over a cool fill', () => {
+  it('holds its own light past the Ring west of its mouth, a warm key low in the south-east over a cool fill', () => {
     expect(inHeatLight(-214, 0)).toBe(true);
     expect(inHeatLight(-100, 0)).toBe(true);
     expect(inHeatLight(-70, 0)).toBe(false);
@@ -163,8 +163,10 @@ describe("the Heat's basalt and light", () => {
     // The key warm (the Hearth's), the shade's fill cool (never a warm wash).
     expect(sr).toBeGreaterThan(sb);
     expect(hb).toBeGreaterThanOrEqual(hr);
-    // From the west, the Hearth's side, low.
-    expect(L.keyDirection[0]).toBeLessThan(-0.5);
+    // Low in the south-east, raking the walls a raid facing the guardian looks at (from
+    // the west, the Hearth's side, it backlit every one of them black).
+    expect(L.keyDirection[0]).toBeGreaterThan(0.3);
+    expect(L.keyDirection[2]).toBeLessThan(-0.3);
     expect(L.keyDirection[1]).toBeLessThan(0.7);
     // The smoke's haze a grey, not orange.
     const [fr, fg, fb] = rgb(SMITH_HEART_HEAT_FOG.color);

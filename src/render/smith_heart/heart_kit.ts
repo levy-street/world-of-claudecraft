@@ -24,6 +24,7 @@ import { applyHeartIceSheen } from './heart_ice_sheen';
 import { applyHeartIsleFill } from './heart_isle_fill';
 import type { HeartKitPlacement } from './heart_kit_core';
 import { applyRockCutaway } from './heart_rock_cutaway';
+import { applyRingStoneLook } from './ring_stone_look';
 
 export const SMITH_HEART_HAMMER_KIT_URL = '/models/props/smith_heart_hammer_kit.glb';
 /** The raid-wide mountain rock kit (phase 2E, heart_rock.ts). */
@@ -64,8 +65,10 @@ export const HEART_KIT_SLOTS: readonly HeartKitSlot[] = ['stone', 'glow', 'ice']
  *  spine (heart_quarters.ts draws it after the floors), or (the Breath's
  *  floating isles, 2026-11-03) as `isle`: the stone with a shade floor and
  *  the cloud sea's cool bounce on every face turned down (heart_isle_fill.ts),
- *  so the hang the raid looks up at never sinks to black. */
-export type HeartKitMaterial = HeartKitSlot | 'rock' | 'spine' | 'isle';
+ *  so the hang the raid looks up at never sinks to black, or (the Ring, the
+ *  owner's concept of 2026-11-11) as `ringStone`: the stone graded from its
+ *  sand tan to a cool pale grey-mauve (ring_stone_look.ts). */
+export type HeartKitMaterial = HeartKitSlot | 'rock' | 'spine' | 'isle' | 'ringStone';
 export const HEART_KIT_MATERIALS: readonly HeartKitMaterial[] = [
   'stone',
   'glow',
@@ -73,6 +76,7 @@ export const HEART_KIT_MATERIALS: readonly HeartKitMaterial[] = [
   'rock',
   'spine',
   'isle',
+  'ringStone',
 ];
 
 /** How long the interior waits for a kit before building with placeholders. */
@@ -259,7 +263,7 @@ export function heartKitSlotMaterial(slot: HeartKitMaterial): THREE.Material {
       m = new THREE.MeshLambertMaterial({ vertexColors: true, name: 'SmithHeartKitRock' });
       applyRockCutaway(m);
     }
-  } else if (slot === 'stone' || slot === 'spine' || slot === 'isle') {
+  } else if (slot === 'stone' || slot === 'spine' || slot === 'isle' || slot === 'ringStone') {
     if (GFX.standardMaterials) {
       const std = new THREE.MeshStandardMaterial({
         vertexColors: true,
@@ -281,6 +285,10 @@ export function heartKitSlotMaterial(slot: HeartKitMaterial): THREE.Material {
     if (slot === 'isle') {
       m.name = 'SmithHeartKitIsle';
       applyHeartIsleFill(m);
+    }
+    if (slot === 'ringStone') {
+      m.name = 'SmithHeartKitRingStone';
+      applyRingStoneLook(m);
     }
   } else if (slot === 'ice') {
     m = GFX.standardMaterials
