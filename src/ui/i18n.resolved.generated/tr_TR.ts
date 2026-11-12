@@ -17149,7 +17149,7 @@ export const tr_TR: EnTranslations = {
       "noStatChanges": "No stat changes",
       "setBonusLost": "Breaks ({pieces}) set bonus",
       "setBonusGained": "Activates ({pieces}) set bonus",
-      "compareRingColumn": "Ring {n}",
+      "compareRingColumn": "Ring {index}",
       "damageSpeed": "{min} - {max} Hasar Hız {speed}",
       "dps": "(saniyede {dps} hasar)",
       "armorStat": "{value} Zırh",

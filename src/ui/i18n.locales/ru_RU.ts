@@ -7546,7 +7546,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.noStatChanges': 'Характеристики не изменятся',
   'itemUi.tooltip.setBonusLost': 'Теряется бонус комплекта ({pieces})',
   'itemUi.tooltip.setBonusGained': 'Включается бонус комплекта ({pieces})',
-  'itemUi.tooltip.compareRingColumn': 'Кольцо {n}',
+  'itemUi.tooltip.compareRingColumn': 'Кольцо {index}',
   'itemUi.tooltip.damageSpeed': '{min} - {max} урона Скорость {speed}',
   'itemUi.tooltip.dps': '({dps} урона в секунду)',
   'itemUi.tooltip.armorStat': '{value} брони',

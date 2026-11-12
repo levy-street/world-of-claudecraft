@@ -17149,7 +17149,7 @@ export const en_XA: EnTranslations = {
       "noStatChanges": "[Ñó šţáţ çĥáñĝéš]",
       "setBonusLost": "[Ɓŕéáķš ({pieces}) šéţ ƀóñúš]",
       "setBonusGained": "[Áçţíʋáţéš ({pieces}) šéţ ƀóñúš]",
-      "compareRingColumn": "[Ŕíñĝ {n}]",
+      "compareRingColumn": "[Ŕíñĝ {index}]",
       "damageSpeed": "[{min} - {max} Ðáɱáĝé Šþééð {speed}]",
       "dps": "[({dps} ðáɱáĝé þéŕ šéçóñð)]",
       "armorStat": "[{value} Áŕɱóŕ]",

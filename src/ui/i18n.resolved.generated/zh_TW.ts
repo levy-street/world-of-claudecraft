@@ -17149,7 +17149,7 @@ export const zh_TW: EnTranslations = {
       "noStatChanges": "屬性無變化",
       "setBonusLost": "破壞（{pieces}）套裝效果",
       "setBonusGained": "啟動（{pieces}）套裝效果",
-      "compareRingColumn": "戒指{n}",
+      "compareRingColumn": "戒指{index}",
       "damageSpeed": "{min} - {max} 傷害 速度 {speed}",
       "dps": "（每秒 {dps} 傷害）",
       "armorStat": "{value} 護甲",

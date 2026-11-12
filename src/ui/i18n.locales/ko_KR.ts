@@ -5677,7 +5677,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.noStatChanges': '능력치 변화 없음',
   'itemUi.tooltip.setBonusLost': '({pieces}) 세트 효과 해제',
   'itemUi.tooltip.setBonusGained': '({pieces}) 세트 효과 활성화',
-  'itemUi.tooltip.compareRingColumn': '반지 {n}',
+  'itemUi.tooltip.compareRingColumn': '반지 {index}',
   'itemUi.tooltip.damageSpeed': '{min} - {max} 피해 속도 {speed}',
   'itemUi.tooltip.dps': '(초당 피해 {dps})',
   'itemUi.tooltip.armorStat': '방어도 {value}',

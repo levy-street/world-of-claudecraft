@@ -103,7 +103,7 @@ const itemStringsEn = {
       setBonusLost: 'Breaks ({pieces}) set bonus',
       setBonusGained: 'Activates ({pieces}) set bonus',
       // Column header when a hovered ring compares against both worn rings.
-      compareRingColumn: 'Ring {n}',
+      compareRingColumn: 'Ring {index}',
       damageSpeed: '{min} - {max} Damage Speed {speed}',
       dps: '({dps} damage per second)',
       armorStat: '{value} Armor',

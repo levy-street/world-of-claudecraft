@@ -17149,7 +17149,7 @@ export const da_DK: EnTranslations = {
       "noStatChanges": "No stat changes",
       "setBonusLost": "Breaks ({pieces}) set bonus",
       "setBonusGained": "Activates ({pieces}) set bonus",
-      "compareRingColumn": "Ring {n}",
+      "compareRingColumn": "Ring {index}",
       "damageSpeed": "{min} - {max} Skade Hastighed {speed}",
       "dps": "({dps} skade i sekundet)",
       "armorStat": "{value} Rustning",

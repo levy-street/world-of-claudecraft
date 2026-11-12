@@ -17149,7 +17149,7 @@ export const en_CA: EnTranslations = {
       "noStatChanges": "No stat changes",
       "setBonusLost": "Breaks ({pieces}) set bonus",
       "setBonusGained": "Activates ({pieces}) set bonus",
-      "compareRingColumn": "Ring {n}",
+      "compareRingColumn": "Ring {index}",
       "damageSpeed": "{min} - {max} Damage Speed {speed}",
       "dps": "({dps} damage per second)",
       "armorStat": "{value} Armour",

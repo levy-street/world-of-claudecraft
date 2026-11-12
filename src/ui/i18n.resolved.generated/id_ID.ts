@@ -17149,7 +17149,7 @@ export const id_ID: EnTranslations = {
       "noStatChanges": "No stat changes",
       "setBonusLost": "Breaks ({pieces}) set bonus",
       "setBonusGained": "Activates ({pieces}) set bonus",
-      "compareRingColumn": "Ring {n}",
+      "compareRingColumn": "Ring {index}",
       "damageSpeed": "{min} - {max} Kerusakan Kecepatan {speed}",
       "dps": "({dps} kerusakan per detik)",
       "armorStat": "{value} Zirah",

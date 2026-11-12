@@ -7115,7 +7115,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.noStatChanges': '属性无变化',
   'itemUi.tooltip.setBonusLost': '破坏（{pieces}）套装效果',
   'itemUi.tooltip.setBonusGained': '激活（{pieces}）套装效果',
-  'itemUi.tooltip.compareRingColumn': '戒指{n}',
+  'itemUi.tooltip.compareRingColumn': '戒指{index}',
   'itemUi.tooltip.damageSpeed': '{min} - {max} 伤害 速度 {speed}',
   'itemUi.tooltip.dps': '（每秒 {dps} 伤害）',
   'itemUi.tooltip.armorStat': '{value} 护甲',

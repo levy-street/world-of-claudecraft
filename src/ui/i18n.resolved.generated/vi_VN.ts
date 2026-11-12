@@ -17149,7 +17149,7 @@ export const vi_VN: EnTranslations = {
       "noStatChanges": "No stat changes",
       "setBonusLost": "Breaks ({pieces}) set bonus",
       "setBonusGained": "Activates ({pieces}) set bonus",
-      "compareRingColumn": "Ring {n}",
+      "compareRingColumn": "Ring {index}",
       "damageSpeed": "{min} - {max} Sát Thương Tốc Độ {speed}",
       "dps": "({dps} sát thương mỗi giây)",
       "armorStat": "{value} Giáp",

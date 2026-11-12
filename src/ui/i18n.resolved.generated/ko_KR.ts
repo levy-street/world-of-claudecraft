@@ -17149,7 +17149,7 @@ export const ko_KR: EnTranslations = {
       "noStatChanges": "능력치 변화 없음",
       "setBonusLost": "({pieces}) 세트 효과 해제",
       "setBonusGained": "({pieces}) 세트 효과 활성화",
-      "compareRingColumn": "반지 {n}",
+      "compareRingColumn": "반지 {index}",
       "damageSpeed": "{min} - {max} 피해 속도 {speed}",
       "dps": "(초당 피해 {dps})",
       "armorStat": "방어도 {value}",

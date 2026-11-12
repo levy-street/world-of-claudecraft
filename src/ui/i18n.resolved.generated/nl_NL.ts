@@ -17149,7 +17149,7 @@ export const nl_NL: EnTranslations = {
       "noStatChanges": "No stat changes",
       "setBonusLost": "Breaks ({pieces}) set bonus",
       "setBonusGained": "Activates ({pieces}) set bonus",
-      "compareRingColumn": "Ring {n}",
+      "compareRingColumn": "Ring {index}",
       "damageSpeed": "{min} - {max} Schade Snelheid {speed}",
       "dps": "({dps} schade per seconde)",
       "armorStat": "{value} Pantser",

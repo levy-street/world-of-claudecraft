@@ -143,8 +143,8 @@ export function itemCompareMarks(
       if (columns.length < 2) return '';
       const heads = columns
         .map((c) => {
-          const n = formatNumber(c.slot === 'ring1' ? 1 : 2, { maximumFractionDigits: 0 });
-          return `<span class="tt-delta">${esc(t('itemUi.tooltip.compareRingColumn', { n }))}</span>`;
+          const index = formatNumber(c.slot === 'ring1' ? 1 : 2, { maximumFractionDigits: 0 });
+          return `<span class="tt-delta">${esc(t('itemUi.tooltip.compareRingColumn', { index }))}</span>`;
         })
         .join('');
       return `<div class="tt-sub tt-row tt-delta-head"><span></span> <span class="${wrap}">${heads}</span></div>`;

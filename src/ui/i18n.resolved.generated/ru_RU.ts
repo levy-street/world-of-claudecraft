@@ -17149,7 +17149,7 @@ export const ru_RU: EnTranslations = {
       "noStatChanges": "Характеристики не изменятся",
       "setBonusLost": "Теряется бонус комплекта ({pieces})",
       "setBonusGained": "Включается бонус комплекта ({pieces})",
-      "compareRingColumn": "Кольцо {n}",
+      "compareRingColumn": "Кольцо {index}",
       "damageSpeed": "{min} - {max} урона Скорость {speed}",
       "dps": "({dps} урона в секунду)",
       "armorStat": "{value} брони",
