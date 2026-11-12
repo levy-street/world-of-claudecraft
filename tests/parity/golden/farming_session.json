@@ -5099,7 +5099,7 @@
       "tick": 1946,
       "time": 97.3,
       "nextId": 1012,
-      "state": "931970c7",
+      "state": "d8322c42",
       "events": "6267f545",
       "rng": {
         "draws": 178,
@@ -5410,9 +5410,9 @@
             "remaining": 18,
             "wellFed": {
               "aura": "Well Fed",
-              "duration": 600,
+              "duration": 900,
               "kind": "buff_sta",
-              "value": 5
+              "value": 12
             }
           },
           "fallStartY": 2.459535,
@@ -5465,7 +5465,7 @@
       "tick": 1960,
       "time": 98,
       "nextId": 1012,
-      "state": "a27db429",
+      "state": "2e21e984",
       "events": "91fcf923",
       "rng": {
         "draws": 178,
@@ -5476,7 +5476,7 @@
       "tick": 1980,
       "time": 99,
       "nextId": 1012,
-      "state": "b7765776",
+      "state": "800ea0d3",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -5487,7 +5487,7 @@
       "tick": 2000,
       "time": 100,
       "nextId": 1012,
-      "state": "70617adc",
+      "state": "40b8970b",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -5498,7 +5498,7 @@
       "tick": 2020,
       "time": 101,
       "nextId": 1012,
-      "state": "6121fb83",
+      "state": "40c458f4",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -5509,7 +5509,7 @@
       "tick": 2040,
       "time": 102,
       "nextId": 1012,
-      "state": "2bb717ff",
+      "state": "4b9497ee",
       "events": "921b287d",
       "rng": {
         "draws": 178,
@@ -5520,7 +5520,7 @@
       "tick": 2060,
       "time": 103,
       "nextId": 1012,
-      "state": "0b76d474",
+      "state": "7cb917b5",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -5531,7 +5531,7 @@
       "tick": 2080,
       "time": 104,
       "nextId": 1012,
-      "state": "803ae656",
+      "state": "588b3211",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -5542,7 +5542,7 @@
       "tick": 2100,
       "time": 105,
       "nextId": 1012,
-      "state": "647805e9",
+      "state": "e6e48976",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -5553,7 +5553,7 @@
       "tick": 2120,
       "time": 106,
       "nextId": 1012,
-      "state": "38e06f60",
+      "state": "40544c6f",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -5564,7 +5564,7 @@
       "tick": 2140,
       "time": 107,
       "nextId": 1012,
-      "state": "4dbf1683",
+      "state": "ea5b4f7c",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -5575,7 +5575,7 @@
       "tick": 2160,
       "time": 108,
       "nextId": 1012,
-      "state": "6f1cbfb5",
+      "state": "64c6b2e4",
       "events": "921b287d",
       "rng": {
         "draws": 178,
@@ -5586,7 +5586,7 @@
       "tick": 2180,
       "time": 109,
       "nextId": 1012,
-      "state": "33550b22",
+      "state": "c8be475b",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -5597,7 +5597,7 @@
       "tick": 2200,
       "time": 110,
       "nextId": 1012,
-      "state": "46813cee",
+      "state": "8dbe9ac9",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -5608,7 +5608,7 @@
       "tick": 2220,
       "time": 111,
       "nextId": 1012,
-      "state": "7b18363c",
+      "state": "6be5aeab",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -5619,7 +5619,7 @@
       "tick": 2240,
       "time": 112,
       "nextId": 1012,
-      "state": "93f5226e",
+      "state": "33c6c5d7",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -5630,7 +5630,7 @@
       "tick": 2260,
       "time": 113,
       "nextId": 1012,
-      "state": "369be53d",
+      "state": "ac1fa604",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -5641,7 +5641,7 @@
       "tick": 2280,
       "time": 114,
       "nextId": 1012,
-      "state": "8d53a895",
+      "state": "7815d915",
       "events": "94ce5b0b",
       "rng": {
         "draws": 178,
@@ -5652,7 +5652,7 @@
       "tick": 2300,
       "time": 115,
       "nextId": 1012,
-      "state": "55f42f43",
+      "state": "8f5acf6b",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -5663,7 +5663,7 @@
       "tick": 2320,
       "time": 116,
       "nextId": 1012,
-      "state": "ca9723c5",
+      "state": "f99c24fd",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -5674,7 +5674,7 @@
       "tick": 2340,
       "time": 117,
       "nextId": 1012,
-      "state": "20bc2687",
+      "state": "a03f6fd7",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -5685,7 +5685,7 @@
       "tick": 2346,
       "time": 117.3,
       "nextId": 1012,
-      "state": "d34a7182",
+      "state": "129bf324",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -5986,14 +5986,14 @@
               "sourceId": 1004
             },
             {
-              "duration": 600,
+              "duration": 900,
               "id": "well_fed",
               "kind": "buff_sta",
               "name": "Well Fed",
-              "remaining": 596.65,
+              "remaining": 896.65,
               "school": "nature",
               "sourceId": 1004,
-              "value": 5
+              "value": 12
             }
           ],
           "blockChance": 0.05,
@@ -6006,12 +6006,12 @@
           "fallStartY": 2.459535,
           "fiveSecondRule": 216.3,
           "healPower": 5,
-          "hp": 150,
+          "hp": 220,
           "id": 1004,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 150,
+          "maxHp": 220,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -6037,7 +6037,7 @@
             "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 28,
+            "sta": 35,
             "str": 23
           },
           "templateId": "warrior",
@@ -6053,7 +6053,7 @@
       "tick": 2346,
       "time": 117.3,
       "nextId": 1013,
-      "state": "6e1261ef",
+      "state": "1e5cac39",
       "events": "1f6660d8",
       "rng": {
         "draws": 178,
@@ -6355,14 +6355,14 @@
               "sourceId": 1004
             },
             {
-              "duration": 600,
+              "duration": 900,
               "id": "well_fed",
               "kind": "buff_sta",
               "name": "Well Fed",
-              "remaining": 596.65,
+              "remaining": 896.65,
               "school": "nature",
               "sourceId": 1004,
-              "value": 5
+              "value": 12
             }
           ],
           "blockChance": 0.05,
@@ -6375,12 +6375,12 @@
           "fallStartY": 2.459535,
           "fiveSecondRule": 216.3,
           "healPower": 5,
-          "hp": 150,
+          "hp": 220,
           "id": 1004,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 150,
+          "maxHp": 220,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -6406,7 +6406,7 @@
             "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 28,
+            "sta": 35,
             "str": 23
           },
           "templateId": "warrior",
@@ -6422,7 +6422,7 @@
       "tick": 2346,
       "time": 117.3,
       "nextId": 1013,
-      "state": "cb521d76",
+      "state": "46501f55",
       "events": "e6fe7631",
       "rng": {
         "draws": 178,
@@ -6724,14 +6724,14 @@
               "sourceId": 1004
             },
             {
-              "duration": 600,
+              "duration": 900,
               "id": "well_fed",
               "kind": "buff_sta",
               "name": "Well Fed",
-              "remaining": 596.65,
+              "remaining": 896.65,
               "school": "nature",
               "sourceId": 1004,
-              "value": 5
+              "value": 12
             }
           ],
           "blockChance": 0.05,
@@ -6748,20 +6748,20 @@
             "remaining": 18,
             "wellFed": {
               "aura": "Well Fed",
-              "duration": 600,
+              "duration": 900,
               "kind": "buff_sta",
-              "value": 5
+              "value": 12
             }
           },
           "fallStartY": 2.459535,
           "fiveSecondRule": 216.3,
           "healPower": 5,
-          "hp": 150,
+          "hp": 220,
           "id": 1004,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 150,
+          "maxHp": 220,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -6787,7 +6787,7 @@
             "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 28,
+            "sta": 35,
             "str": 23
           },
           "templateId": "warrior",
@@ -6803,7 +6803,7 @@
       "tick": 2360,
       "time": 118,
       "nextId": 1013,
-      "state": "65d3d35a",
+      "state": "fe59d7fb",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -6814,7 +6814,7 @@
       "tick": 2380,
       "time": 119,
       "nextId": 1013,
-      "state": "e6432576",
+      "state": "749c73e1",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -6825,7 +6825,7 @@
       "tick": 2400,
       "time": 120,
       "nextId": 1013,
-      "state": "0a16aead",
+      "state": "a30ee396",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -6836,7 +6836,7 @@
       "tick": 2420,
       "time": 121,
       "nextId": 1013,
-      "state": "a0e22bfa",
+      "state": "9387e1a5",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -6847,7 +6847,7 @@
       "tick": 2440,
       "time": 122,
       "nextId": 1013,
-      "state": "6e565a43",
+      "state": "e32d6e78",
       "events": "921b287d",
       "rng": {
         "draws": 178,
@@ -6858,7 +6858,7 @@
       "tick": 2460,
       "time": 123,
       "nextId": 1013,
-      "state": "1df44a5b",
+      "state": "6edbc55a",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -6869,7 +6869,7 @@
       "tick": 2480,
       "time": 124,
       "nextId": 1013,
-      "state": "83a7090f",
+      "state": "6533298a",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -6880,7 +6880,7 @@
       "tick": 2500,
       "time": 125,
       "nextId": 1013,
-      "state": "755dfd97",
+      "state": "8d155e80",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -6891,7 +6891,7 @@
       "tick": 2520,
       "time": 126,
       "nextId": 1013,
-      "state": "051a42a9",
+      "state": "48a07948",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -6902,7 +6902,7 @@
       "tick": 2540,
       "time": 127,
       "nextId": 1013,
-      "state": "7d3cce1f",
+      "state": "a2389fe4",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -6913,7 +6913,7 @@
       "tick": 2560,
       "time": 128,
       "nextId": 1013,
-      "state": "575b550e",
+      "state": "48604cc1",
       "events": "921b287d",
       "rng": {
         "draws": 178,
@@ -6924,7 +6924,7 @@
       "tick": 2580,
       "time": 129,
       "nextId": 1013,
-      "state": "d031e83c",
+      "state": "2678eb61",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -6935,7 +6935,7 @@
       "tick": 2600,
       "time": 130,
       "nextId": 1013,
-      "state": "1d66b27f",
+      "state": "8038bc86",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -6946,7 +6946,7 @@
       "tick": 2620,
       "time": 131,
       "nextId": 1013,
-      "state": "12f14dc4",
+      "state": "3321fd2d",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -6957,7 +6957,7 @@
       "tick": 2640,
       "time": 132,
       "nextId": 1013,
-      "state": "de5b1b21",
+      "state": "68e5783c",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -6968,7 +6968,7 @@
       "tick": 2660,
       "time": 133,
       "nextId": 1013,
-      "state": "ad43468b",
+      "state": "56fe3ae4",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -6979,7 +6979,7 @@
       "tick": 2680,
       "time": 134,
       "nextId": 1013,
-      "state": "659d487e",
+      "state": "b3b5160a",
       "events": "debc0ce2",
       "rng": {
         "draws": 178,
@@ -6990,7 +6990,7 @@
       "tick": 2700,
       "time": 135,
       "nextId": 1013,
-      "state": "a8216608",
+      "state": "ebbb539c",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -7001,7 +7001,7 @@
       "tick": 2720,
       "time": 136,
       "nextId": 1013,
-      "state": "28b96b16",
+      "state": "8a681f1a",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -7012,7 +7012,7 @@
       "tick": 2740,
       "time": 137,
       "nextId": 1013,
-      "state": "e1288c4c",
+      "state": "9a8722b8",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -7023,7 +7023,7 @@
       "tick": 2746,
       "time": 137.3,
       "nextId": 1013,
-      "state": "c74168e9",
+      "state": "73386d4f",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -7325,14 +7325,14 @@
               "sourceId": 1004
             },
             {
-              "duration": 600,
+              "duration": 900,
               "id": "well_fed",
               "kind": "buff_sta",
               "name": "Well Fed",
-              "remaining": 596.65,
+              "remaining": 896.65,
               "school": "nature",
               "sourceId": 1004,
-              "value": 5
+              "value": 12
             }
           ],
           "blockChance": 0.05,
@@ -7345,12 +7345,12 @@
           "fallStartY": 2.459535,
           "fiveSecondRule": 236.3,
           "healPower": 5,
-          "hp": 150,
+          "hp": 220,
           "id": 1004,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 150,
+          "maxHp": 220,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -7376,7 +7376,7 @@
             "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 28,
+            "sta": 35,
             "str": 23
           },
           "templateId": "warrior",
@@ -7392,7 +7392,7 @@
       "tick": 2760,
       "time": 138,
       "nextId": 1013,
-      "state": "05b6d74e",
+      "state": "5cc35bd2",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -7403,7 +7403,7 @@
       "tick": 2767,
       "time": 138.35,
       "nextId": 1013,
-      "state": "13234c50",
+      "state": "13134280",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -7705,14 +7705,14 @@
               "sourceId": 1004
             },
             {
-              "duration": 600,
+              "duration": 900,
               "id": "well_fed",
               "kind": "buff_sta",
               "name": "Well Fed",
-              "remaining": 595.6,
+              "remaining": 895.6,
               "school": "nature",
               "sourceId": 1004,
-              "value": 5
+              "value": 12
             }
           ],
           "blockChance": 0.05,
@@ -7725,12 +7725,12 @@
           "fallStartY": 2.459535,
           "fiveSecondRule": 237.35,
           "healPower": 5,
-          "hp": 150,
+          "hp": 220,
           "id": 1004,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 150,
+          "maxHp": 220,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -7756,7 +7756,7 @@
             "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 28,
+            "sta": 35,
             "str": 23
           },
           "templateId": "warrior",
@@ -7772,7 +7772,7 @@
       "tick": 2767,
       "time": 138.35,
       "nextId": 1013,
-      "state": "13234c50",
+      "state": "13134280",
       "events": "741638a5",
       "rng": {
         "draws": 178,
@@ -8074,14 +8074,14 @@
               "sourceId": 1004
             },
             {
-              "duration": 600,
+              "duration": 900,
               "id": "well_fed",
               "kind": "buff_sta",
               "name": "Well Fed",
-              "remaining": 595.6,
+              "remaining": 895.6,
               "school": "nature",
               "sourceId": 1004,
-              "value": 5
+              "value": 12
             }
           ],
           "blockChance": 0.05,
@@ -8094,12 +8094,12 @@
           "fallStartY": 2.459535,
           "fiveSecondRule": 237.35,
           "healPower": 5,
-          "hp": 150,
+          "hp": 220,
           "id": 1004,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 150,
+          "maxHp": 220,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -8125,7 +8125,7 @@
             "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 28,
+            "sta": 35,
             "str": 23
           },
           "templateId": "warrior",
