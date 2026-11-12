@@ -298,11 +298,11 @@ describe('nameplate_view - NPC plates (close range, name and role only)', () => 
     ent({ kind: 'npc', templateId: 'smith_haldren', pos: { x: 0, y: 0, z }, ...overrides });
 
   it('shows a full NPC plate only inside NPC_NAMEPLATE_RANGE, marker-only to NAMEPLATE_RANGE', () => {
-    expect(NPC_NAMEPLATE_RANGE).toBe(10);
-    expect(plan(npc(10)).hidden).toBe(false);
-    expect(plan(npc(10)).markerOnly).toBe(false);
-    expect(plan(npc(10.01)).hidden).toBe(false);
-    expect(plan(npc(10.01)).markerOnly).toBe(true);
+    expect(NPC_NAMEPLATE_RANGE).toBe(25);
+    expect(plan(npc(25)).hidden).toBe(false);
+    expect(plan(npc(25)).markerOnly).toBe(false);
+    expect(plan(npc(25.01)).hidden).toBe(false);
+    expect(plan(npc(25.01)).markerOnly).toBe(true);
     expect(plan(npc(NPC_NAMEPLATE_RANGE - 0.5)).markerOnly).toBe(false);
     expect(plan(npc(NAMEPLATE_RANGE)).markerOnly).toBe(true);
     expect(plan(npc(NAMEPLATE_RANGE + 0.5)).hidden).toBe(true);
