@@ -17,7 +17,7 @@ import { showLiveWorldNotice } from './live_world_notice';
 // sample (renderer chunks, procgen, smooth/flatten sampling) reads through it.
 
 import { audio } from '../game/audio';
-import { resolveMapMusicZone } from '../game/instance_music';
+import { inTownMusicArea, resolveMapMusicZone } from '../game/instance_music';
 import { type MusicZone, music, musicZoneForLocation } from '../game/music';
 import { Settings } from '../game/settings';
 import {
@@ -9742,8 +9742,7 @@ export class EditorApp {
       this.map.content.zones.find((zd) => zd.id === this.cameraZoneId()) ??
       this.map.content.zones[0];
     if (!zone) return 'vale';
-    const hub = zone.hub;
-    const inHub = !!hub && Math.hypot(x - hub.x, z - hub.z) < hub.radius + 10;
+    const inHub = !!zone.hub && inTownMusicArea({ x, z }, zone);
     return musicZoneForLocation(zone.id, zone.biome, inHub, false, null);
   }
 
