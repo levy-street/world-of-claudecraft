@@ -15979,7 +15979,10 @@ export const ko_KR: EnTranslations = {
         "rite": "의식",
         "sever": "끊기",
         "false_start": "헛영창",
-        "shove": "밀치기"
+        "shove": "밀치기",
+        "bolt": "화살",
+        "brace": "버티기",
+        "dash": "돌진"
       },
       "verbTips": {
         "lunge": "{windup}초 동안 힘을 모은 뒤, 앞쪽 {range}미터 안에서 가장 가까운 상대를 찌릅니다. 적중하면 하트 1개를 빼앗습니다.",
@@ -15992,7 +15995,10 @@ export const ko_KR: EnTranslations = {
         "rite": "제자리에서 {chant}초 동안 영창합니다. 끝내면 1점. 밀려나거나 기절, 이동 불가, 침묵에 걸리면 끊깁니다. 원 안에 다른 참가자가 있어야 합니다.",
         "sever": "대상, 없으면 앞쪽의 가장 가까운 참가자를 방해합니다. {severWindup}초 준비 후 적중하며, 상대가 아직 영창 중이면 {silence}초 동안 침묵시킵니다. 아니면 자신이 침묵합니다. 재사용 대기시간 {severCd}초.",
         "false_start": "자신의 영창을 즉시, 대가 없이 멈춥니다. 자신을 노린 끊기는 시전자를 침묵시킵니다.",
-        "shove": "닿는 거리의 참가자를 {shove}미터 밀쳐 영창을 끊습니다. 재사용 대기시간 {shoveCd}초."
+        "shove": "닿는 거리의 참가자를 {shove}미터 밀쳐 영창을 끊습니다. 재사용 대기시간 {shoveCd}초.",
+        "bolt": "바라보는 방향으로 화살을 쏩니다. 돌이나 벽에 튕기기 전까지는 무해하며, 튕긴 뒤에는 처음 닿는 참가자(자신 포함)의 하트 1개를 빼앗습니다. 최대 {bounces}번 튕깁니다. 재사용 대기시간 {boltCd}초.",
+        "brace": "{braceWindow}초 동안 닿은 화살을 온 방향으로 되돌려 보내며, 그 화살은 내 것이 됩니다. 재사용 대기시간 {braceCd}초.",
+        "dash": "앞으로 {dash}미터 돌진합니다. 재사용 대기시간 {dashCd}초."
       },
       "stance": {
         "lunge": "힘 모으는 중",
@@ -16000,7 +16006,8 @@ export const ko_KR: EnTranslations = {
         "open": "빈틈",
         "chant": "영창 중",
         "sever": "끊는 중",
-        "silenced": "침묵"
+        "silenced": "침묵",
+        "brace": "버티는 중"
       },
       "ready": "준비 완료",
       "unseen": "보이지 않음",

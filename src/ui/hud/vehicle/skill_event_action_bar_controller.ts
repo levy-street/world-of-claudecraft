@@ -14,6 +14,14 @@ import {
   skillEventControlsActive,
 } from '../../../game/skill_event_controls';
 import {
+  BANKSHOT_BOLT_COOLDOWN,
+  BANKSHOT_BRACE_COOLDOWN,
+  BANKSHOT_BRACE_WINDOW,
+  BANKSHOT_DASH_COOLDOWN,
+  BANKSHOT_DASH_DISTANCE,
+  BANKSHOT_MAX_BOUNCES,
+} from '../../../sim/pvp/skill_event_bankshot';
+import {
   FOOTPRINTS_HUSH,
   FOOTPRINTS_HUSH_COOLDOWN,
   FOOTPRINTS_PEBBLE_COOLDOWN,
@@ -73,6 +81,7 @@ const STANCE_KEYS: Readonly<Record<string, TranslationKey>> = {
   chant: 'hud.skillEvent.stance.chant',
   sever: 'hud.skillEvent.stance.sever',
   silenced: 'hud.skillEvent.stance.silenced',
+  brace: 'hud.skillEvent.stance.brace',
 };
 
 const GOAL_KEYS: Readonly<Record<string, TranslationKey>> = {
@@ -109,6 +118,12 @@ const SKILL_EVENT_TIP_VALUES = {
   silence: TONGUES_SILENCE,
   shove: TONGUES_SHOVE_DISTANCE,
   shoveCd: TONGUES_SHOVE_COOLDOWN,
+  bounces: BANKSHOT_MAX_BOUNCES,
+  boltCd: BANKSHOT_BOLT_COOLDOWN,
+  braceWindow: BANKSHOT_BRACE_WINDOW,
+  braceCd: BANKSHOT_BRACE_COOLDOWN,
+  dash: BANKSHOT_DASH_DISTANCE,
+  dashCd: BANKSHOT_DASH_COOLDOWN,
 };
 
 const MAX_CHOICES = 12;

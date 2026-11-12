@@ -12,7 +12,12 @@
 // than a real boot so it reads along the chase camera's shallow pitch, shaded
 // by the sun and multiplied onto the ground, fading in four steps.
 
-import type { HillInfo, SkillEventInfo, SkillEventMark } from '../world_api/world_pvp';
+import type {
+  HillInfo,
+  SkillEventBolt,
+  SkillEventInfo,
+  SkillEventMark,
+} from '../world_api/world_pvp';
 
 /** The field ring is rebuilt when the radius crosses a whole yard. */
 export const SKILL_EVENT_RING_STEP_YARDS = 1;
@@ -138,5 +143,22 @@ export function skillEventStepNormalInto(
   out.x = -gx / len;
   out.y = 1 / len;
   out.z = -gz / len;
+  return out;
+}
+
+/** A bolt is extrapolated along its flight at most this long past its last
+ *  update, so a stalled stream never sends one sailing across the field. */
+export const SKILL_EVENT_BOLT_EXTRAPOLATE_MAX = 0.15;
+
+/** Where to draw a bolt at `now`: its last position carried along its flight. */
+export function skillEventBoltPositionInto(
+  out: { x: number; z: number },
+  bolt: Pick<SkillEventBolt, 'x' | 'z' | 'dx' | 'dz' | 'at'>,
+  now: number,
+  speed: number,
+): { x: number; z: number } {
+  const t = Math.min(SKILL_EVENT_BOLT_EXTRAPOLATE_MAX, Math.max(0, now - bolt.at));
+  out.x = bolt.x + bolt.dx * speed * t;
+  out.z = bolt.z + bolt.dz * speed * t;
   return out;
 }

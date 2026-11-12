@@ -15979,7 +15979,10 @@ export const de_DE: EnTranslations = {
         "rite": "Rite",
         "sever": "Sever",
         "false_start": "False Start",
-        "shove": "Shove"
+        "shove": "Shove",
+        "bolt": "Bolt",
+        "brace": "Brace",
+        "dash": "Dash"
       },
       "verbTips": {
         "lunge": "Wind up for {windup} sec, then thrust at the nearest fighter in front of you within {range} yd. A hit takes 1 heart.",
@@ -15992,7 +15995,10 @@ export const de_DE: EnTranslations = {
         "rite": "Chant for {chant} sec, standing still. Finishing scores 1. Being moved, stunned, rooted or silenced breaks it. Needs another fighter in the circle.",
         "sever": "Interrupt your target, or the nearest fighter in front of you. It winds up for {severWindup} sec, then lands: if they are still chanting, they are silenced for {silence} sec. If not, you are. {severCd} sec cooldown.",
         "false_start": "Drop your own chant at once, at no cost. A Sever aimed at you then silences its caster.",
-        "shove": "Push a fighter within reach {shove} yd away from you, breaking their chant. {shoveCd} sec cooldown."
+        "shove": "Push a fighter within reach {shove} yd away from you, breaking their chant. {shoveCd} sec cooldown.",
+        "bolt": "Fire a bolt the way you face. It is harmless until it bounces off a stone or the wall, then takes 1 heart from the first fighter it touches, you included. Bounces up to {bounces} times. {boltCd} sec cooldown.",
+        "brace": "For {braceWindow} sec, a bolt that reaches you flies back the way it came, and it is yours now. {braceCd} sec cooldown.",
+        "dash": "Dash {dash} yd forward. {dashCd} sec cooldown."
       },
       "stance": {
         "lunge": "Winding up",
@@ -16000,7 +16006,8 @@ export const de_DE: EnTranslations = {
         "open": "Open",
         "chant": "Chanting",
         "sever": "Severing",
-        "silenced": "Silenced"
+        "silenced": "Silenced",
+        "brace": "Bracing"
       },
       "ready": "Ready",
       "unseen": "Unseen",

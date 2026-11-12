@@ -12,6 +12,7 @@ const STANCES: ReadonlySet<unknown> = new Set([
   'chant',
   'sever',
   'silenced',
+  'brace',
 ]);
 
 // biome-ignore lint/suspicious/noExplicitAny: mirrors online.ts's own LooseJson wire-record idiom

@@ -86,6 +86,8 @@ export interface SkillEventKitState {
   riposte?: RiposteKitState;
   footprints?: FootprintsKitState;
   tongues?: TonguesKitState;
+  /** Bankshot: a Brace reflects bolts until this time. */
+  braceUntil?: number;
 }
 
 export interface TonguesKitState {

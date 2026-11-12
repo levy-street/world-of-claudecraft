@@ -171,6 +171,9 @@ export interface SkillEventInfo {
    *  seconds until each is ready, the ability you kept, and the abilities you
    *  may keep (eligible ones you know). Null when you have not joined. */
   kit: SkillEventKitInfo | null;
+  /** Bankshot's standing stones where they stand now (they close in with the
+   *  field), for everyone who can see the event. Null for the other events. */
+  stones: { x: number; z: number; r: number }[] | null;
 }
 
 export interface SkillEventKitInfo {
@@ -193,11 +196,28 @@ export interface SkillEventMark {
   at: number;
 }
 
-/** The marks a fighter can read, with the clock they are timed on. */
+/** A Bankshot bolt in flight: where it was at `at`, flying along (dx, dz) at
+ *  the book's `boltSpeed`. Harmless until its first bounce. */
+export interface SkillEventBolt {
+  id: number;
+  x: number;
+  z: number;
+  dx: number;
+  dz: number;
+  harmful: boolean;
+  at: number;
+}
+
+/** The skill event's marks a viewer can read, with the clock they are timed
+ *  on: Footprints in Ash marks for its fighters, and Bankshot bolts in flight
+ *  for anyone near the arena. */
 export interface SkillEventMarkBook {
-  /** Seconds, the same clock as every mark's `at`. */
+  /** Seconds, the same clock as every mark's and bolt's `at`. */
   now: number;
   marks: readonly SkillEventMark[];
+  bolts: readonly SkillEventBolt[];
+  /** Yards a second a bolt flies (the reader extrapolates between updates). */
+  boltSpeed: number;
 }
 
 export interface IWorldWorldPvp {
@@ -222,7 +242,8 @@ export interface IWorldWorldPvp {
   skillEventAction(verb: string): void;
   /** Keep one of your eligible class abilities for the event. */
   skillEventPickKeepsake(abilityId: string): void;
-  /** The ash marks you can read while you fight Footprints in Ash (empty
-   *  otherwise). Marks fade SKILL_EVENT_MARK_LIFETIME seconds after `at`. */
+  /** The ash marks you can read while you fight Footprints in Ash, and the
+   *  Bankshot bolts in flight near you (both empty otherwise). Marks fade
+   *  SKILL_EVENT_MARK_LIFETIME seconds after `at`. */
   skillEventMarks(): SkillEventMarkBook;
 }

@@ -15979,7 +15979,10 @@ export const ja_JP: EnTranslations = {
         "rite": "詠唱",
         "sever": "断ち切り",
         "false_start": "空詠唱",
-        "shove": "突き飛ばし"
+        "shove": "突き飛ばし",
+        "bolt": "ボルト",
+        "brace": "構え",
+        "dash": "ダッシュ"
       },
       "verbTips": {
         "lunge": "{windup}秒ためてから、前方{range}ヤード以内で最も近い相手を突く。命中するとハートを1つ奪う。",
@@ -15992,7 +15995,10 @@ export const ja_JP: EnTranslations = {
         "rite": "その場で{chant}秒詠唱する。完了すると1点。動かされる、スタン、移動不能、沈黙で中断される。円の中に他の参加者が必要。",
         "sever": "ターゲット、またはいなければ前方で最も近い参加者を妨害する。{severWindup}秒ためてから発動し、相手がまだ詠唱中なら{silence}秒間沈黙させる。そうでなければ自分が沈黙する。再使用まで{severCd}秒。",
         "false_start": "自分の詠唱を即座に、代償なしでやめる。自分を狙った断ち切りは、使った側を沈黙させる。",
-        "shove": "届く範囲の参加者を{shove}ヤード突き飛ばし、詠唱を中断させる。再使用まで{shoveCd}秒。"
+        "shove": "届く範囲の参加者を{shove}ヤード突き飛ばし、詠唱を中断させる。再使用まで{shoveCd}秒。",
+        "bolt": "向いている方向にボルトを撃つ。石か壁で跳ね返るまでは無害で、跳ね返った後は最初に触れた参加者（自分を含む）のハートを1つ奪う。最大{bounces}回跳ね返る。再使用まで{boltCd}秒。",
+        "brace": "{braceWindow}秒間、届いたボルトを来た方向へ跳ね返し、自分のボルトにする。再使用まで{braceCd}秒。",
+        "dash": "前方へ{dash}ヤード駆ける。再使用まで{dashCd}秒。"
       },
       "stance": {
         "lunge": "ため中",
@@ -16000,7 +16006,8 @@ export const ja_JP: EnTranslations = {
         "open": "隙あり",
         "chant": "詠唱中",
         "sever": "断ち切り中",
-        "silenced": "沈黙"
+        "silenced": "沈黙",
+        "brace": "構え中"
       },
       "ready": "準備完了",
       "unseen": "見えていない",

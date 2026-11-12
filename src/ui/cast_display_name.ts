@@ -277,6 +277,7 @@ export const castDisplayName = (id: string): string => {
   if (id === SKILL_EVENT_STANCE_CAST.chant) return t('hud.skillEvent.stance.chant');
   if (id === SKILL_EVENT_STANCE_CAST.sever) return t('hud.skillEvent.stance.sever');
   if (id === SKILL_EVENT_STANCE_CAST.silenced) return t('hud.skillEvent.stance.silenced');
+  if (id === SKILL_EVENT_STANCE_CAST.brace) return t('hud.skillEvent.stance.brace');
   const riftKey = `abilityUi.cast.${id}` as TranslationKey;
   if (riftKey in RIFT_CAST_DISPLAY_KEYS) return t(riftKey);
   const ability = ABILITIES[id];

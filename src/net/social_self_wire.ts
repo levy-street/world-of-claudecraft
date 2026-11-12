@@ -29,7 +29,7 @@ import type {
   WorldPvpInfo,
 } from '../world_api';
 import { decodeDungeonFinderBoard, decodeDungeonFinderInfo } from './dungeon_finder_wire';
-import { applySkillEventMarksWire } from './skill_event_marks_mirror';
+import { applySkillEventBoltsWire, applySkillEventMarksWire } from './skill_event_marks_mirror';
 
 /** The mirrors this cohort writes; the concrete ClientWorld satisfies it
  *  structurally. */
@@ -72,6 +72,7 @@ export interface SocialSelfRecord {
   hill?: unknown;
   sevt?: unknown;
   sevm?: unknown;
+  sevb?: unknown;
 }
 
 const numberOrZero = (v: unknown): number => (typeof v === 'number' ? v : 0);
@@ -122,4 +123,5 @@ export function applySocialSelfWire(target: SocialSelfMirrors, s: SocialSelfReco
   if (s.sevt !== undefined) target.skillEventInfo = s.sevt as SkillEventInfo | null;
   // Footprints in Ash marks: only the new ones, every tick (skill_event_marks_mirror.ts).
   if (s.sevm !== undefined) applySkillEventMarksWire(target, s.sevm);
+  if (s.sevb !== undefined) applySkillEventBoltsWire(target, s.sevb); // Bankshot bolts
 }

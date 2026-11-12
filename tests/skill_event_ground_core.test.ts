@@ -31,6 +31,7 @@ const info = (over: Partial<SkillEventInfo>): SkillEventInfo => ({
   hearts: 4,
   maxHearts: 4,
   kit: null,
+  stones: null,
   ...over,
 });
 

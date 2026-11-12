@@ -5210,6 +5210,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.skillEvent.stance.sever': '断ち切り中',
   'hud.skillEvent.stance.silenced': '沈黙',
   'hud.skillEvent.score': '詠唱：{goal}回中{count}回。最多：{best}。',
+  'hud.skillEvent.verbs.bolt': 'ボルト',
+  'hud.skillEvent.verbs.brace': '構え',
+  'hud.skillEvent.verbs.dash': 'ダッシュ',
+  'hud.skillEvent.stance.brace': '構え中',
+  'hud.skillEvent.verbTips.bolt':
+    '向いている方向にボルトを撃つ。石か壁で跳ね返るまでは無害で、跳ね返った後は最初に触れた参加者（自分を含む）のハートを1つ奪う。最大{bounces}回跳ね返る。再使用まで{boltCd}秒。',
+  'hud.skillEvent.verbTips.brace':
+    '{braceWindow}秒間、届いたボルトを来た方向へ跳ね返し、自分のボルトにする。再使用まで{braceCd}秒。',
+  'hud.skillEvent.verbTips.dash': '前方へ{dash}ヤード駆ける。再使用まで{dashCd}秒。',
   'hud.skillEvent.ready': '準備完了',
   'hud.skillEvent.startsIn': '{minutes}分後に開始',
   'hud.skillEvent.keepsake': '持ち込み技',

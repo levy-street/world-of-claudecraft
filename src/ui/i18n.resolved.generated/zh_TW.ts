@@ -15979,7 +15979,10 @@ export const zh_TW: EnTranslations = {
         "rite": "儀式",
         "sever": "截斷",
         "false_start": "虛詠",
-        "shove": "推搡"
+        "shove": "推搡",
+        "bolt": "彈矢",
+        "brace": "架擋",
+        "dash": "衝刺"
       },
       "verbTips": {
         "lunge": "蓄力 {windup} 秒，然後刺向你前方 {range} 碼內最近的對手。命中會奪走 1 顆紅心。",
@@ -15992,7 +15995,10 @@ export const zh_TW: EnTranslations = {
         "rite": "站定詠唱{chant}秒。完成得1分。被推動、昏迷、定身或沉默都會打斷。圈內需有其他戰鬥者。",
         "sever": "打斷你的目標，或前方最近的戰鬥者。蓄力{severWindup}秒後生效：若對方仍在詠唱，則沉默{silence}秒；否則沉默的是你。冷卻時間{severCd}秒。",
         "false_start": "立即放棄自己的詠唱，沒有代價。此時針對你的截斷會讓施放者沉默。",
-        "shove": "把觸及範圍內的戰鬥者推開{shove}碼，打斷其詠唱。冷卻時間{shoveCd}秒。"
+        "shove": "把觸及範圍內的戰鬥者推開{shove}碼，打斷其詠唱。冷卻時間{shoveCd}秒。",
+        "bolt": "朝你面向的方向射出彈矢。彈到石頭或牆之前它是無害的，之後會奪走它碰到的第一個戰鬥者（包括你）的1顆心。最多反彈{bounces}次。冷卻時間{boltCd}秒。",
+        "brace": "在{braceWindow}秒內，飛到你身上的彈矢會沿原路飛回，並歸你所有。冷卻時間{braceCd}秒。",
+        "dash": "向前衝刺{dash}碼。冷卻時間{dashCd}秒。"
       },
       "stance": {
         "lunge": "蓄力中",
@@ -16000,7 +16006,8 @@ export const zh_TW: EnTranslations = {
         "open": "露出破綻",
         "chant": "詠唱中",
         "sever": "截斷中",
-        "silenced": "沉默"
+        "silenced": "沉默",
+        "brace": "架擋中"
       },
       "ready": "就緒",
       "unseen": "隱形中",

@@ -19,7 +19,7 @@
 // plug in through `skillEventRules`; until one is registered for a kind, that
 // kind runs on the shared baseline below (first to the kill target wins).
 
-import type { SkillEventMark } from '../../world_api/world_pvp';
+import type { SkillEventBolt, SkillEventMark } from '../../world_api/world_pvp';
 import { SKILL_EVENT_SITES, type SkillEventSite } from '../content/skill_event_sites';
 import { ZONES } from '../data';
 import { Rng } from '../rng';
@@ -27,6 +27,12 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { grantHonor } from './honor';
+import {
+  BANKSHOT_BOLT_SPEED,
+  BANKSHOT_RULES,
+  type BankshotBook,
+  bankshotStonesAt,
+} from './skill_event_bankshot';
 import { FOOTPRINTS_RULES, type FootprintsBook } from './skill_event_footprints';
 import {
   keepsakeEligible,
@@ -90,6 +96,8 @@ export interface ActiveSkillEvent {
   winner: number | null;
   /** Footprints in Ash: the marks on the ash (skill_event_footprints.ts). */
   footprints?: FootprintsBook;
+  /** Bankshot: the stones and the bolts in flight (skill_event_bankshot.ts). */
+  bankshot?: BankshotBook;
 }
 
 export interface SkillEventState {
@@ -146,6 +154,8 @@ export function skillEventRules(kind: SkillEventKind): SkillEventRuleSet | undef
       return FOOTPRINTS_RULES;
     case 'tongues':
       return TONGUES_RULES;
+    case 'bankshot':
+      return BANKSHOT_RULES;
     default:
       return undefined;
   }
@@ -479,6 +489,7 @@ export function skillEventInfoFor(
     hearts: ev.hearts.get(pid) ?? null,
     maxHearts: SKILL_EVENT_HEARTS,
     kit: joined ? kitInfoFor(ctx, ev, pid) : null,
+    stones: ev.bankshot ? bankshotStonesAt(ev, ev.bankshot.stones, ctx.time) : null,
   };
 }
 
@@ -519,13 +530,17 @@ export function skillEventTakeHeart(
     source?.kind === 'mob' && source.ownerId !== null
       ? (ctx.entities.get(source.ownerId) ?? null)
       : source;
-  if (!owner || owner.id === target.id || owner.eventHearts === undefined) return true;
+  if (!owner || owner.eventHearts === undefined) return true;
   if (!ev.hearts.has(owner.id) || owner.dead) return true;
-  if (ev.verbHitFrom !== owner.id) return true; // only a kit verb's hit counts
+  // Only a kit verb's hit counts, and only a kit verb can strike its own
+  // owner (a Bankshot bolt coming back): nothing else ever self-damages here.
+  if (ev.verbHitFrom !== owner.id) return true;
+  const self = owner.id === target.id;
   const last = ev.heartLostAt.get(target.id);
   if (last !== undefined && ctx.time - last < SKILL_EVENT_HEART_GRACE_SECONDS) return true;
   ev.heartLostAt.set(target.id, ctx.time);
-  ev.heartsTaken.set(owner.id, (ev.heartsTaken.get(owner.id) ?? 0) + 1);
+  // Hitting yourself costs the heart but never counts toward your win.
+  if (!self) ev.heartsTaken.set(owner.id, (ev.heartsTaken.get(owner.id) ?? 0) + 1);
   const left = Math.max(0, (ev.hearts.get(target.id) ?? 0) - 1);
   setHearts(ctx, ev, target.id, left);
   ctx.emit({
@@ -638,8 +653,39 @@ export function skillEventMarksFor(ctx: SimContext, pid: number): readonly Skill
   return ev.footprints.marks;
 }
 
+const NO_BOLTS: readonly SkillEventBolt[] = [];
+
+/** The Bankshot bolts a viewer sees: everyone within the arena's prompt reach.
+ *  `at` is the sim clock. One list per tick, shared by every viewer. */
+export function skillEventBoltsFor(ctx: SimContext, pid: number): readonly SkillEventBolt[] {
+  const ev = ctx.skillEventState.active;
+  if (!ev || ev.phase !== 'running' || !ev.bankshot || ev.bankshot.bolts.length === 0) {
+    return NO_BOLTS;
+  }
+  const e = ctx.entities.get(pid);
+  if (!e || !withinSkillEventPrompt(ev, e.pos.x, e.pos.z)) return NO_BOLTS;
+  let view = boltViews.get(ev.bankshot);
+  if (!view || view.tick !== ctx.tickCount) {
+    view = {
+      tick: ctx.tickCount,
+      bolts: ev.bankshot.bolts.map((b) => ({
+        id: b.id,
+        x: b.x,
+        z: b.z,
+        dx: b.dx,
+        dz: b.dz,
+        harmful: b.bounces > 0,
+        at: ctx.time,
+      })),
+    };
+    boltViews.set(ev.bankshot, view);
+  }
+  return view.bolts;
+}
+const boltViews = new WeakMap<object, { tick: number; bolts: SkillEventBolt[] }>();
+
 /** The offline IWorld book: one object per sim, refreshed in place per read. */
-const markBooks = new WeakMap<SimContext, { now: number; marks: readonly SkillEventMark[] }>();
+const markBooks = new WeakMap<SimContext, import('../../world_api').SkillEventMarkBook>();
 
 export function skillEventMarkBookFor(
   ctx: SimContext,
@@ -647,10 +693,11 @@ export function skillEventMarkBookFor(
 ): import('../../world_api').SkillEventMarkBook {
   let book = markBooks.get(ctx);
   if (!book) {
-    book = { now: 0, marks: NO_MARKS };
+    book = { now: 0, marks: NO_MARKS, bolts: NO_BOLTS, boltSpeed: BANKSHOT_BOLT_SPEED };
     markBooks.set(ctx, book);
   }
   book.now = ctx.time;
   book.marks = skillEventMarksFor(ctx, pid);
+  book.bolts = skillEventBoltsFor(ctx, pid);
   return book;
 }

@@ -41,6 +41,7 @@ export const SKILL_EVENT_STANCE_CAST = {
   chant: 'skill_event_stance_chant',
   sever: 'skill_event_stance_sever',
   silenced: 'skill_event_stance_silenced',
+  brace: 'skill_event_stance_brace',
 } as const;
 
 export function castBarState(e: Entity): CastBarState {

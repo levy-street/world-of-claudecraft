@@ -6619,6 +6619,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.skillEvent.stance.sever': '截断中',
   'hud.skillEvent.stance.silenced': '沉默',
   'hud.skillEvent.score': '仪式：{count}/{goal}。最高：{best}。',
+  'hud.skillEvent.verbs.bolt': '弹矢',
+  'hud.skillEvent.verbs.brace': '架挡',
+  'hud.skillEvent.verbs.dash': '冲刺',
+  'hud.skillEvent.stance.brace': '架挡中',
+  'hud.skillEvent.verbTips.bolt':
+    '朝你面向的方向射出弹矢。弹到石头或墙之前它是无害的，之后会夺走它碰到的第一个战斗者（包括你）的1颗心。最多反弹{bounces}次。冷却时间{boltCd}秒。',
+  'hud.skillEvent.verbTips.brace':
+    '在{braceWindow}秒内，飞到你身上的弹矢会沿原路飞回，并归你所有。冷却时间{braceCd}秒。',
+  'hud.skillEvent.verbTips.dash': '向前冲刺{dash}码。冷却时间{dashCd}秒。',
   'hud.skillEvent.ready': '就绪',
   'hud.skillEvent.startsIn': '{minutes} 分钟后开始',
   'hud.skillEvent.keepsake': '保留技能',

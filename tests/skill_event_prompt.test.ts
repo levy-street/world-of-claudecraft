@@ -30,6 +30,7 @@ function info(canJoin: boolean): SkillEventInfo {
     hearts: null,
     maxHearts: 4,
     kit: null,
+    stones: null,
   };
 }
 

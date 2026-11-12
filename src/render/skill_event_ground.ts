@@ -25,6 +25,7 @@ import { attachSceneGroupGated } from './gated_scene_attach';
 import { SUN_DIR } from './gfx';
 import { type HillRingCompileGate, HillRingVisuals } from './hill_ring';
 import { sceneKeyLightUniform } from './scene_sampling';
+import { BankshotVisuals } from './skill_event_bankshot_visuals';
 import {
   SKILL_EVENT_STEP_FADE_BUCKETS,
   SKILL_EVENT_STEP_FADE_OPACITY,
@@ -290,11 +291,13 @@ class SkillEventMarkVisuals {
 }
 
 /** The world PvP ground: the King of the Hill circle, the skill event arena
- *  (at its live field radius) and the Footprints in Ash marks. */
+ *  (at its live field radius), the Footprints in Ash marks and the Bankshot
+ *  stones and bolts. */
 export class PvpGroundVisuals {
   private readonly hill: HillRingVisuals;
   private readonly arena: HillRingVisuals;
   private readonly marks: SkillEventMarkVisuals;
+  private readonly bankshot: BankshotVisuals;
 
   constructor(
     scene: THREE.Scene,
@@ -304,6 +307,7 @@ export class PvpGroundVisuals {
     this.hill = new HillRingVisuals(scene, compileGate, groundY);
     this.arena = new HillRingVisuals(scene, compileGate, groundY);
     this.marks = new SkillEventMarkVisuals(scene, compileGate, groundY);
+    this.bankshot = new BankshotVisuals(scene, compileGate, groundY);
   }
 
   /** Each frame, from IWorld. */
@@ -321,6 +325,8 @@ export class PvpGroundVisuals {
     const event = world.skillEventInfo;
     this.arena.sync(skillEventRingInput(event));
     this.arena.update(dt);
-    this.marks.sync(world.skillEventMarks(), camera);
+    const book = world.skillEventMarks();
+    this.marks.sync(book, camera);
+    this.bankshot.sync(event, book);
   }
 }

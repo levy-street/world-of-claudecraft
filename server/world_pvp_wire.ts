@@ -13,7 +13,7 @@
 // so its identity plus the carried flag is the revision. The check costs one
 // identity compare and a scan of the carried bags, at the `wpvp` cadence.
 
-import { skillEventMarksFor } from '../src/sim/pvp/skill_events';
+import { skillEventBoltsFor, skillEventMarksFor } from '../src/sim/pvp/skill_events';
 import { skullBagInfoFor } from '../src/sim/pvp/skull_bag';
 import type { PlayerMeta } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
@@ -169,11 +169,51 @@ export function emitSkillEventMarksKey(
     emitRaw('sevm', JSON.stringify(parts));
 }
 
+const boltWires = new WeakMap<object, { tick: number; json: string }>();
+
+/** Bankshot bolts in flight (src/sim/pvp/skill_event_bankshot.ts) on the self
+ *  wire, for a viewer near the arena: the whole live list as a flat
+ *  `id, x, z, dx, dz, harmful` per bolt, built and serialized ONCE per tick
+ *  and shared by every viewer (the same list for all of them), then
+ *  delta-guarded per session by `emitRaw`, so a still field costs nothing. */
+export function emitSkillEventBoltsKey(
+  emitRaw: (key: 'sevb', serialized: string) => void,
+  sim: { ctx: SimContext },
+  session: { lastSent: Record<string, string> },
+  anchorPid: number,
+): void {
+  const ctx = sim.ctx;
+  const bolts = skillEventBoltsFor(ctx, anchorPid);
+  if (bolts.length === 0) {
+    if (session.lastSent.sevb !== undefined && session.lastSent.sevb !== '[]') {
+      emitRaw('sevb', '[]');
+    }
+    return;
+  }
+  let wire = boltWires.get(bolts);
+  if (!wire || wire.tick !== ctx.tickCount) {
+    const parts: number[] = [];
+    for (const b of bolts) {
+      parts.push(
+        b.id,
+        Math.round(b.x * 100) / 100,
+        Math.round(b.z * 100) / 100,
+        Math.round(b.dx * 100) / 100,
+        Math.round(b.dz * 100) / 100,
+        b.harmful ? 1 : 0,
+      );
+    }
+    wire = { tick: ctx.tickCount, json: JSON.stringify(parts) };
+    boltWires.set(bolts, wire);
+  }
+  emitRaw('sevb', wire.json);
+}
+
 /** The PvP-ledger scalars (delta-guarded like delve marks, so a fresh session
- *  gets both) and the per-tick Footprints in Ash marks, from the self wire. */
+ *  gets both), the per-tick Footprints in Ash marks and the Bankshot bolts. */
 export function emitPvpLedgerKeys(
   maybe: (key: string, value: unknown) => void,
-  maybeRaw: (key: 'sevm', serialized: string) => void,
+  maybeRaw: (key: 'sevm' | 'sevb', serialized: string) => void,
   sim: { ctx: SimContext },
   session: { lastSent: Record<string, string> },
   meta: Pick<PlayerMeta, 'honor' | 'lifetimeHonor'>,
@@ -182,4 +222,5 @@ export function emitPvpLedgerKeys(
   maybe('honor', meta.honor);
   maybe('lhonor', meta.lifetimeHonor);
   emitSkillEventMarksKey(maybeRaw, sim, session, anchorPid);
+  emitSkillEventBoltsKey(maybeRaw, sim, session, anchorPid);
 }

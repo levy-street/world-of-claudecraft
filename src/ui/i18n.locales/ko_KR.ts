@@ -5168,6 +5168,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.skillEvent.stance.sever': '끊는 중',
   'hud.skillEvent.stance.silenced': '침묵',
   'hud.skillEvent.score': '의식: {goal}회 중 {count}회. 최고: {best}.',
+  'hud.skillEvent.verbs.bolt': '화살',
+  'hud.skillEvent.verbs.brace': '버티기',
+  'hud.skillEvent.verbs.dash': '돌진',
+  'hud.skillEvent.stance.brace': '버티는 중',
+  'hud.skillEvent.verbTips.bolt':
+    '바라보는 방향으로 화살을 쏩니다. 돌이나 벽에 튕기기 전까지는 무해하며, 튕긴 뒤에는 처음 닿는 참가자(자신 포함)의 하트 1개를 빼앗습니다. 최대 {bounces}번 튕깁니다. 재사용 대기시간 {boltCd}초.',
+  'hud.skillEvent.verbTips.brace':
+    '{braceWindow}초 동안 닿은 화살을 온 방향으로 되돌려 보내며, 그 화살은 내 것이 됩니다. 재사용 대기시간 {braceCd}초.',
+  'hud.skillEvent.verbTips.dash': '앞으로 {dash}미터 돌진합니다. 재사용 대기시간 {dashCd}초.',
   'hud.skillEvent.ready': '준비 완료',
   'hud.skillEvent.startsIn': '{minutes}분 후 시작',
   'hud.skillEvent.keepsake': '남긴 기술',

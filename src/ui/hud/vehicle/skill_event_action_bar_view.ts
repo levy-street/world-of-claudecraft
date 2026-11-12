@@ -25,6 +25,9 @@ export const SKILL_EVENT_VERB_ICONS: Readonly<Record<string, string>> = {
   sever: 'counterspell',
   false_start: 'arcane_missiles',
   shove: 'thunder_clap',
+  bolt: 'arcane_missiles',
+  brace: 'raised_guard',
+  dash: 'blink',
 };
 
 /** Each verb's name and its tooltip, as explicit keys (the i18n scanner reads them). */
@@ -40,6 +43,9 @@ export const SKILL_EVENT_VERB_LABELS: Readonly<Record<string, TranslationKey>> =
   sever: 'hud.skillEvent.verbs.sever',
   false_start: 'hud.skillEvent.verbs.false_start',
   shove: 'hud.skillEvent.verbs.shove',
+  bolt: 'hud.skillEvent.verbs.bolt',
+  brace: 'hud.skillEvent.verbs.brace',
+  dash: 'hud.skillEvent.verbs.dash',
 };
 export const SKILL_EVENT_VERB_TIPS: Readonly<Record<string, TranslationKey>> = {
   lunge: 'hud.skillEvent.verbTips.lunge',
@@ -53,6 +59,9 @@ export const SKILL_EVENT_VERB_TIPS: Readonly<Record<string, TranslationKey>> = {
   sever: 'hud.skillEvent.verbTips.sever',
   false_start: 'hud.skillEvent.verbTips.false_start',
   shove: 'hud.skillEvent.verbTips.shove',
+  bolt: 'hud.skillEvent.verbTips.bolt',
+  brace: 'hud.skillEvent.verbTips.brace',
+  dash: 'hud.skillEvent.verbTips.dash',
 };
 
 /** Most slots any kit shows: four verbs and the keepsake. */

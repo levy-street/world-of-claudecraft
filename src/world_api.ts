@@ -483,6 +483,7 @@ export type {
   HillPhaseInfo,
   HillSide,
   HillStandingInfo,
+  SkillEventBolt,
   SkillEventInfo,
   SkillEventKitInfo,
   SkillEventMark,
