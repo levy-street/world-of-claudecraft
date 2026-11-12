@@ -14,8 +14,8 @@
 //    wind-up and run stand at a moment after the wind-up's cue (`rushPhase`),
 //    how far the scar it tears is revealed and how it fades (`rushScar`); the
 //    red arrow over the marked player for the whole bar (`rushArrowLook`,
-//    `RUSH_ARROW`: where it floats, its bob, spin and pulse, faster as the bar
-//    runs out).
+//    `RUSH_ARROW`: where it floats, its size, its bob and its pulse, faster as
+//    the bar runs out).
 //
 // Every number a player reacts to (the tether showing at all, the scar along the
 // lane the run took) is drawn on every tier; only the motes, the shards and the
@@ -191,17 +191,22 @@ export const RUSH_TRACE_SECONDS = RUSH_SCAR.hold + RUSH_SCAR.fade;
 
 // ---- Mountain's Rush's arrow over the marked player ----------------------------------------
 
-/** The red arrow over the Rush's marked player (council_rush_arrow.ts), in yards over the
- *  player's feet: its tip floats clear of the head and nameplate, `length` tall, bobbing
- *  `bob` at `bobHz`, turning `spin` rad a second; it pulses from `pulseHz` at the mark to
- *  `pulseHzEnd` as the bar lands. Every tier: the mark is actionable (who to stay clear of,
- *  who must reach a pillar); reduced motion holds the bob, the spin and the pulse. */
+/** The red arrow over the Rush's marked player (council_rush_arrow.ts), in yards: its tip
+ *  floats `tip` over the player's feet, clear of the head and nameplate; it is `length`
+ *  tall and `width` across the head (a camera-facing card with `margin` all round for its
+ *  glow), bobbing `bob` at `bobHz`; it pulses from `pulseHz` at the mark to `pulseHzEnd`
+ *  as the bar lands. Every tier: the mark is actionable (who to stay clear of, who must
+ *  reach a pillar); reduced motion holds the bob and the pulse. */
 export const RUSH_ARROW = {
-  tip: 3.2,
-  length: 1.6,
-  bob: 0.25,
+  tip: 3.8,
+  length: 3.2,
+  width: 2.6,
+  /** Past this many yards from the camera the card grows with the distance, so a far
+   *  arrow keeps its size on screen (a nameplate's rule); nearer it is its true size. */
+  holdFrom: 22,
+  margin: 0.45,
+  bob: 0.3,
   bobHz: 1.4,
-  spin: 1.6,
   pulseHz: 1.6,
   pulseHzEnd: 5,
   /** The glow never falls below this (always readable), up to 1 on the pulse. */
@@ -214,8 +219,6 @@ export const RUSH_ARROW = {
 export interface RushArrowLook {
   /** Height of the tip over the player's feet (yards). */
   y: number;
-  /** Turn round the vertical (radians). */
-  spin: number;
   /** Brightness 0..1 (never under RUSH_ARROW.glowFloor). */
   glow: number;
   /** Size multiplier (1 at rest). */
@@ -230,21 +233,18 @@ export function rushArrowLook(
   reducedMotion: boolean,
   out: RushArrowLook,
 ): RushArrowLook {
-  const left = duration > 0 ? Math.max(0, Math.min(1, remaining / duration)) : 0;
-  const urgency = 1 - left;
   if (reducedMotion) {
     out.y = RUSH_ARROW.tip;
-    out.spin = 0;
     out.glow = 1;
     out.scale = 1;
     return out;
   }
+  const left = duration > 0 ? Math.max(0, Math.min(1, remaining / duration)) : 0;
+  const urgency = 1 - left;
   const hz = RUSH_ARROW.pulseHz + (RUSH_ARROW.pulseHzEnd - RUSH_ARROW.pulseHz) * urgency;
   const pulse = 0.5 + 0.5 * Math.sin(clock * hz * Math.PI * 2);
-  out.y =
-    RUSH_ARROW.tip +
-    RUSH_ARROW.bob * (0.5 + 0.5 * Math.sin(clock * RUSH_ARROW.bobHz * Math.PI * 2));
-  out.spin = clock * RUSH_ARROW.spin;
+  const bob = 0.5 + 0.5 * Math.sin(clock * RUSH_ARROW.bobHz * Math.PI * 2);
+  out.y = RUSH_ARROW.tip + RUSH_ARROW.bob * bob;
   out.glow = RUSH_ARROW.glowFloor + (1 - RUSH_ARROW.glowFloor) * pulse;
   out.scale = 1 + RUSH_ARROW.swell * pulse * (0.35 + 0.65 * urgency);
   return out;

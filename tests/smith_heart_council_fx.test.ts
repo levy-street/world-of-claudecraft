@@ -390,6 +390,7 @@ describe('CouncilFx over a fake world', () => {
     const arrowAt = (arrow as THREE.Object3D | null)?.position;
     expect(arrowAt?.x).toBeCloseTo(marked.pos.x, 5);
     expect(arrowAt?.z).toBeCloseTo(marked.pos.z, 5);
+    // Its tip floats clear of the head.
     expect((arrowAt?.y ?? 0) - marked.pos.y).toBeGreaterThanOrEqual(RUSH_ARROW.tip);
     // The bond: the tether (core, halo, shards) and its aura on both members
     // (a sigil on the floor, a column of light), every tier.

@@ -128,7 +128,7 @@ describe("Mountain's Rush: the wind-up, the run and the scar", () => {
 });
 
 describe("Mountain's Rush: the arrow over the marked player", () => {
-  const look = (): RushArrowLook => ({ y: 0, spin: 0, glow: 0, scale: 0 });
+  const look = (): RushArrowLook => ({ y: 0, glow: 0, scale: 0 });
 
   it('floats clear of the head, bobbing, and never dims below its floor', () => {
     for (let k = 0; k <= 40; k++) {
@@ -170,6 +170,6 @@ describe("Mountain's Rush: the arrow over the marked player", () => {
     const a = rushArrowLook(2, 5, 1.3, true, look());
     const b = rushArrowLook(2, 5, 7.9, true, look());
     expect(a).toEqual(b);
-    expect(a).toEqual({ y: RUSH_ARROW.tip, spin: 0, glow: 1, scale: 1 });
+    expect(a).toEqual({ y: RUSH_ARROW.tip, glow: 1, scale: 1 });
   });
 });

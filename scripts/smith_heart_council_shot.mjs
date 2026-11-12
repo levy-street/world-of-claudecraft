@@ -343,8 +343,18 @@ try {
     const mid = [(g[0] + cursedAt[0]) / 2, (g[1] + cursedAt[1]) / 2];
     const side = [-uz, ux];
     const cam = process.env.SHOT_RUSH_CAM ?? 'side';
+    // 'mark': close on the marked player beyond the cursed pillar (the Rush's arrow).
+    const marked = [cursedAt[0] + ux * 6, cursedAt[1] + uz * 6];
     if (cam === 'side')
       await place([mid[0] + side[0] * 12, mid[1] + side[1] * 12], mid, 0.0, 0.92, 26);
+    else if (cam === 'mark')
+      await place(
+        [marked[0] - ux * 6 + side[0] * 9, marked[1] - uz * 6 + side[1] * 9],
+        marked,
+        0.0,
+        0.5,
+        17,
+      );
     else await place([g[0] - ux * 8, g[1] - uz * 8], cursedAt, 0.0, 0.42, 16);
     const until = Date.now() + 9000;
     while (Date.now() < until) {
@@ -678,6 +688,10 @@ try {
     },
     // Mountain's Rush (consejo_flojos): the wind-up, the run, the stop on the
     // cursed pillar. The Singer parked far off (no bond), the raid aside.
+    // The mark's bar running: the red arrow over the marked player (noche 1112).
+    async c0_flecha_marca() {
+      await rushScene((st) => !!st.bars?.guardian, 1800);
+    },
     async c1_carga_preparacion() {
       await rushScene((st) => st.rush && st.rush.windup > 0 && st.rush.windup < 0.45);
     },
