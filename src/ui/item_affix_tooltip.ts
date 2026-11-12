@@ -7,6 +7,8 @@ import { countsWarfareRating } from '../sim/pvp/power';
 import type { ItemDef } from '../sim/types';
 import { esc } from './esc';
 import { type TranslationKey, t } from './i18n';
+import type { CompareStat } from './item_compare';
+import { compareStatLineHtml, type ItemCompareMarks } from './item_compare_view';
 import { itemNumber } from './item_instance_tooltip';
 import { statNameKey } from './stat_tooltip_view';
 
@@ -14,21 +16,26 @@ import { statNameKey } from './stat_tooltip_view';
 // it (item_instance_tooltip.ts); re-exported so hud.ts keeps one import site.
 export { compareStatLabelKey } from './item_instance_tooltip';
 
-function affixLine(value: number, labelKey: string): string {
+function affixLine(
+  value: number,
+  labelKey: string,
+  stat: CompareStat,
+  marks?: ItemCompareMarks,
+): string {
   if (value <= 0) return '';
-  return `<div class="tt-green">${esc(
-    t('itemUi.tooltip.stat', {
-      value: itemNumber(value),
-      stat: t(labelKey as TranslationKey),
-    }),
-  )}</div>`;
+  const text = t('itemUi.tooltip.stat', {
+    value: itemNumber(value),
+    stat: t(labelKey as TranslationKey),
+  });
+  return compareStatLineHtml('tt-green', esc(text), marks, stat);
 }
 
-/** Both affix lines for an item, or '' when it carries neither. */
-export function itemAffixTooltipLines(item: ItemDef): string {
+/** Both affix lines for an item, or '' when it carries neither. `marks` adds
+ *  each line's comparison cell (item_compare_view.ts). */
+export function itemAffixTooltipLines(item: ItemDef, marks?: ItemCompareMarks): string {
   return (
-    affixLine(item.spellPower ?? 0, statNameKey('spellPower')) +
-    affixLine(item.healPower ?? 0, 'hudChrome.statInfo.names.healPower')
+    affixLine(item.spellPower ?? 0, statNameKey('spellPower'), 'spellPower', marks) +
+    affixLine(item.healPower ?? 0, 'hudChrome.statInfo.names.healPower', 'healPower', marks)
   );
 }
 
@@ -36,15 +43,15 @@ export function itemAffixTooltipLines(item: ItemDef): string {
  *  PvP ratings, shown once) and the hit / crit / haste ratings as classic
  *  "+N Rating" lines sharing the character-sheet labels. Hit answers the
  *  higher-level miss/resist penalty; crit and haste add throughput. */
-export function itemRatingTooltipLines(item: ItemDef): string {
+export function itemRatingTooltipLines(item: ItemDef, marks?: ItemCompareMarks): string {
   let html = '';
-  const line = (value: number, stat: string) =>
-    `<div class="tt-green">${esc(
-      t('itemUi.tooltip.stat', {
-        value: itemNumber(value),
-        stat: t(statNameKey(stat as Parameters<typeof statNameKey>[0]) as TranslationKey),
-      }),
-    )}</div>`;
+  const line = (value: number, stat: CompareStat) => {
+    const text = t('itemUi.tooltip.stat', {
+      value: itemNumber(value),
+      stat: t(statNameKey(stat as Parameters<typeof statNameKey>[0]) as TranslationKey),
+    });
+    return compareStatLineHtml('tt-green', esc(text), marks, stat);
+  };
   const warfareRating = Math.min(item.pvpOffenseRating ?? 0, item.pvpDefenseRating ?? 0);
   if (warfareRating > 0) {
     html += line(warfareRating, 'warfare');

@@ -149,11 +149,11 @@ describe('hud.itemTooltip composition (source pins)', () => {
       new URL('../src/ui/item_combat_tooltip_view.ts', import.meta.url),
       'utf8',
     );
-    const affix = view.indexOf('itemAffixTooltipLines(resolved)');
+    const affix = view.indexOf('itemAffixTooltipLines(resolved, marks)');
     const bonusStats = view.indexOf('instanceBonusStatLines(instance');
     // The hit/crit/haste loop moved into item_affix_tooltip.ts (itemRatingTooltipLines);
     // its composition site is what the column order is pinned against now.
-    const ratings = view.indexOf('itemRatingTooltipLines(resolved)');
+    const ratings = view.indexOf('itemRatingTooltipLines(resolved, marks)');
     expect(bonusStats).toBeGreaterThan(-1);
     // After the def's own stat lines and the baked instance bonus stats
     // (which themselves follow the item.stats loop), matching the module
@@ -166,7 +166,7 @@ describe('hud.itemTooltip composition (source pins)', () => {
     expect(view.indexOf('itemAffixTooltipLines(', affix + 1)).toBe(-1);
     // hud.ts composes through the view exactly once and never reaches the
     // column helpers directly, so the order above is the tooltip's order.
-    const composed = hud.indexOf('itemCombatTooltipLines(item, instance)');
+    const composed = hud.indexOf('itemCombatTooltipLines(item, instance, cmp)');
     expect(composed).toBeGreaterThan(-1);
     expect(hud.indexOf('itemCombatTooltipLines(', composed + 1)).toBe(-1);
     expect(hud).not.toContain('itemAffixTooltipLines(');
@@ -183,6 +183,6 @@ describe('hud.itemTooltip composition (source pins)', () => {
       new URL('../src/ui/item_compare_view.ts', import.meta.url),
       'utf8',
     );
-    expect(compareView).toContain('t(compareStatLabelKey(d.stat) as TranslationKey)');
+    expect(compareView).toContain('t(compareStatLabelKey(stat) as TranslationKey)');
   });
 });

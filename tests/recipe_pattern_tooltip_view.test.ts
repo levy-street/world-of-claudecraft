@@ -674,8 +674,9 @@ describe('reachability through the real Hud tooltip', () => {
     // The potion's own use line, from the same builder its bag tooltip uses.
     expect(block).toContain('Use: Instantly restores 425 mana.');
     expect(block).toContain('Requires: Sunpetal Herb x1');
-    // The embedded card is compare-free: no second "Currently Equipped" block.
-    expect(block).not.toContain('tt-cmp');
+    // The embedded card is compare-free: no change cells, no set-tier line.
+    expect(block).not.toContain('tt-delta');
+    expect(block).not.toContain('tt-set-change');
   });
 
   it('renders a manual set block once, on its last embedded card', () => {

@@ -49,6 +49,25 @@ describe('paintTooltipAt', () => {
     expect(el.style.top).toBe('290px');
   });
 
+  it('measures the box at the left edge, not at the previous tooltip spot', () => {
+    // An absolutely positioned #tooltip shrinks to the room between its left
+    // and the viewport edge, so measuring while it still sits where the LAST
+    // tooltip was (a bag cell near the right edge) wraps a wide card. The fake
+    // records left at measure time.
+    const el = fakeTooltipEl({ w: 200, h: 100 });
+    el.style.left = '1200px';
+    let leftAtMeasure = '';
+    Object.defineProperty(el, 'offsetWidth', {
+      get: () => {
+        leftAtMeasure = el.style.left;
+        return 200;
+      },
+    });
+    paintTooltipAt(el, 'x', 500, 400, VIEW);
+    expect(leftAtMeasure).toBe('0px');
+    expect(el.style.left).toBe('514px');
+  });
+
   it('mounts a prebuilt Node instead of setting innerHTML', () => {
     const el = fakeTooltipEl({ w: 50, h: 50 });
     const node = {} as Node;

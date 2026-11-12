@@ -27,6 +27,7 @@
 import { MOUNT_RACE_START_PLATFORM, STABLE_PADDOCK, TRAINING_MOUNT_KEY } from './content/mounts';
 import { QUESTS } from './data';
 import { forceDismount, forceTrainingMount } from './mounts';
+import { MOUNT_TRAIN_MIN_LEVEL } from './riding_level';
 import {
   BASIC_RIDING_FEE_COPPER,
   ridingMoveSpeedPct,
@@ -44,7 +45,8 @@ import {
 } from './types';
 
 // --- tuning (change numbers here, not inline) -------------------------------
-export const MOUNT_TRAIN_MIN_LEVEL = 20;
+// The level gate lives in the riding_level leaf so light readers can import it.
+export { MOUNT_TRAIN_MIN_LEVEL };
 // The retired 100g lesson fee. Nothing charges it anymore: the lesson is free
 // and the only riding purchase is RIDING_SKILL_FEE_COPPER below. Kept only so
 // the grandfather mapping (mountTrainingFeePaid -> ridingTrained on load) has

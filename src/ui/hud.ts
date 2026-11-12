@@ -694,7 +694,7 @@ import { InteriorMapController } from './interior_map_controller';
 import { itemArmorTypeLabelKey } from './item_armor_type';
 import { requiredClassesForTooltip } from './item_class_restriction';
 import { itemCombatTooltipLines } from './item_combat_tooltip_view';
-import { itemCompareBlocksHtml } from './item_compare_view';
+import { itemCompareMarks } from './item_compare_view';
 import { ItemDragState } from './item_drag_state';
 import {
   instanceBadgeLines,
@@ -6385,6 +6385,7 @@ export class Hud {
     // Item"). Story lines (related quest, progress, rules, orphaned) come from
     // the pure model; escape and tEntity stay in this host.
     const questModel = this.questItemTooltipFor(item);
+    const cmp = compare === true ? this.itemCompare(item, instance) : undefined;
     // Title: quest gold for quest kinds, else the copy's EFFECTIVE quality; a
     // named copy titles the card (item_instance_tooltip.ts owns the rules).
     let html = instanceTitleHtml(item, instance, itemDisplayName(item));
@@ -6497,7 +6498,7 @@ export class Hud {
     // seal and the enchanted marker (item_instance_tooltip.ts owns the copy
     // rules, incl. never claiming a quality-rank upgrade).
     html += instanceBadgeLines(instance);
-    html += itemCombatTooltipLines(item, instance);
+    html += itemCombatTooltipLines(item, instance, cmp);
     html += membershipItemTooltipLines(item, wearer);
     if (item.foodHp)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useFood', { amount: itemNumber(item.foodHp), seconds: itemNumber(CONSUME_DURATION) }))}</div>`;
@@ -6569,8 +6570,8 @@ export class Hud {
       if (mountDef) {
         const descKey = MOUNT_DESC_KEYS[mountDef.key];
         if (descKey) html += `<div class="tt-desc">${esc(t(descKey))}</div>`;
-        // No per-mount level gate any more: the only requirement is the riding
-        // skill, so the tooltip says how to ride instead of quoting a level.
+        // No per-mount gate: the shared Requires Level line below quotes the
+        // riding level (item_level_gate.ts), and this line says how to ride.
         html += `<div class="tt-sub">${esc(t('hudChrome.mounts.useToRide'))}</div>`;
       }
     }
@@ -6587,8 +6588,7 @@ export class Hud {
       html += stackSizeTooltipLine(item, instance);
       html += vendorSellTooltipLine(item);
     }
-    if (compare === true) html += this.itemCompareBlock(item, instance);
-    return html;
+    return html + (cmp?.footerHtml() ?? '');
   }
 
   // Legendary "chance on action" procs: one green trigger line per proc, each
@@ -6652,15 +6652,13 @@ export class Hud {
     return html;
   }
 
-  // Classic-style item comparison (the item_compare_view pure core): Hud
-  // supplies its world's equipment reads, the hovered copy's payload, and the
-  // tooltip renderer, so BOTH sides carry per-copy stats and titles.
-  private itemCompareBlock(item: ItemDef, instance?: ItemInstancePayload): string {
-    return itemCompareBlocksHtml(
+  // The comparison drawn on the hovered card (the item_compare_view pure
+  // core): Hud supplies its world's equipment reads and the hovered copy.
+  private itemCompare(item: ItemDef, instance?: ItemInstancePayload) {
+    return itemCompareMarks(
       item,
       membershipTooltipEquipment(this.sim),
       (id) => ITEMS[id] && membershipTooltipItem(ITEMS[id], this.sim),
-      (equipped, worn) => this.itemTooltip(equipped, false, worn),
       instance,
     );
   }

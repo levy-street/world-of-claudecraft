@@ -44,6 +44,10 @@ export function paintTooltipAt(
   }
   tooltipEl.style.display = 'block';
   tooltipEl.style.maxHeight = `${tooltipMaxHeight(viewport)}px`;
+  // Measure from the left edge: an absolute box shrinks to the room right of
+  // its current left, so the previous tooltip's spot would wrap a wide card
+  // (the side-by-side item compare) and the placement would use that size.
+  tooltipEl.style.left = '0px';
   const box = { w: tooltipEl.offsetWidth, h: tooltipEl.offsetHeight };
   const at = tooltipPlacementAt(x, y, box, viewport);
   tooltipEl.style.left = `${at.left}px`;

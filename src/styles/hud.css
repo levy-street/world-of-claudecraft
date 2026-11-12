@@ -9958,23 +9958,56 @@
     padding-top: 5px;
     border-top: 1px solid #3a3526;
   }
-  /* item comparison block (hover an equippable item to see the worn one + deltas),
-     and the crafted product card a recipe pattern embeds under its teaches line */
-  #tooltip .tt-cmp,
+  /* the crafted product card a recipe pattern embeds under its teaches line */
   #tooltip .tt-recipe-product {
     margin-top: 6px;
     padding-top: 5px;
     border-top: 1px solid #3a3526;
   }
-  #tooltip .tt-cmp-head {
-    color: #8a7f5e;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-top: 3px;
+  /* Item comparison (item_compare_view.ts): the change a swap would make sits
+     in a right-hand cell on the hovered card's own stat lines, so the worn
+     card is never drawn. The arrow is a border triangle in the cell's own
+     color and the cell text keeps its sign, so direction never rests on color
+     alone. A ring against two worn rings gets two fixed-width columns. */
+  #tooltip .tt-deltas {
+    display: flex;
+    flex: none;
+    gap: 10px;
   }
-  #tooltip .tt-cmp-body {
-    opacity: 0.7;
+  #tooltip .tt-delta {
+    font-size: calc(11.5px * var(--tooltip-scale, 1));
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  #tooltip .tt-delta.tt-green::before,
+  #tooltip .tt-delta.tt-red::before {
+    content: "";
+    display: inline-block;
+    margin-right: 3px;
+    vertical-align: 0.1em;
+    border: calc(3.5px * var(--tooltip-scale, 1)) solid transparent;
+  }
+  #tooltip .tt-delta.tt-green::before {
+    border-top-width: 0;
+    border-bottom-color: currentColor;
+  }
+  #tooltip .tt-delta.tt-red::before {
+    border-bottom-width: 0;
+    border-top-color: currentColor;
+  }
+  #tooltip .tt-deltas-2 .tt-delta {
+    min-width: 4.5em;
+    text-align: right;
+  }
+  #tooltip .tt-delta-head .tt-delta {
+    font-size: calc(10px * var(--tooltip-scale, 1));
+    font-weight: normal;
+  }
+  /* A set tier the swap would break (red) or light (green), at the card's foot. */
+  #tooltip .tt-set-change {
+    margin-top: 4px;
+    font-weight: 600;
   }
 
   /* ---------- floating combat text ---------- */
