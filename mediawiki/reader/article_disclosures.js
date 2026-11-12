@@ -33,3 +33,36 @@ export function organizeReferenceDetails(article) {
   }
   sourceHeading.replaceWith(details);
 }
+
+// Boss fights are spoilers: how a boss works stays closed until the reader asks for it.
+const ENCOUNTER_HEADINGS = [
+  'Normal encounter',
+  'Heroic encounter',
+  'Boss encounters',
+  'Pulling the final boss',
+];
+
+export function isBossPage(page) {
+  return /^! Rank\n\| (?:World boss|Boss)$/m.test(page.text ?? '');
+}
+
+export function hideSpoilers(article, page) {
+  const boss = isBossPage(page);
+  for (const heading of [...article.children].filter((node) => node.tagName === 'H2')) {
+    const title = heading.textContent;
+    if (!ENCOUNTER_HEADINGS.includes(title) && !(boss && title === 'Mechanics')) continue;
+    const details = document.createElement('details');
+    details.className = 'wiki-spoiler';
+    const summary = document.createElement('summary');
+    const label = document.createElement('strong');
+    label.textContent = 'Spoiler';
+    summary.append(label, ' · ' + title + '. Select to show how this fight works.');
+    details.append(summary);
+    for (let node = heading.nextElementSibling; node && node.tagName !== 'H2'; ) {
+      const next = node.nextElementSibling;
+      details.append(node);
+      node = next;
+    }
+    if (details.children.length > 1) heading.after(details);
+  }
+}

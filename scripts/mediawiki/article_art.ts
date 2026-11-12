@@ -46,6 +46,16 @@ type TitleMaps = Partial<
 // Never invoke the fallback canvas renderer from the Node seed generator.
 const paintedItem = (id: string) => currencyImageUrl(id) ?? weaponIconUrl(id) ?? itemImageUrl(id);
 
+/** The packaged icon for an item, or '' when the game paints it at run time. */
+export function itemArtPath(id: string): string {
+  const path = paintedItem(id);
+  return path &&
+    /^\/ui\/[A-Za-z0-9_/-]+\.webp$/.test(path) &&
+    existsSync(join('public', path.slice(1)))
+    ? path
+    : '';
+}
+
 export function articleArt(titleBy: TitleMaps): Map<string, string> {
   const byTitle = new Map<string, string>();
   const files = new Map<string, boolean>();

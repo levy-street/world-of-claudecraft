@@ -626,3 +626,22 @@ body {
   color: var(--woc-ink-soft);
   font-size: 13px;
 }
+
+/* Loot tables: header band, zebra rows, aligned numbers. */
+.loot-table {
+  width: 100%;
+}
+.loot-table th {
+  text-align: left;
+}
+.loot-table td:nth-child(3) {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.loot-table .woc-inline-art {
+  width: 28px;
+  height: 28px;
+  margin-right: 8px;
+  vertical-align: middle;
+}

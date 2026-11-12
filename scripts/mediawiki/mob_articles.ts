@@ -10,6 +10,7 @@ import { HEROIC_BOSS_LOOT } from '../../src/sim/content/heroic_loot';
 import {
   DUNGEON_LIST,
   getActiveWorldContent,
+  ITEMS,
   MOBS,
   QUESTS,
   zoneContaining,
@@ -24,10 +25,12 @@ import type { LootEntry } from '../../src/sim/types';
 import { WORLD_BOSS_CORPSE_SECONDS, WORLD_BOSSES } from '../../src/sim/world_boss';
 import { WORLD_SEED } from '../../src/sim/world_seed';
 import { rankValues } from './ability_ranks';
+import { itemArtPath } from './article_art';
 import { companionBossSources, companionByCreature, companionRollText } from './companion_sources';
 import { creatureRole, FRIENDLY_GROUPS } from './creature_role';
 import { journalArticles } from './encounter_articles';
 import { type ArticleTools, append, lines, pct, ref, words } from './entity_format';
+import { type LootRow, lootTables } from './loot_table';
 import { mobMechanicLines } from './mob_mechanics';
 import { releasedCampStats } from './released_camp_stats';
 
@@ -65,6 +68,49 @@ function lootLine(w: ArticleTools, entry: LootEntry, heroicOnly: boolean, upgrad
     reward.join(', ') + ' (' + [pct(entry.chance) + ' base chance', ...conditions].join(', ') + ').'
   );
 }
+const capital = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+// The same facts as lootLine, split into the columns of the loot table.
+function lootRow(
+  w: ArticleTools,
+  entry: LootEntry,
+  heroicOnly: boolean,
+  upgrades: boolean,
+): LootRow {
+  const item = entry.itemId;
+  const notes: string[] = [];
+  let drop = '';
+  if (item) {
+    const art = itemArtPath(item);
+    drop = (art ? '<woc-art path="' + art + '" size="icon" /> ' : '') + ref(w, 'item', item);
+    const heroic = heroicLootItemId(
+      item,
+      upgrades && !entry.questId && !entry.normalOnly && !heroicOnly,
+    );
+    if (heroic !== item) notes.push('On Heroic you get ' + ref(w, 'item', heroic));
+  }
+  if (entry.copper) {
+    const coins =
+      capital(coinRange(entry.copper)) +
+      (entry.heroicCopper ? ' (' + coinRange(entry.heroicCopper) + ' on Heroic)' : '');
+    drop = drop ? drop + ' and ' + coins : coins;
+  }
+  if (entry.questId) notes.push('Only while you need it for ' + ref(w, 'quest', entry.questId));
+  if (entry.unlessOwned) notes.push('Only if you do not already have it');
+  if (entry.unlessOwnedItem)
+    notes.push('Only if you do not have ' + ref(w, 'item', entry.unlessOwnedItem));
+  if (entry.maxPlayerLevel !== undefined)
+    notes.push('Only if you are level ' + entry.maxPlayerLevel + ' or lower');
+  return {
+    drop,
+    quality: item ? capital(ITEMS[item]?.quality ?? 'common') : 'Coins',
+    chance: entry.chance,
+    notes,
+    pool: entry.rollGroup,
+    difficulty: heroicOnly ? 'Heroic' : entry.normalOnly ? 'Normal' : 'Any',
+  };
+}
+
 export function addMobArticles(w: ArticleTools, itemSources: Map<string, Set<string>>) {
   const journals = journalArticles(w);
   const locations = new Map<string, Set<string>>();
@@ -248,6 +294,9 @@ export function addMobArticles(w: ArticleTools, itemSources: Map<string, Set<str
       ]);
     }
     const drops: string[] = [];
+    const lootRows: LootRow[] = [];
+    const lootNotes: string[] = [];
+    const lootExtra: string[] = [];
     for (const [entries, heroicOnly] of [
       [m.loot, false],
       [HEROIC_BOSS_LOOT[m.id] ?? [], true],
@@ -264,6 +313,7 @@ export function addMobArticles(w: ArticleTools, itemSources: Map<string, Set<str
           continue;
         const text = lootLine(w, e, heroicOnly, instanceMobs.has(m.id));
         drops.push(text);
+        lootRows.push(lootRow(w, e, heroicOnly, instanceMobs.has(m.id)));
         if (!e.itemId) continue;
         const source = ref(w, 'mob', m.id) + ' drops ' + text;
         append(itemSources, e.itemId, source);
@@ -271,17 +321,17 @@ export function addMobArticles(w: ArticleTools, itemSources: Map<string, Set<str
           append(itemSources, heroicLootItemId(e.itemId, true), source);
       }
     if (m.loot.some((e) => e.rollGroup) || HEROIC_BOSS_LOOT[m.id]?.some((e) => e.rollGroup))
-      drops.unshift(
+      lootNotes.push(
         'Some items share one roll. Only one of them can drop from that roll. Your class, and items you already have, can change the final odds.',
       );
     if (m.worldBoss)
-      drops.unshift(
+      lootNotes.unshift(
         'Each player who helped and can get loot rolls for themselves. Each player can win at most one gear item per kill, across all the shared gear pools.',
       );
     for (const row of companionBossSources.filter((s) => s.bossId === m.id)) {
       const name = BUDDIES[row.key].name;
       const title = w.titleBy.companion?.get(row.key);
-      drops.push(
+      lootExtra.push(
         (title ? w.link(title, name) : name) +
           ' companion. ' +
           companionRollText(row.fullGroupChance),
@@ -336,7 +386,9 @@ export function addMobArticles(w: ArticleTools, itemSources: Map<string, Set<str
       lines(w, 'Locations', Array.from(locations.get(m.id) ?? [])) +
       lines(w, 'Mechanics', mobMechanicLines(m)) +
       (journals.get(m.id) ?? '') +
-      lines(w, 'Loot', drops) +
+      (drops.length || lootExtra.length
+        ? w.section('Loot', lootTables(lootRows, lootNotes, lootExtra))
+        : '') +
       lines(w, 'Quest credit', Array.from(hunted.get(m.id) ?? []));
     const role = creatureRole(m.id);
     w.add(

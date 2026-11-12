@@ -1,4 +1,4 @@
-import { organizeReferenceDetails } from './article_disclosures.js';
+import { hideSpoilers, organizeReferenceDetails } from './article_disclosures.js';
 
 // Arrange the rendered wikitext without reinterpreting game values or their links.
 const factSections = {
@@ -214,6 +214,7 @@ export function layoutArticle(view, page, wide, zoneName) {
       }
     }
   }
+  hideSpoilers(article, page);
   organizeReferenceDetails(article);
   const toc = contents(article, page.title, wide);
   const front = element('div', 'wiki-opening');

@@ -1362,3 +1362,88 @@ body[data-woc-site] .searchbox #lookup {
   color: var(--text-dim);
   font-size: 13px;
 }
+
+/* Data tables with a header row (loot tables): header band, zebra rows, aligned numbers. */
+#view .wiki-prose table:has(tr:first-child th + th) {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--border-soft);
+  border-radius: 5px;
+  overflow: hidden;
+}
+#view .wiki-prose table:has(tr:first-child th + th) th {
+  padding: 9px 14px;
+  color: var(--gold);
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-align: left;
+  text-transform: uppercase;
+}
+#view .wiki-prose table:has(tr:first-child th + th) td {
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--border-soft);
+  vertical-align: middle;
+}
+#view .wiki-prose table:has(tr:first-child th + th) tr:nth-child(odd) td {
+  background: var(--bg-2);
+}
+#view .wiki-prose table:has(tr:first-child th + th) tr:last-child td {
+  border-bottom: 0;
+}
+#view .wiki-prose table:has(tr:first-child th + th) td:first-child {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: min(300px, 42vw);
+  font-weight: 600;
+}
+#view .wiki-prose table:has(tr:first-child th + th) td:nth-child(3) {
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  white-space: nowrap;
+}
+#view .wiki-prose table:has(tr:first-child th + th) td:nth-child(2) {
+  white-space: nowrap;
+}
+#view .wiki-prose table:has(tr:first-child th + th) td:nth-child(4) {
+  color: var(--text-dim);
+  font-size: 15px;
+}
+#view .wiki-prose table:has(tr:first-child th + th) .ability-icon {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border-soft);
+  border-radius: 4px;
+}
+
+/* Spoiler wall: boss mechanics stay closed until the reader opens them. */
+.wiki-spoiler {
+  margin: 14px 0 26px;
+  border: 1px dashed var(--gold-dim);
+  border-radius: 5px;
+  background: var(--bg-2);
+}
+.wiki-spoiler > summary {
+  padding: 14px 18px;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+.wiki-spoiler > summary strong {
+  color: var(--gold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.wiki-spoiler[open] > summary {
+  border-bottom: 1px dashed var(--gold-dim);
+}
+.wiki-spoiler > :not(summary) {
+  margin-inline: 18px;
+}
+.wiki-spoiler > :last-child {
+  margin-bottom: 16px;
+}
