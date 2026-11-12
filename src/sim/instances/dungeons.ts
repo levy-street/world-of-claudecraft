@@ -99,6 +99,7 @@ import {
   raidReturnRoute,
 } from './raid_return';
 import { RAID_REQUIRED_DUNGEON_IDS, resetCooldownApplies } from './reset_cooldown_policy';
+import { corpseBlocksInstanceReset, deliverPersonalQuestLoot } from './reset_loot_gate';
 
 const DOOR_TRIGGER_RADIUS = 2.0; // walking this close to a dungeon door teleports you
 const HEROIC_REWARD_WINDOW_MS = 24 * 60 * 60 * 1000;
@@ -1362,11 +1363,14 @@ export function resetDungeonInstances(
     }
   }
 
+  // A personal quest slot never blocks: it is delivered to its recipients just
+  // below instead (reset_loot_gate.ts).
   for (const inst of resettable) {
-    if (inst.mobIds.some((id) => ctx.entities.get(id)?.lootable)) {
+    if (inst.mobIds.some((id) => corpseBlocksInstanceReset(ctx, ctx.entities.get(id)))) {
       return blocked('loot', 'You cannot reset instances while loot remains inside.');
     }
   }
+  for (const inst of resettable) deliverPersonalQuestLoot(ctx, inst.mobIds);
 
   // Reclaim each slot immediately at the selected difficulty. This commits the
   // transition atomically: toggling the preference back afterward still rejoins this
