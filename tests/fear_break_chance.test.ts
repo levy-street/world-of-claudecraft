@@ -290,10 +290,12 @@ describe('PvP fear diminishing returns scale the authored duration', () => {
     expect([dr(4), dr(4), dr(4)]).toEqual([4, 2, 1]);
   });
 
-  it('never reaches full immunity, unlike root and stun', () => {
+  it('reaches full immunity once the four rungs are spent, like root', () => {
     const { dr, reset } = pvpRig();
     reset();
-    for (let i = 0; i < 6; i++) expect(dr(8)).not.toBeNull();
+    for (let i = 0; i < 4; i++) expect(dr(8)).not.toBeNull();
+    expect(dr(8)).toBeNull();
+    expect(dr(8)).toBeNull();
   });
 
   it('leaves PvE untouched: a mob target takes the raw authored duration', () => {

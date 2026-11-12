@@ -55,15 +55,17 @@ const PVP_POLYMORPH_DR_DURATIONS = [10, 5, 1] as const;
 // Psychic Scream (4s) and Howl of Terror / Death Coil (3s) were all silently
 // doubled or better. Five abilities across three classes share this ladder, so an
 // absolute table can only ever be right for one of them. These factors reproduce
-// the old 8 -> 4 -> 2 -> 1 exactly for an 8s fear.
+// the old 8 -> 4 -> 2 -> 1 exactly for an 8s fear. Once the last rung is spent
+// the next fear inside the reset window is resisted outright (DR-immune).
 const PVP_FEAR_DR_MULTIPLIERS = [1, 0.5, 0.25, 0.125] as const;
 
 /**
  * The PvP diminishing-returns ladder for one crowd-control category: full
  * duration outside hostile player-versus-player combat, a fixed staged
- * schedule for polymorph, the duration-scaled fear ladder, the shared
- * 100/50/25/immune multiplier ladder for root/lockout, and null once that
- * ladder is exhausted (DR-immune, apply nothing). `now` and `isHostileTo` are
+ * schedule for polymorph, the duration-scaled 100/50/25/12.5/immune fear
+ * ladder, the shared 100/50/25/immune multiplier ladder for root/lockout, and
+ * null once a fear or root/lockout ladder is exhausted (DR-immune, apply
+ * nothing). `now` and `isHostileTo` are
  * passed in rather than read off a host: this keeps the resolver a leaf module
  * with no `SimContext` dependency, so a Vitest can import and exercise it
  * directly. It is NOT a pure function of its arguments: three of its exits
@@ -103,8 +105,13 @@ export function crowdControlDurationAfterDr(
     return PVP_POLYMORPH_DR_DURATIONS[Math.min(stage, PVP_POLYMORPH_DR_DURATIONS.length - 1)];
   }
   if (category === 'fear') {
+    // Past the last rung the target is DR-immune until the window expires. The
+    // immune exit must not write `ccDr`: refreshing `resetAt` here would let a
+    // chain-caster hold the window open forever, and clamping to the last rung
+    // instead (the old behavior) let Harrow be chained at 12.5% indefinitely.
+    if (stage >= PVP_FEAR_DR_MULTIPLIERS.length) return null;
     target.ccDr.set(category, { stage: stage + 1, resetAt: now + reset });
-    return duration * PVP_FEAR_DR_MULTIPLIERS[Math.min(stage, PVP_FEAR_DR_MULTIPLIERS.length - 1)];
+    return duration * PVP_FEAR_DR_MULTIPLIERS[stage];
   }
   if (stage >= PVP_CC_DR_MULTIPLIERS.length) return null;
   target.ccDr.set(category, { stage: stage + 1, resetAt: now + reset });
