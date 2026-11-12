@@ -248,6 +248,9 @@ const UI_PURE_CORES = [
   // hint strip so a printed glyph and its colour can never disagree.
   'src/ui/micro_menu_state_view.ts',
   'src/ui/ability_tooltip_lines.ts',
+  // The ability tooltip body and its Shift-held detail lines.
+  'src/ui/ability_tooltip_view.ts',
+  'src/ui/ability_tooltip_detail_core.ts',
   'src/ui/dawnreaver_damage_tooltip_core.ts',
   'src/ui/proc_ready_glow_core.ts',
   'src/ui/reticle_ticks_core.ts',

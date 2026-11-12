@@ -213,3 +213,64 @@ describe('tooltip input binding', () => {
     expect(r.rect).not.toHaveBeenCalled();
   });
 });
+
+describe('tooltip in-place repaint (Shift detail toggle)', () => {
+  function rigWithRepaint() {
+    const r = rig();
+    const repaints: ((() => void) | null)[] = [];
+    // Rebind a fresh element with the optional hook so the original rig stays untouched.
+    const el = document.createElement('button');
+    document.body.append(el);
+    let content = 'plain';
+    const html = vi.fn(() => content);
+    bindTooltip(el, html, {
+      ...r.deps,
+      setActiveRepaint: (fn: (() => void) | null) => repaints.push(fn),
+    });
+    return { r, el, html, repaints, setContent: (v: string) => (content = v) };
+  }
+
+  it('hands the owner a repaint that re-resolves content at the last pointer spot', () => {
+    const t = rigWithRepaint();
+    mouse(t.el, 'mouseenter');
+    mouse(t.el, 'mousemove', 310, 220);
+    const repaint = t.repaints.at(-1);
+    expect(repaint).toBeTypeOf('function');
+    t.setContent('detailed');
+    t.r.paint.mockClear();
+    repaint?.();
+    expect(t.r.paint).toHaveBeenCalledWith('detailed', 310, 220);
+  });
+
+  it('skips the repaint when the content did not change', () => {
+    const t = rigWithRepaint();
+    mouse(t.el, 'mouseenter');
+    t.r.paint.mockClear();
+    t.repaints.at(-1)?.();
+    expect(t.r.paint).not.toHaveBeenCalled();
+  });
+
+  it('never repaints over a foreign paint of the shared box (the mob card)', () => {
+    const t = rigWithRepaint();
+    // Keyboard focus shows the tooltip; no mouseleave will ever follow.
+    t.el.dispatchEvent(new FocusEvent('focusin'));
+    const repaint = t.repaints.at(-1);
+    // Another surface paints the shared box directly, bypassing this binding.
+    t.r.tooltipEl.innerHTML = '<div>mob card</div>';
+    t.setContent('detailed');
+    t.r.paint.mockClear();
+    repaint?.();
+    expect(t.r.paint).not.toHaveBeenCalled();
+    expect(t.r.tooltipEl.innerHTML).toBe('<div>mob card</div>');
+  });
+
+  it('clears the active repaint when the box hides', () => {
+    const t = rigWithRepaint();
+    mouse(t.el, 'mouseenter');
+    mouse(t.el, 'mouseleave');
+    expect(t.repaints.at(-1)).toBeNull();
+    t.el.dispatchEvent(new FocusEvent('focusin'));
+    t.el.dispatchEvent(new FocusEvent('focusout'));
+    expect(t.repaints.at(-1)).toBeNull();
+  });
+});
