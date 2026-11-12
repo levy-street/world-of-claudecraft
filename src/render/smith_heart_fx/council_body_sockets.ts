@@ -83,6 +83,11 @@ export function councilBodySockets(role: CouncilRole): CouncilBodySocketSet | nu
 }
 
 const HANDS_KEY = 'smithHeartCouncilHands';
+
+function isUnder(o: THREE.Object3D, root: THREE.Object3D): boolean {
+  for (let p: THREE.Object3D | null = o; p; p = p.parent) if (p === root) return true;
+  return false;
+}
 const HAND_BONES = ['Hand.L', 'Hand.R'] as const;
 
 /** `role`'s two hand bones on its live view (both models rig a Hand.L and a
@@ -97,13 +102,16 @@ export function councilHands(
   const kept = s.root.userData[HANDS_KEY] as
     | readonly [THREE.Object3D | null, THREE.Object3D | null]
     | undefined;
-  if (kept) return kept;
+  // Reused only while both bones still hang under this view (a model swap
+  // under the same root leaves the old rig's bones detached).
+  if (kept && kept.every((b) => b !== null && isUnder(b, s.root))) return kept;
   const find = (bone: string) =>
     s.root.getObjectByName(THREE.PropertyBinding.sanitizeNodeName(bone)) ??
     s.root.getObjectByName(bone) ??
     null;
   const hands = [find(HAND_BONES[0]), find(HAND_BONES[1])] as const;
-  s.root.userData[HANDS_KEY] = hands;
+  // Kept only when both resolved (a rig still loading is asked again).
+  if (hands[0] && hands[1]) s.root.userData[HANDS_KEY] = hands;
   return hands;
 }
 

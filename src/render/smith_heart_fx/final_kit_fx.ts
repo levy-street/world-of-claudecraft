@@ -57,6 +57,7 @@ import { GFX } from '../gfx';
 import { getFlameTex } from '../ignivar_fire_vfx';
 import { setRenderCategory } from '../renderer_diagnostics';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
+import { anvilUnder } from './final_anvil_core';
 import { FinalAnvilFx } from './final_anvil_fx';
 import {
   FINAL_KIT_COLORS as C,
@@ -168,6 +169,9 @@ export class FinalKitFx {
   private readonly spikes: THREE.InstancedMesh;
   /** Weight of the Anvil's whole look past its mark (final_anvil_fx.ts). */
   private readonly anvilFx: FinalAnvilFx;
+  /** The players' places this frame for the Anvil's count (pooled). */
+  private readonly underPool: { x: number; z: number; dead: boolean }[] = [];
+  private readonly underPts: { x: number; z: number; dead: boolean }[] = [];
   private readonly rim: THREE.Mesh;
   private readonly rimMat: THREE.ShaderMaterial;
   private readonly unboundRing: THREE.Mesh;
@@ -898,14 +902,20 @@ export class FinalKitFx {
               : timedFill(age, total);
           this.foot(id, 'anvil', FINAL_FOOTPRINTS.anvil, x, z, r, fill, true);
           // How many stand under it (its runes say whether that is a full share).
-          let under = 0;
+          const pts = this.underPts;
+          pts.length = 0;
           for (const pid of this.playerIds) {
             const p = world.entities.get(pid);
-            if (!p || p.dead) continue;
+            if (!p) continue;
             const pAt = fxAnchor(p);
-            if (Math.hypot(pAt.x - x, pAt.z - z) <= r) under++;
+            const slot = this.underPool[pts.length] ?? { x: 0, z: 0, dead: false };
+            this.underPool[pts.length] = slot;
+            slot.x = pAt.x;
+            slot.z = pAt.z;
+            slot.dead = p.dead;
+            pts.push(slot);
           }
-          this.anvilFx.hang(id, x, y, z, fill, under, r);
+          this.anvilFx.hang(id, x, y, z, fill, anvilUnder(pts, x, z, r), r);
           break;
         }
         case 'windWarn':

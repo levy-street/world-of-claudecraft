@@ -1093,6 +1093,9 @@ export class QuenchEntranceFx {
     const e = this.entityId >= 0 ? world.entities.get(this.entityId) : undefined;
     if (!e) {
       if (this.entityId >= 0) this.release();
+      // The pools hang off the root now (not the hidden stage): they run out
+      // and hide on their own clock.
+      this.particles.update(this.clock);
       return;
     }
     const prev = this.time;
@@ -1112,6 +1115,7 @@ export class QuenchEntranceFx {
       // The next scene lays its stage afresh where she lies then.
       this.placedX = Number.NaN;
       this.cut = false;
+      this.particles.update(this.clock);
       return;
     }
     this.place(e);

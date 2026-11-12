@@ -178,13 +178,15 @@ describe('the blows over a fake world', () => {
       fx: 'nova',
       ability: COUNCIL_CASTS.wrath,
     } as SimEvent;
+    const before = r.shakes.length;
     expect(r.fx.handleEvent(nova)).toBe(false);
+    // Exactly one thud from the release (the bar's own frames may rumble).
+    expect(r.shakes.length).toBe(before + 1);
     r.fx.update(1 / 20);
     expect(r.shown('smithHeartCouncilStrikeHand')).toBe(0);
     expect(r.shown('smithHeartCouncilStrikeFlash')).toBe(1);
     expect(r.shown('smithHeartCouncilStrikeCracks')).toBe(1);
     expect(r.shown('smithHeartCouncilStrikePebbles')).toBe(1);
-    expect(r.shakes.length).toBeGreaterThanOrEqual(1);
     const thuds = r.shakes.length;
     // It runs out and hides.
     for (let i = 0; i < (STRIKE_FX.cracksFor + 0.5) * 20; i++) r.fx.update(1 / 20);

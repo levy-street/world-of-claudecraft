@@ -30,6 +30,7 @@ import {
   anvilRuneLit,
   anvilShake,
   anvilSoakReady,
+  anvilUnder,
 } from '../src/render/smith_heart_fx/final_anvil_core';
 import { HEART_ROOM } from '../src/sim/content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
@@ -97,6 +98,25 @@ describe("the Anvil's plan", () => {
     expect(anvilHang(0.5).shudder).toBe(0);
     expect(anvilHang(ANVIL_FX.dropAt - 0.05).shudder).toBeGreaterThan(0);
     expect(anvilHang(0.95).streak).toBeGreaterThan(0.5);
+  });
+
+  it("counts who stands under it by the sim's own test: the rim in, the dead out", () => {
+    const R = T.anvilR;
+    expect(
+      anvilUnder(
+        [
+          { x: 0, z: 0 },
+          { x: R, z: 0 },
+          { x: 0, z: R + 0.01 },
+          { x: 1, z: 1, dead: true },
+          { x: -R * 0.7, z: R * 0.7 },
+        ],
+        0,
+        0,
+        R,
+      ),
+    ).toBe(3);
+    expect(anvilUnder([], 0, 0, R)).toBe(0);
   });
 
   it("turns the runes gold on the sim's own minimum of soakers", () => {
@@ -238,6 +258,20 @@ function rig(opts: { reduced?: boolean; under?: number } = {}) {
     boss.castTotal = T.anvilCast;
     boss.castRemaining = left;
   };
+  const cue = () =>
+    fx.handleEvent({
+      type: 'spellfxAt',
+      x: mark.x,
+      z: mark.z,
+      school: 'physical',
+      fx: 'burst',
+      radius: T.anvilR,
+      ability: FINAL_CUES.anvil,
+    } as SimEvent);
+  const landKeep = () => {
+    boss.castingAbility = null;
+    return cue();
+  };
   const land = () => {
     entities.delete(5);
     (world as { entityRosterVersion: number }).entityRosterVersion++;
@@ -256,7 +290,7 @@ function rig(opts: { reduced?: boolean; under?: number } = {}) {
     const m = root?.getObjectByName(name) as THREE.Mesh;
     return (m.material as THREE.ShaderMaterial).uniforms;
   };
-  return { fx, root, mark, shakes, bar, land, uniforms };
+  return { fx, root, mark, shakes, bar, land, landKeep, uniforms };
 }
 
 describe('the Anvil over a fake world', () => {
@@ -321,6 +355,19 @@ describe('the Anvil over a fake world', () => {
     r.fx.dispose();
   });
 
+  it('never hangs a struck mark again while its object outlives the cue (online)', () => {
+    const r = rig({ under: 3 });
+    r.bar(0.2);
+    r.fx.update(1 / 20);
+    // The cue first, the object still in the snapshot for a few frames.
+    r.landKeep();
+    for (let i = 0; i < 4; i++) r.fx.update(1 / 20);
+    expect(shown(r.root, 'smithHeartFinalAnvil')).toBe(false);
+    expect(shown(r.root, 'smithHeartFinalAnvilRunes')).toBe(false);
+    expect(shown(r.root, 'smithHeartFinalAnvilScar')).toBe(true);
+    r.fx.dispose();
+  });
+
   it('burns ember red with too few under it', () => {
     const r = rig({ under: 1 });
     r.bar(T.anvilCast - 1);
@@ -343,6 +390,22 @@ describe('the Anvil over a fake world', () => {
   });
 
   it('keeps every actionable piece on the low tier, with fewer fragments', () => {
+    const read = (q: ReturnType<typeof rig>) => {
+      const u = q.uniforms('smithHeartFinalAnvilRunes');
+      return {
+        lit: [...(u.uLit.value as number[])],
+        color: (u.uColor.value as THREE.Color).toArray(),
+        close: u.uClose.value,
+        closeA: u.uCloseA.value,
+        alpha: u.uAlpha.value,
+        column: q.uniforms('smithHeartFinalAnvilColumn').uAlpha.value,
+      };
+    };
+    const high = rig({ under: 3 });
+    high.bar(T.anvilCast * 0.1);
+    high.fx.update(1 / 20);
+    const highRead = read(high);
+    high.fx.dispose();
     const original = getActiveGfxProfile();
     activateGfxProfile({ ...original, settings: { ...GFX, tier: 'low' } });
     try {
@@ -358,6 +421,8 @@ describe('the Anvil over a fake world', () => {
       ])
         expect(shown(r.root, n), n).toBe(true);
       expect(r.uniforms('smithHeartFinalAnvilRunes').uClose.value).toBeGreaterThan(1);
+      // Identical to the full look's, not merely shown.
+      expect(read(r)).toEqual(highRead);
       r.land();
       r.fx.update(1 / 20);
       expect(shown(r.root, 'smithHeartFinalAnvilScar')).toBe(true);

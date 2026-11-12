@@ -198,9 +198,10 @@ export class CouncilStrikeFx {
         sprite('smithHeartCouncilStrikeCore', 1.2, handMats),
         sprite('smithHeartCouncilStrikeCore', 1.2, handMats),
       ];
-      // The light held in its fists shines through the stone of the fist
-      // itself (the glow sits on the hand bone, inside the model).
-      for (const sp of [...hands, ...cores]) sp.material.depthTest = false;
+      // Depth-tested: a pillar between the raid and the caster hides its
+      // fists' light too (hiding behind a pillar is how the Wrath is dodged,
+      // so nothing may read as "still in sight" through it). The halo is
+      // drawn wider than the fist so it shows round the stone.
       const flashMats: THREE.SpriteMaterial[] = [];
       const flash = sprite('smithHeartCouncilStrikeFlash', 20, flashMats);
       flash.material.depthTest = false;
@@ -318,7 +319,7 @@ export class CouncilStrikeFx {
     _color[1] = L.core[1];
     _color[2] = L.core[2];
     BURST.radius = 1.2;
-    P.puff(_v.x, _v.y, _v.z, Math.round(110 * this.h.density) + 10, BURST);
+    P.puff(_v.x, _v.y, _v.z, 110, BURST);
     // The dust wall rolling out, and rock flung.
     const wall = Math.round(48 * this.h.density) + 8;
     for (let i = 0; i < wall; i++) {
@@ -349,7 +350,7 @@ export class CouncilStrikeFx {
     _color[1] = L.core[1];
     _color[2] = L.core[2];
     BURST.radius = 1;
-    this.h.particles.puff(_v.x, _v.y, _v.z, Math.round(50 * this.h.density) + 6, BURST);
+    this.h.particles.puff(_v.x, _v.y, _v.z, 50, BURST);
   }
 
   /** Mountain's Rush stops here: a flash and the cracks bursting open. */
@@ -367,7 +368,7 @@ export class CouncilStrikeFx {
     _color[1] = L.core[1];
     _color[2] = L.core[2];
     BURST.radius = 2;
-    this.h.particles.puff(x, y + 1.5, z, Math.round(70 * this.h.density) + 8, BURST);
+    this.h.particles.puff(x, y + 1.5, z, 70, BURST);
     this.fling(x, y, z, Math.round(18 * this.h.density) + 3, 2, 7, 15);
   }
 
@@ -456,14 +457,16 @@ export class CouncilStrikeFx {
     g.scale = Math.max(1, (e.scale ?? 1) * 0.5);
     g.flash.visible = false;
     // The fists.
-    const pulse = 1 + 0.12 * Math.sin(this.clock * (8 + 14 * L.shiver));
+    // Reduced motion: no shiver in the pulse or the pebbles.
+    const shiver = this.h.reducedMotion() ? 0 : L.shiver;
+    const pulse = 1 + 0.12 * Math.sin(this.clock * (8 + 14 * shiver));
     for (let k = 0; k < 2; k++) {
       this.handPoint(g, e, k, _v);
       const hand = g.hands[k];
       const core = g.cores[k];
       hand.position.copy(_v);
       core.position.copy(_v);
-      hand.scale.setScalar((2.2 + 4.5 * L.glow) * pulse * g.scale * 0.6);
+      hand.scale.setScalar((3 + 5.5 * L.glow) * pulse * g.scale * 0.6);
       core.scale.setScalar((0.8 + 1.6 * L.glow) * pulse * g.scale * 0.6);
       hand.visible = true;
       core.visible = true;
@@ -514,7 +517,7 @@ export class CouncilStrikeFx {
     const t = this.clock;
     const base = ri * this.perSet;
     for (let i = 0; i < this.perSet; i++) {
-      pebbleHang(i, this.perSet, L.lift, t, L.shiver, _hang);
+      pebbleHang(i, this.perSet, L.lift, t, shiver, _hang);
       this.setPebble(base + i, g.x, g.y, g.z, g.scale, _hang);
     }
     this.pebbleMat.emissive.setRGB(

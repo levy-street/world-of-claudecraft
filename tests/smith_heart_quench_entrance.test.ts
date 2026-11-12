@@ -648,6 +648,31 @@ describe('QuenchEntranceFx over a fake world', () => {
       }
     }
     expect(near).toBeGreaterThan(50);
+    // A stage-local point and aim land turned to her facing in the world
+    // (+z ahead of her): a missing turn or a wrong sign would miss here.
+    type Puffer = {
+      puff(x: number, y: number, z: number, n: number, o: object): void;
+      particles: { puff(x: number, y: number, z: number, n: number, o: object): void };
+    };
+    const inner = r.fx as unknown as Puffer;
+    const seen: { x: number; y: number; z: number; dir: readonly number[] | undefined }[] = [];
+    const real = inner.particles.puff;
+    inner.particles.puff = (x, y, z, _n, o) =>
+      seen.push({ x, y, z, dir: (o as { dir?: readonly number[] }).dir?.slice() });
+    inner.puff(0, 1, 10, 1, { dir: [0, 0, 1] });
+    inner.particles.puff = real;
+    const f = r.boss.facing;
+    expect(seen).toHaveLength(1);
+    expect(seen[0].x).toBeCloseTo(r.boss.pos.x + Math.sin(f) * 10, 3);
+    expect(seen[0].z).toBeCloseTo(r.boss.pos.z + Math.cos(f) * 10, 3);
+    expect(seen[0].dir?.[0]).toBeCloseTo(Math.sin(f), 5);
+    expect(seen[0].dir?.[2]).toBeCloseTo(Math.cos(f), 5);
+    // Past the scene the pools run out and hide (the stage no longer hides
+    // them: they hang off the root).
+    r.aura(null);
+    for (let s = 0; s < E.end + 8; s += 1 / 20) r.fx.update(1 / 20);
+    for (const mesh of pools)
+      expect(mesh.visible, (mesh.material as THREE.Material).name).toBe(false);
     // The breach's ring races out from under her.
     expect(rings.length).toBeGreaterThanOrEqual(1);
     for (const ring of rings) {

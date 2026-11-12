@@ -119,6 +119,20 @@ export function anvilRuneLit(i: number, runes: number): number {
   return smooth(k) * (1 + 0.6 * Math.sin(k * Math.PI));
 }
 
+/** How many of `points` (living players' places) stand under the mark at
+ *  (x, z) of `radius`: the sim's own test (final_hammer.ts landAnvil:
+ *  within the radius, its rim counted). */
+export function anvilUnder(
+  points: readonly { x: number; z: number; dead?: boolean }[],
+  x: number,
+  z: number,
+  radius: number,
+): number {
+  let n = 0;
+  for (const p of points) if (!p.dead && Math.hypot(p.x - x, p.z - z) <= radius) n++;
+  return n;
+}
+
 /** Enough stand under it for a full share each (the sim's own minimum). */
 export function anvilSoakReady(under: number): boolean {
   return under >= T.anvilMinSoakers;

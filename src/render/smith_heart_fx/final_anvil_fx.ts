@@ -220,6 +220,8 @@ export class FinalAnvilFx {
   private readonly piece = newAnvilChunk();
   /** The mark being drawn (its object id; -1 none) and its last fill. */
   private markId = -1;
+  /** The mark whose strike landed last (its object may outlive the cue). */
+  private struckId = -1;
   private lastFill = 0;
   private shownThisFrame = false;
   private hitAt = -99;
@@ -464,6 +466,9 @@ export class FinalAnvilFx {
     radius: number,
   ): void {
     const h = this.host;
+    // A mark whose strike already landed (online, the cue can come a
+    // snapshot before the object goes): never hung again over its crater.
+    if (id === this.struckId) return;
     const L = anvilHang(fill, this.look);
     if (id !== this.markId) {
       this.markId = id;
@@ -567,6 +572,7 @@ export class FinalAnvilFx {
     this.hitY = y;
     this.hitZ = z;
     this.afterSeen = -1e-6;
+    this.struckId = this.markId;
     this.markId = -1;
     this.hideHanging();
     const d = h.density;
@@ -588,7 +594,7 @@ export class FinalAnvilFx {
       P.puff(x + Math.cos(a) * radius * 0.4, y + 0.6, z + Math.sin(a) * radius * 0.4, 1, SPLASH);
     }
     SPARKS.radius = radius * 0.5;
-    P.puff(x, y + 1.2, z, Math.round(ANVIL_FX.sparks * d) + 10, SPARKS);
+    P.puff(x, y + 1.2, z, ANVIL_FX.sparks, SPARKS);
     // The dust wall rolling out over the floor.
     const wall = Math.round(ANVIL_FX.dustWall * d) + 10;
     for (let i = 0; i < wall; i++) {
