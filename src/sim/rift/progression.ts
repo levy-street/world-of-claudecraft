@@ -234,11 +234,13 @@ export function createRiftGearInstance(
 // independent chase roll for each of the two rift legendaries.
 const RIFT_EPIC_CHANCE_B = 1.0; // guaranteed: B carries heroic stat transform
 const RIFT_SECOND_EPIC_CHANCE_S = 0.35;
-// 0.3% per S clear PER legendary, deliberately the same rate as the epic mount
-// below rather than the 4% it shipped at. S clears carry no lockout on this roll,
-// so 4% made a legendary a matter of a few evenings; at 0.3% each is a chase item
-// on the same cadence as the rarest mount.
-export const RIFT_LEGENDARY_CHANCE_S = 0.003;
+// 2.3% per S clear PER legendary. The design target is a 90% chance at a given
+// legendary within 100 S clears (1 - 0.977^100 is about 90.2%), pinned by
+// tests/rift_rank_tuning.test.ts. S clears carry no lockout on this roll, so
+// the 4% it first shipped at made a legendary a matter of a few evenings, and
+// the 0.3% that replaced it (the epic mount's rate) put the same 90% out past
+// 750 clears. The epic mount below keeps its own 0.3%.
+export const RIFT_LEGENDARY_CHANCE_S = 0.023;
 
 // Clear-time coin bonuses by rank (added on top of the static boss coin, which
 // stays rank-invariant). C mirrors the normal-dungeon economy; B tastes a small
