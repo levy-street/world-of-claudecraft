@@ -101,7 +101,7 @@ import {
 } from './material_item_custody';
 import type { MaterialComposition } from './material_sources';
 import { mountOwned, summonMountItem } from './mounts';
-import { learnRiding } from './mounts_training';
+import { learnRiding, MOUNT_TRAIN_MIN_LEVEL } from './mounts_training';
 import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
 import { placeFeastAction } from './professions/feast';
 import { useGatherToolItem } from './professions/gathering';
@@ -1547,7 +1547,7 @@ export function buyItem(
       ctx.error(meta.entityId, 'You must learn to ride first. Find a riding trainer.');
       return;
     }
-    if (!eventKeepsake && p.level < 20) {
+    if (!eventKeepsake && p.level < MOUNT_TRAIN_MIN_LEVEL) {
       ctx.error(meta.entityId, 'You must be level 20 to buy a mount.');
       return;
     }

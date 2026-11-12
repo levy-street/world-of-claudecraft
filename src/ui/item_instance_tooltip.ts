@@ -12,7 +12,7 @@
 import { ENCHANTS } from '../sim/content/enchants';
 import { effectiveQuality } from '../sim/equipment_rules';
 import { activeItemInstanceStats, isItemEnchantActive } from '../sim/item_instance_stats';
-import { requiredLevelFor } from '../sim/item_level_req';
+import { itemUseRequiredLevel } from '../sim/item_level_gate';
 import type { MaterialComposition } from '../sim/material_sources';
 import { isCommissionEligibleKind } from '../sim/professions/commission';
 import { isEnchantedInstance } from '../sim/professions/enchanting';
@@ -465,10 +465,12 @@ export function vendorSellTooltipLine(item: ItemDef): string {
   )}</div>`;
 }
 
-/** The classic weapon/armor level gate line for the shared item card. */
+/** The classic "Requires Level N" line for the shared item card: every item
+ *  whose use the sim level-gates (gear, held off-hands, mounts and riding, see
+ *  item_level_gate.ts), red while the wearer is below the gate. */
 export function itemRequiredLevelLine(item: ItemDef, playerLevel: number): string {
-  const req = requiredLevelFor(item);
-  if ((item.kind !== 'weapon' && item.kind !== 'armor') || req <= 1) return '';
+  const req = itemUseRequiredLevel(item);
+  if (req <= 1) return '';
   return `<div class="${playerLevel >= req ? 'tt-sub' : 'tt-red'}">${esc(
     t('hudChrome.itemTooltip.requiresLevel', { level: itemNumber(req) }),
   )}</div>`;
