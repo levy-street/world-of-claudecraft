@@ -1,6 +1,6 @@
 // The Smith's Heart's loot moment as numbers: the pure half of
 // loot_coffer_fx.ts. When a guardian falls with loot on its body, a forge
-// coffer rises out of the floor beside the corpse as its death scene
+// coffer rises out of the floor on its authored spot in the arena as its death scene
 // resolves: a ring of molten light opens in the stone, the coffer climbs out
 // of it shedding sparks and dust, locks in place with an anvil's ring, its
 // lid swings open and a shaft of golden light climbs out of it into the
@@ -32,6 +32,7 @@ import {
 } from '../../sim/encounters/smith_heart/council_ids';
 import { FINAL_BOSS } from '../../sim/encounters/smith_heart/final_ids';
 import { HEAT_GUARDIAN } from '../../sim/encounters/smith_heart/heat_ids';
+import { smithHeartLootSpot } from '../../sim/encounters/smith_heart/loot_spots';
 import { QUENCH_GUARDIAN } from '../../sim/encounters/smith_heart/quench_ids';
 import { BREATH_DEATH } from './breath_death_core';
 import { councilSecondDeathSeconds } from './council_death_core';
@@ -111,63 +112,33 @@ export interface LootCofferBoss {
   /** Seconds after the death when the coffer starts to rise: the death
    *  scene's own resolution, so it never steps on the scene's climax. */
   readonly revealAt: number;
-  /** Yards from the corpse's centre to the coffer's. At most
-   *  `LOOT_COFFER_IN_REACH` past the body's own loot reach bonus (its
-   *  bodyRadius, sim/loot/corpse_loot_reach.ts), so a looter standing at the
-   *  coffer's front is inside the body's loot reach and the click or the
-   *  interact key works from right there. The Heat guardian lies in the
-   *  middle of its 10.5 yd wellspring and is looted from the lip, so its
-   *  coffer stands further out than the others. */
-  readonly reach: number;
-  /** Radians off the body's facing (0: straight in front of it). */
-  readonly bearing: number;
 }
-
-/** A coffer stands no further than this past its corpse's loot reach bonus
- *  (0 for an ordinary body): its front (half its depth, scaled) plus a
- *  looter's step stay inside the body's loot reach (INTERACT_RANGE plus that
- *  bonus). */
-export const LOOT_COFFER_IN_REACH = 3.3;
-/** No coffer ever stands further than this. */
-export const LOOT_COFFER_MAX_REACH = 12;
 
 /** The bosses that raise a coffer (their template ids), each with its look. */
 export const LOOT_COFFER_BOSSES: Readonly<Record<string, LootCofferBoss>> = {
   [COUNCIL_GUARDIAN]: {
     flavour: 'stone',
     revealAt: councilSecondDeathSeconds('guardian') - 1.2,
-    reach: 3.2,
-    bearing: 0.35,
   },
   [COUNCIL_SEAM_SINGER]: {
     flavour: 'stone',
     revealAt: councilSecondDeathSeconds('singer') - 1.2,
-    reach: 3.2,
-    bearing: -0.35,
   },
   [BREATH_GUARDIAN]: {
     flavour: 'storm',
     revealAt: BREATH_DEATH.end - 1.4,
-    reach: 3.2,
-    bearing: 0,
   },
   [QUENCH_GUARDIAN]: {
     flavour: 'frost',
     revealAt: QUENCH_DEATH.end - 1.4,
-    reach: 3.2,
-    bearing: 0,
   },
   [HEAT_GUARDIAN]: {
     flavour: 'ember',
     revealAt: HEAT_DEATH.end - 1.2,
-    reach: 8.6,
-    bearing: 0,
   },
   [FINAL_BOSS]: {
     flavour: 'forge',
     revealAt: DEATH_END - 1.0,
-    reach: 3.3,
-    bearing: 1.57,
   },
 };
 
@@ -175,21 +146,21 @@ export function lootCofferBoss(templateId: string): LootCofferBoss | null {
   return LOOT_COFFER_BOSSES[templateId] ?? null;
 }
 
-/** Where the coffer stands beside a corpse at (x, z) facing `facing` (the
- *  game's bearing: forward is (sin, cos)), and its own yaw (its front looks
- *  away from the body, toward whoever walks up to loot it). */
+/** Where a guardian's coffer stands: its authored spot on open floor in the
+ *  guardian's own arena (sim/encounters/smith_heart/loot_spots.ts, the same
+ *  spot the sim's corpse loot gate accepts a looter at), its front turned to
+ *  the raid's way in. The instance is the body's own (`bodyZ`). Falls back to
+ *  the body itself for a body with no authored spot. */
 export function lootCofferSpot(
-  x: number,
-  z: number,
-  facing: number,
-  boss: LootCofferBoss,
+  templateId: string,
+  bodyX: number,
+  bodyZ: number,
   out: { x: number; z: number; yaw: number },
 ): { x: number; z: number; yaw: number } {
-  const a = facing + boss.bearing;
-  const r = Math.min(boss.reach, LOOT_COFFER_MAX_REACH);
-  out.x = x + Math.sin(a) * r;
-  out.z = z + Math.cos(a) * r;
-  out.yaw = a;
+  if (smithHeartLootSpot(templateId, bodyZ, out)) return out;
+  out.x = bodyX;
+  out.z = bodyZ;
+  out.yaw = 0;
   return out;
 }
 

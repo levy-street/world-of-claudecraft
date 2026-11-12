@@ -20,6 +20,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { SFX_FIXED_CATALOG_KEYS } from '../src/game/sfx_manifest.generated';
 import { fxPickProxies } from '../src/render/fx_pick_proxies';
 import { gfxInternalsForTest, sharedUniforms } from '../src/render/gfx';
+import { heartVeinGroovePoint } from '../src/render/smith_heart/heart_vein_groove_core';
 import { BREATH_DEATH } from '../src/render/smith_heart_fx/breath_death_core';
 import {
   COUNCIL_DEATH_END,
@@ -31,9 +32,7 @@ import { HEAT_DEATH } from '../src/render/smith_heart_fx/heat_death_core';
 import {
   LOOT_COFFER,
   LOOT_COFFER_BOSSES,
-  LOOT_COFFER_IN_REACH,
   LOOT_COFFER_LOW_SHARE,
-  LOOT_COFFER_MAX_REACH,
   LOOT_COFFER_PALETTES,
   LOOT_COFFER_RISE_SOUNDS,
   LOOT_COFFER_SECONDARY_LAYERS,
@@ -55,7 +54,23 @@ import { COFFER, COFFER_SCALE } from '../src/render/smith_heart_fx/loot_coffer_s
 import { QUENCH_DEATH } from '../src/render/smith_heart_fx/quench_death_core';
 import { WorldPicking } from '../src/render/world_picking';
 import { SMITH_HEART_DUNGEON } from '../src/sim/content/smith_heart';
-import { DUNGEONS, instanceOrigin } from '../src/sim/data';
+import {
+  BREATH,
+  CORNICE_OPEN_RIM,
+  GIANT_ANVIL,
+  HAMMER_PIT,
+  HEART_ALTARS,
+  HEART_ROOM,
+  HEARTH_WELL,
+  LIGHT_RIVERS,
+  QUARRY_PILLAR_R,
+  QUARRY_PILLAR_SPOTS,
+  QUENCH,
+  SMITH_HEART_BOSS_SPOTS,
+  SMITH_HEART_FIELD,
+} from '../src/sim/content/smith_heart_layout';
+import { heartQuarterSpot, heartRidgeDistance } from '../src/sim/content/smith_heart_quarters';
+import { DUNGEONS, instanceOrigin, MOBS } from '../src/sim/data';
 import { handleSmithHeartDevChat } from '../src/sim/dev/smith_heart_dev';
 import {
   SMITH_HEART_DEV_LOOT_COPPER,
@@ -69,8 +84,9 @@ import {
 } from '../src/sim/encounters/smith_heart/council_ids';
 import { FINAL_BOSS } from '../src/sim/encounters/smith_heart/final_ids';
 import { HEAT_GUARDIAN } from '../src/sim/encounters/smith_heart/heat_ids';
+import { SMITH_HEART_LOOT_SPOTS } from '../src/sim/encounters/smith_heart/loot_spots';
 import { QUENCH_GUARDIAN } from '../src/sim/encounters/smith_heart/quench_ids';
-import { corpseLootReach, corpseLootReachBonus } from '../src/sim/loot/corpse_loot_reach';
+import { corpseLootApproachPoint, corpseLootDistance } from '../src/sim/loot/corpse_loot_reach';
 import type { InstanceSlot } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import { type Entity, INTERACT_RANGE } from '../src/sim/types';
@@ -130,22 +146,156 @@ describe('the guardians', () => {
     );
   });
 
-  it('a looter at the coffer front is in the body loot reach (a big body from its edge)', () => {
+  it('stands every coffer on its authored spot, clear of the body, the props and the hazards', () => {
+    const o = instanceOrigin(DUNGEONS.smith_heart.index, 0);
+    const bossAt: Record<string, { x: number; z: number }> = {
+      [COUNCIL_GUARDIAN]: SMITH_HEART_BOSS_SPOTS.hammer,
+      [COUNCIL_SEAM_SINGER]: SMITH_HEART_BOSS_SPOTS.seamSinger,
+      [BREATH_GUARDIAN]: SMITH_HEART_BOSS_SPOTS.breath,
+      [QUENCH_GUARDIAN]: SMITH_HEART_BOSS_SPOTS.quench,
+      [HEAT_GUARDIAN]: SMITH_HEART_BOSS_SPOTS.heat,
+      [FINAL_BOSS]: SMITH_HEART_BOSS_SPOTS.final,
+    };
+    expect(Object.keys(SMITH_HEART_LOOT_SPOTS).sort()).toEqual(
+      Object.keys(LOOT_COFFER_BOSSES).sort(),
+    );
+    for (const [id, local] of Object.entries(SMITH_HEART_LOOT_SPOTS)) {
+      const at = bossAt[id];
+      // Clear of the body where it falls: its authored body, or a towering
+      // model's footprint (the council's and the final's bodies author none).
+      const body = Math.max(MOBS[id]?.bodyRadius ?? 0, 6);
+      expect(Math.hypot(local.x - at.x, local.z - at.z), id).toBeGreaterThan(body + 4);
+      // Its front turns away from the body, toward the raid's way in.
+      const yaw = Math.atan2(local.face.x - local.x, local.face.z - local.z);
+      const toBody = Math.atan2(at.x - local.x, at.z - local.z);
+      expect(Math.cos(yaw - toBody), id).toBeLessThan(0.2);
+      // The world spot is the instance's own, the same one the sim gate reads.
+      const w = lootCofferSpot(id, o.x + at.x, o.z + at.z, { x: 0, z: 0, yaw: 0 });
+      expect(w.x, id).toBeCloseTo(o.x + local.x, 6);
+      expect(w.z, id).toBeCloseTo(o.z + local.z, 6);
+      expect(w.yaw, id).toBeCloseTo(yaw, 6);
+    }
+    const spot = (id: string) => SMITH_HEART_LOOT_SPOTS[id];
+    // Clear of every authored set piece by 4 yd, with none standing between the
+    // coffer and the way in, and well off every open lip.
+    const footprint = (p: (typeof SMITH_HEART_FIELD.props)[number]) =>
+      p.r ?? (p.hw !== undefined ? Math.hypot(p.hw, p.hd ?? p.hw) : 2.5);
+    const toSeg = (
+      p: { x: number; z: number },
+      a: { x: number; z: number },
+      b: { x: number; z: number },
+    ) => {
+      const dx = b.x - a.x;
+      const dz = b.z - a.z;
+      const t = Math.max(
+        0,
+        Math.min(1, ((p.x - a.x) * dx + (p.z - a.z) * dz) / (dx * dx + dz * dz)),
+      );
+      return Math.hypot(p.x - (a.x + dx * t), p.z - (a.z + dz * t));
+    };
+    for (const [id, s] of Object.entries(SMITH_HEART_LOOT_SPOTS)) {
+      for (const p of SMITH_HEART_FIELD.props) {
+        expect(Math.hypot(p.x - s.x, p.z - s.z) - footprint(p), `${id} ${p.kind}`).toBeGreaterThan(
+          4,
+        );
+        if ((p.h ?? 6) > 1.5)
+          expect(toSeg(p, s.face, s), `${id} sight ${p.kind}`).toBeGreaterThan(footprint(p) + 1);
+      }
+      for (const l of SMITH_HEART_FIELD.lipOpenings ?? [])
+        expect(Math.hypot(l.x - s.x, l.z - s.z) - l.r, id).toBeGreaterThan(4);
+    }
+    // The Anvil of the World: off the quarters' ridges and the vein grooves,
+    // and clear of every quarter's boss spot.
+    const fs = spot(FINAL_BOSS);
+    for (let k = 0; k < 4; k++) expect(heartRidgeDistance(k, fs.x, fs.z)).toBeGreaterThan(8);
+    for (const a of HEART_ALTARS)
+      for (let r = 0; r <= HEART_ROOM.r; r += 0.5) {
+        const g = heartVeinGroovePoint(a.vein, r);
+        expect(Math.hypot(g.x - fs.x, g.z - fs.z), a.vein).toBeGreaterThan(8);
+      }
+    for (const v of ['hammer', 'breath', 'quench', 'heat'] as const) {
+      const q = heartQuarterSpot(v);
+      expect(Math.hypot(q.x - fs.x, q.z - fs.z), v).toBeGreaterThan(12);
+    }
+    // Off every floor light-river (a coffer never stands on a glowing line).
+    const segDist = (
+      p: { x: number; z: number },
+      a: { x: number; z: number },
+      b: { x: number; z: number },
+    ) => {
+      const dx = b.x - a.x;
+      const dz = b.z - a.z;
+      const t = Math.max(
+        0,
+        Math.min(1, ((p.x - a.x) * dx + (p.z - a.z) * dz) / (dx * dx + dz * dz)),
+      );
+      return Math.hypot(p.x - (a.x + dx * t), p.z - (a.z + dz * t));
+    };
+    for (const [id, s] of Object.entries(SMITH_HEART_LOOT_SPOTS))
+      for (const river of Object.values(LIGHT_RIVERS))
+        for (let k = 1; k < river.length; k++)
+          expect(segDist(s, river[k - 1], river[k]), id).toBeGreaterThan(5);
+    // The Quarry: inside the pit, clear of every column.
+    for (const id of [COUNCIL_GUARDIAN, COUNCIL_SEAM_SINGER]) {
+      const s = spot(id);
+      expect(
+        ((s.x - HAMMER_PIT.x) / HAMMER_PIT.rx) ** 2 + ((s.z - HAMMER_PIT.z) / HAMMER_PIT.rz) ** 2,
+      ).toBeLessThan(0.5);
+      for (const p of QUARRY_PILLAR_SPOTS)
+        expect(Math.hypot(s.x - p.x, s.z - p.z), id).toBeGreaterThan(QUARRY_PILLAR_R + 4);
+    }
+    expect(
+      Math.hypot(
+        spot(COUNCIL_GUARDIAN).x - spot(COUNCIL_SEAM_SINGER).x,
+        spot(COUNCIL_GUARDIAN).z - spot(COUNCIL_SEAM_SINGER).z,
+      ),
+    ).toBeGreaterThan(8);
+    // The Cornice: well inside the plateau, off its open lip and wind channels.
+    const b = spot(BREATH_GUARDIAN);
+    const C = BREATH.cornice;
+    expect(((b.x - C.x) / C.rx) ** 2 + ((b.z - C.z) / C.rz) ** 2).toBeLessThan(0.5);
+    for (const d of CORNICE_OPEN_RIM)
+      expect(Math.hypot(b.x - d.x, b.z - d.z)).toBeGreaterThan(d.r + 3);
+    // The Quench: on the frozen lake.
+    const q = spot(QUENCH_GUARDIAN);
+    expect(
+      ((q.x - QUENCH.lake.x) / QUENCH.lake.rx) ** 2 + ((q.z - QUENCH.lake.z) / QUENCH.lake.rz) ** 2,
+    ).toBeLessThan(0.85);
+    // The Hearth: out of the wellspring and clear of the altar-stone, inside the hall.
+    const h = spot(HEAT_GUARDIAN);
+    expect(Math.hypot(h.x - HEARTH_WELL.x, h.z - HEARTH_WELL.z)).toBeGreaterThan(HEARTH_WELL.r + 8);
+    expect(h.x - (GIANT_ANVIL.x + GIANT_ANVIL.hw)).toBeGreaterThan(10);
+    expect(h.x).toBeLessThan(-180);
+    // The Heart: on the platform, clear of the vein altars.
+    const f = spot(FINAL_BOSS);
+    expect(Math.hypot(f.x - HEART_ROOM.x, f.z - HEART_ROOM.z)).toBeLessThan(HEART_ROOM.r - 10);
+    for (const a of HEART_ALTARS) expect(Math.hypot(f.x - a.x, f.z - a.z)).toBeGreaterThan(12);
+  });
+
+  it('a looter at the coffer front takes the loot through the sim gate, wherever the body lies', () => {
+    const o = instanceOrigin(DUNGEONS.smith_heart.index, 0);
     // Half the coffer's depth (scaled) and a looter's step in front of it.
     const front = (COFFER.depth / 2) * COFFER_SCALE + 0.6;
-    expect(LOOT_COFFER_IN_REACH + front).toBeLessThanOrEqual(INTERACT_RANGE);
-    for (const [id, boss] of Object.entries(LOOT_COFFER_BOSSES)) {
-      const spot = lootCofferSpot(10, 20, 0.7, boss, { x: 0, z: 0, yaw: 0 });
-      const r = Math.hypot(spot.x - 10, spot.z - 20);
-      expect(r, id).toBeGreaterThan(2.5);
-      expect(r, id).toBeLessThanOrEqual(LOOT_COFFER_MAX_REACH + 1e-9);
-      const bonus = corpseLootReachBonus({ kind: 'mob', templateId: id });
-      expect(r, id).toBeLessThanOrEqual(LOOT_COFFER_IN_REACH + bonus + 1e-9);
-      // The same sum the sim's lootCorpse gate takes, from the coffer's front.
-      expect(r + front, id).toBeLessThanOrEqual(corpseLootReach({ kind: 'mob', templateId: id }));
+    expect(front).toBeLessThan(INTERACT_RANGE);
+    for (const [id, local] of Object.entries(SMITH_HEART_LOOT_SPOTS)) {
+      const yaw = Math.atan2(local.face.x - local.x, local.face.z - local.z);
+      const looter = {
+        x: o.x + local.x + Math.sin(yaw) * front,
+        z: o.z + local.z + Math.cos(yaw) * front,
+      };
+      // The body fallen far across its arena: the coffer still answers.
+      const body = {
+        kind: 'mob' as const,
+        templateId: id,
+        pos: { x: o.x + local.x + 40, y: 0, z: o.z + local.z - 25 },
+      };
+      expect(corpseLootDistance(body, looter), id).toBeLessThanOrEqual(INTERACT_RANGE);
+      expect(corpseLootApproachPoint(body), id).toEqual({ x: o.x + local.x, z: o.z + local.z });
     }
-    // The guardian lying in its 10.5 yd wellspring is looted from the lip.
-    expect(corpseLootReachBonus({ kind: 'mob', templateId: HEAT_GUARDIAN })).toBeGreaterThan(10);
+    // An ordinary body has no spot: the classic reach to its pivot.
+    const wolf = { kind: 'mob' as const, templateId: 'wolf', pos: { x: 0, y: 0, z: 0 } };
+    expect(corpseLootDistance(wolf, { x: 3, z: 4 })).toBeCloseTo(5, 9);
+    expect(corpseLootApproachPoint(wolf)).toEqual({ x: 0, z: 0 });
   });
 
   it('is a click on its corpse only while there is something to open', () => {
@@ -161,16 +311,6 @@ describe('the guardians', () => {
     expect(lootCofferSettled('empty', hold - 0.1)).toBe(false);
     expect(lootCofferSettled('empty', hold)).toBe(true);
     expect(lootCofferSettled('yours', hold * 10)).toBe(false);
-  });
-
-  it('stands in front of the body (forward is (sin, cos)) and faces away from it', () => {
-    const boss = { flavour: 'forge' as const, revealAt: 1, reach: 3, bearing: 0 };
-    const spot = lootCofferSpot(0, 0, Math.PI / 2, boss, { x: 0, z: 0, yaw: 0 });
-    expect(spot.x).toBeCloseTo(3, 6);
-    expect(spot.z).toBeCloseTo(0, 6);
-    expect(spot.yaw).toBeCloseTo(Math.PI / 2, 6);
-    const far = lootCofferSpot(0, 0, 0, { ...boss, reach: 99 }, { x: 0, z: 0, yaw: 0 });
-    expect(far.z).toBeCloseTo(LOOT_COFFER_MAX_REACH, 6);
   });
 });
 
@@ -371,14 +511,15 @@ describe('LootCofferFx raises the coffer', () => {
     expect(fxPickProxies().some((p) => t.scene.getObjectById(p.id))).toBe(false);
   });
 
-  it('stands beside the body, where its guardian puts it', () => {
+  it("stands on its guardian's authored spot, not beside the body", () => {
     const t = setup();
     t.step(0.5);
     t.kill();
     t.step(LOOT_COFFER_BOSSES[HEAT_GUARDIAN].revealAt + LOOT_COFFER.end + 0.5);
     const stage = t.scene.getObjectByName('smithHeartLootCoffer0') as THREE.Object3D;
-    const d = Math.hypot(stage.position.x - t.boss.pos.x, stage.position.z - t.boss.pos.z);
-    expect(d).toBeCloseTo(LOOT_COFFER_BOSSES[HEAT_GUARDIAN].reach, 3);
+    const o = instanceOrigin(DUNGEONS.smith_heart.index, 0);
+    expect(stage.position.x).toBeCloseTo(o.x + SMITH_HEART_LOOT_SPOTS[HEAT_GUARDIAN].x, 3);
+    expect(stage.position.z).toBeCloseTo(o.z + SMITH_HEART_LOOT_SPOTS[HEAT_GUARDIAN].z, 3);
     t.fx.dispose();
   });
 

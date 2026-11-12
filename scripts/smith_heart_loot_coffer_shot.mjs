@@ -79,6 +79,7 @@ const VIEWS = {
   front: [0.35, 0.16, 11],
   side: [1.05, 0.12, 12],
   high: [0.45, 0.5, 20],
+  raid: [0.15, 0.28, 26],
 };
 
 /** The coffer's plan, straight off the core the page runs. */
@@ -206,7 +207,7 @@ try {
     );
   }, found.id);
   console.log('corpse', dead);
-  const spot = core.lootCofferSpot(dead.x, dead.z, dead.facing, boss, { x: 0, z: 0, yaw: 0 });
+  const spot = core.lootCofferSpot(B.tid, dead.x, dead.z, { x: 0, z: 0, yaw: 0 });
   // The witness stands on the coffer's spot, shrunk out of sight, looking
   // at its front: the camera hangs in front of the coffer, the husk behind.
   const [yaw, pitch, dist] = VIEWS[VIEW] ?? VIEWS.front;

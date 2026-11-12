@@ -29,11 +29,11 @@
 
 import { isInRaidInstance } from '../instances/dungeons';
 import { lootCorpse } from '../interaction';
-import { corpseLootReach } from '../loot/corpse_loot_reach';
+import { corpseLootDistance } from '../loot/corpse_loot_reach';
 import { lootSlotVisibleTo } from '../loot/loot_roll';
 import { corpseHasDecayed } from '../respawn_policy';
 import type { SimContext } from '../sim_context';
-import { dist2d, type Entity } from '../types';
+import { dist2d, type Entity, INTERACT_RANGE } from '../types';
 import { petFollow } from './pet_ai';
 
 /** How far from the OWNER a corpse may be and still be worth the errand
@@ -109,7 +109,7 @@ export function updateBuddyAutoloot(ctx: SimContext, buddy: Entity, owner: Entit
   // the buddy's own position as the range origin: the owner may be up to
   // BUDDY_LOOT_RANGE away, and it is the BUDDY that has to be standing on the
   // corpse, which is the whole point of sending it.
-  if (dist2d(buddy.pos, corpse.pos) <= corpseLootReach(corpse)) {
+  if (corpseLootDistance(corpse, buddy.pos) <= INTERACT_RANGE) {
     lootCorpse(ctx, corpse.id, owner.id, false, true, buddy.pos);
   }
   return true;

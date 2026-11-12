@@ -1,7 +1,7 @@
 // The Smith's Heart's loot moment (plan: loot_coffer_core.ts), hosted by
 // ../rift_death_zone.ts after the guardians' death scenes. When a guardian
 // that fell in sight holds loot as its scene resolves, a forge coffer climbs
-// out of a ring of molten light in the floor beside the corpse, locks in
+// out of a ring of molten light in the floor on its authored spot, locks in
 // place with an anvil's ring, opens, and a shaft of golden light climbs out
 // of it; it waits there breathing while the body holds loot for this viewer,
 // sits ajar and dim while it only holds someone else's, and shuts and goes
@@ -574,7 +574,7 @@ export class LootCofferFx {
     slot.id = e.id;
     slot.boss = boss;
     slot.palette = LOOT_COFFER_PALETTES[boss.flavour];
-    lootCofferSpot(e.pos.x, e.pos.z, e.facing, boss, _spot);
+    lootCofferSpot(e.templateId, e.pos.x, e.pos.z, _spot);
     slot.stage.position.set(_spot.x, this.groundY(_spot.x, _spot.z), _spot.z);
     slot.stage.rotation.set(0, _spot.yaw, 0);
     slot.stage.scale.setScalar(S);

@@ -10,12 +10,13 @@
 // classic 5 yd reach exactly.
 
 import { describe, expect, it } from 'vitest';
-import { shouldApproachPickedEntity } from '../src/game/interactions';
+import { pickedEntityApproachPoint, shouldApproachPickedEntity } from '../src/game/interactions';
 import { resolveNearbyInteractionCandidate } from '../src/game/nearby_interaction_core';
 import { SMITH_HEART_DUNGEON } from '../src/sim/content/smith_heart';
 import { DUNGEONS, instanceOrigin, MOBS } from '../src/sim/data';
 import { handleSmithHeartDevChat } from '../src/sim/dev/smith_heart_dev';
 import { HEAT_GUARDIAN, HEAT_WELL_R } from '../src/sim/encounters/smith_heart/heat_ids';
+import { smithHeartLootSpot } from '../src/sim/encounters/smith_heart/loot_spots';
 import { corpseLootReach, maxCorpseLootReach } from '../src/sim/loot/corpse_loot_reach';
 import { ACTIONS, encodeObs } from '../src/sim/obs';
 import { type InstanceSlot, Sim } from '../src/sim/sim';
@@ -126,6 +127,51 @@ describe('corpse loot reach', () => {
     sim.player.pos = { ...mob.pos, x: mob.pos.x + r + INTERACT_RANGE - 1 };
     sim.autoLoot(mob.id);
     expect(mob.lootable).toBe(false);
+  });
+
+  it("takes a guardian's loot at its coffer's authored spot, far from the body (the real sim path)", () => {
+    const { sim, boss } = deadHeatGuardianWithLoot();
+    const spot = smithHeartLootSpot(HEAT_GUARDIAN, boss.pos.z);
+    if (!spot) throw new Error('no spot');
+    // The coffer stands well past the body-edge reach on open floor.
+    expect(Math.hypot(spot.x - boss.pos.x, spot.z - boss.pos.z)).toBeGreaterThan(
+      HEAT_WELL_R + INTERACT_RANGE,
+    );
+    // Neither at the body's edge nor at the coffer: refused.
+    sim.player.pos = { ...boss.pos, x: spot.x + INTERACT_RANGE + 1, z: spot.z };
+    expect(sim.lootCorpse(boss.id)).toBe(false);
+    // In front of the coffer: the loot is taken.
+    sim.player.pos = {
+      ...boss.pos,
+      x: spot.x + Math.sin(spot.yaw) * 1.8,
+      z: spot.z + Math.cos(spot.yaw) * 1.8,
+    };
+    expect(sim.lootCorpse(boss.id)).toBe(true);
+    expect(boss.lootable).toBe(false);
+  });
+
+  it('offers the press and the click at the coffer on the client, and walks the click there', () => {
+    const { boss } = deadHeatGuardianWithLoot();
+    const spot = smithHeartLootSpot(HEAT_GUARDIAN, boss.pos.z);
+    if (!spot) throw new Error('no spot');
+    const body = { ...boss, tappedById: 1 } as Entity;
+    const atCoffer = stub({ id: 1, kind: 'player', pos: { x: spot.x + 1.5, y: 0, z: spot.z } });
+    expect(shouldApproachPickedEntity(atCoffer, body, false)).toBe(false);
+    const world = {
+      playerId: 1,
+      player: atCoffer,
+      entities: new Map<number, Entity>([
+        [1, atCoffer],
+        [body.id, body],
+      ]),
+      questLog: new Map<string, QuestProgress>(),
+      farmPatches: [],
+    };
+    expect(resolveNearbyInteractionCandidate(world)?.id).toBe(body.id);
+    // From across the hall the click walks the looter to the coffer, not into the well.
+    const far = stub({ id: 1, kind: 'player', pos: { x: spot.x + 30, y: 0, z: spot.z } });
+    expect(shouldApproachPickedEntity(far, body, false)).toBe(true);
+    expect(pickedEntityApproachPoint(body)).toEqual({ x: spot.x, z: spot.z });
   });
 
   it('still refuses past the body edge reach', () => {
