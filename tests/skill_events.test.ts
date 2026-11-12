@@ -30,6 +30,7 @@ import {
 } from '../src/sim/pvp/skill_event_rules';
 import {
   SKILL_EVENT_JOINED_LINE,
+  SKILL_EVENT_NOT_YET_LINE,
   SKILL_EVENT_TOO_FAR_LINE,
   skillEventEndedLine,
   skillEventStartLine,
@@ -264,6 +265,7 @@ describe('skill event flow', () => {
       skillEventEndedLine('Rite of Tongues'),
       SKILL_EVENT_JOINED_LINE,
       SKILL_EVENT_TOO_FAR_LINE,
+      SKILL_EVENT_NOT_YET_LINE,
     ]) {
       expect(localizeSimText(line), line).not.toBeNull();
     }

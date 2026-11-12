@@ -212,6 +212,9 @@ export function skillEventEndedLine(name: string): string {
 export const SKILL_EVENT_JOINED_LINE = 'You have joined the event. Good luck.';
 export const SKILL_EVENT_TOO_FAR_LINE = 'You are too far from the event to join it.';
 export const SKILL_EVENT_NONE_LINE = 'There is no event to join right now.';
+/** A kit button pressed when its verb cannot fire (a cooldown, silenced, no
+ *  one in reach): the error toast says so instead of nothing happening. */
+export const SKILL_EVENT_NOT_YET_LINE = "You can't do that yet.";
 
 function zoneName(zoneId: string): string {
   return ZONES.find((zone) => zone.id === zoneId)?.name ?? zoneId;
@@ -626,7 +629,9 @@ export function skillEventAction(ctx: SimContext, pid: number, verb: string): bo
   const ev = ctx.skillEventState.active;
   if (!ev || ev.phase !== 'running' || !ev.participants.includes(pid)) return false;
   if (!SKILL_EVENT_VERBS[ev.kind].includes(verb)) return false;
-  return skillEventRules(ev.kind)?.action?.(ctx, ev, pid, verb) ?? false;
+  const done = skillEventRules(ev.kind)?.action?.(ctx, ev, pid, verb) ?? false;
+  if (!done) ctx.error(pid, SKILL_EVENT_NOT_YET_LINE);
+  return done;
 }
 
 /** Choose the one class ability a fighter keeps for the event (during the

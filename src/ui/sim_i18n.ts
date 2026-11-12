@@ -721,6 +721,7 @@ const baseEnTable = {
   'skillEvent.joined': 'You have joined the event. Good luck.',
   'skillEvent.tooFar': 'You are too far from the event to join it.',
   'skillEvent.none': 'There is no event to join right now.',
+  'skillEvent.notYet': "You can't do that yet.",
   // The aid refusal (WORLD_PVP_AID_REFUSED_LINE, voiced by
   // src/sim/combat/casting_lifecycle.ts): placeholder-free, EXACT-mapped too.
   'worldPvp.aidRefused': 'You cannot aid a World PvP enemy: invite them to your party first.',

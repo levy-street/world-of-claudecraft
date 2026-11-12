@@ -14,6 +14,7 @@ import {
 } from '../src/sim/pvp/skill_event_riposte';
 import { SKILL_EVENT_HEARTS, SKILL_EVENT_WARNING_SECONDS } from '../src/sim/pvp/skill_event_rules';
 import {
+  SKILL_EVENT_NOT_YET_LINE,
   skillEventAction,
   skillEventCastAllowed,
   skillEventPickKeepsake,
@@ -105,6 +106,20 @@ describe('Riposte', () => {
     expect(skillEventAction(sim.ctx, b, 'lunge')).toBe(false);
     tickSeconds(sim, RIPOSTE_OPEN_AFTER_GUARD);
     expect(skillEventAction(sim.ctx, b, 'lunge')).toBe(true);
+  });
+
+  it('a button that cannot fire yet says so', () => {
+    const { sim, a } = yard();
+    const errors: string[] = [];
+    const emit = sim.ctx.error;
+    sim.ctx.error = (pid, text, reason) => {
+      if (pid === a) errors.push(text);
+      emit(pid, text, reason);
+    };
+    expect(skillEventAction(sim.ctx, a, 'lunge')).toBe(true);
+    expect(errors).toEqual([]);
+    expect(skillEventAction(sim.ctx, a, 'lunge')).toBe(false); // already winding up
+    expect(errors).toEqual([SKILL_EVENT_NOT_YET_LINE]);
   });
 
   it('a feint cancels the wind-up', () => {
