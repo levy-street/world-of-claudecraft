@@ -1732,7 +1732,7 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
     tier: 'epic',
     name: 'Seamcaller',
     type: 'mace',
-    lore: 'A great maul hewn from one block of banded quarry stone, gold-rimmed striking faces round burning amber, gold crest wings, rune glyphs burning in both cheeks and amber seam-crystal growing from the crown.',
+    lore: 'A great maul hewn from one block of dark quarry stone split by burning gold seams, a framed gold rune on both cheeks, gold-rimmed striking faces round burning amber, riveted gold bands, gold crest wings and amber seam-crystal growing from the crown.',
     emissive: {
       hue: [30, 55],
       minS: 0.8,
@@ -1978,7 +1978,7 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
     tier: 'epic',
     name: 'Rimelight Staff',
     type: 'staff',
-    lore: 'A pale silver shaft wound with hoarfrost and broken out in ice, crowned by four silver tines caging a great crystal of cold light inside a crown of ice shards, a splinter of ice hovering above.',
+    lore: 'A blue-steel shaft wound with silver filigree and bound in gem-set silver collars, crowned by four silver crescent blades cradling a great crystal of cold light amid a ring of lesser crystals, a splinter of ice hovering above.',
     emissive: {
       hue: [175, 215],
       minS: 0.5,

@@ -1443,7 +1443,7 @@ export const da_DK: EnTranslations = {
         },
         "seamcaller_maul": {
           "name": "Seamcaller",
-          "look": "Two-handed maul hewn from one block of banded quarry stone, gold-rimmed striking faces round burning amber, gold crest wings, gold runes cut into both cheeks, amber seam-crystal growing from the crown and a basalt haft bound in gold.",
+          "look": "Two-handed maul hewn from one block of dark quarry stone split by burning gold seams, a framed gold rune on both cheeks, gold-rimmed striking faces round burning amber, riveted gold bands, gold crest wings, amber seam-crystal growing from the crown and a basalt haft bound in gold.",
           "lore": "The Hammer Council sang the seam awake before they ever raised a hand against the raid, and the stone remembered every note. This maul was cut from the block their hammers split, and its runes still burn when it swings. Quarry shards circle the head as if the mountain wants them back. The runes and the circling stone are only a look."
         },
         "squallcrest_sword": {
@@ -1453,7 +1453,7 @@ export const da_DK: EnTranslations = {
         },
         "rimelight_staff": {
           "name": "Rimlysets stav",
-          "look": "Pale silver shaft wound with hoarfrost and broken out in ice, crowned by four silver tines caging a great crystal of cold light inside a crown of ice shards, a splinter of ice hovering above.",
+          "look": "Blue-steel shaft wound with silver filigree and bound in gem-set silver collars, crowned by four silver crescent blades cradling a great crystal of cold light amid a ring of lesser crystals, a splinter of ice hovering above.",
           "lore": "The Guardian of the Quench cooled every blade the Heart ever forged. Its crystal was the last thing to stop glowing when it fell, and the raid carried it out still cold enough to frost the hand. Ice circles the crown and runes of frost turn round it. The cold is only a look."
         },
         "hearthbrand_sword": {

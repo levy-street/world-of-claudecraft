@@ -122,6 +122,52 @@ class HeartForge(Forge):
             j = (i + 1) % sides
             self.face([top[i], top[j], tv], m1)
 
+    def crystal_banded(self, base, tip, r, mats, sides=6, seed=0, waist=1.14, bands=4):
+        """A crystal lit from within: like `crystal`, but its prism is cut into `bands` courses
+        painted in turn from `mats` (deep at the root to hot at the cap), so an opaque one-material
+        crystal still reads as cold light gathering toward its point. The last entry paints the
+        cap. Each course swells to `waist` a third of the way up, then narrows to the shoulder."""
+        base, tip = Vector(base), Vector(tip)
+        x, y, z = self.frame(tip - base)
+        length = (tip - base).length
+        rng = random.Random(seed)
+        rot = rng.uniform(0, math.pi)
+        rings = []
+        for k in range(bands + 1):
+            t = 0.72 * k / bands
+            swell = 0.82 + (waist - 0.82) * math.sin(min(t / 0.72, 1.0) * math.pi * 0.62)
+            if t > 0.5:
+                swell *= 1.0 - (t - 0.5) * 0.35
+            p = base + z * (length * t)
+            rings.append([p + (x * math.cos(a + rot) + y * math.sin(a + rot)) * r * swell
+                          for a in (2 * math.pi * i / sides for i in range(sides))])
+        band_mats = [mats[min(len(mats) - 2, int(k * (len(mats) - 1) / bands))] for k in range(bands)]
+        vr = self.loft(rings, band_mats[0], False, True, False, band_mats)
+        tv = self.V(tip)
+        top = vr[-1]
+        for i in range(sides):
+            j = (i + 1) % sides
+            self.face([top[i], top[j], tv], mats[-1])
+
+    def seam(self, pts, origin, u, v, normal, width, mat, lift=0.004):
+        """A burning seam laid on a face: a strip along the 2D polyline `pts` (in the face's
+        `u`, `v` axes about `origin`), `width` wide, `lift` proud of the face."""
+        o, u, v = Vector(origin), Vector(u).normalized(), Vector(v).normalized()
+        n = Vector(normal).normalized()
+        P = [o + u * a + v * b + n * lift for a, b in pts]
+        for k in range(len(P) - 1):
+            d = (P[k + 1] - P[k])
+            if d.length < 1e-6:
+                continue
+            side = d.normalized().cross(n).normalized() * (width * 0.5)
+            ext = d.normalized() * (width * 0.3)
+            q = [self.V(P[k] - ext - side), self.V(P[k] - ext + side),
+                 self.V(P[k + 1] + ext + side), self.V(P[k + 1] + ext - side)]
+            f = self.face(q, mat)
+            f.normal_update()
+            if f.normal.dot(n) < 0:
+                f.normal_flip()
+
     def glyph(self, origin, u, v, size, mat, seed, lift=0.004, normal=None, width=0.16):
         """A rune glyph laid on a face: three to five straight strokes on a 3x3 lattice, picked by
         seed so no two glyphs match. `u`, `v` are the face's in-plane axes, `normal` its outward

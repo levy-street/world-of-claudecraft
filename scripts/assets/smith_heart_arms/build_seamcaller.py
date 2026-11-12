@@ -24,9 +24,9 @@ OUT = args[0]
 BLEND = args[1] if len(args) > 1 else None
 
 F = HeartForge('seamcaller_maul', {
-    'stone': ((0.56, 0.42, 0.27), 0.86, 0.0),
-    'stone_dark': ((0.32, 0.23, 0.15), 0.9, 0.0),
-    'stone_pale': ((0.7, 0.56, 0.38), 0.8, 0.0),
+    'stone': ((0.4, 0.33, 0.26), 0.88, 0.0),
+    'stone_dark': ((0.2, 0.16, 0.13), 0.92, 0.0),
+    'stone_pale': ((0.55, 0.46, 0.35), 0.82, 0.0),
     'gold': ((0.78, 0.5, 0.1), 0.34, 0.65),
     'gold_dark': ((0.38, 0.22, 0.06), 0.42, 0.65),
     'basalt': ((0.20, 0.17, 0.155), 0.7, 0.0),
@@ -100,14 +100,47 @@ for s in (1, -1):
     F.shard((s * (HX - 0.075), 0, HZ - HH - 0.01), (s * (HX - 0.04), 0, HZ - HH - 0.13), 0.035, 'gold',
             sides=6)
 
-# rune glyphs cut into both cheeks between the bands, in a gold frame
+# both cheeks: a gold frame round one great burning rune, the stone split by burning seams that
+# run from it out to the bands (the vein of the Heart forced through the quarry block)
+CHEEK_SEAMS = [
+    [(0.07, 0.0), (0.11, 0.03), (0.15, 0.01), (0.19, 0.05), (0.235, 0.04)],
+    [(0.06, -0.04), (0.1, -0.08), (0.15, -0.07), (0.2, -0.12), (0.235, -0.15)],
+    [(0.04, 0.07), (0.07, 0.12), (0.12, 0.13), (0.15, 0.2), (0.17, 0.235)],
+    [(0.03, -0.08), (0.05, -0.15), (0.03, -0.2), (0.06, -0.235)],
+]
 for side in (1, -1):
     yf = side * (HY + 0.002)
-    for k, x in enumerate((-0.13, 0.0, 0.13)):
-        F.glyph((x, yf, HZ + 0.005), (1, 0, 0), (0, 0, 1), 0.115, 'rune', 100 + k + (0 if side > 0 else 7),
-                lift=0.005, normal=(0, side, 0), width=0.2)
-    F.block((0, yf, HZ + 0.1), (0.44, 0.02, 0.022), 'gold', bevel=0.005)
-    F.block((0, yf, HZ - 0.09), (0.44, 0.02, 0.022), 'gold', bevel=0.005)
+    n = (0, side, 0)
+    F.glyph((0, yf, HZ + 0.005), (1, 0, 0), (0, 0, 1), 0.16, 'rune', 100 + (0 if side > 0 else 7),
+            lift=0.006, normal=n, width=0.2)
+    # a gold lozenge frame round the rune
+    F.path_tube([(0.0, yf + side * 0.006, HZ + 0.13), (0.11, yf + side * 0.006, HZ + 0.005),
+                 (0.0, yf + side * 0.006, HZ - 0.12), (-0.11, yf + side * 0.006, HZ + 0.005),
+                 (0.0, yf + side * 0.006, HZ + 0.13)], 0.011, 'gold', sides=5)
+    for mirror in (1, -1):
+        for k, pts in enumerate(CHEEK_SEAMS):
+            F.seam([(mirror * a, b) for a, b in pts], (0, yf, HZ), (1, 0, 0), (0, 0, 1), n,
+                   0.017 - 0.004 * (k % 2), 'rune', lift=0.003)
+    F.block((0, yf, HZ + 0.19), (0.44, 0.02, 0.022), 'gold', bevel=0.005)
+    F.block((0, yf, HZ - 0.18), (0.44, 0.02, 0.022), 'gold', bevel=0.005)
+    # rivets along the gold rails
+    for x in (-0.18, -0.09, 0.09, 0.18):
+        for z in (HZ + 0.19, HZ - 0.18):
+            F.rock((x, yf + side * 0.012, z), 0.011, 'gold_dark', 900 + int(x * 100) + int(z * 10),
+                   rough=0.05, subdiv=1)
+# the crown and the underside cracked by the seam too
+for zs in (1, -1):
+    zf = HZ + zs * (HH + 0.002)
+    for mirror in (1, -1):
+        F.seam([(mirror * 0.14, 0.0), (mirror * 0.19, 0.06 * zs), (mirror * 0.25, 0.04 * zs),
+                (mirror * 0.3, 0.1 * zs)], (0, 0, zf), (1, 0, 0), (0, 1, 0), (0, 0, zs), 0.016, 'rune',
+               lift=0.003)
+# rivet heads studding the girding bands
+for s in (1, -1):
+    for side in (1, -1):
+        for z in (HZ - 0.15, HZ, HZ + 0.15):
+            F.rock((s * (HX - 0.075), side * (HY + 0.024), z), 0.014, 'gold_dark', 700 + int(z * 50) + s + side,
+                   rough=0.05, subdiv=1)
 
 # hewn chips: knocked-off chunks along the crown and lower edges so the block reads quarried
 for k, (x, y, z) in enumerate([(0.14, 0.17, 0.22), (-0.16, -0.17, 0.21), (0.05, -0.18, -0.23),
