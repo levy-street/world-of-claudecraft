@@ -1042,6 +1042,31 @@ describe('hunter pets', () => {
     ).toBe(true);
   }, 90_000);
 
+  it('a tamed off-stream beast comes back off the shared stream', () => {
+    const sim = makeSim('hunter');
+    sim.setPlayerLevel(10);
+    const wolf = nearestMob(sim, 'forest_wolf');
+    // as in an offStream camp (CampDef.offStream), e.g. the rework's ridge_stalker overflow
+    wolf.offStreamRng = true;
+    teleport(sim, sim.player, wolf.pos.x + 5, wolf.pos.z);
+    sim.targetEntity(wolf.id);
+    sim.player.facing = Math.atan2(wolf.pos.x - sim.player.pos.x, wolf.pos.z - sim.player.pos.z);
+    sim.castAbility('tame_beast');
+    for (let i = 0; i < 20 * 9 && !sim.petOf(sim.playerId); i++) sim.tick();
+    expectDefined(sim.petOf(sim.playerId));
+    const pending = sim.ctx.pendingMobRespawns.find((p) => p.templateId === 'forest_wolf');
+    expect(pending?.offStreamRng).toBe(true);
+    if (!pending) return;
+    const before = new Set(sim.entities.keys());
+    pending.timer = 0;
+    sim.tick();
+    const respawned = [...sim.entities.values()].filter(
+      (e) => !before.has(e.id) && e.kind === 'mob' && e.templateId === 'forest_wolf',
+    );
+    expect(respawned).toHaveLength(1);
+    expect(respawned[0].offStreamRng).toBe(true);
+  });
+
   it('drops a stale enemy player target when that player stealths out of detection', () => {
     const { sim, pet, rogue } = activePetDuel();
     teleport(sim, sim.player, 0, 0);
