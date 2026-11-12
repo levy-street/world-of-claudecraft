@@ -164,6 +164,9 @@ function splinter(
       ...BASE_CLIPS,
       ...RISE_CLIPS,
       idleVariantCadence: { everySec: 20, jitterSec: 12 },
+      // Its fidget is as long as the five-second fidget beat: it waits for the idle loop's seam
+      // (Idle is 5.5 s), so a fidget never fires over a live one.
+      idleVariantsOnLoopSeam: true,
       contacts: { Attack: [1.0], Attack2: [1.0] },
       castByAbility: byAbility,
       castTimeScaleByAbility: { [C.shear]: 1, ...rates },
