@@ -12,7 +12,10 @@
 //    growing with the bond's pulses and flaring on each one).
 //  - Mountain's Rush (encounters/smith_heart/council_rush.ts): where its
 //    wind-up and run stand at a moment after the wind-up's cue (`rushPhase`),
-//    how far the scar it tears is revealed and how it fades (`rushScar`).
+//    how far the scar it tears is revealed and how it fades (`rushScar`); the
+//    red arrow over the marked player for the whole bar (`rushArrowLook`,
+//    `RUSH_ARROW`: where it floats, its bob, spin and pulse, faster as the bar
+//    runs out).
 //
 // Every number a player reacts to (the tether showing at all, the scar along the
 // lane the run took) is drawn on every tier; only the motes, the shards and the
@@ -185,3 +188,64 @@ export function rushScar(
 
 /** Seconds after the stop by which every trace of a Rush is gone. */
 export const RUSH_TRACE_SECONDS = RUSH_SCAR.hold + RUSH_SCAR.fade;
+
+// ---- Mountain's Rush's arrow over the marked player ----------------------------------------
+
+/** The red arrow over the Rush's marked player (council_rush_arrow.ts), in yards over the
+ *  player's feet: its tip floats clear of the head and nameplate, `length` tall, bobbing
+ *  `bob` at `bobHz`, turning `spin` rad a second; it pulses from `pulseHz` at the mark to
+ *  `pulseHzEnd` as the bar lands. Every tier: the mark is actionable (who to stay clear of,
+ *  who must reach a pillar); reduced motion holds the bob, the spin and the pulse. */
+export const RUSH_ARROW = {
+  tip: 3.2,
+  length: 1.6,
+  bob: 0.25,
+  bobHz: 1.4,
+  spin: 1.6,
+  pulseHz: 1.6,
+  pulseHzEnd: 5,
+  /** The glow never falls below this (always readable), up to 1 on the pulse. */
+  glowFloor: 0.7,
+  /** The extra size on the pulse's crest, growing to its whole as the bar runs out. */
+  swell: 0.14,
+} as const;
+
+/** One frame of the arrow, written into `out` (no allocation). */
+export interface RushArrowLook {
+  /** Height of the tip over the player's feet (yards). */
+  y: number;
+  /** Turn round the vertical (radians). */
+  spin: number;
+  /** Brightness 0..1 (never under RUSH_ARROW.glowFloor). */
+  glow: number;
+  /** Size multiplier (1 at rest). */
+  scale: number;
+}
+
+/** The arrow at `clock` (seconds) with `remaining` of the mark's `duration` left. Pure. */
+export function rushArrowLook(
+  remaining: number,
+  duration: number,
+  clock: number,
+  reducedMotion: boolean,
+  out: RushArrowLook,
+): RushArrowLook {
+  const left = duration > 0 ? Math.max(0, Math.min(1, remaining / duration)) : 0;
+  const urgency = 1 - left;
+  if (reducedMotion) {
+    out.y = RUSH_ARROW.tip;
+    out.spin = 0;
+    out.glow = 1;
+    out.scale = 1;
+    return out;
+  }
+  const hz = RUSH_ARROW.pulseHz + (RUSH_ARROW.pulseHzEnd - RUSH_ARROW.pulseHz) * urgency;
+  const pulse = 0.5 + 0.5 * Math.sin(clock * hz * Math.PI * 2);
+  out.y =
+    RUSH_ARROW.tip +
+    RUSH_ARROW.bob * (0.5 + 0.5 * Math.sin(clock * RUSH_ARROW.bobHz * Math.PI * 2));
+  out.spin = clock * RUSH_ARROW.spin;
+  out.glow = RUSH_ARROW.glowFloor + (1 - RUSH_ARROW.glowFloor) * pulse;
+  out.scale = 1 + RUSH_ARROW.swell * pulse * (0.35 + 0.65 * urgency);
+  return out;
+}

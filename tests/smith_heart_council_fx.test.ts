@@ -35,6 +35,7 @@ import {
   rushLane,
   SOUL_COLORS,
 } from '../src/render/smith_heart_fx/council_fx_core';
+import { RUSH_ARROW } from '../src/render/smith_heart_fx/council_mechanic_look_core';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import {
   COUNCIL_AURAS,
@@ -380,6 +381,16 @@ describe('CouncilFx over a fake world', () => {
     guardian.auras.push(aura(COUNCIL_AURAS.bond, 10, 10));
     for (let i = 0; i < 6; i++) fx.update(1 / 30);
     expect(paints()).toBeGreaterThanOrEqual(before + 2);
+    // The red arrow over the marked player, for the whole raid (every tier).
+    expect(shown('smithHeartRushArrow')).toBe(1);
+    let arrow: THREE.Object3D | null = null;
+    root?.traverse((c) => {
+      if (c.name === 'smithHeartRushArrow' && c.visible) arrow = c;
+    });
+    const arrowAt = (arrow as THREE.Object3D | null)?.position;
+    expect(arrowAt?.x).toBeCloseTo(marked.pos.x, 5);
+    expect(arrowAt?.z).toBeCloseTo(marked.pos.z, 5);
+    expect((arrowAt?.y ?? 0) - marked.pos.y).toBeGreaterThanOrEqual(RUSH_ARROW.tip);
     // The bond: the tether (core, halo, shards) and its aura on both members
     // (a sigil on the floor, a column of light), every tier.
     expect(shown('smithHeartCouncilBondThread')).toBe(1);
@@ -410,6 +421,8 @@ describe('CouncilFx over a fake world', () => {
     marked.auras.length = 0;
     for (let i = 0; i < 6; i++) fx.update(1 / 30);
     expect(paints()).toBe(before);
+    // The mark gone, its arrow with it.
+    expect(shown('smithHeartRushArrow')).toBe(0);
     // The wind-up: the line fixed from the Guardian's feet to the cursed
     // pillar's face; the lane stays lit at full through it and the run.
     const run = Math.hypot(cursed.pos.x - guardian.pos.x, cursed.pos.z - guardian.pos.z) - 4;

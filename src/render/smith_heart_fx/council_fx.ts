@@ -21,7 +21,8 @@
 //    its player (danger: every ally inside is hurt each second) with a
 //    shimmer on the body and a ring rolling out on each pulse; Mountain's
 //    Rush's mark round its player and the lane the Guardian will charge down
-//    (council_rush_fx.ts); Hammer's Weight's slam on the tank and its mark
+//    (council_rush_fx.ts), and the red arrow over the marked player for the
+//    whole bar (council_rush_arrow.ts); Hammer's Weight's slam on the tank and its mark
 //    at the tank's feet;
 //  - Bond of the Stone's gold thread between the two members
 //    (council_bond_fx.ts); the mythic Quarry Collapse's falling rock;
@@ -101,6 +102,7 @@ import {
 } from './council_fx_core';
 import { CouncilLimitFx } from './council_limit_fx';
 import { type CouncilFxHost, CouncilPillarsFx, RISEN_HEIGHT } from './council_pillars_fx';
+import { CouncilRushArrow } from './council_rush_arrow';
 import { CouncilRushFx } from './council_rush_fx';
 import { CouncilShelters } from './council_shelter_fx';
 import { CouncilSoakFx } from './council_soak_fx';
@@ -398,6 +400,8 @@ export class CouncilFx {
   private readonly bond: CouncilBondFx;
   /** Mountain's Rush's lane and impact, the Quarry Collapse's blows. */
   private readonly rush: CouncilRushFx;
+  /** The red arrow over the Rush's marked player (every tier). */
+  private readonly arrow: CouncilRushArrow;
   private readonly limitFx: CouncilLimitFx;
   /** The players the Wrath's runes count (refilled at their pace). */
   private readonly limitPlayers: Entity[] = [];
@@ -502,6 +506,7 @@ export class CouncilFx {
     this.pillarsFx = new CouncilPillarsFx(host, carrier);
     this.shelters = new CouncilShelters(host, this.pillarsFx);
     this.soak = new CouncilSoakFx(this.root, this.uTime, this.geometries, this.materials);
+    this.arrow = new CouncilRushArrow(this.root, this.uTime, this.geometries, this.materials);
     this.bond = new CouncilBondFx(host);
     this.rush = new CouncilRushFx(host, playGesture);
     this.limitFx = new CouncilLimitFx(host, this.pillarsFx);
@@ -862,6 +867,7 @@ export class CouncilFx {
     this.updateWrathShelters(world);
     this.bond.update(dt);
     this.rush.update(dt);
+    this.arrow.update(world.entities, this.clock, this.reducedMotion());
     this.audio.update(
       dt,
       (id) => world.entities.get(id),
@@ -884,6 +890,7 @@ export class CouncilFx {
     this.soulFx.beginScan();
     this.bond.beginScan();
     this.rush.beginScan();
+    this.arrow.beginScan();
     this.audio.beginScan();
     for (const m of this.marks) m.seen = false;
     for (const r of this.rocks) r.seen = false;
@@ -933,6 +940,7 @@ export class CouncilFx {
             this.audio.see(e, 'rock');
           } else if (a.id === COUNCIL_AURAS.resonance) this.seeRing(e);
           else if (a.id === COUNCIL_AURAS.weight) this.seeWeight(e);
+          else if (a.id === COUNCIL_AURAS.rushMark) this.arrow.see(e.id);
         }
       }
     }
@@ -942,6 +950,7 @@ export class CouncilFx {
     this.soulFx.endScan();
     this.bond.endScan();
     this.rush.endScan();
+    this.arrow.endScan();
     this.audio.endScan();
     for (const m of this.marks) {
       if (m.playerId >= 0 && !m.seen) this.freeMark(m);

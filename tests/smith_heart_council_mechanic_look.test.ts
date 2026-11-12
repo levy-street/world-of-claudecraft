@@ -15,8 +15,11 @@ import {
   bondArchPoint,
   bondSigil,
   bondTetherLook,
+  RUSH_ARROW,
   RUSH_SCAR,
   RUSH_TRACE_SECONDS,
+  type RushArrowLook,
+  rushArrowLook,
   rushPhase,
   rushScar,
 } from '../src/render/smith_heart_fx/council_mechanic_look_core';
@@ -121,5 +124,52 @@ describe("Mountain's Rush: the wind-up, the run and the scar", () => {
     expect(o.fade).toBe(1);
     rushScar(T.rushWindup + 1 + RUSH_TRACE_SECONDS, 1, o);
     expect(o.fade).toBe(0);
+  });
+});
+
+describe("Mountain's Rush: the arrow over the marked player", () => {
+  const look = (): RushArrowLook => ({ y: 0, spin: 0, glow: 0, scale: 0 });
+
+  it('floats clear of the head, bobbing, and never dims below its floor', () => {
+    for (let k = 0; k <= 40; k++) {
+      const t = k * 0.137;
+      const l = rushArrowLook(3, 5, t, false, look());
+      expect(l.y).toBeGreaterThanOrEqual(RUSH_ARROW.tip - 1e-9);
+      expect(l.y).toBeLessThanOrEqual(RUSH_ARROW.tip + RUSH_ARROW.bob + 1e-9);
+      expect(l.glow).toBeGreaterThanOrEqual(RUSH_ARROW.glowFloor - 1e-9);
+      expect(l.glow).toBeLessThanOrEqual(1 + 1e-9);
+      expect(l.scale).toBeGreaterThanOrEqual(1 - 1e-9);
+    }
+  });
+
+  it('pulses faster and swells more as the bar runs out', () => {
+    // Count the pulse's crests over two seconds at the mark and as it lands.
+    const crests = (remaining: number) => {
+      let n = 0;
+      let prev = rushArrowLook(remaining, 5, 0, false, look()).glow;
+      let rising = false;
+      for (let k = 1; k <= 400; k++) {
+        const g = rushArrowLook(remaining, 5, k * 0.005, false, look()).glow;
+        if (g < prev && rising) n++;
+        rising = g > prev;
+        prev = g;
+      }
+      return n;
+    };
+    expect(crests(0.1)).toBeGreaterThan(crests(5));
+    let early = 0;
+    let late = 0;
+    for (let k = 0; k < 200; k++) {
+      early = Math.max(early, rushArrowLook(5, 5, k * 0.01, false, look()).scale);
+      late = Math.max(late, rushArrowLook(0.1, 5, k * 0.01, false, look()).scale);
+    }
+    expect(late).toBeGreaterThan(early);
+  });
+
+  it('reduced motion holds it still and lit full: the mark stays', () => {
+    const a = rushArrowLook(2, 5, 1.3, true, look());
+    const b = rushArrowLook(2, 5, 7.9, true, look());
+    expect(a).toEqual(b);
+    expect(a).toEqual({ y: RUSH_ARROW.tip, spin: 0, glow: 1, scale: 1 });
   });
 });
