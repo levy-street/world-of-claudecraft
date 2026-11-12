@@ -13,7 +13,11 @@
 //     to a player already carrying Skerrit's (src/sim/muster_pike.ts).
 import { describe, expect, it } from 'vitest';
 import { MUSTER_RACK } from '../src/sim/content/mirefen_muster';
-import { BUILTIN_WORLD, ITEMS, QUESTS } from '../src/sim/data';
+import {
+  MUSTER_PIKE_DRAWN_EVENT,
+  MUSTER_PIKE_DRILL_QUEST_ID,
+} from '../src/sim/content/mirefen_muster_quests';
+import { BUILTIN_WORLD, ITEMS, NPCS, QUESTS } from '../src/sim/data';
 import { SKERRITS_SHARDPIKE_ID } from '../src/sim/lance_balance_core';
 import type { MusterArmyState } from '../src/sim/mirefen_muster';
 import { MUSTER_SHARDPIKE_ID, SHARDPIKE_CARRIED_REFUSAL } from '../src/sim/muster_pike';
@@ -24,6 +28,7 @@ import type { SimContext } from '../src/sim/sim_context';
 import type { Entity, SimEvent, WorldContent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 import { WORLD_BOSSES } from '../src/sim/world_boss';
+import { localizeSimText } from '../src/ui/sim_i18n';
 
 const QUEST = 'q_socketwrights_due';
 const SKERRIT = 'socketwright_skerrit';
@@ -146,6 +151,45 @@ describe("Skerrit's Shardpike goes back to Skerrit", () => {
     h.sim.tick();
     expect(h.held()).toBe(1);
   });
+
+  it('the bank refuses his pike, and a copy banked earlier still goes home', () => {
+    const h = withSkerrit();
+    const banker = [...h.sim.entities.values()].find(
+      (e) => e.kind === 'npc' && NPCS[e.templateId]?.banker === true,
+    );
+    if (!banker) throw new Error('no banker placed');
+    place(h.sim, h.sim.player, banker.pos.x + 1.5, banker.pos.z);
+    h.sim.addItem(SKERRITS_SHARDPIKE_ID, 1);
+    const slot = h.meta().inventory.findIndex((s) => s.itemId === SKERRITS_SHARDPIKE_ID);
+    const deposit = h.sim as unknown as { bankDeposit(i: number): void };
+    // Control: an ordinary item deposits from the same spot, so the refusal is not range.
+    h.sim.addItem('linen_cloth', 1);
+    const linen = h.meta().inventory.findIndex((s) => s.itemId === 'linen_cloth');
+    deposit.bankDeposit(linen);
+    expect(h.meta().bank.inventory.some((s) => s.itemId === 'linen_cloth')).toBe(true);
+    deposit.bankDeposit(slot);
+    expect(h.meta().bank.inventory.some((s) => s.itemId === SKERRITS_SHARDPIKE_ID)).toBe(false);
+    expect(h.sim.countItem(SKERRITS_SHARDPIKE_ID)).toBe(1);
+    // A copy banked before the refusal landed (a save from an older build).
+    h.sim.removeItem(SKERRITS_SHARDPIKE_ID, 1);
+    h.meta().bank.inventory.push({ itemId: SKERRITS_SHARDPIKE_ID, count: 1 });
+    h.meta().questsDone.add(QUEST);
+    const rev = h.meta().bankWireRev;
+    place(h.sim, h.sim.player, h.npc.pos.x + 2, h.npc.pos.z);
+    h.talk();
+    expect(h.meta().bank.inventory.some((s) => s.itemId === SKERRITS_SHARDPIKE_ID)).toBe(false);
+    expect(h.meta().bankWireRev).toBeGreaterThan(rev);
+  });
+
+  it('every new line reaches the player through the client matcher', () => {
+    for (const text of [
+      QUEST_TOOL_RETURNED_TEXT,
+      SHARDPIKE_CARRIED_REFUSAL,
+      'You return the Shardpike to the muster rack.',
+    ]) {
+      expect(localizeSimText(text), text).not.toBeNull();
+    }
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -224,5 +268,27 @@ describe('the muster rack takes its pike back on request', () => {
       .filter((e) => e.type === 'error')
       .map((e) => (e as { text: string }).text);
     expect(errors).toContain(SHARDPIKE_CARRIED_REFUSAL);
+  });
+
+  it('a pike holder whose drill still wants the draw gets the credit and keeps the pike', () => {
+    const r = atTheRack();
+    r.useRack();
+    expect(r.meta().equipment.mainhand).toBe(MUSTER_SHARDPIKE_ID);
+    const quest = QUESTS[MUSTER_PIKE_DRILL_QUEST_ID];
+    const drawIndex = quest.objectives.findIndex(
+      (o) => o.type === 'event' && o.eventId === MUSTER_PIKE_DRAWN_EVENT,
+    );
+    expect(drawIndex).toBeGreaterThanOrEqual(0);
+    r.meta().questLog.set(MUSTER_PIKE_DRILL_QUEST_ID, {
+      questId: MUSTER_PIKE_DRILL_QUEST_ID,
+      state: 'active',
+      counts: quest.objectives.map(() => 0),
+    });
+    r.useRack();
+    expect(r.meta().equipment.mainhand).toBe(MUSTER_SHARDPIKE_ID);
+    expect(r.meta().questLog.get(MUSTER_PIKE_DRILL_QUEST_ID)?.counts[drawIndex]).toBe(1);
+    // With the step done, the next use is a hand-back again.
+    r.useRack();
+    expect(r.lentHeld()).toBe(0);
   });
 });

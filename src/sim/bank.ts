@@ -463,7 +463,10 @@ export function bankDeposit(
   }
   if (!Number.isInteger(slotIndex) || slotIndex < 0 || slotIndex >= meta.inventory.length) return;
   const slot = meta.inventory[slotIndex];
-  if (ITEMS[slot.itemId]?.kind === 'quest') {
+  // A quest's own tool (Skerrit's Shardpike, src/sim/quests/quest_tool_return.ts) is a
+  // quest item too: its giver takes it back, and a banked copy would be stuck forever.
+  const depositDef = ITEMS[slot.itemId];
+  if (depositDef?.kind === 'quest' || (depositDef?.questTool && depositDef.questId)) {
     ctx.error(meta.entityId, 'You cannot store quest items in the bank.');
     return;
   }

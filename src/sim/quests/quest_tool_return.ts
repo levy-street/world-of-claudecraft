@@ -11,9 +11,9 @@
 //     (already finished, abandoned, or never taken), and every copy past the first while it
 //     is active, so a player can never hold more than one.
 //
-// Only bags and worn slots are read: a banked copy stays where the player put it, and the
-// giver's re-grant (regrantMissingQuestItems) already counts it as held, so it never mints a
-// second one. Draws no rng.
+// Bags, worn slots and the bank are all read. The bank refuses quest tools now (bank.ts),
+// but a copy banked before that rule landed must still go home. Draws no rng.
+import { bumpBankWireRev } from '../bank';
 import { ITEMS, QUESTS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { refreshModsForEquipmentChange } from '../progression/talents';
@@ -45,14 +45,32 @@ export function takeBackQuestTool(
     (slot) => meta.equipment[slot] === itemId,
   );
   const carried = ctx.countItem(itemId, pid);
-  // Worn copies claim the kept count first.
+  // Worn copies claim the kept count first, then the bags, then the bank.
   const keptWorn = Math.min(left, wornSlots.length);
   left -= keptWorn;
-  const bagTake = Math.max(0, carried - left);
+  const keptBags = Math.min(left, carried);
+  left -= keptBags;
+  const bagTake = carried - keptBags;
   if (bagTake > 0) {
     ctx.removeItem(itemId, bagTake, pid);
     taken += bagTake;
   }
+  // A copy banked before the bank refused quest tools (bank.ts) comes back too.
+  const bank = meta.bank?.inventory ?? [];
+  let bankChanged = false;
+  for (let i = bank.length - 1; i >= 0; i--) {
+    const slot = bank[i];
+    if (slot.itemId !== itemId || slot.count <= 0) continue;
+    const keepHere = Math.min(left, slot.count);
+    left -= keepHere;
+    const drop = slot.count - keepHere;
+    if (drop <= 0) continue;
+    taken += drop;
+    bankChanged = true;
+    if (keepHere > 0) slot.count = keepHere;
+    else bank.splice(i, 1);
+  }
+  if (bankChanged) bumpBankWireRev(meta);
   const unwear = wornSlots.slice(keptWorn);
   if (unwear.length === 0) return taken;
   for (const slot of unwear) {
