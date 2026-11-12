@@ -107,6 +107,7 @@ import { CouncilRushFx } from './council_rush_fx';
 import { CouncilShelters } from './council_shelter_fx';
 import { CouncilSoakFx } from './council_soak_fx';
 import { CouncilSoulFx } from './council_soul_fx';
+import { CouncilStrikeFx } from './council_strike_fx';
 import { chunkGeometry, Rubble } from './hammer_fx';
 import type { CouncilTelegraphKind } from './painted_telegraph_core';
 import {
@@ -400,6 +401,8 @@ export class CouncilFx {
   private readonly bond: CouncilBondFx;
   /** Mountain's Rush's lane and impact, the Quarry Collapse's blows. */
   private readonly rush: CouncilRushFx;
+  /** The Wrath's and the Rush's gather and release (council_strike_fx.ts). */
+  private readonly strike: CouncilStrikeFx;
   /** The red arrow over the Rush's marked player (every tier). */
   private readonly arrow: CouncilRushArrow;
   private readonly limitFx: CouncilLimitFx;
@@ -509,6 +512,14 @@ export class CouncilFx {
     this.arrow = new CouncilRushArrow(this.root, this.uTime, this.geometries, this.materials);
     this.bond = new CouncilBondFx(host);
     this.rush = new CouncilRushFx(host, playGesture);
+    this.strike = new CouncilStrikeFx(
+      host,
+      () => {
+        const me = this.world?.entities.get(this.world.playerId);
+        return me ? me.pos : null;
+      },
+      this.shakeSink,
+    );
     this.limitFx = new CouncilLimitFx(host, this.pillarsFx);
     this.soulFx = new CouncilSoulFx(host, this.pillarsFx, this.shelters);
     const bandGeo = new THREE.CylinderGeometry(1, 1, 1, 40, 1, true).translate(0, 0.5, 0);
@@ -795,7 +806,8 @@ export class CouncilFx {
       } else if (ev.ability === COUNCIL_CUES.soulBurst) this.pillarsFx.soulBurstAt(ev.x, ev.z);
       else if (ev.ability === COUNCIL_CUES.rockImpact) this.rockImpact(ev.x, ev.z, ev.radius ?? 6);
       else if (ev.ability === COUNCIL_CUES.settle) this.pillarsFx.settleAt(ev.x, ev.z);
-      else if (ev.ability === COUNCIL_CUES.rushWindup)
+      else if (ev.ability === COUNCIL_CUES.rushWindup) {
+        this.strike.rushWindup(ev.sourceId);
         this.rush.windup(
           ev.sourceId,
           ev.x,
@@ -805,13 +817,20 @@ export class CouncilFx {
           ev.speed ?? T.rushSpeed,
           ev.duration ?? 0,
         );
-      else if (ev.ability === COUNCIL_CUES.rushImpact)
+      } else if (ev.ability === COUNCIL_CUES.rushImpact) {
         this.rush.impactAt(ev.x, ev.z, ev.radius ?? T.rushHalfWidth);
-      else if (ev.ability === COUNCIL_CUES.cursedBreak) {
+        this.strike.rushImpact(ev.x, ev.z);
+      } else if (ev.ability === COUNCIL_CUES.cursedBreak) {
         this.pillarsFx.cursedBreakAt(ev.x, ev.z, ev.radius ?? T.cursedR);
         this.rush.pillarStruck(ev.x, ev.z, true);
       } else if (ev.ability === COUNCIL_CUES.quarryCollapse) this.rush.collapseAt(ev.x, ev.z);
       return true;
+    }
+    // Mountain's Wrath lands: its power (the generic nova and the sight
+    // field still draw it, so the cue stays unclaimed).
+    if (ev.type === 'spellfx' && ev.ability === COUNCIL_CASTS.wrath) {
+      this.strike.wrathLand(ev.sourceId);
+      return false;
     }
     if (ev.type !== 'spellfx' || !councilClaims(ev.ability)) return false;
     const ability = ev.ability;
@@ -867,6 +886,7 @@ export class CouncilFx {
     this.updateWrathShelters(world);
     this.bond.update(dt);
     this.rush.update(dt);
+    this.strike.update(dt);
     this.arrow.update(world.entities, this.clock, this.reducedMotion());
     this.audio.update(
       dt,
@@ -890,6 +910,7 @@ export class CouncilFx {
     this.soulFx.beginScan();
     this.bond.beginScan();
     this.rush.beginScan();
+    this.strike.beginScan();
     this.arrow.beginScan();
     this.audio.beginScan();
     for (const m of this.marks) m.seen = false;
@@ -908,6 +929,7 @@ export class CouncilFx {
             this.audio.see(e, 'member');
             this.bond.see(e);
             if (role === 'guardian') this.rush.seeGuardian(e);
+            this.strike.see(e, role);
           }
           if (
             holder < 0 &&
@@ -950,6 +972,7 @@ export class CouncilFx {
     this.soulFx.endScan();
     this.bond.endScan();
     this.rush.endScan();
+    this.strike.endScan();
     this.arrow.endScan();
     this.audio.endScan();
     for (const m of this.marks) {
@@ -1726,6 +1749,7 @@ export class CouncilFx {
     if (this.disposed) return;
     this.disposed = true;
     this.bond.dispose();
+    this.strike.dispose();
     this.root.removeFromParent();
     this.particles.dispose();
     this.kit.dispose();

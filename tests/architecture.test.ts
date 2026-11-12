@@ -1188,6 +1188,8 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart_fx/council_bodies_core.ts',
   // Bond of the Stone's tether and Mountain's Rush's wind-up, run and scar.
   'src/render/smith_heart_fx/council_mechanic_look_core.ts',
+  // Mountain's Wrath's and Mountain's Rush's gather and release.
+  'src/render/smith_heart_fx/council_strike_core.ts',
   // Stone Thrum's ripple off each risen pillar.
   'src/render/smith_heart_fx/council_thrum_core.ts',
   // The Guardian of the Breath's body (its storm form) and its fight's effects.

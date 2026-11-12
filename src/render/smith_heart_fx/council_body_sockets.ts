@@ -82,6 +82,31 @@ export function councilBodySockets(role: CouncilRole): CouncilBodySocketSet | nu
   return s;
 }
 
+const HANDS_KEY = 'smithHeartCouncilHands';
+const HAND_BONES = ['Hand.L', 'Hand.R'] as const;
+
+/** `role`'s two hand bones on its live view (both models rig a Hand.L and a
+ *  Hand.R; null where one is missing), found once per view and kept on it;
+ *  null when no view is live. Read by the blows' gather
+ *  (council_strike_fx.ts): the light swells in its fists. */
+export function councilHands(
+  role: CouncilRole,
+): readonly [THREE.Object3D | null, THREE.Object3D | null] | null {
+  const s = councilBodySockets(role);
+  if (!s) return null;
+  const kept = s.root.userData[HANDS_KEY] as
+    | readonly [THREE.Object3D | null, THREE.Object3D | null]
+    | undefined;
+  if (kept) return kept;
+  const find = (bone: string) =>
+    s.root.getObjectByName(THREE.PropertyBinding.sanitizeNodeName(bone)) ??
+    s.root.getObjectByName(bone) ??
+    null;
+  const hands = [find(HAND_BONES[0]), find(HAND_BONES[1])] as const;
+  s.root.userData[HANDS_KEY] = hands;
+  return hands;
+}
+
 /** Hang the sockets on a view whose model was still loading when it was
  *  attached (called on the scene's scan tick, never every frame). */
 export function retryCouncilBodySockets(): void {
