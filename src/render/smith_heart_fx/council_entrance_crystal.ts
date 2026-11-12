@@ -107,7 +107,7 @@ export function crystalGeometry(): THREE.BufferGeometry {
 }
 
 /** A flat ring a yard round, `uv.y` 0 at its inner edge and 1 at its outer. */
-function ringGeometry(inner: number, segments: number): THREE.BufferGeometry {
+export function ringGeometry(inner: number, segments: number): THREE.BufferGeometry {
   const pos: number[] = [];
   const uv: number[] = [];
   const idx: number[] = [];

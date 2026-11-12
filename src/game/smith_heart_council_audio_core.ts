@@ -23,6 +23,7 @@ import {
   COUNCIL_AURAS,
   COUNCIL_CASTS,
   COUNCIL_CUES,
+  COUNCIL_DEV_CUES,
   endlessSongMult,
   COUNCIL_TUNING as T,
 } from '../sim/encounters/smith_heart/council_ids';
@@ -90,6 +91,9 @@ export const COUNCIL_CUE_SOUNDS: Readonly<Record<string, CouncilSound>> = {
 /** Is this event's ability one the council's sound plays (the HUD's generic
  *  nova sound skipped for it)? */
 export function councilSoundClaims(ability: string | undefined): boolean {
+  // The deaths' dev replay cue is silent here: the death scene's own sounds
+  // play off its beats (render/smith_heart_fx/council_death_fx.ts).
+  if (ability === COUNCIL_DEV_CUES.deathReplay) return true;
   return ability !== undefined && Object.hasOwn(COUNCIL_CUE_SOUNDS, ability);
 }
 

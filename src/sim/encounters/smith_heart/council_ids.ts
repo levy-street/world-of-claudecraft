@@ -37,6 +37,15 @@ export const COUNCIL_TEMPLATE_IDS: readonly string[] = COUNCIL_ROLES.map(
   (r) => COUNCIL_TEMPLATES[r],
 );
 
+/** Dev-only presentation triggers (spellfx 'nova' on a member, emitted only
+ *  by a dev verb, never by the fight): a member's death replayed on its
+ *  living body (`/dev heart council death [guardian|singer]`; the renderer's
+ *  CouncilDeathFx plays the scene, smith_heart_fx/council_death_core.ts, and
+ *  claims the cue). */
+export const COUNCIL_DEV_CUES = {
+  deathReplay: 'heart_council_death_replay',
+} as const;
+
 /** The role whose own job each is. */
 export const JOB_OWNER: Readonly<Record<CouncilJob, CouncilRole>> = {
   wrath: 'guardian',

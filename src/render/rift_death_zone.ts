@@ -64,6 +64,7 @@ import {
   BreathFightFx,
   BreathFx,
   CouncilBodies,
+  CouncilDeathFx,
   CouncilEntranceFx,
   CouncilFx,
   FinalFx,
@@ -241,6 +242,9 @@ export class RiftDeathZoneVisuals {
   /** The council's entrance (the quarry waking), updated before the fight
    *  and the bodies. */
   private readonly councilEntrance: CouncilEntranceFx;
+  /** The council's deaths (the quarry falling silent), updated after the
+   *  fight and the bodies. */
+  private readonly councilDeath: CouncilDeathFx;
   // The Smith's Heart's seal moments felt in the camera.
   private readonly sealShake: SealShake;
   private uninstallDrawnPositions: (() => void) | null = null;
@@ -364,6 +368,15 @@ export class RiftDeathZoneVisuals {
       compileGate,
       reducedMotion,
       shake,
+    );
+    this.councilDeath = new CouncilDeathFx(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+      shake,
+      playGesture,
     );
     this.sealShake = new SealShake(world, shake);
     this.syncScope(world?.player?.pos.x, false);
@@ -712,6 +725,7 @@ export class RiftDeathZoneVisuals {
     this.councilEntrance.update(dt);
     this.councilFx.update(dt);
     this.councilBodies.update(dt);
+    this.councilDeath.update(dt);
     this.sealShake.update();
     for (const visual of this.zones.values()) {
       visual.phase = (visual.phase + dt * deathZonePulseSpeed(visual.remaining)) % (Math.PI * 2);
@@ -755,6 +769,7 @@ export class RiftDeathZoneVisuals {
     this.councilEntrance.dispose();
     this.councilFx.dispose();
     this.councilBodies.dispose();
+    this.councilDeath.dispose();
     this.hoardPresentation.dispose();
   }
 
@@ -795,7 +810,7 @@ export class RiftDeathZoneVisuals {
     const finalKit = this.finalKit.handleEvent(event);
     const finalPhase = this.finalPhase.handleEvent(event);
     this.councilBodies.handleEvent(event);
-    const council = this.councilFx.handleEvent(event);
+    const council = this.councilFx.handleEvent(event) || this.councilDeath.handleEvent(event);
     return (
       this.bastionFx.handleEvent(event) ||
       temple ||

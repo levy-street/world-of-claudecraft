@@ -4,6 +4,7 @@ export { BreathEntranceFx } from './breath_entrance_fx';
 export { BreathFightFx } from './breath_fight_fx';
 export { BreathFx } from './breath_fx';
 export { CouncilBodies } from './council_bodies';
+export { CouncilDeathFx } from './council_death_fx';
 export { CouncilEntranceFx } from './council_entrance_fx';
 export { CouncilFx } from './council_fx';
 export { FinalFx } from './final_fx';

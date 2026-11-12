@@ -120,3 +120,12 @@ export const DEATH_SECONDARY_LAYERS = Object.freeze([
   'smithHeartDeathSheath',
   'smithHeartDeathCometHalo',
 ] as const);
+
+/** The Hammer Council's deaths (council_death_core.ts, painted with its
+ *  entrance's budget): the cosmetic double the low tier never draws, the
+ *  room's crystals settling dark with the columns (the columns' own runes,
+ *  the slabs, the shards, the shafts of light and every beat stay on every
+ *  tier). */
+export const COUNCIL_DEATH_SECONDARY_LAYERS = Object.freeze([
+  'smithHeartCouncilDeathFlares',
+] as const);

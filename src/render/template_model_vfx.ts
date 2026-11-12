@@ -8,6 +8,7 @@ import { IGNIVAR_BOSS_ID } from '../sim/types';
 import { attachIgnivarModelVfx } from './ignivar_model_vfx';
 import { BREATH_GUARDIAN } from './smith_heart_fx/breath_body_core';
 import { attachBreathBodySockets } from './smith_heart_fx/breath_body_sockets';
+import { attachCouncilBodySockets, councilSocketRole } from './smith_heart_fx/council_body_sockets';
 import { HEAT_GUARDIAN } from './smith_heart_fx/heat_body_core';
 import { attachHeatBodySockets } from './smith_heart_fx/heat_body_sockets';
 import { QUENCH_GUARDIAN } from './smith_heart_fx/quench_body_core';
@@ -33,4 +34,9 @@ export function attachTemplateModelVfx(
   else if (templateId === BREATH_GUARDIAN) attachBreathBodySockets(root);
   // The Guardian of the Quench's cold sockets (read by smith_heart_fx/quench_body.ts).
   else if (templateId === QUENCH_GUARDIAN) attachQuenchBodySockets(root);
+  else {
+    // The Hammer Council's death sockets (read by smith_heart_fx/council_death_fx.ts).
+    const role = councilSocketRole(templateId);
+    if (role) attachCouncilBodySockets(role, root);
+  }
 }

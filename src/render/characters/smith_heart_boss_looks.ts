@@ -29,6 +29,7 @@ import {
 } from '../smith_heart_fx/breath_body_core';
 import { BREATH_ENTRANCE_GESTURES } from '../smith_heart_fx/breath_entrance_core';
 import { COUNCIL_MODEL_HEIGHTS } from '../smith_heart_fx/council_bodies_core';
+import { COUNCIL_DEATH_GESTURES, COUNCIL_HUSK_SHADE } from '../smith_heart_fx/council_death_core';
 import {
   COUNCIL_AWAKEN_CLIP,
   COUNCIL_ENTRANCE_GESTURES,
@@ -352,6 +353,7 @@ const BREATH_STORM = breathClips(true);
 
 // ---- the Hammer Council ------------------------------------------------------------------------
 const CG = COUNCIL_ENTRANCE_GESTURES;
+const CD = COUNCIL_DEATH_GESTURES;
 
 /** The Guardian of the Hammer's fighting clips (and its entrance's punch:
  *  CastWake, its fists landing at COUNCIL_AWAKEN_CLIP.punchContact). */
@@ -434,19 +436,35 @@ const councilStances = (
   dormant: string,
   emerge: string,
   stand: string,
+  fall: string,
 ): Record<string, { clips: ClipMap; enter?: string }> => ({
   [dormant]: { clips: asleep(base) },
   [emerge]: { clips: base, enter: 'Awaken' },
   [stand]: { clips: base },
+  // A dev replay of its death (smith_heart_fx/council_death_fx.ts): its Death
+  // clip on the living body, then held low in its crouch until the replay
+  // stands it back up (the stand stance).
+  [fall]: { clips: asleep(base), enter: 'Death' },
 });
 
 /** A member held dark through its sleep (its colour dulled toward the
  *  quarry's grey, re-sent while it sleeps; it fills back over the fall as it
  *  breaks out). Its model has no emissive map, so the pulse takes its one
  *  material by name. */
-const councilDark = (material: string, gesture: string, shade: number) => ({
+const councilDark = (
+  material: string,
+  gesture: string,
+  shade: number,
+  husk: string,
+  huskShade: number,
+) => ({
   materials: [material],
-  pulses: [{ gesture, rise: 0, hold: 1.0, fall: 1.1, peak: 1, shade }],
+  pulses: [
+    { gesture, rise: 0, hold: 1.0, fall: 1.1, peak: 1, shade },
+    // Its death's husk (smith_heart_fx/council_death_core.ts): the stone gone
+    // dark as its light leaves it, re-sent while the corpse lies.
+    { gesture: husk, rise: 0, hold: 1.0, fall: 1.4, peak: 1, shade: huskShade },
+  ],
 });
 
 export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
@@ -474,8 +492,15 @@ export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
       CG.guardianDormant,
       CG.guardianEmerge,
       CG.guardianStand,
+      CD.guardianFall,
     ),
-    glowPulses: councilDark('heart_slabwright', CG.guardianDim, 0.3),
+    glowPulses: councilDark(
+      'heart_slabwright',
+      CG.guardianDim,
+      0.3,
+      CD.guardianHusk,
+      COUNCIL_HUSK_SHADE.guardian,
+    ),
     castClipSync: ['heart_hammers_weight', 'heart_mountains_wrath'],
     oneShotsHoldAttacks: ['Awaken'],
     attackTimeScale: 1,
@@ -507,8 +532,15 @@ export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
       CG.singerDormant,
       CG.singerEmerge,
       CG.singerStand,
+      CD.singerFall,
     ),
-    glowPulses: councilDark('heart_seam_singer', CG.singerDim, 0.42),
+    glowPulses: councilDark(
+      'heart_seam_singer',
+      CG.singerDim,
+      0.42,
+      CD.singerHusk,
+      COUNCIL_HUSK_SHADE.singer,
+    ),
     oneShotsHoldAttacks: ['Awaken'],
     attackTimeScale: 1,
     deathTimeScale: 1,
