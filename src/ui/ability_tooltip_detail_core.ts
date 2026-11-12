@@ -8,6 +8,7 @@
 // Pure and DOM-free (a registered UI_PURE_CORES entry): it returns localized
 // strings, and the tooltip view escapes and wraps them.
 
+import { baselinePushbackImmune } from '../sim/combat/pushback_baseline';
 import type { ResolvedAbility } from '../sim/sim';
 import type { AbilityEffect } from '../sim/types';
 import {
@@ -15,9 +16,11 @@ import {
   abilityDamageBonus,
   abilityOverTimeEffect,
   abilityPrimaryEffect,
+  abilityPrimaryHealingTotal,
   abilitySecondaryEffect,
 } from './ability_damage';
 import { formatAbilityNumber } from './ability_description';
+import { primaryDamageTooltipRange } from './dawnreaver_damage_tooltip_core';
 import { type TranslationKey, t } from './i18n';
 
 /** The four live ratings an ability bonus can read. */
@@ -83,20 +86,21 @@ function scalingLine(
   scaling: AbilityScaling,
 ): string | null {
   if (!eff) return null;
-  // A live primary-damage / primary-healing factor (v0.42 output scaling)
-  // makes the description show (base + bonus) x factor as ONE combined range,
-  // so a bare "+bonus" here would not add up to the number above it.
-  const out = res.outputScaling;
-  if (eff === abilityPrimaryEffect(res) && out) {
-    const healing =
-      eff.type === 'heal' ||
-      eff.type === 'aoeHeal' ||
-      eff.type === 'chainHeal' ||
-      (eff.type === 'consumeAura' && eff.heal !== undefined);
-    const factor = healing ? out.primaryHealing : (out.primaryDamage ?? 1);
-    if (factor !== 1) return null;
+  // When the description folds the bonus into ONE combined number (a live
+  // v0.42 primary-damage or primary-healing factor, or Dawnweave on a prayer),
+  // a bare "+bonus" here would not add up to the number above it. Ask the
+  // SAME helpers the description asks, so the two can never disagree.
+  if (abilityPrimaryHealingTotal(res, eff, scaling) !== null) return null;
+  if (
+    eff === abilityPrimaryEffect(res) &&
+    (res.outputScaling?.primaryDamage ?? 1) !== 1 &&
+    primaryDamageTooltipRange(res, eff, scaling) !== null
+  ) {
+    return null;
   }
-  const bonus = abilityDamageBonus(res, eff, scaling);
+  // The description's "(+N)" on a direct hit carries the rank's damageMult.
+  const mult = eff.type === 'directDamage' ? (eff.damageMult ?? 1) : 1;
+  const bonus = abilityDamageBonus(res, eff, scaling) * mult;
   if (bonus <= 0) return null;
   const stat = abilityScalingStatFor(res, eff, scaling);
   if (!stat) return null;
@@ -125,13 +129,27 @@ function periodicLine(eff: AbilityEffect | undefined): string | null {
   });
 }
 
+/** The heal half of a damage-and-heal ability, shaped exactly as
+ *  abilityDisplayDescription's {healing} splice shapes it. */
+function healHalf(res: ResolvedAbility): AbilityEffect | undefined {
+  const direct = res.effects.find((eff) => eff.type === 'heal');
+  if (direct) return direct;
+  const spore = res.effects.find(
+    (eff): eff is Extract<AbilityEffect, { type: 'sporeBurst' }> => eff.type === 'sporeBurst',
+  );
+  return spore
+    ? { type: 'aoeHeal', min: spore.healMin, max: spore.healMax, radius: spore.radius }
+    : undefined;
+}
+
 function radiusLine(res: ResolvedAbility): string | null {
   const area = res.effects.find(
     (eff) =>
       eff.type === 'aoeDamage' ||
       eff.type === 'aoeHeal' ||
       eff.type === 'groundAoE' ||
-      eff.type === 'frozenOrb',
+      eff.type === 'frozenOrb' ||
+      eff.type === 'sporeBurst',
   );
   if (!area || !('radius' in area) || !(area.radius > 0)) return null;
   return t('hudChrome.abilityTooltipDetail.radius', { radius: formatAbilityNumber(area.radius) });
@@ -156,13 +174,24 @@ export function abilityTooltipDetailLines(res: ResolvedAbility, scaling: Ability
   const overTime = abilityOverTimeEffect(res);
   push(scalingLine(res, primary, scaling));
   if (overTime && overTime !== primary) push(scalingLine(res, overTime, scaling));
+  // A damage-and-heal ability's heal half ({healing} in the description:
+  // Scouring Mercy's direct heal, Spore Burst's splash heal) reads Healing
+  // Power separately; resolve it on the same isolated effect the description
+  // uses, so both name the same bonus.
+  const heal = healHalf(res);
+  if (heal && heal !== primary) {
+    push(scalingLine({ ...res, effects: [heal] }, heal, scaling));
+  }
 
   // No channel pulse-count line: the live count can differ from def.channel
   // (Aether Darts fires more darts at full Arcane Charges).
   push(periodicLine(overTime ?? primary));
   push(radiusLine(res));
 
-  const charges = (res.charges ?? 1) + (res.bonusCharges ?? 0);
+  // `charges` is already the resolved TOTAL cap (abilitiesKnownAt and
+  // applyTalentMods fold bonusCharges into it); an unlearned Talents preview
+  // has no entry yet, so fall back to the definition's own cap.
+  const charges = res.charges ?? res.def.maxCharges ?? 1;
   if (charges > 1) {
     push(t('hudChrome.abilityTooltipDetail.charges', { charges: formatAbilityNumber(charges) }));
   }
@@ -171,7 +200,7 @@ export function abilityTooltipDetailLines(res: ResolvedAbility, scaling: Ability
   if (hasCastBar && (res.castWhileMoving || def.castWhileMoving)) {
     push(t('hudChrome.abilityTooltipDetail.castWhileMoving'));
   }
-  if (hasCastBar && res.damagePushbackImmune) {
+  if (hasCastBar && (res.damagePushbackImmune || baselinePushbackImmune(def))) {
     push(t('hudChrome.abilityTooltipDetail.pushbackImmune'));
   }
 

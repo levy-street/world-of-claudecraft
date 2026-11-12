@@ -9,6 +9,7 @@
 import { describe, expect, it } from 'vitest';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import { classSpecs, computeTalentModifiers, emptyAllocation } from '../src/sim/content/talents';
+import { ABILITIES } from '../src/sim/data';
 import type { ResolvedAbility } from '../src/sim/sim';
 import { ALL_CLASSES, MAX_LEVEL } from '../src/sim/types';
 import {
@@ -18,6 +19,7 @@ import {
   abilityPrimaryEffect,
   abilitySecondaryEffect,
 } from '../src/ui/ability_damage';
+import { abilityEffectText } from '../src/ui/ability_description';
 import {
   type AbilityScalingStat,
   abilityScalingStatFor,
@@ -162,6 +164,107 @@ describe('abilityTooltipDetailLines', () => {
         lines.some((l) => l.includes('ticks')),
         label,
       ).toBe(false);
+    }
+  });
+
+  it('the Shift bonus always equals the "(+N)" the description shows for $d', () => {
+    // Every class and spec, so ranked damageMult (Shadow Bolt) and the v0.42
+    // spec factors are both in play. The description and the detail block
+    // must name the same number, or say nothing in the details.
+    let compared = 0;
+    for (const { label, res } of everyKnownAbility()) {
+      const shown = /\(\+([^)]+)\)/.exec(abilityEffectText(res, SCALING))?.[1];
+      const detail = abilityTooltipDetailLines(res, SCALING)
+        .map((l) => /^Includes \+(\S+) from/.exec(l)?.[1])
+        .find((n) => n !== undefined);
+      if (shown === undefined) continue;
+      expect(detail, label).toBe(shown);
+      compared++;
+    }
+    expect(compared).toBeGreaterThan(50);
+  });
+
+  it('Shadow Bolt below max rank: the bonus carries the rank damageMult', () => {
+    const res = knownFor('warlock', 'shadow_bolt');
+    const bolt = abilityPrimaryEffect(res);
+    if (bolt?.type !== 'directDamage') throw new Error('shadow_bolt has no direct hit');
+    const ranked: ResolvedAbility = {
+      ...res,
+      effects: res.effects.map((e) => (e === bolt ? { ...bolt, damageMult: 0.8 } : e)),
+    };
+    const raw = abilityDamageBonus(ranked, bolt, SCALING);
+    const lines = abilityTooltipDetailLines(ranked, SCALING);
+    expect(lines.some((l) => l.startsWith(`Includes +${Math.round(raw * 0.8)} `))).toBe(true);
+    expect(lines.some((l) => l.startsWith(`Includes +${raw} `))).toBe(false);
+  });
+
+  it('a spec healing factor on a pure HoT drops the separate bonus line', () => {
+    // Restoration Druid scales the whole Rejuvenation tick, so the
+    // description shows one combined total and the bonus cannot be split out.
+    const lines = abilityTooltipDetailLines(
+      knownFor('druid', 'rejuvenation', 'restoration'),
+      SCALING,
+    );
+    expect(lines.some((l) => l.startsWith('Includes'))).toBe(false);
+  });
+
+  it('Dawnweave prayers fold into one combined heal, so no separate bonus line', () => {
+    const res = knownFor('priest', 'prayer_of_healing', 'holy');
+    const plain = abilityTooltipDetailLines(res, SCALING);
+    expect(plain.some((l) => l.startsWith('Includes'))).toBe(true);
+    const prepared = abilityTooltipDetailLines(res, {
+      ...SCALING,
+      auras: [{ id: 'priest_benison_prayers', stacks: 2 }],
+    });
+    expect(prepared.some((l) => l.startsWith('Includes'))).toBe(false);
+  });
+
+  it('charges show the resolved total cap, never cap plus bonus', () => {
+    const charged = everyKnownAbility().filter(({ res }) => (res.charges ?? 1) > 1);
+    expect(charged.length).toBeGreaterThan(3);
+    for (const { label, res } of charged) {
+      expect(abilityTooltipDetailLines(res, SCALING), label).toContain(`Charges: ${res.charges}`);
+    }
+    // An unlearned Talents preview has no resolved cap yet: the def's max.
+    const preview = knownFor('warrior', 'overpower');
+    const { charges: _c, bonusCharges: _b, ...unresolved } = preview;
+    expect(abilityTooltipDetailLines(unresolved as ResolvedAbility, SCALING)).toContain(
+      `Charges: ${preview.def.maxCharges}`,
+    );
+  });
+
+  it('a damage-and-heal ability also names the Healing Power behind its heal half', () => {
+    // Same numbers ability_description.test.ts pins for the {healing} splice.
+    const scaling = { spellPower: 80, healPower: 200, attackPower: 0, rangedPower: 0 };
+    const mercy = abilityTooltipDetailLines(
+      knownFor('priest', 'scouring_mercy', 'discipline'),
+      scaling,
+    );
+    expect(mercy).toContain('Includes +171 from your Healing Power (200)');
+    const spore = abilityTooltipDetailLines(knownFor('druid', 'spore_burst', 'balance'), scaling);
+    expect(spore.some((l) => l.endsWith('from your Healing Power (200)'))).toBe(true);
+    expect(spore).toContain('Radius: 8 yd');
+  });
+
+  it('baseline pushback immunity (Ghost Wolf, uninterruptible channels) is stated', () => {
+    const wolf = knownFor('shaman', 'ghost_wolf');
+    // Bladestorm is a talent pick, so resolve its definition directly.
+    const def = ABILITIES.bladestorm;
+    const storm: ResolvedAbility = {
+      def,
+      rank: 1,
+      cost: def.cost,
+      castTime: def.castTime,
+      cooldown: def.cooldown,
+      effects: def.effects,
+      threatFlat: 0,
+      threatMult: 1,
+    };
+    for (const res of [wolf, storm]) {
+      expect(res.damagePushbackImmune, res.def.id).not.toBe(true);
+      expect(abilityTooltipDetailLines(res, SCALING), res.def.id).toContain(
+        'Taking damage does not delay this cast',
+      );
     }
   });
 
