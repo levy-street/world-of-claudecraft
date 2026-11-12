@@ -165,13 +165,15 @@ void main() {
   // the normal, so no stretch on any face).
   vec3 w = abs(normalize(vN));
   w /= (w.x + w.y + w.z);
-  float rx = 1.0 - abs(an(p.yz * 1.3) * 2.0 - 1.0);
-  float ry = 1.0 - abs(an(p.xz * 1.3 + 4.0) * 2.0 - 1.0);
-  float rz = 1.0 - abs(an(p.xy * 1.3 + 9.0) * 2.0 - 1.0);
+  float rx = 1.0 - abs(an(p.yz * 2.1) * 2.0 - 1.0);
+  float ry = 1.0 - abs(an(p.xz * 2.1 + 4.0) * 2.0 - 1.0);
+  float rz = 1.0 - abs(an(p.xy * 2.1 + 9.0) * 2.0 - 1.0);
   float ridge = rx * w.x + ry * w.y + rz * w.z;
   // Thin seams that widen a little as it heats (never blobs over the
   // carving).
-  float seam = smoothstep(0.935 - 0.03 * uHeat, 0.985, ridge);
+  float seam = smoothstep(0.9 - 0.04 * uHeat, 0.975, ridge);
+  // The seam's white-hot heart.
+  float heart = smoothstep(0.965, 0.99, ridge) * uHeat;
   // A band of runes round its waist: hashed strokes in cells.
   float waist = 1.0 - smoothstep(0.0, 0.5, abs(p.y - 2.6));
   vec2 cell = vec2(atan(p.x, p.z) * 4.0 + p.x * 0.6, p.y * 2.4);
@@ -183,9 +185,11 @@ void main() {
   float pulse = 0.8 + 0.2 * sin(uTime * 6.0 + p.y * 2.0);
   float k = (seam * (0.5 + 2.2 * uHeat) + glyph * (0.25 + 1.8 * uHeat)) * pulse;
   // Its edges hotter as the air rushes past (a rim of heat).
+  // Only the grazing silhouette: a face seen at an angle stays stone.
   float rim = 1.0 - abs(dot(normalize(vN), normalize(vView)));
-  k += rim * rim * uHeat * 0.5;
-  gl_FragColor = vec4(heatRamp(0.08 + 0.85 * uHeat) * k, 1.0);
+  k += pow(rim, 5.0) * uHeat * 0.7;
+  vec3 col = heatRamp(0.15 + 0.6 * uHeat) * k + vec3(1.0, 0.9, 0.7) * heart * 1.2;
+  gl_FragColor = vec4(col, 1.0);
 }
 `;
 

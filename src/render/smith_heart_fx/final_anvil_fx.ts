@@ -482,10 +482,12 @@ export class FinalAnvilFx {
     this.anvil.visible = true;
     // The stone stays dark (its seams and runes carry the heat): only a
     // smoulder in it, never a flat glow over the carving.
+    // (The Heart's exposure lifts even a dim emissive into a flat glow over
+    // the whole block: it stays a whisper here.)
     this.stoneMat.emissive.setRGB(
-      0.04 + 0.16 * L.heat * L.heat,
-      0.012 + 0.04 * L.heat * L.heat,
-      0.005,
+      0.012 + 0.045 * L.heat * L.heat,
+      0.004 + 0.01 * L.heat * L.heat,
+      0.002,
     );
     this.crystalMat.color.setRGB(
       0.9 + 0.6 * L.heat,
@@ -666,7 +668,7 @@ export class FinalAnvilFx {
         _m.compose(_p, _q, _s);
         this.chunks.setMatrixAt(i, _m);
       }
-      this.chunkMat.emissive.setRGB(0.2 * heat, 0.07 * heat * heat, 0.015 * heat);
+      this.chunkMat.emissive.setRGB(0.07 * heat, 0.022 * heat * heat, 0.005 * heat);
       this.chunks.instanceMatrix.needsUpdate = true;
     } else if (was) {
       for (let i = 0; i < this.chunkCount; i++) this.chunks.setMatrixAt(i, _zero);
