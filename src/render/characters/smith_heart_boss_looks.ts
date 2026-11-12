@@ -197,6 +197,11 @@ const HEAT_BASE: ClipMap = {
 /** Under the wellspring through an overflow. */
 const HEAT_UNDER: ClipMap = { ...HEAT_BASE, idle: 'Under', walk: 'Under', run: 'Under' };
 
+/** Fallen through a dev replay of its death: every base pose is its Death
+ *  clip, so the one-shot's end hands back to the same clamped action and the
+ *  body stays down until the replay stands it. */
+const HEAT_FALLEN: ClipMap = { ...HEAT_BASE, idle: 'Death', walk: 'Death', run: 'Death' };
+
 // The Guardian of the Breath (the Storm Cornice, design doc 7.2): floating
 // pieces of ancient armor held together by living wind, one bone a piece, so
 // every piece trails and overshoots on its own. Its claws swipe in turn; the
@@ -672,9 +677,10 @@ export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
       [HEAT_BODY_GESTURES.rise]: { clips: HEAT_BASE, enter: 'Rise' },
       [HEAT_BODY_GESTURES.stand]: { clips: HEAT_BASE },
       // A dev replay of its death (smith_heart_fx/heat_death_fx.ts): its Death
-      // clip on the living body; the replay's end stands it (the stance's
-      // re-send in heat_body.ts).
-      [HEAT_DEATH_GESTURES.fall]: { clips: { ...HEAT_BASE }, enter: 'Death' },
+      // clip on the living body, held down (HEAT_FALLEN) while the replay
+      // plays; its end stands it (the stance's re-send in heat_body.ts, held
+      // off while the death's look is on).
+      [HEAT_DEATH_GESTURES.fall]: { clips: HEAT_FALLEN, enter: 'Death' },
     },
     castClipSync: [HEAT_CASTS.fist],
     glowPulses: {

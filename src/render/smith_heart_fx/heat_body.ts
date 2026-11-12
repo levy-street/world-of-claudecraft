@@ -659,10 +659,12 @@ export class HeatBody {
       this.gestureTimer = 1;
     }
     // Re-sent for a view rebuilt mid-stage (idempotent: the stance held).
+    // Never over a dev replay of its death (heat_death_fx.ts holds its fall
+    // until the replay ends; the next re-send stands it).
     this.gestureTimer -= dt;
     if (this.gestureTimer <= 0) {
       this.gestureTimer = 1;
-      this.send(heatStanceGesture(st.stage, st.stage));
+      if (!heatEntranceFor(e.id)?.death) this.send(heatStanceGesture(st.stage, st.stage));
     }
     this.under = st.stage === HEAT_STAGES.under || st.stage === HEAT_STAGES.sinking;
     if (st.stage === HEAT_STAGES.rising) this.outFor = st.fill * 3;

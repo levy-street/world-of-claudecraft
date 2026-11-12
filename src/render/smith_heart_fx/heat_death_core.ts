@@ -175,6 +175,7 @@ export function heatCracksGone(t: number): number {
 export function heatDeathBodyLook(t: number, out: HeatEntranceLook): HeatEntranceLook {
   const D = HEAT_DEATH;
   out.active = true;
+  out.death = true;
   out.cold = false;
   out.t = 0;
   out.spiral = 1;
@@ -252,6 +253,32 @@ export function heatExhale(t: number): number {
   const s = t - D.exhaleAt;
   if (s < 0 || s >= D.spiralFor) return 0;
   return smooth(0, 0.12, s) * (1 - smooth(D.spiralFor * 0.4, D.spiralFor, s));
+}
+
+/** The exhale's corkscrew: `arms` bright ember trails winding up round one
+ *  axis out of its chest, `turn` radians a second, widening from `r0` by
+ *  `grow` yards a second and climbing `climb` yards a second; the trail is
+ *  laid every `step` yards of a head's path (before the tier's share). */
+export const HEAT_SPIRAL = {
+  arms: 3,
+  turn: 5.2,
+  r0: 1.8,
+  grow: 2.2,
+  climb: 8.5,
+  step: 0.32,
+} as const;
+
+/** Where spiral arm `arm`'s head is `s` seconds after the exhale, off the
+ *  heart (yards; y up). Allocation free. */
+export function heatSpiralHead(s: number, arm: number, out: { x: number; y: number; z: number }) {
+  const S = HEAT_SPIRAL;
+  const ss = Math.max(0, s);
+  const a = ss * S.turn + (arm * Math.PI * 2) / S.arms;
+  const r = S.r0 + S.grow * ss;
+  out.x = Math.sin(a) * r;
+  out.y = S.climb * ss;
+  out.z = Math.cos(a) * r;
+  return out;
 }
 
 // ---- the cracks ------------------------------------------------------------------------------
@@ -415,8 +442,6 @@ export const HEAT_DEATH_RATES = {
   draw: 260,
   /** The ring of fire's flames. */
   ring: 340,
-  /** The exhale's spiral of smoke and embers. */
-  spiral: 280,
 } as const;
 
 /** The sockets the choke draws into (the heart) and the exhale leaves by. */

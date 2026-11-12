@@ -65,8 +65,9 @@ const ENTRY = { x: -196, z: -210 };
 /** Camera holds per view: [yaw off the player's facing, pitch (positive
  *  looks down), distance]. */
 const VIEWS = {
-  shore: [0, -0.1, 21],
-  high: [0.2, 0.55, 40],
+  shore: [0, 0.1, 26],
+  // Looking down over the shore onto the wellspring as it crusts over.
+  high: [0.25, 0.78, 46],
   close: [0.15, 0.05, 12],
 };
 

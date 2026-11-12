@@ -230,6 +230,10 @@ export interface HeatEntranceLook {
   flash: number;
   /** The smoke off the cold hearth (per second, before the tier). */
   smoke: number;
+  /** The look is its death scene's (heat_death_core.ts), not the
+   *  entrance's: the body holds the death's fall and never re-sends its
+   *  stance over it. */
+  death: boolean;
 }
 
 export function newHeatEntranceLook(): HeatEntranceLook {
@@ -264,6 +268,7 @@ export function newHeatEntranceLook(): HeatEntranceLook {
     ring: 0,
     flash: 0,
     smoke: 0,
+    death: false,
   };
 }
 

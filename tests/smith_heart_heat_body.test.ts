@@ -39,6 +39,9 @@ import {
   heatStanceGesture,
   heatWhiteness,
 } from '../src/render/smith_heart_fx/heat_body_core';
+import { heatDeathBodyLook } from '../src/render/smith_heart_fx/heat_death_core';
+import { newHeatEntranceLook } from '../src/render/smith_heart_fx/heat_entrance_core';
+import { holdHeatEntrance } from '../src/render/smith_heart_fx/heat_entrance_state';
 import { SMITH_HEART_MOBS } from '../src/sim/content/smith_heart';
 import { HEARTH_WELL } from '../src/sim/content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
@@ -399,6 +402,16 @@ describe('HeatBody over a fake world', () => {
     (boss as { dead: boolean }).dead = false;
     body.update(1 / 20);
     expect(rockMat.uniforms.uGlow.value).toBe(1);
+    // A dev replay of its death holds its look: the stance is never re-sent
+    // over the fall (it would stand it up mid-replay); let go, it stands.
+    const dying = heatDeathBodyLook(3, newHeatEntranceLook());
+    holdHeatEntrance(boss.id, dying);
+    sent.length = 0;
+    for (let i = 0; i < 60; i++) body.update(1 / 20);
+    expect(sent).not.toContain(HEAT_BODY_GESTURES.stand);
+    holdHeatEntrance(boss.id, null);
+    for (let i = 0; i < 30; i++) body.update(1 / 20);
+    expect(sent).toContain(HEAT_BODY_GESTURES.stand);
     body.dispose();
     body.dispose();
     expect(scene.getObjectByName('smith-heart-heat-body')).toBeUndefined();

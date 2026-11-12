@@ -36,6 +36,7 @@ import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { fxAnchor } from '../attached_fx_anchor';
 import { attachSceneGroupGated } from '../gated_scene_attach';
+import type { SanctumPuffOptions } from '../gravewyrm_sanctum_fx/sanctum_fx_core';
 import { getFlameTex } from '../ignivar_fire_vfx';
 import { setRenderCategory } from '../renderer_diagnostics';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
@@ -56,6 +57,7 @@ import {
   HEAT_DEATH_RATES,
   HEAT_DEATH_SHAKES,
   HEAT_DEATH_SOUNDS,
+  HEAT_SPIRAL,
   heatChokeDraw,
   heatChokeRing,
   heatChunkAt,
@@ -67,6 +69,7 @@ import {
   heatDeathShake,
   heatDeathTime,
   heatExhale,
+  heatSpiralHead,
 } from './heat_death_core';
 import { newHeatEntranceLook } from './heat_entrance_core';
 import { holdHeatEntrance } from './heat_entrance_state';
@@ -76,7 +79,7 @@ const SCAN_SEC = 0.25;
 /** Reduced motion's white-hot: the skin's emissive capped this far past the
  *  authored (a warm glow, never a blaze). */
 const HEAT_DEATH_CALM_GLOW = 0.6;
-const CARDS = 24;
+const CARDS = 28;
 
 const _m = new THREE.Matrix4();
 const _q = new THREE.Quaternion();
@@ -88,17 +91,22 @@ const _axis = new THREE.Vector3();
 const _zero = new THREE.Matrix4().makeScale(0, 0, 0);
 const _ring = { r: 0, k: 0 };
 const _ch = { out: 0, y: 0, turn: 0, landed: false, shown: false };
+const _h0 = { x: 0, y: 0, z: 0 };
+const _h1 = { x: 0, y: 0, z: 0 };
 
 const FIRE: readonly [number, number, number] = [1, 0.55, 0.16];
 const WHITE: readonly [number, number, number] = [1, 0.9, 0.7];
 const EMBER: readonly [number, number, number] = [1, 0.38, 0.08];
 const SMOKE: readonly [number, number, number] = [0.46, 0.4, 0.36];
 const ASH: readonly [number, number, number] = [0.32, 0.29, 0.27];
+/** The coil's trail: hot gold under its white head. */
+const CORE: readonly [number, number, number] = [1, 0.52, 0.16];
+const PALE_ASH: readonly [number, number, number] = [0.6, 0.55, 0.51];
 
 export class HeatDeathFx {
   readonly readyForEntry: Promise<void>;
   private readonly root = new THREE.Group();
-  /** Laid on the guardian's feet (the particles, the chunks: small local
+  /** Laid on the guardian's feet (the cards, the chunks: small local
    *  coordinates, never a world point a hundred thousand yards out). */
   private readonly stage = new THREE.Group();
   private readonly uTime = { value: 0 };
@@ -138,7 +146,6 @@ export class HeatDeathFx {
   private seed = 0x4ea7;
   private drawDebt = 0;
   private ringDebt = 0;
-  private spiralDebt = 0;
   private disposed = false;
 
   constructor(
@@ -159,12 +166,14 @@ export class HeatDeathFx {
     this.secondary = budget.secondary;
     this.density = budget.share;
     const hasDom = typeof document !== 'undefined';
+    // The pools draw WORLD points (their shaders build the point themselves,
+    // camera-relative, and never read a parent's transform): they hang off
+    // the root at the origin and every emit is lifted off the stage (puff).
     this.particles = new EngineParticles(
-      this.stage,
+      this.root,
       this.uTime,
       this.density,
-      (x, z) =>
-        this.groundY(x + this.stage.position.x, z + this.stage.position.z) - this.stage.position.y,
+      (x, z) => this.groundY(x, z),
       () => this.rand(),
       () => this.reducedMotion(),
       hasDom ? getFlameTex() : null,
@@ -401,7 +410,7 @@ export class HeatDeathFx {
         DRAWN.speed = len / DRAWN.life;
         DRAWN.color = this.rand() < 0.3 ? WHITE : FIRE;
         DRAWN.pool = this.rand() < 0.5 ? 'pyre' : 'glow';
-        this.particles.puff(px - sx, py - sy, pz - sz, 1, DRAWN);
+        this.puff(px - sx, py - sy, pz - sz, 1, DRAWN);
       }
     }
     const ring = heatChokeRing(t, _ring);
@@ -417,7 +426,7 @@ export class HeatDeathFx {
         RING_FIRE.dir[2] = -Math.cos(a) * 0.6;
         RING_FIRE.color = this.rand() < 0.25 ? WHITE : FIRE;
         const gy = this.groundY(sx + px, sz + pz) - sy;
-        this.particles.puff(px, gy + 0.4, pz, 1, RING_FIRE);
+        this.puff(px, gy + 0.4, pz, 1, RING_FIRE);
       }
     }
     // ---- the heart's light: white-hot in the choke, red, out ----
@@ -452,52 +461,84 @@ export class HeatDeathFx {
       const lv = heatDeathLight(heatCrackLevel(c, t), reduced);
       const p = this.sock[c.socket];
       if (lv > 0.01) this.card(p.x - sx, p.y - sy, p.z - sz, c.size, lv, 0.36 * lv, 0.06 * lv);
-      if (crossed(c.outAt)) this.particles.puff(p.x - sx, p.y - sy + 0.3, p.z - sz, 6, WISP);
+      if (crossed(c.outAt)) this.puff(p.x - sx, p.y - sy + 0.3, p.z - sz, 6, WISP);
     }
     // ---- the moments ----
     if (crossed(0.03)) {
-      this.particles.puff(heart.x - sx, heart.y - sy, heart.z - sz, 30, CHEST_SPARKS);
+      this.puff(heart.x - sx, heart.y - sy, heart.z - sz, 30, CHEST_SPARKS);
       this.thud(HEAT_DEATH_SHAKES.choke.amount, HEAT_DEATH_SHAKES.choke.reach, e);
     }
     if (crossed(D.exhaleAt)) {
-      this.particles.puff(heart.x - sx, heart.y - sy, heart.z - sz, 200, EXHALE_EMBERS);
-      this.particles.puff(heart.x - sx, heart.y - sy, heart.z - sz, 60, EXHALE_SMOKE);
+      this.puff(heart.x - sx, heart.y - sy, heart.z - sz, 200, EXHALE_EMBERS);
+      this.puff(heart.x - sx, heart.y - sy, heart.z - sz, 34, EXHALE_SMOKE);
       const fk = heatDeathLight(1.2, this.reducedMotion());
       this.card(heart.x - sx, heart.y - sy, heart.z - sz, 14, fk, 0.46 * fk, 0.12 * fk);
-      this.particles.shockRing(0, 0, 0xff7a2a, 22, 1.1, { wake: 0.25, crest: 0.08, strength: 0.6 });
+      this.particles.shockRing(sx, sz, 0xff7a2a, 22, 1.1, {
+        wake: 0.25,
+        crest: 0.08,
+        strength: 0.6,
+      });
       this.thud(HEAT_DEATH_SHAKES.exhale.amount, HEAT_DEATH_SHAKES.exhale.reach, e);
     }
     const ex = heatExhale(t);
-    if (ex > 0.01) {
-      // The spiral: an emitter turning round its axis as it climbs, so the
-      // rising smoke and sparks wind up in a corkscrew.
-      this.spiralDebt += dt * HEAT_DEATH_RATES.spiral * ex * this.density;
-      if (this.spiralDebt > 20) this.spiralDebt = 20;
-      const s = t - D.exhaleAt;
-      while (this.spiralDebt >= 1) {
-        this.spiralDebt -= 1;
-        const a = s * 7 + this.rand() * 0.5;
-        const r = 2 + s * 1.5;
-        const h = heart.y - sy + s * 5;
-        // Mostly sparks and dying flame (they read against the dark rock),
-        // smoke between them.
-        const roll = this.rand();
-        const o = roll < 0.45 ? SPIRAL_SPARK : roll < 0.7 ? SPIRAL_FLAME : SPIRAL_SMOKE;
-        this.particles.puff(
-          heart.x - sx + Math.sin(a) * r,
-          h,
-          heart.z - sz + Math.cos(a) * r,
-          1,
-          o,
-        );
-      }
-    }
+    if (ex > 0.01) this.paintSpiral(t - D.exhaleAt, dt, ex, heart, reduced);
     if (crossed(D.crumbleAt)) {
-      this.particles.puff(0, 0.5, 0, 26, ASH_SLIDE);
+      this.puff(0, 0.5, 0, 26, ASH_SLIDE);
       this.thud(HEAT_DEATH_SHAKES.crumble.amount, HEAT_DEATH_SHAKES.crumble.reach, e);
     }
     this.paintChunks(t);
     this.sounds(t, prev, e);
+  }
+
+  /** The exhale's corkscrew: each arm's head a white-hot ember laying a
+   *  bright trail behind it as it winds up (it hangs and cools, so the
+   *  spiral reads as a ribbon against the dark rock), sparks flung off it and
+   *  pale ash smoke rolling round the outside of the coil. */
+  private paintSpiral(
+    s: number,
+    dt: number,
+    ex: number,
+    heart: THREE.Vector3,
+    reduced: boolean,
+  ): void {
+    const sx = this.stage.position.x;
+    const sy = this.stage.position.y;
+    const sz = this.stage.position.z;
+    const hx = heart.x - sx;
+    const hy = heart.y - sy;
+    const hz = heart.z - sz;
+    const S = HEAT_SPIRAL;
+    const s0 = Math.max(0, s - dt);
+    for (let arm = 0; arm < S.arms; arm++) {
+      heatSpiralHead(s0, arm, _h0);
+      heatSpiralHead(s, arm, _h1);
+      const len = Math.hypot(_h1.x - _h0.x, _h1.y - _h0.y, _h1.z - _h0.z);
+      const n = Math.min(
+        24,
+        Math.max(1, Math.round((len / S.step) * Math.max(0.35, this.density))),
+      );
+      for (let i = 1; i <= n; i++) {
+        const k = i / n;
+        const x = hx + _h0.x + (_h1.x - _h0.x) * k;
+        const y = hy + _h0.y + (_h1.y - _h0.y) * k;
+        const z = hz + _h0.z + (_h1.z - _h0.z) * k;
+        SPIRAL_CORE.alpha = ex;
+        SPIRAL_CORE.color = i === n ? WHITE : CORE;
+        this.puff(x, y, z, 1, SPIRAL_CORE);
+        const roll = this.rand();
+        if (roll < 0.28) this.puff(x, y, z, 1, SPIRAL_SPARK);
+        else if (roll < 0.4) this.puff(x, y, z, 1, SPIRAL_FLAME);
+        // The smoke rolls on the outside of the coil, off the light.
+        if (this.rand() < 0.16 * this.density) {
+          const r = Math.hypot(_h1.x, _h1.z) || 1;
+          const o = 1 + 1.4 / r;
+          this.puff(hx + (x - hx) * o, y - 0.6, hz + (z - hz) * o, 1, SPIRAL_SMOKE);
+        }
+      }
+      // The head's own glow (a light card riding up the coil).
+      const k = heatDeathLight(0.95 * ex, reduced);
+      this.card(hx + _h1.x, hy + _h1.y, hz + _h1.z, 4.2, k, 0.72 * k, 0.36 * k);
+    }
   }
 
   /** The basalt crumbling off the husk (lying at its feet after). */
@@ -548,6 +589,12 @@ export class HeatDeathFx {
     // Their seams cool from a dull ember to dark.
     this.chunkMat.uniforms.uHeat.value = 0.35 * Math.max(0, 1 - since / 1.5);
     this.chunkMat.uniforms.uEmber.value = 0.4 * Math.max(0, 1 - since / 2.5);
+  }
+
+  /** Emit round a stage-local point (the pools take world points). */
+  private puff(x: number, y: number, z: number, n: number, o: SanctumPuffOptions): void {
+    const at = this.stage.position;
+    this.particles.puff(x + at.x, y + at.y, z + at.z, n, o);
   }
 
   private card(
@@ -700,7 +747,7 @@ const EXHALE_EMBERS = {
   speed: 11,
   up: 9,
   life: 2.2,
-  size: [0.8, 0.1] as [number, number],
+  size: [1.7, 0.25] as [number, number],
   color: EMBER,
   alpha: 1,
   pool: 'glow' as const,
@@ -712,21 +759,35 @@ const EXHALE_SMOKE = {
   speed: 5,
   up: 6,
   life: 3.4,
-  size: [4, 12] as [number, number],
-  color: SMOKE,
-  alpha: 0.7,
+  size: [3.5, 10] as [number, number],
+  color: PALE_ASH,
+  alpha: 0.5,
   drag: 0.8,
   radius: 2.5,
   floor: -1e6,
 };
+/** The coil's trail: a white-hot core cooling as it hangs. */
+const SPIRAL_CORE = {
+  speed: 0.15,
+  up: 0.5,
+  life: 1.1,
+  size: [3.4, 1.1] as [number, number],
+  color: CORE,
+  alpha: 1,
+  pool: 'glow' as const,
+  drag: 1.5,
+  floor: -1e6,
+};
+/** Pale ash smoke (it reads against the dark rock, where grey smoke sank
+ *  into it). */
 const SPIRAL_SMOKE = {
-  speed: 0.6,
-  up: 5.5,
-  life: 2.6,
-  size: [3, 8.5] as [number, number],
-  color: SMOKE,
-  alpha: 0.65,
-  drag: 0.3,
+  speed: 0.5,
+  up: 2.2,
+  life: 2.8,
+  size: [2.2, 6.5] as [number, number],
+  color: PALE_ASH,
+  alpha: 0.5,
+  drag: 0.6,
   floor: -1e6,
 };
 const SPIRAL_FLAME = {
@@ -741,10 +802,10 @@ const SPIRAL_FLAME = {
   floor: -1e6,
 };
 const SPIRAL_SPARK = {
-  speed: 1,
-  up: 6.5,
-  life: 1.8,
-  size: [0.7, 0.08] as [number, number],
+  speed: 2.2,
+  up: 4,
+  life: 1.6,
+  size: [1.6, 0.25] as [number, number],
   color: EMBER,
   alpha: 1,
   pool: 'glow' as const,

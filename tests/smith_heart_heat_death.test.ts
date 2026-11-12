@@ -34,6 +34,7 @@ import {
   HEAT_DEATH_GESTURES,
   HEAT_DEATH_SOUNDS,
   HEAT_REPLAY_SECONDS,
+  HEAT_SPIRAL,
   heatChokeRing,
   heatChunkAt,
   heatCrackLevel,
@@ -44,6 +45,8 @@ import {
   heatDeathShake,
   heatDeathSkin,
   heatDeathTime,
+  heatExhale,
+  heatSpiralHead,
   socketOutAt,
 } from '../src/render/smith_heart_fx/heat_death_core';
 import { newHeatEntranceLook } from '../src/render/smith_heart_fx/heat_entrance_core';
@@ -140,6 +143,37 @@ describe('the timeline', () => {
   });
 });
 
+describe('the exhale', () => {
+  it('winds its arms up one corkscrew: evenly spaced, widening and climbing', () => {
+    const a = { x: 0, y: 0, z: 0 };
+    const b = { x: 0, y: 0, z: 0 };
+    for (const s of [0.2, 0.8, 1.6]) {
+      for (let arm = 0; arm < HEAT_SPIRAL.arms; arm++) {
+        heatSpiralHead(s, arm, a);
+        heatSpiralHead(s + 0.3, arm, b);
+        // Climbing and widening as it goes.
+        expect(b.y).toBeGreaterThan(a.y);
+        expect(Math.hypot(b.x, b.z)).toBeGreaterThan(Math.hypot(a.x, a.z));
+        // Turning: the heading moves on.
+        expect(Math.abs(Math.atan2(b.x, b.z) - Math.atan2(a.x, a.z))).toBeGreaterThan(0.1);
+      }
+      // The arms share one height and stand evenly round the axis.
+      heatSpiralHead(s, 0, a);
+      heatSpiralHead(s, 1, b);
+      expect(b.y).toBeCloseTo(a.y, 6);
+      const gap = Math.acos(
+        (a.x * b.x + a.z * b.z) / (Math.hypot(a.x, a.z) * Math.hypot(b.x, b.z)),
+      );
+      expect(gap).toBeCloseTo((Math.PI * 2) / HEAT_SPIRAL.arms, 4);
+    }
+    // It climbs well clear of the body's crown before it fades.
+    heatSpiralHead(HEAT_DEATH.spiralFor, 0, a);
+    expect(a.y).toBeGreaterThan(15);
+    expect(heatExhale(HEAT_DEATH.exhaleAt + 0.5)).toBeGreaterThan(0.9);
+    expect(heatExhale(HEAT_DEATH.exhaleAt + HEAT_DEATH.spiralFor)).toBe(0);
+  });
+});
+
 describe('the beats, the sounds and the clock', () => {
   it('fires a beat once, only for a scene seen crossing it', () => {
     expect(heatDeathCrossed(2.9, 3.0, 2.95)).toBe(true);
@@ -178,6 +212,16 @@ describe('the rig', () => {
     expect(fall?.enter).toBe('Death');
     // Its own vocabulary object, so the swap is never a no-op over the stand.
     expect(fall?.clips).not.toBe(look.clips);
+    // Held down while the replay plays: every base pose is the Death clip,
+    // so the one-shot's end hands back to the same clamped action.
+    expect(fall?.clips.idle).toBe('Death');
+    expect(fall?.clips.walk).toBe('Death');
+    expect(fall?.clips.run).toBe('Death');
+  });
+
+  it("marks its look as the death's, so the body never re-sends its stance over it", () => {
+    expect(heatDeathBodyLook(1, newHeatEntranceLook()).death).toBe(true);
+    expect(newHeatEntranceLook().death).toBe(false);
   });
 });
 
@@ -304,6 +348,35 @@ describe('HeatDeathFx plays the death', () => {
     t.entities.set(t.boss.id, t.boss);
     t.step(0.5);
     expect(t.fx.sceneTime).toBeCloseTo(at + 1.5, 1);
+    t.fx.dispose();
+  });
+
+  it('emits its particles at world points round the body (the pools ignore a parent)', () => {
+    const t = setup();
+    t.step(1);
+    t.boss.dead = true;
+    t.step(HEAT_DEATH.exhaleAt + 0.6);
+    // The pools' shaders build world points themselves: they hang off the
+    // root at the origin, never the stage laid on the body's feet.
+    const pools: THREE.Mesh[] = [];
+    t.scene.traverse((o) => {
+      const m = (o as THREE.Mesh).material as THREE.Material | undefined;
+      if (m && /^trashEngine(Glow|Smoke|Pyre)$/.test(m.name)) pools.push(o as THREE.Mesh);
+    });
+    expect(pools.length).toBeGreaterThanOrEqual(3);
+    let near = 0;
+    for (const mesh of pools) {
+      expect(mesh.parent?.name).toBe('smith-heart-heat-death');
+      const born = mesh.geometry.getAttribute('aLife');
+      const pos = mesh.geometry.getAttribute('aPos0');
+      for (let i = 0; i < born.count; i++) {
+        if (born.getX(i) < 0) continue;
+        const d = Math.hypot(pos.getX(i) - t.boss.pos.x, pos.getZ(i) - t.boss.pos.z);
+        expect(d).toBeLessThan(45);
+        near++;
+      }
+    }
+    expect(near).toBeGreaterThan(50);
     t.fx.dispose();
   });
 
