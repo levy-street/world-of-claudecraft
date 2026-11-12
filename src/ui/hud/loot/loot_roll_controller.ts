@@ -118,10 +118,11 @@ export class LootRollController {
   private readonly dismissedMasterRolls = new Map<number, DismissedMasterRoll>();
   private confirmedMasterRolls = new Set<number>();
   // Master rows the looter has ticked or unticked a box on. Until then a row's
-  // selection is the class preselection, recomputed on every repaint so a party
-  // roster that lands a snapshot after the masterLoot event still ticks its
-  // eligible members; after it, the looter's own selection is carried instead and
-  // is never overwritten. Pruned once the roll is neither shown nor dismissed.
+  // selection is the class preselection, recomputed on every repaint, so a party
+  // roster that lands a snapshot after the masterLoot event ticks its eligible
+  // members on the row's next repaint (a roster change alone does not repaint).
+  // After it, the looter's own selection is carried instead and is never
+  // overwritten. Pruned once the roll is neither shown nor dismissed.
   private readonly touchedMasterRolls = new Set<number>();
 
   constructor(private readonly deps: LootRollControllerDeps) {}

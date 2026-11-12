@@ -792,6 +792,24 @@ describe('LootRollController master-loot class preselection', () => {
     expect(checkedPids(fresh)).toEqual([4]);
   });
 
+  it('treats clearing via select-all as a touch, so the clear survives a repaint', () => {
+    const test = harness();
+    test.setPartyInfo(party());
+    const row = show(test, restricted.id);
+    const selectAll = row?.querySelector<HTMLInputElement>('.ml-all');
+    if (!selectAll) throw new Error('select-all missing');
+    selectAll.checked = false;
+    selectAll.dispatchEvent(new Event('change'));
+    expect(checkedPids(row)).toEqual([]);
+
+    test.controller.showRoll(rollEvent(9));
+
+    const repainted = test.root.querySelector<HTMLElement>(
+      '.master',
+    ) as unknown as LootElement | null;
+    expect(checkedPids(repainted)).toEqual([]);
+  });
+
   it('never re-applies the preselection over boxes the looter cleared', () => {
     const test = harness();
     test.setPartyInfo(party());
