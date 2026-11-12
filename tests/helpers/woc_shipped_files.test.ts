@@ -165,7 +165,7 @@ describe('the shipped file list', () => {
   it('is the directory itself: the pin and the catalog name every file that ships', () => {
     const files = wocShippedFiles();
     expect(files.map((file) => file.url)).toEqual(wocFilesOnDisk());
-    // literal: 2 bases, 2 libraries, 54 armor files, 2 head cores, 20 hairstyles, 2 shared
+    // literal: 2 bases, 2 libraries, 54 armor files, 2 head cores, 26 hairstyles, 2 shared
     // beard files, 2 handlebars, 16 under-armor atlases
     const count = (kind: string) => files.filter((file) => file.kind === kind).length;
     expect(WOC_FILE_KINDS.map((kind) => [kind, count(kind)])).toEqual([
@@ -175,9 +175,9 @@ describe('the shipped file list', () => {
       ['armorMedium', 18],
       ['armorTop', 18],
       ['headCore', 2],
-      ['hair', 20],
+      ['hair', 26],
       ['beards', 2],
-      ['beard', 2],
+      ['beard', 14],
       ['underArmor', 16],
     ]);
   });

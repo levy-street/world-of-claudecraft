@@ -270,6 +270,11 @@ export const WOC_HEAD_TINT_TABLE: Readonly<
   a: {
     hair_long: { role: 'hair', ref: lum(0.0406) },
     hair_mohawk: { role: 'hair', ref: lum(0.0297) },
+    // the mullet samples the mohawk's texture (build_mullet_hair.mjs), so the mohawk's reference
+    hair_mullet: { role: 'hair', ref: lum(0.0297) },
+    // also on the mohawk's texture (build_pompadour_hair.mjs)
+    hair_pompadour: { role: 'hair', ref: lum(0.0297) },
+    hair_monk: { role: 'hair', ref: lum(0.0297) },
     hair_quiff: { role: 'hair', ref: lum(0.1095) },
     hair_quiff_scalp: { role: 'hair', ref: lum(0.0796) },
     hair_shoulder: { role: 'hair', ref: lum(0.0972) },
@@ -289,6 +294,14 @@ export const WOC_HEAD_TINT_TABLE: Readonly<
     hair_beard_chops: { role: 'hair', ref: lum(0.0603) },
     hair_beard_goatee: { role: 'hair', ref: lum(0.0603) },
     hair_beard_handlebar: { role: 'hair', ref: lum(0.0957) },
+    // reshaped from the long beard and the moustache (the shared atlas) and from the handlebar
+    // (its own): build_facial_hair.mjs keeps each source's texture, so its reference
+    hair_beard_forked: { role: 'hair', ref: lum(0.0603) },
+    hair_beard_sage: { role: 'hair', ref: lum(0.0603) },
+    hair_beard_wild: { role: 'hair', ref: lum(0.0603) },
+    hair_beard_walrus: { role: 'hair', ref: lum(0.0603) },
+    hair_beard_whiskers: { role: 'hair', ref: lum(0.0957) },
+    hair_beard_imperial: { role: 'hair', ref: lum(0.0957) },
     hair_beard_long: { role: 'hair', ref: lum(0.0603) },
     hair_beard_moustache: { role: 'hair', ref: lum(0.0603) },
     brow: { role: 'brow', ref: lum(0.023) },
@@ -311,6 +324,11 @@ export const WOC_HEAD_TINT_TABLE: Readonly<
     hair_crown_scalp: { role: 'hair', ref: lum(0.1145) },
     hair_curls: { role: 'hair', ref: lum(0.121) },
     hair_curls_scalp: { role: 'hair', ref: lum(0.0929) },
+    // the mohawk's texture, carried over with its strands: Type A's mohawk reference
+    hair_mullet: { role: 'hair', ref: lum(0.0297) },
+    // also on the mohawk's texture (build_pompadour_hair.mjs)
+    hair_pompadour: { role: 'hair', ref: lum(0.0297) },
+    hair_monk: { role: 'hair', ref: lum(0.0297) },
     hair_ponytail: { role: 'hair', ref: lum(0.0493) },
     hair_twins: { role: 'hair', ref: lum(0.1517) },
     hair_twins_scalp: { role: 'hair', ref: lum(0.1113) },
@@ -328,6 +346,14 @@ export const WOC_HEAD_TINT_TABLE: Readonly<
     hair_beard_chops: { role: 'hair', ref: lum(0.0603) },
     hair_beard_goatee: { role: 'hair', ref: lum(0.0603) },
     hair_beard_handlebar: { role: 'hair', ref: lum(0.0957) },
+    // reshaped from the long beard and the moustache (the shared atlas) and from the handlebar
+    // (its own): build_facial_hair.mjs keeps each source's texture, so its reference
+    hair_beard_forked: { role: 'hair', ref: lum(0.0603) },
+    hair_beard_sage: { role: 'hair', ref: lum(0.0603) },
+    hair_beard_wild: { role: 'hair', ref: lum(0.0603) },
+    hair_beard_walrus: { role: 'hair', ref: lum(0.0603) },
+    hair_beard_whiskers: { role: 'hair', ref: lum(0.0957) },
+    hair_beard_imperial: { role: 'hair', ref: lum(0.0957) },
     hair_beard_long: { role: 'hair', ref: lum(0.0603) },
     hair_beard_moustache: { role: 'hair', ref: lum(0.0603) },
     brow: { role: 'brow', ref: lum(0.0534) },

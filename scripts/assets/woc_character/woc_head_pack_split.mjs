@@ -33,6 +33,15 @@
 //   node scripts/assets/woc_character/woc_head_pack_split.mjs <pack.glb> \
 //     [--out-dir <dir>] [--list]
 //
+// Some pieces are NOT in any pack: the mullet, pompadour and monk hairstyles
+// (head_type_<t>_hair_{mullet,pompadour,monk}.glb) and six facial-hair styles
+// (head_type_<t>_beard_{forked,sage,wild,walrus,whiskers,imperial}.glb) are built in the repo
+// by build_mullet_hair.mjs, build_pompadour_hair.mjs, build_monk_hair.mjs and
+// build_facial_hair.mjs from shipped
+// files, so a split lists them as not written by this split and its `urls` are the catalog's
+// minus those files. Leave them in place: after a pack rebuild that changes the mohawk, the
+// undercut or a beard, re-run those scripts.
+//
 // --out-dir defaults to public/models/chars/players/woc (the catalog's split directory).
 // --list prints the plan (file -> pieces, textures) and writes nothing. The pack itself is a
 // build intermediate: keep it out of public/ (the split files replace it there).
@@ -53,7 +62,16 @@ const SPLIT_DIR = 'models/chars/players/woc';
 const HEAD_BONE = 'head';
 /** Beard ids shipped in a file of their own (a texture of their own): the catalog's
  *  BEARDS_WITH_OWN_FILE. Every other beard rides the shared beards file. */
-const BEARDS_WITH_OWN_FILE = new Set(['handlebar']);
+const BEARDS_WITH_OWN_FILE = new Set([
+  'handlebar',
+  // built in the repo (build_facial_hair.mjs), never in a pack
+  'forked',
+  'sage',
+  'wild',
+  'walrus',
+  'whiskers',
+  'imperial',
+]);
 /** Slots that ride the core file with the base head. */
 const CORE_SLOTS = new Set(['eyes', 'brows', 'nose', 'mouth', 'ears', 'piercing']);
 const MESHOPT = 'EXT_meshopt_compression';

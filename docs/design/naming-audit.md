@@ -924,6 +924,21 @@ full name, already cleared), MTG's "Whirlpool" cards (Quicksand Whirlpool, Whirl
 Path of Exile's and Diablo IV's single-word "Spark" and "Arc", Diablo III's "Hex" and "Plague
 of Toads", MTG's "Snarl" cards (Snarl Song, Snarlfang Vermin).
 
+### The WOC head library's in-repo styles (web-verified 2026-11-11)
+
+One coined name ships with the facial-hair styles built by
+`scripts/assets/woc_character/build_facial_hair.mjs`; the rest are plain English
+(Mullet, Pompadour, Forked Beard, Wild Beard, Walrus Moustache, Drooping Whiskers,
+Imperial Moustache).
+
+- **The Fizwic** (the belly-length wizard beard, id `sage`): CLEAN. Exact-phrase and
+  coined-token searches, plain and against the major game wikis, return no game,
+  character, item or franchise under "Fizwic". Nearest neighbours are user-made
+  characters on roleplay sites under different spellings ("Fizwick Nackle",
+  "Fizzlewick"), which are not a property this name could be taken for. The owner's
+  first pick, "The Fizban", was REFUSED: Fizban is a named wizard of the Dragonlance
+  setting and the title of an official Dungeons and Dragons book.
+
 ### The dungeon trash pass, second wave (web-verified 2026-10-05)
 
 The five mechanics on the trash engine's sight rule and walker

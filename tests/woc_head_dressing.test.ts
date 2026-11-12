@@ -1160,7 +1160,7 @@ describe('WocHeadDressing: the drawn head', () => {
     // exactly what the look draws, once each: never the library
     expect([...hangedPieces(model).keys()].sort()).toEqual([...DEFAULT_NODES].sort());
     expect(hangedPieces(model).size).toBe(11);
-    expect(wocHeadAllNodes('a').length).toBe(57);
+    expect(wocHeadAllNodes('a').length).toBe(66);
   });
 
   it('a body whose files were hung WHOLE is pruned to its look by the first pass', () => {

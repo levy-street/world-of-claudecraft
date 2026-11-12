@@ -13810,7 +13810,10 @@ export const ko_KR: EnTranslations = {
         "bob": "단발",
         "crown": "왕관 땋기",
         "twins": "양갈래 땋은 머리",
-        "curls": "곱슬 올림머리"
+        "curls": "곱슬 올림머리",
+        "mullet": "멀릿",
+        "pompadour": "퐁파두르",
+        "monk": "수도사 삭발"
       },
       "beard": {
         "none": "수염 없음",
@@ -13821,7 +13824,13 @@ export const ko_KR: EnTranslations = {
         "boxed": "짧게 다듬은 수염",
         "long": "긴 수염",
         "chops": "구레나룻 수염",
-        "chinstrap": "턱선 수염"
+        "chinstrap": "턱선 수염",
+        "forked": "갈래 수염",
+        "sage": "피즈윅",
+        "wild": "덥수룩한 수염",
+        "walrus": "바다코끼리 콧수염",
+        "whiskers": "늘어진 콧수염",
+        "imperial": "황제 콧수염"
       },
       "nose": {
         "default": "클래식",

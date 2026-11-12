@@ -13810,7 +13810,10 @@ export const ja_JP: EnTranslations = {
         "bob": "ボブ",
         "crown": "クラウンブレイド",
         "twins": "ツインおさげ",
-        "curls": "カールアップ"
+        "curls": "カールアップ",
+        "mullet": "マレット",
+        "pompadour": "リーゼント",
+        "monk": "修道士の剃髪"
       },
       "beard": {
         "none": "ひげなし",
@@ -13821,7 +13824,13 @@ export const ja_JP: EnTranslations = {
         "boxed": "整えたフルひげ",
         "long": "長いひげ",
         "chops": "もみあげひげ",
-        "chinstrap": "チンストラップ"
+        "chinstrap": "チンストラップ",
+        "forked": "二股のひげ",
+        "sage": "フィズウィック",
+        "wild": "もじゃもじゃのひげ",
+        "walrus": "セイウチひげ",
+        "whiskers": "たれひげ",
+        "imperial": "カイゼルひげ"
       },
       "nose": {
         "default": "クラシック",

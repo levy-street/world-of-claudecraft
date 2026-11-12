@@ -13810,7 +13810,10 @@ export const zh_CN: EnTranslations = {
         "bob": "波波头",
         "crown": "皇冠辫",
         "twins": "双辫",
-        "curls": "卷发盘头"
+        "curls": "卷发盘头",
+        "mullet": "鲻鱼头",
+        "pompadour": "飞机头",
+        "monk": "修士剃发"
       },
       "beard": {
         "none": "无胡须",
@@ -13821,7 +13824,13 @@ export const zh_CN: EnTranslations = {
         "boxed": "短络腮胡",
         "long": "长胡须",
         "chops": "络腮鬓角",
-        "chinstrap": "下颌线胡"
+        "chinstrap": "下颌线胡",
+        "forked": "分叉胡须",
+        "sage": "菲兹威克",
+        "wild": "狂野大胡子",
+        "walrus": "海象胡",
+        "whiskers": "垂须",
+        "imperial": "翘尖八字胡"
       },
       "nose": {
         "default": "经典",

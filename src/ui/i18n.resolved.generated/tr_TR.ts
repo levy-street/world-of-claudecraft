@@ -13810,7 +13810,10 @@ export const tr_TR: EnTranslations = {
         "bob": "Küt Kesim",
         "crown": "Örgü Taç",
         "twins": "Çift Örgü",
-        "curls": "Kıvırcık Topuz"
+        "curls": "Kıvırcık Topuz",
+        "mullet": "Mullet",
+        "pompadour": "Pompadour",
+        "monk": "Monk Tonsure"
       },
       "beard": {
         "none": "Sinekkaydı",
@@ -13821,7 +13824,13 @@ export const tr_TR: EnTranslations = {
         "boxed": "Kutu Sakal",
         "long": "Uzun Sakal",
         "chops": "Gür Favoriler",
-        "chinstrap": "Çene Hattı Sakalı"
+        "chinstrap": "Çene Hattı Sakalı",
+        "forked": "Forked Beard",
+        "sage": "The Fizwic",
+        "wild": "Wild Beard",
+        "walrus": "Walrus Moustache",
+        "whiskers": "Drooping Whiskers",
+        "imperial": "Imperial Moustache"
       },
       "nose": {
         "default": "Klasik",

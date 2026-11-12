@@ -80,12 +80,21 @@ const TRIANGLES: Readonly<Record<string, readonly [lod0: number, mid: number, fa
   'armor/male_warrior_medium.glb': [4497, 3679, 1506],
   'base_female.glb': [8456, 5072, 2283],
   'base_male.glb': [8388, 5032, 2263],
+  'head_type_a_beard_forked.glb': [1470, 1176, 1106],
   'head_type_a_beard_handlebar.glb': [1470, 588, 224],
+  'head_type_a_beard_imperial.glb': [1470, 588, 246],
+  'head_type_a_beard_sage.glb': [1470, 1322, 1114],
+  'head_type_a_beard_walrus.glb': [522, 522, 232],
+  'head_type_a_beard_whiskers.glb': [1470, 588, 260],
+  'head_type_a_beard_wild.glb': [1470, 1470, 1118],
   'head_type_a_beards.glb': [8881, 6397, 5616],
   'head_type_a_core.glb': [22469, 9101, 2745],
   'head_type_a_hair_braid.glb': [3428, 3084, 1126],
   'head_type_a_hair_long.glb': [1999, 1199, 796],
   'head_type_a_hair_mohawk.glb': [1959, 979, 782],
+  'head_type_a_hair_monk.glb': [784, 312, 47],
+  'head_type_a_hair_mullet.glb': [3272, 1962, 1307],
+  'head_type_a_hair_pompadour.glb': [1959, 783, 58],
   'head_type_a_hair_ponytail.glb': [3429, 2743, 751],
   'head_type_a_hair_quiff.glb': [3430, 1620, 588],
   'head_type_a_hair_shoulder.glb': [3429, 2259, 490],
@@ -93,13 +102,22 @@ const TRIANGLES: Readonly<Record<string, readonly [lod0: number, mid: number, fa
   'head_type_a_hair_topknot.glb': [3430, 1648, 370],
   'head_type_a_hair_undercut.glb': [3429, 1885, 1414],
   'head_type_a_hair_waves.glb': [3429, 2743, 2204],
+  'head_type_b_beard_forked.glb': [1470, 1106, 1106],
   'head_type_b_beard_handlebar.glb': [1470, 588, 194],
+  'head_type_b_beard_imperial.glb': [1470, 588, 238],
+  'head_type_b_beard_sage.glb': [1470, 1322, 1114],
+  'head_type_b_beard_walrus.glb': [522, 522, 226],
+  'head_type_b_beard_whiskers.glb': [1470, 588, 264],
+  'head_type_b_beard_wild.glb': [1470, 1322, 1110],
   'head_type_b_beards.glb': [8882, 6482, 5604],
   'head_type_b_core.glb': [26008, 11476, 5166],
   'head_type_b_hair_bob.glb': [3429, 1869, 1047],
   'head_type_b_hair_braid.glb': [3428, 3428, 919],
   'head_type_b_hair_crown.glb': [3430, 1864, 418],
   'head_type_b_hair_curls.glb': [3429, 2445, 1438],
+  'head_type_b_hair_monk.glb': [784, 312, 31],
+  'head_type_b_hair_mullet.glb': [3168, 1900, 1045],
+  'head_type_b_hair_pompadour.glb': [1959, 783, 58],
   'head_type_b_hair_ponytail.glb': [3430, 2744, 754],
   'head_type_b_hair_shoulder.glb': [3429, 1957, 567],
   'head_type_b_hair_topknot.glb': [3429, 1913, 359],
@@ -136,7 +154,10 @@ const TRIANGLE_CEILINGS = {
   // 0 and MID (8,882 / 6,482), head_type_a_beards at FAR (5,616)
   beards: { lod0: 9_320, mid: 6_800, far: 5_890 },
   // the handlebar: 1,470 / 588 / 224
-  beard: { lod0: 1_540, mid: 615, far: 235 },
+  // mid and far raised from 615 and 235 (the handlebar alone) when the six styles reshaped
+  // from the shipped beards were added (build_facial_hair.mjs): the ones cut from the long beard
+  // keep its triangles, as that beard does inside the group file
+  beard: { lod0: 1_540, mid: 1_540, far: 1_180 },
 } as const satisfies Record<string, Ceiling>;
 
 /** The files that carry no geometry of their own, and exactly what their JSON holds instead:
@@ -176,8 +197,8 @@ const triangles = (file: WocShippedFile): WocTriangles => COUNTS.get(file.url) a
 const rowName = (file: WocShippedFile): string => file.url.slice(WOC_SPLIT_DIR.length + 1);
 
 describe('WOC character triangle ratchet', () => {
-  it('pins every mesh file: a row for each of the 84 GLBs that draws, none for one that is gone', () => {
-    expect(GLBS).toHaveLength(84);
+  it('pins every mesh file: a row for each of the 102 GLBs that draws, none for one that is gone', () => {
+    expect(GLBS).toHaveLength(102);
     const drawing = GLBS.filter((file) => ceilingRow(file) !== null);
     expect(drawing.map(rowName)).toEqual(Object.keys(TRIANGLES).sort());
     // the rest carry no geometry, each by its kind's pin below
@@ -239,12 +260,21 @@ describe('WOC character triangle ratchet', () => {
     expect(slack, 'lower these ceilings to their kind (largest file plus at most 5%)').toEqual([]);
   });
 
-  it('counts the files that ship no mid list: two hairstyles, and nothing else', () => {
+  it('counts the files that ship no mid list: two hairstyles, three reshaped beards', () => {
     // a file whose MID equals its level 0 hands every crowd character its full geometry, so
     // which files do is a literal: one more name here is a mid list that went missing
     const noMid = GLBS.filter((file) => ceilingRow(file) !== null)
       .filter((file) => triangles(file).mid === triangles(file).lod0)
       .map(rowName);
-    expect(noMid).toEqual(['head_type_b_hair_braid.glb', 'head_type_b_hair_waves.glb']);
+    // the walrus is the 522 triangle moustache hung thicker, and the Type A wild beard the long
+    // beard pushed out: both built in the repo (build_facial_hair.mjs), and on neither does the
+    // simplifier find a mid list inside the bound
+    expect(noMid).toEqual([
+      'head_type_a_beard_walrus.glb',
+      'head_type_a_beard_wild.glb',
+      'head_type_b_beard_walrus.glb',
+      'head_type_b_hair_braid.glb',
+      'head_type_b_hair_waves.glb',
+    ]);
   });
 });

@@ -13810,7 +13810,10 @@ export const id_ID: EnTranslations = {
         "bob": "Rambut Pendek Rata",
         "crown": "Mahkota Kepang",
         "twins": "Kepang Ganda",
-        "curls": "Sanggul Keriting"
+        "curls": "Sanggul Keriting",
+        "mullet": "Mullet",
+        "pompadour": "Pompadour",
+        "monk": "Monk Tonsure"
       },
       "beard": {
         "none": "Tanpa Janggut",
@@ -13821,7 +13824,13 @@ export const id_ID: EnTranslations = {
         "boxed": "Janggut Kotak",
         "long": "Janggut Panjang",
         "chops": "Cambang Lebat",
-        "chinstrap": "Janggut Garis Rahang"
+        "chinstrap": "Janggut Garis Rahang",
+        "forked": "Forked Beard",
+        "sage": "The Fizwic",
+        "wild": "Wild Beard",
+        "walrus": "Walrus Moustache",
+        "whiskers": "Drooping Whiskers",
+        "imperial": "Imperial Moustache"
       },
       "nose": {
         "default": "Klasik",
