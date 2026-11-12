@@ -18018,7 +18018,7 @@ export const sv_SE: EnTranslations = {
       },
       "aegis_first_dawn": {
         "name": "Första gryningens egid",
-        "description": "Kanalisera en helig kupol på 10 m runt dig. Allierade spelare inuti och i din synlinje tar 50% mindre skada och läks för 35 till 45 varje sekund. Att fullborda kanaliseringen läker dem för 120 till 150 till och ger 30% rörelsehastighet i 4 sek. Läkningen ökar med läkningskraft."
+        "description": "Kanalisera en helig kupol på 10 m runt dig. Allierade spelare inuti och i din synlinje tar 50% mindre skada och läks för {aegisTick} varje sekund. Att fullborda kanaliseringen läker dem för {aegisFinal} till och ger 30% rörelsehastighet i 4 sek. Läkningen ökar med läkningskraft."
       },
       "vowkeeper_strike": {
         "name": "Edvaktarens slag",
@@ -18163,7 +18163,7 @@ export const sv_SE: EnTranslations = {
       },
       "lesser_heal": {
         "name": "Viskad bön",
-        "description": "Läker ett vänligt mål för {damage}. Läkningen ökar med Besvärjelsekraft."
+        "description": "Läker ett vänligt mål för {damage}. Läkningen ökar med läkningskraft."
       },
       "power_word_fortitude": {
         "name": "Beslutsamhetens litania",
@@ -18179,7 +18179,7 @@ export const sv_SE: EnTranslations = {
       },
       "renew": {
         "name": "Dröjande nåd",
-        "description": "Läker målet för {damage} under 15 sek, en gång var 3 sek. Läkningen ökar med Besvärjelsekraft."
+        "description": "Läker målet för {damage} under 15 sek, en gång var 3 sek. Läkningen ökar med läkningskraft."
       },
       "mind_blast": {
         "name": "Sinnessplittring",
@@ -18187,7 +18187,7 @@ export const sv_SE: EnTranslations = {
       },
       "heal": {
         "name": "Högtidlig bön",
-        "description": "Läker ett vänligt mål för {damage}. Läkningen ökar med Besvärjelsekraft."
+        "description": "Läker ett vänligt mål för {damage}. Läkningen ökar med läkningskraft."
       },
       "mind_flay": {
         "name": "Sorgens litania",
@@ -18207,7 +18207,7 @@ export const sv_SE: EnTranslations = {
       },
       "flash_heal": {
         "name": "Brådskande bön",
-        "description": "Läker ett vänligt mål för {damage}. Läkningen ökar med Besvärjelsekraft."
+        "description": "Läker ett vänligt mål för {damage}. Läkningen ökar med läkningskraft."
       },
       "lightning_bolt": {
         "name": "Bågblixt",
@@ -18407,7 +18407,7 @@ export const sv_SE: EnTranslations = {
       },
       "entangling_roots": {
         "name": "Gripande rötter",
-        "description": "Rotar målet på platsen i upp till 12 sek. Högre rangordningar ger också naturskada över 12 sek."
+        "description": "Rotar målet på platsen i upp till 12 sek. Vid sin andra rang vållar den också 32 naturskada över 12 sek, ökad av Besvärjelsekraft."
       },
       "bear_form": {
         "name": "Bruinform",
@@ -18695,7 +18695,7 @@ export const sv_SE: EnTranslations = {
       },
       "holy_nova": {
         "name": "Solsång",
-        "description": "Läker bundsförvanter inom 10 m för {damage} och vållar 24 till 30 Helig skada på fiender i samma område. Båda beloppen ökar med Besvärjelsekraft. (Grund för Helig)"
+        "description": "Läker bundsförvanter inom 10 m för {damage} och vållar 24 till 30 Helig skada på fiender i samma område. Läkningen ökar med läkningskraft och skadan med Besvärjelsekraft. (Grund för Helig)"
       },
       "shadowform": {
         "name": "Skymningsslöja",
@@ -18898,7 +18898,7 @@ export const sv_SE: EnTranslations = {
       },
       "sanguine_aura": {
         "name": "Blodröd aura",
-        "description": "Besjäla ditt vapen med dina fienders blod: du och varje närstridsmedlem i gruppen, på vilket avstånd som helst, får 10% attackhastighet och gör 10% mer skada i 20 sek."
+        "description": "Besjäla ditt vapen med dina fienders blod: du och varje Krigare, Paladin, Skurk, Schaman och Druid i din grupp, på vilket avstånd som helst, får 10% attackhastighet och gör 10% mer skada i 20 sek."
       },
       "victory_rush": {
         "name": "Segerarens rusning",
@@ -19099,7 +19099,7 @@ export const sv_SE: EnTranslations = {
       },
       "temporal_acceleration": {
         "name": "Tidsacceleration",
-        "description": "Accelererar tidens flöde för din grupp eller raid, ökar attack-, kast- och kanalisationshastighet med 30% i 15 sek. Allierade som nyligen påverkats av Temporal Acceleration eller Krigstrummor är för utmattade för att dra nytta av det. (Kronomantik)"
+        "description": "Accelererar tidens flöde för grupp- eller raidallierade inom 40 yards, ökar deras attack-, kast- och kanaliseringshastighet med 30% i 15 sek. Påverkade allierade kan inte dra nytta av Tidsacceleration, Krigstrummor eller Tjuvarnas kör igen på 10 min. (Kronomantik)"
       },
       "perfect_moment": {
         "name": "Perfekt ögonblick",
@@ -19119,7 +19119,7 @@ export const sv_SE: EnTranslations = {
       },
       "prayer_of_healing": {
         "name": "Körläkning",
-        "description": "Läker bundsförvanter inom 30 m för {damage}. Läkningen ökar med Besvärjelsekraft. (Helig)"
+        "description": "Läker bundsförvanter inom 30 m för {damage}. Läkningen ökar med läkningskraft. (Helig)"
       },
       "preparation": {
         "name": "Reservplan",
@@ -19236,7 +19236,7 @@ export const sv_SE: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Befrielsens kör",
-        "description": "Kanaliserar i 6 sek och läker gruppmedlemmar inom 30 meter för {damage} varannan sekund. Läkningen ökar med besvärjelsekraft.",
+        "description": "Kanaliserar i 6 sek och läker dig och varje vänligt mål inom 30 meter och i din synlinje för {damage} varannan sekund. Läkningen ökar med läkningskraft.",
         "specNote_shadow": "I 15 sek delas 20% av den hälsa fiender förlorar av din skuggskada som läkning mellan skadade gruppmedlemmar inom 30 yards, inklusive dig själv. I raider läks bara din undergrupp. Kasta omedelbart och fortsätt attackera i Skymningsslöja. Absorberad skada och skada utöver återstående hälsa ger ingen läkning."
       },
       "bear_charge": {

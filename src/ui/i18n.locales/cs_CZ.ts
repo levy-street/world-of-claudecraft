@@ -5798,7 +5798,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.perfect_moment.name': 'Dokonalý okamžik',
   'entities.abilities.shatter.name': 'Drcení mrazem',
   'entities.abilities.temporal_acceleration.description':
-    'Urychlí tok času pro tvou skupinu nebo raid a zvýší rychlost útoku, sesílání a kanálování o 30 % po dobu 15 s. Spojenci, kteří nedávno byli pod vlivem Urychlení času nebo Válečných bubnů, jsou příliš vyčerpaní, aby z toho měli prospěch. (Chronomagie)',
+    'Urychlí tok času pro spojence ve skupině nebo raidu do 40 yardů a zvýší jejich rychlost útoku, sesílání a usměrňování o 30 % na 15 s. Zasažení spojenci nemohou 10 min znovu těžit z Urychlení času, Válečných bubnů ani Sboru zlodějů. (Chronomagie)',
   'entities.abilities.temporal_acceleration.name': 'Urychlení času',
   'entities.abilities.temporal_barrier.description':
     'Posuneš cíl o okamžik mimo přítomnost; časová schránka pohltí {damage} poškození po dobu 10 s, než se časová linka zacvakne zpět.',
@@ -6276,7 +6276,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Zasáhne všechny nepřátele před tebou do 8 yardů za {damage} fyzického poškození. Při více než 5 cílech je každý zásah snížen tak, aby celek odpovídal 5 zásahům. Když uhneš nebo odrazíš útok tvora na blízko, máš 30% šanci, že tvá příští Odveta do 10 s nebude stát žádný vztek. (Protection)',
   'entities.abilities.revenge.name': 'Odveta',
   'entities.abilities.sanguine_aura.description':
-    'Prosytí tvou zbraň krví tvých nepřátel: ty a každý člen skupiny bojující na blízko, z jakékoli vzdálenosti, získáte na 20 s o 10 % vyšší rychlost útoku a způsobujete o 10 % více poškození.',
+    'Prosytí tvou zbraň krví tvých nepřátel: ty a každý Válečník, Paladin, Tulák, Šaman a Druid ve tvé skupině, z jakékoli vzdálenosti, získáte na 20 s o 10 % vyšší rychlost útoku a způsobujete o 10 % více poškození.',
   'entities.abilities.sanguine_aura.name': 'Krvavá aura',
   'entities.abilities.seasoned_soldier.description':
     'Tvoje kritické automatické útoky generují o 10 % více vzteku. (Arms)',
@@ -10439,7 +10439,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.enrage.description': 'Okamžitě vygeneruje 20 vzteku. Pouze v medvědí podobě.',
   'entities.abilities.enrage.name': 'Rozdmýchání',
   'entities.abilities.entangling_roots.description':
-    'Zakoření cíl na místě až na 12 s. Vyšší stupně také způsobují poškození přírodou po dobu 12 s.',
+    'Zakoření cíl na místě až na 12 s. Na druhém stupni také způsobí 32 poškození přírodou po dobu 12 s, které roste se silou kouzel.',
   'entities.abilities.entangling_roots.name': 'Svazující kořeny',
   'entities.abilities.evasion.description': 'Zvýší tvoji šanci na uhýbání o 50 % na 15 s.',
   'entities.abilities.evasion.name': 'Přízračný krok',
@@ -10472,7 +10472,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Prosytí tvou zbraň na 30 min. Každý úder způsobí {damage} dodatečného ohnivého poškození.',
   'entities.abilities.flametongue_weapon.name': 'Zbraň žárové značky',
   'entities.abilities.flash_heal.description':
-    'Vyléčí spřátelený cíl o {damage}. Léčení roste se silou kouzel.',
+    'Vyléčí spřátelený cíl o {damage}. Léčení roste se silou léčení.',
   'entities.abilities.flash_heal.name': 'Naléhavá modlitba',
   'entities.abilities.flash_of_light.description':
     'Rychlý, úsporný záblesk Světla, který vyléčí spřátelený cíl o {damage}. Obnovení zdraví vytvoří 1 Oddanost, i bez specializace.',
@@ -10507,7 +10507,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Zmrzačí nepřítele za {damage} poškození a zpomalí jeho pohyb o 50 % na 15 s.',
   'entities.abilities.hamstring.name': 'Mrzačící řez',
   'entities.abilities.heal.description':
-    'Vyléčí spřátelený cíl o {damage}. Léčení roste se silou kouzel.',
+    'Vyléčí spřátelený cíl o {damage}. Léčení roste se silou léčení.',
   'entities.abilities.heal.name': 'Slavnostní modlitba',
   'entities.abilities.healing_touch.description': 'Vyléčí spojenecký cíl za {damage}.',
   'entities.abilities.healing_touch.specNote_restoration':
@@ -10548,7 +10548,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Vyléčí spřátelený cíl za {damage} % tvého maximálního zdraví a vytvoří 1 Oddanost, když obnoví zdraví.',
   'entities.abilities.lay_on_hands.name': 'Poslední obřad',
   'entities.abilities.lesser_heal.description':
-    'Vyléčí spřátelený cíl o {damage}. Léčení roste se silou kouzel.',
+    'Vyléčí spřátelený cíl o {damage}. Léčení roste se silou léčení.',
   'entities.abilities.lesser_heal.name': 'Šeptaná modlitba',
   'entities.abilities.life_tap.description':
     'Přemění {damage} zdraví na {damage} many (o 50 % více many s Krevním úvěrem). Selže, pokud máš {damage} zdraví nebo méně.',
@@ -10615,7 +10615,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.raptor_strike.name': 'Párací úder',
   'entities.abilities.regrowth.name': 'Druhý květ',
   'entities.abilities.renew.description':
-    'Vyléčí cíl o {damage} během 15 s, jednou za 3 s. Léčení roste se silou kouzel.',
+    'Vyléčí cíl o {damage} během 15 s, jednou za 3 s. Léčení roste se silou léčení.',
   'entities.abilities.renew.name': 'Přetrvávající milost',
   'entities.abilities.retribution_aura.description':
     'Obklopí tebe i tvou skupinu svatou energií až do smrti nebo nahrazení. Nepřátelé, kteří na blízko zasáhnou zasaženého spojence, utrpí {buff} svatého poškození a zasažení spojenci způsobí automatickými útoky {buff} svatého poškození navíc.',
@@ -11176,7 +11176,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.multi_shot.description':
     'Vystřelí salvu na cílovou oblast a způsobí nepřátelům do 8 yardů {damage} fyzického poškození. (lovecký talent)',
   'entities.abilities.prayer_of_healing.description':
-    'Vyléčí spojence do 30 yardů o {damage}. Léčení roste se silou kouzel. (Požehnání)',
+    'Vyléčí spojence do 30 yardů o {damage}. Léčení roste se silou léčení. (Požehnání)',
   'entities.abilities.preparation.description':
     'Dokončí přebíjení Sprintu, Úhybu a Zmizení. (lotrovský talent)',
   'entities.abilities.presence_of_mind.description':
@@ -13323,7 +13323,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Pomaže spřátelený cíl a zvýší poškození, léčení a rychlost sesílání o 20 % na 15 s.',
   'entities.abilities.holy_nova.name': 'Sluneční kantiléna',
   'entities.abilities.holy_nova.description':
-    'Vyléčí spojence do 10 yardů o {damage} a způsobí 24 až 30 svatého poškození nepřátelům ve stejné oblasti. Obě hodnoty rostou se silou kouzel. (Základ Požehnání)',
+    'Vyléčí spojence do 10 yardů o {damage} a způsobí 24 až 30 svatého poškození nepřátelům ve stejné oblasti. Léčení roste se silou léčení a poškození se silou kouzel. (Základ Požehnání)',
   'entities.abilities.shadowform.name': 'Soumračný závoj',
   'entities.abilities.shadowform.description':
     'Vstoupíš do Soumračného závoje a zvýšíš své stínové poškození o 25 %. Seslání léčivého kouzla jej ukončí. Sešli Soumračný závoj znovu, abys jej opustil. (Signatura Nešporů)',
@@ -15949,7 +15949,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.choir_of_deliverance.name': 'Sbor vysvobození',
   'entities.abilities.scouring_mercy.name': 'Očistné milosrdenství',
   'entities.abilities.aegis_first_dawn.description':
-    'Usměrňuje svatou kupoli o velikosti 10 m kolem tebe. Spřátelení hráči uvnitř a v tvé přímé viditelnosti utrpí o 50 % méně poškození a každou sekundu jsou léčeni za 35 až 45. Dokončení usměrňování je vyléčí o dalších 120 až 150 a na 4 s udělí 30 % rychlosti pohybu. Léčení roste se silou léčení.',
+    'Usměrňuje svatou kupoli o velikosti 10 m kolem tebe. Spřátelení hráči uvnitř a v tvé přímé viditelnosti utrpí o 50 % méně poškození a každou sekundu jsou léčeni za {aegisTick}. Dokončení usměrňování je vyléčí o dalších {aegisFinal} a na 4 s udělí 30 % rychlosti pohybu. Léčení roste se silou léčení.',
   'entities.abilities.aura_mastery.description':
     'Po dobu 8 s ztrojnásobí každou aktivní Oddanost bastionu a Auru odplaty ve tvé skupině: Oddanost bastionu snižuje utrpěné poškození o 15 % a Aura odplaty způsobuje třikrát větší svaté poškození než obvykle. Opakovaná použití se obnovují místo sčítání.',
   'entities.abilities.bastion_rite.description':
@@ -16018,7 +16018,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.vowkeeper_strike.description':
     'Udeří za poškození zbraně plus {damage} fyzického poškození s vysokou hrozbou a vytvoří 1 Oddanost. Úspěšný úder má 20% šanci udělit Sluneční odplatu na 8 s; každý úspěšný blok 25%. Sluneční odplatu spotřebuje tvůj další Sluneční disk (bez ceny many, bez doby obnovy, o 20 % více poškození), Kladivo milosti (bez doby obnovy, vyléčí tě za 100 % způsobeného poškození) nebo Léčivé světlo (okamžité). Vzestup tě navíc na 6 s ochrání štítem za 6 % tvého maximálního zdraví.',
   'entities.abilities.choir_of_deliverance.description':
-    'Kanalizuje po dobu 6 s a každé 2 s léčí členy skupiny do 30 yardů za {damage}. Léčení roste se silou kouzel.',
+    'Kanalizuje po dobu 6 s a každé 2 s léčí tebe i každý spřátelený cíl do 30 yardů ve tvé přímé viditelnosti za {damage}. Léčení roste se silou léčení.',
 
   // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
   // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.

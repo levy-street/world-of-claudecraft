@@ -5917,7 +5917,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.perfect_moment.name': 'Momento Perfeito',
   'entities.abilities.shatter.name': 'Ruína Frágil',
   'entities.abilities.temporal_acceleration.description':
-    'Acelera o fluxo do tempo para seu grupo ou raide, aumentando a velocidade de ataque, lançamento e canalização em 30% por 15 s. Aliados recentemente afetados por Aceleração Temporal ou Tambores de Guerra estão exaustos demais para se beneficiar. (Cronomancia)',
+    'Acelera o fluxo do tempo para aliados de grupo ou raide a até 40 m, aumentando a velocidade de ataque, conjuração e canalização em 30% por 15 s. Os aliados afetados não podem se beneficiar de novo de Aceleração Temporal, Tambores de Guerra ou Coro dos Ladrões por 10 min. (Cronomancia)',
   'entities.abilities.temporal_acceleration.name': 'Aceleração Temporal',
   'entities.abilities.temporal_barrier.description':
     'Desloca o alvo um instante para fora do presente, uma concha temporal absorvendo {damage} de dano por 10 s antes que a linha do tempo se restabeleça.',
@@ -6466,7 +6466,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Atinge todos os inimigos à sua frente a até 8 m causando {damage} de dano Físico. Acima de 5 alvos, cada golpe é reduzido de modo que o total equivalha a 5 golpes. Quando você esquiva ou apara um ataque corpo a corpo de uma criatura, tem 30% de chance de fazer sua próxima Vingança em até 10 s não custar raiva. (Proteção)',
   'entities.abilities.revenge.name': 'Vingança',
   'entities.abilities.sanguine_aura.description':
-    'Impregna sua arma com o sangue dos seus inimigos: você e todos os membros corpo a corpo do grupo, a qualquer distância, ganham 10% de velocidade de ataque e causam 10% mais dano por 20 s.',
+    'Impregna sua arma com o sangue dos seus inimigos: você e todos os Guerreiros, Paladinos, Ladinos, Xamãs e Druidas do seu grupo, a qualquer distância, ganham 10% de velocidade de ataque e causam 10% mais dano por 20 s.',
   'entities.abilities.sanguine_aura.name': 'Aura Sanguínea',
   'entities.abilities.seasoned_soldier.description':
     'Seus ataques automáticos críticos geram 10% mais raiva. (Armas)',
@@ -9511,7 +9511,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Causa {damage} de dano Sagrado. O dano aumenta com o poder mágico. Disciplina cura cada membro do grupo ferido e vinculado a até 30 m em 30% do dano causado (70% com Pacto Gêmeo). Se nenhum estiver ferido, cura em 15% do dano o membro do grupo ferido com menos vida a até 30 m.',
   'entities.abilities.lesser_heal.name': 'Prece Sussurrada',
   'entities.abilities.lesser_heal.description':
-    'Cura um alvo aliado em {damage}. A cura aumenta com o Poder Mágico.',
+    'Cura um alvo aliado em {damage}. A cura aumenta com o poder de cura.',
   'entities.abilities.power_word_fortitude.name': 'Litania da Resolução',
   'entities.abilities.power_word_fortitude.description':
     'Aumenta o Vigor de cada membro do grupo em {buff}% por 30 min.',
@@ -9523,19 +9523,19 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Escuda um alvo aliado, absorvendo {damage} de dano por 30 s. Disciplina também vincula o alvo por 30 s, substituindo seu vínculo anterior (Pacto Gêmeo mantém dois). Enquanto os membros do grupo vinculados estiverem a até 30 m de você, seu Hino Purificador e a Misericórdia Purificadora hostil os curam em 30% do dano causado.',
   'entities.abilities.renew.name': 'Graça Persistente',
   'entities.abilities.renew.description':
-    'Cura o alvo em {damage} ao longo de 15 s, uma vez a cada 3 s. A cura aumenta com o Poder Mágico.',
+    'Cura o alvo em {damage} ao longo de 15 s, uma vez a cada 3 s. A cura aumenta com o poder de cura.',
   'entities.abilities.mind_blast.name': 'Fratura Mental',
   'entities.abilities.mind_blast.description':
     'Causa {damage} de dano das Sombras. O dano aumenta com o Poder Mágico. Sombra prende um alvo com vosso Réquiem da Ruína como sua Efígie, concede 1 de Dízimo Sombrio e ecoa 30% do dano em até 3 outros inimigos que carreguem vosso Réquiem.',
   'entities.abilities.heal.name': 'Prece Solene',
   'entities.abilities.heal.description':
-    'Cura um alvo aliado em {damage}. A cura aumenta com o Poder Mágico.',
+    'Cura um alvo aliado em {damage}. A cura aumenta com o poder de cura.',
   'entities.abilities.mind_flay.name': 'Litania da Aflição',
   'entities.abilities.mind_flay.description':
     'Canaliza por 3 s, causando {damage} de dano das Sombras a cada segundo. O dano aumenta com o Poder Mágico.',
   'entities.abilities.flash_heal.name': 'Prece Urgente',
   'entities.abilities.flash_heal.description':
-    'Cura um alvo aliado em {damage}. A cura aumenta com o Poder Mágico.',
+    'Cura um alvo aliado em {damage}. A cura aumenta com o poder de cura.',
   'entities.abilities.lightning_bolt.name': 'Raio em Arco',
   'entities.abilities.lightning_bolt.description':
     'Causa {damage} de dano de Natureza. O dano aumenta com o Poder Mágico. Elemental: um acerto concede 1 de Trovão.',
@@ -9613,7 +9613,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Espinhos brotam de um alvo aliado por 10 min. Cada golpe corpo a corpo contra o alvo causa {buff} de dano de Natureza ao atacante.',
   'entities.abilities.entangling_roots.name': 'Raízes Agarradoras',
   'entities.abilities.entangling_roots.description':
-    'Enraíza o alvo no lugar por até 12 s. Ranks maiores também causam dano de Natureza ao longo de 12 s.',
+    'Enraíza o alvo no lugar por até 12 s. No segundo rank, também causa 32 de dano de Natureza ao longo de 12 s, aumentado pelo Poder Mágico.',
   'entities.abilities.bear_form.name': 'Forma de Bruin',
   'entities.abilities.bear_form.description':
     'Assume a forma de urso: armadura +110%, vida máxima +30%, poder de ataque +15 mais 1,5 por ponto de Agilidade, seus ataques geram raiva e 30% mais ameaça. Você ataca duas vezes mais rápido com metade do dano por golpe, e cada golpe gera o dobro de raiva. Transformar-se em qualquer forma concede Passada Solta, um breve aumento de velocidade de movimento. Use de novo para voltar à forma de conjurador.',
@@ -9742,7 +9742,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Unge um alvo aliado, aumentando dano, cura e velocidade de conjuração em 20% por 15 s.',
   'entities.abilities.holy_nova.name': 'Cântico Solar',
   'entities.abilities.holy_nova.description':
-    'Cura os aliados a até 10 m em {damage} e causa de 24 a 30 de dano Sagrado aos inimigos na mesma área. Ambos os valores aumentam com o Poder Mágico. (Base de Sagrado)',
+    'Cura os aliados a até 10 m em {damage} e causa de 24 a 30 de dano Sagrado aos inimigos na mesma área. A cura aumenta com o poder de cura e o dano com o Poder Mágico. (Base de Sagrado)',
   'entities.abilities.shadowform.name': 'Véu Crepuscular',
   'entities.abilities.shadowform.description':
     'Entra no Véu Crepuscular, aumentando seu dano de Sombra em 25%. Conjurar uma magia de cura o encerra. Conjure o Véu Crepuscular de novo para sair. (Assinatura de Sombra)',
@@ -15110,7 +15110,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.multi_shot.description':
     'Dispara uma saraivada na área-alvo, causando {damage} de dano Físico aos inimigos a até 8 jardas. (talento de Caçador)',
   'entities.abilities.prayer_of_healing.description':
-    'Cura os aliados a até 30 m em {damage}. A cura aumenta com o Poder Mágico. (Sagrado)',
+    'Cura os aliados a até 30 m em {damage}. A cura aumenta com o poder de cura. (Sagrado)',
   'entities.abilities.preparation.description':
     'Encerra a recarga de Disparada, Evasão e Sumir. (talento de Ladino)',
   'entities.abilities.presence_of_mind.description':
@@ -16282,7 +16282,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.choir_of_deliverance.name': 'Coro da Libertação',
   'entities.abilities.scouring_mercy.name': 'Misericórdia Purificadora',
   'entities.abilities.aegis_first_dawn.description':
-    'Canaliza uma cúpula sagrada de 10 m ao seu redor. Jogadores aliados dentro dela e na sua linha de visão sofrem 50% menos dano e são curados em 35 a 45 a cada segundo. Concluir a canalização os cura em mais 120 a 150 e concede 30% de velocidade de movimento por 4 s. A cura aumenta com o poder de cura.',
+    'Canaliza uma cúpula sagrada de 10 m ao seu redor. Jogadores aliados dentro dela e na sua linha de visão sofrem 50% menos dano e são curados em {aegisTick} a cada segundo. Concluir a canalização os cura em mais {aegisFinal} e concede 30% de velocidade de movimento por 4 s. A cura aumenta com o poder de cura.',
   'entities.abilities.aura_mastery.description':
     'Por 8 s, triplica todas as Devoções do Bastião e Auras de Represália ativas no seu grupo: a Devoção do Bastião reduz o dano sofrido em 15%, e a Aura de Represália causa três vezes o seu dano Sagrado normal. Usos repetidos renovam em vez de acumular.',
   'entities.abilities.bastion_rite.description':
@@ -16352,7 +16352,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.vowkeeper_strike.description':
     'Golpeia com o dano da arma mais {damage} de dano Físico com ameaça elevada, e gera 1 de Devoção. Um golpe bem-sucedido tem 20% de chance de conceder Represália Solar por 8 s; cada bloqueio bem-sucedido tem 25%. A Represália Solar é consumida pelo seu próximo Disco Solar (sem custo de mana, sem recarga, 20% mais dano), Martelo da Graça (sem recarga, cura você em 100% do dano causado) ou Luz Restauradora (instantânea). A Ascensão também protege você com um escudo de 6% da sua vida máxima por 6 s.',
   'entities.abilities.choir_of_deliverance.description':
-    'Canaliza por 6 s, curando membros do grupo num raio de 30 metros em {damage} a cada 2 s. A cura aumenta com o poder mágico.',
+    'Canaliza por 6 s, curando você e todos os alvos aliados a até 30 metros e na sua linha de visão em {damage} a cada 2 s. A cura aumenta com o poder de cura.',
 
   // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
   // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.

@@ -18018,7 +18018,7 @@ export const fr_CA: EnTranslations = {
       },
       "aegis_first_dawn": {
         "name": "Égide de la Première Aube",
-        "description": "Canalise un dôme sacré de 10 m autour de vous. Les joueurs alliés à l'intérieur et dans votre ligne de vue subissent 50% de dégâts en moins et sont soignés de 35 à 45 chaque seconde. Terminer la canalisation les soigne de 120 à 150 supplémentaires et octroie 30% de vitesse de déplacement pendant 4 s. Les soins augmentent avec la puissance de soin."
+        "description": "Canalise un dôme sacré de 10 m autour de vous. Les joueurs alliés à l'intérieur et dans votre ligne de vue subissent 50% de dégâts en moins et sont soignés de {aegisTick} chaque seconde. Terminer la canalisation les soigne de {aegisFinal} supplémentaires et octroie 30% de vitesse de déplacement pendant 4 s. Les soins augmentent avec la puissance de soin."
       },
       "vowkeeper_strike": {
         "name": "Frappe du gardevœu",
@@ -18163,7 +18163,7 @@ export const fr_CA: EnTranslations = {
       },
       "lesser_heal": {
         "name": "Prière murmurée",
-        "description": "Rend {damage} points de vie à une cible alliée. Les soins augmentent avec la puissance des sorts."
+        "description": "Rend {damage} points de vie à une cible alliée. Les soins augmentent avec la puissance de soin."
       },
       "power_word_fortitude": {
         "name": "Litanie de résolution",
@@ -18179,7 +18179,7 @@ export const fr_CA: EnTranslations = {
       },
       "renew": {
         "name": "Grâce persistante",
-        "description": "Rend {damage} points de vie à la cible en 15 s, une fois toutes les 3 s. Les soins augmentent avec la puissance des sorts."
+        "description": "Rend {damage} points de vie à la cible en 15 s, une fois toutes les 3 s. Les soins augmentent avec la puissance de soin."
       },
       "mind_blast": {
         "name": "Fracture mentale",
@@ -18187,7 +18187,7 @@ export const fr_CA: EnTranslations = {
       },
       "heal": {
         "name": "Prière solennelle",
-        "description": "Rend {damage} points de vie à une cible alliée. Les soins augmentent avec la puissance des sorts."
+        "description": "Rend {damage} points de vie à une cible alliée. Les soins augmentent avec la puissance de soin."
       },
       "mind_flay": {
         "name": "Litanie du malheur",
@@ -18207,7 +18207,7 @@ export const fr_CA: EnTranslations = {
       },
       "flash_heal": {
         "name": "Prière urgente",
-        "description": "Rend {damage} points de vie à une cible alliée. Les soins augmentent avec la puissance des sorts."
+        "description": "Rend {damage} points de vie à une cible alliée. Les soins augmentent avec la puissance de soin."
       },
       "lightning_bolt": {
         "name": "Éclair d'arc",
@@ -18407,7 +18407,7 @@ export const fr_CA: EnTranslations = {
       },
       "entangling_roots": {
         "name": "Racines agrippantes",
-        "description": "Enracine la cible sur place pendant 12 s au maximum. Les rangs supérieurs infligent aussi des dégâts de Nature sur 12 s."
+        "description": "Enracine la cible sur place pendant 12 s au maximum. Au deuxième rang, inflige aussi 32 points de dégâts de Nature sur 12 s, augmentés par la puissance des sorts."
       },
       "bear_form": {
         "name": "Forme de Bruin",
@@ -18695,7 +18695,7 @@ export const fr_CA: EnTranslations = {
       },
       "holy_nova": {
         "name": "Cantique solaire",
-        "description": "Soigne les alliés dans un rayon de 10 m de {damage} et inflige 24 à 30 points de dégâts Sacrés aux ennemis de la même zone. Les deux montants augmentent avec la puissance des sorts. (Base Sacré)"
+        "description": "Soigne les alliés dans un rayon de 10 m de {damage} et inflige 24 à 30 points de dégâts Sacrés aux ennemis de la même zone. Les soins augmentent avec la puissance de soin et les dégâts avec la puissance des sorts. (Base Sacré)"
       },
       "shadowform": {
         "name": "Voile crépusculaire",
@@ -18898,7 +18898,7 @@ export const fr_CA: EnTranslations = {
       },
       "sanguine_aura": {
         "name": "Aura sanguine",
-        "description": "Imprégnez votre arme du sang de vos ennemis : vous et chaque membre de mêlée du groupe, à n'importe quelle portée, gagnez 10% de vitesse d'attaque et infligez 10% de dégâts en plus pendant 20 s."
+        "description": "Imprégnez votre arme du sang de vos ennemis : vous et chaque Guerrier, Paladin, Voleur, Chaman et Druide de votre groupe, à n'importe quelle portée, gagnez 10% de vitesse d'attaque et infligez 10% de dégâts en plus pendant 20 s."
       },
       "victory_rush": {
         "name": "Déferlante victorieuse",
@@ -19099,7 +19099,7 @@ export const fr_CA: EnTranslations = {
       },
       "temporal_acceleration": {
         "name": "Accélération temporelle",
-        "description": "Accélère le flux du temps pour votre groupe ou raid, augmentant la vitesse d'attaque, d'incantation et de canalisation de 30 % pendant 15 s. Les alliés récemment affectés par Accélération temporelle ou Tambours de guerre sont trop épuisés pour en bénéficier. (Chromancie)"
+        "description": "Accélère le flux du temps pour les alliés de groupe ou de raid à moins de 40 m, augmentant leur vitesse d'attaque, d'incantation et de canalisation de 30 % pendant 15 s. Les alliés affectés ne peuvent plus bénéficier d'Accélération temporelle, de Tambours de guerre ni du Chœur des voleurs pendant 10 min. (Chromancie)"
       },
       "perfect_moment": {
         "name": "Moment parfait",
@@ -19119,7 +19119,7 @@ export const fr_CA: EnTranslations = {
       },
       "prayer_of_healing": {
         "name": "Soin du chœur",
-        "description": "Soigne les alliés dans un rayon de 30 m de {damage}. Les soins augmentent avec la puissance des sorts. (Sacré)"
+        "description": "Soigne les alliés dans un rayon de 30 m de {damage}. Les soins augmentent avec la puissance de soin. (Sacré)"
       },
       "preparation": {
         "name": "Contingence",
@@ -19236,7 +19236,7 @@ export const fr_CA: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Chœur de délivrance",
-        "description": "Canalise pendant 6 s et soigne les membres du groupe dans un rayon de 30 mètres de {damage} toutes les 2 s. Le soin augmente avec la puissance des sorts.",
+        "description": "Canalise pendant 6 s et vous soigne, ainsi que chaque cible alliée dans un rayon de 30 mètres et dans votre ligne de vue, de {damage} toutes les 2 s. Les soins augmentent avec la puissance de soin.",
         "specNote_shadow": "Pendant 15 s, répartit en soins 20% des points de vie que les ennemis perdent à cause de vos dégâts d'Ombre entre les membres blessés du groupe à moins de 30 m, vous compris. En raid, seul votre sous-groupe est soigné. S'incante instantanément et permet de continuer à attaquer dans le Voile crépusculaire. Les dégâts absorbés et les dégâts excédentaires ne génèrent pas de soins."
       },
       "bear_charge": {

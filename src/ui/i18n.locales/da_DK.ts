@@ -5773,7 +5773,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.perfect_moment.name': 'Perfekt Øjeblik',
   'entities.abilities.shatter.name': 'Skrøbelig Undergang',
   'entities.abilities.temporal_acceleration.description':
-    'Fremskynder tidens gang for din gruppe eller raid og øger angrebshastighed, kastetempo og kanaliseringstempo med 30% i 15 sek. Allierede der for nylig blev påvirkede af Temporal Acceleration eller Krigstrommer er for udmattede til at have gavn af det. (Kronomantik)',
+    'Fremskynder tidens gang for gruppe- eller raidallierede inden for 40 m og øger deres angrebs-, besværgelses- og kanaliseringshastighed med 30% i 15 sek. Berørte allierede kan ikke drage nytte af Tidsacceleration, Krigstrommer eller Tyvenes Kor igen i 10 min. (Kronomantik)',
   'entities.abilities.temporal_acceleration.name': 'Tidsacceleration',
   'entities.abilities.temporal_barrier.description':
     'Forskydes målet et hjerteslag ud af nutiden, og et tidsskjold absorberer {damage} skade i 10 sek. inden tidslinjen snapper tilbage.',
@@ -6284,7 +6284,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Slå alle fjender foran dig inden for 8 m for {damage} fysisk skade. Over 5 mål reduceres hvert træf, så den samlede skade svarer til 5 træf. Når du undviger eller parerer et væsens nærkampsangreb, har du 30% chance for, at dit næste Hævn inden for 10 sek. ikke koster raseri. (Beskyttelse)',
   'entities.abilities.revenge.name': 'Hævn',
   'entities.abilities.sanguine_aura.description':
-    'Gennemtræng dit våben med dine fjenders blod: du og hvert nærkampsmedlem af din gruppe, uanset afstand, får 10% angrebshastighed og gør 10% mere skade i 20 sek.',
+    'Gennemtræng dit våben med dine fjenders blod: du og hver Kriger, Paladin, Slyngel, Shaman og Druide i din gruppe, uanset afstand, får 10% angrebshastighed og gør 10% mere skade i 20 sek.',
   'entities.abilities.sanguine_aura.name': 'Blodrød Aura',
   'entities.abilities.seasoned_soldier.description':
     'Dine kritiske autoangreb genererer 10% mere raseri. (Arms)',
@@ -7844,7 +7844,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.enrage.description': 'Skaber 20 raseri øjeblikkeligt. Kun i Bruin-form.',
   'entities.abilities.enrage.name': 'Optænding',
   'entities.abilities.entangling_roots.description':
-    'Rodfæster målet på stedet i op til 12 sek. Højere rangeringer gør også Naturskade over 12 sek.',
+    'Rodfæster målet på stedet i op til 12 sek. På anden rangering gør den også 32 Naturskade over 12 sek., som stiger med Besværgelseskraft.',
   'entities.abilities.entangling_roots.name': 'Gribende Rødder',
   'entities.abilities.evasion.description': 'Øger din chance for at undvige med 50% i 15 sek.',
   'entities.abilities.evasion.name': 'Spøgelsesfod',
@@ -7889,7 +7889,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Gennemtrænger jeres våben i 30 min. Hvert hug volder {damage} ekstra Ildskade.',
   'entities.abilities.flametongue_weapon.name': 'Bålbrand-Våben',
   'entities.abilities.flash_heal.description':
-    'Helbreder et venligt mål for {damage}. Helbredelsen stiger med Besværgelseskraft.',
+    'Helbreder et venligt mål for {damage}. Helbredelsen stiger med Helbredelseskraft.',
   'entities.abilities.flash_heal.name': 'Hastende Bøn',
   'entities.abilities.flash_of_light.description':
     'Et hurtigt, effektivt glimt af Lys, der helbreder et venligt mål for {damage}. At genoprette helbred skaber 1 Hengivenhed, selv uden specialisering.',
@@ -7925,7 +7925,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Lemlæster fjenden for {damage} skade og sænker dens bevægelse med 50% i 15 sek.',
   'entities.abilities.hamstring.name': 'Lammende Snit',
   'entities.abilities.heal.description':
-    'Helbreder et venligt mål for {damage}. Helbredelsen stiger med Besværgelseskraft.',
+    'Helbreder et venligt mål for {damage}. Helbredelsen stiger med Helbredelseskraft.',
   'entities.abilities.heal.name': 'Højtidelig Bøn',
   'entities.abilities.healing_touch.description': 'Helbreder et venligt mål for {damage}.',
   'entities.abilities.healing_touch.specNote_restoration':
@@ -7963,7 +7963,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Helbred et venligt mål for {damage}% af dit maksimale helbred og generér 1 Hengivenhed, når det genopretter helbred.',
   'entities.abilities.lay_on_hands.name': 'Sidste Rite',
   'entities.abilities.lesser_heal.description':
-    'Helbreder et venligt mål for {damage}. Helbredelsen stiger med Besværgelseskraft.',
+    'Helbreder et venligt mål for {damage}. Helbredelsen stiger med Helbredelseskraft.',
   'entities.abilities.lesser_heal.name': 'Hvisket Bøn',
   'entities.abilities.life_tap.description':
     'Omdanner {damage} helbred til {damage} mana (50% mere mana med Blodkredit). Mislykkes, hvis du har {damage} helbred eller mindre.',
@@ -8027,7 +8027,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.raptor_strike.name': 'Sprættende Slag',
   'entities.abilities.regrowth.name': 'Anden Blomstring',
   'entities.abilities.renew.description':
-    'Helbreder målet for {damage} over 15 sek., én gang hvert 3. sek. Helbredelsen stiger med Besværgelseskraft.',
+    'Helbreder målet for {damage} over 15 sek., én gang hvert 3. sek. Helbredelsen stiger med Helbredelseskraft.',
   'entities.abilities.renew.name': 'Dvælende Nåde',
   'entities.abilities.retribution_aura.description':
     'Omgiver dig og din gruppe med hellig energi indtil død eller udskiftning. Fjender, der rammer en påvirket allieret i nærkamp, tager {buff} Hellig skade, og påvirkede allierede giver {buff} ekstra Hellig skade med automatiske angreb.',
@@ -8165,7 +8165,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Salver et venligt mål og øger skade, helbredelse og besværgelseshastighed med 20% i 15 sek.',
   'entities.abilities.holy_nova.name': 'Solsang',
   'entities.abilities.holy_nova.description':
-    'Helbreder allierede inden for 10 m for {damage} og volder 24 til 30 Hellig skade på fjender i samme område. Begge beløb stiger med Besværgelseskraft. (Grundlag for Hellig)',
+    'Helbreder allierede inden for 10 m for {damage} og volder 24 til 30 Hellig skade på fjender i samme område. Helbredelsen stiger med Helbredelseskraft og skaden med Besværgelseskraft. (Grundlag for Hellig)',
   'entities.abilities.shadowform.name': 'Tusmørkeslør',
   'entities.abilities.shadowform.description':
     'Gå ind i Tusmørkeslør, der øger din Skyggeskade med 25%. At kaste en helbredelsesbesværgelse afslutter det. Kast Tusmørkeslør igen for at forlade det. (Vesper-signatur)',
@@ -14566,7 +14566,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.multi_shot.description':
     'Affyrer en salve mod målområdet og giver {damage} Fysisk skade til fjender inden for 8 yards. (jægertalent)',
   'entities.abilities.prayer_of_healing.description':
-    'Helbreder allierede inden for 30 m for {damage}. Helbredelsen stiger med Besværgelseskraft. (Hellig)',
+    'Helbreder allierede inden for 30 m for {damage}. Helbredelsen stiger med Helbredelseskraft. (Hellig)',
   'entities.abilities.preparation.description':
     'Afslutter nedkølingen på Sprint, Undvigelse og Forsvinden. (slyngeltalent)',
   'entities.abilities.presence_of_mind.description':
@@ -15687,7 +15687,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.choir_of_deliverance.name': 'Befrielsens Kor',
   'entities.abilities.scouring_mercy.name': 'Rensende Nåde',
   'entities.abilities.aegis_first_dawn.description':
-    'Kanaliser en hellig kuppel på 10 m omkring dig. Allierede spillere indeni og i din synslinje tager 50% mindre skade og helbredes for 35 til 45 hvert sekund. At fuldføre kanaliseringen helbreder dem for yderligere 120 til 150 og giver 30% bevægelseshastighed i 4 sek. Helbredelsen stiger med Helbredelseskraft.',
+    'Kanaliser en hellig kuppel på 10 m omkring dig. Allierede spillere indeni og i din synslinje tager 50% mindre skade og helbredes for {aegisTick} hvert sekund. At fuldføre kanaliseringen helbreder dem for yderligere {aegisFinal} og giver 30% bevægelseshastighed i 4 sek. Helbredelsen stiger med Helbredelseskraft.',
   'entities.abilities.aura_mastery.description':
     'I 8 sek. tredobles hver aktiv Bastionens Hengivenhed og Gengældelsens Aura i din gruppe: Bastionens Hengivenhed reducerer modtaget skade med 15%, og Gengældelsens Aura gør tre gange så meget hellig skade som normalt. Gentagne anvendelser fornyer i stedet for at stable.',
   'entities.abilities.bastion_rite.description':
@@ -15756,7 +15756,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.vowkeeper_strike.description':
     'Slå for våbenskade plus {damage} fysisk skade med høj trussel, og generér 1 Hengivenhed. Et vellykket slag har 20% chance for at give Solgengældelse i 8 sek.; hver vellykket blokering har 25%. Solgengældelse forbruges af dit næste Solskive (ingen manaomkostning, ingen nedkøling, 20% mere skade), Nådens Hammer (ingen nedkøling, helbreder dig for 100% af den gjorte skade) eller Lægende Lys (øjeblikkeligt). Ophøjelse giver dig desuden et skjold på 6% af dit maksimale helbred i 6 sek.',
   'entities.abilities.choir_of_deliverance.description':
-    'Kanaliserer i 6 sek. og helbreder gruppemedlemmer inden for 30 meter for {damage} hvert 2. sek. Helbredelsen øges med besværgelseskraft.',
+    'Kanaliserer i 6 sek. og helbreder dig og hvert venligt mål inden for 30 meter og i din synslinje for {damage} hvert 2. sek. Helbredelsen stiger med Helbredelseskraft.',
 
   // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
   // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.

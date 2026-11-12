@@ -18018,7 +18018,7 @@ export const vi_VN: EnTranslations = {
       },
       "aegis_first_dawn": {
         "name": "Khiên Bình Minh Đầu Tiên",
-        "description": "Dẫn phép một mái vòm thánh 10 m quanh bạn. Người chơi đồng minh bên trong và trong tầm nhìn của bạn nhận ít hơn 50% sát thương và được hồi 35 đến 45 máu mỗi giây. Hoàn tất việc dẫn phép sẽ hồi thêm 120 đến 150 cho họ và ban 30% tốc độ di chuyển trong 4 giây. Lượng hồi máu tăng theo sức mạnh trị liệu."
+        "description": "Dẫn phép một mái vòm thánh 10 m quanh bạn. Người chơi đồng minh bên trong và trong tầm nhìn của bạn nhận ít hơn 50% sát thương và được hồi {aegisTick} máu mỗi giây. Hoàn tất việc dẫn phép sẽ hồi thêm {aegisFinal} cho họ và ban 30% tốc độ di chuyển trong 4 giây. Lượng hồi tăng theo Sức Mạnh Trị Liệu."
       },
       "vowkeeper_strike": {
         "name": "Đòn Giữ Thệ",
@@ -18163,7 +18163,7 @@ export const vi_VN: EnTranslations = {
       },
       "lesser_heal": {
         "name": "Lời Nguyện Thì Thầm",
-        "description": "Hồi {damage} máu cho một mục tiêu đồng minh. Lượng hồi tăng theo Sức Mạnh Phép Thuật."
+        "description": "Hồi {damage} máu cho một mục tiêu đồng minh. Lượng hồi tăng theo Sức Mạnh Trị Liệu."
       },
       "power_word_fortitude": {
         "name": "Kinh Cầu Kiên Định",
@@ -18179,7 +18179,7 @@ export const vi_VN: EnTranslations = {
       },
       "renew": {
         "name": "Ân Điển Vương Vấn",
-        "description": "Hồi {damage} máu cho mục tiêu trong 15 giây, mỗi 3 giây một lần. Lượng hồi tăng theo Sức Mạnh Phép Thuật."
+        "description": "Hồi {damage} máu cho mục tiêu trong 15 giây, mỗi 3 giây một lần. Lượng hồi tăng theo Sức Mạnh Trị Liệu."
       },
       "mind_blast": {
         "name": "Nứt Vỡ Tâm Trí",
@@ -18187,7 +18187,7 @@ export const vi_VN: EnTranslations = {
       },
       "heal": {
         "name": "Lời Nguyện Trang Nghiêm",
-        "description": "Hồi {damage} máu cho một mục tiêu đồng minh. Lượng hồi tăng theo Sức Mạnh Phép Thuật."
+        "description": "Hồi {damage} máu cho một mục tiêu đồng minh. Lượng hồi tăng theo Sức Mạnh Trị Liệu."
       },
       "mind_flay": {
         "name": "Kinh Cầu Thống Khổ",
@@ -18207,7 +18207,7 @@ export const vi_VN: EnTranslations = {
       },
       "flash_heal": {
         "name": "Lời Nguyện Khẩn Cấp",
-        "description": "Hồi {damage} máu cho một mục tiêu đồng minh. Lượng hồi tăng theo Sức Mạnh Phép Thuật."
+        "description": "Hồi {damage} máu cho một mục tiêu đồng minh. Lượng hồi tăng theo Sức Mạnh Trị Liệu."
       },
       "lightning_bolt": {
         "name": "Tia Hồ Quang",
@@ -18407,7 +18407,7 @@ export const vi_VN: EnTranslations = {
       },
       "entangling_roots": {
         "name": "Rễ Siết Chặt",
-        "description": "Trói chân mục tiêu tại chỗ tối đa 12 giây. Các bậc cao hơn còn gây sát thương Tự Nhiên trong 12 giây."
+        "description": "Trói chân mục tiêu tại chỗ tối đa 12 giây. Ở bậc thứ hai, còn gây 32 sát thương Tự Nhiên trong 12 giây, tăng theo Sức Mạnh Phép Thuật."
       },
       "bear_form": {
         "name": "Hình Bruin",
@@ -18695,7 +18695,7 @@ export const vi_VN: EnTranslations = {
       },
       "holy_nova": {
         "name": "Khúc Ca Mặt Trời",
-        "description": "Hồi {damage} máu cho đồng minh trong 10 m và gây 24 tới 30 sát thương Thần Thánh lên kẻ địch trong cùng khu vực. Cả hai con số đều tăng theo Sức Mạnh Phép Thuật. (Nền tảng Thần Thánh)"
+        "description": "Hồi {damage} máu cho đồng minh trong 10 m và gây 24 tới 30 sát thương Thần Thánh lên kẻ địch trong cùng khu vực. Lượng hồi tăng theo Sức Mạnh Trị Liệu, sát thương tăng theo Sức Mạnh Phép Thuật. (Nền tảng Thần Thánh)"
       },
       "shadowform": {
         "name": "Màn Chạng Vạng",
@@ -18898,7 +18898,7 @@ export const vi_VN: EnTranslations = {
       },
       "sanguine_aura": {
         "name": "Hào Quang Huyết Sắc",
-        "description": "Tẩm máu quân thù lên vũ khí của bạn: bạn và mọi thành viên nhóm cận chiến, ở bất kỳ khoảng cách nào, nhận thêm 10% tốc độ tấn công và gây thêm 10% sát thương trong 20 giây."
+        "description": "Tẩm máu quân thù lên vũ khí của bạn: bạn và mọi Chiến Binh, Thánh Kỵ Sĩ, Đạo Tặc, Shaman và Druid trong nhóm, ở bất kỳ khoảng cách nào, nhận thêm 10% tốc độ tấn công và gây thêm 10% sát thương trong 20 giây."
       },
       "victory_rush": {
         "name": "Khí Thế Chiến Thắng",
@@ -19099,7 +19099,7 @@ export const vi_VN: EnTranslations = {
       },
       "temporal_acceleration": {
         "name": "Gia Tốc Thời Gian",
-        "description": "Tăng tốc dòng chảy thời gian cho nhóm hoặc đột kích của bạn, tăng tốc độ tấn công, thi triển phép và kênh phép lên 30% trong 15 giây. Đồng minh vừa bị ảnh hưởng bởi Tăng Tốc Thời Gian hoặc Trống Chiến sẽ quá kiệt sức để nhận lợi ích. (Thời Thuật)"
+        "description": "Tăng tốc dòng chảy thời gian cho đồng minh trong nhóm hoặc đội đột kích ở trong 40 mét, tăng 30% tốc độ tấn công, niệm chú và dẫn phép trong 15 giây. Đồng minh chịu ảnh hưởng không thể hưởng lợi từ Gia Tốc Thời Gian, Trống Chiến hay Hợp Xướng Đạo Tặc lần nữa trong 10 phút. (Thời Thuật)"
       },
       "perfect_moment": {
         "name": "Khoảnh Khắc Hoàn Hảo",
@@ -19119,7 +19119,7 @@ export const vi_VN: EnTranslations = {
       },
       "prayer_of_healing": {
         "name": "Hồi Phục Hợp Xướng",
-        "description": "Hồi {damage} máu cho đồng minh trong 30 m. Lượng hồi tăng theo Sức Mạnh Phép Thuật. (Thần Thánh)"
+        "description": "Hồi {damage} máu cho đồng minh trong 30 m. Lượng hồi tăng theo Sức Mạnh Trị Liệu. (Thần Thánh)"
       },
       "preparation": {
         "name": "Dự Phòng",
@@ -19236,7 +19236,7 @@ export const vi_VN: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Hợp Xướng Giải Thoát",
-        "description": "Vận phép trong 6 giây, hồi máu cho các thành viên trong nhóm trong phạm vi 30 mét {damage} mỗi 2 giây. Lượng hồi tăng theo sức mạnh phép thuật.",
+        "description": "Vận phép trong 6 giây, hồi {damage} máu cho bạn và mọi mục tiêu đồng minh trong phạm vi 30 mét và trong tầm nhìn của bạn mỗi 2 giây. Lượng hồi tăng theo Sức Mạnh Trị Liệu.",
         "specNote_shadow": "Trong 15 giây, chia 20% lượng máu kẻ địch mất do sát thương Bóng Tối của bạn thành hồi máu cho các thành viên tổ đội bị thương trong 30 mét, gồm cả bạn. Trong đội đột kích, chỉ nhóm nhỏ của bạn được hồi máu. Thi triển tức thì và tiếp tục tấn công trong Màn Chạng Vạng. Sát thương bị hấp thụ và sát thương vượt quá máu còn lại không tạo hồi máu."
       },
       "bear_charge": {

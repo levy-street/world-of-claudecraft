@@ -18018,7 +18018,7 @@ export const ja_JP: EnTranslations = {
       },
       "aegis_first_dawn": {
         "name": "始暁の大盾",
-        "description": "自身の周囲に半径10メートルの聖なるドームをチャネリングで展開します。ドーム内で視線が通っている味方プレイヤーは受けるダメージが50%減少し、毎秒35から45回復します。チャネリングを完了すると、さらに120から150回復し、4秒間、移動速度が30%増加します。回復量は治癒力とともに上がります。"
+        "description": "自身の周囲に半径10メートルの聖なるドームをチャネリングで展開します。ドーム内で視線が通っている味方プレイヤーは受けるダメージが50%減少し、毎秒{aegisTick}回復します。チャネリングを完了すると、さらに{aegisFinal}回復し、4秒間、移動速度が30%増加します。回復量は治癒力とともに上がります。"
       },
       "vowkeeper_strike": {
         "name": "誓守の一撃",
@@ -18163,7 +18163,7 @@ export const ja_JP: EnTranslations = {
       },
       "lesser_heal": {
         "name": "囁きの祈り",
-        "description": "味方の対象を{damage}回復します。回復量は呪文威力とともに上がります。"
+        "description": "味方の対象を{damage}回復します。回復量は治癒力とともに上がります。"
       },
       "power_word_fortitude": {
         "name": "決意の連祷",
@@ -18179,7 +18179,7 @@ export const ja_JP: EnTranslations = {
       },
       "renew": {
         "name": "留まる恩寵",
-        "description": "15秒かけて対象を{damage}回復します。3秒ごとに1回です。回復量は呪文威力とともに上がります。"
+        "description": "15秒かけて対象を{damage}回復します。3秒ごとに1回です。回復量は治癒力とともに上がります。"
       },
       "mind_blast": {
         "name": "精神粉砕",
@@ -18187,7 +18187,7 @@ export const ja_JP: EnTranslations = {
       },
       "heal": {
         "name": "厳かな祈り",
-        "description": "味方の対象を{damage}回復します。回復量は呪文威力とともに上がります。"
+        "description": "味方の対象を{damage}回復します。回復量は治癒力とともに上がります。"
       },
       "mind_flay": {
         "name": "嘆きの連祷",
@@ -18207,7 +18207,7 @@ export const ja_JP: EnTranslations = {
       },
       "flash_heal": {
         "name": "緊急の祈り",
-        "description": "味方の対象を{damage}回復します。回復量は呪文威力とともに上がります。"
+        "description": "味方の対象を{damage}回復します。回復量は治癒力とともに上がります。"
       },
       "lightning_bolt": {
         "name": "電弧の矢",
@@ -18407,7 +18407,7 @@ export const ja_JP: EnTranslations = {
       },
       "entangling_roots": {
         "name": "締めつける根",
-        "description": "対象を最大12秒間その場に根付かせます。上位ランクでは12秒かけて自然ダメージも与えます。"
+        "description": "対象を最大12秒間その場に根付かせます。第2ランクでは、12秒かけて32の自然ダメージも与え、呪文威力で増加します。"
       },
       "bear_form": {
         "name": "ブルーインフォーム",
@@ -18695,7 +18695,7 @@ export const ja_JP: EnTranslations = {
       },
       "holy_nova": {
         "name": "旭日の聖詠",
-        "description": "10ヤード以内の味方を{damage}回復し、同じ範囲の敵に24から30の神聖ダメージを与えます。どちらも呪文威力とともに上がります。（聖なる基本）"
+        "description": "10ヤード以内の味方を{damage}回復し、同じ範囲の敵に24から30の神聖ダメージを与えます。回復量は治癒力、ダメージは呪文威力とともに上がります。（聖なる基本）"
       },
       "shadowform": {
         "name": "黄昏の帳",
@@ -18898,7 +18898,7 @@ export const ja_JP: EnTranslations = {
       },
       "sanguine_aura": {
         "name": "血のオーラ",
-        "description": "武器に敵の血を宿します。あなたと、距離を問わずすべての近接のパーティメンバーが20秒間、攻撃速度が10%上昇し、与えるダメージが10%増加します。"
+        "description": "武器に敵の血を宿します。あなたと、パーティ内のすべての戦士、パラディン、ローグ、シャーマン、ドルイドが、距離を問わず20秒間、攻撃速度が10%上昇し、与えるダメージが10%増加します。"
       },
       "victory_rush": {
         "name": "勝者の奔流",
@@ -19099,7 +19099,7 @@ export const ja_JP: EnTranslations = {
       },
       "temporal_acceleration": {
         "name": "時間加速",
-        "description": "パーティまたはレイドの時間の流れを加速し、15秒間、攻撃、詠唱、チャネリング速度を30%上昇させます。直近に時間加速またはブラッドラストの影響を受けた味方は疲労しており、効果を得られません。（クロノマンシー）"
+        "description": "40ヤード以内のグループまたはレイドの味方の時間の流れを加速し、15秒間、攻撃、詠唱、チャネリング速度を30%上昇させます。効果を受けた味方は10分間、時間加速、戦の太鼓、盗賊の合唱の恩恵を再び受けられません。（クロノマンシー）"
       },
       "perfect_moment": {
         "name": "完璧な瞬間",
@@ -19119,7 +19119,7 @@ export const ja_JP: EnTranslations = {
       },
       "prayer_of_healing": {
         "name": "聖歌の癒し",
-        "description": "30ヤード以内の味方を{damage}回復します。回復量は呪文威力とともに上がります。（聖なる）"
+        "description": "30ヤード以内の味方を{damage}回復します。回復量は治癒力とともに上がります。（聖なる）"
       },
       "preparation": {
         "name": "備え",
@@ -19236,7 +19236,7 @@ export const ja_JP: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "救済の聖歌隊",
-        "description": "6秒間チャネルし、30ヤード以内のパーティメンバーを2秒ごとに{damage}回復します。回復量はスペルパワーで増加します。",
+        "description": "6秒間チャネルし、あなたと、視線が通っている30ヤード以内のすべての味方を2秒ごとに{damage}回復します。回復量は治癒力とともに上がります。",
         "specNote_shadow": "15秒間、あなたの暗黒ダメージで敵が失った体力の20%を、あなたを含む30ヤード以内の負傷したパーティメンバーに回復として分け与えます。レイドでは自分のサブグループのみが回復します。即時発動で、黄昏の帳のまま攻撃を続けられます。吸収されたダメージと過剰ダメージは回復量に加算されません。"
       },
       "bear_charge": {

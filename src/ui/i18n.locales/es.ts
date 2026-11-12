@@ -5778,7 +5778,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ice_lance.name': 'Lanza de Hielo',
   'entities.abilities.shatter.name': 'Ruina Quebradiza',
   'entities.abilities.temporal_acceleration.description':
-    'Acelera el flujo del tiempo para tu grupo o banda, aumentando la velocidad de ataque, lanzamiento y canalización un 30% durante 15 s. Los aliados afectados recientemente por Aceleración Temporal o Tambores de Guerra están demasiado agotados para beneficiarse. (Cronomancia)',
+    'Acelera el flujo del tiempo para los aliados de grupo o banda a menos de 40 m, aumentando su velocidad de ataque, lanzamiento y canalización un 30% durante 15 s. Los aliados afectados no pueden volver a beneficiarse de Aceleración Temporal, Tambores de Guerra ni Coro de ladrones durante 10 min. (Cronomancia)',
   'entities.abilities.temporal_acceleration.name': 'Aceleración Temporal',
   'entities.abilities.temporal_cascade.description':
     'Sana al objetivo y a hasta 4 aliados cercanos, empezando por los miembros del grupo, y marca a cada uno con un Eco temporal de grupo durante {duration} s. Cada sanación aumenta un 3% por cada 1% de salud que le falte al aliado. Mientras están marcados, el 13% de tu daño Arcano a un solo objetivo y el 6% de tu daño Arcano de área sanan a cada uno de ellos. Impulso de Éter y Dardos de Éter también añaden una reserva de sanación equivalente de cada Eco de grupo, repartida entre los aliados marcados con menos del 60% de salud según la salud que les falte. Un aliado que ya tenga tu Eco temporal lo conserva. (Cronomancia)',
@@ -6326,7 +6326,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Golpea a todos los enemigos frente a ti a menos de 8 m por {damage} de daño Físico. Por encima de 5 objetivos, cada impacto se reduce para que el total equivalga a 5 impactos. Cuando esquivas o paras un ataque cuerpo a cuerpo de una criatura, tienes un 30% de probabilidad de que tu próxima Venganza en los siguientes 10 s no cueste ira. (Protección)',
   'entities.abilities.revenge.name': 'Venganza',
   'entities.abilities.sanguine_aura.description':
-    'Imbuyes tu arma con la sangre de tus enemigos: tú y todos los miembros cuerpo a cuerpo del grupo, a cualquier distancia, obtenéis un 10% de velocidad de ataque e infligís un 10% más de daño durante 20 s.',
+    'Imbuyes tu arma con la sangre de tus enemigos: tú y todos los Guerreros, Paladines, Pícaros, Chamanes y Druidas de tu grupo, a cualquier distancia, obtenéis un 10% de velocidad de ataque e infligís un 10% más de daño durante 20 s.',
   'entities.abilities.sanguine_aura.name': 'Aura Sanguínea',
   'entities.abilities.seasoned_soldier.description':
     'Tus ataques automáticos críticos generan un 10% más de ira. (Armas)',
@@ -9444,7 +9444,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Inflige {damage} de daño Sagrado. El daño aumenta con el poder con hechizos. Disciplina sana a cada miembro del grupo vinculado y herido a menos de 30 m por el 30% del daño infligido (70% con Pacto Gemelo). Si ninguno está herido, sana en su lugar al miembro del grupo herido con menos salud a menos de 30 m por el 15% del daño.',
   'entities.abilities.lesser_heal.name': 'Plegaria Susurrada',
   'entities.abilities.lesser_heal.description':
-    'Sana a un objetivo aliado en {damage}. La sanación aumenta con el poder con hechizos.',
+    'Sana a un objetivo aliado en {damage}. La sanación aumenta con el poder de sanación.',
   'entities.abilities.power_word_fortitude.name': 'Letanía de Entereza',
   'entities.abilities.power_word_fortitude.description':
     'Aumenta el Aguante de todos los miembros del grupo un {buff}% durante 30 min.',
@@ -9459,19 +9459,19 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Cambias a Forma felina si aún no lo estás y te lanzas contra un enemigo a un máximo de 25 m. Al llegar, inflige un 60% de daño de arma, otorga 1 punto de combo y, como Colmillo salvaje, añade 1 Sangre antigua (máx. 3); si la embestida se interrumpe antes de llegar, recupera su reutilización. Utilizable en cualquier forma.',
   'entities.abilities.renew.name': 'Gracia Persistente',
   'entities.abilities.renew.description':
-    'Sana al objetivo en {damage} durante 15 s, una vez cada 3 s. La sanación aumenta con el poder con hechizos.',
+    'Sana al objetivo en {damage} durante 15 s, una vez cada 3 s. La sanación aumenta con el poder de sanación.',
   'entities.abilities.mind_blast.name': 'Fractura Mental',
   'entities.abilities.mind_blast.description':
     'Inflige {damage} de daño de Sombra. El daño aumenta con el poder con hechizos. Sombra ata a un objetivo con tu Endecha de Descomposición como su Efigie, otorga 1 de Diezmo Sombrío y refleja un 30% del daño sobre hasta 3 enemigos más que lleven tu Endecha.',
   'entities.abilities.heal.name': 'Plegaria Solemne',
   'entities.abilities.heal.description':
-    'Sana a un objetivo aliado en {damage}. La sanación aumenta con el poder con hechizos.',
+    'Sana a un objetivo aliado en {damage}. La sanación aumenta con el poder de sanación.',
   'entities.abilities.mind_flay.name': 'Letanía de Aflicción',
   'entities.abilities.mind_flay.description':
     'Canaliza durante 3 s, infligiendo {damage} de daño de Sombra cada segundo. El daño aumenta con el poder con hechizos.',
   'entities.abilities.flash_heal.name': 'Plegaria Urgente',
   'entities.abilities.flash_heal.description':
-    'Sana a un objetivo aliado en {damage}. La sanación aumenta con el poder con hechizos.',
+    'Sana a un objetivo aliado en {damage}. La sanación aumenta con el poder de sanación.',
   'entities.abilities.lightning_bolt.name': 'Arco Eléctrico',
   'entities.abilities.lightning_bolt.description':
     'Inflige {damage} de daño de Naturaleza. El daño aumenta con el poder con hechizos. Elemental: un impacto otorga 1 de Trueno.',
@@ -9549,7 +9549,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Brotan espinas de un objetivo amistoso durante 10 min. Cada golpe cuerpo a cuerpo contra el objetivo inflige {buff} de daño de Naturaleza al atacante.',
   'entities.abilities.entangling_roots.name': 'Raíces Aferradoras',
   'entities.abilities.entangling_roots.description':
-    'Inmoviliza al objetivo en el sitio durante hasta 12 s. Los rangos superiores también infligen daño de Naturaleza durante 12 s.',
+    'Inmoviliza al objetivo en el sitio durante hasta 12 s. En su segundo rango, también inflige 32 de daño de Naturaleza durante 12 s, que aumenta con el poder con hechizos.',
   'entities.abilities.bear_form.name': 'Forma de Bruin',
   'entities.abilities.bear_form.description':
     'Adoptas forma de oso: armadura +110%, salud máxima +30%, poder de ataque +15 más 1,5 por punto de Agilidad, tus ataques generan ira y un 30% más de amenaza. Golpeas el doble de rápido con la mitad de daño por golpe, y cada golpe genera el doble de ira. Cambiar a cualquier forma otorga Zancada Trotadora, un breve aumento de velocidad de movimiento. Lánzala de nuevo para volver a la forma de lanzador.',
@@ -9672,7 +9672,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Unge a un objetivo aliado, aumentando su daño, su sanación y su velocidad de lanzamiento un 20% durante 15 s.',
   'entities.abilities.holy_nova.name': 'Cántico Solar',
   'entities.abilities.holy_nova.description':
-    'Sana a los aliados en 10 m en {damage} e inflige de 24 a 30 de daño Sagrado a los enemigos de esa misma área. Ambas cantidades aumentan con el poder con hechizos. (Base de Sagrado)',
+    'Sana a los aliados en 10 m en {damage} e inflige de 24 a 30 de daño Sagrado a los enemigos de esa misma área. La sanación aumenta con el poder de sanación y el daño con el poder con hechizos. (Base de Sagrado)',
   'entities.abilities.shadowform.name': 'Velo Crepuscular',
   'entities.abilities.shadowform.description':
     'Entras en el Velo Crepuscular y aumentas tu daño de Sombras un 25%. Lanzar un hechizo de sanación lo termina. Lanza el Velo Crepuscular de nuevo para abandonarlo. (Distintivo de Sombra)',
@@ -15274,7 +15274,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.multi_shot.description':
     'Dispara una salva al área objetivo e inflige {damage} de daño físico a los enemigos a 8 yardas o menos. (talento de Cazador)',
   'entities.abilities.prayer_of_healing.description':
-    'Sana a los aliados en 30 m en {damage}. La sanación aumenta con el poder con hechizos. (Sagrado)',
+    'Sana a los aliados en 30 m en {damage}. La sanación aumenta con el poder de sanación. (Sagrado)',
   'entities.abilities.preparation.description':
     'Termina el tiempo de reutilización de Sprint, Evasión y Esfumarse. (talento de Pícaro)',
   'entities.abilities.presence_of_mind.description':
@@ -16487,7 +16487,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.choir_of_deliverance.name': 'Coro de Liberación',
   'entities.abilities.scouring_mercy.name': 'Misericordia Purgante',
   'entities.abilities.aegis_first_dawn.description':
-    'Canaliza una cúpula sagrada de 10 m a tu alrededor. Los jugadores aliados que estén dentro y en tu línea de visión reciben un 50% menos de daño y se sanan de 35 a 45 cada segundo. Completar la canalización los sana de 120 a 150 adicionales y les otorga un 30% de velocidad de movimiento durante 4 s. La sanación aumenta con el poder de sanación.',
+    'Canaliza una cúpula sagrada de 10 m a tu alrededor. Los jugadores aliados que estén dentro y en tu línea de visión reciben un 50% menos de daño y se sanan {aegisTick} cada segundo. Completar la canalización los sana {aegisFinal} adicionales y les otorga un 30% de velocidad de movimiento durante 4 s. La sanación aumenta con el poder de sanación.',
   'entities.abilities.aura_mastery.description':
     'Durante 8 s, triplica todas las Devociones del Bastión y Auras de Represalia activas en tu grupo: la Devoción del Bastión reduce el daño recibido un 15%, y el Aura de Represalia inflige el triple de su daño Sagrado normal. Los usos repetidos se renuevan en lugar de acumularse.',
   'entities.abilities.bastion_rite.description':
@@ -16557,7 +16557,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.vowkeeper_strike.description':
     'Golpea por el daño de arma más {damage} de daño Físico con gran amenaza, y genera 1 de Devoción. Un golpe certero tiene un 20% de probabilidad de otorgar Represalia Solar durante 8 s; cada bloqueo certero tiene un 25%. La Represalia Solar la consume tu próximo Disco Solar (sin coste de maná, sin tiempo de reutilización, 20% más de daño), Martillo de Gracia (sin tiempo de reutilización, te sana por el 100% del daño infligido) o Luz Reparadora (instantánea). La Ascensión además te protege con un escudo del 6% de tu salud máxima durante 6 s.',
   'entities.abilities.choir_of_deliverance.description':
-    'Canaliza durante 6 s y sana a los miembros del grupo en un radio de 30 metros por {damage} cada 2 s. La sanación aumenta con el poder con hechizos.',
+    'Canaliza durante 6 s y te sana a ti y a cada objetivo aliado en un radio de 30 metros y en tu línea de visión por {damage} cada 2 s. La sanación aumenta con el poder de sanación.',
   'entities.abilities.bloodhook.name': 'Garfio Sangriento',
   'entities.abilities.bloodtrail_assault.name': 'Asalto del Rastro de Sangre',
   'entities.abilities.cold_focus.name': 'Concentración Gélida',

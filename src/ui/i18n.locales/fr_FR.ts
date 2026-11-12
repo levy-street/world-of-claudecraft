@@ -6032,7 +6032,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.perfect_moment.name': 'Moment parfait',
   'entities.abilities.shatter.name': 'Ruine fragile',
   'entities.abilities.temporal_acceleration.description':
-    "Accélère le flux du temps pour votre groupe ou raid, augmentant la vitesse d'attaque, d'incantation et de canalisation de 30 % pendant 15 s. Les alliés récemment affectés par Accélération temporelle ou Tambours de guerre sont trop épuisés pour en bénéficier. (Chromancie)",
+    "Accélère le flux du temps pour les alliés de groupe ou de raid à moins de 40 m, augmentant leur vitesse d'attaque, d'incantation et de canalisation de 30 % pendant 15 s. Les alliés affectés ne peuvent plus bénéficier d'Accélération temporelle, de Tambours de guerre ni du Chœur des voleurs pendant 10 min. (Chromancie)",
   'entities.abilities.temporal_acceleration.name': 'Accélération temporelle',
   'entities.abilities.temporal_barrier.description':
     "Décale la cible d'un battement de coeur hors du présent, une coquille temporelle absorbant {damage} points de dégâts pendant 10 s avant que la chronologie ne se rétablisse.",
@@ -6646,7 +6646,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Frappe tous les ennemis devant vous à moins de 8 m pour {damage} points de dégâts Physiques. Au-delà de 5 cibles, chaque coup est réduit pour que le total égale 5 coups. Quand vous esquivez ou parez une attaque de mêlée d'une créature, vous avez 30% de chances que votre prochaine Vengeance dans les 10 s ne coûte aucune rage. (Protection)",
   'entities.abilities.revenge.name': 'Vengeance',
   'entities.abilities.sanguine_aura.description':
-    "Imprégnez votre arme du sang de vos ennemis : vous et chaque membre de mêlée du groupe, à n'importe quelle portée, gagnez 10% de vitesse d'attaque et infligez 10% de dégâts en plus pendant 20 s.",
+    "Imprégnez votre arme du sang de vos ennemis : vous et chaque Guerrier, Paladin, Voleur, Chaman et Druide de votre groupe, à n'importe quelle portée, gagnez 10% de vitesse d'attaque et infligez 10% de dégâts en plus pendant 20 s.",
   'entities.abilities.sanguine_aura.name': 'Aura sanguine',
   'entities.abilities.seasoned_soldier.description':
     'Vos attaques automatiques critiques génèrent 10% de rage en plus. (Armes)',
@@ -10154,7 +10154,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Inflige {damage} points de dégâts Sacrés. Les dégâts augmentent avec la puissance des sorts. Discipline soigne chaque membre du groupe lié blessé à moins de 30 m de 30% des dégâts infligés (70% avec Pacte jumeau). Si aucun n'est blessé, elle soigne à la place de 15% des dégâts le membre du groupe blessé ayant le moins de points de vie à moins de 30 m.",
   'entities.abilities.lesser_heal.name': 'Prière murmurée',
   'entities.abilities.lesser_heal.description':
-    'Rend {damage} points de vie à une cible alliée. Les soins augmentent avec la puissance des sorts.',
+    'Rend {damage} points de vie à une cible alliée. Les soins augmentent avec la puissance de soin.',
   'entities.abilities.power_word_fortitude.name': 'Litanie de résolution',
   'entities.abilities.power_word_fortitude.description':
     "Augmente l'Endurance de chaque membre du groupe de {buff}% pendant 30 min.",
@@ -10166,19 +10166,19 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Protège une cible alliée, absorbant {damage} points de dégâts pendant 30 s. Discipline lie aussi la cible pendant 30 s, remplaçant votre lien précédent (Pacte jumeau en conserve deux). Tant que des membres du groupe liés se trouvent à moins de 30 m de vous, votre Hymne purificateur et votre Miséricorde purifiante hostile les soignent de 30% des dégâts infligés.',
   'entities.abilities.renew.name': 'Grâce persistante',
   'entities.abilities.renew.description':
-    'Rend {damage} points de vie à la cible en 15 s, une fois toutes les 3 s. Les soins augmentent avec la puissance des sorts.',
+    'Rend {damage} points de vie à la cible en 15 s, une fois toutes les 3 s. Les soins augmentent avec la puissance de soin.',
   'entities.abilities.mind_blast.name': 'Fracture mentale',
   'entities.abilities.mind_blast.description':
     "Inflige {damage} points de dégâts d'Ombre. Les dégâts augmentent avec la puissance des sorts. Ombre lie une cible avec votre Chant funèbre de pourriture comme Effigie, accorde 1 Dîme funeste et renvoie 30% des dégâts sur jusqu'à 3 autres ennemis portant votre Chant funèbre.",
   'entities.abilities.heal.name': 'Prière solennelle',
   'entities.abilities.heal.description':
-    'Rend {damage} points de vie à une cible alliée. Les soins augmentent avec la puissance des sorts.',
+    'Rend {damage} points de vie à une cible alliée. Les soins augmentent avec la puissance de soin.',
   'entities.abilities.mind_flay.name': 'Litanie du malheur',
   'entities.abilities.mind_flay.description':
     "Canalise pendant 3 s, infligeant {damage} points de dégâts d'Ombre chaque seconde. Les dégâts augmentent avec la puissance des sorts.",
   'entities.abilities.flash_heal.name': 'Prière urgente',
   'entities.abilities.flash_heal.description':
-    'Rend {damage} points de vie à une cible alliée. Les soins augmentent avec la puissance des sorts.',
+    'Rend {damage} points de vie à une cible alliée. Les soins augmentent avec la puissance de soin.',
   'entities.abilities.lightning_bolt.name': "Éclair d'arc",
   'entities.abilities.lightning_bolt.description':
     'Inflige {damage} points de dégâts de Nature. Les dégâts augmentent avec la puissance des sorts. Élémentaire : un coup au but accorde 1 Tonnerre.',
@@ -10256,7 +10256,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Des épines jaillissent d'une cible alliée pendant 10 min. Chaque coup de mêlée porté contre la cible inflige {buff} points de dégâts de Nature à l'attaquant.",
   'entities.abilities.entangling_roots.name': 'Racines agrippantes',
   'entities.abilities.entangling_roots.description':
-    'Enracine la cible sur place pendant 12 s au maximum. Les rangs supérieurs infligent aussi des dégâts de Nature sur 12 s.',
+    'Enracine la cible sur place pendant 12 s au maximum. Au deuxième rang, inflige aussi 32 points de dégâts de Nature sur 12 s, augmentés par la puissance des sorts.',
   'entities.abilities.bear_form.name': 'Forme de Bruin',
   'entities.abilities.bear_form.description':
     "Prenez la forme d'un ours : armure +110%, points de vie maximum +30%, puissance d'attaque +15 plus 1,5 par point d'Agilité, vos attaques génèrent de la rage et 30% de menace en plus. Vous frappez deux fois plus vite pour moitié moins de dégâts par coup, et chaque coup génère deux fois plus de rage. Se transformer, quelle que soit la forme, confère Foulée bondissante, une brève poussée de vitesse de déplacement. Relancez pour reprendre votre forme de lanceur.",
@@ -10386,7 +10386,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Oint une cible alliée et augmente ses dégâts, ses soins et sa vitesse d'incantation de 20% pendant 15 s.",
   'entities.abilities.holy_nova.name': 'Cantique solaire',
   'entities.abilities.holy_nova.description':
-    'Soigne les alliés dans un rayon de 10 m de {damage} et inflige 24 à 30 points de dégâts Sacrés aux ennemis de la même zone. Les deux montants augmentent avec la puissance des sorts. (Base Sacré)',
+    'Soigne les alliés dans un rayon de 10 m de {damage} et inflige 24 à 30 points de dégâts Sacrés aux ennemis de la même zone. Les soins augmentent avec la puissance de soin et les dégâts avec la puissance des sorts. (Base Sacré)',
   'entities.abilities.shadowform.name': 'Voile crépusculaire',
   'entities.abilities.shadowform.description':
     "Entrez dans le Voile crépusculaire, augmentant vos dégâts d'Ombre de 25%. Lancer un sort de soins y met fin. Relancez le Voile crépusculaire pour en sortir. (Signature Ombre)",
@@ -15566,7 +15566,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.multi_shot.description':
     'Décoche une volée sur la zone ciblée, infligeant {damage} points de dégâts physiques aux ennemis dans un rayon de 8 yards. (talent de Chasseur)',
   'entities.abilities.prayer_of_healing.description':
-    'Soigne les alliés dans un rayon de 30 m de {damage}. Les soins augmentent avec la puissance des sorts. (Sacré)',
+    'Soigne les alliés dans un rayon de 30 m de {damage}. Les soins augmentent avec la puissance de soin. (Sacré)',
   'entities.abilities.preparation.description':
     'Met fin au temps de recharge de Sprint, Évasion et Disparition. (talent de Voleur)',
   'entities.abilities.presence_of_mind.description':
@@ -16710,7 +16710,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.choir_of_deliverance.name': 'Chœur de délivrance',
   'entities.abilities.scouring_mercy.name': 'Miséricorde purifiante',
   'entities.abilities.aegis_first_dawn.description':
-    "Canalise un dôme sacré de 10 m autour de vous. Les joueurs alliés à l'intérieur et dans votre ligne de vue subissent 50% de dégâts en moins et sont soignés de 35 à 45 chaque seconde. Terminer la canalisation les soigne de 120 à 150 supplémentaires et octroie 30% de vitesse de déplacement pendant 4 s. Les soins augmentent avec la puissance de soin.",
+    "Canalise un dôme sacré de 10 m autour de vous. Les joueurs alliés à l'intérieur et dans votre ligne de vue subissent 50% de dégâts en moins et sont soignés de {aegisTick} chaque seconde. Terminer la canalisation les soigne de {aegisFinal} supplémentaires et octroie 30% de vitesse de déplacement pendant 4 s. Les soins augmentent avec la puissance de soin.",
   'entities.abilities.aura_mastery.description':
     "Pendant 8 s, triple l'effet de chaque Dévotion du bastion et Aura de représailles active dans votre groupe : la Dévotion du bastion réduit les dégâts subis de 15%, et l'Aura de représailles inflige trois fois ses dégâts Sacrés normaux. Les utilisations répétées rafraîchissent l'effet au lieu de se cumuler.",
   'entities.abilities.bastion_rite.description':
@@ -16780,7 +16780,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.vowkeeper_strike.description':
     "Frappe pour les dégâts de l'arme plus {damage} points de dégâts Physiques avec une menace élevée, et génère 1 Dévotion. Une frappe réussie a 20% de chances d'octroyer les Représailles solaires pendant 8 s ; chaque blocage réussi, 25%. Les Représailles solaires sont consommées par votre prochain Disque solaire (sans coût en mana, sans temps de recharge, 20% de dégâts en plus), Marteau de grâce (sans temps de recharge, vous soigne de 100% des dégâts infligés) ou Lumière guérisseuse (instantanée). L'Ascension vous octroie aussi un bouclier de 6% de vos points de vie maximum pendant 6 s.",
   'entities.abilities.choir_of_deliverance.description':
-    'Canalise pendant 6 s et soigne les membres du groupe dans un rayon de 30 mètres de {damage} toutes les 2 s. Le soin augmente avec la puissance des sorts.',
+    'Canalise pendant 6 s et vous soigne, ainsi que chaque cible alliée dans un rayon de 30 mètres et dans votre ligne de vue, de {damage} toutes les 2 s. Les soins augmentent avec la puissance de soin.',
 
   // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
   // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.

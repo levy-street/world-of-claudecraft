@@ -5808,7 +5808,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.perfect_moment.name': 'Khoảnh Khắc Hoàn Hảo',
   'entities.abilities.shatter.name': 'Hủy Diệt Giòn Tan',
   'entities.abilities.temporal_acceleration.description':
-    'Tăng tốc dòng chảy thời gian cho nhóm hoặc đột kích của bạn, tăng tốc độ tấn công, thi triển phép và kênh phép lên 30% trong 15 giây. Đồng minh vừa bị ảnh hưởng bởi Tăng Tốc Thời Gian hoặc Trống Chiến sẽ quá kiệt sức để nhận lợi ích. (Thời Thuật)',
+    'Tăng tốc dòng chảy thời gian cho đồng minh trong nhóm hoặc đội đột kích ở trong 40 mét, tăng 30% tốc độ tấn công, niệm chú và dẫn phép trong 15 giây. Đồng minh chịu ảnh hưởng không thể hưởng lợi từ Gia Tốc Thời Gian, Trống Chiến hay Hợp Xướng Đạo Tặc lần nữa trong 10 phút. (Thời Thuật)',
   'entities.abilities.temporal_acceleration.name': 'Gia Tốc Thời Gian',
   'entities.abilities.temporal_barrier.description':
     'Dịch chuyển mục tiêu ra khỏi thực tại một nhịp tim, một lớp bọc thời gian hấp thụ {damage} sát thương trong 10 giây trước khi dòng thời gian bật trở lại.',
@@ -6303,7 +6303,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Giáng đòn lên mọi kẻ địch phía trước bạn trong 8 mét gây {damage} sát thương Vật Lý. Trên 5 mục tiêu, sát thương mỗi đòn bị giảm sao cho tổng bằng 5 đòn. Khi bạn né hoặc gạt đòn cận chiến của một sinh vật, bạn có 30% cơ hội khiến Phục Thù kế tiếp trong 10 giây không tốn nộ khí. (Hộ Vệ)',
   'entities.abilities.revenge.name': 'Phục Thù',
   'entities.abilities.sanguine_aura.description':
-    'Tẩm máu quân thù lên vũ khí của bạn: bạn và mọi thành viên nhóm cận chiến, ở bất kỳ khoảng cách nào, nhận thêm 10% tốc độ tấn công và gây thêm 10% sát thương trong 20 giây.',
+    'Tẩm máu quân thù lên vũ khí của bạn: bạn và mọi Chiến Binh, Thánh Kỵ Sĩ, Đạo Tặc, Shaman và Druid trong nhóm, ở bất kỳ khoảng cách nào, nhận thêm 10% tốc độ tấn công và gây thêm 10% sát thương trong 20 giây.',
   'entities.abilities.sanguine_aura.name': 'Hào Quang Huyết Sắc',
   'entities.abilities.seasoned_soldier.description':
     'Các đòn đánh thường chí mạng của bạn tạo nộ khí nhiều hơn 10%. (nhánh Vũ Khí)',
@@ -8044,7 +8044,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.enrage.description': 'Lập tức tạo ra 20 nộ khí. Chỉ dùng được ở Bruin Form.',
   'entities.abilities.enrage.name': 'Khơi Bùng',
   'entities.abilities.entangling_roots.description':
-    'Trói chân mục tiêu tại chỗ tối đa 12 giây. Các bậc cao hơn còn gây sát thương Tự Nhiên trong 12 giây.',
+    'Trói chân mục tiêu tại chỗ tối đa 12 giây. Ở bậc thứ hai, còn gây 32 sát thương Tự Nhiên trong 12 giây, tăng theo Sức Mạnh Phép Thuật.',
   'entities.abilities.entangling_roots.name': 'Rễ Siết Chặt',
   'entities.abilities.evasion.description': 'Tăng tỷ lệ né đòn của bạn thêm 50% trong 15 giây.',
   'entities.abilities.evasion.name': 'Bước Chân Ma',
@@ -8089,7 +8089,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Thấm vào vũ khí của bạn trong 30 phút. Mỗi cú vung gây thêm {damage} sát thương Hỏa.',
   'entities.abilities.flametongue_weapon.name': 'Vũ Khí Khắc Hỏa',
   'entities.abilities.flash_heal.description':
-    'Hồi {damage} máu cho một mục tiêu đồng minh. Lượng hồi tăng theo Sức Mạnh Phép Thuật.',
+    'Hồi {damage} máu cho một mục tiêu đồng minh. Lượng hồi tăng theo Sức Mạnh Trị Liệu.',
   'entities.abilities.flash_heal.name': 'Lời Nguyện Khẩn Cấp',
   'entities.abilities.flash_of_light.description':
     'Một tia Thánh Quang nhanh và tiết kiệm, hồi {damage} máu cho một mục tiêu đồng minh. Việc hồi máu tạo ra 1 Sùng Tín, kể cả khi chưa có chuyên môn.',
@@ -8125,7 +8125,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Làm bị thương kẻ địch gây {damage} sát thương, làm chậm di chuyển của nó 50% trong 15 giây.',
   'entities.abilities.hamstring.name': 'Nhát Cắt Què Chân',
   'entities.abilities.heal.description':
-    'Hồi {damage} máu cho một mục tiêu đồng minh. Lượng hồi tăng theo Sức Mạnh Phép Thuật.',
+    'Hồi {damage} máu cho một mục tiêu đồng minh. Lượng hồi tăng theo Sức Mạnh Trị Liệu.',
   'entities.abilities.heal.name': 'Lời Nguyện Trang Nghiêm',
   'entities.abilities.healing_touch.description': 'Trị liệu cho đồng minh {damage} máu.',
   'entities.abilities.healing_touch.specNote_restoration':
@@ -8163,7 +8163,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Hồi cho mục tiêu đồng minh {damage}% máu tối đa của bạn và tạo 1 Sùng Tín khi nó hồi được máu.',
   'entities.abilities.lay_on_hands.name': 'Nghi Thức Cuối Cùng',
   'entities.abilities.lesser_heal.description':
-    'Hồi {damage} máu cho một mục tiêu đồng minh. Lượng hồi tăng theo Sức Mạnh Phép Thuật.',
+    'Hồi {damage} máu cho một mục tiêu đồng minh. Lượng hồi tăng theo Sức Mạnh Trị Liệu.',
   'entities.abilities.lesser_heal.name': 'Lời Nguyện Thì Thầm',
   'entities.abilities.life_tap.description':
     'Chuyển hóa {damage} máu thành {damage} mana (nhiều hơn 50% mana với Tín Dụng Máu). Thất bại nếu bạn có {damage} máu hoặc ít hơn.',
@@ -8227,7 +8227,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.raptor_strike.name': 'Đòn Moi Ruột',
   'entities.abilities.regrowth.name': 'Nở Hoa Lần Hai',
   'entities.abilities.renew.description':
-    'Hồi {damage} máu cho mục tiêu trong 15 giây, mỗi 3 giây một lần. Lượng hồi tăng theo Sức Mạnh Phép Thuật.',
+    'Hồi {damage} máu cho mục tiêu trong 15 giây, mỗi 3 giây một lần. Lượng hồi tăng theo Sức Mạnh Trị Liệu.',
   'entities.abilities.renew.name': 'Ân Điển Vương Vấn',
   'entities.abilities.retribution_aura.description':
     'Bao bọc bạn và nhóm của bạn trong năng lượng thánh cho đến khi chết hoặc bị thay thế. Kẻ địch đánh cận chiến một đồng minh chịu ảnh hưởng sẽ nhận {buff} sát thương Thánh, và đồng minh chịu ảnh hưởng gây thêm {buff} sát thương Thánh bằng đòn đánh tự động.',
@@ -8365,7 +8365,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Xức dầu cho một mục tiêu đồng minh, tăng 20% sát thương, lượng hồi và tốc độ niệm chú trong 15 giây.',
   'entities.abilities.holy_nova.name': 'Khúc Ca Mặt Trời',
   'entities.abilities.holy_nova.description':
-    'Hồi {damage} máu cho đồng minh trong 10 m và gây 24 tới 30 sát thương Thần Thánh lên kẻ địch trong cùng khu vực. Cả hai con số đều tăng theo Sức Mạnh Phép Thuật. (Nền tảng Thần Thánh)',
+    'Hồi {damage} máu cho đồng minh trong 10 m và gây 24 tới 30 sát thương Thần Thánh lên kẻ địch trong cùng khu vực. Lượng hồi tăng theo Sức Mạnh Trị Liệu, sát thương tăng theo Sức Mạnh Phép Thuật. (Nền tảng Thần Thánh)',
   'entities.abilities.shadowform.name': 'Màn Chạng Vạng',
   'entities.abilities.shadowform.description':
     'Bước vào Màn Chạng Vạng, tăng 25% sát thương Bóng Tối của bạn. Niệm phép hồi máu sẽ kết thúc nó. Niệm lại Màn Chạng Vạng để rời khỏi. (Đặc trưng Hắc Ám)',
@@ -14664,7 +14664,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.multi_shot.description':
     'Bắn một loạt tên vào khu vực mục tiêu, gây {damage} sát thương Vật lý lên kẻ địch trong vòng 8 yard. (thiên phú Thợ săn)',
   'entities.abilities.prayer_of_healing.description':
-    'Hồi {damage} máu cho đồng minh trong 30 m. Lượng hồi tăng theo Sức Mạnh Phép Thuật. (Thần Thánh)',
+    'Hồi {damage} máu cho đồng minh trong 30 m. Lượng hồi tăng theo Sức Mạnh Trị Liệu. (Thần Thánh)',
   'entities.abilities.preparation.description':
     'Kết thúc thời gian hồi của Chạy nước rút, Né tránh và Biến mất. (thiên phú Đạo tặc)',
   'entities.abilities.presence_of_mind.description':
@@ -15904,7 +15904,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.choir_of_deliverance.name': 'Hợp Xướng Giải Thoát',
   'entities.abilities.scouring_mercy.name': 'Từ Bi Thanh Tẩy',
   'entities.abilities.aegis_first_dawn.description':
-    'Dẫn phép một mái vòm thánh 10 m quanh bạn. Người chơi đồng minh bên trong và trong tầm nhìn của bạn nhận ít hơn 50% sát thương và được hồi 35 đến 45 máu mỗi giây. Hoàn tất việc dẫn phép sẽ hồi thêm 120 đến 150 cho họ và ban 30% tốc độ di chuyển trong 4 giây. Lượng hồi máu tăng theo sức mạnh trị liệu.',
+    'Dẫn phép một mái vòm thánh 10 m quanh bạn. Người chơi đồng minh bên trong và trong tầm nhìn của bạn nhận ít hơn 50% sát thương và được hồi {aegisTick} máu mỗi giây. Hoàn tất việc dẫn phép sẽ hồi thêm {aegisFinal} cho họ và ban 30% tốc độ di chuyển trong 4 giây. Lượng hồi tăng theo Sức Mạnh Trị Liệu.',
   'entities.abilities.aura_mastery.description':
     'Trong 8 giây, nhân ba mọi Sùng Tín Thành Lũy và Hào Quang Báo Đền đang hoạt động trong nhóm bạn: Sùng Tín Thành Lũy giảm 15% sát thương phải chịu, còn Hào Quang Báo Đền gây sát thương Thánh gấp ba lần bình thường. Dùng nhiều lần sẽ làm mới thay vì cộng dồn.',
   'entities.abilities.bastion_rite.description':
@@ -15973,7 +15973,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.vowkeeper_strike.description':
     'Đánh gây sát thương vũ khí cộng thêm {damage} sát thương Vật Lý với mức đe dọa cao, và tạo 1 Sùng Tín. Một đòn thành công có 20% cơ hội ban Báo Thù Nhật Quang trong 8 giây; mỗi lần đỡ đòn thành công có 25%. Báo Thù Nhật Quang được tiêu bởi Đĩa Nhật Quang kế tiếp của bạn (không tốn mana, không hồi chiêu, gây thêm 20% sát thương), Búa Ân Điển (không hồi chiêu, hồi cho bạn 100% sát thương đã gây) hoặc Thánh Quang Chữa Lành (tức thời). Thăng Thiên còn tạo lá chắn bằng 6% máu tối đa của bạn trong 6 giây.',
   'entities.abilities.choir_of_deliverance.description':
-    'Vận phép trong 6 giây, hồi máu cho các thành viên trong nhóm trong phạm vi 30 mét {damage} mỗi 2 giây. Lượng hồi tăng theo sức mạnh phép thuật.',
+    'Vận phép trong 6 giây, hồi {damage} máu cho bạn và mọi mục tiêu đồng minh trong phạm vi 30 mét và trong tầm nhìn của bạn mỗi 2 giây. Lượng hồi tăng theo Sức Mạnh Trị Liệu.',
 
   // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
   // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.

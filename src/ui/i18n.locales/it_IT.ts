@@ -5955,7 +5955,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.perfect_moment.name': 'Momento Perfetto',
   'entities.abilities.shatter.name': 'Rovina Fragile',
   'entities.abilities.temporal_acceleration.description':
-    'Accelera il flusso del tempo per il tuo gruppo o incursione, aumentando la velocità di attacco, lancio e canalizzazione del 30% per 15 secondi. Gli alleati colpiti di recente da Accelerazione Temporale o Tamburi di Guerra sono troppo esausti per beneficiarne. (Cronomanzia)',
+    'Accelera il flusso del tempo per gli alleati di gruppo o incursione entro 40 m, aumentando la velocità di attacco, lancio e canalizzazione del 30% per 15 sec. Gli alleati colpiti non possono beneficiare di nuovo di Accelerazione Temporale, Tamburi di Guerra o Coro dei ladri per 10 min. (Cronomanzia)',
   'entities.abilities.temporal_acceleration.name': 'Accelerazione Temporale',
   'entities.abilities.temporal_barrier.description':
     'Sposta il bersaglio di un istante fuori dal presente: un guscio temporale assorbe {damage} danni per 10 secondi prima che la linea del tempo scatti di ritorno.',
@@ -6513,7 +6513,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Colpisce tutti i nemici davanti a te entro 8 m per {damage} danni Fisici. Oltre i 5 bersagli, ogni colpo viene ridotto in modo che il totale equivalga a 5 colpi. Quando schivi o pari un attacco in mischia di una creatura, hai il 30% di probabilità che la tua prossima Vendetta entro 10 sec non costi rabbia. (Protezione)',
   'entities.abilities.revenge.name': 'Vendetta',
   'entities.abilities.sanguine_aura.description':
-    "Impregni la tua arma con il sangue dei tuoi nemici: tu e ogni membro del gruppo in mischia, a qualsiasi distanza, ottenete il 10% di velocità d'attacco e infliggete il 10% di danni in più per 20 sec.",
+    "Impregni la tua arma con il sangue dei tuoi nemici: tu e ogni Guerriero, Paladino, Ladro, Sciamano e Druido del tuo gruppo, a qualsiasi distanza, ottenete il 10% di velocità d'attacco e infliggete il 10% di danni in più per 20 sec.",
   'entities.abilities.sanguine_aura.name': 'Aura Sanguigna',
   'entities.abilities.seasoned_soldier.description':
     'I tuoi attacchi automatici critici generano il 10% di rabbia in più. (Armi)',
@@ -9584,7 +9584,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Infligge {damage} danni Sacri. Il danno aumenta con il Potere Magico. Disciplina cura ogni membro del gruppo ferito e collegato entro 30 m del 30% dei danni inflitti (70% con Patto Gemello). Se nessuno è ferito, cura invece del 15% dei danni il membro del gruppo ferito con meno salute entro 30 m.',
   'entities.abilities.lesser_heal.name': 'Preghiera Sussurrata',
   'entities.abilities.lesser_heal.description':
-    'Cura un bersaglio alleato di {damage}. La cura aumenta con il Potere Magico.',
+    'Cura un bersaglio alleato di {damage}. La cura aumenta con il Potere di Guarigione.',
   'entities.abilities.power_word_fortitude.name': 'Litania della Fermezza',
   'entities.abilities.power_word_fortitude.description':
     'Aumenta la Costituzione di ogni membro del gruppo del {buff}% per 30 min.',
@@ -9596,19 +9596,19 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Protegge un bersaglio alleato, assorbendo {damage} danni per 30 sec. Disciplina collega inoltre il bersaglio per 30 sec, sostituendo il collegamento precedente (Patto Gemello ne mantiene due). Finché i membri del gruppo collegati si trovano entro 30 m da te, il tuo Inno Purificatore e la Misericordia Purificatrice ostile li curano del 30% dei danni inflitti.',
   'entities.abilities.renew.name': 'Grazia Persistente',
   'entities.abilities.renew.description':
-    "Cura il bersaglio di {damage} nell'arco di 15 sec, una volta ogni 3 sec. La cura aumenta con il Potere Magico.",
+    "Cura il bersaglio di {damage} nell'arco di 15 sec, una volta ogni 3 sec. La cura aumenta con il Potere di Guarigione.",
   'entities.abilities.mind_blast.name': 'Frattura Mentale',
   'entities.abilities.mind_blast.description':
     'Infligge {damage} danni da Ombra. Il danno aumenta con il Potere Magico. Ombra lega un bersaglio con il vostro Canto Funebre della Putrefazione come sua Effigie, concede 1 Decima Tenebrosa e riecheggia il 30% del danno su un massimo di 3 altri nemici che portano il vostro Canto Funebre.',
   'entities.abilities.heal.name': 'Preghiera Solenne',
   'entities.abilities.heal.description':
-    'Cura un bersaglio alleato di {damage}. La cura aumenta con il Potere Magico.',
+    'Cura un bersaglio alleato di {damage}. La cura aumenta con il Potere di Guarigione.',
   'entities.abilities.mind_flay.name': 'Litania della Sventura',
   'entities.abilities.mind_flay.description':
     'Incanala per 3 sec, infliggendo {damage} danni da Ombra ogni secondo. Il danno aumenta con il Potere Magico.',
   'entities.abilities.flash_heal.name': 'Preghiera Urgente',
   'entities.abilities.flash_heal.description':
-    'Cura un bersaglio alleato di {damage}. La cura aumenta con il Potere Magico.',
+    'Cura un bersaglio alleato di {damage}. La cura aumenta con il Potere di Guarigione.',
   'entities.abilities.lightning_bolt.name': 'Dardo Folgorante',
   'entities.abilities.lightning_bolt.description':
     'Infligge {damage} danni da Natura. Il danno aumenta con il Potere Magico. Elementale: un colpo a segno concede 1 Tuono.',
@@ -9686,7 +9686,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Dal bersaglio alleato spuntano spine per 10 min. Ogni colpo in mischia contro il bersaglio infligge {buff} danni da Natura all'attaccante.",
   'entities.abilities.entangling_roots.name': 'Radici Avvinghianti',
   'entities.abilities.entangling_roots.description':
-    'Radica il bersaglio sul posto per un massimo di 12 sec. I ranghi superiori infliggono anche danni da Natura in 12 sec.',
+    'Radica il bersaglio sul posto per un massimo di 12 sec. Al secondo rango infligge anche 32 danni da Natura in 12 sec, aumentati dal Potere Magico.',
   'entities.abilities.bear_form.name': 'Forma di Bruin',
   'entities.abilities.bear_form.description':
     "Ti trasformi in orso: armatura +110%, salute massima +30%, potenza d'attacco +15 più 1,5 per punto di Agilità, i tuoi attacchi generano rabbia e il 30% di minaccia in più. Colpisci il doppio più velocemente con metà danni per colpo, e ogni colpo genera il doppio della rabbia. Assumere una forma qualsiasi concede Passo Felpato, una breve raffica di velocità di movimento. Lanciala di nuovo per tornare alla forma da incantatore.",
@@ -9816,7 +9816,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Unge un bersaglio alleato, aumentando del 20% i danni, le cure e la velocità di lancio per 15 sec.',
   'entities.abilities.holy_nova.name': 'Cantico Solare',
   'entities.abilities.holy_nova.description':
-    'Cura gli alleati entro 10 m di {damage} e infligge da 24 a 30 danni Sacri ai nemici nella stessa area. Entrambi gli importi aumentano con il Potere Magico. (Base di Sacro)',
+    'Cura gli alleati entro 10 m di {damage} e infligge da 24 a 30 danni Sacri ai nemici nella stessa area. La cura aumenta con il Potere di Guarigione e il danno con il Potere Magico. (Base di Sacro)',
   'entities.abilities.shadowform.name': 'Velo Crepuscolare',
   'entities.abilities.shadowform.description':
     'Entri in Velo Crepuscolare, aumentando del 25% i tuoi danni da Ombra. Lanciare una magia di cura lo termina. Lancia di nuovo Velo Crepuscolare per uscirne. (Distintivo di Vespers)',
@@ -15260,7 +15260,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.multi_shot.description':
     'Scaglia una salva sull’area bersaglio, infliggendo {damage} danni fisici ai nemici entro 8 iarde. (talento del Cacciatore)',
   'entities.abilities.prayer_of_healing.description':
-    'Cura gli alleati entro 30 m di {damage}. La cura aumenta con il Potere Magico. (Sacro)',
+    'Cura gli alleati entro 30 m di {damage}. La cura aumenta con il Potere di Guarigione. (Sacro)',
   'entities.abilities.preparation.description':
     'Azzera il tempo di recupero di Scatto, Evasione e Sparizione. (talento del Ladro)',
   'entities.abilities.presence_of_mind.description':
@@ -16368,7 +16368,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.choir_of_deliverance.name': 'Coro della Liberazione',
   'entities.abilities.scouring_mercy.name': 'Misericordia Purificatrice',
   'entities.abilities.aegis_first_dawn.description':
-    'Canalizza una cupola sacra di 10 m attorno a te. I giocatori alleati al suo interno e nella tua linea di vista subiscono il 50% di danni in meno e vengono curati di 35-45 ogni secondo. Completare la canalizzazione li cura di ulteriori 120-150 e concede il 30% di velocità di movimento per 4 sec. La cura aumenta con il Potere di Guarigione.',
+    'Canalizza una cupola sacra di 10 m attorno a te. I giocatori alleati al suo interno e nella tua linea di vista subiscono il 50% di danni in meno e vengono curati di {aegisTick} ogni secondo. Completare la canalizzazione li cura di ulteriori {aegisFinal} e concede il 30% di velocità di movimento per 4 sec. La cura aumenta con il Potere di Guarigione.',
   'entities.abilities.aura_mastery.description':
     "Per 8 sec, triplica ogni Devozione del Bastione e Aura della Rivalsa attiva nel tuo gruppo: la Devozione del Bastione riduce i danni subiti del 15%, e l'Aura della Rivalsa infligge il triplo dei normali danni Sacri. Usi ripetuti rinnovano l'effetto invece di sommarsi.",
   'entities.abilities.bastion_rite.description':
@@ -16438,7 +16438,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.vowkeeper_strike.description':
     "Colpisce per i danni dell'arma più {damage} danni Fisici con minaccia elevata, e genera 1 Devozione. Un colpo riuscito ha il 20% di probabilità di concedere Rappresaglia Solare per 8 sec; ogni parata riuscita il 25%. Rappresaglia Solare viene consumata dal tuo prossimo Disco Solare (nessun costo in mana, nessun tempo di recupero, 20% di danni in più), Martello della Grazia (nessun tempo di recupero, ti cura del 100% dei danni inflitti) o Luce Risanatrice (istantanea). Ascensione ti protegge inoltre con uno scudo pari al 6% della tua salute massima per 6 sec.",
   'entities.abilities.choir_of_deliverance.description':
-    'Canalizza per 6 sec e cura i membri del gruppo entro 30 metri di {damage} ogni 2 sec. La cura aumenta con il potere magico.',
+    'Canalizza per 6 sec, curando te e ogni bersaglio alleato entro 30 metri e nella tua linea di vista di {damage} ogni 2 sec. La cura aumenta con il Potere di Guarigione.',
 
   // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
   // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.

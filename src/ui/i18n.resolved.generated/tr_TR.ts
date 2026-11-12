@@ -18018,7 +18018,7 @@ export const tr_TR: EnTranslations = {
       },
       "aegis_first_dawn": {
         "name": "İlk Şafağın Kalkanı",
-        "description": "Etrafında 10 m'lik kutsal bir kubbeyi kanalize eder. İçindeki ve görüş hattındaki dost oyuncular %50 daha az hasar alır ve her saniye 35 ila 45 iyileşir. Kanalı tamamlamak onları 120 ila 150 daha iyileştirir ve 4 sn boyunca %30 hareket hızı verir. İyileştirme, İyileştirme Gücü ile artar."
+        "description": "Etrafında 10 m'lik kutsal bir kubbeyi kanalize eder. İçindeki ve görüş hattındaki dost oyuncular %50 daha az hasar alır ve her saniye {aegisTick} iyileşir. Kanalı tamamlamak onları {aegisFinal} daha iyileştirir ve 4 sn boyunca %30 hareket hızı verir. İyileştirme, İyileştirme Gücü ile artar."
       },
       "vowkeeper_strike": {
         "name": "Yemin Bekçisi Vuruşu",
@@ -18163,7 +18163,7 @@ export const tr_TR: EnTranslations = {
       },
       "lesser_heal": {
         "name": "Fısıldanan Dua",
-        "description": "Dost bir hedefi {damage} iyileştirir. İyileştirme Büyü Gücü ile artar."
+        "description": "Dost bir hedefi {damage} iyileştirir. İyileştirme, İyileştirme Gücü ile artar."
       },
       "power_word_fortitude": {
         "name": "Azim Yakarışı",
@@ -18179,7 +18179,7 @@ export const tr_TR: EnTranslations = {
       },
       "renew": {
         "name": "Kalıcı Lütuf",
-        "description": "Hedefi 15 sn boyunca {damage} iyileştirir, her 3 sn'de bir kez. İyileştirme Büyü Gücü ile artar."
+        "description": "Hedefi 15 sn boyunca {damage} iyileştirir, her 3 sn'de bir kez. İyileştirme, İyileştirme Gücü ile artar."
       },
       "mind_blast": {
         "name": "Zihin Kırılması",
@@ -18187,7 +18187,7 @@ export const tr_TR: EnTranslations = {
       },
       "heal": {
         "name": "Vakur Dua",
-        "description": "Dost bir hedefi {damage} iyileştirir. İyileştirme Büyü Gücü ile artar."
+        "description": "Dost bir hedefi {damage} iyileştirir. İyileştirme, İyileştirme Gücü ile artar."
       },
       "mind_flay": {
         "name": "Keder Yakarışı",
@@ -18207,7 +18207,7 @@ export const tr_TR: EnTranslations = {
       },
       "flash_heal": {
         "name": "Acil Dua",
-        "description": "Dost bir hedefi {damage} iyileştirir. İyileştirme Büyü Gücü ile artar."
+        "description": "Dost bir hedefi {damage} iyileştirir. İyileştirme, İyileştirme Gücü ile artar."
       },
       "lightning_bolt": {
         "name": "Ark Oku",
@@ -18407,7 +18407,7 @@ export const tr_TR: EnTranslations = {
       },
       "entangling_roots": {
         "name": "Kavrayan Kökler",
-        "description": "Hedefi en fazla 12 sn boyunca olduğu yere köklendirir. Yüksek rütbeler ayrıca 12 sn boyunca Doğa hasarı verir."
+        "description": "Hedefi en fazla 12 sn boyunca olduğu yere köklendirir. İkinci rütbede ayrıca 12 sn boyunca Büyü Gücü ile artan 32 Doğa hasarı verir."
       },
       "bear_form": {
         "name": "Bruin Formu",
@@ -18695,7 +18695,7 @@ export const tr_TR: EnTranslations = {
       },
       "holy_nova": {
         "name": "Güneş İlahisi",
-        "description": "10 m içindeki müttefikleri {damage} iyileştirir ve aynı alandaki düşmanlara 24 ila 30 Kutsal hasar verir. Her iki miktar da Büyü Gücü ile artar. (Kutsal temeli)"
+        "description": "10 m içindeki müttefikleri {damage} iyileştirir ve aynı alandaki düşmanlara 24 ila 30 Kutsal hasar verir. İyileştirme İyileştirme Gücü ile, hasar ise Büyü Gücü ile artar. (Kutsal temeli)"
       },
       "shadowform": {
         "name": "Alacakaranlık Perdesi",
@@ -18898,7 +18898,7 @@ export const tr_TR: EnTranslations = {
       },
       "sanguine_aura": {
         "name": "Kan Aurası",
-        "description": "Silahını düşmanlarının kanıyla donatırsın: sen ve her yakın dövüşçü grup üyesi, menzil fark etmeksizin, 20 sn boyunca %10 saldırı hızı kazanır ve %10 daha fazla hasar verir."
+        "description": "Silahını düşmanlarının kanıyla donatırsın: sen ve gruptaki her Savaşçı, Paladin, Hırsız, Şaman ve Druid, menzil fark etmeksizin, 20 sn boyunca %10 saldırı hızı kazanır ve %10 daha fazla hasar verir."
       },
       "victory_rush": {
         "name": "Zafer Hücumu",
@@ -19099,7 +19099,7 @@ export const tr_TR: EnTranslations = {
       },
       "temporal_acceleration": {
         "name": "Zamansal Hızlanma",
-        "description": "Grubunuz veya akınınız için zamanın akışını hızlandırarak saldırı, büyü atma ve kanalize hızını 15 saniye boyunca %30 artırır. Yakın zamanda Zamansal Hızlanma veya Savaş Davulları'ndan etkilenen müttefikler bu etkiden yararlanamayacak kadar tükenmiştir. (Kronomansi)"
+        "description": "40 yarda içindeki grup veya akın müttefikleri için zamanın akışını hızlandırarak saldırı, büyü ve kanalize hızını 15 sn boyunca %30 artırır. Etkilenen müttefikler 10 dk boyunca Zamansal Hızlanma, Savaş Davulları veya Hırsızlar Korosu'ndan yeniden yararlanamaz. (Kronomansi)"
       },
       "perfect_moment": {
         "name": "Mükemmel An",
@@ -19119,7 +19119,7 @@ export const tr_TR: EnTranslations = {
       },
       "prayer_of_healing": {
         "name": "Koro Şifası",
-        "description": "30 m içindeki müttefikleri {damage} iyileştirir. İyileştirme Büyü Gücü ile artar. (Kutsal)"
+        "description": "30 m içindeki müttefikleri {damage} iyileştirir. İyileştirme, İyileştirme Gücü ile artar. (Kutsal)"
       },
       "preparation": {
         "name": "Acil Plan",
@@ -19236,7 +19236,7 @@ export const tr_TR: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Kurtuluş Korosu",
-        "description": "6 sn kanalize eder, 30 metre içindeki grup üyelerini her 2 saniyede {damage} kadar iyileştirir. İyileştirme büyü gücüyle artar.",
+        "description": "6 sn kanalize eder, sizi ve görüş hattınızdaki 30 yarda içindeki tüm dost hedefleri her 2 sn'de {damage} iyileştirir. İyileştirme, İyileştirme Gücü ile artar.",
         "specNote_shadow": "15 sn boyunca, düşmanların Gölge hasarın yüzünden kaybettiği canın %20'sini, kendin dahil 30 yarda içindeki yaralı grup üyeleri arasında iyileştirme olarak paylaştır. Akınlarda yalnızca kendi alt grubun iyileşir. Anlık kullanılır ve Alacakaranlık Perdesi içinde saldırmaya devam edebilirsin. Emilen hasar ve fazla hasar iyileştirme eklemez."
       },
       "bear_charge": {

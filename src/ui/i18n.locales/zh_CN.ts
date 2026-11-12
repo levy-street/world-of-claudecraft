@@ -4065,7 +4065,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '攻击你前方 8 码内的所有敌人，造成 {damage} 点物理伤害。目标超过 5 个时，每次命中的伤害会降低，使总伤害等同于 5 次命中。当你躲闪或招架生物的近战攻击时，有 30% 几率使你 10 秒内的下一次复仇不消耗怒气。（防护）',
   'entities.abilities.revenge.name': '复仇',
   'entities.abilities.sanguine_aura.description':
-    '以敌人之血浸染你的武器：你和每一名近战小队成员（无论距离多远）攻击速度提高 10%，造成的伤害提高 10%，持续 20 秒。',
+    '以敌人之血浸染你的武器：你和队伍中的每一名战士、圣骑士、潜行者、萨满祭司和德鲁伊（无论距离多远）攻击速度提高 10%，造成的伤害提高 10%，持续 20 秒。',
   'entities.abilities.sanguine_aura.name': '血色光环',
   'entities.abilities.seasoned_soldier.description':
     '你的自动攻击暴击时产生的怒气提高 10%。（武器）',
@@ -7594,7 +7594,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '造成 {damage} 点神圣伤害。伤害随法术强度提升。戒律会为每一名受伤的相连小队成员治疗相当于所造成伤害 30% 的生命值（双生圣约下为 70%），范围 30 码内。若没有受伤的相连成员，则改为治疗 30 码内生命值最低的受伤小队成员，治疗量为伤害的 15%。',
   'entities.abilities.lesser_heal.name': '低语祈祷',
   'entities.abilities.lesser_heal.description':
-    '治疗一个友方目标 {damage} 点生命。治疗量随法术强度提升。',
+    '治疗一个友方目标 {damage} 点生命。治疗量随治疗强度提升。',
   'entities.abilities.power_word_fortitude.name': '坚毅连祷',
   'entities.abilities.power_word_fortitude.description':
     '将每位小队成员的耐力提高 {buff}%，持续 30 分钟。',
@@ -7606,18 +7606,18 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '为一名友方目标施加护盾，在 30 秒内吸收 {damage} 点伤害。戒律还会将该目标相连 30 秒，并替换你之前的相连目标（双生圣约可同时保留两个）。当相连的小队成员位于你 30 码内时，你的涤净圣歌和敌对的涤罪慈悲会为他们治疗相当于所造成伤害 30% 的生命值。',
   'entities.abilities.renew.name': '萦绕恩泽',
   'entities.abilities.renew.description':
-    '在 15 秒内治疗目标 {damage} 点生命，每 3 秒一次。治疗量随法术强度提升。',
+    '在 15 秒内治疗目标 {damage} 点生命，每 3 秒一次。治疗量随治疗强度提升。',
   'entities.abilities.mind_blast.name': '碎心术',
   'entities.abilities.mind_blast.description':
     '造成 {damage} 点暗影伤害。伤害随法术强度提升。暗影会以你的腐朽挽歌把一个目标绑定为它的塑像，给予 1 点幽暗贡赋，并将 30% 的伤害回响至至多 3 名其他带有你腐朽挽歌的敌人。',
   'entities.abilities.heal.name': '庄严祈祷',
-  'entities.abilities.heal.description': '治疗一个友方目标 {damage} 点生命。治疗量随法术强度提升。',
+  'entities.abilities.heal.description': '治疗一个友方目标 {damage} 点生命。治疗量随治疗强度提升。',
   'entities.abilities.mind_flay.name': '悲苦连祷',
   'entities.abilities.mind_flay.description':
     '引导 3 秒，每秒造成 {damage} 点暗影伤害。伤害随法术强度提升。',
   'entities.abilities.flash_heal.name': '紧急祈祷',
   'entities.abilities.flash_heal.description':
-    '治疗一个友方目标 {damage} 点生命。治疗量随法术强度提升。',
+    '治疗一个友方目标 {damage} 点生命。治疗量随治疗强度提升。',
   'entities.abilities.lightning_bolt.name': '电弧箭',
   'entities.abilities.lightning_bolt.description':
     '造成 {damage} 点自然伤害。伤害随法术强度提升。元素：命中可给予 1 点雷霆。',
@@ -7701,7 +7701,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '让友方目标长出荆棘，持续 10 分钟。每次对目标的近战攻击都会对攻击者造成 {buff} 点自然伤害。',
   'entities.abilities.entangling_roots.name': '缠握根须',
   'entities.abilities.entangling_roots.description':
-    '将目标定身在原地，最多持续 12 秒。更高等级还会在 12 秒内造成自然伤害。',
+    '将目标定身在原地，最多持续 12 秒。在第二等级时，还会在 12 秒内造成 32 点自然伤害，伤害随法术强度提升。',
   'entities.abilities.bear_form.name': '巨熊形态',
   'entities.abilities.bear_form.description':
     '变形为熊：护甲 +110%，最大生命值 +30%，攻击强度 +15 外加每点敏捷 1.5，你的攻击会产生怒气并额外产生 30% 威胁值。你的挥击速度提高一倍，但每次挥击的伤害减半，每次挥击产生的怒气翻倍。变形进入任意形态都会获得大步疾驰，带来短暂的移动速度提升。再次施放可返回施法者形态。',
@@ -7867,7 +7867,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '为一个友方目标涂敷圣油，将伤害、治疗与施法速度提高 20%，持续 15 秒。',
   'entities.abilities.holy_nova.name': '旭日圣咏',
   'entities.abilities.holy_nova.description':
-    '治疗 10 米内的盟友 {damage} 点生命，并对同一区域内的敌人造成 24 至 30 点神圣伤害。两者皆随法术强度提升。（神圣基础技能）',
+    '治疗 10 米内的盟友 {damage} 点生命，并对同一区域内的敌人造成 24 至 30 点神圣伤害。治疗量随治疗强度提升，伤害随法术强度提升。（神圣基础技能）',
   'entities.abilities.shadowform.name': '暮色帷幕',
   'entities.abilities.shadowform.description':
     '进入暮色帷幕，使你的暗影伤害提高 25%。施放治疗法术会将其结束。再次施放暮色帷幕即可离开。（暗影招牌技能）',
@@ -15712,7 +15712,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.multi_shot.description':
     '向目标区域射出散射箭，对8码内的敌人造成{damage}点物理伤害。（猎人天赋）',
   'entities.abilities.prayer_of_healing.description':
-    '治疗 30 米内的盟友 {damage} 点生命。治疗量随法术强度提升。（神圣）',
+    '治疗 30 米内的盟友 {damage} 点生命。治疗量随治疗强度提升。（神圣）',
   'entities.abilities.presence_of_mind.description':
     '使你的下一个有施法时间的法术立即完成。持续 60 秒。（法师天赋）',
   'entities.abilities.psychic_scream.description':
@@ -15788,7 +15788,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '向队伍或团队发出一道奥术波，回溯时间，为 40 码内每名盟友恢复其过去 5 秒所受伤害的 30%（最多为其最大生命值的 35%）。此效果无法暴击。（时光术）',
   'entities.abilities.temporal_acceleration.name': '时间加速',
   'entities.abilities.temporal_acceleration.description':
-    '加快队伍或团队的时间流速，使攻击、施法和引导速度提高 30%，持续 15 秒。近期受到时间加速或嗜血影响的盟友过于疲惫，无法再次受益。（时光术）',
+    '加快 40 码内队伍或团队盟友的时间流速，使其攻击、施法和引导速度提高 30%，持续 15 秒。受影响的盟友在 10 分钟内无法再次从时间加速、战鼓或盗贼合唱中获益。（时光术）',
   'entities.abilities.perfect_moment.name': '完美时刻',
   'entities.abilities.perfect_moment.description':
     '抓住完美时刻：立即获得 4 层奥术充能，并且在 10 秒内，以太飞镖不会消耗这些充能，且造成的伤害提高 20%。（时光术）',
@@ -18146,7 +18146,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '在选定地点撕开一道裂隙，将8码内的敌人拉向其中心，造成{damage}点暗影伤害，并使其昏迷2秒。首领会受到伤害，但可抵抗拉扯与昏迷。',
   'entities.abilities.abyssal_rift.name': '深渊裂隙',
   'entities.abilities.aegis_first_dawn.description':
-    '引导出一个以你为中心、半径 10 米的神圣穹顶。位于穹顶内且在你视线内的友方玩家受到的伤害降低 50%，并且每秒恢复 35 至 45 点生命值。完成引导时，再为他们恢复 120 至 150 点生命值，并使其移动速度提高 30%，持续 4 秒。治疗量随治疗强度提升。',
+    '引导出一个以你为中心、半径 10 米的神圣穹顶。位于穹顶内且在你视线内的友方玩家受到的伤害降低 50%，并且每秒恢复 {aegisTick} 点生命值。完成引导时，再为他们恢复 {aegisFinal} 点生命值，并使其移动速度提高 30%，持续 4 秒。治疗量随治疗强度提升。',
   'entities.abilities.aegis_first_dawn.name': '初曙圣盾',
   'entities.abilities.ambush.specNote_subtlety':
     '从暮帷中使用可累积1层幽暝（最多3层）。幽暝达到3层时，无需潜行即可从任意角度使用：该次使用不消耗能量，消耗全部3层幽暝，开启持续6秒的暗影缠身，并造成双倍伤害。',
@@ -18185,7 +18185,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cheap_shot.specNote_subtlety':
     '从暮帷中使用可累积1层幽暝（最多3层）。幽暝达到3层时，无需潜行即可使用：该次使用不消耗能量，消耗全部3层幽暝，并开启持续6秒的暗影缠身。',
   'entities.abilities.choir_of_deliverance.description':
-    '引导6秒，每2秒为30码内的队伍成员恢复{damage}点生命值。治疗量随法术强度提高。',
+    '引导6秒，每2秒为你和30码内且在你视线内的所有友方目标恢复{damage}点生命值。治疗量随治疗强度提高。',
   'entities.abilities.choir_of_deliverance.name': '救赎圣咏团',
   'entities.abilities.cinderhide.description':
     '使皮肤硬化为冷却的熔渣，持续10秒，受到的所有伤害降低25%。',

@@ -5887,7 +5887,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.perfect_moment.name': 'Volmaakt Ogenblik',
   'entities.abilities.shatter.name': 'Broze Ondergang',
   'entities.abilities.temporal_acceleration.description':
-    'Versnelt de tijdstroom voor je groep of raid, waardoor aanvals-, bezwerings- en kanalisatiesnelheid gedurende 15 sec met 30% toeneemt. Bondgenoten die recentelijk door Temporal Acceleration of Oorlogstrommen zijn getroffen, zijn te uitgeput om ervan te profiteren. (Chronomantie)',
+    'Versnelt de tijdstroom voor groeps- of raidbondgenoten binnen 40 yard, waardoor hun aanvals-, bezwerings- en kanalisatiesnelheid 15 sec lang met 30% toeneemt. Getroffen bondgenoten kunnen 10 min lang niet opnieuw profiteren van Temporele Versnelling, Oorlogstrommen of Dievenkoor. (Chronomantie)',
   'entities.abilities.temporal_acceleration.name': 'Temporele Versnelling',
   'entities.abilities.temporal_barrier.description':
     'Verschuift het doelwit een hartslag buiten het heden: een tijdschild absorbeert {damage} schade gedurende 10 sec voordat de tijdlijn terugknalt.',
@@ -6484,7 +6484,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Treft alle vijanden voor je binnen 8 yard voor {damage} fysieke schade. Boven de 5 doelwitten wordt elke treffer verminderd zodat het totaal gelijk is aan 5 treffers. Wanneer je een melee-aanval van een wezen ontwijkt of pareert, heb je 30% kans dat je volgende Wraak binnen 10 sec geen woede kost. (Protectie)',
   'entities.abilities.revenge.name': 'Wraak',
   'entities.abilities.sanguine_aura.description':
-    'Doordrenk je wapen met het bloed van je vijanden: jij en elk melee-groepslid, op elke afstand, krijgen 20 sec lang 10% aanvalssnelheid en doen 10% meer schade.',
+    'Doordrenk je wapen met het bloed van je vijanden: jij en elke Krijger, Paladijn, Schurk, Sjamaan en Druïde in je groep, op elke afstand, krijgen 20 sec lang 10% aanvalssnelheid en doen 10% meer schade.',
   'entities.abilities.sanguine_aura.name': 'Bloedrode Aura',
   'entities.abilities.seasoned_soldier.description':
     'Je kritieke auto-aanvallen genereren 10% meer woede. (Wapens)',
@@ -8144,7 +8144,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Genereert ogenblikkelijk 20 woede. Alleen in Bruingedaante.',
   'entities.abilities.enrage.name': 'Opstoken',
   'entities.abilities.entangling_roots.description':
-    'Wortelt het doelwit tot 12 sec ter plaatse. Hogere rangen brengen ook Natuurschade toe over 12 sec.',
+    'Wortelt het doelwit tot 12 sec ter plaatse. Op de tweede rang brengt het ook 32 Natuurschade toe over 12 sec, verhoogd door Spreukkracht.',
   'entities.abilities.entangling_roots.name': 'Grijpende Wortels',
   'entities.abilities.evasion.description': 'Verhoogt je ontwijkkans met 50% gedurende 15 sec.',
   'entities.abilities.evasion.name': 'Spookvoet',
@@ -8189,7 +8189,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Doordrenkt uw wapen 30 min lang. Elke slag brengt {damage} extra Vuurschade toe.',
   'entities.abilities.flametongue_weapon.name': 'Vuurbrand-Wapen',
   'entities.abilities.flash_heal.description':
-    'Geneest een bevriend doelwit voor {damage}. De genezing stijgt met de Spreukkracht.',
+    'Geneest een bevriend doelwit voor {damage}. De genezing stijgt met de Genezingskracht.',
   'entities.abilities.flash_heal.name': 'Dringend Gebed',
   'entities.abilities.flash_of_light.description':
     'Een snelle, doelmatige flits van Licht die een bevriend doelwit voor {damage} geneest. Gezondheid herstellen wekt 1 Toewijding op, zelfs zonder specialisatie.',
@@ -8226,7 +8226,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Verminkt de vijand voor {damage} schade en vertraagt zijn beweging met 50% gedurende 15 sec.',
   'entities.abilities.hamstring.name': 'Kreupelsnede',
   'entities.abilities.heal.description':
-    'Geneest een bevriend doelwit voor {damage}. De genezing stijgt met de Spreukkracht.',
+    'Geneest een bevriend doelwit voor {damage}. De genezing stijgt met de Genezingskracht.',
   'entities.abilities.heal.name': 'Plechtig Gebed',
   'entities.abilities.healing_touch.description': 'Geneest een bevriend doelwit voor {damage}.',
   'entities.abilities.healing_touch.specNote_restoration':
@@ -8264,7 +8264,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Geneest een bevriend doelwit voor {damage}% van je maximale gezondheid en genereert 1 Toewijding wanneer het gezondheid herstelt.',
   'entities.abilities.lay_on_hands.name': 'Laatste Rite',
   'entities.abilities.lesser_heal.description':
-    'Geneest een bevriend doelwit voor {damage}. De genezing stijgt met de Spreukkracht.',
+    'Geneest een bevriend doelwit voor {damage}. De genezing stijgt met de Genezingskracht.',
   'entities.abilities.lesser_heal.name': 'Gefluisterd Gebed',
   'entities.abilities.life_tap.description':
     'Zet {damage} levenskracht om in {damage} mana (50% meer mana met Bloedkrediet). Mislukt als je {damage} gezondheid of minder hebt.',
@@ -8328,7 +8328,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.raptor_strike.name': 'Ontweiende Slag',
   'entities.abilities.regrowth.name': 'Tweede Bloei',
   'entities.abilities.renew.description':
-    'Geneest het doelwit in 15 sec voor {damage}, eens per 3 sec. De genezing stijgt met de Spreukkracht.',
+    'Geneest het doelwit in 15 sec voor {damage}, eens per 3 sec. De genezing stijgt met de Genezingskracht.',
   'entities.abilities.renew.name': 'Aanhoudende Genade',
   'entities.abilities.retribution_aura.description':
     'Omhult jou en je groep met heilige energie tot de dood of vervanging. Vijanden die een beïnvloede bondgenoot in melee raken, krijgen {buff} Heilige schade, en beïnvloede bondgenoten doen {buff} extra Heilige schade met automatische aanvallen.',
@@ -8467,7 +8467,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Zalft een bevriend doelwit en verhoogt schade, genezing en bezweringssnelheid 15 sec lang met 20%.',
   'entities.abilities.holy_nova.name': 'Zonnegezang',
   'entities.abilities.holy_nova.description':
-    'Geneest bondgenoten binnen 10 yard voor {damage} en brengt vijanden in datzelfde gebied 24 tot 30 Heilige schade toe. Beide bedragen stijgen met de Spreukkracht. (Basis van Heilig)',
+    'Geneest bondgenoten binnen 10 yard voor {damage} en brengt vijanden in datzelfde gebied 24 tot 30 Heilige schade toe. De genezing stijgt met de Genezingskracht en de schade met de Spreukkracht. (Basis van Heilig)',
   'entities.abilities.shadowform.name': 'Schemersluier',
   'entities.abilities.shadowform.description':
     'Treed de Schemersluier binnen en verhoog je Schaduwschade met 25%. Een genezende spreuk uitspreken beëindigt het. Werp de Schemersluier opnieuw om hem te verlaten. (Vespers-kenmerk)',
@@ -14728,7 +14728,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.multi_shot.description':
     'Vuurt een salvo af op het doelgebied en brengt vijanden binnen 8 yards {damage} fysieke schade toe. (jagertalent)',
   'entities.abilities.prayer_of_healing.description':
-    'Geneest bondgenoten binnen 30 yard voor {damage}. De genezing stijgt met de Spreukkracht. (Heilig)',
+    'Geneest bondgenoten binnen 30 yard voor {damage}. De genezing stijgt met de Genezingskracht. (Heilig)',
   'entities.abilities.preparation.description':
     'Beëindigt de afkoeltijd van Sprint, Ontwijking en Verdwijning. (schurkentalent)',
   'entities.abilities.presence_of_mind.description':
@@ -15909,7 +15909,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.choir_of_deliverance.name': 'Koor der Verlossing',
   'entities.abilities.scouring_mercy.name': 'Louterende Genade',
   'entities.abilities.aegis_first_dawn.description':
-    'Kanaliseer een heilige koepel van 10 m om je heen. Bevriende spelers erbinnen en in je gezichtslijn krijgen 50% minder schade en worden elke seconde genezen voor 35 tot 45. Het voltooien van het kanaliseren geneest hen voor nog eens 120 tot 150 en verleent 4 sec lang 30% bewegingssnelheid. De genezing stijgt met Genezingskracht.',
+    'Kanaliseer een heilige koepel van 10 m om je heen. Bevriende spelers erbinnen en in je gezichtslijn krijgen 50% minder schade en worden elke seconde genezen voor {aegisTick}. Het voltooien van het kanaliseren geneest hen voor nog eens {aegisFinal} en verleent 4 sec lang 30% bewegingssnelheid. De genezing stijgt met Genezingskracht.',
   'entities.abilities.aura_mastery.description':
     'Verdrievoudigt 8 sec lang elke actieve Toewijding van het Bastion en Aura van Vergelding in je groep: Toewijding van het Bastion vermindert de opgelopen schade met 15%, en Aura van Vergelding richt drie keer zoveel Heilige schade aan als normaal. Herhaald gebruik vernieuwt in plaats van te stapelen.',
   'entities.abilities.bastion_rite.description':
@@ -15978,7 +15978,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.vowkeeper_strike.description':
     'Slaat toe voor wapenschade plus {damage} fysieke schade met hoge dreiging en genereert 1 Toewijding. Een geslaagde slag heeft 20% kans om 8 sec lang Zonnevergelding te verlenen; elke geslaagde blokkering 25%. Zonnevergelding wordt verbruikt door je volgende Zonneschijf (geen manakosten, geen afkoeling, 20% meer schade), Hamer der Genade (geen afkoeling, geneest je voor 100% van de aangerichte schade) of Helend Licht (direct). Verheffing geeft je ook 6 sec lang een schild van 6% van je maximale gezondheid.',
   'entities.abilities.choir_of_deliverance.description':
-    'Kanaliseer 6 sec en genees groepsleden binnen 30 yard voor {damage} elke 2 sec. De genezing neemt toe met spreukkracht.',
+    'Kanaliseer 6 sec en genees jezelf en elk bevriend doelwit binnen 30 yard en in je gezichtslijn voor {damage} elke 2 sec. De genezing neemt toe met Genezingskracht.',
 
   // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
   // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.

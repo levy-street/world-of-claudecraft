@@ -18018,7 +18018,7 @@ export const id_ID: EnTranslations = {
       },
       "aegis_first_dawn": {
         "name": "Perisai Fajar Pertama",
-        "description": "Menyalurkan kubah suci 10 m di sekitarmu. Pemain sekutu di dalamnya dan dalam garis pandangmu menerima 50% lebih sedikit kerusakan dan disembuhkan 35 sampai 45 setiap detik. Menyelesaikan penyaluran menyembuhkan mereka 120 sampai 150 lagi dan memberi 30% kecepatan gerak selama 4 dtk. Penyembuhan meningkat dengan Kekuatan Penyembuhan."
+        "description": "Menyalurkan kubah suci 10 m di sekitarmu. Pemain sekutu di dalamnya dan dalam garis pandangmu menerima 50% lebih sedikit kerusakan dan disembuhkan {aegisTick} setiap detik. Menyelesaikan penyaluran menyembuhkan mereka {aegisFinal} lagi dan memberi 30% kecepatan gerak selama 4 dtk. Penyembuhan meningkat dengan Kekuatan Penyembuhan."
       },
       "vowkeeper_strike": {
         "name": "Serangan Penjaga Ikrar",
@@ -18163,7 +18163,7 @@ export const id_ID: EnTranslations = {
       },
       "lesser_heal": {
         "name": "Doa Berbisik",
-        "description": "Menyembuhkan sasaran sekutu sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Mantra."
+        "description": "Menyembuhkan sasaran sekutu sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Penyembuhan."
       },
       "power_word_fortitude": {
         "name": "Litani Ketabahan",
@@ -18179,7 +18179,7 @@ export const id_ID: EnTranslations = {
       },
       "renew": {
         "name": "Rahmat Berlanjut",
-        "description": "Menyembuhkan sasaran sebesar {damage} selama 15 dtk, sekali tiap 3 dtk. Penyembuhan meningkat dengan Kekuatan Mantra."
+        "description": "Menyembuhkan sasaran sebesar {damage} selama 15 dtk, sekali tiap 3 dtk. Penyembuhan meningkat dengan Kekuatan Penyembuhan."
       },
       "mind_blast": {
         "name": "Retak Pikiran",
@@ -18187,7 +18187,7 @@ export const id_ID: EnTranslations = {
       },
       "heal": {
         "name": "Doa Khidmat",
-        "description": "Menyembuhkan sasaran sekutu sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Mantra."
+        "description": "Menyembuhkan sasaran sekutu sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Penyembuhan."
       },
       "mind_flay": {
         "name": "Litani Nestapa",
@@ -18207,7 +18207,7 @@ export const id_ID: EnTranslations = {
       },
       "flash_heal": {
         "name": "Doa Mendesak",
-        "description": "Menyembuhkan sasaran sekutu sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Mantra."
+        "description": "Menyembuhkan sasaran sekutu sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Penyembuhan."
       },
       "lightning_bolt": {
         "name": "Sambaran Busur",
@@ -18407,7 +18407,7 @@ export const id_ID: EnTranslations = {
       },
       "entangling_roots": {
         "name": "Akar Cengkeram",
-        "description": "Mengakar target di tempatnya hingga 12 dtk. Peringkat lebih tinggi juga memberi kerusakan Alam selama 12 dtk."
+        "description": "Mengakar target di tempatnya hingga 12 dtk. Pada peringkat kedua, juga memberi 32 kerusakan Alam selama 12 dtk, yang meningkat dengan Kekuatan Mantra."
       },
       "bear_form": {
         "name": "Wujud Bruin",
@@ -18695,7 +18695,7 @@ export const id_ID: EnTranslations = {
       },
       "holy_nova": {
         "name": "Kidung Surya",
-        "description": "Menyembuhkan sekutu dalam 10 yard sebesar {damage} dan memberi 24 sampai 30 kerusakan Suci kepada musuh di area yang sama. Kedua jumlah meningkat dengan Kekuatan Mantra. (Dasar Suci)"
+        "description": "Menyembuhkan sekutu dalam 10 yard sebesar {damage} dan memberi 24 sampai 30 kerusakan Suci kepada musuh di area yang sama. Penyembuhan meningkat dengan Kekuatan Penyembuhan dan kerusakan dengan Kekuatan Mantra. (Dasar Suci)"
       },
       "shadowform": {
         "name": "Selubung Senja",
@@ -18898,7 +18898,7 @@ export const id_ID: EnTranslations = {
       },
       "sanguine_aura": {
         "name": "Aura Darah",
-        "description": "Meresapi senjatamu dengan darah musuh: kamu dan setiap anggota party jarak dekat, pada jarak berapa pun, memperoleh 10% kecepatan serang dan memberi 10% lebih banyak kerusakan selama 20 dtk."
+        "description": "Meresapi senjatamu dengan darah musuh: kamu dan setiap Prajurit, Paladin, Penyamun, Dukun, dan Druid di party-mu, pada jarak berapa pun, memperoleh 10% kecepatan serang dan memberi 10% lebih banyak kerusakan selama 20 dtk."
       },
       "victory_rush": {
         "name": "Lonjakan Pemenang",
@@ -19099,7 +19099,7 @@ export const id_ID: EnTranslations = {
       },
       "temporal_acceleration": {
         "name": "Percepatan Waktu",
-        "description": "Mempercepat aliran waktu untuk grupmu atau raid, meningkatkan kecepatan serangan, rapalan, dan penyaluran sebesar 30% selama 15 dtk. Sekutu yang baru saja terpengaruh Temporal Acceleration atau Genderang Perang terlalu lelah untuk merasakan manfaatnya. (Kronomansi)"
+        "description": "Mempercepat aliran waktu untuk sekutu kelompok atau raid dalam 40 yard, meningkatkan kecepatan serang, rapal, dan salur mereka sebesar 30% selama 15 dtk. Sekutu yang terkena tidak dapat memperoleh manfaat Percepatan Waktu, Genderang Perang, atau Paduan Suara Pencuri lagi selama 10 menit. (Kronomansi)"
       },
       "perfect_moment": {
         "name": "Momen Sempurna",
@@ -19119,7 +19119,7 @@ export const id_ID: EnTranslations = {
       },
       "prayer_of_healing": {
         "name": "Penyembuhan Koor",
-        "description": "Menyembuhkan sekutu dalam 30 yard sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Mantra. (Suci)"
+        "description": "Menyembuhkan sekutu dalam 30 yard sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Penyembuhan. (Suci)"
       },
       "preparation": {
         "name": "Rencana Cadangan",
@@ -19236,7 +19236,7 @@ export const id_ID: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Paduan Suara Pembebasan",
-        "description": "Merapal selama 6 dtk, menyembuhkan anggota grup dalam radius 30 meter sebesar {damage} setiap 2 dtk. Penyembuhan meningkat dengan kekuatan mantra.",
+        "description": "Merapal selama 6 dtk, menyembuhkan dirimu dan setiap target sekutu dalam radius 30 meter serta dalam garis pandangmu sebesar {damage} setiap 2 dtk. Penyembuhan meningkat dengan Kekuatan Penyembuhan.",
         "specNote_shadow": "Selama 15 dtk, bagikan 20% kesehatan yang hilang dari musuh akibat kerusakan Bayanganmu sebagai penyembuhan di antara anggota party yang terluka dalam 30 yard, termasuk dirimu. Dalam raid, hanya subgrupmu yang disembuhkan. Dirapal seketika dan terus menyerang dalam Selubung Senja. Kerusakan yang diserap dan kelebihan kerusakan tidak menambah penyembuhan."
       },
       "bear_charge": {

@@ -18018,7 +18018,7 @@ export const cs_CZ: EnTranslations = {
       },
       "aegis_first_dawn": {
         "name": "Egida prvního úsvitu",
-        "description": "Usměrňuje svatou kupoli o velikosti 10 m kolem tebe. Spřátelení hráči uvnitř a v tvé přímé viditelnosti utrpí o 50 % méně poškození a každou sekundu jsou léčeni za 35 až 45. Dokončení usměrňování je vyléčí o dalších 120 až 150 a na 4 s udělí 30 % rychlosti pohybu. Léčení roste se silou léčení."
+        "description": "Usměrňuje svatou kupoli o velikosti 10 m kolem tebe. Spřátelení hráči uvnitř a v tvé přímé viditelnosti utrpí o 50 % méně poškození a každou sekundu jsou léčeni za {aegisTick}. Dokončení usměrňování je vyléčí o dalších {aegisFinal} a na 4 s udělí 30 % rychlosti pohybu. Léčení roste se silou léčení."
       },
       "vowkeeper_strike": {
         "name": "Úder strážce slibů",
@@ -18163,7 +18163,7 @@ export const cs_CZ: EnTranslations = {
       },
       "lesser_heal": {
         "name": "Šeptaná modlitba",
-        "description": "Vyléčí spřátelený cíl o {damage}. Léčení roste se silou kouzel."
+        "description": "Vyléčí spřátelený cíl o {damage}. Léčení roste se silou léčení."
       },
       "power_word_fortitude": {
         "name": "Litanie odhodlání",
@@ -18179,7 +18179,7 @@ export const cs_CZ: EnTranslations = {
       },
       "renew": {
         "name": "Přetrvávající milost",
-        "description": "Vyléčí cíl o {damage} během 15 s, jednou za 3 s. Léčení roste se silou kouzel."
+        "description": "Vyléčí cíl o {damage} během 15 s, jednou za 3 s. Léčení roste se silou léčení."
       },
       "mind_blast": {
         "name": "Zlomení mysli",
@@ -18187,7 +18187,7 @@ export const cs_CZ: EnTranslations = {
       },
       "heal": {
         "name": "Slavnostní modlitba",
-        "description": "Vyléčí spřátelený cíl o {damage}. Léčení roste se silou kouzel."
+        "description": "Vyléčí spřátelený cíl o {damage}. Léčení roste se silou léčení."
       },
       "mind_flay": {
         "name": "Litanie běd",
@@ -18207,7 +18207,7 @@ export const cs_CZ: EnTranslations = {
       },
       "flash_heal": {
         "name": "Naléhavá modlitba",
-        "description": "Vyléčí spřátelený cíl o {damage}. Léčení roste se silou kouzel."
+        "description": "Vyléčí spřátelený cíl o {damage}. Léčení roste se silou léčení."
       },
       "lightning_bolt": {
         "name": "Bleskový šíp",
@@ -18407,7 +18407,7 @@ export const cs_CZ: EnTranslations = {
       },
       "entangling_roots": {
         "name": "Svazující kořeny",
-        "description": "Zakoření cíl na místě až na 12 s. Vyšší stupně také způsobují poškození přírodou po dobu 12 s."
+        "description": "Zakoření cíl na místě až na 12 s. Na druhém stupni také způsobí 32 poškození přírodou po dobu 12 s, které roste se silou kouzel."
       },
       "bear_form": {
         "name": "Medvědí podoba",
@@ -18695,7 +18695,7 @@ export const cs_CZ: EnTranslations = {
       },
       "holy_nova": {
         "name": "Sluneční kantiléna",
-        "description": "Vyléčí spojence do 10 yardů o {damage} a způsobí 24 až 30 svatého poškození nepřátelům ve stejné oblasti. Obě hodnoty rostou se silou kouzel. (Základ Požehnání)"
+        "description": "Vyléčí spojence do 10 yardů o {damage} a způsobí 24 až 30 svatého poškození nepřátelům ve stejné oblasti. Léčení roste se silou léčení a poškození se silou kouzel. (Základ Požehnání)"
       },
       "shadowform": {
         "name": "Soumračný závoj",
@@ -18898,7 +18898,7 @@ export const cs_CZ: EnTranslations = {
       },
       "sanguine_aura": {
         "name": "Krvavá aura",
-        "description": "Prosytí tvou zbraň krví tvých nepřátel: ty a každý člen skupiny bojující na blízko, z jakékoli vzdálenosti, získáte na 20 s o 10 % vyšší rychlost útoku a způsobujete o 10 % více poškození."
+        "description": "Prosytí tvou zbraň krví tvých nepřátel: ty a každý Válečník, Paladin, Tulák, Šaman a Druid ve tvé skupině, z jakékoli vzdálenosti, získáte na 20 s o 10 % vyšší rychlost útoku a způsobujete o 10 % více poškození."
       },
       "victory_rush": {
         "name": "Vítězný příval",
@@ -19099,7 +19099,7 @@ export const cs_CZ: EnTranslations = {
       },
       "temporal_acceleration": {
         "name": "Urychlení času",
-        "description": "Urychlí tok času pro tvou skupinu nebo raid a zvýší rychlost útoku, sesílání a kanálování o 30 % po dobu 15 s. Spojenci, kteří nedávno byli pod vlivem Urychlení času nebo Válečných bubnů, jsou příliš vyčerpaní, aby z toho měli prospěch. (Chronomagie)"
+        "description": "Urychlí tok času pro spojence ve skupině nebo raidu do 40 yardů a zvýší jejich rychlost útoku, sesílání a usměrňování o 30 % na 15 s. Zasažení spojenci nemohou 10 min znovu těžit z Urychlení času, Válečných bubnů ani Sboru zlodějů. (Chronomagie)"
       },
       "perfect_moment": {
         "name": "Dokonalý okamžik",
@@ -19119,7 +19119,7 @@ export const cs_CZ: EnTranslations = {
       },
       "prayer_of_healing": {
         "name": "Sborové zacelení",
-        "description": "Vyléčí spojence do 30 yardů o {damage}. Léčení roste se silou kouzel. (Požehnání)"
+        "description": "Vyléčí spojence do 30 yardů o {damage}. Léčení roste se silou léčení. (Požehnání)"
       },
       "preparation": {
         "name": "Záložní plán",
@@ -19236,7 +19236,7 @@ export const cs_CZ: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Sbor vysvobození",
-        "description": "Kanalizuje po dobu 6 s a každé 2 s léčí členy skupiny do 30 yardů za {damage}. Léčení roste se silou kouzel.",
+        "description": "Kanalizuje po dobu 6 s a každé 2 s léčí tebe i každý spřátelený cíl do 30 yardů ve tvé přímé viditelnosti za {damage}. Léčení roste se silou léčení.",
         "specNote_shadow": "Po dobu 15 s rozdělíš 20 % zdraví, které nepřátelé ztratí tvým stínovým poškozením, jako léčení mezi zraněné členy skupiny do 30 yardů, včetně tebe. V raidech se léčí jen tvá podskupina. Seslání je okamžité a v Soumračném závoji můžeš dál útočit. Pohlcené poškození a poškození přesahující zbývající zdraví léčení nepřidávají."
       },
       "bear_charge": {

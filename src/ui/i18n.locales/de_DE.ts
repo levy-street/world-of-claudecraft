@@ -5957,7 +5957,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.perfect_moment.name': 'Perfekter Moment',
   'entities.abilities.shatter.name': 'Sprödes Verderben',
   'entities.abilities.temporal_acceleration.description':
-    'Beschleunigt den Zeitfluss für deine Gruppe oder deinen Schlachtzug und erhöht Angriffs-, Zauber- und Kanalisierungsgeschwindigkeit 15 Sek. lang um 30%. Verbündete, die kürzlich von Temporaler Beschleunigung oder Kriegstrommeln betroffen waren, sind zu erschöpft, um davon zu profitieren. (Chronomantie)',
+    'Beschleunigt den Zeitfluss für Gruppen- oder Schlachtzugsverbündete im Umkreis von 40 m und erhöht deren Angriffs-, Zauber- und Kanalisierungstempo 15 Sek. lang um 30%. Betroffene Verbündete können 10 Min. lang nicht erneut von Temporaler Beschleunigung, Kriegstrommeln oder Chor der Diebe profitieren. (Chronomantie)',
   'entities.abilities.temporal_acceleration.name': 'Temporale Beschleunigung',
   'entities.abilities.temporal_barrier.description':
     'Versetzt das Ziel um einen Herzschlag aus der Gegenwart; eine zeitliche Hülle absorbiert 10 Sek. lang {damage} Schaden, bevor der Zeitstrang zurückschnappt.',
@@ -6495,7 +6495,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Trefft alle Gegner vor Euch im Umkreis von 8 m für {damage} physischen Schaden. Bei mehr als 5 Zielen wird jeder Treffer so verringert, dass die Gesamtsumme 5 Treffern entspricht. Wenn Ihr dem Nahkampfangriff einer Kreatur ausweicht oder ihn pariert, habt Ihr eine Chance von 30%, dass Eure nächste Rache innerhalb von 10 Sek. keine Wut kostet. (Schutz)',
   'entities.abilities.revenge.name': 'Rache',
   'entities.abilities.sanguine_aura.description':
-    'Erfüllt Eure Waffe mit dem Blut Eurer Feinde: Ihr und jedes Nahkampf-Gruppenmitglied, egal in welcher Entfernung, erhaltet 20 Sek. lang 10% Angriffstempo und verursacht 10% mehr Schaden.',
+    'Erfüllt Eure Waffe mit dem Blut Eurer Feinde: Ihr und jeder Krieger, Paladin, Schurke, Schamane und Druide in Eurer Gruppe, egal in welcher Entfernung, erhaltet 20 Sek. lang 10% Angriffstempo und verursacht 10% mehr Schaden.',
   'entities.abilities.sanguine_aura.name': 'Blutrote Aura',
   'entities.abilities.seasoned_soldier.description':
     'Eure kritischen Auto-Angriffe erzeugen 10% mehr Wut. (Waffen)',
@@ -9614,7 +9614,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Verursacht {damage} Heiligschaden. Der Schaden steigt mit der Zaubermacht. Disziplin heilt jedes verwundete verbundene Gruppenmitglied im Umkreis von 30 m um 30% des verursachten Schadens (70% mit Zwillingsbund). Ist keines verwundet, heilt sie stattdessen das verwundete Gruppenmitglied mit der geringsten Gesundheit im Umkreis von 30 m um 15% des Schadens.',
   'entities.abilities.lesser_heal.name': 'Geflüstertes Gebet',
   'entities.abilities.lesser_heal.description':
-    'Heilt ein freundliches Ziel um {damage}. Die Heilung steigt mit der Zaubermacht.',
+    'Heilt ein freundliches Ziel um {damage}. Die Heilung steigt mit der Heilkraft.',
   'entities.abilities.power_word_fortitude.name': 'Litanei der Entschlossenheit',
   'entities.abilities.power_word_fortitude.description':
     'Erhöht die Ausdauer jedes Gruppenmitglieds 30 Min. lang um {buff}%.',
@@ -9626,19 +9626,19 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Schützt ein freundliches Ziel und absorbiert 30 Sek. lang {damage} Schaden. Disziplin verbindet das Ziel zudem 30 Sek. lang und ersetzt Eure vorherige Verbindung (der Zwillingsbund behält zwei). Solange verbundene Gruppenmitglieder im Umkreis von 30 m um Euch sind, heilen Eure Läuternde Hymne und die feindliche Läuternde Gnade sie um 30% des verursachten Schadens.',
   'entities.abilities.renew.name': 'Anhaltende Gnade',
   'entities.abilities.renew.description':
-    'Heilt das Ziel über 15 Sek. um {damage}, alle 3 Sek. einmal. Die Heilung steigt mit der Zaubermacht.',
+    'Heilt das Ziel über 15 Sek. um {damage}, alle 3 Sek. einmal. Die Heilung steigt mit der Heilkraft.',
   'entities.abilities.mind_blast.name': 'Geistesbruch',
   'entities.abilities.mind_blast.description':
     'Verursacht {damage} Schattenschaden. Der Schaden steigt mit der Zaubermacht. Schatten bindet ein Ziel mit eurem Klagelied des Verfalls als sein Bildnis, gewährt 1 Düsterzoll und wirft 30% des Schadens auf bis zu 3 weitere Gegner mit eurem Klagelied zurück.',
   'entities.abilities.heal.name': 'Feierliches Gebet',
   'entities.abilities.heal.description':
-    'Heilt ein freundliches Ziel um {damage}. Die Heilung steigt mit der Zaubermacht.',
+    'Heilt ein freundliches Ziel um {damage}. Die Heilung steigt mit der Heilkraft.',
   'entities.abilities.mind_flay.name': 'Litanei des Leids',
   'entities.abilities.mind_flay.description':
     'Kanalisiert 3 Sek. lang und verursacht jede Sekunde {damage} Schattenschaden. Der Schaden steigt mit der Zaubermacht.',
   'entities.abilities.flash_heal.name': 'Dringendes Gebet',
   'entities.abilities.flash_heal.description':
-    'Heilt ein freundliches Ziel um {damage}. Die Heilung steigt mit der Zaubermacht.',
+    'Heilt ein freundliches Ziel um {damage}. Die Heilung steigt mit der Heilkraft.',
   'entities.abilities.lightning_bolt.name': 'Lichtbogenblitz',
   'entities.abilities.lightning_bolt.description':
     'Verursacht {damage} Naturschaden. Der Schaden steigt mit der Zaubermacht. Elementar: Ein Treffer gewährt 1 Donner.',
@@ -9716,7 +9716,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Dornen sprießen 10 Min. lang aus einem freundlichen Ziel. Jeder Nahkampftreffer gegen das Ziel verursacht {buff} Naturschaden am Angreifer.',
   'entities.abilities.entangling_roots.name': 'Greifende Wurzeln',
   'entities.abilities.entangling_roots.description':
-    'Verwurzelt das Ziel bis zu 12 Sek. lang an Ort und Stelle. Höhere Ränge verursachen außerdem Naturschaden über 12 Sek.',
+    'Verwurzelt das Ziel bis zu 12 Sek. lang an Ort und Stelle. Im zweiten Rang verursacht es außerdem 32 Naturschaden über 12 Sek., der mit der Zaubermacht steigt.',
   'entities.abilities.bear_form.name': 'Bruin-Gestalt',
   'entities.abilities.bear_form.description':
     'Verwandelt Euch in einen Bären: Rüstung +110%, maximale Gesundheit +30%, Angriffskraft +15 plus 1,5 pro Punkt Beweglichkeit, Eure Angriffe erzeugen Wut und 30% mehr Bedrohung. Ihr schlagt doppelt so schnell für den halben Schaden pro Schlag, und jeder Schlag erzeugt doppelt so viel Wut. Das Wechseln in eine Gestalt gewährt Trabschritt, einen kurzen Schub an Lauftempo. Erneut wirken, um zur Zaubergestalt zurückzukehren.',
@@ -9844,7 +9844,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Salbt ein freundliches Ziel und erhöht Schaden, Heilung und Zaubertempo 15 Sek. lang um 20%.',
   'entities.abilities.holy_nova.name': 'Sonnenhymnus',
   'entities.abilities.holy_nova.description':
-    'Heilt Verbündete im Umkreis von 10 m um {damage} und fügt Gegnern im selben Bereich 24 bis 30 Heiligschaden zu. Beide Beträge steigen mit der Zaubermacht. (Heilig-Grundlage)',
+    'Heilt Verbündete im Umkreis von 10 m um {damage} und fügt Gegnern im selben Bereich 24 bis 30 Heiligschaden zu. Die Heilung steigt mit der Heilkraft, der Schaden mit der Zaubermacht. (Heilig-Grundlage)',
   'entities.abilities.shadowform.name': 'Dämmerschleier',
   'entities.abilities.shadowform.description':
     'Tretet in den Dämmerschleier und erhöht Euren Schattenschaden um 25%. Das Wirken eines Heilzaubers beendet ihn. Wirkt den Dämmerschleier erneut, um ihn zu verlassen. (Vespers-Signatur)',
@@ -14212,7 +14212,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.multi_shot.description':
     'Feuert eine Salve auf das Zielgebiet und fügt Gegnern innerhalb von 8 Yards {damage} körperlichen Schaden zu. (Jägertalent)',
   'entities.abilities.prayer_of_healing.description':
-    'Heilt Verbündete im Umkreis von 30 m um {damage}. Die Heilung steigt mit der Zaubermacht. (Heilig)',
+    'Heilt Verbündete im Umkreis von 30 m um {damage}. Die Heilung steigt mit der Heilkraft. (Heilig)',
   'entities.abilities.preparation.description':
     'Schließt die Abklingzeiten von Sprint, Entrinnen und Verschwinden ab. (Schurkentalent)',
   'entities.abilities.presence_of_mind.description':
@@ -15075,7 +15075,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.choir_of_deliverance.name': 'Chor der Erlösung',
   'entities.abilities.scouring_mercy.name': 'Läuternde Gnade',
   'entities.abilities.aegis_first_dawn.description':
-    'Kanalisiert eine heilige Kuppel von 10 m um Euch. Verbündete Spieler darin und in Eurer Sichtlinie erleiden 50% weniger Schaden und werden jede Sekunde um 35 bis 45 geheilt. Der Abschluss der Kanalisierung heilt sie um weitere 120 bis 150 und gewährt 4 Sek. lang 30% Lauftempo. Die Heilung steigt mit der Heilkraft.',
+    'Kanalisiert eine heilige Kuppel von 10 m um Euch. Verbündete Spieler darin und in Eurer Sichtlinie erleiden 50% weniger Schaden und werden jede Sekunde um {aegisTick} geheilt. Der Abschluss der Kanalisierung heilt sie um weitere {aegisFinal} und gewährt 4 Sek. lang 30% Lauftempo. Die Heilung steigt mit der Heilkraft.',
   'entities.abilities.aura_mastery.description':
     'Verdreifacht 8 Sek. lang jede aktive Hingabe der Bastion und Aura der Vergeltung in Eurer Gruppe: Die Hingabe der Bastion verringert erlittenen Schaden um 15%, und die Aura der Vergeltung verursacht dreifachen normalen Heiligschaden. Mehrfache Anwendungen erneuern sich, statt sich zu stapeln.',
   'entities.abilities.bastion_rite.description':
@@ -15144,7 +15144,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.vowkeeper_strike.description':
     'Schlägt mit Waffenschaden plus {damage} physischem Schaden und hoher Bedrohung zu und erzeugt 1 Hingabe. Ein erfolgreicher Schlag hat eine Chance von 20%, 8 Sek. lang Sonnenvergeltung zu gewähren; jeder erfolgreiche Block eine von 25%. Sonnenvergeltung wird von Eurer nächsten Sonnenscheibe (keine Manakosten, keine Abklingzeit, 20% mehr Schaden), Eurem nächsten Hammer der Gnade (keine Abklingzeit, heilt Euch um 100% des verursachten Schadens) oder Eurem nächsten Heilenden Licht (sofort) verbraucht. Der Aufstieg gewährt Euch zusätzlich 6 Sek. lang einen Schild in Höhe von 6% Eurer maximalen Gesundheit.',
   'entities.abilities.choir_of_deliverance.description':
-    'Kanalisiert 6 Sek. lang und heilt Gruppenmitglieder im Umkreis von 30 Metern alle 2 Sek. um {damage}. Die Heilung steigt mit Zaubermacht.',
+    'Kanalisiert 6 Sek. lang und heilt Euch und jedes freundliche Ziel im Umkreis von 30 Metern und in Eurer Sichtlinie alle 2 Sek. um {damage}. Die Heilung steigt mit der Heilkraft.',
 
   // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
   // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.

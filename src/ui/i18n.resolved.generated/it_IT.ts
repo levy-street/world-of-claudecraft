@@ -18018,7 +18018,7 @@ export const it_IT: EnTranslations = {
       },
       "aegis_first_dawn": {
         "name": "Egida della Prima Alba",
-        "description": "Canalizza una cupola sacra di 10 m attorno a te. I giocatori alleati al suo interno e nella tua linea di vista subiscono il 50% di danni in meno e vengono curati di 35-45 ogni secondo. Completare la canalizzazione li cura di ulteriori 120-150 e concede il 30% di velocità di movimento per 4 sec. La cura aumenta con il Potere di Guarigione."
+        "description": "Canalizza una cupola sacra di 10 m attorno a te. I giocatori alleati al suo interno e nella tua linea di vista subiscono il 50% di danni in meno e vengono curati di {aegisTick} ogni secondo. Completare la canalizzazione li cura di ulteriori {aegisFinal} e concede il 30% di velocità di movimento per 4 sec. La cura aumenta con il Potere di Guarigione."
       },
       "vowkeeper_strike": {
         "name": "Colpo del Custode dei Voti",
@@ -18163,7 +18163,7 @@ export const it_IT: EnTranslations = {
       },
       "lesser_heal": {
         "name": "Preghiera Sussurrata",
-        "description": "Cura un bersaglio alleato di {damage}. La cura aumenta con il Potere Magico."
+        "description": "Cura un bersaglio alleato di {damage}. La cura aumenta con il Potere di Guarigione."
       },
       "power_word_fortitude": {
         "name": "Litania della Fermezza",
@@ -18179,7 +18179,7 @@ export const it_IT: EnTranslations = {
       },
       "renew": {
         "name": "Grazia Persistente",
-        "description": "Cura il bersaglio di {damage} nell'arco di 15 sec, una volta ogni 3 sec. La cura aumenta con il Potere Magico."
+        "description": "Cura il bersaglio di {damage} nell'arco di 15 sec, una volta ogni 3 sec. La cura aumenta con il Potere di Guarigione."
       },
       "mind_blast": {
         "name": "Frattura Mentale",
@@ -18187,7 +18187,7 @@ export const it_IT: EnTranslations = {
       },
       "heal": {
         "name": "Preghiera Solenne",
-        "description": "Cura un bersaglio alleato di {damage}. La cura aumenta con il Potere Magico."
+        "description": "Cura un bersaglio alleato di {damage}. La cura aumenta con il Potere di Guarigione."
       },
       "mind_flay": {
         "name": "Litania della Sventura",
@@ -18207,7 +18207,7 @@ export const it_IT: EnTranslations = {
       },
       "flash_heal": {
         "name": "Preghiera Urgente",
-        "description": "Cura un bersaglio alleato di {damage}. La cura aumenta con il Potere Magico."
+        "description": "Cura un bersaglio alleato di {damage}. La cura aumenta con il Potere di Guarigione."
       },
       "lightning_bolt": {
         "name": "Dardo Folgorante",
@@ -18407,7 +18407,7 @@ export const it_IT: EnTranslations = {
       },
       "entangling_roots": {
         "name": "Radici Avvinghianti",
-        "description": "Radica il bersaglio sul posto per un massimo di 12 sec. I ranghi superiori infliggono anche danni da Natura in 12 sec."
+        "description": "Radica il bersaglio sul posto per un massimo di 12 sec. Al secondo rango infligge anche 32 danni da Natura in 12 sec, aumentati dal Potere Magico."
       },
       "bear_form": {
         "name": "Forma di Bruin",
@@ -18695,7 +18695,7 @@ export const it_IT: EnTranslations = {
       },
       "holy_nova": {
         "name": "Cantico Solare",
-        "description": "Cura gli alleati entro 10 m di {damage} e infligge da 24 a 30 danni Sacri ai nemici nella stessa area. Entrambi gli importi aumentano con il Potere Magico. (Base di Sacro)"
+        "description": "Cura gli alleati entro 10 m di {damage} e infligge da 24 a 30 danni Sacri ai nemici nella stessa area. La cura aumenta con il Potere di Guarigione e il danno con il Potere Magico. (Base di Sacro)"
       },
       "shadowform": {
         "name": "Velo Crepuscolare",
@@ -18898,7 +18898,7 @@ export const it_IT: EnTranslations = {
       },
       "sanguine_aura": {
         "name": "Aura Sanguigna",
-        "description": "Impregni la tua arma con il sangue dei tuoi nemici: tu e ogni membro del gruppo in mischia, a qualsiasi distanza, ottenete il 10% di velocità d'attacco e infliggete il 10% di danni in più per 20 sec."
+        "description": "Impregni la tua arma con il sangue dei tuoi nemici: tu e ogni Guerriero, Paladino, Ladro, Sciamano e Druido del tuo gruppo, a qualsiasi distanza, ottenete il 10% di velocità d'attacco e infliggete il 10% di danni in più per 20 sec."
       },
       "victory_rush": {
         "name": "Assalto della Vittoria",
@@ -19099,7 +19099,7 @@ export const it_IT: EnTranslations = {
       },
       "temporal_acceleration": {
         "name": "Accelerazione Temporale",
-        "description": "Accelera il flusso del tempo per il tuo gruppo o incursione, aumentando la velocità di attacco, lancio e canalizzazione del 30% per 15 secondi. Gli alleati colpiti di recente da Accelerazione Temporale o Tamburi di Guerra sono troppo esausti per beneficiarne. (Cronomanzia)"
+        "description": "Accelera il flusso del tempo per gli alleati di gruppo o incursione entro 40 m, aumentando la velocità di attacco, lancio e canalizzazione del 30% per 15 sec. Gli alleati colpiti non possono beneficiare di nuovo di Accelerazione Temporale, Tamburi di Guerra o Coro dei ladri per 10 min. (Cronomanzia)"
       },
       "perfect_moment": {
         "name": "Momento Perfetto",
@@ -19119,7 +19119,7 @@ export const it_IT: EnTranslations = {
       },
       "prayer_of_healing": {
         "name": "Cura del Coro",
-        "description": "Cura gli alleati entro 30 m di {damage}. La cura aumenta con il Potere Magico. (Sacro)"
+        "description": "Cura gli alleati entro 30 m di {damage}. La cura aumenta con il Potere di Guarigione. (Sacro)"
       },
       "preparation": {
         "name": "Contingenza",
@@ -19236,7 +19236,7 @@ export const it_IT: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Coro della Liberazione",
-        "description": "Canalizza per 6 sec e cura i membri del gruppo entro 30 metri di {damage} ogni 2 sec. La cura aumenta con il potere magico.",
+        "description": "Canalizza per 6 sec, curando te e ogni bersaglio alleato entro 30 metri e nella tua linea di vista di {damage} ogni 2 sec. La cura aumenta con il Potere di Guarigione.",
         "specNote_shadow": "Per 15 sec, condivide il 20% della salute persa dai nemici a causa dei tuoi danni da Ombra come cura tra i membri feriti del gruppo entro 30 m, te compreso. Nelle incursioni viene curato solo il tuo sottogruppo. Si lancia istantaneamente e puoi continuare ad attaccare in Velo Crepuscolare. I danni assorbiti e i danni in eccesso non aggiungono cure."
       },
       "bear_charge": {

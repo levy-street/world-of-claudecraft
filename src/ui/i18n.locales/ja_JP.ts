@@ -2520,7 +2520,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '前方8ヤード以内のすべての敵に{damage}の物理ダメージを与えます。対象が5体を超えると、合計が5体分になるよう各ダメージが減少します。クリーチャーの近接攻撃を回避または受け流したとき、30%の確率で、10秒以内の次の意趣返しが怒りを消費しなくなります。(防御)',
   'entities.abilities.revenge.name': '意趣返し',
   'entities.abilities.sanguine_aura.description':
-    '武器に敵の血を宿します。あなたと、距離を問わずすべての近接のパーティメンバーが20秒間、攻撃速度が10%上昇し、与えるダメージが10%増加します。',
+    '武器に敵の血を宿します。あなたと、パーティ内のすべての戦士、パラディン、ローグ、シャーマン、ドルイドが、距離を問わず20秒間、攻撃速度が10%上昇し、与えるダメージが10%増加します。',
   'entities.abilities.sanguine_aura.name': '血のオーラ',
   'entities.abilities.seasoned_soldier.description':
     'クリティカルの通常攻撃が生成する怒りが10%増加します。（武器）',
@@ -6220,7 +6220,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '{damage}の神聖ダメージを与えます。ダメージは呪文威力とともに上がります。ディシプリンにより、30ヤード以内で結ばれた負傷したグループメンバーそれぞれを、与えたダメージの30%だけ回復します(双生の盟約では70%)。負傷者がいない場合は、30ヤード以内で体力が最も低い負傷したグループメンバーを代わりに15%回復します。',
   'entities.abilities.lesser_heal.name': '囁きの祈り',
   'entities.abilities.lesser_heal.description':
-    '味方の対象を{damage}回復します。回復量は呪文威力とともに上がります。',
+    '味方の対象を{damage}回復します。回復量は治癒力とともに上がります。',
   'entities.abilities.power_word_fortitude.name': '決意の連祷',
   'entities.abilities.power_word_fortitude.description':
     'パーティ全員の体力を30分間{buff}%高めます。',
@@ -6232,19 +6232,19 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '味方を守り、30秒間{damage}のダメージを吸収します。ディシプリンはさらに対象を30秒間結びつけ、以前の結びつきを置き換えます(双生の盟約では2つ維持)。結ばれたグループメンバーがあなたから30ヤード以内にいる間、浄めの聖歌と敵対的な浄罪の慈悲が、与えたダメージの30%だけ彼らを回復します。',
   'entities.abilities.renew.name': '留まる恩寵',
   'entities.abilities.renew.description':
-    '15秒かけて対象を{damage}回復します。3秒ごとに1回です。回復量は呪文威力とともに上がります。',
+    '15秒かけて対象を{damage}回復します。3秒ごとに1回です。回復量は治癒力とともに上がります。',
   'entities.abilities.mind_blast.name': '精神粉砕',
   'entities.abilities.mind_blast.description':
     '{damage}の影ダメージを与えます。ダメージは呪文威力とともに上がります。影は自分の腐朽の葬送歌で対象をその依代として結び、幽冥の貢ぎを1与え、ダメージの30%を、自分の葬送歌を帯びた他の敵最大3体へ響かせます。',
   'entities.abilities.heal.name': '厳かな祈り',
   'entities.abilities.heal.description':
-    '味方の対象を{damage}回復します。回復量は呪文威力とともに上がります。',
+    '味方の対象を{damage}回復します。回復量は治癒力とともに上がります。',
   'entities.abilities.mind_flay.name': '嘆きの連祷',
   'entities.abilities.mind_flay.description':
     '3秒間詠唱を維持し、毎秒{damage}の影ダメージを与えます。ダメージは呪文威力とともに上がります。',
   'entities.abilities.flash_heal.name': '緊急の祈り',
   'entities.abilities.flash_heal.description':
-    '味方の対象を{damage}回復します。回復量は呪文威力とともに上がります。',
+    '味方の対象を{damage}回復します。回復量は治癒力とともに上がります。',
   'entities.abilities.lightning_bolt.name': '電弧の矢',
   'entities.abilities.lightning_bolt.description':
     '{damage}の自然ダメージを与えます。ダメージは呪文威力とともに上がります。エレメンタル：命中すると雷が1得られます。',
@@ -6331,7 +6331,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '味方から棘を生やし、10分間持続します。対象への近接攻撃のたびに、攻撃者へ{buff}の自然ダメージを与えます。',
   'entities.abilities.entangling_roots.name': '締めつける根',
   'entities.abilities.entangling_roots.description':
-    '対象を最大12秒間その場に根付かせます。上位ランクでは12秒かけて自然ダメージも与えます。',
+    '対象を最大12秒間その場に根付かせます。第2ランクでは、12秒かけて32の自然ダメージも与え、呪文威力で増加します。',
   'entities.abilities.bear_form.name': 'ブルーインフォーム',
   'entities.abilities.bear_form.description':
     '熊に変身します。アーマー+110%、最大体力+30%、攻撃力+15に加えて敏捷性1ごとに+1.5、攻撃が怒りを生成し、脅威が30%増加します。攻撃速度が2倍になる代わりに1回あたりのダメージは半分になり、各攻撃が生成する怒りは2倍になります。どの姿に変身しても、移動速度が短時間上昇する軽快な足取りを得ます。再度使用すると術者形態に戻ります。',
@@ -6502,7 +6502,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '味方の対象に聖油を注ぎ、15秒間ダメージ、回復量、詠唱速度を20%高めます。',
   'entities.abilities.holy_nova.name': '旭日の聖詠',
   'entities.abilities.holy_nova.description':
-    '10ヤード以内の味方を{damage}回復し、同じ範囲の敵に24から30の神聖ダメージを与えます。どちらも呪文威力とともに上がります。（聖なる基本）',
+    '10ヤード以内の味方を{damage}回復し、同じ範囲の敵に24から30の神聖ダメージを与えます。回復量は治癒力、ダメージは呪文威力とともに上がります。（聖なる基本）',
   'entities.abilities.shadowform.name': '黄昏の帳',
   'entities.abilities.shadowform.description':
     '黄昏の帳に入り、影ダメージが25%増加します。回復呪文を唱えると解除されます。もう一度黄昏の帳を唱えると解除できます。(晩課のシグネチャ)',
@@ -14789,7 +14789,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.multi_shot.description':
     '対象地点に散射し、8ヤード以内の敵に{damage}の物理ダメージを与えます。（ハンターの才能）',
   'entities.abilities.prayer_of_healing.description':
-    '30ヤード以内の味方を{damage}回復します。回復量は呪文威力とともに上がります。（聖なる）',
+    '30ヤード以内の味方を{damage}回復します。回復量は治癒力とともに上がります。（聖なる）',
   'entities.abilities.preparation.description':
     'スプリント、回避、煙隠れのクールダウンを完了させる。（ローグのタレント）',
   'entities.abilities.presence_of_mind.description':
@@ -14873,7 +14873,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'パーティまたはレイドに秘術の波を送り、時間を巻き戻します。40ヤード以内の各味方が過去5秒間に受けたダメージの30%を回復します（最大体力の35%まで）。この効果はクリティカルになりません。（クロノマンシー）',
   'entities.abilities.temporal_acceleration.name': '時間加速',
   'entities.abilities.temporal_acceleration.description':
-    'パーティまたはレイドの時間の流れを加速し、15秒間、攻撃、詠唱、チャネリング速度を30%上昇させます。直近に時間加速またはブラッドラストの影響を受けた味方は疲労しており、効果を得られません。（クロノマンシー）',
+    '40ヤード以内のグループまたはレイドの味方の時間の流れを加速し、15秒間、攻撃、詠唱、チャネリング速度を30%上昇させます。効果を受けた味方は10分間、時間加速、戦の太鼓、盗賊の合唱の恩恵を再び受けられません。（クロノマンシー）',
   'entities.abilities.perfect_moment.name': '完璧な瞬間',
   'entities.abilities.perfect_moment.description':
     '完璧な瞬間をつかみ、秘術チャージを即座に4つ獲得します。10秒間、エーテルダーツはチャージを消費せず、与えるダメージが20%増加します。（クロノマンシー）',
@@ -17312,7 +17312,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '選択した地点に裂け目を開き、8ヤード以内の敵を中心へ引き寄せて{damage}の影ダメージを与え、2秒間スタンさせます。ボスはダメージを受けますが、引き寄せとスタンには抵抗します。',
   'entities.abilities.abyssal_rift.name': '深淵の裂け目',
   'entities.abilities.aegis_first_dawn.description':
-    '自身の周囲に半径10メートルの聖なるドームをチャネリングで展開します。ドーム内で視線が通っている味方プレイヤーは受けるダメージが50%減少し、毎秒35から45回復します。チャネリングを完了すると、さらに120から150回復し、4秒間、移動速度が30%増加します。回復量は治癒力とともに上がります。',
+    '自身の周囲に半径10メートルの聖なるドームをチャネリングで展開します。ドーム内で視線が通っている味方プレイヤーは受けるダメージが50%減少し、毎秒{aegisTick}回復します。チャネリングを完了すると、さらに{aegisFinal}回復し、4秒間、移動速度が30%増加します。回復量は治癒力とともに上がります。',
   'entities.abilities.aegis_first_dawn.name': '始暁の大盾',
   'entities.abilities.ambush.specNote_subtlety':
     'ダスクヴェールから使うと薄闇の蓄えが1段階進む（最大3）。3段階のときはステルスなしで、どの角度からでも使用できる：その1回はコストなしで、薄闇の蓄えを3段階すべて消費し、6秒間のヴェールストライクを開始し、2倍のダメージを与える。',
@@ -17351,7 +17351,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cheap_shot.specNote_subtlety':
     'ダスクヴェールから使うと薄闇の蓄えが1段階進む（最大3）。3段階のときはステルスなしで使用できる：その1回はコストなしで、薄闇の蓄えを3段階すべて消費し、6秒間のヴェールストライクを開始する。',
   'entities.abilities.choir_of_deliverance.description':
-    '6秒間チャネルし、30ヤード以内のパーティメンバーを2秒ごとに{damage}回復します。回復量はスペルパワーで増加します。',
+    '6秒間チャネルし、あなたと、視線が通っている30ヤード以内のすべての味方を2秒ごとに{damage}回復します。回復量は治癒力とともに上がります。',
   'entities.abilities.choir_of_deliverance.name': '救済の聖歌隊',
   'entities.abilities.cinderhide.description':
     '皮膚を冷えた鉱滓のように10秒間硬化させ、受けるすべてのダメージを25%減少させる。',

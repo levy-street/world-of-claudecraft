@@ -18018,7 +18018,7 @@ export const en: EnTranslations = {
       },
       "aegis_first_dawn": {
         "name": "Aegis of the First Dawn",
-        "description": "Channel a 10 m holy dome around you. Allied players inside and in your line of sight take 50% less damage and are healed for 35 to 45 every second. Completing the channel heals them for 120 to 150 more and grants 30% movement speed for 4 sec. Healing increases with Healing Power."
+        "description": "Channel a 10 m holy dome around you. Allied players inside and in your line of sight take 50% less damage and are healed for {aegisTick} every second. Completing the channel heals them for {aegisFinal} more and grants 30% movement speed for 4 sec. Healing increases with Healing Power."
       },
       "vowkeeper_strike": {
         "name": "Vowkeeper Strike",
@@ -18163,7 +18163,7 @@ export const en: EnTranslations = {
       },
       "lesser_heal": {
         "name": "Whispered Prayer",
-        "description": "Heal a friendly target for {damage}. Healing increases with Spell Power."
+        "description": "Heal a friendly target for {damage}. Healing increases with Healing Power."
       },
       "power_word_fortitude": {
         "name": "Litany of Resolve",
@@ -18179,7 +18179,7 @@ export const en: EnTranslations = {
       },
       "renew": {
         "name": "Lingering Grace",
-        "description": "Heal the target for {damage} over 15 sec, once every 3 sec. Healing increases with Spell Power."
+        "description": "Heal the target for {damage} over 15 sec, once every 3 sec. Healing increases with Healing Power."
       },
       "mind_blast": {
         "name": "Mindfracture",
@@ -18187,7 +18187,7 @@ export const en: EnTranslations = {
       },
       "heal": {
         "name": "Solemn Prayer",
-        "description": "Heal a friendly target for {damage}. Healing increases with Spell Power."
+        "description": "Heal a friendly target for {damage}. Healing increases with Healing Power."
       },
       "mind_flay": {
         "name": "Litany of Woe",
@@ -18207,7 +18207,7 @@ export const en: EnTranslations = {
       },
       "flash_heal": {
         "name": "Urgent Prayer",
-        "description": "Heal a friendly target for {damage}. Healing increases with Spell Power."
+        "description": "Heal a friendly target for {damage}. Healing increases with Healing Power."
       },
       "lightning_bolt": {
         "name": "Arc Bolt",
@@ -18407,7 +18407,7 @@ export const en: EnTranslations = {
       },
       "entangling_roots": {
         "name": "Gripping Roots",
-        "description": "Roots the target in place for up to 12 sec. Higher ranks also deal Nature damage over 12 sec."
+        "description": "Roots the target in place for up to 12 sec. At its second rank, it also deals 32 Nature damage over 12 sec, increased by Spell Power."
       },
       "bear_form": {
         "name": "Bruin Form",
@@ -18695,7 +18695,7 @@ export const en: EnTranslations = {
       },
       "holy_nova": {
         "name": "Sunburst Canticle",
-        "description": "Heal allies within 10 yards for {damage} and deal 24 to 30 Holy damage to enemies in the same area. Both amounts increase with Spell Power. (Benison baseline)"
+        "description": "Heal allies within 10 yards for {damage} and deal 24 to 30 Holy damage to enemies in the same area. Healing increases with Healing Power and damage with Spell Power. (Benison baseline)"
       },
       "shadowform": {
         "name": "Gloamveil",
@@ -18898,7 +18898,7 @@ export const en: EnTranslations = {
       },
       "sanguine_aura": {
         "name": "Sanguine Aura",
-        "description": "Imbue your weapon with the blood of your foes: you and every melee party member, at any range, gain 10% attack speed and deal 10% more damage for 20 sec."
+        "description": "Imbue your weapon with the blood of your foes: you and every Warrior, Paladin, Rogue, Shaman, and Druid in your party, at any range, gain 10% attack speed and deal 10% more damage for 20 sec."
       },
       "victory_rush": {
         "name": "Victor's Surge",
@@ -19099,7 +19099,7 @@ export const en: EnTranslations = {
       },
       "temporal_acceleration": {
         "name": "Temporal Acceleration",
-        "description": "Accelerates the flow of time for your group or raid, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Temporal Acceleration or Storm Chorus are too exhausted to benefit. (Chronomancy)"
+        "description": "Accelerates the flow of time for group or raid allies within 40 yards, increasing their attack, casting, and channeling speed by 30% for 15 sec. Affected allies cannot benefit from Temporal Acceleration, Storm Chorus, or Thieves' Chorus again for 10 min. (Chronomancy)"
       },
       "perfect_moment": {
         "name": "Perfect Moment",
@@ -19119,7 +19119,7 @@ export const en: EnTranslations = {
       },
       "prayer_of_healing": {
         "name": "Choirmend",
-        "description": "Heal allies within 30 yards for {damage}. Healing increases with Spell Power. (Benison)"
+        "description": "Heal allies within 30 yards for {damage}. Healing increases with Healing Power. (Benison)"
       },
       "preparation": {
         "name": "Contingency",
@@ -19236,7 +19236,7 @@ export const en: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Choir of Deliverance",
-        "description": "Channel for 6 sec, healing party members within 30 yards for {damage} every 2 sec. Healing increases with Spell Power.",
+        "description": "Channel for 6 sec, healing you and every friendly target within 30 yards and in your line of sight for {damage} every 2 sec. Healing increases with Healing Power.",
         "specNote_shadow": "For 15 sec, share 20% of the health enemies lose to your Shadow damage as healing among injured party members within 30 yards, including yourself. In raids, only your subgroup is healed. Cast instantly and keep attacking in Gloamveil. Absorbed damage and overkill do not add healing."
       },
       "bear_charge": {

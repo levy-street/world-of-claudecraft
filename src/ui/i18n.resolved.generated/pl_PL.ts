@@ -18018,7 +18018,7 @@ export const pl_PL: EnTranslations = {
       },
       "aegis_first_dawn": {
         "name": "Egida Pierwszego Świtu",
-        "description": "Kanalizuje świętą kopułę o promieniu 10 m wokół ciebie. Sojuszniczy gracze wewnątrz i w twojej linii wzroku otrzymują o 50% mniej obrażeń i są leczeni za 35 do 45 co sekundę. Ukończenie kanalizowania leczy ich za dodatkowe 120 do 150 i daje 30% prędkości ruchu na 4 s. Leczenie rośnie z mocą leczenia."
+        "description": "Kanalizuje świętą kopułę o promieniu 10 m wokół ciebie. Sojuszniczy gracze wewnątrz i w twojej linii wzroku otrzymują o 50% mniej obrażeń i są leczeni za {aegisTick} co sekundę. Ukończenie kanalizowania leczy ich za dodatkowe {aegisFinal} i daje 30% prędkości ruchu na 4 s. Leczenie rośnie z mocą leczenia."
       },
       "vowkeeper_strike": {
         "name": "Cios Strażnika Ślubów",
@@ -18163,7 +18163,7 @@ export const pl_PL: EnTranslations = {
       },
       "lesser_heal": {
         "name": "Szeptana modlitwa",
-        "description": "Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą zaklęć."
+        "description": "Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą leczenia."
       },
       "power_word_fortitude": {
         "name": "Litania hartu",
@@ -18179,7 +18179,7 @@ export const pl_PL: EnTranslations = {
       },
       "renew": {
         "name": "Trwająca łaska",
-        "description": "Leczy cel o {damage} przez 15 s, raz na 3 s. Leczenie rośnie z mocą zaklęć."
+        "description": "Leczy cel o {damage} przez 15 s, raz na 3 s. Leczenie rośnie z mocą leczenia."
       },
       "mind_blast": {
         "name": "Roztrzaskanie umysłu",
@@ -18187,7 +18187,7 @@ export const pl_PL: EnTranslations = {
       },
       "heal": {
         "name": "Uroczysta modlitwa",
-        "description": "Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą zaklęć."
+        "description": "Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą leczenia."
       },
       "mind_flay": {
         "name": "Litania niedoli",
@@ -18207,7 +18207,7 @@ export const pl_PL: EnTranslations = {
       },
       "flash_heal": {
         "name": "Pilna modlitwa",
-        "description": "Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą zaklęć."
+        "description": "Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą leczenia."
       },
       "lightning_bolt": {
         "name": "Łukowy pocisk",
@@ -18407,7 +18407,7 @@ export const pl_PL: EnTranslations = {
       },
       "entangling_roots": {
         "name": "Chwytające korzenie",
-        "description": "Unieruchamia cel w miejscu na maksymalnie 12 s. Wyższe rangi zadają też obrażenia od natury w ciągu 12 s."
+        "description": "Unieruchamia cel w miejscu na maksymalnie 12 s. Na drugiej randze zadaje też 32 obrażeń od natury w ciągu 12 s, zwiększanych mocą zaklęć."
       },
       "bear_form": {
         "name": "Postać Bruina",
@@ -18695,7 +18695,7 @@ export const pl_PL: EnTranslations = {
       },
       "holy_nova": {
         "name": "Kantyk słoneczny",
-        "description": "Leczy sojuszników w promieniu 10 m o {damage} i zadaje od 24 do 30 obrażeń świętych wrogom w tym samym obszarze. Obie wartości rosną z mocą zaklęć. (Podstawa Świętości)"
+        "description": "Leczy sojuszników w promieniu 10 m o {damage} i zadaje od 24 do 30 obrażeń świętych wrogom w tym samym obszarze. Leczenie rośnie z mocą leczenia, a obrażenia z mocą zaklęć. (Podstawa Świętości)"
       },
       "shadowform": {
         "name": "Zmierzchowa zasłona",
@@ -18898,7 +18898,7 @@ export const pl_PL: EnTranslations = {
       },
       "sanguine_aura": {
         "name": "Aura krwi",
-        "description": "Nasyć swój oręż krwią wrogów: ty i każdy członek drużyny walczący wręcz, z dowolnej odległości, zyskujecie 10% szybkości ataku i zadajecie o 10% więcej obrażeń na 20 s."
+        "description": "Nasyć swój oręż krwią wrogów: ty i każdy Wojownik, Paladyn, Łotrzyk, Szaman i Druid w twojej drużynie, z dowolnej odległości, zyskujecie 10% szybkości ataku i zadajecie o 10% więcej obrażeń na 20 s."
       },
       "victory_rush": {
         "name": "Zryw zwycięstwa",
@@ -19099,7 +19099,7 @@ export const pl_PL: EnTranslations = {
       },
       "temporal_acceleration": {
         "name": "Przyspieszenie czasu",
-        "description": "Przyspiesza bieg czasu dla twojej grupy lub rajdu, zwiększając prędkość ataku, rzucania czarów i kanalizowania o 30% przez 15 sek. Sojusznicy, na których niedawno działała Temporal Acceleration lub Bębny Wojny, są zbyt wyczerpani, aby skorzystać z efektu. (Chronomancja)"
+        "description": "Przyspiesza bieg czasu dla sojuszników z grupy lub rajdu w promieniu 40 m, zwiększając ich prędkość ataku, rzucania i kanalizowania o 30% na 15 s. Objęci sojusznicy nie mogą przez 10 min ponownie skorzystać z Przyspieszenia czasu, Bębnów Wojny ani Chóru złodziei. (Chronomancja)"
       },
       "perfect_moment": {
         "name": "Idealna chwila",
@@ -19119,7 +19119,7 @@ export const pl_PL: EnTranslations = {
       },
       "prayer_of_healing": {
         "name": "Chóralne Uzdrowienie",
-        "description": "Leczy sojuszników w promieniu 30 m o {damage}. Leczenie rośnie z mocą zaklęć. (Świętość)"
+        "description": "Leczy sojuszników w promieniu 30 m o {damage}. Leczenie rośnie z mocą leczenia. (Świętość)"
       },
       "preparation": {
         "name": "Plan Awaryjny",
@@ -19236,7 +19236,7 @@ export const pl_PL: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Chór Wybawienia",
-        "description": "Kanałuje przez 6 s, lecząc członków grupy w promieniu 30 metrów za {damage} co 2 s. Leczenie rośnie wraz z mocą zaklęć.",
+        "description": "Kanałuje przez 6 s, lecząc ciebie i każdy sprzymierzony cel w promieniu 30 metrów i w twojej linii wzroku za {damage} co 2 s. Leczenie rośnie z mocą leczenia.",
         "specNote_shadow": "Przez 15 s dzielisz 20% zdrowia, które wrogowie tracą od twoich obrażeń od cienia, jako leczenie między rannych członków drużyny w promieniu 30 m, w tym ciebie. W rajdach leczona jest tylko twoja podgrupa. Rzucaj natychmiast i atakuj dalej w Zmierzchowej zasłonie. Pochłonięte obrażenia i nadmiarowe obrażenia nie dodają leczenia."
       },
       "bear_charge": {

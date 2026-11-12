@@ -18018,7 +18018,7 @@ export const pt_BR: EnTranslations = {
       },
       "aegis_first_dawn": {
         "name": "Égide da Primeira Alvorada",
-        "description": "Canaliza uma cúpula sagrada de 10 m ao seu redor. Jogadores aliados dentro dela e na sua linha de visão sofrem 50% menos dano e são curados em 35 a 45 a cada segundo. Concluir a canalização os cura em mais 120 a 150 e concede 30% de velocidade de movimento por 4 s. A cura aumenta com o poder de cura."
+        "description": "Canaliza uma cúpula sagrada de 10 m ao seu redor. Jogadores aliados dentro dela e na sua linha de visão sofrem 50% menos dano e são curados em {aegisTick} a cada segundo. Concluir a canalização os cura em mais {aegisFinal} e concede 30% de velocidade de movimento por 4 s. A cura aumenta com o poder de cura."
       },
       "vowkeeper_strike": {
         "name": "Golpe do Guardião dos Votos",
@@ -18163,7 +18163,7 @@ export const pt_BR: EnTranslations = {
       },
       "lesser_heal": {
         "name": "Prece Sussurrada",
-        "description": "Cura um alvo aliado em {damage}. A cura aumenta com o Poder Mágico."
+        "description": "Cura um alvo aliado em {damage}. A cura aumenta com o poder de cura."
       },
       "power_word_fortitude": {
         "name": "Litania da Resolução",
@@ -18179,7 +18179,7 @@ export const pt_BR: EnTranslations = {
       },
       "renew": {
         "name": "Graça Persistente",
-        "description": "Cura o alvo em {damage} ao longo de 15 s, uma vez a cada 3 s. A cura aumenta com o Poder Mágico."
+        "description": "Cura o alvo em {damage} ao longo de 15 s, uma vez a cada 3 s. A cura aumenta com o poder de cura."
       },
       "mind_blast": {
         "name": "Fratura Mental",
@@ -18187,7 +18187,7 @@ export const pt_BR: EnTranslations = {
       },
       "heal": {
         "name": "Prece Solene",
-        "description": "Cura um alvo aliado em {damage}. A cura aumenta com o Poder Mágico."
+        "description": "Cura um alvo aliado em {damage}. A cura aumenta com o poder de cura."
       },
       "mind_flay": {
         "name": "Litania da Aflição",
@@ -18207,7 +18207,7 @@ export const pt_BR: EnTranslations = {
       },
       "flash_heal": {
         "name": "Prece Urgente",
-        "description": "Cura um alvo aliado em {damage}. A cura aumenta com o Poder Mágico."
+        "description": "Cura um alvo aliado em {damage}. A cura aumenta com o poder de cura."
       },
       "lightning_bolt": {
         "name": "Raio em Arco",
@@ -18407,7 +18407,7 @@ export const pt_BR: EnTranslations = {
       },
       "entangling_roots": {
         "name": "Raízes Agarradoras",
-        "description": "Enraíza o alvo no lugar por até 12 s. Ranks maiores também causam dano de Natureza ao longo de 12 s."
+        "description": "Enraíza o alvo no lugar por até 12 s. No segundo rank, também causa 32 de dano de Natureza ao longo de 12 s, aumentado pelo Poder Mágico."
       },
       "bear_form": {
         "name": "Forma de Bruin",
@@ -18695,7 +18695,7 @@ export const pt_BR: EnTranslations = {
       },
       "holy_nova": {
         "name": "Cântico Solar",
-        "description": "Cura os aliados a até 10 m em {damage} e causa de 24 a 30 de dano Sagrado aos inimigos na mesma área. Ambos os valores aumentam com o Poder Mágico. (Base de Sagrado)"
+        "description": "Cura os aliados a até 10 m em {damage} e causa de 24 a 30 de dano Sagrado aos inimigos na mesma área. A cura aumenta com o poder de cura e o dano com o Poder Mágico. (Base de Sagrado)"
       },
       "shadowform": {
         "name": "Véu Crepuscular",
@@ -18898,7 +18898,7 @@ export const pt_BR: EnTranslations = {
       },
       "sanguine_aura": {
         "name": "Aura Sanguínea",
-        "description": "Impregna sua arma com o sangue dos seus inimigos: você e todos os membros corpo a corpo do grupo, a qualquer distância, ganham 10% de velocidade de ataque e causam 10% mais dano por 20 s."
+        "description": "Impregna sua arma com o sangue dos seus inimigos: você e todos os Guerreiros, Paladinos, Ladinos, Xamãs e Druidas do seu grupo, a qualquer distância, ganham 10% de velocidade de ataque e causam 10% mais dano por 20 s."
       },
       "victory_rush": {
         "name": "Ímpeto da Vitória",
@@ -19099,7 +19099,7 @@ export const pt_BR: EnTranslations = {
       },
       "temporal_acceleration": {
         "name": "Aceleração Temporal",
-        "description": "Acelera o fluxo do tempo para seu grupo ou raide, aumentando a velocidade de ataque, lançamento e canalização em 30% por 15 s. Aliados recentemente afetados por Aceleração Temporal ou Tambores de Guerra estão exaustos demais para se beneficiar. (Cronomancia)"
+        "description": "Acelera o fluxo do tempo para aliados de grupo ou raide a até 40 m, aumentando a velocidade de ataque, conjuração e canalização em 30% por 15 s. Os aliados afetados não podem se beneficiar de novo de Aceleração Temporal, Tambores de Guerra ou Coro dos Ladrões por 10 min. (Cronomancia)"
       },
       "perfect_moment": {
         "name": "Momento Perfeito",
@@ -19119,7 +19119,7 @@ export const pt_BR: EnTranslations = {
       },
       "prayer_of_healing": {
         "name": "Cura do Coro",
-        "description": "Cura os aliados a até 30 m em {damage}. A cura aumenta com o Poder Mágico. (Sagrado)"
+        "description": "Cura os aliados a até 30 m em {damage}. A cura aumenta com o poder de cura. (Sagrado)"
       },
       "preparation": {
         "name": "Contingência",
@@ -19236,7 +19236,7 @@ export const pt_BR: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Coro da Libertação",
-        "description": "Canaliza por 6 s, curando membros do grupo num raio de 30 metros em {damage} a cada 2 s. A cura aumenta com o poder mágico.",
+        "description": "Canaliza por 6 s, curando você e todos os alvos aliados a até 30 metros e na sua linha de visão em {damage} a cada 2 s. A cura aumenta com o poder de cura.",
         "specNote_shadow": "Por 15 s, compartilha 20% da vida que os inimigos perdem para o seu dano de Sombra como cura entre os membros feridos do grupo a até 30 m, incluindo você. Em raides, apenas seu subgrupo é curado. Lançamento instantâneo, permitindo continuar atacando no Véu Crepuscular. Dano absorvido e dano excedente à vida restante não geram cura."
       },
       "bear_charge": {

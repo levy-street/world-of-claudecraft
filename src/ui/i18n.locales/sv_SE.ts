@@ -5800,7 +5800,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.perfect_moment.name': 'Perfekt ögonblick',
   'entities.abilities.shatter.name': 'Sprött fördärv',
   'entities.abilities.temporal_acceleration.description':
-    'Accelererar tidens flöde för din grupp eller raid, ökar attack-, kast- och kanalisationshastighet med 30% i 15 sek. Allierade som nyligen påverkats av Temporal Acceleration eller Krigstrummor är för utmattade för att dra nytta av det. (Kronomantik)',
+    'Accelererar tidens flöde för grupp- eller raidallierade inom 40 yards, ökar deras attack-, kast- och kanaliseringshastighet med 30% i 15 sek. Påverkade allierade kan inte dra nytta av Tidsacceleration, Krigstrummor eller Tjuvarnas kör igen på 10 min. (Kronomantik)',
   'entities.abilities.temporal_acceleration.name': 'Tidsacceleration',
   'entities.abilities.temporal_barrier.description':
     'Förskjuter målet ett hjärtslag ur nuet; ett temporalt skal absorberar {damage} skada i 10 sek innan tidslinjen snäpper tillbaka.',
@@ -6309,7 +6309,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Slå alla fiender framför dig inom 8 yards för {damage} fysisk skada. Över 5 mål minskas varje träff så att totalen motsvarar 5 träffar. När du väjer undan eller parerar en varelses närstridsattack har du 30% chans att göra din nästa Hämnd inom 10 sek kostnadsfri i raseri. (Skydd)',
   'entities.abilities.revenge.name': 'Hämnd',
   'entities.abilities.sanguine_aura.description':
-    'Besjäla ditt vapen med dina fienders blod: du och varje närstridsmedlem i gruppen, på vilket avstånd som helst, får 10% attackhastighet och gör 10% mer skada i 20 sek.',
+    'Besjäla ditt vapen med dina fienders blod: du och varje Krigare, Paladin, Skurk, Schaman och Druid i din grupp, på vilket avstånd som helst, får 10% attackhastighet och gör 10% mer skada i 20 sek.',
   'entities.abilities.sanguine_aura.name': 'Blodröd aura',
   'entities.abilities.seasoned_soldier.description':
     'Dina kritiska autoattacker genererar 10 % mer raseri. (Vapen)',
@@ -7863,7 +7863,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.enrage.description': 'Genererar omedelbart 20 raseri. Endast i Bruinform.',
   'entities.abilities.enrage.name': 'Elda på',
   'entities.abilities.entangling_roots.description':
-    'Rotar målet på platsen i upp till 12 sek. Högre rangordningar ger också naturskada över 12 sek.',
+    'Rotar målet på platsen i upp till 12 sek. Vid sin andra rang vållar den också 32 naturskada över 12 sek, ökad av Besvärjelsekraft.',
   'entities.abilities.entangling_roots.name': 'Gripande rötter',
   'entities.abilities.evasion.description': 'Ökar din chans att väja undan med 50 % i 15 sek.',
   'entities.abilities.evasion.name': 'Spökfot',
@@ -7908,7 +7908,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Genomsyrar ert vapen i 30 min. Varje hugg vållar {damage} extra Eldskada.',
   'entities.abilities.flametongue_weapon.name': 'Pyrobrandsvapen',
   'entities.abilities.flash_heal.description':
-    'Läker ett vänligt mål för {damage}. Läkningen ökar med Besvärjelsekraft.',
+    'Läker ett vänligt mål för {damage}. Läkningen ökar med läkningskraft.',
   'entities.abilities.flash_heal.name': 'Brådskande bön',
   'entities.abilities.flash_of_light.description':
     'En snabb, effektiv skur av Ljus som läker ett vänligt mål för {damage}. Att återställa hälsa alstrar 1 Hängivenhet, även utan specialisering.',
@@ -7944,7 +7944,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Stympar fienden för {damage} skada och saktar dess förflyttning med 50 % i 15 sek.',
   'entities.abilities.hamstring.name': 'Haltande hugg',
   'entities.abilities.heal.description':
-    'Läker ett vänligt mål för {damage}. Läkningen ökar med Besvärjelsekraft.',
+    'Läker ett vänligt mål för {damage}. Läkningen ökar med läkningskraft.',
   'entities.abilities.heal.name': 'Högtidlig bön',
   'entities.abilities.healing_touch.description': 'Läker ett vänligt mål för {damage}.',
   'entities.abilities.healing_touch.specNote_restoration':
@@ -7982,7 +7982,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Läk ett vänligt mål för {damage}% av din maximala hälsa och generera 1 hängivenhet när den återställer hälsa.',
   'entities.abilities.lay_on_hands.name': 'Sista smörjelsen',
   'entities.abilities.lesser_heal.description':
-    'Läker ett vänligt mål för {damage}. Läkningen ökar med Besvärjelsekraft.',
+    'Läker ett vänligt mål för {damage}. Läkningen ökar med läkningskraft.',
   'entities.abilities.lesser_heal.name': 'Viskad bön',
   'entities.abilities.life_tap.description':
     'Omvandlar {damage} hälsa till {damage} mana (50% mer mana med Blodskuld). Misslyckas om du har {damage} hälsa eller mindre.',
@@ -8046,7 +8046,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.raptor_strike.name': 'Uppsprättande hugg',
   'entities.abilities.regrowth.name': 'Andra blomningen',
   'entities.abilities.renew.description':
-    'Läker målet för {damage} under 15 sek, en gång var 3 sek. Läkningen ökar med Besvärjelsekraft.',
+    'Läker målet för {damage} under 15 sek, en gång var 3 sek. Läkningen ökar med läkningskraft.',
   'entities.abilities.renew.name': 'Dröjande nåd',
   'entities.abilities.retribution_aura.description':
     'Omger dig och din grupp med helig energi till döden eller tills den ersätts. Fiender som träffar en påverkad allierad i närstrid tar {buff} helig skada, och påverkade allierade gör {buff} extra helig skada med automatiska attacker.',
@@ -8184,7 +8184,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Smörjer ett vänligt mål och ökar skada, läkning och besvärjelsehastighet med 20% i 15 sek.',
   'entities.abilities.holy_nova.name': 'Solsång',
   'entities.abilities.holy_nova.description':
-    'Läker bundsförvanter inom 10 m för {damage} och vållar 24 till 30 Helig skada på fiender i samma område. Båda beloppen ökar med Besvärjelsekraft. (Grund för Helig)',
+    'Läker bundsförvanter inom 10 m för {damage} och vållar 24 till 30 Helig skada på fiender i samma område. Läkningen ökar med läkningskraft och skadan med Besvärjelsekraft. (Grund för Helig)',
   'entities.abilities.shadowform.name': 'Skymningsslöja',
   'entities.abilities.shadowform.description':
     'Gå in i Skymningsslöja, vilket ökar din skuggskada med 25%. Att kasta en läkande besvärjelse avslutar den. Kasta Skymningsslöja igen för att lämna den. (Signatur för Skugga)',
@@ -14784,7 +14784,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.multi_shot.description':
     'Avfyrar en salva mot målområdet och ger {damage} Fysisk skada till fiender inom 8 yards. (jägartalang)',
   'entities.abilities.prayer_of_healing.description':
-    'Läker bundsförvanter inom 30 m för {damage}. Läkningen ökar med Besvärjelsekraft. (Helig)',
+    'Läker bundsförvanter inom 30 m för {damage}. Läkningen ökar med läkningskraft. (Helig)',
   'entities.abilities.preparation.description':
     'Avslutar nedkylningen för Spurt, Undvikande och Försvinnande. (skurktalang)',
   'entities.abilities.presence_of_mind.description':
@@ -16026,7 +16026,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.choir_of_deliverance.name': 'Befrielsens kör',
   'entities.abilities.scouring_mercy.name': 'Rensande nåd',
   'entities.abilities.aegis_first_dawn.description':
-    'Kanalisera en helig kupol på 10 m runt dig. Allierade spelare inuti och i din synlinje tar 50% mindre skada och läks för 35 till 45 varje sekund. Att fullborda kanaliseringen läker dem för 120 till 150 till och ger 30% rörelsehastighet i 4 sek. Läkningen ökar med läkningskraft.',
+    'Kanalisera en helig kupol på 10 m runt dig. Allierade spelare inuti och i din synlinje tar 50% mindre skada och läks för {aegisTick} varje sekund. Att fullborda kanaliseringen läker dem för {aegisFinal} till och ger 30% rörelsehastighet i 4 sek. Läkningen ökar med läkningskraft.',
   'entities.abilities.aura_mastery.description':
     'I 8 sek tredubblas varje aktiv Bastionens hängivenhet och Vedergällningsaura i din grupp: Bastionens hängivenhet minskar skadan som tas med 15%, och Vedergällningsaura ger tre gånger så mycket helig skada som vanligt. Upprepade användningar förnyar i stället för att staplas.',
   'entities.abilities.bastion_rite.description':
@@ -16094,7 +16094,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.vowkeeper_strike.description':
     'Slå för vapenskada plus {damage} fysisk skada med högt hot och generera 1 hängivenhet. Ett lyckat slag har 20% chans att ge Solvedergällning i 8 sek; varje lyckad blockering har 25%. Solvedergällning förbrukas av din nästa Solskiva (ingen manakostnad, ingen nedkylning, 20% mer skada), Nådens hammare (ingen nedkylning, läker dig för 100% av den skada som gjorts) eller Lagande ljus (omedelbar). Upphöjelse ger dig dessutom en sköld på 6% av din maximala hälsa i 6 sek.',
   'entities.abilities.choir_of_deliverance.description':
-    'Kanaliserar i 6 sek och läker gruppmedlemmar inom 30 meter för {damage} varannan sekund. Läkningen ökar med besvärjelsekraft.',
+    'Kanaliserar i 6 sek och läker dig och varje vänligt mål inom 30 meter och i din synlinje för {damage} varannan sekund. Läkningen ökar med läkningskraft.',
 
   // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
   // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.

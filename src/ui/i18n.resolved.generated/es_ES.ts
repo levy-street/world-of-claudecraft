@@ -18018,7 +18018,7 @@ export const es_ES: EnTranslations = {
       },
       "aegis_first_dawn": {
         "name": "Égida del Primer Alba",
-        "description": "Canaliza una cúpula sagrada de 10 m a tu alrededor. Los jugadores aliados que estén dentro y en tu línea de visión reciben un 50% menos de daño y se sanan de 35 a 45 cada segundo. Completar la canalización los sana de 120 a 150 adicionales y les otorga un 30% de velocidad de movimiento durante 4 s. La sanación aumenta con el poder de sanación."
+        "description": "Canaliza una cúpula sagrada de 10 m a tu alrededor. Los jugadores aliados que estén dentro y en tu línea de visión reciben un 50% menos de daño y se sanan {aegisTick} cada segundo. Completar la canalización los sana {aegisFinal} adicionales y les otorga un 30% de velocidad de movimiento durante 4 s. La sanación aumenta con el poder de sanación."
       },
       "vowkeeper_strike": {
         "name": "Golpe del Guardavotos",
@@ -18163,7 +18163,7 @@ export const es_ES: EnTranslations = {
       },
       "lesser_heal": {
         "name": "Plegaria Susurrada",
-        "description": "Sana a un objetivo aliado en {damage}. La sanación aumenta con el poder con hechizos."
+        "description": "Sana a un objetivo aliado en {damage}. La sanación aumenta con el poder de sanación."
       },
       "power_word_fortitude": {
         "name": "Letanía de Entereza",
@@ -18179,7 +18179,7 @@ export const es_ES: EnTranslations = {
       },
       "renew": {
         "name": "Gracia Persistente",
-        "description": "Sana al objetivo en {damage} durante 15 s, una vez cada 3 s. La sanación aumenta con el poder con hechizos."
+        "description": "Sana al objetivo en {damage} durante 15 s, una vez cada 3 s. La sanación aumenta con el poder de sanación."
       },
       "mind_blast": {
         "name": "Fractura Mental",
@@ -18187,7 +18187,7 @@ export const es_ES: EnTranslations = {
       },
       "heal": {
         "name": "Plegaria Solemne",
-        "description": "Sana a un objetivo aliado en {damage}. La sanación aumenta con el poder con hechizos."
+        "description": "Sana a un objetivo aliado en {damage}. La sanación aumenta con el poder de sanación."
       },
       "mind_flay": {
         "name": "Letanía de Aflicción",
@@ -18207,7 +18207,7 @@ export const es_ES: EnTranslations = {
       },
       "flash_heal": {
         "name": "Plegaria Urgente",
-        "description": "Sana a un objetivo aliado en {damage}. La sanación aumenta con el poder con hechizos."
+        "description": "Sana a un objetivo aliado en {damage}. La sanación aumenta con el poder de sanación."
       },
       "lightning_bolt": {
         "name": "Arco Eléctrico",
@@ -18407,7 +18407,7 @@ export const es_ES: EnTranslations = {
       },
       "entangling_roots": {
         "name": "Raíces Aferradoras",
-        "description": "Inmoviliza al objetivo en el sitio durante hasta 12 s. Los rangos superiores también infligen daño de Naturaleza durante 12 s."
+        "description": "Inmoviliza al objetivo en el sitio durante hasta 12 s. En su segundo rango, también inflige 32 de daño de Naturaleza durante 12 s, que aumenta con el poder con hechizos."
       },
       "bear_form": {
         "name": "Forma de Bruin",
@@ -18695,7 +18695,7 @@ export const es_ES: EnTranslations = {
       },
       "holy_nova": {
         "name": "Cántico Solar",
-        "description": "Sana a los aliados en 10 m en {damage} e inflige de 24 a 30 de daño Sagrado a los enemigos de esa misma área. Ambas cantidades aumentan con el poder con hechizos. (Base de Sagrado)"
+        "description": "Sana a los aliados en 10 m en {damage} e inflige de 24 a 30 de daño Sagrado a los enemigos de esa misma área. La sanación aumenta con el poder de sanación y el daño con el poder con hechizos. (Base de Sagrado)"
       },
       "shadowform": {
         "name": "Velo Crepuscular",
@@ -18898,7 +18898,7 @@ export const es_ES: EnTranslations = {
       },
       "sanguine_aura": {
         "name": "Aura Sanguínea",
-        "description": "Imbuyes tu arma con la sangre de tus enemigos: tú y todos los miembros cuerpo a cuerpo del grupo, a cualquier distancia, obtenéis un 10% de velocidad de ataque e infligís un 10% más de daño durante 20 s."
+        "description": "Imbuyes tu arma con la sangre de tus enemigos: tú y todos los Guerreros, Paladines, Pícaros, Chamanes y Druidas de tu grupo, a cualquier distancia, obtenéis un 10% de velocidad de ataque e infligís un 10% más de daño durante 20 s."
       },
       "victory_rush": {
         "name": "Arremetida del vencedor",
@@ -19099,7 +19099,7 @@ export const es_ES: EnTranslations = {
       },
       "temporal_acceleration": {
         "name": "Aceleración Temporal",
-        "description": "Acelera el flujo del tiempo para tu grupo o banda, aumentando la velocidad de ataque, lanzamiento y canalización un 30% durante 15 s. Los aliados afectados recientemente por Aceleración Temporal o Tambores de Guerra están demasiado agotados para beneficiarse. (Cronomancia)"
+        "description": "Acelera el flujo del tiempo para los aliados de grupo o banda a menos de 40 m, aumentando su velocidad de ataque, lanzamiento y canalización un 30% durante 15 s. Los aliados afectados no pueden volver a beneficiarse de Aceleración Temporal, Tambores de Guerra ni Coro de ladrones durante 10 min. (Cronomancia)"
       },
       "perfect_moment": {
         "name": "Momento perfecto",
@@ -19119,7 +19119,7 @@ export const es_ES: EnTranslations = {
       },
       "prayer_of_healing": {
         "name": "Coro Sanador",
-        "description": "Sana a los aliados en 30 m en {damage}. La sanación aumenta con el poder con hechizos. (Sagrado)"
+        "description": "Sana a los aliados en 30 m en {damage}. La sanación aumenta con el poder de sanación. (Sagrado)"
       },
       "preparation": {
         "name": "Contingencia",
@@ -19236,7 +19236,7 @@ export const es_ES: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Coro de Liberación",
-        "description": "Canaliza durante 6 s y sana a los miembros del grupo en un radio de 30 metros por {damage} cada 2 s. La sanación aumenta con el poder con hechizos.",
+        "description": "Canaliza durante 6 s y te sana a ti y a cada objetivo aliado en un radio de 30 metros y en tu línea de visión por {damage} cada 2 s. La sanación aumenta con el poder de sanación.",
         "specNote_shadow": "Durante 15 s, reparte el 20% de la salud que pierden los enemigos por tu daño de Sombras como sanación entre los miembros heridos del grupo a menos de 30 m, incluido tú. En bandas, solo se sana a tu subgrupo. Se lanza al instante y puedes seguir atacando en el Velo Crepuscular. El daño absorbido y el daño que excede la salud restante no añaden sanación."
       },
       "bear_charge": {

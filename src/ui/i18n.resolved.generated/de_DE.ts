@@ -18018,7 +18018,7 @@ export const de_DE: EnTranslations = {
       },
       "aegis_first_dawn": {
         "name": "Ägide der Ersten Morgenröte",
-        "description": "Kanalisiert eine heilige Kuppel von 10 m um Euch. Verbündete Spieler darin und in Eurer Sichtlinie erleiden 50% weniger Schaden und werden jede Sekunde um 35 bis 45 geheilt. Der Abschluss der Kanalisierung heilt sie um weitere 120 bis 150 und gewährt 4 Sek. lang 30% Lauftempo. Die Heilung steigt mit der Heilkraft."
+        "description": "Kanalisiert eine heilige Kuppel von 10 m um Euch. Verbündete Spieler darin und in Eurer Sichtlinie erleiden 50% weniger Schaden und werden jede Sekunde um {aegisTick} geheilt. Der Abschluss der Kanalisierung heilt sie um weitere {aegisFinal} und gewährt 4 Sek. lang 30% Lauftempo. Die Heilung steigt mit der Heilkraft."
       },
       "vowkeeper_strike": {
         "name": "Schwurwahrerschlag",
@@ -18163,7 +18163,7 @@ export const de_DE: EnTranslations = {
       },
       "lesser_heal": {
         "name": "Geflüstertes Gebet",
-        "description": "Heilt ein freundliches Ziel um {damage}. Die Heilung steigt mit der Zaubermacht."
+        "description": "Heilt ein freundliches Ziel um {damage}. Die Heilung steigt mit der Heilkraft."
       },
       "power_word_fortitude": {
         "name": "Litanei der Entschlossenheit",
@@ -18179,7 +18179,7 @@ export const de_DE: EnTranslations = {
       },
       "renew": {
         "name": "Anhaltende Gnade",
-        "description": "Heilt das Ziel über 15 Sek. um {damage}, alle 3 Sek. einmal. Die Heilung steigt mit der Zaubermacht."
+        "description": "Heilt das Ziel über 15 Sek. um {damage}, alle 3 Sek. einmal. Die Heilung steigt mit der Heilkraft."
       },
       "mind_blast": {
         "name": "Geistesbruch",
@@ -18187,7 +18187,7 @@ export const de_DE: EnTranslations = {
       },
       "heal": {
         "name": "Feierliches Gebet",
-        "description": "Heilt ein freundliches Ziel um {damage}. Die Heilung steigt mit der Zaubermacht."
+        "description": "Heilt ein freundliches Ziel um {damage}. Die Heilung steigt mit der Heilkraft."
       },
       "mind_flay": {
         "name": "Litanei des Leids",
@@ -18207,7 +18207,7 @@ export const de_DE: EnTranslations = {
       },
       "flash_heal": {
         "name": "Dringendes Gebet",
-        "description": "Heilt ein freundliches Ziel um {damage}. Die Heilung steigt mit der Zaubermacht."
+        "description": "Heilt ein freundliches Ziel um {damage}. Die Heilung steigt mit der Heilkraft."
       },
       "lightning_bolt": {
         "name": "Lichtbogenblitz",
@@ -18407,7 +18407,7 @@ export const de_DE: EnTranslations = {
       },
       "entangling_roots": {
         "name": "Greifende Wurzeln",
-        "description": "Verwurzelt das Ziel bis zu 12 Sek. lang an Ort und Stelle. Höhere Ränge verursachen außerdem Naturschaden über 12 Sek."
+        "description": "Verwurzelt das Ziel bis zu 12 Sek. lang an Ort und Stelle. Im zweiten Rang verursacht es außerdem 32 Naturschaden über 12 Sek., der mit der Zaubermacht steigt."
       },
       "bear_form": {
         "name": "Bruin-Gestalt",
@@ -18695,7 +18695,7 @@ export const de_DE: EnTranslations = {
       },
       "holy_nova": {
         "name": "Sonnenhymnus",
-        "description": "Heilt Verbündete im Umkreis von 10 m um {damage} und fügt Gegnern im selben Bereich 24 bis 30 Heiligschaden zu. Beide Beträge steigen mit der Zaubermacht. (Heilig-Grundlage)"
+        "description": "Heilt Verbündete im Umkreis von 10 m um {damage} und fügt Gegnern im selben Bereich 24 bis 30 Heiligschaden zu. Die Heilung steigt mit der Heilkraft, der Schaden mit der Zaubermacht. (Heilig-Grundlage)"
       },
       "shadowform": {
         "name": "Dämmerschleier",
@@ -18898,7 +18898,7 @@ export const de_DE: EnTranslations = {
       },
       "sanguine_aura": {
         "name": "Blutrote Aura",
-        "description": "Erfüllt Eure Waffe mit dem Blut Eurer Feinde: Ihr und jedes Nahkampf-Gruppenmitglied, egal in welcher Entfernung, erhaltet 20 Sek. lang 10% Angriffstempo und verursacht 10% mehr Schaden."
+        "description": "Erfüllt Eure Waffe mit dem Blut Eurer Feinde: Ihr und jeder Krieger, Paladin, Schurke, Schamane und Druide in Eurer Gruppe, egal in welcher Entfernung, erhaltet 20 Sek. lang 10% Angriffstempo und verursacht 10% mehr Schaden."
       },
       "victory_rush": {
         "name": "Siegesrausch",
@@ -19099,7 +19099,7 @@ export const de_DE: EnTranslations = {
       },
       "temporal_acceleration": {
         "name": "Temporale Beschleunigung",
-        "description": "Beschleunigt den Zeitfluss für deine Gruppe oder deinen Schlachtzug und erhöht Angriffs-, Zauber- und Kanalisierungsgeschwindigkeit 15 Sek. lang um 30%. Verbündete, die kürzlich von Temporaler Beschleunigung oder Kriegstrommeln betroffen waren, sind zu erschöpft, um davon zu profitieren. (Chronomantie)"
+        "description": "Beschleunigt den Zeitfluss für Gruppen- oder Schlachtzugsverbündete im Umkreis von 40 m und erhöht deren Angriffs-, Zauber- und Kanalisierungstempo 15 Sek. lang um 30%. Betroffene Verbündete können 10 Min. lang nicht erneut von Temporaler Beschleunigung, Kriegstrommeln oder Chor der Diebe profitieren. (Chronomantie)"
       },
       "perfect_moment": {
         "name": "Perfekter Moment",
@@ -19119,7 +19119,7 @@ export const de_DE: EnTranslations = {
       },
       "prayer_of_healing": {
         "name": "Chorheilung",
-        "description": "Heilt Verbündete im Umkreis von 30 m um {damage}. Die Heilung steigt mit der Zaubermacht. (Heilig)"
+        "description": "Heilt Verbündete im Umkreis von 30 m um {damage}. Die Heilung steigt mit der Heilkraft. (Heilig)"
       },
       "preparation": {
         "name": "Notfallplan",
@@ -19236,7 +19236,7 @@ export const de_DE: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Chor der Erlösung",
-        "description": "Kanalisiert 6 Sek. lang und heilt Gruppenmitglieder im Umkreis von 30 Metern alle 2 Sek. um {damage}. Die Heilung steigt mit Zaubermacht.",
+        "description": "Kanalisiert 6 Sek. lang und heilt Euch und jedes freundliche Ziel im Umkreis von 30 Metern und in Eurer Sichtlinie alle 2 Sek. um {damage}. Die Heilung steigt mit der Heilkraft.",
         "specNote_shadow": "15 Sek. lang wird 20% der Gesundheit, die Gegner durch Euren Schattenschaden verlieren, als Heilung auf verwundete Gruppenmitglieder im Umkreis von 30 m verteilt, Euch eingeschlossen. In Schlachtzügen wird nur Eure Untergruppe geheilt. Wird sofort gewirkt, und Ihr könnt im Dämmerschleier weiter angreifen. Absorbierter Schaden und Schaden über die verbleibende Gesundheit hinaus erzeugen keine Heilung."
       },
       "bear_charge": {

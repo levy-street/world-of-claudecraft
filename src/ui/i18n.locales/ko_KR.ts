@@ -2503,7 +2503,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '전방 8미터 이내의 모든 적에게 {damage}의 물리 피해를 입힙니다. 대상이 5명을 넘으면 각 타격의 피해가 감소하여 총합이 5회 타격과 같아집니다. 생물의 근접 공격을 회피하거나 쳐내면 30% 확률로 10초 안의 다음 복수가 분노를 소모하지 않습니다. (방어)',
   'entities.abilities.revenge.name': '복수',
   'entities.abilities.sanguine_aura.description':
-    '적의 피로 무기를 물들입니다. 자신과 모든 근접 파티원이 거리에 관계없이 20초 동안 공격 속도가 10% 증가하고 입히는 피해가 10% 증가합니다.',
+    '적의 피로 무기를 물들입니다. 자신과 파티의 모든 전사, 성기사, 도적, 주술사, 드루이드가 거리에 관계없이 20초 동안 공격 속도가 10% 증가하고 입히는 피해가 10% 증가합니다.',
   'entities.abilities.sanguine_aura.name': '선혈의 오라',
   'entities.abilities.seasoned_soldier.description':
     '자동 공격이 치명타로 적중하면 분노를 10% 더 생성합니다. (무기 특성)',
@@ -6174,7 +6174,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '{damage}의 신성 피해를 입힙니다. 피해량은 주문력에 따라 증가합니다. 수양: 30미터 이내에서 이어진 부상당한 파티원을 각각 입힌 피해의 30%만큼 치유합니다(쌍둥이 서약이면 70%). 부상당한 파티원이 없으면 대신 30미터 이내에서 생명력이 가장 낮은 부상당한 파티원을 15% 치유합니다.',
   'entities.abilities.lesser_heal.name': '속삭이는 기도',
   'entities.abilities.lesser_heal.description':
-    '아군 대상을 {damage}만큼 치유합니다. 치유량은 주문력에 따라 증가합니다.',
+    '아군 대상을 {damage}만큼 치유합니다. 치유량은 치유력에 따라 증가합니다.',
   'entities.abilities.power_word_fortitude.name': '결의의 연도',
   'entities.abilities.power_word_fortitude.description':
     '파티원 모두의 체력을 30분 동안 {buff}% 높입니다.',
@@ -6186,19 +6186,19 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '아군 대상을 감싸 30초 동안 {damage}의 피해를 흡수합니다. 수양은 대상을 30초 동안 이어주기도 하며, 이전에 이은 대상을 대체합니다(쌍둥이 서약이면 두 명을 유지). 이어진 파티원이 30미터 이내에 있는 동안, 정화의 성가와 적대적 정화의 자비가 입힌 피해의 30%만큼 그들을 치유합니다.',
   'entities.abilities.renew.name': '지속되는 은총',
   'entities.abilities.renew.description':
-    '15초에 걸쳐 3초마다 한 번씩 대상을 {damage}만큼 치유합니다. 치유량은 주문력에 따라 증가합니다.',
+    '15초에 걸쳐 3초마다 한 번씩 대상을 {damage}만큼 치유합니다. 치유량은 치유력에 따라 증가합니다.',
   'entities.abilities.mind_blast.name': '정신 파열',
   'entities.abilities.mind_blast.description':
     '{damage}의 암흑 피해를 입힙니다. 피해량은 주문력에 따라 증가합니다. 암흑은 당신의 부패의 만가로 대상을 그 형상으로 묶고, 어스름 공물을 1 주며, 피해의 30%를 당신의 만가를 지닌 다른 적 최대 3명에게 메아리치게 합니다.',
   'entities.abilities.heal.name': '엄숙한 기도',
   'entities.abilities.heal.description':
-    '아군 대상을 {damage}만큼 치유합니다. 치유량은 주문력에 따라 증가합니다.',
+    '아군 대상을 {damage}만큼 치유합니다. 치유량은 치유력에 따라 증가합니다.',
   'entities.abilities.mind_flay.name': '비탄의 연도',
   'entities.abilities.mind_flay.description':
     '3초 동안 정신을 집중해 매초 {damage}의 암흑 피해를 입힙니다. 피해량은 주문력에 따라 증가합니다.',
   'entities.abilities.flash_heal.name': '다급한 기도',
   'entities.abilities.flash_heal.description':
-    '아군 대상을 {damage}만큼 치유합니다. 치유량은 주문력에 따라 증가합니다.',
+    '아군 대상을 {damage}만큼 치유합니다. 치유량은 치유력에 따라 증가합니다.',
   'entities.abilities.lightning_bolt.name': '전격 화살',
   'entities.abilities.lightning_bolt.description':
     '{damage}의 자연 피해를 입힙니다. 피해량은 주문력에 따라 증가합니다. 정기: 명중하면 천둥을 1 얻습니다.',
@@ -6286,7 +6286,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '대상에게 10분 동안 가시가 돋아납니다. 대상을 겨냥한 근접 공격이 적중할 때마다 공격자에게 {buff}의 자연 피해를 입힙니다.',
   'entities.abilities.entangling_roots.name': '옥죄는 뿌리',
   'entities.abilities.entangling_roots.description':
-    '대상을 최대 12초 동안 제자리에 묶습니다. 상위 랭크는 12초 동안 자연 피해도 입힙니다.',
+    '대상을 최대 12초 동안 제자리에 묶습니다. 2랭크에서는 12초 동안 자연 피해 32도 입히며, 주문력에 따라 증가합니다.',
   'entities.abilities.bear_form.name': '큰곰 변신',
   'entities.abilities.bear_form.description':
     '곰으로 변신합니다. 방어도 +110%, 최대 생명력 +30%, 전투력 +15에 민첩 1당 +1.5이며, 공격이 분노를 생성하고 위협 수준이 30% 더 많이 생성됩니다. 공격 속도가 두 배가 되는 대신 타격당 피해가 절반이 되며, 각 타격은 두 배의 분노를 생성합니다. 어떤 형상으로 변신하든 짧은 이동 속도 증가인 성큼걸음을 얻습니다. 다시 시전하면 시전자 형태로 돌아갑니다.',
@@ -6457,7 +6457,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '아군 대상에게 성유를 발라 15초 동안 피해량과 치유량과 시전 속도를 20% 높입니다.',
   'entities.abilities.holy_nova.name': '아침해의 성가',
   'entities.abilities.holy_nova.description':
-    '10미터 안 아군을 {damage}만큼 치유하고 같은 지역의 적에게 24에서 30의 신성 피해를 입힙니다. 두 값 모두 주문력에 따라 증가합니다. (신성 기본)',
+    '10미터 안 아군을 {damage}만큼 치유하고 같은 지역의 적에게 24에서 30의 신성 피해를 입힙니다. 치유량은 치유력에, 피해량은 주문력에 따라 증가합니다. (신성 기본)',
   'entities.abilities.shadowform.name': '황혼의 장막',
   'entities.abilities.shadowform.description':
     '황혼의 장막에 들어 암흑 피해가 25% 증가합니다. 치유 주문을 시전하면 끝납니다. 황혼의 장막을 다시 시전하면 벗어납니다. (암흑 상징)',
@@ -14738,7 +14738,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.multi_shot.description':
     '대상 지역에 산탄을 발사하여 8야드 안의 적에게 물리 피해를 {damage}만큼 입힙니다. (사냥꾼 특성)',
   'entities.abilities.prayer_of_healing.description':
-    '30미터 안 아군을 {damage}만큼 치유합니다. 치유량은 주문력에 따라 증가합니다. (신성)',
+    '30미터 안 아군을 {damage}만큼 치유합니다. 치유량은 치유력에 따라 증가합니다. (신성)',
   'entities.abilities.preparation.description':
     '질주, 회피, 연막 은신의 재사용 대기시간을 완료합니다. (도적 특성)',
   'entities.abilities.presence_of_mind.description':
@@ -14823,7 +14823,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '파티 또는 공격대에 비전 파동을 보내 시간을 되감습니다. 40미터 내 각 아군이 지난 5초 동안 받은 피해의 30%를 회복시킵니다(최대 생명력의 35%까지). 이 효과는 치명타로 발동하지 않습니다. (시간술)',
   'entities.abilities.temporal_acceleration.name': '시간 가속',
   'entities.abilities.temporal_acceleration.description':
-    '파티 또는 공격대의 시간 흐름을 가속해 15초 동안 공격, 시전 및 정신 집중 속도를 30% 증가시킵니다. 최근 시간 가속 또는 피의 욕망 효과를 받은 아군은 지쳐 있어 혜택을 받지 못합니다. (시간술)',
+    '40미터 이내의 파티 또는 공격대 아군의 시간 흐름을 가속해 15초 동안 공격, 시전 및 정신 집중 속도를 30% 증가시킵니다. 영향을 받은 아군은 10분 동안 시간 가속, 전쟁 북, 도적의 합창의 혜택을 다시 받을 수 없습니다. (시간술)',
   'entities.abilities.perfect_moment.name': '완벽한 순간',
   'entities.abilities.perfect_moment.description':
     '완벽한 순간을 붙잡아 즉시 비전 충전 4개를 얻습니다. 10초 동안 에테르 화살이 충전을 소모하지 않고 피해가 20% 증가합니다. (시간술)',
@@ -17257,7 +17257,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '지정한 위치에 균열을 열어 8미터 안의 적을 중심으로 끌어당기고 {damage}의 암흑 피해를 입히며 2초 동안 기절시킵니다. 우두머리는 피해를 받지만 끌어당김과 기절에는 저항합니다.',
   'entities.abilities.abyssal_rift.name': '심연의 균열',
   'entities.abilities.aegis_first_dawn.description':
-    '주변에 반경 10미터의 성스러운 돔을 정신 집중으로 펼칩니다. 돔 안에서 당신의 시야에 있는 아군 플레이어는 받는 피해가 50% 감소하고 매초 35에서 45만큼 치유됩니다. 정신 집중을 완료하면 120에서 150만큼 추가로 치유하고 4초 동안 이동 속도를 30% 증가시킵니다. 치유량은 치유력에 따라 증가합니다.',
+    '주변에 반경 10미터의 성스러운 돔을 정신 집중으로 펼칩니다. 돔 안에서 당신의 시야에 있는 아군 플레이어는 받는 피해가 50% 감소하고 매초 {aegisTick}만큼 치유됩니다. 정신 집중을 완료하면 {aegisFinal}만큼 추가로 치유하고 4초 동안 이동 속도를 30% 증가시킵니다. 치유량은 치유력에 따라 증가합니다.',
   'entities.abilities.aegis_first_dawn.name': '첫 여명의 아이기스',
   'entities.abilities.ambush.specNote_subtlety':
     '황혼장막 상태에서 사용하면 땅거미가 1단계 쌓입니다(최대 3단계). 땅거미 3단계에서는 은신 없이 어느 각도에서든 사용할 수 있습니다: 이때는 자원이 들지 않고, 땅거미 3단계를 모두 소모하며, 6초 동안 그림자에 휩싸이고, 두 배의 피해를 입힙니다.',
@@ -17296,7 +17296,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cheap_shot.specNote_subtlety':
     '황혼장막 상태에서 사용하면 땅거미가 1단계 쌓입니다(최대 3단계). 땅거미 3단계에서는 은신 없이 사용할 수 있습니다: 이때는 자원이 들지 않고, 땅거미 3단계를 모두 소모하며, 6초 동안 그림자에 휩싸입니다.',
   'entities.abilities.choir_of_deliverance.description':
-    '6초 동안 정신을 집중해 30야드 안의 파티원을 2초마다 {damage}만큼 치유합니다. 치유량은 주문력에 따라 증가합니다.',
+    '6초 동안 정신을 집중해 당신과 시야에 있는 30야드 안의 모든 아군을 2초마다 {damage}만큼 치유합니다. 치유량은 치유력에 따라 증가합니다.',
   'entities.abilities.choir_of_deliverance.name': '구원의 성가대',
   'entities.abilities.cinderhide.description':
     '피부를 식은 용암 찌꺼기처럼 10초 동안 굳혀 받는 모든 피해를 25% 감소시킵니다.',

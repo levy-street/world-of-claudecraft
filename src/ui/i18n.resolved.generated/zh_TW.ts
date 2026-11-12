@@ -18018,7 +18018,7 @@ export const zh_TW: EnTranslations = {
       },
       "aegis_first_dawn": {
         "name": "初曙聖盾",
-        "description": "引導一個以你為中心、半徑 10 公尺的神聖穹頂。位於穹頂內且在你視線範圍內的友方玩家受到的傷害降低 50%，並每秒恢復 35 至 45 點生命值。完成引導時，再為他們恢復 120 至 150 點生命值，並使移動速度提高 30%，持續 4 秒。治療量隨治療強度提升。"
+        "description": "引導一個以你為中心、半徑 10 公尺的神聖穹頂。位於穹頂內且在你視線範圍內的友方玩家受到的傷害降低 50%，並每秒恢復 {aegisTick} 點生命值。完成引導時，再為他們恢復 {aegisFinal} 點生命值，並使移動速度提高 30%，持續 4 秒。治療量隨治療強度提升。"
       },
       "vowkeeper_strike": {
         "name": "守誓者打擊",
@@ -18163,7 +18163,7 @@ export const zh_TW: EnTranslations = {
       },
       "lesser_heal": {
         "name": "低語祈禱",
-        "description": "治療一個友方目標 {damage} 點生命。治療量隨法術強度提升。"
+        "description": "治療一個友方目標 {damage} 點生命。治療量隨治療強度提升。"
       },
       "power_word_fortitude": {
         "name": "堅毅連禱",
@@ -18179,7 +18179,7 @@ export const zh_TW: EnTranslations = {
       },
       "renew": {
         "name": "綿延恩典",
-        "description": "在 15 秒內治療目標 {damage} 點生命，每 3 秒一次。治療量隨法術強度提升。"
+        "description": "在 15 秒內治療目標 {damage} 點生命，每 3 秒一次。治療量隨治療強度提升。"
       },
       "mind_blast": {
         "name": "裂心術",
@@ -18187,7 +18187,7 @@ export const zh_TW: EnTranslations = {
       },
       "heal": {
         "name": "肅穆祈禱",
-        "description": "治療一個友方目標 {damage} 點生命。治療量隨法術強度提升。"
+        "description": "治療一個友方目標 {damage} 點生命。治療量隨治療強度提升。"
       },
       "mind_flay": {
         "name": "哀禍連禱",
@@ -18207,7 +18207,7 @@ export const zh_TW: EnTranslations = {
       },
       "flash_heal": {
         "name": "急切祈禱",
-        "description": "治療一個友方目標 {damage} 點生命。治療量隨法術強度提升。"
+        "description": "治療一個友方目標 {damage} 點生命。治療量隨治療強度提升。"
       },
       "lightning_bolt": {
         "name": "電弧箭",
@@ -18407,7 +18407,7 @@ export const zh_TW: EnTranslations = {
       },
       "entangling_roots": {
         "name": "攫纏根鬚",
-        "description": "將目標纏繞在原地，最多持續 12 秒。更高等級還會在 12 秒內造成自然傷害。"
+        "description": "將目標纏繞在原地，最多持續 12 秒。在第二等級時，還會在 12 秒內造成 32 點自然傷害，傷害隨法術強度提升。"
       },
       "bear_form": {
         "name": "巨熊形態",
@@ -18695,7 +18695,7 @@ export const zh_TW: EnTranslations = {
       },
       "holy_nova": {
         "name": "旭日聖詠",
-        "description": "治療 10 公尺內的盟友 {damage} 點生命，並對同一區域內的敵人造成 24 至 30 點神聖傷害。兩者皆隨法術強度提升。（聖光基礎技能）"
+        "description": "治療 10 公尺內的盟友 {damage} 點生命，並對同一區域內的敵人造成 24 至 30 點神聖傷害。治療量隨治療強度提升，傷害隨法術強度提升。（聖光基礎技能）"
       },
       "shadowform": {
         "name": "暮色帷幕",
@@ -18898,7 +18898,7 @@ export const zh_TW: EnTranslations = {
       },
       "sanguine_aura": {
         "name": "血色光環",
-        "description": "以敵人的鮮血浸染你的武器：你與每一名近戰隊伍成員（無論距離遠近）獲得 10% 攻擊速度，並使造成的傷害提高 10%，持續 20 秒。"
+        "description": "以敵人的鮮血浸染你的武器：你與隊伍中的每一名戰士、聖騎士、盜賊、薩滿和德魯伊（無論距離遠近）獲得 10% 攻擊速度，並使造成的傷害提高 10%，持續 20 秒。"
       },
       "victory_rush": {
         "name": "勝者之勢",
@@ -19099,7 +19099,7 @@ export const zh_TW: EnTranslations = {
       },
       "temporal_acceleration": {
         "name": "時間加速",
-        "description": "加快隊伍或團隊的時間流速，使攻擊、施法與引導速度提高 30%，持續 15 秒。近期受到時間加速或嗜血影響的盟友過於疲憊，無法再次受益。（時光術）"
+        "description": "加快 40 碼內隊伍或團隊盟友的時間流速，使其攻擊、施法與引導速度提高 30%，持續 15 秒。受影響的盟友在 10 分鐘內無法再次從時間加速、戰鼓或盜賊合唱中獲益。（時光術）"
       },
       "perfect_moment": {
         "name": "完美時刻",
@@ -19119,7 +19119,7 @@ export const zh_TW: EnTranslations = {
       },
       "prayer_of_healing": {
         "name": "聖歌癒療",
-        "description": "治療 30 公尺內的盟友 {damage} 點生命。治療量隨法術強度提升。（聖光）"
+        "description": "治療 30 公尺內的盟友 {damage} 點生命。治療量隨治療強度提升。（聖光）"
       },
       "preparation": {
         "name": "應變",
@@ -19236,7 +19236,7 @@ export const zh_TW: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "救贖聖詠團",
-        "description": "引導6秒，每2秒為30碼內的隊伍成員恢復{damage}點生命值。治療量隨法術強度提高。",
+        "description": "引導6秒，每2秒為你和30碼內且在你視線內的所有友方目標恢復{damage}點生命值。治療量隨治療強度提高。",
         "specNote_shadow": "持續 15 秒，將敵人因你的暗影傷害而損失生命值的 20%，轉化為治療，分給 30 碼內受傷的隊伍成員（包括你自己）。在團隊中，只有你所在的小隊會受到治療。瞬發施放，且你可在暮色帷幕中繼續攻擊。被吸收的傷害及超出敵人剩餘生命值的傷害不會增加治療量。"
       },
       "bear_charge": {

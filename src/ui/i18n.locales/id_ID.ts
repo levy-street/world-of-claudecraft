@@ -5844,7 +5844,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.perfect_moment.name': 'Momen Sempurna',
   'entities.abilities.shatter.name': 'Kehancuran Rapuh',
   'entities.abilities.temporal_acceleration.description':
-    'Mempercepat aliran waktu untuk grupmu atau raid, meningkatkan kecepatan serangan, rapalan, dan penyaluran sebesar 30% selama 15 dtk. Sekutu yang baru saja terpengaruh Temporal Acceleration atau Genderang Perang terlalu lelah untuk merasakan manfaatnya. (Kronomansi)',
+    'Mempercepat aliran waktu untuk sekutu kelompok atau raid dalam 40 yard, meningkatkan kecepatan serang, rapal, dan salur mereka sebesar 30% selama 15 dtk. Sekutu yang terkena tidak dapat memperoleh manfaat Percepatan Waktu, Genderang Perang, atau Paduan Suara Pencuri lagi selama 10 menit. (Kronomansi)',
   'entities.abilities.temporal_acceleration.name': 'Percepatan Waktu',
   'entities.abilities.temporal_barrier.description':
     'Menggeser target sedetik keluar dari masa kini, cangkang temporal menyerap {damage} kerusakan selama 10 dtk sebelum garis waktu kembali.',
@@ -6314,7 +6314,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menyerang semua musuh di depanmu dalam 8 yard sebesar {damage} kerusakan Fisik. Di atas 5 target, setiap pukulan dikurangi sehingga totalnya setara 5 pukulan. Saat kamu menghindar atau menangkis serangan jarak dekat makhluk, kamu berpeluang 30% membuat Balas Dendam berikutnya dalam 10 dtk tidak memakan amukan. (Perlindungan)',
   'entities.abilities.revenge.name': 'Balas Dendam',
   'entities.abilities.sanguine_aura.description':
-    'Meresapi senjatamu dengan darah musuh: kamu dan setiap anggota party jarak dekat, pada jarak berapa pun, memperoleh 10% kecepatan serang dan memberi 10% lebih banyak kerusakan selama 20 dtk.',
+    'Meresapi senjatamu dengan darah musuh: kamu dan setiap Prajurit, Paladin, Penyamun, Dukun, dan Druid di party-mu, pada jarak berapa pun, memperoleh 10% kecepatan serang dan memberi 10% lebih banyak kerusakan selama 20 dtk.',
   'entities.abilities.sanguine_aura.name': 'Aura Darah',
   'entities.abilities.seasoned_soldier.description':
     'Serangan otomatis kritismu menghasilkan 10% lebih banyak amarah. (Arms)',
@@ -8047,7 +8047,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menghasilkan 20 amarah seketika. Hanya dalam Wujud Bruin.',
   'entities.abilities.enrage.name': 'Kobaran',
   'entities.abilities.entangling_roots.description':
-    'Mengakar target di tempatnya hingga 12 dtk. Peringkat lebih tinggi juga memberi kerusakan Alam selama 12 dtk.',
+    'Mengakar target di tempatnya hingga 12 dtk. Pada peringkat kedua, juga memberi 32 kerusakan Alam selama 12 dtk, yang meningkat dengan Kekuatan Mantra.',
   'entities.abilities.entangling_roots.name': 'Akar Cengkeram',
   'entities.abilities.evasion.description':
     'Meningkatkan peluang mengelakmu sebesar 50% selama 15 detik.',
@@ -8093,7 +8093,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Meresapi senjatamu selama 30 menit. Setiap ayunan memberi {damage} kerusakan Api tambahan.',
   'entities.abilities.flametongue_weapon.name': 'Senjata Pyrebrand',
   'entities.abilities.flash_heal.description':
-    'Menyembuhkan sasaran sekutu sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Mantra.',
+    'Menyembuhkan sasaran sekutu sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Penyembuhan.',
   'entities.abilities.flash_heal.name': 'Doa Mendesak',
   'entities.abilities.flash_of_light.description':
     'Kilatan Cahaya yang cepat dan hemat, yang menyembuhkan sasaran sekutu sebesar {damage}. Memulihkan nyawa menghasilkan 1 Pengabdian, bahkan tanpa spesialisasi.',
@@ -8130,7 +8130,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Melukai musuh sebesar {damage} kerusakan, memperlambat gerakannya sebesar 50% selama 15 detik.',
   'entities.abilities.hamstring.name': 'Sayatan Pincang',
   'entities.abilities.heal.description':
-    'Menyembuhkan sasaran sekutu sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Mantra.',
+    'Menyembuhkan sasaran sekutu sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Penyembuhan.',
   'entities.abilities.heal.name': 'Doa Khidmat',
   'entities.abilities.healing_touch.description': 'Menyembuhkan target sekutu sebesar {damage}.',
   'entities.abilities.healing_touch.specNote_restoration':
@@ -8168,7 +8168,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menyembuhkan target sekutu sebesar {damage}% kesehatan maksimummu dan menghasilkan 1 Pengabdian saat memulihkan kesehatan.',
   'entities.abilities.lay_on_hands.name': 'Ritus Terakhir',
   'entities.abilities.lesser_heal.description':
-    'Menyembuhkan sasaran sekutu sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Mantra.',
+    'Menyembuhkan sasaran sekutu sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Penyembuhan.',
   'entities.abilities.lesser_heal.name': 'Doa Berbisik',
   'entities.abilities.life_tap.description':
     'Mengubah {damage} kesehatan menjadi {damage} mana (50% lebih banyak mana dengan Utang Darah). Gagal jika kesehatanmu {damage} atau kurang.',
@@ -8232,7 +8232,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.raptor_strike.name': 'Serangan Cabik Perut',
   'entities.abilities.regrowth.name': 'Mekar Kedua',
   'entities.abilities.renew.description':
-    'Menyembuhkan sasaran sebesar {damage} selama 15 dtk, sekali tiap 3 dtk. Penyembuhan meningkat dengan Kekuatan Mantra.',
+    'Menyembuhkan sasaran sebesar {damage} selama 15 dtk, sekali tiap 3 dtk. Penyembuhan meningkat dengan Kekuatan Penyembuhan.',
   'entities.abilities.renew.name': 'Rahmat Berlanjut',
   'entities.abilities.retribution_aura.description':
     'Menyelimuti dirimu dan kelompokmu dengan energi suci hingga mati atau digantikan. Musuh yang menyerang sekutu terpengaruh dari jarak dekat menerima {buff} kerusakan Suci, dan sekutu terpengaruh memberikan {buff} kerusakan Suci tambahan dengan serangan otomatis.',
@@ -8371,7 +8371,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Mengurapi sasaran sekutu, meningkatkan kerusakan, penyembuhan, dan kecepatan perapalan sebesar 20% selama 15 dtk.',
   'entities.abilities.holy_nova.name': 'Kidung Surya',
   'entities.abilities.holy_nova.description':
-    'Menyembuhkan sekutu dalam 10 yard sebesar {damage} dan memberi 24 sampai 30 kerusakan Suci kepada musuh di area yang sama. Kedua jumlah meningkat dengan Kekuatan Mantra. (Dasar Suci)',
+    'Menyembuhkan sekutu dalam 10 yard sebesar {damage} dan memberi 24 sampai 30 kerusakan Suci kepada musuh di area yang sama. Penyembuhan meningkat dengan Kekuatan Penyembuhan dan kerusakan dengan Kekuatan Mantra. (Dasar Suci)',
   'entities.abilities.shadowform.name': 'Selubung Senja',
   'entities.abilities.shadowform.description':
     'Memasuki Selubung Senja, menambah kerusakan Bayanganmu 25%. Merapal mantra penyembuhan mengakhirinya. Rapal Selubung Senja lagi untuk meninggalkannya. (Ciri khas Vespers)',
@@ -14757,7 +14757,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.multi_shot.description':
     'Melepaskan hujan tembakan ke area sasaran, memberikan {damage} kerusakan Fisik kepada musuh dalam jarak 8 yard. (talenta Pemburu)',
   'entities.abilities.prayer_of_healing.description':
-    'Menyembuhkan sekutu dalam 30 yard sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Mantra. (Suci)',
+    'Menyembuhkan sekutu dalam 30 yard sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Penyembuhan. (Suci)',
   'entities.abilities.preparation.description':
     'Mengakhiri waktu isi ulang Lari Cepat, Mengelak, dan Lenyap. (talenta Rogue)',
   'entities.abilities.presence_of_mind.description':
@@ -16024,7 +16024,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.choir_of_deliverance.name': 'Paduan Suara Pembebasan',
   'entities.abilities.scouring_mercy.name': 'Belas Kasih Pembersih',
   'entities.abilities.aegis_first_dawn.description':
-    'Menyalurkan kubah suci 10 m di sekitarmu. Pemain sekutu di dalamnya dan dalam garis pandangmu menerima 50% lebih sedikit kerusakan dan disembuhkan 35 sampai 45 setiap detik. Menyelesaikan penyaluran menyembuhkan mereka 120 sampai 150 lagi dan memberi 30% kecepatan gerak selama 4 dtk. Penyembuhan meningkat dengan Kekuatan Penyembuhan.',
+    'Menyalurkan kubah suci 10 m di sekitarmu. Pemain sekutu di dalamnya dan dalam garis pandangmu menerima 50% lebih sedikit kerusakan dan disembuhkan {aegisTick} setiap detik. Menyelesaikan penyaluran menyembuhkan mereka {aegisFinal} lagi dan memberi 30% kecepatan gerak selama 4 dtk. Penyembuhan meningkat dengan Kekuatan Penyembuhan.',
   'entities.abilities.aura_mastery.description':
     'Selama 8 dtk, melipatgandakan tiga kali setiap Pengabdian Benteng dan Aura Ganjaran aktif di kelompokmu: Pengabdian Benteng mengurangi kerusakan yang diterima 15%, dan Aura Ganjaran memberi tiga kali kerusakan Suci normalnya. Penggunaan berulang menyegarkan, bukan menumpuk.',
   'entities.abilities.bastion_rite.description':
@@ -16093,7 +16093,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.vowkeeper_strike.description':
     'Menyerang sebesar kerusakan senjata ditambah {damage} kerusakan Fisik dengan ancaman tinggi, dan menghasilkan 1 Pengabdian. Serangan yang berhasil berpeluang 20% memberi Pembalasan Surya selama 8 dtk; setiap tangkisan yang berhasil berpeluang 25%. Pembalasan Surya dihabiskan oleh Cakram Surya berikutnya (tanpa biaya mana, tanpa masa tunggu, 20% lebih banyak kerusakan), Palu Karunia (tanpa masa tunggu, menyembuhkanmu 100% kerusakan yang diberikan), atau Cahaya Pemulih (seketika). Kenaikan juga memberimu perisai sebesar 6% kesehatan maksimummu selama 6 dtk.',
   'entities.abilities.choir_of_deliverance.description':
-    'Merapal selama 6 dtk, menyembuhkan anggota grup dalam radius 30 meter sebesar {damage} setiap 2 dtk. Penyembuhan meningkat dengan kekuatan mantra.',
+    'Merapal selama 6 dtk, menyembuhkan dirimu dan setiap target sekutu dalam radius 30 meter serta dalam garis pandangmu sebesar {damage} setiap 2 dtk. Penyembuhan meningkat dengan Kekuatan Penyembuhan.',
 
   // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
   // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.

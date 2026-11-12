@@ -18018,7 +18018,7 @@ export const da_DK: EnTranslations = {
       },
       "aegis_first_dawn": {
         "name": "Første Daggrys Ægide",
-        "description": "Kanaliser en hellig kuppel på 10 m omkring dig. Allierede spillere indeni og i din synslinje tager 50% mindre skade og helbredes for 35 til 45 hvert sekund. At fuldføre kanaliseringen helbreder dem for yderligere 120 til 150 og giver 30% bevægelseshastighed i 4 sek. Helbredelsen stiger med Helbredelseskraft."
+        "description": "Kanaliser en hellig kuppel på 10 m omkring dig. Allierede spillere indeni og i din synslinje tager 50% mindre skade og helbredes for {aegisTick} hvert sekund. At fuldføre kanaliseringen helbreder dem for yderligere {aegisFinal} og giver 30% bevægelseshastighed i 4 sek. Helbredelsen stiger med Helbredelseskraft."
       },
       "vowkeeper_strike": {
         "name": "Edvogterens Slag",
@@ -18163,7 +18163,7 @@ export const da_DK: EnTranslations = {
       },
       "lesser_heal": {
         "name": "Hvisket Bøn",
-        "description": "Helbreder et venligt mål for {damage}. Helbredelsen stiger med Besværgelseskraft."
+        "description": "Helbreder et venligt mål for {damage}. Helbredelsen stiger med Helbredelseskraft."
       },
       "power_word_fortitude": {
         "name": "Beslutsomhedens Litani",
@@ -18179,7 +18179,7 @@ export const da_DK: EnTranslations = {
       },
       "renew": {
         "name": "Dvælende Nåde",
-        "description": "Helbreder målet for {damage} over 15 sek., én gang hvert 3. sek. Helbredelsen stiger med Besværgelseskraft."
+        "description": "Helbreder målet for {damage} over 15 sek., én gang hvert 3. sek. Helbredelsen stiger med Helbredelseskraft."
       },
       "mind_blast": {
         "name": "Sindsbrud",
@@ -18187,7 +18187,7 @@ export const da_DK: EnTranslations = {
       },
       "heal": {
         "name": "Højtidelig Bøn",
-        "description": "Helbreder et venligt mål for {damage}. Helbredelsen stiger med Besværgelseskraft."
+        "description": "Helbreder et venligt mål for {damage}. Helbredelsen stiger med Helbredelseskraft."
       },
       "mind_flay": {
         "name": "Jammerens Litani",
@@ -18207,7 +18207,7 @@ export const da_DK: EnTranslations = {
       },
       "flash_heal": {
         "name": "Hastende Bøn",
-        "description": "Helbreder et venligt mål for {damage}. Helbredelsen stiger med Besværgelseskraft."
+        "description": "Helbreder et venligt mål for {damage}. Helbredelsen stiger med Helbredelseskraft."
       },
       "lightning_bolt": {
         "name": "Lysbuelyn",
@@ -18407,7 +18407,7 @@ export const da_DK: EnTranslations = {
       },
       "entangling_roots": {
         "name": "Gribende Rødder",
-        "description": "Rodfæster målet på stedet i op til 12 sek. Højere rangeringer gør også Naturskade over 12 sek."
+        "description": "Rodfæster målet på stedet i op til 12 sek. På anden rangering gør den også 32 Naturskade over 12 sek., som stiger med Besværgelseskraft."
       },
       "bear_form": {
         "name": "Bruin-form",
@@ -18695,7 +18695,7 @@ export const da_DK: EnTranslations = {
       },
       "holy_nova": {
         "name": "Solsang",
-        "description": "Helbreder allierede inden for 10 m for {damage} og volder 24 til 30 Hellig skade på fjender i samme område. Begge beløb stiger med Besværgelseskraft. (Grundlag for Hellig)"
+        "description": "Helbreder allierede inden for 10 m for {damage} og volder 24 til 30 Hellig skade på fjender i samme område. Helbredelsen stiger med Helbredelseskraft og skaden med Besværgelseskraft. (Grundlag for Hellig)"
       },
       "shadowform": {
         "name": "Tusmørkeslør",
@@ -18898,7 +18898,7 @@ export const da_DK: EnTranslations = {
       },
       "sanguine_aura": {
         "name": "Blodrød Aura",
-        "description": "Gennemtræng dit våben med dine fjenders blod: du og hvert nærkampsmedlem af din gruppe, uanset afstand, får 10% angrebshastighed og gør 10% mere skade i 20 sek."
+        "description": "Gennemtræng dit våben med dine fjenders blod: du og hver Kriger, Paladin, Slyngel, Shaman og Druide i din gruppe, uanset afstand, får 10% angrebshastighed og gør 10% mere skade i 20 sek."
       },
       "victory_rush": {
         "name": "Sejrsrus",
@@ -19099,7 +19099,7 @@ export const da_DK: EnTranslations = {
       },
       "temporal_acceleration": {
         "name": "Tidsacceleration",
-        "description": "Fremskynder tidens gang for din gruppe eller raid og øger angrebshastighed, kastetempo og kanaliseringstempo med 30% i 15 sek. Allierede der for nylig blev påvirkede af Temporal Acceleration eller Krigstrommer er for udmattede til at have gavn af det. (Kronomantik)"
+        "description": "Fremskynder tidens gang for gruppe- eller raidallierede inden for 40 m og øger deres angrebs-, besværgelses- og kanaliseringshastighed med 30% i 15 sek. Berørte allierede kan ikke drage nytte af Tidsacceleration, Krigstrommer eller Tyvenes Kor igen i 10 min. (Kronomantik)"
       },
       "perfect_moment": {
         "name": "Perfekt Øjeblik",
@@ -19119,7 +19119,7 @@ export const da_DK: EnTranslations = {
       },
       "prayer_of_healing": {
         "name": "Korhelbredelse",
-        "description": "Helbreder allierede inden for 30 m for {damage}. Helbredelsen stiger med Besværgelseskraft. (Hellig)"
+        "description": "Helbreder allierede inden for 30 m for {damage}. Helbredelsen stiger med Helbredelseskraft. (Hellig)"
       },
       "preparation": {
         "name": "Nødplan",
@@ -19236,7 +19236,7 @@ export const da_DK: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Befrielsens Kor",
-        "description": "Kanaliserer i 6 sek. og helbreder gruppemedlemmer inden for 30 meter for {damage} hvert 2. sek. Helbredelsen øges med besværgelseskraft.",
+        "description": "Kanaliserer i 6 sek. og helbreder dig og hvert venligt mål inden for 30 meter og i din synslinje for {damage} hvert 2. sek. Helbredelsen stiger med Helbredelseskraft.",
         "specNote_shadow": "I 15 sek. deles 20% af det helbred, fjender mister til din Skyggeskade, som helbredelse mellem sårede gruppemedlemmer inden for 30 m, dig selv inklusive. I raids helbredes kun din undergruppe. Kastes øjeblikkeligt, og du kan fortsætte med at angribe i Tusmørkeslør. Absorberet skade og overkill giver ingen helbredelse."
       },
       "bear_charge": {

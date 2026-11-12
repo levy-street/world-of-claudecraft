@@ -18018,7 +18018,7 @@ export const ko_KR: EnTranslations = {
       },
       "aegis_first_dawn": {
         "name": "첫 여명의 아이기스",
-        "description": "주변에 반경 10미터의 성스러운 돔을 정신 집중으로 펼칩니다. 돔 안에서 당신의 시야에 있는 아군 플레이어는 받는 피해가 50% 감소하고 매초 35에서 45만큼 치유됩니다. 정신 집중을 완료하면 120에서 150만큼 추가로 치유하고 4초 동안 이동 속도를 30% 증가시킵니다. 치유량은 치유력에 따라 증가합니다."
+        "description": "주변에 반경 10미터의 성스러운 돔을 정신 집중으로 펼칩니다. 돔 안에서 당신의 시야에 있는 아군 플레이어는 받는 피해가 50% 감소하고 매초 {aegisTick}만큼 치유됩니다. 정신 집중을 완료하면 {aegisFinal}만큼 추가로 치유하고 4초 동안 이동 속도를 30% 증가시킵니다. 치유량은 치유력에 따라 증가합니다."
       },
       "vowkeeper_strike": {
         "name": "맹세수호자의 일격",
@@ -18163,7 +18163,7 @@ export const ko_KR: EnTranslations = {
       },
       "lesser_heal": {
         "name": "속삭이는 기도",
-        "description": "아군 대상을 {damage}만큼 치유합니다. 치유량은 주문력에 따라 증가합니다."
+        "description": "아군 대상을 {damage}만큼 치유합니다. 치유량은 치유력에 따라 증가합니다."
       },
       "power_word_fortitude": {
         "name": "결의의 연도",
@@ -18179,7 +18179,7 @@ export const ko_KR: EnTranslations = {
       },
       "renew": {
         "name": "지속되는 은총",
-        "description": "15초에 걸쳐 3초마다 한 번씩 대상을 {damage}만큼 치유합니다. 치유량은 주문력에 따라 증가합니다."
+        "description": "15초에 걸쳐 3초마다 한 번씩 대상을 {damage}만큼 치유합니다. 치유량은 치유력에 따라 증가합니다."
       },
       "mind_blast": {
         "name": "정신 파열",
@@ -18187,7 +18187,7 @@ export const ko_KR: EnTranslations = {
       },
       "heal": {
         "name": "엄숙한 기도",
-        "description": "아군 대상을 {damage}만큼 치유합니다. 치유량은 주문력에 따라 증가합니다."
+        "description": "아군 대상을 {damage}만큼 치유합니다. 치유량은 치유력에 따라 증가합니다."
       },
       "mind_flay": {
         "name": "비탄의 연도",
@@ -18207,7 +18207,7 @@ export const ko_KR: EnTranslations = {
       },
       "flash_heal": {
         "name": "다급한 기도",
-        "description": "아군 대상을 {damage}만큼 치유합니다. 치유량은 주문력에 따라 증가합니다."
+        "description": "아군 대상을 {damage}만큼 치유합니다. 치유량은 치유력에 따라 증가합니다."
       },
       "lightning_bolt": {
         "name": "전격 화살",
@@ -18407,7 +18407,7 @@ export const ko_KR: EnTranslations = {
       },
       "entangling_roots": {
         "name": "옥죄는 뿌리",
-        "description": "대상을 최대 12초 동안 제자리에 묶습니다. 상위 랭크는 12초 동안 자연 피해도 입힙니다."
+        "description": "대상을 최대 12초 동안 제자리에 묶습니다. 2랭크에서는 12초 동안 자연 피해 32도 입히며, 주문력에 따라 증가합니다."
       },
       "bear_form": {
         "name": "큰곰 변신",
@@ -18695,7 +18695,7 @@ export const ko_KR: EnTranslations = {
       },
       "holy_nova": {
         "name": "아침해의 성가",
-        "description": "10미터 안 아군을 {damage}만큼 치유하고 같은 지역의 적에게 24에서 30의 신성 피해를 입힙니다. 두 값 모두 주문력에 따라 증가합니다. (신성 기본)"
+        "description": "10미터 안 아군을 {damage}만큼 치유하고 같은 지역의 적에게 24에서 30의 신성 피해를 입힙니다. 치유량은 치유력에, 피해량은 주문력에 따라 증가합니다. (신성 기본)"
       },
       "shadowform": {
         "name": "황혼의 장막",
@@ -18898,7 +18898,7 @@ export const ko_KR: EnTranslations = {
       },
       "sanguine_aura": {
         "name": "선혈의 오라",
-        "description": "적의 피로 무기를 물들입니다. 자신과 모든 근접 파티원이 거리에 관계없이 20초 동안 공격 속도가 10% 증가하고 입히는 피해가 10% 증가합니다."
+        "description": "적의 피로 무기를 물들입니다. 자신과 파티의 모든 전사, 성기사, 도적, 주술사, 드루이드가 거리에 관계없이 20초 동안 공격 속도가 10% 증가하고 입히는 피해가 10% 증가합니다."
       },
       "victory_rush": {
         "name": "승자의 쇄도",
@@ -19099,7 +19099,7 @@ export const ko_KR: EnTranslations = {
       },
       "temporal_acceleration": {
         "name": "시간 가속",
-        "description": "파티 또는 공격대의 시간 흐름을 가속해 15초 동안 공격, 시전 및 정신 집중 속도를 30% 증가시킵니다. 최근 시간 가속 또는 피의 욕망 효과를 받은 아군은 지쳐 있어 혜택을 받지 못합니다. (시간술)"
+        "description": "40미터 이내의 파티 또는 공격대 아군의 시간 흐름을 가속해 15초 동안 공격, 시전 및 정신 집중 속도를 30% 증가시킵니다. 영향을 받은 아군은 10분 동안 시간 가속, 전쟁 북, 도적의 합창의 혜택을 다시 받을 수 없습니다. (시간술)"
       },
       "perfect_moment": {
         "name": "완벽한 순간",
@@ -19119,7 +19119,7 @@ export const ko_KR: EnTranslations = {
       },
       "prayer_of_healing": {
         "name": "성가 치유",
-        "description": "30미터 안 아군을 {damage}만큼 치유합니다. 치유량은 주문력에 따라 증가합니다. (신성)"
+        "description": "30미터 안 아군을 {damage}만큼 치유합니다. 치유량은 치유력에 따라 증가합니다. (신성)"
       },
       "preparation": {
         "name": "대비책",
@@ -19236,7 +19236,7 @@ export const ko_KR: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "구원의 성가대",
-        "description": "6초 동안 정신을 집중해 30야드 안의 파티원을 2초마다 {damage}만큼 치유합니다. 치유량은 주문력에 따라 증가합니다.",
+        "description": "6초 동안 정신을 집중해 당신과 시야에 있는 30야드 안의 모든 아군을 2초마다 {damage}만큼 치유합니다. 치유량은 치유력에 따라 증가합니다.",
         "specNote_shadow": "15초 동안 자신의 암흑 피해로 적이 잃은 생명력의 20%를 치유량으로 전환하여 자신을 포함한 30미터 이내의 부상당한 파티원에게 나눕니다. 공격대에서는 자신의 하위 파티만 치유합니다. 즉시 시전하며 황혼의 장막에서 계속 공격할 수 있습니다. 흡수된 피해와 초과 피해는 치유량에 포함되지 않습니다."
       },
       "bear_charge": {

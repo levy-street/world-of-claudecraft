@@ -5769,7 +5769,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.perfect_moment.name': 'Mükemmel An',
   'entities.abilities.shatter.name': 'Kırılgan Yıkım',
   'entities.abilities.temporal_acceleration.description':
-    "Grubunuz veya akınınız için zamanın akışını hızlandırarak saldırı, büyü atma ve kanalize hızını 15 saniye boyunca %30 artırır. Yakın zamanda Zamansal Hızlanma veya Savaş Davulları'ndan etkilenen müttefikler bu etkiden yararlanamayacak kadar tükenmiştir. (Kronomansi)",
+    "40 yarda içindeki grup veya akın müttefikleri için zamanın akışını hızlandırarak saldırı, büyü ve kanalize hızını 15 sn boyunca %30 artırır. Etkilenen müttefikler 10 dk boyunca Zamansal Hızlanma, Savaş Davulları veya Hırsızlar Korosu'ndan yeniden yararlanamaz. (Kronomansi)",
   'entities.abilities.temporal_acceleration.name': 'Zamansal Hızlanma',
   'entities.abilities.temporal_barrier.description':
     'Hedefi şimdiden bir kalp atışı uzaklaştırarak zamansal bir kabuk oluşturur ve zaman çizelgesi geri dökmeden önce 10 saniye boyunca {damage} hasarı emer.',
@@ -6233,7 +6233,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     '8 yarda içinde önündeki tüm düşmanlara {damage} Fiziksel hasar vurur. 5 hedefin üzerinde her vuruş azaltılır ve toplam 5 vuruşa eşit olur. Bir yaratığın yakın dövüş saldırısını savuşturduğunda veya karşıladığında, 10 sn içindeki sonraki İntikamının hiç öfke harcamaması için %30 şansın vardır. (Koruma)',
   'entities.abilities.revenge.name': 'İntikam',
   'entities.abilities.sanguine_aura.description':
-    'Silahını düşmanlarının kanıyla donatırsın: sen ve her yakın dövüşçü grup üyesi, menzil fark etmeksizin, 20 sn boyunca %10 saldırı hızı kazanır ve %10 daha fazla hasar verir.',
+    'Silahını düşmanlarının kanıyla donatırsın: sen ve gruptaki her Savaşçı, Paladin, Hırsız, Şaman ve Druid, menzil fark etmeksizin, 20 sn boyunca %10 saldırı hızı kazanır ve %10 daha fazla hasar verir.',
   'entities.abilities.sanguine_aura.name': 'Kan Aurası',
   'entities.abilities.seasoned_soldier.description':
     'Kritik otomatik saldırıların %10 daha fazla öfke üretir. (Silahşor)',
@@ -7958,7 +7958,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.enrage.description': 'Anında 20 öfke üretir. Yalnızca Bruin Formu.',
   'entities.abilities.enrage.name': 'Körükleme',
   'entities.abilities.entangling_roots.description':
-    'Hedefi en fazla 12 sn boyunca olduğu yere köklendirir. Yüksek rütbeler ayrıca 12 sn boyunca Doğa hasarı verir.',
+    'Hedefi en fazla 12 sn boyunca olduğu yere köklendirir. İkinci rütbede ayrıca 12 sn boyunca Büyü Gücü ile artan 32 Doğa hasarı verir.',
   'entities.abilities.entangling_roots.name': 'Kavrayan Kökler',
   'entities.abilities.evasion.description': 'Sıyırma şansını 15 saniye boyunca %50 artırır.',
   'entities.abilities.evasion.name': 'Hayalet Ayak',
@@ -8003,7 +8003,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Silahına 30 dakika boyunca işler. Her savurma {damage} ek Ateş hasarı verir.',
   'entities.abilities.flametongue_weapon.name': 'Pyrebrand Silahı',
   'entities.abilities.flash_heal.description':
-    'Dost bir hedefi {damage} iyileştirir. İyileştirme Büyü Gücü ile artar.',
+    'Dost bir hedefi {damage} iyileştirir. İyileştirme, İyileştirme Gücü ile artar.',
   'entities.abilities.flash_heal.name': 'Acil Dua',
   'entities.abilities.flash_of_light.description':
     'Dost bir hedefi {damage} iyileştiren hızlı ve verimli bir Işık patlaması. Can yenilemek uzmanlık olmadan bile 1 Adanmışlık üretir.',
@@ -8040,7 +8040,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Düşmanı {damage} hasarla sakatlayarak hareketini 15 saniye boyunca %50 yavaşlatır.',
   'entities.abilities.hamstring.name': 'Topallatan Kesik',
   'entities.abilities.heal.description':
-    'Dost bir hedefi {damage} iyileştirir. İyileştirme Büyü Gücü ile artar.',
+    'Dost bir hedefi {damage} iyileştirir. İyileştirme, İyileştirme Gücü ile artar.',
   'entities.abilities.heal.name': 'Vakur Dua',
   'entities.abilities.healing_touch.description': 'Dost bir hedefi {damage} iyileştirir.',
   'entities.abilities.healing_touch.specNote_restoration':
@@ -8078,7 +8078,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Dost bir hedefi, azami canının %{damage}'i kadar iyileştirir ve can yenilediğinde 1 Adanmışlık üretir.",
   'entities.abilities.lay_on_hands.name': 'Son Ayin',
   'entities.abilities.lesser_heal.description':
-    'Dost bir hedefi {damage} iyileştirir. İyileştirme Büyü Gücü ile artar.',
+    'Dost bir hedefi {damage} iyileştirir. İyileştirme, İyileştirme Gücü ile artar.',
   'entities.abilities.lesser_heal.name': 'Fısıldanan Dua',
   'entities.abilities.life_tap.description':
     '{damage} canı {damage} manaya dönüştürür (Kan Kredisi ile %50 daha fazla mana). Canın {damage} veya altındaysa başarısız olur.',
@@ -8142,7 +8142,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.raptor_strike.name': 'Deşen Darbe',
   'entities.abilities.regrowth.name': 'İkinci Çiçeklenme',
   'entities.abilities.renew.description':
-    "Hedefi 15 sn boyunca {damage} iyileştirir, her 3 sn'de bir kez. İyileştirme Büyü Gücü ile artar.",
+    "Hedefi 15 sn boyunca {damage} iyileştirir, her 3 sn'de bir kez. İyileştirme, İyileştirme Gücü ile artar.",
   'entities.abilities.renew.name': 'Kalıcı Lütuf',
   'entities.abilities.retribution_aura.description':
     'Seni ve grubunu ölüme ya da değiştirilene kadar kutsal enerjiyle sarar. Etkilenen bir müttefike yakın dövüşte vuran düşmanlar {buff} Kutsal hasar alır ve etkilenen müttefikler otomatik saldırılarıyla {buff} ek Kutsal hasar verir.',
@@ -8280,7 +8280,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Dost bir hedefi kutsar, hasarı, iyileştirmeyi ve büyü hızını 15 sn boyunca %20 artırır.',
   'entities.abilities.holy_nova.name': 'Güneş İlahisi',
   'entities.abilities.holy_nova.description':
-    '10 m içindeki müttefikleri {damage} iyileştirir ve aynı alandaki düşmanlara 24 ila 30 Kutsal hasar verir. Her iki miktar da Büyü Gücü ile artar. (Kutsal temeli)',
+    '10 m içindeki müttefikleri {damage} iyileştirir ve aynı alandaki düşmanlara 24 ila 30 Kutsal hasar verir. İyileştirme İyileştirme Gücü ile, hasar ise Büyü Gücü ile artar. (Kutsal temeli)',
   'entities.abilities.shadowform.name': 'Alacakaranlık Perdesi',
   'entities.abilities.shadowform.description':
     'Alacakaranlık Perdesine girerek Gölge hasarını %25 artırırsın. İyileştirme büyüsü yapmak onu bitirir. Çıkmak için Alacakaranlık Perdesini yeniden kullan. (Vespers imzası)',
@@ -14741,7 +14741,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.multi_shot.description':
     'Hedef alana bir yaylım atışı yaparak 8 yard içindeki düşmanlara {damage} Fiziksel hasar verir. (Avcı yeteneği)',
   'entities.abilities.prayer_of_healing.description':
-    '30 m içindeki müttefikleri {damage} iyileştirir. İyileştirme Büyü Gücü ile artar. (Kutsal)',
+    '30 m içindeki müttefikleri {damage} iyileştirir. İyileştirme, İyileştirme Gücü ile artar. (Kutsal)',
   'entities.abilities.preparation.description':
     'Sprint, Kaçınma ve Kaybolmanın bekleme süresini bitirir. (Haydut yeteneği)',
   'entities.abilities.presence_of_mind.description':
@@ -16024,7 +16024,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.choir_of_deliverance.name': 'Kurtuluş Korosu',
   'entities.abilities.scouring_mercy.name': 'Arındıran Merhamet',
   'entities.abilities.aegis_first_dawn.description':
-    "Etrafında 10 m'lik kutsal bir kubbeyi kanalize eder. İçindeki ve görüş hattındaki dost oyuncular %50 daha az hasar alır ve her saniye 35 ila 45 iyileşir. Kanalı tamamlamak onları 120 ila 150 daha iyileştirir ve 4 sn boyunca %30 hareket hızı verir. İyileştirme, İyileştirme Gücü ile artar.",
+    "Etrafında 10 m'lik kutsal bir kubbeyi kanalize eder. İçindeki ve görüş hattındaki dost oyuncular %50 daha az hasar alır ve her saniye {aegisTick} iyileşir. Kanalı tamamlamak onları {aegisFinal} daha iyileştirir ve 4 sn boyunca %30 hareket hızı verir. İyileştirme, İyileştirme Gücü ile artar.",
   'entities.abilities.aura_mastery.description':
     '8 sn boyunca grubundaki etkin her Burç Adanmışlığını ve Karşılık Aurasını üçe katlar: Burç Adanmışlığı alınan hasarı %15 azaltır, Karşılık Aurası normal Kutsal hasarının üç katını verir. Tekrarlı kullanımlar birikmek yerine yeniler.',
   'entities.abilities.bastion_rite.description':
@@ -16093,7 +16093,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.vowkeeper_strike.description':
     "Silah hasarı artı {damage} Fiziksel hasar ile yüksek tehditle vurur ve 1 Adanmışlık üretir. Başarılı bir vuruş %20 ihtimalle 8 sn boyunca Güneş Kısası verir; her başarılı blok %25 ihtimalle verir. Güneş Kısası, sonraki Güneş Diskin (mana harcamaz, bekleme süresi yok, %20 daha fazla hasar), Lütuf Çekicin (bekleme süresi yok, verilen hasarın %100'ü kadar seni iyileştirir) veya Onaran Işığın (anlık) tarafından tüketilir. Yüceliş ayrıca 6 sn boyunca azami canının %6'sı kadar seni kalkanlar.",
   'entities.abilities.choir_of_deliverance.description':
-    '6 sn kanalize eder, 30 metre içindeki grup üyelerini her 2 saniyede {damage} kadar iyileştirir. İyileştirme büyü gücüyle artar.',
+    "6 sn kanalize eder, sizi ve görüş hattınızdaki 30 yarda içindeki tüm dost hedefleri her 2 sn'de {damage} iyileştirir. İyileştirme, İyileştirme Gücü ile artar.",
 
   // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
   // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.

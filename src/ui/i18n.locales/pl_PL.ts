@@ -5845,7 +5845,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.perfect_moment.name': 'Idealna chwila',
   'entities.abilities.shatter.name': 'Krucha ruina',
   'entities.abilities.temporal_acceleration.description':
-    'Przyspiesza bieg czasu dla twojej grupy lub rajdu, zwiększając prędkość ataku, rzucania czarów i kanalizowania o 30% przez 15 sek. Sojusznicy, na których niedawno działała Temporal Acceleration lub Bębny Wojny, są zbyt wyczerpani, aby skorzystać z efektu. (Chronomancja)',
+    'Przyspiesza bieg czasu dla sojuszników z grupy lub rajdu w promieniu 40 m, zwiększając ich prędkość ataku, rzucania i kanalizowania o 30% na 15 s. Objęci sojusznicy nie mogą przez 10 min ponownie skorzystać z Przyspieszenia czasu, Bębnów Wojny ani Chóru złodziei. (Chronomancja)',
   'entities.abilities.temporal_acceleration.name': 'Przyspieszenie czasu',
   'entities.abilities.temporal_barrier.description':
     'Przesuwa cel o chwilę poza teraźniejszość, tworząc temporalną powłokę pochłaniającą {damage} obrażeń przez 10 sek., po czym oś czasu powraca do normy.',
@@ -6448,7 +6448,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Uderza wszystkich wrogów przed tobą w promieniu 8 m za {damage} obrażeń Fizycznych. Powyżej 5 celów każde trafienie jest zmniejszone tak, by suma równała się 5 trafieniom. Gdy unikniesz lub sparujesz atak wręcz stworzenia, masz 30% szans, że twój następny Odwet w ciągu 10 s nie będzie kosztował wściekłości. (Ochrona)',
   'entities.abilities.revenge.name': 'Odwet',
   'entities.abilities.sanguine_aura.description':
-    'Nasyć swój oręż krwią wrogów: ty i każdy członek drużyny walczący wręcz, z dowolnej odległości, zyskujecie 10% szybkości ataku i zadajecie o 10% więcej obrażeń na 20 s.',
+    'Nasyć swój oręż krwią wrogów: ty i każdy Wojownik, Paladyn, Łotrzyk, Szaman i Druid w twojej drużynie, z dowolnej odległości, zyskujecie 10% szybkości ataku i zadajecie o 10% więcej obrażeń na 20 s.',
   'entities.abilities.sanguine_aura.name': 'Aura krwi',
   'entities.abilities.seasoned_soldier.description':
     'Twoje krytyczne ataki automatyczne generują o 10% więcej wściekłości. (specjalizacja Broń)',
@@ -8070,7 +8070,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Natychmiast generuje 20 wściekłości. Tylko w postaci Bruina.',
   'entities.abilities.enrage.name': 'Podsycenie',
   'entities.abilities.entangling_roots.description':
-    'Unieruchamia cel w miejscu na maksymalnie 12 s. Wyższe rangi zadają też obrażenia od natury w ciągu 12 s.',
+    'Unieruchamia cel w miejscu na maksymalnie 12 s. Na drugiej randze zadaje też 32 obrażeń od natury w ciągu 12 s, zwiększanych mocą zaklęć.',
   'entities.abilities.entangling_roots.name': 'Chwytające korzenie',
   'entities.abilities.evasion.description': 'Zwiększa twoją szansę na unik o 50% na 15 sek.',
   'entities.abilities.evasion.name': 'Upiorny krok',
@@ -8115,7 +8115,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Nasyca twoją broń na 30 min. Każdy cios zadaje {damage} dodatkowych obrażeń od ognia.',
   'entities.abilities.flametongue_weapon.name': 'Oręż żarowego piętna',
   'entities.abilities.flash_heal.description':
-    'Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą zaklęć.',
+    'Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą leczenia.',
   'entities.abilities.flash_heal.name': 'Pilna modlitwa',
   'entities.abilities.flash_of_light.description':
     'Szybki, oszczędny błysk Światła, który leczy sprzymierzony cel o {damage}. Przywrócenie zdrowia generuje 1 Oddanie, nawet bez specjalizacji.',
@@ -8151,7 +8151,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Okalecza wroga, zadając {damage} obrażeń i spowalniając jego ruch o 50% na 15 sek.',
   'entities.abilities.hamstring.name': 'Kulawiące cięcie',
   'entities.abilities.heal.description':
-    'Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą zaklęć.',
+    'Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą leczenia.',
   'entities.abilities.heal.name': 'Uroczysta modlitwa',
   'entities.abilities.healing_touch.description': 'Leczy sprzymierzony cel o {damage}.',
   'entities.abilities.healing_touch.specNote_restoration':
@@ -8189,7 +8189,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Leczy sojuszniczy cel o {damage}% twojego maksymalnego zdrowia i generuje 1 Oddanie, gdy przywraca zdrowie.',
   'entities.abilities.lay_on_hands.name': 'Ostatnie namaszczenie',
   'entities.abilities.lesser_heal.description':
-    'Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą zaklęć.',
+    'Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą leczenia.',
   'entities.abilities.lesser_heal.name': 'Szeptana modlitwa',
   'entities.abilities.life_tap.description':
     'Zamienia {damage} zdrowia na {damage} many (o 50% więcej many z Długiem Krwi). Nie działa, jeśli masz {damage} zdrowia lub mniej.',
@@ -8253,7 +8253,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.raptor_strike.name': 'Patroszące uderzenie',
   'entities.abilities.regrowth.name': 'Drugi rozkwit',
   'entities.abilities.renew.description':
-    'Leczy cel o {damage} przez 15 s, raz na 3 s. Leczenie rośnie z mocą zaklęć.',
+    'Leczy cel o {damage} przez 15 s, raz na 3 s. Leczenie rośnie z mocą leczenia.',
   'entities.abilities.renew.name': 'Trwająca łaska',
   'entities.abilities.retribution_aura.description':
     'Otacza ciebie i twoją drużynę świętą energią aż do śmierci lub zastąpienia. Wrogowie, którzy zaatakują wręcz objętego sojusznika, otrzymują {buff} obrażeń od Świętości, a objęci sojusznicy zadają {buff} dodatkowych obrażeń od Świętości atakami automatycznymi.',
@@ -8392,7 +8392,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Namaszcza sprzymierzony cel, zwiększając obrażenia, leczenie i szybkość rzucania o 20% na 15 s.',
   'entities.abilities.holy_nova.name': 'Kantyk słoneczny',
   'entities.abilities.holy_nova.description':
-    'Leczy sojuszników w promieniu 10 m o {damage} i zadaje od 24 do 30 obrażeń świętych wrogom w tym samym obszarze. Obie wartości rosną z mocą zaklęć. (Podstawa Świętości)',
+    'Leczy sojuszników w promieniu 10 m o {damage} i zadaje od 24 do 30 obrażeń świętych wrogom w tym samym obszarze. Leczenie rośnie z mocą leczenia, a obrażenia z mocą zaklęć. (Podstawa Świętości)',
   'entities.abilities.shadowform.name': 'Zmierzchowa zasłona',
   'entities.abilities.shadowform.description':
     'Wkraczasz w Zmierzchową zasłonę, zwiększając swoje obrażenia od cienia o 25%. Rzucenie zaklęcia leczącego ją kończy. Rzuć Zmierzchową zasłonę ponownie, by ją opuścić. (Sygnatura Nieszporów)',
@@ -14977,7 +14977,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.multi_shot.description':
     'Wystrzeliwuje salwę w wybrany obszar, zadając wrogom w promieniu 8 jardów {damage} obrażeń fizycznych. (talent Łowcy)',
   'entities.abilities.prayer_of_healing.description':
-    'Leczy sojuszników w promieniu 30 m o {damage}. Leczenie rośnie z mocą zaklęć. (Świętość)',
+    'Leczy sojuszników w promieniu 30 m o {damage}. Leczenie rośnie z mocą leczenia. (Świętość)',
   'entities.abilities.preparation.description':
     'Kończy czas odnowienia Sprintu, Uniku i Zniknięcia. (talent Łotrzyka)',
   'entities.abilities.presence_of_mind.description':
@@ -16139,7 +16139,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.choir_of_deliverance.name': 'Chór Wybawienia',
   'entities.abilities.scouring_mercy.name': 'Oczyszczające Miłosierdzie',
   'entities.abilities.aegis_first_dawn.description':
-    'Kanalizuje świętą kopułę o promieniu 10 m wokół ciebie. Sojuszniczy gracze wewnątrz i w twojej linii wzroku otrzymują o 50% mniej obrażeń i są leczeni za 35 do 45 co sekundę. Ukończenie kanalizowania leczy ich za dodatkowe 120 do 150 i daje 30% prędkości ruchu na 4 s. Leczenie rośnie z mocą leczenia.',
+    'Kanalizuje świętą kopułę o promieniu 10 m wokół ciebie. Sojuszniczy gracze wewnątrz i w twojej linii wzroku otrzymują o 50% mniej obrażeń i są leczeni za {aegisTick} co sekundę. Ukończenie kanalizowania leczy ich za dodatkowe {aegisFinal} i daje 30% prędkości ruchu na 4 s. Leczenie rośnie z mocą leczenia.',
   'entities.abilities.aura_mastery.description':
     'Przez 8 s potraja każde aktywne Oddanie Bastionu i Aurę odpłaty w twojej drużynie: Oddanie Bastionu zmniejsza otrzymywane obrażenia o 15%, a Aura odpłaty zadaje trzykrotnie więcej normalnych obrażeń Świętych. Wielokrotne użycia odnawiają zamiast się kumulować.',
   'entities.abilities.bastion_rite.description':
@@ -16208,7 +16208,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.vowkeeper_strike.description':
     'Uderza za obrażenia broni plus {damage} obrażeń Fizycznych z wysokim zagrożeniem i generuje 1 Oddanie. Udany cios ma 20% szans na przyznanie Słonecznego Odwetu na 8 s; każdy udany blok ma 25%. Słoneczny Odwet zużywa twój następny Słoneczny Dysk (bez kosztu many, bez odnowienia, o 20% więcej obrażeń), Młot Łaski (bez odnowienia, leczy cię za 100% zadanych obrażeń) albo Kojące Światło (natychmiastowe). Wzniesienie dodatkowo osłania cię tarczą równą 6% twojego maksymalnego zdrowia na 6 s.',
   'entities.abilities.choir_of_deliverance.description':
-    'Kanałuje przez 6 s, lecząc członków grupy w promieniu 30 metrów za {damage} co 2 s. Leczenie rośnie wraz z mocą zaklęć.',
+    'Kanałuje przez 6 s, lecząc ciebie i każdy sprzymierzony cel w promieniu 30 metrów i w twojej linii wzroku za {damage} co 2 s. Leczenie rośnie z mocą leczenia.',
 
   // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
   // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.

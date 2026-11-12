@@ -18018,7 +18018,7 @@ export const nl_NL: EnTranslations = {
       },
       "aegis_first_dawn": {
         "name": "Aegis van de Eerste Dageraad",
-        "description": "Kanaliseer een heilige koepel van 10 m om je heen. Bevriende spelers erbinnen en in je gezichtslijn krijgen 50% minder schade en worden elke seconde genezen voor 35 tot 45. Het voltooien van het kanaliseren geneest hen voor nog eens 120 tot 150 en verleent 4 sec lang 30% bewegingssnelheid. De genezing stijgt met Genezingskracht."
+        "description": "Kanaliseer een heilige koepel van 10 m om je heen. Bevriende spelers erbinnen en in je gezichtslijn krijgen 50% minder schade en worden elke seconde genezen voor {aegisTick}. Het voltooien van het kanaliseren geneest hen voor nog eens {aegisFinal} en verleent 4 sec lang 30% bewegingssnelheid. De genezing stijgt met Genezingskracht."
       },
       "vowkeeper_strike": {
         "name": "Eedbewaardersslag",
@@ -18163,7 +18163,7 @@ export const nl_NL: EnTranslations = {
       },
       "lesser_heal": {
         "name": "Gefluisterd Gebed",
-        "description": "Geneest een bevriend doelwit voor {damage}. De genezing stijgt met de Spreukkracht."
+        "description": "Geneest een bevriend doelwit voor {damage}. De genezing stijgt met de Genezingskracht."
       },
       "power_word_fortitude": {
         "name": "Litanie van Vastberadenheid",
@@ -18179,7 +18179,7 @@ export const nl_NL: EnTranslations = {
       },
       "renew": {
         "name": "Aanhoudende Genade",
-        "description": "Geneest het doelwit in 15 sec voor {damage}, eens per 3 sec. De genezing stijgt met de Spreukkracht."
+        "description": "Geneest het doelwit in 15 sec voor {damage}, eens per 3 sec. De genezing stijgt met de Genezingskracht."
       },
       "mind_blast": {
         "name": "Geestbreuk",
@@ -18187,7 +18187,7 @@ export const nl_NL: EnTranslations = {
       },
       "heal": {
         "name": "Plechtig Gebed",
-        "description": "Geneest een bevriend doelwit voor {damage}. De genezing stijgt met de Spreukkracht."
+        "description": "Geneest een bevriend doelwit voor {damage}. De genezing stijgt met de Genezingskracht."
       },
       "mind_flay": {
         "name": "Litanie van Leed",
@@ -18207,7 +18207,7 @@ export const nl_NL: EnTranslations = {
       },
       "flash_heal": {
         "name": "Dringend Gebed",
-        "description": "Geneest een bevriend doelwit voor {damage}. De genezing stijgt met de Spreukkracht."
+        "description": "Geneest een bevriend doelwit voor {damage}. De genezing stijgt met de Genezingskracht."
       },
       "lightning_bolt": {
         "name": "Boogbliksem",
@@ -18407,7 +18407,7 @@ export const nl_NL: EnTranslations = {
       },
       "entangling_roots": {
         "name": "Grijpende Wortels",
-        "description": "Wortelt het doelwit tot 12 sec ter plaatse. Hogere rangen brengen ook Natuurschade toe over 12 sec."
+        "description": "Wortelt het doelwit tot 12 sec ter plaatse. Op de tweede rang brengt het ook 32 Natuurschade toe over 12 sec, verhoogd door Spreukkracht."
       },
       "bear_form": {
         "name": "Bruingedaante",
@@ -18695,7 +18695,7 @@ export const nl_NL: EnTranslations = {
       },
       "holy_nova": {
         "name": "Zonnegezang",
-        "description": "Geneest bondgenoten binnen 10 yard voor {damage} en brengt vijanden in datzelfde gebied 24 tot 30 Heilige schade toe. Beide bedragen stijgen met de Spreukkracht. (Basis van Heilig)"
+        "description": "Geneest bondgenoten binnen 10 yard voor {damage} en brengt vijanden in datzelfde gebied 24 tot 30 Heilige schade toe. De genezing stijgt met de Genezingskracht en de schade met de Spreukkracht. (Basis van Heilig)"
       },
       "shadowform": {
         "name": "Schemersluier",
@@ -18898,7 +18898,7 @@ export const nl_NL: EnTranslations = {
       },
       "sanguine_aura": {
         "name": "Bloedrode Aura",
-        "description": "Doordrenk je wapen met het bloed van je vijanden: jij en elk melee-groepslid, op elke afstand, krijgen 20 sec lang 10% aanvalssnelheid en doen 10% meer schade."
+        "description": "Doordrenk je wapen met het bloed van je vijanden: jij en elke Krijger, Paladijn, Schurk, Sjamaan en Druïde in je groep, op elke afstand, krijgen 20 sec lang 10% aanvalssnelheid en doen 10% meer schade."
       },
       "victory_rush": {
         "name": "Overwinningsstorm",
@@ -19099,7 +19099,7 @@ export const nl_NL: EnTranslations = {
       },
       "temporal_acceleration": {
         "name": "Temporele Versnelling",
-        "description": "Versnelt de tijdstroom voor je groep of raid, waardoor aanvals-, bezwerings- en kanalisatiesnelheid gedurende 15 sec met 30% toeneemt. Bondgenoten die recentelijk door Temporal Acceleration of Oorlogstrommen zijn getroffen, zijn te uitgeput om ervan te profiteren. (Chronomantie)"
+        "description": "Versnelt de tijdstroom voor groeps- of raidbondgenoten binnen 40 yard, waardoor hun aanvals-, bezwerings- en kanalisatiesnelheid 15 sec lang met 30% toeneemt. Getroffen bondgenoten kunnen 10 min lang niet opnieuw profiteren van Temporele Versnelling, Oorlogstrommen of Dievenkoor. (Chronomantie)"
       },
       "perfect_moment": {
         "name": "Volmaakt Ogenblik",
@@ -19119,7 +19119,7 @@ export const nl_NL: EnTranslations = {
       },
       "prayer_of_healing": {
         "name": "Koorherstel",
-        "description": "Geneest bondgenoten binnen 30 yard voor {damage}. De genezing stijgt met de Spreukkracht. (Heilig)"
+        "description": "Geneest bondgenoten binnen 30 yard voor {damage}. De genezing stijgt met de Genezingskracht. (Heilig)"
       },
       "preparation": {
         "name": "Noodplan",
@@ -19236,7 +19236,7 @@ export const nl_NL: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Koor der Verlossing",
-        "description": "Kanaliseer 6 sec en genees groepsleden binnen 30 yard voor {damage} elke 2 sec. De genezing neemt toe met spreukkracht.",
+        "description": "Kanaliseer 6 sec en genees jezelf en elk bevriend doelwit binnen 30 yard en in je gezichtslijn voor {damage} elke 2 sec. De genezing neemt toe met Genezingskracht.",
         "specNote_shadow": "Verdeel gedurende 15 sec 20% van de gezondheid die vijanden door jouw Schaduwschade verliezen als genezing onder gewonde groepsleden binnen 30 yard, jezelf inbegrepen. In raids wordt alleen je subgroep genezen. Direct uit te spreken; je kunt in de Schemersluier blijven aanvallen. Geabsorbeerde schade en schade boven de resterende gezondheid leveren geen genezing op."
       },
       "bear_charge": {
