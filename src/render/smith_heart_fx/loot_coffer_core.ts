@@ -157,7 +157,7 @@ export function lootCofferSpot(
   bodyZ: number,
   out: { x: number; z: number; yaw: number },
 ): { x: number; z: number; yaw: number } {
-  if (smithHeartLootSpot(templateId, bodyZ, out)) return out;
+  if (smithHeartLootSpot(templateId, bodyX, bodyZ, out)) return out;
   out.x = bodyX;
   out.z = bodyZ;
   out.yaw = 0;

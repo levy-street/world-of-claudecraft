@@ -52,7 +52,11 @@ import { isInRaidInstance } from './instances/dungeons';
 import { FERRY_BELL_OBJECT_ID, tryRingFerryBell } from './interactions/ferry_bell';
 import { HUT_OBJECT_ID, tryBurnHut } from './interactions/firebottle_hut';
 import { mobLootSource } from './loot/awarded_loot_hold';
-import { corpseLootDistance, corpseLootScanRadius } from './loot/corpse_loot_reach';
+import {
+  corpseLootDistance,
+  corpseLootReachBonus,
+  corpseLootScanRadius,
+} from './loot/corpse_loot_reach';
 import { hasSharedLootRights as computeSharedLootRights, lootHasGoneFfa } from './loot/loot_ffa';
 import {
   awardSharedLootItem,
@@ -530,14 +534,16 @@ export function interact(
   if (tryThrowKnot(ctx, p)) return;
   if (p.targetId !== null) {
     const target = ctx.entities.get(p.targetId);
-    // A lootable body answers the press's INTERACT_RANGE + 2 measured as its loot
-    // is (corpseLootDistance: a big body's edge, a guardian's coffer spot).
+    // A lootable body answers the press measured as its loot is (corpseLootDistance:
+    // a big body's edge, a guardian's coffer spot): the classic + 2 slack for an
+    // ordinary body, none past a big body's own loot reach.
     const inPress =
       !!target &&
       (forgeStationForEntity(target)
         ? dist2d(p.pos, target.pos) <= FORGE_INTERACT_RANGE
         : isLootableBody(target)
-          ? corpseLootDistance(target, p.pos) <= INTERACT_RANGE + 2
+          ? corpseLootDistance(target, p.pos) <=
+            INTERACT_RANGE + (corpseLootReachBonus(target) > 0 ? 0 : 2)
           : dist2d(p.pos, target.pos) <= INTERACT_RANGE + 2);
     if (target && inPress) {
       // A usable encounter body (the trash engine's G3: the Soul Brazier):

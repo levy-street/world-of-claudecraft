@@ -67,7 +67,7 @@ export function corpseLootDistance(
   const dz = from.z - body.pos.z;
   const atBody = Math.sqrt(dx * dx + dz * dz) - corpseLootReachBonus(body);
   if (body.kind !== 'mob') return atBody;
-  const spot = smithHeartLootSpot(body.templateId, body.pos.z, _spot);
+  const spot = smithHeartLootSpot(body.templateId, body.pos.x, body.pos.z, _spot);
   if (!spot) return atBody;
   const sx = from.x - spot.x;
   const sz = from.z - spot.z;
@@ -80,7 +80,8 @@ export function corpseLootApproachPoint(body: Pick<Entity, 'kind' | 'templateId'
   x: number;
   z: number;
 } {
-  const spot = body.kind === 'mob' ? smithHeartLootSpot(body.templateId, body.pos.z) : null;
+  const spot =
+    body.kind === 'mob' ? smithHeartLootSpot(body.templateId, body.pos.x, body.pos.z) : null;
   return spot ? { x: spot.x, z: spot.z } : { x: body.pos.x, z: body.pos.z };
 }
 

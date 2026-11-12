@@ -10,7 +10,11 @@ import { canUseForbiddenReflection } from './combat/warlock_talents';
 import { noticeboardDefByEntityId } from './content/noticeboards';
 import { corpseInteractionAvailability } from './corpse_interaction';
 import { CLASSES, ITEMS, QUEST_ORDER, QUESTS, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from './data';
-import { corpseLootDistance, corpseLootScanRadius } from './loot/corpse_loot_reach';
+import {
+  corpseLootApproachPoint,
+  corpseLootDistance,
+  corpseLootScanRadius,
+} from './loot/corpse_loot_reach';
 import {
   ASCENSION_CHARGES,
   ASCENSION_DURATION,
@@ -342,8 +346,12 @@ export function encodeObs(sim: Sim): number[] {
     (bestObject as Interactable | null) ??
     (bestQuestEntity as Interactable | null);
   if (best) {
-    const d = Math.sqrt(best.d2);
-    const rel = normAngle(angleTo(p.pos, best.e.pos) - p.facing);
+    // A corpse is reported where it is looted from (a guardian's coffer spot).
+    const ap = best.type === 0.33 ? corpseLootApproachPoint(best.e) : null;
+    const onSpot = ap !== null && (ap.x !== best.e.pos.x || ap.z !== best.e.pos.z);
+    const at = onSpot && ap ? { x: ap.x, y: p.pos.y, z: ap.z } : best.e.pos;
+    const d = onSpot ? Math.hypot(at.x - p.pos.x, at.z - p.pos.z) : Math.sqrt(best.d2);
+    const rel = normAngle(angleTo(p.pos, at) - p.facing);
     obs.push(1, clamp(d / 40, 0, 1.5), Math.sin(rel), Math.cos(rel), best.type);
   } else {
     obs.push(0, 1.5, 0, 0, 0);

@@ -16,8 +16,15 @@ import { SMITH_HEART_DUNGEON } from '../src/sim/content/smith_heart';
 import { DUNGEONS, instanceOrigin, MOBS } from '../src/sim/data';
 import { handleSmithHeartDevChat } from '../src/sim/dev/smith_heart_dev';
 import { HEAT_GUARDIAN, HEAT_WELL_R } from '../src/sim/encounters/smith_heart/heat_ids';
-import { smithHeartLootSpot } from '../src/sim/encounters/smith_heart/loot_spots';
-import { corpseLootReach, maxCorpseLootReach } from '../src/sim/loot/corpse_loot_reach';
+import {
+  SMITH_HEART_LOOT_SPOTS,
+  smithHeartLootSpot,
+} from '../src/sim/encounters/smith_heart/loot_spots';
+import {
+  corpseLootDistance,
+  corpseLootReach,
+  maxCorpseLootReach,
+} from '../src/sim/loot/corpse_loot_reach';
 import { ACTIONS, encodeObs } from '../src/sim/obs';
 import { type InstanceSlot, Sim } from '../src/sim/sim';
 import { type Entity, INTERACT_RANGE, type QuestProgress } from '../src/sim/types';
@@ -131,7 +138,7 @@ describe('corpse loot reach', () => {
 
   it("takes a guardian's loot at its coffer's authored spot, far from the body (the real sim path)", () => {
     const { sim, boss } = deadHeatGuardianWithLoot();
-    const spot = smithHeartLootSpot(HEAT_GUARDIAN, boss.pos.z);
+    const spot = smithHeartLootSpot(HEAT_GUARDIAN, boss.pos.x, boss.pos.z);
     if (!spot) throw new Error('no spot');
     // The coffer stands well past the body-edge reach on open floor.
     expect(Math.hypot(spot.x - boss.pos.x, spot.z - boss.pos.z)).toBeGreaterThan(
@@ -152,7 +159,7 @@ describe('corpse loot reach', () => {
 
   it('offers the press and the click at the coffer on the client, and walks the click there', () => {
     const { boss } = deadHeatGuardianWithLoot();
-    const spot = smithHeartLootSpot(HEAT_GUARDIAN, boss.pos.z);
+    const spot = smithHeartLootSpot(HEAT_GUARDIAN, boss.pos.x, boss.pos.z);
     if (!spot) throw new Error('no spot');
     const body = { ...boss, tappedById: 1 } as Entity;
     const atCoffer = stub({ id: 1, kind: 'player', pos: { x: spot.x + 1.5, y: 0, z: spot.z } });
@@ -172,6 +179,48 @@ describe('corpse loot reach', () => {
     const far = stub({ id: 1, kind: 'player', pos: { x: spot.x + 30, y: 0, z: spot.z } });
     expect(shouldApproachPickedEntity(far, body, false)).toBe(true);
     expect(pickedEntityApproachPoint(body)).toEqual({ x: spot.x, z: spot.z });
+  });
+
+  it('answers the untargeted press and the RL obs at the coffer, and no extra press slack past a big body', () => {
+    const { sim, boss } = deadHeatGuardianWithLoot();
+    const spot = smithHeartLootSpot(HEAT_GUARDIAN, boss.pos.x, boss.pos.z);
+    if (!spot) throw new Error('no spot');
+    // Targeted, one yard past the body-edge reach and far from the coffer: no loot.
+    sim.player.pos = { ...boss.pos, x: boss.pos.x + HEAT_WELL_R + INTERACT_RANGE + 1 };
+    expect(Math.hypot(sim.player.pos.x - spot.x, sim.player.pos.z - spot.z)).toBeGreaterThan(8);
+    sim.player.targetId = boss.id;
+    sim.interact();
+    expect(boss.lootable).toBe(true);
+    // Untargeted, at the coffer: the obs advertises it close by and the press takes it.
+    sim.player.pos = { ...boss.pos, x: spot.x + 1.5, z: spot.z };
+    sim.player.targetId = null;
+    sim.rebucket(sim.player);
+    const slot = 16 + (ACTIONS.length - 13) * 2 + 9 + 5 * 6;
+    const obs = encodeObs(sim);
+    expect(obs[slot]).toBe(1);
+    expect(obs[slot + 1]).toBeLessThan(0.1);
+    sim.interact();
+    expect(boss.lootable).toBe(false);
+  });
+
+  it('never answers a guardian body at a spot outside the raid or in another claim', () => {
+    const o0 = instanceOrigin(DUNGEONS.smith_heart.index, 0);
+    const o1 = instanceOrigin(DUNGEONS.smith_heart.index, 1);
+    const local = SMITH_HEART_LOOT_SPOTS[HEAT_GUARDIAN];
+    // A guardian template in the open world (a dev spawn): body-only reach.
+    const stray = { kind: 'mob' as const, templateId: HEAT_GUARDIAN, pos: { x: 10, y: 0, z: 0 } };
+    expect(smithHeartLootSpot(HEAT_GUARDIAN, 10, 0)).toBeNull();
+    expect(corpseLootDistance(stray, { x: 10 + HEAT_WELL_R + 3, z: 0 })).toBeCloseTo(3, 9);
+    // A body in claim 1 is never looted from claim 0's coffer.
+    const body1 = {
+      kind: 'mob' as const,
+      templateId: HEAT_GUARDIAN,
+      pos: { x: o1.x - 220, y: 0, z: o1.z },
+    };
+    expect(corpseLootDistance(body1, { x: o0.x + local.x, z: o0.z + local.z })).toBeGreaterThan(
+      100,
+    );
+    expect(corpseLootDistance(body1, { x: o1.x + local.x, z: o1.z + local.z })).toBeLessThan(0.001);
   });
 
   it('still refuses past the body edge reach', () => {

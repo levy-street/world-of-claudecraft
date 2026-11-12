@@ -86,7 +86,11 @@ import { FINAL_BOSS } from '../src/sim/encounters/smith_heart/final_ids';
 import { HEAT_GUARDIAN } from '../src/sim/encounters/smith_heart/heat_ids';
 import { SMITH_HEART_LOOT_SPOTS } from '../src/sim/encounters/smith_heart/loot_spots';
 import { QUENCH_GUARDIAN } from '../src/sim/encounters/smith_heart/quench_ids';
-import { corpseLootApproachPoint, corpseLootDistance } from '../src/sim/loot/corpse_loot_reach';
+import {
+  corpseLootApproachPoint,
+  corpseLootDistance,
+  SMITH_HEART_LOOT_SCAN_R,
+} from '../src/sim/loot/corpse_loot_reach';
 import type { InstanceSlot } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import { type Entity, INTERACT_RANGE } from '../src/sim/types';
@@ -270,6 +274,21 @@ describe('the guardians', () => {
     const f = spot(FINAL_BOSS);
     expect(Math.hypot(f.x - HEART_ROOM.x, f.z - HEART_ROOM.z)).toBeLessThan(HEART_ROOM.r - 10);
     for (const a of HEART_ALTARS) expect(Math.hypot(f.x - a.x, f.z - a.z)).toBeGreaterThan(12);
+  });
+
+  it("scans far enough to find a guardian's body anywhere in its arena from its coffer", () => {
+    const far = (s: { x: number; z: number }, c: { x: number; z: number }, r: number) =>
+      Math.hypot(s.x - c.x, s.z - c.z) + r;
+    const S = SMITH_HEART_LOOT_SPOTS;
+    const reach = [
+      far(S[COUNCIL_GUARDIAN], HAMMER_PIT, HAMMER_PIT.rx),
+      far(S[COUNCIL_SEAM_SINGER], HAMMER_PIT, HAMMER_PIT.rx),
+      far(S[BREATH_GUARDIAN], BREATH.cornice, BREATH.cornice.rx),
+      far(S[QUENCH_GUARDIAN], QUENCH.shelf, QUENCH.shelf.rx),
+      far(S[HEAT_GUARDIAN], HEARTH_WELL, 60),
+      far(S[FINAL_BOSS], HEART_ROOM, HEART_ROOM.r),
+    ];
+    for (const r of reach) expect(r).toBeLessThan(SMITH_HEART_LOOT_SCAN_R);
   });
 
   it('a looter at the coffer front takes the loot through the sim gate, wherever the body lies', () => {

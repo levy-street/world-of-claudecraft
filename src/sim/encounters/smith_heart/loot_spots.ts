@@ -17,7 +17,7 @@
 // Pure: data, the instance frame (sim/data.ts) and the boss ids only.
 
 import { SMITH_HEART_DUNGEON } from '../../content/smith_heart';
-import { DUNGEONS, instanceOrigin, instanceSlotForZ } from '../../data';
+import { DUNGEONS, dungeonAt, instanceOrigin, instanceSlotForZ } from '../../data';
 import { BREATH_GUARDIAN } from './breath_ids';
 import { COUNCIL_GUARDIAN, COUNCIL_SEAM_SINGER } from './council_ids';
 import { FINAL_BOSS } from './final_ids';
@@ -56,17 +56,20 @@ export const SMITH_HEART_LOOT_SPOTS: Readonly<Record<string, SmithHeartLootSpot>
 
 /** Where this body's loot is taken from, in world yards, with the coffer's
  *  yaw (the game's bearing: forward is (sin, cos)); null for any body that is
- *  not a Smith's Heart guardian. The instance is the body's own (its slot off
- *  its z), so every claim's coffer stands in its own arena. */
+ *  not a Smith's Heart guardian lying in the raid (a guardian template met
+ *  anywhere else, a dev spawn, keeps the body-only reach). The instance is the
+ *  body's own (its slot off its z), so every claim's coffer stands in its own
+ *  arena and a coffer never answers for another claim's body. */
 export function smithHeartLootSpot(
   templateId: string,
+  bodyX: number,
   bodyZ: number,
   out: { x: number; z: number; yaw: number } = { x: 0, z: 0, yaw: 0 },
 ): { x: number; z: number; yaw: number } | null {
   const spot = SMITH_HEART_LOOT_SPOTS[templateId];
   if (!spot) return null;
   const def = DUNGEONS[SMITH_HEART_DUNGEON];
-  if (!def) return null;
+  if (!def || dungeonAt(bodyX)?.id !== SMITH_HEART_DUNGEON) return null;
   const o = instanceOrigin(def.index, instanceSlotForZ(bodyZ));
   out.x = o.x + spot.x;
   out.z = o.z + spot.z;
