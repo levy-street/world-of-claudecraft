@@ -55,10 +55,9 @@ describe('wellFedTooltipLines', () => {
   });
 
   it('an apex role plate states the dominant rung: value 13 for 20 min', () => {
-    // The 11c ladder's apex row (6 / 900): the duration is the elixir
-    // ladder's next step above the entry rung, so the plate strictly
-    // dominates every farming dish on both axes and the tooltip says so in
-    // resolved numbers.
+    // The ladder's apex row (13 / 1200, the apex flask's band), so the plate
+    // strictly dominates every farming dish on both axes and the tooltip
+    // says so in resolved numbers.
     expect(wellFedTooltipLines(ITEMS.stonepot_stew)).toBe(
       '<div class="tt-desc">Well Fed: Increases your Stamina by 13 for 20 min once you finish ' +
         'eating. Only one Well Fed effect at a time: a newer meal replaces it.</div>',

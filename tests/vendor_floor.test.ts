@@ -518,7 +518,7 @@ describe('the classification is exhaustive over every vendor-stocked consumable'
   // with every other arm still green.
   // Gourdlight Eve's five candies are the one sweets-priced (never gold) food row:
   // Hester's event shelf, each a verbatim copy of the cooking ladder's ENTRY rung
-  // (eastbrook_glazed_carrots: foodHp 90, Well Fed +2 for 600s), so they undercut no
+  // (eastbrook_glazed_carrots: foodHp 90, Well Fed +6 for 600s), so they undercut no
   // crafted dish and sit outside the gold ladder R23 measures.
   it('the vendor-stocked foodHp set is exactly the eight classified foods and five candies', () => {
     expect(vendorStockedIdsBy(NPCS, (id) => liveMagnitude(id, 'foodHp') !== undefined)).toEqual([

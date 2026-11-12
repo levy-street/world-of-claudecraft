@@ -17,7 +17,8 @@
 // The role foods are the contrast: Well Fed rides one shared 'well_fed' id, is
 // owed only when the 18-second drain COMPLETES, and carries no marker, so it
 // dies with you. The def-level values (flasks 13/1200 after the Phase 15
-// envelope tune, the apex role plates 6/900, the farming rungs 2/3/4/5 at 600,
+// envelope tune, the apex role plates 13/1200, the farming rungs 6/600,
+// 9/900, 12/900 and 12/900 (each matching its quality's potion rung),
 // foodHp 1392) are pinned in tests/masterwrought_budget.test.ts; this file pins
 // what the sim DOES with them.
 import { describe, expect, it } from 'vitest';

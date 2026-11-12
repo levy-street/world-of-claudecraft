@@ -197,7 +197,8 @@ It is reported so a future reader can see the number rather than infer it.
 | flask | one of `ironhusk_flask` / `warboar_flask` / `runewater_flask`, aura id `elixir_<kind>`, `flask: true` | 13 for 1200 s |
 | food | one of `stonepot_stew` / `warspice_skewers` / `sageleaf_chowder`, aura id **`well_fed`**, kind `buff_sta` / `buff_ap` / `buff_int` | **6 for 900 s** as measured (13 for 1200 s since the post-closure change above) |
 
-The food term is the specific aura `well_fed` at 6, delivered by an apex Harvest
+The food term is the specific aura `well_fed` at 6 as measured (13 since the
+post-closure change), delivered by an apex Harvest
 Feast (`stonepot_feast` / `warspice_feast` / `sageleaf_feast`, each
 `charges: 10`, `durationTicks: 3600`, serving its plate through
 `feast.dishItemId`) or by farming's `harvest_feast`. Delivery is what the feast
