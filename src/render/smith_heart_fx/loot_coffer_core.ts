@@ -169,7 +169,7 @@ export const LOOT_COFFER_BOSSES: Readonly<Record<string, LootCofferBoss>> = {
     flavour: 'forge',
     revealAt: DEATH_END - 1.0,
     reach: 3.3,
-    bearing: 0.6,
+    bearing: 1.57,
   },
 };
 
