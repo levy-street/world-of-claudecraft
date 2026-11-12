@@ -466,6 +466,38 @@ describe('CouncilDeathFx plays the deaths', () => {
     t.fx.dispose();
   });
 
+  it('a replay of both keeps the Singer waiting through the stagger, then plays her scene', () => {
+    const t = setup();
+    t.step(1);
+    const cue = (id: number): SimEvent => ({
+      type: 'spellfx',
+      sourceId: id,
+      targetId: id,
+      school: 'arcane',
+      fx: 'nova',
+      ability: COUNCIL_DEV_CUES.deathReplay,
+    });
+    t.fx.handleEvent(cue(t.g.id));
+    t.fx.handleEvent(cue(t.s.id));
+    // Mid-stagger: the Guardian's scene runs, hers waits (no scene yet, and
+    // the wait never ends her replay).
+    t.step(COUNCIL_REPLAY_STAGGER * 0.5);
+    expect(t.fx.sceneTime('guardian')).toBeGreaterThan(0);
+    expect(t.fx.sceneTime('singer')).toBe(-1);
+    t.step(COUNCIL_REPLAY_STAGGER * 0.4);
+    expect(t.fx.sceneTime('singer')).toBe(-1);
+    expect(t.sent).not.toContain('smith_heart_council_singer_stand');
+    // Past the stagger: her scene runs on its own clock.
+    t.step(COUNCIL_REPLAY_STAGGER * 0.1 + 1);
+    expect(t.fx.sceneTime('singer')).toBeGreaterThan(0.8);
+    expect(t.fx.sceneTime('singer')).toBeLessThan(1.2);
+    expect(t.sent).toContain(COUNCIL_DEATH_GESTURES.singerFall);
+    t.step(councilReplaySeconds('singer'));
+    expect(t.fx.sceneTime('singer')).toBe(-1);
+    expect(t.sent).toContain('smith_heart_council_singer_stand');
+    t.fx.dispose();
+  });
+
   it('plays every beat on the low tier and sheds only its named double', () => {
     const restore = gfxInternalsForTest.overrideSettings({ tier: 'low' });
     try {

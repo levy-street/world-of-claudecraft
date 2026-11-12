@@ -500,8 +500,14 @@ export class CouncilDeathFx {
       }
     }
     const t = councilDeathTime(role, this.clock, rec.deadAt, rec.replayAt, rec.deadKnown);
-    // A replay over: the body stands, the clock is spent.
-    if (!rec.deadKnown && rec.replayAt >= 0 && t < 0 && this.clock >= rec.replayAt) {
+    // A replay over: the body stands, the clock is spent. Only once its time
+    // has run out: a staggered replay (the Singer's, COUNCIL_REPLAY_STAGGER
+    // after the Guardian's) reads -1 while it waits and must not end there.
+    if (
+      !rec.deadKnown &&
+      rec.replayAt >= 0 &&
+      this.clock - rec.replayAt >= councilReplaySeconds(role)
+    ) {
       rec.replayAt = -1;
       if (rec.fell && e && !e.dead) this.send(e.id, this.stand(role));
       rec.fell = false;
