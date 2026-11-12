@@ -480,3 +480,27 @@ describe('CouncilFx over a fake world', () => {
     fx.dispose();
   });
 });
+
+describe("Mountain's Rush's arrow: compiled with the council's gated root", () => {
+  it('both arrow cards are under the root the compile gate receives, hidden until a mark', () => {
+    const seen: number[] = [];
+    const world = { entities: new Map(), playerId: -1 } as unknown as IWorld;
+    new CouncilFx(
+      new THREE.Scene(),
+      () => 0,
+      world,
+      (target) => {
+        let n = 0;
+        target.traverse((c) => {
+          if (c.name === 'smithHeartRushArrow') {
+            n++;
+            expect(c.visible).toBe(false);
+          }
+        });
+        seen.push(n);
+        return Promise.resolve();
+      },
+    );
+    expect(seen).toEqual([2]);
+  });
+});

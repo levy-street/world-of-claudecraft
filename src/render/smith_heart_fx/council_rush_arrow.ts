@@ -12,7 +12,7 @@
 // and a red glow round it that breathes with the pulse.
 //
 // Actionable, so it draws on EVERY tier, the static preset included, and never through
-// the FPS governor; reduced motion holds the bob and pulse (the arrow stays, lit full).
+// the FPS governor; reduced motion holds the bob, pulse and shine (the arrow stays, lit full).
 // It draws over the world (no depth test, the transparent pass's top render order), so a
 // pillar or a boss never hides the mark. Built in the constructor under the host's root
 // (one gated attach, the same as the soak's beacon): a fixed pool, one shared quad, one
@@ -57,6 +57,7 @@ uniform vec3 uHot;
 uniform vec3 uRim;
 uniform float uGlow;
 uniform float uTime;
+uniform float uMotion;
 varying vec2 vP;
 float sdBox(vec2 p, vec2 b) {
   vec2 d = abs(p) - b;
@@ -90,7 +91,7 @@ void main() {
   vec3 col = mix(uHot, uColor, smoothstep(0.0, 0.55, h));
   // Brighter in its heart, darker to the edge, a ruby rim inside the outline.
   col *= 0.7 + 0.55 * smoothstep(0.0, -0.32, d);
-  float shine = smoothstep(0.1, 0.0, abs(fract(h * 0.9 - uTime * 0.9) - 0.5) - 0.42);
+  float shine = smoothstep(0.1, 0.0, abs(fract(h * 0.9 - uTime * 0.9 * uMotion) - 0.5) - 0.42);
   col += uHot * shine * 0.35;
   float rim = 1.0 - smoothstep(0.035, 0.09, abs(d + 0.06));
   col = mix(col, uRim, rim * 0.85);
@@ -146,6 +147,8 @@ export class CouncilRushArrow {
           uHot: { value: new THREE.Color(HOT_COLOR) },
           uRim: { value: new THREE.Color(RIM_COLOR) },
           uGlow: { value: 1 },
+          // 0 under reduced motion: the shine holds still too.
+          uMotion: { value: 1 },
           uTime,
         },
         vertexShader: ARROW_VERT,
@@ -173,13 +176,18 @@ export class CouncilRushArrow {
 
   /** The scan saw `playerId` wearing the Rush's mark. */
   see(playerId: number): void {
-    let s = this.slots.find((q) => q.playerId === playerId);
-    if (!s) {
-      s = this.slots.find((q) => q.playerId < 0);
-      if (!s) return;
-      s.playerId = playerId;
+    let free: ArrowSlot | null = null;
+    for (let i = 0; i < this.slots.length; i++) {
+      const s = this.slots[i];
+      if (s.playerId === playerId) {
+        s.seen = true;
+        return;
+      }
+      if (!free && s.playerId < 0) free = s;
     }
-    s.seen = true;
+    if (!free) return;
+    free.playerId = playerId;
+    free.seen = true;
   }
 
   endScan(): void {
@@ -206,6 +214,7 @@ export class CouncilRushArrow {
       s.card.position.set(at.x, at.y + _look.y, at.z);
       s.card.scale.setScalar(_look.scale);
       s.mat.uniforms.uGlow.value = _look.glow;
+      s.mat.uniforms.uMotion.value = reducedMotion ? 0 : 1;
       s.card.visible = true;
     }
   }
