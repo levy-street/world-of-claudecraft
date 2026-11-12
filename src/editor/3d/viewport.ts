@@ -84,6 +84,8 @@ import {
 } from '../custom_map';
 import {
   campHoldsSpawn,
+  campLiveMemberCount,
+  campSpawnDistance,
   findRuntimeCampIndex,
   moveRuntimeMapEntity,
   moveRuntimeMobsById,
@@ -1345,11 +1347,11 @@ export class Editor3DViewport {
           campHoldsSpawn(camp, candidate.spawnPos),
       )
       .sort((a, b) => {
-        const ad = Math.hypot(a.spawnPos.x - camp.center.x, a.spawnPos.z - camp.center.z);
-        const bd = Math.hypot(b.spawnPos.x - camp.center.x, b.spawnPos.z - camp.center.z);
+        const ad = campSpawnDistance(camp, a.spawnPos);
+        const bd = campSpawnDistance(camp, b.spawnPos);
         return ad - bd || a.id - b.id;
       })
-      .slice(0, camp.count)
+      .slice(0, campLiveMemberCount(camp))
       .map((candidate) => ({
         id: candidate.id,
         x: candidate.pos.x,

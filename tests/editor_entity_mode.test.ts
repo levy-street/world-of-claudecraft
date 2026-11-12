@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   campHoldsSpawn,
+  campLiveMemberCount,
+  campSpawnDistance,
   findRuntimeCampIndex,
   moveRuntimeMapEntity,
   moveRuntimeMobsById,
@@ -175,7 +177,7 @@ describe('individual mob selection', () => {
   });
 
   it('owns a spawn on a pinned spot outside the disc, and moves spots with the center', () => {
-    const camp = { center: { x: 0, z: 0 }, radius: 5, spots: [{ x: 30, z: 0 }] };
+    const camp = { center: { x: 0, z: 0 }, radius: 5, count: 2, spots: [{ x: 30, z: 0 }] };
     expect(campHoldsSpawn(camp, { x: 3, z: 0 })).toBe(true);
     expect(campHoldsSpawn(camp, { x: 30.5, z: 0 })).toBe(true);
     expect(campHoldsSpawn(camp, { x: 20, z: 0 })).toBe(false);
@@ -183,12 +185,49 @@ describe('individual mob selection', () => {
     expect(camp.center).toEqual({ x: 10, z: -4 });
     expect(camp.spots).toEqual([{ x: 40, z: -4 }]);
     expect(
-      findRuntimeCampIndex([{ mobId: 'boar', ...camp, count: 2 }], {
+      findRuntimeCampIndex([{ mobId: 'boar', ...camp }], {
         templateId: 'boar',
         pos: { x: 40, z: -4 },
         spawnPos: { x: 40, z: -4 },
       }),
     ).toBe(0);
+  });
+
+  it('a fully pinned camp owns only its live spots, not its disc', () => {
+    // the shipped Eastbrook restless_bones shape: every slot pinned, one spot
+    // outside the radius, and a neighbour camp of the same mob inside the disc
+    const pinned = {
+      mobId: 'restless_bones',
+      center: { x: 82, z: 78 },
+      radius: 28.5,
+      count: 2,
+      spots: [
+        { x: 80, z: 70 },
+        { x: 109.49, z: 94.35 },
+      ],
+    };
+    const chapel = { mobId: 'restless_bones', center: { x: 91.96, z: 85.78 }, radius: 4, count: 1 };
+    const chapelSpawn = { x: 92.5, z: 86 };
+    expect(campHoldsSpawn(pinned, chapelSpawn)).toBe(false);
+    expect(campHoldsSpawn(pinned, { x: 109.49, z: 94.35 })).toBe(true);
+    // the chapel skeleton picks the chapel camp, its own spawn the pinned camp
+    const mobAt = (at: { x: number; z: number }) => ({
+      templateId: 'restless_bones',
+      pos: at,
+      spawnPos: at,
+    });
+    expect(findRuntimeCampIndex([pinned, chapel], mobAt(chapelSpawn))).toBe(1);
+    expect(findRuntimeCampIndex([pinned, chapel], mobAt({ x: 109.49, z: 94.35 }))).toBe(0);
+    // a retired slot's spot owns nothing, and the pick claims only live members
+    const retired = { ...pinned, retiredSlots: 1 };
+    expect(campHoldsSpawn(retired, { x: 109.49, z: 94.35 })).toBe(false);
+    expect(campLiveMemberCount(retired)).toBe(1);
+    // ranked by the nearest live spot, so a pinned member far from the
+    // centre still sorts as one of the camp's own
+    expect(campSpawnDistance(pinned, { x: 109.49, z: 94.35 })).toBe(0);
+    // a camp with an unpinned live slot still owns its disc
+    const partly = { ...pinned, spots: [{ x: 80, z: 70 }] };
+    expect(campHoldsSpawn(partly, chapelSpawn)).toBe(true);
   });
 
   it('plain click selects one while Ctrl-click toggles a multi-selection', () => {

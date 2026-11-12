@@ -16,12 +16,18 @@ interface RuntimeCamp {
   radius: number;
 }
 
-interface RuntimeCampMatch extends RuntimeCamp {
+interface RuntimeCampMatch extends RuntimeCamp, CampSlots {}
+
+/** The slot shape of a camp the ownership tests read (a CampDef fits). */
+interface CampSlots {
   center: Vec2;
+  radius: number;
   count: number;
   // A camp's authored spots (CampDef.spots): a pinned mob spawns on its spot,
   // which may sit outside the camp's radius.
   spots?: readonly Vec2[];
+  // Trailing slots that spawn nothing (CampDef.retiredSlots).
+  retiredSlots?: number;
 }
 
 interface RuntimeMobMatch {
@@ -43,13 +49,12 @@ export function findRuntimeCampIndex(
   for (let i = 0; i < camps.length; i++) {
     const camp = camps[i];
     if (camp.mobId !== mob.templateId) continue;
-    const spawnDistance = Math.hypot(
-      mob.spawnPos.x - camp.center.x,
-      mob.spawnPos.z - camp.center.z,
-    );
+    const spawnDistance = campSpawnDistance(camp, mob.spawnPos);
+    // an exported one-mob camp also owns its mob where the maker dragged it
     const visibleDistance = Math.hypot(mob.pos.x - camp.center.x, mob.pos.z - camp.center.z);
-    const distance = camp.count === 1 ? Math.min(spawnDistance, visibleDistance) : spawnDistance;
-    const owns = distance <= camp.radius + 1 || campHoldsSpawn(camp, mob.spawnPos);
+    const visibleOwns = camp.count === 1 && visibleDistance <= camp.radius + 1;
+    const distance = visibleOwns ? Math.min(spawnDistance, visibleDistance) : spawnDistance;
+    const owns = visibleOwns || campHoldsSpawn(camp, mob.spawnPos);
     if (owns && distance < bestDistance) {
       best = i;
       bestDistance = distance;
@@ -115,14 +120,54 @@ export function splitCampIntoIndividuals<T extends RuntimeCamp & { center: Vec2;
   );
 }
 
-/** True when a spawn point belongs to the camp: inside its scatter disc, or on
- *  one of its pinned spots (CampDef.spots), which can sit outside the disc. */
-export function campHoldsSpawn(
-  camp: { center: Vec2; radius: number; spots?: readonly Vec2[] },
-  spawn: Vec2,
-): boolean {
-  if (Math.hypot(spawn.x - camp.center.x, spawn.z - camp.center.z) <= camp.radius + 1) return true;
-  return (camp.spots ?? []).some((s) => Math.hypot(spawn.x - s.x, spawn.z - s.z) <= 0.75);
+/** Slots that spawn (count less retiredSlots), as camp_scatter.ts campSpawnedCount. */
+function liveSlots(camp: CampSlots): number {
+  return Math.max(0, camp.count - Math.max(0, Math.floor(camp.retiredSlots ?? 0)));
+}
+
+/** The live slots' pinned spots, and whether any live slot scatters on the disc. */
+function liveSlotLayout(camp: CampSlots): { pins: Vec2[]; scatters: boolean } {
+  const pins: Vec2[] = [];
+  let scatters = false;
+  for (let i = 0; i < liveSlots(camp); i++) {
+    const spot = camp.spots?.[i];
+    if (spot) pins.push(spot);
+    else scatters = true;
+  }
+  return { pins, scatters };
+}
+
+/** A pinned spawn lands exactly on its spot; this is the slack for float drift. */
+const SPOT_HOLD = 0.75;
+
+/** True when a spawn point belongs to the camp: on one of its live pinned
+ *  spots (CampDef.spots, which can sit outside the disc), or inside its
+ *  scatter disc when a live slot still scatters there. A camp whose live
+ *  slots are all pinned owns no disc ground, so another camp's mob standing
+ *  inside its radius is not taken for one of its own. */
+export function campHoldsSpawn(camp: CampSlots, spawn: Vec2): boolean {
+  const { pins, scatters } = liveSlotLayout(camp);
+  if (pins.some((s) => Math.hypot(spawn.x - s.x, spawn.z - s.z) <= SPOT_HOLD)) return true;
+  return (
+    scatters && Math.hypot(spawn.x - camp.center.x, spawn.z - camp.center.z) <= camp.radius + 1
+  );
+}
+
+/** How near a spawn point sits to where the camp spawns: its nearest live
+ *  pinned spot, or the camp centre when a live slot scatters. Ranks the camps
+ *  that hold one spawn, and a camp's own members. */
+export function campSpawnDistance(camp: CampSlots, spawn: Vec2): number {
+  const { pins, scatters } = liveSlotLayout(camp);
+  let best = scatters
+    ? Math.hypot(spawn.x - camp.center.x, spawn.z - camp.center.z)
+    : Number.POSITIVE_INFINITY;
+  for (const s of pins) best = Math.min(best, Math.hypot(spawn.x - s.x, spawn.z - s.z));
+  return best;
+}
+
+/** How many mobs the camp spawns: the members a runtime pick may claim. */
+export function campLiveMemberCount(camp: CampSlots): number {
+  return liveSlots(camp);
 }
 
 /** Move a camp's center, carrying its pinned spots by the same offset so the
