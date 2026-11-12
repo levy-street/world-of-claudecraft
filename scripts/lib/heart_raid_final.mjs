@@ -353,8 +353,21 @@ function dragSpot(world, st) {
   const rooted = hasAura(b, FINAL_AURAS.root);
   let target = st.next ?? (z === 'ring' ? lowest(world, null) : z);
   // Heroic: a change while the raid is still Vein-Shaken hits three times
-  // as hard, so the tanks wait the mark out unless the bar runs high.
-  const shaken = world.living().some((p) => hasAura(p, FINAL_AURAS.shaken));
+  // as hard, so the tanks wait the mark out unless the bar runs high. The
+  // boss's state aura carries the mark's seconds left (value3, the server's
+  // own clock), the raid's own auras the same mark.
+  const markLeft = auraOf(b, FINAL_AURAS.state)?.value3 ?? 0;
+  const shaken = markLeft > 0 || world.living().some((p) => hasAura(p, FINAL_AURAS.shaken));
+  // While the mark holds, the tank keeps the boss in the quarter it just
+  // entered: no stale drag target and no walk back to the last quarter
+  // after the root (the runs of 2026-11-11 crossed twice inside 20 s and
+  // took Vein Shock three times over). A bar running high still moves it.
+  if (HEROIC_PLUS && shaken && z !== 'ring' && bar(world, z) < 75) {
+    if (st.next && st.next !== z)
+      log(`HOLD: Vein-Shaken ${markLeft} s, ${z} kept (not ${st.next})`);
+    st.next = null;
+    target = z;
+  }
   // Heroic's Hammer: the Anvil's soakers stay Crushed 30 s and the next
   // Anvil falls 25 s later, so the boss leaves the Hammer once one has fallen.
   // Normal too: every Anvil is a raid-wide soak and a Tremor Crack round,
