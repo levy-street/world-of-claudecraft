@@ -47,6 +47,7 @@ import {
   zoneOf,
   zoneTemplate,
 } from '../src/sim/encounters/smith_heart';
+import { cinderInterval } from '../src/sim/encounters/smith_heart/heat_cinders';
 import { DT, type Entity, RUN_SPEED, type SimEvent } from '../src/sim/types';
 import { hitsOf } from './helpers/council_fight';
 import { HEAT_WAIT_SPOTS, type HeatFight, heatFight } from './helpers/heat_fight';
@@ -752,6 +753,66 @@ describe('Guardian of the Heat: phase 2', () => {
     }
     expect(f.objects(HEAT_OBJECTS.zonePrefix)).toEqual([]);
   });
+});
+
+describe("Guardian of the Heat: the cinders' soft enrage (2026-11-12)", () => {
+  it('pins the rows: Normal after 180 s of phase 3, Heroic and Mythic after 240, every 20 s, cap 6', () => {
+    expect(HEAT_DIFFICULTY.normal.cinderLateAfter).toBe(180);
+    expect(HEAT_DIFFICULTY.heroic.cinderLateAfter).toBe(240);
+    expect(HEAT_DIFFICULTY.mythic.cinderLateAfter).toBe(240);
+    for (const tier of ['normal', 'heroic', 'mythic'] as const)
+      expect(HEAT_DIFFICULTY[tier].cinderLateEvery).toBe(20);
+    expect(T.cinderEvery).toBe(45);
+    expect(T.cinderCap).toBe(6);
+  });
+
+  it('the cadence per tier, before and after the threshold', () => {
+    const at = { normal: 180, heroic: 240, mythic: 240 } as const;
+    for (const tier of ['normal', 'heroic', 'mythic'] as const) {
+      const R = HEAT_DIFFICULTY[tier];
+      expect(cinderInterval(R, 0)).toBe(45);
+      expect(cinderInterval(R, at[tier] - 1)).toBe(45);
+      expect(cinderInterval(R, at[tier])).toBe(20);
+      expect(cinderInterval(R, at[tier] + 120)).toBe(20);
+    }
+    // Normal's has begun at 200 s, Heroic's has not.
+    expect(cinderInterval(HEAT_DIFFICULTY.normal, 200)).toBe(20);
+    expect(cinderInterval(HEAT_DIFFICULTY.heroic, 200)).toBe(45);
+  });
+
+  for (const tier of ['normal', 'heroic', 'mythic'] as const) {
+    it(`${tier}: in the fight, phase 3's clock sets the next cinder's wait`, () => {
+      const f = heatFight(3, 31);
+      if (tier !== 'normal') expect(f.dev(`/dev heart heat ${tier}`)).toBe(true);
+      expect(f.dev('/dev heart heat pull')).toBe(true);
+      f.boss().threat.set(f.players[0].id, 1e6);
+      f.tick(2);
+      f.dev('/dev heart heat phase 3');
+      hold(f);
+      const st = f.state();
+      if (!st) throw new Error('no fight');
+      expect(st.phase).toBe(3);
+      expect(st.difficulty).toBe(tier);
+      // The phase's clock starts where the fight's stood.
+      expect(st.phaseAt).toBeCloseTo(st.clock, 6);
+      const after = HEAT_DIFFICULTY[tier].cinderLateAfter;
+      // Early in phase 3: a cinder called sets the plain 45 s wait.
+      f.dev('/dev heart heat ember');
+      expect(st.cinderTimer).toBe(45);
+      // Two seconds short of the threshold: a long wait still runs...
+      st.phaseAt = st.clock - (after - 2);
+      st.cinderTimer = 30;
+      f.tick(ticks(1));
+      expect(st.cinderTimer).toBeGreaterThan(28);
+      // ...and the tick the threshold passes it is cut to the quicker cadence.
+      f.tick(ticks(1.5));
+      expect(st.cinderTimer).toBeLessThanOrEqual(20);
+      expect(st.cinderTimer).toBeGreaterThan(19);
+      // Past it, a cinder called sets the 20 s wait.
+      f.dev('/dev heart heat ember');
+      expect(st.cinderTimer).toBe(20);
+    });
+  }
 });
 
 describe('Guardian of the Heat: phase 3, the Rolling Cinders', () => {

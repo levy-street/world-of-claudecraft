@@ -16,6 +16,9 @@
 //                  5 s. The raid assigns who strikes it and when. Nothing
 //                  kills it: it rolls on until it reaches someone or the
 //                  fight ends.
+//   Running late   the soft enrage (its difficulty row's cinderLateAfter,
+//                  on the fight clock): that long into phase 3 the cinders
+//                  fall every cinderLateEvery instead (the cap stands).
 //
 // Deterministic: the quarry and the landing are hashed; the only rng draws
 // are the damage rolls, in player order.
@@ -105,11 +108,34 @@ export function dropStrayHunted(
   }
 }
 
+/** The wait before the next Rolling Cinder, `inPhase` seconds into phase 3:
+ *  HEAT_TUNING.cinderEvery, or the tier's quicker cadence once the phase has
+ *  run past its cinderLateAfter (the soft enrage). */
+export function cinderInterval(
+  rules: Pick<HeatScope['rules'], 'cinderLateAfter' | 'cinderLateEvery'>,
+  inPhase: number,
+): number {
+  return inPhase >= rules.cinderLateAfter - 1e-9 ? rules.cinderLateEvery : T.cinderEvery;
+}
+
+/** One tick of the cinders' clock in phase 3. The tick the soft enrage
+ *  begins, a longer wait already running is cut to the quicker cadence. */
+export function stepCinderClock(s: HeatScope): void {
+  const st = s.st;
+  const inPhase = st.clock - st.phaseAt;
+  const late = inPhase >= s.rules.cinderLateAfter - 1e-9;
+  if (late && inPhase - DT < s.rules.cinderLateAfter - 1e-9) {
+    st.cinderTimer = Math.min(st.cinderTimer, s.rules.cinderLateEvery);
+  }
+  st.cinderTimer -= DT;
+  if (st.cinderTimer <= 1e-9) callCinder(s);
+}
+
 /** A Rolling Cinder starts to fall. Returns false at the cap or with nobody
  *  to hunt. Exported for the dev trigger. */
 export function callCinder(s: HeatScope): boolean {
   const st = s.st;
-  st.cinderTimer = T.cinderEvery;
+  st.cinderTimer = cinderInterval(s.rules, st.clock - st.phaseAt);
   if (st.cinders.length + st.falls.length >= T.cinderCap) return false;
   const [quarry] = pickPlayers(s, 1, 1100 + st.cindersCalled);
   if (!quarry) return false;

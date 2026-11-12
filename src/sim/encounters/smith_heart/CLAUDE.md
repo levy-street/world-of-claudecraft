@@ -81,7 +81,7 @@ Quench's, then the Heat's, then the Masterless Strength's, then the seal and the
 | `heat_wellspawn.ts` | Heroic's overflow adds: the Wellspawn walking to the wellspring (slowing with their health, feeding it), the Wellkeepers' Kindling Marks and Cinder Trails. |
 | `heat_seeds.ts` | Phase 2's Hearthseeds and heroic's Seedflames. |
 | `heat_zones.ts` | Wakefire's runs of bands round the wellspring (phases 2 and 3). |
-| `heat_cinders.ts` | Phase 3's Rolling Cinders: the fall, the hunt, the knockback and Cooling Crust, the burst. |
+| `heat_cinders.ts` | Phase 3's Rolling Cinders: the fall, the hunt, the knockback and Cooling Crust, the burst, and the fight's soft enrage (`cinderInterval`, `stepCinderClock`: the tier's quicker cadence late in phase 3). |
 | `heat_cinder_ward.ts` | Pure leaf: a Rolling Cinder is a ward (a hit lands one point), hooked at `combat/damage.ts`. |
 | `quench_intro_plan.ts` | Leaf: the Quench guardian's entrance timeline (`QUENCH_INTRO`: the wake reach onto the ice, the line's moment, the hand-back, the dev replay hold, the pull line's quiet) and its aura's stages (`QUENCH_INTRO_STAGES`), read by the sim and the renderer alike. Imports nothing. |
 | `quench_intro.ts` | Her entrance: frozen under the lake's ice, held by the encounter (`encounterHeld`, not hostile, immune) until a living player steps onto the ice, then the scene held out of reach on the `QUENCH_AURAS.intro` clock, the line yelled once, the hand-back; once per guardian (keyed by her body), spent by a fight begun before she woke, replayed by `/dev heart quench intro`. |

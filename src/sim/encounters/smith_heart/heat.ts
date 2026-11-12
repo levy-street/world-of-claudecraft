@@ -44,7 +44,14 @@ import { clearThreat } from '../../threat';
 import { DT, type Entity } from '../../types';
 import { claimBoss, clearCastIf } from '../sunken_bastion/claim';
 import { settleSmithHeartFeat } from './feats';
-import { callCinder, clearCinders, dropStrayHunted, stepCinders, syncHunted } from './heat_cinders';
+import {
+  callCinder,
+  clearCinders,
+  dropStrayHunted,
+  stepCinderClock,
+  stepCinders,
+  syncHunted,
+} from './heat_cinders';
 import { clearFist, landFist, startFist, stepSwells, wakefireHoldsFist } from './heat_fist';
 import { flare, stepFlare, stepWellFire } from './heat_flare';
 import {
@@ -152,6 +159,7 @@ function freshState(difficulty: HeatDifficulty): HeatFightState {
     finished: false,
     clock: 0,
     phase: 1,
+    phaseAt: 0,
     stage: 'fight',
     stageLeft: 0,
     overflow: null,
@@ -299,6 +307,7 @@ export function beginOverflow(s: HeatScope, n: 1 | 2): void {
 function enterPhase(s: HeatScope, phase: HeatPhase): void {
   const st = s.st;
   st.phase = phase;
+  st.phaseAt = st.clock;
   st.stage = 'fight';
   st.stageLeft = 0;
   st.overflow = null;
@@ -404,10 +413,7 @@ function startMechanics(s: HeatScope): void {
       if (st.wheelTimer <= 1e-9) startWheel(s);
     }
   }
-  if (kit.cinders) {
-    st.cinderTimer -= DT;
-    if (st.cinderTimer <= 1e-9) callCinder(s);
-  }
+  if (kit.cinders) stepCinderClock(s);
   if (kit.fist) {
     st.fistTimer -= DT;
     // Due, it waits out Wakefire (heat_fist.ts wakefireHoldsFist), and

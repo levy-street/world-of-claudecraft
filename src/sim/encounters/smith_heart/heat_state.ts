@@ -171,6 +171,9 @@ export interface HeatFightState {
   /** Seconds since the pull. */
   clock: number;
   phase: HeatPhase;
+  /** The fight clock when this phase began (the cinders' soft enrage reads
+   *  how long phase 3 has run, heat_cinders.ts). */
+  phaseAt: number;
   stage: HeatStage;
   /** Seconds left in a timed stage (sinking, rising). */
   stageLeft: number;
