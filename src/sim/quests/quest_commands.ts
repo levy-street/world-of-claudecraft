@@ -62,6 +62,7 @@ import {
 import { playerHoldsQuestItem } from './quest_item_presence';
 import { grantQuestRecipeReward, validateQuestRecipeReward } from './quest_recipe_rewards';
 import { defaultRewardChoice, questFixedReward, resolveRewardChoice } from './quest_reward_choice';
+import { isOwnQuestTool, takeBackQuestTool } from './quest_tool_return';
 import { weeklyLockedQuestIds, weeklyQuestLockoutId } from './weekly_quest_lock';
 
 // Pure quest-state computation, shared by the sim and the network client. Relocated
@@ -325,8 +326,14 @@ export function acceptLinkedQuest(
 // are durable prerequisites the player keeps, the profession tools (the mining pick,
 // the gathering sickle) and cross-quest keys (the Crypt Keystone). Stripping those
 // would delete a tool the always-require-tool harvest gate still needs.
+// A questTool the quest owns (Skerrit's Shardpike, a wieldable weapon) goes back too,
+// from the hands as well as the bags (quest_tool_return.ts).
 function stripRequiredItems(ctx: SimContext, quest: QuestDef, meta: PlayerMeta): void {
   for (const itemId of quest.requiredItems ?? []) {
+    if (isOwnQuestTool(quest, itemId)) {
+      takeBackQuestTool(ctx, meta, itemId, 0);
+      continue;
+    }
     const def = ITEMS[itemId];
     if (!def || def.kind !== 'quest' || def.questId !== quest.id) continue;
     const have = ctx.countItem(itemId, meta.entityId);

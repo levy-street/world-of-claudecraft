@@ -93,7 +93,7 @@ describe('the rack lends a Shardpike to anyone', () => {
     }
   });
 
-  it('refuses a second pike while one is in hand', () => {
+  it('never lends a second pike: a second use hands the first back', () => {
     const { sim, takePike } = atTheRack('warrior');
     takePike();
     takePike();

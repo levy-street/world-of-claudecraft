@@ -1,5 +1,6 @@
 import { QUESTS } from './data';
 import { regrantMissingQuestItems } from './quests/quest_commands';
+import { returnQuestToolsToGiver } from './quests/quest_tool_return';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { type Entity, questObjectiveRequired } from './types';
@@ -7,6 +8,9 @@ import { type Entity, questObjectiveRequired } from './types';
 /** Ordinary quest-talk credit, shared by the Sim's scripted NPC dispatch. */
 export function interactNpcForQuests(ctx: SimContext, npc: Entity, meta: PlayerMeta): boolean {
   let progressed = false;
+  // Hand back first, then re-grant: a finished quest's tool goes home, and an active one
+  // keeps exactly one copy (src/sim/quests/quest_tool_return.ts).
+  returnQuestToolsToGiver(ctx, meta, npc.templateId);
   regrantMissingQuestItems(ctx, meta, npc.templateId);
   for (const qp of meta.questLog.values()) {
     if (qp.state !== 'active') continue;

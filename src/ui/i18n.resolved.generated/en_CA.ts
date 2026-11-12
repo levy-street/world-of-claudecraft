@@ -27750,7 +27750,7 @@ export const en_CA: EnTranslations = {
       "q_socketwrights_due": {
         "title": "The Socketwright's Due",
         "text": "I set the Barrowglass in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
-        "completion": "You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.",
+        "completion": "You felt it give, did you? Forty years of interest, paid through the socket. Now hand me back my pike, friend; it has done its work. He will heal, he always does, and the next one who comes asking will need it.",
         "objectives": {
           "0": {
             "label": "The Foreman's eye put out"

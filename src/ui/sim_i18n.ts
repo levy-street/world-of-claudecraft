@@ -146,6 +146,10 @@ const baseEnTable = {
   'error.musterPikeLevel': 'The muster lends its pikes only to recruits of level 19 or lower.',
   'log.musterPikeTaken': 'You take a Shardpike from the muster rack.',
   'log.musterPikeReclaimed': 'The muster reclaims its Shardpike.',
+  'log.musterPikeHandedBack': 'You return the Shardpike to the muster rack.',
+  'error.shardpikeCarried': 'You already carry a Shardpike. Wield it instead.',
+  // A quest's own tool going back to its giver (src/sim/quests/quest_tool_return.ts).
+  'log.questToolReturned': 'You hand back a quest item you no longer need.',
   // The drill yard (src/sim/muster_effigy.ts, src/sim/muster_pike.ts): the lantern going
   // out on the Straw Foreman, and the lent pike going back to the rack after it.
   'log.effigyLanternOut':

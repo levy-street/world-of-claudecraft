@@ -1445,7 +1445,7 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
     turnInNpcId: 'socketwright_skerrit',
     text: 'I set the Barrowglass in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, $N: blind him, and every blade in the mire will finally bite.',
     completionText:
-      'You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.',
+      'You felt it give, did you? Forty years of interest, paid through the socket. Now hand me back my pike, friend; it has done its work. He will heal, he always does, and the next one who comes asking will need it.',
     objectives: [
       { type: 'event', eventId: 'balgath_blinded', count: 1, label: "The Foreman's eye put out" },
     ],
@@ -2231,6 +2231,11 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     // regrantMissingQuestItems), so a rare that broke down would mint salvage and
     // disenchant materials forever: break it, talk to him, break the new one.
     noSalvage: true,
+    // Traded away, it would read as missing and he would hand over another: soulbound
+    // closes that, so a player only ever holds one. It is LENT by the quest: turn-in and
+    // abandon take it back, and talking to Skerrit with the quest not in the log hands it
+    // back too (src/sim/quests/quest_tool_return.ts), so it never sits stuck in the bags.
+    soulbound: true,
     questId: 'q_socketwrights_due',
   },
   // The muster's own issue of the same pike, lent from the weapon rack at the command camp

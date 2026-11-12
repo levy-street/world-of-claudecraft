@@ -201,8 +201,8 @@ export function tickMusterArmy(
   tickMusterDrill(ctx, army);
 }
 
-/** The rack was used: lend a pike (interaction.ts routes both the interact key and the
- *  rack click here). True when a pike went into the player's hands. */
+/** The rack was used: lend a pike, or take a lent one back (interaction.ts routes both the
+ *  interact key and the rack click here). True when the rack did either. */
 export function useMusterRack(ctx: SimContext, army: MusterArmyState, pid: number): boolean {
   const took = takeMusterPike(ctx, army.lent, pid);
   // The pike drill's first step (content/mirefen_muster_quests.ts): a player who leaves the
