@@ -595,6 +595,7 @@ const UI_PURE_CORES = [
   'src/ui/wallet_connection_view.ts',
   'src/ui/hud/loot/loot_roll_status_view.ts',
   'src/ui/hud/loot/loot_settings_view.ts',
+  'src/ui/hud/loot/master_loot_preselect_core.ts',
   'src/ui/hud/professions/craft_celebration_view.ts',
   'src/ui/hud/professions/craft_celebration_text_view.ts',
   'src/ui/hud/professions/skill_level_toast_view.ts',

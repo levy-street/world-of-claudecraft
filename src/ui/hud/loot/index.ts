@@ -6,3 +6,4 @@ export * from './loot_roll_status_view';
 export * from './loot_settings_view';
 export * from './loot_settings_window';
 export * from './loot_window_controller';
+export * from './master_loot_preselect_core';
