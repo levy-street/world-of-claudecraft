@@ -15,4 +15,7 @@ export function applyEntityPresenceBits(e: Entity, w: any): void {
   // Skill event hearts (`hrt`): a whole count while in a heart fight, else nothing.
   if (typeof w.hrt === 'number' && w.hrt >= 0) e.eventHearts = Math.floor(w.hrt);
   else delete e.eventHearts;
+  // Riposte stance (`stc`): the wind-up, guard or open tell, else nothing.
+  if (w.stc === 'lunge' || w.stc === 'guard' || w.stc === 'open') e.eventStance = w.stc;
+  else delete e.eventStance;
 }

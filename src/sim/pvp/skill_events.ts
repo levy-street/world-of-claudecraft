@@ -16,7 +16,7 @@
 // never persisted: a restart simply waits for the next hour. The arena draw
 // comes from a PRIVATE rng derived from the seed and the hour (the hill's
 // precedent), so the world stream never moves. The rule sets of the five events
-// plug in through `SKILL_EVENT_RULES`; until one is registered for a kind, that
+// plug in through `skillEventRules`; until one is registered for a kind, that
 // kind runs on the shared baseline below (first to the kill target wins).
 
 import { SKILL_EVENT_SITES, type SkillEventSite } from '../content/skill_event_sites';
@@ -26,6 +26,13 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { grantHonor } from './honor';
+import {
+  keepsakeEligible,
+  kitFor,
+  SKILL_EVENT_VERBS,
+  type SkillEventKitState,
+} from './skill_event_kit';
+import { RIPOSTE_RULES } from './skill_event_riposte';
 import {
   insideSkillEventCircle,
   nextSkillEventStart,
@@ -66,6 +73,10 @@ export interface ActiveSkillEvent {
   hearts: Map<number, number>;
   /** When each fighter last lost a heart (the SKILL_EVENT_HEART_GRACE_SECONDS window). */
   heartLostAt: Map<number, number>;
+  /** Hearts each fighter has taken from others (the last-standing win needs one). */
+  heartsTaken: Map<number, number>;
+  /** Each fighter's kit: the keepsake and the event verbs' state (skill_event_kit.ts). */
+  kits: Map<number, SkillEventKitState>;
   /** Player killing blows landed inside the event, by pid. */
   kills: Map<number, number>;
   /** Set by the rule set the moment the event is won. */
@@ -92,10 +103,25 @@ export interface SkillEventRuleSet {
   /** Once a second while running, after presence. */
   tick?(ctx: SimContext, ev: ActiveSkillEvent): void;
   end?(ctx: SimContext, ev: ActiveSkillEvent): void;
+  /** Every tick while running, before the once-a-second pass: the timing of
+   *  wind-ups and guard windows. */
+  everyTick?(ctx: SimContext, ev: ActiveSkillEvent): void;
+  /** A kit verb pressed by a fighter (already validated as this event's verb).
+   *  True when it took effect. */
+  action?(ctx: SimContext, ev: ActiveSkillEvent, pid: number, verb: string): boolean;
 }
 
-/** The rule sets by kind. A kind with no entry runs the baseline. */
-export const SKILL_EVENT_RULES: Partial<Record<SkillEventKind, SkillEventRuleSet>> = {};
+/** The rule set of a kind, or undefined for the baseline. A function, not a
+ *  table: the rule modules import the sim, which imports this module, so a table
+ *  built at load time could capture a rule set that has not finished loading. */
+export function skillEventRules(kind: SkillEventKind): SkillEventRuleSet | undefined {
+  switch (kind) {
+    case 'riposte':
+      return RIPOSTE_RULES;
+    default:
+      return undefined;
+  }
+}
 
 const BASELINE_KILLS_TO_WIN = 4;
 const PASS_TICKS = 20;
@@ -192,6 +218,8 @@ function openEvent(ctx: SimContext, ordinal: number, startsAt: number): ActiveSk
     presence: new Map(),
     hearts: new Map(),
     heartLostAt: new Map(),
+    heartsTaken: new Map(),
+    kits: new Map(),
     kills: new Map(),
     winner: null,
   };
@@ -223,7 +251,10 @@ export function setHearts(
 function clearHearts(ctx: SimContext, ev: ActiveSkillEvent): void {
   for (const pid of ev.hearts.keys()) {
     const e = ctx.entities.get(pid);
-    if (e) delete e.eventHearts;
+    if (e) {
+      delete e.eventHearts;
+      delete e.eventStance;
+    }
   }
   ev.hearts.clear();
 }
@@ -260,7 +291,7 @@ function earnsResult(ev: ActiveSkillEvent, pid: number): boolean {
 
 /** Close the event: pay everyone, tell the realm, clear it. */
 export function finishSkillEvent(ctx: SimContext, ev: ActiveSkillEvent): void {
-  SKILL_EVENT_RULES[ev.kind]?.end?.(ctx, ev);
+  skillEventRules(ev.kind)?.end?.(ctx, ev);
   const name = SKILL_EVENT_NAMES[ev.kind];
   for (const pid of ev.participants) {
     const meta = ctx.players.get(pid);
@@ -295,6 +326,11 @@ function updateSchedule(ctx: SimContext): void {
 /** The once-a-second pass, from the Sim tick. */
 export function updateSkillEvents(ctx: SimContext): void {
   const state = ctx.skillEventState;
+  const live = state.active;
+  if (live?.phase === 'running') {
+    skillEventRules(live.kind)?.everyTick?.(ctx, live);
+    syncStances(ctx, live);
+  }
   if (ctx.tickCount - state.passTick < PASS_TICKS) return;
   state.passTick = ctx.tickCount;
   if (ctx.worldPvpDisabled) {
@@ -305,7 +341,7 @@ export function updateSkillEvents(ctx: SimContext): void {
   updateSchedule(ctx);
   const ev = state.active;
   if (!ev) return;
-  const rules = SKILL_EVENT_RULES[ev.kind];
+  const rules = skillEventRules(ev.kind);
   if (ev.phase === 'warning') {
     if (ctx.time < ev.startsAt) return;
     ev.phase = 'running';
@@ -372,7 +408,7 @@ export function skillEventOnPlayerDeath(
   grantHonor(ctx, meta, SKILL_EVENT_KILL_HONOR, 'skill_event_kill');
   const kills = (ev.kills.get(killer.id) ?? 0) + 1;
   ev.kills.set(killer.id, kills);
-  const target = SKILL_EVENT_RULES[ev.kind]?.killsToWin ?? BASELINE_KILLS_TO_WIN;
+  const target = skillEventRules(ev.kind)?.killsToWin ?? BASELINE_KILLS_TO_WIN;
   if (kills >= target) ev.winner = killer.id;
 }
 
@@ -437,6 +473,7 @@ export function skillEventTakeHeart(
   const last = ev.heartLostAt.get(target.id);
   if (last !== undefined && ctx.time - last < SKILL_EVENT_HEART_GRACE_SECONDS) return true;
   ev.heartLostAt.set(target.id, ctx.time);
+  ev.heartsTaken.set(owner.id, (ev.heartsTaken.get(owner.id) ?? 0) + 1);
   const left = Math.max(0, (ev.hearts.get(target.id) ?? 0) - 1);
   setHearts(ctx, ev, target.id, left);
   ctx.emit({
@@ -472,4 +509,52 @@ export function skillEventTakeHeart(
     );
   }
   return true;
+}
+
+/** Mirror each fighter's Riposte stance onto their entity, so every client sees
+ *  a wind-up, a raised guard or an open fencer through the per-tick wire. */
+function syncStances(ctx: SimContext, ev: ActiveSkillEvent): void {
+  for (const [pid, kit] of ev.kits) {
+    const e = ctx.entities.get(pid);
+    if (!e) continue;
+    const st = kit.riposte;
+    const stance: Entity['eventStance'] = !st
+      ? undefined
+      : st.lungeAt !== null
+        ? 'lunge'
+        : st.guardFrom !== null
+          ? 'guard'
+          : ctx.time < st.openUntil
+            ? 'open'
+            : undefined;
+    if (stance === undefined) delete e.eventStance;
+    else e.eventStance = stance;
+  }
+}
+
+/** A fighter pressed one of the event's kit verbs. */
+export function skillEventAction(ctx: SimContext, pid: number, verb: string): boolean {
+  const ev = ctx.skillEventState.active;
+  if (!ev || ev.phase !== 'running' || !ev.participants.includes(pid)) return false;
+  if (!SKILL_EVENT_VERBS[ev.kind].includes(verb)) return false;
+  return skillEventRules(ev.kind)?.action?.(ctx, ev, pid, verb) ?? false;
+}
+
+/** Choose the one class ability a fighter keeps for the event (during the
+ *  warning or while it runs). Refused for an unknown or ineligible ability. */
+export function skillEventPickKeepsake(ctx: SimContext, pid: number, abilityId: string): boolean {
+  const ev = ctx.skillEventState.active;
+  if (!ev || !ev.participants.includes(pid)) return false;
+  const meta = ctx.players.get(pid);
+  const known = meta?.known.find((k) => k.def.id === abilityId);
+  if (!known || !keepsakeEligible(known.def)) return false;
+  kitFor(ev, pid).keepsake = abilityId;
+  return true;
+}
+
+/** The cast lock: while an event runs, a fighter may cast only their keepsake. */
+export function skillEventCastAllowed(ctx: SimContext, pid: number, abilityId: string): boolean {
+  const ev = ctx.skillEventState.active;
+  if (!ev || ev.phase !== 'running' || !ev.participants.includes(pid)) return true;
+  return ev.kits.get(pid)?.keepsake === abilityId;
 }

@@ -8267,6 +8267,10 @@ export interface Entity extends ClientMirroredEntityFields {
    *  tick so the overhead heart row and the player frame never lag a hit;
    *  absent outside a heart fight. */
   eventHearts?: number;
+  /** Riposte stance (src/sim/pvp/skill_event_riposte.ts): a lunge winding up, a
+   *  raised guard, or open after a riposte or an overheld guard. Rides the entity
+   *  wire (`stc`) every tick so every fencer sees the tell; absent otherwise. */
+  eventStance?: 'lunge' | 'guard' | 'open';
   /** WARFARE Vitality switch (src/sim/pvp/vitality.ts): false while the player
    *  stands in a PvE instance (a dungeon, raid, delve or rift floor), so honor
    *  gear's health bonus never reaches raid content. Absent means the open
