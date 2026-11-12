@@ -9959,22 +9959,58 @@
     border-top: 1px solid #3a3526;
   }
   /* item comparison block (hover an equippable item to see the worn one + deltas),
-     and the crafted product card a recipe pattern embeds under its teaches line */
-  #tooltip .tt-cmp,
+     and the crafted product card a recipe pattern embeds under its teaches line.
+     The second worn panel (a hovered ring against both worn rings) takes the
+     same divider. */
+  #tooltip .tt-cmp + .tt-cmp,
   #tooltip .tt-recipe-product {
     margin-top: 6px;
     padding-top: 5px;
     border-top: 1px solid #3a3526;
   }
+  /* The compare layout (item_compare_view.ts itemCompareLayoutHtml): the hovered
+     card and the worn panel share one row while the tooltip's max-width has room,
+     and flex-wrap stacks them (hovered card first) on a narrow viewport, so no
+     breakpoint is needed. Each column is capped so one long flavor line cannot
+     push the worn panel under the card on a desktop. */
+  #tooltip .tt-cmp-layout {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 8px 12px;
+  }
+  #tooltip .tt-cmp-main,
+  #tooltip .tt-cmp-side {
+    flex: 1 1 calc(200px * var(--tooltip-scale, 1));
+    min-width: 0;
+    max-width: calc(320px * var(--tooltip-scale, 1));
+  }
+  #tooltip .tt-cmp-side {
+    padding: 5px 8px 6px;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--color-bg-dark) 45%, transparent);
+  }
   #tooltip .tt-cmp-head {
     color: #8a7f5e;
-    font-size: 10px;
+    font-size: calc(10px * var(--tooltip-scale, 1));
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-top: 3px;
   }
-  #tooltip .tt-cmp-body {
-    opacity: 0.7;
+  /* The stat change leads the panel: it is what the player hovered to learn. */
+  #tooltip .tt-cmp-deltas {
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--color-border-default);
+  }
+  #tooltip .tt-cmp-delta {
+    font-weight: 600;
+  }
+  #tooltip .tt-cmp-none {
+    color: var(--color-text-muted);
+    font-weight: normal;
+    font-size: calc(11.5px * var(--tooltip-scale, 1));
   }
 
   /* ---------- floating combat text ---------- */

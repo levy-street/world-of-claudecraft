@@ -17146,6 +17146,7 @@ export const tr_TR: EnTranslations = {
       "qualityKind": "{quality} {kind}",
       "currentlyEquipped": "Şu anda kuşanılmış",
       "ifYouEquip": "Bunu kuşanırsan",
+      "noStatChanges": "No stat changes",
       "damageSpeed": "{min} - {max} Hasar Hız {speed}",
       "dps": "(saniyede {dps} hasar)",
       "armorStat": "{value} Zırh",

@@ -17146,6 +17146,7 @@ export const id_ID: EnTranslations = {
       "qualityKind": "{quality} {kind}",
       "currentlyEquipped": "Sedang dipakai",
       "ifYouEquip": "Jika kamu memakai ini",
+      "noStatChanges": "No stat changes",
       "damageSpeed": "{min} - {max} Kerusakan Kecepatan {speed}",
       "dps": "({dps} kerusakan per detik)",
       "armorStat": "{value} Zirah",

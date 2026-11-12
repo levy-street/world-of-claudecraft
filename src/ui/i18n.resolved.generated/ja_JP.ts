@@ -17146,6 +17146,7 @@ export const ja_JP: EnTranslations = {
       "qualityKind": "{quality} {kind}",
       "currentlyEquipped": "現在の装備",
       "ifYouEquip": "これを装備すると",
+      "noStatChanges": "No stat changes",
       "damageSpeed": "{min} - {max} ダメージ 速度 {speed}",
       "dps": "（秒間 {dps} ダメージ）",
       "armorStat": "防御力 {value}",

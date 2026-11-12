@@ -17146,6 +17146,7 @@ export const pl_PL: EnTranslations = {
       "qualityKind": "{quality} {kind}",
       "currentlyEquipped": "Aktualnie założone",
       "ifYouEquip": "Jeśli to założysz",
+      "noStatChanges": "No stat changes",
       "damageSpeed": "{min} - {max} obrażeń Szybkość {speed}",
       "dps": "({dps} obrażeń na sekundę)",
       "armorStat": "{value} pancerza",

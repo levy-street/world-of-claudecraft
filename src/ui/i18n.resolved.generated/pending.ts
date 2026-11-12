@@ -9,25 +9,65 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "itemUi.tooltip.noStatChanges"
+  ],
+  "es_ES": [
+    "itemUi.tooltip.noStatChanges"
+  ],
+  "fr_FR": [
+    "itemUi.tooltip.noStatChanges"
+  ],
+  "fr_CA": [
+    "itemUi.tooltip.noStatChanges"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "itemUi.tooltip.noStatChanges"
+  ],
+  "de_DE": [
+    "itemUi.tooltip.noStatChanges"
+  ],
+  "zh_CN": [
+    "itemUi.tooltip.noStatChanges"
+  ],
+  "zh_TW": [
+    "itemUi.tooltip.noStatChanges"
+  ],
+  "ko_KR": [
+    "itemUi.tooltip.noStatChanges"
+  ],
+  "ja_JP": [
+    "itemUi.tooltip.noStatChanges"
+  ],
+  "pt_BR": [
+    "itemUi.tooltip.noStatChanges"
+  ],
+  "ru_RU": [
+    "itemUi.tooltip.noStatChanges"
+  ],
+  "cs_CZ": [
+    "itemUi.tooltip.noStatChanges"
+  ],
+  "nl_NL": [
+    "itemUi.tooltip.noStatChanges"
+  ],
+  "pl_PL": [
+    "itemUi.tooltip.noStatChanges"
+  ],
+  "id_ID": [
+    "itemUi.tooltip.noStatChanges"
+  ],
+  "tr_TR": [
+    "itemUi.tooltip.noStatChanges"
+  ],
+  "sv_SE": [
+    "itemUi.tooltip.noStatChanges"
+  ],
+  "vi_VN": [
+    "itemUi.tooltip.noStatChanges"
+  ],
+  "da_DK": [
+    "itemUi.tooltip.noStatChanges"
+  ]
 };

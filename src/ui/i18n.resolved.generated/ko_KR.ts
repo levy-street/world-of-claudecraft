@@ -17146,6 +17146,7 @@ export const ko_KR: EnTranslations = {
       "qualityKind": "{quality} {kind}",
       "currentlyEquipped": "현재 착용 중",
       "ifYouEquip": "이것을 착용하면",
+      "noStatChanges": "No stat changes",
       "damageSpeed": "{min} - {max} 피해 속도 {speed}",
       "dps": "(초당 피해 {dps})",
       "armorStat": "방어도 {value}",

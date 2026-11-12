@@ -694,7 +694,7 @@ import { InteriorMapController } from './interior_map_controller';
 import { itemArmorTypeLabelKey } from './item_armor_type';
 import { requiredClassesForTooltip } from './item_class_restriction';
 import { itemCombatTooltipLines } from './item_combat_tooltip_view';
-import { itemCompareBlocksHtml } from './item_compare_view';
+import { itemCompareBlocksHtml, itemCompareLayoutHtml } from './item_compare_view';
 import { ItemDragState } from './item_drag_state';
 import {
   instanceBadgeLines,
@@ -6587,8 +6587,7 @@ export class Hud {
       html += stackSizeTooltipLine(item, instance);
       html += vendorSellTooltipLine(item);
     }
-    if (compare === true) html += this.itemCompareBlock(item, instance);
-    return html;
+    return compare === true ? this.itemCompareBlock(html, item, instance) : html;
   }
 
   // Legendary "chance on action" procs: one green trigger line per proc, each
@@ -6655,14 +6654,15 @@ export class Hud {
   // Classic-style item comparison (the item_compare_view pure core): Hud
   // supplies its world's equipment reads, the hovered copy's payload, and the
   // tooltip renderer, so BOTH sides carry per-copy stats and titles.
-  private itemCompareBlock(item: ItemDef, instance?: ItemInstancePayload): string {
-    return itemCompareBlocksHtml(
+  private itemCompareBlock(card: string, item: ItemDef, instance?: ItemInstancePayload): string {
+    const blocks = itemCompareBlocksHtml(
       item,
       membershipTooltipEquipment(this.sim),
       (id) => ITEMS[id] && membershipTooltipItem(ITEMS[id], this.sim),
       (equipped, worn) => this.itemTooltip(equipped, false, worn),
       instance,
     );
+    return itemCompareLayoutHtml(card, blocks);
   }
 
   private questProgressText(label: string, current: number, total: number): string {

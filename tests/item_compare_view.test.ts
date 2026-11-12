@@ -7,7 +7,7 @@
 // the bag-only bond fields.
 import { describe, expect, it } from 'vitest';
 import type { ItemDef, ItemInstancePayload } from '../src/sim/types';
-import { itemCompareBlocksHtml } from '../src/ui/item_compare_view';
+import { itemCompareBlocksHtml, itemCompareLayoutHtml } from '../src/ui/item_compare_view';
 
 const HOVERED_HELM = {
   id: 'cmp_test_helm',
@@ -231,5 +231,61 @@ describe('itemCompareBlocksHtml', () => {
     expect(itemCompareBlocksHtml(potion, { equipment: {} }, lookup, render)).toBe('');
     expect(itemCompareBlocksHtml(HOVERED_HELM, { equipment: {} }, lookup, render)).toBe('');
     expect(calls).toEqual([]);
+  });
+
+  it('leads each worn panel with the stat change, ahead of the worn card', () => {
+    const { render } = recordingRenderer();
+    const html = itemCompareBlocksHtml(
+      HOVERED_HELM,
+      { equipment: { helmet: WORN_HELM.id } },
+      lookup,
+      render,
+    );
+    const deltas = html.indexOf('tt-cmp-deltas');
+    const gain = html.indexOf('+4');
+    const wornHead = html.indexOf('Currently equipped');
+    const card = html.indexOf('[card:cmp_test_worn_helm]');
+    expect(deltas).toBeGreaterThan(-1);
+    expect(html.indexOf('If you equip this')).toBeGreaterThan(deltas);
+    expect(gain).toBeGreaterThan(deltas);
+    expect(wornHead).toBeGreaterThan(gain);
+    expect(card).toBeGreaterThan(wornHead);
+  });
+
+  it('says "No stat changes" for a same-for-same swap instead of dropping the section', () => {
+    const { render } = recordingRenderer();
+    const twin = { ...WORN_HELM, id: 'cmp_test_twin_helm', name: 'Twin Helm' } as ItemDef;
+    const html = itemCompareBlocksHtml(
+      twin,
+      { equipment: { helmet: WORN_HELM.id } },
+      lookup,
+      render,
+    );
+    expect(html).toContain('If you equip this');
+    expect(html).toContain('No stat changes');
+    expect(html).not.toContain('tt-green');
+    expect(html).not.toContain('tt-red');
+    // A real change never shows the no-change line.
+    const changed = itemCompareBlocksHtml(
+      HOVERED_HELM,
+      { equipment: { helmet: WORN_HELM.id } },
+      lookup,
+      render,
+    );
+    expect(changed).not.toContain('No stat changes');
+  });
+});
+
+describe('itemCompareLayoutHtml', () => {
+  it('puts the hovered card first and the worn panels beside it', () => {
+    const html = itemCompareLayoutHtml('[hovered]', '[worn]');
+    expect(html).toBe(
+      '<div class="tt-cmp-layout"><div class="tt-cmp-main">[hovered]</div>' +
+        '<div class="tt-cmp-side">[worn]</div></div>',
+    );
+  });
+
+  it('returns the card untouched when there is nothing to compare', () => {
+    expect(itemCompareLayoutHtml('[hovered]', '')).toBe('[hovered]');
   });
 });

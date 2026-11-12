@@ -17146,6 +17146,7 @@ export const cs_CZ: EnTranslations = {
       "qualityKind": "{quality} {kind}",
       "currentlyEquipped": "Právě vybaveno",
       "ifYouEquip": "Pokud si to vybavíš",
+      "noStatChanges": "No stat changes",
       "damageSpeed": "Poškození {min} - {max}, rychlost {speed}",
       "dps": "({dps} poškození za sekundu)",
       "armorStat": "{value} brnění",

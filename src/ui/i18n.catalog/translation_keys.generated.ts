@@ -19372,6 +19372,7 @@ export type TranslationKeyFlat =
   | 'itemUi.tooltip.membershipScaling'
   | 'itemUi.tooltip.membershipToken'
   | 'itemUi.tooltip.membershipWeaponAdaptive'
+  | 'itemUi.tooltip.noStatChanges'
   | 'itemUi.tooltip.qualityKind'
   | 'itemUi.tooltip.questItem'
   | 'itemUi.tooltip.questOrphaned'

@@ -17146,6 +17146,7 @@ export const da_DK: EnTranslations = {
       "qualityKind": "{quality} {kind}",
       "currentlyEquipped": "Aktuelt udrustet",
       "ifYouEquip": "Hvis du udruster denne",
+      "noStatChanges": "No stat changes",
       "damageSpeed": "{min} - {max} Skade Hastighed {speed}",
       "dps": "({dps} skade i sekundet)",
       "armorStat": "{value} Rustning",

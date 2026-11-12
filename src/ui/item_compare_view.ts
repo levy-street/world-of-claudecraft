@@ -87,7 +87,7 @@ function compareBlockForSlot(
         minimumFractionDigits: d.decimals,
         maximumFractionDigits: d.decimals,
       });
-      return `<div class="${cls}">${sign}${magnitude} ${esc(
+      return `<div class="tt-cmp-delta ${cls}">${sign}${magnitude} ${esc(
         t(compareStatLabelKey(d.stat) as TranslationKey),
       )}</div>`;
     })
@@ -96,10 +96,24 @@ function compareBlockForSlot(
   // paperdoll projects it (worn identity is signer/enchant/rolled/name, never
   // the bond), so both hosts render the identical worn card.
   const worn = wornTooltipInstance(source.instances?.[slot]);
-  let html = `<div class="tt-cmp"><div class="tt-cmp-head">${esc(t('itemUi.tooltip.currentlyEquipped'))}</div>`;
+  // The stat change leads the panel (it is what the player hovered to learn),
+  // and a same-for-same swap says so instead of silently omitting the section.
+  const summary =
+    deltas ||
+    `<div class="tt-cmp-delta tt-cmp-none">${esc(t('itemUi.tooltip.noStatChanges'))}</div>`;
+  let html = `<div class="tt-cmp">`;
+  html += `<div class="tt-cmp-deltas"><div class="tt-cmp-head">${esc(t('itemUi.tooltip.ifYouEquip'))}</div>${summary}</div>`;
+  html += `<div class="tt-cmp-head">${esc(t('itemUi.tooltip.currentlyEquipped'))}</div>`;
   html += `<div class="tt-cmp-body">${tooltipHtml(equipped, worn)}</div>`;
-  if (deltas)
-    html += `<div class="tt-cmp-head">${esc(t('itemUi.tooltip.ifYouEquip'))}</div>${deltas}`;
   html += `</div>`;
   return html;
+}
+
+/** Lays the hovered item's card and its comparison panels out together: side
+ *  by side when the tooltip has the room (the stylesheet's flex-wrap decides,
+ *  so a narrow viewport stacks them), the hovered card always first. Returns
+ *  the card untouched when there is nothing to compare. */
+export function itemCompareLayoutHtml(cardHtml: string, compareHtml: string): string {
+  if (!compareHtml) return cardHtml;
+  return `<div class="tt-cmp-layout"><div class="tt-cmp-main">${cardHtml}</div><div class="tt-cmp-side">${compareHtml}</div></div>`;
 }

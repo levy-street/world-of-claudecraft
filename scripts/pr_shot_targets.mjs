@@ -6990,6 +6990,70 @@ export const TARGETS = [
     },
   },
   {
+    key: 'item-compare-tooltip',
+    label: 'A gated off-hand hovered in the bags beside the worn off-hand it would replace',
+    when: ['item_compare_view', 'item_level_gate', 'item_instance_tooltip'],
+    // Desktop only, the stack-size-tooltip precedent: the synthetic hover path
+    // does not raise #tooltip on the touch layout. A level-1 mage wears the
+    // Valefire Lantern and hovers the Sunpetal Grimoire (a rare held off-hand,
+    // equip-gated at 15), so one shot shows the compare layout, the leading
+    // stat-change summary, and the held off-hand's red Requires Level line.
+    variants: [
+      { key: 'offhand', charClass: 'mage', charName: 'Aldwin', beforeLoad: lowGraphicsSeed },
+    ],
+    async capture(page) {
+      await page.waitForFunction(() => window.__game?.sim?.player, { timeout: 90000 });
+      await dismissEntryOverlays(page);
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        for (const id of ['valefire_lantern', 'sunpetal_grimoire']) {
+          try {
+            sim?.addItem(id, 1);
+          } catch {}
+        }
+        try {
+          sim?.equipItem('valefire_lantern');
+        } catch {}
+        const el = document.querySelector('#bags');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.toggleBags?.();
+      });
+      await pollForSize(page, '#bags');
+      // Hover through the REAL pointer path so the tooltip is the one a player sees.
+      await page.evaluate(() => {
+        const cells = [...document.querySelectorAll('#bags *')];
+        const el = cells.find((c) => {
+          const bg = c instanceof HTMLElement ? c.style.backgroundImage : '';
+          const img = c.querySelector?.('img');
+          return (
+            bg?.includes('sunpetal_grimoire') ||
+            img?.getAttribute('src')?.includes('sunpetal_grimoire')
+          );
+        });
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        for (const type of [
+          'pointerenter',
+          'pointerover',
+          'mouseenter',
+          'mouseover',
+          'pointermove',
+          'mousemove',
+        ]) {
+          el.dispatchEvent(
+            new MouseEvent(type, {
+              bubbles: true,
+              clientX: r.left + r.width / 2,
+              clientY: r.top + r.height / 2,
+            }),
+          );
+        }
+      });
+      await wait(600);
+      return { clip: '#ui' };
+    },
+  },
+  {
     key: 'riftbound-band-tooltip',
     label: 'Riftbound band and Rift gem tooltips on the item-level ladder',
     when: ['rift/band_ladder', 'rift_band_tooltip', 'rift/progression', 'content/rift/items'],

@@ -17146,6 +17146,7 @@ export const en_XA: EnTranslations = {
       "qualityKind": "[{quality} {kind}]",
       "currentlyEquipped": "[Çúŕŕéñţļý éɋúíþþéð]",
       "ifYouEquip": "[Íƒ ýóú éɋúíþ ţĥíš]",
+      "noStatChanges": "[Ñó šţáţ çĥáñĝéš]",
       "damageSpeed": "[{min} - {max} Ðáɱáĝé Šþééð {speed}]",
       "dps": "[({dps} ðáɱáĝé þéŕ šéçóñð)]",
       "armorStat": "[{value} Áŕɱóŕ]",

@@ -17146,6 +17146,7 @@ export const nl_NL: EnTranslations = {
       "qualityKind": "{quality} {kind}",
       "currentlyEquipped": "Momenteel uitgerust",
       "ifYouEquip": "Als je dit uitrust",
+      "noStatChanges": "No stat changes",
       "damageSpeed": "{min} - {max} Schade Snelheid {speed}",
       "dps": "({dps} schade per seconde)",
       "armorStat": "{value} Pantser",

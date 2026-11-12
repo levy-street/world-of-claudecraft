@@ -17146,6 +17146,7 @@ export const vi_VN: EnTranslations = {
       "qualityKind": "{quality} {kind}",
       "currentlyEquipped": "Đang trang bị",
       "ifYouEquip": "Nếu bạn trang bị món này",
+      "noStatChanges": "No stat changes",
       "damageSpeed": "{min} - {max} Sát Thương Tốc Độ {speed}",
       "dps": "({dps} sát thương mỗi giây)",
       "armorStat": "{value} Giáp",

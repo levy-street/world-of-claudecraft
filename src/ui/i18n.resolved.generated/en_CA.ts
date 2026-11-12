@@ -17146,6 +17146,7 @@ export const en_CA: EnTranslations = {
       "qualityKind": "{quality} {kind}",
       "currentlyEquipped": "Currently equipped",
       "ifYouEquip": "If you equip this",
+      "noStatChanges": "No stat changes",
       "damageSpeed": "{min} - {max} Damage Speed {speed}",
       "dps": "({dps} damage per second)",
       "armorStat": "{value} Armour",
