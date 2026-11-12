@@ -104,4 +104,70 @@ describe('finder role declarations independent of specialization', () => {
     expect(sim.partyOf(helper)?.leader).toBe(leader);
     expect(sim.players.get(helper)!.talents.spec).toBe('arms');
   });
+
+  // Chronomancy is the mage healing spec, so the class offers the healer role
+  // on every finder path (the role table once left the mage out).
+  it('offers a mage the healer role whatever their specialization', () => {
+    const sim = makeSim();
+    for (const spec of [undefined, ...TALENTS.mage.specs.map((s) => s.id)]) {
+      const pid = add(sim, 'mage', `Mage${spec ?? 'none'}`, spec);
+      sim.dungeonFinderSetRoles(['healer'], pid);
+      const info = sim.dungeonFinderInfoFor(pid)!;
+      expect(info.eligibleRoles).toEqual(['healer', 'dps']);
+      expect(info.roles).toEqual(['healer']);
+    }
+  });
+
+  it('seats a queued Chronomancer as the healer of the proposed group', () => {
+    const sim = makeSim();
+    const chronoSpec = TALENTS.mage.specs.find((s) => s.role === 'healer')!.id;
+    const pids = [
+      add(sim, 'warrior', 'Tank', 'arms'),
+      add(sim, 'mage', 'Chrono', chronoSpec),
+      ...['First', 'Second', 'Third'].map((name) => add(sim, 'rogue', name)),
+    ];
+    const roles: Role[] = ['tank', 'healer', 'dps', 'dps', 'dps'];
+    pids.forEach((pid, i) => {
+      sim.dungeonFinderSetRoles([roles[i]], pid);
+      sim.dungeonFinderQueueJoin(['hollow_crypt_normal'], pid);
+    });
+    sim.tick();
+    expect(pids.map((pid) => sim.dungeonFinderInfoFor(pid)!.proposal?.role)).toEqual(roles);
+    for (const pid of pids) sim.dungeonFinderRespond(true, pid);
+    expect(sim.partyOf(pids[0])?.members).toEqual(pids);
+  });
+
+  it('seats a mage who applies to a listing as healer in the healer slot', () => {
+    const sim = makeSim();
+    const leader = add(sim, 'warrior', 'Leader', 'arms');
+    const mage = add(sim, 'mage', 'Chrono');
+    sim.dungeonFinderSetRoles(['tank'], leader);
+    sim.dungeonFinderSetRoles(['healer'], mage);
+    sim.dungeonFinderListingCreate('hollow_crypt_normal', [], leader);
+    const listingId = sim.dungeonFinderInfoFor(leader)!.myListing!.id;
+    sim.dungeonFinderApply(listingId, mage);
+    expect(sim.dungeonFinderInfoFor(leader)!.myListing!.applicants[0]?.roles).toEqual(['healer']);
+    sim.dungeonFinderApplicationRespond(mage, true, leader);
+    expect(sim.partyOf(leader)?.members).toEqual([leader, mage]);
+    expect(sim.dungeonFinderBoardView()[0].needed).toEqual({ tank: 0, healer: 0, dps: 3 });
+  });
+
+  it('admits a mage healer through the running-expedition application', () => {
+    const sim = makeSim();
+    const leader = add(sim, 'warrior', 'Leader', 'arms');
+    const mage = add(sim, 'mage', 'Chrono');
+    expect(sim.enterDungeon('hollow_crypt', leader)).toBe(true);
+    sim.dungeonFinderExpeditionOpen(leader);
+    const listing = sim.dungeonFinderInfoFor(leader)!.myListing!.id;
+    sim.dungeonFinderExpeditionApply(listing, 'healer', mage);
+    expect(sim.dungeonFinderInfoFor(leader)!.myListing!.applicants[0]?.roles).toEqual(['healer']);
+    sim.dungeonFinderApplicationRespond(mage, true, leader);
+    expect(sim.partyOf(mage)?.leader).toBe(leader);
+    expect(
+      sim
+        .dungeonFinderBoardView()[0]
+        .members.filter((m) => m.cls === 'mage')
+        .map((m) => m.role),
+    ).toEqual(['healer']);
+  });
 });
