@@ -1,7 +1,7 @@
 // The nine world-quest class loot tables (src/sim/content/world_quest_loot.ts).
 // Every entry must be something the class can wear AND would want: legal under
 // the equipment rules, the class's own armor weight, scoring for at least one of
-// its specs. The slot coverage matrix is pinned so a thin cell is a visible
+// its specs, and for a necklace or ring a lead stat one of its specs values. The slot coverage matrix is pinned so a thin cell is a visible
 // authoring decision (docs/prd/world-quests/rewards-brief.md, section 9).
 import { describe, expect, it } from 'vitest';
 import { DEV_KIT_ROLES } from '../src/sim/content/dev_kit_roles';
@@ -17,11 +17,42 @@ import { ALL_CLASSES, type ItemDef, type PlayerClass } from '../src/sim/types';
 const SHELF_MIN_ITEM_LEVEL = 20;
 const SHELF_MAX_ITEM_LEVEL = 26;
 
+// The non-stamina primary stats. Every spec weights stamina, and every
+// necklace and ring carries some, so a score that stamina alone props up says
+// nothing about whether the class wants the piece.
+const LEAD_STATS = ['str', 'agi', 'int', 'spi'] as const;
+
+/** The piece's lead stats: the non-stamina primary stats at its highest value
+ *  (two on a tie). Empty when it carries none. */
+function leadStats(item: ItemDef): (typeof LEAD_STATS)[number][] {
+  const top = Math.max(0, ...LEAD_STATS.map((stat) => item.stats?.[stat] ?? 0));
+  if (top === 0) return [];
+  return LEAD_STATS.filter((stat) => (item.stats?.[stat] ?? 0) === top);
+}
+
+/** Jewelry carries no armor weight, so the weight check never narrows it: the
+ *  piece's lead stat must be one at least one of the class's specs values. This
+ *  closes caster and physical jewelry crossing over, and deliberately stops
+ *  there: Agility adds crit for every class and rogue attack power reads
+ *  Strength (src/sim/entity.ts), so a physical class's off-stat piece is a
+ *  secondary pick, not a wrong one. The stricter SPEC_PRIMARY_STAT rule would
+ *  leave hunter and rogue the same three agility pieces the shelf holds. */
+function jewelryFitsClass(cls: PlayerClass, item: ItemDef): boolean {
+  const lead = leadStats(item);
+  if (lead.length === 0) return true;
+  return DEV_KIT_ROLES[cls].some((role) => lead.some((stat) => (role.weights[stat] ?? 0) > 0));
+}
+
+function isJewelry(item: ItemDef): boolean {
+  return item.slot === 'neck' || item.slot === 'ring';
+}
+
 function isAppropriate(cls: PlayerClass, item: ItemDef): boolean {
   if (!canEquipItem(cls, item)) return false;
   if (item.requiredClass && !item.requiredClass.includes(cls)) return false;
   const weight = armorTypeForItem(item);
   if (weight && weight !== maxArmorTypeForClass(cls)) return false;
+  if (isJewelry(item) && !jewelryFitsClass(cls, item)) return false;
   return DEV_KIT_ROLES[cls].some((role) => roleItemScore(role, item) > 0);
 }
 
@@ -51,10 +82,31 @@ describe('world quest class loot tables', () => {
     }
   });
 
+  it('rejects jewelry that only stamina makes appropriate', () => {
+    // The regression this pins: every class once drew all four necklaces, so a
+    // mage could be paid a strength necklace and a warrior an intellect one.
+    const strengthNeck = ITEMS.medallion_of_endless_profit;
+    const intellectNeck = ITEMS.zense_meridian;
+    const agilityRing = ITEMS.sutils_gambit;
+    const spiritRing = ITEMS.abyssal_loop;
+    expect(isAppropriate('mage', strengthNeck)).toBe(false);
+    expect(isAppropriate('warrior', strengthNeck)).toBe(true);
+    expect(isAppropriate('warrior', intellectNeck)).toBe(false);
+    expect(isAppropriate('mage', intellectNeck)).toBe(true);
+    expect(isAppropriate('warlock', agilityRing)).toBe(false);
+    expect(isAppropriate('rogue', agilityRing)).toBe(true);
+    expect(isAppropriate('hunter', spiritRing)).toBe(false);
+    expect(isAppropriate('priest', spiritRing)).toBe(true);
+    // Stamina still scores for every spec, so the old score-only check would
+    // have passed every one of the rejected pieces above.
+    expect(DEV_KIT_ROLES.mage.some((role) => roleItemScore(role, strengthNeck) > 0)).toBe(true);
+  });
+
   it('keeps the three tables of each armor weight distinct by a real margin', () => {
     // Measured at the first cut: the closest pair (hunter and rogue, who share
-    // the leather shelf) differs by nine entries; every other pair by sixteen
-    // or more. Identity or a one-entry difference would make the nine tables a
+    // the leather shelf) differed by nine entries; every other pair by sixteen
+    // or more. The jewelry fix (2026-11-12) left hunter and rogue at exactly six,
+    // so the next shared edit to the leather tables needs a distinct piece. Identity or a one-entry difference would make the nine tables a
     // fiction, so the bound is a symmetric difference, not a mere inequality.
     const MIN_SYMMETRIC_DIFFERENCE = 6;
     const trios: PlayerClass[][] = [
@@ -105,19 +157,20 @@ describe('world quest class loot tables', () => {
         expect(matrix[cls][slot] ?? 0, `${cls} ${slot}`).toBeGreaterThan(0);
       }
     }
-    // Table sizes, the first cut from the measured shelf (2026-09-19). A table
-    // that grows or shrinks re-pins this line deliberately.
+    // Table sizes, the first cut from the measured shelf (2026-09-19), less the
+    // off-role jewelry the stamina-only score once let through (2026-11-12). A
+    // table that grows or shrinks re-pins this line deliberately.
     expect(
       Object.fromEntries(ALL_CLASSES.map((cls) => [cls, WORLD_QUEST_CLASS_LOOT[cls].length])),
     ).toEqual({
-      warrior: 32,
+      warrior: 29,
       paladin: 36,
-      hunter: 47,
-      rogue: 42,
-      priest: 30,
+      hunter: 45,
+      rogue: 41,
+      priest: 26,
       shaman: 38,
-      mage: 28,
-      warlock: 27,
+      mage: 24,
+      warlock: 23,
       druid: 28,
     });
   });

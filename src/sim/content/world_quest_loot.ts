@@ -5,7 +5,9 @@
 // (docs/prd/world-quests/loot-coverage-20-26.md): within each armor-weight trio the
 // plentiful slots are split so the three tables differ, the scarce slots are shared.
 // Every entry is legal and appropriate for its class (armor weight equals the class
-// maximum, weapon proficiency, explicit class lock, scores for at least one spec),
+// maximum, weapon proficiency, explicit class lock, scores for at least one spec;
+// jewelry has no armor weight, so a necklace or ring must also lead with a stat
+// one of the class's specs values, never just the stamina every piece carries),
 // pinned by tests/world_quest_loot_tables.test.ts, which also prints the slot
 // coverage matrix so a thin cell is a visible authoring decision, never an accident.
 // DATA, not logic: edit the lists, keep the invariants the test names.
@@ -14,7 +16,6 @@ import type { PlayerClass } from '../types';
 export const WORLD_QUEST_CLASS_LOOT: Readonly<Record<PlayerClass, readonly string[]>> =
   Object.freeze({
     warrior: Object.freeze([
-      'abyssal_loop',
       'bloodmane_warleggings',
       'boneguard_breastplate',
       'boundstone_girdle',
@@ -44,8 +45,6 @@ export const WORLD_QUEST_CLASS_LOOT: Readonly<Record<PlayerClass, readonly strin
       'ysols_pearl_greaves',
       'yumis_keepsake_locket',
       'zealotsbane_blade',
-      'zense_meridian',
-      'zyzzs_deathless_signet',
     ]),
     paladin: Object.freeze([
       'architects_cornerstone',
@@ -86,7 +85,6 @@ export const WORLD_QUEST_CLASS_LOOT: Readonly<Record<PlayerClass, readonly strin
       'zense_meridian',
     ]),
     hunter: Object.freeze([
-      'abyssal_loop',
       'boneglass_shiv',
       'broodmother_carapace',
       'brutoks_maul',
@@ -115,6 +113,7 @@ export const WORLD_QUEST_CLASS_LOOT: Readonly<Record<PlayerClass, readonly strin
       'skullsplitter_dirk',
       'stormroot_cowl',
       'stormscale_treads',
+      'sutils_gambit',
       'swiftfang_talisman',
       'thornpeak_wildwraps',
       'verdant_walkers',
@@ -131,11 +130,8 @@ export const WORLD_QUEST_CLASS_LOOT: Readonly<Record<PlayerClass, readonly strin
       'wyrmshadow_treads',
       'yumis_keepsake_locket',
       'zealotsbane_blade',
-      'zense_meridian',
-      'zyzzs_deathless_signet',
     ]),
     rogue: Object.freeze([
-      'architects_cornerstone',
       'boneglass_shiv',
       'broodmother_carapace',
       'brutoks_maul',
@@ -162,6 +158,7 @@ export const WORLD_QUEST_CLASS_LOOT: Readonly<Record<PlayerClass, readonly strin
       'skullsplitter_dirk',
       'stormroot_cowl',
       'stormscale_treads',
+      'sutils_gambit',
       'swiftfang_talisman',
       'thornpeak_wildwraps',
       'verdant_walkers',
@@ -176,7 +173,6 @@ export const WORLD_QUEST_CLASS_LOOT: Readonly<Record<PlayerClass, readonly strin
       'wyrmshadow_treads',
       'yumis_keepsake_locket',
       'zealotsbane_blade',
-      'zense_meridian',
     ]),
     priest: Object.freeze([
       'abyssal_loop',
@@ -187,11 +183,9 @@ export const WORLD_QUEST_CLASS_LOOT: Readonly<Record<PlayerClass, readonly strin
       'gravebound_silk_wraps',
       'korgaths_chainwraps',
       'mantle_of_the_unhorsed',
-      'medallion_of_endless_profit',
       'moonshroud_robe',
       'necromancers_legwraps',
       'necromancers_starshroud',
-      'oath_of_the_round_table',
       'ogre_bonecharm_staff',
       'pactbound_vestments',
       'revenant_silk_robe',
@@ -201,12 +195,10 @@ export const WORLD_QUEST_CLASS_LOOT: Readonly<Record<PlayerClass, readonly strin
       'soulflame_cord',
       'stormshard_leggings',
       'sunbone_ritual_sarong',
-      'swiftfang_talisman',
       'wardens_oathband',
       'wardweave_cowl',
       'wildheart_hexwood_staff',
       'wyrmcult_grand_robe',
-      'yumis_keepsake_locket',
       'zense_meridian',
       'zyzzs_deathless_signet',
     ]),
@@ -258,26 +250,22 @@ export const WORLD_QUEST_CLASS_LOOT: Readonly<Record<PlayerClass, readonly strin
       'korgaths_chainwraps',
       'lilybed_mantle',
       'mawscale_pauldrons',
-      'medallion_of_endless_profit',
       'moonfleece_mitts',
       'moonshroud_robe',
       'necromancers_legwraps',
       'necromancers_starshroud',
       'pactbound_vestments',
       'revenant_silk_robe',
-      'seal_of_the_nine_oaths',
       'soulflame_cord',
       'soulflame_gloves',
       'staff_of_the_gravewyrm',
       'stormshard_leggings',
       'sunbone_ritual_sarong',
       'sunken_idol_mantle',
-      'swiftfang_talisman',
       'wardweave_cowl',
       'wickspun_treads',
       'wyrmcult_grand_robe',
       'wyrmcult_spellgrips',
-      'yumis_keepsake_locket',
       'zense_meridian',
     ]),
     warlock: Object.freeze([
@@ -285,7 +273,6 @@ export const WORLD_QUEST_CLASS_LOOT: Readonly<Record<PlayerClass, readonly strin
       'fountain_court_mantle',
       'korgaths_chainwraps',
       'mantle_of_the_meredark',
-      'medallion_of_endless_profit',
       'moonshroud_robe',
       'necromancers_legwraps',
       'necromancers_soulspire_mantle',
@@ -299,14 +286,11 @@ export const WORLD_QUEST_CLASS_LOOT: Readonly<Record<PlayerClass, readonly strin
       'staff_of_velkhar',
       'stormshard_leggings',
       'sunbone_ritual_sarong',
-      'sutils_gambit',
-      'swiftfang_talisman',
       'voidscar_handwraps',
       'wardweave_cowl',
       'wreck_wardens_mantle',
       'wyrmcult_grand_robe',
       'wyrmcult_soulsteps',
-      'yumis_keepsake_locket',
       'zense_meridian',
     ]),
     druid: Object.freeze([
