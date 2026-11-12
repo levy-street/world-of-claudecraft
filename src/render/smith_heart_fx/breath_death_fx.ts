@@ -40,7 +40,7 @@ import type { SanctumPuffOptions } from '../gravewyrm_sanctum_fx/sanctum_fx_core
 import { getFlameTex } from '../ignivar_fire_vfx';
 import { setRenderCategory } from '../renderer_diagnostics';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
-import { BREATH_SOCKETS, BREATH_YD_PER_UNIT } from './breath_body_core';
+import { BREATH_BODY_GESTURES, BREATH_SOCKETS, BREATH_YD_PER_UNIT } from './breath_body_core';
 import { breathBodySockets } from './breath_body_sockets';
 import {
   BREATH_DEATH,
@@ -134,6 +134,8 @@ export class BreathDeathFx {
   private clock = 0;
   private seed = 0xb7ea;
   private cloudDebt = 0;
+  /** Each stream's trail owed (a fractional debt, before the tier). */
+  private readonly streamDebt = new Float32Array(BREATH_DEATH_STREAMS.length);
   private windDebt = 0;
   private moteDebt = 0;
   private disposed = false;
@@ -328,6 +330,9 @@ export class BreathDeathFx {
     // A replay over (its span spent): the body stands, the wind back.
     if (!this.deadKnown && this.replayAt >= 0 && this.t < 0 && this.clock >= this.replayAt) {
       this.replayAt = -1;
+      // Stood back up explicitly (the body's own re-send waits out an
+      // entrance's scene; it sends the storm stance after if it is in it).
+      if (this.fell && e && !e.dead) this.playGesture?.(e.id, BREATH_BODY_GESTURES.calm);
       this.fell = false;
     }
     this.particles.update(this.clock);
@@ -367,7 +372,8 @@ export class BreathDeathFx {
 
   /** No scene: the hold given back, the scene hidden. */
   private letGo(e: Entity | null): void {
-    if (e && this.holding) holdBreathDeath(e.id, null);
+    // By the tracked id: a body out of view still lets its hold go.
+    if (this.holding && this.entityId >= 0) holdBreathDeath(e?.id ?? this.entityId, null);
     this.holding = false;
     this.rested = false;
     this.hideScene();
@@ -541,13 +547,15 @@ export class BreathDeathFx {
         _h0.z = _h1.z;
       }
       const len = Math.hypot(_h1.x - _h0.x, _h1.y - _h0.y, _h1.z - _h0.z);
-      const n = Math.min(
-        30,
-        Math.max(
-          1,
-          Math.round((len / BREATH_DEATH_RATES.streamStep) * Math.max(0.35, this.density)),
-        ),
+      // A fractional debt per stream: the trail follows its path at the
+      // tier's share, never a floor of one a frame (the rate, not the frame
+      // rate, bounds the glow pool).
+      this.streamDebt[i] = Math.min(
+        12,
+        this.streamDebt[i] + (len / BREATH_DEATH_RATES.streamStep) * this.density,
       );
+      const n = Math.floor(this.streamDebt[i]);
+      this.streamDebt[i] -= n;
       const fade = 1 - _h1.k * 0.3;
       for (let j = 1; j <= n; j++) {
         const k = j / n;
@@ -744,8 +752,8 @@ export class BreathDeathFx {
 
 const STREAM_CORE: SanctumPuffOptions & { alpha: number } = {
   speed: 0.2,
-  life: 0.7,
-  size: [1.3, 0.3],
+  life: 0.55,
+  size: [1.7, 0.4],
   color: WIND,
   alpha: 1,
   pool: 'glow',

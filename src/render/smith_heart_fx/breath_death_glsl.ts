@@ -44,7 +44,9 @@ export const DECK_FRAG = /* glsl */ `
     float a = atan(c.y, c.x + 1e-5);
     vec2 q = vec2(cos(a - uTime * 0.03), sin(a - uTime * 0.03)) * (0.5 + r * 2.2);
     float m = dfbm(q * 1.7 + vec2(uTime * 0.04, 0.0));
-    float m2 = dfbm(c * 3.1 - vec2(0.0, uTime * 0.05));
+    // A tint only: two octaves (the disc covers much of the sky).
+    vec2 q2 = c * 3.1 - vec2(0.0, uTime * 0.05);
+    float m2 = dn(q2) * 0.64 + dn(q2 * 2.07 + 5.3) * 0.36;
     // The gap's ragged edge: the billows' own noise pushes it in and out.
     float edgeR = r + (m - 0.5) * 0.22;
     float open = uOpen * 1.08;

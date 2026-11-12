@@ -146,6 +146,8 @@ export class HeatDeathFx {
   private seed = 0x4ea7;
   private drawDebt = 0;
   private ringDebt = 0;
+  /** Each exhale arm's trail owed (a fractional debt, before the tier). */
+  private readonly armDebt = new Float32Array(HEAT_SPIRAL.arms);
   private disposed = false;
 
   constructor(
@@ -347,12 +349,14 @@ export class HeatDeathFx {
   private letGo(e: Entity | null): void {
     if (this.skin.holding) this.skin.restore();
     // Only a hold of its own (the entrance holds its look each frame first).
-    if (e && this.holding) holdHeatEntrance(e.id, null);
+    // By the tracked id: a body out of view still lets its hold go.
+    if (this.holding && this.entityId >= 0) holdHeatEntrance(e?.id ?? this.entityId, null);
     this.holding = false;
     this.chunks.visible = false;
     this.halo.visible = false;
     this.rested = false;
-    if (this.t < 0) this.stage.visible = this.particles.liveRings() > 0;
+    // The pools and rings hang off the root: the stage holds nothing then.
+    if (this.t < 0) this.stage.visible = false;
   }
 
   private readSockets(e: Entity): void {
@@ -513,10 +517,10 @@ export class HeatDeathFx {
       heatSpiralHead(s0, arm, _h0);
       heatSpiralHead(s, arm, _h1);
       const len = Math.hypot(_h1.x - _h0.x, _h1.y - _h0.y, _h1.z - _h0.z);
-      const n = Math.min(
-        24,
-        Math.max(1, Math.round((len / S.step) * Math.max(0.35, this.density))),
-      );
+      // A fractional debt per arm: the rate, never the frame rate, bounds it.
+      this.armDebt[arm] = Math.min(16, this.armDebt[arm] + (len / S.step) * this.density);
+      const n = Math.floor(this.armDebt[arm]);
+      this.armDebt[arm] -= n;
       for (let i = 1; i <= n; i++) {
         const k = i / n;
         const x = hx + _h0.x + (_h1.x - _h0.x) * k;

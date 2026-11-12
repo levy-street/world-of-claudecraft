@@ -425,7 +425,7 @@ export const BREATH_DEATH_GESTURES = {
 /** The particles' rates (a second, before the tier's share). */
 export const BREATH_DEATH_RATES = {
   /** Each stream's trail, a yard of its head's path. */
-  streamStep: 0.26,
+  streamStep: 0.6,
   /** The cloud it unravels into. */
   cloud: 46,
   /** The wind's streaks over the isle at full. */

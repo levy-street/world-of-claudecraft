@@ -60,6 +60,7 @@ import {
   clearBreathBodySockets,
 } from '../src/render/smith_heart_fx/breath_body_sockets';
 import {
+  BREATH_DEATH,
   breathDeathBodyLook,
   newBreathDeathBodyLook,
 } from '../src/render/smith_heart_fx/breath_death_core';
@@ -559,15 +560,20 @@ describe('BreathBody over a fake world', () => {
     expect(bolts.visible).toBe(true);
     // A dev replay of its death holds its look: the stance is never re-sent
     // over the fall (it would stand it up mid-replay); let go, it is.
-    const dying = breathDeathBodyLook(1.5, newBreathDeathBodyLook());
+    const dying = breathDeathBodyLook(BREATH_DEATH.end, newBreathDeathBodyLook());
     holdBreathDeath(boss.id, dying);
     sent.length = 0;
     for (let i = 0; i < 60; i++) fx.update(1 / 20);
     expect(sent).toEqual([]);
-    expect(bolts.visible).toBe(true);
+    // Its light out at the scene's end (the stones' shards dark).
+    const shardsMid = root?.getObjectByName('smithHeartBreathShards') as THREE.Mesh;
+    expect((shardsMid.material as THREE.ShaderMaterial).uniforms.uGlow.value).toBe(0);
     holdBreathDeath(boss.id, null);
     fx.update(1 / 20);
     expect(sent[sent.length - 1]).toBe(BREATH_BODY_GESTURES.storm);
+    // Its stones' light given back after a replay that put it out.
+    const shards = root?.getObjectByName('smithHeartBreathShards') as THREE.Mesh;
+    expect((shards.material as THREE.ShaderMaterial).uniforms.uGlow.value).toBe(1);
     // Death: the wind thrown off and gone.
     boss.dead = true;
     for (let i = 0; i < 60; i++) fx.update(1 / 20);

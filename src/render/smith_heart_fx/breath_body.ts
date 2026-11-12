@@ -376,6 +376,8 @@ export class BreathBody {
   private arcTimer = 0;
   private readonly swings: number[] = [];
   private deadAt = -1;
+  /** Its death scene's look was held last frame (its end gives the light back). */
+  private dyingHeld = false;
   private seenAlive = false;
   private flaredInhale = false;
   private disposed = false;
@@ -714,12 +716,14 @@ export class BreathBody {
     }
     if (dying) {
       if (e.dead && this.deadAt < 0) this.deadAt = this.clock;
+      this.dyingHeld = true;
       this.poseDying(e, dt, dying);
       return;
     }
-    if (this.deadAt >= 0) {
-      // Up again (a wipe): the wind returns.
+    if (this.deadAt >= 0 || this.dyingHeld) {
+      // Up again (a wipe, a replay's end): the wind and its light return.
       this.deadAt = -1;
+      this.dyingHeld = false;
       this.orbit.setGlow(1);
     }
     this.seenAlive = true;
