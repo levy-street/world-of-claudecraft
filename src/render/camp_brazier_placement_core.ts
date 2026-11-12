@@ -8,7 +8,8 @@
 // the fires are a tall iron BRAZIER, half a low stone FIRE PIT, split by the
 // shared deterministic placement roll.
 
-import type { MobFamily } from '../sim/types';
+import { campLiveArea } from '../sim/camp_scatter';
+import type { CampDef, MobFamily } from '../sim/types';
 import { fireBuildingCamps, uncoveredCampSites } from './night_accents_core';
 
 export type CampFireKind = 'brazier' | 'firepit';
@@ -102,4 +103,26 @@ export function planCampBrazierSites(
     });
   }
   return sites;
+}
+
+/**
+ * Where each camp's fire belongs: the ground its live mobs stand on
+ * (campLiveArea: pinned spots, less retired slots), so a camp whose mobs the
+ * Studio town rework (#4593) moved off its centre does not light the old,
+ * empty one. A fully retired camp lights nothing, and neither does a camp in
+ * `skip` (the rework's overflow camps, extra mobs standing among a camp that
+ * already has its fire). The placement roll is keyed on position, so dropping
+ * or moving one camp's site never changes another's.
+ */
+export function liveCampFireSites(
+  camps: readonly CampDef[],
+  skip: ReadonlySet<CampDef> = new Set(),
+): { mobId: string; center: { x: number; z: number } }[] {
+  const out: { mobId: string; center: { x: number; z: number } }[] = [];
+  for (const camp of camps) {
+    if (skip.has(camp)) continue;
+    const area = campLiveArea(camp);
+    if (area) out.push({ mobId: camp.mobId, center: { x: area.x, z: area.z } });
+  }
+  return out;
 }

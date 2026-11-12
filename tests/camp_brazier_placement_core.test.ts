@@ -2,10 +2,11 @@ import { describe, expect, it } from 'vitest';
 import {
   type BrazierProbes,
   FALLBACK_RINGS,
+  liveCampFireSites,
   planCampBrazierSites,
   ROAD_CLEAR,
 } from '../src/render/camp_brazier_placement_core';
-import type { MobFamily } from '../src/sim/types';
+import type { CampDef, MobFamily } from '../src/sim/types';
 
 // camp_brazier_placement_core: where the camp fires stand and which kind each
 // one is. Pure, so the ring-slide and kind-split rules are asserted directly
@@ -142,5 +143,29 @@ describe('the fallback ring', () => {
     );
     expect(sites).toHaveLength(1);
     expect(Math.abs(sites[0].z) * 0.6).toBeGreaterThanOrEqual(ROAD_CLEAR);
+  });
+});
+
+describe('liveCampFireSites', () => {
+  const base: CampDef = {
+    mobId: 'thornpeak_ogre',
+    center: { x: -45, z: 768 },
+    radius: 6,
+    count: 1,
+  };
+  it('lights a moved camp where its mobs stand, not its old centre', () => {
+    // brutok_skullsmasher's shape: one mob pinned 98 yd off the camp centre
+    const moved = { ...base, spots: [{ x: -114.45, z: 697.5 }] };
+    expect(liveCampFireSites([moved])).toEqual([
+      { mobId: 'thornpeak_ogre', center: { x: -114.45, z: 697.5 } },
+    ]);
+    expect(liveCampFireSites([base])).toEqual([
+      { mobId: 'thornpeak_ogre', center: { x: -45, z: 768 } },
+    ]);
+  });
+  it('lights nothing for a fully retired camp or a skipped overflow camp', () => {
+    expect(liveCampFireSites([{ ...base, retiredSlots: 1 }])).toEqual([]);
+    const overflow = { ...base, offStream: true };
+    expect(liveCampFireSites([base, overflow], new Set([overflow]))).toHaveLength(1);
   });
 });

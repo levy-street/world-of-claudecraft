@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
+import { liveCampFireSites } from '../src/render/camp_brazier_placement_core';
 import {
   BRAZIER_RIM_HEIGHT,
   buildBrazierCoalsGeometry,
@@ -117,8 +118,10 @@ describe('the fire pit geometry', () => {
 
 describe('planCampBraziers on the real world', () => {
   const plan = () => planCampBraziers(0);
+  // Each fire-building camp where its live mobs stand (liveCampFireSites: a camp
+  // the Studio town rework, #4593, pinned elsewhere is lit there, not at its centre).
   const fireBuildingCenters = () =>
-    CAMPS.filter((camp) => {
+    liveCampFireSites(CAMPS).filter((camp) => {
       const family = MOBS[camp.mobId]?.family;
       return family !== undefined && FIRE_BUILDING_FAMILIES.has(family);
     });

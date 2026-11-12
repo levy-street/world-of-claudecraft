@@ -20,6 +20,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { resolvePosition } from '../sim/colliders';
+import { STUDIO_REWORK_CAMPS } from '../sim/content/studio_rework_camps';
 import { CAMPS, getActiveWorldContent, MOBS, zoneAt } from '../sim/data';
 import { usesOverworldSiteDressing } from '../sim/map_presentation';
 import { propPlacementRoll } from '../sim/prop_layout';
@@ -27,6 +28,7 @@ import { roadDistance, terrainHeight, WATER_LEVEL } from '../sim/world';
 import {
   type BrazierSite,
   type CampFireKind,
+  liveCampFireSites,
   planCampBrazierSites,
 } from './camp_brazier_placement_core';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
@@ -180,7 +182,7 @@ export function buildFirePitFlameGeometry(): THREE.BufferGeometry {
 export function planCampBraziers(seed = 0): BrazierSite[] {
   const content = getActiveWorldContent();
   return planCampBrazierSites(
-    CAMPS,
+    liveCampFireSites(CAMPS, new Set(STUDIO_REWORK_CAMPS)),
     content.props.campfires,
     (mobId) => MOBS[mobId]?.family,
     {
