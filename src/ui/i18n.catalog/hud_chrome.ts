@@ -5993,7 +5993,7 @@ export const hudChromeStrings = {
       stormForm:
         'Torn open into a body of lightning: the Storm half of the fight, until the Guardian of the Breath falls.',
       swell:
-        'Every {every} sec the swelling storm deals {min} to {max} damage to everyone on the Cornice, {growth}% more for every pulse before it: {stacks} so far. Heroic and Mythic: {heroicMin} to {heroicMax} damage.',
+        'Every {every} sec the swelling storm deals {min} to {max} damage to everyone on the Cornice, {growth}% more for every pulse before it: {stacks} so far. Heroic and Mythic: {heroicMin} to {heroicMax} damage, {heroicGrowth}% more for every pulse before it.',
     },
     // The Smith's Heart's Guardian of the Quench (src/ui/quench_aura_effect.ts).
     quenchGuardian: {

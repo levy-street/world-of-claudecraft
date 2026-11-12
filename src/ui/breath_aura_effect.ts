@@ -148,7 +148,8 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
           min: T.swellMin,
           max: T.swellMax,
           ...tierRange('heroic', T.swellMin, T.swellMax, HM),
-          growth: pct(T.swellGrowth),
+          growth: pct(BREATH_DIFFICULTY.normal.swellGrowth),
+          heroicGrowth: pct(BREATH_DIFFICULTY.heroic.swellGrowth),
           stacks: a.stacks ?? 0,
         },
       };

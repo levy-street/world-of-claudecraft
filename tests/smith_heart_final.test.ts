@@ -64,8 +64,31 @@ describe('the pure rules', () => {
     let drain = 0.5;
     for (let i = 0; i < sec(30); i++) drain = overloadStep(drain, false, 1 / 20);
     expect(drain).toBeCloseTo(0.5 - 0.5 / 3, 2);
-    expect(pulseScale(1)).toBeGreaterThan(pulseScale(0.5));
-    expect(pulseScale(0.5)).toBeGreaterThan(pulseScale(0));
+    expect(pulseScale(1, 70)).toBeGreaterThan(pulseScale(0.5, 70));
+    expect(pulseScale(0.5, 70)).toBeGreaterThan(pulseScale(0, 70));
+    expect(pulseScale(0, 45)).toBe(1);
+    expect(pulseScale(1, 45)).toBeCloseTo(1 + 45 / O.pulseMin, 9);
+  });
+
+  it('the per-tier Overload rise and the missed Anvil (the balance pass of 2026-11-12)', () => {
+    expect(FINAL_DIFFICULTY.normal.pulseRise).toBe(45);
+    expect(FINAL_DIFFICULTY.heroic.pulseRise).toBe(70);
+    expect(FINAL_DIFFICULTY.mythic.pulseRise).toBe(70);
+    expect([FINAL_DIFFICULTY.normal.anvilMissMin, FINAL_DIFFICULTY.normal.anvilMissMax]).toEqual([
+      1000, 1100,
+    ]);
+    for (const tier of ['heroic', 'mythic'] as const) {
+      expect([FINAL_DIFFICULTY[tier].anvilMissMin, FINAL_DIFFICULTY[tier].anvilMissMax]).toEqual([
+        1500, 1600,
+      ]);
+    }
+    // A full Normal bar pulses 80 to 91, a full Heroic one 105 to 120 (before its factor).
+    const full = (tier: 'normal' | 'heroic') => {
+      const k = pulseScale(1, FINAL_DIFFICULTY[tier].pulseRise);
+      return [Math.round(O.pulseMin * k), Math.round(O.pulseMax * k)];
+    };
+    expect(full('normal')).toEqual([80, 91]);
+    expect(full('heroic')).toEqual([105, 120]);
   });
 
   // The pace (FINAL_OVERLOAD): a visit lasts at least the root plus a short

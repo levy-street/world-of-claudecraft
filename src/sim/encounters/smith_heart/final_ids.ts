@@ -239,6 +239,14 @@ export interface FinalDifficultyRules {
   rotatingAnvil: boolean;
   /** Tremor Cracks laid at once. */
   tremors: number;
+  /** An Overload pulse's rise at a full bar over FINAL_OVERLOAD's empty
+   *  one (pulseScale). Normal's lower since the balance pass of 2026-11-12
+   *  (a full bar's pulse: 80 to 91 rather than 105 to 120). */
+  pulseRise: number;
+  /** Weight of the Anvil with nobody under it: the whole raid takes this.
+   *  Normal's stays under a fresh level-20 cloth pool (about 1,135). */
+  anvilMissMin: number;
+  anvilMissMax: number;
 }
 
 export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyRules>> = {
@@ -257,6 +265,9 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     crushed: false,
     rotatingAnvil: false,
     tremors: 3,
+    pulseRise: 45,
+    anvilMissMin: 1000,
+    anvilMissMax: 1100,
   },
   heroic: {
     // 1.2 until the Heroic pass of 2026-11-05: the bot raid in the previous
@@ -276,6 +287,9 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     crushed: true,
     rotatingAnvil: false,
     tremors: 4,
+    pulseRise: 70,
+    anvilMissMin: 1500,
+    anvilMissMax: 1600,
   },
   mythic: {
     damageMult: 1.3,
@@ -292,6 +306,9 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     crushed: true,
     rotatingAnvil: true,
     tremors: 4,
+    pulseRise: 70,
+    anvilMissMin: 1500,
+    anvilMissMax: 1600,
   },
 };
 
@@ -322,15 +339,14 @@ export const FINAL_OVERLOAD = {
   drainShare: 1 / 3,
   /** The active bar pulses the raid this often. */
   pulseEvery: 4,
-  /** A pulse: this much at an empty bar, rising by `pulseRise` at a full one
-   *  (harder each pulse while it fills). */
+  /** A pulse: this much at an empty bar, rising by the tier's `pulseRise`
+   *  (FINAL_DIFFICULTY) at a full one (harder each pulse while it fills). */
   // 60 to 70 until the bot raid of 2026-11-04: even an empty bar's pulse on
   // all ten was as much as two level-20 healers put out, before any kit.
+  // The rise was 300 until that raid (a bar two thirds full pulsed about 250
+  // every 4 s on everyone), then 70 on every tier until 2026-11-12.
   pulseMin: 35,
   pulseMax: 40,
-  // 300 until the bot raid of 2026-11-04: a bar two thirds full pulsed about
-  // 250 every 4 s on everyone, which wiped a raid that moved the boss on time.
-  pulseRise: 70,
   /** The burst of a full bar, per difficulty (then it is empty again). */
   burst: {
     normal: { min: 700, max: 800 },
@@ -490,9 +506,8 @@ export const FINAL_TUNING = {
   anvilTotal: 6600,
   /** Fewer soakers than this: each takes half as much again. */
   anvilMinSoakers: 3,
-  /** Nobody under it: the whole raid takes this. */
-  anvilMissMin: 1500,
-  anvilMissMax: 1600,
+  // Nobody under it: the whole raid takes its tier's anvilMissMin to
+  // anvilMissMax (FINAL_DIFFICULTY).
   /** Heroic: a Crushed soaker under the next Anvil takes its share this many
    *  times over. */
   crushedSeconds: 30,
@@ -520,9 +535,10 @@ export function finalHash(a: number, b: number): number {
   return (h ^ (h >>> 16)) >>> 0;
 }
 
-/** An Overload pulse's damage before the roll's spread (`fill` 0 to 1). */
-export function pulseScale(fill: number): number {
-  return 1 + (FINAL_OVERLOAD.pulseRise / FINAL_OVERLOAD.pulseMin) * Math.max(0, Math.min(1, fill));
+/** An Overload pulse's damage before the roll's spread (`fill` 0 to 1),
+ *  `rise` the tier's pulseRise. */
+export function pulseScale(fill: number, rise: number): number {
+  return 1 + (rise / FINAL_OVERLOAD.pulseMin) * Math.max(0, Math.min(1, fill));
 }
 
 /** One bar's step over `dt` seconds (0 to 1): filling while the boss stands

@@ -238,7 +238,9 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
   // Contagious cold: a shatter splashes further and harder.
   heroic: {
     damageMult: 1.25,
-    healthMult: 2.2,
+    // 2.2 to 2.0 with the base raised to 112,000 (the balance pass of
+    // 2026-11-12): about 6 to 7 minutes at human pace.
+    healthMult: 2.0,
     shatterMult: 2,
     splashR: 10,
     splashCold: 55,
@@ -258,8 +260,9 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
   // Every round one blade, slash after slash from where the last one ended.
   mythic: {
     damageMult: 1.25,
-    healthMult: 2.2,
-    shatterMult: 1,
+    healthMult: 2.0,
+    // Heroic's doubled shatter (never softer than Heroic, 2026-11-12).
+    shatterMult: 2,
     splashR: 10,
     splashCold: 55,
     slashMarksLake: 2,

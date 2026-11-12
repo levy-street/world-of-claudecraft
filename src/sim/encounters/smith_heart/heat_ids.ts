@@ -213,6 +213,12 @@ export interface HeatDifficultyRules {
   cinderSpeed: number;
   /** The Wheel of the Hearth (heat_wheel.ts). */
   wheel: boolean;
+  /** The fight's soft enrage (heat_cinders.ts cinderInterval): this long
+   *  into phase 3 (seconds on the fight clock), the Rolling Cinders fall
+   *  every `cinderLateEvery` instead of HEAT_TUNING.cinderEvery (the cap
+   *  stands). */
+  cinderLateAfter: number;
+  cinderLateEvery: number;
 }
 
 export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRules>> = {
@@ -224,25 +230,35 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     bolts: 2,
     cinderSpeed: 3.2,
     wheel: false,
+    // Three minutes into phase 3 (the balance pass of 2026-11-12): only a
+    // raid running well past the 4 to 5 minute target feels it.
+    cinderLateAfter: 180,
+    cinderLateEvery: 20,
   },
   heroic: {
     damageMult: 1.25,
-    healthMult: 1.45,
+    // 1.45 to 1.2 with the base raised to 77,000 (2026-11-12): the Heroic
+    // pool stays about where it was (92,800 to 92,400 base).
+    healthMult: 1.2,
     overflowAdds: true,
     seedHatch: true,
     bolts: 3,
     cinderSpeed: 4.4,
     wheel: false,
+    cinderLateAfter: 240,
+    cinderLateEvery: 20,
   },
   // Heroic whole, plus the Wheel of the Hearth.
   mythic: {
     damageMult: 1.25,
-    healthMult: 1.45,
+    healthMult: 1.2,
     overflowAdds: true,
     seedHatch: true,
     bolts: 3,
     cinderSpeed: 4.4,
     wheel: true,
+    cinderLateAfter: 240,
+    cinderLateEvery: 20,
   },
 };
 

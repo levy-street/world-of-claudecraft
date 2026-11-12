@@ -5,6 +5,7 @@
 // (E:/woc/entregas/raid_corazon/heroico/NOTAS.md: the 2026-11-05 heroic pass).
 
 import { describe, expect, it } from 'vitest';
+import { SMITH_HEART_MOBS } from '../src/sim/content/smith_heart';
 import {
   BREATH_DIFFICULTY,
   COUNCIL_DIFFICULTY,
@@ -53,6 +54,18 @@ describe("Smith's Heart: a boss's pool per tier", () => {
       expect(rows.heroic.healthMult).toBeGreaterThan(1);
       expect(rows.mythic.healthMult).toBeGreaterThanOrEqual(rows.heroic.healthMult);
     }
+  });
+
+  it('the balance pass of 2026-11-12: the Quench and the Heat pools per tier', () => {
+    const hp = (id: string) => SMITH_HEART_MOBS[id].hpBase;
+    expect(hp('heart_quench_guardian')).toBe(112000);
+    expect(QUENCH_DIFFICULTY.heroic.healthMult).toBe(2);
+    expect(QUENCH_DIFFICULTY.mythic.healthMult).toBe(2);
+    expect(hp('heart_heat_guardian')).toBe(77000);
+    expect(HEAT_DIFFICULTY.heroic.healthMult).toBe(1.2);
+    expect(HEAT_DIFFICULTY.mythic.healthMult).toBe(1.2);
+    // The Heat's Heroic pool stays about where it was (64,000 x 1.45 = 92,800).
+    expect(Math.abs(77000 * 1.2 - 92800)).toBeLessThan(500);
   });
 
   it('a Heroic pull of the Quench takes the tier pool; the wipe gives the template pool back', () => {

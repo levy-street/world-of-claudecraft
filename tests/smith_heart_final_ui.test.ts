@@ -121,7 +121,8 @@ describe('The Masterless Strength: tooltips', () => {
     const bar = say({ id: overloadAuraId('quench'), kind: 'internal_cd', value: 40 });
     expect(bar).toContain('40% full');
     expect(bar).toContain(`${O.fillSeconds} sec`);
-    expect(bar).toContain(`up to ${O.pulseMax + O.pulseRise}`);
+    // A full Normal bar's top roll: 40 x (1 + 45 / 35), the live rise (2026-11-12).
+    expect(bar).toContain('up to 91 when full');
     // The burst per difficulty: survivable, heavy, lethal.
     const n = (v: number) => String(v);
     expect(bar).toContain(`${n(O.burst.normal.min)} to ${n(O.burst.normal.max)} damage on Normal`);

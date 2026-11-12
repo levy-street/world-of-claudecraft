@@ -248,7 +248,7 @@ export function burstBar(s: FinalScope, vein: SmithHeartVein): Entity[] {
 
 /** An Overload pulse from the active bar. Returns who. */
 export function pulseBar(s: FinalScope, vein: SmithHeartVein): Entity[] {
-  const scale = pulseScale(s.st.overload[vein]);
+  const scale = pulseScale(s.st.overload[vein], s.rules.pulseRise);
   cueOn(s, s.boss, FINAL_CUES.pulse, 'arcane');
   const struck: Entity[] = [];
   for (const p of livePlayers(s)) {

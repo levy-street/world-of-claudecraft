@@ -104,13 +104,20 @@ describe("Smith's Heart Heroic: Mountain's Wrath kills whoever does not hide", (
 });
 
 describe("Smith's Heart Heroic: the Council's soft enrage comes after the lethal Wraths' window", () => {
-  it('Normal and Mythic speed up after 4 Wraths, Heroic after 8', () => {
-    expect(COUNCIL_DIFFICULTY.normal.enrageAfterWraths).toBe(COUNCIL_TUNING.enrageAfterWraths);
-    expect(COUNCIL_DIFFICULTY.mythic.enrageAfterWraths).toBe(COUNCIL_TUNING.enrageAfterWraths);
+  it('Normal speeds up after 5 Wraths, Heroic after 8, Mythic after 6 (2026-11-12)', () => {
+    expect(COUNCIL_DIFFICULTY.normal.enrageAfterWraths).toBe(5);
     expect(COUNCIL_DIFFICULTY.heroic.enrageAfterWraths).toBe(8);
+    expect(COUNCIL_DIFFICULTY.mythic.enrageAfterWraths).toBe(6);
+    // Each tier's row is what the fight reads: Normal's fourth Wrath no
+    // longer fills fast, its fifth does.
+    const normalFill = COUNCIL_TUNING.heirFillSeconds;
+    expect(councilFillSeconds(false, 4, normalFill, 5)).toBe(COUNCIL_TUNING.energyFillSeconds);
+    expect(councilFillSeconds(false, 5, normalFill, 5)).toBe(
+      COUNCIL_TUNING.energyFillSeconds / COUNCIL_TUNING.enrageFillMult,
+    );
     const fill = COUNCIL_TUNING.energyFillSeconds;
     const fast = fill / COUNCIL_TUNING.enrageFillMult;
-    expect(councilFillSeconds(false, 4)).toBe(fast);
+    expect(councilFillSeconds(false, 5)).toBe(fast);
     expect(councilFillSeconds(false, 7, COUNCIL_TUNING.heirFillSeconds, 8)).toBe(fill);
     expect(councilFillSeconds(false, 8, COUNCIL_TUNING.heirFillSeconds, 8)).toBe(fast);
   });
@@ -129,16 +136,16 @@ describe("Smith's Heart Heroic: the Council's soft enrage comes after the lethal
 });
 
 describe("Smith's Heart Heroic: the Quench's shatter lands twice as hard", () => {
-  it('the tier factor: Heroic 2, Normal and Mythic untouched', () => {
+  it('the tier factor: Heroic and Mythic 2 (Mythic since 2026-11-12), Normal untouched', () => {
     expect(QUENCH_DIFFICULTY.normal.shatterMult).toBe(1);
     expect(QUENCH_DIFFICULTY.heroic.shatterMult).toBe(2);
-    expect(QUENCH_DIFFICULTY.mythic.shatterMult).toBe(1);
+    expect(QUENCH_DIFFICULTY.mythic.shatterMult).toBe(2);
   });
 
-  for (const tier of ['normal', 'heroic'] as const) {
+  for (const tier of ['normal', 'heroic', 'mythic'] as const) {
     it(`${tier}: the shatter's roll on the plain body`, () => {
       const f = quenchFight(6, 29);
-      if (tier === 'heroic') expect(f.dev('/dev heart quench heroic')).toBe(true);
+      if (tier !== 'normal') expect(f.dev(`/dev heart quench ${tier}`)).toBe(true);
       expect(f.dev('/dev heart quench pull')).toBe(true);
       f.tick(ticks(QUENCH_TUNING.rimRise) + 2);
       const st = f.state();

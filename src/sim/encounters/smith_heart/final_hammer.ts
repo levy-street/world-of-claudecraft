@@ -170,7 +170,7 @@ export function landAnvil(s: FinalScope): Entity[] {
   });
   if (under.length === 0) {
     for (const p of livePlayers(s))
-      hit(s, p, roll(s, T.anvilMissMin, T.anvilMissMax), FINAL_NAMES.anvil, 'physical');
+      hit(s, p, roll(s, s.rules.anvilMissMin, s.rules.anvilMissMax), FINAL_NAMES.anvil, 'physical');
     return [];
   }
   for (const p of under) {

@@ -21,6 +21,7 @@ import {
   finalZoneOf,
   FINAL_OVERLOAD as O,
   overloadAuraId,
+  pulseScale,
   FINAL_TUNING as T,
 } from '../sim/encounters/smith_heart/final_ids';
 import { WIND_DRIFT_AURA } from '../sim/wind_drift';
@@ -69,6 +70,12 @@ function stateDescriptor(a: AuraEffectInput): AuraEffectDescriptor {
   };
 }
 
+/** A full bar's pulse at the top of its roll on `tier` (before the tier's
+ *  damage factor): the live pulseScale, the tier's own rise. */
+function fullPulse(tier: keyof typeof FINAL_DIFFICULTY): number {
+  return Math.round(O.pulseMax * pulseScale(1, FINAL_DIFFICULTY[tier].pulseRise));
+}
+
 /** The fight's aura's descriptor, or null when `a` is not one of them. */
 export function finalAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor | null {
   // Part 2 (the intermissions, the poured elements, the final phase).
@@ -83,15 +90,15 @@ export function finalAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescrip
         fill: O.fillSeconds,
         every: O.pulseEvery,
         min: O.pulseMin,
-        max: O.pulseMax + O.pulseRise,
+        max: fullPulse('normal'),
         normalMin: O.burst.normal.min,
         normalMax: O.burst.normal.max,
         heroicMin: O.burst.heroic.min,
         heroicMax: O.burst.heroic.max,
         mythicMin: O.burst.mythic.min,
         mythicMax: O.burst.mythic.max,
-        ...tierRange('heroicPulse', O.pulseMin, O.pulseMax + O.pulseRise, HM),
-        ...tierRange('mythicPulse', O.pulseMin, O.pulseMax + O.pulseRise, MM),
+        ...tierRange('heroicPulse', O.pulseMin, fullPulse('heroic'), HM),
+        ...tierRange('mythicPulse', O.pulseMin, fullPulse('mythic'), MM),
       },
     };
   switch (a.id) {

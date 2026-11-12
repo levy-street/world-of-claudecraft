@@ -345,7 +345,9 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     crowdShare: 0.5,
     risenPulseMin: 14,
     risenPulseMax: 16,
-    enrageAfterWraths: 4,
+    // The fifth Wrath (about 4:55), past the 4 to 5 minute target (was the
+    // fourth, about 3:56: the balance pass of 2026-11-12).
+    enrageAfterWraths: 5,
     heirRiseWarn: 2,
     heirFillSeconds: 35,
     rockOutlivesSinger: false,
@@ -365,8 +367,10 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     wrathMult: 6.3,
     heirWrathMult: 2,
     crowdShare: 0.2,
-    risenPulseMin: 19,
-    risenPulseMax: 21,
+    // Normal's Stone Thrum before the tier's 1.25 (was 19 to 21, which rode
+    // 68% over Normal: the balance pass of 2026-11-12).
+    risenPulseMin: 14,
+    risenPulseMax: 16,
     enrageAfterWraths: 8,
     heirRiseWarn: 2,
     heirFillSeconds: 35,
@@ -388,9 +392,11 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     wrathMult: 6.3,
     heirWrathMult: 2,
     crowdShare: 0.2,
-    risenPulseMin: 19,
-    risenPulseMax: 21,
-    enrageAfterWraths: 4,
+    risenPulseMin: 14,
+    risenPulseMax: 16,
+    // The sixth Wrath (about 5:55): Heroic's health asks no more than a
+    // tier of gear (was the fourth, 2026-11-12).
+    enrageAfterWraths: 6,
     heirRiseWarn: 1.5,
     heirFillSeconds: 30,
     rockOutlivesSinger: true,
@@ -427,7 +433,7 @@ export const COUNCIL_TUNING = {
   energyFillSeconds: 55,
   /** After this many Wraths the energy fills much faster (the soft enrage;
    *  the default, each tier's own is COUNCIL_DIFFICULTY's). */
-  enrageAfterWraths: 4,
+  enrageAfterWraths: 5,
   enrageFillMult: 2.5,
   wrathCast: 4,
   wrathRadius: 45,

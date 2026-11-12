@@ -291,7 +291,9 @@ export interface FinalPhaseRules {
 export const FINAL_PHASE_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalPhaseRules>> = {
   normal: {
     adds: 2,
-    addHealth: 6500,
+    // 6,500 until the balance pass of 2026-11-12: Normal's Splinter took
+    // longer to clear at its tier's damage than Heroic's, with worse gear.
+    addHealth: 5000,
     coalMarks: 1,
     ringGaps: 3,
     weightStep: 0.15,
@@ -304,7 +306,7 @@ export const FINAL_PHASE_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalPhase
     // (Splintered Strength, growing each pulse) outran a decent raid's two
     // healers inside 25 s while its damage needed 32 s to clear them; 5,500
     // ends the call before the pulses run away, still more to kill than
-    // Normal's two at 6,500.
+    // Normal's two (5,000 each since 2026-11-12).
     addHealth: 5500,
     coalMarks: 1,
     ringGaps: 2,

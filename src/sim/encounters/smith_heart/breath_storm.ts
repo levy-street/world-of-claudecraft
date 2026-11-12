@@ -326,7 +326,7 @@ function stepSwell(s: BreathScope): void {
   st.swellTimer -= DT;
   if (st.swellTimer > 1e-9) return;
   st.swellTimer += T.swellEvery;
-  const mult = swellMult(st.swellPulses);
+  const mult = swellMult(st.swellPulses, s.rules.swellGrowth);
   st.swellPulses++;
   const b = s.boss;
   const have = b.auras.find((a) => a.id === BREATH_AURAS.swell);

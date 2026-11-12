@@ -420,14 +420,14 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // metal. "Together, but not for too long": the cold bar, the huddle's
   // warmth and the ice it breaks, at half health the Smith's four blades
   // awake and echo its attacks. Every number a SKETCH (bot-measured, never
-  // with players): 62,000 base (about 143,000 after the elite factor) for a
-  // 4 to 5 minute Normal fight; Heroic's own multiplier is its difficulty
+  // with players): 112,000 base (about 258,000 after the elite factor) for a
+  // 4 to 5 minute Normal fight (raised from 62,000 on 2026-11-12); Heroic's own multiplier is its difficulty
   // row's (tier_health.ts). Tempering Strike stays its
   // swing cleave (the fight watches for it to raise the echoes); Quenching
   // Breath is encounter-driven (the fight starts and lands it on its own
   // clock; the record keeps the look's numbers).
   heart_quench_guardian: {
-    ...boss('heart_quench_guardian', 'Guardian of the Quench', 62000, 0x9ad8ff, 3),
+    ...boss('heart_quench_guardian', 'Guardian of the Quench', 112000, 0x9ad8ff, 3),
     ccImmune: true,
     slowImmune: true,
     // Her own model stands some eleven yards tall: her fists settle the tank
@@ -463,14 +463,14 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // Hearth. "The well of the first flame": Basalt Fist and its Molten Swells,
   // Hearth Flare, two overflows, Hearthseeds, Wakefire and the Rolling
   // Cinders (heroic adds the overflows' adds and the Seedflames). Every number a
-  // SKETCH (bot-measured, never with players): 64,000 base (about 147,000
-  // after the elite factor) for a 4 to 5 minute Normal fight, like the other
+  // SKETCH (bot-measured, never with players): 77,000 base (about 177,000
+  // after the elite factor, raised from 64,000 on 2026-11-12) for a 4 to 5 minute Normal fight, like the other
   // guardians; Heroic's own multiplier is its difficulty row's. Its body reaches the wellspring's lip
   // (bodyRadius: melee strikes it from the shore); Cinder Grip is its own
   // stacking burn on every landed swing (the stackPoison seam), so the tanks
   // swap; every other mechanic is the encounter's.
   heart_heat_guardian: {
-    ...boss('heart_heat_guardian', 'Guardian of the Heat', 64000, 0xffe6a0, HEAT_GUARDIAN_SCALE),
+    ...boss('heart_heat_guardian', 'Guardian of the Heat', 77000, 0xffe6a0, HEAT_GUARDIAN_SCALE),
     ccImmune: true,
     slowImmune: true,
     bodyRadius: HEARTH_WELL.r,

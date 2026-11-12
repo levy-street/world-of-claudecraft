@@ -589,8 +589,9 @@ describe('Guardian of the Breath: the Storm', () => {
   });
 
   it('the storm swells: each pulse harder than the first, without end', () => {
-    expect(swellMult(0)).toBe(1);
-    expect(swellMult(10)).toBeCloseTo(1 + 10 * T.swellGrowth, 9);
+    expect(swellMult(0, 0.08)).toBe(1);
+    expect(swellMult(10, 0.08)).toBeCloseTo(1.8, 9);
+    expect(swellMult(10, 0.04)).toBeCloseTo(1.4, 9);
     const f = storm(3);
     const p = f.players[1];
     const ev = f.tick(20 * 60);
@@ -601,6 +602,42 @@ describe('Guardian of the Breath: the Storm', () => {
     expect(last).toBeGreaterThan(first * 1.4);
     const swell = f.boss().auras.find((a) => a.id === BREATH_AURAS.swell);
     expect(swell?.stacks).toBe(f.state()?.swellPulses);
+  });
+});
+
+describe('Guardian of the Breath: the swelling storm per tier', () => {
+  it('pins the growth per tier: Normal 8% a pulse, Heroic and Mythic half that (2026-11-12)', () => {
+    expect(BREATH_DIFFICULTY.normal.swellGrowth).toBe(0.08);
+    expect(BREATH_DIFFICULTY.heroic.swellGrowth).toBe(0.04);
+    expect(BREATH_DIFFICULTY.mythic.swellGrowth).toBe(0.04);
+  });
+
+  it('in the fight, a late pulse hits by its own tier growth', () => {
+    // Forty pulses in: Normal 1 + 0.08 x 40 = 4.2 times the first, Heroic
+    // 1 + 0.04 x 40 = 2.6 (then its own 1.25): the ranges never meet.
+    const late = (heroic: boolean): number[] => {
+      const f = pulled(3);
+      if (heroic) f.dev('/dev heart breath heroic');
+      f.dev('/dev heart breath phase2');
+      f.tick(Math.round((T.stormCast + T.barrageSeconds) / DT) + 4);
+      const st = f.state();
+      if (!st) throw new Error('no fight');
+      st.swellPulses = 40;
+      const p = f.players[1];
+      const hits = hitsOf(
+        until(f, () => (f.state()?.swellPulses ?? 0) > 40, T.swellEvery + 1),
+        BREATH_NAMES.swell,
+        p.id,
+      );
+      expect(hits.length).toBe(1);
+      return hits;
+    };
+    const [n] = late(false);
+    expect(n).toBeGreaterThanOrEqual(Math.floor(T.swellMin * 4.2) - 1);
+    expect(n).toBeLessThanOrEqual(Math.ceil(T.swellMax * 4.2) + 1);
+    const [h] = late(true);
+    expect(h).toBeGreaterThanOrEqual(Math.floor(T.swellMin * 2.6 * 1.25) - 1);
+    expect(h).toBeLessThanOrEqual(Math.ceil(T.swellMax * 2.6 * 1.25) + 1);
   });
 });
 

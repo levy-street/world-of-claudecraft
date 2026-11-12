@@ -19,6 +19,7 @@ import { DUNGEONS } from '../src/sim/data';
 import {
   COUNCIL_AURAS,
   COUNCIL_CASTS,
+  COUNCIL_DIFFICULTY,
   COUNCIL_NAMES,
   type CouncilFightState,
   councilPillarFull,
@@ -497,7 +498,7 @@ describe('Hammer Council: difficulty', () => {
     f.sim.ctx.handleDeath(f.bodies().guardian as Entity, f.players[0]);
     f.tick();
     quiet(f.st);
-    f.st.wraths = T.enrageAfterWraths;
+    f.st.wraths = COUNCIL_DIFFICULTY.normal.enrageAfterWraths;
     f.dev('/dev heart council wrath');
     f.tick(Math.ceil(T.heirWrathCast * 20) + 2);
     f.st.wakeTimer = 999;

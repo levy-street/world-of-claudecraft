@@ -255,6 +255,11 @@ export interface BreathDifficultyRules {
   cradleCount: number;
   cradleSoakers: number;
   cradleTotal: number;
+  /** The swelling storm (phase 2's soft enrage): each pulse this much
+   *  louder than the first, without end. Half as steep on Heroic and Mythic
+   *  (the balance pass of 2026-11-12), so it kills past the 6 to 7 minute
+   *  target, not before it. */
+  swellGrowth: number;
   /** The Islands of the Wind (breath_isles.ts): the health fractions the
    *  guardian raises its Gale Bulwark at, how many isles each round wakes. */
   isleAt: readonly number[];
@@ -309,6 +314,7 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
     cradleCount: 1,
     cradleSoakers: 4,
     cradleTotal: 2600,
+    swellGrowth: 0.08,
     isleAt: [0.7],
     isleCount: 1,
     windwornSeconds: 0,
@@ -325,6 +331,7 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
     cradleCount: 3,
     cradleSoakers: 3,
     cradleTotal: 1900,
+    swellGrowth: 0.04,
     isleAt: [0.8, 0.6],
     isleCount: 2,
     windwornSeconds: 0,
@@ -343,6 +350,7 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
     cradleCount: 3,
     cradleSoakers: 3,
     cradleTotal: 1900,
+    swellGrowth: 0.04,
     isleAt: [0.8, 0.6],
     isleCount: 2,
     windwornSeconds: 150,
@@ -481,8 +489,7 @@ export const BREATH_TUNING = {
   swellEvery: 5,
   swellMin: 35,
   swellMax: 42,
-  /** Each pulse this much louder than the first, without end. */
-  swellGrowth: 0.08,
+  // Each pulse's growth is its difficulty row's (swellGrowth).
   // Heroic phase 2: the short gusts.
   gustFirst: 12,
   gustEvery: 24,
@@ -544,9 +551,10 @@ export function blowBearing(start: number, k: number): number {
   return BLOW_BEARINGS[(((start + k) % n) + n) % n];
 }
 
-/** The swelling storm's multiplier on its `pulse`-th pulse (0 the first). */
-export function swellMult(pulse: number): number {
-  return 1 + BREATH_TUNING.swellGrowth * Math.max(0, pulse);
+/** The swelling storm's multiplier on its `pulse`-th pulse (0 the first),
+ *  each pulse `growth` (the tier's swellGrowth) louder than the first. */
+export function swellMult(pulse: number, growth: number): number {
+  return 1 + growth * Math.max(0, pulse);
 }
 
 /** How each soaker of the Thunder's Cradle fares: the share each takes and

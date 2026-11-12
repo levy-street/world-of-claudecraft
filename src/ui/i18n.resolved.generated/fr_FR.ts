@@ -4786,7 +4786,7 @@ export const fr_FR: EnTranslations = {
         "thrown": "Thrown by the Summit Roar: you cannot move until the throw sets you down.",
         "tossed": "Tossed by a Loose Gale: you cannot move until the gust sets you down.",
         "stormForm": "Torn open into a body of lightning: the Storm half of the fight, until the Guardian of the Breath falls.",
-        "swell": "Every {every} sec the swelling storm deals {min} to {max} damage to everyone on the Cornice, {growth}% more for every pulse before it: {stacks} so far. Heroic and Mythic: {heroicMin} to {heroicMax} damage."
+        "swell": "Every {every} sec the swelling storm deals {min} to {max} damage to everyone on the Cornice, {growth}% more for every pulse before it: {stacks} so far. Heroic and Mythic: {heroicMin} to {heroicMax} damage, {heroicGrowth}% more for every pulse before it."
       },
       "quenchGuardian": {
         "intro": "Frozen under the lake: she cannot be attacked or harmed until she breaks free of the ice.",

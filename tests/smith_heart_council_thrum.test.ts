@@ -89,13 +89,15 @@ const thrumCues = (ev: readonly SimEvent[]) =>
   ev.filter((e) => e.type === 'spellfx' && e.ability === COUNCIL_CUES.risenPulse);
 
 describe('Stone Thrum: risen pillars ring on the whole raid', () => {
-  it('the rows: Normal about 15, Heroic about 25 after its factor, Mythic at least Heroic', () => {
+  it("the rows: Normal 14 to 16, Heroic and Mythic Normal's base with their 1.25 (2026-11-12)", () => {
     const n = COUNCIL_DIFFICULTY.normal;
     const h = COUNCIL_DIFFICULTY.heroic;
     const m = COUNCIL_DIFFICULTY.mythic;
     expect([n.risenPulseMin, n.risenPulseMax]).toEqual([14, 16]);
-    expect(h.risenPulseMin * h.damageMult).toBeCloseTo(23.75);
-    expect(h.risenPulseMax * h.damageMult).toBeCloseTo(26.25);
+    expect([h.risenPulseMin, h.risenPulseMax]).toEqual([14, 16]);
+    expect([m.risenPulseMin, m.risenPulseMax]).toEqual([14, 16]);
+    expect(h.risenPulseMin * h.damageMult).toBeCloseTo(17.5);
+    expect(h.risenPulseMax * h.damageMult).toBeCloseTo(20);
     expect(m.risenPulseMin * m.damageMult).toBeGreaterThanOrEqual(h.risenPulseMin * h.damageMult);
     expect(T.risenPulseEvery).toBe(2);
   });
