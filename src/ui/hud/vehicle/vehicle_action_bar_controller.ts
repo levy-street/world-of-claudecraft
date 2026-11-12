@@ -7,6 +7,7 @@ import {
   shadowChooseSlot,
   shadowControlsActive,
 } from '../../../game/shadow_controls';
+import { skillEventChooseSlot, skillEventControlsActive } from '../../../game/skill_event_controls';
 import { CANNON_TACTICS } from '../../../sim/content/cannon_encounter';
 import { GLIDER_QUEST_ID } from '../../../sim/content/world_quest_glider';
 import { cannonEndlessRound } from '../../../sim/minigames/cannon_endless';
@@ -23,6 +24,10 @@ import { cannonTacticsHint } from './cannon_tactics_view';
 import { ForgeActionBarController, type ForgeBarWorld } from './forge_action_bar_controller';
 import { createGliderActionBarView, gliderBoostDescription } from './glider_action_bar_view';
 import { ShadowActionBarController } from './shadow_action_bar_controller';
+import {
+  SkillEventActionBarController,
+  type SkillEventBarWorld,
+} from './skill_event_action_bar_controller';
 import { createVehicleActionBarView } from './vehicle_action_bar_view';
 import { vehicleActionTooltip } from './vehicle_action_tooltip';
 import { VEHICLE_ACTION_SLOTS, VehicleAimCore } from './vehicle_aim_core';
@@ -72,6 +77,8 @@ export class VehicleActionBarController {
   private gliderMode: boolean | null = null;
   private readonly shadow: ShadowActionBarController | null;
   private readonly forge: ForgeActionBarController | null;
+  private readonly skillEvent: SkillEventActionBarController | null;
+  private readonly skillEventWorld: SkillEventBarWorld | null;
 
   constructor(private readonly deps: VehicleBarDeps) {
     this.shadow =
@@ -101,6 +108,20 @@ export class VehicleActionBarController {
             deps.padKind,
           )
         : null;
+    this.skillEventWorld =
+      'skillEventInfo' in deps.world && deps.world.player
+        ? (deps.world as unknown as SkillEventBarWorld)
+        : null;
+    this.skillEvent = this.skillEventWorld
+      ? new SkillEventActionBarController(
+          this.skillEventWorld,
+          deps.writers,
+          deps.keyLabel,
+          deps.cancelOnEnter,
+          deps.attachTooltip,
+          deps.consumePeek,
+        )
+      : null;
     this.aim = new VehicleAimCore(deps.world, () => {
       deps.clearReticle?.();
       deps.presentation?.setGroundAimReticle(null);
@@ -229,6 +250,10 @@ export class VehicleActionBarController {
       forgeChooseSlot(this.deps.world as ForgeBarWorld, slot);
       return;
     }
+    if (this.skillEventWorld && skillEventControlsActive(this.skillEventWorld)) {
+      skillEventChooseSlot(this.skillEventWorld, slot);
+      return;
+    }
     const action = VEHICLE_ACTION_SLOTS[slot];
     if (action) this.aim.begin(action, slot);
   }
@@ -236,6 +261,7 @@ export class VehicleActionBarController {
   update(): void {
     this.shadow?.update();
     this.forge?.update();
+    this.skillEvent?.update();
     const session = this.deps.world.vehicleSession;
     const writers = this.deps.writers;
     const gliderActive = this.gliderActive();
@@ -325,11 +351,14 @@ export class VehicleActionBarController {
 
   static blocksPlayerActions(
     world: Pick<IWorldVehicles, 'vehicleSession'> &
-      Partial<Pick<ShadowControlWorld, 'worldQuestLog'>>,
+      Partial<Pick<ShadowControlWorld, 'worldQuestLog'>> &
+      Partial<Pick<SkillEventBarWorld, 'skillEventInfo'>>,
   ): boolean {
     const worldQuestLog = world.worldQuestLog;
     return (
       !!world.vehicleSession ||
+      ('skillEventInfo' in world &&
+        skillEventControlsActive({ skillEventInfo: world.skillEventInfo ?? null })) ||
       (!!worldQuestLog &&
         (gliderControlsActive({ worldQuestLog }) ||
           shadowControlsActive({ worldQuestLog }) ||

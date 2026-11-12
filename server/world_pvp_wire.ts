@@ -29,6 +29,8 @@ export interface WorldPvpCommands {
   setWorldPvpFlag(enabled: boolean, pid: number): void;
   skullBagAction(action: SkullBagAction, pid: number): void;
   joinSkillEvent(pid: number): void;
+  skillEventAction(verb: string, pid: number): void;
+  skillEventPickKeepsake(abilityId: string, pid: number): void;
 }
 
 export function dispatchWorldPvpCommand(
@@ -40,13 +42,27 @@ export function dispatchWorldPvpCommand(
   if (msg.cmd === 'pvp_flag' && typeof msg.on === 'boolean') sim.setWorldPvpFlag(msg.on, pid);
   // The hourly skill event's join prompt (src/sim/pvp/skill_events.ts checks
   // reach, level and the realm switch); the frame carries nothing else.
-  else if (msg.cmd === 'skill_event_join') sim.joinSkillEvent(pid);
+  else if (msg.cmd === 'skill_event') dispatchSkillEvent(sim, pid, msg);
   else if (msg.cmd === 'skull_bag' && msg.op === 'store') sim.skullBagAction({ op: 'store' }, pid);
   else if (msg.cmd === 'skull_bag' && msg.op === 'take' && Array.isArray(msg.sources))
     // The buckets stay untrusted: the sim reads them through the canonical
     // material-source validator (src/sim/pvp/skull_bag.ts) and refuses any
     // selection the bag does not hold.
     sim.skullBagAction({ op: 'take', sources: msg.sources }, pid);
+}
+
+/** The hourly skill event's one command: join, a kit verb, or the keepsake. Short
+ *  strings only reach the sim, which validates the event, the verb and the pick. */
+function dispatchSkillEvent(
+  sim: WorldPvpCommands,
+  pid: number,
+  msg: Record<string, unknown>,
+): void {
+  if (msg.op === 'join') sim.joinSkillEvent(pid);
+  else if (msg.op === 'action' && typeof msg.verb === 'string' && msg.verb.length <= 24)
+    sim.skillEventAction(msg.verb, pid);
+  else if (msg.op === 'keepsake' && typeof msg.ability === 'string' && msg.ability.length <= 64)
+    sim.skillEventPickKeepsake(msg.ability, pid);
 }
 
 interface SkullBagSent {

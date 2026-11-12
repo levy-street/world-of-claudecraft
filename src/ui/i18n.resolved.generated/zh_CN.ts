@@ -15953,7 +15953,44 @@ export const zh_CN: EnTranslations = {
       "reportingCharacterMissing": "找不到举报角色。"
     },
     "skillEvent": {
-      "heartsLabel": "红心：{count}/{max}"
+      "heartsLabel": "红心：{count}/{max}",
+      "names": {
+        "riposte": "还击",
+        "footprints": "灰烬足迹",
+        "tongues": "言语之仪",
+        "bankshot": "折射弹",
+        "common_hand": "共同之牌"
+      },
+      "goals": {
+        "riposte": "最后站着的剑士获胜。",
+        "footprints": "最后仍有红心的人获胜。",
+        "tongues": "最先完成 5 次吟诵者获胜。",
+        "bankshot": "最后站着的人获胜。",
+        "common_hand": "最先完成 4 次击杀者获胜。"
+      },
+      "verbs": {
+        "lunge": "突刺",
+        "guard": "格挡",
+        "feint": "佯攻",
+        "sidestep": "侧步"
+      },
+      "verbTips": {
+        "lunge": "蓄力 {windup} 秒，然后刺向你前方 {range} 码内最近的对手。命中会夺走 1 颗红心。",
+        "guard": "举起格挡，最多 {max} 秒。在前 {perfect} 秒内落下的突刺会被反击，攻击者将露出破绽 {stagger} 秒。格挡满 {max} 秒会让你露出破绽 {open} 秒。再按一次可放下格挡。只有在过去 {passive} 秒内突刺过才能格挡。",
+        "feint": "取消你自己的蓄力，引诱对手过早格挡。冷却 {feintCd} 秒。",
+        "sidestep": "向前冲刺 {distance} 码。冷却 {sidestepCd} 秒。"
+      },
+      "stance": {
+        "lunge": "蓄力中",
+        "guard": "格挡中",
+        "open": "露出破绽"
+      },
+      "ready": "就绪",
+      "startsIn": "{minutes} 分钟后开始",
+      "keepsake": "保留技能",
+      "keepsakeTip": "你保留的技能：{name}。这是你在此唯一能使用的职业技能。",
+      "keepsakeEmpty": "为本次活动选择你保留的一个职业技能。",
+      "pickTitle": "选择你保留的一个技能"
     },
     "prompts": {
       "partyInvite": "{name} 邀请你加入队伍。",

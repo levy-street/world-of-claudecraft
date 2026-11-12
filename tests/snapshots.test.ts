@@ -6295,6 +6295,7 @@ function dirtyEveryDeltaField(): {
     heartLostAt: new Map(),
     heartsTaken: new Map(),
     kits: new Map(),
+    verbHitFrom: null,
     kills: new Map(),
     winner: null,
   };

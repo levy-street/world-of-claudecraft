@@ -94,7 +94,7 @@ export interface NameplateCanvasState {
   markerTone: NameplateMarkerTone;
   hpVisible: boolean;
   hpFill: number;
-  hearts: number; // skill event hearts in place of the bar (nameplate_hearts.ts), -1 off
+  hearts: number; // skill event hearts in place of the bar (nameplate_hearts.ts), -1 off, -2 hidden
   castVisible: boolean;
   castFill: number;
   castChannel: boolean;
@@ -696,7 +696,7 @@ export class NameplateCanvasSurface {
   private drawHealth(state: NameplateCanvasState, centerX: number, y: number): void {
     const forcedColors = this.forcedColorsActive();
     if (state.hearts >= 0) drawNameplateHearts(this.ctx, centerX, y, state.hearts, forcedColors);
-    else drawNameplateHealthBar(this.ctx, state, centerX, y, forcedColors);
+    else if (state.hearts === -1) drawNameplateHealthBar(this.ctx, state, centerX, y, forcedColors);
   }
 
   private drawCast(state: NameplateCanvasState, centerX: number, y: number): void {

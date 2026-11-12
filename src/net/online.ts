@@ -4271,7 +4271,13 @@ export class ClientWorld extends ReconWireState implements IWorld {
     this.cmd({ cmd: 'pvp_flag', on: enabled });
   }
   joinSkillEvent(): void {
-    this.cmd({ cmd: 'skill_event_join' });
+    this.cmd({ cmd: 'skill_event', op: 'join' });
+  }
+  skillEventAction(verb: string): void {
+    this.cmd({ cmd: 'skill_event', op: 'action', verb });
+  }
+  skillEventPickKeepsake(abilityId: string): void {
+    this.cmd({ cmd: 'skill_event', op: 'keepsake', ability: abilityId });
   }
   sitOnSeat(seatId: string): void {
     this.cmd({ cmd: 'sit_seat', seat: seatId });

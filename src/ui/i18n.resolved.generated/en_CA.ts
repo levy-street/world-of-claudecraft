@@ -15953,7 +15953,44 @@ export const en_CA: EnTranslations = {
       "reportingCharacterMissing": "Reporting character not found."
     },
     "skillEvent": {
-      "heartsLabel": "Hearts: {count} of {max}"
+      "heartsLabel": "Hearts: {count} of {max}",
+      "names": {
+        "riposte": "Riposte",
+        "footprints": "Footprints in Ash",
+        "tongues": "Rite of Tongues",
+        "bankshot": "Bankshot",
+        "common_hand": "The Common Hand"
+      },
+      "goals": {
+        "riposte": "Last fencer standing wins.",
+        "footprints": "Last one with hearts left wins.",
+        "tongues": "First to finish 5 chants wins.",
+        "bankshot": "Last one standing wins.",
+        "common_hand": "First to 4 killing blows wins."
+      },
+      "verbs": {
+        "lunge": "Lunge",
+        "guard": "Guard",
+        "feint": "Feint",
+        "sidestep": "Sidestep"
+      },
+      "verbTips": {
+        "lunge": "Wind up for {windup} sec, then thrust at the nearest fighter in front of you within {range} yd. A hit takes 1 heart.",
+        "guard": "Raise your guard for up to {max} sec. A lunge that lands in the first {perfect} sec is turned back and leaves the attacker open for {stagger} sec. Holding the full {max} sec leaves you open for {open} sec. Press again to lower it. You can guard only if you lunged in the last {passive} sec.",
+        "feint": "Cancel your own wind-up to draw out an early guard. {feintCd} sec cooldown.",
+        "sidestep": "Dash {distance} yd forward. {sidestepCd} sec cooldown."
+      },
+      "stance": {
+        "lunge": "Winding up",
+        "guard": "Guarding",
+        "open": "Open"
+      },
+      "ready": "Ready",
+      "startsIn": "Starts in {minutes} min",
+      "keepsake": "Kept ability",
+      "keepsakeTip": "Your kept ability: {name}. The only class ability you can use here.",
+      "keepsakeEmpty": "Choose the one class ability you keep for this event.",
+      "pickTitle": "Choose the one ability you keep"
     },
     "prompts": {
       "partyInvite": "{name} invites you to join their party.",

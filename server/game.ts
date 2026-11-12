@@ -7237,7 +7237,7 @@ export class GameServer {
         break;
       // World PvP: the /pvp flag and the Skull Bag (server/world_pvp_wire.ts).
       case 'pvp_flag':
-      case 'skill_event_join':
+      case 'skill_event':
       case 'skull_bag':
         worldPvpWire.dispatchWorldPvpCommand(sim, pid, msg);
         session.lastWpvpWireTick = -worldPvpWire.WPVP_WIRE_INTERVAL_TICKS;

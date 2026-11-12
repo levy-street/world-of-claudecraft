@@ -59,6 +59,7 @@ import {
   nameplateDotsInto,
 } from './nameplate_dots_core';
 import { isFriendlyNameplateHidden } from './nameplate_friendly_core';
+import { nameplateHeartsFor } from './nameplate_hearts';
 import { nameplateSubRowsLift } from './nameplate_heraldry_core';
 import { NameplatePaintGate } from './nameplate_paint_gate_core';
 import {
@@ -292,6 +293,8 @@ export class NameplatePainter {
   // pass so the corpse indicator (corpseIndicatorFor) can answer loot rights
   // without a per-plate allocation; empty when solo.
   private readonly viewerPartyIds: number[] = [];
+  /** Touch layout, read once per update (your own heart row hides on touch). */
+  private mobileTouch = false;
 
   constructor(deps: NameplatePainterDeps) {
     this.views = deps.views;
@@ -334,6 +337,8 @@ export class NameplatePainter {
     const showOwnNameplate = this.showOwnNameplate();
     const showPlayerNameplates = this.showPlayerNameplates();
     const showPetNames = this.showPetNames();
+    this.mobileTouch =
+      typeof document !== 'undefined' && !!document.body?.classList.contains('mobile-touch');
     // Drop the quest-marker snapshot at every full pass so it re-resolves
     // lazily below; throttled passes reuse it (see the field's rationale).
     if (fullPass) this.questMarkerCtx = null;
@@ -699,7 +704,11 @@ export class NameplatePainter {
     state.comboPips = Math.max(0, Math.min(COMBO_PIP_MAX, plan.comboPips));
     state.hpFill = isPlayingDead(entity) ? 0 : entity.hp / Math.max(1, entity.maxHp);
     // Skill event heart fight: hearts replace the bar (src/render/nameplate_hearts.ts).
-    state.hearts = entity.eventHearts ?? -1;
+    state.hearts = nameplateHeartsFor(
+      entity.eventHearts,
+      entity.id === player.id,
+      this.mobileTouch,
+    );
     // A hostile player's tracked cooldowns, on the same per-frame cadence as the dots.
     // The resolver also clears non-player rows before a name-only NPC returns.
     resolveNameplateCooldowns(

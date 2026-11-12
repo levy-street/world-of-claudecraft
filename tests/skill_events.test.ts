@@ -454,9 +454,21 @@ describe('skill event flow', () => {
     tickSeconds(sim, 1.1);
     return { sim, a, b };
   }
+  /** A kit verb's hit, as a rule module lands it (verbHitFrom set around it). */
   function hit(sim: Sim, from: number, to: number, amount = 50): void {
+    const ev = sim.skillEventState.active!;
+    ev.verbHitFrom = from;
     sim.ctx.dealDamage(ent(sim, from), ent(sim, to), amount, false, 'physical', null, 'hit');
+    ev.verbHitFrom = null;
   }
+
+  it('ignores every hit between fighters that is not a kit verb (auto-attacks too)', () => {
+    const { sim, a, b } = heartFight();
+    const hpBefore = ent(sim, b).hp;
+    sim.ctx.dealDamage(ent(sim, a), ent(sim, b), 120, false, 'physical', null, 'hit');
+    expect(ent(sim, b).eventHearts).toBe(SKILL_EVENT_HEARTS);
+    expect(ent(sim, b).hp).toBe(hpBefore);
+  });
 
   it('a hit between fighters takes exactly one heart and no health', () => {
     const { sim, a, b } = heartFight();

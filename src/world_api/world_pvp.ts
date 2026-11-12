@@ -161,6 +161,16 @@ export interface SkillEventInfo {
    *  you are not on hearts. */
   hearts: number | null;
   maxHearts: number;
+  /** Your event kit once you have joined: the verbs in bar order with the
+   *  seconds until each is ready, the ability you kept, and the abilities you
+   *  may keep (eligible ones you know). Null when you have not joined. */
+  kit: SkillEventKitInfo | null;
+}
+
+export interface SkillEventKitInfo {
+  verbs: { id: string; readyIn: number }[];
+  keepsake: string | null;
+  choices: string[];
 }
 
 export interface IWorldWorldPvp {
@@ -180,4 +190,9 @@ export interface IWorldWorldPvp {
   /** Join the skill event (the join prompt's Accept): raises the World PvP
    *  flag. The sim refuses and explains out of reach or under level. */
   joinSkillEvent(): void;
+  /** Press one of the event kit's verbs (the sim checks the event, the verb
+   *  and its timing). */
+  skillEventAction(verb: string): void;
+  /** Keep one of your eligible class abilities for the event. */
+  skillEventPickKeepsake(abilityId: string): void;
 }

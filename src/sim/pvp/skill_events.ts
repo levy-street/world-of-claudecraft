@@ -77,6 +77,10 @@ export interface ActiveSkillEvent {
   heartsTaken: Map<number, number>;
   /** Each fighter's kit: the keepsake and the event verbs' state (skill_event_kit.ts). */
   kits: Map<number, SkillEventKitState>;
+  /** Set by a rule module for the length of a kit verb's own hit: only that
+   *  hit takes a heart (auto-attacks, the keepsake and every other damage
+   *  between fighters is ignored, so the kit alone decides the fight). */
+  verbHitFrom: number | null;
   /** Player killing blows landed inside the event, by pid. */
   kills: Map<number, number>;
   /** Set by the rule set the moment the event is won. */
@@ -220,6 +224,7 @@ function openEvent(ctx: SimContext, ordinal: number, startsAt: number): ActiveSk
     heartLostAt: new Map(),
     heartsTaken: new Map(),
     kits: new Map(),
+    verbHitFrom: null,
     kills: new Map(),
     winner: null,
   };
@@ -441,6 +446,7 @@ export function skillEventInfoFor(
     // shows the ordinary health bar).
     hearts: ev.hearts.get(pid) ?? null,
     maxHearts: SKILL_EVENT_HEARTS,
+    kit: joined ? kitInfoFor(ctx, ev, pid) : null,
   };
 }
 
@@ -470,6 +476,7 @@ export function skillEventTakeHeart(
       : source;
   if (!owner || owner.id === target.id || owner.eventHearts === undefined) return true;
   if (!ev.hearts.has(owner.id) || owner.dead) return true;
+  if (ev.verbHitFrom !== owner.id) return true; // only a kit verb's hit counts
   const last = ev.heartLostAt.get(target.id);
   if (last !== undefined && ctx.time - last < SKILL_EVENT_HEART_GRACE_SECONDS) return true;
   ev.heartLostAt.set(target.id, ctx.time);
@@ -557,4 +564,22 @@ export function skillEventCastAllowed(ctx: SimContext, pid: number, abilityId: s
   const ev = ctx.skillEventState.active;
   if (!ev || ev.phase !== 'running' || !ev.participants.includes(pid)) return true;
   return ev.kits.get(pid)?.keepsake === abilityId;
+}
+
+/** The viewer's kit for the readout: verbs with their wait, the keepsake, and
+ *  the eligible abilities they know (the picker's choices). */
+function kitInfoFor(
+  ctx: SimContext,
+  ev: ActiveSkillEvent,
+  pid: number,
+): import('../../world_api').SkillEventKitInfo {
+  const kit = ev.kits.get(pid);
+  const now = ctx.time;
+  const verbs = SKILL_EVENT_VERBS[ev.kind].map((id) => ({
+    id,
+    readyIn: Math.max(0, Math.round(((kit?.readyAt.get(id) ?? 0) - now) * 10) / 10),
+  }));
+  const known = ctx.players.get(pid)?.known ?? [];
+  const choices = known.filter((k) => keepsakeEligible(k.def)).map((k) => k.def.id);
+  return { verbs, keepsake: kit?.keepsake ?? null, choices };
 }

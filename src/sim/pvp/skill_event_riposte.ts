@@ -141,7 +141,12 @@ function landLunge(ctx: SimContext, ev: ActiveSkillEvent, p: Entity, st: Riposte
     }
     return; // any raised guard turns the thrust aside
   }
-  ctx.dealDamage(p, t, 1, false, 'physical', null, 'hit');
+  ev.verbHitFrom = p.id;
+  try {
+    ctx.dealDamage(p, t, 1, false, 'physical', null, 'hit');
+  } finally {
+    ev.verbHitFrom = null;
+  }
 }
 
 function everyTick(ctx: SimContext, ev: ActiveSkillEvent): void {

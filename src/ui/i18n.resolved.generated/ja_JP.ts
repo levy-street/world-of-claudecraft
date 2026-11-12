@@ -15953,7 +15953,44 @@ export const ja_JP: EnTranslations = {
       "reportingCharacterMissing": "通報するキャラクターが見つかりません。"
     },
     "skillEvent": {
-      "heartsLabel": "ハート：{count}/{max}"
+      "heartsLabel": "ハート：{count}/{max}",
+      "names": {
+        "riposte": "リポスト",
+        "footprints": "灰の足跡",
+        "tongues": "言霊の儀",
+        "bankshot": "バンクショット",
+        "common_hand": "共通の手札"
+      },
+      "goals": {
+        "riposte": "最後まで立っていた剣士の勝ち。",
+        "footprints": "最後までハートが残った者の勝ち。",
+        "tongues": "先に詠唱を5回終えた者の勝ち。",
+        "bankshot": "最後まで立っていた者の勝ち。",
+        "common_hand": "先にとどめを4回刺した者の勝ち。"
+      },
+      "verbs": {
+        "lunge": "突き",
+        "guard": "ガード",
+        "feint": "フェイント",
+        "sidestep": "サイドステップ"
+      },
+      "verbTips": {
+        "lunge": "{windup}秒ためてから、前方{range}ヤード以内で最も近い相手を突く。命中するとハートを1つ奪う。",
+        "guard": "最大{max}秒ガードを構える。構えてから{perfect}秒以内に届いた突きは返され、攻撃側は{stagger}秒間隙だらけになる。{max}秒構えきると自分が{open}秒間隙だらけになる。もう一度押すとガードを下ろす。直近{passive}秒以内に突いていないとガードできない。",
+        "feint": "自分のためを取り消し、相手の早すぎるガードを誘う。再使用まで{feintCd}秒。",
+        "sidestep": "前方へ{distance}ヤード踏み込む。再使用まで{sidestepCd}秒。"
+      },
+      "stance": {
+        "lunge": "ため中",
+        "guard": "ガード中",
+        "open": "隙あり"
+      },
+      "ready": "準備完了",
+      "startsIn": "{minutes}分後に開始",
+      "keepsake": "持ち込み技",
+      "keepsakeTip": "持ち込み技：{name}。ここで使える唯一のクラス技。",
+      "keepsakeEmpty": "このイベントに持ち込むクラス技を1つ選んでください。",
+      "pickTitle": "持ち込む技を1つ選ぶ"
     },
     "prompts": {
       "partyInvite": "{name}があなたをパーティに招待しています。",

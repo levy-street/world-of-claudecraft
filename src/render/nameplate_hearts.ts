@@ -6,6 +6,23 @@
 import { SKILL_EVENT_HEARTS } from '../sim/pvp/skill_event_rules';
 
 const HEART_SIZE = 10;
+
+/** NameplateCanvasState.hearts sentinel: a heart fighter whose row is not
+ *  drawn at all (neither hearts nor the health bar). */
+export const NAMEPLATE_HEARTS_HIDDEN = -2;
+
+/** The hearts value a plate paints: -1 for no heart fight (the health bar),
+ *  NAMEPLATE_HEARTS_HIDDEN for your own plate on a touch screen (the player
+ *  frame already shows your hearts, and the row over your head hides the
+ *  fight), otherwise the hearts left. Targets and other fighters keep theirs. */
+export function nameplateHeartsFor(
+  eventHearts: number | undefined,
+  isOwn: boolean,
+  mobileTouch: boolean,
+): number {
+  if (eventHearts === undefined) return -1;
+  return isOwn && mobileTouch ? NAMEPLATE_HEARTS_HIDDEN : eventHearts;
+}
 const HEART_GAP = 3;
 
 /** Trace one heart of width `s` with its top centre at (cx, top). */

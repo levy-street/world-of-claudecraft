@@ -1320,7 +1320,9 @@ const MONOLITHS: MonolithRow[] = [
     // 11490 with the difficulty menu fix (PR 4625) merged ahead of its landing. wc -l.
     // LOWERED 11410 -> 11389 with the hourly skill events: the tool-slot view moved
     // to professions/tool_effect_slot_view.ts, which paid for the event wiring. wc -l.
-    ceiling: 11389,
+    // LOWERED 11389 -> 11378: the party heal prediction moved to
+    // social/party_incoming_heals.ts beside the skill event kit wiring. wc -l.
+    ceiling: 11378,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

@@ -15953,7 +15953,44 @@ export const ko_KR: EnTranslations = {
       "reportingCharacterMissing": "신고 캐릭터를 찾을 수 없습니다."
     },
     "skillEvent": {
-      "heartsLabel": "하트: {count}/{max}"
+      "heartsLabel": "하트: {count}/{max}",
+      "names": {
+        "riposte": "반격",
+        "footprints": "잿빛 발자국",
+        "tongues": "언령의 의식",
+        "bankshot": "뱅크샷",
+        "common_hand": "공동의 패"
+      },
+      "goals": {
+        "riposte": "마지막까지 서 있는 검사가 승리합니다.",
+        "footprints": "마지막까지 하트가 남은 사람이 승리합니다.",
+        "tongues": "영창을 먼저 5번 마친 사람이 승리합니다.",
+        "bankshot": "마지막까지 서 있는 사람이 승리합니다.",
+        "common_hand": "먼저 결정타 4번을 넣은 사람이 승리합니다."
+      },
+      "verbs": {
+        "lunge": "찌르기",
+        "guard": "방어",
+        "feint": "페인트",
+        "sidestep": "옆걸음"
+      },
+      "verbTips": {
+        "lunge": "{windup}초 동안 힘을 모은 뒤, 앞쪽 {range}미터 안에서 가장 가까운 상대를 찌릅니다. 적중하면 하트 1개를 빼앗습니다.",
+        "guard": "최대 {max}초 동안 방어 자세를 취합니다. 처음 {perfect}초 안에 들어온 찌르기는 되받아치며, 공격자는 {stagger}초 동안 빈틈을 보입니다. {max}초를 끝까지 버티면 {open}초 동안 빈틈을 보입니다. 다시 누르면 방어를 풉니다. 최근 {passive}초 안에 찌른 적이 있어야 방어할 수 있습니다.",
+        "feint": "자신의 힘 모으기를 취소해 상대의 이른 방어를 유도합니다. 재사용 대기시간 {feintCd}초.",
+        "sidestep": "앞으로 {distance}미터 돌진합니다. 재사용 대기시간 {sidestepCd}초."
+      },
+      "stance": {
+        "lunge": "힘 모으는 중",
+        "guard": "방어 중",
+        "open": "빈틈"
+      },
+      "ready": "준비 완료",
+      "startsIn": "{minutes}분 후 시작",
+      "keepsake": "남긴 기술",
+      "keepsakeTip": "남긴 기술: {name}. 여기서 쓸 수 있는 유일한 직업 기술입니다.",
+      "keepsakeEmpty": "이번 이벤트에 남길 직업 기술 하나를 고르세요.",
+      "pickTitle": "남길 기술 하나 고르기"
     },
     "prompts": {
       "partyInvite": "{name}님이 파티에 초대했습니다.",

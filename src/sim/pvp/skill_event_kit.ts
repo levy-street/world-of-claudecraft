@@ -50,6 +50,17 @@ const DAMAGE_EFFECTS: ReadonlySet<string> = new Set([
   'consumeDot',
   'aoeAttackPower',
   'sunder',
+  // Custom effects that strike on the way: a leap that lands a blow, a charge
+  // that bleeds, a pet strike, a summon that fights.
+  'repositionToAim',
+  'hunterBloodhook',
+  'hunterShrapnel',
+  'hunterStampede',
+  'packCommand',
+  'unleashBeast',
+  'frozenOrb',
+  'valkyrsCalling',
+  'summonPyreColossus',
 ]);
 
 /** Can this ability be a fighter's keepsake? Pure: reads the definition only. */

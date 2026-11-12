@@ -707,6 +707,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/hill/hill_bar_view.ts',
   'src/ui/hud/skill_event/skill_event_prompt_core.ts',
   'src/ui/hud/skill_event/heart_bar_view.ts',
+  'src/ui/hud/vehicle/skill_event_action_bar_view.ts',
   // The Iron Cage escape prompt (the Gaol Turnkey's button-mash).
   'src/ui/hud/dungeon/cage_escape_view.ts',
   // Gaoler Ossick's chain alert (the Drowned Anchor, the Shackle Pair).
@@ -3145,6 +3146,7 @@ const UI_DOM_MODULES = [
   'src/ui/hud/treasure/ink_map_picker_controller.ts',
   'src/ui/hud/vehicle/shadow_action_bar_controller.ts',
   'src/ui/hud/vehicle/forge_action_bar_controller.ts',
+  'src/ui/hud/vehicle/skill_event_action_bar_controller.ts',
   'src/ui/account_portal_dom.ts',
   'src/ui/appearance_customizer.ts',
   // The WOC face builder's painter (its rules are woc_head_builder_model.ts).

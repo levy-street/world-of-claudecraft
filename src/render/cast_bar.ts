@@ -27,7 +27,26 @@ export interface CastBarState {
 
 const HIDDEN: CastBarState = { visible: false, channel: false, fill: 0, label: '', fishing: false };
 
+/** The Riposte stance tell's cast labels (src/sim/pvp/skill_event_riposte.ts):
+ *  a fencer winding up a lunge, guarding, or open shows a full bar with the
+ *  stance's name over their head, so every fencer can read the tell. The ids
+ *  are discriminators the label resolver localizes, never display text. */
+export const SKILL_EVENT_STANCE_CAST = {
+  lunge: 'skill_event_stance_lunge',
+  guard: 'skill_event_stance_guard',
+  open: 'skill_event_stance_open',
+} as const;
+
 export function castBarState(e: Entity): CastBarState {
+  if (e.eventStance && !e.dead) {
+    return {
+      visible: true,
+      channel: e.eventStance === 'guard',
+      fill: 1,
+      label: SKILL_EVENT_STANCE_CAST[e.eventStance],
+      fishing: false,
+    };
+  }
   // corpses, doors/crates, and idle entities show nothing; guard the divide too
   if (e.dead || e.kind === 'object' || !e.castingAbility || e.castTotal <= 0) return HIDDEN;
   const remaining = Math.max(0, Math.min(1, e.castRemaining / e.castTotal));

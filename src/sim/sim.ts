@@ -711,6 +711,7 @@ import {
   type SimContextHost,
 } from './sim_context';
 import * as chatMod from './social/chat';
+import { partyIncomingHealsOf } from './social/party_incoming_heals';
 import * as tradeMod from './social/trade';
 import {
   applyResurrectionSickness,
@@ -10389,25 +10390,7 @@ export class Sim {
 
   // UI-facing info objects (the same shapes the server sends over the wire)
   partyIncomingHeals(memberIds: readonly number[]): Map<number, number> {
-    const members = new Set(memberIds);
-    const incoming = new Map<number, number>();
-    for (const casterId of memberIds) {
-      const caster = this.entities.get(casterId);
-      if (!caster?.castingAbility || caster.castTargetId === null) continue;
-      if (!members.has(caster.castTargetId)) continue;
-      const ability = this.players
-        .get(casterId)
-        ?.known.find((known) => known.def.id === caster.castingAbility);
-      if (!ability) continue;
-      let amount = 0;
-      for (const effect of ability.effects) {
-        if (effect.type === 'heal') amount += Math.round((effect.min + effect.max) / 2);
-        else if (effect.type === 'hot') amount += effect.total;
-      }
-      if (amount > 0)
-        incoming.set(caster.castTargetId, (incoming.get(caster.castTargetId) ?? 0) + amount);
-    }
-    return incoming;
+    return partyIncomingHealsOf(this.ctx, memberIds);
   }
 
   get partyInfo(): import('../world_api').PartyInfo | null {
@@ -10469,6 +10452,12 @@ export class Sim {
   }
   joinSkillEvent(pid = this.primaryId): void {
     skillEventsMod.joinSkillEvent(this.ctx, pid);
+  }
+  skillEventAction(verb: string, pid = this.primaryId): void {
+    skillEventsMod.skillEventAction(this.ctx, pid, verb);
+  }
+  skillEventPickKeepsake(abilityId: string, pid = this.primaryId): void {
+    skillEventsMod.skillEventPickKeepsake(this.ctx, pid, abilityId);
   }
   worldPvpInfoFor(pid: number): import('../world_api').WorldPvpInfo | null {
     return worldPvpMod.worldPvpInfoFor(this.ctx, pid);
