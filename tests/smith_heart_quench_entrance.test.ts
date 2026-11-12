@@ -611,6 +611,54 @@ describe('QuenchEntranceFx over a fake world', () => {
     r.fx.dispose();
   });
 
+  it('emits its particles and rings at world points round her (the pools ignore a parent)', () => {
+    const r = rig();
+    // Turned off the frame's axes, so a stage-local point left unturned shows.
+    r.boss.facing = 1.1;
+    r.aura(waking(E.breachAt - 0.6));
+    r.fx.update(0.3);
+    let t = E.breachAt - 0.55;
+    while (t < E.breachAt + 0.8) {
+      r.aura(waking(t));
+      r.fx.update(1 / 20);
+      t += 1 / 20;
+    }
+    // The pools' shaders build world points themselves: they hang off the
+    // root at the origin, never the stage laid on her (whose transform they
+    // never read), and every particle is born round her in the world.
+    const pools: THREE.Mesh[] = [];
+    const rings: THREE.Mesh[] = [];
+    r.scene.traverse((o) => {
+      const m = (o as THREE.Mesh).material as THREE.Material | undefined;
+      if (!m) return;
+      if (/^trashEngine(Glow|Smoke|Pyre|Soulfire)$/.test(m.name)) pools.push(o as THREE.Mesh);
+      if (m.name === 'trashEngineRing' && o.visible) rings.push(o as THREE.Mesh);
+    });
+    expect(pools.length).toBeGreaterThanOrEqual(3);
+    let near = 0;
+    for (const mesh of pools) {
+      expect(mesh.parent?.name).toBe('smith-heart-quench-entrance');
+      const born = mesh.geometry.getAttribute('aLife');
+      const pos = mesh.geometry.getAttribute('aPos0');
+      for (let i = 0; i < born.count; i++) {
+        if (born.getX(i) < 0) continue;
+        const d = Math.hypot(pos.getX(i) - r.boss.pos.x, pos.getZ(i) - r.boss.pos.z);
+        expect(d).toBeLessThan(60);
+        near++;
+      }
+    }
+    expect(near).toBeGreaterThan(50);
+    // The breach's ring races out from under her.
+    expect(rings.length).toBeGreaterThanOrEqual(1);
+    for (const ring of rings) {
+      expect(ring.parent?.name).toBe('smith-heart-quench-entrance');
+      expect(
+        Math.hypot(ring.position.x - r.boss.pos.x, ring.position.z - r.boss.pos.z),
+      ).toBeLessThan(1);
+    }
+    r.fx.dispose();
+  });
+
   it('points each blade at one of the raid near her (by id)', () => {
     const r = rig({ raid: 3 });
     play(r);

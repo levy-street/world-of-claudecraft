@@ -41,6 +41,7 @@ import type { IWorld } from '../../world_api';
 import { fxAnchor } from '../attached_fx_anchor';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { attachSceneGroupGated } from '../gated_scene_attach';
+import type { SanctumPuffOptions } from '../gravewyrm_sanctum_fx/sanctum_fx_core';
 import { setRenderCategory } from '../renderer_diagnostics';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
 import { inSmithHeartClaim } from './council_fx_core';
@@ -351,6 +352,8 @@ const GEYSER_FRAG = /* glsl */ `
 // ---- the particles' options (written in place where they aim) ------------------------------
 
 const _dir: [number, number, number] = [0, 1, 0];
+/** `_dir` (or any aim) turned into the world by puff. */
+const _wdir: [number, number, number] = [0, 1, 0];
 const MIST = {
   speed: 0.6,
   up: 0.15,
@@ -686,11 +689,15 @@ export class QuenchEntranceFx {
     this.stage.visible = false;
     this.root.add(this.stage);
     this.density = entranceBudgetNow('quench').share;
+    // The pools draw WORLD points (their shaders build the point themselves,
+    // camera-relative, and never read a parent's transform): they hang off
+    // the root at the origin and every emit is turned and lifted off the
+    // stage (puff), as the Heat death's are.
     this.particles = new EngineParticles(
-      this.stage,
+      this.root,
       this.uTime,
       this.density,
-      (x, z) => this.floorAt(x, z),
+      (x, z) => this.groundY(x, z),
       () => this.rand(),
       () => this.reducedMotion(),
       null,
@@ -1045,6 +1052,24 @@ export class QuenchEntranceFx {
     return this.groundY(wx, wz) - this.stageY;
   }
 
+  /** Emit at a stage-local point (her frame): turned to her facing and
+   *  lifted onto the stage's world place, its aim turned with it. */
+  private puff(x: number, y: number, z: number, n: number, o: SanctumPuffOptions): void {
+    const at = this.stage.position;
+    const yaw = this.stage.rotation.y;
+    const c = Math.cos(yaw);
+    const s = Math.sin(yaw);
+    const dir = o.dir;
+    if (dir) {
+      _wdir[0] = dir[0] * c + dir[2] * s;
+      _wdir[1] = dir[1];
+      _wdir[2] = -dir[0] * s + dir[2] * c;
+      o.dir = _wdir;
+    }
+    this.particles.puff(at.x + x * c + z * s, at.y + y, at.z - x * s + z * c, n, o);
+    if (dir) o.dir = dir;
+  }
+
   /** The entrance's look for its guardian (tests read it). */
   get currentLook() {
     return this.look;
@@ -1253,7 +1278,7 @@ export class QuenchEntranceFx {
         _dir[1] = 1;
         _dir[2] = Math.cos(a) * 0.6;
         const glint = this.rand() < 0.35;
-        this.particles.puff(x, this.floorAt(x, z) + 0.2, z, 1, glint ? SPRAY_GLINT : SPRAY);
+        this.puff(x, this.floorAt(x, z) + 0.2, z, 1, glint ? SPRAY_GLINT : SPRAY);
       }
     }
     // The geyser.
@@ -1310,7 +1335,6 @@ export class QuenchEntranceFx {
   }
 
   private air(L: QuenchEntranceLook, dt: number, d: number): void {
-    const p = this.particles;
     // Mist off the ice round her.
     let n = dt * P.mistRate * L.mist * d;
     while (n > 0) {
@@ -1318,7 +1342,7 @@ export class QuenchEntranceFx {
       n -= 1;
       const a = this.rand() * Math.PI * 2;
       const r = 2 + Math.sqrt(this.rand()) * FROST_REACH * Math.max(0.35, L.frost);
-      p.puff(Math.sin(a) * r, 0.4, Math.cos(a) * r, 1, MIST);
+      this.puff(Math.sin(a) * r, 0.4, Math.cos(a) * r, 1, MIST);
     }
     // Snow over the lake, driven sideways as it thickens into a flurry.
     const flurry = Math.max(0, L.snow - 1);
@@ -1331,7 +1355,13 @@ export class QuenchEntranceFx {
       n -= 1;
       const a = this.rand() * Math.PI * 2;
       const r = Math.sqrt(this.rand()) * P.snowReach;
-      p.puff(Math.sin(a) * r, P.snowHeight * (0.45 + 0.55 * this.rand()), Math.cos(a) * r, 1, SNOW);
+      this.puff(
+        Math.sin(a) * r,
+        P.snowHeight * (0.45 + 0.55 * this.rand()),
+        Math.cos(a) * r,
+        1,
+        SNOW,
+      );
     }
     // The frost breath off the sheet over her mouth.
     if (L.breath > 0) {
@@ -1348,7 +1378,7 @@ export class QuenchEntranceFx {
           x = _v.x;
           z = _v.z;
         }
-        p.puff(x, QUENCH_SHEET.height * 0.85, z, 4, BREATH);
+        this.puff(x, QUENCH_SHEET.height * 0.85, z, 4, BREATH);
       }
     }
     // Motes of light rising off the web's cracks.
@@ -1360,7 +1390,7 @@ export class QuenchEntranceFx {
         const line = ENTRANCE_WEB[Math.floor(this.rand() * ENTRANCE_WEB.length)];
         const pt = line[Math.floor(this.rand() * line.length)];
         if (pt.reveal > L.web) continue;
-        p.puff(pt.x, this.floorAt(pt.x, pt.z) + 0.15, pt.z, 1, MOTE);
+        this.puff(pt.x, this.floorAt(pt.x, pt.z) + 0.15, pt.z, 1, MOTE);
       }
     }
   }
@@ -1368,11 +1398,10 @@ export class QuenchEntranceFx {
   /** The breach: the sheet bursting, shards and powder flung, the floor's
    *  wave, her own light flaring back, the camera's thud. */
   private breach(e: Entity): void {
-    const p = this.particles;
     const z = QUENCH_SHEET.z;
-    p.puff(0, 1.2, z, Math.round(P.shardBurst * this.density) + 12, SHARDS);
-    p.puff(0, 0.8, z, Math.round(26 * this.density) + 6, POWDER);
-    p.puff(0, 2, z, Math.round(P.debrisBurst * this.density) + 10, DEBRIS);
+    this.puff(0, 1.2, z, Math.round(P.shardBurst * this.density) + 12, SHARDS);
+    this.puff(0, 0.8, z, Math.round(26 * this.density) + 6, POWDER);
+    this.puff(0, 2, z, Math.round(P.debrisBurst * this.density) + 10, DEBRIS);
     // A thick frost mist rolling out over the lake from the hole.
     const n = Math.round(P.mistBurst * this.density * (this.reducedMotion() ? 0.5 : 1)) + 8;
     for (let i = 0; i < n; i++) {
@@ -1380,9 +1409,20 @@ export class QuenchEntranceFx {
       _dir[0] = Math.sin(a);
       _dir[1] = 0.05;
       _dir[2] = Math.cos(a);
-      p.puff(Math.sin(a) * 3, 0.6, z + Math.cos(a) * 3, 1, ROLL);
+      this.puff(Math.sin(a) * 3, 0.6, z + Math.cos(a) * 3, 1, ROLL);
     }
-    p.shockRing(0, 0, C.ring, E.ringTo, E.ringFor, { wake: 0.08, crest: 0.07, strength: 1 });
+    this.particles.shockRing(
+      this.stage.position.x,
+      this.stage.position.z,
+      C.ring,
+      E.ringTo,
+      E.ringFor,
+      {
+        wake: 0.08,
+        crest: 0.07,
+        strength: 1,
+      },
+    );
     const me = this.world?.entities.get(this.world.playerId);
     if (!this.shakeSink || !me) return;
     const amount = quenchEntranceShake(
@@ -1433,7 +1473,7 @@ export class QuenchEntranceFx {
         pt.getWorldPosition(_v);
         this.stage.worldToLocal(_v);
       } else _v.set((this.rand() - 0.5) * 3, 1 + this.rand() * 9, (this.rand() - 0.5) * 3);
-      this.particles.puff(_v.x, _v.y, _v.z, 1, this.rand() < 0.3 ? VAPOR_GLINT : VAPOR);
+      this.puff(_v.x, _v.y, _v.z, 1, this.rand() < 0.3 ? VAPOR_GLINT : VAPOR);
     }
   }
 
@@ -1453,9 +1493,9 @@ export class QuenchEntranceFx {
         const cx = this.pose[o];
         const cy = this.pose[o + 1];
         const cz = this.pose[o + 2];
-        this.particles.puff(cx, cy, cz, Math.round(8 * this.density) + 2, SHATTER_MIST);
+        this.puff(cx, cy, cz, Math.round(8 * this.density) + 2, SHATTER_MIST);
         const calm = this.reducedMotion() ? 0.5 : 1;
-        this.particles.puff(cx, cy, cz, Math.round(40 * this.density * calm) + 6, SHATTER_MOTES);
+        this.puff(cx, cy, cz, Math.round(40 * this.density * calm) + 6, SHATTER_MOTES);
       }
       const since = b.shatter;
       for (let j = 0; j < per; j++) {
@@ -1636,7 +1676,7 @@ export class QuenchEntranceFx {
       // Frost trailing off it as it spins up and circles; ice bursting as it
       // breaks out.
       if (b.lift < 1 && b.lift > 0.05 && this.rand() < dt * 34 * this.density)
-        this.particles.puff(bx, floor + 0.3, bz, 2, BURST);
+        this.puff(bx, floor + 0.3, bz, 2, BURST);
       // The frost trail: thick while it spins up into the circle.
       if (b.lift > 0.3) {
         let n = dt * (b.lift < 1 ? 70 : 14) * this.density * (this.reducedMotion() ? 0.35 : 1);
@@ -1644,7 +1684,7 @@ export class QuenchEntranceFx {
           if (n < 1 && this.rand() > n) break;
           n -= 1;
           _p.set(bx, mid, bz).addScaledVector(_d, B.length * (this.rand() - 0.5));
-          this.particles.puff(_p.x, _p.y, _p.z, 1, BLADE_TRAIL);
+          this.puff(_p.x, _p.y, _p.z, 1, BLADE_TRAIL);
         }
       }
       // Each blade's own star of cracks and burst of ice where it breaks
@@ -1664,7 +1704,7 @@ export class QuenchEntranceFx {
         stars = true;
       } else this.stars.setMatrixAt(i, _zero);
       if (crossedQuenchBeat(prev, t, start + 0.05))
-        this.particles.puff(sx0, floor + 0.4, sz0, Math.round(22 * this.density) + 4, BURST);
+        this.puff(sx0, floor + 0.4, sz0, Math.round(22 * this.density) + 4, BURST);
       // Its pose this frame, for the shards it bursts into.
       const o = i * 6;
       this.pose[o] = bx;
