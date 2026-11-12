@@ -1,5 +1,6 @@
 import { isLootableBody } from '../sim/corpse_loot_state';
 import { WORLD_QUESTS_BY_ID } from '../sim/data';
+import { corpseLootReach } from '../sim/loot/corpse_loot_reach';
 import { kitUsableNow, kitUseOf } from '../sim/mob/trash_kit/encounter_use';
 import { isQuestGatedGroundObjectHidden } from '../sim/quest_gated_entity';
 import { isObjectOpenedByViewer } from '../sim/quests/opened_object_view';
@@ -107,7 +108,7 @@ export function resolveNearbyInteractionCandidate(
   const playerId = world.playerId ?? player.id;
   const partyIds = localPartyMemberIds(world.partyInfo);
   let bestCorpse: Entity | null = null;
-  let bestCorpseDistance = INTERACT_RANGE;
+  let bestCorpseDistance = Number.POSITIVE_INFINITY;
   let bestObject: Entity | null = null;
   let bestObjectDistance = INTERACT_RANGE;
   let bestNpc: Entity | null = null;
@@ -156,6 +157,8 @@ export function resolveNearbyInteractionCandidate(
       !player.dead &&
       isLootableBody(entity) &&
       corpseLootAvailability(entity, playerId, harvestStateReliable, partyIds).hasLoot &&
+      // The sim's own loot reach: INTERACT_RANGE, measured from a big body's edge.
+      distance < corpseLootReach(entity) &&
       distance < bestCorpseDistance
     ) {
       bestCorpse = entity;

@@ -5,6 +5,7 @@ import { isInvestigationNpc } from '../sim/content/world_quest_investigation';
 import { isShadowNpc, SHADOW_NPC_ID } from '../sim/content/world_quest_shadow';
 import { isLootableBody } from '../sim/corpse_loot_state';
 import { ESCORTS } from '../sim/data';
+import { corpseLootReach } from '../sim/loot/corpse_loot_reach';
 import { kitUsableNow } from '../sim/mob/trash_kit/encounter_use';
 import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
 import {
@@ -223,7 +224,7 @@ export function shouldApproachPickedEntity(
   if (entity.dead) {
     return (
       isLootableBody(entity) &&
-      d > INTERACT_RANGE + 1 &&
+      d > corpseLootReach(entity) + 1 &&
       corpseLootAvailability(entity, player.id, harvestStateReliable, partyMemberIds).canOpen
     );
   }
@@ -297,7 +298,8 @@ export function handlePickedEntity(
         hud.showError(tSim('error.cantWhileDead'));
         return false;
       }
-      if (d <= INTERACT_RANGE + 1) {
+      // A big body is looted from its edge (sim/loot/corpse_loot_reach.ts).
+      if (d <= corpseLootReach(e) + 1) {
         if (
           !corpseLootAvailability(
             e,

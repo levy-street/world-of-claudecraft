@@ -1,6 +1,7 @@
 import { bodyPoolSharedWithParty, isLootableBody } from '../sim/corpse_loot_state';
 import { isRaidInstancePos } from '../sim/instances/dungeons';
-import { dist2d, INTERACT_RANGE } from '../sim/types';
+import { corpseLootReach } from '../sim/loot/corpse_loot_reach';
+import { dist2d } from '../sim/types';
 import type { IWorld } from '../world_api';
 
 // The client-side walk-by pass: each frame, scan visible lootable corpses and
@@ -41,7 +42,7 @@ export class AutoLoot {
       const personalMine = e.loot.items.some((slot) => slot.personalFor?.includes(world.playerId));
       const openToAll = e.loot.items.some((slot) => slot.openToAll && slot.count > 0);
       if (!tappedMine && !personalMine && !openToAll) continue;
-      if (dist2d(px, e.pos) > INTERACT_RANGE) continue;
+      if (dist2d(px, e.pos) > corpseLootReach(e)) continue;
       const last = this.lastAttempt.get(e.id);
       if (last !== undefined && now - last < RETRY_MS) continue;
       this.lastAttempt.set(e.id, now);

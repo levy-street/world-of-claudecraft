@@ -52,6 +52,7 @@ import { isInRaidInstance } from './instances/dungeons';
 import { FERRY_BELL_OBJECT_ID, tryRingFerryBell } from './interactions/ferry_bell';
 import { HUT_OBJECT_ID, tryBurnHut } from './interactions/firebottle_hut';
 import { mobLootSource } from './loot/awarded_loot_hold';
+import { corpseLootReach } from './loot/corpse_loot_reach';
 import { hasSharedLootRights as computeSharedLootRights, lootHasGoneFfa } from './loot/loot_ffa';
 import {
   awardSharedLootItem,
@@ -159,7 +160,9 @@ export function lootCorpse(
     ctx.error(meta.entityId, "You don't have permission to loot that.");
     return false;
   }
-  if (dist2d(reachFrom ?? p.pos, mob.pos) > INTERACT_RANGE) {
+  // A big body is looted from its edge (loot/corpse_loot_reach.ts): the classic
+  // INTERACT_RANGE for an ordinary corpse, plus the template's bodyRadius.
+  if (dist2d(reachFrom ?? p.pos, mob.pos) > corpseLootReach(mob)) {
     ctx.error(meta.entityId, 'Too far away.');
     return false;
   }
@@ -280,7 +283,7 @@ export function autoLootForParty(ctx: SimContext, mobId: number, triggerPid: num
   if (isInRaidInstance(ctx, trigger.pos)) return; // silent: no error toast on a passive walk-by
   const mob = ctx.entities.get(mobId);
   if (!mob?.lootable || !mob.loot || corpseHasDecayed(mob.dead, mob.corpseTimer)) return;
-  if (dist2d(trigger.pos, mob.pos) > INTERACT_RANGE) return;
+  if (dist2d(trigger.pos, mob.pos) > corpseLootReach(mob)) return;
 
   // ffaUnlocked=false: walk-by may auto-loot the trigger's own tap, their party's tap,
   // an untapped corpse, personal drops, or open-to-all, but NEVER a stranger's corpse
@@ -289,7 +292,7 @@ export function autoLootForParty(ctx: SimContext, mobId: number, triggerPid: num
   const rights = corpseLootRights(ctx, mob, meta.entityId, false);
   if (!rights.shared && !rights.personal && !rights.open) return;
   // LOAD-BEARING alignment: this pre-check (rights via the same corpseLootRights
-  // + range via the same INTERACT_RANGE above) is what makes the delegated
+  // + range via the same corpseLootReach above) is what makes the delegated
   // lootCorpse's "no permission" / "too far" toasts unreachable from this
   // passive pass; only the full-bags toast needs the explicit quiet flag. If
   // either threshold ever diverges from lootCorpse's, the walk-by retry loop
@@ -527,11 +530,16 @@ export function interact(
   if (tryThrowKnot(ctx, p)) return;
   if (p.targetId !== null) {
     const target = ctx.entities.get(p.targetId);
-    if (
-      target &&
-      dist2d(p.pos, target.pos) <=
-        (forgeStationForEntity(target) ? FORGE_INTERACT_RANGE : INTERACT_RANGE + 2)
-    ) {
+    // A lootable big body answers from its edge (corpseLootReach), never nearer
+    // than the press's own INTERACT_RANGE + 2.
+    const pressReach = !target
+      ? 0
+      : forgeStationForEntity(target)
+        ? FORGE_INTERACT_RANGE
+        : isLootableBody(target)
+          ? Math.max(INTERACT_RANGE + 2, corpseLootReach(target))
+          : INTERACT_RANGE + 2;
+    if (target && dist2d(p.pos, target.pos) <= pressReach) {
       // A usable encounter body (the trash engine's G3: the Soul Brazier):
       // the press starts its use, validated here on the authoritative sim.
       if (tryStartKitUse(ctx, target, p)) return;

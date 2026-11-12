@@ -112,22 +112,21 @@ export interface LootCofferBoss {
    *  scene's own resolution, so it never steps on the scene's climax. */
   readonly revealAt: number;
   /** Yards from the corpse's centre to the coffer's. At most
-   *  `LOOT_COFFER_IN_REACH`, so a looter standing at the coffer's front is
-   *  inside the body's loot reach (INTERACT_RANGE, measured to the corpse's
-   *  centre) and the click or the interact key works from right there. */
+   *  `LOOT_COFFER_IN_REACH` past the body's own loot reach bonus (its
+   *  bodyRadius, sim/loot/corpse_loot_reach.ts), so a looter standing at the
+   *  coffer's front is inside the body's loot reach and the click or the
+   *  interact key works from right there. The Heat guardian lies in the
+   *  middle of its 10.5 yd wellspring and is looted from the lip, so its
+   *  coffer stands further out than the others. */
   readonly reach: number;
   /** Radians off the body's facing (0: straight in front of it). */
   readonly bearing: number;
-  /** The one exception: a body no looter can stand within reach of (the
-   *  Heat guardian lies in the middle of its 10.5 yd wellspring). Its coffer
-   *  stands where it reads, and a click on it walks the looter in (the
-   *  corpse's own approach); see the open item in smith_heart_fx/CLAUDE.md. */
-  readonly outsideReach?: true;
 }
 
-/** A coffer within reach stands no further than this from its corpse: its
- *  front (half its depth, scaled) plus a looter's step stay inside the 5 yd
- *  INTERACT_RANGE. */
+/** A coffer stands no further than this past its corpse's loot reach bonus
+ *  (0 for an ordinary body): its front (half its depth, scaled) plus a
+ *  looter's step stay inside the body's loot reach (INTERACT_RANGE plus that
+ *  bonus). */
 export const LOOT_COFFER_IN_REACH = 3.3;
 /** No coffer ever stands further than this. */
 export const LOOT_COFFER_MAX_REACH = 12;
@@ -163,7 +162,6 @@ export const LOOT_COFFER_BOSSES: Readonly<Record<string, LootCofferBoss>> = {
     revealAt: HEAT_DEATH.end - 1.2,
     reach: 8.6,
     bearing: 0,
-    outsideReach: true,
   },
   [FINAL_BOSS]: {
     flavour: 'forge',

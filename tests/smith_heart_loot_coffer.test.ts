@@ -70,6 +70,7 @@ import {
 import { FINAL_BOSS } from '../src/sim/encounters/smith_heart/final_ids';
 import { HEAT_GUARDIAN } from '../src/sim/encounters/smith_heart/heat_ids';
 import { QUENCH_GUARDIAN } from '../src/sim/encounters/smith_heart/quench_ids';
+import { corpseLootReach, corpseLootReachBonus } from '../src/sim/loot/corpse_loot_reach';
 import type { InstanceSlot } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import { type Entity, INTERACT_RANGE } from '../src/sim/types';
@@ -129,7 +130,7 @@ describe('the guardians', () => {
     );
   });
 
-  it('a looter at the coffer front is in the body loot reach (the Heat alone excepted)', () => {
+  it('a looter at the coffer front is in the body loot reach (a big body from its edge)', () => {
     // Half the coffer's depth (scaled) and a looter's step in front of it.
     const front = (COFFER.depth / 2) * COFFER_SCALE + 0.6;
     expect(LOOT_COFFER_IN_REACH + front).toBeLessThanOrEqual(INTERACT_RANGE);
@@ -138,15 +139,13 @@ describe('the guardians', () => {
       const r = Math.hypot(spot.x - 10, spot.z - 20);
       expect(r, id).toBeGreaterThan(2.5);
       expect(r, id).toBeLessThanOrEqual(LOOT_COFFER_MAX_REACH + 1e-9);
-      if (boss.outsideReach) continue;
-      expect(r, id).toBeLessThanOrEqual(LOOT_COFFER_IN_REACH + 1e-9);
+      const bonus = corpseLootReachBonus({ kind: 'mob', templateId: id });
+      expect(r, id).toBeLessThanOrEqual(LOOT_COFFER_IN_REACH + bonus + 1e-9);
+      // The same sum the sim's lootCorpse gate takes, from the coffer's front.
+      expect(r + front, id).toBeLessThanOrEqual(corpseLootReach({ kind: 'mob', templateId: id }));
     }
-    // Only the guardian standing in its 10.5 yd wellspring is the exception.
-    expect(
-      Object.entries(LOOT_COFFER_BOSSES)
-        .filter(([, b]) => b.outsideReach)
-        .map(([id]) => id),
-    ).toEqual([HEAT_GUARDIAN]);
+    // The guardian lying in its 10.5 yd wellspring is looted from the lip.
+    expect(corpseLootReachBonus({ kind: 'mob', templateId: HEAT_GUARDIAN })).toBeGreaterThan(10);
   });
 
   it('is a click on its corpse only while there is something to open', () => {
