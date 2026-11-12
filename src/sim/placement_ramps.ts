@@ -382,7 +382,7 @@ export function decksMayStand(content: WorldContent, x: number, z: number): bool
   return (
     nearPlacementDecks(content, x, z) ||
     (content.colliderVolumes?.length ?? 0) > 0 ||
-    nearTownWalkIn(x, z)
+    nearTownWalkIn(x, z, content)
   );
 }
 
