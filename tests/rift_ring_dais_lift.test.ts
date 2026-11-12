@@ -55,7 +55,7 @@ describe('rift death-zone ring: raised dais lift', () => {
     let raised = 0;
     for (let s = 1; s < 400 && raised === 0; s++) {
       if (isSetPieceSeed(s)) continue;
-      const floor = generateRiftFloor(s, 28, riftFloorCount(s) - 1);
+      const floor = generateRiftFloor(s, 28, riftFloorCount(s, 28) - 1);
       if (floor.style.daisRaised && floor.layout.dais) raised++;
     }
     expect(raised, 'at least one S boss floor raises its dais').toBeGreaterThan(0);
