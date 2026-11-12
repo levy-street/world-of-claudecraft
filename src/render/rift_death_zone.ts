@@ -77,6 +77,7 @@ import {
   HeatEntranceFx,
   HeatFightFx,
   HeatFx,
+  LootCofferFx,
   QuenchBladesFx,
   QuenchBody,
   QuenchDeathFx,
@@ -257,6 +258,10 @@ export class RiftDeathZoneVisuals {
   /** The council's deaths (the quarry falling silent), updated after the
    *  fight and the bodies. */
   private readonly councilDeath: CouncilDeathFx;
+  /** The loot moment: a forge coffer rising beside a guardian's corpse as
+   *  its scene resolves, clickable as that corpse. Updated after every
+   *  death scene. */
+  private readonly lootCoffer: LootCofferFx;
   // The Smith's Heart's seal moments felt in the camera.
   private readonly sealShake: SealShake;
   private uninstallDrawnPositions: (() => void) | null = null;
@@ -417,6 +422,7 @@ export class RiftDeathZoneVisuals {
       shake,
       playGesture,
     );
+    this.lootCoffer = new LootCofferFx(scene, groundY, world, compileGate, reducedMotion);
     this.sealShake = new SealShake(world, shake);
     this.syncScope(world?.player?.pos.x, false);
   }
@@ -768,6 +774,7 @@ export class RiftDeathZoneVisuals {
     this.councilFx.update(dt);
     this.councilBodies.update(dt);
     this.councilDeath.update(dt);
+    this.lootCoffer.update(dt);
     this.sealShake.update();
     for (const visual of this.zones.values()) {
       visual.phase = (visual.phase + dt * deathZonePulseSpeed(visual.remaining)) % (Math.PI * 2);
@@ -815,6 +822,7 @@ export class RiftDeathZoneVisuals {
     this.councilFx.dispose();
     this.councilBodies.dispose();
     this.councilDeath.dispose();
+    this.lootCoffer.dispose();
     this.hoardPresentation.dispose();
   }
 

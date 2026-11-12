@@ -6,6 +6,7 @@
 
 import * as THREE from 'three';
 import type { IWorld } from '../world_api';
+import { fxPickProxies } from './fx_pick_proxies';
 import { resolveGatherNodePick } from './gather_nodes';
 import { isProjectedNameplateAnchorVisible } from './nameplate_projection';
 import type { PlacedAssetsView } from './placed_assets';
@@ -119,6 +120,12 @@ export class WorldPicking {
     const hits = this.raycastHits;
     hits.length = 0;
     this.raycaster.intersectObjects(this.host.clickTargets(), true, this.raycastHits);
+    // The proxies an effect lends a body (fx_pick_proxies.ts: the Smith's
+    // Heart loot coffer for its corpse). three sorts the whole list, so they
+    // join the capsules' hits nearest first.
+    const lent = fxPickProxies();
+    if (lent.length > 0)
+      this.raycaster.intersectObjects(lent as THREE.Object3D[], false, this.raycastHits);
     const directHitIds = this.directHitIds;
     directHitIds.length = 0;
     for (const hit of hits) {

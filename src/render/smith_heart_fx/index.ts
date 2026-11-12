@@ -17,6 +17,7 @@ export { HeatDeathFx } from './heat_death_fx';
 export { HeatEntranceFx } from './heat_entrance_fx';
 export { HeatFightFx } from './heat_fight_fx';
 export { HeatFx } from './heat_fx';
+export { LootCofferFx } from './loot_coffer_fx';
 export { QuenchBladesFx } from './quench_blades_fx';
 export { QuenchBody } from './quench_body';
 export { QuenchDeathFx } from './quench_death_fx';
