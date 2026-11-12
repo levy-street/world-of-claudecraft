@@ -56,11 +56,15 @@ function withSkerrit() {
   const held = () =>
     sim.countItem(SKERRITS_SHARDPIKE_ID) +
     Object.values(meta().equipment).filter((id) => id === SKERRITS_SHARDPIKE_ID).length;
+  const banked = () =>
+    meta()
+      .bank.inventory.filter((s) => s.itemId === SKERRITS_SHARDPIKE_ID)
+      .reduce((n, s) => n + s.count, 0);
   const talk = (): SimEvent[] => {
     sim.talkToNpc(npc.id);
     return sim.tick();
   };
-  return { sim, ctx, npc, meta, held, talk };
+  return { sim, ctx, npc, meta, held, banked, talk };
 }
 
 const logs = (events: SimEvent[]) =>
@@ -90,14 +94,30 @@ describe("Skerrit's Shardpike goes back to Skerrit", () => {
     expect(h.meta().equipment.mainhand).toBeUndefined();
   });
 
-  it('abandoning takes it back from the hands and the bags', () => {
+  it('turning in takes back a carried copy and a banked one too', () => {
+    const h = withSkerrit();
+    h.sim.acceptQuest(QUEST);
+    expect(h.sim.countItem(SKERRITS_SHARDPIKE_ID)).toBe(1);
+    h.meta().bank.inventory.push({ itemId: SKERRITS_SHARDPIKE_ID, count: 1 });
+    const qp = h.meta().questLog.get(QUEST);
+    if (!qp) throw new Error('quest not in log');
+    qp.counts = [1];
+    qp.state = 'ready';
+    expect(turnInQuestCore(h.ctx, QUEST, QUESTS[QUEST], h.meta())).toBe(true);
+    expect(h.held()).toBe(0);
+    expect(h.banked()).toBe(0);
+  });
+
+  it('abandoning takes it back from the hands, the bags and the bank', () => {
     const h = withSkerrit();
     h.sim.acceptQuest(QUEST);
     h.sim.equipItem(SKERRITS_SHARDPIKE_ID);
     h.sim.addItem(SKERRITS_SHARDPIKE_ID, 1);
+    h.meta().bank.inventory.push({ itemId: SKERRITS_SHARDPIKE_ID, count: 1 });
     expect(h.held()).toBe(2);
     h.sim.abandonQuest(QUEST);
     expect(h.held()).toBe(0);
+    expect(h.banked()).toBe(0);
   });
 
   it('a pike left over from a finished quest is handed back by talking to him', () => {
@@ -112,15 +132,25 @@ describe("Skerrit's Shardpike goes back to Skerrit", () => {
     expect(logs(h.talk())).not.toContain(QUEST_TOOL_RETURNED_TEXT);
   });
 
-  it('a worn leftover goes back too, and the brace state with it', () => {
+  it('a worn leftover goes back too, and the brace and its stats with it', () => {
     const h = withSkerrit();
     h.meta().questsDone.add(QUEST);
     h.sim.addItem(SKERRITS_SHARDPIKE_ID, 1);
     h.sim.equipItem(SKERRITS_SHARDPIKE_ID);
     expect(h.meta().equipment.mainhand).toBe(SKERRITS_SHARDPIKE_ID);
+    h.sim.lanceBrace();
+    expect(h.meta().lance?.phase).toBe('bracing');
+    expect(h.sim.player.bracing).toBe(true);
+    expect(h.sim.player.mainhandItemId).toBe(SKERRITS_SHARDPIKE_ID);
     h.talk();
     expect(h.held()).toBe(0);
     expect(h.meta().equipment.mainhand).toBeUndefined();
+    expect(h.meta().equipmentInstance?.mainhand).toBeUndefined();
+    expect(h.meta().lance).toBeUndefined();
+    expect(h.sim.player.bracing).toBe(false);
+    // Stats were recalculated: the entity's weapon mirror no longer holds the pike.
+    expect(h.sim.player.mainhandItemId).not.toBe(SKERRITS_SHARDPIKE_ID);
+    expect(h.sim.player.weapon?.speed).not.toBe(3.4);
   });
 
   it('while the quest is active, talking to him keeps exactly one (the wielded copy)', () => {
@@ -136,6 +166,26 @@ describe("Skerrit's Shardpike goes back to Skerrit", () => {
     // And with the one in hand, the re-grant never adds another.
     h.talk();
     expect(h.held()).toBe(1);
+  });
+
+  it('while active, a carried copy is kept before a banked one', () => {
+    const h = withSkerrit();
+    h.sim.acceptQuest(QUEST);
+    expect(h.sim.countItem(SKERRITS_SHARDPIKE_ID)).toBe(1);
+    h.meta().bank.inventory.push({ itemId: SKERRITS_SHARDPIKE_ID, count: 2 });
+    h.talk();
+    expect(h.sim.countItem(SKERRITS_SHARDPIKE_ID)).toBe(1);
+    expect(h.banked()).toBe(0);
+  });
+
+  it('while active with none carried, a banked stack is trimmed to one', () => {
+    const h = withSkerrit();
+    h.sim.acceptQuest(QUEST);
+    h.sim.removeItem(SKERRITS_SHARDPIKE_ID, 1);
+    h.meta().bank.inventory.push({ itemId: SKERRITS_SHARDPIKE_ID, count: 2 });
+    h.talk();
+    expect(h.held()).toBe(0);
+    expect(h.banked()).toBe(1);
   });
 
   it('talking to an unrelated NPC never takes his pike', () => {
@@ -187,8 +237,18 @@ describe("Skerrit's Shardpike goes back to Skerrit", () => {
       SHARDPIKE_CARRIED_REFUSAL,
       'You return the Shardpike to the muster rack.',
     ]) {
-      expect(localizeSimText(text), text).not.toBeNull();
+      expect(localizeSimText(text), text).toBe(text);
     }
+    // The constants the sim emits are pinned to their literal English.
+    expect(QUEST_TOOL_RETURNED_TEXT).toBe('You hand back a quest item you no longer need.');
+    expect(SHARDPIKE_CARRIED_REFUSAL).toBe('You already carry a Shardpike. Wield it instead.');
+  });
+
+  it('only the Shardpike is a quest tool its quest takes back', () => {
+    const owned = Object.values(ITEMS)
+      .filter((d) => d.questTool === true && d.questId)
+      .map((d) => d.id);
+    expect(owned).toEqual([SKERRITS_SHARDPIKE_ID]);
   });
 });
 
@@ -258,6 +318,17 @@ describe('the muster rack takes its pike back on request', () => {
     expect(r.meta().equipment.mainhand).toBe(before);
   });
 
+  it('takes a lent pike back even from a player now over the level cap', () => {
+    const r = atTheRack();
+    r.useRack();
+    expect(r.meta().equipment.mainhand).toBe(MUSTER_SHARDPIKE_ID);
+    r.sim.setPlayerLevel(20);
+    const events = r.useRack();
+    expect(r.lentHeld()).toBe(0);
+    const errors = events.filter((e) => e.type === 'error');
+    expect(errors).toEqual([]);
+  });
+
   it("lends nothing to a player already carrying Skerrit's pike in the bags", () => {
     const r = atTheRack();
     r.sim.addItem(SKERRITS_SHARDPIKE_ID, 1);
@@ -290,5 +361,27 @@ describe('the muster rack takes its pike back on request', () => {
     // With the step done, the next use is a hand-back again.
     r.useRack();
     expect(r.lentHeld()).toBe(0);
+  });
+
+  it('a drill player with the lent pike in the bags gets it back in hand with the credit', () => {
+    const r = atTheRack();
+    const before = r.meta().equipment.mainhand;
+    if (!before) throw new Error('no starting weapon');
+    r.useRack();
+    r.sim.equipItem(before);
+    expect(r.sim.countItem(MUSTER_SHARDPIKE_ID)).toBe(1);
+    const quest = QUESTS[MUSTER_PIKE_DRILL_QUEST_ID];
+    const drawIndex = quest.objectives.findIndex(
+      (o) => o.type === 'event' && o.eventId === MUSTER_PIKE_DRAWN_EVENT,
+    );
+    r.meta().questLog.set(MUSTER_PIKE_DRILL_QUEST_ID, {
+      questId: MUSTER_PIKE_DRILL_QUEST_ID,
+      state: 'active',
+      counts: quest.objectives.map(() => 0),
+    });
+    r.useRack();
+    expect(r.meta().equipment.mainhand).toBe(MUSTER_SHARDPIKE_ID);
+    expect(r.lentHeld()).toBe(1);
+    expect(r.meta().questLog.get(MUSTER_PIKE_DRILL_QUEST_ID)?.counts[drawIndex]).toBe(1);
   });
 });

@@ -52,11 +52,12 @@ import {
 } from './content/mirefen_muster_quests';
 import { MOBS, QUESTS } from './data';
 import { createGroundObject, createMob, createNpc } from './entity';
+import { equipItem } from './items';
 import { isShardpikeItem } from './lance_balance_core';
 import { eyeWardBlinded } from './mob/eye_ward';
 import { tickMusterDrill } from './muster_drill';
 import { raiseMusterEffigy, tickMusterEffigy } from './muster_effigy';
-import { type LentPikes, takeMusterPike, tickLentPikes } from './muster_pike';
+import { type LentPikes, MUSTER_SHARDPIKE_ID, takeMusterPike, tickLentPikes } from './muster_pike';
 import { onQuestEventForQuests } from './quests/quest_credit';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -210,10 +211,20 @@ export function tickMusterArmy(
 export function useMusterRack(ctx: SimContext, army: MusterArmyState, pid: number): boolean {
   // A player already wielding a Shardpike whose drill still wants the draw step gets the
   // credit and KEEPS the pike: handing it back here would strand the drill's next step.
+  // A lent pike swapped into the bags goes back into the hand for that step instead.
   const holder = ctx.players.get(pid);
-  if (holder && isShardpikeItem(holder.equipment.mainhand) && drillAwaitsDraw(holder)) {
-    onQuestEventForQuests(ctx, holder, MUSTER_PIKE_DRAWN_EVENT);
-    return true;
+  if (holder && drillAwaitsDraw(holder)) {
+    if (
+      !isShardpikeItem(holder.equipment.mainhand) &&
+      army.lent.has(pid) &&
+      ctx.countItem(MUSTER_SHARDPIKE_ID, pid) > 0
+    ) {
+      equipItem(ctx, MUSTER_SHARDPIKE_ID, pid, 'mainhand');
+    }
+    if (isShardpikeItem(holder.equipment.mainhand)) {
+      onQuestEventForQuests(ctx, holder, MUSTER_PIKE_DRAWN_EVENT);
+      return true;
+    }
   }
   const took = takeMusterPike(ctx, army.lent, pid);
   // The pike drill's first step (content/mirefen_muster_quests.ts): a player who leaves the
