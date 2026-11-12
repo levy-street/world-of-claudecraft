@@ -62,13 +62,17 @@ function tables(h: ReturnType<typeof setup>) {
   const current = h.state.vaults[0];
   return weeklyRewardTableOptions(current, current.choices[0], h.meta.cls, 20, h.state.lootSpec);
 }
+/** One roll stays on one difficulty: a Heroic vault's own tables, else its Normal ones. */
+function oneDifficulty<T extends { difficulty?: 'normal' }>(options: T[]): T[] {
+  return options.filter((table) => table.difficulty === options[0].difficulty);
+}
 function prepare(h: ReturnType<typeof setup>, token?: string) {
   return prepareWeeklyRewardOpen(
     h.sim.ctx,
     '1000:0',
     h.pid,
     token,
-    tables(h).map((t) => t.id),
+    oneDifficulty(tables(h)).map((t) => t.id),
   );
 }
 
@@ -91,7 +95,9 @@ describe('Weekly Vault loot focus integration', () => {
           return items.length ? [{ ...table, items }] : [];
         });
         expect(options, `${cls}:${spec}:${pool}`).toEqual(expected);
-        const candidates = [...new Set(options.flatMap((table) => table.items))].sort();
+        const candidates = [
+          ...new Set(oneDifficulty(options).flatMap((table) => table.items)),
+        ].sort();
         pick.mockClear();
         const opening = prepare(h);
         if (!candidates.length) {

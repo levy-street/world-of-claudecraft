@@ -13,7 +13,10 @@ import { captureFocusKey, FOCUS_KEY_ATTR, findFocusKey } from './focus_restore';
 import { formatDateTime, formatNumber, t } from './i18n';
 import type { PainterHostPresentation } from './painter_host';
 import { weeklyLootSpecLabel } from './weekly_reward_loot_focus_controller';
-import { appendWeeklyRewardTablePicker } from './weekly_reward_table_picker_controller';
+import {
+  appendWeeklyRewardTablePicker,
+  type WeeklyTableDifficulty,
+} from './weekly_reward_table_picker_controller';
 import { showWeeklyRewardsReadyPrompt } from './weekly_rewards_ready_prompt';
 import {
   attachWeeklyVaultReveal,
@@ -32,6 +35,7 @@ export class WeeklyRewardClaimController {
   private revealed = new Set<number>();
   private tableSelections = new Map<number, string[]>();
   private tableExpanded = new Set<number>();
+  private tableDifficulties = new Map<number, WeeklyTableDifficulty>();
   private pending = new Set<number>();
   private revealProgress = new Map<number, WeeklyVaultRevealProgress>();
   private awaitingOpen = new Map<number, ReturnType<typeof setTimeout>>();
@@ -72,6 +76,7 @@ export class WeeklyRewardClaimController {
     this.pending.clear();
     this.tableSelections.clear();
     this.tableExpanded.clear();
+    this.tableDifficulties.clear();
     this.revealProgress.clear();
     for (const timer of this.awaitingOpen.values()) clearTimeout(timer);
     this.awaitingOpen.clear();
@@ -333,6 +338,7 @@ export class WeeklyRewardClaimController {
             saving: this.awaitingOpen.has(index),
             onChange: () => syncAvailability(),
             expanded: this.tableExpanded,
+            difficulties: this.tableDifficulties,
           });
           this.disposers.push(picker.dispose);
           const item = choice.opened && choice.itemId ? ITEMS[choice.itemId] : undefined;

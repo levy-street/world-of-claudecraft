@@ -3,14 +3,16 @@
 // loot focus. It is a catalog of POSSIBLE loot, so it ignores what the player
 // has cleared and their level: a vault itself offers only the bosses cleared at
 // that difficulty and equipment within the level offset (the claim flow's
-// `weeklyRewardAvailability`), and the rule line says so.
+// `weeklyRewardAvailability`), and the rule line says so. It lists one
+// difficulty at a time, so a Heroic vault's Normal alternatives are the Normal
+// catalog, not extra rows here.
 //
 // Pure: no DOM. The painter is weekly_reward_loot_catalog_controller.ts.
 
 import type { PlayerClass } from '../sim/types';
 import {
   type WeeklyRewardTableOption,
-  weeklyRewardTableCandidates,
+  weeklyPoolTableCandidates,
 } from '../sim/weekly_reward_options';
 import { WEEKLY_BOSS_TABLES, type WeeklyBossUnlocks } from '../sim/weekly_reward_tables';
 import type { WeeklyPoolId, WeeklyVaultBatch } from '../sim/weekly_rewards';
@@ -70,9 +72,8 @@ export function weeklyLootCatalogView(
   lootSpec?: string,
 ): WeeklyLootCatalogView {
   const pool = weeklyLootPoolFor(selection);
-  const tables = weeklyRewardTableCandidates(CATALOG_BATCH, { pool }, cls, lootSpec);
+  const tables = weeklyPoolTableCandidates(CATALOG_BATCH, { pool }, cls, lootSpec);
   if (tables.length) return { pool, tables, empty: null };
-  const focusHid =
-    !!lootSpec && weeklyRewardTableCandidates(CATALOG_BATCH, { pool }, cls).length > 0;
+  const focusHid = !!lootSpec && weeklyPoolTableCandidates(CATALOG_BATCH, { pool }, cls).length > 0;
   return { pool, tables, empty: focusHid ? 'focus' : 'none' };
 }

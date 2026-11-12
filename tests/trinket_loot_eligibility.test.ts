@@ -155,16 +155,19 @@ describe('Weekly Vault trinket suitability', () => {
     const pick = vi.spyOn(sim.ctx.rng, 'pick');
     for (const [index, choice] of batch.choices.entries()) {
       const options = weeklyRewardTableOptions(batch, choice, cls, player.level);
-      const candidates = [...new Set(options.flatMap((option) => option.items))].sort();
+      // Every offered table is filtered, at both difficulties of a Heroic vault;
+      // the roll itself stays on one difficulty.
+      expectSuitable(cls, [...new Set(options.flatMap((option) => option.items))]);
+      const rolled = options.filter((option) => option.difficulty === options[0].difficulty);
+      const candidates = [...new Set(rolled.flatMap((option) => option.items))].sort();
       expect(candidates.length).toBeGreaterThan(0);
-      expectSuitable(cls, candidates);
       pick.mockClear();
       const opening = prepareWeeklyRewardOpen(
         sim.ctx,
         `1000:${index}`,
         pid,
         undefined,
-        options.map((option) => option.id),
+        rolled.map((option) => option.id),
       );
       expect(opening).not.toBeNull();
       expect(pick).toHaveBeenCalledExactlyOnceWith(candidates);

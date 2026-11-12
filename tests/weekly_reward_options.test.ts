@@ -7,9 +7,12 @@ import {
   selectedWeeklyRewardTables,
   WEEKLY_TABLE_SELECTION_LIMIT,
   weeklyItemWithinLevel,
+  weeklyNormalPool,
   weeklyRewardTableOptions,
+  weeklyTableSource,
+  weeklyTableSourceId,
 } from '../src/sim/weekly_reward_options';
-import { weeklyBossLootPool } from '../src/sim/weekly_reward_tables';
+import { WEEKLY_BOSS_TABLES, weeklyBossLootPool } from '../src/sim/weekly_reward_tables';
 import {
   emptyWeeklyRewards,
   finishWeeklyRewardOpen,
@@ -17,6 +20,7 @@ import {
   sanitizeWeeklyRewards,
   WEEKLY_KEEPER_ID,
   type WeeklyVaultBatch,
+  weeklyRewardInfoFor,
 } from '../src/sim/weekly_rewards';
 
 const batch = (): WeeklyVaultBatch => ({
@@ -152,13 +156,144 @@ describe('weekly reward table options', () => {
       ].sort(),
     );
     b.choices[0].pool = 'dungeon_heroic';
+    // The earned Heroic table holds only the Heroic clear; the Normal tables a
+    // Heroic vault may roll instead are exactly a Normal vault's, under marked ids.
     expect(weeklyRewardTableOptions(b, b.choices[0], 'mage', 20)).toEqual([
       {
         id: 'hollow_crypt',
         kind: 'dungeon',
         items: weeklyBossLootPool('morthen', 'dungeon_heroic', 'mage'),
       },
+      ...normal.map((table) => ({ ...table, id: `${table.id}:normal`, difficulty: 'normal' })),
     ]);
+  });
+  it('lets a Heroic vault roll a Normal table, and never a Normal vault a Heroic one', () => {
+    const h = setup();
+    const pick = vi.spyOn(h.sim.ctx.rng, 'pick');
+    // A Normal vault has no marked alternative, and its bare id is its own table.
+    expect(
+      prepareWeeklyRewardOpen(h.sim.ctx, '1000:0', h.pid, undefined, ['hollow_crypt:normal']),
+    ).toBeNull();
+    expect(pick).not.toHaveBeenCalled();
+    h.batch.choices[0].pool = 'dungeon_heroic';
+    // sunken_bastion was cleared on Normal only: no Heroic table, a Normal one.
+    expect(
+      prepareWeeklyRewardOpen(h.sim.ctx, '1000:0', h.pid, undefined, ['sunken_bastion']),
+    ).toBeNull();
+    expect(pick).not.toHaveBeenCalled();
+    const normalItems = weeklyBossLootPool('vael_the_mistcaller', 'dungeon', 'mage');
+    const heroicItems = new Set(weeklyBossLootPool('morthen', 'dungeon_heroic', 'mage'));
+    const opening = prepareWeeklyRewardOpen(h.sim.ctx, '1000:0', h.pid, undefined, [
+      'sunken_bastion:normal',
+    ])!;
+    expect(pick).toHaveBeenCalledExactlyOnceWith(normalItems);
+    expect(normalItems).toContain(opening.itemId);
+    expect(heroicItems.has(opening.itemId)).toBe(false);
+    // The vault stays the Heroic one it was earned as; the source records Normal.
+    expect(opening.choice.pool).toBe('dungeon_heroic');
+    expect(opening.choice.tableId).toBe('sunken_bastion:normal');
+    finishWeeklyRewardOpen(opening, true);
+    const rolled = {
+      pool: 'dungeon_heroic',
+      tableId: 'sunken_bastion:normal',
+      itemId: opening.itemId,
+      opened: true,
+    };
+    const saved = h.sim.serializeCharacter(h.pid)!.weeklyRewards;
+    expect(sanitizeWeeklyRewards(saved)!.vaults[0].choices[0]).toEqual(rolled);
+    // The owner's wire view and its client decode keep the marked source too.
+    expect(sanitizeWeeklyRewards(saved, true)!.vaults[0].choices[0]).toEqual(rolled);
+    expect(weeklyRewardInfoFor(h.sim.ctx, h.pid)!.state.vaults[0].choices[0]).toEqual(rolled);
+  });
+  it('refuses a roll that mixes difficulties, and a Normal table of an uncleared boss', () => {
+    const h = setup();
+    h.batch.choices[0].pool = 'dungeon_heroic';
+    const pick = vi.spyOn(h.sim.ctx.rng, 'pick');
+    for (const forged of [
+      ['hollow_crypt', 'hollow_crypt:normal'],
+      ['hollow_crypt', 'sunken_bastion:normal'],
+      // drowned_temple has no clear at either difficulty in this batch.
+      ['drowned_temple:normal'],
+      ['hollow_crypt:normal', 'drowned_temple:normal'],
+    ])
+      expect(prepareWeeklyRewardOpen(h.sim.ctx, '1000:0', h.pid, undefined, forged)).toBeNull();
+    expect(pick).not.toHaveBeenCalled();
+    expect(h.batch.choices[0]).toEqual({ pool: 'dungeon_heroic' });
+    // Several tables of one difficulty still roll as one union.
+    expect(
+      prepareWeeklyRewardOpen(h.sim.ctx, '1000:0', h.pid, undefined, [
+        'hollow_crypt:normal',
+        'sunken_bastion:normal',
+      ]),
+    ).not.toBeNull();
+    expect(pick).toHaveBeenCalledOnce();
+  });
+  it('blocks the claim while a spent Heroic slot can still roll Normal', () => {
+    const h = setup();
+    const heroicItems = weeklyBossLootPool('morthen', 'dungeon_heroic', 'mage');
+    h.batch.bossUnlocks = { morthen: 2 };
+    // Every Heroic item is already rolled, so the last slot has only Normal left.
+    h.batch.choices = [
+      ...heroicItems.map((itemId) => ({
+        pool: 'dungeon_heroic' as const,
+        itemId,
+        opened: true as const,
+      })),
+      { pool: 'dungeon_heroic' },
+    ];
+    const last = h.batch.choices.length - 1;
+    expect(
+      weeklyRewardTableOptions(h.batch, h.batch.choices[last], 'mage', 20).map((t) => t.id),
+    ).toEqual(['hollow_crypt:normal']);
+    h.sim.claimWeeklyReward('1000:0', h.pid);
+    expect(h.state.vaults).toHaveLength(1);
+    const opening = prepareWeeklyRewardOpen(h.sim.ctx, `1000:${last}`, h.pid, undefined, [
+      'hollow_crypt:normal',
+    ])!;
+    finishWeeklyRewardOpen(opening, true);
+    h.sim.claimWeeklyReward('1000:0', h.pid);
+    expect(h.state.vaults).toHaveLength(0);
+    expect(h.sim.ctx.countItem(heroicItems[0], h.pid)).toBe(1);
+  });
+  it('offers a Heroic raid vault each cleared boss at both difficulties', () => {
+    const b = batch();
+    b.bossUnlocks = { nythraxis_scourge_of_thornpeak: 2, ignivar_herald_of_the_last_flame: 1 };
+    b.choices = [{ pool: 'raid_heroic' }];
+    const options = weeklyRewardTableOptions(b, b.choices[0], 'mage', 60);
+    expect(options.map((t) => [t.id, t.kind, t.difficulty])).toEqual([
+      ['nythraxis_scourge_of_thornpeak', 'mob', undefined],
+      ...WEEKLY_BOSS_TABLES.filter(
+        (table) => table.category === 'raid' && (b.bossUnlocks![table.bossId] ?? 0) >= 1,
+      ).map((table) => [`${table.bossId}:normal`, 'mob', 'normal']),
+    ]);
+    expect(options.filter((t) => t.difficulty)).toHaveLength(2);
+    b.choices = [{ pool: 'raid' }];
+    expect(weeklyRewardTableOptions(b, b.choices[0], 'mage', 60).map((t) => t.difficulty)).toEqual([
+      undefined,
+      undefined,
+    ]);
+  });
+  it('recognises a marked Normal source only on a real boss or dungeon table', () => {
+    expect(weeklyTableSource('hollow_crypt:normal')).toEqual({
+      id: 'hollow_crypt:normal',
+      kind: 'dungeon',
+    });
+    expect(weeklyTableSource('morthen:normal')).toEqual({ id: 'morthen:normal', kind: 'mob' });
+    for (const id of ['world:normal', 'pvp:normal', 'fake:normal', ':normal', 'morthen:heroic'])
+      expect(weeklyTableSource(id)).toBeUndefined();
+    expect(weeklyTableSourceId('hollow_crypt:normal')).toBe('hollow_crypt');
+    expect(weeklyTableSourceId('hollow_crypt')).toBe('hollow_crypt');
+    expect([weeklyNormalPool('raid_heroic'), weeklyNormalPool('dungeon_heroic')]).toEqual([
+      'raid',
+      'dungeon',
+    ]);
+    for (const pool of ['raid', 'dungeon', 'world', 'pvp'] as const)
+      expect(weeklyNormalPool(pool)).toBeUndefined();
+    // The marker is unambiguous only while no source id carries a colon.
+    for (const { bossId, dungeonId } of WEEKLY_BOSS_TABLES)
+      expect(`${bossId}${dungeonId}`).not.toContain(':');
+    // Both difficulties of every boss table, plus the two pool tables, fit one request.
+    expect(WEEKLY_TABLE_SELECTION_LIMIT).toBe(WEEKLY_BOSS_TABLES.length * 2 + 2);
   });
   it('rejects missing, malformed, oversized and partly forged selections before any roll', () => {
     const h = setup();

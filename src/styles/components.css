@@ -27674,6 +27674,23 @@
   .weekly-table-option input {
     flex: 0 0 auto;
   }
+  /* A Heroic vault's Normal or Heroic choice, above its table list. */
+  .weekly-loot-picker.weekly-table-difficulty {
+    display: flex;
+    padding: var(--spacing-xs) var(--spacing-xs) var(--spacing-sm);
+  }
+  /* The source of a Heroic vault that rolled Normal, and the summary text of
+     one set to: the Normal badge stays beside the text as one flex item. */
+  .weekly-rolled-source {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-xs);
+  }
+  .weekly-table-difficulty > .weekly-loot-choice {
+    flex: 1 1 0;
+    min-height: 44px;
+  }
   .weekly-loot-table {
     margin-top: 8px;
   }

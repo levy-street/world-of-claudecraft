@@ -51,6 +51,9 @@ export function prepareWeeklyRewardOpen(
     );
     const selected = selectedWeeklyRewardTables(options, ids);
     if (!selected) return null;
+    // One roll stays on one difficulty: a Heroic vault rolls its Heroic tables
+    // or its Normal ones, never a union of both.
+    if (new Set(selected.map((table) => table.difficulty)).size > 1) return null;
     const items = [...new Set(selected.flatMap((table) => table.items))].sort();
     if (!items.length) return null;
     choice.itemId = ctx.rng.pick(items);

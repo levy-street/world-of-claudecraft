@@ -109,6 +109,25 @@ new weekly batches freeze them at the end of the earning period. Intermediate
 boss kills unlock loot without adding a dungeon-clear milestone. Trash does not.
 World and PvP each list their single table by name and submit it automatically when opened; no dropdown or selection step is needed.
 
+A Heroic vault lets the player choose the difficulty it rolls on. Its picker
+carries a Heroic or Normal switch above the table list: Heroic lists the earned
+Heroic tables, Normal lists the Normal table of every boss the character has
+cleared (exactly what a Normal vault offers). One roll stays on one difficulty:
+switching clears the selection, and the server refuses a request that mixes
+them. A Normal vault has no switch and never rolls Heroic loot. The sim offers each Normal alternative as its own table option
+(`weeklyRewardTableCandidates` in `src/sim/weekly_reward_options.ts`), keyed by
+the source id plus a Normal marker, so the open command, the wire and the saved
+`tableId` need no extra field and the server validates the choice like any other
+table. The vault keeps its earned Heroic pool; the saved source records that the
+roll was Normal, and the opened tile shows it. Because the Normal tables count,
+a Heroic slot is exhausted only when both difficulties have nothing left to roll.
+This also applies to weeks already saved: a Heroic slot whose Heroic tables are
+spent must be opened on Normal before the week can be claimed, where it used to
+count as exhausted. Rolled items are reserved across the whole week, so a Normal
+item a Heroic slot rolls is no longer available to that week's Normal slots.
+Pinned by `tests/weekly_reward_options.test.ts` and
+`tests/weekly_reward_table_picker.test.ts`.
+
 The server builds one sorted, deduplicated union of the selected tables. Each
 remaining item has one chance, regardless of duplicate table IDs or overlapping
 loot. Equipment must require no more than the player's current level plus three,
