@@ -125,9 +125,15 @@ describe('the pure rules', () => {
   });
 
   it('the Anvil splits its blow, harder when too few share it, three times for the Crushed', () => {
-    expect(anvilShare(6, false)).toBe(Math.round(T.anvilTotal / 6));
-    expect(anvilShare(2, false)).toBe(Math.round((T.anvilTotal / 2) * 1.5));
-    expect(anvilShare(6, true)).toBe(Math.round((T.anvilTotal / 6) * T.crushedMult));
+    const total = FINAL_DIFFICULTY.heroic.anvilTotal;
+    expect(anvilShare(6, false, total)).toBe(Math.round(total / 6));
+    expect(anvilShare(2, false, total)).toBe(Math.round((total / 2) * 1.5));
+    expect(anvilShare(6, true, total)).toBe(Math.round((total / 6) * T.crushedMult));
+    // The tier's total: Normal 5,600, Heroic and Mythic 6,600 (2026-11-12).
+    expect(FINAL_DIFFICULTY.normal.anvilTotal).toBe(5600);
+    expect(FINAL_DIFFICULTY.heroic.anvilTotal).toBe(6600);
+    expect(FINAL_DIFFICULTY.mythic.anvilTotal).toBe(6600);
+    expect(anvilShare(10, false, FINAL_DIFFICULTY.normal.anvilTotal)).toBe(560);
   });
 
   it('every zone code round-trips through the state aura', () => {
@@ -489,7 +495,7 @@ describe('the Hammer quarter', () => {
     expect(new Set(shared.map((d) => d.targetId))).toEqual(
       new Set([f.pids[1], f.pids[2], f.pids[3]]),
     );
-    expect(shared[0].amount).toBeLessThan(T.anvilTotal / 3 + 200);
+    expect(shared[0].amount).toBeLessThan(FINAL_DIFFICULTY.normal.anvilTotal / 3 + 200);
     // Nobody under it.
     f.dev('/dev heart final anvil', f.pids[1]);
     f.put(f.players[1], c.x - 20, c.z);

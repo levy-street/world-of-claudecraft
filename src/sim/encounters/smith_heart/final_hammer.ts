@@ -175,7 +175,7 @@ export function landAnvil(s: FinalScope): Entity[] {
   }
   for (const p of under) {
     const crushed = s.rules.crushed && auraOf(p, FINAL_AURAS.crushed) !== undefined;
-    const share = anvilShare(under.length, crushed);
+    const share = anvilShare(under.length, crushed, s.rules.anvilTotal);
     hit(s, p, roll(s, share * 0.95, share * 1.05), FINAL_NAMES.anvil, 'physical');
   }
   if (s.rules.crushed)

@@ -247,6 +247,10 @@ export interface FinalDifficultyRules {
    *  Normal's stays under a fresh level-20 cloth pool (about 1,135). */
   anvilMissMin: number;
   anvilMissMax: number;
+  /** Weight of the Anvil: the whole blow, split between everyone under it
+   *  (anvilShare). Normal's 5,600 since the bot raid of 2026-11-12 (1 kill
+   *  in 6 at 6,600: 560 a body with ten under it, 700 with eight). */
+  anvilTotal: number;
 }
 
 export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyRules>> = {
@@ -268,6 +272,7 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     pulseRise: 45,
     anvilMissMin: 1000,
     anvilMissMax: 1100,
+    anvilTotal: 5600,
   },
   heroic: {
     // 1.2 until the Heroic pass of 2026-11-05: the bot raid in the previous
@@ -290,7 +295,8 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     pulseRise: 70,
     anvilMissMin: 1500,
     anvilMissMax: 1600,
-  },
+    anvilTotal: 6600,
+    },
   mythic: {
     damageMult: 1.3,
     healthMult: 2.1,
@@ -309,6 +315,7 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     pulseRise: 70,
     anvilMissMin: 1500,
     anvilMissMax: 1600,
+    anvilTotal: 6600,
   },
 };
 
@@ -497,13 +504,13 @@ export const FINAL_TUNING = {
   anvilEvery: 25,
   anvilCast: 6,
   anvilR: 6,
-  /** The whole blow, split between everyone under it: 660 a body with all
-   *  ten under it, about 55 percent of a fresh level-20 cloth pool (the
-   *  raid's soak band: the Cradle's full share is about 55, the council's
-   *  rock about 35). 9,000 until the bot raid of 2026-11-11: 900 a body with
-   *  the whole raid under it (70 to 77 percent of cloth) killed the cloth
-   *  wearers whenever one raider was missing or a pulse landed with it. */
-  anvilTotal: 6600,
+  // Weight of the Anvil's whole blow is each tier's (FINAL_DIFFICULTY
+  // anvilTotal): on Heroic and Mythic 660 a body with all ten under it, about
+  // 55 percent of a fresh level-20 cloth pool (the raid's soak band: the
+  // Cradle's full share is about 55, the council's rock about 35). 9,000
+  // until the bot raid of 2026-11-11: 900 a body with the whole raid under it
+  // (70 to 77 percent of cloth) killed the cloth wearers whenever one raider
+  // was missing or a pulse landed with it.
   /** Fewer soakers than this: each takes half as much again. */
   anvilMinSoakers: 3,
   // Nobody under it: the whole raid takes its tier's anvilMissMin to
@@ -552,10 +559,10 @@ export function overloadStep(fill: number, active: boolean, dt: number): number 
 /** What each soaker of Weight of the Anvil takes (pure), before the roll:
  *  the whole split between them, half as much again when too few stand
  *  under it, a Crushed soaker's share `crushedMult` times over. */
-export function anvilShare(soakers: number, crushed: boolean): number {
+export function anvilShare(soakers: number, crushed: boolean, total: number): number {
   const T = FINAL_TUNING;
   const n = Math.max(1, soakers);
-  const base = T.anvilTotal / n;
+  const base = total / n;
   const short = n < T.anvilMinSoakers ? 1.5 : 1;
   return Math.round(base * short * (crushed ? T.crushedMult : 1));
 }
