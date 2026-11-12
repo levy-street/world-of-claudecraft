@@ -358,6 +358,7 @@ function makeFakeHost() {
     bgMatches: new Map(),
     worldPvpDisabled: false,
     hillState: { active: null, window: 0, plan: null, attempts: 0, retryAt: 0, passTick: 0 },
+    skillEventState: { active: null, plan: null, passTick: 0 },
     seasonal: freshSeasonalWorldState(),
     hillProbe: { wet: () => false, steep: () => false, blocked: () => false, zoneIdAt: () => null },
     worldPvpBooks: {

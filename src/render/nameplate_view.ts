@@ -209,7 +209,14 @@ export function nameplatePlanInto(
       (d2 > NAMEPLATE_RANGE_SQ ||
         (e.kind === 'object' && !isDoor && !delveInteractNear && !feastNear && !rackNear) ||
         (!isBuddyPet && !showNameplates && e.kind === 'mob' && !e.dead) ||
-        (!showPlayerNameplates && e.kind === 'player' && !isSelf && e.id !== player.targetId)));
+        (!showPlayerNameplates &&
+          e.kind === 'player' &&
+          !isSelf &&
+          e.id !== player.targetId &&
+          // A skill event fighter's hearts and tell (a wind-up, a chant) are the
+          // fight itself, so they show even with other players' plates off.
+          e.eventHearts === undefined &&
+          e.eventStance === undefined)));
   out.noHealthBar = isBuddyPet;
   out.anchorYOffset =
     viewHeight * e.scale +

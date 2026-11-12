@@ -54,6 +54,7 @@ function fields(overrides: Partial<NameplatePaintFields> = {}): NameplatePaintFi
     markerTone: 'none',
     hpVisible: true,
     hpFill: 1,
+    hearts: -1,
     castVisible: false,
     castFill: 0,
     castChannel: false,
@@ -127,6 +128,7 @@ describe('nameplate paint gate core', () => {
 
   it.each([
     ['hp', fields({ hpFill: 0.4 })],
+    ['hearts', fields({ hearts: 2 })],
     ['cast start', fields({ castVisible: true, castFill: 0.2, castLabel: 'Fireball' })],
     ['selection', fields({ currentTarget: true })],
     ['threat', fields({ threat: true })],

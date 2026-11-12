@@ -6817,6 +6817,7 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
       worldQuests: null,
       worldBosses: null,
       hill: null,
+      skillEvent: null,
       player: 'with your own arrow on it',
       pois: 'the points of interest around you',
       npcs: 'the quest givers with their marks',

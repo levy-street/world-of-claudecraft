@@ -3441,7 +3441,10 @@ export const en_CA: EnTranslations = {
         "worldKill": "world kill",
         "worldAssist": "world kill assisted",
         "hillHold": "holding the hill",
-        "worldQuest": "world quest"
+        "worldQuest": "world quest",
+        "skillEventWin": "skill event victory",
+        "skillEventComplete": "skill event fought",
+        "skillEventKill": "skill event kill"
       },
       "floatReasons": {
         "kill": "Kill",
@@ -15949,6 +15952,84 @@ export const en_CA: EnTranslations = {
       "alreadyReported": "You have already reported this player recently.",
       "reportingCharacterMissing": "Reporting character not found."
     },
+    "skillEvent": {
+      "heartsLabel": "Hearts: {count} of {max}",
+      "names": {
+        "riposte": "Riposte",
+        "footprints": "Footprints in Ash",
+        "tongues": "Rite of Tongues",
+        "bankshot": "Bankshot",
+        "common_hand": "The Common Hand"
+      },
+      "goals": {
+        "riposte": "Last fencer standing wins.",
+        "footprints": "Last one with hearts left wins.",
+        "tongues": "First to finish 5 chants wins.",
+        "bankshot": "Last one standing wins.",
+        "common_hand": "First to 4 killing blows wins."
+      },
+      "verbs": {
+        "lunge": "Lunge",
+        "guard": "Guard",
+        "feint": "Feint",
+        "sidestep": "Sidestep",
+        "sweep": "Sweep",
+        "hush": "Hush",
+        "pebble": "Pebble",
+        "rite": "Rite",
+        "sever": "Sever",
+        "false_start": "False Start",
+        "shove": "Shove",
+        "bolt": "Bolt",
+        "brace": "Brace",
+        "dash": "Dash"
+      },
+      "verbTips": {
+        "lunge": "Wind up for {windup} sec, then thrust at the nearest fighter in front of you within {range} yd. A hit takes 1 heart.",
+        "guard": "Raise your guard for up to {max} sec. A lunge that lands in the first {perfect} sec is turned back and leaves the attacker open for {stagger} sec. Holding the full {max} sec leaves you open for {open} sec. Press again to lower it. You can guard only if you lunged in the last {passive} sec.",
+        "feint": "Cancel your own wind-up to draw out an early guard. {feintCd} sec cooldown.",
+        "sidestep": "Dash {distance} yd forward. {sidestepCd} sec cooldown.",
+        "sweep": "Swing at the nearest fighter in a short cone in front of you, within {sweepRange} yd. A hit takes 1 heart and shows you both for {reveal} sec. A miss shows only you.",
+        "hush": "Walk without leaving footprints for {hush} sec. {hushCd} sec cooldown.",
+        "pebble": "Throw a {pebble} yd line of false footprints ahead of you, laid as if someone had just walked away. {pebbleCd} sec cooldown.",
+        "rite": "Chant for {chant} sec, standing still. Finishing scores 1. Being moved, stunned, rooted or silenced breaks it. Needs another fighter in the circle.",
+        "sever": "Interrupt your target, or the nearest fighter in front of you. It winds up for {severWindup} sec, then lands: if they are still chanting, they are silenced for {silence} sec. If not, you are. {severCd} sec cooldown.",
+        "false_start": "Drop your own chant at once, at no cost. A Sever aimed at you then silences its caster.",
+        "shove": "Push a fighter within reach {shove} yd away from you, breaking their chant. {shoveCd} sec cooldown.",
+        "bolt": "Fire a bolt the way you face. It is harmless until it bounces off a stone or the wall, then takes 1 heart from the first fighter it touches, you included. Bounces up to {bounces} times. {boltCd} sec cooldown.",
+        "brace": "For {braceWindow} sec, a bolt that reaches you flies back the way it came, and it is yours now. {braceCd} sec cooldown.",
+        "dash": "Dash {dash} yd forward. {dashCd} sec cooldown."
+      },
+      "stance": {
+        "lunge": "Winding up",
+        "guard": "Guarding",
+        "open": "Open",
+        "chant": "Chanting",
+        "sever": "Severing",
+        "silenced": "Silenced",
+        "brace": "Bracing",
+        "hand": "Casting"
+      },
+      "ready": "Ready",
+      "unseen": "Unseen",
+      "seen": "Seen by everyone",
+      "score": "Rites: {count} of {goal}. Best: {best}.",
+      "scoreKills": "Killing blows: {count} of {goal}. Best: {best}.",
+      "bellIn": "Next hand in {seconds} sec",
+      "nextHand": "Next hand",
+      "handKinds": {
+        "attack": "Attack",
+        "control": "Control",
+        "defensive": "Defensive",
+        "movement": "Movement"
+      },
+      "handTip": "{name} ({kind}), dealt to everyone this hand. Costs nothing. Against another fighter a direct hit takes {direct}% of their maximum health, each periodic tick {periodic}%, a heal restores {heal}% of yours, and a shield holds {shield}% of yours.",
+      "startsIn": "Starts in {minutes} min",
+      "keepsake": "Kept ability",
+      "keepsakeTip": "Your kept ability: {name}. The only class ability you can use here.",
+      "keepsakeEmpty": "Choose the one class ability you keep for this event.",
+      "pickTitle": "Choose the one ability you keep"
+    },
     "prompts": {
       "partyInvite": "{name} invites you to join their party.",
       "joinParty": "Join Party",
@@ -15962,7 +16043,9 @@ export const en_CA: EnTranslations = {
       "acceptDuel": "Accept Duel",
       "resurrectionOffer": "{name} wants to return you to life. Do you accept?",
       "acceptResurrection": "Accept Resurrection",
-      "decline": "Decline"
+      "decline": "Decline",
+      "skillEventJoin": "You are near a PvP event. Would you like to participate? Accepting will toggle PvP on and you can get killed by other players and your purse looted upon death.",
+      "acceptSkillEvent": "Accept"
     },
     "combat": {
       "floatingMiss": "Miss",

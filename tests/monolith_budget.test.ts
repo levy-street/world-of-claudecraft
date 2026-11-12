@@ -1318,7 +1318,13 @@ const MONOLITHS: MonolithRow[] = [
     // riding progression lives in riding_training.ts. wc -l on the merged tree.
     // 11485 after the courier full-bank sync (PR 4598). wc -l.
     // 11490 with the difficulty menu fix (PR 4625) merged ahead of its landing. wc -l.
-    ceiling: 11410,
+    // LOWERED 11410 -> 11389 with the hourly skill events: the tool-slot view moved
+    // to professions/tool_effect_slot_view.ts, which paid for the event wiring. wc -l.
+    // LOWERED 11389 -> 11378: the party heal prediction moved to
+    // social/party_incoming_heals.ts beside the skill event kit wiring. wc -l.
+    // LOWERED 11378 -> 11377: the skill event readout's no-primary guard moved
+    // into skill_events.ts, paying for the Footprints in Ash marks getter. wc -l.
+    ceiling: 11377,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -2389,7 +2395,9 @@ const MONOLITHS: MonolithRow[] = [
     // overhead chevron, screen-edge arrow) draw from nameplate_target_highlight.ts,
     // leaving only their call sites here. wc -l after biome. Exact count, zero slack.
     // Keep inherited bounty/tag fills beside the extracted pens and new cues.
-    ceiling: 797,
+    // LOWERED 797 -> 758 with the skill event hearts: the health bar draw moved
+    // to nameplate_health_bar.ts beside the new nameplate_hearts.ts. wc -l.
+    ceiling: 758,
     seam: 'the pure src/render/nameplate_heraldry_core.ts geometry module',
   },
   {

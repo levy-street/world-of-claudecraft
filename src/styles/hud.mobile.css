@@ -66,6 +66,64 @@
   body.mobile-touch .vehicle-bar-hint {
     font-size: 12px;
   }
+  /* The skill event bar on touch: compact and centred, clear of the move stick. */
+  body.mobile-touch .vehicle-bar.skill-event-bar {
+    grid-template-columns: 1fr;
+    min-width: 0;
+    max-width: min(420px, calc(100% - 340px));
+    padding: 6px 10px;
+    gap: 4px;
+  }
+  body.mobile-touch .skill-event-bar .vehicle-bar-hint {
+    display: none;
+  }
+  /* A scoring event's tally (Rite of Tongues) is the one hint a phone keeps. */
+  body.mobile-touch .skill-event-bar.has-score .vehicle-bar-hint {
+    display: block;
+  }
+  body.mobile-touch .vehicle-bar.skill-event-bar.is-warning {
+    top: 6%;
+    bottom: auto;
+  }
+  body.mobile-touch .skill-event-choice {
+    width: 36px;
+    height: 36px;
+  }
+  /* The Common Hand's next-hand preview: the status line already counts down
+     to the bell, so a phone keeps only a short row of small icons. */
+  body.mobile-touch .skill-event-picker.is-preview .skill-event-picker-title {
+    display: none;
+  }
+  body.mobile-touch .skill-event-picker.is-preview .skill-event-choice {
+    width: 26px;
+    height: 26px;
+  }
+  /* During a skill event the frame (and its hearts) leaves the centre, where it
+     hid the fight, for the middle of the left edge, above the move stick. The
+     doubled class outranks the tier and handedness seats further down. */
+  body.mobile-touch.skill-event-kit.skill-event-kit #player-frame:not(.pf-detached) {
+    left: max(16px, env(safe-area-inset-left, 0px));
+    top: 50%;
+    bottom: auto;
+    margin-bottom: 0;
+    transform: translateY(-50%)
+      scale(calc(var(--mobile-unit-frame-scale) * var(--mobile-chrome-scale, 1)));
+    transform-origin: left center;
+  }
+  /* The cast bar follows the frame to the left edge, just under it, so a chant
+     or wind-up never covers the event bar's status line. */
+  body.mobile-touch.skill-event-kit.skill-event-kit #castbar {
+    left: max(16px, env(safe-area-inset-left, 0px));
+    top: calc(50% + 32px);
+    bottom: auto;
+    transform: none;
+  }
+  @media (orientation: landscape) {
+    body.mobile-touch.skill-event-kit.skill-event-kit #player-frame:not(.pf-detached) {
+      transform: translateY(-50%)
+        scale(calc(var(--mobile-unit-frame-scale-landscape) * var(--mobile-chrome-scale, 1)));
+    }
+  }
   body.mobile-touch.operating-vehicle #player-frame:not(.pf-detached) {
     top: calc(var(--app-vh, 100dvh) - 230px);
     bottom: auto;

@@ -3441,7 +3441,10 @@ export const ja_JP: EnTranslations = {
         "worldKill": "ワールドPvP撃破",
         "worldAssist": "ワールドPvP撃破のアシスト",
         "hillHold": "丘の保持",
-        "worldQuest": "ワールドクエスト"
+        "worldQuest": "ワールドクエスト",
+        "skillEventWin": "skill event victory",
+        "skillEventComplete": "skill event fought",
+        "skillEventKill": "skill event kill"
       },
       "floatReasons": {
         "kill": "撃破",
@@ -15949,6 +15952,84 @@ export const ja_JP: EnTranslations = {
       "alreadyReported": "このプレイヤーは最近すでに通報しています。",
       "reportingCharacterMissing": "通報するキャラクターが見つかりません。"
     },
+    "skillEvent": {
+      "heartsLabel": "ハート：{count}/{max}",
+      "names": {
+        "riposte": "リポスト",
+        "footprints": "灰の足跡",
+        "tongues": "言霊の儀",
+        "bankshot": "バンクショット",
+        "common_hand": "共通の手札"
+      },
+      "goals": {
+        "riposte": "最後まで立っていた剣士の勝ち。",
+        "footprints": "最後までハートが残った者の勝ち。",
+        "tongues": "先に詠唱を5回終えた者の勝ち。",
+        "bankshot": "最後まで立っていた者の勝ち。",
+        "common_hand": "先にとどめを4回刺した者の勝ち。"
+      },
+      "verbs": {
+        "lunge": "突き",
+        "guard": "ガード",
+        "feint": "フェイント",
+        "sidestep": "サイドステップ",
+        "sweep": "薙ぎ払い",
+        "hush": "忍び足",
+        "pebble": "小石",
+        "rite": "詠唱",
+        "sever": "断ち切り",
+        "false_start": "空詠唱",
+        "shove": "突き飛ばし",
+        "bolt": "ボルト",
+        "brace": "構え",
+        "dash": "ダッシュ"
+      },
+      "verbTips": {
+        "lunge": "{windup}秒ためてから、前方{range}ヤード以内で最も近い相手を突く。命中するとハートを1つ奪う。",
+        "guard": "最大{max}秒ガードを構える。構えてから{perfect}秒以内に届いた突きは返され、攻撃側は{stagger}秒間隙だらけになる。{max}秒構えきると自分が{open}秒間隙だらけになる。もう一度押すとガードを下ろす。直近{passive}秒以内に突いていないとガードできない。",
+        "feint": "自分のためを取り消し、相手の早すぎるガードを誘う。再使用まで{feintCd}秒。",
+        "sidestep": "前方へ{distance}ヤード踏み込む。再使用まで{sidestepCd}秒。",
+        "sweep": "前方の短い扇状範囲、{sweepRange}ヤード以内で最も近い相手を薙ぐ。命中するとハートを1つ奪い、{reveal}秒間お互いの姿が見える。外すと自分だけが見える。",
+        "hush": "{hush}秒間、足跡を残さずに歩く。再使用まで{hushCd}秒。",
+        "pebble": "前方へ{pebble}ヤードの偽の足跡を投げる。誰かが歩き去ったばかりのように見える。再使用まで{pebbleCd}秒。",
+        "rite": "その場で{chant}秒詠唱する。完了すると1点。動かされる、スタン、移動不能、沈黙で中断される。円の中に他の参加者が必要。",
+        "sever": "ターゲット、またはいなければ前方で最も近い参加者を妨害する。{severWindup}秒ためてから発動し、相手がまだ詠唱中なら{silence}秒間沈黙させる。そうでなければ自分が沈黙する。再使用まで{severCd}秒。",
+        "false_start": "自分の詠唱を即座に、代償なしでやめる。自分を狙った断ち切りは、使った側を沈黙させる。",
+        "shove": "届く範囲の参加者を{shove}ヤード突き飛ばし、詠唱を中断させる。再使用まで{shoveCd}秒。",
+        "bolt": "向いている方向にボルトを撃つ。石か壁で跳ね返るまでは無害で、跳ね返った後は最初に触れた参加者（自分を含む）のハートを1つ奪う。最大{bounces}回跳ね返る。再使用まで{boltCd}秒。",
+        "brace": "{braceWindow}秒間、届いたボルトを来た方向へ跳ね返し、自分のボルトにする。再使用まで{braceCd}秒。",
+        "dash": "前方へ{dash}ヤード駆ける。再使用まで{dashCd}秒。"
+      },
+      "stance": {
+        "lunge": "ため中",
+        "guard": "ガード中",
+        "open": "隙あり",
+        "chant": "詠唱中",
+        "sever": "断ち切り中",
+        "silenced": "沈黙",
+        "brace": "構え中",
+        "hand": "詠唱中"
+      },
+      "ready": "準備完了",
+      "unseen": "見えていない",
+      "seen": "全員に見えている",
+      "score": "詠唱：{goal}回中{count}回。最多：{best}。",
+      "scoreKills": "とどめ：{goal}回中{count}回。最多：{best}。",
+      "bellIn": "次の手札まで{seconds}秒",
+      "nextHand": "次の手札",
+      "handKinds": {
+        "attack": "攻撃",
+        "control": "妨害",
+        "defensive": "防御",
+        "movement": "移動"
+      },
+      "handTip": "{name}（{kind}）、この手札で全員に配られた。コストなし。他の参加者には、直撃で最大体力の{direct}%、継続ダメージ1回ごとに{periodic}%を与え、回復は自分の{heal}%を回復し、シールドは自分の{shield}%を吸収する。",
+      "startsIn": "{minutes}分後に開始",
+      "keepsake": "持ち込み技",
+      "keepsakeTip": "持ち込み技：{name}。ここで使える唯一のクラス技。",
+      "keepsakeEmpty": "このイベントに持ち込むクラス技を1つ選んでください。",
+      "pickTitle": "持ち込む技を1つ選ぶ"
+    },
     "prompts": {
       "partyInvite": "{name}があなたをパーティに招待しています。",
       "joinParty": "パーティに参加",
@@ -15962,7 +16043,9 @@ export const ja_JP: EnTranslations = {
       "acceptDuel": "決闘を受ける",
       "resurrectionOffer": "{name}があなたを蘇生しようとしています。受け入れますか？",
       "acceptResurrection": "蘇生を受け入れる",
-      "decline": "断る"
+      "decline": "断る",
+      "skillEventJoin": "PvPイベントの近くにいます。参加しますか？承諾するとPvPが有効になり、他のプレイヤーに倒される可能性があり、死亡時には財布の中身を奪われます。",
+      "acceptSkillEvent": "承諾"
     },
     "combat": {
       "floatingMiss": "ミス",

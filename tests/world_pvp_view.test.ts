@@ -286,6 +286,7 @@ describe('applySocialSelfWire: the wpvp self key (the ClientWorld mirror)', () =
     mailUnread: 0,
     worldPvpInfo: null,
     hillInfo: null,
+    skillEventInfo: null,
   });
 
   it('adopts a readout, keeps it when the key is omitted, clears it on null', () => {

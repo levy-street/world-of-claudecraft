@@ -198,6 +198,7 @@ import type {
   PerfectingInfoView,
   SalvageResultView,
 } from '../world_api/professions';
+import type { SkillEventMarkBook } from '../world_api/world_pvp';
 import { buildClientAbilityPresentation } from './ability_presentation';
 import { normalizeAccountCosmetics } from './account_cosmetics_wire';
 import { ActionBarLayoutUploader } from './action_bar_upload';
@@ -281,6 +282,7 @@ import {
 import { decodeReferralCardsSnapshot } from './referral_cards_wire';
 import { type RiftStateEvent, swapMirroredRiftFloor } from './rift_floor_mirror';
 import { isInputSendBackpressured } from './send_backpressure';
+import { skillEventMarkBookOf } from './skill_event_marks_mirror';
 import { snapshotAlpha } from './snapshot_alpha';
 import { applySnapshotHeadSyncs } from './snapshot_head_syncs';
 import {
@@ -1214,6 +1216,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // --- IWorldWorldPvp: the /pvp readout (`s.wpvp`) + the hill (`s.hill`), delta-omitted. ---
   worldPvpInfo: import('../world_api').WorldPvpInfo | null = null;
   hillInfo: import('../world_api').HillInfo | null = null;
+  skillEventInfo: import('../world_api').SkillEventInfo | null = null;
   // --- IWorldDungeonFinder: group-finder state, mirrored from the snapshot
   // self (`s.df` personal blob + `s.dfb` shared board, both delta-omitted: a
   // missing key keeps the prior mirror, an explicit null clears it). ---
@@ -4268,6 +4271,18 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // --- IWorldWorldPvp: the /pvp flag + the Skull Bag (worldPvpInfo is a snapshot read). ---
   setWorldPvpFlag(enabled: boolean): void {
     this.cmd({ cmd: 'pvp_flag', on: enabled });
+  }
+  joinSkillEvent(): void {
+    this.cmd({ cmd: 'skill_event', op: 'join' });
+  }
+  skillEventMarks(): SkillEventMarkBook {
+    return skillEventMarkBookOf(this); // the sevm stream's mirror
+  }
+  skillEventAction(verb: string): void {
+    this.cmd({ cmd: 'skill_event', op: 'action', verb });
+  }
+  skillEventPickKeepsake(abilityId: string): void {
+    this.cmd({ cmd: 'skill_event', op: 'keepsake', ability: abilityId });
   }
   sitOnSeat(seatId: string): void {
     this.cmd({ cmd: 'sit_seat', seat: seatId });

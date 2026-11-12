@@ -35,6 +35,7 @@ import type { FeastState } from './professions/feast';
 import type { PendingProjectile } from './projectile_travel';
 import type { HillState } from './pvp/hill';
 import type { HillSpotProbe } from './pvp/hill_rules';
+import type { SkillEventState } from './pvp/skill_events';
 import type { WorldPvpBooks } from './pvp/world_pvp';
 import type { NaturalRiftPortal } from './rift/portals';
 import type { RiftEvent, RiftInstance } from './rift/types';
@@ -310,6 +311,7 @@ export interface SimContextPrimitives {
   // King of the Hill (pvp/hill.ts): the standing hill, the schedule and the
   // hour's accruals, one live view like the books above (session-only).
   readonly hillState: HillState;
+  readonly skillEventState: SkillEventState; // hourly skill events (pvp/skill_events.ts)
   // The seasonal-event core (seasonal/): the host-fed active event, the /dev
   // override and the open/close edge. One live view, mutated in place.
   readonly seasonal: SeasonalWorldState;
@@ -1533,6 +1535,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get hillState() {
       return host.hillState;
+    },
+    get skillEventState() {
+      return host.skillEventState;
     },
     get seasonal() {
       return host.seasonal;

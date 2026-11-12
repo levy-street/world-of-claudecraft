@@ -28,6 +28,7 @@
 import { recordQueueHealing } from '../instances/queue_participation';
 import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import { worldPvpOnPlayerAided } from '../pvp';
+import { skillEventHandHealPoints } from '../pvp/skill_events';
 import type { SimContext } from '../sim_context';
 import { addThreat, HEAL_THREAT_FACTOR } from '../threat';
 import type { Entity } from '../types';
@@ -126,6 +127,13 @@ export function applyHeal(
   // reads it to repeat a direct heal at a fraction of the resolved amount.
 ): number {
   if (target.dead) return 0;
+  // The Common Hand: a dealt heal on one of its fighters restores a fixed share
+  // of health, whatever the gear (pvp/skill_events.ts skillEventHandHealPoints).
+  const handHeal = skillEventHandHealPoints(ctx, target, abilityId ?? ability);
+  if (handHeal !== null) {
+    amount = handHeal;
+    alreadyResolved = true;
+  }
   const crit = !alreadyResolved && canCrit ? ctx.rng.chance(ctx.spellCrit(source)) : false;
   let healDone = 0;
   for (const aura of source.auras) if (aura.kind === 'buff_heal_done') healDone += aura.value;

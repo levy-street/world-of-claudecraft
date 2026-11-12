@@ -558,6 +558,19 @@
     --color-map-world-quest-area-stroke: rgba(255, 221, 92, 0.72);
     --color-map-world-quest-available: #4aa3ff;
     --color-map-world-boss: #a970ff;
+    /* open-world PvP events: the King of the Hill crown and the hourly skill
+       event badge share one red, which pulses on the map (owner brief 2026-11-12) */
+    --color-map-pvp-event: #ff3b30;
+    --color-map-pvp-event-area-fill: rgba(255, 59, 48, 0.16);
+    --color-map-pvp-event-area-stroke: rgba(255, 99, 88, 0.85);
+    /* the skill event heart row (hud.css "skill event hearts") */
+    --color-skill-event-heart: #e8302a;
+    --color-skill-event-heart-edge: #2a0c0c;
+    --color-skill-event-heart-glow: rgba(255, 70, 60, 0.55);
+    --color-skill-event-heart-spent: #2a1517;
+    --color-skill-event-heart-spent-edge: #8a2a26;
+    --color-skill-event-strip: rgba(14, 8, 10, 0.88);
+    --color-skill-event-strip-edge: rgba(255, 90, 80, 0.35);
     /* the numbered quest badge on each area (gold circle, dark numeral) */
     --color-map-quest-badge-fill: #ffd100;
     --color-map-quest-badge-text: #3a2b00;
@@ -669,6 +682,7 @@
     --color-minimap-gather-cooldown: #90989a;
     --color-minimap-station: #d98e4a;
     --color-minimap-world-quest-available: #4aa3ff;
+    --color-minimap-pvp-event: #ff3b30;
     --color-minimap-world-quest-active: #ffd15c;
     --color-minimap-world-boss: #a970ff;
     /* Tool-tier locked gather node (Professions 2.0): a dark rust

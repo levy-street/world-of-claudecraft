@@ -23,11 +23,13 @@ import type {
   HillInfo,
   MailInfo,
   MarketInfo,
+  SkillEventInfo,
   SkullBagInfo,
   TradeInfo,
   WorldPvpInfo,
 } from '../world_api';
 import { decodeDungeonFinderBoard, decodeDungeonFinderInfo } from './dungeon_finder_wire';
+import { applySkillEventBoltsWire, applySkillEventMarksWire } from './skill_event_marks_mirror';
 
 /** The mirrors this cohort writes; the concrete ClientWorld satisfies it
  *  structurally. */
@@ -47,6 +49,7 @@ export interface SocialSelfMirrors {
   mailUnread: number;
   worldPvpInfo: WorldPvpInfo | null;
   hillInfo: HillInfo | null;
+  skillEventInfo: SkillEventInfo | null;
 }
 
 /** The self-record keys this cohort reads (the server's terse names). */
@@ -67,6 +70,9 @@ export interface SocialSelfRecord {
   wpvp?: unknown;
   skb?: unknown;
   hill?: unknown;
+  sevt?: unknown;
+  sevm?: unknown;
+  sevb?: unknown;
 }
 
 const numberOrZero = (v: unknown): number => (typeof v === 'number' ? v : 0);
@@ -113,4 +119,9 @@ export function applySocialSelfWire(target: SocialSelfMirrors, s: SocialSelfReco
   // King of the Hill: the standing hill from this viewer's seat. Same delta
   // contract; null while no hill stands.
   if (s.hill !== undefined) target.hillInfo = s.hill as HillInfo | null;
+  // The hourly skill event (src/sim/pvp/skill_events.ts): same delta contract.
+  if (s.sevt !== undefined) target.skillEventInfo = s.sevt as SkillEventInfo | null;
+  // Footprints in Ash marks: only the new ones, every tick (skill_event_marks_mirror.ts).
+  if (s.sevm !== undefined) applySkillEventMarksWire(target, s.sevm);
+  if (s.sevb !== undefined) applySkillEventBoltsWire(target, s.sevb); // Bankshot bolts
 }

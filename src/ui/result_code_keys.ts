@@ -90,5 +90,8 @@ export const HONOR_REASON_KEYS: Record<HonorReason, TranslationKey> = {
   world_assist: 'hudChrome.warfare.reasons.worldAssist',
   hill_hold: 'hudChrome.warfare.reasons.hillHold',
   world_quest: 'hudChrome.warfare.reasons.worldQuest',
+  skill_event_win: 'hudChrome.warfare.reasons.skillEventWin',
+  skill_event_complete: 'hudChrome.warfare.reasons.skillEventComplete',
+  skill_event_kill: 'hudChrome.warfare.reasons.skillEventKill',
 };
 export const HONOR_REASON_FALLBACK_KEY: TranslationKey = 'hudChrome.warfare.reasons.arenaWin';

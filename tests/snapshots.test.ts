@@ -92,6 +92,7 @@ import { RETIRED_MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
 import { MOUNT_RACE_START_PLATFORM, type MountKey } from '../src/sim/content/mounts';
 import { CRAFT_RING, STATION_RADIUS } from '../src/sim/content/professions';
 import { COMBO_RECIPES } from '../src/sim/content/recipes';
+import { SKILL_EVENT_SITES } from '../src/sim/content/skill_event_sites';
 import { TREASURE_SITES } from '../src/sim/content/treasure_maps';
 import { NORTH_WATCH_CANNON } from '../src/sim/content/vehicle_stations';
 import { BUILTIN_WORLD, DELVES, GATHER_NODES, ITEMS, MOBS, WORLD_QUESTS } from '../src/sim/data';
@@ -5916,6 +5917,7 @@ const ALL_DELTA_KEYS = [
   'salv',
   'scb',
   'season',
+  'sevt',
   'sh',
   'skb',
   'sp',
@@ -6069,6 +6071,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   rxp: 'restedXp',
   salv: 'lastSalvageResult',
   season: 'activeSeasonalEvent',
+  sevt: 'skillEventInfo',
   sh: 'spellHaste',
   sp: 'spellPower',
   tfocus: 'townFocus',
@@ -6275,6 +6278,27 @@ function dirtyEveryDeltaField(): {
   // King of the Hill: a hill stands (in a free-for-all zone the leader is not
   // in), so the hill self readout rides the snapshot.
   spawnHillNow(sim.ctx);
+  // An hourly skill event is announced, so its sevt self readout rides too.
+  sim.ctx.skillEventState.active = {
+    ordinal: 0,
+    kind: 'riposte',
+    siteId: SKILL_EVENT_SITES[0].id,
+    zoneId: SKILL_EVENT_SITES[0].zoneId,
+    x: SKILL_EVENT_SITES[0].x,
+    z: SKILL_EVENT_SITES[0].z,
+    phase: 'warning',
+    startsAt: sim.time + 300,
+    endsAt: sim.time + 1020,
+    participants: [],
+    presence: new Map(),
+    hearts: new Map(),
+    heartLostAt: new Map(),
+    heartsTaken: new Map(),
+    kits: new Map(),
+    verbHitFrom: null,
+    kills: new Map(),
+    winner: null,
+  };
   meta.restedXp = 222;
   meta.prestigeRank = 3;
   meta.delveMarks = 7;
@@ -7575,7 +7599,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 136 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 137 unique keys in sorted order', () => {
     // 109 plus the release batch's pending Town Focus and Spell Crit core keys (113),
     // plus the courier's three keys and the Shardpike trial's lance, lrest and lguide (119).
     // +2: the courier's courierTravelTicks and courierLegTicks (PR 4281), for 124.
@@ -7644,8 +7668,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // +1: Lantern Hall's weekly contract board gcon (server/quest_snapshot_wire.ts), for 125.
     // Courier vault and other-character stores add one owner delta key.
     // +1: the portrait menu's unapplied claim tier udiff (server/self_scalar_wire.ts).
-    expect(ALL_DELTA_KEYS).toHaveLength(136);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(136);
+    expect(ALL_DELTA_KEYS).toHaveLength(137);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(137);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7826,7 +7850,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     // Lantern Hall's contract board gcon (quest_snapshot_wire.ts) makes 125.
     // Courier vault and other-character stores add one owner delta key.
     // The unapplied claim tier udiff (self_scalar_wire.ts) adds one more.
-    expect(scraped.size).toBe(136);
+    expect(scraped.size).toBe(137);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

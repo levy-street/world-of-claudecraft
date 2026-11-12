@@ -22,8 +22,10 @@
 // perturb combat, loot, or any other pre-existing simulation stream.
 
 import { isBlocked } from '../colliders';
+import { SKILL_EVENT_SITES } from '../content/skill_event_sites';
 import { STRIP_MAX_X, STRIP_MIN_X, WORLD_MAX_X, WORLD_MIN_X, ZONES, zoneAt } from '../data';
 import { createGroundObject } from '../entity';
+import { SKILL_EVENT_PORTAL_RADIUS, spotTouchesSkillArena } from '../pvp/skill_event_rules';
 import { Rng } from '../rng';
 import type { SimContext } from '../sim_context';
 import { RIFT_TIER_COLORS, type RiftTier, type ZoneDef } from '../types';
@@ -281,6 +283,8 @@ export function spawnNaturalRiftPortal(
     if (isBlocked(ctx.cfg.seed, x, z, 1.5)) continue;
     if (inWispMazeFootprint(x, z, 8)) continue;
     if (inGardenMaze(x, z)) continue;
+    // Never on an hourly skill event arena (owner brief 2026-11-12).
+    if (spotTouchesSkillArena(SKILL_EVENT_SITES, x, z, SKILL_EVENT_PORTAL_RADIUS)) continue;
     position = { x, z };
     break;
   }

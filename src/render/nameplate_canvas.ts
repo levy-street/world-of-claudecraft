@@ -11,6 +11,8 @@ import {
   nameplateDotRowHeight,
   newNameplateDotsPlan,
 } from './nameplate_dots_core';
+import { drawNameplateHealthBar } from './nameplate_health_bar';
+import { drawNameplateHearts } from './nameplate_hearts';
 import {
   createNameplateHeraldry,
   NAMEPLATE_HERALDRY_TITLE_STEP,
@@ -39,7 +41,7 @@ import {
   type NameplateBadge,
   roundedRect,
 } from './nameplate_paint_primitives';
-import { NAMEPLATE_BASE_WIDTH, nameplateHealthBarWidth } from './nameplate_pick_core';
+import { NAMEPLATE_BASE_WIDTH } from './nameplate_pick_core';
 import { bountyFill, nameplateGuildFill, nameplateNameFill } from './nameplate_tag_fill_core';
 import {
   drawOverheadChevron,
@@ -92,6 +94,7 @@ export interface NameplateCanvasState {
   markerTone: NameplateMarkerTone;
   hpVisible: boolean;
   hpFill: number;
+  hearts: number; // skill event hearts in place of the bar (nameplate_hearts.ts), -1 off, -2 hidden
   castVisible: boolean;
   castFill: number;
   castChannel: boolean;
@@ -152,6 +155,7 @@ export function createNameplateCanvasState(): NameplateCanvasState {
     markerTone: 'none',
     hpVisible: false,
     hpFill: 1,
+    hearts: -1,
     castVisible: false,
     castFill: 0,
     castChannel: false,
@@ -690,52 +694,9 @@ export class NameplateCanvasSurface {
   }
 
   private drawHealth(state: NameplateCanvasState, centerX: number, y: number): void {
-    const ctx = this.ctx;
     const forcedColors = this.forcedColorsActive();
-    const width = nameplateHealthBarWidth(state.frame === 'boss');
-    const x = centerX - width / 2;
-    if (state.threat) {
-      ctx.save();
-      ctx.shadowColor = forcedColors ? 'CanvasText' : '#c0392b';
-      ctx.shadowBlur = 8;
-      ctx.fillStyle = forcedColors ? 'Canvas' : '#2a0000';
-      roundedRect(ctx, x, y, width, 4, 2);
-      ctx.fill();
-      ctx.restore();
-    }
-    roundedRect(ctx, x, y, width, 4, 2);
-    ctx.fillStyle = forcedColors ? 'Canvas' : '#2a0000';
-    ctx.fill();
-    const fill = Math.max(0, Math.min(1, state.hpFill));
-    if (fill > 0) {
-      roundedRect(ctx, x, y, width * fill, 4, 2);
-      ctx.fillStyle = forcedColors
-        ? 'Highlight'
-        : state.threat
-          ? '#d93632'
-          : state.myPet
-            ? '#4080ff'
-            : state.friendlyPet
-              ? '#76b653'
-              : state.hostile
-                ? '#e12c2c'
-                : '#2dab46';
-      ctx.fill();
-    }
-    ctx.lineWidth = state.frame === 'boss' ? 2 : 1;
-    ctx.strokeStyle = forcedColors
-      ? 'CanvasText'
-      : state.frame === 'boss'
-        ? '#ff5555'
-        : state.frame === 'elite'
-          ? '#f2c84b'
-          : state.currentTarget
-            ? '#ffffffaa'
-            : state.hostile
-              ? '#2e0000'
-              : '#00000088';
-    roundedRect(ctx, x, y, width, 4, 2);
-    ctx.stroke();
+    if (state.hearts >= 0) drawNameplateHearts(this.ctx, centerX, y, state.hearts, forcedColors);
+    else if (state.hearts === -1) drawNameplateHealthBar(this.ctx, state, centerX, y, forcedColors);
   }
 
   private drawCast(state: NameplateCanvasState, centerX: number, y: number): void {

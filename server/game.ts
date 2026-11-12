@@ -7237,6 +7237,7 @@ export class GameServer {
         break;
       // World PvP: the /pvp flag and the Skull Bag (server/world_pvp_wire.ts).
       case 'pvp_flag':
+      case 'skill_event':
       case 'skull_bag':
         worldPvpWire.dispatchWorldPvpCommand(sim, pid, msg);
         session.lastWpvpWireTick = -worldPvpWire.WPVP_WIRE_INTERVAL_TICKS;
@@ -8414,13 +8415,13 @@ export class GameServer {
     maybe('trade', tradeWire(this.sim, anchorSession.pid));
     maybe('duel', duelWire(this.sim, anchorSession.pid));
     maybe('cardDuel', this.sim.cardMinigameInfoFor(anchorSession.pid));
-    // Small PvP-ledger scalars, delta-guarded like delve marks (a fresh session gets both).
-    maybe('honor', meta.honor);
-    maybe('lhonor', meta.lifetimeHonor);
+    // PvP-ledger scalars and the per-tick Footprints in Ash marks (server/world_pvp_wire.ts).
+    worldPvpWire.emitPvpLedgerKeys(maybe, maybeRaw, this.sim, session, meta, anchorSession.pid);
     if (this.sim.tickCount - session.lastWpvpWireTick >= worldPvpWire.WPVP_WIRE_INTERVAL_TICKS) {
       session.lastWpvpWireTick = this.sim.tickCount;
       maybe('wpvp', this.sim.worldPvpInfoFor(anchorSession.pid));
       maybe('hill', this.sim.hillInfoFor(anchorSession.pid));
+      maybe('sevt', this.sim.skillEventInfoFor(anchorSession.pid));
       worldPvpWire.emitSkullBagSelfKey(maybe, this.sim, session, anchorSession.pid);
     }
     if (this.sim.tickCount - session.lastArenaWireTick >= ARENA_WIRE_INTERVAL_TICKS) {

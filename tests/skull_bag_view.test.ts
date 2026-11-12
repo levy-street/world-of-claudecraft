@@ -237,7 +237,13 @@ describe('the bag item', () => {
 
 describe('the wire', () => {
   it('the server boundary forwards only well-formed frames', () => {
-    const sim = { setWorldPvpFlag: vi.fn(), skullBagAction: vi.fn() };
+    const sim = {
+      setWorldPvpFlag: vi.fn(),
+      skullBagAction: vi.fn(),
+      joinSkillEvent: vi.fn(),
+      skillEventAction: vi.fn(),
+      skillEventPickKeepsake: vi.fn(),
+    };
     dispatchWorldPvpCommand(sim, 7, { cmd: 'skull_bag', op: 'store' });
     dispatchWorldPvpCommand(sim, 7, { cmd: 'skull_bag', op: 'take', sources: [victim(1, 'Bet')] });
     dispatchWorldPvpCommand(sim, 7, { cmd: 'skull_bag', op: 'take', sources: 'all' });

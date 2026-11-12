@@ -39,7 +39,11 @@ import {
 import { zoneDisplayName } from './entity_i18n';
 import type { FerryPortMapMarker } from './ferry_port_map_core';
 import { drawFerryPortMapMarker } from './ferry_port_map_painter';
-import { drawHillMapMarker } from './hill_map_marker_painter';
+import {
+  drawHillMapMarker,
+  drawSkillEventMapMarker,
+  mapPvpPulseNow,
+} from './hill_map_marker_painter';
 import { t } from './i18n';
 
 // Typography (Georgia, matching the per-zone map painter).
@@ -88,6 +92,7 @@ const CONTINENT_COLOR_TOKENS = {
   outline: '--color-map-outline',
   player: '--color-map-player',
   worldQuestAvailable: '--color-map-world-quest-available',
+  pvpEvent: '--color-map-pvp-event',
   partyDead: '--color-map-party-dead',
   regionHoverFill: '--color-map-region-hover-fill',
   regionCurrentFill: '--color-map-region-current-fill',
@@ -329,8 +334,14 @@ export class ContinentMapPainter {
       }
     }
 
+    // The open-world PvP markers: the King of the Hill crown and the skill
+    // event badge, one red glow breathing on the map's repaint band.
+    const pvpPulse = model.hill || model.skillEvent ? mapPvpPulseNow() : 0;
     if (model.hill) {
-      drawHillMapMarker(ctx, model.hill, 8, colors.worldQuestAvailable, colors.outline);
+      drawHillMapMarker(ctx, model.hill, 8, colors.pvpEvent, colors.outline, pvpPulse);
+    }
+    if (model.skillEvent) {
+      drawSkillEventMapMarker(ctx, model.skillEvent, 8, colors.pvpEvent, colors.outline, pvpPulse);
     }
 
     // "You are here": a filled dot in a ring at the player's projected position.

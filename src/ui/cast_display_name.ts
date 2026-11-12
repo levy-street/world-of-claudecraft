@@ -3,6 +3,7 @@
 // ability id, in that resolver order. Moved WHOLE from hud.ts at the v0.38.0
 // fourteenth absorb (the monolith ratchet heal); behavior unchanged.
 
+import { SKILL_EVENT_STANCE_CAST } from '../render/cast_bar';
 import { ABILITIES } from '../sim/data';
 import {
   ALLIED_HEARTHSTONE_CAST_ID,
@@ -268,6 +269,15 @@ export const castDisplayName = (id: string): string => {
   if (id === ALLIED_HEARTHSTONE_CAST_ID) return t('entities.items.allied_hearthstone.name');
   if (id === 'demon_heal') return t('abilityUi.cast.demonHeal');
   if (id === 'thunzharr_stormcall') return t('abilityUi.cast.thunzharrStormcall');
+  // The Riposte stance tell (render/cast_bar.ts castBarState): an event stance,
+  // drawn on the fencer's overhead cast bar so everyone can read it.
+  if (id === SKILL_EVENT_STANCE_CAST.lunge) return t('hud.skillEvent.stance.lunge');
+  if (id === SKILL_EVENT_STANCE_CAST.guard) return t('hud.skillEvent.stance.guard');
+  if (id === SKILL_EVENT_STANCE_CAST.open) return t('hud.skillEvent.stance.open');
+  if (id === SKILL_EVENT_STANCE_CAST.chant) return t('hud.skillEvent.stance.chant');
+  if (id === SKILL_EVENT_STANCE_CAST.sever) return t('hud.skillEvent.stance.sever');
+  if (id === SKILL_EVENT_STANCE_CAST.silenced) return t('hud.skillEvent.stance.silenced');
+  if (id === SKILL_EVENT_STANCE_CAST.brace) return t('hud.skillEvent.stance.brace');
   const riftKey = `abilityUi.cast.${id}` as TranslationKey;
   if (riftKey in RIFT_CAST_DISPLAY_KEYS) return t(riftKey);
   const ability = ABILITIES[id];

@@ -16689,3 +16689,125 @@
     min-height: 40px;
   }
 }
+
+@layer components {
+  /* ---------- skill event hearts ---------- */
+  /* The heart row that stands in for the player frame's health bar during a
+     heart event (src/ui/hud/skill_event/heart_bar_painter.ts). It takes the
+     health bar's slot as a dark strip with the hearts centred, so the left end
+     can sit under the portrait like the bar does. A spent heart keeps a red
+     outline, so the count reads at a glance. */
+  #pf-hearts.skill-event-hearts {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: var(--skill-event-hearts-h, 26px);
+    margin-block: 2px;
+    border-radius: 3px;
+    background: var(--color-skill-event-strip);
+    box-shadow: inset 0 0 0 1px var(--color-skill-event-strip-edge);
+  }
+  .skill-event-heart {
+    display: inline-flex;
+    width: var(--skill-event-heart-size, 22px);
+    height: var(--skill-event-heart-size, 22px);
+    flex: none;
+  }
+  .skill-event-heart svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .skill-event-heart path {
+    fill: var(--color-skill-event-heart);
+    stroke: var(--color-skill-event-heart-edge);
+    stroke-width: 1.4;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 3px var(--color-skill-event-heart-glow));
+    transition: fill 0.18s ease-out;
+  }
+  .skill-event-heart[data-state="spent"] path {
+    fill: var(--color-skill-event-heart-spent);
+    stroke: var(--color-skill-event-heart-spent-edge);
+    filter: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .skill-event-heart path {
+      transition: none;
+    }
+  }
+}
+@layer components {
+  /* ---------- skill event bar ---------- */
+  /* The hourly skill event kit (src/ui/hud/vehicle/skill_event_action_bar_controller.ts):
+     the vehicle-bar family at the bottom, which replaces the normal bars while
+     the event runs and lifts the player frame (and its hearts) above it. */
+  body.skill-event-kit
+  :is(
+    #actionbar,
+    #actionbar2,
+    #actionbar3,
+    #cross-hotbar,
+    #stancebar,
+    #petbar,
+    #mobile-action-ring,
+    #mobile-action-radial
+  ) {
+    display: none !important;
+  }
+  body.skill-event-kit #player-frame:not(.pf-detached) {
+    margin-bottom: 250px;
+  }
+  .vehicle-bar.skill-event-bar {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 6px;
+    width: auto;
+    min-width: min(360px, calc(100% - 24px));
+    max-width: calc(100% - 24px);
+    padding: 10px 18px;
+    text-align: center;
+  }
+  .skill-event-bar .vehicle-action-slots {
+    justify-content: center;
+  }
+  /* Before the start (the keepsake pick) the panel floats in the upper third,
+     clear of the normal bars and the player frame it would otherwise cover. */
+  .vehicle-bar.skill-event-bar.is-warning {
+    top: 16%;
+    bottom: auto;
+  }
+  .vehicle-bar.skill-event-bar.is-open {
+    box-shadow:
+      0 0 0 2px var(--color-skill-event-heart),
+      0 0 18px var(--color-skill-event-heart-glow);
+  }
+  .skill-event-picker {
+    display: grid;
+    gap: 6px;
+    justify-items: center;
+  }
+  .skill-event-picker-title {
+    font-size: 13px;
+    color: var(--gold);
+  }
+  .skill-event-choices {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+  }
+  .skill-event-choice {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
+  }
+  .skill-event-choice:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+}

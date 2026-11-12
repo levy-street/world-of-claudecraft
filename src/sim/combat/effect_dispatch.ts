@@ -1,3 +1,4 @@
+import { skillEventHandShieldPoints } from '../pvp/skill_events';
 import { buildBenisonPrayer, consumeBenisonPrayers } from './priest/benison_dawnweave';
 // Effect dispatch (C4b): the per-effect switch that fans a RESOLVED ability's
 // `effects[]` into damage, auras, CC, threat, combo, pets, healing, ground-AoE,
@@ -1694,14 +1695,17 @@ export function runEffects(
           kind: 'absorb',
           remaining: eff.duration,
           duration: eff.duration,
+          // The Common Hand: a dealt shield holds a fixed share of the
+          // shielded fighter's health, whatever the caster's gear.
           value:
+            skillEventHandShieldPoints(ctx, shieldTarget, ability.id) ??
             eff.amount +
-            Math.round(p.maxHp * (eff.casterMaxHpPct ?? 0)) +
-            absorbBonus(
-              p.healPower,
-              eff.spellPowerCoeff ?? 0,
-              talentHealMult * (1 + mods.global.absorbPct),
-            ),
+              Math.round(p.maxHp * (eff.casterMaxHpPct ?? 0)) +
+              absorbBonus(
+                p.healPower,
+                eff.spellPowerCoeff ?? 0,
+                talentHealMult * (1 + mods.global.absorbPct),
+              ),
           sourceId: p.id,
           school: ability.school,
         });

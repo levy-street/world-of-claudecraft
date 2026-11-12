@@ -23,11 +23,45 @@ export interface CastBarState {
   label: string;
   /** the cast is the fishing channel → renderer shows the localized fishing label */
   fishing: boolean;
+  /** A skill event tell: a bar with no countdown of its own, so no timer text. */
+  untimed?: boolean;
 }
 
 const HIDDEN: CastBarState = { visible: false, channel: false, fill: 0, label: '', fishing: false };
 
+/** The skill event tells' cast labels: a Riposte fencer winding up, guarding or
+ *  open, and a Rite of Tongues chant, Sever wind-up or silence, show a bar with
+ *  the tell's name over their head (a chant and a wind-up fill as they run),
+ *  so every fighter can read it. The ids are discriminators the label resolver
+ *  localizes, never display text. */
+export const SKILL_EVENT_STANCE_CAST = {
+  lunge: 'skill_event_stance_lunge',
+  guard: 'skill_event_stance_guard',
+  open: 'skill_event_stance_open',
+  chant: 'skill_event_stance_chant',
+  sever: 'skill_event_stance_sever',
+  silenced: 'skill_event_stance_silenced',
+  brace: 'skill_event_stance_brace',
+} as const;
+
+/** The cast bar label of a tell: a Common Hand cast names its dealt ability
+ *  (an ability id the resolver localizes like any cast), the rest their stance. */
+function tellLabel(stance: NonNullable<Entity['eventStance']>, castId?: string): string {
+  return stance === 'hand' ? (castId ?? '') : SKILL_EVENT_STANCE_CAST[stance];
+}
+
 export function castBarState(e: Entity): CastBarState {
+  if (e.eventStance && !e.dead) {
+    return {
+      visible: true,
+      channel: e.eventStance === 'guard',
+      // A chant or a Sever wind-up fills as it runs; the other tells are full.
+      fill: e.eventStanceFill ?? 1,
+      label: tellLabel(e.eventStance, e.eventCastId),
+      fishing: false,
+      untimed: true,
+    };
+  }
   // corpses, doors/crates, and idle entities show nothing; guard the divide too
   if (e.dead || e.kind === 'object' || !e.castingAbility || e.castTotal <= 0) return HIDDEN;
   const remaining = Math.max(0, Math.min(1, e.castRemaining / e.castTotal));

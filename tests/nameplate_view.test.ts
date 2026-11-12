@@ -94,6 +94,14 @@ describe('nameplate_view - visibility', () => {
     expect(plan(me, viewer({ id: PLAYER_ID }), 2, true, true).hidden).toBe(false);
   });
 
+  it('keeps a skill event fighter plate on even with other players plates off', () => {
+    const other = (o: Record<string, unknown>) => ent({ id: 77, kind: 'player', ...o });
+    const off = (e: any) => plan(e, viewer(), 2, true, false, false).hidden;
+    expect(off(other({}))).toBe(true);
+    expect(off(other({ eventHearts: 3 }))).toBe(false);
+    expect(off(other({ eventStance: 'chant' }))).toBe(false);
+  });
+
   it('hides any entity beyond NAMEPLATE_RANGE and shows it just inside', () => {
     // NAMEPLATE_RANGE is the radius; just past it on z is hidden, just inside shows.
     expect(plan(ent({ pos: { x: 0, y: 0, z: NAMEPLATE_RANGE + 1 } })).hidden).toBe(true);

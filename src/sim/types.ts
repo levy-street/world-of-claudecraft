@@ -154,6 +154,11 @@ export type HonorReason =
   // King of the Hill (pvp/hill.ts): the once-a-minute trickle to a holder
   // standing inside the circle.
   | 'hill_hold'
+  // Hourly skill events (pvp/skill_events.ts): the winner's award, every other
+  // participant's award, and a player killing blow inside the event.
+  | 'skill_event_win'
+  | 'skill_event_complete'
+  | 'skill_event_kill'
   // The day's Honor world quests (src/sim/world_quest_honor_slots.ts): two
   // rotating world quests per realm cycle pay a flat Honor bonus on completion.
   | 'world_quest';
@@ -8257,6 +8262,27 @@ export interface Entity extends ClientMirroredEntityFields {
    *  plain world kill. Rides the entity wire (`hbn`) so every nearby client tags
    *  the nameplate and target frame; absent otherwise. */
   hillBounty?: number;
+  /** Hourly skill event hearts (src/sim/pvp/skill_events.ts): the hits this
+   *  player can still take in a heart fight. Rides the entity wire (`hrt`) every
+   *  tick so the overhead heart row and the player frame never lag a hit;
+   *  absent outside a heart fight. */
+  eventHearts?: number;
+  /** Riposte stance (src/sim/pvp/skill_event_riposte.ts): a lunge winding up, a
+   *  raised guard, or open after a riposte or an overheld guard. Rides the entity
+   *  wire (`stc`) every tick so every fencer sees the tell; absent otherwise. */
+  eventStance?: 'lunge' | 'guard' | 'open' | 'chant' | 'sever' | 'silenced' | 'brace' | 'hand';
+  /** The Common Hand: the dealt ability a `hand` stance is casting, so every
+   *  cast bar can name it. Rides the entity wire (`sca`) beside `stc`. */
+  eventCastId?: string;
+  /** How far the stance's bar is filled (0 to 1): a Rite of Tongues chant or
+   *  Sever wind-up in progress. Rides the entity wire (`stf`) beside `stc`;
+   *  absent for a stance shown as a full bar. */
+  eventStanceFill?: number;
+  /** Footprints in Ash (src/sim/pvp/skill_event_footprints.ts): hidden from
+   *  every other viewer (the server stops sending the entity; offline the
+   *  renderer hides it). Rides the entity wire (`uns`) so your own client can
+   *  show you that you are unseen; absent otherwise. */
+  eventUnseen?: boolean;
   /** WARFARE Vitality switch (src/sim/pvp/vitality.ts): false while the player
    *  stands in a PvE instance (a dungeon, raid, delve or rift floor), so honor
    *  gear's health bonus never reaches raid content. Absent means the open

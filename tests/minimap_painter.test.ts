@@ -712,7 +712,7 @@ afterEach(() => {
 });
 
 describe('minimap_painter: tiny procedural symbols carry identity without hue', () => {
-  it('keeps an off-screen hill circle in place while drawing its skull on the rim', () => {
+  it('keeps an off-screen hill circle in place while drawing its crown on the rim', () => {
     const trace = drawSymbols([
       {
         kind: 'hill',
@@ -727,41 +727,45 @@ describe('minimap_painter: tiny procedural symbols carry identity without hue', 
       x: -20,
       y: 80,
       radius: 50,
-      strokeStyle: 'paint:worldQuestAvailable',
+      strokeStyle: 'paint:pvpEvent',
       lineWidth: 2,
     });
-    expect(trace.filledArcs[0]).toMatchObject({ x: 12, y: 80, radius: 8 });
+    expect(trace.filledArcs).toContainEqual({ x: 12, y: 80, radius: 8 });
   });
-  it('draws the actual hill radius with a skull centred inside it on both profiles', () => {
+  it('draws the actual hill radius with a red crown on a dark badge on both profiles', () => {
     for (const profile of ['standard', 'compact'] as const) {
       const trace = drawSymbols(
         [{ kind: 'hill', mx: 70, my: 80, radius: 50, phase: 'active' }],
         profile,
       );
+      const badge = profile === 'compact' ? 6 : 8;
       expect(trace.strokedArcs).toContainEqual({
         x: 70,
         y: 80,
         radius: 50,
-        strokeStyle: 'paint:worldQuestAvailable',
+        strokeStyle: 'paint:pvpEvent',
         lineWidth: 2,
       });
-      // Filled badge, cranium, two sockets; no text-font skull fallback.
-      expect(trace.filledArcs).toHaveLength(4);
-      expect(trace.filledArcs[0]).toMatchObject({
-        x: 70,
-        y: 80,
-        radius: profile === 'compact' ? 6 : 8,
-      });
+      // Two glow discs (wider than the badge), then the badge itself.
+      expect(trace.filledArcs).toHaveLength(3);
+      expect(trace.filledArcs[0].radius).toBeGreaterThan(badge);
+      expect(trace.filledArcs[2]).toEqual({ x: 70, y: 80, radius: badge });
+      // The crown: one filled red polygon (a base and three points), no text.
+      const crowns = trace.filledPaths.filter(
+        (path) => path.fillStyle === 'paint:pvpEvent' && path.points.length === 9,
+      );
+      expect(crowns).toHaveLength(1);
+      expect(trace.minimapTextCalls).toBe(0);
     }
   });
 
-  it('distinguishes the warning skull with an outer ring', () => {
+  it('distinguishes the warning crown with an outer ring', () => {
     const trace = drawSymbols([{ kind: 'hill', mx: 70, my: 80, radius: 50, phase: 'warning' }]);
     expect(trace.strokedArcs).toContainEqual({
       x: 70,
       y: 80,
       radius: 11,
-      strokeStyle: 'paint:worldQuestAvailable',
+      strokeStyle: 'paint:pvpEvent',
       lineWidth: 2,
     });
   });

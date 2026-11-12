@@ -705,6 +705,9 @@ const UI_PURE_CORES = [
   // The potion Use lines of the item tooltip, moved out of Hud.itemTooltip.
   'src/ui/potion_tooltip_view.ts',
   'src/ui/hud/hill/hill_bar_view.ts',
+  'src/ui/hud/skill_event/skill_event_prompt_core.ts',
+  'src/ui/hud/skill_event/heart_bar_view.ts',
+  'src/ui/hud/vehicle/skill_event_action_bar_view.ts',
   // The Iron Cage escape prompt (the Gaol Turnkey's button-mash).
   'src/ui/hud/dungeon/cage_escape_view.ts',
   // Gaoler Ossick's chain alert (the Drowned Anchor, the Shackle Pair).
@@ -1470,6 +1473,7 @@ const RENDER_PURE_CORES = [
   'src/render/renderer_frame_telemetry_core.ts',
   'src/render/rift_death_zone_core.ts',
   'src/render/hill_ring_core.ts',
+  'src/render/skill_event_ground_core.ts',
   'src/render/scene_census_core.ts',
   'src/render/sea_mist_core.ts',
   'src/render/self_prediction_core.ts',
@@ -3143,6 +3147,7 @@ const UI_DOM_MODULES = [
   'src/ui/hud/treasure/ink_map_picker_controller.ts',
   'src/ui/hud/vehicle/shadow_action_bar_controller.ts',
   'src/ui/hud/vehicle/forge_action_bar_controller.ts',
+  'src/ui/hud/vehicle/skill_event_action_bar_controller.ts',
   'src/ui/account_portal_dom.ts',
   'src/ui/appearance_customizer.ts',
   // The WOC face builder's painter (its rules are woc_head_builder_model.ts).

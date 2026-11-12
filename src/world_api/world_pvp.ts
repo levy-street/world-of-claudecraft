@@ -137,6 +137,93 @@ export interface HillInfo {
   callout?: HillCalloutInfo | null;
 }
 
+/** The hourly skill event (src/sim/pvp/skill_events.ts) from one viewer's
+ *  seat: realm facts (kind, phase, arena) plus the viewer's own join state. */
+export interface SkillEventInfo {
+  kind: 'riposte' | 'footprints' | 'tongues' | 'bankshot' | 'common_hand';
+  /** 'warning' before the start (the arena is marked and joining is open),
+   *  'running' once it has begun. */
+  phase: 'warning' | 'running';
+  zoneId: string;
+  x: number;
+  z: number;
+  radius: number;
+  /** The live fighting ground's radius: the arena's, or for Footprints in Ash
+   *  the ash field as it closes. The ground ring is drawn at this radius. */
+  fieldRadius: number;
+  /** Whole minutes (rounded up) to the start while warning, to the hard cap
+   *  while running. */
+  minutesLeft: number;
+  joined: boolean;
+  /** The join prompt applies: near the arena, not joined and not flagged. */
+  canJoin: boolean;
+  participants: number;
+  yourKills: number;
+  /** A scoring event's tally (Rite of Tongues: Rites completed): yours, the
+   *  best anyone has, and the count that wins. Null for the other events. */
+  score: { yours: number; best: number; toWin: number } | null;
+  /** Your hearts left while you fight a heart event (Riposte, Footprints in
+   *  Ash, Bankshot): the HUD shows them in place of the health bar. Null when
+   *  you are not on hearts. */
+  hearts: number | null;
+  maxHearts: number;
+  /** Your event kit once you have joined: the verbs in bar order with the
+   *  seconds until each is ready, the ability you kept, and the abilities you
+   *  may keep (eligible ones you know). Null when you have not joined. */
+  kit: SkillEventKitInfo | null;
+  /** Bankshot's standing stones where they stand now (they close in with the
+   *  field), for everyone who can see the event. Null for the other events. */
+  stones: { x: number; z: number; r: number }[] | null;
+  /** The Common Hand: the four abilities in play (attack, control, defensive,
+   *  movement, in bar order), the next hand in the last seconds before the bell,
+   *  and the whole seconds to the bell. Null for the other events. */
+  hand: { current: string[]; next: string[] | null; bellIn: number } | null;
+}
+
+export interface SkillEventKitInfo {
+  verbs: { id: string; readyIn: number }[];
+  keepsake: string | null;
+  choices: string[];
+}
+
+/** One mark on the ash of Footprints in Ash: a footprint (real or thrown) or a
+ *  breath plume over someone standing still. Who left it is never sent. */
+export interface SkillEventMark {
+  /** Unique within the event, increasing: new marks have higher numbers. */
+  seq: number;
+  x: number;
+  z: number;
+  /** The walking direction (radians, the entity facing convention). */
+  heading: number;
+  kind: 'step' | 'breath';
+  /** When it was left, on the clock of SkillEventMarkBook.now. */
+  at: number;
+}
+
+/** A Bankshot bolt in flight: where it was at `at`, flying along (dx, dz) at
+ *  the book's `boltSpeed`. Harmless until its first bounce. */
+export interface SkillEventBolt {
+  id: number;
+  x: number;
+  z: number;
+  dx: number;
+  dz: number;
+  harmful: boolean;
+  at: number;
+}
+
+/** The skill event's marks a viewer can read, with the clock they are timed
+ *  on: Footprints in Ash marks for its fighters, and Bankshot bolts in flight
+ *  for anyone near the arena. */
+export interface SkillEventMarkBook {
+  /** Seconds, the same clock as every mark's and bolt's `at`. */
+  now: number;
+  marks: readonly SkillEventMark[];
+  bolts: readonly SkillEventBolt[];
+  /** Yards a second a bolt flies (the reader extrapolates between updates). */
+  boltSpeed: number;
+}
+
 export interface IWorldWorldPvp {
   worldPvpInfo: WorldPvpInfo | null;
   /** Raise (true) or lower (false) the flag; lowering starts the disarm
@@ -149,4 +236,18 @@ export interface IWorldWorldPvp {
   /** The announced or standing King of the Hill circle, or null while none
    *  is (between hills, or on a realm whose World PvP switch is set). */
   hillInfo: HillInfo | null;
+  /** The announced or running hourly skill event, or null between events. */
+  skillEventInfo: SkillEventInfo | null;
+  /** Join the skill event (the join prompt's Accept): raises the World PvP
+   *  flag. The sim refuses and explains out of reach or under level. */
+  joinSkillEvent(): void;
+  /** Press one of the event kit's verbs (the sim checks the event, the verb
+   *  and its timing). */
+  skillEventAction(verb: string): void;
+  /** Keep one of your eligible class abilities for the event. */
+  skillEventPickKeepsake(abilityId: string): void;
+  /** The ash marks you can read while you fight Footprints in Ash, and the
+   *  Bankshot bolts in flight near you (both empty otherwise). Marks fade
+   *  SKILL_EVENT_MARK_LIFETIME seconds after `at`. */
+  skillEventMarks(): SkillEventMarkBook;
 }

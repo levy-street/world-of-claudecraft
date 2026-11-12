@@ -3441,7 +3441,10 @@ export const ko_KR: EnTranslations = {
         "worldKill": "월드 처치",
         "worldAssist": "월드 처치 도움",
         "hillHold": "언덕 점거",
-        "worldQuest": "전역 퀘스트"
+        "worldQuest": "전역 퀘스트",
+        "skillEventWin": "skill event victory",
+        "skillEventComplete": "skill event fought",
+        "skillEventKill": "skill event kill"
       },
       "floatReasons": {
         "kill": "처치",
@@ -15949,6 +15952,84 @@ export const ko_KR: EnTranslations = {
       "alreadyReported": "최근에 이미 이 플레이어를 신고했습니다.",
       "reportingCharacterMissing": "신고 캐릭터를 찾을 수 없습니다."
     },
+    "skillEvent": {
+      "heartsLabel": "하트: {count}/{max}",
+      "names": {
+        "riposte": "반격",
+        "footprints": "잿빛 발자국",
+        "tongues": "언령의 의식",
+        "bankshot": "뱅크샷",
+        "common_hand": "공동의 패"
+      },
+      "goals": {
+        "riposte": "마지막까지 서 있는 검사가 승리합니다.",
+        "footprints": "마지막까지 하트가 남은 사람이 승리합니다.",
+        "tongues": "영창을 먼저 5번 마친 사람이 승리합니다.",
+        "bankshot": "마지막까지 서 있는 사람이 승리합니다.",
+        "common_hand": "먼저 결정타 4번을 넣은 사람이 승리합니다."
+      },
+      "verbs": {
+        "lunge": "찌르기",
+        "guard": "방어",
+        "feint": "페인트",
+        "sidestep": "옆걸음",
+        "sweep": "휩쓸기",
+        "hush": "발소리 죽이기",
+        "pebble": "조약돌",
+        "rite": "의식",
+        "sever": "끊기",
+        "false_start": "헛영창",
+        "shove": "밀치기",
+        "bolt": "화살",
+        "brace": "버티기",
+        "dash": "돌진"
+      },
+      "verbTips": {
+        "lunge": "{windup}초 동안 힘을 모은 뒤, 앞쪽 {range}미터 안에서 가장 가까운 상대를 찌릅니다. 적중하면 하트 1개를 빼앗습니다.",
+        "guard": "최대 {max}초 동안 방어 자세를 취합니다. 처음 {perfect}초 안에 들어온 찌르기는 되받아치며, 공격자는 {stagger}초 동안 빈틈을 보입니다. {max}초를 끝까지 버티면 {open}초 동안 빈틈을 보입니다. 다시 누르면 방어를 풉니다. 최근 {passive}초 안에 찌른 적이 있어야 방어할 수 있습니다.",
+        "feint": "자신의 힘 모으기를 취소해 상대의 이른 방어를 유도합니다. 재사용 대기시간 {feintCd}초.",
+        "sidestep": "앞으로 {distance}미터 돌진합니다. 재사용 대기시간 {sidestepCd}초.",
+        "sweep": "앞쪽의 짧은 부채꼴, {sweepRange}미터 안에서 가장 가까운 상대를 휩씁니다. 적중하면 하트 1개를 빼앗고 {reveal}초 동안 서로의 모습이 드러납니다. 빗나가면 자신만 드러납니다.",
+        "hush": "{hush}초 동안 발자국을 남기지 않고 걷습니다. 재사용 대기시간 {hushCd}초.",
+        "pebble": "앞쪽으로 {pebble}미터 길이의 가짜 발자국을 던집니다. 누군가 방금 걸어간 것처럼 보입니다. 재사용 대기시간 {pebbleCd}초.",
+        "rite": "제자리에서 {chant}초 동안 영창합니다. 끝내면 1점. 밀려나거나 기절, 이동 불가, 침묵에 걸리면 끊깁니다. 원 안에 다른 참가자가 있어야 합니다.",
+        "sever": "대상, 없으면 앞쪽의 가장 가까운 참가자를 방해합니다. {severWindup}초 준비 후 적중하며, 상대가 아직 영창 중이면 {silence}초 동안 침묵시킵니다. 아니면 자신이 침묵합니다. 재사용 대기시간 {severCd}초.",
+        "false_start": "자신의 영창을 즉시, 대가 없이 멈춥니다. 자신을 노린 끊기는 시전자를 침묵시킵니다.",
+        "shove": "닿는 거리의 참가자를 {shove}미터 밀쳐 영창을 끊습니다. 재사용 대기시간 {shoveCd}초.",
+        "bolt": "바라보는 방향으로 화살을 쏩니다. 돌이나 벽에 튕기기 전까지는 무해하며, 튕긴 뒤에는 처음 닿는 참가자(자신 포함)의 하트 1개를 빼앗습니다. 최대 {bounces}번 튕깁니다. 재사용 대기시간 {boltCd}초.",
+        "brace": "{braceWindow}초 동안 닿은 화살을 온 방향으로 되돌려 보내며, 그 화살은 내 것이 됩니다. 재사용 대기시간 {braceCd}초.",
+        "dash": "앞으로 {dash}미터 돌진합니다. 재사용 대기시간 {dashCd}초."
+      },
+      "stance": {
+        "lunge": "힘 모으는 중",
+        "guard": "방어 중",
+        "open": "빈틈",
+        "chant": "영창 중",
+        "sever": "끊는 중",
+        "silenced": "침묵",
+        "brace": "버티는 중",
+        "hand": "시전 중"
+      },
+      "ready": "준비 완료",
+      "unseen": "보이지 않음",
+      "seen": "모두에게 보임",
+      "score": "의식: {goal}회 중 {count}회. 최고: {best}.",
+      "scoreKills": "결정타: {goal}회 중 {count}회. 최고: {best}.",
+      "bellIn": "다음 패까지 {seconds}초",
+      "nextHand": "다음 패",
+      "handKinds": {
+        "attack": "공격",
+        "control": "제어",
+        "defensive": "방어",
+        "movement": "이동"
+      },
+      "handTip": "{name}({kind}), 이번 패에서 모두에게 주어졌습니다. 비용 없음. 다른 참가자에게 직격은 최대 생명력의 {direct}%, 지속 피해는 한 번에 {periodic}%를 주며, 치유는 내 생명력의 {heal}%를 회복하고, 보호막은 내 생명력의 {shield}%를 흡수합니다.",
+      "startsIn": "{minutes}분 후 시작",
+      "keepsake": "남긴 기술",
+      "keepsakeTip": "남긴 기술: {name}. 여기서 쓸 수 있는 유일한 직업 기술입니다.",
+      "keepsakeEmpty": "이번 이벤트에 남길 직업 기술 하나를 고르세요.",
+      "pickTitle": "남길 기술 하나 고르기"
+    },
     "prompts": {
       "partyInvite": "{name}님이 파티에 초대했습니다.",
       "joinParty": "파티 참가",
@@ -15962,7 +16043,9 @@ export const ko_KR: EnTranslations = {
       "acceptDuel": "결투 수락",
       "resurrectionOffer": "{name}님이 당신을 부활시키려 합니다. 수락하시겠습니까?",
       "acceptResurrection": "부활 수락",
-      "decline": "거절"
+      "decline": "거절",
+      "skillEventJoin": "PvP 이벤트 근처에 있습니다. 참가하시겠습니까? 수락하면 PvP가 켜지며, 다른 플레이어에게 처치될 수 있고 사망 시 지갑을 약탈당할 수 있습니다.",
+      "acceptSkillEvent": "수락"
     },
     "combat": {
       "floatingMiss": "빗나감",

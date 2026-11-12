@@ -15,6 +15,10 @@ export function canObserveEntity(sim: Sim, viewer: Entity, entity: Entity, d2: n
   if (entity.vaultOwnerPid !== undefined && !vaultPortalVisibleToPlayer(sim.ctx, entity, viewer.id))
     return false;
   if (entity.kind !== 'player') return true;
+  // Footprints in Ash (src/sim/pvp/skill_event_footprints.ts): an unseen
+  // fighter reaches no other client at all, party and spectators included,
+  // until a Sweep or the closing field reveals them.
+  if (entity.eventUnseen && viewer.id !== entity.id) return false;
   // A released spirit is seen only by its own party or raid, everywhere: a
   // ghost cannot be attacked, so a stranger's ghost is a free scout. Other
   // ghosts still see it (the classic graveyard crowd): one spirit learns

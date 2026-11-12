@@ -707,6 +707,21 @@ const baseEnTable = {
   'hill.rankGroup': "Hill ranking #{rank}: {name}'s group, held {minutes}.",
   'hill.rankSolo': 'Hill ranking #{rank}: {name}, held {minutes}.',
   'hill.vaultPoint': 'Your group held the hill longest: +1 PvP progress toward the Weekly Vault.',
+  // The hourly skill events (src/sim/pvp/skill_events.ts): the realm lines
+  // carry the event's English name, localized by locSkillEvent below.
+  'skillEvent.name.riposte': 'Riposte',
+  'skillEvent.name.footprints': 'Footprints in Ash',
+  'skillEvent.name.tongues': 'Rite of Tongues',
+  'skillEvent.name.bankshot': 'Bankshot',
+  'skillEvent.name.common_hand': 'The Common Hand',
+  'skillEvent.warning': '{name} begins in {zone} in {minutes}.',
+  'skillEvent.begun': '{name} has begun in {zone}.',
+  'skillEvent.won': '{winner} has won {name}.',
+  'skillEvent.noWinner': '{name} has ended with no winner.',
+  'skillEvent.joined': 'You have joined the event. Good luck.',
+  'skillEvent.tooFar': 'You are too far from the event to join it.',
+  'skillEvent.none': 'There is no event to join right now.',
+  'skillEvent.notYet': "You can't do that yet.",
   // The aid refusal (WORLD_PVP_AID_REFUSED_LINE, voiced by
   // src/sim/combat/casting_lifecycle.ts): placeholder-free, EXACT-mapped too.
   'worldPvp.aidRefused': 'You cannot aid a World PvP enemy: invite them to your party first.',
@@ -26575,6 +26590,19 @@ function locZone(name: string): string {
   const id = zoneNameToId.get(name);
   return id ? tEntity({ kind: 'zone', id, field: 'name' }) : name;
 }
+/** A skill event's English name (src/sim/pvp/skill_events.ts SKILL_EVENT_NAMES)
+ *  as the locale's own; an unknown name passes through. */
+const SKILL_EVENT_NAME_KEYS: Record<string, string> = {
+  Riposte: 'riposte',
+  'Footprints in Ash': 'footprints',
+  'Rite of Tongues': 'tongues',
+  Bankshot: 'bankshot',
+  'The Common Hand': 'common_hand',
+};
+function locSkillEvent(name: string): string {
+  const kind = SKILL_EVENT_NAME_KEYS[name];
+  return kind ? tSim(`skillEvent.name.${kind}` as SimMessageKey) : name;
+}
 /** A hill countdown's whole minutes as the locale's own duration phrase. */
 function hillMinutes(minutes: string): string {
   return durationText(Number(minutes) * 60);
@@ -31240,6 +31268,29 @@ const RULES: Rule[] = [
   {
     re: /^The hill still stands in (.+): it falls in (\d+) minutes?\.$/,
     build: (m) => tSim('hill.stillStands', { zone: locZone(m[1]), minutes: hillMinutes(m[2]) }),
+  },
+  // The hourly skill events (src/sim/pvp/skill_events.ts). The name group
+  // only matches the five event names, so no other line can be captured.
+  {
+    re: /^(Riposte|Footprints in Ash|Rite of Tongues|Bankshot|The Common Hand) begins in (.+) in (\d+) minutes?\.$/,
+    build: (m) =>
+      tSim('skillEvent.warning', {
+        name: locSkillEvent(m[1]),
+        zone: locZone(m[2]),
+        minutes: hillMinutes(m[3]),
+      }),
+  },
+  {
+    re: /^(Riposte|Footprints in Ash|Rite of Tongues|Bankshot|The Common Hand) has begun in (.+)\.$/,
+    build: (m) => tSim('skillEvent.begun', { name: locSkillEvent(m[1]), zone: locZone(m[2]) }),
+  },
+  {
+    re: /^(Riposte|Footprints in Ash|Rite of Tongues|Bankshot|The Common Hand) has ended with no winner\.$/,
+    build: (m) => tSim('skillEvent.noWinner', { name: locSkillEvent(m[1]) }),
+  },
+  {
+    re: /^(.+) has won (Riposte|Footprints in Ash|Rite of Tongues|Bankshot|The Common Hand)\.$/,
+    build: (m) => tSim('skillEvent.won', { winner: m[1], name: locSkillEvent(m[2]) }),
   },
   // The group shape first: a lone player's name never ends in "'s group".
   {

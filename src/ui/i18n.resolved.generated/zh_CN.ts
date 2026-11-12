@@ -3441,7 +3441,10 @@ export const zh_CN: EnTranslations = {
         "worldKill": "世界击杀",
         "worldAssist": "世界击杀助攻",
         "hillHold": "占据山丘",
-        "worldQuest": "世界任务"
+        "worldQuest": "世界任务",
+        "skillEventWin": "skill event victory",
+        "skillEventComplete": "skill event fought",
+        "skillEventKill": "skill event kill"
       },
       "floatReasons": {
         "kill": "击杀",
@@ -15949,6 +15952,84 @@ export const zh_CN: EnTranslations = {
       "alreadyReported": "你最近已经举报过该玩家。",
       "reportingCharacterMissing": "找不到举报角色。"
     },
+    "skillEvent": {
+      "heartsLabel": "红心：{count}/{max}",
+      "names": {
+        "riposte": "还击",
+        "footprints": "灰烬足迹",
+        "tongues": "言语之仪",
+        "bankshot": "折射弹",
+        "common_hand": "共同之牌"
+      },
+      "goals": {
+        "riposte": "最后站着的剑士获胜。",
+        "footprints": "最后仍有红心的人获胜。",
+        "tongues": "最先完成 5 次吟诵者获胜。",
+        "bankshot": "最后站着的人获胜。",
+        "common_hand": "最先完成 4 次击杀者获胜。"
+      },
+      "verbs": {
+        "lunge": "突刺",
+        "guard": "格挡",
+        "feint": "佯攻",
+        "sidestep": "侧步",
+        "sweep": "横扫",
+        "hush": "噤声",
+        "pebble": "石子",
+        "rite": "仪式",
+        "sever": "截断",
+        "false_start": "虚咏",
+        "shove": "推搡",
+        "bolt": "弹矢",
+        "brace": "架挡",
+        "dash": "冲刺"
+      },
+      "verbTips": {
+        "lunge": "蓄力 {windup} 秒，然后刺向你前方 {range} 码内最近的对手。命中会夺走 1 颗红心。",
+        "guard": "举起格挡，最多 {max} 秒。在前 {perfect} 秒内落下的突刺会被反击，攻击者将露出破绽 {stagger} 秒。格挡满 {max} 秒会让你露出破绽 {open} 秒。再按一次可放下格挡。只有在过去 {passive} 秒内突刺过才能格挡。",
+        "feint": "取消你自己的蓄力，引诱对手过早格挡。冷却 {feintCd} 秒。",
+        "sidestep": "向前冲刺 {distance} 码。冷却 {sidestepCd} 秒。",
+        "sweep": "向前方短扇形范围内{sweepRange}码内最近的战斗者挥击。命中夺走1颗心，并让你们双方显形{reveal}秒。未命中则只有你显形。",
+        "hush": "在{hush}秒内行走不留脚印。冷却时间{hushCd}秒。",
+        "pebble": "向前方投出一条{pebble}码长的假脚印，看起来像有人刚刚走开。冷却时间{pebbleCd}秒。",
+        "rite": "站定咏唱{chant}秒。完成得1分。被推动、昏迷、定身或沉默都会打断。圈内需有其他战斗者。",
+        "sever": "打断你的目标，或前方最近的战斗者。蓄力{severWindup}秒后生效：若对方仍在咏唱，则沉默{silence}秒；否则沉默的是你。冷却时间{severCd}秒。",
+        "false_start": "立即放弃自己的咏唱，没有代价。此时针对你的截断会让施放者沉默。",
+        "shove": "把触及范围内的战斗者推开{shove}码，打断其咏唱。冷却时间{shoveCd}秒。",
+        "bolt": "朝你面向的方向射出弹矢。弹到石头或墙之前它是无害的，之后会夺走它碰到的第一个战斗者（包括你）的1颗心。最多反弹{bounces}次。冷却时间{boltCd}秒。",
+        "brace": "在{braceWindow}秒内，飞到你身上的弹矢会沿原路飞回，并归你所有。冷却时间{braceCd}秒。",
+        "dash": "向前冲刺{dash}码。冷却时间{dashCd}秒。"
+      },
+      "stance": {
+        "lunge": "蓄力中",
+        "guard": "格挡中",
+        "open": "露出破绽",
+        "chant": "咏唱中",
+        "sever": "截断中",
+        "silenced": "沉默",
+        "brace": "架挡中",
+        "hand": "施放中"
+      },
+      "ready": "就绪",
+      "unseen": "隐形中",
+      "seen": "所有人可见",
+      "score": "仪式：{count}/{goal}。最高：{best}。",
+      "scoreKills": "击杀：{count}/{goal}。最高：{best}。",
+      "bellIn": "{seconds}秒后发下一手",
+      "nextHand": "下一手",
+      "handKinds": {
+        "attack": "攻击",
+        "control": "控制",
+        "defensive": "防御",
+        "movement": "移动"
+      },
+      "handTip": "{name}（{kind}），这一手发给所有人。没有消耗。对其他战斗者，直接命中造成其最大生命值的{direct}%，每次周期伤害{periodic}%，治疗恢复你的{heal}%，护盾吸收你的{shield}%。",
+      "startsIn": "{minutes} 分钟后开始",
+      "keepsake": "保留技能",
+      "keepsakeTip": "你保留的技能：{name}。这是你在此唯一能使用的职业技能。",
+      "keepsakeEmpty": "为本次活动选择你保留的一个职业技能。",
+      "pickTitle": "选择你保留的一个技能"
+    },
     "prompts": {
       "partyInvite": "{name} 邀请你加入队伍。",
       "joinParty": "加入队伍",
@@ -15962,7 +16043,9 @@ export const zh_CN: EnTranslations = {
       "acceptDuel": "接受决斗",
       "resurrectionOffer": "{name}想让你复活。是否接受？",
       "acceptResurrection": "接受复活",
-      "decline": "拒绝"
+      "decline": "拒绝",
+      "skillEventJoin": "你正靠近一场 PvP 活动。要参加吗？接受后将开启 PvP，你可能会被其他玩家击杀，死亡时钱袋会被掠夺。",
+      "acceptSkillEvent": "接受"
     },
     "combat": {
       "floatingMiss": "未命中",

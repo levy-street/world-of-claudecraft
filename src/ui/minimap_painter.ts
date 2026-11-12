@@ -29,7 +29,7 @@ import { activeWorldStripRegion, bgOriginAt, isBgPos, yumiMazeOriginAt } from '.
 import { yumiMazeLayout } from '../sim/yumi_maze_layout';
 import type { IWorld } from '../world_api';
 import { paintBgFieldAtlas } from './bg_field_relief_core';
-import { drawHillMapMarker } from './hill_map_marker_painter';
+import { drawHillMapMarker, mapPvpPulseNow } from './hill_map_marker_painter';
 import { drawBgAtlasMarks } from './hud/battleground';
 import {
   EMPTY_MAP_MARKER_ART,
@@ -1047,6 +1047,7 @@ export const MINIMAP_COLOR_TOKENS = {
   worldQuestAvailable: '--color-minimap-world-quest-available',
   worldQuestActive: '--color-minimap-world-quest-active',
   worldBoss: '--color-minimap-world-boss',
+  pvpEvent: '--color-minimap-pvp-event',
 } as const;
 
 /** The resolved minimap marker colors for one redraw. */
@@ -1441,7 +1442,7 @@ export class MinimapPainter {
         }
         case 'hill': {
           ctx.save();
-          ctx.strokeStyle = colors.worldQuestAvailable;
+          ctx.strokeStyle = colors.pvpEvent;
           ctx.lineWidth = 2;
           if (m.phase === 'warning') ctx.setLineDash([4, 3]);
           ctx.beginPath();
@@ -1452,8 +1453,9 @@ export class MinimapPainter {
             ctx,
             m.skull ? { ...m.skull, phase: m.phase } : m,
             profile === 'compact' ? 6 : 8,
-            colors.worldQuestAvailable,
+            colors.pvpEvent,
             colors.outline,
+            mapPvpPulseNow(),
           );
           break;
         }

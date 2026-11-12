@@ -1,6 +1,7 @@
 import { BENISON_4PC_WHISPER_HEAL_BONUS } from '../content/ignivar_set_bonuses';
 import { courierSummon } from '../courier';
 import { gliderActionsLocked } from '../glider_action_lock';
+import { skillEventCastAllowed } from '../pvp/skill_events';
 import { shadowActionsLocked } from '../shadow_action_lock';
 import { BENISON_WHISPER_AURA_ID } from './priest/benison_dawnweave';
 import { shadowPeriodicHit } from './priest/periodic_crit';
@@ -1078,6 +1079,8 @@ export function castAbility(
     gliderActionsLocked(meta.worldQuestLog)
   )
     return;
+  // Hourly skill events: a fighter casts only the one ability they kept.
+  if (!skillEventCastAllowed(ctx, p.id, abilityId)) return;
   let res = ctx.resolvedAbility(abilityId, p.id);
   if (!res) {
     ctx.error(p.id, 'You do not know that ability.');
