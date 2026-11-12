@@ -401,7 +401,7 @@ export function placeTop(corners, place) {
 }
 
 /** The inverse of an affine 4x4 (column major), applied to points and to directions. */
-function invertAffine(m) {
+export function invertAffine(m) {
   const a = [m[0], m[4], m[8], m[1], m[5], m[9], m[2], m[6], m[10]];
   const det =
     a[0] * (a[4] * a[8] - a[5] * a[7]) -

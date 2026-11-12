@@ -10,10 +10,10 @@
 // draws. Measured on the files shipped with the PR (2026-10-05), a world body in its
 // type's default look, the whole library resident:
 //
-//   Type A (male):   head   94 nodes / 69 meshes / 40 tint clones  ->  18 / 13 / 14
-//   Type B (female): head  110 nodes / 82 meshes / 43 tint clones  ->  18 / 14 / 13
+//   Type A (male):   head  106 nodes / 75 meshes / 46 tint clones  ->  18 / 13 / 14
+//   Type B (female): head  122 nodes / 88 meshes / 49 tint clones  ->  18 / 14 / 13
 //   whole body (the 36 nodes of the base rig and body, bare of armor):
-//                    A 130 nodes / 70 meshes -> 54 / 14,   B 146 / 83 -> 54 / 15
+//                    A 142 nodes / 76 meshes -> 54 / 14,   B 158 / 89 -> 54 / 15
 //
 // (nodes: every Object3D under the head bone, wrappers, piece nodes and meshes; a tint
 // clone is counted per file material, which is what the tier derivation keeps for these
@@ -315,9 +315,9 @@ describe('what a WOC world body carries of the shipped head library', () => {
       expect(now.head.meshes).toBe(drawn.reduce((n, node) => n + (meshesOf.get(node) ?? 0), 0));
       // the numbers this file's header reports (re-measure it when they move)
       const report = `${was.head.nodes}/${was.head.meshes}/${was.tintClones} -> ${now.head.nodes}/${now.head.meshes}/${now.tintClones}`;
-      expect(report).toBe(type === 'a' ? '94/69/40 -> 18/13/14' : '110/82/43 -> 18/14/13');
+      expect(report).toBe(type === 'a' ? '106/75/46 -> 18/13/14' : '122/88/49 -> 18/14/13');
       expect(`${was.body.nodes}/${was.body.meshes} -> ${now.body.nodes}/${now.body.meshes}`).toBe(
-        type === 'a' ? '130/70 -> 54/14' : '146/83 -> 54/15',
+        type === 'a' ? '142/76 -> 54/14' : '158/89 -> 54/15',
       );
       // at least four in five of the head's nodes, meshes and half its tint clones are gone
       expect(now.head.meshes * 4).toBeLessThan(was.head.meshes);

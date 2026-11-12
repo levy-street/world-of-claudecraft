@@ -13823,7 +13823,13 @@ export const pt_BR: EnTranslations = {
         "boxed": "Barba quadrada",
         "long": "Barba longa",
         "chops": "Costeletas largas",
-        "chinstrap": "Barba na mandíbula"
+        "chinstrap": "Barba na mandíbula",
+        "forked": "Forked Beard",
+        "sage": "The Fizwic",
+        "wild": "Wild Beard",
+        "walrus": "Walrus Moustache",
+        "whiskers": "Drooping Whiskers",
+        "imperial": "Imperial Moustache"
       },
       "nose": {
         "default": "Clássico",

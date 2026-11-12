@@ -13823,7 +13823,13 @@ export const id_ID: EnTranslations = {
         "boxed": "Janggut Kotak",
         "long": "Janggut Panjang",
         "chops": "Cambang Lebat",
-        "chinstrap": "Janggut Garis Rahang"
+        "chinstrap": "Janggut Garis Rahang",
+        "forked": "Forked Beard",
+        "sage": "The Fizwic",
+        "wild": "Wild Beard",
+        "walrus": "Walrus Moustache",
+        "whiskers": "Drooping Whiskers",
+        "imperial": "Imperial Moustache"
       },
       "nose": {
         "default": "Klasik",

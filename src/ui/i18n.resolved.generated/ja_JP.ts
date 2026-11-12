@@ -13823,7 +13823,13 @@ export const ja_JP: EnTranslations = {
         "boxed": "整えたフルひげ",
         "long": "長いひげ",
         "chops": "もみあげひげ",
-        "chinstrap": "チンストラップ"
+        "chinstrap": "チンストラップ",
+        "forked": "二股のひげ",
+        "sage": "フィズウィック",
+        "wild": "もじゃもじゃのひげ",
+        "walrus": "セイウチひげ",
+        "whiskers": "たれひげ",
+        "imperial": "カイゼルひげ"
       },
       "nose": {
         "default": "クラシック",

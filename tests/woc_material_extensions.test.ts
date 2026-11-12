@@ -163,8 +163,8 @@ function materialExtensions(glb: WocGlb, extension: string): Readonly<Record<str
 }
 
 describe('WOC character files: the glTF extensions they use', () => {
-  it('covers every GLB that ships: the 88 files of the delivery pin and the head catalog', () => {
-    expect(GLBS).toHaveLength(88);
+  it('covers every GLB that ships: the 100 files of the delivery pin and the head catalog', () => {
+    expect(GLBS).toHaveLength(100);
     // nothing ships outside the list this suite walks
     expect(FILES.map((file) => file.url)).toEqual(wocFilesOnDisk());
   });

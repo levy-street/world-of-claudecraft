@@ -13823,7 +13823,13 @@ export const ru_RU: EnTranslations = {
         "boxed": "Короткая борода",
         "long": "Длинная борода",
         "chops": "Бакенбарды",
-        "chinstrap": "Борода-ремешок"
+        "chinstrap": "Борода-ремешок",
+        "forked": "Раздвоенная борода",
+        "sage": "Физвик",
+        "wild": "Дикая борода",
+        "walrus": "Усы моржа",
+        "whiskers": "Висячие усы",
+        "imperial": "Имперские усы"
       },
       "nose": {
         "default": "Классический",

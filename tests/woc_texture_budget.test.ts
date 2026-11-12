@@ -232,7 +232,7 @@ describe('WOC character textures: size, mip levels and codec', () => {
       'armorMedium UASTC': 56,
       'armorTop UASTC': 56,
       'base UASTC': 2,
-      'beard ETC1S': 2,
+      'beard ETC1S': 14,
       'beards ETC1S': 2,
       'headCore UASTC': 2,
       'hair ETC1S': 35,

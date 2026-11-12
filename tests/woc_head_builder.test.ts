@@ -116,6 +116,12 @@ describe('radio groups', () => {
       'Long Beard',
       'Mutton Chops',
       'Chinstrap',
+      'Forked Beard',
+      'The Fizwic',
+      'Wild Beard',
+      'Walrus Moustache',
+      'Drooping Whiskers',
+      'Imperial Moustache',
     ]);
     const stops = rs.filter((b) => b.tabIndex === 0);
     expect(stops).toHaveLength(1);
@@ -142,7 +148,7 @@ describe('radio groups', () => {
     expect((document.activeElement as HTMLElement).dataset.focusKey).toBe('beard:none');
     key(document.activeElement!, 'ArrowLeft');
     // wraps to the last style
-    expect(last().headBeard).toBe('chinstrap');
+    expect(last().headBeard).toBe('imperial');
   });
 
   it('a click (Enter/Space on a button) picks and keeps focus on the pick', () => {

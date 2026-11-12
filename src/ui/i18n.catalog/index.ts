@@ -470,6 +470,13 @@ export const en = {
         long: 'Long Beard',
         chops: 'Mutton Chops',
         chinstrap: 'Chinstrap',
+        forked: 'Forked Beard',
+        // a coined name (web-verified 2026-11-11: no game, wiki or franchise uses it)
+        sage: 'The Fizwic',
+        wild: 'Wild Beard',
+        walrus: 'Walrus Moustache',
+        whiskers: 'Drooping Whiskers',
+        imperial: 'Imperial Moustache',
       },
       nose: {
         default: 'Classic',

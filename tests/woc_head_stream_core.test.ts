@@ -68,15 +68,27 @@ describe('wocHeadSlotUrls', () => {
     expect(b).toContain(`${DIR}/head_type_b_hair_undercut.glb`);
   });
 
-  it('fetches the shared beards file and the handlebar, nothing for clean shaven', () => {
+  it('fetches the shared beards file and each own-file beard, nothing for clean shaven', () => {
     // catalog order: the moustache (the shared file) comes before the handlebar
     expect(wocHeadSlotUrls('a', 'beard')).toEqual([
       `${DIR}/head_type_a_beards.glb`,
       `${DIR}/head_type_a_beard_handlebar.glb`,
+      `${DIR}/head_type_a_beard_forked.glb`,
+      `${DIR}/head_type_a_beard_sage.glb`,
+      `${DIR}/head_type_a_beard_wild.glb`,
+      `${DIR}/head_type_a_beard_walrus.glb`,
+      `${DIR}/head_type_a_beard_whiskers.glb`,
+      `${DIR}/head_type_a_beard_imperial.glb`,
     ]);
     expect(wocHeadSlotUrls('b', 'beard')).toEqual([
       `${DIR}/head_type_b_beards.glb`,
       `${DIR}/head_type_b_beard_handlebar.glb`,
+      `${DIR}/head_type_b_beard_forked.glb`,
+      `${DIR}/head_type_b_beard_sage.glb`,
+      `${DIR}/head_type_b_beard_wild.glb`,
+      `${DIR}/head_type_b_beard_walrus.glb`,
+      `${DIR}/head_type_b_beard_whiskers.glb`,
+      `${DIR}/head_type_b_beard_imperial.glb`,
     ]);
   });
 

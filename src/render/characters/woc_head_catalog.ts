@@ -162,6 +162,13 @@ const BEARDS: readonly WocHeadVariant[] = [
   v('beard', 'long'),
   v('beard', 'chops'),
   v('beard', 'chinstrap'),
+  // reshaped from the shipped beards: scripts/assets/woc_character/build_facial_hair.mjs
+  v('beard', 'forked'),
+  v('beard', 'sage'),
+  v('beard', 'wild'),
+  v('beard', 'walrus'),
+  v('beard', 'whiskers'),
+  v('beard', 'imperial'),
 ];
 
 export const WOC_HEAD_TYPES: Readonly<Record<WocHeadType, WocHeadTypeDef>> = {
@@ -288,7 +295,15 @@ const PACK_DIR = 'models/chars/players/woc';
 
 /** Beard ids that live in their own file (a texture of their own); every other
  *  beard shares the group file. */
-const BEARDS_WITH_OWN_FILE: ReadonlySet<string> = new Set(['handlebar']);
+const BEARDS_WITH_OWN_FILE: ReadonlySet<string> = new Set([
+  'handlebar',
+  'forked',
+  'sage',
+  'wild',
+  'walrus',
+  'whiskers',
+  'imperial',
+]);
 
 /** A type's core file: the base head, eyes, brows, noses, lips, ears, piercings. */
 export function wocHeadCoreUrl(type: WocHeadType): string {

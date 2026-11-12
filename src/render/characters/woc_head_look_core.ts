@@ -293,6 +293,14 @@ export const WOC_HEAD_TINT_TABLE: Readonly<
     hair_beard_chops: { role: 'hair', ref: lum(0.0603) },
     hair_beard_goatee: { role: 'hair', ref: lum(0.0603) },
     hair_beard_handlebar: { role: 'hair', ref: lum(0.0957) },
+    // reshaped from the long beard and the moustache (the shared atlas) and from the handlebar
+    // (its own): build_facial_hair.mjs keeps each source's texture, so its reference
+    hair_beard_forked: { role: 'hair', ref: lum(0.0603) },
+    hair_beard_sage: { role: 'hair', ref: lum(0.0603) },
+    hair_beard_wild: { role: 'hair', ref: lum(0.0603) },
+    hair_beard_walrus: { role: 'hair', ref: lum(0.0603) },
+    hair_beard_whiskers: { role: 'hair', ref: lum(0.0957) },
+    hair_beard_imperial: { role: 'hair', ref: lum(0.0957) },
     hair_beard_long: { role: 'hair', ref: lum(0.0603) },
     hair_beard_moustache: { role: 'hair', ref: lum(0.0603) },
     brow: { role: 'brow', ref: lum(0.023) },
@@ -336,6 +344,14 @@ export const WOC_HEAD_TINT_TABLE: Readonly<
     hair_beard_chops: { role: 'hair', ref: lum(0.0603) },
     hair_beard_goatee: { role: 'hair', ref: lum(0.0603) },
     hair_beard_handlebar: { role: 'hair', ref: lum(0.0957) },
+    // reshaped from the long beard and the moustache (the shared atlas) and from the handlebar
+    // (its own): build_facial_hair.mjs keeps each source's texture, so its reference
+    hair_beard_forked: { role: 'hair', ref: lum(0.0603) },
+    hair_beard_sage: { role: 'hair', ref: lum(0.0603) },
+    hair_beard_wild: { role: 'hair', ref: lum(0.0603) },
+    hair_beard_walrus: { role: 'hair', ref: lum(0.0603) },
+    hair_beard_whiskers: { role: 'hair', ref: lum(0.0957) },
+    hair_beard_imperial: { role: 'hair', ref: lum(0.0957) },
     hair_beard_long: { role: 'hair', ref: lum(0.0603) },
     hair_beard_moustache: { role: 'hair', ref: lum(0.0603) },
     brow: { role: 'brow', ref: lum(0.0534) },

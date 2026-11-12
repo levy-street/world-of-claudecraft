@@ -13823,7 +13823,13 @@ export const zh_TW: EnTranslations = {
         "boxed": "短絡腮鬍",
         "long": "長鬍鬚",
         "chops": "絡腮鬢角",
-        "chinstrap": "下顎線鬍"
+        "chinstrap": "下顎線鬍",
+        "forked": "分叉鬍鬚",
+        "sage": "菲茲威克",
+        "wild": "狂野大鬍子",
+        "walrus": "海象鬍",
+        "whiskers": "垂鬚",
+        "imperial": "翹尖八字鬍"
       },
       "nose": {
         "default": "經典",

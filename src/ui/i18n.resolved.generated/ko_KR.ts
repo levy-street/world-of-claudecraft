@@ -13823,7 +13823,13 @@ export const ko_KR: EnTranslations = {
         "boxed": "짧게 다듬은 수염",
         "long": "긴 수염",
         "chops": "구레나룻 수염",
-        "chinstrap": "턱선 수염"
+        "chinstrap": "턱선 수염",
+        "forked": "갈래 수염",
+        "sage": "피즈윅",
+        "wild": "덥수룩한 수염",
+        "walrus": "바다코끼리 콧수염",
+        "whiskers": "늘어진 콧수염",
+        "imperial": "황제 콧수염"
       },
       "nose": {
         "default": "클래식",

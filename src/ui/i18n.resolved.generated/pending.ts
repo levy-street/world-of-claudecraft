@@ -10,27 +10,63 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "auth.wocHead.beard.forked",
+    "auth.wocHead.beard.imperial",
+    "auth.wocHead.beard.sage",
+    "auth.wocHead.beard.walrus",
+    "auth.wocHead.beard.whiskers",
+    "auth.wocHead.beard.wild",
     "auth.wocHead.hair.mullet",
     "auth.wocHead.hair.pompadour"
   ],
   "es_ES": [
+    "auth.wocHead.beard.forked",
+    "auth.wocHead.beard.imperial",
+    "auth.wocHead.beard.sage",
+    "auth.wocHead.beard.walrus",
+    "auth.wocHead.beard.whiskers",
+    "auth.wocHead.beard.wild",
     "auth.wocHead.hair.mullet",
     "auth.wocHead.hair.pompadour"
   ],
   "fr_FR": [
+    "auth.wocHead.beard.forked",
+    "auth.wocHead.beard.imperial",
+    "auth.wocHead.beard.sage",
+    "auth.wocHead.beard.walrus",
+    "auth.wocHead.beard.whiskers",
+    "auth.wocHead.beard.wild",
     "auth.wocHead.hair.mullet",
     "auth.wocHead.hair.pompadour"
   ],
   "fr_CA": [
+    "auth.wocHead.beard.forked",
+    "auth.wocHead.beard.imperial",
+    "auth.wocHead.beard.sage",
+    "auth.wocHead.beard.walrus",
+    "auth.wocHead.beard.whiskers",
+    "auth.wocHead.beard.wild",
     "auth.wocHead.hair.mullet",
     "auth.wocHead.hair.pompadour"
   ],
   "en_CA": [],
   "it_IT": [
+    "auth.wocHead.beard.forked",
+    "auth.wocHead.beard.imperial",
+    "auth.wocHead.beard.sage",
+    "auth.wocHead.beard.walrus",
+    "auth.wocHead.beard.whiskers",
+    "auth.wocHead.beard.wild",
     "auth.wocHead.hair.mullet",
     "auth.wocHead.hair.pompadour"
   ],
   "de_DE": [
+    "auth.wocHead.beard.forked",
+    "auth.wocHead.beard.imperial",
+    "auth.wocHead.beard.sage",
+    "auth.wocHead.beard.walrus",
+    "auth.wocHead.beard.whiskers",
+    "auth.wocHead.beard.wild",
     "auth.wocHead.hair.mullet",
     "auth.wocHead.hair.pompadour"
   ],
@@ -39,39 +75,93 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "auth.wocHead.beard.forked",
+    "auth.wocHead.beard.imperial",
+    "auth.wocHead.beard.sage",
+    "auth.wocHead.beard.walrus",
+    "auth.wocHead.beard.whiskers",
+    "auth.wocHead.beard.wild",
     "auth.wocHead.hair.mullet",
     "auth.wocHead.hair.pompadour"
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "auth.wocHead.beard.forked",
+    "auth.wocHead.beard.imperial",
+    "auth.wocHead.beard.sage",
+    "auth.wocHead.beard.walrus",
+    "auth.wocHead.beard.whiskers",
+    "auth.wocHead.beard.wild",
     "auth.wocHead.hair.mullet",
     "auth.wocHead.hair.pompadour"
   ],
   "nl_NL": [
+    "auth.wocHead.beard.forked",
+    "auth.wocHead.beard.imperial",
+    "auth.wocHead.beard.sage",
+    "auth.wocHead.beard.walrus",
+    "auth.wocHead.beard.whiskers",
+    "auth.wocHead.beard.wild",
     "auth.wocHead.hair.mullet",
     "auth.wocHead.hair.pompadour"
   ],
   "pl_PL": [
+    "auth.wocHead.beard.forked",
+    "auth.wocHead.beard.imperial",
+    "auth.wocHead.beard.sage",
+    "auth.wocHead.beard.walrus",
+    "auth.wocHead.beard.whiskers",
+    "auth.wocHead.beard.wild",
     "auth.wocHead.hair.mullet",
     "auth.wocHead.hair.pompadour"
   ],
   "id_ID": [
+    "auth.wocHead.beard.forked",
+    "auth.wocHead.beard.imperial",
+    "auth.wocHead.beard.sage",
+    "auth.wocHead.beard.walrus",
+    "auth.wocHead.beard.whiskers",
+    "auth.wocHead.beard.wild",
     "auth.wocHead.hair.mullet",
     "auth.wocHead.hair.pompadour"
   ],
   "tr_TR": [
+    "auth.wocHead.beard.forked",
+    "auth.wocHead.beard.imperial",
+    "auth.wocHead.beard.sage",
+    "auth.wocHead.beard.walrus",
+    "auth.wocHead.beard.whiskers",
+    "auth.wocHead.beard.wild",
     "auth.wocHead.hair.mullet",
     "auth.wocHead.hair.pompadour"
   ],
   "sv_SE": [
+    "auth.wocHead.beard.forked",
+    "auth.wocHead.beard.imperial",
+    "auth.wocHead.beard.sage",
+    "auth.wocHead.beard.walrus",
+    "auth.wocHead.beard.whiskers",
+    "auth.wocHead.beard.wild",
     "auth.wocHead.hair.mullet",
     "auth.wocHead.hair.pompadour"
   ],
   "vi_VN": [
+    "auth.wocHead.beard.forked",
+    "auth.wocHead.beard.imperial",
+    "auth.wocHead.beard.sage",
+    "auth.wocHead.beard.walrus",
+    "auth.wocHead.beard.whiskers",
+    "auth.wocHead.beard.wild",
     "auth.wocHead.hair.mullet",
     "auth.wocHead.hair.pompadour"
   ],
   "da_DK": [
+    "auth.wocHead.beard.forked",
+    "auth.wocHead.beard.imperial",
+    "auth.wocHead.beard.sage",
+    "auth.wocHead.beard.walrus",
+    "auth.wocHead.beard.whiskers",
+    "auth.wocHead.beard.wild",
     "auth.wocHead.hair.mullet",
     "auth.wocHead.hair.pompadour"
   ]

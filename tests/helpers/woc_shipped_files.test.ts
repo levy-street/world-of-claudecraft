@@ -177,7 +177,7 @@ describe('the shipped file list', () => {
       ['headCore', 2],
       ['hair', 24],
       ['beards', 2],
-      ['beard', 2],
+      ['beard', 14],
       ['underArmor', 16],
     ]);
   });
