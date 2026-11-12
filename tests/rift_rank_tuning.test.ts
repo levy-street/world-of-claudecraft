@@ -48,6 +48,7 @@ import {
   isSetPieceSeed,
   riftFloorCount,
 } from '../src/sim/rift/rift_gen';
+import { makeVaultSeed } from '../src/sim/rift/vault_seed';
 import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
@@ -993,6 +994,29 @@ describe('rift ranks: an S-rank rift is capped at 3 floors', () => {
         counts.add(riftFloorCount(s, baseLevel));
       }
       expect([...counts].sort(), `base ${baseLevel}`).toEqual([3, 4, 5, 6]);
+    }
+  });
+
+  it("the cap leaves every seed's own roll alone below S", () => {
+    // One seed, one roll: B and A read the same count, and so does C wherever
+    // it runs procedural. S is that same roll, clamped.
+    for (let s = 1; s <= 300; s++) {
+      const rolled = riftFloorCount(s, 25);
+      expect(riftFloorCount(s, 22), `seed ${s} B`).toBe(rolled);
+      if (!isSetPieceSeed(s)) expect(riftFloorCount(s, 20), `seed ${s} C`).toBe(rolled);
+      expect(riftFloorCount(s, 28), `seed ${s} S`).toBe(Math.min(rolled, RIFT_S_FLOOR_CAP));
+    }
+    // Literal anchors read off the generator before the cap existed, so a
+    // reshuffled stream cannot pass by agreeing with itself.
+    expect([1, 2, 3, 4, 5, 6, 7, 8].map((s) => riftFloorCount(s, 25))).toEqual([
+      4, 5, 3, 6, 4, 5, 6, 6,
+    ]);
+  });
+
+  it('a Buried Hoard opened at S level is still one room', () => {
+    for (const tier of [0, 1, 2, 3] as const) {
+      const seed = makeVaultSeed(tier, 7919 * (tier + 1));
+      expect(riftFloorCount(seed, 28), `tier ${tier}`).toBe(1);
     }
   });
 
