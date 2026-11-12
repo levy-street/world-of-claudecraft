@@ -1684,6 +1684,9 @@ function sanitizeCamp(v: unknown): CampDef | null {
   if (finiteNum(c.retiredSlots) && c.retiredSlots >= 1) {
     camp.retiredSlots = clamp(Math.floor(c.retiredSlots), 1, camp.count);
   }
+  // An off-stream camp (CampDef.offStream) draws from private sub-streams;
+  // dropping the flag on reload would move every later camp's shared draws.
+  if (c.offStream === true) camp.offStream = true;
   return camp;
 }
 

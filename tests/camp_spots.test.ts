@@ -195,6 +195,19 @@ describe('the map document keeps spots and retired slots', () => {
     ]);
     expect(camps[1].retiredSlots).toBe(2);
   });
+
+  it('keeps an off-stream camp off the shared stream across a reload', () => {
+    const doc = sanitizeMapDoc({
+      version: 1,
+      meta: { name: 'off stream' },
+      content: {
+        zones: [{ id: 'os', name: 'OS', zMin: 500, zMax: 700, hub: { x: 600, z: 600 } }],
+        camps: [{ ...BASE, offStream: true }, { ...BASE, offStream: 'yes' }, BASE],
+      },
+    });
+    const camps = doc?.content.camps ?? [];
+    expect(camps.map((c) => c.offStream)).toEqual([true, undefined, undefined]);
+  });
 });
 
 describe('the map document keeps a sane quest hub', () => {
