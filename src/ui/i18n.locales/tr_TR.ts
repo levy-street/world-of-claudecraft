@@ -5382,7 +5382,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'itemUi.vendor.buyQuantityInput': 'Alınacak miktar',
   'itemUi.vendor.buyQuantityConfirm': 'Satın Al',
   'entities.abilities.greater_invisibility.description':
-    '20 sn boyunca gözden kaybolursun ve zamana yayılan 2 hasar etkisini kaldırırsın. Görünmezlik sona erdiğinde 2 sn boyunca %90 daha az hasar alırsın. (büyücü yeteneği)',
+    'En fazla 20 sn boyunca görünmez olur, düşmanların tehdidini ve hedeflemesini üzerinden düşürür ve üzerindeki en fazla 2 zamana yayılı hasar etkisini kaldırırsın. Saldırmak, büyü yapmak veya hasar almak etkiyi erken bitirir. Bittiğinde 2 sn boyunca %90 daha az hasar alırsın. (Büyücü yeteneği)',
   'entities.items.fine_copper_ore.name': 'Kaliteli Bakır Cevheri',
   'entities.items.fine_iron_ore.name': 'Kaliteli Demir Cevheri',
   'entities.items.fine_thorium_ore.name': 'Kaliteli Toryum Cevheri',
@@ -5742,25 +5742,25 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'cardDuel.waitingOnOpponent': 'Rakibinin kartı bekleniyor...',
   'cardDuel.yourTurn': 'Kart oyna',
   'entities.abilities.arcane_surge.description':
-    "Düşmanın içinden ham aether dalgası geçirerek {damage} hasar verir. Her kullanım bir Gizemli Yük bırakır: bu yük bir sonraki Aether Dalgası'nın hasarını ve çeviri hızını artırır (her biri %5 daha hızlı) ama mana maliyetini keskin şekilde yükseltir; en fazla 4 yığın yapılabilir. Aether Okları yükleri harcar. Her kullanım aynı zamanda Aether Atılımı'nı harekete geçirebilir ve bir sonraki Aether Dalgası'nı ücretsiz ve iki kat daha hızlı hale getirebilir.",
+    'Ham aether dalgasını düşmanın içinden geçirerek {damage} Gizemli hasar verir ve en fazla 4 olmak üzere, 10 sn süren ve her kullanımda yenilenen bir Gizemli Yük kazandırır. Her Gizemli Yük, sonraki Aether Dalgasının %30 daha fazla hasar vermesini ve %5 daha hızlı okunmasını sağlar, ancak mana maliyetini iki katına çıkarır. Aether Okları yükleri harcar. Her kullanım %25 ihtimalle Aether Atılımı verir: 15 sn içindeki sonraki Aether Dalgan mana harcamaz ve iki kat hızlı okunur.',
   'entities.abilities.arcane_surge.name': 'Aether Dalgası',
   'entities.abilities.blizzard.name': 'Kar Fırtınası',
   'entities.abilities.brain_freeze.name': 'Beyin Donması',
   'entities.abilities.dragons_breath.description':
-    'Genişleyen bir alev nefesi biriktirmek için basılı tut, ardından bir koni şeklinde bırak. Daha uzun şarjlar daha uzağa ulaşır ve daha fazla hasar verir. Vurulan düşmanlar yönelim kaybeder; hasar bu etkiyi bozar. Azami şarj her zaman kritik vurur ve Sıcak Seri için bir kez sayılır. (Ateş)',
+    "Şarj etmek için basılı tut, sonra bir alev konisi bırak. 4 şarj aşamasının her biri daha uzağa ve daha geniş alana ulaşır (6 m'den 12 m'ye) ve daha sert vurur (32 ila 40 temel Ateş hasarından tam şarjda 90 ila 110'a); ne kadar uzun şarj edersen Büyü Gücü bonusu o kadar büyür. Vurulan düşmanlar şarj aşamasına göre 1 ila 3 sn yönelim kaybı yaşar; her hasar bunu bozar. Tam şarj her zaman kritik vurur. Her nefes, kaç düşmana vurursa vursun Sıcak Seri için bir kez sayılır. (Ateş)",
   'entities.abilities.dragons_breath.name': 'Ejderha Nefesi',
   'entities.abilities.fingers_of_frost.description':
-    "Ayaz Mızrağı'nın 2 yüke kadar Donmuş Parmaklar kazandırma ihtimali %15'tir: bir sonraki Ice Lance hedefi donmuş gibi değerlendirir. (Don)",
+    'Her Ayaz Mızrağı isabeti, %15 ihtimalle 15 sn süren bir Don Parmakları şarjı verir, en fazla 2 şarj. Her şarj, bir Buz Mızrağının hedefini donmuş saymasını sağlar. 2 şarjdayken gelen tetiklenme kaybolur. (Don)',
   'entities.abilities.fingers_of_frost.name': 'Don Parmakları',
   'entities.abilities.fireball_form.description':
     'Alev saçan bir köze dönüşerek hareket hızını {buff}% artır. Dönüşüm sırasında saldıramazsın veya büyü kullanamazsın. Normal formuna dönmek için yeniden kullan.',
   'entities.abilities.fireball_form.name': 'Kor Formu',
   'entities.abilities.flurry.name': 'Kış Kırbacı',
   'entities.abilities.glacial_front.description':
-    'Genişleyen bir don cephesi biriktirmek için basılı tut, ardından bir koni şeklinde bırak. Daha uzun şarjlar daha uzağa ulaşır ve daha fazla hasar verir. Vurulan tüm düşmanlar 4 saniye boyunca %50 yavaşlar. Azami şarj ayrıca onları 1 saniye kökler. (Don)',
+    "Şarj etmek için basılı tut, sonra bir don konisi bırak. 4 şarj aşamasının her biri daha uzağa ulaşır (7 m'den 16 m'ye) ve daha sert vurur (35 ila 42 temel Ayaz hasarından tam şarjda 88 ila 104'e); ne kadar uzun şarj edersen Büyü Gücü bonusu o kadar büyür. Vurulan tüm düşmanlar 4 sn boyunca %50 yavaşlar; tam şarj ayrıca onları 1 sn köklenir. (Don)",
   'entities.abilities.glacial_front.name': 'Buzul Cephesi',
   'entities.abilities.glacial_spike.description':
-    'Devasa bir buz dikeni çağırarak 5 Buz Parçası tüketir, {damage} Don hasarı verir ve hedefi 4 saniye olduğu yere dondurur. (Don)',
+    '5 Buz Parçası gerektirir. Devasa bir buz dikeni çağırır, 5 Buz Parçasının tümünü tüketerek {damage} Ayaz hasarı verir ve hedefi 4 sn köklenir. Ayaz Mızrağı her isabet ettiğinde veya bir Buz Küresi darbesi vurduğunda bir Buz Parçası kazanırsın, en fazla 5. (Don)',
   'entities.abilities.ice_lance.description':
     "Bir buz kıymığı fırlatarak {damage} Don hasarı verir; donmuş hedefe karşı üç kat etkilidir. Donmuş Parmaklar'ı veya Kışın Üşümesi'nin bir yükünü harcayarak hedefi donmuş gibi değerlendirir. (Don)",
   'entities.abilities.ice_lance.name': 'Buz Mızrağı',
@@ -5775,10 +5775,10 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Hedefi şimdiden bir kalp atışı uzaklaştırarak zamansal bir kabuk oluşturur ve zaman çizelgesi geri dökmeden önce 10 saniye boyunca {damage} hasarı emer.',
   'entities.abilities.temporal_barrier.name': 'Zamansal Bariyer',
   'entities.abilities.temporal_cascade.description':
-    'Grubunuza bir yankı dalgası gönderir: hedef ve dört yakın müttefiki aynı anda iyileştirilir ve her biri {duration} saniye işaretlenir; bu süre içinde verdiğin Gizemli hasar kısmen onların yankıları aracılığıyla geri dönerek onları iyileştirir. Eter Dalgası ve Eter Dartları her grup Yankısından eşit bir iyileştirme rezervi oluşturur ve bu rezerv, canı %60’ın altındaki işaretli müttefikler arasında eksik canlarına göre paylaştırılır. (Kronomansi)',
+    "Hedefi ve yakındaki en fazla 4 müttefiki, önce grup üyeleri olmak üzere iyileştirir ve her birine {duration} sn boyunca bir grup Zamansal Yankısı işareti koyar. Her iyileştirme, müttefikin eksik canının her %1'i için %3 artar. İşaretliyken, tek hedefli Gizemli hasarının %13'ü ve alan etkili Gizemli hasarının %6'sı her birini iyileştirir. Aether Dalgası ve Aether Okları ayrıca her grup Yankısından eşit bir iyileştirme rezervi ekler; bu rezerv, canı %60'ın altındaki işaretli müttefikler arasında eksik canlarına göre paylaştırılır. Zaten senin Zamansal Yankını taşıyan müttefik onu korur. (Kronomansi)",
   'entities.abilities.temporal_cascade.name': 'Zamansal Çağlayan',
   'entities.abilities.temporal_echo.description':
-    'Bir müttefiki daha sağlıklı bir anın yankısıyla işaretleyerek {damage} canı anında iyileştirir. {duration} saniye boyunca diğer tek hedefli Gizemli hasarının %{echoSinglePct}’i ve alan etkili Gizemli hasarının %{echoAreaPct}’i onu iyileştirir. Eter Dalgası ve Eter Dartları bunun yerine verdikleri hasarın %{echoDriverPct}’i kadar iyileştirir.',
+    "Bir müttefiki anında {damage} iyileştirir ve ona {duration} sn boyunca Zamansal Yankı işareti koyar. İşaretliyken, diğer tek hedefli Gizemli hasarının %{echoSinglePct}'i ve alan etkili Gizemli hasarının %{echoAreaPct}'i onu iyileştirir; Aether Dalgası ve Aether Okları bunun yerine verdikleri hasarın %{echoDriverPct}'i kadar iyileştirir. Aynı anda yalnızca bir Zamansal Yankın olabilir: yeniden kullanmak işareti taşır. Tam canın ötesindeki iyileştirme, azami canının %20'sine kadar Zamansal Kalkan olur.",
   'entities.abilities.temporal_echo.name': 'Zamansal Yankı',
   'entities.abilities.temporal_hourglass.description':
     "Seçilen konuma zamansal bir kum saati yerleştir. Bir düşmanın altına yerleştirildiğinde, PvE'de {hostilePveDuration} saniye, PvP'de {hostilePvpDuration} saniye askıya alır ve tüm eylemleri engeller; hasar etkiyi bozar. Ayaklarının dibine veya bir grup müttefikinin altına yerleştirildiğinde, {duration} saniye donukluk verir, hasarı ve eylemleri engeller, azami canın {healing}%'ini geri kazandırır ve bekleme sürelerinin sende {selfCooldownRecovery}% daha hızlı, müttefikte {allyCooldownRecovery}% daha hızlı iyileşmesini sağlar. Boş zemine yerleştirildiğinde, kum saati {groundDuration} saniye bekler ve üzerine basan ilk geçerli birimi etkiler. Yararlı aura manuel olarak kaldırılabilir.",
@@ -6000,7 +6000,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Ana Ekran uygulamasında cüzdan bağlantıları henüz mevcut değil. Phantom veya Solflare kullanmak için World of ClaudeCraft'ı Safari veya Chrome'da aç.",
   'wallet.walletAppUnavailable': '{wallet} hazırlanamadı. Bu pencereyi kapat ve tekrar dene.',
   'entities.abilities.primal_reflexes.description':
-    'İçgüdülerin keskinleşerek 6 sn boyunca savurma şansını %50 artırır.',
+    'İçgüdülerin keskinleşir; 6 sn boyunca savuşturma şansına 50 yüzde puanı ekler.',
   'entities.abilities.primal_reflexes.name': 'Yaban Refleksleri',
   'entities.abilities.sacred_bulwark.description':
     "{duration} sn boyunca, seni öldürebilecek bir sonraki düşman darbesi engellenir ve bunun yerine canın %35'e geri döner.",
@@ -6167,7 +6167,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Saldırgan bir dövüş duruşu: %10 daha fazla öfke üretirsin. Silahşor ve Koruma için varsayılan duruş.',
   'entities.abilities.battle_stance.name': 'Savaş Duruşu',
   'entities.abilities.berserker_stance.description':
-    'Pervasız bir dövüş duruşu: kritik vuruşların %3 daha sık gerçekleşir ve %3 daha sert vurur. Hiddet savaşçısı her zaman bu duruşta dövüşür.',
+    'Pervasız bir dövüş duruşu: %3 kritik vuruş şansı kazanır ve kritik vuruşların %3 daha fazla hasar verir. Hiddet savaşçısı her zaman bu duruşta dövüşür.',
   'entities.abilities.berserker_stance.name': 'Berserker Duruşu',
   'entities.abilities.breachmaker.description':
     'Hedefe silah hasarı artı {damage} vurur ve gardını kırarsın: ona karşı kendi saldırıların 8 sn boyunca %20 daha fazla hasar verir. (Silahşor)',
@@ -6185,13 +6185,13 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Gazaba gelmişken Çifte Darbe %15 daha fazla hasar verir. (Hiddet)',
   'entities.abilities.diabolical_twinstrike.name': 'Şeytani Çifte Darbe',
   'entities.abilities.die_by_sword.description':
-    'Savunma yeteneği: 8 sn boyunca %30 daha az hasar alır ve saldırıları çok daha sık savuşturursun.',
+    '8 sn boyunca %30 daha az hasar alır ve %30 savuşturma şansı kazanırsın.',
   'entities.abilities.die_by_sword.name': 'Kılıçla Ölüm',
   'entities.abilities.emboldening_roar.description':
-    'Yüreklendiren bir kükreme koparırsın: sen ve 40 yarda içindeki dost oyuncular Yüreklenirsiniz ve sonraki 3 yeteneğiniz garantili kritik vuruş olur. (Hiddet)',
+    'Sen ve 40 yarda içindeki müttefikler {duration} sn boyunca Yüreklenirsiniz: her birinizin kullandığı sonraki 3 hasar verici yetenek garantili kritik vuruş olur. (Hiddet)',
   'entities.abilities.emboldening_roar.name': 'Yüreklendiren Kükreme',
   'entities.abilities.enrage_passive.description':
-    'Pasif: gazaba gelmişken 4 sn boyunca %7 daha fazla hasar verir, %25 daha hızlı saldırır ve %10 daha hızlı hareket edersin. Kan Akıtma %30 olasılıkla seni gazaba getirir; Kızıl Hasat ise her zaman getirir. (Hiddet)',
+    'Pasif: Kan Akıtma %30 ihtimalle seni 4 sn boyunca gazaba getirir, Kızıl Hasat ise her zaman getirir. Gazapken %7 daha fazla hasar verir, %25 daha hızlı saldırır ve %10 daha hızlı hareket edersin. (Hiddet)',
   'entities.abilities.enrage_passive.name': 'Kargaşa',
   'entities.abilities.faultline.description':
     'Yerden bir şok dalgası gönderirsin: önündeki 8 yarda içindeki düşmanlar {damage} hasar alır ve 3 sn sersemler. (Koruma)',
@@ -6200,10 +6200,10 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "10 sn boyunca %20 azaltılmış hasar alırsın ve bu süre boyunca Kan Akıtma seni azami canının %20'si kadar iyileştirir. (Hiddet)",
   'entities.abilities.furious_mending.name': 'Öfkeli Onarım',
   'entities.abilities.heroic_leap.description':
-    'Hedef bölgeye sıçrar ve yere indiğinde yakındaki düşmanlara {damage} hasar verirsin.',
+    'Hedef alana sıçrar ve indiğinde 6 yarda içindeki tüm düşmanlara {damage} Fiziksel hasar verir.',
   'entities.abilities.heroic_leap.name': 'Savaş Sıçrayışı',
   'entities.abilities.intimidating_shout.description':
-    '8 m içindeki en fazla 5 düşmanı 4 sn boyunca korkuyla kaçırtan dehşet verici bir haykırış. Hasar etkiyi bozabilir.',
+    "8 yarda içindeki en fazla 5 düşmanı 4 sn boyunca korkuyla kaçırtır. Korkmuş bir düşmana yapılan her vuruş korkuyu bozma şansı taşır; azami canının %10'u veya daha fazlası kadar bir vuruş ise her zaman bozar.",
   'entities.abilities.intimidating_shout.name': 'Gözdağı Narası',
   'entities.abilities.iron_resolve.description':
     'Dişini sıkıp acıyı yok say: bir kalkan, kullanıldığı andaki azami canının {damage}% kadarı hasarı en fazla {duration} sn boyunca soğurur. (Koruma)',
@@ -6224,16 +6224,16 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Yiğitçe bir kükreme salarak sana ve 40 metre içindeki grup üyelerine 10 sn boyunca %20 ek azami sağlık kazandırır. Koruma: süre boyunca ayrıca %5 daha az hasar alırlar.',
   'entities.abilities.rallying_cry.name': 'Yiğitlik Kükremesi',
   'entities.abilities.recklessness.description':
-    'Gazaba gelirsin: öfke üretimin %50, kritik vuruş şansın %20 artar, 12 sn sürer.',
+    '12 sn boyunca %50 daha fazla öfke üretir ve %20 kritik vuruş şansı kazanırsın.',
   'entities.abilities.recklessness.name': 'Pervasızlık',
   'entities.abilities.red_harvest.description':
-    'Her şeyini harca: çılgınca üç kez vurursun; her vuruş %65 silah hasarı artı {damage} verir ve seni her zaman gazaba getirir. (Hiddet)',
+    'Üç kez vurur; her vuruş %65 silah hasarı artı {damage} verir ve seni her zaman {duration} sn boyunca gazaba getirir. (Hiddet)',
   'entities.abilities.red_harvest.name': 'Kızıl Hasat',
   'entities.abilities.revenge.description':
-    'Geniş bir yayla saldırır, önündeki tüm düşmanlara Fiziksel hasar verirsin. 5 hedefin üzerinde hasar azalır. Bir saldırıyı savuşturduğunda ya da karşıladığında bir sonraki İntikam hiç öfkeye mal olmayabilir. (Protection)',
+    '8 yarda içinde önündeki tüm düşmanlara {damage} Fiziksel hasar vurur. 5 hedefin üzerinde her vuruş azaltılır ve toplam 5 vuruşa eşit olur. Bir yaratığın yakın dövüş saldırısını savuşturduğunda veya karşıladığında, 10 sn içindeki sonraki İntikamının hiç öfke harcamaması için %30 şansın vardır. (Koruma)',
   'entities.abilities.revenge.name': 'İntikam',
   'entities.abilities.sanguine_aura.description':
-    'Silahını düşmanlarının kanıyla donatırsın: sen ve yakın dövüşçü müttefiklerin 20 sn boyunca %10 saldırı hızı ve %10 hasar kazanırsınız.',
+    'Silahını düşmanlarının kanıyla donatırsın: sen ve her yakın dövüşçü grup üyesi, menzil fark etmeksizin, 20 sn boyunca %10 saldırı hızı kazanır ve %10 daha fazla hasar verir.',
   'entities.abilities.sanguine_aura.name': 'Kan Aurası',
   'entities.abilities.seasoned_soldier.description':
     'Kritik otomatik saldırıların %10 daha fazla öfke üretir. (Silahşor)',
@@ -6241,10 +6241,10 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.storm_bolt.description':
     'Silahını hedefe fırlatır, {damage} hasar verir ve onu 3 sn sersemletirsin.',
   'entities.abilities.sudden_death.description':
-    'Otomatik saldırıların, canı ne olursa olsun bir hedefe hiç öfke harcamadan Erken Mezar kullanmana izin verme şansı taşır. (Silahşor)',
+    'İsabet eden otomatik saldırılarının %10 ihtimalle 10 sn boyunca Ani Ölüm vermesi vardır: sonraki Erken Mezarın hiç öfke harcamaz ve herhangi bir canda olan bir hedefe kullanılabilir. (Silahşor)',
   'entities.abilities.sudden_death.name': 'Ani Ölüm',
   'entities.abilities.sweeping_strikes.description':
-    '12 sn boyunca tek hedefli saldırıların yakındaki 1 düşmana da tam hasarla vurur. (Silahşor)',
+    '12 sn boyunca tek hedefli yeteneklerinin her vuruşu aynı hasarı hedefinin 8 yarda içindeki 1 başka düşmana da verir. Otomatik saldırılar kopyalanmaz. (Silahşor)',
   'entities.abilities.sweeping_strikes.name': 'Genişleyen Yay',
   'entities.abilities.victory_rush.description':
     "Silah hasarı artı {damage} vurur ve azami canının %20'sini iyileştirirsin. Yalnızca bir düşman öldürdükten sonraki 20 sn içinde kullanılabilir.",
@@ -6299,25 +6299,25 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Fırlatma bıçaklarıyla 6 m içindeki tüm düşmanları biçer, {damage} fiziksel hasar verir ve 2 kombo puanı kazandırır. (Haydut yeteneği)',
   'entities.abilities.thieves_chorus.name': 'Hırsızlar Korosu',
   'entities.abilities.thieves_chorus.description':
-    'Islıkla verilen işaret grubu coşturur: saldırı, büyü ve kanal hızı 10 sn boyunca %10 artar. Yakın zamanda grup hızlandırması alan müttefikler yararlanamayacak kadar bitkindir. (Haydut yeteneği)',
+    '30 yarda içindeki grup veya akın müttefiklerinin saldırı, büyü ve kanalize hızını 10 sn boyunca %10 artırır. Etkilenen müttefikler 10 dk boyunca Hırsızlar Korosu, Savaş Davulları veya Zamansal Hızlanmadan yeniden yararlanamaz. (Hırsız yeteneği)',
   'entities.abilities.venomrend.name': 'Zehir Yarığı',
   'entities.abilities.venomrend.description':
-    'Zehir Ayinini tüketir: 22 artı kombo puanı başına 26 hasar vurur, kanamalarının kalan hasarını patlatır ve 25 enerji yeniler. (Knifework motoru)',
+    '6 Zehir Ayinini tüketir: {damage} Fiziksel hasar vurur, Kan Kaybında, Boğaz Telinde ve zehir yaranda kalan tüm hasarı anında verir, ardından 20 sn boyunca {overTime} hasar veren yeni bir zehir yarası uygular. 20 enerji geri kazandırır. (Suikast)',
   'entities.abilities.veilstrike.name': 'Perde Vuruşu',
   'entities.abilities.veilstrike.description':
-    'Alacakaranlık birikimini tüketerek 6 sn boyunca gölgeye bürünürsün: gizlilik açılışların açıkta çalışır ve %25 daha fazla hasar verirsin. (Skulduggery motoru)',
+    '6 sn boyunca: Alaca Örtüsü açılışların gizlilik olmadan ve her açıdan çalışır, %10 daha fazla hasar verirsin. İçindeki ilk Pusucunun Darben %50 daha fazla silah hasarı verir. (İncelik)',
   'entities.abilities.body_blow.name': 'Gövde Darbesi',
   'entities.abilities.body_blow.description':
     'Silah hasarının %130’u artı 10 vuran, 2 kombo puanı kazandıran ve Redline’ı bir kademe derinleştiren ağır bir darbe. (Thuggery motoru)',
   'entities.abilities.knockout_blow.name': 'Nakavt Darbesi',
   'entities.abilities.knockout_blow.description':
-    'Redline’ı nakavtla bitirir: 45 artı kombo puanı başına 35 vurur, her Redline kademesinde %25 daha sert olur ve 25 enerji geri kazandırır. (Thuggery motoru)',
+    "Redline'ı bir nakavtla bitirir: {damage} Fiziksel hasar vurur; Redline sırasında attığın her Gövde Darbesi için %25 daha sert vurur (en fazla 3) ve 25 enerji geri kazandırır. Hasar Saldırı Gücü ile artar. Redline bitmeden kullan, yoksa nakavt kaybolur. (Dövüş)",
   'entities.abilities.venom_dart.name': 'Zehirli Dart',
   'entities.abilities.venom_dart.description':
     'Zehirli bir dart fırlatarak {damage} doğa hasarı verir. 1 kombo puanı kazandırır. Knifework: Zehir Yarığı yaranızı 6 sn uzatır, en fazla 20 sn.',
   'entities.abilities.smoke_screen.name': 'Duman Perdesi',
   'entities.abilities.smoke_screen.description':
-    'Bir duman bulutunda kaybolur ve 8 sn. boyunca kaçınma şansını %30 artırırsın.',
+    'Çevreni dumanla sararak 8 sn boyunca savuşturma şansını %30 artırırsın.',
   'entities.abilities.spellsteal.description':
     'Bir düşmandan faydalı bir büyü etkisi çalar ve sana aktarır.',
   'entities.abilities.startle_shot.name': 'İrkilten Atış',
@@ -6325,7 +6325,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Hedefi {duration} sn. boyunca sersemleten vahşi bir atış. Alınan her hasar etkiyi bozar.',
   'entities.abilities.typhoon.name': 'Tayfun',
   'entities.abilities.typhoon.description':
-    'Bir rüzgâr patlaması 8 metre içindeki tüm düşmanları senden 15 metre uzağa savurup sersemletir; hareketleri 4 sn boyunca %50 yavaşlar. Düşman oyuncular düz bir hat boyunca havaya fırlar: kenardan savrulurlarsa ilerlemeye devam edip düşme hasarı alırlar; ölümcül düşüş senin öldürmen sayılır.',
+    '8 m içindeki ve görüş hattındaki her düşmanı senden 15 m uzağa savurur ve sersemleterek hareketlerini 4 sn boyunca %50 yavaşlatır. Düşman oyuncular düz bir çizgide havaya fırlatılır: bir kenardan düşerlerse yola devam eder ve düşme hasarı alırlar; ölümcül bir düşüş senin öldürmen sayılır.',
   'entities.abilities.voidfeast.name': 'Hiçlik Ziyafeti',
   'entities.abilities.voidfeast.description':
     'Bir büyü etkisini (düşmandaki faydalı etkiyi veya müttefikteki zararlı etkiyi) yutar ve azami sağlığının %6’sını iyileştirir.',
@@ -7848,7 +7848,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_intellect.description': 'Zekayı 30 dakika boyunca {buff} artırır.',
   'entities.abilities.arcane_intellect.name': 'Aether Sezgisi',
   'entities.abilities.arcane_missiles.description':
-    'Düşmana Aether Okları fırlatır, 3 saniye boyunca her saniye {damage} Gizemli hasar verir.',
+    '3 sn boyunca kanalize ederek her biri {damage} Gizemli hasar veren 3 ok fırlatır. Tüm Gizemli Yüklerini harcar: her yük oklar arasında bölüşülen 9 Gizemli hasar ekler ve 4 yükte kanalize 3 yerine 5 ok fırlatır.',
   'entities.abilities.arcane_missiles.name': 'Aether Okları',
   'entities.abilities.arcane_shot.description':
     'Hedefi {damage} Arkane hasar için vurur. Hasar menzilli saldırı gücüyle artar.',
@@ -7857,7 +7857,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Küheylan suretine bürünerek hareket hızını 30 dakika boyunca %30 artırırsın. Etkin olduğu sürece, hasar almak seni sersemletir ve hareket hızını 2 saniyeliğine yarıya indirir (her isabet sersemlemeyi yeniler).',
   'entities.abilities.aspect_of_the_cheetah.name': 'Küheylan Sureti',
   'entities.abilities.aspect_of_the_hawk.description':
-    'Delice suretine bürünerek saldırı gücünü 30 dakika boyunca {buff} artırırsın.',
+    "Delice Sureti'ne bürünerek Saldırı Gücünü ve Menzilli Saldırı Gücünü 30 dk boyunca {buff} artırırsın.",
   'entities.abilities.aspect_of_the_hawk.name': 'Delice Sureti',
   'entities.abilities.aspect_of_the_monkey.description':
     'Sansar suretine bürünerek kaçınma şansını 30 dakika boyunca %8 artırırsın.',
@@ -7872,30 +7872,31 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Tüm grup üyelerinin saldırı gücünü 30 dakika boyunca %{buff} artıran bir nara.',
   'entities.abilities.battle_shout.name': 'Demir Nara',
   'entities.abilities.bear_charge.description':
-    'Bir düşmana hücum ederek 9 öfke üretir ve onu 1 saniye sersemletir. Sonraki 3 saniye boyunca Kedi Formu ücretsizdir ve hedefi sabitleyerek 4 saniye boyunca %50 yavaşlatır. 8-25 yarda menzil. Yalnızca Bruin Formu.',
+    'Henüz değilsen Bruin Formuna dönüşür, ardından bir düşmana hücum ederek 9 öfke üretir ve onu 1 sn sersemletir. Hücum bittikten sonra 3 sn boyunca (veya savaştan çıkana ya da hedef ölene kadar) Kedi Formu ücretsizdir ve hücum edilen hedefi Sabitler; hedefi 4 sn boyunca %50 yavaşlatır. Her formda kullanılabilir.',
   'entities.abilities.bear_charge.name': 'Bruin Hücumu',
   'entities.abilities.bear_form.description':
-    'Bir ayıya dönüş: zırh +%110, azami sağlık +%30, saldırı gücü büyük ölçüde artar, saldırıların öfke biriktirir ve %30 daha fazla tehdit üretir. İki kat hızlı vurursun ama vuruş başına hasar yarıya iner ve her vuruş iki kat öfke biriktirir. Herhangi bir forma bürünmek, kısa bir hareket hızı patlaması olan Sekme Adımı kazandırır. Büyücü formuna dönmek için tekrar kullan.',
+    'Bir ayıya dönüşürsün: zırh +%110, azami can +%30, saldırı gücü +15 artı Çevikliğin her puanı için 1,5; saldırıların öfke biriktirir ve %30 daha fazla tehdit üretir. İki kat hızlı vurursun ama vuruş başına hasar yarıya iner ve her vuruş iki kat öfke biriktirir. Herhangi bir forma bürünmek kısa bir hareket hızı patlaması olan Sekme Adımı verir. Büyücü formuna dönmek için tekrar kullan.',
   'entities.abilities.bear_form.name': 'Bruin Formu',
   'entities.abilities.berserker_rage.description':
-    'Kaynayan bir gazaba kapılarak 20 öfke üretir. (Savaşçı yeteneği)',
+    'Kaynayan bir gazaba kapılarak anında {rage} öfke üretir.',
   'entities.abilities.berserker_rage.name': 'Kaynayan Gazap',
   'entities.abilities.blessing_of_might.description':
     'Dost bir hedefe bir Kutsama yerleştirir, saldırı gücünü 5 dakika boyunca {buff} artırır.',
   'entities.abilities.blessing_of_might.name': 'Demir Yemini',
   'entities.abilities.blind.description':
-    'Hedefi kör eder, 8 saniye boyunca şaşkın şaşkın dolaşmasına neden olur. Herhangi bir hasar etkiyi bozar.',
+    'Hedefin gözlerine toprak atarak onu 8 sn boyunca etkisiz hale getirir. Her hasar etkiyi bozar.',
   'entities.abilities.blind.name': 'Toprak Fırlatma',
-  'entities.abilities.bloodrage.description': 'Can pahasına 10 öfke üretir.',
+  'entities.abilities.bloodrage.description':
+    "Azami canının %8'ini kaybederek {rage} öfke üretir. Bu seni öldüremez.",
   'entities.abilities.bloodrage.name': 'Kan Bedeli',
   'entities.abilities.bloodthirst.description':
-    'Bir kan çılgınlığıyla anında %60 silah hasarı artı {damage} veren bir saldırı yap. (Hiddet imzası)',
+    "%50 silah hasarı artı {damage} ile vurur, azami canının %3'ü kadar seni iyileştirir ve {rage} öfke üretir. %30 ihtimalle {duration} sn boyunca seni gazaba getirir. (Hiddet imzası)",
   'entities.abilities.bloodthirst.name': 'Kan Akıtma',
   'entities.abilities.cat_form.description':
-    'Kediye dönüş: çeviklik seviyenle artar, saldırı gücü +8 artı seviye başına 2, saldırılar enerji ve kombo puanı kullanır, %15 hızlı hareket eder ve %29 az tehdit üretirsin. Her form değişimi kısa bir hız artışı olan Ağır Aksak Adım verir. Büyücü formuna dönmek için yeniden kullan.',
+    'Kediye dönüşürsün: çeviklik + seviyenin yarısı (en az 2), saldırı gücü +8 artı seviye başına 2; saldırıların enerji ve kombo puanı kullanır, %15 daha hızlı hareket eder ve %29 daha az tehdit üretirsin. Herhangi bir forma bürünmek kısa bir hareket hızı patlaması olan Sekme Adımı verir. Büyücü formuna dönmek için tekrar kullan.',
   'entities.abilities.cat_form.name': 'Kedi Formu',
   'entities.abilities.charge.description':
-    'Bir düşmana hücum ederek 9 öfke üretir ve onu 1 saniye sersemletir. 8-25 yarda menzil.',
+    'Bir düşmana hücum edip onu 1 sn sersemletir ve 9 öfke üretir.',
   'entities.abilities.charge.name': 'Atılım',
   'entities.abilities.cheap_shot.name': 'Mide Yumruğu',
   'entities.abilities.claw.name': 'Yırtan Pençe',
@@ -7912,7 +7913,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'İçildiğinde mana geri kazandıran 2 şişe su çağırır. Daha yüksek rütbeler daha saf su çağırır.',
   'entities.abilities.conjure_water.name': 'Su Bağlama',
   'entities.abilities.consecration.description':
-    'Zemini 9 saniyeliğine kutsar ve her saniye {damage} Kutsal hasar verir. İnanç Muhafızları içerideyken %10 daha az hasar alır.',
+    'Altındaki zemini 9 sn boyunca kutsar ve her saniye yüksek tehditle {damage} Kutsal hasar verir. İlk çarpma 1 Adanmışlık üretir. İnanç Muhafızları içeride dururken %10 daha az hasar alır. Yüceliş hasarını %30 artırır.',
   'entities.abilities.consecration.name': 'Kutsal Toprak',
   'entities.abilities.corruption.description':
     'Hedefi yozlaştırır, 18 saniye boyunca {damage} Gölge hasarı verir.',
@@ -7927,19 +7928,19 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Henüz Kedi Formunda değilsen bu forma geç ve 15 sn boyunca %50 daha hızlı koş. Her formda kullanılabilir. Anlıktır ve genel bekleme süresini tetiklemez.',
   'entities.abilities.dash.name': 'Atılma',
   'entities.abilities.deadly_poison.description':
-    'Silahını 30 dakika boyunca kaplar. Her yakın dövüş vuruşun hedefe bir zehir katı ekler, en fazla 5, ve 12 saniyelik süreyi yeniler. Her kat 2 saniyede bir {damage} Doğa hasarı verir.',
+    "Silahını 30 dk kaplar. Her yakın dövüş savuruşun hedefe en fazla 5 katmana kadar bir zehir katmanı ekler ve 12 sn'lik süreyi yeniler. Her katman 2 sn'de bir {damage} Doğa hasarı verir. Diğer silah kaplamanın yerini alır.",
   'entities.abilities.deadly_poison.name': 'İrinli Zehir',
   'entities.abilities.defensive_stance.description':
     'Savunma amaçlı bir dövüş duruşu: %30 daha fazla tehdit üretirsin ama %10 daha az hasar verir ve alırsın. Duruştan çıkmak için tekrar kullan.',
   'entities.abilities.defensive_stance.name': 'Korumali Durus',
   'entities.abilities.demon_skin.description':
-    'Şeytani deri zırhını 30 dakika boyunca {buff} artırır.',
+    'Zırhını 30 dk boyunca {buff} artırır. Derinleşen Ahit bu zırhı iki katına çıkarır ve İblis Derisi etkinken alınan büyü hasarını %5 azaltır.',
   'entities.abilities.demon_skin.name': 'İblis Derisi',
   'entities.abilities.demoralizing_roar.description':
-    'Yakındaki düşmanların moralini bozarak saldırı güçlerini 20 saniye boyunca 20 azaltır. Yalnızca Bruin Formu.',
+    '8 yarda içindeki her düşmanın moralini bozarak Saldırı Gücünü 20 sn boyunca {buff} azaltır. Yalnızca Bruin Formu.',
   'entities.abilities.demoralizing_roar.name': 'Sindiren Kükreme',
   'entities.abilities.demoralizing_shout.description':
-    'Korkunç bir nara atarak yakındaki tüm düşmanların verdiği hasarı 20 saniye boyunca %{buff} azaltır.',
+    '10 yarda içindeki tüm düşmanların verdiği hasarı {duration} sn boyunca %{buff} azaltan bir nara atar.',
   'entities.abilities.demoralizing_shout.name': 'Vahim Uluma',
   'entities.abilities.devotion_aura.description': 'Zırhını 30 dakika boyunca {buff} artırır.',
   'entities.abilities.devotion_aura.name': 'Sarsılmaz Aura',
@@ -7949,14 +7950,15 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Kutsal bir kalkan {duration} saniye boyunca azami canının %{damage} kadarını emer.',
   'entities.abilities.divine_protection.name': 'İnanç Siperi',
   'entities.abilities.drain_life.description':
-    "Hedefin canlılığını tüketir, her saniye {damage} Gölge hasarı verir ve bunun %70'ini can olarak sana aktarır. Izdırap bunun yerine tamamını aktarır. Birincil Kem Göz'üne kanalize edildiğinde başlangıçta tüm Kader İpliklerini tüketir ve her İplik tık başına 1 fazladan Mahkûmiyet üretir.",
+    "Hedefin canlılığını tüketir; her saniye {damage} Gölge hasarı verir ve verilen hasarın %70'i kadar seni iyileştirir (Izdırap ile tamamı). Kem Gözlü bir düşmanda her tık 2 Mahkûmiyet, kanalı bitirmek 3 daha üretir. Birincil Kem Gözünde ayrıca başlangıçta tüm Kader İpliklerini tüketir: her İplik tık başına 1 Mahkûmiyet ekler ve 3 İplik hasarın kanalı geciktirmesini durdurur.",
   'entities.abilities.drain_life.name': 'Tüketme',
   'entities.abilities.earth_shock.description':
     "{damage} Doğa hasarı verir. Hasar Büyü Gücü ile artar. Elementsel: 5 Gök Gürültüsü'nde %125 daha fazla hasar verir ve tüm Gök Gürültüsü'nü tüketir. Taşa Bağlı: hedefi 3 sn boyunca sana saldırmaya zorlar.",
   'entities.abilities.earth_shock.name': 'Toprak Sarsıntısı',
   'entities.abilities.enrage.description': 'Anında 20 öfke üretir. Yalnızca Bruin Formu.',
   'entities.abilities.enrage.name': 'Körükleme',
-  'entities.abilities.entangling_roots.description': 'Hedefi 12 saniyeye kadar yerine sabitler.',
+  'entities.abilities.entangling_roots.description':
+    'Hedefi en fazla 12 sn boyunca olduğu yere köklendirir. Yüksek rütbeler ayrıca 12 sn boyunca Doğa hasarı verir.',
   'entities.abilities.entangling_roots.name': 'Kavrayan Kökler',
   'entities.abilities.evasion.description': 'Sıyırma şansını 15 saniye boyunca %50 artırır.',
   'entities.abilities.evasion.name': 'Hayalet Ayak',
@@ -7973,14 +7975,15 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Düşmanın yüreğine korku salar ve onu 5 saniyeye kadar sinmiş bırakır. Hedefin azami sağlığının toplam %8'i kadar hasar etkiyi bozar.",
   'entities.abilities.fear.name': 'Dehşet',
   'entities.abilities.ferocious_bite.name': 'Kanlı Isırık',
-  'entities.abilities.fire_blast.description': 'Düşmanı {damage} Ateş hasarıyla patlatır. Anında.',
+  'entities.abilities.fire_blast.description':
+    'Düşmana {damage} Ateş hasarı verir. Her zaman kritik vurur. Küresel bekleme süresine tabi değildir ve başka bir büyü yapılırken kullanılabilir.',
   'entities.abilities.fire_blast.name': 'Köz Yağmuru',
   'entities.abilities.fireball.description':
-    'Ateşli bir top fırlatarak {damage} Ateş hasarı ve ek olarak zamana yayılı hasar verir.',
+    '{damage} Ateş hasarı veren ateşli bir top fırlatır, ardından hedefi {duration} sn boyunca toplam {overTime} Ateş hasarıyla yakar.',
   'entities.abilities.fireball.name': 'Köz Oku',
   'entities.abilities.rain_of_fire.name': 'Ateş Yağmuru',
   'entities.abilities.rain_of_fire.description':
-    "3 Tahribat harcayarak hedef alana ateş yağdırır, 4 sn boyunca her saniye {damage} Ateş hasarı verir, 2. rütbede 6 sn'ye uzar. Harabiyet ilk dalgayı anında indirir.",
+    '3 Tahribat harcayarak hedef alana ateş yağdırır ve içerideki düşmanlara {duration} sn boyunca her saniye {damage} Ateş hasarı verir. Harabiyet ilk dalgayı anında indirir.',
   'entities.abilities.volley.name': 'Ok Yağmuru',
   'entities.abilities.volley.description':
     "3 sn boyunca 8 m'lik bir alana ok yağdırır. Alandaki düşmanlar her 0.5 sn'de {damage} Fiziksel hasar alır. Hasar menzilli saldırı gücüyle artar.",
@@ -7992,7 +7995,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "8 m'lik bir alanı 6 sn sarsar ve her 1.5 sn'de {damage} Doğa hasarı verir. Hasar Büyü Gücü ile artar. Elementsel: 5 Gök Gürültüsü'nde %100 daha fazla hasar verir ve tüm Gök Gürültüsü'nü tüketir.",
   'entities.abilities.flamestrike.name': 'Alev Vuruşu',
   'entities.abilities.flamestrike.description':
-    'Hedef alanda bir alev patlaması yaratır ve patlamaya yakalanan düşmanlara {damage} Ateş hasarı verir.',
+    'Hedef alana bir alev patlaması yağdırır ve patlamaya yakalanan her düşmana {damage} Ateş hasarı verir. Tüm patlama için tek bir kritik vuruş zarı atılır: ya her düşman kritik vuruş alır ya da hiçbiri almaz.',
   'entities.abilities.flame_shock.description':
     '{damage} Ateş hasarı, ardından {duration} sn boyunca {overTime} Ateş hasarı verir. İlk isabet Büyü Gücü ile artar.',
   'entities.abilities.flame_shock.name': 'Köz Sarsıntısı',
@@ -8015,7 +8018,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     '{damage} Buz hasarı verir ve hedefi 8 sn boyunca %50 yavaşlatır. Hasar Büyü Gücü ile artar.',
   'entities.abilities.frost_shock.name': 'Ayaz Sarsıntısı',
   'entities.abilities.frostbolt.description':
-    'Bir ayaz oku fırlatarak {damage} Ayaz hasarı verir ve hareketi %40 yavaşlatır.',
+    'Bir ayaz oku fırlatarak {damage} Ayaz hasarı verir ve hareketi {duration} sn boyunca %40 yavaşlatır.',
   'entities.abilities.frostbolt.name': 'Ayaz Mızrağı',
   'entities.abilities.frostbrand_weapon.description':
     'Silahını kavrayan ayazla güçlendirir: her vuruş 5 dakika boyunca {damage} ek hasar verir.',
@@ -8044,10 +8047,10 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Tamamlanan her kullanım 1 Yeşillik ekler (en fazla 3). Biriken Yeşillik bu büyünün süresini kısaltır: 1 Yeşillikte 2,2 sn, 2'de 1,9 sn, 3'te 1,5 sn. Doğanın Lütfu onu anında, ücretsiz ve %25 daha güçlü yapar.",
   'entities.abilities.healing_touch.name': 'Yaban Şifası',
   'entities.abilities.healing_wave.description':
-    "Dost bir hedefi {damage} iyileştirir. İyileştirme Büyü Gücü ile artar. Onarım: tam iyileştirmenin %50'sini aşırı iyileştirmeden önce 12 sn boyunca Onaran Akım olarak saklar, hedefin azami canının %30'una kadar.",
+    "Dost bir hedefi {damage} iyileştirir. İyileştirme, İyileştirme Gücü ile artar. Ruh Çağrısı: ayrıca aşırı iyileştirmeden önceki tam iyileştirmenin %50'sini hedefin Onaran Akımına ekler; bu havuz onu 12 sn boyunca iyileştirir ve en fazla azami canının %30'unu tutar.",
   'entities.abilities.healing_wave.name': 'Onaran Sular',
   'entities.abilities.heroic_strike.description':
-    'Yakın dövüş hasarını {damage} artıran güçlü bir saldırı. Bir sonraki vuruşunda etkinleşir.',
+    'Bir sonraki yakın dövüş savuruşun {damage} ek hasar verir. Öfke o savuruşa harcanır; yeterli öfken yoksa normal savuruş olarak kalır.',
   'entities.abilities.heroic_strike.name': 'Yağmacı Darbesi',
   'entities.abilities.hibernate.description':
     'Hedefi en fazla 8 sn derin uykuya sokar. Her hasar uyandırır. Oyunculara karşı 18 sn içindeki her tekrar bir öncekinin yarısı kadar sürer ve dördüncüsü başarısız olur.',
@@ -8072,12 +8075,13 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.judgement.name': 'Hukum',
   'entities.abilities.kidney_shot.name': 'Aşağılık Darbe',
   'entities.abilities.lay_on_hands.description':
-    'Devasa bir iyileştirme dalgası azami canının %{damage} kadarını geri kazandırır. 10 dakika bekleme süresi.',
+    "Dost bir hedefi, azami canının %{damage}'i kadar iyileştirir ve can yenilediğinde 1 Adanmışlık üretir.",
   'entities.abilities.lay_on_hands.name': 'Son Ayin',
   'entities.abilities.lesser_heal.description':
     'Dost bir hedefi {damage} iyileştirir. İyileştirme Büyü Gücü ile artar.',
   'entities.abilities.lesser_heal.name': 'Fısıldanan Dua',
-  'entities.abilities.life_tap.description': '{damage} canı {damage} manaya dönüştürür.',
+  'entities.abilities.life_tap.description':
+    '{damage} canı {damage} manaya dönüştürür (Kan Kredisi ile %50 daha fazla mana). Canın {damage} veya altındaysa başarısız olur.',
   'entities.abilities.life_tap.name': 'Ağır Pazarlık',
   'entities.abilities.lightning_bolt.description':
     '{damage} Doğa hasarı verir. Hasar Büyü Gücü ile artar. Elementsel: isabet 1 Gök Gürültüsü verir.',
@@ -8100,13 +8104,13 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mongoose_bite.name': 'Yara Yırtışı',
   'entities.abilities.moonfire.name': 'Ay Fırtınası',
   'entities.abilities.mortal_strike.description':
-    'Silah hasarı artı {damage} veren acımasız bir darbe. (Silahşor imzası)',
+    'Silah hasarı artı {damage} ile vurur ve hedefin aldığı iyileştirmeyi 10 sn boyunca %50 azaltır. Ayrıca 6 sn boyunca 2 tıkta toplam {overTime} Fiziksel hasar veren bir kanama olan Kanayan Yaraları uygular. (Silahşor imzası)',
   'entities.abilities.mortal_strike.name': 'Sakatlayan Darbe',
   'entities.abilities.overpower.description':
-    'Silah hasarı artı {damage} veren anında saldırı. Yalnızca hedef sıyırma yaptıktan sonra kullanılabilir. Sıyrılamaz.',
+    'Silah hasarı artı {damage} ile vurur. Savuşturulamaz. Her kullanım ayrıca {duration} sn boyunca en fazla 2 Kızıl El katmanı verir: sonraki Sakatlayan Darben bunları tüketerek katman başına %20 daha fazla silah hasarı verir. En fazla 2 şarj tutar.',
   'entities.abilities.overpower.name': 'Kızıl El',
   'entities.abilities.polymorph.description':
-    'Düşmanı {duration} saniyeye kadar bir kurbağaya dönüştürür. Kurbağa başıboş dolaşır ve hızla iyileşir. Herhangi bir hasar etkiyi bozar. Yalnızca canavarlar ve insansılar.',
+    "Düşmanı en fazla {duration} sn boyunca bir kurbağaya dönüştürür. Eylemde bulunamaz, canı tamamen yenilenir, her saniye azami canının %10'unu iyileştirir ve zamana yayılı hasar etkilerini kaybeder. Her hasar etkiyi bozar. Ölümsüzlere veya kontrol etkilerine bağışık düşmanlara uygulanamaz.",
   'entities.abilities.polymorph.name': 'Büyüleme',
   'entities.abilities.pounce.description':
     'Hedefi 2 saniye boyunca sersemleten gizlilik açılışı. 1 kombo puanı kazandırır. Yalnızca Kedi Formu. Gizlilik dışında bu düğme Atılış olur.',
@@ -8121,20 +8125,20 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Her grup üyesinin Dayanıklılığını 30 dakika boyunca %{buff} artırır.',
   'entities.abilities.power_word_fortitude.name': 'Azim Yakarışı',
   'entities.abilities.power_word_shield.description':
-    'Dost bir hedefi kalkanlar ve 30 sn boyunca {damage} hasar emer. Disiplin ayrıca hedefi 30 sn boyunca Kutsal hasarına bağlar.',
+    "Dost bir hedefi kalkanlar ve 30 sn boyunca {damage} hasar emer. Disiplin ayrıca hedefi 30 sn boyunca bağlar ve önceki bağını değiştirir (İkiz Ahit ikisini birden tutar). Bağlı grup üyeleri sana 30 yarda içindeyken, Arındıran İlahin ve düşmana yönelik Arındıran Merhametin verilen hasarın %30'u kadar onları iyileştirir.",
   'entities.abilities.power_word_shield.name': 'Koruma Mezmuru',
   'entities.abilities.prowl.description':
     'Kedi Formundayken gizliliğe geçer. Dövüş sırasında kullanılamaz.',
   'entities.abilities.prowl.name': 'Sinsi Sokulma',
   'entities.abilities.pyroblast.description':
-    'Devasa ateşli bir kaya fırlatarak {damage} Ateş hasarı ve ek olarak zamana yayılı hasar verir.',
+    'Dev, ateşli bir kaya fırlatır; {damage} Ateş hasarı verir, ardından hedefi {duration} sn boyunca toplam {overTime} Ateş hasarıyla yakar.',
   'entities.abilities.pyroblast.name': 'Alev Mızrağı',
   'entities.abilities.rake.name': 'Deri Yüzme',
   'entities.abilities.rapid_fire.description':
     'Hareket ederken 2,4 saniye boyunca altı hızlı atış yapar. Her atış {damage} fiziksel hasar verir.',
   'entities.abilities.rapid_fire.name': 'Hummalı Çekiş',
   'entities.abilities.raptor_strike.description':
-    "Silah hasarının %10'u artı {damage} vurur. İsabet 15 Odak yeniler ve 1 Av İvmesi verir. Hasar, silah hasarı üzerinden saldırı gücüyle artar.",
+    "Silah hasarının %10'u artı {damage} ile vurur. Hasar, silah hasarı üzerinden Saldırı Gücü ile artar. Hayatta Kalma ile isabet 15 Odak geri kazandırır ve 1 Av İvmesi verir.",
   'entities.abilities.raptor_strike.name': 'Deşen Darbe',
   'entities.abilities.regrowth.name': 'İkinci Çiçeklenme',
   'entities.abilities.renew.description':
@@ -8151,26 +8155,26 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.righteous_fury.name': 'Yanan Yemin',
   'entities.abilities.rip.name': 'Kanlı Yarık',
   'entities.abilities.rockbiter_weapon.description':
-    'Silahına 30 dakika boyunca işler. Her savurma {damage} ek hasar verir. Güçlendirme ayrıca %40 zırh ve %20 Dayanıklılık kazanır, %15 daha az hasar alır ve yaratıkların kritik vuruşlarına karşı bağışıktır ve 2,75 katı tehdit üretir. Toprak Sarsıntısı hedefini 3 sn boyunca sana saldırmaya zorlar ve Gök Gürültüsü Siperi 3 sn boyunca %10 hasar azaltımı verir.',
+    'Silahını 30 dk boyunca büyüler. Her savuruş {damage} ek hasar verir. Güçlendirme ayrıca %40 zırh ve %20 Dayanıklılık kazanır, %15 daha az hasar alır, yaratıkların kritik vuruşlarına karşı bağışıktır ve 2,75 kat tehdit üretir. Toprak Sarsıntısı hedefini 3 sn boyunca sana saldırmaya zorlar ve Gök Gürültüsü Siperi yapmak 3 sn boyunca %10 hasar azaltımı verir.',
   'entities.abilities.rockbiter_weapon.name': 'Stonebound Silahı',
   'entities.abilities.rupture.name': 'Kan Kaybı',
   'entities.abilities.sap.description':
     "Alaca Örtüsü'nü bozmadan veya dövüş başlatmadan hedefi 8 saniye boyunca etkisiz hale getirir. Gizlenmiş ve dövüş dışı olman gerekir. Herhangi bir hasar etkiyi bozar.",
   'entities.abilities.sap.name': 'Bayıltma',
   'entities.abilities.scorch.description':
-    'Düşmanı {damage} Ateş hasarıyla kavurur. Hızlı büyülenir.',
+    'Düşmanı {damage} Ateş hasarıyla kavurur ve hareket hızını 3 sn boyunca %20 artırır. Canı %30 veya altındaki hedeflere karşı her zaman kritik vurur.',
   'entities.abilities.scorch.name': 'Haşlama',
   'entities.abilities.seal_of_righteousness.description':
     'Seni 30 sn boyunca Kutsal güçle doldurur, böylece her yakın dövüş savurman {damage} ek Kutsal hasar verir.',
   'entities.abilities.seal_of_righteousness.name': 'Yemin Damgası',
   'entities.abilities.searing_pain.description':
-    'Düşmanı ıstırap veren ateşle {damage} Ateş hasarı için dağlar. Hızlı büyülenir.',
+    'Düşmanı {damage} Ateş hasarıyla acı veren ateşle dağlar.',
   'entities.abilities.searing_pain.name': 'Dağlama',
   'entities.abilities.serpent_sting.description':
     "15 sn boyunca toplam {damage} Doğa hasarı verir, her 3 sn'de bir kez. Hasar menzilli saldırı gücüyle artar.",
   'entities.abilities.serpent_sting.name': 'Zehir Dikeni',
   'entities.abilities.shadow_bolt.description':
-    'Düşmana {damage} Gölge hasarı için gölgeli bir ok gönderir.',
+    'Düşmana {damage} Gölge hasarı veren gölgeli bir ok gönderir. Yıkım: 1 Tahribat üretir, en fazla 5.',
   'entities.abilities.shadow_bolt.name': 'Kasvet Oku',
   'entities.abilities.shadow_word_pain.description':
     "18 sn boyunca toplam {damage} Gölge hasarı verir, her 3 sn'de bir kez. Hasar Büyü Gücü ile artar. Gölge: %10 daha fazla hasar verir ve Tasvirin üzerindeki her tık 1 Kasvet Öşürü verir.",
@@ -8179,14 +8183,15 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "1 Tahribat harcayarak canı %20'nin altındaki bir düşmanı {damage} Gölge hasarıyla infaz eder. İşaretlenen hedef 5 sn içinde ölürse Tahribatını geri öder.",
   'entities.abilities.shadowburn.name': 'Alaca Ateşi',
   'entities.abilities.shield_slam.description':
-    'Hedefe kalkanınla %50 silah hasarı artı {damage} hasar verir ve devasa tehdit üretirsin. (Koruma imzası)',
+    'Kalkanınla hedefe çarparak silah hasarı artı {damage} verir ve {rage} öfke üretir. Çok yüksek tehdit üretir. (Koruma imzası)',
   'entities.abilities.shield_slam.name': 'Kalkan Kırma',
   'entities.abilities.sinister_strike.name': 'Kötücül Kesik',
-  'entities.abilities.slam.description': 'Rakibe silah hasarı artı {damage} için çarpar.',
+  'entities.abilities.slam.description':
+    '%50 silah hasarı artı {damage} ile vurur ve {rage} öfke üretir.',
   'entities.abilities.slam.name': 'Kaba Savuruş',
   'entities.abilities.slice_and_dice.name': 'Gaddar Tempo',
   'entities.abilities.smite.description':
-    "{damage} Kutsal hasar verir. Hasar Büyü Gücü ile artar. Disiplin: bağlı her müttefiki hasarın %30'u kadar iyileştirir. Bağlı müttefik yoksa canı en düşük grup üyesini %15 iyileştirir.",
+    "{damage} Kutsal hasar verir. Hasar Büyü Gücü ile artar. Disiplin, 30 yarda içindeki bağlı her yaralı grup üyesini verilen hasarın %30'u kadar iyileştirir (İkiz Ahit ile %70). Hiçbiri yaralı değilse, bunun yerine 30 yarda içindeki en düşük canlı yaralı grup üyesini hasarın %15'i kadar iyileştirir.",
   'entities.abilities.smite.name': 'Arındıran İlahi',
   'entities.abilities.sprint.description': 'Hareket hızını 15 saniye boyunca %70 artırır.',
   'entities.abilities.sprint.name': 'Çevik Topuklar',
@@ -8208,7 +8213,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Büyücünün emrine bir Emberkin çağırır. Emberkin, düşmanlarına uzaktan Kül Oku savurur. Yeni bir iblis çağırmak mevcut olanı gönderir. Aynı anda tek bir iblisin olabilir.',
   'entities.abilities.summon_imp.name': 'Emberkin Çağırma',
   'entities.abilities.summon_infernal.description':
-    "Hedef alana bir Pyre Colossus indirerek çarpma anında 64-79 Ateş hasarı verir. İblisinin yerini almadan 30 sn. savaşır, yakındaki düşmanları 2 sn.'de bir yakar ve her saniye 1 Ruin üretir.",
+    "Hedef alana bir Pyre Colossus indirir; çarpma anında 6 m içindeki düşmanlara {damage} Ateş hasarı verir. İblisinin yerini almadan 30 sn savaşır, her 2 sn'de 8 m içindeki düşmanlara 66 Ateş hasarı verir ve her saniye 1 Tahribat üretir.",
   'entities.abilities.summon_infernal.name': 'Pyre Colossus Çağırma',
   'entities.abilities.summon_succubus.description':
     'Karabüyücünün komutası altında bir Duskborn çağırır. Duskborn, yakın dövüşte hızla vuran ve sert darbeler indiren kırılgan bir iblistir. Yeni bir iblis çağırmak mevcut olanı gönderir. Bir seferde yalnızca bir iblisin olabilir.',
@@ -8219,16 +8224,16 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sunder_armor.name': 'Zırh Kesme',
   'entities.abilities.swipe.name': 'Süpüren Pençeler',
   'entities.abilities.tame_beast.description':
-    'Bir canavarı yoldaşın olması için evcilleştirmeye başlar. Senin seviyende ya da daha düşük olmalı ve seçkin olmamalı. Evcilin seni takip eder, düşmanlarına saldırır ve kendi tehdidini tutar. Bir seferde yalnızca bir evcilin olabilir.',
+    'Bir canavarı yoldaşın olması için evcilleştirmeye başlar. Senin seviyende veya daha düşük olmalı; seçkin, nadir, patron veya zindan yaratığı olamaz. Evcil hayvanın seni takip eder, düşmanlarına saldırır ve kendi tehdidini tutar. Aynı anda yalnızca bir evcil hayvanın olabilir.',
   'entities.abilities.tame_beast.name': 'Yaban Bağı',
   'entities.abilities.taunt.description':
     'Hedefi kışkırtır: tehdidin onun en nefret ettiği düşmana eşit hale gelir ve 3 saniye boyunca sana saldırmaya zorlanır.',
   'entities.abilities.taunt.name': 'Tahrik',
   'entities.abilities.thorns.description':
-    'Hedeften dikenler filizlenir: yakın dövüş saldırganları {buff} Doğa hasarı alır.',
+    'Dost bir hedeften 10 dk boyunca dikenler filizlenir. Hedefe yapılan her yakın dövüş vuruşu saldırgana {buff} Doğa hasarı verir.',
   'entities.abilities.thorns.name': 'Diken Muhafızı',
   'entities.abilities.thunder_clap.description':
-    'Yakındaki düşmanları {damage} hasar için patlatır ve saldırılarını 10 saniye boyunca %10 yavaşlatır.',
+    '8 yarda içindeki tüm düşmanlara {damage} Fiziksel hasar vurur ve saldırı hızlarını 10 sn boyunca %10 yavaşlatır.',
   'entities.abilities.thunder_clap.name': 'Sarsan Darbe',
   'entities.abilities.tigers_fury.description':
     'Anında {rage} enerji kazandırır ve saldırı gücünü {duration} saniye boyunca {buff} artırır. Yalnızca Kedi Formu.',
@@ -8237,9 +8242,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Anında hızlı bir Fleet Formu'na bürünerek hareket hızını %40 artırır ve kırılabilir kök tuzaklarını ve yavaşlatmaları kaldırır. Bürünmüşken diğer yetenekleri kullanamazsın, ancak dövüşte ya da dövüş dışında bürünebilirsin; kaçmak için idealdir. Herhangi bir forma bürünmek, kısa bir hareket hızı patlaması olan Sekme Adımı kazandırır.",
   'entities.abilities.travel_form.name': 'Fleet Formu',
   'entities.abilities.vanish.description':
-    "Gözden kaybolursun, dövüşte bile Duskveil'e geçersin. Gizliyken tam hızla hareket edersin. 10 saniyeye kadar sürer.",
+    'Savaş içindeyken bile gözden kaybolur ve en fazla 10 sn boyunca Alaca Örtüsüne girersin. Savaştan çıkarsın; canavarlar sendeki tüm tehdidi unutur ve etkinken seni algılayamaz, düşman oyuncular seni hedef olarak kaybeder. Gizliyken tam hızla hareket edersin.',
   'entities.abilities.whirlwind.description':
-    'Ölümcül bir yayda dönerek yakındaki tüm düşmanları {damage} için vurursun. (Cinnet yeteneği)',
+    "8 yarda içindeki tüm düşmanlara {damage} Fiziksel hasar vurur. Sonraki {duration} sn boyunca, sonraki 2 tek hedefli yeteneğin hasarlarının %40'ını hedeflerinin 8 yarda içindeki en fazla 4 düşmana daha da verir. (Hiddet)",
   'entities.abilities.whirlwind.name': 'Bıçaklı Girdap',
   'entities.abilities.wing_clip.description':
     'Hedefi {damage} Fiziksel hasar için biçer ve 10 sn boyunca %40 yavaşlatır. Hasar saldırı gücüyle artar.',
@@ -8249,10 +8254,10 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Dost bir hedefi Kutsal enerjiyle sarsar ve onu {damage} kadar iyileştirir. (Kutsal imza)',
   'entities.abilities.holy_shield.name': 'Kutsal Kalkan',
   'entities.abilities.holy_shield.description':
-    'Engellemeyi %30 artırır ve {duration} saniye boyunca azami canının %{damage} kadarına eşit kalkan verir. Yükseliş savunmayı güçlendirir.',
+    "%30 blok şansı ve {duration} sn boyunca azami canının %{damage}'ini emen bir kalkan kazanırsın; bir tehdit darbesi salar. Yüceliş blok şansını %40'a çıkarır, kalkanı %50 artırır ve ikisini de 10 sn'ye uzatır.",
   'entities.abilities.bestial_wrath.name': 'Vahşi Gazap',
   'entities.abilities.bestial_wrath.description':
-    "3 Sürü Vahşeti verir. 20 sn içindeki bir sonraki Canavarı Salıver'in %50 daha fazla vuruş ve pençe hasarı verir ve çılgınlığı 8 yerine 12 sn sürer. (Canavar Hakimiyeti imzası)",
+    "20 sn boyunca 3 Sürü Vahşeti verir ve etkin Salıverilmiş Çılgınlığı bitirir. 20 sn içindeki sonraki Canavarı Salıver'in vuruş ve pençe darbesi hasarı %50 artar ve çılgınlığı 8 yerine 12 sn sürer. (Canavar Hakimiyeti imzası)",
   'entities.abilities.trueshot_aura.name': 'Keskin Nişan Aurası',
   'entities.abilities.trueshot_aura.description':
     '30 m içindeki müttefiklerin saldırı gücünü 30 dakika boyunca %10 artırır. (Keskin Nişancılık imzası)',
@@ -8264,9 +8269,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Büyü hasarını %20 ve büyü hızını %10 artırır, 10 sn sürer. (Gizem imza yeteneği)',
   'entities.abilities.combustion.name': 'Anka Transı',
   'entities.abilities.combustion.description':
-    'Büyü kritik şansını %50 artırır, 15 sn sürer. (Ateş imza yeteneği)',
+    '10 sn boyunca Ateş büyülerin, uçmakta olan oklar dahil, her zaman kritik vurur ve bu kritikler Sıcak Seriyi normal şekilde biriktirir. Küresel bekleme süresine tabi değildir ve büyü yapılırken kullanılabilir. Kullanmak, yenilenmekte olan Köz Yağmuru şarjını bitirir. Anka Transı dışında, Sıcak Seriyi biriktiren her kritik vuruş bekleme süresini 1 sn kısaltır. (Ateş)',
   'entities.abilities.icy_veins.description':
-    'Büyü hızını %30 artırır ve 10 sn boyunca büyü kesintisini ve geri itmeyi önler. (Buz imza yeteneği)',
+    'Büyü hızını %30 artırır ve 10 sn boyunca büyü kesilmesini ve geri itilmeyi engeller. (Don)',
   'entities.abilities.cold_blood.name': 'Soğukkanlılık',
   'entities.abilities.blade_flurry.name': 'Bıçak Yağmuru',
   'entities.abilities.hemorrhage.name': 'Kanama',
@@ -8278,22 +8283,22 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     '10 m içindeki müttefikleri {damage} iyileştirir ve aynı alandaki düşmanlara 24 ila 30 Kutsal hasar verir. Her iki miktar da Büyü Gücü ile artar. (Kutsal temeli)',
   'entities.abilities.shadowform.name': 'Alacakaranlık Perdesi',
   'entities.abilities.shadowform.description':
-    "Alacakaranlık Perdesi'ne girersin ve Gölge hasarını %25 artırırsın. Alacakaranlık Perdesi'nden çıkmak için yeniden kullan. (Gölge imzası)",
+    'Alacakaranlık Perdesine girerek Gölge hasarını %25 artırırsın. İyileştirme büyüsü yapmak onu bitirir. Çıkmak için Alacakaranlık Perdesini yeniden kullan. (Vespers imzası)',
   'entities.abilities.elemental_mastery.name': 'Element Ustalığı',
   'entities.abilities.elemental_mastery.description':
-    "12 sn boyunca Ark Oku 2 Gök Gürültüsü verir. Bir sonraki Ark Oku ya da Çatallı Yıldırım'ın anındadır ve bir sonraki tam Gök Gürültüsü ödemen %25 daha fazla hasar verir. (Elementsel imzası)",
+    '12 sn boyunca Ark Oku 1 yerine 2 Gök Gürültüsü verir. Bu sürede sonraki Ark Okun veya Çatallı Yıldırımın anlık olur ve 5 Gök Gürültüsü tüketen sonraki Toprak Sarsıntın veya Fay Uyanışın %25 daha fazla hasar verir. (Elementsel imzası)',
   'entities.abilities.siphon_life.name': 'Can Sömürüsü',
   'entities.abilities.siphon_life.description':
     'Düşmandan can sömürür, 30 sn boyunca {damage} Gölge hasarı verir ve verilen hasar kadar seni iyileştirir. (Istırap imzası)',
   'entities.abilities.conflagrate.name': 'Tutuşturma',
   'entities.abilities.conflagrate.description':
-    'Yanan Ahdinin gelecek bir tıkını öne alır, ardından hedefi {damage} Ateş hasarı için tutuşturur. 1 Tahribat ve 1 Harabiyet üretir. {charges} şarj tutar. (Yıkım imzası)',
+    "Hedefte Yanan Ahit gerektirir. Onun kalan tıklarından birini anında verir ve süresini bir tık kısaltır, ardından hedefi {damage} Ateş hasarıyla tutuşturur. 1 Tahribat ve 1 Harabiyet üretir (2'ye kadar birikir, 15 sn sürer): sonraki Yıkım Okun %30 daha hızlı okunur veya sonraki Ateş Yağmurun ilk dalgasını anında indirir. {charges} şarj tutar. (Yıkım imzası)",
   'entities.abilities.moonkin_form.name': 'Aykuşu Formu',
   'entities.abilities.moonkin_form.description':
     'Aykuşu formuna girer, geri dönene kadar büyü yapmayı güçlendirirsin. Herhangi bir forma bürünmek, kısa bir hareket hızı patlaması olan Sekme Adımı kazandırır. Normal forma dönmek için tekrar kullan. (Denge imzası)',
   'entities.abilities.feral_charge.name': 'İlkel Dalga',
   'entities.abilities.feral_charge.description':
-    'İlkel bir dalga salar. Kedi Formunda Enerji yenilenmesi 10 sn boyunca %100 artar. Bruin Formunda anında 50 Öfke üretir. (Yabanilik imzası)',
+    'İlkel bir dalga salar. Kedi Formunda Enerji yenilenmesi 10 sn boyunca %100 artar. Bruin Formunda anında 50 Öfke üretir. Kedi ve Bruin Formu dışında etkisi yoktur. (Yaban imzası)',
   'entities.abilities.swiftmend.name': 'Hızlı İyileştirme',
   'entities.abilities.crusader_strike.description':
     'Hedefe silah hasarı artı {damage} Kutsal hasar verir. (Paladin yeteneği)',
@@ -13942,7 +13947,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.selfOnly': 'Yalnızca kendine',
   'itemUi.lootRoll.rolled': '{answered}/{total} zar attı',
   'entities.abilities.sunder_armor.description':
-    'Hedefin zırhını parçalar, her uygulamada %{damage} azaltır. 5 kez istiflenir. Yüksek miktarda tehdit üretir.',
+    'Hedefin zırhını 30 sn boyunca her uygulamada %{damage} azaltacak şekilde parçalar. En fazla 5 kez birikir ve her uygulama süreyi yeniler. Yüksek tehdit üretir.',
   'entities.mobs.training_dummy.name': 'Antrenman Kuklası',
   'entities.mobs.hub_training_dummy.name': 'Antrenman Kuklası',
   'entities.mobs.yumi_cat.name': 'Yumi',
@@ -14335,7 +14340,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Hedefi keser ve 4 sn boyunca o okuldan büyü yapmasını engeller.',
   'entities.abilities.counter_shot.name': 'Karşı Atış',
   'entities.abilities.counterspell.description':
-    'Hedefin büyü kullanımına karşı koyar ve 6 saniye boyunca o okuldan büyü yapılmasını engeller.',
+    'Hedefin büyü yapmasını keser ve 6 sn boyunca o büyü okuluna kilitler. Hedef büyü yapmıyorsa etkisizdir.',
   'entities.abilities.holy_taunt.description':
     'Hedefi alaya alır: Tehditiniz en nefret ettiği düşmanla eşleşecek şekilde yükselir ve 3 saniye boyunca size saldırmak zorunda kalır.',
   'entities.abilities.holy_taunt.name': 'Kutsal Tahrik',
@@ -14343,13 +14348,13 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Hedefin büyüsünü keser ve 4 saniye boyunca o okuldan büyü yapılmasını engeller.',
   'entities.abilities.kick.name': 'Tekme',
   'entities.abilities.pummel.description':
-    'Hedefin büyüsünü keser ve 4 saniye boyunca o okuldan büyü yapılmasını engeller.',
+    'Hedefin büyü yapmasını keser ve 4 sn boyunca o okuldan büyü yapmayı engeller. Bir büyü yapımını durdurduğunda 10 öfke üretir.',
   'entities.abilities.pummel.name': 'Yumruklama',
   'entities.abilities.rebuke.description':
     'Hedefin büyüsünü keser ve 4 saniye boyunca o okuldan büyü yapılmasını engeller.',
   'entities.abilities.rebuke.name': 'Azar',
   'entities.abilities.skull_bash.description':
-    'Hedefin büyüsünü kesintiye uğratan ve okulu 4 saniyeliğine kilitleyen bir kafa vuruşu.',
+    'Hedefe kafa atarak okuduğu büyüyü keser ve o okuldan büyü yapmasını 4 sn boyunca engeller.',
   'entities.abilities.skull_bash.name': 'Kafatası Darbesi',
   'entities.abilities.spell_lock.description':
     'Düşmanın büyü yapmasını keser ve 4 sn boyunca o okuldan büyü yapmasını engeller.',
@@ -14679,7 +14684,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     '30 m içindeki müttefikleri vahşi güçle cesaretlendirir, saldırı güçlerini 45 ve saldırı hızlarını 5 dk. boyunca %5 artırır. (Avcı yeteneği)',
   'entities.abilities.avatar.name': 'Savaş Timsali',
   'entities.abilities.avatar.description':
-    '20 sn boyunca bir devcüsseye dönüşür, üzerindeki tüm kontrol etkilerini kırar ve verdiğin hasarı %20 artırırsın.',
+    'Üzerindeki sersemletmeleri, korkuları, köklenmeleri, susturmaları, silahsızlandırmaları ve yavaşlatmaları kırar (patronlardan gelenleri değil), ardından 20 sn boyunca bir devcüsseye dönüşür ve %20 daha fazla hasar verirsin. Seni yeni kontrol etkilerinden korumaz.',
   'entities.abilities.avenging_wrath.description':
     "Altın kutsal güçten cismani kanatlar açar, 10 Adanmışlık kazanır ve 15 sn boyunca yeteneklerinin ürettiği Adanmışlığı ikiye katlar. Ayrıca verdiğin hasarı ve iyileştirmeyi %20 artırır. Şafak biçicisi: Gazap Çekici'ni herhangi bir hedefe karşı mümkün kılar.",
   'entities.abilities.berserk.description':
@@ -14687,10 +14692,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bladestorm.name': 'Kılıç Fırtınası',
   'entities.abilities.bladestorm.description':
     'Dönen bir çelik fırtınasına dönüşerek 4 sn boyunca 6 metre içindeki tüm düşmanlara her saniye {damage} hasar verirsin.',
-  'entities.abilities.blink.description':
-    'Seni 15 m ileri ışınlar ve kök salma etkilerini bozar. (Büyücü yeteneği)',
+  'entities.abilities.blink.description': 'Seni 15 m ileri ışınlar ve köklenmeleri kırar.',
   'entities.abilities.bloodlust.description':
-    "30 m içindeki grup ya da akın müttefiklerinin saldırı, büyü ve kanalize hızını 15 sn boyunca %30 artırır. Etkilenen müttefikler 10 dakika boyunca Savaş Davulları ya da Zamansal Hızlanma'dan yeniden yararlanamaz. (Şaman yeteneği)",
+    '30 yarda içindeki grup veya akın müttefiklerinin saldırı, büyü ve kanalize hızını 15 sn boyunca %30 artırır. Etkilenen müttefikler 10 dk boyunca Savaş Davulları, Hırsızlar Korosu veya Zamansal Hızlanmadan yeniden yararlanamaz. (Şaman yeteneği)',
   'entities.abilities.chain_lightning.description':
     '10 m içindeki en fazla 3 düşmana her birine {damage} Doğa hasarı vurur. Elementsel: isabet 1 Gök Gürültüsü verir. Hasar Büyü Gücü ile artar.',
   'entities.abilities.chaos_bolt.description':
@@ -14716,22 +14720,22 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frost_trap.description':
     'Hedef alandaki düşmanları 3 sn. boyunca dondurarak hareket etmelerini ve eyleme geçmelerini engeller. (Avcı yeteneği)',
   'entities.abilities.hammer_of_wrath.description':
-    "{damage} hasar için kutsal bir çekiç savurur ve 1 Adanmışlık üretir. Canın %20'nin altındayken ya da Kutsal Yüceliş veya İntikam Gazabı sırasında kullanılabilir. Şafağın Gazabı, herhangi bir hedefe karşı, süregelen bekleme süresini yok sayan ve %20 daha fazla hasar veren fazladan bir kullanım verir. Yüceliş hasarını %30 artırır.",
+    "{damage} Kutsal hasar veren kutsal bir çekiç fırlatır ve 1 Adanmışlık üretir. Yalnızca canı %20'nin altındaki hedeflere kullanılabilir; Kutsal Yüceliş, İntikam Gazabı veya Şafağın Gazabı etkinse bu geçerli değildir. Şafağın Gazabı sonraki kullanımda tüketilir; o kullanım bekleme süresini yok sayar ve %20 daha fazla hasar verir. Yüceliş hasarını %30 artırır.",
   'entities.abilities.healing_stream.description':
-    'Bir müttefik hedefe 12 sn. boyunca 120 sağlık yeniler. (Şaman yeteneği)',
+    "12 sn boyunca her 3 sn'de bir dost bir hedefi {damage} iyileştirir. İyileştirme, İyileştirme Gücü ile artar. (Şaman yeteneği)",
   'entities.abilities.howl_of_terror.description':
-    "Yakındaki düşmanları 5 sn. kadar korkutur. Hedefin azami sağlığının toplam %8'i kadar hasar korkusunu bozar. (Karabüyücü yeteneği)",
+    "8 m içindeki ve görüş hattındaki düşmanları en fazla 5 sn korkutur. Bir hedefin azami canının %8'ine ulaşan toplam hasar korkusunu bozar. (Karabüyücü yeteneği)",
   'entities.abilities.ice_block.description':
-    'Seni 8 sn boyunca katı buzun içine hapseder ve tüm hasara karşı bağışıklık kazandırır. Mevcut sıradan zararlı etkileri kaldırır ve yeni sıradan kontrol etkilerinin uygulanmasını engeller. Sersemlemiş veya polimorfa uğramışken kullanılabilir. Hapsedilmişken eylemde bulunamazsın. İptal etmek için tekrar kullan. (büyücü)',
+    'Seni 8 sn boyunca katı buza hapseder. Hasar almazsın ve sersemletilemez, köklenemez, yavaşlatılamaz, susturulamaz veya başka şekilde kontrol edilemezsin, ancak eylemde bulunamazsın. Kullanıldığında, karşılaşma kontrolü ve toparlanma hastalığı dışındaki zararlı etkileri üzerinden kaldırır. Sersemlemişken veya polimorfa uğramışken kullanılabilir. İptal etmek için tekrar kullan. (Büyücü)',
   'entities.abilities.inner_focus.description':
     'Bir sonraki rahip büyünü bedava ve kesintiye uğratılamaz kılar. 60 sn sürer.',
   'entities.abilities.innervate.description':
-    'Canlı özsu 10 sn. boyunca içinde kabarır ve mevcut kaynağından dalgalar halinde 20 yeniler: mana, öfke veya enerji. Form değiştirmek bunu bozmaz. Uyku, sersemletme veya durağanlık özsuyu durdurur. (Druid yeteneği)',
+    "10 sn boyunca içinde canlı özsu kabarır ve kullandığın kaynaktan (mana, Öfke veya Enerji) her 2 sn'de 20 yeniler. Form değiştirmek onu bitirmez. Uyku, sersemletme veya durağanlık onu duraklatır. (Druid yeteneği)",
   'entities.abilities.mend_pet.name': 'Yama Yap',
   'entities.abilities.mend_pet.description':
     'Sana a dost hedefi por {damage} durante 15 sn. (avcı yeteneği)',
   'entities.abilities.meteor.description':
-    'Hedef alana bir meteor indirerek {damage} Ateş hasarı verir, ardından bölgedeki düşmanlara 6 sn. boyunca 2 sn. arayla 12 ile 18 Ateş hasarı verir. (Büyücü yeteneği)',
+    "Hedef alana bir meteor çağırır. 2 sn sonra çarpar; çarpma alanındaki her düşmana {damage} Ateş hasarı verir ve her birini verilen hasarın %40'ı kadar 6 sn boyunca Tutuşturur. (Ateş)",
   'entities.abilities.mind_sear.description':
     '3 sn kanalize eder ve hedef alanın 8 m çevresindeki düşmanlara her saniye {damage} Gölge hasarı verir. Hasar Büyü Gücü ile artar. (Rahip yeteneği)',
   'entities.abilities.multi_shot.description':
@@ -14748,7 +14752,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Gölgelerin içinden, dost ya da düşman, hedefine Alaca Örtüsü'nü bozmadan adım atarsın. En fazla 2 kullanım birikir. (Haydut yeteneği)",
   'entities.abilities.silence.description': 'Hedefi 4 sn. boyunca susturur. (Rahip yeteneği)',
   'entities.abilities.tranquility.description':
-    '4 sn. boyunca iyileştirici enerji yönlendirir ve 30 m içindeki müttefikleri her saniye 42 ile 52 iyileştirir. (Druid yeteneği)',
+    '4 sn boyunca iyileştirici enerji kanalize eder; 30 m içindeki ve görüş hattındaki, kendin dahil her müttefiki her saniye {damage} iyileştirir. (Druid yeteneği)',
   'game.talents.readout.rowsSummary':
     'Yetenekler: {head}, {picked}/{unlocked} seçim satırı seçildi.',
   'hudChrome.fct.absorbed': 'Emildi ({amount})',
@@ -14762,25 +14766,25 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.greater_invisibility.name': 'Üstün Görünmezlik',
   'entities.abilities.hot_streak.name': 'Sıcak Seri',
   'entities.abilities.hot_streak.description':
-    'Pasif: Ateş büyülerinle (Köz Oku, Köz Yağmuru, Haşlama, Alev Mızrağı veya Alev Vuruşu) art arda yaptığın iki kritik vuruş, sonraki Alev Mızrağı veya Alev Vuruşu büyünü anında ve bedelsiz hale getirir. Harcayıcılar, bedelsiz kullanımlar dâhil SONRAKİ seriye sayılır; Alev Vuruşu kaç düşmana vurursa vursun bir kez sayılır ve yalnızca ilk çarpma hesaba katılır. (Ateş)',
+    'Pasif: Köz Oku, Köz Yağmuru, Haşlama, Alev Mızrağı, Alev Vuruşu veya Ejderha Nefesi ile art arda iki kritik vuruş yapmak, 12 sn içindeki sonraki Alev Mızrağı veya Alev Vuruşunu anlık ve bedelsiz yapar. Bu büyülerden birinin kritik olmayan bir vuruşu sayacı sıfırlar; ilk kritik vuruş 10 sn boyunca hatırlanır. Alev Mızrağı ve Alev Vuruşu, bedelsiz kullanımlar dahil, sonraki seriye sayılır. Alev Vuruşu ve Ejderha Nefesi, kaç düşmana vurursa vursun kullanım başına bir kez sayılır ve yalnızca ilk çarpma hesaba katılır. (Ateş)',
   'entities.abilities.ice_floes.name': 'Buz Kütleleri',
   'entities.abilities.ice_floes.description':
     'Kullanım süresi olan sonraki iki büyünü hareket ederken yapabilirsin. 15 sn. sürer. (büyücü yeteneği)',
   'entities.abilities.ignition.name': 'Tutuşma',
   'entities.abilities.ignition.description':
-    'Pasif: büyülerinin kritik vuruşları hedefi 6 sn. boyunca verilen hasarın %30 kadarı için yakar ve birikir. (Ateş ustalığı)',
+    "Pasif: Ateş büyülerin kritik vuruş yaptığında hedef, verilen hasarın %30'u kadar ek hasarla 6 sn boyunca yanar. Zaten yanan bir hedefte yeni bir yanma, henüz ödenmemiş hasara eklenir ve 6 sn'lik sayacı yeniden başlatır. (Ateş ustalığı)",
   'entities.abilities.mass_barrier.name': 'Toplu Bariyer',
   'entities.abilities.mass_barrier.description':
     'Seni ve 30 m içindeki en fazla 4 yakındaki müttefiki korur; her bariyer 15 sn. boyunca {damage} hasarı soğurur. (büyücü yeteneği)',
   'entities.abilities.overload.name': 'Aşırı Yük',
   'entities.abilities.overload.description':
-    'Sonraki büyün %40 güçlenir, ancak %50 daha fazla mana harcar. 10 sn. sürer. (büyücü yeteneği)',
+    'Mana harcayan sonraki büyünün temel hasar, iyileştirme ve emilim değerleri %40 artar, ancak %50 daha fazla mana harcar. Büyü Gücü bonusu artmaz. 10 sn sürer. (Büyücü yeteneği)',
   'entities.abilities.power_echo.name': 'Güç Yankısı',
   'entities.abilities.power_echo.description':
-    'Sonraki doğrudan büyün aynı hedefte %50 güçle tekrarlanır. 10 sn. sürer. (büyücü yeteneği)',
+    "Sonraki tek hedefli doğrudan hasar veya iyileştirme büyün, verdiği veya iyileştirdiği miktarın %50'si kadarıyla aynı hedefte tekrarlanır. 10 sn sürer. (Büyücü yeteneği)",
   'entities.abilities.rings_of_frost.name': 'Don Halkası',
   'entities.abilities.rings_of_frost.description':
-    '10 sn. boyunca bir halka çağırır. Çevresinden geçen düşmanlar 4 sn. boyunca donar. (büyücü yeteneği)',
+    'Hedef konuma 10 sn boyunca bir don halkası yerleştirir. Halkayı geçen düşman 4 sn köklenir; her düşman onu yalnızca bir kez tetikleyebilir. Halkanın içindeki merkez güvenlidir. (Büyücü yeteneği)',
   'entities.abilities.rune_of_power.name': 'Güç Rünü',
   'entities.abilities.rune_of_power.description':
     '15 sn. boyunca ayaklarının altına bir güç rünü kazırsın: 8 m içinde duran müttefikler %10 daha fazla hasar verir. (büyücü yeteneği)',
@@ -15063,13 +15067,13 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'delveUi.shop.buyConfirmCancel': 'İptal etmek',
   'delveUi.shop.buyConfirmTitle': 'Satın Alma İşlemini Onayla',
   'entities.abilities.brain_freeze.description':
-    "Ayaz Mızrağı'nin bir sonraki Winterlash'nizi anında ve bekleme süresinden kurtulması için %20 şansı vardır. (Don)",
+    'Her Ayaz Mızrağı isabeti, %20 ihtimalle 15 sn boyunca Beyin Donması verir: sonraki Kış Kırbacın anlık olur ve bekleme süresini yok sayar. Beyin Donması etkinken gelen tetiklenme kaybolur. (Don)',
   'entities.abilities.flurry.description':
-    "Her biri {damage} Frost hasarı veren üç buz mermisi fırlatın ve hedefe Winter's Chill'i uygulayın: sonraki 2 uyumlu büyü hedefi donmuş sayar. Brain Freeze, Winterlash'yi anında yapar ve bekleme süresini atlar. (Don)",
+    'Her biri {damage} Ayaz hasarı veren üç buz oku fırlatır ve hedefe 5 sn boyunca Kış Soğuğu uygular: ona isabet eden sonraki 2 Buz Mızrağı hedefi donmuş sayar. Beyin Donması, Kış Kırbacını anlık yapar ve bekleme süresini atlar. (Don)',
   'entities.abilities.frozen_orb.description':
     '8 saniye boyunca ileri doğru sürüklenen, dönen bir buz küresi salarak yakındaki düşmanlara her saniye {damage} Frost hasarı verir ve onları %30 yavaşlatır. Her çarpan darbe bir Buz Saçağı üretir. (Don)',
   'entities.abilities.shatter.description':
-    'Büyüleriniz donmuş hedeflere karşı %50 kritik vuruş şansı kazanır. Fingers of Frost ve Kış Soğuğu donmuş sayılır. (Don)',
+    'Tek hedefli hasar büyülerin, donmuş hedeflere karşı %50 kritik vuruş şansı kazanır: bir Büyücünün kökleme, sersemletme, etkisizleştirme veya Büyüleme etkisiyle tutulan düşmanlar. Don Parmakları ve Kış Soğuğu, Buz Mızrağının hedefini donmuş saymasını sağlar. (Don)',
   'entities.items.anglers_feast_platter.name': 'Balıkçının Ziyafet Tabağı',
   'entities.items.ashwood_smoked_eel.name': 'Ashwood Füme Yılan Balığı',
   'entities.items.cooking_salt.name': 'Pişirme Tuzu',
@@ -16020,9 +16024,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.choir_of_deliverance.name': 'Kurtuluş Korosu',
   'entities.abilities.scouring_mercy.name': 'Arındıran Merhamet',
   'entities.abilities.aegis_first_dawn.description':
-    '5 sn kanalize ederek 10 metrelik kutsal bir kubbe oluşturur. İçindeki müttefikler her saniye iyileşir ve 50% daha az hasar alır. Kanalizasyonu tamamlamak son bir iyileştirme salar ve 4 sn boyunca 30% hareket hızı verir.',
+    "Etrafında 10 m'lik kutsal bir kubbeyi kanalize eder. İçindeki ve görüş hattındaki dost oyuncular %50 daha az hasar alır ve her saniye 35 ila 45 iyileşir. Kanalı tamamlamak onları 120 ila 150 daha iyileştirir ve 4 sn boyunca %30 hareket hızı verir. İyileştirme, İyileştirme Gücü ile artar.",
   'entities.abilities.aura_mastery.description':
-    '8 sn boyunca grubundaki her etkin Adanmışlığı ve Kısas Aurasını güçlendirir. Burç Adanmışlığı hasarı 15% azaltır; Kısas 15 Kutsal hasar verir. Birden fazla kullanım birikmek yerine yeniler.',
+    '8 sn boyunca grubundaki etkin her Burç Adanmışlığını ve Karşılık Aurasını üçe katlar: Burç Adanmışlığı alınan hasarı %15 azaltır, Karşılık Aurası normal Kutsal hasarının üç katını verir. Tekrarlı kullanımlar birikmek yerine yeniler.',
   'entities.abilities.bastion_rite.description':
     'Alınan fiziksel hasarı 20% azaltır ve blok şansını 6 sn boyunca 20% artırır. Yüceliş süreyi 10 sn yapar.',
   'entities.abilities.bastion_sweep.description':
@@ -16032,23 +16036,23 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.dawn_devotion.description':
     'Senin ve grup üyelerinin saldırı gücünü 30 dk boyunca 40 artırır. Kendi Işıyan veya Lütuf Adanmışlığının yerini alır, ancak diğer paladinlerin Adanmışlıkları ve savaşçı naralarıyla birlikte var olur.',
   'entities.abilities.dawnfall.description':
-    'Yakındaki düşmanlara {damage} Kutsal hasar verir ve 1 Adanmışlık üretir. En az bir düşmanı vurmak Son Fermanın kalan bekleme süresini 2 sn kısaltır. Yüceliş hasarını ve yarıçapını artırır.',
+    'Yakındaki düşmanlara {damage} Kutsal hasar verir ve 1 Adanmışlık üretir. En az bir düşmana vurmak Son Fermanın kalan bekleme süresini 2 sn kısaltır. Yüceliş hasarını %50 artırır ve yarıçapını 10 m yapar.',
   'entities.abilities.dawns_embrace.description':
-    'Güçlü bir iyileştirme salar ve 1 Adanmışlık üretir. Işıyan Rezonans mana maliyetini 50%, okuma süresini 1,5 sn yapar. Yüceliş onu anında yapar ve iyileştirmesini 35% artırır.',
+    'Dost bir hedefi {damage} iyileştirir ve 1 Adanmışlık üretir. Işıyan Rezonans mana maliyetini %50 azaltır ve okuma süresini 1,5 sn yapar. Yüceliş onu anlık yapar ve iyileştirmesini %35 artırır.',
   'entities.abilities.devotion_ward.description':
     'Senin ve grup üyelerinin aldığı hasarı ölüme veya değiştirilmeye dek 5% azaltır. Yalnızca bu aura ile Kısas Aurası birbirinin yerini alır; Işıyan, Şafak ve Lütuf Adanmışlığı birlikte var olur.',
   'entities.abilities.divine_ascension.description':
-    '20 Adanmışlık tüketerek en fazla 45 sn boyunca 5 Yüceliş şarjı kazandırır. İşaretli yetenekler bir şarj tüketir ve ek bir etki kazanır.',
+    '20 Adanmışlık harcayarak en fazla 45 sn boyunca 5 Yüceliş şarjı kazanırsın. Yüceliş etkinken uzmanlığının öne çıkan yeteneklerinin her biri, ipucunda anlatılan Yüceliş bonusu için 1 şarj harcar ve Adanmışlık kazanmazsın. Şarjlar veya süre bitince Yüceliş sona erer. Uzatılmış şafak 2 şarj ekler.',
   'entities.abilities.faithforged_guard.description':
     '8 sn boyunca sana gelen bir sonraki düşman vuruşu yanıtlanır: {buff} kadar hasar reddedilir ve saldırgana Kutsal hasar olarak döndürülür, sen de 1 Adanmışlık kazanırsın. Yalnızca tek bir darbe yanıtlanır. Yüceliş yanıtlayabildiği miktarı 50% artırır.',
   'entities.abilities.final_edict.description':
-    'Ezici bir silah vuruşu indirir ve hasar verdiğinde 1 Adanmışlık üretir. Başarılı bir vuruş Şafak Düşüşünün kalan bekleme süresini 2 sn kısaltır. Başarılı otomatik saldırılar ve Son Ferman vuruşlarının 15% ihtimalle 8 sn boyunca Şafağın Gazabını verme şansı vardır. Yüceliş ayrıca çevrende Fiziksel hasar veren bir patlama salar.',
+    'Ezici bir silah darbesi indirir ve hasar verdiğinde 1 Adanmışlık üretir. Başarılı bir vuruş Şafak Düşüşünün kalan bekleme süresini 2 sn kısaltır. Başarılı otomatik saldırılar ve Son Ferman vuruşları %15 ihtimalle 8 sn boyunca Şafağın Gazabını verir: sonraki Gazap Çekicin herhangi bir hedefe vurabilir, bekleme süresini yok sayar ve %20 daha fazla hasar verir. Yüceliş ayrıca çevrende Fiziksel hasar veren bir patlama salar.',
   'entities.abilities.grace_devotion.description':
     'Sen ve grup üyeleri her 5 sn 15 mana geri kazanır ve 30 dk boyunca 3% daha az mana harcarsınız. Kendi Işıyan veya Şafak Adanmışlığının yerini alır, ancak diğer paladinlerin Adanmışlıklarıyla birlikte var olur.',
   'entities.abilities.guardian_covenant.description':
-    'Dost bir hedefi ve kendini korur, alınan hasarı 8 sn boyunca 20% azaltır. Dost hedef seçili değilse varsayılan olarak seni seçer.',
+    "Dost bir hedefi ve kendini korur, alınan hasarı 8 sn boyunca %20 azaltır. Dost hedef seçili değilse seni seçer. Yüceliş azaltmayı %30'a çıkarır.",
   'entities.abilities.hammer_of_grace.description':
-    '20 m içindeki bir düşmana anında kutsal bir çekiç fırlatarak {damage} hasar verir, 70 mana geri kazandırır, verdiği hasarın 50% kadarını sana iyileştirir ve hasar verdiğinde 1 Adanmışlık üretir. Güneş Kısası, Lütuf Çekicinin bekleme süresini yok saymasını ve verdiği hasarın 100% kadarını sana iyileştirmesini sağlar.',
+    "Bir düşmana kutsal bir çekiç fırlatarak {damage} Kutsal hasar verir, 70 mana geri kazandırır ve verilen hasarın %50'si kadar seni iyileştirir. Hasar verdiğinde 1 Adanmışlık üretir. Güneş Kısası (bir İnanç Muhafızı tetiklenmesi) bekleme süresini yok saymasını ve verilen hasarın %100'ü kadar seni iyileştirmesini sağlar.",
   'entities.abilities.hushbrand.description':
     'Büyü okumayı keser ve o okuldan büyüleri 4 sn engeller.',
   'entities.abilities.life_covenant.description':
@@ -16060,7 +16064,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.oath_chain.description':
     'Uzaktaki bir düşmanı anında kutsal bir zincirle bağlar. Düşman saniyede 18 m hızla 3 m mesafeye gelene dek sana doğru ilerler, ardından 4 sn boyunca 50% yavaşlar. Yüceliş sırasında yakındaki ikinci bir düşmanı da bağlar.',
   'entities.abilities.radiant_chorus.description':
-    'Yakındaki müttefikleri {damage} iyileştirir ve 1 Adanmışlık üretir. En az 2 müttefiki etkili biçimde iyileştirmek Işıyan Rezonans verir: sonraki Onaran Işığın anında olur veya sonraki Şafağın Kucaklaması 50% daha az mana harcar ve 1,5 sn içinde okunur. Yüceliş Işıyan Koronun iyileştirmesini ve yarıçapını artırır.',
+    "Yakındaki müttefikleri {damage} iyileştirir ve 1 Adanmışlık üretir. En az 2 müttefiki etkili biçimde iyileştirmek 10 sn boyunca Işıyan Rezonans verir: sonraki Onaran Işığın anlık olur ya da sonraki Şafağın Kucaklaması %50 daha az mana harcar ve 1,5 sn'de okunur. Yüceliş Işıyan Koronun iyileştirmesini %20 artırır ve yarıçapını 40 m yapar.",
   'entities.abilities.radiant_devotion.description':
     'Senin ve grup üyelerinin büyü gücünü 30 dk boyunca 20 artırır. Kendi Şafak veya Lütuf Adanmışlığının yerini alır, ancak diğer paladinlerin Adanmışlıklarıyla birlikte var olur.',
   'entities.abilities.recall_the_fallen.description':
@@ -16070,24 +16074,24 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacred_form.description':
     'Ölüme dek kutsal bir hale girer; iyileştirmeyi 10%, büyü kritik şansını 5% artırır ve üretilen tehdidi 50% azaltır. Yalnızca Güneş Şifacıları için.',
   'entities.abilities.seraphic_vigil.description':
-    'Bir müttefiki 30 sn korur. Onu 35% canın altına düşüren ilk vuruş Nöbeti tüketir ve onu {buff} iyileştirir. (Lütuf imzası)',
+    'Bir müttefiki 30 sn boyunca korur. Onu %35 canın altında bırakan ilk vuruş Nöbeti tüketir ve onu {buff} iyileştirir. Başka bir müttefike kullanmak Nöbetini taşır. (Kutsal imzası)',
   'entities.abilities.scouring_mercy.description':
-    "Bir düşmana {damage} Kutsal hasar verir ya da dost bir hedefi {healing} iyileştirir. Hasar büyü gücüyle, iyileştirme ise iyileştirme gücüyle artar. Öğreti, bu hasarı bağlarınız aracılığıyla iyileştirmeye dönüştürür. 30 metre içinde bağlı yaralı bir grup üyesi yoksa, 30 metre içindeki en düşük canlı yaralı grup üyesini hasarın 15%'i kadar iyileştirir. Bir grup üyesini iyileştirmek, o hedefin 10 metre içindeki ve görüş hattındaki en fazla 2 yaralı grup üyesini daha, her birini iyileşen canın 50%'i kadar iyileştirir. Bu ekstra iyileştirmeler kritik vuramaz ya da Öğreti bağı oluşturamaz. (Öğreti imzası)",
+    "Bir düşmana {damage} Kutsal hasar verir veya dost bir hedefi {healing} iyileştirir. Hasar Büyü Gücü ile, iyileştirme İyileştirme Gücü ile artar. Disiplin, 30 yarda içindeki bağlı her yaralı grup üyesini verilen hasarın %30'u kadar iyileştirir (İkiz Ahit ile %70). Hiçbiri yaralı değilse, bunun yerine 30 yarda içindeki en düşük canlı yaralı grup üyesini hasarın %15'i kadar iyileştirir. Bir grup üyesini iyileştirmek, o hedefin 10 yarda içindeki ve görüş hattındaki en fazla 2 yaralı grup üyesini daha, her birini yenilenen canın %50'si kadar iyileştirir. Bu ekstra iyileştirmeler kritik iyileştirme yapamaz ve Disiplin bağı oluşturamaz. (Disiplin imzası)",
   'entities.abilities.solar_invocation.description':
-    'Bir müttefiki anında {damage} iyileştirir ya da bir düşmana orta düzeyde Kutsal hasar verir. Her iki kullanım da 1 Adanmışlık üretir. Yüceliş sırasında iyileştirme okuması hedefin 10 m yakınındaki dost oyuncuları da yarısı kadar iyileştirir.',
+    'Bir müttefiki anında {damage} iyileştirir veya bir düşmana 120 ila 150 temel Kutsal hasar verir. Hasar Büyü Gücü ile, iyileştirme İyileştirme Gücü ile artar. Her iki kullanım da 1 Adanmışlık üretir. Yüceliş sırasında iyileştirme, hedefin 10 m yakınındaki dost oyuncuları da yarısı kadar iyileştirir.',
   'entities.abilities.solar_step.description': 'Hareket hızını 2 sn boyunca 150% artırır.',
   'entities.abilities.sun_gods_verdict.description':
     'Bir düşmanı 30 sn boyunca Güneş Tanrısının Hükmü altında yargılar. Son Ferman ve Şafak Düşüşü başarılı vuruşta birer şarj işler. Üçüncü şarjı koyan yetenek cezayı belirler: Son Ferman mahkûma yıkıcı hasar salar; Şafak Düşüşü hükmü patlatarak yakındaki düşmanlara hasar verir ve onları 1,5 sn sersemletir.',
   'entities.abilities.sunward_disc.description':
-    'Kalkan gerektirir. Vurup ardından yakındaki düşmanlar arasında seken ışıyan bir disk fırlatır. Hasar veren her çarpma 1 Adanmışlık üretir. Güneş Kısası Güneş Diskinin mana harcamamasını, bekleme süresini yok saymasını ve 20% daha fazla hasar vermesini sağlar. Yüceliş 5 sekmeyi güçlendirir.',
+    "Kalkan gerektirir. Hedefe {damage} Kutsal hasar veren ışıyan bir disk fırlatır, ardından yakındaki en fazla 2 düşmana daha her birine 60 ila 75 temel Kutsal hasarla seker. Hasar veren her çarpma 1 Adanmışlık üretir. Güneş Kısası, Güneş Diskinin mana harcamamasını, bekleme süresini yok saymasını ve %20 daha fazla hasar vermesini sağlar. Yüceliş hasarını %30 artırır ve sekme sayısını 5'e çıkarır.",
   'entities.abilities.valkyrs_calling.description':
     'Havaya yükselir, düşmana doğru uçarken hasara karşı bağışık olursun. 2 sn sonra hedef alana inerek {damage} Kutsal hasar verir ve 1 Adanmışlık üretirsin. Yüceliş çarpma hasarını 50% artırır ve 1 şarj tüketir.',
   'entities.abilities.veilbound_march.description':
-    '4 sn boyunca eterik olursun; 40% hareket hızı ve 30% zırh kazanır, köklenmeye, yavaşlamaya ve yer değiştirmeye karşı bağışık olursun. İçinden geçtiğin düşmanlar 6 sn boyunca Perde Damgası alır: her saniye Kutsal hasar alır, sana 20% daha az hasar verir ve ek tehdit üretirler. İlk damga 1 Adanmışlık verir. Yürüyüş bittiğinde yakındaki damgalı düşmanlar son bir patlama alır. Yüceliş patlamayı 50% artırır ve onları hafifçe sana çeker.',
+    "4 sn boyunca eterik olursun: %40 hareket hızı ve %30 zırh kazanır, köklenmeleri ve yavaşlatmaları kaldırır, köklenmeye, yavaşlamaya ve yer değiştirmeye karşı bağışık olursun. İçinden geçtiğin düşmanlar 6 sn boyunca Perde Damgası alır: her saniye 12 Kutsal hasar alır, üç kat tehdit üretir ve sana %20 daha az hasar verir. İlk damga 1 Adanmışlık verir. Yürüyüş bittiğinde 10 m içindeki damgalı düşmanlar 36 Kutsal hasar alır. Yüceliş bu hasarı 54'e çıkarır ve onları sana doğru 2 m çeker.",
   'entities.abilities.veilbound_mark.description':
     'Her saniye Kutsal hasar alır, damgayı basan paladine 20% daha az hasar verir ve o paladine karşı ek tehdit üretir.',
   'entities.abilities.vowkeeper_strike.description':
-    'Yüksek tehditle vurur ve 1 Adanmışlık üretir. Başarılı bir vuruşun 8 sn boyunca Güneş Kısası verme ihtimali 20%; her başarılı blokun 25%. Güneş Kısası sonraki Güneş Diskini, Lütuf Çekicini veya Onaran Işığını güçlendirir. Yüceliş ayrıca küçük bir emici kalkan verir.',
+    "Silah hasarı artı {damage} Fiziksel hasar ile yüksek tehditle vurur ve 1 Adanmışlık üretir. Başarılı bir vuruş %20 ihtimalle 8 sn boyunca Güneş Kısası verir; her başarılı blok %25 ihtimalle verir. Güneş Kısası, sonraki Güneş Diskin (mana harcamaz, bekleme süresi yok, %20 daha fazla hasar), Lütuf Çekicin (bekleme süresi yok, verilen hasarın %100'ü kadar seni iyileştirir) veya Onaran Işığın (anlık) tarafından tüketilir. Yüceliş ayrıca 6 sn boyunca azami canının %6'sı kadar seni kalkanlar.",
   'entities.abilities.choir_of_deliverance.description':
     '6 sn kanalize eder, 30 metre içindeki grup üyelerini her 2 saniyede {damage} kadar iyileştirir. İyileştirme büyü gücüyle artar.',
 
@@ -16111,31 +16115,31 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodhook.description':
     "Bir düşmana hücum ederek Kanlı Çengel yarası uygular; 12 sn içinde 4 vuruşta 34 temel Fiziksel hasar artı Menzilli Saldırı Gücünün %26'sını verir. Vardığında hedefi 3 sn boyunca %30 yavaşlatır. (Hayatta Kalma)",
   'entities.abilities.bloodtrail_assault.description':
-    '12 sn boyunca Kanlı Çengel, 5 metre içindeki en fazla 2 düşmana %60 güçlü yara yayar; Yara Yırtışı 18 hasarlık bir yoldaş saldırısı emreder; Şarapnel Yükü 2 metre daha uzağa ulaşır, ana hedefe %25 daha fazla temel hasar verir ve %50 daha fazla yara hasarı tetikler. Yaşayan yoldaşın yokken Odak yenilenmen de %100 hızlanır.',
+    '12 sn boyunca Kanlı Çengel, hedefinin 5 yarda içindeki en fazla 2 düşmana daha %60 güçte bir Kanlı Çengel Yarası uygular, Yara Yırtışı yaşayan evcil hayvanının hedefe 18 Fiziksel hasar vurmasını sağlar, Şarapnel Yükü 2 yarda daha uzağa ulaşır, ana hedefine %25 daha fazla temel hasar verir ve anlık yara tıkı %50 daha fazla vurur. Yaşayan evcil hayvanın yokken Odak yenilenmen de %100 daha hızlı olur.',
   'entities.abilities.cold_focus.description':
-    '12 sn boyunca Ölçülü Atış 50% daha fazla odak geri kazandırır, Uzun Çekiş ise 25% daha az harcar ve 30% daha hızlı okunur. (Soğuk Bakış imzası)',
+    '12 sn boyunca Ölçülü Atış 30 Odak geri kazandırır, Uzun Çekiş ise %25 daha az harcar ve okuma süresi %30 daha kısa olur. (Nişancılık imzası)',
   'entities.abilities.fieldcraft_reentry.description':
     'Pasif: Av İvmesi varken İz Kırma sonraki Deşen Darbe veya Kanlı Çengel yeteneğini 12 sn için hazırlar. Deşen Darbe yük başına %15 daha fazla hasar verir. Kanlı Çengel, yük başına %15 ve Menzilli Saldırı Gücüyle artan 18 ila 24 ek Fiziksel hasar verir. 3 yükte her iki saldırıdan biri Av İvmesi yüklerini tüketir. (Hayatta Kalma)',
   'entities.abilities.frostjaw_trap.description':
-    'Seçili konuma bir tuzak yerleştirir. 0,75 sn sonra kurulur, 1 dakika sürer ve onu yalnızca sen ve grubun görebilir. Onu tetikleyen ilk düşman 3 sn köklenir ve 4 metre içindeki düşmanlar 4 sn boyunca 50% yavaşlar.',
+    'Seçili konuma bir tuzak yerleştirir. 0,75 sn sonra kurulur, 1 dakika sürer ve onu yalnızca sen ve grubun görebilir. Tetikleyen ilk düşman 3 sn köklenir, 4 yarda içindeki düşmanlar ise 4 sn boyunca %50 yavaşlar. Aynı anda yalnızca bir Buzçene Tuzağı etkin olabilir. Yenisini yerleştirmek eskisinin yerini alır.',
   'entities.abilities.hunting_momentum.description':
     'Pasif: Deşen Darbe ve bir düşmana isabet eden Şarapnel Yükü birer Av İvmesi verir, en fazla 3. Harcanana veya savaştan çıkana kadar sürer ve her yük hareket hızını %15 artırır. 3 yükte Yara Yırtışı %60 daha fazla darbe hasarı verir ve yükleri tüketir. (Hayatta Kalma)',
   'entities.abilities.measured_shot.description':
     'Hedefe {damage} Fiziksel hasar verecek şekilde ateş eder. İsabet 20 odak geri kazandırır. Hasar menzilli saldırı gücüyle artar.',
   'entities.abilities.pack_command.description':
-    'Yaşayan evcil hayvanına 36 ila 48 Fiziksel hasar vurması için emir verir. Hasar evcil hayvanın saldırı gücüyle artar. İsabet 20 odak geri kazandırır ve 30 sn boyunca 1 Sürü Vahşeti verir, en fazla 3. Her katman evcil hayvanının verdiği tüm hasarı 10% artırır. Bu vuruş, isabetten önceki katmanlarını kullanır.',
+    "Yaşayan evcil hayvanına 36 ila 48 Fiziksel hasar vurması için emir verir. Hasar, evcil hayvanın Saldırı Gücü ile artar. İsabet 20 Odak geri kazandırır ve 30 sn boyunca 1 Sürü Vahşeti verir, en fazla 3 kez. Her katman, evcil hayvanının verdiği tüm hasarı %10 artırır. Bu vuruş, isabetten önceki katmanları kullanır. 3 katmanda bu düğme Canavarı Salıver'e dönüşür. Salıverilmiş Çılgınlık sırasında kullanılamaz.",
   'entities.abilities.pack_rally.description':
     'Küheylan Suretine bürünür ve yakındaki müttefikleri 10 sn boyunca 30% hareket hızı ile 10% saldırı ve okuma hızıyla toplar.',
   'entities.abilities.shellskin.description':
-    'Alınan hasarı 8 sn boyunca 60% azaltır, ancak etkinken saldırmayı engeller.',
+    'Alınan hasarı 8 sn boyunca %60 azaltır. Etkinken tuzaklar dahil düşmanları hedefleyen veya onlara hasar veren yetenekleri kullanamazsın, ancak otomatik saldırıların devam eder.',
   'entities.abilities.shrapnel_charge.description':
     'Önünde 10 metrelik bir koniyi vurur. Hedefin veya hedefin koninin dışındaysa isabet alan en yakın düşman 24 ila 30 Fiziksel hasar alır. Konideki diğer düşmanlar 7 ila 9 hasar alır ve 6 sn boyunca 12 hasar için kanar. Ana hedefte senin Kanlı Çengel yaran varsa hemen 1 yara vuruşu uygulanır. Bir düşmana isabet etmek 1 Av İvmesi verir. Doğrudan hasar Menzilli Saldırı Gücüyle artar.',
   'entities.abilities.stampede.description':
-    '12 sn boyunca 3 canavar çağırır. Her biri 2 sn arayla {damage} Fiziksel hasar verir. Gösterilen hasar, evcil hayvan hasar bonuslarından önce menzilli saldırı gücünün 8% kadarını içerir. Canavarlar çağrıldıklarında Sürü Vahşetini sabitler ve katman başına 10% hasar kazanır. İzdiham beklemedeyken başarılı Sürü Emirlerinin onu sıfırlama ihtimali 20%, 5 başarısız denemeden sonra garantidir. Canavarlar etkinken sıfırlanamaz. (Sürü Efendisi)',
+    "12 sn boyunca 3 canavar çağırır. Her biri 2 sn'de bir {damage} Fiziksel hasar verir. Gösterilen hasar, evcil hayvan hasar bonuslarından önce Menzilli Saldırı Gücünün %8'ini içerir. Canavarlar çağrıldıklarında Sürü Vahşetini sabitler ve katman başına %10 hasar kazanır. İzdiham bekleme süresindeyken başarılı Sürü Emirlerinin onu sıfırlama şansı %20'dir, 5. denemede garantidir. Canavarlar etkinken sıfırlanamaz. (Canavar Hakimiyeti)",
   'entities.abilities.trailbreak.description':
-    '25 metre geriye sıçrar ve kökleme ile hareket yavaşlatma etkilerinden kurtulursun. Av İvmen varsa tazelenir ve Dönüşü 12 sn hazırlar.',
+    '25 yarda geriye sıçrar ve köklenmelerden ile hareket yavaşlatmalarından kurtulursun. İnişte 3 sn boyunca %50 hareket hızı kazanırsın. Av İvmen varsa 12 sn boyunca Silahlı Dönüş kazanırsın: sonraki Deşen Darben veya Kanlı Çengelin, İvme katmanlarına göre ek hasar verir.',
   'entities.abilities.unleash_beast.description':
-    'Evcil hayvanın 83 ila 105 Fiziksel hasar vurup 6 metre içindeki her düşmanı 26 ila 34 sarsmasının ardından 3 Sürü Vahşeti tüketir. Vuruş ve sarsıntı, Sürü Vahşetinin tam 30% evcil hayvan hasar bonusunu kullanır ve evcil hayvanın saldırı gücüyle artar. Sonraki 8 sn boyunca evcil hayvan 25% daha fazla hasar verir, 35% daha hızlı saldırır ve Uğursuz Atışın yakındaki en fazla 2 düşmanı biçmesini sağlar.',
+    'Evcil hayvanın hedefe 42 ila 53 Fiziksel hasar vurur, ardından evcil hayvanın 6 yarda içindeki her düşmana 57 ila 75 hasarlık bir pençe darbesi indirir. Pençe darbesi, ana hedef dışındaki düşmanlara %50 daha fazla hasar verir. Vuruş ve pençe darbesi, Sürü Vahşetinin tam %30 evcil hayvan hasar bonusunu kullanır, evcil hayvanın Saldırı Gücü ile artar ve ardından 3 Sürü Vahşetinin tümünü tüketir. Sonraki 8 sn boyunca (Salıverilmiş Çılgınlık) evcil hayvan %25 daha fazla hasar verir ve %35 daha hızlı saldırır, her Uğursuz Atış hedefin 5 yarda içindeki en fazla 2 düşmanı daha 12 ila 18 Fiziksel hasarla biçer ve Sürü Emrini kullanamazsın.',
   'entities.abilities.wildheart.description': 'Azami canının 30% kadarını anında geri kazandırır.',
   'entities.abilities.ancestor_return.name': 'Ataların Dönüşü',
   'entities.abilities.galeheart_weapon.name': 'Fırtına Yüreği Silahı',
@@ -16150,23 +16154,23 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ancestor_return.description':
     'Grubunun ya da akınının, 40 yarda yakınındaki ve görüş hattındaki düşmüş her üyesini 30% can ve manayla yanına çağırır. Savaşta okunamaz. (Ruh Onarımı)',
   'entities.abilities.galeheart_weapon.description':
-    'Her iki silahı 30 dk büyüler ve Savaş Ruhu Ritmini etkinleştirir.',
+    'Her iki silahı 30 dk büyüler. Etkinken tamamlanan her Savaş Ruhu Ritmi ayrıca Kasırga Yankılarıyla vurur. Stonebound Silahının yerini alır.',
   'entities.abilities.lifespring_weapon.description':
     'Silahını 30 dk büyüler. Onaran Sular ve Gelgit Çağrısı, Onarım Akıntısına 20% daha fazla iyileştirme ekler.',
   'entities.abilities.primal_exaltation.description':
     '12 sn boyunca Gök Gürültüsü Çağrısının Ark Oku ve Çatallı Yıldırımı 50% daha hızlı okunur ve Ark Oku 2 Gök Gürültüsü verir; Savaş Ruhu her 2 silah isabetinde ritmini tetikler; Ruh Onarımı, Onarım Akıntısına 50% daha fazla iyileştirme ekler. (Şaman yeteneği)',
   'entities.abilities.stoneward.description':
-    'Bir müttefiki 60 sn boyunca 6 şarjla korur. Hasar bir şarj tüketerek azami canın 5% kadarını iyileştirir, 3 snde bir. (Şaman yeteneği)',
+    "Bir müttefiki 60 sn boyunca korur. Hasar aldığında bir şarj onu azami canının %5'i kadar iyileştirir; en fazla 3 sn'de bir, en fazla 6 şarj. Taş Muhafızını aynı anda yalnızca bir müttefik taşıyabilir. (Şaman yeteneği)",
   'entities.abilities.stormsurge.description':
     "Pasif: Ata Vuruşu beklemedeyken bir Fırtına Alameti tüketmenin onu sıfırlama ihtimali 25%. İlk 3 şans başarısız olursa 4.'sü her zaman sıfırlar. (Savaş Ruhu)",
   'entities.abilities.thunder_reservoir.description':
     'Pasif: Ark Oku, Çatallı Yıldırım ve Magma Patlaması Gök Gürültüsü verir, en fazla 5. 5 Gök Gürültüsünde Toprak Sarsıntısı 125% daha fazla hasar verir ya da Deprem 100% daha fazla verir, ardından tüm Gök Gürültüsünü tüketir. (Gök Gürültüsü Çağrısı)',
   'entities.abilities.tidecall.description':
-    'Dost bir hedefi {damage} kadar iyileştirir. İyileştirme büyü gücüyle artar. Taşma öncesi tam iyileştirmeyi, hedefin azami canının 30% kadarına dek Onarım Akıntısına ekler.',
+    "Dost bir hedefi {damage} iyileştirir. İyileştirme, İyileştirme Gücü ile artar. Ayrıca aşırı iyileştirmeden önceki tam iyileştirmeyi hedefin Onaran Akımına ekler; bu havuz onu 12 sn boyunca iyileştirir ve en fazla azami canının %30'unu tutar.",
   'entities.abilities.unleash_weapon.description':
     'Silahının etkin büyüsünü salıverir. Ateş Damgası 54 ila 64 Ateş hasarı verir, büyü gücünün 30% kadarını kazanır ve 2 Gök Gürültüsü verir. Fırtına Yüreği silahınla vurur, Savaş Ruhu Ritmini ilerletir ve 6 sn boyunca 20% saldırı hızı verir. Taş Bağı silah hasarının 75% kadarıyla vurur, hedefi sana saldırmaya zorlar ve alınan hasarı 4 sn boyunca 20% azaltır. Yaşam Pınarı, Onarım Akıntını tüketir, kalan iyileştirmesinin 125% kadarını iyileştirir ve 8 sn içindeki sonraki vuruşu geri kazandırılan canın 50% kadarı azaltır.',
   'entities.abilities.warspirit_cadence.description':
-    'Pasif: isabet eden her 3. silah saldırısı %25 Doğa hasarıyla 2 Fırtına Yüreği Yankısı tetikler ve 12 sn boyunca Fırtına Alameti verir. Fırtına Alameti sonraki Ark Okunu, Sarsıntını veya Onaran Sularını anında yapar ve mana maliyetini %50 düşürür. Ata Vuruşu 2 saldırı sayılır. (Savaş Ruhu)',
+    "Pasif: Çift silah saldırılarının ekstra ıskalama şansı yoktur. Kasırga veya Stonebound Silahı etkinken isabet eden her 3. silah saldırısı 12 sn boyunca Fırtına Alameti verir. Fırtına Yüreği Silahı ile ayrıca 2 Kasırga Yankısı tetikler; her biri o vuruşun hasarının %25'ini Doğa hasarı olarak verir. Fırtına Alameti sonraki Ark Okunu, Sarsıntını veya Onaran Sularını anlık yapar ve mana maliyetini %50 düşürür. Atalar Darbesi 2 saldırı sayılır. (Güçlendirme)",
   'entities.abilities.summon_tithefiend.name': 'Öşür İfriti Çağır',
   'entities.abilities.summon_tithefiend.description':
     'Tüm Kasvet Öşürünü tüketerek 1 ila 5 katmanda 6, 8, 10, 12 veya 15 sn boyunca bir Öşür İfriti çağırır. 2 sn arayla 20 ila 24 Gölge hasarı, artı her ek katman için 8 hasar verir. Beş katmanda büyür ve hasarı 25% artar. Hasarı büyü gücünle artar. Kuklanı tercih eder. Her isabet azami mananın 1% kadarını geri kazandırır ve Çürüme Ağıdını taşıyan en fazla 3 başka düşmana hasarın 15% kadarını yansıtır. (Akşam Duası imzası)',
@@ -16235,13 +16239,13 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
   'entities.abilities.marrowbreak.name': 'İlik Kıran',
   'entities.abilities.marrowbreak.description':
-    '3 Kadim Kanı yüksek tehditli, {damage} hasar veren ağır bir vuruş için tüketir. Canın yarısının altındayken bunun yerine azami canının %18 kadarı seni iyileştirir ve 15 öfke iade eder.',
+    "3 Kadim Kanını tüketerek {damage} hasarlık bir darbe vurur; bu darbe hasarının iki katı artı 110 kadar tehdit üretir. Canın yarının altındayken bunun yerine azami canının %18'i kadar seni iyileştirir ve 15 öfke iade eder.",
   'entities.abilities.moonlash.name': 'Ay Kabarışı',
   'entities.abilities.moonlash.description':
     '3 Ay Gelgitini {damage} Gizem hasarı veren ağır bir vuruş için tüketir: hasar seçimi. Güneş İzi de aynı 3 Ay Gelgitini tüketir, o yüzden birini seç.',
   'entities.abilities.moonseed.name': 'Ay Tohumu',
   'entities.abilities.moonseed.description':
-    'Yalnızca Aykuşu Formunda. {damage} Gizem hasarı vurur, bir Ay Gelgiti aşaması ekler ve Ay Fırtınanı 6 sn uzatır, uygulama başına en fazla {duration} sn. Ay Gelgiti doluyken Ay Tohumu, Ay Kabarışına dönüşür.',
+    "Yalnızca Aykuşu Formunda. {damage} Gizemli hasar vurur, 1 Ay Gelgiti ekler (en fazla 3) ve hedefteki Ay Fırtınanı 6 sn uzatır; Ay Fırtınası uygulaması başına en fazla {duration} ek sn. 3 Ay Gelgitinde bu düğme Ay Kabarışına dönüşür: 3'ünü de harcayan, 136 ila 162 Gizemli hasar (artı büyü gücü) veren anlık bir vuruş.",
   'entities.abilities.overbloom.name': 'Taşkın Çiçeklenme',
   'entities.abilities.overbloom.description':
     '3 Yeşillik tüketir. Tüm müttefiklerdeki her süreli iyileştirmeni kalan iyileştirmesinin {buff}% kadarıyla hasat eder, o etkileri kaldırır ve hedefe taze bir Spor Şifası eker.',
@@ -16449,7 +16453,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blade_flurry.description':
     'Bir bıçak fırtınası salar, saldırı hızını 30 sn boyunca %20 artırır. (Thuggery motoru)',
   'entities.abilities.bone_armor.description':
-    "Seni kemiklerle sarar, azami canının %20'si kadar hasarı emer.",
+    "Seni {duration} sn boyunca kemikle sarar ve azami canının %20'si kadar hasarı emer.",
   'entities.abilities.bone_armor.name': 'Kemik Zırhı',
   'entities.abilities.cheap_shot.description':
     'Hedefe {damage} hasar vererek onu 4 sn sersemlet. Gizlenmiş olmalısın. 2 kombo puanı kazandırır.',
@@ -16462,12 +16466,12 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Düşmanı silah hasarı artı {damage} ile pençele. 1 kombo puanı kazandırır. Yalnızca Kedi Formu.',
   'entities.abilities.claw.specNote_feral': 'İsabet eden her vuruş 1 Kadim Kan ekler (en fazla 3).',
   'entities.abilities.cold_blood.description':
-    'Öldürme niyetini odaklar, böylece sonraki 5 saldırın kritik vuruş olur. (Knifework motoru)',
+    'Sonraki {duration} sn içindeki 5 saldırının garantili kritik vuruş olur. Otomatik saldırılar da bir şarj kullanır. (Suikast imzası)',
   'entities.abilities.corpse_explosion.description':
-    'Önce bir Kemik Büyücüyü, sonra bir İskelet Savaşçıyı, bir Mezar Kanadını ise yalnızca son çare olarak feda eder. Kopyalar arasında önce en az kalan süreye, sonra en zayıfa sahip olanı seçer ve seçilen konumda {damage} Gölge hasarı verir.',
+    'Hükümranlık hizmetkârlarından birini (asla Mezar Muhafızını değil) feda ederek seçilen konumun 8 m içindeki düşmanlara {damage} Gölge hasarı verir. Önce bir İskelet Savaşçıyı, sonra bir Kemik Büyücüyü, Mezar Kanadını ise yalnızca son çare olarak alır; aynı türden hizmetkârlar arasında süresi en çok dolana, sonra en yaralı olana öncelik verir. Bir Hükümranlık hizmetkârı gerektirir.',
   'entities.abilities.corpse_explosion.name': 'Ceset Patlaması',
   'entities.abilities.coven.description':
-    'Yakındaki en fazla 4 düşman üzerinde 15 sn süreyle ikincil Kem Gözler oluşturur. Bunlar ortak Mahkûmiyet havuzunu %50 oranında besler ve Hüküm onlara %35 hasarla yankılanır.',
+    "Hedefte birincil Kem Gözün gerektirir. Ona 15 m içindeki en fazla 4 düşmana 15 sn boyunca ikincil Kem Gözler yerleştirir. Bunlar Mahkûmiyeti normal oranın %50'sinde üretir ve Hüküm onların her birine hasarının %35'i kadar yankılanır.",
   'entities.abilities.coven.name': 'Cadı Meclisi',
   'entities.abilities.cruel_pact.description':
     "Azami canının %12'sini feda ederek azami manasının %1,5'ini geri kazandırır ve 20 Mahkûmiyet üretir. Can %20 veya altındayken kullanılamaz.",
@@ -16482,22 +16486,23 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "15 sn süren bir element transına gir, alınan hasarı %30 azalt ve verdiğin tüm hasarın %20'sini manaya dönüştür. (Warspirit motoru)",
   'entities.abilities.elemental_trance.name': 'Element Transı',
   'entities.abilities.evil_eye.description':
-    "Bir düşmanı lanetlerinin odağı olarak işaretler. Gözü taşımak Mahkûmiyeti korur ama 20 sn'lik süresini yenilemez.",
+    "Bir düşmanı lanetlerinin odağı olan Kem Gözünle işaretler. İşaretli düşman hasar verdiğinde (saniyede en fazla bir kez) 2, öldüğünde 10 Mahkûmiyet kazanırsın. Mahkûmiyet en fazla 100'e kadar birikir ve son kazancından 20 sn sonra söner. Gözü taşımak Mahkûmiyetini korur ama o sayacı yenilemez.",
   'entities.abilities.evil_eye.name': 'Kem Göz',
-  'entities.abilities.eviscerate.description': '{damage} veren bitirici hamle.',
+  'entities.abilities.eviscerate.description':
+    '{damage} Fiziksel hasar veren bir bitirici hamle. Hasar Saldırı Gücü ile artar.',
   'entities.abilities.eviscerate.specNote_assassination':
     '6 Zehir Ayininde bu düğme Zehir Yarığına dönüşür: kanamalarının kalan tüm hasarını anında veren, taze bir zehir yarası açan ve 20 enerji geri kazandıran bir vuruş.',
   'entities.abilities.eviscerate.specNote_combat':
-    "Bunu 4 veya daha fazla kombo puanıyla vurmak 8 sn boyunca Redline'ı başlatır: Kötücül Kesik Gövde Darbesine dönüşür ve bu düğme Nakavt Darbesine dönüşür (45 artı kombo puanı başına 35, biriktirilen her Redline kademesinde %25 daha sert vurur, 25 enerji geri kazandırır). Redline bitmeden harca.",
+    "Bunu 4 veya daha fazla kombo puanıyla vurmak 8 sn boyunca Redline'ı başlatır: Kötücül Kesik Gövde Darbesine dönüşür ve bu düğme Nakavt Darbesine dönüşür (45 artı kombo puanı başına 35; Redline sırasında attığın her Gövde Darbesi için %25 daha sert vurur, 25 enerji geri kazandırır). Redline bitmeden harca.",
   'entities.abilities.expose_armor.description':
     'Hedefi 30 sn boyunca açığa çıkaran bitirici hamle: harcanan her kombo puanı zırhını %2 azaltır (5 kombo puanı: %{damage}).',
   'entities.abilities.faerie_fire.description': 'Hedefin zırhını 40 sn boyunca %{damage} azaltır.',
   'entities.abilities.ferocious_bite.description':
-    '{damage} veren bitirici hamle. Yalnızca Kedi Formu.',
+    '{damage} Fiziksel hasar veren bir bitirici hamle. Yalnızca Kedi Formu.',
   'entities.abilities.ferocious_bite.specNote_feral':
     'İsabet eden her vuruş 1 Kadim Kan ekler; 3 Kadim Kanda bu düğme Kızıl Hasata dönüşür: Kadim Kanı harcayarak daha güçlü bir ısırık gerçekleştirir, ayrıca Deri Yüzme ve Parçalamanın kalan tüm hasarını anında vurur ve enerji geri kazandırır.',
   'entities.abilities.funeral_harvest.description':
-    "Senin ya da ölülerinin yakın zamanda hasar verdiği bir düşman öldüğünde, 1 Ruh Parçası kazanırsın. Bu en fazla 3 sn'de bir gerçekleşebilir.",
+    "Senin veya ölülerinin hasar vermesinden sonraki 5 sn içinde bir düşman öldüğünde 1 Ruh Parçası kazanırsın. Bu 3 sn'de en fazla bir kez gerçekleşebilir.",
   'entities.abilities.funeral_harvest.name': 'Cenaze Hasadı',
   'entities.abilities.garrote.description':
     'Düşmanın boğazına bir tel dola: hemen {damage} hasar verir ve 18 sn boyunca {overTime} kanama hasarı verir. Gizlenmiş olmalısın. 1 kombo puanı kazandırır.',
@@ -16506,9 +16511,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ghostly_strike.description':
     'Düşmana silah hasarı artı {damage} ile vurur ve 7 sn boyunca kaçınma şansını %15 artırır. 1 kombo puanı kazandırır. (Haydut yeteneği)',
   'entities.abilities.hemorrhage.description':
-    'Düşmana silah hasarı artı {damage} ile vurur, 12 sn boyunca kanama hasarı verir ve alınan kanama hasarını %40 artırır. 1 kombo puanı kazandırır. Her 2. kullanım 1 Alacakaranlık ekler (en fazla 3). (Skulduggery motoru)',
+    'Düşmana silah hasarı artı {damage} ile vurur ve onu {overTime} kanama hasarıyla 12 sn boyunca kanatır. 12 sn boyunca hedefteki tüm kanamalar %40 daha fazla hasar verir. 1 kombo puanı kazandırır. Her 2. kullanım 1 Alacakaranlık ekler (en fazla 3). (İncelik imzası)',
   'entities.abilities.hex_of_violence.description':
-    "Düşmanı 8 sn boyunca büyüler, Gölge hasarı verir ve her 2 sn'de 2 Mahkûmiyet üretir. Sonraki 3 hasar veren eylemi her seferinde 7 Mahkûmiyet üretir ve ona 17 Gölge hasarı vurur.",
+    "Düşmanı 8 sn boyunca büyüler. Her 2 sn'de 17 Gölge hasarı artı Büyü Gücünden bir pay alır ve 2 Mahkûmiyet kazanırsın. Büyülü düşman hasar verdiği ilk 3 seferde 7 Mahkûmiyet kazanırsın ve o 17 Gölge hasarı alır.",
   'entities.abilities.hex_of_violence.name': 'Şiddet Büyüsü',
   'entities.abilities.hour_of_judgment.description':
     'Birincil Kem Gözüne 15 sn süreyle yargı çağırır: 40 Mahkûmiyet ve 3 Kader İpliği kazandırır, Ele Geçirmeyi etkinleştirir, birincil Gözden üretilen Mahkûmiyeti ikiye katlar ve Hüküm hasarını %20 artırır. İlk Hüküm 50 Mahkûmiyet geri kazandırır.',
@@ -16519,24 +16524,24 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Birincil Kem Gözünü 6 sn boyunca lanetler. Mahkûmiyet kazançları, 8 yarda içindeki en fazla 2 başka düşmana hasar veren bir dalga salar, en fazla saniyede bir. Kademe 2 bunu 8 sn'ye ve 4 düşmana çıkarır.",
   'entities.abilities.litany_of_guilt.name': 'Suç Yakarışı',
   'entities.abilities.maledict_gaze.description':
-    "Kem Bakışın, seçili birincil Kem Gözüne her 2,5 sn'de bir Gölge hasarıyla saldırır. Kem Gözü Ele Geçir onun saldırı hızını ikiye katlar.",
+    "Kem Gözün, hem sen hem düşman savaştayken, birbirinize 30 m içindeyken ve görüş hattındayken birincil Kem Gözünü taşıyan düşmana her 2,5 sn'de bir Gölge hasarıyla saldırır. Kem Gözü Ele Geçir saldırı hızını iki katına çıkarır.",
   'entities.abilities.maledict_gaze.name': 'Kem Bakış',
   'entities.abilities.maul.description':
-    'Yakın dövüş hasarını {damage} artıran ve yüksek miktarda tehdit yaratan bir parçalama saldırısı. Bir sonraki vuruşunda etkinleşir. Yalnızca Bruin Formu.',
+    'Bir sonraki yakın dövüş savuruşun {damage} ek hasar verir ve hasarının 2,5 katı artı küçük bir sabit miktar kadar tehdit üretir. Yalnızca Bruin Formu.',
   'entities.abilities.maul.specNote_feral':
     "İsabet eden her vuruş 1 Kadim Kan ekler; 3 Kadim Kanda bu düğme İlik Kırana dönüşür: yüksek tehditle 78 ila 96 hasar veren bir vuruş; can yarısının altındayken bunun yerine azami canının %18'i kadar seni iyileştirir ve 15 öfke geri kazandırır.",
   'entities.abilities.moonfire.description':
-    'Düşmanı ay ateşiyle yakarak {damage} Gizemli hasar artı zamana yayılı hasar verir.',
+    'Düşmanı {damage} Gizemli hasarla yakar, ardından {duration} sn boyunca {overTime} Gizemli hasar daha verir.',
   'entities.abilities.moonfire.specNote_balance':
     'Yanmaya devam ettir: Ay Tohumu süresini 6 sn uzatır.',
   'entities.abilities.needle_of_fate.description':
     'Düşmanı {damage} Gölge hasarıyla deler ve üzerinde Kem Gözün varsa {needleDoom} Mahkûmiyet üretir. Birincil Kem Gözüne isabet eden her vuruş 12 sn süren bir Kader İpliği ekler, en fazla 3. Hiç Kem Göz yoksa, İğne önce hedefini işaretler.',
   'entities.abilities.needle_of_fate.name': 'Kader İğnesi',
   'entities.abilities.ossuary_mark.description':
-    "Bir düşmanı 15 sn süreyle işaretler, senin ve ölülerinin verdiği hasarın %20'sini depolar. Patlatmak için yeniden oku. İşaretli düşman ölürse, 6 yarda içinde patlar ve 1 Ruh Parçası oluşturur.",
+    "Bir düşmanı 15 sn boyunca işaretler ve senin ile ölülerinin ona verdiği hasarın %20'sini depolar. Erken patlatmak için yeniden kullan: düşman depolanan hasarı Gölge hasarı olarak alır ve sen bunun %25'i kadar iyileşirsin. Damga süresi dolduğunda iyileştirme olmadan patlar. İşaretli düşman ölürse depolanan hasar 6 m içindeki diğer düşmanlara vurur ve 1 Ruh Parçası kazanırsın.",
   'entities.abilities.ossuary_mark.name': 'Kemik Damgası',
   'entities.abilities.possess_evil_eye.description':
-    "Lanetkâr, birincil Kem Gözünü 15 sn boyunca ele geçirir ve 35 Mahkûmiyet üretir. Kader İğnesi 1 sn'de okunur ve 2 ekstra Mahkûmiyet üretir, Tüketme hareket halindeyken kanalize edilebilir, Hüküm ise %25 daha fazla hasar verir ve %60 hasarla gecikmeli bir yankı salar, bu oran seviye 17-20 arasında %30'a geriler.",
+    "Birincil Kem Gözünü 15 sn boyunca ele geçirir ve 35 Mahkûmiyet üretir. Etkinken Kader İğnesi 1 sn'de okunur ve 2 ekstra Mahkûmiyet üretir, Tüketme hareket halindeyken kanalize edilebilir, Kem Bakış iki kat hızlı saldırır, Hüküm ise %25 daha fazla hasar verir ve verilen hasarın %60'ını 0,75 sn sonra tekrarlar (17 ila 20. seviyelerde %30'a düşer).",
   'entities.abilities.possess_evil_eye.name': 'Kem Gözü Ele Geçir',
   'entities.abilities.raise_bone_mage.description':
     "2 Ruh Parçası harcayarak 2 kişilik Hükümranlığına kalıcı bir menzilli Kemik Büyücü ekler. Sana yalnızca bir tanesi hizmet edebilir. Saldırıları hedefi 6 sn boyunca %5 daha fazla büyü hasarına açık bırakır ve Hasat Emri bu zayıflığı %8'e çıkarır.",
@@ -16557,7 +16562,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     '2 Ruh Parçası harcayarak tüm ölü hizmetkarlara birlikte vurma emri verir. Mezar Muhafızları kışkırtır ve hazırlanır, Savaşçılar sabitler, Kemik Büyücüler büyü savunmalarını açığa çıkarır ve Mezar Kanadı vurduğu tüm düşmanları parçalar.',
   'entities.abilities.reaping_command.name': 'Hasat Emri',
   'entities.abilities.regrowth.description':
-    'Dost bir hedefi {damage} ve 15 sn boyunca ek bir miktar iyileştirir. Etki süresinin sonuna kadar sürerse, hedefi ilk iyileştirmeyle aynı miktarda yeniden iyileştirir.',
+    'Dost bir hedefi {damage}, ardından 15 sn boyunca {overTime} daha iyileştirir. Zamanla iyileştirme tam süresini doldurursa, hedefi ilk iyileştirmenin miktarı kadar (kritik bonusundan önce) bir kez daha iyileştirir. Onu Hızlı İyileştirme, Taşkın Çiçeklenme veya yeniden kullanım gibi bir şeyle erken bitirmek bu iyileştirmeyi atlar.',
   'entities.abilities.regrowth.specNote_restoration':
     'Her kullanım 1 Yeşillik ekler (en fazla 3); zaten etkide olan bir çiçeği yenilemek de buna dahildir.',
   'entities.abilities.rejuvenation.description': 'Hedefi 12 sn boyunca {damage} iyileştirir.',
@@ -16572,13 +16577,13 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rupture.description':
     "Hedefi yaralayan bitirici hamle: 6 sn artı kombo puanı başına 2 sn boyunca her 2 sn'de kanar (5 kombo puanı: 16 sn ve toplam {damage} hasar).",
   'entities.abilities.sacrifice_undead.description':
-    "Azami canının %25'ini geri kazanmak için bir Hükümranlık hizmetkarını yok eder.",
+    "En çok yaralı Hükümranlık hizmetkârını (asla Mezar Muhafızını değil) yok ederek azami canının %25'ini geri kazanırsın. Bir Hükümranlık hizmetkârı gerektirir.",
   'entities.abilities.sacrifice_undead.name': 'Ölüyü Feda Et',
   'entities.abilities.sacrilegious_march.description':
     "Hareket hızını %35 artırır, ama her saniye azami canının %2'sini feda eder. İptal etmek için tekrar oku. %20 canda kendiliğinden kapanır.",
   'entities.abilities.sacrilegious_march.name': 'Günahkâr Yürüyüş',
   'entities.abilities.sentence.description':
-    "Düşmana hüküm giydirmek için tüm Mahkûmiyeti ve Kader İpliklerini tüketir. Her İplik hasarı %6 artırır. Ek etkiler 20, 50, 80 ve 100 Mahkûmiyette artar. Hasar ölçeklenmesi seviye 16'dan sonra düzleşir.",
+    "20 Mahkûmiyet ve hedefte birincil Kem Gözün gerektirir. Tüm Mahkûmiyeti ve Kader İpliklerini tüketerek, harcanan Mahkûmiyetle büyüyen Gölge hasarı verir; her İplik hasarı %6 artırır. 50 veya üzerinde verilen hasarın %20'si kadar seni iyileştirir. 80 veya üzerinde ayrıca hasarın %35'ini 8 m içindeki diğer düşmanlara verir. 100'de oyunculara ve patronlara %5 daha fazla hasar verir ve canı %20'nin altındaki normal bir düşmanı öldürür. Temel hasarı 16. seviyeye kadar seviyenle artar, ardından 17 ila 20. seviyeler arasında yavaşlar.",
   'entities.abilities.sentence.name': 'Hüküm',
   'entities.abilities.sinister_strike.description':
     'Silah hasarı artı {damage} veren anlık bir vuruş. 1 kombo puanı kazandırır.',
@@ -16591,7 +16596,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Düşmanın ruhunu {damage} Gölge hasarıyla parçalar ve 1 Ruh Parçası oluşturur, en fazla 5.',
   'entities.abilities.soul_harvest.name': 'Öz Hasadı',
   'entities.abilities.soul_lance.description':
-    "{damage} Gölge hasarı veren hayaletimsi bir mızrak fırlatır. Kemik Damgana karşı kullanılırsa, hasarının %50'si damgaya eklenir.",
+    "{damage} Gölge hasarı veren hayaletimsi bir mızrak fırlatır. Kemik Damganın üzerindeyse, damga hasarının %20 yerine %70'ini depolar.",
   'entities.abilities.soul_lance.name': 'Ruh Mızrağı',
   'entities.abilities.soulwell.description':
     "3 dakika süreyle bir Ruh Kuyusu çağırır. Dövüş dışındayken, grup üyeleri Ruh Taşlarını en fazla 3'e kadar doldurabilir. Bir Ruh Taşı azami canın %25'ini geri kazandırır ve iksir bekleme süresini paylaşır.",
@@ -16601,25 +16606,25 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.specNote_balance':
     "Aykuşu Formundayken, tamamlanan her okuma 1 Ay Gelgiti ekler (en fazla 3). 3 Ay Gelgitinde, bu düğme Güneş İzine dönüşür: 80 ila 100 Doğa hasarı artı 9 sn boyunca 45 yanık hasarı veren, 35 mana geri kazandıran ve tüm 3'ünü harcayan anlık bir vuruş.",
   'entities.abilities.stealth.description':
-    'Seni gölgelerde gizler: düşmanlar seni zar zor fark eder ve tam hızla hareket edersin. Saldırmak ya da hasar almak Alacakaranlık Perdesini bozar. Çıkmak için tekrar oku.',
+    'Gölgelerde gizlenirsin. Düşman oyuncular ve evcil hayvanlar seni göremez, canavarlar seni yalnızca normalden çok daha yakından fark eder (senden yüksek seviyeliyse daha uzaktan). Tam hızla hareket edersin. Saldırmak veya hasar almak Alaca Örtüsünü bozar. Çıkmak için tekrar kullan.',
   'entities.abilities.stealth.specNote_subtlety':
     'Alacakaranlık Perdesinden kullandığın her açılış 1 Alacakaranlık ekler (en fazla 3).',
   'entities.abilities.swiftmend.description':
     "Dost bir hedefteki zamana yayılı bir iyileştirme etkisini tüketerek onu {damage} kadar iyileştirir. Spor Şifası, İkinci Çiçeklenme ve Yaban Şifası'nın her kullanımı 1 Yeşillik ekler; 3 Yeşillikte bu düğme Taşkın Çiçeklenmeye dönüşür ve zamana yayılı iyileştirme etkilerini taşıyan her müttefiki, o etkilerin kalanının %60'ı kadar anında iyileştirir. (Onarım motoru)",
   'entities.abilities.swipe.description':
-    'Pençelerini yakındaki düşmanların arasından geçirerek {damage} hasar ver. Ekstra tehdit yaratır. Yalnızca Bruin Formu.',
+    'Pençelerini 5 yarda içindeki her düşmanın arasından geçirerek her birine {damage} hasar verir ve verilen hasardan %75 daha fazla tehdit üretir. Yalnızca Bruin Formu.',
   'entities.abilities.swipe.specNote_feral':
     'İsabet eden her vuruş 1 Kadim Kan ekler (en fazla 3).',
   'entities.abilities.umbral_anchor.description':
-    'İlk okuma: gölgeni 5 dakika boyunca ayaklarının dibine çapalar. Oraya dönmek için 40 m içinde yeniden oku; bu çapayı tüketir ve 45 saniyelik bekleme süresini başlatır.',
+    "İlk kullanım: gölgeni 5 dk boyunca ayaklarının dibine çapalar. Çapaya 40 m içindeyken yeniden kullanırsan çapaya geri ışınlanırsın; bu çapayı tüketir ve 45 sn'lik bekleme süresini başlatır.",
   'entities.abilities.umbral_anchor.name': 'Gölge Çapası',
   'entities.abilities.unholy_command.description':
     '3 Ruh Parçası harcayarak tüm ölülerine 12 sn boyunca %25 daha fazla hasar vermelerini ve %20 daha hızlı hareket etmelerini emreder.',
   'entities.abilities.unholy_command.name': 'Kutsuz Emir',
   'entities.abilities.venom_dart.specNote_assassination':
-    "1 Zehir Ayini ekler ve zehir yaranı 6 sn uzatır (yara asla 20 sn'nin üzerine çıkmaz).",
+    "1 Zehir Ayini ekler (en fazla 6), 15 enerji iade eder ve zehir yaranı 6 sn uzatır (yara asla 20 sn'yi aşmaz).",
   'entities.abilities.vicarious_suffering.description':
-    "Istırabını 8 sn boyunca bağlar ve düşman vuruşlarından en fazla 15 Mahkûmiyet üretir. Kendi üzerinde, alınan hasarı %20 azaltır. Bir müttefik üzerinde, seni %15 canın altına düşürmeden hasarın en fazla %20'sini sana yönlendirir.",
+    "8 sn boyunca hedefe gelen her düşman vuruşu 3 Mahkûmiyet üretir, toplamda en fazla 15. Kendi üzerinde alınan hasarı %20 azaltır. Bir müttefik üzerinde her düşman vuruşunun %20'sini sana yönlendirir, ancak seni asla %15 canın altına düşürmez.",
   'entities.abilities.vicarious_suffering.name': 'Dolaylı Istırap',
   'entities.abilities.wrath.description':
     'Bir doğa enerjisi yıldırımı fırlatarak {damage} Doğa hasarı verir.',
@@ -18029,9 +18034,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'apiError.world_quest_block.already_blocked': 'O hesap zaten dünya görevlerinden engellenmiş.',
   'apiError.world_quest_block.not_blocked': 'O hesap dünya görevlerinden engellenmemiş.',
   'entities.abilities.melting_acid.description':
-    'Silahını 30 dakika boyunca kaplar. Her yakın dövüş savuruşun hedefe yakıcı asit sıçratır ve 12 saniye boyunca zırhını %5 azaltır.',
+    'Silahını 30 dk kaplar. Her yakın dövüş savuruşun hedefe yakıcı asit sıçratır ve zırhını 12 sn boyunca %5 azaltır. Diğer silah kaplamanın yerini alır.',
   'entities.abilities.nightshade_coating.description':
-    'Silahını 30 dakika boyunca kaplar. Her yakın dövüş savuruşun hedefi itüzümüyle kaplar ve aldığı iyileştirmeyi 12 saniye boyunca %25 azaltır.',
+    'Silahını 30 dk kaplar. Her yakın dövüş savuruşun hedefi gece gölgesiyle kaplar ve aldığı iyileştirmeyi 12 sn boyunca %25 azaltır. Diğer silah kaplamanın yerini alır.',
   'entities.items.reins_chimeglass_tortoise.name': 'Yol Sorumlusunun Zil Kayışı: Tolliver',
   'entities.items.reins_goblin_rocket_sled.name': 'Kontak anahtarı: Goblin Roket Kızağı',
   'entities.items.reins_mech_bird.name': 'Kontak Anahtarı: Cluckwork Makine Kuşu',
@@ -19053,9 +19058,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'devCommand.fields.bed': 'Yatak kimliği (isteğe bağlı)',
   'entities.abilities.blink.name': 'Uçuş Adımı',
   'entities.abilities.blizzard.description':
-    'Hedef bölgeye 6 sn boyunca bir buz fırtınası çağırır, her saniye {damage} Buz hasarı verir ve düşmanları %40 yavaşlatır. Vurulan her düşman Frostglobe’dan 0,5 sn düşürür; her kullanımda en fazla 3 sn. (Buz)',
+    'Hedef alanda 6 sn boyunca esen bir buz fırtınası çağırır; her saniye {damage} Ayaz hasarı verir ve düşmanları 2 sn boyunca %40 yavaşlatır. Vurulan her düşman Buz Küresinin bekleme süresinden 0,5 sn düşürür, kullanım başına en fazla 3 sn. (Don)',
   'entities.abilities.cold_snap.description':
-    'Uçuş Adımı, Buzperdesi ve Büyük Görünmezlik bekleme sürelerini tamamlar. (Büyücü yeteneği)',
+    'Uçuş Adımı (tüm şarjlarını geri getirir), Üstün Görünmezlik ve kişisel bariyerinin (Buz Örtüsü, Alevli Bariyer veya Zamansal Bariyer) bekleme sürelerini bitirir. (Büyücü yeteneği)',
   'entities.abilities.counterspell.name': 'Büyü Keser',
   'entities.abilities.crusader_strike.name': 'Yemin Darbesi',
   'entities.abilities.frozen_orb.name': 'Buz Küresi',
@@ -20038,12 +20043,12 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'questUi.logs.worldQuestRewardMailed':
     'Çantaların dolu. Ödülün posta kutuna gönderildi: {items}.',
   'entities.abilities.natures_boon.description':
-    'Büyülerin Doğanın Lütfunu 10 saniyeliğine etkinleştirebilir: belirtilen büyü ücretsiz olur, %25 güçlenir ve her formda kullanılabilir. Yeni bir tetiklenme süreyi yeniler.',
+    "Doğanın Lütfu, adını verdiği büyüyü ücretsiz, %25 daha güçlü ve her formda kullanılabilir yapan 10 sn'lik bir penceredir. Yeni bir tetiklenme süreyi yeniler.",
   'entities.abilities.natures_boon.name': 'Doğanın Lütfu',
   'entities.abilities.natures_boon.specNote_balance':
     'Kullandığın her Yaban Oku veya Gök Düşüşü, en fazla 10 saniyede bir olmak üzere %10 olasılıkla Spor Patlaması için lütfu etkinleştirir.',
   'entities.abilities.natures_boon.specNote_feral':
-    "İsabet eden her otomatik yakın dövüş saldırısının, Spor Şifası veya Bruin Formundayken Meşe Derisi için lütfu etkinleştirme olasılığı 15'te 1'dir.",
+    "İsabet eden her yakın dövüş otomatik saldırısı onu kurabilir; her formda dakikada yaklaşık 4 kez (Kedi Formunda savuruş başına 15'te 1 ihtimal). Spor Şifasını %25 yerine %50 daha güçlü yaparak ve Bruin Formundayken Meşe Derisini kapsar; ilk kullandığın onu harcar. Her tetiklenme ayrıca Meşe Derisinin bekleme süresini sıfırlar.",
   'entities.abilities.natures_boon.specNote_restoration':
     'Zamana yayılan iyileştirme etkilerinin her darbesi, en fazla 10 saniyede bir olmak üzere %10 olasılıkla Spor Patlaması için lütfu etkinleştirir.',
   'entities.abilities.overbloom.specNote_restoration':
@@ -20070,7 +20075,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swiftmend.specNote_restoration':
     "Dost bir hedefteki zamana yayılan bir iyileştirme etkisini tüketerek onu {damage} iyileştirir. Spor Şifası ve İkinci Çiçeklenme uygulamaları Yeşillik ekler; 5 Yeşillikte bu düğme Taşkın Çiçeklenmeye dönüşür ve zamana yayılan iyileştirme etkilerini taşıyan her müttefiki, bu etkilerin kalan iyileştirmesinin %60'ı kadar anında iyileştirir. (Onarım özel yeteneği)",
   'entities.abilities.tactical_camo.description':
-    'Çevrene karış: düşmanlar seni güçlükle fark eder ve %80 hızla hareket edersin. Saldırmak veya hasar almak Taktik Kamuflajı sona erdirir. Ortaya çıkmak için tekrar kullan. (Saha Becerisi)',
+    'Gizlenir ve %80 hızla hareket edersin. Canavarlar seni yalnızca yakın mesafeden fark eder (normal saldırganlık menzillerinin dörtte biri, senden yüksek seviyeliyse daha fazla); düşman oyuncular ve evcil hayvanlar seni göremez. Saldırmak veya hasar almak Taktik Kamuflajı bozar. Çıkmak için tekrar kullan. (Hayatta Kalma)',
   'entities.abilities.tactical_camo.name': 'Taktik Kamuflaj',
   'entities.itemSets.grovespring.bonus2':
     'Hızlı İyileştirme önce kendi Spor Şifası veya İkinci Çiçeklenme etkini tüketir ve yüzde 25 daha fazla iyileştirir. Alınan hasar artık büyü kullanımını geciktirmez.',
@@ -20122,7 +20127,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Önündeki 8 yardalık, 90 derecelik koni içine bir ok yağmuru ateşleyerek düşmanları senden en fazla 20 yarda uzağa geri iter. Geri itmeye bağışık düşmanlar etkilenmez. Hasar vermez.',
   'entities.abilities.phosphor_flask.name': 'Fosfor Şişesi',
   'entities.abilities.phosphor_flask.description':
-    "Reaktif bir kimyasal karışım taşıyan mühürlü bir kap, 8 metrelik bir alanda 3 sn boyunca akkor beyaz alevlerle patlar. Alevlerin içinde duran düşmanlar her 0,5 sn'de {damage} Ateş hasarı alır. Hasar menzilli saldırı gücüyle artar.",
+    "Bir şişe fırlatır; şişe 8 yarda çapındaki bir alanda 3 sn boyunca alevler içinde patlar. Alevlerin içinde duran düşmanlar her 0,5 sn'de {damage} Ateş hasarı alır. Hasar Menzilli Saldırı Gücü ile artar.",
   'entities.items.lychgate_buckler.name': 'Mezarlık Kapısı Kalkanı',
   'entities.items.bastion_kite_shield.name': 'Tabyanın Uçurtma Kalkanı',
   'entities.items.barrowfield_tower_shield.name': 'Höyük Ovası Kule Kalkanı',
@@ -25625,7 +25630,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Kasvet Öşrü: harcanabilir en fazla 5 yük. Hiçlik Yarılması 3 yük tüketir; Vampir Dokunuşu %30 daha fazla hasar için 2 yük tüketir; Öşür İfriti Çağır tüm birikimini tüketir. Yük üretmek, birikimin doluyken bile Öşür Bombasını da doldurur.',
   'hudChrome.worldBoss.sleepUntilNightfall': '{name} gece çökene kadar uyur.',
   'entities.abilities.choir_of_deliverance.specNote_shadow':
-    "15 sn. boyunca, düşmanların Gölge hasarın yüzünden kaybettiği sağlığın %20'sini, kendin dâhil 30 yarda içindeki yaralı grup üyeleri arasında iyileştirme olarak paylaştır. Baskınlarda yalnızca kendi alt grubun iyileşir. Anında kullanılır ve Alacakaranlık Perdesi içinde saldırmaya devam edebilirsin. Emilen hasar ve kalan sağlığı aşan hasar iyileştirme sağlamaz.",
+    "15 sn boyunca, düşmanların Gölge hasarın yüzünden kaybettiği canın %20'sini, kendin dahil 30 yarda içindeki yaralı grup üyeleri arasında iyileştirme olarak paylaştır. Akınlarda yalnızca kendi alt grubun iyileşir. Anlık kullanılır ve Alacakaranlık Perdesi içinde saldırmaya devam edebilirsin. Emilen hasar ve fazla hasar iyileştirme eklemez.",
   'entities.abilities.inner_focus.specNote_shadow':
     'Ayrıca 60 sn. içindeki sonraki Zihin Kırılması veya Hiçlik Yarılması isabet ederse kesinlikle kritik vurur. Diğer büyüler bu bonusu tüketmez. Hiçlik Yarılması yine 3 Kasvet Öşrü yükü tüketir. Direnilen bir büyü, kritik vuruş bonusunu tüketir.',
   'entities.abilities.spirit_bomb.description':
@@ -25826,4 +25831,19 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'seasonal.tricks.gourdlight_trick_fumes': 'Yeşil Dumanlar',
   'seasonal.tricks.gourdlight_trick_skeleton': 'Takırdayan Kemikler',
   'seasonal.tricks.gourdlight_trick_strawling': 'Samancık Görünümü',
+  'hudChrome.abilityTooltipDetail.hint': "Ayrıntılar için Shift'e basılı tut",
+  'hudChrome.abilityTooltipDetail.school': 'Okul: {school}',
+  'hudChrome.abilityTooltipDetail.scaling': '{stat} ({value}) etkisinden +{bonus} dahildir',
+  'hudChrome.abilityTooltipDetail.stat.spellPower': 'Büyü Gücü',
+  'hudChrome.abilityTooltipDetail.stat.healPower': 'İyileştirme Gücü',
+  'hudChrome.abilityTooltipDetail.stat.attackPower': 'Saldırı Gücü',
+  'hudChrome.abilityTooltipDetail.stat.rangedPower': 'Menzilli Saldırı Gücü',
+  'hudChrome.abilityTooltipDetail.ticks':
+    '{ticks} tık, her biri {interval} sn arayla, {duration} sn boyunca',
+  'hudChrome.abilityTooltipDetail.radius': 'Yarıçap: {radius} yd',
+  'hudChrome.abilityTooltipDetail.charges': 'Şarj: {charges}',
+  'hudChrome.abilityTooltipDetail.castWhileMoving': 'Hareket halindeyken kullanılabilir',
+  'hudChrome.abilityTooltipDetail.pushbackImmune': 'Hasar almak bu büyünün kullanımını geciktirmez',
+  'hudChrome.abilityTooltipDetail.threatMult': 'Yetenek tehdit çarpanı: %{percent}',
+  'hudChrome.abilityTooltipDetail.threatFlat': 'Ek tehdit: +{threat}',
 };

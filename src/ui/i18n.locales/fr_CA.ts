@@ -142,24 +142,24 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.greater_invisibility.name': 'Invisibilité accrue',
   'entities.abilities.hot_streak.name': 'Suite flamboyante',
   'entities.abilities.hot_streak.description':
-    "Passif : deux coups critiques de suite avec tes sorts de Feu (Boule de feu, Trait de feu, Brûlure, Explosion pyrotechnique ou Choc de flammes) rendent ta prochaine Explosion pyrotechnique ou ton prochain Choc de flammes instantané et gratuit. Les sorts qui dépensent cet effet comptent pour la suite SUIVANTE, même les incantations gratuites; Choc de flammes ne compte qu'une fois, peu importe le nombre d'ennemis touchés, et seul le premier impact peut compter. (Feu)",
+    "Passif : deux coups critiques consécutifs de Trait de braises, Pluie de braises, Ébouillanter, Lance de flammes, Frappe enflammée ou Souffle du dragon rendent ta prochaine Lance de flammes ou ta prochaine Frappe enflammée instantanée et gratuite dans les 12 s. Un coup non critique de l'un de ces sorts réinitialise le compte, et un premier coup critique est mémorisé pendant 10 s. Lance de flammes et Frappe enflammée comptent pour la série suivante, y compris les incantations gratuites. Frappe enflammée et Souffle du dragon ne comptent qu'une fois par incantation, quel que soit le nombre d'ennemis touchés, et seul l'impact initial compte. (Feu)",
   'entities.abilities.ice_floes.name': 'Glaces flottantes',
   'entities.abilities.ice_floes.description':
     "Tes deux prochains sorts qui ont un temps d'incantation peuvent être lancés en mouvement. Dure 15 s. (Talent de mage)",
   'entities.abilities.ignition.description':
-    'Passif : les coups critiques de tes sorts enflamment la cible et lui infligent 40% des dégâts causés sur 6 s; cet effet se cumule. (Maîtrise du Feu)',
+    "Passif : quand tes sorts de Feu infligent un coup critique, la cible brûle pour 30% supplémentaires des dégâts infligés sur 6 s. Une nouvelle brûlure sur une cible déjà en feu s'ajoute aux dégâts restants à subir et relance le délai de 6 s. (Maîtrise du Feu)",
   'entities.abilities.mass_barrier.name': 'Bouclier collectif',
   'entities.abilities.mass_barrier.description':
     'Pose un bouclier sur toi et sur un maximum de 4 alliés proches dans un rayon de 30 m; chacun absorbe {damage} points de dégâts pendant 15 s. (Talent de mage)',
   'entities.abilities.overload.name': 'Surpuissance',
   'entities.abilities.overload.description':
-    'Ton prochain sort gagne 40% de puissance, mais coûte 50% de mana de plus. Dure 10 s. (Talent de mage)',
+    "Ton prochain sort qui coûte du mana voit ses valeurs de base de dégâts, de soins et d'absorption augmentées de 40%, mais coûte 50% de mana en plus. Le bonus de puissance des sorts n'est pas augmenté. Dure 10 s. (Talent de mage)",
   'entities.abilities.power_echo.name': 'Écho de pouvoir',
   'entities.abilities.power_echo.description':
-    'Ton prochain sort direct se produit de nouveau à 50% de sa puissance sur la même cible. Dure 10 s. (Talent de mage)',
+    'Ton prochain sort de dégâts directs ou de soins à cible unique se répète sur la même cible pour 50% des dégâts infligés ou des soins prodigués. Dure 10 s. (Talent de mage)',
   'entities.abilities.rings_of_frost.name': 'Cercle de givre',
   'entities.abilities.rings_of_frost.description':
-    'Fait apparaître un cercle pendant 10 s. Les ennemis qui traversent son contour sont gelés pendant 4 s. (Talent de mage)',
+    "Place un anneau de givre à l'endroit ciblé pendant 10 s. Un ennemi qui franchit l'anneau est immobilisé pendant 4 s; chaque ennemi ne peut le déclencher qu'une seule fois. Le centre, à l'intérieur de l'anneau, est sans danger. (Talent de mage)",
   'entities.abilities.rune_of_power.name': 'Rune de pouvoir',
   'entities.abilities.rune_of_power.description':
     'Trace une rune de pouvoir sous tes pieds pendant 15 s : les alliés qui restent à moins de 8 m infligent 10% plus de dégâts. (Talent de mage)',
@@ -344,4 +344,6 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.capacityPools':
     'Articles {generalUsed}/{generalTotal}, matériaux {materialsUsed}/{materialsTotal}',
   'hudChrome.bags.emptyMaterialsOnly': 'Matériaux seulement',
+  'hudChrome.abilityTooltipDetail.hint': 'Maintiens Maj pour les détails',
+  'hudChrome.abilityTooltipDetail.scaling': 'Inclut +{bonus} grâce à ta {stat} ({value})',
 };

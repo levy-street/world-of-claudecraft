@@ -2428,7 +2428,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.barrowfield_tower_shield.name': '고분 들판 타워 실드',
   'entities.abilities.avatar.name': '화신',
   'entities.abilities.avatar.description':
-    '20초 동안 거상으로 변신하여 자신에게 걸린 모든 군중 제어 효과를 해제하고 입히는 피해가 20% 증가합니다.',
+    '자신에게 걸린 기절, 공포, 이동 불가, 침묵, 무장 해제, 감속 효과(우두머리가 건 것은 제외)를 해제한 뒤, 20초 동안 거상이 되어 입히는 피해가 20% 증가합니다. 새로운 제어 효과로부터는 보호해 주지 않습니다.',
   'entities.abilities.bladestorm.name': '칼날폭풍',
   'entities.abilities.battle_stance.description':
     '공격적인 전투 태세입니다. 분노를 10% 더 생성합니다. 무기와 방어 전문화의 기본 태세입니다.',
@@ -2452,16 +2452,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '격노 상태일 때 쌍격이 15% 더 큰 피해를 입힙니다. (분노 특성)',
   'entities.abilities.diabolical_twinstrike.name': '사악한 쌍격',
   'entities.abilities.die_by_sword.description':
-    '방어 재사용 기술입니다. 8초 동안 받는 피해가 30% 감소하고 훨씬 많은 공격을 회피합니다.',
+    '8초 동안 받는 피해가 30% 감소하고 회피 확률이 30% 증가합니다.',
   'entities.abilities.die_by_sword.name': '검의 승부',
   'entities.abilities.intervene.name': '엄호',
   'entities.abilities.intervene.description':
     '아군 플레이어에게 돌진하여 6초 동안 피해 {damage}을(를) 흡수하는 보호막을 부여합니다.',
   'entities.abilities.emboldening_roar.description':
-    '대담한 포효를 내질러 자신과 40yd 이내의 아군 플레이어에게 대담함을 부여하며, 다음 3개의 기술이 반드시 치명타로 적중합니다. (분노 특성)',
+    '자신과 40미터 이내의 아군이 {duration}초 동안 대담해집니다. 각자가 사용하는 다음 피해 기술 3개가 반드시 치명타로 적중합니다. (분노)',
   'entities.abilities.emboldening_roar.name': '대담한 포효',
   'entities.abilities.enrage_passive.description':
-    '지속 효과: 격노 상태일 때 4초 동안 입히는 피해가 7% 증가하고 공격 속도가 25%, 이동 속도가 10% 빨라집니다. 사혈은 30% 확률로 격노시키며, 붉은 수확은 항상 격노시킵니다. (분노 특성)',
+    '사혈은 30% 확률로 4초 동안 격노 상태로 만들고, 붉은 수확은 항상 그렇게 합니다. 격노 중에는 입히는 피해가 7% 증가하고, 공격 속도가 25% 빨라지며, 이동 속도가 10% 빨라집니다. (분노)',
   'entities.abilities.enrage_passive.name': '아수라장',
   'entities.abilities.faultline.description':
     '땅에 충격파를 보내 전방 8yd 이내의 적에게 {damage}의 피해를 입히고 3초 동안 기절시킵니다. (방어 특성)',
@@ -2470,10 +2470,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '10초 동안 받는 피해가 20% 감소하며, 지속되는 동안 사혈이 최대 생명력의 20%만큼 자신을 치유합니다. (분노 특성)',
   'entities.abilities.furious_mending.name': '분노의 회복',
   'entities.abilities.heroic_leap.description':
-    '대상 지역으로 도약하여 착지할 때 주변 적에게 {damage}의 피해를 줍니다.',
+    '대상 지역으로 도약하여 착지할 때 주위 6미터 이내의 모든 적에게 {damage}의 물리 피해를 입힙니다.',
   'entities.abilities.heroic_leap.name': '영웅의 도약',
   'entities.abilities.intimidating_shout.description':
-    '8미터 안의 적 최대 5명을 4초 동안 공포에 질려 달아나게 하는 무시무시한 외침. 피해를 입으면 효과가 풀릴 수 있습니다.',
+    '8미터 이내의 적 최대 5명을 4초 동안 공포에 질려 달아나게 합니다. 공포에 걸린 적을 공격할 때마다 공포가 풀릴 확률이 있으며, 최대 생명력의 10% 이상을 입히면 항상 풀립니다.',
   'entities.abilities.intimidating_shout.name': '위협의 외침',
   'entities.abilities.iron_resolve.description':
     '이를 악물고 고통을 무시합니다. 시전 시 최대 생명력의 {damage}%에 해당하는 피해를 흡수하는 보호막을 얻으며, 최대 {duration}초 동안 지속됩니다. (방어 특성)',
@@ -2494,16 +2494,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '용맹한 포효를 내질러 자신과 40미터 내 파티원의 최대 생명력을 10초 동안 20% 증가시킵니다. 방어 대상은 지속시간 동안 받는 피해도 5% 감소합니다.',
   'entities.abilities.rallying_cry.name': '용맹의 포효',
   'entities.abilities.recklessness.description':
-    '격노: 12초 동안 분노 생성이 50%, 치명타 확률이 20% 증가합니다.',
+    '12초 동안 분노 생성이 50% 증가하고 치명타 확률이 20% 증가합니다.',
   'entities.abilities.recklessness.name': '무모함',
   'entities.abilities.red_harvest.description':
-    '모든 것을 쏟아부어 광란에 휩싸여 세 번 공격하며, 각 타격마다 무기 피해의 65%에 {damage}를 더한 피해를 입히고 반드시 격노합니다. (분노 특성)',
+    '세 번 타격하며, 각 타격은 무기 피해의 65%에 {damage}를 더한 피해를 입히고, 항상 {duration}초 동안 격노 상태가 됩니다. (분노)',
   'entities.abilities.red_harvest.name': '붉은 수확',
   'entities.abilities.revenge.description':
-    '넓은 호를 그리며 공격하여 전방의 모든 적에게 물리 피해를 입힙니다. 대상이 5명을 넘으면 피해가 감소합니다. 회피하거나 무기로 막으면 다음 복수가 분노를 소모하지 않을 수 있습니다. (Protection)',
+    '전방 8미터 이내의 모든 적에게 {damage}의 물리 피해를 입힙니다. 대상이 5명을 넘으면 각 타격의 피해가 감소하여 총합이 5회 타격과 같아집니다. 생물의 근접 공격을 회피하거나 쳐내면 30% 확률로 10초 안의 다음 복수가 분노를 소모하지 않습니다. (방어)',
   'entities.abilities.revenge.name': '복수',
   'entities.abilities.sanguine_aura.description':
-    '적의 피로 무기를 물들여 20초 동안 자신과 근접 아군의 공격 속도와 피해가 10% 증가합니다.',
+    '적의 피로 무기를 물들입니다. 자신과 모든 근접 파티원이 거리에 관계없이 20초 동안 공격 속도가 10% 증가하고 입히는 피해가 10% 증가합니다.',
   'entities.abilities.sanguine_aura.name': '선혈의 오라',
   'entities.abilities.seasoned_soldier.description':
     '자동 공격이 치명타로 적중하면 분노를 10% 더 생성합니다. (무기 특성)',
@@ -2512,10 +2512,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '대상에게 무기를 던져 {damage}의 피해를 입히고 3초 동안 기절시킵니다.',
   'entities.abilities.storm_bolt.name': '우레 투척',
   'entities.abilities.sudden_death.description':
-    '자동 공격 시 일정 확률로 생명력에 관계없이 대상에게 이른 무덤을 분노 소모 없이 시전할 수 있습니다. (무기 특성)',
+    '적중한 자동 공격이 10% 확률로 10초 동안 급살을 부여합니다. 다음 이른 무덤은 분노를 소모하지 않으며 생명력과 관계없이 대상에게 사용할 수 있습니다. (무기)',
   'entities.abilities.sudden_death.name': '급살',
   'entities.abilities.sweeping_strikes.description':
-    '12초 동안 단일 대상 공격이 주위 적 1명에게도 100% 피해로 적중합니다. (무기 특성)',
+    '12초 동안 단일 대상 기술이 적중할 때마다 대상 주변 8미터 이내의 다른 적 1명에게도 같은 피해를 입힙니다. 자동 공격은 복사되지 않습니다. (무기)',
   'entities.abilities.sweeping_strikes.name': '넓어지는 호',
   'entities.abilities.victory_rush.description':
     '무기 피해에 {damage}를 더한 피해로 공격하고 최대 생명력의 20%를 회복합니다. 적을 처치한 후 20초 이내에만 사용할 수 있습니다.',
@@ -2572,7 +2572,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.silence.description': '대상을 4초 동안 침묵시킵니다. (사제 특성)',
   'entities.abilities.smoke_screen.name': '연막',
   'entities.abilities.smoke_screen.description':
-    '연기 속으로 몸을 숨겨 8초 동안 회피율을 30%만큼 증가시킵니다.',
+    '연기로 몸을 감싸 8초 동안 회피 확률이 30% 증가합니다.',
   'entities.abilities.spellsteal.name': '마법 약탈',
   'entities.abilities.spellsteal.description':
     '적의 이로운 마법 효과 하나를 훔쳐 자신에게 옮깁니다.',
@@ -2582,7 +2582,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.tranquility.name': '숲노래',
   'entities.abilities.typhoon.name': '태풍',
   'entities.abilities.typhoon.description':
-    '돌풍이 8미터 안의 모든 적을 자신에게서 15미터 멀리 밀쳐내고 멍하게 하여 4초 동안 이동 속도를 50% 낮춥니다. 적 플레이어는 공중에서 직선으로 날아가며, 절벽 밖으로 밀려나도 계속 이동해 낙하 피해를 받습니다. 추락사하면 자신의 처치로 기록됩니다.',
+    '시야에 있는 8미터 이내의 모든 적을 자신에게서 최대 15미터 밀쳐내고 멍하게 하여 4초 동안 이동 속도를 50% 낮춥니다. 적 플레이어는 공중에서 직선으로 날아갑니다. 절벽 밖으로 밀려나도 계속 날아가 낙하 피해를 받으며, 추락사하면 당신의 처치로 기록됩니다.',
   'entities.abilities.voidfeast.name': '공허의 포식',
   'entities.abilities.voidfeast.description':
     '마법 효과 하나(적의 이로운 효과 또는 아군의 해로운 효과)를 삼키고 최대 생명력의 6%를 회복합니다.',
@@ -5929,32 +5929,34 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.lootRoll.bindsOnPickup': '획득 시 귀속',
   'entities.abilities.heroic_strike.name': '약탈자의 일격',
   'entities.abilities.heroic_strike.description':
-    '강력한 공격으로 근접 피해가 {damage}만큼 증가합니다. 다음 무기 공격 시 발동됩니다.',
+    '다음 근접 공격이 {damage}의 추가 피해를 입힙니다. 분노는 해당 공격에 소모되며, 분노가 부족하면 일반 공격으로 적용됩니다.',
   'entities.abilities.battle_shout.name': '강철의 외침',
   'entities.abilities.battle_shout.description':
     '외침을 질러 30분 동안 모든 파티원의 전투력을 {buff}%만큼 증가시킵니다.',
   'entities.abilities.demoralizing_shout.name': '흉포한 울부짖음',
   'entities.abilities.demoralizing_shout.description':
-    '무시무시한 외침을 내질러 20초 동안 주위 모든 적이 입히는 피해를 {buff}%만큼 감소시킵니다.',
+    '주위 10미터 이내의 모든 적이 입히는 피해를 {duration}초 동안 {buff}%만큼 감소시키는 외침을 내지릅니다.',
   'entities.abilities.charge.name': '쇄도',
   'entities.abilities.charge.description':
-    '적에게 돌진하여 분노 9를 생성하고 1초 동안 기절시킵니다. 사거리 8-25yd.',
+    '적에게 돌진하여 1초 동안 기절시키고 분노 9를 생성합니다.',
   'entities.abilities.thunder_clap.name': '진동의 일격',
   'entities.abilities.thunder_clap.description':
-    '주위 적에게 {damage}의 피해를 입히고 10초 동안 공격 속도를 10%만큼 늦춥니다.',
+    '주위 8미터 이내의 모든 적에게 {damage}의 물리 피해를 입히고 10초 동안 공격 속도를 10%만큼 늦춥니다.',
   'entities.abilities.hamstring.name': '절뚝이는 베기',
   'entities.abilities.hamstring.description':
     '적에게 {damage}의 피해를 입히고 15초 동안 이동 속도를 50%만큼 감소시킵니다.',
   'entities.abilities.bloodrage.name': '피의 대가',
-  'entities.abilities.bloodrage.description': '생명력을 희생하여 분노 10을 생성합니다.',
+  'entities.abilities.bloodrage.description':
+    '최대 생명력의 8%를 잃고 분노 {rage}을 생성합니다. 이로 인해 죽지는 않습니다.',
   'entities.abilities.overpower.name': '붉은 손',
   'entities.abilities.overpower.description':
-    '무기 피해에 {damage}를 더한 피해를 즉시 입힙니다. 대상이 회피한 후에만 사용할 수 있습니다. 회피할 수 없습니다.',
+    '무기 피해에 {damage}를 더한 피해를 입힙니다. 회피할 수 없습니다. 사용할 때마다 {duration}초 동안 붉은 손 중첩도 1 얻으며 최대 2중첩이고, 다음 불구의 일격이 중첩을 소모해 중첩당 무기 피해가 20% 증가합니다. 충전을 최대 2회 보관합니다.',
   'entities.abilities.execute.name': '이른 무덤',
   'entities.abilities.execute.description':
     '상처 입은 적을 끝내려 시도해 {damage}의 피해를 입힙니다. 생명력이 20% 미만인 적에게만 사용할 수 있습니다.',
   'entities.abilities.slam.name': '우악스러운 휘두르기',
-  'entities.abilities.slam.description': '상대에게 무기 피해에 {damage}를 더한 피해를 입힙니다.',
+  'entities.abilities.slam.description':
+    '무기 피해의 50%에 {damage}를 더한 피해를 입히고 분노 {rage}을 생성합니다.',
   'entities.abilities.cleave.name': '수확의 호',
   'entities.abilities.cleave.description': '전방의 모든 적을 휩쓸어 {damage}의 피해를 입힙니다.',
   'entities.abilities.defensive_stance.name': '방어 태세',
@@ -5962,7 +5964,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '방어 전투 태세입니다. 위협 수준을 30% 더 생성하지만, 주고받는 피해가 10% 감소합니다. 다시 시전하면 태세를 해제합니다.',
   'entities.abilities.sunder_armor.name': '방어구 절단',
   'entities.abilities.sunder_armor.description':
-    '대상의 방어구를 가르고 적용마다 {damage}%만큼 감소시킵니다. 최대 5번 중첩됩니다. 많은 위협 수준을 생성합니다.',
+    '대상의 방어구를 가르고 적용마다 {damage}%만큼 30초 동안 감소시킵니다. 최대 5번 중첩되며, 적용할 때마다 지속시간이 갱신됩니다. 많은 위협 수준을 생성합니다.',
   'entities.abilities.taunt.name': '부추김',
   'entities.abilities.taunt.description':
     '대상을 도발합니다. 자신의 위협 수준이 대상이 가장 증오하는 적과 같아지며, 3초 동안 자신을 공격하게 만듭니다.',
@@ -5972,7 +5974,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '타오르는 화염구로 변신해 이동 속도가 {buff}% 증가합니다. 변신 중에는 공격하거나 주문을 시전할 수 없습니다. 다시 사용하면 원래 모습으로 돌아옵니다.',
   'entities.abilities.rain_of_fire.name': '불의 비',
   'entities.abilities.rain_of_fire.description':
-    '파괴력 3을 소모해 대상 지역에 불의 비를 내려 4초 동안 매초 {damage}의 화염 피해를 입힙니다. 2랭크에서는 6초로 늘어납니다. 파멸은 첫 물결을 즉시 떨어뜨립니다.',
+    '파괴력 3을 소모해 대상 지역에 불의 비를 내려, 범위 안의 적에게 매초 {damage}의 화염 피해를 {duration}초 동안 입힙니다. 파멸은 첫 물결을 즉시 떨어뜨립니다.',
   'entities.abilities.volley.name': '일제 사격',
   'entities.abilities.volley.description':
     '8미터 지역에 3초 동안 화살을 퍼붓습니다. 지역 안의 적은 0.5초마다 {damage}의 물리 피해를 입습니다. 피해량은 원거리 전투력에 따라 증가합니다.',
@@ -5984,9 +5986,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '8미터 지역을 6초 동안 뒤흔들며 1.5초마다 {damage}의 자연 피해를 입힙니다. 피해량은 주문력에 따라 증가합니다. 정기: 천둥 5에서 피해량이 100% 증가하고 천둥을 모두 소모합니다.',
   'entities.abilities.flamestrike.name': '화염 폭발',
   'entities.abilities.flamestrike.description':
-    '지정한 지역에 화염 폭발을 일으켜 폭발 범위 안의 적에게 {damage}의 화염 피해를 입힙니다.',
+    '지정한 지역에 화염 폭발을 일으켜 폭발에 휘말린 모든 적에게 {damage}의 화염 피해를 입힙니다. 치명타 판정은 폭발 전체에 한 번만 적용되어, 모든 적이 치명타를 입거나 아무도 입지 않습니다.',
   'entities.abilities.fireball.description':
-    '불덩이를 날려 {damage}의 화염 피해와 추가 지속 피해를 입힙니다.',
+    '불덩이를 날려 {damage}의 화염 피해를 입힌 뒤, {duration}초에 걸쳐 {overTime}의 화염 피해로 대상을 불태웁니다.',
   'entities.abilities.frost_armor.name': '서리 망토',
   'entities.abilities.frost_armor.description':
     '자신을 냉기로 감싸 30분 동안 방어도를 {buff}만큼 증가시킵니다.',
@@ -5994,7 +5996,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_intellect.description': '30분 동안 지능이 {buff}만큼 증가합니다.',
   'entities.abilities.frostbolt.name': '서리 창',
   'entities.abilities.frostbolt.description':
-    '냉기의 화살을 발사해 {damage}의 냉기 피해를 입히고 이동 속도를 40%만큼 늦춥니다.',
+    '냉기의 화살을 발사해 {damage}의 냉기 피해를 입히고 {duration}초 동안 이동 속도를 40%만큼 늦춥니다.',
   'entities.abilities.conjure_water.name': '물 창조',
   'entities.abilities.conjure_water.description':
     '마시면 마나를 회복하는 물병 2개를 창조합니다. 높은 등급은 더 순수한 물을 창조합니다.',
@@ -6003,13 +6005,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '먹으면 생명력을 회복하는 빵 2개를 창조합니다. 높은 등급은 더 든든한 음식을 창조합니다.',
   'entities.abilities.fire_blast.name': '잉걸 작렬',
   'entities.abilities.fire_blast.description':
-    '적에게 {damage}의 화염 피해를 입힙니다. 즉시 시전됩니다.',
+    '적에게 {damage}의 화염 피해를 입힙니다. 항상 치명타로 적중합니다. 전역 재사용 대기시간의 영향을 받지 않으며 다른 주문을 시전하는 중에도 사용할 수 있습니다.',
   'entities.abilities.arcane_missiles.name': '에테르 화살',
   'entities.abilities.arcane_missiles.description':
-    '적에게 에테르 화살을 발사하여 3초 동안 매초 {damage}의 비전 피해를 입힙니다.',
+    '3초 동안 정신을 집중하여 각각 {damage}의 비전 피해를 입히는 화살 3발을 발사합니다. 비전 충전을 모두 소모하며, 충전 1개마다 화살들에 나뉘어 비전 피해 9가 추가되고, 충전 4개에서는 3발 대신 5발을 발사합니다.',
   'entities.abilities.polymorph.name': '홀리기',
   'entities.abilities.polymorph.description':
-    '적을 최대 {duration}초 동안 두꺼비로 변이시킵니다. 두꺼비는 돌아다니며 빠르게 회복합니다. 피해를 받으면 효과가 해제됩니다. 야수와 인간형에게만 사용할 수 있습니다.',
+    '적을 최대 {duration}초 동안 두꺼비로 변이시킵니다. 두꺼비는 행동할 수 없으며, 생명력이 모두 회복되고, 매초 최대 생명력의 10%를 회복하며, 지속 피해 효과를 잃습니다. 피해를 받으면 효과가 해제됩니다. 언데드나 제어 면역인 적에게는 효과가 없습니다.',
   'entities.abilities.frost_nova.name': '얼음 속박',
   'entities.abilities.frost_nova.description':
     '주위 모든 적을 최대 8초 동안 제자리에 얼리고 {damage}의 냉기 피해를 입힙니다. 이동 불가 효과는 대상 최대 생명력의 15%에 해당하는 누적 피해를 받으면 해제되며, 피해 기준은 최소 20, 최대 60입니다.',
@@ -6018,10 +6020,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '비전 에너지 폭발이 주위 모든 적에게 {damage}의 비전 피해를 입힙니다.',
   'entities.abilities.scorch.name': '그을리기',
   'entities.abilities.scorch.description':
-    '적을 불태워 {damage}의 화염 피해를 입힙니다. 빠르게 시전합니다.',
+    '적을 불태워 {damage}의 화염 피해를 입히고 3초 동안 이동 속도를 20% 증가시킵니다. 생명력이 30% 이하인 대상에게는 항상 치명타로 적중합니다.',
   'entities.abilities.pyroblast.name': '화염 창',
   'entities.abilities.pyroblast.description':
-    '거대한 불덩이를 던져 {damage}의 화염 피해와 추가 지속 피해를 입힙니다.',
+    '거대한 불덩이를 던져 {damage}의 화염 피해를 입힌 뒤, {duration}초에 걸쳐 {overTime}의 화염 피해로 대상을 불태웁니다.',
   'entities.abilities.ice_barrier.name': '서리 장막',
   'entities.abilities.ice_barrier.description':
     '얼음으로 자신을 보호해 60초 동안 {damage}의 피해를 흡수합니다.',
@@ -6029,7 +6031,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sinister_strike.description':
     '즉시 무기 피해에 {damage}를 더한 피해를 입힙니다. 연계 점수 1점을 얻습니다.',
   'entities.abilities.eviscerate.name': '영면',
-  'entities.abilities.eviscerate.description': '결정타로 {damage}의 피해를 입힙니다.',
+  'entities.abilities.eviscerate.description':
+    '{damage}의 물리 피해를 입히는 결정타입니다. 피해량은 전투력에 따라 증가합니다.',
   'entities.abilities.backstab.name': '비겁한 찌르기',
   'entities.abilities.backstab.description':
     '대상을 등 뒤에서 찔러 무기 피해의 150%에 {damage}를 더한 피해를 입힙니다. 대상 뒤에 있어야 합니다. 단검이 필요합니다. 연계 점수 1점을 얻습니다.',
@@ -6051,7 +6054,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '은신 상태에서 대상 뒤를 기습해 무기 피해의 250%에 {damage}를 더한 피해를 입힙니다. 단검이 필요합니다. 연계 점수 1점을 얻습니다.',
   'entities.abilities.stealth.name': '황혼장막',
   'entities.abilities.stealth.description':
-    '그림자 속에 몸을 숨깁니다. 적이 거의 알아차리지 못하며 최대 속도로 이동합니다. 공격하거나 피해를 받으면 황혼장막이 해제됩니다. 다시 시전하면 모습을 드러냅니다.',
+    '그림자 속에 몸을 숨깁니다. 적 플레이어와 소환수는 당신을 볼 수 없고, 몬스터는 평소보다 훨씬 가까운 거리에서만 당신을 알아챕니다(당신보다 레벨이 높으면 더 멀리서 알아챕니다). 최대 속도로 이동합니다. 공격하거나 피해를 받으면 황혼장막이 해제됩니다. 다시 시전하면 모습을 드러냅니다.',
   'entities.abilities.adrenaline_rush.name': '들끓는 피',
   'entities.abilities.adrenaline_rush.description': '피가 끓어올라 즉시 기력 60을 회복합니다.',
   'entities.abilities.garrote.name': '철사 목조르기',
@@ -6076,16 +6079,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '대상을 찢는 마무리 기술. 2초마다 출혈하며, 6초에 더해 연계 점수 하나당 2초 지속됩니다 (연계 점수 5: 16초, 모두 {damage}의 피해).',
   'entities.abilities.vanish.name': '연막 걸음',
   'entities.abilities.vanish.description':
-    '시야에서 사라져 전투 중에도 황혼장막 상태가 됩니다. 숨어 있는 동안에도 최대 속도로 이동합니다. 최대 10초 동안 지속됩니다.',
+    '전투 중에도 시야에서 사라져 최대 10초 동안 황혼장막 상태에 들어갑니다. 전투에서 벗어나며, 지속되는 동안 몬스터는 당신에 대한 모든 위협 수준을 잊고 당신을 감지하지 못하며, 적 플레이어는 당신을 대상으로 지정할 수 없게 됩니다. 숨어 있는 동안 최대 속도로 이동합니다.',
   'entities.abilities.instant_poison.name': '독사의 이빨',
   'entities.abilities.instant_poison.description':
     '30분 동안 무기에 독을 발라 근접 공격마다 {damage}의 추가 자연 피해를 입힙니다.',
   'entities.abilities.deadly_poison.name': '곪는 독',
   'entities.abilities.deadly_poison.description':
-    '30분 동안 무기에 독을 바릅니다. 근접 공격마다 대상에게 독 중첩을 하나 추가해 최대 5중첩까지 쌓고, 12초 지속시간을 갱신합니다. 각 중첩은 2초마다 {damage}의 자연 피해를 입힙니다.',
+    '30분 동안 무기에 독을 바릅니다. 근접 공격을 할 때마다 대상에게 독 중첩을 하나 추가해 최대 5중첩까지 쌓고, 12초 지속시간을 갱신합니다. 각 중첩은 2초마다 {damage}의 자연 피해를 입힙니다. 다른 무기 코팅을 대체합니다.',
   'entities.abilities.blind.name': '흙 뿌리기',
   'entities.abilities.blind.description':
-    '대상의 눈을 멀게 해 8초 동안 방향을 잃고 헤매게 만듭니다. 피해를 받으면 효과가 해제됩니다.',
+    '대상의 눈에 흙을 뿌려 8초 동안 행동 불능으로 만듭니다. 피해를 받으면 효과가 해제됩니다.',
   'entities.abilities.seal_of_righteousness.name': '맹세의 낙인',
   'entities.abilities.seal_of_righteousness.description':
     '30초 동안 신성한 힘으로 채워, 근접 휘두르기마다 {damage}의 추가 신성 피해를 입힙니다.',
@@ -6107,7 +6110,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hammer_of_justice.description': '대상을 {duration}초 동안 기절시킵니다.',
   'entities.abilities.lay_on_hands.name': '마지막 의식',
   'entities.abilities.lay_on_hands.description':
-    '최대 생명력의 {damage}%를 되돌리는 거대한 물결. 생명력을 회복시킬 때 헌신을 1 만듭니다. 재사용 대기시간 10분.',
+    '아군 대상을 최대 생명력의 {damage}%만큼 치유하고, 생명력을 회복시키면 헌신을 1 생성합니다.',
   'entities.abilities.holy_taunt.name': '신성한 부추김',
   'entities.abilities.holy_taunt.description':
     '대상을 도발합니다. 자신의 위협 수준이 대상이 가장 증오하는 적과 같아지며, 3초 동안 자신을 공격하게 만듭니다.',
@@ -6119,7 +6122,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '신성한 분노로 악을 몰아내 {damage}의 신성 피해를 입힙니다.',
   'entities.abilities.consecration.name': '신성한 땅',
   'entities.abilities.consecration.description':
-    '발밑의 땅을 9초 동안 신성하게 하여 매초 {damage}의 신성 피해를 높은 위협 수준과 함께 입힙니다. 첫 타격은 헌신을 1 만듭니다. 신앙수호자는 그 안에 서 있는 동안 받는 피해가 10% 줄어듭니다. 승천은 그 피해를 높입니다.',
+    '발밑의 땅을 9초 동안 신성하게 하여 매초 {damage}의 신성 피해를 높은 위협 수준과 함께 입힙니다. 첫 타격은 헌신을 1 생성합니다. 신앙수호자는 그 안에 서 있는 동안 받는 피해가 10% 감소합니다. 승천 중에는 피해가 30% 증가합니다.',
   'entities.abilities.righteous_fury.name': '불타는 맹세',
   'entities.abilities.righteous_fury.description':
     '신성 피해가 만드는 위협 수준을 지속적으로 30% 높입니다. 신앙수호자 전용.',
@@ -6128,15 +6131,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '죽거나 교체될 때까지 자신과 파티를 신성한 힘으로 감쌉니다. 영향을 받는 아군을 근접 공격한 적은 {buff}의 신성 피해를 입고, 영향을 받는 아군의 일반 공격은 {buff}의 신성 피해를 추가로 입힙니다. 자신의 보루 헌신을 대체합니다. 다른 성기사가 응보의 오라를 시전하면 중첩되지 않고 갱신됩니다.',
   'entities.abilities.tame_beast.name': '야생의 결속',
   'entities.abilities.tame_beast.description':
-    '야수를 길들여 동료로 삼기 시작합니다. 야수는 자신의 레벨 이하이며 정예가 아니어야 합니다. 소환수는 주인을 따르고 적을 공격하며 자체 위협 수준을 유지합니다. 한 번에 하나의 소환수만 둘 수 있습니다.',
+    '야수를 길들여 동료로 삼기 시작합니다. 야수는 자신의 레벨 이하여야 하며 정예, 희귀, 우두머리 또는 던전 생물은 불가능합니다. 소환수는 당신을 따르고 적을 공격하며 자체 위협 수준을 유지합니다. 한 번에 하나의 소환수만 둘 수 있습니다.',
   'entities.abilities.dismiss_pet.name': '동료 해제',
   'entities.abilities.dismiss_pet.description': '소환수를 야생으로 돌려보냅니다.',
   'entities.abilities.raptor_strike.name': '내장 가르기',
   'entities.abilities.raptor_strike.description':
-    '무기 피해의 10%에 {damage}를 더해 타격합니다. 명중하면 집중을 15 회복하고 사냥의 기세를 1 얻습니다. 피해량은 무기 피해를 통해 전투력에 따라 증가합니다.',
+    '무기 피해의 10%에 {damage}를 더해 타격합니다. 피해량은 무기 피해를 통해 전투력에 따라 증가합니다. 생존이 있으면 적중 시 집중 15를 회복하고 사냥의 기세를 1 얻습니다.',
   'entities.abilities.aspect_of_the_hawk.name': '새매의 상',
   'entities.abilities.aspect_of_the_hawk.description':
-    '매의 모습을 취해 전투력을 30분 동안 {buff}만큼 높입니다.',
+    '새매의 상을 취해 전투력과 원거리 전투력을 30분 동안 {buff}만큼 높입니다.',
   'entities.abilities.serpent_sting.name': '독 미늘',
   'entities.abilities.serpent_sting.description':
     '15초에 걸쳐 3초마다 한 번씩, 모두 {damage}의 자연 피해를 입힙니다. 피해량은 원거리 전투력에 따라 증가합니다.',
@@ -6168,7 +6171,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '이동하면서 2.4초에 걸쳐 6발을 발사합니다. 발당 {damage}의 물리 피해를 입히며 원거리 전투력에 따라 증가합니다.',
   'entities.abilities.smite.name': '정화의 성가',
   'entities.abilities.smite.description':
-    '{damage}의 신성 피해를 입힙니다. 피해량은 주문력에 따라 증가합니다. 수양: 이어진 아군을 각각 피해량의 30%만큼 치유합니다. 이어진 아군이 없으면 생명력이 가장 낮은 파티원을 15% 치유합니다.',
+    '{damage}의 신성 피해를 입힙니다. 피해량은 주문력에 따라 증가합니다. 수양: 30미터 이내에서 이어진 부상당한 파티원을 각각 입힌 피해의 30%만큼 치유합니다(쌍둥이 서약이면 70%). 부상당한 파티원이 없으면 대신 30미터 이내에서 생명력이 가장 낮은 부상당한 파티원을 15% 치유합니다.',
   'entities.abilities.lesser_heal.name': '속삭이는 기도',
   'entities.abilities.lesser_heal.description':
     '아군 대상을 {damage}만큼 치유합니다. 치유량은 주문력에 따라 증가합니다.',
@@ -6180,7 +6183,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '18초에 걸쳐 3초마다 한 번씩, 모두 {damage}의 암흑 피해를 입힙니다. 피해량은 주문력에 따라 증가합니다. 암흑: 피해량이 10% 늘고, 당신의 형상에 새겨질 때마다 어스름 공물을 1 얻습니다.',
   'entities.abilities.power_word_shield.name': '수호의 성가',
   'entities.abilities.power_word_shield.description':
-    '아군 대상을 감싸 30초 동안 {damage}의 피해를 흡수합니다. 수양은 그 대상을 30초 동안 당신의 신성 피해와 잇기도 합니다.',
+    '아군 대상을 감싸 30초 동안 {damage}의 피해를 흡수합니다. 수양은 대상을 30초 동안 이어주기도 하며, 이전에 이은 대상을 대체합니다(쌍둥이 서약이면 두 명을 유지). 이어진 파티원이 30미터 이내에 있는 동안, 정화의 성가와 적대적 정화의 자비가 입힌 피해의 30%만큼 그들을 치유합니다.',
   'entities.abilities.renew.name': '지속되는 은총',
   'entities.abilities.renew.description':
     '15초에 걸쳐 3초마다 한 번씩 대상을 {damage}만큼 치유합니다. 치유량은 주문력에 따라 증가합니다.',
@@ -6201,10 +6204,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '{damage}의 자연 피해를 입힙니다. 피해량은 주문력에 따라 증가합니다. 정기: 명중하면 천둥을 1 얻습니다.',
   'entities.abilities.rockbiter_weapon.name': '바위결속 무기',
   'entities.abilities.rockbiter_weapon.description':
-    '무기에 30분 동안 힘을 깃들입니다. 휘두를 때마다 {damage}의 추가 피해를 입힙니다. 고양은 여기에 더해 방어도를 40%, 체력을 20% 얻고, 받는 피해가 15% 줄며, 야수의 치명타에 면역이 되며, 위협 수준을 2.75배로 만듭니다. 대지의 충격은 그 대상이 3초 동안 당신을 공격하게 하고, 천둥 결계는 3초 동안 10%의 피해 감소를 줍니다.',
+    '30분 동안 무기에 힘을 깃들입니다. 휘두를 때마다 {damage}의 추가 피해를 입힙니다. 고양은 여기에 더해 방어도 40%와 체력 20%를 얻고, 받는 피해가 15% 줄며, 생물의 치명타에 면역이 되고, 위협 수준을 2.75배로 생성합니다. 대지의 충격은 대상이 3초 동안 당신을 공격하게 만들고, 천둥 결계를 시전하면 3초 동안 피해가 10% 감소합니다.',
   'entities.abilities.healing_wave.name': '치유의 물결',
   'entities.abilities.healing_wave.description':
-    '아군 대상을 {damage}만큼 치유합니다. 치유량은 주문력에 따라 증가합니다. 회복: 과잉 치유가 되기 전에 온전한 치유량의 50%를 12초 동안 치유의 물결로 담아 둡니다. 상한은 대상 최대 생명력의 30%입니다.',
+    '아군 대상을 {damage}만큼 치유합니다. 치유량은 치유력에 따라 증가합니다. 영혼의 부름: 과잉 치유 전 전체 치유량의 50%를 대상의 치유의 물결에도 더합니다. 치유의 물결은 12초에 걸쳐 대상을 치유하며 최대 생명력의 30%까지 저장합니다.',
   'entities.abilities.chain_heal.name': '물결 치유',
   'entities.abilities.chain_heal.description':
     '아군 대상 하나를 {damage}만큼 치유한 뒤, 12야드 내 아군 최대 2명에게 연쇄됩니다. 연쇄될 때마다 이전 대상의 50%만큼 치유합니다. 연쇄된 아군은 남아 있는 치유의 흐름을 소모하고 소모량의 125%만큼 즉시 치유받습니다. 최초 치유량은 주문력에 따라 증가합니다. (복원 전문화)',
@@ -6234,10 +6237,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '무기 피해에 {damage}를 더해 타격하고 전령의 박자를 2단 앞당깁니다. 피해량은 무기 피해를 통해 전투력에 따라 증가합니다.',
   'entities.abilities.shadow_bolt.name': '어스름 화살',
   'entities.abilities.shadow_bolt.description':
-    '적에게 어둠의 화살을 보내 {damage}의 암흑 피해를 입힙니다.',
+    '적에게 어둠의 화살을 보내 {damage}의 암흑 피해를 입힙니다. 파멸: 파괴력을 1 생성하며 최대 5입니다.',
   'entities.abilities.demon_skin.name': '마귀 가죽',
   'entities.abilities.demon_skin.description':
-    '악마의 피부가 30분 동안 방어도를 {buff}만큼 증가시킵니다.',
+    '30분 동안 방어도를 {buff}만큼 증가시킵니다. 계약 심화은 이 방어도를 두 배로 늘리고, 마귀 가죽이 활성화된 동안 받는 마법 피해를 5% 감소시킵니다.',
   'entities.abilities.immolate.name': '불타는 계약',
   'entities.abilities.immolate.description':
     '적을 불태워 {damage}의 화염 피해를 입히고 15초에 걸쳐 추가로 {overTime}의 피해를 입힙니다.',
@@ -6245,19 +6248,20 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corruption.description':
     '대상을 부패시켜 18초에 걸쳐 {damage}의 암흑 피해를 입힙니다.',
   'entities.abilities.life_tap.name': '가혹한 거래',
-  'entities.abilities.life_tap.description': '생명력 {damage}을 마나 {damage}으로 전환합니다.',
+  'entities.abilities.life_tap.description':
+    '생명력 {damage}을 마나 {damage}으로 전환합니다(피의 외상가 있으면 마나 50% 추가). 생명력이 {damage} 이하이면 실패합니다.',
   'entities.abilities.curse_of_agony.name': '고뇌의 저주',
   'entities.abilities.curse_of_agony.description':
     '대상에게 고통의 저주를 걸어 24초에 걸쳐 {damage}의 암흑 피해를 입힙니다.',
   'entities.abilities.drain_life.name': '집어삼키기',
   'entities.abilities.drain_life.description':
-    '대상의 생명력을 집어삼켜 매초 {damage}의 암흑 피해를 입히고 그중 70%를 생명력으로 당신에게 옮깁니다. 고통은 대신 전부를 옮깁니다. 주된 사안에 정신을 집중하면 시작할 때 운명의 실타래를 모두 소모하고, 실타래마다 매 주기 단죄를 1씩 더 만듭니다.',
+    '대상의 생명력을 집어삼켜 매초 {damage}의 암흑 피해를 입히고 입힌 피해의 70%만큼 자신을 치유합니다(고통은 전부). 사안이 걸린 적에게는 틱마다 단죄를 2 생성하고 정신 집중을 마치면 3을 더 생성합니다. 주 사안에는 시작할 때 운명의 실도 모두 소모하며, 실 하나당 틱마다 단죄를 1 더 생성하고 실 3개면 피해를 받아도 정신 집중이 지연되지 않습니다.',
   'entities.abilities.fear.name': '번민',
   'entities.abilities.fear.description':
     '적에게 공포를 심어 최대 5초 동안 떨게 만듭니다. 대상 최대 생명력의 8%에 해당하는 누적 피해를 받으면 효과가 해제됩니다.',
   'entities.abilities.searing_pain.name': '지지기',
   'entities.abilities.searing_pain.description':
-    '고통스러운 불길로 적을 태워 {damage}의 화염 피해를 입힙니다. 빠르게 시전합니다.',
+    '고통스러운 불길로 적을 태워 {damage}의 화염 피해를 입힙니다.',
   'entities.abilities.shadowburn.name': '황혼불꽃',
   'entities.abilities.shadowburn.description':
     '파괴력 1을 소모해 생명력 20% 미만의 적을 {damage}의 암흑 피해로 처형합니다. 지목한 대상이 5초 안에 쓰러지면 그 파괴력을 되돌려 줍니다.',
@@ -6273,21 +6277,22 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '아군 대상에게 야생의 수호를 걸어 30분 동안 방어도를 {buff}만큼 증가시킵니다.',
   'entities.abilities.moonfire.name': '달빛 폭풍',
   'entities.abilities.moonfire.description':
-    '달빛불로 적을 태워 {damage}의 비전 피해와 지속 피해를 입힙니다.',
+    '적을 태워 {damage}의 비전 피해를 입히고, {duration}초에 걸쳐 {overTime}의 비전 피해를 추가로 입힙니다.',
   'entities.abilities.rejuvenation.name': '포자치유',
   'entities.abilities.rejuvenation.description':
     '12초에 걸쳐 대상의 생명력을 {damage}만큼 회복시킵니다.',
   'entities.abilities.thorns.name': '가시 수호',
   'entities.abilities.thorns.description':
-    '대상에게 가시가 돋아 근접 공격자가 {buff}의 자연 피해를 받습니다.',
+    '대상에게 10분 동안 가시가 돋아납니다. 대상을 겨냥한 근접 공격이 적중할 때마다 공격자에게 {buff}의 자연 피해를 입힙니다.',
   'entities.abilities.entangling_roots.name': '옥죄는 뿌리',
-  'entities.abilities.entangling_roots.description': '대상을 최대 12초 동안 제자리에 묶습니다.',
+  'entities.abilities.entangling_roots.description':
+    '대상을 최대 12초 동안 제자리에 묶습니다. 상위 랭크는 12초 동안 자연 피해도 입힙니다.',
   'entities.abilities.bear_form.name': '큰곰 변신',
   'entities.abilities.bear_form.description':
-    "곰으로 변신합니다. 방어도 +110%, 최대 생명력 +30%, 전투력이 크게 증가하고, 공격이 분노와 30% 더 많은 위협 수준을 생성합니다. 공격 속도가 두 배가 되는 대신 타격당 피해가 절반이 되며, 각 타격은 두 배의 분노를 생성합니다. 어떤 형상으로 변신하든 짧은 이동 속도 증가 효과인 '성큼걸음'을 얻습니다. 다시 시전하면 시전자 형태로 돌아갑니다.",
+    '곰으로 변신합니다. 방어도 +110%, 최대 생명력 +30%, 전투력 +15에 민첩 1당 +1.5이며, 공격이 분노를 생성하고 위협 수준이 30% 더 많이 생성됩니다. 공격 속도가 두 배가 되는 대신 타격당 피해가 절반이 되며, 각 타격은 두 배의 분노를 생성합니다. 어떤 형상으로 변신하든 짧은 이동 속도 증가인 성큼걸음을 얻습니다. 다시 시전하면 시전자 형태로 돌아갑니다.',
   'entities.abilities.maul.name': '뼈 분쇄',
   'entities.abilities.maul.description':
-    '근접 피해를 {damage}만큼 증가시키고 많은 위협 수준을 생성하는 난폭한 공격입니다. 다음 무기 공격 시 발동됩니다. 큰곰 변신 전용.',
+    '다음 근접 공격이 {damage}의 추가 피해를 입히고, 피해량의 2.5배에 소량의 고정 수치를 더한 위협 수준을 생성합니다. 큰곰 변신 전용.',
   'entities.abilities.challenging_roar.description':
     '위압적으로 포효합니다. 10미터 내의 모든 적이 도발되어 자신에 대한 위협 수준이 그 적이 가장 증오하는 대상과 같아지며, 3초 동안 자신을 공격하게 만듭니다. 큰곰 변신 전용.',
   'entities.abilities.challenging_roar.name': '위압의 포효',
@@ -6296,7 +6301,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '대상에게 으르렁거립니다. 자신의 위협 수준이 대상이 가장 증오하는 적과 같아지며, 3초 동안 자신을 공격하게 만듭니다. 큰곰 변신 전용.',
   'entities.abilities.cat_form.name': '표범 변신',
   'entities.abilities.cat_form.description':
-    '표범으로 변신합니다. 민첩은 레벨에 따라 오르고 전투력은 8에 레벨당 2를 더해 증가합니다. 공격은 기력과 연계 점수를 사용하며 이동 속도가 15% 증가하고 위협 수준이 29% 감소합니다. 어떤 형태로 변신하든 성큼걸음을 얻어 잠시 빨라집니다. 다시 사용하면 시전자 형태로 돌아옵니다.',
+    '표범으로 변신합니다. 민첩 + 레벨의 절반(최소 2), 전투력 +8에 레벨당 +2, 공격이 기력과 연계 점수를 사용하며, 이동 속도가 15% 빨라지고 위협 수준이 29% 적게 생성됩니다. 어떤 형상으로 변신하든 짧은 이동 속도 증가인 성큼걸음을 얻습니다. 다시 시전하면 시전자 형태로 돌아갑니다.',
   'entities.abilities.claw.name': '찢는 발톱',
   'entities.abilities.claw.description':
     '적을 할퀴어 무기 피해에 {damage}를 더한 피해를 입힙니다. 연계 점수 1점을 얻습니다. 표범 변신 전용.',
@@ -6305,13 +6310,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '6미터 내 주위 대상을 할퀴어 무기 피해에 {damage}를 더한 피해를 입힙니다. 적중한 대상 하나당 연계 점수 1점을 얻습니다. 범위 내 은신 중인 적을 드러냅니다. 표범 변신 전용.',
   'entities.abilities.ferocious_bite.name': '유혈 물어뜯기',
   'entities.abilities.ferocious_bite.description':
-    '결정타로 {damage}의 피해를 입힙니다. 표범 변신 전용.',
+    '{damage}의 물리 피해를 입히는 결정타입니다. 표범 변신 전용.',
   'entities.abilities.swipe.name': '휩쓰는 발톱',
   'entities.abilities.swipe.description':
-    '주위 적을 휘둘러 {damage}의 피해를 입힙니다. 추가 위협 수준을 생성합니다. 큰곰 변신 전용.',
+    '주위 5미터 이내의 모든 적을 발톱으로 휩쓸어 각각 {damage}의 피해를 입히며, 입힌 피해보다 75% 더 많은 위협 수준을 생성합니다. 큰곰 변신 전용.',
   'entities.abilities.regrowth.name': '두 번째 개화',
   'entities.abilities.regrowth.description':
-    '아군 대상의 생명력을 {damage}만큼 회복시키고 15초에 걸쳐 추가로 회복시킵니다. 효과가 끝까지 지속되면 처음 치유와 같은 양만큼 대상을 다시 치유합니다.',
+    '아군 대상을 {damage}만큼 치유한 뒤, 15초에 걸쳐 {overTime}만큼 추가로 치유합니다. 지속 치유가 끝까지 유지되면 첫 치유량(치명타 보너스 적용 전)만큼 대상을 한 번 더 치유합니다. 신속한 치유, 만개 또는 재시전 등으로 일찍 끝내면 그 치유는 발동하지 않습니다.',
   'entities.abilities.barkskin.name': '참나무 가죽',
   'entities.abilities.barkskin.description':
     '피부가 나무껍질처럼 단단해져 15초 동안 방어도가 150만큼 증가합니다.',
@@ -6320,7 +6325,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '{duration}초 동안 다음 적의 치명적인 공격을 무효화하고, 대신 생명력을 최대치의 35%까지 회복합니다.',
   'entities.abilities.primal_reflexes.name': '원시의 반사',
   'entities.abilities.primal_reflexes.description':
-    '본능이 예리해져 6초 동안 회피율이 50% 증가합니다.',
+    '본능이 예리해져 6초 동안 회피 확률이 50%포인트 증가합니다.',
   'entities.abilities.starfire.name': '창공 낙하',
   'entities.abilities.starfire.description':
     '별의 불꽃을 불러 내려 {damage}의 비전 피해를 입힙니다.',
@@ -6359,19 +6364,19 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '마무리 일격으로 대상을 24초 동안 2초마다 출혈시킵니다. 피해 72에 소모한 연계 점수당 48을 더합니다(5점: 총 {damage}). 표범 변신 전용.',
   'entities.abilities.mortal_strike.name': '불구의 일격',
   'entities.abilities.mortal_strike.description':
-    '잔혹한 일격으로 무기 피해에 {damage}의 피해를 더합니다. (무기 특화 대표 기술)',
+    '무기 피해에 {damage}를 더해 타격하고 10초 동안 대상이 받는 치유 효과를 50% 감소시킵니다. 또한 6초에 걸쳐 2회 틱으로 {overTime}의 물리 피해를 입히는 출혈인 벌어진 상처를 부여합니다. (무기 상징)',
   'entities.abilities.bloodthirst.name': '사혈',
   'entities.abilities.bloodthirst.description':
-    '피의 광란으로 즉시 공격하여 무기 피해의 60%에 {damage}를 더한 피해를 줍니다. (분노 특화 대표 기술)',
+    '무기 피해의 50%에 {damage}를 더해 타격하고, 최대 생명력의 3%만큼 자신을 치유하며 분노 {rage}을 생성합니다. 30% 확률로 {duration}초 동안 격노 상태가 됩니다. (분노 상징)',
   'entities.abilities.shield_slam.name': '방패 강타',
   'entities.abilities.shield_slam.description':
-    '방패로 대상을 강타해 무기 피해의 50%에 {damage}를 더한 피해를 주고 막대한 위협을 생성합니다. (방어 특화 대표 기술)',
+    '방패로 대상을 강타해 무기 피해에 {damage}를 더한 피해를 입히고 분노 {rage}을 생성합니다. 매우 높은 위협 수준을 생성합니다. (방어 상징)',
   'entities.abilities.whirlwind.name': '칼날 회오리',
   'entities.abilities.whirlwind.description':
-    '치명적인 호를 그리며 돌아 주변 모든 적에게 {damage}의 피해를 줍니다. (분노 특성)',
+    '주위 8미터 이내의 모든 적에게 {damage}의 물리 피해를 입힙니다. 이후 {duration}초 동안 다음 단일 대상 기술 2회가 대상 주변 8미터 이내의 다른 적 최대 4명에게도 피해의 40%를 입힙니다. (분노)',
   'entities.abilities.berserker_rage.name': '들끓는 격노',
   'entities.abilities.berserker_rage.description':
-    '들끓는 격노에 들어가 분노 20을 생성합니다. (전사 특성)',
+    '들끓는 격노에 빠져 즉시 분노 {rage}을 생성합니다.',
   'entities.abilities.summon_imp.name': '불씨족 소환',
   'entities.abilities.summon_imp.description':
     '흑마법사의 명을 따르는 불씨족을 소환합니다. 불씨족은 먼 거리에서 당신의 적에게 지옥불 화살을 날립니다. 새 악마를 소환하면 지금의 악마는 물러갑니다. 악마는 한 번에 하나만 둘 수 있습니다.',
@@ -6389,16 +6394,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '흑마법사의 명령을 따르는 전쟁마귀를 소환합니다. 전쟁마귀는 전장에 뛰어들어 굳건히 버티는 튼튼한 근접 악마입니다. 새로운 악마를 소환하면 현재 악마는 사라집니다. 한 번에 하나의 악마만 부릴 수 있습니다.',
   'entities.abilities.summon_infernal.name': '화염거상 소환',
   'entities.abilities.summon_infernal.description':
-    '대상 지역에 화염거상을 떨어뜨려 충돌 시 64-79의 화염 피해를 입힙니다. 당신의 악마를 대신하지 않은 채 30초 동안 싸우며, 2초마다 가까운 적을 태우고 1초마다 파괴력을 1 만듭니다.',
+    '대상 지역에 화염거상을 떨어뜨려 충돌 시 6미터 이내의 적에게 {damage}의 화염 피해를 입힙니다. 악마를 대체하지 않은 채 30초 동안 싸우며, 2초마다 8미터 이내의 적에게 66의 화염 피해를 입히고 1초마다 파괴력을 1 생성합니다.',
   'entities.abilities.summon_doomguard.name': '망령태생 소환',
   'entities.abilities.summon_doomguard.description':
     '망령태생을 당신의 의지에 결속합니다. 망령태생은 멀리서 강력한 암흑 피해를 퍼붓는 정예 악마입니다. 긴 재사용 대기시간이 그 파괴적인 힘을 제한합니다. 새로운 악마를 소환하면 현재 악마는 사라집니다. 한 번에 하나의 악마만 부릴 수 있습니다.',
   'entities.abilities.bear_charge.name': '큰곰 돌진',
   'entities.abilities.bear_charge.description':
-    '적에게 돌진하여 분노 9를 생성하고 1초 동안 기절시킵니다. 이후 3초 동안 표범 변신은 무료이며 대상을 고정하여 4초 동안 이동 속도를 50% 감소시킵니다. 사거리 8-25yd. 큰곰 변신 상태에서만 사용 가능.',
+    '큰곰 변신 상태가 아니라면 큰곰으로 변신한 뒤 적에게 돌진하여 분노 9를 생성하고 1초 동안 기절시킵니다. 돌진이 끝난 뒤 3초 동안(또는 전투에서 벗어나거나 대상이 죽을 때까지) 표범 변신은 무료이며 돌진한 대상을 고정시켜 4초 동안 이동 속도를 50% 감소시킵니다. 어떤 형상에서든 사용할 수 있습니다.',
   'entities.abilities.demoralizing_roar.name': '비겁한 포효',
   'entities.abilities.demoralizing_roar.description':
-    '주변의 적들을 위축시켜 20초 동안 그들의 전투력을 20만큼 감소시킵니다. 큰곰 변신 상태에서만 사용 가능.',
+    '8미터 이내의 모든 적을 위축시켜 20초 동안 전투력을 {buff}만큼 감소시킵니다. 큰곰 변신 상태에서만 사용 가능.',
   'entities.abilities.prowl.name': '몰래 접근',
   'entities.abilities.prowl.description':
     '표범 변신 상태에서 은신합니다. 전투 중에는 사용할 수 없습니다.',
@@ -6410,7 +6415,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '소환수를 응급 처치합니다. 살아 있으면 12초에 걸쳐 3초마다 생명력을 회복합니다. 죽어 있으면 35%의 생명력으로 되살립니다.',
   'entities.abilities.tactical_camo.name': '전술 위장',
   'entities.abilities.tactical_camo.description':
-    '주변 환경에 녹아듭니다. 적이 거의 알아채지 못하며, 이동 속도가 80%가 됩니다. 공격하거나 피해를 받으면 전술 위장이 해제됩니다. 다시 시전하면 해제됩니다. (야전술)',
+    '은신 상태에 들어가 80%의 속도로 이동합니다. 몬스터는 가까운 거리에서만 당신을 알아채며(평소 어그로 범위의 4분의 1이고, 당신보다 레벨이 높으면 더 멀리서 알아챕니다), 적 플레이어와 소환수는 당신을 볼 수 없습니다. 공격하거나 피해를 받으면 전술 위장이 해제됩니다. 다시 시전하면 은신에서 벗어납니다. (생존)',
   'entities.abilities.play_dead.name': '죽은 척하기',
   'entities.abilities.play_dead.description':
     '땅에 쓰러져 죽은 척합니다. 모두에게 생명력과 집중이 비어 있는 것으로 보입니다. 적은 당신을 잊고, 당신을 대상으로 삼은 적 플레이어는 대상을 잃습니다. 이동하거나 공격하거나 다른 능력을 사용하면 끝납니다. 이동 중에 시전하면 1초 안에 멈춰야 하며, 그렇지 않으면 이동으로 인해 끝납니다. 다시 시전하면 일어납니다.',
@@ -6419,10 +6424,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '신성한 기운으로 아군 대상을 충격시켜 생명력을 {damage}만큼 회복시킵니다. (신성 전문화 상징)',
   'entities.abilities.holy_shield.name': '신성한 방패',
   'entities.abilities.holy_shield.description':
-    '30% 막기와 함께 최대 생명력의 {damage}%를 흡수하는 보호막을 {duration}초 동안 얻고, 위협 파동을 방출합니다. 신성한 승천이 이 방어를 강화하고 연장합니다.',
+    '막기 확률 30%와 {duration}초 동안 최대 생명력의 {damage}%를 흡수하는 보호막을 얻고, 위협 수준 파동을 방출합니다. 승천 중에는 막기 확률이 40%로 오르고 보호막이 50% 증가하며, 둘 다 10초로 연장됩니다.',
   'entities.abilities.bestial_wrath.name': '야수의 격노',
   'entities.abilities.bestial_wrath.description':
-    '무리의 사나움을 3 줍니다. 20초 안의 다음 야수 해방은 타격과 후려치기 피해가 50% 늘고, 그 광란이 8초가 아니라 12초 지속됩니다. (야수 다루기 상징 기술)',
+    '20초 동안 무리 흉포 3중첩을 부여하고 활성화된 해방된 광란을 끝냅니다. 20초 안의 다음 야수 해방은 공격과 후려치기 피해가 50% 증가하며, 광란이 8초 대신 12초 지속됩니다. (야수 다루기 상징)',
   'entities.abilities.trueshot_aura.name': '정조준 오라',
   'entities.abilities.trueshot_aura.description':
     '30미터 안 아군의 전투력을 30분 동안 10% 높입니다. (사격 상징 기술)',
@@ -6434,19 +6439,19 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '10초 동안 주문 공격력이 20%, 주문 가속이 10% 증가합니다. (비전 전문화 상징)',
   'entities.abilities.combustion.name': '불사조의 무아지경',
   'entities.abilities.combustion.description':
-    '15초 동안 주문 치명타율이 50% 증가합니다. (화염 전문화 상징)',
+    '10초 동안 화염 주문이 이미 날아가는 화살을 포함해 항상 치명타로 적중하며, 이 치명타도 평소처럼 몰아치는 열기를 쌓습니다. 전역 재사용 대기시간의 영향을 받지 않으며 시전 중에도 사용할 수 있습니다. 시전하면 재충전 중인 잉걸 작렬 충전이 완료됩니다. 불사조의 무아지경이 아닐 때, 몰아치는 열기를 쌓는 치명타마다 재사용 대기시간이 1초 줄어듭니다. (화염)',
   'entities.abilities.icy_veins.name': '한파 쇄도',
   'entities.abilities.icy_veins.description':
-    '10초 동안 주문 가속이 30% 증가하고 시전 방해와 밀림을 막습니다. (냉기 전문화 상징)',
+    '10초 동안 주문 가속이 30% 증가하고 시전 방해와 밀림을 막습니다. (냉기)',
   'entities.abilities.cold_blood.name': '냉혈',
   'entities.abilities.cold_blood.description':
-    '살의를 벼려 다음 5회의 공격을 반드시 치명타로 만듭니다. (암살 상징 기술)',
+    '{duration}초 안의 다음 공격 5회가 반드시 치명타가 됩니다. 자동 공격도 충전을 1회 사용합니다. (암살 상징)',
   'entities.abilities.blade_flurry.name': '폭풍의 칼날',
   'entities.abilities.blade_flurry.description':
     '칼날의 난무를 펼쳐 공격 속도를 30초 동안 20% 높입니다. (전투 상징 기술)',
   'entities.abilities.hemorrhage.name': '과다출혈',
   'entities.abilities.hemorrhage.description':
-    '무기 피해에 {damage}를 더해 적을 타격하고 12초 동안 출혈 피해를 입히며, 대상이 받는 출혈 피해를 40% 높입니다. 연계 점수를 1 줍니다. 두 번 쓸 때마다 어스름을 1 더합니다 (최대 3). (잠행 상징 기술)',
+    '무기 피해에 {damage}를 더해 적을 타격하고 12초에 걸쳐 {overTime}의 출혈을 일으킵니다. 12초 동안 대상에게 걸린 모든 출혈의 피해가 40% 증가합니다. 연계 점수를 1 부여합니다. 2번 사용할 때마다 어스름을 1 더합니다(최대 3). (잠행 상징)',
   'entities.abilities.power_infusion.name': '마력 주입',
   'entities.abilities.power_infusion.description':
     '아군 대상에게 성유를 발라 15초 동안 피해량과 치유량과 시전 속도를 20% 높입니다.',
@@ -6455,22 +6460,22 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '10미터 안 아군을 {damage}만큼 치유하고 같은 지역의 적에게 24에서 30의 신성 피해를 입힙니다. 두 값 모두 주문력에 따라 증가합니다. (신성 기본)',
   'entities.abilities.shadowform.name': '황혼의 장막',
   'entities.abilities.shadowform.description':
-    '황혼의 장막에 들어 암흑 피해를 25% 높입니다. 다시 시전하면 황혼의 장막을 떠납니다. (암흑 상징 기술)',
+    '황혼의 장막에 들어 암흑 피해가 25% 증가합니다. 치유 주문을 시전하면 끝납니다. 황혼의 장막을 다시 시전하면 벗어납니다. (암흑 상징)',
   'entities.abilities.elemental_mastery.name': '정기의 깨달음',
   'entities.abilities.elemental_mastery.description':
-    '12초 동안 전격 화살이 천둥을 2 줍니다. 다음 전격 화살이나 갈래 번개가 즉시 시전이 되고, 다음 온전한 천둥 지급은 피해량이 25% 늘어납니다. (정기 상징 기술)',
+    '12초 동안 전격 화살이 천둥을 1 대신 2 부여합니다. 그동안 다음 전격 화살 또는 갈래 번개는 즉시 시전되고, 천둥 5를 소모하는 다음 대지의 충격 또는 단층 각성은 25% 더 많은 피해를 입힙니다. (정기 상징)',
   'entities.abilities.siphon_life.name': '생명력 착취',
   'entities.abilities.siphon_life.description':
     '적의 생명력을 착취하여 30초에 걸쳐 {damage}의 암흑 피해를 주고 준 피해만큼 자신을 치유합니다. (고통 전문화 상징)',
   'entities.abilities.conflagrate.name': '점화',
   'entities.abilities.conflagrate.description':
-    '불타는 계약의 다가올 주기 하나를 앞당긴 뒤 대상을 불살라 {damage}의 화염 피해를 입힙니다. 파괴력 1과 파멸 1을 만듭니다. 충전을 {charges}회 담아 둡니다. (파괴 상징 기술)',
+    '대상에게 걸린 불타는 계약이 필요합니다. 남은 틱 하나를 즉시 입히고 그 틱만큼 지속시간을 줄인 뒤, 대상을 불태워 {damage}의 화염 피해를 입힙니다. 파괴력 1과 파멸 1을 생성합니다(최대 2중첩, 15초 지속). 다음 파멸 화살은 30% 더 빠르게 시전되거나, 다음 불의 비는 첫 물결이 즉시 떨어집니다. 충전을 {charges}회 보관합니다. (파괴 상징)',
   'entities.abilities.moonkin_form.name': '달빛야수 변신',
   'entities.abilities.moonkin_form.description':
     "달빛야수 형상을 취해 돌아올 때까지 주문 시전을 강화합니다. 어떤 형상으로 변신하든 짧은 이동 속도 증가 효과인 '성큼걸음'을 얻습니다. 다시 시전하면 일반 형상으로 돌아옵니다. (조화 전문화 상징)",
   'entities.abilities.feral_charge.name': '원시 쇄도',
   'entities.abilities.feral_charge.description':
-    '원시의 힘을 폭발시킵니다. 표범 변신 상태에서는 10초 동안 기력 회복 속도가 100% 증가합니다. 큰곰 변신 상태에서는 즉시 분노를 50 생성합니다. (야성 전문화 상징)',
+    '원시의 힘을 폭발시킵니다. 표범 변신 상태에서는 10초 동안 기력 재생이 100% 증가합니다. 큰곰 변신 상태에서는 즉시 분노를 50 생성합니다. 표범이나 큰곰 변신 상태가 아니면 효과가 없습니다. (야성 상징)',
   'entities.abilities.swiftmend.name': '신속한 치유',
   'entities.abilities.swiftmend.description':
     '아군 대상에게 걸린 지속 치유 효과 하나를 소모해 {damage}만큼 치유합니다. 포자치유, 두 번째 개화, 야생 치유를 시전할 때마다 푸른 생장이 1단계 쌓이고, 푸른 생장 3단계에서 이 버튼은 만개가 되어, 당신의 지속 치유 효과를 지닌 모든 아군을 그 효과에 남은 양의 60%만큼 즉시 치유합니다. (회복 상징 기술)',
@@ -14533,13 +14538,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   // Baseline class interrupts.
   'entities.abilities.pummel.name': '턱 강타',
   'entities.abilities.pummel.description':
-    '대상의 주문 시전을 중단시키고 4초 동안 해당 계열의 주문을 봉쇄합니다.',
+    '대상의 주문 시전을 방해하고 4초 동안 해당 계열의 주문 시전을 막습니다. 시전을 중단시키면 분노 10을 생성합니다.',
   'entities.abilities.kick.name': '발차기',
   'entities.abilities.kick.description':
     '대상의 주문 시전을 중단시키고 4초 동안 해당 계열의 주문을 봉쇄합니다.',
   'entities.abilities.counterspell.name': '주문 절단',
   'entities.abilities.counterspell.description':
-    '대상의 주문을 무효화하고 6초 동안 해당 계열의 주문을 봉쇄합니다.',
+    '대상의 주문 시전을 방해하고 6초 동안 해당 계열의 주문을 봉쇄합니다. 대상이 시전 중이 아니면 효과가 없습니다.',
   'entities.abilities.counter_shot.name': '침묵의 사격',
   'entities.abilities.counter_shot.description':
     '대상을 방해하고 4초 동안 그 계열의 주문을 쓰지 못하게 합니다.',
@@ -14548,10 +14553,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '대상의 주문 시전을 중단시키고 4초 동안 해당 계열의 주문을 봉쇄합니다.',
   'entities.abilities.skull_bash.name': '박치기',
   'entities.abilities.skull_bash.description':
-    '돌진 박치기로 대상의 시전을 중단시키고 4초 동안 해당 계열을 봉쇄합니다.',
+    '대상에게 박치기를 가해 시전 중인 주문을 방해하고 4초 동안 해당 계열의 주문을 시전하지 못하게 합니다.',
   'entities.abilities.spell_lock.name': '심연의 재갈',
   'entities.abilities.spell_lock.description':
-    '적의 시전을 방해하고 4초 동안 그 계열의 주문을 쓰지 못하게 합니다.',
+    '적의 주문 시전을 방해하고 4초 동안 해당 계열의 주문을 시전하지 못하게 합니다.',
   'guide.bestiary.flavor.sethrael_palecoil':
     '글리머미어의 깊은 벼랑을 미끄러지듯 헤엄치는 뼈처럼 창백한 뱀으로, 자신이 차지한 물의 말없는 파수꾼입니다. 이 못을 함께 쓰는 헤엄치는 이들은 좀처럼 수면 위로 올라오지 못합니다.',
   'guide.combat.metersBody':
@@ -14678,17 +14683,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '대상을 현재에서 한 박자 벗어나게 합니다. 시간의 껍질이 10초 동안 피해를 {damage} 흡수한 뒤 시간선이 제자리로 돌아옵니다.',
   'entities.abilities.temporal_echo.name': '시간의 메아리',
   'entities.abilities.temporal_echo.description':
-    '더 건강했던 순간의 메아리로 아군에게 표식을 남겨 즉시 생명력을 {damage} 회복시킵니다. {duration}초 동안 당신의 다른 단일 대상 비전 피해의 {echoSinglePct}%와 광역 비전 피해의 {echoAreaPct}%가 그 아군을 치유합니다. 에테르 쇄도와 에테르 다트는 대신 자신들이 입힌 피해의 {echoDriverPct}%만큼 그 아군을 치유합니다.',
+    '아군을 즉시 {damage}만큼 치유하고 {duration}초 동안 시간의 메아리 표식을 남깁니다. 표식이 있는 동안 당신의 다른 단일 대상 비전 피해의 {echoSinglePct}%와 광역 비전 피해의 {echoAreaPct}%가 그 아군을 치유합니다. 에테르 쇄도와 에테르 화살은 대신 입힌 피해의 {echoDriverPct}%만큼 그 아군을 치유합니다. 시간의 메아리는 하나만 유지할 수 있으며, 다시 시전하면 표식이 옮겨집니다. 최대 생명력을 넘어선 치유는 최대 생명력의 20%까지 시간의 보호막이 됩니다.',
   'entities.abilities.aspect_of_the_wild.description':
     '30미터 안의 아군에게 야생의 힘을 불어넣어 5분 동안 공격력을 45, 공격 속도를 5%만큼 증가시킵니다. (사냥꾼 특성)',
   'entities.abilities.avenging_wrath.description':
     '황금빛 신성한 힘으로 이루어진 실체 있는 날개를 펼쳐 헌신을 10 얻고, 15초 동안 당신의 기술이 만드는 헌신을 두 배로 만듭니다. 또한 당신이 입히는 피해와 치유량을 20% 높입니다. 여명약탈자: 분노의 망치를 어떤 대상에게든 쓸 수 있게 합니다.',
   'entities.abilities.berserk.description':
     '15초 동안 공격력을 70만큼 증가시킵니다. (드루이드 특성)',
-  'entities.abilities.blink.description':
-    '전방 15미터로 순간이동하고 이동 불가 효과를 해제합니다. (마법사 특성)',
+  'entities.abilities.blink.description': '전방 15미터로 순간이동하고 이동 불가 효과를 해제합니다.',
   'entities.abilities.bloodlust.description':
-    '30미터 안 파티나 공격대 아군의 공격 속도와 시전 속도와 집중 시전 속도를 15초 동안 30% 높입니다. 영향을 받은 아군은 10분 동안 전쟁 북이나 시간 가속의 혜택을 다시 받을 수 없습니다. (주술사 특성)',
+    '30미터 이내의 파티 또는 공격대 아군의 공격, 시전, 정신 집중 속도를 15초 동안 30% 높입니다. 영향을 받은 아군은 10분 동안 전쟁 북, 도적의 합창, 시간 가속의 혜택을 다시 받을 수 없습니다. (주술사 특성)',
   'entities.abilities.chain_lightning.description':
     '10미터 안의 적 최대 3명을 각각 {damage}의 자연 피해로 때립니다. 정기: 명중하면 천둥을 1 얻습니다. 피해량은 주문력에 따라 증가합니다.',
   'entities.abilities.chaos_bolt.description':
@@ -14713,22 +14717,22 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ghostly_strike.description':
     '무기 피해에 {damage}를 더해 적을 타격하고 회피 확률을 7초 동안 15% 높입니다. 연계 점수를 1 줍니다. (도적 특성)',
   'entities.abilities.hammer_of_wrath.description':
-    '신성한 망치를 던져 {damage}의 피해를 입히고 헌신을 1 만듭니다. 생명력 20% 미만일 때, 또는 신성한 승천이나 복수의 격노가 지속되는 동안 쓸 수 있습니다. 여명의 격노는 어떤 대상에게든 쓸 수 있는 추가 시전을 주며, 그것은 진행 중인 재사용 대기시간을 무시하고 20% 더 큰 피해를 입힙니다. 승천은 그 피해를 30% 높입니다.',
+    '성스러운 망치를 던져 {damage}의 신성 피해를 입히고 헌신을 1 생성합니다. 생명력 20% 미만인 대상에게만 사용할 수 있으며, 신성한 승천, 복수의 격노 또는 여명의 격노가 활성화되어 있으면 예외입니다. 여명의 격노는 다음 시전에 소모되며, 그 시전은 재사용 대기시간을 무시하고 피해가 20% 증가합니다. 승천 중에는 피해가 30% 증가합니다.',
   'entities.abilities.healing_stream.description':
-    '12초에 걸쳐 아군 대상의 생명력을 120 회복합니다. (주술사 특성)',
+    '12초에 걸쳐 3초마다 한 번씩 아군 대상을 {damage}만큼 치유합니다. 치유량은 치유력에 따라 증가합니다. (주술사 특성)',
   'entities.abilities.howl_of_terror.description':
-    '주위 적을 최대 5초 동안 공포에 빠뜨립니다. 대상 최대 생명력의 8%에 해당하는 누적 피해를 받으면 공포가 해제됩니다. (흑마법사 특성)',
+    '시야에 있는 8미터 이내의 적을 최대 5초 동안 공포에 빠뜨립니다. 대상 최대 생명력의 8%에 해당하는 누적 피해를 받으면 공포가 해제됩니다. (흑마법사 특성)',
   'entities.abilities.ice_block.description':
-    '8초 동안 단단한 얼음 속에 자신을 가두어 모든 피해에 면역이 됩니다. 이미 활성화된 일반적인 해로운 효과를 제거하고 새로운 일반 제어 효과가 적용되는 것을 방지합니다. 기절 또는 변이 상태에서도 사용할 수 있습니다. 갇힌 동안에는 행동할 수 없습니다. 다시 사용하면 취소됩니다. (마법사)',
+    '8초 동안 단단한 얼음 속에 자신을 가둡니다. 피해를 받지 않으며 기절, 이동 불가, 감속, 침묵 등 어떤 제어도 받지 않지만 행동할 수 없습니다. 시전할 때 전투 해제 효과와 회복 후유증을 제외한 해로운 효과를 제거합니다. 기절 또는 변이 상태에서도 사용할 수 있습니다. 다시 사용하면 취소됩니다. (마법사)',
   'entities.abilities.inner_focus.description':
     '다음 사제 주문은 마나를 소모하지 않으며 차단되지 않습니다. 60초 동안 지속됩니다.',
   'entities.abilities.innervate.description':
-    '생명의 수액이 10초 동안 차올라 현재 자원을 파도처럼 20 회복합니다. 마나, 분노, 기력에 적용되며 변신해도 끊기지 않습니다. 수면, 기절, 정지 상태에서는 수액이 멈춥니다. (드루이드 특성)',
+    '살아 있는 수액이 10초 동안 차올라 2초마다 현재 사용 중인 자원(마나, 분노 또는 기력) 20을 회복합니다. 변신해도 끊기지 않습니다. 수면, 기절, 정지 상태에서는 멈춥니다. (드루이드 특성)',
   'entities.abilities.mend_pet.name': '응급처치',
   'entities.abilities.mend_pet.description':
     '15초에 걸쳐 아군 대상을 {damage}만큼 치유합니다. (사냥꾼 특성)',
   'entities.abilities.meteor.description':
-    '대상 지역에 운석을 떨어뜨려 {damage}의 화염 피해를 입힌 뒤, 그곳의 적에게 6초 동안 2초마다 12에서 18의 화염 피해를 입힙니다. (마법사 특성)',
+    '대상 지역에 운석을 떨어뜨립니다. 2초 뒤에 착지하여 충격 범위의 모든 적에게 {damage}의 화염 피해를 입히고, 각 적을 입힌 피해의 40%만큼 6초에 걸쳐 불태웁니다. (화염)',
   'entities.abilities.mind_sear.description':
     '3초 동안 정신을 집중해 대상 지역 8미터 안의 적에게 매초 {damage}의 암흑 피해를 입힙니다. 피해량은 주문력에 따라 증가합니다. (사제 특성)',
   'entities.abilities.multi_shot.description':
@@ -14744,7 +14748,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowstep.description':
     '그림자를 가로질러 아군이든 적이든 대상에게 다가가며, 황혼장막을 해제하지 않습니다. 최대 2회까지 충전됩니다. (도적 특성)',
   'entities.abilities.tranquility.description':
-    '4초 동안 회복 에너지를 집중해 30미터 안의 아군을 매초 42에서 52만큼 치유합니다. (드루이드 특성)',
+    '4초 동안 회복의 에너지를 집중해 시야에 있는 30미터 이내의 자신을 포함한 모든 아군을 매초 {damage}만큼 치유합니다. (드루이드 특성)',
   'hudChrome.auraEffect.combustionCrit': '화염 주문이 항상 치명타로 적중합니다',
   'hudChrome.auraEffect.overloadNext': '다음 주문이 {pct}% 강화되지만 마나 소모가 50% 증가합니다',
   'hudChrome.auraEffect.powerEchoNext':
@@ -14783,34 +14787,34 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '얼음창을 던져 {damage}의 냉기 피해를 입힙니다. 얼어붙은 대상에게는 피해가 세 배로 증가합니다. 서리의 손가락 또는 혹한의 추위 한 충전을 소모하면 대상을 얼어붙은 것으로 간주합니다. (냉기)',
   'entities.abilities.flurry.name': '겨울의 채찍',
   'entities.abilities.flurry.description':
-    '얼음 화살 세 발을 날려 각각 {damage}의 냉기 피해를 입히고 대상에게 혹한의 추위를 부여합니다. 다음 2회의 호환 주문은 대상을 얼어붙은 것으로 간주합니다. 두뇌 빙결이 발동하면 즉시 시전되고 재사용 대기시간을 무시합니다. (냉기)',
+    '얼음 화살 세 발을 날려 각각 {damage}의 냉기 피해를 입히고, 대상에게 5초 동안 겨울의 한기를 부여합니다. 대상에게 적중하는 다음 얼음창 2회는 대상을 얼어붙은 것으로 취급합니다. 두뇌 빙결은 겨울의 채찍을 즉시 시전되게 하고 재사용 대기시간을 무시하게 합니다. (냉기)',
   'entities.abilities.frozen_orb.name': '서리 구슬',
   'entities.abilities.frozen_orb.description':
     '소용돌이치는 얼음 구슬을 방출해 8초 동안 전방으로 이동시킵니다. 주변 적에게 매초 {damage}의 냉기 피해를 입히고 이동 속도를 30% 감소시킵니다. 적중한 파동마다 고드름 1개를 생성합니다. (냉기)',
   'entities.abilities.blizzard.name': '눈보라',
   'entities.abilities.blizzard.description':
-    '대상 지역에 6초 동안 얼음 폭풍을 불러 매초 {damage}의 냉기 피해를 입히고 적의 이동 속도를 40% 감소시킵니다. 적 한 명에게 적중할 때마다 서리 구슬의 재사용 대기시간이 0.5초, 한 번 시전할 때 최대 3초 감소합니다. (냉기)',
+    '대상 지역에 6초 동안 맹위를 떨치는 얼음 폭풍을 불러 매초 {damage}의 냉기 피해를 입히고 2초 동안 적의 이동 속도를 40% 감소시킵니다. 적 한 명에게 적중할 때마다 서리 구슬의 재사용 대기시간이 0.5초씩, 시전당 최대 3초 줄어듭니다. (냉기)',
   'entities.abilities.glacial_spike.name': '서리 바늘',
   'entities.abilities.glacial_spike.description':
-    '거대한 얼음 쐐기를 만들어 고드름 5개를 소모하고 {damage}의 냉기 피해를 입히며 대상을 4초 동안 제자리에 얼립니다. (냉기)',
+    '고드름 5개가 필요합니다. 거대한 얼음 쐐기를 만들어 고드름 5개를 모두 소모하고 {damage}의 냉기 피해를 입히며 대상을 4초 동안 이동 불가 상태로 만듭니다. 서리 창이 적중하거나 서리 구슬의 파동이 적중할 때마다 고드름을 1개 얻으며 최대 5개입니다. (냉기)',
   'entities.abilities.glacial_front.name': '빙하 전선',
   'entities.abilities.glacial_front.description':
-    '길게 눌러 점점 넓어지는 냉기 전선을 모은 뒤 전방 부채꼴로 방출합니다. 오래 충전할수록 더 멀리 닿고 피해가 증가합니다. 적중한 모든 적의 이동 속도를 4초 동안 50% 감소시키며, 최대 충전 시 1초 동안 이동 불가 상태로 만듭니다. (냉기)',
+    '길게 눌러 충전한 뒤 냉기를 부채꼴로 방출합니다. 4단계의 충전 단계마다 사거리가 7미터에서 16미터까지 늘어나고, 기본 냉기 피해가 35에서 42로 시작해 최대 충전 시 88에서 104까지 증가하며, 오래 충전할수록 주문력 보너스도 커집니다. 적중한 모든 적의 이동 속도가 4초 동안 50% 감소하며, 최대 충전 시에는 1초 동안 이동 불가 상태도 됩니다. (냉기)',
   'entities.abilities.dragons_breath.name': '용의 숨결',
   'entities.abilities.dragons_breath.description':
-    '길게 눌러 점점 넓어지는 화염 숨결을 모은 뒤 전방 부채꼴로 방출합니다. 오래 충전할수록 더 멀리 닿고 피해가 증가합니다. 적중한 적은 혼란에 빠지며 피해를 받으면 효과가 해제됩니다. 최대 충전 시 항상 치명타로 적중하고 몰아치는 열기 조건에 한 번 반영됩니다. (화염)',
+    '길게 눌러 충전한 뒤 화염을 부채꼴로 방출합니다. 4단계의 충전 단계마다 사거리와 폭이 6미터에서 12미터까지 늘어나고, 기본 화염 피해가 32에서 40으로 시작해 최대 충전 시 90에서 110까지 증가하며, 오래 충전할수록 주문력 보너스도 커집니다. 적중한 적은 충전 단계에 따라 1초에서 3초 동안 방향 감각을 잃으며, 피해를 받으면 해제됩니다. 최대 충전 시 항상 치명타로 적중합니다. 숨결은 적중한 적의 수와 관계없이 몰아치는 열기에 한 번만 계산됩니다. (화염)',
   'entities.abilities.fingers_of_frost.name': '서리의 손가락',
   'entities.abilities.fingers_of_frost.description':
-    '서리끝 창이 15% 확률로 서리의 손가락을 부여합니다. 최대 2회 충전됩니다. 다음 얼음창은 대상을 얼어붙은 것으로 간주합니다. (냉기)',
+    '서리 창이 적중할 때마다 15% 확률로 서리의 손가락 충전을 1회 얻으며, 최대 2회이고 15초 동안 지속됩니다. 충전 1회마다 얼음창 한 번이 대상을 얼어붙은 것으로 취급합니다. 2회 충전 상태에서 발동하면 사라집니다. (냉기)',
   'entities.abilities.brain_freeze.name': '두뇌 빙결',
   'entities.abilities.brain_freeze.description':
-    '서리끝 창이 20% 확률로 다음 겨울의 채찍을 즉시 시전하게 하고 재사용 대기시간을 무시하게 합니다. (냉기)',
+    '서리 창이 적중할 때마다 20% 확률로 15초 동안 두뇌 빙결을 얻습니다. 다음 겨울의 채찍이 즉시 시전되고 재사용 대기시간을 무시합니다. 두뇌 빙결이 활성화된 동안 발동하면 사라집니다. (냉기)',
   'entities.abilities.shatter.name': '바스라지는 파멸',
   'entities.abilities.shatter.description':
-    '얼어붙은 대상에 대한 주문의 치명타 확률이 50% 증가합니다. 서리의 손가락과 혹한의 추위도 대상을 얼어붙은 것으로 간주합니다. (냉기)',
+    '단일 대상 피해 주문이 얼어붙은 대상(마법사의 이동 불가, 기절, 행동 불능 또는 홀리기에 걸린 적)에게 치명타 확률이 50% 증가합니다. 서리의 손가락과 겨울의 한기는 얼음창이 대상을 얼어붙은 것으로 취급하게 합니다. (냉기)',
   'entities.abilities.temporal_cascade.name': '시간의 연쇄',
   'entities.abilities.temporal_cascade.description':
-    '시간의 메아리를 파티에 연쇄시켜 대상과 가장 가까운 아군 최대 네 명을 즉시 치유하고 각각에게 {duration}초 동안 징표를 남깁니다. 자신이 입힌 비전 피해의 일부가 메아리를 타고 돌아와 징표가 있는 아군을 치유합니다. (시간술)',
+    '대상과 주변 아군 최대 4명을 치유하되 파티원을 우선하며, 각각에게 {duration}초 동안 파티 시간의 메아리 표식을 남깁니다. 각 치유량은 아군이 잃은 생명력 1%마다 3% 증가합니다. 표식이 있는 동안 당신의 단일 대상 비전 피해의 13%와 광역 비전 피해의 6%가 각각을 치유합니다. 에테르 쇄도와 에테르 화살은 모든 파티 메아리에서 동일한 치유 비축분도 더하며, 생명력 60% 미만인 표식 아군에게 잃은 생명력에 비례해 나뉩니다. 이미 당신의 시간의 메아리를 가진 아군은 그대로 유지합니다. (시간술)',
   'entities.abilities.temporal_reversal.name': '시간 역전',
   'entities.abilities.temporal_reversal.description':
     '쓰러진 아군의 시간선을 되돌려, 전투 중에도 당신 곁에서 생명력과 마나의 35%를 지닌 채 되살립니다. (시간술)',
@@ -14825,7 +14829,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '완벽한 순간을 붙잡아 즉시 비전 충전 4개를 얻습니다. 10초 동안 에테르 화살이 충전을 소모하지 않고 피해가 20% 증가합니다. (시간술)',
   'entities.abilities.arcane_surge.name': '에테르 쇄도',
   'entities.abilities.arcane_surge.description':
-    '적에게 순수한 비전 마력을 흘려보내 {damage}의 피해를 입힙니다. 시전할 때마다 비전 충전이 남아 다음 에테르 쇄도의 피해와 시전 속도가 증가하지만(충전당 5% 빨라짐), 마나 소모량도 크게 증가합니다. 최대 4회 중첩됩니다. 에테르 화살은 충전을 소모합니다. 또한 시전할 때 에테르 질주가 준비되어 다음 에테르 쇄도의 마나 소모가 사라지고 시전 속도가 두 배가 될 수 있습니다.',
+    '적에게 {damage}의 비전 피해를 입히고 비전 충전을 1 얻으며, 최대 4이고 10초 동안 지속되며 시전할 때마다 갱신됩니다. 비전 충전마다 다음 에테르 쇄도의 피해가 30% 증가하고 시전이 5% 빨라지지만 마나 소모량이 두 배가 됩니다. 에테르 화살이 충전을 소모합니다. 시전할 때마다 25% 확률로 에테르 질주를 얻습니다. 15초 안의 다음 에테르 쇄도는 마나를 소모하지 않고 두 배 빠르게 시전됩니다.',
   'entities.items.conjured_bread4.name': '창조된 연회빵',
   'entities.items.conjured_water4.name': '창조된 샘물',
   'entities.abilities.blazing_barrier.name': '이글거리는 방벽',
@@ -14833,31 +14837,31 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '자신을 불길로 감싸 {damage}의 피해를 흡수합니다. 60초 동안 지속됩니다. (화염)',
   'entities.abilities.cold_snap.name': '겨울의 부름',
   'entities.abilities.cold_snap.description':
-    '날쌘걸음, 서리장막 및 상급 투명화의 재사용 대기시간을 즉시 초기화합니다. (마법사 특성)',
+    '날쌘걸음(모든 충전 복구), 상급 투명화, 그리고 개인 방벽인 서리 장막, 이글거리는 방벽 또는 시간의 방벽의 재사용 대기시간을 끝냅니다. (마법사 특성)',
   'entities.abilities.greater_invisibility.name': '상급 투명화',
   'entities.abilities.greater_invisibility.description':
-    '20초 동안 사라지며 지속 피해 효과를 2개 제거합니다. 투명화가 끝나면 2초 동안 받는 피해가 90% 감소합니다. (마법사 특성)',
+    '최대 20초 동안 투명해져 자신에 대한 적의 위협 수준과 대상 지정을 해제하고, 자신에게 걸린 지속 피해 효과를 최대 2개 제거합니다. 공격, 시전 또는 피해를 받으면 일찍 끝납니다. 끝나면 2초 동안 받는 피해가 90% 감소합니다. (마법사 특성)',
   'entities.abilities.hot_streak.name': '몰아치는 열기',
   'entities.abilities.hot_streak.description':
-    '지속 효과: 화염 주문(화염구, 화염 작렬, 불태우기, 불덩이 작렬 또는 불기둥)으로 연속 두 번 치명타를 적중시키면 다음 불덩이 작렬 또는 불기둥이 즉시 시전되고 마나를 소모하지 않습니다. 소모 주문은 무료 시전을 포함해 다음 연속 발동 조건에 포함됩니다. 불기둥은 적중한 적의 수와 관계없이 한 번만 계산되며 최초 충격만 조건에 포함됩니다. (화염)',
+    '지속 효과: 잉걸 화살, 잉걸 작렬, 그을리기, 화염 창, 화염 폭발 또는 용의 숨결이 연속으로 두 번 치명타를 입히면 12초 안의 다음 화염 창 또는 화염 폭발이 즉시 시전되고 비용이 들지 않습니다. 해당 주문이 치명타가 아닌 일반 적중을 하면 횟수가 초기화되며, 첫 치명타는 10초 동안 기억됩니다. 화염 창과 화염 폭발은 무료 시전을 포함해 다음 연속 발동에 계산됩니다. 화염 폭발과 용의 숨결은 적중한 적의 수와 관계없이 시전당 한 번만 계산되며, 최초 충격만 계산됩니다. (화염)',
   'entities.abilities.ice_floes.name': '얼음발',
   'entities.abilities.ice_floes.description':
     '다음 시전 시간이 있는 주문 2개를 이동 중에 시전할 수 있습니다. 15초 동안 지속됩니다. (마법사 특성)',
   'entities.abilities.ignition.name': '점화',
   'entities.abilities.ignition.description':
-    '지속 효과: 주문이 치명타로 적중하면 대상을 불태워 6초에 걸쳐 입힌 피해의 30%만큼 피해를 줍니다. 효과는 중첩됩니다. (화염 특화)',
+    '지속 효과: 화염 주문이 치명타로 적중하면 대상이 6초에 걸쳐 입힌 피해의 30%만큼 추가로 불탑니다. 이미 불타고 있는 대상에게 새로 불태우기가 적용되면 남아 있는 피해에 더해지고 6초 타이머가 다시 시작됩니다. (화염 특화)',
   'entities.abilities.mass_barrier.name': '대규모 방벽',
   'entities.abilities.mass_barrier.description':
     '자신과 30미터 내에 있는 가까운 아군 최대 4명에게 각각 {damage}의 피해를 흡수하는 보호막을 15초 동안 부여합니다. (마법사 특성)',
   'entities.abilities.overload.name': '과부하',
   'entities.abilities.overload.description':
-    '다음 주문의 효과가 40% 증폭되지만 마나 소모량이 50% 증가합니다. 10초 동안 지속됩니다. (마법사 특성)',
+    '마나를 소모하는 다음 주문의 기본 피해, 치유, 흡수 수치가 40% 증가하지만 마나 소모량이 50% 증가합니다. 주문력 보너스는 증가하지 않습니다. 10초 동안 지속됩니다. (마법사 특성)',
   'entities.abilities.power_echo.name': '힘의 메아리',
   'entities.abilities.power_echo.description':
-    '다음 직접 주문이 같은 대상에게 50%의 위력으로 반복됩니다. 10초 동안 지속됩니다. (마법사 특성)',
+    '다음 단일 대상 직접 피해 또는 치유 주문이 같은 대상에게 입힌 피해량이나 치유량의 50%만큼 반복됩니다. 10초 동안 지속됩니다. (마법사 특성)',
   'entities.abilities.rings_of_frost.name': '서리 고리',
   'entities.abilities.rings_of_frost.description':
-    '10초 동안 지속되는 고리를 소환합니다. 경계를 넘어가는 적은 4초 동안 얼어붙습니다. (마법사 특성)',
+    '10초 동안 대상 위치에 서리 고리를 놓습니다. 고리를 가로지르는 적은 4초 동안 이동 불가 상태가 되며, 각 적은 한 번만 발동시킬 수 있습니다. 고리 안쪽 중앙은 안전합니다. (마법사 특성)',
   'entities.abilities.rune_of_power.name': '마력의 룬',
   'entities.abilities.rune_of_power.description':
     '발밑에 15초 동안 지속되는 마력의 룬을 새깁니다. 8미터 내에 서 있는 아군이 입히는 피해가 10% 증가합니다. (마법사 특성)',
@@ -17253,7 +17257,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '지정한 위치에 균열을 열어 8미터 안의 적을 중심으로 끌어당기고 {damage}의 암흑 피해를 입히며 2초 동안 기절시킵니다. 우두머리는 피해를 받지만 끌어당김과 기절에는 저항합니다.',
   'entities.abilities.abyssal_rift.name': '심연의 균열',
   'entities.abilities.aegis_first_dawn.description':
-    '5초 동안 정신을 집중하여 반경 10미터의 성스러운 돔을 만듭니다. 안에 있는 아군은 매초 치유되고 받는 피해가 50% 감소합니다. 정신 집중을 완료하면 마지막 치유를 방출하고 4초 동안 이동 속도를 30% 증가시킵니다.',
+    '주변에 반경 10미터의 성스러운 돔을 정신 집중으로 펼칩니다. 돔 안에서 당신의 시야에 있는 아군 플레이어는 받는 피해가 50% 감소하고 매초 35에서 45만큼 치유됩니다. 정신 집중을 완료하면 120에서 150만큼 추가로 치유하고 4초 동안 이동 속도를 30% 증가시킵니다. 치유량은 치유력에 따라 증가합니다.',
   'entities.abilities.aegis_first_dawn.name': '첫 여명의 아이기스',
   'entities.abilities.ambush.specNote_subtlety':
     '황혼장막 상태에서 사용하면 땅거미가 1단계 쌓입니다(최대 3단계). 땅거미 3단계에서는 은신 없이 어느 각도에서든 사용할 수 있습니다: 이때는 자원이 들지 않고, 땅거미 3단계를 모두 소모하며, 6초 동안 그림자에 휩싸이고, 두 배의 피해를 입힙니다.',
@@ -17264,7 +17268,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '무덤 차원문을 열어 선택한 지배 하수인에 더해 해골 전사, 뼈 마법사, 무덤날개를 20초 동안 임시로 일으킵니다.',
   'entities.abilities.army_of_the_dead.name': '망자의 군세',
   'entities.abilities.aura_mastery.description':
-    '8초 동안 파티에서 활성화된 모든 헌신과 응보의 오라를 강화합니다. 보루의 헌신은 피해를 15% 감소시키고, 응보는 15의 신성 피해를 줍니다. 여러 번 사용하면 중첩되지 않고 지속시간이 갱신됩니다.',
+    '8초 동안 파티에서 활성화된 모든 보루의 헌신과 응보의 오라를 3배로 강화합니다. 보루의 헌신은 받는 피해를 15% 감소시키고, 응보의 오라는 평소의 3배에 해당하는 신성 피해를 줍니다. 여러 번 사용하면 중첩되지 않고 지속시간이 갱신됩니다.',
   'entities.abilities.aura_mastery.name': '성스러운 합일',
   'entities.abilities.backstab.specNote_assassination':
     '공격마다 맹독 의식이 1단계 쌓이고(최대 6단계) 기력 15를 돌려받습니다. 맹독 의식 6단계에서 영면이 맹독 찢기로 변합니다(자신의 남은 출혈 피해를 한꺼번에 입힙니다).',
@@ -17281,13 +17285,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '적에게 돌진하여 피갈고리 상처를 남깁니다. 12초 동안 4회에 걸쳐 기본 물리 피해 34에 원거리 전투력의 26%를 더한 피해를 줍니다. 도착 시 대상을 3초 동안 30% 느려지게 합니다. (생존 고유 기술)',
   'entities.abilities.bloodhook.name': '피갈고리',
   'entities.abilities.bloodtrail_assault.description':
-    '12초 동안 피갈고리는 5미터 안의 적 최대 2명에게 60% 위력의 상처를 퍼뜨리고, 상처 가르기는 소환수에게 피해 18의 공격을 지시합니다. 파편 폭약은 사거리가 2미터 늘고 주 대상 기본 피해가 25%, 발동하는 상처 피해가 50% 증가합니다. 살아 있는 소환수가 없으면 집중 회복 속도도 100% 증가합니다.',
+    '12초 동안 피갈고리가 대상 주변 5미터 이내의 다른 적 최대 2명에게도 위력 60%의 피갈고리 상처를 부여하고, 상처 가르기는 살아 있는 소환수가 대상에게 18의 물리 피해를 입히게 하며, 파편 폭약은 사거리가 2미터 늘고 주 대상에게 입히는 기본 피해가 25% 증가하며 즉시 발동하는 상처 피해가 50% 증가합니다. 살아 있는 소환수가 없으면 집중 재생도 100% 빨라집니다.',
   'entities.abilities.bloodtrail_assault.name': '핏길 습격',
   'entities.abilities.body_blow.description':
     '무기 피해의 130%에 10을 더한 묵직한 일격입니다. 연계 점수 2점을 얻고 레드라인이 1단계 쌓입니다(최대 4단계). (전투)',
   'entities.abilities.body_blow.name': '헤이메이커',
   'entities.abilities.bone_armor.description':
-    '뼈로 몸을 감싸 최대 생명력의 20%에 해당하는 피해를 흡수합니다.',
+    '{duration}초 동안 뼈로 몸을 감싸 최대 생명력의 20%에 해당하는 피해를 흡수합니다.',
   'entities.abilities.bone_armor.name': '뼈 갑옷',
   'entities.abilities.cheap_shot.specNote_subtlety':
     '황혼장막 상태에서 사용하면 땅거미가 1단계 쌓입니다(최대 3단계). 땅거미 3단계에서는 은신 없이 사용할 수 있습니다: 이때는 자원이 들지 않고, 땅거미 3단계를 모두 소모하며, 6초 동안 그림자에 휩싸입니다.',
@@ -17301,13 +17305,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.scratch.specNote_feral':
     '적중한 공격마다 오랜 피가 1단계 쌓입니다(최대 3단계).',
   'entities.abilities.cold_focus.description':
-    '12초 동안 정밀 사격이 더 많은 집중을 생성하고, 장궁 당기기가 더 빠르고 저렴해집니다. (냉철한 시야 상징)',
+    '12초 동안 정밀 사격이 집중 30을 회복시키고, 긴 시위의 소모량이 25% 감소하며 시전 시간이 30% 짧아집니다. (냉철한 시야 상징)',
   'entities.abilities.cold_focus.name': '냉정한 집중',
   'entities.abilities.corpse_explosion.description':
-    '뼈 마법사를 먼저, 해골 전사를 다음으로 희생하며 무덤날개는 최후의 수단으로만 선택합니다. 같은 유형이 여러 마리면 남은 지속시간이 가장 짧은 대상, 그다음 가장 약한 대상을 골라 지정한 위치의 적에게 {damage}의 암흑 피해를 입힙니다.',
+    '지배 하수인 하나(무덤수호병은 제외)를 희생해 지정한 위치 8미터 이내의 적에게 {damage}의 암흑 피해를 입힙니다. 해골 전사를 먼저, 그다음 뼈 마법사를 희생하며 무덤날개는 최후의 수단으로만 선택합니다. 같은 종류가 여러 마리면 남은 지속시간이 가장 짧은 하수인, 그다음 가장 많이 다친 하수인을 고릅니다. 지배 하수인이 필요합니다.',
   'entities.abilities.corpse_explosion.name': '시체 폭발',
   'entities.abilities.coven.description':
-    '주변 적 최대 4명에게 15초 동안 유지되는 보조 사안을 만듭니다. 공유 단죄를 50% 효율로 채우며 선고 피해의 35%를 메아리로 받습니다.',
+    '대상에게 주 사안이 필요합니다. 그 주변 15미터 이내의 다른 적 최대 4명에게 15초 동안 보조 사안을 놓습니다. 보조 사안은 평소의 50% 속도로 단죄를 생성하고, 선고는 각각에게 피해의 35%로 메아리칩니다.',
   'entities.abilities.coven.name': '마녀회',
   'entities.abilities.cruel_pact.description':
     '최대 생명력의 12%를 희생해 단죄를 20 생성합니다. 생명력이 15% 이하일 때는 사용할 수 없습니다.',
@@ -17322,27 +17326,27 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '30분 동안 자신과 파티원의 전투력을 40 증가시킵니다. 자신의 광휘 또는 은총의 헌신을 교체하지만, 다른 성기사의 헌신 및 전사의 외침과는 함께 유지됩니다.',
   'entities.abilities.dawn_devotion.name': '여명의 헌신',
   'entities.abilities.dawnfall.description':
-    '주변 적에게 {damage}의 신성 피해를 주고 헌신을 1 생성합니다. 적어도 하나의 적에게 적중하면 최후의 칙령의 남은 재사용 대기시간이 2초 감소합니다. 승천 중에는 피해와 범위가 증가합니다.',
+    '주변 적에게 {damage}의 신성 피해를 입히고 헌신을 1 생성합니다. 적을 한 명 이상 적중하면 최후의 칙령의 남은 재사용 대기시간이 2초 감소합니다. 승천 중에는 피해가 50% 증가하고 범위가 10미터로 넓어집니다.',
   'entities.abilities.dawnfall.name': '여명 강하',
   'entities.abilities.dawns_embrace.description':
-    '강력한 치유를 적용하고 헌신을 1 생성합니다. 광휘의 공명은 마나 소모량을 50% 감소시키고 시전 시간을 1.5초로 줄입니다. 승천 중에는 즉시 시전되고 치유량이 35% 증가합니다.',
+    '아군 대상을 {damage}만큼 치유하고 헌신을 1 생성합니다. 광휘의 공명은 마나 소모량을 50% 감소시키고 시전 시간을 1.5초로 줄입니다. 승천 중에는 즉시 시전되고 치유량이 35% 증가합니다.',
   'entities.abilities.dawns_embrace.name': '여명의 포옹',
   'entities.abilities.devotion_ward.description':
     '자신과 파티원이 받는 피해를 죽거나 효과가 교체될 때까지 5% 감소시킵니다. 이 오라와 응보의 오라만 서로 교체되며, 광휘, 여명, 은총의 헌신과는 함께 유지됩니다.',
   'entities.abilities.devotion_ward.name': '보루의 헌신',
   'entities.abilities.divine_ascension.description':
-    '헌신을 20 소모하여 최대 45초 동안 유지되는 승천 충전을 5회 얻습니다. 지정된 능력은 충전을 1회 소모하고 추가 효과를 얻습니다.',
+    '헌신 20을 소모해 최대 45초 동안 승천 충전 5회를 얻습니다. 승천이 활성화된 동안 전문화의 강조된 기술은 각각 충전 1회를 소모해 해당 기술 설명에 나온 승천 보너스를 얻으며, 헌신은 얻지 못합니다. 충전이나 시간이 다하면 승천이 끝납니다. 길어진 여명은 충전 2회를 추가합니다.',
   'entities.abilities.divine_ascension.name': '신성한 승천',
   'entities.abilities.elemental_trance.description':
     '15초 동안 정령의 무아지경에 들어가 받는 피해를 30% 줄이고, 입힌 모든 피해의 20%를 마나로 전환합니다. (전쟁정령 고유 능력)',
   'entities.abilities.elemental_trance.name': '정령의 무아지경',
   'entities.abilities.evil_eye.description':
-    '적 하나를 저주의 중심으로 지정합니다. 사안을 옮겨도 단죄는 유지되지만 20초의 만료 시간은 갱신되지 않습니다.',
+    '적 하나에게 저주의 중심인 사안을 표시합니다. 표시된 적이 피해를 입힐 때마다(초당 최대 한 번) 단죄를 2 얻고, 죽을 때 10을 얻습니다. 단죄는 최대 100까지 쌓이며 마지막으로 얻은 후 20초가 지나면 사라집니다. 사안을 옮겨도 단죄는 유지되지만 그 타이머는 갱신되지 않습니다.',
   'entities.abilities.evil_eye.name': '사안',
   'entities.abilities.eviscerate.specNote_assassination':
     '맹독 의식 6단계에서 이 버튼이 맹독 찢기로 변합니다: 자신의 출혈 효과가 앞으로 입힐 남은 피해를 즉시 모두 입히고, 새로운 맹독 상처를 남기며, 기력 20을 회복하는 일격입니다.',
   'entities.abilities.eviscerate.specNote_combat':
-    '연계 점수 4점 이상으로 적중시키면 8초 동안 레드라인이 시작됩니다: 사악한 베기가 헤이메이커로, 이 버튼이 소등으로 변합니다(45 더하기 연계 점수당 35의 피해, 쌓은 레드라인 단계마다 25% 더 강해지며, 기력 25 회복). 레드라인이 끝나기 전에 사용하세요.',
+    '연계 점수 4점 이상으로 적중시키면 8초 동안 레드라인이 시작됩니다. 사악한 베기가 헤이메이커로, 이 버튼이 소등으로 변합니다(45에 연계 점수당 35의 피해, 레드라인 중 던진 헤이메이커마다 25% 더 강하게 적중하며, 기력 25 회복). 레드라인이 끝나기 전에 사용하세요.',
   'entities.abilities.faithforged_guard.description':
     '8초 동안 다음에 받는 적의 공격에 응답합니다. 최대 {buff}의 피해를 막고 같은 양을 신성 피해로 공격자에게 되돌려주며, 헌신을 1 얻습니다. 한 번의 공격에만 응답합니다. 승천은 응답할 수 있는 양을 50% 증가시킵니다.',
   'entities.abilities.faithforged_guard.name': '빛의 빚',
@@ -17352,19 +17356,19 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '지속 효과: 사냥의 기세가 있을 때 흔적 끊기가 다음 내장 가르기나 피갈고리를 12초 동안 강화합니다. 내장 가르기는 중첩당 피해가 15% 증가합니다. 피갈고리는 추가 물리 피해 18~24를 주며 이 피해는 중첩당 15% 및 원거리 전투력에 따라 증가합니다. 3중첩이면 두 공격 중 어느 것이든 사냥의 기세를 소모합니다. (생존)',
   'entities.abilities.fieldcraft_reentry.name': '재진입 준비',
   'entities.abilities.final_edict.description':
-    '강력한 무기 공격을 가하고 피해를 주면 헌신을 1 생성합니다. 적중하면 여명 강하의 남은 재사용 대기시간이 2초 감소합니다. 자동 공격과 최후의 칙령이 적중하면 15% 확률로 8초 동안 여명의 격노를 얻습니다. 승천 중에는 주변에 신성한 폭발도 일으킵니다.',
+    '강력한 무기 공격을 가하고 피해를 입히면 헌신을 1 생성합니다. 적중하면 여명 강하의 남은 재사용 대기시간이 2초 감소합니다. 자동 공격과 최후의 칙령이 성공하면 15% 확률로 8초 동안 여명의 격노를 얻습니다. 다음 분노의 망치는 어떤 대상에게든 사용할 수 있고, 재사용 대기시간을 무시하며, 피해가 20% 증가합니다. 승천 중에는 주변에 물리 폭발도 일으킵니다.',
   'entities.abilities.final_edict.name': '최후의 칙령',
   'entities.abilities.flurry_of_knives.description':
     '투척 단검으로 6야드 내 모든 적을 베어 {damage}의 물리 피해를 입히고 연계 점수 2점을 얻습니다. (도적 특성)',
   'entities.abilities.flurry_of_knives.name': '칼날 난무',
   'entities.abilities.frostjaw_trap.description':
-    '선택한 위치에 덫을 놓습니다. 덫은 0.75초 후 작동 준비되며 1분 동안 유지되고, 자신과 파티원만 볼 수 있습니다. 처음 발동시킨 적은 3초 동안 이동 불가 상태가 되고, 4미터 이내의 적은 4초 동안 이동 속도가 50% 감소합니다.',
+    '선택한 위치에 덫을 놓습니다. 덫은 0.75초 후 작동 준비되며 1분 동안 유지되고, 자신과 파티원만 볼 수 있습니다. 처음 발동시킨 적은 3초 동안 이동 불가 상태가 되고, 4미터 이내의 적은 4초 동안 이동 속도가 50% 감소합니다. 서리턱 덫은 한 번에 하나만 활성화할 수 있으며, 다른 덫을 놓으면 대체됩니다.',
   'entities.abilities.frostjaw_trap.name': '서리턱 덫',
   'entities.abilities.funeral_harvest.description':
-    '자신이나 자신의 언데드가 최근 피해를 준 적이 죽으면 영혼 조각 1개를 얻습니다. 3초에 한 번만 발동합니다.',
+    '당신이나 당신의 언데드에게 피해를 입은 적이 5초 안에 죽으면 영혼 조각 1개를 얻습니다. 3초에 한 번만 발동할 수 있습니다.',
   'entities.abilities.funeral_harvest.name': '장송 수확',
   'entities.abilities.galeheart_weapon.description':
-    '무기에 질풍을 불어넣습니다. 적중한 세 번째 무기 공격마다 두 번 반향하고 폭풍 시전을 활성화합니다.',
+    '양손 무기 모두에 30분 동안 힘을 깃들입니다. 활성화된 동안 완성되는 전령의 박자마다 폭풍우 메아리로도 공격합니다. 바위결속 무기를 대체합니다.',
   'entities.abilities.galeheart_weapon.name': '질풍의 무기',
   'entities.abilities.garrote.specNote_subtlety':
     '황혼장막 상태에서 사용하면 땅거미가 1단계 쌓입니다(최대 3단계). 땅거미 3단계에서는 은신 없이 사용할 수 있습니다: 이때는 자원이 들지 않고, 땅거미 3단계를 모두 소모하며, 6초 동안 그림자에 휩싸입니다.',
@@ -17372,13 +17376,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '30분 동안 자신과 파티원이 5초마다 마나를 15 회복하고, 마나 소모량이 3% 감소합니다. 자신의 광휘 또는 여명의 헌신을 교체하지만, 다른 성기사의 헌신과는 함께 유지됩니다.',
   'entities.abilities.grace_devotion.name': '은총의 헌신',
   'entities.abilities.guardian_covenant.description':
-    '아군 대상과 자신을 보호하여 8초 동안 받는 피해를 20% 감소시킵니다. 아군 대상을 선택하지 않으면 자신에게 사용합니다.',
+    '아군 대상과 자신을 보호하여 8초 동안 받는 피해를 20% 감소시킵니다. 아군 대상을 선택하지 않으면 자신에게 사용합니다. 승천 중에는 감소량이 30%로 늘어납니다.',
   'entities.abilities.guardian_covenant.name': '수호의 서약',
   'entities.abilities.hammer_of_grace.description':
-    '20미터 안의 적에게 성스러운 망치를 즉시 던져 {damage}의 피해를 주고, 마나를 70 회복하며, 준 피해의 50%만큼 자신의 생명력을 회복하고, 피해를 주면 헌신을 1 생성합니다. 태양의 응보가 활성화되면 은총의 망치는 재사용 대기시간을 무시하고 준 피해의 100%만큼 생명력을 회복합니다.',
+    '적에게 성스러운 망치를 던져 {damage}의 신성 피해를 입히고, 마나를 70 회복하며, 입힌 피해의 50%만큼 자신을 치유합니다. 피해를 입히면 헌신을 1 생성합니다. 태양의 응보(신앙수호자 발동 효과)가 발동하면 재사용 대기시간을 무시하고 입힌 피해의 100%만큼 자신을 치유합니다.',
   'entities.abilities.hammer_of_grace.name': '은총의 망치',
   'entities.abilities.hex_of_violence.description':
-    '적을 8초 동안 저주해 암흑 피해를 입히고 2초마다 단죄를 2 생성합니다. 대상의 다음 3회 공격 행동은 각각 단죄를 7 생성하고 17의 암흑 피해를 되돌려 받습니다.',
+    '적을 8초 동안 저주합니다. 2초마다 17의 암흑 피해에 주문력 일부를 더한 피해를 입고, 당신은 단죄를 2 얻습니다. 저주받은 적이 피해를 입히는 처음 3회마다 단죄를 7 얻고 그 적은 17의 암흑 피해를 입습니다.',
   'entities.abilities.hex_of_violence.name': '폭력의 주술',
   'entities.abilities.hour_of_judgment.description':
     '15초 동안 주 사안에 심판을 내려 단죄 40과 운명의 실 3개를 얻고 빙의를 활성화하며, 주 사안을 통해 생성되는 단죄를 두 배로 만들고 선고의 피해를 20% 증가시킵니다. 첫 번째 선고는 단죄 50을 돌려받습니다.',
@@ -17390,7 +17394,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '주문 시전을 방해하고 4초 동안 같은 계열의 주문을 사용하지 못하게 합니다.',
   'entities.abilities.hushbrand.name': '침묵의 낙인',
   'entities.abilities.knockout_blow.description':
-    '녹아웃으로 레드라인을 끝냅니다: 45 더하기 연계 점수당 35의 피해를 입히고, 쌓은 레드라인 단계마다 25% 더 강해지며, 기력 25를 회복합니다. 레드라인이 끝나기 전에 사용하지 않으면 녹아웃 기회가 사라집니다. (전투)',
+    '녹아웃으로 레드라인을 끝냅니다. {damage}의 물리 피해를 입히며, 레드라인 중 던진 헤이메이커마다 25% 더 강하게 적중하고(최대 3), 기력 25를 회복합니다. 피해량은 전투력에 따라 증가합니다. 레드라인이 끝나기 전에 사용하지 않으면 녹아웃 기회가 사라집니다. (전투)',
   'entities.abilities.knockout_blow.name': '소등',
   'entities.abilities.life_covenant.description':
     '6초 동안 아군 하나가 받는 피해를 40% 감소시킵니다. 승천 중에는 충전을 소모하지 않고 120의 피해를 흡수하는 보호막도 부여합니다.',
@@ -17402,10 +17406,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '주 사안을 8초 동안 저주합니다. 단죄를 얻을 때마다 파동을 일으켜 8미터 안의 다른 적 최대 4명에게 피해를 줍니다. 1초에 한 번만 발동합니다.',
   'entities.abilities.litany_of_guilt.name': '죄책의 연도',
   'entities.abilities.maledict_gaze.description':
-    '저주의 눈이 선택한 주 사안 대상을 2.5초마다 공격해 암흑 피해를 줍니다. 사안 빙의 중에는 공격 속도가 두 배가 됩니다.',
+    '당신의 저주의 눈이 당신과 그 적이 모두 전투 중이고, 서로 30미터 이내이며, 시야가 확보되어 있는 동안, 2.5초마다 주 사안이 걸린 적을 공격해 암흑 피해를 입힙니다. 사안 빙의는 공격 속도를 두 배로 만듭니다.',
   'entities.abilities.maledict_gaze.name': '저주의 응시',
   'entities.abilities.marrowbreak.description':
-    '오랜 피 3단계를 소모해 {damage}의 피해를 입히는 위협 수준이 높은 강타를 가합니다. 생명력이 절반 미만이면 대신 최대 생명력의 18%를 회복하고 분노 15를 돌려받습니다.',
+    '오랜 피 3을 소모해 {damage}의 피해를 입히는 강타를 가하며, 피해량의 두 배에 110을 더한 위협 수준을 생성합니다. 생명력이 절반 미만이면 대신 최대 생명력의 18%를 회복하고 분노 15를 돌려받습니다.',
   'entities.abilities.marrowbreak.name': '골수분쇄',
   'entities.abilities.martyrs_aegis.description':
     '아군 한 명이 받는 피해를 8초 동안 40% 감소시킵니다.',
@@ -17424,7 +17428,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '달물결 3단계를 소모해 {damage}의 비전 피해를 입히는 강력한 일격을 가합니다: 피해 특화 선택지입니다. 해돋움도 같은 달물결 3단계를 소모하므로 하나만 선택하세요.',
   'entities.abilities.moonlash.name': '달의 격동',
   'entities.abilities.moonseed.description':
-    '달날개 형상 전용입니다. {damage}의 비전 피해를 입히고, 달물결을 1단계 올리며(최대 3단계), 달빛 폭풍을 6초 연장합니다. 적용 한 번당 최대 {duration}초입니다. 달물결 3단계에서 이 버튼이 달의 격동으로 변합니다: 240에서 285의 비전 피해를 입히는 즉시 공격으로, 3단계를 모두 소모합니다.',
+    '달빛야수 변신 전용입니다. {damage}의 비전 피해를 입히고, 달물결을 1 더하며(최대 3), 대상에게 걸린 달빛 폭풍을 6초 연장합니다. 달빛 폭풍 적용 한 번당 최대 {duration}초까지 추가로 연장됩니다. 달물결 3에서 이 버튼이 달의 격동으로 변합니다. 136에서 162의 비전 피해(주문력 추가)를 입히는 즉시 공격으로, 3을 모두 소모합니다.',
   'entities.abilities.moonseed.name': '달씨앗',
   'entities.abilities.needle_of_fate.description':
     '적을 꿰뚫어 {damage}의 암흑 피해를 줍니다. 대상에게 자신의 사안이 있으면 단죄를 {needleDoom} 생성하고, 사안이 없으면 먼저 대상을 지정합니다.',
@@ -17433,7 +17437,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '멀리 있는 적을 성스러운 사슬로 즉시 결박합니다. 적은 자신에게서 3미터 거리까지 초당 18미터의 속도로 끌려오며, 도착하면 4초 동안 이동 속도가 50% 감소합니다. 승천 중에는 주변의 두 번째 적도 결박합니다.',
   'entities.abilities.oath_chain.name': '맹세의 사슬',
   'entities.abilities.ossuary_mark.description':
-    '적에게 15초 동안 표식을 남겨 당신과 당신의 언데드가 입힌 피해의 20%를 저장합니다. 다시 시전하면 표식을 터뜨립니다. 표식이 남은 적이 죽으면 6야드 안에서 폭발하고 영혼 조각 1개를 생성합니다.',
+    '적에게 15초 동안 표식을 남겨 당신과 당신의 언데드가 입힌 피해의 20%를 저장합니다. 다시 시전하면 표식을 일찍 터뜨립니다. 적이 저장된 피해를 암흑 피해로 받고 당신은 그 25%만큼 치유됩니다. 표식이 만료되면 치유 없이 터집니다. 표식이 걸린 적이 죽으면 저장된 피해가 6미터 이내의 다른 적에게 적중하고 영혼 조각 1개를 얻습니다.',
   'entities.abilities.ossuary_mark.name': '납골 표식',
   'entities.abilities.overbloom.description':
     '푸른 생장 3단계를 소모합니다: 자신의 지속 치유 효과를 지닌 모든 아군이 해당 효과의 남은 치유량 중 {buff}%를 즉시 회복하고, 해당 효과는 제거되며, 대상에게 새로운 포자치유를 심습니다.',
@@ -17441,19 +17445,19 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '푸른 생장 5단계를 소모합니다: 자신의 지속 치유 효과를 지닌 모든 아군이 해당 효과의 남은 치유량 중 {buff}%를 즉시 회복하고, 해당 효과는 제거되며, 대상에게 새로운 포자치유를 심습니다.',
   'entities.abilities.overbloom.name': '만개',
   'entities.abilities.pack_command.description':
-    '살아 있는 소환수에게 공격을 명령합니다. 적중하면 집중 20과 무리 흉포 1단계를 얻습니다.',
+    '살아 있는 소환수에게 공격을 명령하여 36에서 48의 물리 피해를 입힙니다. 피해량은 소환수의 전투력에 따라 증가합니다. 적중하면 집중 20을 회복하고 30초 동안 무리 흉포 1중첩을 얻으며, 최대 3중첩입니다. 중첩마다 소환수가 입히는 모든 피해가 10% 증가합니다. 이 공격은 적중 전에 쌓여 있던 중첩을 사용합니다. 3중첩에서는 이 버튼이 야수 해방으로 바뀝니다. 해방된 광란 중에는 사용할 수 없습니다.',
   'entities.abilities.pack_command.name': '무리 명령',
   'entities.abilities.pack_rally.description':
     '준마의 상을 취하고 주변 아군을 독려해 10초 동안 이동 속도를 30%, 공격 및 시전 속도를 10% 높입니다.',
   'entities.abilities.pack_rally.name': '무리 결집',
   'entities.abilities.possess_evil_eye.description':
-    '저주술사가 주 사안에 15초 동안 빙의하고 단죄를 35 생성합니다. 운명의 바늘은 시전 시간이 1초가 되고 단죄를 2 더 생성하며, 흡명은 이동 중에도 정신 집중할 수 있고, 선고는 피해가 25% 증가합니다. 지연 반향은 60%의 피해를 주며 17레벨부터 20레벨까지 30%로 감소합니다.',
+    '15초 동안 주 사안에 빙의하고 단죄를 35 생성합니다. 활성화된 동안 운명의 바늘은 1초에 시전되고 단죄를 2 더 생성하며, 집어삼키기는 이동 중에도 정신 집중할 수 있고, 저주의 응시는 두 배 빠르게 공격하며, 선고는 25% 더 많은 피해를 입히고 0.75초 뒤 입힌 피해의 60%를 반복합니다(17레벨부터 20레벨에 걸쳐 30%로 감소).',
   'entities.abilities.possess_evil_eye.name': '사안 빙의',
   'entities.abilities.primal_exaltation.description':
     '12초 동안 전문화의 힘을 해방해 기본 순환을 강화합니다. (주술사 특성)',
   'entities.abilities.primal_exaltation.name': '원시적 승천',
   'entities.abilities.radiant_chorus.description':
-    '주변 아군을 {damage}만큼 치유하고 헌신을 1 생성합니다. 아군을 2명 이상 유효하게 치유하면 광휘의 공명을 얻습니다. 다음 치유의 빛이 즉시 시전되거나, 다음 여명의 포옹의 마나 소모량이 50% 감소하고 시전 시간이 1.5초가 됩니다. 승천 중에는 광휘의 합창의 치유량과 범위가 증가합니다.',
+    '주변 아군을 {damage}만큼 치유하고 헌신을 1 생성합니다. 아군 2명 이상을 유효하게 치유하면 10초 동안 광휘의 공명을 얻습니다. 다음 치유의 빛이 즉시 시전되거나, 다음 여명의 포옹의 마나 소모량이 50% 감소하고 1.5초에 시전됩니다. 승천 중에는 광휘의 합창의 치유량이 20% 증가하고 범위가 40미터로 넓어집니다.',
   'entities.abilities.radiant_chorus.name': '광휘의 합창',
   'entities.abilities.radiant_devotion.description':
     '30분 동안 자신과 파티원의 주문력을 20 증가시킵니다. 자신의 여명 또는 은총의 헌신을 교체하지만, 다른 성기사의 헌신과는 함께 유지됩니다.',
@@ -17495,22 +17499,22 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '죽을 때까지 성스러운 상태가 되어 치유량이 10%, 주문 극대화율이 5% 증가하고, 생성하는 위협 수준이 50% 감소합니다. 태양 치유사 전용입니다.',
   'entities.abilities.sacred_form.name': '성스러운 형상',
   'entities.abilities.sacrifice_undead.description':
-    '지배 하수인 하나를 파괴해 최대 생명력의 25%를 회복합니다.',
+    '가장 많이 다친 지배 하수인(무덤수호병은 제외)을 파괴해 최대 생명력의 25%를 회복합니다. 지배 하수인이 필요합니다.',
   'entities.abilities.sacrifice_undead.name': '언데드 희생',
   'entities.abilities.sacrilegious_march.description':
     '이동 속도가 35% 증가하지만 매초 최대 생명력의 2%를 잃습니다. 다시 시전하면 해제됩니다. 생명력이 20%가 되면 자동으로 꺼집니다.',
   'entities.abilities.sacrilegious_march.name': '신성모독 행군',
   'entities.abilities.scouring_mercy.description':
-    '적에게 {damage}의 신성 피해를 입히거나 아군 대상을 {healing}만큼 치유합니다. 피해는 주문력에 비례해 증가하고, 치유는 치유력에 비례해 증가합니다. 교리는 이 피해를 유대를 통해 치유로 전환합니다. 30미터 이내에 유대가 맺어진 부상당한 파티원이 없으면, 30미터 이내에서 생명력이 가장 낮은 부상당한 파티원을 피해량의 15%만큼 치유합니다. 파티원을 치유하면 해당 대상으로부터 10미터 이내에 있고 시야가 확보된 다른 부상당한 파티원 최대 2명도 함께 치유하며, 각각 회복된 생명력의 50%만큼 치유합니다. 이 추가 치유는 치명타가 발생하지 않으며 교리 유대를 생성하지 않습니다. (교리 고유 능력)',
+    '적에게 {damage}의 신성 피해를 입히거나 아군 대상을 {healing}만큼 치유합니다. 피해량은 주문력에 따라, 치유량은 치유력에 따라 증가합니다. 수양: 30미터 이내에서 이어진 부상당한 파티원을 각각 입힌 피해의 30%만큼 치유합니다(쌍둥이 서약이면 70%). 부상당한 파티원이 없으면 대신 30미터 이내에서 생명력이 가장 낮은 부상당한 파티원을 15% 치유합니다. 파티원을 치유하면 그 대상 주변 10미터 이내에 있고 시야가 확보된 다른 부상당한 파티원 최대 2명도 각각 회복된 생명력의 50%만큼 치유합니다. 이 추가 치유는 치명타 치유가 발생하지 않으며 수양의 이음을 만들지 않습니다. (수양 상징)',
   'entities.abilities.scouring_mercy.name': '정화의 자비',
   'entities.abilities.sentence.description':
-    '모든 단죄와 운명의 실을 소모해 적에게 선고를 내립니다. 실 하나당 피해가 6% 증가하고, 추가 효과는 단죄 20, 50, 80, 100에서 강화됩니다. 16레벨 이후 피해 증가폭이 완만해집니다.',
+    '단죄 20과 대상에게 걸린 주 사안이 필요합니다. 모든 단죄와 운명의 실을 소모해 소모한 단죄에 비례하는 암흑 피해를 입히며, 실 하나당 피해가 6% 증가합니다. 50 이상이면 입힌 피해의 20%만큼 자신을 치유합니다. 80 이상이면 주변 8미터 이내의 다른 적에게도 피해의 35%를 입힙니다. 100이면 플레이어와 우두머리에게 5% 더 많은 피해를 입히고, 생명력 20% 미만의 일반 적을 처치합니다. 기본 피해는 16레벨까지 레벨에 따라 증가하다가 17레벨부터 20레벨에 걸쳐 완만해집니다.',
   'entities.abilities.sentence.name': '선고',
   'entities.abilities.seraphic_vigil.description':
-    '아군 한 명에게 수호의 축복을 걸어 위험에 처하면 생명력을 {buff} 회복시킵니다. 축복 고유 능력입니다.',
+    '아군 한 명을 30초 동안 보호합니다. 생명력이 35% 아래로 떨어지게 하는 첫 공격이 수호를 소모하며 {buff}만큼 치유합니다. 다른 아군에게 시전하면 수호가 옮겨집니다. (신성 상징)',
   'entities.abilities.seraphic_vigil.name': '치천사의 수호',
   'entities.abilities.shellskin.description':
-    '8초 동안 받는 피해가 60% 감소하지만, 효과가 지속되는 동안 공격할 수 없습니다.',
+    '8초 동안 받는 피해가 60% 감소합니다. 지속되는 동안에는 덫을 포함해 적을 대상으로 하거나 적에게 피해를 주는 기술을 사용할 수 없지만, 자동 공격은 계속됩니다.',
   'entities.abilities.shellskin.name': '갑각 피부',
   'entities.abilities.shrapnel_charge.description':
     '전방 10미터 원뿔 범위를 공격합니다. 현재 대상, 또는 대상이 범위 밖이면 적중한 가장 가까운 적에게 물리 피해 24~30을 줍니다. 나머지 적에게는 피해 7~9와 6초 동안 출혈 피해 12를 줍니다. 주 대상에 자신의 피갈고리 상처가 있으면 상처 피해를 즉시 1회 줍니다. 적에게 적중하면 사냥의 기세 1중첩을 얻습니다. 직접 피해는 원거리 전투력에 따라 증가합니다.',
@@ -17520,7 +17524,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sinister_strike.specNote_combat':
     '레드라인이 활성화된 동안 이 버튼이 헤이메이커로 변합니다: 무기 피해의 130%에 10을 더한 피해를 입히고, 연계 점수 2점을 얻으며, 레드라인이 1단계 쌓입니다(최대 4단계).',
   'entities.abilities.solar_invocation.description':
-    '아군 하나를 즉시 {damage}만큼 치유하거나 적 하나에게 중간 정도의 신성 피해를 줍니다. 어느 쪽이든 헌신을 1 생성합니다. 승천 중 치유로 사용하면 대상의 10미터 안에 있는 아군 플레이어도 절반만큼 치유합니다.',
+    '아군 하나를 즉시 {damage}만큼 치유하거나 적 하나에게 120에서 150의 기본 신성 피해를 입힙니다. 피해량은 주문력에 따라, 치유량은 치유력에 따라 증가합니다. 어느 쪽이든 헌신을 1 생성합니다. 승천 중 치유로 사용하면 대상 주변 10미터 이내의 아군 플레이어도 절반만큼 치유합니다.',
   'entities.abilities.solar_invocation.name': '태양의 기원',
   'entities.abilities.solar_step.description': '2초 동안 이동 속도가 150% 증가합니다.',
   'entities.abilities.solar_step.name': '태양의 발걸음',
@@ -17528,20 +17532,20 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '적의 영혼을 찢어 {damage}의 암흑 피해를 입히고 영혼 조각 1개를 생성합니다. 최대 5개.',
   'entities.abilities.soul_harvest.name': '정수 수확',
   'entities.abilities.soul_lance.description':
-    '유령의 창을 던져 {damage}의 암흑 피해를 입힙니다. 자신의 납골 표식이 있는 대상에게는 그 피해의 50%가 표식에 더해집니다.',
+    '유령의 창을 던져 {damage}의 암흑 피해를 입힙니다. 자신의 납골 표식이 걸린 대상에게는 표식이 피해의 20% 대신 70%를 저장합니다.',
   'entities.abilities.soul_lance.name': '영혼 창',
   'entities.abilities.soulwell.description':
     '영혼샘을 3분 동안 소환합니다. 전투 중이 아니면 파티원이 영혼석을 3개까지 채울 수 있습니다. 영혼석은 최대 생명력의 25%를 회복하며 물약과 재사용 대기시간을 공유합니다.',
   'entities.abilities.soulwell.name': '영혼샘',
   'entities.abilities.stampede.description':
-    '야수 3마리를 12초 동안 소환합니다. 각 야수는 2초마다 공격해 {damage}의 물리 피해를 입힙니다. 표시된 피해에는 원거리 전투력의 8%가 포함되지만 소환수 피해 보너스는 포함되지 않습니다. 야수는 소환될 때 무리의 흉포함을 저장하며, 중첩당 피해가 10% 증가합니다. 야수 쇄도가 재사용 대기 중일 때 무리 명령이 적중하면 20% 확률로 재사용 대기시간이 초기화되며, 5번 연속 실패하면 반드시 초기화됩니다. 야수들이 활동 중일 때는 초기화되지 않습니다. (무리군주)',
+    '야수 3마리를 12초 동안 소환합니다. 각 야수는 2초마다 공격해 {damage}의 물리 피해를 입힙니다. 표시된 피해에는 소환수 피해 보너스가 적용되기 전 원거리 전투력의 8%가 포함됩니다. 야수는 소환될 때 무리 흉포를 저장하며, 중첩당 피해가 10% 증가합니다. 야수 쇄도가 재사용 대기 중일 때 무리 명령이 성공하면 20% 확률로 재사용 대기시간이 초기화되며, 5번째 기회에서는 반드시 초기화됩니다. 야수들이 활동 중일 때는 초기화되지 않습니다. (야수 다루기)',
   'entities.abilities.stampede.name': '야수 쇄도',
   'entities.abilities.starfire.specNote_balance':
     '달날개 형상에서 시전을 완료할 때마다 달물결이 1단계 쌓입니다(최대 3단계). 달물결 3단계에서 이 버튼이 해돋움으로 변합니다: 160에서 190의 자연 피해와 9초에 걸친 75의 화상 피해를 입히는 즉시 공격으로, 마나 35를 회복하고 3단계를 모두 소모합니다.',
   'entities.abilities.stealth.specNote_subtlety':
     '황혼장막 상태에서 사용하는 선제 기술마다 땅거미가 1단계 쌓입니다(최대 3단계).',
   'entities.abilities.stoneward.description':
-    '아군 하나를 6회 충전으로 60초 동안 보호합니다. 피해를 받으면 충전 1회를 소모해 3초마다 한 번 최대 생명력의 5%를 회복합니다. (주술사 특성)',
+    '아군 하나를 60초 동안 보호합니다. 피해를 받으면 충전 1회가 최대 생명력의 5%를 치유하며, 3초에 한 번까지, 최대 6회 충전됩니다. 한 번에 한 아군만 돌 수호를 받을 수 있습니다. (주술사 특성)',
   'entities.abilities.stoneward.name': '돌 수호',
   'entities.abilities.stormsurge.description':
     '지속 효과: 선조의 일격이 재사용 대기 중일 때 폭풍시전을 소모하면 25% 확률로 재사용 대기시간을 초기화합니다. 4번 실패하면 다음에는 반드시 발동합니다. (전령)',
@@ -17556,30 +17560,30 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '달물결 3단계를 소모해 {damage}의 자연 피해와 9초에 걸친 {overTime}의 화상 피해를 입히고 마나 35를 회복합니다: 마나 특화 선택지입니다. 달의 격동도 같은 달물결 3단계를 소모하므로 하나만 선택하세요.',
   'entities.abilities.sunlance.name': '해돋움',
   'entities.abilities.sunward_disc.description':
-    '방패가 필요합니다. 빛나는 원반을 던져 적에게 적중시킨 후 주변 적 사이를 튕기게 합니다. 피해를 줄 때마다 헌신을 1 생성합니다. 태양의 응보가 활성화되면 태양 수호 원반은 마나를 소모하지 않고 재사용 대기시간을 무시하며 피해가 20% 증가합니다. 승천 중에는 5회 튕깁니다.',
+    '방패가 필요합니다. 빛나는 원반을 던져 대상에게 {damage}의 신성 피해를 입힌 뒤, 주변의 다른 적 최대 2명에게 튕겨 각각 60에서 75의 기본 신성 피해를 입힙니다. 피해를 입힐 때마다 헌신을 1 생성합니다. 태양의 응보가 있으면 태양 수호 원반은 마나를 소모하지 않고, 재사용 대기시간을 무시하며, 피해가 20% 증가합니다. 승천 중에는 피해가 30% 증가하고 튕김이 5회로 늘어납니다.',
   'entities.abilities.sunward_disc.name': '태양 수호 원반',
   'entities.abilities.swipe.specNote_feral':
     '적중한 공격마다 오랜 피가 1단계 쌓입니다(최대 3단계).',
   'entities.abilities.thieves_chorus.description':
-    '휘파람 신호가 파티를 고무시켜 10초 동안 공격, 시전, 정신 집중 속도를 10% 증가시킵니다. 최근 파티 가속 효과를 받은 아군은 너무 지쳐 효과를 받을 수 없습니다. (도적 특성)',
+    '30미터 이내의 파티 또는 공격대 아군의 공격, 시전, 정신 집중 속도를 10초 동안 10% 높입니다. 영향을 받은 아군은 10분 동안 도적의 합창, 전쟁 북, 시간 가속의 혜택을 다시 받을 수 없습니다. (도적 특성)',
   'entities.abilities.thieves_chorus.name': '도적의 합창',
   'entities.abilities.thunder_reservoir.description':
     '지속 효과: 전격 화살, 갈래 번개, 마그마 폭발이 천둥을 부여하며 최대 5중첩입니다. 대지의 충격은 천둥을 모두 소모하여 중첩당 피해가 25% 증가합니다(5중첩에서 125%). 단층 각성은 모두 소모하여 중첩당 피해가 20% 증가합니다(5중첩에서 100%). (정기)',
   'entities.abilities.thunder_reservoir.name': '천둥 비축',
   'entities.abilities.tidecall.description':
-    '아군 대상의 생명력을 {damage}만큼 회복시킵니다. 치유량은 주문력에 따라 증가합니다. 초과 치유 전의 전체 치유량을 치유의 물결에 더하며, 대상 최대 생명력의 30%까지 저장합니다.',
+    '아군 대상을 {damage}만큼 치유합니다. 치유량은 치유력에 따라 증가합니다. 또한 과잉 치유 전 전체 치유량을 대상의 치유의 물결에 더합니다. 치유의 물결은 12초에 걸쳐 대상을 치유하며 최대 생명력의 30%까지 저장합니다.',
   'entities.abilities.tidecall.name': '해일 부름',
   'entities.abilities.trailbreak.description':
-    '뒤로 25미터 도약하며 이동 불가 효과와 이동 속도 감소 효과를 해제합니다. 착지하면 3초 동안 이동 속도가 50% 증가합니다. 사냥의 기세가 있으면 이를 갱신하고 12초 동안 재진입 준비를 부여합니다.',
+    '뒤로 25미터 도약하며 이동 불가 효과와 이동 속도 감소 효과를 해제합니다. 착지하면 3초 동안 이동 속도가 50% 증가합니다. 사냥의 기세가 있으면 12초 동안 재진입 준비를 얻습니다. 다음 내장 가르기 또는 피갈고리가 사냥의 기세 중첩 수에 따라 추가 피해를 입힙니다.',
   'entities.abilities.trailbreak.name': '흔적 끊기',
   'entities.abilities.umbral_anchor.description':
-    '처음 사용하면 발밑에 5분 동안 암영 닻을 설치합니다. 40미터 안에서 다시 사용하면 닻으로 돌아가며, 닻을 소모하고 45초의 재사용 대기시간이 시작됩니다.',
+    '처음 시전하면 발밑에 5분 동안 그림자를 고정시킵니다. 닻에서 40미터 이내에서 다시 시전하면 닻으로 순간이동하며, 닻을 소모하고 45초의 재사용 대기시간이 시작됩니다.',
   'entities.abilities.umbral_anchor.name': '암영 닻',
   'entities.abilities.unholy_command.description':
     '영혼 조각 3개를 소모해 모든 언데드에게 명령하고 12초 동안 공격력을 25%, 행동 속도를 20% 증가시킵니다.',
   'entities.abilities.unholy_command.name': '부정한 명령',
   'entities.abilities.unleash_beast.description':
-    '최대로 쌓인 무리 흉포를 해방해 주 대상과 주변을 강타한 뒤, 소환수를 잠시 휩쓸기 광란에 빠뜨립니다.',
+    '소환수가 대상을 공격해 42에서 53의 물리 피해를 입힌 뒤, 소환수 주변 6미터 이내의 모든 적을 후려쳐 57에서 75의 피해를 입힙니다. 후려치기는 주 대상이 아닌 적에게 50% 더 많은 피해를 입힙니다. 공격과 후려치기에는 무리 흉포의 소환수 피해 보너스 30%가 전부 적용되고, 소환수의 전투력에 따라 증가하며, 이후 무리 흉포 3중첩을 모두 소모합니다. 이후 8초 동안(해방된 광란) 소환수는 25% 더 많은 피해를 입히고 35% 더 빠르게 공격하며, 사악한 사격이 적중할 때마다 대상 주변 5미터 이내의 다른 적 최대 2명에게 12에서 18의 물리 피해를 입히는 휩쓸기가 발동하고, 무리 명령은 사용할 수 없습니다.',
   'entities.abilities.unleash_beast.name': '야수 해방',
   'entities.abilities.unleash_weapon.description':
     '활성화된 무기 마법을 해방합니다. 화염낙인은 54에서 64의 화염 피해를 입히고 주문력의 30%가 추가되며 천둥을 2 얻습니다. 질풍은 무기로 공격하고 전령의 박자를 진행하며 6초 동안 공격 속도를 20% 높입니다. 바위결속은 무기 피해의 75%를 입히고 대상이 자신을 공격하게 하며 4초 동안 받는 피해를 20% 줄입니다. 생명의 샘은 치유의 물결을 소모해 남은 치유량의 125%를 즉시 회복하고 8초 안에 받는 다음 피해를 실제 회복량의 50%만큼 줄입니다.',
@@ -17588,7 +17592,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '공중으로 승천하여 적에게 날아가는 동안 피해에 면역이 됩니다. 2초 후 대상 지역으로 강하하여 {damage}의 신성 피해를 주고 헌신을 1 생성합니다. 승천 중에는 충돌 피해가 50% 증가하고 충전을 1회 소모합니다.',
   'entities.abilities.valkyrs_calling.name': '발키리의 부름',
   'entities.abilities.veilbound_march.description':
-    '4초 동안 영체가 되어 이동 속도가 40%, 방어도가 30% 증가하고 이동 불가, 감속, 강제 이동에 면역이 됩니다. 통과한 적은 6초 동안 장막의 표식을 얻어 매초 신성 피해를 받고, 자신에게 주는 피해가 20% 감소하며, 자신에 대한 위협 수준이 증가합니다. 첫 표식은 헌신을 1 생성합니다. 행진이 끝나면 주변의 표식이 있는 적에게 마지막 폭발을 일으킵니다. 승천 중에는 폭발 피해가 50% 증가하고 적을 자신 쪽으로 조금 끌어당깁니다.',
+    '4초 동안 영체가 되어 이동 속도가 40%, 방어도가 30% 증가하고, 이동 불가와 감속 효과가 해제되며 이동 불가, 감속, 강제 이동에 면역이 됩니다. 통과한 적은 6초 동안 장막의 표식을 얻어 매초 12의 신성 피해를 3배의 위협 수준과 함께 받고 당신에게 입히는 피해가 20% 감소합니다. 첫 표식은 헌신을 1 부여합니다. 행진이 끝나면 10미터 이내의 표식이 있는 적이 36의 신성 피해를 받습니다. 승천 중에는 그 피해가 54로 늘고 적을 2미터 자신 쪽으로 끌어당깁니다.',
   'entities.abilities.veilbound_march.name': '장막결속 행진',
   'entities.abilities.veilbound_mark.description':
     '매초 신성 피해를 받고, 표식을 남긴 성기사에게 주는 피해가 20% 감소하며, 해당 성기사에 대한 위협 수준이 증가합니다.',
@@ -17596,24 +17600,24 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.veilstep.description': '바라보는 방향으로 장막을 통과합니다.',
   'entities.abilities.veilstep.name': '장막걸음',
   'entities.abilities.veilstrike.description':
-    '6초 동안 그림자에 휩싸입니다: 황혼장막 전용 선제 기술을 은신 없이 어느 각도에서든 사용할 수 있고, 입히는 피해가 10% 증가하며, 그 안에서 처음 사용하는 잠복자의 일격이 두 배의 피해를 입힙니다. (잠행)',
+    '6초 동안 황혼장막 선제 기술을 은신 없이 어느 각도에서든 사용할 수 있고, 입히는 피해가 10% 증가합니다. 그 안에서 처음 사용하는 잠복자의 일격은 무기 피해가 50% 증가합니다. (잠행)',
   'entities.abilities.veilstrike.name': '장막 일격',
   'entities.abilities.venom_dart.description':
     '독 묻은 다트를 튕겨 {damage}의 자연 피해를 입힙니다. 연계 점수 1점을 얻습니다.',
   'entities.abilities.venom_dart.name': '맹독 다트',
   'entities.abilities.venom_dart.specNote_assassination':
-    '맹독 의식이 1단계 쌓이고 맹독 상처가 6초 연장됩니다(상처는 20초를 넘지 않습니다).',
+    '맹독 의식을 1 더하고(최대 6), 기력 15를 돌려받으며, 맹독 상처를 6초 연장합니다(상처는 20초를 넘지 않습니다).',
   'entities.abilities.venomrend.description':
-    '맹독 의식 6단계를 소모합니다: 100 더하기 연계 점수당 55의 피해를 입히고, 자신의 출혈 효과가 앞으로 입힐 남은 피해를 즉시 모두 입힌 뒤, 새로운 맹독 상처를 남깁니다(20초에 걸쳐 120의 피해). 기력 20을 회복합니다. (암살)',
+    '맹독 의식 6을 소모합니다. {damage}의 물리 피해를 입히고, 과다출혈, 철사 목조르기, 맹독 상처에 남은 피해를 즉시 모두 입힌 뒤, 20초에 걸쳐 {overTime}의 피해를 입히는 새로운 맹독 상처를 부여합니다. 기력 20을 회복합니다. (암살)',
   'entities.abilities.venomrend.name': '맹독 찢기',
   'entities.abilities.vicarious_suffering.description':
-    '8초 동안 고통을 연결해 적의 공격으로 최대 15의 단죄를 생성합니다. 자신에게 사용하면 받는 피해가 20% 감소합니다. 아군에게 사용하면 피해의 최대 20%를 자신에게 옮기지만 생명력이 15% 아래로 내려가지는 않습니다.',
+    '8초 동안 대상에 대한 적대적 공격이 적중할 때마다 단죄를 3 생성하며, 총 15까지입니다. 자신에게 사용하면 받는 피해가 20% 감소합니다. 아군에게 사용하면 적대적 공격마다 피해의 20%를 자신에게 옮기지만 생명력이 15% 아래로 내려가지는 않습니다.',
   'entities.abilities.vicarious_suffering.name': '고통 전이',
   'entities.abilities.vowkeeper_strike.description':
-    '높은 위협 수준을 생성하는 공격을 가하고 헌신을 1 생성합니다. 적중하면 20% 확률로 8초 동안 태양의 응보를 얻고, 방패 막기에 성공할 때마다 25% 확률로 얻습니다. 태양의 응보는 다음 태양 수호 원반, 은총의 망치, 치유의 빛 중 하나를 강화합니다. 승천 중에는 작은 피해 흡수 보호막도 얻습니다.',
+    '무기 피해에 {damage}의 물리 피해를 더해 높은 위협 수준과 함께 공격하고 헌신을 1 생성합니다. 공격이 성공하면 20% 확률로 8초 동안 태양의 응보를 얻고, 방어에 성공할 때마다 25% 확률로 얻습니다. 태양의 응보는 다음 태양 수호 원반(마나 소모 없음, 재사용 대기시간 없음, 피해 20% 증가), 은총의 망치(재사용 대기시간 없음, 입힌 피해의 100%만큼 자신 치유) 또는 치유의 빛(즉시 시전)에 소모됩니다. 승천 중에는 6초 동안 최대 생명력의 6%에 해당하는 보호막도 얻습니다.',
   'entities.abilities.vowkeeper_strike.name': '맹세수호자의 일격',
   'entities.abilities.warspirit_cadence.description':
-    '지속 효과: 쌍수 무기 공격에는 추가 빗나갈 확률이 적용되지 않습니다. 무기 공격이 3번 적중할 때마다 25%의 자연 피해를 주는 질풍 메아리가 2번 발동하고 12초 동안 폭풍시전을 얻습니다. 폭풍시전은 다음 전격 화살, 충격 또는 치유의 물결을 즉시 시전하고 마나 소모를 50% 줄입니다. 선조의 일격은 공격 2회로 계산됩니다. (전령)',
+    '지속 효과: 쌍수 공격에 추가 빗나감 확률이 없습니다. 질풍의 무기 또는 바위결속 무기가 활성화된 동안 적중한 3번째 무기 공격마다 12초 동안 폭풍시전을 얻습니다. 질풍의 무기에서는 폭풍우 메아리 2회도 발동하며, 각각 그 공격 피해의 25%를 자연 피해로 입힙니다. 폭풍시전은 다음 전격 화살, 충격 또는 치유의 물결을 즉시 시전되게 하고 마나 소모를 50% 줄입니다. 선조의 일격은 공격 2회로 계산됩니다. (고양)',
   'entities.abilities.warspirit_cadence.name': '전령의 박자',
   'entities.abilities.wildheart.description': '최대 생명력의 30%를 즉시 회복합니다.',
   'entities.abilities.wildheart.name': '야생의 심장',
@@ -19494,10 +19498,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.anyTarget': '적 또는 아군 대상',
   'entities.abilities.melting_acid.name': '용해 산',
   'entities.abilities.melting_acid.description':
-    '30분 동안 무기에 산을 입힙니다. 근접 공격을 할 때마다 대상에게 부식성 산을 튀겨 12초 동안 방어도를 5% 감소시킵니다.',
+    '30분 동안 무기에 산을 입힙니다. 근접 공격을 할 때마다 대상에게 부식성 산을 튀겨 12초 동안 방어도를 5% 감소시킵니다. 다른 무기 코팅을 대체합니다.',
   'entities.abilities.nightshade_coating.name': '가지독 코팅',
   'entities.abilities.nightshade_coating.description':
-    '30분 동안 무기에 가지독을 입힙니다. 근접 공격을 할 때마다 대상에게 가지독을 묻혀 12초 동안 받는 치유 효과를 25% 감소시킵니다.',
+    '30분 동안 무기에 코팅을 입힙니다. 근접 공격을 할 때마다 대상에게 가지독을 묻혀 12초 동안 받는 치유 효과를 25% 감소시킵니다. 다른 무기 코팅을 대체합니다.',
   // v0.41 release i18n fill.
   'hudChrome.itemMenu.sell': '판매',
   'hudChrome.itemMenu.sellAll': '모두 판매 ({count})',
@@ -21475,7 +21479,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.priest.bombTooltip':
     '헌납 폭탄: 암흑 십일조를 20개 생성하면 폭탄 하나가 준비됩니다. 암흑 십일조를 소모해도 진행도는 증가하지 않습니다. 진행도는 전투 사이에도 유지됩니다. 사망하거나 공격대 우두머리 전투가 시작되면 초기화됩니다. 시전을 완료하면 폭탄을 소모하며, 취소하면 보존됩니다.',
   'entities.abilities.choir_of_deliverance.specNote_shadow':
-    '15초 동안 자신의 암흑 피해로 적이 실제로 잃은 생명력의 20%를 치유량으로 전환하여 자신을 포함한 30미터 내의 부상당한 파티원에게 나눕니다. 공격대에서는 자신의 하위 파티만 치유합니다. 즉시 시전하며 황혼의 장막으로 계속 공격할 수 있습니다. 흡수된 피해와 적의 남은 생명력을 초과한 피해는 치유량에 포함되지 않습니다.',
+    '15초 동안 자신의 암흑 피해로 적이 잃은 생명력의 20%를 치유량으로 전환하여 자신을 포함한 30미터 이내의 부상당한 파티원에게 나눕니다. 공격대에서는 자신의 하위 파티만 치유합니다. 즉시 시전하며 황혼의 장막에서 계속 공격할 수 있습니다. 흡수된 피해와 초과 피해는 치유량에 포함되지 않습니다.',
   'entities.abilities.void_rupture.name': '공허 균열',
   'entities.abilities.void_rupture.description':
     '암흑 십일조 3중첩을 소모하여 적을 찢고 {damage}의 암흑 피해를 줍니다. 피해는 주문력에 따라 증가하며 극대화될 수 있습니다. 3중첩이 필요하며 저항당해도 소모됩니다.',
@@ -21492,9 +21496,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '치유한 아군마다 포자치유도 부여합니다. 푸르름이 가득 차면 25% 강해지고 푸르름을 소모합니다.',
   'entities.abilities.natures_boon.name': '자연의 은혜',
   'entities.abilities.natures_boon.description':
-    '당신의 주문은 10초 동안 자연의 은혜를 준비할 수 있습니다. 지정된 주문은 무료가 되고 25% 강해지며 어떤 형상에서도 시전할 수 있습니다. 새 발동은 지속시간을 갱신합니다.',
+    '자연의 은혜는 10초 동안 지속되며, 지정된 주문을 무료로 만들고, 25% 더 강하게 하며, 어떤 형상에서도 시전할 수 있게 합니다. 새로 발동하면 지속시간이 갱신됩니다.',
   'entities.abilities.natures_boon.specNote_feral':
-    '적중한 근접 자동 공격마다 15분의 1 확률로 포자치유, 또는 큰곰 형상에서는 오크가죽을 준비합니다.',
+    '적중한 근접 자동 공격마다 준비될 수 있으며, 어떤 형상에서든 분당 약 4회입니다(표범 변신 중 공격당 15분의 1 확률). 포자치유를 25% 대신 50% 더 강하게 하며, 큰곰 변신 중에는 참나무 가죽에도 적용됩니다. 처음 시전하는 주문이 이를 소모합니다. 발동할 때마다 참나무 가죽의 재사용 대기시간도 초기화됩니다.',
   'entities.abilities.natures_boon.specNote_balance':
     '야생 화살이나 하늘낙하를 시전할 때마다 10% 확률로 포자 폭발을 준비합니다. 10초에 한 번까지.',
   'entities.abilities.natures_boon.specNote_restoration':
@@ -21539,7 +21543,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '전방 8야드, 90도 부채꼴 범위에 쇠뇌 화살을 흩뿌려 적을 자신에게서 최대 20야드 떨어진 위치까지 밀쳐냅니다. 밀쳐내기에 면역인 적은 영향을 받지 않습니다. 피해를 주지 않습니다.',
   'entities.abilities.phosphor_flask.name': '인광 플라스크',
   'entities.abilities.phosphor_flask.description':
-    '반응성 화학 혼합물을 담은 밀봉된 용기로, 8미터 지역에 3초 동안 백열하는 불길을 터뜨립니다. 불길 안에 서 있는 적은 0.5초마다 {damage}의 화염 피해를 입습니다. 피해량은 원거리 전투력에 따라 증가합니다.',
+    '8미터 범위에 3초 동안 불길로 터지는 플라스크를 던집니다. 불길 안에 서 있는 적은 0.5초마다 {damage}의 화염 피해를 입습니다. 피해량은 원거리 전투력에 따라 증가합니다.',
   'hudChrome.options.pixelsValue': '{value}픽셀',
   'hudChrome.wocStore.subscription.monthlyTitle': '월간 멤버십',
   'hudChrome.wocStore.subscription.annualTitle': '12개월 멤버십 묶음',
@@ -25677,4 +25681,18 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'seasonal.thatchgrin.wakeYell': '밭에 밤이 내린다! 누가 내 밭을 걷느냐?',
   'seasonal.thatchgrin.sleepYell': '해가 떴군. 기둥으로 돌아가 다시 지켜봐야지.',
   'seasonal.pumpkins.progress': '{label}: {current}/{total}',
+  'hudChrome.abilityTooltipDetail.hint': '쉬프트를 길게 눌러 자세히 보기',
+  'hudChrome.abilityTooltipDetail.school': '계열: {school}',
+  'hudChrome.abilityTooltipDetail.scaling': '{stat}({value})에서 +{bonus} 포함',
+  'hudChrome.abilityTooltipDetail.stat.spellPower': '주문력',
+  'hudChrome.abilityTooltipDetail.stat.healPower': '치유력',
+  'hudChrome.abilityTooltipDetail.stat.attackPower': '전투력',
+  'hudChrome.abilityTooltipDetail.stat.rangedPower': '원거리 전투력',
+  'hudChrome.abilityTooltipDetail.ticks': '{ticks}회 틱, {duration}초 동안 {interval}초마다',
+  'hudChrome.abilityTooltipDetail.radius': '범위: {radius}미터',
+  'hudChrome.abilityTooltipDetail.charges': '충전: {charges}',
+  'hudChrome.abilityTooltipDetail.castWhileMoving': '이동 중에도 시전 가능',
+  'hudChrome.abilityTooltipDetail.pushbackImmune': '피해를 받아도 이 시전이 지연되지 않음',
+  'hudChrome.abilityTooltipDetail.threatMult': '기술 위협 수준 보정: {percent}%',
+  'hudChrome.abilityTooltipDetail.threatFlat': '추가 위협 수준: +{threat}',
 };
