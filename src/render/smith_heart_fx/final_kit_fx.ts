@@ -56,10 +56,9 @@ import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
 import { getFlameTex } from '../ignivar_fire_vfx';
 import { setRenderCategory } from '../renderer_diagnostics';
-import { heartKitMeshes, SMITH_HEART_HEART_KIT_URL } from '../smith_heart/heart_kit';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
+import { FinalAnvilFx } from './final_anvil_fx';
 import {
-  anvilDrop,
   FINAL_KIT_COLORS as C,
   FINAL_KIT_FLOOR as F,
   FINAL_FOOTPRINTS,
@@ -88,13 +87,7 @@ import {
   WHIRL_FRAG,
   WHIRL_VERT,
 } from './final_kit_glsl';
-import {
-  anvilCrystals,
-  anvilStone,
-  FINAL_ANVIL_PIECE,
-  iceCrust,
-  shellStone,
-} from './final_kit_shapes';
+import { iceCrust, shellStone } from './final_kit_shapes';
 import {
   coldReachFill,
   FINAL_TELEGRAPH_POOLS,
@@ -173,9 +166,8 @@ export class FinalKitFx {
   private readonly arcsMesh: THREE.InstancedMesh;
   private readonly arcs: Arc[] = [];
   private readonly spikes: THREE.InstancedMesh;
-  private readonly anvil = new THREE.Group();
-  private readonly anvilStoneMat: THREE.MeshLambertMaterial;
-  private readonly anvilCrystalMat: THREE.MeshBasicMaterial;
+  /** Weight of the Anvil's whole look past its mark (final_anvil_fx.ts). */
+  private readonly anvilFx: FinalAnvilFx;
   private readonly rim: THREE.Mesh;
   private readonly rimMat: THREE.ShaderMaterial;
   private readonly unboundRing: THREE.Mesh;
@@ -400,49 +392,25 @@ export class FinalKitFx {
     this.spikes.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     for (let i = 0; i < P.rootSpikes; i++) this.spikes.setMatrixAt(i, _m.makeScale(0, 0, 0));
     this.root.add(this.spikes);
-    // The great anvil: carved from one block of granite (its stone toned per
-    // vertex, chiselled flat), gold crystals set in its face, heel and
-    // flanks, its veins and crystals hotter as it falls. Built-in materials
-    // (lit by the room like the rest of the Heart's stone): only their
-    // colours move a frame, never their programs.
-    const stoneGeo = anvilStone();
-    const crystalGeo = anvilCrystals();
-    this.geometries.push(stoneGeo, crystalGeo);
-    this.anvilStoneMat = new THREE.MeshLambertMaterial({
-      name: 'smithHeartFinalAnvilStone',
-      vertexColors: true,
-      emissive: 0x120804,
-    });
-    this.anvilCrystalMat = new THREE.MeshBasicMaterial({
-      name: 'smithHeartFinalAnvilCrystal',
-      color: 0xffb030,
-      vertexColors: true,
-      toneMapped: false,
-    });
-    this.materials.push(this.anvilStoneMat, this.anvilCrystalMat);
-    // The Blender model when the Heart kit has landed (the interior waits for it,
-    // capped), the carved fallback otherwise; the same two materials either way.
-    const kitAnvil = hasDom ? heartKitMeshes(SMITH_HEART_HEART_KIT_URL, FINAL_ANVIL_PIECE) : null;
-    if (kitAnvil) {
-      for (const m of kitAnvil.children) {
-        if (!(m instanceof THREE.Mesh)) continue;
-        m.material = m.name.endsWith(':glow') ? this.anvilCrystalMat : this.anvilStoneMat;
-        m.frustumCulled = false;
-      }
-      this.anvil.add(kitAnvil);
-    } else {
-      for (const [geo, mat] of [
-        [stoneGeo, this.anvilStoneMat],
-        [crystalGeo, this.anvilCrystalMat],
-      ] as const) {
-        const m = new THREE.Mesh(geo, mat);
-        m.frustumCulled = false;
-        this.anvil.add(m);
-      }
-    }
-    this.anvil.name = 'smithHeartFinalAnvil';
-    this.anvil.visible = false;
-    this.root.add(this.anvil);
+    // Weight of the Anvil: the great anvil, its countdown, its strike.
+    this.anvilFx = new FinalAnvilFx(
+      {
+        groundY: (x, z) => this.groundY(x, z),
+        particles: this.particles,
+        density: this.density,
+        detail,
+        reducedMotion: () => this.reducedMotion(),
+        me: () => {
+          const me = this.world?.entities.get(this.world.playerId);
+          return me ? me.pos : null;
+        },
+        shakeSink: this.shakeSink,
+        rand: () => this.rand(),
+        hasDom,
+      },
+      this.uTime,
+    );
+    this.root.add(this.anvilFx.group);
     // The gale's rim band (every tier): a flat ring from just inside the
     // band's edge to the rim, on its own floor rung.
     const rimGeo = new THREE.RingGeometry(R.rimInner - 2, R.rimOuter, 200, 2).rotateX(-Math.PI / 2);
@@ -606,12 +574,7 @@ export class FinalKitFx {
         this.shake(x, z, 0.3);
         break;
       case FINAL_CUES.anvil:
-        this.anvil.visible = false;
-        this.dustAt(x, z, 60, R.anvil);
-        this.particles.shockRing(x, z, C.soak, R.anvil * 2.6, 0.9);
-        this.particles.shockRing(x, z, 0xffffff, R.anvil * 1.2, 0.35);
-        this.sparkAt(x, z, [1, 0.85, 0.5], 40, R.anvil);
-        this.shake(x, z, 0.9, 90);
+        this.anvilFx.land(x, z, ev.radius ?? R.anvil);
         break;
       default:
     }
@@ -710,7 +673,9 @@ export class FinalKitFx {
     this.active = true;
     this.scan(world, dt);
     for (const el of ELEMENTS) for (const s of this.pools[el]) s.seen = false;
+    this.anvilFx.begin(this.clock, dt);
     this.paintObjects(world);
+    this.anvilFx.end();
     this.paintMarks(world);
     this.paintBoss(world);
     for (const el of ELEMENTS)
@@ -805,7 +770,6 @@ export class FinalKitFx {
   private paintObjects(world: IWorld): void {
     let whirl = 0;
     let orb = 0;
-    let anvilShown = false;
     let wind: Entity | null = null;
     let blowing = false;
     for (const id of this.objectIds) {
@@ -933,30 +897,15 @@ export class FinalKitFx {
               ? telegraphFillOf(boss.castRemaining, boss.castTotal > 0 ? boss.castTotal : total)
               : timedFill(age, total);
           this.foot(id, 'anvil', FINAL_FOOTPRINTS.anvil, x, z, r, fill, true);
-          const drop = anvilDrop(fill);
-          this.anvil.position.set(x, y + drop.height, z);
-          this.anvil.rotation.y = 0.9 + this.clock * 0.12;
-          // Its crystals and the heat in its stone burn hotter as it falls.
-          this.anvilCrystalMat.color.setRGB(
-            0.8 + 0.7 * drop.glow,
-            0.45 + 0.4 * drop.glow,
-            0.1 + 0.12 * drop.glow,
-          );
-          this.anvilStoneMat.emissive.setRGB(0.09 * drop.glow, 0.035 * drop.glow, 0.01);
-          // Grit and gold motes falling off it as it hangs and drops.
-          if (this.rand() < 0.5 * this.density)
-            this.particles.puff(x, y + drop.height + 0.5, z, 1, {
-              speed: 0.6,
-              up: -3,
-              life: 1.2,
-              size: [0.3, 0.12],
-              color: [1, 0.8, 0.45],
-              alpha: 1,
-              pool: 'glow',
-              radius: R.anvil * 0.6,
-            });
-          this.anvil.visible = true;
-          anvilShown = true;
+          // How many stand under it (its runes say whether that is a full share).
+          let under = 0;
+          for (const pid of this.playerIds) {
+            const p = world.entities.get(pid);
+            if (!p || p.dead) continue;
+            const pAt = fxAnchor(p);
+            if (Math.hypot(pAt.x - x, pAt.z - z) <= r) under++;
+          }
+          this.anvilFx.hang(id, x, y, z, fill, under, r);
           break;
         }
         case 'windWarn':
@@ -982,7 +931,6 @@ export class FinalKitFx {
       ob.core.visible = false;
       ob.ring.visible = false;
     }
-    if (!anvilShown) this.anvil.visible = false;
     this.galeBlowing = blowing;
     this.paintWind(wind);
   }
@@ -1233,7 +1181,7 @@ export class FinalKitFx {
     }
     for (const m of [...this.ice, ...this.shells]) m.visible = false;
     this.shock.visible = false;
-    this.anvil.visible = false;
+    this.anvilFx.hide();
     this.rim.visible = false;
     this.spikes.visible = false;
     this.unboundRing.visible = false;
@@ -1246,6 +1194,7 @@ export class FinalKitFx {
     this.audio.dispose();
     this.root.removeFromParent();
     this.particles.dispose();
+    this.anvilFx.dispose();
     this.kit.dispose();
     this.arcsMesh.dispose();
     this.spikes.dispose();

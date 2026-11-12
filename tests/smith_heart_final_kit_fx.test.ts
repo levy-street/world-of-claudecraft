@@ -17,8 +17,8 @@ import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { TELEGRAPH_THREAT_COLORS } from '../src/render/floor_telegraph';
 import { FinalKitFx } from '../src/render/smith_heart_fx';
+import { anvilHang } from '../src/render/smith_heart_fx/final_anvil_core';
 import {
-  anvilDrop,
   FINAL_FOOTPRINTS,
   FINAL_FX_PARTICLE_RUNGS,
   FINAL_KIT_COLORS,
@@ -123,11 +123,11 @@ describe("the final kits' plan", () => {
   });
 
   it('hangs the anvil high through its bar and lands it at the end; the root rises and sinks', () => {
-    expect(anvilDrop(0).height).toBeGreaterThan(20);
-    expect(anvilDrop(0.7).height).toBeGreaterThan(20);
-    expect(anvilDrop(1).height).toBeLessThan(0.5);
+    expect(anvilHang(0).height).toBeGreaterThan(15);
+    expect(anvilHang(0.7).height).toBeGreaterThan(15);
+    expect(anvilHang(1).height).toBeLessThan(0.5);
     for (let f = 0.8; f < 1; f += 0.02)
-      expect(anvilDrop(f + 0.02).height).toBeLessThanOrEqual(anvilDrop(f).height + 1e-9);
+      expect(anvilHang(f + 0.02).height).toBeLessThanOrEqual(anvilHang(f).height + 1e-9);
     expect(rootRise(T.rootSeconds)).toBe(0);
     expect(rootRise(T.rootSeconds / 2)).toBeCloseTo(1, 5);
     expect(rootRise(0)).toBe(0);

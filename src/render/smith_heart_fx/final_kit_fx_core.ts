@@ -6,9 +6,9 @@
 //   - which of the fight's objects a template is (`finalObjectKind`);
 //   - each footprint's look on the shared floor telegraph (`FINAL_FOOTPRINTS`:
 //     its threat colour and its element accent, on every tier);
-//   - the timed footprints' fill (`timedFill`) and the anvil's fall and the
-//     whirls', orbs' and roots' motion (`anvilDrop`, `whirlSpin`, `orbBob`,
-//     `rootRise`);
+//   - the timed footprints' fill (`timedFill`) and the whirls', orbs' and
+//     roots' motion (`whirlSpin`, `orbBob`, `rootRise`; the anvil's whole
+//     look is final_anvil_core.ts's);
 //   - the vein palette, the cues the painter claims (no generic burst doubles
 //     them), the floor rungs (`FINAL_KIT_FLOOR`: never tied with FinalFx's
 //     particles or HeatFx's fist and lanes, which share the Anvil), the pools,
@@ -145,19 +145,6 @@ export const FINAL_REACH = {
 /** A timed footprint's fill `age` seconds into a `seconds` warning. */
 export function timedFill(age: number, seconds: number): number {
   return seconds > 0 ? clamp01(age / seconds) : 1;
-}
-
-/** Weight of the Anvil's fall over its bar: how high the great anvil hangs
- *  over its mark (yards; it drops the last fifth) and how hot its underside
- *  glows. */
-export function anvilDrop(fill: number): { height: number; glow: number } {
-  const f = clamp01(fill);
-  const high = 26;
-  const fall = f < 0.8 ? 0 : ((f - 0.8) / 0.2) ** 2;
-  return {
-    height: high * (1 - fall) + 3 * (1 - smooth(f / 0.8)) * (1 - fall),
-    glow: 0.3 + 0.7 * f,
-  };
 }
 
 /** A Fire Whirl's turn (radians) and its height at render time `t`, its
