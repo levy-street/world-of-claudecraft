@@ -2380,18 +2380,24 @@ IP-checked in `docs/design/naming-audit.md`). Cosmetic only, like every deed rew
 
 | Deed | Rule (any difficulty) | Pays |
 |---|---|---|
-| Charge Through the Curse | Every Mountain's Rush that lands shatters the cursed pillar (at least one) | Seamcaller (the maul) |
-| Keep Your Feet | No raider falls into the void during the fight, and the storm broke | Squallcrest |
-| No One Left in the Cold | No raider Encased in Rime (a full bar, a splash chain or an unhealed Living Rime), and the second half began | the Rimelight Staff |
+| Charge Through the Curse | Every Mountain's Rush that lands shatters the cursed pillar (at least one), no Rush strikes anyone on its way (the marked player too), and the two members fall within 15 s of each other (the fight's clock, `COUNCIL_FEAT_FALL_WINDOW`) | Seamcaller (the maul) |
+| Keep Your Feet | No raider falls into the void during the fight, every Gale Bulwark is broken by the raid (one that bursts by itself fails it), and the storm broke | Squallcrest |
+| No One Left in the Cold | No raider Encased in Rime (a full bar, a splash chain or an unhealed Living Rime), no ice blade's slash strikes anyone (Mythic's flurry too), and the second half began | the Rimelight Staff |
 | Turn Back the Cinders | No Rolling Cinder reaches its quarry, and at least one was called | Hearthbrand |
-| Kept From the Brim | No Overload bar bursts, and both intermissions were fought | the Heartmeld Staff |
+| Kept From the Brim | No Overload bar bursts, no raider dies at any point in the fight, and both intermissions were fought | the Heartmeld Staff |
 | Heir to the Smith (meta) | All five above | the Quarryheart Charger (soulbound reins) |
 | The Heart Stills | The Masterless Strength defeated | nothing (the clear record) |
 
 - **Detection** (`encounters/smith_heart/feats.ts`; the watch `feat_attempt.ts` rides each
   fight state, born with the pull and gone with a wipe): judged at each coordinator's
   `finish*`, granted to every player in the claim (the encounter-task roster). Every rule needs
-  its proving mechanic to have happened, so a dev kill earns nothing. No rng.
+  its proving mechanic to have happened, so a dev kill earns nothing. No rng. The harder
+  conditions of 2026-11-12 (the owner's approval) mark the same watch: a Rush's strike
+  (`council_rush.ts` `stepRush`), the falls' gap (`council.ts` `noteFallen` records
+  `firstFallAt`, `finishCouncil` compares), a Bulwark's own burst (`breath_isles.ts`
+  `burstBulwark`), a blade's strike (`quench_slash.ts` `flyLine`), and the final's deaths
+  (`feat_attempt.ts` `watchFeatDeaths`: only a raider seen alive in the fight and then dead,
+  never a ghost walking back in).
 - **Rewards** (`src/sim/smith_heart_feat_rewards.ts`, from `grantDeed`): the appearance is
   account-wide (offline the Sim's mirror; online `AccountCosmeticsService.grantDeedRewardSkins`
   on every `deedUnlocked` and at every join over the earned deeds, into

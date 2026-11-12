@@ -5,16 +5,30 @@
 
 import { describe, expect, it } from 'vitest';
 import { DEEDS } from '../src/sim/content/deeds';
-import { CORNICE_GAPS, HAMMER_PIT } from '../src/sim/content/smith_heart_layout';
+import {
+  CORNICE_GAPS,
+  HAMMER_PIT,
+  QUENCH_BLADE_SPOTS,
+} from '../src/sim/content/smith_heart_layout';
 import {
   SMITH_HEART_FEAT_DEEDS,
   SMITH_HEART_FEAT_ORDER,
   SMITH_HEART_META_DEED,
 } from '../src/sim/content/smith_heart_rewards';
 import { COUNCIL_CASTS, COUNCIL_TUNING as T } from '../src/sim/encounters/smith_heart';
+import { ISLE_AURAS, ISLE_TUNING as IT } from '../src/sim/encounters/smith_heart/breath_isle_ids';
 import { raisePillar } from '../src/sim/encounters/smith_heart/council_pillars';
 import type { CouncilFightState } from '../src/sim/encounters/smith_heart/council_state';
+import {
+  COUNCIL_FEAT_FALL_WINDOW,
+  watchFeatDeaths,
+} from '../src/sim/encounters/smith_heart/feat_attempt';
 import { smithHeartFeatMet } from '../src/sim/encounters/smith_heart/feats';
+import { segmentDistance } from '../src/sim/encounters/smith_heart/quench_geometry';
+import {
+  QUENCH_TUNING as QT,
+  QUENCH_DIFFICULTY,
+} from '../src/sim/encounters/smith_heart/quench_ids';
 import type { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { breathFight } from './helpers/breath_fight';
@@ -66,8 +80,9 @@ function plant(f: CouncilFight, e: Entity, x: number, z: number): void {
 }
 
 /** One Rush with no columns standing: `aimAtCurse` puts the marked player just past the
- *  cursed pillar (it shatters), else on the far side of the middle (a miss). */
-function runOneRush(f: Fight, aimAtCurse: boolean): void {
+ *  cursed pillar (it shatters), else on the far side of the middle (a miss); `'through'`
+ *  stands them on the lane short of the cursed pillar (it shatters, but runs them down). */
+function runOneRush(f: Fight, aimAtCurse: boolean | 'through'): void {
   const b = f.bodies();
   const g = b.guardian as Entity;
   const singer = b.singer as Entity;
@@ -87,7 +102,7 @@ function runOneRush(f: Fight, aimAtCurse: boolean): void {
   const from = { x: HAMMER_PIT.x, z: HAMMER_PIT.z };
   const d = Math.hypot(at.x - from.x, at.z - from.z);
   const dir = { x: (at.x - from.x) / d, z: (at.z - from.z) / d };
-  const k = aimAtCurse ? d + T.cursedR + 4 : -14;
+  const k = aimAtCurse === 'through' ? d / 2 : aimAtCurse ? d + T.cursedR + 4 : -14;
   f.put(target, from.x + dir.x * k, from.z + dir.z * k);
   f.tick(sec(T.rushCast + T.rushWindup + 2));
 }
@@ -160,6 +175,63 @@ describe("the Hammer Council's feat: Charge Through the Curse", () => {
     f.tick(sec(T.rushCast + T.rushWindup + 2));
     expect(f.pillars().some((p) => p.cursed)).toBe(true);
     expect(f.st.feat?.broken).toBe(true);
+  });
+
+  it('a Rush that shatters the cursed pillar but runs down the marked player breaks it', () => {
+    const f = councilPulled(4);
+    runOneRush(f, 'through');
+    // The pillar still broke: the only fault is the body on the lane.
+    expect(f.st.feat?.count).toBe(1);
+    expect(f.st.feat?.broken).toBe(true);
+    const b = f.bodies();
+    fell(f.sim, b.guardian as Entity, f.players[0]);
+    fell(f.sim, b.singer as Entity, f.players[0]);
+    f.tick(3);
+    expect(earned(f.sim, f.pids, SMITH_HEART_FEAT_DEEDS.hammer_council)).toEqual([
+      false,
+      false,
+      false,
+      false,
+    ]);
+  });
+
+  /** One clean Rush, the Guardian down, `gap` seconds of the Singer alone, then her fall. */
+  function fallApart(gap: number): Fight {
+    const f = councilPulled(4);
+    runOneRush(f, true);
+    expect(f.st.feat?.broken).toBe(false);
+    const b = f.bodies();
+    fell(f.sim, b.guardian as Entity, f.players[0]);
+    f.tick(1);
+    expect(f.st.firstFallAt).toBeDefined();
+    f.tick(sec(gap) - 1);
+    expect(f.state()?.finished).toBe(false);
+    fell(f.sim, b.singer as Entity, f.players[0]);
+    f.tick(3);
+    expect(f.state()?.finished).toBe(true);
+    return f;
+  }
+
+  it('the two falling within the window of each other keep it', () => {
+    const f = fallApart(COUNCIL_FEAT_FALL_WINDOW - 3);
+    expect(f.st.feat?.broken).toBe(false);
+    expect(earned(f.sim, f.pids, SMITH_HEART_FEAT_DEEDS.hammer_council)).toEqual([
+      true,
+      true,
+      true,
+      true,
+    ]);
+  });
+
+  it('the second falling more than the window after the first breaks it', () => {
+    const f = fallApart(COUNCIL_FEAT_FALL_WINDOW + 2);
+    expect(f.st.feat?.broken).toBe(true);
+    expect(earned(f.sim, f.pids, SMITH_HEART_FEAT_DEEDS.hammer_council)).toEqual([
+      false,
+      false,
+      false,
+      false,
+    ]);
   });
 
   it('a kill with no Rush landed proves nothing (a dev kill earns no feat)', () => {
@@ -258,6 +330,49 @@ describe("the Breath's feat: Keep Your Feet", () => {
     expect(f.state()?.feat?.broken ?? false).toBe(false);
   });
 
+  /** The wind stilled (no gust or inhale through the long round), the Bulwark raised. */
+  function bulwarkUp() {
+    const f = pulled();
+    f.dev('/dev heart breath calm');
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    st.wind.remaining = 9999;
+    st.inhaleTimer = 9999;
+    st.circleTimer = 9999;
+    expect(f.dev('/dev heart breath isles')).toBe(true);
+    expect(f.boss().auras.some((a) => a.id === ISLE_AURAS.bulwark)).toBe(true);
+    return f;
+  }
+
+  it('a Gale Bulwark the raid breaks keeps it', () => {
+    const f = bulwarkUp();
+    expect(f.dev('/dev heart breath bulwark')).toBe(true);
+    f.tick(2);
+    expect(f.state()?.isles.round).toBeNull();
+    expect(f.state()?.feat?.broken ?? false).toBe(false);
+    f.dev('/dev heart breath storm');
+    f.tick(2);
+    fell(f.sim, f.boss(), f.players[0]);
+    f.tick(3);
+    expect(earned(f.sim, f.pids, SMITH_HEART_FEAT_DEEDS.breath)).toEqual([true, true, true]);
+  });
+
+  it('a Gale Bulwark left to burst by itself breaks it', () => {
+    const f = bulwarkUp();
+    f.tick(sec(IT.bulwarkMax - 1));
+    // Held, not yet burst: nothing broken so far.
+    expect(f.state()?.isles.round).not.toBeNull();
+    expect(f.state()?.feat?.broken ?? false).toBe(false);
+    f.tick(sec(2));
+    expect(f.state()?.isles.round).toBeNull();
+    expect(f.state()?.feat?.broken).toBe(true);
+    f.dev('/dev heart breath storm');
+    f.tick(2);
+    fell(f.sim, f.boss(), f.players[0]);
+    f.tick(3);
+    expect(earned(f.sim, f.pids, SMITH_HEART_FEAT_DEEDS.breath)).toEqual([false, false, false]);
+  });
+
   it('a kill before the storm broke proves nothing', () => {
     const f = pulled();
     fell(f.sim, f.boss(), f.players[0]);
@@ -292,6 +407,67 @@ describe("the Quench's feat: No One Left in the Cold", () => {
   it('a kill in the first half proves nothing', () => {
     const f = pulled();
     expect(f.state()?.half).toBe('lake');
+    fell(f.sim, f.boss(), f.players[0]);
+    f.tick(3);
+    expect(earned(f.sim, f.pids, SMITH_HEART_FEAT_DEEDS.quench)).toEqual([false, false, false]);
+  });
+
+  /** Two blades awake, the raid spread apart on the lake, one slash round marked. */
+  function slashing() {
+    const f = pulled();
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    f.tick(sec(QT.rimRise + QT.wakeCast) + 2);
+    st.slashTimer = 999;
+    const mid = QUENCH_BLADE_SPOTS.reduce((a, s) => ({ x: a.x + s.x / 4, z: a.z + s.z / 4 }), {
+      x: 0,
+      z: 0,
+    });
+    f.players.forEach((p, i) => {
+      const a = (i / f.players.length) * Math.PI * 2;
+      f.put(p, mid.x + Math.sin(a) * 14, mid.z + Math.cos(a) * 14);
+    });
+    expect(f.dev('/dev heart quench slash')).toBe(true);
+    const slash = f.state()?.slash;
+    if (!slash) throw new Error('no round');
+    return { f, slash };
+  }
+
+  it('a slash round that strikes nobody keeps it', () => {
+    const { f } = slashing();
+    // Every raider steps off a line that would take them, until the round is done.
+    for (let k = 0; k < sec(40) && f.state()?.slash; k++) {
+      const s = f.state()?.slash;
+      if (s && s.laneId >= 0) {
+        const to = {
+          x: s.from.x + Math.sin(s.facing) * s.length,
+          z: s.from.z + Math.cos(s.facing) * s.length,
+        };
+        const side = s.facing + Math.PI / 2;
+        for (const p of f.players) {
+          const here = f.local(p);
+          if (segmentDistance(s.from, to, here) > QT.laneHalf + 1) continue;
+          f.put(
+            p,
+            here.x + Math.sin(side) * (QT.laneHalf + 4),
+            here.z + Math.cos(side) * (QT.laneHalf + 4),
+          );
+        }
+      }
+      f.tick(1);
+    }
+    expect(f.state()?.slash ?? null).toBeNull();
+    expect(f.state()?.feat?.broken ?? false).toBe(false);
+  });
+
+  it('one raider struck by an ice blade breaks it', () => {
+    const { f } = slashing();
+    expect(f.state()?.feat?.broken ?? false).toBe(false);
+    // The first mark stays on the line: the blade strikes them.
+    f.tick(sec(QUENCH_DIFFICULTY.normal.slashAim + QT.slashFly) + 2);
+    expect(f.state()?.feat?.broken).toBe(true);
+    f.dev('/dev heart quench phase2');
+    f.tick(2);
     fell(f.sim, f.boss(), f.players[0]);
     f.tick(3);
     expect(earned(f.sim, f.pids, SMITH_HEART_FEAT_DEEDS.quench)).toEqual([false, false, false]);
@@ -394,6 +570,22 @@ describe("the Masterless Strength's feat: Kept From the Brim", () => {
     expect(earned(f.sim, f.pids, SMITH_HEART_FEAT_DEEDS.masterless)).toEqual([true, true, true]);
   });
 
+  it('a raider who dies in the fight breaks it', () => {
+    const f = pulled();
+    const lost = f.players[2];
+    f.sim.ctx.dealDamage(null, lost, lost.hp + 1e6, false, 'physical', 'Test', 'hit', true);
+    expect(lost.dead).toBe(true);
+    f.tick(1);
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    expect(st.feat?.broken).toBe(true);
+    st.phase.intermissions = 2;
+    expect(st.bursts).toBe(0);
+    fell(f.sim, f.boss(), f.players[0]);
+    f.tick(3);
+    expect(earned(f.sim, f.pids, SMITH_HEART_FEAT_DEEDS.masterless)).toEqual([false, false, false]);
+  });
+
   it('one Overload Burst breaks it', () => {
     const f = pulled();
     f.dev('/dev heart final burst');
@@ -436,6 +628,38 @@ describe('the feat rules and the meta', () => {
         st: { feat: broken } as unknown as CouncilFightState,
       }),
     ).toBe(false);
+  });
+
+  it("the deeds' text states every condition the rules judge", () => {
+    const desc = (e: keyof typeof SMITH_HEART_FEAT_DEEDS) => DEEDS[SMITH_HEART_FEAT_DEEDS[e]].desc;
+    expect(desc('hammer_council')).toContain(`within ${COUNCIL_FEAT_FALL_WINDOW} seconds`);
+    expect(desc('hammer_council')).toContain('striking no raider');
+    expect(desc('breath')).toContain('every Gale Bulwark broken by the raid');
+    expect(desc('quench')).toContain('without any ice blade striking a raider');
+    expect(desc('masterless')).toContain('without any raider dying');
+  });
+
+  it('the death watch: only a raider seen alive in the fight and then dead breaks it', () => {
+    const st: Parameters<typeof watchFeatDeaths>[0] = { finished: false };
+    // A body already dead when first seen (a ghost walking back in) is no death of the fight.
+    watchFeatDeaths(st, [
+      { id: 1, dead: false },
+      { id: 2, dead: true },
+    ]);
+    watchFeatDeaths(st, [
+      { id: 1, dead: false },
+      { id: 2, dead: true },
+    ]);
+    expect(st.feat?.broken).toBe(false);
+    watchFeatDeaths(st, [
+      { id: 1, dead: true },
+      { id: 2, dead: true },
+    ]);
+    expect(st.feat?.broken).toBe(true);
+    // A fight already over is never touched.
+    const done: Parameters<typeof watchFeatDeaths>[0] = { finished: true };
+    watchFeatDeaths(done, [{ id: 1, dead: true }]);
+    expect(done.feat).toBeUndefined();
   });
 
   it('the meta asks exactly the five feats and grants itself once all five are earned', () => {

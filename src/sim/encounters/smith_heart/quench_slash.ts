@@ -14,6 +14,7 @@
 // round's count).
 
 import { DT, type Entity } from '../../types';
+import { breakFeat } from './feat_attempt';
 import { setBladeObject, syncQuenchWalls } from './quench_blades';
 import { addCold } from './quench_cold';
 import { type QPoint, segmentDistance, slashLine } from './quench_geometry';
@@ -237,6 +238,8 @@ export function flyLine(s: QuenchScope, line: QuenchLine): void {
     if (line.struck.includes(p.id)) continue;
     if (segmentDistance(a, b, at(s, p)) > T.laneHalf) continue;
     line.struck.push(p.id);
+    // The feat asks no blade strike anyone (the Mythic flurry's lines too).
+    breakFeat(s.st);
     frostHit(s, p, roll(s, T.crossMin, T.crossMax), QUENCH_NAMES.cross);
     if (!s.st.flurry) addCold(s, p, T.crossCold);
   }

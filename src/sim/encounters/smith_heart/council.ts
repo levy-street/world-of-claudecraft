@@ -130,7 +130,7 @@ import {
   startWrath,
   syncEnergyBars,
 } from './council_wrath';
-import { breakFeat, countFeat } from './feat_attempt';
+import { breakFeat, COUNCIL_FEAT_FALL_WINDOW, countFeat } from './feat_attempt';
 import { settleSmithHeartFeat } from './feats';
 import { applyTierHealth, restoreTierHealth, tierPoolMult } from './tier_health';
 import { freshSlainWatch } from './voice_slain';
@@ -293,6 +293,7 @@ function syncMemory(s: CouncilScope): void {
 /** A member fell this tick: the light flows from it into each survivor. */
 function noteFallen(s: CouncilScope, role: CouncilRole, dead: Entity): void {
   s.st.fallen.push(role);
+  s.st.firstFallAt ??= s.st.clock;
   // Its own bars and the marks it alone was running go with it.
   delete s.st.bars[role];
   if (s.st.kickable !== null && role === 'singer') s.st.kickable = null;
@@ -507,6 +508,9 @@ function finishCouncil(
   bodies: CouncilBodies,
   st: CouncilFightState,
 ): void {
+  // The feat asks both to fall together: the last within the window of the first.
+  if (st.firstFallAt !== undefined && st.clock - st.firstFallAt > COUNCIL_FEAT_FALL_WINDOW + 1e-9)
+    breakFeat(st);
   st.finished = true;
   settleSmithHeartFeat(ctx, inst, { encounter: 'hammer_council', st });
   const s = scopeOf(ctx, inst, st, bodies);
@@ -544,6 +548,7 @@ function beginCouncil(
   }
   // A member already down when the pull began (a dev kill) has fallen.
   for (const r of COUNCIL_ROLES) if (bodies[r] && !living(bodies[r])) st.fallen.push(r);
+  if (st.fallen.length > 0) st.firstFallAt = 0;
   // Straight after the entrance a pull line it has just said would repeat.
   for (const r of COUNCIL_ROLES)
     if (councilIntroJustSpoke(ctx, bodies, r)) st.said[`${r}_pull`] = 0;
@@ -591,7 +596,8 @@ export function tickHammerCouncil(ctx: SimContext, inst: InstanceSlot): void {
   stepCouncilVoice(s);
   watchCouncilSlain(s);
   stepBars(s);
-  // The feat watch: a landed Rush either shatters the cursed pillar or breaks the feat.
+  // The feat watch: a landed Rush either shatters the cursed pillar or breaks the feat
+  // (a Rush that strikes anyone on its way breaks it too, council_rush.ts).
   const rush = stepRush(s);
   if (rush === 'cursed') countFeat(st);
   else if (rush) breakFeat(st);

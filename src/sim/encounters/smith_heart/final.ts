@@ -40,6 +40,7 @@ import type { SimContext } from '../../sim_context';
 import { clearThreat } from '../../threat';
 import { DT, type Entity } from '../../types';
 import { claimBoss, clearCastIf } from '../sunken_bastion/claim';
+import { watchFeatDeaths } from './feat_attempt';
 import { settleSmithHeartFeat } from './feats';
 import { clearAdds, stepAdds, stepCoals, stepRings } from './final_adds';
 import {
@@ -405,6 +406,8 @@ function resetFinal(ctx: SimContext, inst: InstanceSlot, boss: Entity): void {
 }
 
 function finishFinal(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: FinalFightState): void {
+  // A raider who fell on the boss's last tick still counts against the feat.
+  watchFeatDeaths(st, heartListeners(ctx, inst));
   st.finished = true;
   settleSmithHeartFeat(ctx, inst, { encounter: 'masterless', st });
   finalSay(scopeOf(ctx, inst, st, boss), 'death');
@@ -487,6 +490,8 @@ export function tickFinalBoss(ctx: SimContext, inst: InstanceSlot): void {
   showPhase(s);
   showHidden(s);
   stepFinalVoice(s);
+  // The feat watch: any raider's death in the fight breaks it.
+  watchFeatDeaths(st, heartListeners(ctx, inst));
 }
 
 /** One tick of a stage that is not the quarter fight: the stride into the

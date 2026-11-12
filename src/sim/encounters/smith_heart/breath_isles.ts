@@ -75,6 +75,7 @@ import {
 } from './breath_scope';
 import type { BreathFightState, BreathIsleAdd, BreathRide } from './breath_state';
 import { breathSay } from './breath_voice';
+import { breakFeat } from './feat_attempt';
 import { applyDevAddPool } from './tier_health';
 
 // ---- who stands where -----------------------------------------------------------------------
@@ -338,6 +339,8 @@ function stepMenders(s: BreathScope, shield: { value: number }): void {
 /** Held too long: the Bulwark bursts over the Cornice, the round ends. */
 function burstBulwark(s: BreathScope): void {
   const b = s.boss;
+  // The feat asks every Bulwark broken by the raid, never one that bursts by itself.
+  breakFeat(s.st);
   s.ctx.emit({
     type: 'spellfx',
     sourceId: b.id,

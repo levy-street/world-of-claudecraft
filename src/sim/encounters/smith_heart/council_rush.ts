@@ -66,6 +66,7 @@ import {
 } from './council_scope';
 import type { CouncilRush } from './council_state';
 import { councilSay } from './council_voice';
+import { breakFeat } from './feat_attempt';
 
 /** Is the Rush due now (its clock run out, the Guardian standing, no dash
  *  in flight)? */
@@ -305,6 +306,8 @@ export function stepRush(s: CouncilScope): RushOutcome | null {
     if (p.dead || r.struck.includes(p.id)) continue;
     if (segmentDistance(p.pos, a, b) > T.rushHalfWidth + T.rushBody) continue;
     r.struck.push(p.id);
+    // The feat asks a Rush that strikes nobody, the marked player too.
+    breakFeat(s.st);
     const amount = roll(s, g, T.rushMin, T.rushMax);
     s.ctx.dealDamage(g, p, amount, false, 'physical', COUNCIL_NAMES.rush, 'hit', true);
     if (!p.dead) s.ctx.applyKnockback(g, p, T.rushKnockback);

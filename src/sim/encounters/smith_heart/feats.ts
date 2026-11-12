@@ -10,15 +10,24 @@
 // difficulty counts. Draws no rng.
 //
 //   The Hammer Council   every Mountain's Rush that lands shatters the cursed pillar
-//                        (council.ts marks each landing), at least one.
+//                        (council.ts marks each landing), at least one; no Rush strikes
+//                        anyone on its way, the marked player too (council_rush.ts
+//                        stepRush); and the two members fall within
+//                        COUNCIL_FEAT_FALL_WINDOW seconds of each other (council.ts
+//                        finishCouncil, on the fight's clock).
 //   The Breath           no raider falls into the void in the fight (breath.ts, from the
-//                        void's own deaths), and the storm broke (the second half).
+//                        void's own deaths), no Gale Bulwark bursts by itself (every one
+//                        broken by the raid, breath_isles.ts burstBulwark), and the storm
+//                        broke (the second half).
 //   The Quench           no raider Encased in Rime (quench_cold.ts freezePlayer, every
-//                        freeze's one door), and the second half began.
+//                        freeze's one door), no ice blade's slash strikes anyone
+//                        (quench_slash.ts flyLine, the Mythic flurry's too), and the
+//                        second half began.
 //   The Heat             no Rolling Cinder reaches its quarry (heat_cinders.ts), and at
 //                        least one was called.
-//   The Masterless       no Overload bar burst (the fight's own `bursts`), and both
-//   Strength             intermissions were fought.
+//   The Masterless       no Overload bar burst (the fight's own `bursts`), no raider dies
+//   Strength             in the fight (final.ts, feat_attempt.ts watchFeatDeaths), and
+//                        both intermissions were fought.
 
 import { SMITH_HEART_FEAT_DEEDS } from '../../content/smith_heart_rewards';
 import type { SmithsHeartEncounter } from '../../content/weapon_skins';
@@ -56,7 +65,7 @@ export function smithHeartFeatMet(fight: SmithHeartFeatFight): boolean {
     case 'heat':
       return clean(fight.st.feat) && fight.st.cindersCalled >= 1;
     case 'masterless':
-      return fight.st.bursts === 0 && fight.st.phase.intermissions >= 2;
+      return clean(fight.st.feat) && fight.st.bursts === 0 && fight.st.phase.intermissions >= 2;
   }
 }
 

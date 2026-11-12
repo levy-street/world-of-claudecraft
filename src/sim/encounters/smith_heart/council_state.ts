@@ -91,6 +91,9 @@ export interface CouncilFightState {
   finished: boolean;
   /** This pull's watch on the encounter's feat (feat_attempt.ts), created on first touch. */
   feat?: SmithHeartFeatAttempt;
+  /** The fight's clock when its first member fell (the feat asks the second within
+   *  COUNCIL_FEAT_FALL_WINDOW of it), unset while both stand. */
+  firstFallAt?: number;
   /** Seconds since the pull. */
   clock: number;
   /** The Wrath holder's energy, 0 to 100. */

@@ -4151,7 +4151,7 @@ export const DEEDS: Record<string, DeedDef> = {
   [SMITH_HEART_FEAT_DEEDS.hammer_council]: {
     id: SMITH_HEART_FEAT_DEEDS.hammer_council,
     name: 'Charge Through the Curse',
-    desc: "Defeat the Hammer Council with every Mountain's Rush shattering the cursed pillar. A Rush that stops at another pillar, or meets none, fails it.",
+    desc: "Defeat the Hammer Council with every Mountain's Rush shattering the cursed pillar and striking no raider on its way, the marked one included, and with the Guardian of the Hammer and the Seam Singer falling within 15 seconds of each other. A Rush that stops at another pillar, or meets none, fails it.",
     category: 'dungeon',
     renown: 25,
     trigger: { kind: 'manual' },
@@ -4160,7 +4160,7 @@ export const DEEDS: Record<string, DeedDef> = {
   [SMITH_HEART_FEAT_DEEDS.breath]: {
     id: SMITH_HEART_FEAT_DEEDS.breath,
     name: 'Keep Your Feet',
-    desc: 'Defeat the Guardian of the Breath without any raider falling from the Storm Cornice or an Island of the Wind during the fight.',
+    desc: 'Defeat the Guardian of the Breath without any raider falling from the Storm Cornice or an Island of the Wind during the fight, and with every Gale Bulwark broken by the raid before it bursts on its own.',
     category: 'dungeon',
     renown: 25,
     trigger: { kind: 'manual' },
@@ -4169,7 +4169,7 @@ export const DEEDS: Record<string, DeedDef> = {
   [SMITH_HEART_FEAT_DEEDS.quench]: {
     id: SMITH_HEART_FEAT_DEEDS.quench,
     name: 'No One Left in the Cold',
-    desc: 'Defeat the Guardian of the Quench without any raider being Encased in Rime, whether by a full cold bar, a shatter or an unhealed Living Rime.',
+    desc: 'Defeat the Guardian of the Quench without any raider being Encased in Rime, whether by a full cold bar, a shatter or an unhealed Living Rime, and without any ice blade striking a raider.',
     category: 'dungeon',
     renown: 25,
     trigger: { kind: 'manual' },
@@ -4187,7 +4187,7 @@ export const DEEDS: Record<string, DeedDef> = {
   [SMITH_HEART_FEAT_DEEDS.masterless]: {
     id: SMITH_HEART_FEAT_DEEDS.masterless,
     name: 'Kept From the Brim',
-    desc: 'Defeat the Masterless Strength without any of its four Overload bars bursting.',
+    desc: 'Defeat the Masterless Strength without any of its four Overload bars bursting and without any raider dying during the fight.',
     category: 'dungeon',
     renown: 25,
     trigger: { kind: 'manual' },

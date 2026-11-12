@@ -5,6 +5,7 @@
 
 import type { SmithHeartVein } from '../../content/smith_heart_layout';
 import type { HeartQuarterZone } from '../../content/smith_heart_quarters';
+import type { SmithHeartFeatAttempt } from './feat_attempt';
 import type { FinalDifficulty, FinalPoolKind } from './final_ids';
 import type { FinalStage } from './final_phase_ids';
 import type { FinalVoiceWatch } from './final_voice';
@@ -225,6 +226,9 @@ export interface FinalFightState {
   /** The boss's pool before its tier's (tier_health.ts), given back at a reset. */
   basePool?: number;
   finished: boolean;
+  /** This pull's watch on the encounter's feat (feat_attempt.ts: a raider's death breaks it),
+   *  created on first touch. */
+  feat?: SmithHeartFeatAttempt;
   clock: number;
   /** The zone the boss stands in now. */
   zone: HeartQuarterZone;
