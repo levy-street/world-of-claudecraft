@@ -1465,6 +1465,56 @@ describe('ActionBarController per-spec action bar memory and talent choice swaps
     controller.syncSpec();
     expect(controller.attackAction).toEqual({ type: 'ability', id: 'frostbolt' });
   });
+
+  it('swaps the attack slot per spec when a saved build switches the spec', () => {
+    // A build switch reaches the controller through applyLoadout BEFORE the
+    // per-frame syncSpec sees the new spec, so applyLoadout itself moves the
+    // active spec. It must swap bar 1 button 1 with it: the outgoing spec's
+    // spell stays under its own key and the incoming spec's own spell loads.
+    const storage = new MemoryStorage();
+    const { controller, state } = makeHarness('mage', ['fireball', 'frostbolt'], bar(), storage);
+    const fireKey = 'woc_hotbar_mage_ActionbarTester_fire:s0';
+    const frostKey = 'woc_hotbar_mage_ActionbarTester_frost:s0';
+    state.showAttackButton = false;
+    state.spec = 'fire';
+    controller.init();
+    controller.replaceAttackAction({ type: 'ability', id: 'fireball' });
+    controller.saveAttackAction();
+
+    const switchBuild = (spec: string): void => {
+      state.spec = spec;
+      controller.applyLoadout([], { spec, rows: {} });
+      controller.saveActions();
+      expect(controller.syncSpec()).toBe(false);
+    };
+
+    switchBuild('frost');
+    expect(controller.actionForSlot(0)).toBeNull();
+    controller.replaceAttackAction({ type: 'ability', id: 'frostbolt' });
+    controller.saveAttackAction();
+    expect(storage.getItem(fireKey)).toBe(JSON.stringify({ type: 'ability', id: 'fireball' }));
+
+    switchBuild('fire');
+    expect(controller.actionForSlot(0)).toEqual({ type: 'ability', id: 'fireball' });
+    // An edit after the switch lands under the active spec only.
+    controller.saveAttackAction();
+    expect(storage.getItem(frostKey)).toBe(JSON.stringify({ type: 'ability', id: 'frostbolt' }));
+
+    switchBuild('frost');
+    expect(controller.actionForSlot(0)).toEqual({ type: 'ability', id: 'frostbolt' });
+  });
+
+  it('keeps an unsaved attack slot when a build applies without changing spec', () => {
+    const { controller, state } = makeHarness('mage', ['fireball'], bar());
+    state.showAttackButton = false;
+    state.spec = 'fire';
+    controller.init();
+    controller.replaceAttackAction({ type: 'ability', id: 'fireball' });
+
+    controller.applyLoadout([], { spec: 'fire', rows: {} });
+
+    expect(controller.actionForSlot(0)).toEqual({ type: 'ability', id: 'fireball' });
+  });
 });
 
 describe('isHotbarItemId: usable trinkets are placeable', () => {

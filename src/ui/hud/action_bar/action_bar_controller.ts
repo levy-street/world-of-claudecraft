@@ -327,7 +327,18 @@ export class ActionBarController {
     grantedAbilityIds: ReadonlySet<string> = new Set(),
   ): void {
     if (this.isSpectating()) return;
-    this.activeSpecState = this.deps.talentSpec();
+    const nextSpec = this.deps.talentSpec();
+    if (nextSpec !== this.activeSpecState) {
+      // A build switch moves the active spec HERE, ahead of the per-frame
+      // syncSpec (which then sees no change). A SavedLoadout never carries the
+      // attack slot (bar 1, button 1), so swap it the way syncSpec does: park
+      // the outgoing spec's under its own key and load the incoming spec's.
+      // Skipping this left the old spec's spell in memory under the new spec,
+      // and the next save wrote it over the new spec's own.
+      this.writeAttackAction();
+      this.activeSpecState = nextSpec;
+      this.loadAttackAction();
+    }
     this.actionState = sanitizeHotbarActions(actions, (id) => this.isAbilityPlacementAllowed(id));
     this.unsavedChanges = true;
     this.pendingLoadoutKnownAbilityIds = new Set(targetKnownAbilityIds);
