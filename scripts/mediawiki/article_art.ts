@@ -56,6 +56,16 @@ export function itemArtPath(id: string): string {
     : '';
 }
 
+/** The packaged portrait for a creature, or '' when it has none. */
+export function mobArtPath(id: string): string {
+  const path = targetPortraitUrl(id, true);
+  return path &&
+    /^\/ui\/[A-Za-z0-9_/-]+\.webp$/.test(path) &&
+    existsSync(join('public', path.slice(1)))
+    ? path
+    : '';
+}
+
 export function articleArt(titleBy: TitleMaps): Map<string, string> {
   const byTitle = new Map<string, string>();
   const files = new Map<string, boolean>();

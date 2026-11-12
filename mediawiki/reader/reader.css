@@ -1394,10 +1394,7 @@ body[data-woc-site] .searchbox #lookup {
   border-bottom: 0;
 }
 #view .wiki-prose table:has(tr:first-child th + th) td:first-child {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: min(300px, 42vw);
+  width: 44%;
   font-weight: 600;
 }
 #view .wiki-prose table:has(tr:first-child th + th) td:nth-child(3) {
@@ -1414,9 +1411,10 @@ body[data-woc-site] .searchbox #lookup {
   font-size: 15px;
 }
 #view .wiki-prose table:has(tr:first-child th + th) .ability-icon {
-  flex: none;
   width: 32px;
   height: 32px;
+  margin-right: 10px;
+  vertical-align: middle;
   border: 1px solid var(--border-soft);
   border-radius: 4px;
 }
@@ -1446,4 +1444,41 @@ body[data-woc-site] .searchbox #lookup {
 }
 .wiki-spoiler > :last-child {
   margin-bottom: 16px;
+}
+
+/* Loot by difficulty: two tabs, one panel shown at a time. */
+.loot-tabs {
+  display: flex;
+  gap: 6px;
+  margin: 18px 0 0;
+  border-bottom: 1px solid var(--border);
+}
+#view .loot-tab {
+  padding: 9px 22px;
+  color: var(--text-dim);
+  background: var(--bg-2);
+  border: 1px solid var(--border-soft);
+  border-bottom: 0;
+  border-radius: 5px 5px 0 0;
+  font: 600 15px / 1.3 var(--font-ui);
+  cursor: pointer;
+}
+#view .loot-tab:hover {
+  color: var(--text);
+}
+#view .loot-tab[aria-selected="true"] {
+  color: var(--gold);
+  background: var(--panel);
+  border-color: var(--border);
+  box-shadow: inset 0 2px 0 var(--gold-dim);
+}
+.loot-panel {
+  padding-top: 6px;
+}
+.loot-panel[hidden] {
+  display: none;
+}
+#view .wiki-prose p.loot-title {
+  margin: 22px 0 4px;
+  font: 600 19px / 1.3 var(--font-ui);
 }

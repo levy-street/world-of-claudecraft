@@ -25,12 +25,12 @@ import type { LootEntry } from '../../src/sim/types';
 import { WORLD_BOSS_CORPSE_SECONDS, WORLD_BOSSES } from '../../src/sim/world_boss';
 import { WORLD_SEED } from '../../src/sim/world_seed';
 import { rankValues } from './ability_ranks';
-import { itemArtPath } from './article_art';
+import { itemArtPath, mobArtPath } from './article_art';
 import { companionBossSources, companionByCreature, companionRollText } from './companion_sources';
 import { creatureRole, FRIENDLY_GROUPS } from './creature_role';
 import { journalArticles } from './encounter_articles';
 import { type ArticleTools, append, lines, pct, ref, words } from './entity_format';
-import { type LootRow, lootTables } from './loot_table';
+import { type DropSource, type LootRow, lootTables } from './loot_table';
 import { mobMechanicLines } from './mob_mechanics';
 import { releasedCampStats } from './released_camp_stats';
 
@@ -79,20 +79,26 @@ function lootRow(
 ): LootRow {
   const item = entry.itemId;
   const notes: string[] = [];
+  const cell = (id: string) => {
+    const art = itemArtPath(id);
+    return (art ? '<woc-art path="' + art + '" size="icon" /> ' : '') + ref(w, 'item', id);
+  };
   let drop = '';
+  let heroicDrop: string | undefined;
   if (item) {
-    const art = itemArtPath(item);
-    drop = (art ? '<woc-art path="' + art + '" size="icon" /> ' : '') + ref(w, 'item', item);
+    drop = cell(item);
     const heroic = heroicLootItemId(
       item,
       upgrades && !entry.questId && !entry.normalOnly && !heroicOnly,
     );
-    if (heroic !== item) notes.push('On Heroic you get ' + ref(w, 'item', heroic));
+    if (heroic !== item) heroicDrop = cell(heroic);
   }
   if (entry.copper) {
-    const coins =
-      capital(coinRange(entry.copper)) +
-      (entry.heroicCopper ? ' (' + coinRange(entry.heroicCopper) + ' on Heroic)' : '');
+    const coins = capital(coinRange(entry.copper));
+    if (entry.heroicCopper) {
+      const more = capital(coinRange(entry.heroicCopper));
+      heroicDrop = heroicDrop ? heroicDrop + ' and ' + more : drop ? drop + ' and ' + more : more;
+    } else if (heroicDrop) heroicDrop += ' and ' + coins;
     drop = drop ? drop + ' and ' + coins : coins;
   }
   if (entry.questId) notes.push('Only while you need it for ' + ref(w, 'quest', entry.questId));
@@ -103,6 +109,7 @@ function lootRow(
     notes.push('Only if you are level ' + entry.maxPlayerLevel + ' or lower');
   return {
     drop,
+    heroicDrop,
     quality: item ? capital(ITEMS[item]?.quality ?? 'common') : 'Coins',
     chance: entry.chance,
     notes,
@@ -111,7 +118,11 @@ function lootRow(
   };
 }
 
-export function addMobArticles(w: ArticleTools, itemSources: Map<string, Set<string>>) {
+export function addMobArticles(
+  w: ArticleTools,
+  itemSources: Map<string, Set<string>>,
+  itemDrops: Map<string, DropSource[]> = new Map(),
+) {
   const journals = journalArticles(w);
   const locations = new Map<string, Set<string>>();
   for (const c of getActiveWorldContent().camps) {
@@ -317,8 +328,33 @@ export function addMobArticles(w: ArticleTools, itemSources: Map<string, Set<str
         if (!e.itemId) continue;
         const source = ref(w, 'mob', m.id) + ' drops ' + text;
         append(itemSources, e.itemId, source);
-        if (instanceMobs.has(m.id) && !e.questId && !e.normalOnly && !heroicOnly)
-          append(itemSources, heroicLootItemId(e.itemId, true), source);
+        const inInstance = instanceMobs.has(m.id);
+        const upgraded = inInstance && !e.questId && !e.normalOnly && !heroicOnly;
+        const heroicId = upgraded ? heroicLootItemId(e.itemId, true) : e.itemId;
+        if (upgraded) append(itemSources, heroicId, source);
+        // The same drop as a row for the table on the item's own page.
+        const portrait = mobArtPath(m.id);
+        const row = lootRows[lootRows.length - 1];
+        const pool = e.rollGroup ? entries.filter((x) => x.rollGroup === e.rollGroup).length : 0;
+        const dropSource = (where: string): DropSource => ({
+          creature:
+            (portrait ? '<woc-art path="' + portrait + '" size="icon" /> ' : '') +
+            ref(w, 'mob', m.id),
+          where,
+          chance: e.chance,
+          notes: [
+            ...row.notes,
+            ...(pool > 1 ? ['Shares one roll with ' + (pool - 1) + ' other items'] : []),
+          ],
+        });
+        const add = (id: string, where: string) =>
+          itemDrops.set(id, [...(itemDrops.get(id) ?? []), dropSource(where)]);
+        if (!inInstance) add(e.itemId, 'Open world');
+        else if (heroicOnly) add(e.itemId, 'Heroic only');
+        else if (heroicId !== e.itemId) {
+          add(e.itemId, 'Normal only');
+          add(heroicId, 'Heroic only');
+        } else add(e.itemId, e.normalOnly ? 'Normal only' : 'Normal and Heroic');
       }
     if (m.loot.some((e) => e.rollGroup) || HEROIC_BOSS_LOOT[m.id]?.some((e) => e.rollGroup))
       lootNotes.push(

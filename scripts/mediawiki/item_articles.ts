@@ -75,6 +75,7 @@ import {
 import { indexActivityItems } from './activity_item_sources';
 import { type ArticleTools, append, lines, pct, recipeLabel, ref, words } from './entity_format';
 import { itemAcquisitionArticle, itemAcquisitionIndex } from './item_acquisition';
+import { type DropSource, dropSourceTable } from './loot_table';
 import { indexSpecialItemSources } from './special_item_sources';
 import { vendorOfferText } from './vendor_offer';
 import { wikiItemKind } from './wiki_item_kind';
@@ -464,7 +465,11 @@ function effects(w: ArticleTools, item: ItemDef): string[] {
   return out;
 }
 
-export function addItemArticles(w: ArticleTools, sources: Map<string, Set<string>>) {
+export function addItemArticles(
+  w: ArticleTools,
+  sources: Map<string, Set<string>>,
+  drops: Map<string, DropSource[]> = new Map(),
+) {
   const acquisition = itemAcquisitionIndex(w);
   const vendorStock = new Set(
     Object.values(NPCS)
@@ -718,6 +723,13 @@ export function addItemArticles(w: ArticleTools, sources: Map<string, Set<string
         ) +
         w.section('Facts', w.table(facts)) +
         itemAcquisitionArticle(w, item, acquisition.get(item.id) ?? [], ways) +
+        (drops.get(item.id)?.length
+          ? w.section(
+              'Dropped by',
+              'Every creature that can drop this item, most likely first. The chance is for each kill.\n\n' +
+                dropSourceTable(drops.get(item.id)!),
+            )
+          : '') +
         lines(w, 'Equipment and use', effects(w, item)) +
         lines(w, 'Sources', ways) +
         lines(w, 'Used for', Array.from(uses.get(item.id) ?? [])),
