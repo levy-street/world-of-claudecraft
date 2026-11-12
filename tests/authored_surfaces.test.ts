@@ -227,6 +227,9 @@ const AUTHORED_ATLAS_DEFS = [
   'mount_lanternback_troll',
   'mount_nightwing_chimera',
   'mount_wobbles_slime',
+  // The Smith's Heart's Quarryheart Charger (the meta's reward mount, parked: nothing grants
+  // its reins yet), a Blender build with its own authored atlas.
+  'mount_quarryheart_charger',
   // the Blender-built dungeon bosses and bodies: the Sunken Bastion's Vael,
   // Iron Cage, Drowned Anchor and Gaol Turnkey, and the Hollow Crypt's Lich
   // Bishop (Morthen); and the Bastion's sculpted drowned (the Revenant first)
