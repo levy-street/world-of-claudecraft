@@ -101,6 +101,14 @@ export const QUENCH_OBJECTS = {
   rim: 'sh_quench_rim',
 } as const;
 
+/** Dev-only presentation triggers (spellfx 'nova' on the guardian, emitted
+ *  only by a dev verb, never by the fight): her death replayed on her living
+ *  body (`/dev heart quench death`; the renderer's QuenchDeathFx plays the
+ *  scene, smith_heart_fx/quench_death_core.ts, and claims the cue). */
+export const QUENCH_DEV_CUES = {
+  deathReplay: 'heart_quench_death_replay',
+} as const;
+
 /** The spellfx ability ids of the fight's moments. */
 export const QUENCH_CUES = {
   /** A player freezes solid (spellfx 'nova' on them). */

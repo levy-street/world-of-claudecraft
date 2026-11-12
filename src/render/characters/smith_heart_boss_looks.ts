@@ -27,6 +27,7 @@ import {
   BREATH_BODY_HEIGHT,
   BREATH_BODY_URL,
 } from '../smith_heart_fx/breath_body_core';
+import { BREATH_DEATH_GESTURES } from '../smith_heart_fx/breath_death_core';
 import { BREATH_ENTRANCE_GESTURES } from '../smith_heart_fx/breath_entrance_core';
 import { COUNCIL_MODEL_HEIGHTS } from '../smith_heart_fx/council_bodies_core';
 import { COUNCIL_DEATH_GESTURES, COUNCIL_HUSK_SHADE } from '../smith_heart_fx/council_death_core';
@@ -279,6 +280,11 @@ const BREATH_GATHERED: ClipMap = {
   walk: 'Gathered',
   run: 'Gathered',
 };
+
+/** Fallen through a dev replay of its death (smith_heart_fx/breath_death_fx.ts):
+ *  every base pose is its Death clip, so the one-shot's end hands back to the
+ *  same clamped action and the pieces stay down until the replay ends. */
+const BREATH_FALLEN: ClipMap = { ...BREATH_CALM, idle: 'Death', walk: 'Death', run: 'Death' };
 
 // The Guardian of the Quench (the Frozen Lake, design doc 7.3): an ice queen,
 // one rigged mesh, her gown and her hair on their own bone chains (their sway
@@ -570,6 +576,10 @@ export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
       // it floats on its calm stance after.
       [BREATH_ENTRANCE_GESTURES.gathered]: { clips: BREATH_GATHERED },
       [BREATH_ENTRANCE_GESTURES.form]: { clips: BREATH_CALM, enter: 'Form' },
+      // A dev replay of its death: its Death clip on the living body, held
+      // down while the replay plays; its end re-sends the calm stance
+      // (breath_body.ts, held off while the death's look is on).
+      [BREATH_DEATH_GESTURES.fall]: { clips: BREATH_FALLEN, enter: 'Death' },
     },
     castClipSync: [
       BREATH_CASTS.inhale,

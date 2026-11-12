@@ -136,6 +136,14 @@ export const BREATH_OBJECTS = {
   portalD: 'sh_breath_portal_d',
 } as const;
 
+/** Dev-only presentation triggers (spellfx 'nova' on the guardian, emitted
+ *  only by a dev verb, never by the fight): its death replayed on its living
+ *  body (`/dev heart breath death`; the renderer's BreathDeathFx plays the
+ *  scene, smith_heart_fx/breath_death_core.ts, and claims the cue). */
+export const BREATH_DEV_CUES = {
+  deathReplay: 'heart_breath_death_replay',
+} as const;
+
 /** The spellfx ability ids of the fight's moments. */
 export const BREATH_CUES = {
   /** The exhale lands (spellfx 'nova' on the guardian): the Summit Roar's

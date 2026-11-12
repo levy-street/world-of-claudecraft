@@ -59,6 +59,11 @@ import {
   breathSocketPoint,
   clearBreathBodySockets,
 } from '../src/render/smith_heart_fx/breath_body_sockets';
+import {
+  breathDeathBodyLook,
+  newBreathDeathBodyLook,
+} from '../src/render/smith_heart_fx/breath_death_core';
+import { holdBreathDeath } from '../src/render/smith_heart_fx/breath_death_state';
 import { BreathWindVolume } from '../src/render/smith_heart_fx/breath_wind_volume';
 import { SMITH_HEART_MOBS } from '../src/sim/content/smith_heart';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
@@ -552,6 +557,17 @@ describe('BreathBody over a fake world', () => {
     expect(sent[sent.length - 1]).toBe(BREATH_BODY_GESTURES.storm);
     const bolts = root?.getObjectByName('smithHeartBreathBolts') as THREE.Mesh;
     expect(bolts.visible).toBe(true);
+    // A dev replay of its death holds its look: the stance is never re-sent
+    // over the fall (it would stand it up mid-replay); let go, it is.
+    const dying = breathDeathBodyLook(1.5, newBreathDeathBodyLook());
+    holdBreathDeath(boss.id, dying);
+    sent.length = 0;
+    for (let i = 0; i < 60; i++) fx.update(1 / 20);
+    expect(sent).toEqual([]);
+    expect(bolts.visible).toBe(true);
+    holdBreathDeath(boss.id, null);
+    fx.update(1 / 20);
+    expect(sent[sent.length - 1]).toBe(BREATH_BODY_GESTURES.storm);
     // Death: the wind thrown off and gone.
     boss.dead = true;
     for (let i = 0; i < 60; i++) fx.update(1 / 20);

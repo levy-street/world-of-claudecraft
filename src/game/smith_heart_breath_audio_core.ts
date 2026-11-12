@@ -32,6 +32,7 @@ import {
   BREATH_AURAS,
   BREATH_CASTS,
   BREATH_CUES,
+  BREATH_DEV_CUES,
   type BreathWindPhase,
 } from '../sim/encounters/smith_heart/breath_ids';
 import { ISLE_AURAS, ISLE_CUES } from '../sim/encounters/smith_heart/breath_isle_ids';
@@ -100,6 +101,9 @@ export const BREATH_CUE_SOUNDS: Readonly<Record<string, readonly BreathSound[]>>
 /** Is this event's ability one the fight's sound plays (the HUD's generic
  *  nova or burst sound skipped for it)? */
 export function breathSoundClaims(ability: string | undefined): boolean {
+  // The death's dev replay cue is silent here: the death scene's own sounds
+  // play off its beats (render/smith_heart_fx/breath_death_fx.ts).
+  if (ability === BREATH_DEV_CUES.deathReplay) return true;
   return ability !== undefined && Object.hasOwn(BREATH_CUE_SOUNDS, ability);
 }
 

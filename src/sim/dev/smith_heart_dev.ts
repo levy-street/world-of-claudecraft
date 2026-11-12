@@ -62,6 +62,9 @@
 //   /dev heart breath                the Guardian of the Breath's readout
 //   /dev heart breath <what>         pull (onto the Cornice and pull it),
 //                                    reset (whole again, the wind still),
+//                                    death (its death scene replayed on the
+//                                    living body:
+//                                    sim/dev/smith_heart_death_dev.ts),
 //                                    intro (reset and gathered into the still
 //                                    air again: its entrance replays as the
 //                                    raid climbs onto the Cornice), heroic [on|off] or mythic [on|off] (this
@@ -79,6 +82,9 @@
 //   /dev heart quench                the Guardian of the Quench's readout
 //   /dev heart quench <what>         pull (onto the Frozen Lake and pull it),
 //                                    reset (whole again, the lake whole),
+//                                    death (her death scene replayed on her
+//                                    living body:
+//                                    sim/dev/smith_heart_death_dev.ts),
 //                                    intro (reset and under the ice again:
 //                                    her entrance replays as the raid steps
 //                                    onto the lake), heroic [on|off] or mythic [on|off] (this
@@ -160,7 +166,12 @@ import { instanceHalfWidthOf } from '../instances/instance_footprint';
 import type { InstanceSlot } from '../sim';
 import type { SimContext } from '../sim_context';
 import { displacePlayerForDev } from './dev_displace';
-import { councilDeathReplayForDev, heatDeathReplayForDev } from './smith_heart_death_dev';
+import {
+  breathDeathReplayForDev,
+  councilDeathReplayForDev,
+  heatDeathReplayForDev,
+  quenchDeathReplayForDev,
+} from './smith_heart_death_dev';
 import { smithHeartFeatDev } from './smith_heart_feat_dev';
 import { smithHeartFinalDevTrigger } from './smith_heart_final_dev';
 
@@ -211,7 +222,7 @@ const GUARDIAN_IDS: ReadonlySet<string> = new Set([
 const COUNCIL_IDS: ReadonlySet<string> = new Set(COUNCIL_TEMPLATE_IDS);
 
 const HELP =
-  '[dev] /dev heart enter [normal] | feat <council|breath|quench|heat|final|all> <grant|reset> | tp <cleft|gallery|pit|hammer|balcony|ring|ringse|ringsw|breath|bridge|cornice|breathboss|quench|ice|lake|quenchboss|heat|forge|anvil|heatboss|heart|portal|heartroom|final> | kill <hammer|guardian|singer|council|breath|quench|heat|final|guardians|pack <id>|trash|all> | gates | portal | seal | pool <k> | arrival | final [pull|reset|death|normal|heroic|mythic|quarter <breath|quench|hammer|heat|ring>|fill [vein|all] [pct]|burst|shock|root|unroot|fist|whirl|embers|freeze|cold <n>|ice|wind [deg]|bolt|drawn|orbs|tremor|anvil|shell] | reset | council [pull|reset|intro|death [guardian|singer]|heroic [on|off]|mythic [on|off]|energy <n>|wrath|weight|rush|wake|rock|bolt|song|resonance [n]|soul <guardian|singer>|soulpip <n>] | breath [pull|reset|intro|heroic [on|off]|mythic [on|off]|phase2|blow [deg|n|e|s|w]|calm|circle|inhale|roar|chain|eye|conductor|tornado|gust [deg]|isles [0|1]|ride [0|1]|home|killisle|bulwark|windworn|heart [2|portal a|b|c|d|carry|burst]] | quench [pull|reset|intro|heroic [on|off]|mythic [on|off]|phase2|blades|cold <n>|burst|splash|chain [n]|immune|huddle|hole|crack|breath|slash|flurry] | heat [pull|reset|intro|death|heroic [on|off]|mythic [on|off]|phase <1-3>|intermission|fist|flare|seeds|zones|ember]';
+  '[dev] /dev heart enter [normal] | feat <council|breath|quench|heat|final|all> <grant|reset> | tp <cleft|gallery|pit|hammer|balcony|ring|ringse|ringsw|breath|bridge|cornice|breathboss|quench|ice|lake|quenchboss|heat|forge|anvil|heatboss|heart|portal|heartroom|final> | kill <hammer|guardian|singer|council|breath|quench|heat|final|guardians|pack <id>|trash|all> | gates | portal | seal | pool <k> | arrival | final [pull|reset|death|normal|heroic|mythic|quarter <breath|quench|hammer|heat|ring>|fill [vein|all] [pct]|burst|shock|root|unroot|fist|whirl|embers|freeze|cold <n>|ice|wind [deg]|bolt|drawn|orbs|tremor|anvil|shell] | reset | council [pull|reset|intro|death [guardian|singer]|heroic [on|off]|mythic [on|off]|energy <n>|wrath|weight|rush|wake|rock|bolt|song|resonance [n]|soul <guardian|singer>|soulpip <n>] | breath [pull|reset|intro|death|heroic [on|off]|mythic [on|off]|phase2|blow [deg|n|e|s|w]|calm|circle|inhale|roar|chain|eye|conductor|tornado|gust [deg]|isles [0|1]|ride [0|1]|home|killisle|bulwark|windworn|heart [2|portal a|b|c|d|carry|burst]] | quench [pull|reset|intro|death|heroic [on|off]|mythic [on|off]|phase2|blades|cold <n>|burst|splash|chain [n]|immune|huddle|hole|crack|breath|slash|flurry] | heat [pull|reset|intro|death|heroic [on|off]|mythic [on|off]|phase <1-3>|intermission|fist|flare|seeds|zones|ember]';
 
 /** Where `/dev heart breath pull` sets the player down: on the Cornice, a
  *  few strides west of the guardian. */
@@ -505,6 +516,11 @@ export function handleSmithHeartDevChat(ctx: SimContext, raw: string, pid: numbe
       );
       return true;
     }
+    // Its death replayed on the living body: presentation only, no pull.
+    if (verbName === 'death') {
+      log(ctx, pid, `[dev] ${breathDeathReplayForDev(ctx, boss ?? null)}`);
+      return true;
+    }
     // A mechanic forced on a guardian nobody pulled pulls it first (an
     // unpulled guardian resets its fight on the next tick).
     if (
@@ -551,6 +567,11 @@ export function handleSmithHeartDevChat(ctx: SimContext, raw: string, pid: numbe
           ? '[dev] The Guardian of the Quench wakes on the Frozen Lake.'
           : '[dev] The Guardian of the Quench cannot be pulled (fallen, or not in this run).',
       );
+      return true;
+    }
+    // Her death replayed on her living body: presentation only, no pull.
+    if (verbName === 'death') {
+      log(ctx, pid, `[dev] ${quenchDeathReplayForDev(ctx, boss ?? null)}`);
       return true;
     }
     // A mechanic forced on a guardian nobody pulled pulls it first (an

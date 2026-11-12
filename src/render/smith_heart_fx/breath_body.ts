@@ -103,6 +103,8 @@ import {
   clearBreathBodySockets,
   retryBreathBodySockets,
 } from './breath_body_sockets';
+import type { BreathDeathBodyLook } from './breath_death_core';
+import { breathDeathFor } from './breath_death_state';
 import { breathEntranceFor } from './breath_entrance_state';
 import { BreathRibbonPool, boltUniforms, windUniforms } from './breath_wind_ribbons';
 import { BreathWindVolume } from './breath_wind_volume';
@@ -703,8 +705,16 @@ export class BreathBody {
     const eAt = fxAnchor(e);
     this.readSockets(e);
     this.trackClaws(dt);
-    if (e.dead) {
+    // Its death scene (breath_death_fx.ts) holds the look its air rides,
+    // a dev replay on the living body too.
+    const dying = breathDeathFor(e.id);
+    if (e.dead && !dying) {
       this.poseDead(e, dt);
+      return;
+    }
+    if (dying) {
+      if (e.dead && this.deadAt < 0) this.deadAt = this.clock;
+      this.poseDying(e, dt, dying);
       return;
     }
     if (this.deadAt >= 0) {
@@ -1493,6 +1503,48 @@ export class BreathBody {
       1,
       this.storm,
       look.drop,
+      this.groundY(eAt.x, eAt.z),
+    );
+  }
+
+  /** Its death scene's look (breath_death_core.ts): its currents drawn in
+   *  tight, its arcs wild then sputtering, its body unravelling, its light
+   *  out at the clap, its stones dropping. No stance of its own is sent over
+   *  it (a replay's fall holds); the next living frame re-sends the calm. */
+  private poseDying(e: Entity, dt: number, L: BreathDeathBodyLook): void {
+    const eAt = fxAnchor(e);
+    this.stance = '';
+    this.gestureTimer = 0;
+    this.storm = L.storm;
+    this.windU.uStorm.value = L.storm;
+    this.windU.uFlow.value = 1 + L.spin;
+    this.flash = Math.max(0, this.flash - dt * 4);
+    if (L.flare > 0.5 && this.rand() < dt * 6) this.flash = Math.max(this.flash, 0.5 * L.flare);
+    this.windU.uFlash.value = this.flash;
+    this.currents(L.wind, L.radius, L.spin, L.fling, L.shiver);
+    this.lights(1 + L.flare, L.glow);
+    this.cosmetics(dt, L.drawIn, L.shiver, L.wind);
+    this.hand.visible = false;
+    this.cone.visible = false;
+    this.slashes.commit(0);
+    // Its arcs leap piece to piece at the scene's rate (wild, sputtering).
+    this.arcTimer -= dt * L.arcs * (this.low ? 0.5 : 1);
+    while (this.arcTimer <= 0 && L.arcs > 0) {
+      this.arcTimer += 1;
+      const pair = BREATH_ARC_PAIRS[Math.floor(this.rand() * BREATH_ARC_PAIRS.length)];
+      this.spawnArc(breathSocketIndex(pair[0]), breathSocketIndex(pair[1]), 1);
+    }
+    if (L.arcs <= 0) this.arcTimer = Math.min(this.arcTimer, 1);
+    this.drawArcs();
+    this.orbit.setGlow(L.glow);
+    this.orbit.update(
+      eAt.x,
+      eAt.y,
+      eAt.z,
+      this.clock,
+      1,
+      L.storm,
+      L.drop,
       this.groundY(eAt.x, eAt.z),
     );
   }

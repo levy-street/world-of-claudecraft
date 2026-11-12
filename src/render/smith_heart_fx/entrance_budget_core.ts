@@ -136,3 +136,12 @@ export const COUNCIL_DEATH_SECONDARY_LAYERS = Object.freeze([
  *  cracks, the ring closing in, the spiral and every beat stay on every
  *  tier). */
 export const HEAT_DEATH_SECONDARY_LAYERS = Object.freeze(['smithHeartHeatDeathHalo'] as const);
+
+/** The Guardian of the Breath's death (breath_death_core.ts, painted with its
+ *  entrance's budget): the cosmetic double the low tier never draws, the
+ *  wide soft halo round the shaft of clear light (the shaft itself, the
+ *  cloud parting, the streams, the bolts, the clap and every beat stay on
+ *  every tier). */
+export const BREATH_DEATH_SECONDARY_LAYERS = Object.freeze([
+  'smithHeartBreathDeathShaftHalo',
+] as const);

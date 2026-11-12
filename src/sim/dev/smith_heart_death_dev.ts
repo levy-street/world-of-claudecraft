@@ -11,9 +11,17 @@
 //                         council_death_core.ts)
 //   /dev heart heat death  the Guardian of the Heat (render/smith_heart_fx/
 //                         heat_death_core.ts)
+//   /dev heart breath death
+//                         the Guardian of the Breath (render/smith_heart_fx/
+//                         breath_death_core.ts)
+//   /dev heart quench death
+//                         the Guardian of the Quench (render/smith_heart_fx/
+//                         quench_death_core.ts)
 
+import { BREATH_DEV_CUES } from '../encounters/smith_heart/breath_ids';
 import { COUNCIL_DEV_CUES, councilRoleOf } from '../encounters/smith_heart/council_ids';
 import { HEAT_DEV_CUES } from '../encounters/smith_heart/heat_ids';
+import { QUENCH_DEV_CUES } from '../encounters/smith_heart/quench_ids';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 
@@ -61,4 +69,20 @@ export function heatDeathReplayForDev(ctx: SimContext, boss: Entity | null): str
     return 'No living Guardian of the Heat to play a death on (/dev heart reset).';
   cue(ctx, boss, HEAT_DEV_CUES.deathReplay);
   return 'The Guardian of the Heat plays its death (presentation only: it still burns).';
+}
+
+/** `/dev heart breath death` on the run's guardian. */
+export function breathDeathReplayForDev(ctx: SimContext, boss: Entity | null): string {
+  if (!boss || boss.dead)
+    return 'No living Guardian of the Breath to play a death on (/dev heart breath reset).';
+  cue(ctx, boss, BREATH_DEV_CUES.deathReplay);
+  return 'The Guardian of the Breath plays its death (presentation only: it still blows).';
+}
+
+/** `/dev heart quench death` on the run's guardian. */
+export function quenchDeathReplayForDev(ctx: SimContext, boss: Entity | null): string {
+  if (!boss || boss.dead)
+    return 'No living Guardian of the Quench to play a death on (/dev heart quench reset).';
+  cue(ctx, boss, QUENCH_DEV_CUES.deathReplay);
+  return 'The Guardian of the Quench plays her death (presentation only: she still stands).';
 }

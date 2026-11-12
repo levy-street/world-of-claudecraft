@@ -60,6 +60,7 @@ import {
 import { setHeartKitCompileGate } from './smith_heart/heart_kit';
 import {
   BreathBody,
+  BreathDeathFx,
   BreathEntranceFx,
   BreathFightFx,
   BreathFx,
@@ -214,6 +215,9 @@ export class RiftDeathZoneVisuals {
   /** The Breath guardian's entrance (the calm before the storm), updated
    *  before its body. */
   private readonly breathEntrance: BreathEntranceFx;
+  /** Its death (the storm losing its anchor), updated after the entrance
+   *  and before the body: the body rides its held look. */
+  private readonly breathDeath: BreathDeathFx;
   // Its Quench guardian (Quenching Breath's cone telegraph and its frost,
   // Tempering Strike's ice).
   private readonly quenchFx: QuenchFx;
@@ -274,6 +278,15 @@ export class RiftDeathZoneVisuals {
     this.breathFx = new BreathFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.breathFight = new BreathFightFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.breathEntrance = new BreathEntranceFx(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+      shake,
+      playGesture,
+    );
+    this.breathDeath = new BreathDeathFx(
       scene,
       groundY,
       world,
@@ -722,6 +735,7 @@ export class RiftDeathZoneVisuals {
     this.breathFx.update(dt);
     this.breathFight.update(dt);
     this.breathEntrance.update(dt);
+    this.breathDeath.update(dt);
     this.breathBody.update(dt);
     this.quenchFx.update(dt);
     this.quenchFight.update(dt);
@@ -767,6 +781,7 @@ export class RiftDeathZoneVisuals {
     this.breathFx.dispose();
     this.breathFight.dispose();
     this.breathEntrance.dispose();
+    this.breathDeath.dispose();
     this.breathBody.dispose();
     this.quenchFx.dispose();
     this.quenchFight.dispose();
@@ -814,7 +829,7 @@ export class RiftDeathZoneVisuals {
     this.hammerFx.handleEvent(event);
     this.breathFx.handleEvent(event);
     this.breathBody.handleEvent(event);
-    const breath = this.breathFight.handleEvent(event);
+    const breath = this.breathFight.handleEvent(event) || this.breathDeath.handleEvent(event);
     const quenchBody = this.quenchBody.handleEvent(event);
     this.quenchFx.handleEvent(event);
     const quench = this.quenchFight.handleEvent(event) || quenchBody;
