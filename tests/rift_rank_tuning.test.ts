@@ -1053,7 +1053,7 @@ describe('rift ranks: clear-time epic and legendary payout', () => {
     }
   });
 
-  it('the rift legendary rate gives a 90% chance at one legendary within 100 S clears', () => {
+  it('the rift legendary rate gives a 90% chance at a given legendary within 100 S clears', () => {
     // The design target the rate is tuned to. The literal pins the shipped
     // value; the bounds pin the intent, so a retune has to restate both.
     expect(RIFT_LEGENDARY_CHANCE_S).toBe(0.023);
@@ -1079,8 +1079,9 @@ describe('rift ranks: clear-time epic and legendary payout', () => {
       addRiftClearGearLoot(ctx, boss, baseLevel);
       return boss.loot!.items.map((i) => i.itemId).filter((id) => !bonusDrawIds.has(id!));
     };
-    // 20 000 clears puts the expectation at 460 per legendary, tight enough to
-    // catch a 2x mistuning in either direction.
+    // 20 000 clears puts the expectation at 460 per legendary (standard
+    // deviation about 21), so the 0.8x to 1.25x band below is over four sigma
+    // wide and still catches a mistuning of a quarter in either direction.
     const SAMPLE = 20_000;
     const hits = new Map<string, number>(RIFT_LEGENDARY_ITEM_IDS.map((id) => [id, 0]));
     for (let s = 1; s <= SAMPLE; s++) {
@@ -1090,10 +1091,10 @@ describe('rift ranks: clear-time epic and legendary payout', () => {
     for (const id of RIFT_LEGENDARY_ITEM_IDS) {
       const n = hits.get(id)!;
       expect(n, `${id} observed ${n}/${SAMPLE}, expected about ${expected}`).toBeGreaterThan(
-        expected * 0.5,
+        expected * 0.8,
       );
       expect(n, `${id} observed ${n}/${SAMPLE}, expected about ${expected}`).toBeLessThan(
-        expected * 1.7,
+        expected * 1.25,
       );
     }
     // C/B/A never shed a legendary, no matter how many clears.

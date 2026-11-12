@@ -667,7 +667,8 @@ None of these is a defect. Each is a product decision with no ruling yet.
   pages that carry one. The flagship list is a curated product list.
 - **The Conquerors capstone grew a long tail**, and the Book completion feat
   behind it with it: the honor stock, the realm-rare drops, and the two
-  S-rank-only Rift legendaries at a very low roll per clear. Everything is
+  S-rank-only Rift legendaries at a low roll per clear
+  (`RIFT_LEGENDARY_CHANCE_S`). Everything is
   verified reachable (the heroic pool draws class-agnostically and the
   entry-tier honor stock has no class gate; the class-locked Season 2 Vanguard
   Gallery sits outside completion), so this is a difficulty escalation to accept or

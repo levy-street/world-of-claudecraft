@@ -144,9 +144,9 @@ export const RIFT_CLEAR_LOOT_SOURCE_LEVEL = HEROIC_LOOT_SOURCE_LEVEL; // 25
 // the raid loot source level, so they land at item level 37 (27 + legendary 10).
 // This is a deliberate exception to "a rift never mints above its own tier": the
 // maintainer's call is that the S legendaries ARE top-of-game gear, gated behind
-// a 0.3% roll on the hardest rank of content whose portals spawn a handful of
-// times a day server-wide. They are NOT flagged as raid drops (itemFromRaid stays
-// false); only the source level is shared.
+// a 2.3% roll (RIFT_LEGENDARY_CHANCE_S) on the hardest rank of content whose
+// portals spawn a handful of times a day server-wide. They are NOT flagged as
+// raid drops (itemFromRaid stays false); only the source level is shared.
 export const RIFT_LEGENDARY_LOOT_SOURCE_LEVEL = NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL; // 27
 
 // itemScore weights: how many armor points and how much weapon DPS count as one
