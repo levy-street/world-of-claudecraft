@@ -7237,6 +7237,7 @@ export class GameServer {
         break;
       // World PvP: the /pvp flag and the Skull Bag (server/world_pvp_wire.ts).
       case 'pvp_flag':
+      case 'skill_event_join':
       case 'skull_bag':
         worldPvpWire.dispatchWorldPvpCommand(sim, pid, msg);
         session.lastWpvpWireTick = -worldPvpWire.WPVP_WIRE_INTERVAL_TICKS;
@@ -8421,6 +8422,7 @@ export class GameServer {
       session.lastWpvpWireTick = this.sim.tickCount;
       maybe('wpvp', this.sim.worldPvpInfoFor(anchorSession.pid));
       maybe('hill', this.sim.hillInfoFor(anchorSession.pid));
+      maybe('sevt', this.sim.skillEventInfoFor(anchorSession.pid));
       worldPvpWire.emitSkullBagSelfKey(maybe, this.sim, session, anchorSession.pid);
     }
     if (this.sim.tickCount - session.lastArenaWireTick >= ARENA_WIRE_INTERVAL_TICKS) {

@@ -71,6 +71,7 @@ import {
   worldPvpOnPlayerDamaged,
   worldPvpOnPlayerDeath,
 } from '../pvp';
+import { skillEventOnPlayerDeath } from '../pvp/skill_events';
 import { worldPvpXpAmount } from '../pvp/world_pvp_rewards_rules';
 import { referralArmourXpActive } from '../referral_armour';
 import { emitReferralBossEvidence } from '../referral_evidence';
@@ -1688,6 +1689,9 @@ export function handleDeath(
     // ledger arithmetic on the sim clock, zero rng. Every other death only
     // ends the victim's kill streak and any bounty it earned.
     worldPvpOnPlayerDeath(ctx, e, killer);
+    // Hourly skill events: a participant's killing blow on another pays a flat,
+    // undiminished bounty and counts toward the win (pvp/skill_events.ts).
+    skillEventOnPlayerDeath(ctx, e, killer);
     for (const m of ctx.entities.values()) {
       if (m.kind === 'mob' && !m.dead && m.aggroTargetId === e.id && m.aiState !== 'dead') {
         // turn on the next nearby attacker; go home only if nobody is left

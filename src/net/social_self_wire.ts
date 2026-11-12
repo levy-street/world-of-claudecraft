@@ -23,6 +23,7 @@ import type {
   HillInfo,
   MailInfo,
   MarketInfo,
+  SkillEventInfo,
   SkullBagInfo,
   TradeInfo,
   WorldPvpInfo,
@@ -47,6 +48,7 @@ export interface SocialSelfMirrors {
   mailUnread: number;
   worldPvpInfo: WorldPvpInfo | null;
   hillInfo: HillInfo | null;
+  skillEventInfo: SkillEventInfo | null;
 }
 
 /** The self-record keys this cohort reads (the server's terse names). */
@@ -67,6 +69,7 @@ export interface SocialSelfRecord {
   wpvp?: unknown;
   skb?: unknown;
   hill?: unknown;
+  sevt?: unknown;
 }
 
 const numberOrZero = (v: unknown): number => (typeof v === 'number' ? v : 0);
@@ -113,4 +116,6 @@ export function applySocialSelfWire(target: SocialSelfMirrors, s: SocialSelfReco
   // King of the Hill: the standing hill from this viewer's seat. Same delta
   // contract; null while no hill stands.
   if (s.hill !== undefined) target.hillInfo = s.hill as HillInfo | null;
+  // The hourly skill event (src/sim/pvp/skill_events.ts): same delta contract.
+  if (s.sevt !== undefined) target.skillEventInfo = s.sevt as SkillEventInfo | null;
 }

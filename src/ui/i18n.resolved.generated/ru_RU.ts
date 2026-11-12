@@ -3441,7 +3441,10 @@ export const ru_RU: EnTranslations = {
         "worldKill": "Мировое убийство",
         "worldAssist": "Помощь в мировом убийстве",
         "hillHold": "Удержание холма",
-        "worldQuest": "локальное задание"
+        "worldQuest": "локальное задание",
+        "skillEventWin": "skill event victory",
+        "skillEventComplete": "skill event fought",
+        "skillEventKill": "skill event kill"
       },
       "floatReasons": {
         "kill": "Убийство",
@@ -15962,7 +15965,9 @@ export const ru_RU: EnTranslations = {
       "acceptDuel": "Принять дуэль",
       "resurrectionOffer": "{name} предлагает воскресить вас. Принять?",
       "acceptResurrection": "Принять воскрешение",
-      "decline": "Отклонить"
+      "decline": "Отклонить",
+      "skillEventJoin": "Рядом проходит PvP-событие. Хотите участвовать? Если вы согласитесь, режим PvP будет включён: вас смогут убить другие игроки и обчистить ваш кошелёк после смерти.",
+      "acceptSkillEvent": "Принять"
     },
     "combat": {
       "floatingMiss": "Промах",

@@ -3441,7 +3441,10 @@ export const ko_KR: EnTranslations = {
         "worldKill": "월드 처치",
         "worldAssist": "월드 처치 도움",
         "hillHold": "언덕 점거",
-        "worldQuest": "전역 퀘스트"
+        "worldQuest": "전역 퀘스트",
+        "skillEventWin": "skill event victory",
+        "skillEventComplete": "skill event fought",
+        "skillEventKill": "skill event kill"
       },
       "floatReasons": {
         "kill": "처치",
@@ -15962,7 +15965,9 @@ export const ko_KR: EnTranslations = {
       "acceptDuel": "결투 수락",
       "resurrectionOffer": "{name}님이 당신을 부활시키려 합니다. 수락하시겠습니까?",
       "acceptResurrection": "부활 수락",
-      "decline": "거절"
+      "decline": "거절",
+      "skillEventJoin": "PvP 이벤트 근처에 있습니다. 참가하시겠습니까? 수락하면 PvP가 켜지며, 다른 플레이어에게 처치될 수 있고 사망 시 지갑을 약탈당할 수 있습니다.",
+      "acceptSkillEvent": "수락"
     },
     "combat": {
       "floatingMiss": "빗나감",

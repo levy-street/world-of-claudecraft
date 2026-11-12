@@ -3441,7 +3441,10 @@ export const cs_CZ: EnTranslations = {
         "worldKill": "světové zabití",
         "worldAssist": "asistence u světového zabití",
         "hillHold": "držení kopce",
-        "worldQuest": "světový úkol"
+        "worldQuest": "světový úkol",
+        "skillEventWin": "skill event victory",
+        "skillEventComplete": "skill event fought",
+        "skillEventKill": "skill event kill"
       },
       "floatReasons": {
         "kill": "Zabití",
@@ -15962,7 +15965,9 @@ export const cs_CZ: EnTranslations = {
       "acceptDuel": "Přijmout duel",
       "resurrectionOffer": "{name} tě chce vrátit k životu. Přijímáš?",
       "acceptResurrection": "Přijmout vzkříšení",
-      "decline": "Odmítnout"
+      "decline": "Odmítnout",
+      "skillEventJoin": "You are near a PvP event. Would you like to participate? Accepting will toggle PvP on and you can get killed by other players and your purse looted upon death.",
+      "acceptSkillEvent": "Accept"
     },
     "combat": {
       "floatingMiss": "Minutí",

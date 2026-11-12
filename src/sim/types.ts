@@ -154,6 +154,11 @@ export type HonorReason =
   // King of the Hill (pvp/hill.ts): the once-a-minute trickle to a holder
   // standing inside the circle.
   | 'hill_hold'
+  // Hourly skill events (pvp/skill_events.ts): the winner's award, every other
+  // participant's award, and a player killing blow inside the event.
+  | 'skill_event_win'
+  | 'skill_event_complete'
+  | 'skill_event_kill'
   // The day's Honor world quests (src/sim/world_quest_honor_slots.ts): two
   // rotating world quests per realm cycle pay a flat Honor bonus on completion.
   | 'world_quest';

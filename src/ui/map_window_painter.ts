@@ -47,7 +47,12 @@ import type { IWorld } from '../world_api';
 import type { CastlePlanMarker } from './castle_plan_core';
 import { dungeonDisplayName, riftFloorLabel, zoneDisplayName, zonePoiLabel } from './entity_i18n';
 import { drawFerryPortMapMarker } from './ferry_port_map_painter';
-import { drawHillMapMarker, drawMapSkull } from './hill_map_marker_painter';
+import {
+  drawHillMapMarker,
+  drawMapSkull,
+  drawSkillEventMapMarker,
+  mapPvpPulseNow,
+} from './hill_map_marker_painter';
 import { formatNumber } from './i18n';
 import {
   EMPTY_MAP_MARKER_ART,
@@ -343,6 +348,9 @@ export const MAP_COLOR_TOKENS = {
   worldQuestAreaStroke: '--color-map-world-quest-area-stroke',
   worldQuestAvailable: '--color-map-world-quest-available',
   worldBoss: '--color-map-world-boss',
+  pvpEvent: '--color-map-pvp-event',
+  pvpEventAreaFill: '--color-map-pvp-event-area-fill',
+  pvpEventAreaStroke: '--color-map-pvp-event-area-stroke',
   questBadgeFill: '--color-map-quest-badge-fill',
   questBadgeText: '--color-map-quest-badge-text',
   player: '--color-map-player',
@@ -743,6 +751,18 @@ export class MapWindowPainter {
       }
     }
 
+    // The hourly skill event's arena: the highlighted circle players fight in,
+    // drawn with the objective areas so the markers stay on top of it.
+    if (model.skillEvent) {
+      ctx.fillStyle = colors.pvpEventAreaFill;
+      ctx.strokeStyle = colors.pvpEventAreaStroke;
+      ctx.lineWidth = QUEST_AREA_LINE_WIDTH;
+      ctx.beginPath();
+      ctx.arc(model.skillEvent.mx, model.skillEvent.my, model.skillEvent.radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    }
+
     // Gather nodes: profession-colored type silhouettes over the quest-area
     // blobs (a resource field still reads inside a blue objective region) but
     // under the zone title, POI labels, portals, and quest markers, so label
@@ -1055,13 +1075,27 @@ export class MapWindowPainter {
       drawMapSkull(ctx, marker.mx, marker.my, radius, colors.player, colors.outline);
     }
 
+    // The open-world PvP markers breathe on the map's own repaint band: the
+    // King of the Hill crown and the skill event badge share one red glow.
+    const pvpPulse = model.hill || model.skillEvent ? mapPvpPulseNow() : 0;
     if (model.hill) {
       drawHillMapMarker(
         ctx,
         model.hill,
         geometry.questBadgeRadius + WORLD_QUEST_BADGE_OUTER_ADD,
-        colors.worldQuestAvailable,
+        colors.pvpEvent,
         colors.outline,
+        pvpPulse,
+      );
+    }
+    if (model.skillEvent) {
+      drawSkillEventMapMarker(
+        ctx,
+        model.skillEvent,
+        geometry.questBadgeRadius + WORLD_QUEST_BADGE_OUTER_ADD,
+        colors.pvpEvent,
+        colors.outline,
+        pvpPulse,
       );
     }
 

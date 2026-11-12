@@ -3441,7 +3441,10 @@ export const fr_FR: EnTranslations = {
         "worldKill": "élimination en monde ouvert",
         "worldAssist": "élimination en monde ouvert assistée",
         "hillHold": "colline tenue",
-        "worldQuest": "quête mondiale"
+        "worldQuest": "quête mondiale",
+        "skillEventWin": "skill event victory",
+        "skillEventComplete": "skill event fought",
+        "skillEventKill": "skill event kill"
       },
       "floatReasons": {
         "kill": "Élimination",
@@ -15962,7 +15965,9 @@ export const fr_FR: EnTranslations = {
       "acceptDuel": "Accepter le duel",
       "resurrectionOffer": "{name} souhaite vous ramener à la vie. Acceptez-vous ?",
       "acceptResurrection": "Accepter la résurrection",
-      "decline": "Refuser"
+      "decline": "Refuser",
+      "skillEventJoin": "You are near a PvP event. Would you like to participate? Accepting will toggle PvP on and you can get killed by other players and your purse looted upon death.",
+      "acceptSkillEvent": "Accept"
     },
     "combat": {
       "floatingMiss": "Raté",

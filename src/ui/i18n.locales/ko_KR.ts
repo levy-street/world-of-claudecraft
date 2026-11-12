@@ -5116,6 +5116,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.prompts.resurrectionOffer': '{name}님이 당신을 부활시키려 합니다. 수락하시겠습니까?',
   'hud.prompts.acceptResurrection': '부활 수락',
   'hud.prompts.decline': '거절',
+  'hud.prompts.skillEventJoin':
+    'PvP 이벤트 근처에 있습니다. 참가하시겠습니까? 수락하면 PvP가 켜지며, 다른 플레이어에게 처치될 수 있고 사망 시 지갑을 약탈당할 수 있습니다.',
+  'hud.prompts.acceptSkillEvent': '수락',
   'hud.combat.floatingMiss': '빗나감',
   'hud.combat.floatingDodge': '회피',
   'hud.combat.floatingResist': '저항',

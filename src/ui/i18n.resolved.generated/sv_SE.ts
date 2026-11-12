@@ -3441,7 +3441,10 @@ export const sv_SE: EnTranslations = {
         "worldKill": "världsdödande",
         "worldAssist": "världsdodade assisterad",
         "hillHold": "håller berget",
-        "worldQuest": "världsuppdrag"
+        "worldQuest": "världsuppdrag",
+        "skillEventWin": "skill event victory",
+        "skillEventComplete": "skill event fought",
+        "skillEventKill": "skill event kill"
       },
       "floatReasons": {
         "kill": "Dråp",
@@ -15962,7 +15965,9 @@ export const sv_SE: EnTranslations = {
       "acceptDuel": "Anta duell",
       "resurrectionOffer": "{name} vill återge dig livet. Accepterar du?",
       "acceptResurrection": "Acceptera uppståndelse",
-      "decline": "Avböj"
+      "decline": "Avböj",
+      "skillEventJoin": "You are near a PvP event. Would you like to participate? Accepting will toggle PvP on and you can get killed by other players and your purse looted upon death.",
+      "acceptSkillEvent": "Accept"
     },
     "combat": {
       "floatingMiss": "Bom",

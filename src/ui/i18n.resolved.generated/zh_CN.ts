@@ -3441,7 +3441,10 @@ export const zh_CN: EnTranslations = {
         "worldKill": "世界击杀",
         "worldAssist": "世界击杀助攻",
         "hillHold": "占据山丘",
-        "worldQuest": "世界任务"
+        "worldQuest": "世界任务",
+        "skillEventWin": "skill event victory",
+        "skillEventComplete": "skill event fought",
+        "skillEventKill": "skill event kill"
       },
       "floatReasons": {
         "kill": "击杀",
@@ -15962,7 +15965,9 @@ export const zh_CN: EnTranslations = {
       "acceptDuel": "接受决斗",
       "resurrectionOffer": "{name}想让你复活。是否接受？",
       "acceptResurrection": "接受复活",
-      "decline": "拒绝"
+      "decline": "拒绝",
+      "skillEventJoin": "你正靠近一场 PvP 活动。要参加吗？接受后将开启 PvP，你可能会被其他玩家击杀，死亡时钱袋会被掠夺。",
+      "acceptSkillEvent": "接受"
     },
     "combat": {
       "floatingMiss": "未命中",

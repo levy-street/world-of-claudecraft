@@ -137,6 +137,27 @@ export interface HillInfo {
   callout?: HillCalloutInfo | null;
 }
 
+/** The hourly skill event (src/sim/pvp/skill_events.ts) from one viewer's
+ *  seat: realm facts (kind, phase, arena) plus the viewer's own join state. */
+export interface SkillEventInfo {
+  kind: 'riposte' | 'footprints' | 'tongues' | 'bankshot' | 'common_hand';
+  /** 'warning' before the start (the arena is marked and joining is open),
+   *  'running' once it has begun. */
+  phase: 'warning' | 'running';
+  zoneId: string;
+  x: number;
+  z: number;
+  radius: number;
+  /** Whole minutes (rounded up) to the start while warning, to the hard cap
+   *  while running. */
+  minutesLeft: number;
+  joined: boolean;
+  /** The join prompt applies: near the arena, not joined and not flagged. */
+  canJoin: boolean;
+  participants: number;
+  yourKills: number;
+}
+
 export interface IWorldWorldPvp {
   worldPvpInfo: WorldPvpInfo | null;
   /** Raise (true) or lower (false) the flag; lowering starts the disarm
@@ -149,4 +170,9 @@ export interface IWorldWorldPvp {
   /** The announced or standing King of the Hill circle, or null while none
    *  is (between hills, or on a realm whose World PvP switch is set). */
   hillInfo: HillInfo | null;
+  /** The announced or running hourly skill event, or null between events. */
+  skillEventInfo: SkillEventInfo | null;
+  /** Join the skill event (the join prompt's Accept): raises the World PvP
+   *  flag. The sim refuses and explains out of reach or under level. */
+  joinSkillEvent(): void;
 }

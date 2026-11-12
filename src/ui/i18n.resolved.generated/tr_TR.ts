@@ -3441,7 +3441,10 @@ export const tr_TR: EnTranslations = {
         "worldKill": "dünya öldürme",
         "worldAssist": "dünya öldürme desteklemek",
         "hillHold": "tepenin üstünde durmak",
-        "worldQuest": "dünya görevi"
+        "worldQuest": "dünya görevi",
+        "skillEventWin": "skill event victory",
+        "skillEventComplete": "skill event fought",
+        "skillEventKill": "skill event kill"
       },
       "floatReasons": {
         "kill": "Öldürme",
@@ -15962,7 +15965,9 @@ export const tr_TR: EnTranslations = {
       "acceptDuel": "Düelloyu Kabul Et",
       "resurrectionOffer": "{name} seni hayata döndürmek istiyor. Kabul ediyor musun?",
       "acceptResurrection": "Dirilişi Kabul Et",
-      "decline": "Reddet"
+      "decline": "Reddet",
+      "skillEventJoin": "You are near a PvP event. Would you like to participate? Accepting will toggle PvP on and you can get killed by other players and your purse looted upon death.",
+      "acceptSkillEvent": "Accept"
     },
     "combat": {
       "floatingMiss": "Iskaladı",

@@ -3441,7 +3441,10 @@ export const nl_NL: EnTranslations = {
         "worldKill": "wereldkill",
         "worldAssist": "wereldkill geassisteerd",
         "hillHold": "heuvelbeheersing",
-        "worldQuest": "wereldmissie"
+        "worldQuest": "wereldmissie",
+        "skillEventWin": "skill event victory",
+        "skillEventComplete": "skill event fought",
+        "skillEventKill": "skill event kill"
       },
       "floatReasons": {
         "kill": "Kill",
@@ -15962,7 +15965,9 @@ export const nl_NL: EnTranslations = {
       "acceptDuel": "Duel aanvaarden",
       "resurrectionOffer": "{name} wil je terugbrengen tot leven. Aanvaarden?",
       "acceptResurrection": "Opstanding Aanvaarden",
-      "decline": "Weigeren"
+      "decline": "Weigeren",
+      "skillEventJoin": "You are near a PvP event. Would you like to participate? Accepting will toggle PvP on and you can get killed by other players and your purse looted upon death.",
+      "acceptSkillEvent": "Accept"
     },
     "combat": {
       "floatingMiss": "Mis",

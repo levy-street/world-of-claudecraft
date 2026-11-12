@@ -3441,7 +3441,10 @@ export const da_DK: EnTranslations = {
         "worldKill": "verden drab",
         "worldAssist": "verden drab assisteret",
         "hillHold": "holder højen",
-        "worldQuest": "verdensopgave"
+        "worldQuest": "verdensopgave",
+        "skillEventWin": "skill event victory",
+        "skillEventComplete": "skill event fought",
+        "skillEventKill": "skill event kill"
       },
       "floatReasons": {
         "kill": "Drab",
@@ -15962,7 +15965,9 @@ export const da_DK: EnTranslations = {
       "acceptDuel": "Accepter duel",
       "resurrectionOffer": "{name} vil gerne bringe dig tilbage til livet. Accepterer du?",
       "acceptResurrection": "Accepter opstandelse",
-      "decline": "Afvis"
+      "decline": "Afvis",
+      "skillEventJoin": "You are near a PvP event. Would you like to participate? Accepting will toggle PvP on and you can get killed by other players and your purse looted upon death.",
+      "acceptSkillEvent": "Accept"
     },
     "combat": {
       "floatingMiss": "Forbier",

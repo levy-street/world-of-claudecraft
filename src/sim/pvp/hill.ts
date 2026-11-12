@@ -46,6 +46,7 @@
 // number so it searches new ground. The schedule, the contest clock and the
 // accruals run on ctx.time and ctx.tickCount. No DOM, no wall clock.
 
+import { SKILL_EVENT_SITES } from '../content/skill_event_sites';
 import { zoneContaining } from '../data';
 import { Rng } from '../rng';
 import type { SimContext } from '../sim_context';
@@ -93,6 +94,7 @@ import {
 } from './hill_rules';
 import { hillZones } from './hill_zones';
 import { grantHonor } from './honor';
+import { spotTouchesSkillArena } from './skill_event_rules';
 import { worldPvpOnHillPresence } from './world_pvp';
 
 /** 'warning': announced, drawn on the ground, not yet contestable.
@@ -244,6 +246,8 @@ export function pickHillSpot(
     const z = rng.range(zMin, zMax);
     if (Math.hypot(x - zone.hub.x, z - zone.hub.z) < hubClear) continue;
     if (!hillSpotIsOpen(probe, zone.id, x, z, HILL_RADIUS)) continue;
+    // Never on a skill event arena (owner brief 2026-11-12: the two never share ground).
+    if (spotTouchesSkillArena(SKILL_EVENT_SITES, x, z, HILL_RADIUS)) continue;
     return { x: Math.round(x * 10) / 10, z: Math.round(z * 10) / 10 };
   }
   return null;
@@ -301,8 +305,13 @@ export function spawnHill(
   attempt = 0,
   zoneId?: string,
 ): ActiveHill | null {
-  const zones = hillZones();
-  if (zones.length === 0) return null;
+  const allZones = hillZones();
+  if (allZones.length === 0) return null;
+  // Never in the zone of an announced or running skill event (pvp/skill_events.ts):
+  // the event already avoids a standing hill's zone, this closes the other order.
+  const eventZone = ctx.skillEventState.active?.zoneId ?? null;
+  const awayFromEvent = allZones.filter((z) => z.id !== eventZone);
+  const zones = awayFromEvent.length > 0 ? awayFromEvent : allZones;
   const rng = hillRng(ctx, ordinal, SPOT_SALT ^ Math.imul(attempt, 0x27d4eb2f));
   const zone = zoneId ? zones.find((z) => z.id === zoneId) : zones[rng.int(0, zones.length - 1)];
   if (!zone) return null;

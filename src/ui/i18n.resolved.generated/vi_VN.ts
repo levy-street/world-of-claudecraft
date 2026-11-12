@@ -3441,7 +3441,10 @@ export const vi_VN: EnTranslations = {
         "worldKill": "tiêu diệt thế giới",
         "worldAssist": "hỗ trợ tiêu diệt thế giới",
         "hillHold": "giữ đồi",
-        "worldQuest": "nhiệm vụ thế giới"
+        "worldQuest": "nhiệm vụ thế giới",
+        "skillEventWin": "skill event victory",
+        "skillEventComplete": "skill event fought",
+        "skillEventKill": "skill event kill"
       },
       "floatReasons": {
         "kill": "Hạ Gục",
@@ -15962,7 +15965,9 @@ export const vi_VN: EnTranslations = {
       "acceptDuel": "Chấp Nhận Đấu Tay Đôi",
       "resurrectionOffer": "{name} muốn đưa bạn trở lại cõi sống. Bạn có chấp nhận không?",
       "acceptResurrection": "Chấp Nhận Hồi Sinh",
-      "decline": "Từ Chối"
+      "decline": "Từ Chối",
+      "skillEventJoin": "You are near a PvP event. Would you like to participate? Accepting will toggle PvP on and you can get killed by other players and your purse looted upon death.",
+      "acceptSkillEvent": "Accept"
     },
     "combat": {
       "floatingMiss": "Trượt",

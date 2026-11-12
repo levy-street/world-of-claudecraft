@@ -705,6 +705,7 @@ const UI_PURE_CORES = [
   // The potion Use lines of the item tooltip, moved out of Hud.itemTooltip.
   'src/ui/potion_tooltip_view.ts',
   'src/ui/hud/hill/hill_bar_view.ts',
+  'src/ui/hud/skill_event/skill_event_prompt_core.ts',
   // The Iron Cage escape prompt (the Gaol Turnkey's button-mash).
   'src/ui/hud/dungeon/cage_escape_view.ts',
   // Gaoler Ossick's chain alert (the Drowned Anchor, the Shackle Pair).

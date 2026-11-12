@@ -3873,6 +3873,10 @@ export const hudChromeStrings = {
       hillHold: 'holding the hill',
       // The day's Honor world quests (src/sim/world_quest_honor_slots.ts).
       worldQuest: 'world quest',
+      // The hourly skill events (src/sim/pvp/skill_events.ts).
+      skillEventWin: 'skill event victory',
+      skillEventComplete: 'skill event fought',
+      skillEventKill: 'skill event kill',
     },
     // Short labels for the floating text over your own character. Kept apart from
     // `reasons` above, which are mid-sentence fragments for the chat line.

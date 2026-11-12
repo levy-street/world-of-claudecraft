@@ -197,7 +197,7 @@ import {
 } from './content/ignivar_loot';
 import { normalizeMountSkinId } from './content/mount_skins';
 import { DEFAULT_MOUNT, type MountKey } from './content/mounts';
-import { GATHERING_PROFESSION_IDS, type GatheringProfessionId } from './content/professions';
+import type { GatheringProfessionId } from './content/professions';
 import { PROVING_SHORE_ARRIVAL } from './content/proving_shore';
 import { PTR_DEV_VENDOR_DEF } from './content/ptr_dev_vendor';
 import { FURY_ENTITY_ID, FURY_NPC_ID } from './content/pvp_honor';
@@ -624,8 +624,8 @@ import {
   rechargeToolEffectAction,
   slotToolEffectAction,
 } from './professions/tool_effect_actions';
+import { toolEffectSlotViewsOf } from './professions/tool_effect_slot_view';
 import {
-  EMPTY_TOOL_EFFECT_SLOT_VIEWS,
   normalizeToolEffectSlots,
   structuredCloneToolEffectSlots,
   type ToolEffectConfirmMode,
@@ -663,6 +663,7 @@ import * as honorMod from './pvp';
 import * as hillMod from './pvp/hill';
 import { type HillSpotProbe, hillProbeFor } from './pvp/hill_probe';
 import { savedHonorState } from './pvp/honor_persist';
+import * as skillEventsMod from './pvp/skill_events';
 // By path, not through the pvp barrel: see the comment in src/sim/pvp/index.ts.
 import {
   spawnWarfareQuartermaster,
@@ -2021,6 +2022,7 @@ export class Sim {
   bgMatches = new Map<number, bgMod.BgMatch>(); // pid -> shared match (all members)
   worldPvpBooks = worldPvpMod.newWorldPvpBooks(); // /pvp assist + DR books (live ctx view)
   hillState = hillMod.newHillState(); // King of the Hill: the standing hill (live ctx view)
+  skillEventState = skillEventsMod.newSkillEventState(); // hourly skill events (live ctx view)
   seasonal = seasonalMod.freshSeasonalWorldState(); // host-fed event + /dev override (ctx view)
   readonly hillProbe: HillSpotProbe; // the hill's spot probe, bound in the ctor (pvp/hill_probe.ts)
   private bgBusySlots = new Set<number>();
@@ -5157,6 +5159,9 @@ export class Sim {
       get hillState() {
         return sim.hillState;
       },
+      get skillEventState() {
+        return sim.skillEventState;
+      },
       get seasonal() {
         return sim.seasonal;
       },
@@ -6162,6 +6167,7 @@ export class Sim {
     worldPvpMod.updateWorldPvp(this.ctx); // the /pvp clock, zone pass + books sweep; zero rng
     lap?.('worldPvp');
     hillMod.updateHill(this.ctx, weeklyMod.recordWeeklyPvpWin); // King of the Hill (pvp/hill.ts): PRIVATE rng
+    skillEventsMod.updateSkillEvents(this.ctx); // hourly skill events: PRIVATE rng
     seasonalMod.updateSeasonal(this.ctx); // seasonal events + field boss (rng only in his pull)
     lap?.('hill');
     // The Dungeon Finder phase draws ZERO rng (queue bookkeeping + role
@@ -10453,6 +10459,17 @@ export class Sim {
   hillInfoFor(pid: number): import('../world_api').HillInfo | null {
     return hillMod.hillInfoFor(this.ctx, pid);
   }
+  get skillEventInfo(): import('../world_api').SkillEventInfo | null {
+    return this.primaryId === -1
+      ? null
+      : skillEventsMod.skillEventInfoFor(this.ctx, this.primaryId);
+  }
+  skillEventInfoFor(pid: number): import('../world_api').SkillEventInfo | null {
+    return skillEventsMod.skillEventInfoFor(this.ctx, pid);
+  }
+  joinSkillEvent(pid = this.primaryId): void {
+    skillEventsMod.joinSkillEvent(this.ctx, pid);
+  }
   worldPvpInfoFor(pid: number): import('../world_api').WorldPvpInfo | null {
     return worldPvpMod.worldPvpInfoFor(this.ctx, pid);
   }
@@ -11236,46 +11253,9 @@ export class Sim {
     return this.gatheringProficiencyFor(this.primaryId);
   }
 
-  // The viewer's slotted tool effects, projected for the seam. Takes an
-  // explicit pid (the gatheringProficiencyFor precedent) so the server can
-  // build one player's delta while the offline getter below reads the primary.
-  //
-  // Returns [] for the absent field, which is the default and must stay that
-  // way: an empty object still serializes into the parity state digest, so
-  // initialising the map would move every golden for a feature no scenario
-  // uses. Sorted by professionId so the JSON form is a stable delta signature.
+  // The viewer's slotted tool effects (professions/tool_effect_slot_view.ts).
   toolEffectSlotsFor(pid: number): readonly ToolEffectSlotView[] {
-    const meta = this.players.get(pid);
-    const slots = meta?.toolEffectSlots;
-    // The empty arms return the shared frozen instance: this runs per tick
-    // per session on the snapshot path, and a fresh [] here was two
-    // allocations per player per tick (the array plus its serialized "[]")
-    // for the overwhelming majority who never slot an effect.
-    if (!meta || !slots) return EMPTY_TOOL_EFFECT_SLOT_VIEWS;
-    const rows: ToolEffectSlotView[] = [];
-    for (const professionId of GATHERING_PROFESSION_IDS) {
-      const slot = slots[professionId];
-      if (!slot) continue;
-      rows.push({
-        professionId,
-        effectId: slot.effectId,
-        charges: slot.durability,
-        maxCharges: slot.maxDurability,
-        confirmMode: slot.confirmMode,
-        // The R48 privacy-preserving provenance projection: a boolean, never
-        // the name (a foreign crafter's identity stays server-side).
-        selfCrafted: slot.craftedBy !== undefined && slot.craftedBy === meta.name,
-      });
-    }
-    if (rows.length === 0) return EMPTY_TOOL_EFFECT_SLOT_VIEWS;
-    // GATHERING_PROFESSION_IDS is already a stable content order, but the sort
-    // is what the signature contract actually promises, so state it. A plain
-    // codepoint compare, never localeCompare: this runs per tick per session on
-    // the snapshot path, and an ICU collation inside the deterministic core
-    // would make the wire order depend on the host's locale data.
-    return rows.sort((a, b) =>
-      a.professionId < b.professionId ? -1 : a.professionId > b.professionId ? 1 : 0,
-    );
+    return toolEffectSlotViewsOf(this.players.get(pid));
   }
 
   get toolEffectSlots(): readonly ToolEffectSlotView[] {

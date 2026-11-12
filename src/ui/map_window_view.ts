@@ -860,6 +860,9 @@ export interface OverworldMapModel {
   worldQuests: MapWorldQuestMarker[];
   worldBosses: MapWorldBossMarker[];
   hill: { mx: number; my: number; phase: 'warning' | 'active' } | null;
+  /** The hourly skill event's arena (src/sim/pvp/skill_events.ts) when it sits
+   *  in this zone and in view; `radius` is the arena circle in canvas pixels. */
+  skillEvent: { mx: number; my: number; radius: number; phase: 'warning' | 'running' } | null;
   /** Gather nodes in the committed zone (all zoom levels). Empty only when
    *  the zone has no authored nodes in view. */
   gatherNodes: MapGatherNodeMarker[];
@@ -947,6 +950,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   const landmarkPlacement = MAP_LANDMARK_PLACEMENT_BY_PROFILE[input.markerProfile ?? 'standard'];
   const p = world.player;
   const hill = world.hillInfo;
+  const skillEvent = world.skillEventInfo;
 
   // Inside a rift the overworld zone (the current-zone frame below still keys
   // off `zone`, which the player's far-off rift x displaces past any real
@@ -1451,6 +1455,14 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     hill:
       hill && hill.zoneId === zone.id && inView(hill.x, hill.z)
         ? { ...toMap(hill.x, hill.z), phase: hill.phase }
+        : null,
+    skillEvent:
+      skillEvent && skillEvent.zoneId === zone.id && inView(skillEvent.x, skillEvent.z)
+        ? {
+            ...toMap(skillEvent.x, skillEvent.z),
+            radius: (skillEvent.radius / spanX) * S,
+            phase: skillEvent.phase,
+          }
         : null,
     gatherNodes,
     stations,

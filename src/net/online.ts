@@ -1214,6 +1214,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // --- IWorldWorldPvp: the /pvp readout (`s.wpvp`) + the hill (`s.hill`), delta-omitted. ---
   worldPvpInfo: import('../world_api').WorldPvpInfo | null = null;
   hillInfo: import('../world_api').HillInfo | null = null;
+  skillEventInfo: import('../world_api').SkillEventInfo | null = null;
   // --- IWorldDungeonFinder: group-finder state, mirrored from the snapshot
   // self (`s.df` personal blob + `s.dfb` shared board, both delta-omitted: a
   // missing key keeps the prior mirror, an explicit null clears it). ---
@@ -4268,6 +4269,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // --- IWorldWorldPvp: the /pvp flag + the Skull Bag (worldPvpInfo is a snapshot read). ---
   setWorldPvpFlag(enabled: boolean): void {
     this.cmd({ cmd: 'pvp_flag', on: enabled });
+  }
+  joinSkillEvent(): void {
+    this.cmd({ cmd: 'skill_event_join' });
   }
   sitOnSeat(seatId: string): void {
     this.cmd({ cmd: 'sit_seat', seat: seatId });

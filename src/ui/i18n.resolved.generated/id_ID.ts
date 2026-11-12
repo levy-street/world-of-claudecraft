@@ -3441,7 +3441,10 @@ export const id_ID: EnTranslations = {
         "worldKill": "pembunuhan dunia",
         "worldAssist": "membantu pembunuhan dunia",
         "hillHold": "memegang bukit",
-        "worldQuest": "misi dunia"
+        "worldQuest": "misi dunia",
+        "skillEventWin": "skill event victory",
+        "skillEventComplete": "skill event fought",
+        "skillEventKill": "skill event kill"
       },
       "floatReasons": {
         "kill": "Bunuh",
@@ -15962,7 +15965,9 @@ export const id_ID: EnTranslations = {
       "acceptDuel": "Terima Duel",
       "resurrectionOffer": "{name} ingin menghidupkanmu kembali. Apakah kamu menerima?",
       "acceptResurrection": "Terima Kebangkitan",
-      "decline": "Tolak"
+      "decline": "Tolak",
+      "skillEventJoin": "You are near a PvP event. Would you like to participate? Accepting will toggle PvP on and you can get killed by other players and your purse looted upon death.",
+      "acceptSkillEvent": "Accept"
     },
     "combat": {
       "floatingMiss": "Meleset",

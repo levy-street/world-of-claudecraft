@@ -433,6 +433,11 @@ const hudStringsEn = {
       resurrectionOffer: '{name} wants to return you to life. Do you accept?',
       acceptResurrection: 'Accept Resurrection',
       decline: 'Decline',
+      // The hourly skill event's join prompt (src/ui/hud/skill_event/), shown
+      // to an unflagged player who comes near the event's arena.
+      skillEventJoin:
+        'You are near a PvP event. Would you like to participate? Accepting will toggle PvP on and you can get killed by other players and your purse looted upon death.',
+      acceptSkillEvent: 'Accept',
     },
     combat: {
       floatingMiss: 'Miss',

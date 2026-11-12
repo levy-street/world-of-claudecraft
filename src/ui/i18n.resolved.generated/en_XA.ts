@@ -3441,7 +3441,10 @@ export const en_XA: EnTranslations = {
         "worldKill": "[ŵóŕļð ķíļļ]",
         "worldAssist": "[ŵóŕļð ķíļļ áššíšţéð]",
         "hillHold": "[ĥóļðíñĝ ţĥé ĥíļļ]",
-        "worldQuest": "[ŵóŕļð ɋúéšţ]"
+        "worldQuest": "[ŵóŕļð ɋúéšţ]",
+        "skillEventWin": "[šķíļļ éʋéñţ ʋíçţóŕý]",
+        "skillEventComplete": "[šķíļļ éʋéñţ ƒóúĝĥţ]",
+        "skillEventKill": "[šķíļļ éʋéñţ ķíļļ]"
       },
       "floatReasons": {
         "kill": "[Ķíļļ]",
@@ -15962,7 +15965,9 @@ export const en_XA: EnTranslations = {
       "acceptDuel": "[Áççéþţ Ðúéļ]",
       "resurrectionOffer": "[{name} ŵáñţš ţó ŕéţúŕñ ýóú ţó ļíƒé. Ðó ýóú áççéþţ?]",
       "acceptResurrection": "[Áççéþţ Ŕéšúŕŕéçţíóñ]",
-      "decline": "[Ðéçļíñé]"
+      "decline": "[Ðéçļíñé]",
+      "skillEventJoin": "[Ýóú áŕé ñéáŕ á ÞʋÞ éʋéñţ. Ŵóúļð ýóú ļíķé ţó þáŕţíçíþáţé? Áççéþţíñĝ ŵíļļ ţóĝĝļé ÞʋÞ óñ áñð ýóú çáñ ĝéţ ķíļļéð ƀý óţĥéŕ þļáýéŕš áñð ýóúŕ þúŕšé ļóóţéð úþóñ ðéáţĥ.]",
+      "acceptSkillEvent": "[Áççéþţ]"
     },
     "combat": {
       "floatingMiss": "[Ɱíšš]",

@@ -3441,7 +3441,10 @@ export const ja_JP: EnTranslations = {
         "worldKill": "ワールドPvP撃破",
         "worldAssist": "ワールドPvP撃破のアシスト",
         "hillHold": "丘の保持",
-        "worldQuest": "ワールドクエスト"
+        "worldQuest": "ワールドクエスト",
+        "skillEventWin": "skill event victory",
+        "skillEventComplete": "skill event fought",
+        "skillEventKill": "skill event kill"
       },
       "floatReasons": {
         "kill": "撃破",
@@ -15962,7 +15965,9 @@ export const ja_JP: EnTranslations = {
       "acceptDuel": "決闘を受ける",
       "resurrectionOffer": "{name}があなたを蘇生しようとしています。受け入れますか？",
       "acceptResurrection": "蘇生を受け入れる",
-      "decline": "断る"
+      "decline": "断る",
+      "skillEventJoin": "PvPイベントの近くにいます。参加しますか？承諾するとPvPが有効になり、他のプレイヤーに倒される可能性があり、死亡時には財布の中身を奪われます。",
+      "acceptSkillEvent": "承諾"
     },
     "combat": {
       "floatingMiss": "ミス",

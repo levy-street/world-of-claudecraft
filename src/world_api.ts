@@ -483,6 +483,7 @@ export type {
   HillPhaseInfo,
   HillSide,
   HillStandingInfo,
+  SkillEventInfo,
   SkullBagAction,
   SkullBagInfo,
   WorldPvpInfo,
@@ -977,6 +978,7 @@ export const COMMAND_NAMES = [
   // World PvP: raise or lower the /pvp flag (IWorldWorldPvp.setWorldPvpFlag;
   // the bare /pvp chat line toggles through the sim's own chat router).
   'pvp_flag',
+  'skill_event_join',
   // Guild custom ranks (docs/prd/guild-custom-ranks.md): the Guild Master
   // replaces the guild's rank ladder (titles, order, permissions).
   'guild_set_ranks',

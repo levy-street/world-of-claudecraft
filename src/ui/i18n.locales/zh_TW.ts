@@ -6571,6 +6571,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.prompts.resurrectionOffer': '{name}想讓你復活。是否接受？',
   'hud.prompts.acceptResurrection': '接受復活',
   'hud.prompts.decline': '拒絕',
+  'hud.prompts.skillEventJoin':
+    '你正靠近一場 PvP 活動。要參加嗎？接受後將開啟 PvP，你可能會被其他玩家擊殺，死亡時錢袋會被掠奪。',
+  'hud.prompts.acceptSkillEvent': '接受',
   'hud.combat.floatingMiss': '未命中',
   'hud.combat.floatingDodge': '閃避',
   'hud.combat.floatingResist': '抵抗',

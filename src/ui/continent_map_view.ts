@@ -86,6 +86,8 @@ export interface ContinentMapModel {
   /** The zone id the player currently stands in (the on-canvas subtitle). */
   currentZoneId: string;
   hill: { mx: number; my: number; phase: 'warning' | 'active' } | null;
+  /** The hourly skill event's arena (src/sim/pvp/skill_events.ts), or null. */
+  skillEvent: { mx: number; my: number; phase: 'warning' | 'running' } | null;
 }
 
 export interface ContinentMapInput {
@@ -140,6 +142,7 @@ export function buildContinentMapModel(input: ContinentMapInput): ContinentMapMo
 
   const p = world.player;
   const hill = world.hillInfo;
+  const skillEvent = world.skillEventInfo;
   const currentZoneId = zoneAt(p.pos.x, p.pos.z).id;
 
   const regions: ContinentZoneRegion[] = ZONES.map((zone) => {
@@ -204,6 +207,10 @@ export function buildContinentMapModel(input: ContinentMapInput): ContinentMapMo
     ports,
     currentZoneId,
     hill: hill && inWorld(hill.x, hill.z) ? { ...toMap(hill.x, hill.z), phase: hill.phase } : null,
+    skillEvent:
+      skillEvent && inWorld(skillEvent.x, skillEvent.z)
+        ? { ...toMap(skillEvent.x, skillEvent.z), phase: skillEvent.phase }
+        : null,
   };
 }
 

@@ -28,6 +28,7 @@ export const WPVP_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * WPVP_WI
 export interface WorldPvpCommands {
   setWorldPvpFlag(enabled: boolean, pid: number): void;
   skullBagAction(action: SkullBagAction, pid: number): void;
+  joinSkillEvent(pid: number): void;
 }
 
 export function dispatchWorldPvpCommand(
@@ -37,6 +38,9 @@ export function dispatchWorldPvpCommand(
 ): void {
   // A non-boolean flag is a malformed frame and is ignored.
   if (msg.cmd === 'pvp_flag' && typeof msg.on === 'boolean') sim.setWorldPvpFlag(msg.on, pid);
+  // The hourly skill event's join prompt (src/sim/pvp/skill_events.ts checks
+  // reach, level and the realm switch); the frame carries nothing else.
+  else if (msg.cmd === 'skill_event_join') sim.joinSkillEvent(pid);
   else if (msg.cmd === 'skull_bag' && msg.op === 'store') sim.skullBagAction({ op: 'store' }, pid);
   else if (msg.cmd === 'skull_bag' && msg.op === 'take' && Array.isArray(msg.sources))
     // The buckets stay untrusted: the sim reads them through the canonical

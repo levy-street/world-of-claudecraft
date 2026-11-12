@@ -9,25 +9,135 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hud.prompts.acceptSkillEvent",
+    "hud.prompts.skillEventJoin",
+    "hudChrome.warfare.reasons.skillEventComplete",
+    "hudChrome.warfare.reasons.skillEventKill",
+    "hudChrome.warfare.reasons.skillEventWin"
+  ],
+  "es_ES": [
+    "hud.prompts.acceptSkillEvent",
+    "hud.prompts.skillEventJoin",
+    "hudChrome.warfare.reasons.skillEventComplete",
+    "hudChrome.warfare.reasons.skillEventKill",
+    "hudChrome.warfare.reasons.skillEventWin"
+  ],
+  "fr_FR": [
+    "hud.prompts.acceptSkillEvent",
+    "hud.prompts.skillEventJoin",
+    "hudChrome.warfare.reasons.skillEventComplete",
+    "hudChrome.warfare.reasons.skillEventKill",
+    "hudChrome.warfare.reasons.skillEventWin"
+  ],
+  "fr_CA": [
+    "hud.prompts.acceptSkillEvent",
+    "hud.prompts.skillEventJoin",
+    "hudChrome.warfare.reasons.skillEventComplete",
+    "hudChrome.warfare.reasons.skillEventKill",
+    "hudChrome.warfare.reasons.skillEventWin"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "hud.prompts.acceptSkillEvent",
+    "hud.prompts.skillEventJoin",
+    "hudChrome.warfare.reasons.skillEventComplete",
+    "hudChrome.warfare.reasons.skillEventKill",
+    "hudChrome.warfare.reasons.skillEventWin"
+  ],
+  "de_DE": [
+    "hud.prompts.acceptSkillEvent",
+    "hud.prompts.skillEventJoin",
+    "hudChrome.warfare.reasons.skillEventComplete",
+    "hudChrome.warfare.reasons.skillEventKill",
+    "hudChrome.warfare.reasons.skillEventWin"
+  ],
+  "zh_CN": [
+    "hudChrome.warfare.reasons.skillEventComplete",
+    "hudChrome.warfare.reasons.skillEventKill",
+    "hudChrome.warfare.reasons.skillEventWin"
+  ],
+  "zh_TW": [
+    "hudChrome.warfare.reasons.skillEventComplete",
+    "hudChrome.warfare.reasons.skillEventKill",
+    "hudChrome.warfare.reasons.skillEventWin"
+  ],
+  "ko_KR": [
+    "hudChrome.warfare.reasons.skillEventComplete",
+    "hudChrome.warfare.reasons.skillEventKill",
+    "hudChrome.warfare.reasons.skillEventWin"
+  ],
+  "ja_JP": [
+    "hudChrome.warfare.reasons.skillEventComplete",
+    "hudChrome.warfare.reasons.skillEventKill",
+    "hudChrome.warfare.reasons.skillEventWin"
+  ],
+  "pt_BR": [
+    "hud.prompts.acceptSkillEvent",
+    "hud.prompts.skillEventJoin",
+    "hudChrome.warfare.reasons.skillEventComplete",
+    "hudChrome.warfare.reasons.skillEventKill",
+    "hudChrome.warfare.reasons.skillEventWin"
+  ],
+  "ru_RU": [
+    "hudChrome.warfare.reasons.skillEventComplete",
+    "hudChrome.warfare.reasons.skillEventKill",
+    "hudChrome.warfare.reasons.skillEventWin"
+  ],
+  "cs_CZ": [
+    "hud.prompts.acceptSkillEvent",
+    "hud.prompts.skillEventJoin",
+    "hudChrome.warfare.reasons.skillEventComplete",
+    "hudChrome.warfare.reasons.skillEventKill",
+    "hudChrome.warfare.reasons.skillEventWin"
+  ],
+  "nl_NL": [
+    "hud.prompts.acceptSkillEvent",
+    "hud.prompts.skillEventJoin",
+    "hudChrome.warfare.reasons.skillEventComplete",
+    "hudChrome.warfare.reasons.skillEventKill",
+    "hudChrome.warfare.reasons.skillEventWin"
+  ],
+  "pl_PL": [
+    "hud.prompts.acceptSkillEvent",
+    "hud.prompts.skillEventJoin",
+    "hudChrome.warfare.reasons.skillEventComplete",
+    "hudChrome.warfare.reasons.skillEventKill",
+    "hudChrome.warfare.reasons.skillEventWin"
+  ],
+  "id_ID": [
+    "hud.prompts.acceptSkillEvent",
+    "hud.prompts.skillEventJoin",
+    "hudChrome.warfare.reasons.skillEventComplete",
+    "hudChrome.warfare.reasons.skillEventKill",
+    "hudChrome.warfare.reasons.skillEventWin"
+  ],
+  "tr_TR": [
+    "hud.prompts.acceptSkillEvent",
+    "hud.prompts.skillEventJoin",
+    "hudChrome.warfare.reasons.skillEventComplete",
+    "hudChrome.warfare.reasons.skillEventKill",
+    "hudChrome.warfare.reasons.skillEventWin"
+  ],
+  "sv_SE": [
+    "hud.prompts.acceptSkillEvent",
+    "hud.prompts.skillEventJoin",
+    "hudChrome.warfare.reasons.skillEventComplete",
+    "hudChrome.warfare.reasons.skillEventKill",
+    "hudChrome.warfare.reasons.skillEventWin"
+  ],
+  "vi_VN": [
+    "hud.prompts.acceptSkillEvent",
+    "hud.prompts.skillEventJoin",
+    "hudChrome.warfare.reasons.skillEventComplete",
+    "hudChrome.warfare.reasons.skillEventKill",
+    "hudChrome.warfare.reasons.skillEventWin"
+  ],
+  "da_DK": [
+    "hud.prompts.acceptSkillEvent",
+    "hud.prompts.skillEventJoin",
+    "hudChrome.warfare.reasons.skillEventComplete",
+    "hudChrome.warfare.reasons.skillEventKill",
+    "hudChrome.warfare.reasons.skillEventWin"
+  ]
 };
