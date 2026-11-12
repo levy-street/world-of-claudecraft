@@ -32,6 +32,7 @@ import {
   RIFT_HEROIC_TUNING,
   RIFT_NONLETHAL_MECHANIC_CAP_PCT,
   RIFT_RANK_MECHANIC_BUDGET,
+  RIFT_S_FLOOR_CAP,
   RIFT_S_ZONE_TEMPO,
   type RiftSpawnRole,
   riftFloorLevel,
@@ -41,7 +42,12 @@ import {
   riftRoleDamageMultiplier,
   riftRoleHealthMultiplier,
 } from '../src/sim/rift/ranks';
-import { generateRiftFloor, isSetPieceSeed, riftFloorCount } from '../src/sim/rift/rift_gen';
+import {
+  generateRiftFloor,
+  generateRiftPlan,
+  isSetPieceSeed,
+  riftFloorCount,
+} from '../src/sim/rift/rift_gen';
 import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
@@ -938,6 +944,65 @@ describe('rift ranks: B/A/S rifts are never shorter than 3 floors', () => {
     const floor = generateRiftFloor(seed, 28, 0);
     // S-rank is flat 23 on every floor.
     for (const sp of floor.spawns) expect(sp.level).toBe(23);
+  });
+});
+
+describe('rift ranks: an S-rank rift is capped at 3 floors', () => {
+  it('pins the cap literal', () => {
+    expect(RIFT_S_FLOOR_CAP).toBe(3);
+  });
+
+  it('every S-rank seed runs exactly 3 floors, including seeds that roll longer below S', () => {
+    let longerBelowS = 0;
+    for (let s = 1; s <= 300; s++) {
+      // 28 is the natural S portal level; 30 is a /dev portal banded into S.
+      for (const baseLevel of [28, 30]) {
+        expect(riftFloorCount(s, baseLevel), `seed ${s} base ${baseLevel}`).toBe(3);
+        expect(generateRiftPlan(s, baseLevel).floorCount).toBe(3);
+      }
+      if (riftFloorCount(s, 25) > 3) longerBelowS++;
+    }
+    // The cap is doing real work: most seeds roll past 3 at the uncapped ranks.
+    expect(longerBelowS).toBeGreaterThan(150);
+  });
+
+  it('the third S floor is the boss floor, and a deeper index clamps onto it', () => {
+    let seed = -1;
+    for (let s = 1; s < 400 && seed < 0; s++) if (riftFloorCount(s, 25) === 6) seed = s;
+    expect(seed, 'a seed that rolls 6 floors at A').toBeGreaterThan(0);
+    // The same seed one rank down still runs its full 6 floors, boss on the sixth.
+    expect(generateRiftFloor(seed, 25, 2).isBoss).toBe(false);
+    expect(generateRiftFloor(seed, 25, 5).isBoss).toBe(true);
+    for (const index of [0, 1]) {
+      const floor = generateRiftFloor(seed, 28, index);
+      expect(floor.floorCount).toBe(3);
+      expect(floor.isBoss, `floor ${index}`).toBe(false);
+    }
+    const last = generateRiftFloor(seed, 28, 2);
+    expect(last.floorCount).toBe(3);
+    expect(last.isBoss).toBe(true);
+    expect(last.spawns.some((sp) => sp.boss)).toBe(true);
+    expect(generateRiftFloor(seed, 28, 5).floorIndex).toBe(2);
+  });
+
+  it('C, B and A keep the full 3 to 6 floor range', () => {
+    for (const baseLevel of [20, 22, 25]) {
+      const counts = new Set<number>();
+      for (let s = 1; s <= 300; s++) {
+        if (baseLevel === 20 && isSetPieceSeed(s)) continue;
+        counts.add(riftFloorCount(s, baseLevel));
+      }
+      expect([...counts].sort(), `base ${baseLevel}`).toEqual([3, 4, 5, 6]);
+    }
+  });
+
+  it('a live S-rank run reports 3 floors on the instance', () => {
+    let seed = -1;
+    for (let s = 1; s < 400 && seed < 0; s++) if (riftFloorCount(s, 25) === 6) seed = s;
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true });
+    sim.setPlayerLevel(20);
+    sim.enterRift(seed, 28, sim.player.id);
+    expect(active(sim).floorCount).toBe(3);
   });
 });
 

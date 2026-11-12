@@ -51,6 +51,11 @@ export function riftFloorLevel(baseLevel: number, floorIndex: number): number {
   return Math.max(1, Math.min(RIFT_LEVEL_CAP, rounded + floorIndex));
 }
 
+/** The most floors an S-rank rift runs. C, B and A keep the generator's full
+ * procedural range; S is the hardest rank on every floor, so its descent is
+ * held to the shortest procedural length (rift_gen.ts riftFloorCount). */
+export const RIFT_S_FLOOR_CAP = 3;
+
 /** How many of a boss template's `rankMechanics` are live per rank. */
 export const RIFT_RANK_MECHANIC_BUDGET: Record<RiftTier, number> = { C: 1, B: 2, A: 3, S: 4 };
 

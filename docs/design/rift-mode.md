@@ -60,6 +60,10 @@ through the spawn-time stat transform in `rift/ranks.ts`, the rank mechanic
 budget (C=1 .. S=4 of a boss's `rankMechanics` kit), and the hazard gate.
 Rifts are group content at every rank including C.
 
+Rank also bounds the length of the descent at the top: an S-rank rift never
+runs more floors than `RIFT_S_FLOOR_CAP` (`rift/ranks.ts`), while C, B and A
+keep the generator's full procedural range.
+
 The ladder is calibrated onto the v0.30 dungeon ladder: C is a normal dungeon
 (normal Gravewyrm Sanctum's own line), B is the heroic five-man line at 1.0x, A
 is 1.2x heroic, S is 1.33x heroic. Health and damage are split by mob class
