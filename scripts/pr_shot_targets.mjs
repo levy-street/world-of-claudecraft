@@ -2159,9 +2159,9 @@ export const TARGETS = [
     key: 'npc-quest-marker-range',
     label: 'NPC quest markers: the giver marker past the close NPC plate range',
     when: ['render/nameplate_view', 'render/nameplate_painter'],
-    // The nearest quest giver with an offer, seen from 25 yards: past
-    // NPC_NAMEPLATE_RANGE, so the base checkout draws no plate at all and the
-    // marker-only plate draws the bare quest marker. Desktop only: the plate
+    // The nearest quest giver with an offer, seen from 35 yards: past
+    // NPC_NAMEPLATE_RANGE (and inside NAMEPLATE_RANGE), so the marker-only
+    // plate draws the bare quest marker with no name or role line. Desktop only: the plate
     // paints identically on the compact tier, and the mobile chase camera
     // looks down past the giver.
     variants: [{ key: 'desktop' }],
@@ -2189,8 +2189,8 @@ export const TARGETS = [
         // and face the giver with the chase camera on the same heading.
         const ux = (player.pos.x - giver.pos.x) / (best || 1);
         const uz = (player.pos.z - giver.pos.z) / (best || 1);
-        player.pos.x = giver.pos.x + ux * 25;
-        player.pos.z = giver.pos.z + uz * 25;
+        player.pos.x = giver.pos.x + ux * 35;
+        player.pos.z = giver.pos.z + uz * 35;
         player.pos.y = game.renderer?.groundSample?.(player.pos.x, player.pos.z) ?? giver.pos.y;
         player.prevPos = { ...player.pos };
         player.facing = Math.atan2(-ux, -uz);

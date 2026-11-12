@@ -38,7 +38,7 @@ export const NAMEPLATE_RANGE_SQ = NAMEPLATE_RANGE * NAMEPLATE_RANGE;
 // busy hub does not fill the screen with labels for people across the square.
 // Beyond it, out to the normal NAMEPLATE_RANGE, a quest giver still shows its
 // '!' or '?' on its own (`markerOnly`), so a quest reads from across the square.
-export const NPC_NAMEPLATE_RANGE = 10;
+export const NPC_NAMEPLATE_RANGE = 25;
 export const NPC_NAMEPLATE_RANGE_SQ = NPC_NAMEPLATE_RANGE * NPC_NAMEPLATE_RANGE;
 
 // Within this many yards (or when targeted / casting) a nameplate refreshes its
