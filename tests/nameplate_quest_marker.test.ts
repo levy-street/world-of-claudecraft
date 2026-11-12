@@ -477,6 +477,16 @@ describe('nameplate quest marker beyond the close NPC plate range', () => {
     painter.update(false);
     expect([near.name, near.guild, near.guildLabel, near.title]).toEqual(['', '', '', '']);
     expectMarker(painter, '!', 'quest');
+
+    // Walking back in to 20 yd crosses NPC_NAMEPLATE_RANGE while still outside
+    // NAMEPLATE_URGENT_RANGE: the same flip brings the full plate back on a
+    // throttled pass, without waiting for the next full one.
+    world.player.pos.z = 20;
+    painter.update(false);
+    const approach = stateOf(painter, 2);
+    expect(approach.name).not.toBe('');
+    expect(approach.guild + approach.title).not.toBe('');
+    expectMarker(painter, '!', 'quest');
   });
 
   it('draws nothing for a far NPC with no marker', () => {
