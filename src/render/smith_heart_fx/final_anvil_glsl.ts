@@ -139,7 +139,7 @@ varying vec3 vN;
 varying vec3 vView;
 void main() {
   float facing = abs(dot(normalize(vN), normalize(vView)));
-  float soft = pow(facing, 1.6);
+  float soft = facing * facing;
   // uDown 1: the column (hot at its foot); 0: the streak (hot at its head).
   float h = mix(vUv.y, 1.0 - vUv.y, uDown);
   float along = mix(1.0 - h, h, uDown);
@@ -187,7 +187,8 @@ void main() {
   // Its edges hotter as the air rushes past (a rim of heat).
   // Only the grazing silhouette: a face seen at an angle stays stone.
   float rim = 1.0 - abs(dot(normalize(vN), normalize(vView)));
-  k += pow(rim, 5.0) * uHeat * 0.7;
+  float rim2 = rim * rim;
+  k += rim2 * rim2 * rim * uHeat * 0.7;
   vec3 col = heatRamp(0.15 + 0.6 * uHeat) * k + vec3(1.0, 0.9, 0.7) * heart * 1.2;
   gl_FragColor = vec4(col, 1.0);
 }
