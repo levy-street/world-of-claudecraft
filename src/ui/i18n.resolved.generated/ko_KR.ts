@@ -15972,13 +15972,19 @@ export const ko_KR: EnTranslations = {
         "lunge": "찌르기",
         "guard": "방어",
         "feint": "페인트",
-        "sidestep": "옆걸음"
+        "sidestep": "옆걸음",
+        "sweep": "휩쓸기",
+        "hush": "발소리 죽이기",
+        "pebble": "조약돌"
       },
       "verbTips": {
         "lunge": "{windup}초 동안 힘을 모은 뒤, 앞쪽 {range}미터 안에서 가장 가까운 상대를 찌릅니다. 적중하면 하트 1개를 빼앗습니다.",
         "guard": "최대 {max}초 동안 방어 자세를 취합니다. 처음 {perfect}초 안에 들어온 찌르기는 되받아치며, 공격자는 {stagger}초 동안 빈틈을 보입니다. {max}초를 끝까지 버티면 {open}초 동안 빈틈을 보입니다. 다시 누르면 방어를 풉니다. 최근 {passive}초 안에 찌른 적이 있어야 방어할 수 있습니다.",
         "feint": "자신의 힘 모으기를 취소해 상대의 이른 방어를 유도합니다. 재사용 대기시간 {feintCd}초.",
-        "sidestep": "앞으로 {distance}미터 돌진합니다. 재사용 대기시간 {sidestepCd}초."
+        "sidestep": "앞으로 {distance}미터 돌진합니다. 재사용 대기시간 {sidestepCd}초.",
+        "sweep": "앞쪽의 짧은 부채꼴, {sweepRange}미터 안에서 가장 가까운 상대를 휩씁니다. 적중하면 하트 1개를 빼앗고 {reveal}초 동안 서로의 모습이 드러납니다. 빗나가면 자신만 드러납니다.",
+        "hush": "{hush}초 동안 발자국을 남기지 않고 걷습니다. 재사용 대기시간 {hushCd}초.",
+        "pebble": "앞쪽으로 {pebble}미터 길이의 가짜 발자국을 던집니다. 누군가 방금 걸어간 것처럼 보입니다. 재사용 대기시간 {pebbleCd}초."
       },
       "stance": {
         "lunge": "힘 모으는 중",
@@ -15986,6 +15992,8 @@ export const ko_KR: EnTranslations = {
         "open": "빈틈"
       },
       "ready": "준비 완료",
+      "unseen": "보이지 않음",
+      "seen": "모두에게 보임",
       "startsIn": "{minutes}분 후 시작",
       "keepsake": "남긴 기술",
       "keepsakeTip": "남긴 기술: {name}. 여기서 쓸 수 있는 유일한 직업 기술입니다.",

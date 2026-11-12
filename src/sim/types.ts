@@ -8271,6 +8271,11 @@ export interface Entity extends ClientMirroredEntityFields {
    *  raised guard, or open after a riposte or an overheld guard. Rides the entity
    *  wire (`stc`) every tick so every fencer sees the tell; absent otherwise. */
   eventStance?: 'lunge' | 'guard' | 'open';
+  /** Footprints in Ash (src/sim/pvp/skill_event_footprints.ts): hidden from
+   *  every other viewer (the server stops sending the entity; offline the
+   *  renderer hides it). Rides the entity wire (`uns`) so your own client can
+   *  show you that you are unseen; absent otherwise. */
+  eventUnseen?: boolean;
   /** WARFARE Vitality switch (src/sim/pvp/vitality.ts): false while the player
    *  stands in a PvE instance (a dungeon, raid, delve or rift floor), so honor
    *  gear's health bonus never reaches raid content. Absent means the open

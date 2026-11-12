@@ -482,7 +482,6 @@ import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { buildHauntedPumpkin, syncHauntedPumpkin } from './haunted_pumpkin';
 import { usedJsHeapMb } from './heap_sample';
-import { HillRingVisuals } from './hill_ring';
 import { createHitchFrameAligner } from './hitch_frame_align_core';
 import { HOARD_BODY_IDS, hoardEntrance } from './hoard_entrance';
 import * as hoardValley from './hoard_valley_frame';
@@ -834,6 +833,7 @@ import {
 } from './shadow_texel_snap_core';
 import { disposeUnsharedMeshResources } from './shared_resource';
 import { shipShadowHold } from './ship_shadow_hold';
+import { PvpGroundVisuals } from './skill_event_ground';
 import {
   buildSky,
   ensureSkyAssetsAt,
@@ -2018,8 +2018,9 @@ export class Renderer {
   private abyssalRiftFx!: AbyssalRiftFx;
   private ringOfFrostVisuals!: RingOfFrostVisuals;
   private riftDeathZoneVisuals!: import('./rift_death_zone').RiftDeathZoneVisuals;
-  // King of the Hill: the standing hill's circle (hill_ring.ts, IWorld.hillInfo).
-  private hillRingVisuals!: HillRingVisuals;
+  // World PvP ground: the King of the Hill circle, the skill event arena and the
+  // Footprints in Ash marks (skill_event_ground.ts, from IWorld).
+  private pvpGroundVisuals!: PvpGroundVisuals;
   // The viewer's OWN farm plots. Seats are sampled once with the static beds;
   // the visuals wait for the Vfx, which is built later in the same lifecycle.
   private farmBedSeats: ReadonlyMap<string, FarmBedSeat> = new Map();
@@ -3060,7 +3061,7 @@ export class Renderer {
         this.sim, (amount) => this.addShake(amount), () => this.reducedMotion(), (id, gesture) => this.triggerAttack(id, gesture),
       );
     });
-    this.hillRingVisuals = new HillRingVisuals(this.scene, gate, (x, z) =>
+    this.pvpGroundVisuals = new PvpGroundVisuals(this.scene, gate, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
     this.temporalHourglassGroundVisuals = new TemporalHourglassGroundVisuals(this.scene, (x, z) =>
@@ -5073,8 +5074,7 @@ export class Renderer {
       this.riftDeathZoneVisuals.sync(this.sim.riftBossDeathZones(), this.sim.hoardBossCues());
       this.riftDeathZoneVisuals.update(dt);
     }
-    this.hillRingVisuals.sync(this.sim.hillInfo);
-    this.hillRingVisuals.update(dt);
+    this.pvpGroundVisuals.drive(this.sim, dt, this.camera);
     this.farmPatchVisuals?.drive(this.sim, dt, this.sim.entities.has(this.sim.playerId));
     this.temporalHourglassGroundVisuals.sync(this.sim.activeTemporalHourglasses);
     this.temporalHourglassGroundVisuals.update(dt);
@@ -9805,10 +9805,10 @@ export class Renderer {
         // still re-hide loot.
         v.group.visible = raidEncounterViewVisibleDuringCompile(e, v.compilePending);
         // The graveyard resurrection angel is present only to a released spirit: hide
-        // it from the living local player. It stays in the sim for the ghost and for
-        // server-side resurrect-range checks, and other ghosts still see it. The
-        // continue also skips its holy shimmer and ghost pass below.
-        if (e.templateId === 'spirit_healer' && !p.ghost) {
+        // it from the living local player (it stays in the sim for the ghost and the
+        // resurrect-range checks). A Footprints in Ash fighter who is unseen hides too
+        // (online the server never sends one). The continue skips the passes below.
+        if ((e.templateId === 'spirit_healer' && !p.ghost) || e.eventUnseen) {
           v.group.visible = false;
           continue;
         }
@@ -11281,8 +11281,7 @@ export class Renderer {
       this.riftDeathZoneVisuals.sync(this.sim.riftBossDeathZones(), this.sim.hoardBossCues());
       this.riftDeathZoneVisuals.update(dt);
     }
-    this.hillRingVisuals.sync(this.sim.hillInfo);
-    this.hillRingVisuals.update(dt);
+    this.pvpGroundVisuals.drive(this.sim, dt, this.camera);
     this.farmPatchVisuals?.drive(this.sim, dt);
     this.temporalHourglassGroundVisuals.sync(this.sim.activeTemporalHourglasses);
     this.temporalHourglassGroundVisuals.update(dt);

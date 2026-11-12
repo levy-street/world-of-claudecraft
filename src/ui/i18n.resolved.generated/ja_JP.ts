@@ -15972,13 +15972,19 @@ export const ja_JP: EnTranslations = {
         "lunge": "突き",
         "guard": "ガード",
         "feint": "フェイント",
-        "sidestep": "サイドステップ"
+        "sidestep": "サイドステップ",
+        "sweep": "薙ぎ払い",
+        "hush": "忍び足",
+        "pebble": "小石"
       },
       "verbTips": {
         "lunge": "{windup}秒ためてから、前方{range}ヤード以内で最も近い相手を突く。命中するとハートを1つ奪う。",
         "guard": "最大{max}秒ガードを構える。構えてから{perfect}秒以内に届いた突きは返され、攻撃側は{stagger}秒間隙だらけになる。{max}秒構えきると自分が{open}秒間隙だらけになる。もう一度押すとガードを下ろす。直近{passive}秒以内に突いていないとガードできない。",
         "feint": "自分のためを取り消し、相手の早すぎるガードを誘う。再使用まで{feintCd}秒。",
-        "sidestep": "前方へ{distance}ヤード踏み込む。再使用まで{sidestepCd}秒。"
+        "sidestep": "前方へ{distance}ヤード踏み込む。再使用まで{sidestepCd}秒。",
+        "sweep": "前方の短い扇状範囲、{sweepRange}ヤード以内で最も近い相手を薙ぐ。命中するとハートを1つ奪い、{reveal}秒間お互いの姿が見える。外すと自分だけが見える。",
+        "hush": "{hush}秒間、足跡を残さずに歩く。再使用まで{hushCd}秒。",
+        "pebble": "前方へ{pebble}ヤードの偽の足跡を投げる。誰かが歩き去ったばかりのように見える。再使用まで{pebbleCd}秒。"
       },
       "stance": {
         "lunge": "ため中",
@@ -15986,6 +15992,8 @@ export const ja_JP: EnTranslations = {
         "open": "隙あり"
       },
       "ready": "準備完了",
+      "unseen": "見えていない",
+      "seen": "全員に見えている",
       "startsIn": "{minutes}分後に開始",
       "keepsake": "持ち込み技",
       "keepsakeTip": "持ち込み技：{name}。ここで使える唯一のクラス技。",

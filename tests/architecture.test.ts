@@ -1473,6 +1473,7 @@ const RENDER_PURE_CORES = [
   'src/render/renderer_frame_telemetry_core.ts',
   'src/render/rift_death_zone_core.ts',
   'src/render/hill_ring_core.ts',
+  'src/render/skill_event_ground_core.ts',
   'src/render/scene_census_core.ts',
   'src/render/sea_mist_core.ts',
   'src/render/self_prediction_core.ts',

@@ -18,4 +18,5 @@ export function writeEntityStatusWire(e: Entity, out: Record<string, unknown>): 
   // so the overhead row and your own heart bar never lag a hit.
   if (e.eventHearts !== undefined) out.hrt = e.eventHearts;
   if (e.eventStance !== undefined) out.stc = e.eventStance; // Riposte tell
+  if (e.eventUnseen) out.uns = 1; // Footprints in Ash: your own client only ever sees it
 }

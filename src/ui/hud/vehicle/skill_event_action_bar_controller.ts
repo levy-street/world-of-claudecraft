@@ -14,6 +14,14 @@ import {
   skillEventControlsActive,
 } from '../../../game/skill_event_controls';
 import {
+  FOOTPRINTS_HUSH,
+  FOOTPRINTS_HUSH_COOLDOWN,
+  FOOTPRINTS_PEBBLE_COOLDOWN,
+  FOOTPRINTS_PEBBLE_LENGTH,
+  FOOTPRINTS_REVEAL,
+  FOOTPRINTS_SWEEP_RANGE,
+} from '../../../sim/pvp/skill_event_footprints';
+import {
   RIPOSTE_FEINT_COOLDOWN,
   RIPOSTE_GUARD_MAX,
   RIPOSTE_LUNGE_RANGE,
@@ -74,6 +82,12 @@ const SKILL_EVENT_TIP_VALUES = {
   feintCd: RIPOSTE_FEINT_COOLDOWN,
   distance: RIPOSTE_SIDESTEP_DISTANCE,
   sidestepCd: RIPOSTE_SIDESTEP_COOLDOWN,
+  sweepRange: FOOTPRINTS_SWEEP_RANGE,
+  reveal: FOOTPRINTS_REVEAL,
+  hush: FOOTPRINTS_HUSH,
+  hushCd: FOOTPRINTS_HUSH_COOLDOWN,
+  pebble: FOOTPRINTS_PEBBLE_LENGTH,
+  pebbleCd: FOOTPRINTS_PEBBLE_COOLDOWN,
 };
 
 const MAX_CHOICES = 12;
@@ -202,7 +216,9 @@ export class SkillEventActionBarController {
         ? t('hud.skillEvent.startsIn', { minutes: info.minutesLeft })
         : stance
           ? t(STANCE_KEYS[stance])
-          : t('hud.skillEvent.ready'),
+          : info.kind === 'footprints'
+            ? t(this.world.player.eventUnseen ? 'hud.skillEvent.unseen' : 'hud.skillEvent.seen')
+            : t('hud.skillEvent.ready'),
     );
     this.writers.toggleClass(this.root, 'is-open', stance === 'open');
     this.writers.toggleClass(this.root, 'is-warning', info.phase === 'warning');

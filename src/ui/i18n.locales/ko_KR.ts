@@ -5141,6 +5141,17 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.skillEvent.stance.lunge': '힘 모으는 중',
   'hud.skillEvent.stance.guard': '방어 중',
   'hud.skillEvent.stance.open': '빈틈',
+  'hud.skillEvent.verbs.sweep': '휩쓸기',
+  'hud.skillEvent.verbs.hush': '발소리 죽이기',
+  'hud.skillEvent.verbs.pebble': '조약돌',
+  'hud.skillEvent.verbTips.sweep':
+    '앞쪽의 짧은 부채꼴, {sweepRange}미터 안에서 가장 가까운 상대를 휩씁니다. 적중하면 하트 1개를 빼앗고 {reveal}초 동안 서로의 모습이 드러납니다. 빗나가면 자신만 드러납니다.',
+  'hud.skillEvent.verbTips.hush':
+    '{hush}초 동안 발자국을 남기지 않고 걷습니다. 재사용 대기시간 {hushCd}초.',
+  'hud.skillEvent.verbTips.pebble':
+    '앞쪽으로 {pebble}미터 길이의 가짜 발자국을 던집니다. 누군가 방금 걸어간 것처럼 보입니다. 재사용 대기시간 {pebbleCd}초.',
+  'hud.skillEvent.unseen': '보이지 않음',
+  'hud.skillEvent.seen': '모두에게 보임',
   'hud.skillEvent.ready': '준비 완료',
   'hud.skillEvent.startsIn': '{minutes}분 후 시작',
   'hud.skillEvent.keepsake': '남긴 기술',

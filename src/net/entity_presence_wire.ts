@@ -18,4 +18,7 @@ export function applyEntityPresenceBits(e: Entity, w: any): void {
   // Riposte stance (`stc`): the wind-up, guard or open tell, else nothing.
   if (w.stc === 'lunge' || w.stc === 'guard' || w.stc === 'open') e.eventStance = w.stc;
   else delete e.eventStance;
+  // Footprints in Ash unseen bit (`uns`): only ever on your own record.
+  if (w.uns) e.eventUnseen = true;
+  else delete e.eventUnseen;
 }

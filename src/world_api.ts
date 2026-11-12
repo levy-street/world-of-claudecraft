@@ -485,6 +485,8 @@ export type {
   HillStandingInfo,
   SkillEventInfo,
   SkillEventKitInfo,
+  SkillEventMark,
+  SkillEventMarkBook,
   SkullBagAction,
   SkullBagInfo,
   WorldPvpInfo,

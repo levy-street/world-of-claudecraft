@@ -148,6 +148,9 @@ export interface SkillEventInfo {
   x: number;
   z: number;
   radius: number;
+  /** The live fighting ground's radius: the arena's, or for Footprints in Ash
+   *  the ash field as it closes. The ground ring is drawn at this radius. */
+  fieldRadius: number;
   /** Whole minutes (rounded up) to the start while warning, to the hard cap
    *  while running. */
   minutesLeft: number;
@@ -173,6 +176,27 @@ export interface SkillEventKitInfo {
   choices: string[];
 }
 
+/** One mark on the ash of Footprints in Ash: a footprint (real or thrown) or a
+ *  breath plume over someone standing still. Who left it is never sent. */
+export interface SkillEventMark {
+  /** Unique within the event, increasing: new marks have higher numbers. */
+  seq: number;
+  x: number;
+  z: number;
+  /** The walking direction (radians, the entity facing convention). */
+  heading: number;
+  kind: 'step' | 'breath';
+  /** When it was left, on the clock of SkillEventMarkBook.now. */
+  at: number;
+}
+
+/** The marks a fighter can read, with the clock they are timed on. */
+export interface SkillEventMarkBook {
+  /** Seconds, the same clock as every mark's `at`. */
+  now: number;
+  marks: readonly SkillEventMark[];
+}
+
 export interface IWorldWorldPvp {
   worldPvpInfo: WorldPvpInfo | null;
   /** Raise (true) or lower (false) the flag; lowering starts the disarm
@@ -195,4 +219,7 @@ export interface IWorldWorldPvp {
   skillEventAction(verb: string): void;
   /** Keep one of your eligible class abilities for the event. */
   skillEventPickKeepsake(abilityId: string): void;
+  /** The ash marks you can read while you fight Footprints in Ash (empty
+   *  otherwise). Marks fade SKILL_EVENT_MARK_LIFETIME seconds after `at`. */
+  skillEventMarks(): SkillEventMarkBook;
 }

@@ -1322,7 +1322,9 @@ const MONOLITHS: MonolithRow[] = [
     // to professions/tool_effect_slot_view.ts, which paid for the event wiring. wc -l.
     // LOWERED 11389 -> 11378: the party heal prediction moved to
     // social/party_incoming_heals.ts beside the skill event kit wiring. wc -l.
-    ceiling: 11378,
+    // LOWERED 11378 -> 11377: the skill event readout's no-primary guard moved
+    // into skill_events.ts, paying for the Footprints in Ash marks getter. wc -l.
+    ceiling: 11377,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

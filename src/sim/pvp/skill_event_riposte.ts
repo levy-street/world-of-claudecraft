@@ -19,6 +19,7 @@ import { relocateSwept } from '../combat/heroic_leap';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { kitFor, type RiposteKitState, verbReady } from './skill_event_kit';
+import { heartFighting, lastFighterStandingTick } from './skill_event_last_standing';
 import type { ActiveSkillEvent, SkillEventRuleSet } from './skill_events';
 
 export const RIPOSTE_LUNGE_WINDUP = 0.5;
@@ -49,10 +50,6 @@ function riposteState(ev: ActiveSkillEvent, pid: number): RiposteKitState {
   return kit.riposte;
 }
 
-function fighting(ev: ActiveSkillEvent, e: Entity | undefined): e is Entity {
-  return !!e && !e.dead && e.kind === 'player' && (ev.hearts.get(e.id) ?? 0) > 0;
-}
-
 /** The nearest living fighter in front of `p` within lunge range, or null. */
 export function lungeTarget(ctx: SimContext, ev: ActiveSkillEvent, p: Entity): Entity | null {
   const fx = Math.sin(p.facing);
@@ -62,7 +59,7 @@ export function lungeTarget(ctx: SimContext, ev: ActiveSkillEvent, p: Entity): E
   for (const pid of ev.hearts.keys()) {
     if (pid === p.id) continue;
     const t = ctx.entities.get(pid);
-    if (!fighting(ev, t)) continue;
+    if (!heartFighting(ev, t)) continue;
     const dx = t.pos.x - p.pos.x;
     const dz = t.pos.z - p.pos.z;
     const d = Math.hypot(dx, dz);
@@ -80,7 +77,7 @@ function busy(st: RiposteKitState, now: number): boolean {
 
 function action(ctx: SimContext, ev: ActiveSkillEvent, pid: number, verb: string): boolean {
   const p = ctx.entities.get(pid);
-  if (!fighting(ev, p)) return false;
+  if (!heartFighting(ev, p)) return false;
   const kit = kitFor(ev, pid);
   const st = riposteState(ev, pid);
   const now = ctx.time;
@@ -155,7 +152,7 @@ function everyTick(ctx: SimContext, ev: ActiveSkillEvent): void {
     const st = kit.riposte;
     if (!st) continue;
     const p = ctx.entities.get(pid);
-    if (!fighting(ev, p)) {
+    if (!heartFighting(ev, p)) {
       st.lungeAt = null;
       st.guardFrom = null;
       st.guardUntil = null;
@@ -171,27 +168,9 @@ function everyTick(ctx: SimContext, ev: ActiveSkillEvent): void {
   }
 }
 
-/** Last fencer standing wins, if they took at least one heart. */
-function tick(ctx: SimContext, ev: ActiveSkillEvent): void {
-  if (ev.hearts.size < 2) return;
-  let standing: number | null = null;
-  let count = 0;
-  for (const pid of ev.hearts.keys()) {
-    if (fighting(ev, ctx.entities.get(pid))) {
-      standing = pid;
-      count++;
-    }
-  }
-  if (count === 1 && standing !== null && (ev.heartsTaken.get(standing) ?? 0) > 0) {
-    ev.winner = standing;
-  } else if (count === 0) {
-    ev.endsAt = Math.min(ev.endsAt, ctx.time);
-  }
-}
-
 export const RIPOSTE_RULES: SkillEventRuleSet = {
   killsToWin: Number.POSITIVE_INFINITY,
   action,
   everyTick,
-  tick,
+  tick: lastFighterStandingTick,
 };

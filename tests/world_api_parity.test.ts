@@ -660,6 +660,8 @@ export const IWORLD_MEMBERS = [
   { name: 'joinSkillEvent', kind: 'method' },
   { name: 'skillEventAction', kind: 'method' },
   { name: 'skillEventPickKeepsake', kind: 'method' },
+  // Footprints in Ash: the ash marks a fighter reads (skill_event_footprints.ts).
+  { name: 'skillEventMarks', kind: 'method' },
   // The classic inn "Resting" state (IWorldProgressionXp): derived in both worlds.
   { name: 'resting', kind: 'data' },
   // IWorldSeating (seating.ts): sit on a piece of furniture by its seat id.
@@ -1036,9 +1038,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // Riding ranks (PR 4390) add one method over the release: 466/140/329.
     // The portrait menu's unappliedDungeonDifficulty (method, PR 4625) adds one
     // more: 471/140/331.
-    expect(IWORLD_MEMBERS.length).toBe(475);
+    // Footprints in Ash's skillEventMarks (method) adds one more: 476/141/335.
+    expect(IWORLD_MEMBERS.length).toBe(476);
     expect(DATA_MEMBERS.length).toBe(141);
-    expect(METHOD_MEMBERS.length).toBe(334);
+    expect(METHOD_MEMBERS.length).toBe(335);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -1444,6 +1447,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'sitOnSeat',
       'skillEventAction',
       'skillEventInfo',
+      'skillEventMarks',
       'skillEventPickKeepsake',
       'skullBagAction',
       'slotToolEffect',
@@ -1957,6 +1961,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'shadowWorldQuestAction',
       'sitOnSeat',
       'skillEventAction',
+      'skillEventMarks',
       'skillEventPickKeepsake',
       'skullBagAction',
       'slotToolEffect',
@@ -2740,6 +2745,7 @@ const FACET_WORLD_PVP = [
   'joinSkillEvent',
   'skillEventAction',
   'skillEventPickKeepsake',
+  'skillEventMarks',
 ] as const satisfies readonly (keyof IWorldWorldPvp)[];
 type _ExhaustWorldPvp = AssertNever<
   Exclude<keyof IWorldWorldPvp, (typeof FACET_WORLD_PVP)[number]>
@@ -2904,8 +2910,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // adds resting (data) and sitOnSeat (the seating facet's method).
     // Plus Lantern Hall's guildContracts and buyGuildCosmetic, the riding
     // ranks method (PR 4390) and unappliedDungeonDifficulty (PR 4625).
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(475);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(475);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(476);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(476);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

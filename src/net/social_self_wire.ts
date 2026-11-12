@@ -29,6 +29,7 @@ import type {
   WorldPvpInfo,
 } from '../world_api';
 import { decodeDungeonFinderBoard, decodeDungeonFinderInfo } from './dungeon_finder_wire';
+import { applySkillEventMarksWire } from './skill_event_marks_mirror';
 
 /** The mirrors this cohort writes; the concrete ClientWorld satisfies it
  *  structurally. */
@@ -70,6 +71,7 @@ export interface SocialSelfRecord {
   skb?: unknown;
   hill?: unknown;
   sevt?: unknown;
+  sevm?: unknown;
 }
 
 const numberOrZero = (v: unknown): number => (typeof v === 'number' ? v : 0);
@@ -118,4 +120,6 @@ export function applySocialSelfWire(target: SocialSelfMirrors, s: SocialSelfReco
   if (s.hill !== undefined) target.hillInfo = s.hill as HillInfo | null;
   // The hourly skill event (src/sim/pvp/skill_events.ts): same delta contract.
   if (s.sevt !== undefined) target.skillEventInfo = s.sevt as SkillEventInfo | null;
+  // Footprints in Ash marks: only the new ones, every tick (skill_event_marks_mirror.ts).
+  if (s.sevm !== undefined) applySkillEventMarksWire(target, s.sevm);
 }

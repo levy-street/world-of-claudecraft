@@ -19,6 +19,7 @@
 // plug in through `skillEventRules`; until one is registered for a kind, that
 // kind runs on the shared baseline below (first to the kill target wins).
 
+import type { SkillEventMark } from '../../world_api/world_pvp';
 import { SKILL_EVENT_SITES, type SkillEventSite } from '../content/skill_event_sites';
 import { ZONES } from '../data';
 import { Rng } from '../rng';
@@ -26,6 +27,7 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { grantHonor } from './honor';
+import { FOOTPRINTS_RULES, type FootprintsBook } from './skill_event_footprints';
 import {
   keepsakeEligible,
   kitFor,
@@ -85,6 +87,8 @@ export interface ActiveSkillEvent {
   kills: Map<number, number>;
   /** Set by the rule set the moment the event is won. */
   winner: number | null;
+  /** Footprints in Ash: the marks on the ash (skill_event_footprints.ts). */
+  footprints?: FootprintsBook;
 }
 
 export interface SkillEventState {
@@ -113,6 +117,9 @@ export interface SkillEventRuleSet {
   /** A kit verb pressed by a fighter (already validated as this event's verb).
    *  True when it took effect. */
   action?(ctx: SimContext, ev: ActiveSkillEvent, pid: number, verb: string): boolean;
+  /** The live fighting ground's radius when it is not the arena's (a closing
+   *  field). */
+  fieldRadius?(ev: ActiveSkillEvent, now: number): number;
 }
 
 /** The rule set of a kind, or undefined for the baseline. A function, not a
@@ -122,6 +129,8 @@ export function skillEventRules(kind: SkillEventKind): SkillEventRuleSet | undef
   switch (kind) {
     case 'riposte':
       return RIPOSTE_RULES;
+    case 'footprints':
+      return FOOTPRINTS_RULES;
     default:
       return undefined;
   }
@@ -259,6 +268,7 @@ function clearHearts(ctx: SimContext, ev: ActiveSkillEvent): void {
     if (e) {
       delete e.eventHearts;
       delete e.eventStance;
+      delete e.eventUnseen;
     }
   }
   ev.hearts.clear();
@@ -423,7 +433,7 @@ export function skillEventInfoFor(
   pid: number,
 ): import('../../world_api').SkillEventInfo | null {
   const ev = ctx.skillEventState.active;
-  if (!ev) return null;
+  if (!ev || pid < 0) return null; // pid -1: a host with no primary player
   const e = ctx.entities.get(pid);
   const meta = ctx.players.get(pid);
   const joined = ev.participants.includes(pid);
@@ -435,6 +445,10 @@ export function skillEventInfoFor(
     x: ev.x,
     z: ev.z,
     radius: SKILL_EVENT_RADIUS,
+    fieldRadius:
+      ev.phase === 'running'
+        ? (skillEventRules(ev.kind)?.fieldRadius?.(ev, ctx.time) ?? SKILL_EVENT_RADIUS)
+        : SKILL_EVENT_RADIUS,
     minutesLeft: skillEventMinutesUntil(ev.phase === 'warning' ? ev.startsAt : ev.endsAt, ctx.time),
     joined,
     // The join prompt: near the arena, not in it yet, and not already flagged
@@ -582,4 +596,31 @@ function kitInfoFor(
   const known = ctx.players.get(pid)?.known ?? [];
   const choices = known.filter((k) => keepsakeEligible(k.def)).map((k) => k.def.id);
   return { verbs, keepsake: kit?.keepsake ?? null, choices };
+}
+
+const NO_MARKS: readonly SkillEventMark[] = [];
+
+/** The ash marks a viewer may read: only a fighter of a running Footprints in
+ *  Ash sees them (IWorld.skillEventMarks; the server streams the same list). */
+export function skillEventMarksFor(ctx: SimContext, pid: number): readonly SkillEventMark[] {
+  const ev = ctx.skillEventState.active;
+  if (!ev || ev.phase !== 'running' || !ev.footprints || !ev.hearts.has(pid)) return NO_MARKS;
+  return ev.footprints.marks;
+}
+
+/** The offline IWorld book: one object per sim, refreshed in place per read. */
+const markBooks = new WeakMap<SimContext, { now: number; marks: readonly SkillEventMark[] }>();
+
+export function skillEventMarkBookFor(
+  ctx: SimContext,
+  pid: number,
+): import('../../world_api').SkillEventMarkBook {
+  let book = markBooks.get(ctx);
+  if (!book) {
+    book = { now: 0, marks: NO_MARKS };
+    markBooks.set(ctx, book);
+  }
+  book.now = ctx.time;
+  book.marks = skillEventMarksFor(ctx, pid);
+  return book;
 }

@@ -10434,18 +10434,17 @@ export class Sim {
   skullBagAction(action: import('../world_api').SkullBagAction, pid = this.primaryId): void {
     honorMod.skullBagAction(this.ctx, pid, action);
   }
-
   get hillInfo(): import('../world_api').HillInfo | null {
     return this.primaryId === -1 ? null : hillMod.hillInfoFor(this.ctx, this.primaryId);
   }
-
   hillInfoFor(pid: number): import('../world_api').HillInfo | null {
     return hillMod.hillInfoFor(this.ctx, pid);
   }
   get skillEventInfo(): import('../world_api').SkillEventInfo | null {
-    return this.primaryId === -1
-      ? null
-      : skillEventsMod.skillEventInfoFor(this.ctx, this.primaryId);
+    return skillEventsMod.skillEventInfoFor(this.ctx, this.primaryId); // null with no primary
+  }
+  skillEventMarks(): import('../world_api').SkillEventMarkBook {
+    return skillEventsMod.skillEventMarkBookFor(this.ctx, this.primaryId);
   }
   skillEventInfoFor(pid: number): import('../world_api').SkillEventInfo | null {
     return skillEventsMod.skillEventInfoFor(this.ctx, pid);

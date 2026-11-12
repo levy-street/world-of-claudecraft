@@ -8415,9 +8415,8 @@ export class GameServer {
     maybe('trade', tradeWire(this.sim, anchorSession.pid));
     maybe('duel', duelWire(this.sim, anchorSession.pid));
     maybe('cardDuel', this.sim.cardMinigameInfoFor(anchorSession.pid));
-    // Small PvP-ledger scalars, delta-guarded like delve marks (a fresh session gets both).
-    maybe('honor', meta.honor);
-    maybe('lhonor', meta.lifetimeHonor);
+    // PvP-ledger scalars and the per-tick Footprints in Ash marks (server/world_pvp_wire.ts).
+    worldPvpWire.emitPvpLedgerKeys(maybe, maybeRaw, this.sim, session, meta, anchorSession.pid);
     if (this.sim.tickCount - session.lastWpvpWireTick >= worldPvpWire.WPVP_WIRE_INTERVAL_TICKS) {
       session.lastWpvpWireTick = this.sim.tickCount;
       maybe('wpvp', this.sim.worldPvpInfoFor(anchorSession.pid));

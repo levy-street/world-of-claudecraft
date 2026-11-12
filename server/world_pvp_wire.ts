@@ -13,8 +13,10 @@
 // so its identity plus the carried flag is the revision. The check costs one
 // identity compare and a scan of the carried bags, at the `wpvp` cadence.
 
+import { skillEventMarksFor } from '../src/sim/pvp/skill_events';
 import { skullBagInfoFor } from '../src/sim/pvp/skull_bag';
 import type { PlayerMeta } from '../src/sim/sim';
+import type { SimContext } from '../src/sim/sim_context';
 import { DT } from '../src/sim/types';
 import type { SkullBagAction } from '../src/world_api';
 
@@ -103,4 +105,81 @@ export function emitSkullBagSelfKey(
   }
   emit('skb', info ?? null);
   skullBagSent.set(session, next);
+}
+
+interface MarksSent {
+  pid: number;
+  ordinal: number;
+  lastSeq: number;
+}
+
+/** Per session: whose marks were last streamed, for which event, up to which
+ *  mark. Reset with the session's sent-record so a resync resends the book. */
+const marksSent = new WeakMap<object, MarksSent>();
+
+/** The Footprints in Ash marks (src/sim/pvp/skill_event_footprints.ts) on the
+ *  self wire, every tick, only the ones new since the last send: a flat list of
+ *  `seq, x, z, heading, kind, ageTenths` per mark (kind 0 a footprint, 1 a
+ *  breath plume), or `null` once the viewer is out of the fight. Who left a
+ *  mark is never sent. Decoded by src/net/skill_event_marks_mirror.ts. The
+ *  cost is bounded by one event's fighters: a viewer outside the fight pays a
+ *  map read and nothing else. */
+export function emitSkillEventMarksKey(
+  emitRaw: (key: 'sevm', serialized: string) => void,
+  sim: { ctx: SimContext },
+  session: { lastSent: Record<string, string> },
+  anchorPid: number,
+): void {
+  const ctx = sim.ctx;
+  const ev = ctx.skillEventState.active;
+  const inFight = !!ev?.footprints && ev.phase === 'running' && ev.hearts.has(anchorPid);
+  let last = marksSent.get(session);
+  if (!ev || !inFight) {
+    if (last) {
+      if (session.lastSent.sevm !== undefined) emitRaw('sevm', 'null');
+      marksSent.delete(session);
+    }
+    return;
+  }
+  if (
+    !last ||
+    last.pid !== anchorPid ||
+    last.ordinal !== ev.ordinal ||
+    session.lastSent.sevm === undefined
+  ) {
+    last = { pid: anchorPid, ordinal: ev.ordinal, lastSeq: 0 };
+    marksSent.set(session, last);
+  }
+  const parts: number[] = [];
+  for (const m of skillEventMarksFor(ctx, anchorPid)) {
+    if (m.seq <= last.lastSeq) continue;
+    parts.push(
+      m.seq,
+      Math.round(m.x * 100) / 100,
+      Math.round(m.z * 100) / 100,
+      Math.round(m.heading * 100) / 100,
+      m.kind === 'breath' ? 1 : 0,
+      Math.max(0, Math.round((ctx.time - m.at) * 10)),
+    );
+    last.lastSeq = m.seq;
+  }
+  // A first send with nothing on the ash yet still opens the book (`[]`), so
+  // the session's sent-record marks the stream as live.
+  if (parts.length > 0 || session.lastSent.sevm === undefined)
+    emitRaw('sevm', JSON.stringify(parts));
+}
+
+/** The PvP-ledger scalars (delta-guarded like delve marks, so a fresh session
+ *  gets both) and the per-tick Footprints in Ash marks, from the self wire. */
+export function emitPvpLedgerKeys(
+  maybe: (key: string, value: unknown) => void,
+  maybeRaw: (key: 'sevm', serialized: string) => void,
+  sim: { ctx: SimContext },
+  session: { lastSent: Record<string, string> },
+  meta: Pick<PlayerMeta, 'honor' | 'lifetimeHonor'>,
+  anchorPid: number,
+): void {
+  maybe('honor', meta.honor);
+  maybe('lhonor', meta.lifetimeHonor);
+  emitSkillEventMarksKey(maybeRaw, sim, session, anchorPid);
 }

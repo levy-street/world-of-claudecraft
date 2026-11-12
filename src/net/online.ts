@@ -198,6 +198,7 @@ import type {
   PerfectingInfoView,
   SalvageResultView,
 } from '../world_api/professions';
+import type { SkillEventMarkBook } from '../world_api/world_pvp';
 import { buildClientAbilityPresentation } from './ability_presentation';
 import { normalizeAccountCosmetics } from './account_cosmetics_wire';
 import { ActionBarLayoutUploader } from './action_bar_upload';
@@ -281,6 +282,7 @@ import {
 import { decodeReferralCardsSnapshot } from './referral_cards_wire';
 import { type RiftStateEvent, swapMirroredRiftFloor } from './rift_floor_mirror';
 import { isInputSendBackpressured } from './send_backpressure';
+import { skillEventMarkBookOf } from './skill_event_marks_mirror';
 import { snapshotAlpha } from './snapshot_alpha';
 import { applySnapshotHeadSyncs } from './snapshot_head_syncs';
 import {
@@ -4272,6 +4274,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   joinSkillEvent(): void {
     this.cmd({ cmd: 'skill_event', op: 'join' });
+  }
+  skillEventMarks(): SkillEventMarkBook {
+    return skillEventMarkBookOf(this); // the sevm stream's mirror
   }
   skillEventAction(verb: string): void {
     this.cmd({ cmd: 'skill_event', op: 'action', verb });

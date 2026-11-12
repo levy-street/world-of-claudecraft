@@ -18,6 +18,9 @@ export const SKILL_EVENT_VERB_ICONS: Readonly<Record<string, string>> = {
   guard: 'raised_guard',
   feint: 'evasion',
   sidestep: 'blink',
+  sweep: 'whirlwind',
+  hush: 'prowl',
+  pebble: 'sap',
 };
 
 /** Each verb's name and its tooltip, as explicit keys (the i18n scanner reads them). */
@@ -26,12 +29,18 @@ export const SKILL_EVENT_VERB_LABELS: Readonly<Record<string, TranslationKey>> =
   guard: 'hud.skillEvent.verbs.guard',
   feint: 'hud.skillEvent.verbs.feint',
   sidestep: 'hud.skillEvent.verbs.sidestep',
+  sweep: 'hud.skillEvent.verbs.sweep',
+  hush: 'hud.skillEvent.verbs.hush',
+  pebble: 'hud.skillEvent.verbs.pebble',
 };
 export const SKILL_EVENT_VERB_TIPS: Readonly<Record<string, TranslationKey>> = {
   lunge: 'hud.skillEvent.verbTips.lunge',
   guard: 'hud.skillEvent.verbTips.guard',
   feint: 'hud.skillEvent.verbTips.feint',
   sidestep: 'hud.skillEvent.verbTips.sidestep',
+  sweep: 'hud.skillEvent.verbTips.sweep',
+  hush: 'hud.skillEvent.verbTips.hush',
+  pebble: 'hud.skillEvent.verbTips.pebble',
 };
 
 /** Most slots any kit shows: four verbs and the keepsake. */

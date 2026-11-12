@@ -6593,6 +6593,16 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.skillEvent.stance.lunge': '蓄力中',
   'hud.skillEvent.stance.guard': '格挡中',
   'hud.skillEvent.stance.open': '露出破绽',
+  'hud.skillEvent.verbs.sweep': '横扫',
+  'hud.skillEvent.verbs.hush': '噤声',
+  'hud.skillEvent.verbs.pebble': '石子',
+  'hud.skillEvent.verbTips.sweep':
+    '向前方短扇形范围内{sweepRange}码内最近的战斗者挥击。命中夺走1颗心，并让你们双方显形{reveal}秒。未命中则只有你显形。',
+  'hud.skillEvent.verbTips.hush': '在{hush}秒内行走不留脚印。冷却时间{hushCd}秒。',
+  'hud.skillEvent.verbTips.pebble':
+    '向前方投出一条{pebble}码长的假脚印，看起来像有人刚刚走开。冷却时间{pebbleCd}秒。',
+  'hud.skillEvent.unseen': '隐形中',
+  'hud.skillEvent.seen': '所有人可见',
   'hud.skillEvent.ready': '就绪',
   'hud.skillEvent.startsIn': '{minutes} 分钟后开始',
   'hud.skillEvent.keepsake': '保留技能',

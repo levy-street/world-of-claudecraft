@@ -359,6 +359,9 @@ export class NameplatePainter {
       // The courier guards exist only for a cloaked infiltrator (their bodies are
       // withheld by the renderer gate; the plate must not outlive the body).
       if (shadowGuardHidden(entity, world) || investigationDisguiseHidden(entity, world)) continue;
+      // An unseen Footprints in Ash fighter has no body here (renderer.ts); online
+      // the server never sends one, so this only ever skips an offline plate.
+      if (entity.eventUnseen && id !== player.id) continue;
       // A compile gate can leave this entity with no body at all (the arrival
       // gate hides the whole group). Its plate is then the only thing that says
       // an enemy is there, so it is forced on over the nameplate toggles for

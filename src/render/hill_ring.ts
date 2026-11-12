@@ -50,6 +50,13 @@ const GROUND_LIFT = 0.12;
 /** The twin's radius: no program key input reads the size, so a few yards do. */
 const TWIN_RADIUS = 3;
 
+/** What the ring draws from: a hill, or an hourly skill event's arena
+ *  (skill_event_ground_core.ts skillEventRingInput maps one onto this). */
+export type HillRingInput = Pick<
+  HillInfo,
+  'x' | 'z' | 'radius' | 'phase' | 'holder' | 'challenger'
+>;
+
 /** The renderer's live compile gate (`worldCompileGate`), absent where the
  *  parallel compile is not supported. */
 export type HillRingCompileGate = (target: THREE.Object3D) => Promise<unknown>;
@@ -76,8 +83,9 @@ export class HillRingVisuals {
     private readonly groundY: (x: number, z: number) => number,
   ) {}
 
-  /** Called each frame with IWorld.hillInfo (null while no hill stands). */
-  sync(info: HillInfo | null): void {
+  /** Called each frame with IWorld.hillInfo (null while no hill stands), or an
+   *  event arena's ring input. */
+  sync(info: HillRingInput | null): void {
     if (!info) {
       this.clear();
       return;
@@ -122,7 +130,7 @@ export class HillRingVisuals {
     this.visual = null;
   }
 
-  private warmTwin(info: HillInfo, key: string, gate: HillRingCompileGate): void {
+  private warmTwin(info: HillRingInput, key: string, gate: HillRingCompileGate): void {
     const ring = this.create({ ...info, radius: TWIN_RADIUS });
     const twin = ring.group;
     twin.name = 'hill-ring-twin';
@@ -155,7 +163,7 @@ export class HillRingVisuals {
     });
   }
 
-  private create(info: HillInfo): RingVisual {
+  private create(info: HillRingInput): RingVisual {
     const group = new THREE.Group();
     group.name = 'hill-ring';
     const plan = hillRingPlan(0, info);

@@ -442,6 +442,9 @@ const hudStringsEn = {
         guard: 'Guard',
         feint: 'Feint',
         sidestep: 'Sidestep',
+        sweep: 'Sweep',
+        hush: 'Hush',
+        pebble: 'Pebble',
       },
       verbTips: {
         lunge:
@@ -450,6 +453,11 @@ const hudStringsEn = {
           'Raise your guard for up to {max} sec. A lunge that lands in the first {perfect} sec is turned back and leaves the attacker open for {stagger} sec. Holding the full {max} sec leaves you open for {open} sec. Press again to lower it. You can guard only if you lunged in the last {passive} sec.',
         feint: 'Cancel your own wind-up to draw out an early guard. {feintCd} sec cooldown.',
         sidestep: 'Dash {distance} yd forward. {sidestepCd} sec cooldown.',
+        sweep:
+          'Swing at the nearest fighter in a short cone in front of you, within {sweepRange} yd. A hit takes 1 heart and shows you both for {reveal} sec. A miss shows only you.',
+        hush: 'Walk without leaving footprints for {hush} sec. {hushCd} sec cooldown.',
+        pebble:
+          'Throw a {pebble} yd line of false footprints ahead of you, laid as if someone had just walked away. {pebbleCd} sec cooldown.',
       },
       stance: {
         lunge: 'Winding up',
@@ -457,6 +465,9 @@ const hudStringsEn = {
         open: 'Open',
       },
       ready: 'Ready',
+      // Footprints in Ash: whether the other fighters can see you right now.
+      unseen: 'Unseen',
+      seen: 'Seen by everyone',
       startsIn: 'Starts in {minutes} min',
       keepsake: 'Kept ability',
       keepsakeTip: 'Your kept ability: {name}. The only class ability you can use here.',

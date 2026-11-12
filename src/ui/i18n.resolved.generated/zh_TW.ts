@@ -15972,13 +15972,19 @@ export const zh_TW: EnTranslations = {
         "lunge": "突刺",
         "guard": "格擋",
         "feint": "佯攻",
-        "sidestep": "側步"
+        "sidestep": "側步",
+        "sweep": "橫掃",
+        "hush": "噤聲",
+        "pebble": "石子"
       },
       "verbTips": {
         "lunge": "蓄力 {windup} 秒，然後刺向你前方 {range} 碼內最近的對手。命中會奪走 1 顆紅心。",
         "guard": "舉起格擋，最多 {max} 秒。在前 {perfect} 秒內落下的突刺會被反擊，攻擊者將露出破綻 {stagger} 秒。格擋滿 {max} 秒會讓你露出破綻 {open} 秒。再按一次可放下格擋。只有在過去 {passive} 秒內突刺過才能格擋。",
         "feint": "取消你自己的蓄力，引誘對手過早格擋。冷卻 {feintCd} 秒。",
-        "sidestep": "向前衝刺 {distance} 碼。冷卻 {sidestepCd} 秒。"
+        "sidestep": "向前衝刺 {distance} 碼。冷卻 {sidestepCd} 秒。",
+        "sweep": "向前方短扇形範圍內{sweepRange}碼內最近的戰鬥者揮擊。命中奪走1顆心，並讓你們雙方現形{reveal}秒。未命中則只有你現形。",
+        "hush": "在{hush}秒內行走不留腳印。冷卻時間{hushCd}秒。",
+        "pebble": "向前方投出一條{pebble}碼長的假腳印，看起來像有人剛剛走開。冷卻時間{pebbleCd}秒。"
       },
       "stance": {
         "lunge": "蓄力中",
@@ -15986,6 +15992,8 @@ export const zh_TW: EnTranslations = {
         "open": "露出破綻"
       },
       "ready": "就緒",
+      "unseen": "隱形中",
+      "seen": "所有人可見",
       "startsIn": "{minutes} 分鐘後開始",
       "keepsake": "保留技能",
       "keepsakeTip": "你保留的技能：{name}。這是你在此唯一能使用的職業技能。",

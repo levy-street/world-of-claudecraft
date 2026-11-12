@@ -20,6 +20,7 @@ function info(canJoin: boolean): SkillEventInfo {
     x: 0,
     z: 0,
     radius: 25,
+    fieldRadius: 25,
     minutesLeft: 4,
     joined: false,
     canJoin,

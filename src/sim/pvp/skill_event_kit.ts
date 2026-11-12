@@ -68,7 +68,13 @@ export function keepsakeEligible(def: AbilityDef): boolean {
   if (KEEPSAKE_EXCLUDED_IDS.has(def.id)) return false;
   const flags = def as AbilityDef & { passive?: boolean; hiddenFromPlayer?: boolean };
   if (flags.passive || flags.hiddenFromPlayer || def.onNextSwing) return false;
-  return !def.effects.some((effect) => DAMAGE_EFFECTS.has(effect.type));
+  return !def.effects.some(
+    (effect) =>
+      DAMAGE_EFFECTS.has(effect.type) ||
+      // Class stealth would hide a fencer no one else can find, and it would
+      // outlast a Footprints in Ash reveal: never a keepsake.
+      (effect as { kind?: string }).kind === 'stealth',
+  );
 }
 
 /** One fighter's kit state for the running event. */
@@ -78,6 +84,7 @@ export interface SkillEventKitState {
   readyAt: Map<string, number>;
   /** Event-specific state, owned by the event's rule module. */
   riposte?: RiposteKitState;
+  footprints?: FootprintsKitState;
 }
 
 export interface RiposteKitState {
@@ -90,6 +97,22 @@ export interface RiposteKitState {
   openUntil: number;
   /** The last lunge (the anti-passive rule: no guard without one lately). */
   lastLungeAt: number;
+}
+
+export interface FootprintsKitState {
+  /** Hush: no prints are left until this time. */
+  hushUntil: number;
+  /** Seen by everyone until this time (a Sweep, landed or missed). */
+  revealUntil: number;
+  /** Where the last footprint fell, and which foot left it. */
+  lastPrintX: number;
+  lastPrintZ: number;
+  leftFoot: boolean;
+  /** Standing still: where, since when, and the last breath plume. */
+  stillX: number;
+  stillZ: number;
+  stillSince: number;
+  lastBreathAt: number;
 }
 
 export function kitFor(ev: ActiveSkillEvent, pid: number): SkillEventKitState {

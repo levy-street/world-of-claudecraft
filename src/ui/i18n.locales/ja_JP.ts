@@ -5184,6 +5184,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.skillEvent.stance.lunge': 'ため中',
   'hud.skillEvent.stance.guard': 'ガード中',
   'hud.skillEvent.stance.open': '隙あり',
+  'hud.skillEvent.verbs.sweep': '薙ぎ払い',
+  'hud.skillEvent.verbs.hush': '忍び足',
+  'hud.skillEvent.verbs.pebble': '小石',
+  'hud.skillEvent.verbTips.sweep':
+    '前方の短い扇状範囲、{sweepRange}ヤード以内で最も近い相手を薙ぐ。命中するとハートを1つ奪い、{reveal}秒間お互いの姿が見える。外すと自分だけが見える。',
+  'hud.skillEvent.verbTips.hush': '{hush}秒間、足跡を残さずに歩く。再使用まで{hushCd}秒。',
+  'hud.skillEvent.verbTips.pebble':
+    '前方へ{pebble}ヤードの偽の足跡を投げる。誰かが歩き去ったばかりのように見える。再使用まで{pebbleCd}秒。',
+  'hud.skillEvent.unseen': '見えていない',
+  'hud.skillEvent.seen': '全員に見えている',
   'hud.skillEvent.ready': '準備完了',
   'hud.skillEvent.startsIn': '{minutes}分後に開始',
   'hud.skillEvent.keepsake': '持ち込み技',
