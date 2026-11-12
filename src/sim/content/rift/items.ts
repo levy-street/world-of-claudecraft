@@ -414,7 +414,7 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
   // The caster half of the S-rank chase. Deliberately a DAGGER: the only other
   // spell-facing legendary is a two-handed staff (deathless_heartwood), so this
   // is the first main-hand option for a caster who wants an offhand, and it does
-  // not touch any melee dps ladder. Rolls on its own independent 0.3%, so an S
+  // not touch any melee dps ladder. Rolls on its own independent 2.3%, so an S
   // clear can shed both legendaries.
   //
   // Stats are the ilvl-37 legendary main-hand budget exactly (49 = 37 * 0.7 *

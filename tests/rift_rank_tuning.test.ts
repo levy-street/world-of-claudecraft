@@ -1053,7 +1053,16 @@ describe('rift ranks: clear-time epic and legendary payout', () => {
     }
   });
 
-  it('each rift legendary drops at its own declared 0.3% rate on S, and never below S', () => {
+  it('the rift legendary rate gives a 90% chance at a given legendary within 100 S clears', () => {
+    // The design target the rate is tuned to. The literal pins the shipped
+    // value; the bounds pin the intent, so a retune has to restate both.
+    expect(RIFT_LEGENDARY_CHANCE_S).toBe(0.023);
+    const within100 = 1 - (1 - RIFT_LEGENDARY_CHANCE_S) ** 100;
+    expect(within100).toBeGreaterThanOrEqual(0.9);
+    expect(within100).toBeLessThan(0.92);
+  });
+
+  it('each rift legendary drops at its own declared 2.3% rate on S, and never below S', () => {
     // Same bonus-draw filter as the gear block above: mounts (draw 5), apex
     // patterns (draw 6, phase 11) and the farming roll (draw 7, masterwrought
     // Phase 11f) are independent rolls outside this claim.
@@ -1070,21 +1079,22 @@ describe('rift ranks: clear-time epic and legendary payout', () => {
       addRiftClearGearLoot(ctx, boss, baseLevel);
       return boss.loot!.items.map((i) => i.itemId).filter((id) => !bonusDrawIds.has(id!));
     };
-    // A 0.3% rate needs a big sample to be measurable at all; 20 000 clears puts
-    // the expectation at 60 per legendary, tight enough to catch a 2x mistuning.
+    // 20 000 clears puts the expectation at 460 per legendary (standard
+    // deviation about 21), so the 0.8x to 1.25x band below is over four sigma
+    // wide and still catches a mistuning of a quarter in either direction.
     const SAMPLE = 20_000;
     const hits = new Map<string, number>(RIFT_LEGENDARY_ITEM_IDS.map((id) => [id, 0]));
     for (let s = 1; s <= SAMPLE; s++) {
       for (const id of run(28, s)) if (hits.has(id!)) hits.set(id!, hits.get(id!)! + 1);
     }
-    const expected = SAMPLE * RIFT_LEGENDARY_CHANCE_S; // 60
+    const expected = SAMPLE * RIFT_LEGENDARY_CHANCE_S; // 460
     for (const id of RIFT_LEGENDARY_ITEM_IDS) {
       const n = hits.get(id)!;
       expect(n, `${id} observed ${n}/${SAMPLE}, expected about ${expected}`).toBeGreaterThan(
-        expected * 0.5,
+        expected * 0.8,
       );
       expect(n, `${id} observed ${n}/${SAMPLE}, expected about ${expected}`).toBeLessThan(
-        expected * 1.7,
+        expected * 1.25,
       );
     }
     // C/B/A never shed a legendary, no matter how many clears.
