@@ -71,6 +71,14 @@ function live(kind: CouncilAlertKind, title: string, mark: AlertAura): CouncilAl
   };
 }
 
+/** Is Mountain's Rush marked on the player? The one council mark that kills: its
+ *  alert shows whatever the hints setting (dungeon_prompts.ts), big, red and in the
+ *  screen's upper middle (the CSS's `is-rush`), with its alarm in the player's ear
+ *  (game/smith_heart_council_audio_core.ts RUSH_MARK_ALARM). */
+export function councilRushMarked(auras: readonly AlertAura[]): boolean {
+  return auraOf(auras, COUNCIL_AURAS.rushMark) !== null;
+}
+
 export function buildCouncilAlertView(input: CouncilAlertInput): CouncilAlertView {
   const rush = auraOf(input.auras, COUNCIL_AURAS.rushMark);
   if (rush) return live('rush', t('hudChrome.council.alert.rushTitle'), rush);

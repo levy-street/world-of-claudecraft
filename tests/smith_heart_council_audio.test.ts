@@ -15,6 +15,7 @@ import {
   COUNCIL_SFX_KEYS,
   councilSoundClaims,
   ROCK_FALL_SOUND,
+  RUSH_MARK_ALARM,
   songPulseSound,
 } from '../src/game/smith_heart_council_audio_core';
 import {
@@ -68,14 +69,21 @@ describe('Hammer Council sounds: the plan', () => {
     for (const id of [COUNCIL_CASTS.wrath, COUNCIL_CASTS.bolt, COUNCIL_CASTS.weight])
       expect(councilSoundClaims(id), id).toBe(true);
     for (const key of COUNCIL_SFX_KEYS) {
-      // The council's own takes, and the raid's shared stone mark.
-      expect(key.startsWith('heart_council_') || key === 'heart_mark_stone', key).toBe(true);
+      // The council's own takes, the raid's shared stone mark, and the Rush's
+      // alarm (the alert palette's war horn).
+      expect(
+        key.startsWith('heart_council_') ||
+          key === 'heart_mark_stone' ||
+          key === 'ui_aura_blaring_horn',
+        key,
+      ).toBe(true);
       expect(Object.hasOwn(SFX_CLIPS, key), `${key} in the manifest`).toBe(true);
     }
     // The Walking Slab's grind loop left with the Slabwright; the Rush's two
     // takes, the Bond's pulse, Resonance, Narrow Shelter's strain and the
-    // stone mark came with the AAA pass (the Rush no longer borrows the crush).
-    expect(COUNCIL_SFX_KEYS.length).toBe(22);
+    // stone mark came with the AAA pass (the Rush no longer borrows the crush);
+    // the Rush mark's alarm with the owner's playtest of 2026-11-12.
+    expect(COUNCIL_SFX_KEYS.length).toBe(23);
     expect(councilSoundClaims('frost_nova')).toBe(false);
     expect(councilSoundClaims(undefined)).toBe(false);
   });
@@ -183,6 +191,26 @@ describe('Hammer Council sounds: the adapter', () => {
     b.see(g, 'member');
     b.endScan();
     b.update(0.05, byId);
+    expect(p2).toEqual([]);
+  });
+
+  it("the Rush's mark sounds its sting and the alarm once, in the marked player's ear only", () => {
+    const { sink, plays } = fakeSink();
+    const a = new CouncilAudio(sink);
+    const mark = { id: COUNCIL_AURAS.rushMark, remaining: 5, duration: 5 };
+    const me = ent(9, 4, 6, { kind: 'player', auras: [mark as never] });
+    a.update(0.05, () => me, me);
+    expect(plays.map((q) => q.key).sort()).toEqual(
+      [RUSH_MARK_ALARM[COUNCIL_AURAS.rushMark].key, 'heart_mark_stone'].sort(),
+    );
+    expect(plays.every((q) => q.x === 4 && q.z === 6)).toBe(true);
+    // Held: no repeat while the mark stays on.
+    a.update(0.05, () => me, me);
+    expect(plays).toHaveLength(2);
+    // Another player's mark is never the local player's alarm.
+    const { sink: s2, plays: p2 } = fakeSink();
+    const b = new CouncilAudio(s2);
+    b.update(0.05, () => me, ent(10, 0, 0, { kind: 'player' }));
     expect(p2).toEqual([]);
   });
 

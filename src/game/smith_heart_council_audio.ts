@@ -18,6 +18,7 @@ import {
   COUNCIL_SFX_KEYS,
   type CouncilSound,
   ROCK_FALL_SOUND,
+  RUSH_MARK_ALARM,
   SHELTER_STRAIN_SOUND,
   shelterStrainDue,
   songPulseSound,
@@ -72,6 +73,8 @@ export class CouncilAudio {
   private readonly watches: Watch[] = [];
   private preloaded = false;
   private readonly marks = new HeartMarkEar(COUNCIL_MARK_SOUNDS);
+  /** The Rush's alarm over its sting (RUSH_MARK_ALARM). */
+  private readonly alarm = new HeartMarkEar(RUSH_MARK_ALARM);
   /** Pillars crowded past Narrow Shelter at the last lay. */
   private crowded = 0;
 
@@ -195,6 +198,7 @@ export class CouncilAudio {
     me: Entity | null = null,
   ): void {
     this.marks.update(me, this.sink);
+    this.alarm.update(me, this.sink);
     for (const w of this.watches) {
       if (w.id < 0) continue;
       const e = entityOf(w.id);

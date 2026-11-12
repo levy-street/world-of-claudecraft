@@ -154,12 +154,21 @@ export const COUNCIL_MARK_SOUNDS: Readonly<Record<string, HeartMarkSound>> = {
   [COUNCIL_AURAS.resonance]: markSound(HEART_MARK.stone, 0.75, 1.3),
 };
 
+/** Mountain's Rush's alarm in the marked player's own ear, over the stone's
+ *  sting: the war horn of the shared alert palette (aura_cue_catalog.ts), loud,
+ *  so the mark is heard as a call to run behind a pillar (the owner's playtest
+ *  of 2026-11-12: the sting alone went unnoticed). */
+export const RUSH_MARK_ALARM: Readonly<Record<string, HeartMarkSound>> = {
+  [COUNCIL_AURAS.rushMark]: { key: 'ui_aura_blaring_horn', gain: 1, rate: 1 },
+};
+
 /** Every sample the council plays, for preloading once. */
 export const COUNCIL_SFX_KEYS: readonly string[] = [
   ...new Set([
     ...Object.values(COUNCIL_CUE_SOUNDS).map((s) => s.key),
     ...Object.values(COUNCIL_BAR_SOUNDS).map((s) => s.key),
     ...Object.values(COUNCIL_MARK_SOUNDS).map((s) => s.key),
+    ...Object.values(RUSH_MARK_ALARM).map((s) => s.key),
     ROCK_FALL_SOUND.key,
     SHELTER_STRAIN_SOUND.key,
   ]),

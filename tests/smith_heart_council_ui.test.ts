@@ -2,6 +2,7 @@
 // read in the world; the yells stay), the personal alert's priorities, the marks' tooltips from the live tuning, and
 // every cast and damage name re-localized.
 
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   COUNCIL_AURAS,
@@ -11,7 +12,7 @@ import {
 } from '../src/sim/encounters/smith_heart/council_ids';
 import type { SimEvent } from '../src/sim/types';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
-import { buildCouncilAlertView } from '../src/ui/hud/dungeon/council_alert_view';
+import { buildCouncilAlertView, councilRushMarked } from '../src/ui/hud/dungeon/council_alert_view';
 import { t } from '../src/ui/i18n';
 import { localizeSimAuraName } from '../src/ui/sim_i18n';
 import { councilFight } from './helpers/council_fight';
@@ -88,6 +89,32 @@ describe('Hammer Council alert', () => {
       expect(m.visible && m.barLabel, id).toBe('3s');
       if (m.visible) expect(m.title.split(' ').length, id).toBeLessThanOrEqual(4);
     }
+  });
+});
+
+describe("Hammer Council alert: Mountain's Rush on you", () => {
+  it('the Rush mark is the one council mark the hints setting never hides', () => {
+    const mark = { id: COUNCIL_AURAS.rushMark, remaining: 4, duration: 5 };
+    expect(councilRushMarked([mark])).toBe(true);
+    for (const id of [
+      COUNCIL_AURAS.rockMark,
+      COUNCIL_AURAS.wakeMark,
+      COUNCIL_AURAS.weight,
+      COUNCIL_AURAS.resonance,
+    ])
+      expect(councilRushMarked([{ id, remaining: 4, duration: 5 }]), id).toBe(false);
+    const v = buildCouncilAlertView({ auras: [mark] });
+    expect(v.visible && v.kind).toBe('rush');
+    expect(v.visible && v.title).toBe(t('hudChrome.council.alert.rushTitle'));
+  });
+
+  it('paints big and red in the upper middle, throbbing, on every tier', () => {
+    const css = readFileSync('src/styles/components.css', 'utf8');
+    const rule = css.slice(css.indexOf('#heart-council-alert.is-rush,'));
+    expect(rule).toContain('top: 22%;');
+    expect(rule).toContain('animation: heart-rush-throb');
+    expect(css).toMatch(/#heart-council-alert\.is-rush \.fa-title \{\s*font-size: 44px;/);
+    expect(css).toContain('@keyframes heart-rush-throb');
   });
 });
 

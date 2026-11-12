@@ -19135,9 +19135,58 @@
     color: var(--color-energy);
     --bar-color: var(--color-energy);
   }
+  /* Mountain's Rush on YOU: the one mark that kills, so it leaves the slot for the
+     screen's upper middle, big, red and throbbing for the whole bar (the owner's
+     playtest of 2026-11-12: the slot's panel went unnoticed). The raid sees the
+     red arrow over the marked player (council_rush_arrow.ts); this is the marked
+     player's own call, on every graphics tier. */
+  #heart-council-alert.is-rush,
+  body.show-actionbar3 #heart-council-alert.is-rush,
+  body.mobile-touch #heart-council-alert.is-rush {
+    top: 22%;
+    bottom: auto;
+    min-width: min(560px, calc(100vw - 32px));
+    padding: 14px 28px 16px;
+    border-width: 3px;
+    background: color-mix(in srgb, var(--color-hostile-rim) 55%, transparent);
+    animation: heart-rush-throb 0.55s ease-in-out infinite alternate;
+  }
+  #heart-council-alert.is-rush .fa-title {
+    font-size: 44px;
+    line-height: 1.05;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-shadow:
+      0 0 14px color-mix(in srgb, var(--color-hostile) 85%, transparent),
+      0 2px 0 var(--color-hostile-rim);
+  }
+  #heart-council-alert.is-rush .fa-bar {
+    --bar-h: 16px;
+  }
+  #heart-council-alert.is-rush .fa-bar-label {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-hostile);
+  }
+  body.mobile-touch #heart-council-alert.is-rush .fa-title {
+    font-size: 30px;
+  }
+  @keyframes heart-rush-throb {
+    from {
+      transform: translateX(-50%) scale(1);
+      box-shadow: 0 0 10px color-mix(in srgb, var(--color-hostile) 45%, transparent);
+    }
+    to {
+      transform: translateX(-50%) scale(1.06);
+      box-shadow: 0 0 36px color-mix(in srgb, var(--color-hostile) 90%, transparent);
+    }
+  }
   @media (prefers-reduced-motion: reduce) {
     #heart-council-alert {
       animation: none;
+    }
+    #heart-council-alert.is-rush {
+      box-shadow: 0 0 28px color-mix(in srgb, var(--color-hostile) 80%, transparent);
     }
   }
 
