@@ -274,6 +274,7 @@ export const WOC_HEAD_TINT_TABLE: Readonly<
     hair_mullet: { role: 'hair', ref: lum(0.0297) },
     // also on the mohawk's texture (build_pompadour_hair.mjs)
     hair_pompadour: { role: 'hair', ref: lum(0.0297) },
+    hair_monk: { role: 'hair', ref: lum(0.0297) },
     hair_quiff: { role: 'hair', ref: lum(0.1095) },
     hair_quiff_scalp: { role: 'hair', ref: lum(0.0796) },
     hair_shoulder: { role: 'hair', ref: lum(0.0972) },
@@ -327,6 +328,7 @@ export const WOC_HEAD_TINT_TABLE: Readonly<
     hair_mullet: { role: 'hair', ref: lum(0.0297) },
     // also on the mohawk's texture (build_pompadour_hair.mjs)
     hair_pompadour: { role: 'hair', ref: lum(0.0297) },
+    hair_monk: { role: 'hair', ref: lum(0.0297) },
     hair_ponytail: { role: 'hair', ref: lum(0.0493) },
     hair_twins: { role: 'hair', ref: lum(0.1517) },
     hair_twins_scalp: { role: 'hair', ref: lum(0.1113) },

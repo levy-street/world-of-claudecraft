@@ -13812,7 +13812,8 @@ export const da_DK: EnTranslations = {
         "twins": "To fletninger",
         "curls": "Krøllet opsætning",
         "mullet": "Mullet",
-        "pompadour": "Pompadour"
+        "pompadour": "Pompadour",
+        "monk": "Monk Tonsure"
       },
       "beard": {
         "none": "Glatbarberet",

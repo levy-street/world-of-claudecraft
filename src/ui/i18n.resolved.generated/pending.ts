@@ -16,6 +16,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.wocHead.beard.walrus",
     "auth.wocHead.beard.whiskers",
     "auth.wocHead.beard.wild",
+    "auth.wocHead.hair.monk",
     "auth.wocHead.hair.mullet",
     "auth.wocHead.hair.pompadour"
   ],
@@ -26,6 +27,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.wocHead.beard.walrus",
     "auth.wocHead.beard.whiskers",
     "auth.wocHead.beard.wild",
+    "auth.wocHead.hair.monk",
     "auth.wocHead.hair.mullet",
     "auth.wocHead.hair.pompadour"
   ],
@@ -36,6 +38,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.wocHead.beard.walrus",
     "auth.wocHead.beard.whiskers",
     "auth.wocHead.beard.wild",
+    "auth.wocHead.hair.monk",
     "auth.wocHead.hair.mullet",
     "auth.wocHead.hair.pompadour"
   ],
@@ -46,6 +49,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.wocHead.beard.walrus",
     "auth.wocHead.beard.whiskers",
     "auth.wocHead.beard.wild",
+    "auth.wocHead.hair.monk",
     "auth.wocHead.hair.mullet",
     "auth.wocHead.hair.pompadour"
   ],
@@ -57,6 +61,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.wocHead.beard.walrus",
     "auth.wocHead.beard.whiskers",
     "auth.wocHead.beard.wild",
+    "auth.wocHead.hair.monk",
     "auth.wocHead.hair.mullet",
     "auth.wocHead.hair.pompadour"
   ],
@@ -67,6 +72,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.wocHead.beard.walrus",
     "auth.wocHead.beard.whiskers",
     "auth.wocHead.beard.wild",
+    "auth.wocHead.hair.monk",
     "auth.wocHead.hair.mullet",
     "auth.wocHead.hair.pompadour"
   ],
@@ -81,6 +87,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.wocHead.beard.walrus",
     "auth.wocHead.beard.whiskers",
     "auth.wocHead.beard.wild",
+    "auth.wocHead.hair.monk",
     "auth.wocHead.hair.mullet",
     "auth.wocHead.hair.pompadour"
   ],
@@ -92,6 +99,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.wocHead.beard.walrus",
     "auth.wocHead.beard.whiskers",
     "auth.wocHead.beard.wild",
+    "auth.wocHead.hair.monk",
     "auth.wocHead.hair.mullet",
     "auth.wocHead.hair.pompadour"
   ],
@@ -102,6 +110,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.wocHead.beard.walrus",
     "auth.wocHead.beard.whiskers",
     "auth.wocHead.beard.wild",
+    "auth.wocHead.hair.monk",
     "auth.wocHead.hair.mullet",
     "auth.wocHead.hair.pompadour"
   ],
@@ -112,6 +121,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.wocHead.beard.walrus",
     "auth.wocHead.beard.whiskers",
     "auth.wocHead.beard.wild",
+    "auth.wocHead.hair.monk",
     "auth.wocHead.hair.mullet",
     "auth.wocHead.hair.pompadour"
   ],
@@ -122,6 +132,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.wocHead.beard.walrus",
     "auth.wocHead.beard.whiskers",
     "auth.wocHead.beard.wild",
+    "auth.wocHead.hair.monk",
     "auth.wocHead.hair.mullet",
     "auth.wocHead.hair.pompadour"
   ],
@@ -132,6 +143,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.wocHead.beard.walrus",
     "auth.wocHead.beard.whiskers",
     "auth.wocHead.beard.wild",
+    "auth.wocHead.hair.monk",
     "auth.wocHead.hair.mullet",
     "auth.wocHead.hair.pompadour"
   ],
@@ -142,6 +154,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.wocHead.beard.walrus",
     "auth.wocHead.beard.whiskers",
     "auth.wocHead.beard.wild",
+    "auth.wocHead.hair.monk",
     "auth.wocHead.hair.mullet",
     "auth.wocHead.hair.pompadour"
   ],
@@ -152,6 +165,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.wocHead.beard.walrus",
     "auth.wocHead.beard.whiskers",
     "auth.wocHead.beard.wild",
+    "auth.wocHead.hair.monk",
     "auth.wocHead.hair.mullet",
     "auth.wocHead.hair.pompadour"
   ],
@@ -162,6 +176,7 @@ export const pending: Record<string, readonly string[]> = {
     "auth.wocHead.beard.walrus",
     "auth.wocHead.beard.whiskers",
     "auth.wocHead.beard.wild",
+    "auth.wocHead.hair.monk",
     "auth.wocHead.hair.mullet",
     "auth.wocHead.hair.pompadour"
   ]

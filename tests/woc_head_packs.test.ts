@@ -138,6 +138,7 @@ describe('the prefetches fetch exactly the files they name', () => {
         'braid',
         'long',
         'mohawk',
+        'monk',
         'mullet',
         'pompadour',
         'ponytail',
@@ -151,7 +152,7 @@ describe('the prefetches fetch exactly the files they name', () => {
     );
     // a second open is free: every file is already in flight
     prefetchWocHeadSlot('a', 'hair');
-    expect(loads.calls).toHaveLength(12);
+    expect(loads.calls).toHaveLength(13);
   });
 
   it('a Facial Hair prefetch fetches the beards file and each beard with a file of its own', () => {
@@ -413,7 +414,7 @@ describe('hanging pieces: a body carries what its look draws, never the library'
     // the type's default look: its eleven pieces of the library's fifty-seven
     expect(inGraph(m)).toEqual([...DEFAULT_NODES].sort());
     expect(inGraph(m)).toHaveLength(11);
-    expect(wocHeadAllNodes('a')).toHaveLength(65);
+    expect(wocHeadAllNodes('a')).toHaveLength(66);
     expect([...(wocHeadRigOf(m)?.files.keys() ?? [])]).toEqual([CORE, SWEPT, BEARDS]);
     expect(m.getObjectByName('head')?.children).toHaveLength(3);
 

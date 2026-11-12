@@ -18057,6 +18057,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'auth.wocHead.hair.curls': '卷发盘头',
   'auth.wocHead.hair.mullet': '鲻鱼头',
   'auth.wocHead.hair.pompadour': '飞机头',
+  'auth.wocHead.hair.monk': '修士剃发',
   'auth.wocHead.beard.none': '无胡须',
   'auth.wocHead.beard.moustache': '上唇胡',
   'auth.wocHead.beard.handlebar': '翘八字胡',

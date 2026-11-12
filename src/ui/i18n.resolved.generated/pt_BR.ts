@@ -13812,7 +13812,8 @@ export const pt_BR: EnTranslations = {
         "twins": "Duas tranças",
         "curls": "Coque cacheado",
         "mullet": "Mullet",
-        "pompadour": "Pompadour"
+        "pompadour": "Pompadour",
+        "monk": "Monk Tonsure"
       },
       "beard": {
         "none": "Rosto barbeado",

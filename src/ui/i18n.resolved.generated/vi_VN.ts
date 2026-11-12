@@ -13812,7 +13812,8 @@ export const vi_VN: EnTranslations = {
         "twins": "Tóc Tết Đôi",
         "curls": "Tóc Xoăn Búi Cao",
         "mullet": "Mullet",
-        "pompadour": "Pompadour"
+        "pompadour": "Pompadour",
+        "monk": "Monk Tonsure"
       },
       "beard": {
         "none": "Cạo Nhẵn",

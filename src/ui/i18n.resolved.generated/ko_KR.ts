@@ -13812,7 +13812,8 @@ export const ko_KR: EnTranslations = {
         "twins": "양갈래 땋은 머리",
         "curls": "곱슬 올림머리",
         "mullet": "멀릿",
-        "pompadour": "퐁파두르"
+        "pompadour": "퐁파두르",
+        "monk": "수도사 삭발"
       },
       "beard": {
         "none": "수염 없음",

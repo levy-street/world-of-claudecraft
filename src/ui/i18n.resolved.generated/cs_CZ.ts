@@ -13812,7 +13812,8 @@ export const cs_CZ: EnTranslations = {
         "twins": "Dva copy",
         "curls": "Vyčesané kudrny",
         "mullet": "Mullet",
-        "pompadour": "Pompadour"
+        "pompadour": "Pompadour",
+        "monk": "Monk Tonsure"
       },
       "beard": {
         "none": "Hladce oholený",

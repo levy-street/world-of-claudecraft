@@ -13812,7 +13812,8 @@ export const ru_RU: EnTranslations = {
         "twins": "Две косы",
         "curls": "Собранные кудри",
         "mullet": "Маллет",
-        "pompadour": "Помпадур"
+        "pompadour": "Помпадур",
+        "monk": "Монашеская тонзура"
       },
       "beard": {
         "none": "Без бороды",

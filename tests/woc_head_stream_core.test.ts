@@ -56,12 +56,13 @@ describe('wocHeadSlotUrls', () => {
       // built in the repo (scripts/assets/woc_character/build_mullet_hair.mjs)
       `${DIR}/head_type_a_hair_mullet.glb`,
       `${DIR}/head_type_a_hair_pompadour.glb`,
+      `${DIR}/head_type_a_hair_monk.glb`,
     ]);
   });
 
   it("fetches Type B's own hairstyles, never Type A's", () => {
     const b = wocHeadSlotUrls('b', 'hair');
-    expect(b).toHaveLength(12);
+    expect(b).toHaveLength(13);
     for (const url of b) expect(url).toMatch(/^models\/chars\/players\/woc\/head_type_b_hair_/);
     expect(b).toContain(`${DIR}/head_type_b_hair_braid.glb`);
     // a Type A style fitted onto the Type B head is Type B's own file

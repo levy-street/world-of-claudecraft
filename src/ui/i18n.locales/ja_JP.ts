@@ -17237,6 +17237,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'auth.wocHead.hair.curls': 'カールアップ',
   'auth.wocHead.hair.mullet': 'マレット',
   'auth.wocHead.hair.pompadour': 'リーゼント',
+  'auth.wocHead.hair.monk': '修道士の剃髪',
   'auth.wocHead.beard.none': 'ひげなし',
   'auth.wocHead.beard.moustache': '口ひげ',
   'auth.wocHead.beard.handlebar': 'カイゼルひげ',

@@ -92,6 +92,7 @@ const TRIANGLES: Readonly<Record<string, readonly [lod0: number, mid: number, fa
   'head_type_a_hair_braid.glb': [3428, 3084, 1126],
   'head_type_a_hair_long.glb': [1999, 1199, 796],
   'head_type_a_hair_mohawk.glb': [1959, 979, 782],
+  'head_type_a_hair_monk.glb': [784, 312, 47],
   'head_type_a_hair_mullet.glb': [3272, 1962, 1307],
   'head_type_a_hair_pompadour.glb': [1959, 783, 58],
   'head_type_a_hair_ponytail.glb': [3429, 2743, 751],
@@ -114,6 +115,7 @@ const TRIANGLES: Readonly<Record<string, readonly [lod0: number, mid: number, fa
   'head_type_b_hair_braid.glb': [3428, 3428, 919],
   'head_type_b_hair_crown.glb': [3430, 1864, 418],
   'head_type_b_hair_curls.glb': [3429, 2445, 1438],
+  'head_type_b_hair_monk.glb': [784, 312, 31],
   'head_type_b_hair_mullet.glb': [3168, 1900, 1045],
   'head_type_b_hair_pompadour.glb': [1959, 783, 58],
   'head_type_b_hair_ponytail.glb': [3430, 2744, 754],
@@ -195,8 +197,8 @@ const triangles = (file: WocShippedFile): WocTriangles => COUNTS.get(file.url) a
 const rowName = (file: WocShippedFile): string => file.url.slice(WOC_SPLIT_DIR.length + 1);
 
 describe('WOC character triangle ratchet', () => {
-  it('pins every mesh file: a row for each of the 100 GLBs that draws, none for one that is gone', () => {
-    expect(GLBS).toHaveLength(100);
+  it('pins every mesh file: a row for each of the 102 GLBs that draws, none for one that is gone', () => {
+    expect(GLBS).toHaveLength(102);
     const drawing = GLBS.filter((file) => ceilingRow(file) !== null);
     expect(drawing.map(rowName)).toEqual(Object.keys(TRIANGLES).sort());
     // the rest carry no geometry, each by its kind's pin below

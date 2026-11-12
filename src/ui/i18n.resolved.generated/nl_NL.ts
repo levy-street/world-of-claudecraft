@@ -13812,7 +13812,8 @@ export const nl_NL: EnTranslations = {
         "twins": "Twee Vlechten",
         "curls": "Opgestoken krullen",
         "mullet": "Mullet",
-        "pompadour": "Pompadour"
+        "pompadour": "Pompadour",
+        "monk": "Monk Tonsure"
       },
       "beard": {
         "none": "Gladgeschoren",

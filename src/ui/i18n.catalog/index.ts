@@ -459,6 +459,7 @@ export const en = {
         curls: 'Curly Updo',
         mullet: 'Mullet',
         pompadour: 'Pompadour',
+        monk: 'Monk Tonsure',
       },
       beard: {
         none: 'Clean Shaven',

@@ -13812,7 +13812,8 @@ export const ja_JP: EnTranslations = {
         "twins": "ツインおさげ",
         "curls": "カールアップ",
         "mullet": "マレット",
-        "pompadour": "リーゼント"
+        "pompadour": "リーゼント",
+        "monk": "修道士の剃髪"
       },
       "beard": {
         "none": "ひげなし",

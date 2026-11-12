@@ -193,6 +193,8 @@ export const WOC_HEAD_TYPES: Readonly<Record<WocHeadType, WocHeadTypeDef>> = {
         v('hair', 'mullet'),
         // the mohawk combed sleek with a raised front: build_pompadour_hair.mjs
         v('hair', 'pompadour'),
+        // a tonsure, grown on the head's own skull: build_monk_hair.mjs
+        v('hair', 'monk'),
         v('hair', 'bald'),
       ],
       beard: BEARDS,
@@ -243,6 +245,8 @@ export const WOC_HEAD_TYPES: Readonly<Record<WocHeadType, WocHeadTypeDef>> = {
         v('hair', 'mullet'),
         // the mohawk combed sleek with a raised front: build_pompadour_hair.mjs
         v('hair', 'pompadour'),
+        // a tonsure, grown on the head's own skull: build_monk_hair.mjs
+        v('hair', 'monk'),
         v('hair', 'bald'),
       ],
       beard: BEARDS,
