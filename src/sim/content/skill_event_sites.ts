@@ -32,7 +32,6 @@ export const SKILL_EVENT_SITES: readonly SkillEventSite[] = [
   { id: 'palmreach_1', zoneId: 'palmreach', x: -397, z: 747 },
   { id: 'palmreach_2', zoneId: 'palmreach', x: -241, z: 995 },
   { id: 'palmreach_3', zoneId: 'palmreach', x: -433, z: 1035 },
-  { id: 'evergarden_1', zoneId: 'evergarden', x: 379, z: 771 },
   { id: 'evergarden_2', zoneId: 'evergarden', x: 239, z: 803 },
   { id: 'galecrest_1', zoneId: 'galecrest', x: 347, z: 359 },
   { id: 'galecrest_2', zoneId: 'galecrest', x: 387, z: 495 },

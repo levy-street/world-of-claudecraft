@@ -15952,6 +15952,9 @@ export const fr_CA: EnTranslations = {
       "alreadyReported": "Vous avez déjà signalé ce joueur récemment.",
       "reportingCharacterMissing": "Personnage signalant introuvable."
     },
+    "skillEvent": {
+      "heartsLabel": "Hearts: {count} of {max}"
+    },
     "prompts": {
       "partyInvite": "{name} vous invite à rejoindre son groupe.",
       "joinParty": "Rejoindre le groupe",

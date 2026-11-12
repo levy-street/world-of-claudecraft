@@ -29,6 +29,8 @@ import { grantHonor } from './honor';
 import {
   insideSkillEventCircle,
   nextSkillEventStart,
+  SKILL_EVENT_HEART_KINDS,
+  SKILL_EVENT_HEARTS,
   SKILL_EVENT_KILL_HONOR,
   SKILL_EVENT_MAX_SECONDS,
   SKILL_EVENT_MIN_PRESENCE_SECONDS,
@@ -59,6 +61,8 @@ export interface ActiveSkillEvent {
   participants: number[];
   /** Seconds each participant has spent inside the running arena. */
   presence: Map<number, number>;
+  /** Hearts left, by pid, in a heart event once it runs (SKILL_EVENT_HEART_KINDS). */
+  hearts: Map<number, number>;
   /** Player killing blows landed inside the event, by pid. */
   kills: Map<number, number>;
   /** Set by the rule set the moment the event is won. */
@@ -183,6 +187,7 @@ function openEvent(ctx: SimContext, ordinal: number, startsAt: number): ActiveSk
     endsAt: startsAt + SKILL_EVENT_MAX_SECONDS,
     participants: [],
     presence: new Map(),
+    hearts: new Map(),
     kills: new Map(),
     winner: null,
   };
@@ -197,9 +202,35 @@ function openEvent(ctx: SimContext, ordinal: number, startsAt: number): ActiveSk
   return ev;
 }
 
+/** Set a participant's hearts on the event book and on their entity (the wire
+ *  carries the entity's copy every tick). */
+export function setHearts(
+  ctx: SimContext,
+  ev: ActiveSkillEvent,
+  pid: number,
+  hearts: number,
+): void {
+  ev.hearts.set(pid, hearts);
+  const e = ctx.entities.get(pid);
+  if (e) e.eventHearts = hearts;
+}
+
+/** The event is over: everyone goes back to their health bar. */
+function clearHearts(ctx: SimContext, ev: ActiveSkillEvent): void {
+  for (const pid of ev.hearts.keys()) {
+    const e = ctx.entities.get(pid);
+    if (e) delete e.eventHearts;
+  }
+  ev.hearts.clear();
+}
+
 function addParticipant(ctx: SimContext, ev: ActiveSkillEvent, pid: number): void {
   if (ev.participants.includes(pid)) return;
   ev.participants.push(pid);
+  // A player who joins a running heart event starts on full hearts.
+  if (ev.phase === 'running' && SKILL_EVENT_HEART_KINDS.has(ev.kind)) {
+    setHearts(ctx, ev, pid, SKILL_EVENT_HEARTS);
+  }
   notice(ctx, pid, SKILL_EVENT_JOINED_LINE);
 }
 
@@ -243,6 +274,7 @@ export function finishSkillEvent(ctx: SimContext, ev: ActiveSkillEvent): void {
     winner ? skillEventWonLine(name, winner.name) : skillEventEndedLine(name),
     START_COLOR,
   );
+  clearHearts(ctx, ev);
   ctx.skillEventState.active = null;
 }
 
@@ -262,6 +294,7 @@ export function updateSkillEvents(ctx: SimContext): void {
   if (ctx.tickCount - state.passTick < PASS_TICKS) return;
   state.passTick = ctx.tickCount;
   if (ctx.worldPvpDisabled) {
+    if (state.active) clearHearts(ctx, state.active);
     state.active = null;
     return;
   }
@@ -277,6 +310,9 @@ export function updateSkillEvents(ctx: SimContext): void {
       skillEventStartLine(SKILL_EVENT_NAMES[ev.kind], zoneName(ev.zoneId)),
       START_COLOR,
     );
+    if (SKILL_EVENT_HEART_KINDS.has(ev.kind)) {
+      for (const pid of ev.participants) setHearts(ctx, ev, pid, SKILL_EVENT_HEARTS);
+    }
     rules?.start?.(ctx, ev);
   }
   updatePresence(ctx, ev, PASS_TICKS / 20);
@@ -361,5 +397,9 @@ export function skillEventInfoFor(
     canJoin: near && !joined && !!meta && !isWorldPvpFlagged(meta),
     participants: ev.participants.length,
     yourKills: ev.kills.get(pid) ?? 0,
+    // Your hearts while you fight a heart event; null otherwise (the HUD then
+    // shows the ordinary health bar).
+    hearts: ev.hearts.get(pid) ?? null,
+    maxHearts: SKILL_EVENT_HEARTS,
   };
 }

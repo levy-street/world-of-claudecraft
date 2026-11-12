@@ -15952,6 +15952,9 @@ export const cs_CZ: EnTranslations = {
       "alreadyReported": "Tohoto hráče jsi nedávno už nahlásil(a).",
       "reportingCharacterMissing": "Nahlašující postava nebyla nalezena."
     },
+    "skillEvent": {
+      "heartsLabel": "Hearts: {count} of {max}"
+    },
     "prompts": {
       "partyInvite": "{name} tě zve do své skupiny.",
       "joinParty": "Vstoupit do skupiny",

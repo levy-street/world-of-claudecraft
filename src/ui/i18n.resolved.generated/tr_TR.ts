@@ -15952,6 +15952,9 @@ export const tr_TR: EnTranslations = {
       "alreadyReported": "Bu oyuncuyu yakın zamanda zaten bildirdin.",
       "reportingCharacterMissing": "Bildirimi yapan karakter bulunamadı."
     },
+    "skillEvent": {
+      "heartsLabel": "Hearts: {count} of {max}"
+    },
     "prompts": {
       "partyInvite": "{name} seni grubuna katılmaya davet ediyor.",
       "joinParty": "Gruba Katıl",

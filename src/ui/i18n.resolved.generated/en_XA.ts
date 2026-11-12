@@ -15952,6 +15952,9 @@ export const en_XA: EnTranslations = {
       "alreadyReported": "[Ýóú ĥáʋé áļŕéáðý ŕéþóŕţéð ţĥíš þļáýéŕ ŕéçéñţļý.]",
       "reportingCharacterMissing": "[Ŕéþóŕţíñĝ çĥáŕáçţéŕ ñóţ ƒóúñð.]"
     },
+    "skillEvent": {
+      "heartsLabel": "[Ĥéáŕţš: {count} óƒ {max}]"
+    },
     "prompts": {
       "partyInvite": "[{name} íñʋíţéš ýóú ţó ĵóíñ ţĥéíŕ þáŕţý.]",
       "joinParty": "[Ĵóíñ Þáŕţý]",

@@ -637,7 +637,7 @@ import { RiftMapPainter } from './hud/rift';
 import { RiftFloorTrackerController } from './hud/rift/rift_floor_tracker_controller';
 import { RiftForgeWindow, riftForgeInReach } from './hud/rift_forge';
 import { createShardpikeBar, shardpikeBlindFeedback } from './hud/shardpike';
-import { SkillEventPromptController } from './hud/skill_event';
+import { SkillEventHud } from './hud/skill_event';
 import { skullBagTooltipLines } from './hud/skull_bag';
 import { StanceBarController } from './hud/stance';
 import { closeOpenTouchMenu } from './hud/tap_menu';
@@ -5671,9 +5671,10 @@ export class Hud {
     writers: this.writerFacet,
     banner: (text) => this.showBanner(text, true, undefined, 'pvp'),
   });
-  private readonly skillEventPrompt = new SkillEventPromptController(
+  private readonly skillEventPrompt = new SkillEventHud(
     (text, accept, onAccept, onDecline) => this.showPrompt(text, accept, onAccept, onDecline),
     () => this.sim.joinSkillEvent(),
+    this.writerFacet,
   );
   // Dungeon prompts: the Iron Cage escape (a tap is an interact press), Ossick's chains.
   private readonly dungeonPrompts = new DungeonPrompts({
@@ -8618,6 +8619,7 @@ export class Hud {
     playerFrame.borderSlug = deedBorderSlug(sim.activeBorder);
     playerFrame.absorb = p;
     this.playerFramePainter.paint(unitFrameViewInto(this.playerFrameBuffer, playerFrame));
+    this.skillEventPrompt.paintHearts(p.eventHearts); // skill event hearts replace the bar
     this.updateLowHealthVignette(p.hp, p.maxHp);
     this.updateLowResource(p);
     const fateThreads = this.updateWarlockDoomMeter(p);

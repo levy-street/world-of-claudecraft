@@ -418,6 +418,11 @@ const hudStringsEn = {
       alreadyReported: 'You have already reported this player recently.',
       reportingCharacterMissing: 'Reporting character not found.',
     },
+    // The hourly skill events (src/ui/hud/skill_event/): the heart row that
+    // replaces the health bar in Riposte, Footprints in Ash and Bankshot.
+    skillEvent: {
+      heartsLabel: 'Hearts: {count} of {max}',
+    },
     prompts: {
       partyInvite: '{name} invites you to join their party.',
       joinParty: 'Join Party',

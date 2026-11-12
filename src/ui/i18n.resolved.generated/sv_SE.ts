@@ -15952,6 +15952,9 @@ export const sv_SE: EnTranslations = {
       "alreadyReported": "Du har redan rapporterat den här spelaren nyligen.",
       "reportingCharacterMissing": "Rapporterande karaktär hittades inte."
     },
+    "skillEvent": {
+      "heartsLabel": "Hearts: {count} of {max}"
+    },
     "prompts": {
       "partyInvite": "{name} bjuder in dig att gå med i sin grupp.",
       "joinParty": "Gå med i grupp",

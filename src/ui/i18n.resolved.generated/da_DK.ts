@@ -15952,6 +15952,9 @@ export const da_DK: EnTranslations = {
       "alreadyReported": "Du har allerede rapporteret denne spiller for nylig.",
       "reportingCharacterMissing": "Rapporterende karakter ikke fundet."
     },
+    "skillEvent": {
+      "heartsLabel": "Hearts: {count} of {max}"
+    },
     "prompts": {
       "partyInvite": "{name} inviterer dig til at slutte dig til sin gruppe.",
       "joinParty": "Tilslut gruppe",

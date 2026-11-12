@@ -14,4 +14,7 @@ export const ENTITY_STATUS_KEYS = ['ak', 'pvp', 'bty', 'hbn'] as const;
 export function writeEntityStatusWire(e: Entity, out: Record<string, unknown>): void {
   writeEntityPresenceBits(out, e);
   if (e.bounty) out.bty = 1; // World PvP bounty bit: the blood-red name tag
+  // Skill event hearts (src/sim/pvp/skill_events.ts): sent every tick while set,
+  // so the overhead row and your own heart bar never lag a hit.
+  if (e.eventHearts !== undefined) out.hrt = e.eventHearts;
 }

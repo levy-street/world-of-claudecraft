@@ -8262,6 +8262,11 @@ export interface Entity extends ClientMirroredEntityFields {
    *  plain world kill. Rides the entity wire (`hbn`) so every nearby client tags
    *  the nameplate and target frame; absent otherwise. */
   hillBounty?: number;
+  /** Hourly skill event hearts (src/sim/pvp/skill_events.ts): the hits this
+   *  player can still take in a heart fight. Rides the entity wire (`hrt`) every
+   *  tick so the overhead heart row and the player frame never lag a hit;
+   *  absent outside a heart fight. */
+  eventHearts?: number;
   /** WARFARE Vitality switch (src/sim/pvp/vitality.ts): false while the player
    *  stands in a PvE instance (a dungeon, raid, delve or rift floor), so honor
    *  gear's health bonus never reaches raid content. Absent means the open

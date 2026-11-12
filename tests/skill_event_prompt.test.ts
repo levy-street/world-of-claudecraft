@@ -6,6 +6,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   answerSkillEventPrompt,
+  buildHeartBarView,
   newSkillEventPromptState,
   stepSkillEventPrompt,
 } from '../src/ui/hud/skill_event';
@@ -24,6 +25,8 @@ function info(canJoin: boolean): SkillEventInfo {
     canJoin,
     participants: 0,
     yourKills: 0,
+    hearts: null,
+    maxHearts: 4,
   };
 }
 
@@ -52,5 +55,20 @@ describe('skill event join prompt', () => {
     answerSkillEventPrompt(state);
     expect(stepSkillEventPrompt(state, info(false))).toBe('none');
     expect(stepSkillEventPrompt(state, info(true))).toBe('open');
+  });
+});
+
+describe('skill event heart bar', () => {
+  it('shows only while the viewer carries hearts', () => {
+    expect(buildHeartBarView(undefined, 4).show).toBe(false);
+    expect(buildHeartBarView(3, 4)).toEqual({ show: true, filled: 3, max: 4 });
+    expect(buildHeartBarView(0, 4)).toEqual({ show: true, filled: 0, max: 4 });
+    expect(buildHeartBarView(3, 0).show).toBe(false);
+  });
+
+  it('clamps the hearts into the bar', () => {
+    expect(buildHeartBarView(9, 4).filled).toBe(4);
+    expect(buildHeartBarView(-2, 4).filled).toBe(0);
+    expect(buildHeartBarView(Number.NaN, 4).show).toBe(false);
   });
 });

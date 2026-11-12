@@ -15952,6 +15952,9 @@ export const nl_NL: EnTranslations = {
       "alreadyReported": "Je hebt deze speler onlangs al gerapporteerd.",
       "reportingCharacterMissing": "Meldend personage niet gevonden."
     },
+    "skillEvent": {
+      "heartsLabel": "Hearts: {count} of {max}"
+    },
     "prompts": {
       "partyInvite": "{name} nodigt je uit om hun groep te betreden.",
       "joinParty": "Groep betreden",

@@ -156,6 +156,11 @@ export interface SkillEventInfo {
   canJoin: boolean;
   participants: number;
   yourKills: number;
+  /** Your hearts left while you fight a heart event (Riposte, Footprints in
+   *  Ash, Bankshot): the HUD shows them in place of the health bar. Null when
+   *  you are not on hearts. */
+  hearts: number | null;
+  maxHearts: number;
 }
 
 export interface IWorldWorldPvp {

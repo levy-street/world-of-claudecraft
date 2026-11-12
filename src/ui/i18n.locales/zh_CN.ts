@@ -6570,6 +6570,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.prompts.resurrectionOffer': '{name}想让你复活。是否接受？',
   'hud.prompts.acceptResurrection': '接受复活',
   'hud.prompts.decline': '拒绝',
+  'hud.skillEvent.heartsLabel': '红心：{count}/{max}',
   'hud.prompts.skillEventJoin':
     '你正靠近一场 PvP 活动。要参加吗？接受后将开启 PvP，你可能会被其他玩家击杀，死亡时钱袋会被掠夺。',
   'hud.prompts.acceptSkillEvent': '接受',

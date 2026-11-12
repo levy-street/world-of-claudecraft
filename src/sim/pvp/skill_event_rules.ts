@@ -6,6 +6,10 @@
 
 import type { SkillEventSite } from '../content/skill_event_sites';
 
+/** Hit points in the heart events (owner brief 2026-11-12): every hit from
+ *  another participant takes exactly one, heals and absorbs do nothing. */
+export const SKILL_EVENT_HEARTS = 4;
+
 /** The five events, in their fixed hourly rotation order. */
 export const SKILL_EVENT_KINDS = [
   'riposte',
@@ -15,6 +19,14 @@ export const SKILL_EVENT_KINDS = [
   'common_hand',
 ] as const;
 export type SkillEventKind = (typeof SKILL_EVENT_KINDS)[number];
+
+/** The events fought on hearts instead of health. Rite of Tongues deals no
+ *  damage at all and The Common Hand keeps ordinary health bars. */
+export const SKILL_EVENT_HEART_KINDS: ReadonlySet<SkillEventKind> = new Set([
+  'riposte',
+  'footprints',
+  'bankshot',
+]);
 
 /** One event starts every hour, on the hour. */
 export const SKILL_EVENT_PERIOD_SECONDS = 60 * 60;

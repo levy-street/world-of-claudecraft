@@ -87,6 +87,8 @@ export interface NameplatePaintFields {
   readonly markerTone: string;
   readonly hpVisible: boolean;
   readonly hpFill: number;
+  /** Hearts left in a skill event heart fight, -1 when on ordinary health. */
+  readonly hearts: number;
   readonly castVisible: boolean;
   readonly castFill: number;
   readonly castChannel: boolean;
@@ -131,6 +133,7 @@ interface PlateRecord {
   markerTone: string;
   hpVisible: boolean;
   hpFill: number;
+  hearts: number;
   castVisible: boolean;
   castFill: number;
   castChannel: boolean;
@@ -250,6 +253,7 @@ function plateDiffers(
     record.markerTone !== f.markerTone ||
     record.hpVisible !== f.hpVisible ||
     record.hpFill !== f.hpFill ||
+    record.hearts !== f.hearts ||
     record.castVisible !== f.castVisible ||
     record.castFill !== f.castFill ||
     record.castChannel !== f.castChannel ||
@@ -301,6 +305,7 @@ function writePlate(
   record.markerTone = f.markerTone;
   record.hpVisible = f.hpVisible;
   record.hpFill = f.hpFill;
+  record.hearts = f.hearts;
   record.castVisible = f.castVisible;
   record.castFill = f.castFill;
   record.castChannel = f.castChannel;
@@ -373,6 +378,7 @@ function newRecord(): PlateRecord {
     markerTone: '',
     hpVisible: false,
     hpFill: 0,
+    hearts: -1,
     castVisible: false,
     castFill: 0,
     castChannel: false,

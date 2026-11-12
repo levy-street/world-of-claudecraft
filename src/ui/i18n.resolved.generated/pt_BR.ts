@@ -15952,6 +15952,9 @@ export const pt_BR: EnTranslations = {
       "alreadyReported": "Você já denunciou este jogador recentemente.",
       "reportingCharacterMissing": "Personagem denunciante não encontrado."
     },
+    "skillEvent": {
+      "heartsLabel": "Hearts: {count} of {max}"
+    },
     "prompts": {
       "partyInvite": "{name} convida você para o grupo.",
       "joinParty": "Entrar no grupo",

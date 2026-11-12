@@ -6291,6 +6291,7 @@ function dirtyEveryDeltaField(): {
     endsAt: sim.time + 1020,
     participants: [],
     presence: new Map(),
+    hearts: new Map(),
     kills: new Map(),
     winner: null,
   };

@@ -12,6 +12,7 @@ import { pickHillSpot, spawnHill } from '../src/sim/pvp/hill';
 import {
   nextSkillEventStart,
   SKILL_EVENT_FIRST_START_SECONDS,
+  SKILL_EVENT_HEARTS,
   SKILL_EVENT_KILL_HONOR,
   SKILL_EVENT_KINDS,
   SKILL_EVENT_MIN_PRESENCE_SECONDS,
@@ -400,6 +401,41 @@ describe('skill event flow', () => {
       const hill = spawnHill(sim.ctx, 3, { warnAt: 0, risesAt: 1, closesAt: 2 }, attempt);
       if (hill) expect(hill.zoneId).not.toBe('drakelands');
     }
+  });
+
+  it('puts hearts on every fighter in a heart event and takes them off at the end', () => {
+    const sim = world();
+    const a = addPlayer(sim, 'Aleph');
+    const b = addPlayer(sim, 'Bet');
+    openSoon(sim, 0); // Riposte: a heart event
+    const ev = sim.skillEventState.active!;
+    for (const pid of [a, b]) {
+      place(sim, pid, ev.x, ev.z);
+      sim.joinSkillEvent(pid);
+    }
+    expect(ent(sim, a).eventHearts).toBeUndefined(); // not before the start
+    ev.startsAt = sim.time;
+    tickSeconds(sim, 1.1);
+    expect(ent(sim, a).eventHearts).toBe(SKILL_EVENT_HEARTS);
+    expect(ent(sim, b).eventHearts).toBe(SKILL_EVENT_HEARTS);
+    expect(sim.skillEventInfoFor(a)?.hearts).toBe(SKILL_EVENT_HEARTS);
+    ev.endsAt = sim.time;
+    tickSeconds(sim, 1.1);
+    expect(ent(sim, a).eventHearts).toBeUndefined();
+    expect(ent(sim, b).eventHearts).toBeUndefined();
+  });
+
+  it('keeps ordinary health in The Common Hand', () => {
+    const sim = world();
+    const a = addPlayer(sim, 'Aleph');
+    openSoon(sim, 4);
+    const ev = sim.skillEventState.active!;
+    place(sim, a, ev.x, ev.z);
+    sim.joinSkillEvent(a);
+    ev.startsAt = sim.time;
+    tickSeconds(sim, 1.1);
+    expect(ent(sim, a).eventHearts).toBeUndefined();
+    expect(sim.skillEventInfoFor(a)?.hearts).toBeNull();
   });
 
   it('runs no event on a realm whose World PvP switch is off', () => {

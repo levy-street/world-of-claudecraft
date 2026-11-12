@@ -12,6 +12,7 @@ export const pending: Record<string, readonly string[]> = {
   "es": [
     "hud.prompts.acceptSkillEvent",
     "hud.prompts.skillEventJoin",
+    "hud.skillEvent.heartsLabel",
     "hudChrome.warfare.reasons.skillEventComplete",
     "hudChrome.warfare.reasons.skillEventKill",
     "hudChrome.warfare.reasons.skillEventWin"
@@ -19,6 +20,7 @@ export const pending: Record<string, readonly string[]> = {
   "es_ES": [
     "hud.prompts.acceptSkillEvent",
     "hud.prompts.skillEventJoin",
+    "hud.skillEvent.heartsLabel",
     "hudChrome.warfare.reasons.skillEventComplete",
     "hudChrome.warfare.reasons.skillEventKill",
     "hudChrome.warfare.reasons.skillEventWin"
@@ -26,6 +28,7 @@ export const pending: Record<string, readonly string[]> = {
   "fr_FR": [
     "hud.prompts.acceptSkillEvent",
     "hud.prompts.skillEventJoin",
+    "hud.skillEvent.heartsLabel",
     "hudChrome.warfare.reasons.skillEventComplete",
     "hudChrome.warfare.reasons.skillEventKill",
     "hudChrome.warfare.reasons.skillEventWin"
@@ -33,6 +36,7 @@ export const pending: Record<string, readonly string[]> = {
   "fr_CA": [
     "hud.prompts.acceptSkillEvent",
     "hud.prompts.skillEventJoin",
+    "hud.skillEvent.heartsLabel",
     "hudChrome.warfare.reasons.skillEventComplete",
     "hudChrome.warfare.reasons.skillEventKill",
     "hudChrome.warfare.reasons.skillEventWin"
@@ -41,6 +45,7 @@ export const pending: Record<string, readonly string[]> = {
   "it_IT": [
     "hud.prompts.acceptSkillEvent",
     "hud.prompts.skillEventJoin",
+    "hud.skillEvent.heartsLabel",
     "hudChrome.warfare.reasons.skillEventComplete",
     "hudChrome.warfare.reasons.skillEventKill",
     "hudChrome.warfare.reasons.skillEventWin"
@@ -48,6 +53,7 @@ export const pending: Record<string, readonly string[]> = {
   "de_DE": [
     "hud.prompts.acceptSkillEvent",
     "hud.prompts.skillEventJoin",
+    "hud.skillEvent.heartsLabel",
     "hudChrome.warfare.reasons.skillEventComplete",
     "hudChrome.warfare.reasons.skillEventKill",
     "hudChrome.warfare.reasons.skillEventWin"
@@ -75,6 +81,7 @@ export const pending: Record<string, readonly string[]> = {
   "pt_BR": [
     "hud.prompts.acceptSkillEvent",
     "hud.prompts.skillEventJoin",
+    "hud.skillEvent.heartsLabel",
     "hudChrome.warfare.reasons.skillEventComplete",
     "hudChrome.warfare.reasons.skillEventKill",
     "hudChrome.warfare.reasons.skillEventWin"
@@ -87,6 +94,7 @@ export const pending: Record<string, readonly string[]> = {
   "cs_CZ": [
     "hud.prompts.acceptSkillEvent",
     "hud.prompts.skillEventJoin",
+    "hud.skillEvent.heartsLabel",
     "hudChrome.warfare.reasons.skillEventComplete",
     "hudChrome.warfare.reasons.skillEventKill",
     "hudChrome.warfare.reasons.skillEventWin"
@@ -94,6 +102,7 @@ export const pending: Record<string, readonly string[]> = {
   "nl_NL": [
     "hud.prompts.acceptSkillEvent",
     "hud.prompts.skillEventJoin",
+    "hud.skillEvent.heartsLabel",
     "hudChrome.warfare.reasons.skillEventComplete",
     "hudChrome.warfare.reasons.skillEventKill",
     "hudChrome.warfare.reasons.skillEventWin"
@@ -101,6 +110,7 @@ export const pending: Record<string, readonly string[]> = {
   "pl_PL": [
     "hud.prompts.acceptSkillEvent",
     "hud.prompts.skillEventJoin",
+    "hud.skillEvent.heartsLabel",
     "hudChrome.warfare.reasons.skillEventComplete",
     "hudChrome.warfare.reasons.skillEventKill",
     "hudChrome.warfare.reasons.skillEventWin"
@@ -108,6 +118,7 @@ export const pending: Record<string, readonly string[]> = {
   "id_ID": [
     "hud.prompts.acceptSkillEvent",
     "hud.prompts.skillEventJoin",
+    "hud.skillEvent.heartsLabel",
     "hudChrome.warfare.reasons.skillEventComplete",
     "hudChrome.warfare.reasons.skillEventKill",
     "hudChrome.warfare.reasons.skillEventWin"
@@ -115,6 +126,7 @@ export const pending: Record<string, readonly string[]> = {
   "tr_TR": [
     "hud.prompts.acceptSkillEvent",
     "hud.prompts.skillEventJoin",
+    "hud.skillEvent.heartsLabel",
     "hudChrome.warfare.reasons.skillEventComplete",
     "hudChrome.warfare.reasons.skillEventKill",
     "hudChrome.warfare.reasons.skillEventWin"
@@ -122,6 +134,7 @@ export const pending: Record<string, readonly string[]> = {
   "sv_SE": [
     "hud.prompts.acceptSkillEvent",
     "hud.prompts.skillEventJoin",
+    "hud.skillEvent.heartsLabel",
     "hudChrome.warfare.reasons.skillEventComplete",
     "hudChrome.warfare.reasons.skillEventKill",
     "hudChrome.warfare.reasons.skillEventWin"
@@ -129,6 +142,7 @@ export const pending: Record<string, readonly string[]> = {
   "vi_VN": [
     "hud.prompts.acceptSkillEvent",
     "hud.prompts.skillEventJoin",
+    "hud.skillEvent.heartsLabel",
     "hudChrome.warfare.reasons.skillEventComplete",
     "hudChrome.warfare.reasons.skillEventKill",
     "hudChrome.warfare.reasons.skillEventWin"
@@ -136,6 +150,7 @@ export const pending: Record<string, readonly string[]> = {
   "da_DK": [
     "hud.prompts.acceptSkillEvent",
     "hud.prompts.skillEventJoin",
+    "hud.skillEvent.heartsLabel",
     "hudChrome.warfare.reasons.skillEventComplete",
     "hudChrome.warfare.reasons.skillEventKill",
     "hudChrome.warfare.reasons.skillEventWin"

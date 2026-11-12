@@ -15952,6 +15952,9 @@ export const en_CA: EnTranslations = {
       "alreadyReported": "You have already reported this player recently.",
       "reportingCharacterMissing": "Reporting character not found."
     },
+    "skillEvent": {
+      "heartsLabel": "Hearts: {count} of {max}"
+    },
     "prompts": {
       "partyInvite": "{name} invites you to join their party.",
       "joinParty": "Join Party",

@@ -5160,6 +5160,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.prompts.resurrectionOffer': '{name}があなたを蘇生しようとしています。受け入れますか？',
   'hud.prompts.acceptResurrection': '蘇生を受け入れる',
   'hud.prompts.decline': '断る',
+  'hud.skillEvent.heartsLabel': 'ハート：{count}/{max}',
   'hud.prompts.skillEventJoin':
     'PvPイベントの近くにいます。参加しますか？承諾するとPvPが有効になり、他のプレイヤーに倒される可能性があり、死亡時には財布の中身を奪われます。',
   'hud.prompts.acceptSkillEvent': '承諾',

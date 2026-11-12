@@ -698,6 +698,8 @@ export class NameplatePainter {
     state.overheadMarker = highlighted && this.targetHighlight.overhead;
     state.comboPips = Math.max(0, Math.min(COMBO_PIP_MAX, plan.comboPips));
     state.hpFill = isPlayingDead(entity) ? 0 : entity.hp / Math.max(1, entity.maxHp);
+    // Skill event heart fight: hearts replace the bar (src/render/nameplate_hearts.ts).
+    state.hearts = entity.eventHearts ?? -1;
     // A hostile player's tracked cooldowns, on the same per-frame cadence as the dots.
     // The resolver also clears non-player rows before a name-only NPC returns.
     resolveNameplateCooldowns(

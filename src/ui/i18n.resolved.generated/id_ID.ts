@@ -15952,6 +15952,9 @@ export const id_ID: EnTranslations = {
       "alreadyReported": "Anda baru saja melaporkan pemain ini.",
       "reportingCharacterMissing": "Karakter pelapor tidak ditemukan."
     },
+    "skillEvent": {
+      "heartsLabel": "Hearts: {count} of {max}"
+    },
     "prompts": {
       "partyInvite": "{name} mengundang Anda untuk bergabung dengan party mereka.",
       "joinParty": "Gabung Party",

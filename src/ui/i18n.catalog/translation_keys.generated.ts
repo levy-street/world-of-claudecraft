@@ -12377,6 +12377,7 @@ export type TranslationKeyFlat =
   | 'hud.report.targetMissing'
   | 'hud.report.targetOffline'
   | 'hud.report.title'
+  | 'hud.skillEvent.heartsLabel'
   | 'hud.social.add'
   | 'hud.social.boundFriend'
   | 'hud.social.boundFriendLink'

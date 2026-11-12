@@ -15952,6 +15952,9 @@ export const ko_KR: EnTranslations = {
       "alreadyReported": "최근에 이미 이 플레이어를 신고했습니다.",
       "reportingCharacterMissing": "신고 캐릭터를 찾을 수 없습니다."
     },
+    "skillEvent": {
+      "heartsLabel": "하트: {count}/{max}"
+    },
     "prompts": {
       "partyInvite": "{name}님이 파티에 초대했습니다.",
       "joinParty": "파티 참가",

@@ -15952,6 +15952,9 @@ export const ru_RU: EnTranslations = {
       "alreadyReported": "Вы уже недавно жаловались на этого игрока.",
       "reportingCharacterMissing": "Персонаж, отправляющий жалобу, не найден."
     },
+    "skillEvent": {
+      "heartsLabel": "Сердца: {count} из {max}"
+    },
     "prompts": {
       "partyInvite": "{name} приглашает вас в группу.",
       "joinParty": "Вступить в группу",

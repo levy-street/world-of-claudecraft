@@ -15952,6 +15952,9 @@ export const ja_JP: EnTranslations = {
       "alreadyReported": "このプレイヤーは最近すでに通報しています。",
       "reportingCharacterMissing": "通報するキャラクターが見つかりません。"
     },
+    "skillEvent": {
+      "heartsLabel": "ハート：{count}/{max}"
+    },
     "prompts": {
       "partyInvite": "{name}があなたをパーティに招待しています。",
       "joinParty": "パーティに参加",

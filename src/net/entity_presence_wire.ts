@@ -12,4 +12,7 @@ export function applyEntityPresenceBits(e: Entity, w: any): void {
   // whole Honor value, or nothing.
   if (typeof w.hbn === 'number' && w.hbn > 0) e.hillBounty = w.hbn;
   else delete e.hillBounty;
+  // Skill event hearts (`hrt`): a whole count while in a heart fight, else nothing.
+  if (typeof w.hrt === 'number' && w.hrt >= 0) e.eventHearts = Math.floor(w.hrt);
+  else delete e.eventHearts;
 }

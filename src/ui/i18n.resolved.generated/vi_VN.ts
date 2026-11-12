@@ -15952,6 +15952,9 @@ export const vi_VN: EnTranslations = {
       "alreadyReported": "Bạn vừa mới tố cáo người chơi này gần đây.",
       "reportingCharacterMissing": "Không tìm thấy nhân vật tố cáo."
     },
+    "skillEvent": {
+      "heartsLabel": "Hearts: {count} of {max}"
+    },
     "prompts": {
       "partyInvite": "{name} mời bạn gia nhập tổ đội của họ.",
       "joinParty": "Gia Nhập Tổ Đội",

@@ -6979,6 +6979,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.prompts.resurrectionOffer': '{name} предлагает воскресить вас. Принять?',
   'hud.prompts.acceptResurrection': 'Принять воскрешение',
   'hud.prompts.decline': 'Отклонить',
+  'hud.skillEvent.heartsLabel': 'Сердца: {count} из {max}',
   'hud.prompts.skillEventJoin':
     'Рядом проходит PvP-событие. Хотите участвовать? Если вы согласитесь, режим PvP будет включён: вас смогут убить другие игроки и обчистить ваш кошелёк после смерти.',
   'hud.prompts.acceptSkillEvent': 'Принять',

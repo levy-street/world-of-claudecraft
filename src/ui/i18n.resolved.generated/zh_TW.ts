@@ -15952,6 +15952,9 @@ export const zh_TW: EnTranslations = {
       "alreadyReported": "你最近已經檢舉過該玩家。",
       "reportingCharacterMissing": "找不到檢舉角色。"
     },
+    "skillEvent": {
+      "heartsLabel": "紅心：{count}/{max}"
+    },
     "prompts": {
       "partyInvite": "{name} 邀請你加入隊伍。",
       "joinParty": "加入隊伍",

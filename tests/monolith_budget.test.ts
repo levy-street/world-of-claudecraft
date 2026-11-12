@@ -2391,7 +2391,9 @@ const MONOLITHS: MonolithRow[] = [
     // overhead chevron, screen-edge arrow) draw from nameplate_target_highlight.ts,
     // leaving only their call sites here. wc -l after biome. Exact count, zero slack.
     // Keep inherited bounty/tag fills beside the extracted pens and new cues.
-    ceiling: 797,
+    // LOWERED 797 -> 758 with the skill event hearts: the health bar draw moved
+    // to nameplate_health_bar.ts beside the new nameplate_hearts.ts. wc -l.
+    ceiling: 758,
     seam: 'the pure src/render/nameplate_heraldry_core.ts geometry module',
   },
   {
