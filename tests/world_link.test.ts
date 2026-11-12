@@ -7,6 +7,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { customMapToWorldContent, mapBounds, newFlatCustomMap } from '../src/editor/custom_map';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { sanitizeMapDoc } from '../src/sim/map_doc';
+import { townWalkInPlacements } from '../src/sim/town_walk_in';
 import { terrainHeight } from '../src/sim/world';
 
 const NOW = 1752710400000; // 2026-07-17
@@ -194,7 +195,13 @@ describe('linked playtest projection', () => {
       ...map.content,
       camps: [
         ...map.content.camps,
-        { mobId: 'forest_wolf', center: { x: 10, z: 10 }, radius: 6, count: 2 },
+        {
+          mobId: 'forest_wolf',
+          center: { x: 10, z: 10 },
+          radius: 6,
+          count: 2,
+          spots: [{ x: 12, z: 9 }],
+        },
       ],
     };
     map.content = {
@@ -217,11 +224,25 @@ describe('linked playtest projection', () => {
     expect(world.camps.length).toBe(BUILTIN_WORLD.camps.length + 1);
     const linkedCamp = world.camps[world.camps.length - 1];
     expect(linkedCamp.center).toEqual({ x: -190, z: 810 });
+    // its pinned spot rides the anchor too, never left near the origin
+    expect(linkedCamp.spots).toEqual([{ x: -188, z: 809 }]);
     expect(world.npcs.custom_greeter?.pos).toEqual({ x: -199, z: 801 });
     // Built-in NPCs are all still present.
     for (const id of Object.keys(BUILTIN_WORLD.npcs)) {
       expect(world.npcs[id]).toBeDefined();
     }
+  });
+
+  it('carries the live Fenbridge layout, so its walk-in doorways stay open', () => {
+    const map = blankMap();
+    map.worldAnchor = { x: -200, z: 800 };
+    const world = customMapToWorldContent(map);
+    expect(BUILTIN_WORLD.fenbridgeTouchup).toBeDefined();
+    expect(world.fenbridgeTouchup).toEqual(BUILTIN_WORLD.fenbridgeTouchup);
+    // every walk-in building the built-in world opens, the linked world opens too
+    const builtin = townWalkInPlacements(BUILTIN_WORLD);
+    expect(builtin.length).toBeGreaterThan(0);
+    expect(townWalkInPlacements(world)).toHaveLength(builtin.length);
   });
 
   // Sound authoring is positional, so it embeds at the offset like the props do.

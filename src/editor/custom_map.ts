@@ -677,6 +677,8 @@ function linkedWorldContent(map: CustomMap, anchor: { x: number; z: number }): W
       ...map.content.camps.map((c) => ({
         ...deepClone(c),
         center: { x: c.center.x + ax, z: c.center.z + az },
+        // pinned slot spots (CampDef.spots) ride the anchor with their camp
+        ...(c.spots ? { spots: c.spots.map((s) => ({ x: s.x + ax, z: s.z + az })) } : {}),
       })),
     ] as WorldContent['camps'],
     npcs: {
@@ -725,6 +727,13 @@ function linkedWorldContent(map: CustomMap, anchor: { x: number; z: number }): W
       ...(map.terrainBase ? { terrainBase: { ...map.terrainBase } } : {}),
     },
   };
+  // The cloned built-in props carry the LIVE Fenbridge (the world touch-up
+  // moved its buildings, cistern and stall records): carry the touch-up with
+  // them, as the standalone projection does, so the walk-in floors and the
+  // town's drawn civic pieces resolve the same layout the records hold.
+  if (BUILTIN_WORLD.fenbridgeTouchup) {
+    world.fenbridgeTouchup = deepClone(BUILTIN_WORLD.fenbridgeTouchup);
+  }
   if (map.playerSpawnArea) {
     world.playerSpawnArea = {
       minX: map.playerSpawnArea.minX + ax,
