@@ -178,7 +178,7 @@ export const PRIEST_ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'aoeHeal', min: 90, max: 110, radius: 30 }],
     description:
-      'Channel for 6 sec, healing party members within 30 yards for $d every 2 sec. Healing increases with Spell Power.',
+      'Channel for 6 sec, healing you and every friendly target within 30 yards and in your line of sight for $d every 2 sec. Healing increases with Healing Power.',
     specNotes: {
       shadow:
         'For 15 sec, share 20% of the health enemies lose to your Shadow damage as healing among injured party members within 30 yards, including yourself. In raids, only your subgroup is healed. Cast instantly and keep attacking in Gloamveil. Absorbed damage and overkill do not add healing.',

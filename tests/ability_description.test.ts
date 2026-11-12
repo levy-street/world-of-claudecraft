@@ -97,3 +97,19 @@ describe('periodic total rounding', () => {
     expect(abilityEffectText(resolved)).toBe('156');
   });
 });
+
+describe('Aegis of the First Dawn heal ranges', () => {
+  it('splices the Holy Paladin primary-healing factor into both ranges, as combat applies it', () => {
+    // paladin_aegis.ts heals scalePrimaryHealing(roll + Healing Power, 1.1) for
+    // Holy, so even with no Healing Power the base reads 39 to 50 and 132 to 165.
+    const mods = computeTalentModifiers('paladin', { ...emptyAllocation(), spec: 'holy' });
+    const aegis = abilitiesKnownAt('paladin', MAX_LEVEL, mods).find(
+      (k) => k.def.id === 'aegis_first_dawn',
+    );
+    if (!aegis) throw new Error('missing Aegis of the First Dawn');
+    expect(aegis.outputScaling?.primaryHealing).toBe(1.1);
+    const text = abilityDisplayDescription(aegis, abilityEffectText(aegis));
+    expect(text).toContain('healed for 39 to 50 every second');
+    expect(text).toContain('heals them for 132 to 165 more');
+  });
+});

@@ -13,6 +13,7 @@ import {
   TEMPORAL_ECHO_ROTATION_CONVERSION_MULTIPLIER,
   TEMPORAL_ECHO_SINGLE_CONVERSION,
 } from '../sim/content/chronomancy_tuning';
+import { scalePrimaryHealing } from '../sim/primary_healing';
 import type { ResolvedAbility } from '../sim/sim';
 import {
   type AbilityEffect,
@@ -345,6 +346,16 @@ export function abilityDisplayDescription(
   // any bonusCharges rows), so Conflagrate's "Holds N charges" line reads 3
   // for Ruincaller 2pc wearers and the base 2 for everyone else.
   const charges = res.charges;
+  // {aegisTick} / {aegisFinal} splice Aegis of the First Dawn's per-second and
+  // completion heal ranges with the caster's primary-healing factor (Sunmender)
+  // folded in exactly as paladin_aegis.ts applies it, so a Holy Paladin reads
+  // the base they actually heal for; Healing Power adds on top (the prose says so).
+  const aegis = res.effects.find(
+    (eff): eff is Extract<AbilityEffect, { type: 'paladinAegis' }> => eff.type === 'paladinAegis',
+  );
+  const healFactor = res.outputScaling?.primaryHealing ?? 1;
+  const healRange = (min: number, max: number): string =>
+    abilityAmountRange(scalePrimaryHealing(min, healFactor), scalePrimaryHealing(max, healFactor));
   const echoSingle = res.echoConvertSingle ?? TEMPORAL_ECHO_SINGLE_CONVERSION;
   const dawnreaver = dawnreaverTooltipValues(res, scaling);
   const values: InterpolationValues = {
@@ -364,6 +375,8 @@ export function abilityDisplayDescription(
     absorbPerRage: absorbPerRage === undefined ? '' : formatAbilityNumber(absorbPerRage),
     needleDoom: needleDoom === undefined ? '' : formatAbilityNumber(needleDoom),
     charges: charges === undefined ? '' : formatAbilityNumber(charges),
+    aegisTick: aegis ? healRange(aegis.tickMin, aegis.tickMax) : '',
+    aegisFinal: aegis ? healRange(aegis.finalMin, aegis.finalMax) : '',
     echoSinglePct: formatAbilityNumber(echoSingle * 100),
     echoAreaPct: formatAbilityNumber(TEMPORAL_ECHO_AREA_CONVERSION * 100),
     echoDriverPct: formatAbilityNumber(

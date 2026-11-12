@@ -422,7 +422,7 @@ export const TALENT_ABILITIES_V2_A = {
       },
     ],
     description:
-      'Heal allies within 30 yards for $d. Healing increases with Spell Power. (Benison)',
+      'Heal allies within 30 yards for $d. Healing increases with Healing Power. (Benison)',
   },
   mind_sear: {
     id: 'mind_sear',

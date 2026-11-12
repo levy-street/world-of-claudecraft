@@ -161,6 +161,9 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   life_tap: [50],
   // DRAIN_TICK_GAIN Condemnation per Evil Eye tick (combat/affliction.ts).
   drain_life: [2],
+  // Gripping Roots names its second rank's Nature DoT total (the rank 2 'dot'
+  // effect in classes.ts); rank 1 has no DoT, so no placeholder can carry it.
+  entangling_roots: [32],
 };
 
 // Every resolved rank of every class ability (deduped by rank).

@@ -746,7 +746,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'aoeAttackPower', amount: 0, pct: 0.2, duration: 20, radius: 10 }],
     description:
-      'Shout to reduce the damage dealt by all enemies within 10 yards by 20% for 20 sec.',
+      'Shout to reduce the damage dealt by all enemies within 10 yards by $b% for $t sec.',
   },
   charge: {
     id: 'charge',
@@ -2823,7 +2823,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Accelerates the flow of time for your group or raid, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Temporal Acceleration or Storm Chorus are too exhausted to benefit. (Chronomancy)',
+      "Accelerates the flow of time for group or raid allies within 40 yards, increasing their attack, casting, and channeling speed by 30% for 15 sec. Affected allies cannot benefit from Temporal Acceleration, Storm Chorus, or Thieves' Chorus again for 10 min. (Chronomancy)",
   },
   // ---- Chronomancy (healer) Phase 3: Aether Surge, docs/prd/mage-chronomancy.md
   // sections 13.4 / 14. The single-target Arcane spender that drives the offensive
@@ -4554,7 +4554,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         effects: [{ type: 'heal', min: 160, max: 192 }],
       },
     ],
-    description: 'Heal a friendly target for $d. Healing increases with Spell Power.',
+    description: 'Heal a friendly target for $d. Healing increases with Healing Power.',
   },
   power_word_fortitude: {
     id: 'power_word_fortitude',
@@ -4692,7 +4692,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Heal the target for $d over 15 sec, once every 3 sec. Healing increases with Spell Power.',
+      'Heal the target for $d over 15 sec, once every 3 sec. Healing increases with Healing Power.',
   },
   mind_blast: {
     id: 'mind_blast',
@@ -4737,7 +4737,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetType: 'friendly',
     effects: [{ type: 'heal', min: 165, max: 195 }],
     ranks: [{ rank: 2, level: 20, cost: 130, effects: [{ type: 'heal', min: 335, max: 390 }] }],
-    description: 'Heal a friendly target for $d. Healing increases with Spell Power.',
+    description: 'Heal a friendly target for $d. Healing increases with Healing Power.',
   },
   mind_flay: {
     id: 'mind_flay',
@@ -4768,7 +4768,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     targetType: 'friendly',
     effects: [{ type: 'heal', min: 174, max: 206 }],
-    description: 'Heal a friendly target for $d. Healing increases with Spell Power.',
+    description: 'Heal a friendly target for $d. Healing increases with Healing Power.',
   },
 
   // ====================== SHAMAN ======================
@@ -6653,7 +6653,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Roots the target in place for up to 12 sec. Higher ranks also deal Nature damage over 12 sec.',
+      'Roots the target in place for up to 12 sec. At its second rank, it also deals 32 Nature damage over 12 sec, increased by Spell Power.',
   },
   bear_form: {
     id: 'bear_form',
@@ -7485,7 +7485,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     offGcd: true,
     effects: [{ type: 'interrupt', lockout: 4, rageOnInterrupt: 10 }],
     description:
-      'Interrupts spellcasting, preventing any spell in that school from being cast for 4 sec. Generates 10 rage when it stops a cast.',
+      "Interrupts the target's spellcast and prevents casting from that school for 4 sec. Generates 10 rage when it stops a cast.",
   },
   heroic_leap: {
     id: 'heroic_leap',
@@ -7770,7 +7770,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Imbue your weapon with the blood of your foes: you and every melee party member, at any range, gain 10% attack speed and deal 10% more damage for 20 sec.',
+      'Imbue your weapon with the blood of your foes: you and every Warrior, Paladin, Rogue, Shaman, and Druid in your party, at any range, gain 10% attack speed and deal 10% more damage for 20 sec.',
   },
 
   // ============== TALENT-GRANTED (Classic specs) ==============
@@ -8104,7 +8104,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Heal allies within 10 yards for $d and deal 24 to 30 Holy damage to enemies in the same area. Both amounts increase with Spell Power. (Benison baseline)',
+      'Heal allies within 10 yards for $d and deal 24 to 30 Holy damage to enemies in the same area. Healing increases with Healing Power and damage with Spell Power. (Benison baseline)',
   },
   shadowform: {
     id: 'shadowform',
