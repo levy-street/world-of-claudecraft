@@ -279,6 +279,20 @@ describe('HeatDeathFx plays the death', () => {
     t.fx.dispose();
   });
 
+  it('seen alive, gone from view and back dead is a cold husk, never a late scene', () => {
+    const t = setup();
+    t.step(1);
+    t.entities.delete(t.boss.id);
+    t.step(1);
+    t.boss.dead = true;
+    t.entities.set(t.boss.id, t.boss);
+    t.step(1);
+    expect(t.fx.sceneTime).toBeGreaterThan(HEAT_DEATH.end);
+    expect(t.shakes()).toBe(0);
+    expect(heatEntranceFor(t.boss.id)?.coal).toBeCloseTo(0.24, 3);
+    t.fx.dispose();
+  });
+
   it('out of view mid-scene and back still dead resumes, never restarts', () => {
     const t = setup();
     t.step(0.5);
@@ -338,6 +352,39 @@ describe('HeatDeathFx plays the death', () => {
     t.step(HEAT_DEATH.hotAt);
     expect(shown(t.scene, HEAT_DEATH_SECONDARY_LAYERS[0])).toBe(true);
     t.fx.dispose();
+  });
+
+  it('plays the crumble on the low tier too', () => {
+    const restore = gfxInternalsForTest.overrideSettings({ tier: 'low' });
+    try {
+      const t = setup();
+      t.step(0.5);
+      t.boss.dead = true;
+      t.step(HEAT_DEATH.crumbleAt + 0.4);
+      expect(shown(t.scene, 'smithHeartHeatDeathChunks')).toBe(true);
+      expect(heatEntranceFor(t.boss.id)?.active).toBe(true);
+      t.fx.dispose();
+    } finally {
+      restore();
+    }
+  });
+
+  it('calms the light under reduced motion: the same beat, less light', () => {
+    const peak = (reduced: boolean) => {
+      const t = setup(reduced);
+      t.step(0.5);
+      t.boss.dead = true;
+      t.step(HEAT_DEATH.hotAt);
+      const mesh = t.scene.getObjectByName('smithHeartHeatDeathLight') as THREE.InstancedMesh;
+      const c = mesh.instanceColor?.array ?? [];
+      let m = 0;
+      for (let i = 0; i < c.length; i++) m = Math.max(m, c[i]);
+      t.fx.dispose();
+      return m;
+    };
+    const calm = peak(true);
+    expect(calm).toBeGreaterThan(0);
+    expect(calm).toBeLessThan(peak(false));
   });
 
   it('takes every thud under reduced motion, the scene itself whole', () => {

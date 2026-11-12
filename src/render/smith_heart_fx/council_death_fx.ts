@@ -247,7 +247,9 @@ export class CouncilDeathFx {
       return mesh;
     };
     this.cards = cards('smithHeartCouncilDeathLight', true, CARDS);
-    this.flashes = cards('smithHeartCouncilDeathFlash', false, FLASHES);
+    // Depth-tested: a burst on its body, never a wash over the floor's
+    // marks round the member still fighting.
+    this.flashes = cards('smithHeartCouncilDeathFlash', true, FLASHES);
     this.flashes.renderOrder = 10_000;
     // ---- the shafts of light: open cones, root narrow, mouth wide ----
     const coneGeo = new THREE.CylinderGeometry(1, 0.22, 1, 10, 1, true).translate(0, 0.5, 0);
@@ -443,8 +445,14 @@ export class CouncilDeathFx {
       const replay = !gr.deadKnown;
       const look = guardianDeathLook(gr.t, replay, this.gLook);
       // A replay sinks its rubble as it ends; a corpse keeps it.
-      const left = councilReplaySeconds('guardian') - gr.t;
-      const sink = replay ? Math.max(0, Math.min(1, left / 0.8)) : 1;
+      // While the Singer still fights, the slabs sink into the floor once the
+      // scene is over, so no rubble covers a mark on the floor under them.
+      const left = replay
+        ? councilReplaySeconds('guardian') - gr.t
+        : s && !s.dead
+          ? GUARDIAN_DEATH.end - gr.t
+          : 1;
+      const sink = Math.max(0, Math.min(1, left / 0.8));
       this.stone.paint(look, gr.body, gr.t, gr.prev, dt, sink);
       this.sounds(GUARDIAN_DEATH_SOUNDS, gr, gr.t, gr.prev);
     } else this.stone.hide();
@@ -469,6 +477,9 @@ export class CouncilDeathFx {
   private step(world: IWorld, role: CouncilRole, dt: number): Entity | null {
     const rec = this.recs[role];
     const e = rec.id >= 0 ? (world.entities.get(rec.id) ?? null) : null;
+    // Out of view and not dying: a death that happens unseen is a husk when
+    // it comes back, never a scene replayed late.
+    if (!e && !rec.deadKnown) rec.seenAlive = false;
     if (e) {
       if (e.dead) {
         if (!rec.deadKnown) {
@@ -497,7 +508,8 @@ export class CouncilDeathFx {
     }
     rec.t = t;
     if (!e) return null;
-    this.readBody(role, e, rec.body);
+    // The bones are read only while its scene runs (never through the fight).
+    if (rec.t >= 0) this.readBody(role, e, rec.body);
     this.gestures(role, rec, e, dt);
     return e;
   }
@@ -585,7 +597,8 @@ export class CouncilDeathFx {
       return;
     }
     this.place(me);
-    this.readColumns(world);
+    // The columns matter only once someone has fallen (or a replay plays).
+    if (this.recs.guardian.t >= 0 || this.recs.singer.t >= 0) this.readColumns(world);
     if (world.entityRosterVersion === this.rosterSeen) return;
     this.rosterSeen = world.entityRosterVersion;
     for (const e of world.entities.values()) {
@@ -864,6 +877,11 @@ export class CouncilDeathFx {
     this.release();
     this.root.removeFromParent();
     this.particles.dispose();
+    // An instanced mesh frees its instance buffers only on its own dispose.
+    for (const mesh of [this.cards, this.flashes, this.shafts, this.sheaths, this.flares])
+      mesh.dispose();
+    this.stone.dispose();
+    this.crystal.dispose();
     for (const g of this.geometries) g.dispose();
     for (const m of this.materials) m.dispose();
     clearCouncilBodySockets();

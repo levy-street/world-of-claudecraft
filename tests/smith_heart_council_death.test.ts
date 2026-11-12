@@ -363,8 +363,9 @@ describe('CouncilDeathFx plays the deaths', () => {
     expect(t.sent).toContain(COUNCIL_DEATH_GESTURES.guardianHusk);
     expect(t.shakes()).toBeGreaterThan(0);
     t.step(GUARDIAN_DEATH.end + 2);
-    // The corpse keeps its rubble and its husk; the scene's light is gone.
-    expect(shown(t.scene, 'smithHeartCouncilDeathSlabs')).toBe(true);
+    // The Singer still fights: the rubble has sunk (no slab over a floor
+    // mark), the husk stays dark; the scene's light is gone.
+    expect(shown(t.scene, 'smithHeartCouncilDeathSlabs')).toBe(false);
     expect(shown(t.scene, 'smithHeartCouncilDeathShafts')).toBe(false);
     const before = t.sent.filter((x) => x === COUNCIL_DEATH_GESTURES.guardianHusk).length;
     t.step(2);
@@ -402,6 +403,20 @@ describe('CouncilDeathFx plays the deaths', () => {
     expect(shown(t.scene, 'smithHeartCouncilDeathShards')).toBe(false);
     expect(shown(t.scene, 'smithHeartCouncilDeathColumns')).toBe(false);
     expect(t.shakes()).toBe(0);
+    t.fx.dispose();
+  });
+
+  it('a member seen alive, gone from view and back dead is a husk, never a late scene', () => {
+    const t = setup();
+    t.step(1);
+    t.entities.delete(t.g.id);
+    t.step(1);
+    t.g.dead = true;
+    t.entities.set(t.g.id, t.g);
+    t.step(1);
+    expect(t.fx.sceneTime('guardian')).toBeGreaterThan(GUARDIAN_DEATH.end);
+    expect(t.shakes()).toBe(0);
+    expect(t.sent).toContain(COUNCIL_DEATH_GESTURES.guardianHusk);
     t.fx.dispose();
   });
 
@@ -461,6 +476,8 @@ describe('CouncilDeathFx plays the deaths', () => {
       t.s.dead = true;
       t.step(SINGER_DEATH.shatterAt - 0.1);
       expect(shown(t.scene, 'smithHeartCouncilDeathShafts')).toBe(true);
+      expect(shown(t.scene, 'smithHeartCouncilDeathRings')).toBe(true);
+      expect(shown(t.scene, 'smithHeartCouncilDeathLight')).toBe(true);
       t.step(COUNCIL_END_LEAD.singer + 0.7 - (SINGER_DEATH.shatterAt - 0.1));
       expect(shown(t.scene, 'smithHeartCouncilDeathColumns')).toBe(true);
       for (const layer of COUNCIL_DEATH_SECONDARY_LAYERS)
@@ -480,6 +497,43 @@ describe('CouncilDeathFx plays the deaths', () => {
     t.step(COUNCIL_END_LEAD.singer + 0.7);
     expect(shown(t.scene, COUNCIL_DEATH_SECONDARY_LAYERS[0])).toBe(true);
     t.fx.dispose();
+  });
+
+  it('throws its slabs and its shards on the low tier too', () => {
+    const restore = gfxInternalsForTest.overrideSettings({ tier: 'low' });
+    try {
+      const t = setup();
+      t.step(0.5);
+      t.g.dead = true;
+      t.step(GUARDIAN_DEATH.splitAt + 0.3);
+      expect(shown(t.scene, 'smithHeartCouncilDeathSlabs')).toBe(true);
+      t.s.dead = true;
+      t.step(SINGER_DEATH.shatterAt + 0.3);
+      expect(shown(t.scene, 'smithHeartCouncilDeathShards')).toBe(true);
+      t.fx.dispose();
+    } finally {
+      restore();
+    }
+  });
+
+  it('calms the blaze under reduced motion: the same beat, less light', () => {
+    const peak = (reduced: boolean) => {
+      const t = setup(reduced);
+      t.step(0.5);
+      t.g.dead = true;
+      t.step(GUARDIAN_DEATH.blazeFull + 0.1);
+      const mesh = t.scene.getObjectByName('smithHeartCouncilDeathLight') as THREE.InstancedMesh;
+      const c = mesh.instanceColor?.array ?? [];
+      let m = 0;
+      for (let i = 0; i < c.length; i++) m = Math.max(m, c[i]);
+      t.fx.dispose();
+      return m;
+    };
+    const calm = peak(true);
+    expect(calm).toBeGreaterThan(0);
+    expect(calm).toBeLessThan(peak(false));
+    // Capped (the hottest card carries 1.5 times its level in red).
+    expect(calm).toBeLessThanOrEqual(1.5 * 0.7 + 1e-6);
   });
 
   it('takes every thud under reduced motion, the scene itself whole', () => {

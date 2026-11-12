@@ -145,6 +145,11 @@ export class CouncilDeathCrystal {
     this.born = false;
   }
 
+  dispose(): void {
+    this.rings.dispose();
+    this.shards.dispose();
+  }
+
   reset(): void {
     this.born = false;
     this.landed.fill(0);

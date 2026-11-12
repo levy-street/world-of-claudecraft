@@ -73,6 +73,9 @@ import { holdHeatEntrance } from './heat_entrance_state';
 import { heatParticleSteps } from './heat_floor_ladder_core';
 
 const SCAN_SEC = 0.25;
+/** Reduced motion's white-hot: the skin's emissive capped this far past the
+ *  authored (a warm glow, never a blaze). */
+const HEAT_DEATH_CALM_GLOW = 0.6;
 const CARDS = 24;
 
 const _m = new THREE.Matrix4();
@@ -115,6 +118,8 @@ export class HeatDeathFx {
   private readonly skin = new HeatCoalSkin();
   /** This scene holds the guardian's look (heat_entrance_state.ts). */
   private holding = false;
+  /** A husk long past its scene, painted once at rest (nothing more to write). */
+  private rested = false;
   private readonly look = newHeatEntranceLook();
   private cardN = 0;
   /** The sockets this frame (world), from the model's bones or the plan. */
@@ -267,6 +272,9 @@ export class HeatDeathFx {
       this.scan(world);
     }
     const e = this.entityId >= 0 ? (world.entities.get(this.entityId) ?? null) : null;
+    // Out of view and not dying: a death that happens unseen is a husk when
+    // it comes back, never a scene replayed late.
+    if (!e && !this.deadKnown) this.seenAlive = false;
     if (e) {
       if (e.dead) {
         if (!this.deadKnown) {
@@ -297,11 +305,23 @@ export class HeatDeathFx {
       this.paintCards();
       return;
     }
-    // The body's fire and skin ride the scene (the held look).
+    // The body's fire and skin ride the scene (the held look). A husk long
+    // past it keeps its last look held and its rubble still: nothing to write.
+    const rest = this.deadKnown && this.t > HEAT_DEATH.end + 1;
+    if (rest && this.rested) {
+      holdHeatEntrance(e.id, this.look);
+      this.holding = true;
+      return;
+    }
+    this.rested = rest;
     heatDeathBodyLook(this.t, this.look);
     holdHeatEntrance(e.id, this.look);
     this.holding = true;
-    this.skin.apply(this.look.glow, this.look.coal);
+    // Reduced motion: white-hot is calmed (the cooling still reads).
+    const glow = this.reducedMotion()
+      ? Math.min(this.look.glow, 1 + HEAT_DEATH_CALM_GLOW)
+      : this.look.glow;
+    this.skin.apply(glow, this.look.coal);
     if (!this.deadKnown && !this.fell) {
       this.fell = true;
       this.playGesture?.(e.id, HEAT_DEATH_GESTURES.fall);
@@ -322,6 +342,7 @@ export class HeatDeathFx {
     this.holding = false;
     this.chunks.visible = false;
     this.halo.visible = false;
+    this.rested = false;
     if (this.t < 0) this.stage.visible = this.particles.liveRings() > 0;
   }
 
@@ -441,7 +462,8 @@ export class HeatDeathFx {
     if (crossed(D.exhaleAt)) {
       this.particles.puff(heart.x - sx, heart.y - sy, heart.z - sz, 200, EXHALE_EMBERS);
       this.particles.puff(heart.x - sx, heart.y - sy, heart.z - sz, 60, EXHALE_SMOKE);
-      this.card(heart.x - sx, heart.y - sy, heart.z - sz, 14, 1.2, 0.55, 0.15);
+      const fk = heatDeathLight(1.2, this.reducedMotion());
+      this.card(heart.x - sx, heart.y - sy, heart.z - sz, 14, fk, 0.46 * fk, 0.12 * fk);
       this.particles.shockRing(0, 0, 0xff7a2a, 22, 1.1, { wake: 0.25, crest: 0.08, strength: 0.6 });
       this.thud(HEAT_DEATH_SHAKES.exhale.amount, HEAT_DEATH_SHAKES.exhale.reach, e);
     }
@@ -629,6 +651,9 @@ export class HeatDeathFx {
     this.release();
     this.root.removeFromParent();
     this.particles.dispose();
+    this.cards.dispose();
+    this.halo.dispose();
+    this.chunks.dispose();
     for (const g of this.geometries) g.dispose();
     for (const m of this.materials) m.dispose();
   }

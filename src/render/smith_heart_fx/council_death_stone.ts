@@ -122,6 +122,8 @@ export class CouncilDeathStone {
   private born = false;
   private readonly landed: Uint8Array;
   private sparkDebt = 0;
+  /** The rubble lies at rest (painted once more, then left alone). */
+  private settled = false;
   private dustDebt = 0;
 
   constructor(
@@ -179,6 +181,7 @@ export class CouncilDeathStone {
   /** The scene starts again (a replay, a death after a wipe). */
   reset(): void {
     this.born = false;
+    this.settled = false;
     this.landed.fill(0);
   }
 
@@ -205,7 +208,7 @@ export class CouncilDeathStone {
         shown++;
         const front = Math.exp(-(((look.seams - p.h) * 7) ** 2));
         const flick = reduced ? 1 : 0.8 + 0.2 * Math.sin(tt * 13 + i * 2.3);
-        const k = look.blaze * flick * (0.85 + 0.8 * front);
+        const k = councilDeathLight(look.blaze * flick * (0.85 + 0.8 * front), reduced);
         const x = body.pts[i * 3];
         const y = body.pts[i * 3 + 1];
         const z = body.pts[i * 3 + 2];
@@ -255,7 +258,7 @@ export class CouncilDeathStone {
     if (look.core > 0.01) {
       const tt = h.uTime.value;
       const flick = reduced ? 1 : 0.85 + 0.15 * Math.sin(tt * 21) * Math.sin(tt * 7.3);
-      const k = Math.min(2, look.core) * flick;
+      const k = councilDeathLight(Math.min(2, look.core) * flick, reduced);
       const cx = body.pts[CHEST * 3];
       // Lifted off the chest rock (once it lies in the rubble, its light
       // glows up out of it).
@@ -304,6 +307,10 @@ export class CouncilDeathStone {
     }
     if (!this.born) this.bear(body);
     this.stage.visible = true;
+    // A corpse long past its scene: its rubble lies still, nothing to write.
+    const rest = sink >= 1 && look.sinceSplit > D.end - D.splitAt + 1;
+    if (rest && this.settled) return;
+    this.settled = rest;
     const u = this.stoneMat.uniforms;
     u.uHeat.value = look.slabHeat;
     u.uEmber.value = look.slabEmber;
@@ -348,7 +355,13 @@ export class CouncilDeathStone {
 
   /** Hold each slab's birth off the body's points now (stage-local), and
    *  lay the stage on its feet. */
+  dispose(): void {
+    this.slabs.dispose();
+    this.chunks.dispose();
+  }
+
   private bear(body: CouncilDeathBody): void {
+    this.settled = false;
     this.stage.position.set(body.x, body.y, body.z);
     this.stage.updateMatrixWorld();
     const fx = Math.sin(body.facing);

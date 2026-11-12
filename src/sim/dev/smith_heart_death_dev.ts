@@ -36,7 +36,10 @@ export function councilDeathReplayForDev(
   members: readonly (Entity | null)[],
   which: string | undefined,
 ): string {
+  if (which && which !== 'guardian' && which !== 'singer')
+    return 'Name one: /dev heart council death [guardian|singer].';
   let n = 0;
+  let one = '';
   for (const m of members) {
     if (!m || m.dead) continue;
     const role = councilRoleOf(m.templateId);
@@ -44,11 +47,12 @@ export function councilDeathReplayForDev(
     if (which && which !== role) continue;
     cue(ctx, m, COUNCIL_DEV_CUES.deathReplay);
     n++;
+    one = role;
   }
   if (n === 0) return 'No living council member to play a death on (/dev heart council reset).';
   return n === 2
     ? 'The Hammer Council plays its deaths (presentation only: both still stand).'
-    : `The ${which === 'singer' ? 'Seam Singer' : 'Guardian of the Hammer'} plays its death (presentation only: it still stands).`;
+    : `The ${one === 'singer' ? 'Seam Singer' : 'Guardian of the Hammer'} plays its death (presentation only: it still stands).`;
 }
 
 /** `/dev heart heat death` on the run's guardian. */

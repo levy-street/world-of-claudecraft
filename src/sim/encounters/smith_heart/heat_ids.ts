@@ -104,7 +104,6 @@ export const HEAT_OBJECTS = {
   trailPrefix: 'sh_heat_trail_',
 } as const;
 
-/** The spellfx ability ids of the fight's moments. */
 /** Dev-only presentation triggers (spellfx 'nova' on the guardian, emitted
  *  only by a dev verb, never by the fight): its death replayed on its living
  *  body (`/dev heart heat death`; the renderer's HeatDeathFx plays the scene,
@@ -113,6 +112,7 @@ export const HEAT_DEV_CUES = {
   deathReplay: 'heart_heat_death_replay',
 } as const;
 
+/** The spellfx ability ids of the fight's moments. */
 export const HEAT_CUES = {
   /** Basalt Fist lands (spellfxAt 'burst' at its spot). */
   fist: 'heart_heat_fist_land',

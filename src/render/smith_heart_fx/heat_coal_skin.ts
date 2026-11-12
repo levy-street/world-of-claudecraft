@@ -19,6 +19,14 @@ interface CoalMaterial {
   b: number;
 }
 
+/** Each material's authored look, stamped the first time any skin meets it
+ *  (module-wide, so the entrance's skin and the death's never take one
+ *  another's dimmed values for the authored ones). */
+const PRISTINE = new WeakMap<
+  THREE.Material,
+  { emissive: number; r: number; g: number; b: number }
+>();
+
 export class HeatCoalSkin {
   private coal: CoalMaterial[] = [];
   private root: THREE.Object3D | null = null;
@@ -44,13 +52,17 @@ export class HeatCoalSkin {
             if (!/heat_guardian/.test(mm.name)) continue;
             if (seen.has(mm) || mm.emissiveIntensity === undefined || !mm.color) continue;
             seen.add(mm);
-            this.coal.push({
-              mat: mm,
-              emissive: mm.emissiveIntensity,
-              r: mm.color.r,
-              g: mm.color.g,
-              b: mm.color.b,
-            });
+            let base = PRISTINE.get(mm);
+            if (!base) {
+              base = {
+                emissive: mm.emissiveIntensity,
+                r: mm.color.r,
+                g: mm.color.g,
+                b: mm.color.b,
+              };
+              PRISTINE.set(mm, base);
+            }
+            this.coal.push({ mat: mm, ...base });
           }
         });
       }
