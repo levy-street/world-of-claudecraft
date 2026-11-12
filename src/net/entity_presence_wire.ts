@@ -13,6 +13,7 @@ const STANCES: ReadonlySet<unknown> = new Set([
   'sever',
   'silenced',
   'brace',
+  'hand',
 ]);
 
 // biome-ignore lint/suspicious/noExplicitAny: mirrors online.ts's own LooseJson wire-record idiom
@@ -33,6 +34,9 @@ export function applyEntityPresenceBits(e: Entity, w: any): void {
   if (typeof w.stf === 'number' && Number.isFinite(w.stf)) {
     e.eventStanceFill = Math.max(0, Math.min(1, w.stf));
   } else delete e.eventStanceFill;
+  // The Common Hand's dealt cast (`sca`): an ability id, only beside a `hand` tell.
+  if (typeof w.sca === 'string' && w.sca.length <= 64) e.eventCastId = w.sca;
+  else delete e.eventCastId;
   // Footprints in Ash unseen bit (`uns`): only ever on your own record.
   if (w.uns) e.eventUnseen = true;
   else delete e.eventUnseen;

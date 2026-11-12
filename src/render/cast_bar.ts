@@ -44,6 +44,12 @@ export const SKILL_EVENT_STANCE_CAST = {
   brace: 'skill_event_stance_brace',
 } as const;
 
+/** The cast bar label of a tell: a Common Hand cast names its dealt ability
+ *  (an ability id the resolver localizes like any cast), the rest their stance. */
+function tellLabel(stance: NonNullable<Entity['eventStance']>, castId?: string): string {
+  return stance === 'hand' ? (castId ?? '') : SKILL_EVENT_STANCE_CAST[stance];
+}
+
 export function castBarState(e: Entity): CastBarState {
   if (e.eventStance && !e.dead) {
     return {
@@ -51,7 +57,7 @@ export function castBarState(e: Entity): CastBarState {
       channel: e.eventStance === 'guard',
       // A chant or a Sever wind-up fills as it runs; the other tells are full.
       fill: e.eventStanceFill ?? 1,
-      label: SKILL_EVENT_STANCE_CAST[e.eventStance],
+      label: tellLabel(e.eventStance, e.eventCastId),
       fishing: false,
       untimed: true,
     };

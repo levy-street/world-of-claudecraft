@@ -16007,12 +16007,23 @@ export const ko_KR: EnTranslations = {
         "chant": "영창 중",
         "sever": "끊는 중",
         "silenced": "침묵",
-        "brace": "버티는 중"
+        "brace": "버티는 중",
+        "hand": "시전 중"
       },
       "ready": "준비 완료",
       "unseen": "보이지 않음",
       "seen": "모두에게 보임",
       "score": "의식: {goal}회 중 {count}회. 최고: {best}.",
+      "scoreKills": "결정타: {goal}회 중 {count}회. 최고: {best}.",
+      "bellIn": "다음 패까지 {seconds}초",
+      "nextHand": "다음 패",
+      "handKinds": {
+        "attack": "공격",
+        "control": "제어",
+        "defensive": "방어",
+        "movement": "이동"
+      },
+      "handTip": "{name}({kind}), 이번 패에서 모두에게 주어졌습니다. 비용 없음. 다른 참가자에게 직격은 최대 생명력의 {direct}%, 지속 피해는 한 번에 {periodic}%를 주며, 치유는 내 생명력의 {heal}%를 회복하고, 보호막은 내 생명력의 {shield}%를 흡수합니다.",
       "startsIn": "{minutes}분 후 시작",
       "keepsake": "남긴 기술",
       "keepsakeTip": "남긴 기술: {name}. 여기서 쓸 수 있는 유일한 직업 기술입니다.",

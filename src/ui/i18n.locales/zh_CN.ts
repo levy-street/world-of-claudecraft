@@ -6628,6 +6628,16 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.skillEvent.verbTips.brace':
     '在{braceWindow}秒内，飞到你身上的弹矢会沿原路飞回，并归你所有。冷却时间{braceCd}秒。',
   'hud.skillEvent.verbTips.dash': '向前冲刺{dash}码。冷却时间{dashCd}秒。',
+  'hud.skillEvent.stance.hand': '施放中',
+  'hud.skillEvent.scoreKills': '击杀：{count}/{goal}。最高：{best}。',
+  'hud.skillEvent.bellIn': '{seconds}秒后发下一手',
+  'hud.skillEvent.nextHand': '下一手',
+  'hud.skillEvent.handKinds.attack': '攻击',
+  'hud.skillEvent.handKinds.control': '控制',
+  'hud.skillEvent.handKinds.defensive': '防御',
+  'hud.skillEvent.handKinds.movement': '移动',
+  'hud.skillEvent.handTip':
+    '{name}（{kind}），这一手发给所有人。没有消耗。对其他战斗者，直接命中造成其最大生命值的{direct}%，每次周期伤害{periodic}%，治疗恢复你的{heal}%，护盾吸收你的{shield}%。',
   'hud.skillEvent.ready': '就绪',
   'hud.skillEvent.startsIn': '{minutes} 分钟后开始',
   'hud.skillEvent.keepsake': '保留技能',

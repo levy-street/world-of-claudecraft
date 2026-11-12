@@ -33,6 +33,14 @@ import {
   type BankshotBook,
   bankshotStonesAt,
 } from './skill_event_bankshot';
+import {
+  COMMON_HAND_RULES,
+  type CommonHandBook,
+  commonHandHealPoints,
+  commonHandHitPoints,
+  commonHandInfo,
+  commonHandShieldPoints,
+} from './skill_event_common_hand';
 import { FOOTPRINTS_RULES, type FootprintsBook } from './skill_event_footprints';
 import {
   keepsakeEligible,
@@ -98,6 +106,8 @@ export interface ActiveSkillEvent {
   footprints?: FootprintsBook;
   /** Bankshot: the stones and the bolts in flight (skill_event_bankshot.ts). */
   bankshot?: BankshotBook;
+  /** The Common Hand: the hand in play, casts and returns (skill_event_common_hand.ts). */
+  commonHand?: CommonHandBook;
 }
 
 export interface SkillEventState {
@@ -135,12 +145,16 @@ export interface SkillEventRuleSet {
   stanceOf?(ctx: SimContext, ev: ActiveSkillEvent, pid: number): SkillEventStance | undefined;
   /** A scoring event's tally for one viewer. */
   scoreFor?(ev: ActiveSkillEvent, pid: number): { yours: number; best: number; toWin: number };
+  /** A fighter died while the event runs (before the kill is counted). */
+  onDeath?(ctx: SimContext, ev: ActiveSkillEvent, victim: Entity): void;
 }
 
 /** A fighter's visible tell: the stance, and how far its bar is filled. */
 export interface SkillEventStance {
   stance: NonNullable<Entity['eventStance']>;
   fill?: number;
+  /** The ability a `hand` stance is casting. */
+  castId?: string;
 }
 
 /** The rule set of a kind, or undefined for the baseline. A function, not a
@@ -156,6 +170,8 @@ export function skillEventRules(kind: SkillEventKind): SkillEventRuleSet | undef
       return TONGUES_RULES;
     case 'bankshot':
       return BANKSHOT_RULES;
+    case 'common_hand':
+      return COMMON_HAND_RULES;
     default:
       return undefined;
   }
@@ -295,6 +311,7 @@ function clearHearts(ctx: SimContext, ev: ActiveSkillEvent): void {
       delete e.eventHearts;
       delete e.eventStance;
       delete e.eventStanceFill;
+      delete e.eventCastId;
       delete e.eventUnseen;
     }
   }
@@ -433,7 +450,9 @@ export function skillEventOnPlayerDeath(
   killer: Entity | null,
 ): void {
   const ev = ctx.skillEventState.active;
-  if (!ev || ev.phase !== 'running' || ev.winner !== null || !killer) return;
+  if (!ev || ev.phase !== 'running' || ev.winner !== null) return;
+  if (victim.kind === 'player') skillEventRules(ev.kind)?.onDeath?.(ctx, ev, victim);
+  if (!killer) return;
   // A pet's or guardian's killing blow is its owner's.
   const owner =
     killer.kind === 'mob' && killer.ownerId !== null ? ctx.entities.get(killer.ownerId) : killer;
@@ -490,6 +509,7 @@ export function skillEventInfoFor(
     maxHearts: SKILL_EVENT_HEARTS,
     kit: joined ? kitInfoFor(ctx, ev, pid) : null,
     stones: ev.bankshot ? bankshotStonesAt(ev, ev.bankshot.stones, ctx.time) : null,
+    hand: ev.kind === 'common_hand' && ev.phase === 'running' ? commonHandInfo(ctx, ev) : null,
   };
 }
 
@@ -583,16 +603,19 @@ export function skillEventTakeHeart(
  *  per-tick entity wire. */
 function syncStances(ctx: SimContext, ev: ActiveSkillEvent): void {
   const stanceOf = skillEventRules(ev.kind)?.stanceOf;
-  for (const pid of ev.kits.keys()) {
+  for (const pid of ev.participants) {
     const e = ctx.entities.get(pid);
     if (!e) continue;
     const tell = stanceOf?.(ctx, ev, pid);
     if (!tell) {
       delete e.eventStance;
       delete e.eventStanceFill;
+      delete e.eventCastId;
       continue;
     }
     e.eventStance = tell.stance;
+    if (tell.castId === undefined) delete e.eventCastId;
+    else e.eventCastId = tell.castId;
     if (tell.fill === undefined) delete e.eventStanceFill;
     else e.eventStanceFill = Math.round(tell.fill * 100) / 100;
   }
@@ -700,4 +723,51 @@ export function skillEventMarkBookFor(
   book.marks = skillEventMarksFor(ctx, pid);
   book.bolts = skillEventBoltsFor(ctx, pid);
   return book;
+}
+
+/** The Common Hand's equal-damage rule, from the top of dealDamage: the points
+ *  a hit between two of its fighters removes (0 blocks it), or null when the
+ *  rule does not apply (any other event, or a hit from outside the fight). */
+export function skillEventHandHitPoints(
+  ctx: SimContext,
+  source: Entity | null,
+  target: Entity,
+  abilityId: string | null,
+  direct: boolean,
+): number | null {
+  if (target.kind !== 'player' || !source) return null;
+  const ev = ctx.skillEventState.active;
+  if (!ev || ev.kind !== 'common_hand' || ev.phase !== 'running') return null;
+  const owner =
+    source.kind === 'mob' && source.ownerId !== null ? ctx.entities.get(source.ownerId) : source;
+  if (!owner || owner.kind !== 'player' || owner.id === target.id) return null;
+  if (!ev.participants.includes(target.id) || !ev.participants.includes(owner.id)) return null;
+  return commonHandHitPoints(ev, target, abilityId, direct);
+}
+
+/** The Common Hand's equal-heal rule, from applyHeal: a dealt heal on one of
+ *  its fighters restores a fixed share, or null when the rule does not apply. */
+export function skillEventHandHealPoints(
+  ctx: SimContext,
+  target: Entity,
+  abilityId: string,
+): number | null {
+  const ev = ctx.skillEventState.active;
+  if (!ev || ev.kind !== 'common_hand' || ev.phase !== 'running') return null;
+  if (!ev.participants.includes(target.id)) return null;
+  return commonHandHealPoints(ev, target, abilityId);
+}
+
+/** The Common Hand's equal-shield rule, from the absorb effect: a dealt shield
+ *  on one of its fighters holds a fixed share of their health, or null when
+ *  the rule does not apply. */
+export function skillEventHandShieldPoints(
+  ctx: SimContext,
+  target: Entity,
+  abilityId: string,
+): number | null {
+  const ev = ctx.skillEventState.active;
+  if (!ev || ev.kind !== 'common_hand' || ev.phase !== 'running') return null;
+  if (!ev.participants.includes(target.id)) return null;
+  return commonHandShieldPoints(ev, target, abilityId);
 }

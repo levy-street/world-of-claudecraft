@@ -5177,6 +5177,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.skillEvent.verbTips.brace':
     '{braceWindow}초 동안 닿은 화살을 온 방향으로 되돌려 보내며, 그 화살은 내 것이 됩니다. 재사용 대기시간 {braceCd}초.',
   'hud.skillEvent.verbTips.dash': '앞으로 {dash}미터 돌진합니다. 재사용 대기시간 {dashCd}초.',
+  'hud.skillEvent.stance.hand': '시전 중',
+  'hud.skillEvent.scoreKills': '결정타: {goal}회 중 {count}회. 최고: {best}.',
+  'hud.skillEvent.bellIn': '다음 패까지 {seconds}초',
+  'hud.skillEvent.nextHand': '다음 패',
+  'hud.skillEvent.handKinds.attack': '공격',
+  'hud.skillEvent.handKinds.control': '제어',
+  'hud.skillEvent.handKinds.defensive': '방어',
+  'hud.skillEvent.handKinds.movement': '이동',
+  'hud.skillEvent.handTip':
+    '{name}({kind}), 이번 패에서 모두에게 주어졌습니다. 비용 없음. 다른 참가자에게 직격은 최대 생명력의 {direct}%, 지속 피해는 한 번에 {periodic}%를 주며, 치유는 내 생명력의 {heal}%를 회복하고, 보호막은 내 생명력의 {shield}%를 흡수합니다.',
   'hud.skillEvent.ready': '준비 완료',
   'hud.skillEvent.startsIn': '{minutes}분 후 시작',
   'hud.skillEvent.keepsake': '남긴 기술',

@@ -3,7 +3,9 @@
 // states for the shared ActionBarPainter. Verb cooldowns come from the event
 // readout; the keepsake's from the fighter's own cooldowns.
 
+import { ABILITIES } from '../../../sim/content/classes';
 import type { SkillEventInfo } from '../../../world_api';
+import { abilityDisplayName } from '../../ability_display_name';
 import { t } from '../../i18n';
 import type { TranslationKey } from '../../i18n.catalog';
 import {
@@ -92,10 +94,15 @@ export function createSkillEventBarView() {
         const verb = verbs[i];
         if (verb) {
           slot.kind = 'ability';
-          slot.abilityId = `skill_event_${verb.id}`;
-          slot.iconKey = SKILL_EVENT_VERB_ICONS[verb.id] ?? 'heroic_strike';
+          // The Common Hand's buttons wear the dealt ability itself.
+          const dealt = info.hand?.current[i];
+          const dealtDef = dealt ? ABILITIES[dealt] : undefined;
+          slot.abilityId = dealtDef ? dealtDef.id : `skill_event_${verb.id}`;
+          slot.iconKey = dealtDef
+            ? dealtDef.id
+            : (SKILL_EVENT_VERB_ICONS[verb.id] ?? 'heroic_strike');
           const label = SKILL_EVENT_VERB_LABELS[verb.id];
-          slot.ariaLabel = label ? t(label) : '';
+          slot.ariaLabel = dealtDef ? abilityDisplayName(dealtDef) : label ? t(label) : '';
           slot.keybindLabel = keyLabel(i);
           fillCooldown(slot, verb.readyIn);
           slot.usable = verb.readyIn <= 0;

@@ -13,6 +13,7 @@ import {
   skillEventChooseSlot,
   skillEventControlsActive,
 } from '../../../game/skill_event_controls';
+import { ABILITIES } from '../../../sim/content/classes';
 import {
   BANKSHOT_BOLT_COOLDOWN,
   BANKSHOT_BRACE_COOLDOWN,
@@ -21,6 +22,12 @@ import {
   BANKSHOT_DASH_DISTANCE,
   BANKSHOT_MAX_BOUNCES,
 } from '../../../sim/pvp/skill_event_bankshot';
+import {
+  COMMON_HAND_DIRECT_SHARE,
+  COMMON_HAND_HEAL_SHARE,
+  COMMON_HAND_PERIODIC_SHARE,
+  COMMON_HAND_SHIELD_SHARE,
+} from '../../../sim/pvp/skill_event_common_hand';
 import {
   FOOTPRINTS_HUSH,
   FOOTPRINTS_HUSH_COOLDOWN,
@@ -51,6 +58,7 @@ import {
   TONGUES_SHOVE_DISTANCE,
   TONGUES_SILENCE,
 } from '../../../sim/pvp/skill_event_tongues';
+import { abilityDisplayName } from '../../ability_display_name';
 import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
 import type { TranslationKey } from '../../i18n.catalog';
@@ -82,6 +90,7 @@ const STANCE_KEYS: Readonly<Record<string, TranslationKey>> = {
   sever: 'hud.skillEvent.stance.sever',
   silenced: 'hud.skillEvent.stance.silenced',
   brace: 'hud.skillEvent.stance.brace',
+  hand: 'hud.skillEvent.stance.hand',
 };
 
 const GOAL_KEYS: Readonly<Record<string, TranslationKey>> = {
@@ -127,6 +136,14 @@ const SKILL_EVENT_TIP_VALUES = {
 };
 
 const MAX_CHOICES = 12;
+
+/** The Common Hand's four kinds, in bar order (skill_event_common_hand.ts). */
+const HAND_KIND_KEYS: readonly TranslationKey[] = [
+  'hud.skillEvent.handKinds.attack',
+  'hud.skillEvent.handKinds.control',
+  'hud.skillEvent.handKinds.defensive',
+  'hud.skillEvent.handKinds.movement',
+];
 
 export class SkillEventActionBarController {
   private readonly root = document.createElement('section');
@@ -200,7 +217,7 @@ export class SkillEventActionBarController {
       choice.className = 'skill-event-choice ui-socket';
       choice.addEventListener('click', () => {
         const id = choice.dataset.ability;
-        if (id) this.world.skillEventPickKeepsake(id);
+        if (id && !choice.dataset.preview) this.world.skillEventPickKeepsake(id);
       });
       attachTooltip(choice, () => esc(this.abilityName(choice.dataset.ability ?? '')));
       this.choiceRow.append(choice);
@@ -212,12 +229,27 @@ export class SkillEventActionBarController {
   }
 
   private abilityName(id: string): string {
-    return this.world.known.find((k) => k.def.id === id)?.def.name ?? '';
+    const def = this.world.known.find((k) => k.def.id === id)?.def ?? ABILITIES[id];
+    return def ? abilityDisplayName(def) : '';
   }
 
   private slotTooltip(index: number): string {
     const kit = this.world.skillEventInfo?.kit;
     const verb = kit?.verbs[index];
+    const dealt = this.world.skillEventInfo?.hand?.current[index];
+    if (verb && dealt) {
+      // The Common Hand: the dealt ability, its kind, and the equal-for-all rule.
+      return esc(
+        t('hud.skillEvent.handTip', {
+          name: this.abilityName(dealt),
+          kind: t(HAND_KIND_KEYS[index] ?? HAND_KIND_KEYS[0]),
+          direct: formatNumber(COMMON_HAND_DIRECT_SHARE * 100),
+          periodic: formatNumber(COMMON_HAND_PERIODIC_SHARE * 100),
+          heal: formatNumber(COMMON_HAND_HEAL_SHARE * 100),
+          shield: formatNumber(COMMON_HAND_SHIELD_SHARE * 100),
+        }),
+      );
+    }
     if (verb) {
       const tip = SKILL_EVENT_VERB_TIPS[verb.id];
       return tip ? esc(t(tip, SKILL_EVENT_TIP_VALUES)) : '';
@@ -254,7 +286,9 @@ export class SkillEventActionBarController {
           ? t(STANCE_KEYS[stance])
           : info.kind === 'footprints'
             ? t(this.world.player.eventUnseen ? 'hud.skillEvent.unseen' : 'hud.skillEvent.seen')
-            : t('hud.skillEvent.ready'),
+            : info.hand
+              ? t('hud.skillEvent.bellIn', { seconds: formatNumber(info.hand.bellIn) })
+              : t('hud.skillEvent.ready'),
     );
     // A scoring event's tally rides the goal line (Rite of Tongues: Rites done).
     const score = info.score;
@@ -264,7 +298,7 @@ export class SkillEventActionBarController {
     this.writers.setText(
       this.hint,
       score
-        ? t('hud.skillEvent.score', {
+        ? t(info.kind === 'common_hand' ? 'hud.skillEvent.scoreKills' : 'hud.skillEvent.score', {
             count: formatNumber(score.yours),
             goal: formatNumber(score.toWin),
             best: formatNumber(score.best),
@@ -277,15 +311,21 @@ export class SkillEventActionBarController {
       const used = i < kit.verbs.length || (i === kit.verbs.length && !!kit.keepsake);
       this.writers.setDisplay(this.slotButtons[i], used ? '' : 'none');
     }
-    this.paintPicker(kit.keepsake, kit.choices);
+    // The Common Hand shows the next hand in the picker's place before the bell.
+    const next = kit.keepsake !== null ? (info.hand?.next ?? null) : null;
+    this.paintPicker(kit.keepsake, next ?? kit.choices, next !== null);
   }
 
-  private paintPicker(keepsake: string | null, choices: readonly string[]): void {
-    const open = keepsake === null && choices.length > 0;
+  private paintPicker(keepsake: string | null, choices: readonly string[], preview = false): void {
+    const open = (keepsake === null || preview) && choices.length > 0;
     this.writers.setDisplay(this.picker, open ? '' : 'none');
+    this.writers.toggleClass(this.picker, 'is-preview', preview);
     if (!open) return;
-    this.writers.setText(this.pickerTitle, t('hud.skillEvent.pickTitle'));
-    const signature = choices.join(',');
+    this.writers.setText(
+      this.pickerTitle,
+      preview ? t('hud.skillEvent.nextHand') : t('hud.skillEvent.pickTitle'),
+    );
+    const signature = `${preview ? 'next:' : ''}${choices.join(',')}`;
     if (signature === this.choiceSignature) return;
     this.choiceSignature = signature;
     for (let i = 0; i < this.choiceButtons.length; i++) {
@@ -296,6 +336,7 @@ export class SkillEventActionBarController {
         continue;
       }
       btn.dataset.ability = id;
+      btn.dataset.preview = preview ? '1' : '';
       this.writers.setStyleProp(btn, 'background-image', `url(${iconDataUrl('ability', id, 56)})`);
       this.writers.setAttr(btn, 'aria-label', this.abilityName(id));
       this.writers.setDisplay(btn, '');

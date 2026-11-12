@@ -31,6 +31,7 @@ function info(canJoin: boolean): SkillEventInfo {
     maxHearts: 4,
     kit: null,
     stones: null,
+    hand: null,
   };
 }
 

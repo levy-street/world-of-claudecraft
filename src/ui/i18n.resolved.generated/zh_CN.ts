@@ -16007,12 +16007,23 @@ export const zh_CN: EnTranslations = {
         "chant": "咏唱中",
         "sever": "截断中",
         "silenced": "沉默",
-        "brace": "架挡中"
+        "brace": "架挡中",
+        "hand": "施放中"
       },
       "ready": "就绪",
       "unseen": "隐形中",
       "seen": "所有人可见",
       "score": "仪式：{count}/{goal}。最高：{best}。",
+      "scoreKills": "击杀：{count}/{goal}。最高：{best}。",
+      "bellIn": "{seconds}秒后发下一手",
+      "nextHand": "下一手",
+      "handKinds": {
+        "attack": "攻击",
+        "control": "控制",
+        "defensive": "防御",
+        "movement": "移动"
+      },
+      "handTip": "{name}（{kind}），这一手发给所有人。没有消耗。对其他战斗者，直接命中造成其最大生命值的{direct}%，每次周期伤害{periodic}%，治疗恢复你的{heal}%，护盾吸收你的{shield}%。",
       "startsIn": "{minutes} 分钟后开始",
       "keepsake": "保留技能",
       "keepsakeTip": "你保留的技能：{name}。这是你在此唯一能使用的职业技能。",

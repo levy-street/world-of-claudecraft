@@ -174,6 +174,10 @@ export interface SkillEventInfo {
   /** Bankshot's standing stones where they stand now (they close in with the
    *  field), for everyone who can see the event. Null for the other events. */
   stones: { x: number; z: number; r: number }[] | null;
+  /** The Common Hand: the four abilities in play (attack, control, defensive,
+   *  movement, in bar order), the next hand in the last seconds before the bell,
+   *  and the whole seconds to the bell. Null for the other events. */
+  hand: { current: string[]; next: string[] | null; bellIn: number } | null;
 }
 
 export interface SkillEventKitInfo {

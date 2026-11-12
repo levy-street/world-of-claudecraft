@@ -89,6 +89,15 @@
     width: 36px;
     height: 36px;
   }
+  /* The Common Hand's next-hand preview: the status line already counts down
+     to the bell, so a phone keeps only a short row of small icons. */
+  body.mobile-touch .skill-event-picker.is-preview .skill-event-picker-title {
+    display: none;
+  }
+  body.mobile-touch .skill-event-picker.is-preview .skill-event-choice {
+    width: 26px;
+    height: 26px;
+  }
   /* During a skill event the frame (and its hearts) leaves the centre, where it
      hid the fight, for the middle of the left edge, above the move stick. The
      doubled class outranks the tier and handedness seats further down. */

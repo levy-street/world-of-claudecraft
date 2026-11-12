@@ -98,7 +98,19 @@ function openSoon(sim: Sim, ordinal = 0): void {
 }
 function kill(sim: Sim, killer: number, victim: number): void {
   const v = ent(sim, victim);
-  sim.ctx.dealDamage(ent(sim, killer), v, v.hp + 10_000, false, 'physical', null, 'hit');
+  // In The Common Hand only a dealt ability hurts another fighter (a fixed
+  // share of health): land the killing blow with the hand's attack.
+  const hand = sim.skillEventState.active?.commonHand?.hand;
+  if (hand) v.hp = 1;
+  sim.ctx.dealDamage(
+    ent(sim, killer),
+    v,
+    v.hp + 10_000,
+    false,
+    'physical',
+    hand?.[0] ?? null,
+    'hit',
+  );
 }
 
 describe('skill event rotation and clock', () => {

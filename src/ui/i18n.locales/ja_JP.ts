@@ -5219,6 +5219,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.skillEvent.verbTips.brace':
     '{braceWindow}秒間、届いたボルトを来た方向へ跳ね返し、自分のボルトにする。再使用まで{braceCd}秒。',
   'hud.skillEvent.verbTips.dash': '前方へ{dash}ヤード駆ける。再使用まで{dashCd}秒。',
+  'hud.skillEvent.stance.hand': '詠唱中',
+  'hud.skillEvent.scoreKills': 'とどめ：{goal}回中{count}回。最多：{best}。',
+  'hud.skillEvent.bellIn': '次の手札まで{seconds}秒',
+  'hud.skillEvent.nextHand': '次の手札',
+  'hud.skillEvent.handKinds.attack': '攻撃',
+  'hud.skillEvent.handKinds.control': '妨害',
+  'hud.skillEvent.handKinds.defensive': '防御',
+  'hud.skillEvent.handKinds.movement': '移動',
+  'hud.skillEvent.handTip':
+    '{name}（{kind}）、この手札で全員に配られた。コストなし。他の参加者には、直撃で最大体力の{direct}%、継続ダメージ1回ごとに{periodic}%を与え、回復は自分の{heal}%を回復し、シールドは自分の{shield}%を吸収する。',
   'hud.skillEvent.ready': '準備完了',
   'hud.skillEvent.startsIn': '{minutes}分後に開始',
   'hud.skillEvent.keepsake': '持ち込み技',

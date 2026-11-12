@@ -71,7 +71,11 @@ import {
   worldPvpOnPlayerDamaged,
   worldPvpOnPlayerDeath,
 } from '../pvp';
-import { skillEventOnPlayerDeath, skillEventTakeHeart } from '../pvp/skill_events';
+import {
+  skillEventHandHitPoints,
+  skillEventOnPlayerDeath,
+  skillEventTakeHeart,
+} from '../pvp/skill_events';
 import { worldPvpXpAmount } from '../pvp/world_pvp_rewards_rules';
 import { referralArmourXpActive } from '../referral_armour';
 import { emitReferralBossEvidence } from '../referral_evidence';
@@ -264,6 +268,16 @@ export function dealDamage(
   // Hourly skill events: between two fighters on hearts a hit costs one heart,
   // never health (pvp/skill_events.ts skillEventTakeHeart).
   if (skillEventTakeHeart(ctx, source, target)) return 0;
+  // The Common Hand: between its fighters a dealt ability removes a fixed share
+  // of health, whatever the gear, and anything else does nothing.
+  const handHit = skillEventHandHitPoints(ctx, source, target, abilityId ?? ability, direct);
+  if (handHit !== null) {
+    if (handHit <= 0) return 0;
+    amount = handHit;
+    resolvedHpLoss = true;
+    alreadyFinal = true;
+    crit = false;
+  }
   // A Nythraxis Bone Spike is a ward (nythraxis_bone_spike.ts): any player or
   // pet hit lands exactly one point, whatever it would have dealt, and the
   // spike's pool is its hit count. Resolved like an exact copy so no source

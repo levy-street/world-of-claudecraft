@@ -16007,12 +16007,23 @@ export const zh_TW: EnTranslations = {
         "chant": "詠唱中",
         "sever": "截斷中",
         "silenced": "沉默",
-        "brace": "架擋中"
+        "brace": "架擋中",
+        "hand": "施放中"
       },
       "ready": "就緒",
       "unseen": "隱形中",
       "seen": "所有人可見",
       "score": "儀式：{count}/{goal}。最高：{best}。",
+      "scoreKills": "擊殺：{count}/{goal}。最高：{best}。",
+      "bellIn": "{seconds}秒後發下一手",
+      "nextHand": "下一手",
+      "handKinds": {
+        "attack": "攻擊",
+        "control": "控制",
+        "defensive": "防禦",
+        "movement": "移動"
+      },
+      "handTip": "{name}（{kind}），這一手發給所有人。沒有消耗。對其他戰鬥者，直接命中造成其最大生命值的{direct}%，每次週期傷害{periodic}%，治療恢復你的{heal}%，護盾吸收你的{shield}%。",
       "startsIn": "{minutes} 分鐘後開始",
       "keepsake": "保留技能",
       "keepsakeTip": "你保留的技能：{name}。這是你在此唯一能使用的職業技能。",

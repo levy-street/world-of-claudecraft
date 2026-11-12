@@ -485,6 +485,7 @@ const hudStringsEn = {
         sever: 'Severing',
         silenced: 'Silenced',
         brace: 'Bracing',
+        hand: 'Casting',
       },
       ready: 'Ready',
       // Footprints in Ash: whether the other fighters can see you right now.
@@ -492,6 +493,18 @@ const hudStringsEn = {
       seen: 'Seen by everyone',
       // Rite of Tongues: your completed Rites, the goal, and the leader's count.
       score: 'Rites: {count} of {goal}. Best: {best}.',
+      // The Common Hand: the kill tally, the bell, the next hand, and a dealt button.
+      scoreKills: 'Killing blows: {count} of {goal}. Best: {best}.',
+      bellIn: 'Next hand in {seconds} sec',
+      nextHand: 'Next hand',
+      handKinds: {
+        attack: 'Attack',
+        control: 'Control',
+        defensive: 'Defensive',
+        movement: 'Movement',
+      },
+      handTip:
+        '{name} ({kind}), dealt to everyone this hand. Costs nothing. Against another fighter a direct hit takes {direct}% of their maximum health, each periodic tick {periodic}%, a heal restores {heal}% of yours, and a shield holds {shield}% of yours.',
       startsIn: 'Starts in {minutes} min',
       keepsake: 'Kept ability',
       keepsakeTip: 'Your kept ability: {name}. The only class ability you can use here.',

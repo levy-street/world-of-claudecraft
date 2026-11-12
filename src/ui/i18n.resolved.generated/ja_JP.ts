@@ -16007,12 +16007,23 @@ export const ja_JP: EnTranslations = {
         "chant": "詠唱中",
         "sever": "断ち切り中",
         "silenced": "沈黙",
-        "brace": "構え中"
+        "brace": "構え中",
+        "hand": "詠唱中"
       },
       "ready": "準備完了",
       "unseen": "見えていない",
       "seen": "全員に見えている",
       "score": "詠唱：{goal}回中{count}回。最多：{best}。",
+      "scoreKills": "とどめ：{goal}回中{count}回。最多：{best}。",
+      "bellIn": "次の手札まで{seconds}秒",
+      "nextHand": "次の手札",
+      "handKinds": {
+        "attack": "攻撃",
+        "control": "妨害",
+        "defensive": "防御",
+        "movement": "移動"
+      },
+      "handTip": "{name}（{kind}）、この手札で全員に配られた。コストなし。他の参加者には、直撃で最大体力の{direct}%、継続ダメージ1回ごとに{periodic}%を与え、回復は自分の{heal}%を回復し、シールドは自分の{shield}%を吸収する。",
       "startsIn": "{minutes}分後に開始",
       "keepsake": "持ち込み技",
       "keepsakeTip": "持ち込み技：{name}。ここで使える唯一のクラス技。",

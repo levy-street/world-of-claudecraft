@@ -19,7 +19,7 @@ export const SKILL_EVENT_VERBS: Readonly<Record<SkillEventKind, readonly string[
   footprints: ['sweep', 'hush', 'pebble'],
   tongues: ['rite', 'sever', 'false_start', 'shove'],
   bankshot: ['bolt', 'brace', 'dash'],
-  common_hand: [],
+  common_hand: ['hand_0', 'hand_1', 'hand_2', 'hand_3'],
 };
 
 /** Never a keepsake: full immunities, death denial, a blocked hit (worth a whole
