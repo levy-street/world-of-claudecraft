@@ -29,10 +29,11 @@
 
 import { isInRaidInstance } from '../instances/dungeons';
 import { lootCorpse } from '../interaction';
+import { corpseLootReach } from '../loot/corpse_loot_reach';
 import { lootSlotVisibleTo } from '../loot/loot_roll';
 import { corpseHasDecayed } from '../respawn_policy';
 import type { SimContext } from '../sim_context';
-import { dist2d, type Entity, INTERACT_RANGE } from '../types';
+import { dist2d, type Entity } from '../types';
 import { petFollow } from './pet_ai';
 
 /** How far from the OWNER a corpse may be and still be worth the errand
@@ -88,8 +89,9 @@ export function buddyLootTarget(ctx: SimContext, owner: Entity): Entity | null {
  *  `targetOverride`, so the walk out is the same obstacle-avoiding heel the
  *  buddy already uses, just aimed somewhere else. petFollow parks the buddy at
  *  PET_FOLLOW_DISTANCE (3.5yd) from what it is aimed at, comfortably inside
- *  the INTERACT_RANGE (5yd) the loot itself needs, so arriving and looting are
- *  not in tension. */
+ *  the loot reach the loot itself needs (INTERACT_RANGE, measured from a big
+ *  body's edge: loot/corpse_loot_reach.ts), so arriving and looting are not in
+ *  tension. */
 export function updateBuddyAutoloot(ctx: SimContext, buddy: Entity, owner: Entity): boolean {
   // A dead owner has no bags to fill and no corpse of their own to be looting
   // over; the buddy just keeps standing by them (buddy_ai.ts's header rule).
@@ -107,7 +109,7 @@ export function updateBuddyAutoloot(ctx: SimContext, buddy: Entity, owner: Entit
   // the buddy's own position as the range origin: the owner may be up to
   // BUDDY_LOOT_RANGE away, and it is the BUDDY that has to be standing on the
   // corpse, which is the whole point of sending it.
-  if (dist2d(buddy.pos, corpse.pos) <= INTERACT_RANGE) {
+  if (dist2d(buddy.pos, corpse.pos) <= corpseLootReach(corpse)) {
     lootCorpse(ctx, corpse.id, owner.id, false, true, buddy.pos);
   }
   return true;

@@ -10,6 +10,7 @@ import { canUseForbiddenReflection } from './combat/warlock_talents';
 import { noticeboardDefByEntityId } from './content/noticeboards';
 import { corpseInteractionAvailability } from './corpse_interaction';
 import { CLASSES, ITEMS, QUEST_ORDER, QUESTS, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from './data';
+import { corpseLootReach, maxCorpseLootReach } from './loot/corpse_loot_reach';
 import {
   ASCENSION_CHARGES,
   ASCENSION_DURATION,
@@ -295,17 +296,19 @@ export function encodeObs(sim: Sim): number[] {
   // five-yard interaction range.
   type Interactable = { e: Entity; d2: number; type: number };
   let bestCorpse: Interactable | null = null;
-  let bestCorpseD2 = INTERACT_RANGE * INTERACT_RANGE;
+  let bestCorpseD2 = Number.POSITIVE_INFINITY;
   let bestObject: Interactable | null = null;
   let bestObjectD2 = INTERACT_RANGE * INTERACT_RANGE;
   let bestQuestEntity: Interactable | null = null;
   let bestQuestEntityD2 = INTERACT_RANGE * INTERACT_RANGE;
-  sim.grid.forEachInRadius(p.pos.x, p.pos.z, INTERACT_RANGE, (e, d2) => {
+  // A big body is looted from its edge (loot/corpse_loot_reach.ts), as the interact path scans.
+  sim.grid.forEachInRadius(p.pos.x, p.pos.z, maxCorpseLootReach(), (e, d2) => {
     if (
       e.kind === 'mob' &&
       e.lootable &&
-      corpseInteractionAvailability(sim.ctx, e, p.id, true).hasLoot &&
-      d2 < bestCorpseD2
+      d2 < corpseLootReach(e) ** 2 &&
+      d2 < bestCorpseD2 &&
+      corpseInteractionAvailability(sim.ctx, e, p.id, true).hasLoot
     ) {
       bestCorpse = { e, d2, type: 0.33 };
       bestCorpseD2 = d2;

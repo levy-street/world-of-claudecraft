@@ -52,7 +52,7 @@ import { isInRaidInstance } from './instances/dungeons';
 import { FERRY_BELL_OBJECT_ID, tryRingFerryBell } from './interactions/ferry_bell';
 import { HUT_OBJECT_ID, tryBurnHut } from './interactions/firebottle_hut';
 import { mobLootSource } from './loot/awarded_loot_hold';
-import { corpseLootReach } from './loot/corpse_loot_reach';
+import { corpseLootReach, maxCorpseLootReach } from './loot/corpse_loot_reach';
 import { hasSharedLootRights as computeSharedLootRights, lootHasGoneFfa } from './loot/loot_ffa';
 import {
   awardSharedLootItem,
@@ -623,17 +623,21 @@ export function interact(
   // active begins the walk (escort.ts picks the nearest eligible one).
   if (tryStartEscort(ctx, p, r.meta)) return;
   let bestCorpse: Entity | null = null;
-  let bestCorpseD2 = INTERACT_RANGE * INTERACT_RANGE;
+  let bestCorpseD2 = Number.POSITIVE_INFINITY;
   let bestObj: Entity | null = null;
   let bestObjD2 = INTERACT_RANGE * INTERACT_RANGE;
   let bestQuestEntity: Entity | null = null;
   let bestQuestD2 = INTERACT_RANGE * INTERACT_RANGE;
-  ctx.grid.forEachInRadius(p.pos.x, p.pos.z, INTERACT_RANGE, (e, d2) => {
+  // The scan reaches as far as the widest corpse loot reach (a big body is looted
+  // from its edge, loot/corpse_loot_reach.ts); every other candidate keeps its own
+  // INTERACT_RANGE gate below, and each corpse is gated on its own reach.
+  ctx.grid.forEachInRadius(p.pos.x, p.pos.z, maxCorpseLootReach(), (e, d2) => {
     if (
       (e.kind === 'mob' || isLootableBody(e)) &&
       e.lootable &&
-      corpseInteractionAvailability(ctx, e, p.id, true).hasLoot &&
-      d2 < bestCorpseD2
+      d2 < corpseLootReach(e) ** 2 &&
+      d2 < bestCorpseD2 &&
+      corpseInteractionAvailability(ctx, e, p.id, true).hasLoot
     ) {
       bestCorpse = e;
       bestCorpseD2 = d2;

@@ -27,3 +27,20 @@ export function corpseLootReachBonus(body: Pick<Entity, 'kind' | 'templateId'>):
 export function corpseLootReach(body: Pick<Entity, 'kind' | 'templateId'>): number {
   return INTERACT_RANGE + corpseLootReachBonus(body);
 }
+
+let maxReach: number | null = null;
+
+/** The widest loot reach any mob template has: the radius a proximity scan
+ *  for corpses (the untargeted interact press, the RL observation) queries
+ *  before it gates each body on its own `corpseLootReach`. MOBS is fixed once
+ *  the content is merged, so this is computed once. */
+export function maxCorpseLootReach(): number {
+  if (maxReach === null) {
+    let r = 0;
+    for (const t of Object.values(MOBS)) {
+      if (t.bodyRadius !== undefined && t.bodyRadius > r) r = t.bodyRadius;
+    }
+    maxReach = INTERACT_RANGE + r;
+  }
+  return maxReach;
+}
