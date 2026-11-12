@@ -8,6 +8,9 @@
 // at its budget. Looks only: every template keeps its scale, reach, speed and abilities.
 
 import { readFileSync } from 'node:fs';
+import { NodeIO } from '@gltf-transform/core';
+import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
+import { MeshoptDecoder } from 'meshoptimizer';
 import { describe, expect, it } from 'vitest';
 import { glbJsonChunk } from '../scripts/assets/lib/glb_texture_compression_core.mjs';
 import {
@@ -36,6 +39,7 @@ import {
 import { MOBS } from '../src/sim/data';
 import { ISLE_CASTS } from '../src/sim/encounters/smith_heart/breath_isle_ids';
 import { FINAL_PHASE_CASTS, FINAL_PHASES } from '../src/sim/encounters/smith_heart/final_phase_ids';
+import { HEAT_CUES } from '../src/sim/encounters/smith_heart/heat_ids';
 import { DT, type Entity } from '../src/sim/types';
 import { weldedSkinReport } from './helpers/welded_skin';
 
@@ -181,6 +185,39 @@ const BAR_POSES: Record<string, { bar: number; pose: number }> = {
 
 const PLAYER_HEIGHT = VISUALS.player_warrior.height;
 
+/** The adds their fight walks or sets on a player the moment they spawn: their rise never holds
+ *  off a swing. */
+const ENGAGED_AT_SPAWN = [...TRASH_RISE_CUES[HEAT_CUES.spawn], ...TRASH_RISE_CUES[HEAT_CUES.hatch]];
+
+/** How far the Entrance clip carries the body up (the largest vertical travel of any bone's
+ *  translation in it, rig units on the 2.2 tall rig), read from the shipped (meshopt) GLB. */
+async function entranceClimb(file: string): Promise<number> {
+  await MeshoptDecoder.ready;
+  const doc = await new NodeIO()
+    .registerExtensions(ALL_EXTENSIONS)
+    .registerDependencies({ 'meshopt.decoder': MeshoptDecoder })
+    .read(`public/models/creatures/${file}.glb`);
+  const anim = doc
+    .getRoot()
+    .listAnimations()
+    .find((a) => a.getName() === 'Entrance');
+  let climb = 0;
+  const v = [0, 0, 0];
+  for (const ch of anim?.listChannels() ?? []) {
+    const out = ch.getSampler()?.getOutput();
+    if (ch.getTargetPath() !== 'translation' || !out) continue;
+    let lo = Number.POSITIVE_INFINITY;
+    let hi = Number.NEGATIVE_INFINITY;
+    for (let i = 0; i < out.getCount(); i++) {
+      out.getElement(i, v);
+      lo = Math.min(lo, v[1]);
+      hi = Math.max(hi, v[1]);
+    }
+    climb = Math.max(climb, hi - lo);
+  }
+  return climb;
+}
+
 function read(file: string): { file: Buffer; json: GltfJson; clips: Map<string, number> } {
   const buf = readFileSync(`public/models/creatures/${file}.glb`);
   const json = glbJsonChunk(buf) as GltfJson;
@@ -277,12 +314,15 @@ describe("the Smith's Heart's own trash and add bodies", () => {
       expect(Math.abs((pulse?.delay ?? 0) + (pulse?.rise ?? 0) - contact)).toBeLessThan(0.1);
     });
 
-    it("puts every bar-locked cast's key pose on the bar's end, and plays it out", () => {
+    it("puts every bar-locked cast's key pose on the bar's end, and plays out all but a kick", () => {
       const synced = Array.isArray(def.castClipSync) ? def.castClipSync : [];
       for (const cast of synced) {
         const clip = def.clips.castByAbility?.[cast] ?? '';
         expect(clips.has(clip), cast).toBe(true);
-        expect(def.clips.castPlayOut, cast).toContain(clip);
+        // Rime Toll can be kicked: a play-out would still ring the fist on the core.
+        if (cast === FINAL_PHASE_CASTS.toll)
+          expect(def.clips.castPlayOut, cast).not.toContain(clip);
+        else expect(def.clips.castPlayOut, cast).toContain(clip);
         const pose = BAR_POSES[cast];
         expect(pose, cast).toBeDefined();
         const rate = def.clips.castTimeScaleByAbility?.[cast] ?? 1;
@@ -326,7 +366,7 @@ describe("the Smith's Heart's own trash and add bodies", () => {
       );
     });
 
-    it('rises out of the floor on its fight cue, whole, never cut short', () => {
+    it('rises out of the floor on its fight cue, cut short only by a blow that lands', async () => {
       const rises = Object.entries(TRASH_RISE_CUES).some(([, templates]) =>
         templates.includes(b.mob),
       );
@@ -337,8 +377,15 @@ describe("the Smith's Heart's own trash and add bodies", () => {
       expect(def.entranceGesture).toBe(SMITH_HEART_TRASH_RISE);
       expect(def.clips.entrance).toBe('Entrance');
       expect(def.clips.castSnapIn).toContain('Entrance');
-      expect(def.oneShotsHoldAttacks).toContain('Entrance');
+      if (ENGAGED_AT_SPAWN.includes(b.mob))
+        expect(def.oneShotsHoldAttacks ?? []).not.toContain('Entrance');
+      else expect(def.oneShotsHoldAttacks).toContain('Entrance');
       expect(clips.get('Entrance') ?? 0).toBeGreaterThan(1.4);
+      // It climbs out of the floor (the Seedflame cracks out of the seed it lies in): the travel
+      // survived the build, whichever bone carries it.
+      const climb = await entranceClimb(b.file);
+      if (b.mob === 'heart_heat_seedflame') expect(climb).toBeLessThan(1);
+      else expect(climb).toBeGreaterThan(1.5);
     });
 
     it('answers every claimed cue it sends with a gesture it maps, never a plain swing', () => {

@@ -61,6 +61,9 @@ const RISES = {
   entranceGesture: SMITH_HEART_TRASH_RISE,
   oneShotsHoldAttacks: ['Entrance'],
 } satisfies Partial<VisualDef>;
+/** A body its fight walks or sets on a player the moment it spawns (the Hearth's adds): it rises
+ *  the same way, but its first swing cuts the rise, so a blow that lands is always seen. */
+const RISES_ENGAGED = { entranceGesture: SMITH_HEART_TRASH_RISE } satisfies Partial<VisualDef>;
 const RISE_CLIPS = { entrance: 'Entrance', castSnapIn: ['Entrance'] } satisfies Partial<ClipMap>;
 
 /** A melee warder: two swings and the template's arc cleave, every blow landing at 1.0 s, its
@@ -164,7 +167,9 @@ function splinter(
       contacts: { Attack: [1.0], Attack2: [1.0] },
       castByAbility: byAbility,
       castTimeScaleByAbility: { [C.shear]: 1, ...rates },
-      castPlayOut: Object.values(byAbility),
+      // Every bar plays out its follow-through but Rime Toll's: a kick cuts the toll, and a play-out
+      // would still ring the fist on the core, a toll that never landed.
+      castPlayOut: Object.values(byAbility).filter((clip) => clip !== 'Toll'),
       ...clips,
     },
     ...RISES,
@@ -245,7 +250,7 @@ export const SMITH_HEART_TRASH_LOOKS: Record<string, VisualDef> = {
       idleVariantCadence: { everySec: 12, jitterSec: 8 },
       contacts: { Attack: [0.6], Attack2: [0.6] },
     },
-    ...RISES,
+    ...RISES_ENGAGED,
     attackTimeScale: 1,
     deathTimeScale: 1,
     turnRate: 4,
@@ -268,7 +273,7 @@ export const SMITH_HEART_TRASH_LOOKS: Record<string, VisualDef> = {
     0.52,
     1.29,
     {
-      ...RISES,
+      ...RISES_ENGAGED,
       glowPulses: {
         pulses: [
           { gesture: HEAT_CUES.kindling, delay: 0.25, rise: 0.15, hold: 0.2, fall: 0.7, peak: 2.4 },
@@ -295,7 +300,7 @@ export const SMITH_HEART_TRASH_LOOKS: Record<string, VisualDef> = {
       idleVariantCadence: { everySec: 12, jitterSec: 8 },
       contacts: { Attack: [0.5], Attack2: [0.55] },
     },
-    ...RISES,
+    ...RISES_ENGAGED,
     attackTimeScale: 1,
     deathTimeScale: 1,
     turnRate: 5,
