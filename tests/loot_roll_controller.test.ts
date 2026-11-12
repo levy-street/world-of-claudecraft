@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { ITEMS } from '../src/sim/data';
 import type {
   LootRollGroupStatus,
   LootRollPrompt,
@@ -8,7 +9,7 @@ import type {
 import { LootRollController } from '../src/ui/hud/loot/loot_roll_controller';
 import { LOOT_ROLL_REGRACE_MS } from '../src/ui/hud/loot/loot_roll_reconcile';
 import { makeWriterFacet } from '../src/ui/painter_host';
-import type { IWorld } from '../src/world_api';
+import type { IWorld, PartyInfo, PartyMemberInfo } from '../src/world_api';
 import { FakeDocument, FakeElement } from './helpers/fake_dom';
 
 class LootElement extends FakeElement {
@@ -95,6 +96,7 @@ function harness() {
   let open: LootRollPrompt[] = [];
   let masterOpen: MasterLootPrompt[] = [];
   let statuses: LootRollGroupStatus[] = [];
+  let partyInfo: PartyInfo | null = null;
   const submitLootRoll = vi.fn();
   const assignMasterLoot = vi.fn();
   const hideTooltip = vi.fn();
@@ -117,6 +119,9 @@ function harness() {
     activeLootRolls: () => open,
     activeMasterLootRolls: () => masterOpen,
     lootRollGroupStatus: () => statuses,
+    get partyInfo() {
+      return partyInfo;
+    },
     submitLootRoll,
     assignMasterLoot,
   } as unknown as Pick<
@@ -125,6 +130,7 @@ function harness() {
     | 'activeMasterLootRolls'
     | 'assignMasterLoot'
     | 'lootRollGroupStatus'
+    | 'partyInfo'
     | 'playerId'
     | 'submitLootRoll'
   >;
@@ -155,6 +161,9 @@ function harness() {
     },
     setStatuses: (next: LootRollGroupStatus[]) => {
       statuses = next;
+    },
+    setPartyInfo: (next: PartyInfo | null) => {
+      partyInfo = next;
     },
     advance: (ms: number) => {
       now += ms;
@@ -691,6 +700,114 @@ describe('bind-on-pickup note on roll prompts', () => {
     });
     const row = test.root.querySelector<HTMLElement>('.master') as unknown as LootElement | null;
     expect(row?.innerHTML).toContain('Binds when picked up');
+  });
+});
+
+// Master loot preselects the candidates whose class the item names, so a
+// class-restricted drop only needs the looter to confirm.
+describe('LootRollController master-loot class preselection', () => {
+  const restricted = Object.values(ITEMS).find(
+    (item) => (item.requiredClass?.length ?? 0) > 0 && !item.requiredClass?.includes('mage'),
+  );
+  if (!restricted?.requiredClass) throw new Error('fixture: no class-restricted item');
+  const eligible = restricted.requiredClass[0];
+  const member = (pid: number, name: string, cls: PartyMemberInfo['cls']) =>
+    ({ pid, name, cls }) as PartyMemberInfo;
+  const roster = [
+    { pid: 2, name: 'Aki' },
+    { pid: 3, name: 'Bex' },
+    { pid: 4, name: 'Cai' },
+    { pid: 5, name: 'Dov' },
+  ];
+  const party = (): PartyInfo =>
+    ({
+      leader: 2,
+      raid: false,
+      master: { enabled: true, looter: 2, threshold: 'uncommon' },
+      // Dov (pid 5) is deliberately absent: an unknown class is never preselected.
+      members: [member(2, 'Aki', 'mage'), member(3, 'Bex', eligible), member(4, 'Cai', eligible)],
+    }) as PartyInfo;
+  const show = (test: ReturnType<typeof harness>, itemId: string) => {
+    test.controller.showMasterRoll({
+      type: 'masterLoot',
+      ...prompt(),
+      itemId,
+      candidates: roster,
+    });
+    return test.root.querySelector<HTMLElement>('.master') as unknown as LootElement | null;
+  };
+  const checkedPids = (row: LootElement | null) =>
+    [...(row?.querySelectorAll<HTMLInputElement>('.ml-pick') ?? [])]
+      .filter((pick) => pick.checked)
+      .map((pick) => Number(pick.value));
+
+  it('ticks exactly the eligible-class candidates and enables Roll', () => {
+    const test = harness();
+    test.setPartyInfo(party());
+    const row = show(test, restricted.id);
+
+    expect(checkedPids(row)).toEqual([3, 4]);
+    expect(row?.querySelector<HTMLButtonElement>('.ml-roll')?.disabled).toBe(false);
+    row?.querySelector<HTMLButtonElement>('.ml-roll')?.dispatchEvent(new Event('click'));
+    expect(test.assignMasterLoot).toHaveBeenCalledWith(7, [3, 4]);
+  });
+
+  it('ticks nothing for an item without a class list', () => {
+    const test = harness();
+    test.setPartyInfo(party());
+    const row = show(test, 'greyjaw_hide_boots');
+
+    expect(checkedPids(row)).toEqual([]);
+    expect(row?.querySelector<HTMLButtonElement>('.ml-roll')?.disabled).toBe(true);
+  });
+
+  it('ticks a roster that arrives after the row, until the looter touches it', () => {
+    const test = harness();
+    test.setMasterOpen([{ ...masterPrompt(roster), itemId: restricted.id }]);
+    const row = show(test, restricted.id);
+    expect(checkedPids(row)).toEqual([]);
+
+    // The party snapshot lands a beat after the masterLoot event (reconnect).
+    test.setPartyInfo(party());
+    test.controller.showRoll(rollEvent(9));
+
+    const repainted = test.root.querySelector<HTMLElement>(
+      '.master',
+    ) as unknown as LootElement | null;
+    expect(checkedPids(repainted)).toEqual([3, 4]);
+  });
+
+  it('drops a preselected candidate the roster refresh removes', () => {
+    const test = harness();
+    test.setPartyInfo(party());
+    test.setMasterOpen([{ ...masterPrompt(roster), itemId: restricted.id }]);
+    show(test, restricted.id);
+
+    test.setMasterOpen([
+      { ...masterPrompt([roster[0], roster[2], roster[3]]), itemId: restricted.id },
+    ]);
+    test.controller.update(test.now());
+
+    const fresh = test.root.querySelector<HTMLElement>('.master') as unknown as LootElement | null;
+    expect(checkedPids(fresh)).toEqual([4]);
+  });
+
+  it('never re-applies the preselection over boxes the looter cleared', () => {
+    const test = harness();
+    test.setPartyInfo(party());
+    const row = show(test, restricted.id);
+    const picks = row?.querySelectorAll<HTMLInputElement>('.ml-pick') ?? [];
+    for (const pick of picks) pick.checked = false;
+    picks[0]?.dispatchEvent(new Event('change'));
+
+    // Any repaint (here another roll opening) rebuilds the master row.
+    test.controller.showRoll(rollEvent(9));
+
+    const repainted = test.root.querySelector<HTMLElement>(
+      '.master',
+    ) as unknown as LootElement | null;
+    expect(repainted).not.toBe(row);
+    expect(checkedPids(repainted)).toEqual([]);
   });
 });
 

@@ -1,5 +1,11 @@
 import { ITEMS } from '../../../sim/data';
-import type { ItemDef, ItemInstancePayload, LootRollChoice, SimEvent } from '../../../sim/types';
+import type {
+  ItemDef,
+  ItemInstancePayload,
+  LootRollChoice,
+  PlayerClass,
+  SimEvent,
+} from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
@@ -15,6 +21,7 @@ import {
   type LootRollStatusRow,
   lootRollStatusFingerprint,
 } from './loot_roll_status_view';
+import { masterLootPreselectedPids } from './master_loot_preselect_core';
 
 type LootRollEvent = Extract<SimEvent, { type: 'lootRoll' }>;
 type MasterLootEvent = Extract<SimEvent, { type: 'masterLoot' }>;
@@ -44,6 +51,7 @@ type LootRollWorld = Pick<
   | 'activeMasterLootRolls'
   | 'assignMasterLoot'
   | 'lootRollGroupStatus'
+  | 'partyInfo'
   | 'playerId'
   | 'submitLootRoll'
 >;
@@ -109,6 +117,12 @@ export class LootRollController {
   // is wrong by up to five minutes.
   private readonly dismissedMasterRolls = new Map<number, DismissedMasterRoll>();
   private confirmedMasterRolls = new Set<number>();
+  // Master rows the looter has ticked or unticked a box on. Until then a row's
+  // selection is the class preselection, recomputed on every repaint so a party
+  // roster that lands a snapshot after the masterLoot event still ticks its
+  // eligible members; after it, the looter's own selection is carried instead and
+  // is never overwritten. Pruned once the roll is neither shown nor dismissed.
+  private readonly touchedMasterRolls = new Set<number>();
 
   constructor(private readonly deps: LootRollControllerDeps) {}
 
@@ -460,6 +474,11 @@ export class LootRollController {
   private render(): void {
     const root = this.root();
     const checkedByRoll = this.checkedMasterPids();
+    for (const rollId of this.touchedMasterRolls) {
+      if (!this.activeMasterRolls.has(rollId) && !this.dismissedMasterRolls.has(rollId)) {
+        this.touchedMasterRolls.delete(rollId);
+      }
+    }
     // Every repaint tears down and rebuilds the whole subtree below, so any
     // element currently under the cursor (and possibly owning the shared
     // #tooltip box) is about to be detached without a mouseleave ever firing.
@@ -557,6 +576,16 @@ export class LootRollController {
     }
   }
 
+  // Master-loot candidates' classes, from the party roster the client already
+  // mirrors (candidates are always party members). Read ONCE per row: the offline
+  // Sim rebuilds the whole roster on every partyInfo read.
+  private candidateClassLookup(): (pid: number) => PlayerClass | undefined {
+    const classes = new Map(
+      (this.deps.world().partyInfo?.members ?? []).map((member) => [member.pid, member.cls]),
+    );
+    return (pid) => classes.get(pid);
+  }
+
   private renderMasterRow(
     root: HTMLElement,
     rollId: number,
@@ -608,23 +637,29 @@ export class LootRollController {
     }
     // Carry a selection made before this repaint. Only pids still on the roster
     // survive: a candidate the sim has dropped must not come back checked, which is
-    // the whole reason the roster refresh exists.
-    if (checked) {
-      for (const pick of pickElements) pick.checked = checked.has(Number(pick.value));
-    }
+    // the whole reason the roster refresh exists. A row the looter has not touched
+    // yet shows the item's eligible classes ticked instead (see touchedMasterRolls).
+    const selection = this.touchedMasterRolls.has(rollId)
+      ? (checked ?? new Set<number>())
+      : new Set(masterLootPreselectedPids(item, event.candidates, this.candidateClassLookup()));
+    for (const pick of pickElements) pick.checked = selection.has(Number(pick.value));
     const syncRoll = (): void => {
       const picked = pickElements.filter((pick) => pick.checked).length;
       rollButton.disabled = picked === 0;
       selectAll.checked = pickElements.length > 0 && picked === pickElements.length;
     };
-    // A carried selection has to re-derive the button and select-all state, or the
-    // row comes back with boxes ticked and Roll still greyed out.
-    if (checked) syncRoll();
+    // A carried or preselected selection has to re-derive the button and select-all
+    // state, or the row comes up with boxes ticked and Roll still greyed out.
+    syncRoll();
+    const touch = (): void => {
+      this.touchedMasterRolls.add(rollId);
+      syncRoll();
+    };
     selectAll.addEventListener('change', () => {
       for (const pick of pickElements) pick.checked = selectAll.checked;
-      syncRoll();
+      touch();
     });
-    for (const pick of pickElements) pick.addEventListener('change', syncRoll);
+    for (const pick of pickElements) pick.addEventListener('change', touch);
     rollButton.addEventListener('click', () => {
       const targetPids = pickElements
         .filter((pick) => pick.checked)
