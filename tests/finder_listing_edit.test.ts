@@ -80,7 +80,7 @@ describe('bring your party: leader-assigned member roles', () => {
       {
         kind: 'party_roles',
         roles: [
-          { pid: mage, role: 'healer' },
+          { pid: mage, role: 'tank' },
           { pid: stranger, role: 'healer' },
           { pid: leader, role: 'dps' },
         ],

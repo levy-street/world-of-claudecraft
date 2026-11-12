@@ -38,7 +38,7 @@ boost groups. Existing manually created groups and physical dungeon entry rules 
   require choosing or changing a specialization first.
 - Compatible roles come from a fixed class capability table:
   - Tank: warrior, paladin, druid.
-  - Healer: paladin, priest, shaman, druid.
+  - Healer: paladin, priest, shaman, mage (Chronomancy), druid.
   - DPS: every class.
 - A player may select multiple compatible roles. The matcher assigns one role for a proposal.
 - The server-authoritative simulation validates every submitted role and never trusts the client.
