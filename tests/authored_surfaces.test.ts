@@ -363,6 +363,22 @@ const AUTHORED_ATLAS_DEFS = [
   // heart_quench_caller.json)
   'smith_heart_quench_warder',
   'smith_heart_quench_caller',
+  // the raid's own trash and add bodies (scripts/assets/specs/heart_<name>.json,
+  // src/render/characters/smith_heart_trash_looks.ts)
+  'smith_heart_ring_warder',
+  'smith_heart_breath_warder',
+  'smith_heart_breath_caller',
+  'smith_heart_gale_sentinel',
+  'smith_heart_gale_mender',
+  'smith_heart_heat_warder',
+  'smith_heart_heat_caller',
+  'smith_heart_wellspawn',
+  'smith_heart_wellkeeper',
+  'smith_heart_seedflame',
+  'smith_heart_splinter_hammer',
+  'smith_heart_splinter_breath',
+  'smith_heart_splinter_quench',
+  'smith_heart_splinter_heat',
 ];
 
 describe('authored surfaces', () => {
