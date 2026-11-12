@@ -13,6 +13,7 @@ import {
 import type { SimEvent } from '../src/sim/types';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import { buildCouncilAlertView, councilRushMarked } from '../src/ui/hud/dungeon/council_alert_view';
+import { dungeonPromptEnabled } from '../src/ui/hud/dungeon/dungeon_prompt_policy_core';
 import { t } from '../src/ui/i18n';
 import { localizeSimAuraName } from '../src/ui/sim_i18n';
 import { councilFight } from './helpers/council_fight';
@@ -115,6 +116,26 @@ describe("Hammer Council alert: Mountain's Rush on you", () => {
     expect(rule).toContain('animation: heart-rush-throb');
     expect(css).toMatch(/#heart-council-alert\.is-rush \.fa-title \{\s*font-size: 44px;/);
     expect(css).toContain('@keyframes heart-rush-throb');
+    // Reduced motion (the OS's and the game's own setting) holds the throb.
+    const reduced = css.slice(
+      css.indexOf('@media (prefers-reduced-motion: reduce) {', css.indexOf('heart-rush-throb')),
+    );
+    expect(reduced.slice(0, 600)).toMatch(
+      /body\.mobile-touch #heart-council-alert\.is-rush \{\s*animation: none;/,
+    );
+    expect(css).toMatch(
+      /body\.reduce-motion\.mobile-touch #heart-council-alert\.is-rush \{\s*animation: none;/,
+    );
+  });
+
+  it('with the hints off the Rush mark still shows; the other council marks do not', () => {
+    expect(dungeonPromptEnabled('council', false)).toBe(false);
+    expect(
+      dungeonPromptEnabled('council', false, councilRushMarked([{ id: COUNCIL_AURAS.rushMark }])),
+    ).toBe(true);
+    expect(
+      dungeonPromptEnabled('council', false, councilRushMarked([{ id: COUNCIL_AURAS.rockMark }])),
+    ).toBe(false);
   });
 });
 

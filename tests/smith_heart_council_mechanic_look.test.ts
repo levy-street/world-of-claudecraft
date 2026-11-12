@@ -143,27 +143,39 @@ describe("Mountain's Rush: the arrow over the marked player", () => {
   });
 
   it('pulses faster and swells more as the bar runs out', () => {
-    // Count the pulse's crests over two seconds at the mark and as it lands.
-    const crests = (remaining: number) => {
+    // The bar sweeps down at 200 frames a second: count the pulse's crests and its
+    // biggest swell in the bar's first second and in its last.
+    const sweep = (from: number) => {
       let n = 0;
-      let prev = rushArrowLook(remaining, 5, 0, false, look()).glow;
+      let big = 0;
+      let prev = rushArrowLook(5 - from, 5, from, false, look()).glow;
       let rising = false;
-      for (let k = 1; k <= 400; k++) {
-        const g = rushArrowLook(remaining, 5, k * 0.005, false, look()).glow;
-        if (g < prev && rising) n++;
-        rising = g > prev;
-        prev = g;
+      for (let k = 1; k <= 200; k++) {
+        const t = from + k * 0.005;
+        const l = rushArrowLook(5 - t, 5, t, false, look());
+        if (l.glow < prev && rising) n++;
+        rising = l.glow > prev;
+        prev = l.glow;
+        big = Math.max(big, l.scale);
       }
-      return n;
+      return { n, big };
     };
-    expect(crests(0.1)).toBeGreaterThan(crests(5));
-    let early = 0;
-    let late = 0;
-    for (let k = 0; k < 200; k++) {
-      early = Math.max(early, rushArrowLook(5, 5, k * 0.01, false, look()).scale);
-      late = Math.max(late, rushArrowLook(0.1, 5, k * 0.01, false, look()).scale);
-    }
+    const first = sweep(0);
+    const last = sweep(4);
+    expect(last.n).toBeGreaterThan(first.n);
+    const early = first.big;
+    const late = last.big;
     expect(late).toBeGreaterThan(early);
+  });
+
+  it('a long session never turns the pulse into flicker: frame to frame it moves a little', () => {
+    // An hour into the session, the mark's bar sweeping down at 60 frames a second.
+    let prev = rushArrowLook(5, 5, 3600, false, look()).glow;
+    for (let k = 1; k <= 300; k++) {
+      const g = rushArrowLook(5 - k / 60, 5, 3600 + k / 60, false, look()).glow;
+      expect(Math.abs(g - prev)).toBeLessThan(0.1);
+      prev = g;
+    }
   });
 
   it('reduced motion holds it still and lit full: the mark stays', () => {

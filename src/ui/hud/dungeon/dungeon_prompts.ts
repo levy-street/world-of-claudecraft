@@ -327,10 +327,9 @@ export class DungeonPrompts {
       : HINT_HIDDEN;
     const cryptSoft = crypt.visible && CRYPT_SOFT_ALERT_KINDS.has(crypt.kind);
     // Mountain's Rush on the player is never advisory: the one council mark that kills.
-    const council =
-      dungeonPromptEnabled('council', hints) || councilRushMarked(p.auras)
-        ? buildCouncilAlertView({ auras: p.auras })
-        : HINT_HIDDEN;
+    const council = dungeonPromptEnabled('council', hints, councilRushMarked(p.auras))
+      ? buildCouncilAlertView({ auras: p.auras })
+      : HINT_HIDDEN;
     this.council.paint(council);
     // The cold bar is the player's own gauge: never hidden by the hints.
     const quench = dungeonPromptEnabled('quench', hints)
@@ -372,7 +371,8 @@ export class DungeonPrompts {
     slot.wildheart = wildheart.visible;
     slot.sanctum = sanctum.visible;
     slot.crypt = crypt.visible;
-    slot.council = council.visible;
+    // The Rush's alert leaves the slot for the screen's upper middle: it holds no slot.
+    slot.council = council.visible && council.kind !== 'rush';
     slot.quench = quench.visible;
     slot.final = final.visible;
     slot.knot = knot.visible;

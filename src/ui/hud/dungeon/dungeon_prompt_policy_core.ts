@@ -16,6 +16,9 @@
 //    Strength's alert (the same cold gauge and the marks the player must
 //    move for), and the use prompt (the
 //    panel is the interact press on a brazier or a candle).
+//    One carve-out: an advisory alert showing a mark that kills the player if
+//    ignored (`actionable`: the Hammer Council's Mountain's Rush on the player,
+//    council_alert_view.ts councilRushMarked) shows whatever the setting.
 //    It is a player-chosen interface preference, never a graphics-tier knob:
 //    this module takes the setting's own boolean and reads no preset, effects
 //    profile or governor (tests/dungeon_hints_setting.test.ts pins that).
@@ -60,9 +63,14 @@ export const DUNGEON_PROMPT_ADVISORY: Readonly<Record<DungeonPromptId, boolean>>
 };
 
 /** Whether `id` may show under the hints setting: an action prompt always, an
- *  advisory alert only while the hints are on. */
-export function dungeonPromptEnabled(id: DungeonPromptId, mechanicHints: boolean): boolean {
-  return mechanicHints || !DUNGEON_PROMPT_ADVISORY[id];
+ *  advisory alert only while the hints are on, unless it now shows an
+ *  `actionable` mark (one that kills if ignored). */
+export function dungeonPromptEnabled(
+  id: DungeonPromptId,
+  mechanicHints: boolean,
+  actionable = false,
+): boolean {
+  return mechanicHints || actionable || !DUNGEON_PROMPT_ADVISORY[id];
 }
 
 /** The prompts above the use prompt, as painted this frame (a prompt the

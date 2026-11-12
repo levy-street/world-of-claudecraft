@@ -225,7 +225,8 @@ export interface RushArrowLook {
   scale: number;
 }
 
-/** The arrow at `clock` (seconds) with `remaining` of the mark's `duration` left. Pure. */
+/** The arrow at `clock` (seconds, the bob's) with `remaining` of the mark's `duration`
+ *  left (the pulse's). Pure. */
 export function rushArrowLook(
   remaining: number,
   duration: number,
@@ -241,8 +242,14 @@ export function rushArrowLook(
   }
   const left = duration > 0 ? Math.max(0, Math.min(1, remaining / duration)) : 0;
   const urgency = 1 - left;
-  const hz = RUSH_ARROW.pulseHz + (RUSH_ARROW.pulseHzEnd - RUSH_ARROW.pulseHz) * urgency;
-  const pulse = 0.5 + 0.5 * Math.sin(clock * hz * Math.PI * 2);
+  // The pulse's phase is the mark's own time integrated (its rate climbing from pulseHz
+  // to pulseHzEnd over the bar), never the host's running clock times a rate: that would
+  // speed up without bound over a long session and flicker.
+  const e = Math.max(0, duration * urgency);
+  const span = Math.max(1e-6, duration);
+  const cycles =
+    RUSH_ARROW.pulseHz * e + ((RUSH_ARROW.pulseHzEnd - RUSH_ARROW.pulseHz) * e * e) / (2 * span);
+  const pulse = 0.5 + 0.5 * Math.sin(cycles * Math.PI * 2);
   const bob = 0.5 + 0.5 * Math.sin(clock * RUSH_ARROW.bobHz * Math.PI * 2);
   out.y = RUSH_ARROW.tip + RUSH_ARROW.bob * bob;
   out.glow = RUSH_ARROW.glowFloor + (1 - RUSH_ARROW.glowFloor) * pulse;

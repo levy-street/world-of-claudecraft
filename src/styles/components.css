@@ -19185,9 +19185,19 @@
     #heart-council-alert {
       animation: none;
     }
-    #heart-council-alert.is-rush {
+    #heart-council-alert.is-rush,
+    body.show-actionbar3 #heart-council-alert.is-rush,
+    body.mobile-touch #heart-council-alert.is-rush {
+      animation: none;
       box-shadow: 0 0 28px color-mix(in srgb, var(--color-hostile) 80%, transparent);
     }
+  }
+  /* The in-game Reduce Motion setting holds the throb too. */
+  body.reduce-motion #heart-council-alert.is-rush,
+  body.reduce-motion.show-actionbar3 #heart-council-alert.is-rush,
+  body.reduce-motion.mobile-touch #heart-council-alert.is-rush {
+    animation: none;
+    box-shadow: 0 0 28px color-mix(in srgb, var(--color-hostile) 80%, transparent);
   }
 
   /* ---------- The Smith's Heart's Guardian of the Quench cold bar ---------- */
