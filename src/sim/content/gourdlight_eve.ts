@@ -97,9 +97,9 @@ export type GourdlightTitleWrit = (typeof GOURDLIGHT_TITLE_WRITS)[number];
  *  18s sit-restore, the buff minted when the meal completes, the one shared
  *  'well_fed' id so the newest meal replaces the last). Every number is the cooking
  *  ladder's entry rung verbatim (content/profession_items.ts eastbrook_glazed_carrots:
- *  foodHp 90, +2, 600s), one candy per primary stat, so none outranks a crafted
+ *  foodHp 90, +6, 600s), one candy per primary stat, so none outranks a crafted
  *  dish; the price is a sweet or two above the Jar of Mischief. */
-export const GOURDLIGHT_CANDY_RUNG = Object.freeze({ foodHp: 90, value: 2, duration: 600 });
+export const GOURDLIGHT_CANDY_RUNG = Object.freeze({ foodHp: 90, value: 6, duration: 600 });
 export const GOURDLIGHT_CANDIES = Object.freeze([
   { itemId: 'hearthroot_toffee', itemName: 'Hearthroot Toffee', kind: 'buff_sta', price: 3 },
   { itemId: 'gourdseed_brittle', itemName: 'Gourdseed Brittle', kind: 'buff_str', price: 3 },

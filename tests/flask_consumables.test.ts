@@ -506,8 +506,8 @@ describe('role foods: Well Fed lands only on a finished meal, and is mortal', ()
     const fed = aurasById(p, WELL_FED);
     expect(fed, 'the finished meal paid out').toHaveLength(1);
     expect(fed[0].kind).toBe('buff_sta');
-    expect(fed[0].value).toBe(6);
-    expect(fed[0].duration).toBe(900);
+    expect(fed[0].value).toBe(13);
+    expect(fed[0].duration).toBe(1200);
     expect(fed[0].remaining).toBeGreaterThan(890);
     expect(fed[0].flask, 'Well Fed carries no flask marker').toBeUndefined();
   });
@@ -579,7 +579,7 @@ describe('role foods: Well Fed lands only on a finished meal, and is mortal', ()
     const fed = aurasById(p, WELL_FED);
     expect(fed, 'never two plates at once').toHaveLength(1);
     expect(fed[0].kind, 'the newest role wins the slot').toBe('buff_int');
-    expect(fed[0].value).toBe(6);
+    expect(fed[0].value).toBe(13);
     expect(p.auras.length, 'the second plate added no aura beside the slot').toBe(totalAfterFirst);
   });
 
@@ -715,19 +715,20 @@ describe('the R5 full kit: a flask and a Well Fed plate ride together, both magn
     expect(sim.countItem(IRONHUSK), 'the flask really was drunk').toBe(0);
     const fed = aurasById(p, WELL_FED);
     expect(fed, 'the marker-less food buff survived the strip').toHaveLength(1);
-    expect(fed[0].value, 'at full strength').toBe(6);
+    expect(fed[0].value, 'at full strength').toBe(13);
     const flasks = flaskAuras(p);
     expect(flasks, 'and the flask is the only marked aura').toHaveLength(1);
     expect(flasks[0].id).toBe(STA_FAMILY);
     expect(flasks[0].value).toBe(13);
   });
 
-  it('the R5 stamina arithmetic: flask 13 plus plate 6 is 19 on the stat book, both orders', () => {
+  it('the R5 stamina arithmetic: flask 13 plus plate 13 is 26 on the stat book, both orders', () => {
     // The number power-verification.md sets the gate on, measured rather than
     // asserted in prose, and read off stats.sta rather than off the aura list:
     // an aura that rides but no longer folds into the book would pass every
     // other arm in this file. It read 15 plus 6 for 21 before Phase 15 trimmed
-    // the flask band to the measured envelope.
+    // the flask band to the measured envelope, and 13 plus 6 for 19 before the
+    // Well Fed ladder was matched to the potion ladder.
     const flaskFirst = world();
     const baseSta = flaskFirst.p.stats.sta;
     use(flaskFirst.sim, flaskFirst.pid, IRONHUSK);
@@ -736,16 +737,16 @@ describe('the R5 full kit: a flask and a Well Fed plate ride together, both magn
     expect(aurasById(flaskFirst.p, WELL_FED)).toHaveLength(1);
     expect(flaskAuras(flaskFirst.p)).toHaveLength(1);
     expect(flaskFirst.p.stats.sta, 'flask then plate: both magnitudes reach the book').toBe(
-      baseSta + 13 + 6,
+      baseSta + 13 + 13,
     );
-    expect(flaskFirst.p.stats.sta - baseSta, 'the literal beside it').toBe(19);
+    expect(flaskFirst.p.stats.sta - baseSta, 'the literal beside it').toBe(26);
 
     const foodFirst = world(43);
     const baseSta2 = foodFirst.p.stats.sta;
     use(foodFirst.sim, foodFirst.pid, STEW);
     for (let i = 0; i < MEAL_TICKS; i++) foodFirst.sim.tick();
     use(foodFirst.sim, foodFirst.pid, IRONHUSK);
-    expect(foodFirst.p.stats.sta, 'plate then flask: the same 19').toBe(baseSta2 + 19);
+    expect(foodFirst.p.stats.sta, 'plate then flask: the same 26').toBe(baseSta2 + 26);
   });
 
   it('the maximal legal kit: an int flask, a stamina elixir and an int plate all ride', () => {
@@ -770,7 +771,7 @@ describe('the R5 full kit: a flask and a Well Fed plate ride together, both magn
     expect(aurasById(p, STA_FAMILY), 'the stamina elixir beside it').toHaveLength(1);
     expect(aurasById(p, WELL_FED), 'and the plate').toHaveLength(1);
     expect(flaskAuras(p), 'exactly one marked aura').toHaveLength(1);
-    expect(p.stats.int, 'flask 13 plus plate 6 on one stat').toBe(base.int + 13 + 6);
+    expect(p.stats.int, 'flask 13 plus plate 13 on one stat').toBe(base.int + 13 + 13);
     expect(p.stats.sta, 'the elixir on the other').toBe(base.sta + 12);
   });
 
@@ -794,7 +795,7 @@ describe('the R5 full kit: a flask and a Well Fed plate ride together, both magn
     expect(aurasById(p, STA_FAMILY), 'the stamina elixir beside it').toHaveLength(1);
     expect(aurasById(p, WELL_FED), 'and the plate').toHaveLength(1);
     expect(flaskAuras(p), 'exactly one marked aura').toHaveLength(1);
-    expect(p.attackPower, 'flask 13 plus plate 6 of attack power').toBe(base.ap + 13 + 6);
+    expect(p.attackPower, 'flask 13 plus plate 13 of attack power').toBe(base.ap + 13 + 13);
     expect(p.stats.sta, 'the elixir untouched on the other stat').toBe(base.sta + 12);
   });
 });

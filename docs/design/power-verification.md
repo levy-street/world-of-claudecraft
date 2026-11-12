@@ -23,6 +23,21 @@ committed as `scripts/r5_envelope_probe.ts` (section 9.1 gives the invocation),
 and the catalog read behind section 12's reagent-cost column (section 12.3
 defines it).
 
+## Post-closure change: Well Fed matched to the potion ladder (2026-11-12)
+
+After the closure below, the maintainer raised every Well Fed food to match the
+potion ladder rung for rung by quality, deliberately past this envelope's food
+term. The farming dishes now match the elixir of their quality (common 6 for
+600 s, uncommon 9 for 900 s, both rare dishes 12 for 900 s), the Gourdlight
+candies sit on the common rung, and the apex role plates match the apex flask
+(13 for 1200 s). Food still stacks with an elixir or flask, so the crafted
+stamina ceiling reads **flask 13 plus plate 13 for 26** (it was 19). The tank
+effective-health delta in `tests/r5_envelope_probe.test.ts` moved from 3.899 to
+6.646 percent. The sections below are the measurement record AS CLOSED: their
+food term (6 for 900 s), the 2 / 3 / 4 / 5 farming ladder and the 19 ceiling
+describe the state the verdict was ruled on, not the shipped values. Where the
+two disagree, the catalog and its pins win.
+
 ## Verdict
 
 **CLOSED BY RULING (2026-08-29).** The maintainer delivered all four priced
@@ -180,7 +195,7 @@ It is reported so a future reader can see the number rather than infer it.
 | gear | 2 Perfected apex pieces, the equip cap (`MASTERWROUGHT_EQUIP_CAP = 2`, `src/sim/equipment_rules.ts`) | +1 lead primary stat per piece |
 | enchant | the apex (Lucent) enchants, where they beat the pre-packet best on the same slot and axis | see 8.2 |
 | flask | one of `ironhusk_flask` / `warboar_flask` / `runewater_flask`, aura id `elixir_<kind>`, `flask: true` | 13 for 1200 s |
-| food | one of `stonepot_stew` / `warspice_skewers` / `sageleaf_chowder`, aura id **`well_fed`**, kind `buff_sta` / `buff_ap` / `buff_int` | **6 for 900 s** |
+| food | one of `stonepot_stew` / `warspice_skewers` / `sageleaf_chowder`, aura id **`well_fed`**, kind `buff_sta` / `buff_ap` / `buff_int` | **6 for 900 s** as measured (13 for 1200 s since the post-closure change above) |
 
 The food term is the specific aura `well_fed` at 6, delivered by an apex Harvest
 Feast (`stonepot_feast` / `warspice_feast` / `sageleaf_feast`, each

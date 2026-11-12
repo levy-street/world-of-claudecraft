@@ -1298,8 +1298,9 @@ describe('masterwrought Phase 11h: the arithmetic above every row', () => {
       expect(def, `${row.id} output def`).toBeDefined();
       expect(def.slot, `${row.id} must not output an equippable`).toBeUndefined();
     }
-    // The two numbers R5 is measured against: flask 13 plus plate 6 equals 19
-    // stamina, the shipped kit after Phase 15's envelope tune. Pinned per row
+    // The two numbers R5 is measured against: flask 13 plus plate 13 equals 26
+    // stamina, the shipped kit since the Well Fed ladder was matched to the
+    // potion ladder (19 after Phase 15's envelope tune, before that). Pinned per row
     // so a magnitude change on any one of the six is a red HERE, in the phase
     // that must not have moved it, and not only in the budget suite.
     for (const id of ['ironhusk_flask', 'warboar_flask', 'runewater_flask']) {
@@ -1311,8 +1312,8 @@ describe('masterwrought Phase 11h: the arithmetic above every row', () => {
       const food = foodDef(id);
       expect(ITEMS[id]?.sellValue, `${id} sellValue`).toBe(90);
       expect(food.foodHp, `${id} foodHp`).toBe(1392);
-      expect(food.wellFed?.value, `${id} Well Fed magnitude`).toBe(6);
-      expect(food.wellFed?.duration, `${id} Well Fed duration`).toBe(900);
+      expect(food.wellFed?.value, `${id} Well Fed magnitude`).toBe(13);
+      expect(food.wellFed?.duration, `${id} Well Fed duration`).toBe(1200);
     }
     for (const id of ['grand_cauldron', 'laden_hearth']) {
       expect(ITEMS[id]?.sellValue, `${id} sellValue`).toBe(380);

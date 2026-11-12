@@ -134,15 +134,19 @@ describe('the R5 envelope harness', () => {
     // (Agility feeds armor and the swapped ring carries less of it). The
     // consumable and enchant steps ride on top unchanged.
     expect(base).toEqual({ hp: 3642, armor: 3377, sta: 343 });
-    expect(consumables).toEqual({ hp: 3742, armor: 3377, sta: 353 });
-    expect(withEnchant).toEqual({ hp: 3782, armor: 3377, sta: 357 });
-    expect(full).toEqual({ hp: 3782, armor: 3380, sta: 357 });
+    // Re-pinned when the Well Fed ladder was matched to the potion ladder:
+    // the apex plate went from 6 to 13 stamina, so every consumable step
+    // carries 10 more stamina (the plate's +7 through the tank's stamina
+    // multipliers) and 100 more health than before.
+    expect(consumables).toEqual({ hp: 3842, armor: 3377, sta: 363 });
+    expect(withEnchant).toEqual({ hp: 3882, armor: 3377, sta: 367 });
+    expect(full).toEqual({ hp: 3882, armor: 3380, sta: 367 });
 
     const ehp = (body: { hp: number; armor: number }, level: number): number =>
       body.hp / (1 - armorReduction(body.armor, level));
     const expected: Array<[number, number, number, string]> = [
-      [22, 9060, 9413, '3.899'],
-      [23, 8865, 9210, '3.898'],
+      [22, 9060, 9662, '6.646'],
+      [23, 8865, 9454, '6.646'],
     ];
     for (const [level, baseEhp, fullEhp, delta] of expected) {
       const deltaPct = ((ehp(full, level) - ehp(base, level)) / ehp(base, level)) * 100;
@@ -178,7 +182,7 @@ describe('the R5 envelope harness', () => {
       expect(elixirValue(id), `${id} flask band`).toBe(13);
     }
     for (const id of ['stonepot_stew', 'warspice_skewers', 'sageleaf_chowder']) {
-      expect(wellFedValue(id), `${id} plate band`).toBe(6);
+      expect(wellFedValue(id), `${id} plate band`).toBe(13);
     }
 
     // The probe's DERIVED step constants, pinned both ways (the Phase 15 QA):

@@ -49,18 +49,18 @@ describe('wellFedTooltipLines', () => {
 
   it('glazed carrots state the buff, the trigger, and the one-at-a-time rule', () => {
     expect(wellFedTooltipLines(ITEMS.eastbrook_glazed_carrots)).toBe(
-      '<div class="tt-desc">Well Fed: Increases your Stamina by 2 for 10 min once you finish ' +
+      '<div class="tt-desc">Well Fed: Increases your Stamina by 6 for 10 min once you finish ' +
         'eating. Only one Well Fed effect at a time: a newer meal replaces it.</div>',
     );
   });
 
-  it('an apex role plate states the dominant rung: value 6 for 15 min', () => {
+  it('an apex role plate states the dominant rung: value 13 for 20 min', () => {
     // The 11c ladder's apex row (6 / 900): the duration is the elixir
     // ladder's next step above the entry rung, so the plate strictly
     // dominates every farming dish on both axes and the tooltip says so in
     // resolved numbers.
     expect(wellFedTooltipLines(ITEMS.stonepot_stew)).toBe(
-      '<div class="tt-desc">Well Fed: Increases your Stamina by 6 for 15 min once you finish ' +
+      '<div class="tt-desc">Well Fed: Increases your Stamina by 13 for 20 min once you finish ' +
         'eating. Only one Well Fed effect at a time: a newer meal replaces it.</div>',
     );
   });
@@ -286,23 +286,23 @@ describe('the five non-Latin fills render end to end (frozen literals, the M16 s
   const MAPPED: [SupportedLanguage, string][] = [
     [
       'zh_CN',
-      '<div class="tt-desc">精神饱满：吃完后使你的耐力提高 2 点，持续 10 分钟。同时只能有一种精神饱满效果：更新的一餐会顶替它。</div>',
+      '<div class="tt-desc">精神饱满：吃完后使你的耐力提高 6 点，持续 10 分钟。同时只能有一种精神饱满效果：更新的一餐会顶替它。</div>',
     ],
     [
       'zh_TW',
-      '<div class="tt-desc">精神飽滿：吃完後使你的耐力提高 2 點，持續 10 分鐘。同時只能有一種精神飽滿效果：較新的餐點會頂替它。</div>',
+      '<div class="tt-desc">精神飽滿：吃完後使你的耐力提高 6 點，持續 10 分鐘。同時只能有一種精神飽滿效果：較新的餐點會頂替它。</div>',
     ],
     [
       'ko_KR',
-      '<div class="tt-desc">잘 먹음: 식사를 마치면 체력이(가) 2 증가하며 10분 동안 지속됩니다. 잘 먹음 효과는 한 번에 하나만 유지되며, 새로 먹은 음식이 이전 효과를 대체합니다.</div>',
+      '<div class="tt-desc">잘 먹음: 식사를 마치면 체력이(가) 6 증가하며 10분 동안 지속됩니다. 잘 먹음 효과는 한 번에 하나만 유지되며, 새로 먹은 음식이 이전 효과를 대체합니다.</div>',
     ],
     [
       'ja_JP',
-      '<div class="tt-desc">満腹：食べ終えるとスタミナが 2 上昇し、10 分間持続します。満腹の効果は同時に一つだけで、新しい食事が古いものを置き換えます。</div>',
+      '<div class="tt-desc">満腹：食べ終えるとスタミナが 6 上昇し、10 分間持続します。満腹の効果は同時に一つだけで、新しい食事が古いものを置き換えます。</div>',
     ],
     [
       'ru_RU',
-      '<div class="tt-desc">Сытость: по окончании трапезы повышает Выносливость на 2 в течение 10 мин. Одновременно действует только один эффект сытости: более свежая трапеза заменяет прежний.</div>',
+      '<div class="tt-desc">Сытость: по окончании трапезы повышает Выносливость на 6 в течение 10 мин. Одновременно действует только один эффект сытости: более свежая трапеза заменяет прежний.</div>',
     ],
   ];
   const FALLBACK: [SupportedLanguage, string][] = [

@@ -327,15 +327,15 @@ describe('the multi-session feast routing over the real broadcast path', () => {
     expect(eat.remaining).toBeLessThanOrEqual(CONSUME_DURATION);
 
     // Past the 18s sit-restore, the completion path mints Well Fed on the
-    // EATER's own snapshot: the unified 'well_fed' id, the dish's value 5
-    // (the 11c five-rung ladder's top farming rung).
+    // EATER's own snapshot: the unified 'well_fed' id, the dish's value 12
+    // (the top farming rung, matched to the rare elixir).
     for (let i = 0; i < CONSUME_DURATION * 20 + 10; i++) routeTick(server);
     const wellfed = awaitFrames(server, () => {
       const snap = lastSnap(guestFc.sent);
       const auras = (snap?.self?.auras ?? []) as { id?: string; value?: number }[];
       return auras.find((a) => a.id === WELL_FED_AURA_ID) ?? null;
     });
-    expect(wellfed.value).toBe(5);
+    expect(wellfed.value).toBe(12);
 
     // The SECOND bite answers the ledger deny, to the eater's socket ONLY
     // (farm events are pid-scoped personal; the placer is the bystander

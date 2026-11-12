@@ -248,7 +248,7 @@ describe('well fed: completion timing', () => {
       id: WELL_FED_AURA_ID,
       name: 'Well Fed',
       kind: 'buff_sta',
-      value: 2,
+      value: 6,
       duration: 600,
       school: 'nature',
       sourceId: p.id,
@@ -354,7 +354,7 @@ describe('well fed: interruption forfeits the buff', () => {
     expect(p.eating).toBeNull();
     const wf = wellFedAuras(p);
     expect(wf).toHaveLength(1);
-    expect(wf[0].value).toBe(2); // A's value, never B's 3
+    expect(wf[0].value).toBe(6); // A's value, never B's 9
   });
 });
 
@@ -372,7 +372,7 @@ describe('well fed: elixir coexistence (the ids cannot collide, both orders)', (
     const wf = p.auras.find((a) => a.id === WELL_FED_AURA_ID);
     const elx = p.auras.find((a) => a.id === 'elixir_buff_sta');
     expect(wf, 'food buff survives the quaff').toBeTruthy();
-    expect(wf!.value).toBe(2);
+    expect(wf!.value).toBe(6);
     expect(elx, 'elixir landed beside it').toBeTruthy();
     expect(elx!.value).toBe(6);
   });
@@ -385,7 +385,7 @@ describe('well fed: elixir coexistence (the ids cannot collide, both orders)', (
     const wf = p.auras.find((a) => a.id === WELL_FED_AURA_ID);
     const elx = p.auras.find((a) => a.id === 'elixir_buff_sta');
     expect(wf, 'food buff landed').toBeTruthy();
-    expect(wf!.value).toBe(2);
+    expect(wf!.value).toBe(6);
     expect(elx, 'elixir intact after the meal').toBeTruthy();
     expect(elx!.value).toBe(6);
   });
@@ -427,12 +427,12 @@ describe('well fed: one food buff at a time (last eaten wins, whole family)', ()
     const { sim, pid, p } = playerWorld();
     eatToCompletion(sim, pid, p, 'eastbrook_glazed_carrots');
     expect(wellFedAuras(p).length).toBe(1);
-    expect(wellFedAuras(p)[0].value).toBe(2);
+    expect(wellFedAuras(p)[0].value).toBe(6);
 
     eatToCompletion(sim, pid, p, 'fenbridge_rice_pudding');
     const wf = wellFedAuras(p);
     expect(wf.length, 'food buffs never stack with each other').toBe(1);
-    expect(wf[0].value).toBe(3);
+    expect(wf[0].value).toBe(9);
     expect(wellFedByName(p), 'one Well Fed by name after the overwrite').toHaveLength(1);
   });
 
@@ -457,7 +457,7 @@ describe('well fed: one food buff at a time (last eaten wins, whole family)', ()
     wf = wellFedAuras(p);
     expect(wf, 'the chowder replaced the skewers').toHaveLength(1);
     expect(wf[0].kind).toBe('buff_int');
-    expect(wf[0].value).toBe(6);
+    expect(wf[0].value).toBe(13);
     expect(wellFedByName(p), 'one Well Fed by name after three plates').toHaveLength(1);
   });
 
@@ -465,24 +465,24 @@ describe('well fed: one food buff at a time (last eaten wins, whole family)', ()
     // Dish then plate: the apex overwrites the trainer rung.
     const a = playerWorld();
     eatToCompletion(a.sim, a.pid, a.p, 'evergarden_braised_greens');
-    expect(wellFedAuras(a.p)[0].value).toBe(5);
+    expect(wellFedAuras(a.p)[0].value).toBe(12);
     eatToCompletion(a.sim, a.pid, a.p, 'stonepot_stew');
     let wf = wellFedAuras(a.p);
     expect(wf, 'the plate replaced the dish').toHaveLength(1);
-    expect(wf[0].value).toBe(6);
-    expect(wf[0].duration).toBe(900);
+    expect(wf[0].value).toBe(13);
+    expect(wf[0].duration).toBe(1200);
     expect(wellFedByName(a.p), 'dish then plate: one Well Fed by name').toHaveLength(1);
 
     // Plate then dish: last eaten still wins, even downward. Classic rule:
     // the mint never compares power, it replaces on the shared id.
     const b = playerWorld(43);
     eatToCompletion(b.sim, b.pid, b.p, 'stonepot_stew');
-    expect(wellFedAuras(b.p)[0].value).toBe(6);
+    expect(wellFedAuras(b.p)[0].value).toBe(13);
     eatToCompletion(b.sim, b.pid, b.p, 'evergarden_braised_greens');
     wf = wellFedAuras(b.p);
     expect(wf, 'the dish replaced the plate').toHaveLength(1);
-    expect(wf[0].value).toBe(5);
-    expect(wf[0].duration).toBe(600);
+    expect(wf[0].value).toBe(12);
+    expect(wf[0].duration).toBe(900);
     expect(wellFedByName(b.p), 'plate then dish: one Well Fed by name').toHaveLength(1);
   });
 
@@ -491,13 +491,13 @@ describe('well fed: one food buff at a time (last eaten wins, whole family)', ()
     eatToCompletion(sim, pid, p, 'fenbridge_rice_pudding');
     tickSeconds(sim, 30);
     const before = wellFedAuras(p)[0].remaining;
-    expect(before).toBeLessThan(580); // decayed well below full (600)
+    expect(before).toBeLessThan(880); // decayed well below full (900)
 
     eatToCompletion(sim, pid, p, 'fenbridge_rice_pudding');
     const wf = wellFedAuras(p);
     expect(wf.length, 'still exactly one well_fed aura').toBe(1);
     expect(wf[0].remaining).toBeGreaterThan(before);
-    expect(wf[0].remaining).toBeGreaterThan(590); // fresh 600 minus tick slack
+    expect(wf[0].remaining).toBeGreaterThan(890); // fresh 900 minus tick slack
   });
 });
 

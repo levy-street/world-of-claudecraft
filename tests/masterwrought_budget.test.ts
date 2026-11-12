@@ -590,7 +590,7 @@ const APEX_CONSUMABLES: Record<
     resultCount: 4,
     stationType: 'kitchens',
     sellValue: 90,
-    effect: { aura: 'Well Fed', kind: 'buff_sta', value: 6, duration: 900 },
+    effect: { aura: 'Well Fed', kind: 'buff_sta', value: 13, duration: 1200 },
     foodHp: 1392,
     // The TANK plate's own crop (masterwrought Phase 11h, 11h-GATE-B).
     reagents: roleFoodBill('frost_gourd', 2),
@@ -601,7 +601,7 @@ const APEX_CONSUMABLES: Record<
     resultCount: 4,
     stationType: 'kitchens',
     sellValue: 90,
-    effect: { aura: 'Well Fed', kind: 'buff_ap', value: 6, duration: 900 },
+    effect: { aura: 'Well Fed', kind: 'buff_ap', value: 13, duration: 1200 },
     foodHp: 1392,
     // The PHYSICAL plate's own crop.
     reagents: roleFoodBill('highland_barley', 2),
@@ -612,7 +612,7 @@ const APEX_CONSUMABLES: Record<
     resultCount: 4,
     stationType: 'kitchens',
     sellValue: 90,
-    effect: { aura: 'Well Fed', kind: 'buff_int', value: 6, duration: 900 },
+    effect: { aura: 'Well Fed', kind: 'buff_int', value: 13, duration: 1200 },
     foodHp: 1392,
     // The CASTER plate's own crop, the tier-3 leaf.
     reagents: roleFoodBill('thornpeak_cabbage', 2),
@@ -1447,13 +1447,13 @@ describe('masterwrought apex budget sweep', () => {
       if (def.kind !== 'food' || !def.wellFed) throw new Error(`${id} carries no wellFed payload`);
       return def.wellFed;
     };
-    // One shared apex band across all three roles (value 6 at the 11c ladder's
-    // apex duration 900), so the choice is which stat you carry, never how
-    // much; the band's own derivation lives in the phase 10 increment pins.
+    // One shared apex band across all three roles (value 13 for 1200s, the
+    // apex flask's own band), so the choice is which stat you carry, never
+    // how much; the band's own derivation lives in the phase 10 increment pins.
     const bands = new Set(
       roleFoodIds.map((id) => `${wellFedOf(id).value}/${wellFedOf(id).duration}`),
     );
-    expect(bands).toEqual(new Set(['6/900']));
+    expect(bands).toEqual(new Set(['13/1200']));
     // One shared aura display NAME too, which puts every role food (and since
     // 11c every farming buff dish) on the single 'well_fed' exclusivity id
     // minted by src/sim/wellfed.ts.
@@ -2125,25 +2125,21 @@ describe('the phase 10 apex rungs step exactly one rung off the shipped ladders'
     );
     expect(shippedCeiling, 'the shipped food ceiling').toBe(980);
 
-    // The 11c derivation (ruling 11c-D-2), computed LIVE with the twin
-    // literals the file's own idiom uses: the apex VALUE is still the
-    // consumable family's own entry rung (the bottom elixir, the number R5's
-    // kit was measured against), and the apex DURATION takes the elixir
-    // ladder's own duration step above that entry rung (boar to venomfire,
-    // 600 + 300 = 900), so the plate strictly dominates the farming rungs
-    // below without moving the R5 magnitude.
-    const entry = elixirPayload('elixir_of_the_boar');
-    const durationStep = elixirPayload('venomfire_elixir').duration - entry.duration;
+    // The apex band matches the potion ladder at its own rarity, computed
+    // LIVE with the twin literals the file's own idiom uses: an epic plate
+    // carries exactly the apex flask's value and duration (ironhusk_flask),
+    // the same way each farming dish matches the elixir of its quality
+    // (tests/farm_recipes.test.ts). Food still stacks with the flask
+    // (different aura id): a deliberate raise past the R5 kit's food term.
+    const flask = elixirPayload('ironhusk_flask');
     for (const id of APEX_FOOD_IDS) {
       const def = foodDef(id);
       expect(def.foodHp, `${id} sits above the shipped ceiling`).toBeGreaterThan(shippedCeiling);
       expect(def.foodHp, `${id} foodHp literal`).toBe(1392);
-      expect(def.wellFed?.value, `${id} enters at the elixir entry value`).toBe(entry.value);
-      expect(def.wellFed?.duration, `${id} duration is entry plus the ladder step`).toBe(
-        entry.duration + durationStep,
-      );
-      expect(def.wellFed?.value, `${id} well-fed value literal`).toBe(6);
-      expect(def.wellFed?.duration, `${id} well-fed duration literal`).toBe(900);
+      expect(def.wellFed?.value, `${id} matches the apex flask value`).toBe(flask.value);
+      expect(def.wellFed?.duration, `${id} matches the apex flask duration`).toBe(flask.duration);
+      expect(def.wellFed?.value, `${id} well-fed value literal`).toBe(13);
+      expect(def.wellFed?.duration, `${id} well-fed duration literal`).toBe(1200);
     }
   });
 

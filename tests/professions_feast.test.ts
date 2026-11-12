@@ -213,8 +213,8 @@ describe('shared feast: wire tokens and content', () => {
     expect(dish.kind === 'food' ? dish.wellFed : undefined).toEqual({
       aura: 'Well Fed',
       kind: 'buff_sta',
-      value: 5,
-      duration: 600,
+      value: 12,
+      duration: 900,
     });
   });
 });
@@ -573,8 +573,8 @@ describe('shared feast: the bite and the Well Fed mint', () => {
     const wf = wellFedAuras(eater.p);
     expect(wf).toHaveLength(1);
     expect(wf[0].id).toBe(WELL_FED_AURA_ID);
-    expect(wf[0].value).toBe(5);
-    expect(wf[0].duration).toBe(600);
+    expect(wf[0].value).toBe(12);
+    expect(wf[0].duration).toBe(900);
   });
 
   it('a feast bite and a bagged dish of the same id mint an IDENTICAL aura', () => {
@@ -1077,25 +1077,25 @@ describe('shared feast: well-fed vs elixir coexistence and last-eaten-wins', () 
     tickSeconds(sim, 22);
     expect(eater.p.eating).toBeNull();
     expect(wellFedAuras(eater.p)).toHaveLength(1);
-    expect(wellFedAuras(eater.p)[0].value).toBe(5);
+    expect(wellFedAuras(eater.p)[0].value).toBe(12);
     expect(
       eater.p.auras.find((a) => a.id === 'elixir_buff_sta')?.value,
       'the elixir survived the feast grant',
     ).toBe(6);
 
-    // Last eaten wins, the downgrade direction: a tier-1 dish (value 2)
-    // eaten after the feast REPLACES the value-5 buff, one shared aura id.
+    // Last eaten wins, the downgrade direction: a tier-1 dish (value 6)
+    // eaten after the feast REPLACES the value-12 buff, one shared aura id.
     sim.addItem('eastbrook_glazed_carrots', 1, eater.pid);
     sim.useItem('eastbrook_glazed_carrots', eater.pid);
     tickSeconds(sim, 22);
     expect(eater.p.eating).toBeNull();
     const wf = wellFedAuras(eater.p);
     expect(wf, 'still exactly one well_fed aura').toHaveLength(1);
-    expect(wf[0].value).toBe(2);
+    expect(wf[0].value).toBe(6);
     expect(eater.p.auras.find((a) => a.id === 'elixir_buff_sta')?.value).toBe(6);
   });
 
-  it('the upgrade direction: the feast bite after a tier-1 dish overwrites 2 with 5', () => {
+  it('the upgrade direction: the feast bite after a tier-1 dish overwrites 6 with 12', () => {
     const { sim, placer, eaters } = world(1);
     const eater = eaters[0];
     const feastId = placeOk(sim, placer);
@@ -1103,13 +1103,13 @@ describe('shared feast: well-fed vs elixir coexistence and last-eaten-wins', () 
     sim.addItem('eastbrook_glazed_carrots', 1, eater.pid);
     sim.useItem('eastbrook_glazed_carrots', eater.pid);
     tickSeconds(sim, 22);
-    expect(wellFedAuras(eater.p)[0].value).toBe(2);
+    expect(wellFedAuras(eater.p)[0].value).toBe(6);
 
     sim.consumeFeast(feastId, eater.pid);
     tickSeconds(sim, 22);
     const wf = wellFedAuras(eater.p);
     expect(wf).toHaveLength(1);
-    expect(wf[0].value).toBe(5);
+    expect(wf[0].value).toBe(12);
   });
 });
 
@@ -1463,9 +1463,9 @@ describe('the apex feast tier: the placeable family', () => {
     expect(auras[0].value, 'the magnitude resolved off the DISH, never re-typed').toBe(
       wanted?.value,
     );
-    expect(auras[0].value, 'and the literal beside it').toBe(6);
+    expect(auras[0].value, 'and the literal beside it').toBe(13);
     // And the discriminator, which is what makes this arm decisive: the party
-    // feast's dish is buff_sta at 5, so a bite that served the module constant
+    // feast's dish is buff_sta at 12, so a bite that served the module constant
     // instead of the placed item would land buff_sta here.
     expect(auras[0].kind, 'the CASTER plate').toBe('buff_int');
     expect(auras[0].kind).not.toBe('buff_sta');
@@ -1486,7 +1486,7 @@ describe('the apex feast tier: the placeable family', () => {
     // stonepot_stew's own value, resolved through the feast rather than typed.
     const stew = ITEMS.stonepot_stew;
     expect(wellFedAuras(guest.p)[0].value).toBe(stew.kind === 'food' ? stew.wellFed?.value : -1);
-    expect(wellFedAuras(guest.p)[0].value, 'and the literal beside it').toBe(6);
+    expect(wellFedAuras(guest.p)[0].value, 'and the literal beside it').toBe(13);
 
     // Now a party feast from a DIFFERENT placer (the one-per-placer rule is
     // per placer, so this needs a second cook).
@@ -1498,7 +1498,7 @@ describe('the apex feast tier: the placeable family', () => {
     tickSeconds(sim, 20);
     const after = wellFedAuras(guest.p);
     expect(after, 'still exactly one Well Fed: replaced, never stacked').toHaveLength(1);
-    expect(after[0].value, 'the party dish replaced the apex one').toBe(5);
+    expect(after[0].value, 'the party dish replaced the apex one').toBe(12);
   });
 });
 
