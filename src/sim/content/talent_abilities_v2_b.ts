@@ -125,7 +125,7 @@ export const TALENT_ABILITIES_V2_B = {
     requiresTarget: false,
     effects: [{ type: 'aoeFear', duration: 5, radius: 8 }],
     description:
-      "Frightens nearby enemies for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)",
+      "Frightens enemies within 8 yd and in line of sight for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)",
   },
   curse_of_exhaustion: {
     id: 'curse_of_exhaustion',
@@ -210,7 +210,7 @@ export const TALENT_ABILITIES_V2_B = {
     // druid. Mobs keep the grounded shove.
     effects: [{ type: 'aoeKnockback', radius: 8, distance: 15, dazeMult: 0.5, dazeDuration: 4 }],
     description:
-      'A blast of wind hurls all enemies within 8 yd 15 yd away from you and dazes them, slowing their movement by 50% for 4 sec. Enemy players are thrown into the air in a straight line: knocked off a ledge, they keep going and take falling damage, and a fatal fall counts as your kill.',
+      'Knocks every enemy within 8 yd and in your line of sight up to 15 yd away from you and dazes them, slowing their movement by 50% for 4 sec. Enemy players are thrown into the air in a straight line: knocked off a ledge, they keep going and take falling damage, and a fatal fall counts as your kill.',
   },
   innervate: {
     id: 'innervate',
@@ -227,7 +227,7 @@ export const TALENT_ABILITIES_V2_B = {
     usableInForm: true,
     effects: [{ type: 'selfBuff', kind: 'resource_sap', value: 20, duration: 10 }],
     description:
-      'Living sap wells up in you for 10 sec, restoring 20 of your current resource in waves: mana, Rage, or Energy, and shifting forms does not break it. Sleep, stun, or stasis stills the sap. (Druid talent)',
+      'Living sap wells up in you for 10 sec, restoring 20 of whichever resource you are using (mana, Rage, or Energy) every 2 sec. Shifting forms does not end it. Sleep, stun, or stasis pauses it. (Druid talent)',
   },
   // Wildfang's in-form heal. Authored for the Talents 2.0 L17 row, but that row
   // shipped granting Gladesong instead and left this stranded: fully defined,
@@ -296,6 +296,6 @@ export const TALENT_ABILITIES_V2_B = {
     requiresTarget: false,
     effects: [{ type: 'aoeHeal', min: 42, max: 52, radius: 30 }],
     description:
-      'Channels restorative energy for 4 sec, healing allies within 30 yd for 42 to 52 each second. (Druid talent)',
+      'Channels restorative energy for 4 sec, healing every ally within 30 yd and in your line of sight, including you, for $d each second. (Druid talent)',
   },
 } satisfies Record<string, AbilityDef>;

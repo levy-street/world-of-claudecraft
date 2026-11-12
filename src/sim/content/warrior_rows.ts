@@ -75,8 +75,7 @@ export const WARRIOR_ROWS: RowTree = [
       {
         id: 'war_row_die_by_the_sword',
         name: 'Die by the Sword',
-        description:
-          'Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks.',
+        description: 'For 8 sec, you take 30% less damage and gain 30% dodge chance.',
         // LIVE: grants the defensive cooldown; the cut lives in dealDamage.
         effect: { grant: { ability: 'die_by_sword' } },
       },

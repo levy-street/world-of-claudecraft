@@ -164,7 +164,7 @@ describe('warlock class talent tree', () => {
 
   it('makes Pact Deepened double Fiendhide armor', () => {
     expect(ABILITIES.demon_skin.description).toContain(
-      'Pact Deepened can double this armor and reduce magic damage taken while Fiendhide is active',
+      'Pact Deepened doubles this armor and reduces magic damage taken by 5% while Fiendhide is active',
     );
     const base = rig({});
     const deepened = rig({ 11: 'wlk_r11_improved_life_tap' });

@@ -15,7 +15,7 @@ const common: AbilityDef[] = [
     offGcd: true,
     effects: [{ type: 'divineAscension' }],
     description:
-      'Consume 20 Devotion to gain 5 Ascension charges for up to 45 sec. Marked abilities consume one charge and gain an additional effect.',
+      "Spend 20 Devotion to gain 5 Ascension charges for up to 45 sec. While Ascension is active, your specialization's highlighted abilities each spend 1 charge for the Ascension bonus their tooltips describe, and you gain no Devotion. Ascension ends when the charges or the time run out. Extended Dawn adds 2 charges.",
   },
   {
     id: 'aura_mastery',
@@ -39,7 +39,7 @@ const common: AbilityDef[] = [
       },
     ],
     description:
-      'For 8 sec, empower every active combat aura in your group: Bastion Devotion reduces damage by 15%, and both Requital Aura effects deal 15 Holy damage. Repeated uses refresh instead of stacking.',
+      'For 8 sec, triple every active Bastion Devotion and Requital Aura in your group: Bastion Devotion reduces damage taken by 15%, and Requital Aura deals three times its normal Holy damage. Repeated uses refresh instead of stacking.',
   },
   {
     id: 'devotion_ward',
@@ -118,7 +118,7 @@ const common: AbilityDef[] = [
       },
     ],
     description:
-      'Instantly hurl a holy hammer at an enemy within 20 m for $d, restoring 70 mana, healing yourself for 50% of damage dealt, and generating 1 Devotion when it deals damage. Solar Reprisal lets Hammer of Grace ignore its cooldown and heal you for 100% of damage dealt.',
+      'Hurl a holy hammer at an enemy for $d Holy damage, restoring 70 mana and healing yourself for 50% of the damage dealt. Generates 1 Devotion when it deals damage. Solar Reprisal (a Faithwarden proc) makes it ignore its cooldown and heal you for 100% of the damage dealt.',
   },
   {
     id: 'hushbrand',
@@ -155,7 +155,7 @@ const common: AbilityDef[] = [
       { type: 'selfBuff', kind: 'buff_dr', value: 0.2, duration: 8 },
     ],
     description:
-      'Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected.',
+      'Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected. Ascension raises the reduction to 30%.',
   },
   {
     id: 'solar_step',
@@ -192,7 +192,7 @@ const common: AbilityDef[] = [
       { type: 'directDamage', min: 120, max: 150 },
     ],
     description:
-      'Instantly heal an ally for $d or deal moderate Holy damage to an enemy. Either use generates 1 Devotion. During Ascension, a healing cast also heals allied players within 10 m of the target for half as much.',
+      'Instantly heal an ally for $d or deal 120 to 150 base Holy damage to an enemy. Damage increases with Spell Power and healing with Healing Power. Either use generates 1 Devotion. During Ascension, a healing cast also heals allied players within 10 m of the target for half as much.',
   },
   {
     id: 'recall_the_fallen',
@@ -274,7 +274,7 @@ const retribution: AbilityDef[] = [
       },
     ],
     description:
-      "Deliver a crushing weapon strike and generate 1 Devotion when it deals damage. A successful hit reduces Dawnfall's remaining cooldown by 2 sec. Successful auto-attacks and Final Edict hits have a 15% chance to grant Dawn's Wrath for 8 sec. Ascension also releases a Physical explosion around you.",
+      "Deliver a crushing weapon strike and generate 1 Devotion when it deals damage. A successful hit reduces Dawnfall's remaining cooldown by 2 sec. Successful auto-attacks and Final Edict hits have a 15% chance to grant Dawn's Wrath for 8 sec: your next Tolling Hammer can hit any target, ignores its cooldown, and deals 20% more damage. Ascension also releases a Physical explosion around you.",
   },
   {
     id: 'dawnfall',
@@ -291,7 +291,7 @@ const retribution: AbilityDef[] = [
     requiresTarget: false,
     effects: [{ type: 'aoeDamage', min: 55, max: 70, radius: 6, softCap: 5 }],
     description:
-      "Deal $d Holy damage to nearby enemies and generate 1 Devotion. Hitting at least one enemy reduces Final Edict's remaining cooldown by 2 sec. Ascension increases its damage and radius.",
+      "Deal $d Holy damage to nearby enemies and generate 1 Devotion. Hitting at least one enemy reduces Final Edict's remaining cooldown by 2 sec. Ascension increases its damage by 50% and its radius to 10 m.",
   },
   {
     // Debt of Light keeps the `faithforged_guard` id on purpose: the id is what saved
@@ -316,7 +316,7 @@ const retribution: AbilityDef[] = [
     offGcd: true,
     effects: [{ type: 'selfBuff', kind: 'paladin_debt_of_light', value: 140, duration: 8 }],
     description:
-      'For 8 sec, the next enemy hit against you is answered: up to $b damage is denied and returned to the attacker as Holy damage, and you gain 1 Devotion. Only one blow is answered.',
+      'For 8 sec, the next enemy hit against you is answered: up to $b damage is denied and returned to the attacker as Holy damage, and you gain 1 Devotion. Only one blow is answered. Ascension raises the amount it can answer by 50%.',
   },
   {
     id: 'hammer_of_wrath',
@@ -333,7 +333,7 @@ const retribution: AbilityDef[] = [
     executeThreshold: 0.2,
     effects: [{ type: 'directDamage', min: 150, max: 180 }],
     description:
-      "Hurl a holy hammer for $d damage and generate 1 Devotion. Usable below 20% health, or during Divine Ascension or Zealwing. Dawn's Wrath grants an additional cast against any target that ignores its current cooldown and deals 20% more damage. Ascension increases its damage by 30%.",
+      "Hurl a holy hammer for $d Holy damage and generate 1 Devotion. Only usable on a target below 20% health, unless Divine Ascension, Zealwing, or Dawn's Wrath is active. Dawn's Wrath is consumed by the next cast, which ignores the cooldown and deals 20% more damage. Ascension increases its damage by 30%.",
   },
   {
     id: 'avenging_wrath',
@@ -466,7 +466,7 @@ const holy: AbilityDef[] = [
     targetType: 'friendly',
     effects: [{ type: 'heal', min: 260, max: 310 }],
     description:
-      'Deliver a powerful heal and generate 1 Devotion. Radiant Resonance reduces its mana cost by 50% and cast time to 1.5 sec. Ascension makes it instant and increases its healing by 35%.',
+      'Heal a friendly target for $d and generate 1 Devotion. Radiant Resonance reduces its mana cost by 50% and cast time to 1.5 sec. Ascension makes it instant and increases its healing by 35%.',
   },
   {
     id: 'radiant_chorus',
@@ -482,7 +482,7 @@ const holy: AbilityDef[] = [
     requiresTarget: false,
     effects: [{ type: 'aoeHeal', min: 90, max: 110, radius: 30 }],
     description:
-      "Heal nearby allies for $d and generate 1 Devotion. Effectively healing at least 2 allies grants Radiant Resonance: your next Mending Light is instant, or your next Dawn's Embrace costs 50% less mana and casts in 1.5 sec. Ascension increases Radiant Chorus healing and radius.",
+      "Heal nearby allies for $d and generate 1 Devotion. Effectively healing at least 2 allies grants Radiant Resonance for 10 sec: your next Mending Light is instant, or your next Dawn's Embrace costs 50% less mana and casts in 1.5 sec. Ascension increases Radiant Chorus healing by 20% and its radius to 40 m.",
   },
   {
     id: 'life_covenant',
@@ -529,7 +529,7 @@ const holy: AbilityDef[] = [
       },
     ],
     description:
-      'Channel for 5 sec, creating a 10 meter holy dome. Allies inside are healed every second and take 50% less damage. Completing the channel releases a final heal and grants 30% movement speed for 4 sec.',
+      'Channel a 10 m holy dome around you. Allied players inside and in your line of sight take 50% less damage and are healed for 35 to 45 every second. Completing the channel heals them for 120 to 150 more and grants 30% movement speed for 4 sec. Healing increases with Healing Power.',
   },
 ];
 
@@ -548,7 +548,7 @@ const protection: AbilityDef[] = [
     requiresTarget: false,
     effects: [{ type: 'veilboundMarch', duration: 4, speedMult: 1.4, armorPct: 30 }],
     description:
-      'Become ethereal for 4 sec, gaining 40% movement speed and 30% armor and becoming immune to roots, slows, and displacement. Enemies you pass through are Veil Marked for 6 sec, taking Holy damage each second, dealing 20% less damage to you, and generating extra threat. The first mark grants 1 Devotion. When the march ends, nearby marked enemies take a final burst. Ascension increases the burst by 50% and lightly pulls them toward you.',
+      'Become ethereal for 4 sec, gaining 40% movement speed and 30% armor, removing roots and slows, and becoming immune to roots, slows, and displacement. Enemies you pass through are Veil Marked for 6 sec: they take 12 Holy damage each second with triple threat and deal 20% less damage to you. The first mark grants 1 Devotion. When the march ends, marked enemies within 10 m take 36 Holy damage. Ascension raises that damage to 54 and pulls them 2 m toward you.',
   },
   {
     id: 'vowkeeper_strike',
@@ -565,7 +565,7 @@ const protection: AbilityDef[] = [
     threat: { mult: 2.5 },
     effects: [{ type: 'weaponStrike', bonus: 21, weaponMult: 1 }],
     description:
-      'Strike with high threat and generate 1 Devotion. A successful strike has a 20% chance to grant Solar Reprisal for 8 sec; each successful block has a 25% chance. Solar Reprisal empowers your next Sunward Disc, Hammer of Grace, or Mending Light. Ascension also grants a small absorption shield.',
+      'Strike for weapon damage plus $d Physical damage with high threat, and generate 1 Devotion. A successful strike has a 20% chance to grant Solar Reprisal for 8 sec; each successful block has a 25% chance. Solar Reprisal is consumed by your next Sunward Disc (no mana cost, no cooldown, 20% more damage), Hammer of Grace (no cooldown, heals you for 100% of damage dealt), or Mending Light (instant). Ascension also shields you for 6% of your maximum health for 6 sec.',
   },
   {
     id: 'bastion_rite',
@@ -607,7 +607,7 @@ const protection: AbilityDef[] = [
       { type: 'chainDamage', min: 60, max: 75, jumps: 2, falloff: 1, radius: 10 },
     ],
     description:
-      'Requires a shield. Hurl a radiant disc that strikes and then bounces between nearby enemies. Each damaging impact generates 1 Devotion. Solar Reprisal makes Sunward Disc cost no mana, ignore its cooldown, and deal 20% more damage. Ascension empowers 5 bounces.',
+      'Requires a shield. Hurl a radiant disc that deals $d Holy damage to the target, then bounces to up to 2 other nearby enemies for 60 to 75 base Holy damage each. Each damaging impact generates 1 Devotion. Solar Reprisal makes Sunward Disc cost no mana, ignore its cooldown, and deal 20% more damage. Ascension increases its damage by 30% and its bounces to 5.',
   },
   {
     id: 'sacred_challenge',
@@ -680,7 +680,7 @@ const protection: AbilityDef[] = [
       { type: 'threatPulse', amount: 150, radius: 8 },
     ],
     description:
-      'Gain 30% block and a shield that absorbs $d% of your maximum health for $t sec, releasing a pulse of threat. Ascension strengthens and extends the defense.',
+      'Gain 30% block chance and a shield that absorbs $d% of your maximum health for $t sec, releasing a pulse of threat. Ascension raises block chance to 40%, increases the shield by 50%, and extends both to 10 sec.',
   },
   {
     id: 'oath_chain',
@@ -772,7 +772,7 @@ const protection: AbilityDef[] = [
       },
     ],
     description:
-      'Consecrate the ground beneath you for 9 sec, dealing $d Holy damage with high threat every second. The first impact generates 1 Devotion. Faithwardens take 10% less damage while standing inside. Ascension increases its damage.',
+      'Consecrate the ground beneath you for 9 sec, dealing $d Holy damage with high threat every second. The first impact generates 1 Devotion. Faithwardens take 10% less damage while standing inside. Ascension increases its damage by 30%.',
   },
 ];
 

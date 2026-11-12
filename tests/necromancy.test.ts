@@ -1554,7 +1554,7 @@ describe('Necromancy Warlock', () => {
       ?.known.find((known) => known.def.id === 'corpse_explosion');
     if (!corpseExplosion) throw new Error('Expected Corpse Explosion to be known');
     expect(abilityDisplayDescription(corpseExplosion, '48-60')).toBe(
-      'Sacrifices a Skeletal Warrior first, then a Bone Mage, and a Gravewing only as a last resort. Among duplicates it chooses the one with the least remaining duration, then the weakest, to deal 48-60 Shadow damage at the chosen location.',
+      'Sacrifices one of your Dominion servants (never your Graveguard) to deal 48-60 Shadow damage to enemies within 8 yd of the chosen location. It takes a Skeletal Warrior first, then a Bone Mage, and a Gravewing only as a last resort; among servants of the same kind, the one closest to expiring, then the most injured. Requires a Dominion servant.',
     );
     expect(deathEchoes(sim.player)).toEqual([expect.objectContaining({ id: 'legacy_death_echo' })]);
     expect(sim.player.cooldowns.get('corpse_explosion')).toBeGreaterThan(0);

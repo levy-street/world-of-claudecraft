@@ -68,7 +68,8 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   // Valor Roar's Protection-only damage reduction is applied when the party
   // maximum-health aura is created, rather than stored on its shared effect.
   rallying_cry: [5],
-  bear_form: [30, 110],
+  // Bruin Form attack power is 15 + round(Agility x 1.5) (entity.ts bearForm).
+  bear_form: [30, 110, 15, 1.5],
   // "compelled to attack you for 3 sec": the taunt compel window in threat.ts.
   taunt: [3],
   holy_taunt: [3],
@@ -123,7 +124,8 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   // The "arm Re-entry for 12 sec" window is stamped by trailbreak().
   trailbreak: [12, 15, 18, 24, 50, 3],
   // The Priest spec relationship rules are post-damage hooks rather than ability effects.
-  smite: [15, 30],
+  // 70 = Twin Covenant's Doctrine conversion (combat/priest/doctrine.ts).
+  smite: [15, 30, 70],
   // 10 = VESPERS_DOT_DAMAGE_MULT (1.1), applied by resolveVespersAbility at
   // cast time, not by the ability effect table.
   shadow_word_pain: [1, 10],
@@ -145,7 +147,20 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   bloodlust: [10],
   // Divine Ascension's resource price, charge count and lifetime are owned by
   // the dedicated paladin devotion state machine, not an AbilityEffect.
-  divine_ascension: [20, 5, 45],
+  // 2 = EXTENDED_DAWN_ASCENSION_CHARGE_BONUS (paladin_devotion.ts).
+  divine_ascension: [20, 5, 45, 2],
+  // A hit for FEAR_BREAK_CHANCE_SCALE (0.1) of max health always breaks the fear
+  // (combat/effect_dispatch.ts).
+  intimidating_shout: [10],
+  // Bewitch heals its target 10% of max health per second (combat/auras.ts).
+  polymorph: [10],
+  // Ruination's Wrack: gainRuin(1) up to RUIN_MAX 5 (combat/destruction.ts).
+  shadow_bolt: [1, 5],
+  // Blood Credit's buffPct 0.5 on the mana half (choice_rows_classic.ts,
+  // applied in the effect_dispatch lifeTap arm).
+  life_tap: [50],
+  // DRAIN_TICK_GAIN Condemnation per Evil Eye tick (combat/affliction.ts).
+  drain_life: [2],
 };
 
 // Every resolved rank of every class ability (deduped by rank).

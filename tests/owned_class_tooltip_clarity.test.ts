@@ -71,7 +71,8 @@ describe('owned-class English tooltip clarity', () => {
       wing_clip: /Attack Power/,
       volley: /Ranged Attack Power/,
       lightning_bolt: /Spell Power/,
-      healing_wave: /Spell Power/,
+      // Heals scale with the Healing Power stat (Spell Power plus gear healing).
+      healing_wave: /Healing Power/,
       earth_shock: /Spell Power/,
       flame_shock: /Spell Power/,
       frost_shock: /Spell Power/,

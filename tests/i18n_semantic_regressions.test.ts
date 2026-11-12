@@ -240,7 +240,9 @@ describe('reviewed localization semantics', () => {
       expect(direhowl).toContain(terms.damage);
       expect(direhowl).toContain('{buff}');
       expect(direhowl).toContain('%');
-      expect(direhowl).toContain('20');
+      // The duration is the live {duration} placeholder (resolved from the
+      // shout's effect), not a hardcoded "20".
+      expect(direhowl).toContain('{duration}');
       expect(direhowl).not.toContain('30');
 
       const bladestorm = translation(locale, 'entities.abilities.bladestorm.description');

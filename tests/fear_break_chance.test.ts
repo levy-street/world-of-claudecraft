@@ -176,7 +176,7 @@ describe('G5: damage-scaled fear break', () => {
       "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect.",
     );
     expect(ABILITIES.howl_of_terror.description).toBe(
-      "Frightens nearby enemies for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)",
+      "Frightens enemies within 8 yd and in line of sight for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)",
     );
   });
 
