@@ -454,7 +454,9 @@ export const COUNCIL_TUNING = {
   // the blow and the throw on everyone it runs through.
   rushFirst: 16,
   rushEvery: 24,
-  rushCast: 3,
+  /** The mark's bar, the marked player's time to put a pillar between them and the
+   *  Guardian: 5 s on every tier (3 until the owner's playtest of 2026-11-12). */
+  rushCast: 5,
   rushHalfWidth: 2,
   /** A body is struck within the half width plus this (its own girth): the
    *  lane on the floor is drawn to the two together. */

@@ -3,7 +3,7 @@
 // number lives in COUNCIL_TUNING (`rush*`, `cursed*`, `collapse*`) and the
 // difficulty rows (`cursedPulseMin/Max`, `missCollapse`).
 //
-//   The mark      every 24 s (first at 16) a 3 s bar at one player who is no
+//   The mark      every 24 s (first at 16) a 5 s bar at one player who is no
 //                 council member's tank (nobody else on the floor: no Rush);
 //                 the player wears the mark and the bar's target draws the lane
 //                 from the Guardian.

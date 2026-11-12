@@ -209,14 +209,15 @@ describe("Mountain's Rush: the first pillar on its line", () => {
 });
 
 describe("Mountain's Rush: the wind-up and the run", () => {
-  it('a heavy run: the wind-up and the speed leave the 3 s telegraph to aim', () => {
+  it('a heavy run: the wind-up and the speed leave the 5 s telegraph to aim', () => {
     // Slow enough to read and to step out of, fast enough to threaten: a
     // heavy charge, never the old 40 yd/s blink.
     expect(T.rushSpeed).toBeGreaterThanOrEqual(18);
     expect(T.rushSpeed).toBeLessThanOrEqual(24);
     expect(T.rushWindup).toBeGreaterThanOrEqual(0.5);
     expect(T.rushWindup).toBeLessThanOrEqual(1.2);
-    expect(T.rushCast).toBe(3);
+    // The mark's bar: 5 s on every tier, time to get a pillar between you and him.
+    expect(T.rushCast).toBe(5);
     expect(rushSeconds(T.rushSpeed * 2)).toBeCloseTo(T.rushWindup + 2, 6);
   });
 
