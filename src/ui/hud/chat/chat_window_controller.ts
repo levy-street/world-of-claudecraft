@@ -27,6 +27,7 @@ import {
   WHISPER_TAB,
   WHISPER_TAB_LABEL_KEY,
 } from './chat_channels';
+import { bindChatLinkPointerBlur } from './chat_link_focus';
 
 const CHAT_TABS_KEY = 'woc_chat_tabs';
 const CHAT_ACTIVE_TAB_KEY = 'woc_chat_active_tab';
@@ -100,6 +101,9 @@ export class ChatWindowController {
   init(): void {
     if (this.initialized) return;
     this.initialized = true;
+    // A mouse-clicked chat link must not keep focus (see chat_link_focus.ts).
+    bindChatLinkPointerBlur(this.deps.chatLog);
+    bindChatLinkPointerBlur(this.deps.combatLog);
     let savedTabs: string | null = null;
     let savedActive: string | null = null;
     try {

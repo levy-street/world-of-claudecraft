@@ -14,8 +14,11 @@ import { Keybinds } from '../../src/game/keybinds';
 import { wireChromeFocus } from '../../src/ui/chrome_focus_wiring';
 import { markDialogRoot } from '../../src/ui/dialog_root';
 import { FocusManager } from '../../src/ui/focus_manager';
+import { bindChatLinkPointerBlur } from '../../src/ui/hud/chat/chat_link_focus';
+import { deedChatLinkEl } from '../../src/ui/hud/chat/deed_chat_line';
 import { bindChromeButtonKeyGuard, bindPointerBlur } from '../../src/ui/pointer_blur';
 import { installPromptDialog } from '../../src/ui/prompt_dialog';
+import { makeWindowFocus } from '../../src/ui/window_focus';
 
 // One shared Input for the whole file: its window-level listeners cannot be
 // removed, so a per-test instance would stack handlers. `blocked` stands in for
@@ -137,6 +140,43 @@ function makeMailIndicator(): {
   return { mail, opens: () => opens, focusedAtOpen: () => focusedAtOpen };
 }
 
+/** A chat pane wired the way ChatWindowController.init wires it, holding one REAL
+ *  deed chat link whose click opens a window on the REAL window-focus bridge
+ *  (captureFocus on open, restoreFocus on close), the deeds-window shape. */
+function makeChatLink(): {
+  link: HTMLSpanElement;
+  opens: () => number;
+  close: () => Promise<void>;
+} {
+  const frame = document.createElement('div');
+  frame.id = 'chatlog';
+  const win = document.createElement('div');
+  markDialogRoot(win, { label: 'window' });
+  win.style.display = 'none';
+  const fm = new FocusManager();
+  const focus = makeWindowFocus(fm, () => win);
+  let opens = 0;
+  let opener: HTMLElement | null = null;
+  const link = deedChatLinkEl(document, 'A Deed', () => {
+    opens++;
+    opener = focus.captureFocus();
+    win.style.display = 'block';
+  });
+  frame.appendChild(link);
+  document.body.append(frame, win);
+  bindChatLinkPointerBlur(frame);
+  return {
+    link,
+    opens: () => opens,
+    close: async () => {
+      win.style.display = 'none';
+      focus.restoreFocus(opener);
+      // FocusManager.restore defers the focus() one macrotask.
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    },
+  };
+}
+
 async function pressSpace(): Promise<void> {
   await userEvent.keyboard('[Space>]');
   await userEvent.keyboard('[/Space]');
@@ -164,6 +204,30 @@ describe('stale focus vs gameplay keys (the reported bugs and their fixes)', () 
     expect(focusedAtOpen()).toBe(true);
     expect(document.activeElement).toBe(mail);
     expect(chatOpens).toBe(0);
+  });
+
+  it('mouse-click a chat link, close the window it opened, then Space: jumps, no re-open', async () => {
+    const { link, opens, close } = makeChatLink();
+    await userEvent.click(link);
+    expect(opens()).toBe(1);
+    expect(document.activeElement).not.toBe(link);
+    // The regression: the window recorded the still-focused link as its opener,
+    // so closing it planted focus back on the link and Space re-opened it.
+    await close();
+    expect(document.activeElement).not.toBe(link);
+    await userEvent.keyboard('[Space>]');
+    expect(input.debugState().movementHeld.jump).toBe(true);
+    await userEvent.keyboard('[/Space]');
+    expect(opens()).toBe(1);
+  });
+
+  it('keyboard-focused chat link keeps Space activation and gets focus back on close', async () => {
+    const { link, opens, close } = makeChatLink();
+    link.focus();
+    await pressSpace();
+    expect(opens()).toBe(1);
+    await close();
+    expect(document.activeElement).toBe(link);
   });
 
   it('(a) mouse-click a micromenu button, then Space: no re-toggle, jump requested', async () => {
