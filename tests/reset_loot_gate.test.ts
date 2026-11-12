@@ -8,11 +8,12 @@ import {
   IGNIVAR_SECOND_WING_ID,
   VARKHUL_BOSS_ID,
 } from '../src/sim/ignivar_raid_ids';
-import { enterDungeon, leaveDungeon } from '../src/sim/instances/dungeons';
+import { enterDungeon, leaveDungeon, resetDungeonInstances } from '../src/sim/instances/dungeons';
 import {
   corpseBlocksInstanceReset,
   isPersonalQuestSlot,
 } from '../src/sim/instances/reset_loot_gate';
+import { BOSS_CORPSE_HOLD_SECONDS } from '../src/sim/mob/boss_corpse_hold';
 import { type InstanceSlot, type PlayerMeta, Sim } from '../src/sim/sim';
 import type { Entity, LootSlot } from '../src/sim/types';
 
@@ -63,6 +64,9 @@ function crucibleWithLoot(loot: (lead: PlayerMeta, ally: PlayerMeta) => LootSlot
     .find((m): m is Entity => m?.templateId === VARKHUL_BOSS_ID)!;
   varkhul.dead = true;
   varkhul.lootable = true;
+  // The hold a real instance-boss kill stamps (combat/damage.ts), so the corpse
+  // does not read as decayed the moment a player walks back in.
+  varkhul.corpseTimer = BOSS_CORPSE_HOLD_SECONDS;
   varkhul.loot = { copper: 0, items: loot(lead, ally) };
   const e = sim.entities.get(lead.entityId)!;
   for (let hop = 0; hop < 6 && e.pos.x > DUNGEON_X_THRESHOLD; hop += 1) {
@@ -111,6 +115,13 @@ describe('personal quest slot predicate', () => {
     ['a shared-personal token', varkhul, { ...ember(7), sharedPersonal: true }],
     // A held roll award is personal gear the winner may still come back for.
     ['a held roll award', varkhul, { itemId: 'varkhul_forgebreaker', count: 1, personalFor: [7] }],
+    // An item Varkhul really drops, but from a plain (non-quest) entry: a held
+    // award of it must never read as a quest slot.
+    [
+      'a held award of a plain drop',
+      varkhul,
+      { itemId: 'lastflame_core', count: 1, personalFor: [7] },
+    ],
     // Classified by the mob's quest entry, not the item kind.
     ['the quest item on a mob with no quest entry for it', { templateId: 'wolf' }, ember(7)],
   ])('rejects %s', (_label, mob, slot) => {
@@ -158,8 +169,50 @@ describe('the Crucible difficulty change with an unclaimed quest item on Varkhul
     expect(sim.players.has(allyId)).toBe(false);
   });
 
+  it('skips a recipient who is logging out and still pays the next one', () => {
+    let slot!: LootSlot;
+    const { sim, lead, ally } = crucibleWithLoot((l, a) => {
+      slot = ember(a.entityId, l.entityId);
+      return [slot];
+    });
+    ally.leaving = true;
+    sim.setDungeonDifficulty('heroic', lead.entityId);
+    expect(errors(sim)).toContain(APPLIED);
+    expect(sim.ctx.countItem(EMBER, ally.entityId)).toBe(0);
+    expect(sim.ctx.countItem(EMBER, lead.entityId)).toBe(1);
+    expect(slot.count).toBe(0);
+  });
+
+  it('Reset All Instances also delivers the Ember instead of refusing', () => {
+    const { sim, lead, ally } = crucibleWithLoot((_l, a) => [ember(a.entityId)]);
+    const result = resetDungeonInstances(sim.ctx, lead.entityId);
+    expect(result.status).toBe('reset');
+    expect(errors(sim)).not.toContain(LOOT_BLOCKED);
+    expect(sim.ctx.countItem(EMBER, ally.entityId)).toBe(1);
+  });
+
+  it('a change queued while a member is inside delivers the Ember once they leave', () => {
+    const { sim, lead, ally } = crucibleWithLoot((_l, a) => [ember(a.entityId)]);
+    if (!enterDungeon(sim.ctx, IGNIVAR_LIFT_ROOM_ID, ally.entityId)) throw new Error('lift');
+    sim.drainEvents();
+    sim.setDungeonDifficulty('heroic', lead.entityId);
+    expect(sim.ctx.pendingDifficultyChanges.size).toBe(1);
+    // An occupancy refusal hands nothing out.
+    expect(sim.ctx.countItem(EMBER, ally.entityId)).toBe(0);
+    walkOut(sim, ally.entityId);
+    sim.drainEvents();
+    // tick() hands back its own events; the queued retry runs in the 1 Hz phase.
+    const ticked: { type: string; text?: string }[] = [];
+    for (let i = 0; i < 25; i += 1) ticked.push(...(sim.tick() as typeof ticked));
+    expect(ticked.filter((e) => e.type === 'error').map((e) => e.text)).toContain(APPLIED);
+    expect(sim.ctx.pendingDifficultyChanges.size).toBe(0);
+    expect(liveClaim(sim, IGNIVAR_LIFT_ROOM_ID)?.difficulty).toBe('heroic');
+    expect(sim.ctx.countItem(EMBER, ally.entityId)).toBe(1);
+  });
+
   it('skips a recipient whose bags cannot fit it, and the change still applies', () => {
-    const { sim, lead, ally } = crucibleWithLoot((l, a) => [ember(l.entityId, a.entityId)]);
+    // The full-bag recipient is listed FIRST, so the one after it must still be paid.
+    const { sim, lead, ally } = crucibleWithLoot((l, a) => [ember(a.entityId, l.entityId)]);
     const real = sim.ctx.canAddItem;
     const spy = vi
       .spyOn(sim.ctx, 'canAddItem')
@@ -178,6 +231,11 @@ describe('the Crucible difficulty change with an unclaimed quest item on Varkhul
     [
       'a held roll award',
       (l) => [{ itemId: 'varkhul_forgebreaker', count: 1, personalFor: [l.entityId] }],
+      0,
+    ],
+    [
+      'a held award of a plain Varkhul drop',
+      (l) => [{ itemId: 'lastflame_core', count: 1, personalFor: [l.entityId] }],
       0,
     ],
     ['copper', () => [], 5],

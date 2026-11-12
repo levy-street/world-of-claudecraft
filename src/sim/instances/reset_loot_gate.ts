@@ -1,16 +1,18 @@
 // The "loot remains inside" half of an instance reset (resetDungeonInstances in
-// dungeons.ts, shared by the difficulty toggle and Reset All Instances).
+// dungeons.ts, shared by the difficulty toggle, its queued retry, and Reset All
+// Instances).
 //
 // The gate exists so a reset never wipes loot the group still means to take:
-// copper, a shared drop, a held roll award, or an open need-greed roll. A
-// personal QUEST slot is different. It names specific players (the guaranteed
-// Forgefather's Ember on Varkhul in the Crucible, say), nobody else can take
-// it, and a recipient who walks away or relogs (a relog mints a new entity id,
-// so the slot no longer names them) left the whole raid unable to change
-// difficulty until the corpse decayed (owner report 2026-11-05). So a personal
-// quest slot never blocks; instead the reset delivers it to each recipient who
-// is still online and has room, the same capacity check the corpse take path
-// uses, and only an undeliverable copy is lost with the instance.
+// copper, a shared drop, a held roll award, an open need-greed roll, or an
+// unclaimed harvest. A personal QUEST slot is different. It names specific
+// players (the guaranteed Forgefather's Ember on Varkhul in the Crucible, say),
+// nobody else can take it, and instance corpses never decay, so a recipient who
+// walked away or relogged (a relog mints a new entity id, so the slot no longer
+// names them) left the whole raid unable to change difficulty at all (owner
+// report 2026-11-05). So a personal quest slot never blocks; instead the reset
+// delivers it to each recipient who is still online and has room, the same
+// capacity check the corpse take path uses, and only an undeliverable copy is
+// lost with the instance.
 //
 // `src/sim`-pure: no DOM/Three, no wall clock, no rng.
 
@@ -19,7 +21,7 @@ import { mobLootSource } from '../loot/awarded_loot_hold';
 import { hasPendingLootRollForMob } from '../loot/loot_roll';
 import { isHarvestableCorpse } from '../professions/gathering';
 import type { SimContext } from '../sim_context';
-import { cloneItemInstancePayload, type Entity, type LootSlot } from '../types';
+import type { Entity, LootSlot } from '../types';
 
 /** A live slot only its listed players may take, rolled by one of this mob's
  *  quest-gated loot entries (the questId branch of rollLoot). Classified from
@@ -62,25 +64,19 @@ export function corpseBlocksInstanceReset(ctx: SimContext, mob: Entity | undefin
 export function deliverPersonalQuestLoot(ctx: SimContext, mobIds: readonly number[]): void {
   for (const id of mobIds) {
     const mob = ctx.entities.get(id);
-    if (!mob?.dead || !mob.lootable || !mob.loot) continue;
+    // The same corpse condition the gate reads, so every slot it let through is
+    // a slot delivered here.
+    if (!mob?.lootable || !mob.loot) continue;
     for (const slot of mob.loot.items) {
-      if (!isPersonalQuestSlot(mob, slot)) continue;
+      if (!isPersonalQuestSlot(mob, slot) || !slot.personalFor) continue;
       const lootOpts = { source: mobLootSource(mob) };
-      for (const pid of slot.personalFor ?? []) {
-        const meta = ctx.players.get(pid);
-        if (!meta || meta.leaving || !ctx.entities.has(pid)) continue;
-        if (!ctx.canAddItem(slot.itemId, slot.count, pid, slot.instance)) continue;
-        if (slot.instance) {
-          ctx.addItemInstance(
-            slot.itemId,
-            cloneItemInstancePayload(slot.instance),
-            pid,
-            slot.count,
-            lootOpts,
-          );
-        } else {
-          ctx.addItem(slot.itemId, slot.count, pid, lootOpts);
-        }
+      // Quest slots never carry an item instance (rollLoot builds them bare and
+      // the quality roll excludes them), so a plain grant is the whole job.
+      // canAddItem also refuses an id that no longer resolves to a player.
+      for (const pid of slot.personalFor) {
+        if (ctx.players.get(pid)?.leaving) continue;
+        if (!ctx.canAddItem(slot.itemId, slot.count, pid)) continue;
+        ctx.addItem(slot.itemId, slot.count, pid, lootOpts);
       }
       slot.personalFor = [];
       slot.count = 0;
