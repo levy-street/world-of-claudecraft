@@ -111,3 +111,12 @@ export const ENTRANCE_SECONDARY_LAYERS: Readonly<Record<SmithHeartEntrance, read
     heat: ['smithHeartHeatEntranceHaze'],
     final: ['smithHeartArrivalCrown', 'smithHeartArrivalSheath'],
   });
+
+/** The final boss's death (final_death_core.ts, painted with its arrival's
+ *  budget): the cosmetic doubles the low tier never draws, the column's
+ *  soft sheath and the comets' coloured halos (the white heads, their
+ *  sparks, the grooves, the well and every beat stay on every tier). */
+export const DEATH_SECONDARY_LAYERS = Object.freeze([
+  'smithHeartDeathSheath',
+  'smithHeartDeathCometHalo',
+] as const);

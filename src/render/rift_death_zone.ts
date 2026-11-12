@@ -791,7 +791,7 @@ export class RiftDeathZoneVisuals {
     this.heatFx.handleEvent(event);
     this.heatBody.handleEvent(event);
     const heat = this.heatFight.handleEvent(event);
-    this.finalFx.handleEvent(event);
+    const finalBoss = this.finalFx.handleEvent(event);
     const finalKit = this.finalKit.handleEvent(event);
     const finalPhase = this.finalPhase.handleEvent(event);
     this.councilBodies.handleEvent(event);
@@ -808,6 +808,7 @@ export class RiftDeathZoneVisuals {
       breath ||
       quench ||
       heat ||
+      finalBoss ||
       finalKit ||
       finalPhase
     );

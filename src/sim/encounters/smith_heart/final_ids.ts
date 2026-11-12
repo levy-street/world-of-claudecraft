@@ -168,6 +168,14 @@ export const FINAL_CUES = {
   settle: 'heart_final_settle',
 } as const;
 
+/** Dev-only presentation triggers (spellfx 'nova' on the boss, emitted only
+ *  by a dev verb, never by the fight): the death's replay on a living body
+ *  (`/dev heart final death`; the renderer's FinalFx plays the death scene,
+ *  smith_heart_fx/final_death_core.ts, and claims the cue). */
+export const FINAL_DEV_CUES = {
+  deathReplay: 'heart_final_death_replay',
+} as const;
+
 /** The damage, aura and object names (combat log, floating text, the buff
  *  bar; re-localized by src/ui/sim_i18n.ts through the mechanic reverse map).
  *  The reused ones keep the guardians' keys. */
@@ -296,7 +304,7 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     anvilMissMin: 1500,
     anvilMissMax: 1600,
     anvilTotal: 6600,
-    },
+  },
   mythic: {
     damageMult: 1.3,
     healthMult: 2.1,

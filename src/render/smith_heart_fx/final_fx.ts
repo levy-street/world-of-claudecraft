@@ -19,9 +19,14 @@
 //    riding out over the whole Anvil on the trash engine's wave clock, a
 //    pulse a low ring of it (the bars themselves are the HUD's, the floor's
 //    light the room's);
-//  - the death: the heart (the Heart kit's crystal) rising out of its chest,
-//    flickering dark and sinking into its bed (the room goes dark with it:
-//    ../smith_heart/heart_final_core.ts).
+//  - the death (final_death_core.ts, painted by final_death_fx.ts): the
+//    body kneels and its essence tears free: the heart (the Heart kit's
+//    crystal) rips out of its chest and bursts into four comets that race
+//    to their altars and down the spiral grooves into the central well,
+//    plunging into the pit; the room goes dark with it
+//    (../smith_heart/heart_final_core.ts). A dev replay cue
+//    (FINAL_DEV_CUES.deathReplay, `/dev heart final death`) plays it on a
+//    living body.
 // Cosmetic layers thin on the low tier (particles) and under reduced
 // motion (the shake); the model, the scene and the timelines never do.
 //
@@ -31,14 +36,15 @@
 // hidden carrier); no light; fixed pools, no per-frame allocation.
 
 import * as THREE from 'three';
-import {
-  HEART_ROOM,
-  SMITH_HEART_VEIN_COLORS,
-  type SmithHeartVein,
-} from '../../sim/content/smith_heart_layout';
+import { SMITH_HEART_VEIN_COLORS, type SmithHeartVein } from '../../sim/content/smith_heart_layout';
 import { heartFinalPhase } from '../../sim/content/smith_heart_quarters';
 import { DUNGEONS, instanceOrigin, instanceSlotForZ } from '../../sim/data';
-import { FINAL_AURAS, FINAL_CUES, finalZoneOf } from '../../sim/encounters/smith_heart/final_ids';
+import {
+  FINAL_AURAS,
+  FINAL_CUES,
+  FINAL_DEV_CUES,
+  finalZoneOf,
+} from '../../sim/encounters/smith_heart/final_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { fxAnchor } from '../attached_fx_anchor';
@@ -57,7 +63,6 @@ import {
   SMITH_HEART_HEART_KIT_URL,
 } from '../smith_heart/heart_kit';
 import { noteHeartQuarterBoss } from '../smith_heart/heart_quarters_core';
-import { HEART_CORE_BED_Y } from '../smith_heart/heart_room_kit_plan_core';
 import { heartSealSlotKey, heartSealView, newHeartSealView } from '../smith_heart/heart_seal_core';
 import { radialGlowTexture } from '../textures';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
@@ -81,16 +86,26 @@ import {
 import { FINAL_BODY_HEIGHT, finalBodyPoint } from './final_body_core';
 import { FinalBodyFx } from './final_body_fx';
 import {
+  DEATH_END,
+  DEATH_TEAR,
+  DEATH_VEINS,
+  type DeathCrystalLook,
+  deathAltarLevel,
+  deathCrystal,
+  deathHoverPoint,
+  deathKneel,
+  deathSceneTime,
+  deathSkyFlare,
+} from './final_death_core';
+import { type FinalDeathFrame, FinalDeathFx } from './final_death_fx';
+import {
   COLOSSUS_FIST_IMPACT,
   COLOSSUS_FIST_SECONDS,
-  DEATH_END,
   FINAL_BODY_CASTS,
   FINAL_BOSS,
   FINAL_FX_COLORS,
   FORGE_FIST_CUE,
   finalBossKit,
-  heartDeathLevel,
-  heartSink,
   pourGather,
   wrathBlastLook,
   wrathGather,
@@ -249,7 +264,10 @@ export class FinalFx {
   private prevArrival = -1;
   private skipAt = -1;
   private skipFrom = 0;
-  private deadAt = -1;
+  /** When the body died on this clock (it may be negative: a corpse first
+   *  seen dead is dated long before), and whether it is dead at all. */
+  private deadAt = 0;
+  private deadKnown = false;
   private seenAlive = false;
   private castId: string | null = null;
   private castProgress = 0;
@@ -286,8 +304,42 @@ export class FinalFx {
   private readonly heartAt = { x: 0, y: 0, z: 0 };
   private readonly eyeAt = { x: 0, y: 0, z: 0 };
   private zone: ReturnType<typeof finalZoneOf> = 'ring';
+  /** The chest the crystal tears from (instance-local), held from the death. */
   private readonly diedHeart = new THREE.Vector3();
   private diedHeartSet = false;
+  /** The death: its painter, its clock (seconds into the scene, -1 none)
+   *  and last frame's, a dev replay's start, the frame handed over. */
+  private readonly death: FinalDeathFx;
+  private deathT = -1;
+  private prevDeath = -1;
+  private replayAt = -1;
+  private readonly crystal: DeathCrystalLook = {
+    shown: false,
+    lift: 0,
+    scale: 1,
+    spin: 0,
+    level: 1,
+    flare: 0,
+    halo: 0,
+  };
+  private readonly hover = { x: 0, y: 0, z: 0 };
+  private crystalSpin = 0;
+  private readonly deathFrame: FinalDeathFrame = {
+    t: -1,
+    prev: -1,
+    replay: false,
+    bossId: -1,
+    ox: 0,
+    oz: 0,
+    footX: 0,
+    footY: 0,
+    footZ: 0,
+    chestX: 0,
+    chestY: 0,
+    chestZ: 0,
+    facing: 0,
+    dt: 0,
+  };
 
   constructor(
     scene: THREE.Scene,
@@ -419,6 +471,11 @@ export class FinalFx {
     };
     this.bodyFx = new FinalBodyFx(this.root, host, playGesture);
     this.arrival = new FinalArrivalBeam(this.root, host);
+    this.death = new FinalDeathFx(this.root, {
+      ...host,
+      reducedMotion: () => this.reducedMotion(),
+      playGesture,
+    });
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})
       .catch(() => {});
@@ -480,9 +537,16 @@ export class FinalFx {
     f.sprite.visible = true;
   }
 
-  /** Never claims an event: the renderer's own draws still play under these. */
+  /** Claims only the dev replay cue (a presentation trigger with no draw of
+   *  its own); the fight's cues are never claimed, the renderer's own draws
+   *  still play under these. */
   handleEvent(ev: SimEvent): boolean {
     if (!this.world || this.disposed) return false;
+    if (ev.type === 'spellfx' && ev.ability === FINAL_DEV_CUES.deathReplay) {
+      const e = this.world.entities.get(ev.sourceId);
+      if (e && e.templateId === FINAL_BOSS && !e.dead) this.replayAt = this.clock;
+      return true;
+    }
     if (ev.type === 'damage') {
       if (ev.sourceId === this.bossId || ev.targetId === this.bossId) this.bossHitAt = this.clock;
       return false;
@@ -523,6 +587,7 @@ export class FinalFx {
       this.heartHalo.visible = false;
       if (this.slotKey) noteHeartArrivalLight(this.slotKey, null);
       this.arrival.hide();
+      this.death.hide();
       this.particles.update(this.clock);
       return;
     }
@@ -536,8 +601,10 @@ export class FinalFx {
       this.slotKey = heartSealSlotKey(o.x, o.z);
       this.prevArrival = -1;
       this.skipAt = -1;
-      this.deadAt = -1;
+      this.deadKnown = false;
       this.seenAlive = false;
+      this.replayAt = -1;
+      this.prevDeath = -1;
     }
     this.body.visible = true;
     this.body.position.set(o.x, 0, o.z);
@@ -545,16 +612,21 @@ export class FinalFx {
     heartSealView(this.slotKey, now, this.view);
     // The death: first seen already dead, the fall has long settled.
     if (boss.dead) {
-      if (this.deadAt < 0) {
+      if (!this.deadKnown) {
+        this.deadKnown = true;
         this.deadAt = this.seenAlive ? this.clock : this.clock - DEATH_END - 1;
-        if (this.clock - this.deadAt < 0.5) this.deathFlash();
+        this.replayAt = -1;
       }
     } else {
-      this.deadAt = -1;
+      this.deadKnown = false;
       this.seenAlive = true;
     }
-    const dead = this.deadAt >= 0;
-    noteHeartFinalDeath(this.slotKey, dead ? now - (this.clock - this.deadAt) : null);
+    const dead = this.deadKnown;
+    // The death's clock (a dev replay plays it on the living body).
+    this.deathT = deathSceneTime(this.clock, this.deadAt, this.replayAt, dead);
+    const replaying = !dead && this.deathT >= 0;
+    if (!dead && !replaying) this.replayAt = -1;
+    noteHeartFinalDeath(this.slotKey, this.deathT >= 0 ? now - this.deathT : null);
     // The arrival's clock: a heart asleep is -1. Engaged: online a mob's
     // in-combat bit is not mirrored, so a cast, a wound or a blow traded with
     // it counts too.
@@ -604,8 +676,14 @@ export class FinalFx {
     this.readCast(boss);
     const falseDeath = !dead && hidden?.stage === 'kneel';
     this.poseHeart(boss, t, dt, falseDeath);
-    // The room's altars and sky through the scene (the interior reads it).
-    if (!dead && t < ARRIVAL_END) {
+    // The room's altars and sky through the scene (the interior reads it):
+    // the death's while it plays, else the arrival's.
+    if (this.deathT >= 0 && this.deathT < DEATH_END) {
+      for (let i = 0; i < DEATH_VEINS.length; i++)
+        ARRIVAL_LIGHT.veins[DEATH_VEINS[i]] = deathAltarLevel(this.deathT, i);
+      ARRIVAL_LIGHT.flare = deathSkyFlare(this.deathT);
+      noteHeartArrivalLight(this.slotKey, ARRIVAL_LIGHT);
+    } else if (!dead && t < ARRIVAL_END) {
       for (let i = 0; i < ARRIVAL_VEINS.length; i++)
         ARRIVAL_LIGHT.veins[ARRIVAL_VEINS[i]] = arrivalAltarLevel(t, i);
       ARRIVAL_LIGHT.flare = arrivalSkyFlare(t);
@@ -629,6 +707,23 @@ export class FinalFx {
     fr.dt = dt;
     this.arrival.update(fr);
     this.prevArrival = t;
+    const df = this.deathFrame;
+    df.t = this.deathT;
+    df.prev = this.prevDeath;
+    df.replay = replaying;
+    df.bossId = boss.id;
+    df.ox = o.x;
+    df.oz = o.z;
+    df.footX = at.x;
+    df.footY = fr.footY;
+    df.footZ = at.z;
+    df.chestX = this.diedHeart.x;
+    df.chestY = this.diedHeart.y;
+    df.chestZ = this.diedHeart.z;
+    df.facing = boss.facing;
+    df.dt = dt;
+    this.death.update(df);
+    this.prevDeath = this.deathT;
     this.updateFlashes();
     this.updateTint(boss, dt);
     this.bodyFx.update({
@@ -636,9 +731,11 @@ export class FinalFx {
       zone: this.zone,
       whole: dead || t >= ARRIVAL_WAVE_AT,
       forming: arrivalForming(t, dead),
-      stance: arrivalStance(t, dead, falseDeath),
+      // A dev replay kneels the living body (its Kneel clip, the corpse's
+      // death clip too) and stands it back up at its end.
+      stance: arrivalStance(t, dead, falseDeath || replaying),
       dark: arrivalDark(t, dead),
-      dead,
+      dead: dead || replaying,
       clock: this.clock,
       dt,
     });
@@ -719,10 +816,12 @@ export class FinalFx {
   /** The heart in the model's chest (and its eyes) this frame, its halo, and
    *  the crystal rising out of the fallen body. */
   private poseHeart(boss: Entity, t: number, dt: number, falseDeath: boolean): void {
-    const dead = this.deadAt >= 0;
+    const dying = this.deathT >= 0;
+    const dead = this.deadKnown;
     // The false death (Mythic) sinks it to its knee; the rebirth lifts it.
+    // Dying (or a replay), it drops to its knee with its Kneel clip.
     const hv = heartCollapseView(this.slotKey);
-    const kneelTo = falseDeath ? 1 : 0;
+    const kneelTo = falseDeath ? 1 : dying ? deathKneel(this.deathT) : 0;
     const kneelRate = hv?.stage === 'rebirth' ? 0.2 : kneelTo === 1 ? 0.9 : 1.5;
     const kneelD = kneelTo - this.kneel;
     this.kneel += Math.sign(kneelD) * Math.min(Math.abs(kneelD), kneelRate * dt);
@@ -734,24 +833,25 @@ export class FinalFx {
     const ly = this.groundY(at.x, at.z);
     finalBodyPoint('heart', lx, ly, lz, boss.facing, height, this.heartAt);
     finalBodyPoint('head', lx, ly, lz, boss.facing, height, this.eyeAt);
-    // Dead: the heart starts from the chest it stood in as it fell.
-    if (!dead || !this.diedHeartSet) {
+    // Dying: the crystal tears from the chest it knelt with (held from the
+    // tear, so the comets leave from where it hung).
+    const held = dying && this.deathT >= DEATH_TEAR;
+    if (!held || !this.diedHeartSet) {
       this.diedHeart.set(this.heartAt.x, this.heartAt.y, this.heartAt.z);
-      this.diedHeartSet = dead;
+      this.diedHeartSet = held;
     }
     this.heartPos.copy(this.diedHeart);
     let heartLevel = 1;
     let flare = 0;
-    if (dead) {
-      const deathT = this.clock - this.deadAt;
-      heartLevel = heartDeathLevel(deathT);
-      const sink = heartSink(deathT);
-      const bed = HEART_CORE_BED_Y + 1;
-      this.heartPos.set(
-        this.heartPos.x + (HEART_ROOM.x - this.heartPos.x) * sink,
-        this.heartPos.y + (bed - this.heartPos.y) * sink - Math.min(1, deathT / 1.2) * 1.5,
-        this.heartPos.z + (HEART_ROOM.z - this.heartPos.z) * sink,
-      );
+    const cr = deathCrystal(this.deathT, this.crystal);
+    if (dying) {
+      // The struggle throbs in the chest; torn out, it climbs to its hover
+      // point spinning and blazing, then bursts (the painter's comets).
+      deathHoverPoint(this.diedHeart, this.hover);
+      this.heartPos.y += (this.hover.y - this.diedHeart.y) * cr.lift;
+      heartLevel = cr.level;
+      flare = cr.flare;
+      this.crystalSpin += cr.spin * dt;
     } else if (t < ARRIVAL_END) {
       const lv = arrivalHeartLevel(t);
       heartLevel = Math.min(1, lv);
@@ -777,17 +877,25 @@ export class FinalFx {
     this.heartMat.uniforms.uFlare.value = flare;
     if (this.heartMesh) {
       this.heartMesh.position.copy(this.heartPos);
-      _e.set(0, this.clock * 0.3, 0.1 * Math.sin(this.clock * 0.7));
+      _e.set(
+        0.25 * Math.sin(this.crystalSpin * 0.3),
+        this.clock * 0.3 + this.crystalSpin,
+        0.1 * Math.sin(this.clock * 0.7),
+      );
       this.heartMesh.quaternion.setFromEuler(_e);
-      this.heartMesh.scale.setScalar(1.5);
-      // The model's own gem is the heart while it stands; the crystal rises
+      this.heartMesh.scale.setScalar(cr.shown ? cr.scale : 1.5);
+      // The model's own gem is the heart while it stands; the crystal tears
       // out of its chest at its death.
-      this.heartMesh.visible = dead;
+      this.heartMesh.visible = cr.shown;
     }
     // The halo is in the root's frame (world); the body's group is offset.
     // Asleep it is all but out; the model's gem carries its own light.
-    const halo = (14 + flare * 16) * Math.max(0.15, heartLevel) * (dead ? 1 : 0.5);
-    this.heartHalo.visible = heartLevel > 0.05 || flare > 0;
+    // Dying, it is the struggle's throb and the torn crystal's blaze, gone
+    // with the burst (and on a husk long dead).
+    const halo = dying
+      ? cr.halo
+      : (14 + flare * 16) * Math.max(0.15, heartLevel) * (dead ? 1 : 0.5);
+    this.heartHalo.visible = dying ? cr.halo > 0 : heartLevel > 0.05 || flare > 0;
     this.heartHalo.position.set(
       this.originX + this.heartPos.x,
       this.heartPos.y,
@@ -810,16 +918,6 @@ export class FinalFx {
       f.sprite.scale.set(s, s, 1);
       (f.sprite.material as THREE.SpriteMaterial).opacity = f.peak * (1 - k) * (1 - k);
     }
-  }
-
-  // ---- the death ------------------------------------------------------------------------------
-
-  /** It falls: the heart's flash and a thud as it tears free of the chest. */
-  private deathFlash(): void {
-    const cx = this.originX + this.heartAt.x;
-    const cz = this.originZ + this.heartAt.z;
-    this.flash(cx, this.heartAt.y, cz, 30, 0.8, 0xffd8a0);
-    this.shakeNear(cx, cz, 0.6, 120);
   }
 
   // ---- the quarter it drinks --------------------------------------------------------------
@@ -934,6 +1032,7 @@ export class FinalFx {
     this.particles.dispose();
     this.bodyFx.dispose();
     this.arrival.dispose();
+    this.death.dispose();
     for (const g of this.geometries) g.dispose();
     for (const m of this.materials) m.dispose();
   }

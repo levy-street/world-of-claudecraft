@@ -42,7 +42,6 @@ import {
   type ArrivalBeamLook,
   arrivalBeam,
   arrivalStreamLevel,
-  arrivalStreamLift,
   arrivalStreamPath,
   arrivalStreamPointAt,
   arrivalVeinColor,
@@ -58,6 +57,7 @@ import {
   ARRIVAL_STREAM_VERT,
   ARRIVAL_SWIRL_FRAG,
 } from './final_arrival_glsl';
+import { buildGrooveRibbon, type GrooveRibbon, layGrooveRibbon } from './final_groove_ribbon';
 
 /** What the host lends: its particles, flashes, camera thud and dice. */
 export interface FinalArrivalHost {
@@ -115,9 +115,8 @@ export class FinalArrivalBeam {
   private readonly materials: THREE.Material[] = [];
   private readonly streams: THREE.Mesh;
   private readonly streamMat: THREE.ShaderMaterial;
-  private readonly streamPos: THREE.BufferAttribute;
-  /** Each stream vertex's height over the walk (the leap over the kerb). */
-  private readonly streamLift: Float32Array;
+  /** The streams' ribbon (final_groove_ribbon.ts). */
+  private readonly ribbon: GrooveRibbon;
   private readonly swirl: THREE.Mesh;
   private readonly swirlMat: THREE.ShaderMaterial;
   private readonly core: THREE.Mesh;
@@ -200,75 +199,17 @@ export class FinalArrivalBeam {
       return m;
     };
     // ---- the four streams: one draw, each a ribbon laid down its groove ----
-    // Two strips per vein: the ribbon flat in the groove, then a low veil of
-    // light standing on its centreline (`aRise` 0 at its foot, 1 at its top;
-    // the ribbon's -1), so a stream still reads from the terrace, where the
-    // floor is seen almost edge on.
-    const pts = PATHS[0].x.length;
-    const strip = ARRIVAL_VEINS.length * pts * 2;
-    const n = strip * 2;
-    const pos = new Float32Array(n * 3);
-    const along = new Float32Array(n);
-    const side = new Float32Array(n);
-    const vein = new Float32Array(n);
-    const rise = new Float32Array(n).fill(-1);
-    const index: number[] = [];
-    let length = 0;
-    const lift = new Float32Array(n);
-    ARRIVAL_VEINS.forEach((_, i) => {
-      const path = PATHS[i];
-      length = Math.max(length, path.length);
-      for (let s = 0; s < pts; s++) {
-        // Square to the run here (its neighbours' chord), in the plan.
-        const a0 = Math.max(0, s - 1);
-        const a1 = Math.min(pts - 1, s + 1);
-        const tx = path.x[a1] - path.x[a0];
-        const tz = path.z[a1] - path.z[a0];
-        const tl = Math.hypot(tx, tz) || 1;
-        const px = -tz / tl;
-        const pz = tx / tl;
-        const k = path.along[s] / path.length;
-        const half = STREAM_HALF + (STREAM_HALF_END - STREAM_HALF) * k * k;
-        for (let e = 0; e < 2; e++) {
-          const j = (i * pts + s) * 2 + e;
-          const sd = e === 0 ? -half : half;
-          // Instance-local (the mesh stands at the slot's origin).
-          pos[j * 3] = path.x[s] + px * sd;
-          pos[j * 3 + 1] = STREAM_LIFT;
-          lift[j] = STREAM_LIFT + arrivalStreamLift(path.r[s]);
-          pos[j * 3 + 2] = path.z[s] + pz * sd;
-          along[j] = k;
-          side[j] = sd;
-          vein[j] = i;
-        }
-        for (let e = 0; e < 2; e++) {
-          const j = strip + (i * pts + s) * 2 + e;
-          pos[j * 3] = path.x[s];
-          pos[j * 3 + 1] = STREAM_LIFT;
-          pos[j * 3 + 2] = path.z[s];
-          lift[j] = STREAM_LIFT + arrivalStreamLift(path.r[s]) + e * STREAM_VEIL;
-          along[j] = k;
-          side[j] = 0;
-          vein[j] = i;
-          rise[j] = e;
-        }
-        if (s < pts - 1) {
-          const a = (i * pts + s) * 2;
-          index.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
-          const b = strip + a;
-          index.push(b, b + 1, b + 2, b + 1, b + 3, b + 2);
-        }
-      }
+    // (final_groove_ribbon.ts: the ribbon flat in the groove and a low veil
+    // of light standing on its centreline, so a stream reads from the
+    // terrace).
+    this.ribbon = buildGrooveRibbon(PATHS, {
+      half: STREAM_HALF,
+      halfEnd: STREAM_HALF_END,
+      lift: STREAM_LIFT,
+      veil: STREAM_VEIL,
     });
-    this.streamLift = lift;
-    const streamGeo = new THREE.BufferGeometry();
-    this.streamPos = new THREE.BufferAttribute(pos, 3);
-    streamGeo.setAttribute('position', this.streamPos);
-    streamGeo.setAttribute('aAlong', new THREE.BufferAttribute(along, 1));
-    streamGeo.setAttribute('aSide', new THREE.BufferAttribute(side, 1));
-    streamGeo.setAttribute('aVein', new THREE.BufferAttribute(vein, 1));
-    streamGeo.setAttribute('aRise', new THREE.BufferAttribute(rise, 1));
-    streamGeo.setIndex(index);
+    const streamGeo = this.ribbon.geometry;
+    const length = this.ribbon.length;
     this.geometries.push(streamGeo);
     this.streamMat = additive(
       'smithHeartArrivalStreams',
@@ -394,11 +335,7 @@ export class FinalArrivalBeam {
     this.laidX = ox;
     this.laidZ = oz;
     this.streams.position.set(ox, 0, oz);
-    const a = this.streamPos.array as Float32Array;
-    for (let j = 0; j < a.length; j += 3)
-      a[j + 1] = this.host.groundY(ox + a[j], oz + a[j + 2]) + this.streamLift[j / 3];
-
-    this.streamPos.needsUpdate = true;
+    layGrooveRibbon(this.ribbon, ox, oz, (x, z) => this.host.groundY(x, z));
   }
 
   private paintStreams(f: FinalArrivalFrame): void {

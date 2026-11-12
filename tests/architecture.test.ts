@@ -1201,6 +1201,7 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart_fx/quench_blade_tip_core.ts',
   // The final boss's rebuild drawn into its own model.
   'src/render/smith_heart_fx/final_arrival_core.ts',
+  'src/render/smith_heart_fx/final_death_core.ts',
   'src/render/smith_heart_fx/quench_frost_fx_core.ts',
   // Living Rime's crust and ring on its carrier.
   'src/render/smith_heart_fx/quench_rime_core.ts',

@@ -40,6 +40,7 @@ import {
   FINAL_BODY_HEIGHT,
   FINAL_BODY_NODES,
 } from '../smith_heart_fx/final_body_core';
+import { DEATH_GESTURES, DEATH_HUSK_SHADE } from '../smith_heart_fx/final_death_core';
 import { FORGE_FIST_CUE } from '../smith_heart_fx/final_fx_core';
 import { ARC_CLEAVE_ABILITY } from '../smith_heart_fx/hammer_fx_core';
 import {
@@ -117,7 +118,10 @@ const BASE: ClipMap = {
   },
   attackTimeScaleByAbility: { [FORGE_FIST_CUE]: 1, [FINAL_BODY_GESTURES.shift]: 1 },
   hit: ['Hit'],
-  death: 'Death',
+  // Its death is its essence escaping (smith_heart_fx/final_death_core.ts):
+  // the body drops to one knee and stays there, a husk of stone, never
+  // sprawled (the Death clip's fall).
+  death: 'Kneel',
   cast: 'Pour',
   castByAbility: {
     [FINAL_CASTS.fist]: 'Wrath',
@@ -681,6 +685,20 @@ export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
           fall: 1.4,
           peak: 0,
           shade: 0.1,
+        },
+        // The death (final_death_core.ts): the cracks blazing as the four
+        // colours fight in the kneeling body, then the husk the essence
+        // leaves, its stone gone dark at once under the tear's flash
+        // (re-sent while it holds, as the dark pulse is: a re-send restarts
+        // the envelope, so it rises at once).
+        { gesture: DEATH_GESTURES.blaze, rise: 0.25, hold: 1.0, fall: 0.5, peak: 4 },
+        {
+          gesture: DEATH_GESTURES.husk,
+          rise: 0,
+          hold: 1.0,
+          fall: 1.4,
+          peak: 0,
+          shade: DEATH_HUSK_SHADE,
         },
       ],
       deathFade: 3,

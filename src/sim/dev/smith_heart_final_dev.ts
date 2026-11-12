@@ -25,6 +25,10 @@
 //   final last | enrage         the final phase (15 percent) / Masterless Fury
 //   final coal|toll|ring|pounce|circles|shear   a Splinter's signature now
 //                               (encounters/smith_heart/final_phase_dev.ts)
+//   final death                 replay the death scene on the living boss (its
+//                               essence escaping into the well; presentation
+//                               only: a cue the renderer plays, no kill, no
+//                               pull, no loot)
 
 import { SMITH_HEART_DUNGEON, SMITH_HEART_FINAL_BOSS } from '../content/smith_heart';
 import {
@@ -42,6 +46,7 @@ import {
   resetFinalForDev,
   setFinalDevTier,
 } from '../encounters/smith_heart';
+import { FINAL_DEV_CUES } from '../encounters/smith_heart/final_ids';
 import type { InstanceSlot } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
@@ -112,6 +117,17 @@ export function smithHeartFinalDevTrigger(
   }
   const boss = smithHeartFinalBoss(ctx, inst);
   if (!boss) return 'The Masterless Strength has fallen in this run (/dev heart reset).';
+  if (verb === 'death') {
+    ctx.emit({
+      type: 'spellfx',
+      sourceId: boss.id,
+      targetId: boss.id,
+      school: 'arcane',
+      fx: 'nova',
+      ability: FINAL_DEV_CUES.deathReplay,
+    });
+    return 'The Masterless Strength plays its death (presentation only: it still stands).';
+  }
   const me = ctx.entities.get(pid);
   if (verb === 'pull') {
     if (me) displacePlayerForDev(ctx, me, boss.pos.x + 6, boss.pos.z - 6);

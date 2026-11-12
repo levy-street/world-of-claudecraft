@@ -4,7 +4,8 @@
 // arrival scene itself is tests/smith_heart_final_arrival.test.ts):
 //   - the boss's numbers read, never tuned;
 //   - the arm's reach keeps its bones' lengths (the Hammer Council's bodies);
-//   - the heart goes dark after the fall; the room's memory follows it;
+//   - the room's memory goes dark after the fall (the death scene itself is
+//     tests/smith_heart_final_death.test.ts);
 //   - the seal memory reads the arrival live when it is seen waking and long
 //     past when first seen awake (a late arrival sees the body whole);
 //   - FinalFx over a fake world slams the floor when a gathering bar lands,
@@ -29,12 +30,10 @@ import { FinalFx } from '../src/render/smith_heart_fx';
 import { ARRIVAL_END } from '../src/render/smith_heart_fx/final_arrival_core';
 import {
   colossusArmIk,
-  DEATH_END,
   FINAL_BODY_CASTS,
   FINAL_BOSS,
   FORGE_FIST_CUE,
   finalBossKit,
-  heartDeathLevel,
 } from '../src/render/smith_heart_fx/final_fx_core';
 import { SMITH_HEART_MOBS } from '../src/sim/content/smith_heart';
 import { HEART_ROOM, SMITH_HEART_VEIN_COLORS } from '../src/sim/content/smith_heart_layout';
@@ -85,11 +84,6 @@ describe("the Masterless Strength's body", () => {
         expect(Math.hypot(ik.wrist.x - w.x, ik.wrist.y - w.y, ik.wrist.z - w.z)).toBeLessThan(1e-6);
       }
     }
-  });
-
-  it('the heart goes dark after the fall', () => {
-    expect(heartDeathLevel(DEATH_END)).toBeCloseTo(0, 6);
-    expect(heartDeathLevel(0.1)).toBeGreaterThan(0.3);
   });
 });
 

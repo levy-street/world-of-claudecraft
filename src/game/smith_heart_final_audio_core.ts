@@ -31,7 +31,12 @@
 // borrows a guardian's mechanic). A WARNING swells with no hit; an IMPACT is
 // a hard transient.
 
-import { FINAL_AURAS, FINAL_CASTS, FINAL_CUES } from '../sim/encounters/smith_heart/final_ids';
+import {
+  FINAL_AURAS,
+  FINAL_CASTS,
+  FINAL_CUES,
+  FINAL_DEV_CUES,
+} from '../sim/encounters/smith_heart/final_ids';
 import {
   FINAL_PHASE_AURAS,
   FINAL_PHASE_CASTS,
@@ -139,6 +144,9 @@ export const FINAL_CUE_SOUNDS: Readonly<Record<string, readonly FinalSound[]>> =
 /** Is this event's ability one the fight's sound plays (the HUD's generic
  *  nova, beam or burst sound skipped for it)? */
 export function finalSoundClaims(ability: string | undefined): boolean {
+  // The death's dev replay cue is silent here: the death scene's own sounds
+  // play off its beats (render/smith_heart_fx/final_death_fx.ts).
+  if (ability === FINAL_DEV_CUES.deathReplay) return true;
   return ability !== undefined && Object.hasOwn(FINAL_CUE_SOUNDS, ability);
 }
 

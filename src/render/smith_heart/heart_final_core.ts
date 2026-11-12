@@ -9,6 +9,8 @@
 //
 // Pure and Three-free (the clock is passed in, render seconds).
 
+import { DEATH_IMPACT } from '../smith_heart_fx/final_death_core';
+
 const memory = new Map<string, number>();
 
 /** The final boss of slot `key` fell at render time `since` (or lives:
@@ -18,9 +20,11 @@ export function noteHeartFinalDeath(key: string, since: number | null): void {
   else memory.set(key, since);
 }
 
-/** When the heart starts going dark after the fall, and how long it takes
- *  (the body's own fall, final_fx_core.ts DEATH). */
-export const HEART_FINAL_DARK = { at: 2.0, seconds: 1.6 } as const;
+/** When the heart starts going dark after the fall, and how long it takes:
+ *  from the moment the boss's essence plunges into the well (the death
+ *  scene's impact, ../smith_heart_fx/final_death_core.ts), as its burning
+ *  grooves cool to embers. */
+export const HEART_FINAL_DARK = { at: DEATH_IMPACT, seconds: 2.4 } as const;
 
 /** How dark the slot's heart is at `now` (0 burning, 1 dark). */
 export function heartFinalDarkness(key: string, now: number): number {

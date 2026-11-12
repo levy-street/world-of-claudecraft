@@ -4,8 +4,8 @@
 // heart in its chest; its arrival is final_arrival_core.ts. Here: the sim's
 // numbers read (Forge Fist's arc and reach, the Overload Burst's reach, the
 // bars' casts), never changed; the gathering bars and the Overload Burst; the
-// death's heart going dark and sinking into its bed; the two-bone reach the
-// Hammer Council's bodies borrow.
+// two-bone reach the Hammer Council's bodies borrow. Its death is
+// final_death_core.ts.
 //
 // Three-free, DOM-free, deterministic.
 
@@ -64,7 +64,6 @@ const smooth = (v: number) => {
   const c = clamp01(v);
   return c * c * (3 - 2 * c);
 };
-const easeOut = (v: number) => 1 - (1 - clamp01(v)) ** 3;
 
 export interface V3 {
   x: number;
@@ -124,37 +123,6 @@ export function colossusArmIk(
  *  this far into it (the model's Slam clip: the effects' own beat). */
 export const COLOSSUS_FIST_SECONDS = 1.5;
 export const COLOSSUS_FIST_IMPACT = 0.34;
-
-// ---- the death ------------------------------------------------------------------------------
-
-/** The death's timeline (seconds after the body died): the heart flickers
- *  and the veins go out of it as the model falls (its Death clip), then the
- *  dark heart rises out of its chest and sinks into its bed. */
-export const DEATH = {
-  darkAt: 2.0,
-  darkSeconds: 1.6,
-  heartSinkAt: 3.2,
-  heartSinkSeconds: 4.5,
-} as const;
-
-/** The heart's light after the death: 1 burning, toward 0 dark. */
-export function heartDeathLevel(t: number): number {
-  if (t < DEATH.darkAt) {
-    // Flickering as the veins go out.
-    const f = 0.7 + 0.3 * Math.sin(t * 31) * Math.sin(t * 7.3);
-    return f * (1 - 0.3 * smooth(t / DEATH.darkAt));
-  }
-  return 0.7 * (1 - easeOut((t - DEATH.darkAt) / DEATH.darkSeconds));
-}
-
-/** How far the dark heart has sunk back toward its bed (0 to 1). */
-export function heartSink(t: number): number {
-  return smooth((t - DEATH.heartSinkAt) / DEATH.heartSinkSeconds);
-}
-
-/** The fall settles after this long (a later sight of the dead body shows
- *  the room as it ends: rubble, the heart dark in its bed). */
-export const DEATH_END = DEATH.heartSinkAt + DEATH.heartSinkSeconds + 0.5;
 
 // ---- the gathering bars and the Overload Burst ---------------------------------------------
 
