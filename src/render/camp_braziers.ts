@@ -21,13 +21,14 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { resolvePosition } from '../sim/colliders';
 import { STUDIO_REWORK_CAMPS } from '../sim/content/studio_rework_camps';
-import { CAMPS, getActiveWorldContent, MOBS, zoneAt } from '../sim/data';
+import { getActiveWorldContent, MOBS, zoneAt } from '../sim/data';
 import { usesOverworldSiteDressing } from '../sim/map_presentation';
 import { propPlacementRoll } from '../sim/prop_layout';
 import { roadDistance, terrainHeight, WATER_LEVEL } from '../sim/world';
 import {
   type BrazierSite,
   type CampFireKind,
+  campsMatching,
   liveCampFireSites,
   planCampBrazierSites,
 } from './camp_brazier_placement_core';
@@ -179,10 +180,14 @@ export function buildFirePitFlameGeometry(): THREE.BufferGeometry {
  * ring-slide and kind-split rules live and are tested) against the real world
  * content and the sim's own probes.
  */
+const SKIP_OVERFLOW_CAMPS = campsMatching(STUDIO_REWORK_CAMPS);
+
 export function planCampBraziers(seed = 0): BrazierSite[] {
   const content = getActiveWorldContent();
   return planCampBrazierSites(
-    liveCampFireSites(CAMPS, new Set(STUDIO_REWORK_CAMPS)),
+    // the active world's camps (a custom or linked map edits them), less the
+    // rework's overflow camps, matched by value since map content clones them
+    liveCampFireSites(content.camps, SKIP_OVERFLOW_CAMPS),
     content.props.campfires,
     (mobId) => MOBS[mobId]?.family,
     {

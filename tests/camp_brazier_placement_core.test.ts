@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   type BrazierProbes,
+  campsMatching,
   FALLBACK_RINGS,
   liveCampFireSites,
   planCampBrazierSites,
@@ -165,7 +166,11 @@ describe('liveCampFireSites', () => {
   });
   it('lights nothing for a fully retired camp or a skipped overflow camp', () => {
     expect(liveCampFireSites([{ ...base, retiredSlots: 1 }])).toEqual([]);
-    const overflow = { ...base, offStream: true };
-    expect(liveCampFireSites([base, overflow], new Set([overflow]))).toHaveLength(1);
+    const overflow = { ...base, center: { x: -40, z: 760 }, offStream: true };
+    const skip = campsMatching([overflow]);
+    expect(liveCampFireSites([base, overflow], skip)).toHaveLength(1);
+    // matched by mob and centre, so a deep-cloned copy (map content) still skips
+    expect(liveCampFireSites([base, structuredClone(overflow)], skip)).toHaveLength(1);
+    expect(liveCampFireSites([{ ...overflow, center: { x: 0, z: 0 } }], skip)).toHaveLength(1);
   });
 });
