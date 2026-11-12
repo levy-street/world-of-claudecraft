@@ -27,6 +27,7 @@ const info = (over: Partial<SkillEventInfo>): SkillEventInfo => ({
   canJoin: false,
   participants: 2,
   yourKills: 0,
+  score: null,
   hearts: 4,
   maxHearts: 4,
   kit: null,

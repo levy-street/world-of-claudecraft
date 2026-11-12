@@ -33,8 +33,18 @@ import {
   RIPOSTE_SIDESTEP_DISTANCE,
   RIPOSTE_STAGGER,
 } from '../../../sim/pvp/skill_event_riposte';
+import {
+  TONGUES_CHANT,
+  TONGUES_CIRCLE,
+  TONGUES_RITES_TO_WIN,
+  TONGUES_SEVER_COOLDOWN,
+  TONGUES_SEVER_WINDUP,
+  TONGUES_SHOVE_COOLDOWN,
+  TONGUES_SHOVE_DISTANCE,
+  TONGUES_SILENCE,
+} from '../../../sim/pvp/skill_event_tongues';
 import { esc } from '../../esc';
-import { t } from '../../i18n';
+import { formatNumber, t } from '../../i18n';
 import type { TranslationKey } from '../../i18n.catalog';
 import { iconDataUrl } from '../../icons';
 import type { PainterHostWriters } from '../../painter_host';
@@ -60,6 +70,9 @@ const STANCE_KEYS: Readonly<Record<string, TranslationKey>> = {
   lunge: 'hud.skillEvent.stance.lunge',
   guard: 'hud.skillEvent.stance.guard',
   open: 'hud.skillEvent.stance.open',
+  chant: 'hud.skillEvent.stance.chant',
+  sever: 'hud.skillEvent.stance.sever',
+  silenced: 'hud.skillEvent.stance.silenced',
 };
 
 const GOAL_KEYS: Readonly<Record<string, TranslationKey>> = {
@@ -88,6 +101,14 @@ const SKILL_EVENT_TIP_VALUES = {
   hushCd: FOOTPRINTS_HUSH_COOLDOWN,
   pebble: FOOTPRINTS_PEBBLE_LENGTH,
   pebbleCd: FOOTPRINTS_PEBBLE_COOLDOWN,
+  chant: TONGUES_CHANT,
+  circle: TONGUES_CIRCLE,
+  goal: TONGUES_RITES_TO_WIN,
+  severWindup: TONGUES_SEVER_WINDUP,
+  severCd: TONGUES_SEVER_COOLDOWN,
+  silence: TONGUES_SILENCE,
+  shove: TONGUES_SHOVE_DISTANCE,
+  shoveCd: TONGUES_SHOVE_COOLDOWN,
 };
 
 const MAX_CHOICES = 12;
@@ -220,9 +241,21 @@ export class SkillEventActionBarController {
             ? t(this.world.player.eventUnseen ? 'hud.skillEvent.unseen' : 'hud.skillEvent.seen')
             : t('hud.skillEvent.ready'),
     );
+    // A scoring event's tally rides the goal line (Rite of Tongues: Rites done).
+    const score = info.score;
+    this.writers.toggleClass(this.root, 'has-score', !!score);
     this.writers.toggleClass(this.root, 'is-open', stance === 'open');
     this.writers.toggleClass(this.root, 'is-warning', info.phase === 'warning');
-    this.writers.setText(this.hint, t(GOAL_KEYS[info.kind]));
+    this.writers.setText(
+      this.hint,
+      score
+        ? t('hud.skillEvent.score', {
+            count: formatNumber(score.yours),
+            goal: formatNumber(score.toWin),
+            best: formatNumber(score.best),
+          })
+        : t(GOAL_KEYS[info.kind]),
+    );
     const keepsakeCd = kit.keepsake ? (this.world.player.cooldowns.get(kit.keepsake) ?? 0) : 0;
     this.painter.paint(this.view.tick(info, keepsakeCd, (slot) => this.keyLabel(slot)));
     for (let i = 0; i < this.slotButtons.length; i++) {

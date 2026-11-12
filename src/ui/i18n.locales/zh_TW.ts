@@ -6604,6 +6604,22 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '向前方投出一條{pebble}碼長的假腳印，看起來像有人剛剛走開。冷卻時間{pebbleCd}秒。',
   'hud.skillEvent.unseen': '隱形中',
   'hud.skillEvent.seen': '所有人可見',
+  'hud.skillEvent.verbs.rite': '儀式',
+  'hud.skillEvent.verbs.sever': '截斷',
+  'hud.skillEvent.verbs.false_start': '虛詠',
+  'hud.skillEvent.verbs.shove': '推搡',
+  'hud.skillEvent.verbTips.rite':
+    '站定詠唱{chant}秒。完成得1分。被推動、昏迷、定身或沉默都會打斷。圈內需有其他戰鬥者。',
+  'hud.skillEvent.verbTips.sever':
+    '打斷你的目標，或前方最近的戰鬥者。蓄力{severWindup}秒後生效：若對方仍在詠唱，則沉默{silence}秒；否則沉默的是你。冷卻時間{severCd}秒。',
+  'hud.skillEvent.verbTips.false_start':
+    '立即放棄自己的詠唱，沒有代價。此時針對你的截斷會讓施放者沉默。',
+  'hud.skillEvent.verbTips.shove':
+    '把觸及範圍內的戰鬥者推開{shove}碼，打斷其詠唱。冷卻時間{shoveCd}秒。',
+  'hud.skillEvent.stance.chant': '詠唱中',
+  'hud.skillEvent.stance.sever': '截斷中',
+  'hud.skillEvent.stance.silenced': '沉默',
+  'hud.skillEvent.score': '儀式：{count}/{goal}。最高：{best}。',
   'hud.skillEvent.ready': '就緒',
   'hud.skillEvent.startsIn': '{minutes} 分鐘後開始',
   'hud.skillEvent.keepsake': '保留技能',

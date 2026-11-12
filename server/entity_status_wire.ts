@@ -17,6 +17,7 @@ export function writeEntityStatusWire(e: Entity, out: Record<string, unknown>): 
   // Skill event hearts (src/sim/pvp/skill_events.ts): sent every tick while set,
   // so the overhead row and your own heart bar never lag a hit.
   if (e.eventHearts !== undefined) out.hrt = e.eventHearts;
-  if (e.eventStance !== undefined) out.stc = e.eventStance; // Riposte tell
+  if (e.eventStance !== undefined) out.stc = e.eventStance; // Riposte / Rite of Tongues tell
+  if (e.eventStanceFill !== undefined) out.stf = e.eventStanceFill; // the tell's bar fill
   if (e.eventUnseen) out.uns = 1; // Footprints in Ash: your own client only ever sees it
 }

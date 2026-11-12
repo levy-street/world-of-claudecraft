@@ -85,6 +85,21 @@ export interface SkillEventKitState {
   /** Event-specific state, owned by the event's rule module. */
   riposte?: RiposteKitState;
   footprints?: FootprintsKitState;
+  tongues?: TonguesKitState;
+}
+
+export interface TonguesKitState {
+  /** A Rite in progress: when it began and where the chanter stood. */
+  chantFrom: number | null;
+  chantX: number;
+  chantZ: number;
+  /** A Sever winding up: when it lands, and on whom. */
+  severAt: number | null;
+  severTarget: number | null;
+  /** Silenced by a Sever (no Rite, no Sever) until this time. */
+  silencedUntil: number;
+  /** Rites completed and still standing (leaving the circle wipes them). */
+  rites: number;
 }
 
 export interface RiposteKitState {

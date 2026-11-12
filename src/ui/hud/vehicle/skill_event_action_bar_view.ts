@@ -21,6 +21,10 @@ export const SKILL_EVENT_VERB_ICONS: Readonly<Record<string, string>> = {
   sweep: 'whirlwind',
   hush: 'prowl',
   pebble: 'sap',
+  rite: 'holy_light',
+  sever: 'counterspell',
+  false_start: 'arcane_missiles',
+  shove: 'thunder_clap',
 };
 
 /** Each verb's name and its tooltip, as explicit keys (the i18n scanner reads them). */
@@ -32,6 +36,10 @@ export const SKILL_EVENT_VERB_LABELS: Readonly<Record<string, TranslationKey>> =
   sweep: 'hud.skillEvent.verbs.sweep',
   hush: 'hud.skillEvent.verbs.hush',
   pebble: 'hud.skillEvent.verbs.pebble',
+  rite: 'hud.skillEvent.verbs.rite',
+  sever: 'hud.skillEvent.verbs.sever',
+  false_start: 'hud.skillEvent.verbs.false_start',
+  shove: 'hud.skillEvent.verbs.shove',
 };
 export const SKILL_EVENT_VERB_TIPS: Readonly<Record<string, TranslationKey>> = {
   lunge: 'hud.skillEvent.verbTips.lunge',
@@ -41,6 +49,10 @@ export const SKILL_EVENT_VERB_TIPS: Readonly<Record<string, TranslationKey>> = {
   sweep: 'hud.skillEvent.verbTips.sweep',
   hush: 'hud.skillEvent.verbTips.hush',
   pebble: 'hud.skillEvent.verbTips.pebble',
+  rite: 'hud.skillEvent.verbTips.rite',
+  sever: 'hud.skillEvent.verbTips.sever',
+  false_start: 'hud.skillEvent.verbTips.false_start',
+  shove: 'hud.skillEvent.verbTips.shove',
 };
 
 /** Most slots any kit shows: four verbs and the keepsake. */

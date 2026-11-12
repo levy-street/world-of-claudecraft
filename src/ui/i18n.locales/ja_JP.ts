@@ -5194,6 +5194,22 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '前方へ{pebble}ヤードの偽の足跡を投げる。誰かが歩き去ったばかりのように見える。再使用まで{pebbleCd}秒。',
   'hud.skillEvent.unseen': '見えていない',
   'hud.skillEvent.seen': '全員に見えている',
+  'hud.skillEvent.verbs.rite': '詠唱',
+  'hud.skillEvent.verbs.sever': '断ち切り',
+  'hud.skillEvent.verbs.false_start': '空詠唱',
+  'hud.skillEvent.verbs.shove': '突き飛ばし',
+  'hud.skillEvent.verbTips.rite':
+    'その場で{chant}秒詠唱する。完了すると1点。動かされる、スタン、移動不能、沈黙で中断される。円の中に他の参加者が必要。',
+  'hud.skillEvent.verbTips.sever':
+    'ターゲット、またはいなければ前方で最も近い参加者を妨害する。{severWindup}秒ためてから発動し、相手がまだ詠唱中なら{silence}秒間沈黙させる。そうでなければ自分が沈黙する。再使用まで{severCd}秒。',
+  'hud.skillEvent.verbTips.false_start':
+    '自分の詠唱を即座に、代償なしでやめる。自分を狙った断ち切りは、使った側を沈黙させる。',
+  'hud.skillEvent.verbTips.shove':
+    '届く範囲の参加者を{shove}ヤード突き飛ばし、詠唱を中断させる。再使用まで{shoveCd}秒。',
+  'hud.skillEvent.stance.chant': '詠唱中',
+  'hud.skillEvent.stance.sever': '断ち切り中',
+  'hud.skillEvent.stance.silenced': '沈黙',
+  'hud.skillEvent.score': '詠唱：{goal}回中{count}回。最多：{best}。',
   'hud.skillEvent.ready': '準備完了',
   'hud.skillEvent.startsIn': '{minutes}分後に開始',
   'hud.skillEvent.keepsake': '持ち込み技',

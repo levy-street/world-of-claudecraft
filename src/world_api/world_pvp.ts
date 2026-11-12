@@ -159,6 +159,9 @@ export interface SkillEventInfo {
   canJoin: boolean;
   participants: number;
   yourKills: number;
+  /** A scoring event's tally (Rite of Tongues: Rites completed): yours, the
+   *  best anyone has, and the count that wins. Null for the other events. */
+  score: { yours: number; best: number; toWin: number } | null;
   /** Your hearts left while you fight a heart event (Riposte, Footprints in
    *  Ash, Bankshot): the HUD shows them in place of the health bar. Null when
    *  you are not on hearts. */

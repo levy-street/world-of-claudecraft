@@ -445,6 +445,10 @@ const hudStringsEn = {
         sweep: 'Sweep',
         hush: 'Hush',
         pebble: 'Pebble',
+        rite: 'Rite',
+        sever: 'Sever',
+        false_start: 'False Start',
+        shove: 'Shove',
       },
       verbTips: {
         lunge:
@@ -458,16 +462,28 @@ const hudStringsEn = {
         hush: 'Walk without leaving footprints for {hush} sec. {hushCd} sec cooldown.',
         pebble:
           'Throw a {pebble} yd line of false footprints ahead of you, laid as if someone had just walked away. {pebbleCd} sec cooldown.',
+        rite: 'Chant for {chant} sec, standing still. Finishing scores 1. Being moved, stunned, rooted or silenced breaks it. Needs another fighter in the circle.',
+        sever:
+          'Interrupt your target, or the nearest fighter in front of you. It winds up for {severWindup} sec, then lands: if they are still chanting, they are silenced for {silence} sec. If not, you are. {severCd} sec cooldown.',
+        false_start:
+          'Drop your own chant at once, at no cost. A Sever aimed at you then silences its caster.',
+        shove:
+          'Push a fighter within reach {shove} yd away from you, breaking their chant. {shoveCd} sec cooldown.',
       },
       stance: {
         lunge: 'Winding up',
         guard: 'Guarding',
         open: 'Open',
+        chant: 'Chanting',
+        sever: 'Severing',
+        silenced: 'Silenced',
       },
       ready: 'Ready',
       // Footprints in Ash: whether the other fighters can see you right now.
       unseen: 'Unseen',
       seen: 'Seen by everyone',
+      // Rite of Tongues: your completed Rites, the goal, and the leader's count.
+      score: 'Rites: {count} of {goal}. Best: {best}.',
       startsIn: 'Starts in {minutes} min',
       keepsake: 'Kept ability',
       keepsakeTip: 'Your kept ability: {name}. The only class ability you can use here.',

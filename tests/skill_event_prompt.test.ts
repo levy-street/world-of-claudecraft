@@ -26,6 +26,7 @@ function info(canJoin: boolean): SkillEventInfo {
     canJoin,
     participants: 0,
     yourKills: 0,
+    score: null,
     hearts: null,
     maxHearts: 4,
     kit: null,

@@ -5152,6 +5152,22 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '앞쪽으로 {pebble}미터 길이의 가짜 발자국을 던집니다. 누군가 방금 걸어간 것처럼 보입니다. 재사용 대기시간 {pebbleCd}초.',
   'hud.skillEvent.unseen': '보이지 않음',
   'hud.skillEvent.seen': '모두에게 보임',
+  'hud.skillEvent.verbs.rite': '의식',
+  'hud.skillEvent.verbs.sever': '끊기',
+  'hud.skillEvent.verbs.false_start': '헛영창',
+  'hud.skillEvent.verbs.shove': '밀치기',
+  'hud.skillEvent.verbTips.rite':
+    '제자리에서 {chant}초 동안 영창합니다. 끝내면 1점. 밀려나거나 기절, 이동 불가, 침묵에 걸리면 끊깁니다. 원 안에 다른 참가자가 있어야 합니다.',
+  'hud.skillEvent.verbTips.sever':
+    '대상, 없으면 앞쪽의 가장 가까운 참가자를 방해합니다. {severWindup}초 준비 후 적중하며, 상대가 아직 영창 중이면 {silence}초 동안 침묵시킵니다. 아니면 자신이 침묵합니다. 재사용 대기시간 {severCd}초.',
+  'hud.skillEvent.verbTips.false_start':
+    '자신의 영창을 즉시, 대가 없이 멈춥니다. 자신을 노린 끊기는 시전자를 침묵시킵니다.',
+  'hud.skillEvent.verbTips.shove':
+    '닿는 거리의 참가자를 {shove}미터 밀쳐 영창을 끊습니다. 재사용 대기시간 {shoveCd}초.',
+  'hud.skillEvent.stance.chant': '영창 중',
+  'hud.skillEvent.stance.sever': '끊는 중',
+  'hud.skillEvent.stance.silenced': '침묵',
+  'hud.skillEvent.score': '의식: {goal}회 중 {count}회. 최고: {best}.',
   'hud.skillEvent.ready': '준비 완료',
   'hud.skillEvent.startsIn': '{minutes}분 후 시작',
   'hud.skillEvent.keepsake': '남긴 기술',

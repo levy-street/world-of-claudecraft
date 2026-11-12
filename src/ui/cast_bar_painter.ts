@@ -110,7 +110,7 @@ export class CastBarPainter {
         input.cast.channel ? 'channel' : 'cast',
         input.cast.fill,
         this.opts.resolveCastLabel(input.cast),
-        input.castRemaining,
+        input.cast.untimed ? null : input.castRemaining,
       );
     } else if (input.mountSummon?.visible) {
       // PLAYER-ONLY: mount summon channel uses the channel styling (draining bar).
@@ -146,14 +146,20 @@ export class CastBarPainter {
 
   // Show the bar with a fill/label/timer. State classes are written before the
   // progress and text values so every painter instance follows the same order.
-  private paintBar(style: CastBarStyle, fill: number, label: string, remaining: number): void {
+  /** `remaining` null: an untimed bar (a skill event tell), no timer text. */
+  private paintBar(
+    style: CastBarStyle,
+    fill: number,
+    label: string,
+    remaining: number | null,
+  ): void {
     this.writers.setDisplay(this.el.bar, this.opts.shownDisplay ?? SHOWN_DISPLAY);
     this.writers.toggleClass(this.el.bar, CHANNEL_CLASS, style !== 'cast');
     this.writers.toggleClass(this.el.bar, UI_CHANNEL_CLASS, style === 'channel');
     this.writers.toggleClass(this.el.bar, UI_CONSUME_CLASS, style === 'consume');
     this.writers.setWidth(this.el.fill, `${(fill * 100).toFixed(PERCENT_FRACTION_DIGITS)}%`);
     this.writers.setText(this.el.label, label);
-    this.writers.setText(this.el.timer, this.timerText(remaining));
+    this.writers.setText(this.el.timer, remaining === null ? '' : this.timerText(remaining));
     // Report the progress value: the bar is role="progressbar" with static
     // aria-valuemin/max but never exposed a value. Numeric, so no i18n key and no
     // hardcoded literal; routes through the elided setAttr so an unchanged percent does not write.

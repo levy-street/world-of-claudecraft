@@ -8270,7 +8270,11 @@ export interface Entity extends ClientMirroredEntityFields {
   /** Riposte stance (src/sim/pvp/skill_event_riposte.ts): a lunge winding up, a
    *  raised guard, or open after a riposte or an overheld guard. Rides the entity
    *  wire (`stc`) every tick so every fencer sees the tell; absent otherwise. */
-  eventStance?: 'lunge' | 'guard' | 'open';
+  eventStance?: 'lunge' | 'guard' | 'open' | 'chant' | 'sever' | 'silenced';
+  /** How far the stance's bar is filled (0 to 1): a Rite of Tongues chant or
+   *  Sever wind-up in progress. Rides the entity wire (`stf`) beside `stc`;
+   *  absent for a stance shown as a full bar. */
+  eventStanceFill?: number;
   /** Footprints in Ash (src/sim/pvp/skill_event_footprints.ts): hidden from
    *  every other viewer (the server stops sending the entity; offline the
    *  renderer hides it). Rides the entity wire (`uns`) so your own client can

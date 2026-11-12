@@ -53,6 +53,7 @@ import {
   skillEventSitesAvoiding,
   withinSkillEventPrompt,
 } from './skill_event_rules';
+import { TONGUES_RULES } from './skill_event_tongues';
 import { isWorldPvpFlagged, setWorldPvpFlag } from './world_pvp';
 
 export type SkillEventPhase = 'warning' | 'running';
@@ -120,6 +121,18 @@ export interface SkillEventRuleSet {
   /** The live fighting ground's radius when it is not the arena's (a closing
    *  field). */
   fieldRadius?(ev: ActiveSkillEvent, now: number): number;
+  /** No damage between fighters at all (Rite of Tongues). */
+  noDamage?: boolean;
+  /** A fighter's tell, mirrored onto their entity every tick for every client. */
+  stanceOf?(ctx: SimContext, ev: ActiveSkillEvent, pid: number): SkillEventStance | undefined;
+  /** A scoring event's tally for one viewer. */
+  scoreFor?(ev: ActiveSkillEvent, pid: number): { yours: number; best: number; toWin: number };
+}
+
+/** A fighter's visible tell: the stance, and how far its bar is filled. */
+export interface SkillEventStance {
+  stance: NonNullable<Entity['eventStance']>;
+  fill?: number;
 }
 
 /** The rule set of a kind, or undefined for the baseline. A function, not a
@@ -131,6 +144,8 @@ export function skillEventRules(kind: SkillEventKind): SkillEventRuleSet | undef
       return RIPOSTE_RULES;
     case 'footprints':
       return FOOTPRINTS_RULES;
+    case 'tongues':
+      return TONGUES_RULES;
     default:
       return undefined;
   }
@@ -263,11 +278,13 @@ export function setHearts(
 
 /** The event is over: everyone goes back to their health bar. */
 function clearHearts(ctx: SimContext, ev: ActiveSkillEvent): void {
-  for (const pid of ev.hearts.keys()) {
+  // Every fighter: a no-heart event (Rite of Tongues) still leaves stance tells.
+  for (const pid of new Set([...ev.hearts.keys(), ...ev.participants])) {
     const e = ctx.entities.get(pid);
     if (e) {
       delete e.eventHearts;
       delete e.eventStance;
+      delete e.eventStanceFill;
       delete e.eventUnseen;
     }
   }
@@ -456,12 +473,25 @@ export function skillEventInfoFor(
     canJoin: near && !joined && !!meta && !isWorldPvpFlagged(meta),
     participants: ev.participants.length,
     yourKills: ev.kills.get(pid) ?? 0,
+    score: joined ? (skillEventRules(ev.kind)?.scoreFor?.(ev, pid) ?? null) : null,
     // Your hearts while you fight a heart event; null otherwise (the HUD then
     // shows the ordinary health bar).
     hearts: ev.hearts.get(pid) ?? null,
     maxHearts: SKILL_EVENT_HEARTS,
     kit: joined ? kitInfoFor(ctx, ev, pid) : null,
   };
+}
+
+/** A no-damage event (Rite of Tongues): nothing one fighter does hurts another
+ *  while it runs (a pet's hit is its owner's). */
+function skillEventBlocksDamage(ctx: SimContext, source: Entity | null, target: Entity): boolean {
+  if (target.kind !== 'player' || !source) return false;
+  const ev = ctx.skillEventState.active;
+  if (!ev || ev.phase !== 'running' || !skillEventRules(ev.kind)?.noDamage) return false;
+  const owner =
+    source.kind === 'mob' && source.ownerId !== null ? ctx.entities.get(source.ownerId) : source;
+  if (!owner || owner.kind !== 'player') return false;
+  return ev.participants.includes(target.id) && ev.participants.includes(owner.id);
 }
 
 /** The hit rule of the heart events, from the top of dealDamage (before any
@@ -478,6 +508,7 @@ export function skillEventTakeHeart(
   source: Entity | null,
   target: Entity,
 ): boolean {
+  if (skillEventBlocksDamage(ctx, source, target)) return true;
   if (target.eventHearts === undefined) return false;
   const ev = ctx.skillEventState.active;
   if (!ev || ev.phase !== 'running' || !ev.hearts.has(target.id)) {
@@ -532,24 +563,23 @@ export function skillEventTakeHeart(
   return true;
 }
 
-/** Mirror each fighter's Riposte stance onto their entity, so every client sees
- *  a wind-up, a raised guard or an open fencer through the per-tick wire. */
+/** Mirror each fighter's tell (a Riposte wind-up or guard, a Rite of Tongues
+ *  chant or Sever) onto their entity, so every client sees it through the
+ *  per-tick entity wire. */
 function syncStances(ctx: SimContext, ev: ActiveSkillEvent): void {
-  for (const [pid, kit] of ev.kits) {
+  const stanceOf = skillEventRules(ev.kind)?.stanceOf;
+  for (const pid of ev.kits.keys()) {
     const e = ctx.entities.get(pid);
     if (!e) continue;
-    const st = kit.riposte;
-    const stance: Entity['eventStance'] = !st
-      ? undefined
-      : st.lungeAt !== null
-        ? 'lunge'
-        : st.guardFrom !== null
-          ? 'guard'
-          : ctx.time < st.openUntil
-            ? 'open'
-            : undefined;
-    if (stance === undefined) delete e.eventStance;
-    else e.eventStance = stance;
+    const tell = stanceOf?.(ctx, ev, pid);
+    if (!tell) {
+      delete e.eventStance;
+      delete e.eventStanceFill;
+      continue;
+    }
+    e.eventStance = tell.stance;
+    if (tell.fill === undefined) delete e.eventStanceFill;
+    else e.eventStanceFill = Math.round(tell.fill * 100) / 100;
   }
 }
 

@@ -20,7 +20,7 @@ import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { kitFor, type RiposteKitState, verbReady } from './skill_event_kit';
 import { heartFighting, lastFighterStandingTick } from './skill_event_last_standing';
-import type { ActiveSkillEvent, SkillEventRuleSet } from './skill_events';
+import type { ActiveSkillEvent, SkillEventRuleSet, SkillEventStance } from './skill_events';
 
 export const RIPOSTE_LUNGE_WINDUP = 0.5;
 export const RIPOSTE_LUNGE_RANGE = 5;
@@ -168,7 +168,22 @@ function everyTick(ctx: SimContext, ev: ActiveSkillEvent): void {
   }
 }
 
+/** The fencer's tell: winding up, guarding, or open. */
+function stanceOf(
+  ctx: SimContext,
+  ev: ActiveSkillEvent,
+  pid: number,
+): SkillEventStance | undefined {
+  const st = ev.kits.get(pid)?.riposte;
+  if (!st) return undefined;
+  if (st.lungeAt !== null) return { stance: 'lunge' };
+  if (st.guardFrom !== null) return { stance: 'guard' };
+  if (ctx.time < st.openUntil) return { stance: 'open' };
+  return undefined;
+}
+
 export const RIPOSTE_RULES: SkillEventRuleSet = {
+  stanceOf,
   killsToWin: Number.POSITIVE_INFINITY,
   action,
   everyTick,

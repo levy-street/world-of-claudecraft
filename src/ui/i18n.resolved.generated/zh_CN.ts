@@ -15975,7 +15975,11 @@ export const zh_CN: EnTranslations = {
         "sidestep": "侧步",
         "sweep": "横扫",
         "hush": "噤声",
-        "pebble": "石子"
+        "pebble": "石子",
+        "rite": "仪式",
+        "sever": "截断",
+        "false_start": "虚咏",
+        "shove": "推搡"
       },
       "verbTips": {
         "lunge": "蓄力 {windup} 秒，然后刺向你前方 {range} 码内最近的对手。命中会夺走 1 颗红心。",
@@ -15984,16 +15988,24 @@ export const zh_CN: EnTranslations = {
         "sidestep": "向前冲刺 {distance} 码。冷却 {sidestepCd} 秒。",
         "sweep": "向前方短扇形范围内{sweepRange}码内最近的战斗者挥击。命中夺走1颗心，并让你们双方显形{reveal}秒。未命中则只有你显形。",
         "hush": "在{hush}秒内行走不留脚印。冷却时间{hushCd}秒。",
-        "pebble": "向前方投出一条{pebble}码长的假脚印，看起来像有人刚刚走开。冷却时间{pebbleCd}秒。"
+        "pebble": "向前方投出一条{pebble}码长的假脚印，看起来像有人刚刚走开。冷却时间{pebbleCd}秒。",
+        "rite": "站定咏唱{chant}秒。完成得1分。被推动、昏迷、定身或沉默都会打断。圈内需有其他战斗者。",
+        "sever": "打断你的目标，或前方最近的战斗者。蓄力{severWindup}秒后生效：若对方仍在咏唱，则沉默{silence}秒；否则沉默的是你。冷却时间{severCd}秒。",
+        "false_start": "立即放弃自己的咏唱，没有代价。此时针对你的截断会让施放者沉默。",
+        "shove": "把触及范围内的战斗者推开{shove}码，打断其咏唱。冷却时间{shoveCd}秒。"
       },
       "stance": {
         "lunge": "蓄力中",
         "guard": "格挡中",
-        "open": "露出破绽"
+        "open": "露出破绽",
+        "chant": "咏唱中",
+        "sever": "截断中",
+        "silenced": "沉默"
       },
       "ready": "就绪",
       "unseen": "隐形中",
       "seen": "所有人可见",
+      "score": "仪式：{count}/{goal}。最高：{best}。",
       "startsIn": "{minutes} 分钟后开始",
       "keepsake": "保留技能",
       "keepsakeTip": "你保留的技能：{name}。这是你在此唯一能使用的职业技能。",

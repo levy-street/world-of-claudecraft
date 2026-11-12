@@ -15975,7 +15975,11 @@ export const es_ES: EnTranslations = {
         "sidestep": "Sidestep",
         "sweep": "Sweep",
         "hush": "Hush",
-        "pebble": "Pebble"
+        "pebble": "Pebble",
+        "rite": "Rite",
+        "sever": "Sever",
+        "false_start": "False Start",
+        "shove": "Shove"
       },
       "verbTips": {
         "lunge": "Wind up for {windup} sec, then thrust at the nearest fighter in front of you within {range} yd. A hit takes 1 heart.",
@@ -15984,16 +15988,24 @@ export const es_ES: EnTranslations = {
         "sidestep": "Dash {distance} yd forward. {sidestepCd} sec cooldown.",
         "sweep": "Swing at the nearest fighter in a short cone in front of you, within {sweepRange} yd. A hit takes 1 heart and shows you both for {reveal} sec. A miss shows only you.",
         "hush": "Walk without leaving footprints for {hush} sec. {hushCd} sec cooldown.",
-        "pebble": "Throw a {pebble} yd line of false footprints ahead of you, laid as if someone had just walked away. {pebbleCd} sec cooldown."
+        "pebble": "Throw a {pebble} yd line of false footprints ahead of you, laid as if someone had just walked away. {pebbleCd} sec cooldown.",
+        "rite": "Chant for {chant} sec, standing still. Finishing scores 1. Being moved, stunned, rooted or silenced breaks it. Needs another fighter in the circle.",
+        "sever": "Interrupt your target, or the nearest fighter in front of you. It winds up for {severWindup} sec, then lands: if they are still chanting, they are silenced for {silence} sec. If not, you are. {severCd} sec cooldown.",
+        "false_start": "Drop your own chant at once, at no cost. A Sever aimed at you then silences its caster.",
+        "shove": "Push a fighter within reach {shove} yd away from you, breaking their chant. {shoveCd} sec cooldown."
       },
       "stance": {
         "lunge": "Winding up",
         "guard": "Guarding",
-        "open": "Open"
+        "open": "Open",
+        "chant": "Chanting",
+        "sever": "Severing",
+        "silenced": "Silenced"
       },
       "ready": "Ready",
       "unseen": "Unseen",
       "seen": "Seen by everyone",
+      "score": "Rites: {count} of {goal}. Best: {best}.",
       "startsIn": "Starts in {minutes} min",
       "keepsake": "Kept ability",
       "keepsakeTip": "Your kept ability: {name}. The only class ability you can use here.",

@@ -4,6 +4,16 @@
 // per-record display mirrors, never delta-guarded.
 import type { Entity } from '../sim/types';
 
+/** The skill event tells the wire may carry (`stc`). */
+const STANCES: ReadonlySet<unknown> = new Set([
+  'lunge',
+  'guard',
+  'open',
+  'chant',
+  'sever',
+  'silenced',
+]);
+
 // biome-ignore lint/suspicious/noExplicitAny: mirrors online.ts's own LooseJson wire-record idiom
 export function applyEntityPresenceBits(e: Entity, w: any): void {
   e.afk = !!w.ak; // /afk display bit: drives the nameplate tag + social presence dot
@@ -15,9 +25,13 @@ export function applyEntityPresenceBits(e: Entity, w: any): void {
   // Skill event hearts (`hrt`): a whole count while in a heart fight, else nothing.
   if (typeof w.hrt === 'number' && w.hrt >= 0) e.eventHearts = Math.floor(w.hrt);
   else delete e.eventHearts;
-  // Riposte stance (`stc`): the wind-up, guard or open tell, else nothing.
-  if (w.stc === 'lunge' || w.stc === 'guard' || w.stc === 'open') e.eventStance = w.stc;
+  // The skill event tell (`stc`): a Riposte or Rite of Tongues stance, else nothing.
+  if (STANCES.has(w.stc)) e.eventStance = w.stc;
   else delete e.eventStance;
+  // The tell's bar fill (`stf`), 0 to 1: a chant or Sever wind-up in progress.
+  if (typeof w.stf === 'number' && Number.isFinite(w.stf)) {
+    e.eventStanceFill = Math.max(0, Math.min(1, w.stf));
+  } else delete e.eventStanceFill;
   // Footprints in Ash unseen bit (`uns`): only ever on your own record.
   if (w.uns) e.eventUnseen = true;
   else delete e.eventUnseen;

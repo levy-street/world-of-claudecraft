@@ -15975,7 +15975,11 @@ export const ja_JP: EnTranslations = {
         "sidestep": "サイドステップ",
         "sweep": "薙ぎ払い",
         "hush": "忍び足",
-        "pebble": "小石"
+        "pebble": "小石",
+        "rite": "詠唱",
+        "sever": "断ち切り",
+        "false_start": "空詠唱",
+        "shove": "突き飛ばし"
       },
       "verbTips": {
         "lunge": "{windup}秒ためてから、前方{range}ヤード以内で最も近い相手を突く。命中するとハートを1つ奪う。",
@@ -15984,16 +15988,24 @@ export const ja_JP: EnTranslations = {
         "sidestep": "前方へ{distance}ヤード踏み込む。再使用まで{sidestepCd}秒。",
         "sweep": "前方の短い扇状範囲、{sweepRange}ヤード以内で最も近い相手を薙ぐ。命中するとハートを1つ奪い、{reveal}秒間お互いの姿が見える。外すと自分だけが見える。",
         "hush": "{hush}秒間、足跡を残さずに歩く。再使用まで{hushCd}秒。",
-        "pebble": "前方へ{pebble}ヤードの偽の足跡を投げる。誰かが歩き去ったばかりのように見える。再使用まで{pebbleCd}秒。"
+        "pebble": "前方へ{pebble}ヤードの偽の足跡を投げる。誰かが歩き去ったばかりのように見える。再使用まで{pebbleCd}秒。",
+        "rite": "その場で{chant}秒詠唱する。完了すると1点。動かされる、スタン、移動不能、沈黙で中断される。円の中に他の参加者が必要。",
+        "sever": "ターゲット、またはいなければ前方で最も近い参加者を妨害する。{severWindup}秒ためてから発動し、相手がまだ詠唱中なら{silence}秒間沈黙させる。そうでなければ自分が沈黙する。再使用まで{severCd}秒。",
+        "false_start": "自分の詠唱を即座に、代償なしでやめる。自分を狙った断ち切りは、使った側を沈黙させる。",
+        "shove": "届く範囲の参加者を{shove}ヤード突き飛ばし、詠唱を中断させる。再使用まで{shoveCd}秒。"
       },
       "stance": {
         "lunge": "ため中",
         "guard": "ガード中",
-        "open": "隙あり"
+        "open": "隙あり",
+        "chant": "詠唱中",
+        "sever": "断ち切り中",
+        "silenced": "沈黙"
       },
       "ready": "準備完了",
       "unseen": "見えていない",
       "seen": "全員に見えている",
+      "score": "詠唱：{goal}回中{count}回。最多：{best}。",
       "startsIn": "{minutes}分後に開始",
       "keepsake": "持ち込み技",
       "keepsakeTip": "持ち込み技：{name}。ここで使える唯一のクラス技。",
