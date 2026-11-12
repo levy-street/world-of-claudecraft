@@ -107,12 +107,12 @@ describe('the item zones', () => {
     expect(perClass).toEqual({
       warrior: 'bloodmane_warleggings',
       paladin: 'ysols_pearl_greaves',
-      hunter: 'wyrmshadow_legguards',
-      rogue: 'wildgrowth_leggings',
-      priest: 'mantle_of_the_unhorsed',
+      hunter: 'wyrmscale_jerkin',
+      rogue: 'vineclaw_stalking_breeches',
+      priest: 'korgaths_chainwraps',
       shaman: 'hoarfrost_edge',
       mage: 'architects_cornerstone',
-      warlock: 'staff_of_velkhar',
+      warlock: 'soulflame_cord',
       druid: 'grovewardens_grips',
     });
   });
