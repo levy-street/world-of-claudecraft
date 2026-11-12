@@ -496,6 +496,7 @@ describe('well fed: one food buff at a time (last eaten wins, whole family)', ()
     eatToCompletion(sim, pid, p, 'fenbridge_rice_pudding');
     const wf = wellFedAuras(p);
     expect(wf.length, 'still exactly one well_fed aura').toBe(1);
+    expect(wf[0].duration).toBe(900);
     expect(wf[0].remaining).toBeGreaterThan(before);
     expect(wf[0].remaining).toBeGreaterThan(890); // fresh 900 minus tick slack
   });

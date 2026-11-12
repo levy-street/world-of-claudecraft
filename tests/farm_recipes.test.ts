@@ -1097,12 +1097,14 @@ describe('FARM_RECIPES: the dish ItemDef shape, reopened by Phase 11 and closed 
       uncommon: 'venomfire_elixir',
       rare: 'elixir_of_the_serpent',
     };
-    const TIER_ORDER = [
-      'eastbrook_glazed_carrots',
-      'fenbridge_rice_pudding',
-      'highwatch_barley_porridge',
-      'evergarden_braised_greens',
-    ];
+    // The literal beside the derivation, so a re-tune of a dish AND its
+    // elixir together still reds here (value / duration, crop-tier order).
+    const LITERAL: Record<string, string> = {
+      eastbrook_glazed_carrots: '6/600',
+      fenbridge_rice_pudding: '9/900',
+      highwatch_barley_porridge: '12/900',
+      evergarden_braised_greens: '12/900',
+    };
     const buff = dishes.filter((d) => BUFF_DISH_IDS.includes(d.resultItemId));
     expect(buff, 'the buff sweep really covers the four Phase 11 dishes').toHaveLength(4);
     for (const dish of buff) {
@@ -1116,8 +1118,9 @@ describe('FARM_RECIPES: the dish ItemDef shape, reopened by Phase 11 and closed 
       // ids can never collide.
       expect(wellFed.aura, `${dish.resultItemId} aura name`).toBe('Well Fed');
       expect(wellFed.kind, `${dish.resultItemId} aura kind`).toBe('buff_sta');
-      const tier = TIER_ORDER.indexOf(dish.resultItemId);
-      expect(tier, `${dish.resultItemId} sits on the crop-tier ladder`).toBeGreaterThanOrEqual(0);
+      expect(`${wellFed.value}/${wellFed.duration}`, `${dish.resultItemId} literal rung`).toBe(
+        LITERAL[dish.resultItemId],
+      );
       const elixirId = ELIXIR_BY_QUALITY[def.quality ?? ''];
       expect(elixirId, `${dish.resultItemId} has a matching elixir quality`).toBeDefined();
       const elixir = ITEMS[elixirId].elixir;

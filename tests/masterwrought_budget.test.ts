@@ -2178,13 +2178,19 @@ describe('the phase 10 apex rungs step exactly one rung off the shipped ladders'
         ).toBeLessThan(apex!.duration);
       }
     }
-    // The ruling's ADJACENCY, not just the ordering: the farming ladder tops
-    // out EXACTLY one point below the apex (11c-D-2, "topping out one below
-    // the apex"). Without this arm the dominance sweep would stay green if
-    // the apex drifted upward and reopened a gap the ruling closed.
+    // The potion-ladder match, not just the ordering: the farming ladder tops
+    // out at the top elixir rung and the apex sits on the flask rung, so the
+    // gap between them is exactly the potion ladder's own gap. Without this
+    // arm the dominance sweep would stay green if the apex drifted upward and
+    // opened a gap the potion ladder does not have.
     const topRung = Math.max(...nonApex.map((d) => d.wellFed!.value));
     const apexValue = foodDef(APEX_FOOD_IDS[0]).wellFed!.value;
-    expect(topRung, 'the farming ladder tops out one below the apex').toBe(apexValue - 1);
+    expect(topRung, 'the farming ladder tops out at the top elixir rung').toBe(
+      elixirPayload('elixir_of_the_serpent').value,
+    );
+    expect(apexValue, 'the apex plate sits on the flask rung').toBe(
+      elixirPayload('ironhusk_flask').value,
+    );
   });
 
   it('every feast serves a well-fed FOOD at or below the apex point, on both axes', () => {

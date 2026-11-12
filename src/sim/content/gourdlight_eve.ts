@@ -6,7 +6,7 @@
 // Almost everything here is cosmetic: looks, toys and titles. The one exception is
 // the candy shelf (GOURDLIGHT_CANDIES): five sweets that are ordinary Well Fed
 // food, a 1:1 mirror of the cooking ladder's ENTRY rung (Eastbrook Glazed Carrots:
-// 90 health over the 18s sit, +2 of one stat for ten minutes, under the one shared
+// 90 health over the 18s sit, +6 of one stat for ten minutes, under the one shared
 // well_fed aura id), so they never outrank anything a cook can make.
 //
 // WHEN the event runs is not data here and never a clock in the sim: the

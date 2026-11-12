@@ -703,12 +703,10 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // deliberate raise past the R5 kit envelope's food term (flask 13 plus
   // plate 13, 26; see docs/design/power-verification.md). The apex plate
   // strictly dominates every farming rung of the Well Fed ladder below
-  // (6 / 9 / 12 / 12) on stat
-  // AND duration, last eaten wins under the one 'well_fed' id). R23 governs
-  // the vendor-versus-crafted margin and no vendor item grants Well Fed at
-  // all. sellValue 90 is set by
-  // the BATCH, not the quality band: the recipe yields four plates and
-  // 4 x 90 = 360 stays strictly below the summed reagent value (about 422),
+  // (6 / 9 / 12 / 12) on stat AND duration; last eaten wins under the one
+  // 'well_fed' id. R23 governs the vendor-versus-crafted margin and no vendor
+  // item grants Well Fed at all. sellValue 90 is set by the BATCH, not the
+  // quality band: the recipe yields four plates and 4 x 90 = 360 stays strictly below the summed reagent value (about 422),
   // where Marlow's per-plate 150 on a four-plate batch (600) would turn the
   // recipe into a gold faucet. So an epic plate vendors for less than the
   // rare Marlow's Grand Roast on purpose (an accepted player-visible inversion;
@@ -984,11 +982,10 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // coexists (different aura id), so the farming rungs' own stacking ceiling
   // is dish 12 plus elixir 12, 24 stamina (the global crafted ceiling is the
   // apex block's flask plus plate, 26).
-  // The earlier per-kind
-  // wellfed_<kind> namespace and its "at or below the elixir budget ceiling"
-  // calibration were retired here: they let a cooking-50 trainer dish (12 /
-  // 900) beat the cooking-100 apex plate on both axes, the inversion the
-  // re-tune removes.
+  // Historical: the earlier per-kind wellfed_<kind> namespace and its "at or
+  // below the elixir budget ceiling" calibration were retired in 11c because
+  // they let a cooking-50 trainer dish (12 / 900) beat the then 6 / 900 apex
+  // plate; the apex now sits on the flask rung above every dish.
   //
   // foodHp and sellValue reuse shipped curve points; quality matches the
   // rung. Both farmer counters stock the tier 3/4 seed chain, so the two upper
