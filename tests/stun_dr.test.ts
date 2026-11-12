@@ -111,9 +111,36 @@ describe('crowdControlDurationAfterDr / diminishedCrowdControlDuration', () => {
     expect(crowdControlDurationAfterDr(0, hostile, source, target, 'fear', 8)).toBe(4);
     expect(crowdControlDurationAfterDr(0, hostile, source, target, 'fear', 8)).toBe(2);
     expect(crowdControlDurationAfterDr(0, hostile, source, target, 'fear', 8)).toBe(1);
-    // The multiplier array is exhausted at index 3; further stages hold at the
-    // final factor rather than going null (fear never becomes immune).
-    expect(crowdControlDurationAfterDr(0, hostile, source, target, 'fear', 8)).toBe(1);
+    // The multiplier array is exhausted at index 3; the next fear inside the
+    // reset window is DR-immune (null), it does not hold at the final factor.
+    expect(crowdControlDurationAfterDr(0, hostile, source, target, 'fear', 8)).toBeNull();
+  });
+
+  it('makes a chain-feared player immune until the fear window expires', () => {
+    // Regression: the ladder used to clamp to its last rung forever, and every
+    // cast pushed the 60s window forward, so Harrow could be chained at 12.5%
+    // without end. Authored 5s is Harrow's own duration.
+    const { source, target } = players();
+    const fear = (now: number) =>
+      crowdControlDurationAfterDr(now, hostile, source, target, 'fear', 5);
+    expect([fear(0), fear(5), fear(10), fear(15)]).toEqual([5, 2.5, 1.25, 0.625]);
+    // The fourth fear landed at t=15, so the window runs to t=75.
+    expect(fear(20)).toBeNull();
+    // Casting into immunity must not extend the window: still t=75, not t=134.
+    expect(fear(74)).toBeNull();
+    expect(target.ccDr.get('fear')).toEqual({ stage: 4, resetAt: 75 });
+    // Window expired: the ladder starts over at full duration.
+    expect(fear(75)).toBe(5);
+    expect(fear(76)).toBe(2.5);
+  });
+
+  it('leaves fear undiminished outside hostile PvP however often it lands', () => {
+    const { source, target } = players();
+    const pveTarget = mob();
+    for (let i = 0; i < 6; i++) {
+      expect(crowdControlDurationAfterDr(0, hostile, source, pveTarget, 'fear', 5)).toBe(5);
+      expect(crowdControlDurationAfterDr(0, friendly, source, target, 'fear', 5)).toBe(5);
+    }
   });
 
   it("scales fear from each ability's authored duration", () => {
@@ -124,7 +151,7 @@ describe('crowdControlDurationAfterDr / diminishedCrowdControlDuration', () => {
     expect(crowdControlDurationAfterDr(0, hostile, source, target, 'fear', 4)).toBe(2);
     expect(crowdControlDurationAfterDr(0, hostile, source, target, 'fear', 4)).toBe(1);
     expect(crowdControlDurationAfterDr(0, hostile, source, target, 'fear', 4)).toBe(0.5);
-    expect(crowdControlDurationAfterDr(0, hostile, source, target, 'fear', 4)).toBe(0.5);
+    expect(crowdControlDurationAfterDr(0, hostile, source, target, 'fear', 4)).toBeNull();
   });
 
   it('leaves stun categories (openerStun/controlledStun/randomStun) undiminished', () => {
