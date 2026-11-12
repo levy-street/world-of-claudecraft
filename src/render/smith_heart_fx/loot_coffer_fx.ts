@@ -68,11 +68,13 @@ import {
   type LootCofferSound,
   lootCofferBreath,
   lootCofferBudget,
+  lootCofferClickable,
   lootCofferCrossed,
   lootCofferEase,
   lootCofferFade,
   lootCofferMood,
   lootCofferRise,
+  lootCofferSettled,
   lootCofferSink,
   lootCofferSpark,
   lootCofferSpot,
@@ -146,6 +148,8 @@ interface Slot {
   /** The clock its body went (-1 while it lies there). */
   goneAt: number;
   mood: LootCofferMood;
+  /** The clock its mood turned empty (-1 while it holds something). */
+  emptySince: number;
   lid: number;
   glow: number;
   shaftLevel: number;
@@ -263,14 +267,25 @@ export class LootCofferFx {
       'smithHeartLootSparks',
       PARTICLE_GLOW_FRAG,
       THREE.AdditiveBlending,
-      320,
+      440,
       14,
     );
 
     // ---- the coffers ----
     const proxyMat = new THREE.MeshBasicMaterial({ name: 'smithHeartLootProxy' });
     this.materials.push(proxyMat);
-    for (let i = 0; i < SLOTS; i++) this.slots.push(this.buildSlot(i, shapes, proxyMat));
+    // One light-card material for both coffers (no per-coffer uniforms).
+    const cardMat = new THREE.ShaderMaterial({
+      name: 'smithHeartLootLight',
+      vertexShader: GLOW_VERT,
+      fragmentShader: GLOW_FRAG,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      toneMapped: false,
+    });
+    this.materials.push(cardMat);
+    for (let i = 0; i < SLOTS; i++) this.slots.push(this.buildSlot(i, shapes, proxyMat, cardMat));
 
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})
@@ -281,6 +296,7 @@ export class LootCofferFx {
     i: number,
     shapes: ReturnType<typeof buildLootCofferShapes>,
     proxyMat: THREE.Material,
+    cardMat: THREE.Material,
   ): Slot {
     const stage = new THREE.Group();
     stage.name = `smithHeartLootCoffer${i}`;
@@ -314,15 +330,19 @@ export class LootCofferFx {
     // The heart's position in view space, written once a frame per coffer
     // from the camera that draws it (both iron meshes share the uniform).
     const heart = new THREE.Vector3();
-    body.onBeforeRender = (_r, _s2, camera) => {
+    const heartToView: THREE.Object3D['onBeforeRender'] = (_r, _s2, camera) => {
       (iron.uniforms.uHeart.value as THREE.Vector3)
         .copy(heart)
         .applyMatrix4(camera.matrixWorldInverse);
     };
+    body.onBeforeRender = heartToView;
+    lid.onBeforeRender = heartToView;
     const inlay = new THREE.MeshBasicMaterial({
       name: 'smithHeartLootInlay',
       color: 0xffffff,
       toneMapped: false,
+      // Unfogged like the iron round it (a fogged inlay drifts off its iron).
+      fog: false,
     });
     this.materials.push(inlay);
     const inlayMesh = new THREE.Mesh(shapes.inlay, inlay);
@@ -335,6 +355,7 @@ export class LootCofferFx {
       name: 'smithHeartLootHoard',
       vertexColors: true,
       toneMapped: false,
+      fog: false,
     });
     this.materials.push(hoardMat);
     const hoard = new THREE.Mesh(shapes.hoard, hoardMat);
@@ -401,16 +422,6 @@ export class LootCofferFx {
     floor.position.y = 0.06;
     stage.add(floor);
 
-    const cardMat = new THREE.ShaderMaterial({
-      name: 'smithHeartLootLight',
-      vertexShader: GLOW_VERT,
-      fragmentShader: GLOW_FRAG,
-      transparent: true,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      toneMapped: false,
-    });
-    this.materials.push(cardMat);
     const cards = new THREE.InstancedMesh(shapes.card, cardMat, CARDS);
     cards.name = 'smithHeartLootLights';
     cards.frustumCulled = false;
@@ -452,6 +463,7 @@ export class LootCofferFx {
       risePrev: -1,
       goneAt: -1,
       mood: 'empty',
+      emptySince: -1,
       lid: 0,
       glow: 0,
       shaftLevel: 0,
@@ -573,6 +585,7 @@ export class LootCofferFx {
     slot.risePrev = -1;
     slot.goneAt = -1;
     slot.mood = mood;
+    slot.emptySince = mood === 'empty' ? this.clock : -1;
     const target = LOOT_COFFER_TARGETS[mood];
     // A coffer standing from the start is already in its mood; a rising
     // one eases in under its ceremony.
@@ -598,6 +611,7 @@ export class LootCofferFx {
     if (mood === slot.mood) return;
     const shut = mood === 'empty' && slot.lid > 12;
     slot.mood = mood;
+    slot.emptySince = mood === 'empty' ? this.clock : -1;
     if (shut) this.shut(slot);
   }
 
@@ -693,10 +707,12 @@ export class LootCofferFx {
 
     // A click on the coffer is a click on its body, while the body holds
     // something and the coffer is up out of the floor.
-    const clickable = slot.goneAt < 0 && slot.mood !== 'empty' && sink < 1;
+    const clickable = lootCofferClickable(slot.goneAt >= 0, slot.mood, sink);
     slot.proxy.userData.entityId = clickable ? slot.id : undefined;
 
-    if (slot.goneAt < 0) this.emitWaiting(slot, dt, open, shaft, calm);
+    if (slot.goneAt < 0 && !calm) this.emitWaiting(slot, dt, open, shaft);
+    // Emptied, shut and lingered: it sinks away and frees its slot.
+    if (slot.goneAt < 0 && lootCofferSettled(slot.mood, t - slot.emptySince)) this.letGo(slot);
   }
 
   private paintCards(
@@ -783,7 +799,7 @@ export class LootCofferFx {
           0.16,
         );
         if (this.rand() < LOOT_COFFER_EMIT.climbDust / LOOT_COFFER_EMIT.climbSparks)
-          this.dust(_w.x, _w.y, _w.z, 1.6, 0.9);
+          this.dust(_w.x, _w.y, _w.z, 1.1, 0.8);
       }
     }
     // The lock: a burst of sparks out of the seam and a ring of dust.
@@ -809,14 +825,14 @@ export class LootCofferFx {
       for (let i = 0; i < d; i++) {
         const a = (i / Math.max(1, d)) * Math.PI * 2;
         this.local(slot, Math.cos(a) * 1.9, 0.15, Math.sin(a) * 1.9);
-        this.dust(_w.x, _w.y, _w.z, 2.4, 1.3);
+        this.dust(_w.x, _w.y, _w.z, 1.5, 1.1);
       }
     }
   }
 
   /** The waiting coffer: motes out of its open hold, glints up its shaft. */
-  private emitWaiting(slot: Slot, dt: number, open: number, shaft: number, calm: boolean): void {
-    const k = this.share * (calm ? 0.5 : 1);
+  private emitWaiting(slot: Slot, dt: number, open: number, shaft: number): void {
+    const k = this.share;
     const opened = Math.min(1, open / 40);
     slot.moteDebt += dt * LOOT_COFFER_EMIT.motes * slot.sparks * opened * k;
     while (slot.moteDebt >= 1) {
@@ -874,6 +890,8 @@ export class LootCofferFx {
   /** The lid falling shut on an emptied coffer: a puff and a few sparks. */
   private shut(slot: Slot): void {
     this.sound(slot, LOOT_COFFER_SHUT_SOUND);
+    // Reduced motion: the lid falls and the light goes, no puff.
+    if (this.reducedMotion()) return;
     const n = Math.round(LOOT_COFFER_EMIT.shutDust * this.share);
     for (let i = 0; i < n; i++) {
       this.local(slot, (this.rand() - 0.5) * COFFER.width, COFFER_RIM_Y, COFFER.depth / 2 + 0.1);
@@ -977,7 +995,7 @@ export class LootCofferFx {
     s.r = 0.36;
     s.g = 0.31;
     s.b = 0.27;
-    s.a = 0.55;
+    s.a = 0.38;
     this.dustPool.emit(this.clock, s);
   }
 

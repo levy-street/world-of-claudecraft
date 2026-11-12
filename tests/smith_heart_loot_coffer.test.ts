@@ -31,6 +31,7 @@ import { HEAT_DEATH } from '../src/render/smith_heart_fx/heat_death_core';
 import {
   LOOT_COFFER,
   LOOT_COFFER_BOSSES,
+  LOOT_COFFER_IN_REACH,
   LOOT_COFFER_LOW_SHARE,
   LOOT_COFFER_MAX_REACH,
   LOOT_COFFER_PALETTES,
@@ -40,14 +41,17 @@ import {
   LOOT_COFFER_TARGETS,
   type LootCofferRise,
   lootCofferBudget,
+  lootCofferClickable,
   lootCofferCrossed,
   lootCofferEase,
   lootCofferMood,
   lootCofferRise,
+  lootCofferSettled,
   lootCofferSink,
   lootCofferSpot,
 } from '../src/render/smith_heart_fx/loot_coffer_core';
 import { LootCofferFx } from '../src/render/smith_heart_fx/loot_coffer_fx';
+import { COFFER, COFFER_SCALE } from '../src/render/smith_heart_fx/loot_coffer_shape';
 import { QUENCH_DEATH } from '../src/render/smith_heart_fx/quench_death_core';
 import { WorldPicking } from '../src/render/world_picking';
 import { SMITH_HEART_DUNGEON } from '../src/sim/content/smith_heart';
@@ -68,7 +72,7 @@ import { HEAT_GUARDIAN } from '../src/sim/encounters/smith_heart/heat_ids';
 import { QUENCH_GUARDIAN } from '../src/sim/encounters/smith_heart/quench_ids';
 import type { InstanceSlot } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
-import type { Entity } from '../src/sim/types';
+import { type Entity, INTERACT_RANGE } from '../src/sim/types';
 import type { IWorld } from '../src/world_api';
 
 const newRise = (): LootCofferRise => ({
@@ -125,13 +129,39 @@ describe('the guardians', () => {
     );
   });
 
-  it('stands clear of the body, never past its cap', () => {
+  it('a looter at the coffer front is in the body loot reach (the Heat alone excepted)', () => {
+    // Half the coffer's depth (scaled) and a looter's step in front of it.
+    const front = (COFFER.depth / 2) * COFFER_SCALE + 0.6;
+    expect(LOOT_COFFER_IN_REACH + front).toBeLessThanOrEqual(INTERACT_RANGE);
     for (const [id, boss] of Object.entries(LOOT_COFFER_BOSSES)) {
       const spot = lootCofferSpot(10, 20, 0.7, boss, { x: 0, z: 0, yaw: 0 });
       const r = Math.hypot(spot.x - 10, spot.z - 20);
-      expect(r, id).toBeGreaterThan(3);
+      expect(r, id).toBeGreaterThan(2.5);
       expect(r, id).toBeLessThanOrEqual(LOOT_COFFER_MAX_REACH + 1e-9);
+      if (boss.outsideReach) continue;
+      expect(r, id).toBeLessThanOrEqual(LOOT_COFFER_IN_REACH + 1e-9);
     }
+    // Only the guardian standing in its 10.5 yd wellspring is the exception.
+    expect(
+      Object.entries(LOOT_COFFER_BOSSES)
+        .filter(([, b]) => b.outsideReach)
+        .map(([id]) => id),
+    ).toEqual([HEAT_GUARDIAN]);
+  });
+
+  it('is a click on its corpse only while there is something to open', () => {
+    expect(lootCofferClickable(false, 'yours', 0)).toBe(true);
+    expect(lootCofferClickable(false, 'others', 0.5)).toBe(true);
+    expect(lootCofferClickable(false, 'empty', 0)).toBe(false);
+    expect(lootCofferClickable(true, 'yours', 0)).toBe(false);
+    expect(lootCofferClickable(false, 'yours', 1.2)).toBe(false);
+  });
+
+  it('an emptied coffer lingers shut, then settles away', () => {
+    const hold = LOOT_COFFER.closeFor + LOOT_COFFER.emptyHold;
+    expect(lootCofferSettled('empty', hold - 0.1)).toBe(false);
+    expect(lootCofferSettled('empty', hold)).toBe(true);
+    expect(lootCofferSettled('yours', hold * 10)).toBe(false);
   });
 
   it('stands in front of the body (forward is (sin, cos)) and faces away from it', () => {
@@ -403,8 +433,10 @@ describe('LootCofferFx raises the coffer', () => {
     expect(t.lidAngle()).toBeCloseTo(0, 3);
     expect(shown(t.scene, 'smithHeartLootShaft')).toBe(false);
     expect(t.proxy()).toBeUndefined();
-    // Still beside the body while it lies there, shut.
+    // Still beside the body a while, shut and dark; then it sinks away.
     expect(t.fx.standing).toEqual([t.boss.id]);
+    t.step(LOOT_COFFER.emptyHold + LOOT_COFFER.sinkFor + 0.5);
+    expect(t.fx.standing).toEqual([]);
     t.fx.dispose();
   });
 
@@ -533,6 +565,120 @@ describe('LootCofferFx raises the coffer', () => {
     t.step(0.5);
     expect(t.fx.standing).toEqual([]);
     t.fx.dispose();
+  });
+});
+
+describe('LootCofferFx across the raid', () => {
+  afterEach(() => {
+    sharedUniforms.uTime.value = 0;
+  });
+
+  /** A fake world holding several bodies, entities in the ClientWorld mirror
+   *  shape when `mirror` (blank_entity.ts: ffa as Infinity or 0, a null
+   *  loot list, a tap from the wire). */
+  function raid(ids: string[]) {
+    const o = instanceOrigin(DUNGEONS.smith_heart.index, 0);
+    const entities = new Map<number, Entity>();
+    const mk = (id: number, kind: Entity['kind'], tid: string, x: number, z: number) =>
+      ({
+        id,
+        kind,
+        templateId: tid,
+        name: tid,
+        pos: { x, y: 0, z },
+        prevPos: { x, y: 0, z },
+        facing: 0,
+        scale: 1,
+        hp: 100,
+        maxHp: 100,
+        dead: false,
+        lootable: false,
+        loot: null,
+        corpseTimer: 600,
+        lootFfaTimer: Number.POSITIVE_INFINITY,
+        tappedById: null,
+        ownerId: null,
+        harvestClaimedBy: null,
+        inCombat: false,
+        auras: [],
+      }) as unknown as Entity;
+    const me = mk(1, 'player', 'warrior', o.x, o.z);
+    entities.set(me.id, me);
+    const bodies = ids.map((tid, i) => {
+      const e = mk(10 + i, 'mob', tid, o.x + 30 * i, o.z + 20);
+      entities.set(e.id, e);
+      return e;
+    });
+    const world = {
+      entities,
+      player: me,
+      playerId: me.id,
+      partyInfo: null,
+      entityRosterVersion: 1,
+    } as unknown as IWorld;
+    const fx = new LootCofferFx(
+      new THREE.Scene(),
+      () => 0,
+      world,
+      undefined,
+      () => false,
+    );
+    const step = (seconds: number) => {
+      for (let i = 0; i < Math.round(seconds * 20); i++) {
+        sharedUniforms.uTime.value += 0.05;
+        fx.update(0.05);
+      }
+    };
+    return { fx, me, bodies, step };
+  }
+
+  it('two looted council coffers settle away, so a later guardian still gets one', () => {
+    const r = raid([COUNCIL_GUARDIAN, COUNCIL_SEAM_SINGER, BREATH_GUARDIAN]);
+    const [g, s, b] = r.bodies;
+    r.step(0.5);
+    for (const e of [g, s]) {
+      e.dead = true;
+      e.lootable = true;
+      e.loot = { copper: 10, items: [] };
+      e.lootFfaTimer = 0;
+    }
+    r.step(Math.max(LOOT_COFFER_BOSSES[COUNCIL_GUARDIAN].revealAt, 5) + LOOT_COFFER.end + 1);
+    expect(r.fx.standing.sort()).toEqual([g.id, s.id].sort());
+    for (const e of [g, s]) {
+      e.loot = null;
+      e.lootable = false;
+    }
+    r.step(LOOT_COFFER.closeFor + LOOT_COFFER.emptyHold + LOOT_COFFER.sinkFor + 1);
+    expect(r.fx.standing).toEqual([]);
+    b.dead = true;
+    b.lootable = true;
+    b.loot = { copper: 10, items: [] };
+    b.lootFfaTimer = 0;
+    r.step(LOOT_COFFER_BOSSES[BREATH_GUARDIAN].revealAt + 1);
+    expect(r.fx.standing).toEqual([b.id]);
+    r.fx.dispose();
+  });
+
+  it('reads the mirror shape: another party tap is "others", a pending roll too', () => {
+    const r = raid([QUENCH_GUARDIAN]);
+    const [q] = r.bodies;
+    r.step(0.5);
+    // Tapped by someone else, still owner-locked (the wire's ffa = Infinity).
+    q.dead = true;
+    q.lootable = true;
+    q.tappedById = 999;
+    q.loot = { copper: 40, items: [] };
+    r.step(LOOT_COFFER_BOSSES[QUENCH_GUARDIAN].revealAt + 1);
+    expect(r.fx.standing).toEqual([q.id]);
+    // A roll still running: lootable with a null loot list.
+    q.loot = null;
+    r.step(1);
+    expect(r.fx.standing).toEqual([q.id]);
+    // The roll resolved: the body settles empty.
+    q.lootable = false;
+    r.step(LOOT_COFFER.closeFor + LOOT_COFFER.emptyHold + LOOT_COFFER.sinkFor + 1);
+    expect(r.fx.standing).toEqual([]);
+    r.fx.dispose();
   });
 });
 

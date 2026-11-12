@@ -111,14 +111,25 @@ export interface LootCofferBoss {
   /** Seconds after the death when the coffer starts to rise: the death
    *  scene's own resolution, so it never steps on the scene's climax. */
   readonly revealAt: number;
-  /** Yards from the corpse's centre to the coffer's: clear of the drawn
-   *  body (a guardian is far bigger than a player). */
+  /** Yards from the corpse's centre to the coffer's. At most
+   *  `LOOT_COFFER_IN_REACH`, so a looter standing at the coffer's front is
+   *  inside the body's loot reach (INTERACT_RANGE, measured to the corpse's
+   *  centre) and the click or the interact key works from right there. */
   readonly reach: number;
   /** Radians off the body's facing (0: straight in front of it). */
   readonly bearing: number;
+  /** The one exception: a body no looter can stand within reach of (the
+   *  Heat guardian lies in the middle of its 10.5 yd wellspring). Its coffer
+   *  stands where it reads, and a click on it walks the looter in (the
+   *  corpse's own approach); see the open item in smith_heart_fx/CLAUDE.md. */
+  readonly outsideReach?: true;
 }
 
-/** A coffer never stands further than this from its corpse. */
+/** A coffer within reach stands no further than this from its corpse: its
+ *  front (half its depth, scaled) plus a looter's step stay inside the 5 yd
+ *  INTERACT_RANGE. */
+export const LOOT_COFFER_IN_REACH = 3.3;
+/** No coffer ever stands further than this. */
 export const LOOT_COFFER_MAX_REACH = 12;
 
 /** The bosses that raise a coffer (their template ids), each with its look. */
@@ -126,25 +137,25 @@ export const LOOT_COFFER_BOSSES: Readonly<Record<string, LootCofferBoss>> = {
   [COUNCIL_GUARDIAN]: {
     flavour: 'stone',
     revealAt: councilSecondDeathSeconds('guardian') - 1.2,
-    reach: 5.6,
+    reach: 3.2,
     bearing: 0.35,
   },
   [COUNCIL_SEAM_SINGER]: {
     flavour: 'stone',
     revealAt: councilSecondDeathSeconds('singer') - 1.2,
-    reach: 3.8,
+    reach: 3.2,
     bearing: -0.35,
   },
   [BREATH_GUARDIAN]: {
     flavour: 'storm',
     revealAt: BREATH_DEATH.end - 1.4,
-    reach: 5.6,
+    reach: 3.2,
     bearing: 0,
   },
   [QUENCH_GUARDIAN]: {
     flavour: 'frost',
     revealAt: QUENCH_DEATH.end - 1.4,
-    reach: 4.2,
+    reach: 3.2,
     bearing: 0,
   },
   [HEAT_GUARDIAN]: {
@@ -152,12 +163,13 @@ export const LOOT_COFFER_BOSSES: Readonly<Record<string, LootCofferBoss>> = {
     revealAt: HEAT_DEATH.end - 1.2,
     reach: 8.6,
     bearing: 0,
+    outsideReach: true,
   },
   [FINAL_BOSS]: {
     flavour: 'forge',
     revealAt: DEATH_END - 1.0,
-    reach: 7.6,
-    bearing: 0,
+    reach: 3.3,
+    bearing: 0.6,
   },
 };
 
@@ -231,6 +243,9 @@ export const LOOT_COFFER = {
   end: 2.8,
   /** Emptied: the lid falls shut over this long. */
   closeFor: 0.42,
+  /** Emptied and shut, it lingers dark this long, then sinks away (so a
+   *  looted coffer never holds a slot a later guardian needs). */
+  emptyHold: 6,
   /** Gone (the body taken away, or a reset): it sinks back over this long. */
   sinkFor: 1.3,
   /** The floor ring's radius at its widest (yards). */
@@ -322,7 +337,7 @@ export const LOOT_COFFER_RATES = {
   lidOpen: 120,
   lidShut: 68 / LOOT_COFFER.closeFor,
   glowUp: 1.6,
-  glowDown: 0.55,
+  glowDown: 1.1,
   shaft: 1.8,
   sparks: 2.5,
 } as const;
@@ -339,6 +354,18 @@ export function lootCofferEase(
   if (v < target) return Math.min(target, v + rateUp * dt);
   if (v > target) return Math.max(target, v - rateDown * dt);
   return v;
+}
+
+/** Is the coffer a click on its corpse right now? Only while the body holds
+ *  something, the body is there, and the coffer is up out of the floor
+ *  (never a click target that would open nothing). */
+export function lootCofferClickable(gone: boolean, mood: LootCofferMood, sink: number): boolean {
+  return !gone && mood !== 'empty' && sink < 1;
+}
+
+/** Has an emptied coffer shut and lingered long enough to sink away? */
+export function lootCofferSettled(mood: LootCofferMood, emptyFor: number): boolean {
+  return mood === 'empty' && emptyFor >= LOOT_COFFER.closeFor + LOOT_COFFER.emptyHold;
 }
 
 /** The waiting coffer's breath: a slow swell with a surge now and then
