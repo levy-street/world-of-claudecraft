@@ -33,6 +33,7 @@ import {
   QUENCH_AURAS,
   QUENCH_CASTS,
   QUENCH_CUES,
+  QUENCH_DEV_CUES,
   QUENCH_TUNING,
 } from '../sim/encounters/smith_heart/quench_ids';
 import { HEART_MARK, type HeartMarkSound } from './smith_heart_mark_audio';
@@ -78,6 +79,9 @@ export const QUENCH_CUE_SOUNDS: Readonly<Record<string, QuenchSound>> = {
 /** Is this event's ability one the fight's sound plays (the HUD's generic
  *  nova or burst sound skipped for it)? */
 export function quenchSoundClaims(ability: string | undefined): boolean {
+  // The death's dev replay cue is silent here: the death scene's own sounds
+  // play off its beats (render/smith_heart_fx/quench_death_fx.ts).
+  if (ability === QUENCH_DEV_CUES.deathReplay) return true;
   return ability !== undefined && Object.hasOwn(QUENCH_CUE_SOUNDS, ability);
 }
 

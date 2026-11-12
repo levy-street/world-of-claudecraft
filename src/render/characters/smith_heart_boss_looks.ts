@@ -59,6 +59,7 @@ import {
   QUENCH_BODY_HEIGHT,
   QUENCH_BODY_URL,
 } from '../smith_heart_fx/quench_body_core';
+import { QUENCH_DEATH_GESTURES } from '../smith_heart_fx/quench_death_core';
 import { QUENCH_STRIKE_FALL } from '../smith_heart_fx/quench_strike_core';
 import type { MeshToggleDef } from './gesture_mesh_toggles';
 import type { ClipMap, VisualDef } from './manifest';
@@ -361,6 +362,11 @@ const QUENCH_CLIPS: ClipMap = {
 
 /** Her entrance's first stance: lying frozen under the lake's ice, still. */
 const QUENCH_FROZEN: ClipMap = { ...QUENCH_CLIPS, idle: 'Frozen', walk: 'Frozen', run: 'Frozen' };
+
+/** Fallen through a dev replay of her death (smith_heart_fx/quench_death_fx.ts):
+ *  every base pose is her Death clip, so the one-shot's end hands back to the
+ *  same clamped action and she stays knelt until the replay stands her. */
+const QUENCH_FALLEN: ClipMap = { ...QUENCH_CLIPS, idle: 'Death', walk: 'Death', run: 'Death' };
 const BREATH_STORM = breathClips(true);
 
 // ---- the Hammer Council ------------------------------------------------------------------------
@@ -619,6 +625,9 @@ export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
       [QUENCH_BODY_GESTURES.frozen]: { clips: QUENCH_FROZEN },
       [QUENCH_BODY_GESTURES.emerge]: { clips: QUENCH_CLIPS, enter: 'Emerge' },
       [QUENCH_BODY_GESTURES.stand]: { clips: QUENCH_CLIPS },
+      // A dev replay of her death: her Death clip on the living body, held
+      // knelt; the replay's end sends her stand.
+      [QUENCH_DEATH_GESTURES.fall]: { clips: QUENCH_FALLEN, enter: 'Death' },
     },
     castClipSync: [QUENCH_CASTS.breath, QUENCH_CASTS.wake],
     glowPulses: {

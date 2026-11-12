@@ -1208,6 +1208,8 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart_fx/heat_death_core.ts',
   // The Guardian of the Breath's death, the storm losing its anchor.
   'src/render/smith_heart_fx/breath_death_core.ts',
+  // The Guardian of the Quench's death, frozen from within and shattered.
+  'src/render/smith_heart_fx/quench_death_core.ts',
   'src/render/smith_heart_fx/quench_frost_fx_core.ts',
   // Living Rime's crust and ring on its carrier.
   'src/render/smith_heart_fx/quench_rime_core.ts',

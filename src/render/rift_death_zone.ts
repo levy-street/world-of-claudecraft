@@ -79,6 +79,7 @@ import {
   HeatFx,
   QuenchBladesFx,
   QuenchBody,
+  QuenchDeathFx,
   QuenchEntranceFx,
   QuenchFightFx,
   QuenchFx,
@@ -229,6 +230,9 @@ export class RiftDeathZoneVisuals {
   /** Her entrance (frozen under the lake's ice, the breach, her blades),
    *  updated before her body: it reads its look. */
   private readonly quenchEntrance: QuenchEntranceFx;
+  /** Her death (frozen from within and shattered), updated after the
+   *  entrance and before her body: the body rides its held look. */
+  private readonly quenchDeath: QuenchDeathFx;
   // Its Heat guardian (Basalt Fist's spot and lanes, the falling fist and
   // the rolling Molten Swells).
   private readonly heatFx: HeatFx;
@@ -312,6 +316,15 @@ export class RiftDeathZoneVisuals {
     this.quenchFight = new QuenchFightFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.quenchBlades = new QuenchBladesFx(scene, groundY, world, compileGate, reducedMotion);
     this.quenchEntrance = new QuenchEntranceFx(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+      shake,
+      playGesture,
+    );
+    this.quenchDeath = new QuenchDeathFx(
       scene,
       groundY,
       world,
@@ -741,6 +754,7 @@ export class RiftDeathZoneVisuals {
     this.quenchFight.update(dt);
     this.quenchBlades.update(dt);
     this.quenchEntrance.update(dt);
+    this.quenchDeath.update(dt);
     this.quenchBody.update(dt);
     this.heatFx.update(dt);
     this.heatEntrance.update(dt);
@@ -787,6 +801,7 @@ export class RiftDeathZoneVisuals {
     this.quenchFight.dispose();
     this.quenchBlades.dispose();
     this.quenchEntrance.dispose();
+    this.quenchDeath.dispose();
     this.quenchBody.dispose();
     this.heatFx.dispose();
     this.heatEntrance.dispose();
@@ -832,7 +847,8 @@ export class RiftDeathZoneVisuals {
     const breath = this.breathFight.handleEvent(event) || this.breathDeath.handleEvent(event);
     const quenchBody = this.quenchBody.handleEvent(event);
     this.quenchFx.handleEvent(event);
-    const quench = this.quenchFight.handleEvent(event) || quenchBody;
+    const quench =
+      this.quenchFight.handleEvent(event) || this.quenchDeath.handleEvent(event) || quenchBody;
     this.heatFx.handleEvent(event);
     this.heatBody.handleEvent(event);
     const heat = this.heatFight.handleEvent(event) || this.heatDeath.handleEvent(event);

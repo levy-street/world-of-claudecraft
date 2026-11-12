@@ -120,6 +120,8 @@ import {
   quenchBreathMistAt,
 } from './quench_breath_core';
 import { QuenchBreathStreaks } from './quench_breath_streaks';
+import type { QuenchDeathBodyLook } from './quench_death_core';
+import { quenchDeathFor } from './quench_death_state';
 import { quenchEntranceFor } from './quench_entrance_state';
 import { QuenchRimeSteps } from './quench_rime_steps';
 import { holdQuenchStatueGlaze } from './quench_statue_glaze';
@@ -325,6 +327,8 @@ interface Flash {
   peak: number;
 }
 
+const _deathGlaze = { height: 0, glow: 0, bite: 0, alpha: 0 };
+
 export class QuenchBody {
   readonly readyForEntry: Promise<void>;
   private readonly root = new THREE.Group();
@@ -389,6 +393,8 @@ export class QuenchBody {
   private wakeAt = -99;
   private slashAt = -99;
   private deadAt = -1;
+  /** Her death scene's look was held last frame (its end lets the glaze go). */
+  private dyingHeld = false;
   private sealed = false;
   private flaredBreath = false;
   // accumulators for the per-frame emitters
@@ -753,13 +759,23 @@ export class QuenchBody {
   private pose(e: Entity, dt: number): void {
     const eAt = fxAnchor(e);
     this.readSockets(e);
+    // Her death scene (quench_death_fx.ts) holds the look her body rides,
+    // a dev replay on her living body too.
+    const dying = quenchDeathFor(e.id);
+    if (dying) {
+      if (e.dead && this.deadAt < 0) this.deadAt = this.clock;
+      this.dyingHeld = true;
+      this.poseDying(e, dying);
+      return;
+    }
     if (e.dead) {
       this.poseDead(e, dt);
       return;
     }
-    if (this.deadAt >= 0) {
-      // Up again (a wipe): the statue's frost lets go.
+    if (this.deadAt >= 0 || this.dyingHeld) {
+      // Up again (a wipe, a replay's end): the statue's frost lets go.
       this.deadAt = -1;
+      this.dyingHeld = false;
       this.sealed = false;
       holdQuenchStatueGlaze(e.id, null);
     }
@@ -1217,6 +1233,22 @@ export class QuenchBody {
   }
 
   // ---- the death ------------------------------------------------------------------------------
+
+  /** Her death scene's look (quench_death_core.ts): the statue glaze on her
+   *  own material, her heart blooming then out, her eyes going dark. The
+   *  scene's painter draws the rest (the frost's race, the blades, the
+   *  seams, the shatter, the lake). */
+  private poseDying(e: Entity, L: QuenchDeathBodyLook): void {
+    _deathGlaze.height = L.glazeHeight;
+    _deathGlaze.glow = L.glazeGlow;
+    _deathGlaze.bite = L.glazeBite;
+    _deathGlaze.alpha = L.glazeAlpha;
+    holdQuenchStatueGlaze(e.id, _deathGlaze);
+    this.lights(L.heart, L.eyes, L.crown, 0.5 * L.life, 0, L.life);
+    this.wake.hide();
+    this.windPending = false;
+    this.windup.hide();
+  }
 
   private poseDead(e: Entity, dt: number): void {
     if (this.deadAt < 0) {

@@ -49,6 +49,12 @@ import {
   quenchSocketPoint,
 } from '../src/render/smith_heart_fx/quench_body_sockets';
 import {
+  newQuenchDeathBodyLook,
+  QUENCH_DEATH,
+  quenchDeathBodyLook,
+} from '../src/render/smith_heart_fx/quench_death_core';
+import { holdQuenchDeath } from '../src/render/smith_heart_fx/quench_death_state';
+import {
   BLADE_FLOAT_LIFT,
   BLADE_TIP,
   bladeLook,
@@ -557,6 +563,16 @@ describe('QuenchBody over a fake world', () => {
     expect(glaze?.height).toBeGreaterThan(0.5);
     // Up again (a wipe): the frost lets go.
     boss.dead = false;
+    fx.update(1 / 20);
+    expect(quenchStatueGlazeFor(boss.id)).toBeNull();
+    // A dev replay of her death (quench_death_fx.ts holds its look on her
+    // living body): the statue glaze rides the scene's look; let go, her
+    // frost lets go too.
+    const dying = quenchDeathBodyLook(QUENCH_DEATH.frozenAt, newQuenchDeathBodyLook());
+    holdQuenchDeath(boss.id, dying);
+    fx.update(1 / 20);
+    expect(quenchStatueGlazeFor(boss.id)?.height).toBeCloseTo(dying.glazeHeight, 5);
+    holdQuenchDeath(boss.id, null);
     fx.update(1 / 20);
     expect(quenchStatueGlazeFor(boss.id)).toBeNull();
     // Leaving the world frees her.

@@ -145,3 +145,12 @@ export const HEAT_DEATH_SECONDARY_LAYERS = Object.freeze(['smithHeartHeatDeathHa
 export const BREATH_DEATH_SECONDARY_LAYERS = Object.freeze([
   'smithHeartBreathDeathShaftHalo',
 ] as const);
+
+/** The Guardian of the Quench's death (quench_death_core.ts, painted with
+ *  her entrance's budget): the cosmetic double the low tier never draws, the
+ *  additive glint over the calm mirror sheet (the sheet itself, the blades,
+ *  the seams, the shatter, the web healing and every beat stay on every
+ *  tier). */
+export const QUENCH_DEATH_SECONDARY_LAYERS = Object.freeze([
+  'smithHeartQuenchDeathMirrorSheen',
+] as const);
