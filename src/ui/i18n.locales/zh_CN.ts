@@ -7112,6 +7112,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.qualityKind': '{quality}{kind}',
   'itemUi.tooltip.currentlyEquipped': '当前装备',
   'itemUi.tooltip.ifYouEquip': '装备后',
+  'itemUi.tooltip.noStatChanges': '属性无变化',
   'itemUi.tooltip.damageSpeed': '{min} - {max} 伤害 速度 {speed}',
   'itemUi.tooltip.dps': '（每秒 {dps} 伤害）',
   'itemUi.tooltip.armorStat': '{value} 护甲',

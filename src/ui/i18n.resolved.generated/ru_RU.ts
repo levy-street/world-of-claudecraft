@@ -17146,7 +17146,7 @@ export const ru_RU: EnTranslations = {
       "qualityKind": "{quality} {kind}",
       "currentlyEquipped": "Сейчас надето",
       "ifYouEquip": "Если надеть это",
-      "noStatChanges": "No stat changes",
+      "noStatChanges": "Характеристики не изменятся",
       "damageSpeed": "{min} - {max} урона Скорость {speed}",
       "dps": "({dps} урона в секунду)",
       "armorStat": "{value} брони",

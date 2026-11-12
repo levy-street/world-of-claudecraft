@@ -7543,6 +7543,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.qualityKind': '{quality} {kind}',
   'itemUi.tooltip.currentlyEquipped': 'Сейчас надето',
   'itemUi.tooltip.ifYouEquip': 'Если надеть это',
+  'itemUi.tooltip.noStatChanges': 'Характеристики не изменятся',
   'itemUi.tooltip.damageSpeed': '{min} - {max} урона Скорость {speed}',
   'itemUi.tooltip.dps': '({dps} урона в секунду)',
   'itemUi.tooltip.armorStat': '{value} брони',

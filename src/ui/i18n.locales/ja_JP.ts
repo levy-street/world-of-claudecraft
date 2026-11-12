@@ -5718,6 +5718,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.qualityKind': '{quality} {kind}',
   'itemUi.tooltip.currentlyEquipped': '現在の装備',
   'itemUi.tooltip.ifYouEquip': 'これを装備すると',
+  'itemUi.tooltip.noStatChanges': '能力値の変化なし',
   'itemUi.tooltip.damageSpeed': '{min} - {max} ダメージ 速度 {speed}',
   'itemUi.tooltip.dps': '（秒間 {dps} ダメージ）',
   'itemUi.tooltip.armorStat': '防御力 {value}',

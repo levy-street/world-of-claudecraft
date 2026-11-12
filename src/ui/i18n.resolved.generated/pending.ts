@@ -28,24 +28,14 @@ export const pending: Record<string, readonly string[]> = {
   "de_DE": [
     "itemUi.tooltip.noStatChanges"
   ],
-  "zh_CN": [
-    "itemUi.tooltip.noStatChanges"
-  ],
-  "zh_TW": [
-    "itemUi.tooltip.noStatChanges"
-  ],
-  "ko_KR": [
-    "itemUi.tooltip.noStatChanges"
-  ],
-  "ja_JP": [
-    "itemUi.tooltip.noStatChanges"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
     "itemUi.tooltip.noStatChanges"
   ],
-  "ru_RU": [
-    "itemUi.tooltip.noStatChanges"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
     "itemUi.tooltip.noStatChanges"
   ],

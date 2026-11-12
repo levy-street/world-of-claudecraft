@@ -17146,7 +17146,7 @@ export const zh_TW: EnTranslations = {
       "qualityKind": "{quality}{kind}",
       "currentlyEquipped": "目前已裝備",
       "ifYouEquip": "裝備後",
-      "noStatChanges": "No stat changes",
+      "noStatChanges": "屬性無變化",
       "damageSpeed": "{min} - {max} 傷害 速度 {speed}",
       "dps": "（每秒 {dps} 傷害）",
       "armorStat": "{value} 護甲",

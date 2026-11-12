@@ -7,7 +7,7 @@
 //   equipItem, `requiredLevelFor` (item_level_req.ts). The held off-hand kind is
 //   equip-gated exactly like weapons and armor.
 // - Mount reins and the Riding Training service entry: riding itself is learned
-//   at MOUNT_TRAIN_MIN_LEVEL (mounts_training.ts learnRiding), every mount needs
+//   at MOUNT_TRAIN_MIN_LEVEL (riding_level.ts; learnRiding enforces it), every mount needs
 //   the riding skill to summon (mounts.ts summonMountItem), and the vendor
 //   purchase gate for reins (items.ts buyItem) is the same level.
 // - Everything else (consumables, materials, patterns, tools, bags) has no level
@@ -18,7 +18,7 @@
 // Pure leaf: no DOM/Three/render-ui-game-net imports, no rng/clock.
 
 import { requiredLevelFor } from './item_level_req';
-import { MOUNT_TRAIN_MIN_LEVEL } from './mounts_training';
+import { MOUNT_TRAIN_MIN_LEVEL } from './riding_level';
 import type { ItemDef } from './types';
 
 /** Whether `item` is wearable gear the equip path level-gates. Mirrors the kind
