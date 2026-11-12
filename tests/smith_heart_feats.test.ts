@@ -586,6 +586,23 @@ describe("the Masterless Strength's feat: Kept From the Brim", () => {
     expect(earned(f.sim, f.pids, SMITH_HEART_FEAT_DEEDS.masterless)).toEqual([false, false, false]);
   });
 
+  it('a wipe takes the broken watch with it: the next pull starts clean', () => {
+    const f = pulled();
+    const lost = f.players[2];
+    f.sim.ctx.dealDamage(null, lost, lost.hp + 1e6, false, 'physical', 'Test', 'hit', true);
+    f.tick(1);
+    expect(f.state()?.feat?.broken).toBe(true);
+    expect(f.dev('/dev heart final reset')).toBe(true);
+    expect(f.state()).toBeNull();
+    lost.dead = false;
+    lost.hp = lost.maxHp;
+    f.pullIn('heat');
+    f.tick(2);
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    expect(st.feat?.broken ?? false).toBe(false);
+  });
+
   it('one Overload Burst breaks it', () => {
     const f = pulled();
     f.dev('/dev heart final burst');
@@ -656,6 +673,35 @@ describe('the feat rules and the meta', () => {
       { id: 2, dead: true },
     ]);
     expect(st.feat?.broken).toBe(true);
+    // One who died late in a tick and released out of the room before the next watch still
+    // counts; one who walked out alive is forgotten.
+    const late: Parameters<typeof watchFeatDeaths>[0] = { finished: false };
+    const bodies = new Map([
+      [1, { dead: false }],
+      [2, { dead: false }],
+    ]);
+    watchFeatDeaths(
+      late,
+      [
+        { id: 1, dead: false },
+        { id: 2, dead: false },
+      ],
+      (id) => bodies.get(id),
+    );
+    bodies.set(2, { dead: false });
+    watchFeatDeaths(late, [{ id: 1, dead: false }], (id) => bodies.get(id));
+    expect(late.feat?.broken).toBe(false);
+    watchFeatDeaths(
+      late,
+      [
+        { id: 1, dead: false },
+        { id: 2, dead: false },
+      ],
+      (id) => bodies.get(id),
+    );
+    bodies.set(2, { dead: true });
+    watchFeatDeaths(late, [{ id: 1, dead: false }], (id) => bodies.get(id));
+    expect(late.feat?.broken).toBe(true);
     // A fight already over is never touched.
     const done: Parameters<typeof watchFeatDeaths>[0] = { finished: true };
     watchFeatDeaths(done, [{ id: 1, dead: true }]);

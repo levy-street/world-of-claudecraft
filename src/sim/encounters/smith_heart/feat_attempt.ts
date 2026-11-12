@@ -34,15 +34,27 @@ export function countFeat(st: { feat?: SmithHeartFeatAttempt; finished: boolean 
 
 /** A raider's death breaks the feat: every player seen alive in the fight is remembered, and
  *  one of them seen dead afterwards breaks it (a body already dead when first seen, a ghost
- *  walking back, is no death of this fight). Draws no rng; `players` in any order. */
+ *  walking back, is no death of this fight). One remembered but gone from `players` (a death
+ *  late in the tick, then a release that carried the ghost out of the room) is looked up by
+ *  `entityOf`: dead, it breaks the feat; alive elsewhere or logged out, it is forgotten.
+ *  Draws no rng; `players` in any order. */
 export function watchFeatDeaths(
   st: { feat?: SmithHeartFeatAttempt; finished: boolean },
   players: readonly { id: number; dead: boolean }[],
+  entityOf: (id: number) => { dead: boolean } | undefined = () => undefined,
 ): void {
   if (st.finished) return;
   const feat = featAttempt(st);
   if (!feat.alive) feat.alive = [];
   const alive = feat.alive;
+  for (let i = alive.length - 1; i >= 0; i--) {
+    const id = alive[i];
+    let here = false;
+    for (const p of players) if (p.id === id) here = true;
+    if (here) continue;
+    alive.splice(i, 1);
+    if (entityOf(id)?.dead) feat.broken = true;
+  }
   for (const p of players) {
     const at = alive.indexOf(p.id);
     if (!p.dead) {

@@ -407,7 +407,7 @@ function resetFinal(ctx: SimContext, inst: InstanceSlot, boss: Entity): void {
 
 function finishFinal(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: FinalFightState): void {
   // A raider who fell on the boss's last tick still counts against the feat.
-  watchFeatDeaths(st, heartListeners(ctx, inst));
+  watchFeatDeaths(st, heartListeners(ctx, inst), (id) => ctx.entities.get(id));
   st.finished = true;
   settleSmithHeartFeat(ctx, inst, { encounter: 'masterless', st });
   finalSay(scopeOf(ctx, inst, st, boss), 'death');
@@ -491,7 +491,7 @@ export function tickFinalBoss(ctx: SimContext, inst: InstanceSlot): void {
   showHidden(s);
   stepFinalVoice(s);
   // The feat watch: any raider's death in the fight breaks it.
-  watchFeatDeaths(st, heartListeners(ctx, inst));
+  watchFeatDeaths(st, heartListeners(ctx, inst), (id) => ctx.entities.get(id));
 }
 
 /** One tick of a stage that is not the quarter fight: the stride into the
