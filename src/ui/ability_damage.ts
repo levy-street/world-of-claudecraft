@@ -116,6 +116,11 @@ export function abilityDamageBonus(
       // directHitBonus(..., aoe) into the zone's spBonus at cast time (Spore
       // Burst's damage half snapshots the same rider).
       return directHitBonus(power, def, res.castTime, true, out.damage);
+    case 'frozenOrb':
+      // Frostglobe's pulses snapshot directHitBonus(..., aoe) at release with
+      // NO talent multiplier argument (effect_dispatch.ts 'frozenOrb' ->
+      // spawnFrozenOrb), so the tooltip mirrors that exactly.
+      return directHitBonus(power, def, res.castTime, true);
     case 'valkyrsCalling':
       // The delayed landing owns its authored range in the movement system.
       return 0;
@@ -291,6 +296,7 @@ export function abilityPrimaryEffect(res: ResolvedAbility): AbilityEffect | unde
       eff.type === 'aoeRoot' ||
       eff.type === 'chainDamage' ||
       eff.type === 'groundAoE' ||
+      eff.type === 'frozenOrb' ||
       eff.type === 'valkyrsCalling' ||
       (eff.type === 'repositionToAim' && eff.landingAoe !== undefined) ||
       eff.type === 'consumeAura' ||

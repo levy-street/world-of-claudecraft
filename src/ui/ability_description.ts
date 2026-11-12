@@ -78,6 +78,7 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
       case 'aoeRoot':
       case 'chainDamage':
       case 'groundAoE':
+      case 'frozenOrb':
       case 'sporeBurst':
       case 'drainTick':
       case 'valkyrsCalling':
