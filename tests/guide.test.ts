@@ -3830,8 +3830,8 @@ describe('Guide professions pages and routes', () => {
     expect(html).toContain(
       t('guide.profPages.effectFeastWellFed', {
         stat: t(staKey),
-        value: '5',
-        minutes: '10',
+        value: '12',
+        minutes: '15',
       }),
     );
     expect(html, 'a feast must not tell the reader they eat it').not.toContain(
@@ -3840,8 +3840,8 @@ describe('Guide professions pages and routes', () => {
     expect(html).not.toContain(
       t('guide.profPages.effectWellFed', {
         stat: t(staKey),
-        value: '5',
-        minutes: '10',
+        value: '12',
+        minutes: '15',
       }),
     );
     // The cell really reaches the page, and a BAGGED dish on the same page

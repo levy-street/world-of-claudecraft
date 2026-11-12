@@ -372,8 +372,9 @@ What each knob does, and why it is gameplay-neutral:
   knob (FCT, minimap, the debuff bar, the target strip) is unaffected, so this is a player
   PREFERENCE layered on top of the STATIC preset, never a second preset-like governor.
   **The 2026-09-01 Well Fed cosmetic-shed ratification:** the farming packet's Phase 11 QA left
-  one fairness READ open against this classification. Well Fed runs 600 sec on the farm buff
-  dishes and 900 sec on the apex plates, an order of magnitude past `SHORT_BUFF_PRIORITY_SEC`, so
+  one fairness READ open against this classification. Well Fed runs 600 to 900 sec on the farm
+  buff dishes and 1200 sec on the apex plates (since the 2026-11-12 potion-ladder match),
+  an order of magnitude past `SHORT_BUFF_PRIORITY_SEC`, so
   it sits in exactly the long-duration bucket the priority pass above sheds FIRST, on the one
   preset, taken from the player whose only cue to re-eat is that icon. RULED
   (`qr-19-aura-visible-cap-low-fairness`, under `qr-19-best-for-project`): the classification is

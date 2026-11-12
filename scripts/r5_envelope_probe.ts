@@ -178,7 +178,8 @@ export const CHEST_STA_STEP_PLATE =
 
 const SEED_COUNT = Number(process.env.WOC_R5_SEEDS ?? 25);
 const SECONDS = Number(process.env.WOC_R5_SECONDS ?? 180);
-// The always-on consumable premise breaks before the plate's 900 s duration:
+// The always-on consumable premise breaks before the stamina elixir's 900 s
+// duration (the shortest kit aura since the plate moved to 1200 s):
 // auras are applied once at dress time and never refreshed, and the rogue lane
 // burns a 2 s poison-prep window before its fight starts, so the guard sits at
 // 897 and lives HERE, at the parse site, so every consumer inherits it (the
@@ -272,8 +273,8 @@ const plateAura = (kind: string): Aura =>
     id: 'well_fed',
     name: 'Well Fed',
     kind,
-    remaining: 900,
-    duration: 900,
+    remaining: 1200,
+    duration: 1200,
     value: defValue(PLATE_BY_KIND, kind, 'wellFed'),
   }) as unknown as Aura;
 

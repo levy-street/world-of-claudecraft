@@ -1287,9 +1287,10 @@ describe('masterwrought Phase 11h: the arithmetic above every row', () => {
     // PHASE 15 MOVED THE FLASK, and this pin is re-cut to the shipped value
     // rather than deleted. The 11h premise was "flask 15 plus food 6 equals
     // 21"; the R5 measured pass found the full kit outside the envelope and
-    // used its own named tune-down knob, so the shipped kit is flask 13 plus
-    // plate 6 for 19 (docs/design/power-verification.md section
-    // 10.4). The pin's JOB is unchanged: 11h is an input-cost phase and may
+    // used its own named tune-down knob, so the kit read flask 13 plus
+    // plate 6 for 19 (docs/design/power-verification.md section 10.4),
+    // and since the Well Fed ladder was matched to the potion ladder it reads
+    // flask 13 plus plate 13 for 26. The pin's JOB is unchanged: 11h is an input-cost phase and may
     // never move these six numbers, so a magnitude change still reds HERE and
     // not only in the budget suite.
     for (const row of APEX_ROWS) {
@@ -1298,8 +1299,9 @@ describe('masterwrought Phase 11h: the arithmetic above every row', () => {
       expect(def, `${row.id} output def`).toBeDefined();
       expect(def.slot, `${row.id} must not output an equippable`).toBeUndefined();
     }
-    // The two numbers R5 is measured against: flask 13 plus plate 6 equals 19
-    // stamina, the shipped kit after Phase 15's envelope tune. Pinned per row
+    // The two numbers R5 is measured against: flask 13 plus plate 13 equals 26
+    // stamina, the shipped kit since the Well Fed ladder was matched to the
+    // potion ladder (19 after Phase 15's envelope tune, before that). Pinned per row
     // so a magnitude change on any one of the six is a red HERE, in the phase
     // that must not have moved it, and not only in the budget suite.
     for (const id of ['ironhusk_flask', 'warboar_flask', 'runewater_flask']) {
@@ -1311,8 +1313,8 @@ describe('masterwrought Phase 11h: the arithmetic above every row', () => {
       const food = foodDef(id);
       expect(ITEMS[id]?.sellValue, `${id} sellValue`).toBe(90);
       expect(food.foodHp, `${id} foodHp`).toBe(1392);
-      expect(food.wellFed?.value, `${id} Well Fed magnitude`).toBe(6);
-      expect(food.wellFed?.duration, `${id} Well Fed duration`).toBe(900);
+      expect(food.wellFed?.value, `${id} Well Fed magnitude`).toBe(13);
+      expect(food.wellFed?.duration, `${id} Well Fed duration`).toBe(1200);
     }
     for (const id of ['grand_cauldron', 'laden_hearth']) {
       expect(ITEMS[id]?.sellValue, `${id} sellValue`).toBe(380);

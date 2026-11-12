@@ -1083,24 +1083,28 @@ describe('FARM_RECIPES: the dish ItemDef shape, reopened by Phase 11 and closed 
     }
   });
 
-  it('every buff dish wellFed field sits on the derived 11c ladder rung', () => {
-    // The five-rung Well Fed ladder (Masterwrought 11c, ruling 11c-D-2), the
-    // farming rungs DERIVED rather than pasted: one point of stamina per crop
-    // tier starting at 2 (carrots / pudding / porridge / greens = 2/3/4/5),
-    // every rung at the consumable family's own entry duration, read LIVE
-    // off elixir_of_the_boar so the anchor cannot drift apart from the
-    // ladder it calibrates. The apex plates (6 / entry + step) live in
-    // profession_items.ts's apex block; their dominance over these rungs is
-    // pinned in tests/masterwrought_budget.test.ts over the live catalog.
-    const boar = ITEMS.elixir_of_the_boar;
-    const entryDuration = boar.elixir?.duration;
-    expect(entryDuration, 'the elixir entry rung anchors the dish duration').toBeDefined();
-    const TIER_ORDER = [
-      'eastbrook_glazed_carrots',
-      'fenbridge_rice_pudding',
-      'highwatch_barley_porridge',
-      'evergarden_braised_greens',
-    ];
+  it('every buff dish wellFed field matches the elixir of its quality', () => {
+    // The farming rungs DERIVED rather than pasted: each dish carries the
+    // value AND duration of the elixir at its own quality, read LIVE off the
+    // elixir defs so the food ladder cannot drift apart from the potion
+    // ladder it mirrors (common boar 6 / 600, uncommon venomfire 9 / 900,
+    // rare serpent 12 / 900; both rare dishes sit on the one rare rung). The
+    // apex plates (the flask's 13 / 1200) live in profession_items.ts's apex
+    // block; their dominance over these rungs is pinned in
+    // tests/masterwrought_budget.test.ts over the live catalog.
+    const ELIXIR_BY_QUALITY: Record<string, string> = {
+      common: 'elixir_of_the_boar',
+      uncommon: 'venomfire_elixir',
+      rare: 'elixir_of_the_serpent',
+    };
+    // The literal beside the derivation, so a re-tune of a dish AND its
+    // elixir together still reds here (value / duration, crop-tier order).
+    const LITERAL: Record<string, string> = {
+      eastbrook_glazed_carrots: '6/600',
+      fenbridge_rice_pudding: '9/900',
+      highwatch_barley_porridge: '12/900',
+      evergarden_braised_greens: '12/900',
+    };
     const buff = dishes.filter((d) => BUFF_DISH_IDS.includes(d.resultItemId));
     expect(buff, 'the buff sweep really covers the four Phase 11 dishes').toHaveLength(4);
     for (const dish of buff) {
@@ -1114,10 +1118,17 @@ describe('FARM_RECIPES: the dish ItemDef shape, reopened by Phase 11 and closed 
       // ids can never collide.
       expect(wellFed.aura, `${dish.resultItemId} aura name`).toBe('Well Fed');
       expect(wellFed.kind, `${dish.resultItemId} aura kind`).toBe('buff_sta');
-      const tier = TIER_ORDER.indexOf(dish.resultItemId);
-      expect(tier, `${dish.resultItemId} sits on the crop-tier ladder`).toBeGreaterThanOrEqual(0);
-      expect(wellFed.value, `${dish.resultItemId} ladder value (tier + 2)`).toBe(tier + 2);
-      expect(wellFed.duration, `${dish.resultItemId} entry-rung duration`).toBe(entryDuration);
+      expect(`${wellFed.value}/${wellFed.duration}`, `${dish.resultItemId} literal rung`).toBe(
+        LITERAL[dish.resultItemId],
+      );
+      const elixirId = ELIXIR_BY_QUALITY[def.quality ?? ''];
+      expect(elixirId, `${dish.resultItemId} has a matching elixir quality`).toBeDefined();
+      const elixir = ITEMS[elixirId].elixir;
+      expect(elixir, `${elixirId} carries an elixir payload`).toBeDefined();
+      expect(wellFed.value, `${dish.resultItemId} matches ${elixirId} value`).toBe(elixir?.value);
+      expect(wellFed.duration, `${dish.resultItemId} matches ${elixirId} duration`).toBe(
+        elixir?.duration,
+      );
     }
   });
 

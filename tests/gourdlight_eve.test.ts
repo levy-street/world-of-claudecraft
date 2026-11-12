@@ -611,6 +611,8 @@ describe("Hester's candy shelf", () => {
       value: rung.wellFed.value,
       duration: rung.wellFed.duration,
     });
+    // and the literal beside it, so moving the dish and the rung together reds
+    expect(GOURDLIGHT_CANDY_RUNG).toEqual({ foodHp: 90, value: 6, duration: 600 });
     expect(new Set(GOURDLIGHT_CANDIES.map((c) => c.kind))).toEqual(
       new Set(['buff_sta', 'buff_str', 'buff_agi', 'buff_int', 'buff_spi']),
     );

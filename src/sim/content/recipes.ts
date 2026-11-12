@@ -3046,8 +3046,8 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
   // is small, it is invisible to anyone using the market, and the alternative
   // (three crops sharing one timer) would break the crop ladder's own rule.
   //
-  // The INPUT side only. foodHp, the Well Fed magnitude and duration (11c's
-  // settled ladder, 6 for 900 seconds on the single well_fed aura id),
+  // The INPUT side only. foodHp, the Well Fed magnitude and duration (13 for
+  // 1200 seconds on the single well_fed aura id, the apex flask's band),
   // sellValue, resultCount, skillReq: none of them moves here, and a reagent
   // changes what a craft COSTS and never what it produces.
   {

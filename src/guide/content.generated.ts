@@ -12008,8 +12008,8 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "wellfed": {
             "aura": "Well Fed",
             "kind": "buff_sta",
-            "value": 6,
-            "minutes": 15
+            "value": 13,
+            "minutes": 20
           }
         }
       },
@@ -12078,8 +12078,8 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "wellfed": {
             "aura": "Well Fed",
             "kind": "buff_ap",
-            "value": 6,
-            "minutes": 15
+            "value": 13,
+            "minutes": 20
           }
         }
       },
@@ -12148,8 +12148,8 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "wellfed": {
             "aura": "Well Fed",
             "kind": "buff_int",
-            "value": 6,
-            "minutes": 15
+            "value": 13,
+            "minutes": 20
           }
         }
       },
@@ -12383,8 +12383,8 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "wellfed": {
             "aura": "Well Fed",
             "kind": "buff_sta",
-            "value": 6,
-            "minutes": 15
+            "value": 13,
+            "minutes": 20
           }
         }
       },
@@ -12462,8 +12462,8 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "wellfed": {
             "aura": "Well Fed",
             "kind": "buff_ap",
-            "value": 6,
-            "minutes": 15
+            "value": 13,
+            "minutes": 20
           }
         }
       },
@@ -12541,8 +12541,8 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "wellfed": {
             "aura": "Well Fed",
             "kind": "buff_int",
-            "value": 6,
-            "minutes": 15
+            "value": 13,
+            "minutes": 20
           }
         }
       },
@@ -12963,7 +12963,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "wellfed": {
             "aura": "Well Fed",
             "kind": "buff_sta",
-            "value": 2,
+            "value": 6,
             "minutes": 10
           }
         }
@@ -13008,8 +13008,8 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "wellfed": {
             "aura": "Well Fed",
             "kind": "buff_sta",
-            "value": 3,
-            "minutes": 10
+            "value": 9,
+            "minutes": 15
           }
         }
       },
@@ -13053,8 +13053,8 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "wellfed": {
             "aura": "Well Fed",
             "kind": "buff_sta",
-            "value": 4,
-            "minutes": 10
+            "value": 12,
+            "minutes": 15
           }
         }
       },
@@ -13098,8 +13098,8 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "wellfed": {
             "aura": "Well Fed",
             "kind": "buff_sta",
-            "value": 5,
-            "minutes": 10
+            "value": 12,
+            "minutes": 15
           }
         }
       },
@@ -13152,8 +13152,8 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "wellfed": {
             "aura": "Well Fed",
             "kind": "buff_sta",
-            "value": 5,
-            "minutes": 10
+            "value": 12,
+            "minutes": 15
           }
         }
       }
