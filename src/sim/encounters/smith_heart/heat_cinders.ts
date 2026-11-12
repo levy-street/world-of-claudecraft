@@ -108,7 +108,9 @@ export function dropStrayHunted(
   }
 }
 
-/** The wait before the next Rolling Cinder, `inPhase` seconds into phase 3:
+/** The wait before the next Rolling Cinder, `inPhase` seconds into the
+ *  current phase (the clock only runs in phase 3; a dev call elsewhere reads
+ *  the phase it is in):
  *  HEAT_TUNING.cinderEvery, or the tier's quicker cadence once the phase has
  *  run past its cinderLateAfter (the soft enrage). */
 export function cinderInterval(
@@ -118,15 +120,14 @@ export function cinderInterval(
   return inPhase >= rules.cinderLateAfter - 1e-9 ? rules.cinderLateEvery : T.cinderEvery;
 }
 
-/** One tick of the cinders' clock in phase 3. The tick the soft enrage
- *  begins, a longer wait already running is cut to the quicker cadence. */
+/** One tick of the cinders' clock in phase 3. Once the soft enrage holds,
+ *  no wait runs longer than the quicker cadence (a longer one already
+ *  running is cut; applied every tick, so no float edge can miss it). A
+ *  test that parks the timer high is cut too once the enrage begins. */
 export function stepCinderClock(s: HeatScope): void {
   const st = s.st;
-  const inPhase = st.clock - st.phaseAt;
-  const late = inPhase >= s.rules.cinderLateAfter - 1e-9;
-  if (late && inPhase - DT < s.rules.cinderLateAfter - 1e-9) {
+  if (st.clock - st.phaseAt >= s.rules.cinderLateAfter - 1e-9)
     st.cinderTimer = Math.min(st.cinderTimer, s.rules.cinderLateEvery);
-  }
   st.cinderTimer -= DT;
   if (st.cinderTimer <= 1e-9) callCinder(s);
 }
