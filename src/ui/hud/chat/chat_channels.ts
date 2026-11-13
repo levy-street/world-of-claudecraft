@@ -242,7 +242,15 @@ export function sentLineTargetForHost(
 // built-in `all` / `combat` views are implicit and not stored. Parsing is
 // defensive: unknown, duplicate, or malformed entries are dropped so a corrupt
 // or forward-version blob can never throw inside the HUD.
+//
+// A player with NO saved layout (`null`: the key was never written) gets
+// DEFAULT_CHAT_TABS. Any saved value wins as it is, including an empty list
+// from a player who closed every tab, so a default added later never reopens
+// a tab somebody closed and never rewrites a layout somebody arranged.
+export const DEFAULT_CHAT_TABS: readonly ChatOpenTab[] = [WHISPER_TAB];
+
 export function parseChatTabs(raw: string | null): ChatOpenTab[] {
+  if (raw === null) return [...DEFAULT_CHAT_TABS];
   if (!raw) return [];
   let arr: unknown;
   try {
