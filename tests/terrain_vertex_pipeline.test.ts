@@ -82,8 +82,13 @@ describe('terrain vertex pipeline', () => {
     // (terrain_calm_anchors.ts), so the probe chunk's heights move and a few
     // splits flip; the chunk builder's split rule is unchanged. Computed twice
     // in separate processes.
+    // Re-minted for the Studio town rework (#4593) carried into the live world:
+    // the touch-up's Eastbrook terrain edits and the moved buildings' and NPC
+    // stands' calm pads move the probe chunk's heights, so a few diagonal
+    // splits flip; the split rule is unchanged. Measured twice in separate
+    // processes on the branch tree, identical both times.
     expect(triangleMultisetFingerprint(state.indices)).toBe(
-      'cc9e73ca2615d13c7b1cafc1aade6a0f4d0c78f8ff3f403349c64f972688dd74',
+      '2fbe9298d5b7ba1fe7ab68372d871e49b0622f3e25c085fd0f0b3e5a79a7c408',
     );
     const tiledAcmr = acmr(state.indices, 16);
     expect(tiledAcmr).toBeLessThan(0.7);

@@ -6,10 +6,11 @@ import {
   type InstanceMusicEntity,
   type InstanceMusicInput,
   instanceMusicDecision,
+  inTownMusicArea,
   resolveMapMusicZone,
 } from '../src/game/instance_music';
 import { ZONE_STREAM_URLS } from '../src/game/music_tracks';
-import { DELVE_X_MIN, DUNGEONS, instanceOrigin, ZONES } from '../src/sim/data';
+import { DELVE_X_MIN, DUNGEONS, instanceOrigin, NPCS, PLAYER_START, ZONES } from '../src/sim/data';
 
 const eastbrookFixture = ZONES.find((zone) => zone.id === 'eastbrook_vale');
 if (!eastbrookFixture) throw new Error('eastbrook_vale fixture is missing');
@@ -68,6 +69,38 @@ describe('instance music policy', () => {
       'dungeon_hollow_crypt',
     );
     expect(port.update).toHaveBeenLastCalledWith('dungeon_hollow_crypt', false);
+  });
+});
+
+describe('town music across a reworked town (ZoneDef.questHub)', () => {
+  // The Studio town rework (#4593) spread Eastbrook and Highwatch past their
+  // narrow terrain hubs and gave each a wider questHub: the town theme follows
+  // the whole town, not just the hub circle.
+  const highwatch = ZONES.find((zone) => zone.id === 'thornpeak_heights');
+  it('plays the town theme at the player start and the far Eastbrook services', () => {
+    expect(eastbrook.questHub).toBeDefined();
+    const far = [PLAYER_START, NPCS.marshal_redbrook.pos];
+    for (const pos of far) {
+      // well outside the narrow hub, so this pins the questHub arm
+      expect(Math.hypot(pos.x - eastbrook.hub.x, pos.z - eastbrook.hub.z)).toBeGreaterThan(
+        eastbrook.hub.radius + 10,
+      );
+      expect(inTownMusicArea(pos, eastbrook)).toBe(true);
+      expect(instanceMusicDecision(input({ playerPos: { x: pos.x, z: pos.z } })).zone).toBe(
+        'town_eastbrook',
+      );
+    }
+  });
+  it('covers the reworked Highwatch too, and stops in the wilds', () => {
+    if (!highwatch) throw new Error('thornpeak_heights fixture is missing');
+    const qh = highwatch.questHub;
+    if (!qh) throw new Error('Highwatch lost its questHub');
+    const edge = { x: qh.x + qh.radius + 5, z: qh.z };
+    expect(inTownMusicArea(edge, highwatch)).toBe(true);
+    expect(inTownMusicArea({ x: qh.x + qh.radius + 15, z: qh.z }, highwatch)).toBe(false);
+    // a zone with no questHub reads the hub alone
+    const { questHub: _drop, ...hubOnly } = highwatch;
+    expect(inTownMusicArea(edge, hubOnly)).toBe(false);
   });
 });
 

@@ -14,8 +14,7 @@
 // changes.
 import { describe, expect, it } from 'vitest';
 import { DEEDS } from '../src/sim/content/deeds';
-import { GATHER_NODES } from '../src/sim/content/gather_nodes';
-import { LAKE, MOBS } from '../src/sim/data';
+import { gatherNodesInActiveWorld, LAKE, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { startFishing } from '../src/sim/professions/fishing';
 import { queueGatheringGrant } from '../src/sim/professions/gathering';
@@ -353,7 +352,13 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // the wander fix around those huts (an idle pick inside a hut wall is
     // skipped for one more pause, mob/locomotion.ts): the murlocs' wander draws
     // move, so the shared stream forks again; the koi now lands on session index 3.
-    expect(koiSession).toBe(30);
+    // Re-hunted for the Studio town rework (#4593): its reworked camps retire
+    // mobs (CampDef.retiredSlots), so fewer idle-wander draws run per tick and
+    // the shared stream forks again; the koi now lands on session index 25.
+    // Re-hunted for the rework's town fixes (the Eastbrook benches follow
+    // their masters, the lots and the quay stand at the map's heights, the
+    // hub yard's marks are native): world-gen inputs again; index 8.
+    expect(koiSession).toBe(8);
     expect(sawBiteOnKoiSession).toBe(true); // the celebration follows the bite moment
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false); // grant sweeps at the tick tail
     const evs = sim.tick();
@@ -414,27 +419,33 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // the koi hunt above (45, 0, 14 to 26, 44, 67). Re-recorded in order for
     // the solid Mirefen mudfin huts named at the koi hunt above (26, 44, 67 to
     // 17, 38, 48). Re-recorded in order for the wander fix around those huts
-    // named at the koi hunt above (17, 38, 48 to 25, 59, 7).
+    // named at the koi hunt above (17, 38, 48 to 25, 59, 7). Re-recorded in
+    // order, one at a time, for the Studio town rework (#4593) named at the
+    // koi hunt above (69, 157, 21 to 8, 133, 83); its moved wood_eastbrook_1
+    // is read at its live spot. Re-recorded in order for the rework's town
+    // fixes named at the koi hunt above (8, 133, 83 to 148, 156, 128).
     // Re-recorded in order after composing the permanent loot-quality craft
     // draws with the current release world/combat stream. The real gather
     // events land at 114, 169 and 20, after the merged koi session at 9.
     const hunts: { nodeId: string; deedId: string; itemId: string; hitAt: number }[] = [
-      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 69 },
+      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 148 },
       {
         nodeId: 'wood_eastbrook_1',
         deedId: 'col_ancient_heartwood',
         itemId: 'ironbark_log',
-        hitAt: 157,
+        hitAt: 156,
       },
       {
         nodeId: 'herb_eastbrook_1',
         deedId: 'col_moonlit_bloom',
         itemId: 'silverleaf_herb',
-        hitAt: 21,
+        hitAt: 128,
       },
     ];
     for (const hunt of hunts) {
-      const node = GATHER_NODES.find((n) => n.id === hunt.nodeId);
+      // The live node (the Studio town rework, #4593, moved wood_eastbrook_1
+      // through objectMoves), never the raw table's old spot.
+      const node = gatherNodesInActiveWorld().find((n) => n.id === hunt.nodeId);
       if (!node) throw new Error(`missing node ${hunt.nodeId}`);
       teleportTo(node.pos.x, node.pos.z);
       expect(meta.deedsEarned.has(hunt.deedId)).toBe(false);
@@ -509,8 +520,10 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // painted towns and the Mirefen tavern (#4525) yield 5; the solid Mirefen
     // mudfin huts (named at the koi hunt above) yield 7; the wander fix around
     // those huts (named at the koi hunt above) yields 0, a real first-harvest
-    // hit (hitAt starts at -1), not a skipped hunt.
-    expect(hitAt).toBe(1);
+    // hit (hitAt starts at -1), not a skipped hunt; the Studio town rework
+    // (#4593, named at the koi hunt above) yields 15, and its moved stations,
+    // pads and quay (the town fixes) yield 4.
+    expect(hitAt).toBe(4);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     // The signature rides materialSources, not instance.signer (the two are
     // mutually exclusive; corpse_harvest_grant.test.ts / corpse_harvest_sim.test.ts

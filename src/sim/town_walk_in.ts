@@ -62,12 +62,14 @@ let lastFenWalkInMinZ = 0;
 let lastFenWalkInMaxZ = -1;
 
 /** Whether (x, z) lies where a walk-in town floor could stand: the cheap test
- *  that lets a world with no placements skip the deck table everywhere else. */
-export function nearTownWalkIn(x: number, z: number): boolean {
+ *  that lets a world with no placements skip the deck table everywhere else.
+ *  `content` names the world whose Fenbridge layout counts (default: the bound
+ *  active world), so a caller holding its own content stays pure in it. */
+export function nearTownWalkIn(x: number, z: number, content?: WorldContent): boolean {
   for (const walkIn of WALK_IN_TOWNS) {
     if (x >= walkIn.minX && x <= walkIn.maxX && z >= walkIn.minZ && z <= walkIn.maxZ) return true;
   }
-  const fenLayout = activeFenbridgeLayout();
+  const fenLayout = activeFenbridgeLayout(content);
   if (fenLayout === FENBRIDGE_LAYOUT) return false;
   if (fenLayout !== lastFenWalkInLayout) {
     let minX = Number.POSITIVE_INFINITY;

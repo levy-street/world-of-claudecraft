@@ -46,7 +46,7 @@ import { extractTradableCopyImpl, grantTradableCopyImpl } from './broker_custody
 import * as buddiesMod from './buddies';
 import { revealBuddiesOnJoin, updateBuddyReveals } from './buddy_drops';
 import { renameBuddy } from './buddy_names';
-import { campSpawnOffset } from './camp_scatter';
+import { campSlotPoint, drawRetiredCampSlot, isRetiredCampSlot } from './camp_scatter';
 import { carveSpawnFloor, caveSpawnFloor } from './cave_ground_core';
 import type { CharacterState, PetState } from './character_state';
 import {
@@ -405,6 +405,7 @@ import { resetEvadingMob as resetEvadingMobFn, updateMob as updateMobFn } from '
 import { runMobSwingAffixes } from './mob/mob_swing';
 import { moveTowardImpl } from './mob/move_toward';
 import { spawnOpenWorldMob } from './mob/open_world_tuning';
+import { type PendingMobRespawn, spawnPendingMobRespawn } from './mob/pending_respawn';
 import { applyPlayerDummyVitals } from './mob/practice_dummies';
 import { questGateBlocksAggro, questGateBlocksCombat } from './mob/quest_gated_aggro';
 import {
@@ -1849,16 +1850,9 @@ export interface AwayStatus {
 // Persisted character and pet shapes live in the type-only character_state.ts
 // leaf and are re-exported above for public import compatibility.
 
-// PendingMobRespawn is exported so SimContext can type the live `pendingMobRespawns`
-// view that pet_commands.ts (completeTame) pushes the tamed beast's respawn into.
-export interface PendingMobRespawn {
-  templateId: string;
-  level: number;
-  pos: Vec3;
-  facing: number;
-  dungeonId: string | null;
-  timer: number;
-}
+// PendingMobRespawn (the tamed beast's queued replacement) lives in mob/pending_respawn.ts,
+// re-exported for SimContext's live `pendingMobRespawns` view.
+export type { PendingMobRespawn } from './mob/pending_respawn';
 
 // computeQuestState (the pure quest-state fn) moved to quests/quest_commands.ts (W4),
 // re-exported from sim.ts (see the import region) so the ClientWorld import stays
@@ -2404,24 +2398,24 @@ export class Sim {
         // its array index, so reordering the list cannot move it), and never
         // from wall-clock, so all three hosts agree.
         const campRng = camp.offStream ? campPrivateRng(this.cfg.seed, camp, i) : this.rng;
-        // Spread the camp's mobs with even nearest-neighbor spacing (a sunflower
-        // spiral) instead of independent uniform sampling, which let mobs stack.
-        // The two draws below feed campSpawnOffset as jitter and are consumed in the
+        if (isRetiredCampSlot(camp, i)) {
+          drawRetiredCampSlot(campRng); // keeps its draws and id (CampDef.retiredSlots)
+          this.nextId++;
+          continue;
+        }
+        // Spread the camp's mobs evenly (a sunflower spiral, camp_scatter.ts).
+        // The two draws below feed campSlotPoint as jitter and are consumed in the
         // SAME order/count as the old angle/radius rolls, so the global rng stream
         // position is unchanged: only spawn positions move (see camp_scatter.ts).
         const jitterAngle = campRng.range(0, Math.PI * 2);
         const jitterFrac = campRng.next();
-        const off = campSpawnOffset(i, camp.count, camp.radius, jitterAngle, jitterFrac);
+        const spot = campSlotPoint(camp, i, jitterAngle, jitterFrac); // or its authored spot
         // Keep camp mobs out of every dungeon door's clear ring so approaching or
         // zoning out of a dungeon never lands the player in a pack's aggro radius.
         // Pure geometry on the already-rolled point: it draws no rng, so the spawn
         // loop's own draw order is untouched (mob positions do shift, which moves
         // their later idle-wander draws, but that is downstream in the drive phase).
-        const cleared = projectOutsideDungeonDoors(
-          camp.center.x + off.x,
-          camp.center.z + off.z,
-          worldContent.objectMoves,
-        );
+        const cleared = projectOutsideDungeonDoors(spot.x, spot.z, worldContent.objectMoves);
         // findSafePos's inward spiral can walk a shore-side ring-edge point back
         // toward land, i.e. back INTO the ring; re-project the safe point so the
         // "never inside a door ring" guarantee holds for every seed, not just the
@@ -2634,15 +2628,8 @@ export class Sim {
       const pending = this.pendingMobRespawns[i];
       pending.timer -= DT;
       if (pending.timer > 0) continue;
-      const template = MOBS[pending.templateId];
-      if (template) {
-        const spawn = pending.dungeonId ? createMob : spawnOpenWorldMob;
-        const mob = spawn(this.nextId++, template, pending.level, { ...pending.pos });
-        mob.facing = pending.facing;
-        mob.prevFacing = pending.facing;
-        mob.dungeonId = pending.dungeonId;
-        this.addEntity(mob);
-      }
+      const mob = spawnPendingMobRespawn(pending, () => this.nextId++);
+      if (mob) this.addEntity(mob);
       this.pendingMobRespawns.splice(i, 1);
     }
   }

@@ -619,7 +619,7 @@ export const TEMPLE_NPCS: Record<string, NpcDef> = {
     id: 'tidewatcher_ondrel',
     name: 'Ondrel Vane',
     title: 'Tidewatcher',
-    pos: { x: -66, z: 786 },
+    pos: { x: -57.11, z: 781.53 },
     facing: -2.4,
     color: 0x7fa6c9,
     questIds: [

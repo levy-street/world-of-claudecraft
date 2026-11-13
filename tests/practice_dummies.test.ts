@@ -14,11 +14,8 @@ import {
   FRIENDLY_PLAYER_DUMMY_ID,
   HEROIC_BOSS_DUMMY_ID,
   NORMAL_BOSS_DUMMY_ID,
-  PRACTICE_ROW_CAMPFIRE,
-  PRACTICE_ROW_CAMPFIRE_OFFSET,
+  PRACTICE_ROW_MARKS,
   PRACTICE_ROW_ORDER,
-  PRACTICE_ROW_SPACING,
-  PRACTICE_ROW_X,
 } from '../src/sim/content/practice_dummies';
 import { BUILTIN_WORLD, MOBS, PROPS } from '../src/sim/data';
 import { bestEpicGearFor } from '../src/sim/dev/bis_gear';
@@ -41,11 +38,14 @@ const NYTHRAXIS_ARENA = 'nythraxis_boss_arena';
 // Sim-construction overhead (same trimming as tests/training_dummy.test.ts).
 const PRACTICE_ROW_WORLD: WorldContent = {
   ...BUILTIN_WORLD,
-  // Filtered by the row's own x too: the Eastbrook hub dummy is a second
+  // Filtered by the row's own marks too: the Eastbrook hub dummy is a second
   // `training_dummy` camp (content/practice_dummies.ts HUB_PRACTICE_DUMMY_CAMPS)
-  // and must not stand in for the row's slot 1.
+  // and must not stand in for the row's original dummy.
   camps: BUILTIN_WORLD.camps.filter(
-    (camp) => PRACTICE_ROW_ORDER.includes(camp.mobId) && camp.center.x === PRACTICE_ROW_X,
+    (camp) =>
+      PRACTICE_ROW_ORDER.includes(camp.mobId) &&
+      camp.center.x === PRACTICE_ROW_MARKS[camp.mobId]?.x &&
+      camp.center.z === PRACTICE_ROW_MARKS[camp.mobId]?.z,
   ),
   npcs: {},
   groundObjects: [],
@@ -90,92 +90,61 @@ function nythraxisArmor(difficulty: 'normal' | 'heroic'): number {
 }
 
 describe('the Highwatch practice row', () => {
-  it('stands the four dummies 6 yards apart in ally, trash, normal boss, heroic boss order', () => {
-    const sim = makeWorld();
-    const zs = PRACTICE_ROW_ORDER.map((id) => dummyOf(sim, id).pos.z);
+  // The row as the Studio town rework (#4593) stood it: a diagonal line on the
+  // shelf below Stalker Ridge, from the town side ally, normal boss, heroic
+  // boss, then the original training dummy. Literal marks, so a retune reds
+  // here with a named cause.
+  const ALONG_ROW = [
+    FRIENDLY_PLAYER_DUMMY_ID,
+    NORMAL_BOSS_DUMMY_ID,
+    HEROIC_BOSS_DUMMY_ID,
+    'training_dummy',
+  ] as const;
 
-    // The requested order along ascending z, at the requested pitch.
-    expect(zs.map(Math.round)).toEqual([642, 648, 654, 660]);
-    for (let i = 1; i < zs.length; i++) {
-      expect(Math.round(zs[i] - zs[i - 1])).toBe(PRACTICE_ROW_SPACING);
-    }
-    // One line: the row is a row, not a cluster.
+  it('stands every dummy exactly on its authored mark', () => {
+    expect(PRACTICE_ROW_MARKS).toEqual({
+      [FRIENDLY_PLAYER_DUMMY_ID]: { x: -65.95, z: 611.4 },
+      training_dummy: { x: -80.04, z: 598.23 },
+      [NORMAL_BOSS_DUMMY_ID]: { x: -70.82, z: 606.36 },
+      [HEROIC_BOSS_DUMMY_ID]: { x: -75.65, z: 602.33 },
+    });
+    const sim = makeWorld();
+    // EXACTLY on the mark: nothing near the row (a fire, a prop) shoves a
+    // dummy off it when the spawn resolves clearance.
     for (const id of PRACTICE_ROW_ORDER) {
-      expect(Math.round(dummyOf(sim, id).pos.x)).toBe(PRACTICE_ROW_X);
-    }
-    // The original training dummy did not move off its shipped mark, which the
-    // Wall Drills deed and tests/training_dummy.test.ts both name.
-    expect(Math.round(dummyOf(sim, 'training_dummy').pos.x)).toBe(-40);
-    expect(Math.round(dummyOf(sim, 'training_dummy').pos.z)).toBe(648);
-  });
-
-  // The row is laid ACROSS the walk-up from Highwatch, which is the whole point
-  // of running it along z: laid along x it is seen end-on and the four bodies
-  // collapse into one. Pinned as an angle so a future retune of either the hub
-  // or the row cannot quietly restore the single-file view.
-  it('runs across the approach from Highwatch, not along it', () => {
-    const sim = makeWorld();
-    const first = dummyOf(sim, PRACTICE_ROW_ORDER[0]).pos;
-    const last = dummyOf(sim, PRACTICE_ROW_ORDER[PRACTICE_ROW_ORDER.length - 1]).pos;
-    const hub = { x: 0, z: 660 };
-
-    // Unit vector along the row, and from the row's middle toward the hub.
-    const rowX = last.x - first.x;
-    const rowZ = last.z - first.z;
-    const rowLen = Math.hypot(rowX, rowZ);
-    const midX = (first.x + last.x) / 2;
-    const midZ = (first.z + last.z) / 2;
-    const toHubX = hub.x - midX;
-    const toHubZ = hub.z - midZ;
-    const toHubLen = Math.hypot(toHubX, toHubZ);
-    const cos = Math.abs((rowX * toHubX + rowZ * toHubZ) / (rowLen * toHubLen));
-
-    // Within 30 degrees of square to the approach (cos 60 degrees = 0.5 would
-    // be the halfway point; the shipped layout is about 10 degrees off square).
-    expect(cos).toBeLessThan(0.5);
-  });
-
-  // One fire for the row, not one per dummy. The dummy camps used to each earn
-  // a procedural brazier (they are family 'humanoid'), which lit four fires on
-  // a row of straw targets; render/night_accents_core.ts now excludes inert
-  // mobs, and this authored campfire is the single one that remains.
-  it('authors exactly one campfire, standing in front of the normal boss dummy', () => {
-    const sim = makeWorld();
-    const boss = dummyOf(sim, NORMAL_BOSS_DUMMY_ID).pos;
-
-    // Front is plus x: the row faces the walk-up from Highwatch (x 0).
-    expect(PRACTICE_ROW_CAMPFIRE).toEqual([-38.5, 654]);
-    expect(PRACTICE_ROW_CAMPFIRE[0]).toBeGreaterThan(boss.x);
-    expect(PRACTICE_ROW_CAMPFIRE[0] - boss.x).toBeCloseTo(PRACTICE_ROW_CAMPFIRE_OFFSET, 6);
-    expect(PRACTICE_ROW_CAMPFIRE[1]).toBeCloseTo(boss.z, 6);
-
-    // And it is in the world's real prop table exactly once. Anything else in
-    // the campfire table is far from the row.
-    const nearRow = PROPS.campfires.filter(
-      ([x, z]) => Math.hypot(x - PRACTICE_ROW_X, z - boss.z) < 20,
-    );
-    expect(nearRow).toEqual([PRACTICE_ROW_CAMPFIRE]);
-  });
-
-  // The fire is a SOLID collider (radius 0.85), so standing it too close shoves
-  // the dummy off its camp mark when the spawn resolves clearance: at a 1 yard
-  // offset the boss dummy landed at (-38.66, 652.54), two yards out of line.
-  // 1.5 is the nearest offset that leaves the mark untouched, so this asserts
-  // the dummy is EXACTLY on it rather than merely close.
-  it('stands its fire far enough out that the boss dummy keeps its exact mark', () => {
-    const sim = makeWorld();
-    const boss = dummyOf(sim, NORMAL_BOSS_DUMMY_ID).pos;
-
-    expect(PRACTICE_ROW_CAMPFIRE_OFFSET).toBeGreaterThanOrEqual(1.5);
-    expect(boss.x).toBeCloseTo(PRACTICE_ROW_X, 6);
-    expect(boss.z).toBeCloseTo(654, 6);
-    // Every other dummy in the row is on its mark too: one fire, one row, no
-    // dummy nudged by it.
-    for (const [slot, id] of PRACTICE_ROW_ORDER.entries()) {
       const p = dummyOf(sim, id).pos;
-      expect(p.x).toBeCloseTo(PRACTICE_ROW_X, 6);
-      expect(p.z).toBeCloseTo(642 + slot * PRACTICE_ROW_SPACING, 6);
+      expect(p.x, id).toBeCloseTo(PRACTICE_ROW_MARKS[id].x, 6);
+      expect(p.z, id).toBeCloseTo(PRACTICE_ROW_MARKS[id].z, 6);
     }
+  });
+
+  it('spaces the row 6 to 7 yards apart, along one line', () => {
+    const marks = ALONG_ROW.map((id) => PRACTICE_ROW_MARKS[id]);
+    for (let i = 1; i < marks.length; i++) {
+      const gap = Math.hypot(marks[i].x - marks[i - 1].x, marks[i].z - marks[i - 1].z);
+      expect(gap).toBeGreaterThan(5.5);
+      expect(gap).toBeLessThan(7.5);
+    }
+    // One line, not a cluster: every mark within a yard of the end-to-end chord.
+    const a = marks[0];
+    const b = marks[marks.length - 1];
+    const len = Math.hypot(b.x - a.x, b.z - a.z);
+    for (const m of marks) {
+      const off = Math.abs((b.x - a.x) * (a.z - m.z) - (a.x - m.x) * (b.z - a.z)) / len;
+      expect(off).toBeLessThan(1);
+    }
+  });
+
+  // The row has no fire. The dummy camps used to each earn a procedural
+  // brazier (they are family 'humanoid'); render/night_accents_core.ts excludes
+  // inert mobs, and the rework took the row's one authored campfire out.
+  it('stands no campfire near the row', () => {
+    const near = PROPS.campfires.filter(([x, z]) =>
+      ALONG_ROW.some(
+        (id) => Math.hypot(x - PRACTICE_ROW_MARKS[id].x, z - PRACTICE_ROW_MARKS[id].z) < 20,
+      ),
+    );
+    expect(near).toEqual([]);
   });
 
   it('gives the normal boss dummy normal Nythraxis level and armor', () => {

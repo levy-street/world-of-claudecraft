@@ -1256,7 +1256,7 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
     // -4.3). Balgath's circuit once ran through the gate; it now rings the Starfall
     // Crater's muster pickets 130 yards east, so no slam, shockwave, or wreck telegraph
     // ever reaches the man handing out the counter to them.
-    pos: { x: -22, z: 358 },
+    pos: { x: -10.95, z: 309.92 },
     facing: 1.71,
     color: 0x8a6d3b,
     questIds: ['q_socketwrights_due'],

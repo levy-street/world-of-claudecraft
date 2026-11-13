@@ -56,9 +56,23 @@ describe('Eastbrook ferry berth', () => {
     // the scheduled route owns the ship: no static decorProps row moors it
     expect(PROPS.decorProps?.filter((prop) => prop.key === 'eastbrookFerry')).toHaveLength(0);
     expect(ferry).toMatchObject({ id: 'eastbrook', x: -125, z: -54.8, rot: 0 });
-    // the ferry pier keeps its authored width (no widening for the ship)
-    const pier = EASTBROOK_HARBOR_DECKS[1];
-    expect(pier).toMatchObject({ x: -107, z: -54, hl: 10, hw: 2.2 });
+    // the ferry pier keeps its authored width (no widening for the ship) and
+    // its authored reach (x -97 to -117). The Studio town rework (#4593) raised
+    // the quay, so the pier is two planes: a ramp off the quay lip, then the
+    // level berth the gangplank meets, flush end to end.
+    const ramp = EASTBROOK_HARBOR_DECKS[1];
+    const pier = EASTBROOK_HARBOR_DECKS[2];
+    expect(ramp).toMatchObject({ x: -101, z: -54, hl: 4, hw: 2.2, farAboveWater: 2.64 });
+    expect(pier).toMatchObject({
+      x: -111,
+      z: -54,
+      hl: 6,
+      hw: 2.2,
+      nearAboveWater: 2.64,
+      farAboveWater: 2.64,
+    });
+    expect(ramp.x + ramp.hl).toBe(-97);
+    expect(ramp.x - ramp.hl).toBe(pier.x + pier.hl);
     // the port gangway looks square down the pier's axis
     const gangway = HULL.boarding.find((b) => b.side === 'port');
     if (!gangway) throw new Error('no port gangway');

@@ -19,6 +19,7 @@ import {
   WORLD_MAX_Z,
   WORLD_MIN_Z,
 } from '../sim/data';
+import { FENBRIDGE_LAYOUT } from '../sim/fenbridge_layout';
 import { fluidVolumesFromPlacements } from '../sim/fluid_volumes';
 import {
   type AssetCollisionBox,
@@ -156,9 +157,12 @@ export function newCustomMap(name: string, id: string, now: number): CustomMap {
     content: {
       zones: deepClone(BASE_WORLD.zones as CustomMap['content']['zones']),
       camps: deepClone(BASE_WORLD.camps as CustomMap['content']['camps']),
-      npcs: deepClone(BASE_WORLD.npcs as CustomMap['content']['npcs']),
+      // The live world's NPCs: the touch-up moved Fenbridge's townsfolk with
+      // its buildings, and the projection resolves the town from that same
+      // touch-up, so they stand where its streets and doors are.
+      npcs: deepClone(BUILTIN_WORLD.npcs as CustomMap['content']['npcs']),
       objects: deepClone(BASE_WORLD.groundObjects as CustomMap['content']['objects']),
-      roads: deepClone(BASE_WORLD.roads as CustomMap['content']['roads']),
+      roads: deepClone(fenbridgeAlignedRoads() as CustomMap['content']['roads']),
     },
     terrainEdits: [],
     placements: [
@@ -184,6 +188,31 @@ export function newCustomMap(name: string, id: string, now: number): CustomMap {
     promotedScenery: Object.fromEntries(FEATURE_PROMOTIONS.map((family) => [family.flag, true])),
     propsMode: 'editable-all',
   };
+}
+
+/** How far from Fenbridge's hub a road counts as one of the town's streets. */
+const FENBRIDGE_STREET_REACH = 90;
+
+/**
+ * The base world's road network with Fenbridge's streets taken from the live
+ * world: the touch-up re-laid the town's streets along with its buildings and
+ * NPCs, so a new map's Fenbridge agrees with the live layout its projection
+ * resolves. Roads elsewhere stay the base world's: a new map forks the base
+ * world, and the live-world editor is where the rest of the rework is edited.
+ * The base roads keep their order (road edits key on the index); the live
+ * Fenbridge streets the base lacks follow them.
+ */
+export function fenbridgeAlignedRoads(): { x: number; z: number }[][] {
+  const hub = FENBRIDGE_LAYOUT.hub.center;
+  const inTown = (road: readonly { x: number; z: number }[]) =>
+    road.some((p) => Math.hypot(p.x - hub.x, p.z - hub.z) < FENBRIDGE_STREET_REACH);
+  const key = (road: readonly { x: number; z: number }[]) => JSON.stringify(road);
+  const live = new Set(BUILTIN_WORLD.roads.map(key));
+  const base = new Set(BASE_WORLD.roads.map(key));
+  return [
+    ...BASE_WORLD.roads.filter((road) => !inTown(road) || live.has(key(road))),
+    ...BUILTIN_WORLD.roads.filter((road) => inTown(road) && !base.has(key(road))),
+  ];
 }
 
 /** Requested dimensions for a sized blank map (yards). */
@@ -539,6 +568,16 @@ export function customMapToWorldContent(map: CustomMap): WorldContent {
     biomePaint: map.biomePaint ? deepClone(map.biomePaint) : undefined,
     promotedScenery: promotedSceneryFor(map.propsMode, map.placements, map.promotedScenery),
   };
+  // The cloned built-in props carry the LIVE Fenbridge (the world touch-up
+  // moved its buildings, cistern and stall records): carry the touch-up with
+  // them, so every reader of the town layout (record walls, walk-in floors,
+  // the town's drawn civic pieces) resolves the same layout the records hold.
+  if (map.propsMode !== 'empty' && BUILTIN_WORLD.fenbridgeTouchup) {
+    world.fenbridgeTouchup = touchupForPlacedCottages(
+      BUILTIN_WORLD.fenbridgeTouchup,
+      map.placements,
+    );
+  }
   if (map.playerSpawnArea) world.playerSpawnArea = { ...map.playerSpawnArea };
   // The built-in gameplay objects this map moved (farm beds, practice dummies,
   // gather nodes, dungeon doors): the playtest and the published map read
@@ -631,6 +670,53 @@ export function customMapToWorldContent(map: CustomMap): WorldContent {
 }
 
 /**
+ * The live Fenbridge touch-up, less any added cottage the map does not place,
+ * and each placed one where its placement now stands (matched by placement
+ * uid, as live_world_core.ts liveFenbridgeTouchup does): an added cottage's
+ * touch-up clears grass and scatter and walls its reach, so without its
+ * placement it would leave a bare footprint, and a moved one must carry them.
+ */
+export function touchupForPlacedCottages(
+  touchup: NonNullable<WorldContent['fenbridgeTouchup']>,
+  placements: readonly { uid?: string; x: number; z: number; rotY: number }[],
+): NonNullable<WorldContent['fenbridgeTouchup']> {
+  const out = deepClone(touchup);
+  if (!out.addedCottages) return out;
+  const byUid = new Map(placements.flatMap((p) => (p.uid ? [[p.uid, p] as const] : [])));
+  const kept = out.addedCottages.flatMap((c) => {
+    const p = byUid.get(c.uid);
+    return p ? [{ ...c, x: p.x, z: p.z, rot: p.rotY }] : [];
+  });
+  if (kept.length > 0) return { ...out, addedCottages: kept };
+  const { addedCottages: _none, ...rest } = out;
+  return rest;
+}
+
+/** Whether a point stands inside a world rect (edges included). */
+function pointInRect(
+  p: { x: number; z: number },
+  rect: { minX: number; maxX: number; minZ: number; maxZ: number },
+): boolean {
+  return p.x >= rect.minX && p.x <= rect.maxX && p.z >= rect.minZ && p.z <= rect.maxZ;
+}
+
+/** Whether a height stamp's footprint (at most the square of half side
+ *  `radius` about its centre, HeightStamp.shape) reaches into a world rect.
+ *  Exact for a square stamp; a round one grazing the rect only by a corner
+ *  of that square counts too, erring toward leaving it out. */
+export function stampReachesRect(
+  s: { x: number; z: number; radius: number },
+  rect: { minX: number; maxX: number; minZ: number; maxZ: number },
+): boolean {
+  return (
+    s.x + s.radius > rect.minX &&
+    s.x - s.radius < rect.maxX &&
+    s.z + s.radius > rect.minZ &&
+    s.z - s.radius < rect.maxZ
+  );
+}
+
+/**
  * LINK-TO-WORLD projection: embed the map's layers into the FULL built-in
  * world, offset so the map's origin lands on `anchor`. The base game keeps
  * running around the placed region (terrain, mobs, NPCs, quests, SPACEY's
@@ -661,6 +747,7 @@ function linkedWorldContent(map: CustomMap, anchor: { x: number; z: number }): W
   );
   const placements = map.placements.map((p) => ({ ...p, x: p.x + ax, z: p.z + az }));
   const start = map.playerStart ?? { x: 0, z: 0 };
+  const linkedRect = { minX: ax - halfW, maxX: ax + halfW, minZ: az + zMin, maxZ: az + zMax };
   const world: WorldContent = {
     zones: deepClone(BUILTIN_WORLD.zones),
     // The maker's camps/NPCs/objects/roads join the world's own at the offset.
@@ -670,6 +757,8 @@ function linkedWorldContent(map: CustomMap, anchor: { x: number; z: number }): W
       ...map.content.camps.map((c) => ({
         ...deepClone(c),
         center: { x: c.center.x + ax, z: c.center.z + az },
+        // pinned slot spots (CampDef.spots) ride the anchor with their camp
+        ...(c.spots ? { spots: c.spots.map((s) => ({ x: s.x + ax, z: s.z + az })) } : {}),
       })),
     ] as WorldContent['camps'],
     npcs: {
@@ -699,11 +788,30 @@ function linkedWorldContent(map: CustomMap, anchor: { x: number; z: number }): W
     ] as WorldContent['roads'],
     props: deepClone(BUILTIN_WORLD.props),
     playerStart: { x: start.x + ax, z: start.z + az },
-    terrainEdits: map.terrainEdits.map((s) => ({ ...s, x: s.x + ax, z: s.z + az })),
+    // The built-in world's own sculpts (its touch-up layer: town pads, the
+    // reworked streets) keep shaping the world around the map, then the
+    // map's stamps at the offset. A built-in stamp reaching into the map's
+    // rect is left out whole: inside it the map's own ground is the whole
+    // word, and a stamp is one shape (its outer part is then lost too, where
+    // the edge band blends the map into the world).
+    terrainEdits: [
+      ...(BUILTIN_WORLD.terrainEdits ?? [])
+        .filter((s) => !stampReachesRect(s, linkedRect))
+        .map((s) => ({ ...s })),
+      ...map.terrainEdits.map((s) => ({ ...s, x: s.x + ax, z: s.z + az })),
+    ],
     ...(map.clutter && map.clutter.length > 0
       ? { clutter: map.clutter.map((s) => ({ ...s, x: s.x + ax, z: s.z + az })) }
       : {}),
-    placements: placementsToPlayAssets(placements, map.assetCollisionMesh),
+    // The built-in world's placed models (its touch-up layer: the reworked
+    // towns' buildings, stalls and fences, the Fenbridge cottages) stand
+    // around the map like its props do, then the map's own. A built-in model
+    // standing inside the map's rect stays out with the sculpts that seat
+    // it: the map's own ground replaces that patch of the world.
+    placements: [
+      ...deepClone(BUILTIN_WORLD.placements ?? []).filter((p) => !pointInRect(p, linkedRect)),
+      ...placementsToPlayAssets(placements, map.assetCollisionMesh),
+    ],
     // The map's own terrain REPLACES the overworld base inside its rect
     // (world.ts terrainHeight linkedMap override, edge-blended): the placed
     // district looks exactly like the authored map, its flat slate or its
@@ -718,6 +826,25 @@ function linkedWorldContent(map: CustomMap, anchor: { x: number; z: number }): W
       ...(map.terrainBase ? { terrainBase: { ...map.terrainBase } } : {}),
     },
   };
+  // The cloned built-in props carry the LIVE Fenbridge (the world touch-up
+  // moved its buildings, cistern and stall records): carry the touch-up with
+  // them, as the standalone projection does, so the walk-in floors and the
+  // town's drawn civic pieces resolve the same layout the records hold.
+  if (BUILTIN_WORLD.fenbridgeTouchup) {
+    world.fenbridgeTouchup = deepClone(BUILTIN_WORLD.fenbridgeTouchup);
+  }
+  // The rest of the built-in world's touch-up and service layers, so the
+  // world around the map is the live one: the gameplay objects it moved, the
+  // decorations its placements replaced, its scrubbed grass, its painted
+  // biome (the map's own paint, when it has one, takes the whole grid, as a
+  // paint is one grid per world), and its stations, mailboxes and graveyards.
+  if (BUILTIN_WORLD.objectMoves) world.objectMoves = BUILTIN_WORLD.objectMoves;
+  if (BUILTIN_WORLD.decorationExclusions) {
+    world.decorationExclusions = [...BUILTIN_WORLD.decorationExclusions];
+  }
+  if (BUILTIN_WORLD.grassClear) world.grassClear = deepClone(BUILTIN_WORLD.grassClear);
+  if (BUILTIN_WORLD.biomePaint) world.biomePaint = deepClone(BUILTIN_WORLD.biomePaint);
+  if (BUILTIN_WORLD.services) world.services = deepClone(BUILTIN_WORLD.services);
   if (map.playerSpawnArea) {
     world.playerSpawnArea = {
       minX: map.playerSpawnArea.minX + ax,
@@ -726,15 +853,18 @@ function linkedWorldContent(map: CustomMap, anchor: { x: number; z: number }): W
       maxZ: map.playerSpawnArea.maxZ + az,
     };
   }
-  if (interiorBlockers.length > 0) {
-    world.blockers = interiorBlockers.map((b) => ({
+  // The built-in world's own invisible walls stand too, then the maker's.
+  const blockers = [
+    ...deepClone(BUILTIN_WORLD.blockers ?? []),
+    ...interiorBlockers.map((b) => ({
       ...b,
       x1: b.x1 + ax,
       z1: b.z1 + az,
       x2: b.x2 + ax,
       z2: b.z2 + az,
-    }));
-  }
+    })),
+  ];
+  if (blockers.length > 0) world.blockers = blockers;
   if (map.assetCollision && Object.keys(map.assetCollision).length > 0) {
     world.assetCollision = playAssetCollision(map.assetCollision);
   }

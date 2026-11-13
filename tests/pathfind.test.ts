@@ -16,14 +16,15 @@ import {
 import { Sim } from '../src/sim/sim';
 import { groundHeight, WATER_LEVEL } from '../src/sim/world';
 
-// Highwatch paddock west run: an isolated, open-field fence with room to detour
+// Proving Shore south run, west of Nel's gate: an isolated, open-field fence with room to detour
 // on both sides, used to exercise generic fence-blocking / fence-jump pathfinding
 // (not Eastbrook or Fenbridge-specific). The old (-18,313) pin was a removed
-// Fenbridge legacy fence that no longer ships.
+// Fenbridge legacy fence that no longer ships, and the Highwatch south gate run
+// (-14,649 to -4,647) after it was removed by the Studio town rework (#4593).
 const TEST_FENCE_PLACEMENT = PROPS.fences.find(
-  (fence) => fence.x1 === -14 && fence.z1 === 649 && fence.x2 === -4 && fence.z2 === 647,
+  (fence) => fence.x1 === -319 && fence.z1 === 39 && fence.x2 === -330 && fence.z2 === 39,
 );
-if (!TEST_FENCE_PLACEMENT) throw new Error('missing Highwatch paddock west fence');
+if (!TEST_FENCE_PLACEMENT) throw new Error('missing the Proving Shore south fence run');
 const TEST_FENCE = {
   x1: TEST_FENCE_PLACEMENT.x1,
   z1: TEST_FENCE_PLACEMENT.z1,
@@ -31,8 +32,7 @@ const TEST_FENCE = {
   z2: TEST_FENCE_PLACEMENT.z2,
 } as const;
 
-// Highwatch's painted chapel stands just south of this fence, door to it, so
-// the crossings below start on the chapel's forecourt, a stride off the rails.
+// The crossings below start a stride off the rails, on open ground either side.
 const FENCE_CROSSING_DISTANCE = 2;
 
 function acrossFence(distance: number): {
@@ -76,18 +76,21 @@ describe('player pathfinding', () => {
     // the green at (2,-78): the apothecary's shop at (-7,-82) blocked the
     // straight line along z -80. Re-staged for the World of ClaudeCraft Studio
     // map's arrangement, which moved the shop to the strand: the smithy that
-    // took the old chapel rise blocks the straight line along z -73, with open
-    // ground at both ends to detour over.
+    // took the old chapel rise blocks the straight line. The Studio town rework
+    // (#4593) turned the smithy end-on to the old z -73 line, so its long side
+    // runs north to south past the planner's 8 yd margin there; the line now
+    // crosses it at z -78, a few yards short of its north end, where the
+    // detour round that end stays inside the search window.
     const seed = 20061;
-    const from = { x: -13, z: -73 };
-    const to = { x: 9, z: -73 };
+    const from = { x: -16, z: -78 };
+    const to = { x: 4, z: -78 };
     const path = findPlayerPath(seed, from, to);
 
-    expect(isBlocked(seed, -2, -73)).toBe(true);
+    expect(isBlocked(seed, -6, -78)).toBe(true);
     expect(isBlocked(seed, from.x, from.z)).toBe(false);
     expect(isBlocked(seed, to.x, to.z)).toBe(false);
     expect(path.length).toBeGreaterThan(1);
-    expect(path.some((p) => Math.abs(p.z + 73) > 0.5)).toBe(true);
+    expect(path.some((p) => Math.abs(p.z + 78) > 0.5)).toBe(true);
     expect(path[path.length - 1]).toEqual(to);
   });
 

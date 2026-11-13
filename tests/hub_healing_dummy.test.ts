@@ -9,13 +9,11 @@
 // with the Highwatch row.
 import { describe, expect, it } from 'vitest';
 import { isBlocked } from '../src/sim/colliders';
-import { HEALING_DUMMY_IDS } from '../src/sim/content/healing_training';
 import {
   HUB_HEALING_DUMMY_ID,
   HUB_HEALING_DUMMY_POS,
   HUB_PRACTICE_NPCS,
   HUB_SPARRING_MASTER_POS,
-  HUB_TRAINING_DUMMY_POS,
 } from '../src/sim/content/practice_dummies';
 import { BUILTIN_WORLD, MOBS } from '../src/sim/data';
 import {
@@ -26,6 +24,7 @@ import {
 import { Sim } from '../src/sim/sim';
 import type { Entity, WorldContent } from '../src/sim/types';
 import { groundHeight, waterLevelAt } from '../src/sim/world';
+import { HUB_HEALING_DUMMY_MARK, HUB_TRAINING_DUMMY_MARK } from './helpers/hub_yard';
 
 const SEED = 42;
 
@@ -41,7 +40,7 @@ function makeWorld(): Sim {
 }
 
 function healingDummyOf(sim: Sim): Entity {
-  const { x, z } = HUB_HEALING_DUMMY_POS;
+  const { x, z } = HUB_HEALING_DUMMY_MARK;
   const d = [...sim.entities.values()].find(
     (e) =>
       e.templateId === HUB_HEALING_DUMMY_ID && !e.dead && Math.hypot(e.pos.x - x, e.pos.z - z) < 5,
@@ -78,22 +77,31 @@ describe('the hub healing dummy is a level-5 template of its own', () => {
 });
 
 describe('placement: near Hale, clear of the road and every quay neighbour', () => {
-  it('stands on dry, unblocked ground a few yards from Hale and the damage dummy', () => {
-    const { x, z } = HUB_HEALING_DUMMY_POS;
+  it('stands on dry, unblocked ground beside the damage dummy', () => {
+    // The Studio town rework (#4593) mark, as a literal: the map's spot, the
+    // native HUB_HEALING_DUMMY_POS now (no touch-up object move rides over it).
+    expect(HUB_HEALING_DUMMY_MARK).toEqual({ x: -77.6, z: -3.17 });
+    expect(HUB_HEALING_DUMMY_MARK).toBe(HUB_HEALING_DUMMY_POS);
+    const { x, z } = HUB_HEALING_DUMMY_MARK;
     expect(isBlocked(SEED, x, z, 0.5)).toBe(false);
     expect(groundHeight(x, z, SEED)).toBeGreaterThan(waterLevelAt(x, z, SEED));
+    const toDamageDummy = Math.hypot(x - HUB_TRAINING_DUMMY_MARK.x, z - HUB_TRAINING_DUMMY_MARK.z);
+    expect(toDamageDummy).toBeGreaterThan(2.5); // its own mark, not stacked on the other dummy
+    expect(toDamageDummy).toBeLessThan(10); // the two dummies share one yard
+  });
+
+  it('stands a few yards from Hale', () => {
+    const { x, z } = HUB_HEALING_DUMMY_MARK;
     const toHale = Math.hypot(x - HUB_SPARRING_MASTER_POS.x, z - HUB_SPARRING_MASTER_POS.z);
     expect(toHale).toBeGreaterThan(2.5); // not on top of him
     expect(toHale).toBeLessThan(8); // "beside it" is true
-    const toDamageDummy = Math.hypot(x - HUB_TRAINING_DUMMY_POS.x, z - HUB_TRAINING_DUMMY_POS.z);
-    expect(toDamageDummy).toBeGreaterThan(2.5); // its own mark, not stacked on the other dummy
   });
 
   it('findSafePos leaves it exactly on its authored mark, clear of every other quay entity', () => {
     const sim = new Sim({ seed: SEED, playerClass: 'priest', world: BUILTIN_WORLD });
     const d = healingDummyOf(sim);
-    expect(Math.round(d.pos.x)).toBe(HUB_HEALING_DUMMY_POS.x);
-    expect(Math.round(d.pos.z)).toBe(HUB_HEALING_DUMMY_POS.z);
+    expect(d.pos.x).toBeCloseTo(HUB_HEALING_DUMMY_MARK.x, 6);
+    expect(d.pos.z).toBeCloseTo(HUB_HEALING_DUMMY_MARK.z, 6);
     for (const e of sim.entities.values()) {
       if (e.id === d.id || e.id === sim.player.id) continue;
       expect(Math.hypot(e.pos.x - d.pos.x, e.pos.z - d.pos.z)).toBeGreaterThan(2.5);
@@ -108,9 +116,10 @@ describe('placement: near Hale, clear of the road and every quay neighbour', () 
       playerClass: 'priest',
       world: { ...BUILTIN_WORLD, npcs: npcsWithoutHale },
     });
-    // Hale owns the hub damage/healing dummies and the five nearby healing
-    // training allies, all outside normal camp construction.
-    expect(withYard.entities.size).toBe(withoutYard.entities.size + 3 + HEALING_DUMMY_IDS.length);
+    // Hale owns the hub damage/healing dummies, outside normal camp
+    // construction. The five healing training allies he also gates no longer
+    // spawn: the Studio town rework (#4593) deleted them from the shipped world.
+    expect(withYard.entities.size).toBe(withoutYard.entities.size + 3);
     const damageDummy = [...withYard.entities.values()].find(
       (e) => e.templateId === 'hub_training_dummy',
     );

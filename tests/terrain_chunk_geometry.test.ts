@@ -427,7 +427,15 @@ describe('generated chunk geometry is stable', () => {
     // Re-minted for the freight yard and ferry bell moving to the quay. The
     // dense height atlas changes at 74 of 167,188 samples, all within 5.93 yd
     // of an old or new object position (maximum height delta 2.84 yd).
-    expect(digestOf(inRect)).toBe('3d621f9335e944b43575c00e60652941');
+    // Re-minted for the Studio town rework (#4593) carried into the live world:
+    // the touch-up's Eastbrook terrain edits regrade the town, and the moved
+    // smithy, quay cottage and weekly vault, the authored NPC stands and the
+    // new placements, pads, re-placed stations and nodes move their calm
+    // pads with them. Measured twice in
+    // separate processes on the branch tree, identical both times. Re-minted
+    // again as the Wolf Run, Boar Meadow and Sableweb POIs follow their camps
+    // (their calm pads move with them).
+    expect(digestOf(inRect)).toBe('351621fe4ed397e7030eb132583f5a38');
     // The gap super-chunk digest pin is gone with the gap chunks themselves
     // (the island claims the old vale gap cells); gapFill.length above pins
     // their absence.

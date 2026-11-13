@@ -34,7 +34,7 @@ export const REALM_ZONE: ZoneDef = {
   biome: 'dusk',
   sealedSouthBorder: true,
   hub: { x: -40, z: 1030, radius: 30, name: 'Eldershine' },
-  graveyard: { x: -60, z: 1004 },
+  graveyard: { x: -53.1, z: 1009.1 },
   // Overlapping carves make organic shorelines: inlets and coves instead of
   // circular ponds. The tarn cuts into the western highlands; the falls pool
   // terrace above Starfall is shaped in world.ts (VEILED_HOLLOW_SHAPING).
@@ -482,7 +482,7 @@ export const REALM_NPCS: Record<string, NpcDef> = {
     id: 'keeper_saelwyn',
     name: 'Keeper Saelwyn',
     title: 'Keeper of the Hollow',
-    pos: { x: -43, z: 1016 },
+    pos: { x: -42.57, z: 1018.23 },
     facing: -2.85, // back to the great tree, greeting arrivals from the ring
     color: 0xd8c4f0,
     questIds: [
@@ -509,8 +509,8 @@ export const REALM_NPCS: Record<string, NpcDef> = {
     id: 'provisioner_fenna',
     name: 'Provisioner Fenna',
     title: 'Eldershine Provisioner',
-    pos: { x: -46, z: 1031 },
-    facing: -0.87,
+    pos: { x: 0.34, z: 1031.42 },
+    facing: 6.199,
     color: 0x8fbf8a,
     questIds: ['q_gleaming_antlers', 'q_grove_menace', 'q_hollow_the_huntsman'],
     vendorItems: [
@@ -528,7 +528,7 @@ export const REALM_NPCS: Record<string, NpcDef> = {
     id: 'wardsmith_orun',
     name: 'Wardsmith Orun',
     title: 'Keeper of the Old Forges',
-    pos: { x: -34, z: 1031 },
+    pos: { x: -52.51, z: 1067.99 },
     facing: 0.87,
     color: 0x9a86b8,
     questIds: [],
@@ -539,8 +539,8 @@ export const REALM_NPCS: Record<string, NpcDef> = {
     id: 'archivist_tullo',
     name: 'Archivist Tullo',
     title: 'Reader of Stones',
-    pos: { x: -31, z: 1021 },
-    facing: 2.08, // back to the great tree, looking out toward his monuments
+    pos: { x: -27, z: 1045.44 },
+    facing: 3.651,
     color: 0xb8a8d8,
     questIds: ['q_monument_tour', 'q_shards_of_starfall', 'q_wardens_echoes'],
     greeting:

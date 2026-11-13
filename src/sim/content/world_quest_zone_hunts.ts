@@ -68,7 +68,10 @@ export const WORLD_QUEST_ZONE_HUNTS: readonly WorldQuestDef[] = Object.freeze([
     'wq_eastbrook_spiders',
     'eastbrook_vale',
     WORLD_QUEST_MIN_LEVEL,
-    { x: -70, z: 2, radius: 38 },
+    // Studio town rework (#4593): the camp's spiders stand on authored spots
+    // north of its disc now, so the ring moved 15 yd north and grew to hold
+    // the disc and every spot with its wander.
+    { x: -70, z: 17, radius: 55 },
     'webwood_spider',
     5,
   ),
@@ -98,7 +101,10 @@ export const WORLD_QUEST_ZONE_HUNTS: readonly WorldQuestDef[] = Object.freeze([
     'wq_thornpeak_ogres',
     'thornpeak_heights',
     13,
-    { x: -75, z: 715, radius: 53 },
+    // Studio town rework (#4593): the ogres stand on authored spots west of
+    // their discs and a new lone camp stands at (-129, 719), so the ring moved
+    // 14 yd west and grew to hold them all with their wander.
+    { x: -89, z: 721, radius: 58 },
     'thornpeak_ogre',
     5,
   ),
@@ -172,7 +178,9 @@ export const WORLD_QUEST_ZONE_HUNTS: readonly WorldQuestDef[] = Object.freeze([
     'rime_elemental',
     3,
   ),
-  kill('wq_frostveil_sprites', 'frostveil', 17, { x: -84, z: 1738, radius: 22 }, 'fen_sprite', 3),
+  // Studio town rework (#4593): the sprites stand on authored spots south of
+  // their disc, so the ring moved 11 yd south and grew to hold them.
+  kill('wq_frostveil_sprites', 'frostveil', 17, { x: -84, z: 1727, radius: 32 }, 'fen_sprite', 3),
   // Willowfen (levels 19 to 20)
   kill('wq_willowfen_toads', 'willowfen', 19, { x: -363, z: 328, radius: 132 }, 'bogtoad', 6, {
     x: -354,
@@ -270,7 +278,9 @@ export const WORLD_QUEST_ZONE_HUNTS: readonly WorldQuestDef[] = Object.freeze([
     'wq_evergarden_gnomes',
     'evergarden',
     20,
-    { x: 362, z: 972, radius: 119 },
+    // Studio town rework (#4593): a new lone gnome camp at (459.6, 913.3), so
+    // the ring grew 7 yd to hold it with its wander.
+    { x: 362, z: 972, radius: 126 },
     'hedge_gnome',
     4,
     { x: 268, z: 984 },

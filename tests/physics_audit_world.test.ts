@@ -29,6 +29,7 @@ import {
 import { CRYPT_LAYOUT, DAIS_HEIGHT, tombSlotRoll } from '../src/sim/dungeon_layout';
 import { morthenEntranceHeight } from '../src/sim/encounters/hollow_crypt/ids';
 import { FENBRIDGE_LAYOUT } from '../src/sim/fenbridge_layout';
+import { dungeonDoorPos } from '../src/sim/moved_objects';
 import {
   CHAPEL_HALL_ROOF_EAVE,
   CHAPEL_HALL_ROOF_TOP,
@@ -186,10 +187,12 @@ describe('the town wall is a vaultable parapet, not a curtain', () => {
       height: 2.7,
     };
     const walls: StaticObbPropDef[] = [
-      { ...wing, id: 'fixture_wall_wing', x: -60, z: 0 },
-      { ...wing, id: 'fixture_wall_wing_mirrored', x: -60, z: 20, mirrored: true },
+      { ...wing, id: 'fixture_wall_wing', x: -60, z: 10 },
+      { ...wing, id: 'fixture_wall_wing_mirrored', x: -60, z: 30, mirrored: true },
     ];
     // Open, dry ground before the wings go in, so every push below is theirs.
+    // The Studio town rework (#4593) planted pines round (-60, 0), so the
+    // pair stands 10 yd further north on ground that is still open.
     for (const wall of walls) expect(isBlocked(SEED, wall.x, wall.z, 3.5), wall.id).toBe(false);
     setActiveWorldContent({ ...BUILTIN_WORLD, props: { ...BUILTIN_WORLD.props, walls } });
     try {
@@ -273,8 +276,11 @@ describe('interactable landmarks are solid (the v0.31 walk-through sweep)', () =
   it('dungeon door jambs block while the mouth stays a walkable trigger lane', () => {
     // Dawnhold Castle keeps the generic arch. The five-man dungeons no longer
     // do: each door is a built set piece with its own colliders now
-    // (src/sim/dungeon_door_jambs.ts).
-    const door = DUNGEONS.dawnhold_castle.doorPos;
+    // (src/sim/dungeon_door_jambs.ts). The Studio town rework (#4593) moved
+    // the Dawnhold door by an object move, so the jambs stand at the moved
+    // point the world resolves (dungeonDoorPos), not the content literal.
+    const door = dungeonDoorPos(BUILTIN_WORLD.objectMoves, DUNGEONS.dawnhold_castle);
+    expect(door).not.toEqual(DUNGEONS.dawnhold_castle.doorPos);
     for (const sx of [-DOOR_ARCH_JAMB_X, DOOR_ARCH_JAMB_X]) {
       expect(isBlocked(SEED, door.x + sx, door.z, 0.4), `jamb ${sx}`).toBe(true);
       // a generic jamb is a slim post: a yard further out the ground is open
@@ -320,22 +326,32 @@ describe('interactable landmarks are solid (the v0.31 walk-through sweep)', () =
 
 describe('civic bench (rebuild furniture)', () => {
   it('strides up onto the seat with no jump, and off again clean', () => {
-    // Re-pinned 2026-08 for the harbor move (d19aa33f76): the civic benches
-    // ring the market square now; this is the SOUTH bench at (-14, -104.9),
-    // rot 0, drawn 1.8 x 0.6 x 0.40: the 0.40 seat sits inside
-    // MAX_STEP_HEIGHT, so a plain walk climbs it like a kerb, and the
-    // far-side walk-off crosses toward the square and re-seats on terrain.
+    // The civic benches ring the realm-builder monument (eastbrook_layout.ts
+    // BENCHES); the south one has no open approach left (the monument stands
+    // behind it), so the run walks the WEST bench end to end along its 1.8
+    // length, rot PI/2, drawn 1.8 x 0.6 x 0.40: the 0.40 seat sits inside
+    // MAX_STEP_HEIGHT, so a plain walk climbs it like a kerb. The Studio town
+    // rework (#4593) re-levelled the square with hard-edged brush strokes, so
+    // the terrain under the seat now steps by a tenth of a yard: the seat
+    // height reads against the ground at the bench's own anchor (where
+    // colliders.ts seats its 0.40 top), not the step under the mover.
+    const bench = (BUILTIN_WORLD.props.benches ?? []).find(
+      (b) => b.id === 'eastbrook_civic_bench_west',
+    );
+    if (!bench) throw new Error('missing the west civic bench');
+    expect(bench.rot).toBeCloseTo(Math.PI / 2, 9);
+    const seatBase = groundHeight(bench.x, bench.z, SEED);
     const sim = makeSim();
-    teleport(sim, -14, -104.9 - 1.3, 0);
+    teleport(sim, bench.x, bench.z - bench.w / 2 - 1.3, 0);
     const p = sim.player;
     let stood = 0;
     for (let i = 0; i < 40; i++) {
       hold(sim, { forward: true }, 1);
-      if (p.onGround) stood = Math.max(stood, p.pos.y - groundHeight(p.pos.x, p.pos.z, SEED));
+      if (p.onGround) stood = Math.max(stood, p.pos.y - seatBase);
     }
     expect(stood).toBeGreaterThan(0.3);
     expect(stood).toBeLessThan(0.5);
-    // Keep walking: off the far side, seated back on the terrain, unhurt.
+    // Keep walking: off the far end, seated back on the terrain, unhurt.
     const hpBefore = p.hp;
     hold(sim, { forward: true }, 30);
     expect(p.hp).toBe(hpBefore);
@@ -388,10 +404,12 @@ describe('chapel flows', () => {
   // The rebuilds replaced every one the built-in world stood (the Eastbrook civic
   // kit, Highwatch, then the painted towns of sim/painted_towns/), so the flow
   // stands its own fixture chapel, the walls fixture's way: the record Icemantle's
-  // plaza last carried, at its old spot, size and turn, on ground checked open.
+  // plaza last carried, at its size and turn, on ground checked open. Its old
+  // spot (-18, 1570) is built over since the Studio town rework (#4593) moved
+  // Icemantle's buildings, so it stands on open ground north of the town.
   const rot = -2;
-  const cx = -18;
-  const cz = 1570;
+  const cx = -24;
+  const cz = 1628;
   const fx = Math.sin(rot);
   const fz = Math.cos(rot);
   const chapel = { kind: 'chapel' as const, x: cx, z: cz, w: 5, d: 7, rot };
@@ -435,10 +453,10 @@ describe('chapel flows', () => {
 
 // Generic gabled market stand (no assetId) keeps the sloped-canopy physics
 // pinned. The old Fenbridge (-5, 310.5) stand was replaced by the rebuild
-// provision stall GLB, so this suite uses Bridgemere's stand instead, re-pinned
-// 2026-10 to the forecourt where the painted rebuild moved it (the island inn
-// covers its old spot).
-const LEGACY_STALL = { x: -370, z: 349.5, rot: 0.5 };
+// provision stall GLB, and the Studio town rework (#4593) removed Bridgemere's
+// forecourt stand, so this suite uses the Nightbloom stand (nightbloom.ts
+// stalls, the first generic one).
+const LEGACY_STALL = { x: -373, z: 1416, rot: 0.4 };
 // local +Z (eave approach) in the stall yaw convention.
 const LEGACY_STALL_APPROACH = {
   x: Math.sin(LEGACY_STALL.rot),
@@ -476,12 +494,16 @@ describe('stall rim behavior', () => {
 describe('dock flows', () => {
   it('deck to hut roof to deck, and step into the moored rowboat', () => {
     const sim = makeSim();
-    // Hut world position (dock -64,60 rot -2.2; hut local 2.8,2.4).
-    const rot = -2.2;
-    const hx = -64 + 2.8 * Math.cos(rot) + 2.4 * Math.sin(rot);
-    const hz = 60 - 2.8 * Math.sin(rot) + 2.4 * Math.cos(rot);
+    // Hut world position (hut local 2.8,2.4). The Studio town rework (#4593)
+    // moved the dock from (-64, 60) rot -2.2 to (-79.377, 72.658) and turned
+    // it by -1.8509 (studio_rework_props.ts), so rot is -4.0509 now.
+    const dx = -79.377;
+    const dz = 72.658;
+    const rot = -4.0509;
+    const hx = dx + 2.8 * Math.cos(rot) + 2.4 * Math.sin(rot);
+    const hz = dz - 2.8 * Math.sin(rot) + 2.4 * Math.cos(rot);
     // Approach across the deck from the dock anchor toward the hut.
-    teleport(sim, -64, 60, Math.atan2(hx + 64, hz - 60));
+    teleport(sim, dx, dz, Math.atan2(hx - dx, hz - dz));
     const p = sim.player;
     let onRoof = false;
     for (let i = 0; i < 140 && !onRoof; i++) {
@@ -496,9 +518,11 @@ describe('dock flows', () => {
       x: 2.4 * Math.cos(rot) + -5.0 * Math.sin(rot),
       z: -2.4 * Math.sin(rot) + -5.0 * Math.cos(rot),
     };
-    const bx = -64 + boff.x;
-    const bz = 60 + boff.z;
-    teleport(sim, bx - Math.sin(0.4) * 3, bz - Math.cos(0.4) * 3, 0.4);
+    const bx = dx + boff.x;
+    const bz = dz + boff.z;
+    // The approach heading turns with the dock (0.4 at the old rot -2.2).
+    const boatHeading = 0.4 + (rot + 2.2);
+    teleport(sim, bx - Math.sin(boatHeading) * 3, bz - Math.cos(boatHeading) * 3, boatHeading);
     let inBoat = false;
     for (let i = 0; i < 100 && !inBoat; i++) {
       hold(sim, { forward: true, jump: true }, 1);
@@ -514,7 +538,7 @@ describe('dock flows', () => {
 describe('abilities x collision', () => {
   it('Vaulting Charge onto the stall canopy seats on the sampled gable, and off again', () => {
     const sim = makeSim();
-    // 4 yd out: open street (Bridgemere's inn step stands 5.5 yd out this side)
+    // 4 yd out: open ground on the stand's approach side
     const approachX = LEGACY_STALL.x + LEGACY_STALL_APPROACH.x * 4;
     const approachZ = LEGACY_STALL.z + LEGACY_STALL_APPROACH.z * 4;
     teleport(

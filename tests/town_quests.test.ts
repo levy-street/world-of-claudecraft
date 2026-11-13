@@ -193,6 +193,7 @@ describe('townQuestsComplete', () => {
       ...eastbrook,
       id: 'nowhere',
       hub: { x: 9000, z: 9000, radius: 1, name: 'Nowhere' },
+      questHub: { x: 9000, z: 9000, radius: 1 },
     };
     expect(townQuestIds(empty)).toEqual([]);
     expect(townQuestsComplete(empty, () => 'done', 'warrior')).toBe(false);

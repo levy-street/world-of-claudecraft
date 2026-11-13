@@ -37,7 +37,7 @@ export interface InstanceMusicInput {
   inCombat: boolean;
   playerId: number;
   playerPos: { x: number; z: number };
-  zone: Pick<ZoneDef, 'id' | 'biome' | 'hub'>;
+  zone: Pick<ZoneDef, 'id' | 'biome' | 'hub' | 'questHub'>;
   inDungeon: boolean;
   entities: Iterable<InstanceMusicEntity>;
   // The active procedural Rift floor (null outside a rift). A rift floor scores
@@ -79,6 +79,25 @@ export interface InstanceMusicPort {
 }
 
 const MUSIC_ZONE_SET: ReadonlySet<string> = new Set(ALL_MUSIC_ZONES);
+
+/** How far past a town circle its town theme still plays, in yards. */
+const TOWN_MUSIC_PAD = 10;
+
+/**
+ * Whether a point hears its zone's town theme: within the pad of the hub
+ * circle, or of the wider questHub circle a town that spread past its hub
+ * carries (the Studio town rework, #4593, ZoneDef.questHub). The town is the
+ * union of the two circles, as professions/focus.ts isInTownZone reads it.
+ * Shared by the running game and the editor's music preview.
+ */
+export function inTownMusicArea(
+  pos: { x: number; z: number },
+  zone: Pick<ZoneDef, 'hub' | 'questHub'>,
+): boolean {
+  const near = (c: { x: number; z: number; radius: number }) =>
+    Math.hypot(pos.x - c.x, pos.z - c.z) < c.radius + TOWN_MUSIC_PAD;
+  return near(zone.hub) || (zone.questHub !== undefined && near(zone.questHub));
+}
 
 /**
  * The track an authored map asks for at (x, z), or null when it asks for
@@ -135,10 +154,7 @@ export function instanceMusicDecision(input: InstanceMusicInput): InstanceMusicD
   bossEngaged =
     bossEngaged || inRaidArena || input.now - input.lastBossCombatEventAt < RECENT_BOSS_COMBAT_MS;
 
-  const { hub } = input.zone;
-  const inHub =
-    !input.inDungeon &&
-    Math.hypot(input.playerPos.x - hub.x, input.playerPos.z - hub.z) < hub.radius + 10;
+  const inHub = !input.inDungeon && inTownMusicArea(input.playerPos, input.zone);
   const instanceId = isDelvePos(input.playerPos.x)
     ? (delveAt(input.playerPos.x)?.id ?? FALLBACK_DELVE_ID)
     : (dungeon?.id ?? null);

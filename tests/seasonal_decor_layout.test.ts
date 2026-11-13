@@ -152,8 +152,12 @@ describe('seasonal decor placement against the live world', () => {
   it('refuses a spot inside a collider, on the road and on an NPC (the resolver rule itself)', () => {
     const lamp = streetlampPlacements(WORLD_SEED)[0];
     expect(groundSpotProblem(WORLD_SEED, lamp.x, lamp.z, [], [])).toBe('collider');
-    const wilkes = NPCS.trader_wilkes.pos;
-    expect(groundSpotProblem(WORLD_SEED, wilkes.x, wilkes.z, [wilkes], [])).toBe('npc');
+    // (the Studio town rework, #4593, stood Trader Wilkes on the road's edge,
+    // where the road rule answers first; the merchant keeps an open stand)
+    const merchant = NPCS.the_merchant.pos;
+    expect(roadDistance(merchant.x, merchant.z)).toBeGreaterThan(DECOR_ROAD_CLEARANCE);
+    expect(groundSpotProblem(WORLD_SEED, merchant.x, merchant.z, [merchant], [])).toBe('npc');
+    expect(groundSpotProblem(WORLD_SEED, merchant.x, merchant.z, [], [])).not.toBe('npc');
     // The keeper's own stand is never under a piece.
     const keeper = NPCS.gourdlight_keeper.pos;
     for (const p of layout.ground) {

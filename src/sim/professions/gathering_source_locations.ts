@@ -20,6 +20,7 @@
 // player state, no runtime/SQL reads. UI localizes at its own seam
 // (itemDisplayName/zone display/mob display); this module hands back ids.
 
+import { campSpawnedCount } from '../camp_scatter';
 import { FARM_CROPS, farmCropSkillThreshold } from '../content/farm_crops';
 import { FARM_PATCHES } from '../content/farm_patches';
 import { FISHING_TABLES_BY_BAND, type FishingEntry } from '../content/items';
@@ -220,7 +221,10 @@ function scanCorpseCarriers(matchesTags: (mobTags: readonly string[]) => boolean
       const key = `${mob.id} ${zoneId}`;
       const existing = examplesByKey.get(key);
       if (existing) {
-        examplesByKey.set(key, { ...existing, spawnCount: existing.spawnCount + camp.count });
+        examplesByKey.set(key, {
+          ...existing,
+          spawnCount: existing.spawnCount + campSpawnedCount(camp),
+        });
       } else {
         examplesByKey.set(key, {
           mobId: mob.id,
@@ -228,7 +232,7 @@ function scanCorpseCarriers(matchesTags: (mobTags: readonly string[]) => boolean
           rare: !!mob.rare,
           elite: !!mob.elite,
           questGated: mob.requiresQuestId !== undefined,
-          spawnCount: camp.count,
+          spawnCount: campSpawnedCount(camp),
         });
       }
     }

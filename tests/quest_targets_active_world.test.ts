@@ -7,6 +7,7 @@
 // holds on any branch.
 
 import { afterEach, describe, expect, it } from 'vitest';
+import { campLiveArea } from '../src/sim/camp_scatter';
 import {
   BUILTIN_WORLD,
   CAMPS,
@@ -37,7 +38,12 @@ function withCampsShifted(mobId: string): WorldContent {
     ...BUILTIN_WORLD,
     camps: CAMPS.map((camp) =>
       camp.mobId === mobId
-        ? { ...camp, center: { x: camp.center.x + SHIFT.x, z: camp.center.z + SHIFT.z } }
+        ? {
+            ...camp,
+            center: { x: camp.center.x + SHIFT.x, z: camp.center.z + SHIFT.z },
+            // a moved camp carries its pinned spots with it
+            spots: camp.spots?.map((s) => ({ x: s.x + SHIFT.x, z: s.z + SHIFT.z })),
+          }
         : camp,
     ),
   };
@@ -52,10 +58,14 @@ function centersFor(quest: QuestDef, objectiveIndex: number): string[] {
     .sort();
 }
 
+// Each camp's area sits where its live mobs stand (campLiveArea), so a camp
+// whose slots the Studio town rework pinned is marked at its spots.
 function campCenters(world: WorldContent, mobId: string): string[] {
   return world.camps
     .filter((camp) => camp.mobId === mobId)
-    .map((camp) => `${camp.center.x},${camp.center.z}`)
+    .map(campLiveArea)
+    .filter((area) => area !== null)
+    .map((area) => `${area.x},${area.z}`)
     .sort();
 }
 

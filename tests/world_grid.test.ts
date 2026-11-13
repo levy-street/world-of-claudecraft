@@ -57,9 +57,13 @@ describe('the continent derives the right border set', () => {
     // stadium (the New Eastbrook program demolition); back to 9 when the
     // Proving Shore's moat carve joined starterMoat in the always-run mask
     // (its south open-sea band has unbounded z support).
+    // camps 17 to 19: the Studio town rework (#4593) added two single-mob vale
+    // camps in this 128yd cell's padded neighbourhood (the vale_bandit at
+    // (67.2, 40.95) and the restless_bones at (114.35, 72.74),
+    // content/studio_rework_camps.ts).
     expect(terrainRegionCandidateCountsAt(2, -2)).toEqual({
       appliers: 9,
-      camps: 17,
+      camps: 19,
       hubs: 1,
     });
   });

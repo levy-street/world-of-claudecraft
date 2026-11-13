@@ -44,7 +44,7 @@ export const EVERGARDEN_ZONE: ZoneDef = {
   hub: { x: 320, z: 810, radius: 16, name: 'Hedgewick' },
   // inside the churchyard, east of the chapel (matched to PROPS.graveyards
   // so the Pale Keeper hovers over the headstones, clear of the chapel)
-  graveyard: { x: 309, z: 793 },
+  graveyard: { x: 316, z: 801.7 },
   lakes: [
     { x: 440, z: 850, radius: 11 }, // the Petal Pond
     { x: 340, z: 1170, radius: 10 }, // the Lily Basin
@@ -266,8 +266,8 @@ export const EVERGARDEN_NPCS: Record<string, NpcDef> = {
     id: 'gatewarden_pell',
     name: 'Gatewarden Pell',
     title: 'Keeper of the Garden Gate',
-    pos: { x: 390, z: 714 },
-    facing: -2.6,
+    pos: { x: 385.17, z: 741.69 },
+    facing: 2.898,
     color: 0x8a9a6a,
     questIds: ['q_eg_gate_report'],
     greeting:
@@ -277,8 +277,8 @@ export const EVERGARDEN_NPCS: Record<string, NpcDef> = {
     id: 'head_gardener_amaranth',
     name: 'Head Gardener Amaranth',
     title: 'Head Gardener of the Evergarden',
-    pos: { x: 323, z: 808 },
-    facing: 2.8,
+    pos: { x: 332.08, z: 816.16 },
+    facing: 4.371,
     color: 0xb46a7a,
     questIds: ['q_eg_gate_report', 'q_eg_hungry_shapes', 'q_eg_who_trims_the_hedges'],
     greeting:
@@ -288,8 +288,8 @@ export const EVERGARDEN_NPCS: Record<string, NpcDef> = {
     id: 'wickmother_sorrel',
     name: 'Wickmother Sorrel',
     title: 'Keeper of the Hedgewick Inn',
-    pos: { x: 317, z: 814 },
-    facing: 0.5,
+    pos: { x: 326.94, z: 798.18 },
+    facing: 5.998,
     color: 0xc98a5a,
     questIds: ['q_eg_stolen_shears', 'q_eg_gnomes_in_the_green'],
     greeting:
@@ -319,12 +319,15 @@ export const EVERGARDEN_NPCS: Record<string, NpcDef> = {
   // compost PLUS all four tier-4 seeds, each at buyValue 64, put there by
   // GATE 1 (Phase 11e). This header read "compost only ... seed-back and
   // market goods (D11)" until then, the same revert hazard as the Highwatch
-  // twin. tests/farmer_npc_placement.test.ts pins the seat.
+  // twin. tests/farmer_npc_placement.test.ts pins the seat. The Studio town
+  // rework (#4593) moved her to (353.14, 863.59) facing away from the beds;
+  // she stands 2.4 yd nearer them (inside the trade range) and keeps her
+  // shipped facing, looking up the rows.
   farmer_verbena: {
     id: 'farmer_verbena',
     name: 'Farmer Verbena',
     title: 'Parterre Gardener',
-    pos: { x: 348.5, z: 867 },
+    pos: { x: 353.14, z: 866 },
     facing: 0,
     color: 0x7d9b5c,
     questIds: [],
@@ -594,7 +597,16 @@ export const EVERGARDEN_CAMPS: CampDef[] = [
   { mobId: 'topiary_wolf', center: { x: 302, z: 898 }, radius: 6, count: 3 },
   { mobId: 'topiary_wolf', center: { x: 418, z: 1124 }, radius: 10, count: 3 },
   { mobId: 'hedge_gnome', center: { x: 268, z: 1002 }, radius: 10, count: 3 },
-  { mobId: 'hedge_gnome', center: { x: 456, z: 942 }, radius: 10, count: 2 },
+  {
+    mobId: 'hedge_gnome',
+    center: { x: 456, z: 942 },
+    radius: 10,
+    count: 2,
+    spots: [
+      { x: 467.29, z: 943.75 },
+      { x: 465.98, z: 927.09 },
+    ],
+  },
   { mobId: 'the_topiary_bull', center: { x: 360, z: 1016 }, radius: 5, count: 1 },
 ];
 

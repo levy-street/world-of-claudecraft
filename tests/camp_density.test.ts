@@ -291,8 +291,9 @@ describe('the Thornpeak corridor is one dense cluster ON PURPOSE', () => {
     // Pinned so a future camp addition to this corridor is a visible decision.
     // 63 -> 64: the quest-dedupe pass placed Brakka the Wallbreaker (a single
     // slow-respawn quest capstone elite) at the ogre foothills inside this
-    // corridor.
-    expect(merged[0].mobCount).toBe(64);
+    // corridor. 64 -> 65: the Studio town rework (#4593) added a lone
+    // thornpeak_ogre camp at (-128.99, 718.92) (content/studio_rework_camps.ts).
+    expect(merged[0].mobCount).toBe(65);
   });
 
   it('bounds that cluster by YIELD instead, since density here is the layout', () => {
@@ -310,7 +311,8 @@ describe('the Thornpeak corridor is one dense cluster ON PURPOSE', () => {
     for (const y of richest.camps) {
       if (isTrash(y.template)) expect(y.respawnSeconds, y.camp.mobId).toBe(60);
     }
-    expect(fastTrashCount(richest.camps)).toBe(59);
+    // 59 -> 60: the Studio town rework's (#4593) lone thornpeak_ogre camp is trash.
+    expect(fastTrashCount(richest.camps)).toBe(60);
   });
 });
 

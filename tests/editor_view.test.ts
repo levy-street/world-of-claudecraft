@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { buildEntities, diffMoved, formatPatch, snapshot, zoneIdAt } from '../src/editor/model';
+import {
+  buildEntities,
+  diffMoved,
+  formatPatch,
+  hubHandle,
+  snapshot,
+  zoneIdAt,
+} from '../src/editor/model';
 import { Camera, type Handle, pickHandle } from '../src/editor/view';
 
 const VP = { width: 800, height: 600 };
@@ -171,5 +178,51 @@ describe('model: build + diff + patch', () => {
     const base = snapshot(ents);
     ents[0].point.x += 0.0001;
     expect(diffMoved(ents, base, 2)).toHaveLength(0);
+  });
+});
+
+describe('hub marker carries the town circle', () => {
+  it('moves the questHub by the same offset as the hub', () => {
+    const zone = {
+      hub: { x: 0, z: 0, radius: 10, name: 'Town' },
+      questHub: { x: 5, z: -3, radius: 40 },
+    };
+    const handle = hubHandle(zone);
+    handle.x = 12;
+    Object.assign(handle, { x: 14, z: 7 });
+    expect(zone.hub).toMatchObject({ x: 14, z: 7, radius: 10 });
+    expect(zone.questHub).toEqual({ x: 19, z: 4, radius: 40 });
+    expect({ x: handle.x, z: handle.z }).toEqual({ x: 14, z: 7 });
+  });
+
+  it('is the hub entity buildEntities hands the 2D view', () => {
+    const zone = {
+      id: 'q',
+      name: 'Q',
+      zMin: -50,
+      zMax: 50,
+      levelRange: [1, 5] as [number, number],
+      biome: 'vale' as never,
+      hub: { x: 0, z: 0, radius: 10, name: 'Town' },
+      questHub: { x: 2, z: 2, radius: 30 },
+      graveyard: { x: 5, z: 5 },
+      lakes: [],
+      pois: [],
+      welcome: '',
+    };
+    const hub = buildEntities({ zones: [zone], camps: [], npcs: {}, objects: [] }).find(
+      (e) => e.key === 'hub:q',
+    );
+    if (!hub) throw new Error('no hub entity');
+    hub.point.x = 10;
+    hub.point.z = -5;
+    expect(zone.hub).toMatchObject({ x: 10, z: -5 });
+    expect(zone.questHub).toEqual({ x: 12, z: -3, radius: 30 });
+  });
+
+  it('moves a hub alone when the zone has no questHub', () => {
+    const zone: { hub: { x: number; z: number }; questHub?: never } = { hub: { x: 1, z: 1 } };
+    hubHandle(zone).z = 9;
+    expect(zone).toEqual({ hub: { x: 1, z: 9 } });
   });
 });

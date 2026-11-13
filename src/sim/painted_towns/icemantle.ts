@@ -2,7 +2,7 @@
 // in the Highwatch look (Alpine slate). The plaza keeps every service it had
 // (the well and the great fire, the four stalls and their crates, Warden
 // Kaldra, the mailbox, the board, the Frostveil Barrow); the buildings ring it
-// between its four roads: the Hearth-Lodge south, the trade hall west, the
+// between its four roads: the trade hall west, the
 // chapel north behind the graves, a house on the high shelf north-east, and
 // the east side open over the sea cliff. A pure, frozen data/geometry module:
 // no engine imports, no randomness, no clocks (sim/painted_towns/CLAUDE.md).
@@ -17,28 +17,7 @@ import { paintedTownBuilding } from './models';
 import type { PaintedTownLayout } from './types';
 
 const LOOK = 'highwatch' as const;
-const SOUTH_FACING = 0; // the door looks south (-z)
-const NORTH_FACING = Math.PI; // the door looks north (+z)
-const EAST_FACING = Math.PI / 2; // the door looks east (-x)
-const WEST_FACING = -Math.PI / 2; // the door looks west (+x)
 
-// The Hearth-Lodge: south of the plaza on the shelf above the sea cliff, its
-// long front and door on the plaza at the plaza's own height. It stands at 1.0,
-// not the grand 1.2: between the pass road and the sea cliff the promontory is
-// about 38 yd across, and the 36 yd lodge at 1.2 runs onto the road or sends
-// its pads over the cliff into the sea in every position and turn; the other
-// sides of the plaza are narrower still (the cove and the wolves' benches to
-// the west and north-west, the Shiverfen road to the north). Its door still
-// clears 4.4 yd.
-const INN = paintedTownBuilding({
-  id: 'icemantle_hearth_lodge',
-  kind: 'inn',
-  model: 'tavern_b',
-  look: LOOK,
-  anchor: { x: -39.05, z: 1529.92 },
-  rotation: NORTH_FACING,
-  scale: 1,
-});
 // The chapel: north of the plaza behind the Frostveil Barrow, between the tarn
 // road and the Shiverfen road, its door and bell tower over the graves.
 const CHAPEL = paintedTownBuilding({
@@ -46,8 +25,8 @@ const CHAPEL = paintedTownBuilding({
   kind: 'chapel',
   model: 'hall',
   look: LOOK,
-  anchor: { x: -27.9, z: 1600.83 },
-  rotation: SOUTH_FACING,
+  anchor: { x: -49.28, z: 1608.63 }, // Studio town rework (#4593): nudged off the road band
+  rotation: 5.969, // Studio town rework (#4593)
   scale: 1.2,
 });
 // The trade hall (the kit 'inn' record that stood for it): west of the plaza
@@ -57,8 +36,9 @@ const TRADE_HALL = paintedTownBuilding({
   kind: 'house',
   model: 'shop_a',
   look: LOOK,
-  anchor: { x: -3.65, z: 1554 },
-  rotation: EAST_FACING,
+  // Studio town rework (#4593): 6 yd south, off the road band and the caravan start
+  anchor: { x: -13.64, z: 1566.84 },
+  rotation: 1.5882, // Studio town rework (#4593)
   scale: 1.5,
 });
 // A house on the high shelf across the Shiverfen road from the chapel (sealed),
@@ -68,30 +48,31 @@ const SHELF_HOUSE = paintedTownBuilding({
   kind: 'house',
   model: 'house_c',
   look: LOOK,
-  anchor: { x: -68.06, z: 1598 },
-  rotation: WEST_FACING,
+  anchor: { x: -49.32, z: 1555.38 }, // Studio town rework (#4593): nudged off the road band
+  rotation: 4.1713, // Studio town rework (#4593)
   scale: 1.4,
 });
 
-const BUILDINGS = [INN, CHAPEL, TRADE_HALL, SHELF_HOUSE] as const;
+// The hearth lodge was taken down in the Studio town rework (#4593).
+const BUILDINGS = [CHAPEL, TRADE_HALL, SHELF_HOUSE] as const;
 
-// Each building's pad and its apron. The lodge stands at the plaza's own
-// height (3.0) with a small apron that stays off the sea-cliff face; the trade
+// Each building's pad and its apron. The trade
 // hall sits on the low ground west of the plaza (1.5), the chapel in the dip
 // behind the graves (2.5), the house on the high shelf (5.5).
 const GROUND: readonly TownGround[] = [
-  { building: INN, height: 3, columns: 4, rows: 3, taper: 4, apron: 6 },
   { building: CHAPEL, height: 2.5, columns: 2, rows: 3, taper: 4, apron: 8 },
   { building: TRADE_HALL, height: 1.5, columns: 2, rows: 2, taper: 4, apron: 8 },
-  { building: SHELF_HOUSE, height: 5.5, columns: 2, rows: 2, taper: 4, apron: 6 },
+  // Studio town rework (#4593): a wider apron eases the bank west of its new site
+  { building: SHELF_HOUSE, height: 5.5, columns: 2, rows: 2, taper: 4, apron: 9 },
 ];
 
 // Hearthkeeper Maeve keeps the lodge (her old spot was the kit lodge's door): a
 // stride out from its door, on the plaza's edge, so she stands a yard inside
 // the hub circle and her errands stay town quests (the door's own standing
 // point is 21.9 yd out, of the circle's 22).
-const MAEVE = { x: INN.frontStandingPoint.x, z: INN.frontStandingPoint.z + 1 };
-const NPCS = [makeTownNpc('hearthkeeper_maeve', MAEVE, INN.frontFacing, INN.id)];
+// (The lodge is gone since the Studio town rework, #4593: she keeps the plaza.)
+const MAEVE = { x: -42.53, z: 1565.15 };
+const NPCS = [makeTownNpc('hearthkeeper_maeve', MAEVE, 0.8, 'icemantle_plaza')];
 
 export const ICEMANTLE_LAYOUT: PaintedTownLayout = deepFreeze({
   id: 'icemantle',

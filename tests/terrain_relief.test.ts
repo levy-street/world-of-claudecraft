@@ -75,11 +75,17 @@ describe('the calm field keeps graded features on their exact classic terrain', 
     // legacy field. Measured, understood, and far below anything a player
     // can see on a road; the golden follows the intended move.
     ['vale road', 30, -30, -1.777849597020717],
-    ['peaks road', -98, 727, 10.139872348652359],
+    // Re-minted for the Studio town rework (#4593) touch-up: the maintainer's
+    // Smooth brush strokes (level stamps at strength 0.2) run along the peaks
+    // road and over the ogre camps north-west of Highwatch, so these three
+    // points now stand on the authored smoothed grade (10.14, 12.54 and 13.50
+    // before; 33, 1 and 10 strokes cover them, and origin/main still reads the
+    // old values bit for bit).
+    ['peaks road', -98, 727, 9.268535595219094],
     ['marsh road', 20, 470, -1.769678368869094],
     ['frost road', -73, 1696, 13.619770689175878],
-    ['peaks camp core', -90, 700, 12.536439409032718],
-    ['tiny camp core', -78, 716, 13.501711523786856],
+    ['peaks camp core', -90, 700, 12.515552625086624],
+    ['tiny camp core', -78, 716, 12.701218891686723],
     ['ember camp core', 392, 2296, 10.399999999999999],
     // Re-minted 2026-08: the hub core moved with the town to the civic
     // square on the harbor plat (d19aa33f76,
@@ -93,7 +99,10 @@ describe('the calm field keeps graded features on their exact classic terrain', 
     // Re-minted for the World of ClaudeCraft Studio map's arrangement: the
     // shop moved down to the strand and no building pad reaches the square
     // now, so the core is back on the plat's own grade.
-    ['vale hub core', -14, -102, -0.8902171227961108],
+    // Re-minted for the Studio town rework (#4593) touch-up: one of its
+    // Eastbrook Smooth strokes (r 4.8 at (-12.2, -105.8)) covers the core and
+    // eases it 14 cm up (-0.8902 before).
+    ['vale hub core', -14, -102, -0.7489552908388606],
     ['drakemaw bench n', 390, 2330, 13.5055094022491],
     ['drakemaw bench s', 390, 2308, 13.4],
     ['drakemaw bench e', 402, 2320, 13.4],
@@ -130,8 +139,15 @@ describe('the relief actually shapes the world', () => {
     // touching the crags between pads. Lantern Hall's yard, cut level into the
     // hill in front of Highwatch's guild (inside this box), took it from just
     // over 2.5% to about 2.4%.
-    expect(maxH).toBeGreaterThan(38);
-    expect(steep / n).toBeGreaterThan(0.0225);
+    // The peak floor sits at 36: the Studio town rework (#4593) cut the moved
+    // Thornpeak farm and a moved Highwatch building into the crag at about
+    // (-75, 650), which was this box's old 38.4 summit (now 29.5); the box
+    // still tops out at 37.3, far above the pre-relief 27. The same rework
+    // moved the practice row's calm pads onto the hillside above Highwatch and
+    // levelled a house terrace there, which took the steep fraction to about
+    // 2.24%, so the floor sits at 2.2%.
+    expect(maxH).toBeGreaterThan(36);
+    expect(steep / n).toBeGreaterThan(0.022);
   });
 
   it('the wetlands stay calm', () => {

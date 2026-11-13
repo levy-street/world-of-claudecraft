@@ -65,6 +65,13 @@ function editedWorld(moves: Record<string, ObjectMove>): WorldContent {
   return { ...BUILTIN_WORLD, objectMoves: freezeObjectMoves(moves) };
 }
 
+// The id comparisons below diff an edited world against the same world with
+// NO object edits. Not BUILTIN_WORLD itself: since the Studio town rework
+// (#4593) the live touch-up carries object edits of its own (it deletes the
+// five healing-ground dummies and moves the Dawnhold door), and editedWorld
+// replaces those, so the built-in world is no longer the unedited baseline.
+const uneditedWorld = (): WorldContent => editedWorld({});
+
 afterEach(() => {
   setActiveWorldContent(null);
   invalidateStaticColliders();
@@ -173,7 +180,7 @@ describe('object edits: entities keep their ids', () => {
         rotY: 1.25,
       },
     });
-    const shipped = new Sim({ seed: 5, playerClass: 'priest', world: { ...BUILTIN_WORLD } });
+    const shipped = new Sim({ seed: 5, playerClass: 'priest', world: uneditedWorld() });
     const edited = new Sim({ seed: 5, playerClass: 'priest', world });
     const shippedIds = ids(shipped);
     const gone = shippedIds.find(([, t]) => t === HUB_TRAINING_DUMMY_ID);
@@ -190,7 +197,7 @@ describe('object edits: entities keep their ids', () => {
       [objectMoveKey('practiceDummy', HUB_HEALING_DUMMY_ID)]: { x: 0, z: 0, removed: true },
       [objectMoveKey('practiceDummy', ground.mobId)]: { ...ground.pos, removed: true },
     });
-    const shipped = new Sim({ seed: 7, playerClass: 'priest', world: { ...BUILTIN_WORLD } });
+    const shipped = new Sim({ seed: 7, playerClass: 'priest', world: uneditedWorld() });
     const edited = new Sim({ seed: 7, playerClass: 'priest', world });
     const shippedIds = ids(shipped);
     const gone = shippedIds.filter(([, t]) => t === HUB_HEALING_DUMMY_ID || t === ground.mobId);
@@ -204,7 +211,7 @@ describe('object edits: entities keep their ids', () => {
     const world = editedWorld({
       [objectMoveKey('dungeonDoor', crypt.id)]: { ...crypt.doorPos, removed: true },
     });
-    const shipped = new Sim({ seed: 3, playerClass: 'warrior', world: { ...BUILTIN_WORLD } });
+    const shipped = new Sim({ seed: 3, playerClass: 'warrior', world: uneditedWorld() });
     const edited = new Sim({ seed: 3, playerClass: 'warrior', world });
     const shippedIds = ids(shipped);
     const door = shippedIds.find(

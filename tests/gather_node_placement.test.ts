@@ -41,6 +41,7 @@ import {
   zoneAt,
 } from '../src/sim/data';
 import { POI_VISIT_RADIUS } from '../src/sim/deeds';
+import { dockSectionWorldCenter } from '../src/sim/dock_layout';
 import { MAX_AGGRO_RADIUS } from '../src/sim/mob/aggro_ranges';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../src/sim/pathfind';
 import { NODE_HARVEST_TABLE } from '../src/sim/professions/gathering';
@@ -368,15 +369,20 @@ const ON_MAZE_WALL_POCKET = { x: -232, z: 452 };
 const MAZE_WALL_FLOOD_BOX = boxAround([ZONES[0].hub, ON_MAZE_WALL_POCKET]);
 const MAZE_WALL_FLOOD = floodFrom(ZONES[0].hub, MAZE_WALL_FLOOD_BOX);
 // The Eastbrook lake dock's plank surface: groundHeight rides dockSurfaceHeight
-// above the shore terrain here, so the two really differ.
-const ON_A_DOCK_PLANK = { x: PROPS.docks[0].x, z: PROPS.docks[0].z };
+// above the shore terrain here, so the two really differ. The middle section,
+// out over the water: the Studio town rework (#4593) moved the dock onto a
+// bank whose ground rises to within 0.15yd of the planks at the dock's own
+// anchor, so the anchor stopped being a point where the two clearly differ.
+const ON_A_DOCK_PLANK = dockSectionWorldCenter(PROPS.docks[0], 1);
 // Re-pinned 2026-08 for the Eastbrook harbor move (d19aa33f76,
 // docs/design/eastbrook-revamp/site-plan.md): the old fixture (-29,0) sat
 // inside the origin town's ring wall, and the move demolished the wall and
 // emptied that ground. This point sits just inside the relocated smithy's
 // west wall at the crafts district (smithy lot (-2,-122)), with standable
-// ground a yard away, the same shallow shape the old fixture had.
-const INSIDE_A_TOWN_COLLIDER = { x: -7, z: -123 };
+// ground a yard away, the same shallow shape the old fixture had. Re-staged
+// when the Studio town rework (#4593) moved the smithy to (-5.48, -75.12):
+// the point sits just inside its wall line, standable ground a yard away.
+const INSIDE_A_TOWN_COLLIDER = { x: -12, z: -77 };
 // Genuinely enclosed, not merely overlapping: the nearest ground a player
 // can hold is 4yd away, nearly three times the widest clearance a node's own
 // body can account for, and still inside the harvest reach the sweep
@@ -385,8 +391,9 @@ const INSIDE_A_TOWN_COLLIDER = { x: -7, z: -123 };
 // Re-staged 2026-10 inside the sealed quay cottage
 // (EASTBROOK_BUILDINGS_BY_ID.eastbrook_quay_cottage) when the genshin artstyle
 // merge (8bff2cec638) cleared the Wolf Run barracks the old (17, -6) fixture
-// sat inside.
-const DEEP_INSIDE_A_BUILDING = { x: -59, z: -55 };
+// sat inside, and re-staged again at the cottage's new anchor when the Studio
+// town rework (#4593) moved it from (-59.11, -51.35) to (-53.46, -47.24).
+const DEEP_INSIDE_A_BUILDING = { x: -57, z: -50 };
 
 describe('gather node placement: every node sits on ground a player can work', () => {
   it('dry land: no node sits at or under a declared water surface', () => {

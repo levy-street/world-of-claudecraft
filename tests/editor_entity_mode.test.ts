@@ -1,9 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
+  campHoldsSpawn,
+  campLiveMemberCount,
+  campSpawnDistance,
   findRuntimeCampIndex,
   moveRuntimeMapEntity,
   moveRuntimeMobsById,
   pickMovableEntity,
+  setCampCenter,
   setRuntimeNpcFacing,
   splitCampIntoIndividuals,
   toggledMobSelection,
@@ -147,6 +151,92 @@ describe('individual mob selection', () => {
       { mobId: 'boar', center: { x: 11, z: 9 }, radius: 0.5, count: 1 },
       { mobId: 'boar', center: { x: 14, z: 13 }, radius: 0.5, count: 1 },
     ]);
+  });
+
+  it('splits a camp with pinned spots and retired slots into plain one-mob camps', () => {
+    const camp = {
+      mobId: 'boar',
+      center: { x: 10, z: 10 },
+      radius: 12,
+      count: 3,
+      spots: [
+        { x: 40, z: 40 },
+        { x: 41, z: 41 },
+      ],
+      retiredSlots: 1,
+    };
+    expect(
+      splitCampIntoIndividuals(camp, [
+        { x: 40, z: 40 },
+        { x: 41, z: 41 },
+      ]),
+    ).toEqual([
+      { mobId: 'boar', center: { x: 40, z: 40 }, radius: 0.5, count: 1 },
+      { mobId: 'boar', center: { x: 41, z: 41 }, radius: 0.5, count: 1 },
+    ]);
+  });
+
+  it('owns a spawn on a pinned spot outside the disc, and moves spots with the center', () => {
+    const camp = { center: { x: 0, z: 0 }, radius: 5, count: 2, spots: [{ x: 30, z: 0 }] };
+    expect(campHoldsSpawn(camp, { x: 3, z: 0 })).toBe(true);
+    expect(campHoldsSpawn(camp, { x: 30.5, z: 0 })).toBe(true);
+    expect(campHoldsSpawn(camp, { x: 20, z: 0 })).toBe(false);
+    setCampCenter(camp, 10, -4);
+    expect(camp.center).toEqual({ x: 10, z: -4 });
+    expect(camp.spots).toEqual([{ x: 40, z: -4 }]);
+    expect(
+      findRuntimeCampIndex([{ mobId: 'boar', ...camp }], {
+        templateId: 'boar',
+        pos: { x: 40, z: -4 },
+        spawnPos: { x: 40, z: -4 },
+      }),
+    ).toBe(0);
+  });
+
+  it('a one-mob camp owns a dragged mob only while its slot scatters', () => {
+    const one = { mobId: 'boar', center: { x: 0, z: 0 }, radius: 3, count: 1 };
+    // the mob spawned elsewhere but the maker dragged it into the disc
+    const dragged = { templateId: 'boar', pos: { x: 1, z: 1 }, spawnPos: { x: 40, z: 40 } };
+    expect(findRuntimeCampIndex([one], dragged)).toBe(0);
+    expect(findRuntimeCampIndex([{ ...one, retiredSlots: 1 }], dragged)).toBe(-1);
+    expect(findRuntimeCampIndex([{ ...one, spots: [{ x: 20, z: 20 }] }], dragged)).toBe(-1);
+  });
+
+  it('a fully pinned camp owns only its live spots, not its disc', () => {
+    // the shipped Eastbrook restless_bones shape: every slot pinned, one spot
+    // outside the radius, and a neighbour camp of the same mob inside the disc
+    const pinned = {
+      mobId: 'restless_bones',
+      center: { x: 82, z: 78 },
+      radius: 28.5,
+      count: 2,
+      spots: [
+        { x: 80, z: 70 },
+        { x: 109.49, z: 94.35 },
+      ],
+    };
+    const chapel = { mobId: 'restless_bones', center: { x: 91.96, z: 85.78 }, radius: 4, count: 1 };
+    const chapelSpawn = { x: 92.5, z: 86 };
+    expect(campHoldsSpawn(pinned, chapelSpawn)).toBe(false);
+    expect(campHoldsSpawn(pinned, { x: 109.49, z: 94.35 })).toBe(true);
+    // the chapel skeleton picks the chapel camp, its own spawn the pinned camp
+    const mobAt = (at: { x: number; z: number }) => ({
+      templateId: 'restless_bones',
+      pos: at,
+      spawnPos: at,
+    });
+    expect(findRuntimeCampIndex([pinned, chapel], mobAt(chapelSpawn))).toBe(1);
+    expect(findRuntimeCampIndex([pinned, chapel], mobAt({ x: 109.49, z: 94.35 }))).toBe(0);
+    // a retired slot's spot owns nothing, and the pick claims only live members
+    const retired = { ...pinned, retiredSlots: 1 };
+    expect(campHoldsSpawn(retired, { x: 109.49, z: 94.35 })).toBe(false);
+    expect(campLiveMemberCount(retired)).toBe(1);
+    // ranked by the nearest live spot, so a pinned member far from the
+    // centre still sorts as one of the camp's own
+    expect(campSpawnDistance(pinned, { x: 109.49, z: 94.35 })).toBe(0);
+    // a camp with an unpinned live slot still owns its disc
+    const partly = { ...pinned, spots: [{ x: 80, z: 70 }] };
+    expect(campHoldsSpawn(partly, chapelSpawn)).toBe(true);
   });
 
   it('plain click selects one while Ctrl-click toggles a multi-selection', () => {

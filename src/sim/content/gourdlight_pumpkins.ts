@@ -33,7 +33,8 @@ export const GOURDLIGHT_PUMPKINS: readonly GourdlightPumpkin[] = [
   { id: 'drakelands_3', zoneId: 'drakelands', x: 339, z: 2088 }, // Cinder Dunes
   { id: 'drakelands_4', zoneId: 'drakelands', x: 407, z: 2023 }, // Trollmoot
   { id: 'drakelands_5', zoneId: 'drakelands', x: 499, z: 2199 }, // The Last Keep
-  { id: 'frostveil_1', zoneId: 'frostveil', x: -19, z: 1566 }, // Icemantle
+  // Studio town rework (#4593): off (-19, 1566), under the moved trade hall
+  { id: 'frostveil_1', zoneId: 'frostveil', x: -27, z: 1568 }, // Icemantle
   { id: 'frostveil_2', zoneId: 'frostveil', x: -22, z: 1503 }, // The Snowline
   { id: 'frostveil_3', zoneId: 'frostveil', x: 39, z: 1728 }, // The Aurora Steps
   { id: 'frostveil_4', zoneId: 'frostveil', x: -101, z: 1751 }, // The Shiverfen

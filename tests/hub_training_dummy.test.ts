@@ -1,9 +1,10 @@
 // The Eastbrook hub training dummy (content/practice_dummies.ts
-// HUB_PRACTICE_DUMMY_CAMPS): a DEDICATED level-5 `hub_training_dummy` on the
-// quay pad where every new character first stands, so a build can be
-// measured in town without the ride to the hill above Highwatch. What this
-// suite pins is the PLACEMENT (on its authored mark, a few yards from the
-// player start, on ground the sim can spawn on), its own level-5 body
+// HUB_PRACTICE_DUMMY_CAMPS): a DEDICATED level-5 `hub_training_dummy` in
+// town, so a build can be measured without the ride to the hill above
+// Highwatch. The Studio town rework (#4593) moved it off the quay pad to the
+// Sableweb practice ground north of the player start. What this suite pins
+// is the PLACEMENT (on its authored mark, on ground the sim can spawn on),
+// its own level-5 body
 // (never the shared level-20 zone3.ts `training_dummy`), and the
 // append-last contract that keeps every earlier entity id untouched.
 import { describe, expect, it } from 'vitest';
@@ -22,6 +23,7 @@ import { BUILTIN_WORLD, CAMPS, MOBS, PLAYER_START } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { Entity, WorldContent } from '../src/sim/types';
 import { groundHeight, waterLevelAt } from '../src/sim/world';
+import { HUB_TRAINING_DUMMY_MARK } from './helpers/hub_yard';
 
 const SEED = 42;
 
@@ -41,7 +43,7 @@ function makeWorld(): Sim {
 }
 
 function dummyOf(sim: Sim): Entity {
-  const { x, z } = HUB_TRAINING_DUMMY_POS;
+  const { x, z } = HUB_TRAINING_DUMMY_MARK;
   const d = [...sim.entities.values()].find(
     (e) =>
       e.templateId === HUB_TRAINING_DUMMY_ID && !e.dead && Math.hypot(e.pos.x - x, e.pos.z - z) < 5,
@@ -66,10 +68,13 @@ describe('Eastbrook hub training dummy', () => {
 
   it('is NOT a camp: it spawns after the player so no construction-time id or rng draw moves', () => {
     expect(CAMPS.some((camp) => camp.center.z === HUB_TRAINING_DUMMY_POS.z)).toBe(false);
+    expect(CAMPS.some((camp) => camp.center.z === HUB_TRAINING_DUMMY_MARK.z)).toBe(false);
     expect(HUB_PRACTICE_DUMMY_CAMPS[0].mobId).toBe(HUB_TRAINING_DUMMY_ID);
     // With the yard and without it, the player and every earlier entity keep
-    // their ids; Hale's local practice yard adds the original three hub
-    // entities plus the five high-id healing training allies.
+    // their ids; Hale's local practice yard adds the three hub entities. The
+    // Studio town rework (#4593) deleted the five high-id healing training
+    // allies from the shipped world (their object moves are `removed`), so
+    // none of them spawn here.
     const withYard = new Sim({ seed: SEED, playerClass: 'warrior', world: BUILTIN_WORLD });
     const { drillmaster_hale: _hale, ...npcsWithoutHale } = BUILTIN_WORLD.npcs;
     const withoutYard = new Sim({
@@ -78,19 +83,23 @@ describe('Eastbrook hub training dummy', () => {
       world: { ...BUILTIN_WORLD, npcs: npcsWithoutHale },
     });
     expect(withYard.playerId).toBe(withoutYard.playerId);
-    expect(withYard.entities.size).toBe(withoutYard.entities.size + 3 + HEALING_DUMMY_IDS.length);
+    expect(withYard.entities.size).toBe(withoutYard.entities.size + 3);
     expect(dummyOf(withYard).id).toBeGreaterThan(withYard.playerId);
     for (const id of HEALING_DUMMY_IDS) {
-      const dummy = [...withYard.entities.values()].find((e) => e.templateId === id && !e.dead);
-      expect(dummy?.id).toBe(HEALING_TRAINING_ENTITY_IDS[id]);
+      expect(withYard.entities.has(HEALING_TRAINING_ENTITY_IDS[id])).toBe(false);
+      expect([...withYard.entities.values()].some((e) => e.templateId === id)).toBe(false);
     }
     expect(
       [...withoutYard.entities.values()].some((e) => e.templateId === 'drillmaster_hale'),
     ).toBe(false);
   });
 
-  it('stands on its authored mark, on dry standable ground, a few yards from the player start', () => {
-    const { x, z } = HUB_TRAINING_DUMMY_POS;
+  it('stands on its authored mark, on dry standable ground, north of the player start', () => {
+    // The Studio town rework (#4593) mark, as a literal: the map's spot, the
+    // native content constant now (no touch-up object move rides over it).
+    expect(HUB_TRAINING_DUMMY_MARK).toEqual({ x: -71.2, z: -6.56 });
+    expect(HUB_TRAINING_DUMMY_MARK).toBe(HUB_TRAINING_DUMMY_POS);
+    const { x, z } = HUB_TRAINING_DUMMY_MARK;
     // Ground the sim can spawn on: not inside a prop or building, above water.
     expect(isBlocked(SEED, x, z, 0.5)).toBe(false);
     expect(groundHeight(x, z, SEED)).toBeGreaterThan(waterLevelAt(x, z, SEED));
@@ -103,12 +112,14 @@ describe('Eastbrook hub training dummy', () => {
       if (e.id === d.id || e.id === sim.player.id) continue;
       expect(Math.hypot(e.pos.x - d.pos.x, e.pos.z - d.pos.z)).toBeGreaterThan(3);
     }
-    // findSafePos left it exactly where it was authored (nothing shoved it).
-    expect(Math.round(d.pos.x)).toBe(x);
-    expect(Math.round(d.pos.z)).toBe(z);
+    // Nothing shoved it: it stands exactly where it was authored.
+    expect(d.pos.x).toBeCloseTo(x, 6);
+    expect(d.pos.z).toBeCloseTo(z, 6);
+    // The rework moved the yard from eleven yards inland of the player start
+    // to the practice ground about 56 yards north of it.
     const dist = Math.hypot(d.pos.x - PLAYER_START.x, d.pos.z - PLAYER_START.z);
-    expect(dist).toBeGreaterThan(5); // not on top of the spawn point
-    expect(dist).toBeLessThan(15); // in sight of a fresh character
+    expect(dist).toBeGreaterThan(50);
+    expect(dist).toBeLessThan(60);
   });
 
   it('spawns at literal level 5, inert like the Highwatch dummy: hit it, it never fights back', () => {

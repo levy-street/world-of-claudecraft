@@ -79,6 +79,27 @@ function airOf(building: Building) {
   return air;
 }
 
+/** A world point in the air's own axes: the world's for a record at a quarter turn, the
+ *  record's frame for any other turn (the Studio town rework, #4593, turned the Highwatch
+ *  chapel off the quarter turns). */
+function toAir(air: ReturnType<typeof airOf>, point: { x: number; z: number }) {
+  const f = air.frame;
+  if (!f) return { x: point.x, z: point.z };
+  const dx = point.x - f.x;
+  const dz = point.z - f.z;
+  return { x: dx * f.cos - dz * f.sin, z: dx * f.sin + dz * f.cos };
+}
+
+/** A point in the air's own axes back in the world (the inverse of toAir). */
+function fromAir(air: ReturnType<typeof airOf>, point: { x: number; z: number }) {
+  const f = air.frame;
+  if (!f) return { x: point.x, z: point.z };
+  return {
+    x: f.x + point.x * f.cos + point.z * f.sin,
+    z: f.z - point.x * f.sin + point.z * f.cos,
+  };
+}
+
 /** A point `depth` yards in from the door along the building's own axis. */
 function inside(building: Building, depth: number) {
   const door = building.sockets.entrance.localPosition;
@@ -144,7 +165,7 @@ describe('the air of a walk-in placed building', () => {
       const floorY = box[2];
       // the door's middle is on the record's entrance socket: square across the wall, and
       // no deeper than the wall's own thickness off its face
-      const door = building.sockets.entrance.position;
+      const door = toAir(air, building.sockets.entrance.position);
       const across =
         front.axis === 0 ? (box[4] + box[5]) / 2 - door.z : (box[0] + box[1]) / 2 - door.x;
       const deep =
@@ -153,8 +174,9 @@ describe('the air of a walk-in placed building', () => {
       expect(Math.abs(deep), building.id).toBeLessThan(1);
       // the opening faces the standing point outside it
       const facing = building.frontStandingPoint;
+      const facingInAir = toAir(air, facing);
       const centre = { x: (box[0] + box[1]) / 2, z: (box[4] + box[5]) / 2 };
-      const outward = front.axis === 0 ? facing.x - centre.x : facing.z - centre.z;
+      const outward = front.axis === 0 ? facingInAir.x - centre.x : facingInAir.z - centre.z;
       expect(Math.sign(outward), building.id).toBe(front.side);
       // grand: every door clears about five yards over its floor (a player stands 2.6)
       const head = box[3] - floorY;
@@ -174,7 +196,10 @@ describe('the air of a walk-in placed building', () => {
           [piece[0], piece[4]],
           [piece[1], piece[5]],
         ]) {
-          expect(distancePointToObb({ x, z }, building.reach), building.id).toBeLessThan(0.01);
+          expect(
+            distancePointToObb(fromAir(air, { x, z }), building.reach),
+            building.id,
+          ).toBeLessThan(0.01);
         }
       }
     }

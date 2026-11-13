@@ -12,9 +12,7 @@
 // first stretch and one herb node (content/gather_nodes.ts) moved.
 import {
   deepFreeze,
-  facingToward,
   indexById,
-  localToWorld,
   makePlacedTownBuilding,
   makeTownNpc,
   padsAlong,
@@ -65,9 +63,6 @@ const SMITHY_SCALE = 1.3;
 const PAINTED_SET = '/models/tidehold/highwatch';
 
 const EAST_FACING = Math.PI / 2; // the door looks east (-x), the model turned a quarter
-const WEST_FACING = -Math.PI / 2; // the door looks west (+x)
-const SOUTH_FACING = 0; // the door looks south (-z), the model as authored
-const NORTH_FACING = Math.PI; // the door looks north (+z), the model turned half round
 
 // The site plan, widened for the grand buildings: the square round the well
 // keeps every service it had and opens out to the buildings round it. The inn
@@ -112,8 +107,8 @@ const CHAPEL = makePlacedTownBuilding(
     // east of the Fenbridge road at the south gate, its long side on the
     // road and its door looking north at the gate and the square: Brother
     // Aldric keeps the door inside the hub circle, as he kept his old spot
-    anchor: { x: -12.2, z: 629.8 },
-    rotation: NORTH_FACING,
+    anchor: { x: 34.25, z: 736.45 },
+    rotation: 0.8029, // Studio town rework (#4593)
     ...scalePlacedTownMeasurements(
       {
         reach: { x: 1.9255, z: -0.254, width: 18.851, height: 30.5, depth: 24.212 },
@@ -138,8 +133,8 @@ const COUNTING_HOUSE = makePlacedTownBuilding(
     assetId: `${PAINTED_SET}/shop_a.glb`,
     kind: 'house',
     // east of the square, its counter and awning on the square
-    anchor: { x: -26.8, z: 657.5 },
-    rotation: WEST_FACING,
+    anchor: { x: -30.24, z: 699.1 },
+    rotation: 0.5934, // Studio town rework (#4593)
     ...scalePlacedTownMeasurements(
       {
         reach: { x: 0, z: -0.8, width: 13.004, height: 16.28, depth: 12.2 },
@@ -162,8 +157,8 @@ const WATCH_HOUSE = makePlacedTownBuilding(
     assetId: `${PAINTED_SET}/house_c.glb`,
     kind: 'house',
     // west of the Fenbridge road at the south gate, its door on the road
-    anchor: { x: 15, z: 634 },
-    rotation: EAST_FACING,
+    anchor: { x: 13.86, z: 627.8 },
+    rotation: 2.4784, // Studio town rework (#4593)
     ...scalePlacedTownMeasurements(
       {
         reach: { x: 0.386, z: 0.23, width: 12.764, height: 19.58, depth: 16.264 },
@@ -182,8 +177,8 @@ const SMITHY = makePlacedTownBuilding(
     assetId: `${PAINTED_SET}/smithy.glb`,
     kind: 'house',
     // the north-west terrace, the forge shelter at its west end
-    anchor: { x: 20, z: 704 },
-    rotation: SOUTH_FACING,
+    anchor: { x: -45.8, z: 665.35 },
+    rotation: 4.9218, // Studio town rework (#4593)
     ...scalePlacedTownMeasurements(
       {
         reach: { x: 3.4285, z: -0.2955, width: 19.797, height: 12.781, depth: 11.69 },
@@ -241,39 +236,22 @@ const BUILDINGS = [INN, CHAPEL, COUNTING_HOUSE, WATCH_HOUSE, SMITHY, GUILD] as c
 // The counting house's market counter (the stall annex on its front): the
 // auctioneer keeps it, a stride and a half in front of the boards (the counter
 // is the model's, at the building's scale; the stride is a person's).
-const COUNTER = { x: 2.375, z: -5.925, depth: 0.77 } as const;
-const COUNTER_STANDING_POINT = localToWorld(
-  COUNTING_HOUSE.placement,
-  COUNTING_HOUSE.rotation,
-  COUNTER.x * COUNTING_HOUSE_SCALE,
-  (COUNTER.z - COUNTER.depth / 2) * COUNTING_HOUSE_SCALE - 1.3,
-);
 
 // Loremaster Caddis gave his corner to the inn's porch: he keeps the square's
 // south-west corner, between the mailbox and the turret, facing the well.
-const LOREMASTER_POSITION = { x: 8.5, z: 651.5 } as const;
 
+// Studio town rework stands (#4593): the bursar keeps the new bank on the
+// north road, the auctioneer the square, Brother Aldric the chapel's new site.
 const NPCS = [
-  makeTownNpc('brother_aldric_highwatch', CHAPEL.frontStandingPoint, CHAPEL.frontFacing, CHAPEL.id),
-  // the bursar keeps the counting house door, the strongbox beside him
-  makeTownNpc(
-    'bursar_aldous_crane',
-    COUNTING_HOUSE.frontStandingPoint,
-    COUNTING_HOUSE.frontFacing,
-    COUNTING_HOUSE.id,
-  ),
+  makeTownNpc('brother_aldric_highwatch', { x: 27, z: 723.07 }, 3.927, CHAPEL.id),
+  makeTownNpc('bursar_aldous_crane', { x: -8.16, z: 744.05 }, Math.PI / 2, COUNTING_HOUSE.id),
   makeTownNpc(
     'auctioneer_voss',
-    COUNTER_STANDING_POINT,
-    COUNTING_HOUSE.frontFacing,
+    { x: -13.54, z: 662.26 },
+    Math.PI / 2,
     `${COUNTING_HOUSE.id}_counter`,
   ),
-  makeTownNpc(
-    'loremaster_caddis',
-    LOREMASTER_POSITION,
-    facingToward(LOREMASTER_POSITION, { x: 0, z: 662 }),
-    'highwatch_square',
-  ),
+  makeTownNpc('loremaster_caddis', { x: 17.74, z: 665.15 }, -0.681, 'highwatch_square'),
 ] as const;
 
 // The Stormcrag road's first stretch: it leaves the square at its north-west
@@ -293,28 +271,33 @@ const STORMCRAG_ROAD = [
 // Level pads under the buildings (terrain edits, applied after the built-in
 // world's other stamps): each building stands on level ground across its
 // whole reach, and the taper beyond carries the grade change into the
-// streets. The shelf is a disc of level ground at y 9; the inn and the
-// counting house stand at its height, cut into the rising ground behind them,
-// the chapel and the watch house a little lower where the road falls toward
-// the gate, the smithy on its terrace above. Each building gets a row of
-// stamps along its long axis rather than one circle (placed_town_kit.ts
+// streets. Studio town rework (#4593): each pad stands at the height the
+// map sculpted round its building (read off the map with every stroke
+// applied), so the map's ground and the pad agree: the square and the inn
+// on the shelf at about 11, the watch house a little lower where the road
+// falls toward the gate, the counting house and the smithy on the terraces
+// at about 15.7 and the chapel up the slope at 20.7. Each building gets a row
+// of stamps along its long axis rather than one circle (placed_town_kit.ts
 // padsAlong), so the level ground hugs its walls instead of spilling across
 // the square.
 
-// The Stormcrag road climbs out of the square's north-west corner between the
-// inn (level with the square) and the smithy's terrace: three tilted stamps
-// along it grade the lane from the one to the other, applied over the aprons
-// and before the pads, so the buildings' own pads keep their ground.
-const INN_HEIGHT = 9;
+// The Stormcrag road climbs out of the square's north-west corner past the
+// inn's north end: three tilted stamps along it grade the lane from the inn's
+// shelf up to the terrace the map sculpted north of it (the Studio town
+// rework moved the smithy that stood there across town), applied over the
+// aprons and before the pads, so the buildings' own pads keep their ground.
+const INN_HEIGHT = 11.33;
 // the guild's pad, the old stable yard's own height; a short apron (the yard is all but level
 // already, and the elementals' ground lies a little way north)
 const GUILD_HEIGHT = 9;
 const GUILD_APRON = 8;
-const SMITHY_HEIGHT = 10.6;
+const SMITHY_HEIGHT = 15.7;
 const INN_NORTH_Z = INN.reach.center.z + INN.reach.halfWidth;
-const SMITHY_SOUTH_Z = SMITHY.reach.center.z - SMITHY.reach.halfDepth;
-// smithy terrace over inn shelf, across the lane
-const ROAD_GRADE_FALL = (SMITHY_HEIGHT - INN_HEIGHT) / (SMITHY_SOUTH_Z - INN_NORTH_Z);
+// the map's terrace north of the lane, and where its level ground begins
+const LANE_NORTH_HEIGHT = 13.1;
+const LANE_NORTH_Z = 694;
+// inn shelf under the north terrace, across the lane
+const ROAD_GRADE_FALL = (LANE_NORTH_HEIGHT - INN_HEIGHT) / (LANE_NORTH_Z - INN_NORTH_Z);
 const ROAD_GRADE = [14, 22, 30].map((x) => {
   const z = 689 + ((x - 11) / 22) * 2.5;
   return {
@@ -335,19 +318,21 @@ const ROAD_GRADE = [14, 22, 30].map((x) => {
 // height, before any pad: the hill eases down to it (and the fill out from it)
 // at a walkable grade, and the pads, applied after every apron, still level
 // each reach exactly. The counting house and the smithy cut deepest into the
-// hill, so theirs reach furthest.
+// hill, so theirs reach furthest, and the chapel's knoll (Studio town rework,
+// #4593) stands 12 yd over the valley east of it, so its apron is as wide.
 const GROUND = [
   { building: INN, height: INN_HEIGHT, columns: 4, rows: 3, taper: 5, apron: 15 },
-  { building: COUNTING_HOUSE, height: 8.8, columns: 2, rows: 2, taper: 4, apron: 14 },
-  { building: CHAPEL, height: 8.8, columns: 2, rows: 3, taper: 5, apron: 10 },
-  { building: WATCH_HOUSE, height: 7.6, columns: 2, rows: 3, taper: 4, apron: 10 },
+  { building: COUNTING_HOUSE, height: 15.7, columns: 2, rows: 2, taper: 4, apron: 14 },
+  { building: CHAPEL, height: 20.7, columns: 2, rows: 3, taper: 5, apron: 22 },
+  { building: WATCH_HOUSE, height: 8.5, columns: 2, rows: 3, taper: 4, apron: 10 },
   { building: SMITHY, height: SMITHY_HEIGHT, columns: 3, rows: 2, taper: 4, apron: 13 },
   { building: GUILD, height: GUILD_HEIGHT, columns: 4, rows: 5, taper: 4, apron: GUILD_APRON },
 ] as const;
 
 // The aprons reach into the square: this sets the shelf back at its own height
-// (level out to 14 yd from the hub) before the road and the pads go down.
-const SQUARE_HEIGHT = 9;
+// (level out to 14 yd from the hub) before the road and the pads go down, at
+// the height the map sculpted the square to (Studio town rework, #4593).
+const SQUARE_HEIGHT = 11;
 const SQUARE_FLAT = 14;
 const SQUARE_RELEVEL = {
   x: HUB_CENTER.x,

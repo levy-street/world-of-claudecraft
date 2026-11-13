@@ -58,27 +58,35 @@ export const TOWN_PLAT_TERRAIN_EDITS: HeightStamp[] = [
 // flank so the walk onto the pad never exceeds the movement slope gate.
 // The flat stamps stop at x -99; the cove's water starts near x -102, so
 // no wet cell is lifted (the Mirror Lake lesson).
+// Studio town rework (#4593): the map raised the quay's middle from -2 to 0
+// and its sculpt wins, so the whole pad stands at 0 (the map's strokes on it
+// are dropped from the touch-up, so the two agree). At -2 beside the map's 0
+// it left a 2 yd wall and trench along x -88 to -86 that bodies stuck in; the
+// approach blend from the flank eases to -0.6, between the quay and the
+// ground east of it, and the shoulders round the flat cores hold their full
+// pull out past the cores' edge (hardness 0.6), so the flat cores never end
+// in a lip above the shoulders.
 export const EASTBROOK_QUAY_TERRAIN_EDITS: HeightStamp[] = [
-  { x: -84, z: -54, radius: 18, delta: -1.9, falloff: 'smooth', mode: 'level' },
-  { x: -92, z: -46, radius: 13, delta: -2.0, falloff: 'smooth', mode: 'level' },
-  { x: -92, z: -54, radius: 13, delta: -2.0, falloff: 'smooth', mode: 'level' },
-  { x: -92, z: -62, radius: 13, delta: -2.0, falloff: 'smooth', mode: 'level' },
-  { x: -88, z: -67, radius: 10, delta: -2.0, falloff: 'smooth', mode: 'level' },
-  { x: -92, z: -46, radius: 7, delta: -2.0, falloff: 'flat', mode: 'level' },
-  { x: -92, z: -54, radius: 7, delta: -2.0, falloff: 'flat', mode: 'level' },
-  { x: -92, z: -62, radius: 7, delta: -2.0, falloff: 'flat', mode: 'level' },
+  { x: -84, z: -54, radius: 18, delta: -0.6, falloff: 'smooth', mode: 'level' },
+  { x: -92, z: -46, radius: 13, delta: 0, falloff: 'smooth', mode: 'level', hardness: 0.6 },
+  { x: -92, z: -54, radius: 13, delta: 0, falloff: 'smooth', mode: 'level', hardness: 0.6 },
+  { x: -92, z: -62, radius: 13, delta: 0, falloff: 'smooth', mode: 'level', hardness: 0.6 },
+  { x: -88, z: -67, radius: 10, delta: 0, falloff: 'smooth', mode: 'level', hardness: 0.6 },
+  { x: -92, z: -46, radius: 7, delta: 0, falloff: 'flat', mode: 'level' },
+  { x: -92, z: -54, radius: 7, delta: 0, falloff: 'flat', mode: 'level' },
+  { x: -92, z: -62, radius: 7, delta: 0, falloff: 'flat', mode: 'level' },
   // Round 6: a narrow graded strip under the quay boardwalk itself. A berm ran
   // along x -99 and punched up THROUGH the planks (groundHeight takes the max
   // of terrain and deck surface, so the player walked over a dirt hump in the
   // middle of the boardwalk and the boards drew underground). Radius 4.5 keeps
   // every stamp east of x -103.5, clear of the cove water near x -104, so no
   // wet cell is lifted.
-  { x: -98.5, z: -40, radius: 4, delta: -2.0, falloff: 'flat', mode: 'level' },
-  { x: -98.5, z: -46, radius: 4, delta: -2.0, falloff: 'flat', mode: 'level' },
-  { x: -98.5, z: -52, radius: 4, delta: -2.0, falloff: 'flat', mode: 'level' },
-  { x: -98.5, z: -58, radius: 4, delta: -2.0, falloff: 'flat', mode: 'level' },
-  { x: -98.5, z: -64, radius: 4, delta: -2.0, falloff: 'flat', mode: 'level' },
-  { x: -98.5, z: -70, radius: 4, delta: -2.0, falloff: 'flat', mode: 'level' },
+  { x: -98.5, z: -40, radius: 4, delta: 0, falloff: 'flat', mode: 'level' },
+  { x: -98.5, z: -46, radius: 4, delta: 0, falloff: 'flat', mode: 'level' },
+  { x: -98.5, z: -52, radius: 4, delta: 0, falloff: 'flat', mode: 'level' },
+  { x: -98.5, z: -58, radius: 4, delta: 0, falloff: 'flat', mode: 'level' },
+  { x: -98.5, z: -64, radius: 4, delta: 0, falloff: 'flat', mode: 'level' },
+  { x: -98.5, z: -70, radius: 4, delta: 0, falloff: 'flat', mode: 'level' },
 ];
 
 // Sandy shoreline around the harbor cove's rims near the town (owner
@@ -177,17 +185,28 @@ export const ZONE1_ZONE: ZoneDef = {
   levelRange: [1, 7],
   biome: 'vale',
   hub: { x: -14, z: -100, radius: TOWN_RADIUS, name: 'Eastbrook' },
+  // Studio town rework (#4593): Marshal Redbrook greets the ferry at the
+  // quay, Apothecary Lin keeps her shop on the strand and the smithy's yard
+  // and the inn lane hold their masters, all past the 26 yd hub (which also
+  // shapes the terrain, so it stays). The town's errands read this wider
+  // circle instead: it holds every town quest giver and every bench and its
+  // master, and keeps Brother Aldric's chapel errands (66 yd off its centre)
+  // their own, as they always were.
+  questHub: { x: -43, z: -78, radius: 58 },
   graveyard: GRAVEYARD_POS,
   lakes: [LAKE],
   pois: [
     { x: -14, z: -102, label: 'Eastbrook', id: 'eastbrook' },
-    { x: 2, z: -4, label: 'Wolf Run', id: 'wolf_run' },
+    // Studio town rework (#4593): over its mobs where the rework stood them
+    { x: -18, z: 28, label: 'Wolf Run', id: 'wolf_run' },
     // follows the boars to their new downs (round 6 swap, then the westward push)
     // pulled off the causeway's latitude: both labels sat at z -46 and the
     // world map drew them on the same line, overlapping
-    { x: 60, z: -64, label: 'Boar Meadow', id: 'boar_meadow' },
+    // Studio town rework (#4593): over its mobs where the rework stood them
+    { x: 72, z: -74, label: 'Boar Meadow', id: 'boar_meadow' },
     { x: -88, z: 82, label: 'Mirror Lake', id: 'mirror_lake' },
-    { x: -60, z: 4, label: 'Sableweb', id: 'sableweb' },
+    // Studio town rework (#4593): over its mobs where the rework stood them
+    { x: -70, z: 36, label: 'Sableweb', id: 'sableweb' },
     { x: -34, z: 142, label: 'Copper Dig', id: 'copper_dig' },
     // stays with Gorrak's camp, which did not move in the round 6 swap
     { x: 98, z: 28, label: 'Bandit Camp', id: 'bandit_camp' },
@@ -1015,8 +1034,10 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     // the inn up the slope north of the beds; she keeps her spot: at the old
     // Studio rebuild map's (-17, -82) she would stand inside the 3 yd the beds
     // keep clear, and a customer beside her inside a bed's working reach)
-    pos: { x: -15.5, z: -81.5 },
-    facing: -Math.PI / 2,
+    // Studio town rework (#4593): she keeps the allotment the map moved west,
+    // turned to face its beds (at the shipped -PI/2 she looked away from them).
+    pos: { x: -85.26, z: -71.07 },
+    facing: 2.655,
     color: 0xa8843a,
     questIds: ['q_farm_intro'],
     vendorItems: [
@@ -1869,11 +1890,42 @@ export const ZONE1_CAMPS: CampDef[] = [
   // produced a run of mirrored quest directions; verify any direction claim
   // against that note, never against raw signs.
   // Wolves: north woods
-  { mobId: 'forest_wolf', center: { x: -10, z: 6 }, radius: 28.5, count: 6 },
-  { mobId: 'forest_wolf', center: { x: 12, z: 52 }, radius: 26, count: 5 },
+  {
+    mobId: 'forest_wolf',
+    center: { x: -10, z: 6 },
+    radius: 28.5,
+    count: 6,
+    spots: [
+      { x: -12.01, z: 3.01 },
+      { x: -19.51, z: 19.44 },
+      { x: 9.59, z: 21.39 },
+      { x: -33.32, z: 31.92 },
+      { x: -21.38, z: 38.96 },
+      { x: -33.36, z: 52.24 },
+    ],
+  },
+  {
+    mobId: 'forest_wolf',
+    center: { x: 12, z: 52 },
+    radius: 26,
+    count: 5,
+    spots: [
+      { x: 10.82, z: 58.46 },
+      { x: 4.53, z: 47.52 },
+      { x: 20.55, z: 43.41 },
+      { x: 26.77, z: 58.74 },
+    ],
+    retiredSlots: 1,
+  },
   // Nudged north to stay ahead of the widened wolf runs (q_greyjaw sends the
   // player to "the deep woods north of the wolf runs").
-  { mobId: 'old_greyjaw', center: { x: 0, z: 100 }, radius: 8, count: 1 },
+  {
+    mobId: 'old_greyjaw',
+    center: { x: 0, z: 100 },
+    radius: 8,
+    count: 1,
+    spots: [{ x: 20.01, z: 71.76 }],
+  },
   // Boars: west meadow
   // Round 6 (owner + team): the boar meadow and the bandit camp trade ground.
   // The bandits sat closest of any hostile camp to the town gate (disc edge 41
@@ -1899,11 +1951,42 @@ export const ZONE1_CAMPS: CampDef[] = [
   // its disc so the rare still patrols his boars. The A centre keeps the
   // vale-road probe at (30,-30) outside its flatten reach (50.5 vs 47.8),
   // the trap this corridor sprang once already this round.
-  { mobId: 'wild_boar', center: { x: 58, z: -72 }, radius: 26, count: 5 },
+  {
+    mobId: 'wild_boar',
+    center: { x: 58, z: -72 },
+    radius: 26,
+    count: 5,
+    spots: [
+      { x: 75.05, z: -79.5 },
+      { x: 76.45, z: -57.93 },
+      { x: 75.34, z: -90.76 },
+      { x: 63.6, z: -44.14 },
+      { x: 71.61, z: -98.95 },
+    ],
+  },
   { mobId: 'wild_boar', center: { x: 97, z: -43 }, radius: 23.5, count: 4 },
-  { mobId: 'mogger', center: { x: 118, z: -26 }, radius: 5, count: 1 },
+  {
+    mobId: 'mogger',
+    center: { x: 118, z: -26 },
+    radius: 5,
+    count: 1,
+    spots: [{ x: 108.07, z: -16.72 }],
+  },
   // Spiders: eastern woods
-  { mobId: 'webwood_spider', center: { x: -70, z: 2 }, radius: 28.5, count: 6 },
+  {
+    mobId: 'webwood_spider',
+    center: { x: -70, z: 2 },
+    radius: 28.5,
+    count: 6,
+    spots: [
+      { x: -48.7, z: 17.78 },
+      { x: -82.64, z: 25.61 },
+      { x: -62.48, z: 32.65 },
+      { x: -89.21, z: 41.79 },
+      { x: -79.18, z: 52.91 },
+      { x: -66.04, z: 60.03 },
+    ],
+  },
   // Murlocs: lake shore northeast, camp still straddles the waterline. This camp is
   // radius-capped by Mirror Lake, not by its neighbours: the terrain flatten disc is
   // radius * 1.8, so a radius wide enough for 11.5 yd spacing drags a 59 yd flatten
@@ -1916,30 +1999,107 @@ export const ZONE1_CAMPS: CampDef[] = [
   // lifts spacing from 4.95 to 6.71 yd. It is the one camp that cannot reach 11.5;
   // the documented exception and the lake guard live in
   // tests/eastbrook_camp_spacing.test.ts.
-  { mobId: 'mudfin_murloc', center: { x: -75, z: 57 }, radius: 15, count: 5 },
+  {
+    mobId: 'mudfin_murloc',
+    center: { x: -75, z: 57 },
+    radius: 15,
+    count: 5,
+    spots: [
+      { x: -107.63, z: 52.68 },
+      { x: -116.21, z: 49.14 },
+      { x: -115.28, z: 41.42 },
+      { x: -124.13, z: 47.13 },
+      { x: -125.97, z: 54.74 },
+    ],
+  },
   // Kobolds: the Copper Dig, northeast of the Wolf Run on the Mirefen road
   // (phase 0b of the New Eastbrook program: the interim dig headland went
   // back to open sea for the ferry lane, and the whole cluster moved rigidly
   // +110,+230 to the rise past Mirror Lake). Keep-outs verified empirically:
   // 54yd to Old Greyjaw's prowl disc, 74yd+ to both wolf runs, the camp edge
   // stops 3yd inside the zone 1 band.
-  { mobId: 'tunnel_rat', center: { x: -32, z: 144 }, radius: 33, count: 8 },
+  {
+    mobId: 'tunnel_rat',
+    center: { x: -32, z: 144 },
+    radius: 33,
+    count: 8,
+    spots: [
+      { x: -32.6, z: 152.05 },
+      { x: -21.32, z: 134.12 },
+      { x: -50.37, z: 145.58 },
+      { x: -16.84, z: 157.25 },
+      { x: -10.33, z: 141.34 },
+      { x: -36.16, z: 119.54 },
+      { x: -43.93, z: 169.67 },
+    ],
+    retiredSlots: 1,
+  },
   // Bandits: southwest camp. Shifted off its own campfire collider and clear of the
   // boar meadow; the tents, crates and supply drops all stay inside the disc, and it
   // no longer merges with the outpost below.
   // The main bandit band takes the old boar meadow, a step north of where the
   // boars stood. Gorrak's own camp below stays put with the boss, so the
   // Bandit Camp landmark and the ringleader fight keep their ground.
-  { mobId: 'vale_bandit', center: { x: 80, z: 15 }, radius: 28.5, count: 6 },
+  {
+    mobId: 'vale_bandit',
+    center: { x: 80, z: 15 },
+    radius: 28.5,
+    count: 6,
+    spots: [
+      { x: 82.11, z: 8.56 },
+      { x: 76.61, z: 23.93 },
+      { x: 89.99, z: 21.79 },
+      { x: 72.48, z: 5.45 },
+      { x: 62.97, z: 19.57 },
+      { x: 91.62, z: 37.71 },
+    ],
+  },
   // Round 6b (owner): Gorrak's camp joins the main band. The two bandit
   // camps were 105 yd apart with the boar meadow sitting between them, so
   // half the vale bandits read as a separate population with no camp.
-  { mobId: 'vale_bandit', center: { x: 115, z: 42 }, radius: 16, count: 5 },
-  { mobId: 'gorrak', center: { x: 118, z: 45 }, radius: 2, count: 1 },
+  {
+    mobId: 'vale_bandit',
+    center: { x: 115, z: 42 },
+    radius: 16,
+    count: 5,
+    spots: [
+      { x: 124.03, z: 44 },
+      { x: 115.35, z: 55.26 },
+      { x: 101.85, z: 53.35 },
+      { x: 103.89, z: 26.81 },
+    ],
+    retiredSlots: 1,
+  },
+  {
+    mobId: 'gorrak',
+    center: { x: 118, z: 45 },
+    radius: 2,
+    count: 1,
+    spots: [{ x: 106.68, z: 39.93 }],
+  },
   // Undead: ruins northwest. The chapel guardians below are the same population, so
   // they may still flank the altar inside this disc.
-  { mobId: 'restless_bones', center: { x: 82, z: 78 }, radius: 28.5, count: 6 },
-  { mobId: 'captain_verlan', center: { x: 92, z: 90 }, radius: 4, count: 1 },
+  {
+    mobId: 'restless_bones',
+    center: { x: 82, z: 78 },
+    radius: 28.5,
+    count: 6,
+    spots: [
+      { x: 94.6, z: 67.38 },
+      { x: 62.46, z: 74.01 },
+      { x: 100.28, z: 69.02 },
+      { x: 106.53, z: 77.61 },
+      { x: 79.39, z: 106.01 },
+      { x: 109.49, z: 94.35 },
+    ],
+  },
+  {
+    mobId: 'captain_verlan',
+    center: { x: 92, z: 90 },
+    radius: 4,
+    count: 1,
+    spots: [{ x: 89.85, z: 102.04 }],
+  },
 ];
 
 // Spawned LAST in the merged CAMPS array (see data.ts) so these appended draws
@@ -1949,8 +2109,21 @@ export const ZONE1_CAMPS: CampDef[] = [
 // content's deterministic spawn rolls, so fixed-seed tests stay stable.
 export const ZONE1_CHAPEL_CAMPS: CampDef[] = [
   // A pair of bone guardians flank the chapel's broken altar; their binder lurks within.
-  { mobId: 'restless_bones', center: { x: 88, z: 90 }, radius: 6, count: 2 },
-  { mobId: 'wraithbinder_maldrec', center: { x: 88, z: 92 }, radius: 3, count: 1 },
+  {
+    mobId: 'restless_bones',
+    center: { x: 88, z: 90 },
+    radius: 6,
+    count: 2,
+    spots: [{ x: 91.96, z: 85.78 }],
+    retiredSlots: 1,
+  },
+  {
+    mobId: 'wraithbinder_maldrec',
+    center: { x: 88, z: 92 },
+    radius: 3,
+    count: 1,
+    spots: [{ x: 80.21, z: 79.66 }],
+  },
 ];
 
 export const ZONE1_OBJECTS: GroundObjectDef[] = [
@@ -1962,7 +2135,8 @@ export const ZONE1_OBJECTS: GroundObjectDef[] = [
       { x: 72, z: 15 },
       { x: 82, z: 22 },
       { x: 106, z: 40 },
-      { x: 110, z: 48 },
+      // Studio town rework (#4593): a muster tent now stands on (110, 48).
+      { x: 108.5, z: 48 },
       { x: 116, z: 37 },
     ],
   },

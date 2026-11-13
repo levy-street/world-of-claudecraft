@@ -2,15 +2,30 @@ import { existsSync } from 'node:fs';
 import { expect, it } from 'vitest';
 import { resolvePosition } from '../src/sim/colliders';
 import { CANNON_EMPLACEMENT_PROPS } from '../src/sim/content/cannon_emplacement';
-import { VEHICLE_STATIONS } from '../src/sim/content/vehicle_stations';
+import { STUDIO_REWORK_PROP_EDITS } from '../src/sim/content/studio_rework_props';
+import { NORTH_WATCH_CANNON, VEHICLE_STATIONS } from '../src/sim/content/vehicle_stations';
 import { PROPS } from '../src/sim/data';
 import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 it('registers a bounded artillery dressing set using shipped non-explosive props', () => {
   expect(CANNON_EMPLACEMENT_PROPS).toHaveLength(7 * VEHICLE_STATIONS.length);
+  // The Studio town rework (#4593) took the North Watch battery's seven dressing
+  // props off the map: each is retired by its own studio prop edit, so the live
+  // props carry only the other stations' sets.
+  const retired = (p: { x: number; z: number }) =>
+    STUDIO_REWORK_PROP_EDITS.some(
+      (e) => e.table === 'decorProps' && e.remove && e.at.x === p.x && e.at.z === p.z,
+    );
+  const atNorthWatch = (p: { x: number; z: number }) =>
+    Math.hypot(p.x - NORTH_WATCH_CANNON.x, p.z - NORTH_WATCH_CANNON.z) < 10;
+  expect(CANNON_EMPLACEMENT_PROPS.filter(retired)).toEqual(
+    CANNON_EMPLACEMENT_PROPS.filter(atNorthWatch),
+  );
+  expect(CANNON_EMPLACEMENT_PROPS.filter(retired)).toHaveLength(7);
   for (const prop of CANNON_EMPLACEMENT_PROPS) {
-    expect(PROPS.decorProps).toContainEqual(prop);
+    if (retired(prop)) expect(PROPS.decorProps).not.toContainEqual(prop);
+    else expect(PROPS.decorProps).toContainEqual(prop);
     expect(prop.key.toLowerCase()).not.toContain('barrel');
     expect(prop.terrainCalm).toBe(false);
   }

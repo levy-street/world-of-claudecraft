@@ -192,28 +192,12 @@ export const PRACTICE_DUMMY_MOBS: Record<string, MobTemplate> = {
   },
 };
 
-// The row runs ACROSS the walk-up from Highwatch, not along it. The hub sits at
-// (0, 660) and the row at x -40, so a player arrives travelling almost pure
-// minus x: a row laid out along x is seen end-on, which stacks the four bodies
-// and their nameplates into what reads as a single dummy. Running the row along
-// z instead puts them side by side from that approach.
-//
-// The pitch is 6 yards: wide enough that each dummy owns its own ground and its
-// own nameplate lane, tight enough that all four are still in frame from where a
-// player stands to read one. It is also the only axis with room to spread at
-// all: 6 yard steps along x would walk the heroic dummy to x -28, halfway back
-// to the Highwatch hub boundary.
-//
-// Order along ascending z is what each represents: ally, normal trash, normal
-// boss, heroic boss. The original training dummy holds its shipped spot at
-// (-40, 648) (zone3.ts owns that camp entry and the deed that names it), so the
-// row is anchored on it and the three new marks are measured off it rather than
-// the dummies being re-placed around a new anchor.
-export const PRACTICE_ROW_X = -40;
-export const PRACTICE_ROW_SPACING = 6;
-export const PRACTICE_ROW_TRAINING_DUMMY_Z = 648;
-
-// Position in the row, ascending z. The training dummy is slot 1.
+// The Highwatch practice row, as the Studio town rework (#4593) stood it: a
+// diagonal line on the shelf below Stalker Ridge, south-west of Highwatch,
+// about 6 yards between marks. Along the row from the town side: ally, normal
+// boss, heroic boss, then the original training dummy at the far end (zone3.ts
+// owns that camp entry and the Wall Drills deed that names it). The row has no
+// fire: an inert practice target builds no brazier (render/night_accents_core.ts).
 export const PRACTICE_ROW_ORDER: readonly string[] = [
   FRIENDLY_PLAYER_DUMMY_ID,
   'training_dummy',
@@ -221,68 +205,43 @@ export const PRACTICE_ROW_ORDER: readonly string[] = [
   HEROIC_BOSS_DUMMY_ID,
 ];
 
-const TRAINING_DUMMY_SLOT = PRACTICE_ROW_ORDER.indexOf('training_dummy');
-
-/** The z of a row slot, measured off the training dummy's shipped position. */
-export function practiceRowZ(slot: number): number {
-  return PRACTICE_ROW_TRAINING_DUMMY_Z + (slot - TRAINING_DUMMY_SLOT) * PRACTICE_ROW_SPACING;
-}
+/** Each row dummy's mark. Studio town rework (#4593): the map's diagonal row,
+ *  the far training dummy turned onto the row's line (the map stood it a yard
+ *  off it), the same six yards past the heroic boss dummy. */
+export const PRACTICE_ROW_MARKS: Readonly<Record<string, { x: number; z: number }>> = {
+  [FRIENDLY_PLAYER_DUMMY_ID]: { x: -65.95, z: 611.4 },
+  training_dummy: { x: -80.04, z: 598.23 },
+  [NORMAL_BOSS_DUMMY_ID]: { x: -70.82, z: 606.36 },
+  [HEROIC_BOSS_DUMMY_ID]: { x: -75.65, z: 602.33 },
+};
 
 // radius 0 / count 1, like the training dummy's own entry: a dummy camp is a
 // fixed deterministic prop and the spawn loop gives it no scatter and draws no
 // rng for it (sim.ts), so the row lands exactly on these marks.
-export const PRACTICE_DUMMY_CAMPS: CampDef[] = PRACTICE_ROW_ORDER.flatMap((mobId, slot) =>
+export const PRACTICE_DUMMY_CAMPS: CampDef[] = PRACTICE_ROW_ORDER.flatMap((mobId) =>
   mobId === 'training_dummy'
     ? []
-    : [{ mobId, center: { x: PRACTICE_ROW_X, z: practiceRowZ(slot) }, radius: 0, count: 1 }],
+    : [{ mobId, center: { ...PRACTICE_ROW_MARKS[mobId] }, radius: 0, count: 1 }],
 );
 
-// The row's ONE fire, authored into ZONE3_PROPS.campfires.
-//
-// Every camp whose mob family builds fires and that no authored campfire
-// already covers gets a procedural brazier of its own (render/camp_braziers.ts),
-// and a dummy is family 'humanoid', so the row was lighting one fire per dummy:
-// four inert practice targets each tending a campfire. The fix has two halves.
-// An inert practice target now builds nothing (render/night_accents_core.ts),
-// which removes all four, and this authored campfire puts a single one back in
-// FRONT of the normal boss dummy. Front is plus x: the row faces the walk-up
-// from Highwatch, which is the side a player stands on.
-//
-// The offset is 1.5 yards, not the 3 feet the fire LOOKS like it wants, and the
-// reason is the campfire's own collider. A campfire is a solid circle of radius
-// 0.85 (sim/colliders.ts) and a spawning mob keeps 0.65 of clearance, so a fire
-// closer than their sum shoves the dummy off its camp mark: at 1 yard the boss
-// dummy resolved to (-38.66, 652.54), two yards out of the row and visibly
-// crooked beside its neighbours. 1.5 is the nearest the fire can stand with the
-// dummy still exactly on its mark, which tests/practice_dummies.test.ts pins so
-// a future clearance change fails loudly instead of bending the row again.
-export const PRACTICE_ROW_CAMPFIRE_OFFSET = 1.5;
-export const PRACTICE_ROW_CAMPFIRE: [number, number] = [
-  PRACTICE_ROW_X + PRACTICE_ROW_CAMPFIRE_OFFSET,
-  practiceRowZ(PRACTICE_ROW_ORDER.indexOf(NORMAL_BOSS_DUMMY_ID)),
-];
-
 // The Eastbrook hub dummy: a second `training_dummy` (zone3.ts owns the
-// template) on the quay pad where every new character first stands, eleven
-// yards inland of the player start (eastbrook_layout.ts services.playerStart,
-// (-94, -58)). The Highwatch row is a level-20 measuring station; this one is
+// template). The Highwatch row is a level-20 measuring station; this one is
 // the hub's, so a player can test a build, a new piece of gear or a rotation
 // the moment they respec in town instead of riding to the hill above Highwatch.
 //
-// The mark sits on the dock's levelled shelf (zone1.ts levels it flat), six
-// yards east of the quay-walk road centreline (x -92, halfWidth 1.5), clear of
-// Fisherman Brandt (-95, -50), Foreman Odell (-84, -63) and the watchtower and
-// crate colliders on the pad's north edge, so findSafePos never has to move it
-// (tests/training_dummy.test.ts pins that it lands on its authored mark).
-export const HUB_TRAINING_DUMMY_POS = { x: -86, z: -50 } as const;
+// The Studio town rework (#4593) moved the yard off the quay pad to the
+// practice ground below Sableweb, north of town, and these marks are where the
+// map stands the two dummies (they used to ride the touch-up as object moves
+// over the old quay marks), each turned the map's 130 degrees. Clear of every
+// collider and neighbour, so findSafePos never has to move either
+// (tests/hub_training_dummy.test.ts and tests/hub_healing_dummy.test.ts pin
+// that each lands on its mark).
+export const HUB_TRAINING_DUMMY_POS = { x: -71.2, z: -6.56 } as const;
+export const HUB_TRAINING_DUMMY_FACING = 2.269;
 
-// East of Hale, mirroring the damage dummy on his other side: a few yards
-// off, clear of the quay road (centreline x -92, halfWidth 1.5), Fisherman
-// Brandt (-95, -50) and the pad's watchtower/crate cluster to the north (the
-// same clearance rule as HUB_TRAINING_DUMMY_POS above).
-// tests/hub_healing_dummy.test.ts pins the clearance and that findSafePos
-// leaves it exactly here.
-export const HUB_HEALING_DUMMY_POS = { x: -85, z: -44 } as const;
+// West of the damage dummy, the two sharing one yard, a few yards from Hale.
+export const HUB_HEALING_DUMMY_POS = { x: -77.6, z: -3.17 } as const;
+export const HUB_HEALING_DUMMY_FACING = 2.269;
 
 // NOT a CAMPS entry: the hub yard (both dummies + sparring master) spawns
 // after the player in sim/hub_practice.ts so it consumes only trailing entity
@@ -298,14 +257,15 @@ export const HUB_PRACTICE_DUMMY_CAMPS: CampDef[] = [
 // meters keybind, Shift+H by default) is the least discoverable window in the
 // HUD: nothing in the world names it. Hale's greeting and his one quest do.
 //
-// Placed a few yards SOUTH of the dummy (north is the pad's watchtower and
-// crate edge), east of the quay-walk road (centreline x -92, halfWidth 1.5)
-// and clear of Fisherman Brandt (-95, -50), facing the player arrival
-// point at (-94, -58) so newcomers see his face rather than his back.
-// tests/hub_dummy_drill.test.ts pins that findSafePos leaves him on his
-// mark and that nothing else stands within arm's reach.
+// He moved with the hub dummies to the Sableweb practice ground (Studio town
+// rework, #4593). The map stood him 18 to 24 yd west of them; he stands in
+// front of the pair instead, a few yards south of them on the town side, so
+// both dummies are behind him as his greeting says, facing the player arrival
+// point at (-94, -58) so newcomers walking up see his face rather than his
+// back. tests/hub_dummy_drill.test.ts pins that findSafePos leaves him on
+// his mark and that nothing else stands within arm's reach.
 export const HUB_SPARRING_MASTER_ID = 'drillmaster_hale';
-export const HUB_SPARRING_MASTER_POS = { x: -88, z: -45 } as const;
+export const HUB_SPARRING_MASTER_POS = { x: -75.96, z: -9.09 } as const;
 
 export const HUB_PRACTICE_NPCS: Record<string, NpcDef> = {
   [HUB_SPARRING_MASTER_ID]: {
@@ -313,7 +273,8 @@ export const HUB_PRACTICE_NPCS: Record<string, NpcDef> = {
     name: 'Drillmaster Hale',
     title: 'Quay Sparring Master',
     pos: { ...HUB_SPARRING_MASTER_POS },
-    facing: -2.71, // atan2(dx, dz) toward the quay arrival point
+    // toward the player arrival point (atan2(-94 - x, -58 - z))
+    facing: Math.atan2(-94 - HUB_SPARRING_MASTER_POS.x, -58 - HUB_SPARRING_MASTER_POS.z),
     color: 0x7a4a4a,
     questIds: ['q_hub_know_your_numbers', 'q_hub_healing_numbers'],
     // Spawned by sim/hub_practice.ts after the player (trailing ids), not by

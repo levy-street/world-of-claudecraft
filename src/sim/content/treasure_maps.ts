@@ -194,7 +194,8 @@ export const TREASURE_SITES: readonly TreasureSiteDef[] = Object.freeze([
   { id: 'site_frostveil_west_road', zoneId: 'frostveil', x: -84, z: 1642 },
   { id: 'site_amberfall_south_road', zoneId: 'amberfall', x: -340, z: 1825 },
   { id: 'site_amberfall_east_road', zoneId: 'amberfall', x: -359, z: 1928 },
-  { id: 'site_willowfen_east_road', zoneId: 'willowfen', x: -349, z: 304 },
+  // Studio town rework (#4593): off (-349, 304), where the barrow chapel now stands
+  { id: 'site_willowfen_east_road', zoneId: 'willowfen', x: -334, z: 295 },
   { id: 'site_willowfen_west_road', zoneId: 'willowfen', x: -438, z: 363 },
   { id: 'site_nightbloom_north_road', zoneId: 'nightbloom', x: -336, z: 1325 },
   { id: 'site_nightbloom_south_road', zoneId: 'nightbloom', x: -311, z: 1270 },

@@ -664,17 +664,18 @@ describe('the hold and the leash still rule a caster no route reaches', () => {
 // The same sight rule in the open world, on a world caster (Corrupted Priest
 // Malric's Mindfracture, an instant petSpell) with one of the world's own
 // props between him and his target: the authored quay watch tower (zone1
-// decorProp hexWatchtower at (-89, -41), r 2.4, h 12) stands 5 yd east of the
-// player's spot. The pair has moved twice: the prop 5 yd east of the origin
-// went when #4525 moved Eastbrook, and the Wolf Run garrison watch tower at
-// (27, -13) that replaced it went with the genshin artstyle merge
-// (8bff2cec638), so the pair now uses the same model on the quay. Out here no
+// decorProp hexWatchtower, r 2.4, h 12, which the Studio town rework (#4593)
+// moved from (-89, -41) to (-97.37, 1.49) in studio_rework_props.ts) stands 5 yd
+// east of the player's spot. The pair has moved three times: the prop 5 yd east
+// of the origin went when #4525 moved Eastbrook, the Wolf Run garrison watch
+// tower at (27, -13) that replaced it went with the genshin artstyle merge
+// (8bff2cec638), and the rework carried the quay tower north. Out here no
 // route is planned (chase_route.ts keeps routes to instances): he closes
 // straight, the slide fan rounds the prop, and the leash and the stall are
 // what they always were.
 describe('in the open world', () => {
   const WORLD_SEED_WITH_PROP = 7788;
-  const SPOT = { x: -94, z: -41 };
+  const SPOT = { x: -102.4, z: 1.5 };
 
   function field(dist: number): { sim: Sim; player: Entity; caster: Entity } {
     const sim = new Sim({ seed: WORLD_SEED_WITH_PROP, playerClass: 'warrior' });

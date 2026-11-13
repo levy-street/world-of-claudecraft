@@ -39,7 +39,7 @@ export const NIGHTBLOOM_ZONE: ZoneDef = {
   biome: 'night',
   southPassX: -330, // the Nightgate: where the jungle road climbs into the dark
   hub: { x: -370, z: 1420, radius: 18, name: 'Moonrest' },
-  graveyard: { x: -388, z: 1402 },
+  graveyard: { x: -392.7, z: 1414.6 },
   lakes: [
     { x: -290, z: 1380, radius: 14 }, // the Moonspring: a round mirror tarn
     // the Gloamfield pools, scattered through the flower downs
@@ -516,7 +516,17 @@ export const NIGHTBLOOM_ITEMS: Record<string, ItemDef> = {
 export const NIGHTBLOOM_CAMPS: CampDef[] = [
   { mobId: 'moonfleece_grazer', center: { x: -436, z: 1466 }, radius: 12, count: 4 },
   { mobId: 'moonfleece_grazer', center: { x: -320, z: 1446 }, radius: 10, count: 3 },
-  { mobId: 'gloam_strider', center: { x: -410, z: 1522 }, radius: 10, count: 3 },
+  {
+    mobId: 'gloam_strider',
+    center: { x: -410, z: 1522 },
+    radius: 10,
+    count: 3,
+    spots: [
+      { x: -412.11, z: 1523.99 },
+      { x: -405.97, z: 1519.67 },
+      { x: -405.94, z: 1529.75 },
+    ],
+  },
   { mobId: 'gloam_strider', center: { x: -240, z: 1402 }, radius: 10, count: 3 },
   { mobId: 'nightkin_stargazer', center: { x: -272, z: 1538 }, radius: 8, count: 3 },
   { mobId: 'barrow_king', center: { x: -360, z: 1650 }, radius: 5, count: 1 },

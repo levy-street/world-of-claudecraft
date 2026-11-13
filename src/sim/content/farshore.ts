@@ -46,7 +46,7 @@ export const FARSHORE_ZONE: ZoneDef = {
   levelRange: [3, 7],
   biome: 'vale',
   hub: { x: 305, z: 70, radius: 15, name: 'Gullhaven' },
-  graveyard: { x: 290, z: 86 },
+  graveyard: { x: 295.2, z: 90.6 },
   lakes: [
     { x: 388, z: 26, radius: 8 }, // the Hilltop Spring, under the Watch Meadow
     // Gull Mere, the fishing town's actual water (the packet review's R55).
@@ -245,7 +245,7 @@ export const FARSHORE_NPCS: Record<string, NpcDef> = {
     id: 'warden_coalfast',
     name: 'Warden Coalfast',
     title: 'Redoubt Commander',
-    pos: { x: 305, z: 66 },
+    pos: { x: 302.23, z: 59.08 },
     facing: 0,
     color: 0x8a4b2b,
     questIds: [
@@ -272,7 +272,7 @@ export const FARSHORE_NPCS: Record<string, NpcDef> = {
     id: 'quartermaster_edda',
     name: 'Quartermaster Edda',
     title: 'Redoubt Armorer',
-    pos: { x: 298, z: 74 },
+    pos: { x: 294.48, z: 72.66 },
     facing: Math.PI / 2,
     color: 0x6b6b3a,
     questIds: ['q_fs_steel_for_the_redoubt'],
@@ -584,8 +584,26 @@ export const FARSHORE_CAMPS: CampDef[] = [
   { mobId: 'breach_wretch', center: { x: 400, z: 96 }, radius: 11, count: 3 }, // the north downs
   { mobId: 'riftspawn', center: { x: 452, z: 66 }, radius: 11, count: 3 }, // deep in the Riftfields
   { mobId: 'riftspawn', center: { x: 388, z: -44 }, radius: 11, count: 3 }, // above the Sundered Cliffs
-  { mobId: 'void_stalker', center: { x: 418, z: -30 }, radius: 12, count: 2 }, // the cliff approach
-  { mobId: 'void_stalker', center: { x: 462, z: 20 }, radius: 11, count: 2 }, // the east reach
+  {
+    mobId: 'void_stalker',
+    center: { x: 418, z: -30 },
+    radius: 12,
+    count: 2,
+    spots: [
+      { x: 410.85, z: -29.21 },
+      { x: 421.21, z: -20.7 },
+    ],
+  }, // the cliff approach
+  {
+    mobId: 'void_stalker',
+    center: { x: 462, z: 20 },
+    radius: 11,
+    count: 2,
+    spots: [
+      { x: 454.29, z: 27.2 },
+      { x: 445.05, z: 20.64 },
+    ],
+  }, // the east reach
   { mobId: 'sundered_horror', center: { x: 402, z: -78 }, radius: 6, count: 1 }, // the cliffs' great break
 ];
 export const FARSHORE_OBJECTS: GroundObjectDef[] = [

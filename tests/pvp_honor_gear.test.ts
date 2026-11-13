@@ -213,8 +213,11 @@ describe('FURY WARFARE stock', () => {
     // smithy's forge shelter took the north road's old line, so the road swings
     // west round it over his stand and he keeps the town's edge a few strides
     // on, between that road and the coast track.
-    expect(NPCS.fury.pos).toEqual({ x: 21, z: -83.5 });
-    expect(NPCS.fury.facing).toBe(-2.0570389598824015);
+    // Re-pinned for the Studio town rework (#4593): the map stands FURY at an
+    // authored literal, 27 yd from the Eastbrook hub center, with an authored
+    // facing (eastbrook_layout.ts EASTBROOK_NPC_PLACEMENTS_BY_ID.fury).
+    expect(NPCS.fury.pos).toEqual({ x: 0.77, z: -123 });
+    expect(NPCS.fury.facing).toBe(5.012);
     expect(NPCS.fury.dynamic).toBe(true);
     // The entry tier first, then the two honor trinkets, then Warfare Season 2
     // (pinned as the gear tail in warfare_season2.test.ts), then the buddy.

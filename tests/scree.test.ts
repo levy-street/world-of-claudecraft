@@ -5,7 +5,7 @@ import {
   screeSpotAt,
   screeSpotsInBounds,
 } from '../src/render/cliff_scree_core';
-import { BUILTIN_WORLD, GATHER_NODES, setActiveWorldContent } from '../src/sim/data';
+import { BUILTIN_WORLD, gatherNodesInActiveWorld, setActiveWorldContent } from '../src/sim/data';
 import type { WorldContent } from '../src/sim/types';
 import {
   groundHeight,
@@ -81,12 +81,16 @@ describe('cliff scree placement', () => {
     // seed is therefore the decisive one here: with the exclusion removed
     // this sweep fails at 20061 (the measured regression), not just in
     // principle. 6 = INTERACT_RANGE + 1yd of visual margin
-    // (cliff_scree_core.ts NODE_EXCLUSION_RADIUS).
+    // (cliff_scree_core.ts NODE_EXCLUSION_RADIUS). The nodes are read where
+    // the live world stands them (gatherNodesInActiveWorld, the table the
+    // core screens against): the Studio town rework (#4593) moved several
+    // veins through the touch-up's object moves, and the raw table's old
+    // spots no longer hold a node to keep clear of.
     const SHIPPED_SEED = 20061;
     const pad = 6 + SCREE_CELL; // exclusion radius + one full candidate cell
     let spotsSeen = 0;
     for (const seed of [SHIPPED_SEED, SEED]) {
-      for (const node of GATHER_NODES) {
+      for (const node of gatherNodesInActiveWorld()) {
         for (
           let ci = Math.floor((node.pos.x - pad) / SCREE_CELL);
           ci <= Math.ceil((node.pos.x + pad) / SCREE_CELL);

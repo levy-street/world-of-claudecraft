@@ -19,7 +19,13 @@
 // boats, shipyard, anchor and ship monument, and Galecrest Rest keeps its
 // walled churchyard. No town hall: the hall model fits only the square's
 // north-east corner, the workshop's own ground the smithy holds.
-import { deepFreeze, indexById, levelTownPads, type TownGround } from '../placed_town_kit';
+import {
+  deepFreeze,
+  indexById,
+  levelTownPads,
+  padsAlong,
+  type TownGround,
+} from '../placed_town_kit';
 import { paintedTownBuilding } from './models';
 import type { PaintedTownLayout } from './types';
 
@@ -27,8 +33,6 @@ const LOOK = 'brick' as const;
 
 // The models face local -Z (rotation 0 turns the door south, -z; PI north,
 // +z; PI / 2 east, -x; -PI / 2 west, +x: this world's east is -x).
-const SOUTH_FACING = 0;
-const NORTH_FACING = Math.PI;
 
 // The harbour inn (tavern, 1.2: the door clears 5.3): the square's south side,
 // where the town hall stood, its long front and door on the square (the board
@@ -39,8 +43,8 @@ const INN = paintedTownBuilding({
   kind: 'inn',
   model: 'tavern',
   look: LOOK,
-  anchor: { x: 423, z: 333.04 },
-  rotation: NORTH_FACING,
+  anchor: { x: 431.77, z: 333.58 },
+  rotation: 3.6303, // Studio town rework (#4593)
   scale: 1.2,
 });
 // The smithy (smithy, 1.3, walk-in): the square's north-east corner, where
@@ -52,8 +56,8 @@ const SMITHY = paintedTownBuilding({
   kind: 'house',
   model: 'smithy',
   look: LOOK,
-  anchor: { x: 387.83, z: 370.64 },
-  rotation: -1.561,
+  anchor: { x: 382.88, z: 370.6 },
+  rotation: 0, // Studio town rework (#4593)
   scale: 1.3,
 });
 // The market hall (shop_a, 1.3, walk-in): the square's north-west corner,
@@ -66,8 +70,8 @@ const MARKET = paintedTownBuilding({
   kind: 'house',
   model: 'shop_a',
   look: LOOK,
-  anchor: { x: 434.62, z: 372.62 },
-  rotation: 0.349,
+  anchor: { x: 411.5, z: 392.19 }, // Studio town rework (#4593): nudged off the road band
+  rotation: 4.6949, // Studio town rework (#4593)
   scale: 1.3,
 });
 // The downs house (house_a, 1.4, sealed): beside the churchyard where the
@@ -77,8 +81,8 @@ const DOWNS_HOUSE = paintedTownBuilding({
   kind: 'house',
   model: 'house_a',
   look: LOOK,
-  anchor: { x: 385.04, z: 335.91 },
-  rotation: NORTH_FACING,
+  anchor: { x: 382.66, z: 338.3 },
+  rotation: 2.9322, // Studio town rework (#4593)
   scale: 1.4,
 });
 // The Windway house (house_a, 1.4, sealed): beyond the smithy where the kit
@@ -89,12 +93,30 @@ const WINDWAY_HOUSE = paintedTownBuilding({
   kind: 'house',
   model: 'house_a',
   look: LOOK,
-  anchor: { x: 368.96, z: 373.09 },
-  rotation: SOUTH_FACING,
+  anchor: { x: 342.34, z: 375.42 },
+  rotation: 0.2269, // Studio town rework (#4593)
   scale: 1.4,
 });
 
 const BUILDINGS = [INN, SMITHY, MARKET, DOWNS_HOUSE, WINDWAY_HOUSE] as const;
+
+// The market hall's shipped ground stays level where the hall stood before the Studio town
+// rework (#4593) moved it: the Wickharbor ferry wharf's model (scripts/assets/
+// wickharbor_wharf) was built in Blender on the ground its pad shaped. Its apron and pad
+// stamps exactly as they shipped, laid after the town's own pads.
+const SHIPPED_MARKET_GROUND = paintedTownBuilding({
+  id: 'wickharbor_market_hall',
+  kind: 'house',
+  model: 'shop_a',
+  look: LOOK,
+  anchor: { x: 434.62, z: 372.62 },
+  rotation: 0.349,
+  scale: 1.3,
+});
+const SHIPPED_MARKET_STAMPS = [
+  ...padsAlong(SHIPPED_MARKET_GROUND, 2.5, 2, 2, 3),
+  ...padsAlong(SHIPPED_MARKET_GROUND, 2.5, 2, 2, 4),
+];
 
 // Level pads. The square's own height (2.5) carries the inn and the market
 // hall, the smithy and the Windway house stand a little lower on the road in.
@@ -104,7 +126,9 @@ const BUILDINGS = [INN, SMITHY, MARKET, DOWNS_HOUSE, WINDWAY_HOUSE] as const;
 // reaches the sea or a camp's ground (the shoal scuttlers' radius stays about
 // 3 yd past every pad).
 const GROUND: readonly TownGround[] = [
-  { building: INN, height: 2.5, columns: 3, rows: 2, taper: 4, apron: 6 },
+  // apron 5.5 (was 6): where the Studio town rework (#4593) turned the inn, a 6 yd apron
+  // reached the Wickharbor harbor model's shore grid (scripts/assets/wickharbor_harbor)
+  { building: INN, height: 2.5, columns: 3, rows: 2, taper: 4, apron: 5.5 },
   { building: SMITHY, height: 2.2, columns: 2, rows: 3, taper: 4, apron: 6 },
   { building: MARKET, height: 2.5, columns: 2, rows: 2, taper: 4, apron: 3 },
   { building: DOWNS_HOUSE, height: 1.2, columns: 2, rows: 2, taper: 3, apron: 3 },
@@ -138,7 +162,7 @@ export const WICKHARBOR_LAYOUT: PaintedTownLayout = deepFreeze({
     { key: 'hexbHomeA', x: 441, z: 332, rot: 0.64, scale: 7.5, r: 4.5, h: 8 },
     { key: 'hexbHomeB', x: 386, z: 336, rot: -0.28, scale: 7.5, r: 5, h: 10 },
   ],
-  pads: levelTownPads(GROUND),
+  pads: levelTownPads(GROUND, { after: SHIPPED_MARKET_STAMPS }),
   npcs: [],
 });
 

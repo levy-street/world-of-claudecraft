@@ -482,6 +482,9 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     zoneId: 'eastbrook_vale',
     minLevel: WORLD_QUEST_MIN_LEVEL,
     area: { x: -61, z: -68, radius: 26 },
+    // Studio town rework (#4593): an oak now stands on the default spot
+    // (-53, -60), so the champion rises half a yard off it.
+    championAt: { x: -52.5, z: -59 },
     objective: {
       type: 'delivery',
       pickupObjectItemId: 'eastbrook_freight_crate',
@@ -559,8 +562,9 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     zoneId: 'willowfen',
     minLevel: 19,
     area: { x: -370, z: 355, radius: 108 },
-    // Clear of Bridgemere's painted building footprint.
-    championAt: { x: -362, z: 372 },
+    // Clear of Bridgemere's painted building footprints, as the Studio town
+    // rework (#4593) stands them (the old spot, (-362, 372), is blocked now).
+    championAt: { x: -362, z: 375.5 },
     objective: { type: 'gather', nodeType: 'ore' },
     count: 3,
   },

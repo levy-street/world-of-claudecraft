@@ -422,7 +422,9 @@ describe('authoritative Eastbrook replacement plan', () => {
     // chapel, the apothecary's shop and the inn nudged off the strand and the
     // farm plots), each at its own grand size (the apothecary's shop at 1.5,
     // the rest at 1.3), and every measurement is the model's own at authored
-    // size carried to that size.
+    // size carried to that size. The Studio town rework (#4593) then turned
+    // and shifted the smithy and the quay cottage, so their rows moved with
+    // them (anchor, turn, front, annex and reach).
     expect(
       EASTBROOK_LAYOUT.buildings.map((building) => ({
         id: building.id,
@@ -507,25 +509,25 @@ describe('authoritative Eastbrook replacement plan', () => {
         assetId: '/models/tidehold/smithy.glb',
         kind: 'house',
         position: {
-          x: -4.2,
-          z: -75.2,
+          x: -5.48,
+          z: -75.12,
         },
         nativeDimensions: {
           width: 14.3,
           height: 15.265170000000003,
           depth: 11.700000000000001,
         },
-        rotation: 0.3490658503988659,
+        rotation: 5.044,
         maxCornerRadius: 9.238235762308735,
         frontClearance: 1.8,
         frontStandingPoint: {
-          x: -8.282374584867384,
-          z: -81.85509712542417,
+          x: 1.2453368825200792,
+          z: -79.08559501419587,
         },
         placement: {
-          x: -4.2,
-          z: -75.2,
-          rotation: 0.3490658503988659,
+          x: -5.48,
+          z: -75.12,
+          rotation: 5.044,
           scale: 1.3,
           lift: -1.35,
           modelSize: 19.797,
@@ -534,23 +536,23 @@ describe('authoritative Eastbrook replacement plan', () => {
           {
             id: 'eastbrook_smithy:forge_shelter',
             center: {
-              x: 6.900320054667162,
-              z: -79.37852920114891,
+              x: -1.495851691066557,
+              z: -63.94843905923068,
             },
             halfWidth: 4.70002,
             halfDepth: 6.24,
-            rotation: 0.3490658503988659,
+            rotation: 5.044,
           },
         ],
         reach: {
           id: 'eastbrook_smithy',
           center: {
-            x: -0.1429077294915601,
-            z: -77.08477299988107,
+            x: -3.666326373962809,
+            z: -71.03062902994641,
           },
           halfWidth: 12.86805,
           halfDepth: 7.598565,
-          rotation: 0.3490658503988659,
+          rotation: 5.044,
         },
         walkIn: true,
       },
@@ -745,25 +747,25 @@ describe('authoritative Eastbrook replacement plan', () => {
         assetId: '/models/tidehold/house_b.glb',
         kind: 'house',
         position: {
-          x: -59.11,
-          z: -51.35,
+          x: -53.46,
+          z: -47.24,
         },
         nativeDimensions: {
           width: 16.57994,
           height: 19.42387,
           depth: 11.119940000000001,
         },
-        rotation: 0.8028514559173916,
+        rotation: 1.9548,
         maxCornerRadius: 9.981826937079205,
         frontClearance: 1.8,
         frontStandingPoint: {
-          x: -64.40431935029846,
-          z: -56.46266476682711,
+          x: -60.283959225330506,
+          z: -44.48269354406757,
         },
         placement: {
-          x: -59.11,
-          z: -51.35,
-          rotation: 0.8028514559173916,
+          x: -53.46,
+          z: -47.24,
+          rotation: 1.9548,
           scale: 1.3,
           lift: -1.35,
           modelSize: 15.9799,
@@ -772,23 +774,23 @@ describe('authoritative Eastbrook replacement plan', () => {
           {
             id: 'eastbrook_quay_cottage:crates',
             center: {
-              x: -67.16406219932666,
-              z: -46.421566629051654,
+              x: -52.23324184518815,
+              z: -37.877711933928616,
             },
             halfWidth: 0.74997,
             halfDepth: 1.46003,
-            rotation: 0.8028514559173916,
+            rotation: 1.9548,
           },
         ],
         reach: {
           id: 'eastbrook_quay_cottage',
           center: {
-            x: -59.38461929359355,
-            z: -51.06562339673212,
+            x: -53.31189532549402,
+            z: -46.8734610330545,
           },
           halfWidth: 9.757995,
           halfDepth: 7.604805,
-          rotation: 0.8028514559173916,
+          rotation: 1.9548,
         },
         walkIn: false,
       },
@@ -929,12 +931,14 @@ describe('authoritative Eastbrook replacement plan', () => {
         id: 'eastbrook_market_stall_world_market',
         assetId: '/models/props/eastbrook_market_stall.glb',
         canopyVariant: 'gold',
-        radiusFromCivic: 10.307764064044152,
-        position: { x: -20.5, z: -94 },
+        // the Studio town rework (#4593) stood its keeper by the bank's door,
+        // and the stall stands with him
+        radiusFromCivic: 39.87547382428577,
+        position: { x: -51.9329678441002, z: -114.29403771141769 },
         width: 2.8,
         depth: 2.2,
-        rotation: 2.4805494847391065,
-        frontStandingPoint: { x: -19.517695018376127, z: -95.26296354780212 },
+        rotation: 0.785,
+        frontStandingPoint: { x: -50.802047554331615, z: -113.16221648075016 },
       },
       {
         id: 'eastbrook_market_stall_provisions',
@@ -1120,7 +1124,9 @@ describe('wall and road geometry', () => {
     // harbour end of the main street, so the nearest LAYOUT solid was the
     // apothecary's shop on the square. Re-pinned again for the World of
     // ClaudeCraft Studio map's arrangement: the inn up the slope north of the
-    // farm plots is the nearest now, still seventy yards off.
+    // farm plots was the nearest, seventy yards off. The Studio town rework
+    // (#4593) turned the smithy so its forge shelter swings north-east, and
+    // that shelter is the nearest now, still sixty-six yards off.
     const wanderTarget = { x: 29.4338221478, z: 0.9998592577 };
     expect(EASTBROOK_LAYOUT.wall.segments).toHaveLength(0);
     const clearances = nonWallSolidObbs()
@@ -1130,8 +1136,8 @@ describe('wall and road geometry', () => {
       }))
       .sort((left, right) => left.clearance - right.clearance);
     expect(clearances[0]).toEqual({
-      id: 'eastbrook_inn',
-      clearance: 74.03488192823825,
+      id: 'eastbrook_smithy:forge_shelter',
+      clearance: 66.80539370017037,
     });
     expect(clearances[0].clearance).toBeGreaterThan(PLAYER_RADIUS);
   });
@@ -1180,14 +1186,14 @@ describe('wall and road geometry', () => {
             x: 12.5,
             z: -71,
           },
-          {
-            x: 4,
-            z: -67,
-          },
-          {
-            x: 0,
-            z: -58,
-          },
+          // the Studio town rework (#4593) lays it east of the turned smithy's
+          // forge shelter, on the map's line (a fifth of a yard east past the
+          // shelter's corner)
+          { x: 7.8, z: -69.03 },
+          { x: 7.6, z: -61.62 },
+          { x: 5.38, z: -56.12 },
+          { x: 3.88, z: -55.12 },
+          { x: -0.55, z: -54.72 },
         ],
       },
       {
@@ -1484,6 +1490,9 @@ describe('layout clearance and service anchors', () => {
     // The authored playerStart is the offline and editor spawn; a real new
     // character arrives at the ferry landing, which is why the givers moved
     // toward the quay side of the square rather than toward this spawn.
+    // Re-pinned for the Studio town rework (#4593): every NPC but the weaver
+    // and the tinker stands at an authored literal from that map now, a few
+    // nudged off it by the least that clears a rule (eastbrook_layout.ts NPCS).
     // Re-pinned 2026-10 for the Tidehold rebuild: the stands that hung off a
     // kit shell moved with the six placed buildings. apothecary_lin keeps her
     // shop now and stands at its door looking out over the square (anchored
@@ -1545,9 +1554,11 @@ describe('layout clearance and service anchors', () => {
         x: 37.5,
         z: -99.3,
       },
+      // The Studio town rework (#4593) set the release point at the
+      // churchyard gate.
       legacyReleasePoint: {
-        x: 39.5,
-        z: -99.3,
+        x: 35,
+        z: -96.5,
       },
       healerTemplateId: 'spirit_healer',
       healerFacing: Math.PI,
@@ -1614,20 +1625,16 @@ describe('layout clearance and service anchors', () => {
         id: 'station_eastbrook_forge',
         type: 'forge',
         masterNpcId: 'forgemistress_darva',
-        position: {
-          x: -6.293250516799596,
-          z: -124.1466252583998,
-        },
+        // the Studio town rework (#4593): the forge and the kitchens follow
+        // their moved masters
+        position: { x: 11.6, z: -61.36 },
         interactionRadius: 20,
       },
       {
         id: 'station_eastbrook_kitchens',
         type: 'kitchens',
         masterNpcId: 'cook_marlow',
-        position: {
-          x: -42.82589170715949,
-          z: -90.73189846640925,
-        },
+        position: { x: -25.09, z: -76 },
         interactionRadius: 20,
       },
       {
@@ -1661,61 +1668,19 @@ describe('layout clearance and service anchors', () => {
         npc.anchorId,
       ]),
     ).toEqual([
-      [
-        'the_merchant',
-        -19.333512834321652,
-        -95.49976921301501,
-        2.4805494847391065,
-        'eastbrook_market_stall_world_market',
-      ],
-      ['marshal_redbrook', 1.5, -95.3, -1.9787985229559204, 'eastbrook_noticeboard'],
-      ['trader_wilkes', -25, -94, 2.1995926132103296, 'eastbrook_civic_square'],
-      ['apothecary_lin', -24.5, -112.5, 0.7853981633974483, 'eastbrook_apothecary'],
-      [
-        'brother_aldric',
-        15.011652086947231,
-        -110.38541937474815,
-        -0.9599310885968813,
-        'eastbrook_chapel',
-      ],
-      [
-        'smith_haldren',
-        -8.282374584867384,
-        -81.85509712542417,
-        -2.7925268031909276,
-        'eastbrook_smithy',
-      ],
-      ['fisherman_brandt', -22.3, -104.6, 1.2672255874712333, 'eastbrook_civic_square'],
-      ['foreman_odell', -3.5, -104.5, -1.3370531459259951, 'eastbrook_civic_square'],
-      [
-        'bursar_fernando',
-        -55.21592057176678,
-        -105.19195954108784,
-        0.7853981633974481,
-        'eastbrook_bank',
-      ],
-      [
-        'card_master',
-        -48.85195954108786,
-        -111.55592057176676,
-        0.7853981633974481,
-        'eastbrook_bank',
-      ],
-      ['chronicler_saul', 10.2, -87.5, 0.5880026035475675, 'mailbox_eastbrook'],
-      [
-        'forgemistress_darva',
-        -8.171547617899419,
-        -120.39003105620014,
-        -2.0344439357957027,
-        'station_eastbrook_forge',
-      ],
-      [
-        'cook_marlow',
-        -42.62589170715949,
-        -92.23189846640925,
-        -0.669638945676638,
-        'station_eastbrook_kitchens',
-      ],
+      ['the_merchant', -50.59, -112.95, 0.785, 'eastbrook_market_stall_world_market'],
+      ['marshal_redbrook', -86.67, -42.95, 4.304, 'eastbrook_noticeboard'],
+      ['trader_wilkes', -14.6, -119.4, 0, 'eastbrook_civic_square'],
+      ['apothecary_lin', -31.3, -119.3, 0.785, 'eastbrook_apothecary'],
+      ['brother_aldric', 18.5, -103.31, -0.96, 'eastbrook_chapel'],
+      ['smith_haldren', -8.6, -122.54, 0, 'eastbrook_smithy'],
+      ['fisherman_brandt', -21.3, -120.6, 0.75, 'eastbrook_civic_square'],
+      ['foreman_odell', 0.06, -82.14, 1.937, 'eastbrook_civic_square'],
+      ['bursar_fernando', -57.26, -107.07, 0.785, 'eastbrook_bank'],
+      ['card_master', -38.05, -68.85, 3.124, 'eastbrook_bank'],
+      ['chronicler_saul', -44.27, -118.01, 0.588, 'mailbox_eastbrook'],
+      ['forgemistress_darva', 9.6, -62.86, 2.775, 'station_eastbrook_forge'],
+      ['cook_marlow', -25.09, -74.5, 3.77, 'station_eastbrook_kitchens'],
       ['weaver_ottilie', -20.5, -117.5, 1.1071487177940904, 'station_eastbrook_loom'],
       [
         'tinker_gizzel',
@@ -1724,7 +1689,7 @@ describe('layout clearance and service anchors', () => {
         0.5880026035475675,
         'station_eastbrook_toolworks',
       ],
-      ['fury', 21, -83.5, -2.0570389598824015, 'eastbrook_chapel'],
+      ['fury', 0.77, -123, 5.012, 'eastbrook_chapel'],
     ]);
 
     const pointAnchors = [

@@ -37,9 +37,9 @@ import {
   ESCORTS,
   GATHER_NODES,
   GROUND_OBJECTS,
+  GROUND_PROPS,
   NPCS,
   PORTALS,
-  PROPS,
   ZONES,
 } from './data';
 import { GALE_HARBOR_DECKS } from './gale_harbor';
@@ -288,26 +288,27 @@ export function collectCalmAnchorPads(): CalmPadRow[] {
   // line work (fences, walls) are deliberately absent: a tree or a fence
   // rides a slope fine, and the optional-skip rule would drop the hub rows
   // anyway.
-  for (const b of PROPS.buildings) {
+  for (const b of GROUND_PROPS.buildings) {
     pad('building', b.x, b.z, Math.hypot(b.w, b.d) / 2 + 1.5, Math.hypot(b.w, b.d) / 2 + 9);
   }
-  for (const well of PROPS.wells) pad('well', well.x, well.z, well.r + 2, well.r + 9);
-  for (const stall of PROPS.stalls) pad('stall', stall.x, stall.z, 3, 9);
-  for (const mine of PROPS.mines) pad('mine', mine.x, mine.z, 6, 13);
-  for (const dock of PROPS.docks) pad('dock', dock.x, dock.z, 8, 16);
-  for (const tent of PROPS.tents) pad('tent', tent.x, tent.z, 4, 10);
-  for (const [cx, cz] of PROPS.crates) pad('crate', cx, cz, 2.5, 7.5);
-  for (const [cx, cz] of PROPS.campfires) pad('campfire', cx, cz, 2.5, 7.5);
-  for (const [cx, cz] of PROPS.mudHuts) pad('mudHut', cx, cz, 5, 11);
-  for (const ring of PROPS.ruinRings) {
+  for (const well of GROUND_PROPS.wells) pad('well', well.x, well.z, well.r + 2, well.r + 9);
+  for (const stall of GROUND_PROPS.stalls) pad('stall', stall.x, stall.z, 3, 9);
+  for (const mine of GROUND_PROPS.mines) pad('mine', mine.x, mine.z, 6, 13);
+  for (const dock of GROUND_PROPS.docks) pad('dock', dock.x, dock.z, 8, 16);
+  for (const tent of GROUND_PROPS.tents) pad('tent', tent.x, tent.z, 4, 10);
+  for (const [cx, cz] of GROUND_PROPS.crates) pad('crate', cx, cz, 2.5, 7.5);
+  for (const [cx, cz] of GROUND_PROPS.campfires) pad('campfire', cx, cz, 2.5, 7.5);
+  for (const [cx, cz] of GROUND_PROPS.mudHuts) pad('mudHut', cx, cz, 5, 11);
+  for (const ring of GROUND_PROPS.ruinRings) {
     pad('ruinRing', ring.x, ring.z, ring.ringR + 2, ring.ringR + 9);
   }
-  for (const bench of PROPS.benches ?? []) pad('bench', bench.x, bench.z, 2.5, 7.5);
-  for (const gy of PROPS.graveyards) pad('headstones', gy.x, gy.z, 8, 15);
+  for (const bench of GROUND_PROPS.benches ?? []) pad('bench', bench.x, bench.z, 2.5, 7.5);
+  for (const gy of GROUND_PROPS.graveyards) pad('headstones', gy.x, gy.z, 8, 15);
   // rIn 8: the delve arch draws 4yd off the marker and the exit drop lands
   // 5.96yd out, so the pad must reach past both.
-  for (const marker of PROPS.delveMarkers ?? []) pad('delveMarker', marker.x, marker.z, 8, 15);
-  for (const decor of PROPS.decorProps ?? []) {
+  for (const marker of GROUND_PROPS.delveMarkers ?? [])
+    pad('delveMarker', marker.x, marker.z, 8, 15);
+  for (const decor of GROUND_PROPS.decorProps ?? []) {
     if (decor.terrainCalm === false) continue;
     // decor.r is the COLLIDER radius (absent on walk-through dressing);
     // the VISUAL footprint tracks scale, so a scale-9 landmark gets a
@@ -326,8 +327,8 @@ export function collectCalmAnchorPads(): CalmPadRow[] {
   for (const route of TRANSPORT_ROUTES) {
     for (const berth of route.berths) pad('decorProp', berth.x, berth.z, 3.5, 9.5);
   }
-  if (PROPS.raceCourse) {
-    const course = PROPS.raceCourse;
+  if (GROUND_PROPS.raceCourse) {
+    const course = GROUND_PROPS.raceCourse;
     pad('raceCourse', course.arch.x, course.arch.z, 3.5, 9);
     for (const jump of course.jumps) pad('raceCourse', jump.x, jump.z, 3.5, 9);
   }

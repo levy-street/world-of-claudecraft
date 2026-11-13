@@ -42,7 +42,10 @@ export const GOURDLIGHT_DECOR_CITIES: readonly SeasonalCityDecorRule[] = Object.
     zoneId: 'mirefen_marsh',
     radius: 62,
     square: { count: 6, ring: 5 },
-    street: { max: 18, spacing: 8 },
+    // Studio town rework (#4593): the town's re-laid lanes moved the street
+    // cells, and the eighteen nearest the square drew no hay bale; one more
+    // shoulder piece seats Fenbridge's bale again.
+    street: { max: 19, spacing: 8 },
   },
   {
     zoneId: 'thornpeak_heights',

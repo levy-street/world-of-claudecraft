@@ -1,12 +1,12 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { deflateRawSync, inflateRawSync } from 'node:zlib';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { mapBounds, newCustomMap } from '../src/editor/custom_map';
+import { fenbridgeAlignedRoads, mapBounds, newCustomMap } from '../src/editor/custom_map';
 import {
   ambientDecorationsToPlacements,
   closestAmbientDecorations,
 } from '../src/editor/foliage_edit_core';
-import { BASE_WORLD, setActiveWorldContent } from '../src/sim/data';
+import { BASE_WORLD, BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { generateGroundDressing } from '../src/sim/ground_dressing';
 import { MAX_PLACEMENTS } from '../src/sim/map_doc';
 import { generateDecorationsInBounds } from '../src/sim/world';
@@ -75,9 +75,11 @@ describe('default world bundle', () => {
     // Content parity with the base world, field for field, not just counts.
     expect(map.content.zones).toEqual(BASE_WORLD.zones);
     expect(map.content.camps).toEqual(BASE_WORLD.camps);
-    expect(map.content.npcs).toEqual(BASE_WORLD.npcs);
+    // Fenbridge's townsfolk and streets follow the live touch-up (the town's
+    // buildings and floors do too); everything else is the base world.
+    expect(map.content.npcs).toEqual(BUILTIN_WORLD.npcs);
     expect(map.content.objects).toEqual(BASE_WORLD.groundObjects);
-    expect(map.content.roads).toEqual(BASE_WORLD.roads);
+    expect(map.content.roads).toEqual(fenbridgeAlignedRoads());
 
     if (process.env.UPDATE_DEFAULT_WORLD === '1') {
       // Same container the importer reads: one deflate-raw member, "map.json".
@@ -136,7 +138,8 @@ describe('default world bundle', () => {
     expect(shipped.placements.length).toBe(map.placements.length);
     expect(shipped.content.zones).toEqual(BASE_WORLD.zones);
     expect(shipped.content.camps).toEqual(BASE_WORLD.camps);
-    expect(shipped.content.roads).toEqual(BASE_WORLD.roads);
+    expect(shipped.content.roads).toEqual(fenbridgeAlignedRoads());
+    expect(shipped.content.npcs).toEqual(BUILTIN_WORLD.npcs);
     expect(shipped.decorationsMode).toBe('empty');
     expect(shipped.propsMode).toBe('editable-all');
   });

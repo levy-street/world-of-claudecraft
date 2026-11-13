@@ -83,6 +83,9 @@ import {
   placementsToRenderAssets,
 } from '../custom_map';
 import {
+  campHoldsSpawn,
+  campLiveMemberCount,
+  campSpawnDistance,
   findRuntimeCampIndex,
   moveRuntimeMapEntity,
   moveRuntimeMobsById,
@@ -1341,15 +1344,16 @@ export class Editor3DViewport {
           candidate.kind === 'mob' &&
           candidate.ownerId === null &&
           candidate.templateId === camp.mobId &&
-          Math.hypot(candidate.spawnPos.x - camp.center.x, candidate.spawnPos.z - camp.center.z) <=
-            camp.radius + 1,
+          campHoldsSpawn(camp, candidate.spawnPos) &&
+          // a same-mob camp whose disc overlaps keeps its own mobs
+          findRuntimeCampIndex(this.map.content.camps, candidate) === campIndex,
       )
       .sort((a, b) => {
-        const ad = Math.hypot(a.spawnPos.x - camp.center.x, a.spawnPos.z - camp.center.z);
-        const bd = Math.hypot(b.spawnPos.x - camp.center.x, b.spawnPos.z - camp.center.z);
+        const ad = campSpawnDistance(camp, a.spawnPos);
+        const bd = campSpawnDistance(camp, b.spawnPos);
         return ad - bd || a.id - b.id;
       })
-      .slice(0, camp.count)
+      .slice(0, campLiveMemberCount(camp))
       .map((candidate) => ({
         id: candidate.id,
         x: candidate.pos.x,

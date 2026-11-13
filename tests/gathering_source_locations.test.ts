@@ -33,8 +33,9 @@ describe('gathering source locations: corpse-harvest materials', () => {
     expect(wolf?.rare).toBe(false);
     expect(wolf?.elite).toBe(false);
     expect(wolf?.questGated).toBe(false);
-    // Two eastbrook_vale forest_wolf camps, counts 6 and 5, folded into one example.
-    expect(wolf?.spawnCount).toBe(11);
+    // Two eastbrook_vale forest_wolf camps folded into one example: 6 plus 4,
+    // since the Studio town rework (#4593) retired one slot of the 5-wolf camp.
+    expect(wolf?.spawnCount).toBe(10);
 
     const rare = info.examples.find((e) => e.mobId === 'old_greyjaw');
     expect(rare).toBeDefined();

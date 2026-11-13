@@ -11,12 +11,10 @@
 // (sim/painted_towns/CLAUDE.md).
 import {
   deepFreeze,
-  facingToward,
   indexById,
   levelTownPads,
   type Point2,
   type TownGround,
-  wrapAngle,
 } from '../placed_town_kit';
 import { paintedTownBuilding } from './models';
 import type { PaintedTownLayout } from './types';
@@ -24,24 +22,19 @@ import type { PaintedTownLayout } from './types';
 // The diamond look: default colours, diamond slate roof, ashlar walls.
 const LOOK = 'diamond' as const;
 const HUB: Point2 = { x: -370, z: 1420 };
-const NORTH_FACING = Math.PI; // the door looks north (+z)
 
 /** The rotation that turns a painted model's door (its -Z face) toward `target`. */
-function doorToward(anchor: Point2, target: Point2): number {
-  return wrapAngle(facingToward(anchor, target) + Math.PI);
-}
 
 // The inn: west-south-west of the square between the Vigil road and the
 // re-routed Moonspring spur, turned to face the square, its long front and door
 // on it; its north corner keeps clear of the moonfleece grazers' ground.
-const INN_ANCHOR: Point2 = { x: -343.5, z: 1409.5 };
 const INN = paintedTownBuilding({
   id: 'moonrest_inn',
   kind: 'inn',
   model: 'tavern',
   look: LOOK,
-  anchor: INN_ANCHOR,
-  rotation: doorToward(INN_ANCHOR, HUB),
+  anchor: { x: -343.21, z: 1394.54 }, // Studio town rework (#4593): nudged off the road band
+  rotation: 3.6303, // Studio town rework (#4593) HUB),
   scale: 1.2,
 });
 // The moon shrine (the old kit chapel): south of the Nightbloom Rest graves,
@@ -54,20 +47,19 @@ const SHRINE = paintedTownBuilding({
   kind: 'chapel',
   model: 'hall',
   look: LOOK,
-  anchor: { x: -380.5, z: 1382.4 },
-  rotation: NORTH_FACING,
+  anchor: { x: -387.26, z: 1400.73 },
+  rotation: 4.0317, // Studio town rework (#4593)
   scale: 1,
 });
 // A house north-north-east between the Barrow road and the Gloamfield road
 // (sealed), turned to face the square.
-const HOUSE_ANCHOR: Point2 = { x: -385.5, z: 1454.5 };
 const HOUSE = paintedTownBuilding({
   id: 'moonrest_house',
   kind: 'house',
   model: 'house_c',
   look: LOOK,
-  anchor: HOUSE_ANCHOR,
-  rotation: doorToward(HOUSE_ANCHOR, HUB),
+  anchor: { x: -382.58, z: 1449.91 }, // Studio town rework (#4593): nudged off the road band
+  rotation: 5.9865, // Studio town rework (#4593) HUB),
   scale: 1.4,
 });
 

@@ -20,6 +20,8 @@
 // so only spawn POSITIONS move (the whole point) while every downstream seed-stable
 // roll stays put.
 
+import type { CampDef } from './types';
+
 // Golden angle (radians): consecutive spiral points are offset by this angle, the
 // irrational rotation that yields the even, non-repeating sunflower packing.
 export const CAMP_GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
@@ -54,4 +56,74 @@ export function campSpawnOffset(
     x: Math.sin(baseAng) * baseR + Math.sin(jitterAngle) * jitterMag,
     z: Math.cos(baseAng) * baseR + Math.cos(jitterAngle) * jitterMag,
   };
+}
+
+// Where camp slot `index` lands in world space: its authored spot when the camp
+// pins one (CampDef.spots), else its scatter point about the camp center. The
+// caller draws the two jitter values for EVERY slot, pinned or not, so pinning
+// never changes the draw count.
+export function campSlotPoint(
+  camp: CampDef,
+  index: number,
+  jitterAngle: number,
+  jitterFrac: number,
+): { x: number; z: number } {
+  const spot = camp.spots?.[index];
+  if (spot) return { x: spot.x, z: spot.z };
+  const off = campSpawnOffset(index, camp.count, camp.radius, jitterAngle, jitterFrac);
+  return { x: camp.center.x + off.x, z: camp.center.z + off.z };
+}
+
+// Shared-stream draws one spawned camp slot makes in the Sim's camp loop, in
+// order: jitter angle, jitter fraction, level, facing, wander pause. Every Rng
+// method funnels through exactly one next() (src/sim/rng.ts).
+export const CAMP_SLOT_DRAWS = 5;
+
+/** Whether camp slot `index` is retired (CampDef.retiredSlots): it spawns nothing. */
+export function isRetiredCampSlot(camp: CampDef, index: number): boolean {
+  return index >= campSpawnedCount(camp);
+}
+
+/** Consume a retired slot's draws, so the stream after it is exactly as if it spawned. */
+export function drawRetiredCampSlot(rng: { next(): number }): void {
+  for (let i = 0; i < CAMP_SLOT_DRAWS; i++) rng.next();
+}
+
+/** Mobs the camp actually spawns: its slots less the retired ones. */
+export function campSpawnedCount(camp: Pick<CampDef, 'count' | 'retiredSlots'>): number {
+  return Math.max(0, camp.count - Math.max(0, Math.floor(camp.retiredSlots ?? 0)));
+}
+
+/**
+ * The ground a camp's live mobs cover, as one enclosing circle (centroid plus
+ * its farthest member; not minimal, plenty at map scale). Pinned slots
+ * (CampDef.spots) count at their spots; any live unpinned slot scatters over
+ * the camp disc, so the disc is enclosed whole. Retired slots spawn nothing
+ * and count for nothing: a fully retired camp has no area (null). A camp with
+ * no pinned live slot is exactly its own disc.
+ */
+export function campLiveArea(camp: CampDef): { x: number; z: number; radius: number } | null {
+  const live = campSpawnedCount(camp);
+  if (live === 0) return null;
+  const pins: { x: number; z: number }[] = [];
+  let scatters = false;
+  for (let i = 0; i < live; i++) {
+    const spot = camp.spots?.[i];
+    if (spot) pins.push(spot);
+    else scatters = true;
+  }
+  if (pins.length === 0) return { x: camp.center.x, z: camp.center.z, radius: camp.radius };
+  const pts = scatters ? [...pins, camp.center] : pins;
+  let cx = 0;
+  let cz = 0;
+  for (const p of pts) {
+    cx += p.x;
+    cz += p.z;
+  }
+  cx /= pts.length;
+  cz /= pts.length;
+  let r = 0;
+  for (const p of pins) r = Math.max(r, Math.hypot(p.x - cx, p.z - cz));
+  if (scatters) r = Math.max(r, Math.hypot(camp.center.x - cx, camp.center.z - cz) + camp.radius);
+  return { x: cx, z: cz, radius: r };
 }

@@ -1,6 +1,7 @@
-// The Eastbrook quay's practice yard (content/practice_dummies.ts): the hub
-// training dummy, the hub healing dummy, and Drillmaster Hale, its sparring
-// master.
+// The Eastbrook practice yard (content/practice_dummies.ts; the Studio town
+// rework, #4593, moved it from the quay to the Sableweb practice ground): the
+// hub training dummy, the hub healing dummy, and Drillmaster Hale, its
+// sparring master.
 //
 // Spawned AFTER the player and the escorts rather than by the NPC and camp
 // loops on purpose. Those loops mint ids in order, so an entry appended to
@@ -20,9 +21,11 @@
 // `src/sim`-pure (tests/architecture.test.ts).
 
 import {
+  HUB_HEALING_DUMMY_FACING,
   HUB_HEALING_DUMMY_ID,
   HUB_HEALING_DUMMY_POS,
   HUB_SPARRING_MASTER_ID,
+  HUB_TRAINING_DUMMY_FACING,
   HUB_TRAINING_DUMMY_ID,
   HUB_TRAINING_DUMMY_POS,
 } from './content/practice_dummies';
@@ -55,7 +58,7 @@ export function spawnHubPractice(ctx: SimContext, world: WorldContent): void {
       dummyTemplate.maxLevel,
       ctx.groundPos(dummyPos.x, dummyPos.z),
     );
-    dummy.facing = practiceDummyFacing(moves, HUB_TRAINING_DUMMY_ID, 0);
+    dummy.facing = practiceDummyFacing(moves, HUB_TRAINING_DUMMY_ID, HUB_TRAINING_DUMMY_FACING);
     dummy.prevFacing = dummy.facing;
     ctx.addEntity(dummy);
   }
@@ -72,7 +75,7 @@ export function spawnHubPractice(ctx: SimContext, world: WorldContent): void {
     healingTemplate.maxLevel,
     ctx.groundPos(healingPos.x, healingPos.z),
   );
-  healingDummy.facing = practiceDummyFacing(moves, HUB_HEALING_DUMMY_ID, 0);
+  healingDummy.facing = practiceDummyFacing(moves, HUB_HEALING_DUMMY_ID, HUB_HEALING_DUMMY_FACING);
   healingDummy.prevFacing = healingDummy.facing;
   // Begins injured, same rest fraction as the Highwatch row's own friendly
   // dummy (mob/practice_dummies.ts): a healer arrives at something worth
@@ -85,7 +88,9 @@ export function spawnHubPractice(ctx: SimContext, world: WorldContent): void {
 /** The dev-only Highwatch healer practice dummy a no-player dev host gets
  *  (moved here from the Sim constructor under the monolith ratchet). */
 export function spawnDevHealerPracticeDummy(ctx: SimContext): void {
-  const pos = ctx.groundPos(-34, 648);
+  // Beside the practice row's friendly end (content/practice_dummies.ts
+  // PRACTICE_ROW_MARKS), where the Studio town rework (#4593) moved the row.
+  const pos = ctx.groundPos(-61.6, 615.5);
   const dummy = createMob(ctx.nextId++, MOBS.training_dummy, 20, pos);
   dummy.name = 'Healing Dummy';
   dummy.color = 0x74c476;

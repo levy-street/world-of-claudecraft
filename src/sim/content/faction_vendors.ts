@@ -966,7 +966,7 @@ export const FACTION_VENDOR_NPCS: Record<string, NpcDef> = {
     id: 'npc_church_order_quartermaster',
     name: 'Templar Althea',
     title: 'Church Order Quartermaster',
-    pos: { x: 13.29, z: -112.84 },
+    pos: { x: 11.45, z: -113.95 },
     facing: -0.96,
     color: 0xecd57a,
     questIds: [],
@@ -995,7 +995,8 @@ export const FACTION_VENDOR_NPCS: Record<string, NpcDef> = {
     id: 'npc_wq_taskmaster',
     name: 'Taskmaster Kaelen',
     title: 'World Quest Taskmaster',
-    pos: { x: -2.8, z: -96 },
+    pos: { x: -72.33, z: -94.12 },
+    // Studio town rework (#4593): the shipped facing (the map turned him 180 degrees)
     facing: -2.1,
     color: 0x8a6a50,
     questIds: [],

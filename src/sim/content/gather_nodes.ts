@@ -263,7 +263,9 @@ const GATHER_NODE_ROWS: GatherNodeDef[] = [
     // the harbor town on that basin), but the meadow spot above the ground
     // keeps 8.0yd of sea freeboard and 5.4yd across the whole harvest reach,
     // and the basin below is reserved construction ground now anyway.
-    pos: { x: 12, z: -63 },
+    // The Studio town rework (#4593) re-laid the road past (12, -63), so the
+    // patch stepped 2 yd east to keep its 5 yd road clearance.
+    pos: { x: 14, z: -63 },
     level: 4,
     tier: 1,
   },
@@ -659,7 +661,9 @@ const GATHER_NODE_ROWS: GatherNodeDef[] = [
     id: 'herb_thornpeak_t3',
     zoneId: 'thornpeak_heights',
     type: 'herb',
-    pos: { x: -28, z: 690 },
+    // Studio town rework (#4593): off (-28, 690), under the moved counting
+    // house, to beside the spot the map gave it (clear of the road band).
+    pos: { x: -6.7, z: 733.4 },
     level: 17,
     tier: 3,
   },
@@ -833,7 +837,8 @@ const GATHER_NODE_ROWS: GatherNodeDef[] = [
     id: 'herb_frostveil_2',
     zoneId: 'frostveil',
     type: 'herb',
-    pos: { x: -44, z: 1612 },
+    // Studio town rework (#4593): off (-44, 1612), inside the moved Icemantle chapel
+    pos: { x: -34.4, z: 1615.7 },
     level: 19,
     tier: 1,
   },
@@ -1089,7 +1094,8 @@ const GATHER_NODE_ROWS: GatherNodeDef[] = [
     id: 'ore_nightbloom_1',
     zoneId: 'nightbloom',
     type: 'ore',
-    pos: { x: -332, z: 1394 },
+    // Studio town rework (#4593): off (-332, 1394), inside the moved Moonrest inn
+    pos: { x: -327.8, z: 1390.5 },
     level: 20,
     tier: 1,
   },
@@ -1462,8 +1468,9 @@ const GATHER_NODE_ROWS: GatherNodeDef[] = [
     // Moved up the bank off (290,772): the stand cleared the world sea plane
     // by 0.39yd with open water 1.5yd away, so the logs sat in the lake's
     // margin and the harvest disc ran 0.89yd under it. Now 5.4yd of
-    // freeboard, the whole reach 2.1yd clear.
-    pos: { x: 290, z: 780 },
+    // freeboard, the whole reach 2.1yd clear. Studio town rework (#4593): off
+    // (290, 780), inside the moved Hedgewick chapel, onto the flat east of it.
+    pos: { x: 299, z: 782 },
     level: 20,
     tier: 1,
   },

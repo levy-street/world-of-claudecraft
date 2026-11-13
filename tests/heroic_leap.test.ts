@@ -31,6 +31,12 @@ describe('Vaulting Charge: arcs over time, slams on landing', () => {
     }) as AnySim;
     sim.setPlayerLevel(MAX_LEVEL);
     const p: Entity = sim.player;
+    // Open, level ground north-east of the Eastbrook quay. The player start no
+    // longer serves: the Studio town rework (#4593) raised the quay pad, so ten
+    // yards east of the start now runs into a two yard step that stops the leap
+    // short (a correct stop, but not the open-ground flight this case measures).
+    p.pos = sim.groundPos(-30, 2);
+    p.prevPos = { ...p.pos };
     const from = { ...p.pos };
     const aim = { x: p.pos.x + 10, z: p.pos.z };
     const mob = createMob(sim.nextId++, MOBS.forest_wolf, 1, {

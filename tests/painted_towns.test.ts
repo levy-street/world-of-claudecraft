@@ -7,6 +7,7 @@ import {
 } from '../src/render/placed_town_interior_core';
 import { AUTHORED_TOWN_INN_IDS, AUTHORED_TOWNS } from '../src/sim/authored_town_registry';
 import { buildingContainsRestPoint } from '../src/sim/building_layout';
+import { campSpawnedCount } from '../src/sim/camp_scatter';
 import { isBlocked, resolveMovement, streetlampPlacements } from '../src/sim/colliders';
 import { FACTION_HUB_LANDINGS } from '../src/sim/content/faction_vendors';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
@@ -30,6 +31,7 @@ import {
 } from '../src/sim/painted_towns';
 import { findPath, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../src/sim/pathfind';
 import { distancePointToObb, localToWorld, type Obb2 } from '../src/sim/placed_town_kit';
+import type { CampDef } from '../src/sim/types';
 import {
   farshorePalmSpots,
   reachPalmSpots,
@@ -119,6 +121,24 @@ function squareSpot(town: PaintedTownLayout): { x: number; z: number } {
  *  stables, docks and the castle are not town houses and may stay. */
 const HEX_TOWN_BUILDING =
   /^hex[br]?(HomeA|HomeB|Tavern|Townhall|Market|Workshop|Church|Blacksmith)$/;
+
+/** Towns whose inn the Studio town rework (#4593) took down on purpose. */
+const TOWNS_WITHOUT_AN_INN: ReadonlySet<string> = new Set(['gibbetmere', 'icemantle']);
+
+/** Where a camp's living mobs spawn: each authored spot (CampDef.spots, the
+ *  Studio town rework, #4593) is its own home ground, and any slot without one
+ *  scatters across the camp's disc. Retired slots spawn nothing. */
+function campHomes(camp: CampDef): { center: { x: number; z: number }; radius: number }[] {
+  const homes: { center: { x: number; z: number }; radius: number }[] = [];
+  let scattered = false;
+  for (let i = 0; i < campSpawnedCount(camp); i++) {
+    const spot = camp.spots?.[i];
+    if (spot) homes.push({ center: { x: spot.x, z: spot.z }, radius: 0 });
+    else scattered = true;
+  }
+  if (scattered) homes.push({ center: camp.center, radius: camp.radius });
+  return homes;
+}
 
 function nearTown(town: PaintedTownLayout, x: number, z: number, margin: number): boolean {
   return Math.hypot(x - town.hub.center.x, z - town.hub.center.z) <= town.hub.radius + margin;
@@ -212,14 +232,18 @@ describe('the painted towns recipe', () => {
   });
 
   it("appends every town's pads to the built-in terrain edits after Highwatch's, in order", () => {
+    // The Studio town rework (#4593) carries its own terrain edits in the live
+    // touch-up, which replaces the built-in list with the shipped one plus its
+    // own strokes after it: the painted pads still follow Highwatch's directly,
+    // in order, and only the touch-up's strokes come after them.
     const edits = BUILTIN_WORLD.terrainEdits ?? [];
     const painted = PAINTED_TOWNS.flatMap((town) => town.pads);
-    const tail = edits.slice(edits.length - painted.length);
-    expect(tail).toEqual(painted);
     const highwatch = HIGHWATCH_LAYOUT.pads;
-    expect(
-      edits.slice(edits.length - painted.length - highwatch.length, edits.length - painted.length),
-    ).toEqual([...highwatch]);
+    const start = edits.findIndex((edit) => JSON.stringify(edit) === JSON.stringify(highwatch[0]));
+    expect(start).toBeGreaterThan(0);
+    expect(edits.slice(start, start + highwatch.length)).toEqual([...highwatch]);
+    const end = start + highwatch.length + painted.length;
+    expect(edits.slice(start + highwatch.length, end)).toEqual(painted);
   });
 });
 
@@ -239,7 +263,11 @@ function describePaintedTown(town: PaintedTownLayout): void {
     it('stands its buildings in its zone, on shipped files, at a grand scale', () => {
       const ids = buildings.map((building) => building.id);
       expect(new Set(ids).size).toBe(ids.length);
-      expect(buildings.some((building) => building.kind === 'inn')).toBe(true);
+      // the Studio town rework (#4593) took down the Gibbetmere inn and the
+      // Icemantle hearth lodge; every other town still stands its inn
+      expect(buildings.some((building) => building.kind === 'inn')).toBe(
+        !TOWNS_WITHOUT_AN_INN.has(town.id),
+      );
       for (const building of buildings) {
         expect(building.id.startsWith(`${town.id}_`), building.id).toBe(true);
         expect(zoneAt(building.position.x, building.position.z).id, building.id).toBe(town.zoneId);
@@ -393,7 +421,8 @@ function describePaintedTown(town: PaintedTownLayout): void {
     });
 
     it("keeps every camp's home ground and wander clear of the town", () => {
-      // A camp's mobs spawn inside its radius and wander up to 9 yd past it. No pad
+      // A camp's mobs spawn inside its radius (or on its authored spots, see
+      // campHomes) and wander up to 9 yd past it. No pad
       // or apron may reshape the ground they spawn on, and no building may stand
       // where they wander (Highwatch's aprons reach a stalker camp's outer wander,
       // which is fine: its mobs still spawn and roam on their own ground).
@@ -401,16 +430,19 @@ function describePaintedTown(town: PaintedTownLayout): void {
       for (const camp of CAMPS) {
         // a mob that never moves (a practice dummy) wanders nowhere: its ground may change
         if (camp.count === 0 || MOBS[camp.mobId]?.moveSpeed === 0) continue;
-        for (const pad of town.pads) {
-          const gap =
-            Math.hypot(camp.center.x - pad.x, camp.center.z - pad.z) - pad.radius - camp.radius;
-          expect(gap, `${camp.mobId} at ${camp.center.x}, ${camp.center.z}`).toBeGreaterThan(0);
-        }
-        for (const building of buildings) {
-          expect(
-            distancePointToObb(camp.center, building.reach) - camp.radius,
-            `${building.id} to ${camp.mobId}`,
-          ).toBeGreaterThan(wander);
+        for (const home of campHomes(camp)) {
+          const label = `${camp.mobId} at ${home.center.x}, ${home.center.z}`;
+          for (const pad of town.pads) {
+            const gap =
+              Math.hypot(home.center.x - pad.x, home.center.z - pad.z) - pad.radius - home.radius;
+            expect(gap, label).toBeGreaterThan(0);
+          }
+          for (const building of buildings) {
+            expect(
+              distancePointToObb(home.center, building.reach) - home.radius,
+              `${building.id} to ${label}`,
+            ).toBeGreaterThan(wander);
+          }
         }
       }
     });

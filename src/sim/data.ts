@@ -1,5 +1,7 @@
 import { MEMBERSHIP_ITEMS } from './content/membership';
 import { REFERRAL_ITEMS } from './content/referral';
+import { STUDIO_REWORK_CAMPS } from './content/studio_rework_camps';
+import { applyStudioPropEdits, editsReshapingGround } from './content/studio_rework_props';
 import { INVESTIGATION_MOB, INVESTIGATION_NPCS } from './content/world_quest_investigation';
 import { SHADOW_GUARDS, SHADOW_NPC_DEF } from './content/world_quest_shadow';
 import { bindFenbridgeActiveWorldGetter } from './fenbridge_touchup';
@@ -732,6 +734,9 @@ export const CAMPS: CampDef[] = [
   // private streams (mob/idle_rng.ts) move: a content append like this one
   // legitimately re-mints the parity goldens without touching a draw digest.
   ...PROVING_SHORE_CAMPS,
+  // The Studio town rework's new camps (content/studio_rework_camps.ts), all
+  // offStream, appended last by the same rule.
+  ...STUDIO_REWORK_CAMPS,
   // The Eastbrook hub dummy is NOT a camp: it spawns with its sparring master
   // after the player (sim/hub_practice.ts), so it consumes only trailing ids.
 ];
@@ -957,7 +962,8 @@ export const PORTALS: PortalDef[] = [
   ...PROVING_SHORE_PORTALS,
 ];
 
-export const PROPS: ZonePropsDef = mergeProps([
+/** Every zone's shipped props, before the Studio town rework's edits. */
+export const SHIPPED_PROPS: ZonePropsDef = mergeProps([
   ZONE1_PROPS,
   ZONE2_PROPS,
   ZONE3_PROPS,
@@ -975,6 +981,16 @@ export const PROPS: ZonePropsDef = mergeProps([
   FARSHORE_PROPS,
   PROVING_SHORE_PROPS,
 ]);
+
+// The Studio town rework's removed and moved scenery records apply last
+// (content/studio_rework_props.ts).
+export const PROPS: ZonePropsDef = applyStudioPropEdits(SHIPPED_PROPS);
+/** The props the terrain's calm pads read: PROPS, except that records an edit marks
+ *  `keepGround` keep the pad they shipped with (content/studio_rework_props.ts). */
+export const GROUND_PROPS: ZonePropsDef = applyStudioPropEdits(
+  SHIPPED_PROPS,
+  editsReshapingGround(),
+);
 
 function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
   return {

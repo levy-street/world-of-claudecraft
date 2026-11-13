@@ -412,5 +412,8 @@ describe('terrain height bit identity', () => {
 
     expect(comparisons).toBeGreaterThanOrEqual(200_000);
     expect(mismatches, mismatches.join('\n')).toHaveLength(0);
-  }, 30_000);
+    // The Studio town rework (#4593) touch-up carries thousands of terrain
+    // edits, each a stencil here, so the corpus roughly doubled; the budget
+    // follows it.
+  }, 60_000);
 });

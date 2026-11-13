@@ -11,9 +11,7 @@ import {
   HUB_DUMMY_DRILL_QUEST_ID,
   HUB_HEALING_DRILL_QUEST_ID,
   HUB_HEALING_DUMMY_ID,
-  HUB_HEALING_DUMMY_POS,
   HUB_TRAINING_DUMMY_ID,
-  HUB_TRAINING_DUMMY_POS,
 } from '../src/sim/content/practice_dummies';
 import type { QuestState } from '../src/sim/types';
 import {
@@ -24,6 +22,7 @@ import {
   type HubMeterTab,
 } from '../src/ui/hud/practice/hub_lesson_controller';
 import type { IWorld } from '../src/world_api';
+import { HUB_HEALING_DUMMY_MARK, HUB_TRAINING_DUMMY_MARK } from './helpers/hub_yard';
 
 const PID = 1;
 const DAMAGE_DUMMY_ID = 200;
@@ -63,6 +62,10 @@ function enc(startedAt: number, dummyId: string, dmg = 1): HubLessonEncounterLik
   return { startedAt, mainMobTemplateId: dummyId, tallies: new Map([[PID, { dmg, heal: 0 }]]) };
 }
 
+// The fake yard stands where the shipped world does: the controller gates on
+// the midpoint of the world's own dummy marks (the touch-up's object moves,
+// which the Studio town rework (#4593) moved about 45 yards from the content
+// constants), so a fake built on the stale constants reads as out of the yard.
 function fakeWorld(playerClass: 'warrior' | 'priest' = 'warrior') {
   const entities = new Map<number, any>();
   const player: {
@@ -76,7 +79,7 @@ function fakeWorld(playerClass: 'warrior' | 'priest' = 'warrior') {
     name: 'Hero',
     level: 5,
     targetId: null,
-    pos: { x: HUB_TRAINING_DUMMY_POS.x, y: 0, z: HUB_TRAINING_DUMMY_POS.z },
+    pos: { x: HUB_TRAINING_DUMMY_MARK.x, y: 0, z: HUB_TRAINING_DUMMY_MARK.z },
   };
   entities.set(PID, { id: PID, kind: 'player', templateId: playerClass });
   entities.set(DAMAGE_DUMMY_ID, {
@@ -84,14 +87,14 @@ function fakeWorld(playerClass: 'warrior' | 'priest' = 'warrior') {
     kind: 'mob',
     templateId: HUB_TRAINING_DUMMY_ID,
     dead: false,
-    pos: { x: HUB_TRAINING_DUMMY_POS.x, y: 0, z: HUB_TRAINING_DUMMY_POS.z },
+    pos: { x: HUB_TRAINING_DUMMY_MARK.x, y: 0, z: HUB_TRAINING_DUMMY_MARK.z },
   });
   entities.set(HEALING_DUMMY_ID, {
     id: HEALING_DUMMY_ID,
     kind: 'mob',
     templateId: HUB_HEALING_DUMMY_ID,
     dead: false,
-    pos: { x: HUB_HEALING_DUMMY_POS.x, y: 0, z: HUB_HEALING_DUMMY_POS.z },
+    pos: { x: HUB_HEALING_DUMMY_MARK.x, y: 0, z: HUB_HEALING_DUMMY_MARK.z },
   });
   const quests: Partial<Record<string, QuestState>> = {};
   const world = {
@@ -168,8 +171,8 @@ describe('HubLessonController: eligibility gating', () => {
     expect(b!.innerHTML).toBe(element.innerHTML);
     // Anchored over the DAMAGE dummy, not a guessed position.
     expect(projections.at(-1)).toMatchObject({
-      x: HUB_TRAINING_DUMMY_POS.x,
-      z: HUB_TRAINING_DUMMY_POS.z,
+      x: HUB_TRAINING_DUMMY_MARK.x,
+      z: HUB_TRAINING_DUMMY_MARK.z,
     });
   });
 
@@ -294,13 +297,13 @@ describe('HubLessonController: the world bubble mirrors every guided step', () =
     const { world, quests, player } = fakeWorld('priest');
     quests[HUB_DUMMY_DRILL_QUEST_ID] = 'unavailable';
     quests[HUB_HEALING_DRILL_QUEST_ID] = 'active';
-    player.pos = { x: HUB_HEALING_DUMMY_POS.x, y: 0, z: HUB_HEALING_DUMMY_POS.z };
+    player.pos = { x: HUB_HEALING_DUMMY_MARK.x, y: 0, z: HUB_HEALING_DUMMY_MARK.z };
     const meters = new FakeMeters();
     const { controller, projections } = makeController(world, meters);
     tick(controller);
     expect(projections.at(-1)).toMatchObject({
-      x: HUB_HEALING_DUMMY_POS.x,
-      z: HUB_HEALING_DUMMY_POS.z,
+      x: HUB_HEALING_DUMMY_MARK.x,
+      z: HUB_HEALING_DUMMY_MARK.z,
     });
   });
 

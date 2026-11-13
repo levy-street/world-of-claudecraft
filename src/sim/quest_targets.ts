@@ -15,6 +15,7 @@
 // built-in world wraps the shipped tables themselves, so the shipped game
 // reads exactly what it always did.
 
+import { campLiveArea } from './camp_scatter';
 import { FARM_PATCHES } from './content/farm_patches';
 import { ESCORTS, gatherNodesInActiveWorld, getActiveWorldContent, MOBS, QUESTS } from './data';
 import { farmPatchesFor } from './moved_objects';
@@ -337,9 +338,11 @@ export function questObjectiveAreas(
   const world = getActiveWorldContent();
   const pushMobCamps = (ref: QuestObjectiveRef, mobId: string): void => {
     for (const camp of world.camps) {
-      // fresh {x,z}: never alias the shared camp content the sim spawns from
-      if (camp.mobId === mobId)
-        push(ref, { x: camp.center.x, z: camp.center.z }, camp.radius + CAMP_AREA_PAD);
+      if (camp.mobId !== mobId) continue;
+      // Where the camp's live mobs stand (its pinned spots, less its retired
+      // slots), always a fresh {x,z} that never aliases the shared camp content.
+      const area = campLiveArea(camp);
+      if (area) push(ref, { x: area.x, z: area.z }, area.radius + CAMP_AREA_PAD);
     }
   };
   // Centroid of a set of points plus its farthest member: a simple enclosing

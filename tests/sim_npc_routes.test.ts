@@ -20,10 +20,12 @@ const SEED = 42;
 // merge: the Eastbrook rebuild dropped the Grand Armoury footprint (17.5, -5.5,
 // 13x9) across the old x 10..22, z -10 leg, so the walker collided mid-route.
 // Moved 15 yd north for the World of ClaudeCraft Studio map's arrangement of
-// the town: the quay cottage stands on the old z -45 leg now.
-const A = { x: -58, z: -30 };
-const B = { x: -52, z: -30 };
-const C = { x: -46, z: -30 };
+// the town: the quay cottage stands on the old z -45 leg now. Moved 16 yd
+// north and 6 east for the Studio town rework (#4593): a placed cottage
+// stands across the old z -30 leg now.
+const A = { x: -52, z: -14 };
+const B = { x: -46, z: -14 };
+const C = { x: -40, z: -14 };
 
 function npcDef(id: string, route?: NpcRoute): NpcDef {
   return {

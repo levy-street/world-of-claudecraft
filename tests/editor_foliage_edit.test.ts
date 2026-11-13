@@ -107,7 +107,12 @@ describe('ambientDecorationsToPlacements', () => {
     const before = generateDecorationsInBounds(20061, bounds);
     expect(before.length).toBeGreaterThan(1);
     const excluded = decorationKey(before[0]);
-    setActiveWorldContent({ ...BUILTIN_WORLD, decorationExclusions: [excluded] });
+    // Keep the shipped touch-up's own exclusions (the Studio town rework (#4593) converted
+    // many anchors in this area), so only the one new key changes the count.
+    setActiveWorldContent({
+      ...BUILTIN_WORLD,
+      decorationExclusions: [...(BUILTIN_WORLD.decorationExclusions ?? []), excluded],
+    });
     const after = generateDecorationsInBounds(20061, bounds);
     expect(after).toHaveLength(before.length - 1);
     expect(after.some((decoration) => decorationKey(decoration) === excluded)).toBe(false);
@@ -118,7 +123,12 @@ describe('ambientDecorationsToPlacements', () => {
     const before = generateGroundDressing(20061, { bounds });
     expect(before.length).toBeGreaterThan(0);
     const excluded = groundDressingKey(before[0]);
-    setActiveWorldContent({ ...BUILTIN_WORLD, decorationExclusions: [excluded] });
+    // Keep the shipped touch-up's own exclusions (the Studio town rework (#4593) converted
+    // many anchors in this area), so only the one new key changes the count.
+    setActiveWorldContent({
+      ...BUILTIN_WORLD,
+      decorationExclusions: [...(BUILTIN_WORLD.decorationExclusions ?? []), excluded],
+    });
     const after = generateGroundDressing(20061, { bounds });
     expect(after).toHaveLength(before.length - 1);
     expect(after.some((spot) => groundDressingKey(spot) === excluded)).toBe(false);

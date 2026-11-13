@@ -8,6 +8,7 @@ import {
   type WolvesGuideReader,
 } from '../src/render/eastbrook_wolves_guidance_core';
 import { isBlocked, pathCrossesFence } from '../src/sim/colliders';
+import { ZONE1_CAMPS } from '../src/sim/content/zone1';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { EASTBROOK_NPC_PLACEMENTS_BY_ID } from '../src/sim/eastbrook_layout';
 import { FERRY_BELL_TOWN_LANDING } from '../src/sim/interactions/ferry_bell';
@@ -21,7 +22,7 @@ function world(state = 'active'): WolvesGuideReader {
 describe('wolves guidance geometry and visibility', () => {
   it('resolves the authored forest wolf camp (a content rename degrades to no route, never a throw)', () => {
     expect(WOLF_RUN_CAMP).not.toBeNull();
-    expect(WOLVES_ROUTE.length).toBe(8);
+    expect(WOLVES_ROUTE.length).toBe(3);
   });
 
   it('answers a finished quest from questsDone before the zone scan or any questState read', () => {
@@ -86,22 +87,30 @@ describe('wolves guidance geometry and visibility', () => {
     const outbound = eastbrookWolvesGuide(world(), () => false);
     const home = eastbrookWolvesGuide(world('ready'), () => false);
     if (!outbound.plan) throw new Error('Expected active wolves route');
-    expect(WOLF_RUN_CAMP).toEqual({ x: -10, z: 6, radius: 28.5 });
+    // The ring is where the camp's live wolves stand: the Studio town rework
+    // (#4593) pinned them (CampDef.spots) north-west of the camp's old centre.
+    const wolves = ZONE1_CAMPS.find((c) => c.mobId === 'forest_wolf');
+    expect(WOLF_RUN_CAMP?.x).toBeCloseTo(-18.33, 2);
+    expect(WOLF_RUN_CAMP?.z).toBeCloseTo(27.83, 2);
+    expect(WOLF_RUN_CAMP?.radius).toBeCloseTo(28.67, 2);
+    for (const spot of wolves?.spots ?? []) {
+      const ring = WOLF_RUN_CAMP ?? { x: 0, z: 0, radius: 0 };
+      expect(Math.hypot(spot.x - ring.x, spot.z - ring.z)).toBeLessThanOrEqual(ring.radius + 1e-9);
+    }
+    expect(wolves?.spots?.length).toBeGreaterThan(0);
     expect(outbound.plan?.points).toEqual(WOLVES_ROUTE);
     // Re-pinned 2026-10 for the Tidehold rebuild: the apothecary's shop stood
     // on the old line north-west out of the square, so the trail followed the
     // north road round its east end. Re-pinned for the World of ClaudeCraft
     // Studio map's arrangement: the smithy stands on that line now, so the
     // trail follows the north road's swing round its forge shelter's west end
-    // and back over the rise behind it, west of the road's lamp.
+    // and back over the rise behind it, west of the road's lamp. Re-pinned for
+    // the Studio town rework (#4593): Marshal greets the ferry at the quay now,
+    // so the trail leaves his stand north-east past the quay cottage and
+    // crosses the open ground below Sableweb onto the Wolf Run.
     expect(WOLVES_ROUTE).toEqual([
       EASTBROOK_NPC_PLACEMENTS_BY_ID.marshal_redbrook.position,
-      { x: 13.5, z: -93.5 },
-      { x: 16.3, z: -83 },
-      { x: 17.5, z: -76 },
-      { x: 14, z: -69 },
-      { x: 7.5, z: -61.5 },
-      { x: 5, z: -52 },
+      { x: -49.2, z: -31.5 },
       WOLF_RUN_CAMP,
     ]);
     expect(outbound.areaRing).toEqual(WOLF_RUN_CAMP);
@@ -137,10 +146,11 @@ describe('wolves guidance geometry and visibility', () => {
 describe('wolves guidance follows Marshal where he stands', () => {
   beforeEach(() => resetWolvesGuideCache());
   afterEach(() => setActiveWorldContent(BUILTIN_WORLD));
-  // A map can move Marshal Redbrook (the Studio "Eastbrook and Mirefen
-  // changes" map stands him on the quay beside the ferry bell); the golden
-  // guidance must lead to the NPC the player can see, not the code layout.
-  const MOVED = { x: -86.2, z: -44.4 };
+  // A map can move Marshal Redbrook; the golden guidance must lead to the NPC
+  // the player can see, not the code layout. The Studio town rework (#4593)
+  // made his quay stand beside the ferry bell the layout spot itself, so the
+  // moved map here stands him back at his former square stand, as a literal.
+  const MOVED = { x: 1.5, z: -95.3 };
   const marshalAt = (pos: { x: number; z: number }, dead = false) =>
     new Map([
       [7, { kind: 'mob', templateId: 'forest_wolf', pos: { x: -10, z: 6 } }],

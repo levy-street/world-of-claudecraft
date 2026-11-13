@@ -133,6 +133,11 @@ describe('trick-or-treat', () => {
         const def = NPCS[id];
         expect(def, id).toBeDefined();
         const d = Math.hypot(def.pos.x - (zone?.hub.x ?? 0), def.pos.z - (zone?.hub.z ?? 0));
+        // or inside the town's quest hub, where the town outgrew the hub circle
+        // (the Studio town rework, #4593, carries one for Eastbrook and
+        // Highwatch; professions/focus.ts isInTownZone reads the town by it)
+        const quest = zone?.questHub;
+        if (quest && Math.hypot(def.pos.x - quest.x, def.pos.z - quest.z) <= quest.radius) continue;
         expect(d, `${id} distance from ${zoneId}`).toBeLessThan(60);
       }
     }

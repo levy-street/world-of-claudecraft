@@ -24,7 +24,7 @@ import {
   TIER3_TOOL_GATE_PROFICIENCY,
   VENDOR_ROW_GATES,
 } from '../src/sim/content/vendor_row_gates';
-import { GATHER_NODES, ITEMS, NPCS, zoneAt } from '../src/sim/data';
+import { GATHER_NODES, gatherNodesInActiveWorld, ITEMS, NPCS, zoneAt } from '../src/sim/data';
 import * as items from '../src/sim/items';
 import {
   GATHER_GAIN_TIER_STEP,
@@ -1130,8 +1130,12 @@ describe('the gated tools are stocked somewhere a gated row can be seen', () => 
     expect(GATHER_NODES.length).toBeGreaterThan(0);
     let closest = Number.POSITIVE_INFINITY;
     let closestPair = '';
+    // The nodes where the live world stands them: a Studio map can move a
+    // vein (moved_objects.ts), and the raw table would judge its old spot.
+    const liveNodes = gatherNodesInActiveWorld();
+    expect(liveNodes).toHaveLength(GATHER_NODES.length);
     for (const npc of gatedStockists) {
-      for (const node of GATHER_NODES) {
+      for (const node of liveNodes) {
         const d = Math.hypot(node.pos.x - npc.pos.x, node.pos.z - npc.pos.z);
         if (d < closest) {
           closest = d;

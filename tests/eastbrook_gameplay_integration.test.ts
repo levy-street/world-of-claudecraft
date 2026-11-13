@@ -731,10 +731,12 @@ describe('Eastbrook authored gameplay data integration', () => {
     // The farmer's inline seat beside the allotments (the go-live), pinned
     // here as the non-layout Eastbrook placement; the world-side proof (never
     // nudged, beside the beds, off the road) lives in
-    // tests/farmer_npc_placement.test.ts.
+    // tests/farmer_npc_placement.test.ts. The Studio town rework (#4593)
+    // moved her with the allotments to the ground west of the bank quay, and
+    // she turns to face their beds there.
     expect(ZONE1_NPCS.farmer_jessica).toMatchObject({
-      pos: { x: -15.5, z: -81.5 },
-      facing: -Math.PI / 2,
+      pos: { x: -85.26, z: -71.07 },
+      facing: 2.655,
       farmer: true,
     });
     expect(ZONE1_NPCS.farmer_jessica.dynamic).toBeUndefined();
@@ -749,18 +751,20 @@ describe('Eastbrook authored gameplay data integration', () => {
   // Re-pinned for the World of ClaudeCraft Studio map's arrangement: the north
   // road swings west round the smithy's forge shelter over his old stand, so
   // he keeps the town's edge between that road and the coast track.
+  // Re-pinned for the Studio town rework (#4593): FURY's stand and facing are
+  // authored literals now, south of the smithy by the coast track.
   it('spawns layout-authored FURY under a reserved id without shifting nextId or RNG', () => {
     expect(EASTBROOK_NPC_PLACEMENTS_BY_ID.fury).toEqual({
       id: 'fury',
-      position: { x: 21, z: -83.5 },
-      facing: -2.0570389598824015,
+      position: { x: 0.77, z: -123 },
+      facing: 5.012,
       anchorId: 'eastbrook_chapel',
       bodyRadius: 0.6,
     });
     expect(BUILTIN_WORLD.npcs[FURY_NPC_ID]).toMatchObject({
       id: 'fury',
-      pos: { x: 21, z: -83.5 },
-      facing: -2.0570389598824015,
+      pos: { x: 0.77, z: -123 },
+      facing: 5.012,
       dynamic: true,
     });
     expect(FURY_ENTITY_ID).toBe(1_000_000_001);
@@ -795,12 +799,12 @@ describe('Eastbrook authored gameplay data integration', () => {
       id: 1_000_000_001,
       kind: 'npc',
       templateId: 'fury',
-      x: 21,
-      z: -83.5,
-      spawnX: 21,
-      spawnZ: -83.5,
-      facing: -2.0570389598824015,
-      prevFacing: -2.0570389598824015,
+      x: 0.77,
+      z: -123,
+      spawnX: 0.77,
+      spawnZ: -123,
+      facing: 5.012,
+      prevFacing: 5.012,
     });
     expect([...withFury.entities.keys()].filter((id) => id !== FURY_ENTITY_ID)).toEqual([
       ...withoutFury.entities.keys(),
@@ -847,7 +851,9 @@ describe('Eastbrook authored gameplay data integration', () => {
         id: 'station_highwatch_apothecary',
         type: 'apothecary',
         zoneId: 'thornpeak_heights',
-        pos: { x: 7, z: 660 },
+        // the Studio town rework (#4593) moved Alchemist Verane, and her bench
+        // follows her, stood clear of the counting house's doorway and porch
+        pos: { x: -40, z: 690.5 },
         masterNpcId: 'alchemist_verane',
       },
     ]);
@@ -889,9 +895,11 @@ describe('Eastbrook authored gameplay data integration', () => {
     // the moved spawn is re-pinned here as exported data.
     // Re-pinned for the World of ClaudeCraft Studio map's arrangement: the
     // graveyard moved with the chapel into the churchyard beside it.
+    // The Studio town rework (#4593) authored the release point at the
+    // churchyard gate rather than 2 yd east of the first stone.
     expect(PLAYER_START).toEqual({ x: -94, z: -58 });
     expect(EASTBROOK_LAYOUT.services.graveyard.position).toEqual({ x: 37.5, z: -99.3 });
-    expect(EASTBROOK_LAYOUT.services.graveyard.legacyReleasePoint).toEqual({ x: 39.5, z: -99.3 });
+    expect(EASTBROOK_LAYOUT.services.graveyard.legacyReleasePoint).toEqual({ x: 35, z: -96.5 });
   });
 });
 
@@ -1256,11 +1264,13 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
     // facing, taken from the runtime entity) is far outside mailbox reach
     // rather than a stride from it. The targetless-interact regression this
     // stages is unchanged.
-    const facePoint = { x: 11.032050294337843, z: -86.25192455849323 };
+    // Re-measured for the Studio town rework (#4593): Saul stands on the bank
+    // quay's south side now, further still from the square's mailbox.
+    const facePoint = { x: -43.43795295508876, z: -116.76192239221496 };
 
     expect(Math.hypot(facePoint.x - saul.pos.x, facePoint.z - saul.pos.z)).toBeCloseTo(1.5, 12);
     const mailboxDistance = Math.hypot(facePoint.x - mailbox.pos.x, facePoint.z - mailbox.pos.z);
-    expect(mailboxDistance).toBe(24.090753748334464);
+    expect(mailboxDistance).toBe(38.34196695108672);
     expect(mailboxDistance).toBeGreaterThan(INTERACT_RANGE);
 
     const talkToNpc = vi.spyOn(sim, 'talkToNpc');

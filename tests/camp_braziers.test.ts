@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
+import { liveCampFireSites } from '../src/render/camp_brazier_placement_core';
 import {
   BRAZIER_RIM_HEIGHT,
   buildBrazierCoalsGeometry,
@@ -12,7 +13,13 @@ import {
 } from '../src/render/camp_braziers';
 import { FIRE_BUILDING_FAMILIES } from '../src/render/night_accents_core';
 import { buildLampFixtureGeometry } from '../src/render/streetlamps';
-import { CAMPS, getActiveWorldContent, MOBS } from '../src/sim/data';
+import {
+  BUILTIN_WORLD,
+  CAMPS,
+  getActiveWorldContent,
+  MOBS,
+  setActiveWorldContent,
+} from '../src/sim/data';
 import { roadDistance, terrainHeight, WATER_LEVEL } from '../src/sim/world';
 
 // camp_braziers: the burning fire standing at every fire-building mob camp
@@ -117,8 +124,10 @@ describe('the fire pit geometry', () => {
 
 describe('planCampBraziers on the real world', () => {
   const plan = () => planCampBraziers(0);
+  // Each fire-building camp where its live mobs stand (liveCampFireSites: a camp
+  // the Studio town rework, #4593, pinned elsewhere is lit there, not at its centre).
   const fireBuildingCenters = () =>
-    CAMPS.filter((camp) => {
+    liveCampFireSites(CAMPS).filter((camp) => {
       const family = MOBS[camp.mobId]?.family;
       return family !== undefined && FIRE_BUILDING_FAMILIES.has(family);
     });
@@ -187,6 +196,43 @@ describe('planCampBraziers on the real world', () => {
       for (const [x, z] of campfires) {
         expect(Math.hypot(x - site.x, z - site.z)).toBeGreaterThanOrEqual(12 - 4.2 - 1e-6);
       }
+    }
+  });
+});
+
+describe('planCampBraziers reads the active world camps', () => {
+  // A custom or linked map edits content.camps: its fires follow those camps,
+  // not the module's built-in CAMPS list.
+  it('plans the same fires on a deep-cloned world (the overflow skip holds)', () => {
+    const builtin = planCampBraziers(0);
+    try {
+      setActiveWorldContent({ ...BUILTIN_WORLD, camps: structuredClone(BUILTIN_WORLD.camps) });
+      expect(planCampBraziers(0)).toEqual(builtin);
+    } finally {
+      setActiveWorldContent(null);
+    }
+  });
+
+  it('drops the fire of a camp the map deleted', () => {
+    const builtin = planCampBraziers(0);
+    expect(builtin.length).toBeGreaterThan(0);
+    const lit = builtin[0];
+    const dist = (c: (typeof CAMPS)[number]) => {
+      const at = liveCampFireSites([c])[0]?.center;
+      return at ? Math.hypot(at.x - lit.x, at.z - lit.z) : Number.POSITIVE_INFINITY;
+    };
+    // the camp whose live area sits nearest the first fire
+    const nearest = [...BUILTIN_WORLD.camps].sort((a, b) => dist(a) - dist(b))[0];
+    try {
+      setActiveWorldContent({
+        ...BUILTIN_WORLD,
+        camps: BUILTIN_WORLD.camps.filter((c) => c !== nearest),
+      });
+      const after = planCampBraziers(0);
+      expect(after).toHaveLength(builtin.length - 1);
+      expect(after.some((s) => s.x === lit.x && s.z === lit.z)).toBe(false);
+    } finally {
+      setActiveWorldContent(null);
     }
   });
 });

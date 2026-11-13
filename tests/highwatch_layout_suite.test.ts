@@ -8,13 +8,14 @@ import {
   resolveMovement,
   streetlampPlacements,
 } from '../src/sim/colliders';
+import { FARM_PATCHES } from '../src/sim/content/farm_patches';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { MAILBOXES } from '../src/sim/content/mailboxes';
 import { NOTICEBOARDS } from '../src/sim/content/noticeboards';
-import { PRACTICE_ROW_X } from '../src/sim/content/practice_dummies';
+import { PRACTICE_ROW_MARKS } from '../src/sim/content/practice_dummies';
 import { STATIONS } from '../src/sim/content/professions';
 import { ZONE3_NPCS, ZONE3_PROPS, ZONE3_ROADS, ZONE3_ZONE } from '../src/sim/content/zone3';
-import { BUILTIN_WORLD, CAMPS } from '../src/sim/data';
+import { BASE_WORLD, BUILTIN_WORLD, CAMPS } from '../src/sim/data';
 import { isExcludedStreetlamp } from '../src/sim/decoration_exclusions';
 import {
   HIGHWATCH_BUILDINGS_BY_ID,
@@ -22,6 +23,7 @@ import {
   HIGHWATCH_NPC_PLACEMENTS_BY_ID,
   REMOVED_HIGHWATCH_BUILDINGS,
 } from '../src/sim/highwatch_layout';
+import { farmPatchesFor, gatherNodesFor } from '../src/sim/moved_objects';
 import { PAINTED_TOWNS } from '../src/sim/painted_towns';
 import { findPath, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../src/sim/pathfind';
 import { distancePointToObb, localToWorld } from '../src/sim/placed_town_kit';
@@ -44,6 +46,19 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 
 const SEED = WORLD_SEED;
 const BUILDINGS = HIGHWATCH_LAYOUT.buildings;
+// The Highwatch townsfolk the Studio town rework (#4593) moved to new authored
+// spots (content/zone3.ts): they no longer keep the spots this suite pinned.
+const STUDIO_MOVED_NPCS = [
+  'captain_thessaly',
+  'scout_maren_highwatch',
+  'quartermaster_bree',
+  'armorer_hode',
+  'heroic_quartermaster',
+  'warmarshal_draven_kole',
+  'chronicler_edda_hartwell',
+  'alchemist_verane',
+  'farmer_hollis',
+];
 
 function expectDeepFrozen(value: unknown): void {
   if (value === null || typeof value !== 'object') return;
@@ -168,7 +183,9 @@ describe('the Highwatch layout', () => {
     const well = ZONE3_PROPS.wells.find((candidate) => candidate.x === 0 && candidate.z === 662);
     expect(well).toBeDefined();
     const station = STATIONS.find((candidate) => candidate.id === 'station_highwatch_apothecary');
-    expect(station?.pos).toEqual({ x: 7, z: 660 });
+    // the bench followed Alchemist Verane when the Studio town rework (#4593)
+    // moved her off the square (stations follow their masters)
+    expect(station?.pos).toEqual({ x: -40, z: 690.5 });
     expect(MAILBOXES).toContainEqual({ x: 6, z: 654 });
     const board = NOTICEBOARDS.find((candidate) => candidate.id === 'highwatch_noticeboard');
     expect(board).toMatchObject({ x: -5, z: 652 });
@@ -184,7 +201,7 @@ describe('the Highwatch layout', () => {
     const kept: { id: string; x: number; z: number; clearance: number }[] = [
       { id: 'hub centre', x: 0, z: 660, clearance: 8 },
       { id: 'well', x: 0, z: 662, clearance: 3 },
-      { id: 'station', x: 7, z: 660, clearance: 2 },
+      { id: 'station', x: -40, z: 690.5, clearance: 2 },
       { id: 'mailbox', x: 6, z: 654, clearance: 2 },
       { id: 'noticeboard reading spot', x: -5, z: 653.5, clearance: 2 },
       { id: 'quartermaster stall', x: -7.5, z: 667, clearance: 2.5 },
@@ -193,24 +210,33 @@ describe('the Highwatch layout', () => {
       { id: 'gate fence west end', x: 14, z: 649, clearance: 1 },
       { id: 'Thornpeak Cairns', x: 15, z: 645, clearance: 1 },
       { id: 'cairn headstones', x: 19.4, z: 647.6, clearance: 1 },
-      { id: 'practice row', x: PRACTICE_ROW_X, z: 654, clearance: 3 },
-      // the farm's six beds
-      ...[
-        [-23, 685],
-        [-18, 685],
-        [-13, 685],
-        [-23, 690],
-        [-18, 690],
-        [-13, 690],
-      ].map(([x, z]) => ({ id: `bed ${x},${z}`, x, z, clearance: 3 })),
+      ...Object.entries(PRACTICE_ROW_MARKS).map(([id, m]) => ({
+        id: `practice row ${id}`,
+        ...m,
+        clearance: 3,
+      })),
+      // the farm's six beds, where this world's moves stand them
+      ...(
+        farmPatchesFor(BUILTIN_WORLD.objectMoves, FARM_PATCHES).find(
+          (p) => p.id === 'patch_thornpeak',
+        )?.beds ?? []
+      ).map((b) => ({
+        id: b.id,
+        x: b.x,
+        z: b.z,
+        clearance: 3,
+      })),
     ];
     // and every NPC that kept its spot
     for (const [id, npc] of Object.entries(ZONE3_NPCS)) {
       if (npc.dynamic || id in HIGHWATCH_NPC_PLACEMENTS_BY_ID) continue;
+      if (STUDIO_MOVED_NPCS.includes(id)) continue;
       if (Math.hypot(npc.pos.x, npc.pos.z - 660) > 50) continue;
       kept.push({ id, x: npc.pos.x, z: npc.pos.z, clearance: 1.5 });
     }
-    for (const node of GATHER_NODES) {
+    // the gather nodes where this world's moves stand them (the Studio town
+    // rework (#4593) carried herb_thornpeak_t3 off the counting house's new site)
+    for (const node of gatherNodesFor(BUILTIN_WORLD.objectMoves, GATHER_NODES)) {
       if (Math.hypot(node.pos.x, node.pos.z - 660) > 50) continue;
       kept.push({ id: node.id, x: node.pos.x, z: node.pos.z, clearance: 2 });
     }
@@ -221,6 +247,18 @@ describe('the Highwatch layout', () => {
           `${building.id} to ${point.id}`,
         ).toBeGreaterThan(point.clearance);
       }
+    }
+    // The townsfolk the Studio town rework (#4593) stood on new authored
+    // spots may stand on a building's porch or steps (inside its reach), but
+    // never in its walls or annexes, and never with a collider under the body.
+    for (const id of STUDIO_MOVED_NPCS) {
+      const npc = ZONE3_NPCS[id];
+      for (const building of BUILDINGS) {
+        for (const solid of [building.footprint, ...building.annexes]) {
+          expect(distancePointToObb(npc.pos, solid), `${solid.id} to ${id}`).toBeGreaterThan(0.6);
+        }
+      }
+      expect(isBlocked(SEED, npc.pos.x, npc.pos.z, 0.6), id).toBe(false);
     }
   });
 
@@ -286,13 +324,15 @@ describe('the Highwatch layout', () => {
       { x: 0, z: 780 },
       { x: 0, z: 860 },
     ]);
-    // it runs between the inn's north end and the smithy's terrace
+    // it runs past the inn's north end; the Studio town rework (#4593) moved
+    // the smithy that flanked it across town, east of the square, so the lane
+    // has the inn alone beside it now
     const inn = BUILDINGS.find((building) => building.id === 'highwatch_summit_inn');
     const smithy = BUILDINGS.find((building) => building.id === 'highwatch_smithy');
     if (!inn || !smithy) throw new Error('missing inn or smithy');
     const roadZAt22 = 689 + ((22 - 11) / (33 - 11)) * (691.5 - 689);
     expect(roadZAt22).toBeGreaterThan(inn.reach.center.z + inn.reach.halfWidth);
-    expect(roadZAt22).toBeLessThan(smithy.reach.center.z - smithy.reach.halfDepth);
+    expect(distancePointToObb({ x: 22, z: roadZAt22 }, smithy.reach)).toBeGreaterThan(50);
   });
 
   it('keeps every drawn road off every building', () => {
@@ -337,20 +377,29 @@ describe('the Highwatch layout', () => {
   });
 
   it('levels each building on its own pad across its whole reach', () => {
-    const edits = BUILTIN_WORLD.terrainEdits ?? [];
+    const edits = BASE_WORLD.terrainEdits ?? [];
     const pads = HIGHWATCH_LAYOUT.pads;
-    // applied after every other stamp of the built-in world but the painted
+    // applied after every other stamp of the shipped world but the painted
     // towns' (sim/painted_towns/), which follow it on their own ground
     const after = PAINTED_TOWNS.reduce((count, town) => count + town.pads.length, 0);
     expect(edits.slice(edits.length - after - pads.length, edits.length - after)).toEqual([
       ...pads,
     ]);
+    // the live touch-up (the Studio town rework, #4593) carries the pads
+    // whole, in order, and lays its own sculpting after the painted towns'
+    const live = BUILTIN_WORLD.terrainEdits ?? [];
+    const start = live.findIndex((edit) => JSON.stringify(edit) === JSON.stringify(pads[0]));
+    expect(start).toBeGreaterThan(0);
+    expect(live.slice(start, start + pads.length)).toEqual([...pads]);
+    expect(live.length).toBeGreaterThan(start + pads.length + after);
+    // the Studio town rework (#4593) set each pad to the height the map
+    // sculpted round its building
     const expected: Record<string, number> = {
-      highwatch_summit_inn: 9,
-      highwatch_gate_chapel: 8.8,
-      highwatch_counting_house: 8.8,
-      highwatch_watch_house: 7.6,
-      highwatch_smithy: 10.6,
+      highwatch_summit_inn: 11.33,
+      highwatch_gate_chapel: 20.7,
+      highwatch_counting_house: 15.7,
+      highwatch_watch_house: 8.5,
+      highwatch_smithy: 15.7,
       highwatch_guild: 9,
     };
     for (const building of BUILDINGS) {
@@ -361,14 +410,14 @@ describe('the Highwatch layout', () => {
         );
       }
     }
-    // the square stays the shelf it was
+    // the square stays a level shelf, at the map's height for it (11)
     for (const point of [
       { x: 0, z: 660 },
       { x: 6, z: 654 },
       { x: -5, z: 668 },
       { x: 0, z: 672 },
     ]) {
-      expect(terrainHeight(point.x, point.z, SEED), `${point.x},${point.z}`).toBeCloseTo(9, 1);
+      expect(terrainHeight(point.x, point.z, SEED), `${point.x},${point.z}`).toBeCloseTo(11, 1);
     }
   });
 
@@ -401,10 +450,12 @@ describe('the Highwatch layout', () => {
 
   it('stands no street lamp on a building, and drops the one that stood on the watch house', () => {
     const lamps = streetlampPlacements(SEED);
-    // the town's roads keep their lamps
+    // the town's roads keep their lamps (eight since the Studio town rework,
+    // #4593: its re-drawn Fenbridge road plans one more on the watch house's
+    // corner, which the live touch-up excludes)
     expect(
       lamps.filter((lamp) => Math.hypot(lamp.x, lamp.z - 660) < 90).length,
-    ).toBeGreaterThanOrEqual(9);
+    ).toBeGreaterThanOrEqual(8);
     for (const building of BUILDINGS) {
       for (const lamp of lamps) {
         expect(distancePointToObb(lamp, building.reach), `${building.id} lamp`).toBeGreaterThan(
@@ -420,15 +471,24 @@ describe('the Highwatch layout', () => {
 
 describe('Highwatch NPCs, services and traversal', () => {
   it('stands the moved NPCs at their doors and counter, spawned exactly there and unblocked', () => {
+    // The Studio town rework (#4593) stood both on authored spots: Brother
+    // Aldric a few strides off the moved chapel's door, outside its walls,
+    // and the bursar on the north road by the new bank.
     const chapel = HIGHWATCH_BUILDINGS_BY_ID.highwatch_gate_chapel;
-    const bank = HIGHWATCH_BUILDINGS_BY_ID.highwatch_counting_house;
     expect(HIGHWATCH_NPC_PLACEMENTS_BY_ID.brother_aldric_highwatch).toMatchObject({
-      position: chapel.frontStandingPoint,
-      facing: chapel.frontFacing,
+      position: { x: 27, z: 723.07 },
+      facing: 3.927,
+      anchorId: 'highwatch_gate_chapel',
     });
+    const aldric = HIGHWATCH_NPC_PLACEMENTS_BY_ID.brother_aldric_highwatch.position;
+    expect(
+      Math.hypot(aldric.x - chapel.frontStandingPoint.x, aldric.z - chapel.frontStandingPoint.z),
+    ).toBeLessThan(6);
+    expect(distancePointToObb(aldric, chapel.footprint)).toBeGreaterThan(0.6);
     expect(HIGHWATCH_NPC_PLACEMENTS_BY_ID.bursar_aldous_crane).toMatchObject({
-      position: bank.frontStandingPoint,
-      facing: bank.frontFacing,
+      position: { x: -8.16, z: 744.05 },
+      facing: Math.PI / 2,
+      anchorId: 'highwatch_counting_house',
     });
     expect(HIGHWATCH_LAYOUT.services.bank.npcId).toBe('bursar_aldous_crane');
     const sim = new Sim({ seed: SEED, playerClass: 'warrior', noPlayer: true });
@@ -446,7 +506,9 @@ describe('Highwatch NPCs, services and traversal', () => {
       );
     }
     // no collider covers any town NPC's spot, and Kole keeps his elbow room
-    const kole = { x: -11, z: 669 };
+    // (on the spot the Studio town rework, #4593, stood him)
+    const kole = ZONE3_NPCS.warmarshal_draven_kole.pos;
+    expect(kole).toEqual({ x: -7.17, z: 671.57 });
     for (const [id, npc] of Object.entries(ZONE3_NPCS)) {
       if (npc.dynamic || Math.hypot(npc.pos.x, npc.pos.z - 660) > 45) continue;
       expect(isBlocked(SEED, npc.pos.x, npc.pos.z, 0.05), id).toBe(false);

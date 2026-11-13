@@ -135,7 +135,10 @@ describe('Icicles build-up', () => {
     // Re-hunted for the wander fix around those huts (an idle pick inside a
     // hut wall is skipped for one more pause, mob/locomotion.ts): the stream
     // forks again and seed 13 banks nothing on cast 5. Seed 14 passes the loop.
-    const { sim, p } = makeSim({ seed: 14 });
+    // Re-hunted for the Studio town rework (#4593), whose reworked camps pin
+    // mobs to authored spots and shift the shared stream again: seed 14 now
+    // banks nothing on cast 2, seed 15 passes the loop.
+    const { sim, p } = makeSim({ seed: 15 });
     spawnTarget(sim, p);
     expect(frostIcicleCharges(p.auras)).toBe(0);
     for (let n = 1; n <= ICICLE_MAX + 2; n++) {

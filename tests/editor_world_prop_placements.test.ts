@@ -348,6 +348,15 @@ describe('editable overworld scenery', () => {
 
   it('keeps moved fences jump-aware and moved inns rest-aware', () => {
     const map = newCustomMap('Gameplay props', 'gameplay-props', 100);
+    // The Studio town rework (#4593) removed the shipped world's last editable inn
+    // (the Galecrest stables barn), so the map gains one through the same converter,
+    // at that barn's old footprint.
+    map.placements.push(
+      ...worldMajorPropPlacements({
+        ...EMPTY,
+        buildings: [{ kind: 'inn', x: 352, z: 598, w: 10, d: 8, rot: 2.7 }],
+      }),
+    );
     const fence = map.placements.find((p) => p.worldPropKind === 'fence');
     const inn = map.placements.find((p) => p.worldPropKind === 'inn');
     expect(fence).toBeDefined();

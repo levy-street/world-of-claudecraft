@@ -75,6 +75,8 @@ export interface FarmPatchDef {
 
 const FARM_PATCH_ROWS: readonly FarmPatchDef[] = [
   {
+    // The Studio town rework (#4593) moved these beds to the ground west of
+    // the bank quay; the siting notes that follow describe the first site.
     // The Eastbrook allotments, on the open ground at the harbor town's
     // north-east edge: 20 yards from the civic center, north of the civic
     // ring and east of the chapel yard, 16 yards off every lane (the nearest
@@ -88,13 +90,15 @@ const FARM_PATCH_ROWS: readonly FarmPatchDef[] = [
     id: 'patch_eastbrook',
     zoneId: 'eastbrook_vale',
     tier: 1,
-    x: -21.5,
-    z: -81.5,
+    // Studio town rework (#4593): the patch moved to the map's site, the beds
+    // keeping their pitch about it.
+    x: -81.31,
+    z: -78.54,
     beds: [
-      { id: 'bed_eastbrook_1', x: -24, z: -84 },
-      { id: 'bed_eastbrook_2', x: -19, z: -84 },
-      { id: 'bed_eastbrook_3', x: -24, z: -79 },
-      { id: 'bed_eastbrook_4', x: -19, z: -79 },
+      { id: 'bed_eastbrook_1', x: -83.81, z: -81.04 },
+      { id: 'bed_eastbrook_2', x: -78.81, z: -81.04 },
+      { id: 'bed_eastbrook_3', x: -83.81, z: -76.04 },
+      { id: 'bed_eastbrook_4', x: -78.81, z: -76.04 },
     ],
   },
   {
@@ -116,21 +120,25 @@ const FARM_PATCH_ROWS: readonly FarmPatchDef[] = [
     ],
   },
   {
+    // The Studio town rework (#4593) moved these beds down beside the
+    // south-west walk-up; the siting notes that follow describe the first site.
     // Terraces on the shelf below Highwatch, south-west of the hold. Slope is
     // the binding constraint on this whole mountain, and this shelf is where
     // six beds fit with no cliff anywhere in any bed's working reach.
     id: 'patch_thornpeak',
     zoneId: 'thornpeak_heights',
     tier: 3,
-    x: -18,
-    z: 687.5,
+    // Studio town rework (#4593): the patch moved to the map's site, the beds
+    // keeping their pitch about it.
+    x: -43.92,
+    z: 642.91,
     beds: [
-      { id: 'bed_thornpeak_1', x: -23, z: 685 },
-      { id: 'bed_thornpeak_2', x: -18, z: 685 },
-      { id: 'bed_thornpeak_3', x: -13, z: 685 },
-      { id: 'bed_thornpeak_4', x: -23, z: 690 },
-      { id: 'bed_thornpeak_5', x: -18, z: 690 },
-      { id: 'bed_thornpeak_6', x: -13, z: 690 },
+      { id: 'bed_thornpeak_1', x: -48.92, z: 640.41 },
+      { id: 'bed_thornpeak_2', x: -43.92, z: 640.41 },
+      { id: 'bed_thornpeak_3', x: -38.92, z: 640.41 },
+      { id: 'bed_thornpeak_4', x: -48.92, z: 645.41 },
+      { id: 'bed_thornpeak_5', x: -43.92, z: 645.41 },
+      { id: 'bed_thornpeak_6', x: -38.92, z: 645.41 },
     ],
   },
   {

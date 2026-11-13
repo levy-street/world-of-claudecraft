@@ -37,7 +37,7 @@ export const GALECREST_ZONE: ZoneDef = {
   biome: 'gale',
   westPassZ: 440, // the Windway: where the marsh road climbs into the wind
   hub: { x: 420, z: 360, radius: 16, name: 'Wickharbor' },
-  graveyard: { x: 404, z: 344 },
+  graveyard: { x: 406.9, z: 343.7 },
   lakes: [
     { x: 300, z: 560, radius: 10 }, // the Mirror Tarn, up on the downs
   ],
@@ -313,8 +313,8 @@ export const GALECREST_NPCS: Record<string, NpcDef> = {
     id: 'harbormaster_odile',
     name: 'Harbormaster Odile',
     title: 'Harbormaster of Wickharbor',
-    pos: { x: 424, z: 364 },
-    facing: -2.2,
+    pos: { x: 410.43, z: 369.18 },
+    facing: 2.512,
     color: 0x4a6a8a,
     questIds: [
       'q_gc_down_the_windway',
@@ -601,13 +601,48 @@ export const GALECREST_ITEMS: Record<string, ItemDef> = {
 export const GALECREST_CAMPS: CampDef[] = [
   { mobId: 'moor_ram', center: { x: 292, z: 312 }, radius: 11, count: 3 },
   { mobId: 'moor_ram', center: { x: 262, z: 360 }, radius: 10, count: 3 },
-  { mobId: 'topiary_wolf', center: { x: 302, z: 522 }, radius: 11, count: 3 },
+  {
+    mobId: 'topiary_wolf',
+    center: { x: 302, z: 522 },
+    radius: 11,
+    count: 3,
+    spots: [
+      { x: 294.06, z: 525.06 },
+      { x: 306.13, z: 529.76 },
+    ],
+    retiredSlots: 1,
+  },
   // the pack hunts the empty downs southwest of the tarn, far from the
   // lakeside barns and every building
   { mobId: 'topiary_wolf', center: { x: 250, z: 505 }, radius: 8, count: 3 },
-  { mobId: 'wreck_thief', center: { x: 444, z: 438 }, radius: 10, count: 3 },
-  { mobId: 'moor_ram', center: { x: 386, z: 622 }, radius: 9, count: 2 },
-  { mobId: 'the_wreck_warden', center: { x: 330, z: 638 }, radius: 5, count: 1 },
+  {
+    mobId: 'wreck_thief',
+    center: { x: 444, z: 438 },
+    radius: 10,
+    count: 3,
+    spots: [
+      { x: 443.9, z: 441.8 },
+      { x: 446.25, z: 448.56 },
+      { x: 450.21, z: 446.87 },
+    ],
+  },
+  {
+    mobId: 'moor_ram',
+    center: { x: 386, z: 622 },
+    radius: 9,
+    count: 2,
+    spots: [
+      { x: 404.36, z: 642.62 },
+      { x: 411.87, z: 644.61 },
+    ],
+  },
+  {
+    mobId: 'the_wreck_warden',
+    center: { x: 330, z: 638 },
+    radius: 5,
+    count: 1,
+    spots: [{ x: 361.56, z: 668.09 }],
+  },
   // the outskirt raider camps (appended: camp order is world-gen rng order):
   // bandits hold the north and Windway camps, thieves the coast road camps
   { mobId: 'downs_bandit', center: { x: 252, z: 250 }, radius: 4, count: 2 },
@@ -654,13 +689,63 @@ export const GALECREST_QUEST_CAMPS: CampDef[] = [
   // (q_gc_scuttlers_in_the_pots): they climbed up from the shoals to raid
   // the crab pots, so their two camps flank the road south of town, clear
   // of the wreck_thief camp further down at (444, 438).
-  { mobId: 'shoal_scuttler', center: { x: 410, z: 400 }, radius: 9, count: 5, offStream: true },
-  { mobId: 'shoal_scuttler', center: { x: 440, z: 460 }, radius: 8, count: 5, offStream: true },
+  {
+    mobId: 'shoal_scuttler',
+    center: { x: 410, z: 400 },
+    radius: 9,
+    count: 5,
+    spots: [
+      { x: 374.18, z: 414.45 },
+      { x: 365.51, z: 412.16 },
+      { x: 366.77, z: 422.27 },
+      { x: 362.89, z: 418.68 },
+      { x: 356.47, z: 415.08 },
+    ],
+    offStream: true,
+  },
+  {
+    mobId: 'shoal_scuttler',
+    center: { x: 440, z: 460 },
+    radius: 8,
+    count: 5,
+    spots: [
+      { x: 448.59, z: 481.97 },
+      { x: 454.67, z: 484.42 },
+      { x: 459.94, z: 484.88 },
+      { x: 450.53, z: 491.33 },
+      { x: 456.84, z: 490.75 },
+    ],
+    offStream: true,
+  },
   // Gale wisps on the high downs beside the Mirror Tarn
   // (q_gc_wind_against_the_wick): kept east of the tarn itself and clear of
   // the topiary_wolf pack that already holds its southwest bank.
-  { mobId: 'gale_wisp', center: { x: 330, z: 565 }, radius: 9, count: 4, offStream: true },
-  { mobId: 'gale_wisp', center: { x: 355, z: 585 }, radius: 8, count: 4, offStream: true },
+  {
+    mobId: 'gale_wisp',
+    center: { x: 330, z: 565 },
+    radius: 9,
+    count: 4,
+    spots: [
+      { x: 319.36, z: 587.55 },
+      { x: 335.09, z: 538.26 },
+      { x: 307.44, z: 582.84 },
+      { x: 333.18, z: 536.11 },
+    ],
+    offStream: true,
+  },
+  {
+    mobId: 'gale_wisp',
+    center: { x: 355, z: 585 },
+    radius: 8,
+    count: 4,
+    spots: [
+      { x: 316.06, z: 595.8 },
+      { x: 310.01, z: 588.2 },
+      { x: 340.99, z: 538.03 },
+      { x: 346.01, z: 532.01 },
+    ],
+    offStream: true,
+  },
 ];
 
 export const GALECREST_PROPS: ZonePropsDef = {

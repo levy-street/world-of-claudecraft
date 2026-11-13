@@ -62,7 +62,7 @@ export const PROVING_SHORE_ZONE: ZoneDef = {
   levelRange: [1, 2],
   biome: 'vale',
   hub: { x: -300, z: 50, radius: 14, name: 'Dawnrest Camp' },
-  graveyard: { x: -324, z: 58 },
+  graveyard: { x: -320.1, z: 59.7 },
   lakes: [],
   pois: [
     { x: -300, z: 50, label: 'Dawnrest Camp', id: 'dawnrest_camp' },
@@ -296,10 +296,10 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
     id: 'quartermaster_finch',
     name: 'Quartermaster Finch',
     title: 'Camp Outfitter',
-    // Behind her stall on the camp's north edge (the old second tent's
-    // ground), facing south over the counter into the muster ground. Kept a
-    // step south of the perimeter rail, which crosses z 57.8 at this x.
-    pos: { x: -312, z: 57.2 },
+    // By her stall on the camp's north edge (the old second tent's ground),
+    // facing south into the muster ground. The Studio town rework (#4593)
+    // stood her a few yards south of the counter; her flag and lantern follow.
+    pos: { x: -312.93, z: 51.19 },
     facing: Math.PI,
     color: 0x6b6b3a,
     // The stall sells EXACTLY the bank lesson's Linen Pouch: no provisions
@@ -783,7 +783,13 @@ export const PROVING_SHORE_CAMPS: CampDef[] = [
   { mobId: 'training_effigy', center: { x: -336, z: -14 }, radius: 4, count: 1, offStream: true },
   { mobId: 'training_effigy', center: { x: -341, z: -17 }, radius: 4, count: 1, offStream: true },
   { mobId: 'training_effigy', center: { x: -331, z: -11 }, radius: 4, count: 1, offStream: true },
-  { mobId: 'training_effigy', center: { x: -334, z: -20 }, radius: 4, count: 1, offStream: true },
+  {
+    mobId: 'training_effigy',
+    center: { x: -330.63, z: -19.8 },
+    radius: 4,
+    count: 1,
+    offStream: true,
+  },
   { mobId: 'training_effigy', center: { x: -339, z: -9 }, radius: 4, count: 1, offStream: true },
   // The wreck line lives on the FAR strand past the practice yard (the path
   // from the yard leads straight to it), leaving the south strand nearest
@@ -940,7 +946,7 @@ export const PROVING_SHORE_PROPS: ZonePropsDef = {
     { key: 'hexFlag', x: -338.5, z: -31.5 },
     { key: 'hexFlag', x: -346.5, z: -12 },
     { key: 'hexFlag', x: -372.5, z: -14 },
-    { key: 'hexFlag', x: -310.5, z: 56 },
+    { key: 'hexFlag', x: -311.43, z: 49.99 }, // Studio town rework (#4593): follows Finch
     { key: 'hexFlag', x: -297.5, z: 48.5 },
     // A lit lantern post BEHIND each quest giver (1.6 yd opposite their
     // authored facing; forward = (-sin f, cos f)), so every station stays
@@ -955,7 +961,7 @@ export const PROVING_SHORE_PROPS: ZonePropsDef = {
     { key: 'kcasTorch', x: -337, z: -35 },
     { key: 'kcasTorch', x: -343.9, z: -9.9 },
     { key: 'kcasTorch', x: -369.9, z: -11.9 },
-    { key: 'kcasTorch', x: -312, z: 58.8 },
+    { key: 'kcasTorch', x: -312.93, z: 52.79 }, // Studio town rework (#4593): follows Finch
     { key: 'kcasTorch', x: -300.1, z: 50.1 },
     { key: 'kcasTorch', x: -320, z: 40 },
     { key: 'kcasTorch', x: -290, z: -12 },

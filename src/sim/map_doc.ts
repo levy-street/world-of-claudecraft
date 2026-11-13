@@ -91,7 +91,7 @@ export const MAP_DOC_VERSION = 2;
 
 // Hard caps applied by the sanitizer (the server stores what the sanitizer
 // returns, so these bound document size and playtest cost).
-// Terrain stamps are spatially indexed (world.ts EDIT_INDEX_CELL), so
+// Terrain stamps are spatially indexed (terrain_edit_layer.ts EDIT_INDEX_CELL), so
 // per-sample cost tracks LOCAL stamp density, not the total; 10k stamps is
 // ~80KiB JSON, well under the 2MiB server payload cap. The cap still exists
 // so a hostile document cannot stall the editor's chunk rebuilds.
@@ -1668,6 +1668,25 @@ function sanitizeCamp(v: unknown): CampDef | null {
   const questNotes = str(c.questNotes, '').slice(0, MAX_AUTHORING_NOTES_LENGTH);
   if (aiNotes) camp.aiNotes = aiNotes;
   if (questNotes) camp.questNotes = questNotes;
+  // Authored per-slot spawn points and retired slots (CampDef.spots and
+  // retiredSlots): kept so a projected native camp spawns where it does in
+  // the built-in world. Bounded by the camp's own slot count. Spots are
+  // indexed by slot, so the list stops at the first malformed entry (that slot
+  // and every later one scatter) rather than shifting later spots a slot down.
+  if (Array.isArray(c.spots)) {
+    const spots: { x: number; z: number }[] = [];
+    for (const p of c.spots.slice(0, camp.count)) {
+      if (!p || typeof p !== 'object' || !finiteNum(p.x) || !finiteNum(p.z)) break;
+      spots.push({ x: coord(p.x), z: coord(p.z) });
+    }
+    if (spots.length) camp.spots = spots;
+  }
+  if (finiteNum(c.retiredSlots) && c.retiredSlots >= 1) {
+    camp.retiredSlots = clamp(Math.floor(c.retiredSlots), 1, camp.count);
+  }
+  // An off-stream camp (CampDef.offStream) draws from private sub-streams;
+  // dropping the flag on reload would move every later camp's shared draws.
+  if (c.offStream === true) camp.offStream = true;
   return camp;
 }
 
@@ -1829,6 +1848,26 @@ function fillZoneDefaults(v: unknown): ZoneDef {
   if (!finiteNum(hub.radius)) hub.radius = 20;
   else hub.radius = clamp(hub.radius, 1, 200);
   if (typeof hub.name !== 'string') hub.name = '';
+  // The optional wider town circle (ZoneDef.questHub): sanitized like the hub,
+  // dropped when malformed, so a stored map cannot make the whole map "town".
+  const qh = z.questHub as Record<string, unknown> | undefined;
+  if (qh !== undefined) {
+    if (
+      !qh ||
+      typeof qh !== 'object' ||
+      !finiteNum(qh.x) ||
+      !finiteNum(qh.z) ||
+      !finiteNum(qh.radius)
+    ) {
+      delete z.questHub;
+    } else {
+      z.questHub = {
+        x: coord(qh.x as number),
+        z: coord(qh.z as number),
+        radius: clamp(qh.radius as number, 1, 200),
+      };
+    }
+  }
   const gy = z.graveyard as Record<string, unknown> | undefined;
   if (!gy || !finiteNum(gy.x) || !finiteNum(gy.z)) {
     z.graveyard = { x: hub.x, z: hub.z };

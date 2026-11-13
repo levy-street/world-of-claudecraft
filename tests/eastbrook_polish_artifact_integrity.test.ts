@@ -1438,7 +1438,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // No capture was retaken.
   // Re-minted for v0.45.4 graphics and dungeon loading optimizations in renderer.ts.
   // No capture was retaken.
-  '4f474fa63f385a9500a579234fa54bb0347928db42b34bce32c8b908ea32f6db';
+  // Re-minted for the Studio town rework's (#4593) town fixes in
+  // eastbrook_layout.ts. No capture was retaken.
+  'd6a106e78b1f3f4c1c8816fbc0232baf89a1378de350ae567ea606d8822cf822';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -1496,7 +1498,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // No capture was retaken.
   // Re-minted for v0.45.4 graphics and dungeon loading optimizations in renderer.ts.
   // No capture was retaken.
-  'f79dd14b173b432d7056d797f2184116e645d03474c03ef9d8000cdeb5dd80b9';
+  // Re-minted for the Studio town rework's (#4593) town fixes in
+  // eastbrook_layout.ts. No capture was retaken.
+  '3502fd5be371b7081c5d5cd23f20b2ec153c0501671f0e430cd3fc5e0500711d';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2905,7 +2909,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // release/v0.45.3: recomputed from the swept evidence. No capture was retaken.
       // v0.45.4 graphics and dungeon loading optimizations in renderer.ts:
       // recomputed from the swept evidence. No capture was retaken.
-    ).toBe('cac822feca2db6382e3569357b7b23fab2f038db18acfc98cc07412512475032');
+      // The Studio town rework's (#4593) town fixes in eastbrook_layout.ts:
+      // recomputed from the swept evidence. No capture was retaken.
+    ).toBe('b39a2c953ed08323eb58951347de5a012f39618dc8df82880b230c18d11262d4');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

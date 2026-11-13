@@ -22,7 +22,6 @@ import { BUILTIN_WORLD, PLAYER_START, setActiveWorldContent } from '../src/sim/d
 import { isExcludedDecoration, isExcludedStreetlamp } from '../src/sim/decoration_exclusions';
 import { EASTBROOK_LAYOUT, localToWorld, type Obb2 } from '../src/sim/eastbrook_layout';
 import { HIGHWATCH_LAYOUT } from '../src/sim/highwatch_layout';
-import { PAINTED_TOWNS } from '../src/sim/painted_towns';
 import { PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { Sim } from '../src/sim/sim';
 import {
@@ -97,10 +96,31 @@ function assetIdOf(building: Building): string {
   return building.assetId.replace(/^\/models\//, '').replace(/\.glb$/, '');
 }
 
+// The Studio town rework (#4593) moved the smithy and the quay cottage off the
+// rebuild map's spots: their anchors and turns are the rework map's, pinned
+// here literally; their seat and size are still the rebuild map's.
+const STUDIO_REWORK_MOVES: Record<string, { x: number; z: number; rotY: number }> = {
+  eastbrook_smithy: { x: -5.48, z: -75.12, rotY: 5.044 },
+  eastbrook_quay_cottage: { x: -53.46, z: -47.24, rotY: 1.9548 },
+};
+
 function mapPlacementOf(building: Building): MapPlacement {
   const found = REBUILD_MAP.placements.find((p) => p.assetId === assetIdOf(building));
   if (!found) throw new Error(`the rebuild map places no ${assetIdOf(building)}`);
-  return found;
+  return { ...found, ...STUDIO_REWORK_MOVES[building.id] };
+}
+
+/** The built-in world's terrain edits without the building pads, matched by
+ *  value: the live touch-up carries its own copy of the whole edit list, so the
+ *  pads are no longer the same objects as EASTBROOK_BUILDING_PAD_TERRAIN_EDITS. */
+function editsWithoutBuildingPads() {
+  const key = (edit: object) => JSON.stringify(Object.entries(edit).sort());
+  const pads = new Set(EASTBROOK_BUILDING_PAD_TERRAIN_EDITS.map(key));
+  const edits = BUILTIN_WORLD.terrainEdits ?? [];
+  const kept = edits.filter((edit) => !pads.has(key(edit)));
+  // every pad is in the list, so the filter really removes them
+  expect(edits.length - kept.length).toBe(EASTBROOK_BUILDING_PAD_TERRAIN_EDITS.length);
+  return kept;
 }
 
 /** A world point in the model's own axes (the inverse of localToWorld). */
@@ -257,7 +277,9 @@ describe('the six placed Eastbrook buildings', () => {
       if (!found) throw new Error(`that map places no ${assetId}`);
       return found;
     };
-    for (const building of BUILDINGS) {
+    // The Studio town rework (#4593) moved the smithy and the quay cottage off
+    // that map's spots (STUDIO_REWORK_MOVES, pinned in the test above).
+    for (const building of BUILDINGS.filter((b) => !STUDIO_REWORK_MOVES[b.id])) {
       const placed = theirs(assetIdOf(building));
       const nudge = nudges[building.id] ?? { x: 0, z: 0 };
       expect(building.placement.x - nudge.x, `${building.id} x`).toBeCloseTo(placed.x, 1);
@@ -275,13 +297,15 @@ describe('the six placed Eastbrook buildings', () => {
     const back = toModelAxes(inn, { x: tavern.x, z: tavern.z });
     expect(Math.abs(back.x)).toBeLessThan(0.01);
     expect(back.z).toBeCloseTo(-3.5, 1);
+    // the rework stands the vault a yard up the quay from that map's spot, and
+    // a tenth of a yard further out along its width, clear of the bank's box
     const vault = theirs('tidehold/vault');
     expect(
       Math.hypot(
         EASTBROOK_LAYOUT.weeklyVault.x - vault.x,
         EASTBROOK_LAYOUT.weeklyVault.z - vault.z,
       ),
-    ).toBeCloseTo(0.5, 1);
+    ).toBeCloseTo(0.95, 2);
     expect(EASTBROOK_LAYOUT.weeklyVault.rot).toBeCloseTo(vault.rotY ?? 0, 9);
   });
 
@@ -352,10 +376,14 @@ describe('the six placed Eastbrook buildings', () => {
   });
 
   it('keeps the Weekly Vault where that map stands it', () => {
+    // The Studio town rework (#4593) stands the vault a yard up the quay from
+    // the rebuild map's spot, near the rework map's anchor (-72.98, -102.95):
+    // a tenth of a yard further out along its own width, where its box clears
+    // the bank's. The turn is unchanged.
     const placed = REBUILD_MAP.placements.find((p) => p.assetId === 'tidehold/vault');
     expect(placed).toBeDefined();
-    expect(EASTBROOK_LAYOUT.weeklyVault.x).toBe(placed?.x);
-    expect(EASTBROOK_LAYOUT.weeklyVault.z).toBe(placed?.z);
+    expect(EASTBROOK_LAYOUT.weeklyVault.x).toBe(-73.08);
+    expect(EASTBROOK_LAYOUT.weeklyVault.z).toBe(-102.85);
     expect(EASTBROOK_LAYOUT.weeklyVault.rot).toBe(placed?.rotY);
   });
 
@@ -723,10 +751,10 @@ describe('walking into the walk-in Eastbrook buildings', () => {
 });
 
 describe('the ground under the placed buildings', () => {
-  it('carries the layout level pads, the last edits on their ground, as the rebuild map does', () => {
+  it('carries the layout level pads, then the Highwatch pads, in the live touch-up edit list', () => {
     const pads = EASTBROOK_BUILDING_PAD_TERRAIN_EDITS;
-    // Highwatch's pads come after them in both lists, on the Thornpeak shelf
-    // far to the north, where no Eastbrook pad reaches
+    // Highwatch's pads come after them, on the Thornpeak shelf far to the
+    // north, where no Eastbrook pad reaches
     const highwatchPads = HIGHWATCH_LAYOUT.pads.length;
     for (const pad of HIGHWATCH_LAYOUT.pads) {
       for (const own of pads) {
@@ -735,31 +763,34 @@ describe('the ground under the placed buildings', () => {
         );
       }
     }
-    // Each stamp in the repo file carries the editor's permanent id
-    // (src/editor/map_item_ids.ts); the game never sees it, so compare without.
-    const mapStamps = REBUILD_MAP.terrainEdits.map(({ id: _id, ...stamp }) => stamp);
-    expect(mapStamps.slice(-highwatchPads)).toEqual(HIGHWATCH_LAYOUT.pads);
-    const mapPads = mapStamps.slice(-pads.length - highwatchPads, -highwatchPads);
     // a grid of level stamps under every building (and the vault on the bank's
-    // shelf), copied plain from the layout, and the map carries the same list
+    // shelf), copied plain from the layout
     expect(pads).toEqual(EASTBROOK_LAYOUT.pads.map((pad) => ({ ...pad })));
-    expect(mapPads).toEqual(pads);
     for (const pad of pads) {
       expect(pad.mode).toBe('level');
       expect(pad.falloff).toBe('smooth');
     }
     // the shelf heights: the harbour end at the main street's height, the
-    // chapel on the plat, the rise north of the square a little above it
+    // chapel on the plat, and the rise north of the square where the Studio
+    // town rework (#4593) sculpted it: the quay cottage, the inn and the smithy
     expect([...new Set(pads.map((pad) => pad.delta))].sort((a, b) => a - b)).toEqual([
-      -0.9, -0.7, 0.5,
+      -0.9, -0.7, 1.29, 2.17, 2.54,
     ]);
-    // the built-in world stands the painted towns' pads after Highwatch's
-    // (sim/painted_towns/); the rebuild map carries none of them
-    const paintedPads = PAINTED_TOWNS.flatMap((town) => town.pads).length;
+    // The Studio town rework (#4593) ships its whole terrain edit list through
+    // the live touch-up, which replaces the built-in list (and so the rebuild
+    // map's): it still carries the pads as one block, Highwatch's right after,
+    // but its own later lot stamps now come after both.
     const builtin = BUILTIN_WORLD.terrainEdits ?? [];
-    const edits = builtin.slice(0, builtin.length - paintedPads);
-    expect(edits.slice(-pads.length - highwatchPads, -highwatchPads)).toEqual(pads);
-    expect(edits.slice(-highwatchPads)).toEqual(HIGHWATCH_LAYOUT.pads);
+    const start = builtin.findIndex(
+      (edit) =>
+        JSON.stringify(Object.entries(edit).sort()) ===
+        JSON.stringify(Object.entries(pads[0]).sort()),
+    );
+    expect(start).toBeGreaterThan(0);
+    expect(builtin.slice(start, start + pads.length)).toEqual(pads);
+    expect(builtin.slice(start + pads.length, start + pads.length + highwatchPads)).toEqual(
+      HIGHWATCH_LAYOUT.pads,
+    );
   });
 
   it('is level under each building, across its whole reach', () => {
@@ -786,7 +817,9 @@ describe('the ground under the placed buildings', () => {
 
   it('leaves the quay and the ground a new character first stands on exactly as they were', () => {
     expect(PLAYER_START).toEqual({ x: -94, z: -58 });
-    expect(terrainHeight(PLAYER_START.x, PLAYER_START.z, WORLD_SEED)).toBe(-2);
+    // the Studio town rework (#4593) raised the quay from -2 to 0, and its
+    // native pad (zone1.ts EASTBROOK_QUAY_TERRAIN_EDITS) stands there now
+    expect(terrainHeight(PLAYER_START.x, PLAYER_START.z, WORLD_SEED)).toBeCloseTo(0, 6);
     for (const pad of EASTBROOK_BUILDING_PAD_TERRAIN_EDITS) {
       expect(
         Math.hypot(pad.x - PLAYER_START.x, pad.z - PLAYER_START.z),
@@ -802,11 +835,7 @@ describe('the ground under the placed buildings', () => {
         samples.push({ x, z, y: terrainHeight(x, z, WORLD_SEED) });
       }
     }
-    const pads = new Set<unknown>(EASTBROOK_BUILDING_PAD_TERRAIN_EDITS);
-    setActiveWorldContent({
-      ...BUILTIN_WORLD,
-      terrainEdits: (BUILTIN_WORLD.terrainEdits ?? []).filter((edit) => !pads.has(edit)),
-    });
+    setActiveWorldContent({ ...BUILTIN_WORLD, terrainEdits: editsWithoutBuildingPads() });
     try {
       for (const sample of samples) {
         expect(terrainHeight(sample.x, sample.z, WORLD_SEED), `${sample.x}, ${sample.z}`).toBe(
@@ -831,11 +860,7 @@ describe('the ground under the placed buildings', () => {
       return out;
     };
     const withPads = sample();
-    const pads = new Set<unknown>(EASTBROOK_BUILDING_PAD_TERRAIN_EDITS);
-    setActiveWorldContent({
-      ...BUILTIN_WORLD,
-      terrainEdits: (BUILTIN_WORLD.terrainEdits ?? []).filter((edit) => !pads.has(edit)),
-    });
+    setActiveWorldContent({ ...BUILTIN_WORLD, terrainEdits: editsWithoutBuildingPads() });
     let withoutPads: number[];
     try {
       withoutPads = sample();
@@ -879,11 +904,7 @@ describe('the ground under the placed buildings', () => {
       }
     }
     expect(cells.length).toBeGreaterThan(10000);
-    const pads = new Set<unknown>(EASTBROOK_BUILDING_PAD_TERRAIN_EDITS);
-    setActiveWorldContent({
-      ...BUILTIN_WORLD,
-      terrainEdits: (BUILTIN_WORLD.terrainEdits ?? []).filter((edit) => !pads.has(edit)),
-    });
+    setActiveWorldContent({ ...BUILTIN_WORLD, terrainEdits: editsWithoutBuildingPads() });
     const tooSteep: string[] = [];
     let shaped = 0;
     try {
@@ -914,7 +935,8 @@ describe('the ground under the placed buildings', () => {
       minZ: -150,
       maxZ: -20,
     });
-    expect(scatter.length).toBeGreaterThan(20);
+    // the Studio town rework (#4593) cleared most of the town's scatter
+    expect(scatter.length).toBeGreaterThanOrEqual(10);
     for (const decoration of scatter) {
       for (const building of BUILDINGS) {
         const local = toModelAxes(building, decoration);

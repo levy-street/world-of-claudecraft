@@ -1,3 +1,4 @@
+import { campSpawnedCount } from '../sim/camp_scatter';
 import type { EditorEntity } from './model';
 import type { Vec2 } from './view';
 
@@ -16,9 +17,18 @@ interface RuntimeCamp {
   radius: number;
 }
 
-interface RuntimeCampMatch extends RuntimeCamp {
+interface RuntimeCampMatch extends RuntimeCamp, CampSlots {}
+
+/** The slot shape of a camp the ownership tests read (a CampDef fits). */
+interface CampSlots {
   center: Vec2;
+  radius: number;
   count: number;
+  // A camp's authored spots (CampDef.spots): a pinned mob spawns on its spot,
+  // which may sit outside the camp's radius.
+  spots?: readonly Vec2[];
+  // Trailing slots that spawn nothing (CampDef.retiredSlots).
+  retiredSlots?: number;
 }
 
 interface RuntimeMobMatch {
@@ -40,13 +50,16 @@ export function findRuntimeCampIndex(
   for (let i = 0; i < camps.length; i++) {
     const camp = camps[i];
     if (camp.mobId !== mob.templateId) continue;
-    const spawnDistance = Math.hypot(
-      mob.spawnPos.x - camp.center.x,
-      mob.spawnPos.z - camp.center.z,
-    );
+    const spawnDistance = campSpawnDistance(camp, mob.spawnPos);
+    // an exported one-mob camp also owns its mob where the maker dragged it,
+    // while its one slot is live and scatters (a pinned or retired slot owns
+    // only what campHoldsSpawn grants it)
     const visibleDistance = Math.hypot(mob.pos.x - camp.center.x, mob.pos.z - camp.center.z);
-    const distance = camp.count === 1 ? Math.min(spawnDistance, visibleDistance) : spawnDistance;
-    if (distance <= camp.radius + 1 && distance < bestDistance) {
+    const visibleOwns =
+      camp.count === 1 && liveSlotLayout(camp).scatters && visibleDistance <= camp.radius + 1;
+    const distance = visibleOwns ? Math.min(spawnDistance, visibleDistance) : spawnDistance;
+    const owns = visibleOwns || campHoldsSpawn(camp, mob.spawnPos);
+    if (owns && distance < bestDistance) {
       best = i;
       bestDistance = distance;
     }
@@ -88,15 +101,86 @@ export function splitCampIntoIndividuals<T extends RuntimeCamp & { center: Vec2;
   camp: T,
   positions: readonly Vec2[],
 ): T[] {
+  // The positions are the mobs that actually spawned, so a retired slot has
+  // none; each one-mob camp stands at its own position, never inheriting the
+  // group's pinned spots or retired slots (spots[0] would pin every one to
+  // the same point, and a retired slot would erase it).
+  const {
+    spots: _spots,
+    retiredSlots: _retired,
+    ...rest
+  } = camp as T & {
+    spots?: unknown;
+    retiredSlots?: unknown;
+  };
   return positions.slice(0, camp.count).map(
     (position) =>
       ({
-        ...camp,
+        ...rest,
         center: { x: position.x, z: position.z },
         radius: 0.5,
         count: 1,
-      }) as T,
+      }) as unknown as T,
   );
+}
+
+/** The live slots' pinned spots, and whether any live slot scatters on the disc. */
+function liveSlotLayout(camp: CampSlots): { pins: Vec2[]; scatters: boolean } {
+  const pins: Vec2[] = [];
+  let scatters = false;
+  for (let i = 0; i < campSpawnedCount(camp); i++) {
+    const spot = camp.spots?.[i];
+    if (spot) pins.push(spot);
+    else scatters = true;
+  }
+  return { pins, scatters };
+}
+
+/** A pinned spawn lands exactly on its spot; this is the slack for float drift. */
+const SPOT_HOLD = 0.75;
+
+/** True when a spawn point belongs to the camp: on one of its live pinned
+ *  spots (CampDef.spots, which can sit outside the disc), or inside its
+ *  scatter disc when a live slot still scatters there. A camp whose live
+ *  slots are all pinned owns no disc ground, so another camp's mob standing
+ *  inside its radius is not taken for one of its own. */
+export function campHoldsSpawn(camp: CampSlots, spawn: Vec2): boolean {
+  const { pins, scatters } = liveSlotLayout(camp);
+  if (pins.some((s) => Math.hypot(spawn.x - s.x, spawn.z - s.z) <= SPOT_HOLD)) return true;
+  return (
+    scatters && Math.hypot(spawn.x - camp.center.x, spawn.z - camp.center.z) <= camp.radius + 1
+  );
+}
+
+/** How near a spawn point sits to where the camp spawns: its nearest live
+ *  pinned spot, or the camp centre when a live slot scatters. Ranks the camps
+ *  that hold one spawn, and a camp's own members. */
+export function campSpawnDistance(camp: CampSlots, spawn: Vec2): number {
+  const { pins, scatters } = liveSlotLayout(camp);
+  let best = scatters
+    ? Math.hypot(spawn.x - camp.center.x, spawn.z - camp.center.z)
+    : Number.POSITIVE_INFINITY;
+  for (const s of pins) best = Math.min(best, Math.hypot(spawn.x - s.x, spawn.z - s.z));
+  return best;
+}
+
+/** How many mobs the camp spawns: the members a runtime pick may claim. */
+export const campLiveMemberCount: (camp: CampSlots) => number = campSpawnedCount;
+
+/** Move a camp's center, carrying its pinned spots by the same offset so the
+ *  camp moves as one group. */
+export function setCampCenter(
+  camp: { center: Vec2; spots?: readonly Vec2[] },
+  x: number,
+  z: number,
+): void {
+  const dx = x - camp.center.x;
+  const dz = z - camp.center.z;
+  if (camp.spots && (dx !== 0 || dz !== 0)) {
+    camp.spots = camp.spots.map((s) => ({ x: s.x + dx, z: s.z + dz }));
+  }
+  camp.center.x = x;
+  camp.center.z = z;
 }
 
 export function toggledMobSelection(

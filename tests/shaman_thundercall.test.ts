@@ -14,8 +14,11 @@ function place(sim: Sim, entity: Entity, x: number, z: number): void {
 }
 
 // Default seed re-hunted (2801 to 2802) after the v0.34.0 catch-up merge shifted
-// the shared draw order; a missed Arc Bolt impact banks no charge.
-function setup(seed = 2802): { sim: Sim; shaman: Entity; target: Entity } {
+// the shared draw order; a missed Arc Bolt impact banks no charge. Re-hunted
+// again (2802 to 2805) for the Studio town rework (#4593), whose world content
+// re-rolls the stream so that 2802's single Arc Bolt rolls an Arc Overload,
+// which banks a second charge. Spares on record: 2806, 2807.
+function setup(seed = 2805): { sim: Sim; shaman: Entity; target: Entity } {
   const sim = new Sim({ seed, playerClass: 'shaman', noPlayer: true });
   const pid = sim.addPlayer('shaman', 'Stormbank');
   sim.setPlayerLevel(20, pid);

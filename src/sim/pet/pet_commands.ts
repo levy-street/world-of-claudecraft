@@ -405,6 +405,8 @@ export function completeTame(ctx: SimContext, p: Entity, target: Entity): void {
     facing: target.facing,
     dungeonId: target.dungeonId,
     timer: TAMED_TARGET_RESPAWN_SECONDS,
+    // an off-stream camp's beast (CampDef.offStream) comes back off-stream too
+    ...(target.offStreamRng ? { offStreamRng: true } : {}),
   });
   ctx.clearEntityMarker(target.id);
   ctx.dropEntity(target.id);

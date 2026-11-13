@@ -31,6 +31,33 @@ export interface ZoneContent {
 // Default pick/draw radii (yards) for markers with no inherent world size.
 const POINT_RADIUS = 2;
 
+/**
+ * The hub marker's point. Writes move the hub, and carry the zone's wider
+ * town circle (ZoneDef.questHub) by the same offset, so dragging a town in
+ * the 2D view never leaves its quest and music circle behind.
+ */
+export function hubHandle(zone: {
+  hub: Vec2;
+  questHub?: { x: number; z: number; radius: number };
+}): Vec2 {
+  return {
+    get x() {
+      return zone.hub.x;
+    },
+    set x(v: number) {
+      if (zone.questHub) zone.questHub.x += v - zone.hub.x;
+      zone.hub.x = v;
+    },
+    get z() {
+      return zone.hub.z;
+    },
+    set z(v: number) {
+      if (zone.questHub) zone.questHub.z += v - zone.hub.z;
+      zone.hub.z = v;
+    },
+  };
+}
+
 export function buildEntities(content: ZoneContent): EditorEntity[] {
   const out: EditorEntity[] = [];
   const zoneOf = (p: Vec2) => zoneIdAt(content.zones, p);
@@ -42,7 +69,7 @@ export function buildEntities(content: ZoneContent): EditorEntity[] {
       label: `${z.name} hub (${z.hub.name})`,
       zoneId: z.id,
       radius: z.hub.radius,
-      point: z.hub,
+      point: hubHandle(z),
     });
     out.push({
       key: `graveyard:${z.id}`,

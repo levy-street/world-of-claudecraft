@@ -252,7 +252,7 @@ export const WRAITHWOOD_NPCS: Record<string, NpcDef> = {
     id: 'widow_tansy',
     name: 'Widow Tansy',
     title: 'Candlewright of Gibbetmere',
-    pos: { x: 357, z: 1424 },
+    pos: { x: 358.05, z: 1416.78 },
     facing: 0.7,
     color: 0xb8a2c8,
     questIds: ['q_ww_widows_skeins', 'q_ww_candles_at_the_bounds'],

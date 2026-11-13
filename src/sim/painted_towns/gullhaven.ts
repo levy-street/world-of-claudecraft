@@ -24,7 +24,6 @@ const LOOK = 'brick' as const;
 // The models face local -Z (rotation 0 turns the door south, -z; PI north,
 // +z; PI / 2 east, -x: this world's east is -x).
 const SOUTH_FACING = 0;
-const NORTH_FACING = Math.PI;
 const EAST_FACING = Math.PI / 2;
 
 // The muster hall (tavern, 1.2: the door clears 5.3): the square's north side,
@@ -63,14 +62,15 @@ const WATCH_HOUSE = paintedTownBuilding({
   kind: 'house',
   model: 'house_a',
   look: LOOK,
-  anchor: { x: 304.54, z: 43.91 },
-  rotation: NORTH_FACING,
+  anchor: { x: 304.28, z: 50.18 }, // Studio town rework (#4593): nudged off the road band
+  rotation: 3.1416, // Studio town rework (#4593)
   scale: 1.4,
 });
 
 const NPCS = [
   // the field surgeon at the menders' hall door, looking out at the square
-  makeTownNpc('mender_saul', CHAPEL.frontStandingPoint, CHAPEL.frontFacing, CHAPEL.id),
+  // Studio town rework stand (#4593)
+  makeTownNpc('mender_saul', { x: 319.21, z: 65.65 }, CHAPEL.frontFacing, CHAPEL.id),
 ] as const;
 
 // Level pads: each building on level ground across its whole reach, eased out

@@ -15,7 +15,6 @@ import {
   HUB_SPARRING_MASTER_ID,
   HUB_SPARRING_MASTER_POS,
   HUB_TRAINING_DUMMY_ID,
-  HUB_TRAINING_DUMMY_POS,
 } from '../src/sim/content/practice_dummies';
 import { BUILTIN_WORLD, MOBS, NPCS, QUEST_ORDER, QUESTS } from '../src/sim/data';
 import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
@@ -29,6 +28,7 @@ import {
 import { startingAttackFor } from '../src/sim/tutorial/starting_attack';
 import type { Entity, QuestProgress } from '../src/sim/types';
 import { groundHeight, waterLevelAt } from '../src/sim/world';
+import { HUB_TRAINING_DUMMY_MARK } from './helpers/hub_yard';
 
 const SEED = 42;
 
@@ -106,17 +106,30 @@ describe('Drillmaster Hale stands beside the hub dummy', () => {
     const dz = start.z - hale.pos.z;
     const approachDot =
       (Math.sin(hale.facing) * dx + Math.cos(hale.facing) * dz) / Math.hypot(dx, dz);
-    expect(approachDot).toBeGreaterThan(0.95);
+    // The Studio town rework (#4593) moved him to the Sableweb practice
+    // ground; he stands in front of the two dummies there, turned straight to
+    // the player start 52 yards south, so the dummies stand behind him.
+    expect(hale.facing).toBeCloseTo(-2.78823, 5);
+    expect(approachDot).toBeGreaterThan(0.9);
     expect(hale.prevFacing).toBe(hale.facing);
   });
 
-  it('on his authored mark, on dry ground, within a few yards of the dummy', () => {
+  it('within a few yards of the dummy', () => {
+    const { x, z } = HUB_SPARRING_MASTER_POS;
+    // Where the world actually stands the dummy (the touch-up's object move,
+    // not the content constant HUB_TRAINING_DUMMY_POS).
+    const toDummy = Math.hypot(x - HUB_TRAINING_DUMMY_MARK.x, z - HUB_TRAINING_DUMMY_MARK.z);
+    expect(toDummy).toBeGreaterThan(3); // not on top of it
+    expect(toDummy).toBeLessThan(8); // "the post behind me" is true
+  });
+
+  it('on his authored mark, on dry ground, clear of every neighbour', () => {
+    // The Studio town rework (#4593) mark, as a literal: in front of the
+    // dummies, on the town side (the map stood him 18 to 24 yd west of them).
+    expect(HUB_SPARRING_MASTER_POS).toEqual({ x: -75.96, z: -9.09 });
     const { x, z } = HUB_SPARRING_MASTER_POS;
     expect(isBlocked(SEED, x, z, 0.5)).toBe(false);
     expect(groundHeight(x, z, SEED)).toBeGreaterThan(waterLevelAt(x, z, SEED));
-    const toDummy = Math.hypot(x - HUB_TRAINING_DUMMY_POS.x, z - HUB_TRAINING_DUMMY_POS.z);
-    expect(toDummy).toBeGreaterThan(3); // not on top of it
-    expect(toDummy).toBeLessThan(8); // "the post behind me" is true
     // The FULL built-in world: the placement claims clearance from the quay's
     // other NPCs and props, and findSafePos must leave him where authored.
     const sim = new Sim({ seed: SEED, playerClass: 'warrior', world: BUILTIN_WORLD });
@@ -124,8 +137,8 @@ describe('Drillmaster Hale stands beside the hub dummy', () => {
       (e) => e.kind === 'npc' && e.templateId === HUB_SPARRING_MASTER_ID,
     );
     expect(hale).toBeTruthy();
-    expect(Math.round(hale!.pos.x)).toBe(x);
-    expect(Math.round(hale!.pos.z)).toBe(z);
+    expect(hale!.pos.x).toBeCloseTo(x, 6);
+    expect(hale!.pos.z).toBeCloseTo(z, 6);
     for (const e of sim.entities.values()) {
       if (e.id === hale!.id || e.id === sim.player.id) continue;
       expect(Math.hypot(e.pos.x - hale!.pos.x, e.pos.z - hale!.pos.z)).toBeGreaterThan(2.5);

@@ -347,7 +347,8 @@ export const GOURDLIGHT_KEEPER_POSTS: readonly GourdlightKeeperPost[] = Object.f
     id: 'highwatch',
     zoneId: 'thornpeak_heights',
     entityId: GOURDLIGHT_KEEPER_HIGHWATCH_ENTITY_ID,
-    pos: { x: -8.47, z: 656.05 },
+    // Studio town rework (#4593): a yard west, so both lit pumpkins fit
+    pos: { x: -9.47, z: 656.05 },
     facing: Math.PI / 2,
   },
 ]);

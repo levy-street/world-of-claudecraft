@@ -23,6 +23,7 @@
 
 import { supportHeightAt } from '../../src/sim/colliders';
 import { CORPSE_DURATION } from '../../src/sim/combat/damage';
+import { farmBedById } from '../../src/sim/content/farm_patches';
 import {
   arenaOrigin,
   DELVES,
@@ -66,6 +67,7 @@ import {
 import { NYTHRAXIS_GRAVE_ERUPTION_TELEGRAPH_SECONDS } from '../../src/sim/nythraxis_grave_eruption';
 import { PLAYER_BODY_RADIUS } from '../../src/sim/pathfind';
 import type { PlotState } from '../../src/sim/professions/farm_projection';
+import { isFarmerNpcEntity } from '../../src/sim/professions/farmer_npcs';
 import { convertHusks, harvestCrop, plantCrop } from '../../src/sim/professions/farming';
 
 // The 41-tick window the farming session used to spend riding out the plant
@@ -195,8 +197,13 @@ function requireEntity(sim: AnySim, id: number, context: string): AnyEntity {
 // belonged) and no assertion watched. Deriving the position still moves the
 // golden when content moves, since position is sampled, and that is the gate
 // doing its job; what it buys is that the HARVEST stays a harvest.
+//
+// The node is resolved through the sim's own object moves (the same lookup
+// harvestNode gates on), because a Studio map may move a node without touching
+// its content row: the Studio town rework (#4593) moved wood_eastbrook_1 from
+// its row's (-62, 8) to about (-22.4, 68.0) that way.
 function standOnNode(sim: AnySim, e: AnyEntity, nodeId: string): void {
-  const node = gatherNodeById(nodeId);
+  const node = gatherNodeById(nodeId, sim.ctx.objectMoves);
   if (!node) throw new Error(`parity scenario: no gather node ${nodeId}`);
   teleport(sim, e, node.pos.x, node.pos.z);
 }
@@ -5311,7 +5318,7 @@ function professionsGather(seed = 1): Scenario {
       // proficiency ceiling (zero common weight), so the rolled tier plus the
       // signed-or-fungible grant shape land in the state sample.
       meta.gatheringProficiency.logging = 100;
-      teleport(sim, p, -62, 8); // wood_eastbrook_1
+      standOnNode(sim, p, 'wood_eastbrook_1'); // derived: #4593 moved it off (-62, 8)
       sim.harvestNode('wood_eastbrook_1', undefined, pid);
       rec.tick(castTicks);
       rec.snapshot('harvest-wood-max-proficiency');
@@ -6000,16 +6007,27 @@ export const FARM_GOLDEN_WIN_YIELD_SEED = 7;
 export const FARM_GOLDEN_PADDING_CYCLES = 36;
 
 function professionsFarmingSession(seed = 1): Scenario {
-  // The two northern beds of the Eastbrook allotments (content/farm_patches.ts
-  // bed_eastbrook_1 at 16,30 and bed_eastbrook_2 at 21,30). Beds sit on a 5
-  // yard pitch, which is INTERACT_RANGE, so the midpoint below is 2.5yd from
-  // each and one stand point reaches both: no teleport between the plants, and
-  // none between the harvests. The Phase 5 extension (deviation (z)) then
-  // moves to the Thornpeak patch (content/farm_patches.ts bed_thornpeak_1 at
-  // -23,685) for the tier-3 seed-back beat.
+  // Two neighbouring beds of the Eastbrook allotments (content/farm_patches.ts
+  // bed_eastbrook_1 and bed_eastbrook_2). Beds sit on a 5 yard pitch, which is
+  // INTERACT_RANGE, so their midpoint is 2.5yd from each and one stand point
+  // reaches both: no teleport between the plants, and none between the
+  // harvests. The Phase 5 extension (deviation (z)) then moves to the Thornpeak
+  // patch (bed_thornpeak_1) for the tier-3 seed-back beat. Stand points are read
+  // from the bed table, so a patch move (the Studio town rework, #4593, moved
+  // both) carries the scenario with it.
   const BED_READY = 'bed_eastbrook_1';
   const BED_WITHERED = 'bed_eastbrook_2';
   const BED_T3 = 'bed_thornpeak_1';
+  const bedAt = (id: string): { x: number; z: number } => {
+    const bed = farmBedById(id);
+    if (!bed) throw new Error(`farming_session: no bed ${id}`);
+    return bed;
+  };
+  const PAIR_MID = {
+    x: (bedAt(BED_READY).x + bedAt(BED_WITHERED).x) / 2,
+    z: (bedAt(BED_READY).z + bedAt(BED_WITHERED).z) / 2,
+  };
+  const T3_STAND = bedAt(BED_T3);
   const CROP = 'vale_wheat';
   return {
     name: 'farming_session',
@@ -6062,11 +6080,8 @@ function professionsFarmingSession(seed = 1): Scenario {
       sim.addItem('vale_wheat_seed', 2, pid);
       // The step-12 hoe gate: plantCrop now refuses without a wieldable hoe.
       sim.addItem('garden_hoe', 1, pid);
-      // Midway between bed_eastbrook_1 (-24, -84) and bed_eastbrook_2 (-19, -84),
-      // both in reach. The patch moved from the north lane (beds at z 30) to the
-      // rebuilt town's north-east edge at the release/v0.41.0 merge, when the
-      // second wolf run landed on the old site.
-      teleport(sim, p, -21.5, -84);
+      // Midway between bed_eastbrook_1 and bed_eastbrook_2, both in reach.
+      teleport(sim, p, PAIR_MID.x, PAIR_MID.z);
 
       // Plant one: the first two draws of the session.
       plantCrop(sim.ctx, p, meta, BED_READY, CROP);
@@ -6148,6 +6163,17 @@ function professionsFarmingSession(seed = 1): Scenario {
 
       // HUSK CONVERSION: the withered beat above paid exactly 2 husks, one
       // batch, so this trades them into exactly one compost. Zero draws.
+      // The trade needs a farmer in reach (farmer_npcs.ts nearFarmerNpc), so
+      // the drive stands on the live Eastbrook farmer, read from the roster
+      // rather than a literal: the pair midpoint used to be in reach of her,
+      // but the Studio town rework (#4593) moved the allotment and her apart
+      // (about 10.7 yd, past FARMER_TRADE_RANGE), which turned this beat into
+      // a quiet no_farmer denial.
+      const farmer = [...(sim.entities as Map<number, AnyEntity>).values()].find(
+        (e) => isFarmerNpcEntity(e) && e.templateId === 'farmer_jessica',
+      );
+      if (!farmer) throw new Error('farming_session: no live farmer_jessica');
+      teleport(sim, p, farmer.pos.x, farmer.pos.z);
       convertHusks(sim.ctx, p, meta);
       rec.snapshot('husks-converted');
 
@@ -6156,7 +6182,7 @@ function professionsFarmingSession(seed = 1): Scenario {
       // also drains the toniced harvest's queued gain BEFORE the proficiency
       // write below, so the write is the last word.
       rec.tick(FARM_PLANT_WINDOW_TICKS);
-      teleport(sim, p, -23, 685); // bed_thornpeak_1 (content/farm_patches.ts)
+      teleport(sim, p, T3_STAND.x, T3_STAND.z); // bed_thornpeak_1
       meta.gatheringProficiency.farming = 75;
       sim.addItem('skysilver_hoe', 1, pid);
       sim.addItem('highland_barley_seed', 1, pid);
@@ -6184,7 +6210,7 @@ function professionsFarmingSession(seed = 1): Scenario {
       // fact: a draw or a repeat here moves the event digest and nothing
       // else in the suite would see it. ----
       sim.addItem('vale_wheat_seed', 1, pid);
-      teleport(sim, p, -21.5, -84); // back to the freed Eastbrook bed (the pair's midpoint)
+      teleport(sim, p, PAIR_MID.x, PAIR_MID.z); // back to the freed Eastbrook bed (the pair's midpoint)
       // Ride out the t3 plant's flavor cast remainder (its harvest landed
       // mid-cast and tick(8) covers only 0.4 sec), or this plant denies busy.
       rec.tick(FARM_PLANT_WINDOW_TICKS);
@@ -6286,7 +6312,7 @@ function professionsFarmingSession(seed = 1): Scenario {
       padFinal.survivalRoll = 0.99;
       harvestCrop(sim.ctx, p, meta, BED_WITHERED);
       meta.gatheringProficiency.farming = 75; // restore for the tier-3 beat
-      teleport(sim, p, -23, 685); // bed_thornpeak_1 (content/farm_patches.ts)
+      teleport(sim, p, T3_STAND.x, T3_STAND.z); // bed_thornpeak_1
       sim.addItem('highland_barley_seed', 1, pid);
       rec.tick(FARM_PLANT_WINDOW_TICKS);
       plantCrop(sim.ctx, p, meta, BED_T3, 'highland_barley');
@@ -6840,10 +6866,14 @@ function catFormAutoSwing(): Scenario {
 // the fixture way (hand-killed trash, hand-solved puzzle), then the descent is
 // walked through the real trigger; the boss floor kill lets the tick pre-pass
 // stamp the death and the sweep pay the clear. Dev entry (no portal) wins the
-// claim by design, so the payout runs without race scaffolding. Seed 4332 is
+// claim by design, so the payout runs without race scaffolding. Seed 4349 is
 // chosen so the 8% pattern roll (draw 6) SUCCEEDS in-window: the golden pins
 // not only every chance() position but the rng.int pick over the sorted
-// RIFT_PATTERN_ITEM_IDS (pattern_forgefold_legguards on this seed). The boss is
+// RIFT_PATTERN_ITEM_IDS (pattern_sunspun_leggings on this seed). It was 4332
+// until the Studio town rework (#4593): the reworked open-world roster ticks
+// during the run and spend the shared stream differently, so 4332's draw 6
+// became a miss and the seed was re-hunted (the first in-window hit at or after
+// 4332; the rift itself and the ctor stream are unchanged). The boss is
 // tracked, so the corpse loot (guaranteed heroic epic + the pattern + the
 // A-rank coin bonus) is in the state digest, not just the draw digest.
 //
@@ -6857,14 +6887,14 @@ function catFormAutoSwing(): Scenario {
 //
 // baseLevel picks the rank through the shipped inverse map
 // (RIFT_RANK_BASE_LEVEL: C 20, B 22, A 25, S 28), so the ranks here are derived
-// from content rather than restated. The A row keeps the original scenario NAME
-// and its original SEED, so its committed golden does not move for the rename.
-// Each rank carries its OWN seed because the pattern draw is a 0.08 chance and
-// a golden that pins the rng.int pick position is worth far more than one that
-// records a miss: the B and S seeds were hunted for an in-window pattern hit
+// from content rather than restated. The A row keeps the original scenario NAME,
+// so its committed golden keeps its file. Each rank carries its OWN seed
+// because the pattern draw is a 0.08 chance and a golden that pins the
+// rng.int pick position is worth far more than one that records a miss: the
+// B and S seeds were hunted for an in-window pattern hit
 // (about 1 in 12 seeds). C needs no hunt because its arm RETURNS after draw 0
 // and never reaches the pattern roll at all.
-function riftClearRewards(baseLevel = 25, seed = 4332): Scenario {
+function riftClearRewards(baseLevel = 25, seed = 4349): Scenario {
   const rank = riftRankForBaseLevel(baseLevel);
   // Per-rank coverage: what each rank's arm actually reaches in the numbered
   // ladder, so a reader can see the four rows tile it between them.
@@ -8087,14 +8117,17 @@ export const SCENARIOS: Scenario[] = [
   riftClearRewards(),
   // The three sibling ranks (masterwrought Phase 11f, closing the residual the
   // A row used to record). Seeds: C keeps 4332 because its arm returns after
-  // draw 0 and has no chance() to land in-window; B 4353 and S 4333 were HUNTED
+  // draw 0 and has no chance() to land in-window; B 4355 and S 4349 were HUNTED
   // for an in-window pattern hit on draw 6, so all three of the ranks that
   // reach that draw pin the rng.int pick position rather than recording a miss.
-  // The hunt measured 3 B hits and 4 S hits in 40 consecutive seeds, which is
-  // the 0.08 rate showing up where it should.
+  // The Studio town rework (#4593) re-hunted them (and A) from the old 4353 and
+  // 4333, whose draw 6 became a miss once the reworked open-world roster spent
+  // the shared stream differently during the run: each new seed is the first
+  // in-window hit at or after the old one. Over seeds 4330 to 4373 the re-hunt
+  // saw 4 B hits and 4 S hits, about the 0.08 rate, as it should be.
   riftClearRewards(20, 4332),
-  riftClearRewards(22, 4353),
-  riftClearRewards(28, 4333),
+  riftClearRewards(22, 4355),
+  riftClearRewards(28, 4349),
   // The heroic claim on the raid boss (masterwrought Phase 11f, closing the
   // sibling residual the base table's own append comment records). Appended
   // last, so it lands in the final shard automatically like every other
