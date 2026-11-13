@@ -116,6 +116,11 @@ export function abilityDamageBonus(
       // directHitBonus(..., aoe) into the zone's spBonus at cast time (Spore
       // Burst's damage half snapshots the same rider).
       return directHitBonus(power, def, res.castTime, true, out.damage);
+    case 'frozenOrb':
+      // Frostglobe's pulses snapshot directHitBonus(..., aoe) at release with
+      // NO talent multiplier argument (effect_dispatch.ts 'frozenOrb' ->
+      // spawnFrozenOrb), so the tooltip mirrors that exactly.
+      return directHitBonus(power, def, res.castTime, true);
     case 'valkyrsCalling':
       // The delayed landing owns its authored range in the movement system.
       return 0;
@@ -291,6 +296,7 @@ export function abilityPrimaryEffect(res: ResolvedAbility): AbilityEffect | unde
       eff.type === 'aoeRoot' ||
       eff.type === 'chainDamage' ||
       eff.type === 'groundAoE' ||
+      eff.type === 'frozenOrb' ||
       eff.type === 'valkyrsCalling' ||
       (eff.type === 'repositionToAim' && eff.landingAoe !== undefined) ||
       eff.type === 'consumeAura' ||
@@ -336,6 +342,10 @@ export function abilityBuffValue(res: ResolvedAbility): number | null {
     // harvestPct as a whole percent, so the Grovespring 4pc's 75 shows live
     // for wearers the same way a talent-upgraded value would (base 60).
     if (eff.type === 'druidOverbloom') return Math.round(eff.harvestPct * 100);
+    // Hard Bargain's mana half, Blood Credit included (applyTalentMods).
+    if (eff.type === 'lifeTap') return eff.mana;
+    // Cruel Pact's max-mana percent, Blood Credit included.
+    if (eff.type === 'afflictionCruelPact') return Math.round(eff.manaPctMax * 10000) / 100;
     if (eff.type === 'selfBuff' || eff.type === 'buffTarget') {
       // form_fireball carries a 1+fraction speed multiplier; the tooltip's $b%
       // wants the whole-percent bonus (1.4 -> 40).

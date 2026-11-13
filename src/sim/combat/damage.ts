@@ -170,6 +170,7 @@ import {
   priestOnVigilTriggered,
 } from './priest/talents';
 import { duskhymnChannelStopped, vespersEchoDamage, vespersOnEntityDeath } from './priest/vespers';
+import { baselinePushbackImmune } from './pushback_baseline';
 import { questGateBlocksDamage } from './quest_damage_gate';
 import { foulPlayGuardsBreak } from './rogue_talents';
 import { onHarvestDeath, tetherRedirect } from './sanctum_trinkets';
@@ -200,8 +201,7 @@ const BLOODBATH_MAX_STACKS = 5;
 // same flat ability record as casting/tooltips; mobs fall back to authored defs.
 function ignoresDamagePushback(ctx: SimContext, target: Entity, abilityId: string): boolean {
   return (
-    abilityId === 'ghost_wolf' ||
-    ABILITIES[abilityId]?.uninterruptible === true ||
+    baselinePushbackImmune(ABILITIES[abilityId] ?? { id: abilityId }) ||
     ctx.resolvedAbility(abilityId, target.id)?.damagePushbackImmune === true ||
     (abilityId === 'drain_life' && hasAfflictionConsumePushbackImmunity(target))
   );

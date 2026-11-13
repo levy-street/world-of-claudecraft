@@ -1813,6 +1813,24 @@ export const pl_PL: EnTranslations = {
       "ascensionLastAnnouncement": "Wzniesienie: ostatni ładunek",
       "ascensionSpenderAria": "Slot akcji {slot}: {ability}. Zużywa jeden ładunek Wzniesienia."
     },
+    "abilityTooltipDetail": {
+      "hint": "Przytrzymaj Shift, aby zobaczyć szczegóły",
+      "school": "Szkoła: {school}",
+      "scaling": "Zawiera +{bonus} z twojej statystyki: {stat} ({value})",
+      "stat": {
+        "spellPower": "Moc zaklęć",
+        "healPower": "Moc leczenia",
+        "attackPower": "Moc ataku",
+        "rangedPower": "Moc ataku dystansowego"
+      },
+      "ticks": "{ticks} tyknięć, jedno co {interval} s w ciągu {duration} s",
+      "radius": "Promień: {radius} m",
+      "charges": "Ładunki: {charges}",
+      "castWhileMoving": "Można rzucać w ruchu",
+      "pushbackImmune": "Otrzymywanie obrażeń nie opóźnia tego rzucania",
+      "threatMult": "Modyfikator zagrożenia umiejętności: {percent}%",
+      "threatFlat": "Dodatkowe zagrożenie: +{threat}"
+    },
     "abilityScaling": {
       "bonus": "(+{value})"
     },
@@ -17498,11 +17516,11 @@ export const pl_PL: EnTranslations = {
       },
       "flamestrike": {
         "name": "Ognista nawała",
-        "description": "Sprowadza wybuch płomieni na wybrany obszar, zadając {damage} obrażeń od ognia wrogom w zasięgu eksplozji."
+        "description": "Sprowadza wybuch płomieni na wybrany obszar, zadając {damage} obrażeń od ognia każdemu wrogowi w zasięgu eksplozji. Jeden rzut na trafienie krytyczne obejmuje cały wybuch: albo każdy wróg otrzymuje trafienie krytyczne, albo żaden."
       },
       "rain_of_fire": {
         "name": "Deszcz ognia",
-        "description": "Wydaje 3 Spustoszenia, by spuścić na obszar celu deszcz ognia zadający {damage} obrażeń od ognia co sekundę przez 4 s, wydłużone do 6 s na randze 2. Ruina sprowadza pierwszą falę natychmiast."
+        "description": "Wydaje 3 Spustoszenia, by spuścić na obszar celu deszcz ognia zadający wrogom wewnątrz {damage} obrażeń od ognia co sekundę przez {duration} s. Ruina sprowadza pierwszą falę natychmiast."
       },
       "volley": {
         "name": "Salwa",
@@ -17510,19 +17528,19 @@ export const pl_PL: EnTranslations = {
       },
       "phosphor_flask": {
         "name": "Fosforowa Kolba",
-        "description": "Zapieczętowane naczynie z reaktywną mieszanką chemiczną, która przez 3 s wybucha białym, rozżarzonym płomieniem na obszarze 8 m. Wrogowie stojący w płomieniach otrzymują {damage} obrażeń od ognia co 0,5 s. Obrażenia rosną z mocą ataku dystansowego."
+        "description": "Rzuć kolbę, która wybucha płomieniem na obszarze 8 m na 3 s. Wrogowie stojący w płomieniach otrzymują {damage} obrażeń od ognia co 0,5 s. Obrażenia rosną z mocą ataku dystansowego."
       },
       "pack_command": {
         "name": "Rozkaz Sfory",
-        "description": "Rozkazuje twojemu żywemu towarzyszowi uderzyć za 36 do 48 obrażeń Fizycznych. Obrażenia rosną wraz z mocą ataku towarzysza. Trafienie odnawia 20 skupienia i przyznaje 1 Zaciekłość Sfory na 30 s, do 3. Każdy ładunek zwiększa wszystkie obrażenia twojego towarzysza o 10%. To uderzenie korzysta z ładunków sprzed trafienia."
+        "description": "Rozkazuje twojemu żywemu towarzyszowi uderzyć za 36 do 48 obrażeń Fizycznych. Obrażenia rosną wraz z mocą ataku towarzysza. Trafienie odnawia 20 skupienia i przyznaje 1 Zaciekłość Sfory na 30 s, do 3. Każdy ładunek zwiększa wszystkie obrażenia twojego towarzysza o 10%. To uderzenie korzysta z ładunków sprzed trafienia. Przy 3 ładunkach ten przycisk zmienia się w Spuść Bestię. Nie można go użyć podczas Rozpętanego Szału."
       },
       "stampede": {
         "name": "Tratowanie",
-        "description": "Przyzywa 3 bestie na 12 s. Każda atakuje co 2 s za {damage} obrażeń Fizycznych. Pokazane obrażenia zawierają 8% twojej mocy ataku dystansowego przed premiami do obrażeń towarzysza. Bestie utrwalają Zaciekłość Sfory przy przyzwaniu, zyskując 10% obrażeń za ładunek. Gdy Tratowanie jest w odnowieniu, udane Rozkazy Sfory mają 20% szans je zresetować, gwarantowane po 5 nieudanych szansach. Nie może się zresetować, gdy bestie są aktywne. (Władca Sfory)"
+        "description": "Przyzywa 3 bestie na 12 s. Każda atakuje co 2 s za {damage} obrażeń Fizycznych. Pokazane obrażenia zawierają 8% twojej mocy ataku dystansowego przed premiami do obrażeń towarzysza. Bestie utrwalają Zaciekłość Sfory przy przyzwaniu, zyskując 10% obrażeń za ładunek. Gdy Tratowanie jest w odnowieniu, udane Rozkazy Sfory mają 20% szans je zresetować, gwarantowane przy 5. szansie. Nie może się zresetować, gdy bestie są aktywne. (Władanie bestiami)"
       },
       "unleash_beast": {
         "name": "Spuść Bestię",
-        "description": "Zużywa 3 Zaciekłości Sfory po tym, jak twój towarzysz uderzy za 83 do 105 obrażeń Fizycznych i wstrząśnie każdym wrogiem w promieniu 6 metrów za 26 do 34. Uderzenie i wstrząs korzystają z pełnej 30% premii do obrażeń towarzysza z Zaciekłości Sfory i rosną wraz z mocą ataku towarzysza. Przez kolejne 8 s towarzysz zadaje o 25% więcej obrażeń, atakuje o 35% szybciej i sprawia, że Plugawy strzał trafia do 2 pobliskich wrogów."
+        "description": "Twój towarzysz uderza cel za 42 do 53 obrażeń Fizycznych, po czym klaszcze w każdego wroga w promieniu 6 m od towarzysza za 57 do 75. Klaśnięcie zadaje o 50% więcej obrażeń wrogom innym niż główny cel. Uderzenie i klaśnięcie korzystają z pełnej 30% premii do obrażeń towarzysza z Zaciekłości Sfory, rosną wraz z mocą ataku towarzysza, a następnie zużywają wszystkie 3 ładunki Zaciekłości Sfory. Przez kolejne 8 s (Rozpętany Szał) towarzysz zadaje o 25% więcej obrażeń i atakuje o 35% szybciej, każdy Plugawy strzał sprawia, że rani on do 2 innych wrogów w promieniu 5 m od celu za 12 do 18 obrażeń Fizycznych, a ty nie możesz używać Rozkazu Sfory."
       },
       "measured_shot": {
         "name": "Wyważony Strzał",
@@ -17530,7 +17548,7 @@ export const pl_PL: EnTranslations = {
       },
       "cold_focus": {
         "name": "Zimne Skupienie",
-        "description": "Przez 12 s Wyważony Strzał odnawia o 50% więcej skupienia, a Długie Naciągnięcie kosztuje o 25% mniej i rzuca się o 30% szybciej. (Sygnatura Zimnego Wzroku)"
+        "description": "Przez 12 s Wyważony Strzał odnawia 30 skupienia, a Długie Naciągnięcie kosztuje o 25% mniej i rzuca się o 30% szybciej. (Sygnatura Strzelectwa)"
       },
       "bloodhook": {
         "name": "Krwawy Hak",
@@ -17542,11 +17560,11 @@ export const pl_PL: EnTranslations = {
       },
       "bloodtrail_assault": {
         "name": "Szturm Krwawego Tropu",
-        "description": "Przez 12 s Krwawy Hak rozprzestrzenia ranę o 60% sile na najwyżej 2 wrogów w promieniu 5 metrów, Rozdarcie ran nakazuje atak zwierzaka za 18 obrażeń, a Ładunek Odłamkowy sięga o 2 metry dalej, zadaje głównemu celowi o 25% więcej bazowych obrażeń i wywołuje o 50% więcej obrażeń rany. Bez żywego zwierzaka twoje Skupienie odnawia się też o 100% szybciej."
+        "description": "Przez 12 s Krwawy Hak nakłada też Ranę Krwawego Haka o 60% siły na najwyżej 2 innych wrogów w promieniu 5 m od swojego celu, Rozdarcie ran sprawia, że twój żywy towarzysz zadaje celowi 18 obrażeń Fizycznych, a Ładunek Odłamkowy sięga o 2 m dalej, zadaje głównemu celowi o 25% więcej bazowych obrażeń, a jego natychmiastowe tyknięcie rany zadaje o 50% więcej. Dopóki nie masz żywego towarzysza, twoje skupienie regeneruje się też o 100% szybciej."
       },
       "trailbreak": {
         "name": "Zerwanie Tropu",
-        "description": "Skacz 25 metrów w tył i uwolnij się od unieruchomień oraz spowolnień ruchu. Jeśli masz Rozpęd Łowów, zostaje odnowiony i przygotowuje Powrót na 12 s."
+        "description": "Skacz 25 m do tyłu i uwolnij się od unieruchomień oraz spowolnień ruchu. Lądowanie daje 50% prędkości ruchu na 3 s. Jeśli masz Rozpęd Łowów, zyskujesz na 12 s Zbrojny Powrót: twoje następne Patroszące uderzenie lub Krwawy Hak zadaje dodatkowe obrażenia zależne od liczby ładunków Rozpędu."
       },
       "wildheart": {
         "name": "Dzikie Serce",
@@ -17554,7 +17572,7 @@ export const pl_PL: EnTranslations = {
       },
       "shellskin": {
         "name": "Pancerna Skóra",
-        "description": "Zmniejsza otrzymywane obrażenia o 60% na 8 s, ale uniemożliwia atakowanie, gdy jest aktywna."
+        "description": "Zmniejsza otrzymywane obrażenia o 60% na 8 s. Gdy działa, nie możesz używać umiejętności, które celują we wrogów lub ich ranią, w tym pułapek, ale twoje ataki automatyczne trwają nadal."
       },
       "play_dead": {
         "name": "Udawanie martwego",
@@ -17562,11 +17580,11 @@ export const pl_PL: EnTranslations = {
       },
       "tactical_camo": {
         "name": "Kamuflaż taktyczny",
-        "description": "Wtop się w otoczenie: wrogowie ledwo cię zauważają, a ty poruszasz się z prędkością 80%. Atak lub otrzymanie obrażeń przerywa Kamuflaż taktyczny. Użyj ponownie, aby się ujawnić. (Sztuka przetrwania)"
+        "description": "Wejdź w ukrycie i poruszaj się z prędkością 80%. Potwory zauważają cię tylko z bliska (jedna czwarta ich normalnego zasięgu agresji, więcej, jeśli mają wyższy poziom od ciebie), a wrodzy gracze i zwierzęta nie mogą cię zobaczyć. Atak lub otrzymanie obrażeń przerywa Kamuflaż taktyczny. Użyj ponownie, aby się ujawnić. (Sztuka przetrwania)"
       },
       "frostjaw_trap": {
         "name": "Pułapka Mroźnej Paszczy",
-        "description": "Umieszcza pułapkę w wybranym miejscu. Uzbraja się po 0,75 s, trwa 1 minutę i widzisz ją tylko ty i twoja drużyna. Pierwszy wróg, który ją wyzwoli, zostaje unieruchomiony na 3 s, a wrogowie w promieniu 4 metrów spowolnieni o 50% na 4 s."
+        "description": "Umieszcza pułapkę w wybranym miejscu. Uzbraja się po 0,75 s, trwa 1 minutę i widzisz ją tylko ty i twoja drużyna. Pierwszy wróg, który ją wyzwoli, zostaje unieruchomiony na 3 s, a wrogowie w promieniu 4 m zostają spowolnieni o 50% na 4 s. Jednocześnie może być aktywna tylko jedna Pułapka Mroźnej Paszczy. Postawienie kolejnej zastępuje poprzednią."
       },
       "bear_trap": {
         "name": "Pułapka na Niedźwiedzie",
@@ -17590,7 +17608,7 @@ export const pl_PL: EnTranslations = {
       },
       "heroic_strike": {
         "name": "Cios łupieżcy",
-        "description": "Potężny atak, który zwiększa obrażenia w zwarciu o {damage}. Aktywuje się przy następnym uderzeniu."
+        "description": "Twoje następne uderzenie w zwarciu zadaje dodatkowe {damage} obrażeń. Wściekłość jest zużywana przy tym uderzeniu; bez wystarczającej ilości wściekłości pozostaje zwykłym uderzeniem."
       },
       "battle_shout": {
         "name": "Żelazny ryk",
@@ -17598,15 +17616,15 @@ export const pl_PL: EnTranslations = {
       },
       "demoralizing_shout": {
         "name": "Złowieszcze wycie",
-        "description": "Wydaje przerażający okrzyk, zmniejszając obrażenia zadawane przez wszystkich pobliskich wrogów o {buff}% na 20 sek."
+        "description": "Wydaje okrzyk, zmniejszając obrażenia zadawane przez wszystkich wrogów w promieniu 10 m o {buff}% na {duration} s."
       },
       "charge": {
         "name": "Natarcie",
-        "description": "Szarżuj na wroga, generując 9 wściekłości i ogłuszając go na 1 sek. Zasięg 8-25 jardów."
+        "description": "Szarżuje na wroga i ogłusza go na 1 s, generując 9 wściekłości."
       },
       "thunder_clap": {
         "name": "Trzęsący cios",
-        "description": "Razi pobliskich wrogów za {damage} obrażeń i spowalnia ich ataki o 10% na 10 sek."
+        "description": "Uderza wszystkich wrogów w promieniu 8 m za {damage} obrażeń Fizycznych i spowalnia ich szybkość ataku o 10% na 10 s."
       },
       "hamstring": {
         "name": "Kulawiące cięcie",
@@ -17614,11 +17632,11 @@ export const pl_PL: EnTranslations = {
       },
       "bloodrage": {
         "name": "Krwawa danina",
-        "description": "Generuje 10 wściekłości kosztem zdrowia."
+        "description": "Tracisz 8% maksymalnego zdrowia, aby wygenerować {rage} wściekłości. Nie może cię zabić."
       },
       "overpower": {
         "name": "Krwawa ręka",
-        "description": "Natychmiastowy atak za obrażenia broni plus {damage}. Użyteczne tylko po uniku celu. Nie można uniknąć."
+        "description": "Uderza za obrażenia broni plus {damage}. Nie można go uniknąć. Każde użycie przyznaje też ładunek Krwawej ręki na {duration} s, do 2: twoje następne Okaleczające uderzenie zużywa je, by zadać o 20% więcej obrażeń broni za ładunek. Mieści do 2 ładunków."
       },
       "execute": {
         "name": "Przedwczesny grób",
@@ -17626,7 +17644,7 @@ export const pl_PL: EnTranslations = {
       },
       "slam": {
         "name": "Brutalny zamach",
-        "description": "Wali przeciwnika, zadając obrażenia broni plus {damage}."
+        "description": "Uderza za 50% obrażeń broni plus {damage} i generuje {rage} wściekłości."
       },
       "cleave": {
         "name": "Kosiący łuk",
@@ -17638,7 +17656,7 @@ export const pl_PL: EnTranslations = {
       },
       "sunder_armor": {
         "name": "Rozdarcie pancerza",
-        "description": "Rozdziera pancerz celu, zmniejszając go o {damage}% za każde nałożenie. Kumuluje się do 5 razy. Generuje dużą ilość zagrożenia."
+        "description": "Rozdziera pancerz celu, zmniejszając go o {damage}% za każde nałożenie na 30 s. Kumuluje się do 5 razy, a każde nałożenie odświeża czas trwania. Generuje duże zagrożenie."
       },
       "taunt": {
         "name": "Podjudzenie",
@@ -17646,7 +17664,7 @@ export const pl_PL: EnTranslations = {
       },
       "fireball": {
         "name": "Żarowy pocisk",
-        "description": "Ciska ognistą kulą, która zadaje {damage} obrażeń od ognia oraz dodatkowe obrażenia w czasie."
+        "description": "Ciska ognistą kulą, która zadaje {damage} obrażeń od ognia, a następnie podpala cel, zadając {overTime} obrażeń od ognia w ciągu {duration} s."
       },
       "fireball_form": {
         "name": "Postać żaru",
@@ -17662,7 +17680,7 @@ export const pl_PL: EnTranslations = {
       },
       "frostbolt": {
         "name": "Szronowa lanca",
-        "description": "Wystrzeliwuje pocisk mrozu, zadając {damage} obrażeń od mrozu i spowalniając ruch o 40%."
+        "description": "Wystrzeliwuje pocisk mrozu, zadając {damage} obrażeń od mrozu i spowalniając ruch o 40% na {duration} s."
       },
       "blazing_barrier": {
         "name": "Płonąca bariera",
@@ -17670,15 +17688,15 @@ export const pl_PL: EnTranslations = {
       },
       "cold_snap": {
         "name": "Zew zimy",
-        "description": "Kończy czas odnowienia Mignięcia, Zimnej zasłony i Większej niewidzialności. (Talent maga)"
+        "description": "Kończy czas odnowienia Mignięcia (przywracając wszystkie jego ładunki), Większej niewidzialności i twojej osobistej bariery: Lodowej zasłony, Płonącej bariery lub Czasowej bariery. (Talent maga)"
       },
       "greater_invisibility": {
         "name": "Większa niewidzialność",
-        "description": "Znikasz na 20 s i usuwasz 2 efekty obrażeń w czasie. Gdy niewidzialność się kończy, przez 2 s otrzymujesz o 90% mniej obrażeń. (talent maga)"
+        "description": "Stajesz się niewidzialny na maksymalnie 20 s, zrzucając z siebie zagrożenie i namierzanie wrogów, i usuwasz z siebie do 2 efektów obrażeń w czasie. Atak, rzucanie zaklęcia lub otrzymanie obrażeń kończy ją wcześniej. Gdy się kończy, przez 2 s otrzymujesz o 90% mniej obrażeń. (Talent maga)"
       },
       "hot_streak": {
         "name": "Gorąca seria",
-        "description": "Bierne: dwa trafienia krytyczne z rzędu twoimi zaklęciami Ognia (Żarowy pocisk, Deszcz żaru, Poparzenie, Ognista lanca lub Ognista nawała) sprawiają, że twoja następna Ognista lanca lub Ognista nawała jest natychmiastowa i darmowa. Zaklęcia zużywające efekt liczą się do NASTĘPNEJ serii, również darmowe użycia; Ognista nawała liczy się raz bez względu na liczbę trafionych wrogów i zawsze liczy się tylko pierwsze uderzenie. (Ogień)"
+        "description": "Bierne: dwa trafienia krytyczne z rzędu z Żarowego pocisku, Deszczu żaru, Poparzenia, Ognistej lancy, Ognistej nawały lub Smoczego oddechu sprawiają, że twoja następna Ognista lanca lub Ognista nawała w ciągu 12 s jest natychmiastowa i darmowa. Trafienie niekrytyczne z jednego z tych zaklęć zeruje licznik, a pierwszy cios krytyczny jest pamiętany przez 10 s. Ognista lanca i Ognista nawała liczą się do następnej serii, także darmowe rzucenia. Ognista nawała i Smoczy oddech liczą się raz na rzucenie bez względu na liczbę trafionych wrogów, i liczy się tylko pierwsze uderzenie. (Ogień)"
       },
       "ice_floes": {
         "name": "Kry lodowe",
@@ -17686,7 +17704,7 @@ export const pl_PL: EnTranslations = {
       },
       "ignition": {
         "name": "Zapłon",
-        "description": "Bierne: trafienia krytyczne twoich zaklęć podpalają cel, zadając 30% zadanych obrażeń przez 6 sek.; efekt się kumuluje. (mistrzostwo Ognia)"
+        "description": "Bierne: gdy twoje zaklęcia Ognia zadają trafienie krytyczne, cel płonie, otrzymując dodatkowe 1,5% zadanych obrażeń za każdy poziom postaci (30% na poziomie 20) w ciągu 6 s. Nowe podpalenie celu, który już płonie, dodaje się do obrażeń jeszcze należnych i restartuje 6-sekundowy czas. (mistrzostwo Ognia)"
       },
       "mass_barrier": {
         "name": "Masowa bariera",
@@ -17694,15 +17712,15 @@ export const pl_PL: EnTranslations = {
       },
       "overload": {
         "name": "Przeciążenie",
-        "description": "Twoje następne zaklęcie jest wzmocnione o 40%, ale kosztuje o 50% więcej many. Trwa 10 sek. (talent maga)"
+        "description": "Twoje następne zaklęcie, które kosztuje manę, ma bazowe wartości obrażeń, leczenia i pochłaniania zwiększone o 40%, ale kosztuje o 50% więcej many. Premia z mocy zaklęć nie jest zwiększona. Trwa 10 s. (Talent maga)"
       },
       "power_echo": {
         "name": "Echo mocy",
-        "description": "Twoje następne bezpośrednie zaklęcie powtarza się na tym samym celu z 50% mocy. Trwa 10 sek. (talent maga)"
+        "description": "Twoje następne zaklęcie zadające bezpośrednie obrażenia lub lecznicze na pojedynczy cel powtarza się na tym samym celu za 50% zadanej lub wyleczonej wartości. Trwa 10 s. (Talent maga)"
       },
       "rings_of_frost": {
         "name": "Pierścień mrozu",
-        "description": "Przywołuje pierścień na 10 sek. Wrogowie przekraczający jego obwód zostają zamrożeni na 4 sek. (talent maga)"
+        "description": "Umieszcza pierścień mrozu w wybranym miejscu na 10 s. Wróg, który przekroczy pierścień, zostaje unieruchomiony na 4 s; każdy wróg może go wyzwolić tylko raz. Środek wewnątrz pierścienia jest bezpieczny. (Talent maga)"
       },
       "rune_of_power": {
         "name": "Runa mocy",
@@ -17718,7 +17736,7 @@ export const pl_PL: EnTranslations = {
       },
       "flurry": {
         "name": "Zimowy bicz",
-        "description": "Wystrzel trzy lodowe pociski zadają {damage} obrażenia od Mrozu i nakładają Zimowy Chłód na cel: kolejne 2 nadchodzące kompatybilne zaklęcia traktują go jako zamrożony. Brain Freeze sprawia, że ​​Winterlash jest natychmiastowy i pomija jego czas odnowienia. (Mróz)"
+        "description": "Wypuść trzy lodowe pociski, każdy za {damage} obrażeń od mrozu, i nałóż na cel Zimowy Chłód na 5 s: następne 2 Lodowe lance, które go trafią, traktują go jako zamrożonego. Zamrożenie mózgu czyni Zimowy bicz natychmiastowym i pomija jego czas odnowienia. (Mróz)"
       },
       "frozen_orb": {
         "name": "Lodowa kula",
@@ -17726,31 +17744,31 @@ export const pl_PL: EnTranslations = {
       },
       "blizzard": {
         "name": "Zamieć",
-        "description": "Przywołuje burzę lodową nad wybranym obszarem na 6 sek., zadając {damage} obrażeń od Mrozu co sekundę i spowalniając wrogów o 40%. Każdy trafiony wróg skraca odnowienie Frostglobe o 0,5 sek., maksymalnie 3 sek. na rzucenie. (Mróz)"
+        "description": "Przywołuje burzę lodową nad wybranym obszarem, która szaleje przez 6 s, zadając {damage} obrażeń od mrozu co sekundę i spowalniając wrogów o 40% na 2 s. Każdy trafiony wróg skraca odnowienie Lodowej kuli o 0,5 s, maksymalnie o 3 s na rzucenie. (Mróz)"
       },
       "glacial_spike": {
         "name": "Lodowa iglica",
-        "description": "Przywołuje masywny sopel lodu, pochłaniając 5 Soplii, aby zadać {damage} obrażeń od Mrozu i zamrozić cel w miejscu na 4 sek. (Mróz)"
+        "description": "Wymaga 5 Sopli. Przywołuje masywny kolec lodu, zużywając wszystkie 5 Sopli, by zadać {damage} obrażeń od mrozu i unieruchomić cel na 4 s. Zyskujesz Sopel za każdym razem, gdy trafi Szronowa lanca lub uderzy pulsacja Lodowej kuli, do 5. (Mróz)"
       },
       "glacial_front": {
         "name": "Front lodowcowy",
-        "description": "Przytrzymaj, aby zebrać rosnący front lodowy, a następnie go wypuść w stożku. Dłuższe ładowanie sięga dalej i zadaje więcej obrażeń. Wszyscy trafieni wrogowie zostają spowolnieni o 50% na 4 sek.; maksymalny ładunek dodatkowo unieruchamia ich na 1 sek. (Mróz)"
+        "description": "Przytrzymaj, aby się naładować, po czym wypuść stożek mrozu. Każdy z 4 etapów ładowania sięga dalej, od 7 m do 16 m, i uderza mocniej, od 35 do 42 bazowych obrażeń od mrozu aż do 88 do 104 przy pełnym ładunku, z większą premią z mocy zaklęć im dłużej ładujesz. Wszyscy trafieni wrogowie zostają spowolnieni o 50% na 4 s; pełny ładunek dodatkowo unieruchamia ich na 1 s. (Mróz)"
       },
       "dragons_breath": {
         "name": "Smoczy oddech",
-        "description": "Przytrzymaj, aby zebrać rosnący stożek płomieni, a następnie go wypuść. Dłuższe ładowanie sięga dalej i zadaje więcej obrażeń. Trafieni wrogowie zostają zdezorientowani, a obrażenia zrywają efekt; maksymalny ładunek zawsze trafia krytycznie i wlicza się raz do Gorącej Serii. (Ogień)"
+        "description": "Przytrzymaj, aby się naładować, po czym wypuść stożek płomieni. Każdy z 4 etapów ładowania sięga dalej i szerzej, od 6 m do 12 m, i uderza mocniej, od 32 do 40 bazowych obrażeń od ognia aż do 90 do 110 przy pełnym ładunku, z większą premią z mocy zaklęć im dłużej ładujesz. Trafieni wrogowie są zdezorientowani na 1 do 3 s zależnie od etapu ładowania; każde obrażenia przerywają efekt. Pełny ładunek zawsze trafia krytycznie. Każdy oddech liczy się raz do Gorącej serii, bez względu na liczbę trafionych wrogów. (Ogień)"
       },
       "fingers_of_frost": {
         "name": "Palce mrozu",
-        "description": "Szronowa lanca ma 15% szansy na przyznanie Palców Mrozu, do 2 ładunków: następna Ice Lance traktuje cel jako zamrożony. (Mróz)"
+        "description": "Każde trafienie Szronową lancą ma 15% szans na przyznanie ładunku Palców mrozu, do 2 ładunków, na 15 s. Każdy ładunek sprawia, że jedna Lodowa lanca traktuje cel jako zamrożony. Aktywacja przy 2 ładunkach przepada. (Mróz)"
       },
       "brain_freeze": {
         "name": "Zamrożenie mózgu",
-        "description": "Szronowa lanca ma 20% szans, że twój następny Winterlash będzie natychmiastowy i pozbawiony czasu odnowienia. (Mróz)"
+        "description": "Każde trafienie Szronową lancą ma 20% szans na przyznanie Zamrożenia mózgu na 15 s: twój następny Zimowy bicz jest natychmiastowy i ignoruje czas odnowienia. Aktywacja, gdy Zamrożenie mózgu jest aktywne, przepada. (Mróz)"
       },
       "shatter": {
         "name": "Krucha ruina",
-        "description": "Twoje zaklęcia zyskują 50% szansy na trafienie krytyczne w przypadku zamrożonych celów. Fingers of Frost i Winter's Chill liczą się jako zamrożone. (Mróz)"
+        "description": "Twoje zaklęcia zadające obrażenia pojedynczemu celowi zyskują 50% szansy na trafienie krytyczne przeciw zamrożonym celom: wrogom unieruchomionym, ogłuszonym, obezwładnionym przez maga lub dotkniętym Zauroczeniem. Palce mrozu i Zimowy Chłód sprawiają, że Lodowa lanca traktuje cel jako zamrożony. (Mróz)"
       },
       "conjure_water": {
         "name": "Przywołanie wody",
@@ -17762,15 +17780,15 @@ export const pl_PL: EnTranslations = {
       },
       "fire_blast": {
         "name": "Deszcz żaru",
-        "description": "Razi wroga, zadając {damage} obrażeń od ognia. Natychmiastowe."
+        "description": "Razi wroga za {damage} obrażeń od ognia. Zawsze trafia krytycznie. Poza globalnym odnowieniem i możliwe do użycia podczas rzucania innego zaklęcia."
       },
       "arcane_missiles": {
         "name": "Eteryczne strzały",
-        "description": "Wystrzeliwuje eteryczne strzały we wroga, zadając {damage} obrażeń arkanicznych co sekundę przez 3 sek."
+        "description": "Kanalizuje przez 3 s, wystrzeliwując 3 strzały, z których każda zadaje {damage} obrażeń od arkanów. Zużywa wszystkie twoje Ładunki Arkanów: każdy ładunek dodaje 9 obrażeń od arkanów rozdzielonych między strzały, a przy 4 ładunkach kanalizowanie wystrzeliwuje 5 strzał zamiast 3."
       },
       "polymorph": {
         "name": "Zauroczenie",
-        "description": "Przemienia wroga w ropuchę na nawet {duration} sek. Ropucha błąka się i szybko się leczy. Każde obrażenie przerywa efekt. Tylko bestie i humanoidy."
+        "description": "Przemienia wroga w ropuchę na maksymalnie {duration} s. Nie może działać, odzyskuje pełne zdrowie, leczy 10% maksymalnego zdrowia co sekundę i traci swoje efekty obrażeń w czasie. Każde obrażenia przerywają efekt. Nie działa na nieumarłych ani wrogów odpornych na kontrolę."
       },
       "frost_nova": {
         "name": "Lodowe okowy",
@@ -17782,11 +17800,11 @@ export const pl_PL: EnTranslations = {
       },
       "scorch": {
         "name": "Poparzenie",
-        "description": "Osmala wroga, zadając {damage} obrażeń od Ognia. Szybkie do rzucenia."
+        "description": "Parzy wroga za {damage} obrażeń od ognia i zwiększa twoją prędkość ruchu o 20% na 3 s. Zawsze trafia krytycznie cele z 30% zdrowia lub mniej."
       },
       "pyroblast": {
         "name": "Ognista lanca",
-        "description": "Ciska ogromnym ognistym głazem, który zadaje {damage} obrażeń od ognia oraz dodatkowe obrażenia w czasie."
+        "description": "Ciska ogromnym ognistym głazem, który zadaje {damage} obrażeń od ognia, a następnie podpala cel, zadając {overTime} obrażeń od ognia w ciągu {duration} s."
       },
       "ice_barrier": {
         "name": "Lodowa zasłona",
@@ -17796,17 +17814,17 @@ export const pl_PL: EnTranslations = {
         "name": "Nikczemne cięcie",
         "description": "Natychmiastowy cios za obrażenia broni plus {damage}. Przyznaje 1 punkt combo.",
         "specNote_assassination": "Dodaje 1 Rytuał Jadu (maks. 6).",
-        "specNote_combat": "Gdy Redline jest aktywny, ten przycisk zmienia się w Cios w korpus: 130% obrażeń broni plus 10, przyznaje 2 punkty combo i dodaje 1 kreskę Redline (maks. 4)."
+        "specNote_combat": "Gdy Redline jest aktywny, ten przycisk zmienia się w Cios w korpus: cięższe uderzenie bronią, które przyznaje 2 punkty combo i dodaje 1 kreskę Redline (maks. 4)."
       },
       "eviscerate": {
         "name": "Wieczny sen",
-        "description": "Umiejętność kończąca, która zadaje {damage}.",
+        "description": "Umiejętność kończąca, która zadaje {damage} obrażeń Fizycznych. Obrażenia rosną z mocą ataku.",
         "specNote_assassination": "Przy 6 Rytuale Jadu ten przycisk zmienia się w Jadowite rozdarcie: cios, który natychmiast zadaje wszystkie obrażenia, jakie zadałyby jeszcze twoje krwawienia, zadaje świeżą jadowitą ranę i przywraca 20 energii.",
-        "specNote_combat": "Trafienie tym przy 4 lub więcej punktach combo rozpoczyna Redline na 8 sekund: Nikczemne cięcie zmienia się w Cios w korpus, a ten przycisk w Cios nokautujący (45 plus 35 za punkt combo, trafiając o 25% mocniej za każdą zbudowaną kreskę Redline, przywraca 25 energii). Wykorzystaj go, zanim Redline się zakończy."
+        "specNote_combat": "Trafienie tym przy 4 lub więcej punktach combo rozpoczyna Redline na 8 s: Nikczemne cięcie zmienia się w Cios w korpus, a ten przycisk w Cios nokautujący (umiejętność kończąca, trafiająca o 25% mocniej za każdy Cios w korpus rzucony podczas Redline, przywraca 25 energii). Wykorzystaj go, zanim Redline się zakończy."
       },
       "backstab": {
         "name": "Tchórzliwe pchnięcie",
-        "description": "Wbij sztylet w plecy celu za 150% obrażeń broni plus {damage}. Musisz znajdować się za celem. Wymaga sztyletu. Przyznaje 1 punkt combo.",
+        "description": "Wbij sztylet w plecy celu za {weaponPercent}% obrażeń broni plus {damage}. Musisz znajdować się za celem. Wymaga sztyletu. Przyznaje 1 punkt combo.",
         "specNote_assassination": "Każdy trafiony cios dodaje 1 Rytuał Jadu (maks. 6) i zwraca 15 energii. Przy 6 Rytuale Jadu, Wieczny sen zmienia się w Jadowite rozdarcie (zadaje od razu wszystkie pozostałe obrażenia twoich krwawień)."
       },
       "gouge": {
@@ -17831,12 +17849,12 @@ export const pl_PL: EnTranslations = {
       },
       "ambush": {
         "name": "Cios czyhacza",
-        "description": "Uderz z cienia za 250% obrażeń broni plus {damage}. Musisz być w ukryciu i za celem. Wymaga sztyletu. Przyznaje 1 punkt combo.",
+        "description": "Uderz z cienia za {weaponPercent}% obrażeń broni plus {damage}. Musisz być w ukryciu i za celem. Wymaga sztyletu. Przyznaje 1 punkt combo.",
         "specNote_subtlety": "Użyte z Zasłony zmierzchu dodaje 1 Mrok (maks. 3). Przy 3 Mroku możesz użyć tej zdolności BEZ ukrycia i z dowolnego kąta: takie użycie nic nie kosztuje, zużywa cały Mrok, rozpoczyna 6-sekundową Zasłonę Cieni i zadaje podwójne obrażenia."
       },
       "stealth": {
         "name": "Zasłona zmierzchu",
-        "description": "Ukrywa cię w cieniach: wrogowie ledwo cię zauważają i poruszasz się z pełną prędkością. Atakowanie lub otrzymanie obrażeń przerywa Zasłonę zmierzchu. Rzuć ponownie, aby z niej wyjść.",
+        "description": "Ukrywa cię w cieniach. Wrodzy gracze i zwierzęta nie mogą cię zobaczyć, a potwory zauważają cię tylko ze znacznie mniejszej odległości niż zwykle (z większej, jeśli mają wyższy poziom od ciebie). Poruszasz się z pełną prędkością. Atakowanie lub otrzymanie obrażeń przerywa Zasłonę zmierzchu. Rzuć ponownie, aby z niej wyjść.",
         "specNote_subtlety": "Każdy otwierający cios użyty z Zasłony zmierzchu dodaje 1 Mrok (maks. 3)."
       },
       "adrenaline_rush": {
@@ -17864,11 +17882,11 @@ export const pl_PL: EnTranslations = {
       },
       "melting_acid": {
         "name": "Topniejący kwas",
-        "description": "Pokrywa twoją broń na 30 min. Każdy atak wręcz opryskuje cel żrącym kwasem i zmniejsza jego pancerz o 5% na 12 sek."
+        "description": "Pokrywa twoją broń na 30 min. Każdy atak wręcz opryskuje cel żrącym kwasem, zmniejszając jego pancerz o 5% na 12 s. Zastępuje inną powłokę twojej broni."
       },
       "nightshade_coating": {
         "name": "Powłoka Nocnego Cienia",
-        "description": "Pokrywa twoją broń na 30 min. Każdy atak wręcz pokrywa cel psianką i redukuje otrzymywane leczenie o 25% na 12 sek."
+        "description": "Pokrywa twoją broń na 30 min. Każdy atak wręcz pokrywa cel psianką i redukuje otrzymywane przez niego leczenie o 25% na 12 s. Zastępuje inną powłokę twojej broni."
       },
       "expose_armor": {
         "name": "Wyłom w pancerzu",
@@ -17880,7 +17898,7 @@ export const pl_PL: EnTranslations = {
       },
       "vanish": {
         "name": "Dymne zniknięcie",
-        "description": "Znikasz z pola widzenia, wchodząc w Duskveil nawet w walce. Ukryty poruszasz się z pełną prędkością. Trwa do 10 sek."
+        "description": "Znikasz z pola widzenia, nawet w walce, wchodząc w Zasłonę zmierzchu na maksymalnie 10 s. Wychodzisz z walki, potwory zapominają całe zagrożenie, jakie na nich wywierasz, i nie mogą cię wykryć, dopóki trwa, a wrodzy gracze tracą cię jako cel. Ukryty poruszasz się z pełną prędkością."
       },
       "instant_poison": {
         "name": "Ukąszenie żmii",
@@ -17888,11 +17906,11 @@ export const pl_PL: EnTranslations = {
       },
       "deadly_poison": {
         "name": "Jątrzący jad",
-        "description": "Pokrywa twój oręż na 30 min. Każde uderzenie wręcz dodaje celowi warstwę trucizny, do 5, i odnawia czas trwania 12 sek. Każda warstwa zadaje {damage} obrażeń natury co 2 sek."
+        "description": "Pokrywa twoją broń na 30 min. Każdy atak wręcz dodaje celowi ładunek jadu, do 5, i odnawia czas trwania 12 s. Każdy ładunek zadaje {damage} obrażeń od natury co 2 s. Zastępuje inną powłokę twojej broni."
       },
       "blind": {
         "name": "Rzut piaskiem",
-        "description": "Oślepia cel, sprawiając, że błądzi zdezorientowany przez 8 sek. Jakiekolwiek obrażenia przerywają efekt."
+        "description": "Ciska brudem w oczy celu, obezwładniając go na 8 s. Jakiekolwiek obrażenia przerywają efekt."
       },
       "seal_of_righteousness": {
         "name": "Piętno przysięgi",
@@ -17908,11 +17926,11 @@ export const pl_PL: EnTranslations = {
       },
       "divine_ascension": {
         "name": "Boskie Wzniesienie",
-        "description": "Zużywa 20 Oddania, aby uzyskać 5 ładunków Wzniesienia na maksymalnie 45 s. Oznaczone umiejętności zużywają jeden ładunek i zyskują dodatkowy efekt."
+        "description": "Zużywa 20 Oddania, aby zyskać 5 ładunków Wzniesienia na maksymalnie 45 s. Gdy Wzniesienie jest aktywne, wyróżnione umiejętności twojej specjalizacji zużywają po 1 ładunku za premię Wzniesienia opisaną w ich podpowiedziach, a ty nie zyskujesz Oddania. Wzniesienie kończy się, gdy skończą się ładunki lub czas. Przedłużony Świt dodaje 2 ładunki."
       },
       "aura_mastery": {
         "name": "Święta Zgoda",
-        "description": "Przez 8 s wzmacnia każde aktywne Oddanie i Aurę Odwetu w twojej drużynie. Oddanie Bastionu zmniejsza obrażenia o 15%; Odwet zadaje 15 obrażeń Świętych. Wielokrotne użycia odnawiają zamiast się kumulować."
+        "description": "Przez 8 s potraja każde aktywne Oddanie Bastionu i Aurę odpłaty w twojej drużynie: Oddanie Bastionu zmniejsza otrzymywane obrażenia o 15%, a Aura odpłaty zadaje trzykrotnie więcej normalnych obrażeń Świętych. Wielokrotne użycia odnawiają zamiast się kumulować."
       },
       "devotion_ward": {
         "name": "Oddanie Bastionu",
@@ -17920,7 +17938,7 @@ export const pl_PL: EnTranslations = {
       },
       "hammer_of_grace": {
         "name": "Młot Łaski",
-        "description": "Natychmiast ciska świętym młotem we wroga w promieniu 20 m za {damage}, odnawia 70 many, leczy cię za 50% zadanych obrażeń i generuje 1 Oddanie, gdy zadaje obrażenia. Słoneczny Odwet pozwala Młotowi Łaski zignorować odnowienie i leczyć cię za 100% zadanych obrażeń."
+        "description": "Ciska świętym młotem we wroga za {damage} obrażeń Świętych, odnawiając 70 many i lecząc cię za 50% zadanych obrażeń. Generuje 1 Oddanie, gdy zadaje obrażenia. Słoneczny Odwet (efekt Strażnika Wiary) sprawia, że ignoruje odnowienie i leczy cię za 100% zadanych obrażeń."
       },
       "hushbrand": {
         "name": "Piętno Ciszy",
@@ -17928,23 +17946,23 @@ export const pl_PL: EnTranslations = {
       },
       "guardian_covenant": {
         "name": "Przymierze Strażnika",
-        "description": "Chroni sojuszniczy cel i ciebie, zmniejszając otrzymywane obrażenia o 20% przez 8 s. Domyślnie wybiera ciebie, gdy nie wskazano sojuszniczego celu."
+        "description": "Chroni sojuszniczy cel i ciebie, zmniejszając otrzymywane obrażenia o 20% na 8 s. Domyślnie wybiera ciebie, gdy nie wskazano sojuszniczego celu. Wzniesienie podnosi redukcję do 30%."
       },
       "solar_step": {
         "name": "Słoneczny Krok",
-        "description": "Zwiększa twoją prędkość ruchu o 150% na 2 s."
+        "description": "Zwiększa twoją prędkość ruchu o 150% na {duration} s."
       },
       "solar_invocation": {
         "name": "Słoneczne Wezwanie",
-        "description": "Natychmiast leczy sojusznika za {damage} albo zadaje umiarkowane obrażenia Święte wrogowi. Oba zastosowania generują 1 Oddanie. Podczas Wzniesienia rzut leczący leczy także sojuszniczych graczy w promieniu 10 m od celu o połowę."
+        "description": "Natychmiast leczy sojusznika za {damage} albo zadaje wrogowi 120 do 150 bazowych obrażeń Świętych. Obrażenia rosną z mocą zaklęć, a leczenie z mocą leczenia. Oba zastosowania generują 1 Oddanie. Podczas Wzniesienia rzut leczący leczy też sojuszniczych graczy w promieniu 10 m od celu o połowę tej wartości."
       },
       "radiant_devotion": {
         "name": "Promienne Oddanie",
-        "description": "Zwiększa moc zaklęć twoją i członków drużyny o 20 na 30 min. Zastępuje twoje własne Oddanie Świtu lub Łaski, ale współistnieje z Oddaniami innych paladynów."
+        "description": "Zwiększa moc zaklęć twoją i członków drużyny o {buff} na 30 min. Zastępuje twoje własne Oddanie Świtu lub Łaski, ale współistnieje z Oddaniami innych paladynów."
       },
       "dawn_devotion": {
         "name": "Oddanie Świtu",
-        "description": "Zwiększa moc ataku twoją i członków drużyny o 40 na 30 min. Zastępuje twoje własne Promienne Oddanie lub Oddanie Łaski, ale współistnieje z Oddaniami innych paladynów i z okrzykami wojownika."
+        "description": "Zwiększa moc ataku twoją i członków drużyny o {buff} na 30 min. Zastępuje twoje własne Promienne Oddanie lub Oddanie Łaski, ale współistnieje z Oddaniami innych paladynów i z okrzykami wojownika."
       },
       "grace_devotion": {
         "name": "Oddanie Łaski",
@@ -17960,11 +17978,11 @@ export const pl_PL: EnTranslations = {
       },
       "final_edict": {
         "name": "Ostatni Edykt",
-        "description": "Zadaje miażdżący cios bronią i generuje 1 Oddanie, gdy zadaje obrażenia. Udane trafienie skraca pozostałe odnowienie Upadku Świtu o 2 s. Udane automatyczne ataki i trafienia Ostatniego Edyktu mają 15% szans na przyznanie Gniewu Świtu na 8 s. Wzniesienie uwalnia dodatkowo eksplozję wokół ciebie, która zadaje obrażenia Fizyczne."
+        "description": "Zadaje miażdżący cios bronią i generuje 1 Oddanie, gdy zadaje obrażenia. Udane trafienie skraca pozostałe odnowienie Upadku Świtu o 2 s. Udane automatyczne ataki i trafienia Ostatniego Edyktu mają 15% szans na przyznanie Gniewu Świtu na 8 s: twój następny Młot gniewu może trafić dowolny cel, ignoruje odnowienie i zadaje o 20% więcej obrażeń. Wzniesienie uwalnia dodatkowo eksplozję obrażeń Fizycznych wokół ciebie."
       },
       "dawnfall": {
         "name": "Upadek Świtu",
-        "description": "Zadaje {damage} obrażeń Świętych pobliskim wrogom i generuje 1 Oddanie. Trafienie co najmniej jednego wroga skraca pozostałe odnowienie Ostatniego Edyktu o 2 s. Wzniesienie zwiększa jego obrażenia i promień."
+        "description": "Zadaje {damage} obrażeń Świętych pobliskim wrogom i generuje 1 Oddanie. Trafienie co najmniej jednego wroga skraca pozostałe odnowienie Ostatniego Edyktu o 2 s. Wzniesienie zwiększa jego obrażenia o 50% i promień do 10 m."
       },
       "sun_gods_verdict": {
         "name": "Wyrok Boga Słońca",
@@ -17988,11 +18006,11 @@ export const pl_PL: EnTranslations = {
       },
       "dawns_embrace": {
         "name": "Uścisk Świtu",
-        "description": "Uwalnia potężne leczenie i generuje 1 Oddanie. Promienny Rezonans zmniejsza jego koszt many o 50%, a czas rzucania do 1,5 s. Wzniesienie czyni je natychmiastowym i zwiększa jego leczenie o 35%."
+        "description": "Leczy sojuszniczy cel za {damage} i generuje 1 Oddanie. Promienny Rezonans zmniejsza jego koszt many o 50%, a czas rzucania do 1,5 s. Wzniesienie czyni je natychmiastowym i zwiększa jego leczenie o 35%."
       },
       "radiant_chorus": {
         "name": "Promienny Chór",
-        "description": "Leczy pobliskich sojuszników za {damage} i generuje 1 Oddanie. Skuteczne wyleczenie co najmniej 2 sojuszników przyznaje Promienny Rezonans: twoje następne Kojące Światło jest natychmiastowe albo twój następny Uścisk Świtu kosztuje o 50% mniej many i rzuca się w 1,5 s. Wzniesienie zwiększa leczenie i promień Promiennego Chóru."
+        "description": "Leczy pobliskich sojuszników za {damage} i generuje 1 Oddanie. Skuteczne wyleczenie co najmniej 2 sojuszników przyznaje Promienny Rezonans na 10 s: twoje następne Kojące Światło jest natychmiastowe albo twój następny Uścisk Świtu kosztuje o 50% mniej many i rzuca się w 1,5 s. Wzniesienie zwiększa leczenie Promiennego Chóru o 20%, a jego promień do 40 m."
       },
       "life_covenant": {
         "name": "Przymierze Życia",
@@ -18000,11 +18018,11 @@ export const pl_PL: EnTranslations = {
       },
       "aegis_first_dawn": {
         "name": "Egida Pierwszego Świtu",
-        "description": "Kanalizuj przez 5 s, tworząc świętą kopułę o średnicy 10 metrów. Sojusznicy wewnątrz są leczeni co sekundę i otrzymują o 50% mniej obrażeń. Ukończenie kanalizowania uwalnia końcowe leczenie i zapewnia 30% prędkości ruchu przez 4 s."
+        "description": "Kanalizuje świętą kopułę o promieniu 10 m wokół ciebie. Sojuszniczy gracze wewnątrz i w twojej linii wzroku otrzymują o 50% mniej obrażeń i są leczeni za {aegisTick} co sekundę. Ukończenie kanalizowania leczy ich za dodatkowe {aegisFinal} i daje 30% prędkości ruchu na 4 s. Leczenie rośnie z mocą leczenia."
       },
       "vowkeeper_strike": {
         "name": "Cios Strażnika Ślubów",
-        "description": "Uderza z wysokim zagrożeniem i generuje 1 Oddanie. Udany cios ma 20% szans na przyznanie Słonecznego Odwetu na 8 s; każdy udany blok ma 25%. Słoneczny Odwet wzmacnia twój następny Słoneczny Dysk, Młot Łaski lub Kojące Światło. Wzniesienie zapewnia także niewielką tarczę pochłaniającą."
+        "description": "Uderza za obrażenia broni plus {damage} obrażeń Fizycznych z wysokim zagrożeniem i generuje 1 Oddanie. Udany cios ma 20% szans na przyznanie Słonecznego Odwetu na 8 s; każdy udany blok ma 25%. Słoneczny Odwet zużywa twój następny Słoneczny Dysk (bez kosztu many, bez odnowienia, o 20% więcej obrażeń), Młot Łaski (bez odnowienia, leczy cię za 100% zadanych obrażeń) albo Kojące Światło (natychmiastowe). Wzniesienie dodatkowo osłania cię tarczą równą 6% twojego maksymalnego zdrowia na 6 s."
       },
       "bastion_rite": {
         "name": "Rytuał Bastionu",
@@ -18012,7 +18030,7 @@ export const pl_PL: EnTranslations = {
       },
       "sunward_disc": {
         "name": "Słoneczny Dysk",
-        "description": "Wymaga tarczy. Ciska promiennym dyskiem, który trafia, a następnie odbija się między pobliskimi wrogami. Każde raniące uderzenie generuje 1 Oddanie. Słoneczny Odwet sprawia, że Słoneczny Dysk nie kosztuje many, ignoruje odnowienie i zadaje o 20% więcej obrażeń. Wzniesienie wzmacnia 5 odbić."
+        "description": "Wymaga tarczy. Ciska promiennym dyskiem, który zadaje celowi {damage} obrażeń Świętych, a następnie odbija się do 2 innych pobliskich wrogów, zadając każdemu 60 do 75 bazowych obrażeń Świętych. Każde uderzenie zadające obrażenia generuje 1 Oddanie. Słoneczny Odwet sprawia, że Słoneczny Dysk nie kosztuje many, ignoruje odnowienie i zadaje o 20% więcej obrażeń. Wzniesienie zwiększa jego obrażenia o 30%, a liczbę odbić do 5."
       },
       "sacred_challenge": {
         "name": "Święty Bodziec",
@@ -18036,7 +18054,7 @@ export const pl_PL: EnTranslations = {
       },
       "lay_on_hands": {
         "name": "Ostatnie namaszczenie",
-        "description": "Potężny przypływ uzdrowienia przywraca {damage}% twojego maksymalnego zdrowia. 10 min czasu odnowienia."
+        "description": "Leczy sojuszniczy cel o {damage}% twojego maksymalnego zdrowia i generuje 1 Oddanie, gdy przywraca zdrowie."
       },
       "holy_taunt": {
         "name": "Święte Podjudzenie",
@@ -18052,7 +18070,7 @@ export const pl_PL: EnTranslations = {
       },
       "consecration": {
         "name": "Święta ziemia",
-        "description": "Poświęca ziemię na 9 sek. i co sekundę zadaje {damage} obrażeń od Świętości. Strażnicy Wiary otrzymują w niej o 10% mniej obrażeń."
+        "description": "Poświęca ziemię pod tobą na 9 s, co sekundę zadając {damage} obrażeń Świętych z wysokim zagrożeniem. Pierwsze uderzenie generuje 1 Oddanie. Strażnicy Wiary otrzymują stojąc w środku o 10% mniej obrażeń. Wzniesienie zwiększa jego obrażenia o 30%."
       },
       "bastion_sweep": {
         "name": "Zamach Bastionu",
@@ -18064,7 +18082,7 @@ export const pl_PL: EnTranslations = {
       },
       "veilbound_march": {
         "name": "Marsz Zasłony",
-        "description": "Stajesz się eteryczny na 4 s, zyskując 40% prędkości ruchu i 30% pancerza oraz odporność na unieruchomienia, spowolnienia i przemieszczenia. Wrogowie, przez których przechodzisz, otrzymują Piętno Zasłony na 6 s: co sekundę otrzymują obrażenia Święte, zadają ci o 20% mniej obrażeń i generują dodatkowe zagrożenie. Pierwsze piętno przyznaje 1 Oddanie. Gdy marsz się kończy, pobliscy napiętnowani wrogowie otrzymują końcowy wybuch. Wzniesienie zwiększa wybuch o 50% i lekko przyciąga ich ku tobie."
+        "description": "Stajesz się eteryczny na 4 s, zyskując 40% prędkości ruchu i 30% pancerza, usuwając unieruchomienia i spowolnienia oraz stając się odpornym na unieruchomienia, spowolnienia i przemieszczenia. Wrogowie, przez których przechodzisz, otrzymują Piętno Zasłony na 6 s: co sekundę otrzymują 12 obrażeń Świętych z potrójnym zagrożeniem i zadają ci o 20% mniej obrażeń. Pierwsze piętno przyznaje 1 Oddanie. Gdy marsz się kończy, napiętnowani wrogowie w promieniu 10 m otrzymują 36 obrażeń Świętych. Wzniesienie podnosi te obrażenia do 54 i przyciąga ich o 2 m ku tobie."
       },
       "veilbound_mark": {
         "name": "Piętno Zasłony",
@@ -18080,7 +18098,7 @@ export const pl_PL: EnTranslations = {
       },
       "tame_beast": {
         "name": "Dzika więź",
-        "description": "Rozpoczyna oswajanie bestii, by stała się twoim towarzyszem. Musi być na twoim poziomie lub niższym i nie może być elitą. Twoje zwierzę podąża za tobą, atakuje twoich wrogów i utrzymuje własne zagrożenie. Możesz mieć jedno zwierzę naraz."
+        "description": "Rozpoczyna oswajanie bestii, by stała się twoim towarzyszem. Musi być na twoim poziomie lub niższym i nie może być elitą, rzadkim potworem, bossem ani stworzeniem z lochu. Twoje zwierzę podąża za tobą, atakuje twoich wrogów i utrzymuje własne zagrożenie. Możesz mieć jedno zwierzę naraz."
       },
       "dismiss_pet": {
         "name": "Uwolnij towarzysza",
@@ -18088,11 +18106,11 @@ export const pl_PL: EnTranslations = {
       },
       "raptor_strike": {
         "name": "Patroszące uderzenie",
-        "description": "Uderza za 10% obrażeń broni plus {damage}. Trafienie przywraca 15 Skupienia i daje 1 Rozpęd Łowów. Obrażenia rosną z mocą ataku poprzez obrażenia broni."
+        "description": "Uderza za 10% obrażeń broni plus {damage}. Obrażenia rosną z mocą ataku poprzez obrażenia broni. Ze Sztuką przetrwania trafienie przywraca 15 skupienia i daje 1 Rozpęd Łowów."
       },
       "aspect_of_the_hawk": {
         "name": "Postać błotniaka",
-        "description": "Przyjmij postać błotniaka, zwiększając swoją moc ataku o {buff} na 30 min."
+        "description": "Przyjmij postać błotniaka, zwiększając swoją moc ataku i moc ataku dystansowego o {buff} na 30 min."
       },
       "serpent_sting": {
         "name": "Jadowity kolec",
@@ -18141,11 +18159,11 @@ export const pl_PL: EnTranslations = {
       },
       "smite": {
         "name": "Hymn oczyszczenia",
-        "description": "Zadaje {damage} obrażeń świętych. Obrażenia rosną z mocą zaklęć. Dyscyplina: leczy każdego powiązanego sojusznika o 30% obrażeń. Jeśli żaden sojusznik nie jest powiązany, leczy o 15% członka drużyny z najniższym zdrowiem."
+        "description": "Zadaje {damage} obrażeń Świętych. Obrażenia rosną z mocą zaklęć. Dyscyplina leczy każdego rannego powiązanego członka drużyny w promieniu 30 m za 30% zadanych obrażeń (70% z Podwójnym Przymierzem). Jeśli żaden nie jest ranny, leczy zamiast tego członka drużyny z najniższym zdrowiem w promieniu 30 m za 15% obrażeń."
       },
       "lesser_heal": {
         "name": "Szeptana modlitwa",
-        "description": "Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą zaklęć."
+        "description": "Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą leczenia."
       },
       "power_word_fortitude": {
         "name": "Litania hartu",
@@ -18157,11 +18175,11 @@ export const pl_PL: EnTranslations = {
       },
       "power_word_shield": {
         "name": "Psalm ochrony",
-        "description": "Osłania sprzymierzony cel, pochłaniając {damage} obrażeń przez 30 s. Dyscyplina dodatkowo wiąże cel z twoimi obrażeniami świętymi na 30 s."
+        "description": "Osłania sprzymierzony cel, pochłaniając {damage} obrażeń przez 30 s. Dyscyplina dodatkowo wiąże cel na 30 s, zastępując twoje poprzednie powiązanie (Podwójne Przymierze utrzymuje dwa). Dopóki powiązani członkowie drużyny są w promieniu 30 m od ciebie, twój Hymn oczyszczenia i wrogie Oczyszczające Miłosierdzie leczą ich za 30% zadanych obrażeń."
       },
       "renew": {
         "name": "Trwająca łaska",
-        "description": "Leczy cel o {damage} przez 15 s, raz na 3 s. Leczenie rośnie z mocą zaklęć."
+        "description": "Leczy cel o {damage} przez 15 s, raz na 3 s. Leczenie rośnie z mocą leczenia."
       },
       "mind_blast": {
         "name": "Roztrzaskanie umysłu",
@@ -18169,7 +18187,7 @@ export const pl_PL: EnTranslations = {
       },
       "heal": {
         "name": "Uroczysta modlitwa",
-        "description": "Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą zaklęć."
+        "description": "Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą leczenia."
       },
       "mind_flay": {
         "name": "Litania niedoli",
@@ -18189,7 +18207,7 @@ export const pl_PL: EnTranslations = {
       },
       "flash_heal": {
         "name": "Pilna modlitwa",
-        "description": "Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą zaklęć."
+        "description": "Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą leczenia."
       },
       "lightning_bolt": {
         "name": "Łukowy pocisk",
@@ -18213,11 +18231,11 @@ export const pl_PL: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Oręż kamiennych okowów",
-        "description": "Nasyca twoją broń na 30 min. Każdy cios zadaje {damage} dodatkowych obrażeń. Wzmocnienie żywiołów zyskuje ponadto 40% pancerza i 20% wytrzymałości, otrzymuje o 15% mniej obrażeń i jest odporny na trafienia krytyczne od stworzeń i generuje 2,75 razy większe zagrożenie. Ziemny wstrząs zmusza swój cel do atakowania ciebie przez 3 s, a Osłona gromu daje 10% redukcji obrażeń na 3 s."
+        "description": "Nasyca twoją broń na 30 min. Każde uderzenie zadaje {damage} dodatkowych obrażeń. Wzmocnienie żywiołów zyskuje ponadto 40% pancerza i 20% wytrzymałości, otrzymuje o 15% mniej obrażeń, jest odporny na trafienia krytyczne od stworzeń i generuje dwa i trzy czwarte razy większe zagrożenie. Ziemny wstrząs zmusza swój cel do atakowania ciebie przez 3 s, a rzucenie Osłony gromu daje 10% redukcji obrażeń na 3 s."
       },
       "healing_wave": {
         "name": "Kojące wody",
-        "description": "Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą zaklęć. Odnowienie: zachowuje 50% pełnego leczenia przed przeleczeniem jako Leczniczy Prąd na 12 s, do 30% maksymalnego zdrowia celu."
+        "description": "Leczy sojuszniczy cel za {damage}. Leczenie rośnie z mocą leczenia. Odnowienie: dodaje też 50% pełnego leczenia sprzed nadleczenia do Leczniczego Prądu celu, puli, która leczy go przez 12 s i mieści najwyżej 30% jego maksymalnego zdrowia."
       },
       "earth_shock": {
         "name": "Ziemny wstrząs",
@@ -18253,11 +18271,11 @@ export const pl_PL: EnTranslations = {
       },
       "shadow_bolt": {
         "name": "Pocisk mroku",
-        "description": "Wysyła mroczny pocisk w stronę wroga, zadając {damage} obrażeń od Cienia."
+        "description": "Wysyła mroczny pocisk w stronę wroga, zadając {damage} obrażeń od cienia. Zniszczenie: generuje 1 Spustoszenie, do 5."
       },
       "demon_skin": {
         "name": "Skóra plugawca",
-        "description": "Demoniczna skóra zwiększa twój pancerz o {buff} na 30 min."
+        "description": "Zwiększa twój pancerz o {buff} na 30 min. Pogłębiony Pakt podwaja ten pancerz i zmniejsza otrzymywane obrażenia magiczne o 5%, gdy Skóra plugawca jest aktywna."
       },
       "immolate": {
         "name": "Płonący pakt",
@@ -18269,11 +18287,11 @@ export const pl_PL: EnTranslations = {
       },
       "evil_eye": {
         "name": "Złe Oko",
-        "description": "Oznacza jednego wroga jako ognisko twoich klątw. Przeniesienie oka zachowuje Potępienie, ale nie odświeża jego 20-sekundowego czasu wygaśnięcia."
+        "description": "Oznacza jednego wroga twoim Złym Okiem, ogniskiem twoich klątw. Zyskujesz 2 Potępienia za każdym razem, gdy oznaczony wróg zadaje obrażenia (najwyżej raz na sekundę), i 10, gdy ginie. Potępienie kumuluje się do 100 i zanika 20 s po ostatnim przyroście. Przeniesienie Oka zachowuje Potępienie, ale nie odświeża tego czasu."
       },
       "maledict_gaze": {
         "name": "Spojrzenie Przekleństwa",
-        "description": "Twoje Oko Przekleństwa atakuje wybrane główne Złe Oko co 2,5 sekundy, zadając obrażenia od Cienia. Opętaj Złe Oko podwaja jego szybkość ataku."
+        "description": "Twoje Oko Przekleństwa atakuje wroga noszącego twoje główne Złe Oko co 2,5 s, zadając obrażenia od cienia, dopóki ty i ten wróg jesteście w walce, w promieniu 30 m od siebie i w linii wzroku. Opętaj Złe Oko podwaja jego szybkość ataku."
       },
       "needle_of_fate": {
         "name": "Igła Przeznaczenia",
@@ -18281,11 +18299,11 @@ export const pl_PL: EnTranslations = {
       },
       "sentence": {
         "name": "Wyrok",
-        "description": "Zużywa całe Potępienie i Nici Przeznaczenia, aby wydać wyrok na wroga. Każda Nić zwiększa obrażenia o 6%. Dodatkowe efekty eskalują przy 20, 50, 80 i 100 Potępienia. Skalowanie jego obrażeń spłaszcza się po 16 poziomie."
+        "description": "Wymaga 20 Potępienia i twojego głównego Złego Oka na celu. Zużywa całe Potępienie i Nici Przeznaczenia, by zadać obrażenia od cienia rosnące wraz ze zużytym Potępieniem; każda Nić dodaje 6% obrażeń. Przy 50 lub więcej leczy cię za 20% zadanych obrażeń. Przy 80 lub więcej zadaje też 35% obrażeń innym wrogom w promieniu 8 m. Przy 100 zadaje o 5% więcej obrażeń graczom i bossom oraz zabija zwykłego wroga poniżej 20% zdrowia. Jego bazowe obrażenia rosną z twoim poziomem do 16, po czym słabną między poziomami 17 a 20."
       },
       "life_tap": {
         "name": "Trudny targ",
-        "description": "Zamienia {damage} zdrowia na {damage} many."
+        "description": "Zamienia {damage} zdrowia na {buff} many. Nie działa, jeśli masz {damage} zdrowia lub mniej."
       },
       "cursed_accomplice": {
         "name": "Przeklęty Wspólnik",
@@ -18297,11 +18315,11 @@ export const pl_PL: EnTranslations = {
       },
       "drain_life": {
         "name": "Pochłonięcie",
-        "description": "Pochłania witalność celu, zadając {damage} obrażeń od cienia co sekundę i przenosząc ci 70% z nich jako zdrowie. Udręka przenosi zamiast tego całość. Kanałowane na twoim głównym Złym Oku zużywa na starcie wszystkie Nici Przeznaczenia, a każda Nić generuje 1 dodatkowe Potępienie na tyknięcie."
+        "description": "Pochłania witalność celu, zadając {damage} obrażeń od cienia co sekundę i lecząc cię za 70% zadanych obrażeń (całość dla Udręki). Na wrogu z twoim Złym Okiem każde tyknięcie generuje 2 Potępienia, a ukończenie kanalizowania generuje 3 kolejne. Na twoim głównym Złym Oku na starcie zużywa też wszystkie Nici Przeznaczenia: każda Nić dodaje 1 Potępienie na tyknięcie, a 3 Nici sprawiają, że obrażenia nie opóźniają kanalizowania."
       },
       "litany_of_guilt": {
         "name": "Litania Winy",
-        "description": "Rzuca klątwę na twoje główne Złe Oko na 6 sekund. Zyski Potępienia uwalniają falę, która zadaje obrażenia maksymalnie 2 innym wrogom w promieniu 8 m, najwyżej raz na sekundę. Ranga 2 wydłuża to do 8 sekund i 4 wrogów."
+        "description": "Rzuca klątwę na twoje główne Złe Oko na {duration} sekund. Zyski Potępienia uwalniają falę, która zadaje obrażenia maksymalnie 2 innym wrogom (4 od Rangi 2) w promieniu 8 m, najwyżej raz na sekundę."
       },
       "cinderhide": {
         "name": "Żarowa Skóra",
@@ -18309,7 +18327,7 @@ export const pl_PL: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Mroczna Kotwica",
-        "description": "Pierwsze rzucenie: zakotwicza twój cień u twoich stóp na 5 minut. Rzuć ponownie w promieniu 40 m, aby tam wrócić, zużywając kotwicę i rozpoczynając 45-sekundowy czas odnowienia."
+        "description": "Pierwsze rzucenie: zakotwicza twój cień u twoich stóp na 5 min. Rzuć ponownie w promieniu 40 m od kotwicy, aby się do niej teleportować, zużywając kotwicę i rozpoczynając 45-sekundowe odnowienie."
       },
       "soulwell": {
         "name": "Studnia Dusz",
@@ -18317,19 +18335,19 @@ export const pl_PL: EnTranslations = {
       },
       "hex_of_violence": {
         "name": "Klątwa Przemocy",
-        "description": "Rzuca urok na wroga na 8 sekund, zadając obrażenia od Cienia i generując 2 Potępienia co 2 sekundy. Jego następne 3 zadające obrażenia działania generują po 7 Potępienia i smagają go za 17 obrażeń od Cienia."
+        "description": "Rzuca urok na wroga na 8 s. Co 2 s otrzymuje 17 obrażeń od cienia plus część twojej mocy zaklęć, a ty zyskujesz 2 Potępienia. Pierwsze 3 razy, gdy ten wróg zadaje obrażenia, zyskujesz 7 Potępienia, a on otrzymuje 17 obrażeń od cienia."
       },
       "cruel_pact": {
         "name": "Okrutny Pakt",
-        "description": "Poświęca 12% twojego maksymalnego zdrowia, aby przywrócić 1,5% maksymalnej many i wygenerować 20 Potępienia. Nie można użyć przy 20% zdrowia lub mniej."
+        "description": "Poświęca 12% twojego maksymalnego zdrowia, aby przywrócić {buff}% maksymalnej many i wygenerować 20 Potępienia. Nie można użyć przy 20% zdrowia lub mniej."
       },
       "vicarious_suffering": {
         "name": "Zastępcze Cierpienie",
-        "description": "Wiąże twoje cierpienie na 8 sekund i generuje do 15 Potępienia z wrogich trafień. Użyte na sobie, zmniejsza otrzymywane obrażenia o 20%. Użyte na sojuszniku, przekierowuje do 20% obrażeń na ciebie, nie obniżając twojego zdrowia poniżej 15%."
+        "description": "Przez 8 s każde wrogie trafienie w cel generuje 3 Potępienia, łącznie do 15. Na sobie zmniejsza otrzymywane obrażenia o 20%. Na sojuszniku przekierowuje na ciebie 20% każdego wrogiego trafienia, ale nigdy nie obniża twojego zdrowia poniżej 15%."
       },
       "possess_evil_eye": {
         "name": "Opętaj Złe Oko",
-        "description": "Maledyktor opętuje twoje główne Złe Oko na 15 sekund i generuje 35 Potępienia. Igła Przeznaczenia rzuca się w 1 sekundę i generuje 2 dodatkowe Potępienia, Pochłonięcie można kanalizować podczas ruchu, a Wyrok zadaje o 25% więcej obrażeń i uwalnia opóźnione echo za 60% obrażeń, malejące do 30% między poziomem 17 a 20."
+        "description": "Opętuje twoje główne Złe Oko na 15 s i generuje 35 Potępienia. Gdy jest aktywne, Igła Przeznaczenia rzuca się w 1 s i generuje 2 dodatkowe Potępienia, Pochłonięcie można kanalizować w ruchu, Spojrzenie Przekleństwa atakuje dwa razy szybciej, a Wyrok zadaje o 25% więcej obrażeń i powtarza 60% zadanych obrażeń 0,75 s później (malejące do 30% między poziomami 17 a 20)."
       },
       "hour_of_judgment": {
         "name": "Godzina Sądu",
@@ -18337,7 +18355,7 @@ export const pl_PL: EnTranslations = {
       },
       "coven": {
         "name": "Sabat",
-        "description": "Tworzy drugorzędne Złe Oko na maksymalnie 4 pobliskich wrogach na 15 sekund. Zasilają one wspólną pulę Potępienia w 50%, a Wyrok odbija się do nich za 35% obrażeń."
+        "description": "Wymaga twojego głównego Złego Oka na celu. Umieszcza drugorzędne Złe Oczy na maksymalnie 4 innych wrogach w promieniu 15 m od niego na 15 s. Generują Potępienie w 50% normalnego tempa, a Wyrok odbija się do każdego z nich za 35% swoich obrażeń."
       },
       "fear": {
         "name": "Trwoga",
@@ -18345,7 +18363,7 @@ export const pl_PL: EnTranslations = {
       },
       "searing_pain": {
         "name": "Przypalenie",
-        "description": "Przypieka wroga dręczącym ogniem, zadając {damage} obrażeń od Ognia. Szybkie do rzucenia."
+        "description": "Przypieka wroga dręczącym ogniem za {damage} obrażeń od ognia."
       },
       "shadowburn": {
         "name": "Ogień zmierzchu",
@@ -18371,12 +18389,12 @@ export const pl_PL: EnTranslations = {
       },
       "moonfire": {
         "name": "Księżycowa nawałnica",
-        "description": "Podpala wroga księżycowym ogniem, zadając {damage} obrażeń od Arkanów plus obrażenia w czasie.",
+        "description": "Podpala wroga za {damage} obrażeń od arkanów, a następnie zadaje kolejne {overTime} obrażeń od arkanów w ciągu {duration} s.",
         "specNote_balance": "Utrzymuj płomień: Księżycowe nasienie przedłuża go o 6 sekund."
       },
       "moonseed": {
         "name": "Księżycowe nasienie",
-        "description": "Tylko w Postaci księżycowej sowy. Uderza za {damage} obrażeń tajemnych, dodaje jeden stopień Księżycowego przypływu i przedłuża twoją Księżycową nawałnicę o 6 s, do {duration} s na użycie. Przy pełnym Księżycowym przypływie Księżycowe nasienie staje się Księżycowym przyborem."
+        "description": "Tylko w Postaci księżycowej sowy. Uderza za {damage} obrażeń od arkanów, dodaje 1 Księżycowy przypływ (maks. 3) i przedłuża twoją Księżycową nawałnicę na celu o 6 s, do {duration} dodatkowych s na nałożenie Księżycowej nawałnicy. Przy 3 Księżycowych przypływach ten przycisk zmienia się w Księżycowy przybór: potężne natychmiastowe uderzenie obrażeniami od arkanów, które zużywa wszystkie 3."
       },
       "rejuvenation": {
         "name": "Zarodnikowe gojenie",
@@ -18385,20 +18403,20 @@ export const pl_PL: EnTranslations = {
       },
       "thorns": {
         "name": "Cierniowa straż",
-        "description": "Z celu wyrastają ciernie: atakujący wręcz otrzymują {buff} obrażeń od Natury."
+        "description": "Z przyjaznego celu wyrastają ciernie na 10 min. Każde trafienie wręcz w cel zadaje atakującemu {buff} obrażeń od natury."
       },
       "entangling_roots": {
         "name": "Chwytające korzenie",
-        "description": "Unieruchamia cel w miejscu nawet na 12 sek."
+        "description": "Unieruchamia cel w miejscu na maksymalnie 12 s. Na drugiej randze zadaje też 32 obrażeń od natury w ciągu 12 s, zwiększanych mocą zaklęć."
       },
       "bear_form": {
         "name": "Postać Bruina",
-        "description": "Zmień postać w niedźwiedzia: pancerz +110%, maksymalne zdrowie +30%, znacznie zwiększona moc ataku, twoje ataki budują wściekłość i generują 30% więcej zagrożenia. Atakujesz dwa razy szybciej za połowę obrażeń na cios, a każdy cios buduje podwójną wściekłość. Przemiana w każdą postać przyznaje Chyży Krok, krótki przyrost prędkości ruchu. Rzuć ponownie, aby wrócić do postaci rzucającego."
+        "description": "Przemień się w niedźwiedzia: pancerz +110%, maksymalne zdrowie +30%, moc ataku +15 plus 1,5 za punkt zręczności, twoje ataki budują wściekłość i generują 30% więcej zagrożenia. Atakujesz dwa razy szybciej za połowę obrażeń na cios, a każdy cios buduje podwójną wściekłość. Przemiana w dowolną postać przyznaje Chyży Krok, krótki przyrost prędkości ruchu. Rzuć ponownie, aby wrócić do postaci rzucającego."
       },
       "maul": {
         "name": "Kruszenie kości",
-        "description": "Miażdżący atak, który zwiększa obrażenia w walce wręcz o {damage} i wzbudza wysokie zagrożenie. Aktywuje się przy twoim następnym zamachu. Tylko w Postaci Bruina.",
-        "specNote_feral": "Każdy trafiony cios dodaje 1 Starą Krew; przy 3 Starej Krwi ten przycisk zmienia się w Łamacz szpiku: cios zadający od 78 do 96 obrażeń przy wysokim zagrożeniu; poniżej połowy zdrowia zamiast tego leczy cię o 18% twojego maksymalnego zdrowia i zwraca 15 wściekłości."
+        "description": "Twoje następne uderzenie w zwarciu zadaje dodatkowe {damage} obrażeń i generuje zagrożenie równe 2,5-krotności swoich obrażeń plus niewielką stałą wartość. Tylko w Postaci Bruina.",
+        "specNote_feral": "Każdy trafiony cios dodaje 1 Starą Krew; przy 3 Starej Krwi ten przycisk zmienia się w Łamacz szpiku: potężny cios przy wysokim zagrożeniu; poniżej połowy zdrowia zamiast tego leczy cię o 18% twojego maksymalnego zdrowia i zwraca 15 wściekłości."
       },
       "growl": {
         "name": "Groźba",
@@ -18410,7 +18428,7 @@ export const pl_PL: EnTranslations = {
       },
       "cat_form": {
         "name": "Postać kota",
-        "description": "Zmień się w kota: zręczność rośnie z poziomem, moc ataku +8 plus 2 na poziom, ataki używają energii i punktów kombinacji, poruszasz się o 15% szybciej i tworzysz o 29% mniej zagrożenia. Każda zmiana postaci daje Długi krok, krótkie przyspieszenie. Rzuć ponownie, aby wrócić do postaci rzucającej zaklęcia."
+        "description": "Przemień się w kota: zręczność + połowa twojego poziomu (co najmniej 2), moc ataku +8 plus 2 na poziom, twoje ataki używają energii i punktów combo, poruszasz się o 15% szybciej i generujesz o 29% mniej zagrożenia. Przemiana w dowolną postać przyznaje Chyży Krok, krótki przyrost prędkości ruchu. Rzuć ponownie, aby wrócić do postaci rzucającego."
       },
       "claw": {
         "name": "Szarpiący pazur",
@@ -18424,22 +18442,22 @@ export const pl_PL: EnTranslations = {
       },
       "ferocious_bite": {
         "name": "Krwawe ukąszenie",
-        "description": "Umiejętność kończąca, która zadaje {damage}. Tylko w Postaci kota.",
+        "description": "Umiejętność kończąca, która zadaje {damage} obrażeń Fizycznych. Tylko w Postaci kota.",
         "specNote_feral": "Każdy trafiony cios dodaje 1 Starą Krew; przy 3 Starej Krwi ten przycisk zmienia się w Czerwone Żniwa, które zużywają Starą Krew na silniejszy cios, dodatkowo natychmiast zadają wszystkie obrażenia, jakie zadałyby jeszcze twoje Zdzieranie i Rozszarpanie, i przywracają energię."
       },
       "swipe": {
         "name": "Zamaszyste pazury",
-        "description": "Zamaszyście przeczesz pazurami pobliskich wrogów, zadając {damage} obrażeń. Wzbudza dodatkowe zagrożenie. Tylko w Postaci Bruina.",
+        "description": "Przeczesz pazurami każdego wroga w promieniu 5 m, zadając każdemu {damage} obrażeń i generując o 75% więcej zagrożenia niż zadane obrażenia. Tylko w Postaci Bruina.",
         "specNote_feral": "Każdy trafiony cios dodaje 1 Starą Krew (maks. 3)."
       },
       "regrowth": {
         "name": "Drugi rozkwit",
-        "description": "Leczy przyjazny cel za {damage} oraz dodatkową ilość w ciągu 15 sekund. Jeśli efekt utrzyma się przez pełny czas, ponownie leczy cel o tę samą wartość co początkowe leczenie.",
+        "description": "Leczy sojuszniczy cel za {damage}, a następnie za dodatkowe {overTime} w ciągu 15 s. Jeśli leczenie w czasie trwa pełny czas, leczy cel jeszcze raz za wartość pierwszego leczenia (przed premią z trafienia krytycznego). Zakończenie go wcześniej, na przykład Szybkim uzdrowieniem, Nadrozkwitem lub ponownym rzuceniem, pomija to leczenie.",
         "specNote_restoration": "Każde rzucenie dodaje 1 Zieleń (maks. 3), także gdy odnawia rozkwit, który już działa."
       },
       "barkskin": {
         "name": "Dębowa skóra",
-        "description": "Twoja skóra twardnieje niczym kora, zwiększając pancerz o 150 na 15 sek."
+        "description": "Twoja skóra twardnieje niczym kora, zwiększając pancerz o {buff}% na 15 sek."
       },
       "sacred_bulwark": {
         "name": "Święty Bastion",
@@ -18447,12 +18465,12 @@ export const pl_PL: EnTranslations = {
       },
       "primal_reflexes": {
         "name": "Pierwotne Odruchy",
-        "description": "Twoje instynkty wyostrzają się, zwiększając szansę na unik o 50% przez 6 sek."
+        "description": "Twoje instynkty wyostrzają się, dodając 50 punktów procentowych do twojej szansy na unik na 6 s."
       },
       "starfire": {
         "name": "Spadające niebo",
         "description": "Przyzywa pocisk gwiezdnego ognia, zadając {damage} obrażeń od Arkanów.",
-        "specNote_balance": "W Postaci księżycowej sowy każde ukończone rzucenie dodaje 1 Księżycowy przypływ (maks. 3). Przy 3 Księżycowym przypływie ten przycisk zmienia się w Słoneczny ślad: natychmiastowe uderzenie zadające od 80 do 100 obrażeń od Natury plus podpalenie na 45 obrażeń przez 9 sekund, przywracające 35 many i zużywające wszystkie 3 stopnie Księżycowego przypływu."
+        "specNote_balance": "W Postaci księżycowej sowy każde ukończone rzucenie dodaje 1 Księżycowy przypływ (maks. 3). Przy 3 Księżycowym przypływie ten przycisk zmienia się w Słoneczny ślad: natychmiastowe uderzenie obrażeniami od Natury plus podpalenie trwające 9 sekund, przywracające 35 many i zużywające wszystkie 3 stopnie Księżycowego przypływu."
       },
       "travel_form": {
         "name": "Postać Fleet",
@@ -18500,28 +18518,28 @@ export const pl_PL: EnTranslations = {
       },
       "rip": {
         "name": "Krwawa szczelina",
-        "description": "Cios kończący wywołujący krwawienie co 2 s przez 24 s: 72 obrażenia plus 48 za wydany punkt kombinacji (5 punktów: łącznie {damage}). Tylko w Postaci kota.",
+        "description": "Cios kończący wywołujący krwawienie co 2 s przez 24 s, zadający tym większe obrażenia, im więcej punktów kombinacji wydano (5 punktów: łącznie {damage}). Tylko w Postaci kota.",
         "specNote_feral": "Trafiony cios dodaje 1 Starą Krew (maks. 3)."
       },
       "mortal_strike": {
         "name": "Okaleczające uderzenie",
-        "description": "Bezlitosne uderzenie zadające obrażenia broni plus {damage}. (Sygnatura Oręża)"
+        "description": "Uderza za obrażenia broni plus {damage} i zmniejsza leczenie otrzymywane przez cel o 50% na 10 s. Nakłada też Ziejące rany, krwawienie zadające {overTime} obrażeń Fizycznych w ciągu 6 s w 2 tyknięciach. (Sygnatura Oręża)"
       },
       "bloodthirst": {
         "name": "Upust krwi",
-        "description": "Natychmiast atakuj w krwawym szale, zadając 60% obrażeń broni plus {damage}. (Sygnatura furii)"
+        "description": "Uderza za 50% obrażeń broni plus {damage}, leczy cię za 3% twojego maksymalnego zdrowia i generuje {rage} wściekłości. Ma 30% szans na wprawienie cię w Szał na {duration} s. (Sygnatura Furii)"
       },
       "shield_slam": {
         "name": "Trzask tarczy",
-        "description": "Uderza cel tarczą, zadając 50% obrażeń broni plus {damage} i wzbudzając ogromne zagrożenie. (Znak rozpoznawczy Ochrony)"
+        "description": "Uderza cel tarczą za obrażenia broni plus {damage} i generuje {rage} wściekłości. Wywołuje bardzo duże zagrożenie. (Sygnatura Ochrony)"
       },
       "whirlwind": {
         "name": "Wir ostrzy",
-        "description": "Wirujesz w śmiercionośnym łuku, uderzając wszystkich pobliskich wrogów za {damage}. (Talent Furii)"
+        "description": "Uderza wszystkich wrogów w promieniu 8 m za {damage} obrażeń Fizycznych. Przez następne {duration} s twoje następne 2 umiejętności na pojedynczy cel zadają też 40% swoich obrażeń maksymalnie 4 innym wrogom w promieniu 8 m od ich celu. (Furia)"
       },
       "berserker_rage": {
         "name": "Kipiąca furia",
-        "description": "Wpadnij w kipiącą furię, generując 20 wściekłości. (Talent wojownika)"
+        "description": "Wpadasz w kipiącą furię, natychmiast generując {rage} wściekłości."
       },
       "crusader_strike": {
         "name": "Cios przysięgi",
@@ -18533,11 +18551,11 @@ export const pl_PL: EnTranslations = {
       },
       "galeheart_weapon": {
         "name": "Broń Serca Wichru",
-        "description": "Zaklina obie bronie na 30 min, umożliwiając Kadencję Ducha Wojny."
+        "description": "Zaklina obie bronie na 30 min. Gdy jest aktywne, każda ukończona Kadencja Ducha Wojny uderza też Echami Huraganu. Zastępuje Oręż kamiennych okowów."
       },
       "warspirit_cadence": {
         "name": "Kadencja Ducha Wojny",
-        "description": "Pasywna: Ataki obiema broniami nie mają dodatkowej szansy na chybienie. Co 3. celne uderzenie bronią wyzwala 2 Echa Huraganu za 25% obrażeń od Natury i przyznaje Znak Burzy na 12 s. Znak Burzy czyni twój następny Łukowy pocisk, Wstrząs lub Kojące wody natychmiastowymi i obniża ich koszt many o 50%. Uderzenie przodków liczy się jako 2 ataki. (Duch Wojny)"
+        "description": "Bierne: ataki dwiema broniami nie mają dodatkowej szansy na chybienie. Gdy aktywny jest Broń Serca Wichru lub Oręż kamiennych okowów, co 3. celne uderzenie bronią przyznaje Sztormowe Wezwanie na 12 s. Z Bronią Serca Wichru wyzwala też 2 Echa Huraganu, z których każde zadaje 25% obrażeń tego trafienia jako obrażenia od natury. Sztormowe Wezwanie sprawia, że twój następny Łukowy pocisk, Wstrząs lub Kojące wody są natychmiastowe i kosztują o 50% mniej many. Uderzenie przodków liczy się jako 2 ataki. (Wzmocnienie żywiołów)"
       },
       "stormsurge": {
         "name": "Sztormowa Fala",
@@ -18561,11 +18579,11 @@ export const pl_PL: EnTranslations = {
       },
       "stoneward": {
         "name": "Kamienna Straż",
-        "description": "Chroni sojusznika przez 60 s z 6 ładunkami. Obrażenia zużywają ładunek, aby wyleczyć 5% maksymalnego zdrowia, raz na 3 s. (Talent szamana)"
+        "description": "Chroni jednego sojusznika przez 60 s. Gdy otrzymuje obrażenia, ładunek leczy go za 5% jego maksymalnego zdrowia, najwyżej raz na 3 s, do 6 ładunków. Tylko jeden sojusznik naraz może mieć twoją Kamienną Straż. (Talent szamana)"
       },
       "tidecall": {
         "name": "Wezwanie Przypływu",
-        "description": "Leczy przyjazny cel za {damage}. Leczenie rośnie wraz z mocą zaklęć. Dodaje pełne leczenie sprzed nadleczenia do Nurtu Cerowania, do 30% maksymalnego zdrowia celu."
+        "description": "Leczy sojuszniczy cel za {damage}. Leczenie rośnie z mocą leczenia. Dodaje też pełne leczenie sprzed nadleczenia do Leczniczego Prądu celu, puli, która leczy go przez 12 s i mieści najwyżej 30% jego maksymalnego zdrowia."
       },
       "soul_harvest": {
         "name": "Żniwo Esencji",
@@ -18573,7 +18591,7 @@ export const pl_PL: EnTranslations = {
       },
       "soul_lance": {
         "name": "Lanca Duszy",
-        "description": "Ciska widmową lancę, zadając {damage} obrażeń od Cienia. Przeciwko celowi noszącemu twój Znak Ossuarium, 50% tych obrażeń dolicza się do znaku."
+        "description": "Ciska widmową lancę za {damage} obrażeń od cienia. Przeciwko twojemu Znakowi Ossuarium znak gromadzi 70% jej obrażeń zamiast 20%."
       },
       "raise_graveguard": {
         "name": "Wskrześ Strażnika Grobu",
@@ -18589,19 +18607,19 @@ export const pl_PL: EnTranslations = {
       },
       "bone_armor": {
         "name": "Kościany Pancerz",
-        "description": "Owija cię kośćmi, pochłaniając obrażenia równe 20% twojego maksymalnego zdrowia."
+        "description": "Owija cię kośćmi na {duration} s, pochłaniając obrażenia równe 20% twojego maksymalnego zdrowia."
       },
       "corpse_explosion": {
         "name": "Wybuch Zwłok",
-        "description": "Poświęca najpierw Kościanego Maga, potem Szkieletowego Wojownika, a Grobowe Skrzydło tylko w ostateczności. Spośród duplikatów wybiera tego z najkrótszym pozostałym czasem trwania, a następnie najsłabszego, aby zadać {damage} obrażeń od Cienia w wybranym miejscu."
+        "description": "Poświęca jednego z twoich sług Władzy (nigdy Strażnika Grobu), by zadać {damage} obrażeń od cienia wrogom w promieniu 8 m od wybranego miejsca. Najpierw bierze Szkieletowego Wojownika, potem Kościanego Maga, a Grobowe Skrzydło tylko w ostateczności; spośród sług tego samego rodzaju wybiera tego, któremu zostało najmniej czasu, a potem najbardziej rannego. Wymaga sługi Władzy."
       },
       "funeral_harvest": {
         "name": "Pogrzebowe Żniwo",
-        "description": "Gdy umiera wróg, któremu niedawno zadałeś obrażenia ty lub twoi nieumarli, zyskujesz 1 Odłamek Duszy. Może się to zdarzyć najwyżej raz na 3 sekundy."
+        "description": "Gdy wróg umiera w ciągu 5 s od otrzymania obrażeń od ciebie lub twoich nieumarłych, zyskujesz 1 Odłamek Duszy. Może się to zdarzyć najwyżej raz na 3 s."
       },
       "ossuary_mark": {
         "name": "Znak Ossuarium",
-        "description": "Oznacza wroga na 15 sekund, gromadząc 20% obrażeń zadanych przez ciebie i twoich nieumarłych. Rzuć ponownie, aby zdetonować znak. Jeśli oznaczony wróg umrze, znak eksploduje w promieniu 6 jardów i tworzy 1 Odłamek Duszy."
+        "description": "Oznacza wroga na 15 s, gromadząc 20% obrażeń zadanych mu przez ciebie i twoich nieumarłych. Rzuć ponownie, aby zdetonować go wcześniej: wróg otrzymuje zgromadzone obrażenia jako obrażenia od cienia, a ty leczysz się za 25% z nich. Gdy znak wygasa, detonuje bez leczenia. Jeśli oznaczony wróg umrze, zgromadzone obrażenia trafiają innych wrogów w promieniu 6 m, a ty zyskujesz 1 Odłamek Duszy."
       },
       "unholy_command": {
         "name": "Nieświęty Rozkaz",
@@ -18613,7 +18631,7 @@ export const pl_PL: EnTranslations = {
       },
       "sacrifice_undead": {
         "name": "Poświęć Nieumarłego",
-        "description": "Niszczy jednego sługę Władzy, aby przywrócić 25% twojego maksymalnego zdrowia."
+        "description": "Niszczy twojego najbardziej rannego sługę Władzy (nigdy Strażnika Grobu), aby przywrócić 25% twojego maksymalnego zdrowia. Wymaga sługi Władzy."
       },
       "raise_gravewing": {
         "name": "Wskrześ Grobowe Skrzydło",
@@ -18633,11 +18651,11 @@ export const pl_PL: EnTranslations = {
       },
       "holy_shield": {
         "name": "Święta tarcza",
-        "description": "Zwiększa blok o 30% i daje na {duration} sek. tarczę równą {damage}% twojego maksymalnego zdrowia. Wniebowstąpienie wzmacnia obronę."
+        "description": "Zyskujesz 30% szansy na blok i tarczę pochłaniającą {damage}% twojego maksymalnego zdrowia na {duration} s, uwalniając impuls zagrożenia. Wzniesienie podnosi szansę na blok do 40%, zwiększa tarczę o 50% i wydłuża oba efekty do 10 s."
       },
       "bestial_wrath": {
         "name": "Bestialski gniew",
-        "description": "Daje 3 Zajadłość Watahy. Twoje następne Spuść Bestię w ciągu 20 s zadaje o 50% więcej obrażeń od uderzenia i klepnięcia, a jej szał trwa 12 s zamiast 8. (Znak Władania bestiami)"
+        "description": "Daje 3 Zaciekłości Sfory na 20 s i kończy każdy aktywny Rozpętany Szał. Twoje następne Spuść Bestię w ciągu 20 s zadaje o 50% więcej obrażeń od uderzenia i klaśnięcia, a jego szał trwa 12 s zamiast 8. (Sygnatura Władania bestiami)"
       },
       "trueshot_aura": {
         "name": "Aura celnego strzału",
@@ -18653,15 +18671,15 @@ export const pl_PL: EnTranslations = {
       },
       "combustion": {
         "name": "Trans feniksa",
-        "description": "Zwiększa szansę na krytyczny efekt zaklęć o 50% na 15 sek. (specjalizacja Ogień)"
+        "description": "Przez 10 s twoje zaklęcia Ognia zawsze trafiają krytycznie, w tym pociski już w locie, a te trafienia budują Gorącą serię jak zwykle. Poza globalnym odnowieniem i możliwe do użycia podczas rzucania. Jego rzucenie kończy ładowanie ładunku Deszczu żaru, który się odnawia. Poza Transem feniksa każde trafienie krytyczne budujące Gorącą serię skraca jego odnowienie o 1 s. (Ogień)"
       },
       "icy_veins": {
         "name": "Lodowy przypływ",
-        "description": "Zwiększa przyspieszenie zaklęć o 30% oraz zapobiega przerwaniu i opóźnieniu rzucania na 10 sek. (specjalizacja Mróz)"
+        "description": "Zwiększa przyspieszenie zaklęć o 30% i zapobiega przerwaniu oraz opóźnieniu rzucania na 10 s. (Mróz)"
       },
       "cold_blood": {
         "name": "Zimna krew",
-        "description": "Skupia twój morderczy zamiar, dzięki czemu twoje następne 5 ataków to trafienia krytyczne. (silnik Knifework)"
+        "description": "Twoje następne 5 ataków w ciągu {duration} s to gwarantowane trafienia krytyczne. Ataki automatyczne też zużywają ładunek. (Sygnatura Zabójstwa)"
       },
       "blade_flurry": {
         "name": "Nawałnica ostrzy",
@@ -18669,7 +18687,7 @@ export const pl_PL: EnTranslations = {
       },
       "hemorrhage": {
         "name": "Krwotok",
-        "description": "Uderza wroga za obrażenia broni plus {damage}, zadaje obrażenia od krwawienia przez 12 sekund i zwiększa otrzymywane obrażenia od krwawienia o 40%. Przyznaje 1 punkt combo. Co drugie użycie dodaje 1 Mrok (maks. 3). (silnik Skulduggery)"
+        "description": "Uderza wroga za obrażenia broni plus {damage} i sprawia, że krwawi za {overTime} w ciągu 12 s. Przez 12 s wszystkie krwawienia na celu zadają o 40% więcej obrażeń. Przyznaje 1 punkt combo. Co drugie użycie dodaje 1 Mrok (maks. 3). (Sygnatura Skrytości)"
       },
       "power_infusion": {
         "name": "Infuzja mocy",
@@ -18677,15 +18695,15 @@ export const pl_PL: EnTranslations = {
       },
       "holy_nova": {
         "name": "Kantyk słoneczny",
-        "description": "Leczy sojuszników w promieniu 10 m o {damage} i zadaje od 24 do 30 obrażeń świętych wrogom w tym samym obszarze. Obie wartości rosną z mocą zaklęć. (Podstawa Świętości)"
+        "description": "Leczy sojuszników w promieniu 10 m o {damage} i zadaje od 24 do 30 obrażeń świętych wrogom w tym samym obszarze. Leczenie rośnie z mocą leczenia, a obrażenia z mocą zaklęć. (Podstawa Świętości)"
       },
       "shadowform": {
         "name": "Zmierzchowa zasłona",
-        "description": "Wkraczasz w Zmierzchową zasłonę i zwiększasz swoje obrażenia od cienia o 25%. Rzuć ponownie, by opuścić Zmierzchową zasłonę. (Znak Cienia)"
+        "description": "Wkraczasz w Zmierzchową zasłonę, zwiększając swoje obrażenia od cienia o 25%. Rzucenie zaklęcia leczącego ją kończy. Rzuć Zmierzchową zasłonę ponownie, by ją opuścić. (Sygnatura Nieszporów)"
       },
       "elemental_mastery": {
         "name": "Mistrzostwo żywiołów",
-        "description": "Przez 12 s Łukowy pocisk daje 2 Gromy. Twój następny Łukowy pocisk albo Rozgałęziona Błyskawica jest natychmiastowy, a twoja następna pełna wypłata Gromu zadaje o 25% więcej obrażeń. (Znak Żywiołów)"
+        "description": "Przez 12 s Łukowy pocisk daje 2 Gromy zamiast 1. Twój następny Łukowy pocisk lub Rozgałęziona Błyskawica w tym czasie jest natychmiastowy, a twój następny Ziemny wstrząs lub Przebudzenie uskoku, które zużywa 5 Gromów, zadaje o 25% więcej obrażeń. (Sygnatura Żywiołów)"
       },
       "siphon_life": {
         "name": "Wyssanie życia",
@@ -18693,7 +18711,7 @@ export const pl_PL: EnTranslations = {
       },
       "conflagrate": {
         "name": "Pożoga",
-        "description": "Przyspiesza przyszłe tyknięcie twojego Płonącego paktu, a następnie podpala cel za {damage} obrażeń od ognia. Generuje 1 Spustoszenie i 1 Ruinę. Mieści {charges} ładunki. (Znak Zniszczenia)"
+        "description": "Wymaga twojego Płonącego paktu na celu. Natychmiast zadaje jedno z jego pozostałych tyknięć, skracając go o jedno tyknięcie, a następnie podpala cel za {damage} obrażeń od ognia. Generuje 1 Spustoszenie i 1 Ruinę (kumuluje się do 2, trwa 15 s): twój następny Pocisk Ruiny rzuca się o 30% szybciej albo twój następny Deszcz ognia zrzuca pierwszą falę natychmiast. Mieści {charges} ładunki. (Sygnatura Zniszczenia)"
       },
       "moonkin_form": {
         "name": "Postać księżycowej sowy",
@@ -18701,7 +18719,7 @@ export const pl_PL: EnTranslations = {
       },
       "feral_charge": {
         "name": "Pierwotny przypływ",
-        "description": "Wyzwalasz pierwotny przypływ. W Postaci kota regeneracja energii wzrasta o 100% na 10 sek. W Postaci Bruina natychmiast zyskujesz 50 pkt. wściekłości. (specjalizacja Dzikość)"
+        "description": "Wyzwalasz pierwotny przypływ. W Postaci kota regeneracja energii wzrasta o 100% na 10 s. W Postaci Bruina natychmiast generuje 50 wściekłości. Poza Postacią kota i Bruina nie ma efektu. (Sygnatura Dzikości)"
       },
       "swiftmend": {
         "name": "Szybkie uzdrowienie",
@@ -18722,7 +18740,7 @@ export const pl_PL: EnTranslations = {
       },
       "marrowbreak": {
         "name": "Łamacz szpiku",
-        "description": "Zużywa twoje 3 Starej Krwi na ciężki cios o wysokim zagrożeniu, zadający {damage} obrażeń. Poniżej połowy zdrowia zamiast tego leczy cię o 18% maksymalnego zdrowia i zwraca 15 szału."
+        "description": "Zużywa twoje 3 Starej Krwi na uderzenie za {damage} obrażeń, które generuje zagrożenie równe dwukrotności swoich obrażeń plus 110. Poniżej połowy zdrowia zamiast tego leczy cię za 18% twojego maksymalnego zdrowia i zwraca 15 wściekłości."
       },
       "wildwake": {
         "name": "Dzikie Przebudzenie",
@@ -18744,8 +18762,8 @@ export const pl_PL: EnTranslations = {
       },
       "natures_boon": {
         "name": "Dar przyrody",
-        "description": "Twoje zaklęcia mogą przygotować Dar przyrody na 10 s: wskazane zaklęcie staje się darmowe, o 25% silniejsze i dostępne w każdej postaci. Ponowna aktywacja odświeża czas trwania.",
-        "specNote_feral": "Każdy trafiony automatyczny atak wręcz ma szansę 1 do 15 na przygotowanie go dla Zarodnikowego gojenia, a w Postaci Bruina dla Dębowej skóry.",
+        "description": "Dar przyrody to 10-sekundowe okno, które sprawia, że wskazane zaklęcie jest darmowe, o 25% silniejsze i dostępne w każdej postaci. Nowa aktywacja odświeża czas trwania.",
+        "specNote_feral": "Każdy trafiony automatyczny atak wręcz może go uzbroić, około 4 razy na minutę w dowolnej postaci (szansa 1 do 15 na uderzenie w Postaci kota). Obejmuje Zarodnikowe gojenie, które czyni o 50% silniejszym zamiast 25%, oraz Dębową skórę, gdy jesteś w Postaci Bruina; pierwsze, które rzucisz, go zużywa. Każda aktywacja zeruje też odnowienie Dębowej skóry.",
         "specNote_balance": "Każdy rzucony Dziki pocisk lub Spadające niebo ma 10% szans na przygotowanie go dla Wybuchu zarodników, najwyżej raz na 10 s.",
         "specNote_restoration": "Każdy impuls twoich efektów leczenia w czasie ma 10% szans na przygotowanie go dla Wybuchu zarodników, najwyżej raz na 10 s."
       },
@@ -18776,7 +18794,7 @@ export const pl_PL: EnTranslations = {
       },
       "summon_infernal": {
         "name": "Przywołanie Pyre Colossus",
-        "description": "Sprowadza Pyre Colossus na wskazany obszar, zadając przy lądowaniu 64-79 pkt. obrażeń od Ognia. Walczy przez 30 sek. bez zastępowania twojego demona, co 2 sek. podpala pobliskich wrogów i co sekundę generuje 1 pkt. Ruiny."
+        "description": "Sprowadza Pyre Colossus na wskazany obszar, zadając przy uderzeniu {damage} obrażeń od ognia wrogom w promieniu 6 m. Walczy przez 30 s bez zastępowania twojego demona, co 2 s zadaje 66 obrażeń od ognia wrogom w promieniu 8 m i co sekundę generuje 1 Spustoszenie."
       },
       "summon_doomguard": {
         "name": "Przywołanie Wraithborna",
@@ -18788,11 +18806,11 @@ export const pl_PL: EnTranslations = {
       },
       "berserker_stance": {
         "name": "Postawa berserkera",
-        "description": "Brawurowa postawa bojowa: twoje trafienia krytyczne zdarzają się o 3% częściej i zadają o 3% większe obrażenia. Wojownik specjalizacji Furia zawsze walczy w tej postawie."
+        "description": "Brawurowa postawa bojowa: zyskujesz 3% szansy na trafienie krytyczne, a twoje trafienia krytyczne zadają o 3% więcej obrażeń. Wojownik Furii zawsze walczy w tej postawie."
       },
       "sweeping_strikes": {
         "name": "Poszerzony łuk",
-        "description": "Przez 12 sek. twoje ataki na pojedynczy cel trafiają dodatkowo 1 pobliskiego wroga za pełne obrażenia. (specjalizacja Broń)"
+        "description": "Przez 12 s każde trafienie twoich umiejętności na pojedynczy cel zadaje te same obrażenia także 1 innemu wrogowi w promieniu 8 m od twojego celu. Ataki automatyczne nie są kopiowane. (Oręż)"
       },
       "deep_wounds": {
         "name": "Ziejące rany",
@@ -18800,7 +18818,7 @@ export const pl_PL: EnTranslations = {
       },
       "enrage_passive": {
         "name": "Rzeź",
-        "description": "Pasywne: gdy jesteś w Szale, przez 4 sek. zadajesz o 7% większe obrażenia, atakujesz o 25% szybciej i poruszasz się o 10% szybciej. Upust krwi ma 30% szansy na wprawienie cię w Szał; Krwawe żniwo robi to zawsze. (specjalizacja Furia)"
+        "description": "Upust krwi ma 30% szans na wprawienie cię w Szał na 4 s, a Krwawe żniwo zawsze to robi. W Szale zadajesz o 7% więcej obrażeń, atakujesz o 25% szybciej i poruszasz się o 10% szybciej. (Furia)"
       },
       "raging_gale": {
         "name": "Bliźniaczy cios",
@@ -18808,7 +18826,7 @@ export const pl_PL: EnTranslations = {
       },
       "red_harvest": {
         "name": "Krwawe żniwo",
-        "description": "Stawiasz wszystko: w amoku uderzasz trzykrotnie, każdy cios zadaje 65% obrażeń broni plus {damage}, a ty zawsze wpadasz w Szał. (specjalizacja Furia)"
+        "description": "Uderza trzykrotnie, każde trafienie zadaje 65% obrażeń broni plus {damage}, i zawsze wprawia cię w Szał na {duration} s. (Furia)"
       },
       "furious_mending": {
         "name": "Wściekłe gojenie",
@@ -18816,7 +18834,7 @@ export const pl_PL: EnTranslations = {
       },
       "emboldening_roar": {
         "name": "Ośmielający ryk",
-        "description": "Wydajesz ośmielający ryk: ty i przyjaźni gracze w promieniu 40 jardów zostajecie Ośmieleni, a twoje następne 3 umiejętności są gwarantowanymi trafieniami krytycznymi. (specjalizacja Furia)"
+        "description": "Ty i sojusznicy w promieniu 40 m zostajecie Ośmieleni na {duration} s: następne 3 umiejętności zadające obrażenia, których każdy z was użyje, są gwarantowanymi trafieniami krytycznymi. (Furia)"
       },
       "raised_guard": {
         "name": "Podniesiona garda",
@@ -18856,7 +18874,7 @@ export const pl_PL: EnTranslations = {
       },
       "sudden_death": {
         "name": "Nagła śmierć",
-        "description": "Twoje ataki automatyczne mają szansę pozwolić ci użyć Przedwczesnego grobu na celu o dowolnym poziomie zdrowia, bez kosztu wściekłości. (specjalizacja Broń)"
+        "description": "Twoje ataki automatyczne, które trafiają, mają 10% szans na przyznanie Nagłej śmierci na 10 s: twój następny Przedwczesny grób nie kosztuje wściekłości i można go użyć na celu o dowolnym poziomie zdrowia. (Oręż)"
       },
       "storm_bolt": {
         "name": "Rzut gromu",
@@ -18868,7 +18886,7 @@ export const pl_PL: EnTranslations = {
       },
       "die_by_sword": {
         "name": "Śmierć od miecza",
-        "description": "Umiejętność obronna: przez 8 sek. otrzymujesz o 30% mniejsze obrażenia i unikasz znacznie większej liczby ataków."
+        "description": "Przez 8 s otrzymujesz o 30% mniej obrażeń i zyskujesz 30% szansy na unik."
       },
       "intervene": {
         "name": "Interwencja",
@@ -18876,11 +18894,11 @@ export const pl_PL: EnTranslations = {
       },
       "recklessness": {
         "name": "Brawura",
-        "description": "Szał: twoje generowanie wściekłości zwiększa się o 50%, a szansa na trafienie krytyczne o 20% na 12 sek."
+        "description": "Przez 12 s generujesz o 50% więcej wściekłości i zyskujesz 20% szansy na trafienie krytyczne."
       },
       "sanguine_aura": {
         "name": "Aura krwi",
-        "description": "Nasycasz swój oręż krwią wrogów: ty i twoi sojusznicy walczący wręcz zyskujecie 10% szybkości ataku i 10% obrażeń na 20 sek."
+        "description": "Nasyć swój oręż krwią wrogów: ty i każdy Wojownik, Paladyn, Łotrzyk, Szaman i Druid w twojej drużynie, z dowolnej odległości, zyskujecie 10% szybkości ataku i zadajecie o 10% więcej obrażeń na 20 s."
       },
       "victory_rush": {
         "name": "Zryw zwycięstwa",
@@ -18888,15 +18906,15 @@ export const pl_PL: EnTranslations = {
       },
       "intimidating_shout": {
         "name": "Zastraszający okrzyk",
-        "description": "Przerażający okrzyk, który zmusza do 5 wrogów w promieniu 8 m do ucieczki w strachu na 4 s. Obrażenia mogą przerwać efekt."
+        "description": "Zmusza do ucieczki w strachu do 5 wrogów w promieniu 8 m na 4 s. Każde trafienie przestraszonego wroga ma szansę przerwać strach, a trafienie za 10% jego maksymalnego zdrowia lub więcej zawsze to robi."
       },
       "revenge": {
         "name": "Odwet",
-        "description": "Atakujesz szerokim łukiem, zadając obrażenia fizyczne wszystkim wrogom przed tobą. Powyżej 5 celów obrażenia są zmniejszone. Gdy unikniesz ciosu lub go sparujesz, twój następny Odwet może nie kosztować wściekłości. (Protection)"
+        "description": "Uderza wszystkich wrogów przed tobą w promieniu 8 m za {damage} obrażeń Fizycznych. Powyżej 5 celów każde trafienie jest zmniejszone tak, by suma równała się 5 trafieniom. Gdy unikniesz lub sparujesz atak wręcz stworzenia, masz 30% szans, że twój następny Odwet w ciągu 10 s nie będzie kosztował wściekłości. (Ochrona)"
       },
       "heroic_leap": {
         "name": "Wojenny Skok",
-        "description": "Skaczesz do wskazanego obszaru, zadając przy lądowaniu pobliskim wrogom {damage} pkt. obrażeń."
+        "description": "Skacze na wskazany obszar, zadając wszystkim wrogom w promieniu 6 m {damage} obrażeń Fizycznych po wylądowaniu."
       },
       "rallying_cry": {
         "name": "Ryk Waleczności",
@@ -18908,11 +18926,11 @@ export const pl_PL: EnTranslations = {
       },
       "avatar": {
         "name": "Awatar",
-        "description": "Przemieniasz się w kolosa na 20 sek., uwalniając się od wszystkich efektów kontroli i zwiększając zadawane obrażenia o 20%."
+        "description": "Przełamuje ogłuszenia, strach, unieruchomienia, uciszenia, rozbrojenia i spowolnienia na tobie (nie te od bossów), po czym stajesz się kolosem na 20 s, zadając o 20% więcej obrażeń. Nie chroni cię przed nowymi efektami kontroli."
       },
       "avenging_wrath": {
         "name": "Mściwy gniew",
-        "description": "Rozwija cielesne skrzydła ze złotej świętej mocy, zyskując 10 Oddania i podwajając na 15 s Oddanie generowane przez twoje umiejętności. Zwiększa ponadto zadawane obrażenia i leczenie o 20%. Żniwiarz świtu: umożliwia Młot gniewu przeciw dowolnemu celowi."
+        "description": "Rozwija cielesne skrzydła ze złotej świętej mocy, zyskując 10 Oddania i podwajając na {duration} s Oddanie generowane przez twoje umiejętności. Zwiększa ponadto zadawane obrażenia i leczenie o 20%. Żniwiarz świtu: umożliwia Młot gniewu przeciw dowolnemu celowi."
       },
       "berserk": {
         "name": "Czerwona Mgła",
@@ -18924,11 +18942,11 @@ export const pl_PL: EnTranslations = {
       },
       "blink": {
         "name": "Mignięcie",
-        "description": "Teleportuje cię o 15 m do przodu i usuwa efekty unieruchomienia. (talent Maga)"
+        "description": "Teleportuje cię 15 m do przodu i usuwa unieruchomienia."
       },
       "bloodlust": {
         "name": "Bębny Wojny",
-        "description": "Zwiększa szybkość ataku, rzucania i kanałowania sojuszników z drużyny albo rajdu w promieniu 30 m o 30% na 15 s. Objęci sojusznicy nie mogą przez 10 min ponownie skorzystać z Bębnów Wojny ani z Przyspieszenia czasu. (Talent szamana)"
+        "description": "Zwiększa szybkość ataku, rzucania i kanalizowania sojuszników z drużyny lub rajdu w promieniu 30 m o 30% na 15 s. Objęci sojusznicy nie mogą przez 10 min ponownie skorzystać z Bębnów Wojny, Chóru złodziei ani Przyspieszenia czasu. (Talent szamana)"
       },
       "chain_lightning": {
         "name": "Rozgałęziona Błyskawica",
@@ -18956,7 +18974,7 @@ export const pl_PL: EnTranslations = {
       },
       "counterspell": {
         "name": "Rozproszenie zaklęcia",
-        "description": "Kontruje zaklęcia celu i zapobiega rzucaniu ich z tej szkoły przez 6 sekund."
+        "description": "Przerywa rzucane zaklęcie celu i blokuje mu szkołę tego zaklęcia na 6 s. Nie działa, jeśli cel nie rzuca zaklęcia."
       },
       "curse_of_exhaustion": {
         "name": "Ołowiana Klątwa",
@@ -19004,19 +19022,19 @@ export const pl_PL: EnTranslations = {
       },
       "hammer_of_wrath": {
         "name": "Młot gniewu",
-        "description": "Ciska świętym młotem za {damage} obrażeń i generuje 1 Oddanie. Użyteczny poniżej 20% zdrowia albo podczas Boskiego Wzniesienia lub Mściwego gniewu. Gniew Świtu daje dodatkowe rzucenie przeciw dowolnemu celowi, które ignoruje trwający czas odnowienia i zadaje o 20% więcej obrażeń. Wzniesienie zwiększa jego obrażenia o 30%."
+        "description": "Ciska świętym młotem za {damage} obrażeń Świętych i generuje 1 Oddanie. Można go użyć tylko na celu poniżej 20% zdrowia, chyba że aktywne jest Boskie Wzniesienie, Mściwy gniew lub Gniew Świtu. Gniew Świtu jest zużywany przez następne rzucenie, które ignoruje odnowienie i zadaje o 20% więcej obrażeń. Wzniesienie zwiększa jego obrażenia o 30%."
       },
       "healing_stream": {
         "name": "Źródlisko",
-        "description": "Przywraca sojuszniczemu celowi 120 zdrowia przez 12 sek. (talent Szamana)"
+        "description": "Leczy sojuszniczy cel za {damage} w ciągu 12 s, raz na 3 s. Leczenie rośnie z mocą leczenia. (Talent szamana)"
       },
       "howl_of_terror": {
         "name": "Wycie Grozy",
-        "description": "Przeraża pobliskich wrogów na maksymalnie 5 sek. Obrażenia równe łącznie 8% maksymalnego zdrowia celu przerywają jego strach. (talent Czarnoksiężnika)"
+        "description": "Przeraża wrogów w promieniu 8 m i w linii wzroku na maksymalnie 5 s. Obrażenia równe łącznie 8% maksymalnego zdrowia celu przerywają jego strach. (Talent czarnoksiężnika)"
       },
       "ice_block": {
         "name": "Zimna Trumna",
-        "description": "Zamyka cię w litym lodzie na 8 sek., zapewniając odporność na wszystkie obrażenia. Usuwa istniejące zwykłe szkodliwe efekty i zapobiega nakładaniu nowych zwykłych efektów kontroli. Można użyć podczas ogłuszenia lub przemiany. W zamknięciu nie możesz działać. Użyj ponownie, aby anulować. (mag)"
+        "description": "Zamyka cię w litym lodzie na 8 s. Nie otrzymujesz obrażeń i nie można cię ogłuszyć, unieruchomić, spowolnić, uciszyć ani w inny sposób kontrolować, ale nie możesz działać. Przy rzuceniu usuwa z ciebie szkodliwe efekty, z wyjątkiem kontroli spotkania i choroby regeneracji. Można użyć podczas ogłuszenia lub przemiany. Rzuć ponownie, aby anulować. (Mag)"
       },
       "inner_focus": {
         "name": "Wyciszony Umysł",
@@ -19025,11 +19043,11 @@ export const pl_PL: EnTranslations = {
       },
       "innervate": {
         "name": "Życiodajna Soki",
-        "description": "Żywe soki wzbierają w tobie przez 10 sek. i falami przywracają 20 twojego bieżącego zasobu: many, szału lub energii. Zmiana postaci ich nie przerywa. Sen, ogłuszenie lub zastój zatrzymują przepływ soków. (talent Druida)"
+        "description": "Żywe soki wzbierają w tobie przez 10 s, przywracając 20 używanego zasobu (many, wściekłości lub energii) co 2 s. Zmiana postaci go nie kończy. Sen, ogłuszenie lub zastój go wstrzymują. (Talent druida)"
       },
       "pummel": {
         "name": "Okładanie",
-        "description": "Przerywa rzucanie zaklęć celu i uniemożliwia rzucanie ich z tej szkoły na 4 sekundy."
+        "description": "Przerywa rzucane zaklęcie celu i uniemożliwia rzucanie zaklęć z tej szkoły na 4 s. Generuje 10 wściekłości, gdy przerwie rzucanie."
       },
       "kick": {
         "name": "Kopnięcie",
@@ -19041,7 +19059,7 @@ export const pl_PL: EnTranslations = {
       },
       "meteor": {
         "name": "Niebiański Kamień",
-        "description": "Przyzywa meteor na wybrany obszar, zadając {damage} obrażeń od Ognia. Następnie przez 6 sek. zadaje znajdującym się tam wrogom od 12 do 18 obrażeń od Ognia co 2 sek. (talent Maga)"
+        "description": "Przyzywa meteor na wybrany obszar. Po 2 s uderza, zadając każdemu wrogowi w miejscu uderzenia {damage} obrażeń od ognia i Podpalając każdego na 40% zadanych obrażeń w ciągu 6 s. (Ogień)"
       },
       "temporal_mend": {
         "name": "Czasowe ukojenie",
@@ -19053,11 +19071,11 @@ export const pl_PL: EnTranslations = {
       },
       "temporal_echo": {
         "name": "Czasowe echo",
-        "description": "Naznacza sojusznika echem zdrowszej chwili, natychmiast lecząc {damage} punktów zdrowia. Przez {duration} sek. leczy go {echoSinglePct}% twoich pozostałych obrażeń Arkanów przeciw jednemu celowi oraz {echoAreaPct}% obszarowych obrażeń Arkanów. Przypływ Eteru i Eteryczne Pociski leczą go zamiast tego za {echoDriverPct}% zadanych obrażeń."
+        "description": "Natychmiast leczy sojusznika za {damage} i naznacza go Czasowym echem na {duration} s. Gdy jest naznaczony, {echoSinglePct}% twoich pozostałych obrażeń od arkanów na pojedynczy cel i {echoAreaPct}% twoich obszarowych obrażeń od arkanów leczy go; Przypływ eteru i Eteryczne strzały leczą go zamiast tego za {echoDriverPct}% zadanych obrażeń. Możesz mieć jedno Czasowe echo naraz: ponowne rzucenie przenosi znak. Leczenie ponad pełne zdrowie staje się tarczą Czasowej Egidy, do 20% jego maksymalnego zdrowia."
       },
       "temporal_cascade": {
         "name": "Czasowa kaskada",
-        "description": "Wysyła echo kaskadą przez twoją grupę: cel i do czterech najbliższych sojuszników zostają natychmiast uleczeni i naznaczeni przez {duration} sek., przekierowując część zadawanych przez ciebie obrażeń Arkanów z powrotem przez ich echa, aby ich leczyć. Przypływ Eteru i Eteryczne Pociski tworzą z każdego grupowego Echa równą rezerwę leczenia, rozdzielaną według brakującego zdrowia między naznaczonych sojuszników poniżej 60% zdrowia. (Chronomancja)"
+        "description": "Leczy cel i do 4 pobliskich sojuszników, najpierw członków drużyny, i naznacza każdego grupowym Czasowym echem na {duration} s. Każde leczenie jest zwiększone o 3% za każdy 1% brakującego sojusznikowi zdrowia. Gdy są naznaczeni, 13% twoich obrażeń od arkanów na pojedynczy cel i 6% twoich obszarowych obrażeń od arkanów leczy każdego z nich. Przypływ eteru i Eteryczne strzały dodają też równą rezerwę leczenia z każdego grupowego Echa, rozdzielaną między naznaczonych sojuszników poniżej 60% zdrowia według brakującego zdrowia. Sojusznik, który już ma twoje Czasowe echo, zachowuje je. (Chronomancja)"
       },
       "temporal_reversal": {
         "name": "Odwrócenie czasu",
@@ -19081,7 +19099,7 @@ export const pl_PL: EnTranslations = {
       },
       "temporal_acceleration": {
         "name": "Przyspieszenie czasu",
-        "description": "Przyspiesza bieg czasu dla twojej grupy lub rajdu, zwiększając prędkość ataku, rzucania czarów i kanalizowania o 30% przez 15 sek. Sojusznicy, na których niedawno działała Temporal Acceleration lub Bębny Wojny, są zbyt wyczerpani, aby skorzystać z efektu. (Chronomancja)"
+        "description": "Przyspiesza bieg czasu dla sojuszników z grupy lub rajdu w promieniu 40 m, zwiększając ich prędkość ataku, rzucania i kanalizowania o 30% na 15 s. Objęci sojusznicy nie mogą przez 10 min ponownie skorzystać z Przyspieszenia czasu, Bębnów Wojny ani Chóru złodziei. (Chronomancja)"
       },
       "perfect_moment": {
         "name": "Idealna chwila",
@@ -19089,7 +19107,7 @@ export const pl_PL: EnTranslations = {
       },
       "arcane_surge": {
         "name": "Przypływ eteru",
-        "description": "Przepuszcza przez wroga falę surowego eteru, zadając {damage} obrażeń. Każde rzucenie czaru pozostawia Eteryczny Ładunek zwiększający obrażenia i prędkość rzucania kolejnego Aether Surge (o 5% szybciej za każdy), lecz znacznie podnoszący koszt many, maksymalnie do 4; Eteryczne strzały wydają te ładunki. Każde rzucenie może również naładować Eteryczny Pęd, czyniąc następny Aether Surge darmowym i dwukrotnie szybszym w rzucaniu."
+        "description": "Zadaje wrogowi {damage} obrażeń od arkanów i przyznaje Ładunek Arkanów, do 4, trwający 10 s i odświeżany każdym rzuceniem. Każdy Ładunek Arkanów sprawia, że twój następny Przypływ eteru zadaje o 30% więcej obrażeń i rzuca się o 5% szybciej, ale podwaja jego koszt many. Eteryczne strzały zużywają ładunki. Każde rzucenie ma 25% szans na przyznanie Eterycznego Pędu: twój następny Przypływ eteru w ciągu 15 s nie kosztuje many i rzuca się dwa razy szybciej."
       },
       "mind_sear": {
         "name": "Myślopalenie",
@@ -19101,7 +19119,7 @@ export const pl_PL: EnTranslations = {
       },
       "prayer_of_healing": {
         "name": "Chóralne Uzdrowienie",
-        "description": "Leczy sojuszników w promieniu 30 m o {damage}. Leczenie rośnie z mocą zaklęć. (Świętość)"
+        "description": "Leczy sojuszników w promieniu 30 m o {damage}. Leczenie rośnie z mocą leczenia. (Świętość)"
       },
       "preparation": {
         "name": "Plan Awaryjny",
@@ -19133,7 +19151,7 @@ export const pl_PL: EnTranslations = {
       },
       "smoke_screen": {
         "name": "Zasłona Dymna",
-        "description": "Znikasz w chmurze dymu, zwiększając szansę na unik o 30% na 8 sek."
+        "description": "Otaczasz się dymem, zwiększając swoją szansę na unik o 30% na 8 s."
       },
       "sacrilegious_march": {
         "name": "Świętokradczy Marsz",
@@ -19149,7 +19167,7 @@ export const pl_PL: EnTranslations = {
       },
       "skull_bash": {
         "name": "Uderzenie Czaszką",
-        "description": "Uderzenie głową z doskoku, które przerywa rzucenie zaklęcia celu i blokuje tę szkołę na 4 sek."
+        "description": "Uderza cel głową, przerywając rzucane zaklęcie i blokując rzucanie zaklęć z tej szkoły na 4 s."
       },
       "spell_lock": {
         "name": "Otchłanny knebel",
@@ -19157,36 +19175,36 @@ export const pl_PL: EnTranslations = {
       },
       "thieves_chorus": {
         "name": "Chór złodziei",
-        "description": "Gwizdnięty sygnał zagrzewa twoją grupę: szybkość ataku, rzucania zaklęć i kanałowania zwiększona o 10% na 10 sek. Sojusznicy niedawno objęci grupowym przyspieszeniem są zbyt wyczerpani, by skorzystać. (talent Łotrzyka)"
+        "description": "Zwiększa szybkość ataku, rzucania i kanalizowania sojuszników z drużyny lub rajdu w promieniu 30 m o 10% na 10 s. Objęci sojusznicy nie mogą przez 10 min ponownie skorzystać z Chóru złodziei, Bębnów Wojny ani Przyspieszenia czasu. (Talent łotrzyka)"
       },
       "tranquility": {
         "name": "Pieśń Gaju",
-        "description": "Kanalizuje uzdrawiającą energię przez 4 sek., lecząc sojuszników w promieniu 30 m o 42 do 52 co sekundę. (talent Druida)"
+        "description": "Kanalizuje uzdrawiającą energię przez 4 s, lecząc każdego sojusznika w promieniu 30 m i w twojej linii wzroku, w tym ciebie, za {damage} co sekundę. (Talent druida)"
       },
       "venom_dart": {
         "name": "Jadowita strzałka",
         "description": "Ciska zatrutą strzałką, zadając {damage} obrażeń natury. Przyznaje 1 punkt combo. Knifework: przedłuża ranę od Jadowitego rozdarcia o 6 sek., maksymalnie do 20 sek.",
-        "specNote_assassination": "Dodaje 1 Rytuał Jadu i przedłuża twoją jadowitą ranę o 6 sekund (rana nigdy nie przekracza 20 sekund)."
+        "specNote_assassination": "Dodaje 1 Rytuał Jadu (maks. 6), zwraca 15 energii i przedłuża twoją jadowitą ranę o 6 s (rana nigdy nie przekracza 20 s)."
       },
       "body_blow": {
         "name": "Cios w korpus",
-        "description": "Potężny cios za 130% obrażeń broni plus 10, który przyznaje 2 punkty combo i pogłębia Redline o jedną kreskę. (silnik Thuggery)"
+        "description": "Potężny cios za {weaponPercent}% obrażeń broni plus {damage}, który przyznaje 2 punkty combo i pogłębia Redline o jedną kreskę (maks. 4). (silnik Thuggery)"
       },
       "knockout_blow": {
         "name": "Cios nokautujący",
-        "description": "Zakończ Redline nokautem: uderza za 45 plus 35 za każdy punkt combo, o 25% mocniej za każdą kreskę Redline, i przywraca 25 energii. (silnik Thuggery)"
+        "description": "Kończy Redline nokautem: uderza za {damage} obrażeń Fizycznych, mocniej o 25% za każdy Cios w korpus rzucony podczas Redline (do 3), i przywraca 25 energii. Obrażenia rosną z mocą ataku. Użyj go, zanim Redline się skończy, inaczej nokaut przepadnie. (Walka)"
       },
       "veilstrike": {
         "name": "Cios zasłony",
-        "description": "Pochłania zapas Pomroki, spowijając cię cieniem na 6 sek.: twoje otwarcia z ukrycia działają w odkrytym terenie, a ty zadajesz 25% więcej obrażeń. (silnik Skulduggery)"
+        "description": "Przez 6 s: twoje otwarcia z Zasłony zmierzchu działają bez ukrycia i pod dowolnym kątem, a ty zadajesz o 10% więcej obrażeń. Twój pierwszy Cios czyhacza w jej trakcie zadaje o 50% więcej obrażeń broni. (Skrytość)"
       },
       "venomrend": {
         "name": "Jadowite rozdarcie",
-        "description": "Pochłania Rytuał Jadu: uderza za 22 plus 26 za punkt combo, detonuje pozostałe obrażenia twoich krwawień i przywraca 25 energii. (silnik Knifework)"
+        "description": "Zużywa twoje 6 Rytuału Jadu: uderza za {damage} obrażeń Fizycznych, natychmiast zadaje całość obrażeń pozostałych na twoim Wykrwawieniu, Drucie na gardło i jadowitej ranie, po czym nakłada nową jadowitą ranę zadającą {overTime} w ciągu 20 s. Przywraca 20 energii. (Zabójstwo)"
       },
       "typhoon": {
         "name": "Tajfun",
-        "description": "Podmuch wiatru odrzuca wszystkich wrogów w promieniu 8 metrów na 15 metrów od ciebie i oszałamia ich, spowalniając o 50% na 4 s. Wrodzy gracze lecą w powietrzu po prostej: za krawędzią lecą dalej i otrzymują obrażenia od upadku; śmiertelny upadek liczy się jako twoje zabójstwo."
+        "description": "Odrzuca każdego wroga w promieniu 8 m i w twojej linii wzroku na 15 m od ciebie i oszałamia go, spowalniając jego ruch o 50% na 4 s. Wrodzy gracze są wyrzucani w powietrze po prostej: zepchnięci z krawędzi lecą dalej i otrzymują obrażenia od upadku, a śmiertelny upadek liczy się jako twoje zabójstwo."
       },
       "voidfeast": {
         "name": "Uczta Pustki",
@@ -19198,11 +19216,11 @@ export const pl_PL: EnTranslations = {
       },
       "scouring_mercy": {
         "name": "Oczyszczające Miłosierdzie",
-        "description": "Zadaje {damage} obrażeń Świętych wrogowi albo leczy sojuszniczy cel o {healing}. Obrażenia rosną wraz z mocą zaklęć, a leczenie z mocą leczenia. Doktryna zamienia te obrażenia w leczenie poprzez twoje więzi. Jeśli żaden związany ranny członek drużyny nie znajduje się w promieniu 30 metrów, leczy rannego członka drużyny o najniższym zdrowiu w promieniu 30 metrów za 15% obrażeń. Wyleczenie członka drużyny leczy też do 2 innych rannych członków drużyny w promieniu 10 metrów od tego celu i w twojej linii wzroku, każdego za 50% przywróconego zdrowia. Te dodatkowe leczenia nie mogą być krytyczne ani tworzyć więzi Doktryny. (Sygnatura Doktryny)"
+        "description": "Zadaje {damage} obrażeń Świętych wrogowi albo leczy sojuszniczy cel za {healing}. Obrażenia rosną z mocą zaklęć, a leczenie z mocą leczenia. Dyscyplina leczy każdego rannego powiązanego członka drużyny w promieniu 30 m za 30% zadanych obrażeń (70% z Podwójnym Przymierzem). Jeśli żaden nie jest ranny, leczy zamiast tego członka drużyny z najniższym zdrowiem w promieniu 30 m za 15% obrażeń. Leczenie członka drużyny leczy też do 2 innych rannych członków drużyny w promieniu 10 m od tego celu i w twojej linii wzroku, każdego za 50% przywróconego zdrowia. Te dodatkowe leczenia nie mogą być krytyczne ani tworzyć powiązań Dyscypliny. (Sygnatura Dyscypliny)"
       },
       "seraphic_vigil": {
         "name": "Serafinowa Straż",
-        "description": "Chroni sojusznika przez 30 s. Pierwszy cios, który zepchnie go poniżej 35% zdrowia, zużywa Straż i leczy go za {buff}. (Sygnatura Błogosławieństwa)"
+        "description": "Chroni jednego sojusznika przez 30 s. Pierwsze trafienie, które zostawi go poniżej 35% zdrowia, zużywa Straż i leczy go za {buff}. Rzucenie jej na innego sojusznika przenosi twoją Straż. (Sygnatura Świętości)"
       },
       "summon_tithefiend": {
         "name": "Przyzwij Dziesięcinnika",
@@ -19218,16 +19236,16 @@ export const pl_PL: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Chór Wybawienia",
-        "description": "Kanałuje przez 6 s, lecząc członków grupy w promieniu 30 metrów za {damage} co 2 s. Leczenie rośnie wraz z mocą zaklęć.",
-        "specNote_shadow": "Przez 15 s rozdzielasz leczenie równe 20% zdrowia utraconego przez wrogów od twoich obrażeń Cienia między rannych członków drużyny w promieniu 30 jardów, wliczając siebie. W rajdzie leczenie obejmuje tylko twoją podgrupę. Rzucasz natychmiast i możesz dalej atakować w Zmierzchowej zasłonie. Pochłonięte obrażenia i obrażenia przekraczające pozostałe zdrowie nie zwiększają leczenia."
+        "description": "Kanałuje przez 6 s, lecząc ciebie i każdy sprzymierzony cel w promieniu 30 metrów i w twojej linii wzroku za {damage} co 2 s. Leczenie rośnie z mocą leczenia.",
+        "specNote_shadow": "Przez 15 s dzielisz 20% zdrowia, które wrogowie tracą od twoich obrażeń od cienia, jako leczenie między rannych członków drużyny w promieniu 30 m, w tym ciebie. W rajdach leczona jest tylko twoja podgrupa. Rzucaj natychmiast i atakuj dalej w Zmierzchowej zasłonie. Pochłonięte obrażenia i nadmiarowe obrażenia nie dodają leczenia."
       },
       "bear_charge": {
         "name": "Szarża Bruina",
-        "description": "Szarżuj na wroga, generując 9 wściekłości i ogłuszając go na 1 sek. Przez 3 sek. potem Postać kota jest darmowa i przygważdża cel, spowalniając go o 50% na 4 sek. Zasięg 8-25 jardów. Tylko w postaci Bruina."
+        "description": "Przemień się w Postać Bruina, jeśli jeszcze nią nie jesteś, po czym szarżuj na wroga, generując 9 wściekłości i ogłuszając go na 1 s. Przez 3 s po zakończeniu szarży (lub do wyjścia z walki albo śmierci celu) Postać kota jest darmowa i Przygważdża szarżowany cel, spowalniając go o 50% na 4 s. Można użyć w dowolnej postaci."
       },
       "demoralizing_roar": {
         "name": "Tchórzliwy ryk",
-        "description": "Demoralizuje pobliskich wrogów, zmniejszając ich moc ataku o 20 na 20 sek. Tylko w postaci Bruina."
+        "description": "Demoralizuje każdego wroga w promieniu 8 m, zmniejszając jego moc ataku o {buff} na 20 s. Tylko w Postaci Bruina."
       },
       "prowl": {
         "name": "Podchody",

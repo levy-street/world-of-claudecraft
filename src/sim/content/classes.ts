@@ -699,7 +699,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
         effects: [{ type: 'weaponDamage', bonus: 44 }],
       },
     ],
-    description: 'A strong attack that increases melee damage by $d. Activates on your next swing.',
+    description:
+      'Your next melee swing deals $d extra damage. The rage is spent on that swing; without enough rage it stays a normal swing.',
   },
   battle_shout: {
     id: 'battle_shout',
@@ -745,7 +746,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'aoeAttackPower', amount: 0, pct: 0.2, duration: 20, radius: 10 }],
     description:
-      'Lets out a fearsome shout, reducing the damage dealt by all nearby enemies by 20% for 20 sec.',
+      'Shout to reduce the damage dealt by all enemies within 10 yards by $b% for $t sec.',
   },
   charge: {
     id: 'charge',
@@ -761,7 +762,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     offGcd: true,
     effects: [{ type: 'charge' }, { type: 'stun', duration: 1 }],
-    description: 'Rushes an enemy, generating 9 rage and stunning it for 1 sec. 8-25 yd range.',
+    description: 'Rush to an enemy and stun it for 1 sec, generating 9 rage.',
   },
   thunder_clap: {
     id: 'thunder_clap',
@@ -802,7 +803,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
         ],
       },
     ],
-    description: 'Blasts nearby enemies for $d damage and slows their attacks by 10% for 10 sec.',
+    description:
+      'Strike all enemies within 8 yards for $d Physical damage and slow their attack speed by 10% for 10 sec.',
   },
   hamstring: {
     id: 'hamstring',
@@ -852,7 +854,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // The sim-source fallback hardcodes the base gainResource amount (10); the
     // translated catalog uses the {rage} splice so the Blood Offering talent's
     // upgraded amount shows live in the rendered tooltip.
-    description: 'Generates 10 rage at the cost of health.',
+    description: 'Lose 8% of your maximum health to generate 10 rage. This cannot kill you.',
   },
   overpower: {
     id: 'overpower',
@@ -903,7 +905,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Instant attack (2 charges) for weapon damage plus $d that empowers your next Maiming Strike by 20% (stacks twice). Cannot be dodged.',
+      'Strike for weapon damage plus $d. Cannot be dodged. Each use also grants a Redhand stack for $t sec, up to 2: your next Maiming Strike consumes them to deal 20% more weapon damage per stack. Stores up to 2 charges.',
   },
   // Fury's active rage builder (operator design, Arremetida Enfurecida): two
   // 60%-weapon hits so the pair lands slightly more than one signature
@@ -976,8 +978,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'weaponStrike', bonus: 15, weaponMult: 0.5 },
       { type: 'gainResource', amount: 8 },
     ],
-    description:
-      'Swings brutally at the opponent for 50% weapon damage plus $d, generating 8 rage.',
+    description: 'Strike for 50% weapon damage plus $d and generate 8 rage.',
   },
   // Fury's dump-everything spender (operator design, Desenfreno): three full
   // weapon hits, each carrying a Maiming Strike-scale bonus (era table:
@@ -1004,7 +1005,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'enrageChance', chance: 1, duration: 4 },
     ],
     description:
-      'Spend everything: strike three times in a frenzy for 65% weapon damage plus $d each, always Enraging you. (Fury)',
+      'Strike three times, each hit dealing 65% weapon damage plus $d, and always become Enraged for $t sec. (Fury)',
   },
   // Spellbook-only passive trait (owner 2026-07-08): documents the Enrage buff
   // that Bloodletting / Red Harvest apply (the actual mechanic is the enrageChance
@@ -1024,7 +1025,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [],
     description:
-      'Passive: while Enraged you deal 7% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)',
+      'Bloodletting has a 30% chance to Enrage you for 4 sec, and Red Harvest always does. While Enraged, you deal 7% more damage, attack 25% faster and move 10% faster. (Fury)',
   },
   // Fury's defensive cooldown (operator correction 2026-07-07, Regeneracion
   // Enfurecida): a 10s / 20% damage-taken cut (the buff_dr aura read by
@@ -1076,7 +1077,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'aoeAllySureCrit', charges: 3, duration: 20, radius: 40 }],
     description:
-      'Lets loose an emboldening roar: you and friendly players within 40 yards are Emboldened, and your next 3 abilities are guaranteed critical strikes. (Fury)',
+      'You and allies within 40 yards become Emboldened for $t sec: the next 3 damaging abilities each of you uses are guaranteed critical strikes. (Fury)',
   },
   // Protection's active shield block (operator design, Bloquear con Escudo):
   // an off-GCD 6 sec self buff cutting PHYSICAL damage taken in half (the
@@ -1306,7 +1307,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [],
     description:
-      'Your auto-attacks have a chance to let you cast Early Grave on a target at any health, costing no rage. (Arms)',
+      'Your auto-attacks that connect have a 10% chance to grant Sudden Death for 10 sec: your next Early Grave costs no rage and can be used on a target at any health. (Arms)',
   },
   // Arms restructure 2026-07-08. Sweeping Strikes: a 12s window where your
   // single-target strikes also clip one nearby enemy at full damage. Deep Wounds: a
@@ -1326,7 +1327,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     offGcd: true,
     effects: [{ type: 'selfBuff', kind: 'sweeping_strikes', value: 1, duration: 12 }],
     description:
-      'For 12 sec your single-target attacks also strike 1 nearby enemy for full damage. (Arms)',
+      'For 12 sec, each hit from your single-target abilities also deals the same damage to 1 other enemy within 8 yards of your target. Auto-attacks are not copied. (Arms)',
   },
   deep_wounds: {
     id: 'deep_wounds',
@@ -1395,7 +1396,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Attack in a wide arc, dealing 18 to 24 Physical damage to all enemies in front of you. Above 5 targets the damage is reduced. When you dodge or parry, your next Revenge may cost no rage. (Protection)',
+      "Strike all enemies in front of you within 8 yards for $d Physical damage. Above 5 targets, each hit is reduced so the total equals 5 hits. When you dodge or parry a creature's melee attack, you have a 30% chance to make your next Revenge within 10 sec cost no rage. (Protection)",
   },
   // Warrior combat stances. All three share exclusiveGroup 'warrior_stance', so
   // casting one swaps the sibling and a warrior is never stanceless (the default
@@ -1436,7 +1437,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     exclusiveGroup: 'warrior_stance',
     effects: [{ type: 'selfBuff', kind: 'berserker_stance', value: 0, duration: 3600 }],
     description:
-      'A reckless combat stance: your critical strikes land 3% more often and hit for 3% more. The Fury warrior always fights in this stance.',
+      'A reckless combat stance: you gain 3% critical strike chance and your critical strikes deal 3% more damage. The Fury warrior always fights in this stance.',
   },
   defensive_stance: {
     id: 'defensive_stance',
@@ -1492,7 +1493,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      "Sunders the target's armor, reducing it by $d% per application. Stacks up to 5 times. Generates a high amount of threat.",
+      "Sunder the target's armor, reducing it by $d% per application for 30 sec. Stacks up to 5 times, and each application refreshes the duration. Generates high threat.",
   },
   taunt: {
     id: 'taunt',
@@ -1559,7 +1560,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
         ],
       },
     ],
-    description: 'Hurls a fiery ball that causes $d Fire damage plus additional damage over time.',
+    description:
+      'Hurls a fiery ball that deals $d Fire damage, then burns the target for $o Fire damage over $t sec.',
   },
   fireball_form: {
     id: 'fireball_form',
@@ -1679,7 +1681,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
         ],
       },
     ],
-    description: 'Launches a bolt of frost, causing $d Frost damage and slowing movement by 40%.',
+    description:
+      'Launches a bolt of frost, causing $d Frost damage and slowing movement by 40% for $t sec.',
   },
   // Frost mage spec kit (owner design 2026-07-11; combat/frost_mage.ts owns
   // the proc engine these feed). Ice Lance: the instant proc spender. Its 3x
@@ -1749,7 +1752,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      "Loose three icy bolts for $d Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Winterlash instant and skips its cooldown. (Frost)",
+      "Loose three icy bolts for $d Frost damage each and apply Winter's Chill to the target for 5 sec: the next 2 Ice Lances that hit it treat it as frozen. Brain Freeze makes Winterlash instant and skips its cooldown. (Frost)",
   },
   // Frostglobe: the roaming Icicle generator (combat/frozen_orb.ts). Instant,
   // 45s cooldown; the orb drifts forward pulsing frost damage + a 30% snare
@@ -1833,7 +1836,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Conjure a massive spike of ice, consuming 5 Icicles to deal $d Frost damage and freeze the target in place for 4 sec. (Frost)',
+      'Requires 5 Icicles. Conjure a massive spike of ice, consuming all 5 Icicles to deal $d Frost damage and root the target for 4 sec. You gain an Icicle each time Rimelance hits or a Frostglobe pulse strikes, up to 5. (Frost)',
   },
   // Blizzard: the frost AoE workhorse, a ground-aimed channel on the
   // rain_of_fire template plus a snare rider (the position-channel aoeSlow
@@ -1873,7 +1876,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Conjures an ice storm at the target area: after a 2 sec cast it rages for 6 sec, dealing 12 to 16 Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frostglobe, up to 3 sec per cast. (Frost)',
+      "Conjures an ice storm at the target area that rages for 6 sec, dealing $d Frost damage each second and slowing enemies by 40% for 2 sec. Each enemy struck shaves 0.5 sec off Frostglobe's cooldown, up to 3 sec per cast. (Frost)",
   },
   // Frente Glacial: Frost's hold-to-charge cone. The 2.4 sec cast is the
   // authoritative maximum charge clock; releasing earlier selects one of the
@@ -1908,7 +1911,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Hold to gather a widening front of frost, then release it in a cone. Longer charges reach farther and deal more damage. All enemies hit are slowed by 50% for 4 sec; maximum charge also roots them for 1 sec. (Frost)',
+      'Hold to charge, then release a cone of frost. Each of the 4 charge stages reaches farther, from 7 yd to 16 yd, and hits harder, from 35 to 42 base Frost damage up to 88 to 104 at full charge, with a larger Spell Power bonus the longer you charge. All enemies hit are slowed by 50% for 4 sec; full charge also roots them for 1 sec. (Frost)',
   },
   // Aliento de dragón: Fire's hold-to-charge frontal breath. The server owns
   // the live 2.4 second clock; each release resolves one deterministic range,
@@ -1943,7 +1946,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Hold to gather a widening breath of flame, then release it in a cone. Longer charges reach farther and deal more damage. Enemies hit are disoriented and damage breaks the effect; maximum charge always critically strikes and counts once toward Hot Streak. (Fire)',
+      'Hold to charge, then release a cone of flame. Each of the 4 charge stages reaches farther and wider, from 6 yd to 12 yd, and hits harder, from 32 to 40 base Fire damage up to 90 to 110 at full charge, with a larger Spell Power bonus the longer you charge. Enemies hit are disoriented for 1 to 3 sec by charge stage; any damage breaks it. Full charge always critically strikes. Each breath counts once toward Hot Streak, however many enemies it hits. (Fire)',
   },
   // The three frost spec passives: spellbook/spec-screen documentation of the
   // proc engine (combat/frost_mage.ts owns the mechanics; these carry no
@@ -1963,7 +1966,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [],
     description:
-      'Rimelance has a 15% chance to grant Fingers of Frost, up to 2 charges: your next Ice Lance treats its target as frozen. (Frost)',
+      'Each Rimelance hit has a 15% chance to grant a charge of Fingers of Frost, up to 2 charges, lasting 15 sec. Each charge makes one Ice Lance treat its target as frozen. A proc at 2 charges is lost. (Frost)',
   },
   brain_freeze: {
     id: 'brain_freeze',
@@ -1980,7 +1983,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [],
     description:
-      'Rimelance has a 20% chance to make your next Winterlash instant and free of its cooldown. (Frost)',
+      'Each Rimelance hit has a 20% chance to grant Brain Freeze for 15 sec: your next Winterlash is instant and ignores its cooldown. A proc while Brain Freeze is active is lost. (Frost)',
   },
   shatter: {
     id: 'shatter',
@@ -1997,7 +2000,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [],
     description:
-      "Your spells gain 50% critical strike chance against frozen targets. Fingers of Frost and Winter's Chill count as frozen. (Frost)",
+      "Your single-target damage spells gain 50% critical strike chance against frozen targets: enemies held by a Mage's root, stun, incapacitate or Bewitch. Fingers of Frost and Winter's Chill make Ice Lance treat its target as frozen. (Frost)",
   },
   conjure_water: {
     id: 'conjure_water',
@@ -2088,7 +2091,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
         effects: [{ type: 'directDamage', min: 68, max: 82 }],
       },
     ],
-    description: 'Blasts the enemy for $d Fire damage. Instant.',
+    description:
+      'Blasts the enemy for $d Fire damage. Always critically strikes. Off the global cooldown and usable while casting another spell.',
   },
   arcane_missiles: {
     id: 'arcane_missiles',
@@ -2125,7 +2129,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Launches Aether Darts at the enemy, causing $d Arcane damage each second for 3 sec.',
+      'Channel for 3 sec, firing 3 darts that each deal $d Arcane damage. Spends all your Arcane Charges: each charge adds 9 Arcane damage split across the darts, and at 4 charges the channel fires 5 darts instead of 3.',
   },
   polymorph: {
     id: 'polymorph',
@@ -2148,7 +2152,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Transforms the enemy into a toad for up to $t sec. The toad wanders and heals rapidly. Any damage breaks the effect. Beasts and humanoids only.',
+      'Transforms the enemy into a toad for up to $t sec. It cannot act, is restored to full health, heals 10% of its maximum health each second, and loses its damage-over-time effects. Any damage breaks the effect. Cannot affect undead or control-immune enemies.',
   },
   // One meaningful follow-up breaks Icebind, while tiny incidental ticks do not.
   // The cap prevents high-health targets from gaining a stronger root.
@@ -2236,7 +2240,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // a Flamestrike is a single Hot Streak crit however many enemies it hits).
     effects: [{ type: 'aoeDamage', min: 34, max: 44, radius: 7, canCrit: true }],
     description:
-      'Calls down a burst of flame at the target area, dealing $d Fire damage to enemies caught in the blast. Can critically strike (one strike for the whole blast).',
+      'Calls down a burst of flame at the target area, dealing $d Fire damage to each enemy caught in the blast. One critical strike roll covers the whole blast: every enemy is hit by a critical strike, or none are.',
   },
   // Ground-targeted thematic spells (targetMode 'position'), one per caster/ranged
   // class, all built on the ground-target cast primitive (docs/design/arpg-spell-mechanics.md).
@@ -2284,7 +2288,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Spends 3 Wrack to rain fire over the target area for 4 sec, increasing to 6 sec at rank 2. Desolation calls down the first wave immediately.',
+      'Spends 3 Wrack to rain fire on the target area, dealing $d Fire damage to enemies inside each second for $t sec. Desolation calls down the first wave immediately.',
   },
   volley: {
     id: 'volley',
@@ -2325,7 +2329,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // enemies standing in the flames take damage; nothing lingers once they leave.
     effects: [{ type: 'groundAoE', min: 12, max: 16, radius: 8, duration: 3, interval: 0.5 }],
     description:
-      'A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take $d Fire damage every 0.5 sec. Damage increases with Ranged Attack Power.',
+      'Throw a flask that bursts into flame over an 8-yard area for 3 sec. Enemies standing in the flames take $d Fire damage every 0.5 sec. Damage increases with Ranged Attack Power.',
   },
   hurricane: {
     id: 'hurricane',
@@ -2395,7 +2399,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'selfBuff', kind: 'buff_speed', value: 1.2, duration: 3 },
     ],
     description:
-      'Scalds the enemy for $d Fire damage and quickens you by 20% for 3 sec. Quick to cast, and castable while moving.',
+      'Scalds the enemy for $d Fire damage and increases your movement speed by 20% for 3 sec. Always critically strikes against targets at or below 30% health.',
   },
   pyroblast: {
     id: 'pyroblast',
@@ -2421,7 +2425,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'dot', total: 50, duration: 12, interval: 2 },
     ],
     description:
-      'Hurls an immense fiery boulder that causes $d Fire damage plus additional damage over time.',
+      'Hurls an immense fiery boulder that deals $d Fire damage, then burns the target for $o Fire damage over $t sec.',
   },
   // ---- Chronomancy (healer) Phase 1 kit, docs/prd/mage-chronomancy.md ----
   temporal_mend: {
@@ -2585,7 +2589,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Marks an ally with an echo of a healthier moment, mending $d health at once. For $t sec, $x% of your other single-target Arcane damage and $y% of your area Arcane damage heals them. Aether Surge and Aether Darts instead heal them for $z% of the damage they deal.',
+      'Heals an ally for $d at once and marks them with Temporal Echo for $t sec. While marked, $x% of your other single-target Arcane damage and $y% of your area Arcane damage heals them; Aether Surge and Aether Darts heal them for $z% of the damage they deal instead. You can keep one Temporal Echo out: casting it again moves the mark. Healing beyond full health becomes a Temporal Aegis shield, up to 20% of their maximum health.',
   },
   // ---- Chronomancy (healer) Phase 4: Cascada temporal (Temporal Cascade),
   // docs/prd/mage-chronomancy.md Phase 4. The GROUP version of Temporal Echo: a 1.5s
@@ -2652,7 +2656,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Sends an echo cascading through your group: the target and up to four of their nearest allies are mended at once, healing for more on those who have lost the most health, and each marked for $t sec, drawing part of the Arcane damage you deal back through their echoes to heal them. Aether Surge and Aether Darts create an equal healing reserve from every group Echo, shared among marked allies below 60% health according to missing health. (Chronomancy)',
+      'Heals the target and up to 4 nearby allies, group members first, and marks each with a group Temporal Echo for $t sec. Each heal is increased by 3% for every 1% of health the ally is missing. While marked, 13% of your single-target Arcane damage and 6% of your area Arcane damage heals each of them. Aether Surge and Aether Darts also add an equal healing reserve from every group Echo, shared among marked allies below 60% health by missing health. An ally already holding your Temporal Echo keeps it. (Chronomancy)',
   },
   // ---- Chronomancy combat resurrection: Temporal Reversal. Rewinds a DEAD group/raid
   // member's timeline back to life at their corpse, IN COMBAT, with a fraction of their
@@ -2793,7 +2797,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'perfectMoment' }],
     description:
-      'Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them and deals 20% increased damage. (Chronomancer)',
+      'Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them and deals 20% increased damage. (Chronomancy)',
   },
   temporal_acceleration: {
     id: 'temporal_acceleration',
@@ -2819,7 +2823,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Accelerates the flow of time for your group or raid, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Temporal Acceleration or Storm Chorus are too exhausted to benefit. (Chronomancy)',
+      "Accelerates the flow of time for group or raid allies within 40 yards, increasing their attack, casting, and channeling speed by 30% for 15 sec. Affected allies cannot benefit from Temporal Acceleration, Storm Chorus, or Thieves' Chorus again for 10 min. (Chronomancy)",
   },
   // ---- Chronomancy (healer) Phase 3: Aether Surge, docs/prd/mage-chronomancy.md
   // sections 13.4 / 14. The single-target Arcane spender that drives the offensive
@@ -2867,7 +2871,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 4, level: 20, cost: 14, effects: [{ type: 'directDamage', min: 12, max: 14 }] },
     ],
     description:
-      "Draws a surge of raw aether through the enemy for $d damage. Each cast leaves an Arcane Charge that raises your next Aether Surge's damage and cast speed (5% faster each) but sharply raises its mana cost, stacking up to 4; Aether Darts spends the charges. Each cast can also arm Aether Rush, making your next Aether Surge free and twice as fast to cast.",
+      'Deals $d Arcane damage to the enemy and grants an Arcane Charge, up to 4, lasting 10 sec and refreshed by each cast. Each Arcane Charge makes your next Aether Surge deal 30% more damage and cast 5% faster, but doubles its mana cost. Aether Darts spends the charges. Each cast has a 25% chance to grant Aether Rush: your next Aether Surge within 15 sec costs no mana and casts twice as fast.',
   },
   ice_barrier: {
     id: 'ice_barrier',
@@ -2944,7 +2948,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description: 'Flick a poisoned dart for $d Nature damage. Awards 1 combo point.',
     specNotes: {
       assassination:
-        'Adds 1 Venom Ritual and extends your venom wound by 6 sec (the wound never goes above 20 sec).',
+        'Adds 1 Venom Ritual (max 6), refunds 15 energy, and extends your venom wound by 6 sec (the wound never goes above 20 sec).',
     },
   },
   sinister_strike: {
@@ -2987,7 +2991,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     specNotes: {
       assassination: 'Adds 1 Venom Ritual (max 6).',
       combat:
-        'While Redline is active, this button becomes Haymaker: 130% weapon damage plus 10, awards 2 combo points, and adds 1 Redline (max 4).',
+        'While Redline is active, this button becomes Haymaker: a heavier weapon strike that awards 2 combo points and adds 1 Redline (max 4).',
     },
   },
   eviscerate: {
@@ -3027,12 +3031,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
         effects: [{ type: 'finisherDamage', base: 14, perCombo: 18, variance: 9 }],
       },
     ],
-    description: 'Finishing move that causes $d.',
+    description:
+      'Finishing move that deals $d Physical damage. Damage increases with Attack Power.',
     specNotes: {
       assassination:
         'At 6 Venom Ritual, this button becomes Venomrend: a strike that instantly deals all the damage your bleeds would still have dealt, plants a fresh venom wound, and restores 20 energy.',
       combat:
-        'Landing this with 4 or more combo points starts Redline for 8 sec: Wicked Slash becomes Haymaker and this button becomes Lights Out (45 plus 35 per combo point, hitting 25% harder for each Redline built, restores 25 energy). Spend it before Redline ends.',
+        'Landing this with 4 or more combo points starts Redline for 8 sec: Wicked Slash becomes Haymaker and this button becomes Lights Out (a finisher that hits 25% harder for each Haymaker you throw during Redline and restores 25 energy). Spend it before Redline ends.',
     },
   },
   backstab: {
@@ -3232,7 +3237,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresOutOfCombat: true,
     effects: [{ type: 'selfBuff', kind: 'stealth', value: 1.0, duration: 3600 }],
     description:
-      'Conceals you in the shadows: enemies barely notice you, and you move at full speed. Attacking or taking damage breaks Duskveil. Cast again to step out.',
+      'Conceal yourself in the shadows. Enemy players and pets cannot see you, and monsters notice you only from much closer than normal (from farther away if they outlevel you). You move at full speed. Attacking or taking damage breaks Duskveil. Cast again to step out.',
     specNotes: {
       subtlety: 'Each opener you use from Duskveil adds 1 Gloam (max 3).',
     },
@@ -3402,7 +3407,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     offGcd: true,
     effects: [{ type: 'selfBuff', kind: 'stealth', value: 1.0, duration: 10 }],
     description:
-      'Melt from sight, entering Duskveil even in combat. You move at full speed while hidden. Lasts up to 10 sec.',
+      'Vanish from sight, even in combat, entering Duskveil for up to 10 sec. You leave combat, monsters forget all threat on you and cannot detect you while it lasts, and enemy players lose you as a target. You move at full speed while hidden.',
   },
   instant_poison: {
     id: 'instant_poison',
@@ -3445,7 +3450,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Coats your weapon for 30 min. Each of your melee swings adds a stack of venom to the target, up to 5, and refreshes the 12 sec duration. Each stack deals $d Nature damage every 2 sec.',
+      'Coats your weapon for 30 min. Each of your melee swings adds a stack of venom to the target, up to 5, and refreshes the 12 sec duration. Each stack deals $d Nature damage every 2 sec. Replaces your other weapon coating.',
   },
   // The two utility poisons. Both are weapon COATS, in the Adder's Bite mould
   // rather than the Leaden Venom one: same class, cost, school, and 30 min
@@ -3475,7 +3480,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Coats your weapon for 30 min. Each of your melee swings splashes the target with caustic acid, reducing its armor by 5% for 12 sec.',
+      'Coats your weapon for 30 min. Each of your melee swings splashes the target with caustic acid, reducing its armor by 5% for 12 sec. Replaces your other weapon coating.',
   },
   nightshade_coating: {
     id: 'nightshade_coating',
@@ -3501,7 +3506,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Coats your weapon for 30 min. Each of your melee swings coats the target in nightshade, reducing the healing it receives by 25% for 12 sec.',
+      'Coats your weapon for 30 min. Each of your melee swings coats the target in nightshade, reducing the healing it receives by 25% for 12 sec. Replaces your other weapon coating.',
   },
   blind: {
     id: 'blind',
@@ -3516,7 +3521,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [{ type: 'incapacitate', duration: 8 }],
     description:
-      "Tosses dirt into the target's eyes, causing it to wander disoriented for 8 sec. Any damage breaks the effect.",
+      "Throw dirt in the target's eyes, incapacitating it for 8 sec. Any damage breaks the effect.",
   },
 
   // ====================== PALADIN ======================
@@ -3682,7 +3687,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetType: 'friendly',
     effects: [{ type: 'heal', min: 0, max: 0, casterMaxHpPct: 1, canCrit: false }],
     description:
-      'A massive surge that restores $d% of your maximum health and generates 1 Devotion when it restores health. 10 min cooldown.',
+      'Heal a friendly target for $d% of your maximum health and generate 1 Devotion when it restores health.',
   },
   holy_taunt: {
     id: 'holy_taunt',
@@ -3829,7 +3834,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [{ type: 'tamePet' }],
     description:
-      'Begins taming a beast to be your companion. It must be your level or lower and not an elite. Your pet follows you, attacks your enemies, and holds threat of its own. You may have one pet at a time.',
+      'Begin taming a beast to be your companion. It must be your level or lower and cannot be elite, rare, a boss, or a dungeon creature. Your pet follows you, attacks your enemies, and holds threat of its own. You may have one pet at a time.',
   },
   dismiss_pet: {
     id: 'dismiss_pet',
@@ -3898,7 +3903,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Strike for 10% weapon damage plus $d. A hit restores 15 Focus and grants 1 Hunting Momentum. Damage increases with Attack Power through weapon damage.',
+      'Strike for 10% weapon damage plus $d. Damage increases with Attack Power through weapon damage. With Fieldcraft, a hit restores 15 Focus and grants 1 Hunting Momentum.',
   },
   pack_command: {
     id: 'pack_command',
@@ -3919,7 +3924,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     },
     effects: [{ type: 'packCommand', min: 36, max: 48, focus: 20, ferocityDuration: 30 }],
     description:
-      "Command your living pet to strike for 36 to 48 Physical damage. Damage increases with the pet's Attack Power. A hit restores 20 Focus and grants 1 Pack Ferocity for 30 sec, up to 3. Each stack increases all damage dealt by your pet by 10%. This strike uses the stacks you had before the hit.",
+      "Command your living pet to strike for 36 to 48 Physical damage. Damage increases with the pet's Attack Power. A hit restores 20 Focus and grants 1 Pack Ferocity for 30 sec, up to 3. Each stack increases all damage dealt by your pet by 10%. This strike uses the stacks you had before the hit. At 3 stacks, this button becomes Unleash Beast. Cannot be used during Unleashed Frenzy.",
   },
   unleash_beast: {
     id: 'unleash_beast',
@@ -3946,7 +3951,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      "Consume 3 Pack Ferocity after your pet strikes for 42 to 53 Physical damage and claps every enemy within 6 yards for 57 to 75. The clap deals 50% more damage to enemies other than the main target. The strike and clap use Pack Ferocity's full 30% pet damage bonus and increase with the pet's Attack Power. For 8 sec afterward, the pet deals 25% more damage, attacks 35% faster, and makes Fell Shot cleave up to 2 enemies within 5 yards of the target.",
+      "Your pet strikes the target for 42 to 53 Physical damage, then claps every enemy within 6 yards of the pet for 57 to 75. The clap deals 50% more damage to enemies other than the main target. The strike and clap use Pack Ferocity's full 30% pet damage bonus, increase with the pet's Attack Power, and then consume all 3 Pack Ferocity. For 8 sec afterward (Unleashed Frenzy), the pet deals 25% more damage and attacks 35% faster, each Fell Shot makes it cleave up to 2 other enemies within 5 yards of the target for 12 to 18 Physical damage, and you cannot use Pack Command.",
   },
   stampede: {
     id: 'stampede',
@@ -3972,7 +3977,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Summon 3 beasts for 12 sec. Each attacks every 2 sec for $d Physical damage. The shown damage includes 8% of your Ranged Attack Power before pet damage bonuses. The beasts snapshot Pack Ferocity when summoned, gaining 10% damage per stack. While Stampede is on cooldown, successful Pack Commands have a 20% chance to reset it, guaranteed after 5 failed chances. It cannot reset while the beasts are active. (Packlord)',
+      'Summon 3 beasts for 12 sec. Each attacks every 2 sec for $d Physical damage. The shown damage includes 8% of your Ranged Attack Power before pet damage bonuses. The beasts snapshot Pack Ferocity when summoned, gaining 10% damage per stack. While Stampede is on cooldown, successful Pack Commands have a 20% chance to reset it, guaranteed on the 5th chance. It cannot reset while the beasts are active. (Packlord)',
   },
   measured_shot: {
     id: 'measured_shot',
@@ -4023,7 +4028,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
         effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 50, duration: 1800 }],
       },
     ],
-    description: "Adopt Harrier's Guise, increasing your Attack Power by $b for 30 min.",
+    description:
+      "Adopt Harrier's Guise, increasing your Attack Power and Ranged Attack Power by $b for 30 min.",
   },
   serpent_sting: {
     id: 'serpent_sting',
@@ -4312,7 +4318,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     offGcd: true,
     effects: [{ type: 'selfBuff', kind: 'hunter_bloodtrail', value: 1, duration: 12 }],
     description:
-      'For 12 sec, Bloodhook spreads a 60%-strength wound to up to 2 enemies within 5 yards, Woundrend commands an 18-damage pet attack, and Shrapnel Charge reaches 2 yards farther, deals 25% more base damage to its main target, and triggers 50% more wound damage. While you have no living pet, your Focus also regenerates 100% faster.',
+      'For 12 sec, Bloodhook also applies a 60%-strength Bloodhook Wound to up to 2 other enemies within 5 yards of its target, Woundrend makes your living pet deal 18 Physical damage to the target, and Shrapnel Charge reaches 2 yards farther, deals 25% more base damage to its main target, and its instant wound tick deals 50% more. While you have no living pet, your Focus also regenerates 100% faster.',
   },
   trailbreak: {
     id: 'trailbreak',
@@ -4328,7 +4334,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     offGcd: true,
     effects: [{ type: 'hunterTrailbreak', distance: 25 }],
     description:
-      'Leap 25 yards backward and break free of roots and movement slows. Landing grants 50% movement speed for 3 sec. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec.',
+      'Leap 25 yards backward and break free of roots and movement slows. Landing grants 50% movement speed for 3 sec. If you have Hunting Momentum, gain Armed Re-entry for 12 sec: your next Gutting Strike or Bloodhook deals bonus damage based on your Momentum stacks.',
   },
   wildheart: {
     id: 'wildheart',
@@ -4358,7 +4364,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     offGcd: true,
     effects: [{ type: 'selfBuff', kind: 'shield_wall', value: 0.6, duration: 8 }],
-    description: 'Reduce damage taken by 60% for 8 sec, but prevent attacks while active.',
+    description:
+      'Reduce damage taken by 60% for 8 sec. While it lasts, you cannot use abilities that target or damage enemies, including traps, but your auto-attacks continue.',
   },
   play_dead: {
     id: 'play_dead',
@@ -4396,7 +4403,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // Duskveil's stealth at 80% movement speed: attacking or taking damage breaks it.
     effects: [{ type: 'selfBuff', kind: 'stealth', value: 0.8, duration: 3600 }],
     description:
-      'Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)',
+      'Enter stealth and move at 80% speed. Monsters notice you only at close range (a quarter of their normal aggro range, more if they outlevel you), and enemy players and pets cannot see you. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)',
   },
   frostjaw_trap: {
     id: 'frostjaw_trap',
@@ -4424,7 +4431,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it is rooted for 3 sec, and enemies within 4 yards are slowed by 50% for 4 sec.',
+      'Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it is rooted for 3 sec, and enemies within 4 yards are slowed by 50% for 4 sec. Only one Frostjaw Trap can be active at a time. Placing another replaces it.',
   },
   bear_trap: {
     id: 'bear_trap',
@@ -4512,7 +4519,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Deal $d Holy damage. Damage increases with Spell Power. Doctrine converts this damage into healing through your links. If no injured linked group member is within 30 yards, heal the lowest-health injured group member within 30 yards for 15% of the damage.',
+      'Deal $d Holy damage. Damage increases with Spell Power. Doctrine heals each injured linked group member within 30 yards for 30% of the damage dealt (70% with Twin Covenant). If none is injured, it heals the lowest-health injured group member within 30 yards for 15% of the damage instead.',
   },
   lesser_heal: {
     id: 'lesser_heal',
@@ -4547,7 +4554,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         effects: [{ type: 'heal', min: 160, max: 192 }],
       },
     ],
-    description: 'Heal a friendly target for $d. Healing increases with Spell Power.',
+    description: 'Heal a friendly target for $d. Healing increases with Healing Power.',
   },
   power_word_fortitude: {
     id: 'power_word_fortitude',
@@ -4655,7 +4662,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Shield a friendly target, absorbing $d damage for 30 sec. Doctrine also links the target for 30 sec. Your Scouring Hymn and hostile Scouring Mercy heal linked group members while they are within 30 yards of you.',
+      'Shield a friendly target, absorbing $d damage for 30 sec. Doctrine also links the target for 30 sec, replacing your previous link (Twin Covenant keeps two). While linked group members are within 30 yards of you, your Scouring Hymn and hostile Scouring Mercy heal them for 30% of the damage dealt.',
   },
   renew: {
     id: 'renew',
@@ -4685,7 +4692,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Heal the target for $d over 15 sec, once every 3 sec. Healing increases with Spell Power.',
+      'Heal the target for $d over 15 sec, once every 3 sec. Healing increases with Healing Power.',
   },
   mind_blast: {
     id: 'mind_blast',
@@ -4730,7 +4737,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetType: 'friendly',
     effects: [{ type: 'heal', min: 165, max: 195 }],
     ranks: [{ rank: 2, level: 20, cost: 130, effects: [{ type: 'heal', min: 335, max: 390 }] }],
-    description: 'Heal a friendly target for $d. Healing increases with Spell Power.',
+    description: 'Heal a friendly target for $d. Healing increases with Healing Power.',
   },
   mind_flay: {
     id: 'mind_flay',
@@ -4761,7 +4768,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     targetType: 'friendly',
     effects: [{ type: 'heal', min: 174, max: 206 }],
-    description: 'Heal a friendly target for $d. Healing increases with Spell Power.',
+    description: 'Heal a friendly target for $d. Healing increases with Healing Power.',
   },
 
   // ====================== SHAMAN ======================
@@ -4909,7 +4916,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 3, level: 16, cost: 45, effects: [{ type: 'imbue', bonus: 14, duration: 1800 }] },
     ],
     description:
-      'Imbue your weapon for 30 min. Each swing deals $d extra damage. Warspirit also gains 40% armor and 20% Stamina, takes 15% less damage, is immune to critical strikes from creatures, and generates two and three quarter times as much threat. Earthen Jolt forces its target to attack you for 3 sec, and Thunder Ward grants 10% damage reduction for 3 sec.',
+      'Imbue your weapon for 30 min. Each swing deals $d extra damage. Warspirit also gains 40% armor and 20% Stamina, takes 15% less damage, is immune to critical strikes from creatures, and generates two and three quarter times as much threat. Earthen Jolt forces its target to attack you for 3 sec, and casting Thunder Ward grants 10% damage reduction for 3 sec.',
   },
   galeheart_weapon: {
     id: 'galeheart_weapon',
@@ -4924,7 +4931,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'nature',
     requiresTarget: false,
     effects: [{ type: 'imbue', bonus: 0, duration: 1800 }],
-    description: 'Imbue both weapons for 30 min, enabling Warspirit Cadence.',
+    description:
+      'Imbue both weapons for 30 min. While it is active, each completed Warspirit Cadence also strikes with Galeheart Echoes. Replaces Stonebound Weapon.',
   },
   warspirit_cadence: {
     id: 'warspirit_cadence',
@@ -4941,7 +4949,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [],
     description:
-      'Passive: Dual-wield attacks have no extra miss chance. Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 25% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)',
+      "Passive: Dual-wield attacks have no extra miss chance. While Galeheart or Stonebound Weapon is active, every 3rd landed weapon attack grants Stormcast for 12 sec. With Galeheart Weapon, it also triggers 2 Galeheart Echoes, each dealing 25% of that hit's damage as Nature damage. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)",
   },
   stormsurge: {
     id: 'stormsurge',
@@ -5100,7 +5108,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      "Heal a friendly target for $d. Healing increases with Spell Power. Spiritcall: store 50% of the full heal before overhealing as Mending Current for 12 sec, up to 30% of the target's maximum health.",
+      "Heal a friendly target for $d. Healing increases with Healing Power. Spiritcall: also add 50% of the full heal before overhealing to the target's Mending Current, a pool that heals them over 12 sec and holds at most 30% of their maximum health.",
   },
   tidecall: {
     id: 'tidecall',
@@ -5118,7 +5126,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetType: 'friendly',
     effects: [{ type: 'heal', min: 58, max: 72 }],
     description:
-      "Heal a friendly target for $d. Healing increases with Spell Power. Add the full heal before overhealing to Mending Current, up to 30% of the target's maximum health.",
+      "Heal a friendly target for $d. Healing increases with Healing Power. Also add the full heal before overhealing to the target's Mending Current, a pool that heals them over 12 sec and holds at most 30% of their maximum health.",
   },
   earth_shock: {
     id: 'earth_shock',
@@ -5340,7 +5348,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     projectile: false,
     effects: [{ type: 'afflictionEvilEye' }],
     description:
-      'Marks one enemy as the focus of your curses. Moving the Eye preserves Condemnation but does not refresh its 20 sec expiry.',
+      'Marks one enemy with your Evil Eye, the focus of your curses. You gain 2 Condemnation each time the marked enemy deals damage (at most once per sec) and 10 when it dies. Condemnation stacks up to 100 and fades 20 sec after your last gain. Moving the Eye keeps your Condemnation but does not refresh that timer.',
   },
   maledict_gaze: {
     id: 'maledict_gaze',
@@ -5357,7 +5365,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     passive: true,
     effects: [],
     description:
-      'Your Maledict Eye attacks your selected primary Evil Eye every 2.5 sec for Shadow damage. Possess the Evil Eye doubles its attack speed.',
+      'Your Maledict Eye attacks the enemy bearing your primary Evil Eye every 2.5 sec for Shadow damage, while you and that enemy are both in combat, within 30 yd of each other and in line of sight. Possess the Evil Eye doubles its attack speed.',
   },
   needle_of_fate: {
     id: 'needle_of_fate',
@@ -5418,7 +5426,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresAuraStacks: 20,
     effects: [{ type: 'afflictionSentence' }],
     description:
-      'Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Each Thread increases damage by 6%. Added effects escalate at 20, 50, 80, and 100 Condemnation. Its damage scaling flattens after level 16.',
+      'Requires 20 Condemnation and your primary Evil Eye on the target. Consumes all Condemnation and Fate Threads to deal Shadow damage that grows with the Condemnation spent; each Thread adds 6% damage. At 50 or more, heals you for 20% of the damage dealt. At 80 or more, also deals 35% of the damage to other enemies within 8 yd. At 100, deals 5% more damage to players and bosses and kills a normal enemy below 20% health. Its base damage rises with your level until 16, then tapers across levels 17 to 20.',
   },
   cursed_accomplice: {
     id: 'cursed_accomplice',
@@ -5463,7 +5471,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Hexes the enemy for 8 sec, dealing Shadow damage and generating 2 Condemnation every 2 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 17 Shadow damage.',
+      'Hexes the enemy for 8 sec. Every 2 sec it takes 17 Shadow damage plus a share of your Spell Power, and you gain 2 Condemnation. The first 3 times the hexed enemy deals damage, you gain 7 Condemnation and it takes 17 Shadow damage.',
   },
   cruel_pact: {
     id: 'cruel_pact',
@@ -5486,7 +5494,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Condemnation. Cannot be used at or below 20% health.',
+      'Sacrifices 12% of your maximum health to restore $b% of your maximum mana and generate 20 Condemnation. Cannot be used at or below 20% health.',
   },
   vicarious_suffering: {
     id: 'vicarious_suffering',
@@ -5503,7 +5511,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetType: 'friendly',
     effects: [{ type: 'afflictionVicarious', duration: 8, maxDoom: 15 }],
     description:
-      'Links your suffering for 8 sec and generates up to 15 Condemnation from hostile hits. On yourself, reduces damage taken by 20%. On an ally, redirects up to 20% to you without taking you below 15% health.',
+      'For 8 sec, each hostile hit on the target generates 3 Condemnation, up to 15 in total. On yourself, reduces damage taken by 20%. On an ally, redirects 20% of each hostile hit to you, but never takes you below 15% health.',
   },
   possess_evil_eye: {
     id: 'possess_evil_eye',
@@ -5526,7 +5534,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     projectile: false,
     effects: [{ type: 'afflictionPossession', duration: 15, doom: 35 }],
     description:
-      'The Maledictor possesses your primary Evil Eye for 15 sec and generates 35 Condemnation. Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving, and Sentence deals 25% more damage and releases a delayed echo for 60% damage, tapering to 30% across levels 17-20.',
+      'Possesses your primary Evil Eye for 15 sec and generates 35 Condemnation. While active, Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving, Maledict Gaze attacks twice as fast, and Sentence deals 25% more damage and repeats 60% of the damage dealt 0.75 sec later (falling to 30% across levels 17 to 20).',
   },
   hour_of_judgment: {
     id: 'hour_of_judgment',
@@ -5564,7 +5572,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     projectile: false,
     effects: [{ type: 'afflictionCoven', duration: 15, radius: 15, maxSecondary: 4 }],
     description:
-      'Creates secondary Evil Eyes on up to 4 nearby enemies for 15 sec. They feed the shared Condemnation pool at 50%, and Sentence echoes to them for 35% damage.',
+      'Requires your primary Evil Eye on the target. Places secondary Evil Eyes on up to 4 other enemies within 15 yd of it for 15 sec. They generate Condemnation at 50% of the normal rate, and Sentence echoes to each of them for 35% of its damage.',
   },
   shadow_bolt: {
     id: 'shadow_bolt',
@@ -5628,7 +5636,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
         ],
       },
     ],
-    description: 'Sends a shadowy bolt at the enemy for $d Shadow damage.',
+    description:
+      'Sends a shadowy bolt at the enemy for $d Shadow damage. Ruination: generates 1 Wrack, up to 5.',
   },
   demon_skin: {
     id: 'demon_skin',
@@ -5657,7 +5666,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Demonic skin increases your armor by $b for 30 min. Pact Deepened can double this armor and reduce magic damage taken while Fiendhide is active.',
+      'Increases your armor by $b for 30 min. Pact Deepened doubles this armor and reduces magic damage taken by 5% while Fiendhide is active.',
   },
   immolate: {
     id: 'immolate',
@@ -5754,7 +5763,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         effects: [{ type: 'lifeTap', hp: 85, mana: 85 }],
       },
     ],
-    description: 'Converts $d health into $d mana.',
+    description: 'Converts $d health into $b mana. Fails if you have $d health or less.',
   },
   curse_of_agony: {
     id: 'curse_of_agony',
@@ -5814,7 +5823,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      "Consumes the target's vitality, dealing $d Shadow damage each second and transferring 70% of it as health. Affliction transfers all of it instead. When channeled on your primary Evil Eye, it consumes all Fate Threads at the start, and each Thread generates 1 extra Condemnation per tick.",
+      "Consumes the target's vitality, dealing $d Shadow damage each second and healing you for 70% of the damage dealt (all of it for Affliction). On an enemy with your Evil Eye, each tick generates 2 Condemnation and finishing the channel generates 3 more. On your primary Evil Eye, it also consumes all Fate Threads at the start: each Thread adds 1 Condemnation per tick, and 3 Threads stop damage from delaying the channel.",
   },
   soul_lance: {
     id: 'soul_lance',
@@ -5844,7 +5853,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Hurls a spectral lance for $d Shadow damage. Against your Ossuary Mark, 50% of its damage is added to the mark.',
+      'Hurls a spectral lance for $d Shadow damage. Against your Ossuary Mark, the mark stores 70% of its damage instead of 20%.',
   },
   litany_of_guilt: {
     id: 'litany_of_guilt',
@@ -5903,7 +5912,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Curses your primary Evil Eye for 6 sec. Condemnation gains release a wave that damages up to 2 other enemies within 8 yd, at most once per second. Rank 2 extends it to 8 sec and 4 enemies.',
+      'Curses your primary Evil Eye for $t sec. Condemnation gains release a wave that damages up to 2 other enemies (4 from Rank 2) within 8 yd, at most once per second.',
   },
   umbral_anchor: {
     id: 'umbral_anchor',
@@ -5918,7 +5927,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'warlockUmbralAnchor', duration: 300, maxRange: 40 }],
     description:
-      'First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, consuming the anchor and starting a 45 sec cooldown.',
+      'First cast: anchors your shadow at your feet for 5 min. Recast within 40 yd of the anchor to teleport back to it, consuming the anchor and starting a 45 sec cooldown.',
   },
   soulwell: {
     id: 'soulwell',
@@ -5965,7 +5974,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     excludeSpecs: ['affliction', 'demonology', 'destruction'],
     effects: [{ type: 'directDamage', min: 30, max: 38 }],
-    description: 'Sears the enemy with agonizing fire for $d Fire damage. Quick to cast.',
+    description: 'Sears the enemy with agonizing fire for $d Fire damage.',
   },
   shadowburn: {
     id: 'shadowburn',
@@ -6107,7 +6116,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'summonPyreColossus', duration: 30 },
     ],
     description:
-      'Calls a Pyre Colossus down at the target area, dealing 64-79 Fire damage on impact. It fights for 30 sec without replacing your demon, burns nearby enemies every 2 sec, and generates 1 Wrack every 1 sec.',
+      'Calls a Pyre Colossus down at the target area, dealing $d Fire damage to enemies within 6 yd on impact. It fights for 30 sec without replacing your demon, deals 66 Fire damage to enemies within 8 yd every 2 sec, and generates 1 Wrack every sec.',
   },
   soul_harvest: {
     id: 'soul_harvest',
@@ -6223,7 +6232,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'shadow',
     requiresTarget: false,
     effects: [{ type: 'selfAbsorbPctMax', pct: 0.2, duration: 12 }],
-    description: 'Wraps you in bone, absorbing damage equal to 20% of your maximum health.',
+    description:
+      'Wraps you in bone for $t sec, absorbing damage equal to 20% of your maximum health.',
   },
   corpse_explosion: {
     id: 'corpse_explosion',
@@ -6240,7 +6250,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetMode: 'position',
     effects: [{ type: 'aoeDamage', min: 48, max: 60, radius: 8, canCrit: true }],
     description:
-      'Sacrifices a Skeletal Warrior first, then a Bone Mage, and a Gravewing only as a last resort. Among duplicates it chooses the one with the least remaining duration, then the weakest, to deal $d Shadow damage at the chosen location.',
+      'Sacrifices one of your Dominion servants (never your Graveguard) to deal $d Shadow damage to enemies within 8 yd of the chosen location. It takes a Skeletal Warrior first, then a Bone Mage, and a Gravewing only as a last resort; among servants of the same kind, the one closest to expiring, then the most injured. Requires a Dominion servant.',
   },
   funeral_harvest: {
     id: 'funeral_harvest',
@@ -6257,7 +6267,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     passive: true,
     effects: [],
     description:
-      'When an enemy recently damaged by you or your undead dies, you gain 1 Soul Fragment. This can occur once every 3 sec.',
+      'When an enemy dies within 5 sec of taking damage from you or your undead, you gain 1 Soul Fragment. This can occur once every 3 sec.',
   },
   ossuary_mark: {
     id: 'ossuary_mark',
@@ -6282,7 +6292,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Marks an enemy for 15 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment.',
+      'Marks an enemy for 15 sec, storing 20% of the damage you and your undead deal to it. Recast to detonate it early: the enemy takes the stored damage as Shadow damage and you heal for 25% of it. When the mark expires it detonates without the heal. If the marked enemy dies, the stored damage hits other enemies within 6 yd and you gain 1 Soul Fragment.',
   },
   unholy_command: {
     id: 'unholy_command',
@@ -6332,7 +6342,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'shadow',
     requiresTarget: false,
     effects: [{ type: 'sacrificeUndead', healPctMax: 0.25 }],
-    description: 'Destroys one Dominion servant to restore 25% of your maximum health.',
+    description:
+      'Destroys your most injured Dominion servant (never your Graveguard) to restore 25% of your maximum health. Requires a Dominion servant.',
   },
   raise_gravewing: {
     id: 'raise_gravewing',
@@ -6512,7 +6523,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         ],
       },
     ],
-    description: 'Burns the enemy with moonfire for $d Arcane damage plus damage over time.',
+    description: 'Burns the enemy for $d Arcane damage, then $o more Arcane damage over $t sec.',
     specNotes: {
       balance: 'Keep it burning: Moonseed extends it by 6 sec.',
     },
@@ -6545,7 +6556,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // extendDot maxBonus, see abilityDurationValue): Moonscorch 2pc wearers
     // read 12 there, everyone else the base 6.
     description:
-      'Moonwing Form only. Strikes for $d Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to $t sec per application. At 3 Moontide, this button becomes Moonsurge: an instant strike for 136 to 162 Arcane damage (plus spell power) that spends all 3.',
+      'Moonwing Form only. Strikes for $d Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest on the target by 6 sec, up to $t extra sec per Lunar Tempest application. At 3 Moontide, this button becomes Moonsurge: an instant heavy Arcane strike that spends all 3.',
   },
   rejuvenation: {
     id: 'rejuvenation',
@@ -6614,7 +6625,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
         effects: [{ type: 'buffTarget', kind: 'thorns', value: 9, duration: 600 }],
       },
     ],
-    description: 'Thorns sprout from the target: melee attackers take $b Nature damage.',
+    description:
+      'Thorns sprout from a friendly target for 10 min. Each melee hit against the target deals $b Nature damage to the attacker.',
   },
   entangling_roots: {
     id: 'entangling_roots',
@@ -6639,7 +6651,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
         ],
       },
     ],
-    description: 'Roots the target in place for up to 12 sec.',
+    description:
+      'Roots the target in place for up to 12 sec. At its second rank, it also deals 32 Nature damage over 12 sec, increased by Spell Power.',
   },
   bear_form: {
     id: 'bear_form',
@@ -6655,7 +6668,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'form_bear', value: 0.65, duration: 3600 }],
     description:
-      'Shapeshift into a bear: armor +110%, maximum health +30%, greatly increased attack power, your attacks build rage and generate 30% more threat. You swing twice as fast for half the damage per swing, and each swing builds double rage. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form.',
+      'Shapeshift into a bear: armor +110%, maximum health +30%, attack power +15 plus 1.5 per point of Agility, your attacks build rage and generate 30% more threat. You swing twice as fast for half the damage per swing, and each swing builds double rage. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form.',
   },
   bear_charge: {
     id: 'bear_charge',
@@ -6677,7 +6690,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     usableInForm: true,
     effects: [{ type: 'charge' }, { type: 'stun', duration: 1 }],
     description:
-      'Shift into Bruin Form if you are not already, then rush an enemy, generating 9 rage and stunning it for 1 sec. For 3 sec afterwards, or until you leave combat, Cat Form is free and Pins that target (the one you Rushed), slowing it by 50% for 4 sec. 8-25 yd range. Usable in any form.',
+      'Shift into Bruin Form if you are not already, then rush an enemy, generating 9 rage and stunning it for 1 sec. For 3 sec after the rush ends (or until you leave combat or the target dies), Cat Form is free and Pins the rushed target, slowing it by 50% for 4 sec. Usable in any form.',
   },
   maul: {
     id: 'maul',
@@ -6709,10 +6722,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'A mauling attack that increases melee damage by $d and causes a high amount of threat. Activates on your next swing. Bruin Form only.',
+      'Your next melee swing deals $d extra damage and generates threat equal to 2.5 times its damage plus a small flat amount. Bruin Form only.',
     specNotes: {
       feral:
-        'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead heals you for 18% of your maximum health and refunds 15 rage.',
+        'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a heavy strike at high threat; below half health it instead heals you for 18% of your maximum health and refunds 15 rage.',
     },
   },
   growl: {
@@ -6776,7 +6789,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Demoralizes nearby enemies, reducing their attack power by 20 for 20 sec. Bruin Form only.',
+      'Demoralizes every enemy within 8 yards, reducing their attack power by $b for 20 sec. Bruin Form only.',
   },
   cat_form: {
     id: 'cat_form',
@@ -6792,7 +6805,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'form_cat', value: 0.71, duration: 3600 }],
     description:
-      'Shapeshift into a cat: agility rises with your level, attack power +8 plus 2 per level, your attacks use energy and combo points, you move 15% faster, and you generate 29% less threat. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form.',
+      'Shapeshift into a cat: agility + half your level (at least 2), attack power +8 plus 2 per level, your attacks use energy and combo points, you move 15% faster, and you generate 29% less threat. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form.',
   },
   prowl: {
     id: 'prowl',
@@ -6928,7 +6941,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresForm: 'cat',
     effects: [{ type: 'finisherDamage', base: 45, perCombo: 39, variance: 8 }],
     actionReplacement: { abilityId: 'redharvest', auraKind: 'old_blood', minStacks: 3 },
-    description: 'Finishing move that causes $d. Cat Form only.',
+    description: 'Finishing move that deals $d Physical damage. Cat Form only.',
     specNotes: {
       feral:
         'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest, which spends the Old Blood for a stronger strike that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores energy.',
@@ -6949,7 +6962,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     threat: { mult: 1.75 }, // classic: swipe damage causes 1.75x threat
     effects: [{ type: 'aoeDamage', min: 12, max: 15, radius: 5 }],
     description:
-      'Sweep your claws through nearby enemies for $d damage. Causes extra threat. Bruin Form only.',
+      'Sweep your claws through every enemy within 5 yards for $d damage each, generating 75% more threat than the damage dealt. Bruin Form only.',
     specNotes: {
       feral: 'Each hit that lands adds 1 Old Blood (max 3).',
     },
@@ -6982,7 +6995,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Heals a friendly target for $d and an additional amount over 15 sec. If the effect runs its full duration, it heals the target again for the same amount as the initial heal.',
+      'Heals a friendly target for $d, then for $o more over 15 sec. If the heal over time runs its full duration, it heals the target once more for the amount of the first heal (before any critical bonus). Ending it early, such as with Fleetmend, Overbloom, or a recast, skips that heal.',
     specNotes: {
       restoration:
         'Each cast adds 1 Verdance (max 3), including a refresh of a bloom already ticking.',
@@ -7015,7 +7028,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // this row breaks the en-vs-locale interpolation-parity guard
     // (tests/i18n_completeness.test.ts) for all 20 overlays, whose translations
     // carry no token. Same shape the flat 150 shipped with.
-    description: 'Your skin hardens like bark, increasing armor by 20% for 15 sec.',
+    description: 'Your skin hardens like bark, increasing armor by $b% for 15 sec.',
   },
   // Druid tank cooldown: a dodge-based defensive (distinct from Oakhide's armor
   // boost). Usable while shapeshifted so a bear tank pops it mid-fight; buff_dodge
@@ -7035,7 +7048,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     offGcd: true,
     usableInForm: true,
     effects: [{ type: 'selfBuff', kind: 'buff_dodge', value: 0.5, duration: 6 }],
-    description: 'Your instincts sharpen, increasing your chance to dodge by 50% for 6 sec.',
+    description:
+      'Your instincts sharpen, adding 50 percentage points to your chance to dodge for 6 sec.',
   },
   starfire: {
     id: 'starfire',
@@ -7058,7 +7072,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description: 'Calls down a bolt of stellar fire, causing $d Arcane damage.',
     specNotes: {
       balance:
-        'In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant strike for 80 to 100 Nature damage plus a 45 burn over 9 sec, restoring 35 mana and spending all 3.',
+        'In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant Nature strike plus a burn over 9 sec, restoring 35 mana and spending all 3.',
     },
   },
   travel_form: {
@@ -7305,7 +7319,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'dot', total: 312, duration: 24, interval: 2, baseTotal: 72, perComboTotal: 48 },
     ],
     description:
-      'Finishing move that makes the target bleed every 2 sec for 24 sec: 72 damage plus 48 per combo point spent (5 combo points: $d total). Cat Form only.',
+      'Finishing move that makes the target bleed every 2 sec for 24 sec, dealing more damage for each combo point spent (5 combo points: $d total). Cat Form only.',
     specNotes: {
       feral: 'The landed hit adds 1 Old Blood (max 3).',
     },
@@ -7343,7 +7357,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'A vicious strike dealing weapon damage plus $d and reducing healing the target receives by 50% for 10 sec. Applies Gaping Wounds (bleed). (Arms signature)',
+      'Strike for weapon damage plus $d and reduce healing the target receives by 50% for 10 sec. Also applies Gaping Wounds, a bleed that deals $o Physical damage over 6 sec in 2 ticks. (Arms signature)',
   },
   bloodthirst: {
     id: 'bloodthirst',
@@ -7364,7 +7378,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'enrageChance', chance: 0.3, duration: 4 },
     ],
     description:
-      'Instantly attack in a blood frenzy for $d, healing you for 3% of your maximum health and generating 12 rage. Has a 30% chance to Enrage you. (Fury signature)',
+      'Strike for 50% weapon damage plus $d, heal yourself for 3% of your maximum health and generate 12 rage. Has a 30% chance to Enrage you for $t sec. (Fury signature)',
   },
   shield_slam: {
     id: 'shield_slam',
@@ -7394,7 +7408,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'gainResource', amount: 15 },
     ],
     description:
-      'Slam the target with your shield for $d and massive threat, generating 15 rage. (Protection signature)',
+      'Slam the target with your shield for weapon damage plus $d and generate 15 rage. Causes very high threat. (Protection signature)',
   },
   whirlwind: {
     id: 'whirlwind',
@@ -7435,7 +7449,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Spin in a deadly arc, striking all nearby enemies for $d at no rage cost. Your next 2 single-target abilities also strike enemies near their target. (Fury talent)',
+      'Strike all enemies within 8 yards for $d Physical damage. For the next $t sec, your next 2 single-target abilities also deal 40% of their damage to up to 4 other enemies within 8 yards of their target. (Fury)',
   },
   berserker_rage: {
     id: 'berserker_rage',
@@ -7450,7 +7464,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     offGcd: true,
     effects: [{ type: 'gainResource', amount: 20 }],
-    description: 'Enter a berserker rage, generating 20 rage. (Warrior talent)',
+    description: 'Enter a seething fury, instantly generating 20 rage.',
   },
   // ------ Base-kit rescues from PR #1348 (owner ruling: these three are BASE
   // warrior abilities, not talents) ------
@@ -7470,7 +7484,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     offGcd: true,
     effects: [{ type: 'interrupt', lockout: 4, rageOnInterrupt: 10 }],
     description:
-      'Interrupts spellcasting, preventing any spell in that school from being cast for 4 sec. Generates 10 rage when it stops a cast.',
+      "Interrupts the target's spellcast and prevents casting from that school for 4 sec. Generates 10 rage when it stops a cast.",
   },
   heroic_leap: {
     id: 'heroic_leap',
@@ -7488,7 +7502,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     targetMode: 'position',
     effects: [{ type: 'repositionToAim', landingAoe: { min: 24, max: 32, radius: 6 } }],
-    description: 'Leap to the target area, dealing $d damage to nearby enemies on landing.',
+    description:
+      'Leap to the target area, dealing $d Physical damage to all enemies within 6 yards when you land.',
   },
   rallying_cry: {
     id: 'rallying_cry',
@@ -7551,7 +7566,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // rather than on an invented number.
     effects: [{ type: 'aoeFear', duration: 4, radius: 8, maxTargets: 5 }],
     description:
-      'A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 4 sec. Damage may break the effect.',
+      'Send up to 5 enemies within 8 yards fleeing in fear for 4 sec. Each hit on a feared enemy has a chance to break the fear, and a hit for 10% of its maximum health or more always does.',
   },
   bladestorm: {
     id: 'bladestorm',
@@ -7632,8 +7647,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     offGcd: true,
     effects: [{ type: 'selfBuff', kind: 'die_by_sword', value: 0.3, duration: 8 }],
-    description:
-      'Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks.',
+    description: 'For 8 sec, you take 30% less damage and gain 30% dodge chance.',
   },
   // The level-5 mobility row's peel option (replaces Double Charge, which stored a
   // second Onrush use and, under the parallel per-charge recharge model, handed PvP
@@ -7706,8 +7720,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     offGcd: true,
     effects: [{ type: 'selfBuff', kind: 'buff_reckless', value: 0.2, duration: 12 }],
-    description:
-      'Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec.',
+    description: 'For 12 sec, you generate 50% more rage and gain 20% critical strike chance.',
   },
   avatar: {
     id: 'avatar',
@@ -7733,7 +7746,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'selfBuff', kind: 'buff_avatar', value: 0.2, duration: 20 },
     ],
     description:
-      'Transform into a colossus for 20 sec, breaking enemy control effects on you (boss control is unaffected) and increasing your damage dealt by 20%.',
+      'Break the stuns, fears, roots, silences, disarms and slows on you (not those from bosses), then become a colossus for 20 sec, dealing 20% more damage. It does not protect you from new control effects.',
   },
   sanguine_aura: {
     id: 'sanguine_aura',
@@ -7756,7 +7769,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec.',
+      'Imbue your weapon with the blood of your foes: you and every Warrior, Paladin, Rogue, Shaman, and Druid in your party, at any range, gain 10% attack speed and deal 10% more damage for 20 sec.',
   },
 
   // ============== TALENT-GRANTED (Classic specs) ==============
@@ -7841,7 +7854,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     offGcd: true,
     effects: [{ type: 'howlingRage', duration: 12 }],
     description:
-      'Grant 3 Pack Ferocity. Your next Unleash Beast within 20 sec deals 50% more strike and clap damage, and its frenzy lasts 12 sec instead of 8. (Packlord signature)',
+      'Grant 3 Pack Ferocity for 20 sec and end any active Unleashed Frenzy. Your next Unleash Beast within 20 sec deals 50% more strike and clap damage, and its frenzy lasts 12 sec instead of 8. (Packlord signature)',
   },
   cold_focus: {
     id: 'cold_focus',
@@ -7857,7 +7870,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     offGcd: true,
     effects: [{ type: 'selfBuff', kind: 'hunter_cold_focus', value: 1, duration: 12 }],
     description:
-      'For 12 sec, Measured Shot restores 30 Focus, and Long Draw costs 25% less and casts 30% faster. (Coldsight signature)',
+      'For 12 sec, Measured Shot restores 30 Focus, and Long Draw costs 25% less and has a 30% shorter cast time. (Coldsight signature)',
   },
   bloodhook: {
     id: 'bloodhook',
@@ -7955,7 +7968,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // same day: the Phoenix Trance window is meant to chain free Pyroblasts).
     effects: [{ type: 'selfBuff', kind: 'combustion', value: 0, duration: 10 }],
     description:
-      'Combust: for 10 sec your Fire spells always critically strike, including bolts already in flight. Off the global cooldown. These crits build Hot Streak like any other, and casting it finishes the Cinderfall charge currently recharging. (Fire signature)',
+      'For 10 sec, your Fire spells always critically strike, including bolts already in flight, and these crits build Hot Streak as normal. Off the global cooldown and usable while casting. Casting it finishes the Cinderfall charge that is recharging. Outside Phoenix Trance, each critical strike that builds Hot Streak shortens its cooldown by 1 sec. (Fire)',
   },
   cone_of_cold: {
     id: 'cone_of_cold',
@@ -7988,7 +8001,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'selfBuff', kind: 'cast_shield', value: 1, duration: 10 },
     ],
     description:
-      'Increases spell haste by 30% and prevents cast interruption and pushback for 10 sec. (Frost signature)',
+      'Increases spell haste by 30% and prevents cast interruption and pushback for 10 sec. (Frost)',
   },
   cold_blood: {
     id: 'cold_blood',
@@ -8004,7 +8017,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'next_attack_crit', value: 1, duration: 60, charges: 5 }],
     description:
-      'Focuses your killing intent so your next 5 attacks are critical strikes. (Knifework signature)',
+      'Your next 5 attacks within $t sec are guaranteed critical strikes. Auto attacks use a charge too. (Knifework signature)',
   },
   blade_flurry: {
     id: 'blade_flurry',
@@ -8040,7 +8053,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'applyDebuff', kind: 'bleed_vuln', value: 0.4, duration: 12 },
     ],
     description:
-      'Strikes the enemy for weapon damage plus $d, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. Every 2nd use adds 1 Gloam (max 3). (Skulduggery signature)',
+      'Strike the enemy for weapon damage plus $d and make it bleed for $o over 12 sec. For 12 sec, all bleeds on the target deal 40% more damage. Awards 1 combo point. Every 2nd use adds 1 Gloam (max 3). (Skulduggery signature)',
   },
   power_infusion: {
     id: 'power_infusion',
@@ -8090,7 +8103,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Heal allies within 10 yards for $d and deal 24 to 30 Holy damage to enemies in the same area. Both amounts increase with Spell Power. (Benison baseline)',
+      'Heal allies within 10 yards for $d and deal 24 to 30 Holy damage to enemies in the same area. Healing increases with Healing Power and damage with Spell Power. (Benison baseline)',
   },
   shadowform: {
     id: 'shadowform',
@@ -8106,7 +8119,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'form_shadow', value: 25, duration: 3600 }],
     description:
-      'Enter Gloamveil, increasing your Shadow damage by 25%. Cast it again to leave Gloamveil. (Vespers signature)',
+      'Enter Gloamveil, increasing your Shadow damage by 25%. Casting a healing spell ends it. Cast Gloamveil again to leave it. (Vespers signature)',
   },
   elemental_mastery: {
     id: 'elemental_mastery',
@@ -8121,7 +8134,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [],
     description:
-      'For 12 sec, Arc Bolt grants 2 Thunder. Your next Arc Bolt or Skybranch is instant, and your next full Thunder payoff deals 25% more damage. (Thundercall signature)',
+      'For 12 sec, Arc Bolt grants 2 Thunder instead of 1. Your next Arc Bolt or Skybranch in that time is instant, and your next Earthen Jolt or Faultwake that consumes 5 Thunder deals 25% more damage. (Thundercall signature)',
   },
   siphon_life: {
     id: 'siphon_life',
@@ -8157,7 +8170,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       // contract in tests/ability_tooltip_consistency.test.ts); the catalog
       // row splices the RESOLVED count as {charges}, so Ruincaller 2pc
       // wearers read 3 there.
-      'Advances one future tick of your Burning Pact, then ignites the target for $d Fire damage. Generates 1 Wrack and 1 Desolation. Holds 2 charges. (Destruction signature)',
+      'Requires your Burning Pact on the target. Deals one of its remaining ticks immediately, shortening it by one tick, then ignites the target for $d Fire damage. Generates 1 Wrack and 1 Desolation (stacks to 2, lasts 15 sec): your next Ruinbolt casts 30% faster, or your next Rain of Fire lands its first wave immediately. Holds 2 charges. (Destruction signature)',
   },
   moonkin_form: {
     id: 'moonkin_form',
@@ -8246,10 +8259,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [],
     description:
-      "Your spells can arm Nature's Boon for 10 sec: the spell it names becomes free, 25% stronger, and castable in any form. A fresh proc refreshes the duration.",
+      "Nature's Boon is a 10 sec window that makes the spell it names free, 25% stronger, and castable in any form. A fresh proc refreshes the duration.",
     specNotes: {
       feral:
-        'Each landed melee auto-attack has a 1 in 15 chance to arm it for Sporemending, or for Oakhide while in Bruin Form.',
+        "Each landed melee auto-attack can arm it, about 4 times per minute in any form (a 1 in 15 chance per Cat Form swing). It covers Sporemending, which it makes 50% stronger instead of 25%, and Oakhide while you are in Bruin Form; the first one you cast spends it. Each proc also resets Oakhide's cooldown.",
       balance:
         'Each Wildbolt or Skyfall you cast has a 10% chance to arm it for Spore Burst, at most once every 10 sec.',
       restoration:
@@ -8271,7 +8284,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     usableInForm: true,
     effects: [{ type: 'feralCharge' }],
     description:
-      'Unleash a primal surge. In Cat Form, Energy regeneration is increased by 100% for 10 sec. In Bruin Form, instantly generates 50 Rage. (Feral signature)',
+      'Unleash a primal surge. In Cat Form, Energy regeneration is increased by 100% for 10 sec. In Bruin Form, instantly generates 50 Rage. Outside Cat and Bruin Form it has no effect. (Feral signature)',
   },
   swiftmend: {
     id: 'swiftmend',
@@ -8412,7 +8425,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'druidMarrowbreakGuard', belowFrac: 0.5, healPctMaxHp: 0.18, rage: 15 },
     ],
     description:
-      'Spends your 3 Old Blood for a heavy, high-threat strike of $d damage. Below half health it instead heals you for 18% of your maximum health and refunds 15 rage.',
+      'Spends your 3 Old Blood for a strike of $d damage that generates threat equal to twice its damage plus 110. Below half health it instead heals you for 18% of your maximum health and refunds 15 rage.',
   },
   overbloom: {
     id: 'overbloom',
@@ -8507,7 +8520,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'arcane',
     requiresTarget: false,
     effects: [{ type: 'blinkForward', distance: 15, breakRoots: true }],
-    description: 'Teleports you 15 yd forward and breaks roots. (Mage talent)',
+    description: 'Teleports you 15 yd forward and breaks roots.',
   },
   counter_shot: {
     id: 'counter_shot',
@@ -8538,7 +8551,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [{ type: 'interrupt', lockout: 6 }],
     description:
-      'Counters enemy spellcasting, preventing any spell in that school from being cast for 6 sec. (Mage talent)',
+      "Interrupts the target's spellcast and locks them out of that spell's school for 6 sec. Has no effect if the target is not casting.",
   },
   deep_freeze: {
     id: 'deep_freeze',
@@ -8597,7 +8610,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     usableWhileControlled: true,
     effects: [{ type: 'cleanseSelf' }, { type: 'selfBuff', kind: 'stasis', value: 0, duration: 8 }],
     description:
-      'Encases you in solid ice for 8 sec, becoming immune to all damage and effects and removing every harmful effect. Usable while stunned or polymorphed. You cannot act while encased. Recast to cancel. (Mage)',
+      'Encases you in solid ice for 8 sec. You take no damage and cannot be stunned, rooted, slowed, silenced or otherwise controlled, but you cannot act. Removes harmful effects from you when cast, except encounter control and recovery sickness. Usable while stunned or polymorphed. Recast to cancel. (Mage)',
   },
   mend_pet: {
     id: 'mend_pet',
@@ -8649,7 +8662,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Calls a meteor down on the target area: after a 2 sec fall it deals 90 to 120 Fire damage and Ignites everything it strikes. (Fire)',
+      'Calls a meteor down on the target area. After 2 sec it lands, dealing $d Fire damage to each enemy in the impact and Igniting each one for 40% of the damage dealt over 6 sec. (Fire)',
   },
   presence_of_mind: {
     id: 'presence_of_mind',
@@ -8710,7 +8723,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)',
+      'Turn invisible for up to 20 sec, dropping enemy threat and targeting on you, and remove up to 2 damage-over-time effects from yourself. Attacking, casting or taking damage ends it early. When it ends, you take 90% less damage for 2 sec. (Mage talent)',
   },
   rings_of_frost: {
     id: 'rings_of_frost',
@@ -8737,7 +8750,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Summons a ring for 10 sec. Enemies crossing its perimeter are frozen for 4 sec. (Mage talent)',
+      'Places a ring of frost at the target location for 10 sec. An enemy that crosses the ring is rooted for 4 sec; each enemy can trigger it only once. The center inside the ring is safe. (Mage talent)',
   },
   cold_snap: {
     id: 'cold_snap',
@@ -8764,7 +8777,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Finishes the cooldown on Flitstep, Frostveil, and Greater Invisibility. (Mage talent)',
+      'Finishes the cooldowns of Flitstep (restoring all its charges), Greater Invisibility, and your personal barrier: Frostveil, Blazing Barrier or Temporal Barrier. (Mage talent)',
   },
   mass_barrier: {
     id: 'mass_barrier',
@@ -8806,7 +8819,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     offGcd: true,
     effects: [{ type: 'selfBuff', kind: 'overload', value: 0.4, duration: 10 }],
     description:
-      'Your next spell is amplified by 40% but costs 50% more mana. Lasts 10 sec. (Mage talent)',
+      'Your next spell that costs mana has its base damage, healing and absorb values increased by 40%, but costs 50% more mana. The Spell Power bonus is not increased. Lasts 10 sec. (Mage talent)',
   },
   power_echo: {
     id: 'power_echo',
@@ -8822,7 +8835,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     offGcd: true,
     effects: [{ type: 'selfBuff', kind: 'power_echo', value: 0.5, duration: 10 }],
     description:
-      'Your next direct spell repeats at 50% power on the same target. Lasts 10 sec. (Mage talent)',
+      'Your next single-target direct damage or healing spell repeats on the same target for 50% of the amount it dealt or healed. Lasts 10 sec. (Mage talent)',
   },
   rune_of_power: {
     id: 'rune_of_power',
@@ -8919,7 +8932,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [],
     description:
-      'Passive: your spell critical strikes burn the target for 30% of the damage dealt over 6 sec, stacking. (Fire mastery)',
+      'Passive: when your Fire spells critically strike, the target burns for an extra 1.5% of the damage dealt per character level (30% at level 20) over 6 sec. A new burn on a target that is already burning adds to the damage still owed and restarts the 6 sec timer. (Fire mastery)',
   },
   hot_streak: {
     id: 'hot_streak',
@@ -8936,7 +8949,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [],
     description:
-      'Passive: two critical strikes in a row with your Fire spells (Cinderbolt, Cinderfall, Scald, Pyrelance or Flamestrike) make your next Pyrelance or Flamestrike instant and free. The spenders count toward the NEXT streak, free casts included; a Flamestrike counts once however many enemies it strikes, and only the initial impact ever counts. (Fire)',
+      "Passive: two critical strikes in a row from Cinderbolt, Cinderfall, Scald, Pyrelance, Flamestrike or Dragon's Breath make your next Pyrelance or Flamestrike within 12 sec instant and free. A non-critical hit from one of those spells resets the count, and a first crit is remembered for 10 sec. Pyrelance and Flamestrike count toward the next streak, free casts included. Flamestrike and Dragon's Breath count once per cast however many enemies they hit, and only the initial impact counts. (Fire)",
   },
   summon_water_elemental: {
     id: 'summon_water_elemental',
@@ -8982,7 +8995,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [{ type: 'interrupt', lockout: 4 }],
     description:
-      'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Druid talent)',
+      'Headbutt the target, interrupting the spell it is casting and preventing it from casting spells of that school for 4 sec.',
   },
   spell_lock: {
     id: 'spell_lock',
@@ -8997,7 +9010,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [{ type: 'interrupt', lockout: 4 }],
     description:
-      'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Warlock talent)',
+      "Interrupts the enemy's spellcasting and prevents it from casting spells of that school for 4 sec.",
   },
 
   // Canonical Talents V2 active grants. These are absent from baseline class kits
@@ -9313,11 +9326,8 @@ function scaleEffect(
         : eff;
     case 'lifeTap':
       // Same policy as gainResource below: a health-to-mana conversion is
-      // economy, not damage. Scaling only the mana half would also break the
-      // authored hp == mana symmetry the Hard Bargain tooltip promises
-      // ("Converts {damage} health into {damage} mana"). Intentional yield
-      // scaling rides the per-ability buffPct (Blood Credit), applied at the
-      // effect_dispatch lifeTap arm.
+      // economy, not damage. Intentional yield scaling rides the per-ability
+      // buffPct (Blood Credit), resolved onto the mana half in applyTalentMods.
       return eff;
     case 'gainResource':
       // Resource generation is economy, not damage. Damage modifiers must not
@@ -9459,21 +9469,30 @@ export function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): voi
                 // the same resolved rate the dispatch consumes.
                 e.type === 'absorbSpentResource'
                 ? { ...e, mult: Math.round(e.mult * mul) }
-                : // Forgewall 2pc (Iron Resolve 20% to 25% of max health): a
-                  // shield's flat amount and its max-health fraction are both
-                  // buff-shaped, so the per-ability knob scales them and the
-                  // {damage} splice reads the same resolved fraction the
-                  // dispatch consumes.
-                  e.type === 'absorb'
-                  ? {
-                      ...e,
-                      amount: Math.round(e.amount * mul),
-                      casterMaxHpPct:
-                        e.casterMaxHpPct === undefined
-                          ? undefined
-                          : Math.round(e.casterMaxHpPct * mul * 10_000) / 10_000,
-                    }
-                  : e,
+                : // Blood Credit: more mana per Hard Bargain, same health
+                  // price. Resolved here so the tooltip's {buff} and the
+                  // dispatch read the one number.
+                  e.type === 'lifeTap'
+                  ? { ...e, mana: Math.round(e.mana * mul) }
+                  : // Blood Credit on Cruel Pact: the same buffPct on its
+                    // max-mana fraction, health price unchanged.
+                    e.type === 'afflictionCruelPact'
+                    ? { ...e, manaPctMax: e.manaPctMax * mul }
+                    : // Forgewall 2pc (Iron Resolve 20% to 25% of max health): a
+                      // shield's flat amount and its max-health fraction are both
+                      // buff-shaped, so the per-ability knob scales them and the
+                      // {damage} splice reads the same resolved fraction the
+                      // dispatch consumes.
+                      e.type === 'absorb'
+                      ? {
+                          ...e,
+                          amount: Math.round(e.amount * mul),
+                          casterMaxHpPct:
+                            e.casterMaxHpPct === undefined
+                              ? undefined
+                              : Math.round(e.casterMaxHpPct * mul * 10_000) / 10_000,
+                        }
+                      : e,
       );
     }
   }

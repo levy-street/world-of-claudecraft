@@ -101,7 +101,9 @@ export function abilityRangeLine(def: AbilityDef): string | null {
 // `Math.max(0, ...)` floor, so a shown cast time never disagrees with the real one (a
 // net-negative haste, e.g. a cast-slow debuff, floors at 0 for both). ui/ cannot import
 // the sim-combat helper across the seam, so the formula is kept identical here by hand.
-export function playerSpellHasteFrac(p: Entity | null | undefined): number {
+export function playerSpellHasteFrac(
+  p: (Pick<Entity, 'auras'> & Partial<Pick<Entity, 'spellHaste'>>) | null | undefined,
+): number {
   if (!p) return 0;
   // ?? 0: a mirrored online entity can omit default-zero fields, and an
   // absent spellHaste must read as none, never NaN (which the floor below

@@ -42,7 +42,10 @@ describe('Bleed Out and Bloodrift tooltips: $d shows the full five-point spend',
 
     expect(abilityEffectText(rip, NO_SCALING)).toBe('312');
     expect(abilityEffectText(rip, NO_SCALING)).not.toBe('72');
-    expect(ABILITIES.rip.description).toContain('48 per combo point spent');
+    // The prose states the per-point rule, not a literal: talents and spec
+    // scaling change the per-point amount, so only $d carries a number.
+    expect(ABILITIES.rip.description).toContain('more damage for each combo point spent');
+    expect(ABILITIES.rip.description).toContain('$d total');
   });
 
   it('both dots carry their scaling in data, so $d stays the full-spend number', () => {

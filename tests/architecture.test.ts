@@ -248,6 +248,11 @@ const UI_PURE_CORES = [
   // hint strip so a printed glyph and its colour can never disagree.
   'src/ui/micro_menu_state_view.ts',
   'src/ui/ability_tooltip_lines.ts',
+  // The ability tooltip body and its Shift-held detail lines.
+  'src/ui/ability_tooltip_view.ts',
+  'src/ui/ability_tooltip_detail_core.ts',
+  // Shift-held tooltip detail state: a pure reducer over key/blur events.
+  'src/ui/tooltip_detail_key.ts',
   'src/ui/dawnreaver_damage_tooltip_core.ts',
   'src/ui/proc_ready_glow_core.ts',
   'src/ui/reticle_ticks_core.ts',
@@ -1568,6 +1573,7 @@ const RENDER_PURE_CORES = [
 // updating this list) fails the cross-check instead of silently escaping the
 // reverse-completeness guard.
 const BARE_NAMED = [
+  'src/ui/tooltip_detail_key.ts',
   'src/ui/trinket_aura_effect.ts',
   'src/ui/trinket_aura_art.ts',
   'src/ui/ability_tooltip_lines.ts',
@@ -2760,6 +2766,7 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/target_frame_pos.ts',
   'src/ui/terms_link.ts',
   'src/ui/tool_effect_tooltip.ts',
+  'src/ui/tooltip_detail_key.ts',
   'src/ui/trinket_aura_art.ts',
   'src/ui/trinket_aura_effect.ts',
   'src/ui/unit_frame.ts',

@@ -1813,6 +1813,24 @@ export const id_ID: EnTranslations = {
       "ascensionLastAnnouncement": "Kenaikan: muatan terakhir",
       "ascensionSpenderAria": "Slot aksi {slot}: {ability}. Menghabiskan satu muatan Kenaikan."
     },
+    "abilityTooltipDetail": {
+      "hint": "Tahan Shift untuk detail",
+      "school": "Aliran: {school}",
+      "scaling": "Termasuk +{bonus} dari {stat}-mu ({value})",
+      "stat": {
+        "spellPower": "Kekuatan Mantra",
+        "healPower": "Kekuatan Penyembuhan",
+        "attackPower": "Kekuatan Serangan",
+        "rangedPower": "Kekuatan Serangan Jarak Jauh"
+      },
+      "ticks": "{ticks} denyut, satu setiap {interval} dtk selama {duration} dtk",
+      "radius": "Radius: {radius} yd",
+      "charges": "Muatan: {charges}",
+      "castWhileMoving": "Dapat dirapal sambil bergerak",
+      "pushbackImmune": "Menerima kerusakan tidak menunda rapalan ini",
+      "threatMult": "Pengubah ancaman kemampuan: {percent}%",
+      "threatFlat": "Ancaman bonus: +{threat}"
+    },
     "abilityScaling": {
       "bonus": "(+{value})"
     },
@@ -17498,11 +17516,11 @@ export const id_ID: EnTranslations = {
       },
       "flamestrike": {
         "name": "Hantaman Api",
-        "description": "Memanggil ledakan api di area sasaran, memberikan {damage} kerusakan Api kepada musuh yang terkena ledakan."
+        "description": "Menjatuhkan ledakan api di area sasaran, memberikan {damage} kerusakan Api kepada setiap musuh yang terkena ledakan. Satu lemparan peluang serangan kritis berlaku untuk seluruh ledakan: semua musuh terkena serangan kritis, atau tidak ada satu pun."
       },
       "rain_of_fire": {
         "name": "Hujan Api",
-        "description": "Menghabiskan 3 Pemusnahan untuk menurunkan hujan api ke area sasaran, memberi {damage} kerusakan Api setiap detik selama 4 dtk, diperpanjang menjadi 6 dtk pada peringkat 2. Kehancuran menurunkan gelombang pertamanya seketika."
+        "description": "Menghabiskan 3 Pemusnahan untuk menurunkan hujan api ke area sasaran, memberikan {damage} kerusakan Api kepada musuh di dalamnya setiap detik selama {duration} dtk. Kehancuran menurunkan gelombang pertama seketika."
       },
       "volley": {
         "name": "Hujan Panah",
@@ -17510,19 +17528,19 @@ export const id_ID: EnTranslations = {
       },
       "phosphor_flask": {
         "name": "Labu Fosfor",
-        "description": "Bejana tersegel berisi campuran kimia reaktif yang meledak menjadi api putih membara di area 8 meter selama 3 dtk. Musuh yang berdiri di dalam api menerima {damage} kerusakan Api setiap 0,5 dtk. Kerusakan meningkat dengan kekuatan serang jarak jauh."
+        "description": "Melempar labu yang meledak menjadi api di area 8 yard selama 3 dtk. Musuh yang berdiri di dalam api menerima {damage} kerusakan Api setiap 0,5 dtk. Kerusakan meningkat dengan Kekuatan Serangan Jarak Jauh."
       },
       "pack_command": {
         "name": "Perintah Kawanan",
-        "description": "Memerintahkan hewan peliharaanmu yang hidup untuk menyerang sebesar 36 sampai 48 kerusakan Fisik. Kerusakan meningkat dengan kekuatan serang hewan peliharaan. Serangan yang mengenai memulihkan 20 fokus dan memberi 1 Keganasan Kawanan selama 30 dtk, hingga 3. Setiap tumpukan menambah semua kerusakan hewan peliharaanmu sebesar 10%. Serangan ini memakai tumpukan yang kamu miliki sebelum benturan."
+        "description": "Memerintahkan hewan peliharaanmu yang hidup untuk menyerang sebesar 36 sampai 48 kerusakan Fisik. Kerusakan meningkat dengan Kekuatan Serangan hewan peliharaan. Serangan yang mengenai memulihkan 20 Fokus dan memberi 1 Keganasan Kawanan selama 30 dtk, hingga 3. Setiap tumpukan menambah semua kerusakan hewan peliharaanmu sebesar 10%. Serangan ini memakai tumpukan yang kamu miliki sebelum pukulan. Pada 3 tumpukan, tombol ini menjadi Lepaskan Sang Buas. Tidak dapat digunakan selama Kalap Terlepas."
       },
       "stampede": {
         "name": "Serbuan Liar",
-        "description": "Memanggil 3 binatang buas selama 12 dtk. Masing-masing menyerang tiap 2 dtk sebesar {damage} kerusakan Fisik. Kerusakan yang ditampilkan mencakup 8% kekuatan serang jarak jauhmu sebelum bonus kerusakan hewan peliharaan. Binatang buas mengunci Keganasan Kawanan saat dipanggil, memperoleh 10% kerusakan per tumpukan. Saat Serbuan Liar dalam jeda, Perintah Kawanan yang berhasil berpeluang 20% mengatur ulangnya, dijamin setelah 5 peluang gagal. Ia tidak dapat diatur ulang selama binatang buas aktif. (Penguasa Kawanan)"
+        "description": "Memanggil 3 binatang buas selama 12 dtk. Masing-masing menyerang tiap 2 dtk sebesar {damage} kerusakan Fisik. Kerusakan yang ditampilkan mencakup 8% Kekuatan Serangan Jarak Jauhmu sebelum bonus kerusakan hewan peliharaan. Binatang buas mengunci Keganasan Kawanan saat dipanggil, memperoleh 10% kerusakan per tumpukan. Saat Serbuan Liar dalam masa tunggu, Perintah Kawanan yang berhasil berpeluang 20% mengatur ulangnya, dijamin pada peluang ke-5. Ia tidak dapat diatur ulang selama binatang buas aktif. (Penguasaan Hewan Buas)"
       },
       "unleash_beast": {
         "name": "Lepaskan Sang Buas",
-        "description": "Menghabiskan 3 Keganasan Kawanan setelah hewan peliharaanmu menyerang sebesar 83 sampai 105 kerusakan Fisik dan mengguncang setiap musuh dalam 6 meter sebesar 26 sampai 34. Serangan dan guncangan memakai bonus kerusakan hewan peliharaan penuh 30% dari Keganasan Kawanan dan meningkat dengan kekuatan serang hewan peliharaan. Selama 8 dtk sesudahnya, hewan peliharaan memberi 25% lebih banyak kerusakan, menyerang 35% lebih cepat, dan membuat Tembakan Bengis membelah hingga 2 musuh di dekatnya."
+        "description": "Hewan peliharaanmu menyerang target sebesar 42 sampai 53 kerusakan Fisik, lalu menepuk setiap musuh dalam 6 yard dari hewan peliharaan sebesar 57 sampai 75. Tepukan memberi 50% lebih banyak kerusakan kepada musuh selain target utama. Serangan dan tepukan memakai bonus kerusakan hewan peliharaan penuh 30% dari Keganasan Kawanan, meningkat dengan Kekuatan Serangan hewan peliharaan, lalu menghabiskan seluruh 3 Keganasan Kawanan. Selama 8 dtk sesudahnya (Kalap Terlepas), hewan peliharaan memberi 25% lebih banyak kerusakan dan menyerang 35% lebih cepat, setiap Tembakan Bengis membuatnya membelah hingga 2 musuh lain dalam 5 yard dari target sebesar 12 sampai 18 kerusakan Fisik, dan kamu tidak dapat menggunakan Perintah Kawanan."
       },
       "measured_shot": {
         "name": "Tembakan Terukur",
@@ -17530,7 +17548,7 @@ export const id_ID: EnTranslations = {
       },
       "cold_focus": {
         "name": "Fokus Dingin",
-        "description": "Selama 12 dtk, Tembakan Terukur memulihkan 50% lebih banyak fokus, dan Tarikan Panjang menghabiskan 25% lebih sedikit serta dirapal 30% lebih cepat. (Ciri khas Pandangan Dingin)"
+        "description": "Selama 12 dtk, Tembakan Terukur memulihkan 30 Fokus, dan Tarikan Panjang menghabiskan 25% lebih sedikit serta dirapal 30% lebih cepat. (Ciri khas Kepiawaian Menembak)"
       },
       "bloodhook": {
         "name": "Kait Darah",
@@ -17542,11 +17560,11 @@ export const id_ID: EnTranslations = {
       },
       "bloodtrail_assault": {
         "name": "Serbuan Jejak Darah",
-        "description": "Selama 12 dtk, Kait Darah menyebarkan luka dengan kekuatan 60% ke maksimal 2 musuh dalam 5 meter, Robekan Luka memerintahkan serangan peliharaan sebesar 18 kerusakan, dan Muatan Serpihan menjangkau 2 meter lebih jauh, memberikan 25% kerusakan dasar lebih besar kepada target utama serta memicu 50% kerusakan luka lebih besar. Tanpa peliharaan hidup, Fokusmu juga pulih 100% lebih cepat."
+        "description": "Selama 12 dtk, Kait Darah juga menerapkan Luka Kait Darah berkekuatan 60% pada hingga 2 musuh lain dalam 5 yard dari targetnya, Robekan Luka membuat hewan peliharaanmu yang hidup memberi 18 kerusakan Fisik kepada target, dan Muatan Serpihan menjangkau 2 yard lebih jauh, memberi 25% lebih banyak kerusakan dasar kepada target utamanya, dan denyut lukanya yang seketika memberi 50% lebih banyak. Selama kamu tidak punya hewan peliharaan hidup, Fokusmu juga pulih 100% lebih cepat."
       },
       "trailbreak": {
         "name": "Putus Jejak",
-        "description": "Melompat 25 meter ke belakang dan lepas dari efek akar serta perlambatan gerak. Bila kamu punya Momentum Berburu, ia disegarkan dan menyiapkan Masuk Kembali selama 12 dtk."
+        "description": "Melompat 25 yard ke belakang dan lepas dari akar serta perlambatan gerak. Mendarat memberi 50% kecepatan gerak selama 3 dtk. Jika kamu punya Momentum Berburu, kamu mendapat Masuk Kembali Bersenjata selama 12 dtk: Serangan Cabik Perut atau Kait Darah berikutnya memberi kerusakan bonus berdasarkan tumpukan Momentum-mu."
       },
       "wildheart": {
         "name": "Hati Liar",
@@ -17554,7 +17572,7 @@ export const id_ID: EnTranslations = {
       },
       "shellskin": {
         "name": "Kulit Cangkang",
-        "description": "Mengurangi kerusakan yang diterima 60% selama 8 dtk, tetapi mencegah serangan selama aktif."
+        "description": "Mengurangi kerusakan yang diterima 60% selama 8 dtk. Selama aktif, kamu tidak dapat menggunakan kemampuan yang menarget atau melukai musuh, termasuk jerat, tetapi serangan otomatismu tetap berlanjut."
       },
       "play_dead": {
         "name": "Pura-pura Mati",
@@ -17562,11 +17580,11 @@ export const id_ID: EnTranslations = {
       },
       "tactical_camo": {
         "name": "Kamuflase Taktis",
-        "description": "Menyatu dengan lingkungan: musuh nyaris tidak menyadari kehadiranmu, dan kamu bergerak dengan kecepatan 80%. Menyerang atau menerima kerusakan mengakhiri Kamuflase Taktis. Gunakan lagi untuk keluar. (Bertahan Hidup)"
+        "description": "Masuk ke mode siluman dan bergerak dengan kecepatan 80%. Monster hanya menyadarimu dari jarak dekat (seperempat jarak agro normal mereka, lebih jauh jika level mereka lebih tinggi darimu), dan pemain serta hewan peliharaan musuh tidak dapat melihatmu. Menyerang atau menerima kerusakan mengakhiri Kamuflase Taktis. Rapal lagi untuk keluar. (Bertahan Hidup)"
       },
       "frostjaw_trap": {
         "name": "Jerat Rahang Beku",
-        "description": "Menempatkan jerat di lokasi terpilih. Ia aktif setelah 0,75 dtk dan bertahan 1 menit, dan hanya kamu dan kelompokmu yang dapat melihatnya. Musuh pertama yang memicunya terakar 3 dtk, dan musuh dalam 4 meter diperlambat 50% selama 4 dtk."
+        "description": "Menempatkan jerat di lokasi terpilih. Ia aktif setelah 0,75 dtk dan bertahan 1 menit, dan hanya kamu dan kelompokmu yang dapat melihatnya. Musuh pertama yang memicunya terakar selama 3 dtk, dan musuh dalam 4 yard diperlambat 50% selama 4 dtk. Hanya satu Jerat Rahang Beku yang dapat aktif sekaligus. Menempatkan yang lain menggantikannya."
       },
       "bear_trap": {
         "name": "Jerat Beruang",
@@ -17590,7 +17608,7 @@ export const id_ID: EnTranslations = {
       },
       "heroic_strike": {
         "name": "Serangan Perampas",
-        "description": "Serangan kuat yang meningkatkan kerusakan jarak dekat sebesar {damage}. Aktif pada ayunan berikutnya."
+        "description": "Ayunan jarak dekat berikutnya memberi {damage} kerusakan tambahan. Amukan dihabiskan pada ayunan itu; tanpa amukan yang cukup, ia tetap menjadi ayunan biasa."
       },
       "battle_shout": {
         "name": "Raungan Besi",
@@ -17598,15 +17616,15 @@ export const id_ID: EnTranslations = {
       },
       "demoralizing_shout": {
         "name": "Lolongan Petaka",
-        "description": "Melepaskan pekikan mengerikan yang mengurangi kerusakan yang ditimbulkan semua musuh di sekitar sebesar {buff}% selama 20 detik."
+        "description": "Berteriak untuk mengurangi kerusakan yang diberikan semua musuh dalam 10 yard sebesar {buff}% selama {duration} dtk."
       },
       "charge": {
         "name": "Serbuan",
-        "description": "Menerjang musuh, menghasilkan 9 amarah dan menyetrumnya selama 1 detik. Jangkauan 8-25 yard."
+        "description": "Menerjang musuh dan menyetrumnya selama 1 dtk, menghasilkan 9 amukan."
       },
       "thunder_clap": {
         "name": "Pukulan Gempa",
-        "description": "Menghantam musuh di sekitar sebesar {damage} kerusakan dan memperlambat serangan mereka sebesar 10% selama 10 detik."
+        "description": "Menghantam semua musuh dalam 8 yard sebesar {damage} kerusakan Fisik dan memperlambat kecepatan serang mereka 10% selama 10 dtk."
       },
       "hamstring": {
         "name": "Sayatan Pincang",
@@ -17614,11 +17632,11 @@ export const id_ID: EnTranslations = {
       },
       "bloodrage": {
         "name": "Tumbal Darah",
-        "description": "Menghasilkan 10 amarah dengan mengorbankan nyawa."
+        "description": "Kehilangan 8% kesehatan maksimummu untuk menghasilkan {rage} amukan. Ini tidak dapat membunuhmu."
       },
       "overpower": {
         "name": "Tangan Merah",
-        "description": "Serangan seketika sebesar kerusakan senjata ditambah {damage}. Hanya dapat digunakan setelah target mengelak. Tidak dapat dielakkan."
+        "description": "Menyerang sebesar kerusakan senjata ditambah {damage}. Tidak dapat dielakkan. Setiap penggunaan juga memberi satu tumpukan Tangan Merah selama {duration} dtk, hingga 2: Serangan Pelukai berikutnya menghabiskannya untuk memberi 20% lebih banyak kerusakan senjata per tumpukan. Menyimpan hingga 2 muatan."
       },
       "execute": {
         "name": "Ajal Dini",
@@ -17626,7 +17644,7 @@ export const id_ID: EnTranslations = {
       },
       "slam": {
         "name": "Ayunan Brutal",
-        "description": "Menghantam lawan sebesar kerusakan senjata ditambah {damage}."
+        "description": "Menghantam sebesar 50% kerusakan senjata ditambah {damage} dan menghasilkan {rage} amukan."
       },
       "cleave": {
         "name": "Busur Penuai",
@@ -17638,7 +17656,7 @@ export const id_ID: EnTranslations = {
       },
       "sunder_armor": {
         "name": "Robek Zirah",
-        "description": "Merobek zirah target, menguranginya sebesar {damage}% per penerapan. Menumpuk hingga 5 kali. Menghasilkan ancaman dalam jumlah besar."
+        "description": "Merobek zirah target, mengurangi zirahnya sebesar {damage}% per penerapan selama 30 dtk. Menumpuk hingga 5 kali, dan setiap penerapan menyegarkan durasinya. Menghasilkan ancaman tinggi."
       },
       "taunt": {
         "name": "Hasutan",
@@ -17646,7 +17664,7 @@ export const id_ID: EnTranslations = {
       },
       "fireball": {
         "name": "Panah Bara",
-        "description": "Melontarkan bola berkobar yang menimbulkan {damage} kerusakan Api ditambah kerusakan tambahan seiring waktu."
+        "description": "Melontarkan bola berapi yang memberi {damage} kerusakan Api, lalu membakar target sebesar {overTime} kerusakan Api selama {duration} dtk."
       },
       "fireball_form": {
         "name": "Wujud Bara",
@@ -17662,7 +17680,7 @@ export const id_ID: EnTranslations = {
       },
       "frostbolt": {
         "name": "Tombak Beku",
-        "description": "Melepaskan panah embun beku, menimbulkan {damage} kerusakan Beku dan memperlambat gerakan sebesar 40%."
+        "description": "Melepaskan panah embun beku, memberi {damage} kerusakan Beku dan memperlambat gerakan sebesar 40% selama {duration} dtk."
       },
       "blazing_barrier": {
         "name": "Penghalang Membara",
@@ -17670,15 +17688,15 @@ export const id_ID: EnTranslations = {
       },
       "cold_snap": {
         "name": "Panggilan Musim Dingin",
-        "description": "Menyelesaikan masa tunggu Langkah Lincah, Selubung Beku, dan Gaib Lebih Agung. (Bakat Penyihir)"
+        "description": "Menuntaskan masa tunggu Langkah Lincah (memulihkan semua muatannya), Ketaklihatan Agung, dan penghalang pribadimu: Selubung Beku, Penghalang Membara, atau Penghalang Waktu. (Bakat Penyihir)"
       },
       "greater_invisibility": {
         "name": "Ketaklihatan Agung",
-        "description": "Menghilang selama 20 dtk dan menghapus 2 efek kerusakan seiring waktu. Saat ketaklihatan berakhir, kamu menerima 90% lebih sedikit kerusakan selama 2 dtk. (talenta mage)"
+        "description": "Menjadi tak terlihat hingga 20 dtk, menghilangkan ancaman dan penargetan musuh terhadapmu, dan menghapus hingga 2 efek kerusakan-seiring-waktu dari dirimu. Menyerang, merapal, atau menerima kerusakan mengakhirinya lebih awal. Saat berakhir, kamu menerima 90% lebih sedikit kerusakan selama 2 dtk. (Bakat Penyihir)"
       },
       "hot_streak": {
         "name": "Rentetan Membara",
-        "description": "Pasif: dua serangan kritis berturut-turut dengan mantra Api milikmu (Cinderbolt, Cinderfall, Lepuh, Pyrelance, atau Hantaman Api) membuat Pyrelance atau Hantaman Api berikutnya seketika dan gratis. Mantra penghabis dihitung untuk rentetan BERIKUTNYA, termasuk penggunaan gratis; Hantaman Api dihitung sekali berapa pun musuh yang terkena, dan hanya benturan awal yang dapat dihitung. (Api)"
+        "description": "Pasif: dua serangan kritis berturut-turut dari Panah Bara, Guguran Bara, Lepuh, Tombak Api, Hantaman Api, atau Napas Naga membuat Tombak Api atau Hantaman Api berikutnya dalam 12 dtk menjadi seketika dan gratis. Serangan tanpa kritis dari salah satu mantra itu mengatur ulang hitungan, dan kritis pertama diingat selama 10 dtk. Tombak Api dan Hantaman Api dihitung untuk rentetan berikutnya, termasuk rapalan gratis. Hantaman Api dan Napas Naga dihitung sekali per rapalan berapa pun musuh yang terkena, dan hanya benturan awal yang dihitung. (Api)"
       },
       "ice_floes": {
         "name": "Bongkahan Es",
@@ -17686,7 +17704,7 @@ export const id_ID: EnTranslations = {
       },
       "ignition": {
         "name": "Penyalaan",
-        "description": "Pasif: serangan kritis mantramu membakar target sebesar 30% kerusakan yang ditimbulkan selama 6 dtk. dan dapat bertumpuk. (penguasaan Api)"
+        "description": "Pasif: saat mantra Apimu mendapat serangan kritis, target terbakar sebesar tambahan 1,5% dari kerusakan yang diberikan per level karakter (30% pada level 20) selama 6 dtk. Pembakaran baru pada target yang sudah terbakar menambah kerusakan yang masih tersisa dan memulai ulang penghitung waktu 6 dtk. (Penguasaan Api)"
       },
       "mass_barrier": {
         "name": "Penghalang Massal",
@@ -17694,15 +17712,15 @@ export const id_ID: EnTranslations = {
       },
       "overload": {
         "name": "Beban Berlebih",
-        "description": "Mantra berikutnya diperkuat sebesar 40%, tetapi membutuhkan 50% lebih banyak mana. Berlangsung 10 dtk. (talenta mage)"
+        "description": "Mantra berikutnya yang menghabiskan mana mendapat nilai kerusakan dasar, penyembuhan, dan penyerapan yang naik 40%, tetapi menghabiskan 50% lebih banyak mana. Bonus Kekuatan Mantra tidak bertambah. Berlangsung 10 dtk. (Bakat Penyihir)"
       },
       "power_echo": {
         "name": "Gema Kekuatan",
-        "description": "Mantra langsung berikutnya terulang dengan 50% kekuatan pada target yang sama. Berlangsung 10 dtk. (talenta mage)"
+        "description": "Mantra kerusakan langsung atau penyembuhan target tunggal berikutnya terulang pada target yang sama sebesar 50% dari jumlah yang diberikan atau disembuhkannya. Berlangsung 10 dtk. (Bakat Penyihir)"
       },
       "rings_of_frost": {
         "name": "Cincin Embun Beku",
-        "description": "Memanggil cincin selama 10 dtk. Musuh yang melintasi tepinya membeku selama 4 dtk. (talenta mage)"
+        "description": "Menempatkan cincin embun beku di lokasi sasaran selama 10 dtk. Musuh yang melintasi cincin terakar selama 4 dtk; setiap musuh hanya dapat memicunya sekali. Bagian tengah di dalam cincin aman. (Bakat Penyihir)"
       },
       "rune_of_power": {
         "name": "Rune Kekuatan",
@@ -17718,7 +17736,7 @@ export const id_ID: EnTranslations = {
       },
       "flurry": {
         "name": "Cambuk Musim Dingin",
-        "description": "Lepaskan tiga baut es untuk masing-masing kerusakan {damage} Frost dan terapkan Winter's Chill pada target: 2 mantra kompatibel berikutnya yang masuk akan memperlakukannya sebagai beku. Brain Freeze menjadikan Winterlash instan dan melewatkan cooldownnya. (Embun beku)"
+        "description": "Melepaskan tiga panah es sebesar {damage} kerusakan Beku masing-masing dan menerapkan Dingin Musim Dingin pada target selama 5 dtk: 2 Tombak Es berikutnya yang mengenainya memperlakukannya sebagai beku. Otak Beku membuat Cambuk Musim Dingin seketika dan melewati masa tunggunya. (Beku)"
       },
       "frozen_orb": {
         "name": "Bola Beku",
@@ -17726,31 +17744,31 @@ export const id_ID: EnTranslations = {
       },
       "blizzard": {
         "name": "Badai Salju",
-        "description": "Memanggil badai es ke area target selama 6 dtk, memberikan {damage} kerusakan Beku setiap detik dan memperlambat musuh sebesar 40%. Setiap musuh yang terkena mempersingkat Frostglobe sebesar 0,5 dtk, hingga 3 dtk per rapalan. (Beku)"
+        "description": "Memunculkan badai es di area sasaran yang mengamuk selama 6 dtk, memberi {damage} kerusakan Beku setiap detik dan memperlambat musuh 40% selama 2 dtk. Setiap musuh yang terkena memangkas 0,5 dtk dari masa tunggu Bola Beku, hingga 3 dtk per rapalan. (Beku)"
       },
       "glacial_spike": {
         "name": "Jarum Es",
-        "description": "Konjur paku es raksasa, mengonsumsi 5 Jarum Es untuk memberikan {damage} kerusakan Beku dan membekukan target di tempat selama 4 dtk. (Beku)"
+        "description": "Membutuhkan 5 Jarum Es. Memunculkan paku es raksasa, menghabiskan semua 5 Jarum Es untuk memberi {damage} kerusakan Beku dan mengakar target selama 4 dtk. Kamu mendapat satu Jarum Es setiap kali Tombak Beku mengenai atau denyut Bola Beku menghantam, hingga 5. (Beku)"
       },
       "glacial_front": {
         "name": "Front Glasial",
-        "description": "Tahan untuk mengumpulkan barisan embun beku yang melebar, lalu lepaskan dalam kerucut. Pengisian lebih lama menjangkau lebih jauh dan memberikan lebih banyak kerusakan. Semua musuh yang terkena diperlambat 50% selama 4 dtk; pengisian maksimum juga mengakar mereka selama 1 dtk. (Beku)"
+        "description": "Tahan untuk mengisi daya, lalu lepaskan kerucut embun beku. Setiap dari 4 tahap pengisian menjangkau lebih jauh, dari 7 yard hingga 16 yard, dan memukul lebih keras, dari 35 sampai 42 kerusakan Beku dasar hingga 88 sampai 104 pada pengisian penuh, dengan bonus Kekuatan Mantra yang lebih besar semakin lama kamu mengisi. Semua musuh yang terkena diperlambat 50% selama 4 dtk; pengisian penuh juga mengakar mereka selama 1 dtk. (Beku)"
       },
       "dragons_breath": {
         "name": "Napas Naga",
-        "description": "Tahan untuk mengumpulkan napas api yang melebar, lalu lepaskan dalam kerucut. Pengisian lebih lama menjangkau lebih jauh dan memberikan lebih banyak kerusakan. Musuh yang terkena kehilangan arah dan kerusakan mematahkan efeknya; pengisian maksimum selalu menghasilkan serangan kritis dan dihitung sekali untuk Hot Streak. (Api)"
+        "description": "Tahan untuk mengisi daya, lalu lepaskan kerucut api. Setiap dari 4 tahap pengisian menjangkau lebih jauh dan lebih lebar, dari 6 yard hingga 12 yard, dan memukul lebih keras, dari 32 sampai 40 kerusakan Api dasar hingga 90 sampai 110 pada pengisian penuh, dengan bonus Kekuatan Mantra yang lebih besar semakin lama kamu mengisi. Musuh yang terkena kehilangan arah selama 1 sampai 3 dtk menurut tahap pengisian; kerusakan apa pun mematahkannya. Pengisian penuh selalu menghasilkan serangan kritis. Setiap napas dihitung sekali untuk Rentetan Membara, berapa pun musuh yang terkena. (Api)"
       },
       "fingers_of_frost": {
         "name": "Jemari Es",
-        "description": "Rimelance memiliki peluang 15% memberikan Fingers of Frost, hingga 2 muatan: Ice Lance berikutmu memperlakukan target seolah membeku. (Beku)"
+        "description": "Setiap pukulan Tombak Beku berpeluang 15% memberi satu muatan Jemari Es, hingga 2 muatan, berlangsung 15 dtk. Setiap muatan membuat satu Tombak Es memperlakukan targetnya sebagai beku. Peluang yang muncul pada 2 muatan hilang. (Beku)"
       },
       "brain_freeze": {
         "name": "Otak Beku",
-        "description": "Rimelance memiliki peluang 20% ​​untuk membuat Winterlash berikutnya menjadi instan dan bebas cooldown. (Embun beku)"
+        "description": "Setiap pukulan Tombak Beku berpeluang 20% memberi Otak Beku selama 15 dtk: Cambuk Musim Dingin berikutnya seketika dan mengabaikan masa tunggunya. Peluang yang muncul saat Otak Beku aktif hilang. (Beku)"
       },
       "shatter": {
         "name": "Kehancuran Rapuh",
-        "description": "Mantra Anda mendapatkan 50% peluang serangan kritis terhadap target yang dibekukan. Fingers of Frost dan Winter's Chill dihitung sebagai beku. (Embun beku)"
+        "description": "Mantra kerusakan target tunggalmu mendapat 50% peluang serangan kritis terhadap target beku: musuh yang tertahan oleh akar, setrum, pelumpuhan, atau Guna-guna seorang Penyihir. Jemari Es dan Dingin Musim Dingin membuat Tombak Es memperlakukan targetnya sebagai beku. (Beku)"
       },
       "conjure_water": {
         "name": "Ikatan Air",
@@ -17762,15 +17780,15 @@ export const id_ID: EnTranslations = {
       },
       "fire_blast": {
         "name": "Guguran Bara",
-        "description": "Meledakkan musuh sebesar {damage} kerusakan Api. Seketika."
+        "description": "Meledakkan musuh sebesar {damage} kerusakan Api. Selalu menghasilkan serangan kritis. Di luar masa tunggu global dan dapat digunakan saat merapal mantra lain."
       },
       "arcane_missiles": {
         "name": "Panah Aether",
-        "description": "Melontarkan Panah Aether ke arah musuh, menimbulkan {damage} kerusakan Arkana setiap detik selama 3 detik."
+        "description": "Menyalurkan selama 3 dtk, menembakkan 3 panah yang masing-masing memberi {damage} kerusakan Arkana. Menghabiskan semua Muatan Arkanamu: setiap muatan menambah 9 kerusakan Arkana yang dibagi di antara panah, dan pada 4 muatan penyaluran menembakkan 5 panah, bukan 3."
       },
       "polymorph": {
         "name": "Guna-guna",
-        "description": "Mengubah musuh menjadi katak hingga {duration} detik. Katak itu berkeliaran dan menyembuh dengan cepat. Kerusakan apa pun mematahkan efeknya. Hanya hewan buas dan makhluk humanoid."
+        "description": "Mengubah musuh menjadi katak hingga {duration} dtk. Ia tidak dapat bertindak, dipulihkan ke kesehatan penuh, menyembuhkan 10% kesehatan maksimumnya setiap detik, dan kehilangan efek kerusakan-seiring-waktunya. Kerusakan apa pun mematahkan efeknya. Tidak dapat memengaruhi mayat hidup atau musuh yang kebal kendali."
       },
       "frost_nova": {
         "name": "Belenggu Es",
@@ -17782,11 +17800,11 @@ export const id_ID: EnTranslations = {
       },
       "scorch": {
         "name": "Lepuh",
-        "description": "Menghanguskan musuh sebesar {damage} kerusakan Api. Cepat dirapal."
+        "description": "Menghanguskan musuh sebesar {damage} kerusakan Api dan menambah kecepatan gerakmu 20% selama 3 dtk. Selalu menghasilkan serangan kritis terhadap target dengan kesehatan 30% atau kurang."
       },
       "pyroblast": {
         "name": "Tombak Api",
-        "description": "Melontarkan bongkahan berkobar raksasa yang menimbulkan {damage} kerusakan Api ditambah kerusakan tambahan seiring waktu."
+        "description": "Melontarkan bongkahan api raksasa yang memberi {damage} kerusakan Api, lalu membakar target sebesar {overTime} kerusakan Api selama {duration} dtk."
       },
       "ice_barrier": {
         "name": "Selubung Beku",
@@ -17796,17 +17814,17 @@ export const id_ID: EnTranslations = {
         "name": "Tebasan Keji",
         "description": "Serangan seketika sebesar kerusakan senjata ditambah {damage}. Memberi 1 poin combo.",
         "specNote_assassination": "Menambah 1 Ritus Bisa (maks 6).",
-        "specNote_combat": "Selagi Redline aktif, tombol ini berubah menjadi Haymaker: 130% kerusakan senjata plus 10, memberi 2 poin combo, dan menambah 1 Redline (maks 4)."
+        "specNote_combat": "Selagi Redline aktif, tombol ini berubah menjadi Haymaker: serangan senjata yang lebih berat, memberi 2 poin combo, dan menambah 1 Redline (maks 4)."
       },
       "eviscerate": {
         "name": "Tidur Abadi",
-        "description": "Jurus penutup yang menyebabkan {damage}.",
+        "description": "Jurus penutup yang memberi {damage} kerusakan Fisik. Kerusakan meningkat dengan Kekuatan Serangan.",
         "specNote_assassination": "Pada 6 Ritus Bisa, tombol ini berubah menjadi Venomrend: serangan yang seketika menimbulkan seluruh kerusakan yang masih akan diberikan pendarahanmu, menanamkan luka bisa yang segar, dan memulihkan 20 energi.",
-        "specNote_combat": "Mendaratkan ini dengan 4 poin combo atau lebih memulai Redline selama 8 detik: Wicked Slash berubah menjadi Haymaker dan tombol ini berubah menjadi Lights Out (45 plus 35 per poin combo, menghantam 25% lebih keras untuk setiap tingkat Redline yang terkumpul, memulihkan 25 energi). Gunakan sebelum Redline berakhir."
+        "specNote_combat": "Mendaratkan ini dengan 4 poin kombo atau lebih memulai Redline selama 8 dtk: Tebasan Keji berubah menjadi Pukulan Tubuh dan tombol ini menjadi Pukulan Nokaut (jurus penutup yang memukul 25% lebih keras untuk setiap Pukulan Tubuh yang kamu lancarkan selama Redline dan memulihkan 25 energi). Gunakan sebelum Redline berakhir."
       },
       "backstab": {
         "name": "Tusukan Pengecut",
-        "description": "Tancapkan belatimu ke punggung target sebesar 150% kerusakan senjata ditambah {damage}. Harus berada di belakang target. Membutuhkan belati. Memberi 1 poin combo.",
+        "description": "Tancapkan belatimu ke punggung target sebesar {weaponPercent}% kerusakan senjata ditambah {damage}. Harus berada di belakang target. Membutuhkan belati. Memberi 1 poin combo.",
         "specNote_assassination": "Setiap serangan menambah 1 Ritus Bisa (maks 6) dan mengembalikan 15 energi. Pada 6 Ritus Bisa, Dirt Nap berubah menjadi Venomrend (menimbulkan seluruh sisa kerusakan pendarahanmu sekaligus)."
       },
       "gouge": {
@@ -17831,12 +17849,12 @@ export const id_ID: EnTranslations = {
       },
       "ambush": {
         "name": "Serangan Penyergap",
-        "description": "Menyerang dari bayangan sebesar 250% kerusakan senjata ditambah {damage}. Harus dalam siluman dan berada di belakang target. Membutuhkan belati. Memberi 1 poin combo.",
+        "description": "Menyerang dari bayangan sebesar {weaponPercent}% kerusakan senjata ditambah {damage}. Harus dalam siluman dan berada di belakang target. Membutuhkan belati. Memberi 1 poin combo.",
         "specNote_subtlety": "Dipakai dari Selubung Senja, ini menambah 1 Gloam (maks 3). Pada 3 Gloam kamu bisa memakainya TANPA siluman dan dari sudut mana pun: penggunaan itu tidak memakan biaya, menghabiskan seluruh 3 Gloam, memulai Tabir Bayangan selama 6 detik, dan menghantam dua kali lipat."
       },
       "stealth": {
         "name": "Selubung Senja",
-        "description": "Menyembunyikanmu dalam bayangan: musuh nyaris tidak menyadarimu, dan kamu bergerak dengan kecepatan penuh. Menyerang atau menerima kerusakan membatalkan Selubung Senja. Rapal lagi untuk keluar.",
+        "description": "Menyembunyikan dirimu dalam bayangan. Pemain dan hewan peliharaan musuh tidak dapat melihatmu, dan monster menyadarimu hanya dari jarak yang jauh lebih dekat dari biasanya (dari lebih jauh jika level mereka lebih tinggi darimu). Kamu bergerak dengan kecepatan penuh. Menyerang atau menerima kerusakan mengakhiri Selubung Senja. Rapal lagi untuk keluar.",
         "specNote_subtlety": "Setiap pembuka yang kamu pakai dari Selubung Senja menambah 1 Gloam (maks 3)."
       },
       "adrenaline_rush": {
@@ -17864,11 +17882,11 @@ export const id_ID: EnTranslations = {
       },
       "melting_acid": {
         "name": "Asam Meleleh",
-        "description": "Melapisi senjatamu selama 30 menit. Setiap ayunan jarak dekat memercikkan asam kaustik ke target dan mengurangi armornya sebesar 5% selama 12 detik."
+        "description": "Melapisi senjatamu selama 30 menit. Setiap ayunan jarak dekatmu memercikkan asam kaustik ke target, mengurangi zirahnya 5% selama 12 dtk. Menggantikan lapisan senjatamu yang lain."
       },
       "nightshade_coating": {
         "name": "Lapisan Nightshade",
-        "description": "Melapisi senjatamu selama 30 menit. Setiap ayunan jarak dekat melapisi target dengan nightshade dan mengurangi penyembuhan yang diterimanya sebesar 25% selama 12 detik."
+        "description": "Melapisi senjatamu selama 30 menit. Setiap ayunan jarak dekatmu melapisi target dengan nightshade, mengurangi penyembuhan yang diterimanya 25% selama 12 dtk. Menggantikan lapisan senjatamu yang lain."
       },
       "expose_armor": {
         "name": "Tembus Zirah",
@@ -17880,7 +17898,7 @@ export const id_ID: EnTranslations = {
       },
       "vanish": {
         "name": "Luruh Asap",
-        "description": "Menghilang dari pandangan, masuk ke Duskveil bahkan dalam pertempuran. Kau bergerak dengan kecepatan penuh saat tersembunyi. Bertahan hingga 10 detik."
+        "description": "Menghilang dari pandangan, bahkan dalam pertempuran, memasuki Selubung Senja hingga 10 dtk. Kamu keluar dari pertempuran, monster melupakan semua ancaman terhadapmu dan tidak dapat mendeteksimu selama itu, dan pemain musuh kehilanganmu sebagai target. Kamu bergerak dengan kecepatan penuh saat tersembunyi."
       },
       "instant_poison": {
         "name": "Gigitan Beludak",
@@ -17888,11 +17906,11 @@ export const id_ID: EnTranslations = {
       },
       "deadly_poison": {
         "name": "Bisa Membusuk",
-        "description": "Melapisi senjatamu selama 30 menit. Setiap ayunan jarak dekatmu menambah satu tumpukan racun pada target, hingga 5, dan menyegarkan durasi 12 detik. Setiap tumpukan memberi {damage} Kerusakan alam setiap 2 detik."
+        "description": "Melapisi senjatamu selama 30 menit. Setiap ayunan jarak dekatmu menambah satu tumpukan bisa pada target, hingga 5, dan menyegarkan durasi 12 dtk. Setiap tumpukan memberi {damage} kerusakan Alam setiap 2 dtk. Menggantikan lapisan senjatamu yang lain."
       },
       "blind": {
         "name": "Lemparan Tanah",
-        "description": "Membutakan target, membuatnya mengembara linglung selama 8 detik. Kerusakan apa pun mematahkan efeknya."
+        "description": "Melempar tanah ke mata target, melumpuhkannya selama 8 dtk. Kerusakan apa pun mematahkan efeknya."
       },
       "seal_of_righteousness": {
         "name": "Cap Sumpah",
@@ -17908,11 +17926,11 @@ export const id_ID: EnTranslations = {
       },
       "divine_ascension": {
         "name": "Kenaikan Ilahi",
-        "description": "Menghabiskan 20 Pengabdian untuk memperoleh 5 muatan Kenaikan hingga 45 dtk. Kemampuan bertanda menghabiskan satu muatan dan memperoleh efek tambahan."
+        "description": "Menghabiskan 20 Pengabdian untuk memperoleh 5 muatan Kenaikan hingga 45 dtk. Selama Kenaikan aktif, kemampuan unggulan spesialisasimu masing-masing menghabiskan 1 muatan untuk bonus Kenaikan yang dijelaskan tooltip-nya, dan kamu tidak memperoleh Pengabdian. Kenaikan berakhir saat muatan atau waktunya habis. Fajar Diperpanjang menambah 2 muatan."
       },
       "aura_mastery": {
         "name": "Kerukunan Suci",
-        "description": "Selama 8 dtk, memperkuat setiap Pengabdian dan Aura Pembalasan aktif di kelompokmu. Pengabdian Benteng mengurangi kerusakan 15%; Pembalasan memberi 15 kerusakan Suci. Penggunaan berulang menyegarkan, bukan menumpuk."
+        "description": "Selama 8 dtk, melipatgandakan tiga kali setiap Pengabdian Benteng dan Aura Ganjaran aktif di kelompokmu: Pengabdian Benteng mengurangi kerusakan yang diterima 15%, dan Aura Ganjaran memberi tiga kali kerusakan Suci normalnya. Penggunaan berulang menyegarkan, bukan menumpuk."
       },
       "devotion_ward": {
         "name": "Pengabdian Benteng",
@@ -17920,7 +17938,7 @@ export const id_ID: EnTranslations = {
       },
       "hammer_of_grace": {
         "name": "Palu Karunia",
-        "description": "Seketika melemparkan palu suci ke musuh dalam 20 yard sebesar {damage}, memulihkan 70 mana, menyembuhkanmu sebesar 50% kerusakan yang diberikan, dan menghasilkan 1 Pengabdian saat memberi kerusakan. Pembalasan Surya membuat Palu Karunia mengabaikan jedanya dan menyembuhkanmu sebesar 100% kerusakan yang diberikan."
+        "description": "Melempar palu suci ke musuh sebesar {damage} kerusakan Suci, memulihkan 70 mana dan menyembuhkan dirimu sebesar 50% kerusakan yang diberikan. Menghasilkan 1 Pengabdian saat memberi kerusakan. Pembalasan Surya (efek Penjaga Iman) membuatnya mengabaikan masa tunggunya dan menyembuhkanmu sebesar 100% kerusakan yang diberikan."
       },
       "hushbrand": {
         "name": "Tanda Bisu",
@@ -17928,23 +17946,23 @@ export const id_ID: EnTranslations = {
       },
       "guardian_covenant": {
         "name": "Perjanjian Penjaga",
-        "description": "Melindungi satu sasaran sekutu dan dirimu, mengurangi kerusakan yang diterima 20% selama 8 dtk. Memilih dirimu secara bawaan bila tidak ada sasaran sekutu."
+        "description": "Melindungi sasaran sekutu dan dirimu, mengurangi kerusakan yang diterima 20% selama 8 dtk. Otomatis mengenai dirimu bila tidak ada sasaran sekutu terpilih. Kenaikan menaikkan pengurangan menjadi 30%."
       },
       "solar_step": {
         "name": "Langkah Surya",
-        "description": "Menambah kecepatan gerakmu 150% selama 2 dtk."
+        "description": "Menambah kecepatan gerakmu 150% selama {duration} dtk."
       },
       "solar_invocation": {
         "name": "Seruan Surya",
-        "description": "Seketika menyembuhkan sekutu sebesar {damage} atau memberi kerusakan Suci sedang kepada musuh. Kedua penggunaan menghasilkan 1 Pengabdian. Selama Kenaikan, rapalan penyembuhan juga menyembuhkan pemain sekutu dalam 10 yard dari sasaran sebesar separuhnya."
+        "description": "Seketika menyembuhkan sekutu sebesar {damage} atau memberi 120 sampai 150 kerusakan Suci dasar kepada musuh. Kerusakan meningkat dengan Kekuatan Mantra dan penyembuhan dengan Kekuatan Penyembuhan. Kedua penggunaan menghasilkan 1 Pengabdian. Selama Kenaikan, rapalan penyembuhan juga menyembuhkan pemain sekutu dalam 10 m dari target sebesar setengahnya."
       },
       "radiant_devotion": {
         "name": "Pengabdian Berseri",
-        "description": "Menambah kekuatan mantra kamu dan anggota kelompok sebesar 20 selama 30 mnt. Menggantikan Pengabdian Fajar atau Karuniamu sendiri, tetapi berdampingan dengan Pengabdian paladin lain."
+        "description": "Menambah kekuatan mantra kamu dan anggota kelompok sebesar {buff} selama 30 mnt. Menggantikan Pengabdian Fajar atau Karuniamu sendiri, tetapi berdampingan dengan Pengabdian paladin lain."
       },
       "dawn_devotion": {
         "name": "Pengabdian Fajar",
-        "description": "Menambah kekuatan serang kamu dan anggota kelompok sebesar 40 selama 30 mnt. Menggantikan Pengabdian Berseri atau Karuniamu sendiri, tetapi berdampingan dengan Pengabdian paladin lain dan dengan seruan pendekar."
+        "description": "Menambah kekuatan serang kamu dan anggota kelompok sebesar {buff} selama 30 mnt. Menggantikan Pengabdian Berseri atau Karuniamu sendiri, tetapi berdampingan dengan Pengabdian paladin lain dan dengan seruan pendekar."
       },
       "grace_devotion": {
         "name": "Pengabdian Karunia",
@@ -17960,11 +17978,11 @@ export const id_ID: EnTranslations = {
       },
       "final_edict": {
         "name": "Titah Terakhir",
-        "description": "Melancarkan serangan senjata yang menghancurkan dan menghasilkan 1 Pengabdian saat memberi kerusakan. Pukulan yang berhasil memangkas sisa jeda Runtuhnya Fajar sebesar 2 dtk. Serangan otomatis yang berhasil dan pukulan Titah Terakhir berpeluang 15% memberi Murka Fajar selama 8 dtk. Kenaikan juga melepaskan ledakan di sekitarmu yang memberi kerusakan Fisik."
+        "description": "Melancarkan serangan senjata yang menghancurkan dan menghasilkan 1 Pengabdian saat memberi kerusakan. Pukulan yang berhasil memangkas sisa masa tunggu Runtuhnya Fajar sebesar 2 dtk. Serangan otomatis yang berhasil dan pukulan Titah Terakhir berpeluang 15% memberi Murka Fajar selama 8 dtk: Palu Murka berikutnya dapat mengenai target mana pun, mengabaikan masa tunggunya, dan memberi 20% lebih banyak kerusakan. Kenaikan juga melepaskan ledakan Fisik di sekitarmu."
       },
       "dawnfall": {
         "name": "Runtuhnya Fajar",
-        "description": "Memberi {damage} kerusakan Suci kepada musuh di dekatnya dan menghasilkan 1 Pengabdian. Mengenai setidaknya satu musuh memangkas sisa jeda Titah Terakhir sebesar 2 dtk. Kenaikan menambah kerusakan dan radiusnya."
+        "description": "Memberi {damage} kerusakan Suci kepada musuh di dekatnya dan menghasilkan 1 Pengabdian. Mengenai setidaknya satu musuh memangkas sisa masa tunggu Titah Terakhir sebesar 2 dtk. Kenaikan menambah kerusakannya 50% dan radiusnya menjadi 10 m."
       },
       "sun_gods_verdict": {
         "name": "Putusan Dewa Matahari",
@@ -17988,11 +18006,11 @@ export const id_ID: EnTranslations = {
       },
       "dawns_embrace": {
         "name": "Pelukan Fajar",
-        "description": "Melepaskan penyembuhan kuat dan menghasilkan 1 Pengabdian. Resonansi Berseri memangkas biaya mananya 50% dan waktu rapal menjadi 1,5 dtk. Kenaikan menjadikannya seketika dan menambah penyembuhannya 35%."
+        "description": "Menyembuhkan target sekutu sebesar {damage} dan menghasilkan 1 Pengabdian. Resonansi Berseri memangkas biaya mananya 50% dan waktu rapal menjadi 1,5 dtk. Kenaikan menjadikannya seketika dan menambah penyembuhannya 35%."
       },
       "radiant_chorus": {
         "name": "Paduan Suara Berseri",
-        "description": "Menyembuhkan sekutu di dekatnya sebesar {damage} dan menghasilkan 1 Pengabdian. Menyembuhkan secara efektif setidaknya 2 sekutu memberi Resonansi Berseri: Cahaya Pemulih berikutnya menjadi seketika, atau Pelukan Fajar berikutnya menghabiskan 50% lebih sedikit mana dan dirapal dalam 1,5 dtk. Kenaikan menambah penyembuhan dan radius Paduan Suara Berseri."
+        "description": "Menyembuhkan sekutu di dekatnya sebesar {damage} dan menghasilkan 1 Pengabdian. Menyembuhkan secara efektif setidaknya 2 sekutu memberi Resonansi Berseri selama 10 dtk: Cahaya Pemulih berikutnya seketika, atau Pelukan Fajar berikutnya menghabiskan 50% lebih sedikit mana dan dirapal dalam 1,5 dtk. Kenaikan menambah penyembuhan Paduan Suara Berseri 20% dan radiusnya menjadi 40 m."
       },
       "life_covenant": {
         "name": "Perjanjian Kehidupan",
@@ -18000,11 +18018,11 @@ export const id_ID: EnTranslations = {
       },
       "aegis_first_dawn": {
         "name": "Perisai Fajar Pertama",
-        "description": "Salurkan selama 5 dtk, menciptakan kubah suci berdiameter 10 meter. Sekutu di dalamnya disembuhkan tiap detik dan menerima 50% lebih sedikit kerusakan. Menyelesaikan penyaluran melepaskan penyembuhan akhir dan memberi 30% kecepatan gerak selama 4 dtk."
+        "description": "Menyalurkan kubah suci 10 m di sekitarmu. Pemain sekutu di dalamnya dan dalam garis pandangmu menerima 50% lebih sedikit kerusakan dan disembuhkan {aegisTick} setiap detik. Menyelesaikan penyaluran menyembuhkan mereka {aegisFinal} lagi dan memberi 30% kecepatan gerak selama 4 dtk. Penyembuhan meningkat dengan Kekuatan Penyembuhan."
       },
       "vowkeeper_strike": {
         "name": "Serangan Penjaga Ikrar",
-        "description": "Menyerang dengan ancaman tinggi dan menghasilkan 1 Pengabdian. Serangan yang berhasil berpeluang 20% memberi Pembalasan Surya selama 8 dtk; setiap tangkisan yang berhasil berpeluang 25%. Pembalasan Surya memperkuat Cakram Surya, Palu Karunia, atau Cahaya Pemulih berikutnya. Kenaikan juga memberi perisai penyerap kecil."
+        "description": "Menyerang sebesar kerusakan senjata ditambah {damage} kerusakan Fisik dengan ancaman tinggi, dan menghasilkan 1 Pengabdian. Serangan yang berhasil berpeluang 20% memberi Pembalasan Surya selama 8 dtk; setiap tangkisan yang berhasil berpeluang 25%. Pembalasan Surya dihabiskan oleh Cakram Surya berikutnya (tanpa biaya mana, tanpa masa tunggu, 20% lebih banyak kerusakan), Palu Karunia (tanpa masa tunggu, menyembuhkanmu 100% kerusakan yang diberikan), atau Cahaya Pemulih (seketika). Kenaikan juga memberimu perisai sebesar 6% kesehatan maksimummu selama 6 dtk."
       },
       "bastion_rite": {
         "name": "Ritus Benteng",
@@ -18012,7 +18030,7 @@ export const id_ID: EnTranslations = {
       },
       "sunward_disc": {
         "name": "Cakram Surya",
-        "description": "Membutuhkan perisai. Melemparkan cakram berseri yang menghantam lalu memantul di antara musuh di dekatnya. Setiap benturan yang melukai menghasilkan 1 Pengabdian. Pembalasan Surya membuat Cakram Surya tidak menghabiskan mana, mengabaikan jedanya, dan memberi 20% lebih banyak kerusakan. Kenaikan memperkuat 5 pantulan."
+        "description": "Membutuhkan perisai. Melempar cakram berseri yang memberi {damage} kerusakan Suci kepada target, lalu memantul ke hingga 2 musuh lain di dekatnya sebesar 60 sampai 75 kerusakan Suci dasar masing-masing. Setiap benturan yang melukai menghasilkan 1 Pengabdian. Pembalasan Surya membuat Cakram Surya tanpa biaya mana, mengabaikan masa tunggunya, dan memberi 20% lebih banyak kerusakan. Kenaikan menambah kerusakannya 30% dan pantulannya menjadi 5."
       },
       "sacred_challenge": {
         "name": "Pacuan Suci",
@@ -18036,7 +18054,7 @@ export const id_ID: EnTranslations = {
       },
       "lay_on_hands": {
         "name": "Ritus Terakhir",
-        "description": "Lonjakan penyembuhan masif memulihkan {damage}% dari kesehatan maksimummu. Jeda 10 menit."
+        "description": "Menyembuhkan target sekutu sebesar {damage}% kesehatan maksimummu dan menghasilkan 1 Pengabdian saat memulihkan kesehatan."
       },
       "holy_taunt": {
         "name": "Hasutan Suci",
@@ -18052,7 +18070,7 @@ export const id_ID: EnTranslations = {
       },
       "consecration": {
         "name": "Tanah Suci",
-        "description": "Mentahbiskan tanah selama 9 detik dan menimbulkan {damage} kerusakan Suci tiap detik. Penjaga Iman menerima 10% lebih sedikit kerusakan di dalamnya."
+        "description": "Menyucikan tanah di bawahmu selama 9 dtk, memberi {damage} kerusakan Suci dengan ancaman tinggi setiap detik. Benturan pertama menghasilkan 1 Pengabdian. Penjaga Iman menerima 10% lebih sedikit kerusakan saat berdiri di dalamnya. Kenaikan menambah kerusakannya 30%."
       },
       "bastion_sweep": {
         "name": "Sapuan Benteng",
@@ -18064,7 +18082,7 @@ export const id_ID: EnTranslations = {
       },
       "veilbound_march": {
         "name": "Barisan Tabir",
-        "description": "Menjadi halus selama 4 dtk, memperoleh 40% kecepatan gerak dan 30% baju zirah serta kebal terhadap akar, perlambatan, dan pemindahan. Musuh yang kamu lewati mendapat Tanda Tabir selama 6 dtk: mereka menerima kerusakan Suci tiap detik, memberimu 20% lebih sedikit kerusakan, dan menghasilkan ancaman tambahan. Tanda pertama memberi 1 Pengabdian. Saat barisan berakhir, musuh bertanda di dekatnya menerima ledakan akhir. Kenaikan menambah ledakan 50% dan sedikit menarik mereka ke arahmu."
+        "description": "Menjadi halus selama 4 dtk, memperoleh 40% kecepatan gerak dan 30% zirah, menghapus akar dan perlambatan, serta kebal terhadap akar, perlambatan, dan pemindahan. Musuh yang kamu lewati diberi Tanda Tabir selama 6 dtk: mereka menerima 12 kerusakan Suci setiap detik dengan ancaman tiga kali lipat dan memberimu 20% lebih sedikit kerusakan. Tanda pertama memberi 1 Pengabdian. Saat barisan berakhir, musuh bertanda dalam 10 m menerima 36 kerusakan Suci. Kenaikan menaikkan kerusakan itu menjadi 54 dan menarik mereka 2 m ke arahmu."
       },
       "veilbound_mark": {
         "name": "Tanda Tabir",
@@ -18080,7 +18098,7 @@ export const id_ID: EnTranslations = {
       },
       "tame_beast": {
         "name": "Ikatan Liar",
-        "description": "Mulai menjinakkan seekor hewan untuk menjadi pendampingmu. Hewan itu harus selevel atau lebih rendah darimu dan bukan elit. Peliharaanmu mengikutimu, menyerang musuhmu, dan menahan ancamannya sendiri. Kau hanya boleh memiliki satu peliharaan pada satu waktu."
+        "description": "Mulai menjinakkan seekor hewan untuk menjadi pendampingmu. Hewan itu harus selevel atau lebih rendah darimu dan tidak boleh elit, langka, bos, atau makhluk dungeon. Hewan peliharaanmu mengikutimu, menyerang musuhmu, dan menahan ancamannya sendiri. Kamu hanya boleh memiliki satu hewan peliharaan pada satu waktu."
       },
       "dismiss_pet": {
         "name": "Lepaskan Pendamping",
@@ -18088,11 +18106,11 @@ export const id_ID: EnTranslations = {
       },
       "raptor_strike": {
         "name": "Serangan Cabik Perut",
-        "description": "Memukul sebesar 10% kerusakan senjata ditambah {damage}. Sebuah pukulan telak memulihkan 15 Fokus dan memberi 1 Momentum Berburu. Kerusakan meningkat dengan daya serang melalui kerusakan senjata."
+        "description": "Menyerang sebesar 10% kerusakan senjata ditambah {damage}. Kerusakan meningkat dengan Kekuatan Serangan melalui kerusakan senjata. Dengan Bertahan Hidup, pukulan yang mengenai memulihkan 15 Fokus dan memberi 1 Momentum Berburu."
       },
       "aspect_of_the_hawk": {
         "name": "Wujud Elang Penyambar",
-        "description": "Mengambil wujud elang penyambar, meningkatkan daya serangmu sebesar {buff} selama 30 menit."
+        "description": "Mengambil Wujud Elang Penyambar, meningkatkan Kekuatan Serangan dan Kekuatan Serangan Jarak Jauhmu sebesar {buff} selama 30 menit."
       },
       "serpent_sting": {
         "name": "Duri Bisa",
@@ -18141,11 +18159,11 @@ export const id_ID: EnTranslations = {
       },
       "smite": {
         "name": "Himne Pemurnian",
-        "description": "Memberi {damage} kerusakan Suci. Kerusakan meningkat dengan Kekuatan Mantra. Disiplin: menyembuhkan setiap sekutu yang tertaut sebesar 30% dari kerusakannya. Kalau tidak ada sekutu yang tertaut, menyembuhkan anggota kelompok bernyawa terendah sebesar 15%."
+        "description": "Memberi {damage} kerusakan Suci. Kerusakan meningkat dengan Kekuatan Mantra. Disiplin menyembuhkan setiap anggota kelompok tertaut yang terluka dalam 30 yard sebesar 30% kerusakan yang diberikan (70% dengan Perjanjian Kembar). Jika tidak ada yang terluka, ia menyembuhkan anggota kelompok terluka dengan kesehatan terendah dalam 30 yard sebesar 15% kerusakan."
       },
       "lesser_heal": {
         "name": "Doa Berbisik",
-        "description": "Menyembuhkan sasaran sekutu sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Mantra."
+        "description": "Menyembuhkan sasaran sekutu sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Penyembuhan."
       },
       "power_word_fortitude": {
         "name": "Litani Ketabahan",
@@ -18157,11 +18175,11 @@ export const id_ID: EnTranslations = {
       },
       "power_word_shield": {
         "name": "Mazmur Penangkal",
-        "description": "Melindungi sasaran sekutu, menyerap {damage} kerusakan selama 30 dtk. Disiplin juga menautkan sasaran itu pada kerusakan Sucimu selama 30 dtk."
+        "description": "Melindungi target sekutu, menyerap {damage} kerusakan selama 30 dtk. Disiplin juga menautkan target selama 30 dtk, menggantikan tautan sebelumnya (Perjanjian Kembar menyimpan dua). Selama anggota kelompok tertaut berada dalam 30 yard darimu, Himne Pemurnian dan Belas Kasih Pembersih yang memusuhi menyembuhkan mereka sebesar 30% kerusakan yang diberikan."
       },
       "renew": {
         "name": "Rahmat Berlanjut",
-        "description": "Menyembuhkan sasaran sebesar {damage} selama 15 dtk, sekali tiap 3 dtk. Penyembuhan meningkat dengan Kekuatan Mantra."
+        "description": "Menyembuhkan sasaran sebesar {damage} selama 15 dtk, sekali tiap 3 dtk. Penyembuhan meningkat dengan Kekuatan Penyembuhan."
       },
       "mind_blast": {
         "name": "Retak Pikiran",
@@ -18169,7 +18187,7 @@ export const id_ID: EnTranslations = {
       },
       "heal": {
         "name": "Doa Khidmat",
-        "description": "Menyembuhkan sasaran sekutu sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Mantra."
+        "description": "Menyembuhkan sasaran sekutu sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Penyembuhan."
       },
       "mind_flay": {
         "name": "Litani Nestapa",
@@ -18189,7 +18207,7 @@ export const id_ID: EnTranslations = {
       },
       "flash_heal": {
         "name": "Doa Mendesak",
-        "description": "Menyembuhkan sasaran sekutu sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Mantra."
+        "description": "Menyembuhkan sasaran sekutu sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Penyembuhan."
       },
       "lightning_bolt": {
         "name": "Sambaran Busur",
@@ -18213,11 +18231,11 @@ export const id_ID: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Senjata Stonebound",
-        "description": "Meresapi senjatamu selama 30 menit. Setiap ayunan memberi {damage} kerusakan tambahan. Penguatan juga memperoleh 40% zirah dan 20% Stamina, menerima 15% kerusakan lebih sedikit, dan kebal terhadap serangan kritis dari makhluk, dan menghasilkan 2,75 kali lipat ancaman. Sentakan Bumi memaksa sasarannya menyerangmu selama 3 dtk, dan Tameng Guntur memberi 10% pengurangan kerusakan selama 3 dtk."
+        "description": "Meresapi senjatamu selama 30 menit. Setiap ayunan memberi {damage} kerusakan tambahan. Penguatan juga memperoleh 40% zirah dan 20% Stamina, menerima 15% lebih sedikit kerusakan, kebal terhadap serangan kritis dari makhluk, dan menghasilkan ancaman dua tiga perempat kali lipat. Sentakan Bumi memaksa targetnya menyerangmu selama 3 dtk, dan merapal Tameng Guntur memberi 10% pengurangan kerusakan selama 3 dtk."
       },
       "healing_wave": {
         "name": "Air Pemulih",
-        "description": "Menyembuhkan sasaran sekutu sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Mantra. Pemulihan: menyimpan 50% dari penyembuhan penuh sebelum kelebihan sebagai Arus Pemulih selama 12 dtk, sampai 30% nyawa maksimum sasaran."
+        "description": "Menyembuhkan target sekutu sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Penyembuhan. Panggilan Roh: juga menambahkan 50% dari penyembuhan penuh sebelum kelebihan penyembuhan ke Arus Pemulih target, kolam yang menyembuhkannya selama 12 dtk dan menampung paling banyak 30% kesehatan maksimumnya."
       },
       "earth_shock": {
         "name": "Sentakan Bumi",
@@ -18253,11 +18271,11 @@ export const id_ID: EnTranslations = {
       },
       "shadow_bolt": {
         "name": "Panah Suram",
-        "description": "Mengirimkan panah bayangan ke arah musuh sebesar {damage} kerusakan Bayangan."
+        "description": "Mengirim panah bayangan ke musuh sebesar {damage} kerusakan Bayangan. Penghancuran: menghasilkan 1 Pemusnahan, hingga 5."
       },
       "demon_skin": {
         "name": "Kulit Iblis",
-        "description": "Kulit iblis meningkatkan zirahmu sebesar {buff} selama 30 menit."
+        "description": "Menambah zirahmu sebesar {buff} selama 30 menit. Pakta Mendalam menggandakan zirah ini dan mengurangi kerusakan sihir yang diterima 5% selama Kulit Iblis aktif."
       },
       "immolate": {
         "name": "Pakta Membara",
@@ -18269,11 +18287,11 @@ export const id_ID: EnTranslations = {
       },
       "evil_eye": {
         "name": "Mata Jahat",
-        "description": "Menandai satu musuh sebagai fokus kutukanmu. Memindahkan Eye mempertahankan Kecaman tetapi tidak memperbarui masa berlakunya yang 20 detik."
+        "description": "Menandai satu musuh dengan Mata Jahatmu, fokus kutukanmu. Kamu memperoleh 2 Kecaman setiap kali musuh bertanda memberi kerusakan (paling banyak sekali per dtk) dan 10 saat ia mati. Kecaman menumpuk hingga 100 dan memudar 20 dtk setelah perolehan terakhirmu. Memindahkan Mata mempertahankan Kecamanmu tetapi tidak menyegarkan penghitung waktu itu."
       },
       "maledict_gaze": {
         "name": "Tatapan Kutukan",
-        "description": "Maledict Eye-mu menyerang Mata Jahat utama yang kamu pilih setiap 2,5 detik untuk kerusakan Bayangan. Rasuki Mata Jahat menggandakan kecepatan serangnya."
+        "description": "Mata Kutukanmu menyerang musuh yang memikul Mata Jahat utamamu setiap 2,5 dtk dengan kerusakan Bayangan, selama kamu dan musuh itu sama-sama dalam pertempuran, berjarak 30 yard satu sama lain, dan dalam garis pandang. Rasuki Mata Jahat menggandakan kecepatan serangnya."
       },
       "needle_of_fate": {
         "name": "Jarum Takdir",
@@ -18281,11 +18299,11 @@ export const id_ID: EnTranslations = {
       },
       "sentence": {
         "name": "Vonis",
-        "description": "Mengonsumsi semua Kecaman dan Benang Takdir untuk menjatuhkan vonis kepada musuh. Setiap Benang meningkatkan kerusakan sebesar 6%. Efek tambahan meningkat pada 20, 50, 80, dan 100 Kecaman. Skala kerusakannya mendatar setelah level 16."
+        "description": "Membutuhkan 20 Kecaman dan Mata Jahat utamamu pada target. Menghabiskan semua Kecaman dan Benang Takdir untuk memberi kerusakan Bayangan yang tumbuh dengan Kecaman yang dihabiskan; setiap Benang menambah 6% kerusakan. Pada 50 atau lebih, menyembuhkanmu 20% kerusakan yang diberikan. Pada 80 atau lebih, juga memberi 35% kerusakan kepada musuh lain dalam 8 yard. Pada 100, memberi 5% lebih banyak kerusakan kepada pemain dan bos dan membunuh musuh biasa di bawah 20% kesehatan. Kerusakan dasarnya naik seiring levelmu hingga 16, lalu menurun di level 17 sampai 20."
       },
       "life_tap": {
         "name": "Tawar Getir",
-        "description": "Mengubah {damage} kesehatan menjadi {damage} mana."
+        "description": "Mengubah {damage} kesehatan menjadi {buff} mana. Gagal jika kesehatanmu {damage} atau kurang."
       },
       "cursed_accomplice": {
         "name": "Sekutu Terkutuk",
@@ -18297,11 +18315,11 @@ export const id_ID: EnTranslations = {
       },
       "drain_life": {
         "name": "Melahap",
-        "description": "Melahap daya hidup sasaran, memberi {damage} kerusakan Bayangan setiap detik dan memindahkan 70% darinya kepadamu sebagai nyawa. Derita justru memindahkan seluruhnya. Ketika disalurkan pada Mata Jahat utamamu, ia menghabiskan seluruh Benang Takdir di awal, dan setiap Benang menghasilkan 1 Kecaman tambahan per denyut."
+        "description": "Menyedot daya hidup target, memberi {damage} kerusakan Bayangan setiap detik dan menyembuhkanmu 70% kerusakan yang diberikan (seluruhnya untuk Derita). Pada musuh dengan Mata Jahatmu, setiap denyut menghasilkan 2 Kecaman dan menyelesaikan penyaluran menghasilkan 3 lagi. Pada Mata Jahat utamamu, ia juga menghabiskan semua Benang Takdir di awal: setiap Benang menambah 1 Kecaman per denyut, dan 3 Benang menghentikan kerusakan dari menunda penyaluran."
       },
       "litany_of_guilt": {
         "name": "Litani Rasa Bersalah",
-        "description": "Mengutuk Mata Jahat utamamu selama 6 detik. Perolehan Kecaman melepaskan gelombang yang merusak hingga 2 musuh lain dalam radius 8 yard, paling banyak sekali per detik. Peringkat 2 memperpanjangnya menjadi 8 detik dan 4 musuh."
+        "description": "Mengutuk Mata Jahat utamamu selama {duration} detik. Perolehan Kecaman melepaskan gelombang yang merusak hingga 2 musuh lain (4 mulai Peringkat 2) dalam radius 8 yard, paling banyak sekali per detik."
       },
       "cinderhide": {
         "name": "Kulit Bara",
@@ -18309,7 +18327,7 @@ export const id_ID: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Jangkar Bayangan",
-        "description": "Rapalan pertama: menjangkarkan bayanganmu di kakimu selama 5 menit. Rapal ulang dalam radius 40 yard untuk kembali ke sana, mengonsumsi jangkar dan memulai jeda 45 detik."
+        "description": "Rapalan pertama: menjangkarkan bayanganmu di kakimu selama 5 menit. Rapal ulang dalam 40 yard dari jangkar untuk berteleportasi kembali ke sana, menghabiskan jangkar dan memulai masa tunggu 45 dtk."
       },
       "soulwell": {
         "name": "Sumur Jiwa",
@@ -18317,19 +18335,19 @@ export const id_ID: EnTranslations = {
       },
       "hex_of_violence": {
         "name": "Kutukan Kekerasan",
-        "description": "Mengutuk musuh selama 8 detik, memberikan kerusakan Bayangan dan menghasilkan 2 Kecaman setiap 2 detik. 3 tindakan merusak berikutnya masing-masing menghasilkan 7 Kecaman dan mencambuknya sebesar 17 kerusakan Bayangan."
+        "description": "Mengutuk musuh selama 8 dtk. Setiap 2 dtk ia menerima 17 kerusakan Bayangan ditambah bagian dari Kekuatan Mantramu, dan kamu memperoleh 2 Kecaman. Pada 3 kali pertama musuh terkutuk memberi kerusakan, kamu memperoleh 7 Kecaman dan ia menerima 17 kerusakan Bayangan."
       },
       "cruel_pact": {
         "name": "Perjanjian Kejam",
-        "description": "Mengorbankan 12% dari nyawa maksimummu untuk memulihkan 1,5% dari mana maksimummu dan menghasilkan 20 Kecaman. Tidak dapat digunakan pada atau di bawah 20% nyawa."
+        "description": "Mengorbankan 12% dari nyawa maksimummu untuk memulihkan {buff}% dari mana maksimummu dan menghasilkan 20 Kecaman. Tidak dapat digunakan pada atau di bawah 20% nyawa."
       },
       "vicarious_suffering": {
         "name": "Derita Pengganti",
-        "description": "Menautkan penderitaanmu selama 8 detik dan menghasilkan hingga 15 Kecaman dari pukulan bermusuhan. Pada dirimu sendiri, mengurangi kerusakan yang diterima sebesar 20%. Pada sekutu, mengalihkan hingga 20% kepadamu tanpa membuat nyawamu turun di bawah 15%."
+        "description": "Selama 8 dtk, setiap pukulan bermusuhan pada target menghasilkan 3 Kecaman, hingga 15 total. Pada dirimu sendiri, mengurangi kerusakan yang diterima 20%. Pada sekutu, mengalihkan 20% setiap pukulan bermusuhan kepadamu, tetapi tidak pernah menurunkan kesehatanmu di bawah 15%."
       },
       "possess_evil_eye": {
         "name": "Rasuki Mata Jahat",
-        "description": "Maledictor merasuki Mata Jahat utamamu selama 15 detik dan menghasilkan 35 Kecaman. Jarum Takdir dirapal dalam 1 detik dan menghasilkan 2 Kecaman tambahan, Melahap dapat disalurkan sambil bergerak, dan Vonis memberikan 25% kerusakan lebih besar dan melepaskan gema tertunda sebesar 60% kerusakan, menurun menjadi 30% sepanjang level 17-20."
+        "description": "Merasuki Mata Jahat utamamu selama 15 dtk dan menghasilkan 35 Kecaman. Selama aktif, Jarum Takdir dirapal dalam 1 dtk dan menghasilkan 2 Kecaman tambahan, Melahap dapat disalurkan sambil bergerak, Tatapan Kutukan menyerang dua kali lebih cepat, dan Vonis memberi 25% lebih banyak kerusakan dan mengulang 60% kerusakan yang diberikan 0,75 dtk kemudian (turun menjadi 30% di level 17 sampai 20)."
       },
       "hour_of_judgment": {
         "name": "Saat Penghakiman",
@@ -18337,7 +18355,7 @@ export const id_ID: EnTranslations = {
       },
       "coven": {
         "name": "Persekutuan Penyihir",
-        "description": "Menciptakan Mata Jahat sekunder pada hingga 4 musuh terdekat selama 15 detik. Mereka mengisi kumpulan Kecaman bersama sebesar 50%, dan Vonis bergema kepada mereka sebesar 35% kerusakan."
+        "description": "Membutuhkan Mata Jahat utamamu pada target. Menempatkan Mata Jahat sekunder pada hingga 4 musuh lain dalam 15 yard darinya selama 15 dtk. Mereka menghasilkan Kecaman dengan laju 50% dari normal, dan Vonis bergema ke masing-masing dari mereka sebesar 35% kerusakannya."
       },
       "fear": {
         "name": "Cekaman",
@@ -18345,7 +18363,7 @@ export const id_ID: EnTranslations = {
       },
       "searing_pain": {
         "name": "Bakar",
-        "description": "Membakar musuh dengan api menyiksa sebesar {damage} kerusakan Api. Cepat dirapal."
+        "description": "Membakar musuh dengan api menyiksa sebesar {damage} kerusakan Api."
       },
       "shadowburn": {
         "name": "Api Senja",
@@ -18371,12 +18389,12 @@ export const id_ID: EnTranslations = {
       },
       "moonfire": {
         "name": "Badai Rembulan",
-        "description": "Membakar musuh dengan api rembulan sebesar {damage} kerusakan Arkana ditambah kerusakan seiring waktu.",
+        "description": "Membakar musuh sebesar {damage} kerusakan Arkana, lalu {overTime} kerusakan Arkana lagi selama {duration} dtk.",
         "specNote_balance": "Jaga agar tetap membara: Moonseed memperpanjangnya selama 6 detik."
       },
       "moonseed": {
         "name": "Benih Rembulan",
-        "description": "Hanya dalam Wujud Burung Bulan. Menyerang sebesar {damage} kerusakan Gaib, menambah satu tahap Pasang Rembulan, dan memperpanjang Badai Rembulan-mu 6 dtk, hingga {duration} dtk per penerapan. Saat Pasang Rembulan penuh, Benih Rembulan menjadi Gelombang Rembulan."
+        "description": "Hanya dalam Wujud Burung Bulan. Menyerang sebesar {damage} kerusakan Arkana, menambah 1 Pasang Rembulan (maks 3), dan memperpanjang Badai Rembulanmu pada target selama 6 dtk, hingga {duration} dtk tambahan per penerapan Badai Rembulan. Pada 3 Pasang Rembulan, tombol ini menjadi Gelombang Rembulan: serangan Arkana berat seketika yang menghabiskan ketiganya."
       },
       "rejuvenation": {
         "name": "Pemulihan Spora",
@@ -18385,20 +18403,20 @@ export const id_ID: EnTranslations = {
       },
       "thorns": {
         "name": "Perisai Onak",
-        "description": "Duri bertunas dari target: penyerang jarak dekat menerima {buff} kerusakan Alam."
+        "description": "Duri tumbuh dari target sekutu selama 10 menit. Setiap pukulan jarak dekat terhadap target memberi {buff} kerusakan Alam kepada penyerang."
       },
       "entangling_roots": {
         "name": "Akar Cengkeram",
-        "description": "Mengakar target di tempatnya hingga 12 detik."
+        "description": "Mengakar target di tempatnya hingga 12 dtk. Pada peringkat kedua, juga memberi 32 kerusakan Alam selama 12 dtk, yang meningkat dengan Kekuatan Mantra."
       },
       "bear_form": {
         "name": "Wujud Bruin",
-        "description": "Berubah wujud menjadi beruang: zirah +110%, kesehatan maksimum +30%, daya serang sangat meningkat, seranganmu membangun amarah dan menghasilkan 30% lebih banyak ancaman. Kamu menyerang dua kali lebih cepat dengan setengah kerusakan per ayunan, dan setiap ayunan membangun amarah dua kali lipat. Berubah menjadi wujud apa pun memberikan Langkah Berderap Lambat, ledakan singkat kecepatan gerak. Rapal lagi untuk kembali ke wujud perapal."
+        "description": "Berubah wujud menjadi beruang: zirah +110%, kesehatan maksimum +30%, kekuatan serang +15 ditambah 1,5 per poin Kelincahan, seranganmu membangun amukan dan menghasilkan 30% lebih banyak ancaman. Kamu menyerang dua kali lebih cepat dengan setengah kerusakan per ayunan, dan setiap ayunan membangun amukan dua kali lipat. Berubah ke wujud apa pun memberi Langkah Berderap, ledakan singkat kecepatan gerak. Rapal lagi untuk kembali ke wujud perapal."
       },
       "maul": {
         "name": "Remuk Tulang",
-        "description": "Serangan mencabik yang meningkatkan kerusakan jarak dekat sebesar {damage} dan menimbulkan ancaman besar. Aktif pada ayunanmu berikutnya. Hanya dalam Wujud Bruin.",
-        "specNote_feral": "Setiap pukulan yang mengenai menambah 1 Darah Tua; pada 3 Darah Tua tombol ini berubah menjadi Marrowbreak: serangan sebesar 78 hingga 96 kerusakan dengan ancaman besar; di bawah setengah nyawa, ia justru menyembuhkanmu sebesar 18% dari nyawa maksimummu dan mengembalikan 15 amarah."
+        "description": "Ayunan jarak dekat berikutnya memberi {damage} kerusakan tambahan dan menghasilkan ancaman sebesar 2,5 kali kerusakannya ditambah sedikit jumlah tetap. Hanya dalam Wujud Bruin.",
+        "specNote_feral": "Setiap pukulan yang mengenai menambah 1 Darah Tua; pada 3 Darah Tua tombol ini berubah menjadi Marrowbreak: serangan berat dengan ancaman besar; di bawah setengah nyawa, ia justru menyembuhkanmu sebesar 18% dari nyawa maksimummu dan mengembalikan 15 amarah."
       },
       "growl": {
         "name": "Gertakan",
@@ -18410,7 +18428,7 @@ export const id_ID: EnTranslations = {
       },
       "cat_form": {
         "name": "Wujud Kucing",
-        "description": "Berubah menjadi kucing: kelincahan naik sesuai level, daya serang +8 ditambah 2 per level, serangan memakai energi dan poin kombo, gerak 15% lebih cepat dan ancaman berkurang 29%. Setiap perubahan wujud memberi Langkah Berderap Lambat, peningkatan kecepatan singkat. Gunakan lagi untuk kembali ke wujud perapal."
+        "description": "Berubah wujud menjadi kucing: kelincahan + setengah levelmu (minimal 2), kekuatan serang +8 ditambah 2 per level, seranganmu memakai energi dan poin kombo, kamu bergerak 15% lebih cepat, dan menghasilkan 29% lebih sedikit ancaman. Berubah ke wujud apa pun memberi Langkah Berderap, ledakan singkat kecepatan gerak. Rapal lagi untuk kembali ke wujud perapal."
       },
       "claw": {
         "name": "Cakar Perobek",
@@ -18424,22 +18442,22 @@ export const id_ID: EnTranslations = {
       },
       "ferocious_bite": {
         "name": "Gigitan Berdarah",
-        "description": "Jurus penutup yang menyebabkan {damage}. Hanya dalam Wujud Kucing.",
+        "description": "Jurus penutup yang memberi {damage} kerusakan Fisik. Hanya dalam Wujud Kucing.",
         "specNote_feral": "Setiap pukulan yang mengenai menambah 1 Darah Tua; pada 3 Darah Tua tombol ini berubah menjadi Redharvest, yang menghabiskan Darah Tua untuk serangan yang lebih kuat, juga seketika menimbulkan seluruh kerusakan yang masih akan diberikan Flense dan Bloodrift-mu, dan memulihkan energi."
       },
       "swipe": {
         "name": "Cakar Menyapu",
-        "description": "Sapukan cakarmu melalui musuh terdekat sebesar {damage} kerusakan. Menimbulkan ancaman ekstra. Hanya dalam Wujud Bruin.",
+        "description": "Menyapukan cakarmu ke setiap musuh dalam 5 yard sebesar {damage} kerusakan masing-masing, menghasilkan 75% lebih banyak ancaman daripada kerusakan yang diberikan. Hanya dalam Wujud Bruin.",
         "specNote_feral": "Setiap pukulan yang mengenai menambah 1 Darah Tua (maks 3)."
       },
       "regrowth": {
         "name": "Mekar Kedua",
-        "description": "Menyembuhkan target kawan sebesar {damage} dan jumlah tambahan selama 15 detik. Jika efek berlangsung penuh, efek itu menyembuhkan target lagi sebesar jumlah penyembuhan awal.",
+        "description": "Menyembuhkan target sekutu sebesar {damage}, lalu {overTime} lagi selama 15 dtk. Jika penyembuhan-seiring-waktu berjalan penuh, ia menyembuhkan target sekali lagi sebesar jumlah penyembuhan pertama (sebelum bonus kritis). Mengakhirinya lebih awal, seperti dengan Pemulihan Cepat, Mekar Raya, atau rapal ulang, melewatkan penyembuhan itu.",
         "specNote_restoration": "Setiap rapalan menambah 1 Kehijauan (maks 3), termasuk saat menyegarkan kuntum yang masih aktif."
       },
       "barkskin": {
         "name": "Kulit Ek",
-        "description": "Kulitmu mengeras bagai kulit kayu, meningkatkan zirah sebesar 150 selama 15 detik."
+        "description": "Kulitmu mengeras bagai kulit kayu, meningkatkan zirah sebesar {buff}% selama 15 detik."
       },
       "sacred_bulwark": {
         "name": "Benteng Suci",
@@ -18447,12 +18465,12 @@ export const id_ID: EnTranslations = {
       },
       "primal_reflexes": {
         "name": "Refleks Purba",
-        "description": "Nalurimu menajam, meningkatkan peluang menghindar sebesar 50% selama 6 detik."
+        "description": "Nalurimu menajam, menambah 50 poin persentase pada peluang menghindarmu selama 6 dtk."
       },
       "starfire": {
         "name": "Langit Runtuh",
         "description": "Memanggil turun baut api bintang, menyebabkan {damage} kerusakan Arkana.",
-        "specNote_balance": "Dalam Wujud Burung Bulan, setiap rapalan yang selesai menambah 1 Moontide (maks 3). Pada 3 Moontide, tombol ini berubah menjadi Sunwake: serangan seketika sebesar 80 hingga 100 kerusakan Alam plus bakaran 45 selama 9 detik, memulihkan 35 mana dan menghabiskan seluruh 3."
+        "specNote_balance": "Dalam Wujud Burung Bulan, setiap rapalan yang selesai menambah 1 Moontide (maks 3). Pada 3 Moontide, tombol ini berubah menjadi Sunwake: serangan Alam seketika plus bakaran selama 9 detik, memulihkan 35 mana dan menghabiskan seluruh 3."
       },
       "travel_form": {
         "name": "Wujud Fleet",
@@ -18500,28 +18518,28 @@ export const id_ID: EnTranslations = {
       },
       "rip": {
         "name": "Celah Darah",
-        "description": "Serangan penutup yang membuat target berdarah setiap 2 dtk selama 24 dtk: 72 kerusakan ditambah 48 per poin kombo yang dipakai (5 poin: total {damage}). Hanya Wujud Kucing.",
+        "description": "Serangan penutup yang membuat target berdarah setiap 2 dtk selama 24 dtk, dengan kerusakan lebih besar untuk setiap poin kombo yang dipakai (5 poin: total {damage}). Hanya Wujud Kucing.",
         "specNote_feral": "Pukulan yang mengenai menambah 1 Darah Tua (maks 3)."
       },
       "mortal_strike": {
         "name": "Serangan Pelukai",
-        "description": "Serangan ganas yang menimbulkan kerusakan senjata ditambah {damage}. (Ciri khas Arms)"
+        "description": "Menyerang sebesar kerusakan senjata ditambah {damage} dan mengurangi penyembuhan yang diterima target 50% selama 10 dtk. Juga menerapkan Luka Menganga, pendarahan yang memberi {overTime} kerusakan Fisik selama 6 dtk dalam 2 denyut. (Ciri khas Arms)"
       },
       "bloodthirst": {
         "name": "Pertumpahan Darah",
-        "description": "Seketika menyerang dalam amukan darah untuk 60% kerusakan senjata ditambah {damage}. (Penanda Fury)"
+        "description": "Menyerang sebesar 50% kerusakan senjata ditambah {damage}, menyembuhkan dirimu 3% kesehatan maksimummu, dan menghasilkan {rage} amukan. Berpeluang 30% membuatmu Mengamuk selama {duration} dtk. (Ciri khas Fury)"
       },
       "shield_slam": {
         "name": "Pemecah Perisai",
-        "description": "Menghantam target dengan perisaimu sebesar 50% kerusakan senjata ditambah {damage} dan ancaman besar. (Ciri khas Perlindungan)"
+        "description": "Menghantam target dengan perisaimu sebesar kerusakan senjata ditambah {damage} dan menghasilkan {rage} amukan. Menyebabkan ancaman sangat tinggi. (Ciri khas Perlindungan)"
       },
       "whirlwind": {
         "name": "Pusaran Berpisau",
-        "description": "Berputar dalam busur mematikan, menyerang semua musuh di sekitar sebesar {damage}. (Talenta Murka)"
+        "description": "Menyerang semua musuh dalam 8 yard sebesar {damage} kerusakan Fisik. Selama {duration} dtk berikutnya, 2 kemampuan target tunggalmu berikutnya juga memberi 40% kerusakannya kepada hingga 4 musuh lain dalam 8 yard dari targetnya. (Fury)"
       },
       "berserker_rage": {
         "name": "Amukan Mendidih",
-        "description": "Memasuki amukan mendidih, menghasilkan 20 amarah. (Talenta Prajurit)"
+        "description": "Memasuki amukan mendidih, seketika menghasilkan {rage} amukan."
       },
       "crusader_strike": {
         "name": "Serangan Sumpah",
@@ -18533,11 +18551,11 @@ export const id_ID: EnTranslations = {
       },
       "galeheart_weapon": {
         "name": "Senjata Hati Badai",
-        "description": "Menyihir kedua senjata selama 30 mnt, mengaktifkan Irama Roh Perang."
+        "description": "Meresapi kedua senjata selama 30 menit. Selama aktif, setiap Irama Roh Perang yang selesai juga menyerang dengan Gema Hati Badai. Menggantikan Senjata Stonebound."
       },
       "warspirit_cadence": {
         "name": "Irama Roh Perang",
-        "description": "Pasif: serangan dengan kedua senjata tidak memiliki peluang meleset tambahan. Setiap serangan senjata ke-3 yang mengenai memicu 2 Gema Hati Badai sebesar 25% kerusakan Alam dan memberi Pertanda Badai selama 12 dtk. Pertanda Badai membuat Sambaran Busur, Sentakan, atau Air Pemulih berikutnya seketika dan memangkas biaya mananya 50%. Serangan Leluhur dihitung sebagai 2 serangan. (Roh Perang)"
+        "description": "Pasif: serangan dua senjata tidak memiliki peluang meleset tambahan. Selama Senjata Hati Badai atau Stonebound aktif, setiap serangan senjata ke-3 yang mengenai memberi Pertanda Badai selama 12 dtk. Dengan Senjata Hati Badai, ia juga memicu 2 Gema Hati Badai, masing-masing memberi 25% kerusakan pukulan itu sebagai kerusakan Alam. Pertanda Badai membuat Sambaran Busur, Sentakan, atau Air Pemulih berikutnya seketika dan menghabiskan 50% lebih sedikit mana. Serangan Leluhur dihitung sebagai 2 serangan. (Penguatan)"
       },
       "stormsurge": {
         "name": "Gelombang Badai",
@@ -18561,11 +18579,11 @@ export const id_ID: EnTranslations = {
       },
       "stoneward": {
         "name": "Penjaga Batu",
-        "description": "Melindungi satu sekutu selama 60 dtk dengan 6 muatan. Kerusakan menghabiskan satu muatan untuk menyembuhkan 5% nyawa maksimum, sekali tiap 3 dtk. (Bakat syaman)"
+        "description": "Melindungi satu sekutu selama 60 dtk. Saat mereka menerima kerusakan, satu muatan menyembuhkan mereka 5% kesehatan maksimumnya, paling banyak sekali per 3 dtk, hingga 6 muatan. Hanya satu sekutu yang dapat memegang Penjaga Batu-mu pada satu waktu. (Bakat Dukun)"
       },
       "tidecall": {
         "name": "Panggilan Pasang",
-        "description": "Menyembuhkan sasaran kawan sebesar {damage}. Penyembuhan meningkat dengan kekuatan mantra. Menambahkan penyembuhan penuh sebelum kelebihan ke Arus Pemulih, hingga 30% dari nyawa maksimum sasaran."
+        "description": "Menyembuhkan target sekutu sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Penyembuhan. Juga menambahkan penyembuhan penuh sebelum kelebihan penyembuhan ke Arus Pemulih target, kolam yang menyembuhkannya selama 12 dtk dan menampung paling banyak 30% kesehatan maksimumnya."
       },
       "soul_harvest": {
         "name": "Tuai Esensi",
@@ -18573,7 +18591,7 @@ export const id_ID: EnTranslations = {
       },
       "soul_lance": {
         "name": "Tombak Jiwa",
-        "description": "Melontarkan tombak spektral sebesar {damage} kerusakan Bayangan. Terhadap Tanda Rumah Tulang-mu, 50% kerusakannya ditambahkan ke tanda tersebut."
+        "description": "Melontarkan tombak spektral sebesar {damage} kerusakan Bayangan. Terhadap Tanda Rumah Tulangmu, tanda itu menyimpan 70% kerusakannya, bukan 20%."
       },
       "raise_graveguard": {
         "name": "Bangkitkan Penjaga Kubur",
@@ -18589,19 +18607,19 @@ export const id_ID: EnTranslations = {
       },
       "bone_armor": {
         "name": "Zirah Tulang",
-        "description": "Menyelimutimu dengan tulang, menyerap kerusakan setara 20% dari nyawa maksimummu."
+        "description": "Membungkusmu dengan tulang selama {duration} dtk, menyerap kerusakan setara 20% kesehatan maksimummu."
       },
       "corpse_explosion": {
         "name": "Ledakan Mayat",
-        "description": "Mengorbankan Penyihir Tulang terlebih dahulu, lalu Prajurit Kerangka, dan Sayap Kubur hanya sebagai upaya terakhir. Di antara duplikat, ia memilih yang durasi tersisanya paling sedikit, lalu yang terlemah, untuk memberikan {damage} kerusakan Bayangan di lokasi yang dipilih."
+        "description": "Mengorbankan salah satu abdi Dominasimu (bukan Penjaga Kuburmu) untuk memberi {damage} kerusakan Bayangan kepada musuh dalam 8 yard dari lokasi terpilih. Ia mengambil Prajurit Kerangka lebih dulu, lalu Penyihir Tulang, dan Sayap Kubur hanya sebagai pilihan terakhir; di antara abdi sejenis, yang paling dekat berakhir, lalu yang paling terluka. Membutuhkan abdi Dominasi."
       },
       "funeral_harvest": {
         "name": "Panen Pemakaman",
-        "description": "Saat musuh yang baru saja kamu atau mayat hidupmu lukai mati, kamu memperoleh 1 Serpihan Jiwa. Ini dapat terjadi sekali setiap 3 detik."
+        "description": "Saat musuh mati dalam 5 dtk setelah menerima kerusakan darimu atau mayat hidupmu, kamu memperoleh 1 Serpihan Jiwa. Ini dapat terjadi sekali setiap 3 dtk."
       },
       "ossuary_mark": {
         "name": "Tanda Rumah Tulang",
-        "description": "Menandai musuh selama 15 detik, menyimpan 20% dari kerusakan yang diberikan olehmu dan mayat hidupmu. Rapal ulang untuk meledakkannya. Jika musuh yang ditandai mati, ia meledak dalam radius 6 yard dan menciptakan 1 Serpihan Jiwa."
+        "description": "Menandai musuh selama 15 dtk, menyimpan 20% kerusakan yang kamu dan mayat hidupmu berikan padanya. Rapal ulang untuk meledakkannya lebih awal: musuh menerima kerusakan tersimpan sebagai kerusakan Bayangan dan kamu disembuhkan 25% darinya. Saat tanda berakhir, ia meledak tanpa penyembuhan. Jika musuh bertanda mati, kerusakan tersimpan mengenai musuh lain dalam 6 yard dan kamu memperoleh 1 Serpihan Jiwa."
       },
       "unholy_command": {
         "name": "Perintah Tak Suci",
@@ -18613,7 +18631,7 @@ export const id_ID: EnTranslations = {
       },
       "sacrifice_undead": {
         "name": "Korbankan Mayat Hidup",
-        "description": "Menghancurkan satu abdi Dominasi untuk memulihkan 25% dari nyawa maksimummu."
+        "description": "Menghancurkan abdi Dominasimu yang paling terluka (bukan Penjaga Kuburmu) untuk memulihkan 25% kesehatan maksimummu. Membutuhkan abdi Dominasi."
       },
       "raise_gravewing": {
         "name": "Bangkitkan Sayap Kubur",
@@ -18633,11 +18651,11 @@ export const id_ID: EnTranslations = {
       },
       "holy_shield": {
         "name": "Perisai Suci",
-        "description": "Meningkatkan blok sebesar 30% dan memberi perisai sebesar {damage}% kesehatan maksimummu selama {duration} detik. Ascension memperkuat pertahanan."
+        "description": "Memperoleh 30% peluang blok dan perisai yang menyerap {damage}% kesehatan maksimummu selama {duration} dtk, melepaskan denyut ancaman. Kenaikan menaikkan peluang blok menjadi 40%, menambah perisai 50%, dan memperpanjang keduanya menjadi 10 dtk."
       },
       "bestial_wrath": {
         "name": "Murka Buas",
-        "description": "Memberi 3 Keganasan Kawanan. Lepaskan Sang Buas berikutnya dalam 20 dtk memberi 50% kerusakan pukul dan tepuk lebih besar, dan amukannya bertahan 12 dtk alih-alih 8. (Ciri khas Penguasaan Hewan Buas)"
+        "description": "Memberi 3 Keganasan Kawanan selama 20 dtk dan mengakhiri Kalap Terlepas yang aktif. Lepaskan Sang Buas berikutnya dalam 20 dtk memberi 50% lebih banyak kerusakan serangan dan tepukan, dan kalapnya bertahan 12 dtk, bukan 8. (Ciri khas Penguasaan Hewan Buas)"
       },
       "trueshot_aura": {
         "name": "Aura Tembakan Jitu",
@@ -18653,15 +18671,15 @@ export const id_ID: EnTranslations = {
       },
       "combustion": {
         "name": "Trans Feniks",
-        "description": "Meningkatkan peluang kritis mantra sebesar 50% selama 15 dtk. (signature Fire)"
+        "description": "Selama 10 dtk, mantra Apimu selalu menghasilkan serangan kritis, termasuk panah yang sudah melayang, dan kritis ini membangun Rentetan Membara seperti biasa. Di luar masa tunggu global dan dapat digunakan saat merapal. Merapalnya menuntaskan muatan Guguran Bara yang sedang mengisi ulang. Di luar Trans Feniks, setiap serangan kritis yang membangun Rentetan Membara memangkas masa tunggunya 1 dtk. (Api)"
       },
       "icy_veins": {
         "name": "Gelombang Dingin",
-        "description": "Meningkatkan haste mantra sebesar 30% dan mencegah interupsi serta pushback cast selama 10 dtk. (signature Frost)"
+        "description": "Menambah kecepatan mantra 30% dan mencegah gangguan serta pendorongan rapalan selama 10 dtk. (Beku)"
       },
       "cold_blood": {
         "name": "Darah Dingin",
-        "description": "Memusatkan niat membunuhmu sehingga 5 seranganmu berikutnya menjadi pukulan kritis. (mesin Knifework)"
+        "description": "5 serangan berikutnya dalam {duration} dtk dijamin serangan kritis. Serangan otomatis juga memakai satu muatan. (Ciri khas Pembunuhan)"
       },
       "blade_flurry": {
         "name": "Tebasan Bertubi",
@@ -18669,7 +18687,7 @@ export const id_ID: EnTranslations = {
       },
       "hemorrhage": {
         "name": "Pendarahan",
-        "description": "Menghantam musuh sebesar kerusakan senjata ditambah {damage}, menyebabkan kerusakan pendarahan selama 12 detik, dan meningkatkan kerusakan pendarahan yang diterima sebesar 40%. Memberi 1 poin combo. Setiap penggunaan ke-2 menambah 1 Gloam (maks 3). (mesin Skulduggery)"
+        "description": "Menyerang musuh sebesar kerusakan senjata ditambah {damage} dan membuatnya berdarah sebesar {overTime} selama 12 dtk. Selama 12 dtk, semua pendarahan pada target memberi 40% lebih banyak kerusakan. Memberi 1 poin kombo. Setiap penggunaan ke-2 menambah 1 Gloam (maks 3). (Ciri khas Kesamaran)"
       },
       "power_infusion": {
         "name": "Infusi Kekuatan",
@@ -18677,15 +18695,15 @@ export const id_ID: EnTranslations = {
       },
       "holy_nova": {
         "name": "Kidung Surya",
-        "description": "Menyembuhkan sekutu dalam 10 yard sebesar {damage} dan memberi 24 sampai 30 kerusakan Suci kepada musuh di area yang sama. Kedua jumlah meningkat dengan Kekuatan Mantra. (Dasar Suci)"
+        "description": "Menyembuhkan sekutu dalam 10 yard sebesar {damage} dan memberi 24 sampai 30 kerusakan Suci kepada musuh di area yang sama. Penyembuhan meningkat dengan Kekuatan Penyembuhan dan kerusakan dengan Kekuatan Mantra. (Dasar Suci)"
       },
       "shadowform": {
         "name": "Selubung Senja",
-        "description": "Memasuki Selubung Senja dan meningkatkan kerusakan Bayanganmu sebesar 25%. Rapal lagi untuk meninggalkan Selubung Senja. (Ciri khas Bayangan)"
+        "description": "Memasuki Selubung Senja, menambah kerusakan Bayanganmu 25%. Merapal mantra penyembuhan mengakhirinya. Rapal Selubung Senja lagi untuk meninggalkannya. (Ciri khas Vespers)"
       },
       "elemental_mastery": {
         "name": "Penguasaan Elemen",
-        "description": "Selama 12 dtk, Sambaran Busur memberi 2 Guntur. Sambaran Busur atau Petir Bercabang berikutnya menjadi seketika, dan pembayaran Guntur penuh berikutnya memberi 25% kerusakan lebih besar. (Ciri khas Elemental)"
+        "description": "Selama 12 dtk, Sambaran Busur memberi 2 Guntur, bukan 1. Sambaran Busur atau Petir Bercabang berikutnya dalam waktu itu seketika, dan Sentakan Bumi atau Bangkitan Sesar berikutnya yang menghabiskan 5 Guntur memberi 25% lebih banyak kerusakan. (Ciri khas Elemental)"
       },
       "siphon_life": {
         "name": "Sifon Nyawa",
@@ -18693,7 +18711,7 @@ export const id_ID: EnTranslations = {
       },
       "conflagrate": {
         "name": "Kobaran Api",
-        "description": "Memajukan satu denyut mendatang dari Pakta Membaramu, lalu membakar sasaran sebesar {damage} kerusakan Api. Menghasilkan 1 Pemusnahan dan 1 Kehancuran. Menampung {charges} muatan. (Ciri khas Penghancuran)"
+        "description": "Membutuhkan Pakta Membaramu pada target. Memberi satu denyut sisanya seketika, memperpendeknya satu denyut, lalu membakar target sebesar {damage} kerusakan Api. Menghasilkan 1 Pemusnahan dan 1 Kehancuran (menumpuk hingga 2, berlangsung 15 dtk): Baut Reruntuhan berikutnya dirapal 30% lebih cepat, atau Hujan Api berikutnya menjatuhkan gelombang pertamanya seketika. Menampung {charges} muatan. (Ciri khas Penghancuran)"
       },
       "moonkin_form": {
         "name": "Wujud Burung Bulan",
@@ -18701,7 +18719,7 @@ export const id_ID: EnTranslations = {
       },
       "feral_charge": {
         "name": "Gelora Purba",
-        "description": "Lepaskan gelora purba. Dalam Wujud Kucing, regenerasi energi meningkat 100% selama 10 detik. Dalam Wujud Bruin, langsung menghasilkan 50 Amukan. (ciri khas Keganasan)"
+        "description": "Melepaskan gelora purba. Dalam Wujud Kucing, regenerasi Energi bertambah 100% selama 10 dtk. Dalam Wujud Bruin, seketika menghasilkan 50 Amukan. Di luar Wujud Kucing dan Bruin ia tidak berefek. (Ciri khas Feral)"
       },
       "swiftmend": {
         "name": "Pemulihan Cepat",
@@ -18722,7 +18740,7 @@ export const id_ID: EnTranslations = {
       },
       "marrowbreak": {
         "name": "Pematah Sumsum",
-        "description": "Menghabiskan 3 Darah Tua milikmu untuk serangan berat berancaman tinggi sebesar {damage} kerusakan. Di bawah setengah nyawa, sebagai gantinya menyembuhkanmu sebesar 18% nyawa maksimum dan mengembalikan 15 amarah."
+        "description": "Menghabiskan 3 Darah Tuamu untuk serangan sebesar {damage} kerusakan yang menghasilkan ancaman sebesar dua kali kerusakannya ditambah 110. Di bawah setengah kesehatan, sebagai gantinya ia menyembuhkanmu 18% kesehatan maksimummu dan mengembalikan 15 amukan."
       },
       "wildwake": {
         "name": "Bangkit Liar",
@@ -18744,8 +18762,8 @@ export const id_ID: EnTranslations = {
       },
       "natures_boon": {
         "name": "Karunia Alam",
-        "description": "Mantramu dapat mengaktifkan Karunia Alam selama 10 dtk: mantra yang disebut menjadi gratis, 25% lebih kuat, dan dapat digunakan dalam wujud apa pun. Aktivasi baru memperbarui durasinya.",
-        "specNote_feral": "Setiap serangan otomatis jarak dekat yang mengenai sasaran memiliki peluang 1 dari 15 untuk mengaktifkannya bagi Pemulihan Spora, atau bagi Kulit Ek dalam Wujud Bruin.",
+        "description": "Karunia Alam adalah jendela 10 dtk yang membuat mantra yang disebutnya gratis, 25% lebih kuat, dan dapat dirapal dalam wujud apa pun. Pemicu baru menyegarkan durasinya.",
+        "specNote_feral": "Setiap serangan otomatis jarak dekat yang mengenai dapat mengaktifkannya, sekitar 4 kali per menit dalam wujud apa pun (peluang 1 dari 15 per ayunan Wujud Kucing). Ia mencakup Pemulihan Spora, yang dibuatnya 50% lebih kuat, bukan 25%, dan Kulit Ek saat kamu dalam Wujud Bruin; yang pertama kamu rapal menghabiskannya. Setiap pemicu juga mengatur ulang masa tunggu Kulit Ek.",
         "specNote_balance": "Setiap Panah Liar atau Langit Runtuh yang digunakan memiliki peluang 10% untuk mengaktifkannya bagi Ledakan Spora, paling sering sekali setiap 10 dtk.",
         "specNote_restoration": "Setiap denyut efek penyembuhan berkalamu memiliki peluang 10% untuk mengaktifkannya bagi Ledakan Spora, paling sering sekali setiap 10 dtk."
       },
@@ -18776,7 +18794,7 @@ export const id_ID: EnTranslations = {
       },
       "summon_infernal": {
         "name": "Panggil Raksasa Pyre",
-        "description": "Menjatuhkan Raksasa Pyre di area sasaran dan memberikan 64-79 kerusakan Api saat mendarat. Ia bertarung selama 30 dtk tanpa menggantikan iblismu, membakar musuh di sekitar setiap 2 dtk, dan menghasilkan 1 Wrack setiap detik."
+        "description": "Menjatuhkan Raksasa Pyre di area sasaran, memberi {damage} kerusakan Api kepada musuh dalam 6 yard saat benturan. Ia bertarung selama 30 dtk tanpa menggantikan iblismu, memberi 66 kerusakan Api kepada musuh dalam 8 yard setiap 2 dtk, dan menghasilkan 1 Pemusnahan setiap detik."
       },
       "summon_doomguard": {
         "name": "Panggil Wraithborn",
@@ -18788,11 +18806,11 @@ export const id_ID: EnTranslations = {
       },
       "berserker_stance": {
         "name": "Kuda-kuda Berserker",
-        "description": "Kuda-kuda tempur nekat: serangan kritismu mendarat 3% lebih sering dan menghantam 3% lebih keras. Prajurit Fury selalu bertarung dalam kuda-kuda ini."
+        "description": "Kuda-kuda tempur nekat: kamu memperoleh 3% peluang serangan kritis dan serangan kritismu memberi 3% lebih banyak kerusakan. Prajurit Fury selalu bertarung dalam kuda-kuda ini."
       },
       "sweeping_strikes": {
         "name": "Busur Melebar",
-        "description": "Selama 12 detik serangan target-tunggalmu juga menghantam 1 musuh terdekat dengan kerusakan penuh. (Arms)"
+        "description": "Selama 12 dtk, setiap pukulan dari kemampuan target tunggalmu juga memberi kerusakan yang sama kepada 1 musuh lain dalam 8 yard dari targetmu. Serangan otomatis tidak disalin. (Arms)"
       },
       "deep_wounds": {
         "name": "Luka Menganga",
@@ -18800,7 +18818,7 @@ export const id_ID: EnTranslations = {
       },
       "enrage_passive": {
         "name": "Huru-hara",
-        "description": "Pasif: saat Mengamuk kamu memberikan 7% lebih banyak kerusakan, menyerang 25% lebih cepat, dan bergerak 10% lebih cepat selama 4 detik. Pertumpahan Darah punya peluang 30% membuatmu Mengamuk; Panen Merah selalu melakukannya. (Fury)"
+        "description": "Pertumpahan Darah berpeluang 30% membuatmu Mengamuk selama 4 dtk, dan Panen Merah selalu melakukannya. Saat Mengamuk, kamu memberi 7% lebih banyak kerusakan, menyerang 25% lebih cepat, dan bergerak 10% lebih cepat. (Fury)"
       },
       "raging_gale": {
         "name": "Serangan Kembar",
@@ -18808,7 +18826,7 @@ export const id_ID: EnTranslations = {
       },
       "red_harvest": {
         "name": "Panen Merah",
-        "description": "Menghabiskan segalanya: menyerang tiga kali dalam amukan untuk 65% kerusakan senjata ditambah {damage} setiap serangan, selalu membuatmu Mengamuk. (Fury)"
+        "description": "Menyerang tiga kali, setiap pukulan memberi 65% kerusakan senjata ditambah {damage}, dan selalu membuatmu Mengamuk selama {duration} dtk. (Fury)"
       },
       "furious_mending": {
         "name": "Pemulihan Murka",
@@ -18816,7 +18834,7 @@ export const id_ID: EnTranslations = {
       },
       "emboldening_roar": {
         "name": "Auman Penyemangat",
-        "description": "Melepaskan auman penyemangat: kamu dan pemain kawan dalam 40 yard menjadi Bernyali, dan 3 kemampuanmu berikutnya dipastikan menjadi serangan kritis. (Fury)"
+        "description": "Kamu dan sekutu dalam 40 yard menjadi Bersemangat selama {duration} dtk: 3 kemampuan berkerusakan berikutnya yang digunakan masing-masing dari kalian dijamin serangan kritis. (Fury)"
       },
       "raised_guard": {
         "name": "Perisai Terangkat",
@@ -18856,7 +18874,7 @@ export const id_ID: EnTranslations = {
       },
       "sudden_death": {
         "name": "Kematian Mendadak",
-        "description": "Serangan otomatismu punya peluang membuatmu bisa merapal Ajal Dini pada target dengan kesehatan berapa pun, tanpa membutuhkan amarah. (Arms)"
+        "description": "Serangan otomatismu yang mengenai berpeluang 10% memberi Kematian Mendadak selama 10 dtk: Ajal Dini berikutnya tidak memakan amukan dan dapat digunakan pada target dengan kesehatan berapa pun. (Arms)"
       },
       "storm_bolt": {
         "name": "Lemparan Guntur",
@@ -18868,7 +18886,7 @@ export const id_ID: EnTranslations = {
       },
       "die_by_sword": {
         "name": "Mati oleh Pedang",
-        "description": "Kemampuan bertahan: selama 8 detik kamu menerima 30% lebih sedikit kerusakan dan mengelak jauh lebih banyak serangan."
+        "description": "Selama 8 dtk, kamu menerima 30% lebih sedikit kerusakan dan memperoleh 30% peluang menghindar."
       },
       "intervene": {
         "name": "Intervensi",
@@ -18876,11 +18894,11 @@ export const id_ID: EnTranslations = {
       },
       "recklessness": {
         "name": "Kenekatan",
-        "description": "Mengamuk: penghasilan amarahmu meningkat sebesar 50% dan peluang serangan kritismu sebesar 20% selama 12 detik."
+        "description": "Selama 12 dtk, kamu menghasilkan 50% lebih banyak amukan dan memperoleh 20% peluang serangan kritis."
       },
       "sanguine_aura": {
         "name": "Aura Darah",
-        "description": "Mengisi senjatamu dengan darah musuh-musuhmu: kamu dan sekutu jarak dekatmu mendapatkan 10% kecepatan serangan dan 10% kerusakan selama 20 detik."
+        "description": "Meresapi senjatamu dengan darah musuh: kamu dan setiap Prajurit, Paladin, Penyamun, Dukun, dan Druid di party-mu, pada jarak berapa pun, memperoleh 10% kecepatan serang dan memberi 10% lebih banyak kerusakan selama 20 dtk."
       },
       "victory_rush": {
         "name": "Lonjakan Pemenang",
@@ -18888,15 +18906,15 @@ export const id_ID: EnTranslations = {
       },
       "intimidating_shout": {
         "name": "Teriakan Menggentarkan",
-        "description": "Teriakan menakutkan yang membuat hingga 5 musuh dalam 8 yard lari ketakutan selama 4 dtk. Kerusakan bisa mematahkan efeknya."
+        "description": "Membuat hingga 5 musuh dalam 8 yard lari ketakutan selama 4 dtk. Setiap pukulan pada musuh yang ketakutan berpeluang mematahkan rasa takut, dan pukulan sebesar 10% kesehatan maksimumnya atau lebih selalu mematahkannya."
       },
       "revenge": {
         "name": "Balas Dendam",
-        "description": "Menyerang dalam busur lebar, memberikan kerusakan Fisik kepada semua musuh di hadapanmu. Di atas 5 target kerusakannya berkurang. Saat kamu mengelak atau menangkis, Balas Dendam berikutnya mungkin tidak membutuhkan amarah. (Protection)"
+        "description": "Menyerang semua musuh di depanmu dalam 8 yard sebesar {damage} kerusakan Fisik. Di atas 5 target, setiap pukulan dikurangi sehingga totalnya setara 5 pukulan. Saat kamu menghindar atau menangkis serangan jarak dekat makhluk, kamu berpeluang 30% membuat Balas Dendam berikutnya dalam 10 dtk tidak memakan amukan. (Perlindungan)"
       },
       "heroic_leap": {
         "name": "Lompatan Perang",
-        "description": "Melompat ke area target dan memberikan {damage} kerusakan kepada musuh di sekitar saat mendarat."
+        "description": "Melompat ke area sasaran, memberi {damage} kerusakan Fisik kepada semua musuh dalam 6 yard saat kamu mendarat."
       },
       "rallying_cry": {
         "name": "Raungan Keberanian",
@@ -18908,11 +18926,11 @@ export const id_ID: EnTranslations = {
       },
       "avatar": {
         "name": "Titisan Perang",
-        "description": "Berubah menjadi kolosus selama 20 detik, melepaskan semua efek kontrol pada dirimu dan meningkatkan kerusakan yang kamu hasilkan sebesar 20%."
+        "description": "Mematahkan setrum, ketakutan, akar, pembungkaman, pelucutan senjata, dan perlambatan pada dirimu (bukan yang dari bos), lalu menjadi kolosus selama 20 dtk, memberi 20% lebih banyak kerusakan. Ia tidak melindungimu dari efek kendali baru."
       },
       "avenging_wrath": {
         "name": "Murka Pembalas",
-        "description": "Membentangkan sayap wadag dari kekuatan suci keemasan, memperoleh 10 Pengabdian dan menggandakan Pengabdian yang dihasilkan kemampuanmu selama 15 dtk. Juga meningkatkan kerusakan dan penyembuhan yang kamu berikan sebesar 20%. Penuai fajar: memungkinkan Palu Murka terhadap sasaran mana pun."
+        "description": "Membentangkan sayap wadag dari kekuatan suci keemasan, memperoleh 10 Pengabdian dan menggandakan Pengabdian yang dihasilkan kemampuanmu selama {duration} dtk. Juga meningkatkan kerusakan dan penyembuhan yang kamu berikan sebesar 20%. Penuai fajar: memungkinkan Palu Murka terhadap sasaran mana pun."
       },
       "berserk": {
         "name": "Kabut Merah",
@@ -18924,11 +18942,11 @@ export const id_ID: EnTranslations = {
       },
       "blink": {
         "name": "Langkah Lincah",
-        "description": "Menteleportasimu 15 yard ke depan dan membebaskan efek pengakaran. (talenta Mage)"
+        "description": "Memindahkanmu 15 yard ke depan dan mematahkan akar."
       },
       "bloodlust": {
         "name": "Genderang Perang",
-        "description": "Meningkatkan kecepatan serang, rapal, dan salur sekutu kelompok atau raid dalam 30 yard sebesar 30% selama 15 dtk. Sekutu yang terkena tidak bisa memperoleh manfaat Genderang Perang atau Percepatan Waktu lagi selama 10 menit. (Talenta shaman)"
+        "description": "Menambah kecepatan serang, rapal, dan salur sekutu kelompok atau raid dalam 30 yard sebesar 30% selama 15 dtk. Sekutu yang terkena tidak dapat memperoleh manfaat Genderang Perang, Paduan Suara Pencuri, atau Percepatan Waktu lagi selama 10 menit. (Bakat Dukun)"
       },
       "chain_lightning": {
         "name": "Petir Bercabang",
@@ -18956,7 +18974,7 @@ export const id_ID: EnTranslations = {
       },
       "counterspell": {
         "name": "Pemecah Mantra",
-        "description": "Menangkal perapalan mantra target dan mencegah perapalan dari aliran sihir itu selama 6 detik."
+        "description": "Menginterupsi rapalan mantra target dan mengunci mereka dari aliran mantra itu selama 6 dtk. Tidak berefek jika target tidak sedang merapal."
       },
       "curse_of_exhaustion": {
         "name": "Kutuk Timah",
@@ -19004,19 +19022,19 @@ export const id_ID: EnTranslations = {
       },
       "hammer_of_wrath": {
         "name": "Palu Murka",
-        "description": "Melontarkan palu suci sebesar {damage} kerusakan dan menghasilkan 1 Pengabdian. Bisa dipakai di bawah 20% nyawa, atau selama Kenaikan Ilahi maupun Murka Pembalas. Murka Fajar memberi satu rapalan tambahan terhadap sasaran mana pun yang mengabaikan waktu jedanya yang sedang berjalan dan memberi 20% kerusakan lebih besar. Kenaikan meningkatkan kerusakannya sebesar 30%."
+        "description": "Melempar palu suci sebesar {damage} kerusakan Suci dan menghasilkan 1 Pengabdian. Hanya dapat digunakan pada target di bawah 20% kesehatan, kecuali Kenaikan Ilahi, Murka Pembalas, atau Murka Fajar aktif. Murka Fajar dihabiskan oleh rapalan berikutnya, yang mengabaikan masa tunggu dan memberi 20% lebih banyak kerusakan. Kenaikan menambah kerusakannya 30%."
       },
       "healing_stream": {
         "name": "Mata Air",
-        "description": "Memulihkan 120 nyawa target sekutu selama 12 detik. (talenta Shaman)"
+        "description": "Menyembuhkan target sekutu sebesar {damage} selama 12 dtk, sekali setiap 3 dtk. Penyembuhan meningkat dengan Kekuatan Penyembuhan. (Bakat Dukun)"
       },
       "howl_of_terror": {
         "name": "Lolongan Ngeri",
-        "description": "Membuat musuh di dekatnya ketakutan hingga 5 detik. Kerusakan total sebesar 8% dari kesehatan maksimum target mematahkan ketakutannya. (talenta Warlock)"
+        "description": "Menakuti musuh dalam 8 yard dan dalam garis pandang hingga 5 dtk. Kerusakan senilai total 8% kesehatan maksimum target mematahkan ketakutannya. (Bakat Penyihir Iblis)"
       },
       "ice_block": {
         "name": "Peti Es",
-        "description": "Membungkusmu dalam es padat selama 8 detik, membuatmu kebal terhadap semua kerusakan. Menghapus efek berbahaya biasa yang sudah aktif dan mencegah penerapan efek pengendalian biasa yang baru. Dapat digunakan saat terkena stun atau polymorph. Kamu tidak dapat bertindak selama terbungkus. Rapal lagi untuk membatalkan. (mage)"
+        "description": "Membungkusmu dalam es padat selama 8 dtk. Kamu tidak menerima kerusakan dan tidak dapat disetrum, diakar, diperlambat, dibungkam, atau dikendalikan, tetapi kamu tidak dapat bertindak. Menghapus efek berbahaya darimu saat dirapal, kecuali kendali pertarungan dan sakit pemulihan. Dapat digunakan saat tersetrum atau dipolimorf. Rapal ulang untuk membatalkan. (Penyihir)"
       },
       "inner_focus": {
         "name": "Pikiran Hening",
@@ -19025,11 +19043,11 @@ export const id_ID: EnTranslations = {
       },
       "innervate": {
         "name": "Getah Hidup",
-        "description": "Getah hidup mengalir dalam dirimu selama 10 detik dan memulihkan 20 sumber dayamu saat ini dalam gelombang: mana, amarah, atau energi. Berganti wujud tidak memutusnya. Tidur, pingsan, atau stasis menghentikan aliran getah. (talenta Druid)"
+        "description": "Getah hidup mengalir dalam dirimu selama 10 dtk, memulihkan 20 sumber daya apa pun yang kamu pakai (mana, Amukan, atau Energi) setiap 2 dtk. Berganti wujud tidak mengakhirinya. Tidur, setrum, atau stasis menjedanya. (Bakat Druid)"
       },
       "pummel": {
         "name": "Pukulan Bertubi",
-        "description": "Mengganggu perapalan mantra target dan mencegah casting dari sekolah itu selama 4 detik."
+        "description": "Menginterupsi rapalan mantra target dan mencegah merapal dari aliran itu selama 4 dtk. Menghasilkan 10 amukan saat menghentikan rapalan."
       },
       "kick": {
         "name": "Tendangan",
@@ -19041,7 +19059,7 @@ export const id_ID: EnTranslations = {
       },
       "meteor": {
         "name": "Batu Langit",
-        "description": "Memanggil meteor ke area target dan menghasilkan {damage} kerusakan Api, lalu membakar musuh di sana dengan 12 sampai 18 kerusakan Api setiap 2 detik selama 6 detik. (talenta Mage)"
+        "description": "Memanggil meteor ke area sasaran. Setelah 2 dtk ia mendarat, memberi {damage} kerusakan Api kepada setiap musuh dalam benturan dan Membakar masing-masing sebesar 40% kerusakan yang diberikan selama 6 dtk. (Api)"
       },
       "temporal_mend": {
         "name": "Pemulihan Waktu",
@@ -19053,11 +19071,11 @@ export const id_ID: EnTranslations = {
       },
       "temporal_echo": {
         "name": "Gema Waktu",
-        "description": "Menandai sekutu dengan gema dari momen yang lebih sehat, memulihkan {damage} kesehatan sekaligus. Selama {duration} dtk, {echoSinglePct}% kerusakan Arkan satu target lainnya dan {echoAreaPct}% kerusakan Arkan areamu menyembuhkan mereka. Gelombang Aether dan Panah Aether sebagai gantinya menyembuhkan sebesar {echoDriverPct}% dari kerusakan yang dihasilkan."
+        "description": "Seketika menyembuhkan sekutu sebesar {damage} dan menandainya dengan Gema Waktu selama {duration} dtk. Selama ditandai, {echoSinglePct}% kerusakan Arkana target tunggal lainnya dan {echoAreaPct}% kerusakan Arkana areamu menyembuhkannya; Kekuatan Arkan dan Panah Aether sebagai gantinya menyembuhkannya sebesar {echoDriverPct}% dari kerusakan yang mereka berikan. Kamu hanya dapat menyimpan satu Gema Waktu: merapalnya lagi memindahkan tanda. Penyembuhan melebihi kesehatan penuh menjadi perisai Perisai Waktu, hingga 20% kesehatan maksimumnya."
       },
       "temporal_cascade": {
         "name": "Riam Waktu",
-        "description": "Mengirim gema berjenjang melalui grupmu: target dan hingga empat sekutu terdekatnya dipulihkan sekaligus dan masing-masing ditandai selama {duration} dtk, menarik sebagian kerusakan Arkan yang kamu berikan kembali melalui gema mereka untuk menyembuhkan mereka. Gelombang Aether dan Panah Aether membuat cadangan penyembuhan yang sama dari setiap Gema grup, dibagikan menurut kesehatan yang hilang di antara sekutu bertanda dengan kesehatan di bawah 60%. (Kronomansi)"
+        "description": "Menyembuhkan target dan hingga 4 sekutu di dekatnya, anggota kelompok lebih dulu, dan menandai masing-masing dengan Gema Waktu kelompok selama {duration} dtk. Setiap penyembuhan bertambah 3% untuk setiap 1% kesehatan yang hilang dari sekutu. Selama ditandai, 13% kerusakan Arkana target tunggalmu dan 6% kerusakan Arkana areamu menyembuhkan masing-masing dari mereka. Kekuatan Arkan dan Panah Aether juga menambah cadangan penyembuhan yang sama dari setiap Gema kelompok, dibagi di antara sekutu bertanda di bawah 60% kesehatan menurut kesehatan yang hilang. Sekutu yang sudah memegang Gema Waktumu tetap memilikinya. (Kronomansi)"
       },
       "temporal_reversal": {
         "name": "Pembalikan Waktu",
@@ -19081,7 +19099,7 @@ export const id_ID: EnTranslations = {
       },
       "temporal_acceleration": {
         "name": "Percepatan Waktu",
-        "description": "Mempercepat aliran waktu untuk grupmu atau raid, meningkatkan kecepatan serangan, rapalan, dan penyaluran sebesar 30% selama 15 dtk. Sekutu yang baru saja terpengaruh Temporal Acceleration atau Genderang Perang terlalu lelah untuk merasakan manfaatnya. (Kronomansi)"
+        "description": "Mempercepat aliran waktu untuk sekutu kelompok atau raid dalam 40 yard, meningkatkan kecepatan serang, rapal, dan salur mereka sebesar 30% selama 15 dtk. Sekutu yang terkena tidak dapat memperoleh manfaat Percepatan Waktu, Genderang Perang, atau Paduan Suara Pencuri lagi selama 10 menit. (Kronomansi)"
       },
       "perfect_moment": {
         "name": "Momen Sempurna",
@@ -19089,7 +19107,7 @@ export const id_ID: EnTranslations = {
       },
       "arcane_surge": {
         "name": "Kekuatan Arkan",
-        "description": "Mengalirkan gelombang aether mentah melalui musuh untuk {damage} kerusakan. Setiap rapalan meninggalkan Muatan Arkan yang meningkatkan kerusakan dan kecepatan rapalan Aether Surge berikutmu (5% lebih cepat setiap muatan) namun meningkatkan biaya mana secara tajam, menumpuk hingga 4; Panah Aether menghabiskan muatan itu. Setiap rapalan juga dapat mengaktifkan Aether Rush, menjadikan Aether Surge berikutmu gratis dan dua kali lebih cepat."
+        "description": "Memberi {damage} kerusakan Arkana kepada musuh dan memberi Muatan Arkana, hingga 4, berlangsung 10 dtk dan disegarkan oleh setiap rapalan. Setiap Muatan Arkana membuat Kekuatan Arkan berikutnya memberi 30% lebih banyak kerusakan dan dirapal 5% lebih cepat, tetapi menggandakan biaya mananya. Panah Aether menghabiskan muatan. Setiap rapalan berpeluang 25% memberi Lesatan Aether: Kekuatan Arkan berikutnya dalam 15 dtk tanpa biaya mana dan dirapal dua kali lebih cepat."
       },
       "mind_sear": {
         "name": "Bakar Pikir",
@@ -19101,7 +19119,7 @@ export const id_ID: EnTranslations = {
       },
       "prayer_of_healing": {
         "name": "Penyembuhan Koor",
-        "description": "Menyembuhkan sekutu dalam 30 yard sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Mantra. (Suci)"
+        "description": "Menyembuhkan sekutu dalam 30 yard sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Penyembuhan. (Suci)"
       },
       "preparation": {
         "name": "Rencana Cadangan",
@@ -19133,7 +19151,7 @@ export const id_ID: EnTranslations = {
       },
       "smoke_screen": {
         "name": "Tabir Asap",
-        "description": "Kamu menghilang ke dalam kepulan asap, meningkatkan peluang menghindar sebesar 30% selama 8 dtk."
+        "description": "Menyelimuti dirimu dengan asap, menambah peluang menghindarmu 30% selama 8 dtk."
       },
       "sacrilegious_march": {
         "name": "Barisan Penodaan",
@@ -19149,44 +19167,44 @@ export const id_ID: EnTranslations = {
       },
       "skull_bash": {
         "name": "Hantaman Tengkorak",
-        "description": "Serudukan kepala yang menerjang, mengganggu perapalan mantra target dan mengunci aliran sihir itu selama 4 detik."
+        "description": "Hantaman Tengkorak mengenai target, menginterupsi mantra yang sedang dirapalnya dan mencegahnya merapal mantra dari aliran itu selama 4 dtk."
       },
       "spell_lock": {
         "name": "Sumpal Jurang",
-        "description": "Menginterupsi perapalan musuh dan mencegahnya merapal mantra dari aliran itu selama 4 dtk."
+        "description": "Menginterupsi rapalan mantra musuh dan mencegahnya merapal mantra dari aliran itu selama 4 dtk."
       },
       "thieves_chorus": {
         "name": "Paduan Suara Pencuri",
-        "description": "Sinyal siulan memacu kelompokmu: kecepatan serangan, rapalan, dan kanal meningkat 10% selama 10 detik. Sekutu yang baru saja terkena lonjakan percepatan kelompok terlalu lelah untuk mendapat manfaat. (talenta Rogue)"
+        "description": "Menambah kecepatan serang, rapal, dan salur sekutu kelompok atau raid dalam 30 yard sebesar 10% selama 10 dtk. Sekutu yang terkena tidak dapat memperoleh manfaat Paduan Suara Pencuri, Genderang Perang, atau Percepatan Waktu lagi selama 10 menit. (Bakat Penyamun)"
       },
       "tranquility": {
         "name": "Lagu Rimba",
-        "description": "Menyalurkan energi pemulihan selama 4 detik, memulihkan 42 sampai 52 nyawa sekutu dalam jarak 30 yard setiap detik. (talenta Druid)"
+        "description": "Menyalurkan energi pemulihan selama 4 dtk, menyembuhkan setiap sekutu dalam 30 yard dan dalam garis pandangmu, termasuk dirimu, sebesar {damage} setiap detik. (Bakat Druid)"
       },
       "venom_dart": {
         "name": "Damak Bisa",
         "description": "Melontarkan damak beracun sebesar {damage} kerusakan alam. Memberi 1 poin combo. Knifework: memperpanjang luka Koyak Bisa Anda 6 detik, hingga 20 detik.",
-        "specNote_assassination": "Menambah 1 Ritus Bisa dan memperpanjang luka bisamu selama 6 detik (luka itu tidak akan pernah melebihi 20 detik)."
+        "specNote_assassination": "Menambah 1 Ritus Bisa (maks 6), mengembalikan 15 energi, dan memperpanjang luka bisamu selama 6 dtk (luka tidak pernah melampaui 20 dtk)."
       },
       "body_blow": {
         "name": "Pukulan Tubuh",
-        "description": "Pukulan berat sebesar 130% kerusakan senjata plus 10 yang memberikan 2 poin combo dan memperdalam Redline satu tingkat. (mesin Thuggery)"
+        "description": "Pukulan berat sebesar {weaponPercent}% kerusakan senjata plus {damage} yang memberikan 2 poin combo dan memperdalam Redline satu tingkat (maks 4). (mesin Thuggery)"
       },
       "knockout_blow": {
         "name": "Pukulan Nokaut",
-        "description": "Akhiri Redline dengan nokaut: menghantam sebesar 45 plus 35 per poin combo, 25% lebih keras per tingkat Redline, dan memulihkan 25 energi. (mesin Thuggery)"
+        "description": "Mengakhiri Redline dengan nokaut: menyerang sebesar {damage} kerusakan Fisik, memukul 25% lebih keras untuk setiap Pukulan Tubuh yang kamu lancarkan selama Redline (hingga 3), dan memulihkan 25 energi. Kerusakan meningkat dengan Kekuatan Serangan. Gunakan sebelum Redline habis atau nokaut hilang. (Tempur)"
       },
       "veilstrike": {
         "name": "Hantaman Tabir",
-        "description": "Melahap simpanan Remang untuk menyelubungi dirimu dalam bayangan selama 6 detik: pembuka senyapmu bekerja di tempat terbuka dan kerusakanmu meningkat 25%. (mesin Skulduggery)"
+        "description": "Selama 6 dtk: pembuka Selubung Senjamu bekerja tanpa siluman dan dari sudut mana pun, dan kamu memberi 10% lebih banyak kerusakan. Serangan Penyergap pertamamu di dalamnya memberi 50% lebih banyak kerusakan senjata. (Kesamaran)"
       },
       "venomrend": {
         "name": "Koyak Bisa",
-        "description": "Melahap Ritual Bisa: menghantam sebesar 22 tambah 26 per poin combo, meledakkan sisa kerusakan pendarahanmu, dan memulihkan 25 energi. (mesin Knifework)"
+        "description": "Menghabiskan 6 Ritus Bisamu: menyerang sebesar {damage} kerusakan Fisik, seketika memberi semua kerusakan yang tersisa pada Kehabisan Darah, Kawat Leher, dan luka bisamu, lalu menerapkan luka bisa baru yang memberi {overTime} selama 20 dtk. Memulihkan 20 energi. (Pembunuhan)"
       },
       "typhoon": {
         "name": "Topan",
-        "description": "Hembusan angin melempar semua musuh dalam 8 meter sejauh 15 meter darimu dan membuat mereka linglung, memperlambat gerak sebesar 50% selama 4 dtk. Pemain musuh dilempar lurus melalui udara: jika melewati tepian, mereka terus melaju dan menerima kerusakan jatuh; jatuh yang mematikan dihitung sebagai pembunuhanmu."
+        "description": "Melempar setiap musuh dalam 8 yard dan dalam garis pandangmu hingga 15 yard darimu dan membuat mereka linglung, memperlambat gerak mereka 50% selama 4 dtk. Pemain musuh dilempar ke udara dalam garis lurus: jika terlempar dari tebing, mereka terus melaju dan menerima kerusakan jatuh, dan jatuh yang mematikan dihitung sebagai pembunuhanmu."
       },
       "voidfeast": {
         "name": "Santapan Kehampaan",
@@ -19198,11 +19216,11 @@ export const id_ID: EnTranslations = {
       },
       "scouring_mercy": {
         "name": "Belas Kasih Pembersih",
-        "description": "Memberi {damage} kerusakan Suci kepada musuh atau menyembuhkan sasaran sekutu sebesar {healing}. Kerusakan meningkat dengan kekuatan mantra; penyembuhan meningkat dengan kekuatan penyembuhan. Doktrin mengubah kerusakan ini menjadi penyembuhan lewat ikatanmu. Jika tidak ada anggota kelompok terikat yang terluka dalam 30 meter, sembuhkan anggota kelompok terluka dengan nyawa terendah dalam 30 meter sebesar 15% dari kerusakan. Menyembuhkan anggota kelompok juga menyembuhkan hingga 2 anggota kelompok terluka lainnya dalam 10 meter dari sasaran tersebut dan dalam garis pandangmu, masing-masing sebesar 50% dari nyawa yang dipulihkan. Penyembuhan tambahan ini tidak bisa kritis atau membuat ikatan Doktrin. (Ciri khas Doktrin)"
+        "description": "Memberi {damage} kerusakan Suci kepada musuh atau menyembuhkan target sekutu sebesar {healing}. Kerusakan meningkat dengan Kekuatan Mantra; penyembuhan meningkat dengan Kekuatan Penyembuhan. Disiplin menyembuhkan setiap anggota kelompok tertaut yang terluka dalam 30 yard sebesar 30% kerusakan yang diberikan (70% dengan Perjanjian Kembar). Jika tidak ada yang terluka, ia menyembuhkan anggota kelompok terluka dengan kesehatan terendah dalam 30 yard sebesar 15% kerusakan. Menyembuhkan anggota kelompok juga menyembuhkan hingga 2 anggota kelompok terluka lain dalam 10 yard dari target itu dan dalam garis pandangmu, masing-masing sebesar 50% kesehatan yang dipulihkan. Penyembuhan tambahan ini tidak bisa kritis atau membuat tautan Disiplin. (Ciri khas Disiplin)"
       },
       "seraphic_vigil": {
         "name": "Jaga Serafik",
-        "description": "Melindungi satu sekutu selama 30 dtk. Pukulan pertama yang membuatnya turun di bawah 35% nyawa menghabiskan Jaga dan menyembuhkannya sebesar {buff}. (Ciri khas Berkat)"
+        "description": "Melindungi satu sekutu selama 30 dtk. Pukulan pertama yang membuat kesehatannya di bawah 35% menghabiskan Jaga dan menyembuhkannya sebesar {buff}. Merapalnya pada sekutu lain memindahkan Jaga-mu. (Ciri khas Suci)"
       },
       "summon_tithefiend": {
         "name": "Panggil Iblis Persepuluhan",
@@ -19218,16 +19236,16 @@ export const id_ID: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Paduan Suara Pembebasan",
-        "description": "Merapal selama 6 dtk, menyembuhkan anggota grup dalam radius 30 meter sebesar {damage} setiap 2 dtk. Penyembuhan meningkat dengan kekuatan mantra.",
-        "specNote_shadow": "Selama 15 dtk, bagikan 20% kesehatan yang hilang dari musuh akibat kerusakan Bayanganmu sebagai pemulihan kepada anggota party yang terluka dalam 30 yard, termasuk dirimu. Dalam raid, hanya subgrupmu yang dipulihkan. Dirapal seketika dan kamu dapat terus menyerang dalam Selubung Senja. Kerusakan yang diserap dan yang melampaui sisa kesehatan tidak menambah pemulihan."
+        "description": "Merapal selama 6 dtk, menyembuhkan dirimu dan setiap target sekutu dalam radius 30 meter serta dalam garis pandangmu sebesar {damage} setiap 2 dtk. Penyembuhan meningkat dengan Kekuatan Penyembuhan.",
+        "specNote_shadow": "Selama 15 dtk, bagikan 20% kesehatan yang hilang dari musuh akibat kerusakan Bayanganmu sebagai penyembuhan di antara anggota party yang terluka dalam 30 yard, termasuk dirimu. Dalam raid, hanya subgrupmu yang disembuhkan. Dirapal seketika dan terus menyerang dalam Selubung Senja. Kerusakan yang diserap dan kelebihan kerusakan tidak menambah penyembuhan."
       },
       "bear_charge": {
         "name": "Terjangan Bruin",
-        "description": "Menerjang musuh, menghasilkan 9 amarah dan menyetrumnya selama 1 detik. Selama 3 detik setelahnya, Wujud Kucing gratis dan menjepit target, memperlambatnya 50% selama 4 detik. Jangkauan 8-25 yard. Hanya dalam Wujud Bruin."
+        "description": "Berubah ke Wujud Bruin jika belum, lalu menerjang musuh, menghasilkan 9 amukan dan menyetrumnya selama 1 dtk. Selama 3 dtk setelah terjangan berakhir (atau sampai kamu keluar dari pertempuran atau target mati), Wujud Kucing gratis dan Menjepit target yang diterjang, memperlambatnya 50% selama 4 dtk. Dapat digunakan dalam wujud apa pun."
       },
       "demoralizing_roar": {
         "name": "Auman Pengecut",
-        "description": "Melemahkan semangat musuh di sekitar, mengurangi kekuatan serang mereka sebesar 20 selama 20 detik. Hanya dalam Wujud Bruin."
+        "description": "Melemahkan semangat setiap musuh dalam 8 yard, mengurangi kekuatan serang mereka sebesar {buff} selama 20 dtk. Hanya dalam Wujud Bruin."
       },
       "prowl": {
         "name": "Mengintai",

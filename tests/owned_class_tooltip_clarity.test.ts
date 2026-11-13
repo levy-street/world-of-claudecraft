@@ -71,19 +71,21 @@ describe('owned-class English tooltip clarity', () => {
       wing_clip: /Attack Power/,
       volley: /Ranged Attack Power/,
       lightning_bolt: /Spell Power/,
-      healing_wave: /Spell Power/,
+      // Heals scale with the Healing Power stat (Spell Power plus gear healing).
+      healing_wave: /Healing Power/,
       earth_shock: /Spell Power/,
       flame_shock: /Spell Power/,
       frost_shock: /Spell Power/,
       smite: /Spell Power/,
-      lesser_heal: /Spell Power/,
+      // Priest heals read p.healPower too, so they name Healing Power.
+      lesser_heal: /Healing Power/,
       shadow_word_pain: /Spell Power/,
-      renew: /Spell Power/,
-      heal: /Spell Power/,
+      renew: /Healing Power/,
+      heal: /Healing Power/,
       mind_flay: /Spell Power/,
-      flash_heal: /Spell Power/,
-      prayer_of_healing: /Spell Power/,
-      choir_of_deliverance: /Spell Power/,
+      flash_heal: /Healing Power/,
+      prayer_of_healing: /Healing Power/,
+      choir_of_deliverance: /Healing Power/,
     };
     const failures = Object.entries(scalingCopy)
       .filter(([id, pattern]) => !pattern.test(ABILITIES[id]?.description ?? ''))

@@ -4,10 +4,13 @@ import { computeTalentModifiers, emptyAllocation } from '../src/sim/content/tale
 import { type ResolvedAbility, Sim } from '../src/sim/sim';
 import { Hud } from '../src/ui/hud';
 import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
+import { TooltipDetailKey } from '../src/ui/tooltip_detail_key';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 interface AbilityTooltipHarness {
   sim: Sim;
+  tooltipDetailKey: TooltipDetailKey;
+  isMobileLayout(): boolean;
   abilityTooltip(res: ResolvedAbility): string;
 }
 
@@ -19,6 +22,10 @@ function tooltipHarness(): AbilityTooltipHarness {
     autoEquip: false,
     world: EMPTY_TEST_WORLD,
   });
+  // The prototype harness skips the constructor: seed the two fields the
+  // tooltip's Shift-detail mode reads (desktop layout, Shift up).
+  hud.tooltipDetailKey = new TooltipDetailKey();
+  hud.isMobileLayout = () => false;
   hud.sim.setPlayerLevel(20);
   expect(hud.sim.setSpec('affliction')).toBe(true);
   return hud;

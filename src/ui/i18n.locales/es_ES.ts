@@ -208,25 +208,25 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.greater_invisibility.name': 'Invisibilidad mejorada',
   'entities.abilities.hot_streak.name': 'Racha ardiente',
   'entities.abilities.hot_streak.description':
-    'Pasivo: dos críticos consecutivos de tus hechizos de Fuego (Bola de Fuego, Explosión de Fuego, Agostar, Piroexplosión o Fogonazo) convierten tu siguiente Piroexplosión o Fogonazo en un lanzamiento instantáneo y sin coste. Los hechizos que gastan el efecto aportan a la racha SIGUIENTE, también si son gratuitos; Fogonazo aporta una sola vez, aunque alcance a varios enemigos, y únicamente puede aportar el primer impacto. (Fuego)',
+    'Pasivo: dos críticos consecutivos de Descarga de Ascuas, Lluvia de Ascuas, Escaldar, Lanza Ígnea, Llamarada o Aliento de Dragón convierten tu siguiente Lanza Ígnea o Llamarada de los próximos 12 s en un lanzamiento instantáneo y sin coste. Un impacto no crítico de uno de esos hechizos reinicia la cuenta, y un primer crítico se recuerda durante 10 s. Lanza Ígnea y Llamarada aportan a la siguiente racha, también los lanzamientos gratuitos. Llamarada y Aliento de Dragón aportan una sola vez por lanzamiento, aunque alcancen a varios enemigos, y únicamente cuenta el impacto inicial. (Fuego)',
   'entities.abilities.ice_floes.name': 'Hielos flotantes',
   'entities.abilities.ice_floes.description':
     'Puedes lanzar en movimiento tus dos siguientes hechizos que tengan tiempo de lanzamiento. Permanece 15 s. (Talento de mago)',
   'entities.abilities.ignition.name': 'Combustión',
   'entities.abilities.ignition.description':
-    'Pasivo: los críticos de tus hechizos prenden al objetivo y le infligen un 40% del daño causado a lo largo de 6 s; el efecto se acumula. (Maestría de Fuego)',
+    'Pasivo: cuando tus hechizos de Fuego asestan un golpe crítico, el objetivo arde y sufre un 1,5% adicional del daño infligido por nivel de personaje (un 30% en el nivel 20) a lo largo de 6 s. Una nueva quemadura sobre un objetivo que ya está ardiendo se suma al daño pendiente y reinicia el temporizador de 6 s. (Maestría de Fuego)',
   'entities.abilities.mass_barrier.name': 'Barrera colectiva',
   'entities.abilities.mass_barrier.description':
     'Otorga un escudo a ti y a un máximo de 4 aliados cercanos en 30 m; cada uno absorbe {damage} de daño durante 15 s. (Talento de mago)',
   'entities.abilities.overload.name': 'Potenciación',
   'entities.abilities.overload.description':
-    'Potencia tu siguiente hechizo un 40%, pero aumenta su coste de maná un 50%. Permanece 10 s. (Talento de mago)',
+    'Los valores base de daño, sanación y absorción de tu siguiente hechizo que cueste maná aumentan un 40%, pero cuesta un 50% más de maná. La bonificación del poder con hechizos no aumenta. Permanece 10 s. (Talento de mago)',
   'entities.abilities.power_echo.name': 'Eco de potencia',
   'entities.abilities.power_echo.description':
-    'Tu siguiente hechizo directo vuelve a actuar con un 50% de potencia sobre el mismo objetivo. Permanece 10 s. (Talento de mago)',
+    'Tu siguiente hechizo de daño directo o sanación a un único objetivo se repite sobre el mismo objetivo por el 50% de la cantidad que infligió o sanó. Permanece 10 s. (Talento de mago)',
   'entities.abilities.rings_of_frost.name': 'Círculo de Escarcha',
   'entities.abilities.rings_of_frost.description':
-    'Crea un círculo durante 10 s. Los enemigos que atraviesan el borde quedan congelados durante 4 s. (Talento de mago)',
+    'Crea un círculo de escarcha en la ubicación objetivo durante 10 s. Un enemigo que atraviese el círculo queda inmovilizado durante 4 s; cada enemigo solo puede activarlo una vez. El centro del círculo es una zona segura. (Talento de mago)',
   'entities.abilities.rune_of_power.name': 'Runa de potencia',
   'entities.abilities.rune_of_power.description':
     'Traza una runa de potencia bajo tus pies durante 15 s: los aliados situados a menos de 8 m infligen un 10% más de daño. (Talento de mago)',
@@ -401,22 +401,23 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.specNote_feral':
     'Cada golpe que conecta añade 1 de Sangre Antigua (máx. 3).',
   'entities.abilities.cold_blood.description':
-    'Concentra tu instinto asesino para que tus próximos 5 ataques sean golpes críticos. (motor de Knifework)',
+    'Tus próximos 5 ataques en los siguientes {duration} s son golpes críticos garantizados. Los ataques automáticos también gastan una carga. (motor de Asesinato)',
   'entities.abilities.dark_pact.description':
     'Sacrifica un 10% de tu salud actual para absorber una cantidad de daño equivalente al 30% de tu salud máxima durante 8 s.',
   'entities.abilities.dark_pact.name': 'Sanguine Covenant',
   'entities.abilities.elemental_trance.description':
     'Entra en un trance elemental durante 15 s, reduciendo el daño recibido un 30% y convirtiendo el 20% de todo el daño que infliges en maná. (habilidad distintiva de Espíritu Guerrero)',
   'entities.abilities.elemental_trance.name': 'Elemental Trance',
-  'entities.abilities.eviscerate.description': 'Movimiento de remate que inflige {damage}.',
+  'entities.abilities.eviscerate.description':
+    'Movimiento de remate que inflige {damage} de daño Físico. El daño aumenta con el poder de ataque.',
   'entities.abilities.eviscerate.specNote_assassination':
     'Con 6 de Ritual de Veneno, este botón se convierte en Desgarraveneno: un golpe que inflige al instante todo el daño que tus sangrados aún habrían infligido, planta una herida nueva de Desgarro venenoso y restaura 20 de energía.',
   'entities.abilities.eviscerate.specNote_combat':
-    'Conectar esto con 4 o más puntos de combo inicia la Redline durante 8 s: Tajo Perverso se convierte en Golpe al cuerpo y este botón se convierte en Golpe de nocaut (45 más 35 por punto de combo, un 25% más fuerte por cada nivel de la Redline, restaura 25 de energía). Gástalo antes de que termine la Redline.',
+    'Conectar esto con 4 o más puntos de combo inicia la Redline durante 8 s: Tajo Perverso se convierte en Golpe al cuerpo y este botón se convierte en Golpe de nocaut (un remate que golpea un 25% más fuerte por cada Golpe al cuerpo que lances durante la Redline y restaura 25 de energía). Gástalo antes de que termine la Redline.',
   'entities.abilities.expose_armor.description':
     'Movimiento de remate que expone al objetivo durante 30 s: cada punto de combo gastado reduce su armadura un 2% (5 puntos de combo: {damage}%).',
   'entities.abilities.ferocious_bite.description':
-    'Movimiento de remate que inflige {damage}. Solo en Forma de lobo.',
+    'Movimiento de remate que inflige {damage} de daño Físico. Solo en Forma felina.',
   'entities.abilities.ferocious_bite.specNote_feral':
     'Cada golpe que conecta añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Cosecha Roja, que consume la Sangre Antigua para un golpe más fuerte que también inflige al instante todo el daño que tus Desollar y Desgarrar aún habrían infligido, y restaura energía.',
   'entities.abilities.garrote.description':
@@ -424,23 +425,21 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.garrote.specNote_subtlety':
     'Usado desde el Velo Crepuscular, esto añade 1 de Penumbra (máx. 3). Con 3 de Penumbra puedes usarlo SIN sigilo: ese uso no cuesta nada, gasta los 3 de Penumbra e inicia el velo de sombras de 6 s.',
   'entities.abilities.hemorrhage.description':
-    'Golpea al enemigo por daño de arma más {damage}, causa daño de sangrado durante 12 s y aumenta el daño de sangrado recibido un 40%. Otorga 1 punto de combo. Cada segundo uso añade 1 de Penumbra (máx. 3). (motor de Skulduggery)',
+    'Golpea al enemigo por daño de arma más {damage} y lo hace sangrar por {overTime} durante 12 s. Durante 12 s, todos los sangrados sobre el objetivo infligen un 40% más de daño. Otorga 1 punto de combo. Cada 2.º uso añade 1 de Penumbra (máx. 3). (motor de Sutileza)',
   'entities.abilities.kidney_shot.description':
     'Movimiento de remate que aturde al objetivo durante 2 s más 1 s por punto de combo (5 puntos de combo: 7 s).',
-  'entities.abilities.maul.description':
-    'Un ataque brutal que aumenta el daño cuerpo a cuerpo en {damage} y causa una gran cantidad de amenaza. Se activa en tu siguiente golpe. Solo en forma de Bruin.',
   'entities.abilities.maul.specNote_feral':
-    'Cada golpe que conecta añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Quiebramédula: un golpe de 78 a 96 de daño con mucha amenaza; por debajo de la mitad de salud, en su lugar te sana el equivalente al 18% de tu salud máxima y te devuelve 15 de ira.',
+    'Cada golpe que conecta añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Quiebramédula: un golpe contundente con mucha amenaza; por debajo de la mitad de salud, en su lugar te sana el equivalente al 18% de tu salud máxima y te devuelve 15 de ira.',
   'entities.abilities.ossuary_mark.description':
-    'Marca a un enemigo durante 15 s, almacenando el 20% del daño que tú y tus no muertos infligís. Vuelve a lanzarla para detonarla. Si el enemigo marcado muere, explota en un radio de 6 yardas y crea 1 Fragmento de alma.',
+    'Marca a un enemigo durante 15 s, almacenando el 20% del daño que tú y tus no muertos le infligís. Vuelve a lanzarla para detonarla antes de tiempo: el enemigo sufre el daño almacenado como daño de Sombras y te sanas el 25% de él. Cuando la marca expira, detona sin la sanación. Si el enemigo marcado muere, el daño almacenado golpea a otros enemigos en un radio de 6 yardas y obtienes 1 Fragmento de alma.',
   'entities.abilities.ossuary_mark.name': 'Ossuary Mark',
   'entities.abilities.rake.specNote_feral':
     'Cada golpe que conecta añade 1 de Sangre Antigua (máx. 3).',
   'entities.abilities.regrowth.description':
-    'Sana a un objetivo amistoso por {damage} y una cantidad adicional durante 15 s. Si el efecto dura todo su tiempo, vuelve a sanar al objetivo por la misma cantidad que la sanación inicial.',
+    'Sana a un objetivo amistoso por {damage} y después por {overTime} más durante 15 s. Si la sanación periódica dura todo su tiempo, vuelve a sanar al objetivo una vez más por la cantidad de la primera sanación (antes de cualquier bonificación de crítico). Terminarla antes de tiempo, por ejemplo con Alivio presto, Sobrefloración o volviendo a lanzarla, omite esa sanación.',
   'entities.abilities.rejuvenation.description': 'Sana al objetivo por {damage} durante 12 s.',
   'entities.abilities.rip.description':
-    'Movimiento de remate que hace sangrar al objetivo cada 2 s durante 24 s: 36 de daño más 24 por punto de combo gastado (5 puntos de combo: {damage} en total). Solo en Forma de lobo.',
+    'Movimiento de remate que hace sangrar al objetivo cada 2 s durante 24 s e inflige más daño por cada punto de combo gastado (5 puntos de combo: {damage} en total). Solo en Forma de lobo.',
   'entities.abilities.ruinous_brand.description':
     'Marca a un enemigo durante 15 s. Tus próximos 3 hechizos directos hacen eco por un 25% de daño contra el enemigo marcado, o copian un 50% de daño hacia él cuando se lanzan contra otro objetivo.',
   'entities.abilities.ruinous_brand.name': 'Ruinous Brand',
@@ -450,11 +449,11 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
     'Aumenta la velocidad de movimiento un 35%, pero sacrifica un 2% de tu salud máxima cada segundo. Vuelve a lanzarlo para cancelarlo. Se desactiva al llegar al 20% de salud.',
   'entities.abilities.sacrilegious_march.name': 'Sacrilegious March',
   'entities.abilities.sinister_strike.specNote_combat':
-    'Mientras la Redline está activa, este botón se convierte en Golpe al cuerpo: 130% de daño de arma más 10, otorga 2 puntos de combo y añade 1 de Redline (máx. 4).',
+    'Mientras la Redline está activa, este botón se convierte en Golpe al cuerpo: un golpe de arma más fuerte que otorga 2 puntos de combo y añade 1 de Redline (máx. 4).',
   'entities.abilities.slice_and_dice.description':
     'Movimiento de remate que aumenta la velocidad de ataque cuerpo a cuerpo un 30% durante 12 s más 4 s por punto de combo (5 puntos de combo: 32 s).',
   'entities.abilities.soul_lance.description':
-    'Lanza una lanza espectral que inflige {damage} de daño de las Sombras. Contra tu Ossuary Mark, el 50% de su daño se añade a la marca.',
+    'Lanza una lanza espectral que inflige {damage} de daño de las Sombras. Contra tu Ossuary Mark, la marca almacena el 70% de su daño en lugar del 20%.',
   'entities.abilities.soul_lance.name': 'Soul Lance',
   'entities.abilities.soulwell.description':
     'Invoca un Soulwell durante 3 min. Mientras estén fuera de combate, los miembros del grupo pueden recargar sus Piedras de alma hasta 3. Una Piedra de alma restaura el 25% de la salud máxima y comparte el tiempo de reutilización de las pociones.',
@@ -462,17 +461,17 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.description':
     'Hace caer un rayo de fuego estelar que causa {damage} de daño Arcano.',
   'entities.abilities.starfire.specNote_balance':
-    'En Forma de lechúcico lunar, cada lanzamiento completado añade 1 de Marea Lunar (máx. 3). Con 3 de Marea Lunar, este botón se convierte en Estela Solar: un golpe instantáneo de 80 a 100 de daño de Naturaleza más una quemadura de 45 a lo largo de 9 s, que restaura 35 de maná y gasta los 3.',
+    'En Forma de lechúcico lunar, cada lanzamiento completado añade 1 de Marea Lunar (máx. 3). Con 3 de Marea Lunar, este botón se convierte en Estela Solar: un golpe de Naturaleza instantáneo más una quemadura a lo largo de 9 s, que restaura 35 de maná y gasta los 3.',
   'entities.abilities.stealth.description':
-    'Te oculta entre las sombras: los enemigos apenas te perciben y te mueves a velocidad completa. Atacar o recibir daño rompe el Velo Crepuscular. Vuelve a lanzarlo para salir de él.',
+    'Te ocultas entre las sombras. Los jugadores y las mascotas enemigos no pueden verte, y los monstruos solo te notan desde mucho más cerca de lo normal (desde más lejos si te superan en nivel). Te mueves a velocidad completa. Atacar o recibir daño rompe el Velo Crepuscular. Vuelve a lanzarlo para salir de él.',
   'entities.abilities.swiftmend.description':
     'Consume un efecto de sanación periódica en un objetivo amistoso para sanarlo por {damage}. Cada lanzamiento de Sporemending, Segundo Florecer y Cura Silvestre añade 1 de Verdor; con 3 de Verdor este botón se convierte en Sobrefloración, que sana al instante a todos los aliados que lleven tus efectos de sanación periódica por el 60% de su sanación restante. (habilidad distintiva de Restauración)',
   'entities.abilities.swipe.description':
-    'Barre con tus garras a los enemigos cercanos infligiendo {damage} de daño. Causa amenaza adicional. Solo en forma de Bruin.',
+    'Barre con tus garras a todos los enemigos a menos de 5 m infligiendo {damage} de daño a cada uno, y genera un 75% más de amenaza que el daño infligido. Solo en Forma de Bruin.',
   'entities.abilities.swipe.specNote_feral':
     'Cada golpe que conecta añade 1 de Sangre Antigua (máx. 3).',
   'entities.abilities.venom_dart.specNote_assassination':
-    'Añade 1 de Ritual de Veneno y prolonga tu herida de Desgarro venenoso 6 s (nunca supera los 20 s).',
+    'Añade 1 de Ritual de Veneno (máx. 6), reembolsa 15 de energía y prolonga 6 s tu herida de veneno (la herida nunca supera los 20 s).',
   'entities.items.soul_stone.name': 'Piedra de alma',
   'hud.pet.abyssalChainDesc':
     'Ordena a tu Duskmurk que arrastre a un enemigo normal de más de 8 m y hasta 20 m de vuelta hacia sí. Los jefes no pueden ser arrastrados. Tiempo de reutilización: 15 segundos. Haz clic con el botón derecho, mantén la pulsación táctil, o pulsa Mayús+Intro para alternar el lanzamiento automático.',
@@ -535,5 +534,5 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bear_trap.description':
     'Coloca una trampa en la ubicación seleccionada. Se arma tras 0,75 s y dura 1 min; solo tú y tu grupo podéis verla. El primer enemigo que la active sangra por {damage} de daño Físico durante 15 s y queda ralentizado un 50% durante 4 s. El daño aumenta con el poder de ataque a distancia. Solo puede haber una Trampa para Osos activa a la vez. Puede coexistir con tu Trampa Fauces de Escarcha. Colocar otra Trampa para Osos reemplaza la anterior.',
   'entities.abilities.frostjaw_trap.description':
-    'Coloca una trampa en la ubicación seleccionada. Se arma tras 0,75 s y dura 1 min, y solo tú y tu grupo podéis verla. El primer enemigo que la active queda inmovilizado durante 3 s, y los enemigos a menos de 4 metros quedan ralentizados un 50% durante 4 s.',
+    'Coloca una trampa en la ubicación seleccionada. Se arma tras 0,75 s y dura 1 min, y solo vosotros y tu grupo podéis verla. El primer enemigo que la active queda inmovilizado durante 3 s, y los enemigos a menos de 4 metros quedan ralentizados un 50% durante 4 s. Solo puede haber una Trampa Fauces de Escarcha activa a la vez. Colocar otra la sustituye.',
 };

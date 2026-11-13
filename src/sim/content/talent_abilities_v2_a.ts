@@ -117,7 +117,7 @@ export const TALENT_ABILITIES_V2_A = {
     requiresTarget: false,
     school: 'physical',
     effects: [{ type: 'selfBuff', kind: 'buff_dodge', value: 0.3, duration: 8 }],
-    description: 'Vanish into a cloud of smoke, increasing your chance to dodge by 30% for 8 sec.',
+    description: 'Surround yourself with smoke, increasing your dodge chance by 30% for 8 sec.',
   },
   flurry_of_knives: {
     id: 'flurry_of_knives',
@@ -161,7 +161,7 @@ export const TALENT_ABILITIES_V2_A = {
       },
     ],
     description:
-      'A whistled signal spurs your group on, increasing attack, casting, and channeling speed by 10% for 10 sec. Allies recently affected by a group haste burst are too exhausted to benefit. (Rogue talent)',
+      "Increase the attack, casting, and channeling speed of group or raid allies within 30 yards by 10% for 10 sec. Affected allies cannot benefit from Thieves' Chorus, Storm Chorus, or Temporal Acceleration again for 10 min. (Rogue talent)",
   },
   venomrend: {
     id: 'venomrend',
@@ -195,7 +195,7 @@ export const TALENT_ABILITIES_V2_A = {
       { type: 'gainResource', amount: 20 },
     ],
     description:
-      'Spends your 6 Venom Ritual: strike for 100 plus 55 per combo point, instantly deal all the damage your bleeds would still have dealt, then apply a fresh venom wound (120 damage over 20 sec). Restores 20 energy. (Knifework)',
+      'Spends your 6 Venom Ritual: strike for $d Physical damage, instantly deal all the damage left on your Bleed Out, Throat Wire, and venom wound, then apply a fresh venom wound that deals $o over 20 sec. Restores 20 energy. (Knifework)',
   },
   body_blow: {
     id: 'body_blow',
@@ -214,7 +214,7 @@ export const TALENT_ABILITIES_V2_A = {
     // run by one pip (rogueEngineOnCast), feeding the Knockout cash-out.
     effects: [{ type: 'weaponStrike', bonus: 10, weaponMult: 1.3, normalized: true }],
     description:
-      'A heavy blow for 130% weapon damage plus 10. Awards 2 combo points and adds 1 Redline (max 4). (Thuggery)',
+      'A heavy blow for 130% weapon damage plus $d. Awards 2 combo points and adds 1 Redline (max 4). (Thuggery)',
   },
   knockout_blow: {
     id: 'knockout_blow',
@@ -237,7 +237,7 @@ export const TALENT_ABILITIES_V2_A = {
       { type: 'gainResource', amount: 25 },
     ],
     description:
-      'Ends Redline with a knockout: strike for 45 plus 35 per combo point, hitting 25% harder for each Redline you built, and recover 25 energy. Use it before Redline runs out or the knockout is lost. (Thuggery)',
+      'Ends Redline with a knockout: strike for $d Physical damage, hitting 25% harder for each Haymaker you threw during Redline (up to 3), and recover 25 energy. Damage increases with Attack Power. Use it before Redline runs out or the knockout is lost. (Thuggery)',
   },
   veilstrike: {
     id: 'veilstrike',
@@ -258,7 +258,7 @@ export const TALENT_ABILITIES_V2_A = {
     // and the Veiled Edge is applied by the same engine hook.
     effects: [{ type: 'selfBuff', kind: 'buff_dmg_done', value: 0.1, duration: 6 }],
     description:
-      "For 6 sec: your Duskveil openers work without stealth and from any angle, you deal 10% more damage, and your first Lurker's Strike inside it hits for double. (Skulduggery)",
+      "For 6 sec: your Duskveil openers work without stealth and from any angle, and you deal 10% more damage. Your first Lurker's Strike inside it deals 50% more weapon damage. (Skulduggery)",
   },
   preparation: {
     id: 'preparation',
@@ -422,7 +422,7 @@ export const TALENT_ABILITIES_V2_A = {
       },
     ],
     description:
-      'Heal allies within 30 yards for $d. Healing increases with Spell Power. (Benison)',
+      'Heal allies within 30 yards for $d. Healing increases with Healing Power. (Benison)',
   },
   mind_sear: {
     id: 'mind_sear',
@@ -455,7 +455,8 @@ export const TALENT_ABILITIES_V2_A = {
     requiresTarget: true,
     targetType: 'friendly',
     effects: [{ type: 'hot', total: 120, duration: 12, interval: 3 }],
-    description: 'Restores 120 health to a friendly target over 12 sec. (Shaman talent)',
+    description:
+      'Heal a friendly target for $d over 12 sec, once every 3 sec. Healing increases with Healing Power. (Shaman talent)',
   },
   chain_lightning: {
     id: 'chain_lightning',
@@ -513,7 +514,7 @@ export const TALENT_ABILITIES_V2_A = {
     targetType: 'friendly',
     effects: [],
     description:
-      'Protects one ally for 60 sec with 6 charges. Damage consumes a charge to heal 5% maximum health, once every 3 sec. (Shaman talent)',
+      'Ward one ally for 60 sec. When they take damage, a charge heals them for 5% of their maximum health, at most once every 3 sec, for up to 6 charges. Only one ally can hold your Stoneward at a time. (Shaman talent)',
   },
   primal_exaltation: {
     id: 'primal_exaltation',
@@ -557,6 +558,6 @@ export const TALENT_ABILITIES_V2_A = {
       },
     ],
     description:
-      'Increase the attack, casting, and channeling speed of group or raid allies within 30 yards by 30% for 15 sec. Affected allies cannot benefit from Storm Chorus or Temporal Acceleration again for 10 min. (Shaman talent)',
+      "Increase the attack, casting, and channeling speed of group or raid allies within 30 yards by 30% for 15 sec. Affected allies cannot benefit from Storm Chorus, Thieves' Chorus, or Temporal Acceleration again for 10 min. (Shaman talent)",
   },
 } satisfies Record<string, AbilityDef>;

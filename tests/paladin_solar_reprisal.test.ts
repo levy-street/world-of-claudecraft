@@ -73,7 +73,9 @@ describe('Protection Paladin Solar Reprisal', () => {
     expect(ABILITIES.vowkeeper_strike.description).toContain('20% chance');
     expect(ABILITIES.vowkeeper_strike.description).toContain('25% chance');
     expect(ABILITIES.sunward_disc.description).toContain('deal 20% more damage');
-    expect(ABILITIES.hammer_of_grace.description).toContain('heal you for 100% of damage dealt');
+    expect(ABILITIES.hammer_of_grace.description).toContain(
+      'heal you for 100% of the damage dealt',
+    );
     expect(ABILITIES.holy_light.description).toContain(
       'Radiant Resonance or Solar Reprisal makes it instant',
     );

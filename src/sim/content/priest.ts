@@ -108,7 +108,7 @@ export const PRIEST_ABILITIES: Record<string, AbilityDef> = {
       { type: 'heal', min: 130, max: 155 },
     ],
     description:
-      'Deal $d Holy damage to an enemy or heal a friendly target for $h. Damage increases with Spell Power; healing increases with Healing Power. Doctrine converts this damage into healing through your links. If no injured linked group member is within 30 yards, heal the lowest-health injured group member within 30 yards for 15% of the damage. Healing a group member also heals up to 2 other injured group members within 10 yards of that target and in your line of sight, each for 50% of the health restored. These extra heals cannot critically heal or create Doctrine links. (Doctrine signature)',
+      'Deal $d Holy damage to an enemy or heal a friendly target for $h. Damage increases with Spell Power; healing increases with Healing Power. Doctrine heals each injured linked group member within 30 yards for 30% of the damage dealt (70% with Twin Covenant). If none is injured, it heals the lowest-health injured group member within 30 yards for 15% of the damage instead. Healing a group member also heals up to 2 other injured group members within 10 yards of that target and in your line of sight, each for 50% of the health restored. These extra heals cannot critically heal or create Doctrine links. (Doctrine signature)',
   },
   seraphic_vigil: {
     id: 'seraphic_vigil',
@@ -125,7 +125,7 @@ export const PRIEST_ABILITIES: Record<string, AbilityDef> = {
     targetType: 'friendly',
     effects: [{ type: 'buffTarget', kind: 'heal_echo', value: 180, duration: 30 }],
     description:
-      'Protect one ally for 30 sec. The first hit that leaves them below 35% health consumes the Vigil and heals them for $b. (Benison signature)',
+      'Protect one ally for 30 sec. The first hit that leaves them below 35% health consumes the Vigil and heals them for $b. Casting it on another ally moves your Vigil. (Benison signature)',
   },
   summon_tithefiend: {
     id: 'summon_tithefiend',
@@ -178,10 +178,10 @@ export const PRIEST_ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'aoeHeal', min: 90, max: 110, radius: 30 }],
     description:
-      'Channel for 6 sec, healing party members within 30 yards for $d every 2 sec. Healing increases with Spell Power.',
+      'Channel for 6 sec, healing you and every friendly target within 30 yards and in your line of sight for $d every 2 sec. Healing increases with Healing Power.',
     specNotes: {
       shadow:
-        'For 15 sec, share 20% of the health enemies lose to your Shadow damage as healing among injured party members within 30 yards, including yourself. In raids, only your subgroup is healed. Cast instantly and keep attacking in Shadowform. Absorbed damage and overkill do not add healing.',
+        'For 15 sec, share 20% of the health enemies lose to your Shadow damage as healing among injured party members within 30 yards, including yourself. In raids, only your subgroup is healed. Cast instantly and keep attacking in Gloamveil. Absorbed damage and overkill do not add healing.',
     },
   },
   // Both healer specs share the out-of-combat group resurrection.

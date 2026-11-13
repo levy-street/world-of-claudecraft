@@ -1210,6 +1210,30 @@ export const hudChromeStrings = {
     ascensionLastAnnouncement: 'Ascension final charge',
     ascensionSpenderAria: 'Action slot {slot}: {ability}. Consumes one Ascension charge.',
   },
+  // The Shift-held ability tooltip detail block (src/ui/ability_tooltip_detail_core.ts).
+  abilityTooltipDetail: {
+    // Shown on desktop under an ability tooltip that has a detail block.
+    hint: 'Hold Shift for details',
+    school: 'School: {school}',
+    // {bonus} is the amount the description's (+N) adds; {value} is the
+    // character's current rating in {stat}.
+    scaling: 'Includes +{bonus} from your {stat} ({value})',
+    stat: {
+      spellPower: 'Spell Power',
+      healPower: 'Healing Power',
+      attackPower: 'Attack Power',
+      rangedPower: 'Ranged Attack Power',
+    },
+    ticks: '{ticks} ticks, one every {interval} sec over {duration} sec',
+    radius: 'Radius: {radius} yd',
+    charges: 'Charges: {charges}',
+    castWhileMoving: 'Can be cast while moving',
+    pushbackImmune: 'Taking damage does not delay this cast',
+    // The ability's own multiplier on the threat its damage causes; stance and
+    // aura threat modifiers apply on top.
+    threatMult: 'Ability threat modifier: {percent}%',
+    threatFlat: 'Bonus threat: +{threat}',
+  },
   // The Spell Power / Attack Power contribution appended to an ability tooltip's
   // base damage, e.g. "66 to 74 (+29)". Punctuation + a formatted number only (no
   // words), so it is locale-neutral and an English-only add.

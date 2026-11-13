@@ -64,7 +64,10 @@ describe("Retribution Paladin Dawn's Wrath", () => {
     expect(DAWNS_WRATH_DAMAGE_MULT).toBe(1.2);
     expect(ABILITIES.final_edict.description).toContain('15% chance');
     expect(ABILITIES.final_edict.description).toContain("Dawn's Wrath");
-    expect(ABILITIES.hammer_of_wrath.description).toContain('additional cast');
+    expect(ABILITIES.hammer_of_wrath.description).toContain(
+      "unless Divine Ascension, Zealwing, or Dawn's Wrath",
+    );
+    expect(ABILITIES.hammer_of_wrath.description).toContain('ignores the cooldown');
     expect(ABILITIES.hammer_of_wrath.description).toContain('20% more damage');
   });
 

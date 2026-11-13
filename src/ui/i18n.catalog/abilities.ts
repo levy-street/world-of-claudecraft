@@ -166,12 +166,12 @@ const classAbilityNamesEn = {
       [
         'flamestrike',
         'Flamestrike',
-        'Calls down a burst of flame at the target area, dealing {damage} Fire damage to enemies caught in the blast.',
+        'Calls down a burst of flame at the target area, dealing {damage} Fire damage to each enemy caught in the blast. One critical strike roll covers the whole blast: every enemy is hit by a critical strike, or none are.',
       ],
       [
         'rain_of_fire',
         'Rain of Fire',
-        'Spends 3 Wrack to rain fire over the target area for {damage} Fire damage each second for 4 sec, increasing to 6 sec at rank 2. Desolation calls down the first wave immediately.',
+        'Spends 3 Wrack to rain fire on the target area, dealing {damage} Fire damage to enemies inside each second for {duration} sec. Desolation calls down the first wave immediately.',
       ],
       [
         'volley',
@@ -181,22 +181,22 @@ const classAbilityNamesEn = {
       [
         'phosphor_flask',
         'Phosphor Flask',
-        'A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power.',
+        'Throw a flask that bursts into flame over an 8-yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power.',
       ],
       [
         'pack_command',
         'Pack Command',
-        "Command your living pet to strike for 36 to 48 Physical damage. Damage increases with the pet's Attack Power. A hit restores 20 Focus and grants 1 Pack Ferocity for 30 sec, up to 3. Each stack increases all damage dealt by your pet by 10%. This strike uses the stacks you had before the hit.",
+        "Command your living pet to strike for 36 to 48 Physical damage. Damage increases with the pet's Attack Power. A hit restores 20 Focus and grants 1 Pack Ferocity for 30 sec, up to 3. Each stack increases all damage dealt by your pet by 10%. This strike uses the stacks you had before the hit. At 3 stacks, this button becomes Unleash Beast. Cannot be used during Unleashed Frenzy.",
       ],
       [
         'stampede',
         'Stampede',
-        'Summon 3 beasts for 12 sec. Each attacks every 2 sec for {damage} Physical damage. The shown damage includes 8% of your Ranged Attack Power before pet damage bonuses. The beasts snapshot Pack Ferocity when summoned, gaining 10% damage per stack. While Stampede is on cooldown, successful Pack Commands have a 20% chance to reset it, guaranteed after 5 failed chances. It cannot reset while the beasts are active. (Packlord)',
+        'Summon 3 beasts for 12 sec. Each attacks every 2 sec for {damage} Physical damage. The shown damage includes 8% of your Ranged Attack Power before pet damage bonuses. The beasts snapshot Pack Ferocity when summoned, gaining 10% damage per stack. While Stampede is on cooldown, successful Pack Commands have a 20% chance to reset it, guaranteed on the 5th chance. It cannot reset while the beasts are active. (Packlord)',
       ],
       [
         'unleash_beast',
         'Unleash Beast',
-        "Consume 3 Pack Ferocity after your pet strikes for 42 to 53 Physical damage and claps every enemy within 6 yards for 57 to 75. The clap deals 50% more damage to enemies other than the main target. The strike and clap use Pack Ferocity's full 30% pet damage bonus and increase with the pet's Attack Power. For 8 sec afterward, the pet deals 25% more damage, attacks 35% faster, and makes Fell Shot cleave up to 2 enemies within 5 yards of the target.",
+        "Your pet strikes the target for 42 to 53 Physical damage, then claps every enemy within 6 yards of the pet for 57 to 75. The clap deals 50% more damage to enemies other than the main target. The strike and clap use Pack Ferocity's full 30% pet damage bonus, increase with the pet's Attack Power, and then consume all 3 Pack Ferocity. For 8 sec afterward (Unleashed Frenzy), the pet deals 25% more damage and attacks 35% faster, each Fell Shot makes it cleave up to 2 other enemies within 5 yards of the target for 12 to 18 Physical damage, and you cannot use Pack Command.",
       ],
       [
         'measured_shot',
@@ -209,7 +209,7 @@ const classAbilityNamesEn = {
         // Absolute, not "50% more": the Coldsight 2pc adds a flat 5 after the
         // window rewrite (25 -> 35 for wearers is not 50 percent), so only the
         // absolute base value composes honestly with the set tooltip.
-        'For 12 sec, Measured Shot restores 30 Focus, and Long Draw costs 25% less and casts 30% faster. (Coldsight signature)',
+        'For 12 sec, Measured Shot restores 30 Focus, and Long Draw costs 25% less and has a 30% shorter cast time. (Coldsight signature)',
       ],
       [
         'bloodhook',
@@ -224,18 +224,18 @@ const classAbilityNamesEn = {
       [
         'bloodtrail_assault',
         'Bloodtrail Assault',
-        'For 12 sec, Bloodhook spreads a 60%-strength wound to up to 2 enemies within 5 yards, Woundrend commands an 18-damage pet attack, and Shrapnel Charge reaches 2 yards farther, deals 25% more base damage to its main target, and triggers 50% more wound damage. While you have no living pet, your Focus also regenerates 100% faster.',
+        'For 12 sec, Bloodhook also applies a 60%-strength Bloodhook Wound to up to 2 other enemies within 5 yards of its target, Woundrend makes your living pet deal 18 Physical damage to the target, and Shrapnel Charge reaches 2 yards farther, deals 25% more base damage to its main target, and its instant wound tick deals 50% more. While you have no living pet, your Focus also regenerates 100% faster.',
       ],
       [
         'trailbreak',
         'Trailbreak',
-        'Leap 25 yards backward and break free of roots and movement slows. Landing grants 50% movement speed for 3 sec. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec.',
+        'Leap 25 yards backward and break free of roots and movement slows. Landing grants 50% movement speed for 3 sec. If you have Hunting Momentum, gain Armed Re-entry for 12 sec: your next Gutting Strike or Bloodhook deals bonus damage based on your Momentum stacks.',
       ],
       ['wildheart', 'Wildheart', 'Immediately restore 30% of your maximum health.'],
       [
         'shellskin',
         'Shellskin',
-        'Reduce damage taken by 60% for 8 sec, but prevent attacks while active.',
+        'Reduce damage taken by 60% for 8 sec. While it lasts, you cannot use abilities that target or damage enemies, including traps, but your auto-attacks continue.',
       ],
       [
         'play_dead',
@@ -245,12 +245,12 @@ const classAbilityNamesEn = {
       [
         'tactical_camo',
         'Tactical Camo',
-        'Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)',
+        'Enter stealth and move at 80% speed. Monsters notice you only at close range (a quarter of their normal aggro range, more if they outlevel you), and enemy players and pets cannot see you. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)',
       ],
       [
         'frostjaw_trap',
         'Frostjaw Trap',
-        'Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it is rooted for 3 sec, and enemies within 4 yards are slowed by 50% for 4 sec.',
+        'Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it is rooted for 3 sec, and enemies within 4 yards are slowed by 50% for 4 sec. Only one Frostjaw Trap can be active at a time. Placing another replaces it.',
       ],
       [
         'bear_trap',
@@ -280,7 +280,7 @@ const classAbilityNamesEn = {
       [
         'heroic_strike',
         'Reaver Strike',
-        'A strong attack that increases melee damage by {damage}. Activates on your next swing.',
+        'Your next melee swing deals {damage} extra damage. The rage is spent on that swing; without enough rage it stays a normal swing.',
       ],
       [
         'battle_shout',
@@ -290,35 +290,39 @@ const classAbilityNamesEn = {
       [
         'demoralizing_shout',
         'Direhowl',
-        'Lets out a fearsome shout, reducing the damage dealt by all nearby enemies by {buff}% for 20 sec.',
+        'Shout to reduce the damage dealt by all enemies within 10 yards by {buff}% for {duration} sec.',
       ],
-      [
-        'charge',
-        'Onrush',
-        'Rushes an enemy, generating 9 rage and stunning it for 1 sec. 8-25 yd range.',
-      ],
+      ['charge', 'Onrush', 'Rush to an enemy and stun it for 1 sec, generating 9 rage.'],
       [
         'thunder_clap',
         'Quaking Blow',
-        'Blasts nearby enemies for {damage} damage and slows their attacks by 10% for 10 sec.',
+        'Strike all enemies within 8 yards for {damage} Physical damage and slow their attack speed by 10% for 10 sec.',
       ],
       [
         'hamstring',
         'Hobbling Cut',
         'Maims the enemy for {damage} damage, slowing its movement by 50% for 15 sec.',
       ],
-      ['bloodrage', 'Blood Toll', 'Generates 10 rage at the cost of health.'],
+      [
+        'bloodrage',
+        'Blood Toll',
+        'Lose 8% of your maximum health to generate {rage} rage. This cannot kill you.',
+      ],
       [
         'overpower',
         'Redhand',
-        'Instant attack for weapon damage plus {damage}. Only usable after the target dodges. Cannot be dodged.',
+        'Strike for weapon damage plus {damage}. Cannot be dodged. Each use also grants a Redhand stack for {duration} sec, up to 2: your next Maiming Strike consumes them to deal 20% more weapon damage per stack. Stores up to 2 charges.',
       ],
       [
         'execute',
         'Early Grave',
         'Attempt to finish off a wounded foe, causing {damage} damage. Only usable on enemies below 20% health.',
       ],
-      ['slam', 'Brute Swing', 'Slams the opponent for weapon damage plus {damage}.'],
+      [
+        'slam',
+        'Brute Swing',
+        'Strike for 50% weapon damage plus {damage} and generate {rage} rage.',
+      ],
       [
         'cleave',
         'Reaping Arc',
@@ -332,7 +336,7 @@ const classAbilityNamesEn = {
       [
         'sunder_armor',
         'Armor Shear',
-        "Sunders the target's armor, reducing it by {damage}% per application. Stacks up to 5 times. Generates a high amount of threat.",
+        "Sunder the target's armor, reducing it by {damage}% per application for 30 sec. Stacks up to 5 times, and each application refreshes the duration. Generates high threat.",
       ],
       [
         'taunt',
@@ -342,7 +346,7 @@ const classAbilityNamesEn = {
       [
         'fireball',
         'Cinderbolt',
-        'Hurls a fiery ball that causes {damage} Fire damage plus additional damage over time.',
+        'Hurls a fiery ball that deals {damage} Fire damage, then burns the target for {overTime} Fire damage over {duration} sec.',
       ],
       [
         'fireball_form',
@@ -362,7 +366,7 @@ const classAbilityNamesEn = {
       [
         'frostbolt',
         'Rimelance',
-        'Launches a bolt of frost, causing {damage} Frost damage and slowing movement by 40%.',
+        'Launches a bolt of frost, causing {damage} Frost damage and slowing movement by 40% for {duration} sec.',
       ],
       [
         'blazing_barrier',
@@ -372,17 +376,17 @@ const classAbilityNamesEn = {
       [
         'cold_snap',
         "Winter's Recall",
-        'Finishes the cooldown on Flitstep, Frostveil, and Greater Invisibility. (Mage talent)',
+        'Finishes the cooldowns of Flitstep (restoring all its charges), Greater Invisibility, and your personal barrier: Frostveil, Blazing Barrier or Temporal Barrier. (Mage talent)',
       ],
       [
         'greater_invisibility',
         'Greater Invisibility',
-        'Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)',
+        'Turn invisible for up to 20 sec, dropping enemy threat and targeting on you, and remove up to 2 damage-over-time effects from yourself. Attacking, casting or taking damage ends it early. When it ends, you take 90% less damage for 2 sec. (Mage talent)',
       ],
       [
         'hot_streak',
         'Hot Streak',
-        'Passive: two critical strikes in a row with your Fire spells (Cinderbolt, Cinderfall, Scald, Pyrelance or Flamestrike) make your next Pyrelance or Flamestrike instant and free. The spenders count toward the NEXT streak, free casts included; a Flamestrike counts once however many enemies it strikes, and only the initial impact ever counts. (Fire)',
+        "Passive: two critical strikes in a row from Cinderbolt, Cinderfall, Scald, Pyrelance, Flamestrike or Dragon's Breath make your next Pyrelance or Flamestrike within 12 sec instant and free. A non-critical hit from one of those spells resets the count, and a first crit is remembered for 10 sec. Pyrelance and Flamestrike count toward the next streak, free casts included. Flamestrike and Dragon's Breath count once per cast however many enemies they hit, and only the initial impact counts. (Fire)",
       ],
       [
         'ice_floes',
@@ -392,7 +396,7 @@ const classAbilityNamesEn = {
       [
         'ignition',
         'Ignition',
-        'Passive: your spell critical strikes burn the target for 30% of the damage dealt over 6 sec, stacking. (Fire mastery)',
+        'Passive: when your Fire spells critically strike, the target burns for an extra 1.5% of the damage dealt per character level (30% at level 20) over 6 sec. A new burn on a target that is already burning adds to the damage still owed and restarts the 6 sec timer. (Fire mastery)',
       ],
       [
         'mass_barrier',
@@ -402,17 +406,17 @@ const classAbilityNamesEn = {
       [
         'overload',
         'Overload',
-        'Your next spell is amplified by 40% but costs 50% more mana. Lasts 10 sec. (Mage talent)',
+        'Your next spell that costs mana has its base damage, healing and absorb values increased by 40%, but costs 50% more mana. The Spell Power bonus is not increased. Lasts 10 sec. (Mage talent)',
       ],
       [
         'power_echo',
         'Power Echo',
-        'Your next direct spell repeats at 50% power on the same target. Lasts 10 sec. (Mage talent)',
+        'Your next single-target direct damage or healing spell repeats on the same target for 50% of the amount it dealt or healed. Lasts 10 sec. (Mage talent)',
       ],
       [
         'rings_of_frost',
         'Ring of Frost',
-        'Summons a ring for 10 sec. Enemies crossing its perimeter are frozen for 4 sec. (Mage talent)',
+        'Places a ring of frost at the target location for 10 sec. An enemy that crosses the ring is rooted for 4 sec; each enemy can trigger it only once. The center inside the ring is safe. (Mage talent)',
       ],
       [
         'rune_of_power',
@@ -432,7 +436,7 @@ const classAbilityNamesEn = {
       [
         'flurry',
         'Winterlash',
-        "Loose three icy bolts for {damage} Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Winterlash instant and skips its cooldown. (Frost)",
+        "Loose three icy bolts for {damage} Frost damage each and apply Winter's Chill to the target for 5 sec: the next 2 Ice Lances that hit it treat it as frozen. Brain Freeze makes Winterlash instant and skips its cooldown. (Frost)",
       ],
       [
         'frozen_orb',
@@ -442,37 +446,37 @@ const classAbilityNamesEn = {
       [
         'blizzard',
         'Blizzard',
-        'Calls an ice storm onto the target area for 6 sec, dealing {damage} Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frostglobe, up to 3 sec per cast. (Frost)',
+        "Conjures an ice storm at the target area that rages for 6 sec, dealing {damage} Frost damage each second and slowing enemies by 40% for 2 sec. Each enemy struck shaves 0.5 sec off Frostglobe's cooldown, up to 3 sec per cast. (Frost)",
       ],
       [
         'glacial_spike',
         'Rimeneedle',
-        'Conjure a massive spike of ice, consuming 5 Icicles to deal {damage} Frost damage and freeze the target in place for 4 sec. (Frost)',
+        'Requires 5 Icicles. Conjure a massive spike of ice, consuming all 5 Icicles to deal {damage} Frost damage and root the target for 4 sec. You gain an Icicle each time Rimelance hits or a Frostglobe pulse strikes, up to 5. (Frost)',
       ],
       [
         'glacial_front',
         'Glacial Front',
-        'Hold to gather a widening front of frost, then release it in a cone. Longer charges reach farther and deal more damage. All enemies hit are slowed by 50% for 4 sec; maximum charge also roots them for 1 sec. (Frost)',
+        'Hold to charge, then release a cone of frost. Each of the 4 charge stages reaches farther, from 7 yd to 16 yd, and hits harder, from 35 to 42 base Frost damage up to 88 to 104 at full charge, with a larger Spell Power bonus the longer you charge. All enemies hit are slowed by 50% for 4 sec; full charge also roots them for 1 sec. (Frost)',
       ],
       [
         'dragons_breath',
         "Dragon's Breath",
-        'Hold to gather a widening breath of flame, then release it in a cone. Longer charges reach farther and deal more damage. Enemies hit are disoriented and damage breaks the effect; maximum charge always critically strikes and counts once toward Hot Streak. (Fire)',
+        'Hold to charge, then release a cone of flame. Each of the 4 charge stages reaches farther and wider, from 6 yd to 12 yd, and hits harder, from 32 to 40 base Fire damage up to 90 to 110 at full charge, with a larger Spell Power bonus the longer you charge. Enemies hit are disoriented for 1 to 3 sec by charge stage; any damage breaks it. Full charge always critically strikes. Each breath counts once toward Hot Streak, however many enemies it hits. (Fire)',
       ],
       [
         'fingers_of_frost',
         'Fingers of Frost',
-        'Rimelance has a 15% chance to grant Fingers of Frost, up to 2 charges: your next Ice Lance treats its target as frozen. (Frost)',
+        'Each Rimelance hit has a 15% chance to grant a charge of Fingers of Frost, up to 2 charges, lasting 15 sec. Each charge makes one Ice Lance treat its target as frozen. A proc at 2 charges is lost. (Frost)',
       ],
       [
         'brain_freeze',
         'Brain Freeze',
-        'Rimelance has a 20% chance to make your next Winterlash instant and free of its cooldown. (Frost)',
+        'Each Rimelance hit has a 20% chance to grant Brain Freeze for 15 sec: your next Winterlash is instant and ignores its cooldown. A proc while Brain Freeze is active is lost. (Frost)',
       ],
       [
         'shatter',
         'Brittle Ruin',
-        "Your spells gain 50% critical strike chance against frozen targets. Fingers of Frost and Winter's Chill count as frozen. (Frost)",
+        "Your single-target damage spells gain 50% critical strike chance against frozen targets: enemies held by a Mage's root, stun, incapacitate or Bewitch. Fingers of Frost and Winter's Chill make Ice Lance treat its target as frozen. (Frost)",
       ],
       [
         'conjure_water',
@@ -484,16 +488,20 @@ const classAbilityNamesEn = {
         'Breadbind',
         'Conjures 2 servings of bread, restoring health when eaten. Higher ranks conjure heartier fare.',
       ],
-      ['fire_blast', 'Cinderfall', 'Blasts the enemy for {damage} Fire damage. Instant.'],
+      [
+        'fire_blast',
+        'Cinderfall',
+        'Blasts the enemy for {damage} Fire damage. Always critically strikes. Off the global cooldown and usable while casting another spell.',
+      ],
       [
         'arcane_missiles',
         'Aether Darts',
-        'Launches Aether Darts at the enemy, causing {damage} Arcane damage each second for 3 sec.',
+        'Channel for 3 sec, firing 3 darts that each deal {damage} Arcane damage. Spends all your Arcane Charges: each charge adds 9 Arcane damage split across the darts, and at 4 charges the channel fires 5 darts instead of 3.',
       ],
       [
         'polymorph',
         'Bewitch',
-        'Transforms the enemy into a toad for up to {duration} sec. The toad wanders and heals rapidly. Any damage breaks the effect. Beasts and humanoids only.',
+        'Transforms the enemy into a toad for up to {duration} sec. It cannot act, is restored to full health, heals 10% of its maximum health each second, and loses its damage-over-time effects. Any damage breaks the effect. Cannot affect undead or control-immune enemies.',
       ],
       [
         'frost_nova',
@@ -505,11 +513,15 @@ const classAbilityNamesEn = {
         'Aetherburst',
         'A burst of Arcane energy hits all nearby enemies for {damage} Arcane damage.',
       ],
-      ['scorch', 'Scald', 'Scalds the enemy for {damage} Fire damage. Quick to cast.'],
+      [
+        'scorch',
+        'Scald',
+        'Scalds the enemy for {damage} Fire damage and increases your movement speed by 20% for 3 sec. Always critically strikes against targets at or below 30% health.',
+      ],
       [
         'pyroblast',
         'Pyrelance',
-        'Hurls an immense fiery boulder that causes {damage} Fire damage plus additional damage over time.',
+        'Hurls an immense fiery boulder that deals {damage} Fire damage, then burns the target for {overTime} Fire damage over {duration} sec.',
       ],
       ['ice_barrier', 'Frostveil', 'Shields you in ice, absorbing {damage} damage for 60 sec.'],
       [
@@ -519,24 +531,24 @@ const classAbilityNamesEn = {
         {
           assassination: 'Adds 1 Venom Ritual (max 6).',
           combat:
-            'While Redline is active, this button becomes Haymaker: 130% weapon damage plus 10, awards 2 combo points, and adds 1 Redline (max 4).',
+            'While Redline is active, this button becomes Haymaker: a heavier weapon strike that awards 2 combo points and adds 1 Redline (max 4).',
         },
       ],
       [
         'eviscerate',
         'Dirt Nap',
-        'Finishing move that causes {damage}.',
+        'Finishing move that deals {damage} Physical damage. Damage increases with Attack Power.',
         {
           assassination:
             'At 6 Venom Ritual, this button becomes Venomrend: a strike that instantly deals all the damage your bleeds would still have dealt, plants a fresh venom wound, and restores 20 energy.',
           combat:
-            'Landing this with 4 or more combo points starts Redline for 8 sec: Wicked Slash becomes Haymaker and this button becomes Lights Out (45 plus 35 per combo point, hitting 25% harder for each Redline built, restores 25 energy). Spend it before Redline ends.',
+            'Landing this with 4 or more combo points starts Redline for 8 sec: Wicked Slash becomes Haymaker and this button becomes Lights Out (a finisher that hits 25% harder for each Haymaker you throw during Redline and restores 25 energy). Spend it before Redline ends.',
         },
       ],
       [
         'backstab',
         'Craven Thrust',
-        "Drive your dagger into the target's back for 150% weapon damage plus {damage}. Must be behind the target. Requires a dagger. Awards 1 combo point.",
+        "Drive your dagger into the target's back for {weaponPercent}% weapon damage plus {damage}. Must be behind the target. Requires a dagger. Awards 1 combo point.",
         {
           assassination:
             'Each strike adds 1 Venom Ritual (max 6) and refunds 15 energy. At 6 Venom Ritual, Dirt Nap becomes Venomrend (it deals all your remaining bleed damage at once).',
@@ -562,7 +574,7 @@ const classAbilityNamesEn = {
       [
         'ambush',
         "Lurker's Strike",
-        'Strike from the shadows for 250% weapon damage plus {damage}. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point.',
+        'Strike from the shadows for {weaponPercent}% weapon damage plus {damage}. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point.',
         {
           subtlety:
             'From Duskveil, double both the weapon damage and flat bonus, and gain 1 Gloam (max 3). Stealth still requires a dagger and attacking from behind. At 3 Gloam, using this without stealth costs nothing, spends all 3 Gloam and starts Shadow Veil for 6 sec. Veiled Edge adds 50% to its weapon damage, without increasing the flat bonus. Veiled Edge does not stack with the stealth bonus.',
@@ -571,7 +583,7 @@ const classAbilityNamesEn = {
       [
         'stealth',
         'Duskveil',
-        'Conceals you in the shadows: enemies barely notice you, and you move at full speed. Attacking or taking damage breaks Duskveil. Cast again to step out.',
+        'Conceal yourself in the shadows. Enemy players and pets cannot see you, and monsters notice you only from much closer than normal (from farther away if they outlevel you). You move at full speed. Attacking or taking damage breaks Duskveil. Cast again to step out.',
         { subtlety: 'Each opener you use from Duskveil adds 1 Gloam (max 3).' },
       ],
       ['adrenaline_rush', 'Quickened Blood', 'Your blood runs hot, instantly restoring 60 energy.'],
@@ -610,12 +622,12 @@ const classAbilityNamesEn = {
       [
         'melting_acid',
         'Melting Acid',
-        'Coats your weapon for 30 min. Each of your melee swings splashes the target with caustic acid, reducing its armor by 5% for 12 sec.',
+        'Coats your weapon for 30 min. Each of your melee swings splashes the target with caustic acid, reducing its armor by 5% for 12 sec. Replaces your other weapon coating.',
       ],
       [
         'nightshade_coating',
         'Nightshade Coating',
-        'Coats your weapon for 30 min. Each of your melee swings coats the target in nightshade, reducing the healing it receives by 25% for 12 sec.',
+        'Coats your weapon for 30 min. Each of your melee swings coats the target in nightshade, reducing the healing it receives by 25% for 12 sec. Replaces your other weapon coating.',
       ],
       [
         'expose_armor',
@@ -630,7 +642,7 @@ const classAbilityNamesEn = {
       [
         'vanish',
         'Smokefade',
-        'Melt from sight, entering Duskveil even in combat. You move at full speed while hidden. Lasts up to 10 sec.',
+        'Vanish from sight, even in combat, entering Duskveil for up to 10 sec. You leave combat, monsters forget all threat on you and cannot detect you while it lasts, and enemy players lose you as a target. You move at full speed while hidden.',
       ],
       [
         'instant_poison',
@@ -640,12 +652,12 @@ const classAbilityNamesEn = {
       [
         'deadly_poison',
         'Festering Venom',
-        'Coats your weapon for 30 min. Each of your melee swings adds a stack of venom to the target, up to 5, and refreshes the 12 sec duration. Each stack deals {damage} Nature damage every 2 sec.',
+        'Coats your weapon for 30 min. Each of your melee swings adds a stack of venom to the target, up to 5, and refreshes the 12 sec duration. Each stack deals {damage} Nature damage every 2 sec. Replaces your other weapon coating.',
       ],
       [
         'blind',
         'Dirt Toss',
-        "Tosses dirt into the target's eyes, causing it to wander disoriented for 8 sec. Any damage breaks the effect.",
+        "Throw dirt in the target's eyes, incapacitating it for 8 sec. Any damage breaks the effect.",
       ],
       [
         'seal_of_righteousness',
@@ -665,12 +677,12 @@ const classAbilityNamesEn = {
       [
         'divine_ascension',
         'Divine Ascension',
-        'Consume 20 Devotion to gain 5 Ascension charges for up to 45 sec. Marked abilities consume one charge and gain an additional effect.',
+        "Spend 20 Devotion to gain 5 Ascension charges for up to 45 sec. While Ascension is active, your specialization's highlighted abilities each spend 1 charge for the Ascension bonus their tooltips describe, and you gain no Devotion. Ascension ends when the charges or the time run out. Extended Dawn adds 2 charges.",
       ],
       [
         'aura_mastery',
         'Sacred Concord',
-        'For 8 sec, empower every active Devotion and Requital Aura in your group. Bastion Devotion reduces damage by 15%; Requital deals 15 Holy damage. Multiple uses refresh instead of stacking.',
+        'For 8 sec, triple every active Bastion Devotion and Requital Aura in your group: Bastion Devotion reduces damage taken by 15%, and Requital Aura deals three times its normal Holy damage. Repeated uses refresh instead of stacking.',
       ],
       [
         'devotion_ward',
@@ -680,7 +692,7 @@ const classAbilityNamesEn = {
       [
         'hammer_of_grace',
         'Hammer of Grace',
-        'Instantly hurl a holy hammer at an enemy within 20 m for {damage}, restoring 70 mana, healing yourself for 50% of damage dealt, and generating 1 Devotion when it deals damage. Solar Reprisal lets Hammer of Grace ignore its cooldown and heal you for 100% of damage dealt.',
+        'Hurl a holy hammer at an enemy for {damage} Holy damage, restoring 70 mana and healing yourself for 50% of the damage dealt. Generates 1 Devotion when it deals damage. Solar Reprisal (a Faithwarden proc) makes it ignore its cooldown and heal you for 100% of the damage dealt.',
       ],
       [
         'hushbrand',
@@ -690,23 +702,23 @@ const classAbilityNamesEn = {
       [
         'guardian_covenant',
         'Guardian Covenant',
-        'Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected.',
+        'Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected. Ascension raises the reduction to 30%.',
       ],
-      ['solar_step', 'Solar Step', 'Increase your movement speed by 150% for 2 sec.'],
+      ['solar_step', 'Solar Step', 'Increase your movement speed by 150% for {duration} sec.'],
       [
         'solar_invocation',
         'Solar Invocation',
-        'Instantly heal an ally for {damage} or deal moderate Holy damage to an enemy. Either use generates 1 Devotion. During Ascension, a healing cast also heals allied players within 10 m of the target for half as much.',
+        'Instantly heal an ally for {damage} or deal 120 to 150 base Holy damage to an enemy. Damage increases with Spell Power and healing with Healing Power. Either use generates 1 Devotion. During Ascension, a healing cast also heals allied players within 10 m of the target for half as much.',
       ],
       [
         'radiant_devotion',
         'Radiant Devotion',
-        'Increase the spell power of you and party members by 20 for 30 min. Replaces your own Dawn or Grace Devotion. Another Paladin casting Radiant Devotion refreshes it instead of stacking; a different Devotion coexists.',
+        'Increase the spell power of you and party members by {buff} for 30 min. Replaces your own Dawn or Grace Devotion. Another Paladin casting Radiant Devotion refreshes it instead of stacking; a different Devotion coexists.',
       ],
       [
         'dawn_devotion',
         'Dawn Devotion',
-        'Increase the attack power of you and party members by 40 for 30 min. Replaces your own Radiant or Grace Devotion. Another Paladin casting Dawn Devotion refreshes it instead of stacking; a different Devotion, and Warrior shouts, coexist.',
+        'Increase the attack power of you and party members by {buff} for 30 min. Replaces your own Radiant or Grace Devotion. Another Paladin casting Dawn Devotion refreshes it instead of stacking; a different Devotion, and Warrior shouts, coexist.',
       ],
       [
         'grace_devotion',
@@ -726,12 +738,12 @@ const classAbilityNamesEn = {
       [
         'final_edict',
         'Final Edict',
-        "Deliver a crushing weapon strike and generate 1 Devotion when it deals damage. A successful hit reduces Dawnfall's remaining cooldown by 2 sec. Successful auto-attacks and Final Edict hits have a 15% chance to grant Dawn's Wrath for 8 sec. Ascension also releases a Physical explosion around you.",
+        "Deliver a crushing weapon strike and generate 1 Devotion when it deals damage. A successful hit reduces Dawnfall's remaining cooldown by 2 sec. Successful auto-attacks and Final Edict hits have a 15% chance to grant Dawn's Wrath for 8 sec: your next Tolling Hammer can hit any target, ignores its cooldown, and deals 20% more damage. Ascension also releases a Physical explosion around you.",
       ],
       [
         'dawnfall',
         'Dawnfall',
-        "Deal {damage} Holy damage to nearby enemies and generate 1 Devotion. Hitting at least one enemy reduces Final Edict's remaining cooldown by 2 sec. Ascension increases its damage and radius.",
+        "Deal {damage} Holy damage to nearby enemies and generate 1 Devotion. Hitting at least one enemy reduces Final Edict's remaining cooldown by 2 sec. Ascension increases its damage by 50% and its radius to 10 m.",
       ],
       [
         'sun_gods_verdict',
@@ -761,12 +773,12 @@ const classAbilityNamesEn = {
       [
         'dawns_embrace',
         "Dawn's Embrace",
-        'Deliver a powerful heal and generate 1 Devotion. Radiant Resonance reduces its mana cost by 50% and cast time to 1.5 sec. Ascension makes it instant and increases its healing by 35%.',
+        'Heal a friendly target for {damage} and generate 1 Devotion. Radiant Resonance reduces its mana cost by 50% and cast time to 1.5 sec. Ascension makes it instant and increases its healing by 35%.',
       ],
       [
         'radiant_chorus',
         'Radiant Chorus',
-        "Heal nearby allies for {damage} and generate 1 Devotion. Effectively healing at least 2 allies grants Radiant Resonance: your next Mending Light is instant, or your next Dawn's Embrace costs 50% less mana and casts in 1.5 sec. Ascension increases Radiant Chorus healing and radius.",
+        "Heal nearby allies for {damage} and generate 1 Devotion. Effectively healing at least 2 allies grants Radiant Resonance for 10 sec: your next Mending Light is instant, or your next Dawn's Embrace costs 50% less mana and casts in 1.5 sec. Ascension increases Radiant Chorus healing by 20% and its radius to 40 m.",
       ],
       [
         'life_covenant',
@@ -776,12 +788,12 @@ const classAbilityNamesEn = {
       [
         'aegis_first_dawn',
         'Aegis of the First Dawn',
-        'Channel for 5 sec, creating a 10 meter holy dome. Allies inside are healed every second and take 50% less damage. Completing the channel releases a final heal and grants 30% movement speed for 4 sec.',
+        'Channel a 10 m holy dome around you. Allied players inside and in your line of sight take 50% less damage and are healed for {aegisTick} every second. Completing the channel heals them for {aegisFinal} more and grants 30% movement speed for 4 sec. Healing increases with Healing Power.',
       ],
       [
         'vowkeeper_strike',
         'Vowkeeper Strike',
-        'Strike with high threat and generate 1 Devotion. A successful strike has a 20% chance to grant Solar Reprisal for 8 sec; each successful block has a 25% chance. Solar Reprisal empowers your next Sunward Disc, Hammer of Grace, or Mending Light. Ascension also grants a small absorption shield.',
+        'Strike for weapon damage plus {damage} Physical damage with high threat, and generate 1 Devotion. A successful strike has a 20% chance to grant Solar Reprisal for 8 sec; each successful block has a 25% chance. Solar Reprisal is consumed by your next Sunward Disc (no mana cost, no cooldown, 20% more damage), Hammer of Grace (no cooldown, heals you for 100% of damage dealt), or Mending Light (instant). Ascension also shields you for 6% of your maximum health for 6 sec.',
       ],
       [
         'bastion_rite',
@@ -791,7 +803,7 @@ const classAbilityNamesEn = {
       [
         'sunward_disc',
         'Sunward Disc',
-        'Requires a shield. Hurl a radiant disc that strikes and then bounces between nearby enemies. Each damaging impact generates 1 Devotion. Solar Reprisal makes Sunward Disc cost no mana, ignore its cooldown, and deal 20% more damage. Ascension empowers 5 bounces.',
+        'Requires a shield. Hurl a radiant disc that deals {damage} Holy damage to the target, then bounces to up to 2 other nearby enemies for 60 to 75 base Holy damage each. Each damaging impact generates 1 Devotion. Solar Reprisal makes Sunward Disc cost no mana, ignore its cooldown, and deal 20% more damage. Ascension increases its damage by 30% and its bounces to 5.',
       ],
       [
         'sacred_challenge',
@@ -817,7 +829,7 @@ const classAbilityNamesEn = {
       [
         'lay_on_hands',
         'Last Rite',
-        'A massive surge that restores {damage}% of your maximum health and generates 1 Devotion when it restores health. 10 min cooldown.',
+        'Heal a friendly target for {damage}% of your maximum health and generate 1 Devotion when it restores health.',
       ],
       [
         'holy_taunt',
@@ -837,7 +849,7 @@ const classAbilityNamesEn = {
       [
         'consecration',
         'Holy Ground',
-        'Consecrate the ground beneath you for 9 sec, dealing {damage} Holy damage with high threat every second. The first impact generates 1 Devotion. Faithwardens take 10% less damage while standing inside. Ascension increases its damage.',
+        'Consecrate the ground beneath you for 9 sec, dealing {damage} Holy damage with high threat every second. The first impact generates 1 Devotion. Faithwardens take 10% less damage while standing inside. Ascension increases its damage by 30%.',
       ],
       [
         'bastion_sweep',
@@ -852,7 +864,7 @@ const classAbilityNamesEn = {
       [
         'veilbound_march',
         'Veilbound March',
-        'Become ethereal for 4 sec, gaining 40% movement speed and 30% armor and becoming immune to roots, slows, and displacement. Enemies you pass through are Veil Marked for 6 sec, taking Holy damage each second, dealing 20% less damage to you, and generating extra threat. The first mark grants 1 Devotion. When the march ends, nearby marked enemies take a final burst. Ascension increases the burst by 50% and lightly pulls them toward you.',
+        'Become ethereal for 4 sec, gaining 40% movement speed and 30% armor, removing roots and slows, and becoming immune to roots, slows, and displacement. Enemies you pass through are Veil Marked for 6 sec: they take 12 Holy damage each second with triple threat and deal 20% less damage to you. The first mark grants 1 Devotion. When the march ends, marked enemies within 10 m take 36 Holy damage. Ascension raises that damage to 54 and pulls them 2 m toward you.',
       ],
       [
         'veilbound_mark',
@@ -872,18 +884,18 @@ const classAbilityNamesEn = {
       [
         'tame_beast',
         'Wildbond',
-        'Begins taming a beast to be your companion. It must be your level or lower and not an elite. Your pet follows you, attacks your enemies, and holds threat of its own. You may have one pet at a time.',
+        'Begin taming a beast to be your companion. It must be your level or lower and cannot be elite, rare, a boss, or a dungeon creature. Your pet follows you, attacks your enemies, and holds threat of its own. You may have one pet at a time.',
       ],
       ['dismiss_pet', 'Release Companion', 'Releases your pet back to the wild.'],
       [
         'raptor_strike',
         'Gutting Strike',
-        'Strike for 10% weapon damage plus {damage}. A hit restores 15 Focus and grants 1 Hunting Momentum. Damage increases with Attack Power through weapon damage.',
+        'Strike for 10% weapon damage plus {damage}. Damage increases with Attack Power through weapon damage. With Fieldcraft, a hit restores 15 Focus and grants 1 Hunting Momentum.',
       ],
       [
         'aspect_of_the_hawk',
         "Harrier's Guise",
-        "Adopt Harrier's Guise, increasing your Attack Power by {buff} for 30 min.",
+        "Adopt Harrier's Guise, increasing your Attack Power and Ranged Attack Power by {buff} for 30 min.",
       ],
       [
         'serpent_sting',
@@ -947,12 +959,12 @@ const classAbilityNamesEn = {
       [
         'smite',
         'Scouring Hymn',
-        'Deal {damage} Holy damage. Damage increases with Spell Power. Doctrine converts this damage into healing through your links. If no injured linked group member is within 30 yards, heal the lowest-health injured group member within 30 yards for 15% of the damage.',
+        'Deal {damage} Holy damage. Damage increases with Spell Power. Doctrine heals each injured linked group member within 30 yards for 30% of the damage dealt (70% with Twin Covenant). If none is injured, it heals the lowest-health injured group member within 30 yards for 15% of the damage instead.',
       ],
       [
         'lesser_heal',
         'Whispered Prayer',
-        'Heal a friendly target for {damage}. Healing increases with Spell Power.',
+        'Heal a friendly target for {damage}. Healing increases with Healing Power.',
       ],
       [
         'power_word_fortitude',
@@ -967,12 +979,12 @@ const classAbilityNamesEn = {
       [
         'power_word_shield',
         'Psalm of Warding',
-        'Shield a friendly target, absorbing {damage} damage for 30 sec. Doctrine also links the target for 30 sec. Your Scouring Hymn and hostile Scouring Mercy heal linked group members while they are within 30 yards of you.',
+        'Shield a friendly target, absorbing {damage} damage for 30 sec. Doctrine also links the target for 30 sec, replacing your previous link (Twin Covenant keeps two). While linked group members are within 30 yards of you, your Scouring Hymn and hostile Scouring Mercy heal them for 30% of the damage dealt.',
       ],
       [
         'renew',
         'Lingering Grace',
-        'Heal the target for {damage} over 15 sec, once every 3 sec. Healing increases with Spell Power.',
+        'Heal the target for {damage} over 15 sec, once every 3 sec. Healing increases with Healing Power.',
       ],
       [
         'mind_blast',
@@ -982,7 +994,7 @@ const classAbilityNamesEn = {
       [
         'heal',
         'Solemn Prayer',
-        'Heal a friendly target for {damage}. Healing increases with Spell Power.',
+        'Heal a friendly target for {damage}. Healing increases with Healing Power.',
       ],
       [
         'mind_flay',
@@ -1007,7 +1019,7 @@ const classAbilityNamesEn = {
       [
         'flash_heal',
         'Urgent Prayer',
-        'Heal a friendly target for {damage}. Healing increases with Spell Power.',
+        'Heal a friendly target for {damage}. Healing increases with Healing Power.',
       ],
       [
         'lightning_bolt',
@@ -1037,12 +1049,12 @@ const classAbilityNamesEn = {
       [
         'rockbiter_weapon',
         'Stonebound Weapon',
-        'Imbue your weapon for 30 min. Each swing deals {damage} extra damage. Warspirit also gains 40% armor and 20% Stamina, takes 15% less damage, is immune to critical strikes from creatures, and generates two and three quarter times as much threat. Earthen Jolt forces its target to attack you for 3 sec, and Thunder Ward grants 10% damage reduction for 3 sec.',
+        'Imbue your weapon for 30 min. Each swing deals {damage} extra damage. Warspirit also gains 40% armor and 20% Stamina, takes 15% less damage, is immune to critical strikes from creatures, and generates two and three quarter times as much threat. Earthen Jolt forces its target to attack you for 3 sec, and casting Thunder Ward grants 10% damage reduction for 3 sec.',
       ],
       [
         'healing_wave',
         'Mending Waters',
-        "Heal a friendly target for {damage}. Healing increases with Spell Power. Spiritcall: store 50% of the full heal before overhealing as Mending Current for 12 sec, up to 30% of the target's maximum health.",
+        "Heal a friendly target for {damage}. Healing increases with Healing Power. Spiritcall: also add 50% of the full heal before overhealing to the target's Mending Current, a pool that heals them over 12 sec and holds at most 30% of their maximum health.",
       ],
       [
         'earth_shock',
@@ -1087,12 +1099,12 @@ const classAbilityNamesEn = {
       [
         'shadow_bolt',
         'Gloom Bolt',
-        'Sends a shadowy bolt at the enemy for {damage} Shadow damage.',
+        'Sends a shadowy bolt at the enemy for {damage} Shadow damage. Ruination: generates 1 Wrack, up to 5.',
       ],
       [
         'demon_skin',
         'Fiendhide',
-        'Demonic skin increases your armor by {buff} for 30 min. Pact Deepened can double this armor and reduce magic damage taken while Fiendhide is active.',
+        'Increases your armor by {buff} for 30 min. Pact Deepened doubles this armor and reduces magic damage taken by 5% while Fiendhide is active.',
       ],
       [
         'immolate',
@@ -1107,12 +1119,12 @@ const classAbilityNamesEn = {
       [
         'evil_eye',
         'Evil Eye',
-        'Marks one enemy as the focus of your curses. Moving the Eye preserves Condemnation but does not refresh its 20 sec expiry.',
+        'Marks one enemy with your Evil Eye, the focus of your curses. You gain 2 Condemnation each time the marked enemy deals damage (at most once per sec) and 10 when it dies. Condemnation stacks up to 100 and fades 20 sec after your last gain. Moving the Eye keeps your Condemnation but does not refresh that timer.',
       ],
       [
         'maledict_gaze',
         'Maledict Gaze',
-        'Your Maledict Eye attacks your selected primary Evil Eye every 2.5 sec for Shadow damage. Possess the Evil Eye doubles its attack speed.',
+        'Your Maledict Eye attacks the enemy bearing your primary Evil Eye every 2.5 sec for Shadow damage, while you and that enemy are both in combat, within 30 yd of each other and in line of sight. Possess the Evil Eye doubles its attack speed.',
       ],
       [
         'needle_of_fate',
@@ -1122,9 +1134,13 @@ const classAbilityNamesEn = {
       [
         'sentence',
         'Sentence',
-        'Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Each Thread increases damage by 6%. Added effects escalate at 20, 50, 80, and 100 Condemnation. Its damage scaling flattens after level 16.',
+        'Requires 20 Condemnation and your primary Evil Eye on the target. Consumes all Condemnation and Fate Threads to deal Shadow damage that grows with the Condemnation spent; each Thread adds 6% damage. At 50 or more, heals you for 20% of the damage dealt. At 80 or more, also deals 35% of the damage to other enemies within 8 yd. At 100, deals 5% more damage to players and bosses and kills a normal enemy below 20% health. Its base damage rises with your level until 16, then tapers across levels 17 to 20.',
       ],
-      ['life_tap', 'Hard Bargain', 'Converts {damage} health into {damage} mana.'],
+      [
+        'life_tap',
+        'Hard Bargain',
+        'Converts {damage} health into {buff} mana. Fails if you have {damage} health or less.',
+      ],
       [
         'cursed_accomplice',
         'Cursed Accomplice',
@@ -1138,12 +1154,12 @@ const classAbilityNamesEn = {
       [
         'drain_life',
         'Consume',
-        "Consumes the target's vitality, dealing {damage} Shadow damage each second and transferring 70% of it as health. Affliction transfers all of it instead. When channeled on your primary Evil Eye, it consumes all Fate Threads at the start, and each Thread generates 1 extra Condemnation per tick.",
+        "Consumes the target's vitality, dealing {damage} Shadow damage each second and healing you for 70% of the damage dealt (all of it for Affliction). On an enemy with your Evil Eye, each tick generates 2 Condemnation and finishing the channel generates 3 more. On your primary Evil Eye, it also consumes all Fate Threads at the start: each Thread adds 1 Condemnation per tick, and 3 Threads stop damage from delaying the channel.",
       ],
       [
         'litany_of_guilt',
         'Litany of Guilt',
-        'Curses your primary Evil Eye for 6 sec. Condemnation gains release a wave that damages up to 2 other enemies within 8 yards, at most once per second. Rank 2 extends it to 8 sec and 4 enemies.',
+        'Curses your primary Evil Eye for {duration} sec. Condemnation gains release a wave that damages up to 2 other enemies (4 from Rank 2) within 8 yards, at most once per second.',
       ],
       [
         'cinderhide',
@@ -1153,7 +1169,7 @@ const classAbilityNamesEn = {
       [
         'umbral_anchor',
         'Umbral Anchor',
-        'First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, consuming the anchor and starting a 45 sec cooldown.',
+        'First cast: anchors your shadow at your feet for 5 min. Recast within 40 yd of the anchor to teleport back to it, consuming the anchor and starting a 45 sec cooldown.',
       ],
       [
         'soulwell',
@@ -1163,22 +1179,22 @@ const classAbilityNamesEn = {
       [
         'hex_of_violence',
         'Hex of Violence',
-        'Hexes the enemy for 8 sec, dealing Shadow damage and generating 2 Condemnation every 2 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 17 Shadow damage.',
+        'Hexes the enemy for 8 sec. Every 2 sec it takes 17 Shadow damage plus a share of your Spell Power, and you gain 2 Condemnation. The first 3 times the hexed enemy deals damage, you gain 7 Condemnation and it takes 17 Shadow damage.',
       ],
       [
         'cruel_pact',
         'Cruel Pact',
-        'Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Condemnation. Cannot be used at or below 20% health.',
+        'Sacrifices 12% of your maximum health to restore {buff}% of your maximum mana and generate 20 Condemnation. Cannot be used at or below 20% health.',
       ],
       [
         'vicarious_suffering',
         'Vicarious Suffering',
-        'Links your suffering for 8 sec and generates up to 15 Condemnation from hostile hits. On yourself, reduces damage taken by 20%. On an ally, redirects up to 20% to you without taking you below 15% health.',
+        'For 8 sec, each hostile hit on the target generates 3 Condemnation, up to 15 in total. On yourself, reduces damage taken by 20%. On an ally, redirects 20% of each hostile hit to you, but never takes you below 15% health.',
       ],
       [
         'possess_evil_eye',
         'Possess the Evil Eye',
-        'The Maledictor possesses your primary Evil Eye for 15 sec and generates 35 Condemnation. Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving, and Sentence deals 25% more damage and releases a delayed echo for 60% damage, tapering to 30% across levels 17-20.',
+        'Possesses your primary Evil Eye for 15 sec and generates 35 Condemnation. While active, Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving, Maledict Gaze attacks twice as fast, and Sentence deals 25% more damage and repeats 60% of the damage dealt 0.75 sec later (falling to 30% across levels 17 to 20).',
       ],
       [
         'hour_of_judgment',
@@ -1188,18 +1204,14 @@ const classAbilityNamesEn = {
       [
         'coven',
         'Coven',
-        'Creates secondary Evil Eyes on up to 4 nearby enemies for 15 sec. They feed the shared Condemnation pool at 50%, and Sentence echoes to them for 35% damage.',
+        'Requires your primary Evil Eye on the target. Places secondary Evil Eyes on up to 4 other enemies within 15 yd of it for 15 sec. They generate Condemnation at 50% of the normal rate, and Sentence echoes to each of them for 35% of its damage.',
       ],
       [
         'fear',
         'Harrow',
         "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect.",
       ],
-      [
-        'searing_pain',
-        'Sear',
-        'Sears the enemy with agonizing fire for {damage} Fire damage. Quick to cast.',
-      ],
+      ['searing_pain', 'Sear', 'Sears the enemy with agonizing fire for {damage} Fire damage.'],
       [
         'shadowburn',
         'Duskfire',
@@ -1236,13 +1248,13 @@ const classAbilityNamesEn = {
       [
         'moonfire',
         'Lunar Tempest',
-        'Burns the enemy with moonfire for {damage} Arcane damage plus damage over time.',
+        'Burns the enemy for {damage} Arcane damage, then {overTime} more Arcane damage over {duration} sec.',
         { balance: 'Keep it burning: Moonseed extends it by 6 sec.' },
       ],
       [
         'moonseed',
         'Moonseed',
-        'Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to {duration} sec per application. At 3 Moontide, this button becomes Moonsurge: an instant strike for 136 to 162 Arcane damage (plus spell power) that spends all 3.',
+        'Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest on the target by 6 sec, up to {duration} extra sec per Lunar Tempest application. At 3 Moontide, this button becomes Moonsurge: an instant heavy Arcane strike that spends all 3.',
       ],
       [
         'rejuvenation',
@@ -1256,21 +1268,25 @@ const classAbilityNamesEn = {
       [
         'thorns',
         'Briarguard',
-        'Thorns sprout from the target: melee attackers take {buff} Nature damage.',
+        'Thorns sprout from a friendly target for 10 min. Each melee hit against the target deals {buff} Nature damage to the attacker.',
       ],
-      ['entangling_roots', 'Gripping Roots', 'Roots the target in place for up to 12 sec.'],
+      [
+        'entangling_roots',
+        'Gripping Roots',
+        'Roots the target in place for up to 12 sec. At its second rank, it also deals 32 Nature damage over 12 sec, increased by Spell Power.',
+      ],
       [
         'bear_form',
         'Bruin Form',
-        'Shapeshift into a bear: armor +110%, maximum health +30%, greatly increased attack power, your attacks build rage and generate 30% more threat. You swing twice as fast for half the damage per swing, and each swing builds double rage. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form.',
+        'Shapeshift into a bear: armor +110%, maximum health +30%, attack power +15 plus 1.5 per point of Agility, your attacks build rage and generate 30% more threat. You swing twice as fast for half the damage per swing, and each swing builds double rage. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form.',
       ],
       [
         'maul',
         'Bonecrush',
-        'A mauling attack that increases melee damage by {damage} and causes a high amount of threat. Activates on your next swing. Bruin Form only.',
+        'Your next melee swing deals {damage} extra damage and generates threat equal to 2.5 times its damage plus a small flat amount. Bruin Form only.',
         {
           feral:
-            'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead heals you for 18% of your maximum health and refunds 15 rage.',
+            'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a heavy strike at high threat; below half health it instead heals you for 18% of your maximum health and refunds 15 rage.',
         },
       ],
       [
@@ -1286,7 +1302,7 @@ const classAbilityNamesEn = {
       [
         'cat_form',
         'Cat Form',
-        'Shapeshift into a cat: agility rises with your level, attack power +8 plus 2 per level, your attacks use energy and combo points, you move 15% faster, and you generate 29% less threat. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form.',
+        'Shapeshift into a cat: agility + half your level (at least 2), attack power +8 plus 2 per level, your attacks use energy and combo points, you move 15% faster, and you generate 29% less threat. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form.',
       ],
       [
         'claw',
@@ -1303,7 +1319,7 @@ const classAbilityNamesEn = {
       [
         'ferocious_bite',
         'Gorebite',
-        'Finishing move that causes {damage}. Cat Form only.',
+        'Finishing move that deals {damage} Physical damage. Cat Form only.',
         {
           feral:
             'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest, which spends the Old Blood for a stronger strike that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores energy.',
@@ -1312,19 +1328,23 @@ const classAbilityNamesEn = {
       [
         'swipe',
         'Sweeping Claws',
-        'Sweep your claws through nearby enemies for {damage} damage. Causes extra threat. Bruin Form only.',
+        'Sweep your claws through every enemy within 5 yards for {damage} damage each, generating 75% more threat than the damage dealt. Bruin Form only.',
         { feral: 'Each hit that lands adds 1 Old Blood (max 3).' },
       ],
       [
         'regrowth',
         'Second Bloom',
-        'Heals a friendly target for {damage} and an additional amount over 15 sec. If the effect runs its full duration, it heals the target again for the same amount as the initial heal.',
+        'Heals a friendly target for {damage}, then for {overTime} more over 15 sec. If the heal over time runs its full duration, it heals the target once more for the amount of the first heal (before any critical bonus). Ending it early, such as with Fleetmend, Overbloom, or a recast, skips that heal.',
         {
           restoration:
             'Each cast adds 1 Verdance (max 3), including a refresh of a bloom already ticking.',
         },
       ],
-      ['barkskin', 'Oakhide', 'Your skin hardens like bark, increasing armor by 20% for 15 sec.'],
+      [
+        'barkskin',
+        'Oakhide',
+        'Your skin hardens like bark, increasing armor by {buff}% for 15 sec.',
+      ],
       // Tank defensive cooldowns (paladin / druid), one distinct mechanic each.
       [
         'sacred_bulwark',
@@ -1334,7 +1354,7 @@ const classAbilityNamesEn = {
       [
         'primal_reflexes',
         'Primal Reflexes',
-        'Your instincts sharpen, increasing your chance to dodge by 50% for 6 sec.',
+        'Your instincts sharpen, adding 50 percentage points to your chance to dodge for 6 sec.',
       ],
       [
         'starfire',
@@ -1342,7 +1362,7 @@ const classAbilityNamesEn = {
         'Calls down a bolt of stellar fire, causing {damage} Arcane damage.',
         {
           balance:
-            'In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant strike for 80 to 100 Nature damage plus a 45 burn over 9 sec, restoring 35 mana and spending all 3.',
+            'In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant Nature strike plus a burn over 9 sec, restoring 35 mana and spending all 3.',
         },
       ],
       [
@@ -1391,33 +1411,33 @@ const classAbilityNamesEn = {
       [
         'rip',
         'Bloodrift',
-        'Finishing move that makes the target bleed every 2 sec for 24 sec: 72 damage plus 48 per combo point spent (5 combo points: {damage} total). Cat Form only.',
+        'Finishing move that makes the target bleed every 2 sec for 24 sec, dealing more damage for each combo point spent (5 combo points: {damage} total). Cat Form only.',
         { feral: 'The landed hit adds 1 Old Blood (max 3).' },
       ],
       [
         'mortal_strike',
         'Maiming Strike',
-        'A vicious strike dealing weapon damage plus {damage}. (Arms signature)',
+        'Strike for weapon damage plus {damage} and reduce healing the target receives by 50% for 10 sec. Also applies Gaping Wounds, a bleed that deals {overTime} Physical damage over 6 sec in 2 ticks. (Arms signature)',
       ],
       [
         'bloodthirst',
         'Bloodletting',
-        'Instantly attack in a blood frenzy for 60% weapon damage plus {damage}. (Fury signature)',
+        'Strike for 50% weapon damage plus {damage}, heal yourself for 3% of your maximum health and generate {rage} rage. Has a 30% chance to Enrage you for {duration} sec. (Fury signature)',
       ],
       [
         'shield_slam',
         'Shieldcrack',
-        'Slam the target with your shield for 50% weapon damage plus {damage} and massive threat. (Protection signature)',
+        'Slam the target with your shield for weapon damage plus {damage} and generate {rage} rage. Causes very high threat. (Protection signature)',
       ],
       [
         'whirlwind',
         'Bladed Gyre',
-        'Spin in a deadly arc, striking all nearby enemies for {damage}. (Fury talent)',
+        'Strike all enemies within 8 yards for {damage} Physical damage. For the next {duration} sec, your next 2 single-target abilities also deal 40% of their damage to up to 4 other enemies within 8 yards of their target. (Fury)',
       ],
       [
         'berserker_rage',
         'Seething Fury',
-        'Enter a seething fury, generating 20 rage. (Warrior talent)',
+        'Enter a seething fury, instantly generating {rage} rage.',
       ],
       [
         'crusader_strike',
@@ -1432,12 +1452,12 @@ const classAbilityNamesEn = {
       [
         'galeheart_weapon',
         'Galeheart Weapon',
-        'Imbue both weapons for 30 min, enabling Warspirit Cadence.',
+        'Imbue both weapons for 30 min. While it is active, each completed Warspirit Cadence also strikes with Galeheart Echoes. Replaces Stonebound Weapon.',
       ],
       [
         'warspirit_cadence',
         'Warspirit Cadence',
-        'Passive: Dual-wield attacks have no extra miss chance. Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 25% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)',
+        "Passive: Dual-wield attacks have no extra miss chance. While Galeheart or Stonebound Weapon is active, every 3rd landed weapon attack grants Stormcast for 12 sec. With Galeheart Weapon, it also triggers 2 Galeheart Echoes, each dealing 25% of that hit's damage as Nature damage. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)",
       ],
       [
         'stormsurge',
@@ -1467,12 +1487,12 @@ const classAbilityNamesEn = {
       [
         'stoneward',
         'Stoneward',
-        'Protects one ally for 60 sec with 6 charges. Damage consumes a charge to heal 5% maximum health, once every 3 sec. (Shaman talent)',
+        'Ward one ally for 60 sec. When they take damage, a charge heals them for 5% of their maximum health, at most once every 3 sec, for up to 6 charges. Only one ally can hold your Stoneward at a time. (Shaman talent)',
       ],
       [
         'tidecall',
         'Tidecall',
-        "Heal a friendly target for {damage}. Healing increases with Spell Power. Add the full heal before overhealing to Mending Current, up to 30% of the target's maximum health.",
+        "Heal a friendly target for {damage}. Healing increases with Healing Power. Also add the full heal before overhealing to the target's Mending Current, a pool that heals them over 12 sec and holds at most 30% of their maximum health.",
       ],
       [
         'soul_harvest',
@@ -1482,7 +1502,7 @@ const classAbilityNamesEn = {
       [
         'soul_lance',
         'Soul Lance',
-        'Hurls a spectral lance for {damage} Shadow damage. Against your Ossuary Mark, 50% of its damage is added to the mark.',
+        'Hurls a spectral lance for {damage} Shadow damage. Against your Ossuary Mark, the mark stores 70% of its damage instead of 20%.',
       ],
       [
         'raise_graveguard',
@@ -1502,22 +1522,22 @@ const classAbilityNamesEn = {
       [
         'bone_armor',
         'Bone Armor',
-        'Wraps you in bone, absorbing damage equal to 20% of your maximum health.',
+        'Wraps you in bone for {duration} sec, absorbing damage equal to 20% of your maximum health.',
       ],
       [
         'corpse_explosion',
         'Corpse Explosion',
-        'Sacrifices a Skeletal Warrior first, then a Bone Mage, and a Gravewing only as a last resort. Among duplicates it chooses the one with the least remaining duration, then the weakest, to deal {damage} Shadow damage at the chosen location.',
+        'Sacrifices one of your Dominion servants (never your Graveguard) to deal {damage} Shadow damage to enemies within 8 yd of the chosen location. It takes a Skeletal Warrior first, then a Bone Mage, and a Gravewing only as a last resort; among servants of the same kind, the one closest to expiring, then the most injured. Requires a Dominion servant.',
       ],
       [
         'funeral_harvest',
         'Funeral Harvest',
-        'When an enemy recently damaged by you or your undead dies, you gain 1 Soul Fragment. This can occur once every 3 sec.',
+        'When an enemy dies within 5 sec of taking damage from you or your undead, you gain 1 Soul Fragment. This can occur once every 3 sec.',
       ],
       [
         'ossuary_mark',
         'Ossuary Mark',
-        'Marks an enemy for 15 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment.',
+        'Marks an enemy for 15 sec, storing 20% of the damage you and your undead deal to it. Recast to detonate it early: the enemy takes the stored damage as Shadow damage and you heal for 25% of it. When the mark expires it detonates without the heal. If the marked enemy dies, the stored damage hits other enemies within 6 yd and you gain 1 Soul Fragment.',
       ],
       [
         'unholy_command',
@@ -1532,7 +1552,7 @@ const classAbilityNamesEn = {
       [
         'sacrifice_undead',
         'Sacrifice Undead',
-        'Destroys one Dominion servant to restore 25% of your maximum health.',
+        'Destroys your most injured Dominion servant (never your Graveguard) to restore 25% of your maximum health. Requires a Dominion servant.',
       ],
       [
         'raise_gravewing',
@@ -1557,12 +1577,12 @@ const classAbilityNamesEn = {
       [
         'holy_shield',
         'Hallowed Wall',
-        'Gain 30% block and a shield that absorbs {damage}% of your maximum health for {duration} sec, releasing a pulse of threat. Ascension strengthens and extends the defense.',
+        'Gain 30% block chance and a shield that absorbs {damage}% of your maximum health for {duration} sec, releasing a pulse of threat. Ascension raises block chance to 40%, increases the shield by 50%, and extends both to 10 sec.',
       ],
       [
         'bestial_wrath',
         'Howling Rage',
-        'Grant 3 Pack Ferocity. Your next Unleash Beast within 20 sec deals 50% more strike and clap damage, and its frenzy lasts 12 sec instead of 8. (Packlord signature)',
+        'Grant 3 Pack Ferocity for 20 sec and end any active Unleashed Frenzy. Your next Unleash Beast within 20 sec deals 50% more strike and clap damage, and its frenzy lasts 12 sec instead of 8. (Packlord signature)',
       ],
       [
         'trueshot_aura',
@@ -1582,17 +1602,17 @@ const classAbilityNamesEn = {
       [
         'combustion',
         'Phoenix Trance',
-        'Combust: for 10 sec your Fire spells always critically strike, including bolts already in flight. Off the global cooldown. These crits build Hot Streak like any other, and casting it finishes the Cinderfall charge currently recharging. (Fire signature)',
+        'For 10 sec, your Fire spells always critically strike, including bolts already in flight, and these crits build Hot Streak as normal. Off the global cooldown and usable while casting. Casting it finishes the Cinderfall charge that is recharging. Outside Phoenix Trance, each critical strike that builds Hot Streak shortens its cooldown by 1 sec. (Fire)',
       ],
       [
         'icy_veins',
         'Coldsurge',
-        'Increases spell haste by 30% and prevents cast interruption and pushback for 10 sec. (Frost signature)',
+        'Increases spell haste by 30% and prevents cast interruption and pushback for 10 sec. (Frost)',
       ],
       [
         'cold_blood',
         "Killer's Calm",
-        'Focuses your killing intent so your next 5 attacks are critical strikes. (Knifework signature)',
+        'Your next 5 attacks within {duration} sec are guaranteed critical strikes. Auto attacks use a charge too. (Knifework signature)',
       ],
       [
         'blade_flurry',
@@ -1602,7 +1622,7 @@ const classAbilityNamesEn = {
       [
         'hemorrhage',
         'Red Ribbon',
-        'Strikes the enemy for weapon damage plus {damage}, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. Every 2nd use adds 1 Gloam (max 3). (Skulduggery signature)',
+        'Strike the enemy for weapon damage plus {damage} and make it bleed for {overTime} over 12 sec. For 12 sec, all bleeds on the target deal 40% more damage. Awards 1 combo point. Every 2nd use adds 1 Gloam (max 3). (Skulduggery signature)',
       ],
       [
         'power_infusion',
@@ -1612,17 +1632,17 @@ const classAbilityNamesEn = {
       [
         'holy_nova',
         'Sunburst Canticle',
-        'Heal allies within 10 yards for {damage} and deal 24 to 30 Holy damage to enemies in the same area. Both amounts increase with Spell Power. (Benison baseline)',
+        'Heal allies within 10 yards for {damage} and deal 24 to 30 Holy damage to enemies in the same area. Healing increases with Healing Power and damage with Spell Power. (Benison baseline)',
       ],
       [
         'shadowform',
         'Gloamveil',
-        'Enter Gloamveil, increasing your Shadow damage by 25%. Cast it again to leave Gloamveil. (Vespers signature)',
+        'Enter Gloamveil, increasing your Shadow damage by 25%. Casting a healing spell ends it. Cast Gloamveil again to leave it. (Vespers signature)',
       ],
       [
         'elemental_mastery',
         'Primal Mastery',
-        'For 12 sec, Arc Bolt grants 2 Thunder. Your next Arc Bolt or Skybranch is instant, and your next full Thunder payoff deals 25% more damage. (Thundercall signature)',
+        'For 12 sec, Arc Bolt grants 2 Thunder instead of 1. Your next Arc Bolt or Skybranch in that time is instant, and your next Earthen Jolt or Faultwake that consumes 5 Thunder deals 25% more damage. (Thundercall signature)',
       ],
       [
         'siphon_life',
@@ -1632,7 +1652,7 @@ const classAbilityNamesEn = {
       [
         'conflagrate',
         'Conflagrate',
-        'Advances one future tick of your Burning Pact, then ignites the target for {damage} Fire damage. Generates 1 Wrack and 1 Desolation. Holds {charges} charges. (Destruction signature)',
+        'Requires your Burning Pact on the target. Deals one of its remaining ticks immediately, shortening it by one tick, then ignites the target for {damage} Fire damage. Generates 1 Wrack and 1 Desolation (stacks to 2, lasts 15 sec): your next Ruinbolt casts 30% faster, or your next Rain of Fire lands its first wave immediately. Holds {charges} charges. (Destruction signature)',
       ],
       [
         'moonkin_form',
@@ -1642,7 +1662,7 @@ const classAbilityNamesEn = {
       [
         'feral_charge',
         'Primal Surge',
-        'Unleash a primal surge. In Cat Form, Energy regeneration is increased by 100% for 10 sec. In Bruin Form, instantly generates 50 Rage. (Feral signature)',
+        'Unleash a primal surge. In Cat Form, Energy regeneration is increased by 100% for 10 sec. In Bruin Form, instantly generates 50 Rage. Outside Cat and Bruin Form it has no effect. (Feral signature)',
       ],
       [
         'swiftmend',
@@ -1671,7 +1691,7 @@ const classAbilityNamesEn = {
       [
         'marrowbreak',
         'Marrowbreak',
-        'Spends your 3 Old Blood for a heavy, high-threat strike of {damage} damage. Below half health it instead heals you for 18% of your maximum health and refunds 15 rage.',
+        'Spends your 3 Old Blood for a strike of {damage} damage that generates threat equal to twice its damage plus 110. Below half health it instead heals you for 18% of your maximum health and refunds 15 rage.',
       ],
       [
         'wildwake',
@@ -1701,10 +1721,10 @@ const classAbilityNamesEn = {
       [
         'natures_boon',
         "Nature's Boon",
-        "Your spells can arm Nature's Boon for 10 sec: the spell it names becomes free, 25% stronger, and castable in any form. A fresh proc refreshes the duration.",
+        "Nature's Boon is a 10 sec window that makes the spell it names free, 25% stronger, and castable in any form. A fresh proc refreshes the duration.",
         {
           feral:
-            'Each landed melee auto-attack has a 1 in 15 chance to arm it for Sporemending, or for Oakhide while in Bruin Form.',
+            "Each landed melee auto-attack can arm it, about 4 times per minute in any form (a 1 in 15 chance per Cat Form swing). It covers Sporemending, which it makes 50% stronger instead of 25%, and Oakhide while you are in Bruin Form; the first one you cast spends it. Each proc also resets Oakhide's cooldown.",
           balance:
             'Each Wildbolt or Skyfall you cast has a 10% chance to arm it for Spore Burst, at most once every 10 sec.',
           restoration:
@@ -1748,7 +1768,7 @@ const classAbilityNamesEn = {
       [
         'summon_infernal',
         'Summon Pyre Colossus',
-        'Calls a Pyre Colossus down at the target area, dealing 64-79 Fire damage on impact. It fights for 30 sec without replacing your demon, burns nearby enemies every 2 sec, and generates 1 Wrack every 1 sec.',
+        'Calls a Pyre Colossus down at the target area, dealing {damage} Fire damage to enemies within 6 yd on impact. It fights for 30 sec without replacing your demon, deals 66 Fire damage to enemies within 8 yd every 2 sec, and generates 1 Wrack every sec.',
       ],
       [
         'summon_doomguard',
@@ -1763,12 +1783,12 @@ const classAbilityNamesEn = {
       [
         'berserker_stance',
         'Berserker Stance',
-        'A reckless combat stance: your critical strikes land 3% more often and hit for 3% more. The Fury warrior always fights in this stance.',
+        'A reckless combat stance: you gain 3% critical strike chance and your critical strikes deal 3% more damage. The Fury warrior always fights in this stance.',
       ],
       [
         'sweeping_strikes',
         'Widening Arc',
-        'For 12 sec your single-target attacks also strike 1 nearby enemy for full damage. (Arms)',
+        'For 12 sec, each hit from your single-target abilities also deals the same damage to 1 other enemy within 8 yards of your target. Auto-attacks are not copied. (Arms)',
       ],
       [
         'deep_wounds',
@@ -1778,7 +1798,7 @@ const classAbilityNamesEn = {
       [
         'enrage_passive',
         'Mayhem',
-        'Passive: while Enraged you deal 7% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)',
+        'Bloodletting has a 30% chance to Enrage you for 4 sec, and Red Harvest always does. While Enraged, you deal 7% more damage, attack 25% faster and move 10% faster. (Fury)',
       ],
       [
         'raging_gale',
@@ -1788,7 +1808,7 @@ const classAbilityNamesEn = {
       [
         'red_harvest',
         'Red Harvest',
-        'Spend everything: strike three times in a frenzy for 65% weapon damage plus {damage} each, always Enraging you. (Fury)',
+        'Strike three times, each hit dealing 65% weapon damage plus {damage}, and always become Enraged for {duration} sec. (Fury)',
       ],
       [
         'furious_mending',
@@ -1798,7 +1818,7 @@ const classAbilityNamesEn = {
       [
         'emboldening_roar',
         'Emboldening Roar',
-        'Lets loose an emboldening roar: you and friendly players within 40 yards are Emboldened, and your next 3 abilities are guaranteed critical strikes. (Fury)',
+        'You and allies within 40 yards become Emboldened for {duration} sec: the next 3 damaging abilities each of you uses are guaranteed critical strikes. (Fury)',
       ],
       [
         'raised_guard',
@@ -1848,7 +1868,7 @@ const classAbilityNamesEn = {
       [
         'sudden_death',
         'Sudden Death',
-        'Your auto-attacks have a chance to let you cast Early Grave on a target at any health, costing no rage. (Arms)',
+        'Your auto-attacks that connect have a 10% chance to grant Sudden Death for 10 sec: your next Early Grave costs no rage and can be used on a target at any health. (Arms)',
       ],
       [
         'storm_bolt',
@@ -1863,7 +1883,7 @@ const classAbilityNamesEn = {
       [
         'die_by_sword',
         'Die by the Sword',
-        'Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks.',
+        'For 8 sec, you take 30% less damage and gain 30% dodge chance.',
       ],
       [
         'intervene',
@@ -1873,12 +1893,12 @@ const classAbilityNamesEn = {
       [
         'recklessness',
         'Recklessness',
-        'Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec.',
+        'For 12 sec, you generate 50% more rage and gain 20% critical strike chance.',
       ],
       [
         'sanguine_aura',
         'Sanguine Aura',
-        'Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec.',
+        'Imbue your weapon with the blood of your foes: you and every Warrior, Paladin, Rogue, Shaman, and Druid in your party, at any range, gain 10% attack speed and deal 10% more damage for 20 sec.',
       ],
       [
         'victory_rush',
@@ -1888,17 +1908,17 @@ const classAbilityNamesEn = {
       [
         'intimidating_shout',
         'Intimidating Shout',
-        'A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 4 sec. Damage may break the effect.',
+        'Send up to 5 enemies within 8 yards fleeing in fear for 4 sec. Each hit on a feared enemy has a chance to break the fear, and a hit for 10% of its maximum health or more always does.',
       ],
       [
         'revenge',
         'Revenge',
-        'Attack in a wide arc, dealing 18 to 24 Physical damage to all enemies in front of you. Above 5 targets the damage is reduced. When you dodge or parry, your next Revenge may cost no rage. (Protection)',
+        "Strike all enemies in front of you within 8 yards for {damage} Physical damage. Above 5 targets, each hit is reduced so the total equals 5 hits. When you dodge or parry a creature's melee attack, you have a 30% chance to make your next Revenge within 10 sec cost no rage. (Protection)",
       ],
       [
         'heroic_leap',
         'Vaulting Charge',
-        'Leap to the target area, dealing {damage} damage to nearby enemies on landing.',
+        'Leap to the target area, dealing {damage} Physical damage to all enemies within 6 yards when you land.',
       ],
       [
         'rallying_cry',
@@ -1913,12 +1933,12 @@ const classAbilityNamesEn = {
       [
         'avatar',
         'Avatar',
-        'Transform into a colossus for 20 sec, breaking enemy control effects on you (boss control is unaffected) and increasing your damage dealt by 20%.',
+        'Break the stuns, fears, roots, silences, disarms and slows on you (not those from bosses), then become a colossus for 20 sec, dealing 20% more damage. It does not protect you from new control effects.',
       ],
       [
         'avenging_wrath',
         'Zealwing',
-        'Unfurl physical wings of golden holy power, gaining 10 Devotion and doubling Devotion generated by your abilities for 15 sec. Also increases damage and healing done by 20%. Dawnreaver: enables Tolling Hammer against any target.',
+        'Unfurl physical wings of golden holy power, gaining 10 Devotion and doubling Devotion generated by your abilities for {duration} sec. Also increases damage and healing done by 20%. Dawnreaver: enables Tolling Hammer against any target.',
       ],
       ['berserk', 'Red Haze', 'Increases attack power by 70 for 15 sec. (Druid talent)'],
       [
@@ -1926,11 +1946,11 @@ const classAbilityNamesEn = {
         'Bladestorm',
         'Become a whirling storm of steel, striking all enemies within 6 yards for {damage} every second for 4 sec.',
       ],
-      ['blink', 'Flitstep', 'Teleports you 15 yd forward and breaks roots. (Mage talent)'],
+      ['blink', 'Flitstep', 'Teleports you 15 yd forward and breaks roots.'],
       [
         'bloodlust',
         'Storm Chorus',
-        'Increase the attack, casting, and channeling speed of group or raid allies within 30 yards by 30% for 15 sec. Affected allies cannot benefit from Storm Chorus or Temporal Acceleration again for 10 min. (Shaman talent)',
+        "Increase the attack, casting, and channeling speed of group or raid allies within 30 yards by 30% for 15 sec. Affected allies cannot benefit from Storm Chorus, Thieves' Chorus, or Temporal Acceleration again for 10 min. (Shaman talent)",
       ],
       [
         'chain_lightning',
@@ -1965,7 +1985,7 @@ const classAbilityNamesEn = {
       [
         'counterspell',
         'Spellsever',
-        'Counters enemy spellcasting, preventing any spell in that school from being cast for 6 sec. (Mage talent)',
+        "Interrupts the target's spellcast and locks them out of that spell's school for 6 sec. Has no effect if the target is not casting.",
       ],
       [
         'curse_of_exhaustion',
@@ -2021,22 +2041,22 @@ const classAbilityNamesEn = {
       [
         'hammer_of_wrath',
         'Tolling Hammer',
-        "Hurl a holy hammer for {damage} damage and generate 1 Devotion. Usable below 20% health, or during Divine Ascension or Zealwing. Dawn's Wrath grants an additional cast against any target that ignores its current cooldown and deals 20% more damage. Ascension increases its damage by 30%.",
+        "Hurl a holy hammer for {damage} Holy damage and generate 1 Devotion. Only usable on a target below 20% health, unless Divine Ascension, Zealwing, or Dawn's Wrath is active. Dawn's Wrath is consumed by the next cast, which ignores the cooldown and deals 20% more damage. Ascension increases its damage by 30%.",
       ],
       [
         'healing_stream',
         'Springwell',
-        'Restores 120 health to a friendly target over 12 sec. (Shaman talent)',
+        'Heal a friendly target for {damage} over 12 sec, once every 3 sec. Healing increases with Healing Power. (Shaman talent)',
       ],
       [
         'howl_of_terror',
         'Dread Chorus',
-        "Frightens nearby enemies for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)",
+        "Frightens enemies within 8 yd and in line of sight for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)",
       ],
       [
         'ice_block',
         'Cold Coffin',
-        'Encases you in solid ice for 8 sec, making you immune to all damage. Removes existing ordinary harmful effects and prevents new ordinary control effects. Usable while stunned or polymorphed. You cannot act while encased. Recast to cancel. (Mage)',
+        'Encases you in solid ice for 8 sec. You take no damage and cannot be stunned, rooted, slowed, silenced or otherwise controlled, but you cannot act. Removes harmful effects from you when cast, except encounter control and recovery sickness. Usable while stunned or polymorphed. Recast to cancel. (Mage)',
       ],
       [
         'inner_focus',
@@ -2050,13 +2070,13 @@ const classAbilityNamesEn = {
       [
         'innervate',
         'Lifesap',
-        'Living sap wells up in you for 10 sec, restoring 20 of your current resource in waves: mana, Rage, or Energy, and shifting forms does not break it. Sleep, stun, or stasis stills the sap. (Druid talent)',
+        'Living sap wells up in you for 10 sec, restoring 20 of whichever resource you are using (mana, Rage, or Energy) every 2 sec. Shifting forms does not end it. Sleep, stun, or stasis pauses it. (Druid talent)',
       ],
       // Baseline class interrupts.
       [
         'pummel',
         'Jawcrack',
-        "Interrupts the target's spellcast and prevents casting from that school for 4 sec.",
+        "Interrupts the target's spellcast and prevents casting from that school for 4 sec. Generates 10 rage when it stops a cast.",
       ],
       [
         'kick',
@@ -2067,7 +2087,7 @@ const classAbilityNamesEn = {
       [
         'meteor',
         'Skystone',
-        'Calls down a meteor at the target area, dealing {damage} Fire damage and burning the ground. (Mage talent)',
+        'Calls a meteor down on the target area. After 2 sec it lands, dealing {damage} Fire damage to each enemy in the impact and Igniting each one for 40% of the damage dealt over 6 sec. (Fire)',
       ],
       [
         'temporal_mend',
@@ -2082,12 +2102,12 @@ const classAbilityNamesEn = {
       [
         'temporal_echo',
         'Temporal Echo',
-        'Marks an ally with an echo of a healthier moment, mending {damage} health at once. For {duration} sec, {echoSinglePct}% of your other single-target Arcane damage and {echoAreaPct}% of your area Arcane damage heals them. Aether Surge and Aether Darts instead heal them for {echoDriverPct}% of the damage they deal.',
+        'Heals an ally for {damage} at once and marks them with Temporal Echo for {duration} sec. While marked, {echoSinglePct}% of your other single-target Arcane damage and {echoAreaPct}% of your area Arcane damage heals them; Aether Surge and Aether Darts heal them for {echoDriverPct}% of the damage they deal instead. You can keep one Temporal Echo out: casting it again moves the mark. Healing beyond full health becomes a Temporal Aegis shield, up to 20% of their maximum health.',
       ],
       [
         'temporal_cascade',
         'Temporal Cascade',
-        'Sends an echo cascading through your group: the target and up to four of their nearest allies are mended at once, healing for more on those who have lost the most health, and each marked for {duration} sec, drawing part of the Arcane damage you deal back through their echoes to heal them. Aether Surge and Aether Darts create an equal healing reserve from every group Echo, shared among marked allies below 60% health according to missing health. (Chronomancy)',
+        'Heals the target and up to 4 nearby allies, group members first, and marks each with a group Temporal Echo for {duration} sec. Each heal is increased by 3% for every 1% of health the ally is missing. While marked, 13% of your single-target Arcane damage and 6% of your area Arcane damage heals each of them. Aether Surge and Aether Darts also add an equal healing reserve from every group Echo, shared among marked allies below 60% health by missing health. An ally already holding your Temporal Echo keeps it. (Chronomancy)',
       ],
       [
         'temporal_reversal',
@@ -2117,7 +2137,7 @@ const classAbilityNamesEn = {
       [
         'temporal_acceleration',
         'Temporal Acceleration',
-        'Accelerates the flow of time for your group or raid, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Temporal Acceleration or Storm Chorus are too exhausted to benefit. (Chronomancy)',
+        "Accelerates the flow of time for group or raid allies within 40 yards, increasing their attack, casting, and channeling speed by 30% for 15 sec. Affected allies cannot benefit from Temporal Acceleration, Storm Chorus, or Thieves' Chorus again for 10 min. (Chronomancy)",
       ],
       [
         'perfect_moment',
@@ -2127,7 +2147,7 @@ const classAbilityNamesEn = {
       [
         'arcane_surge',
         'Aether Surge',
-        "Draws a surge of raw aether through the enemy for {damage} damage. Each cast leaves an Arcane Charge that raises your next Aether Surge's damage and cast speed (5% faster each) but sharply raises its mana cost, stacking up to 4; Aether Darts spends the charges. Each cast can also arm Aether Rush, making your next Aether Surge free and twice as fast to cast.",
+        'Deals {damage} Arcane damage to the enemy and grants an Arcane Charge, up to 4, lasting 10 sec and refreshed by each cast. Each Arcane Charge makes your next Aether Surge deal 30% more damage and cast 5% faster, but doubles its mana cost. Aether Darts spends the charges. Each cast has a 25% chance to grant Aether Rush: your next Aether Surge within 15 sec costs no mana and casts twice as fast.',
       ],
       [
         'mind_sear',
@@ -2142,7 +2162,7 @@ const classAbilityNamesEn = {
       [
         'prayer_of_healing',
         'Choirmend',
-        'Heal allies within 30 yards for {damage}. Healing increases with Spell Power. (Benison)',
+        'Heal allies within 30 yards for {damage}. Healing increases with Healing Power. (Benison)',
       ],
       [
         'preparation',
@@ -2178,7 +2198,7 @@ const classAbilityNamesEn = {
       [
         'smoke_screen',
         'Smoke Screen',
-        'Vanish into a cloud of smoke, increasing your chance to dodge by 30% for 8 sec.',
+        'Surround yourself with smoke, increasing your dodge chance by 30% for 8 sec.',
       ],
       [
         'sacrilegious_march',
@@ -2198,22 +2218,22 @@ const classAbilityNamesEn = {
       [
         'skull_bash',
         'Headbutt',
-        "A lunging headbutt that interrupts the target's spellcast and locks that school for 4 sec.",
+        'Headbutt the target, interrupting the spell it is casting and preventing it from casting spells of that school for 4 sec.',
       ],
       [
         'spell_lock',
         'Abyssal Gag',
-        'Interrupts enemy spellcasting and prevents casting from that school for 4 sec.',
+        "Interrupts the enemy's spellcasting and prevents it from casting spells of that school for 4 sec.",
       ],
       [
         'thieves_chorus',
         "Thieves' Chorus",
-        'A whistled signal spurs your group on, increasing attack, casting, and channeling speed by 10% for 10 sec. Allies recently affected by a group haste burst are too exhausted to benefit. (Rogue talent)',
+        "Increase the attack, casting, and channeling speed of group or raid allies within 30 yards by 10% for 10 sec. Affected allies cannot benefit from Thieves' Chorus, Storm Chorus, or Temporal Acceleration again for 10 min. (Rogue talent)",
       ],
       [
         'tranquility',
         'Gladesong',
-        'Channels restorative energy for 4 sec, healing allies within 30 yd for 42 to 52 each second. (Druid talent)',
+        'Channels restorative energy for 4 sec, healing every ally within 30 yd and in your line of sight, including you, for {damage} each second. (Druid talent)',
       ],
       [
         'venom_dart',
@@ -2221,33 +2241,33 @@ const classAbilityNamesEn = {
         'Flick a poisoned dart for {damage} Nature damage. Awards 1 combo point.',
         {
           assassination:
-            'Adds 1 Venom Ritual and extends your venom wound by 6 sec (the wound never goes above 20 sec).',
+            'Adds 1 Venom Ritual (max 6), refunds 15 energy, and extends your venom wound by 6 sec (the wound never goes above 20 sec).',
         },
       ],
       [
         'body_blow',
         'Haymaker',
-        'A heavy blow for 130% weapon damage plus 10. Awards 2 combo points and adds 1 Redline (max 4). (Thuggery)',
+        'A heavy blow for {weaponPercent}% weapon damage plus {damage}. Awards 2 combo points and adds 1 Redline (max 4). (Thuggery)',
       ],
       [
         'knockout_blow',
         'Lights Out',
-        'Ends Redline with a knockout: strike for 45 plus 35 per combo point, hitting 25% harder for each Redline you built, and recover 25 energy. Use it before Redline runs out or the knockout is lost. (Thuggery)',
+        'Ends Redline with a knockout: strike for {damage} Physical damage, hitting 25% harder for each Haymaker you threw during Redline (up to 3), and recover 25 energy. Damage increases with Attack Power. Use it before Redline runs out or the knockout is lost. (Thuggery)',
       ],
       [
         'veilstrike',
         'Shadow Veil',
-        "For 6 sec: your Duskveil openers work without stealth and from any angle, you deal 10% more damage, and your first Lurker's Strike inside it hits for double. (Skulduggery)",
+        "For 6 sec: your Duskveil openers work without stealth and from any angle, and you deal 10% more damage. Your first Lurker's Strike inside it deals 50% more weapon damage. (Skulduggery)",
       ],
       [
         'venomrend',
         'Venomrend',
-        'Spends your 6 Venom Ritual: strike for 100 plus 55 per combo point, instantly deal all the damage your bleeds would still have dealt, then apply a fresh venom wound (120 damage over 20 sec). Restores 20 energy. (Knifework)',
+        'Spends your 6 Venom Ritual: strike for {damage} Physical damage, instantly deal all the damage left on your Bleed Out, Throat Wire, and venom wound, then apply a fresh venom wound that deals {overTime} over 20 sec. Restores 20 energy. (Knifework)',
       ],
       [
         'typhoon',
         'Typhoon',
-        'A blast of wind hurls all enemies within 8 yd 15 yd away from you and dazes them, slowing their movement by 50% for 4 sec. Enemy players are thrown into the air in a straight line: knocked off a ledge, they keep going and take falling damage, and a fatal fall counts as your kill.',
+        'Knocks every enemy within 8 yd and in your line of sight up to 15 yd away from you and dazes them, slowing their movement by 50% for 4 sec. Enemy players are thrown into the air in a straight line: knocked off a ledge, they keep going and take falling damage, and a fatal fall counts as your kill.',
       ],
       [
         'voidfeast',
@@ -2258,12 +2278,12 @@ const classAbilityNamesEn = {
       [
         'scouring_mercy',
         'Scouring Mercy',
-        'Deal {damage} Holy damage to an enemy or heal a friendly target for {healing}. Damage increases with Spell Power; healing increases with Healing Power. Doctrine converts this damage into healing through your links. If no injured linked group member is within 30 yards, heal the lowest-health injured group member within 30 yards for 15% of the damage. Healing a group member also heals up to 2 other injured group members within 10 yards of that target and in your line of sight, each for 50% of the health restored. These extra heals cannot critically heal or create Doctrine links. (Doctrine signature)',
+        'Deal {damage} Holy damage to an enemy or heal a friendly target for {healing}. Damage increases with Spell Power; healing increases with Healing Power. Doctrine heals each injured linked group member within 30 yards for 30% of the damage dealt (70% with Twin Covenant). If none is injured, it heals the lowest-health injured group member within 30 yards for 15% of the damage instead. Healing a group member also heals up to 2 other injured group members within 10 yards of that target and in your line of sight, each for 50% of the health restored. These extra heals cannot critically heal or create Doctrine links. (Doctrine signature)',
       ],
       [
         'seraphic_vigil',
         'Seraphic Vigil',
-        'Protect one ally for 30 sec. The first hit that leaves them below 35% health consumes the Vigil and heals them for {buff}. (Benison signature)',
+        'Protect one ally for 30 sec. The first hit that leaves them below 35% health consumes the Vigil and heals them for {buff}. Casting it on another ally moves your Vigil. (Benison signature)',
       ],
       [
         'summon_tithefiend',
@@ -2279,10 +2299,10 @@ const classAbilityNamesEn = {
       [
         'choir_of_deliverance',
         'Choir of Deliverance',
-        'Channel for 6 sec, healing party members within 30 yards for {damage} every 2 sec. Healing increases with Spell Power.',
+        'Channel for 6 sec, healing you and every friendly target within 30 yards and in your line of sight for {damage} every 2 sec. Healing increases with Healing Power.',
         {
           shadow:
-            'For 15 sec, share 20% of the health enemies lose to your Shadow damage as healing among injured party members within 30 yards, including yourself. In raids, only your subgroup is healed. Cast instantly and keep attacking in Shadowform. Absorbed damage and overkill do not add healing.',
+            'For 15 sec, share 20% of the health enemies lose to your Shadow damage as healing among injured party members within 30 yards, including yourself. In raids, only your subgroup is healed. Cast instantly and keep attacking in Gloamveil. Absorbed damage and overkill do not add healing.',
         },
       ],
     ]),

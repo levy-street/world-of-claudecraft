@@ -11,6 +11,10 @@ export interface TooltipBindingDeps {
   paintTooltipAt(html: string, x: number, y: number): { w: number; h: number };
   tooltipViewport(): TooltipViewport;
   hoverAllowed(): boolean;
+  /** Told which repaint closure owns the visible box (null once hidden), so a
+   *  modifier-key change (Shift for ability details) can re-resolve the live
+   *  content in place without waiting for the pointer to move. */
+  setActiveRepaint?(repaint: (() => void) | null): void;
 }
 
 export function bindTooltip(el: HTMLElement, html: () => string, deps: TooltipBindingDeps): void {
@@ -20,6 +24,34 @@ export function bindTooltip(el: HTMLElement, html: () => string, deps: TooltipBi
   // calls, so re-reading offsetWidth/Height per mousemove only forced a reflow
   let ttW = 0;
   let ttH = 0;
+  // Last paint anchor, kept current by mousemove so an in-place repaint lands
+  // where the box already is.
+  let lastX = 0;
+  let lastY = 0;
+  // What this element last painted: the HTML string, and the first node it
+  // produced in the shared box. A foreign paint (the mob card, a map marker)
+  // replaces the box's children without going through this binding, so a
+  // changed first child means the box is no longer ours.
+  let lastHtml = '';
+  let paintedFirst: ChildNode | null = null;
+  const paint = () => {
+    lastHtml = html();
+    const size = deps.paintTooltipAt(lastHtml, lastX, lastY);
+    paintedFirst = deps.tooltipEl.firstChild;
+    ttW = size.w;
+    ttH = size.h;
+  };
+  // The external in-place repaint (a modifier-key flip). It only repaints
+  // when this element still owns the visible box AND its content changed, so
+  // a Shift press never paints over another surface's card and never
+  // re-measures a tooltip whose HTML does not depend on the modifier.
+  const repaintIfOwned = () => {
+    if (deps.tooltipOwner.current() !== el) return;
+    if (deps.tooltipEl.style.display === 'none') return;
+    if (deps.tooltipEl.firstChild !== paintedFirst) return;
+    if (html() === lastHtml) return;
+    paint();
+  };
   const mobile = () => document.body.classList.contains('mobile-touch');
   const clearTouchTimer = () => {
     if (touchTimer !== undefined) window.clearTimeout(touchTimer);
@@ -29,13 +61,14 @@ export function bindTooltip(el: HTMLElement, html: () => string, deps: TooltipBi
     // Touch-only path: showing the tooltip means the held control is being
     // inspected, so the release click should peek, not fire its action.
     deps.peekGuard.tooltipShown(trigger);
-    const size = deps.paintTooltipAt(html(), x, y);
+    lastX = x;
+    lastY = y;
     // cache the measured box for the mousemove clamp below (no forced reflow)
-    ttW = size.w;
-    ttH = size.h;
+    paint();
     // This element now owns the shared box, so its own mousemove keeps the
     // cheap reposition-only path and a hover onto any other element re-resolves.
     deps.tooltipOwner.claim(el);
+    deps.setActiveRepaint?.(repaintIfOwned);
   };
   const showNearElement = () => {
     const rect = el.getBoundingClientRect();
@@ -78,6 +111,8 @@ export function bindTooltip(el: HTMLElement, html: () => string, deps: TooltipBi
       showAt(e.clientX, e.clientY, 'mouse');
       return;
     }
+    lastX = e.clientX;
+    lastY = e.clientY;
     // reuse the box size measured in showAt: same content, no forced reflow
     const at = tooltipPlacementAt(e.clientX, e.clientY, { w: ttW, h: ttH }, deps.tooltipViewport());
     deps.tooltipEl.style.left = `${at.left}px`;
@@ -88,11 +123,13 @@ export function bindTooltip(el: HTMLElement, html: () => string, deps: TooltipBi
     deps.tooltipEl.style.display = 'none';
     // Box hidden: no element owns it, so the next move over any slot re-resolves.
     deps.tooltipOwner.release();
+    deps.setActiveRepaint?.(null);
   });
   el.addEventListener('focusout', () => {
     clearTouchTimer();
     deps.tooltipEl.style.display = 'none';
     deps.tooltipOwner.release();
+    deps.setActiveRepaint?.(null);
   });
   el.addEventListener('pointerdown', (e) => {
     if (!mobile() || e.pointerType === 'mouse') return;

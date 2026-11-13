@@ -139,22 +139,10 @@ import {
   type OverheadEmoteId,
   type PartyInfo,
 } from '../world_api';
-import { abilityScalingOf } from './ability_damage';
-import {
-  abilityDisplayDescription,
-  abilityEffectAuraInput,
-  abilityEffectText,
-  formatAbilityNumber,
-} from './ability_description';
+import { formatAbilityNumber } from './ability_description';
 import { abilityDisplayName, abilityDisplayNameFromSource } from './ability_display_name';
-import {
-  abilityCastLine,
-  abilityRangeLine,
-  abilityRequirementLines,
-  describeAbilitySummary,
-  playerSpellHasteFrac,
-  resourceDisplayName,
-} from './ability_tooltip_lines';
+import { describeAbilitySummary, playerSpellHasteFrac } from './ability_tooltip_lines';
+import { abilityTooltipHtml } from './ability_tooltip_view';
 import { ArenaWindow } from './arena_window';
 import { auraDisplayNameForHud, auraDisplayNameFromSource } from './aura_display_name';
 import {
@@ -965,6 +953,7 @@ import { toolEffectNameKey } from './tool_effect_name';
 import { toolEffectTooltipLines } from './tool_effect_tooltip';
 import { bindTooltip } from './tooltip_binding';
 import type { TooltipViewport } from './tooltip_clamp_core';
+import { TooltipDetailKey } from './tooltip_detail_key';
 import { createTooltipLine } from './tooltip_line';
 import { SharedTooltipOwner } from './tooltip_owner';
 import {
@@ -1490,6 +1479,9 @@ export class Hud {
   // drag-drop, or Firefox's spurious post-drag re-enter on the drag source) and
   // re-resolve its own tooltip instead of trailing the stale one (#1626).
   private readonly tooltipOwner = new SharedTooltipOwner<HTMLElement>();
+  // Shift held = ability detail mode; a flip repaints the visible box in place.
+  private readonly tooltipDetailKey = new TooltipDetailKey();
+  private activeTooltipRepaint: (() => void) | null = null;
   // Distinguishes a touch long-press "peek" (inspect, no action) from a tap.
   private peekGuard = new TouchPeekGuard();
   // The world entity whose hover tooltip is currently shown, so main.ts can call
@@ -2294,7 +2286,7 @@ export class Hud {
       attachTooltip: (el, html, isSpell) => this.attachTooltip(el, html, isSpell),
       hideTooltip: () => this.hideTooltip(),
       previewResolvedAbility: (id) => this.previewResolvedAbility(id),
-      abilityTooltip: (res) => this.abilityTooltip(res),
+      abilityTooltip: (res) => this.abilityTooltip(res, false),
     });
     this.targetAurasWindow = new TargetAurasWindow({
       root: $('#target-auras-window'),
@@ -2722,6 +2714,9 @@ export class Hud {
     mm.style.cursor = 'var(--cursor-point)';
     mm.title = t('controls.worldMap');
     bindMinimapObjectiveTap(mm, this);
+    this.tooltipDetailKey.install(window, () => {
+      if (this.tooltipEl.style.display !== 'none') this.activeTooltipRepaint?.();
+    });
     window.addEventListener('pointermove', (ev) => {
       if (this.emoteWheelOpen) this.updateEmoteWheelPointer(ev.clientX, ev.clientY);
     });
@@ -6249,6 +6244,9 @@ export class Hud {
       tooltipViewport: () => this.tooltipViewport(),
       hoverAllowed: () =>
         !isSpell() || (this.optionsHooks?.settings.get('spellTooltipOnHover') ?? true),
+      setActiveRepaint: (repaint) => {
+        this.activeTooltipRepaint = repaint;
+      },
     });
   }
 
@@ -6268,6 +6266,7 @@ export class Hud {
     // later move over any slot re-resolves its live tooltip instead of keeping
     // the now-stale content (#1626).
     this.tooltipOwner.release();
+    this.activeTooltipRepaint = null;
   }
 
   private showRaidLockoutTooltip(): void {
@@ -6929,84 +6928,21 @@ export class Hud {
     };
   }
 
-  private abilityTooltip(res: ResolvedAbility): string {
-    const a = res.def;
-    const scaling = abilityScalingOf(this.sim.player);
-    const damageText = abilityEffectText(res, scaling);
-    let html = `<div class="tt-title">${esc(abilityDisplayName(a))}</div>`;
-    html += `<div class="tt-sub">${esc(t('abilityUi.tooltip.rank', { rank: formatAbilityNumber(res.rank) }))}</div>`;
-    const costLine: string[] = [];
-    if (res.cost > 0) {
-      costLine.push(
-        t('abilityUi.tooltip.cost', {
-          cost: formatAbilityNumber(res.cost),
-          resource: resourceDisplayName(this.sim.player.resourceType),
-        }),
-      );
-    }
-    if (a.devotionCost) {
-      costLine.push(
-        t('abilityUi.tooltip.cost', {
-          cost: formatAbilityNumber(a.devotionCost),
-          resource: t('abilityUi.resources.devotion'),
-        }),
-      );
-    }
-    if ((a.ruinCost ?? 0) > 0) {
-      costLine.push(
-        t('abilityUi.tooltip.ruinCost', {
-          cost: formatAbilityNumber(a.ruinCost ?? 0),
-        }),
-      );
-    }
-    const rangeLine = abilityRangeLine(a);
-    if (rangeLine) costLine.push(rangeLine);
-    if (costLine.length) html += `<div class="tt-stat">${costLine.map(esc).join(' &nbsp; ')}</div>`;
-    const castLine = [abilityCastLine(res, playerSpellHasteFrac(this.sim.player))];
-    // Use the RESOLVED cooldown (res.cooldown), not res.def.cooldown, so talents that
-    // reduce cooldown (Improved Mortal Strike, Barrage, Improved Fire Blast, ...) show
-    // their effect in the tooltip.
-    if (res.cooldown > 0)
-      castLine.push(
-        t('abilityUi.tooltip.cooldownSeconds', {
-          seconds: formatAbilityNumber(res.cooldown),
-        }),
-      );
-    html += `<div class="tt-stat">${castLine.map(esc).join(' &nbsp; ')}</div>`;
-    html += `<div class="tt-desc">${esc(abilityDisplayDescription(res, damageText, scaling, undefined, this.sim.talents.spec))}</div>`;
-    // Resolved buff/aura effect line(s). Reads the RESOLVED effect value, so a buff's
-    // tooltip reflects rank AND talents that strengthen it (Improved Devotion Aura /
-    // Aspect of the Hawk / Fortitude via buffPct) - which the static description can't.
-    for (const eff of res.effects) {
-      if (res.def.tooltipOmitEffectLines) break;
-      const resolvedAuraEffect = abilityEffectAuraInput(eff);
-      if (resolvedAuraEffect) {
-        html += this.auraEffectTooltipHtml(resolvedAuraEffect);
-      } else if (eff.type === 'selfBuff' || eff.type === 'buffTarget') {
-        // Pass the ability id so the effect line can resolve its damage school
-        // (the {school} placeholder in the thorns/dot/absorb summaries).
-        html += this.auraEffectTooltipHtml({
-          kind: eff.kind,
-          value: eff.value,
-          id: a.id,
-        });
-      } else if (eff.type === 'partyMeleeBuff') {
-        // Sanguine Aura: surface the same composite line the buff icon shows.
-        html += this.auraEffectTooltipHtml({
-          kind: 'sanguine',
-          value: eff.attackSpeedMult,
-          value2: eff.dmgPct,
-        });
-      }
-    }
-    // Pass the RESOLVED ability, not just its def: a talent that retires a
-    // requirement (Cheap Trick on Gut Punch) must retire its line with it, the
-    // same way the resolved cost / cast / cooldown above beat the def's.
-    const requirements = abilityRequirementLines(a, this.sim.talents.spec, res);
-    if (requirements.length) {
-      html += requirements.map((line) => `<div class="tt-sub">${esc(line)}</div>`).join('');
-    }
-    return html;
+  // `withDetails` false: a surface showing abilities the player may not own
+  // (the death recap's enemy casts) skips the Shift block, whose scaling and
+  // threat lines read the PLAYER's stats.
+  private abilityTooltip(res: ResolvedAbility, withDetails = true): string {
+    return abilityTooltipHtml(res, {
+      player: this.sim.player,
+      spec: this.sim.talents.spec,
+      auraEffectHtml: (input) => this.auraEffectTooltipHtml(input),
+      // Touch has no Shift key, so mobile always shows the detail block.
+      detailMode: !withDetails
+        ? 'none'
+        : this.isMobileLayout() || this.tooltipDetailKey.isHeld()
+          ? 'details'
+          : 'hint',
+    });
   }
 
   // -------------------------------------------------------------------------
@@ -17719,7 +17655,8 @@ export class Hud {
 
 // abilityRangeLine, playerSpellHasteFrac, abilityCastLine,
 // abilityRequirementLines, describeAbilitySummary and resourceDisplayName
-// moved WHOLE to ./ability_tooltip_lines (imported above) at the Phase 10
-// headroom extraction, so a Vitest can pin the tooltip lines directly.
+// moved WHOLE to ./ability_tooltip_lines at the Phase 10 headroom extraction,
+// so a Vitest can pin the tooltip lines directly. The ability tooltip body
+// itself lives in ./ability_tooltip_view (abilityTooltipHtml).
 
 // require2dContext moved to ./canvas_context (imported above).

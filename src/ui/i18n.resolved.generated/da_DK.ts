@@ -1813,6 +1813,24 @@ export const da_DK: EnTranslations = {
       "ascensionLastAnnouncement": "Ophøjelse: sidste ladning",
       "ascensionSpenderAria": "Handlingsplads {slot}: {ability}. Bruger én Ophøjelsesladning."
     },
+    "abilityTooltipDetail": {
+      "hint": "Hold Shift for detaljer",
+      "school": "Skole: {school}",
+      "scaling": "Inkluderer +{bonus} fra din {stat} ({value})",
+      "stat": {
+        "spellPower": "Besværgelseskraft",
+        "healPower": "Helbredelseskraft",
+        "attackPower": "Angrebsstyrke",
+        "rangedPower": "Afstandsangrebsstyrke"
+      },
+      "ticks": "{ticks} tik, ét hvert {interval} sek. over {duration} sek.",
+      "radius": "Radius: {radius} yd",
+      "charges": "Ladninger: {charges}",
+      "castWhileMoving": "Kan kastes under bevægelse",
+      "pushbackImmune": "Modtaget skade forsinker ikke dette kast",
+      "threatMult": "Evnens trusselsmodifikator: {percent}%",
+      "threatFlat": "Bonustrussel: +{threat}"
+    },
     "abilityScaling": {
       "bonus": "(+{value})"
     },
@@ -17498,11 +17516,11 @@ export const da_DK: EnTranslations = {
       },
       "flamestrike": {
         "name": "Flammeslag",
-        "description": "Nedkalder en flammeeksplosion på målområdet, der giver {damage} Ildskade til fjender fanget i eksplosionen."
+        "description": "Nedkalder en flammeeksplosion på målområdet og giver {damage} Ildskade til hver fjende, der rammes af eksplosionen. Ét kritisk-træf-kast dækker hele eksplosionen: enten rammes alle fjender kritisk, eller ingen gør."
       },
       "rain_of_fire": {
         "name": "Ildregn",
-        "description": "Bruger 3 Forødelse på at lade ild regne over målområdet og volde {damage} Ildskade hvert sekund i 4 sek., forlænget til 6 sek. på rang 2. Tilintetgørelse kalder den første bølge ned med det samme."
+        "description": "Bruger 3 Wrack på at lade ild regne over målområdet og giver fjender indeni {damage} Ildskade hvert sekund i {duration} sek. Tilintetgørelse kalder den første bølge ned med det samme."
       },
       "volley": {
         "name": "Pileregn",
@@ -17510,19 +17528,19 @@ export const da_DK: EnTranslations = {
       },
       "phosphor_flask": {
         "name": "Fosforflaske",
-        "description": "En forseglet beholder med en reaktiv kemisk blanding, der bryder ud i hvidglødende flammer over et område på 8 m i 3 sek. Fjender, der står i flammerne, tager {damage} Ildskade hvert 0,5 sek. Skaden stiger med afstandsangrebskraft."
+        "description": "Kast en flaske, der bryder ud i flammer over et område på 8 m i 3 sek. Fjender, der står i flammerne, tager {damage} Ildskade hvert 0,5 sek. Skaden stiger med Afstandsangrebsstyrke."
       },
       "pack_command": {
         "name": "Flokbefaling",
-        "description": "Befal dit levende kæledyr at slå for 36 til 48 fysisk skade. Skaden stiger med kæledyrets angrebskraft. Et træf genopretter 20 fokus og giver 1 Flokvildskab i 30 sek., op til 3. Hver stak øger al skade, dit kæledyr gør, med 10%. Dette slag bruger de stakke, du havde før træffet."
+        "description": "Befal dit levende kæledyr at slå for 36 til 48 fysisk skade. Skaden stiger med kæledyrets Angrebsstyrke. Et træf genopretter 20 Fokus og giver 1 Flokvildskab i 30 sek., op til 3. Hver stak øger al skade, dit kæledyr gør, med 10%. Dette slag bruger de stakke, du havde før træffet. Ved 3 stakke bliver denne knap til Slip Bæstet Løs. Kan ikke bruges under Løsladt Raseri."
       },
       "stampede": {
         "name": "Vildt Spring",
-        "description": "Tilkalder 3 bæster i 12 sek. Hvert angriber hvert 2. sek. for {damage} fysisk skade. Den viste skade inkluderer 8% af din afstandsangrebskraft før kæledyrsskadebonusser. Bæsterne fastlåser Flokvildskabet ved tilkaldelsen og får 10% skade per stak. Mens Vildt Spring er under nedkøling, har vellykkede Flokbefalinger 20% chance for at nulstille det, garanteret efter 5 mislykkede chancer. Det kan ikke nulstilles, mens bæsterne er aktive. (Flokherre)"
+        "description": "Tilkalder 3 bæster i 12 sek. Hvert angriber hvert 2. sek. for {damage} fysisk skade. Den viste skade inkluderer 8% af din Afstandsangrebsstyrke før kæledyrsskadebonusser. Bæsterne fastlåser Flokvildskab ved tilkaldelsen og får 10% skade pr. stak. Mens Vildt Spring er under nedkøling, har vellykkede Flokbefalinger 20% chance for at nulstille det, garanteret ved den 5. chance. Det kan ikke nulstilles, mens bæsterne er aktive. (Bæstemestring)"
       },
       "unleash_beast": {
         "name": "Slip Bæstet Løs",
-        "description": "Forbruger 3 Flokvildskab, efter at dit kæledyr har slået for 83 til 105 fysisk skade og rystet enhver fjende inden for 6 meter for 26 til 34. Slaget og rystelsen bruger Flokvildskabets fulde kæledyrsskadebonus på 30% og stiger med kæledyrets angrebskraft. I de følgende 8 sek. gør kæledyret 25% mere skade, angriber 35% hurtigere og får Grumt Skud til at ramme op til 2 nærliggende fjender."
+        "description": "Dit kæledyr slår målet for 42 til 53 fysisk skade og klapper derefter alle fjender inden for 6 m af kæledyret for 57 til 75. Klappet gør 50% mere skade på andre fjender end hovedmålet. Slaget og klappet bruger Flokvildskabs fulde kæledyrsskadebonus på 30%, stiger med kæledyrets Angrebsstyrke og forbruger derefter alle 3 Flokvildskab. I de følgende 8 sek. (Løsladt Raseri) gør kæledyret 25% mere skade og angriber 35% hurtigere, hvert Grumt Skud får det til at kløve op til 2 andre fjender inden for 5 m af målet for 12 til 18 fysisk skade, og du kan ikke bruge Flokbefaling."
       },
       "measured_shot": {
         "name": "Afmålt Skud",
@@ -17530,7 +17548,7 @@ export const da_DK: EnTranslations = {
       },
       "cold_focus": {
         "name": "Koldt Fokus",
-        "description": "I 12 sek. genopretter Afmålt Skud 50% mere fokus, og Langt Træk koster 25% mindre og kastes 30% hurtigere. (Koldsynssignatur)"
+        "description": "I 12 sek. genopretter Afmålt Skud 30 Fokus, og Langt Optræk koster 25% mindre og har 30% kortere kastetid. (Skarpskytteri-signatur)"
       },
       "bloodhook": {
         "name": "Blodkrog",
@@ -17542,11 +17560,11 @@ export const da_DK: EnTranslations = {
       },
       "bloodtrail_assault": {
         "name": "Blodsporsangreb",
-        "description": "I 12 sek. spreder Blodkrog et sår med 60% styrke til op til 2 fjender inden for 5 meter, Sårflænger beordrer et kæledyrsangreb for 18 skade, og Splintladning når 2 meter længere, gør 25% mere grundskade på hovedmålet og udløser 50% mere sårskade. Uden et levende kæledyr gendannes dit Fokus også 100% hurtigere."
+        "description": "I 12 sek. påfører Blodkrog også et Blodkrogsår med 60% styrke på op til 2 andre fjender inden for 5 m af sit mål, Sårflænger får dit levende kæledyr til at gøre 18 fysisk skade på målet, og Splintladning når 2 m længere, gør 25% mere grundskade på hovedmålet, og dens øjeblikkelige sårtik gør 50% mere. Uden et levende kæledyr regenererer dit Fokus også 100% hurtigere."
       },
       "trailbreak": {
         "name": "Sporbrud",
-        "description": "Spring 25 meter baglæns og bryd fri af rodfæstelser og bevægelsesnedsættelser. Har du Jagtfart, fornyes den og gør Genindtræden klar i 12 sek."
+        "description": "Spring 25 m baglæns og bryd fri af rodfæstelser og bevægelsesnedsættelser. Landingen giver 50% bevægelseshastighed i 3 sek. Har du Jagtfart, får du Bevæbnet Genindtræden i 12 sek.: dit næste Sprættende Slag eller Blodkrog gør bonusskade baseret på dine stakke af Jagtfart."
       },
       "wildheart": {
         "name": "Vildhjerte",
@@ -17554,7 +17572,7 @@ export const da_DK: EnTranslations = {
       },
       "shellskin": {
         "name": "Skalhud",
-        "description": "Reducerer den skade, du tager, med 60% i 8 sek., men forhindrer angreb, mens den er aktiv."
+        "description": "Reducerer den skade, du tager, med 60% i 8 sek. Mens den varer, kan du ikke bruge evner, der rammer eller skader fjender, herunder fælder, men dine autoangreb fortsætter."
       },
       "play_dead": {
         "name": "Spil død",
@@ -17562,11 +17580,11 @@ export const da_DK: EnTranslations = {
       },
       "tactical_camo": {
         "name": "Taktisk Camouflage",
-        "description": "Fald i ét med omgivelserne: fjender bemærker dig knap nok, og du bevæger dig med 80% hastighed. Angreb eller modtaget skade bryder Taktisk Camouflage. Kast igen for at træde frem. (Feltkunst)"
+        "description": "Gå i skjul og bevæg dig med 80% hastighed. Monstre bemærker dig kun på kort afstand (en fjerdedel af deres normale aggroafstand, mere hvis de har højere niveau end dig), og fjendtlige spillere og kæledyr kan ikke se dig. Angreb eller modtaget skade bryder Taktisk Camouflage. Kast igen for at træde frem. (Overlevelse)"
       },
       "frostjaw_trap": {
         "name": "Frostkæbefælde",
-        "description": "Placer en fælde på det valgte sted. Den armeres efter 0,75 sek. og varer 1 min, og kun du og din gruppe kan se den. Den første fjende, der udløser den, rodfæstes i 3 sek., og fjender inden for 4 meter sænkes med 50% i 4 sek."
+        "description": "Placer en fælde på det valgte sted. Den armeres efter 0,75 sek. og varer 1 min, og kun du og din gruppe kan se den. Den første fjende, der udløser den, rodfæstes i 3 sek., og fjender inden for 4 m sænkes med 50% i 4 sek. Kun én Frostkæbefælde kan være aktiv ad gangen. Placerer du en ny, erstatter den den gamle."
       },
       "bear_trap": {
         "name": "Bjørnefælde",
@@ -17590,7 +17608,7 @@ export const da_DK: EnTranslations = {
       },
       "heroic_strike": {
         "name": "Plyndrerslag",
-        "description": "Et stærkt angreb, der øger nærkampsskaden med {damage}. Aktiveres ved dit næste hug."
+        "description": "Dit næste nærkampsslag gør {damage} ekstra skade. Raseriet bruges på det slag; uden nok raseri forbliver det et almindeligt slag."
       },
       "battle_shout": {
         "name": "Jernbrøl",
@@ -17598,15 +17616,15 @@ export const da_DK: EnTranslations = {
       },
       "demoralizing_shout": {
         "name": "Rædselshyl",
-        "description": "Udstøder et frygtindgydende råb, der reducerer skaden, som alle nærliggende fjender forvolder, med {buff}% i 20 sek."
+        "description": "Råb for at reducere skaden, som alle fjender inden for 10 m forvolder, med {buff}% i {duration} sek."
       },
       "charge": {
         "name": "Fremstorm",
-        "description": "Storm mod en fjende, generér 9 raseri og bedøv den i 1 sek. 8-25 m rækkevidde."
+        "description": "Storm mod en fjende og bedøv den i 1 sek., og generér 9 raseri."
       },
       "thunder_clap": {
         "name": "Rystende Slag",
-        "description": "Sprænger nærliggende fjender for {damage} skade og sløver deres angreb med 10 % i 10 sek."
+        "description": "Slå alle fjender inden for 8 m for {damage} fysisk skade og sænk deres angrebshastighed med 10% i 10 sek."
       },
       "hamstring": {
         "name": "Lammende Snit",
@@ -17614,11 +17632,11 @@ export const da_DK: EnTranslations = {
       },
       "bloodrage": {
         "name": "Blodtold",
-        "description": "Genererer 10 raseri på bekostning af helbred."
+        "description": "Mist 8% af dit maksimale helbred for at generere {rage} raseri. Det kan ikke slå dig ihjel."
       },
       "overpower": {
         "name": "Rødhånd",
-        "description": "Øjeblikkeligt angreb for våbenskade plus {damage}. Kan kun bruges efter målet undviger. Kan ikke undviges."
+        "description": "Slå for våbenskade plus {damage}. Kan ikke undviges. Hver brug giver også en stak Rødhånd i {duration} sek., op til 2: dit næste Lemlæstende Slag forbruger dem og gør 20% mere våbenskade pr. stak. Gemmer op til 2 ladninger."
       },
       "execute": {
         "name": "Tidlig Grav",
@@ -17626,7 +17644,7 @@ export const da_DK: EnTranslations = {
       },
       "slam": {
         "name": "Brutalt Sving",
-        "description": "Drøner modstanderen for våbenskade plus {damage}."
+        "description": "Slå for 50% våbenskade plus {damage} og generér {rage} raseri."
       },
       "cleave": {
         "name": "Mejende Bue",
@@ -17638,7 +17656,7 @@ export const da_DK: EnTranslations = {
       },
       "sunder_armor": {
         "name": "Rustningsskær",
-        "description": "Flænger målets rustning og sænker den med {damage}% pr. anvendelse. Stakker op til 5 gange. Skaber en stor mængde trussel."
+        "description": "Flænger målets rustning og reducerer den med {damage}% pr. anvendelse i 30 sek. Stakker op til 5 gange, og hver anvendelse fornyer varigheden. Skaber en stor mængde trussel."
       },
       "taunt": {
         "name": "Ægge",
@@ -17646,7 +17664,7 @@ export const da_DK: EnTranslations = {
       },
       "fireball": {
         "name": "Glødlyn",
-        "description": "Slynger en flammende kugle, der volder {damage} ildskade plus yderligere skade over tid."
+        "description": "Slynger en flammende kugle, der gør {damage} Ildskade og derefter brænder målet for {overTime} Ildskade over {duration} sek."
       },
       "fireball_form": {
         "name": "Glødform",
@@ -17662,7 +17680,7 @@ export const da_DK: EnTranslations = {
       },
       "frostbolt": {
         "name": "Rimlanse",
-        "description": "Affyrer et frostlyn, der volder {damage} frostskade og sænker bevægelsen med 40%."
+        "description": "Affyrer et frostlyn, der gør {damage} Frostskade og sænker bevægelseshastigheden med 40% i {duration} sek."
       },
       "blazing_barrier": {
         "name": "Flammende barriere",
@@ -17670,15 +17688,15 @@ export const da_DK: EnTranslations = {
       },
       "cold_snap": {
         "name": "Vinterens kalden",
-        "description": "Afslutter nedkølingen af Flittrin, Frostslør og Større Usynlighed. (Magiker-talentevne)"
+        "description": "Afslutter nedkølingen af Flittrin (og genopretter alle dets ladninger), Større usynlighed og din personlige barriere: Frostslør, Flammende barriere eller Tidsbarriere. (Magikertalent)"
       },
       "greater_invisibility": {
         "name": "Større usynlighed",
-        "description": "Forsvind i 20 sek., og fjern 2 effekter med skade over tid. Når usynligheden slutter, tager du 90% mindre skade i 2 sek. (magikertalent)"
+        "description": "Bliv usynlig i op til 20 sek., så fjendernes trussel og målvalg på dig forsvinder, og fjern op til 2 effekter med skade over tid fra dig selv. Angreb, besværgelser eller modtaget skade afslutter den før tid. Når den slutter, tager du 90% mindre skade i 2 sek. (Magikertalent)"
       },
       "hot_streak": {
         "name": "Hed stime",
-        "description": "Passiv: to kritiske træffere i træk med dine Ildbesværgelser (Glødlyn, Gløderfald, Skoldning, Bållanse eller Flammeslag) gør din næste Bållanse eller dit næste Flammeslag øjeblikkeligt og gratis. Forbrugerne tæller med til den NÆSTE stime, også gratis kast; et Flammeslag tæller én gang, uanset hvor mange fjender det rammer, og kun det første nedslag tæller nogensinde. (Ild)"
+        "description": "Passiv: to kritiske træffere i træk fra Glødlyn, Gløderfald, Skoldning, Bållanse, Flammeslag eller Drageånde gør dit næste Bållanse eller Flammeslag inden for 12 sek. øjeblikkeligt og gratis. Et ikke-kritisk træf fra en af disse besværgelser nulstiller tællingen, og et første kritisk træf huskes i 10 sek. Bållanse og Flammeslag tæller med mod den næste stime, også gratis kast. Flammeslag og Drageånde tæller én gang pr. kast, uanset hvor mange fjender de rammer, og kun det første nedslag tæller. (Ild)"
       },
       "ice_floes": {
         "name": "Isflager",
@@ -17686,7 +17704,7 @@ export const da_DK: EnTranslations = {
       },
       "ignition": {
         "name": "Antændelse",
-        "description": "Passiv: kritiske træffere med dine besværgelser brænder målet for 30% af den påførte skade over 6 sek. og kan stables. (Ildbeherskelse)"
+        "description": "Passiv: når dine Ildbesværgelser rammer kritisk, brænder målet for yderligere 1,5% af den påførte skade pr. karakterniveau (30% på niveau 20) over 6 sek. En ny brand på et mål, der allerede brænder, lægges til den skade, der stadig mangler, og genstarter 6 sek.-timeren. (Ildbeherskelse)"
       },
       "mass_barrier": {
         "name": "Massebarriere",
@@ -17694,15 +17712,15 @@ export const da_DK: EnTranslations = {
       },
       "overload": {
         "name": "Overbelastning",
-        "description": "Din næste besværgelse forstærkes med 40%, men koster 50% mere mana. Varer i 10 sek. (magikertalent)"
+        "description": "Din næste besværgelse, der koster mana, får sine grundværdier for skade, helbredelse og absorbering øget med 40%, men koster 50% mere mana. Bonussen fra Besværgelseskraft øges ikke. Varer i 10 sek. (Magikertalent)"
       },
       "power_echo": {
         "name": "Kraftekko",
-        "description": "Din næste direkte besværgelse gentages med 50% kraft på det samme mål. Varer i 10 sek. (magikertalent)"
+        "description": "Din næste direkte skades- eller helbredelsesbesværgelse mod ét mål gentages på samme mål for 50% af den mængde, den gjorde eller helbredte. Varer i 10 sek. (Magikertalent)"
       },
       "rings_of_frost": {
         "name": "Frostring",
-        "description": "Hidkalder en ring i 10 sek. Fjender, der krydser dens kant, fryses i 4 sek. (magikertalent)"
+        "description": "Placerer en frostring på målstedet i 10 sek. En fjende, der krydser ringen, rodfæstes i 4 sek.; hver fjende kan kun udløse den én gang. Midten inden i ringen er sikker. (Magikertalent)"
       },
       "rune_of_power": {
         "name": "Kraftrune",
@@ -17718,7 +17736,7 @@ export const da_DK: EnTranslations = {
       },
       "flurry": {
         "name": "Vinterpisk",
-        "description": "Affyr tre iskolde projektiler, der hver giver {damage} frostskade, og påfør målet Vinterkulde: de næste 2 kompatible besværgelser mod det behandler det som frossent. Brain Freeze gør Winterlash øjeblikkelig og springer dens nedkøling over. (Frost)"
+        "description": "Afskyd tre iskolde lyn, der hver gør {damage} Frostskade, og påfør målet Vinterkulde i 5 sek.: de næste 2 Islanser, der rammer det, behandler det som frosset. Hjernefrys gør Vinterpisk øjeblikkelig og springer dens nedkøling over. (Frost)"
       },
       "frozen_orb": {
         "name": "Frostkugle",
@@ -17726,31 +17744,31 @@ export const da_DK: EnTranslations = {
       },
       "blizzard": {
         "name": "Snestorm",
-        "description": "Kalder en isstorm ned over målområdet i 6 sek., gør {damage} Frost-skade hvert sekund og sætter fjenders hast ned med 40%. Hver fjende ramt reducerer Frostglobe med 0,5 sek., op til 3 sek. pr. kast. (Frost)"
+        "description": "Fremkalder en isstorm over målområdet, der raser i 6 sek., gør {damage} Frostskade hvert sekund og sænker fjender med 40% i 2 sek. Hver fjende, der rammes, barberer 0,5 sek. af Frostkugles nedkøling, op til 3 sek. pr. kast. (Frost)"
       },
       "glacial_spike": {
         "name": "Rimnål",
-        "description": "Fremkald en massiv isspids og forbrug 5 Istapper for at gøre {damage} Frost-skade og fryse målet på stedet i 4 sek. (Frost)"
+        "description": "Kræver 5 Istapper. Fremkald en massiv isspids, der forbruger alle 5 Istapper for at gøre {damage} Frostskade og rodfæste målet i 4 sek. Du får en Istap, hver gang Rimlanse rammer, eller en puls fra Frostkugle rammer, op til 5. (Frost)"
       },
       "glacial_front": {
         "name": "Gletsjerfront",
-        "description": "Hold for at samle en stadig bredere front af frost, og slip den derefter i en kegle. Længere opladning rækker længere og gør mere skade. Alle fjender ramt sættes ned med 50% i 4 sek.; maksimal opladning rodfæster dem også i 1 sek. (Frost)"
+        "description": "Hold for at oplade, og slip derefter en kegle af frost. Hver af de 4 opladningstrin rækker længere, fra 7 m til 16 m, og rammer hårdere, fra 35 til 42 grundskade i Frost op til 88 til 104 ved fuld opladning, med en større bonus fra Besværgelseskraft, jo længere du oplader. Alle fjender, der rammes, sænkes med 50% i 4 sek.; fuld opladning rodfæster dem også i 1 sek. (Frost)"
       },
       "dragons_breath": {
         "name": "Drageånde",
-        "description": "Hold for at samle et stadig bredere åndedrag af flammer, og slip det derefter i en kegle. Længere opladning rækker længere og gør mere skade. Fjender ramt bliver desorienterede og skade afbryder effekten; maksimal opladning rammer altid kritisk og tæller én gang mod Hed Stime. (Ild)"
+        "description": "Hold for at oplade, og slip derefter en kegle af flammer. Hver af de 4 opladningstrin rækker længere og bredere, fra 6 m til 12 m, og rammer hårdere, fra 32 til 40 grundskade i Ild op til 90 til 110 ved fuld opladning, med en større bonus fra Besværgelseskraft, jo længere du oplader. Fjender, der rammes, desorienteres i 1 til 3 sek. alt efter opladningstrin; enhver skade bryder effekten. Fuld opladning rammer altid kritisk. Hvert åndedrag tæller én gang mod Hed stime, uanset hvor mange fjender det rammer. (Ild)"
       },
       "fingers_of_frost": {
         "name": "Frostens Fingre",
-        "description": "Rimlanse har 15% chance for at give Fingers of Frost, op til 2 ladninger: din næste Ice Lance behandler målet som frosset. (Frost)"
+        "description": "Hvert træf med Rimlanse har 15% chance for at give en ladning af Frostens Fingre, op til 2 ladninger, i 15 sek. Hver ladning får én Islanse til at behandle sit mål som frosset. En udløsning ved 2 ladninger går tabt. (Frost)"
       },
       "brain_freeze": {
         "name": "Hjernefrys",
-        "description": "Rimlanse har 20 % chance for at gøre din næste Winterlash øjeblikkelig og fri for dens nedkøling. (Frost)"
+        "description": "Hvert træf med Rimlanse har 20% chance for at give Hjernefrys i 15 sek.: din næste Vinterpisk er øjeblikkelig og ignorerer sin nedkøling. En udløsning, mens Hjernefrys er aktiv, går tabt. (Frost)"
       },
       "shatter": {
         "name": "Skrøbelig Undergang",
-        "description": "Dine besværgelser får 50 % chance for kritiske træffere mod frosne mål. Fingers of Frost og Vinterkulde tæller som frosne. (Frost)"
+        "description": "Dine enkeltmålsskadesbesværgelser får 50% kritisk chance mod frosne mål: fjender, der holdes fast af en Magikers rodfæstelse, bedøvelse, ukampdygtiggørelse eller Forheks. Frostens Fingre og Vinterkulde får Islanse til at behandle sit mål som frosset. (Frost)"
       },
       "conjure_water": {
         "name": "Vandbinding",
@@ -17762,15 +17780,15 @@ export const da_DK: EnTranslations = {
       },
       "fire_blast": {
         "name": "Gløderfald",
-        "description": "Sprænger fjenden for {damage} ildskade. Øjeblikkelig."
+        "description": "Sprænger fjenden for {damage} Ildskade. Rammer altid kritisk. Uden for den globale nedkøling og kan bruges, mens du kaster en anden besværgelse."
       },
       "arcane_missiles": {
         "name": "Æterpile",
-        "description": "Affyrer Æterpile mod fjenden, der forvolder {damage} Arkan skade hvert sekund i 3 sek."
+        "description": "Kanaliser i 3 sek. og affyr 3 pile, der hver gør {damage} Arkan skade. Bruger alle dine Arkane Ladninger: hver ladning tilføjer 9 Arkan skade fordelt på pilene, og ved 4 ladninger affyrer kanaliseringen 5 pile i stedet for 3."
       },
       "polymorph": {
         "name": "Forheks",
-        "description": "Forvandler fjenden til en tudse i op til {duration} sek. Tudsen vandrer omkring og helbredes hurtigt. Enhver skade bryder effekten. Kun bæster og humanoider."
+        "description": "Forvandler fjenden til en tudse i op til {duration} sek. Den kan ikke handle, genopretter fuldt helbred, helbreder 10% af sit maksimale helbred hvert sekund og mister sine effekter med skade over tid. Enhver skade bryder effekten. Virker ikke på udøde eller kontrolimmune fjender."
       },
       "frost_nova": {
         "name": "Isbinding",
@@ -17782,11 +17800,11 @@ export const da_DK: EnTranslations = {
       },
       "scorch": {
         "name": "Skoldning",
-        "description": "Svider fjenden for {damage} Ild skade. Hurtig at kaste."
+        "description": "Svider fjenden for {damage} Ildskade og øger din bevægelseshastighed med 20% i 3 sek. Rammer altid kritisk mod mål med 30% helbred eller derunder."
       },
       "pyroblast": {
         "name": "Bållanse",
-        "description": "Slynger en enorm flammende kampesten, der volder {damage} ildskade plus yderligere skade over tid."
+        "description": "Slynger en enorm flammende kampesten, der gør {damage} Ildskade og derefter brænder målet for {overTime} Ildskade over {duration} sek."
       },
       "ice_barrier": {
         "name": "Frostslør",
@@ -17796,17 +17814,17 @@ export const da_DK: EnTranslations = {
         "name": "Ondsindet Hug",
         "description": "Et øjeblikkeligt slag for våbenskade plus {damage}. Giver 1 combopoint.",
         "specNote_assassination": "Tilføjer 1 Giftritual (maks. 6).",
-        "specNote_combat": "Mens Redline er aktiv, bliver denne knap til Kropsstød: 130% våbenskade plus 10, giver 2 combopoint og tilføjer 1 Redline (maks. 4)."
+        "specNote_combat": "Mens Redline er aktiv, bliver denne knap til Kropsstød: et tungere våbenslag, der giver 2 combopoint og tilføjer 1 Redline (maks. 4)."
       },
       "eviscerate": {
         "name": "Gravsøvn",
-        "description": "Afsluttende manøvre, der giver {damage}.",
+        "description": "Afsluttende manøvre, der gør {damage} fysisk skade. Skaden stiger med Angrebsstyrke.",
         "specNote_assassination": "Ved 6 Giftritual bliver denne knap til Giftflænge: et slag, der øjeblikkeligt giver al den skade, dine blødninger stadig ville have givet, planter et frisk giftsår og gendanner 20 energi.",
-        "specNote_combat": "At lande dette med 4 eller flere combopoint starter Redline i 8 sek.: Ondsindet Hug bliver til Kropsstød, og denne knap bliver til Knockoutstød (45 plus 35 pr. combopoint, der rammer 25% hårdere for hvert opbygget Redline-hak, og gendanner 25 energi). Brug det, før Redline slutter."
+        "specNote_combat": "Rammer dette med 4 eller flere kombopoint, starter Redline i 8 sek.: Ondsindet Hug bliver til Kropsstød, og denne knap bliver til Knockoutstød (en afslutter, der rammer 25% hårdere for hvert Kropsstød, du har kastet under Redline, og genopretter 25 energi). Brug det, før Redline slutter."
       },
       "backstab": {
         "name": "Fejt Stød",
-        "description": "Stød din dolk ind i målets ryg for 150% våbenskade plus {damage}. Skal være bag målet. Kræver en dolk. Giver 1 combopoint.",
+        "description": "Stød din dolk ind i målets ryg for {weaponPercent}% våbenskade plus {damage}. Skal være bag målet. Kræver en dolk. Giver 1 combopoint.",
         "specNote_assassination": "Hvert slag tilføjer 1 Giftritual (maks. 6) og gendanner 15 energi. Ved 6 Giftritual bliver Gravsøvn til Giftflænge (den giver al din resterende blødningsskade på én gang)."
       },
       "gouge": {
@@ -17831,12 +17849,12 @@ export const da_DK: EnTranslations = {
       },
       "ambush": {
         "name": "Luskerens Slag",
-        "description": "Slå til fra skyggerne for 250% våbenskade plus {damage}. Skal være i snigen og bag målet. Kræver en dolk. Giver 1 combopoint.",
+        "description": "Slå til fra skyggerne for {weaponPercent}% våbenskade plus {damage}. Skal være i snigen og bag målet. Kræver en dolk. Giver 1 combopoint.",
         "specNote_subtlety": "Brugt fra Skumringsslør tilføjer dette 1 Tusmørke (maks. 3). Ved 3 Tusmørke kan du bruge den UDEN snigen og fra enhver vinkel: den brug koster intet, forbruger alle 3 Tusmørke, starter det 6 sek. lange Skyggesløret og rammer dobbelt."
       },
       "stealth": {
         "name": "Skumringsslør",
-        "description": "Skjuler dig i skyggerne: fjender lægger næsten ikke mærke til dig, og du bevæger dig med fuld fart. At angribe eller tage skade bryder Skumringsslør. Kast igen for at træde frem.",
+        "description": "Skjul dig i skyggerne. Fjendtlige spillere og kæledyr kan ikke se dig, og monstre bemærker dig kun fra meget tættere på end normalt (fra længere væk, hvis de har højere niveau end dig). Du bevæger dig med fuld hastighed. Angreb eller modtaget skade bryder Skumringsslør. Kast igen for at træde frem.",
         "specNote_subtlety": "Hver åbner, du bruger fra Skumringsslør, tilføjer 1 Tusmørke (maks. 3)."
       },
       "adrenaline_rush": {
@@ -17864,11 +17882,11 @@ export const da_DK: EnTranslations = {
       },
       "melting_acid": {
         "name": "Smeltende syre",
-        "description": "Smører dit våben i 30 min. Hvert af dine nærkampshug sprøjter målet med ætsende syre og reducerer dets rustning med 5 % i 12 sek."
+        "description": "Smører dit våben i 30 min. Hvert af dine nærkampsslag sprøjter målet med ætsende syre og reducerer dets rustning med 5% i 12 sek. Erstatter din anden våbenbelægning."
       },
       "nightshade_coating": {
         "name": "Natskygge belægning",
-        "description": "Smører dit våben i 30 min. Hvert af dine nærkampshug overtrækker målet i natskygge og reducerer den heling, det modtager, med 25 % i 12 sek."
+        "description": "Smører dit våben i 30 min. Hvert af dine nærkampsslag overtrækker målet i natskygge og reducerer den helbredelse, det modtager, med 25% i 12 sek. Erstatter din anden våbenbelægning."
       },
       "expose_armor": {
         "name": "Rustningsbrud",
@@ -17880,7 +17898,7 @@ export const da_DK: EnTranslations = {
       },
       "vanish": {
         "name": "Røgtåge",
-        "description": "Forsvind fra syne og træd ind i Duskveil selv i kamp. Du bevæger dig med fuld fart mens du er skjult. Varer op til 10 sek."
+        "description": "Forsvind fra syne, selv i kamp, og gå ind i Skumringsslør i op til 10 sek. Du forlader kampen, monstre glemmer al trussel mod dig og kan ikke opdage dig, så længe det varer, og fjendtlige spillere mister dig som mål. Du bevæger dig med fuld hastighed, mens du er skjult."
       },
       "instant_poison": {
         "name": "Hugormbid",
@@ -17888,11 +17906,11 @@ export const da_DK: EnTranslations = {
       },
       "deadly_poison": {
         "name": "Betændt Gift",
-        "description": "Smører dit våben i 30 min. Hvert af dine nærkampshug lægger et lag gift på målet, op til 5, og fornyer varigheden på 12 sek. Hvert lag volder {damage} naturskade hvert 2. sek."
+        "description": "Smører dit våben i 30 min. Hvert af dine nærkampsslag lægger en stak gift på målet, op til 5, og fornyer varigheden på 12 sek. Hver stak gør {damage} Naturskade hvert 2. sek. Erstatter din anden våbenbelægning."
       },
       "blind": {
         "name": "Jordkast",
-        "description": "Forblænder målet, så det vandrer forvirret omkring i 8 sek. Enhver skade bryder effekten."
+        "description": "Kast snavs i målets øjne, så det er ukampdygtigt i 8 sek. Enhver skade bryder effekten."
       },
       "seal_of_righteousness": {
         "name": "Edsbrand",
@@ -17908,11 +17926,11 @@ export const da_DK: EnTranslations = {
       },
       "divine_ascension": {
         "name": "Guddommelig Ophøjelse",
-        "description": "Forbruger 20 Hengivenhed for at få 5 Ophøjelsesladninger i op til 45 sek. Markerede evner forbruger én ladning og får en ekstra effekt."
+        "description": "Brug 20 Hengivenhed for at få 5 Ophøjelsesladninger i op til 45 sek. Mens Ophøjelse er aktiv, bruger hver af din specialiserings fremhævede evner 1 ladning for den Ophøjelsesbonus, deres tooltips beskriver, og du får ingen Hengivenhed. Ophøjelse slutter, når ladningerne eller tiden er brugt op. Forlænget daggry tilføjer 2 ladninger."
       },
       "aura_mastery": {
         "name": "Hellig Endrægtighed",
-        "description": "Styrker i 8 sek. enhver aktiv Hengivenhed og Gengældelsesaura i din gruppe. Bastionens Hengivenhed reducerer skade med 15%; Gengældelse gør 15 hellig skade. Flere anvendelser fornyer i stedet for at stable."
+        "description": "I 8 sek. tredobles hver aktiv Bastionens Hengivenhed og Gengældelsens Aura i din gruppe: Bastionens Hengivenhed reducerer modtaget skade med 15%, og Gengældelsens Aura gør tre gange så meget hellig skade som normalt. Gentagne anvendelser fornyer i stedet for at stable."
       },
       "devotion_ward": {
         "name": "Bastionens Hengivenhed",
@@ -17920,7 +17938,7 @@ export const da_DK: EnTranslations = {
       },
       "hammer_of_grace": {
         "name": "Nådens Hammer",
-        "description": "Kaster øjeblikkeligt en hellig hammer mod en fjende inden for 20 m for {damage}, genopretter 70 mana, helbreder dig for 50% af den gjorte skade og genererer 1 Hengivenhed, når den gør skade. Solgengældelse lader Nådens Hammer ignorere sin nedkøling og helbrede dig for 100% af den gjorte skade."
+        "description": "Slynger en hellig hammer mod en fjende for {damage} hellig skade, genopretter 70 mana og helbreder dig selv for 50% af den gjorte skade. Genererer 1 Hengivenhed, når den gør skade. Solgengældelse (en udløsning for Trosvogtere) får den til at ignorere sin nedkøling og helbrede dig for 100% af den gjorte skade."
       },
       "hushbrand": {
         "name": "Tavshedsmærke",
@@ -17928,23 +17946,23 @@ export const da_DK: EnTranslations = {
       },
       "guardian_covenant": {
         "name": "Vogterens Pagt",
-        "description": "Beskytter et venligt mål og dig selv og reducerer den skade, I tager, med 20% i 8 sek. Vælger dig som standard, når intet venligt mål er valgt."
+        "description": "Beskytter et venligt mål og dig selv og reducerer modtaget skade med 20% i 8 sek. Vælger dig som standard, når intet venligt mål er valgt. Ophøjelse hæver reduktionen til 30%."
       },
       "solar_step": {
         "name": "Solskridt",
-        "description": "Øger din bevægelseshastighed med 150% i 2 sek."
+        "description": "Øger din bevægelseshastighed med 150% i {duration} sek."
       },
       "solar_invocation": {
         "name": "Solpåkaldelse",
-        "description": "Helbreder øjeblikkeligt en allieret for {damage} eller gør moderat hellig skade på en fjende. Begge anvendelser genererer 1 Hengivenhed. Under Ophøjelse helbreder en helbredende kastning også allierede spillere inden for 10 m af målet for halvdelen."
+        "description": "Helbred øjeblikkeligt en allieret for {damage} eller gør 120 til 150 hellig grundskade på en fjende. Skaden stiger med Besværgelseskraft og helbredelsen med Helbredelseskraft. Begge anvendelser genererer 1 Hengivenhed. Under Ophøjelse helbreder et helbredende kast også allierede spillere inden for 10 m af målet for halvt så meget."
       },
       "radiant_devotion": {
         "name": "Strålende Hengivenhed",
-        "description": "Øger besværgelseskraften hos dig og gruppemedlemmerne med 20 i 30 min. Erstatter din egen Daggryets eller Nådens Hengivenhed, men eksisterer side om side med Hengivenheder fra andre paladiner."
+        "description": "Øger besværgelseskraften hos dig og gruppemedlemmerne med {buff} i 30 min. Erstatter din egen Daggryets eller Nådens Hengivenhed. En anden paladin, der kaster Strålende Hengivenhed, genopfrisker den i stedet for at stakke; en anden Hengivenhed eksisterer side om side."
       },
       "dawn_devotion": {
         "name": "Daggryets Hengivenhed",
-        "description": "Øger angrebskraften hos dig og gruppemedlemmerne med 40 i 30 min. Erstatter din egen Strålende eller Nådens Hengivenhed, men eksisterer side om side med Hengivenheder fra andre paladiner og med krigerråb."
+        "description": "Øger angrebskraften hos dig og gruppemedlemmerne med {buff} i 30 min. Erstatter din egen Strålende eller Nådens Hengivenhed. En anden paladin, der kaster Daggryets Hengivenhed, genopfrisker den i stedet for at stakke; en anden Hengivenhed og krigerråb eksisterer side om side."
       },
       "grace_devotion": {
         "name": "Nådens Hengivenhed",
@@ -17960,11 +17978,11 @@ export const da_DK: EnTranslations = {
       },
       "final_edict": {
         "name": "Sidste Påbud",
-        "description": "Leverer et knusende våbenslag og genererer 1 Hengivenhed, når det gør skade. Et vellykket træf reducerer Daggryfalds resterende nedkøling med 2 sek. Vellykkede autoangreb og træf med Sidste Påbud har 15% chance for at give Daggryets Vrede i 8 sek. Ophøjelse frigiver desuden en eksplosion omkring dig, der gør fysisk skade."
+        "description": "Leverer et knusende våbenslag og genererer 1 Hengivenhed, når det gør skade. Et vellykket træf reducerer Daggryfalds resterende nedkøling med 2 sek. Vellykkede autoangreb og træf med Sidste Påbud har 15% chance for at give Daggryets Vrede i 8 sek.: dit næste Vredens Hammer kan ramme ethvert mål, ignorerer sin nedkøling og gør 20% mere skade. Ophøjelse frigiver desuden en fysisk eksplosion omkring dig."
       },
       "dawnfall": {
         "name": "Daggryfald",
-        "description": "Gør {damage} hellig skade på nærliggende fjender og genererer 1 Hengivenhed. At ramme mindst én fjende reducerer Sidste Påbuds resterende nedkøling med 2 sek. Ophøjelse øger dens skade og radius."
+        "description": "Gør {damage} hellig skade på nærliggende fjender og genererer 1 Hengivenhed. At ramme mindst én fjende reducerer Sidste Påbuds resterende nedkøling med 2 sek. Ophøjelse øger dens skade med 50% og dens radius til 10 m."
       },
       "sun_gods_verdict": {
         "name": "Solgudens Dom",
@@ -17988,11 +18006,11 @@ export const da_DK: EnTranslations = {
       },
       "dawns_embrace": {
         "name": "Daggryets Favn",
-        "description": "Leverer en kraftfuld helbredelse og genererer 1 Hengivenhed. Strålende Resonans reducerer dens manaomkostning med 50% og kastetiden til 1,5 sek. Ophøjelse gør den øjeblikkelig og øger dens helbredelse med 35%."
+        "description": "Helbred et venligt mål for {damage} og generér 1 Hengivenhed. Strålende Resonans reducerer dens manaomkostning med 50% og kastetiden til 1,5 sek. Ophøjelse gør den øjeblikkelig og øger dens helbredelse med 35%."
       },
       "radiant_chorus": {
         "name": "Strålende Kor",
-        "description": "Helbreder nærliggende allierede for {damage} og genererer 1 Hengivenhed. At helbrede mindst 2 allierede effektivt giver Strålende Resonans: dit næste Lægende Lys bliver øjeblikkeligt, eller din næste Daggryets Favn koster 50% mindre mana og kastes på 1,5 sek. Ophøjelse øger Strålende Kors helbredelse og radius."
+        "description": "Helbred nærliggende allierede for {damage} og generér 1 Hengivenhed. At helbrede mindst 2 allierede effektivt giver Strålende Resonans i 10 sek.: dit næste Lægende Lys er øjeblikkeligt, eller dit næste Daggryets Favn koster 50% mindre mana og kastes på 1,5 sek. Ophøjelse øger Strålende Kors' helbredelse med 20% og dens radius til 40 m."
       },
       "life_covenant": {
         "name": "Livets Pagt",
@@ -18000,11 +18018,11 @@ export const da_DK: EnTranslations = {
       },
       "aegis_first_dawn": {
         "name": "Første Daggrys Ægide",
-        "description": "Kanaliser i 5 sek. og skab en hellig kuppel på 10 meter. Allierede indeni helbredes hvert sekund og tager 50% mindre skade. At fuldføre kanaliseringen frigiver en sidste helbredelse og giver 30% bevægelseshastighed i 4 sek."
+        "description": "Kanaliser en hellig kuppel på 10 m omkring dig. Allierede spillere indeni og i din synslinje tager 50% mindre skade og helbredes for {aegisTick} hvert sekund. At fuldføre kanaliseringen helbreder dem for yderligere {aegisFinal} og giver 30% bevægelseshastighed i 4 sek. Helbredelsen stiger med Helbredelseskraft."
       },
       "vowkeeper_strike": {
         "name": "Edvogterens Slag",
-        "description": "Slår med høj trussel og genererer 1 Hengivenhed. Et vellykket slag har 20% chance for at give Solgengældelse i 8 sek.; hver vellykket blokering har 25%. Solgengældelse styrker din næste Solskive, Nådens Hammer eller Lægende Lys. Ophøjelse giver også et lille absorptionsskjold."
+        "description": "Slå for våbenskade plus {damage} fysisk skade med høj trussel, og generér 1 Hengivenhed. Et vellykket slag har 20% chance for at give Solgengældelse i 8 sek.; hver vellykket blokering har 25%. Solgengældelse forbruges af dit næste Solskive (ingen manaomkostning, ingen nedkøling, 20% mere skade), Nådens Hammer (ingen nedkøling, helbreder dig for 100% af den gjorte skade) eller Lægende Lys (øjeblikkeligt). Ophøjelse giver dig desuden et skjold på 6% af dit maksimale helbred i 6 sek."
       },
       "bastion_rite": {
         "name": "Bastionens Ritual",
@@ -18012,7 +18030,7 @@ export const da_DK: EnTranslations = {
       },
       "sunward_disc": {
         "name": "Solskive",
-        "description": "Kræver et skjold. Kaster en strålende skive, der rammer og derefter hopper mellem nærliggende fjender. Hvert skadevoldende nedslag genererer 1 Hengivenhed. Solgengældelse gør, at Solskiven ikke koster mana, ignorerer sin nedkøling og gør 20% mere skade. Ophøjelse styrker 5 hop."
+        "description": "Kræver et skjold. Slyng en strålende skive, der gør {damage} hellig skade på målet og derefter preller videre til op til 2 andre nærliggende fjender for 60 til 75 hellig grundskade hver. Hvert skadevoldende nedslag genererer 1 Hengivenhed. Solgengældelse får Solskive til at koste ingen mana, ignorere sin nedkøling og gøre 20% mere skade. Ophøjelse øger dens skade med 30% og dens prel til 5."
       },
       "sacred_challenge": {
         "name": "Hellig Spore",
@@ -18036,7 +18054,7 @@ export const da_DK: EnTranslations = {
       },
       "lay_on_hands": {
         "name": "Sidste Rite",
-        "description": "En massiv bølge af helbredelse genopretter {damage}% af dit maksimale helbred. 10 min afkøling."
+        "description": "Helbred et venligt mål for {damage}% af dit maksimale helbred og generér 1 Hengivenhed, når det genopretter helbred."
       },
       "holy_taunt": {
         "name": "Hellig Æggelse",
@@ -18052,7 +18070,7 @@ export const da_DK: EnTranslations = {
       },
       "consecration": {
         "name": "Hellig Jord",
-        "description": "Indvier jorden i 9 sek. og giver {damage} Hellig skade hvert sekund. Trosvogtere tager 10% mindre skade, mens de står i området."
+        "description": "Indvier jorden under dig i 9 sek. og gør {damage} hellig skade med høj trussel hvert sekund. Det første nedslag genererer 1 Hengivenhed. Trosvogtere tager 10% mindre skade, mens de står indeni. Ophøjelse øger dens skade med 30%."
       },
       "bastion_sweep": {
         "name": "Bastionssving",
@@ -18064,7 +18082,7 @@ export const da_DK: EnTranslations = {
       },
       "veilbound_march": {
         "name": "Slørmarch",
-        "description": "Bliv æterisk i 4 sek., få 40% bevægelseshastighed og 30% rustning og bliv immun over for rødder, nedsættelser og forskydning. Fjender, du passerer igennem, får Slørmærket i 6 sek.: de tager hellig skade hvert sekund, gør 20% mindre skade på dig og genererer ekstra trussel. Det første mærke giver 1 Hengivenhed. Når marchen slutter, tager nærliggende mærkede fjender et sidste udbrud. Ophøjelse øger udbruddet med 50% og trækker dem let mod dig."
+        "description": "Bliv æterisk i 4 sek., få 40% bevægelseshastighed og 30% rustning, fjern rodfæstelser og nedsættelser, og bliv immun over for rodfæstelser, nedsættelser og forskydning. Fjender, du passerer igennem, får Slørmærke i 6 sek.: de tager 12 hellig skade hvert sekund med tredobbelt trussel og gør 20% mindre skade på dig. Det første mærke giver 1 Hengivenhed. Når marchen slutter, tager mærkede fjender inden for 10 m 36 hellig skade. Ophøjelse hæver den skade til 54 og trækker dem 2 m mod dig."
       },
       "veilbound_mark": {
         "name": "Slørmærke",
@@ -18080,7 +18098,7 @@ export const da_DK: EnTranslations = {
       },
       "tame_beast": {
         "name": "Vildbånd",
-        "description": "Begynder at tæmme et bæst, der skal være din ledsager. Det skal være på dit niveau eller lavere og ikke en elite. Dit kæledyr følger dig, angriber dine fjender og holder sin egen trussel. Du kan have ét kæledyr ad gangen."
+        "description": "Begynd at tæmme et bæst som din ledsager. Det skal være på dit niveau eller lavere og må ikke være elite, sjælden, en boss eller et væsen fra en fangekælder. Dit kæledyr følger dig, angriber dine fjender og holder sin egen trussel. Du kan have ét kæledyr ad gangen."
       },
       "dismiss_pet": {
         "name": "Slip Følgesvend",
@@ -18088,11 +18106,11 @@ export const da_DK: EnTranslations = {
       },
       "raptor_strike": {
         "name": "Sprættende Slag",
-        "description": "Slår for 10% våbenskade plus {damage}. Et træf genopretter 15 Fokus og giver 1 Jagtfart. Skaden stiger med angrebsstyrke gennem våbenskaden."
+        "description": "Slå for 10% våbenskade plus {damage}. Skaden stiger med Angrebsstyrke gennem våbenskaden. Med Overlevelse genopretter et træf 15 Fokus og giver 1 Jagtfart."
       },
       "aspect_of_the_hawk": {
         "name": "Kærhøgens Skikkelse",
-        "description": "Antag kærhøgens skikkelse og øg jeres angrebsstyrke med {buff} i 30 min."
+        "description": "Antag Kærhøgens Skikkelse, der øger din Angrebsstyrke og Afstandsangrebsstyrke med {buff} i 30 min."
       },
       "serpent_sting": {
         "name": "Giftbrod",
@@ -18141,11 +18159,11 @@ export const da_DK: EnTranslations = {
       },
       "smite": {
         "name": "Lutrende Hymne",
-        "description": "Volder {damage} Hellig skade. Skaden stiger med Besværgelseskraft. Disciplin: helbreder hver forbundet allieret for 30% af skaden. Er ingen allieret forbundet, helbredes det gruppemedlem med lavest helbred for 15%."
+        "description": "Gør {damage} hellig skade. Skaden stiger med Besværgelseskraft. Disciplin helbreder hvert såret forbundet gruppemedlem inden for 30 m for 30% af den gjorte skade (70% med Tvillingepagt). Hvis ingen er såret, helbreder den i stedet det sårede gruppemedlem med lavest helbred inden for 30 m for 15% af skaden."
       },
       "lesser_heal": {
         "name": "Hvisket Bøn",
-        "description": "Helbreder et venligt mål for {damage}. Helbredelsen stiger med Besværgelseskraft."
+        "description": "Helbreder et venligt mål for {damage}. Helbredelsen stiger med Helbredelseskraft."
       },
       "power_word_fortitude": {
         "name": "Beslutsomhedens Litani",
@@ -18157,11 +18175,11 @@ export const da_DK: EnTranslations = {
       },
       "power_word_shield": {
         "name": "Værnets Salme",
-        "description": "Skjolder et venligt mål og absorberer {damage} skade i 30 sek. Disciplin forbinder desuden målet med jeres Hellige skade i 30 sek."
+        "description": "Skjold et venligt mål, der absorberer {damage} skade i 30 sek. Disciplin forbinder desuden målet i 30 sek. og erstatter dit tidligere bånd (Tvillingepagt beholder to). Mens forbundne gruppemedlemmer er inden for 30 m af dig, helbreder din Lutrende Hymne og fjendtlige Rensende Nåde dem for 30% af den gjorte skade."
       },
       "renew": {
         "name": "Dvælende Nåde",
-        "description": "Helbreder målet for {damage} over 15 sek., én gang hvert 3. sek. Helbredelsen stiger med Besværgelseskraft."
+        "description": "Helbreder målet for {damage} over 15 sek., én gang hvert 3. sek. Helbredelsen stiger med Helbredelseskraft."
       },
       "mind_blast": {
         "name": "Sindsbrud",
@@ -18169,7 +18187,7 @@ export const da_DK: EnTranslations = {
       },
       "heal": {
         "name": "Højtidelig Bøn",
-        "description": "Helbreder et venligt mål for {damage}. Helbredelsen stiger med Besværgelseskraft."
+        "description": "Helbreder et venligt mål for {damage}. Helbredelsen stiger med Helbredelseskraft."
       },
       "mind_flay": {
         "name": "Jammerens Litani",
@@ -18189,7 +18207,7 @@ export const da_DK: EnTranslations = {
       },
       "flash_heal": {
         "name": "Hastende Bøn",
-        "description": "Helbreder et venligt mål for {damage}. Helbredelsen stiger med Besværgelseskraft."
+        "description": "Helbreder et venligt mål for {damage}. Helbredelsen stiger med Helbredelseskraft."
       },
       "lightning_bolt": {
         "name": "Lysbuelyn",
@@ -18213,11 +18231,11 @@ export const da_DK: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Stenbundet Våben",
-        "description": "Gennemtrænger jeres våben i 30 min. Hvert hug volder {damage} ekstra skade. Forstærkning vinder desuden 40% rustning og 20% udholdenhed, tager 15% mindre skade og er immun over for kritiske træf fra væsner og skaber 2,75 gange så meget trussel. Jordstød tvinger sit mål til at angribe jer i 3 sek., og Tordenværn giver 10% skadereduktion i 3 sek."
+        "description": "Gennemtræng dit våben i 30 min. Hvert slag gør {damage} ekstra skade. Forstærkning får desuden 40% rustning og 20% Udholdenhed, tager 15% mindre skade, er immun over for kritiske træffere fra væsner og skaber to og tre fjerdedele gange så meget trussel. Jordstød tvinger sit mål til at angribe dig i 3 sek., og at kaste Tordenværn giver 10% skadereduktion i 3 sek."
       },
       "healing_wave": {
         "name": "Lægende Vande",
-        "description": "Helbreder et venligt mål for {damage}. Helbredelsen stiger med Besværgelseskraft. Genoprettelse: gemmer 50% af den fulde helbredelse før overhelbredelse som Helbredende Strøm i 12 sek., op til 30% af målets maksimale helbred."
+        "description": "Helbred et venligt mål for {damage}. Helbredelsen stiger med Helbredelseskraft. Genoprettelse: tilføjer desuden 50% af den fulde helbredelse før overhelbredelse til målets Helbredende Strøm, en pulje der helbreder dem over 12 sek. og højst rummer 30% af deres maksimale helbred."
       },
       "earth_shock": {
         "name": "Jordstød",
@@ -18253,11 +18271,11 @@ export const da_DK: EnTranslations = {
       },
       "shadow_bolt": {
         "name": "Dysterlyn",
-        "description": "Sender et skyggefuldt lyn mod fjenden for {damage} Skygge skade."
+        "description": "Sender et skyggelyn mod fjenden for {damage} Skyggeskade. Ødelæggelse: genererer 1 Wrack, op til 5."
       },
       "demon_skin": {
         "name": "Djævlehud",
-        "description": "Dæmonisk hud øger din rustning med {buff} i 30 min."
+        "description": "Øger din rustning med {buff} i 30 min. Uddybet Pagt fordobler denne rustning og reducerer modtaget magisk skade med 5%, mens Djævlehud er aktiv."
       },
       "immolate": {
         "name": "Brændende Pagt",
@@ -18269,11 +18287,11 @@ export const da_DK: EnTranslations = {
       },
       "evil_eye": {
         "name": "Onde øje",
-        "description": "Mærker én fjende som fokus for dine forbandelser. At flytte Øjet bevarer Fordømmelse, men fornyer ikke dets 20 sek. udløb."
+        "description": "Mærker én fjende med dit Onde øje, fokus for dine forbandelser. Du får 2 Fordømmelse, hver gang den mærkede fjende gør skade (højst én gang pr. sek.), og 10, når den dør. Fordømmelse stakker op til 100 og forsvinder 20 sek. efter din seneste optjening. At flytte Øjet bevarer din Fordømmelse, men fornyer ikke den timer."
       },
       "maledict_gaze": {
         "name": "Forbandet blik",
-        "description": "Dit forbandede øje angriber dit valgte primære onde øje hvert 2,5 sek for Skyggeskade. Besæt det onde øje fordobler dets angrebshastighed."
+        "description": "Dit Forbandede Øje angriber fjenden, der bærer dit primære Onde øje, hvert 2,5 sek. for Skyggeskade, mens både du og den fjende er i kamp, inden for 30 m af hinanden og i synslinje. Besæt det onde øje fordobler dets angrebshastighed."
       },
       "needle_of_fate": {
         "name": "Skæbnens nål",
@@ -18281,11 +18299,11 @@ export const da_DK: EnTranslations = {
       },
       "sentence": {
         "name": "Dom",
-        "description": "Forbruger al Fordømmelse og alle Skæbnetråde for at afsige dom over fjenden. Hver Tråd øger skaden med 6%. Ekstra effekter eskalerer ved 20, 50, 80 og 100 Fordømmelse. Dens skadesskalering flader ud efter niveau 16."
+        "description": "Kræver 20 Fordømmelse og dit primære Onde øje på målet. Forbruger al Fordømmelse og alle Skæbnetråde for at gøre Skyggeskade, der vokser med den brugte Fordømmelse; hver Tråd tilføjer 6% skade. Ved 50 eller flere helbreder den dig for 20% af den gjorte skade. Ved 80 eller flere gør den desuden 35% af skaden på andre fjender inden for 8 m. Ved 100 gør den 5% mere skade på spillere og bosser og dræber en almindelig fjende under 20% helbred. Dens grundskade stiger med dit niveau til og med 16 og aftager derefter hen over niveau 17 til 20."
       },
       "life_tap": {
         "name": "Hård Handel",
-        "description": "Omdanner {damage} helbred til {damage} mana."
+        "description": "Omdanner {damage} helbred til {buff} mana. Mislykkes, hvis du har {damage} helbred eller mindre."
       },
       "cursed_accomplice": {
         "name": "Forbandet medskyldig",
@@ -18297,11 +18315,11 @@ export const da_DK: EnTranslations = {
       },
       "drain_life": {
         "name": "Fortær",
-        "description": "Fortærer målets livskraft, volder {damage} Skyggeskade hvert sekund og overfører 70% af den som helbred til jer. Plage overfører i stedet det hele. Kanaliseret på jeres primære onde øje bruger den alle Skæbnetråde ved begyndelsen, og hver Tråd skaber 1 ekstra Fordømmelse per tik."
+        "description": "Fortærer målets livskraft, gør {damage} Skyggeskade hvert sekund og helbreder dig for 70% af den gjorte skade (hele med Plage). På en fjende med dit Onde øje genererer hvert tik 2 Fordømmelse, og at afslutte kanaliseringen genererer 3 mere. På dit primære Onde øje forbruger den desuden alle Skæbnetråde ved begyndelsen: hver Tråd tilføjer 1 Fordømmelse pr. tik, og 3 Tråde forhindrer, at skade forsinker kanaliseringen."
       },
       "litany_of_guilt": {
         "name": "Skyldens litani",
-        "description": "Forbander dit primære onde øje i 6 sek. Fordømmelsesgevinster udløser en bølge, der skader op til 2 andre fjender inden for 8 yards, højst én gang pr. sekund. Rang 2 forlænger den til 8 sek. og 4 fjender."
+        "description": "Forbander dit primære onde øje i {duration} sek. Fordømmelsesgevinster udløser en bølge, der skader op til 2 andre fjender (4 fra Rang 2) inden for 8 yards, højst én gang pr. sekund."
       },
       "cinderhide": {
         "name": "Glødehud",
@@ -18309,7 +18327,7 @@ export const da_DK: EnTranslations = {
       },
       "umbral_anchor": {
         "name": "Skyggeanker",
-        "description": "Første kast: forankrer din skygge ved dine fødder i 5 min. Kast igen inden for 40 m for at vende tilbage dertil, hvilket forbruger ankeret og starter en 45 sek. nedkøling."
+        "description": "Første kast: forankrer din skygge ved dine fødder i 5 min. Kast igen inden for 40 m af ankeret for at teleportere tilbage til det, hvilket forbruger ankeret og starter en nedkøling på 45 sek."
       },
       "soulwell": {
         "name": "Sjælebrønd",
@@ -18317,19 +18335,19 @@ export const da_DK: EnTranslations = {
       },
       "hex_of_violence": {
         "name": "Voldens forbandelse",
-        "description": "Forhekser fjenden i 8 sek., hvilket forårsager Skyggeskade og genererer 2 Fordømmelse hvert 2. sek. Dens næste 3 skadevoldende handlinger genererer hver 7 Fordømmelse og pisker den for 17 Skyggeskade."
+        "description": "Forhekser fjenden i 8 sek. Hvert 2. sek. tager den 17 Skyggeskade plus en andel af din Besværgelseskraft, og du får 2 Fordømmelse. De første 3 gange, den forhekste fjende gør skade, får du 7 Fordømmelse, og den tager 17 Skyggeskade."
       },
       "cruel_pact": {
         "name": "Grusom pagt",
-        "description": "Ofrer 12% af dit maksimale helbred for at genoprette 1,5% af din maksimale mana og generere 20 Fordømmelse. Kan ikke bruges ved eller under 20% helbred."
+        "description": "Ofrer 12% af dit maksimale helbred for at genoprette {buff}% af din maksimale mana og generere 20 Fordømmelse. Kan ikke bruges ved eller under 20% helbred."
       },
       "vicarious_suffering": {
         "name": "Stedfortrædende lidelse",
-        "description": "Forbinder din lidelse i 8 sek. og genererer op til 15 Fordømmelse fra fjendtlige træf. På dig selv reducerer det skade modtaget med 20%. På en allieret omdirigerer det op til 20% til dig, uden at bringe dig under 15% helbred."
+        "description": "I 8 sek. genererer hvert fjendtligt træf på målet 3 Fordømmelse, op til 15 i alt. På dig selv reducerer det modtaget skade med 20%. På en allieret omdirigerer det 20% af hvert fjendtligt træf til dig, men bringer dig aldrig under 15% helbred."
       },
       "possess_evil_eye": {
         "name": "Besæt det onde øje",
-        "description": "Maledictor besætter dit primære onde øje i 15 sek. og genererer 35 Fordømmelse. Skæbnens nål kastes på 1 sek. og genererer 2 ekstra Fordømmelse, Fortær kan kanaliseres, mens du bevæger dig, og Dom gør 25% mere skade og udløser et forsinket ekko for 60% skade, aftagende til 30% hen over niveau 17 til 20."
+        "description": "Besætter dit primære Onde øje i 15 sek. og genererer 35 Fordømmelse. Mens den er aktiv, kastes Skæbnens nål på 1 sek. og genererer 2 ekstra Fordømmelse, Fortær kan kanaliseres under bevægelse, Forbandet blik angriber dobbelt så hurtigt, og Dom gør 25% mere skade og gentager 60% af den gjorte skade 0,75 sek. senere (aftagende til 30% hen over niveau 17 til 20)."
       },
       "hour_of_judgment": {
         "name": "Dommens time",
@@ -18337,7 +18355,7 @@ export const da_DK: EnTranslations = {
       },
       "coven": {
         "name": "Heksekreds",
-        "description": "Skaber sekundære onde øjne på op til 4 nærliggende fjender i 15 sek. De fodrer den delte Fordømmelse-pulje med 50%, og Dom ekkoer til dem for 35% skade."
+        "description": "Kræver dit primære Onde øje på målet. Placerer sekundære Onde øjne på op til 4 andre fjender inden for 15 m af det i 15 sek. De genererer Fordømmelse med 50% af den normale rate, og Dom ekkoer til hver af dem for 35% af sin skade."
       },
       "fear": {
         "name": "Hjemsøg",
@@ -18345,7 +18363,7 @@ export const da_DK: EnTranslations = {
       },
       "searing_pain": {
         "name": "Svid",
-        "description": "Brænder fjenden med pinefuld ild for {damage} Ild skade. Hurtig at kaste."
+        "description": "Svider fjenden med pinefuld ild for {damage} Ildskade."
       },
       "shadowburn": {
         "name": "Skumringsild",
@@ -18371,12 +18389,12 @@ export const da_DK: EnTranslations = {
       },
       "moonfire": {
         "name": "Månestorm",
-        "description": "Brænder fjenden med månebrand for {damage} arkan skade plus skade over tid.",
+        "description": "Brænder fjenden for {damage} Arkan skade og derefter yderligere {overTime} Arkan skade over {duration} sek.",
         "specNote_balance": "Hold den brændende: Månefrø forlænger den med 6 sek."
       },
       "moonseed": {
         "name": "Månefrø",
-        "description": "Kun i Månekinform. Rammer for {damage} arkan skade, tilføjer et Måneflod-trin og forlænger din Månestorm med 6 sek., op til {duration} sek. pr. anvendelse. Ved fuld Måneflod bliver Månefrø til Månebølge."
+        "description": "Kun i Månekinform. Rammer for {damage} Arkan skade, tilføjer 1 Måneflod (maks. 3) og forlænger din Månestorm på målet med 6 sek., op til {duration} ekstra sek. pr. anvendelse af Månestorm. Ved 3 Måneflod bliver denne knap til Månebølge: et øjeblikkeligt tungt Arkan-slag, der bruger alle 3."
       },
       "rejuvenation": {
         "name": "Sporeheling",
@@ -18385,20 +18403,20 @@ export const da_DK: EnTranslations = {
       },
       "thorns": {
         "name": "Torneværn",
-        "description": "Torne spirer frem fra målet: nærkampsangribere tager {buff} Natur skade."
+        "description": "Torne spirer frem fra et venligt mål i 10 min. Hvert nærkampstræf mod målet gør {buff} Naturskade på angriberen."
       },
       "entangling_roots": {
         "name": "Gribende Rødder",
-        "description": "Forankrer målet på stedet i op til 12 sek."
+        "description": "Rodfæster målet på stedet i op til 12 sek. På anden rangering gør den også 32 Naturskade over 12 sek., som stiger med Besværgelseskraft."
       },
       "bear_form": {
         "name": "Bruin-form",
-        "description": "Forvandl dig til en bjørn: rustning +110%, maksimalt helbred +30%, stærkt øget angrebskraft, dine angreb opbygger raseri og genererer 30% mere trussel. Du slår dobbelt så hurtigt for halv skade pr. slag, og hvert slag opbygger dobbelt raseri. Ethvert formskifte giver Fjedrende Skridt, et kort ryk i bevægelseshastighed. Kast igen for at vende tilbage til besværgerform."
+        "description": "Skift form til en bjørn: rustning +110%, maksimalt helbred +30%, angrebsstyrke +15 plus 1,5 pr. point Smidighed, dine angreb opbygger raseri og genererer 30% mere trussel. Du slår dobbelt så hurtigt for halv skade pr. slag, og hvert slag opbygger dobbelt raseri. Ethvert formskifte giver Fjedrende Skridt, et kort ryk i bevægelseshastighed. Kast igen for at vende tilbage til besværgerform."
       },
       "maul": {
         "name": "Knogleknus",
-        "description": "Et knusende angreb, der øger nærkampsskaden med {damage} og forårsager en stor mængde trussel. Aktiveres ved dit næste sving. Kun i Bruin-form.",
-        "specNote_feral": "Hvert slag, der rammer, tilføjer 1 Gammelt Blod; ved 3 Gammelt Blod bliver denne knap til Marvbrækker: et slag for 78 til 96 skade med høj trussel; under halvt helbred helbreder det dig i stedet for 18% af dit maksimale helbred og refunderer 15 raseri."
+        "description": "Dit næste nærkampsslag gør {damage} ekstra skade og genererer trussel svarende til 2,5 gange dets skade plus en lille fast mængde. Kun i Bruin-form.",
+        "specNote_feral": "Hvert slag, der rammer, tilføjer 1 Gammelt Blod; ved 3 Gammelt Blod bliver denne knap til Marvbrækker: et tungt slag med høj trussel; under halvt helbred helbreder det dig i stedet for 18% af dit maksimale helbred og refunderer 15 raseri."
       },
       "growl": {
         "name": "Trussel",
@@ -18410,7 +18428,7 @@ export const da_DK: EnTranslations = {
       },
       "cat_form": {
         "name": "Katteform",
-        "description": "Forvandl dig til en kat: smidigheden stiger med dit niveau, angrebsstyrke +8 plus 2 pr. niveau, angreb bruger energi og kombopoint, du bevæger dig 15% hurtigere og skaber 29% mindre trussel. Ethvert formskift giver Langstrakt gang, et kort hastighedsboost. Kast igen for at vende tilbage til besværgerform."
+        "description": "Skift form til en kat: smidighed + halvdelen af dit niveau (mindst 2), angrebsstyrke +8 plus 2 pr. niveau, dine angreb bruger energi og kombopoint, du bevæger dig 15% hurtigere og genererer 29% mindre trussel. Ethvert formskifte giver Fjedrende Skridt, et kort ryk i bevægelseshastighed. Kast igen for at vende tilbage til besværgerform."
       },
       "claw": {
         "name": "Flængeklo",
@@ -18424,22 +18442,22 @@ export const da_DK: EnTranslations = {
       },
       "ferocious_bite": {
         "name": "Blodbid",
-        "description": "Afsluttende manøvre, der giver {damage}. Kun i Katteform.",
+        "description": "Afsluttende manøvre, der gør {damage} fysisk skade. Kun i Katteform.",
         "specNote_feral": "Hvert slag, der rammer, tilføjer 1 Gammelt Blod; ved 3 Gammelt Blod bliver denne knap til Rød Høst, som forbruger dit Gamle Blod til et kraftigere slag, der også øjeblikkeligt giver al den skade, dine Flæns og Sønderriv stadig ville have givet, og gendanner energi."
       },
       "swipe": {
         "name": "Fejende Kløer",
-        "description": "Fej dine kløer gennem nærliggende fjender for {damage} skade. Forårsager ekstra trussel. Kun i Bruin-form.",
+        "description": "Fej dine kløer gennem hver fjende inden for 5 m for {damage} skade hver og generér 75% mere trussel end den gjorte skade. Kun i Bruin-form.",
         "specNote_feral": "Hvert slag, der rammer, tilføjer 1 Gammelt Blod (maks. 3)."
       },
       "regrowth": {
         "name": "Anden Blomstring",
-        "description": "Helbreder et venligt mål for {damage} og en yderligere mængde over 15 sek. Hvis effekten varer hele sin varighed, helbreder den målet igen for samme mængde som den første helbredelse.",
+        "description": "Helbreder et venligt mål for {damage} og derefter for yderligere {overTime} over 15 sek. Hvis helbredelsen over tid varer hele sin varighed, helbreder den målet endnu en gang for samme mængde som den første helbredelse (før kritisk bonus). Afsluttes den tidligt, for eksempel med Hurtig heling, Overblomstring eller et nyt kast, springes den helbredelse over.",
         "specNote_restoration": "Hver kastning giver 1 Grønske (maks. 3), også når den fornyer en blomstring, der allerede virker."
       },
       "barkskin": {
         "name": "Egehud",
-        "description": "Din hud hærder som bark, og øger rustning med 150 i 15 sek."
+        "description": "Din hud hærder som bark, og øger rustning med {buff}% i 15 sek."
       },
       "sacred_bulwark": {
         "name": "Hellig Bolværk",
@@ -18447,12 +18465,12 @@ export const da_DK: EnTranslations = {
       },
       "primal_reflexes": {
         "name": "Primalreflekser",
-        "description": "Dine instinkter skærpes og øger din chance for at undvige med 50% i 6 sek."
+        "description": "Dine instinkter skærpes og lægger 50 procentpoint til din chance for at undvige i 6 sek."
       },
       "starfire": {
         "name": "Himmelfald",
         "description": "Nedkalder et stråleglimt af stjerneild og giver {damage} arkan skade.",
-        "specNote_balance": "I Månekinform tilføjer hver fuldført besværgelse 1 Måneflod (maks. 3). Ved 3 Måneflod bliver denne knap til Solspor: et øjeblikkeligt slag for 80 til 100 naturskade plus en forbrænding på 45 over 9 sek., der gendanner 35 mana og forbruger alle 3."
+        "specNote_balance": "I Månekinform tilføjer hver fuldført besværgelse 1 Måneflod (maks. 3). Ved 3 Måneflod bliver denne knap til Solspor: et øjeblikkeligt naturslag plus en forbrænding over 9 sek., der gendanner 35 mana og forbruger alle 3."
       },
       "travel_form": {
         "name": "Fleet-form",
@@ -18500,28 +18518,28 @@ export const da_DK: EnTranslations = {
       },
       "rip": {
         "name": "Blodrevne",
-        "description": "Afsluttende angreb, der får målet til at bløde hvert 2. sek. i 24 sek.: 72 skade plus 48 pr. brugt kombopoint (5 point: {damage} i alt). Kun i Katteform.",
+        "description": "Afsluttende angreb, der får målet til at bløde hvert 2. sek. i 24 sek. og gør mere skade for hvert brugt kombopoint (5 point: {damage} i alt). Kun i Katteform.",
         "specNote_feral": "Det ramte slag tilføjer 1 Gammelt Blod (maks. 3)."
       },
       "mortal_strike": {
         "name": "Lemlæstende Slag",
-        "description": "Et ondskabsfuldt slag, der volder våbenskade plus {damage}. (Arms-signatur)"
+        "description": "Slå for våbenskade plus {damage} og reducer den helbredelse, målet modtager, med 50% i 10 sek. Påfører også Gabende Sår, en blødning der gør {overTime} fysisk skade over 6 sek. i 2 tik. (Arms-signatur)"
       },
       "bloodthirst": {
         "name": "Åreladning",
-        "description": "Angrib øjeblikkeligt i et blodraseri for 60% våbenskade plus {damage}. (Furie-signatur)"
+        "description": "Slå for 50% våbenskade plus {damage}, helbred dig selv for 3% af dit maksimale helbred og generér {rage} raseri. Har 30% chance for at gøre dig Rasende i {duration} sek. (Furie-signatur)"
       },
       "shield_slam": {
         "name": "Skjoldknæk",
-        "description": "Slå målet med dit skjold for 50% våbenskade plus {damage} og enorm trussel. (Beskyttelses-kendetegn)"
+        "description": "Slå målet med dit skjold for våbenskade plus {damage} og generér {rage} raseri. Giver meget høj trussel. (Beskyttelses-signatur)"
       },
       "whirlwind": {
         "name": "Klingehvirvel",
-        "description": "Snur i en dødelig bue og ram alle nærliggende fjender for {damage}. (Raseri-talent)"
+        "description": "Slå alle fjender inden for 8 m for {damage} fysisk skade. De næste {duration} sek. gør dine næste 2 enkeltmålsevner også 40% af deres skade på op til 4 andre fjender inden for 8 m af deres mål. (Furie)"
       },
       "berserker_rage": {
         "name": "Sydende Raseri",
-        "description": "Gå i et sydende raseri, og generér 20 raseri. (Krigertalent)"
+        "description": "Gå i et sydende raseri og generér øjeblikkeligt {rage} raseri."
       },
       "crusader_strike": {
         "name": "Eedsslag",
@@ -18533,11 +18551,11 @@ export const da_DK: EnTranslations = {
       },
       "galeheart_weapon": {
         "name": "Stormhjertevåben",
-        "description": "Fortryller begge våben i 30 min. og muliggør Krigsåndens Kadence."
+        "description": "Gennemtræng begge dine våben i 30 min. Mens den er aktiv, slår hver fuldført Krigsåndens Kadence også til med Stormhjerteekkoer. Erstatter Stenbundet Våben."
       },
       "warspirit_cadence": {
         "name": "Krigsåndens Kadence",
-        "description": "Passiv: Angreb med et våben i hver hånd har ingen ekstra chance for at ramme forbi. Hvert 3. landede våbenangreb udløser 2 Stormhjerteekkoer for 25% naturskade og giver et Stormtegn i 12 sek. Stormtegnet gør dit næste Lysbuelyn, Stød eller Lægende Vande øjeblikkeligt og sænker manaomkostningen med 50%. Forfædreslaget tæller som 2 angreb. (Krigsånd)"
+        "description": "Passiv: Angreb med et våben i hver hånd har ingen ekstra chance for at ramme forbi. Mens Stormhjerte- eller Stenbundet Våben er aktivt, giver hvert 3. landede våbenangreb Stormtegn i 12 sek. Med Stormhjertevåben udløser det også 2 Stormhjerteekkoer, der hver gør 25% af det træfs skade som Naturskade. Stormtegn gør dit næste Lysbuelyn, Stød eller Lægende Vande øjeblikkeligt og 50% billigere i mana. Forfædrenes Slag tæller som 2 angreb. (Forstærkning)"
       },
       "stormsurge": {
         "name": "Stormflod",
@@ -18561,11 +18579,11 @@ export const da_DK: EnTranslations = {
       },
       "stoneward": {
         "name": "Stenværn",
-        "description": "Beskytter en allieret i 60 sek. med 6 ladninger. Skade forbruger en ladning for at helbrede 5% af den maksimale sundhed, én gang hvert 3. sek. (Shamantalent)"
+        "description": "Værn én allieret i 60 sek. Når de tager skade, helbreder en ladning dem for 5% af deres maksimale helbred, højst én gang hvert 3. sek., for op til 6 ladninger. Kun én allieret kan holde dit Stenværn ad gangen. (Shamantalent)"
       },
       "tidecall": {
         "name": "Tidevandskald",
-        "description": "Helbreder et venligt mål for {damage}. Helbredelsen øges med besværgelseskraft. Tilføjer hele helbredelsen før overhelbredelse til Lapningsstrømmen, op til 30% af målets maksimale helbred."
+        "description": "Helbred et venligt mål for {damage}. Helbredelsen stiger med Helbredelseskraft. Tilføjer desuden hele helbredelsen før overhelbredelse til målets Helbredende Strøm, en pulje der helbreder dem over 12 sek. og højst rummer 30% af deres maksimale helbred."
       },
       "soul_harvest": {
         "name": "Essenshøst",
@@ -18573,7 +18591,7 @@ export const da_DK: EnTranslations = {
       },
       "soul_lance": {
         "name": "Sjælelanse",
-        "description": "Kaster en spøgelseslanse for {damage} Skyggeskade. Mod dit Benhusmærke tilføjes 50% af dens skade til mærket."
+        "description": "Slynger en spøgelseslanse for {damage} Skyggeskade. Mod dit Benhusmærke lagrer mærket 70% af dens skade i stedet for 20%."
       },
       "raise_graveguard": {
         "name": "Væk gravvogter",
@@ -18589,19 +18607,19 @@ export const da_DK: EnTranslations = {
       },
       "bone_armor": {
         "name": "Knoglerustning",
-        "description": "Hyller dig i knogler og opsuger skade svarende til 20% af dit maksimale helbred."
+        "description": "Hyller dig i knogler i {duration} sek. og absorberer skade svarende til 20% af dit maksimale helbred."
       },
       "corpse_explosion": {
         "name": "Ligeksplosion",
-        "description": "Ofrer først en Knoglemagiker, dernæst en Skeletkriger, og en Gravvinge kun som sidste udvej. Blandt dubletter vælges den med kortest resterende varighed, dernæst den svageste, for at give {damage} Skyggeskade på det valgte sted."
+        "description": "Ofrer en af dine Herredømme-tjenere (aldrig din Gravvogter) for at gøre {damage} Skyggeskade på fjender inden for 8 m af det valgte sted. Den tager først en Skeletkriger, dernæst en Knoglemagiker og en Gravvinge kun som sidste udvej; blandt tjenere af samme slags vælges den, der er tættest på at udløbe, dernæst den mest sårede. Kræver en Herredømme-tjener."
       },
       "funeral_harvest": {
         "name": "Begravelseshøst",
-        "description": "Når en fjende, du eller dine udøde for nylig har skadet, dør, får du 1 Sjælesplint. Dette kan ske højst én gang hvert 3. sek."
+        "description": "Når en fjende dør inden for 5 sek. efter at have taget skade fra dig eller dine udøde, får du 1 Sjælesplint. Det kan ske højst én gang hvert 3. sek."
       },
       "ossuary_mark": {
         "name": "Benhusmærke",
-        "description": "Mærker en fjende i 15 sek. og opbevarer 20% af skaden, du og dine udøde gør. Kast igen for at detonere det. Hvis det mærkede mål dør, eksploderer det inden for 6 yards og skaber 1 Sjælesplint."
+        "description": "Mærker en fjende i 15 sek. og lagrer 20% af den skade, du og dine udøde gør på den. Kast igen for at detonere det før tid: fjenden tager den lagrede skade som Skyggeskade, og du helbredes for 25% af den. Når mærket udløber, detonerer det uden helbredelsen. Hvis den mærkede fjende dør, rammer den lagrede skade andre fjender inden for 6 m, og du får 1 Sjælesplint."
       },
       "unholy_command": {
         "name": "Vanhellig befaling",
@@ -18613,7 +18631,7 @@ export const da_DK: EnTranslations = {
       },
       "sacrifice_undead": {
         "name": "Ofr udød",
-        "description": "Destruerer én Herredømme-tjener for at genoprette 25% af dit maksimale helbred."
+        "description": "Destruerer din mest sårede Herredømme-tjener (aldrig din Gravvogter) for at genoprette 25% af dit maksimale helbred. Kræver en Herredømme-tjener."
       },
       "raise_gravewing": {
         "name": "Væk gravvinge",
@@ -18633,11 +18651,11 @@ export const da_DK: EnTranslations = {
       },
       "holy_shield": {
         "name": "Hellig skjold",
-        "description": "Øger blokering med 30% og giver et skjold på {damage}% af dit maksimale helbred i {duration} sek. Ascension styrker forsvaret."
+        "description": "Få 30% blokchance og et skjold, der absorberer {damage}% af dit maksimale helbred i {duration} sek., og udløs en puls af trussel. Ophøjelse hæver blokchancen til 40%, øger skjoldet med 50% og forlænger begge til 10 sek."
       },
       "bestial_wrath": {
         "name": "Bestialsk vrede",
-        "description": "Giver 3 Flokvildskab. Jeres næste Slip Bæstet Løs inden for 20 sek. volder 50% mere hug- og labbeskade, og dens raseri varer 12 sek. i stedet for 8. (Kendetegn for Bæstemestring)"
+        "description": "Giv 3 Flokvildskab i 20 sek. og afslut ethvert aktivt Løsladt Raseri. Dit næste Slip Bæstet Løs inden for 20 sek. gør 50% mere slag- og klapskade, og dens raseri varer 12 sek. i stedet for 8. (Bæstemestring-signatur)"
       },
       "trueshot_aura": {
         "name": "Træfsikkerhedsaura",
@@ -18653,15 +18671,15 @@ export const da_DK: EnTranslations = {
       },
       "combustion": {
         "name": "Føniks-trance",
-        "description": "Øger kritisk chance med besværgelser med 50% i 15 sek. (Fire-signatur)"
+        "description": "I 10 sek. rammer dine Ildbesværgelser altid kritisk, også lyn, der allerede er undervejs, og disse kritiske træffere opbygger Hed stime som normalt. Uden for den globale nedkøling og kan bruges under kast. At kaste den afslutter den Gløderfald-ladning, der er ved at genoplades. Uden for Føniks-trance forkorter hvert kritisk træf, der opbygger Hed stime, dens nedkøling med 1 sek. (Ild)"
       },
       "icy_veins": {
         "name": "Kuldeflod",
-        "description": "Øger besværgelseshast med 30% og forhindrer afbrydelse og tilbageslag i 10 sek. (Frost-signatur)"
+        "description": "Øger besværgelseshastigheden med 30% og forhindrer afbrydelse og tilbageslag af kast i 10 sek. (Frost)"
       },
       "cold_blood": {
         "name": "Koldt blod",
-        "description": "Fokuserer din dræberinstinkt, så dine næste 5 angreb rammer kritisk. (Knifework-motoren)"
+        "description": "Dine næste 5 angreb inden for {duration} sek. er garanterede kritiske træffere. Autoangreb bruger også en ladning. (Snigmord-signatur)"
       },
       "blade_flurry": {
         "name": "Klingevirvel",
@@ -18669,7 +18687,7 @@ export const da_DK: EnTranslations = {
       },
       "hemorrhage": {
         "name": "Blødning",
-        "description": "Slår fjenden for våbenskade plus {damage}, giver blødningsskade over 12 sek. og øger blødningsskade modtaget med 40%. Giver 1 combopoint. Hver 2. brug tilføjer 1 Tusmørke (maks. 3). (Skulduggery-motoren)"
+        "description": "Slå fjenden for våbenskade plus {damage} og få den til at bløde for {overTime} over 12 sek. I 12 sek. gør alle blødninger på målet 40% mere skade. Giver 1 kombopoint. Hver 2. brug tilføjer 1 Tusmørke (maks. 3). (Listighed-signatur)"
       },
       "power_infusion": {
         "name": "Kraftinfusion",
@@ -18677,15 +18695,15 @@ export const da_DK: EnTranslations = {
       },
       "holy_nova": {
         "name": "Solsang",
-        "description": "Helbreder allierede inden for 10 m for {damage} og volder 24 til 30 Hellig skade på fjender i samme område. Begge beløb stiger med Besværgelseskraft. (Grundlag for Hellig)"
+        "description": "Helbreder allierede inden for 10 m for {damage} og volder 24 til 30 Hellig skade på fjender i samme område. Helbredelsen stiger med Helbredelseskraft og skaden med Besværgelseskraft. (Grundlag for Hellig)"
       },
       "shadowform": {
         "name": "Tusmørkeslør",
-        "description": "Træd ind i Tusmørkesløret og øg jeres Skyggeskade med 25%. Kast den igen for at forlade Tusmørkesløret. (Kendetegn for Skygge)"
+        "description": "Gå ind i Tusmørkeslør, der øger din Skyggeskade med 25%. At kaste en helbredelsesbesværgelse afslutter det. Kast Tusmørkeslør igen for at forlade det. (Vesper-signatur)"
       },
       "elemental_mastery": {
         "name": "Elementær beherskelse",
-        "description": "I 12 sek. giver Lysbuelyn 2 Torden. Jeres næste Lysbuelyn eller Gaffellyn er øjeblikkelig, og jeres næste fulde Tordenudbetaling volder 25% mere skade. (Kendetegn for Elementær)"
+        "description": "I 12 sek. giver Lysbuelyn 2 Torden i stedet for 1. Dit næste Lysbuelyn eller Gaffellyn i den tid er øjeblikkeligt, og dit næste Jordstød eller Forkastningsvækning, der forbruger 5 Torden, gør 25% mere skade. (Elementær-signatur)"
       },
       "siphon_life": {
         "name": "Sug liv",
@@ -18693,7 +18711,7 @@ export const da_DK: EnTranslations = {
       },
       "conflagrate": {
         "name": "Antændelse",
-        "description": "Fremrykker et kommende tik af jeres Brændende Pagt og antænder derefter målet for {damage} Ildskade. Skaber 1 Forødelse og 1 Tilintetgørelse. Rummer {charges} ladninger. (Kendetegn for Ødelæggelse)"
+        "description": "Kræver din Brændende Pagt på målet. Udløser øjeblikkeligt et af dens resterende tik og forkorter den med ét tik, og antænder derefter målet for {damage} Ildskade. Genererer 1 Wrack og 1 Tilintetgørelse (stakker til 2, varer 15 sek.): dit næste Undergangslyn kastes 30% hurtigere, eller dit næste Ildregn lander sin første bølge med det samme. Rummer {charges} ladninger. (Ødelæggelses-signatur)"
       },
       "moonkin_form": {
         "name": "Månekinform",
@@ -18701,7 +18719,7 @@ export const da_DK: EnTranslations = {
       },
       "feral_charge": {
         "name": "Urkraftsbølge",
-        "description": "Udløs en urkraftsbølge. I Katteform øges jeres energiregenerering med 100% i 10 sek. I Bruin-form får I øjeblikkeligt 50 raseri. (Vildskabssignatur)"
+        "description": "Udløs en urkraftsbølge. I Katteform øges energiregenerering med 100% i 10 sek. I Bruin-form genererer den øjeblikkeligt 50 raseri. Uden for Katte- og Bruin-form har den ingen virkning. (Vildskabs-signatur)"
       },
       "swiftmend": {
         "name": "Hurtig heling",
@@ -18722,7 +18740,7 @@ export const da_DK: EnTranslations = {
       },
       "marrowbreak": {
         "name": "Marvbrækker",
-        "description": "Forbruger dine 3 Gammelt Blod til et tungt slag med høj trussel og {damage} skade. Under halvt helbred helbreder det dig i stedet for 18% af dit maksimale helbred og refunderer 15 raseri."
+        "description": "Bruger dine 3 Gammelt Blod på et slag for {damage} skade, der genererer trussel svarende til det dobbelte af dets skade plus 110. Under halvt helbred helbreder det dig i stedet for 18% af dit maksimale helbred og refunderer 15 raseri."
       },
       "wildwake": {
         "name": "Vildopvågnen",
@@ -18744,8 +18762,8 @@ export const da_DK: EnTranslations = {
       },
       "natures_boon": {
         "name": "Naturens velsignelse",
-        "description": "Dine besværgelser kan klargøre Naturens velsignelse i 10 sek.: den angivne besværgelse bliver gratis, 25% stærkere og kan kastes i enhver form. En ny udløsning genopfrisker varigheden.",
-        "specNote_feral": "Hvert nærkampsautoangreb, der rammer, har 1 ud af 15 chance for at klargøre den til Sporeheling, eller til Egehud i Bruin-form.",
+        "description": "Naturens velsignelse er et vindue på 10 sek., der gør den besværgelse, den nævner, gratis, 25% stærkere og mulig at kaste i enhver form. En ny udløsning fornyer varigheden.",
+        "specNote_feral": "Hvert landet nærkampsautoangreb kan klargøre den, omkring 4 gange i minuttet i enhver form (1 ud af 15 chance pr. slag i Katteform). Den dækker Sporeheling, som den gør 50% stærkere i stedet for 25%, og Egehud, mens du er i Bruin-form; den første, du kaster, bruger den. Hver udløsning nulstiller også Egehuds nedkøling.",
         "specNote_balance": "Hvert Vildlyn eller Himmelfald, du kaster, har 10% chance for at klargøre den til Sporebrist, højst én gang hvert 10. sek.",
         "specNote_restoration": "Hvert tik af dine heling-over-tid-effekter har 10% chance for at klargøre den til Sporebrist, højst én gang hvert 10. sek."
       },
@@ -18776,7 +18794,7 @@ export const da_DK: EnTranslations = {
       },
       "summon_infernal": {
         "name": "Tilkald Pyre Colossus",
-        "description": "Kalder en Pyre Colossus ned i målområdet og giver 64-79 ildskade ved nedslaget. Den kæmper i 30 sek. uden at erstatte din dæmon, brænder fjender i nærheden hvert 2. sek. og genererer 1 Wrack hvert sekund."
+        "description": "Kalder en Pyre Colossus ned i målområdet og gør {damage} Ildskade på fjender inden for 6 m ved nedslaget. Den kæmper i 30 sek. uden at erstatte din dæmon, gør 66 Ildskade på fjender inden for 8 m hvert 2. sek. og genererer 1 Wrack hvert sekund."
       },
       "summon_doomguard": {
         "name": "Tilkald Wraithborn",
@@ -18788,11 +18806,11 @@ export const da_DK: EnTranslations = {
       },
       "berserker_stance": {
         "name": "Berserkerstilling",
-        "description": "En dumdristig kampstilling: dine kritiske slag rammer 3% oftere og slår 3% hårdere. Furie-krigeren kæmper altid i denne stilling."
+        "description": "En dumdristig kampstilling: du får 3% kritisk chance, og dine kritiske træffere gør 3% mere skade. Furie-krigeren kæmper altid i denne stilling."
       },
       "sweeping_strikes": {
         "name": "Voksende Bue",
-        "description": "I 12 sek rammer dine enkeltmålsangreb også 1 nærliggende fjende for fuld skade. (Arms)"
+        "description": "I 12 sek. gør hvert træf fra dine enkeltmålsevner også samme skade på 1 anden fjende inden for 8 m af dit mål. Autoangreb kopieres ikke. (Arms)"
       },
       "deep_wounds": {
         "name": "Gabende Sår",
@@ -18800,7 +18818,7 @@ export const da_DK: EnTranslations = {
       },
       "enrage_passive": {
         "name": "Amok",
-        "description": "Passiv: mens du er Rasende, volder du 7% mere skade, angriber 25% hurtigere og bevæger dig 10% hurtigere i 4 sek. Åreladning har 30% chance for at gøre dig Rasende; Rød Høst gør det altid. (Furie)"
+        "description": "Åreladning har 30% chance for at gøre dig Rasende i 4 sek., og Rød Høst gør det altid. Mens du er Rasende, gør du 7% mere skade, angriber 25% hurtigere og bevæger dig 10% hurtigere. (Furie)"
       },
       "raging_gale": {
         "name": "Tvillingeslag",
@@ -18808,7 +18826,7 @@ export const da_DK: EnTranslations = {
       },
       "red_harvest": {
         "name": "Rød Høst",
-        "description": "Brug alt: slå tre gange i vildskab for 65% våbenskade plus {damage} hver, og bliv altid Rasende. (Furie)"
+        "description": "Slå tre gange, hvert træf gør 65% våbenskade plus {damage}, og bliv altid Rasende i {duration} sek. (Furie)"
       },
       "furious_mending": {
         "name": "Rasende Heling",
@@ -18816,7 +18834,7 @@ export const da_DK: EnTranslations = {
       },
       "emboldening_roar": {
         "name": "Opildnende Brøl",
-        "description": "Udstøder et opildnende brøl: du og venlige spillere inden for 40 m bliver Opildnet, og de næste 3 evner er garanterede kritiske slag. (Furie)"
+        "description": "Du og allierede inden for 40 m bliver Opildnet i {duration} sek.: de næste 3 skadevoldende evner, som hver af jer bruger, er garanterede kritiske træffere. (Furie)"
       },
       "raised_guard": {
         "name": "Hævet Garde",
@@ -18856,7 +18874,7 @@ export const da_DK: EnTranslations = {
       },
       "sudden_death": {
         "name": "Pludselig Død",
-        "description": "Dine autoangreb har en chance for at lade dig kaste Tidlig Grav på et mål uanset helbred, uden at det koster raseri. (Arms)"
+        "description": "Dine autoangreb, der rammer, har 10% chance for at give Pludselig Død i 10 sek.: dit næste Tidlig Grav koster intet raseri og kan bruges på et mål ved ethvert helbredsniveau. (Arms)"
       },
       "storm_bolt": {
         "name": "Tordenkast",
@@ -18868,7 +18886,7 @@ export const da_DK: EnTranslations = {
       },
       "die_by_sword": {
         "name": "Dø ved Sværdet",
-        "description": "Defensiv nedkøling: i 8 sek tager du 30% mindre skade og undviger langt flere angreb."
+        "description": "I 8 sek. tager du 30% mindre skade og får 30% undvigechance."
       },
       "intervene": {
         "name": "Indgriben",
@@ -18876,11 +18894,11 @@ export const da_DK: EnTranslations = {
       },
       "recklessness": {
         "name": "Dumdristighed",
-        "description": "Gør dig Rasende: din raserigenerering øges med 50% og din chance for kritiske slag med 20% i 12 sek."
+        "description": "I 12 sek. genererer du 50% mere raseri og får 20% kritisk chance."
       },
       "sanguine_aura": {
         "name": "Blodrød Aura",
-        "description": "Gennemtræng dit våben med dine fjenders blod: du og dine nærkampsallierede får 10% angrebshastighed og 10% skade i 20 sek."
+        "description": "Gennemtræng dit våben med dine fjenders blod: du og hver Kriger, Paladin, Slyngel, Shaman og Druide i din gruppe, uanset afstand, får 10% angrebshastighed og gør 10% mere skade i 20 sek."
       },
       "victory_rush": {
         "name": "Sejrsrus",
@@ -18888,15 +18906,15 @@ export const da_DK: EnTranslations = {
       },
       "intimidating_shout": {
         "name": "Frygtindgydende Råb",
-        "description": "Et skrækindjagende råb, der får op til 5 fjender inden for 8 m til at flygte i rædsel i 4 sek. Skade kan bryde effekten."
+        "description": "Send op til 5 fjender inden for 8 m på flugt i rædsel i 4 sek. Hvert træf på en skræmt fjende har chance for at bryde frygten, og et træf på 10% af dens maksimale helbred eller mere gør det altid."
       },
       "revenge": {
         "name": "Hævn",
-        "description": "Angrib i en bred bue og vold fysisk skade på alle fjender foran dig. Over 5 mål reduceres skaden. Når du undviger eller parerer, koster din næste Hævn muligvis intet raseri. (Protection)"
+        "description": "Slå alle fjender foran dig inden for 8 m for {damage} fysisk skade. Over 5 mål reduceres hvert træf, så den samlede skade svarer til 5 træf. Når du undviger eller parerer et væsens nærkampsangreb, har du 30% chance for, at dit næste Hævn inden for 10 sek. ikke koster raseri. (Beskyttelse)"
       },
       "heroic_leap": {
         "name": "Krigsspring",
-        "description": "Spring til målområdet og påfør {damage} skade på fjender i nærheden, når du lander."
+        "description": "Spring til målområdet og gør {damage} fysisk skade på alle fjender inden for 6 m, når du lander."
       },
       "rallying_cry": {
         "name": "Tapperhedsbrøl",
@@ -18908,11 +18926,11 @@ export const da_DK: EnTranslations = {
       },
       "avatar": {
         "name": "Avatar",
-        "description": "Forvandl dig til en kolos i 20 sek., bryd alle kontroleffekter på dig, og øg din skade med 20%."
+        "description": "Bryd bedøvelser, frygt, rodfæstelser, tavsheder, afvæbninger og nedsættelser på dig (ikke dem fra bosser), og bliv derefter en kolos i 20 sek., der gør 20% mere skade. Det beskytter dig ikke mod nye kontroleffekter."
       },
       "avenging_wrath": {
         "name": "Hævnende Vrede",
-        "description": "Folder legemlige vinger af gylden hellig kraft ud, vinder 10 Hengivenhed og fordobler den Hengivenhed, jeres evner skaber, i 15 sek. Øger desuden den skade og helbredelse, I udretter, med 20%. Daggryshøster: muliggør Vredens Hammer mod ethvert mål."
+        "description": "Folder legemlige vinger af gylden hellig kraft ud, vinder 10 Hengivenhed og fordobler den Hengivenhed, jeres evner skaber, i {duration} sek. Øger desuden den skade og helbredelse, I udretter, med 20%. Daggryshøster: muliggør Vredens Hammer mod ethvert mål."
       },
       "berserk": {
         "name": "Rød dis",
@@ -18924,11 +18942,11 @@ export const da_DK: EnTranslations = {
       },
       "blink": {
         "name": "Flittrin",
-        "description": "Teleporterer dig 15 m fremad og bryder forankringseffekter. (magikertalent)"
+        "description": "Teleporterer dig 15 m fremad og bryder rodfæstelser."
       },
       "bloodlust": {
         "name": "Krigstrommer",
-        "description": "Øger angrebs-, besværgelses- og kanaliseringshastigheden hos gruppe- eller raidallierede inden for 30 m med 30% i 15 sek. Berørte allierede kan ikke drage nytte af Krigstrommer eller Tidsacceleration igen i 10 min. (Shamantalent)"
+        "description": "Øger angrebs-, besværgelses- og kanaliseringshastigheden hos gruppe- eller raidallierede inden for 30 m med 30% i 15 sek. Berørte allierede kan ikke drage nytte af Krigstrommer, Tyvenes Kor eller Tidsacceleration igen i 10 min. (Shamantalent)"
       },
       "chain_lightning": {
         "name": "Gaffellyn",
@@ -18956,7 +18974,7 @@ export const da_DK: EnTranslations = {
       },
       "counterspell": {
         "name": "Besværgelseskløver",
-        "description": "Afbryder målets besværgelse og forhindrer det i at kaste besværgelser fra den pågældende magiskole i 6 sek."
+        "description": "Afbryder målets besværgelse og forhindrer det i at kaste fra den besværgelses magiskole i 6 sek. Har ingen virkning, hvis målet ikke kaster."
       },
       "curse_of_exhaustion": {
         "name": "Blytung forbandelse",
@@ -19004,19 +19022,19 @@ export const da_DK: EnTranslations = {
       },
       "hammer_of_wrath": {
         "name": "Vredens Hammer",
-        "description": "Slynger en hellig hammer for {damage} skade og skaber 1 Hengivenhed. Kan bruges under 20% helbred, eller under Guddommelig Ophøjelse eller Hævnende Vrede. Daggryets Vrede giver en ekstra kastning mod ethvert mål, som ser bort fra dens igangværende nedkølingstid og volder 20% mere skade. Ophøjelse øger dens skade med 30%."
+        "description": "Slyng en hellig hammer for {damage} hellig skade og generér 1 Hengivenhed. Kan kun bruges på et mål under 20% helbred, medmindre Guddommelig Ophøjelse, Hævnende Vrede eller Daggryets Vrede er aktiv. Daggryets Vrede forbruges af det næste kast, som ignorerer nedkølingen og gør 20% mere skade. Ophøjelse øger dens skade med 30%."
       },
       "healing_stream": {
         "name": "Kildebrønd",
-        "description": "Genopretter 120 helbred hos et allieret mål over 12 sek. (shamantalent)"
+        "description": "Helbred et venligt mål for {damage} over 12 sek., én gang hvert 3. sek. Helbredelsen stiger med Helbredelseskraft. (Shamantalent)"
       },
       "howl_of_terror": {
         "name": "Rædselshyl",
-        "description": "Skræmmer fjender i nærheden i op til 5 sek. Skade svarende til 8% af målets maksimale helbred bryder deres frygt. (troldmandstalent)"
+        "description": "Skræmmer fjender inden for 8 m og i synslinje i op til 5 sek. Skade svarende til 8% af et måls maksimale helbred bryder dets frygt. (Heksemester-talent)"
       },
       "ice_block": {
         "name": "Kold kiste",
-        "description": "Indkapsler jer i fast is i 8 sek. og gør jer immune over for al skade. Fjerner eksisterende almindelige skadelige effekter og forhindrer, at nye almindelige kontroleffekter bliver påført. Kan bruges, mens I er bedøvede eller forvandlede. I kan ikke handle, mens I er indkapslet. Kast igen for at annullere. (magiker)"
+        "description": "Indkapsler dig i fast is i 8 sek. Du tager ingen skade og kan ikke bedøves, rodfæstes, sænkes, bringes til tavshed eller på anden vis kontrolleres, men du kan ikke handle. Fjerner skadelige effekter fra dig ved kast, undtagen mødekontrol og genopretningssyge. Kan bruges, mens du er bedøvet eller forvandlet. Kast igen for at annullere. (Magiker)"
       },
       "inner_focus": {
         "name": "Stillet sind",
@@ -19025,11 +19043,11 @@ export const da_DK: EnTranslations = {
       },
       "innervate": {
         "name": "Livssaft",
-        "description": "Levende saft vælder op i dig i 10 sek. og genopretter 20 af din aktuelle ressource i bølger: mana, raseri eller energi. Formskifte afbryder den ikke. Søvn, bedøvelse eller stase standser saften. (druidentalent)"
+        "description": "Levende saft vælder op i dig i 10 sek. og genopretter 20 af den ressource, du bruger (mana, raseri eller energi), hvert 2. sek. Formskifte afbryder den ikke. Søvn, bedøvelse eller stase sætter den på pause. (Druidetalent)"
       },
       "pummel": {
         "name": "Kæbeknuser",
-        "description": "Afbryder målets besværgelse og forhindrer det i at kaste besværgelser fra den pågældende magiskole i 4 sek."
+        "description": "Afbryder målets besværgelse og forhindrer kast fra den magiskole i 4 sek. Genererer 10 raseri, når den stopper et kast."
       },
       "kick": {
         "name": "Spark",
@@ -19041,7 +19059,7 @@ export const da_DK: EnTranslations = {
       },
       "meteor": {
         "name": "Himmelsten",
-        "description": "Nedkalder en meteor på målområdet og giver {damage} Ildskade. Derefter brændes fjender i området for 12 til 18 Ildskade hvert 2. sek. i 6 sek. (magikertalent)"
+        "description": "Nedkalder en meteor på målområdet. Efter 2 sek. lander den og gør {damage} Ildskade på hver fjende i nedslaget og Antænder hver af dem for 40% af den gjorte skade over 6 sek. (Ild)"
       },
       "temporal_mend": {
         "name": "Tidsheling",
@@ -19053,11 +19071,11 @@ export const da_DK: EnTranslations = {
       },
       "temporal_echo": {
         "name": "Tidsekko",
-        "description": "Mærker en allieret med et ekko af et sundere øjeblik og gendanner {damage} helbred øjeblikkeligt. I {duration} sek. helbreder {echoSinglePct}% af din øvrige Arkane enkeltmålsskade og {echoAreaPct}% af din Arkane områdeskade dem. Æterbølge og Æterpile helbreder dem i stedet for {echoDriverPct}% af den skade, de gør."
+        "description": "Helbreder en allieret for {damage} med det samme og mærker dem med Tidsekko i {duration} sek. Mens de er mærket, helbreder {echoSinglePct}% af din øvrige Arkane enkeltmålsskade og {echoAreaPct}% af din Arkane områdeskade dem; Arkan kraft og Æterpile helbreder dem i stedet for {echoDriverPct}% af den skade, de gør. Du kan have ét Tidsekko ude ad gangen: at kaste det igen flytter mærket. Helbredelse ud over fuldt helbred bliver til et Tidsægide-skjold på op til 20% af deres maksimale helbred."
       },
       "temporal_cascade": {
         "name": "Tidskaskade",
-        "description": "Sender et ekko kaskadevejende gennem din gruppe: målet og op til fire af deres nærmeste allierede helbredes øjeblikkeligt og markeres hver i {duration} sek., og trækker en del af den Arkane skade du gør tilbage gennem deres ekkoer for at helbrede dem. Æterbølge og Æterpile skaber en tilsvarende helingsreserve fra hvert gruppeekko, fordelt efter manglende helbred blandt markerede allierede under 60% helbred. (Kronomantik)"
+        "description": "Helbreder målet og op til 4 nærliggende allierede, gruppemedlemmer først, og mærker hver med et gruppe-Tidsekko i {duration} sek. Hver helbredelse øges med 3% for hver 1% helbred, den allierede mangler. Mens de er mærket, helbreder 13% af din Arkane enkeltmålsskade og 6% af din Arkane områdeskade hver af dem. Arkan kraft og Æterpile tilføjer desuden en lige så stor helbredelsesreserve fra hvert gruppe-Ekko, fordelt blandt mærkede allierede under 60% helbred efter manglende helbred. En allieret, der allerede har dit Tidsekko, beholder det. (Kronomantik)"
       },
       "temporal_reversal": {
         "name": "Tidsvending",
@@ -19081,7 +19099,7 @@ export const da_DK: EnTranslations = {
       },
       "temporal_acceleration": {
         "name": "Tidsacceleration",
-        "description": "Fremskynder tidens gang for din gruppe eller raid og øger angrebshastighed, kastetempo og kanaliseringstempo med 30% i 15 sek. Allierede der for nylig blev påvirkede af Temporal Acceleration eller Krigstrommer er for udmattede til at have gavn af det. (Kronomantik)"
+        "description": "Fremskynder tidens gang for gruppe- eller raidallierede inden for 40 m og øger deres angrebs-, besværgelses- og kanaliseringshastighed med 30% i 15 sek. Berørte allierede kan ikke drage nytte af Tidsacceleration, Krigstrommer eller Tyvenes Kor igen i 10 min. (Kronomantik)"
       },
       "perfect_moment": {
         "name": "Perfekt Øjeblik",
@@ -19089,7 +19107,7 @@ export const da_DK: EnTranslations = {
       },
       "arcane_surge": {
         "name": "Arkan kraft",
-        "description": "Leder en bølge af rå æter gennem fjenden og påfører {damage} skade. Hvert kast efterlader en Arkan Ladning, der øger din næste Aether Surges skade og kastetempo (5% hurtigere for hvert) men øger manakostningen kraftigt, stablet op til 4; Æterpile bruger ladningerne. Hvert kast kan også udløse Æterrus, der gør din næste Aether Surge gratis og dobbelt så hurtig at kaste."
+        "description": "Gør {damage} Arkan skade på fjenden og giver en Arkan Ladning, op til 4, der varer 10 sek. og fornyes ved hvert kast. Hver Arkan Ladning får din næste Arkan kraft til at gøre 30% mere skade og kastes 5% hurtigere, men fordobler dens manaomkostning. Æterpile bruger ladningerne. Hvert kast har 25% chance for at give Æterrus: din næste Arkan kraft inden for 15 sek. koster ingen mana og kastes dobbelt så hurtigt."
       },
       "mind_sear": {
         "name": "Tankebrand",
@@ -19101,7 +19119,7 @@ export const da_DK: EnTranslations = {
       },
       "prayer_of_healing": {
         "name": "Korhelbredelse",
-        "description": "Helbreder allierede inden for 30 m for {damage}. Helbredelsen stiger med Besværgelseskraft. (Hellig)"
+        "description": "Helbreder allierede inden for 30 m for {damage}. Helbredelsen stiger med Helbredelseskraft. (Hellig)"
       },
       "preparation": {
         "name": "Nødplan",
@@ -19133,7 +19151,7 @@ export const da_DK: EnTranslations = {
       },
       "smoke_screen": {
         "name": "Røgslør",
-        "description": "Du forsvinder i en røgsky, hvilket øger din undvigelseschance med 30 % i 8 sek."
+        "description": "Omgiv dig med røg, der øger din undvigechance med 30% i 8 sek."
       },
       "sacrilegious_march": {
         "name": "Vanhellig march",
@@ -19149,44 +19167,44 @@ export const da_DK: EnTranslations = {
       },
       "skull_bash": {
         "name": "Skalle",
-        "description": "En fremadstormende skalle, der afbryder målets besværgelse og låser den pågældende magiskole i 4 sek."
+        "description": "Giv målet en skalle, der afbryder den besværgelse, det kaster, og forhindrer det i at kaste besværgelser fra den magiskole i 4 sek."
       },
       "spell_lock": {
         "name": "Afgrundsknebel",
-        "description": "Afbryder fjendens besværgelse og forhindrer den i at besværge fra den skole i 4 sek."
+        "description": "Afbryder fjendens besværgelseskast og forhindrer den i at kaste besværgelser fra den magiskole i 4 sek."
       },
       "thieves_chorus": {
         "name": "Tyvenes Kor",
-        "description": "Et fløjtet signal ansporer din gruppe: angrebs-, besværgelses- og kanaliseringshastighed øget med 10% i 10 sek. Allierede, der for nylig fik et gruppehast-udbrud, er for udmattede til at få gavn. (slyngeltalent)"
+        "description": "Øger angrebs-, besværgelses- og kanaliseringshastigheden hos gruppe- eller raidallierede inden for 30 m med 10% i 10 sek. Berørte allierede kan ikke drage nytte af Tyvenes Kor, Krigstrommer eller Tidsacceleration igen i 10 min. (Slyngeltalent)"
       },
       "tranquility": {
         "name": "Lundens sang",
-        "description": "Kanaliserer helbredende energi i 4 sek. og helbreder allierede inden for 30 m for 42 til 52 hvert sekund. (druidentalent)"
+        "description": "Kanaliserer helbredende energi i 4 sek. og helbreder hver allieret inden for 30 m og i din synslinje, dig selv inklusive, for {damage} hvert sekund. (Druidetalent)"
       },
       "venom_dart": {
         "name": "Giftpil",
         "description": "Kaster en forgiftet pil for {damage} naturskade. Giver 1 combopoint. Knifework: forlænger dit Giftflænge-sår med 6 sek., op til 20 sek.",
-        "specNote_assassination": "Tilføjer 1 Giftritual og forlænger dit giftsår med 6 sek. (såret kommer aldrig over 20 sek.)."
+        "specNote_assassination": "Tilføjer 1 Giftritual (maks. 6), refunderer 15 energi og forlænger dit giftsår med 6 sek. (såret kommer aldrig over 20 sek.)."
       },
       "body_blow": {
         "name": "Kropsstød",
-        "description": "Et tungt stød for 130% våbenskade plus 10, der giver 2 combopoint og uddyber Redline med ét hak. (Thuggery-motoren)"
+        "description": "Et tungt stød for {weaponPercent}% våbenskade plus {damage}. Giver 2 combopoint og tilføjer 1 Redline (maks. 4). (Thuggery)"
       },
       "knockout_blow": {
         "name": "Knockoutstød",
-        "description": "Afslut Redline med en knockout: rammer for 45 plus 35 pr. combopoint, 25% hårdere pr. Redline-hak, og genvinder 25 energi. (Thuggery-motoren)"
+        "description": "Afslutter Redline med et knockout: slå for {damage} fysisk skade, der rammer 25% hårdere for hvert Kropsstød, du kastede under Redline (op til 3), og genvind 25 energi. Skaden stiger med Angrebsstyrke. Brug det, før Redline løber ud, ellers går knockouten tabt. (Kamp)"
       },
       "veilstrike": {
         "name": "Slørstød",
-        "description": "Fortærer Skumringslageret og hyller dig i skygge i 6 sek.: dine snigåbnere virker i det åbne, og du gør 25% mere skade. (Skulduggery-motoren)"
+        "description": "I 6 sek.: dine Skumringsslør-åbninger virker uden skjul og fra enhver vinkel, og du gør 10% mere skade. Dit første Luskerens Slag indeni gør 50% mere våbenskade. (Listighed)"
       },
       "venomrend": {
         "name": "Giftflænge",
-        "description": "Fortærer Giftritualet: rammer for 22 plus 26 pr. kombopoint, detonerer dine blødningers resterende skade og gendanner 25 energi. (Knifework-motoren)"
+        "description": "Bruger dine 6 Giftritual: slå for {damage} fysisk skade, gør øjeblikkeligt al den skade, der er tilbage på din Forblødning, Strubetråd og dit giftsår, og påfør derefter et nyt giftsår, der gør {overTime} over 20 sek. Genopretter 20 energi. (Snigmord)"
       },
       "typhoon": {
         "name": "Tyfon",
-        "description": "Et vindstød kaster alle fjender inden for 8 meter 15 meter væk fra dig og fortumler dem, så hastigheden falder med 50% i 4 sek. Fjendtlige spillere kastes lige gennem luften: over en kant fortsætter de og tager faldskade; et dødeligt fald tæller som dit drab."
+        "description": "Slår hver fjende inden for 8 m og i din synslinje op til 15 m væk fra dig og fortumler dem, så deres bevægelseshastighed sænkes med 50% i 4 sek. Fjendtlige spillere kastes op i luften i en lige linje: slås de ud over en kant, fortsætter de og tager faldskade, og et dødeligt fald tæller som dit drab."
       },
       "voidfeast": {
         "name": "Tomhedsfest",
@@ -19198,11 +19216,11 @@ export const da_DK: EnTranslations = {
       },
       "scouring_mercy": {
         "name": "Rensende Nåde",
-        "description": "Gør {damage} hellig skade på en fjende eller helbreder et venligt mål for {healing}. Skaden stiger med besværgelseskraft; helbredelsen stiger med helbredelseskraft. Læren omdanner denne skade til helbredelse gennem dine bånd. Hvis intet bundet såret gruppemedlem er inden for 30 meter, helbredes det sårede gruppemedlem med lavest sundhed inden for 30 meter for 15% af skaden. At helbrede et gruppemedlem helbreder også op til 2 andre sårede gruppemedlemmer inden for 10 meter af det mål og inden for din sigtelinje, hver for 50% af den gendannede sundhed. Denne ekstra helbredelse kan hverken være kritisk eller skabe Læren-bånd. (Læresignatur)"
+        "description": "Gør {damage} hellig skade på en fjende eller helbred et venligt mål for {healing}. Skaden stiger med Besværgelseskraft; helbredelsen stiger med Helbredelseskraft. Disciplin helbreder hvert såret forbundet gruppemedlem inden for 30 m for 30% af den gjorte skade (70% med Tvillingepagt). Hvis ingen er såret, helbreder den i stedet det sårede gruppemedlem med lavest helbred inden for 30 m for 15% af skaden. At helbrede et gruppemedlem helbreder også op til 2 andre sårede gruppemedlemmer inden for 10 m af det mål og i din synslinje, hver for 50% af det genoprettede helbred. Disse ekstra helbredelser kan ikke være kritiske eller skabe Disciplin-bånd. (Disciplin-signatur)"
       },
       "seraphic_vigil": {
         "name": "Serafisk Vagt",
-        "description": "Beskytter en allieret i 30 sek. Det første slag, der bringer vedkommende under 35% sundhed, forbruger Vagten og helbreder vedkommende for {buff}. (Velsignelsessignatur)"
+        "description": "Beskyt én allieret i 30 sek. Det første træf, der efterlader dem under 35% helbred, forbruger Vagten og helbreder dem for {buff}. At kaste den på en anden allieret flytter din Vagt. (Hellig-signatur)"
       },
       "summon_tithefiend": {
         "name": "Tilkald Tiendedæmon",
@@ -19218,16 +19236,16 @@ export const da_DK: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Befrielsens Kor",
-        "description": "Kanaliserer i 6 sek. og helbreder gruppemedlemmer inden for 30 meter for {damage} hvert 2. sek. Helbredelsen øges med besværgelseskraft.",
-        "specNote_shadow": "I 15 sek. fordeles 20% af det helbred, fjender mister til din Skyggeskade, som helbredelse mellem sårede gruppemedlemmer inden for 30 yards, inklusive dig selv. I raids helbredes kun din undergruppe. Kastes øjeblikkeligt, og du kan fortsætte med at angribe i Tusmørkeslør. Absorberet skade og skade ud over resterende helbred giver ingen helbredelse."
+        "description": "Kanaliserer i 6 sek. og helbreder dig og hvert venligt mål inden for 30 meter og i din synslinje for {damage} hvert 2. sek. Helbredelsen stiger med Helbredelseskraft.",
+        "specNote_shadow": "I 15 sek. deles 20% af det helbred, fjender mister til din Skyggeskade, som helbredelse mellem sårede gruppemedlemmer inden for 30 m, dig selv inklusive. I raids helbredes kun din undergruppe. Kastes øjeblikkeligt, og du kan fortsætte med at angribe i Tusmørkeslør. Absorberet skade og overkill giver ingen helbredelse."
       },
       "bear_charge": {
         "name": "Bruin-storm",
-        "description": "Storm mod en fjende, generér 9 raseri og bedøv den i 1 sek. I 3 sek. derefter er Katteform gratis og fastholder målet, hvilket nedsætter dets hastighed med 50% i 4 sek. 8-25 m rækkevidde. Kun i Bruin-form."
+        "description": "Skift til Bruin-form, hvis du ikke allerede er det, og storm derefter mod en fjende, generér 9 raseri og bedøv den i 1 sek. I 3 sek. efter stormen slutter (eller indtil du forlader kamp, eller målet dør) er Katteform gratis og Fastholder det angrebne mål, så dets hastighed sænkes med 50% i 4 sek. Kan bruges i enhver form."
       },
       "demoralizing_roar": {
         "name": "Fejt Brøl",
-        "description": "Demoraliserer nærliggende fjender og sænker deres angrebsstyrke med 20 i 20 sek. Kun i Bruin-form."
+        "description": "Demoraliserer hver fjende inden for 8 m og reducerer deres angrebsstyrke med {buff} i 20 sek. Kun i Bruin-form."
       },
       "prowl": {
         "name": "Snig",
