@@ -214,7 +214,7 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
     'Puedes lanzar en movimiento tus dos siguientes hechizos que tengan tiempo de lanzamiento. Permanece 15 s. (Talento de mago)',
   'entities.abilities.ignition.name': 'Combustión',
   'entities.abilities.ignition.description':
-    'Pasivo: cuando tus hechizos de Fuego asestan un golpe crítico, el objetivo arde y sufre un 30% adicional del daño infligido a lo largo de 6 s. Una nueva quemadura sobre un objetivo que ya está ardiendo se suma al daño pendiente y reinicia el temporizador de 6 s. (Maestría de Fuego)',
+    'Pasivo: cuando tus hechizos de Fuego asestan un golpe crítico, el objetivo arde y sufre un 1,5% adicional del daño infligido por nivel de personaje (un 30% en el nivel 20) a lo largo de 6 s. Una nueva quemadura sobre un objetivo que ya está ardiendo se suma al daño pendiente y reinicia el temporizador de 6 s. (Maestría de Fuego)',
   'entities.abilities.mass_barrier.name': 'Barrera colectiva',
   'entities.abilities.mass_barrier.description':
     'Otorga un escudo a ti y a un máximo de 4 aliados cercanos en 30 m; cada uno absorbe {damage} de daño durante 15 s. (Talento de mago)',
@@ -413,7 +413,7 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.eviscerate.specNote_assassination':
     'Con 6 de Ritual de Veneno, este botón se convierte en Desgarraveneno: un golpe que inflige al instante todo el daño que tus sangrados aún habrían infligido, planta una herida nueva de Desgarro venenoso y restaura 20 de energía.',
   'entities.abilities.eviscerate.specNote_combat':
-    'Conectar esto con 4 o más puntos de combo inicia la Redline durante 8 s: Tajo Perverso se convierte en Golpe al cuerpo y este botón se convierte en Golpe de nocaut (45 más 35 por punto de combo, un 25% más fuerte por cada Golpe al cuerpo que lances durante la Redline, restaura 25 de energía). Gástalo antes de que termine la Redline.',
+    'Conectar esto con 4 o más puntos de combo inicia la Redline durante 8 s: Tajo Perverso se convierte en Golpe al cuerpo y este botón se convierte en Golpe de nocaut (un remate que golpea un 25% más fuerte por cada Golpe al cuerpo que lances durante la Redline y restaura 25 de energía). Gástalo antes de que termine la Redline.',
   'entities.abilities.expose_armor.description':
     'Movimiento de remate que expone al objetivo durante 30 s: cada punto de combo gastado reduce su armadura un 2% (5 puntos de combo: {damage}%).',
   'entities.abilities.ferocious_bite.description':
@@ -429,7 +429,7 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.kidney_shot.description':
     'Movimiento de remate que aturde al objetivo durante 2 s más 1 s por punto de combo (5 puntos de combo: 7 s).',
   'entities.abilities.maul.specNote_feral':
-    'Cada golpe que conecta añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Quiebramédula: un golpe de 78 a 96 de daño con mucha amenaza; por debajo de la mitad de salud, en su lugar te sana el equivalente al 18% de tu salud máxima y te devuelve 15 de ira.',
+    'Cada golpe que conecta añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Quiebramédula: un golpe contundente con mucha amenaza; por debajo de la mitad de salud, en su lugar te sana el equivalente al 18% de tu salud máxima y te devuelve 15 de ira.',
   'entities.abilities.ossuary_mark.description':
     'Marca a un enemigo durante 15 s, almacenando el 20% del daño que tú y tus no muertos le infligís. Vuelve a lanzarla para detonarla antes de tiempo: el enemigo sufre el daño almacenado como daño de Sombras y te sanas el 25% de él. Cuando la marca expira, detona sin la sanación. Si el enemigo marcado muere, el daño almacenado golpea a otros enemigos en un radio de 6 yardas y obtienes 1 Fragmento de alma.',
   'entities.abilities.ossuary_mark.name': 'Ossuary Mark',
@@ -439,7 +439,7 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
     'Sana a un objetivo amistoso por {damage} y después por {overTime} más durante 15 s. Si la sanación periódica dura todo su tiempo, vuelve a sanar al objetivo una vez más por la cantidad de la primera sanación (antes de cualquier bonificación de crítico). Terminarla antes de tiempo, por ejemplo con Alivio presto, Sobrefloración o volviendo a lanzarla, omite esa sanación.',
   'entities.abilities.rejuvenation.description': 'Sana al objetivo por {damage} durante 12 s.',
   'entities.abilities.rip.description':
-    'Movimiento de remate que hace sangrar al objetivo cada 2 s durante 24 s: 36 de daño más 24 por punto de combo gastado (5 puntos de combo: {damage} en total). Solo en Forma de lobo.',
+    'Movimiento de remate que hace sangrar al objetivo cada 2 s durante 24 s e inflige más daño por cada punto de combo gastado (5 puntos de combo: {damage} en total). Solo en Forma de lobo.',
   'entities.abilities.ruinous_brand.description':
     'Marca a un enemigo durante 15 s. Tus próximos 3 hechizos directos hacen eco por un 25% de daño contra el enemigo marcado, o copian un 50% de daño hacia él cuando se lanzan contra otro objetivo.',
   'entities.abilities.ruinous_brand.name': 'Ruinous Brand',
@@ -449,7 +449,7 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
     'Aumenta la velocidad de movimiento un 35%, pero sacrifica un 2% de tu salud máxima cada segundo. Vuelve a lanzarlo para cancelarlo. Se desactiva al llegar al 20% de salud.',
   'entities.abilities.sacrilegious_march.name': 'Sacrilegious March',
   'entities.abilities.sinister_strike.specNote_combat':
-    'Mientras la Redline está activa, este botón se convierte en Golpe al cuerpo: 130% de daño de arma más 10, otorga 2 puntos de combo y añade 1 de Redline (máx. 4).',
+    'Mientras la Redline está activa, este botón se convierte en Golpe al cuerpo: un golpe de arma más fuerte que otorga 2 puntos de combo y añade 1 de Redline (máx. 4).',
   'entities.abilities.slice_and_dice.description':
     'Movimiento de remate que aumenta la velocidad de ataque cuerpo a cuerpo un 30% durante 12 s más 4 s por punto de combo (5 puntos de combo: 32 s).',
   'entities.abilities.soul_lance.description':
@@ -461,7 +461,7 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.description':
     'Hace caer un rayo de fuego estelar que causa {damage} de daño Arcano.',
   'entities.abilities.starfire.specNote_balance':
-    'En Forma de lechúcico lunar, cada lanzamiento completado añade 1 de Marea Lunar (máx. 3). Con 3 de Marea Lunar, este botón se convierte en Estela Solar: un golpe instantáneo de 80 a 100 de daño de Naturaleza más una quemadura de 45 a lo largo de 9 s, que restaura 35 de maná y gasta los 3.',
+    'En Forma de lechúcico lunar, cada lanzamiento completado añade 1 de Marea Lunar (máx. 3). Con 3 de Marea Lunar, este botón se convierte en Estela Solar: un golpe de Naturaleza instantáneo más una quemadura a lo largo de 9 s, que restaura 35 de maná y gasta los 3.',
   'entities.abilities.stealth.description':
     'Te ocultas entre las sombras. Los jugadores y las mascotas enemigos no pueden verte, y los monstruos solo te notan desde mucho más cerca de lo normal (desde más lejos si te superan en nivel). Te mueves a velocidad completa. Atacar o recibir daño rompe el Velo Crepuscular. Vuelve a lanzarlo para salir de él.',
   'entities.abilities.swiftmend.description':

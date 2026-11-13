@@ -6570,7 +6570,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     '6 Sek. lang: Eure Eröffnungsangriffe aus dem Dämmerschleier funktionieren ohne Schleichen und aus jedem Winkel, und Ihr verursacht 10% mehr Schaden. Euer erster Lauererstoß darin verursacht 50% mehr Waffenschaden. (Täuschung)',
   'entities.abilities.body_blow.name': 'Körpertreffer',
   'entities.abilities.body_blow.description':
-    'Ein wuchtiger Treffer für 130% Waffenschaden plus 10, der 2 Combopunkte gewährt und die Redline um eine Stufe vertieft. (Thuggery-Engine)',
+    'Ein wuchtiger Treffer für {weaponPercent}% Waffenschaden plus {damage}. Gewährt 2 Combopunkte und fügt 1 Redline hinzu (max. 4). (Thuggery)',
   'entities.abilities.knockout_blow.name': 'K.o.-Schlag',
   'entities.abilities.knockout_blow.description':
     'Beendet die Redline mit einem K.o.: trifft für {damage} physischen Schaden, 25% härter für jeden während der Redline geworfenen Körpertreffer (bis zu 3), und stellt 25 Energie wieder her. Der Schaden steigt mit der Angriffskraft. Setzt ihn ein, bevor die Redline endet, sonst geht das K.o. verloren. (Kampf)',
@@ -9447,7 +9447,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Eure nächsten zwei Zauber mit Zauberzeit können aus der Bewegung gewirkt werden. Hält 15 Sek. lang an. (Magiertalent)',
   'entities.abilities.ignition.name': 'Entzündung',
   'entities.abilities.ignition.description':
-    'Passiv: Wenn Eure Feuerzauber kritisch treffen, verbrennt das Ziel 6 Sek. lang und erleidet zusätzlich 30% des verursachten Schadens. Eine neue Verbrennung auf einem bereits brennenden Ziel erhöht den noch ausstehenden Schaden und startet den 6-Sek.-Zeitgeber neu. (Feuermeisterschaft)',
+    'Passiv: Wenn Eure Feuerzauber kritisch treffen, verbrennt das Ziel 6 Sek. lang und erleidet zusätzlich 1,5% des verursachten Schadens pro Charakterstufe (30% auf Stufe 20). Eine neue Verbrennung auf einem bereits brennenden Ziel erhöht den noch ausstehenden Schaden und startet den 6-Sek.-Zeitgeber neu. (Feuermeisterschaft)',
   'entities.abilities.mass_barrier.name': 'Massenbarriere',
   'entities.abilities.mass_barrier.description':
     'Schützt Euch und bis zu 4 Verbündete im Umkreis von 30 m; jeder Schild absorbiert 15 Sek. lang {damage} Schaden. (Magiertalent)',
@@ -9686,7 +9686,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Verderbt das Ziel und verursacht über 18 Sek. {damage} Schattenschaden.',
   'entities.abilities.life_tap.name': 'Harter Handel',
   'entities.abilities.life_tap.description':
-    'Wandelt {damage} Gesundheit in {damage} Mana um (50% mehr Mana mit Blutkredit). Schlägt fehl, wenn Ihr {damage} Gesundheit oder weniger habt.',
+    'Wandelt {damage} Gesundheit in {buff} Mana um. Schlägt fehl, wenn Ihr {damage} Gesundheit oder weniger habt.',
   'entities.abilities.curse_of_agony.name': 'Fluch der Qual',
   'entities.abilities.curse_of_agony.description':
     'Verflucht das Ziel mit Pein: {damage} Schattenschaden über 24 Sek.',
@@ -9733,7 +9733,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.regrowth.name': 'Zweite Blüte',
   'entities.abilities.barkskin.name': 'Eichenhaut',
   'entities.abilities.barkskin.description':
-    'Eure Haut härtet wie Rinde und erhöht die Rüstung 15 Sek. lang um 150.',
+    'Eure Haut härtet wie Rinde und erhöht die Rüstung 15 Sek. lang um {buff}%.',
   'entities.abilities.starfire.name': 'Himmelssturz',
   'entities.abilities.travel_form.name': 'Fleet-Gestalt',
   'entities.abilities.travel_form.description':
@@ -14157,7 +14157,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.avatar.description':
     'Löst Betäubungen, Furcht, Wurzeln, Verstummen, Entwaffnungen und Verlangsamungen von Euch (nicht die von Bossen) und verwandelt Euch dann 20 Sek. lang in einen Koloss, der 20% mehr Schaden verursacht. Er schützt Euch nicht vor neuen Kontrolleffekten.',
   'entities.abilities.avenging_wrath.description':
-    'Entfaltet leibhaftige Schwingen aus goldener heiliger Macht, gewinnt 10 Hingabe und verdoppelt 15 Sek. lang die von euren Fähigkeiten erzeugte Hingabe. Erhöht zudem verursachten Schaden und Heilung um 20%. Dämmerungsreaver: ermöglicht Hammer des Zorns gegen jedes Ziel.',
+    'Entfaltet leibhaftige Schwingen aus goldener heiliger Macht, gewinnt 10 Hingabe und verdoppelt {duration} Sek. lang die von euren Fähigkeiten erzeugte Hingabe. Erhöht zudem verursachten Schaden und Heilung um 20%. Dämmerungsreaver: ermöglicht Hammer des Zorns gegen jedes Ziel.',
   'entities.abilities.berserk.description':
     'Erhöht Eure Angriffskraft 15 Sek. lang um 70. (Druidentalent)',
   'entities.abilities.bladestorm.name': 'Klingensturm',
@@ -15085,7 +15085,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.beacon_of_light.description':
     'Markiert ein Gruppenmitglied als Euer Leuchtfeuer des Lichts. 50% Eurer effektiven direkten Heilung an einem anderen Gruppenmitglied innerhalb von 60 m heilen auch das Leuchtfeuer. Flächen- und periodische Heilung werden nicht übertragen. Hält an, bis einer von Euch stirbt.',
   'entities.abilities.dawn_devotion.description':
-    'Erhöht die Angriffskraft von Euch und Euren Gruppenmitgliedern 30 Min. lang um 40. Ersetzt Eure eigene Strahlende Hingabe oder Hingabe der Gnade, besteht aber neben den Hingaben anderer Paladine und neben Kriegerrufen.',
+    'Erhöht die Angriffskraft von Euch und Euren Gruppenmitgliedern 30 Min. lang um {buff}. Ersetzt Eure eigene Strahlende Hingabe oder Hingabe der Gnade. Wirkt ein anderer Paladin Hingabe der Morgenröte, wird sie erneuert statt gestapelt; eine andere Hingabe und Kriegerrufe bestehen daneben.',
   'entities.abilities.dawnfall.description':
     'Verursacht {damage} Heiligschaden an nahen Gegnern und erzeugt 1 Hingabe. Mindestens einen Gegner zu treffen verringert die verbleibende Abklingzeit des Letzten Edikts um 2 Sek. Der Aufstieg erhöht den Schaden um 50% und den Radius auf 10 m.',
   'entities.abilities.dawns_embrace.description':
@@ -15117,7 +15117,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.radiant_chorus.description':
     'Heilt nahe Verbündete um {damage} und erzeugt 1 Hingabe. Mindestens 2 Verbündete wirksam zu heilen gewährt 10 Sek. lang Strahlende Resonanz: Euer nächstes Heilendes Licht wird sofort gewirkt, oder Eure nächste Umarmung der Morgenröte kostet 50% weniger Mana und wird in 1,5 Sek. gewirkt. Der Aufstieg erhöht die Heilung des Strahlenden Chors um 20% und seinen Radius auf 40 m.',
   'entities.abilities.radiant_devotion.description':
-    'Erhöht die Zaubermacht von Euch und Euren Gruppenmitgliedern 30 Min. lang um 20. Ersetzt Eure eigene Hingabe der Morgenröte oder Hingabe der Gnade, besteht aber neben den Hingaben anderer Paladine.',
+    'Erhöht die Zaubermacht von Euch und Euren Gruppenmitgliedern 30 Min. lang um {buff}. Ersetzt Eure eigene Hingabe der Morgenröte oder Hingabe der Gnade. Wirkt ein anderer Paladin Strahlende Hingabe, wird sie erneuert statt gestapelt; eine andere Hingabe besteht daneben.',
   'entities.abilities.recall_the_fallen.description':
     'Erweckt ein totes Gruppenmitglied mit 35% Gesundheit und Mana an Eurer Seite wieder zum Leben. Ein Sonnenheiler der Stufe 16 oder höher ruft stattdessen alle gefallenen Mitglieder der Gruppe innerhalb von 30 Metern und in Eurer Sichtlinie zurück.',
   'entities.abilities.sacred_challenge.description':
@@ -15130,7 +15130,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Verursacht {damage} Heiligschaden an einem Gegner oder heilt ein freundliches Ziel um {healing}. Der Schaden steigt mit der Zaubermacht, die Heilung mit der Heilkraft. Disziplin heilt jedes verwundete verbundene Gruppenmitglied im Umkreis von 30 m um 30% des verursachten Schadens (70% mit Zwillingsbund). Ist keines verwundet, heilt sie stattdessen das verwundete Gruppenmitglied mit der geringsten Gesundheit im Umkreis von 30 m um 15% des Schadens. Das Heilen eines Gruppenmitglieds heilt außerdem bis zu 2 weitere verwundete Gruppenmitglieder im Umkreis von 10 m um dieses Ziel und in Eurer Sichtlinie, jeweils um 50% der wiederhergestellten Gesundheit. Diese zusätzlichen Heilungen können weder kritisch heilen noch Disziplin-Verbindungen erschaffen. (Disziplin-Signatur)',
   'entities.abilities.solar_invocation.description':
     'Heilt einen Verbündeten sofort um {damage} oder verursacht 120 bis 150 Heilig-Grundschaden an einem Gegner. Der Schaden steigt mit der Zaubermacht, die Heilung mit der Heilkraft. Beide Anwendungen erzeugen 1 Hingabe. Während des Aufstiegs heilt ein Heilzauber zusätzlich verbündete Spieler im Umkreis von 10 m um das Ziel um die Hälfte.',
-  'entities.abilities.solar_step.description': 'Erhöht Euer Tempo 2 Sek. lang um 150%.',
+  'entities.abilities.solar_step.description': 'Erhöht Euer Tempo {duration} Sek. lang um 150%.',
   'entities.abilities.sun_gods_verdict.description':
     'Richtet einen Gegner 30 Sek. lang unter dem Urteil des Sonnengottes. Das Letzte Edikt und der Morgensturz schreiben bei einem erfolgreichen Treffer je eine Aufladung ein. Die Fähigkeit, die die dritte Aufladung setzt, bestimmt das Urteil: Das Letzte Edikt entfesselt verheerenden Schaden am Verurteilten; der Morgensturz zündet das Urteil und verletzt und betäubt nahe Gegner 1,5 Sek. lang.',
   'entities.abilities.sunward_disc.description':
@@ -15296,7 +15296,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Verbraucht 3 Mondflut für einen schweren Schlag mit {damage} Arkanschaden: die Schadenswahl. Sonnenspur verbraucht dieselben 3 Mondflut, also wählt eine.',
   'entities.abilities.moonseed.name': 'Mondsaat',
   'entities.abilities.moonseed.description':
-    'Nur in Mondkingestalt. Trifft für {damage} Arkanschaden, fügt 1 Mondflut hinzu (max. 3) und verlängert Euren Mondsturm auf dem Ziel um 6 Sek., bis zu {duration} zusätzliche Sek. pro Anwendung des Mondsturms. Bei 3 Mondfluten wird diese Taste zu Mondwoge: ein sofortiger Schlag für 136 bis 162 Arkanschaden (plus Zaubermacht), der alle 3 verbraucht.',
+    'Nur in Mondkingestalt. Trifft für {damage} Arkanschaden, fügt 1 Mondflut hinzu (max. 3) und verlängert Euren Mondsturm auf dem Ziel um 6 Sek., bis zu {duration} zusätzliche Sek. pro Anwendung des Mondsturms. Bei 3 Mondfluten wird diese Taste zu Mondwoge: ein sofortiger schwerer Arkanschlag, der alle 3 verbraucht.',
   'entities.abilities.overbloom.name': 'Überblüte',
   'entities.abilities.overbloom.description':
     'Verbraucht 3 Grünkraft. Erntet jede Eurer Heilungen über Zeit auf allen Verbündeten für {buff}% ihrer verbleibenden Heilung, entfernt diese Effekte und pflanzt eine frische Sporenheilung auf das Ziel.',
@@ -16907,14 +16907,14 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Reißt am gewählten Ort einen Riss auf, der Gegner im Umkreis von 8 m zu seinem Zentrum zieht, {damage} Schattenschaden verursacht und sie 2 Sek. lang betäubt. Bosse erleiden den Schaden, widerstehen aber dem Sog und der Betäubung.',
   'entities.abilities.abyssal_rift.name': 'Abgrundriss',
   'entities.abilities.ambush.description':
-    'Schlagt aus dem Schatten zu für 250% Waffenschaden plus {damage}. Erfordert Verstohlenheit und Position hinter dem Ziel. Erfordert einen Dolch. Gewährt 1 Combopunkt.',
+    'Schlagt aus dem Schatten zu für {weaponPercent}% Waffenschaden plus {damage}. Erfordert Verstohlenheit und Position hinter dem Ziel. Erfordert einen Dolch. Gewährt 1 Combopunkt.',
   'entities.abilities.ambush.specNote_subtlety':
     'Aus Duskveil eingesetzt fügt dies 1 Dämmer hinzu (max. 3). Bei 3 Dämmer könnt Ihr es OHNE Verstohlenheit und aus jedem Winkel einsetzen: Dieser Einsatz kostet nichts, verbraucht alle 3 Dämmer, startet den 6 Sek. langen Schattenschleier und trifft doppelt.',
   'entities.abilities.army_of_the_dead.description':
     'Reißt ein Grabportal auf, das für 20 Sek. einen zeitweiligen Skelettkrieger, einen Knochenmagier und eine Grabschwinge erweckt und damit die Lücken füllt, die Eure ständigen Domänendiener offen lassen.',
   'entities.abilities.army_of_the_dead.name': 'Armee der Toten',
   'entities.abilities.backstab.description':
-    'Rammt Euren Dolch in den Rücken des Ziels für 150% Waffenschaden plus {damage}. Erfordert Position hinter dem Ziel. Erfordert einen Dolch. Gewährt 1 Combopunkt.',
+    'Rammt Euren Dolch in den Rücken des Ziels für {weaponPercent}% Waffenschaden plus {damage}. Erfordert Position hinter dem Ziel. Erfordert einen Dolch. Gewährt 1 Combopunkt.',
   'entities.abilities.backstab.specNote_assassination':
     'Jeder Treffer fügt 1 Giftritual hinzu (max. 6) und erstattet 15 Energie zurück. Bei 6 Giftritual wird Grabesschlaf zu Giftriss (er verursacht sofort Euren gesamten verbleibenden Blutungsschaden).',
   'entities.abilities.blade_flurry.description':
@@ -16942,7 +16942,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Erfordert Euer primäres Böses Auge auf dem Ziel. Platziert sekundäre Böse Augen auf bis zu 4 weiteren Gegnern im Umkreis von 15 m um das Ziel für 15 Sek. Sie erzeugen Verdammnis mit 50% der normalen Rate, und der Schuldspruch hallt zu jedem von ihnen für 35% seines Schadens wider.',
   'entities.abilities.coven.name': 'Hexenzirkel',
   'entities.abilities.cruel_pact.description':
-    'Opfert 12% Eurer maximalen Gesundheit, um 1,5% Eures maximalen Manas wiederherzustellen und 20 Verdammnis zu erzeugen. Nicht nutzbar bei 20% Gesundheit oder darunter.',
+    'Opfert 12% Eurer maximalen Gesundheit, um {buff}% Eures maximalen Manas wiederherzustellen und 20 Verdammnis zu erzeugen. Nicht nutzbar bei 20% Gesundheit oder darunter.',
   'entities.abilities.cruel_pact.name': 'Grausamer Pakt',
   'entities.abilities.cursed_accomplice.description':
     'Verbindet Euer Fluchauge, wenn kein Verbündeter ausgewählt ist, sodass dessen Fluchblick 2 Verdammnis erzeugt. Die Verbindung mit einem ausgewählten Gruppenmitglied lässt stattdessen nur dessen Schaden an Eurem Bösen Auge 3 erzeugen. Eine neue Verbindung ersetzt die vorherige und kann höchstens alle 2 Sek. auslösen.',
@@ -16961,7 +16961,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.eviscerate.specNote_assassination':
     'Bei 6 Giftritual wird diese Taste zu Giftriss: ein Schlag, der sofort allen Schaden verursacht, den Eure Blutungen noch verursacht hätten, eine frische Giftwunde setzt und 20 Energie wiederherstellt.',
   'entities.abilities.eviscerate.specNote_combat':
-    'Landet dies mit 4 oder mehr Combopunkten, startet die Redline für 8 Sek.: Boshafter Hieb wird zu Körpertreffer, und diese Taste wird zu K.o.-Schlag (45 plus 35 pro Combopunkt, pro geworfenem Körpertreffer während der Redline 25% härter, stellt 25 Energie wieder her). Setzt ihn ein, bevor die Redline endet.',
+    'Landet dies mit 4 oder mehr Combopunkten, startet die Redline für 8 Sek.: Boshafter Hieb wird zu Körpertreffer, und diese Taste wird zu K.o.-Schlag (ein Finisher, der pro geworfenem Körpertreffer während der Redline 25% härter trifft und 25 Energie wiederherstellt). Setzt ihn ein, bevor die Redline endet.',
   'entities.abilities.expose_armor.description':
     'Finishing-Move, der das Ziel 30 Sek. lang entblößt: jeder eingesetzte Combopunkt verringert seine Rüstung um 2% (5 Combopunkte: {damage}%).',
   'entities.abilities.faerie_fire.description':
@@ -16990,7 +16990,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.kidney_shot.description':
     'Finishing-Move, der das Ziel 2 Sek. plus 1 Sek. pro Combopunkt betäubt (5 Combopunkte: 7 Sek.).',
   'entities.abilities.litany_of_guilt.description':
-    'Verflucht Euer primäres Böses Auge 6 Sek. lang. Verdammnisgewinne lösen eine Welle aus, die bis zu 2 weitere Gegner im Umkreis von 8 Yard schädigt, höchstens einmal pro Sekunde. Rang 2 verlängert dies auf 8 Sek. und 4 Gegner.',
+    'Verflucht Euer primäres Böses Auge {duration} Sek. lang. Verdammnisgewinne lösen eine Welle aus, die bis zu 2 weitere Gegner (ab Rang 2: 4) im Umkreis von 8 Yard schädigt, höchstens einmal pro Sekunde.',
   'entities.abilities.litany_of_guilt.name': 'Litanei der Schuld',
   'entities.abilities.maledict_gaze.description':
     'Euer Fluchauge greift alle 2,5 Sek. den Gegner mit Eurem primären Bösen Auge mit Schattenschaden an, solange Ihr und dieser Gegner beide im Kampf seid, höchstens 30 m voneinander entfernt und in Sichtlinie. Besessenheit des Bösen Auges verdoppelt sein Angriffstempo.',
@@ -16998,7 +16998,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.description':
     'Euer nächster Nahkampfschwung verursacht {damage} zusätzlichen Schaden und erzeugt Bedrohung in Höhe des 2,5-Fachen seines Schadens plus einen kleinen festen Betrag. Nur in Bruin-Gestalt.',
   'entities.abilities.maul.specNote_feral':
-    'Jeder Treffer, der landet, fügt 1 Altes Blut hinzu; bei 3 Altem Blut wird diese Taste zu Markbrecher: ein Schlag für 78 bis 96 Schaden bei hoher Bedrohung; unter halber Gesundheit heilt er Euch stattdessen um 18% Eurer maximalen Gesundheit und erstattet 15 Wut zurück.',
+    'Jeder Treffer, der landet, fügt 1 Altes Blut hinzu; bei 3 Altem Blut wird diese Taste zu Markbrecher: ein schwerer Schlag bei hoher Bedrohung; unter halber Gesundheit heilt er Euch stattdessen um 18% Eurer maximalen Gesundheit und erstattet 15 Wut zurück.',
   'entities.abilities.moonfire.description':
     'Verbrennt den Gegner für {damage} Arkanschaden und dann für weitere {overTime} Arkanschaden über {duration} Sek.',
   'entities.abilities.moonfire.specNote_balance':
@@ -17039,7 +17039,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rejuvenation.specNote_restoration':
     'Jeder Zauber fügt 1 Grünkraft hinzu (max. 3), auch wenn er eine bereits wirkende Blüte erneuert. Bei 3 Grünkraft wird Rasche Heilung zu Überblüte.',
   'entities.abilities.rip.description':
-    'Finishing-Move, der das Ziel 24 Sek. lang alle 2 Sek. bluten lässt: 72 Schaden plus 48 pro verbrauchtem Combopunkt (5 Combopunkte: insgesamt {damage}). Nur in Katzengestalt.',
+    'Finishing-Move, der das Ziel 24 Sek. lang alle 2 Sek. bluten lässt und pro verbrauchtem Combopunkt mehr Schaden verursacht (5 Combopunkte: insgesamt {damage}). Nur in Katzengestalt.',
   'entities.abilities.rip.specNote_feral':
     'Der gelandete Treffer fügt 1 Altes Blut hinzu (max. 3).',
   'entities.abilities.ruinous_brand.description':
@@ -17060,7 +17060,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Ein sofortiger Schlag für Waffenschaden plus {damage}. Gewährt 1 Combopunkt.',
   'entities.abilities.sinister_strike.specNote_assassination': 'Fügt 1 Giftritual hinzu (max. 6).',
   'entities.abilities.sinister_strike.specNote_combat':
-    'Solange die Redline aktiv ist, wird diese Taste zu Körpertreffer: 130% Waffenschaden plus 10, gewährt 2 Combopunkte und fügt 1 Redline hinzu (max. 4).',
+    'Solange die Redline aktiv ist, wird diese Taste zu Körpertreffer: ein schwererer Waffenschlag, der 2 Combopunkte gewährt und 1 Redline hinzufügt (max. 4).',
   'entities.abilities.slice_and_dice.description':
     'Finishing-Move, der das Nahkampf-Angriffstempo 12 Sek. plus 4 Sek. pro Combopunkt lang um 30% erhöht (5 Combopunkte: 32 Sek.).',
   'entities.abilities.soul_harvest.description':
@@ -17075,7 +17075,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.description':
     'Ruft einen Blitz aus Sternenfeuer herab, der {damage} Arkanschaden verursacht.',
   'entities.abilities.starfire.specNote_balance':
-    'In Mondkingestalt fügt jeder abgeschlossene Zauber 1 Mondflut hinzu (max. 3). Bei 3 Mondflut wird diese Taste zu Sonnenspur: ein sofortiger Schlag für 80 bis 100 Naturschaden plus 45 Brand über 9 Sek., der 35 Mana wiederherstellt und alle 3 verbraucht.',
+    'In Mondkingestalt fügt jeder abgeschlossene Zauber 1 Mondflut hinzu (max. 3). Bei 3 Mondflut wird diese Taste zu Sonnenspur: ein sofortiger Naturschlag plus ein Brand über 9 Sek., der 35 Mana wiederherstellt und alle 3 verbraucht.',
   'entities.abilities.stealth.description':
     'Verbergt Euch im Schatten. Gegnerische Spieler und Begleiter können Euch nicht sehen, und Monster bemerken Euch nur aus viel geringerer Entfernung als sonst (aus größerer Entfernung, wenn sie Euch an Stufe übertreffen). Ihr bewegt Euch mit voller Geschwindigkeit. Angreifen oder Schaden erleiden bricht den Dämmerschleier. Erneut wirken, um herauszutreten.',
   'entities.abilities.stealth.specNote_subtlety':

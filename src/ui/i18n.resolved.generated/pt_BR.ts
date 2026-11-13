@@ -17704,7 +17704,7 @@ export const pt_BR: EnTranslations = {
       },
       "ignition": {
         "name": "Ignição",
-        "description": "Passivo: quando suas magias de Fogo causam acerto crítico, o alvo queima causando 30% adicionais do dano provocado ao longo de 6 s. Uma nova queimadura em um alvo que já está queimando soma-se ao dano ainda pendente e reinicia o contador de 6 s. (Maestria de Fogo)"
+        "description": "Passivo: quando suas magias de Fogo causam acerto crítico, o alvo queima causando 1,5% adicional do dano provocado por nível do personagem (30% no nível 20) ao longo de 6 s. Uma nova queimadura em um alvo que já está queimando soma-se ao dano ainda pendente e reinicia o contador de 6 s. (Maestria de Fogo)"
       },
       "mass_barrier": {
         "name": "Barreira em Massa",
@@ -17814,17 +17814,17 @@ export const pt_BR: EnTranslations = {
         "name": "Talho Perverso",
         "description": "Um golpe instantâneo por dano da arma mais {damage}. Concede 1 ponto de combo.",
         "specNote_assassination": "Adiciona 1 de Ritual de Veneno (máx. 6).",
-        "specNote_combat": "Enquanto a Redline está ativa, este botão se torna Golpe no Corpo: 130% do dano da arma mais 10, concede 2 pontos de combo e adiciona 1 nível de Redline (máx. 4)."
+        "specNote_combat": "Enquanto a Redline está ativa, este botão se torna Golpe no Corpo: um golpe de arma mais pesado que concede 2 pontos de combo e adiciona 1 nível de Redline (máx. 4)."
       },
       "eviscerate": {
         "name": "Sono Eterno",
         "description": "Movimento finalizador que causa {damage} de dano Físico. O dano aumenta com o poder de ataque.",
         "specNote_assassination": "Em 6 de Ritual de Veneno, este botão se torna Rasgaveneno: um golpe que causa instantaneamente todo o dano que seus sangramentos ainda causariam, planta uma nova ferida envenenada e restaura 20 de energia.",
-        "specNote_combat": "Acertar isto com 4 ou mais pontos de combo inicia a Linha Vermelha por 8 s: Talho Perverso se torna Golpe no Corpo e este botão se torna Golpe de Nocaute (45 mais 35 por ponto de combo, atingindo 25% mais forte por cada Golpe no Corpo desferido durante a Linha Vermelha, restaura 25 de energia). Gaste-o antes que a Linha Vermelha termine."
+        "specNote_combat": "Acertar isto com 4 ou mais pontos de combo inicia a Linha Vermelha por 8 s: Talho Perverso se torna Golpe no Corpo e este botão se torna Golpe de Nocaute (um finalizador que atinge 25% mais forte por cada Golpe no Corpo desferido durante a Linha Vermelha e restaura 25 de energia). Gaste-o antes que a Linha Vermelha termine."
       },
       "backstab": {
         "name": "Estocada Covarde",
-        "description": "Crave sua adaga nas costas do alvo por 150% do dano da arma mais {damage}. Deve estar atrás do alvo. Requer uma adaga. Concede 1 ponto de combo.",
+        "description": "Crave sua adaga nas costas do alvo por {weaponPercent}% do dano da arma mais {damage}. Deve estar atrás do alvo. Requer uma adaga. Concede 1 ponto de combo.",
         "specNote_assassination": "Cada acerto adiciona 1 de Ritual de Veneno (máx. 6) e reembolsa 15 de energia. Em 6 de Ritual de Veneno, Sono Eterno se torna Rasgaveneno (causa instantaneamente todo o dano restante dos seus sangramentos de uma vez)."
       },
       "gouge": {
@@ -17849,7 +17849,7 @@ export const pt_BR: EnTranslations = {
       },
       "ambush": {
         "name": "Golpe do Espreitador",
-        "description": "Golpeia a partir das sombras por 250% do dano da arma mais {damage}. Deve estar furtivo e atrás do alvo. Requer uma adaga. Concede 1 ponto de combo.",
+        "description": "Golpeia a partir das sombras por {weaponPercent}% do dano da arma mais {damage}. Deve estar furtivo e atrás do alvo. Requer uma adaga. Concede 1 ponto de combo.",
         "specNote_subtlety": "Usada a partir de Duskveil, adiciona 1 Gloam (máx. 3). Em 3 Gloam, você pode usá-la SEM furtividade e de qualquer ângulo: esse uso não custa nada, gasta todos os 3 Gloam, inicia o Shadow Veil de 6 s e causa o dobro de dano."
       },
       "stealth": {
@@ -17950,7 +17950,7 @@ export const pt_BR: EnTranslations = {
       },
       "solar_step": {
         "name": "Passo Solar",
-        "description": "Aumenta sua velocidade de movimento em 150% por 2 s."
+        "description": "Aumenta sua velocidade de movimento em 150% por {duration} s."
       },
       "solar_invocation": {
         "name": "Invocação Solar",
@@ -17958,11 +17958,11 @@ export const pt_BR: EnTranslations = {
       },
       "radiant_devotion": {
         "name": "Devoção Radiante",
-        "description": "Aumenta o poder mágico seu e dos membros do grupo em 20 por 30 min. Substitui sua própria Devoção da Alvorada ou da Graça, mas coexiste com as Devoções de outros paladinos."
+        "description": "Aumenta o poder mágico seu e dos membros do grupo em {buff} por 30 min. Substitui sua própria Devoção da Alvorada ou da Graça, mas coexiste com as Devoções de outros paladinos."
       },
       "dawn_devotion": {
         "name": "Devoção da Alvorada",
-        "description": "Aumenta o poder de ataque seu e dos membros do grupo em 40 por 30 min. Substitui sua própria Devoção Radiante ou da Graça, mas coexiste com as Devoções de outros paladinos e com os gritos de guerreiro."
+        "description": "Aumenta o poder de ataque seu e dos membros do grupo em {buff} por 30 min. Substitui sua própria Devoção Radiante ou da Graça, mas coexiste com as Devoções de outros paladinos e com os gritos de guerreiro."
       },
       "grace_devotion": {
         "name": "Devoção da Graça",
@@ -18303,7 +18303,7 @@ export const pt_BR: EnTranslations = {
       },
       "life_tap": {
         "name": "Barganha Amarga",
-        "description": "Converte {damage} de vida em {damage} de mana (50% a mais de mana com Crédito de Sangue). Falha se você tiver {damage} de vida ou menos."
+        "description": "Converte {damage} de vida em {buff} de mana. Falha se você tiver {damage} de vida ou menos."
       },
       "cursed_accomplice": {
         "name": "Cúmplice Amaldiçoado",
@@ -18319,7 +18319,7 @@ export const pt_BR: EnTranslations = {
       },
       "litany_of_guilt": {
         "name": "Litania da Culpa",
-        "description": "Amaldiçoa seu Olho Maligno primário por 6 s. Ganhos de Condenação liberam uma onda que causa dano a até 2 outros inimigos num raio de 8 jardas, no máximo uma vez por segundo. O Grau 2 estende para 8 s e 4 inimigos."
+        "description": "Amaldiçoa seu Olho Maligno primário por {duration} s. Ganhos de Condenação liberam uma onda que causa dano a até 2 outros inimigos (4 a partir do Grau 2) num raio de 8 jardas, no máximo uma vez por segundo."
       },
       "cinderhide": {
         "name": "Pele de Escórias",
@@ -18339,7 +18339,7 @@ export const pt_BR: EnTranslations = {
       },
       "cruel_pact": {
         "name": "Pacto Cruel",
-        "description": "Sacrifica 12% da sua vida máxima para restaurar 1,5% da sua mana máxima e gerar 20 de Condenação. Não pode ser usada com 20% de vida ou menos."
+        "description": "Sacrifica 12% da sua vida máxima para restaurar {buff}% da sua mana máxima e gerar 20 de Condenação. Não pode ser usada com 20% de vida ou menos."
       },
       "vicarious_suffering": {
         "name": "Sofrimento Vicário",
@@ -18394,7 +18394,7 @@ export const pt_BR: EnTranslations = {
       },
       "moonseed": {
         "name": "Semente Lunar",
-        "description": "Somente na Forma de Luniscante. Atinge por {damage} de dano Arcano, adiciona 1 de Maré Lunar (máx. 3) e estende sua Tempestade Lunar no alvo em 6 s, até {duration} s extras por aplicação de Tempestade Lunar. Com 3 de Maré Lunar, este botão se torna Onda Lunar: um golpe instantâneo de 136 a 162 de dano Arcano (mais poder mágico) que gasta as 3."
+        "description": "Somente na Forma de Luniscante. Atinge por {damage} de dano Arcano, adiciona 1 de Maré Lunar (máx. 3) e estende sua Tempestade Lunar no alvo em 6 s, até {duration} s extras por aplicação de Tempestade Lunar. Com 3 de Maré Lunar, este botão se torna Onda Lunar: um golpe Arcano pesado e instantâneo que gasta as 3."
       },
       "rejuvenation": {
         "name": "Cura de Esporos",
@@ -18416,7 +18416,7 @@ export const pt_BR: EnTranslations = {
       "maul": {
         "name": "Esmaga-Ossos",
         "description": "Seu próximo golpe corpo a corpo causa {damage} de dano adicional e gera ameaça igual a 2,5 vezes o seu dano mais uma pequena quantidade fixa. Apenas na Forma de Bruin.",
-        "specNote_feral": "Cada acerto adiciona 1 de Sangue Antigo; em 3 de Sangue Antigo, este botão se torna Quebra-Medula: um golpe de 78 a 96 de dano com alta ameaça; abaixo de metade da vida, ele em vez disso cura você em 18% da sua vida máxima e reembolsa 15 de raiva."
+        "specNote_feral": "Cada acerto adiciona 1 de Sangue Antigo; em 3 de Sangue Antigo, este botão se torna Quebra-Medula: um golpe pesado com alta ameaça; abaixo de metade da vida, ele em vez disso cura você em 18% da sua vida máxima e reembolsa 15 de raiva."
       },
       "growl": {
         "name": "Ameaçar",
@@ -18457,7 +18457,7 @@ export const pt_BR: EnTranslations = {
       },
       "barkskin": {
         "name": "Pele de Carvalho",
-        "description": "Sua pele endurece como casca, aumentando a armadura em 150 por 15 s."
+        "description": "Sua pele endurece como casca, aumentando a armadura em {buff}% por 15 s."
       },
       "sacred_bulwark": {
         "name": "Baluarte Sagrado",
@@ -18470,7 +18470,7 @@ export const pt_BR: EnTranslations = {
       "starfire": {
         "name": "Queda Celeste",
         "description": "Invoca um raio de fogo estelar, causando {damage} de dano Arcano.",
-        "specNote_balance": "Na Forma de Luniscante, cada conjuração concluída adiciona 1 Moontide (máx. 3). Em 3 Moontide, este botão se torna Despertar Solar: um golpe instantâneo de 80 a 100 de dano de Natureza mais uma queimadura de 45 ao longo de 9 s, restaurando 35 de mana e gastando todos os 3."
+        "specNote_balance": "Na Forma de Luniscante, cada conjuração concluída adiciona 1 Moontide (máx. 3). Em 3 Moontide, este botão se torna Despertar Solar: um golpe instantâneo de Natureza mais uma queimadura ao longo de 9 s, restaurando 35 de mana e gastando todos os 3."
       },
       "travel_form": {
         "name": "Forma de Fleet",
@@ -18518,7 +18518,7 @@ export const pt_BR: EnTranslations = {
       },
       "rip": {
         "name": "Fenda Sangrenta",
-        "description": "Golpe final que faz o alvo sangrar a cada 2 s por 24 s: 72 de dano mais 48 por ponto de combo gasto (5 pontos: {damage} no total). Apenas na Forma de Gato.",
+        "description": "Golpe final que faz o alvo sangrar a cada 2 s por 24 s, causando mais dano para cada ponto de combo gasto (5 pontos: {damage} no total). Apenas na Forma de Gato.",
         "specNote_feral": "O acerto adiciona 1 de Sangue Antigo (máx. 3)."
       },
       "mortal_strike": {
@@ -18930,7 +18930,7 @@ export const pt_BR: EnTranslations = {
       },
       "avenging_wrath": {
         "name": "Ira Vingadora",
-        "description": "Desdobra asas físicas de dourado poder sagrado, ganhando 10 de Devoção e dobrando por 15 s a Devoção gerada por vossas habilidades. Aumenta ainda em 20% o dano e a cura que causais. Ceifador da alvorada: permite Martelo da Ira contra qualquer alvo."
+        "description": "Desdobra asas físicas de dourado poder sagrado, ganhando 10 de Devoção e dobrando por {duration} s a Devoção gerada por vossas habilidades. Aumenta ainda em 20% o dano e a cura que causais. Ceifador da alvorada: permite Martelo da Ira contra qualquer alvo."
       },
       "berserk": {
         "name": "Névoa Rubra",
@@ -19188,7 +19188,7 @@ export const pt_BR: EnTranslations = {
       },
       "body_blow": {
         "name": "Golpe no Corpo",
-        "description": "Um golpe pesado por 130% do dano da arma mais 10 que concede 2 pontos de combo e aprofunda a Redline em um nível. (motor de Thuggery)"
+        "description": "Um golpe pesado por {weaponPercent}% do dano da arma mais {damage} que concede 2 pontos de combo e aprofunda a Redline em um nível (máx. 4). (motor de Thuggery)"
       },
       "knockout_blow": {
         "name": "Golpe de Nocaute",

@@ -17704,7 +17704,7 @@ export const nl_NL: EnTranslations = {
       },
       "ignition": {
         "name": "Ontbranding",
-        "description": "Passief: wanneer je Vuurspreuken kritiek treffen, brandt het doelwit 6 sec lang voor extra 30% van de toegebrachte schade. Een nieuwe brandwond op een doelwit dat al brandt, wordt opgeteld bij de nog openstaande schade en start de timer van 6 sec opnieuw. (Vuurmeesterschap)"
+        "description": "Passief: wanneer je Vuurspreuken kritiek treffen, brandt het doelwit voor extra 1,5% van de toegebrachte schade per karakterniveau (30% op niveau 20) gedurende 6 sec. Een nieuwe brandwond op een doelwit dat al brandt, wordt opgeteld bij de nog openstaande schade en start de timer van 6 sec opnieuw. (Vuurmeesterschap)"
       },
       "mass_barrier": {
         "name": "Massabarrière",
@@ -17814,17 +17814,17 @@ export const nl_NL: EnTranslations = {
         "name": "Kwaadaardige Houw",
         "description": "Een directe slag voor wapenschade plus {damage}. Levert 1 combopunt op.",
         "specNote_assassination": "Voegt 1 Gifritueel toe (max 6).",
-        "specNote_combat": "Terwijl de Rode Lijn actief is, wordt deze knop Lichaamsstoot: 130% wapenschade plus 10, levert 2 combopunten op, en voegt 1 Rode Lijn toe (max 4)."
+        "specNote_combat": "Terwijl de Rode Lijn actief is, wordt deze knop Lichaamsstoot: een zwaardere wapenslag die 2 combopunten op, en voegt 1 Rode Lijn toe (max 4)."
       },
       "eviscerate": {
         "name": "Zandslaap",
         "description": "Afmaakactie die {damage} fysieke schade toebrengt. De schade stijgt met je aanvalskracht.",
         "specNote_assassination": "Bij 6 Gifritueel wordt deze knop Gifscheur: een slag die onmiddellijk alle schade toebrengt die je bloedingen nog zouden hebben toegebracht, een verse gifwond plant, en 20 energie herstelt.",
-        "specNote_combat": "Als je dit landt met 4 of meer combopunten, start de Rode Lijn 8 sec lang: Kwaadaardige Houw wordt Lichaamsstoot en deze knop wordt Knock-outslag (45 plus 35 per combopunt, 25% harder voor elke Lichaamsstoot die je tijdens de Rode Lijn uitdeelt, herstelt 25 energie). Gebruik hem voordat de Rode Lijn afloopt."
+        "specNote_combat": "Als je dit landt met 4 of meer combopunten, start de Rode Lijn 8 sec lang: Kwaadaardige Houw wordt Lichaamsstoot en deze knop wordt Knock-outslag (een afmaker die 25% harder raakt voor elke Lichaamsstoot die je tijdens de Rode Lijn uitdeelt en 25 energie herstelt). Gebruik hem voordat de Rode Lijn afloopt."
       },
       "backstab": {
         "name": "Laffe Steek",
-        "description": "Boort je dolk in de rug van het doelwit voor 150% wapenschade plus {damage}. Moet achter het doelwit staan. Vereist een dolk. Levert 1 combopunt op.",
+        "description": "Boort je dolk in de rug van het doelwit voor {weaponPercent}% wapenschade plus {damage}. Moet achter het doelwit staan. Vereist een dolk. Levert 1 combopunt op.",
         "specNote_assassination": "Elke slag voegt 1 Gifritueel toe (max 6) en geeft 15 energie terug. Bij 6 Gifritueel wordt Zandslaap Gifscheur (het brengt al je resterende bloedingsschade in één keer toe)."
       },
       "gouge": {
@@ -17849,7 +17849,7 @@ export const nl_NL: EnTranslations = {
       },
       "ambush": {
         "name": "Sluiperslag",
-        "description": "Slaat toe vanuit de schaduwen voor 250% wapenschade plus {damage}. Moet in sluiptocht zijn en achter het doelwit staan. Vereist een dolk. Levert 1 combopunt op.",
+        "description": "Slaat toe vanuit de schaduwen voor {weaponPercent}% wapenschade plus {damage}. Moet in sluiptocht zijn en achter het doelwit staan. Vereist een dolk. Levert 1 combopunt op.",
         "specNote_subtlety": "Vanuit Schemersluier gebruikt voegt dit 1 Schemer toe (max 3). Bij 3 Schemer kun je het gebruiken ZONDER sluiptocht en vanuit elke hoek: dat gebruik kost niets, verbruikt alle 3 Schemer, start de schaduwsluier van 6 sec, en slaat dubbel zo hard toe."
       },
       "stealth": {
@@ -17950,7 +17950,7 @@ export const nl_NL: EnTranslations = {
       },
       "solar_step": {
         "name": "Zonnestap",
-        "description": "Verhoogt je loopsnelheid 2 sec. lang met 150%."
+        "description": "Verhoogt je loopsnelheid {duration} sec. lang met 150%."
       },
       "solar_invocation": {
         "name": "Zonne-aanroeping",
@@ -17958,11 +17958,11 @@ export const nl_NL: EnTranslations = {
       },
       "radiant_devotion": {
         "name": "Stralende Toewijding",
-        "description": "Verhoogt de spreukkracht van jou en je groepsleden 30 min. lang met 20. Vervangt je eigen Toewijding van de Dageraad of van Genade, maar bestaat naast de Toewijdingen van andere paladijnen."
+        "description": "Verhoogt de spreukkracht van jou en je groepsleden 30 min. lang met {buff}. Vervangt je eigen Toewijding van de Dageraad of van Genade, maar bestaat naast de Toewijdingen van andere paladijnen."
       },
       "dawn_devotion": {
         "name": "Toewijding van de Dageraad",
-        "description": "Verhoogt de aanvalskracht van jou en je groepsleden 30 min. lang met 40. Vervangt je eigen Stralende Toewijding of Toewijding van Genade, maar bestaat naast de Toewijdingen van andere paladijnen en naast krijgerskreten."
+        "description": "Verhoogt de aanvalskracht van jou en je groepsleden 30 min. lang met {buff}. Vervangt je eigen Stralende Toewijding of Toewijding van Genade, maar bestaat naast de Toewijdingen van andere paladijnen en naast krijgerskreten."
       },
       "grace_devotion": {
         "name": "Toewijding van Genade",
@@ -18303,7 +18303,7 @@ export const nl_NL: EnTranslations = {
       },
       "life_tap": {
         "name": "Zware Koop",
-        "description": "Zet {damage} levenskracht om in {damage} mana (50% meer mana met Bloedkrediet). Mislukt als je {damage} gezondheid of minder hebt."
+        "description": "Zet {damage} levenskracht om in {buff} mana. Mislukt als je {damage} gezondheid of minder hebt."
       },
       "cursed_accomplice": {
         "name": "Vervloekte handlanger",
@@ -18319,7 +18319,7 @@ export const nl_NL: EnTranslations = {
       },
       "litany_of_guilt": {
         "name": "Schuldlitanie",
-        "description": "Vervloekt je primaire Boze oog gedurende 6 sec. Verdoemenis-winsten laten een golf los die tot 2 andere vijanden binnen 8 yard beschadigt, hoogstens eenmaal per seconde. Rang 2 verlengt dit tot 8 sec en 4 vijanden."
+        "description": "Vervloekt je primaire Boze oog gedurende {duration} sec. Verdoemenis-winsten laten een golf los die tot 2 andere vijanden (4 vanaf Rang 2) binnen 8 yard beschadigt, hoogstens eenmaal per seconde."
       },
       "cinderhide": {
         "name": "Sintelhuid",
@@ -18339,7 +18339,7 @@ export const nl_NL: EnTranslations = {
       },
       "cruel_pact": {
         "name": "Wreed pact",
-        "description": "Offert 12% van je maximale gezondheid op om 1,5% van je maximale mana te herstellen en 20 Verdoemenis te genereren. Kan niet worden gebruikt op of onder 20% gezondheid."
+        "description": "Offert 12% van je maximale gezondheid op om {buff}% van je maximale mana te herstellen en 20 Verdoemenis te genereren. Kan niet worden gebruikt op of onder 20% gezondheid."
       },
       "vicarious_suffering": {
         "name": "Plaatsvervangend lijden",
@@ -18394,7 +18394,7 @@ export const nl_NL: EnTranslations = {
       },
       "moonseed": {
         "name": "Maanzaad",
-        "description": "Alleen in Maanuilvorm. Slaat toe voor {damage} Arcaneschade, voegt 1 Maanvloed toe (max 3) en verlengt je Maanstorm op het doelwit met 6 sec, tot {duration} extra sec per toepassing van Maanstorm. Bij 3 Maanvloed wordt deze knop Maangolf: een directe slag voor 136 tot 162 Arcaneschade (plus spreukkracht) die alle 3 verbruikt."
+        "description": "Alleen in Maanuilvorm. Slaat toe voor {damage} Arcaneschade, voegt 1 Maanvloed toe (max 3) en verlengt je Maanstorm op het doelwit met 6 sec, tot {duration} extra sec per toepassing van Maanstorm. Bij 3 Maanvloed wordt deze knop Maangolf: een zware, directe Arcane-slag die alle 3 verbruikt."
       },
       "rejuvenation": {
         "name": "Sporenheling",
@@ -18416,7 +18416,7 @@ export const nl_NL: EnTranslations = {
       "maul": {
         "name": "Botverbrijzelen",
         "description": "Je volgende melee-slag doet {damage} extra schade en genereert dreiging gelijk aan 2,5 keer de schade plus een klein vast bedrag. Alleen in Bruingedaante.",
-        "specNote_feral": "Elke slag die raakt voegt 1 Oud Bloed toe; bij 3 Oud Bloed wordt deze knop Mergbreker: een slag voor 78 tot 96 schade met hoge dreiging; onder de helft van je gezondheid geneest hij je in plaats daarvan voor 18% van je maximale gezondheid en geeft 15 woede terug."
+        "specNote_feral": "Elke slag die raakt voegt 1 Oud Bloed toe; bij 3 Oud Bloed wordt deze knop Mergbreker: een zware slag met hoge dreiging; onder de helft van je gezondheid geneest hij je in plaats daarvan voor 18% van je maximale gezondheid en geeft 15 woede terug."
       },
       "growl": {
         "name": "Bedreigen",
@@ -18457,7 +18457,7 @@ export const nl_NL: EnTranslations = {
       },
       "barkskin": {
         "name": "Eikenhuid",
-        "description": "Je huid verhardt als schors, waardoor je pantser met 150 toeneemt gedurende 15 sec."
+        "description": "Je huid verhardt als schors, waardoor je pantser met {buff}% toeneemt gedurende 15 sec."
       },
       "sacred_bulwark": {
         "name": "Heilige Verschansing",
@@ -18470,7 +18470,7 @@ export const nl_NL: EnTranslations = {
       "starfire": {
         "name": "Hemelval",
         "description": "Roept een bout van stervuur op, die {damage} Arcaneschade veroorzaakt.",
-        "specNote_balance": "In Maanuilvorm voegt elke voltooide bezwering 1 Maanvloed toe (max 3). Bij 3 Maanvloed wordt deze knop Zonnespoor: een directe slag voor 80 tot 100 Natuurschade plus een brandwond van 45 over 9 sec, die 35 mana herstelt en alle 3 verbruikt."
+        "specNote_balance": "In Maanuilvorm voegt elke voltooide bezwering 1 Maanvloed toe (max 3). Bij 3 Maanvloed wordt deze knop Zonnespoor: een directe Natuurslag plus een brandwond over 9 sec, die 35 mana herstelt en alle 3 verbruikt."
       },
       "travel_form": {
         "name": "Fleetgedaante",
@@ -18518,7 +18518,7 @@ export const nl_NL: EnTranslations = {
       },
       "rip": {
         "name": "Bloedscheur",
-        "description": "Afmaker die het doel elke 2 sec gedurende 24 sec laat bloeden: 72 schade plus 48 per verbruikt combopunt (5 punten: {damage} totaal). Alleen in Katgedaante.",
+        "description": "Afmaker die het doel elke 2 sec gedurende 24 sec laat bloeden en meer schade doet voor elk verbruikt combopunt (5 punten: {damage} totaal). Alleen in Katgedaante.",
         "specNote_feral": "De gelande treffer voegt 1 Oud Bloed toe (max 3)."
       },
       "mortal_strike": {
@@ -18930,7 +18930,7 @@ export const nl_NL: EnTranslations = {
       },
       "avenging_wrath": {
         "name": "Wrekende Toorn",
-        "description": "Ontvouwt lijfelijke vleugels van gouden heilige kracht, wint 10 Toewijding en verdubbelt 15 sec lang de Toewijding die uw vaardigheden opwekken. Verhoogt bovendien de schade en genezing die u toebrengt met 20%. Dageraadmaaier: maakt Hamer der Toorn tegen elk doelwit mogelijk."
+        "description": "Ontvouwt lijfelijke vleugels van gouden heilige kracht, wint 10 Toewijding en verdubbelt {duration} sec lang de Toewijding die uw vaardigheden opwekken. Verhoogt bovendien de schade en genezing die u toebrengt met 20%. Dageraadmaaier: maakt Hamer der Toorn tegen elk doelwit mogelijk."
       },
       "berserk": {
         "name": "Rode nevel",
@@ -19188,7 +19188,7 @@ export const nl_NL: EnTranslations = {
       },
       "body_blow": {
         "name": "Lichaamsstoot",
-        "description": "Een zware stoot voor 130% wapenschade plus 10 die 2 combopunten geeft en de Redline één streepje verdiept. (Thuggery-motor)"
+        "description": "Een zware stoot voor {weaponPercent}% wapenschade plus {damage} die 2 combopunten geeft en de Redline één streepje verdiept (max 4). (Thuggery-motor)"
       },
       "knockout_blow": {
         "name": "Knock-outslag",

@@ -6721,7 +6721,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Pendant 6 s : vos ouvertures du Voile du crépuscule fonctionnent sans furtivité et sous n'importe quel angle, et vous infligez 10% de dégâts en plus. Votre première Frappe du rôdeur pendant cet effet inflige 50% de dégâts d'arme en plus. (Finesse)",
   'entities.abilities.body_blow.name': 'Coup au corps',
   'entities.abilities.body_blow.description':
-    'Un coup puissant infligeant 130% des dégâts de l’arme plus 10, qui confère 2 points de combo et approfondit la Redline d’un cran. (moteur Thuggery)',
+    'Un coup puissant infligeant {weaponPercent}% des dégâts de l’arme plus {damage}. Confère 2 points de combo et ajoute 1 Redline (max 4). (Thuggery)',
   'entities.abilities.knockout_blow.name': 'Coup de K.-O.',
   'entities.abilities.knockout_blow.description':
     "Termine Redline par un K.-O. : frappe pour {damage} points de dégâts Physiques, 25% plus fort pour chaque Coup au corps lancé pendant Redline (jusqu'à 3), et restaure 25 énergie. Les dégâts augmentent avec la puissance d'attaque. Utilisez-le avant la fin de Redline sous peine de perdre le K.-O. (Combat)",
@@ -9986,7 +9986,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Vos deux prochains sorts avec un temps d'incantation peuvent être lancés en vous déplaçant. Dure 15 s. (Talent de mage)",
   'entities.abilities.ignition.name': 'Embrasement',
   'entities.abilities.ignition.description':
-    "Passif : quand vos sorts de Feu infligent un coup critique, la cible brûle pour 30% supplémentaires des dégâts infligés sur 6 s. Une nouvelle brûlure sur une cible déjà en feu s'ajoute aux dégâts restant dus et relance le délai de 6 s. (Maîtrise du Feu)",
+    "Passif : quand vos sorts de Feu infligent un coup critique, la cible brûle pour 1,5% supplémentaires des dégâts infligés par niveau de personnage (30% au niveau 20) sur 6 s. Une nouvelle brûlure sur une cible déjà en feu s'ajoute aux dégâts restant dus et relance le délai de 6 s. (Maîtrise du Feu)",
   'entities.abilities.mass_barrier.name': 'Barrière de masse',
   'entities.abilities.mass_barrier.description':
     "Vous protège ainsi que jusqu'à 4 alliés proches dans un rayon de 30 m, chaque bouclier absorbant {damage} points de dégâts pendant 15 s. (Talent de mage)",
@@ -10226,7 +10226,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Corrompt la cible et inflige {damage} points de dégâts d'Ombre en 18 s.",
   'entities.abilities.life_tap.name': 'Marché brutal',
   'entities.abilities.life_tap.description':
-    'Convertit {damage} points de vie en {damage} mana (50% de mana en plus avec Crédit de sang). Échoue si vous avez {damage} points de vie ou moins.',
+    'Convertit {damage} points de vie en {buff} mana. Échoue si vous avez {damage} points de vie ou moins.',
   'entities.abilities.curse_of_agony.name': "Maléfice d'angoisse",
   'entities.abilities.curse_of_agony.description':
     "Maudit la cible d'agonie: {damage} points de dégâts d'Ombre en 24 s.",
@@ -10273,7 +10273,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.regrowth.name': 'Seconde floraison',
   'entities.abilities.barkskin.name': 'Peau de chêne',
   'entities.abilities.barkskin.description':
-    "Votre peau durcit comme de l'écorce et augmente l'armure de 150 pendant 15 s.",
+    "Votre peau durcit comme de l'écorce et augmente l'armure de {buff}% pendant 15 s.",
   'entities.abilities.starfire.name': 'Chute céleste',
   'entities.abilities.travel_form.name': 'Forme de Fleet',
   'entities.abilities.travel_form.description':
@@ -15510,7 +15510,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.avatar.description':
     'Brise les étourdissements, terreurs, immobilisations, silences, désarmements et ralentissements qui vous affectent (hors ceux des boss), puis devenez un colosse pendant 20 s, infligeant 20% de dégâts en plus. Cela ne vous protège pas des nouveaux effets de contrôle.',
   'entities.abilities.avenging_wrath.description':
-    "Déploie des ailes physiques de puissance sacrée dorée, gagnant 10 Dévotion et doublant la Dévotion générée par vos capacités pendant 15 s. Augmente aussi de 20% les dégâts et les soins infligés. Faucheur de l'aube : permet Marteau de courroux contre n'importe quelle cible.",
+    "Déploie des ailes physiques de puissance sacrée dorée, gagnant 10 Dévotion et doublant la Dévotion générée par vos capacités pendant {duration} s. Augmente aussi de 20% les dégâts et les soins infligés. Faucheur de l'aube : permet Marteau de courroux contre n'importe quelle cible.",
   'entities.abilities.berserk.description':
     "Augmente votre puissance d'attaque de 70 pendant 15 s. (talent de Druide)",
   'entities.abilities.bladestorm.name': 'Tempête de lames',
@@ -16720,7 +16720,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.beacon_of_light.description':
     "Désigne un membre du groupe comme votre Phare de lumière. 50% de vos soins directs effectifs sur un autre membre du groupe situé à moins de 60 m soignent aussi le Phare. Les soins de zone et périodiques ne sont pas transférés. Dure jusqu'à la mort de l'un de vous deux.",
   'entities.abilities.dawn_devotion.description':
-    "Augmente la puissance d'attaque de vous-même et des membres du groupe de 40 pendant 30 min. Remplace votre propre Dévotion radiante ou de grâce, mais coexiste avec les Dévotions des autres paladins et avec les cris de guerrier.",
+    "Augmente la puissance d'attaque de vous-même et des membres du groupe de {buff} pendant 30 min. Remplace votre propre Dévotion radiante ou de grâce. Un autre paladin lançant Dévotion de l'aube la rafraîchit au lieu de s'additionner ; une autre Dévotion et les cris de guerrier coexistent.",
   'entities.abilities.dawnfall.description':
     "Inflige {damage} points de dégâts Sacrés aux ennemis proches et génère 1 Dévotion. Toucher au moins un ennemi réduit de 2 s le temps de recharge restant de l'Édit final. L'Ascension augmente ses dégâts de 50% et son rayon à 10 m.",
   'entities.abilities.dawns_embrace.description':
@@ -16752,7 +16752,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.radiant_chorus.description':
     "Soigne les alliés proches de {damage} et génère 1 Dévotion. Soigner effectivement au moins 2 alliés octroie la Résonance radiante pendant 10 s : votre prochaine Lumière guérisseuse est instantanée, ou votre prochaine Étreinte de l'aube coûte 50% de mana en moins et s'incante en 1,5 s. L'Ascension augmente de 20% les soins du Chœur radiant et son rayon à 40 m.",
   'entities.abilities.radiant_devotion.description':
-    "Augmente la puissance des sorts de vous-même et des membres du groupe de 20 pendant 30 min. Remplace votre propre Dévotion de l'aube ou de grâce, mais coexiste avec les Dévotions des autres paladins.",
+    "Augmente la puissance des sorts de vous-même et des membres du groupe de {buff} pendant 30 min. Remplace votre propre Dévotion de l'aube ou de grâce. Un autre paladin lançant Dévotion radiante la rafraîchit au lieu de s'additionner ; une autre Dévotion coexiste.",
   'entities.abilities.recall_the_fallen.description':
     'Ramène à la vie un membre mort du groupe à vos côtés avec 35% de points de vie et de mana. Un Sagesoleil de niveau 16 ou plus rappelle à la place tous les membres tombés du groupe à moins de 30 mètres et dans votre ligne de vue.',
   'entities.abilities.sacred_challenge.description':
@@ -16766,7 +16766,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.solar_invocation.description':
     "Soigne instantanément un allié de {damage} ou inflige 120 à 150 points de dégâts Sacrés de base à un ennemi. Les dégâts augmentent avec la puissance des sorts et les soins avec la puissance de soin. Les deux usages génèrent 1 Dévotion. Pendant l'Ascension, une incantation de soin soigne aussi, à hauteur de la moitié, les joueurs alliés à moins de 10 m de la cible.",
   'entities.abilities.solar_step.description':
-    'Augmente votre vitesse de déplacement de 150% pendant 2 s.',
+    'Augmente votre vitesse de déplacement de 150% pendant {duration} s.',
   'entities.abilities.sun_gods_verdict.description':
     "Juge un ennemi sous le Verdict du Dieu Soleil pendant 30 s. L'Édit final et la Chute de l'aube inscrivent une charge à chaque coup réussi. La capacité qui pose la troisième charge dicte la sentence : l'Édit final déchaîne des dégâts dévastateurs sur le condamné ; la Chute de l'aube fait détoner le verdict, blessant et étourdissant les ennemis proches pendant 1,5 s.",
   'entities.abilities.sunward_disc.description':
@@ -16932,7 +16932,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Consomme vos 3 Marée lunaire pour une frappe lourde de {damage} points de dégâts d'Arcane : le choix des dégâts. Sillage solaire consomme les mêmes 3 Marée lunaire, alors choisissez-en un.",
   'entities.abilities.moonseed.name': 'Graine lunaire',
   'entities.abilities.moonseed.description':
-    "Forme de sélénien uniquement. Frappe pour {damage} points de dégâts des Arcanes, ajoute 1 Marée lunaire (max 3) et prolonge votre Tempête lunaire sur la cible de 6 s, jusqu'à {duration} s supplémentaires par application de Tempête lunaire. À 3 Marée lunaire, ce bouton devient Déferlante lunaire : une frappe instantanée pour 136 à 162 points de dégâts des Arcanes (plus la puissance des sorts) qui dépense les 3.",
+    "Forme de sélénien uniquement. Frappe pour {damage} points de dégâts des Arcanes, ajoute 1 Marée lunaire (max 3) et prolonge votre Tempête lunaire sur la cible de 6 s, jusqu'à {duration} s supplémentaires par application de Tempête lunaire. À 3 Marée lunaire, ce bouton devient Déferlante lunaire : une lourde frappe instantanée des Arcanes qui dépense les 3.",
   'entities.abilities.overbloom.name': 'Surfloraison',
   'entities.abilities.overbloom.description':
     'Consomme 3 Verdoyance. Récolte chaque soin sur la durée que vous possédez sur tous les alliés pour {buff}% de ses soins restants, retire ces effets et plante une Soin de spores fraîche sur la cible.',
@@ -17035,14 +17035,14 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Ouvre une faille à l'endroit ciblé, attirant les ennemis dans un rayon de 8 m vers son centre, infligeant {damage} points de dégâts d'Ombre, et les étourdissant pendant 2 s. Les boss subissent les dégâts mais résistent à l'attraction et à l'étourdissement.",
   'entities.abilities.abyssal_rift.name': 'Faille abyssale',
   'entities.abilities.ambush.description':
-    "Frappe depuis les ombres pour 250% des dégâts de l'arme plus {damage}. Camouflage requis, derrière la cible. Requiert une dague. Confère 1 point de combo.",
+    "Frappe depuis les ombres pour {weaponPercent}% des dégâts de l'arme plus {damage}. Camouflage requis, derrière la cible. Requiert une dague. Confère 1 point de combo.",
   'entities.abilities.ambush.specNote_subtlety':
     "Utilisée depuis le Voile du crépuscule, elle ajoute 1 Pénombre (maximum 3). À 3 Pénombre, vous pouvez l'utiliser SANS camouflage et sous n'importe quel angle : cette utilisation ne coûte rien, dépense les 3 Pénombre, déclenche le voile d'ombre de 6 s, et inflige le double de dégâts.",
   'entities.abilities.army_of_the_dead.description':
     'Ouvre un portail funéraire pour relever temporairement un Guerrier squelette, un Mage d’os et une Aile funéraire pendant 20 s, comblant les rangs que vos serviteurs de Domination habituels laissent vides.',
   'entities.abilities.army_of_the_dead.name': 'Armée des morts',
   'entities.abilities.backstab.description':
-    "Plantez votre dague dans le dos de la cible pour 150% des dégâts de l'arme plus {damage}. Doit être derrière la cible. Requiert une dague. Confère 1 point de combo.",
+    "Plantez votre dague dans le dos de la cible pour {weaponPercent}% des dégâts de l'arme plus {damage}. Doit être derrière la cible. Requiert une dague. Confère 1 point de combo.",
   'entities.abilities.backstab.specNote_assassination':
     "Chaque frappe ajoute 1 Rituel du venin (maximum 6) et rembourse 15 énergie. À 6 Rituel du venin, Sommeil éternel devient Déchirure venimeuse (elle inflige d'un coup tous les dégâts de saignement restants).",
   'entities.abilities.blade_flurry.description':
@@ -17069,7 +17069,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Nécessite votre Mauvais œil principal sur la cible. Place des Mauvais œil secondaires sur jusqu'à 4 autres ennemis à moins de 15 m de celle-ci pendant 15 s. Ils génèrent de la Condamnation à 50% du rythme normal, et Sentence se répercute sur chacun d'eux pour 35% de ses dégâts.",
   'entities.abilities.coven.name': 'Sabbat',
   'entities.abilities.cruel_pact.description':
-    'Sacrifie 12% de vos points de vie maximum pour restaurer 1,5% de votre mana maximum et générer 20 Condamnation. Inutilisable à 20% de points de vie ou moins.',
+    'Sacrifie 12% de vos points de vie maximum pour restaurer {buff}% de votre mana maximum et générer 20 Condamnation. Inutilisable à 20% de points de vie ou moins.',
   'entities.abilities.cruel_pact.name': 'Pacte cruel',
   'entities.abilities.cursed_accomplice.description':
     "Lie votre Œil maudit quand aucun allié n'est sélectionné, faisant générer 2 Condamnation à son Regard. Lier un membre du groupe sélectionné fait que seuls ses dégâts sur votre Mauvais œil génèrent 3 à la place. Un nouveau lien remplace le précédent et peut se déclencher une fois toutes les 2 s.",
@@ -17088,7 +17088,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.eviscerate.specNote_assassination':
     'À 6 Rituel du venin, ce bouton devient Déchirure venimeuse : une frappe qui inflige instantanément tous les dégâts que vos saignements auraient encore infligés, plante une nouvelle plaie de venin, et restaure 20 énergie.',
   'entities.abilities.eviscerate.specNote_combat':
-    'Toucher avec 4 points de combo ou plus déclenche Redline pendant 8 s : Taillade perfide devient Coup au corps et ce bouton devient Coup de K.-O. (45 plus 35 par point de combo, frappe 25% plus fort pour chaque Coup au corps lancé pendant Redline, restaure 25 énergie). Dépensez-le avant la fin de Redline.',
+    'Toucher avec 4 points de combo ou plus déclenche Redline pendant 8 s : Taillade perfide devient Coup au corps et ce bouton devient Coup de K.-O. (un coup de grâce qui frappe 25% plus fort pour chaque Coup au corps lancé pendant Redline et restaure 25 énergie). Dépensez-le avant la fin de Redline.',
   'entities.abilities.expose_armor.description':
     'Technique de finition qui expose la cible pendant 30 s : chaque point de combo dépensé réduit son armure de 2% (5 combo points : {damage}%).',
   'entities.abilities.faerie_fire.description':
@@ -17117,7 +17117,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.kidney_shot.description':
     'Technique de finition qui étourdit la cible pendant 2 s plus 1 s par point de combo (5 points de combo : 7 s).',
   'entities.abilities.litany_of_guilt.description':
-    "Maudit votre Mauvais œil principal pendant 6 s. Les gains de Condamnation libèrent une onde qui inflige des dégâts à 2 autres ennemis au plus dans un rayon de 8 m, au plus une fois par seconde. Le rang 2 l'étend à 8 s et 4 ennemis.",
+    'Maudit votre Mauvais œil principal pendant {duration} s. Les gains de Condamnation libèrent une onde qui inflige des dégâts à 2 autres ennemis au plus (4 à partir du rang 2) dans un rayon de 8 m, au plus une fois par seconde.',
   'entities.abilities.litany_of_guilt.name': 'Litanie de la culpabilité',
   'entities.abilities.maledict_gaze.description':
     "Votre Œil maudit attaque l'ennemi portant votre Mauvais œil principal toutes les 2,5 s pour des dégâts d'Ombre, tant que vous et cet ennemi êtes tous deux en combat, à moins de 30 m l'un de l'autre et en ligne de vue. Posséder le Mauvais œil double sa vitesse d'attaque.",
@@ -17125,7 +17125,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.description':
     'Votre prochain coup de mêlée inflige {damage} points de dégâts supplémentaires et génère une menace égale à 2,5 fois ses dégâts plus un petit montant fixe. Forme de Bruin uniquement.',
   'entities.abilities.maul.specNote_feral':
-    'Chaque coup porté ajoute 1 Sang ancien ; à 3 Sang ancien, ce bouton devient Brise-moelle : une frappe de 78 à 96 dégâts à forte menace ; sous la moitié des points de vie, elle vous soigne à la place de 18% de vos points de vie maximum et rembourse 15 rage.',
+    'Chaque coup porté ajoute 1 Sang ancien ; à 3 Sang ancien, ce bouton devient Brise-moelle : une lourde frappe à forte menace ; sous la moitié des points de vie, elle vous soigne à la place de 18% de vos points de vie maximum et rembourse 15 rage.',
   'entities.abilities.moonfire.description':
     "Brûle l'ennemi pour {damage} points de dégâts des Arcanes, puis {overTime} points de dégâts des Arcanes supplémentaires sur {duration} s.",
   'entities.abilities.moonfire.specNote_balance':
@@ -17165,7 +17165,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rejuvenation.specNote_restoration':
     "Chaque incantation ajoute 1 Verdoyance (maximum 3), même lorsqu'elle renouvelle une floraison déjà active. À 3 Verdoyance, Prompte guérison devient Surfloraison.",
   'entities.abilities.rip.description':
-    'Coup de grâce qui fait saigner la cible toutes les 2 s pendant 24 s : 72 dégâts plus 48 par point de combo dépensé (5 points : {damage} au total). Forme de chat uniquement.',
+    'Coup de grâce qui fait saigner la cible toutes les 2 s pendant 24 s et inflige plus de dégâts pour chaque point de combo dépensé (5 points : {damage} au total). Forme de chat uniquement.',
   'entities.abilities.rip.specNote_feral': 'Le coup porté ajoute 1 Sang ancien (maximum 3).',
   'entities.abilities.ruinous_brand.description':
     "Marque un ennemi pendant 15 s. Vos 3 prochains sorts directs se répercutent pour 25% de dégâts contre l'ennemi marqué, ou lui recopient 50% de dégâts quand ils sont lancés sur une autre cible. Les répercussions de Trait de ruine comptent aussi comme coups critiques, sans multiplicateur de dégâts critiques supplémentaire.",
@@ -17186,7 +17186,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sinister_strike.specNote_assassination':
     'Ajoute 1 Rituel du venin (maximum 6).',
   'entities.abilities.sinister_strike.specNote_combat':
-    "Tant que Redline est active, ce bouton devient Coup au corps : 130% des dégâts de l'arme plus 10, confère 2 points de combo, et ajoute 1 Redline (maximum 4).",
+    "Tant que Redline est active, ce bouton devient Coup au corps : une frappe d'arme plus lourde qui confère 2 points de combo et ajoute 1 Redline (maximum 4).",
   'entities.abilities.slice_and_dice.description':
     "Technique de finition qui augmente la vitesse d'attaque au corps à corps de 30% pendant 12 s plus 4 s par point de combo (5 points de combo : 32 s).",
   'entities.abilities.soul_harvest.description':
@@ -17201,7 +17201,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.description':
     "Appelle un trait de feu stellaire, infligeant {damage} points de dégâts d'Arcane.",
   'entities.abilities.starfire.specNote_balance':
-    'En Forme de sélénien, chaque incantation achevée ajoute 1 Marée lunaire (maximum 3). À 3 Marée lunaire, ce bouton devient Sillage solaire : une frappe instantanée de 80 à 100 dégâts de Nature plus une brûlure de 45 sur 9 s, restaurant 35 mana et dépensant les 3.',
+    'En Forme de sélénien, chaque incantation achevée ajoute 1 Marée lunaire (maximum 3). À 3 Marée lunaire, ce bouton devient Sillage solaire : une frappe de Nature instantanée plus une brûlure sur 9 s, restaurant 35 mana et dépensant les 3.',
   'entities.abilities.stealth.description':
     "Dissimulez-vous dans les ombres. Les joueurs et familiers ennemis ne peuvent pas vous voir, et les monstres ne vous remarquent que de beaucoup plus près que d'habitude (de plus loin s'ils ont un niveau supérieur au vôtre). Vous vous déplacez à pleine vitesse. Attaquer ou subir des dégâts rompt le Voile du crépuscule. Relancez pour en sortir.",
   'entities.abilities.stealth.specNote_subtlety':

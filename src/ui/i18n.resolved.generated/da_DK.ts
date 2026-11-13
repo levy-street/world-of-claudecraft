@@ -17704,7 +17704,7 @@ export const da_DK: EnTranslations = {
       },
       "ignition": {
         "name": "Antændelse",
-        "description": "Passiv: når dine Ildbesværgelser rammer kritisk, brænder målet for yderligere 30% af den påførte skade over 6 sek. En ny brand på et mål, der allerede brænder, lægges til den skade, der stadig mangler, og genstarter 6 sek.-timeren. (Ildbeherskelse)"
+        "description": "Passiv: når dine Ildbesværgelser rammer kritisk, brænder målet for yderligere 1,5% af den påførte skade pr. karakterniveau (30% på niveau 20) over 6 sek. En ny brand på et mål, der allerede brænder, lægges til den skade, der stadig mangler, og genstarter 6 sek.-timeren. (Ildbeherskelse)"
       },
       "mass_barrier": {
         "name": "Massebarriere",
@@ -17814,17 +17814,17 @@ export const da_DK: EnTranslations = {
         "name": "Ondsindet Hug",
         "description": "Et øjeblikkeligt slag for våbenskade plus {damage}. Giver 1 combopoint.",
         "specNote_assassination": "Tilføjer 1 Giftritual (maks. 6).",
-        "specNote_combat": "Mens Redline er aktiv, bliver denne knap til Kropsstød: 130% våbenskade plus 10, giver 2 combopoint og tilføjer 1 Redline (maks. 4)."
+        "specNote_combat": "Mens Redline er aktiv, bliver denne knap til Kropsstød: et tungere våbenslag, der giver 2 combopoint og tilføjer 1 Redline (maks. 4)."
       },
       "eviscerate": {
         "name": "Gravsøvn",
         "description": "Afsluttende manøvre, der gør {damage} fysisk skade. Skaden stiger med Angrebsstyrke.",
         "specNote_assassination": "Ved 6 Giftritual bliver denne knap til Giftflænge: et slag, der øjeblikkeligt giver al den skade, dine blødninger stadig ville have givet, planter et frisk giftsår og gendanner 20 energi.",
-        "specNote_combat": "Rammer dette med 4 eller flere kombopoint, starter Redline i 8 sek.: Ondsindet Hug bliver til Kropsstød, og denne knap bliver til Knockoutstød (45 plus 35 pr. kombopoint, rammer 25% hårdere for hvert Kropsstød, du har kastet under Redline, genopretter 25 energi). Brug det, før Redline slutter."
+        "specNote_combat": "Rammer dette med 4 eller flere kombopoint, starter Redline i 8 sek.: Ondsindet Hug bliver til Kropsstød, og denne knap bliver til Knockoutstød (en afslutter, der rammer 25% hårdere for hvert Kropsstød, du har kastet under Redline, og genopretter 25 energi). Brug det, før Redline slutter."
       },
       "backstab": {
         "name": "Fejt Stød",
-        "description": "Stød din dolk ind i målets ryg for 150% våbenskade plus {damage}. Skal være bag målet. Kræver en dolk. Giver 1 combopoint.",
+        "description": "Stød din dolk ind i målets ryg for {weaponPercent}% våbenskade plus {damage}. Skal være bag målet. Kræver en dolk. Giver 1 combopoint.",
         "specNote_assassination": "Hvert slag tilføjer 1 Giftritual (maks. 6) og gendanner 15 energi. Ved 6 Giftritual bliver Gravsøvn til Giftflænge (den giver al din resterende blødningsskade på én gang)."
       },
       "gouge": {
@@ -17849,7 +17849,7 @@ export const da_DK: EnTranslations = {
       },
       "ambush": {
         "name": "Luskerens Slag",
-        "description": "Slå til fra skyggerne for 250% våbenskade plus {damage}. Skal være i snigen og bag målet. Kræver en dolk. Giver 1 combopoint.",
+        "description": "Slå til fra skyggerne for {weaponPercent}% våbenskade plus {damage}. Skal være i snigen og bag målet. Kræver en dolk. Giver 1 combopoint.",
         "specNote_subtlety": "Brugt fra Skumringsslør tilføjer dette 1 Tusmørke (maks. 3). Ved 3 Tusmørke kan du bruge den UDEN snigen og fra enhver vinkel: den brug koster intet, forbruger alle 3 Tusmørke, starter det 6 sek. lange Skyggesløret og rammer dobbelt."
       },
       "stealth": {
@@ -17950,7 +17950,7 @@ export const da_DK: EnTranslations = {
       },
       "solar_step": {
         "name": "Solskridt",
-        "description": "Øger din bevægelseshastighed med 150% i 2 sek."
+        "description": "Øger din bevægelseshastighed med 150% i {duration} sek."
       },
       "solar_invocation": {
         "name": "Solpåkaldelse",
@@ -17958,11 +17958,11 @@ export const da_DK: EnTranslations = {
       },
       "radiant_devotion": {
         "name": "Strålende Hengivenhed",
-        "description": "Øger besværgelseskraften hos dig og gruppemedlemmerne med 20 i 30 min. Erstatter din egen Daggryets eller Nådens Hengivenhed, men eksisterer side om side med Hengivenheder fra andre paladiner."
+        "description": "Øger besværgelseskraften hos dig og gruppemedlemmerne med {buff} i 30 min. Erstatter din egen Daggryets eller Nådens Hengivenhed. En anden paladin, der kaster Strålende Hengivenhed, genopfrisker den i stedet for at stakke; en anden Hengivenhed eksisterer side om side."
       },
       "dawn_devotion": {
         "name": "Daggryets Hengivenhed",
-        "description": "Øger angrebskraften hos dig og gruppemedlemmerne med 40 i 30 min. Erstatter din egen Strålende eller Nådens Hengivenhed, men eksisterer side om side med Hengivenheder fra andre paladiner og med krigerråb."
+        "description": "Øger angrebskraften hos dig og gruppemedlemmerne med {buff} i 30 min. Erstatter din egen Strålende eller Nådens Hengivenhed. En anden paladin, der kaster Daggryets Hengivenhed, genopfrisker den i stedet for at stakke; en anden Hengivenhed og krigerråb eksisterer side om side."
       },
       "grace_devotion": {
         "name": "Nådens Hengivenhed",
@@ -18303,7 +18303,7 @@ export const da_DK: EnTranslations = {
       },
       "life_tap": {
         "name": "Hård Handel",
-        "description": "Omdanner {damage} helbred til {damage} mana (50% mere mana med Blodkredit). Mislykkes, hvis du har {damage} helbred eller mindre."
+        "description": "Omdanner {damage} helbred til {buff} mana. Mislykkes, hvis du har {damage} helbred eller mindre."
       },
       "cursed_accomplice": {
         "name": "Forbandet medskyldig",
@@ -18319,7 +18319,7 @@ export const da_DK: EnTranslations = {
       },
       "litany_of_guilt": {
         "name": "Skyldens litani",
-        "description": "Forbander dit primære onde øje i 6 sek. Fordømmelsesgevinster udløser en bølge, der skader op til 2 andre fjender inden for 8 yards, højst én gang pr. sekund. Rang 2 forlænger den til 8 sek. og 4 fjender."
+        "description": "Forbander dit primære onde øje i {duration} sek. Fordømmelsesgevinster udløser en bølge, der skader op til 2 andre fjender (4 fra Rang 2) inden for 8 yards, højst én gang pr. sekund."
       },
       "cinderhide": {
         "name": "Glødehud",
@@ -18339,7 +18339,7 @@ export const da_DK: EnTranslations = {
       },
       "cruel_pact": {
         "name": "Grusom pagt",
-        "description": "Ofrer 12% af dit maksimale helbred for at genoprette 1,5% af din maksimale mana og generere 20 Fordømmelse. Kan ikke bruges ved eller under 20% helbred."
+        "description": "Ofrer 12% af dit maksimale helbred for at genoprette {buff}% af din maksimale mana og generere 20 Fordømmelse. Kan ikke bruges ved eller under 20% helbred."
       },
       "vicarious_suffering": {
         "name": "Stedfortrædende lidelse",
@@ -18394,7 +18394,7 @@ export const da_DK: EnTranslations = {
       },
       "moonseed": {
         "name": "Månefrø",
-        "description": "Kun i Månekinform. Rammer for {damage} Arkan skade, tilføjer 1 Måneflod (maks. 3) og forlænger din Månestorm på målet med 6 sek., op til {duration} ekstra sek. pr. anvendelse af Månestorm. Ved 3 Måneflod bliver denne knap til Månebølge: et øjeblikkeligt slag for 136 til 162 Arkan skade (plus besværgelseskraft), der bruger alle 3."
+        "description": "Kun i Månekinform. Rammer for {damage} Arkan skade, tilføjer 1 Måneflod (maks. 3) og forlænger din Månestorm på målet med 6 sek., op til {duration} ekstra sek. pr. anvendelse af Månestorm. Ved 3 Måneflod bliver denne knap til Månebølge: et øjeblikkeligt tungt Arkan-slag, der bruger alle 3."
       },
       "rejuvenation": {
         "name": "Sporeheling",
@@ -18416,7 +18416,7 @@ export const da_DK: EnTranslations = {
       "maul": {
         "name": "Knogleknus",
         "description": "Dit næste nærkampsslag gør {damage} ekstra skade og genererer trussel svarende til 2,5 gange dets skade plus en lille fast mængde. Kun i Bruin-form.",
-        "specNote_feral": "Hvert slag, der rammer, tilføjer 1 Gammelt Blod; ved 3 Gammelt Blod bliver denne knap til Marvbrækker: et slag for 78 til 96 skade med høj trussel; under halvt helbred helbreder det dig i stedet for 18% af dit maksimale helbred og refunderer 15 raseri."
+        "specNote_feral": "Hvert slag, der rammer, tilføjer 1 Gammelt Blod; ved 3 Gammelt Blod bliver denne knap til Marvbrækker: et tungt slag med høj trussel; under halvt helbred helbreder det dig i stedet for 18% af dit maksimale helbred og refunderer 15 raseri."
       },
       "growl": {
         "name": "Trussel",
@@ -18457,7 +18457,7 @@ export const da_DK: EnTranslations = {
       },
       "barkskin": {
         "name": "Egehud",
-        "description": "Din hud hærder som bark, og øger rustning med 150 i 15 sek."
+        "description": "Din hud hærder som bark, og øger rustning med {buff}% i 15 sek."
       },
       "sacred_bulwark": {
         "name": "Hellig Bolværk",
@@ -18470,7 +18470,7 @@ export const da_DK: EnTranslations = {
       "starfire": {
         "name": "Himmelfald",
         "description": "Nedkalder et stråleglimt af stjerneild og giver {damage} arkan skade.",
-        "specNote_balance": "I Månekinform tilføjer hver fuldført besværgelse 1 Måneflod (maks. 3). Ved 3 Måneflod bliver denne knap til Solspor: et øjeblikkeligt slag for 80 til 100 naturskade plus en forbrænding på 45 over 9 sek., der gendanner 35 mana og forbruger alle 3."
+        "specNote_balance": "I Månekinform tilføjer hver fuldført besværgelse 1 Måneflod (maks. 3). Ved 3 Måneflod bliver denne knap til Solspor: et øjeblikkeligt naturslag plus en forbrænding over 9 sek., der gendanner 35 mana og forbruger alle 3."
       },
       "travel_form": {
         "name": "Fleet-form",
@@ -18518,7 +18518,7 @@ export const da_DK: EnTranslations = {
       },
       "rip": {
         "name": "Blodrevne",
-        "description": "Afsluttende angreb, der får målet til at bløde hvert 2. sek. i 24 sek.: 72 skade plus 48 pr. brugt kombopoint (5 point: {damage} i alt). Kun i Katteform.",
+        "description": "Afsluttende angreb, der får målet til at bløde hvert 2. sek. i 24 sek. og gør mere skade for hvert brugt kombopoint (5 point: {damage} i alt). Kun i Katteform.",
         "specNote_feral": "Det ramte slag tilføjer 1 Gammelt Blod (maks. 3)."
       },
       "mortal_strike": {
@@ -18930,7 +18930,7 @@ export const da_DK: EnTranslations = {
       },
       "avenging_wrath": {
         "name": "Hævnende Vrede",
-        "description": "Folder legemlige vinger af gylden hellig kraft ud, vinder 10 Hengivenhed og fordobler den Hengivenhed, jeres evner skaber, i 15 sek. Øger desuden den skade og helbredelse, I udretter, med 20%. Daggryshøster: muliggør Vredens Hammer mod ethvert mål."
+        "description": "Folder legemlige vinger af gylden hellig kraft ud, vinder 10 Hengivenhed og fordobler den Hengivenhed, jeres evner skaber, i {duration} sek. Øger desuden den skade og helbredelse, I udretter, med 20%. Daggryshøster: muliggør Vredens Hammer mod ethvert mål."
       },
       "berserk": {
         "name": "Rød dis",
@@ -19188,7 +19188,7 @@ export const da_DK: EnTranslations = {
       },
       "body_blow": {
         "name": "Kropsstød",
-        "description": "Et tungt stød for 130% våbenskade plus 10, der giver 2 combopoint og uddyber Redline med ét hak. (Thuggery-motoren)"
+        "description": "Et tungt stød for {weaponPercent}% våbenskade plus {damage}. Giver 2 combopoint og tilføjer 1 Redline (maks. 4). (Thuggery)"
       },
       "knockout_blow": {
         "name": "Knockoutstød",

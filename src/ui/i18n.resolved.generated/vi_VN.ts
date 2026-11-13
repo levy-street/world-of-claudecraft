@@ -17704,7 +17704,7 @@ export const vi_VN: EnTranslations = {
       },
       "ignition": {
         "name": "Bốc Cháy",
-        "description": "Nội tại: khi phép Lửa của bạn chí mạng, mục tiêu bị đốt thêm 30% sát thương đã gây ra trong 6 giây. Một vết đốt mới lên mục tiêu đang cháy sẽ cộng vào lượng sát thương còn lại và khởi động lại bộ đếm 6 giây. (Tinh thông Lửa)"
+        "description": "Nội tại: khi phép Lửa của bạn chí mạng, mục tiêu bị đốt thêm 1,5% sát thương đã gây ra cho mỗi cấp nhân vật (30% ở cấp 20) trong 6 giây. Một vết đốt mới lên mục tiêu đang cháy sẽ cộng vào lượng sát thương còn lại và khởi động lại bộ đếm 6 giây. (Tinh thông Lửa)"
       },
       "mass_barrier": {
         "name": "Lá Chắn Hàng Loạt",
@@ -17814,17 +17814,17 @@ export const vi_VN: EnTranslations = {
         "name": "Nhát Chém Gian Tà",
         "description": "Một đòn đánh tức thời gây sát thương vũ khí cộng thêm {damage}. Nhận 1 điểm liên hoàn.",
         "specNote_assassination": "Thêm 1 Nghi Thức Độc (tối đa 6).",
-        "specNote_combat": "Khi Redline đang hoạt động, nút này trở thành Đòn Trời Giáng: 130% sát thương vũ khí cộng 10, nhận 2 điểm liên hoàn, và thêm 1 Redline (tối đa 4)."
+        "specNote_combat": "Khi Redline đang hoạt động, nút này trở thành Đòn Trời Giáng: một đòn vũ khí nặng hơn, nhận 2 điểm liên hoàn, và thêm 1 Redline (tối đa 4)."
       },
       "eviscerate": {
         "name": "Giấc Ngủ Vùi Đất",
         "description": "Chiêu kết liễu gây {damage} sát thương Vật Lý. Sát thương tăng theo sức tấn công.",
         "specNote_assassination": "Ở 6 Nghi Thức Độc, nút này trở thành Xé Độc: một đòn đánh lập tức gây toàn bộ sát thương chảy máu còn lại của bạn, gieo một vết thương độc mới, và hồi 20 năng lượng.",
-        "specNote_combat": "Đánh trúng đòn này với 4 điểm liên hoàn trở lên sẽ kích hoạt Redline trong 8 giây: Nhát Chém Gian Tà trở thành Đòn Thân và nút này trở thành Đòn Nốc Ao (45 cộng 35 mỗi điểm liên hoàn, đánh mạnh hơn 25% cho mỗi Đòn Thân bạn tung trong Redline, hồi 25 năng lượng). Hãy dùng nó trước khi Redline kết thúc."
+        "specNote_combat": "Đánh trúng đòn này với 4 điểm liên hoàn trở lên sẽ kích hoạt Redline trong 8 giây: Nhát Chém Gian Tà trở thành Đòn Thân và nút này trở thành Đòn Nốc Ao (đòn kết thúc đánh mạnh hơn 25% cho mỗi Đòn Thân bạn tung trong Redline và hồi 25 năng lượng). Hãy dùng nó trước khi Redline kết thúc."
       },
       "backstab": {
         "name": "Đòn Đâm Hèn Hạ",
-        "description": "Đâm dao găm vào lưng mục tiêu gây 150% sát thương vũ khí cộng thêm {damage}. Phải đứng sau lưng mục tiêu. Yêu cầu dao găm. Nhận 1 điểm liên hoàn.",
+        "description": "Đâm dao găm vào lưng mục tiêu gây {weaponPercent}% sát thương vũ khí cộng thêm {damage}. Phải đứng sau lưng mục tiêu. Yêu cầu dao găm. Nhận 1 điểm liên hoàn.",
         "specNote_assassination": "Mỗi đòn đánh trúng thêm 1 Nghi Thức Độc (tối đa 6) và hoàn lại 15 năng lượng. Ở 6 Nghi Thức Độc, Giấc Ngủ Vùi Đất trở thành Xé Độc (gây toàn bộ sát thương chảy máu còn lại của bạn cùng lúc)."
       },
       "gouge": {
@@ -17849,7 +17849,7 @@ export const vi_VN: EnTranslations = {
       },
       "ambush": {
         "name": "Đòn Kẻ Rình Rập",
-        "description": "Xuất chiêu từ trong bóng tối gây 250% sát thương vũ khí cộng thêm {damage}. Phải đang ẩn thân và đứng sau lưng mục tiêu. Yêu cầu dao găm. Nhận 1 điểm liên hoàn.",
+        "description": "Xuất chiêu từ trong bóng tối gây {weaponPercent}% sát thương vũ khí cộng thêm {damage}. Phải đang ẩn thân và đứng sau lưng mục tiêu. Yêu cầu dao găm. Nhận 1 điểm liên hoàn.",
         "specNote_subtlety": "Dùng từ Màn Chạng Vạng sẽ thêm 1 U Ám (tối đa 3). Ở 3 U Ám, bạn có thể dùng đòn này MÀ KHÔNG CẦN ẩn thân và từ mọi góc: lần dùng đó không tốn gì, tiêu hết 3 U Ám, kích hoạt Màn Bóng Tối 6 giây, và gây sát thương gấp đôi."
       },
       "stealth": {
@@ -17950,7 +17950,7 @@ export const vi_VN: EnTranslations = {
       },
       "solar_step": {
         "name": "Bước Nhật Quang",
-        "description": "Tăng 150% tốc độ di chuyển của bạn trong 2 giây."
+        "description": "Tăng 150% tốc độ di chuyển của bạn trong {duration} giây."
       },
       "solar_invocation": {
         "name": "Triệu Nhật",
@@ -17958,11 +17958,11 @@ export const vi_VN: EnTranslations = {
       },
       "radiant_devotion": {
         "name": "Sùng Tín Rực Rỡ",
-        "description": "Tăng 20 sức mạnh phép thuật cho bạn và các thành viên nhóm trong 30 phút. Thay thế Sùng Tín Bình Minh hoặc Ân Điển của chính bạn, nhưng cùng tồn tại với Sùng Tín của các thánh kỵ sĩ khác."
+        "description": "Tăng {buff} sức mạnh phép thuật cho bạn và các thành viên nhóm trong 30 phút. Thay thế Sùng Tín Bình Minh hoặc Ân Điển của chính bạn. Một thánh kỵ sĩ khác dùng Sùng Tín Rực Rỡ sẽ làm mới thay vì cộng dồn; một Sùng Tín khác cùng tồn tại."
       },
       "dawn_devotion": {
         "name": "Sùng Tín Bình Minh",
-        "description": "Tăng 40 sức tấn công cho bạn và các thành viên nhóm trong 30 phút. Thay thế Sùng Tín Rực Rỡ hoặc Ân Điển của chính bạn, nhưng cùng tồn tại với Sùng Tín của các thánh kỵ sĩ khác và với tiếng hô của chiến binh."
+        "description": "Tăng {buff} sức tấn công cho bạn và các thành viên nhóm trong 30 phút. Thay thế Sùng Tín Rực Rỡ hoặc Ân Điển của chính bạn. Một thánh kỵ sĩ khác dùng Sùng Tín Bình Minh sẽ làm mới thay vì cộng dồn; một Sùng Tín khác và tiếng hô của chiến binh cùng tồn tại."
       },
       "grace_devotion": {
         "name": "Sùng Tín Ân Điển",
@@ -18303,7 +18303,7 @@ export const vi_VN: EnTranslations = {
       },
       "life_tap": {
         "name": "Mặc Cả Nghiệt Ngã",
-        "description": "Chuyển hóa {damage} máu thành {damage} mana (nhiều hơn 50% mana với Tín Dụng Máu). Thất bại nếu bạn có {damage} máu hoặc ít hơn."
+        "description": "Chuyển hóa {damage} máu thành {buff} mana. Thất bại nếu bạn có {damage} máu hoặc ít hơn."
       },
       "cursed_accomplice": {
         "name": "Đồng Lõa Bị Nguyền",
@@ -18319,7 +18319,7 @@ export const vi_VN: EnTranslations = {
       },
       "litany_of_guilt": {
         "name": "Kinh Cầu Tội Lỗi",
-        "description": "Nguyền rủa Ác Nhãn chính của bạn trong 6 giây. Mỗi lần nhận Kết Án sẽ giải phóng một đợt sóng gây sát thương cho tối đa 2 kẻ địch khác trong bán kính 8 thước, tối đa một lần mỗi giây. Cấp 2 kéo dài hiệu ứng này lên 8 giây và 4 kẻ địch."
+        "description": "Nguyền rủa Ác Nhãn chính của bạn trong {duration} giây. Mỗi lần nhận Kết Án sẽ giải phóng một đợt sóng gây sát thương cho tối đa 2 kẻ địch khác (4 từ Cấp 2) trong bán kính 8 thước, tối đa một lần mỗi giây."
       },
       "cinderhide": {
         "name": "Da Than Hồng",
@@ -18339,7 +18339,7 @@ export const vi_VN: EnTranslations = {
       },
       "cruel_pact": {
         "name": "Khế Ước Tàn Nhẫn",
-        "description": "Hy sinh 12% máu tối đa của bạn để hồi 1,5% mana tối đa và tạo ra 20 Kết Án. Không thể dùng khi máu ở mức 20% hoặc thấp hơn."
+        "description": "Hy sinh 12% máu tối đa của bạn để hồi {buff}% mana tối đa và tạo ra 20 Kết Án. Không thể dùng khi máu ở mức 20% hoặc thấp hơn."
       },
       "vicarious_suffering": {
         "name": "Thống Khổ Sẻ Chia",
@@ -18394,7 +18394,7 @@ export const vi_VN: EnTranslations = {
       },
       "moonseed": {
         "name": "Nguyệt Chủng",
-        "description": "Chỉ trong Dạng Cú Mặt Trăng. Đánh gây {damage} sát thương Bí Thuật, thêm 1 Triều Nguyệt (tối đa 3) và kéo dài Bão Tố Nguyệt của bạn lên mục tiêu thêm 6 giây, tối đa {duration} giây thêm mỗi lần áp dụng Bão Tố Nguyệt. Ở 3 Triều Nguyệt, nút này trở thành Nguyệt Trào: một đòn tức thì gây 136 đến 162 sát thương Bí Thuật (cộng sức mạnh phép thuật) và tiêu hết cả 3."
+        "description": "Chỉ trong Dạng Cú Mặt Trăng. Đánh gây {damage} sát thương Bí Thuật, thêm 1 Triều Nguyệt (tối đa 3) và kéo dài Bão Tố Nguyệt của bạn lên mục tiêu thêm 6 giây, tối đa {duration} giây thêm mỗi lần áp dụng Bão Tố Nguyệt. Ở 3 Triều Nguyệt, nút này trở thành Nguyệt Trào: một đòn nặng tức thì gây sát thương Bí Thuật và tiêu hết cả 3."
       },
       "rejuvenation": {
         "name": "Chữa Lành Bào Tử",
@@ -18416,7 +18416,7 @@ export const vi_VN: EnTranslations = {
       "maul": {
         "name": "Nghiền Xương",
         "description": "Đòn cận chiến kế tiếp của bạn gây thêm {damage} sát thương và tạo lượng đe dọa bằng 2,5 lần sát thương của nó cộng một lượng cố định nhỏ. Chỉ dùng được ở Hình Bruin.",
-        "specNote_feral": "Mỗi đòn đánh trúng thêm 1 Huyết Cổ; ở 3 Huyết Cổ, nút này trở thành Nghiền Tủy: một đòn đánh gây 78 đến 96 sát thương với lượng thù hận lớn; dưới nửa máu, nó sẽ thay vào đó hồi cho bạn 18% máu tối đa và hoàn lại 15 nộ khí."
+        "specNote_feral": "Mỗi đòn đánh trúng thêm 1 Huyết Cổ; ở 3 Huyết Cổ, nút này trở thành Nghiền Tủy: một đòn đánh nặng với lượng thù hận lớn; dưới nửa máu, nó sẽ thay vào đó hồi cho bạn 18% máu tối đa và hoàn lại 15 nộ khí."
       },
       "growl": {
         "name": "Hăm Dọa",
@@ -18457,7 +18457,7 @@ export const vi_VN: EnTranslations = {
       },
       "barkskin": {
         "name": "Da Sồi",
-        "description": "Da ngươi rắn lại như vỏ cây, tăng 150 giáp trong 15 giây."
+        "description": "Da ngươi rắn lại như vỏ cây, tăng {buff}% giáp trong 15 giây."
       },
       "sacred_bulwark": {
         "name": "Phòng Bị Thánh Thần",
@@ -18470,7 +18470,7 @@ export const vi_VN: EnTranslations = {
       "starfire": {
         "name": "Thiên Giáng",
         "description": "Triệu gọi một tia lửa sao, gây {damage} sát thương Bí Thuật.",
-        "specNote_balance": "Ở Dạng Cú Mặt Trăng, mỗi lần thi triển hoàn tất thêm 1 Triều Nguyệt (tối đa 3). Ở 3 Triều Nguyệt, nút này trở thành Vệt Dương: một đòn đánh tức thời gây 80 đến 100 sát thương Thiên Nhiên cộng thêm 45 sát thương thiêu đốt trong 9 giây, hồi 35 mana và tiêu hết cả 3."
+        "specNote_balance": "Ở Dạng Cú Mặt Trăng, mỗi lần thi triển hoàn tất thêm 1 Triều Nguyệt (tối đa 3). Ở 3 Triều Nguyệt, nút này trở thành Vệt Dương: một đòn đánh tức thời gây sát thương Thiên Nhiên cộng thêm sát thương thiêu đốt trong 9 giây, hồi 35 mana và tiêu hết cả 3."
       },
       "travel_form": {
         "name": "Hình Thần Tốc",
@@ -18518,7 +18518,7 @@ export const vi_VN: EnTranslations = {
       },
       "rip": {
         "name": "Vết Nứt Máu",
-        "description": "Đòn kết thúc khiến mục tiêu chảy máu mỗi 2 giây trong 24 giây: 72 sát thương cộng 48 mỗi điểm liên kích tiêu hao (5 điểm: tổng {damage}). Chỉ ở Hình Mèo.",
+        "description": "Đòn kết thúc khiến mục tiêu chảy máu mỗi 2 giây trong 24 giây, gây nhiều sát thương hơn cho mỗi điểm liên kích tiêu hao (5 điểm: tổng {damage}). Chỉ ở Hình Mèo.",
         "specNote_feral": "Đòn đánh trúng thêm 1 Huyết Cổ (tối đa 3)."
       },
       "mortal_strike": {
@@ -18930,7 +18930,7 @@ export const vi_VN: EnTranslations = {
       },
       "avenging_wrath": {
         "name": "Cuồng Nộ Báo Thù",
-        "description": "Mở ra đôi cánh hữu hình bằng thánh lực vàng ròng, nhận 10 Sùng Tín và nhân đôi lượng Sùng Tín do các kỹ năng của bạn tạo ra trong 15 giây. Cũng tăng 20% sát thương và lượng hồi bạn gây ra. Kẻ gặt bình minh: cho phép Búa Cuồng Nộ dùng lên bất cứ mục tiêu nào."
+        "description": "Mở ra đôi cánh hữu hình bằng thánh lực vàng ròng, nhận 10 Sùng Tín và nhân đôi lượng Sùng Tín do các kỹ năng của bạn tạo ra trong {duration} giây. Cũng tăng 20% sát thương và lượng hồi bạn gây ra. Kẻ gặt bình minh: cho phép Búa Cuồng Nộ dùng lên bất cứ mục tiêu nào."
       },
       "berserk": {
         "name": "Sương Đỏ",
@@ -19188,7 +19188,7 @@ export const vi_VN: EnTranslations = {
       },
       "body_blow": {
         "name": "Đòn Thân",
-        "description": "Một đòn nặng gây 130% sát thương vũ khí cộng 10, cho 2 điểm liên hoàn và làm sâu thêm Redline một nấc. (động cơ Thuggery)"
+        "description": "Một đòn nặng gây {weaponPercent}% sát thương vũ khí cộng {damage}, cho 2 điểm liên hoàn và làm sâu thêm Redline một nấc. (động cơ Thuggery)"
       },
       "knockout_blow": {
         "name": "Đòn Nốc Ao",

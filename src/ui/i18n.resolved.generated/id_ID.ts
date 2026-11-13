@@ -17704,7 +17704,7 @@ export const id_ID: EnTranslations = {
       },
       "ignition": {
         "name": "Penyalaan",
-        "description": "Pasif: saat mantra Apimu mendapat serangan kritis, target terbakar sebesar tambahan 30% dari kerusakan yang diberikan selama 6 dtk. Pembakaran baru pada target yang sudah terbakar menambah kerusakan yang masih tersisa dan memulai ulang penghitung waktu 6 dtk. (Penguasaan Api)"
+        "description": "Pasif: saat mantra Apimu mendapat serangan kritis, target terbakar sebesar tambahan 1,5% dari kerusakan yang diberikan per level karakter (30% pada level 20) selama 6 dtk. Pembakaran baru pada target yang sudah terbakar menambah kerusakan yang masih tersisa dan memulai ulang penghitung waktu 6 dtk. (Penguasaan Api)"
       },
       "mass_barrier": {
         "name": "Penghalang Massal",
@@ -17814,17 +17814,17 @@ export const id_ID: EnTranslations = {
         "name": "Tebasan Keji",
         "description": "Serangan seketika sebesar kerusakan senjata ditambah {damage}. Memberi 1 poin combo.",
         "specNote_assassination": "Menambah 1 Ritus Bisa (maks 6).",
-        "specNote_combat": "Selagi Redline aktif, tombol ini berubah menjadi Haymaker: 130% kerusakan senjata plus 10, memberi 2 poin combo, dan menambah 1 Redline (maks 4)."
+        "specNote_combat": "Selagi Redline aktif, tombol ini berubah menjadi Haymaker: serangan senjata yang lebih berat, memberi 2 poin combo, dan menambah 1 Redline (maks 4)."
       },
       "eviscerate": {
         "name": "Tidur Abadi",
         "description": "Jurus penutup yang memberi {damage} kerusakan Fisik. Kerusakan meningkat dengan Kekuatan Serangan.",
         "specNote_assassination": "Pada 6 Ritus Bisa, tombol ini berubah menjadi Venomrend: serangan yang seketika menimbulkan seluruh kerusakan yang masih akan diberikan pendarahanmu, menanamkan luka bisa yang segar, dan memulihkan 20 energi.",
-        "specNote_combat": "Mendaratkan ini dengan 4 poin kombo atau lebih memulai Redline selama 8 dtk: Tebasan Keji berubah menjadi Pukulan Tubuh dan tombol ini menjadi Pukulan Nokaut (45 ditambah 35 per poin kombo, memukul 25% lebih keras untuk setiap Pukulan Tubuh yang kamu lancarkan selama Redline, memulihkan 25 energi). Gunakan sebelum Redline berakhir."
+        "specNote_combat": "Mendaratkan ini dengan 4 poin kombo atau lebih memulai Redline selama 8 dtk: Tebasan Keji berubah menjadi Pukulan Tubuh dan tombol ini menjadi Pukulan Nokaut (jurus penutup yang memukul 25% lebih keras untuk setiap Pukulan Tubuh yang kamu lancarkan selama Redline dan memulihkan 25 energi). Gunakan sebelum Redline berakhir."
       },
       "backstab": {
         "name": "Tusukan Pengecut",
-        "description": "Tancapkan belatimu ke punggung target sebesar 150% kerusakan senjata ditambah {damage}. Harus berada di belakang target. Membutuhkan belati. Memberi 1 poin combo.",
+        "description": "Tancapkan belatimu ke punggung target sebesar {weaponPercent}% kerusakan senjata ditambah {damage}. Harus berada di belakang target. Membutuhkan belati. Memberi 1 poin combo.",
         "specNote_assassination": "Setiap serangan menambah 1 Ritus Bisa (maks 6) dan mengembalikan 15 energi. Pada 6 Ritus Bisa, Dirt Nap berubah menjadi Venomrend (menimbulkan seluruh sisa kerusakan pendarahanmu sekaligus)."
       },
       "gouge": {
@@ -17849,7 +17849,7 @@ export const id_ID: EnTranslations = {
       },
       "ambush": {
         "name": "Serangan Penyergap",
-        "description": "Menyerang dari bayangan sebesar 250% kerusakan senjata ditambah {damage}. Harus dalam siluman dan berada di belakang target. Membutuhkan belati. Memberi 1 poin combo.",
+        "description": "Menyerang dari bayangan sebesar {weaponPercent}% kerusakan senjata ditambah {damage}. Harus dalam siluman dan berada di belakang target. Membutuhkan belati. Memberi 1 poin combo.",
         "specNote_subtlety": "Dipakai dari Selubung Senja, ini menambah 1 Gloam (maks 3). Pada 3 Gloam kamu bisa memakainya TANPA siluman dan dari sudut mana pun: penggunaan itu tidak memakan biaya, menghabiskan seluruh 3 Gloam, memulai Tabir Bayangan selama 6 detik, dan menghantam dua kali lipat."
       },
       "stealth": {
@@ -17950,7 +17950,7 @@ export const id_ID: EnTranslations = {
       },
       "solar_step": {
         "name": "Langkah Surya",
-        "description": "Menambah kecepatan gerakmu 150% selama 2 dtk."
+        "description": "Menambah kecepatan gerakmu 150% selama {duration} dtk."
       },
       "solar_invocation": {
         "name": "Seruan Surya",
@@ -17958,11 +17958,11 @@ export const id_ID: EnTranslations = {
       },
       "radiant_devotion": {
         "name": "Pengabdian Berseri",
-        "description": "Menambah kekuatan mantra kamu dan anggota kelompok sebesar 20 selama 30 mnt. Menggantikan Pengabdian Fajar atau Karuniamu sendiri, tetapi berdampingan dengan Pengabdian paladin lain."
+        "description": "Menambah kekuatan mantra kamu dan anggota kelompok sebesar {buff} selama 30 mnt. Menggantikan Pengabdian Fajar atau Karuniamu sendiri, tetapi berdampingan dengan Pengabdian paladin lain."
       },
       "dawn_devotion": {
         "name": "Pengabdian Fajar",
-        "description": "Menambah kekuatan serang kamu dan anggota kelompok sebesar 40 selama 30 mnt. Menggantikan Pengabdian Berseri atau Karuniamu sendiri, tetapi berdampingan dengan Pengabdian paladin lain dan dengan seruan pendekar."
+        "description": "Menambah kekuatan serang kamu dan anggota kelompok sebesar {buff} selama 30 mnt. Menggantikan Pengabdian Berseri atau Karuniamu sendiri, tetapi berdampingan dengan Pengabdian paladin lain dan dengan seruan pendekar."
       },
       "grace_devotion": {
         "name": "Pengabdian Karunia",
@@ -18303,7 +18303,7 @@ export const id_ID: EnTranslations = {
       },
       "life_tap": {
         "name": "Tawar Getir",
-        "description": "Mengubah {damage} kesehatan menjadi {damage} mana (50% lebih banyak mana dengan Utang Darah). Gagal jika kesehatanmu {damage} atau kurang."
+        "description": "Mengubah {damage} kesehatan menjadi {buff} mana. Gagal jika kesehatanmu {damage} atau kurang."
       },
       "cursed_accomplice": {
         "name": "Sekutu Terkutuk",
@@ -18319,7 +18319,7 @@ export const id_ID: EnTranslations = {
       },
       "litany_of_guilt": {
         "name": "Litani Rasa Bersalah",
-        "description": "Mengutuk Mata Jahat utamamu selama 6 detik. Perolehan Kecaman melepaskan gelombang yang merusak hingga 2 musuh lain dalam radius 8 yard, paling banyak sekali per detik. Peringkat 2 memperpanjangnya menjadi 8 detik dan 4 musuh."
+        "description": "Mengutuk Mata Jahat utamamu selama {duration} detik. Perolehan Kecaman melepaskan gelombang yang merusak hingga 2 musuh lain (4 mulai Peringkat 2) dalam radius 8 yard, paling banyak sekali per detik."
       },
       "cinderhide": {
         "name": "Kulit Bara",
@@ -18339,7 +18339,7 @@ export const id_ID: EnTranslations = {
       },
       "cruel_pact": {
         "name": "Perjanjian Kejam",
-        "description": "Mengorbankan 12% dari nyawa maksimummu untuk memulihkan 1,5% dari mana maksimummu dan menghasilkan 20 Kecaman. Tidak dapat digunakan pada atau di bawah 20% nyawa."
+        "description": "Mengorbankan 12% dari nyawa maksimummu untuk memulihkan {buff}% dari mana maksimummu dan menghasilkan 20 Kecaman. Tidak dapat digunakan pada atau di bawah 20% nyawa."
       },
       "vicarious_suffering": {
         "name": "Derita Pengganti",
@@ -18394,7 +18394,7 @@ export const id_ID: EnTranslations = {
       },
       "moonseed": {
         "name": "Benih Rembulan",
-        "description": "Hanya dalam Wujud Burung Bulan. Menyerang sebesar {damage} kerusakan Arkana, menambah 1 Pasang Rembulan (maks 3), dan memperpanjang Badai Rembulanmu pada target selama 6 dtk, hingga {duration} dtk tambahan per penerapan Badai Rembulan. Pada 3 Pasang Rembulan, tombol ini menjadi Gelombang Rembulan: serangan seketika sebesar 136 sampai 162 kerusakan Arkana (ditambah kekuatan mantra) yang menghabiskan ketiganya."
+        "description": "Hanya dalam Wujud Burung Bulan. Menyerang sebesar {damage} kerusakan Arkana, menambah 1 Pasang Rembulan (maks 3), dan memperpanjang Badai Rembulanmu pada target selama 6 dtk, hingga {duration} dtk tambahan per penerapan Badai Rembulan. Pada 3 Pasang Rembulan, tombol ini menjadi Gelombang Rembulan: serangan Arkana berat seketika yang menghabiskan ketiganya."
       },
       "rejuvenation": {
         "name": "Pemulihan Spora",
@@ -18416,7 +18416,7 @@ export const id_ID: EnTranslations = {
       "maul": {
         "name": "Remuk Tulang",
         "description": "Ayunan jarak dekat berikutnya memberi {damage} kerusakan tambahan dan menghasilkan ancaman sebesar 2,5 kali kerusakannya ditambah sedikit jumlah tetap. Hanya dalam Wujud Bruin.",
-        "specNote_feral": "Setiap pukulan yang mengenai menambah 1 Darah Tua; pada 3 Darah Tua tombol ini berubah menjadi Marrowbreak: serangan sebesar 78 hingga 96 kerusakan dengan ancaman besar; di bawah setengah nyawa, ia justru menyembuhkanmu sebesar 18% dari nyawa maksimummu dan mengembalikan 15 amarah."
+        "specNote_feral": "Setiap pukulan yang mengenai menambah 1 Darah Tua; pada 3 Darah Tua tombol ini berubah menjadi Marrowbreak: serangan berat dengan ancaman besar; di bawah setengah nyawa, ia justru menyembuhkanmu sebesar 18% dari nyawa maksimummu dan mengembalikan 15 amarah."
       },
       "growl": {
         "name": "Gertakan",
@@ -18457,7 +18457,7 @@ export const id_ID: EnTranslations = {
       },
       "barkskin": {
         "name": "Kulit Ek",
-        "description": "Kulitmu mengeras bagai kulit kayu, meningkatkan zirah sebesar 150 selama 15 detik."
+        "description": "Kulitmu mengeras bagai kulit kayu, meningkatkan zirah sebesar {buff}% selama 15 detik."
       },
       "sacred_bulwark": {
         "name": "Benteng Suci",
@@ -18470,7 +18470,7 @@ export const id_ID: EnTranslations = {
       "starfire": {
         "name": "Langit Runtuh",
         "description": "Memanggil turun baut api bintang, menyebabkan {damage} kerusakan Arkana.",
-        "specNote_balance": "Dalam Wujud Burung Bulan, setiap rapalan yang selesai menambah 1 Moontide (maks 3). Pada 3 Moontide, tombol ini berubah menjadi Sunwake: serangan seketika sebesar 80 hingga 100 kerusakan Alam plus bakaran 45 selama 9 detik, memulihkan 35 mana dan menghabiskan seluruh 3."
+        "specNote_balance": "Dalam Wujud Burung Bulan, setiap rapalan yang selesai menambah 1 Moontide (maks 3). Pada 3 Moontide, tombol ini berubah menjadi Sunwake: serangan Alam seketika plus bakaran selama 9 detik, memulihkan 35 mana dan menghabiskan seluruh 3."
       },
       "travel_form": {
         "name": "Wujud Fleet",
@@ -18518,7 +18518,7 @@ export const id_ID: EnTranslations = {
       },
       "rip": {
         "name": "Celah Darah",
-        "description": "Serangan penutup yang membuat target berdarah setiap 2 dtk selama 24 dtk: 72 kerusakan ditambah 48 per poin kombo yang dipakai (5 poin: total {damage}). Hanya Wujud Kucing.",
+        "description": "Serangan penutup yang membuat target berdarah setiap 2 dtk selama 24 dtk, dengan kerusakan lebih besar untuk setiap poin kombo yang dipakai (5 poin: total {damage}). Hanya Wujud Kucing.",
         "specNote_feral": "Pukulan yang mengenai menambah 1 Darah Tua (maks 3)."
       },
       "mortal_strike": {
@@ -18930,7 +18930,7 @@ export const id_ID: EnTranslations = {
       },
       "avenging_wrath": {
         "name": "Murka Pembalas",
-        "description": "Membentangkan sayap wadag dari kekuatan suci keemasan, memperoleh 10 Pengabdian dan menggandakan Pengabdian yang dihasilkan kemampuanmu selama 15 dtk. Juga meningkatkan kerusakan dan penyembuhan yang kamu berikan sebesar 20%. Penuai fajar: memungkinkan Palu Murka terhadap sasaran mana pun."
+        "description": "Membentangkan sayap wadag dari kekuatan suci keemasan, memperoleh 10 Pengabdian dan menggandakan Pengabdian yang dihasilkan kemampuanmu selama {duration} dtk. Juga meningkatkan kerusakan dan penyembuhan yang kamu berikan sebesar 20%. Penuai fajar: memungkinkan Palu Murka terhadap sasaran mana pun."
       },
       "berserk": {
         "name": "Kabut Merah",
@@ -19188,7 +19188,7 @@ export const id_ID: EnTranslations = {
       },
       "body_blow": {
         "name": "Pukulan Tubuh",
-        "description": "Pukulan berat sebesar 130% kerusakan senjata plus 10 yang memberikan 2 poin combo dan memperdalam Redline satu tingkat. (mesin Thuggery)"
+        "description": "Pukulan berat sebesar {weaponPercent}% kerusakan senjata plus {damage} yang memberikan 2 poin combo dan memperdalam Redline satu tingkat (maks 4). (mesin Thuggery)"
       },
       "knockout_blow": {
         "name": "Pukulan Nokaut",

@@ -6359,7 +6359,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'I 6 sek.: dine Skumringsslør-åbninger virker uden skjul og fra enhver vinkel, og du gør 10% mere skade. Dit første Luskerens Slag indeni gør 50% mere våbenskade. (Listighed)',
   'entities.abilities.body_blow.name': 'Kropsstød',
   'entities.abilities.body_blow.description':
-    'Et tungt stød for 130% våbenskade plus 10, der giver 2 combopoint og uddyber Redline med ét hak. (Thuggery-motoren)',
+    'Et tungt stød for {weaponPercent}% våbenskade plus {damage}. Giver 2 combopoint og tilføjer 1 Redline (maks. 4). (Thuggery)',
   'entities.abilities.knockout_blow.name': 'Knockoutstød',
   'entities.abilities.knockout_blow.description':
     'Afslutter Redline med et knockout: slå for {damage} fysisk skade, der rammer 25% hårdere for hvert Kropsstød, du kastede under Redline (op til 3), og genvind 25 energi. Skaden stiger med Angrebsstyrke. Brug det, før Redline løber ud, ellers går knockouten tabt. (Kamp)',
@@ -7750,7 +7750,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_monkey.name': 'Mårens Skikkelse',
   'entities.abilities.backstab.name': 'Fejt Stød',
   'entities.abilities.barkskin.description':
-    'Din hud hærder som bark, og øger rustning med 150 i 15 sek.',
+    'Din hud hærder som bark, og øger rustning med {buff}% i 15 sek.',
   'entities.abilities.barkskin.name': 'Egehud',
   'entities.abilities.bash.description': 'Bedøver målet i 2 sek. Kun i Bruin-form.',
   'entities.abilities.bash.name': 'Chokslag',
@@ -7966,7 +7966,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Helbreder et venligt mål for {damage}. Helbredelsen stiger med Helbredelseskraft.',
   'entities.abilities.lesser_heal.name': 'Hvisket Bøn',
   'entities.abilities.life_tap.description':
-    'Omdanner {damage} helbred til {damage} mana (50% mere mana med Blodkredit). Mislykkes, hvis du har {damage} helbred eller mindre.',
+    'Omdanner {damage} helbred til {buff} mana. Mislykkes, hvis du har {damage} helbred eller mindre.',
   'entities.abilities.life_tap.name': 'Hård Handel',
   'entities.abilities.lightning_bolt.description':
     'Volder {damage} Naturskade. Skaden stiger med Besværgelseskraft. Elementær: et træf giver 1 Torden.',
@@ -14511,7 +14511,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.avatar.description':
     'Bryd bedøvelser, frygt, rodfæstelser, tavsheder, afvæbninger og nedsættelser på dig (ikke dem fra bosser), og bliv derefter en kolos i 20 sek., der gør 20% mere skade. Det beskytter dig ikke mod nye kontroleffekter.',
   'entities.abilities.avenging_wrath.description':
-    'Folder legemlige vinger af gylden hellig kraft ud, vinder 10 Hengivenhed og fordobler den Hengivenhed, jeres evner skaber, i 15 sek. Øger desuden den skade og helbredelse, I udretter, med 20%. Daggryshøster: muliggør Vredens Hammer mod ethvert mål.',
+    'Folder legemlige vinger af gylden hellig kraft ud, vinder 10 Hengivenhed og fordobler den Hengivenhed, jeres evner skaber, i {duration} sek. Øger desuden den skade og helbredelse, I udretter, med 20%. Daggryshøster: muliggør Vredens Hammer mod ethvert mål.',
   'entities.abilities.berserk.description':
     'Øger din angrebskraft med 70 i 15 sek. (druidentalent)',
   'entities.abilities.bladestorm.name': 'Klingestorm',
@@ -14596,7 +14596,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Dine næste to besværgelser med kastetid kan kastes, mens du bevæger dig. Varer i 15 sek. (magikertalent)',
   'entities.abilities.ignition.name': 'Antændelse',
   'entities.abilities.ignition.description':
-    'Passiv: når dine Ildbesværgelser rammer kritisk, brænder målet for yderligere 30% af den påførte skade over 6 sek. En ny brand på et mål, der allerede brænder, lægges til den skade, der stadig mangler, og genstarter 6 sek.-timeren. (Ildbeherskelse)',
+    'Passiv: når dine Ildbesværgelser rammer kritisk, brænder målet for yderligere 1,5% af den påførte skade pr. karakterniveau (30% på niveau 20) over 6 sek. En ny brand på et mål, der allerede brænder, lægges til den skade, der stadig mangler, og genstarter 6 sek.-timeren. (Ildbeherskelse)',
   'entities.abilities.mass_barrier.name': 'Massebarriere',
   'entities.abilities.mass_barrier.description':
     'Beskytter dig og op til 4 nærliggende allierede inden for 30 m; hver barriere absorberer {damage} skade i 15 sek. (magikertalent)',
@@ -15697,7 +15697,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.beacon_of_light.description':
     'Markerer ét gruppemedlem som din Lysets Bavn. 50% af din effektive direkte helbredelse på et andet gruppemedlem inden for 60 m helbreder også Bavnen. Områdehelbredelse og periodisk helbredelse overføres ikke. Varer indtil en af jer dør.',
   'entities.abilities.dawn_devotion.description':
-    'Øger angrebskraften hos dig og gruppemedlemmerne med 40 i 30 min. Erstatter din egen Strålende eller Nådens Hengivenhed, men eksisterer side om side med Hengivenheder fra andre paladiner og med krigerråb.',
+    'Øger angrebskraften hos dig og gruppemedlemmerne med {buff} i 30 min. Erstatter din egen Strålende eller Nådens Hengivenhed. En anden paladin, der kaster Daggryets Hengivenhed, genopfrisker den i stedet for at stakke; en anden Hengivenhed og krigerråb eksisterer side om side.',
   'entities.abilities.dawnfall.description':
     'Gør {damage} hellig skade på nærliggende fjender og genererer 1 Hengivenhed. At ramme mindst én fjende reducerer Sidste Påbuds resterende nedkøling med 2 sek. Ophøjelse øger dens skade med 50% og dens radius til 10 m.',
   'entities.abilities.dawns_embrace.description':
@@ -15729,7 +15729,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.radiant_chorus.description':
     "Helbred nærliggende allierede for {damage} og generér 1 Hengivenhed. At helbrede mindst 2 allierede effektivt giver Strålende Resonans i 10 sek.: dit næste Lægende Lys er øjeblikkeligt, eller dit næste Daggryets Favn koster 50% mindre mana og kastes på 1,5 sek. Ophøjelse øger Strålende Kors' helbredelse med 20% og dens radius til 40 m.",
   'entities.abilities.radiant_devotion.description':
-    'Øger besværgelseskraften hos dig og gruppemedlemmerne med 20 i 30 min. Erstatter din egen Daggryets eller Nådens Hengivenhed, men eksisterer side om side med Hengivenheder fra andre paladiner.',
+    'Øger besværgelseskraften hos dig og gruppemedlemmerne med {buff} i 30 min. Erstatter din egen Daggryets eller Nådens Hengivenhed. En anden paladin, der kaster Strålende Hengivenhed, genopfrisker den i stedet for at stakke; en anden Hengivenhed eksisterer side om side.',
   'entities.abilities.recall_the_fallen.description':
     'Bringer et dødt gruppemedlem tilbage til livet ved din side med 35% sundhed og mana. En Solheler på niveau 16 eller derover kalder i stedet ethvert faldent medlem af gruppen, som er inden for 30 meter og i din synsvidde, tilbage.',
   'entities.abilities.sacred_challenge.description':
@@ -15742,7 +15742,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Gør {damage} hellig skade på en fjende eller helbred et venligt mål for {healing}. Skaden stiger med Besværgelseskraft; helbredelsen stiger med Helbredelseskraft. Disciplin helbreder hvert såret forbundet gruppemedlem inden for 30 m for 30% af den gjorte skade (70% med Tvillingepagt). Hvis ingen er såret, helbreder den i stedet det sårede gruppemedlem med lavest helbred inden for 30 m for 15% af skaden. At helbrede et gruppemedlem helbreder også op til 2 andre sårede gruppemedlemmer inden for 10 m af det mål og i din synslinje, hver for 50% af det genoprettede helbred. Disse ekstra helbredelser kan ikke være kritiske eller skabe Disciplin-bånd. (Disciplin-signatur)',
   'entities.abilities.solar_invocation.description':
     'Helbred øjeblikkeligt en allieret for {damage} eller gør 120 til 150 hellig grundskade på en fjende. Skaden stiger med Besværgelseskraft og helbredelsen med Helbredelseskraft. Begge anvendelser genererer 1 Hengivenhed. Under Ophøjelse helbreder et helbredende kast også allierede spillere inden for 10 m af målet for halvt så meget.',
-  'entities.abilities.solar_step.description': 'Øger din bevægelseshastighed med 150% i 2 sek.',
+  'entities.abilities.solar_step.description':
+    'Øger din bevægelseshastighed med 150% i {duration} sek.',
   'entities.abilities.sun_gods_verdict.description':
     'Dømmer en fjende under Solgudens Dom i 30 sek. Sidste Påbud og Daggryfald indskriver én ladning ved et vellykket træf. Den evne, der sætter den tredje ladning, dikterer dommen: Sidste Påbud udløser ødelæggende skade på den dømte; Daggryfald detonerer dommen og skader og bedøver nærliggende fjender i 1,5 sek.',
   'entities.abilities.sunward_disc.description':
@@ -15905,7 +15906,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Forbruger dine 3 Måneflod til et tungt slag med {damage} arkan skade: skadesvalget. Solspor forbruger de samme 3 Måneflod, så vælg et.',
   'entities.abilities.moonseed.name': 'Månefrø',
   'entities.abilities.moonseed.description':
-    'Kun i Månekinform. Rammer for {damage} Arkan skade, tilføjer 1 Måneflod (maks. 3) og forlænger din Månestorm på målet med 6 sek., op til {duration} ekstra sek. pr. anvendelse af Månestorm. Ved 3 Måneflod bliver denne knap til Månebølge: et øjeblikkeligt slag for 136 til 162 Arkan skade (plus besværgelseskraft), der bruger alle 3.',
+    'Kun i Månekinform. Rammer for {damage} Arkan skade, tilføjer 1 Måneflod (maks. 3) og forlænger din Månestorm på målet med 6 sek., op til {duration} ekstra sek. pr. anvendelse af Månestorm. Ved 3 Måneflod bliver denne knap til Månebølge: et øjeblikkeligt tungt Arkan-slag, der bruger alle 3.',
   'entities.abilities.overbloom.name': 'Overblomstring',
   'entities.abilities.overbloom.description':
     'Forbruger 3 Grønske. Høster hver af dine helbredelser over tid på alle allierede for {buff}% af den resterende helbredelse, fjerner de virkninger og planter en frisk Sporeheling på målet.',
@@ -16382,14 +16383,14 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Åbner en rift på det valgte sted, trækker fjender inden for 8 m ind mod dens centrum, giver {damage} Skyggeskade og bedøver dem i 2 sek. Bosser tager skade, men modstår trækket og bedøvelsen.',
   'entities.abilities.abyssal_rift.name': 'Afgrundssprække',
   'entities.abilities.ambush.description':
-    'Slå til fra skyggerne for 250% våbenskade plus {damage}. Skal være i snigen og bag målet. Kræver en dolk. Giver 1 combopoint.',
+    'Slå til fra skyggerne for {weaponPercent}% våbenskade plus {damage}. Skal være i snigen og bag målet. Kræver en dolk. Giver 1 combopoint.',
   'entities.abilities.ambush.specNote_subtlety':
     'Brugt fra Skumringsslør tilføjer dette 1 Tusmørke (maks. 3). Ved 3 Tusmørke kan du bruge den UDEN snigen og fra enhver vinkel: den brug koster intet, forbruger alle 3 Tusmørke, starter det 6 sek. lange Skyggesløret og rammer dobbelt.',
   'entities.abilities.army_of_the_dead.description':
     'Åbner en gravportal og rejser en midlertidig Skeletkriger, Knoglemagiker og Gravvinge i 20 sek., der fylder de pladser, dine stående Herredømme-tjenere lader stå tomme.',
   'entities.abilities.army_of_the_dead.name': 'De dødes hær',
   'entities.abilities.backstab.description':
-    'Stød din dolk ind i målets ryg for 150% våbenskade plus {damage}. Skal være bag målet. Kræver en dolk. Giver 1 combopoint.',
+    'Stød din dolk ind i målets ryg for {weaponPercent}% våbenskade plus {damage}. Skal være bag målet. Kræver en dolk. Giver 1 combopoint.',
   'entities.abilities.backstab.specNote_assassination':
     'Hvert slag tilføjer 1 Giftritual (maks. 6) og gendanner 15 energi. Ved 6 Giftritual bliver Gravsøvn til Giftflænge (den giver al din resterende blødningsskade på én gang).',
   'entities.abilities.blade_flurry.description':
@@ -16417,7 +16418,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Kræver dit primære Onde øje på målet. Placerer sekundære Onde øjne på op til 4 andre fjender inden for 15 m af det i 15 sek. De genererer Fordømmelse med 50% af den normale rate, og Dom ekkoer til hver af dem for 35% af sin skade.',
   'entities.abilities.coven.name': 'Heksekreds',
   'entities.abilities.cruel_pact.description':
-    'Ofrer 12% af dit maksimale helbred for at genoprette 1,5% af din maksimale mana og generere 20 Fordømmelse. Kan ikke bruges ved eller under 20% helbred.',
+    'Ofrer 12% af dit maksimale helbred for at genoprette {buff}% af din maksimale mana og generere 20 Fordømmelse. Kan ikke bruges ved eller under 20% helbred.',
   'entities.abilities.cruel_pact.name': 'Grusom pagt',
   'entities.abilities.cursed_accomplice.description':
     'Forbinder dit forbandede øje, når ingen allieret er valgt, så dets Forbandet blik genererer 2 Fordømmelse. At forbinde ét valgt gruppemedlem gør i stedet, at kun deres skade til dit onde øje genererer 3. Et nyt bånd erstatter det forrige og kan udløses højst én gang hvert 2. sek.',
@@ -16436,7 +16437,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.eviscerate.specNote_assassination':
     'Ved 6 Giftritual bliver denne knap til Giftflænge: et slag, der øjeblikkeligt giver al den skade, dine blødninger stadig ville have givet, planter et frisk giftsår og gendanner 20 energi.',
   'entities.abilities.eviscerate.specNote_combat':
-    'Rammer dette med 4 eller flere kombopoint, starter Redline i 8 sek.: Ondsindet Hug bliver til Kropsstød, og denne knap bliver til Knockoutstød (45 plus 35 pr. kombopoint, rammer 25% hårdere for hvert Kropsstød, du har kastet under Redline, genopretter 25 energi). Brug det, før Redline slutter.',
+    'Rammer dette med 4 eller flere kombopoint, starter Redline i 8 sek.: Ondsindet Hug bliver til Kropsstød, og denne knap bliver til Knockoutstød (en afslutter, der rammer 25% hårdere for hvert Kropsstød, du har kastet under Redline, og genopretter 25 energi). Brug det, før Redline slutter.',
   'entities.abilities.expose_armor.description':
     'Afsluttende manøvre, der blotter målet i 30 sek.: hvert brugt combopoint reducerer dets rustning med 2% (5 combopoint: {damage}%).',
   'entities.abilities.faerie_fire.description': 'Reducerer målets rustning med {damage}% i 40 sek.',
@@ -16464,7 +16465,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.kidney_shot.description':
     'Afsluttende manøvre, der bedøver målet i 2 sek. plus 1 sek. pr. combopoint (5 combopoint: 7 sek.).',
   'entities.abilities.litany_of_guilt.description':
-    'Forbander dit primære onde øje i 6 sek. Fordømmelsesgevinster udløser en bølge, der skader op til 2 andre fjender inden for 8 yards, højst én gang pr. sekund. Rang 2 forlænger den til 8 sek. og 4 fjender.',
+    'Forbander dit primære onde øje i {duration} sek. Fordømmelsesgevinster udløser en bølge, der skader op til 2 andre fjender (4 fra Rang 2) inden for 8 yards, højst én gang pr. sekund.',
   'entities.abilities.litany_of_guilt.name': 'Skyldens litani',
   'entities.abilities.maledict_gaze.description':
     'Dit Forbandede Øje angriber fjenden, der bærer dit primære Onde øje, hvert 2,5 sek. for Skyggeskade, mens både du og den fjende er i kamp, inden for 30 m af hinanden og i synslinje. Besæt det onde øje fordobler dets angrebshastighed.',
@@ -16472,7 +16473,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.description':
     'Dit næste nærkampsslag gør {damage} ekstra skade og genererer trussel svarende til 2,5 gange dets skade plus en lille fast mængde. Kun i Bruin-form.',
   'entities.abilities.maul.specNote_feral':
-    'Hvert slag, der rammer, tilføjer 1 Gammelt Blod; ved 3 Gammelt Blod bliver denne knap til Marvbrækker: et slag for 78 til 96 skade med høj trussel; under halvt helbred helbreder det dig i stedet for 18% af dit maksimale helbred og refunderer 15 raseri.',
+    'Hvert slag, der rammer, tilføjer 1 Gammelt Blod; ved 3 Gammelt Blod bliver denne knap til Marvbrækker: et tungt slag med høj trussel; under halvt helbred helbreder det dig i stedet for 18% af dit maksimale helbred og refunderer 15 raseri.',
   'entities.abilities.moonfire.description':
     'Brænder fjenden for {damage} Arkan skade og derefter yderligere {overTime} Arkan skade over {duration} sek.',
   'entities.abilities.moonfire.specNote_balance':
@@ -16513,7 +16514,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rejuvenation.specNote_restoration':
     'Hver kastning giver 1 Grønske (maks. 3), også når den fornyer en blomstring, der allerede virker. Ved 3 Grønske bliver Hurtig heling til Overblomstring.',
   'entities.abilities.rip.description':
-    'Afsluttende angreb, der får målet til at bløde hvert 2. sek. i 24 sek.: 72 skade plus 48 pr. brugt kombopoint (5 point: {damage} i alt). Kun i Katteform.',
+    'Afsluttende angreb, der får målet til at bløde hvert 2. sek. i 24 sek. og gør mere skade for hvert brugt kombopoint (5 point: {damage} i alt). Kun i Katteform.',
   'entities.abilities.rip.specNote_feral': 'Det ramte slag tilføjer 1 Gammelt Blod (maks. 3).',
   'entities.abilities.ruinous_brand.description':
     'Brænder en fjende i 15 sek. Dine næste 3 direkte besværgelser ekkoer for 25% skade mod den brændemærkede fjende, eller kopierer 50% skade til den, når de kastes mod et andet mål. Undergangslyn-ekkoer tæller også som kritiske træffere, uden endnu en kritisk skademultiplikator.',
@@ -16533,7 +16534,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Et øjeblikkeligt slag for våbenskade plus {damage}. Giver 1 combopoint.',
   'entities.abilities.sinister_strike.specNote_assassination': 'Tilføjer 1 Giftritual (maks. 6).',
   'entities.abilities.sinister_strike.specNote_combat':
-    'Mens Redline er aktiv, bliver denne knap til Kropsstød: 130% våbenskade plus 10, giver 2 combopoint og tilføjer 1 Redline (maks. 4).',
+    'Mens Redline er aktiv, bliver denne knap til Kropsstød: et tungere våbenslag, der giver 2 combopoint og tilføjer 1 Redline (maks. 4).',
   'entities.abilities.slice_and_dice.description':
     'Afsluttende manøvre, der øger nærkampsangrebshastigheden med 30% i 12 sek. plus 4 sek. pr. combopoint (5 combopoint: 32 sek.).',
   'entities.abilities.soul_harvest.description':
@@ -16548,7 +16549,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.description':
     'Nedkalder et stråleglimt af stjerneild og giver {damage} arkan skade.',
   'entities.abilities.starfire.specNote_balance':
-    'I Månekinform tilføjer hver fuldført besværgelse 1 Måneflod (maks. 3). Ved 3 Måneflod bliver denne knap til Solspor: et øjeblikkeligt slag for 80 til 100 naturskade plus en forbrænding på 45 over 9 sek., der gendanner 35 mana og forbruger alle 3.',
+    'I Månekinform tilføjer hver fuldført besværgelse 1 Måneflod (maks. 3). Ved 3 Måneflod bliver denne knap til Solspor: et øjeblikkeligt naturslag plus en forbrænding over 9 sek., der gendanner 35 mana og forbruger alle 3.',
   'entities.abilities.stealth.description':
     'Skjul dig i skyggerne. Fjendtlige spillere og kæledyr kan ikke se dig, og monstre bemærker dig kun fra meget tættere på end normalt (fra længere væk, hvis de har højere niveau end dig). Du bevæger dig med fuld hastighed. Angreb eller modtaget skade bryder Skumringsslør. Kast igen for at træde frem.',
   'entities.abilities.stealth.specNote_subtlety':

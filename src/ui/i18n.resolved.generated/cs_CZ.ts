@@ -17704,7 +17704,7 @@ export const cs_CZ: EnTranslations = {
       },
       "ignition": {
         "name": "Vznícení",
-        "description": "Pasivní: když tvá ohnivá kouzla kriticky zasáhnou, cíl se po dobu 6 s spaluje za dalších 30 % způsobeného poškození. Nové spálení cíle, který už hoří, se přičte k poškození, které ještě zbývá, a spustí 6s časovač znovu. (Mistrovství Ohně)"
+        "description": "Pasivní: když tvá ohnivá kouzla kriticky zasáhnou, cíl se po dobu 6 s spaluje za dalších 1,5 % způsobeného poškození za každou úroveň postavy (30 % na úrovni 20). Nové spálení cíle, který už hoří, se přičte k poškození, které ještě zbývá, a spustí 6s časovač znovu. (Mistrovství Ohně)"
       },
       "mass_barrier": {
         "name": "Hromadná bariéra",
@@ -17814,17 +17814,17 @@ export const cs_CZ: EnTranslations = {
         "name": "Zlý sek",
         "description": "Okamžitý úder za poškození zbraně plus {damage}. Udělí 1 combo bod.",
         "specNote_assassination": "Přidá 1 Jedový rituál (max 6).",
-        "specNote_combat": "Zatímco je Redline aktivní, toto tlačítko se změní na Úder na tělo: 130 % poškození zbraně plus 10, udělí 2 combo body a přidá 1 Redline (max 4)."
+        "specNote_combat": "Zatímco je Redline aktivní, toto tlačítko se změní na Úder na tělo: silnější úder zbraní, který udělí 2 combo body a přidá 1 Redline (max 4)."
       },
       "eviscerate": {
         "name": "Do hrobu",
         "description": "Dokončovací útok, který způsobí {damage} fyzického poškození. Poškození roste se silou útoku.",
         "specNote_assassination": "Při 6 Jedovém rituálu se toto tlačítko změní na Jedovou trhlinu: úder, který okamžitě způsobí veškeré poškození, které by ještě způsobila tvá krvácení, zasadí čerstvou jedovou ránu a obnoví 20 energie.",
-        "specNote_combat": "Zásah tímto útokem se 4 nebo více combo body na 8 s spustí Redline: Zlý sek se změní na Úder na tělo a toto tlačítko na Nokautující úder (45 plus 35 za combo bod, o 25 % silněji za každý Úder na tělo, který během Redline vyšleš, obnoví 25 energie). Utrať ho, než Redline skončí."
+        "specNote_combat": "Zásah tímto útokem se 4 nebo více combo body na 8 s spustí Redline: Zlý sek se změní na Úder na tělo a toto tlačítko na Nokautující úder (zakončení, které zasáhne o 25 % silněji za každý Úder na tělo, který během Redline vyšleš, a obnoví 25 energie). Utrať ho, než Redline skončí."
       },
       "backstab": {
         "name": "Zbabělý výpad",
-        "description": "Zaboduj dýkou do zad cíle za 150 % poškození zbraně plus {damage}. Musíš být za cílem. Musíš mít dýku. Udělí 1 combo bod.",
+        "description": "Zaboduj dýkou do zad cíle za {weaponPercent} % poškození zbraně plus {damage}. Musíš být za cílem. Musíš mít dýku. Udělí 1 combo bod.",
         "specNote_assassination": "Každý úder přidá 1 Jedový rituál (max 6) a vrátí 15 energie. Při 6 Jedovém rituálu se Do hrobu změní na Jedovou trhlinu (okamžitě způsobí veškeré zbývající poškození tvých krvácení)."
       },
       "gouge": {
@@ -17849,7 +17849,7 @@ export const cs_CZ: EnTranslations = {
       },
       "ambush": {
         "name": "Úder z číhání",
-        "description": "Udeř ze stínů za 250 % poškození zbraně plus {damage}. Musíš být v skrytí a za cílem. Musíš mít dýku. Udělí 1 combo bod.",
+        "description": "Udeř ze stínů za {weaponPercent} % poškození zbraně plus {damage}. Musíš být v skrytí a za cílem. Musíš mít dýku. Udělí 1 combo bod.",
         "specNote_subtlety": "Použití ze Závoje šera přidá 1 Šero (max 3). Při 3 Šeru ji můžeš použít BEZ skrytí a z libovolného úhlu: takové použití nic nestojí, spotřebuje všechna 3 Šera, spustí Stínový závoj na 6 s a zasáhne dvojnásobně."
       },
       "stealth": {
@@ -17950,7 +17950,7 @@ export const cs_CZ: EnTranslations = {
       },
       "solar_step": {
         "name": "Sluneční krok",
-        "description": "Zvýší tvou rychlost pohybu o 150% na 2 s."
+        "description": "Zvýší tvou rychlost pohybu o 150% na {duration} s."
       },
       "solar_invocation": {
         "name": "Sluneční vzývání",
@@ -17958,11 +17958,11 @@ export const cs_CZ: EnTranslations = {
       },
       "radiant_devotion": {
         "name": "Zářivá oddanost",
-        "description": "Zvyšuje tvou sílu kouzel a sílu členů skupiny o 20 na 30 min. Nahrazuje tvou vlastní Oddanost úsvitu nebo milosti, ale koexistuje s Oddanostmi jiných paladinů."
+        "description": "Zvyšuje tvou sílu kouzel a sílu členů skupiny o {buff} na 30 min. Nahrazuje tvou vlastní Oddanost úsvitu nebo milosti. Další paladin, který seslá Zářivou oddanost, ji obnoví místo sčítání; jiná Oddanost koexistuje."
       },
       "dawn_devotion": {
         "name": "Oddanost úsvitu",
-        "description": "Zvyšuje tvou útočnou sílu a sílu členů skupiny o 40 na 30 min. Nahrazuje tvou vlastní Zářivou oddanost nebo Oddanost milosti, ale koexistuje s Oddanostmi jiných paladinů a s válečnickými pokřiky."
+        "description": "Zvyšuje tvou útočnou sílu a sílu členů skupiny o {buff} na 30 min. Nahrazuje tvou vlastní Zářivou oddanost nebo Oddanost milosti. Další paladin, který seslá Oddanost úsvitu, ji obnoví místo sčítání; jiná Oddanost a válečnické pokřiky koexistují."
       },
       "grace_devotion": {
         "name": "Oddanost milosti",
@@ -18303,7 +18303,7 @@ export const cs_CZ: EnTranslations = {
       },
       "life_tap": {
         "name": "Tvrdý obchod",
-        "description": "Přemění {damage} zdraví na {damage} many (o 50 % více many s Krevním úvěrem). Selže, pokud máš {damage} zdraví nebo méně."
+        "description": "Přemění {damage} zdraví na {buff} many. Selže, pokud máš {damage} zdraví nebo méně."
       },
       "cursed_accomplice": {
         "name": "Prokletý spolupachatel",
@@ -18319,7 +18319,7 @@ export const cs_CZ: EnTranslations = {
       },
       "litany_of_guilt": {
         "name": "Litanie viny",
-        "description": "Na 6 s prokleje tvé primární Uhrančivé oko. Zisky Odsouzení uvolní vlnu, která poškodí až 2 další nepřátele v okruhu 8 yardů, nejvýše jednou za sekundu. Stupeň 2 to prodlouží na 8 s a 4 nepřátele."
+        "description": "Na {duration} s prokleje tvé primární Uhrančivé oko. Zisky Odsouzení uvolní vlnu, která poškodí až 2 další nepřátele (od Stupně 2 až 4) v okruhu 8 yardů, nejvýše jednou za sekundu."
       },
       "cinderhide": {
         "name": "Strusková kůže",
@@ -18339,7 +18339,7 @@ export const cs_CZ: EnTranslations = {
       },
       "cruel_pact": {
         "name": "Krutá dohoda",
-        "description": "Obětuje 12 % tvého maximálního zdraví, obnoví 1,5 % tvé maximální many a vygeneruje 20 Odsouzení. Nelze použít při 20 % zdraví nebo méně."
+        "description": "Obětuje 12 % tvého maximálního zdraví, obnoví {buff} % tvé maximální many a vygeneruje 20 Odsouzení. Nelze použít při 20 % zdraví nebo méně."
       },
       "vicarious_suffering": {
         "name": "Zástupné utrpení",
@@ -18394,7 +18394,7 @@ export const cs_CZ: EnTranslations = {
       },
       "moonseed": {
         "name": "Měsíční semeno",
-        "description": "Pouze v Podobě měsíčního křídla. Udeří za {damage} arkánního poškození, přidá 1 Měsíční příliv (nejvýše 3) a prodlouží tvou Měsíční bouři na cíli o 6 s, nejvýše o {duration} s navíc za každé použití Měsíční bouře. Při 3 Měsíčních přílivech se toto tlačítko změní na Měsíční vzedmutí: okamžitý úder za 136 až 162 arkánního poškození (plus síla kouzel), který spotřebuje všechny 3."
+        "description": "Pouze v Podobě měsíčního křídla. Udeří za {damage} arkánního poškození, přidá 1 Měsíční příliv (nejvýše 3) a prodlouží tvou Měsíční bouři na cíli o 6 s, nejvýše o {duration} s navíc za každé použití Měsíční bouře. Při 3 Měsíčních přílivech se toto tlačítko změní na Měsíční vzedmutí: okamžitý těžký arkánní úder, který spotřebuje všechny 3."
       },
       "rejuvenation": {
         "name": "Výtrusové hojení",
@@ -18416,7 +18416,7 @@ export const cs_CZ: EnTranslations = {
       "maul": {
         "name": "Drcení kostí",
         "description": "Tvůj příští úder na blízko způsobí o {damage} více poškození a vytvoří hrozbu rovnou 2,5násobku svého poškození plus malé pevné množství. Pouze v Medvědí podobě.",
-        "specNote_feral": "Každý zásah přidá 1 Starou krev; při 3 Staré krvi se toto tlačítko změní na Lámání morku: úder za 78 až 96 poškození s vysokou hrozbou; pod polovinou zdraví tě místo toho vyléčí o 18 % tvého maximálního zdraví a vrátí 15 vzteku."
+        "specNote_feral": "Každý zásah přidá 1 Starou krev; při 3 Staré krvi se toto tlačítko změní na Lámání morku: těžký úder s vysokou hrozbou; pod polovinou zdraví tě místo toho vyléčí o 18 % tvého maximálního zdraví a vrátí 15 vzteku."
       },
       "growl": {
         "name": "Hrozba",
@@ -18457,7 +18457,7 @@ export const cs_CZ: EnTranslations = {
       },
       "barkskin": {
         "name": "Dubová kůže",
-        "description": "Tvoje kůže ztvrdne jako kůra a zvýší zbroj o 150 na 15 s."
+        "description": "Tvoje kůže ztvrdne jako kůra a zvýší zbroj o {buff} % na 15 s."
       },
       "sacred_bulwark": {
         "name": "Posvátná hradba",
@@ -18470,7 +18470,7 @@ export const cs_CZ: EnTranslations = {
       "starfire": {
         "name": "Pád nebes",
         "description": "Přivolá blesk hvězdného ohně a způsobí {damage} arkánního poškození.",
-        "specNote_balance": "V Podobě měsíčního křídla každé dokončené seslání přidá 1 Měsíční příliv (max 3). Při 3 Měsíčním přílivu se toto tlačítko změní na Sluneční vzedmutí: okamžitý úder za 80 až 100 přírodního poškození plus 45 hoření po dobu 9 s, obnoví 35 many a spotřebuje všechny 3."
+        "specNote_balance": "V Podobě měsíčního křídla každé dokončené seslání přidá 1 Měsíční příliv (max 3). Při 3 Měsíčním přílivu se toto tlačítko změní na Sluneční vzedmutí: okamžitý přírodní úder plus hoření po dobu 9 s, obnoví 35 many a spotřebuje všechny 3."
       },
       "travel_form": {
         "name": "Svižná podoba",
@@ -18518,7 +18518,7 @@ export const cs_CZ: EnTranslations = {
       },
       "rip": {
         "name": "Krvavá trhlina",
-        "description": "Zakončení, které nechá cíl krvácet každé 2 s po 24 s: 72 poškození plus 48 za utracený combo bod (5 bodů: celkem {damage}). Pouze v Kočičí podobě.",
+        "description": "Zakončení, které nechá cíl krvácet každé 2 s po 24 s a způsobí více poškození za každý utracený combo bod (5 bodů: celkem {damage}). Pouze v Kočičí podobě.",
         "specNote_feral": "Zasažený úder přidá 1 Starou krev (max 3)."
       },
       "mortal_strike": {
@@ -18930,7 +18930,7 @@ export const cs_CZ: EnTranslations = {
       },
       "avenging_wrath": {
         "name": "Mstivý hněv",
-        "description": "Rozvine tělesná křídla ze zlaté svaté moci, získá 10 Oddanosti a na 15 s zdvojnásobí Oddanost vytvářenou tvými schopnostmi. Navíc zvyšuje způsobené poškození a léčení o 20 %. Žnec úsvitu: umožňuje Kladivo hněvu proti jakémukoli cíli."
+        "description": "Rozvine tělesná křídla ze zlaté svaté moci, získá 10 Oddanosti a na {duration} s zdvojnásobí Oddanost vytvářenou tvými schopnostmi. Navíc zvyšuje způsobené poškození a léčení o 20 %. Žnec úsvitu: umožňuje Kladivo hněvu proti jakémukoli cíli."
       },
       "berserk": {
         "name": "Rudý opar",
@@ -19188,7 +19188,7 @@ export const cs_CZ: EnTranslations = {
       },
       "body_blow": {
         "name": "Úder na tělo",
-        "description": "Těžký úder za 130 % poškození zbraně plus 10, který uděluje 2 combo body a prohlubuje Redline o jeden dílek. (engine Thuggery)"
+        "description": "Těžký úder za {weaponPercent} % poškození zbraně plus {damage}, který uděluje 2 combo body a přidá 1 Redline (max 4). (Thuggery)"
       },
       "knockout_blow": {
         "name": "Nokautující úder",

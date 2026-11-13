@@ -5406,7 +5406,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Si no seleccionas a un jugador aliado, enlaza tu ojo maléfico y hace que su Mirada genere 2 de Condena. Al enlazar a un aliado, su daño al objetivo de Mal de ojo genera 3. Solo puede activarse una vez cada 2 s.',
   'entities.abilities.litany_of_guilt.name': 'Liturgia de culpa',
   'entities.abilities.litany_of_guilt.description':
-    'Maldice tu Mal de ojo principal durante 8 s. Obtener Condena libera una onda que daña a un máximo de 4 enemigos más en 8 m, como máximo una vez por segundo.',
+    'Maldice tu Mal de ojo principal durante {duration} s. Obtener Condena libera una onda que daña a un máximo de 2 enemigos más (4 desde el Rango 2) en 8 m, como máximo una vez por segundo.',
   'entities.abilities.umbral_anchor.name': 'Ancla umbría',
   'entities.abilities.umbral_anchor.description':
     'Primer uso: ancla tu sombra a tus pies durante 5 min. Vuelve a lanzarla a menos de 40 m del ancla para teletransportarte de vuelta a ella, consumiendo el ancla e iniciando un tiempo de reutilización de 45 s.',
@@ -5415,7 +5415,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Maldice al enemigo durante 8 s. Cada 2 s sufre 17 de daño de Sombras más una parte de tu poder con hechizos, y ganas 2 de Condena. Las primeras 3 veces que el enemigo maldito inflige daño, ganas 7 de Condena y sufre 17 de daño de Sombras.',
   'entities.abilities.cruel_pact.name': 'Pacto cruel',
   'entities.abilities.cruel_pact.description':
-    'Sacrifica un 12% de tu salud máxima para generar 20 de Condena. No se puede usar con un 15% de salud o menos.',
+    'Sacrifica un 12% de tu salud máxima para restaurar un {buff}% de tu maná máximo y generar 20 de Condena. No se puede usar con un 20% de salud o menos.',
   'entities.abilities.vicarious_suffering.name': 'Sufrimiento vicario',
   'entities.abilities.vicarious_suffering.description':
     'Durante 8 s, cada golpe hostil sobre el objetivo genera 3 de Condena, hasta 15 en total. Sobre ti, reduce el daño recibido un 20%. Sobre un aliado, redirige hacia ti el 20% de cada golpe hostil, pero nunca te baja del 15% de salud.',
@@ -6401,7 +6401,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Durante 6 s: tus aperturas del Velo Crepuscular funcionan sin sigilo y desde cualquier ángulo, e infliges un 10% más de daño. Tu primer Golpe del Acechador dentro de este efecto inflige un 50% más de daño de arma. (motor de Sutileza)',
   'entities.abilities.body_blow.name': 'Golpe al cuerpo',
   'entities.abilities.body_blow.description':
-    'Un golpe contundente por el 130% del daño del arma más 10 que otorga 2 puntos de combo y profundiza la Redline un nivel. (motor de Thuggery)',
+    'Un golpe contundente por el {weaponPercent}% del daño del arma más {damage}. Otorga 2 puntos de combo y añade 1 de Redline (máx. 4). (Thuggery)',
   'entities.abilities.knockout_blow.name': 'Golpe de nocaut',
   'entities.abilities.knockout_blow.description':
     'Termina la Redline con un nocaut: golpea por {damage} de daño Físico, con un 25% más de fuerza por cada Golpe al cuerpo que lanzaste durante la Redline (hasta 3), y recupera 25 de energía. El daño aumenta con el poder de ataque. Úsalo antes de que se acabe la Redline o perderás el nocaut. (motor de Combate)',
@@ -9275,7 +9275,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Tus próximos dos hechizos con tiempo de lanzamiento pueden lanzarse en movimiento. Dura 15 s. (Talento de mago)',
   'entities.abilities.ignition.name': 'Ignición',
   'entities.abilities.ignition.description':
-    'Pasivo: cuando tus hechizos de Fuego asestan un golpe crítico, el objetivo arde y sufre un 30% adicional del daño infligido durante 6 s. Una nueva quemadura sobre un objetivo que ya está ardiendo se suma al daño pendiente y reinicia el temporizador de 6 s. (Maestría de Fuego)',
+    'Pasivo: cuando tus hechizos de Fuego asestan un golpe crítico, el objetivo arde y sufre un 1,5% adicional del daño infligido por nivel de personaje (un 30% en el nivel 20) durante 6 s. Una nueva quemadura sobre un objetivo que ya está ardiendo se suma al daño pendiente y reinicia el temporizador de 6 s. (Maestría de Fuego)',
   'entities.abilities.mass_barrier.name': 'Barrera masiva',
   'entities.abilities.mass_barrier.description':
     'Protege a ti y hasta a 4 aliados cercanos en un radio de 30 m; cada escudo absorbe {damage} de daño durante 15 s. (Talento de mago)',
@@ -9519,7 +9519,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Corrompe al objetivo y causa {damage} de daño de las Sombras durante 18 s.',
   'entities.abilities.life_tap.name': 'Trato Amargo',
   'entities.abilities.life_tap.description':
-    'Convierte {damage} de salud en {damage} de maná (un 50% más de maná con Crédito de Sangre). Falla si tienes {damage} de salud o menos.',
+    'Convierte {damage} de salud en {buff} de maná. Falla si tienes {damage} de salud o menos.',
   'entities.abilities.curse_of_agony.name': 'Sortilegio de Angustia',
   'entities.abilities.curse_of_agony.description':
     'Maldice al objetivo con agonía: {damage} de daño de las Sombras durante 24 s.',
@@ -9566,7 +9566,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.regrowth.name': 'Segundo Florecer',
   'entities.abilities.barkskin.name': 'Piel de Roble',
   'entities.abilities.barkskin.description':
-    'Tu piel se endurece como corteza y aumenta la armadura en 150 durante 15 s.',
+    'Tu piel se endurece como corteza y aumenta la armadura un {buff}% durante 15 s.',
   'entities.abilities.starfire.name': 'Caída Celeste',
   'entities.abilities.travel_form.name': 'Forma Fleet',
   'entities.abilities.travel_form.description':
@@ -15218,7 +15218,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.avatar.description':
     'Rompe los aturdimientos, miedos, inmovilizaciones, silencios, desarmes y ralentizaciones que sufres (no los de jefes) y luego te conviertes en un coloso durante 20 s, infligiendo un 20% más de daño. No te protege de nuevos efectos de control.',
   'entities.abilities.avenging_wrath.description':
-    'Despliega alas físicas de poder sagrado dorado, ganando 10 de Devoción y duplicando la Devoción generada por tus habilidades durante 15 s. Aumenta además un 20% el daño y la sanación que realizas. Segador del alba: permite Martillo de Ira contra cualquier objetivo.',
+    'Despliega alas físicas de poder sagrado dorado, ganando 10 de Devoción y duplicando la Devoción generada por tus habilidades durante {duration} s. Aumenta además un 20% el daño y la sanación que realizas. Segador del alba: permite Martillo de Ira contra cualquier objetivo.',
   'entities.abilities.berserk.description':
     'Aumenta tu poder de ataque en 70 durante 15 s. (talento de Druida)',
   'entities.abilities.bladestorm.name': 'Tormenta de cuchillas',
@@ -16497,7 +16497,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.beacon_of_light.description':
     'Marca a un miembro del grupo como tu Faro de Luz. El 50% de tu sanación directa efectiva sobre otro miembro del grupo a menos de 60 m también sana al Faro. La sanación de área y periódica no se transfiere. Dura hasta que uno de los dos muera.',
   'entities.abilities.dawn_devotion.description':
-    'Aumenta el poder de ataque tuyo y de los miembros del grupo en 40 durante 30 min. Reemplaza tu propia Devoción Radiante o de Gracia, pero coexiste con las Devociones de otros paladines y con los gritos de guerrero.',
+    'Aumenta el poder de ataque tuyo y de los miembros del grupo en {buff} durante 30 min. Reemplaza tu propia Devoción Radiante o de Gracia. Si otro paladín lanza Devoción del Alba, la renueva en lugar de acumularse; una Devoción distinta y los gritos de guerrero coexisten.',
   'entities.abilities.dawnfall.description':
     'Inflige {damage} de daño Sagrado a los enemigos cercanos y genera 1 de Devoción. Golpear al menos a un enemigo reduce en 2 s el tiempo de reutilización restante del Edicto Final. La Ascensión aumenta su daño un 50% y su radio a 10 m.',
   'entities.abilities.dawns_embrace.description':
@@ -16529,7 +16529,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.radiant_chorus.description':
     'Sana a los aliados cercanos por {damage} y genera 1 de Devoción. Sanar de forma efectiva al menos a 2 aliados otorga Resonancia Radiante durante 10 s: tu próxima Luz Reparadora es instantánea, o tu próximo Abrazo del Alba cuesta un 50% menos de maná y se lanza en 1,5 s. La Ascensión aumenta la sanación del Coro Radiante un 20% y su radio a 40 m.',
   'entities.abilities.radiant_devotion.description':
-    'Aumenta el poder con hechizos tuyo y de los miembros del grupo en 20 durante 30 min. Reemplaza tu propia Devoción del Alba o de Gracia, pero coexiste con las Devociones de otros paladines.',
+    'Aumenta el poder con hechizos tuyo y de los miembros del grupo en {buff} durante 30 min. Reemplaza tu propia Devoción del Alba o de Gracia. Si otro paladín lanza Devoción Radiante, la renueva en lugar de acumularse; una Devoción distinta coexiste.',
   'entities.abilities.recall_the_fallen.description':
     'Devuelve a la vida a un miembro muerto del grupo a tu lado con un 35% de salud y maná. Un Sanador del Sol de nivel 16 o superior llama de vuelta a todos los miembros caídos del grupo en un radio de 30 yardas y dentro de tu línea de visión.',
   'entities.abilities.sacred_challenge.description':
@@ -16543,7 +16543,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.solar_invocation.description':
     'Sana al instante a un aliado por {damage} o inflige 120 a 150 de daño Sagrado base a un enemigo. El daño aumenta con el poder con hechizos y la sanación con el poder de sanación. Cualquiera de los dos usos genera 1 de Devoción. Durante la Ascensión, un lanzamiento de sanación también sana a los jugadores aliados a menos de 10 m del objetivo por la mitad.',
   'entities.abilities.solar_step.description':
-    'Aumenta tu velocidad de movimiento un 150% durante 2 s.',
+    'Aumenta tu velocidad de movimiento un 150% durante {duration} s.',
   'entities.abilities.sun_gods_verdict.description':
     'Juzga a un enemigo bajo el Veredicto del Dios Sol durante 30 s. El Edicto Final y la Caída del Alba inscriben una carga con cada impacto certero. La habilidad que coloque la tercera carga dicta la sentencia: el Edicto Final desata un daño devastador sobre el condenado; la Caída del Alba detona el veredicto, dañando y aturdiendo a los enemigos cercanos durante 1,5 s.',
   'entities.abilities.sunward_disc.description':
@@ -16703,7 +16703,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Consume tus 3 de Marea Lunar para un golpe pesado de {damage} de daño Arcano: la opción de daño. Estela Solar consume los mismos 3 de Marea Lunar, así que elige una.',
   'entities.abilities.moonseed.name': 'Semilla Lunar',
   'entities.abilities.moonseed.description':
-    'Solo en Forma de lechúcico lunar. Golpea por {damage} de daño Arcano, añade 1 de Marea Lunar (máx. 3) y extiende 6 s tu Tempestad Lunar sobre el objetivo, hasta {duration} s adicionales por aplicación de Tempestad Lunar. Con 3 de Marea Lunar, este botón se convierte en Oleada Lunar: un golpe instantáneo de 136 a 162 de daño Arcano (más poder con hechizos) que gasta las 3.',
+    'Solo en Forma de lechúcico lunar. Golpea por {damage} de daño Arcano, añade 1 de Marea Lunar (máx. 3) y extiende 6 s tu Tempestad Lunar sobre el objetivo, hasta {duration} s adicionales por aplicación de Tempestad Lunar. Con 3 de Marea Lunar, este botón se convierte en Oleada Lunar: un golpe Arcano instantáneo y contundente que gasta las 3.',
   'entities.abilities.overbloom.name': 'Sobrefloración',
   'entities.abilities.overbloom.description':
     'Consume 3 de Verdor. Cosecha cada sanación periódica tuya en todos los aliados por un {buff}% de su sanación restante, elimina esos efectos y planta una Remiendo de Esporas nueva en el objetivo.',
@@ -16806,11 +16806,11 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Abre una brecha en el lugar seleccionado, que atrae hacia su centro a los enemigos en un radio de 8 m, inflige {damage} de daño de las Sombras y los aturde durante 2 s. Los jefes reciben el daño pero resisten la atracción y el aturdimiento.',
   'entities.abilities.abyssal_rift.name': 'Brecha Abisal',
   'entities.abilities.ambush.description':
-    'Golpea desde las sombras por un 250% de daño de arma más {damage}. Debes estar en sigilo y detrás del objetivo. Requiere una daga. Otorga 1 punto de combo.',
+    'Golpea desde las sombras por un {weaponPercent}% de daño de arma más {damage}. Debes estar en sigilo y detrás del objetivo. Requiere una daga. Otorga 1 punto de combo.',
   'entities.abilities.ambush.specNote_subtlety':
     'Usada desde el Velo Crepuscular, añade 1 de Penumbra (máx. 3). Con 3 de Penumbra puedes usarla SIN sigilo y desde cualquier ángulo: ese uso no cuesta nada, gasta toda la Penumbra, activa el Velo de Sombras de 6 s y golpea por el doble.',
   'entities.abilities.backstab.description':
-    'Clava tu daga en la espalda del objetivo por un 150% de daño de arma más {damage}. Debes estar detrás del objetivo. Requiere una daga. Otorga 1 punto de combo.',
+    'Clava tu daga en la espalda del objetivo por un {weaponPercent}% de daño de arma más {damage}. Debes estar detrás del objetivo. Requiere una daga. Otorga 1 punto de combo.',
   'entities.abilities.backstab.specNote_assassination':
     'Cada golpe añade 1 de Ritual de Veneno (máx. 6) y restaura 15 de energía. Con 6 de Ritual de Veneno, Descanso Eterno se convierte en Desgarro venenoso (inflige al instante todo el daño de sangrado que te quedaba).',
   'entities.abilities.blade_flurry.description':
@@ -16836,7 +16836,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.eviscerate.specNote_assassination':
     'Con 6 de Ritual de Veneno, este botón se convierte en Desgarro venenoso: un golpe que inflige al instante todo el daño que tus sangrados aún habrían causado, planta una herida venenosa nueva y restaura 20 de energía.',
   'entities.abilities.eviscerate.specNote_combat':
-    'Conectar este golpe con 4 o más puntos de combo activa la Redline durante 8 s: Tajo Perverso se convierte en Golpe al cuerpo y este botón se convierte en Golpe de nocaut (45 más 35 por punto de combo, un 25% más fuerte por cada Golpe al cuerpo que lances durante la Redline, restaura 25 de energía). Gástalo antes de que termine la Redline.',
+    'Conectar este golpe con 4 o más puntos de combo activa la Redline durante 8 s: Tajo Perverso se convierte en Golpe al cuerpo y este botón se convierte en Golpe de nocaut (un remate que golpea un 25% más fuerte por cada Golpe al cuerpo que lances durante la Redline y restaura 25 de energía). Gástalo antes de que termine la Redline.',
   'entities.abilities.expose_armor.description':
     'Movimiento final que expone al objetivo durante 30 s: cada punto de combo gastado reduce su armadura un 2% (5 puntos de combo: {damage}%).',
   'entities.abilities.faerie_fire.description':
@@ -16858,7 +16858,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.description':
     'Tu siguiente golpe cuerpo a cuerpo inflige {damage} de daño adicional y genera una amenaza igual a 2,5 veces su daño más una pequeña cantidad fija. Solo en Forma de Bruin.',
   'entities.abilities.maul.specNote_feral':
-    'Cada golpe conectado añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Quiebramédula: un golpe de 78 a 96 de daño con alta amenaza; por debajo de la mitad de salud, en su lugar te sana un 18% de tu salud máxima y restaura 15 de ira.',
+    'Cada golpe conectado añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Quiebramédula: un golpe contundente con alta amenaza; por debajo de la mitad de salud, en su lugar te sana un 18% de tu salud máxima y restaura 15 de ira.',
   'entities.abilities.moonfire.description':
     'Quema al enemigo por {damage} de daño Arcano y luego {overTime} más de daño Arcano durante {duration} s.',
   'entities.abilities.moonfire.specNote_balance':
@@ -16879,7 +16879,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rejuvenation.specNote_restoration':
     'Cada lanzamiento añade 1 de Verdor (máx. 3), incluso si renueva una floración que ya está activa. Con 3 de Verdor, Alivio presto se convierte en Sobrefloración.',
   'entities.abilities.rip.description':
-    'Remate que hace sangrar al objetivo cada 2 s durante 24 s: 72 de daño más 48 por punto de combo gastado (5 puntos: {damage} en total). Solo en Forma felina.',
+    'Remate que hace sangrar al objetivo cada 2 s durante 24 s e inflige más daño por cada punto de combo gastado (5 puntos: {damage} en total). Solo en Forma felina.',
   'entities.abilities.rip.specNote_feral': 'El golpe conectado añade 1 de Sangre Antigua (máx. 3).',
   'entities.abilities.ruinous_brand.description':
     'Marca a un enemigo durante 15 s. Tus siguientes 3 hechizos directos resuenan por un 25% de daño contra el enemigo marcado, o copian un 50% del daño hacia él cuando los lanzas contra otro objetivo.',
@@ -16894,7 +16894,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sinister_strike.specNote_assassination':
     'Añade 1 de Ritual de Veneno (máx. 6).',
   'entities.abilities.sinister_strike.specNote_combat':
-    'Mientras la Redline está activa, este botón se convierte en Golpe al cuerpo: 130% de daño de arma más 10, otorga 2 puntos de combo y añade 1 nivel de Redline (máx. 4).',
+    'Mientras la Redline está activa, este botón se convierte en Golpe al cuerpo: un golpe de arma más fuerte que otorga 2 puntos de combo y añade 1 nivel de Redline (máx. 4).',
   'entities.abilities.slice_and_dice.description':
     'Movimiento final que aumenta la velocidad de ataque cuerpo a cuerpo un 30% durante 12 s más 4 s por punto de combo (5 puntos de combo: 32 s).',
   'entities.abilities.soul_lance.description':
@@ -16906,7 +16906,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.description':
     'Invoca un rayo de fuego estelar que causa {damage} de daño Arcano.',
   'entities.abilities.starfire.specNote_balance':
-    'En Forma de lechúcico lunar, cada lanzamiento completado añade 1 de Marea Lunar (máx. 3). Con 3 de Marea Lunar, este botón se convierte en Estela Solar: un golpe instantáneo de 80 a 100 de daño de Naturaleza más una quemadura de 45 a lo largo de 9 s, que restaura 35 de maná y gasta toda la Marea Lunar.',
+    'En Forma de lechúcico lunar, cada lanzamiento completado añade 1 de Marea Lunar (máx. 3). Con 3 de Marea Lunar, este botón se convierte en Estela Solar: un golpe de Naturaleza instantáneo más una quemadura a lo largo de 9 s, que restaura 35 de maná y gasta toda la Marea Lunar.',
   'entities.abilities.stealth.description':
     'Te ocultas entre las sombras. Los jugadores y mascotas enemigos no pueden verte, y los monstruos solo te notan desde mucho más cerca de lo normal (desde más lejos si te superan en nivel). Te mueves a velocidad completa. Atacar o recibir daño rompe el Velo Crepuscular. Vuelve a lanzarla para salir.',
   'entities.abilities.stealth.specNote_subtlety':

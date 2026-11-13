@@ -6080,7 +6080,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '{damage}の物理ダメージを与えるフィニッシュムーブです。ダメージは攻撃力とともに上がります。',
   'entities.abilities.backstab.name': '卑劣な突き',
   'entities.abilities.backstab.description':
-    '対象を背後から刺し、武器ダメージの150%に {damage} を加えたダメージを与えます。対象の背後にいる必要があります。ダガーが必要です。コンボポイントを1獲得します。',
+    '対象を背後から刺し、武器ダメージの{weaponPercent}%に {damage} を加えたダメージを与えます。対象の背後にいる必要があります。ダガーが必要です。コンボポイントを1獲得します。',
   'entities.abilities.gouge.name': '目潰し',
   'entities.abilities.gouge.description':
     '対象を打って{damage}ダメージを与え、4秒間行動不能にします。ダメージを受けると効果が切れます。コンボポイントを1獲得します。',
@@ -6096,7 +6096,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '対象を2秒に加えコンボポイント1つにつき1秒スタンさせるフィニッシュ技（コンボポイント5：7秒）。',
   'entities.abilities.ambush.name': '潜伏者の一撃',
   'entities.abilities.ambush.description':
-    'ステルス中に対象の背後から奇襲し、武器ダメージの250%に {damage} を加えたダメージを与えます。ダガーが必要です。コンボポイントを1獲得します。',
+    'ステルス中に対象の背後から奇襲し、武器ダメージの{weaponPercent}%に {damage} を加えたダメージを与えます。ダガーが必要です。コンボポイントを1獲得します。',
   'entities.abilities.stealth.name': 'ダスクヴェール',
   'entities.abilities.stealth.description':
     '影に身を隠します。敵プレイヤーとペットにはあなたが見えず、モンスターは通常よりずっと近づかないとあなたに気づきません(レベルが上の相手ならもっと遠くから)。通常の速度で移動できます。攻撃するかダメージを受けるとダスクヴェールは解除されます。再使用で解除できます。',
@@ -6295,7 +6295,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '対象を堕落させ、18秒間で {damage} の暗黒ダメージを与えます。',
   'entities.abilities.life_tap.name': '過酷な取引',
   'entities.abilities.life_tap.description':
-    '体力{damage}をマナ{damage}に変換します(血の貸しでは得られるマナが50%増加)。体力が{damage}以下の場合は失敗します。',
+    '体力{damage}をマナ{buff}に変換します。体力が{damage}以下の場合は失敗します。',
   'entities.abilities.curse_of_agony.name': '苦悶の呪い',
   'entities.abilities.curse_of_agony.description':
     '対象に苦痛の呪いをかけ、24秒間で {damage} の暗黒ダメージを与えます。',
@@ -6364,7 +6364,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '味方を{damage}回復し、その後15秒かけてさらに{overTime}回復します。継続回復が最後まで持続すると、最初の回復量(クリティカルボーナス適用前)と同じ量でもう一度対象を回復します。スウィフトメンド、満開、再詠唱などで途中で終了した場合、その回復は発生しません。',
   'entities.abilities.barkskin.name': '樫の肌',
   'entities.abilities.barkskin.description':
-    '肌が樹皮のように硬くなり、15秒間アーマーが150増加します。',
+    '肌が樹皮のように硬くなり、15秒間アーマーが{buff}%増加します。',
   'entities.abilities.sacred_bulwark.name': '聖なる防壁',
   'entities.abilities.sacred_bulwark.description':
     '{duration}秒間、次に敵から受ける致命的な一撃を無効化し、代わりに体力を最大値の35%まで回復します。',
@@ -6406,7 +6406,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'エネルギーを{rage}回復し、攻撃力を{duration}秒間{buff}上昇させます。キャットフォーム専用。',
   'entities.abilities.rip.name': '血裂',
   'entities.abilities.rip.description':
-    'フィニッシュ技。標的に2秒ごと、24秒間出血させます。72ダメージに消費コンボポイントごと48を加算します（5ポイントで合計{damage}）。キャットフォーム専用。',
+    'フィニッシュ技。標的に2秒ごと、24秒間出血させます。消費したコンボポイントが多いほどダメージが増えます（5ポイントで合計{damage}）。キャットフォーム専用。',
   'entities.abilities.mortal_strike.name': '重傷の一撃',
   'entities.abilities.mortal_strike.description':
     '武器ダメージに{damage}を加えた攻撃を放ち、10秒間、対象が受ける回復量を50%低下させます。さらに、6秒かけて2回に分けて合計{overTime}の物理ダメージを与える出血、抉れた傷も付与します。(武器のシグネチャ)',
@@ -14736,7 +14736,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_wild.description':
     '30ヤード以内の味方を野生の力で鼓舞し、攻撃力を45、攻撃速度を5%上昇させる。効果時間5分。（ハンターのタレント）',
   'entities.abilities.avenging_wrath.description':
-    '黄金の神聖なる力でできた実体の翼を広げ、献身を10得て、15秒間あなたのアビリティが生む献身を二倍にします。さらに与えるダメージと回復量を20%高めます。暁の刈り手：ヘイマー・オヴ・ラースをあらゆる対象へ使えるようにします。',
+    '黄金の神聖なる力でできた実体の翼を広げ、献身を10得て、{duration}秒間あなたのアビリティが生む献身を二倍にします。さらに与えるダメージと回復量を20%高めます。暁の刈り手：ヘイマー・オヴ・ラースをあらゆる対象へ使えるようにします。',
   'entities.abilities.berserk.description':
     '攻撃力を70上昇させる。効果時間15秒。（ドルイドのタレント）',
   'entities.abilities.blink.description': '15ヤード前方へ瞬間移動し、移動不能効果を解除します。',
@@ -14899,7 +14899,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '次の詠唱時間のある呪文2回を移動しながら発動できます。15秒間持続します。（メイジタレント）',
   'entities.abilities.ignition.name': 'イグニッション',
   'entities.abilities.ignition.description':
-    'パッシブ：火の呪文がクリティカルになると、対象は与えたダメージの30%を追加で6秒かけて燃え続けます。すでに燃えている対象に新たな燃焼が加わると、残りのダメージに加算され、6秒のタイマーが最初からになります。(火のマスタリー)',
+    'パッシブ：火の呪文がクリティカルになると、対象はキャラクターレベルごとに与えたダメージの1.5%（レベル20で30%）を追加で6秒かけて燃え続けます。すでに燃えている対象に新たな燃焼が加わると、残りのダメージに加算され、6秒のタイマーが最初からになります。(火のマスタリー)',
   'entities.abilities.mass_barrier.name': 'マスバリア',
   'entities.abilities.mass_barrier.description':
     '自身と30メートル以内にいる近くの味方最大4人に、それぞれ{damage}ダメージを吸収するシールドを15秒間付与します。（メイジタレント）',
@@ -17343,7 +17343,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '12秒間、血鉤が対象から5ヤード以内の他の敵最大2体にも威力60%の血鉤の傷を与え、傷裂きが生きたペットに対象へ18の物理ダメージを与えさせ、榴散弾装薬は射程が2ヤード伸び、主対象への基礎ダメージが25%増え、即時に発生する傷のダメージが50%増えます。生きたペットがいない間は、集中値の回復速度も100%上がります。',
   'entities.abilities.bloodtrail_assault.name': '血跡強襲',
   'entities.abilities.body_blow.description':
-    '武器ダメージの130%に10を加えた重い一撃。コンボポイントを2獲得し、レッドラインのピップを1増やす（最大4）。（コンバット）',
+    '武器ダメージの{weaponPercent}%に{damage}を加えた重い一撃。コンボポイントを2獲得し、レッドラインのピップを1増やす（最大4）。（コンバット）',
   'entities.abilities.body_blow.name': 'ヘイメーカー',
   'entities.abilities.bone_armor.description':
     '{duration}秒間、骨で身を包み、最大体力の20%に相当するダメージを吸収します。',
@@ -17368,7 +17368,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '対象に主要な邪眼が必要です。その周囲15ヤード以内の他の敵最大4体に、15秒間副次的な邪眼を設置します。副次的な邪眼は通常の50%の速度で断罪を生成し、宣告はそれぞれにダメージの35%を反響させます。',
   'entities.abilities.coven.name': '魔女盟約',
   'entities.abilities.cruel_pact.description':
-    '最大体力の12%を捧げて断罪を20生成します。体力が15%以下では使用できません。',
+    '最大体力の12%を捧げて最大マナの{buff}%を回復し、断罪を20生成します。体力が20%以下では使用できません。',
   'entities.abilities.cruel_pact.name': '残酷な契約',
   'entities.abilities.cursed_accomplice.description':
     '味方プレイヤーを選択していない場合は呪眼と結び、その凝視で断罪を2生成します。味方と結ぶと、その味方が邪眼対象へ与えるダメージで3生成します。発動は2秒に1回までです。',
@@ -17377,7 +17377,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '現在の体力の10%を捧げ、8秒間、最大体力の30%に相当するダメージを吸収します。',
   'entities.abilities.dark_pact.name': '血の盟約',
   'entities.abilities.dawn_devotion.description':
-    '30分間、自身とパーティメンバーの攻撃力を40増加させる。自身の光輝または恩寵の献身を置き換えるが、他のパラディンの献身やウォリアーの雄叫びとは共存する。',
+    '30分間、自身とパーティメンバーの攻撃力を{buff}増加させる。自身の光輝または恩寵の献身を置き換えるが、他のパラディンの献身やウォリアーの雄叫びとは共存する。',
   'entities.abilities.dawn_devotion.name': '暁の献身',
   'entities.abilities.dawnfall.description':
     '周囲の敵に{damage}の神聖ダメージを与え、献身を1生成します。1体以上に命中すると、最後の勅令の残りクールダウンが2秒短縮されます。昇天中はダメージが50%増加し、範囲が10メートルになります。',
@@ -17400,7 +17400,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.eviscerate.specNote_assassination':
     '毒の儀式が6段階のとき、このボタンは毒裂きに変化する：出血効果が与えるはずだった残りダメージを即座にすべて与え、新しい毒の傷を刻み、エナジーを20回復する一撃。',
   'entities.abilities.eviscerate.specNote_combat':
-    'コンボポイント4以上で命中させると、8秒間のレッドラインが始まります。邪悪な斬撃はヘイメーカーに、このボタンは消灯に変わります(45にコンボポイントごとに35を加えたダメージ。レッドライン中に放ったヘイメーカー1回ごとに25%強化され、エナジーを25回復)。レッドラインが終わる前に使ってください。',
+    'コンボポイント4以上で命中させると、8秒間のレッドラインが始まります。邪悪な斬撃はヘイメーカーに、このボタンは消灯に変わります(レッドライン中に放ったヘイメーカー1回ごとに25%強化されるフィニッシュ技で、エナジーを25回復)。レッドラインが終わる前に使ってください。',
   'entities.abilities.faithforged_guard.description':
     '8秒間、次に受ける敵の攻撃に報いる。最大{buff}のダメージを打ち消し、同量を神聖ダメージとして攻撃者に返し、信仰を1得る。報いるのは1撃のみ。昇天は報いられる量を50%増加させる。',
   'entities.abilities.faithforged_guard.name': '聖光の負債',
@@ -17457,7 +17457,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '武器に生命の水を宿し、癒しの水流への蓄積量を20%増加させます。',
   'entities.abilities.lifespring_weapon.name': '命泉の武器',
   'entities.abilities.litany_of_guilt.description':
-    '主要な邪眼を8秒間呪います。断罪を獲得するたびに波動を放ち、8ヤード以内にいる他の敵最大4体にダメージを与えます。発動は1秒に1回までです。',
+    '主要な邪眼を{duration}秒間呪います。断罪を獲得するたびに波動を放ち、8ヤード以内にいる他の敵最大2体(ランク2からは4体)にダメージを与えます。発動は1秒に1回までです。',
   'entities.abilities.litany_of_guilt.name': '罪責の連祷',
   'entities.abilities.maledict_gaze.description':
     'あなたと主要な邪眼の対象の敵がともに戦闘中で、互いに30ヤード以内かつ視線が通っている間、呪眼が2.5秒ごとにその敵を攻撃して影ダメージを与えます。邪眼憑依は攻撃速度を2倍にします。',
@@ -17468,7 +17468,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.martyrs_aegis.description': '味方1体が受けるダメージを8秒間40%軽減する。',
   'entities.abilities.martyrs_aegis.name': '殉教者の盾',
   'entities.abilities.maul.specNote_feral':
-    '命中した攻撃ごとに古き血を1蓄える。古き血が3のとき、このボタンは骨髄砕きに変化する：78から96のダメージを与える高脅威の一撃。体力が半分未満のときは、代わりに最大体力の18%を回復し、怒りを15回復する。',
+    '命中した攻撃ごとに古き血を1蓄える。古き血が3のとき、このボタンは骨髄砕きに変化する：高脅威の強力な一撃。体力が半分未満のときは、代わりに最大体力の18%を回復し、怒りを15回復する。',
   'entities.abilities.measured_shot.description':
     '慎重に狙った一射で{damage}の物理ダメージを与え、命中時に集中値を20生成します。',
   'entities.abilities.measured_shot.name': '精密射撃',
@@ -17480,7 +17480,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '月潮を3消費し、{damage}の秘術ダメージの強撃を放つ、ダメージ重視の選択肢。陽醒も同じ月潮3を消費するため、どちらか一方を選ぶこと。',
   'entities.abilities.moonlash.name': 'ムーンサージ',
   'entities.abilities.moonseed.description':
-    'ムーンキンフォーム専用。{damage}の秘術ダメージを与え、月潮を1得て(最大3)、対象にかかっている月の嵐を6秒延長します。月の嵐1回の付与につき最大{duration}秒の追加延長までです。月潮が3のとき、このボタンはムーンサージに変わります。3すべてを消費して、136から162の秘術ダメージ(呪文威力を加算)を与える即時攻撃です。',
+    'ムーンキンフォーム専用。{damage}の秘術ダメージを与え、月潮を1得て(最大3)、対象にかかっている月の嵐を6秒延長します。月の嵐1回の付与につき最大{duration}秒の追加延長までです。月潮が3のとき、このボタンはムーンサージに変わります。3すべてを消費する、即時の強力な秘術攻撃です。',
   'entities.abilities.moonseed.name': '月の種',
   'entities.abilities.needle_of_fate.description':
     '敵を貫いて{damage}の影ダメージを与えます。対象に自分の邪眼があれば断罪を{needleDoom}生成し、邪眼がなければ先に対象を指定します。',
@@ -17512,7 +17512,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '周囲の味方を{damage}回復し、献身を1生成します。2人以上の味方を実際に回復すると、光輝の共鳴を10秒間得ます。次の癒しの光が即時発動になるか、次の暁の抱擁のマナ消費が50%減少して詠唱時間が1.5秒になります。昇天中は光輝の合唱の回復量が20%増加し、範囲が40メートルになります。',
   'entities.abilities.radiant_chorus.name': '光輝の合唱',
   'entities.abilities.radiant_devotion.description':
-    '30分間、自身とパーティメンバーの呪文威力を20増加させる。自身の暁または恩寵の献身を置き換えるが、他のパラディンの献身とは共存する。',
+    '30分間、自身とパーティメンバーの呪文威力を{buff}増加させる。自身の暁または恩寵の献身を置き換えるが、他のパラディンの献身とは共存する。',
   'entities.abilities.radiant_devotion.name': '光輝の献身',
   'entities.abilities.raise_bone_mage.description':
     '魂の欠片を2個消費し、永続する遠隔型の骨魔導士を2枠のドミニオンに加える。同時に従えるのは1体まで。攻撃は6秒間受ける魔法ダメージを5%増加させ、リーピング・コマンドでは8%に強化する。',
@@ -17573,11 +17573,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shrapnel_charge.name': '榴散弾装薬',
   'entities.abilities.sinister_strike.specNote_assassination': '毒の儀式を1段階進める（最大6）。',
   'entities.abilities.sinister_strike.specNote_combat':
-    'レッドライン中、このボタンはヘイメーカーに変化する：武器ダメージの130%に10を加えたダメージを与え、コンボポイントを2獲得し、レッドラインのピップを1増やす（最大4）。',
+    'レッドライン中、このボタンはヘイメーカーに変化する：より重い武器攻撃で、コンボポイントを2獲得し、レッドラインのピップを1増やす（最大4）。',
   'entities.abilities.solar_invocation.description':
     '味方を即座に{damage}回復するか、敵に基礎120から150の神聖ダメージを与えます。ダメージは呪文威力、回復は治癒力とともに上がります。どちらの場合も献身を1生成します。昇天中に回復として使用すると、対象から10メートル以内の味方プレイヤーも半分の量だけ回復します。',
   'entities.abilities.solar_invocation.name': '太陽の祈願',
-  'entities.abilities.solar_step.description': '2秒間、移動速度を150%増加させる。',
+  'entities.abilities.solar_step.description': '{duration}秒間、移動速度を150%増加させる。',
   'entities.abilities.solar_step.name': '陽光の歩み',
   'entities.abilities.soul_harvest.description':
     '敵の魂を切り裂いて{damage}のシャドウダメージを与え、魂の欠片を1個生成する。最大5個。',
@@ -17592,7 +17592,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '獣を3体、12秒間召喚します。各獣は2秒ごとに攻撃し、{damage}の物理ダメージを与えます。表示ダメージには、ペットダメージボーナス適用前の遠隔攻撃力の8%が含まれます。獣は召喚時の群れの獰猛さを記録し、1スタックごとにダメージが10%増加します。獣群突撃がクールダウン中、群れの指令が命中するたびに20%の確率でクールダウンがリセットされ、5回目の判定では必ずリセットされます。獣が活動中はリセットされません。(野獣熟達)',
   'entities.abilities.stampede.name': '獣群突撃',
   'entities.abilities.starfire.specNote_balance':
-    '月翼形態では、詠唱を完了するたびに月潮が1段階進む（最大3）。月潮が3段階のとき、このボタンは陽醒に変化する：160から190の自然ダメージに加え、9秒かけて75の炎上ダメージを与え、マナを35回復し、3段階すべてを消費する即時攻撃。',
+    '月翼形態では、詠唱を完了するたびに月潮が1段階進む（最大3）。月潮が3段階のとき、このボタンは陽醒に変化する：自然属性の即時攻撃に加え、9秒かけて燃焼ダメージを与え、マナを35回復し、3段階すべてを消費する。',
   'entities.abilities.stealth.specNote_subtlety':
     'ダスクヴェールから使う先制技ごとに薄闇の蓄えが1段階進む（最大3）。',
   'entities.abilities.stoneward.description':

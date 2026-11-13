@@ -17704,7 +17704,7 @@ export const it_IT: EnTranslations = {
       },
       "ignition": {
         "name": "Ignizione",
-        "description": "Passivo: quando le tue magie di Fuoco infliggono un colpo critico, il bersaglio brucia per un ulteriore 30% dei danni inflitti in 6 sec. Una nuova bruciatura su un bersaglio già in fiamme si somma ai danni ancora dovuti e riavvia il timer di 6 sec. (Maestria del Fuoco)"
+        "description": "Passivo: quando le tue magie di Fuoco infliggono un colpo critico, il bersaglio brucia per un ulteriore 1,5% dei danni inflitti per livello del personaggio (30% al livello 20) in 6 sec. Una nuova bruciatura su un bersaglio già in fiamme si somma ai danni ancora dovuti e riavvia il timer di 6 sec. (Maestria del Fuoco)"
       },
       "mass_barrier": {
         "name": "Barriera di massa",
@@ -17814,17 +17814,17 @@ export const it_IT: EnTranslations = {
         "name": "Fendente Malvagio",
         "description": "Un colpo istantaneo per danni dell'arma più {damage}. Conferisce 1 punto combo.",
         "specNote_assassination": "Aggiunge 1 Rituale del Veleno (massimo 6).",
-        "specNote_combat": "Mentre la Linea Rossa è attiva, questo pulsante diventa Colpo al corpo: 130% dei danni dell'arma più 10, conferisce 2 punti combo e aggiunge 1 Linea Rossa (massimo 4)."
+        "specNote_combat": "Mentre la Linea Rossa è attiva, questo pulsante diventa Colpo al corpo: un colpo d'arma più pesante che conferisce 2 punti combo e aggiunge 1 Linea Rossa (massimo 4)."
       },
       "eviscerate": {
         "name": "Sonno Eterno",
         "description": "Mossa finale che infligge {damage} danni Fisici. Il danno aumenta con la Potenza d'Attacco.",
         "specNote_assassination": "A 6 Rituale del Veleno, questo pulsante diventa Squarcio velenoso: un colpo che infligge istantaneamente tutti i danni che i tuoi sanguinamenti avrebbero ancora inflitto, pianta una nuova ferita avvelenata e ripristina 20 energia.",
-        "specNote_combat": "Colpire con questo a 4 o più punti combo avvia Redline per 8 sec: Fendente Malvagio diventa Colpo al corpo e questo pulsante diventa Colpo da knockout (45 più 35 per punto combo, colpisce il 25% più forte per ogni Colpo al corpo sferrato durante Redline, ripristina 25 energia). Usalo prima che Redline termini."
+        "specNote_combat": "Colpire con questo a 4 o più punti combo avvia Redline per 8 sec: Fendente Malvagio diventa Colpo al corpo e questo pulsante diventa Colpo da knockout (una mossa finale che colpisce il 25% più forte per ogni Colpo al corpo sferrato durante Redline e ripristina 25 energia). Usalo prima che Redline termini."
       },
       "backstab": {
         "name": "Affondo Codardo",
-        "description": "Conficca il tuo pugnale nella schiena del bersaglio per il 150% dei danni dell'arma più {damage}. Devi essere dietro al bersaglio. Richiede un pugnale. Conferisce 1 punto combo.",
+        "description": "Conficca il tuo pugnale nella schiena del bersaglio per il {weaponPercent}% dei danni dell'arma più {damage}. Devi essere dietro al bersaglio. Richiede un pugnale. Conferisce 1 punto combo.",
         "specNote_assassination": "Ogni colpo aggiunge 1 Rituale del Veleno (massimo 6) e rimborsa 15 energia. A 6 Rituale del Veleno, Sonno Eterno diventa Squarcio velenoso (infligge tutti i danni da sanguinamento residui in una volta)."
       },
       "gouge": {
@@ -17849,7 +17849,7 @@ export const it_IT: EnTranslations = {
       },
       "ambush": {
         "name": "Colpo dell'Agguato",
-        "description": "Colpisci dalle ombre per il 250% dei danni dell'arma più {damage}. Devi essere furtivo e dietro al bersaglio. Richiede un pugnale. Conferisce 1 punto combo.",
+        "description": "Colpisci dalle ombre per il {weaponPercent}% dei danni dell'arma più {damage}. Devi essere furtivo e dietro al bersaglio. Richiede un pugnale. Conferisce 1 punto combo.",
         "specNote_subtlety": "Usata dal Velo Crepuscolare, aggiunge 1 Caligine (massimo 3). A 3 Caligine puoi usarla SENZA furtività e da qualsiasi angolazione: quell'uso non costa nulla, spende tutte le 3 Caligine, avvia il Velo d'Ombra di 6 sec e colpisce per il doppio."
       },
       "stealth": {
@@ -17950,7 +17950,7 @@ export const it_IT: EnTranslations = {
       },
       "solar_step": {
         "name": "Passo Solare",
-        "description": "Aumenta la tua velocità di movimento del 150% per 2 s."
+        "description": "Aumenta la tua velocità di movimento del 150% per {duration} s."
       },
       "solar_invocation": {
         "name": "Invocazione Solare",
@@ -17958,11 +17958,11 @@ export const it_IT: EnTranslations = {
       },
       "radiant_devotion": {
         "name": "Devozione Radiante",
-        "description": "Aumenta di 20 la potenza magica tua e dei membri del gruppo per 30 min. Sostituisce la tua Devozione dell'Alba o della Grazia, ma coesiste con le Devozioni di altri paladini."
+        "description": "Aumenta di {buff} la potenza magica tua e dei membri del gruppo per 30 min. Sostituisce la tua Devozione dell'Alba o della Grazia, ma coesiste con le Devozioni di altri paladini."
       },
       "dawn_devotion": {
         "name": "Devozione dell'Alba",
-        "description": "Aumenta di 40 la potenza d'attacco tua e dei membri del gruppo per 30 min. Sostituisce la tua Devozione Radiante o della Grazia, ma coesiste con le Devozioni di altri paladini e con i gridi del guerriero."
+        "description": "Aumenta di {buff} la potenza d'attacco tua e dei membri del gruppo per 30 min. Sostituisce la tua Devozione Radiante o della Grazia, ma coesiste con le Devozioni di altri paladini e con i gridi del guerriero."
       },
       "grace_devotion": {
         "name": "Devozione della Grazia",
@@ -18303,7 +18303,7 @@ export const it_IT: EnTranslations = {
       },
       "life_tap": {
         "name": "Patto Amaro",
-        "description": "Converte {damage} salute in {damage} mana (50% di mana in più con Credito di Sangue). Fallisce se hai {damage} salute o meno."
+        "description": "Converte {damage} salute in {buff} mana. Fallisce se hai {damage} salute o meno."
       },
       "cursed_accomplice": {
         "name": "Complice Maledetto",
@@ -18319,7 +18319,7 @@ export const it_IT: EnTranslations = {
       },
       "litany_of_guilt": {
         "name": "Litania della Colpa",
-        "description": "Maledice il tuo Malocchio primario per 6 sec. I guadagni di Condanna rilasciano un'onda che danneggia fino a 2 altri nemici entro 8 iarde, al massimo una volta al secondo. Il Grado 2 lo estende a 8 sec e 4 nemici."
+        "description": "Maledice il tuo Malocchio primario per {duration} sec. I guadagni di Condanna rilasciano un'onda che danneggia fino a 2 altri nemici (4 dal Grado 2) entro 8 iarde, al massimo una volta al secondo."
       },
       "cinderhide": {
         "name": "Pelle di Scorie",
@@ -18339,7 +18339,7 @@ export const it_IT: EnTranslations = {
       },
       "cruel_pact": {
         "name": "Patto Crudele",
-        "description": "Sacrifica il 12% della tua salute massima per ripristinare l'1,5% del tuo mana massimo e generare 20 Condanna. Non utilizzabile al 20% di salute o meno."
+        "description": "Sacrifica il 12% della tua salute massima per ripristinare il {buff}% del tuo mana massimo e generare 20 Condanna. Non utilizzabile al 20% di salute o meno."
       },
       "vicarious_suffering": {
         "name": "Sofferenza Vicaria",
@@ -18394,7 +18394,7 @@ export const it_IT: EnTranslations = {
       },
       "moonseed": {
         "name": "Seme Lunare",
-        "description": "Solo in Forma di Lunagufo. Colpisce per {damage} danni Arcani, aggiunge 1 Marea Lunare (massimo 3) ed estende la tua Tempesta Lunare sul bersaglio di 6 sec, fino a {duration} sec extra per applicazione di Tempesta Lunare. Con 3 Maree Lunari, questo pulsante diventa Ondata Lunare: un colpo istantaneo da 136-162 danni Arcani (più potere magico) che le spende tutte e 3."
+        "description": "Solo in Forma di Lunagufo. Colpisce per {damage} danni Arcani, aggiunge 1 Marea Lunare (massimo 3) ed estende la tua Tempesta Lunare sul bersaglio di 6 sec, fino a {duration} sec extra per applicazione di Tempesta Lunare. Con 3 Maree Lunari, questo pulsante diventa Ondata Lunare: un colpo Arcano pesante istantaneo che le spende tutte e 3."
       },
       "rejuvenation": {
         "name": "Cura delle Spore",
@@ -18416,7 +18416,7 @@ export const it_IT: EnTranslations = {
       "maul": {
         "name": "Frantumaossa",
         "description": "Il tuo prossimo colpo in mischia infligge {damage} danni extra e genera una minaccia pari a 2,5 volte i suoi danni più una piccola quantità fissa. Solo in Forma di Bruin.",
-        "specNote_feral": "Ogni colpo a segno aggiunge 1 Sangue Antico; a 3 Sangue Antico questo pulsante diventa Spezzamidollo: un colpo da 78 a 96 danni ad alta minaccia; sotto metà salute ti cura invece del 18% della tua salute massima e rimborsa 15 rabbia."
+        "specNote_feral": "Ogni colpo a segno aggiunge 1 Sangue Antico; a 3 Sangue Antico questo pulsante diventa Spezzamidollo: un colpo pesante ad alta minaccia; sotto metà salute ti cura invece del 18% della tua salute massima e rimborsa 15 rabbia."
       },
       "growl": {
         "name": "Intimidazione",
@@ -18457,7 +18457,7 @@ export const it_IT: EnTranslations = {
       },
       "barkskin": {
         "name": "Scorza di Quercia",
-        "description": "La tua pelle si indurisce come corteccia, aumentando l'armatura di 150 per 15 s."
+        "description": "La tua pelle si indurisce come corteccia, aumentando l'armatura del {buff}% per 15 s."
       },
       "sacred_bulwark": {
         "name": "Bastione Sacro",
@@ -18470,7 +18470,7 @@ export const it_IT: EnTranslations = {
       "starfire": {
         "name": "Caduta Celeste",
         "description": "Richiama un fulmine di fuoco stellare, infliggendo {damage} danni Arcani.",
-        "specNote_balance": "In Forma di Lunagufo, ogni lancio completato aggiunge 1 Marea Lunare (massimo 3). A 3 Marea Lunare, questo pulsante diventa Scia Solare: un colpo istantaneo da 80 a 100 danni da Natura più una bruciatura di 45 in 9 sec, che ripristina 35 mana e spende tutte e 3."
+        "specNote_balance": "In Forma di Lunagufo, ogni lancio completato aggiunge 1 Marea Lunare (massimo 3). A 3 Marea Lunare, questo pulsante diventa Scia Solare: un colpo istantaneo da Natura più una bruciatura in 9 sec, che ripristina 35 mana e spende tutte e 3."
       },
       "travel_form": {
         "name": "Forma di Fleet",
@@ -18518,7 +18518,7 @@ export const it_IT: EnTranslations = {
       },
       "rip": {
         "name": "Faglia Sanguigna",
-        "description": "Mossa finale che fa sanguinare il bersaglio ogni 2 s per 24 s: 72 danni più 48 per punto combo consumato (5 punti: {damage} totali). Solo in Forma del Gatto.",
+        "description": "Mossa finale che fa sanguinare il bersaglio ogni 2 s per 24 s, infliggendo più danni per ogni punto combo consumato (5 punti: {damage} totali). Solo in Forma del Gatto.",
         "specNote_feral": "Il colpo a segno aggiunge 1 Sangue Antico (massimo 3)."
       },
       "mortal_strike": {
@@ -18930,7 +18930,7 @@ export const it_IT: EnTranslations = {
       },
       "avenging_wrath": {
         "name": "Ira Vendicatrice",
-        "description": "Dispiega ali fisiche di dorato potere sacro, guadagnando 10 Devozione e raddoppiando per 15 sec la Devozione generata dalle vostre abilità. Aumenta inoltre del 20% i danni e le cure che infliggete. Mietitore dell'alba: consente Martello dell'Ira contro qualsiasi bersaglio."
+        "description": "Dispiega ali fisiche di dorato potere sacro, guadagnando 10 Devozione e raddoppiando per {duration} sec la Devozione generata dalle vostre abilità. Aumenta inoltre del 20% i danni e le cure che infliggete. Mietitore dell'alba: consente Martello dell'Ira contro qualsiasi bersaglio."
       },
       "berserk": {
         "name": "Bruma Rossa",
@@ -19188,7 +19188,7 @@ export const it_IT: EnTranslations = {
       },
       "body_blow": {
         "name": "Colpo al corpo",
-        "description": "Un colpo pesante per il 130% del danno dell’arma più 10 che conferisce 2 punti combo e approfondisce la Redline di una tacca. (motore Thuggery)"
+        "description": "Un colpo pesante per il {weaponPercent}% del danno dell’arma più {damage} che conferisce 2 punti combo e approfondisce la Redline di una tacca (massimo 4). (motore Thuggery)"
       },
       "knockout_blow": {
         "name": "Colpo da knockout",

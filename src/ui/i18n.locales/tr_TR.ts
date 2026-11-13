@@ -6308,7 +6308,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     '6 sn boyunca: Alaca Örtüsü açılışların gizlilik olmadan ve her açıdan çalışır, %10 daha fazla hasar verirsin. İçindeki ilk Pusucunun Darben %50 daha fazla silah hasarı verir. (İncelik)',
   'entities.abilities.body_blow.name': 'Gövde Darbesi',
   'entities.abilities.body_blow.description':
-    'Silah hasarının %130’u artı 10 vuran, 2 kombo puanı kazandıran ve Redline’ı bir kademe derinleştiren ağır bir darbe. (Thuggery motoru)',
+    '%{weaponPercent} silah hasarı artı {damage} vuran, 2 kombo puanı kazandıran ve Redline’ı bir kademe derinleştiren ağır bir darbe. (Thuggery motoru)',
   'entities.abilities.knockout_blow.name': 'Nakavt Darbesi',
   'entities.abilities.knockout_blow.description':
     "Redline'ı bir nakavtla bitirir: {damage} Fiziksel hasar vurur; Redline sırasında attığın her Gövde Darbesi için %25 daha sert vurur (en fazla 3) ve 25 enerji geri kazandırır. Hasar Saldırı Gücü ile artar. Redline bitmeden kullan, yoksa nakavt kaybolur. (Dövüş)",
@@ -7864,7 +7864,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_monkey.name': 'Sansar Sureti',
   'entities.abilities.backstab.name': 'Korkakça Saplama',
   'entities.abilities.barkskin.description':
-    'Derin ağaç kabuğu gibi sertleşir, zırhı 15 saniye boyunca 150 artırır.',
+    'Derin ağaç kabuğu gibi sertleşir, zırhı 15 saniye boyunca %{buff} artırır.',
   'entities.abilities.barkskin.name': 'Meşe Derisi',
   'entities.abilities.bash.description': 'Hedefi 2 saniye sersemletir. Yalnızca Bruin Formu.',
   'entities.abilities.bash.name': 'Sarsma',
@@ -8081,7 +8081,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Dost bir hedefi {damage} iyileştirir. İyileştirme, İyileştirme Gücü ile artar.',
   'entities.abilities.lesser_heal.name': 'Fısıldanan Dua',
   'entities.abilities.life_tap.description':
-    '{damage} canı {damage} manaya dönüştürür (Kan Kredisi ile %50 daha fazla mana). Canın {damage} veya altındaysa başarısız olur.',
+    '{damage} canı {buff} manaya dönüştürür. Canın {damage} veya altındaysa başarısız olur.',
   'entities.abilities.life_tap.name': 'Ağır Pazarlık',
   'entities.abilities.lightning_bolt.description':
     '{damage} Doğa hasarı verir. Hasar Büyü Gücü ile artar. Elementsel: isabet 1 Gök Gürültüsü verir.',
@@ -14686,7 +14686,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.avatar.description':
     'Üzerindeki sersemletmeleri, korkuları, köklenmeleri, susturmaları, silahsızlandırmaları ve yavaşlatmaları kırar (patronlardan gelenleri değil), ardından 20 sn boyunca bir devcüsseye dönüşür ve %20 daha fazla hasar verirsin. Seni yeni kontrol etkilerinden korumaz.',
   'entities.abilities.avenging_wrath.description':
-    "Altın kutsal güçten cismani kanatlar açar, 10 Adanmışlık kazanır ve 15 sn boyunca yeteneklerinin ürettiği Adanmışlığı ikiye katlar. Ayrıca verdiğin hasarı ve iyileştirmeyi %20 artırır. Şafak biçicisi: Gazap Çekici'ni herhangi bir hedefe karşı mümkün kılar.",
+    "Altın kutsal güçten cismani kanatlar açar, 10 Adanmışlık kazanır ve {duration} sn boyunca yeteneklerinin ürettiği Adanmışlığı ikiye katlar. Ayrıca verdiğin hasarı ve iyileştirmeyi %20 artırır. Şafak biçicisi: Gazap Çekici'ni herhangi bir hedefe karşı mümkün kılar.",
   'entities.abilities.berserk.description':
     'Saldırı gücünü 15 sn. boyunca 70 artırır. (Druid yeteneği)',
   'entities.abilities.bladestorm.name': 'Kılıç Fırtınası',
@@ -14772,7 +14772,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Kullanım süresi olan sonraki iki büyünü hareket ederken yapabilirsin. 15 sn. sürer. (büyücü yeteneği)',
   'entities.abilities.ignition.name': 'Tutuşma',
   'entities.abilities.ignition.description':
-    "Pasif: Ateş büyülerin kritik vuruş yaptığında hedef, verilen hasarın %30'u kadar ek hasarla 6 sn boyunca yanar. Zaten yanan bir hedefte yeni bir yanma, henüz ödenmemiş hasara eklenir ve 6 sn'lik sayacı yeniden başlatır. (Ateş ustalığı)",
+    "Pasif: Ateş büyülerin kritik vuruş yaptığında hedef, karakter seviyesi başına verilen hasarın %1,5'i kadar (20. seviyede %30) ek hasarla 6 sn boyunca yanar. Zaten yanan bir hedefte yeni bir yanma, henüz ödenmemiş hasara eklenir ve 6 sn'lik sayacı yeniden başlatır. (Ateş ustalığı)",
   'entities.abilities.mass_barrier.name': 'Toplu Bariyer',
   'entities.abilities.mass_barrier.description':
     'Seni ve 30 m içindeki en fazla 4 yakındaki müttefiki korur; her bariyer 15 sn. boyunca {damage} hasarı soğurur. (büyücü yeteneği)',
@@ -16034,7 +16034,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.beacon_of_light.description':
     'Bir grup üyesini Işık Fenerin olarak işaretler. 60 m içindeki başka bir grup üyesine yaptığın etkili doğrudan iyileştirmenin 50% kadarı Feneri de iyileştirir. Alan ve süreli iyileştirme aktarılmaz. Biriniz ölene dek sürer.',
   'entities.abilities.dawn_devotion.description':
-    'Senin ve grup üyelerinin saldırı gücünü 30 dk boyunca 40 artırır. Kendi Işıyan veya Lütuf Adanmışlığının yerini alır, ancak diğer paladinlerin Adanmışlıkları ve savaşçı naralarıyla birlikte var olur.',
+    'Senin ve grup üyelerinin saldırı gücünü 30 dk boyunca {buff} artırır. Kendi Işıyan veya Lütuf Adanmışlığının yerini alır. Başka bir paladin Şafak Adanmışlığı kullanırsa yığılmaz, yenilenir; farklı bir Adanmışlık ve savaşçı naraları birlikte var olur.',
   'entities.abilities.dawnfall.description':
     'Yakındaki düşmanlara {damage} Kutsal hasar verir ve 1 Adanmışlık üretir. En az bir düşmana vurmak Son Fermanın kalan bekleme süresini 2 sn kısaltır. Yüceliş hasarını %50 artırır ve yarıçapını 10 m yapar.',
   'entities.abilities.dawns_embrace.description':
@@ -16066,7 +16066,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.radiant_chorus.description':
     "Yakındaki müttefikleri {damage} iyileştirir ve 1 Adanmışlık üretir. En az 2 müttefiki etkili biçimde iyileştirmek 10 sn boyunca Işıyan Rezonans verir: sonraki Onaran Işığın anlık olur ya da sonraki Şafağın Kucaklaması %50 daha az mana harcar ve 1,5 sn'de okunur. Yüceliş Işıyan Koronun iyileştirmesini %20 artırır ve yarıçapını 40 m yapar.",
   'entities.abilities.radiant_devotion.description':
-    'Senin ve grup üyelerinin büyü gücünü 30 dk boyunca 20 artırır. Kendi Şafak veya Lütuf Adanmışlığının yerini alır, ancak diğer paladinlerin Adanmışlıklarıyla birlikte var olur.',
+    'Senin ve grup üyelerinin büyü gücünü 30 dk boyunca {buff} artırır. Kendi Şafak veya Lütuf Adanmışlığının yerini alır. Başka bir paladin Işıyan Adanmışlık kullanırsa yığılmaz, yenilenir; farklı bir Adanmışlık birlikte var olur.',
   'entities.abilities.recall_the_fallen.description':
     'Ölü bir grup üyesini yanına, 35% can ve manayla yaşama döndürür. 16. seviye ya da üzeri bir Güneş Şifacısı bunun yerine grubun 30 yarda yakınındaki ve görüş hattındaki düşmüş tüm üyelerini geri çağırır.',
   'entities.abilities.sacred_challenge.description':
@@ -16079,7 +16079,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Bir düşmana {damage} Kutsal hasar verir veya dost bir hedefi {healing} iyileştirir. Hasar Büyü Gücü ile, iyileştirme İyileştirme Gücü ile artar. Disiplin, 30 yarda içindeki bağlı her yaralı grup üyesini verilen hasarın %30'u kadar iyileştirir (İkiz Ahit ile %70). Hiçbiri yaralı değilse, bunun yerine 30 yarda içindeki en düşük canlı yaralı grup üyesini hasarın %15'i kadar iyileştirir. Bir grup üyesini iyileştirmek, o hedefin 10 yarda içindeki ve görüş hattındaki en fazla 2 yaralı grup üyesini daha, her birini yenilenen canın %50'si kadar iyileştirir. Bu ekstra iyileştirmeler kritik iyileştirme yapamaz ve Disiplin bağı oluşturamaz. (Disiplin imzası)",
   'entities.abilities.solar_invocation.description':
     'Bir müttefiki anında {damage} iyileştirir veya bir düşmana 120 ila 150 temel Kutsal hasar verir. Hasar Büyü Gücü ile, iyileştirme İyileştirme Gücü ile artar. Her iki kullanım da 1 Adanmışlık üretir. Yüceliş sırasında iyileştirme, hedefin 10 m yakınındaki dost oyuncuları da yarısı kadar iyileştirir.',
-  'entities.abilities.solar_step.description': 'Hareket hızını 2 sn boyunca 150% artırır.',
+  'entities.abilities.solar_step.description': 'Hareket hızını {duration} sn boyunca 150% artırır.',
   'entities.abilities.sun_gods_verdict.description':
     'Bir düşmanı 30 sn boyunca Güneş Tanrısının Hükmü altında yargılar. Son Ferman ve Şafak Düşüşü başarılı vuruşta birer şarj işler. Üçüncü şarjı koyan yetenek cezayı belirler: Son Ferman mahkûma yıkıcı hasar salar; Şafak Düşüşü hükmü patlatarak yakındaki düşmanlara hasar verir ve onları 1,5 sn sersemletir.',
   'entities.abilities.sunward_disc.description':
@@ -16245,7 +16245,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     '3 Ay Gelgitini {damage} Gizem hasarı veren ağır bir vuruş için tüketir: hasar seçimi. Güneş İzi de aynı 3 Ay Gelgitini tüketir, o yüzden birini seç.',
   'entities.abilities.moonseed.name': 'Ay Tohumu',
   'entities.abilities.moonseed.description':
-    "Yalnızca Aykuşu Formunda. {damage} Gizemli hasar vurur, 1 Ay Gelgiti ekler (en fazla 3) ve hedefteki Ay Fırtınanı 6 sn uzatır; Ay Fırtınası uygulaması başına en fazla {duration} ek sn. 3 Ay Gelgitinde bu düğme Ay Kabarışına dönüşür: 3'ünü de harcayan, 136 ila 162 Gizemli hasar (artı büyü gücü) veren anlık bir vuruş.",
+    "Yalnızca Aykuşu Formunda. {damage} Gizemli hasar vurur, 1 Ay Gelgiti ekler (en fazla 3) ve hedefteki Ay Fırtınanı 6 sn uzatır; Ay Fırtınası uygulaması başına en fazla {duration} ek sn. 3 Ay Gelgitinde bu düğme Ay Kabarışına dönüşür: 3'ünü de harcayan, anlık ve ağır bir Gizemli vuruş.",
   'entities.abilities.overbloom.name': 'Taşkın Çiçeklenme',
   'entities.abilities.overbloom.description':
     '3 Yeşillik tüketir. Tüm müttefiklerdeki her süreli iyileştirmeni kalan iyileştirmesinin {buff}% kadarıyla hasat eder, o etkileri kaldırır ve hedefe taze bir Spor Şifası eker.',
@@ -16440,14 +16440,14 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Seçilen konumda bir yarık açar, 8 yarda içindeki düşmanları merkezine çeker, {damage} Gölge hasarı verir ve onları 2 sn sersemletir. Patronlar hasar alır ama çekilmeye ve sersemlemeye direnir.',
   'entities.abilities.abyssal_rift.name': 'Uçurum Yarığı',
   'entities.abilities.ambush.description':
-    "Gölgelerden saldırarak silah hasarının %250'si artı {damage} vur. Gizlenmiş ve hedefin arkasında olmalısın. Hançer gerektirir. 1 kombo puanı kazandırır.",
+    'Gölgelerden saldırarak %{weaponPercent} silah hasarı artı {damage} vur. Gizlenmiş ve hedefin arkasında olmalısın. Hançer gerektirir. 1 kombo puanı kazandırır.',
   'entities.abilities.ambush.specNote_subtlety':
     "Alacakaranlık Perdesinden kullanıldığında 1 Alacakaranlık ekler (en fazla 3). 3 Alacakaranlıkta gizlilik OLMADAN ve her açıdan kullanabilirsin: bu kullanım hiçbir şeye mal olmaz, 3 Alacakaranlığın tümünü harcar, 6 sn'lik Gölge Perdesini başlatır ve iki kat hasar verir.",
   'entities.abilities.army_of_the_dead.description':
     'Geçici bir İskelet Savaşçı, Kemik Büyücü ve Mezar Kanadı diriltmek için 20 sn süreyle bir mezar portalı açar; kalıcı Hükümranlık hizmetkarlarının boş bıraktığı yerleri doldurur.',
   'entities.abilities.army_of_the_dead.name': 'Ölüler Ordusu',
   'entities.abilities.backstab.description':
-    "Hançerini hedefin sırtına sapla: silah hasarının %150'si artı {damage}. Hedefin arkasında olmalısın. Hançer gerektirir. 1 kombo puanı kazandırır.",
+    'Hançerini hedefin sırtına sapla: %{weaponPercent} silah hasarı artı {damage}. Hedefin arkasında olmalısın. Hançer gerektirir. 1 kombo puanı kazandırır.',
   'entities.abilities.backstab.specNote_assassination':
     'Her vuruş 1 Zehir Ayini ekler (en fazla 6) ve 15 enerji geri kazandırır. 6 Zehir Ayininde, Toprak Uykusu Zehir Yarığına dönüşür (kalan tüm kanama hasarını tek seferde verir).',
   'entities.abilities.blade_flurry.description':
@@ -16474,7 +16474,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Hedefte birincil Kem Gözün gerektirir. Ona 15 m içindeki en fazla 4 düşmana 15 sn boyunca ikincil Kem Gözler yerleştirir. Bunlar Mahkûmiyeti normal oranın %50'sinde üretir ve Hüküm onların her birine hasarının %35'i kadar yankılanır.",
   'entities.abilities.coven.name': 'Cadı Meclisi',
   'entities.abilities.cruel_pact.description':
-    "Azami canının %12'sini feda ederek azami manasının %1,5'ini geri kazandırır ve 20 Mahkûmiyet üretir. Can %20 veya altındayken kullanılamaz.",
+    "Azami canının %12'sini feda ederek azami manasının %{buff} kadarını geri kazandırır ve 20 Mahkûmiyet üretir. Can %20 veya altındayken kullanılamaz.",
   'entities.abilities.cruel_pact.name': 'Zalim Ahit',
   'entities.abilities.cursed_accomplice.description':
     "Hiçbir müttefik seçili değilken Kem Gözünü bağlar, böylece onun Bakışı 2 Mahkûmiyet üretir. Seçili tek bir grup üyesini bağlamak yalnızca onların Kem Gözüne verdiği hasarın 3 üretmesini sağlar. Yeni bir bağ öncekinin yerini alır ve en fazla 2 sn'de bir tetiklenebilir.",
@@ -16493,7 +16493,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.eviscerate.specNote_assassination':
     '6 Zehir Ayininde bu düğme Zehir Yarığına dönüşür: kanamalarının kalan tüm hasarını anında veren, taze bir zehir yarası açan ve 20 enerji geri kazandıran bir vuruş.',
   'entities.abilities.eviscerate.specNote_combat':
-    "Bunu 4 veya daha fazla kombo puanıyla vurmak 8 sn boyunca Redline'ı başlatır: Kötücül Kesik Gövde Darbesine dönüşür ve bu düğme Nakavt Darbesine dönüşür (45 artı kombo puanı başına 35; Redline sırasında attığın her Gövde Darbesi için %25 daha sert vurur, 25 enerji geri kazandırır). Redline bitmeden harca.",
+    "Bunu 4 veya daha fazla kombo puanıyla vurmak 8 sn boyunca Redline'ı başlatır: Kötücül Kesik Gövde Darbesine dönüşür ve bu düğme Nakavt Darbesine dönüşür (Redline sırasında attığın her Gövde Darbesi için %25 daha sert vuran ve 25 enerji geri kazandıran bir bitirici). Redline bitmeden harca.",
   'entities.abilities.expose_armor.description':
     'Hedefi 30 sn boyunca açığa çıkaran bitirici hamle: harcanan her kombo puanı zırhını %2 azaltır (5 kombo puanı: %{damage}).',
   'entities.abilities.faerie_fire.description': 'Hedefin zırhını 40 sn boyunca %{damage} azaltır.',
@@ -16521,7 +16521,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.kidney_shot.description':
     'Hedefi 2 sn artı kombo puanı başına 1 sn sersemleten bitirici hamle (5 kombo puanı: 7 sn).',
   'entities.abilities.litany_of_guilt.description':
-    "Birincil Kem Gözünü 6 sn boyunca lanetler. Mahkûmiyet kazançları, 8 yarda içindeki en fazla 2 başka düşmana hasar veren bir dalga salar, en fazla saniyede bir. Kademe 2 bunu 8 sn'ye ve 4 düşmana çıkarır.",
+    'Birincil Kem Gözünü {duration} sn boyunca lanetler. Mahkûmiyet kazançları, 8 yarda içindeki en fazla 2 başka düşmana (2. kademeden itibaren 4) hasar veren bir dalga salar, en fazla saniyede bir.',
   'entities.abilities.litany_of_guilt.name': 'Suç Yakarışı',
   'entities.abilities.maledict_gaze.description':
     "Kem Gözün, hem sen hem düşman savaştayken, birbirinize 30 m içindeyken ve görüş hattındayken birincil Kem Gözünü taşıyan düşmana her 2,5 sn'de bir Gölge hasarıyla saldırır. Kem Gözü Ele Geçir saldırı hızını iki katına çıkarır.",
@@ -16529,7 +16529,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.description':
     'Bir sonraki yakın dövüş savuruşun {damage} ek hasar verir ve hasarının 2,5 katı artı küçük bir sabit miktar kadar tehdit üretir. Yalnızca Bruin Formu.',
   'entities.abilities.maul.specNote_feral':
-    "İsabet eden her vuruş 1 Kadim Kan ekler; 3 Kadim Kanda bu düğme İlik Kırana dönüşür: yüksek tehditle 78 ila 96 hasar veren bir vuruş; can yarısının altındayken bunun yerine azami canının %18'i kadar seni iyileştirir ve 15 öfke geri kazandırır.",
+    "İsabet eden her vuruş 1 Kadim Kan ekler; 3 Kadim Kanda bu düğme İlik Kırana dönüşür: yüksek tehditli ağır bir vuruş; can yarısının altındayken bunun yerine azami canının %18'i kadar seni iyileştirir ve 15 öfke geri kazandırır.",
   'entities.abilities.moonfire.description':
     'Düşmanı {damage} Gizemli hasarla yakar, ardından {duration} sn boyunca {overTime} Gizemli hasar daha verir.',
   'entities.abilities.moonfire.specNote_balance':
@@ -16569,7 +16569,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rejuvenation.specNote_restoration':
     'Her kullanım 1 Yeşillik ekler (en fazla 3); zaten etkide olan bir çiçeği yenilemek de buna dahildir. 3 Yeşillikte, Hızlı İyileştirme Taşkın Çiçeklenmeye dönüşür.',
   'entities.abilities.rip.description':
-    "Hedefi 24 sn boyunca her 2 sn'de kanatan bitirici: harcanan kombo puanı başına 48 artı 72 hasar (5 puan: toplam {damage}). Yalnızca Kedi Formunda.",
+    "Hedefi 24 sn boyunca her 2 sn'de kanatan ve harcanan her kombo puanı için daha fazla hasar veren bitirici (5 puan: toplam {damage}). Yalnızca Kedi Formunda.",
   'entities.abilities.rip.specNote_feral': 'İsabet eden vuruş 1 Kadim Kan ekler (en fazla 3).',
   'entities.abilities.ruinous_brand.description':
     'Bir düşmanı 15 sn süreyle damgalar. Sonraki 3 doğrudan büyün, damgalı düşmana karşı %25 hasarla yankılanır ya da başka bir hedefe atıldığında ona %50 hasar kopyalar. Yıkım Oku yankıları da başka bir kritik hasar çarpanı olmadan kritik vuruş sayılır.',
@@ -16589,7 +16589,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Silah hasarı artı {damage} veren anlık bir vuruş. 1 kombo puanı kazandırır.',
   'entities.abilities.sinister_strike.specNote_assassination': '1 Zehir Ayini ekler (en fazla 6).',
   'entities.abilities.sinister_strike.specNote_combat':
-    "Redline etkinken, bu düğme Gövde Darbesine dönüşür: silah hasarının %130'u artı 10, 2 kombo puanı kazandırır ve 1 Redline ekler (en fazla 4).",
+    'Redline etkinken, bu düğme Gövde Darbesine dönüşür: daha ağır bir silah vuruşu; 2 kombo puanı kazandırır ve 1 Redline ekler (en fazla 4).',
   'entities.abilities.slice_and_dice.description':
     'Yakın dövüş saldırı hızını 12 sn artı kombo puanı başına 4 sn boyunca %30 artıran bitirici hamle (5 kombo puanı: 32 sn).',
   'entities.abilities.soul_harvest.description':
@@ -16604,7 +16604,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.description':
     'Yıldız ateşinden bir yıldırım çağırarak {damage} Gizemli hasar verir.',
   'entities.abilities.starfire.specNote_balance':
-    "Aykuşu Formundayken, tamamlanan her okuma 1 Ay Gelgiti ekler (en fazla 3). 3 Ay Gelgitinde, bu düğme Güneş İzine dönüşür: 80 ila 100 Doğa hasarı artı 9 sn boyunca 45 yanık hasarı veren, 35 mana geri kazandıran ve tüm 3'ünü harcayan anlık bir vuruş.",
+    "Aykuşu Formundayken, tamamlanan her okuma 1 Ay Gelgiti ekler (en fazla 3). 3 Ay Gelgitinde, bu düğme Güneş İzine dönüşür: anlık bir Doğa vuruşu artı 9 sn boyunca bir yanık hasarı veren, 35 mana geri kazandıran ve tüm 3'ünü harcayan bir darbe.",
   'entities.abilities.stealth.description':
     'Gölgelerde gizlenirsin. Düşman oyuncular ve evcil hayvanlar seni göremez, canavarlar seni yalnızca normalden çok daha yakından fark eder (senden yüksek seviyeliyse daha uzaktan). Tam hızla hareket edersin. Saldırmak veya hasar almak Alaca Örtüsünü bozar. Çıkmak için tekrar kullan.',
   'entities.abilities.stealth.specNote_subtlety':

@@ -17704,7 +17704,7 @@ export const fr_FR: EnTranslations = {
       },
       "ignition": {
         "name": "Embrasement",
-        "description": "Passif : quand vos sorts de Feu infligent un coup critique, la cible brûle pour 30% supplémentaires des dégâts infligés sur 6 s. Une nouvelle brûlure sur une cible déjà en feu s'ajoute aux dégâts restant dus et relance le délai de 6 s. (Maîtrise du Feu)"
+        "description": "Passif : quand vos sorts de Feu infligent un coup critique, la cible brûle pour 1,5% supplémentaires des dégâts infligés par niveau de personnage (30% au niveau 20) sur 6 s. Une nouvelle brûlure sur une cible déjà en feu s'ajoute aux dégâts restant dus et relance le délai de 6 s. (Maîtrise du Feu)"
       },
       "mass_barrier": {
         "name": "Barrière de masse",
@@ -17814,17 +17814,17 @@ export const fr_FR: EnTranslations = {
         "name": "Taillade perfide",
         "description": "Une frappe instantanée pour les dégâts de l'arme plus {damage}. Confère 1 point de combo.",
         "specNote_assassination": "Ajoute 1 Rituel du venin (maximum 6).",
-        "specNote_combat": "Tant que Redline est active, ce bouton devient Coup au corps : 130% des dégâts de l'arme plus 10, confère 2 points de combo, et ajoute 1 Redline (maximum 4)."
+        "specNote_combat": "Tant que Redline est active, ce bouton devient Coup au corps : une frappe d'arme plus lourde qui confère 2 points de combo et ajoute 1 Redline (maximum 4)."
       },
       "eviscerate": {
         "name": "Sommeil éternel",
         "description": "Technique de finition qui inflige {damage} points de dégâts Physiques. Les dégâts augmentent avec la puissance d'attaque.",
         "specNote_assassination": "À 6 Rituel du venin, ce bouton devient Déchirure venimeuse : une frappe qui inflige instantanément tous les dégâts que vos saignements auraient encore infligés, plante une nouvelle plaie de venin, et restaure 20 énergie.",
-        "specNote_combat": "Toucher avec 4 points de combo ou plus déclenche Redline pendant 8 s : Taillade perfide devient Coup au corps et ce bouton devient Coup de K.-O. (45 plus 35 par point de combo, frappe 25% plus fort pour chaque Coup au corps lancé pendant Redline, restaure 25 énergie). Dépensez-le avant la fin de Redline."
+        "specNote_combat": "Toucher avec 4 points de combo ou plus déclenche Redline pendant 8 s : Taillade perfide devient Coup au corps et ce bouton devient Coup de K.-O. (un coup de grâce qui frappe 25% plus fort pour chaque Coup au corps lancé pendant Redline et restaure 25 énergie). Dépensez-le avant la fin de Redline."
       },
       "backstab": {
         "name": "Estoc lâche",
-        "description": "Plantez votre dague dans le dos de la cible pour 150% des dégâts de l'arme plus {damage}. Doit être derrière la cible. Requiert une dague. Confère 1 point de combo.",
+        "description": "Plantez votre dague dans le dos de la cible pour {weaponPercent}% des dégâts de l'arme plus {damage}. Doit être derrière la cible. Requiert une dague. Confère 1 point de combo.",
         "specNote_assassination": "Chaque frappe ajoute 1 Rituel du venin (maximum 6) et rembourse 15 énergie. À 6 Rituel du venin, Sommeil éternel devient Déchirure venimeuse (elle inflige d'un coup tous les dégâts de saignement restants)."
       },
       "gouge": {
@@ -17849,7 +17849,7 @@ export const fr_FR: EnTranslations = {
       },
       "ambush": {
         "name": "Frappe du rôdeur",
-        "description": "Frappe depuis les ombres pour 250% des dégâts de l'arme plus {damage}. Camouflage requis, derrière la cible. Requiert une dague. Confère 1 point de combo.",
+        "description": "Frappe depuis les ombres pour {weaponPercent}% des dégâts de l'arme plus {damage}. Camouflage requis, derrière la cible. Requiert une dague. Confère 1 point de combo.",
         "specNote_subtlety": "Utilisée depuis le Voile du crépuscule, elle ajoute 1 Pénombre (maximum 3). À 3 Pénombre, vous pouvez l'utiliser SANS camouflage et sous n'importe quel angle : cette utilisation ne coûte rien, dépense les 3 Pénombre, déclenche le voile d'ombre de 6 s, et inflige le double de dégâts."
       },
       "stealth": {
@@ -17950,7 +17950,7 @@ export const fr_FR: EnTranslations = {
       },
       "solar_step": {
         "name": "Pas solaire",
-        "description": "Augmente votre vitesse de déplacement de 150% pendant 2 s."
+        "description": "Augmente votre vitesse de déplacement de 150% pendant {duration} s."
       },
       "solar_invocation": {
         "name": "Invocation solaire",
@@ -17958,11 +17958,11 @@ export const fr_FR: EnTranslations = {
       },
       "radiant_devotion": {
         "name": "Dévotion radiante",
-        "description": "Augmente la puissance des sorts de vous-même et des membres du groupe de 20 pendant 30 min. Remplace votre propre Dévotion de l'aube ou de grâce, mais coexiste avec les Dévotions des autres paladins."
+        "description": "Augmente la puissance des sorts de vous-même et des membres du groupe de {buff} pendant 30 min. Remplace votre propre Dévotion de l'aube ou de grâce. Un autre paladin lançant Dévotion radiante la rafraîchit au lieu de s'additionner ; une autre Dévotion coexiste."
       },
       "dawn_devotion": {
         "name": "Dévotion de l'aube",
-        "description": "Augmente la puissance d'attaque de vous-même et des membres du groupe de 40 pendant 30 min. Remplace votre propre Dévotion radiante ou de grâce, mais coexiste avec les Dévotions des autres paladins et avec les cris de guerrier."
+        "description": "Augmente la puissance d'attaque de vous-même et des membres du groupe de {buff} pendant 30 min. Remplace votre propre Dévotion radiante ou de grâce. Un autre paladin lançant Dévotion de l'aube la rafraîchit au lieu de s'additionner ; une autre Dévotion et les cris de guerrier coexistent."
       },
       "grace_devotion": {
         "name": "Dévotion de grâce",
@@ -18303,7 +18303,7 @@ export const fr_FR: EnTranslations = {
       },
       "life_tap": {
         "name": "Marché brutal",
-        "description": "Convertit {damage} points de vie en {damage} mana (50% de mana en plus avec Crédit de sang). Échoue si vous avez {damage} points de vie ou moins."
+        "description": "Convertit {damage} points de vie en {buff} mana. Échoue si vous avez {damage} points de vie ou moins."
       },
       "cursed_accomplice": {
         "name": "Complice maudit",
@@ -18319,7 +18319,7 @@ export const fr_FR: EnTranslations = {
       },
       "litany_of_guilt": {
         "name": "Litanie de la culpabilité",
-        "description": "Maudit votre Mauvais œil principal pendant 6 s. Les gains de Condamnation libèrent une onde qui inflige des dégâts à 2 autres ennemis au plus dans un rayon de 8 m, au plus une fois par seconde. Le rang 2 l'étend à 8 s et 4 ennemis."
+        "description": "Maudit votre Mauvais œil principal pendant {duration} s. Les gains de Condamnation libèrent une onde qui inflige des dégâts à 2 autres ennemis au plus (4 à partir du rang 2) dans un rayon de 8 m, au plus une fois par seconde."
       },
       "cinderhide": {
         "name": "Peau de braise",
@@ -18339,7 +18339,7 @@ export const fr_FR: EnTranslations = {
       },
       "cruel_pact": {
         "name": "Pacte cruel",
-        "description": "Sacrifie 12% de vos points de vie maximum pour restaurer 1,5% de votre mana maximum et générer 20 Condamnation. Inutilisable à 20% de points de vie ou moins."
+        "description": "Sacrifie 12% de vos points de vie maximum pour restaurer {buff}% de votre mana maximum et générer 20 Condamnation. Inutilisable à 20% de points de vie ou moins."
       },
       "vicarious_suffering": {
         "name": "Souffrance par procuration",
@@ -18394,7 +18394,7 @@ export const fr_FR: EnTranslations = {
       },
       "moonseed": {
         "name": "Graine lunaire",
-        "description": "Forme de sélénien uniquement. Frappe pour {damage} points de dégâts des Arcanes, ajoute 1 Marée lunaire (max 3) et prolonge votre Tempête lunaire sur la cible de 6 s, jusqu'à {duration} s supplémentaires par application de Tempête lunaire. À 3 Marée lunaire, ce bouton devient Déferlante lunaire : une frappe instantanée pour 136 à 162 points de dégâts des Arcanes (plus la puissance des sorts) qui dépense les 3."
+        "description": "Forme de sélénien uniquement. Frappe pour {damage} points de dégâts des Arcanes, ajoute 1 Marée lunaire (max 3) et prolonge votre Tempête lunaire sur la cible de 6 s, jusqu'à {duration} s supplémentaires par application de Tempête lunaire. À 3 Marée lunaire, ce bouton devient Déferlante lunaire : une lourde frappe instantanée des Arcanes qui dépense les 3."
       },
       "rejuvenation": {
         "name": "Soin de spores",
@@ -18416,7 +18416,7 @@ export const fr_FR: EnTranslations = {
       "maul": {
         "name": "Brise-os",
         "description": "Votre prochain coup de mêlée inflige {damage} points de dégâts supplémentaires et génère une menace égale à 2,5 fois ses dégâts plus un petit montant fixe. Forme de Bruin uniquement.",
-        "specNote_feral": "Chaque coup porté ajoute 1 Sang ancien ; à 3 Sang ancien, ce bouton devient Brise-moelle : une frappe de 78 à 96 dégâts à forte menace ; sous la moitié des points de vie, elle vous soigne à la place de 18% de vos points de vie maximum et rembourse 15 rage."
+        "specNote_feral": "Chaque coup porté ajoute 1 Sang ancien ; à 3 Sang ancien, ce bouton devient Brise-moelle : une lourde frappe à forte menace ; sous la moitié des points de vie, elle vous soigne à la place de 18% de vos points de vie maximum et rembourse 15 rage."
       },
       "growl": {
         "name": "Menacer",
@@ -18457,7 +18457,7 @@ export const fr_FR: EnTranslations = {
       },
       "barkskin": {
         "name": "Peau de chêne",
-        "description": "Votre peau durcit comme de l'écorce et augmente l'armure de 150 pendant 15 s."
+        "description": "Votre peau durcit comme de l'écorce et augmente l'armure de {buff}% pendant 15 s."
       },
       "sacred_bulwark": {
         "name": "Rempart sacré",
@@ -18470,7 +18470,7 @@ export const fr_FR: EnTranslations = {
       "starfire": {
         "name": "Chute céleste",
         "description": "Appelle un trait de feu stellaire, infligeant {damage} points de dégâts d'Arcane.",
-        "specNote_balance": "En Forme de sélénien, chaque incantation achevée ajoute 1 Marée lunaire (maximum 3). À 3 Marée lunaire, ce bouton devient Sillage solaire : une frappe instantanée de 80 à 100 dégâts de Nature plus une brûlure de 45 sur 9 s, restaurant 35 mana et dépensant les 3."
+        "specNote_balance": "En Forme de sélénien, chaque incantation achevée ajoute 1 Marée lunaire (maximum 3). À 3 Marée lunaire, ce bouton devient Sillage solaire : une frappe de Nature instantanée plus une brûlure sur 9 s, restaurant 35 mana et dépensant les 3."
       },
       "travel_form": {
         "name": "Forme de Fleet",
@@ -18518,7 +18518,7 @@ export const fr_FR: EnTranslations = {
       },
       "rip": {
         "name": "Faille sanglante",
-        "description": "Coup de grâce qui fait saigner la cible toutes les 2 s pendant 24 s : 72 dégâts plus 48 par point de combo dépensé (5 points : {damage} au total). Forme de chat uniquement.",
+        "description": "Coup de grâce qui fait saigner la cible toutes les 2 s pendant 24 s et inflige plus de dégâts pour chaque point de combo dépensé (5 points : {damage} au total). Forme de chat uniquement.",
         "specNote_feral": "Le coup porté ajoute 1 Sang ancien (maximum 3)."
       },
       "mortal_strike": {
@@ -18930,7 +18930,7 @@ export const fr_FR: EnTranslations = {
       },
       "avenging_wrath": {
         "name": "Colère vengeresse",
-        "description": "Déploie des ailes physiques de puissance sacrée dorée, gagnant 10 Dévotion et doublant la Dévotion générée par vos capacités pendant 15 s. Augmente aussi de 20% les dégâts et les soins infligés. Faucheur de l'aube : permet Marteau de courroux contre n'importe quelle cible."
+        "description": "Déploie des ailes physiques de puissance sacrée dorée, gagnant 10 Dévotion et doublant la Dévotion générée par vos capacités pendant {duration} s. Augmente aussi de 20% les dégâts et les soins infligés. Faucheur de l'aube : permet Marteau de courroux contre n'importe quelle cible."
       },
       "berserk": {
         "name": "Brume rouge",
@@ -19188,7 +19188,7 @@ export const fr_FR: EnTranslations = {
       },
       "body_blow": {
         "name": "Coup au corps",
-        "description": "Un coup puissant infligeant 130% des dégâts de l’arme plus 10, qui confère 2 points de combo et approfondit la Redline d’un cran. (moteur Thuggery)"
+        "description": "Un coup puissant infligeant {weaponPercent}% des dégâts de l’arme plus {damage}. Confère 2 points de combo et ajoute 1 Redline (max 4). (Thuggery)"
       },
       "knockout_blow": {
         "name": "Coup de K.-O.",

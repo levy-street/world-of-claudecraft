@@ -17704,7 +17704,7 @@ export const sv_SE: EnTranslations = {
       },
       "ignition": {
         "name": "Antändning",
-        "description": "Passiv: när dina Eldbesvärjelser får kritiska träffar brinner målet för ytterligare 30% av den utdelade skadan under 6 sek. En ny brand på ett mål som redan brinner läggs till den skada som återstår och startar om 6-sekunderstimern. (Eldmästerskap)"
+        "description": "Passiv: när dina Eldbesvärjelser får kritiska träffar brinner målet för ytterligare 1,5% av den utdelade skadan per karaktärsnivå (30% på nivå 20) under 6 sek. En ny brand på ett mål som redan brinner läggs till den skada som återstår och startar om 6-sekunderstimern. (Eldmästerskap)"
       },
       "mass_barrier": {
         "name": "Massbarriär",
@@ -17814,17 +17814,17 @@ export const sv_SE: EnTranslations = {
         "name": "Ondsint hugg",
         "description": "Ett omedelbart slag för vapenskada plus {damage}. Ger 1 kombopoäng.",
         "specNote_assassination": "Lägger till 1 Giftritual (max 6).",
-        "specNote_combat": "Medan Röd linje är aktiv blir denna knapp Kroppsslag: 130% vapenskada plus 10, ger 2 kombopoäng och lägger till 1 Röd linje (max 4)."
+        "specNote_combat": "Medan Röd linje är aktiv blir denna knapp Kroppsslag: ett tyngre vapenslag som ger 2 kombopoäng och lägger till 1 Röd linje (max 4)."
       },
       "eviscerate": {
         "name": "Sista vilan",
         "description": "Avslutande drag som ger {damage} fysisk skada. Skadan ökar med attackkraft.",
         "specNote_assassination": "Vid 6 Giftritual blir denna knapp Giftrivning: ett slag som omedelbart ger all skada dina blödningar ännu skulle ha gett, planterar ett färskt Giftrivning-sår och återställer 20 energi.",
-        "specNote_combat": "Att landa denna med 4 eller fler kombopoäng startar Röd linje i 8 sek: Ondsint hugg blir Kroppsslag och denna knapp blir Knockoutslag (45 plus 35 per kombopoäng, slår 25% hårdare för varje Kroppsslag du slängt under Röd linje, återställer 25 energi). Använd den innan Röd linje tar slut."
+        "specNote_combat": "Att landa denna med 4 eller fler kombopoäng startar Röd linje i 8 sek: Ondsint hugg blir Kroppsslag och denna knapp blir Knockoutslag (en avslutare som slår 25% hårdare för varje Kroppsslag du slängt under Röd linje och återställer 25 energi). Använd den innan Röd linje tar slut."
       },
       "backstab": {
         "name": "Feg stöt",
-        "description": "Driv din dolk in i målets rygg för 150% vapenskada plus {damage}. Du måste vara bakom målet. Kräver en dolk. Ger 1 kombopoäng.",
+        "description": "Driv din dolk in i målets rygg för {weaponPercent}% vapenskada plus {damage}. Du måste vara bakom målet. Kräver en dolk. Ger 1 kombopoäng.",
         "specNote_assassination": "Varje slag lägger till 1 Giftritual (max 6) och återställer 15 energi. Vid 6 Giftritual blir Sista vilan till Giftrivning (den detonerar dina blödningars återstående skada på en gång)."
       },
       "gouge": {
@@ -17849,7 +17849,7 @@ export const sv_SE: EnTranslations = {
       },
       "ambush": {
         "name": "Smygarens hugg",
-        "description": "Slå till från skuggorna för 250% vapenskada plus {damage}. Du måste vara dold och bakom målet. Kräver en dolk. Ger 1 kombopoäng.",
+        "description": "Slå till från skuggorna för {weaponPercent}% vapenskada plus {damage}. Du måste vara dold och bakom målet. Kräver en dolk. Ger 1 kombopoäng.",
         "specNote_subtlety": "Använd från Skymningsslöja lägger detta till 1 Skymningsförråd (max 3). Vid 3 Skymningsförråd kan du använda den UTAN att vara dold och från valfri vinkel: den användningen kostar inget, förbrukar alla 3 Skymningsförråd, startar den 6 sekunder långa Skuggslöjan och slår dubbelt så hårt."
       },
       "stealth": {
@@ -17950,7 +17950,7 @@ export const sv_SE: EnTranslations = {
       },
       "solar_step": {
         "name": "Solsteg",
-        "description": "Ökar din förflyttningshastighet med 150% i 2 sek."
+        "description": "Ökar din förflyttningshastighet med 150% i {duration} sek."
       },
       "solar_invocation": {
         "name": "Solåkallan",
@@ -17958,11 +17958,11 @@ export const sv_SE: EnTranslations = {
       },
       "radiant_devotion": {
         "name": "Strålande hängivenhet",
-        "description": "Ökar besvärjelsekraften hos dig och gruppmedlemmarna med 20 i 30 min. Ersätter din egen Gryningens eller Nådens hängivenhet, men samexisterar med hängivenheter från andra paladiner."
+        "description": "Ökar besvärjelsekraften hos dig och gruppmedlemmarna med {buff} i 30 min. Ersätter din egen Gryningens eller Nådens hängivenhet. En annan paladin som kastar Strålande hängivenhet förnyar den i stället för att stapla; en annan hängivenhet samexisterar."
       },
       "dawn_devotion": {
         "name": "Gryningens hängivenhet",
-        "description": "Ökar attackkraften hos dig och gruppmedlemmarna med 40 i 30 min. Ersätter din egen Strålande eller Nådens hängivenhet, men samexisterar med hängivenheter från andra paladiner och med krigarrop."
+        "description": "Ökar attackkraften hos dig och gruppmedlemmarna med {buff} i 30 min. Ersätter din egen Strålande eller Nådens hängivenhet. En annan paladin som kastar Gryningens hängivenhet förnyar den i stället för att stapla; en annan hängivenhet och krigarrop samexisterar."
       },
       "grace_devotion": {
         "name": "Nådens hängivenhet",
@@ -18303,7 +18303,7 @@ export const sv_SE: EnTranslations = {
       },
       "life_tap": {
         "name": "Hårt köpslag",
-        "description": "Omvandlar {damage} hälsa till {damage} mana (50% mer mana med Blodskuld). Misslyckas om du har {damage} hälsa eller mindre."
+        "description": "Omvandlar {damage} hälsa till {buff} mana. Misslyckas om du har {damage} hälsa eller mindre."
       },
       "cursed_accomplice": {
         "name": "Förbannad medhjälpare",
@@ -18319,7 +18319,7 @@ export const sv_SE: EnTranslations = {
       },
       "litany_of_guilt": {
         "name": "Skuldens litania",
-        "description": "Förbannar ditt primära onda öga i 6 sek. Fördömelse-vinster släpper en våg som skadar upp till 2 andra fiender inom 8 yards, högst en gång per sekund. Rang 2 förlänger den till 8 sek och 4 fiender."
+        "description": "Förbannar ditt primära onda öga i {duration} sek. Fördömelse-vinster släpper en våg som skadar upp till 2 andra fiender (4 från rang 2) inom 8 yards, högst en gång per sekund."
       },
       "cinderhide": {
         "name": "Glödhud",
@@ -18339,7 +18339,7 @@ export const sv_SE: EnTranslations = {
       },
       "cruel_pact": {
         "name": "Grym pakt",
-        "description": "Offrar 12% av din maximala hälsa för att återställa 1,5% av din maximala mana och generera 20 Fördömelse. Kan inte användas vid eller under 20% hälsa."
+        "description": "Offrar 12% av din maximala hälsa för att återställa {buff}% av din maximala mana och generera 20 Fördömelse. Kan inte användas vid eller under 20% hälsa."
       },
       "vicarious_suffering": {
         "name": "Ställföreträdande lidande",
@@ -18394,7 +18394,7 @@ export const sv_SE: EnTranslations = {
       },
       "moonseed": {
         "name": "Månfrö",
-        "description": "Endast Månugglaform. Slår för {damage} arkan skada, lägger till 1 Månflod (max 3) och förlänger din Månstorm på målet med 6 sek, upp till {duration} extra sek per applicering av Månstorm. Vid 3 Månflod blir den här knappen Månsvall: ett omedelbart slag för 136 till 162 arkan skada (plus besvärjelsekraft) som förbrukar alla 3."
+        "description": "Endast Månugglaform. Slår för {damage} arkan skada, lägger till 1 Månflod (max 3) och förlänger din Månstorm på målet med 6 sek, upp till {duration} extra sek per applicering av Månstorm. Vid 3 Månflod blir den här knappen Månsvall: ett omedelbart kraftigt arkanslag som förbrukar alla 3."
       },
       "rejuvenation": {
         "name": "Sporläkning",
@@ -18416,7 +18416,7 @@ export const sv_SE: EnTranslations = {
       "maul": {
         "name": "Benkross",
         "description": "Ditt nästa närstridshugg ger {damage} extra skada och genererar hot motsvarande 2,5 gånger dess skada plus ett litet fast belopp. Endast Bruinform.",
-        "specNote_feral": "Varje träffande slag lägger till 1 Gammalt Blod; vid 3 Gammalt Blod blir denna knapp Märgbräckare: ett slag för 78 till 96 skada med högt hot; under halv hälsa helar det dig i stället för 18% av din maximala hälsa och återbetalar 15 raseri."
+        "specNote_feral": "Varje träffande slag lägger till 1 Gammalt Blod; vid 3 Gammalt Blod blir denna knapp Märgbräckare: ett kraftigt slag med högt hot; under halv hälsa helar det dig i stället för 18% av din maximala hälsa och återbetalar 15 raseri."
       },
       "growl": {
         "name": "Hota",
@@ -18457,7 +18457,7 @@ export const sv_SE: EnTranslations = {
       },
       "barkskin": {
         "name": "Ekhud",
-        "description": "Din hud hårdnar som bark och ökar rustning med 150 i 15 sek."
+        "description": "Din hud hårdnar som bark och ökar rustning med {buff}% i 15 sek."
       },
       "sacred_bulwark": {
         "name": "Helig Bålverk",
@@ -18470,7 +18470,7 @@ export const sv_SE: EnTranslations = {
       "starfire": {
         "name": "Himlafall",
         "description": "Kallar ner en stråle av stjärneld, vilket orsakar {damage} arkan skada.",
-        "specNote_balance": "I Månugglaform lägger varje fullbordad besvärjelse till 1 Månflod (max 3). Vid 3 Månflod blir denna knapp Solspår: ett omedelbart slag som ger 80 till 100 naturskada plus en brännskada på 45 under 9 sek, återställer 35 mana och förbrukar alla 3."
+        "specNote_balance": "I Månugglaform lägger varje fullbordad besvärjelse till 1 Månflod (max 3). Vid 3 Månflod blir denna knapp Solspår: ett omedelbart naturslag plus en brännskada under 9 sek, återställer 35 mana och förbrukar alla 3."
       },
       "travel_form": {
         "name": "Fleetform",
@@ -18518,7 +18518,7 @@ export const sv_SE: EnTranslations = {
       },
       "rip": {
         "name": "Blodsspricka",
-        "description": "Avslutande attack som får målet att blöda varannan sekund i 24 sek: 72 skada plus 48 per förbrukad kombopoäng (5 poäng: {damage} totalt). Endast i Kattform.",
+        "description": "Avslutande attack som får målet att blöda varannan sekund i 24 sek och ger mer skada för varje förbrukad kombopoäng (5 poäng: {damage} totalt). Endast i Kattform.",
         "specNote_feral": "Det landade slaget lägger till 1 Gammalt Blod (max 3)."
       },
       "mortal_strike": {
@@ -18930,7 +18930,7 @@ export const sv_SE: EnTranslations = {
       },
       "avenging_wrath": {
         "name": "Hämnande vrede",
-        "description": "Vecklar ut lekamliga vingar av gyllene helig kraft, vinner 10 Hängivenhet och fördubblar den Hängivenhet era förmågor alstrar i 15 sek. Ökar dessutom skadan och läkningen ni utdelar med 20%. Gryningsskördare: möjliggör Vredens hammare mot vilket mål som helst."
+        "description": "Vecklar ut lekamliga vingar av gyllene helig kraft, vinner 10 Hängivenhet och fördubblar den Hängivenhet era förmågor alstrar i {duration} sek. Ökar dessutom skadan och läkningen ni utdelar med 20%. Gryningsskördare: möjliggör Vredens hammare mot vilket mål som helst."
       },
       "berserk": {
         "name": "Röd dimma",
@@ -19188,7 +19188,7 @@ export const sv_SE: EnTranslations = {
       },
       "body_blow": {
         "name": "Kroppsslag",
-        "description": "Ett tungt slag för 130% vapenskada plus 10 som ger 2 combopoäng och fördjupar Redline med ett steg. (Thuggery-motorn)"
+        "description": "Ett tungt slag för {weaponPercent}% vapenskada plus {damage} som ger 2 combopoäng och fördjupar Redline med ett steg. (Thuggery-motorn)"
       },
       "knockout_blow": {
         "name": "Knockoutslag",

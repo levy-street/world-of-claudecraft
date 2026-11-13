@@ -6523,7 +6523,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Przez 6 s: twoje otwarcia z Zasłony zmierzchu działają bez ukrycia i pod dowolnym kątem, a ty zadajesz o 10% więcej obrażeń. Twój pierwszy Cios czyhacza w jej trakcie zadaje o 50% więcej obrażeń broni. (Skrytość)',
   'entities.abilities.body_blow.name': 'Cios w korpus',
   'entities.abilities.body_blow.description':
-    'Potężny cios za 130% obrażeń broni plus 10, który przyznaje 2 punkty combo i pogłębia Redline o jedną kreskę. (silnik Thuggery)',
+    'Potężny cios za {weaponPercent}% obrażeń broni plus {damage}, który przyznaje 2 punkty combo i pogłębia Redline o jedną kreskę (maks. 4). (silnik Thuggery)',
   'entities.abilities.knockout_blow.name': 'Cios nokautujący',
   'entities.abilities.knockout_blow.description':
     'Kończy Redline nokautem: uderza za {damage} obrażeń Fizycznych, mocniej o 25% za każdy Cios w korpus rzucony podczas Redline (do 3), i przywraca 25 energii. Obrażenia rosną z mocą ataku. Użyj go, zanim Redline się skończy, inaczej nokaut przepadnie. (Walka)',
@@ -7975,7 +7975,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_monkey.name': 'Postać kuny',
   'entities.abilities.backstab.name': 'Tchórzliwe pchnięcie',
   'entities.abilities.barkskin.description':
-    'Twoja skóra twardnieje niczym kora, zwiększając pancerz o 150 na 15 sek.',
+    'Twoja skóra twardnieje niczym kora, zwiększając pancerz o {buff}% na 15 sek.',
   'entities.abilities.barkskin.name': 'Dębowa skóra',
   'entities.abilities.bash.description': 'Ogłusza cel na 2 sek. Tylko w postaci Bruina.',
   'entities.abilities.bash.name': 'Wstrząśnienie',
@@ -8192,7 +8192,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Leczy sprzymierzony cel o {damage}. Leczenie rośnie z mocą leczenia.',
   'entities.abilities.lesser_heal.name': 'Szeptana modlitwa',
   'entities.abilities.life_tap.description':
-    'Zamienia {damage} zdrowia na {damage} many (o 50% więcej many z Długiem Krwi). Nie działa, jeśli masz {damage} zdrowia lub mniej.',
+    'Zamienia {damage} zdrowia na {buff} many. Nie działa, jeśli masz {damage} zdrowia lub mniej.',
   'entities.abilities.life_tap.name': 'Trudny targ',
   'entities.abilities.lightning_bolt.description':
     'Zadaje {damage} obrażeń od natury. Obrażenia rosną z mocą zaklęć. Żywioły: trafienie daje 1 Grom.',
@@ -14922,7 +14922,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.avatar.description':
     'Przełamuje ogłuszenia, strach, unieruchomienia, uciszenia, rozbrojenia i spowolnienia na tobie (nie te od bossów), po czym stajesz się kolosem na 20 s, zadając o 20% więcej obrażeń. Nie chroni cię przed nowymi efektami kontroli.',
   'entities.abilities.avenging_wrath.description':
-    'Rozwija cielesne skrzydła ze złotej świętej mocy, zyskując 10 Oddania i podwajając na 15 s Oddanie generowane przez twoje umiejętności. Zwiększa ponadto zadawane obrażenia i leczenie o 20%. Żniwiarz świtu: umożliwia Młot gniewu przeciw dowolnemu celowi.',
+    'Rozwija cielesne skrzydła ze złotej świętej mocy, zyskując 10 Oddania i podwajając na {duration} s Oddanie generowane przez twoje umiejętności. Zwiększa ponadto zadawane obrażenia i leczenie o 20%. Żniwiarz świtu: umożliwia Młot gniewu przeciw dowolnemu celowi.',
   'entities.abilities.berserk.description':
     'Zwiększa twoją siłę ataku o 70 na 15 sek. (talent Druida)',
   'entities.abilities.bladestorm.name': 'Burza Ostrzy',
@@ -15007,7 +15007,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Następne dwa zaklęcia z czasem rzucania możesz rzucić w ruchu. Trwa 15 sek. (talent maga)',
   'entities.abilities.ignition.name': 'Zapłon',
   'entities.abilities.ignition.description':
-    'Bierne: gdy twoje zaklęcia Ognia zadają trafienie krytyczne, cel płonie, otrzymując dodatkowe 30% zadanych obrażeń w ciągu 6 s. Nowe podpalenie celu, który już płonie, dodaje się do obrażeń jeszcze należnych i restartuje 6-sekundowy czas. (mistrzostwo Ognia)',
+    'Bierne: gdy twoje zaklęcia Ognia zadają trafienie krytyczne, cel płonie, otrzymując dodatkowe 1,5% zadanych obrażeń za każdy poziom postaci (30% na poziomie 20) w ciągu 6 s. Nowe podpalenie celu, który już płonie, dodaje się do obrażeń jeszcze należnych i restartuje 6-sekundowy czas. (mistrzostwo Ognia)',
   'entities.abilities.mass_barrier.name': 'Masowa bariera',
   'entities.abilities.mass_barrier.description':
     'Osłania ciebie i maksymalnie 4 pobliskich sojuszników w promieniu 30 m; każda bariera pochłania {damage} obrażeń przez 15 sek. (talent maga)',
@@ -16149,7 +16149,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.beacon_of_light.description':
     'Oznacza jednego członka drużyny jako twoją Latarnię Światła. 50% twojego skutecznego leczenia bezpośredniego na innym członku drużyny w promieniu 60 m leczy także Latarnię. Leczenie obszarowe i okresowe nie jest przenoszone. Trwa, dopóki jedno z was nie zginie.',
   'entities.abilities.dawn_devotion.description':
-    'Zwiększa moc ataku twoją i członków drużyny o 40 na 30 min. Zastępuje twoje własne Promienne Oddanie lub Oddanie Łaski, ale współistnieje z Oddaniami innych paladynów i z okrzykami wojownika.',
+    'Zwiększa moc ataku twoją i członków drużyny o {buff} na 30 min. Zastępuje twoje własne Promienne Oddanie lub Oddanie Łaski, ale współistnieje z Oddaniami innych paladynów i z okrzykami wojownika.',
   'entities.abilities.dawnfall.description':
     'Zadaje {damage} obrażeń Świętych pobliskim wrogom i generuje 1 Oddanie. Trafienie co najmniej jednego wroga skraca pozostałe odnowienie Ostatniego Edyktu o 2 s. Wzniesienie zwiększa jego obrażenia o 50% i promień do 10 m.',
   'entities.abilities.dawns_embrace.description':
@@ -16181,7 +16181,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.radiant_chorus.description':
     'Leczy pobliskich sojuszników za {damage} i generuje 1 Oddanie. Skuteczne wyleczenie co najmniej 2 sojuszników przyznaje Promienny Rezonans na 10 s: twoje następne Kojące Światło jest natychmiastowe albo twój następny Uścisk Świtu kosztuje o 50% mniej many i rzuca się w 1,5 s. Wzniesienie zwiększa leczenie Promiennego Chóru o 20%, a jego promień do 40 m.',
   'entities.abilities.radiant_devotion.description':
-    'Zwiększa moc zaklęć twoją i członków drużyny o 20 na 30 min. Zastępuje twoje własne Oddanie Świtu lub Łaski, ale współistnieje z Oddaniami innych paladynów.',
+    'Zwiększa moc zaklęć twoją i członków drużyny o {buff} na 30 min. Zastępuje twoje własne Oddanie Świtu lub Łaski, ale współistnieje z Oddaniami innych paladynów.',
   'entities.abilities.recall_the_fallen.description':
     'Przywraca do życia u twojego boku martwego członka drużyny z 35% zdrowia i many. Słoneczny Uzdrowiciel na poziomie 16 lub wyższym przywołuje zamiast tego każdego poległego członka drużyny w promieniu 30 jardów i w zasięgu wzroku.',
   'entities.abilities.sacred_challenge.description':
@@ -16194,7 +16194,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Zadaje {damage} obrażeń Świętych wrogowi albo leczy sojuszniczy cel za {healing}. Obrażenia rosną z mocą zaklęć, a leczenie z mocą leczenia. Dyscyplina leczy każdego rannego powiązanego członka drużyny w promieniu 30 m za 30% zadanych obrażeń (70% z Podwójnym Przymierzem). Jeśli żaden nie jest ranny, leczy zamiast tego członka drużyny z najniższym zdrowiem w promieniu 30 m za 15% obrażeń. Leczenie członka drużyny leczy też do 2 innych rannych członków drużyny w promieniu 10 m od tego celu i w twojej linii wzroku, każdego za 50% przywróconego zdrowia. Te dodatkowe leczenia nie mogą być krytyczne ani tworzyć powiązań Dyscypliny. (Sygnatura Dyscypliny)',
   'entities.abilities.solar_invocation.description':
     'Natychmiast leczy sojusznika za {damage} albo zadaje wrogowi 120 do 150 bazowych obrażeń Świętych. Obrażenia rosną z mocą zaklęć, a leczenie z mocą leczenia. Oba zastosowania generują 1 Oddanie. Podczas Wzniesienia rzut leczący leczy też sojuszniczych graczy w promieniu 10 m od celu o połowę tej wartości.',
-  'entities.abilities.solar_step.description': 'Zwiększa twoją prędkość ruchu o 150% na 2 s.',
+  'entities.abilities.solar_step.description':
+    'Zwiększa twoją prędkość ruchu o 150% na {duration} s.',
   'entities.abilities.sun_gods_verdict.description':
     'Osądza wroga pod Wyrokiem Boga Słońca przez 30 s. Ostatni Edykt i Upadek Świtu zapisują jeden ładunek przy udanym trafieniu. Umiejętność, która nałoży trzeci ładunek, dyktuje wyrok: Ostatni Edykt uwalnia druzgocące obrażenia na skazanym; Upadek Świtu detonuje wyrok, raniąc i ogłuszając pobliskich wrogów na 1,5 s.',
   'entities.abilities.sunward_disc.description':
@@ -16360,7 +16361,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Zużywa twoje 3 Księżycowego przypływu na ciężki cios zadający {damage} obrażeń tajemnych: wybór obrażeń. Słoneczny ślad zużywa te same 3 Księżycowego przypływu, więc wybierz jeden.',
   'entities.abilities.moonseed.name': 'Księżycowe nasienie',
   'entities.abilities.moonseed.description':
-    'Tylko w Postaci księżycowej sowy. Uderza za {damage} obrażeń od arkanów, dodaje 1 Księżycowy przypływ (maks. 3) i przedłuża twoją Księżycową nawałnicę na celu o 6 s, do {duration} dodatkowych s na nałożenie Księżycowej nawałnicy. Przy 3 Księżycowych przypływach ten przycisk zmienia się w Księżycowy przybór: natychmiastowe uderzenie za 136 do 162 obrażeń od arkanów (plus moc zaklęć), które zużywa wszystkie 3.',
+    'Tylko w Postaci księżycowej sowy. Uderza za {damage} obrażeń od arkanów, dodaje 1 Księżycowy przypływ (maks. 3) i przedłuża twoją Księżycową nawałnicę na celu o 6 s, do {duration} dodatkowych s na nałożenie Księżycowej nawałnicy. Przy 3 Księżycowych przypływach ten przycisk zmienia się w Księżycowy przybór: potężne natychmiastowe uderzenie obrażeniami od arkanów, które zużywa wszystkie 3.',
   'entities.abilities.overbloom.name': 'Nadrozkwit',
   'entities.abilities.overbloom.description':
     'Zużywa 3 punkty Zieleni. Zbiera każde twoje leczenie w czasie na wszystkich sojusznikach za {buff}% pozostałego leczenia, usuwa te efekty i sadzi świeży Zarodnikowe gojenie na celu.',
@@ -16554,14 +16555,14 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Rozdziera przestrzeń w wybranym miejscu, przyciągając wrogów w promieniu 8 m do jego środka, zadając {damage} obrażeń od Cienia i ogłuszając ich na 2 sekundy. Bossowie otrzymują obrażenia, ale są odporni na przyciąganie i ogłuszenie.',
   'entities.abilities.abyssal_rift.name': 'Szczelina Otchłani',
   'entities.abilities.ambush.description':
-    'Uderz z cienia za 250% obrażeń broni plus {damage}. Musisz być w ukryciu i za celem. Wymaga sztyletu. Przyznaje 1 punkt combo.',
+    'Uderz z cienia za {weaponPercent}% obrażeń broni plus {damage}. Musisz być w ukryciu i za celem. Wymaga sztyletu. Przyznaje 1 punkt combo.',
   'entities.abilities.ambush.specNote_subtlety':
     'Użyte z Zasłony zmierzchu dodaje 1 Mrok (maks. 3). Przy 3 Mroku możesz użyć tej zdolności BEZ ukrycia i z dowolnego kąta: takie użycie nic nie kosztuje, zużywa cały Mrok, rozpoczyna 6-sekundową Zasłonę Cieni i zadaje podwójne obrażenia.',
   'entities.abilities.army_of_the_dead.description':
     'Rozdziera grobowy portal, by na 20 sekund wskrzesić tymczasowego Szkieletowego Wojownika, Kościanego Maga i Grobowe Skrzydło, wypełniając szeregi, które pozostawiają puste twoi stali słudzy Władzy.',
   'entities.abilities.army_of_the_dead.name': 'Armia Umarłych',
   'entities.abilities.backstab.description':
-    'Wbij sztylet w plecy celu za 150% obrażeń broni plus {damage}. Musisz znajdować się za celem. Wymaga sztyletu. Przyznaje 1 punkt combo.',
+    'Wbij sztylet w plecy celu za {weaponPercent}% obrażeń broni plus {damage}. Musisz znajdować się za celem. Wymaga sztyletu. Przyznaje 1 punkt combo.',
   'entities.abilities.backstab.specNote_assassination':
     'Każdy trafiony cios dodaje 1 Rytuał Jadu (maks. 6) i zwraca 15 energii. Przy 6 Rytuale Jadu, Wieczny sen zmienia się w Jadowite rozdarcie (zadaje od razu wszystkie pozostałe obrażenia twoich krwawień).',
   'entities.abilities.blade_flurry.description':
@@ -16588,7 +16589,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Wymaga twojego głównego Złego Oka na celu. Umieszcza drugorzędne Złe Oczy na maksymalnie 4 innych wrogach w promieniu 15 m od niego na 15 s. Generują Potępienie w 50% normalnego tempa, a Wyrok odbija się do każdego z nich za 35% swoich obrażeń.',
   'entities.abilities.coven.name': 'Sabat',
   'entities.abilities.cruel_pact.description':
-    'Poświęca 12% twojego maksymalnego zdrowia, aby przywrócić 1,5% maksymalnej many i wygenerować 20 Potępienia. Nie można użyć przy 20% zdrowia lub mniej.',
+    'Poświęca 12% twojego maksymalnego zdrowia, aby przywrócić {buff}% maksymalnej many i wygenerować 20 Potępienia. Nie można użyć przy 20% zdrowia lub mniej.',
   'entities.abilities.cruel_pact.name': 'Okrutny Pakt',
   'entities.abilities.cursed_accomplice.description':
     'Wiąże twoje Oko Przekleństwa, gdy nie wybrano żadnego sojusznika, dzięki czemu jego Spojrzenie Przekleństwa generuje 2 Potępienia. Powiązanie jednego wybranego członka grupy sprawia, że zamiast tego tylko jego obrażenia zadane twojemu Złemu Oku generują 3. Nowe powiązanie zastępuje poprzednie i może się uruchomić nie częściej niż raz na 2 sekundy.',
@@ -16607,7 +16608,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.eviscerate.specNote_assassination':
     'Przy 6 Rytuale Jadu ten przycisk zmienia się w Jadowite rozdarcie: cios, który natychmiast zadaje wszystkie obrażenia, jakie zadałyby jeszcze twoje krwawienia, zadaje świeżą jadowitą ranę i przywraca 20 energii.',
   'entities.abilities.eviscerate.specNote_combat':
-    'Trafienie tym przy 4 lub więcej punktach combo rozpoczyna Redline na 8 s: Nikczemne cięcie zmienia się w Cios w korpus, a ten przycisk w Cios nokautujący (45 plus 35 za punkt combo, trafiając o 25% mocniej za każdy Cios w korpus rzucony podczas Redline, przywraca 25 energii). Wykorzystaj go, zanim Redline się zakończy.',
+    'Trafienie tym przy 4 lub więcej punktach combo rozpoczyna Redline na 8 s: Nikczemne cięcie zmienia się w Cios w korpus, a ten przycisk w Cios nokautujący (umiejętność kończąca, trafiająca o 25% mocniej za każdy Cios w korpus rzucony podczas Redline, przywraca 25 energii). Wykorzystaj go, zanim Redline się zakończy.',
   'entities.abilities.expose_armor.description':
     'Umiejętność kończąca, która obnaża cel na 30 sekund: każdy wydany punkt combo zmniejsza jego pancerz o 2% (5 punktów combo: {damage}%).',
   'entities.abilities.faerie_fire.description': 'Zmniejsza pancerz celu o {damage}% na 40 sekund.',
@@ -16635,7 +16636,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.kidney_shot.description':
     'Umiejętność kończąca, która ogłusza cel na 2 sekundy plus 1 sekundę za punkt combo (5 punktów combo: 7 sekund).',
   'entities.abilities.litany_of_guilt.description':
-    'Rzuca klątwę na twoje główne Złe Oko na 6 sekund. Zyski Potępienia uwalniają falę, która zadaje obrażenia maksymalnie 2 innym wrogom w promieniu 8 m, najwyżej raz na sekundę. Ranga 2 wydłuża to do 8 sekund i 4 wrogów.',
+    'Rzuca klątwę na twoje główne Złe Oko na {duration} sekund. Zyski Potępienia uwalniają falę, która zadaje obrażenia maksymalnie 2 innym wrogom (4 od Rangi 2) w promieniu 8 m, najwyżej raz na sekundę.',
   'entities.abilities.litany_of_guilt.name': 'Litania Winy',
   'entities.abilities.maledict_gaze.description':
     'Twoje Oko Przekleństwa atakuje wroga noszącego twoje główne Złe Oko co 2,5 s, zadając obrażenia od cienia, dopóki ty i ten wróg jesteście w walce, w promieniu 30 m od siebie i w linii wzroku. Opętaj Złe Oko podwaja jego szybkość ataku.',
@@ -16643,7 +16644,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.description':
     'Twoje następne uderzenie w zwarciu zadaje dodatkowe {damage} obrażeń i generuje zagrożenie równe 2,5-krotności swoich obrażeń plus niewielką stałą wartość. Tylko w Postaci Bruina.',
   'entities.abilities.maul.specNote_feral':
-    'Każdy trafiony cios dodaje 1 Starą Krew; przy 3 Starej Krwi ten przycisk zmienia się w Łamacz szpiku: cios zadający od 78 do 96 obrażeń przy wysokim zagrożeniu; poniżej połowy zdrowia zamiast tego leczy cię o 18% twojego maksymalnego zdrowia i zwraca 15 wściekłości.',
+    'Każdy trafiony cios dodaje 1 Starą Krew; przy 3 Starej Krwi ten przycisk zmienia się w Łamacz szpiku: potężny cios przy wysokim zagrożeniu; poniżej połowy zdrowia zamiast tego leczy cię o 18% twojego maksymalnego zdrowia i zwraca 15 wściekłości.',
   'entities.abilities.moonfire.description':
     'Podpala wroga za {damage} obrażeń od arkanów, a następnie zadaje kolejne {overTime} obrażeń od arkanów w ciągu {duration} s.',
   'entities.abilities.moonfire.specNote_balance':
@@ -16683,7 +16684,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rejuvenation.specNote_restoration':
     'Każde rzucenie dodaje 1 Zieleń (maks. 3), także gdy odnawia rozkwit, który już działa. Przy 3 Zieleni Szybkie uzdrowienie zmienia się w Nadrozkwit.',
   'entities.abilities.rip.description':
-    'Cios kończący wywołujący krwawienie co 2 s przez 24 s: 72 obrażenia plus 48 za wydany punkt kombinacji (5 punktów: łącznie {damage}). Tylko w Postaci kota.',
+    'Cios kończący wywołujący krwawienie co 2 s przez 24 s, zadający tym większe obrażenia, im więcej punktów kombinacji wydano (5 punktów: łącznie {damage}). Tylko w Postaci kota.',
   'entities.abilities.rip.specNote_feral': 'Trafiony cios dodaje 1 Starą Krew (maks. 3).',
   'entities.abilities.ruinous_brand.description':
     'Naznacza wroga na 15 sekund. Twoje następne 3 bezpośrednie zaklęcia odbijają się za 25% obrażeń w naznaczonego wroga, albo kopiują na niego 50% obrażeń, gdy rzucone są na inny cel. Echa Pocisku Ruiny również liczą się jako trafienia krytyczne, bez dodatkowego mnożnika obrażeń krytycznych.',
@@ -16703,7 +16704,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Natychmiastowy cios za obrażenia broni plus {damage}. Przyznaje 1 punkt combo.',
   'entities.abilities.sinister_strike.specNote_assassination': 'Dodaje 1 Rytuał Jadu (maks. 6).',
   'entities.abilities.sinister_strike.specNote_combat':
-    'Gdy Redline jest aktywny, ten przycisk zmienia się w Cios w korpus: 130% obrażeń broni plus 10, przyznaje 2 punkty combo i dodaje 1 kreskę Redline (maks. 4).',
+    'Gdy Redline jest aktywny, ten przycisk zmienia się w Cios w korpus: cięższe uderzenie bronią, które przyznaje 2 punkty combo i dodaje 1 kreskę Redline (maks. 4).',
   'entities.abilities.slice_and_dice.description':
     'Umiejętność kończąca, która zwiększa szybkość ataku w walce wręcz o 30% na 12 sekund plus 4 sekundy za punkt combo (5 punktów combo: 32 sekundy).',
   'entities.abilities.soul_harvest.description':
@@ -16718,7 +16719,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.description':
     'Przyzywa pocisk gwiezdnego ognia, zadając {damage} obrażeń od Arkanów.',
   'entities.abilities.starfire.specNote_balance':
-    'W Postaci księżycowej sowy każde ukończone rzucenie dodaje 1 Księżycowy przypływ (maks. 3). Przy 3 Księżycowym przypływie ten przycisk zmienia się w Słoneczny ślad: natychmiastowe uderzenie zadające od 80 do 100 obrażeń od Natury plus podpalenie na 45 obrażeń przez 9 sekund, przywracające 35 many i zużywające wszystkie 3 stopnie Księżycowego przypływu.',
+    'W Postaci księżycowej sowy każde ukończone rzucenie dodaje 1 Księżycowy przypływ (maks. 3). Przy 3 Księżycowym przypływie ten przycisk zmienia się w Słoneczny ślad: natychmiastowe uderzenie obrażeniami od Natury plus podpalenie trwające 9 sekund, przywracające 35 many i zużywające wszystkie 3 stopnie Księżycowego przypływu.',
   'entities.abilities.stealth.description':
     'Ukrywa cię w cieniach. Wrodzy gracze i zwierzęta nie mogą cię zobaczyć, a potwory zauważają cię tylko ze znacznie mniejszej odległości niż zwykle (z większej, jeśli mają wyższy poziom od ciebie). Poruszasz się z pełną prędkością. Atakowanie lub otrzymanie obrażeń przerywa Zasłonę zmierzchu. Rzuć ponownie, aby z niej wyjść.',
   'entities.abilities.stealth.specNote_subtlety':

@@ -6389,7 +6389,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Selama 6 dtk: pembuka Selubung Senjamu bekerja tanpa siluman dan dari sudut mana pun, dan kamu memberi 10% lebih banyak kerusakan. Serangan Penyergap pertamamu di dalamnya memberi 50% lebih banyak kerusakan senjata. (Kesamaran)',
   'entities.abilities.body_blow.name': 'Pukulan Tubuh',
   'entities.abilities.body_blow.description':
-    'Pukulan berat sebesar 130% kerusakan senjata plus 10 yang memberikan 2 poin combo dan memperdalam Redline satu tingkat. (mesin Thuggery)',
+    'Pukulan berat sebesar {weaponPercent}% kerusakan senjata plus {damage} yang memberikan 2 poin combo dan memperdalam Redline satu tingkat (maks 4). (mesin Thuggery)',
   'entities.abilities.knockout_blow.name': 'Pukulan Nokaut',
   'entities.abilities.knockout_blow.description':
     'Mengakhiri Redline dengan nokaut: menyerang sebesar {damage} kerusakan Fisik, memukul 25% lebih keras untuk setiap Pukulan Tubuh yang kamu lancarkan selama Redline (hingga 3), dan memulihkan 25 energi. Kerusakan meningkat dengan Kekuatan Serangan. Gunakan sebelum Redline habis atau nokaut hilang. (Tempur)',
@@ -7950,7 +7950,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_monkey.name': 'Wujud Musang',
   'entities.abilities.backstab.name': 'Tusukan Pengecut',
   'entities.abilities.barkskin.description':
-    'Kulitmu mengeras bagai kulit kayu, meningkatkan zirah sebesar 150 selama 15 detik.',
+    'Kulitmu mengeras bagai kulit kayu, meningkatkan zirah sebesar {buff}% selama 15 detik.',
   'entities.abilities.barkskin.name': 'Kulit Ek',
   'entities.abilities.bash.description':
     'Menyetrum target selama 2 detik. Hanya dalam Wujud Bruin.',
@@ -8171,7 +8171,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menyembuhkan sasaran sekutu sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Penyembuhan.',
   'entities.abilities.lesser_heal.name': 'Doa Berbisik',
   'entities.abilities.life_tap.description':
-    'Mengubah {damage} kesehatan menjadi {damage} mana (50% lebih banyak mana dengan Utang Darah). Gagal jika kesehatanmu {damage} atau kurang.',
+    'Mengubah {damage} kesehatan menjadi {buff} mana. Gagal jika kesehatanmu {damage} atau kurang.',
   'entities.abilities.life_tap.name': 'Tawar Getir',
   'entities.abilities.lightning_bolt.description':
     'Memberi {damage} kerusakan Alam. Kerusakan meningkat dengan Kekuatan Mantra. Elemental: pukulan telak memberi 1 Guntur.',
@@ -14702,7 +14702,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.avatar.description':
     'Mematahkan setrum, ketakutan, akar, pembungkaman, pelucutan senjata, dan perlambatan pada dirimu (bukan yang dari bos), lalu menjadi kolosus selama 20 dtk, memberi 20% lebih banyak kerusakan. Ia tidak melindungimu dari efek kendali baru.',
   'entities.abilities.avenging_wrath.description':
-    'Membentangkan sayap wadag dari kekuatan suci keemasan, memperoleh 10 Pengabdian dan menggandakan Pengabdian yang dihasilkan kemampuanmu selama 15 dtk. Juga meningkatkan kerusakan dan penyembuhan yang kamu berikan sebesar 20%. Penuai fajar: memungkinkan Palu Murka terhadap sasaran mana pun.',
+    'Membentangkan sayap wadag dari kekuatan suci keemasan, memperoleh 10 Pengabdian dan menggandakan Pengabdian yang dihasilkan kemampuanmu selama {duration} dtk. Juga meningkatkan kerusakan dan penyembuhan yang kamu berikan sebesar 20%. Penuai fajar: memungkinkan Palu Murka terhadap sasaran mana pun.',
   'entities.abilities.berserk.description':
     'Meningkatkan daya serangmu sebesar 70 selama 15 detik. (talenta Druid)',
   'entities.abilities.bladestorm.name': 'Badai Pedang',
@@ -14787,7 +14787,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Dua mantra berikutnya yang memiliki waktu perapalan dapat dirapal sambil bergerak. Berlangsung 15 dtk. (talenta mage)',
   'entities.abilities.ignition.name': 'Penyalaan',
   'entities.abilities.ignition.description':
-    'Pasif: saat mantra Apimu mendapat serangan kritis, target terbakar sebesar tambahan 30% dari kerusakan yang diberikan selama 6 dtk. Pembakaran baru pada target yang sudah terbakar menambah kerusakan yang masih tersisa dan memulai ulang penghitung waktu 6 dtk. (Penguasaan Api)',
+    'Pasif: saat mantra Apimu mendapat serangan kritis, target terbakar sebesar tambahan 1,5% dari kerusakan yang diberikan per level karakter (30% pada level 20) selama 6 dtk. Pembakaran baru pada target yang sudah terbakar menambah kerusakan yang masih tersisa dan memulai ulang penghitung waktu 6 dtk. (Penguasaan Api)',
   'entities.abilities.mass_barrier.name': 'Penghalang Massal',
   'entities.abilities.mass_barrier.description':
     'Melindungi dirimu dan hingga 4 sekutu di dekatmu dalam jarak 30 yard; masing-masing menyerap {damage} kerusakan selama 15 dtk. (talenta mage)',
@@ -16034,7 +16034,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.beacon_of_light.description':
     'Menandai satu anggota kelompok sebagai Mercusuar Cahayamu. 50% penyembuhan langsungmu yang efektif pada anggota kelompok lain dalam 60 yard juga menyembuhkan Mercusuar. Penyembuhan area dan berkala tidak dialihkan. Bertahan sampai salah satu dari kalian mati.',
   'entities.abilities.dawn_devotion.description':
-    'Menambah kekuatan serang kamu dan anggota kelompok sebesar 40 selama 30 mnt. Menggantikan Pengabdian Berseri atau Karuniamu sendiri, tetapi berdampingan dengan Pengabdian paladin lain dan dengan seruan pendekar.',
+    'Menambah kekuatan serang kamu dan anggota kelompok sebesar {buff} selama 30 mnt. Menggantikan Pengabdian Berseri atau Karuniamu sendiri, tetapi berdampingan dengan Pengabdian paladin lain dan dengan seruan pendekar.',
   'entities.abilities.dawnfall.description':
     'Memberi {damage} kerusakan Suci kepada musuh di dekatnya dan menghasilkan 1 Pengabdian. Mengenai setidaknya satu musuh memangkas sisa masa tunggu Titah Terakhir sebesar 2 dtk. Kenaikan menambah kerusakannya 50% dan radiusnya menjadi 10 m.',
   'entities.abilities.dawns_embrace.description':
@@ -16066,7 +16066,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.radiant_chorus.description':
     'Menyembuhkan sekutu di dekatnya sebesar {damage} dan menghasilkan 1 Pengabdian. Menyembuhkan secara efektif setidaknya 2 sekutu memberi Resonansi Berseri selama 10 dtk: Cahaya Pemulih berikutnya seketika, atau Pelukan Fajar berikutnya menghabiskan 50% lebih sedikit mana dan dirapal dalam 1,5 dtk. Kenaikan menambah penyembuhan Paduan Suara Berseri 20% dan radiusnya menjadi 40 m.',
   'entities.abilities.radiant_devotion.description':
-    'Menambah kekuatan mantra kamu dan anggota kelompok sebesar 20 selama 30 mnt. Menggantikan Pengabdian Fajar atau Karuniamu sendiri, tetapi berdampingan dengan Pengabdian paladin lain.',
+    'Menambah kekuatan mantra kamu dan anggota kelompok sebesar {buff} selama 30 mnt. Menggantikan Pengabdian Fajar atau Karuniamu sendiri, tetapi berdampingan dengan Pengabdian paladin lain.',
   'entities.abilities.recall_the_fallen.description':
     'Menghidupkan kembali anggota kelompok yang mati ke sisimu dengan 35% nyawa dan mana. Penyembuh Surya level 16 atau lebih tinggi justru memanggil kembali seluruh anggota kelompok yang gugur dalam 30 yard dan dalam garis pandangmu.',
   'entities.abilities.sacred_challenge.description':
@@ -16079,7 +16079,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Memberi {damage} kerusakan Suci kepada musuh atau menyembuhkan target sekutu sebesar {healing}. Kerusakan meningkat dengan Kekuatan Mantra; penyembuhan meningkat dengan Kekuatan Penyembuhan. Disiplin menyembuhkan setiap anggota kelompok tertaut yang terluka dalam 30 yard sebesar 30% kerusakan yang diberikan (70% dengan Perjanjian Kembar). Jika tidak ada yang terluka, ia menyembuhkan anggota kelompok terluka dengan kesehatan terendah dalam 30 yard sebesar 15% kerusakan. Menyembuhkan anggota kelompok juga menyembuhkan hingga 2 anggota kelompok terluka lain dalam 10 yard dari target itu dan dalam garis pandangmu, masing-masing sebesar 50% kesehatan yang dipulihkan. Penyembuhan tambahan ini tidak bisa kritis atau membuat tautan Disiplin. (Ciri khas Disiplin)',
   'entities.abilities.solar_invocation.description':
     'Seketika menyembuhkan sekutu sebesar {damage} atau memberi 120 sampai 150 kerusakan Suci dasar kepada musuh. Kerusakan meningkat dengan Kekuatan Mantra dan penyembuhan dengan Kekuatan Penyembuhan. Kedua penggunaan menghasilkan 1 Pengabdian. Selama Kenaikan, rapalan penyembuhan juga menyembuhkan pemain sekutu dalam 10 m dari target sebesar setengahnya.',
-  'entities.abilities.solar_step.description': 'Menambah kecepatan gerakmu 150% selama 2 dtk.',
+  'entities.abilities.solar_step.description':
+    'Menambah kecepatan gerakmu 150% selama {duration} dtk.',
   'entities.abilities.sun_gods_verdict.description':
     'Mengadili musuh di bawah Putusan Dewa Matahari selama 30 dtk. Titah Terakhir dan Runtuhnya Fajar menuliskan satu muatan pada pukulan yang berhasil. Kemampuan yang menempatkan muatan ketiga menentukan hukumannya: Titah Terakhir melepaskan kerusakan dahsyat pada terdakwa; Runtuhnya Fajar meledakkan putusan, melukai dan membuat musuh di dekatnya terhuyung 1,5 dtk.',
   'entities.abilities.sunward_disc.description':
@@ -16246,7 +16247,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menghabiskan 3 Pasang Rembulan milikmu untuk serangan berat sebesar {damage} kerusakan Gaib: pilihan kerusakan. Jejak Surya menghabiskan 3 Pasang Rembulan yang sama, jadi pilih salah satu.',
   'entities.abilities.moonseed.name': 'Benih Rembulan',
   'entities.abilities.moonseed.description':
-    'Hanya dalam Wujud Burung Bulan. Menyerang sebesar {damage} kerusakan Arkana, menambah 1 Pasang Rembulan (maks 3), dan memperpanjang Badai Rembulanmu pada target selama 6 dtk, hingga {duration} dtk tambahan per penerapan Badai Rembulan. Pada 3 Pasang Rembulan, tombol ini menjadi Gelombang Rembulan: serangan seketika sebesar 136 sampai 162 kerusakan Arkana (ditambah kekuatan mantra) yang menghabiskan ketiganya.',
+    'Hanya dalam Wujud Burung Bulan. Menyerang sebesar {damage} kerusakan Arkana, menambah 1 Pasang Rembulan (maks 3), dan memperpanjang Badai Rembulanmu pada target selama 6 dtk, hingga {duration} dtk tambahan per penerapan Badai Rembulan. Pada 3 Pasang Rembulan, tombol ini menjadi Gelombang Rembulan: serangan Arkana berat seketika yang menghabiskan ketiganya.',
   'entities.abilities.overbloom.name': 'Mekar Raya',
   'entities.abilities.overbloom.description':
     'Menghabiskan 3 Kehijauan. Memanen setiap penyembuhan berkala milikmu pada semua sekutu sebesar {buff}% dari penyembuhan tersisa, menghapus efek itu, dan menanam Pemulihan Spora segar pada sasaran.',
@@ -16625,14 +16626,14 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Membuka celah di lokasi yang dipilih, menarik musuh dalam radius 8 yard ke pusatnya, memberikan {damage} kerusakan Bayangan, dan membuat mereka terpana selama 2 detik. Bos menerima kerusakan tetapi menahan tarikan dan efek terpana.',
   'entities.abilities.abyssal_rift.name': 'Celah Jurang',
   'entities.abilities.ambush.description':
-    'Menyerang dari bayangan sebesar 250% kerusakan senjata ditambah {damage}. Harus dalam siluman dan berada di belakang target. Membutuhkan belati. Memberi 1 poin combo.',
+    'Menyerang dari bayangan sebesar {weaponPercent}% kerusakan senjata ditambah {damage}. Harus dalam siluman dan berada di belakang target. Membutuhkan belati. Memberi 1 poin combo.',
   'entities.abilities.ambush.specNote_subtlety':
     'Dipakai dari Selubung Senja, ini menambah 1 Gloam (maks 3). Pada 3 Gloam kamu bisa memakainya TANPA siluman dan dari sudut mana pun: penggunaan itu tidak memakan biaya, menghabiskan seluruh 3 Gloam, memulai Tabir Bayangan selama 6 detik, dan menghantam dua kali lipat.',
   'entities.abilities.army_of_the_dead.description':
     'Membuka portal makam untuk membangkitkan Prajurit Kerangka, Penyihir Tulang, dan Sayap Kubur sementara selama 20 detik, mengisi barisan yang dikosongkan oleh abdi Dominasi tetapmu.',
   'entities.abilities.army_of_the_dead.name': 'Pasukan Mayat',
   'entities.abilities.backstab.description':
-    'Tancapkan belatimu ke punggung target sebesar 150% kerusakan senjata ditambah {damage}. Harus berada di belakang target. Membutuhkan belati. Memberi 1 poin combo.',
+    'Tancapkan belatimu ke punggung target sebesar {weaponPercent}% kerusakan senjata ditambah {damage}. Harus berada di belakang target. Membutuhkan belati. Memberi 1 poin combo.',
   'entities.abilities.backstab.specNote_assassination':
     'Setiap serangan menambah 1 Ritus Bisa (maks 6) dan mengembalikan 15 energi. Pada 6 Ritus Bisa, Dirt Nap berubah menjadi Venomrend (menimbulkan seluruh sisa kerusakan pendarahanmu sekaligus).',
   'entities.abilities.blade_flurry.description':
@@ -16660,7 +16661,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Membutuhkan Mata Jahat utamamu pada target. Menempatkan Mata Jahat sekunder pada hingga 4 musuh lain dalam 15 yard darinya selama 15 dtk. Mereka menghasilkan Kecaman dengan laju 50% dari normal, dan Vonis bergema ke masing-masing dari mereka sebesar 35% kerusakannya.',
   'entities.abilities.coven.name': 'Persekutuan Penyihir',
   'entities.abilities.cruel_pact.description':
-    'Mengorbankan 12% dari nyawa maksimummu untuk memulihkan 1,5% dari mana maksimummu dan menghasilkan 20 Kecaman. Tidak dapat digunakan pada atau di bawah 20% nyawa.',
+    'Mengorbankan 12% dari nyawa maksimummu untuk memulihkan {buff}% dari mana maksimummu dan menghasilkan 20 Kecaman. Tidak dapat digunakan pada atau di bawah 20% nyawa.',
   'entities.abilities.cruel_pact.name': 'Perjanjian Kejam',
   'entities.abilities.cursed_accomplice.description':
     'Menautkan Maledict Eye-mu saat tidak ada sekutu yang dipilih, membuat Gaze miliknya menghasilkan 2 Kecaman. Menautkan satu anggota grup yang dipilih membuat hanya kerusakan mereka terhadap Mata Jahat-mu yang menghasilkan 3 sebagai gantinya. Tautan baru menggantikan yang sebelumnya dan dapat terpicu sekali setiap 2 detik.',
@@ -16679,7 +16680,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.eviscerate.specNote_assassination':
     'Pada 6 Ritus Bisa, tombol ini berubah menjadi Venomrend: serangan yang seketika menimbulkan seluruh kerusakan yang masih akan diberikan pendarahanmu, menanamkan luka bisa yang segar, dan memulihkan 20 energi.',
   'entities.abilities.eviscerate.specNote_combat':
-    'Mendaratkan ini dengan 4 poin kombo atau lebih memulai Redline selama 8 dtk: Tebasan Keji berubah menjadi Pukulan Tubuh dan tombol ini menjadi Pukulan Nokaut (45 ditambah 35 per poin kombo, memukul 25% lebih keras untuk setiap Pukulan Tubuh yang kamu lancarkan selama Redline, memulihkan 25 energi). Gunakan sebelum Redline berakhir.',
+    'Mendaratkan ini dengan 4 poin kombo atau lebih memulai Redline selama 8 dtk: Tebasan Keji berubah menjadi Pukulan Tubuh dan tombol ini menjadi Pukulan Nokaut (jurus penutup yang memukul 25% lebih keras untuk setiap Pukulan Tubuh yang kamu lancarkan selama Redline dan memulihkan 25 energi). Gunakan sebelum Redline berakhir.',
   'entities.abilities.expose_armor.description':
     'Jurus penutup yang membuka pertahanan target selama 30 detik: setiap poin combo yang dipakai mengurangi zirahnya sebesar 2% (5 poin combo: {damage}%).',
   'entities.abilities.faerie_fire.description':
@@ -16708,7 +16709,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.kidney_shot.description':
     'Jurus penutup yang membuat target terpana selama 2 detik plus 1 detik per poin combo (5 poin combo: 7 detik).',
   'entities.abilities.litany_of_guilt.description':
-    'Mengutuk Mata Jahat utamamu selama 6 detik. Perolehan Kecaman melepaskan gelombang yang merusak hingga 2 musuh lain dalam radius 8 yard, paling banyak sekali per detik. Peringkat 2 memperpanjangnya menjadi 8 detik dan 4 musuh.',
+    'Mengutuk Mata Jahat utamamu selama {duration} detik. Perolehan Kecaman melepaskan gelombang yang merusak hingga 2 musuh lain (4 mulai Peringkat 2) dalam radius 8 yard, paling banyak sekali per detik.',
   'entities.abilities.litany_of_guilt.name': 'Litani Rasa Bersalah',
   'entities.abilities.maledict_gaze.description':
     'Mata Kutukanmu menyerang musuh yang memikul Mata Jahat utamamu setiap 2,5 dtk dengan kerusakan Bayangan, selama kamu dan musuh itu sama-sama dalam pertempuran, berjarak 30 yard satu sama lain, dan dalam garis pandang. Rasuki Mata Jahat menggandakan kecepatan serangnya.',
@@ -16716,7 +16717,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.description':
     'Ayunan jarak dekat berikutnya memberi {damage} kerusakan tambahan dan menghasilkan ancaman sebesar 2,5 kali kerusakannya ditambah sedikit jumlah tetap. Hanya dalam Wujud Bruin.',
   'entities.abilities.maul.specNote_feral':
-    'Setiap pukulan yang mengenai menambah 1 Darah Tua; pada 3 Darah Tua tombol ini berubah menjadi Marrowbreak: serangan sebesar 78 hingga 96 kerusakan dengan ancaman besar; di bawah setengah nyawa, ia justru menyembuhkanmu sebesar 18% dari nyawa maksimummu dan mengembalikan 15 amarah.',
+    'Setiap pukulan yang mengenai menambah 1 Darah Tua; pada 3 Darah Tua tombol ini berubah menjadi Marrowbreak: serangan berat dengan ancaman besar; di bawah setengah nyawa, ia justru menyembuhkanmu sebesar 18% dari nyawa maksimummu dan mengembalikan 15 amarah.',
   'entities.abilities.moonfire.description':
     'Membakar musuh sebesar {damage} kerusakan Arkana, lalu {overTime} kerusakan Arkana lagi selama {duration} dtk.',
   'entities.abilities.moonfire.specNote_balance':
@@ -16758,7 +16759,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rejuvenation.specNote_restoration':
     'Setiap rapalan menambah 1 Kehijauan (maks 3), termasuk saat menyegarkan kuntum yang masih aktif. Pada 3 Kehijauan, Pemulihan Cepat berubah menjadi Mekar Raya.',
   'entities.abilities.rip.description':
-    'Serangan penutup yang membuat target berdarah setiap 2 dtk selama 24 dtk: 72 kerusakan ditambah 48 per poin kombo yang dipakai (5 poin: total {damage}). Hanya Wujud Kucing.',
+    'Serangan penutup yang membuat target berdarah setiap 2 dtk selama 24 dtk, dengan kerusakan lebih besar untuk setiap poin kombo yang dipakai (5 poin: total {damage}). Hanya Wujud Kucing.',
   'entities.abilities.rip.specNote_feral': 'Pukulan yang mengenai menambah 1 Darah Tua (maks 3).',
   'entities.abilities.ruinous_brand.description':
     'Menandai musuh selama 15 detik. 3 mantra langsung berikutnya bergema sebesar 25% kerusakan terhadap musuh yang ditandai, atau menyalin 50% kerusakan kepadanya saat dirapalkan terhadap target lain. Gema Baut Reruntuhan juga terhitung sebagai pukulan kritis, tanpa pengganda kerusakan kritis tambahan.',
@@ -16778,7 +16779,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Serangan seketika sebesar kerusakan senjata ditambah {damage}. Memberi 1 poin combo.',
   'entities.abilities.sinister_strike.specNote_assassination': 'Menambah 1 Ritus Bisa (maks 6).',
   'entities.abilities.sinister_strike.specNote_combat':
-    'Selagi Redline aktif, tombol ini berubah menjadi Haymaker: 130% kerusakan senjata plus 10, memberi 2 poin combo, dan menambah 1 Redline (maks 4).',
+    'Selagi Redline aktif, tombol ini berubah menjadi Haymaker: serangan senjata yang lebih berat, memberi 2 poin combo, dan menambah 1 Redline (maks 4).',
   'entities.abilities.slice_and_dice.description':
     'Jurus penutup yang meningkatkan kecepatan serang jarak dekat sebesar 30% selama 12 detik plus 4 detik per poin combo (5 poin combo: 32 detik).',
   'entities.abilities.soul_harvest.description':
@@ -16793,7 +16794,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.description':
     'Memanggil turun baut api bintang, menyebabkan {damage} kerusakan Arkana.',
   'entities.abilities.starfire.specNote_balance':
-    'Dalam Wujud Burung Bulan, setiap rapalan yang selesai menambah 1 Moontide (maks 3). Pada 3 Moontide, tombol ini berubah menjadi Sunwake: serangan seketika sebesar 80 hingga 100 kerusakan Alam plus bakaran 45 selama 9 detik, memulihkan 35 mana dan menghabiskan seluruh 3.',
+    'Dalam Wujud Burung Bulan, setiap rapalan yang selesai menambah 1 Moontide (maks 3). Pada 3 Moontide, tombol ini berubah menjadi Sunwake: serangan Alam seketika plus bakaran selama 9 detik, memulihkan 35 mana dan menghabiskan seluruh 3.',
   'entities.abilities.stealth.description':
     'Menyembunyikan dirimu dalam bayangan. Pemain dan hewan peliharaan musuh tidak dapat melihatmu, dan monster menyadarimu hanya dari jarak yang jauh lebih dekat dari biasanya (dari lebih jauh jika level mereka lebih tinggi darimu). Kamu bergerak dengan kecepatan penuh. Menyerang atau menerima kerusakan mengakhiri Selubung Senja. Rapal lagi untuk keluar.',
   'entities.abilities.stealth.specNote_subtlety':

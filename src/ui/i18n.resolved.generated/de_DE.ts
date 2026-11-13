@@ -17704,7 +17704,7 @@ export const de_DE: EnTranslations = {
       },
       "ignition": {
         "name": "Entzündung",
-        "description": "Passiv: Wenn Eure Feuerzauber kritisch treffen, verbrennt das Ziel 6 Sek. lang und erleidet zusätzlich 30% des verursachten Schadens. Eine neue Verbrennung auf einem bereits brennenden Ziel erhöht den noch ausstehenden Schaden und startet den 6-Sek.-Zeitgeber neu. (Feuermeisterschaft)"
+        "description": "Passiv: Wenn Eure Feuerzauber kritisch treffen, verbrennt das Ziel 6 Sek. lang und erleidet zusätzlich 1,5% des verursachten Schadens pro Charakterstufe (30% auf Stufe 20). Eine neue Verbrennung auf einem bereits brennenden Ziel erhöht den noch ausstehenden Schaden und startet den 6-Sek.-Zeitgeber neu. (Feuermeisterschaft)"
       },
       "mass_barrier": {
         "name": "Massenbarriere",
@@ -17814,17 +17814,17 @@ export const de_DE: EnTranslations = {
         "name": "Boshafter Hieb",
         "description": "Ein sofortiger Schlag für Waffenschaden plus {damage}. Gewährt 1 Combopunkt.",
         "specNote_assassination": "Fügt 1 Giftritual hinzu (max. 6).",
-        "specNote_combat": "Solange die Redline aktiv ist, wird diese Taste zu Körpertreffer: 130% Waffenschaden plus 10, gewährt 2 Combopunkte und fügt 1 Redline hinzu (max. 4)."
+        "specNote_combat": "Solange die Redline aktiv ist, wird diese Taste zu Körpertreffer: ein schwererer Waffenschlag, der 2 Combopunkte gewährt und 1 Redline hinzufügt (max. 4)."
       },
       "eviscerate": {
         "name": "Grabesschlaf",
         "description": "Finishing-Move, der {damage} physischen Schaden verursacht. Der Schaden steigt mit der Angriffskraft.",
         "specNote_assassination": "Bei 6 Giftritual wird diese Taste zu Giftriss: ein Schlag, der sofort allen Schaden verursacht, den Eure Blutungen noch verursacht hätten, eine frische Giftwunde setzt und 20 Energie wiederherstellt.",
-        "specNote_combat": "Landet dies mit 4 oder mehr Combopunkten, startet die Redline für 8 Sek.: Boshafter Hieb wird zu Körpertreffer, und diese Taste wird zu K.o.-Schlag (45 plus 35 pro Combopunkt, pro geworfenem Körpertreffer während der Redline 25% härter, stellt 25 Energie wieder her). Setzt ihn ein, bevor die Redline endet."
+        "specNote_combat": "Landet dies mit 4 oder mehr Combopunkten, startet die Redline für 8 Sek.: Boshafter Hieb wird zu Körpertreffer, und diese Taste wird zu K.o.-Schlag (ein Finisher, der pro geworfenem Körpertreffer während der Redline 25% härter trifft und 25 Energie wiederherstellt). Setzt ihn ein, bevor die Redline endet."
       },
       "backstab": {
         "name": "Feiger Stoß",
-        "description": "Rammt Euren Dolch in den Rücken des Ziels für 150% Waffenschaden plus {damage}. Erfordert Position hinter dem Ziel. Erfordert einen Dolch. Gewährt 1 Combopunkt.",
+        "description": "Rammt Euren Dolch in den Rücken des Ziels für {weaponPercent}% Waffenschaden plus {damage}. Erfordert Position hinter dem Ziel. Erfordert einen Dolch. Gewährt 1 Combopunkt.",
         "specNote_assassination": "Jeder Treffer fügt 1 Giftritual hinzu (max. 6) und erstattet 15 Energie zurück. Bei 6 Giftritual wird Grabesschlaf zu Giftriss (er verursacht sofort Euren gesamten verbleibenden Blutungsschaden)."
       },
       "gouge": {
@@ -17849,7 +17849,7 @@ export const de_DE: EnTranslations = {
       },
       "ambush": {
         "name": "Lauererstoß",
-        "description": "Schlagt aus dem Schatten zu für 250% Waffenschaden plus {damage}. Erfordert Verstohlenheit und Position hinter dem Ziel. Erfordert einen Dolch. Gewährt 1 Combopunkt.",
+        "description": "Schlagt aus dem Schatten zu für {weaponPercent}% Waffenschaden plus {damage}. Erfordert Verstohlenheit und Position hinter dem Ziel. Erfordert einen Dolch. Gewährt 1 Combopunkt.",
         "specNote_subtlety": "Aus Duskveil eingesetzt fügt dies 1 Dämmer hinzu (max. 3). Bei 3 Dämmer könnt Ihr es OHNE Verstohlenheit und aus jedem Winkel einsetzen: Dieser Einsatz kostet nichts, verbraucht alle 3 Dämmer, startet den 6 Sek. langen Schattenschleier und trifft doppelt."
       },
       "stealth": {
@@ -17950,7 +17950,7 @@ export const de_DE: EnTranslations = {
       },
       "solar_step": {
         "name": "Sonnenschritt",
-        "description": "Erhöht Euer Tempo 2 Sek. lang um 150%."
+        "description": "Erhöht Euer Tempo {duration} Sek. lang um 150%."
       },
       "solar_invocation": {
         "name": "Sonnenanrufung",
@@ -17958,11 +17958,11 @@ export const de_DE: EnTranslations = {
       },
       "radiant_devotion": {
         "name": "Strahlende Hingabe",
-        "description": "Erhöht die Zaubermacht von Euch und Euren Gruppenmitgliedern 30 Min. lang um 20. Ersetzt Eure eigene Hingabe der Morgenröte oder Hingabe der Gnade, besteht aber neben den Hingaben anderer Paladine."
+        "description": "Erhöht die Zaubermacht von Euch und Euren Gruppenmitgliedern 30 Min. lang um {buff}. Ersetzt Eure eigene Hingabe der Morgenröte oder Hingabe der Gnade. Wirkt ein anderer Paladin Strahlende Hingabe, wird sie erneuert statt gestapelt; eine andere Hingabe besteht daneben."
       },
       "dawn_devotion": {
         "name": "Hingabe der Morgenröte",
-        "description": "Erhöht die Angriffskraft von Euch und Euren Gruppenmitgliedern 30 Min. lang um 40. Ersetzt Eure eigene Strahlende Hingabe oder Hingabe der Gnade, besteht aber neben den Hingaben anderer Paladine und neben Kriegerrufen."
+        "description": "Erhöht die Angriffskraft von Euch und Euren Gruppenmitgliedern 30 Min. lang um {buff}. Ersetzt Eure eigene Strahlende Hingabe oder Hingabe der Gnade. Wirkt ein anderer Paladin Hingabe der Morgenröte, wird sie erneuert statt gestapelt; eine andere Hingabe und Kriegerrufe bestehen daneben."
       },
       "grace_devotion": {
         "name": "Hingabe der Gnade",
@@ -18303,7 +18303,7 @@ export const de_DE: EnTranslations = {
       },
       "life_tap": {
         "name": "Harter Handel",
-        "description": "Wandelt {damage} Gesundheit in {damage} Mana um (50% mehr Mana mit Blutkredit). Schlägt fehl, wenn Ihr {damage} Gesundheit oder weniger habt."
+        "description": "Wandelt {damage} Gesundheit in {buff} Mana um. Schlägt fehl, wenn Ihr {damage} Gesundheit oder weniger habt."
       },
       "cursed_accomplice": {
         "name": "Verfluchter Komplize",
@@ -18319,7 +18319,7 @@ export const de_DE: EnTranslations = {
       },
       "litany_of_guilt": {
         "name": "Litanei der Schuld",
-        "description": "Verflucht Euer primäres Böses Auge 6 Sek. lang. Verdammnisgewinne lösen eine Welle aus, die bis zu 2 weitere Gegner im Umkreis von 8 Yard schädigt, höchstens einmal pro Sekunde. Rang 2 verlängert dies auf 8 Sek. und 4 Gegner."
+        "description": "Verflucht Euer primäres Böses Auge {duration} Sek. lang. Verdammnisgewinne lösen eine Welle aus, die bis zu 2 weitere Gegner (ab Rang 2: 4) im Umkreis von 8 Yard schädigt, höchstens einmal pro Sekunde."
       },
       "cinderhide": {
         "name": "Schlackenhaut",
@@ -18339,7 +18339,7 @@ export const de_DE: EnTranslations = {
       },
       "cruel_pact": {
         "name": "Grausamer Pakt",
-        "description": "Opfert 12% Eurer maximalen Gesundheit, um 1,5% Eures maximalen Manas wiederherzustellen und 20 Verdammnis zu erzeugen. Nicht nutzbar bei 20% Gesundheit oder darunter."
+        "description": "Opfert 12% Eurer maximalen Gesundheit, um {buff}% Eures maximalen Manas wiederherzustellen und 20 Verdammnis zu erzeugen. Nicht nutzbar bei 20% Gesundheit oder darunter."
       },
       "vicarious_suffering": {
         "name": "Stellvertretendes Leid",
@@ -18394,7 +18394,7 @@ export const de_DE: EnTranslations = {
       },
       "moonseed": {
         "name": "Mondsaat",
-        "description": "Nur in Mondkingestalt. Trifft für {damage} Arkanschaden, fügt 1 Mondflut hinzu (max. 3) und verlängert Euren Mondsturm auf dem Ziel um 6 Sek., bis zu {duration} zusätzliche Sek. pro Anwendung des Mondsturms. Bei 3 Mondfluten wird diese Taste zu Mondwoge: ein sofortiger Schlag für 136 bis 162 Arkanschaden (plus Zaubermacht), der alle 3 verbraucht."
+        "description": "Nur in Mondkingestalt. Trifft für {damage} Arkanschaden, fügt 1 Mondflut hinzu (max. 3) und verlängert Euren Mondsturm auf dem Ziel um 6 Sek., bis zu {duration} zusätzliche Sek. pro Anwendung des Mondsturms. Bei 3 Mondfluten wird diese Taste zu Mondwoge: ein sofortiger schwerer Arkanschlag, der alle 3 verbraucht."
       },
       "rejuvenation": {
         "name": "Sporenheilung",
@@ -18416,7 +18416,7 @@ export const de_DE: EnTranslations = {
       "maul": {
         "name": "Knochenmalmer",
         "description": "Euer nächster Nahkampfschwung verursacht {damage} zusätzlichen Schaden und erzeugt Bedrohung in Höhe des 2,5-Fachen seines Schadens plus einen kleinen festen Betrag. Nur in Bruin-Gestalt.",
-        "specNote_feral": "Jeder Treffer, der landet, fügt 1 Altes Blut hinzu; bei 3 Altem Blut wird diese Taste zu Markbrecher: ein Schlag für 78 bis 96 Schaden bei hoher Bedrohung; unter halber Gesundheit heilt er Euch stattdessen um 18% Eurer maximalen Gesundheit und erstattet 15 Wut zurück."
+        "specNote_feral": "Jeder Treffer, der landet, fügt 1 Altes Blut hinzu; bei 3 Altem Blut wird diese Taste zu Markbrecher: ein schwerer Schlag bei hoher Bedrohung; unter halber Gesundheit heilt er Euch stattdessen um 18% Eurer maximalen Gesundheit und erstattet 15 Wut zurück."
       },
       "growl": {
         "name": "Bedrohen",
@@ -18457,7 +18457,7 @@ export const de_DE: EnTranslations = {
       },
       "barkskin": {
         "name": "Eichenhaut",
-        "description": "Eure Haut härtet wie Rinde und erhöht die Rüstung 15 Sek. lang um 150."
+        "description": "Eure Haut härtet wie Rinde und erhöht die Rüstung 15 Sek. lang um {buff}%."
       },
       "sacred_bulwark": {
         "name": "Heiliges Bollwerk",
@@ -18470,7 +18470,7 @@ export const de_DE: EnTranslations = {
       "starfire": {
         "name": "Himmelssturz",
         "description": "Ruft einen Blitz aus Sternenfeuer herab, der {damage} Arkanschaden verursacht.",
-        "specNote_balance": "In Mondkingestalt fügt jeder abgeschlossene Zauber 1 Mondflut hinzu (max. 3). Bei 3 Mondflut wird diese Taste zu Sonnenspur: ein sofortiger Schlag für 80 bis 100 Naturschaden plus 45 Brand über 9 Sek., der 35 Mana wiederherstellt und alle 3 verbraucht."
+        "specNote_balance": "In Mondkingestalt fügt jeder abgeschlossene Zauber 1 Mondflut hinzu (max. 3). Bei 3 Mondflut wird diese Taste zu Sonnenspur: ein sofortiger Naturschlag plus ein Brand über 9 Sek., der 35 Mana wiederherstellt und alle 3 verbraucht."
       },
       "travel_form": {
         "name": "Fleet-Gestalt",
@@ -18518,7 +18518,7 @@ export const de_DE: EnTranslations = {
       },
       "rip": {
         "name": "Blutriss",
-        "description": "Finishing-Move, der das Ziel 24 Sek. lang alle 2 Sek. bluten lässt: 72 Schaden plus 48 pro verbrauchtem Combopunkt (5 Combopunkte: insgesamt {damage}). Nur in Katzengestalt.",
+        "description": "Finishing-Move, der das Ziel 24 Sek. lang alle 2 Sek. bluten lässt und pro verbrauchtem Combopunkt mehr Schaden verursacht (5 Combopunkte: insgesamt {damage}). Nur in Katzengestalt.",
         "specNote_feral": "Der gelandete Treffer fügt 1 Altes Blut hinzu (max. 3)."
       },
       "mortal_strike": {
@@ -18930,7 +18930,7 @@ export const de_DE: EnTranslations = {
       },
       "avenging_wrath": {
         "name": "Zornige Vergeltung",
-        "description": "Entfaltet leibhaftige Schwingen aus goldener heiliger Macht, gewinnt 10 Hingabe und verdoppelt 15 Sek. lang die von euren Fähigkeiten erzeugte Hingabe. Erhöht zudem verursachten Schaden und Heilung um 20%. Dämmerungsreaver: ermöglicht Hammer des Zorns gegen jedes Ziel."
+        "description": "Entfaltet leibhaftige Schwingen aus goldener heiliger Macht, gewinnt 10 Hingabe und verdoppelt {duration} Sek. lang die von euren Fähigkeiten erzeugte Hingabe. Erhöht zudem verursachten Schaden und Heilung um 20%. Dämmerungsreaver: ermöglicht Hammer des Zorns gegen jedes Ziel."
       },
       "berserk": {
         "name": "Roter Dunst",
@@ -19188,7 +19188,7 @@ export const de_DE: EnTranslations = {
       },
       "body_blow": {
         "name": "Körpertreffer",
-        "description": "Ein wuchtiger Treffer für 130% Waffenschaden plus 10, der 2 Combopunkte gewährt und die Redline um eine Stufe vertieft. (Thuggery-Engine)"
+        "description": "Ein wuchtiger Treffer für {weaponPercent}% Waffenschaden plus {damage}. Gewährt 2 Combopunkte und fügt 1 Redline hinzu (max. 4). (Thuggery)"
       },
       "knockout_blow": {
         "name": "K.o.-Schlag",

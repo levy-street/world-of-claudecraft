@@ -17704,7 +17704,7 @@ export const pl_PL: EnTranslations = {
       },
       "ignition": {
         "name": "Zapłon",
-        "description": "Bierne: gdy twoje zaklęcia Ognia zadają trafienie krytyczne, cel płonie, otrzymując dodatkowe 30% zadanych obrażeń w ciągu 6 s. Nowe podpalenie celu, który już płonie, dodaje się do obrażeń jeszcze należnych i restartuje 6-sekundowy czas. (mistrzostwo Ognia)"
+        "description": "Bierne: gdy twoje zaklęcia Ognia zadają trafienie krytyczne, cel płonie, otrzymując dodatkowe 1,5% zadanych obrażeń za każdy poziom postaci (30% na poziomie 20) w ciągu 6 s. Nowe podpalenie celu, który już płonie, dodaje się do obrażeń jeszcze należnych i restartuje 6-sekundowy czas. (mistrzostwo Ognia)"
       },
       "mass_barrier": {
         "name": "Masowa bariera",
@@ -17814,17 +17814,17 @@ export const pl_PL: EnTranslations = {
         "name": "Nikczemne cięcie",
         "description": "Natychmiastowy cios za obrażenia broni plus {damage}. Przyznaje 1 punkt combo.",
         "specNote_assassination": "Dodaje 1 Rytuał Jadu (maks. 6).",
-        "specNote_combat": "Gdy Redline jest aktywny, ten przycisk zmienia się w Cios w korpus: 130% obrażeń broni plus 10, przyznaje 2 punkty combo i dodaje 1 kreskę Redline (maks. 4)."
+        "specNote_combat": "Gdy Redline jest aktywny, ten przycisk zmienia się w Cios w korpus: cięższe uderzenie bronią, które przyznaje 2 punkty combo i dodaje 1 kreskę Redline (maks. 4)."
       },
       "eviscerate": {
         "name": "Wieczny sen",
         "description": "Umiejętność kończąca, która zadaje {damage} obrażeń Fizycznych. Obrażenia rosną z mocą ataku.",
         "specNote_assassination": "Przy 6 Rytuale Jadu ten przycisk zmienia się w Jadowite rozdarcie: cios, który natychmiast zadaje wszystkie obrażenia, jakie zadałyby jeszcze twoje krwawienia, zadaje świeżą jadowitą ranę i przywraca 20 energii.",
-        "specNote_combat": "Trafienie tym przy 4 lub więcej punktach combo rozpoczyna Redline na 8 s: Nikczemne cięcie zmienia się w Cios w korpus, a ten przycisk w Cios nokautujący (45 plus 35 za punkt combo, trafiając o 25% mocniej za każdy Cios w korpus rzucony podczas Redline, przywraca 25 energii). Wykorzystaj go, zanim Redline się zakończy."
+        "specNote_combat": "Trafienie tym przy 4 lub więcej punktach combo rozpoczyna Redline na 8 s: Nikczemne cięcie zmienia się w Cios w korpus, a ten przycisk w Cios nokautujący (umiejętność kończąca, trafiająca o 25% mocniej za każdy Cios w korpus rzucony podczas Redline, przywraca 25 energii). Wykorzystaj go, zanim Redline się zakończy."
       },
       "backstab": {
         "name": "Tchórzliwe pchnięcie",
-        "description": "Wbij sztylet w plecy celu za 150% obrażeń broni plus {damage}. Musisz znajdować się za celem. Wymaga sztyletu. Przyznaje 1 punkt combo.",
+        "description": "Wbij sztylet w plecy celu za {weaponPercent}% obrażeń broni plus {damage}. Musisz znajdować się za celem. Wymaga sztyletu. Przyznaje 1 punkt combo.",
         "specNote_assassination": "Każdy trafiony cios dodaje 1 Rytuał Jadu (maks. 6) i zwraca 15 energii. Przy 6 Rytuale Jadu, Wieczny sen zmienia się w Jadowite rozdarcie (zadaje od razu wszystkie pozostałe obrażenia twoich krwawień)."
       },
       "gouge": {
@@ -17849,7 +17849,7 @@ export const pl_PL: EnTranslations = {
       },
       "ambush": {
         "name": "Cios czyhacza",
-        "description": "Uderz z cienia za 250% obrażeń broni plus {damage}. Musisz być w ukryciu i za celem. Wymaga sztyletu. Przyznaje 1 punkt combo.",
+        "description": "Uderz z cienia za {weaponPercent}% obrażeń broni plus {damage}. Musisz być w ukryciu i za celem. Wymaga sztyletu. Przyznaje 1 punkt combo.",
         "specNote_subtlety": "Użyte z Zasłony zmierzchu dodaje 1 Mrok (maks. 3). Przy 3 Mroku możesz użyć tej zdolności BEZ ukrycia i z dowolnego kąta: takie użycie nic nie kosztuje, zużywa cały Mrok, rozpoczyna 6-sekundową Zasłonę Cieni i zadaje podwójne obrażenia."
       },
       "stealth": {
@@ -17950,7 +17950,7 @@ export const pl_PL: EnTranslations = {
       },
       "solar_step": {
         "name": "Słoneczny Krok",
-        "description": "Zwiększa twoją prędkość ruchu o 150% na 2 s."
+        "description": "Zwiększa twoją prędkość ruchu o 150% na {duration} s."
       },
       "solar_invocation": {
         "name": "Słoneczne Wezwanie",
@@ -17958,11 +17958,11 @@ export const pl_PL: EnTranslations = {
       },
       "radiant_devotion": {
         "name": "Promienne Oddanie",
-        "description": "Zwiększa moc zaklęć twoją i członków drużyny o 20 na 30 min. Zastępuje twoje własne Oddanie Świtu lub Łaski, ale współistnieje z Oddaniami innych paladynów."
+        "description": "Zwiększa moc zaklęć twoją i członków drużyny o {buff} na 30 min. Zastępuje twoje własne Oddanie Świtu lub Łaski, ale współistnieje z Oddaniami innych paladynów."
       },
       "dawn_devotion": {
         "name": "Oddanie Świtu",
-        "description": "Zwiększa moc ataku twoją i członków drużyny o 40 na 30 min. Zastępuje twoje własne Promienne Oddanie lub Oddanie Łaski, ale współistnieje z Oddaniami innych paladynów i z okrzykami wojownika."
+        "description": "Zwiększa moc ataku twoją i członków drużyny o {buff} na 30 min. Zastępuje twoje własne Promienne Oddanie lub Oddanie Łaski, ale współistnieje z Oddaniami innych paladynów i z okrzykami wojownika."
       },
       "grace_devotion": {
         "name": "Oddanie Łaski",
@@ -18303,7 +18303,7 @@ export const pl_PL: EnTranslations = {
       },
       "life_tap": {
         "name": "Trudny targ",
-        "description": "Zamienia {damage} zdrowia na {damage} many (o 50% więcej many z Długiem Krwi). Nie działa, jeśli masz {damage} zdrowia lub mniej."
+        "description": "Zamienia {damage} zdrowia na {buff} many. Nie działa, jeśli masz {damage} zdrowia lub mniej."
       },
       "cursed_accomplice": {
         "name": "Przeklęty Wspólnik",
@@ -18319,7 +18319,7 @@ export const pl_PL: EnTranslations = {
       },
       "litany_of_guilt": {
         "name": "Litania Winy",
-        "description": "Rzuca klątwę na twoje główne Złe Oko na 6 sekund. Zyski Potępienia uwalniają falę, która zadaje obrażenia maksymalnie 2 innym wrogom w promieniu 8 m, najwyżej raz na sekundę. Ranga 2 wydłuża to do 8 sekund i 4 wrogów."
+        "description": "Rzuca klątwę na twoje główne Złe Oko na {duration} sekund. Zyski Potępienia uwalniają falę, która zadaje obrażenia maksymalnie 2 innym wrogom (4 od Rangi 2) w promieniu 8 m, najwyżej raz na sekundę."
       },
       "cinderhide": {
         "name": "Żarowa Skóra",
@@ -18339,7 +18339,7 @@ export const pl_PL: EnTranslations = {
       },
       "cruel_pact": {
         "name": "Okrutny Pakt",
-        "description": "Poświęca 12% twojego maksymalnego zdrowia, aby przywrócić 1,5% maksymalnej many i wygenerować 20 Potępienia. Nie można użyć przy 20% zdrowia lub mniej."
+        "description": "Poświęca 12% twojego maksymalnego zdrowia, aby przywrócić {buff}% maksymalnej many i wygenerować 20 Potępienia. Nie można użyć przy 20% zdrowia lub mniej."
       },
       "vicarious_suffering": {
         "name": "Zastępcze Cierpienie",
@@ -18394,7 +18394,7 @@ export const pl_PL: EnTranslations = {
       },
       "moonseed": {
         "name": "Księżycowe nasienie",
-        "description": "Tylko w Postaci księżycowej sowy. Uderza za {damage} obrażeń od arkanów, dodaje 1 Księżycowy przypływ (maks. 3) i przedłuża twoją Księżycową nawałnicę na celu o 6 s, do {duration} dodatkowych s na nałożenie Księżycowej nawałnicy. Przy 3 Księżycowych przypływach ten przycisk zmienia się w Księżycowy przybór: natychmiastowe uderzenie za 136 do 162 obrażeń od arkanów (plus moc zaklęć), które zużywa wszystkie 3."
+        "description": "Tylko w Postaci księżycowej sowy. Uderza za {damage} obrażeń od arkanów, dodaje 1 Księżycowy przypływ (maks. 3) i przedłuża twoją Księżycową nawałnicę na celu o 6 s, do {duration} dodatkowych s na nałożenie Księżycowej nawałnicy. Przy 3 Księżycowych przypływach ten przycisk zmienia się w Księżycowy przybór: potężne natychmiastowe uderzenie obrażeniami od arkanów, które zużywa wszystkie 3."
       },
       "rejuvenation": {
         "name": "Zarodnikowe gojenie",
@@ -18416,7 +18416,7 @@ export const pl_PL: EnTranslations = {
       "maul": {
         "name": "Kruszenie kości",
         "description": "Twoje następne uderzenie w zwarciu zadaje dodatkowe {damage} obrażeń i generuje zagrożenie równe 2,5-krotności swoich obrażeń plus niewielką stałą wartość. Tylko w Postaci Bruina.",
-        "specNote_feral": "Każdy trafiony cios dodaje 1 Starą Krew; przy 3 Starej Krwi ten przycisk zmienia się w Łamacz szpiku: cios zadający od 78 do 96 obrażeń przy wysokim zagrożeniu; poniżej połowy zdrowia zamiast tego leczy cię o 18% twojego maksymalnego zdrowia i zwraca 15 wściekłości."
+        "specNote_feral": "Każdy trafiony cios dodaje 1 Starą Krew; przy 3 Starej Krwi ten przycisk zmienia się w Łamacz szpiku: potężny cios przy wysokim zagrożeniu; poniżej połowy zdrowia zamiast tego leczy cię o 18% twojego maksymalnego zdrowia i zwraca 15 wściekłości."
       },
       "growl": {
         "name": "Groźba",
@@ -18457,7 +18457,7 @@ export const pl_PL: EnTranslations = {
       },
       "barkskin": {
         "name": "Dębowa skóra",
-        "description": "Twoja skóra twardnieje niczym kora, zwiększając pancerz o 150 na 15 sek."
+        "description": "Twoja skóra twardnieje niczym kora, zwiększając pancerz o {buff}% na 15 sek."
       },
       "sacred_bulwark": {
         "name": "Święty Bastion",
@@ -18470,7 +18470,7 @@ export const pl_PL: EnTranslations = {
       "starfire": {
         "name": "Spadające niebo",
         "description": "Przyzywa pocisk gwiezdnego ognia, zadając {damage} obrażeń od Arkanów.",
-        "specNote_balance": "W Postaci księżycowej sowy każde ukończone rzucenie dodaje 1 Księżycowy przypływ (maks. 3). Przy 3 Księżycowym przypływie ten przycisk zmienia się w Słoneczny ślad: natychmiastowe uderzenie zadające od 80 do 100 obrażeń od Natury plus podpalenie na 45 obrażeń przez 9 sekund, przywracające 35 many i zużywające wszystkie 3 stopnie Księżycowego przypływu."
+        "specNote_balance": "W Postaci księżycowej sowy każde ukończone rzucenie dodaje 1 Księżycowy przypływ (maks. 3). Przy 3 Księżycowym przypływie ten przycisk zmienia się w Słoneczny ślad: natychmiastowe uderzenie obrażeniami od Natury plus podpalenie trwające 9 sekund, przywracające 35 many i zużywające wszystkie 3 stopnie Księżycowego przypływu."
       },
       "travel_form": {
         "name": "Postać Fleet",
@@ -18518,7 +18518,7 @@ export const pl_PL: EnTranslations = {
       },
       "rip": {
         "name": "Krwawa szczelina",
-        "description": "Cios kończący wywołujący krwawienie co 2 s przez 24 s: 72 obrażenia plus 48 za wydany punkt kombinacji (5 punktów: łącznie {damage}). Tylko w Postaci kota.",
+        "description": "Cios kończący wywołujący krwawienie co 2 s przez 24 s, zadający tym większe obrażenia, im więcej punktów kombinacji wydano (5 punktów: łącznie {damage}). Tylko w Postaci kota.",
         "specNote_feral": "Trafiony cios dodaje 1 Starą Krew (maks. 3)."
       },
       "mortal_strike": {
@@ -18930,7 +18930,7 @@ export const pl_PL: EnTranslations = {
       },
       "avenging_wrath": {
         "name": "Mściwy gniew",
-        "description": "Rozwija cielesne skrzydła ze złotej świętej mocy, zyskując 10 Oddania i podwajając na 15 s Oddanie generowane przez twoje umiejętności. Zwiększa ponadto zadawane obrażenia i leczenie o 20%. Żniwiarz świtu: umożliwia Młot gniewu przeciw dowolnemu celowi."
+        "description": "Rozwija cielesne skrzydła ze złotej świętej mocy, zyskując 10 Oddania i podwajając na {duration} s Oddanie generowane przez twoje umiejętności. Zwiększa ponadto zadawane obrażenia i leczenie o 20%. Żniwiarz świtu: umożliwia Młot gniewu przeciw dowolnemu celowi."
       },
       "berserk": {
         "name": "Czerwona Mgła",
@@ -19188,7 +19188,7 @@ export const pl_PL: EnTranslations = {
       },
       "body_blow": {
         "name": "Cios w korpus",
-        "description": "Potężny cios za 130% obrażeń broni plus 10, który przyznaje 2 punkty combo i pogłębia Redline o jedną kreskę. (silnik Thuggery)"
+        "description": "Potężny cios za {weaponPercent}% obrażeń broni plus {damage}, który przyznaje 2 punkty combo i pogłębia Redline o jedną kreskę (maks. 4). (silnik Thuggery)"
       },
       "knockout_blow": {
         "name": "Cios nokautujący",

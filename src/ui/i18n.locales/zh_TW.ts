@@ -7457,7 +7457,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '終結技，造成 {damage} 點物理傷害。傷害隨攻擊強度提升。',
   'entities.abilities.backstab.name': '怯懦突刺',
   'entities.abilities.backstab.description':
-    '背刺目標，造成 150% 武器傷害加 {damage}。必須位於目標背後。需要匕首。獎勵 1 個連擊點。',
+    '背刺目標，造成 {weaponPercent}% 武器傷害加 {damage}。必須位於目標背後。需要匕首。獎勵 1 個連擊點。',
   'entities.abilities.gouge.name': '戳眼一擊',
   'entities.abilities.gouge.description':
     '攻擊目標，造成 {damage} 點傷害，使其癱瘓 4 秒。任何傷害都會打破效果。獎勵 1 個連擊點。',
@@ -7473,7 +7473,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '終結技，昏迷目標 2 秒外加每點連擊點 1 秒（5 點連擊點：7 秒）。',
   'entities.abilities.ambush.name': '潛伏者一擊',
   'entities.abilities.ambush.description':
-    '伏擊目標，造成 250% 武器傷害加 {damage}。必須處於潛行並位於目標背後。需要匕首。獎勵 1 個連擊點。',
+    '伏擊目標，造成 {weaponPercent}% 武器傷害加 {damage}。必須處於潛行並位於目標背後。需要匕首。獎勵 1 個連擊點。',
   'entities.abilities.stealth.name': '暮紗',
   'entities.abilities.stealth.description':
     '將自己隱藏在陰影中。敵對玩家和寵物無法看見你，怪物只會在比平常近得多的距離察覺你（等級高於你的怪物則在更遠處察覺）。你能以全速移動。攻擊或受到傷害會打破暮紗。再次施放可現身。',
@@ -7667,7 +7667,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.corruption.description': '腐蝕目標，在 18 秒內造成 {damage} 點暗影傷害。',
   'entities.abilities.life_tap.name': '苛刻交易',
   'entities.abilities.life_tap.description':
-    '將 {damage} 點生命值轉化為 {damage} 點法力值（血契賒帳可多獲得 50% 法力值）。若你的生命值不高於 {damage} 點，則施放失敗。',
+    '將 {damage} 點生命值轉化為 {buff} 點法力值。若你的生命值不高於 {damage} 點，則施放失敗。',
   'entities.abilities.curse_of_agony.name': '苦楚邪咒',
   'entities.abilities.curse_of_agony.description':
     '以痛苦詛咒目標：在 24 秒內造成 {damage} 點暗影傷害。',
@@ -7732,7 +7732,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.regrowth.description':
     '為一名友方目標恢復 {damage} 點生命值，隨後在 15 秒內再恢復 {overTime} 點。若持續治療效果持續完整時間，會再次為目標恢復相當於首次治療量的生命值（在任何致命一擊加成之前）。提前結束它（例如使用迅癒、盛放或重新施放）會跳過這次治療。',
   'entities.abilities.barkskin.name': '橡樹皮術',
-  'entities.abilities.barkskin.description': '你的皮膚硬化如樹皮，使護甲提高 150，持續 15 秒。',
+  'entities.abilities.barkskin.description': '你的皮膚硬化如樹皮，使護甲提高 {buff}%，持續 15 秒。',
   'entities.abilities.sacred_bulwark.name': '神聖壁壘',
   'entities.abilities.sacred_bulwark.description':
     '在 {duration} 秒內，下一次會殺死你的敵人攻擊將被抵消，轉而將你恢復至 35% 生命值。',
@@ -7773,7 +7773,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '湧起{rage}點能量，並使攻擊強度提高 {buff}，持續 {duration} 秒。僅限貓形態。',
   'entities.abilities.rip.name': '血隙',
   'entities.abilities.rip.description':
-    '終結技，使目標每2秒流血一次，持續24秒：造成72點傷害，每消耗1個連擊點額外增加48點（5個連擊點共{damage}點）。僅限貓形態。',
+    '終結技，使目標每2秒流血一次，持續24秒，每消耗1個連擊點造成的傷害更高（5個連擊點共{damage}點）。僅限貓形態。',
   'entities.abilities.mortal_strike.name': '致殘打擊',
   'entities.abilities.mortal_strike.description':
     '打擊敵人，造成武器傷害加 {damage} 點，並使目標受到的治療降低 50%，持續 10 秒。同時施加撕裂創傷，這是一種流血效果，在 6 秒內分 2 跳造成 {overTime} 點物理傷害。（武器專精招牌技能）',
@@ -15657,7 +15657,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_wild.description':
     '以野性力量激勵30碼內的盟友，使其攻擊強度提高45、攻擊速度提高5%，持續5分鐘。（獵人天賦）',
   'entities.abilities.avenging_wrath.description':
-    '展開由金色神聖之力凝成的實體羽翼，獲得 10 點虔誠，並在 15 秒內使你的技能所產生的虔誠翻倍。同時將你造成的傷害與治療提高 20%。破曉者：使憤怒之錘可對任何目標使用。',
+    '展開由金色神聖之力凝成的實體羽翼，獲得 10 點虔誠，並在 {duration} 秒內使你的技能所產生的虔誠翻倍。同時將你造成的傷害與治療提高 20%。破曉者：使憤怒之錘可對任何目標使用。',
   'entities.abilities.berserk.description': '使你的攻擊強度提高70，持續15秒。（德魯伊天賦）',
   'entities.abilities.blink.description': '將你向前傳送 15 碼，並解除定身效果。',
   'entities.abilities.bloodlust.description':
@@ -15812,7 +15812,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '你接下來兩個有施法時間的法術可以在移動中施放。持續 15 秒。（法師天賦）',
   'entities.abilities.ignition.name': '點燃',
   'entities.abilities.ignition.description':
-    '被動：你的火焰法術造成致命一擊時，目標會在 6 秒內額外灼燒，造成相當於該次傷害 30% 的傷害。對已在燃燒的目標再次施加灼燒，會累加尚未結算的傷害並重新開始 6 秒計時。（火焰精通）',
+    '被動：你的火焰法術造成致命一擊時，目標會在 6 秒內額外灼燒，每個角色等級造成相當於該次傷害 1.5% 的傷害（20 級時為 30%）。對已在燃燒的目標再次施加灼燒，會累加尚未結算的傷害並重新開始 6 秒計時。（火焰精通）',
   'entities.abilities.mass_barrier.name': '群體屏障',
   'entities.abilities.mass_barrier.description':
     '為你與 30 公尺內至多 4 名附近盟友施加護盾，每個護盾吸收 {damage} 點傷害，持續 15 秒。（法師天賦）',
@@ -18178,7 +18178,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '持續 12 秒，血鉤還會對其目標 5 碼內最多 2 名其他敵人施加強度為 60% 的血鉤創傷，裂創使你的活體寵物對目標造成 18 點物理傷害，榴片炸彈的射程增加 2 碼，對主目標的基礎傷害提高 25%，其即時創傷跳傷提高 50%。沒有活體寵物時，你的集中值恢復速度還提高 100%。',
   'entities.abilities.bloodtrail_assault.name': '血跡突襲',
   'entities.abilities.body_blow.description':
-    '沉重的一擊，造成130%武器傷害外加10點。獲得2個連擊點，並使紅線加深一格（最多4格）。（戰鬥）',
+    '沉重的一擊，造成{weaponPercent}%武器傷害外加{damage}點。獲得2個連擊點，並使紅線加深一格（最多4格）。（戰鬥）',
   'entities.abilities.body_blow.name': '重磅擺拳',
   'entities.abilities.bone_armor.description':
     '以骸骨包裹你 {duration} 秒，吸收相當於你最大生命值 20% 的傷害。',
@@ -18203,7 +18203,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '需要目標身上有你的主要邪眼。在其 15 碼內最多 4 名其他敵人身上放置次級邪眼，持續 15 秒。它們以正常速率 50% 產生譴罪，裁決會對其中每一個回響其傷害的 35%。',
   'entities.abilities.coven.name': '巫契',
   'entities.abilities.cruel_pact.description':
-    '犧牲最大生命值的12%以產生20點譴罪。生命值不高於15%時無法使用。',
+    '犧牲最大生命值的12%，恢復最大法力值的{buff}%並產生20點譴罪。生命值不高於20%時無法使用。',
   'entities.abilities.cruel_pact.name': '殘酷契約',
   'entities.abilities.cursed_accomplice.description':
     '未選擇友方玩家時連結你的咒眼，使其凝視產生2點譴罪；連結友方玩家時，該玩家對邪眼目標造成傷害會產生3點。每2秒最多觸發一次。',
@@ -18212,7 +18212,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '犧牲當前生命值的10%，在8秒內吸收相當於最大生命值30%的傷害。',
   'entities.abilities.dark_pact.name': '血契',
   'entities.abilities.dawn_devotion.description':
-    '使你和隊伍成員的攻擊強度提高 40 點，持續 30 分鐘。會取代你自己的輝光或恩典虔誠，但可與其他聖騎士的虔誠及戰士的戰吼共存。',
+    '使你和隊伍成員的攻擊強度提高 {buff} 點，持續 30 分鐘。會取代你自己的輝光或恩典虔誠。其他聖騎士施放黎明虔誠時會刷新而非疊加；不同的虔誠及戰士的戰吼可共存。',
   'entities.abilities.dawn_devotion.name': '黎明虔誠',
   'entities.abilities.dawnfall.description':
     '對附近敵人造成 {damage} 點神聖傷害並產生 1 點虔誠。命中至少一名敵人會使終末敕令的剩餘冷卻時間縮短 2 秒。昇華使其傷害提高 50%，作用半徑擴大到 10 公尺。',
@@ -18235,7 +18235,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.eviscerate.specNote_assassination':
     '毒祭達 6 層時，此按鈕變為蝕毒撕裂：這一擊會立即引爆你的流血效果的全部剩餘傷害，種下一道新的蝕毒傷口，並恢復 20 點能量。',
   'entities.abilities.eviscerate.specNote_combat':
-    '以 4 個或更多連擊點命中時，開啟紅線 8 秒：邪惡揮斬變為重磅擺拳，此按鈕變為眼前一黑（造成 45 點傷害，每個連擊點額外造成 35 點，紅線期間你每擲出一次重磅擺拳，傷害便提高 25%，並恢復 25 點能量）。請在紅線結束前使用。',
+    '以 4 個或更多連擊點命中時，開啟紅線 8 秒：邪惡揮斬變為重磅擺拳，此按鈕變為眼前一黑（終結技，紅線期間你每擲出一次重磅擺拳，傷害便提高 25%，並恢復 25 點能量）。請在紅線結束前使用。',
   'entities.abilities.faithforged_guard.description':
     '在 8 秒內，你受到的下一次敵人攻擊將被回敬：至多抵消 {buff} 點傷害，並以等量神聖傷害返還給攻擊者，同時你獲得 1 點虔誠。只回敬一次攻擊。昇華使可回敬的數值提高 50%。',
   'entities.abilities.faithforged_guard.name': '聖光之債',
@@ -18291,7 +18291,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '為武器灌注生命之水，使癒合水流的注入量提高20%。',
   'entities.abilities.lifespring_weapon.name': '活泉武器',
   'entities.abilities.litany_of_guilt.description':
-    '詛咒你的主要邪眼8秒。每次獲得譴罪時會釋放衝擊波，對8碼內最多4名其他敵人造成傷害，每秒最多觸發一次。',
+    '詛咒你的主要邪眼{duration}秒。每次獲得譴罪時會釋放衝擊波，對8碼內最多2名其他敵人（2級起為4名）造成傷害，每秒最多觸發一次。',
   'entities.abilities.litany_of_guilt.name': '罪責禱文',
   'entities.abilities.maledict_gaze.description':
     '你的咒眼每 2.5 秒攻擊一次帶有你主要邪眼的敵人，造成暗影傷害，條件是你和該敵人都處於戰鬥中、彼此相距不超過 30 碼且處於視線內。附身邪眼使其攻擊速度加倍。',
@@ -18302,7 +18302,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.martyrs_aegis.description': '使一名盟友受到的傷害降低 40%，持續 8 秒。',
   'entities.abilities.martyrs_aegis.name': '殉道者聖盾',
   'entities.abilities.maul.specNote_feral':
-    '每次命中的攻擊累積 1 層古血；古血達 3 層時，此按鈕變為碎髓：造成 78 至 96 點高威脅傷害；生命值低於一半時，改為恢復相當於最大生命值 18% 的生命值，並恢復 15 點怒氣。',
+    '每次命中的攻擊累積 1 層古血；古血達 3 層時，此按鈕變為碎髓：高威脅的重擊；生命值低於一半時，改為恢復相當於最大生命值 18% 的生命值，並恢復 15 點怒氣。',
   'entities.abilities.measured_shot.description':
     '一記從容瞄準的射擊，造成 {damage} 點物理傷害，並在命中時產生 20 點集中值。',
   'entities.abilities.measured_shot.name': '審慎射擊',
@@ -18314,7 +18314,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '消耗3層月潮，造成{damage}點秘法傷害的強力打擊：傷害之選。與日醒消耗同一份月潮，二者只能擇一。',
   'entities.abilities.moonlash.name': '月湧',
   'entities.abilities.moonseed.description':
-    '僅限梟獸形態。造成 {damage} 點秘法傷害，累積 1 層月潮（最多 3 層），並將目標身上的月光風暴延長 6 秒；每次月光風暴施加最多額外延長 {duration} 秒。月潮達 3 層時，此按鈕變為月湧：立即造成 136 至 162 點秘法傷害（外加法術強度），並耗盡全部 3 層。',
+    '僅限梟獸形態。造成 {damage} 點秘法傷害，累積 1 層月潮（最多 3 層），並將目標身上的月光風暴延長 6 秒；每次月光風暴施加最多額外延長 {duration} 秒。月潮達 3 層時，此按鈕變為月湧：立即施放的重擊，造成秘法傷害並耗盡全部 3 層。',
   'entities.abilities.moonseed.name': '月種',
   'entities.abilities.needle_of_fate.description':
     '刺穿敵人，造成{damage}點暗影傷害。若目標帶有你的邪眼，則產生{needleDoom}點譴罪；若不存在邪眼，則先標記目標。',
@@ -18346,7 +18346,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '為附近盟友恢復 {damage} 點生命值並產生 1 點虔誠。有效治療至少 2 名盟友會獲得持續 10 秒的輝光共鳴：你的下一次療癒聖光瞬發，或下一次黎明之擁的法力消耗降低 50%，施法時間縮短至 1.5 秒。昇華使輝光聖歌的治療量提高 20%，作用半徑擴大到 40 公尺。',
   'entities.abilities.radiant_chorus.name': '輝光聖歌',
   'entities.abilities.radiant_devotion.description':
-    '使你和隊伍成員的法術強度提高 20 點，持續 30 分鐘。會取代你自己的黎明或恩典虔誠，但可與其他聖騎士的虔誠共存。',
+    '使你和隊伍成員的法術強度提高 {buff} 點，持續 30 分鐘。會取代你自己的黎明或恩典虔誠。其他聖騎士施放輝光虔誠時會刷新而非疊加；不同的虔誠可共存。',
   'entities.abilities.radiant_devotion.name': '輝光虔誠',
   'entities.abilities.raise_bone_mage.description':
     '消耗2枚靈魂碎片，將一名永久遠程骸骨法師加入你的2槽統御。只能有一名為你效命。它的攻擊使目標受到的魔法傷害提高5%，持續6秒；收割號令將此弱點提高至8%。',
@@ -18407,11 +18407,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shrapnel_charge.name': '榴片炸彈',
   'entities.abilities.sinister_strike.specNote_assassination': '累積 1 層毒祭（最多 6 層）。',
   'entities.abilities.sinister_strike.specNote_combat':
-    '紅線期間，此按鈕變為重磅擺拳：造成 130% 武器傷害加 10，獎勵 2 個連擊點，並使紅線加深一格（最多 4 格）。',
+    '紅線期間，此按鈕變為重磅擺拳：更重的武器打擊，獎勵 2 個連擊點，並使紅線加深一格（最多 4 格）。',
   'entities.abilities.solar_invocation.description':
     '立即為一名盟友恢復 {damage} 點生命值，或對一名敵人造成 120 至 150 點基礎神聖傷害。傷害隨法術強度提升，治療隨治療強度提升。任一用途都會產生 1 點虔誠。昇華期間，治療施法還會治療目標 10 公尺內的友方玩家，治療量為原來的一半。',
   'entities.abilities.solar_invocation.name': '烈陽祈喚',
-  'entities.abilities.solar_step.description': '使你的移動速度提高 150%，持續 2 秒。',
+  'entities.abilities.solar_step.description': '使你的移動速度提高 150%，持續 {duration} 秒。',
   'entities.abilities.solar_step.name': '烈陽步',
   'entities.abilities.soul_harvest.description':
     '撕裂敵人的靈魂，造成 {damage} 點暗影傷害，並產生 1 枚靈魂碎片，最多 5 枚。',
@@ -18426,7 +18426,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '召喚 3 隻野獸，持續 12 秒。每隻每 2 秒攻擊一次，造成 {damage} 點物理傷害。顯示的傷害已計入你遠程攻擊強度的 8%，但尚未計入寵物傷害加成。野獸在召喚時會鎖定獸群凶性層數，每層使其傷害提高 10%。獸群奔襲處於冷卻時，成功施放獸群號令有 20% 機率重置其冷卻，連續第 5 次判定必定重置。野獸存在期間無法重置。（野獸控制）',
   'entities.abilities.stampede.name': '獸群奔襲',
   'entities.abilities.starfire.specNote_balance':
-    '月翼形態下，每次完成施法累積 1 層月潮（最多 3 層）。月潮達 3 層時，此按鈕變為日醒：立即造成 160 至 190 點自然傷害，外加 9 秒內共 75 點灼燒傷害，恢復 35 點法力並耗盡全部 3 層。',
+    '月翼形態下，每次完成施法累積 1 層月潮（最多 3 層）。月潮達 3 層時，此按鈕變為日醒：立即造成自然傷害，外加 9 秒內持續的灼燒傷害，恢復 35 點法力並耗盡全部 3 層。',
   'entities.abilities.stealth.specNote_subtlety':
     '自暮紗中使用的每個先制技累積 1 層幽暝（最多 3 層）。',
   'entities.abilities.stoneward.description':

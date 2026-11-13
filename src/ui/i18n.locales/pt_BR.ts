@@ -6541,7 +6541,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Por 6 s: suas aberturas do Véu Crepuscular funcionam sem furtividade e de qualquer ângulo, e você causa 10% mais dano. Seu primeiro Golpe do Espreitador dentro dele causa 50% mais dano de arma. (Sutileza)',
   'entities.abilities.body_blow.name': 'Golpe no Corpo',
   'entities.abilities.body_blow.description':
-    'Um golpe pesado por 130% do dano da arma mais 10 que concede 2 pontos de combo e aprofunda a Redline em um nível. (motor de Thuggery)',
+    'Um golpe pesado por {weaponPercent}% do dano da arma mais {damage} que concede 2 pontos de combo e aprofunda a Redline em um nível (máx. 4). (motor de Thuggery)',
   'entities.abilities.knockout_blow.name': 'Golpe de Nocaute',
   'entities.abilities.knockout_blow.description':
     'Encerra a Linha Vermelha com um nocaute: golpeia causando {damage} de dano Físico, atingindo 25% mais forte por cada Golpe no Corpo desferido durante a Linha Vermelha (até 3), e recupera 25 de energia. O dano aumenta com o poder de ataque. Use-o antes que a Linha Vermelha acabe, ou o nocaute é perdido. (Combate)',
@@ -9344,7 +9344,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Suas próximas duas magias com tempo de lançamento podem ser lançadas em movimento. Dura 15 s. (Talento de mago)',
   'entities.abilities.ignition.name': 'Ignição',
   'entities.abilities.ignition.description':
-    'Passivo: quando suas magias de Fogo causam acerto crítico, o alvo queima causando 30% adicionais do dano provocado ao longo de 6 s. Uma nova queimadura em um alvo que já está queimando soma-se ao dano ainda pendente e reinicia o contador de 6 s. (Maestria de Fogo)',
+    'Passivo: quando suas magias de Fogo causam acerto crítico, o alvo queima causando 1,5% adicional do dano provocado por nível do personagem (30% no nível 20) ao longo de 6 s. Uma nova queimadura em um alvo que já está queimando soma-se ao dano ainda pendente e reinicia o contador de 6 s. (Maestria de Fogo)',
   'entities.abilities.mass_barrier.name': 'Barreira em Massa',
   'entities.abilities.mass_barrier.description':
     'Protege você e até 4 aliados próximos em um raio de 30 m; cada escudo absorve {damage} de dano por 15 s. (Talento de mago)',
@@ -9583,7 +9583,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Corrompe o alvo, causando {damage} de dano de Sombra ao longo de 18 s.',
   'entities.abilities.life_tap.name': 'Barganha Amarga',
   'entities.abilities.life_tap.description':
-    'Converte {damage} de vida em {damage} de mana (50% a mais de mana com Crédito de Sangue). Falha se você tiver {damage} de vida ou menos.',
+    'Converte {damage} de vida em {buff} de mana. Falha se você tiver {damage} de vida ou menos.',
   'entities.abilities.curse_of_agony.name': 'Praga da Angústia',
   'entities.abilities.curse_of_agony.description':
     'Amaldiçoa o alvo com agonia: {damage} de dano de Sombra ao longo de 24 s.',
@@ -9630,7 +9630,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.regrowth.name': 'Segundo Florescer',
   'entities.abilities.barkskin.name': 'Pele de Carvalho',
   'entities.abilities.barkskin.description':
-    'Sua pele endurece como casca, aumentando a armadura em 150 por 15 s.',
+    'Sua pele endurece como casca, aumentando a armadura em {buff}% por 15 s.',
   'entities.abilities.starfire.name': 'Queda Celeste',
   'entities.abilities.travel_form.name': 'Forma de Fleet',
   'entities.abilities.travel_form.description':
@@ -15054,7 +15054,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.avatar.description':
     'Rompe os atordoamentos, medos, enraizamentos, silenciamentos, desarmes e lentidões sobre você (exceto os de chefes) e então se torna um colosso por 20 s, causando 20% mais dano. Não protege você de novos efeitos de controle.',
   'entities.abilities.avenging_wrath.description':
-    'Desdobra asas físicas de dourado poder sagrado, ganhando 10 de Devoção e dobrando por 15 s a Devoção gerada por vossas habilidades. Aumenta ainda em 20% o dano e a cura que causais. Ceifador da alvorada: permite Martelo da Ira contra qualquer alvo.',
+    'Desdobra asas físicas de dourado poder sagrado, ganhando 10 de Devoção e dobrando por {duration} s a Devoção gerada por vossas habilidades. Aumenta ainda em 20% o dano e a cura que causais. Ceifador da alvorada: permite Martelo da Ira contra qualquer alvo.',
   'entities.abilities.berserk.description':
     'Aumenta seu poder de ataque em 70 por 15 s. (talento de Druida)',
   'entities.abilities.bladestorm.name': 'Tempestade de Lâminas',
@@ -16292,7 +16292,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.beacon_of_light.description':
     'Marca um membro do grupo como seu Farol de Luz. 50% da sua cura direta efetiva em outro membro do grupo a até 60 m também cura o Farol. Curas em área e periódicas não são transferidas. Dura até que um de vocês morra.',
   'entities.abilities.dawn_devotion.description':
-    'Aumenta o poder de ataque seu e dos membros do grupo em 40 por 30 min. Substitui sua própria Devoção Radiante ou da Graça, mas coexiste com as Devoções de outros paladinos e com os gritos de guerreiro.',
+    'Aumenta o poder de ataque seu e dos membros do grupo em {buff} por 30 min. Substitui sua própria Devoção Radiante ou da Graça, mas coexiste com as Devoções de outros paladinos e com os gritos de guerreiro.',
   'entities.abilities.dawnfall.description':
     'Causa {damage} de dano Sagrado aos inimigos próximos e gera 1 de Devoção. Atingir pelo menos um inimigo reduz em 2 s a recarga restante do Édito Final. A Ascensão aumenta seu dano em 50% e seu raio para 10 m.',
   'entities.abilities.dawns_embrace.description':
@@ -16324,7 +16324,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.radiant_chorus.description':
     'Cura aliados próximos em {damage} e gera 1 de Devoção. Curar efetivamente ao menos 2 aliados concede Ressonância Radiante por 10 s: sua próxima Luz Restauradora é instantânea, ou seu próximo Abraço da Alvorada custa 50% menos mana e é conjurado em 1,5 s. A Ascensão aumenta a cura do Coro Radiante em 20% e seu raio para 40 m.',
   'entities.abilities.radiant_devotion.description':
-    'Aumenta o poder mágico seu e dos membros do grupo em 20 por 30 min. Substitui sua própria Devoção da Alvorada ou da Graça, mas coexiste com as Devoções de outros paladinos.',
+    'Aumenta o poder mágico seu e dos membros do grupo em {buff} por 30 min. Substitui sua própria Devoção da Alvorada ou da Graça, mas coexiste com as Devoções de outros paladinos.',
   'entities.abilities.recall_the_fallen.description':
     'Traz de volta à vida, ao seu lado, um membro morto do grupo com 35% de vida e mana. Um Curassol de nível 16 ou superior, em vez disso, chama de volta todos os membros caídos do grupo a até 30 m e dentro da sua linha de visão.',
   'entities.abilities.sacred_challenge.description':
@@ -16338,7 +16338,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.solar_invocation.description':
     'Cura instantaneamente um aliado em {damage} ou causa de 120 a 150 de dano base Sagrado a um inimigo. O dano aumenta com o poder mágico e a cura com o poder de cura. Qualquer um dos usos gera 1 de Devoção. Durante a Ascensão, uma conjuração de cura também cura pela metade os jogadores aliados a até 10 m do alvo.',
   'entities.abilities.solar_step.description':
-    'Aumenta sua velocidade de movimento em 150% por 2 s.',
+    'Aumenta sua velocidade de movimento em 150% por {duration} s.',
   'entities.abilities.sun_gods_verdict.description':
     'Julga um inimigo sob o Veredito do Deus Sol por 30 s. O Édito Final e a Queda da Alvorada inscrevem uma carga a cada acerto bem-sucedido. A habilidade que aplicar a terceira carga dita a sentença: o Édito Final desencadeia dano devastador sobre o condenado; a Queda da Alvorada detona o veredito, danificando e atordoando inimigos próximos por 1,5 s.',
   'entities.abilities.sunward_disc.description':
@@ -16503,7 +16503,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Consome seus 3 de Maré Lunar para um golpe pesado de {damage} de dano Arcano: a escolha de dano. Esteira Solar consome os mesmos 3 de Maré Lunar, então escolha um.',
   'entities.abilities.moonseed.name': 'Semente Lunar',
   'entities.abilities.moonseed.description':
-    'Somente na Forma de Luniscante. Atinge por {damage} de dano Arcano, adiciona 1 de Maré Lunar (máx. 3) e estende sua Tempestade Lunar no alvo em 6 s, até {duration} s extras por aplicação de Tempestade Lunar. Com 3 de Maré Lunar, este botão se torna Onda Lunar: um golpe instantâneo de 136 a 162 de dano Arcano (mais poder mágico) que gasta as 3.',
+    'Somente na Forma de Luniscante. Atinge por {damage} de dano Arcano, adiciona 1 de Maré Lunar (máx. 3) e estende sua Tempestade Lunar no alvo em 6 s, até {duration} s extras por aplicação de Tempestade Lunar. Com 3 de Maré Lunar, este botão se torna Onda Lunar: um golpe Arcano pesado e instantâneo que gasta as 3.',
   'entities.abilities.overbloom.name': 'Superflorescência',
   'entities.abilities.overbloom.description':
     'Consome 3 de Verdor. Colhe cada cura ao longo do tempo sua em todos os aliados por {buff}% da cura restante, remove esses efeitos e planta um Cura de Esporos novo no alvo.',
@@ -17265,14 +17265,14 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Abre uma fenda no local selecionado, puxando os inimigos num raio de 8 m para o centro dela, causando {damage} de dano das Sombras e atordoando-os por 2 s. Chefes sofrem o dano, mas resistem ao puxão e ao atordoamento.',
   'entities.abilities.abyssal_rift.name': 'Fenda Abissal',
   'entities.abilities.ambush.description':
-    'Golpeia a partir das sombras por 250% do dano da arma mais {damage}. Deve estar furtivo e atrás do alvo. Requer uma adaga. Concede 1 ponto de combo.',
+    'Golpeia a partir das sombras por {weaponPercent}% do dano da arma mais {damage}. Deve estar furtivo e atrás do alvo. Requer uma adaga. Concede 1 ponto de combo.',
   'entities.abilities.ambush.specNote_subtlety':
     'Usada a partir de Duskveil, adiciona 1 Gloam (máx. 3). Em 3 Gloam, você pode usá-la SEM furtividade e de qualquer ângulo: esse uso não custa nada, gasta todos os 3 Gloam, inicia o Shadow Veil de 6 s e causa o dobro de dano.',
   'entities.abilities.army_of_the_dead.description':
     'Abre um portal tumular para erguer temporariamente um Guerreiro Esquelético, um Mago de Ossos e uma Asa Tumular por 20 s, preenchendo as vagas que os servos fixos do seu Domínio deixarem livres.',
   'entities.abilities.army_of_the_dead.name': 'Exército dos Mortos',
   'entities.abilities.backstab.description':
-    'Crave sua adaga nas costas do alvo por 150% do dano da arma mais {damage}. Deve estar atrás do alvo. Requer uma adaga. Concede 1 ponto de combo.',
+    'Crave sua adaga nas costas do alvo por {weaponPercent}% do dano da arma mais {damage}. Deve estar atrás do alvo. Requer uma adaga. Concede 1 ponto de combo.',
   'entities.abilities.backstab.specNote_assassination':
     'Cada acerto adiciona 1 de Ritual de Veneno (máx. 6) e reembolsa 15 de energia. Em 6 de Ritual de Veneno, Sono Eterno se torna Rasgaveneno (causa instantaneamente todo o dano restante dos seus sangramentos de uma vez).',
   'entities.abilities.blade_flurry.description':
@@ -17299,7 +17299,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Requer seu Olho Maligno primário no alvo. Posiciona Olhos Malignos secundários em até 4 outros inimigos a até 15 m dele por 15 s. Eles geram Condenação a 50% da taxa normal, e a Sentença ecoa em cada um deles com 35% do seu dano.',
   'entities.abilities.coven.name': 'Conciliábulo',
   'entities.abilities.cruel_pact.description':
-    'Sacrifica 12% da sua vida máxima para restaurar 1,5% da sua mana máxima e gerar 20 de Condenação. Não pode ser usada com 20% de vida ou menos.',
+    'Sacrifica 12% da sua vida máxima para restaurar {buff}% da sua mana máxima e gerar 20 de Condenação. Não pode ser usada com 20% de vida ou menos.',
   'entities.abilities.cruel_pact.name': 'Pacto Cruel',
   'entities.abilities.cursed_accomplice.description':
     'Vincula seu Maledict Eye quando nenhum aliado está selecionado, fazendo seu Olhar Maldito gerar 2 de Condenação. Vincular um membro de grupo selecionado faz apenas o dano dele ao seu Olho Maligno gerar 3 em vez disso. Um novo vínculo substitui o anterior e pode ser acionado uma vez a cada 2 s.',
@@ -17318,7 +17318,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.eviscerate.specNote_assassination':
     'Em 6 de Ritual de Veneno, este botão se torna Rasgaveneno: um golpe que causa instantaneamente todo o dano que seus sangramentos ainda causariam, planta uma nova ferida envenenada e restaura 20 de energia.',
   'entities.abilities.eviscerate.specNote_combat':
-    'Acertar isto com 4 ou mais pontos de combo inicia a Linha Vermelha por 8 s: Talho Perverso se torna Golpe no Corpo e este botão se torna Golpe de Nocaute (45 mais 35 por ponto de combo, atingindo 25% mais forte por cada Golpe no Corpo desferido durante a Linha Vermelha, restaura 25 de energia). Gaste-o antes que a Linha Vermelha termine.',
+    'Acertar isto com 4 ou mais pontos de combo inicia a Linha Vermelha por 8 s: Talho Perverso se torna Golpe no Corpo e este botão se torna Golpe de Nocaute (um finalizador que atinge 25% mais forte por cada Golpe no Corpo desferido durante a Linha Vermelha e restaura 25 de energia). Gaste-o antes que a Linha Vermelha termine.',
   'entities.abilities.expose_armor.description':
     'Movimento finalizador que expõe o alvo por 30 s: cada ponto de combo gasto reduz sua armadura em 2% (5 pontos de combo: {damage}%).',
   'entities.abilities.faerie_fire.description': 'Reduz a armadura do alvo em {damage}% por 40 s.',
@@ -17346,7 +17346,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.kidney_shot.description':
     'Movimento finalizador que atordoa o alvo por 2 s mais 1 s por ponto de combo (5 pontos de combo: 7 s).',
   'entities.abilities.litany_of_guilt.description':
-    'Amaldiçoa seu Olho Maligno primário por 6 s. Ganhos de Condenação liberam uma onda que causa dano a até 2 outros inimigos num raio de 8 jardas, no máximo uma vez por segundo. O Grau 2 estende para 8 s e 4 inimigos.',
+    'Amaldiçoa seu Olho Maligno primário por {duration} s. Ganhos de Condenação liberam uma onda que causa dano a até 2 outros inimigos (4 a partir do Grau 2) num raio de 8 jardas, no máximo uma vez por segundo.',
   'entities.abilities.litany_of_guilt.name': 'Litania da Culpa',
   'entities.abilities.maledict_gaze.description':
     'Seu Olho Maldito ataca o inimigo que carrega seu Olho Maligno primário a cada 2,5 s causando dano de Sombra, enquanto você e esse inimigo estiverem em combate, a até 30 m um do outro e em linha de visão. Possuir o Olho Maligno dobra sua velocidade de ataque.',
@@ -17354,7 +17354,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.description':
     'Seu próximo golpe corpo a corpo causa {damage} de dano adicional e gera ameaça igual a 2,5 vezes o seu dano mais uma pequena quantidade fixa. Apenas na Forma de Bruin.',
   'entities.abilities.maul.specNote_feral':
-    'Cada acerto adiciona 1 de Sangue Antigo; em 3 de Sangue Antigo, este botão se torna Quebra-Medula: um golpe de 78 a 96 de dano com alta ameaça; abaixo de metade da vida, ele em vez disso cura você em 18% da sua vida máxima e reembolsa 15 de raiva.',
+    'Cada acerto adiciona 1 de Sangue Antigo; em 3 de Sangue Antigo, este botão se torna Quebra-Medula: um golpe pesado com alta ameaça; abaixo de metade da vida, ele em vez disso cura você em 18% da sua vida máxima e reembolsa 15 de raiva.',
   'entities.abilities.moonfire.description':
     'Queima o inimigo causando {damage} de dano Arcano, e depois mais {overTime} de dano Arcano ao longo de {duration} s.',
   'entities.abilities.moonfire.specNote_balance':
@@ -17394,7 +17394,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rejuvenation.specNote_restoration':
     'Cada lançamento adiciona 1 de Verdor (máx. 3), inclusive ao renovar uma floração que já está ativa. Com 3 de Verdor, Recuperação Rápida se torna Superflorescência.',
   'entities.abilities.rip.description':
-    'Golpe final que faz o alvo sangrar a cada 2 s por 24 s: 72 de dano mais 48 por ponto de combo gasto (5 pontos: {damage} no total). Apenas na Forma de Gato.',
+    'Golpe final que faz o alvo sangrar a cada 2 s por 24 s, causando mais dano para cada ponto de combo gasto (5 pontos: {damage} no total). Apenas na Forma de Gato.',
   'entities.abilities.rip.specNote_feral': 'O acerto adiciona 1 de Sangue Antigo (máx. 3).',
   'entities.abilities.ruinous_brand.description':
     'Marca um inimigo por 15 s. Seus próximos 3 feitiços diretos ecoam por 25% de dano contra o inimigo marcado, ou copiam 50% de dano para ele quando conjurados contra outro alvo. Ecos de Seta da Ruína também contam como acertos críticos, sem outro multiplicador de dano crítico.',
@@ -17415,7 +17415,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sinister_strike.specNote_assassination':
     'Adiciona 1 de Ritual de Veneno (máx. 6).',
   'entities.abilities.sinister_strike.specNote_combat':
-    'Enquanto a Redline está ativa, este botão se torna Golpe no Corpo: 130% do dano da arma mais 10, concede 2 pontos de combo e adiciona 1 nível de Redline (máx. 4).',
+    'Enquanto a Redline está ativa, este botão se torna Golpe no Corpo: um golpe de arma mais pesado que concede 2 pontos de combo e adiciona 1 nível de Redline (máx. 4).',
   'entities.abilities.slice_and_dice.description':
     'Movimento finalizador que aumenta a velocidade de ataque corpo a corpo em 30% por 12 s mais 4 s por ponto de combo (5 pontos de combo: 32 s).',
   'entities.abilities.soul_harvest.description':
@@ -17430,7 +17430,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.description':
     'Invoca um raio de fogo estelar, causando {damage} de dano Arcano.',
   'entities.abilities.starfire.specNote_balance':
-    'Na Forma de Luniscante, cada conjuração concluída adiciona 1 Moontide (máx. 3). Em 3 Moontide, este botão se torna Despertar Solar: um golpe instantâneo de 80 a 100 de dano de Natureza mais uma queimadura de 45 ao longo de 9 s, restaurando 35 de mana e gastando todos os 3.',
+    'Na Forma de Luniscante, cada conjuração concluída adiciona 1 Moontide (máx. 3). Em 3 Moontide, este botão se torna Despertar Solar: um golpe instantâneo de Natureza mais uma queimadura ao longo de 9 s, restaurando 35 de mana e gastando todos os 3.',
   'entities.abilities.stealth.description':
     'Oculta você nas sombras. Jogadores e companheiros inimigos não conseguem ver você, e monstros só percebem você de muito mais perto que o normal (de mais longe se tiverem nível maior que o seu). Você se move em velocidade máxima. Atacar ou receber dano rompe o Véu Crepuscular. Use de novo para sair.',
   'entities.abilities.stealth.specNote_subtlety':

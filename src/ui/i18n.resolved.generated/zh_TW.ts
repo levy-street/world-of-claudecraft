@@ -17704,7 +17704,7 @@ export const zh_TW: EnTranslations = {
       },
       "ignition": {
         "name": "點燃",
-        "description": "被動：你的火焰法術造成致命一擊時，目標會在 6 秒內額外灼燒，造成相當於該次傷害 30% 的傷害。對已在燃燒的目標再次施加灼燒，會累加尚未結算的傷害並重新開始 6 秒計時。（火焰精通）"
+        "description": "被動：你的火焰法術造成致命一擊時，目標會在 6 秒內額外灼燒，每個角色等級造成相當於該次傷害 1.5% 的傷害（20 級時為 30%）。對已在燃燒的目標再次施加灼燒，會累加尚未結算的傷害並重新開始 6 秒計時。（火焰精通）"
       },
       "mass_barrier": {
         "name": "群體屏障",
@@ -17814,17 +17814,17 @@ export const zh_TW: EnTranslations = {
         "name": "邪惡揮斬",
         "description": "立即攻擊，造成武器傷害加 {damage}。獎勵 1 個連擊點。",
         "specNote_assassination": "累積 1 層毒祭（最多 6 層）。",
-        "specNote_combat": "紅線期間，此按鈕變為重磅擺拳：造成 130% 武器傷害加 10，獎勵 2 個連擊點，並使紅線加深一格（最多 4 格）。"
+        "specNote_combat": "紅線期間，此按鈕變為重磅擺拳：更重的武器打擊，獎勵 2 個連擊點，並使紅線加深一格（最多 4 格）。"
       },
       "eviscerate": {
         "name": "入土長眠",
         "description": "終結技，造成 {damage} 點物理傷害。傷害隨攻擊強度提升。",
         "specNote_assassination": "毒祭達 6 層時，此按鈕變為蝕毒撕裂：這一擊會立即引爆你的流血效果的全部剩餘傷害，種下一道新的蝕毒傷口，並恢復 20 點能量。",
-        "specNote_combat": "以 4 個或更多連擊點命中時，開啟紅線 8 秒：邪惡揮斬變為重磅擺拳，此按鈕變為眼前一黑（造成 45 點傷害，每個連擊點額外造成 35 點，紅線期間你每擲出一次重磅擺拳，傷害便提高 25%，並恢復 25 點能量）。請在紅線結束前使用。"
+        "specNote_combat": "以 4 個或更多連擊點命中時，開啟紅線 8 秒：邪惡揮斬變為重磅擺拳，此按鈕變為眼前一黑（終結技，紅線期間你每擲出一次重磅擺拳，傷害便提高 25%，並恢復 25 點能量）。請在紅線結束前使用。"
       },
       "backstab": {
         "name": "怯懦突刺",
-        "description": "背刺目標，造成 150% 武器傷害加 {damage}。必須位於目標背後。需要匕首。獎勵 1 個連擊點。",
+        "description": "背刺目標，造成 {weaponPercent}% 武器傷害加 {damage}。必須位於目標背後。需要匕首。獎勵 1 個連擊點。",
         "specNote_assassination": "每次攻擊累積 1 層毒祭（最多 6 層）並恢復 15 點能量。毒祭達 6 層時，入土長眠變為蝕毒撕裂（一次引爆你所有流血效果的剩餘傷害）。"
       },
       "gouge": {
@@ -17849,7 +17849,7 @@ export const zh_TW: EnTranslations = {
       },
       "ambush": {
         "name": "潛伏者一擊",
-        "description": "伏擊目標，造成 250% 武器傷害加 {damage}。必須處於潛行並位於目標背後。需要匕首。獎勵 1 個連擊點。",
+        "description": "伏擊目標，造成 {weaponPercent}% 武器傷害加 {damage}。必須處於潛行並位於目標背後。需要匕首。獎勵 1 個連擊點。",
         "specNote_subtlety": "自暮紗中使用時累積 1 層幽暝（最多 3 層）。幽暝達 3 層時，可在明處以任意角度使用：那一次施展不消耗資源，耗盡全部 3 層幽暝，開啟 6 秒的暗影纏身，並造成雙倍傷害。"
       },
       "stealth": {
@@ -17950,7 +17950,7 @@ export const zh_TW: EnTranslations = {
       },
       "solar_step": {
         "name": "烈陽步",
-        "description": "使你的移動速度提高 150%，持續 2 秒。"
+        "description": "使你的移動速度提高 150%，持續 {duration} 秒。"
       },
       "solar_invocation": {
         "name": "烈陽祈喚",
@@ -17958,11 +17958,11 @@ export const zh_TW: EnTranslations = {
       },
       "radiant_devotion": {
         "name": "輝光虔誠",
-        "description": "使你和隊伍成員的法術強度提高 20 點，持續 30 分鐘。會取代你自己的黎明或恩典虔誠，但可與其他聖騎士的虔誠共存。"
+        "description": "使你和隊伍成員的法術強度提高 {buff} 點，持續 30 分鐘。會取代你自己的黎明或恩典虔誠。其他聖騎士施放輝光虔誠時會刷新而非疊加；不同的虔誠可共存。"
       },
       "dawn_devotion": {
         "name": "黎明虔誠",
-        "description": "使你和隊伍成員的攻擊強度提高 40 點，持續 30 分鐘。會取代你自己的輝光或恩典虔誠，但可與其他聖騎士的虔誠及戰士的戰吼共存。"
+        "description": "使你和隊伍成員的攻擊強度提高 {buff} 點，持續 30 分鐘。會取代你自己的輝光或恩典虔誠。其他聖騎士施放黎明虔誠時會刷新而非疊加；不同的虔誠及戰士的戰吼可共存。"
       },
       "grace_devotion": {
         "name": "恩典虔誠",
@@ -18303,7 +18303,7 @@ export const zh_TW: EnTranslations = {
       },
       "life_tap": {
         "name": "苛刻交易",
-        "description": "將 {damage} 點生命值轉化為 {damage} 點法力值（血契賒帳可多獲得 50% 法力值）。若你的生命值不高於 {damage} 點，則施放失敗。"
+        "description": "將 {damage} 點生命值轉化為 {buff} 點法力值。若你的生命值不高於 {damage} 點，則施放失敗。"
       },
       "cursed_accomplice": {
         "name": "受咒共犯",
@@ -18319,7 +18319,7 @@ export const zh_TW: EnTranslations = {
       },
       "litany_of_guilt": {
         "name": "罪責禱文",
-        "description": "詛咒你的主要邪眼8秒。每次獲得譴罪時會釋放衝擊波，對8碼內最多4名其他敵人造成傷害，每秒最多觸發一次。"
+        "description": "詛咒你的主要邪眼{duration}秒。每次獲得譴罪時會釋放衝擊波，對8碼內最多2名其他敵人（2級起為4名）造成傷害，每秒最多觸發一次。"
       },
       "cinderhide": {
         "name": "熔渣皮膚",
@@ -18339,7 +18339,7 @@ export const zh_TW: EnTranslations = {
       },
       "cruel_pact": {
         "name": "殘酷契約",
-        "description": "犧牲最大生命值的12%以產生20點譴罪。生命值不高於15%時無法使用。"
+        "description": "犧牲最大生命值的12%，恢復最大法力值的{buff}%並產生20點譴罪。生命值不高於20%時無法使用。"
       },
       "vicarious_suffering": {
         "name": "苦痛轉承",
@@ -18394,7 +18394,7 @@ export const zh_TW: EnTranslations = {
       },
       "moonseed": {
         "name": "月種",
-        "description": "僅限梟獸形態。造成 {damage} 點秘法傷害，累積 1 層月潮（最多 3 層），並將目標身上的月光風暴延長 6 秒；每次月光風暴施加最多額外延長 {duration} 秒。月潮達 3 層時，此按鈕變為月湧：立即造成 136 至 162 點秘法傷害（外加法術強度），並耗盡全部 3 層。"
+        "description": "僅限梟獸形態。造成 {damage} 點秘法傷害，累積 1 層月潮（最多 3 層），並將目標身上的月光風暴延長 6 秒；每次月光風暴施加最多額外延長 {duration} 秒。月潮達 3 層時，此按鈕變為月湧：立即施放的重擊，造成秘法傷害並耗盡全部 3 層。"
       },
       "rejuvenation": {
         "name": "孢癒術",
@@ -18416,7 +18416,7 @@ export const zh_TW: EnTranslations = {
       "maul": {
         "name": "碎骨擊",
         "description": "你的下一次近戰揮擊額外造成 {damage} 點傷害，並產生相當於其傷害 2.5 倍外加少量固定值的威脅值。僅限巨熊形態。",
-        "specNote_feral": "每次命中的攻擊累積 1 層古血；古血達 3 層時，此按鈕變為碎髓：造成 78 至 96 點高威脅傷害；生命值低於一半時，改為恢復相當於最大生命值 18% 的生命值，並恢復 15 點怒氣。"
+        "specNote_feral": "每次命中的攻擊累積 1 層古血；古血達 3 層時，此按鈕變為碎髓：高威脅的重擊；生命值低於一半時，改為恢復相當於最大生命值 18% 的生命值，並恢復 15 點怒氣。"
       },
       "growl": {
         "name": "威嚇",
@@ -18457,7 +18457,7 @@ export const zh_TW: EnTranslations = {
       },
       "barkskin": {
         "name": "橡樹皮術",
-        "description": "你的皮膚硬化如樹皮，使護甲提高 150，持續 15 秒。"
+        "description": "你的皮膚硬化如樹皮，使護甲提高 {buff}%，持續 15 秒。"
       },
       "sacred_bulwark": {
         "name": "神聖壁壘",
@@ -18470,7 +18470,7 @@ export const zh_TW: EnTranslations = {
       "starfire": {
         "name": "隕天術",
         "description": "召下一道星辰之火，造成 {damage} 點秘法傷害。",
-        "specNote_balance": "月翼形態下，每次完成施法累積 1 層月潮（最多 3 層）。月潮達 3 層時，此按鈕變為日醒：立即造成 160 至 190 點自然傷害，外加 9 秒內共 75 點灼燒傷害，恢復 35 點法力並耗盡全部 3 層。"
+        "specNote_balance": "月翼形態下，每次完成施法累積 1 層月潮（最多 3 層）。月潮達 3 層時，此按鈕變為日醒：立即造成自然傷害，外加 9 秒內持續的灼燒傷害，恢復 35 點法力並耗盡全部 3 層。"
       },
       "travel_form": {
         "name": "迅捷形態",
@@ -18518,7 +18518,7 @@ export const zh_TW: EnTranslations = {
       },
       "rip": {
         "name": "血隙",
-        "description": "終結技，使目標每2秒流血一次，持續24秒：造成72點傷害，每消耗1個連擊點額外增加48點（5個連擊點共{damage}點）。僅限貓形態。",
+        "description": "終結技，使目標每2秒流血一次，持續24秒，每消耗1個連擊點造成的傷害更高（5個連擊點共{damage}點）。僅限貓形態。",
         "specNote_feral": "命中的一擊累積 1 層古血（最多 3 層）。"
       },
       "mortal_strike": {
@@ -18930,7 +18930,7 @@ export const zh_TW: EnTranslations = {
       },
       "avenging_wrath": {
         "name": "復仇之怒",
-        "description": "展開由金色神聖之力凝成的實體羽翼，獲得 10 點虔誠，並在 15 秒內使你的技能所產生的虔誠翻倍。同時將你造成的傷害與治療提高 20%。破曉者：使憤怒之錘可對任何目標使用。"
+        "description": "展開由金色神聖之力凝成的實體羽翼，獲得 10 點虔誠，並在 {duration} 秒內使你的技能所產生的虔誠翻倍。同時將你造成的傷害與治療提高 20%。破曉者：使憤怒之錘可對任何目標使用。"
       },
       "berserk": {
         "name": "赤紅迷霧",
@@ -19188,7 +19188,7 @@ export const zh_TW: EnTranslations = {
       },
       "body_blow": {
         "name": "重磅擺拳",
-        "description": "沉重的一擊，造成130%武器傷害外加10點。獲得2個連擊點，並使紅線加深一格（最多4格）。（戰鬥）"
+        "description": "沉重的一擊，造成{weaponPercent}%武器傷害外加{damage}點。獲得2個連擊點，並使紅線加深一格（最多4格）。（戰鬥）"
       },
       "knockout_blow": {
         "name": "眼前一黑",

@@ -6384,7 +6384,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'I 6 sek: dina öppningsattacker från Skymningsslöja fungerar utan smyg och från vilken vinkel som helst, och du gör 10% mer skada. Ditt första Smygarens hugg under den gör 50% mer vapenskada. (Subtilitet)',
   'entities.abilities.body_blow.name': 'Kroppsslag',
   'entities.abilities.body_blow.description':
-    'Ett tungt slag för 130% vapenskada plus 10 som ger 2 combopoäng och fördjupar Redline med ett steg. (Thuggery-motorn)',
+    'Ett tungt slag för {weaponPercent}% vapenskada plus {damage} som ger 2 combopoäng och fördjupar Redline med ett steg. (Thuggery-motorn)',
   'entities.abilities.knockout_blow.name': 'Knockoutslag',
   'entities.abilities.knockout_blow.description':
     'Avslutar Röd linje med en knockout: slå för {damage} fysisk skada, 25% hårdare för varje Kroppsslag du kastat under Röd linje (upp till 3), och återfå 25 energi. Skadan ökar med attackkraft. Använd den innan Röd linje tar slut, annars går knockouten förlorad. (Strid)',
@@ -7769,7 +7769,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_monkey.name': 'Mårdens skepnad',
   'entities.abilities.backstab.name': 'Feg stöt',
   'entities.abilities.barkskin.description':
-    'Din hud hårdnar som bark och ökar rustning med 150 i 15 sek.',
+    'Din hud hårdnar som bark och ökar rustning med {buff}% i 15 sek.',
   'entities.abilities.barkskin.name': 'Ekhud',
   'entities.abilities.bash.description': 'Bedövar målet i 2 sek. Endast i Bruinform.',
   'entities.abilities.bash.name': 'Omtumla',
@@ -7985,7 +7985,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Läker ett vänligt mål för {damage}. Läkningen ökar med läkningskraft.',
   'entities.abilities.lesser_heal.name': 'Viskad bön',
   'entities.abilities.life_tap.description':
-    'Omvandlar {damage} hälsa till {damage} mana (50% mer mana med Blodskuld). Misslyckas om du har {damage} hälsa eller mindre.',
+    'Omvandlar {damage} hälsa till {buff} mana. Misslyckas om du har {damage} hälsa eller mindre.',
   'entities.abilities.life_tap.name': 'Hårt köpslag',
   'entities.abilities.lightning_bolt.description':
     'Vållar {damage} Naturskada. Skadan ökar med Besvärjelsekraft. Elementär: en träff ger 1 Åska.',
@@ -14730,7 +14730,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.avatar.description':
     'Bryt bedövningar, skräck, rotningar, tystnader, avväpningar och inbromsningar på dig (inte de från bossar) och bli sedan en koloss i 20 sek som gör 20% mer skada. Den skyddar dig inte mot nya kontrolleffekter.',
   'entities.abilities.avenging_wrath.description':
-    'Vecklar ut lekamliga vingar av gyllene helig kraft, vinner 10 Hängivenhet och fördubblar den Hängivenhet era förmågor alstrar i 15 sek. Ökar dessutom skadan och läkningen ni utdelar med 20%. Gryningsskördare: möjliggör Vredens hammare mot vilket mål som helst.',
+    'Vecklar ut lekamliga vingar av gyllene helig kraft, vinner 10 Hängivenhet och fördubblar den Hängivenhet era förmågor alstrar i {duration} sek. Ökar dessutom skadan och läkningen ni utdelar med 20%. Gryningsskördare: möjliggör Vredens hammare mot vilket mål som helst.',
   'entities.abilities.berserk.description': 'Ökar din attackkraft med 70 i 15 sek. (druidtalang)',
   'entities.abilities.bladestorm.name': 'Klingstorm',
   'entities.abilities.bladestorm.description':
@@ -14814,7 +14814,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Dina nästa två besvärjelser med kasttid kan kastas medan du rör dig. Varar i 15 sek. (magikertalang)',
   'entities.abilities.ignition.name': 'Antändning',
   'entities.abilities.ignition.description':
-    'Passiv: när dina Eldbesvärjelser får kritiska träffar brinner målet för ytterligare 30% av den utdelade skadan under 6 sek. En ny brand på ett mål som redan brinner läggs till den skada som återstår och startar om 6-sekunderstimern. (Eldmästerskap)',
+    'Passiv: när dina Eldbesvärjelser får kritiska träffar brinner målet för ytterligare 1,5% av den utdelade skadan per karaktärsnivå (30% på nivå 20) under 6 sek. En ny brand på ett mål som redan brinner läggs till den skada som återstår och startar om 6-sekunderstimern. (Eldmästerskap)',
   'entities.abilities.mass_barrier.name': 'Massbarriär',
   'entities.abilities.mass_barrier.description':
     'Skyddar dig och upp till 4 närliggande allierade inom 30 m; varje barriär absorberar {damage} skada i 15 sek. (magikertalang)',
@@ -16036,7 +16036,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.beacon_of_light.description':
     'Märk en gruppmedlem som din Ljusets båk. 50% av din effektiva direktläkning på en annan gruppmedlem inom 60 m läker även båken. Ytläkning och periodisk läkning överförs inte. Varar tills någon av er dör.',
   'entities.abilities.dawn_devotion.description':
-    'Ökar attackkraften hos dig och gruppmedlemmarna med 40 i 30 min. Ersätter din egen Strålande eller Nådens hängivenhet, men samexisterar med hängivenheter från andra paladiner och med krigarrop.',
+    'Ökar attackkraften hos dig och gruppmedlemmarna med {buff} i 30 min. Ersätter din egen Strålande eller Nådens hängivenhet. En annan paladin som kastar Gryningens hängivenhet förnyar den i stället för att stapla; en annan hängivenhet och krigarrop samexisterar.',
   'entities.abilities.dawnfall.description':
     'Ge {damage} helig skada till närliggande fiender och generera 1 hängivenhet. Att träffa minst en fiende minskar Sista påbudets återstående nedkylning med 2 sek. Upphöjelse ökar dess skada med 50% och dess radie till 10 m.',
   'entities.abilities.dawns_embrace.description':
@@ -16067,7 +16067,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.radiant_chorus.description':
     'Läk närliggande allierade för {damage} och generera 1 hängivenhet. Att effektivt läka minst 2 allierade ger Strålande resonans i 10 sek: ditt nästa Lagande ljus blir omedelbart, eller din nästa Gryningens famn kostar 50% mindre mana och kastas på 1,5 sek. Upphöjelse ökar Strålande körs läkning med 20% och dess radie till 40 m.',
   'entities.abilities.radiant_devotion.description':
-    'Ökar besvärjelsekraften hos dig och gruppmedlemmarna med 20 i 30 min. Ersätter din egen Gryningens eller Nådens hängivenhet, men samexisterar med hängivenheter från andra paladiner.',
+    'Ökar besvärjelsekraften hos dig och gruppmedlemmarna med {buff} i 30 min. Ersätter din egen Gryningens eller Nådens hängivenhet. En annan paladin som kastar Strålande hängivenhet förnyar den i stället för att stapla; en annan hängivenhet samexisterar.',
   'entities.abilities.recall_the_fallen.description':
     'Återför en död gruppmedlem till livet vid din sida med 35% hälsa och mana. En Solhelare på nivå 16 eller högre kallar i stället tillbaka varje fallen medlem i gruppen inom 30 meter och inom synhåll.',
   'entities.abilities.sacred_challenge.description':
@@ -16080,7 +16080,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Ge {damage} helig skada till en fiende eller läk ett vänligt mål för {healing}. Skadan ökar med besvärjelsekraft; läkningen ökar med läkningskraft. Disciplin läker varje skadad länkad gruppmedlem inom 30 yards för 30% av den skada som gjorts (70% med Tvillingförbundet). Om ingen är skadad läker den i stället den skadade gruppmedlem inom 30 yards som har lägst hälsa för 15% av skadan. Att läka en gruppmedlem läker också upp till 2 andra skadade gruppmedlemmar inom 10 yards från det målet och i din synlinje, var och en för 50% av den återställda hälsan. Dessa extra läkningar kan inte ge kritisk läkning eller skapa Disciplinlänkar. (Disciplinsignatur)',
   'entities.abilities.solar_invocation.description':
     'Läk omedelbart en allierad för {damage} eller gör 120 till 150 helig grundskada på en fiende. Skadan ökar med besvärjelsekraft och läkningen med läkningskraft. Båda användningarna genererar 1 hängivenhet. Under Upphöjelse läker en läkande kastning även allierade spelare inom 10 m från målet för hälften så mycket.',
-  'entities.abilities.solar_step.description': 'Ökar din förflyttningshastighet med 150% i 2 sek.',
+  'entities.abilities.solar_step.description':
+    'Ökar din förflyttningshastighet med 150% i {duration} sek.',
   'entities.abilities.sun_gods_verdict.description':
     'Dömer en fiende under Solgudens dom i 30 sek. Sista påbudet och Gryningsfall inskriver en laddning vid varje lyckad träff. Förmågan som sätter den tredje laddningen dikterar domen: Sista påbudet släpper lös förödande skada på den dömde; Gryningsfall detonerar domen och skadar och bedövar närliggande fiender i 1,5 sek.',
   'entities.abilities.sunward_disc.description':
@@ -16244,7 +16245,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Förbrukar dina 3 Månflod för ett tungt slag som ger {damage} arkan skada: skadevalet. Solspår förbrukar samma 3 Månflod, så välj ett.',
   'entities.abilities.moonseed.name': 'Månfrö',
   'entities.abilities.moonseed.description':
-    'Endast Månugglaform. Slår för {damage} arkan skada, lägger till 1 Månflod (max 3) och förlänger din Månstorm på målet med 6 sek, upp till {duration} extra sek per applicering av Månstorm. Vid 3 Månflod blir den här knappen Månsvall: ett omedelbart slag för 136 till 162 arkan skada (plus besvärjelsekraft) som förbrukar alla 3.',
+    'Endast Månugglaform. Slår för {damage} arkan skada, lägger till 1 Månflod (max 3) och förlänger din Månstorm på målet med 6 sek, upp till {duration} extra sek per applicering av Månstorm. Vid 3 Månflod blir den här knappen Månsvall: ett omedelbart kraftigt arkanslag som förbrukar alla 3.',
   'entities.abilities.overbloom.name': 'Överblomning',
   'entities.abilities.overbloom.description':
     'Förbrukar 3 Grönska. Skördar varje läkning över tid du äger på alla allierade för {buff}% av dess återstående läkning, tar bort de effekterna och planterar en färsk Sporemending på målet.',
@@ -16437,14 +16438,14 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'River upp en reva på den valda platsen, drar fiender inom 8 meter till dess mitt, vållar {damage} skuggskada och bedövar dem i 2 sek. Bossar tar skada men motstår dragningen och bedövningen.',
   'entities.abilities.abyssal_rift.name': 'Avgrundsspricka',
   'entities.abilities.ambush.description':
-    'Slå till från skuggorna för 250% vapenskada plus {damage}. Du måste vara dold och bakom målet. Kräver en dolk. Ger 1 kombopoäng.',
+    'Slå till från skuggorna för {weaponPercent}% vapenskada plus {damage}. Du måste vara dold och bakom målet. Kräver en dolk. Ger 1 kombopoäng.',
   'entities.abilities.ambush.specNote_subtlety':
     'Använd från Skymningsslöja lägger detta till 1 Skymningsförråd (max 3). Vid 3 Skymningsförråd kan du använda den UTAN att vara dold och från valfri vinkel: den användningen kostar inget, förbrukar alla 3 Skymningsförråd, startar den 6 sekunder långa Skuggslöjan och slår dubbelt så hårt.',
   'entities.abilities.army_of_the_dead.description':
     'River upp en gravportal för att väcka upp en tillfällig Skelettkrigare, Benmagiker och Gravvinge i 20 sek, vilket fyller de platser dina stående Herravälde-tjänare lämnar tomma.',
   'entities.abilities.army_of_the_dead.name': 'De dödas armé',
   'entities.abilities.backstab.description':
-    'Driv din dolk in i målets rygg för 150% vapenskada plus {damage}. Du måste vara bakom målet. Kräver en dolk. Ger 1 kombopoäng.',
+    'Driv din dolk in i målets rygg för {weaponPercent}% vapenskada plus {damage}. Du måste vara bakom målet. Kräver en dolk. Ger 1 kombopoäng.',
   'entities.abilities.backstab.specNote_assassination':
     'Varje slag lägger till 1 Giftritual (max 6) och återställer 15 energi. Vid 6 Giftritual blir Sista vilan till Giftrivning (den detonerar dina blödningars återstående skada på en gång).',
   'entities.abilities.blade_flurry.description':
@@ -16472,7 +16473,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Kräver ditt primära Onda ögat på målet. Placerar sekundära ögon (Onda ögat) på upp till 4 andra fiender inom 15 m från det i 15 sek. De genererar Fördömelse i 50% av normal takt, och Dom ekar till var och en av dem för 35% av sin skada.',
   'entities.abilities.coven.name': 'Häxring',
   'entities.abilities.cruel_pact.description':
-    'Offrar 12% av din maximala hälsa för att återställa 1,5% av din maximala mana och generera 20 Fördömelse. Kan inte användas vid eller under 20% hälsa.',
+    'Offrar 12% av din maximala hälsa för att återställa {buff}% av din maximala mana och generera 20 Fördömelse. Kan inte användas vid eller under 20% hälsa.',
   'entities.abilities.cruel_pact.name': 'Grym pakt',
   'entities.abilities.cursed_accomplice.description':
     'Länkar ditt förbannade öga när ingen allierad är vald, vilket får dess Förbannad blick att generera 2 Fördömelse. Att länka en vald gruppmedlem gör att bara deras skada mot ditt onda öga genererar 3 i stället. En ny länk ersätter den föregående och kan utlösas högst en gång var 2:e sek.',
@@ -16491,7 +16492,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.eviscerate.specNote_assassination':
     'Vid 6 Giftritual blir denna knapp Giftrivning: ett slag som omedelbart ger all skada dina blödningar ännu skulle ha gett, planterar ett färskt Giftrivning-sår och återställer 20 energi.',
   'entities.abilities.eviscerate.specNote_combat':
-    'Att landa denna med 4 eller fler kombopoäng startar Röd linje i 8 sek: Ondsint hugg blir Kroppsslag och denna knapp blir Knockoutslag (45 plus 35 per kombopoäng, slår 25% hårdare för varje Kroppsslag du slängt under Röd linje, återställer 25 energi). Använd den innan Röd linje tar slut.',
+    'Att landa denna med 4 eller fler kombopoäng startar Röd linje i 8 sek: Ondsint hugg blir Kroppsslag och denna knapp blir Knockoutslag (en avslutare som slår 25% hårdare för varje Kroppsslag du slängt under Röd linje och återställer 25 energi). Använd den innan Röd linje tar slut.',
   'entities.abilities.expose_armor.description':
     'Avslutande drag som exponerar målet i 30 sek: varje förbrukat kombopoäng minskar dess rustning med 2% (5 kombopoäng: {damage}%).',
   'entities.abilities.faerie_fire.description': 'Minskar målets rustning med {damage}% i 40 sek.',
@@ -16519,7 +16520,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.kidney_shot.description':
     'Avslutande drag som bedövar målet i 2 sek plus 1 sek per kombopoäng (5 kombopoäng: 7 sek).',
   'entities.abilities.litany_of_guilt.description':
-    'Förbannar ditt primära onda öga i 6 sek. Fördömelse-vinster släpper en våg som skadar upp till 2 andra fiender inom 8 yards, högst en gång per sekund. Rang 2 förlänger den till 8 sek och 4 fiender.',
+    'Förbannar ditt primära onda öga i {duration} sek. Fördömelse-vinster släpper en våg som skadar upp till 2 andra fiender (4 från rang 2) inom 8 yards, högst en gång per sekund.',
   'entities.abilities.litany_of_guilt.name': 'Skuldens litania',
   'entities.abilities.maledict_gaze.description':
     'Ditt Förbannade öga attackerar fienden som bär ditt primära Onda ögat var 2,5:e sek med skuggskada, medan du och fienden båda är i strid, inom 30 m från varandra och i synlinje. Besätt det onda ögat fördubblar dess attackhastighet.',
@@ -16527,7 +16528,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.description':
     'Ditt nästa närstridshugg ger {damage} extra skada och genererar hot motsvarande 2,5 gånger dess skada plus ett litet fast belopp. Endast Bruinform.',
   'entities.abilities.maul.specNote_feral':
-    'Varje träffande slag lägger till 1 Gammalt Blod; vid 3 Gammalt Blod blir denna knapp Märgbräckare: ett slag för 78 till 96 skada med högt hot; under halv hälsa helar det dig i stället för 18% av din maximala hälsa och återbetalar 15 raseri.',
+    'Varje träffande slag lägger till 1 Gammalt Blod; vid 3 Gammalt Blod blir denna knapp Märgbräckare: ett kraftigt slag med högt hot; under halv hälsa helar det dig i stället för 18% av din maximala hälsa och återbetalar 15 raseri.',
   'entities.abilities.moonfire.description':
     'Bränner fienden för {damage} arkan skada, sedan ytterligare {overTime} arkan skada över {duration} sek.',
   'entities.abilities.moonfire.specNote_balance':
@@ -16568,7 +16569,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rejuvenation.specNote_restoration':
     'Varje kastning ger 1 Grönska (max 3), även när den förnyar en blomning som redan verkar. Vid 3 Grönska blir Snabb läkning Överblomning.',
   'entities.abilities.rip.description':
-    'Avslutande attack som får målet att blöda varannan sekund i 24 sek: 72 skada plus 48 per förbrukad kombopoäng (5 poäng: {damage} totalt). Endast i Kattform.',
+    'Avslutande attack som får målet att blöda varannan sekund i 24 sek och ger mer skada för varje förbrukad kombopoäng (5 poäng: {damage} totalt). Endast i Kattform.',
   'entities.abilities.rip.specNote_feral': 'Det landade slaget lägger till 1 Gammalt Blod (max 3).',
   'entities.abilities.ruinous_brand.description':
     'Märker en fiende i 15 sek. Dina nästa 3 direkta besvärjelser ekar för 25% skada mot det märkta målet, eller kopierar 50% skada till det när de kastas mot ett annat mål. Fördärvsbult-ekon räknas också som kritiska träffar, utan ytterligare multiplikator för kritisk skada.',
@@ -16588,7 +16589,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Ett omedelbart slag för vapenskada plus {damage}. Ger 1 kombopoäng.',
   'entities.abilities.sinister_strike.specNote_assassination': 'Lägger till 1 Giftritual (max 6).',
   'entities.abilities.sinister_strike.specNote_combat':
-    'Medan Röd linje är aktiv blir denna knapp Kroppsslag: 130% vapenskada plus 10, ger 2 kombopoäng och lägger till 1 Röd linje (max 4).',
+    'Medan Röd linje är aktiv blir denna knapp Kroppsslag: ett tyngre vapenslag som ger 2 kombopoäng och lägger till 1 Röd linje (max 4).',
   'entities.abilities.slice_and_dice.description':
     'Avslutande drag som ökar närstridens attackhastighet med 30% i 12 sek plus 4 sek per kombopoäng (5 kombopoäng: 32 sek).',
   'entities.abilities.soul_harvest.description':
@@ -16603,7 +16604,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.description':
     'Kallar ner en stråle av stjärneld, vilket orsakar {damage} arkan skada.',
   'entities.abilities.starfire.specNote_balance':
-    'I Månugglaform lägger varje fullbordad besvärjelse till 1 Månflod (max 3). Vid 3 Månflod blir denna knapp Solspår: ett omedelbart slag som ger 80 till 100 naturskada plus en brännskada på 45 under 9 sek, återställer 35 mana och förbrukar alla 3.',
+    'I Månugglaform lägger varje fullbordad besvärjelse till 1 Månflod (max 3). Vid 3 Månflod blir denna knapp Solspår: ett omedelbart naturslag plus en brännskada under 9 sek, återställer 35 mana och förbrukar alla 3.',
   'entities.abilities.stealth.description':
     'Dölj dig i skuggorna. Fiendespelare och fiendehusdjur kan inte se dig, och monster märker dig bara från mycket närmare håll än normalt (från längre bort om de har högre nivå än du). Du rör dig i full fart. Att attackera eller ta skada bryter Skymningsslöja. Kasta igen för att kliva fram.',
   'entities.abilities.stealth.specNote_subtlety':

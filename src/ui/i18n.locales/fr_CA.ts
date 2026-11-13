@@ -147,7 +147,7 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ice_floes.description':
     "Tes deux prochains sorts qui ont un temps d'incantation peuvent être lancés en mouvement. Dure 15 s. (Talent de mage)",
   'entities.abilities.ignition.description':
-    "Passif : quand tes sorts de Feu infligent un coup critique, la cible brûle pour 30% supplémentaires des dégâts infligés sur 6 s. Une nouvelle brûlure sur une cible déjà en feu s'ajoute aux dégâts restants à subir et relance le délai de 6 s. (Maîtrise du Feu)",
+    "Passif : quand tes sorts de Feu infligent un coup critique, la cible brûle pour 1,5% supplémentaires des dégâts infligés par niveau de personnage (30% au niveau 20) sur 6 s. Une nouvelle brûlure sur une cible déjà en feu s'ajoute aux dégâts restants à subir et relance le délai de 6 s. (Maîtrise du Feu)",
   'entities.abilities.mass_barrier.name': 'Bouclier collectif',
   'entities.abilities.mass_barrier.description':
     'Pose un bouclier sur toi et sur un maximum de 4 alliés proches dans un rayon de 30 m; chacun absorbe {damage} points de dégâts pendant 15 s. (Talent de mage)',
