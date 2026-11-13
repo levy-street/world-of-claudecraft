@@ -3527,7 +3527,8 @@
             "x": 356.47,
             "z": 415.08
           }
-        ]
+        ],
+        "offStream": true
       },
       {
         "mobId": "shoal_scuttler",
@@ -3558,7 +3559,8 @@
             "x": 456.84,
             "z": 490.75
           }
-        ]
+        ],
+        "offStream": true
       },
       {
         "mobId": "gale_wisp",
@@ -3585,7 +3587,8 @@
             "x": 333.18,
             "z": 536.11
           }
-        ]
+        ],
+        "offStream": true
       },
       {
         "mobId": "gale_wisp",
@@ -3612,7 +3615,8 @@
             "x": 346.01,
             "z": 532.01
           }
-        ]
+        ],
+        "offStream": true
       },
       {
         "mobId": "hedge_knight",
@@ -3666,7 +3670,8 @@
           "z": 2302
         },
         "radius": 8,
-        "count": 1
+        "count": 1,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3675,7 +3680,8 @@
           "z": 2266
         },
         "radius": 9,
-        "count": 7
+        "count": 7,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3684,7 +3690,8 @@
           "z": 2278
         },
         "radius": 9,
-        "count": 7
+        "count": 7,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3693,7 +3700,8 @@
           "z": 2352
         },
         "radius": 9,
-        "count": 7
+        "count": 7,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3702,7 +3710,8 @@
           "z": 2302
         },
         "radius": 9,
-        "count": 7
+        "count": 7,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3711,7 +3720,8 @@
           "z": 2348
         },
         "radius": 10,
-        "count": 8
+        "count": 8,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3720,7 +3730,8 @@
           "z": 2318
         },
         "radius": 10,
-        "count": 5
+        "count": 5,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3729,7 +3740,8 @@
           "z": 2300
         },
         "radius": 12,
-        "count": 5
+        "count": 5,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3738,7 +3750,8 @@
           "z": 2380
         },
         "radius": 12,
-        "count": 5
+        "count": 5,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_broodguard",
@@ -3747,7 +3760,8 @@
           "z": 2242
         },
         "radius": 9,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_broodguard",
@@ -3756,7 +3770,8 @@
           "z": 2296
         },
         "radius": 9,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_broodguard",
@@ -3765,7 +3780,8 @@
           "z": 2282
         },
         "radius": 8,
-        "count": 2
+        "count": 2,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_broodguard",
@@ -3774,7 +3790,8 @@
           "z": 2338
         },
         "radius": 8,
-        "count": 2
+        "count": 2,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_broodguard",
@@ -3783,7 +3800,8 @@
           "z": 2302
         },
         "radius": 9,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_broodguard",
@@ -3792,7 +3810,8 @@
           "z": 2252
         },
         "radius": 8,
-        "count": 2
+        "count": 2,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_broodguard",
@@ -3801,7 +3820,8 @@
           "z": 2384
         },
         "radius": 8,
-        "count": 2
+        "count": 2,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3810,7 +3830,8 @@
           "z": 2242
         },
         "radius": 7,
-        "count": 4
+        "count": 4,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3819,7 +3840,8 @@
           "z": 2303
         },
         "radius": 7,
-        "count": 4
+        "count": 4,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3828,7 +3850,8 @@
           "z": 2286
         },
         "radius": 6,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3837,7 +3860,8 @@
           "z": 2334
         },
         "radius": 7,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3846,7 +3870,8 @@
           "z": 2308
         },
         "radius": 7,
-        "count": 4
+        "count": 4,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3855,7 +3880,8 @@
           "z": 2258
         },
         "radius": 7,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3864,7 +3890,8 @@
           "z": 2380
         },
         "radius": 7,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "friendly_player_dummy",
@@ -3900,7 +3927,8 @@
           "z": -14
         },
         "radius": 4,
-        "count": 1
+        "count": 1,
+        "offStream": true
       },
       {
         "mobId": "training_effigy",
@@ -3909,7 +3937,8 @@
           "z": -17
         },
         "radius": 4,
-        "count": 1
+        "count": 1,
+        "offStream": true
       },
       {
         "mobId": "training_effigy",
@@ -3918,7 +3947,8 @@
           "z": -11
         },
         "radius": 4,
-        "count": 1
+        "count": 1,
+        "offStream": true
       },
       {
         "mobId": "training_effigy",
@@ -3927,7 +3957,8 @@
           "z": -19.8
         },
         "radius": 4,
-        "count": 1
+        "count": 1,
+        "offStream": true
       },
       {
         "mobId": "training_effigy",
@@ -3936,7 +3967,8 @@
           "z": -9
         },
         "radius": 4,
-        "count": 1
+        "count": 1,
+        "offStream": true
       },
       {
         "mobId": "shore_scuttler",
@@ -3945,7 +3977,8 @@
           "z": -42
         },
         "radius": 4,
-        "count": 2
+        "count": 2,
+        "offStream": true
       },
       {
         "mobId": "shore_scuttler",
@@ -3954,7 +3987,8 @@
           "z": -48
         },
         "radius": 4,
-        "count": 2
+        "count": 2,
+        "offStream": true
       },
       {
         "mobId": "shore_scuttler",
@@ -3963,7 +3997,8 @@
           "z": -40
         },
         "radius": 4,
-        "count": 2
+        "count": 2,
+        "offStream": true
       },
       {
         "mobId": "ridge_stalker",
@@ -3982,7 +4017,8 @@
             "x": 66.74,
             "z": 574.94
           }
-        ]
+        ],
+        "offStream": true
       },
       {
         "mobId": "ridge_stalker",
@@ -4001,7 +4037,8 @@
             "x": 37.71,
             "z": 558.22
           }
-        ]
+        ],
+        "offStream": true
       },
       {
         "mobId": "ridge_stalker",
@@ -4016,7 +4053,8 @@
             "x": 45.17,
             "z": 573.11
           }
-        ]
+        ],
+        "offStream": true
       },
       {
         "mobId": "thornpeak_ogre",
@@ -4031,7 +4069,8 @@
             "x": -128.99,
             "z": 718.92
           }
-        ]
+        ],
+        "offStream": true
       },
       {
         "mobId": "hedge_gnome",
@@ -4050,7 +4089,8 @@
             "x": 460.63,
             "z": 914.29
           }
-        ]
+        ],
+        "offStream": true
       },
       {
         "mobId": "vale_bandit",
@@ -4065,7 +4105,8 @@
             "x": 67.2,
             "z": 40.95
           }
-        ]
+        ],
+        "offStream": true
       },
       {
         "mobId": "restless_bones",
@@ -4080,7 +4121,8 @@
             "x": 114.35,
             "z": 72.74
           }
-        ]
+        ],
+        "offStream": true
       },
       {
         "mobId": "gloam_strider",
@@ -4095,7 +4137,8 @@
             "x": -413.29,
             "z": 1512.58
           }
-        ]
+        ],
+        "offStream": true
       },
       {
         "mobId": "void_stalker",
@@ -4110,7 +4153,8 @@
             "x": 424.71,
             "z": -39.02
           }
-        ]
+        ],
+        "offStream": true
       }
     ],
     "npcs": {
