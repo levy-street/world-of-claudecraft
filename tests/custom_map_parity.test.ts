@@ -153,16 +153,45 @@ describe('custom-map terrain seam', () => {
     // projected world must resolve the same layout: every record is still
     // the town's own building (its walls stand down under a promoted town)
     expect(BUILTIN_WORLD.fenbridgeTouchup).toBeDefined();
-    const world = customMapToWorldContent(newCustomMap('Fen', 'fen', 0));
-    expect(world.fenbridgeTouchup).toEqual(BUILTIN_WORLD.fenbridgeTouchup);
+    const map = newCustomMap('Fen', 'fen', 0);
+    const world = customMapToWorldContent(map);
+    // the whole touch-up, less the added cottages the map does not place (an
+    // added cottage clears ground for its walls; without it, a bare footprint)
+    const { addedCottages, ...rest } = BUILTIN_WORLD.fenbridgeTouchup ?? {};
+    expect(addedCottages?.length).toBeGreaterThan(0);
+    expect(world.fenbridgeTouchup).toEqual(rest);
     setActiveWorldContent(world);
     const layout = activeFenbridgeLayout();
     expect(layout.buildings.length).toBeGreaterThan(0);
+    // the promoted building placements stand where that layout puts the town
+    // (its walk-in floors and streets), not at the pre-touch-up layout
+    for (const building of layout.buildings) {
+      const assetId = building.assetId.replace(/^\/models\//, '').replace(/\.glb$/i, '');
+      const placed = map.placements.filter(
+        (p) =>
+          p.assetId === assetId &&
+          Math.hypot(p.x - building.placement.x, p.z - building.placement.z) < 1e-6,
+      );
+      expect(placed, building.id).toHaveLength(1);
+    }
     for (const building of layout.buildings) {
       const record = world.props.buildings.find((candidate) => candidate.id === building.id);
       if (!record) throw new Error(`the projected world has no ${building.id} record`);
       expect(isAuthoredTownBuildingDef(record), building.id).toBe(true);
     }
+    // a map that does place an added cottage (by its uid) keeps that cottage
+    const cottage = addedCottages?.[0];
+    if (!cottage) throw new Error('the touch-up adds no cottage');
+    map.placements.push({
+      assetId: 'tidehold/fenrire/house_a',
+      uid: cottage.uid,
+      x: cottage.x,
+      z: cottage.z,
+      rotY: cottage.rot,
+      scale: 1,
+      collide: true,
+    });
+    expect(customMapToWorldContent(map).fenbridgeTouchup?.addedCottages).toEqual([cottage]);
     // an empty-props map clones no records, so it carries no touch-up either
     const flat = customMapToWorldContent(newFlatCustomMap('Flat', 'flat', 0));
     expect(flat.fenbridgeTouchup).toBeUndefined();

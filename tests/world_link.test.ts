@@ -4,7 +4,12 @@
 // built-in world keeps running around it.
 
 import { afterEach, describe, expect, it } from 'vitest';
-import { customMapToWorldContent, mapBounds, newFlatCustomMap } from '../src/editor/custom_map';
+import {
+  customMapToWorldContent,
+  mapBounds,
+  newFlatCustomMap,
+  stampReachesRect,
+} from '../src/editor/custom_map';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { sanitizeMapDoc } from '../src/sim/map_doc';
 import { townWalkInPlacements } from '../src/sim/town_walk_in';
@@ -170,15 +175,20 @@ describe('linked playtest projection', () => {
     expect(placed?.z).toBe(1205);
     expect(world.playerStart).toEqual({ x: 502, z: 1198 });
     expect(world.locations?.[0]).toMatchObject({ minX: 495, maxX: 505, minZ: 1195, maxZ: 1205 });
-    // Terrain stamps (the blank map's flatten grid) offset with the map.
-    const stamp = (world.terrainEdits ?? [])[0];
+    // Terrain stamps (the blank map's flatten grid) offset with the map,
+    // after the built-in world's own sculpts.
+    const edits = world.terrainEdits ?? [];
+    const stamp = edits[edits.length - map.terrainEdits.length];
     const local = map.terrainEdits[0];
     expect(stamp.x).toBe(local.x + 500);
     expect(stamp.z).toBe(local.z + 1200);
 
     // The auto perimeter walls are STRIPPED (walk in from the world); the
-    // maker's interior blocker survives at the offset.
-    const blockers = world.blockers ?? [];
+    // maker's interior blocker survives at the offset, after the built-in
+    // world's own walls.
+    const builtinBlockers = BUILTIN_WORLD.blockers ?? [];
+    const blockers = (world.blockers ?? []).slice(builtinBlockers.length);
+    expect(world.blockers?.slice(0, builtinBlockers.length)).toEqual(builtinBlockers);
     expect(blockers).toHaveLength(1);
     expect(blockers[0]).toMatchObject({ x1: 497, z1: 1197, x2: 503, z2: 1197 });
     // ...and nothing remains on the old rect perimeter lines.
@@ -231,6 +241,52 @@ describe('linked playtest projection', () => {
     for (const id of Object.keys(BUILTIN_WORLD.npcs)) {
       expect(world.npcs[id]).toBeDefined();
     }
+  });
+
+  it('keeps the live world around the map: its touch-up and service layers', () => {
+    // The Studio town rework (#4593) lives in the built-in touch-up layer
+    // (placements, sculpts, moved objects, scrubbed grass, replaced
+    // decorations, biome paint); a linked map must not drop it.
+    const map = blankMap();
+    map.worldAnchor = { x: -200, z: 800 };
+    const world = customMapToWorldContent(map);
+    const builtinPlacements = BUILTIN_WORLD.placements ?? [];
+    expect(builtinPlacements.length).toBeGreaterThan(100);
+    expect(world.placements?.slice(0, builtinPlacements.length)).toEqual(builtinPlacements);
+    expect(world.objectMoves).toBe(BUILTIN_WORLD.objectMoves);
+    expect(world.decorationExclusions).toEqual(BUILTIN_WORLD.decorationExclusions);
+    expect(world.grassClear).toEqual(BUILTIN_WORLD.grassClear);
+    expect(world.biomePaint).toEqual(BUILTIN_WORLD.biomePaint);
+    expect(world.services).toEqual(BUILTIN_WORLD.services);
+    for (const key of [
+      'objectMoves',
+      'grassClear',
+      'decorationExclusions',
+      'biomePaint',
+    ] as const) {
+      expect(BUILTIN_WORLD[key], key).toBeDefined();
+    }
+  });
+
+  it('keeps the built-in sculpts outside the map rect, none inside it', () => {
+    // Anchored on reworked Eastbrook: the built-in stamps there would
+    // re-sculpt the map's own ground, so they stay out; the rest stay in.
+    const map = blankMap();
+    map.terrainEdits = [];
+    map.worldAnchor = { x: -43, z: -78 };
+    const { halfW, zMin, zMax } = mapBounds(map);
+    const rect = { minX: -43 - halfW, maxX: -43 + halfW, minZ: -78 + zMin, maxZ: -78 + zMax };
+    const builtin = BUILTIN_WORLD.terrainEdits ?? [];
+    const inside = builtin.filter((s) => stampReachesRect(s, rect));
+    expect(inside.length).toBeGreaterThan(0);
+    const edits = customMapToWorldContent(map).terrainEdits ?? [];
+    expect(edits).toHaveLength(builtin.length - inside.length);
+    for (const s of edits) expect(stampReachesRect(s, rect)).toBe(false);
+    // the footprint test is the stamp's bounding square against the rect
+    const r = { minX: 0, maxX: 10, minZ: 0, maxZ: 10 };
+    expect(stampReachesRect({ x: -2, z: 5, radius: 3 }, r)).toBe(true);
+    expect(stampReachesRect({ x: -3, z: 5, radius: 3 }, r)).toBe(false);
+    expect(stampReachesRect({ x: 5, z: 13, radius: 3 }, r)).toBe(false);
   });
 
   it('carries the live Fenbridge layout, so its walk-in doorways stay open', () => {

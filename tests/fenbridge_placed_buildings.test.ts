@@ -651,7 +651,9 @@ function wallBoxGrid(building: Building, dx = 0, dz = 0): { x: number; z: number
 describe('Fenbridge in Studio', () => {
   it('turns each building into one movable placement at the spot the game stands it', () => {
     const converted = authoredTownBuildingPlacements(WORLD_SEED);
-    for (const building of BUILDINGS) {
+    // where the live world stands it: the world touch-up moved them, and the
+    // projection resolves the town's floors from that same touch-up
+    for (const building of LIVE_FENBRIDGE.buildings) {
       const placed = converted.filter((p) => p.assetId === placementAssetIdOf(building));
       expect(placed, building.id).toHaveLength(1);
       expect(placed[0]).toMatchObject({

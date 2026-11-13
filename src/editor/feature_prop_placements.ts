@@ -31,6 +31,7 @@ import { AUTHORED_TOWNS, type AuthoredTownFamily } from '../sim/authored_town_re
 import { BUILTIN_WORLD } from '../sim/data';
 import { EASTBROOK_LAYOUT, localToWorld } from '../sim/eastbrook_layout';
 import { emberLilySpots } from '../sim/ember_lilies';
+import { resolveFenbridgeLayout } from '../sim/fenbridge_touchup';
 import { REMOVED_HIGHWATCH_BUILDINGS } from '../sim/highwatch_layout';
 import { MAX_PLACEMENTS, type MapPlacement } from '../sim/map_doc';
 import { PAINTED_TOWNS } from '../sim/painted_towns';
@@ -363,10 +364,21 @@ export const TOWN_BUILDING_NATURAL: Readonly<Record<string, NaturalSize>> = {
  * one uniform scale and its buried footing, with the model's baked collision,
  * so the document's copy is the walk-in building a maker expects.
  */
+/**
+ * A town's buildings where the live world stands them. Fenbridge's come from
+ * the world touch-up (BUILTIN_WORLD.fenbridgeTouchup moved them), the same
+ * layout the projection resolves the town's streets, NPCs and walk-in floors
+ * from (custom_map.ts), so a promoted building never lands off its own floor.
+ */
+function liveTownBuildings(town: (typeof AUTHORED_TOWNS)[number]) {
+  if (town.id !== 'fenbridge') return town.buildings;
+  return resolveFenbridgeLayout(BUILTIN_WORLD.fenbridgeTouchup).buildings;
+}
+
 function townBuildingPlacementsOf(family: AuthoredTownFamily): MapPlacement[] {
   const out: MapPlacement[] = [];
   const towns = AUTHORED_TOWNS.filter((town) => town.promotedBy === family);
-  for (const b of towns.flatMap((town) => town.buildings)) {
+  for (const b of towns.flatMap(liveTownBuildings)) {
     const assetId = b.assetId.replace(/^\/models\//, '').replace(/\.glb$/i, '');
     const nat = TOWN_BUILDING_NATURAL[assetId];
     if (!nat) continue;
