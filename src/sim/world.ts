@@ -4733,30 +4733,8 @@ export const BIOME_BY_ID: BiomeId[] = [
   'cave',
 ];
 
-// Every BiomeId, as a runtime list. A ZONE's biome may be any of these, the
-// realm biomes (frost, dusk, ember, ...) drive palettes, sky features (the
-// Frostveil's aurora), and ambient weather, and a zone carrying one round-trips
-// through a saved map even though no brush paints it. Validating a zone against
-// BIOME_BY_ID instead silently downgraded every realm zone to 'vale' on export.
-export const ALL_BIOME_IDS: readonly BiomeId[] = [
-  'vale',
-  'marsh',
-  'peaks',
-  'beach',
-  'desert',
-  'volcano',
-  'cave',
-  'dusk',
-  'ember',
-  'frost',
-  'amber',
-  'fen',
-  'night',
-  'haunt',
-  'jungle',
-  'garden',
-  'gale',
-];
+// Every BiomeId, as a runtime list (biome_ids.ts: an exhaustive record).
+export { ALL_BIOME_IDS } from './biome_ids';
 
 // The persisted paint id at (x,z), including custom swatches. Renderers that
 // support custom textures need the raw id rather than the built-in biome below.

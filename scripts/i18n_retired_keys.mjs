@@ -126,6 +126,11 @@ export const RETIRED_KEYS = [
   'guide.professions.harvestBodyChoice', // folded into the harvest section's body copy
   // -> guide.profPages.gatherDeeds.farmingSown (farming gained its own deeds at D13)
   'guide.profPages.gatherDeeds.farming',
+  // -> guide.profPages.gatherDeeds.<trade>WithIsle (thirteen zones with the Quartered Isle)
+  'guide.profPages.gatherDeeds.mining',
+  'guide.profPages.gatherDeeds.logging',
+  'guide.profPages.gatherDeeds.herbalism',
+  'guide.profPages.gatherDeeds.fishing',
   // The World PvP zone layer (src/sim/pvp/world_pvp_zones.ts): the flag is no
   // longer the whole story, so each of these states a rule the game has stopped
   // following. Sanctuaries allow no world fighting at all, the free-for-all

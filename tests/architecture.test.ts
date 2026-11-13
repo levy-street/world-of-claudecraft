@@ -1505,6 +1505,7 @@ const RENDER_PURE_CORES = [
   'src/render/foliage_frame_windows_core.ts',
   'src/render/lava_chain_core.ts',
   'src/render/quartered_landmark_dressing_core.ts',
+  'src/render/quartered_landmark_lane_core.ts',
   'src/render/quartered_floating_debris_core.ts',
   'src/render/quartered_fissure_lava_core.ts',
   // the scatter boulders' biome and Cinderscar tint (foliage.ts)

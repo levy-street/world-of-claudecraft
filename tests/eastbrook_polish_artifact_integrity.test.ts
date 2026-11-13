@@ -1438,7 +1438,7 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // No capture was retaken.
   // Re-minted for v0.45.4 graphics and dungeon loading optimizations in renderer.ts.
   // No capture was retaken.
-  '8aa1226aca33fde5db58da69355481a91b4c5a62c9712ac7162e336a96b62430';
+  'c8b2222aabd919559058947ae9382e07770a32f3fb5c9e94e5e11f285a5d297c';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -1496,7 +1496,7 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // No capture was retaken.
   // Re-minted for v0.45.4 graphics and dungeon loading optimizations in renderer.ts.
   // No capture was retaken.
-  '734c7f5d2ef9e87737bda3799de1a273f717dd2c278ded67ff98c1521717b2e0';
+  '296e8abfd972ce668e0f61986ecbf9b124a32db32b299721868c9d8e8ac456fb';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2905,7 +2905,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // release/v0.45.3: recomputed from the swept evidence. No capture was retaken.
       // v0.45.4 graphics and dungeon loading optimizations in renderer.ts:
       // recomputed from the swept evidence. No capture was retaken.
-    ).toBe('b69bc09e58c6331c869b6c8978b59dd7ad234589511f1c8c5b3bfcf2d2a841a0');
+    ).toBe('6c5eb34015408f1ff1d7f2e44596c7f0676a2e3136a8f0b2de12c65f3e5a17fe');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

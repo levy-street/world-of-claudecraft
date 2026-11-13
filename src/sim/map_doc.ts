@@ -1812,6 +1812,22 @@ function fillZoneDefaults(v: unknown): ZoneDef {
       return poi;
     });
   if (typeof z.welcome !== 'string') z.welcome = '';
+  // The optional column and claim fields feed zoneAt, the terrain region
+  // index and the hill picker straight from an untrusted document: clamp the
+  // finite ones, drop the rest, and keep a flag only when it is a real boolean.
+  for (const key of ['xMin', 'xMax'] as const) {
+    if (finiteNum(z[key])) z[key] = coord(z[key] as number);
+    else delete z[key];
+  }
+  const arena = z.hillArena as Record<string, unknown> | undefined;
+  if (arena && typeof arena === 'object' && finiteNum(arena.x) && finiteNum(arena.z)) {
+    z.hillArena = { x: coord(arena.x as number), z: coord(arena.z as number) };
+  } else {
+    delete z.hillArena;
+  }
+  for (const key of ['claimsOverlap', 'waterSouthBorder'] as const) {
+    if (typeof z[key] !== 'boolean') delete z[key];
+  }
   // A zone may carry ANY biome, not just the paintable ones (BIOME_BY_ID is the
   // brush vocabulary). Validating against the paint table downgraded frost /
   // dusk / ember / amber / fen / night / haunt / jungle / garden / gale zones to

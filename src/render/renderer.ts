@@ -337,7 +337,7 @@ import {
 } from './door_portal';
 import { watchDevicePixelRatio } from './dpr_watch';
 import { DrainChannelStopLatch, drainChannelVisualPlan } from './drain_channel_visual_core';
-import { drakelandsKitLoadFor, drakelandsKitRecheck } from './drakelands_kit_lane';
+import { drakelandsKitLoadFor } from './drakelands_kit_lane';
 import { createLogicalFrameDrawStats, type LogicalFrameDrawStats } from './draw_stats_core';
 import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
 import { DynamicEntityAmbienceSources } from './dynamic_entity_ambience';
@@ -714,8 +714,8 @@ import { buildPropMaterialPrewarmGroup, buildProps, propResidencySources } from 
 import {
   buildQuarteredLandmarks,
   type QuarteredLandmarkDressingView,
-  quarteredLandmarkLoadFor,
 } from './quartered_landmark_dressing';
+import { quarteredLandmarkLoadFor, zoneKitRecheck } from './quartered_landmark_lane';
 import {
   attachEntityViewBody,
   buildQuestCaravanBody,
@@ -4023,7 +4023,7 @@ export class Renderer {
     this.skyResidency.updateSkyResidency(cameraX, cameraZ);
     // The ACTIVE world's zones, never the module list.
     const zones = this.sim.cfg.world?.zones ?? ZONES;
-    const kitHolds = drakelandsKitRecheck(zones, cameraX, cameraZ, horizon, this.visibleZoneCheck);
+    const kitHolds = zoneKitRecheck(zones, cameraX, cameraZ, horizon, this.visibleZoneCheck);
     const forwardX = this.cameraLookAt.x - cameraX;
     const forwardZ = this.cameraLookAt.z - cameraZ;
     // The ACTIVE zone list, not the shipped one: an authored map's background

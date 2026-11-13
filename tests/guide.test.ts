@@ -2903,7 +2903,10 @@ describe('Guide professions gathering accuracy', () => {
   it('never enumerates the Master Gatherer roster in the deed prose', () => {
     setLanguage('en');
     for (const id of GATHERING_PROFESSION_IDS) {
-      const body = t(`guide.profPages.gatherDeeds.${id}` as never);
+      // the live leaf per trade: farming's is farmingSown, the other four their
+      // *WithIsle successors (professions_gathering.ts deedsSection)
+      const leaf = id === 'farming' ? 'farmingSown' : `${id}WithIsle`;
+      const body = t(`guide.profPages.gatherDeeds.${leaf}` as never);
       expect(body.length, id).toBeGreaterThan(0);
       expect(body, `gatherDeeds.${id} enumerates the gathering roster`).not.toMatch(
         /any three of/i,
@@ -3459,14 +3462,22 @@ describe('Guide professions gathering accuracy', () => {
     };
     const castWord = words[firstCast.length];
     expect(castWord, `unmapped first-cast count ${firstCast.length}`).toBeDefined();
-    expect(guideStrings.profPages.gatherDeeds.fishing).toContain(
+    expect(guideStrings.profPages.gatherDeeds.fishingWithIsle).toContain(
       `each of ${castWord} zones' waters`,
     );
+    // the sentence's own list names every first-cast zone it counts: the three
+    // heartland zones stand as one phrase, the rest by name
+    const named = (
+      guideStrings.profPages.gatherDeeds.fishingWithIsle.match(
+        / the [A-Z][A-Za-z]+(?: Isle)?(?=,| beyond)/g,
+      ) ?? []
+    ).length;
+    expect(named + 3).toBe(firstCast.length);
     const chronWord = words[chronicles.length];
     expect(chronWord, `unmapped gatherer-chronicle count ${chronicles.length}`).toBeDefined();
     const chronSentence = `${(chronWord as string)[0].toUpperCase()}${(chronWord as string).slice(1)} zones keep a gatherer's chronicle page apiece`;
     for (const trade of ['mining', 'logging', 'herbalism'] as const) {
-      expect(guideStrings.profPages.gatherDeeds[trade]).toContain(chronSentence);
+      expect(guideStrings.profPages.gatherDeeds[`${trade}WithIsle`]).toContain(chronSentence);
     }
   });
 

@@ -38,6 +38,7 @@ import { terrainHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { attachBiomeHaze } from './biome_haze_field';
+import { drakelandsKitBootThunk } from './drakelands_kit_lane_core';
 import { prepareFrostIceParts } from './frost_ice_fields';
 import { GFX } from './gfx';
 import {
@@ -92,6 +93,15 @@ function loadLavaTextures(): Promise<void> {
 
 // The spire loads at boot everywhere, as frost_ice_fields.ts loads it.
 registerDeferredPreload(() => loadSource('spire'));
+// The fissure lava's textures too, except on the iOS memory profile (the
+// isles' rule, quartered_floating_isles.ts): without this they were resident
+// only if the Ignivar raid had loaded first, so every approach fetched them.
+registerDeferredPreload(
+  drakelandsKitBootThunk(
+    () => loadLavaTextures(),
+    () => GFX,
+  ),
+);
 
 /** Every model and texture buildQuarteredLandmarks reads is resident. */
 export function quarteredLandmarkAssetsResident(): boolean {
@@ -234,6 +244,8 @@ function fissureLavaMesh(tile: FissureLavaTile, material: THREE.Material): THREE
   const mesh = new THREE.Mesh(geometry, material);
   mesh.name = `quartered-fissure-lava-mesh-${tile.ti}-${tile.tj}`;
   mesh.userData.quarteredFissureLava = true;
+  // the Ignivar moat's shared lava material: never this view's to dispose
+  mesh.userData[BORROWED_MATERIAL_FLAG] = true;
   mesh.castShadow = false;
   mesh.receiveShadow = false;
   return mesh;
@@ -252,12 +264,43 @@ const CLUSTER_NAMES = {
 } as const;
 type ClusterKey = keyof typeof CLUSTER_NAMES;
 
+/** Set on a mesh whose material belongs to someone else (a cached GLB's, the
+ *  Ignivar moat's shared lava): dispose() frees its geometry and nothing more. */
+export const BORROWED_MATERIAL_FLAG = 'quarteredBorrowedMaterial';
+
+/** Free what one build allocated: every geometry in the view (all cloned or
+ *  procedural), and each material the view made with its procedural
+ *  DataTexture. A borrowed material, and any texture that is not a
+ *  DataTexture (a cached GLB's map on an ice material), is left alone. */
+function disposeDressing(group: THREE.Group): void {
+  const geometries = new Set<THREE.BufferGeometry>();
+  const materials = new Set<THREE.Material>();
+  group.traverse((object) => {
+    const mesh = object as THREE.Mesh;
+    if (!mesh.isMesh) return;
+    geometries.add(mesh.geometry);
+    if (mesh.userData[BORROWED_MATERIAL_FLAG] === true) return;
+    for (const material of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
+      materials.add(material);
+    }
+  });
+  for (const geometry of geometries) geometry.dispose();
+  for (const material of materials) {
+    const map = (material as THREE.MeshStandardMaterial).map;
+    if (map instanceof THREE.DataTexture) map.dispose();
+    material.dispose();
+  }
+  group.clear();
+}
+
 export interface QuarteredLandmarkDressingView {
   group: THREE.Group;
   /** one per landmark cluster (and one per frozen lake and per lava tile):
    *  the isle spans ~370yd, and one footprint that wide could never be
    *  distance-culled (attachZoneFeature registers these) */
   cullGroups: THREE.Group[];
+  /** Free the view's own GPU resources (the renderer's teardown; idempotent). */
+  dispose(): void;
 }
 
 export function buildQuarteredLandmarks(seed: number): QuarteredLandmarkDressingView {
@@ -342,7 +385,16 @@ export function buildQuarteredLandmarks(seed: number): QuarteredLandmarkDressing
     ...(['near', 'mid', 'far'] as const).map((k) => clusters[k]),
   ].filter((cluster) => cluster.children.length > 0);
   for (const cluster of cullGroups) group.add(cluster);
-  return { group, cullGroups };
+  let disposed = false;
+  return {
+    group,
+    cullGroups,
+    dispose(): void {
+      if (disposed) return;
+      disposed = true;
+      disposeDressing(group);
+    },
+  };
 }
 
 export const quarteredLandmarkDressingInternalsForTest = {

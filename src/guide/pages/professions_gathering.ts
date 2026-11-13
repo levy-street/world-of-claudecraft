@@ -265,13 +265,14 @@ function deedsSection(g: GuideProfGathering): string {
   // Farming's arm re-points at a NEW leaf (the harvestBodyChoice
   // precedent): the retired gatherDeeds.farming prose promised the trade
   // kept no deeds yet, which the celebrations phase (D13) made false, and
-  // a reword would strand any filled locale copy.
+  // a reword would strand any filled locale copy. The other four re-point the
+  // same way at their *WithIsle leaves (thirteen zones, the Quartered Isle).
   // Only the template-literal arm needs the cast; casting the literal arm
   // too would let a typo'd key name slip past tsc.
   const key =
     g.id === 'farming'
       ? 'guide.profPages.gatherDeeds.farmingSown'
-      : (`guide.profPages.gatherDeeds.${g.id}` as TranslationKey);
+      : (`guide.profPages.gatherDeeds.${g.id}WithIsle` as TranslationKey);
   return `<section class="guide-block" id="prof-gather-deeds">
       <h2>${esc(t('guide.profPages.gatherDeedsHeading'))}</h2>
       ${paras(key)}

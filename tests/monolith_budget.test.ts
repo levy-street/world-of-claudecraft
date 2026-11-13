@@ -2129,8 +2129,10 @@ const MONOLITHS: MonolithRow[] = [
     // (the ember_coast.ts pattern), so the file shrank: exact count.
     // The isle's claim seams and landmark applier rode in with the shared
     // metaball coastline evaluator extracted to metaball_landness.ts: exact
-    // count, lowered.
-    ceiling: 5060,
+    // count, lowered. The runtime biome id list then moved to biome_ids.ts as
+    // an exhaustive record (a biome missing from it downgraded its zone to
+    // 'vale' on a saved-map round trip): exact count, lowered again.
+    ceiling: 5038,
     seam: 'zone/terrain data as content records; logic as sim sibling modules',
   },
   {

@@ -30,6 +30,7 @@
 
 import { BG_GRAVEYARDS } from './battleground_layout';
 import {
+  activeZoneAt,
   battlegroundOrigin,
   DELVES,
   delveAt,
@@ -93,7 +94,8 @@ export { RESURRECTION_SICKNESS_ID, UNSTUCK_SICKNESS_ID };
 
 // --- graveyard selection ----------------------------------------------------
 
-// Nearest overworld graveyard to a position. Worlds without authored graveyards
+// Nearest overworld graveyard to a position (the nearest in the death's own
+// zone when that zone claims its ground). Worlds without authored graveyards
 // fall back to their own start point rather than leaking a built-in town anchor.
 export function nearestOverworldGraveyard(
   x: number,
@@ -103,7 +105,14 @@ export function nearestOverworldGraveyard(
 ): { x: number; z: number } {
   let best: { x: number; z: number } = fallback;
   let bestD = Infinity;
-  for (const g of graveyards) {
+  // A zone that claims its ground is its own landmass (the Quartered Isle
+  // across its straits): a death there releases at that zone's own yard, never
+  // at a mainland one a shorter line across the sea happens to reach. Any
+  // other zone, and a claiming zone with no yard, keeps the plain nearest.
+  const home = activeZoneAt(x, z);
+  const own =
+    home.claimsOverlap === true ? graveyards.filter((g) => activeZoneAt(g.x, g.z) === home) : [];
+  for (const g of own.length > 0 ? own : graveyards) {
     const dx = g.x - x;
     const dz = g.z - z;
     const d = dx * dx + dz * dz;

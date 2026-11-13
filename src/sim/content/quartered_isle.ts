@@ -125,7 +125,7 @@ function gyreMarkers(): DecorProp[] {
     const r = Math.hypot(dx, dz);
     const lip = (r + GYRE_PEAK.pathW / 2 - 0.9) / r;
     out.push({
-      key: i % 3 === 0 ? 'rockTallH' : 'rockLargeD',
+      key: 'rockTallH',
       x: round2(GYRE_PEAK.x + dx * lip),
       z: round2(GYRE_PEAK.z + dz * lip),
       rot: round2(i * 1.7),

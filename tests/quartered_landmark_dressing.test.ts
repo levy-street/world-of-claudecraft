@@ -16,6 +16,7 @@ import {
 } from '../src/render/quartered_floating_debris_core';
 import { floatingIslesInternalsForTest } from '../src/render/quartered_floating_isles';
 import {
+  BORROWED_MATERIAL_FLAG,
   buildQuarteredLandmarks,
   quarteredLandmarkAssetsResident,
   quarteredLandmarkDressingInternalsForTest,
@@ -258,6 +259,57 @@ describe('the Quartered Isle landmark dressing module', () => {
       expect(material).toBe(banks[0].material);
       expect(bank.castShadow).toBe(false);
     }
+  });
+
+  it('frees its own geometry, materials and procedural textures, never a borrowed material', () => {
+    installAll();
+    const view = buildQuarteredLandmarks(0);
+    const geometries = new Set<THREE.BufferGeometry>();
+    const own = new Set<THREE.Material>();
+    const borrowed = new Set<THREE.Material>();
+    const dataTextures = new Set<THREE.Texture>();
+    view.group.traverse((o) => {
+      const mesh = o as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      geometries.add(mesh.geometry);
+      for (const m of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
+        (mesh.userData[BORROWED_MATERIAL_FLAG] === true ? borrowed : own).add(m);
+        const map = (m as THREE.MeshStandardMaterial).map;
+        if (map instanceof THREE.DataTexture && mesh.userData[BORROWED_MATERIAL_FLAG] !== true) {
+          dataTextures.add(map);
+        }
+      }
+    });
+    // the islands' cached GLB materials and the shared Ignivar lava are borrowed
+    expect(borrowed.size).toBeGreaterThanOrEqual(2);
+    expect(own.size).toBeGreaterThanOrEqual(4); // ice sheet, spire ice, chain iron, cloud
+    expect(dataTextures.size).toBe(2); // the lake ice and the cloud puff
+    for (const m of borrowed) expect(own.has(m)).toBe(false);
+    const seen = new Set<object>();
+    const watch = (target: THREE.EventDispatcher<{ dispose: object }>) =>
+      target.addEventListener('dispose', () => seen.add(target));
+    for (const g of geometries) watch(g);
+    for (const m of [...own, ...borrowed]) watch(m);
+    for (const t of dataTextures) watch(t);
+
+    view.dispose();
+    for (const g of geometries) expect(seen.has(g)).toBe(true);
+    for (const m of own) expect(seen.has(m)).toBe(true);
+    for (const t of dataTextures) expect(seen.has(t)).toBe(true);
+    for (const m of borrowed) expect(seen.has(m)).toBe(false);
+    expect(view.group.children).toHaveLength(0);
+    // idempotent: a second call frees nothing twice
+    const count = seen.size;
+    view.dispose();
+    expect(seen.size).toBe(count);
+  });
+
+  it('is disposed by the renderer teardown (source pin)', () => {
+    const lifecycle = readFileSync(
+      new URL('../src/render/renderer_resource_lifecycle.ts', import.meta.url),
+      'utf8',
+    );
+    expect(lifecycle).toContain('bestEffort(() => resources.quarteredMarks?.dispose());');
   });
 
   it('is wired as a gated zone feature for the quartered biome (renderer source pin)', () => {

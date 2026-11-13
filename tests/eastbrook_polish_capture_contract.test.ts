@@ -742,7 +742,7 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // No capture was retaken.
   // Re-minted for the Quartered Isle landmark hook in renderer.ts.
   // No capture was retaken.
-  '734c7f5d2ef9e87737bda3799de1a273f717dd2c278ded67ff98c1521717b2e0';
+  '296e8abfd972ce668e0f61986ecbf9b124a32db32b299721868c9d8e8ac456fb';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

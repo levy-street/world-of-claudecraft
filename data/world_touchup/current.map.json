@@ -1455,7 +1455,7 @@
         "xMax": 250,
         "claimsOverlap": true,
         "levelRange": [20, 20],
-        "biome": "vale",
+        "biome": "quartered",
         "southPassX": 22,
         "waterSouthBorder": true,
         "eastPassZ": 2064,

@@ -142,6 +142,8 @@ function instanceIsles(
   const scale = new THREE.Vector3();
   for (const part of baked.parts) {
     const mesh = new THREE.InstancedMesh(part.geometry, part.material, isles.length);
+    // the cached island GLB's own material: the dressing view never disposes it
+    mesh.userData.quarteredBorrowedMaterial = true;
     mesh.name = `quartered-floating-isle-${model}`;
     mesh.userData.quarteredIsle = model;
     isles.forEach((isle, i) => {
