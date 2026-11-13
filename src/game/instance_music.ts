@@ -80,12 +80,6 @@ export interface InstanceMusicPort {
 
 const MUSIC_ZONE_SET: ReadonlySet<string> = new Set(ALL_MUSIC_ZONES);
 
-/**
- * The track an authored map asks for at (x, z), or null when it asks for
- * nothing there. The smallest containing area wins, then the map-wide track.
- * Unknown ids are ignored (documents stay forward-compatible), so a stale or
- * misspelt track simply falls back to the location walk.
- */
 /** How far past a town circle its town theme still plays, in yards. */
 const TOWN_MUSIC_PAD = 10;
 
@@ -105,6 +99,12 @@ export function inTownMusicArea(
   return near(zone.hub) || (zone.questHub !== undefined && near(zone.questHub));
 }
 
+/**
+ * The track an authored map asks for at (x, z), or null when it asks for
+ * nothing there. The smallest containing area wins, then the map-wide track.
+ * Unknown ids are ignored (documents stay forward-compatible), so a stale or
+ * misspelt track simply falls back to the location walk.
+ */
 export function resolveMapMusicZone(
   music: MapMusic | null | undefined,
   x: number,

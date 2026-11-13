@@ -1344,7 +1344,9 @@ export class Editor3DViewport {
           candidate.kind === 'mob' &&
           candidate.ownerId === null &&
           candidate.templateId === camp.mobId &&
-          campHoldsSpawn(camp, candidate.spawnPos),
+          campHoldsSpawn(camp, candidate.spawnPos) &&
+          // a same-mob camp whose disc overlaps keeps its own mobs
+          findRuntimeCampIndex(this.map.content.camps, candidate) === campIndex,
       )
       .sort((a, b) => {
         const ad = campSpawnDistance(camp, a.spawnPos);

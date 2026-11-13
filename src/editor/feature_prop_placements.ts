@@ -355,16 +355,6 @@ export const TOWN_BUILDING_NATURAL: Readonly<Record<string, NaturalSize>> = {
 };
 
 /**
- * One promoted family's rebuild BUILDINGS as editable placements: every
- * town of sim/authored_town_registry.ts that family promotes. The rest of
- * each town, wells, stalls, fences, streets, wall, harbor, stays town-drawn.
- *
- * Every town building is a PLACED one (the painted Tidehold set): it converts
- * back into the placement its record was built from, the model's own anchor,
- * one uniform scale and its buried footing, with the model's baked collision,
- * so the document's copy is the walk-in building a maker expects.
- */
-/**
  * A town's buildings where the live world stands them. Fenbridge's come from
  * the world touch-up (BUILTIN_WORLD.fenbridgeTouchup moved them), the same
  * layout the projection resolves the town's streets, NPCs and walk-in floors
@@ -375,6 +365,16 @@ function liveTownBuildings(town: (typeof AUTHORED_TOWNS)[number]) {
   return resolveFenbridgeLayout(BUILTIN_WORLD.fenbridgeTouchup).buildings;
 }
 
+/**
+ * One promoted family's rebuild BUILDINGS as editable placements: every
+ * town of sim/authored_town_registry.ts that family promotes. The rest of
+ * each town, wells, stalls, fences, streets, wall, harbor, stays town-drawn.
+ *
+ * Every town building is a PLACED one (the painted Tidehold set): it converts
+ * back into the placement its record was built from, the model's own anchor,
+ * one uniform scale and its buried footing, with the model's baked collision,
+ * so the document's copy is the walk-in building a maker expects.
+ */
 function townBuildingPlacementsOf(family: AuthoredTownFamily): MapPlacement[] {
   const out: MapPlacement[] = [];
   const towns = AUTHORED_TOWNS.filter((town) => town.promotedBy === family);

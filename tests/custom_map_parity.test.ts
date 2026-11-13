@@ -192,6 +192,14 @@ describe('custom-map terrain seam', () => {
       collide: true,
     });
     expect(customMapToWorldContent(map).fenbridgeTouchup?.addedCottages).toEqual([cottage]);
+    // and where the maker moved it, its cleared ground and walls follow
+    const placed = map.placements[map.placements.length - 1];
+    placed.x += 4;
+    placed.z -= 3;
+    placed.rotY = 0.5;
+    expect(customMapToWorldContent(map).fenbridgeTouchup?.addedCottages).toEqual([
+      { ...cottage, x: cottage.x + 4, z: cottage.z - 3, rot: 0.5 },
+    ]);
     // an empty-props map clones no records, so it carries no touch-up either
     const flat = customMapToWorldContent(newFlatCustomMap('Flat', 'flat', 0));
     expect(flat.fenbridgeTouchup).toBeUndefined();

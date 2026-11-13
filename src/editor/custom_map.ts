@@ -641,6 +641,53 @@ export function customMapToWorldContent(map: CustomMap): WorldContent {
 }
 
 /**
+ * The live Fenbridge touch-up, less any added cottage the map does not place,
+ * and each placed one where its placement now stands (matched by placement
+ * uid, as live_world_core.ts liveFenbridgeTouchup does): an added cottage's
+ * touch-up clears grass and scatter and walls its reach, so without its
+ * placement it would leave a bare footprint, and a moved one must carry them.
+ */
+export function touchupForPlacedCottages(
+  touchup: NonNullable<WorldContent['fenbridgeTouchup']>,
+  placements: readonly { uid?: string; x: number; z: number; rotY: number }[],
+): NonNullable<WorldContent['fenbridgeTouchup']> {
+  const out = deepClone(touchup);
+  if (!out.addedCottages) return out;
+  const byUid = new Map(placements.flatMap((p) => (p.uid ? [[p.uid, p] as const] : [])));
+  const kept = out.addedCottages.flatMap((c) => {
+    const p = byUid.get(c.uid);
+    return p ? [{ ...c, x: p.x, z: p.z, rot: p.rotY }] : [];
+  });
+  if (kept.length > 0) return { ...out, addedCottages: kept };
+  const { addedCottages: _none, ...rest } = out;
+  return rest;
+}
+
+/** Whether a point stands inside a world rect (edges included). */
+function pointInRect(
+  p: { x: number; z: number },
+  rect: { minX: number; maxX: number; minZ: number; maxZ: number },
+): boolean {
+  return p.x >= rect.minX && p.x <= rect.maxX && p.z >= rect.minZ && p.z <= rect.maxZ;
+}
+
+/** Whether a height stamp's footprint (at most the square of half side
+ *  `radius` about its centre, HeightStamp.shape) reaches into a world rect.
+ *  Exact for a square stamp; a round one grazing the rect only by a corner
+ *  of that square counts too, erring toward leaving it out. */
+export function stampReachesRect(
+  s: { x: number; z: number; radius: number },
+  rect: { minX: number; maxX: number; minZ: number; maxZ: number },
+): boolean {
+  return (
+    s.x + s.radius > rect.minX &&
+    s.x - s.radius < rect.maxX &&
+    s.z + s.radius > rect.minZ &&
+    s.z - s.radius < rect.maxZ
+  );
+}
+
+/**
  * LINK-TO-WORLD projection: embed the map's layers into the FULL built-in
  * world, offset so the map's origin lands on `anchor`. The base game keeps
  * running around the placed region (terrain, mobs, NPCs, quests, SPACEY's
@@ -656,39 +703,6 @@ export function customMapToWorldContent(map: CustomMap): WorldContent {
  * Authoring is untouched: the editor always works at the map's own origin,
  * only this playtest projection applies the offset.
  */
-/**
- * The live Fenbridge touch-up, less any added cottage the map does not place
- * (matched by placement uid, as live_world_core.ts liveFenbridgeTouchup
- * does): an added cottage's touch-up clears grass and scatter for its walls,
- * so without its placement it would leave a bare, empty footprint.
- */
-export function touchupForPlacedCottages(
-  touchup: NonNullable<WorldContent['fenbridgeTouchup']>,
-  placements: readonly { uid?: string }[],
-): NonNullable<WorldContent['fenbridgeTouchup']> {
-  const out = deepClone(touchup);
-  if (!out.addedCottages) return out;
-  const uids = new Set(placements.map((p) => p.uid).filter((uid) => uid !== undefined));
-  const kept = out.addedCottages.filter((c) => uids.has(c.uid));
-  if (kept.length > 0) return { ...out, addedCottages: kept };
-  const { addedCottages: _none, ...rest } = out;
-  return rest;
-}
-
-/** Whether a height stamp's footprint (at most the square of half side
- *  `radius` about its centre, HeightStamp.shape) reaches into a world rect. */
-export function stampReachesRect(
-  s: { x: number; z: number; radius: number },
-  rect: { minX: number; maxX: number; minZ: number; maxZ: number },
-): boolean {
-  return (
-    s.x + s.radius > rect.minX &&
-    s.x - s.radius < rect.maxX &&
-    s.z + s.radius > rect.minZ &&
-    s.z - s.radius < rect.maxZ
-  );
-}
-
 function linkedWorldContent(map: CustomMap, anchor: { x: number; z: number }): WorldContent {
   const ax = anchor.x;
   const az = anchor.z;
@@ -748,7 +762,9 @@ function linkedWorldContent(map: CustomMap, anchor: { x: number; z: number }): W
     // The built-in world's own sculpts (its touch-up layer: town pads, the
     // reworked streets) keep shaping the world around the map, then the
     // map's stamps at the offset. A built-in stamp reaching into the map's
-    // rect is left out: inside it the map's own ground is the whole word.
+    // rect is left out whole: inside it the map's own ground is the whole
+    // word, and a stamp is one shape (its outer part is then lost too, where
+    // the edge band blends the map into the world).
     terrainEdits: [
       ...(BUILTIN_WORLD.terrainEdits ?? [])
         .filter((s) => !stampReachesRect(s, linkedRect))
@@ -760,9 +776,11 @@ function linkedWorldContent(map: CustomMap, anchor: { x: number; z: number }): W
       : {}),
     // The built-in world's placed models (its touch-up layer: the reworked
     // towns' buildings, stalls and fences, the Fenbridge cottages) stand
-    // around the map like its props do, then the map's own.
+    // around the map like its props do, then the map's own. A built-in model
+    // standing inside the map's rect stays out with the sculpts that seat
+    // it: the map's own ground replaces that patch of the world.
     placements: [
-      ...deepClone(BUILTIN_WORLD.placements ?? []),
+      ...deepClone(BUILTIN_WORLD.placements ?? []).filter((p) => !pointInRect(p, linkedRect)),
       ...placementsToPlayAssets(placements, map.assetCollisionMesh),
     ],
     // The map's own terrain REPLACES the overworld base inside its rect

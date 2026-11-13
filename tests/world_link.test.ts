@@ -268,6 +268,20 @@ describe('linked playtest projection', () => {
     }
   });
 
+  it("lets the map's own biome paint take the grid, at the offset", () => {
+    const map = blankMap();
+    map.worldAnchor = { x: -200, z: 800 };
+    map.biomePaint = { cell: 2, cols: 1, rows: 1, originX: -4, originZ: 6, ids: [1] };
+    expect(customMapToWorldContent(map).biomePaint).toMatchObject({
+      cell: 2,
+      cols: 1,
+      rows: 1,
+      originX: -204,
+      originZ: 806,
+      ids: [1],
+    });
+  });
+
   it('keeps the built-in sculpts outside the map rect, none inside it', () => {
     // Anchored on reworked Eastbrook: the built-in stamps there would
     // re-sculpt the map's own ground, so they stay out; the rest stay in.
@@ -282,6 +296,15 @@ describe('linked playtest projection', () => {
     const edits = customMapToWorldContent(map).terrainEdits ?? [];
     expect(edits).toHaveLength(builtin.length - inside.length);
     for (const s of edits) expect(stampReachesRect(s, rect)).toBe(false);
+    // the built-in models standing in the rect (the reworked Eastbrook) stay
+    // out with the pads that seat them; the rest of the world's stay in
+    const inRect = (p: { x: number; z: number }) =>
+      p.x >= rect.minX && p.x <= rect.maxX && p.z >= rect.minZ && p.z <= rect.maxZ;
+    const placedInside = (BUILTIN_WORLD.placements ?? []).filter(inRect);
+    expect(placedInside.length).toBeGreaterThan(0);
+    const placements = customMapToWorldContent(map).placements ?? [];
+    expect(placements.filter(inRect)).toEqual([]);
+    expect(placements).toHaveLength((BUILTIN_WORLD.placements ?? []).length - placedInside.length);
     // the footprint test is the stamp's bounding square against the rect
     const r = { minX: 0, maxX: 10, minZ: 0, maxZ: 10 };
     expect(stampReachesRect({ x: -2, z: 5, radius: 3 }, r)).toBe(true);

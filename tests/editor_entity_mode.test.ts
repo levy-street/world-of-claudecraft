@@ -193,6 +193,15 @@ describe('individual mob selection', () => {
     ).toBe(0);
   });
 
+  it('a one-mob camp owns a dragged mob only while its slot scatters', () => {
+    const one = { mobId: 'boar', center: { x: 0, z: 0 }, radius: 3, count: 1 };
+    // the mob spawned elsewhere but the maker dragged it into the disc
+    const dragged = { templateId: 'boar', pos: { x: 1, z: 1 }, spawnPos: { x: 40, z: 40 } };
+    expect(findRuntimeCampIndex([one], dragged)).toBe(0);
+    expect(findRuntimeCampIndex([{ ...one, retiredSlots: 1 }], dragged)).toBe(-1);
+    expect(findRuntimeCampIndex([{ ...one, spots: [{ x: 20, z: 20 }] }], dragged)).toBe(-1);
+  });
+
   it('a fully pinned camp owns only its live spots, not its disc', () => {
     // the shipped Eastbrook restless_bones shape: every slot pinned, one spot
     // outside the radius, and a neighbour camp of the same mob inside the disc

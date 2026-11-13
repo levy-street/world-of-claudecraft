@@ -1,3 +1,4 @@
+import { campSpawnedCount } from '../sim/camp_scatter';
 import type { EditorEntity } from './model';
 import type { Vec2 } from './view';
 
@@ -50,9 +51,12 @@ export function findRuntimeCampIndex(
     const camp = camps[i];
     if (camp.mobId !== mob.templateId) continue;
     const spawnDistance = campSpawnDistance(camp, mob.spawnPos);
-    // an exported one-mob camp also owns its mob where the maker dragged it
+    // an exported one-mob camp also owns its mob where the maker dragged it,
+    // while its one slot is live and scatters (a pinned or retired slot owns
+    // only what campHoldsSpawn grants it)
     const visibleDistance = Math.hypot(mob.pos.x - camp.center.x, mob.pos.z - camp.center.z);
-    const visibleOwns = camp.count === 1 && visibleDistance <= camp.radius + 1;
+    const visibleOwns =
+      camp.count === 1 && liveSlotLayout(camp).scatters && visibleDistance <= camp.radius + 1;
     const distance = visibleOwns ? Math.min(spawnDistance, visibleDistance) : spawnDistance;
     const owns = visibleOwns || campHoldsSpawn(camp, mob.spawnPos);
     if (owns && distance < bestDistance) {
@@ -120,16 +124,11 @@ export function splitCampIntoIndividuals<T extends RuntimeCamp & { center: Vec2;
   );
 }
 
-/** Slots that spawn (count less retiredSlots), as camp_scatter.ts campSpawnedCount. */
-function liveSlots(camp: CampSlots): number {
-  return Math.max(0, camp.count - Math.max(0, Math.floor(camp.retiredSlots ?? 0)));
-}
-
 /** The live slots' pinned spots, and whether any live slot scatters on the disc. */
 function liveSlotLayout(camp: CampSlots): { pins: Vec2[]; scatters: boolean } {
   const pins: Vec2[] = [];
   let scatters = false;
-  for (let i = 0; i < liveSlots(camp); i++) {
+  for (let i = 0; i < campSpawnedCount(camp); i++) {
     const spot = camp.spots?.[i];
     if (spot) pins.push(spot);
     else scatters = true;
@@ -166,9 +165,7 @@ export function campSpawnDistance(camp: CampSlots, spawn: Vec2): number {
 }
 
 /** How many mobs the camp spawns: the members a runtime pick may claim. */
-export function campLiveMemberCount(camp: CampSlots): number {
-  return liveSlots(camp);
-}
+export const campLiveMemberCount: (camp: CampSlots) => number = campSpawnedCount;
 
 /** Move a camp's center, carrying its pinned spots by the same offset so the
  *  camp moves as one group. */

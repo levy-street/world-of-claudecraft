@@ -90,7 +90,7 @@ export function drawRetiredCampSlot(rng: { next(): number }): void {
 }
 
 /** Mobs the camp actually spawns: its slots less the retired ones. */
-export function campSpawnedCount(camp: CampDef): number {
+export function campSpawnedCount(camp: Pick<CampDef, 'count' | 'retiredSlots'>): number {
   return Math.max(0, camp.count - Math.max(0, Math.floor(camp.retiredSlots ?? 0)));
 }
 

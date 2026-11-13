@@ -195,6 +195,31 @@ describe('hub marker carries the town circle', () => {
     expect({ x: handle.x, z: handle.z }).toEqual({ x: 14, z: 7 });
   });
 
+  it('is the hub entity buildEntities hands the 2D view', () => {
+    const zone = {
+      id: 'q',
+      name: 'Q',
+      zMin: -50,
+      zMax: 50,
+      levelRange: [1, 5] as [number, number],
+      biome: 'vale' as never,
+      hub: { x: 0, z: 0, radius: 10, name: 'Town' },
+      questHub: { x: 2, z: 2, radius: 30 },
+      graveyard: { x: 5, z: 5 },
+      lakes: [],
+      pois: [],
+      welcome: '',
+    };
+    const hub = buildEntities({ zones: [zone], camps: [], npcs: {}, objects: [] }).find(
+      (e) => e.key === 'hub:q',
+    );
+    if (!hub) throw new Error('no hub entity');
+    hub.point.x = 10;
+    hub.point.z = -5;
+    expect(zone.hub).toMatchObject({ x: 10, z: -5 });
+    expect(zone.questHub).toEqual({ x: 12, z: -3, radius: 30 });
+  });
+
   it('moves a hub alone when the zone has no questHub', () => {
     const zone: { hub: { x: number; z: number }; questHub?: never } = { hub: { x: 1, z: 1 } };
     hubHandle(zone).z = 9;
