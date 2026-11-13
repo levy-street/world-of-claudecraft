@@ -72,3 +72,25 @@ export function chatUnreadAfterViewChange(
   }
   return next ?? counts;
 }
+
+/** What the badge on the chat controls shows: ONE count for everything unread,
+ *  worn in the colour of the channel that leads. */
+export interface ChatUnreadDot {
+  /** Unread whispers plus unread party lines. */
+  total: number;
+  /** The channel whose colour the badge wears: whisper while any whisper is
+   *  unread (it is the one addressed to the player alone), else party. */
+  lead: ChatUnreadChannel;
+}
+
+/** The badge for these counts, or null when everything is read. */
+export function chatUnreadDot(counts: ChatUnreadCounts): ChatUnreadDot | null {
+  let total = 0;
+  let lead: ChatUnreadChannel | null = null;
+  for (const channel of CHAT_UNREAD_CHANNELS) {
+    if (counts[channel] <= 0) continue;
+    total += counts[channel];
+    lead ??= channel;
+  }
+  return lead === null ? null : { total, lead };
+}

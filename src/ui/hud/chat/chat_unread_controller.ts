@@ -75,6 +75,6 @@ export class ChatUnreadController {
   }
 
   private paint(force = false): void {
-    this.badge.render(this.counts.whisper, force);
+    this.badge.render(this.counts, force);
   }
 }

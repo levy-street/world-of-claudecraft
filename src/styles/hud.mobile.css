@@ -1855,10 +1855,11 @@
       0 0 12px color-mix(in srgb, var(--gold) 67%, transparent),
       inset 0 0 8px color-mix(in srgb, var(--gold) 33%, transparent);
   }
-  /* Unread-whisper badge (whisper_unread_badge.ts) on the controls that lead to
+  /* Unread chat badge (whisper_unread_badge.ts) on the controls that lead to
      chat: the Quick Actions anchor, the strip's Chat seat and the More tray's
      Chat button. It composes the .ui-badge--corner primitive and only swaps the
-     fill for the whisper channel color, which the painter hands over as
+     fill for a chat channel color (whisper while a whisper is unread, else
+     party), which the painter hands over as
      --whisper-unread-color so the color keeps its one home in chat_channels.ts.
      Steady by design: no pulse or scale (the motion-sickness rule), so there is
      nothing to switch off under prefers-reduced-motion, and it recedes with its

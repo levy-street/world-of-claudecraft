@@ -1392,10 +1392,11 @@ export const hudChromeStrings = {
     quickActionsAriaTap:
       'Quick Actions. Tap to open the row of mount, chat, map, bags and more, then tap an item. Tap the control again to close.',
     quickActionsLabel: 'Actions',
-    // The unread-whisper badge on the touch controls that open chat
-    // (whisper_unread_badge.ts). Overflow is the capped badge text ("9+");
-    // Desc is the aria-describedby text, composed from the existing Whisper tab
-    // label so every locale reads natively with no new prose to translate.
+    // The unread chat badge on the touch controls that open chat
+    // (whisper_unread_badge.ts), lit by whispers and party lines. Overflow is
+    // the capped badge text ("9+"); Desc is one part of the aria-describedby
+    // text, composed from the existing tab labels ("Whisper: 2") so every
+    // locale reads natively with no new prose to translate.
     whisperUnreadOverflow: '{count}+',
     whisperUnreadDesc: '{channel}: {count}',
     // The touch stance control: ONE circle on the button row wearing the stance

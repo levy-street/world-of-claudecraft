@@ -6,6 +6,7 @@ import {
   channelInView,
   chatUnreadAfterReceive,
   chatUnreadAfterViewChange,
+  chatUnreadDot,
   isChatUnreadChannel,
   NO_CHAT_UNREAD,
 } from '../src/ui/hud/chat/chat_unread_core';
@@ -106,5 +107,25 @@ describe('chat unread counter', () => {
     expect(channelInView('whisper', view({ logVisible: true, activeTab: 'guild' }))).toBe(false);
     expect(channelInView('party', view({ logVisible: true, activeTab: 'party' }))).toBe(true);
     expect(channelInView('party', view({ logVisible: true, activeTab: 'general' }))).toBe(false);
+  });
+});
+
+describe('the badge the counts light', () => {
+  it('is off when everything is read', () => {
+    expect(chatUnreadDot(counts())).toBeNull();
+  });
+
+  it('lights for party chat alone, in the party colour', () => {
+    expect(chatUnreadDot(counts({ party: 3 }))).toEqual({ total: 3, lead: 'party' });
+  });
+
+  it('adds whispers and party into one count', () => {
+    expect(chatUnreadDot(counts({ whisper: 2, party: 3 }))).toEqual({ total: 5, lead: 'whisper' });
+  });
+
+  it('wears the whisper colour while any whisper is unread, else party', () => {
+    expect(chatUnreadDot(counts({ whisper: 1, party: 40 }))?.lead).toBe('whisper');
+    expect(chatUnreadDot(counts({ whisper: 1 }))?.lead).toBe('whisper');
+    expect(chatUnreadDot(counts({ party: 1 }))?.lead).toBe('party');
   });
 });

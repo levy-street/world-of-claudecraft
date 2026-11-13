@@ -1,8 +1,12 @@
-// The touch HUD's unread-whisper badge: a small whisper-colored count on every
-// control that leads to chat. This is the thin DOM side: it paints the count it
-// is handed. The count is the whisper slot of the shared unread counter
+// The touch HUD's unread chat badge: a small count on every control that leads
+// to chat, lit by unread whispers and party lines. This is the thin DOM side: it
+// paints the counts it is handed. The counts are the unread counter
 // (chat_unread_core.ts), kept by ChatUnreadController, which also follows chat
 // opening and closing, so no touch-input file needs to know about the badge.
+//
+// ONE number (whispers plus party) in ONE colour: the whisper colour while any
+// whisper is unread, else the party colour. The split is spelled out for
+// assistive tech in the description ("Whisper: 2, Party: 1").
 //
 // Three controls are badged because which one is on screen depends on where the
 // player is: the Quick Actions anchor (the only one visible while chat is
@@ -14,8 +18,9 @@
 // (it swaps per gesture mode) and the shell re-stamps every data-i18n-aria name
 // on a language switch, so a rewritten label would be fought over and lost.
 
-import { formatNumber, t } from '../../i18n';
-import { chatChannelColor, WHISPER_TAB, WHISPER_TAB_LABEL_KEY } from './chat_channels';
+import { formatList, formatNumber, t } from '../../i18n';
+import { chatChannelColor, chatOpenTabLabelKey } from './chat_channels';
+import { CHAT_UNREAD_CHANNELS, type ChatUnreadCounts, chatUnreadDot } from './chat_unread_core';
 import { whisperUnreadBadge } from './whisper_unread_core';
 
 /** Every control that opens chat or reveals the one that does. */
@@ -31,22 +36,22 @@ export const WHISPER_UNREAD_DESC_ID = 'whisper-unread-desc';
 const DESCRIBED_BY = 'aria-describedby';
 
 export class WhisperUnreadBadge {
-  private count = 0;
-  private painted = 0;
+  private painted = '';
   private description: HTMLElement | null = null;
   private readonly badges = new Map<string, HTMLElement>();
 
   constructor(private readonly document: Document) {}
 
-  /** Paint `count` unread whispers; `force` repaints an unchanged count (a
-   *  language switch). */
-  render(count: number, force = false): void {
-    this.count = count;
-    if (!force && this.count === this.painted) return;
-    this.painted = this.count;
+  /** Paint the unread counts; `force` repaints unchanged counts (a language
+   *  switch). */
+  render(counts: ChatUnreadCounts, force = false): void {
+    const key = CHAT_UNREAD_CHANNELS.map((channel) => counts[channel]).join('/');
+    if (!force && key === this.painted) return;
+    this.painted = key;
     const { document } = this;
-    const badge = whisperUnreadBadge(this.count);
-    if (badge === null) {
+    const dot = chatUnreadDot(counts);
+    const badge = dot === null ? null : whisperUnreadBadge(dot.total);
+    if (dot === null || badge === null) {
       for (const id of WHISPER_UNREAD_HOST_IDS) {
         this.badges.get(id)?.remove();
         this.badges.delete(id);
@@ -71,10 +76,16 @@ export class WhisperUnreadBadge {
       this.description.hidden = true;
       document.body.append(this.description);
     }
-    this.description.textContent = t('hudChrome.mobile.whisperUnreadDesc', {
-      channel: t(WHISPER_TAB_LABEL_KEY),
-      count: formatNumber(this.count, digits),
-    });
+    this.description.textContent = formatList(
+      CHAT_UNREAD_CHANNELS.filter((channel) => counts[channel] > 0).map((channel) =>
+        t('hudChrome.mobile.whisperUnreadDesc', {
+          channel: t(chatOpenTabLabelKey(channel)),
+          count: formatNumber(counts[channel], digits),
+        }),
+      ),
+    );
+    // Each channel colour has one home (chat_channels.ts); CSS reads it.
+    const color = chatChannelColor(dot.lead);
     for (const id of WHISPER_UNREAD_HOST_IDS) {
       const host = document.getElementById(id);
       if (!host) continue;
@@ -84,11 +95,10 @@ export class WhisperUnreadBadge {
         el = document.createElement('span');
         el.className = `ui-badge ui-badge--corner ${WHISPER_UNREAD_BADGE_CLASS}`;
         el.setAttribute('aria-hidden', 'true');
-        // The whisper channel color has one home (chat_channels.ts); CSS reads it.
-        el.style.setProperty('--whisper-unread-color', chatChannelColor(WHISPER_TAB));
         host.append(el);
         this.badges.set(id, el);
       }
+      el.style.setProperty('--whisper-unread-color', color);
       el.textContent = text;
       host.classList.add(WHISPER_UNREAD_HOST_CLASS);
       host.setAttribute(DESCRIBED_BY, WHISPER_UNREAD_DESC_ID);

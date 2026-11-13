@@ -70,7 +70,7 @@ const tab = (id: string): HTMLButtonElement =>
 /** Let the body-class MutationObserver deliver. */
 const settle = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 0));
 
-describe('unread-whisper badge on the touch chat controls', () => {
+describe('unread chat badge on the touch chat controls', () => {
   let chat: ChatWindowController;
   beforeEach(() => {
     chat = mount();
@@ -170,6 +170,48 @@ describe('unread-whisper badge on the touch chat controls', () => {
     tab('whisper').click();
     chat.noteChatReceived('whisper');
     expect(badgeTexts()).toEqual(['1', '1', '1']);
+  });
+
+  it('lights for party chat too, in the party colour', () => {
+    chat.noteChatReceived('party');
+    chat.noteChatReceived('party');
+    expect(badgeTexts()).toEqual(['2', '2', '2']);
+    for (const id of WHISPER_UNREAD_HOST_IDS) {
+      expect(badgeOn(id)?.style.getPropertyValue('--whisper-unread-color')).toBe('#7fd4ff');
+    }
+    expect(document.getElementById(WHISPER_UNREAD_DESC_ID)?.textContent).toBe('Party: 2');
+  });
+
+  it('shows whispers plus party as one count, pink while a whisper is unread', async () => {
+    chat = mount(['whisper', 'party']);
+    document.body.classList.add('mobile-touch');
+    chat.noteChatReceived('party');
+    chat.noteChatReceived('party');
+    chat.noteChatReceived('whisper');
+    expect(badgeTexts()).toEqual(['3', '3', '3']);
+    expect(badgeOn('mobile-menu-anchor')?.style.getPropertyValue('--whisper-unread-color')).toBe(
+      '#ff80ff',
+    );
+    expect(document.getElementById(WHISPER_UNREAD_DESC_ID)?.textContent).toBe(
+      'Whisper: 1 and Party: 2',
+    );
+    // Reading the whispers leaves the party lines waiting, now in party blue.
+    tab('whisper').click();
+    document.body.classList.add('mobile-chat-open');
+    await settle();
+    expect(badgeTexts()).toEqual(['2', '2', '2']);
+    expect(badgeOn('mobile-menu-anchor')?.style.getPropertyValue('--whisper-unread-color')).toBe(
+      '#7fd4ff',
+    );
+    tab('party').click();
+    expect(badgeTexts()).toEqual([null, null, null]);
+  });
+
+  it('never lights for General, Say or any other channel', () => {
+    for (const channel of ['general', 'say', 'yell', 'world', 'lfg', 'guild', 'officer']) {
+      chat.noteChatReceived(channel);
+    }
+    expect(badgeTexts()).toEqual([null, null, null]);
   });
 
   it('never badges on desktop', () => {
