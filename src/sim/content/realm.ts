@@ -1171,9 +1171,11 @@ export const REALM_PROPS: ZonePropsDef = {
   // The great tree's trunk is solid (colliders.ts); everything else rings it
   // at a respectful distance so the square breathes.
   // r matches the rendered trunk's root flare at ground level (the twisted_1
-  // model spans 0.85 native at its base, 5.5yd at the 6.5x town scale), so
-  // players collide with the visual bark instead of sinking into it.
-  greatTrees: [{ x: -40, z: 1026, r: 5.5 }],
+  // model spans 0.85 native at its base, 2.05yd at the 2.4x town scale of
+  // render/great_tree_look_core.ts), so players collide with the visual bark
+  // instead of sinking into it. (The tree stood 6.5x and r 5.5 until it was
+  // brought down from a hundred-yard trunk to a grand tree of the square.)
+  greatTrees: [{ x: -40, z: 1026, r: 2.05 }],
   // The town is radial: the painted inn, shrine, market, smithy and wayhouse
   // ring the great tree at (-40,1026) in the quiet sectors BETWEEN the four
   // spoke roads, doors on the ring or on their spoke, clear of the ring path

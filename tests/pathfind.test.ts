@@ -77,13 +77,15 @@ describe('player pathfinding', () => {
     // straight line along z -80. Re-staged for the World of ClaudeCraft Studio
     // map's arrangement, which moved the shop to the strand: the smithy that
     // took the old chapel rise blocks the straight line along z -73, with open
-    // ground at both ends to detour over.
+    // ground at both ends to detour over. Re-staged for the hand-built smithy
+    // lot on the same rise: it is walk-in, so (-2, -73) is its own floor now,
+    // and what blocks the straight line is its west wall at (-11, -73).
     const seed = 20061;
     const from = { x: -13, z: -73 };
     const to = { x: 9, z: -73 };
     const path = findPlayerPath(seed, from, to);
 
-    expect(isBlocked(seed, -2, -73)).toBe(true);
+    expect(isBlocked(seed, -11, -73)).toBe(true);
     expect(isBlocked(seed, from.x, from.z)).toBe(false);
     expect(isBlocked(seed, to.x, to.z)).toBe(false);
     expect(path.length).toBeGreaterThan(1);

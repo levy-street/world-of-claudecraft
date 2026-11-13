@@ -29,6 +29,7 @@ import { runBoundedLane } from './build_lane_core';
 import { isCanvasDrawableImage } from './canvas_drawable';
 import { type ChunkGrid, type GroundPendingAt, orderCellsForEntry } from './chunk_residency_core';
 import { GFX, type GfxSettings, SUN_DIR, sharedUniforms } from './gfx';
+import { groundSetFromQuery, PHOTO_GROUND_SET } from './ground_set_core';
 import {
   cellCountsAsPending,
   islandIsolationActive,
@@ -129,7 +130,10 @@ export const CHUNK_SIZE = 60;
 const IDLE_BUILD_TIMEOUT_MS = 200;
 
 // ---------------------------------------------------------------------------
-// Real PBR splat layers (ambientCG 1K, shipped under public/textures/terrain).
+// The splat layers, shipped under public/textures/terrain. Meadow, earth and
+// rock wear the painted set by default (scripts/assets/eastbrook_ground); the
+// ambientCG 1K photo layers they replaced are the `?ground=photo` fallback,
+// and sand, mud and snow are photo layers on either set.
 // Kicked off at module import and registered with the preload gate, so by the
 // time buildTerrain runs the resolved textures are available synchronously.
 // ---------------------------------------------------------------------------
@@ -142,19 +146,22 @@ function prepareTerrainTex(key: string, file: string, srgb: boolean): Promise<vo
   const existing = terrainTexTasks.get(key);
   if (existing) return existing;
   const url = `/textures/terrain/${file}`;
-  // The ambientCG NORMAL maps ship a KTX2 sibling and are requested
+  // The ambientCG NORMAL maps (sand on either ground set; grass, dirt and rock
+  // on the `?ground=photo` fallback) ship a KTX2 sibling and are requested
   // compressed: they stay GPU-compressed instead of decoding to a full
   // 1024x1024 RGBA bitmap each, and they bind directly as samplers. The
   // vertical flip is baked into the container at compress time, so `srgb`
-  // here only still selects the anisotropy budget.
+  // here only still selects the anisotropy budget. The painted set's normal
+  // maps are PNG with no sibling, so they take the plain image path.
   // The six COLOUR layers deliberately stay raw JPG: buildSplatAlbedoArray
   // drawImages them into the packed DataArrayTexture (a CompressedTexture's
   // image is not a CanvasImageSource, and binding one here took the renderer
   // down at world build), and on every tier that loads them the packed array
   // is the resident form anyway, so compressing the pack SOURCE bought
-  // nothing. GroundAO_Packed.png is also NOT converted: it is a packed DATA
-  // texture whose measured per-channel statistics are baked into shader
-  // constants (see the "Measured sds" comment below), and a lossy block
+  // nothing. The packed relief texture (GroundAO_Packed.png on the photo
+  // layers, the painted set's own beside it) is also NOT converted: it is a
+  // packed DATA texture whose measured per-channel statistics are baked into
+  // shader constants (see the "Measured sds" comment below), and a lossy block
   // encode would shift them.
   const task = (
     url.toLowerCase().endsWith('.jpg') && !srgb
@@ -173,26 +180,60 @@ function prepareTerrainTex(key: string, file: string, srgb: boolean): Promise<vo
   return task;
 }
 
+// Which ground set the overworld wears (ground_set_core.ts owns the switch and
+// its allowlist): the painted set by default, and the photo layers it replaced
+// under `?ground=photo`, so the two grounds can be looked at side by side from
+// the same spot. Read once at module load, because the layers are resolved once
+// per page; a headless host without a location wears the default. Comments
+// further down still call a splat layer's image its "photo layer", whichever
+// set it comes from: the name predates the painted set.
+const GROUND_SET = groundSetFromQuery(typeof location === 'undefined' ? '' : location.search);
+/** File prefix of the painted set in use, or null on the photo layers. */
+const PAINTED_GROUND = GROUND_SET === PHOTO_GROUND_SET ? null : GROUND_SET;
+
 /** Prepare the terrain texture channel selected by an explicit target profile. */
 export function prepareTerrainProfileAssets(target: Readonly<GfxSettings>): Promise<void> {
   if (!target.terrainSplat) return Promise.resolve();
   const tasks = [
-    prepareTerrainTex('grassC', 'Grass001_Color.jpg', true),
-    prepareTerrainTex('grassN', 'Grass001_NormalGL.jpg', false),
-    // Ground023 (leaf-littered packed earth), not Ground048: at the splat tile
-    // scale 048 is one uniform high-frequency crumble (measured large/fine
-    // luminance-std ratio 0.21, saturation 0.39, R/G 1.35) and paths read as
-    // pink carpet. 023 carries real medium-scale features (ratio 0.47), an
-    // earthier desaturated hue (R/G 1.15, saturation 0.26), a clean row/col
-    // variance ratio (1.34, no corduroy) and a usable AO map (sd 0.117).
-    prepareTerrainTex('dirtC', 'Ground023_Color.jpg', true),
-    prepareTerrainTex('dirtN', 'Ground023_NormalGL.jpg', false),
-    // Rock026 (fractured cliff plates), not Rock051: Rock051's striations are
-    // directional (anisotropy 2.57), and wall-projecting them at one scale is
-    // what gave mountainsides the vertical corduroy. Rock051 stays on disk for
-    // voxel_terrain.
-    prepareTerrainTex('rockC', 'Rock026_Color.jpg', true),
-    prepareTerrainTex('rockN', 'Rock026_NormalGL.jpg', false),
+    // Meadow, earth and rock: the painted layer by default, and under
+    // `?ground=photo` the photo layer it replaced (the notes on the earth and
+    // the rock below are about those two photo layers).
+    prepareTerrainTex(
+      'grassC',
+      PAINTED_GROUND ? `${PAINTED_GROUND}_Meadow_Color.jpg` : 'Grass001_Color.jpg',
+      true,
+    ),
+    prepareTerrainTex(
+      'grassN',
+      PAINTED_GROUND ? `${PAINTED_GROUND}_Meadow_NormalGL.png` : 'Grass001_NormalGL.jpg',
+      false,
+    ),
+    // The photo earth is Ground023 (leaf-littered packed earth), not Ground048:
+    // at the splat tile scale 048 is one uniform high-frequency crumble
+    // (measured large/fine luminance-std ratio 0.21, saturation 0.39, R/G 1.35)
+    // and paths read as pink carpet. 023 carries real medium-scale features
+    // (ratio 0.47), an earthier desaturated hue (R/G 1.15, saturation 0.26), a
+    // clean row/col variance ratio (1.34, no corduroy) and a usable AO map
+    // (sd 0.117).
+    prepareTerrainTex(
+      'dirtC',
+      PAINTED_GROUND ? `${PAINTED_GROUND}_Earth_Color.jpg` : 'Ground023_Color.jpg',
+      true,
+    ),
+    // (The painted set has no earth or rock normal map to load: it draws flat detail
+    // normals by design, buildSplatNormalArray below. Its meadow keeps one, which the
+    // Wildheart Basin floor reads through terrainSplatTexture.)
+    ...(PAINTED_GROUND ? [] : [prepareTerrainTex('dirtN', 'Ground023_NormalGL.jpg', false)]),
+    // The photo rock is Rock026 (fractured cliff plates), not Rock051: Rock051's
+    // striations are directional (anisotropy 2.57), and wall-projecting them at
+    // one scale is what gave mountainsides the vertical corduroy. Rock051 stays
+    // on disk for voxel_terrain.
+    prepareTerrainTex(
+      'rockC',
+      PAINTED_GROUND ? `${PAINTED_GROUND}_Rock_Color.jpg` : 'Rock026_Color.jpg',
+      true,
+    ),
+    ...(PAINTED_GROUND ? [] : [prepareTerrainTex('rockN', 'Rock026_NormalGL.jpg', false)]),
     prepareTerrainTex('sandC', 'Ground080_Color.jpg', true),
     prepareTerrainTex('sandN', 'Ground080_NormalGL.jpg', false),
     prepareTerrainTex('mudC', 'Ground071_Color.jpg', true),
@@ -210,14 +251,22 @@ export function prepareTerrainProfileAssets(target: Readonly<GfxSettings>): Prom
       isBuiltinWorldActive() ? 'Snow010A_Color.jpg' : 'Snow004_Color.jpg',
       true,
     ),
-    // The packs' relief channels, packed offline into one RGBA texture by
+    // The photo packs' relief channels, packed offline into one RGBA texture by
     // scripts/assets/pack_ground_ao.mjs (R grass AO, G dirt AO, B rock height,
     // A sand AO): one sampler instead of four keeps the splat material under
     // the 16-sampler fragment limit. B is a Rock026+Rock060 displacement blend,
     // not an AO map: Rock026's authored AO is near-white, and displacement is
     // the honest cavity signal for the new rocks. Linear data: cavity = dark,
-    // open surface = bright.
-    prepareTerrainTex('groundAO', 'GroundAO_Packed.png', false),
+    // open surface = bright. The painted set binds its own pack in the same
+    // layout (scripts/assets/eastbrook_ground/build.py): each painting's own
+    // shade in R, G and B, aimed at the mean and spread of the photo channel it
+    // stands in for because the shader's relief constants are measured from
+    // that pack, with the photo pack's sand channel kept in A.
+    prepareTerrainTex(
+      'groundAO',
+      PAINTED_GROUND ? `GroundAO_Packed_${PAINTED_GROUND}.png` : 'GroundAO_Packed.png',
+      false,
+    ),
   ];
   return Promise.all(tasks).then(() => undefined);
 }
@@ -229,9 +278,9 @@ export function hasTerrainSplatAssets(): boolean {
     TERRAIN_TEX.grassC &&
       TERRAIN_TEX.grassN &&
       TERRAIN_TEX.dirtC &&
-      TERRAIN_TEX.dirtN &&
+      (PAINTED_GROUND !== null || TERRAIN_TEX.dirtN) &&
       TERRAIN_TEX.rockC &&
-      TERRAIN_TEX.rockN &&
+      (PAINTED_GROUND !== null || TERRAIN_TEX.rockN) &&
       TERRAIN_TEX.sandC &&
       TERRAIN_TEX.sandN &&
       TERRAIN_TEX.mudC &&
@@ -1188,11 +1237,20 @@ function compressedMips(tex: THREE.Texture | undefined): MipLevel[] | null {
  */
 function buildSplatNormalArray(t: Record<string, THREE.Texture>): SplatNormalArray {
   if (splatNormalCache?.complete) return splatNormalCache;
+  // The painted set wears FLAT detail normals, on purpose: its relief is painted
+  // into the colour, and it was signed off looking that way. So it ships no earth
+  // or rock normal map at all (prepareTerrainProfileAssets loads none), and the
+  // flat array is the finished answer here, built once instead of retried on
+  // every material. Giving the painted ground real detail normals would change
+  // how every yard of it takes the light: a look review, not a clean-up
+  // (scripts/assets/eastbrook_ground/build.py can write the maps for one).
+  const flatByDesign = PAINTED_GROUND !== null;
   const sources = SPLAT_NORMAL_LAYERS.map((k) => t[k] as THREE.CompressedTexture | undefined);
   const chains = sources.map(compressedMips);
   const first = sources[0];
   const firstChain = chains[0];
   const compatible =
+    !flatByDesign &&
     first !== undefined &&
     firstChain !== null &&
     chains.every(
@@ -1253,7 +1311,7 @@ function buildSplatNormalArray(t: Record<string, THREE.Texture>): SplatNormalArr
   applyTextureAnisotropy(texture, 'normal');
   texture.needsUpdate = true;
   splatNormalCache?.texture.dispose();
-  splatNormalCache = { texture, complete: compatible };
+  splatNormalCache = { texture, complete: compatible || flatByDesign };
   return splatNormalCache;
 }
 
@@ -2425,6 +2483,14 @@ export const terrainInternalsForTest = {
     return buildSplatMaterial(normal, makeBrushUniforms());
   },
   finishChunkGeometry,
+  /** The packed detail-normal array for a set of loaded layers, and whether
+   *  the packer counts it finished (never rebuilt). */
+  splatNormalArray(layers: Record<string, THREE.Texture>): {
+    texture: THREE.Texture;
+    complete: boolean;
+  } {
+    return buildSplatNormalArray(layers);
+  },
 };
 
 function buildLambertMaterial(brush: BrushUniforms): THREE.MeshLambertMaterial {

@@ -65,10 +65,16 @@ describe('kit uv surface routing', () => {
   // The partition of the SHIPPED meshes must be exact. A nonzero `unresolved`
   // here means an asset was re-exported and the swatch table needs
   // re-measuring: that is a real signal, never something to tolerate.
-  it.each([
-    ['/models/biome/hex_ship_blue.glb', 1580, { wood: 774, cloth: 764, stone: 42 }],
-    ['/models/biome/hex_watchtower.glb', 1490, { wood: 1144, cloth: 226, stone: 120 }],
-  ] as [string, number, Record<KitSurfaceFamily, number>][])(
+  //
+  // The ship and the watchtower this was first measured on (774 wood, 764
+  // cloth, 42 stone and 1144, 226, 120) are hand-painted models now, with a
+  // material per surface, so they never reach this router. The proof stands on
+  // the kit model that still ships with the palette atlas: the stone bridge.
+  it.each([['/models/biome/hex_bridge.glb', 604, { wood: 0, cloth: 0, stone: 604 }]] as [
+    string,
+    number,
+    Record<KitSurfaceFamily, number>,
+  ][])(
     'partitions %s with no ambiguous or unmapped triangle',
     async (assetUrl, triangles, expected) => {
       const { uvs, indices } = await readPrimitive(assetUrl);

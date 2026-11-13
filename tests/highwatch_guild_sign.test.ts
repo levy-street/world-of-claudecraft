@@ -1,10 +1,14 @@
-// Lantern Hall's name on its gateway (src/render/highwatch_guild_sign.ts): two painted faces,
-// each turned to read the right way round, standing at the model's board in the guild's own
-// frame, the lettering localized through t() and repainted in place on a language switch,
-// and the town kit adding them to the guild's model before its materials convert (so they
-// fade, cull and reveal with the building: highwatch_town.ts highwatchBuildingExtras through
+// Lantern Hall's name over its doors (src/render/highwatch_guild_sign.ts): one painted face
+// standing on the name board the hall's model wears, in the guild's own frame, the lettering
+// localized through t() and repainted in place on a language switch, and the town kit adding
+// it to the guild's model before its materials convert (so it fades, culls and reveals with
+// the building: highwatch_town.ts highwatchBuildingExtras through
 // eastbrook_placed_building.ts buildPlacedTownBuilding).
 // @vitest-environment jsdom
+import path from 'node:path';
+import { getBounds, NodeIO } from '@gltf-transform/core';
+import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
+import { MeshoptDecoder } from 'meshoptimizer';
 import * as THREE from 'three';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { buildPlacedTownBuilding } from '../src/render/eastbrook_placed_building';
@@ -30,31 +34,56 @@ beforeAll(() => {
   HTMLCanvasElement.prototype.getContext = (() => ctx) as never;
 });
 
-describe("the guild's gateway sign", () => {
+describe("the guild's name board", () => {
   it('reads the guild name and its line through the catalog', () => {
     expect(guildSignLabels()).toEqual({ name: 'Lantern Hall', subtitle: "Adventurers' Guild" });
   });
 
-  it('stands two faces at the board, one toward the road and one toward the yard', () => {
+  it('stands one face on the board, looking out with the doors', () => {
     highwatchGuildSignInternalsForTest.clearForTest();
     const group = buildHighwatchGuildSign();
     const s = HIGHWATCH_GUILD_SIGN;
     expect(group.position.toArray()).toEqual([s.x, s.y, s.z]);
     const faces = group.children as THREE.Mesh[];
-    expect(faces.map((f) => f.name)).toEqual(['GuildSignText', 'GuildSignText']);
+    expect(faces.map((f) => f.name)).toEqual(['GuildSignText']);
     group.updateMatrixWorld(true);
-    const normals = faces.map((f) =>
-      new THREE.Vector3(0, 0, 1).applyQuaternion(f.getWorldQuaternion(new THREE.Quaternion())),
+    const normal = new THREE.Vector3(0, 0, 1).applyQuaternion(
+      faces[0].getWorldQuaternion(new THREE.Quaternion()),
     );
-    // the road face looks down model -z (out of the yard), the yard face up +z
-    expect(normals[0].z).toBeCloseTo(-1, 9);
-    expect(normals[1].z).toBeCloseTo(1, 9);
+    // the doors look down model -z, and so does the lettering; never mirrored
+    expect(normal.z).toBeCloseTo(-1, 9);
     expect(faces[0].position.z).toBe(-s.face);
-    expect(faces[1].position.z).toBe(s.face);
-    // never mirrored, one shared geometry and material
-    for (const f of faces) expect(f.scale.x).toBeGreaterThan(0);
-    expect(faces[0].material).toBe(faces[1].material);
-    expect(faces[0].geometry).toBe(faces[1].geometry);
+    expect(faces[0].scale.x).toBeGreaterThan(0);
+  });
+
+  it('sits on the name board the shipped hall wears, proud of its oak and inside its frame', async () => {
+    await MeshoptDecoder.ready;
+    const io = new NodeIO()
+      .registerExtensions(ALL_EXTENSIONS)
+      .registerDependencies({ 'meshopt.decoder': MeshoptDecoder });
+    const guild = HIGHWATCH_BUILDINGS_BY_ID.highwatch_guild;
+    const doc = await io.read(path.join(process.cwd(), 'public', guild.assetId));
+    const board = doc
+      .getRoot()
+      .listNodes()
+      .find((node) => node.getName() === 'G_SignBoard');
+    if (!board) throw new Error('the guild model has no G_SignBoard object');
+    const { min, max } = getBounds(board);
+    const s = HIGHWATCH_GUILD_SIGN;
+    // centred on the board, every edge of the lettering inside the gilded frame
+    expect(s.x).toBeCloseTo((min[0] + max[0]) / 2, 2);
+    expect(s.y).toBeCloseTo((min[1] + max[1]) / 2, 2);
+    expect(s.x - s.width / 2).toBeGreaterThan(min[0] + 0.13);
+    expect(s.x + s.width / 2).toBeLessThan(max[0] - 0.13);
+    expect(s.y - s.height / 2).toBeGreaterThan(min[1] + 0.13);
+    expect(s.y + s.height / 2).toBeLessThan(max[1] - 0.13);
+    // the board hangs on the front wall (max z); its frame's lip is the front (min z). The
+    // lettering stands in front of the oak and behind the lip, so it neither sinks nor floats.
+    const face = s.z - s.face;
+    expect(face).toBeLessThan(max[2] - 0.18 - 0.02);
+    expect(face).toBeGreaterThan(min[2] + 0.02);
+    // well over a player's head (a player stands 2.6) and over the doors' arch
+    expect(s.y - s.height / 2).toBeGreaterThan(6);
   });
 
   it('repaints the canvas in place, never a new material', () => {
@@ -88,7 +117,7 @@ describe("the guild's gateway sign", () => {
     built.group.traverse((o) => {
       if (o.name === 'GuildSignText') texts.push(o as THREE.Mesh);
     });
-    expect(texts).toHaveLength(2);
+    expect(texts).toHaveLength(1);
     expect(built.mats.some((record) => record.mat === texts[0].material)).toBe(true);
   });
 });

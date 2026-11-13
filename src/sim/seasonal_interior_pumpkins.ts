@@ -14,13 +14,15 @@
 //     snug against a wall or a piece of furniture, never out in the walkway;
 //   - CLEAR: off every furniture collider at the pumpkin's own radius, and off every
 //     townsfolk's spot.
-// Never in a chapel (seasonal_decor_exclusions.ts keeps the street dressing off it too).
+// Never in a chapel, nor inside its keep-clear zone where a neighbouring house reaches
+// into it (seasonal_decor_exclusions.ts keeps the street dressing off the same zone).
 // One pumpkin per house at most, a few per city, taken in a fixed order. Pinned against
 // the live world by tests/seasonal_interior_pumpkins.test.ts. Pure: no rng, no clock.
 
 import { isBlocked, supportHeightAt } from './colliders';
 import { NPCS } from './data';
 import { hash2 } from './rng';
+import { chapelAt } from './seasonal_decor_exclusions';
 import type { SeasonalGroundPiece } from './seasonal_decor_layout';
 import { SEASONAL_EVENT_TOWNS } from './seasonal_towns';
 import { groundHeight } from './world';
@@ -203,6 +205,8 @@ function houseSpot(
       const { x, z } = toWorld(centre.x, centre.z, rot, lx, lz);
       if (distToSegment(x, z, door.x, door.z, centre.x, centre.z) < DOOR_CLEARANCE) continue;
       if (npcSpots.some((n) => Math.hypot(n.x - x, n.z - z) < NPC_CLEARANCE)) continue;
+      // a house built against a chapel keeps its pumpkin on the side away from it
+      if (chapelAt(x, z) !== null) continue;
       cells.push({ x, z, order: hash2(Math.round(x * 10), Math.round(z * 10), 0x7a3) });
     }
   }

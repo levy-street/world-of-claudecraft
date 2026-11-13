@@ -43,7 +43,12 @@ tier keeps, so every solid is in a low-tier part):
     wharf reads as the quay's raised berth mole.
     HarborClutter        high tier and up: rope coils, crab pots, sacks, nets, oars, a bucket
 
-Everything is original procedural work for this project.
+The geometry is original procedural work for this project. Its timber, fittings and
+stone are PAINTED: they wear the Eastbrook ferry's maps (scripts/assets/eastbrook_ferry/tex,
+cut from the project's Eastbrook town paintings by paint_ferry.py), laid at world scale by
+the painted layer over shiplib (paintlib.py: every board, pile and post on one painted board
+with the grain along its length, the stone in level courses), and the vertex colours below
+tint them.
 """
 import json
 import math
@@ -57,7 +62,8 @@ sys.path.insert(0, os.path.join(HERE, '..', 'wyrmwatch_harbor'))
 sys.path.insert(0, HERE)
 
 import bpy  # noqa: E402
-from shiplib import IRON, P, ROPE, WOOD, Piece, empty, triangles  # noqa: E402
+from paintlib import HarbourPiece as Piece  # noqa: E402
+from shiplib import IRON, P, ROPE, WOOD, empty, triangles  # noqa: E402
 
 import build_wyrmwatch_harbor as W  # noqa: E402
 

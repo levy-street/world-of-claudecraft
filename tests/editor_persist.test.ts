@@ -164,8 +164,9 @@ describe('CustomMap build + projection', () => {
     expect(exteriorValeMine).toBeDefined();
     expect(fenbridgeInn).toMatchObject({
       id: 'fenbridge_crooked_reed_inn',
-      // the painted tavern on the main street, stood grand (fenbridge_layout.ts)
-      assetId: expect.stringMatching(/\/tidehold\/(?:fenrire\/)?tavern\.glb$/),
+      // the painted tavern on the main street, stood grand (fenbridge_layout.ts).
+      // Re-pinned 2026-11-11 for the hand-built harbour lots: Fenbridge wears the moss set.
+      assetId: '/models/tidehold/harbour_moss/tavern.glb',
     });
     expect(fenbridgeInn?.x).toBeCloseTo(21.403452673548912, 6);
     expect(fenbridgeInn?.z).toBeCloseTo(297.9037795860382, 6);

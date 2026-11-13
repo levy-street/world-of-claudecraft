@@ -1,8 +1,7 @@
-import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { MeshoptDecoder } from 'meshoptimizer';
 import type * as THREE from 'three';
-import { type GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { SRGBColorSpace } from 'three';
+import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { activateGfxProfile, GFX, type GfxTier, getActiveGfxProfile } from '../src/render/gfx';
 import { ditherFadeUniform, setDitherFadeEnabledForTest } from '../src/render/occluder_dither_fade';
@@ -34,6 +33,7 @@ import {
 } from '../src/sim/content/wyrmwatch_harbor_house';
 import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
+import { expectPaintedMeshes, parsePaintedGlb } from './helpers/painted_glb';
 
 // The Wyrmwatch cliff harbor painter (src/render/wyrmwatch_harbor.ts) over the shipped GLB:
 // the model placed on the waterline at the harbor origin, what each graphics tier really
@@ -80,14 +80,8 @@ function glowing(root: THREE.Object3D): number {
 }
 
 beforeAll(async () => {
-  await MeshoptDecoder.ready;
-  const bytes = readFileSync(GLB);
-  const ab = bytes.buffer.slice(
-    bytes.byteOffset,
-    bytes.byteOffset + bytes.byteLength,
-  ) as ArrayBuffer;
-  const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
-  gltf = await new Promise<GLTF>((resolve, reject) => loader.parse(ab, '', resolve, reject));
+  // the harbor's painted maps are KTX2: Node gets stand-ins (helpers/painted_glb.ts)
+  gltf = await parsePaintedGlb(GLB);
 });
 
 // The blend arm is what these cases pin; the dithered arm (the default below High since
@@ -113,6 +107,21 @@ describe('wyrmwatch harbor painter', () => {
     expect(model.position.y).toBe(WATER_LEVEL);
     expect(model.position.z).toBe(WYRMWATCH_HARBOR_ORIGIN.z);
     expect(model.userData.assetUrl).toBe(internals.assetUrl);
+  });
+
+  it('draws painted on every tier and material family: planking, fittings and stone under the tint', () => {
+    for (const tier of ['low', 'high'] as const) {
+      for (const standardMaterials of [true, false]) {
+        activateGfxProfile({
+          ...originalProfile,
+          settings: { ...GFX, effectsTier: tier, standardMaterials },
+        });
+        internals.setLoadedGltfForTest(gltf);
+        // the house shell's fading clones and the path stones wear the same three maps
+        const maps = expectPaintedMeshes(buildWyrmwatchHarbor(WORLD_SEED), SRGBColorSpace);
+        expect(maps.size, `${tier} ${standardMaterials}`).toBe(3);
+      }
+    }
   });
 
   it('draws the structure, solids and lanterns on low, adds the trim on medium, the dressing from high', () => {

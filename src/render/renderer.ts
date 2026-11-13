@@ -309,7 +309,6 @@ import {
   effectiveDayness,
   fullDayGrade,
   globalDayness,
-  moonDirection,
   moonTerminator,
   NEUTRAL_DAY_GRADE,
   nightIblScale,
@@ -318,7 +317,6 @@ import {
   REALM_DAYNIGHT_AMPLITUDE,
   REALM_MOON_TINT,
   realmLightTint,
-  sunDirection,
   sunsetWarmGate,
   usesLiveDayNightLighting,
   warmDuskGrade,
@@ -988,6 +986,7 @@ import {
   zoneEntryPoint,
   zonesWithinStreamingHorizon,
 } from './zone_streaming';
+import { resetZoneSun, zoneCelestial } from './zone_sun';
 
 // Festival gold/white celebration palette, shared by the Vale Cup full-time
 // draw show and the Book of Deeds unlock burst (one palette, two sites).
@@ -2479,6 +2478,7 @@ export class Renderer {
     // ?charcull=off restores the pre-cull behaviour for an A/B bench run
     this.cullCharacters = !renderLayerDisabled('charcull');
     this.sunDir.copy(SUN_DIR);
+    resetZoneSun(); // this renderer opens on its own zone's sun
     // The boot rig, captured for the editor lighting override to restore.
     this.lightRig = { sun: this.sun, hemi: this.hemi, sunDir: this.sunDir };
     this.authoredLighting.capture(this.lightRig, this.envOutdoorIntensity);
@@ -8889,8 +8889,7 @@ export class Renderer {
         this.moonUp = 0;
         this.starAmt = 0;
       } else {
-        const sd = sunDirection(phase);
-        const md = moonDirection(phase);
+        const { sun: sd, moon: md } = zoneCelestial(BIOME_LIGHT[biome], dt, phase);
         this.sunDir.set(sd[0], sd[1], sd[2]);
         this.moonDir.set(md[0], md[1], md[2]);
         this.sunUp = aboveHorizon(sd[1]) * amp;

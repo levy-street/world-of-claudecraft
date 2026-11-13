@@ -423,6 +423,16 @@ describe('authoritative Eastbrook replacement plan', () => {
     // farm plots), each at its own grand size (the apothecary's shop at 1.5,
     // the rest at 1.3), and every measurement is the model's own at authored
     // size carried to that size.
+    // Re-pinned 2026-11-11 for the hand-built harbour lots
+    // (scripts/assets/eastbrook_houses/lots.py): each row names its lot under
+    // /models/tidehold/harbour/ and stands on the anchor, turn, size, seat,
+    // wall box, door and reach it had. Beside the path, three things moved,
+    // each measured off the shipped files: nativeDimensions.height (the lot's
+    // own top over its ground line), placement.modelSize (the lot's largest
+    // dimension at authored size, which the reach no longer bounds: a roof
+    // sweeps out past it) and the three annex boxes that follow the lots' own
+    // bench and barrels (the inn's front_bench and barrels, the apothecary's
+    // stall_barrels). Every other number below is bit for bit what it was.
     expect(
       EASTBROOK_LAYOUT.buildings.map((building) => ({
         id: building.id,
@@ -442,7 +452,7 @@ describe('authoritative Eastbrook replacement plan', () => {
     ).toEqual([
       {
         id: 'eastbrook_bank',
-        assetId: '/models/tidehold/bank.glb',
+        assetId: '/models/tidehold/harbour/bank.glb',
         kind: 'house',
         position: {
           x: -61.99,
@@ -450,7 +460,7 @@ describe('authoritative Eastbrook replacement plan', () => {
         },
         nativeDimensions: {
           width: 23.400000000000002,
-          height: 27.90065,
+          height: 27.837600000000002,
           depth: 16.239990000000002,
         },
         rotation: 3.9269908169872414,
@@ -466,7 +476,7 @@ describe('authoritative Eastbrook replacement plan', () => {
           rotation: 3.9269908169872414,
           scale: 1.3,
           lift: -1.35,
-          modelSize: 22.6067,
+          modelSize: 25.5973,
         },
         annexes: [
           {
@@ -504,7 +514,7 @@ describe('authoritative Eastbrook replacement plan', () => {
       },
       {
         id: 'eastbrook_smithy',
-        assetId: '/models/tidehold/smithy.glb',
+        assetId: '/models/tidehold/harbour/smithy.glb',
         kind: 'house',
         position: {
           x: -4.2,
@@ -512,7 +522,7 @@ describe('authoritative Eastbrook replacement plan', () => {
         },
         nativeDimensions: {
           width: 14.3,
-          height: 15.265170000000003,
+          height: 21.972,
           depth: 11.700000000000001,
         },
         rotation: 0.3490658503988659,
@@ -528,7 +538,7 @@ describe('authoritative Eastbrook replacement plan', () => {
           rotation: 0.3490658503988659,
           scale: 1.3,
           lift: -1.35,
-          modelSize: 19.797,
+          modelSize: 19.99,
         },
         annexes: [
           {
@@ -556,7 +566,7 @@ describe('authoritative Eastbrook replacement plan', () => {
       },
       {
         id: 'eastbrook_inn',
-        assetId: '/models/tidehold/tavern.glb',
+        assetId: '/models/tidehold/harbour/tavern.glb',
         kind: 'inn',
         position: {
           x: -30.34,
@@ -564,7 +574,7 @@ describe('authoritative Eastbrook replacement plan', () => {
         },
         nativeDimensions: {
           width: 26,
-          height: 23.063740000000003,
+          height: 26.677999999999997,
           depth: 16.900000000000002,
         },
         rotation: 0.4188790204786391,
@@ -580,17 +590,17 @@ describe('authoritative Eastbrook replacement plan', () => {
           rotation: 0.4188790204786391,
           scale: 1.3,
           lift: -1.35,
-          modelSize: 22.6483,
+          modelSize: 27.6003,
         },
         annexes: [
           {
             id: 'eastbrook_inn:front_bench',
             center: {
-              x: -40.228289966143066,
-              z: -66.5389890801282,
+              x: -40.23029924515986,
+              z: -66.54350199468897,
             },
-            halfWidth: 3.5100000000000002,
-            halfDepth: 0.579995,
+            halfWidth: 3.3800000000000003,
+            halfDepth: 0.325,
             rotation: 0.4188790204786391,
           },
           {
@@ -599,8 +609,8 @@ describe('authoritative Eastbrook replacement plan', () => {
               x: -19.98597328159719,
               z: -72.21274279756746,
             },
-            halfWidth: 0.709995,
-            halfDepth: 1.489995,
+            halfWidth: 0.65,
+            halfDepth: 1.56,
             rotation: 0.4188790204786391,
           },
         ],
@@ -618,7 +628,7 @@ describe('authoritative Eastbrook replacement plan', () => {
       },
       {
         id: 'eastbrook_chapel',
-        assetId: '/models/tidehold/hall.glb',
+        assetId: '/models/tidehold/harbour/hall.glb',
         kind: 'chapel',
         position: {
           x: 28.2,
@@ -626,7 +636,7 @@ describe('authoritative Eastbrook replacement plan', () => {
         },
         nativeDimensions: {
           width: 15.600000000000001,
-          height: 38.29974,
+          height: 37.0546,
           depth: 28.6,
         },
         rotation: 2.181661564992912,
@@ -642,7 +652,7 @@ describe('authoritative Eastbrook replacement plan', () => {
           rotation: 2.181661564992912,
           scale: 1.3,
           lift: -1.35,
-          modelSize: 30.4998,
+          modelSize: 30.2535,
         },
         annexes: [
           {
@@ -680,7 +690,7 @@ describe('authoritative Eastbrook replacement plan', () => {
       },
       {
         id: 'eastbrook_apothecary',
-        assetId: '/models/tidehold/shop_a.glb',
+        assetId: '/models/tidehold/harbour/shop_a.glb',
         kind: 'house',
         position: {
           x: -30.59,
@@ -688,7 +698,7 @@ describe('authoritative Eastbrook replacement plan', () => {
         },
         nativeDimensions: {
           width: 16.5,
-          height: 22.869549999999997,
+          height: 28.765,
           depth: 12.600000000000001,
         },
         rotation: 3.0543261909900767,
@@ -704,7 +714,7 @@ describe('authoritative Eastbrook replacement plan', () => {
           rotation: 3.0543261909900767,
           scale: 1.5,
           lift: -1.55,
-          modelSize: 16.2797,
+          modelSize: 20.21,
         },
         annexes: [
           {
@@ -720,11 +730,11 @@ describe('authoritative Eastbrook replacement plan', () => {
           {
             id: 'eastbrook_apothecary:stall_barrels',
             center: {
-              x: -38.64224065120936,
-              z: -119.65921778195442,
+              x: -38.66701765252592,
+              z: -119.64105813697553,
             },
-            halfWidth: 1.107675,
-            halfDepth: 1.6269,
+            halfWidth: 1.0499999999999998,
+            halfDepth: 1.6124999999999998,
             rotation: 3.0543261909900767,
           },
         ],
@@ -742,7 +752,7 @@ describe('authoritative Eastbrook replacement plan', () => {
       },
       {
         id: 'eastbrook_quay_cottage',
-        assetId: '/models/tidehold/house_b.glb',
+        assetId: '/models/tidehold/harbour/house_b.glb',
         kind: 'house',
         position: {
           x: -59.11,
@@ -750,7 +760,7 @@ describe('authoritative Eastbrook replacement plan', () => {
         },
         nativeDimensions: {
           width: 16.57994,
-          height: 19.42387,
+          height: 20.763,
           depth: 11.119940000000001,
         },
         rotation: 0.8028514559173916,
@@ -766,7 +776,7 @@ describe('authoritative Eastbrook replacement plan', () => {
           rotation: 0.8028514559173916,
           scale: 1.3,
           lift: -1.35,
-          modelSize: 15.9799,
+          modelSize: 19.7713,
         },
         annexes: [
           {

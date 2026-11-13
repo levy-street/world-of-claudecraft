@@ -15,11 +15,23 @@
 // identity, so the shipped path is unchanged BY CONSTRUCTION and no shipped
 // scenery can ever be gated off by a document flag it never carries.
 
-import { BUILTIN_WORLD, getActiveWorldContent } from '../sim/data';
+import { BUILTIN_WORLD, getActiveWorldContent, isBuiltinWorldActive } from '../sim/data';
 import type { PromotedScenery } from '../sim/types';
 
 export function activeWorldPromoted(family: keyof PromotedScenery): boolean {
   const content = getActiveWorldContent();
   if (content === BUILTIN_WORLD) return false;
   return content.promotedScenery?.[family] === true;
+}
+
+/** Whether the active world is the built-in one, whose live touch-up document
+ *  (data/world_touchup/current.map.json, applied by sim/data.ts) stands the hand-painted
+ *  square dressing of Eastbrook and Fenbridge and the weekly vault's strong-house as
+ *  placements of its own, so only there do the town views stand their own copies down for
+ *  it. A Studio map or a custom world carries no touch-up: its towns draw their dressing and
+ *  the vault hall themselves, as they always did (unless the document owns them,
+ *  activeWorldPromoted). "Built-in" is sim/data.ts isBuiltinWorldContent: the shipped world,
+ *  the Studio's preview of it, and its touch-up-less base, which only tests activate. */
+export function activeWorldStandsLiveTouchup(): boolean {
+  return isBuiltinWorldActive();
 }

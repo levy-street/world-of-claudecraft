@@ -1,3 +1,7 @@
+import path from 'node:path';
+import { getBounds, NodeIO } from '@gltf-transform/core';
+import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
+import { MeshoptDecoder } from 'meshoptimizer';
 import * as THREE from 'three';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
@@ -86,28 +90,53 @@ describe('Eastbrook independent stone vault', () => {
       expect(terrainHeight(x, z, 1337)).toBeCloseTo(normal, 10);
     }
   });
-  it('builds a substantial hall within the declared bounds and accounts for every triangle and fade material', () => {
+  it('draws nothing in the shipped world: the strong-house carries the great round door itself', async () => {
+    // The hall is no longer the town's to draw: it is the hand-built strong-house the
+    // live-world document stands on this spot (eastbrook_weekly_vault.ts
+    // activeWorldStandsLiveTouchup, and scripts/assets/eastbrook_houses/houses.py
+    // vault_house). The town keeps the slot and the record's collider and nothing else,
+    // so a flat code-drawn door can never hang on a painted building again.
     const { group, hideTarget } = buildEastbrookWeeklyVault(() => 0);
-    group.rotation.y = 0;
-    const size = new THREE.Box3().setFromObject(group).getSize(new THREE.Vector3());
-    expect(size.x).toBeLessThanOrEqual(14.1);
-    expect(size.x).toBeGreaterThan(13);
-    expect(size.y).toBeGreaterThan(11);
-    expect(size.z).toBeLessThan(12.5);
-    let triangles = 0;
     let meshes = 0;
     group.traverse((object) => {
-      if (object instanceof THREE.Mesh) {
-        triangles +=
-          (object.geometry.index?.count ?? object.geometry.getAttribute('position').count) / 3;
-        meshes++;
-        expect(object.castShadow).toBe(true);
-        expect(object.receiveShadow).toBe(true);
-      }
+      if (object instanceof THREE.Mesh) meshes++;
     });
-    expect(triangles).toBe(WEEKLY_VAULT_TRIANGLES);
-    expect(meshes).toBe(8);
-    expect(hideTarget.mats).toHaveLength(8);
+    expect(meshes).toBe(0);
+    expect(WEEKLY_VAULT_TRIANGLES).toBe(0);
+    expect(hideTarget.mats).toHaveLength(0);
     expect(hideTarget.x).toBe(EASTBROOK_LAYOUT.weeklyVault.x);
+
+    // The door is an object of the shipped model: a round door of nearly seven yards
+    // across its stone ring, centred on the front, standing proud of the wall by under a
+    // yard, its sill at the ground and its crown well under the jettied loft.
+    await MeshoptDecoder.ready;
+    const io = new NodeIO()
+      .registerExtensions(ALL_EXTENSIONS)
+      .registerDependencies({ 'meshopt.decoder': MeshoptDecoder });
+    const doc = await io.read(
+      path.join(process.cwd(), 'public/models/eastbrook_houses/vault_house.glb'),
+    );
+    const nodes = doc.getRoot().listNodes();
+    const door = nodes.find((node) => node.getName() === 'V_GreatDoor');
+    const house = nodes.find((node) => node.getName() === 'vault_house');
+    if (!door || !house) throw new Error('vault_house.glb has no V_GreatDoor or vault_house');
+    const d = getBounds(door);
+    const h = getBounds(house);
+    const width = d.max[0] - d.min[0];
+    expect(width).toBeGreaterThan(6.6);
+    expect(width).toBeLessThan(7.2);
+    expect((d.min[0] + d.max[0]) / 2).toBeCloseTo(0, 1);
+    // round: as tall as it is wide, less what the ground hides of the ring
+    expect(d.max[1] - d.min[1]).toBeGreaterThan(width - 1);
+    expect(d.min[1]).toBeLessThan(0.1);
+    expect(d.max[1]).toBeLessThan(7.6);
+    // on the front (+z in the file): proud of the stone, never a room deep
+    const through = d.max[2] - d.min[2];
+    expect(through).toBeGreaterThan(0.4);
+    expect(through).toBeLessThan(1.6);
+    expect(d.max[2]).toBeGreaterThan(5.7);
+    expect(d.max[2]).toBeLessThan(h.max[2] + 0.01);
+    // twice a player's height (2.6): a door to look up at
+    expect(width / 2.6).toBeGreaterThan(2.5);
   });
 });

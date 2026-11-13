@@ -34,7 +34,8 @@ afterEach(() => {
 
 /** The painted model a URL names, whichever look folder it ships in. */
 function paintedModelName(url: string): string | null {
-  return /\/tidehold\/(?:fenrire\/)?([a-z_]+)\.glb$/.exec(url)?.[1] ?? null;
+  // the hand-built harbour lots in Fenbridge's moss colour set (re-pinned 2026-11-11)
+  return /\/tidehold\/harbour_moss\/([a-z_]+)\.glb$/.exec(url)?.[1] ?? null;
 }
 
 function meshesOf(root: THREE.Object3D): THREE.Mesh[] {

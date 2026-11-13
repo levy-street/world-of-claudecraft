@@ -117,6 +117,10 @@ export function makePlacedTownBuilding<Kind extends 'house' | 'inn' | 'chapel'>(
     annexes?: readonly { name: string; x: number; z: number; width: number; depth: number }[];
     /** Where the door sits along the front (local -Z) face. */
     doorX: number;
+    /** The model's largest dimension at authored size, when `reach` (the ground it covers)
+     *  does not give it: a roof that sweeps out past its walls makes the model wider than
+     *  its reach, and a yard the reach takes in makes the reach wider than the model. */
+    modelSize?: number;
     walkIn?: boolean;
   },
   seat: PlacedTownSeat,
@@ -181,7 +185,9 @@ export function makePlacedTownBuilding<Kind extends 'house' | 'inn' | 'chapel'>(
        *  rows are stored in multiples of this over the placed-asset target
        *  height (sim/town_walk_in.ts). `reach` is at the placed size, so the
        *  seat's scale comes back out. */
-      modelSize: Math.max(spec.reach.width, spec.reach.height, spec.reach.depth) / seat.scale,
+      modelSize:
+        spec.modelSize ??
+        Math.max(spec.reach.width, spec.reach.height, spec.reach.depth) / seat.scale,
     },
     annexes,
     reach: {
@@ -202,6 +208,8 @@ export interface PlacedTownMeasurements {
   walls: { x: number; z: number; width: number; depth: number };
   annexes?: readonly { name: string; x: number; z: number; width: number; depth: number }[];
   doorX: number;
+  /** The model's largest dimension at authored size (never scaled: see makePlacedTownBuilding). */
+  modelSize?: number;
 }
 
 /** A building's measurements taken at the model's AUTHORED size, carried to a placed

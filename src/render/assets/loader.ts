@@ -18,6 +18,7 @@ import {
   browserDecodesImageBitmap,
   fetchImageBlob,
 } from './image_bitmap_decode';
+import { applyKitShadeLiftToScene } from './kit_shade_lift';
 import {
   capCompressedMips,
   capGltfKtx2Mips,
@@ -300,6 +301,10 @@ export function loadGltf(
         applyVertexColourScale(gltf.scene);
         // The Tidehold town kit's per-building weathering masks (town_smart_material.ts).
         applyTownSmartToScene(gltf.scene);
+        // The painted kit's building stone, lifted where the sun does not reach it
+        // (kit_shade_lift.ts). At parse, before any consumer clones or decorates the
+        // material, so every later layer chains onto it in one order.
+        applyKitShadeLiftToScene(gltf.scene, resolved);
         // Transmissive materials become translucent (transmission_neutralize.ts).
         neutralizeGltfTransmission(gltf);
         // Kit foliage cards fade out as they turn edge-on (foliage_edge_fade.ts).

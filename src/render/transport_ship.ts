@@ -6,9 +6,16 @@
 // names a ship model. Collision is not here: the sim moors the ship's simple deck
 // volumes (src/sim/transport_ship.ts) on the same row.
 //
+// The ship is painted: its wood, fittings and cloth materials each carry one small
+// base-colour map from the GLB (planking, gilding and iron, canvas), and the model's
+// vertex colours tint it, so a converted material is white, vertex coloured and
+// mapped. The rope and the glow carry no map and their meshes no `uv`.
+//
 // GPU work: the view is built into the props root at world build, so its materials
 // are linked by the world-entry scene compile like every other prop (the hidden
 // LODs share the visible LOD's materials and attributes, so they add no program).
+// The maps ride the converted materials from the first template on, so the prewarm
+// twins below link the mapped programs and no map arrives later to change a key.
 // The one runtime program change, a sail fading while it stands between the eye and
 // the camera, rides the occluder-fade gate (occluder_fade.ts) exactly like a
 // building's ghost fade, prefetched once the camera comes within reach.
@@ -165,8 +172,13 @@ function convertMaterial(source: THREE.Material): THREE.Material {
   const key = `${source.name}|${GFX.standardMaterials ? 's' : 'l'}`;
   const cached = convertedMaterials.get(key);
   if (cached) return cached;
+  // The painted base colour, as the loader made it: GLTFLoader tags a base-colour map
+  // sRGB (tests/transport_ship_render.test.ts pins it), and a cached GLB's texture is
+  // never mutated here. The rope and the glow have none.
+  const map = std.map ?? undefined;
   const mat = surfaceMat({
     color: 0xffffff,
+    map,
     vertexColors: true,
     roughness: std.roughness ?? 0.85,
     metalness: std.metalness ?? 0,
@@ -179,10 +191,13 @@ function convertMaterial(source: THREE.Material): THREE.Material {
   return mat;
 }
 
+/** The merge's copy of a static mesh: position, normal, the tint and, where the
+ *  mesh is painted, its `uv` (the map-free rope and glow meshes carry none, and
+ *  the bucket key keeps the two layouts apart). */
 function floatGeometry(mesh: THREE.Mesh, toAnchor: THREE.Matrix4): THREE.BufferGeometry {
   const src = mesh.geometry;
   const out = new THREE.BufferGeometry();
-  for (const name of ['position', 'normal', 'color'] as const) {
+  for (const name of ['position', 'normal', 'color', 'uv'] as const) {
     const attr = src.getAttribute(name) as THREE.BufferAttribute | undefined;
     if (attr) out.setAttribute(name, dequantizeAttribute(attr));
   }

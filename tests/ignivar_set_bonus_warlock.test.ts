@@ -374,41 +374,48 @@ describe('Gravebrand 4pc: unison strikes deal 25 percent more damage', () => {
   });
 
   it('an owner gear swap mid-fight moves the very next command (no pet-side state)', () => {
-    const sim = liveWarlock(518, 'demonology');
-    const target = addHostileTarget(sim);
-    finishCast(sim, 'raise_graveguard');
-    // Two commands cost four Soul Fragments. Each harvest is a real cast, and a
-    // real cast keeps the floor chance of a full resist whatever hitBonus says,
-    // so the bank is filled by count rather than by four casts taken on trust:
-    // a resisted harvest is cast again (bounded).
-    for (let cast = 0; cast < 8 && soulFragmentCount(sim.player) < 4; cast++) {
-      finishCast(sim, 'soul_harvest', target);
+    // One trial: bank four Soul Fragments, command, put the set on, ride out the
+    // cooldown, command again. Each harvest is a real cast, and a real cast
+    // keeps the floor chance of a full resist whatever hitBonus says, so the
+    // bank is filled by count rather than by four casts taken on trust: a
+    // resisted harvest is cast again (bounded).
+    const trial = (seed: number): { first: number; second: number } => {
+      const sim = liveWarlock(seed, 'demonology');
+      const target = addHostileTarget(sim);
+      finishCast(sim, 'raise_graveguard');
+      for (let cast = 0; cast < 8 && soulFragmentCount(sim.player) < 4; cast++) {
+        finishCast(sim, 'soul_harvest', target);
+      }
+      expect(soulFragmentCount(sim.player)).toBe(4);
+      const command = (): number =>
+        expectDefined(
+          finishCast(sim, 'reaping_command', target).find(
+            (event): event is Extract<SimEvent, { type: 'damage' }> =>
+              event.type === 'damage' &&
+              event.targetId === target.id &&
+              event.ability === 'Reaping Command',
+          ),
+        ).amount;
+      const first = command();
+      equipSet(sim, 'gravebrand', 4);
+      for (let tick = 0; tick < 20 * 9; tick++) sim.tick(); // ride out the cooldown
+      return { first, second: command() };
+    };
+    // The command is a real cast too and meets the same floor: one the target
+    // resists outright strikes for nothing, and which cast that falls on moves
+    // with the world's draws. The claim is about the VERY NEXT command after
+    // the swap, so a resisted command is never commanded again inside a trial
+    // (a later strike would not prove it): the whole trial is run on the next
+    // seed until one lands both commands on their first cast (bounded).
+    let landed: { first: number; second: number } | undefined;
+    for (let seed = 518; seed < 518 + 8 && !landed; seed++) {
+      const result = trial(seed);
+      if (result.first > 0 && result.second > 0) landed = result;
     }
-    expect(soulFragmentCount(sim.player)).toBe(4);
-    const firstEvents = finishCast(sim, 'reaping_command', target);
-    const first = expectDefined(
-      firstEvents.find(
-        (event): event is Extract<SimEvent, { type: 'damage' }> =>
-          event.type === 'damage' &&
-          event.targetId === target.id &&
-          event.ability === 'Reaping Command',
-      ),
-    );
-    equipSet(sim, 'gravebrand', 4);
-    for (let tick = 0; tick < 20 * 9; tick++) sim.tick(); // ride out the cooldown
-    const secondEvents = finishCast(sim, 'reaping_command', target);
-    const second = expectDefined(
-      secondEvents.find(
-        (event): event is Extract<SimEvent, { type: 'damage' }> =>
-          event.type === 'damage' &&
-          event.targetId === target.id &&
-          event.ability === 'Reaping Command',
-      ),
-    );
-    expect(
-      Math.abs(second.amount - first.amount * GRAVEBRAND_4PC_UNISON_DAMAGE_MULT),
-    ).toBeLessThanOrEqual(1);
-  });
+    const { first, second } = expectDefined(landed);
+    expect(Math.abs(second - first * GRAVEBRAND_4PC_UNISON_DAMAGE_MULT)).toBeLessThanOrEqual(1);
+    expect(second).toBeGreaterThan(first);
+  }, 60_000);
 });
 
 describe('Ruincaller 2pc: Conflagrate holds 3 charges', () => {

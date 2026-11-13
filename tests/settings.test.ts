@@ -212,7 +212,9 @@ describe('Settings', () => {
     expect(s.get('clickToMove')).toBe(0);
     expect(s.get('clickToMoveButton')).toBe(0);
     expect(s.get('cameraFov')).toBe(SETTING_RANGES.cameraFov.def);
-    expect(s.get('cameraFov')).toBe(60); // unchanged from the shipped look by default
+    // 72 since the painted-world pass (60 before): the wider view takes in the sky and
+    // the country beyond the nearest wall, see SETTING_RANGES.cameraFov
+    expect(s.get('cameraFov')).toBe(72);
     expect(s.get('mouseCamera')).toBe(false);
     // walk-by autoloot is opt-in: auto-grabbing loot by walking past can feel jarring.
     expect(s.get('walkByAutoloot')).toBe(false);

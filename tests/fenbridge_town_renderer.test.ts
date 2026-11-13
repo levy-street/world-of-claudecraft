@@ -691,6 +691,13 @@ describe('Fenbridge dedicated town renderer', () => {
     // Fenrire look (src/render/eastbrook_placed_building.ts) replaced the seven
     // template shells, one instance each. Keyed by row, not by file, because a
     // look re-bakes a model's maps on the same geometry.
+    // Re-pinned 2026-11-11 for the hand-built harbour lots: each row now draws
+    // the lot of the same name in the moss colour set (PAINTED_SET in
+    // src/sim/fenbridge_layout.ts, /models/tidehold/harbour_moss/), a different
+    // file on the same wall box, so each count is the new file's own: the
+    // warden house 1_663 to 4_512, the inn 12_844 to 11_521, the chapel 3_857
+    // to 6_021, the apothecary 5_433 to 7_759 and the bank 7_210 to 7_422. The
+    // chapel then got its lancets, rose window and open belfry: 6_021 to 6_386.
     expect(
       Object.fromEntries(
         FENBRIDGE_LAYOUT.buildings.map((building) => [
@@ -699,11 +706,11 @@ describe('Fenbridge dedicated town renderer', () => {
         ]),
       ),
     ).toEqual({
-      fenbridge_warden_gatehouse: 1_663,
-      fenbridge_crooked_reed_inn: 12_844,
-      fenbridge_lantern_chapel: 3_857,
-      fenbridge_moonwort_apothecary: 5_433,
-      fenbridge_gilded_strongbox: 7_210,
+      fenbridge_warden_gatehouse: 4_512,
+      fenbridge_crooked_reed_inn: 11_521,
+      fenbridge_lantern_chapel: 6_386,
+      fenbridge_moonwort_apothecary: 7_759,
+      fenbridge_gilded_strongbox: 7_422,
     });
     const budget = fenbridgeTownTriangleBudget(triangleCountByAsset);
     const shareOf = (placed: boolean): number =>
@@ -719,14 +726,21 @@ describe('Fenbridge dedicated town renderer', () => {
     // legacy-family share is the sibling of tests/fenbridge_town_assets.test.ts
     // EXPECTED_TOTALS.townPlacementTriangles; move both together. The skirt
     // reserve stays 0 (see the reserve test above).
+    // Re-pinned 2026-11-11 for the hand-built harbour lots: the five lots'
+    // 37_235 triangles arrived where the Fenrire models' 31_007 left (+6_228),
+    // so the whole town went 39_627 to 45_855, and the chapel's new parts add
+    // 365 more (37_600, 46_220). The legacy family stays 8_620:
+    // the budget still counts the cistern, the stall and the muster board, one
+    // instance each, though the town batch no longer draws them (see the root
+    // totals below).
     expect({ legacyFamily: shareOf(false), paintedBuildings: shareOf(true) }).toEqual({
       legacyFamily: 8_620,
-      paintedBuildings: 31_007,
+      paintedBuildings: 37_600,
     });
     expect(budget).toMatchObject({
-      assetTriangles: 39_627,
+      assetTriangles: 46_220,
       maximumFoundationTriangles: 0,
-      maximumRuntimeTriangles: 39_627,
+      maximumRuntimeTriangles: 46_220,
       hardCeiling: 88_000,
       withinHardCeiling: true,
     });
@@ -740,12 +754,36 @@ describe('Fenbridge dedicated town renderer', () => {
 
     // The shipped models' furniture: every mesh under a G_INT node, which
     // never casts.
-    const interiorMeshes = FENBRIDGE_LAYOUT.buildings.reduce((sum, building) => {
-      const source = sources.get(building.assetId);
-      if (!source) throw new Error(`missing shipped source for ${building.id}`);
-      return sum + meshesOf(source).filter((mesh) => isPlacedBuildingInterior(mesh)).length;
-    }, 0);
-    expect(interiorMeshes).toBe(15);
+    // Re-pinned 2026-11-11 for the hand-built harbour lots: a lot has no G_INT
+    // node. Its room, furniture included, is its `<model>_INT_L0` mesh, and the
+    // placed path treats a mesh whose own name carries that `_INT` tag as
+    // indoors, the same as one under a G_INT node (buildPlacedTownBuilding in
+    // src/render/eastbrook_placed_building.ts), so the count reads both. Three
+    // parses one mesh per primitive, keyed by row here like the triangles
+    // above: the four walk-in lots carry a room and the sealed warden house
+    // none, 25 where the Fenrire models carried 15.
+    const interiorMeshesByRow = Object.fromEntries(
+      FENBRIDGE_LAYOUT.buildings.map((building) => {
+        const source = sources.get(building.assetId);
+        if (!source) throw new Error(`missing shipped source for ${building.id}`);
+        const interior = meshesOf(source).filter(
+          (mesh) => isPlacedBuildingInterior(mesh) || /_INT(?:_|$)/.test(mesh.name),
+        );
+        return [building.id, interior.length];
+      }),
+    );
+    expect(interiorMeshesByRow).toEqual({
+      fenbridge_warden_gatehouse: 0,
+      fenbridge_crooked_reed_inn: 6,
+      fenbridge_lantern_chapel: 7,
+      fenbridge_moonwort_apothecary: 6,
+      fenbridge_gilded_strongbox: 6,
+    });
+    const interiorMeshes = Object.values(interiorMeshesByRow).reduce(
+      (sum, count) => sum + count,
+      0,
+    );
+    expect(interiorMeshes).toBe(25);
 
     const ground = (x: number, z: number): number => terrainHeight(x, z, 20_061);
     setGfx({ standardMaterials: true, dynamicShadows: true, surfaceDetail: false, composer: true });
@@ -767,23 +805,49 @@ describe('Fenbridge dedicated town renderer', () => {
     // opaque and emissive passes, the boardwalk's opaque one) and 1 shadow
     // draw (only the micro batch's opaque pass casts). Colour 78 to 75, shadow
     // 60 to 58, triangles 56_339 to 39_219.
-    expect(standardRoot).toMatchObject({ colorDraws: 75, shadowDraws: 58, triangles: 39_219 });
+    // Re-pinned 2026-11-11 for the hand-built harbour lots: the five lots are
+    // 64 meshes where the Fenrire models were 72, 39 of them casting (all but
+    // the 25 room meshes). The town batch also stopped drawing the square
+    // dressing (activeWorldStandsLiveTouchup in src/render/fenbridge_town.ts:
+    // the cistern, the stall and the muster board are hand-painted props the
+    // live-world document stands on the same spots), so the micro batch's two
+    // passes are gone, its one caster with them, and the template batches are
+    // 1 colour draw (the boardwalk's opaque pass) and no shadow draw. Colour
+    // 75 to 65, shadow 58 to 39. Triangles 39_219 to 40_995: the lots' 37_235
+    // in for the Fenrire models' 31_007 (+6_228), the square dressing's 4_452
+    // out (pinned below). The chapel's stained glass is one more mesh, drawn
+    // and casting, and its new parts 365 triangles: 66, 40 and 41_360.
+    expect(standardRoot).toMatchObject({ colorDraws: 66, shadowDraws: 40, triangles: 41_360 });
     expect(townDrawSplit(standard.group)).toEqual({
-      batchColor: 3,
-      batchShadow: 1,
-      buildingColor: 72,
-      buildingShadow: 72 - interiorMeshes,
+      batchColor: 1,
+      batchShadow: 0,
+      buildingColor: 65,
+      buildingShadow: 65 - interiorMeshes,
     });
     // Every triangle the root draws is shipped geometry: the whole budget less
     // the muster orders the quest renderer draws, with no skirt anywhere.
+    // Re-pinned 2026-11-11 for the hand-built harbour lots: and less the square
+    // dressing (the cistern, the stall and the muster board, one instance each,
+    // 4_452 triangles between them), which the budget still counts and the
+    // town batch no longer draws.
+    const { cistern, provisionStall, musterBoard } = FENBRIDGE_LAYOUT.civic;
+    const squareDressingTriangles =
+      triangleCountByAsset[cistern.assetId] +
+      triangleCountByAsset[provisionStall.assetId] +
+      triangleCountByAsset[musterBoard.assetId];
+    expect(squareDressingTriangles).toBe(4_452);
     expect(standardRoot.triangles).toBe(
-      budget.assetTriangles - questTriangles * FENBRIDGE_LAYOUT.repeated.musterOrders.length,
+      budget.assetTriangles -
+        questTriangles * FENBRIDGE_LAYOUT.repeated.musterOrders.length -
+        squareDressingTriangles,
     );
+    // (the root and the two muster orders: 41_360 + 408, the whole budget's
+    // 46_220 less the square dressing's 4_452)
     expect({
       colorDraws: standardRoot.colorDraws + questDraws * 2,
       shadowDraws: standardRoot.shadowDraws,
       triangles: standardRoot.triangles + questTriangles * 2,
-    }).toEqual({ colorDraws: 77, shadowDraws: 58, triangles: 39_627 });
+    }).toEqual({ colorDraws: 68, shadowDraws: 40, triangles: 41_768 });
 
     setGfx({
       standardMaterials: false,
@@ -802,14 +866,21 @@ describe('Fenbridge dedicated town renderer', () => {
     // Re-pinned for the open town: the palisade and gate-arch classes left
     // with the ring, so the batches are 2 Lambert passes (the micro batch and
     // the boardwalk, no caster) and colour goes 76 to 74.
-    expect(lowRoot).toMatchObject({ colorDraws: 74, shadowDraws: 57, triangles: 39_219 });
+    // Re-pinned 2026-11-11 for the hand-built harbour lots: the lots keep all
+    // 64 of their meshes on their own Lambert clones, 39 of them carrying a
+    // cast flag, and the micro batch's Lambert pass left with the square
+    // dressing, so the batches are 1 Lambert pass (the boardwalk, no caster).
+    // Colour 74 to 65, shadow 57 to 39, triangles 39_219 to 40_995 as on
+    // Standard above.
+    // (66, 40 and 41_360 with the chapel's stained glass, as on Standard)
+    expect(lowRoot).toMatchObject({ colorDraws: 66, shadowDraws: 40, triangles: 41_360 });
     expect(townDrawSplit(low.group)).toEqual({
-      batchColor: 2,
+      batchColor: 1,
       batchShadow: 0,
-      buildingColor: 72,
-      buildingShadow: 72 - interiorMeshes,
+      buildingColor: 65,
+      buildingShadow: 65 - interiorMeshes,
     });
-    expect(lowRoot.colorDraws + questDraws * 2).toBe(76);
+    expect(lowRoot.colorDraws + questDraws * 2).toBe(68);
     // The Low draw ceiling, re-set for the painted town and again for the
     // open one. The template town held Low under 16 draws: one Lambert pass
     // per building and per placement class. A painted building draws its
@@ -818,7 +889,13 @@ describe('Fenbridge dedicated town renderer', () => {
     // once the ring came down. A model that gains a mesh, or a batch that
     // stops folding its glow into its colour pass, crosses it and has to move
     // it on purpose.
-    const LOW_TOWN_COLOR_DRAW_CEILING = 74;
+    // Re-set 2026-11-11 for the hand-built harbour lots: 64 meshes over the
+    // five lots plus the one batch pass left (the boardwalk) now the square
+    // dressing is out of the batch, so the ceiling comes down from 74 to 65
+    // with the count it bounds. Moved to 66 on purpose for the chapel's stained
+    // glass: its lancets and rose window wear a second glass tile, one more
+    // mesh on the one chapel.
+    const LOW_TOWN_COLOR_DRAW_CEILING = 66;
     expect(lowRoot.colorDraws).toBeLessThanOrEqual(LOW_TOWN_COLOR_DRAW_CEILING);
   });
 
@@ -862,12 +939,19 @@ describe('Fenbridge dedicated town renderer', () => {
     // micro batch's opaque pass casts (1): colour 23 to 19, shadow 13 to 11.
     // These are the FIXTURE's numbers; the shipped totals are pinned in the
     // shipping-GLB test above.
+    // Re-pinned 2026-11-11 for the hand-built harbour lots: the town batch no
+    // longer draws the square dressing (activeWorldStandsLiveTouchup in
+    // src/render/fenbridge_town.ts: the cistern, the stall and the muster
+    // board are hand-painted props the live-world document stands on the same
+    // spots), so the micro batch's opaque and emissive passes are gone and its
+    // one caster with them. The batches are the boardwalk's two passes (2),
+    // neither casting: colour 19 to 17, shadow 11 to 10, micro batches 2 to 0.
     expect(stats).toMatchObject({
-      colorDraws: 19,
-      shadowDraws: 11,
+      colorDraws: 17,
+      shadowDraws: 10,
       buildingCount: 5,
       buildingFadeTargetCount: 5,
-      microBatchCount: 2,
+      microBatchCount: 0,
       repeatedBatchCount: 2,
       boardwalkCount: 10,
     });
@@ -875,8 +959,8 @@ describe('Fenbridge dedicated town renderer', () => {
     expect(stats).not.toHaveProperty('wallSegmentCount');
     expect(stats).not.toHaveProperty('gateCount');
     expect(townDrawSplit(view.group)).toEqual({
-      batchColor: 4,
-      batchShadow: 1,
+      batchColor: 2,
+      batchShadow: 0,
       buildingColor: 15,
       buildingShadow: 10,
     });
@@ -970,9 +1054,14 @@ describe('Fenbridge dedicated town renderer', () => {
     // draws on Low: the batches' one pass per placement class (2) plus the
     // buildings' 15. The shipped models' count is pinned in the shipping-GLB
     // test above.
-    expect(stats.colorDraws).toBe(17);
+    // Re-pinned 2026-11-11 for the hand-built harbour lots: the town batch no
+    // longer draws the square dressing (activeWorldStandsLiveTouchup in
+    // src/render/fenbridge_town.ts), so the micro batch's Lambert pass is gone
+    // and the boardwalk is the one placement class the batches draw. The town
+    // is 16 draws on Low: that one pass (1) plus the buildings' 15.
+    expect(stats.colorDraws).toBe(16);
     expect(townDrawSplit(view.group)).toEqual({
-      batchColor: 2,
+      batchColor: 1,
       batchShadow: 0,
       buildingColor: 15,
       buildingShadow: 10,
@@ -981,10 +1070,7 @@ describe('Fenbridge dedicated town renderer', () => {
     // batch per placement class, no emissive batch at all.
     const buildingMeshes = buildingMeshSet(view.group);
     const batches = meshesOf(view.group).filter((mesh) => !buildingMeshes.has(mesh));
-    expect(batches.map((mesh) => mesh.name)).toEqual([
-      'fenbridgeTownMicroOpaqueBatch',
-      'fenbridgeTownBoardwalkOpaqueInstances',
-    ]);
+    expect(batches.map((mesh) => mesh.name)).toEqual(['fenbridgeTownBoardwalkOpaqueInstances']);
     // No shadow pass on Low. No batch casts, and the shadow draws counted here
     // are the buildings' own exterior meshes, whose cast flags the placed path
     // sets on every tier (as Eastbrook's town and an authored map do). They
@@ -1238,9 +1324,15 @@ describe('Fenbridge dedicated town renderer', () => {
       () => 1.2,
       true,
     );
-    expect(shipped.group.getObjectByName('fenbridgeTownMicroOpaqueBatch')).toBeInstanceOf(
-      THREE.Mesh,
-    );
+    // Re-pinned 2026-11-11 for the hand-built harbour lots: the shipped town
+    // draws no micro batch either. The cistern, the stall and the muster board
+    // are hand-painted props the live-world document stands on the same spots
+    // (activeWorldStandsLiveTouchup in src/render/fenbridge_town.ts), so
+    // what a promoted document takes from the shipped town is the boardwalk
+    // instances, and the shipped town keeps those.
+    for (const name of ['fenbridgeTownMicroOpaqueBatch', 'fenbridgeTownMicroEmissiveBatch']) {
+      expect(shipped.group.getObjectByName(name), name).toBeUndefined();
+    }
     expect(shipped.group.getObjectByName('fenbridgeTownBoardwalkOpaqueInstances')).toBeInstanceOf(
       THREE.InstancedMesh,
     );
@@ -1320,13 +1412,18 @@ describe('Fenbridge dedicated town renderer', () => {
       if (!group) throw new Error(`renderer fixture lost ${building.id}`);
       return group;
     });
-    const micro = view.group.getObjectByName('fenbridgeTownMicroOpaqueBatch');
-    if (!micro) throw new Error('renderer fixture lost the micro batch');
+    // Re-pinned 2026-11-11 for the hand-built harbour lots: the static batch
+    // this test holds beside the buildings is the boardwalk instances. It was
+    // the micro batch, which the town no longer builds now the square dressing
+    // is hand-painted props (activeWorldStandsLiveTouchup in
+    // src/render/fenbridge_town.ts).
+    const boardwalks = view.group.getObjectByName('fenbridgeTownBoardwalkOpaqueInstances');
+    if (!boardwalks) throw new Error('renderer fixture lost the boardwalk batch');
     // The gate compiles the buildings WITH the batches: every building group
     // (each painted model's own cloned materials, its glow among them) is a
     // reveal root.
     for (const group of buildingGroups) expect(view.staticRevealRoots()).toContain(group);
-    expect(view.staticRevealRoots()).toContain(micro);
+    expect(view.staticRevealRoots()).toContain(boardwalks);
 
     // Camera outside the town cull radius, town and buildings inside the fog.
     // The radius is the hub ring plus a fixed margin, where the walled town
@@ -1339,7 +1436,7 @@ describe('Fenbridge dedicated town renderer', () => {
     const approachX = hub.x + cullRadius + 20;
     view.update(approachX, 2, hub.z, approachX - 5, 2, hub.z, 400, 0.05);
     expect(requested).toEqual(['fenbridge-town-static']);
-    expect(micro.visible).toBe(false);
+    expect(boardwalks.visible).toBe(false);
     for (const group of buildingGroups) expect(group.visible).toBe(false);
 
     // Held frames never re-request; the settle reveals batches and buildings
@@ -1349,7 +1446,7 @@ describe('Fenbridge dedicated town renderer', () => {
     for (const group of buildingGroups) expect(group.visible).toBe(false);
     gate.settle('fenbridge-town-static');
     view.update(approachX, 2, hub.z, approachX - 5, 2, hub.z, 400, 0.05);
-    expect(micro.visible).toBe(true);
+    expect(boardwalks.visible).toBe(true);
     for (const group of buildingGroups) expect(group.visible).toBe(true);
     view.setRevealGate(createRevealGateCore((key) => requested.push(`again:${key}`)));
     view.update(approachX, 2, hub.z, approachX - 5, 2, hub.z, 400, 0.05);
@@ -1370,8 +1467,14 @@ describe('Fenbridge dedicated town renderer', () => {
     const firstGroup = view.group.getObjectByName(`fenbridgeBuilding:${first.id}`);
     const second = FENBRIDGE_LAYOUT.buildings[1];
     const secondGroup = view.group.getObjectByName(`fenbridgeBuilding:${second.id}`);
-    const micro = view.group.getObjectByName('fenbridgeTownMicroOpaqueBatch');
-    if (!firstGroup || !secondGroup || !micro) throw new Error('renderer fixture lost a town node');
+    // Re-pinned 2026-11-11 for the hand-built harbour lots: the batch that
+    // stays cold is the boardwalk instances. It was the micro batch, which the
+    // town no longer builds (activeWorldStandsLiveTouchup in
+    // src/render/fenbridge_town.ts).
+    const boardwalks = view.group.getObjectByName('fenbridgeTownBoardwalkOpaqueInstances');
+    if (!firstGroup || !secondGroup || !boardwalks) {
+      throw new Error('renderer fixture lost a town node');
+    }
 
     const hub = FENBRIDGE_LAYOUT.hub.center;
     const cullRadius = fenbridgeTownInternalsForTest.townCullRadius;
@@ -1384,7 +1487,7 @@ describe('Fenbridge dedicated town renderer', () => {
     expect(gate.state('fenbridge-town-static')).toBe('compiling');
     expect(firstGroup.visible).toBe(true);
     // Nothing else moved: the batches and the other buildings are still cold.
-    expect(micro.visible).toBe(false);
+    expect(boardwalks.visible).toBe(false);
     expect(secondGroup.visible).toBe(false);
 
     // A revealed root is never taken back while the key is still held.
@@ -1433,9 +1536,13 @@ describe('Fenbridge dedicated town renderer', () => {
     view.update(x, 2, z, x, 2, z + 5, 200, 0.05);
     expect(group.visible).toBe(true);
     // The town key itself never warmed: this is the floor, not a reveal.
-    const micro = view.group.getObjectByName('fenbridgeTownMicroOpaqueBatch');
-    if (!micro) throw new Error('renderer fixture lost the micro batch');
-    expect(micro.visible).toBe(false);
+    // Re-pinned 2026-11-11 for the hand-built harbour lots: read off the
+    // boardwalk instances, the static batch the town still builds (the micro
+    // batch went with the square dressing, activeWorldStandsLiveTouchup in
+    // src/render/fenbridge_town.ts).
+    const boardwalks = view.group.getObjectByName('fenbridgeTownBoardwalkOpaqueInstances');
+    if (!boardwalks) throw new Error('renderer fixture lost the boardwalk batch');
+    expect(boardwalks.visible).toBe(false);
   });
 
   it('hands the gate its roots nearest to the camera first', () => {
@@ -1478,8 +1585,14 @@ describe('Fenbridge dedicated town renderer', () => {
     const otherMaterials = materialsOf(other);
     expect(targetMaterials).toHaveLength(3);
     expect(otherMaterials).toHaveLength(3);
-    const micro = view.group.getObjectByName('fenbridgeTownMicroOpaqueBatch') as THREE.Mesh;
-    const microMaterial = micro.material as THREE.Material;
+    // Re-pinned 2026-11-11 for the hand-built harbour lots: the static batch
+    // that must not be touched is the boardwalk instances. It was the micro
+    // batch, which the town no longer builds (activeWorldStandsLiveTouchup
+    // in src/render/fenbridge_town.ts).
+    const boardwalks = view.group.getObjectByName(
+      'fenbridgeTownBoardwalkOpaqueInstances',
+    ) as THREE.Mesh;
+    const boardwalkMaterial = boardwalks.material as THREE.Material;
     view.update(
       building.position.x + 20,
       2,
@@ -1492,7 +1605,7 @@ describe('Fenbridge dedicated town renderer', () => {
     );
     for (const material of targetMaterials) expect(material.opacity).toBeCloseTo(0.2, 10);
     for (const material of otherMaterials) expect(material.opacity).toBe(1);
-    expect(microMaterial.opacity).toBe(1);
+    expect(boardwalkMaterial.opacity).toBe(1);
   });
 
   it('ghosts a placed building from inside its wall box under its roof line, never from under its eaves, and keeps a walk-in room solid round a camera inside it', () => {
@@ -1537,8 +1650,14 @@ describe('Fenbridge dedicated town renderer', () => {
       () => groundY,
       true,
     );
-    const micro = view.group.getObjectByName('fenbridgeTownMicroOpaqueBatch') as THREE.Mesh;
-    if (!micro) throw new Error('renderer fixture lost the micro batch');
+    // Re-pinned 2026-11-11 for the hand-built harbour lots: the batch probed
+    // beside each building is the boardwalk instances. It was the micro batch,
+    // which the town no longer builds (activeWorldStandsLiveTouchup in
+    // src/render/fenbridge_town.ts).
+    const boardwalks = view.group.getObjectByName(
+      'fenbridgeTownBoardwalkOpaqueInstances',
+    ) as THREE.Mesh;
+    if (!boardwalks) throw new Error('renderer fixture lost the boardwalk batch');
     const fadeState = (materials: readonly THREE.Material[]): string => {
       if (materials.every((material) => !material.transparent && material.opacity === 1)) {
         return 'solid';
@@ -1655,9 +1774,10 @@ describe('Fenbridge dedicated town renderer', () => {
           `${building.id} camera over the roof`,
         ).toBe('ghost');
       }
-      // The merged microgeometry is never a camera-fade target.
-      expect((micro.material as THREE.Material).transparent).toBe(false);
-      expect((micro.material as THREE.Material).opacity).toBe(1);
+      // The batched geometry (the boardwalk instances) is never a camera-fade
+      // target.
+      expect((boardwalks.material as THREE.Material).transparent).toBe(false);
+      expect((boardwalks.material as THREE.Material).opacity).toBe(1);
     }
   });
 
@@ -1672,8 +1792,12 @@ describe('Fenbridge dedicated town renderer', () => {
     setGfx({ standardMaterials: false, dynamicShadows: false, surfaceDetail: false });
     const fogFar = 100;
     const view = fenbridgeTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
-    const micro = view.group.getObjectByName('fenbridgeTownMicroOpaqueBatch');
-    if (!micro) throw new Error('renderer fixture lost the micro batch');
+    // Re-pinned 2026-11-11 for the hand-built harbour lots: the town's own fog
+    // answer is read off the boardwalk instances. It was read off the micro
+    // batch, which the town no longer builds (activeWorldStandsLiveTouchup
+    // in src/render/fenbridge_town.ts).
+    const boardwalks = view.group.getObjectByName('fenbridgeTownBoardwalkOpaqueInstances');
+    if (!boardwalks) throw new Error('renderer fixture lost the boardwalk batch');
     const hub = FENBRIDGE_LAYOUT.hub.center;
     for (const building of FENBRIDGE_LAYOUT.buildings) {
       const group = buildingGroup(view.group, building.id);
@@ -1709,7 +1833,7 @@ describe('Fenbridge dedicated town renderer', () => {
       expect(group.visible, `${building.id} far corner still in the fog`).toBe(true);
       standAt(fogFar + widest + 0.01);
       expect(group.visible, `${building.id} past its cull radius`).toBe(false);
-      expect(micro.visible, `${building.id} town still in the fog`).toBe(true);
+      expect(boardwalks.visible, `${building.id} town still in the fog`).toBe(true);
       standAt(fogFar + farCorner - 0.01);
       expect(group.visible, `${building.id} back inside the fog`).toBe(true);
     }

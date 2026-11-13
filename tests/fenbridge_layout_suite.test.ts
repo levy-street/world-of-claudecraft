@@ -123,7 +123,9 @@ describe('Fenbridge canonical pure layout', () => {
     const roadSamples = FENBRIDGE_LAYOUT.roads.flatMap((road) => samplePolyline(road.points, 0.25));
     for (let left = 0; left < FENBRIDGE_LAYOUT.buildings.length; left++) {
       const building = FENBRIDGE_LAYOUT.buildings[left];
-      expect(building.assetId).toMatch(/^\/models\/tidehold\/(?:fenrire\/)?[a-z_]+\.glb$/);
+      // Re-pinned 2026-11-11 for the hand-built harbour lots: every Fenbridge building is a
+      // lot of the moss colour set, and of no other.
+      expect(building.assetId).toMatch(/^\/models\/tidehold\/harbour_moss\/[a-z_]+\.glb$/);
       expect(FENBRIDGE_BUILDINGS_BY_ID[building.id]).toBe(building);
       // the visitor's stand at the foot of the stoop (1.8 yd off the wall at
       // authored size, growing with the building), and the way they look

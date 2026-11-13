@@ -1365,7 +1365,18 @@ const RENDER_PURE_CORES = [
   'src/render/farm_patches_core.ts',
   'src/render/fishing_bobber_core.ts',
   'src/render/flower_meadows_core.ts',
+  // the clarity pass's session settings (the grade's unsharp arm)
+  'src/render/clarity_core.ts',
   'src/render/foliage_core.ts',
+  // a zone's own sun: the turn and noon height arithmetic
+  'src/render/zone_sun_core.ts',
+  // how big the realms' great trees stand (shared with the editor's conversion)
+  'src/render/great_tree_look_core.ts',
+  // the grass card tuft's tint from the ground under it
+  'src/render/grass_card_follow_core.ts',
+  'src/render/grass_card_tint_core.ts',
+  // the Drakelands fortress and Last Keep keep their bare ground: no blade grass inside them
+  'src/render/fortress_grass_keepout_core.ts',
   'src/render/foliage_decimation_core.ts',
   'src/render/foliage_shore_gate_core.ts',
   'src/render/gpu_queue_window_core.ts',
@@ -1426,6 +1437,9 @@ const RENDER_PURE_CORES = [
   // The opt-in cel-shading R&D look (`?cel=on`): URL parse + the toon ramp
   // patch over three's directional light loop.
   'src/render/cel_shading_core.ts',
+  // The `?ground=` switch: which ground set the terrain wears, parsed from the
+  // URL against an allowlist (terrain.ts reads it once at module load).
+  'src/render/ground_set_core.ts',
   'src/render/post_bloom_shader_core.ts',
   'src/render/dynamic_resolution_core.ts',
   'src/render/post_plan_core.ts',

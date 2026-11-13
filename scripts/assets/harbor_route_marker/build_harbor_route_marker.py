@@ -36,8 +36,12 @@ Hierarchy (the runtime depends on these names):
                               face offset of each text plane)
     Socket_ArrowTip           the tip of the arrow (the direction the sign points)
 
-Everything is original procedural work for this project. The palette is the Eastbrook ferry's
-(scripts/assets/eastbrook_ferry/build_eastbrook_ferry.py PAL) so the sign belongs to the ship.
+The geometry is original procedural work for this project. The palette is the Eastbrook ferry's
+(scripts/assets/eastbrook_ferry/build_eastbrook_ferry.py PAL) so the sign belongs to the ship,
+and so is its paint: the wood and the fittings wear the ferry's maps
+(scripts/assets/eastbrook_ferry/tex, cut from the project's Eastbrook town paintings by
+paint_ferry.py), laid by the painted layer over shiplib (paintlib.py) with the grain along the
+post and the board, and the vertex colours below tint them.
 """
 import math
 import os
@@ -50,7 +54,9 @@ sys.path.insert(0, HERE)
 
 import bpy  # noqa: E402
 from mathutils import Matrix, Vector  # noqa: E402
-from shiplib import EDGE, FLAT, GLOW, IRON, ROPE, WOOD, P, Piece, empty, scale_color, triangles  # noqa: E402
+from paintlib import HarbourPiece as Piece  # noqa: E402
+from paintlib import harbour_materials, weathered  # noqa: E402
+from shiplib import EDGE, FLAT, GLOW, IRON, ROPE, WOOD, P, empty, scale_color, triangles  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Palette: the Eastbrook ferry's own values (build_eastbrook_ferry.py PAL)
@@ -72,6 +78,11 @@ PAL = dict(
     rope_dark=(0.56, 0.46, 0.32),
     glow=(1.0, 0.78, 0.46),
 )
+
+# The post and the board are harbour timber: weathered like the wharves the sign stands on
+# (paintlib.weathered, as in build_wyrmwatch_harbor.py) rather than the ferry's fresh wood.
+for _key in ('plank', 'post', 'post_dark', 'trim_dark', 'seam'):
+    PAL[_key] = weathered(PAL[_key])
 
 MATERIAL_SPECS = (
     # name, roughness, metallic, emission; indexed like shiplib (WOOD, IRON, -, ROPE, GLOW)
@@ -386,22 +397,10 @@ def build_rope():
 # Scene
 # ---------------------------------------------------------------------------
 def make_materials():
-    mats = []
-    for name, rough, metal, emission in MATERIAL_SPECS:
-        mat = bpy.data.materials.new(name)
-        mat.use_nodes = True
-        bsdf = mat.node_tree.nodes.get('Principled BSDF')
-        bsdf.inputs['Roughness'].default_value = rough
-        bsdf.inputs['Metallic'].default_value = metal
-        attr = mat.node_tree.nodes.new('ShaderNodeVertexColor')
-        attr.layer_name = 'Col'
-        mat.node_tree.links.new(attr.outputs['Color'], bsdf.inputs['Base Color'])
-        if emission:
-            mat.node_tree.links.new(attr.outputs['Color'], bsdf.inputs['Emission Color'])
-            bsdf.inputs['Emission Strength'].default_value = emission
-        mat.use_backface_culling = True
-        mats.append(mat)
-    return mats
+    """The marker's materials, painted like the harbours it points to: the planking on the
+    wood, the fittings map on the iron (the Eastbrook ferry's maps, scripts/assets/
+    eastbrook_ferry/paintlib.py), the vertex colours tinting them. Nothing here is stone."""
+    return harbour_materials(MATERIAL_SPECS, kinds=('wood', 'fittings', None))
 
 
 CRITICAL = ('Post', 'SignBoard', 'MaritimeIcon')
@@ -474,6 +473,7 @@ def export(path, objs):
         filepath=path, export_format='GLB', use_selection=True, export_apply=True, export_yup=True,
         export_extras=True, export_animations=False, export_cameras=False, export_lights=False,
         export_vertex_color='ACTIVE', export_all_vertex_colors=False, export_morph=False,
+        export_texcoords=True, export_image_format='WEBP', export_image_quality=92,
     )
     print('WROTE', path)
 

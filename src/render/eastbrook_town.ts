@@ -55,7 +55,7 @@ import {
 import { type PlacedTextureTier, placedTextureTierPath } from './placed_texture_tier_core';
 import { placedTownCullRadius } from './placed_town_buildings';
 import { createPlacedTownInteriors } from './placed_town_interiors';
-import { activeWorldPromoted } from './promoted_scenery_gate';
+import { activeWorldPromoted, activeWorldStandsLiveTouchup } from './promoted_scenery_gate';
 import {
   buildRealmBuilderMonumentBody,
   buildRealmBuilderMonumentFx,
@@ -1027,8 +1027,13 @@ function buildMicroBatches(
 
   // A document that owns the square's dressing as placements
   // (promotedScenery.authoredTownDressing) draws the benches, stalls and yard
-  // fences itself, so these three loops stand down together.
-  const dressingPromoted = activeWorldPromoted('authoredTownDressing');
+  // fences itself, so these three loops stand down together. So does the built-in
+  // world: its live touch-up document stands hand-painted benches, stalls and fences on
+  // the same spots (scripts/assets/eastbrook_houses/sites.json), which the batch could
+  // only draw in flat colour through the town atlas. The records and their colliders
+  // are unchanged either way.
+  const dressingPromoted =
+    activeWorldStandsLiveTouchup() || activeWorldPromoted('authoredTownDressing');
   const benches = dressingPromoted ? [] : EASTBROOK_LAYOUT.civic.benches;
   const stalls = dressingPromoted ? [] : EASTBROOK_LAYOUT.market.stalls;
   const fences = dressingPromoted ? [] : EASTBROOK_LAYOUT.fences;

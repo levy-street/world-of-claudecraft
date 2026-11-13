@@ -2494,7 +2494,10 @@ const MONOLITHS: MonolithRow[] = [
     // the Studio's own delta (2414 - 2420 = -6) gives 2356; re-measure with wc -l.
     // Integration merge of #4479 (ClaudeCraft Studio): exact merged count, within
     // the release/v0.45.0 ceiling both merged PRs were held to.
-    ceiling: 2414,
+    // Lowered 2414 -> 2323: the authored floors' risers, door stairs and ledges moved
+    // to src/render/authored_relief.ts, and the two palaces' painted tiles draw from
+    // src/render/palace_tile_kit.ts (paying for the palace hooks). Exact count.
+    ceiling: 2323,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {

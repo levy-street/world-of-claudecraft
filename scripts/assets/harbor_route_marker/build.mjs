@@ -1,6 +1,6 @@
 // Ship the Blender-authored harbor route marker (scripts/assets/harbor_route_marker/): validate
 // the exported hierarchy, materials and text anchor, stamp the source fingerprint, then prune,
-// dedup and meshopt it into public/models/props/harbor_route_marker.glb. Never flatten or
+// dedup, turn its painted maps into KTX2 and meshopt it into public/models/props/harbor_route_marker.glb. Never flatten or
 // join: the runtime (src/render/harbor_route_markers.ts) keeps or sheds the named tier groups
 // and reads the destination text anchor by name.
 //
@@ -14,8 +14,19 @@ import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { dedup, meshopt, prune } from '@gltf-transform/functions';
 import { MeshoptDecoder, MeshoptEncoder } from 'meshoptimizer';
+import {
+  checkPaintedMaps,
+  checkShippedMaps,
+  fingerprintBody,
+  paintedMapInputs,
+  paintedMapTransforms,
+} from '../eastbrook_ferry/painted_maps.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
+
+/** The painted base-colour map each material wears (scripts/assets/eastbrook_ferry/
+ *  painted_maps.mjs: the ferry's own maps); the rope and the glow wear none. */
+const PAINTED_MAPS = { HarborIron: 'ferry_fittings', HarborWood: 'ferry_wood' };
 
 export const HARBOR_ROUTE_MARKER_ASSET = {
   source: 'scripts/assets/harbor_route_marker/harbor_route_marker_source.glb',
@@ -26,6 +37,7 @@ export const HARBOR_ROUTE_MARKER_ASSET = {
     'scripts/assets/harbor_route_marker/harbor_route_marker_source.glb',
     'scripts/assets/harbor_route_marker/build_harbor_route_marker.py',
     'scripts/assets/eastbrook_ferry/shiplib.py',
+    ...paintedMapInputs(PAINTED_MAPS),
     'scripts/assets/harbor_route_marker/build.mjs',
   ],
   /** Named nodes the runtime depends on. */
@@ -42,17 +54,19 @@ export const HARBOR_ROUTE_MARKER_ASSET = {
     'Socket_ArrowTip',
   ],
   materials: ['HarborGlow', 'HarborIron', 'HarborRope', 'HarborWood'],
+  maps: PAINTED_MAPS,
+  /** No map ships larger than this on a side. */
+  maxMapSize: 256,
+  /** A map this model shows little of ships smaller: map name to pixels a side. */
+  mapSizes: {},
 };
 
 export function sourceFingerprint(asset = HARBOR_ROUTE_MARKER_ASSET, root = ROOT) {
   const hash = createHash('sha256');
   for (const file of asset.inputs) {
     // Text inputs hash with normalized line endings so a Windows checkout and a Linux
-    // checkout agree; the source GLB is binary and hashes byte for byte.
-    const bytes = readFileSync(path.join(root, file));
-    const body = file.endsWith('.glb')
-      ? bytes
-      : Buffer.from(bytes.toString('utf8').replace(/\r\n/g, '\n'));
+    // checkout agree; the source GLB and the maps are binary and hash byte for byte.
+    const body = fingerprintBody(file, readFileSync(path.join(root, file)));
     hash.update(file).update('\0').update(body).update('\0');
   }
   return hash.digest('hex');
@@ -78,14 +92,11 @@ export async function buildHarborRouteMarker(asset = HARBOR_ROUTE_MARKER_ASSET, 
   if (JSON.stringify(materials) !== JSON.stringify(asset.materials)) {
     throw new Error(`Unexpected marker materials: ${materials.join(', ')}`);
   }
-  if (
-    gltf.listTextures().length ||
-    gltf.listCameras().length ||
-    gltf.listSkins().length ||
-    gltf.listAnimations().length
-  ) {
-    throw new Error('The marker ships texture-free, camera-free, unskinned and still');
+  if (gltf.listCameras().length || gltf.listSkins().length || gltf.listAnimations().length) {
+    throw new Error('The marker ships camera-free, unskinned and still');
   }
+  // one painted base-colour map on each material that wears one, and no other texture
+  checkPaintedMaps(gltf, asset.maps);
   const extras = gltf.listScenes()[0]?.listChildren()[0]?.getExtras() ?? {};
   if (!extras.harborRouteMarker) throw new Error('HarborRouteMarker_ROOT lost its extras');
   const anchor = gltf.listNodes().find((node) => node.getName() === 'DestinationTextAnchor');
@@ -94,10 +105,13 @@ export async function buildHarborRouteMarker(asset = HARBOR_ROUTE_MARKER_ASSET, 
   }
   gltf.setExtras({ sourceFingerprint: sourceFingerprint(asset, root), authoring: 'Blender' });
   await doc.transform(
+    // prune also drops the texture coordinates of the map-free materials
     prune({ keepExtras: true, keepLeaves: true }),
     dedup(),
+    ...(await paintedMapTransforms(asset.maxMapSize, asset.mapSizes)),
     meshopt({ encoder: MeshoptEncoder, level: 'high' }),
   );
+  checkShippedMaps(gltf, asset.maxMapSize, asset.mapSizes);
   return io.writeBinary(doc);
 }
 

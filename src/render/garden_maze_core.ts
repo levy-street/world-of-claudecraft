@@ -35,6 +35,11 @@ export interface MazePieceSpot {
 // src/sim may not import src/render. Re-exported below so this module and its
 // test still read one source of truth.
 export const MAZE_ARCH_SCALE = MAZE_CELL / 0.98; // spans the opening, 7.7 high at the crown
+/** The hedge walls stand CLIPPED to this share of the model's height (0.45: the sim's
+ *  MAZE_WALL_HEIGHT carries it, since the camera top is the sim's to know): head-high walls
+ *  a walker cannot see over while the country beyond shows above them. At the model's full
+ *  six yards they walled every view in the maze and the Fountain Court off from the sky. */
+export const MAZE_WALL_HEIGHT_SCALE = MAZE_WALL_HEIGHT / (0.57 * MAZE_WALL_SCALE);
 
 export interface GardenMazePlan {
   walls: MazePieceSpot[];

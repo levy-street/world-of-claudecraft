@@ -188,12 +188,14 @@ describe('banker chest model and placement', () => {
       // forecourt of the painted bank now, six yards off its front wall, so
       // the ground behind him is open and the chest takes the FIRST candidate,
       // behind and beside him (the kit town hall's facade stood directly
-      // behind him and pushed it to the front corner). Petra's rebuilt exterior
-      // teller still keeps the bank facade directly behind her, so her first
-      // fully clear spot is in front.
+      // behind him and pushed it to the front corner). Re-pinned again for the
+      // hand-built harbour lots: Petra and Aldous each stand at their bank's
+      // door, and the release shop's stall counter and barrels no longer crowd
+      // the wall beside it, so the sim finds the FIRST candidate clear for
+      // them too (measured: the spot bankerChestSpots resolves for each).
       bursar_fernando: [1.15, -1.6],
-      bursar_petra_vell: [2.0, 0.9],
-      bursar_aldous_crane: [2.0, 0.9],
+      bursar_petra_vell: [1.15, -1.6],
+      bursar_aldous_crane: [1.15, -1.6],
     };
     for (const [templateId, expected] of Object.entries(expectedOffsets)) {
       const entity = placedBuiltInBanker(templateId);

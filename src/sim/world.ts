@@ -1397,7 +1397,7 @@ export const MAZE_WALL_DEPTH = 4.2; // yd across a hedge piece (tracks the model
 // src/render. render/garden_maze_core.ts re-exports all three.
 export const MAZE_WALL_OVERLAP = 0.75; // yd each piece reaches into its neighbor
 export const MAZE_WALL_SCALE = (MAZE_CELL + 2 * MAZE_WALL_OVERLAP) / 0.98; // 10.5 x 6.1 x 4.1
-export const MAZE_WALL_HEIGHT = 0.57 * MAZE_WALL_SCALE; // 6.1yd, the hedges' visual top
+export const MAZE_WALL_HEIGHT = 0.57 * MAZE_WALL_SCALE * 0.45; // 2.75yd: the hedges' visual top, CLIPPED to 45% of the model (render/garden_maze_core.ts says why)
 
 /** Inside the maze footprint (small margin), where dressing must not spawn. */
 export function inGardenMaze(x: number, z: number): boolean {

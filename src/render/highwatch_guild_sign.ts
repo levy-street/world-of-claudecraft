@@ -1,28 +1,31 @@
-// Lantern Hall's name on its gateway (the gateway itself is part of the guild's model,
-// scripts/assets/highwatch_guild/guild_yard.py): the guild's localized name and the line
-// under it, painted once on a canvas and shown on both faces of the name board, so it reads
-// the right way round from the road and from the yard. The harbor route markers' recipe
-// (harbor_route_markers.ts): the back face is the same plane turned half a turn, never a
-// mirrored one, and a language switch (woc:languagechange) or the web font arriving repaints
-// the canvas in place: a texture upload, never a material or program change.
+// Lantern Hall's name over its doors: the guild's localized name and the line under it, painted
+// once on a canvas and shown on the face of the name board the hall wears between its doors'
+// arch and its jettied storey. The board itself is part of the guild's model (the
+// `G_SignBoard` object of scripts/assets/eastbrook_houses/lots.py guild), so the lettering
+// always sits on timber, never in the air. The harbor route markers' recipe
+// (harbor_route_markers.ts): a language switch (woc:languagechange) or the web font arriving
+// repaints the canvas in place: a texture upload, never a material or program change.
 //
-// GPU work and the camera fade: the two planes are added to the guild's own model, in its
-// frame, before the town kit converts its materials (highwatch_town.ts highwatchBuildingExtras,
-// the kit's `decorate` hook), so they take the building's material conversion, its fade twins,
-// its fog cull and its reveal compile with the rest of the guild. Nothing here runs per frame.
+// GPU work and the camera fade: the plane is added to the guild's own model, in its frame,
+// before the town kit converts its materials (highwatch_town.ts highwatchBuildingExtras, the
+// kit's `decorate` hook), so it takes the building's material conversion, its fade twins, its
+// fog cull and its reveal compile with the rest of the guild. Nothing here runs per frame.
 import * as THREE from 'three';
 import { guildSignLabels } from './entity_labels';
 
-/** The gateway's name board in the guild's model frame (yards over its ground line), the
- *  model's own `highwatchGuild.sign` extras, pinned equal by tests/highwatch_guild_asset. */
+/** The name board over the hall's doors, in the guild's model frame (yards over its ground
+ *  line; the doors look down model -z): the centre of the board's oak, and the size of the
+ *  lettering painted on it. tests/highwatch_guild_sign.test.ts pins it to the `G_SignBoard`
+ *  object of the shipped model, so a rebuilt hall can never leave the lettering behind. */
 export const HIGHWATCH_GUILD_SIGN = {
-  x: -8,
-  y: 4.05,
-  z: -24.3,
-  width: 5.6,
-  height: 1.18,
-  /** Each painted face's offset from the board's centre plane. */
-  face: 0.14,
+  x: 0,
+  y: 7.9,
+  z: -10.99,
+  width: 7,
+  height: 1.477,
+  /** The painted face's offset out from the board's centre plane (a real gap proud of the
+   *  oak, behind the gilded frame's lip). */
+  face: 0.13,
 } as const;
 
 const CANVAS_W = 1024;
@@ -139,27 +142,22 @@ function signMaterial(): THREE.MeshStandardMaterial {
   return material;
 }
 
-/** The two painted faces of the gateway's board, in the guild's model frame (yards over its
- *  ground line), for the town kit to add to the model. Empty without a document (a Node host
- *  builds the town without the lettering). */
+/** The painted face of the name board, in the guild's model frame (yards over its ground
+ *  line), for the town kit to add to the model. Empty without a document (a Node host builds
+ *  the town without the lettering). */
 export function buildHighwatchGuildSign(): THREE.Group {
   const s = HIGHWATCH_GUILD_SIGN;
   const group = new THREE.Group();
   group.name = 'highwatchGuildSign';
   if (typeof document === 'undefined') return group;
   group.position.set(s.x, s.y, s.z);
-  const mat = signMaterial();
-  // the road face looks down model -z (out of the yard), the yard face up +z
-  for (const [z, yaw] of [
-    [-s.face, Math.PI],
-    [s.face, 0],
-  ] as const) {
-    const face = new THREE.Mesh(signGeometry(), mat);
-    face.name = 'GuildSignText';
-    face.position.z = z;
-    face.rotation.y = yaw;
-    group.add(face);
-  }
+  // One face, looking down model -z with the doors: the board is fixed to the wall, so
+  // there is no far side to letter.
+  const face = new THREE.Mesh(signGeometry(), signMaterial());
+  face.name = 'GuildSignText';
+  face.position.z = -s.face;
+  face.rotation.y = Math.PI;
+  group.add(face);
   return group;
 }
 

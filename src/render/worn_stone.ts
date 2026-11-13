@@ -491,8 +491,11 @@ const STONE_KITS: Record<string, WornFamilyPick> = {
 /** Names that must NEVER take the layer: canopies and ground cover stay clean
  *  color cards, organic skin/face/hair belongs to the character art, and
  *  glass/window/glow/fx surfaces are transparent or self-lit. */
+// `eh_` is the hand-painted harbour set (scripts/assets/eastbrook_houses): its stone, timber
+// and planking are paintings that carry their own grain, and a generic layer over them
+// only muddies the brushwork.
 const SKIP_NAME =
-  /leaf|leaves|foliage|bush|grass|flower|plant|vine|moss|skin|face|body|hair|eye|glass|window|glow|flame|fire|lava|water|crystal|gem/i;
+  /^eh_|leaf|leaves|foliage|bush|grass|flower|plant|vine|moss|skin|face|body|hair|eye|glass|window|glow|flame|fire|lava|water|crystal|gem/i;
 const BARK_NAME = /bark|trunk/i;
 const FABRIC_NAME = /cloth|fabric|banner|flag|tent|sail|awning|carpet|rug|bag|leather|strap|rope/i;
 const METAL_NAME_ROUTE = /metal|iron|steel|gold|silver|anvil|chain|blade|bell/i;

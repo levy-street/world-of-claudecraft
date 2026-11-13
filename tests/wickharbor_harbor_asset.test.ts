@@ -28,19 +28,27 @@ import {
   WICKHARBOR_HARBOR_PROPS,
 } from '../src/sim/content/wickharbor_harbor';
 import { WYRMWATCH_RAIL_HEIGHT } from '../src/sim/content/wyrmwatch_harbor';
+import { expectPaintedMaps } from './helpers/painted_glb';
 
 // The shipped Wickharbor harbor GLB (public/models/props/wickharbor_harbor.glb), built in
 // Blender from the sim's own layout (scripts/assets/wickharbor_harbor/layout.json, exported from
 // src/sim/content/wickharbor_harbor.ts with the terrain under it) and shipped by build.mjs. Pins
 // the bytes, the source fingerprint, the layout's freshness against the sim and the terrain,
-// the named tier parts the runtime keeps or sheds, the five texture-free materials (the ferry
+// the named tier parts the runtime keeps or sheds, the five materials and their painted maps (the ferry
 // wharf's and the Wyrmwatch harbor's: one wood), the triangle budget, and the model's stamped
 // numbers against the sim. Re-pin the sha256 and size literals only with a re-export.
 
 const ROOT = path.join(__dirname, '..');
 const GLB = path.join(ROOT, WICKHARBOR_HARBOR_ASSET.target);
-const SHIPPED_SHA256 = '80c06317330739ca6daa9d0fa8d8af894e3ff1297e96d0b22c89838c55b98423';
-const SHIPPED_BYTES = 409384;
+// Re-pinned for the PAINTED model: its wood, fittings and stone now wear the Eastbrook ferry's
+// maps (scripts/assets/eastbrook_ferry/paintlib.py), so the file carries KTX2 images and a
+// texture coordinate on every painted vertex. The geometry is the same triangle for triangle
+// (the triangle pins below did not move). Measured off the shipped file.
+const SHIPPED_SHA256 = '867e9106b8b5fdde7bd3723356ea758cd268283ee7da989a7cd7dbe1b5d56182';
+const SHIPPED_BYTES = 743668;
+/** The painted model stays a small download, and no one map weighs more than this. */
+const MAX_BYTES = 851968;
+const MAX_MAP_BYTES = 72 * 1024;
 /** Triangles per named part, from the Blender build report. */
 const TRIANGLES: Record<string, number> = {
   HarborDecks: 5148,
@@ -103,6 +111,7 @@ describe('wickharbor harbor GLB', () => {
   it('ships the pinned bytes, in the media manifest', () => {
     const bytes = readFileSync(GLB);
     expect(bytes.length).toBe(SHIPPED_BYTES);
+    expect(bytes.length).toBeLessThan(MAX_BYTES);
     expect(createHash('sha256').update(bytes).digest('hex')).toBe(SHIPPED_SHA256);
     expect(bytes.toString('latin1')).toContain('EXT_meshopt_compression');
     expect(MEDIA_ASSETS['models/props/wickharbor_harbor.glb']).toMatch(
@@ -158,7 +167,7 @@ describe('wickharbor harbor GLB', () => {
     });
   });
 
-  it("is the ferry wharf's wood: the same five texture-free, vertex-coloured materials, and nothing animates", () => {
+  it("is the ferry wharf's wood: the same five vertex-coloured materials and painted maps, and nothing animates", () => {
     const materials = doc.getRoot().listMaterials();
     expect(materials.map((m) => m.getName()).sort()).toEqual(WICKHARBOR_HARBOR_ASSET.materials);
     expect(WICKHARBOR_HARBOR_ASSET.materials).toEqual(WICKHARBOR_WHARF_ASSET.materials);
@@ -167,7 +176,8 @@ describe('wickharbor harbor GLB', () => {
       expect(asset.inputs).toContain('scripts/assets/wyrmwatch_harbor/build_wyrmwatch_harbor.py');
       expect(asset.inputs).toContain('scripts/assets/eastbrook_ferry/shiplib.py');
     }
-    expect(doc.getRoot().listTextures()).toHaveLength(0);
+    // painted: the planking, the fittings and the stone it has, each a small KTX2 map
+    expectPaintedMaps(doc, WICKHARBOR_HARBOR_ASSET, MAX_MAP_BYTES);
     expect(doc.getRoot().listSkins()).toHaveLength(0);
     expect(doc.getRoot().listAnimations()).toHaveLength(0);
     for (const mesh of doc.getRoot().listMeshes()) {

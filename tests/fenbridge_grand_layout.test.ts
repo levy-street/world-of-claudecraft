@@ -156,10 +156,10 @@ describe('the grand Fenbridge buildings', () => {
     );
     // measured off the baked collision at authored size
     expect(doors).toEqual({
-      fenbridge_crooked_reed_inn: 4.4,
-      fenbridge_lantern_chapel: 5,
-      fenbridge_moonwort_apothecary: 3.25,
-      fenbridge_gilded_strongbox: 3.25,
+      fenbridge_crooked_reed_inn: 4.21,
+      fenbridge_lantern_chapel: 5.03,
+      fenbridge_moonwort_apothecary: 3.26,
+      fenbridge_gilded_strongbox: 3.26,
     });
     for (const building of BUILDINGS.filter((candidate) => candidate.walkIn)) {
       const door = authoredDoorHeight(building);
@@ -175,7 +175,7 @@ describe('the grand Fenbridge buildings', () => {
     }
   });
 
-  it('stands the sealed warden house a storey high as the Highwatch watch house', () => {
+  it('stands the sealed warden house at the size of the Highwatch watch house, a storey and more high', () => {
     const storeyOf = (building: { assetId: string; placement: { modelSize: number } }) => {
       const { boxes, decks } = authoredRows(building as Building);
       // the sealed shell: the widest box standing on the ground line, its top
@@ -183,8 +183,10 @@ describe('the grand Fenbridge buildings', () => {
       const shell = boxes
         .filter((box) => box.y0 < 0.1)
         .sort((a, b) => b.x1 - b.x0 - (a.x1 - a.x0))[0];
-      if (!shell || decks.length === 0) throw new Error(`no shell for ${building.assetId}`);
-      return shell.y1 - Math.max(...decks.map((deck) => deck.y1));
+      if (!shell) throw new Error(`no shell for ${building.assetId}`);
+      // a hand-built sealed lot stands on the ground line with no door step, so its
+      // storey is measured from there
+      return shell.y1 - Math.max(0, ...decks.map((deck) => deck.y1));
     };
     const warden = BUILDINGS.find((building) => building.id === 'fenbridge_warden_gatehouse');
     const watch = HIGHWATCH_LAYOUT.buildings.find(
@@ -192,13 +194,15 @@ describe('the grand Fenbridge buildings', () => {
     );
     if (!warden || !watch) throw new Error('missing a sealed house');
     expect(warden.walkIn).toBe(false);
-    expect(storeyOf(warden)).toBeCloseTo(3.95, 1);
+    // the sealed lot's wall top over the ground line, measured off its baked rows
+    expect(storeyOf(warden)).toBeCloseTo(7.7, 1);
     expect(warden.placement.scale).toBe(watch.placement.scale);
     expect(storeyOf(warden) * warden.placement.scale).toBeGreaterThan(5.4);
-    expect(storeyOf(warden) * warden.placement.scale).toBeCloseTo(
-      storeyOf(watch) * watch.placement.scale,
-      0,
-    );
+    // The two sealed houses were one model once, so they stood exactly as tall. They are
+    // two different hand-built lots now (a cottage here, a tall town house in Highwatch):
+    // what still holds is that both stand at the one size and neither is squat.
+    expect(storeyOf(watch) * watch.placement.scale).toBeGreaterThan(5.4);
+    expect(storeyOf(watch)).toBeGreaterThan(storeyOf(warden));
   });
 
   it('keeps every building clear of every other one, a lane between their walls', () => {

@@ -7,7 +7,7 @@ import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 import { buildCaravanDriver } from './world_quest_caravan_driver';
 
 const FREIGHT_ASSET_URLS = Object.freeze({
-  wagon: '/models/biome/city_wagon.glb',
+  wagon: '/models/quest/freight_wagon.glb',
   horse: '/models/mounts/valorsteed.glb',
   crate: '/models/quest/supply_crate.glb',
 });

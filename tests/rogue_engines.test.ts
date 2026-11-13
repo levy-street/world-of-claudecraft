@@ -371,8 +371,12 @@ describe('Skulduggery: the Gloam bank and its detonation', () => {
     // see the pin comment above). Re-hunted for the Mirefen hut wall wander
     // fix (an idle pick inside a mudfin hut wall is skipped for one more
     // pause, mob/locomotion.ts), which forks the shared stream: now three
-    // ticks (one and two no longer land a plain hit).
-    for (let i = 0; i < 3; i++) sim.tick();
+    // ticks (one and two no longer land a plain hit). Re-hunted for the
+    // hand-built town lots and props (building annexes, prop colliders and
+    // the ground cleared round the placed houses are world-gen inputs,
+    // scripts/assets/eastbrook_houses/), which forks it again: now two ticks
+    // (one, three and four do not land a plain hit).
+    for (let i = 0; i < 2; i++) sim.tick();
 
     // The detonation: one press, in the open, face to face. The veil rises
     // BEFORE the strike resolves, so this very hit is the empowered (+50%,

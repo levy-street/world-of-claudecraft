@@ -72,7 +72,7 @@ const INN_SCALE = 1.2;
 const CHAPEL_SCALE = 1;
 const APOTHECARY_SCALE = 1.5;
 const BANK_SCALE = 1.5;
-const PAINTED_SET = '/models/tidehold/fenrire';
+const PAINTED_SET = '/models/tidehold/harbour_moss';
 const TOWN_GROUND_HEIGHT = 1.2;
 const PROVISION_STALL_WIDTH = 3.2;
 const PROVISION_STALL_DEPTH = 1.6;
@@ -186,9 +186,10 @@ function makeHouseACottage(id: string, anchor: Point2, rotation: number): Placed
       rotation,
       ...scalePlacedTownMeasurements(
         {
-          reach: { x: 0.2145, z: 0, width: 11.763, height: 12.23, depth: 9.8 },
+          reach: { x: 0.2145, z: 0, width: 11.763, height: 16.41, depth: 9.8 },
           walls: { x: 0, z: 0, width: 9.36, depth: 7.96 },
           doorX: -1.4,
+          modelSize: 16.41,
         },
         WARDEN_HOUSE_SCALE,
       ),
@@ -270,13 +271,14 @@ export function resolveFenbridgeLayout(touchup?: FenbridgeTouchup): ResolvedFenb
       rotation: innSpec.rotation,
       ...scalePlacedTownMeasurements(
         {
-          reach: { x: 0.272, z: -0.05, width: 22.648, height: 18.78, depth: 16.8 },
+          reach: { x: 0.272, z: -0.05, width: 22.648, height: 21.56, depth: 16.8 },
           walls: { x: 0, z: 0, width: 20, depth: 13 },
           annexes: [
-            { name: 'front_bench', x: -5.1, z: -7.25, width: 5.4, depth: 0.9 },
-            { name: 'barrels', x: 10.9, z: -4.9, width: 1.1, depth: 2.3 },
+            { name: 'front_bench', x: -5.1, z: -7.25, width: 5.2, depth: 0.5 },
+            { name: 'barrels', x: 10.9, z: -4.9, width: 1.0, depth: 2.4 },
           ],
           doorX: 0,
+          modelSize: 27.6003,
         },
         INN_SCALE,
       ),
@@ -295,13 +297,14 @@ export function resolveFenbridgeLayout(touchup?: FenbridgeTouchup): ResolvedFenb
       rotation: chapelSpec.rotation,
       ...scalePlacedTownMeasurements(
         {
-          reach: { x: 1.9255, z: -0.254, width: 18.851, height: 30.5, depth: 24.212 },
+          reach: { x: 1.9255, z: -0.254, width: 18.851, height: 29.542, depth: 24.212 },
           walls: { x: 0, z: 0, width: 12, depth: 22 },
           annexes: [
             { name: 'bell_tower', x: 8.25, z: -9, width: 5.4, depth: 5.4 },
             { name: 'notice_board', x: -4.2, z: -11.8, width: 1.8, depth: 0.6 },
           ],
           doorX: 0,
+          modelSize: 30.2535,
         },
         CHAPEL_SCALE,
       ),
@@ -323,10 +326,11 @@ export function resolveFenbridgeLayout(touchup?: FenbridgeTouchup): ResolvedFenb
       rotation: apothecarySpec.rotation,
       ...scalePlacedTownMeasurements(
         {
-          reach: { x: 0.4745, z: -0.849, width: 13.649, height: 18.7, depth: 12.702 },
+          reach: { x: 0.4745, z: -0.849, width: 13.649, height: 20.31, depth: 12.702 },
           walls: { x: 0, z: 0, width: 9.4, depth: 9 },
           annexes: [{ name: 'turret', x: 5.19, z: -4.99, width: 2.66, depth: 2.66 }],
           doorX: -0.7,
+          modelSize: 20.31,
         },
         APOTHECARY_SCALE,
       ),
@@ -345,13 +349,14 @@ export function resolveFenbridgeLayout(touchup?: FenbridgeTouchup): ResolvedFenb
       rotation: bankSpec.rotation,
       ...scalePlacedTownMeasurements(
         {
-          reach: { x: 0, z: -0.8, width: 13.004, height: 16.28, depth: 12.2 },
+          reach: { x: 0, z: -0.8, width: 13.004, height: 20.21, depth: 12.2 },
           walls: { x: 0, z: 0, width: 11, depth: 8.4 },
           annexes: [
             { name: 'stall_counter', x: 2.375, z: -5.925, width: 3.61, depth: 0.77 },
-            { name: 'stall_barrels', x: 4.885, z: -5.762, width: 1.477, depth: 2.169 },
+            { name: 'stall_barrels', x: 4.9, z: -5.775, width: 1.4, depth: 2.15 },
           ],
           doorX: -1.6,
+          modelSize: 20.21,
         },
         BANK_SCALE,
       ),

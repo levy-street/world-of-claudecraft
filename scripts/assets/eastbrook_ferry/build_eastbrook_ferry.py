@@ -27,8 +27,12 @@ to Blender). Hierarchy (the runtime depends on these names):
     Sockets                             gangway, wake, splash and helm attachment points
     AnimationControllers                documents the idle clip (extras)
 
-Everything is original procedural work for this project: the hull, the sea-serpent
-figurehead, the Eastbrook compass emblem, no third-party mesh, texture or reference.
+The geometry is original procedural work for this project. Its three painted maps
+(tex/, written by paint_ferry.py) are cut from the project's own Eastbrook town paintings
+(scripts/assets/eastbrook_houses/paint): the planking from the painted hull, the canvas
+from the painted plaster, the gilded bands and the figurehead from the trim and parts
+sheets. paintlib.py (the painted layer over the shared shiplib.py) lays them on the pieces;
+the vertex colours below tint them.
 """
 import json
 import math
@@ -41,9 +45,9 @@ sys.path.insert(0, HERE)
 
 import bpy  # noqa: E402
 from mathutils import Matrix, Vector  # noqa: E402
+from paintlib import AUTO, PARTS, UPRIGHT, WHITE, Piece, make_materials, uv_part  # noqa: E402
 from shiplib import (  # noqa: E402
-    CLOTH, FLAT, GLOW, IRON, ROPE, WOOD, P, Piece, empty, lerp, make_materials, mix,
-    scale_color, smooth, triangles,
+    CLOTH, FLAT, GLOW, IRON, ROPE, WOOD, P, empty, lerp, mix, scale_color, smooth, triangles,
 )
 
 # ---------------------------------------------------------------------------
@@ -95,40 +99,59 @@ def inner(z):
 # frost) swap this table; the geometry stays.
 # ---------------------------------------------------------------------------
 PAL = dict(
-    hull=[(0.66, 0.45, 0.29), (0.62, 0.42, 0.27), (0.69, 0.47, 0.3), (0.64, 0.435, 0.28),
-          (0.6, 0.405, 0.26)],
-    bottom=(0.44, 0.37, 0.27),
-    wale=(0.42, 0.28, 0.18),
-    deck=[(0.7, 0.55, 0.39), (0.65, 0.51, 0.36), (0.74, 0.58, 0.41), (0.68, 0.53, 0.37),
-          (0.62, 0.49, 0.35)],
+    # The harbour colourway: the town's own colours (scripts/assets/eastbrook_houses), so the
+    # ferry belongs to the quay it sails from. Oxblood strakes like the house timber, dark
+    # tarred wales, the shutters' teal on the sheer band, cream castle panels like the
+    # plaster, gilded mouldings and figurehead, navy and gold for the flags and the emblem.
+    # (the strakes are lighter than a tarred hull would be so the painted plank lines and
+    # brushwork read from the quay, in sun or in the ship's own shade)
+    hull=[(0.75, 0.27, 0.16), (0.71, 0.245, 0.15), (0.79, 0.295, 0.17), (0.73, 0.26, 0.155),
+          (0.68, 0.23, 0.14)],
+    bottom=(0.2, 0.17, 0.15),
+    wale=(0.33, 0.16, 0.1),
+    deck=[(0.7, 0.55, 0.39), (0.67, 0.525, 0.37), (0.73, 0.575, 0.405), (0.69, 0.54, 0.38),
+          (0.66, 0.515, 0.365)],
     seam=(0.42, 0.3, 0.2),
-    deck_edge=(0.56, 0.4, 0.27),
-    trim=(0.76, 0.53, 0.34),
-    trim_dark=(0.54, 0.37, 0.24),
-    castle=[(0.7, 0.55, 0.41), (0.66, 0.52, 0.39), (0.73, 0.58, 0.43)],
-    beam=(0.42, 0.28, 0.18),
+    deck_edge=(0.5, 0.33, 0.2),
+    trim=(0.84, 0.66, 0.3),
+    trim_dark=(0.6, 0.43, 0.18),
+    spar=(0.66, 0.46, 0.29),
+    spar_dark=(0.46, 0.31, 0.2),
+    castle=[(0.95, 0.86, 0.68), (0.92, 0.83, 0.65), (0.97, 0.885, 0.71)],
+    beam=(0.26, 0.14, 0.09),
     iron=(0.36, 0.36, 0.38),
     iron_hi=(0.52, 0.52, 0.54),
-    sail=(0.95, 0.92, 0.82),
-    sail_panel=(0.95, 0.92, 0.82),
-    sail_edge=(0.87, 0.82, 0.7),
-    sail_patch=(0.91, 0.87, 0.75),
-    sail_band=(0.95, 0.92, 0.82),
-    accent=(0.2, 0.36, 0.7),
-    accent_hi=(0.23, 0.4, 0.74),
+    sail=(0.96, 0.93, 0.83),
+    sail_panel=(0.93, 0.89, 0.78),
+    sail_edge=(0.86, 0.8, 0.66),
+    sail_patch=(0.9, 0.86, 0.74),
+    sail_band=(0.6, 0.16, 0.12),
+    accent=(0.07, 0.38, 0.4),
+    accent_hi=(0.1, 0.46, 0.47),
     cream=(0.95, 0.9, 0.76),
-    ivory=(0.93, 0.88, 0.75),
-    ivory_dark=(0.82, 0.75, 0.61),
+    ivory=(0.9, 0.7, 0.27),
+    ivory_dark=(0.62, 0.44, 0.15),
     rope=(0.72, 0.6, 0.43),
     rope_dark=(0.56, 0.46, 0.32),
     glow=(1.0, 0.78, 0.46),
     dark=(0.12, 0.09, 0.07),
+    navy=(0.09, 0.13, 0.36),
+    navy_hi=(0.13, 0.18, 0.44),
+    gold=(0.94, 0.74, 0.27),
 )
+
+
+def gilded(t0=0.0, t1=1.0, depth=0.48, band='gilded'):
+    """A course of the hull or a castle laid with one of the painted fittings bands (the
+    gilded scrollwork unless told otherwise): untinted, on the fittings material."""
+    return (WHITE, IRON, ('band', band, t0, t1, depth))
 
 
 def plank(i, j=0, pal='hull'):
     tones = PAL[pal]
-    return tones[(i * 3 + (j // 3) * 7 + (i * j) % 3) % len(tones)]
+    # a strake keeps its tone for three stations, then a butt joint: the painted planking
+    # carries the finer variation now
+    return tones[(i * 3 + ((j + i) // 3) * 7) % len(tones)]
 
 
 def accent(j=0):
@@ -230,9 +253,10 @@ def hull_color(y, i_row, j):
     if y < 0.2:
         return mix(PAL['bottom'], plank(i_row, j), 0.3)
     if 3.66 <= y < 4.14:
-        return accent(j)
+        # the sheer band: gilded scrollwork the whole length of the ship, under the rail
+        return gilded()
     if 3.42 <= y < 3.66 or 4.14 <= y < 4.34:
-        return PAL['castle'][(i_row + j // 2) % 3]
+        return accent(j)
     if 3.3 <= y < 3.42 or y >= 4.34:
         return PAL['trim']
     if 1.72 <= y < 2.02 or 2.9 <= y < 3.3:
@@ -327,6 +351,9 @@ def build_castles(p, fine=True):
             rows.append(row)
 
         def color(i, j):
+            if i in (2, 3) and fine:
+                # the gilded scrollwork at the quarterdeck line, in two courses of the mesh
+                return gilded(0.0, 0.5, 0.5) if i == 2 else gilded(0.5, 1.0, 0.5)
             if i in (0, 2, 3, 7):
                 return PAL['trim']
             if i == 5:
@@ -476,6 +503,12 @@ def build_transom(p, fine=True):
         y = ylist[i]
         if y < 0.2:
             return PAL['bottom']
+        if fine and 3.66 <= y < 4.14:
+            return gilded()  # the sheer band carried round the stern
+        if fine and 5.95 <= y < 6.45:
+            return gilded(depth=0.5)  # and the quarterdeck band, over the cabin windows
+        if fine and 6.78 <= y < 7.06:
+            return gilded(depth=0.28, band='bargeboard')  # red and gold under the crown
         if 3.66 <= y < 4.14 or 6.78 <= y < 7.06:
             return accent(j)
         if 3.3 <= y < 3.42 or 5.95 <= y < 6.45 or y >= 7.3 or 4.34 <= y < 4.6:
@@ -497,7 +530,8 @@ def build_transom(p, fine=True):
         if fine:
             p.box((x, 4.95, zf - 0.11), (0.07, h, 0.05), PAL['trim_dark'], WOOD)
             p.box((x, 4.95 + h * 0.12, zf - 0.11), (w, 0.07, 0.05), PAL['trim_dark'], WOOD)
-        p.box((x, 4.95 + h / 2 + 0.2, zf - 0.08), (w + 0.42, 0.14, 0.26), PAL['trim_dark'], WOOD,
+            leaded_lights(p, x, 4.95, zf - 0.125, w, h)
+        p.box((x, 4.95 + h / 2 + 0.2, zf - 0.08), (w + 0.42, 0.14, 0.26), PAL['trim'], WOOD,
               bevel=0.03 if fine else 0)
     # a gallery rail under the windows
     p.box((0, 4.1, station_z(z, 4.1) - 0.18), (2 * half_breadth(z, 4.1) - 0.3, 0.16, 0.36), PAL['trim'], WOOD,
@@ -510,9 +544,38 @@ def build_transom(p, fine=True):
             p.box((0, y, STERN_Z - 0.32), (0.46, 0.16, 0.95), PAL['iron'], IRON)
 
 
+def leaded_lights(p, cx, cy, z, w, h, pitch=0.3, lead=0.032):
+    """The diamond leading of a lit cabin window: thin dark cames across the glowing pane,
+    facing aft, each run clipped to the pane."""
+    x0, x1, y0, y1 = cx - w / 2, cx + w / 2, cy - h / 2, cy + h / 2
+    for slope in (1.0, -1.0):
+        c = -(w + h)
+        while c < w + h:
+            # the line y - cy = slope * (x - cx) + c, clipped to the pane
+            ends = []
+            for x in (x0, x1):
+                y = cy + slope * (x - cx) + c
+                if y0 <= y <= y1:
+                    ends.append((x, y))
+            for y in (y0, y1):
+                x = cx + (y - cy - c) / slope
+                if x0 < x < x1:
+                    ends.append((x, y))
+            if len(ends) >= 2:
+                (xa, ya), (xb, yb) = min(ends), max(ends)
+                if math.hypot(xb - xa, yb - ya) > 0.12:
+                    d = lead / 2 * math.sqrt(2)
+                    quad = [(xa, ya - d, z), (xa, ya + d, z), (xb, yb + d, z), (xb, yb - d, z)]
+                    f = p.face(quad, PAL['dark'], WOOD, FLAT)
+                    f.normal_update()
+                    if f.normal.dot(P(0, 0, -1)) < 0:
+                        f.normal_flip()
+            c += pitch
+
+
 def emblem(p, center, radius, normal=(0, 0, -1), fine=True, up=(0, 1, 0)):
-    """The Eastbrook compass: a cobalt roundel ringed in cream, a cream eight-point
-    star, a cobalt heart. Thin plates standing off `normal`."""
+    """The Eastbrook compass: a navy roundel ringed in gold, a gold eight-point star, a
+    navy heart. Thin plates standing off `normal`."""
     c = Vector(center)
     n = Vector(normal).normalized()
     u = Vector(up).cross(n).normalized()
@@ -526,8 +589,8 @@ def emblem(p, center, radius, normal=(0, 0, -1), fine=True, up=(0, 1, 0)):
         a0 = math.tau * k / seg
         a1 = math.tau * (k + 1) / seg
         p.face([pt(radius * 0.86, a0, 0.02), pt(radius, a0, 0.02), pt(radius, a1, 0.02),
-                pt(radius * 0.86, a1, 0.02)], PAL['cream'], WOOD, FLAT)
-        p.face([pt(0, 0, 0.03), pt(radius * 0.86, a0, 0.03), pt(radius * 0.86, a1, 0.03)], PAL['accent'], WOOD,
+                pt(radius * 0.86, a1, 0.02)], PAL['gold'], WOOD, FLAT)
+        p.face([pt(0, 0, 0.03), pt(radius * 0.86, a0, 0.03), pt(radius * 0.86, a1, 0.03)], PAL['navy'], WOOD,
                FLAT)
     star = []
     for k in range(16):
@@ -537,11 +600,11 @@ def emblem(p, center, radius, normal=(0, 0, -1), fine=True, up=(0, 1, 0)):
     for k in range(16):
         r0, a0 = star[k]
         r1, a1 = star[(k + 1) % 16]
-        p.face([pt(0, 0, 0.045), pt(r0, a0, 0.045), pt(r1, a1, 0.045)], PAL['cream'], WOOD, FLAT)
+        p.face([pt(0, 0, 0.045), pt(r0, a0, 0.045), pt(r1, a1, 0.045)], PAL['gold'], WOOD, FLAT)
     for k in range(8):
         a0 = math.tau * k / 8
         a1 = math.tau * (k + 1) / 8
-        p.face([pt(0, 0, 0.06), pt(radius * 0.13, a0, 0.06), pt(radius * 0.13, a1, 0.06)], PAL['accent'], WOOD,
+        p.face([pt(0, 0, 0.06), pt(radius * 0.13, a0, 0.06), pt(radius * 0.13, a1, 0.06)], PAL['navy'], WOOD,
                FLAT)
 
 
@@ -549,7 +612,7 @@ def emblem(p, center, radius, normal=(0, 0, -1), fine=True, up=(0, 1, 0)):
 # Decks, stairs, cabin front, railings
 # ---------------------------------------------------------------------------
 
-def deck_grid(p, z0, z1, y, planks, dz, width_fn=inner, z_edges=None, seam=0.022):
+def deck_grid(p, z0, z1, y, planks, dz, width_fn=inner, z_edges=None, seam=0.022, boards=False):
     zs = []
     z = z0
     while z < z1 - 1e-6:
@@ -571,10 +634,13 @@ def deck_grid(p, z0, z1, y, planks, dz, width_fn=inner, z_edges=None, seam=0.022
             return PAL['seam']
         c = j // 2
         if c == 0 or c == planks - 1:
-            return PAL['deck_edge']
-        # butt joints: each plank changes tone every few yards, staggered by column
-        seg = (i + c * 2) // 3
-        return plank(c, seg * 5 + c, 'deck')
+            tone = PAL['deck_edge']
+        else:
+            # butt joints: each plank changes tone every few yards, staggered by column
+            seg = (i + c * 2) // 3
+            tone = plank(c, seg * 5 + c, 'deck')
+        # each modelled board wears one painted board, ink line to ink line
+        return (tone, WOOD, ('course', c * 3 + 1, 3.4)) if boards else tone
 
     return p.surface(rows, color, WOOD, outward=lambda c: (0, 1, 0), soft=False)
 
@@ -583,11 +649,12 @@ def build_decks(fine=True):
     p = Piece('Deck', wear=0.06, gradient=0.0)
     planks = 18 if fine else 6
     dz = 1.0 if fine else 4.0
-    seam = 0.022 if fine else 0.0
-    deck_grid(p, QD_FRONT, FC_BACK, DECK, planks, dz, z_edges=list(GANGWAY), seam=seam)
-    deck_grid(p, STERN_Z + 0.28, QD_FRONT, CAPTAIN, planks, dz, seam=seam)
+    # the seams between boards are painted now (the ink lines of the planking), not modelled
+    seam = 0.0
+    deck_grid(p, QD_FRONT, FC_BACK, DECK, planks, dz, z_edges=list(GANGWAY), seam=seam, boards=fine)
+    deck_grid(p, STERN_Z + 0.28, QD_FRONT, CAPTAIN, planks, dz, seam=seam, boards=fine)
     deck_grid(p, FC_BACK, 14.9, FORECASTLE, max(4, planks - 4), dz,
-              width_fn=lambda z: max(0.1, inner(z) - (0.12 if z > 13 else 0)), seam=seam)
+              width_fn=lambda z: max(0.1, inner(z) - (0.12 if z > 13 else 0)), seam=seam, boards=fine)
     # the raised decks' leading edges: a trim fascia with a molding
     for z, y1 in ((QD_FRONT, CAPTAIN), (FC_BACK, FORECASTLE)):
         w = inner(z)
@@ -619,7 +686,9 @@ def build_cabin_front(p, fine=True):
         p.box((x, (DECK + CAPTAIN) / 2, z + 0.08), (0.3, CAPTAIN - DECK, 0.2), PAL['trim'], WOOD,
               bevel=0.04 if fine else 0)
     # door: 3 yd tall, 1.5 wide, iron strapped, under a carved hood
+    p.grain = UPRIGHT  # a door's boards stand on end
     p.box((0, DECK + 1.45, z + 0.06), (1.5, 2.9, 0.12), PAL['beam'], WOOD, bevel=0.03 if fine else 0)
+    p.grain = AUTO
     if fine:
         for k in range(4):
             p.box((-0.56 + k * 0.375, DECK + 1.45, z + 0.125), (0.04, 2.8, 0.02), PAL['dark'], WOOD)
@@ -635,12 +704,19 @@ def build_cabin_front(p, fine=True):
     lantern(p, (0, DECK + 3.55, z + 0.35), 0.3, fine=fine)
 
 
-def lantern(p, center, s, fine=True):
+def lantern(p, center, s, fine=True, gilt=False):
+    """A lantern: an iron cage round a lit pane. `gilt` makes it a great stern lantern, its
+    cage and crown gilded, a finial on top."""
     x, y, z = center
-    p.box((x, y, z), (s * 1.1, s * 1.35, s * 1.1), PAL['iron'], IRON, bevel=0.02 if fine else 0)
+    frame, mat = (PAL['gold'], WOOD) if gilt else (PAL['iron'], IRON)
+    p.box((x, y, z), (s * 1.1, s * 1.35, s * 1.1), frame, mat, bevel=0.02 if fine else 0)
     p.box((x, y, z), (s * 0.8, s * 1.1, s * 1.18), PAL['glow'], GLOW)
     p.box((x, y, z), (s * 1.18, s * 1.1, s * 0.8), PAL['glow'], GLOW)
-    p.box((x, y + s * 0.82, z), (s * 0.75, s * 0.32, s * 0.75), PAL['iron'], IRON, taper=0.4)
+    p.box((x, y + s * 0.82, z), (s * 0.75, s * 0.32, s * 0.75), frame, mat, taper=0.4)
+    if gilt:
+        p.box((x, y - s * 0.8, z), (s * 0.8, s * 0.24, s * 0.8), frame, mat, taper=1.5)
+        if fine:
+            p.box((x, y + s * 1.12, z), (s * 0.22, s * 0.34, s * 0.22), frame, mat, taper=0.3)
 
 
 def build_stairs(fine=True):
@@ -756,8 +832,8 @@ def build_mast(name, fine=True):
     d = MAST_PARTS[name]
     p = Piece(name, wear=0.05, gradient=0.08)
     sides = 10 if fine else 6
-    p.cylinder((0, d['foot'] - 0.2, z), (0, d['head'], z), r, PAL['trim'], WOOD, sides=sides, r1=r * 0.78)
-    p.cylinder((0, d['foot'] - 0.05, z), (0, d['foot'] + 0.32, z), r + 0.14, PAL['trim_dark'], WOOD, sides=sides)
+    p.cylinder((0, d['foot'] - 0.2, z), (0, d['head'], z), r, PAL['spar'], WOOD, sides=sides, r1=r * 0.78)
+    p.cylinder((0, d['foot'] - 0.05, z), (0, d['foot'] + 0.32, z), r + 0.14, PAL['spar_dark'], WOOD, sides=sides)
     if fine:
         y = d['foot'] + 1.4
         while y < d['head'] - 0.8:
@@ -765,18 +841,18 @@ def build_mast(name, fine=True):
             p.cylinder((0, y, z), (0, y + 0.22, z), rr + 0.05, PAL['iron'], IRON, sides=sides)
             y += 2.1
     ty = d['top']
-    p.box((0, ty, z - 0.15), (2.5, 0.22, 2.0), PAL['trim'], WOOD, bevel=0.05 if fine else 0,
-          edge_color=scale_color(PAL['trim'], 1.2))
+    p.box((0, ty, z - 0.15), (2.5, 0.22, 2.0), PAL['spar'], WOOD, bevel=0.05 if fine else 0,
+          edge_color=scale_color(PAL['spar'], 1.2))
     if fine:
         p.box((0, ty - 0.26, z - 0.15), (2.1, 0.3, 0.3), PAL['beam'], WOOD)
         p.box((0, ty - 0.26, z - 0.15), (0.3, 0.3, 1.7), PAL['beam'], WOOD)
         for x in (-1.1, 1.1):
-            p.box((x, ty + 0.42, z - 0.15), (0.12, 0.62, 1.9), PAL['trim_dark'], WOOD)
-        p.box((0, ty + 0.42, z - 1.1), (2.3, 0.62, 0.12), PAL['trim_dark'], WOOD)
+            p.box((x, ty + 0.42, z - 0.15), (0.12, 0.62, 1.9), PAL['spar_dark'], WOOD)
+        p.box((0, ty + 0.42, z - 1.1), (2.3, 0.62, 0.12), PAL['spar_dark'], WOOD)
     p.box((0, d['head'], z), (0.84, 0.38, 1.15), PAL['beam'], WOOD, bevel=0.04 if fine else 0)
-    p.cylinder((0, d['head'] - 2.2, z - 0.05), (0, d['topmast'], z - 0.05), r * 0.6, PAL['trim'], WOOD,
+    p.cylinder((0, d['head'] - 2.2, z - 0.05), (0, d['topmast'], z - 0.05), r * 0.6, PAL['spar'], WOOD,
                sides=8 if fine else 5, r1=r * 0.42)
-    p.cylinder((0, d['topmast'], z - 0.05), (0, pole, z - 0.05), r * 0.36, PAL['trim'], WOOD,
+    p.cylinder((0, d['topmast'], z - 0.05), (0, pole, z - 0.05), r * 0.36, PAL['spar'], WOOD,
                sides=6 if fine else 4, r1=r * 0.22)
     p.box((0, pole + 0.12, z - 0.05), (0.3, 0.24, 0.3), PAL['iron'], IRON)
     m = p.mark()
@@ -786,7 +862,7 @@ def build_mast(name, fine=True):
         yy, half = yard
         pts = [(-half, yy, z + 0.35), (-half * 0.5, yy, z + 0.35), (0, yy, z + 0.35), (half * 0.5, yy, z + 0.35),
                (half, yy, z + 0.35)]
-        p.sweep(pts, 0, 0, PAL['trim'], sides=8 if fine else 5, radii=[0.1, 0.2, 0.25, 0.2, 0.1])
+        p.sweep(pts, 0, 0, PAL['spar'], sides=8 if fine else 5, radii=[0.1, 0.2, 0.25, 0.2, 0.1])
         if fine:
             for x in (-half * 0.62, half * 0.62):
                 p.cylinder((x - 0.1, yy, z + 0.35), (x + 0.1, yy, z + 0.35), 0.21, PAL['iron'], IRON, sides=8)
@@ -915,7 +991,7 @@ BOWSPRIT_TIP = (0, 9.1, 23.4)
 
 
 def build_bowsprit(p, fine=True):
-    p.sweep([BOWSPRIT_HEEL, BOWSPRIT_TIP], 0.38, 0.2, PAL['trim'], sides=8 if fine else 5)
+    p.sweep([BOWSPRIT_HEEL, BOWSPRIT_TIP], 0.38, 0.2, PAL['spar'], sides=8 if fine else 5)
     p.box((0, FORECASTLE + 0.6, 13.1), (1.3, 1.2, 0.46), PAL['beam'], WOOD, bevel=0.05 if fine else 0)
     if fine:
         for t in (0.45, 0.72, 0.96):
@@ -1059,118 +1135,61 @@ def build_bow(fine=True):
     return p
 
 
-def _head_frame():
-    f = Vector((0.0, -0.2, 1.0)).normalized()
-    r = Vector((1.0, 0.0, 0.0))
-    u = f.cross(r).normalized()
-    if u.y < 0:
-        u = -u
-    return f, u, r
-
-
-def _ring(center, f, u, r, w, h, n=10, flat_bottom=0.75, flat_top=0.92, bulge=0.0):
-    pts = []
-    for k in range(n):
-        a = (k + 0.5) / n * math.tau
-        ca, sa = math.cos(a), math.sin(a)
-        hh = h * (flat_top if sa > 0 else flat_bottom)
-        ww = w * (1 + bulge * max(0.0, -sa * 0.5 + 0.3))
-        pts.append(tuple(center + r * ca * ww + u * sa * hh))
-    return pts
+FIGUREHEAD_HEIGHT = 3.3  # yards, the painted carving top to bottom
+FIGUREHEAD_FOOT = (3.25, 16.75)  # y, z of the painting's lower aft corner, on the stem
+FIGUREHEAD_LEAN = math.radians(10)  # how far she leans out over the water
+FIGUREHEAD_THICK = 0.26
 
 
 def build_figurehead(fine=True):
-    """An original sea serpent rising off the stem under the bowsprit: an ivory
-    body, a cobalt dorsal fin and cheek frills, lantern-amber eyes, an open jaw."""
-    p = Piece('Figurehead', wear=0.035, gradient=0.14)
-    sides = 10 if fine else 6
-    neck = [(0, 2.55, 16.25), (0, 2.95, 17.05), (0, 3.7, 17.75), (0, 4.6, 18.15), (0, 5.3, 18.2),
-            (0, 5.7, 18.05)]
-    radii = [0.58, 0.6, 0.56, 0.5, 0.46, 0.44]
-    p.sweep(neck, 0, 0, PAL['ivory'], sides=sides, radii=radii, up=(1, 0, 0), phase=math.pi / sides,
-            color_fn=lambda i, k: PAL['ivory'] if i % 2 == 0 else PAL['ivory_dark'])
-    f, u, r = _head_frame()
-    O = Vector((0.0, 5.72, 17.85))
-    sections = [(-0.12, 0.46, 0.46, 0.0), (0.28, 0.58, 0.52, 0.05), (0.68, 0.54, 0.45, 0.04),
-                (1.08, 0.4, 0.33, -0.02), (1.42, 0.34, 0.28, -0.05), (1.7, 0.27, 0.23, -0.07),
-                (1.9, 0.15, 0.14, -0.09)]
-    if not fine:
-        sections = [sections[0], sections[2], sections[4], sections[6]]
-    rings = [_ring(O + f * d + u * yo, f, u, r, w, h, n=sides, bulge=0.25) for d, w, h, yo in sections]
-    p.loft(rings, lambda i, k: PAL['ivory'] if i != 1 else PAL['ivory_dark'], WOOD)
-    # the lower jaw, open a little
-    fj = (f * math.cos(0.36) - u * math.sin(0.36)).normalized()
-    uj = fj.cross(r).normalized()
-    if uj.y < 0:
-        uj = -uj
-    J = O + u * (-0.36) + f * 0.2
-    jaw = [(0.0, 0.38, 0.15), (0.55, 0.32, 0.14), (1.1, 0.23, 0.11), (1.45, 0.13, 0.08)]
-    if not fine:
-        jaw = [jaw[0], jaw[2], jaw[3]]
-    p.loft([_ring(J + fj * d, fj, uj, r, w, h, n=8, flat_bottom=1.0, flat_top=0.6) for d, w, h in jaw],
-           lambda i, k: PAL['ivory_dark'], WOOD)
-    # the mouth's dark inside
-    p.box(tuple(O + f * 0.75 + u * (-0.3)), (0.5, 0.28, 1.0), PAL['dark'], WOOD, pitch=0.2)
-    if fine:
-        # fangs: down from the upper jaw, up from the lower
-        for side in (1, -1):
-            for d, lng in ((0.95, 0.3), (1.28, 0.24), (1.58, 0.18)):
-                base = O + f * d + r * (side * 0.28) + u * (-0.24)
-                p.prism(tuple(base), 4, 0.06, 0.005, lng, PAL['cream'], WOOD, axis=tuple(-u))
-            base = J + fj * 1.25 + r * (side * 0.17) + uj * 0.08
-            p.prism(tuple(base), 4, 0.05, 0.005, 0.2, PAL['cream'], WOOD, axis=tuple(uj))
+    """The gilded lady of the Eastbrook paintings, carved in relief on the ship's centre
+    line under the bowsprit: her hair streaming aft, the scrolled bracket she rises from
+    bedded on the stem. A slab cut to the traced outline of the painting, which it wears
+    on both cheeks, with a gilt edge."""
+    p = Piece('Figurehead', wear=0.0, gradient=0.0)
+    part = PARTS['figurehead']
+    loop = [tuple(q) for q in (part['loop'] if fine else part['loop'][::3])]
+    h = FIGUREHEAD_HEIGHT
+    w = h * part['aspect']
+    y0, z0 = FIGUREHEAD_FOOT
+    c, sn = math.cos(FIGUREHEAD_LEAN), math.sin(FIGUREHEAD_LEAN)
+
+    def turned(px, py):
+        """The painting's plane (px toward the bow, py up) leaned forward, as (dy, dz)."""
+        return (-px * sn + py * c, px * c + py * sn)
+
+    def at(fx, fy, x):
+        dy, dz = turned(fx * w, (1.0 - fy) * h)
+        return (x, y0 + dy, z0 + dz)
+
+    half = FIGUREHEAD_THICK / 2
     for side in (1, -1):
-        eye = O + f * 0.62 + r * (side * 0.47) + u * 0.17
-        p.box(tuple(eye), (0.16, 0.14, 0.24), PAL['glow'], GLOW)
-        p.box(tuple(eye + u * 0.15 - f * 0.02), (0.24, 0.1, 0.48), PAL['ivory_dark'], WOOD, pitch=0.2)
-        # swept-back horns
-        hb = O + f * 0.15 + r * (side * 0.28) + u * 0.4
-        horn = [hb, hb - f * 0.55 + u * 0.28 + r * (side * 0.12), hb - f * 1.15 + u * 0.18 + r * (side * 0.22)]
-        p.sweep([tuple(q) for q in horn], 0, 0, PAL['ivory_dark'], sides=5, radii=[0.12, 0.08, 0.015])
-        # cheek frills: a fan of cream rays webbed in cobalt
-        root = O + f * 0.32 + r * (side * 0.5) + u * (-0.04)
-        tips = [root + r * (side * 0.75) - f * 0.95 + u * 0.55, root + r * (side * 0.95) - f * 1.05,
-                root + r * (side * 0.72) - f * 0.85 + u * (-0.5)]
-        for t in tips:
-            mid = root.lerp(t, 0.5) + r * (side * 0.08)
-            p.sweep([tuple(root), tuple(mid), tuple(t)], 0, 0, PAL['cream'], sides=4, radii=[0.07, 0.05, 0.01])
-        for a, b in ((tips[0], tips[1]), (tips[1], tips[2])):
-            q = [tuple(root), tuple(a), tuple(b)]
-            p.face(q, PAL['accent_hi'], WOOD)
-            p.face(list(reversed(q)), PAL['accent_hi'], WOOD)
-    # dorsal fin: a cobalt membrane on cream spines from the crown down the neck
-    fin_base = [O + f * 0.35 + u * 0.5, O + f * (-0.1) + u * 0.46]
-    heights = [0.62, 0.8]
-    for k in range(len(neck) - 1, 0, -1):
-        pk = Vector(neck[k])
-        t = (Vector(neck[min(k + 1, len(neck) - 1)]) - Vector(neck[k - 1])).normalized()
-        back = t.cross(Vector((1, 0, 0))).normalized()
-        if back.z > 0:
-            back = -back
-        fin_base.append(pk + back * radii[k] * 0.92)
-        heights.append(lerp(0.3, 0.75, k / (len(neck) - 1)))
-    tipsv = []
-    for k, b in enumerate(fin_base):
-        up = (b - (O if k < 2 else Vector(neck[len(neck) - 1 - (k - 2)]))).normalized()
-        up = (up + Vector((0, 0.35, -0.5))).normalized()
-        tipsv.append(b + up * heights[k])
-    for k in range(len(fin_base) - 1):
-        q = [tuple(fin_base[k]), tuple(fin_base[k + 1]), tuple(tipsv[k + 1]), tuple(tipsv[k])]
-        p.face(q, PAL['accent'], WOOD)
-        p.face(list(reversed(q)), PAL['accent'], WOOD)
-    for k in range(len(fin_base)):
-        tip = tipsv[k] + (tipsv[k] - fin_base[k]).normalized() * 0.18
-        p.sweep([tuple(fin_base[k]), tuple(tip)], 0, 0, PAL['cream'], sides=4, radii=[0.06, 0.012])
-    # the coil: the body wraps down the stem under the neck, ending in a tail fin
-    coil = [(0.0, 2.6, 16.2), (0.48, 2.1, 16.1), (0.42, 1.5, 15.9), (-0.22, 1.08, 15.72), (-0.42, 0.65, 15.55),
-            (-0.3, 0.3, 15.42)]
-    p.sweep(coil, 0, 0, PAL['ivory'], sides=8 if fine else 5, radii=[0.46, 0.4, 0.33, 0.26, 0.19, 0.1],
-            up=(0, 0, 1), color_fn=lambda i, k: PAL['ivory'] if i % 2 == 0 else PAL['ivory_dark'])
-    tail = Vector(coil[-1])
-    for dy, dz in ((0.35, 0.4), (-0.35, 0.45)):
-        q = [tuple(tail), tuple(tail + Vector((-0.05, dy, dz))), tuple(tail + Vector((-0.05, 0, 0.7)))]
-        p.face(q, PAL['accent'], WOOD)
-        p.face(list(reversed(q)), PAL['accent'], WOOD)
+        f = p.face([at(fx, fy, side * half) for fx, fy in loop], WHITE, IRON, FLAT,
+                   uvs=[uv_part('figurehead', fx, fy) for fx, fy in loop])
+        f.normal_update()
+        if f.normal.dot(P(side, 0, 0)) < 0:
+            f.normal_flip()
+    # the edge: a gilt wall round the outline, facing away from the paint
+    n = len(loop)
+    run = 0.0
+    for k in range(n):
+        (ax, ay), (bx, by) = loop[k], loop[(k + 1) % n]
+        dpx, dqy = (bx - ax) * w, (by - ay) * h  # along the outline, in yards (qy down)
+        step = math.hypot(dpx, dqy)
+        if step < 1e-6:
+            continue
+        dy, dz = turned(dqy, dpx)  # a quarter turn off the outline: away from the paint
+        # one course of the plain gilt, run along the edge
+        u0 = (run * 0.25) % 0.7
+        u1 = u0 + min(0.25, step * 0.25)
+        f = p.face([at(ax, ay, half), at(bx, by, half), at(bx, by, -half), at(ax, ay, -half)],
+                   (0.8, 0.72, 0.56), IRON,
+                   uvs=[uv_part('gilt', u0, 0.012), uv_part('gilt', u1, 0.012), uv_part('gilt', u1, 0.04),
+                        uv_part('gilt', u0, 0.04)])
+        f.normal_update()
+        if f.normal.dot(P(0, dy, dz)) < 0:
+            f.normal_flip()
+        run += step
     return p
 
 
@@ -1263,7 +1282,7 @@ def build_structure_misc(fine=True):
         z = STERN_Z + 0.55
         top = castle_top(z)
         p.cylinder((x, top, z), (x, top + 1.1, z), 0.07, PAL['iron'], IRON, sides=6)
-        lantern(p, (x, top + 1.35, z), 0.36, fine=fine)
+        lantern(p, (x, top + 1.42, z), 0.46, fine=fine, gilt=True)
     for side in (1, -1):
         for z in (-10.2, -6.0):
             x = side * (wall_x(z) + 0.04)
@@ -1419,7 +1438,7 @@ def build_lod2(materials, parent, name='Silhouette_LOD2', far=False):
     for side in (1, -1):
         rows = [[(side * half_breadth(z, row_y(z, y)), row_y(z, y), station_z(z, row_y(z, y))) for z in zs]
                 for y in ys]
-        p.surface(rows, lambda i, j: PAL['accent'] if (not far and i == 2) else (
+        p.surface(rows, lambda i, j: PAL['gold'] if (not far and i == 2) else (
             PAL['castle'][0] if i == 3 else PAL['hull'][0]), WOOD, outward=lambda c, s=side: (s, 0, 0))
     p.face([(-half_breadth(STERN_Z, ys[0]), ys[0], STERN_Z), (half_breadth(STERN_Z, ys[0]), ys[0], STERN_Z),
             (wall_x(STERN_Z), CAPTAIN + RAIL, STERN_Z), (-wall_x(STERN_Z), CAPTAIN + RAIL, STERN_Z)],
@@ -1578,15 +1597,15 @@ def build_scene():
     wheel.finish(mats, lod0, location=wheel_pivot)
     mz = MASTS['MainMast'][0]
     pennant = flag_chain('Pennant_Main', groups['Flags'], mats, (0.0, MASTS['MainMast'][1] - 0.35, mz + 0.1), 5.2,
-                         0.62, 0.08, 3, [PAL['accent'], PAL['accent_hi'], PAL['cream']])
+                         0.62, 0.08, 3, [PAL['navy'], PAL['navy_hi'], PAL['gold']])
     fz = MASTS['SecondaryMast'][0]
     pen_f = flag_chain('Pennant_Fore', groups['Flags'], mats, (0.0, MASTS['SecondaryMast'][1] - 0.3, fz + 0.1), 2.6,
-                       0.42, 0.06, 2, [PAL['accent'], PAL['cream']])
+                       0.42, 0.06, 2, [PAL['navy'], PAL['gold']])
     zz = MASTS['MizzenMast'][0]
     pen_z = flag_chain('Pennant_Mizzen', groups['Flags'], mats, (0.0, MASTS['MizzenMast'][1] - 0.3, zz + 0.1), 2.4,
-                       0.4, 0.06, 2, [PAL['accent'], PAL['cream']])
+                       0.4, 0.06, 2, [PAL['navy'], PAL['gold']])
     ensign = flag_chain('Ensign', groups['Flags'], mats, (0.0, 11.6, STERN_Z - 0.5), 2.1, 1.3, 1.2, 3,
-                        [PAL['accent']], emblem_seg=1)
+                        [PAL['navy']], emblem_seg=1)
 
     lod1 = empty('LOD1', motion)
     build_lod1(mats, lod1)
@@ -1652,6 +1671,7 @@ def export(path, scene_objs):
         export_anim_scene_split_object=False, export_force_sampling=True, export_frame_range=True,
         export_optimize_animation_size=False, export_cameras=False, export_lights=False,
         export_vertex_color='ACTIVE', export_all_vertex_colors=False, export_morph=False,
+        export_texcoords=True, export_image_format='WEBP', export_image_quality=92,
     )
     print('WROTE', path)
 

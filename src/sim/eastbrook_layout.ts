@@ -750,109 +750,111 @@ const APOTHECARY_SCALE = 1.5;
 // from its door, so its walls stand outside the farm beds' working reach.
 // Building IDS are kept where the role is (the forge ambience keys on the
 // smithy, the rest rule on the inn), so nothing that resolves through an id
-// moved with the mesh. Reach boxes are the shipped models' bounds, and the
-// wall and annex boxes are their baked collision lines
-// (tests/eastbrook_placed_buildings.test.ts measures all of them off the
-// shipped files). Every one whose model bakes an open doorway (all but the
-// quay cottage) is walk-in.
+// moved with the mesh. The models are the hand-built harbour lots
+// (scripts/assets/eastbrook_houses/lots.py), each made to stand on these same
+// wall and annex boxes with its door where the record says. Reach boxes keep
+// the ground each lot covers; `height` and `modelSize` are measured off the
+// built files and written here by scripts/assets/eastbrook_houses/wire.py.
+// Every one whose model has an open doorway (all but the quay cottage) is
+// walk-in.
 const BUILDINGS = [
   makePlacedBuilding({
     id: 'eastbrook_bank',
-    assetId: '/models/tidehold/bank.glb',
+    assetId: '/models/tidehold/harbour/bank.glb',
     kind: 'house',
     anchor: { x: -61.99, z: -118.33 },
     rotation: 225 * DEGREE,
     scale: STANDARD_SCALE,
-    reach: { x: -0.7013, z: 0.7819, width: 22.6067, height: 22.5005, depth: 19.8387 },
+    reach: { x: -0.7013, z: 0.7819, width: 22.6067, height: 22.452, depth: 19.8387 },
     walls: { x: 0, z: 0, width: 18, depth: 12.4923 },
     annexes: [
       { name: 'strongroom', x: 0, z: 8.2, width: 5.8, depth: 3.9077 },
       { name: 'turret', x: -9.5923, z: -6.8462, width: 3.2308, depth: 3.2308 },
     ],
     doorX: 0,
-    modelSize: 22.6067,
+    modelSize: 25.5973,
     walkIn: true,
   }),
   makePlacedBuilding({
     id: 'eastbrook_smithy',
-    assetId: '/models/tidehold/smithy.glb',
+    assetId: '/models/tidehold/harbour/smithy.glb',
     kind: 'house',
     anchor: { x: -4.2, z: -75.2 },
     rotation: 20 * DEGREE,
     scale: STANDARD_SCALE,
-    reach: { x: 3.4285, z: -0.295, width: 19.797, height: 12.7809, depth: 11.6901 },
+    reach: { x: 3.4285, z: -0.295, width: 19.797, height: 17.94, depth: 11.6901 },
     walls: { x: 0, z: 0, width: 11, depth: 9 },
     // the open forge shelter at its west end: a raised deck under a roof,
     // crowded with the forge, the anvil and the quench trough
     annexes: [{ name: 'forge_shelter', x: 9.1231, z: -0.1, width: 7.2308, depth: 9.6 }],
     doorX: -1.2,
-    modelSize: 19.797,
+    modelSize: 19.99,
     walkIn: true,
   }),
   makePlacedBuilding({
     id: 'eastbrook_inn',
-    assetId: '/models/tidehold/tavern.glb',
+    assetId: '/models/tidehold/harbour/tavern.glb',
     kind: 'inn',
     anchor: { x: -30.34, z: -60.63 },
     rotation: 24 * DEGREE,
     scale: STANDARD_SCALE,
-    reach: { x: 0.2721, z: -0.0502, width: 22.6483, height: 18.7798, depth: 16.7997 },
+    reach: { x: 0.2721, z: -0.0502, width: 22.6483, height: 21.56, depth: 16.7997 },
     walls: { x: 0, z: 0, width: 20, depth: 13 },
     annexes: [
-      { name: 'front_bench', x: -5.1, z: -7.2462, width: 5.4, depth: 0.8923 },
-      { name: 'barrels', x: 10.9, z: -4.9, width: 1.0923, depth: 2.2923 },
+      { name: 'front_bench', x: -5.1, z: -7.25, width: 5.2, depth: 0.5 },
+      { name: 'barrels', x: 10.9, z: -4.9, width: 1.0, depth: 2.4 },
     ],
     doorX: 0,
-    modelSize: 22.6483,
+    modelSize: 27.6003,
     walkIn: true,
   }),
   makePlacedBuilding({
     id: 'eastbrook_chapel',
-    assetId: '/models/tidehold/hall.glb',
+    assetId: '/models/tidehold/harbour/hall.glb',
     kind: 'chapel',
     anchor: { x: 28.2, z: -119.62 },
     rotation: 125 * DEGREE,
     scale: STANDARD_SCALE,
-    reach: { x: 1.9255, z: -0.254, width: 18.8515, height: 30.4998, depth: 24.212 },
+    reach: { x: 1.9255, z: -0.254, width: 18.8515, height: 29.542, depth: 24.212 },
     walls: { x: 0, z: 0, width: 12, depth: 22 },
     annexes: [
       { name: 'bell_tower', x: 8.2538, z: -9, width: 5.4, depth: 5.4 },
       { name: 'notice_board', x: -4.2, z: -11.8, width: 1.8, depth: 0.6 },
     ],
     doorX: 0,
-    modelSize: 30.4998,
+    modelSize: 30.2535,
     walkIn: true,
   }),
   makePlacedBuilding({
     id: 'eastbrook_apothecary',
-    assetId: '/models/tidehold/shop_a.glb',
+    assetId: '/models/tidehold/harbour/shop_a.glb',
     kind: 'house',
     anchor: { x: -30.59, z: -127.63 },
     rotation: 175 * DEGREE,
     scale: APOTHECARY_SCALE,
-    reach: { x: 0, z: -0.8001, width: 13.004, height: 16.2797, depth: 12.2001 },
+    reach: { x: 0, z: -0.8001, width: 13.004, height: 20.21, depth: 12.2001 },
     walls: { x: 0, z: 0, width: 11, depth: 8.4 },
     annexes: [
       { name: 'stall_counter', x: 2.3769, z: -5.9231, width: 3.6154, depth: 0.7692 },
       // the barrels at the stall's east end, with the awning post beside them
-      { name: 'stall_barrels', x: 4.8846, z: -5.7615, width: 1.4769, depth: 2.1692 },
+      { name: 'stall_barrels', x: 4.9, z: -5.775, width: 1.4, depth: 2.15 },
     ],
     doorX: -1.6,
-    modelSize: 16.2797,
+    modelSize: 20.21,
     walkIn: true,
   }),
   makePlacedBuilding({
     id: 'eastbrook_quay_cottage',
-    assetId: '/models/tidehold/house_b.glb',
+    assetId: '/models/tidehold/harbour/house_b.glb',
     kind: 'house',
     anchor: { x: -59.11, z: -51.35 },
     rotation: 46 * DEGREE,
     scale: STANDARD_SCALE,
-    reach: { x: -0.3041, z: 0, width: 15.0123, height: 15.9799, depth: 11.6997 },
+    reach: { x: -0.3041, z: 0, width: 15.0123, height: 17.01, depth: 11.6997 },
     walls: { x: 0, z: 0, width: 12.7538, depth: 8.5538 },
     annexes: [{ name: 'crates', x: -7.0308, z: -1.8231, width: 1.1538, depth: 2.2462 }],
     doorX: 0,
-    modelSize: 15.9799,
+    modelSize: 19.7713,
     // no walkIn: the cottage's model bakes a shut door, so it stays one sealed box
   }),
 ] as const;

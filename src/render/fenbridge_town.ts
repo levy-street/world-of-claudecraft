@@ -43,7 +43,7 @@ import {
 import { type PlacedTextureTier, placedTextureTierPath } from './placed_texture_tier_core';
 import { placedTownCullRadius } from './placed_town_buildings';
 import { createPlacedTownInteriors } from './placed_town_interiors';
-import { activeWorldPromoted } from './promoted_scenery_gate';
+import { activeWorldPromoted, activeWorldStandsLiveTouchup } from './promoted_scenery_gate';
 import type { RevealGateCore } from './reveal_gate_core';
 import {
   isLowSceneryCullActive,
@@ -534,7 +534,11 @@ function microPlacements() {
   // A document that owns the square's dressing as placements
   // (promotedScenery.authoredTownDressing) draws the cistern, the stall and
   // the muster board itself.
-  if (activeWorldPromoted('authoredTownDressing')) return [];
+  // So does the built-in world: its live touch-up document stands hand-painted ones on
+  // the same spots (scripts/assets/eastbrook_houses/sites.json), which the batch could
+  // only draw in flat colour through the town atlas. Their records and colliders are
+  // unchanged either way, and the boardwalks stay batch-drawn.
+  if (activeWorldStandsLiveTouchup() || activeWorldPromoted('authoredTownDressing')) return [];
   const layout = activeFenbridgeLayout();
   const cistern = layout.civic.cistern;
   const stall = layout.civic.provisionStall;

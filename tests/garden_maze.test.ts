@@ -20,7 +20,9 @@ import {
   MAZE_Z1,
   planGardenMazePieces,
 } from '../src/render/garden_maze_core';
+import { lineOfSightClear, SIGHT_HEIGHT } from '../src/sim/colliders';
 import { gardenMazeCellPieces, inGardenMaze, inGardenMazeWall } from '../src/sim/world';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
 const cellCenter = (c: number, r: number) => ({
   x: MAZE_X0 + (c + 0.5) * MAZE_CELL,
@@ -92,6 +94,24 @@ describe('the modeled-hedge plan', () => {
 
   it('is deterministic', () => {
     expect(planGardenMazePieces()).toEqual(planGardenMazePieces());
+  });
+
+  it('still blocks sight between two walkers either side of a clipped hedge', () => {
+    // The hedge top is what the sim's sight line clears or does not (colliders.ts gives
+    // each piece MAZE_WALL_HEIGHT as its top): at 2.75 yards it stands over an eye on the
+    // maze floor, so the maze still hides what is round the corner. Clipping the walls
+    // must never open the maze to casts through it.
+    const wall = cellCenter(8, 15); // a wall cell with a north-south piece
+    expect(gardenMazeCellPieces(8, 15)?.v).toBe(true);
+    const reach = MAZE_WALL_DEPTH / 2 + 1.2;
+    const west = { x: wall.x - reach, z: wall.z };
+    const east = { x: wall.x + reach, z: wall.z };
+    expect(inGardenMazeWall(west.x, west.z)).toBe(false);
+    expect(inGardenMazeWall(east.x, east.z)).toBe(false);
+    expect(lineOfSightClear(WORLD_SEED, west, east)).toBe(false);
+    // while two walkers on the same side of it see each other
+    expect(lineOfSightClear(WORLD_SEED, west, { x: west.x, z: west.z + 2 })).toBe(true);
+    expect(MAZE_WALL_HEIGHT).toBeGreaterThan(SIGHT_HEIGHT + 0.8);
   });
 
   it('lifts the camera over hedges and leaves corridor centers untouched', () => {

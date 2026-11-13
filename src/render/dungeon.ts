@@ -36,12 +36,7 @@ import {
   type WallStub,
 } from '../sim/dungeon_layout';
 import { polygonContainsPoint, polygonXAtZ } from '../sim/geometry2d';
-import {
-  authoredLiftAt,
-  authoredWallSegments,
-  doorRampHalf,
-  type WallSeg,
-} from '../sim/rift/authored';
+import { authoredLiftAt, authoredWallSegments, type WallSeg } from '../sim/rift/authored';
 import { ARENA_WATER_NAVE_HALF_X, arenaWaterBands } from './arena_water_band_core';
 import { type LoadedGltf, loadGltf, releaseGltf } from './assets/loader';
 import { fitAuthoredWallSegment } from './authored_walls_core';
@@ -68,6 +63,7 @@ import {
 // Re-exported for the editor's shipped-map adapter, which reads the tape here.
 export type { DungeonPlacementRecord } from './dungeon_arena_walls';
 
+import { addAuthoredLedges, addAuthoredRelief } from './authored_relief';
 import { dungeonBannerKind, hangsKitBanners } from './dungeon_banner_core';
 import {
   capturePlacementRecords,
@@ -119,6 +115,7 @@ import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { ensureNythraxisPropAssets } from './nythraxis_prop_assets';
 import { type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
 import { OPEN_AIR_FIELDS, OpenAirFieldRoster } from './open_air_fields';
+import { addPalaceTiles, ensurePalaceTileAssets, isPalaceVariant } from './palace_tile_kit';
 import type { FireLightSink } from './point_light_budget';
 import { buildInfernalDecor, ensureInfernalDecorAssets } from './rift_decor';
 import { riftPlatformSlabs } from './rift_platform_core';
@@ -150,7 +147,7 @@ export type DungeonInteriorVariant =
   | 'arena_drowned'
   // The Last Keep: the lived-in Drakelands castle interior. Clean stone walls,
   // warm candle torchlight, and the kcas furniture dressing on stories 1-2;
-  // only its undercroft rooms keep the crypt's cracked stone and cold flame.
+  // its undercroft wears the same stone, marked by the crypt's cold flame.
   | 'lastkeep'
   // Dawnhold Castle: the Evergarden garden palace. The lastkeep grammar but
   // BRIGHTER and greener-warm (daylight through a garden palace, no cold
@@ -641,6 +638,7 @@ export class DungeonInteriors {
       await ensureDungeonAssets();
       await ensureIgnivarRaidDressingAssets(interior);
       await ensureIgnivarTileAssets(interior, loadModuleAsset);
+      await ensurePalaceTileAssets(variant);
       if (interior === 'nythraxis') await ensureNythraxisPropAssets();
       if (isDelveVariant(variant)) await ensureDelvePropAssets();
       if (variant === 'delve_marsh' || variant === 'delve_marsh_apse')
@@ -703,20 +701,20 @@ export class DungeonInteriors {
         // replace the single-room shell entirely. Walls come from the SAME segment
         // helper the sim derives collision from, so they cannot drift apart.
         if (layout.rooms) {
-          await ensureInfernalDecorAssets();
+          await ensureInfernalDecorAssets(isPalaceVariant(variant));
           this.placeAuthoredFloor(p, layout, variant);
           this.placeAuthoredWalls(p, layout, variant);
-          this.placeAuthoredRelief(group, layout);
-          this.placeAuthoredLedges(group, layout);
+          addAuthoredRelief(group, layout, variant);
+          addAuthoredLedges(group, layout, variant);
           const liftAt = (x: number, z: number): number =>
             authoredLiftAt(layout.rooms ?? [], layout.doors ?? [], x, z);
           const light = (x: number, z: number, color: number, y?: number, scale?: number): void =>
             this.addInfernalLight(group, x, z, color, y, scale);
           if (variant === 'lastkeep') {
-            // The keep's stories light differently: the undercroft (the one
-            // dungeon-flavored story) keeps the crypt's cold blue flame while the
-            // lived-in floors above burn warm candle-orange, so the same decor
-            // list splits by the story its position sits on.
+            // The keep's stories light differently: the undercroft wears the same
+            // stone as the floors above (palace_tile_kit.ts), so the crypt's cold
+            // blue flame and its own decor are what mark it, while the lived-in
+            // floors burn warm candle-orange: the decor list splits by story.
             const decor = layout.decor ?? [];
             buildInfernalDecor(
               group,
@@ -724,6 +722,7 @@ export class DungeonInteriors {
               TORCH_COLORS.crypt,
               light,
               liftAt,
+              true,
             );
             buildInfernalDecor(
               group,
@@ -731,6 +730,7 @@ export class DungeonInteriors {
               torch,
               light,
               liftAt,
+              true,
             );
             // The lived-in furnishing: kcas bookcases, tables, benches, kegs,
             // banners, and mounted torches instanced along the authored room walls.
@@ -740,7 +740,7 @@ export class DungeonInteriors {
             // Dawnhold Castle has NO cold story: every room burns the same warm
             // garden-gold flame, and the dressing pass fills it with kcas
             // furniture, planters, and flowers.
-            buildInfernalDecor(group, layout.decor ?? [], torch, light, liftAt);
+            buildInfernalDecor(group, layout.decor ?? [], torch, light, liftAt, true);
             await ensureDawnholdDressing();
             buildDawnholdDressing(group, light, this.lowGfx);
           } else {
@@ -1130,100 +1130,6 @@ export class DungeonInteriors {
     }
   }
 
-  /** Solid risers under every lifted authored room, plus stair runs across each
-   * door that joins rooms of different lift. Box tops follow the same linear
-   * ramp authoredLiftAt gives the sim, so what you climb is what the sim
-   * stands you on (the sub-step mismatch is the platform stairs' own). */
-  /**
-   * The parkour shelves. A ledge is a real standable collider in the sim, so
-   * it MUST be drawn: an invisible surface a player vaults onto is worse
-   * than no surface at all. Each is a plain stone slab whose TOP sits
-   * exactly on the collider's moveTopY, so what the eye reads and what the
-   * body stands on are the same plane.
-   */
-  private placeAuthoredLedges(group: THREE.Group, layout: DungeonLayout): void {
-    const ledges = layout.ledges ?? [];
-    if (ledges.length === 0) return;
-    const rooms = layout.rooms ?? [];
-    const doors = layout.doors ?? [];
-    const mat = new THREE.MeshLambertMaterial({ color: 0x6a6270, emissive: 0x0c0a10 });
-    const THICK = 0.5;
-    for (const l of ledges) {
-      const top = authoredLiftAt(rooms, doors, l.x, l.z) + l.top;
-      const slab = new THREE.Mesh(new THREE.BoxGeometry(l.hw * 2, THICK, l.hd * 2), mat);
-      slab.position.set(l.x, top - THICK / 2, l.z);
-      slab.castShadow = true;
-      slab.receiveShadow = true;
-      group.add(slab);
-      // the bracket under it, so the shelf reads as corbelled off the wall
-      // rather than floating in the room
-      const post = new THREE.Mesh(new THREE.BoxGeometry(l.hw * 0.7, top - THICK, l.hd * 0.7), mat);
-      post.position.set(l.x, (top - THICK) / 2, l.z);
-      post.receiveShadow = true;
-      group.add(post);
-    }
-  }
-
-  private placeAuthoredRelief(group: THREE.Group, layout: DungeonLayout): void {
-    const rooms = layout.rooms ?? [];
-    const doors = layout.doors ?? [];
-    if (!rooms.some((r) => (r.lift ?? 0) !== 0)) return;
-    const mat = new THREE.MeshLambertMaterial({ color: 0x4a4652, emissive: 0x0a0a12 });
-    for (const r of rooms) {
-      const lift = r.lift ?? 0;
-      if (lift <= 0) continue;
-      // Top sits a hair below the tile tops so the slab never z-fights them.
-      const riser = new THREE.Mesh(
-        new THREE.BoxGeometry(r.x1 - r.x0 + 2, lift - 0.02, r.z1 - r.z0 + 2),
-        mat,
-      );
-      riser.position.set((r.x0 + r.x1) / 2, (lift - 0.02) / 2, (r.z0 + r.z1) / 2);
-      riser.receiveShadow = true;
-      group.add(riser);
-    }
-    for (const d of doors) {
-      const south = rooms.find((r) => r.z1 === d.z && d.x >= r.x0 && d.x <= r.x1);
-      const north = rooms.find((r) => r.z0 === d.z && d.x >= r.x0 && d.x <= r.x1);
-      if (south && north) {
-        const a = south.lift ?? 0;
-        const b = north.lift ?? 0;
-        if (a === b) continue;
-        const h = doorRampHalf(d.hd, b - a);
-        const width = d.hw * 2 + 1;
-        const steps = Math.max(4, Math.min(16, Math.round((2 * h) / 0.9)));
-        const depth = (2 * h) / steps;
-        for (let i = 0; i < steps; i++) {
-          const zMid = d.z - h + (i + 0.5) * depth;
-          const top = Math.max(0.05, a + ((b - a) * (i + 0.5)) / steps);
-          const step = new THREE.Mesh(new THREE.BoxGeometry(width, top, depth + 0.05), mat);
-          step.position.set(d.x, top / 2, zMid);
-          step.receiveShadow = true;
-          group.add(step);
-        }
-        continue;
-      }
-      const west = rooms.find((r) => r.x1 === d.x && d.z >= r.z0 && d.z <= r.z1);
-      const east = rooms.find((r) => r.x0 === d.x && d.z >= r.z0 && d.z <= r.z1);
-      if (west && east) {
-        const a = west.lift ?? 0;
-        const b = east.lift ?? 0;
-        if (a === b) continue;
-        const h = doorRampHalf(d.hw, b - a);
-        const width = d.hd * 2 + 1;
-        const steps = Math.max(4, Math.min(16, Math.round((2 * h) / 0.9)));
-        const depth = (2 * h) / steps;
-        for (let i = 0; i < steps; i++) {
-          const xMid = d.x - h + (i + 0.5) * depth;
-          const top = Math.max(0.05, a + ((b - a) * (i + 0.5)) / steps);
-          const step = new THREE.Mesh(new THREE.BoxGeometry(depth + 0.05, top, width), mat);
-          step.position.set(xMid, top / 2, d.z);
-          step.receiveShadow = true;
-          group.add(step);
-        }
-      }
-    }
-  }
-
   private placeRiftPlatform(
     group: THREE.Group,
     layout: DungeonLayout,
@@ -1418,6 +1324,9 @@ export class DungeonInteriors {
   ): void {
     const isMarsh = variant === 'delve_marsh' || variant === 'delve_marsh_apse';
     for (const [kind, mats] of p.byKind) {
+      // The two palaces draw these from the painted castle kit (palace_tile_kit.ts).
+      if (addPalaceTiles(group, variant, kind, mats, this.lowGfx, CASTER_KINDS, RECEIVER_KINDS))
+        continue;
       // The Ignivar rooms swap their structural stone for the raid-only
       // dark-iron duplicates; kind-keyed policy below (shadows, tints) still
       // reads the ORIGINAL kind, so only geometry + material identity change.
@@ -1586,9 +1495,9 @@ export class DungeonInteriors {
     const maxX = Math.max(...rooms.map((r) => r.x1)) + 2;
     const minZ = Math.min(...rooms.map((r) => r.z0)) - 2;
     const maxZ = Math.max(...rooms.map((r) => r.z1)) + 2;
-    // The Last Keep's undercroft (lift below the state floor) keeps the crypt's
-    // cracked, weeded flags while the lived-in stories above tile clean: the
-    // per-cell room lift already says which story a tile belongs to.
+    // The Last Keep's undercroft (lift below the state floor) still picks from
+    // the crypt's floor mix, but the palace tile kit draws every one of those
+    // kinds as the keep's own clean flags; the per-cell room lift names the story.
     const cellVariant = (x: number, z: number): Variant =>
       variant === 'lastkeep' && roomLift(x, z) < 1.6 ? 'crypt' : variant;
     for (let z = minZ; z <= maxZ; z += FLOOR_CELL) {
@@ -1629,7 +1538,7 @@ export class DungeonInteriors {
     const openAt = (x: number, z: number): boolean =>
       rooms.some((r) => x > r.x0 && x < r.x1 && z > r.z0 && z < r.z1);
     // Highest lift among the rooms a wall segment borders: says which story the
-    // wall belongs to (the keep's undercroft keeps cracked crypt stone, and the
+    // wall belongs to (the keep's undercroft takes the crypt's wall mix, and the
     // lookout's parapet row is shortened so it stays an OPEN rooftop).
     const segMaxLift = (seg: WallSeg): number => {
       let best = 0;
@@ -1652,8 +1561,8 @@ export class DungeonInteriors {
       const cells = fitAuthoredWallSegment(seg.a, seg.b, 8);
       // Face the wall detail into an adjacent room (either one, when it is shared).
       const ry = segRy(seg);
-      // Only the Last Keep has a dungeon-flavored undercroft to re-key to the
-      // crypt mix; Dawnhold's ground floor stays warm palace stone.
+      // Only the Last Keep re-keys its undercroft to the crypt mix, and the palace
+      // tile kit draws those kinds (wall_cracked too) in the keep's own stone.
       const segVariant: Variant =
         variant === 'lastkeep' && segMaxLift(seg) < 1.6 ? 'crypt' : variant;
       for (const cell of cells) {

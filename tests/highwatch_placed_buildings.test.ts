@@ -61,11 +61,13 @@ const BAKED = JSON.parse(
   readFileSync(path.join(ROOT, 'data/asset_collision_overrides.json'), 'utf8'),
 ) as Record<string, { boxes: BakedBox[]; ramps?: BakedBox[] }>;
 
-/** The model a record draws: `tidehold/highwatch/x` re-bakes the textures of
- *  `tidehold/x` on the same geometry, so it shares its rows. */
+/** The model a record draws: the hand-built harbour lot in its Alpine slate
+ *  (`tidehold/harbour_alpine/x`), which carries its own baked rows; they are
+ *  the default harbour set's (`tidehold/harbour/x`) for every model that set
+ *  has, the same geometry in other colours. */
 function modelIdOf(building: Building): string {
   const name = building.assetId.replace(/^.*\//, '').replace(/\.glb$/, '');
-  return OWN_MODEL_IDS.has(building.id) ? `tidehold/highwatch/${name}` : `tidehold/${name}`;
+  return `tidehold/harbour_alpine/${name}`;
 }
 
 function recordOf(building: Building): BuildingDef {
@@ -174,16 +176,18 @@ const PLACED_TARGET_HEIGHT = 2.2;
 describe('the six placed Highwatch buildings', () => {
   it('are the painted Tidehold set in the Highwatch look', () => {
     expect(BUILDINGS.map((building) => [building.id, modelIdOf(building), building.kind])).toEqual([
-      ['highwatch_summit_inn', 'tidehold/tavern_b', 'inn'],
-      ['highwatch_gate_chapel', 'tidehold/hall', 'chapel'],
-      ['highwatch_counting_house', 'tidehold/shop_a', 'house'],
-      ['highwatch_watch_house', 'tidehold/house_c', 'house'],
-      ['highwatch_smithy', 'tidehold/smithy', 'house'],
-      ['highwatch_guild', 'tidehold/highwatch/guild', 'house'],
+      ['highwatch_summit_inn', 'tidehold/harbour_alpine/tavern_b', 'inn'],
+      ['highwatch_gate_chapel', 'tidehold/harbour_alpine/hall', 'chapel'],
+      ['highwatch_counting_house', 'tidehold/harbour_alpine/shop_a', 'house'],
+      ['highwatch_watch_house', 'tidehold/harbour_alpine/house_c', 'house'],
+      ['highwatch_smithy', 'tidehold/harbour_alpine/smithy', 'house'],
+      ['highwatch_guild', 'tidehold/harbour_alpine/guild', 'house'],
     ]);
     for (const building of BUILDINGS) {
       expect(isPlacedBuildingAsset(building.assetId), building.id).toBe(true);
-      expect(building.assetId.startsWith('/models/tidehold/highwatch/'), building.id).toBe(true);
+      expect(building.assetId.startsWith('/models/tidehold/harbour_alpine/'), building.id).toBe(
+        true,
+      );
     }
   });
 
@@ -207,20 +211,28 @@ describe('the six placed Highwatch buildings', () => {
     }
   });
 
-  it('reach across the whole model, measured off the shipped file', () => {
+  it('reach over the ground each lot covers, with its height measured off the shipped file', () => {
     for (const building of BUILDINGS) {
       const bounds = boundsOf(building);
       const scale = building.placement.scale;
-      const measured: Rect = {
-        x0: bounds.min[0] * scale,
-        x1: bounds.max[0] * scale,
-        z0: bounds.min[2] * scale,
-        z1: bounds.max[2] * scale,
-      };
-      expect(
-        worstEdge(rectOf(building, building.reach), measured),
-        `${building.id} reach`,
-      ).toBeLessThan(0.02);
+      // The reach is the ground the building covers: the box the town cuts its
+      // terrain pads from. The hand-built lots stand on the release models'
+      // walls, so the records keep that ground where it was and the peak under
+      // the town did not move; a lot's roof and jetty overhang it. It still
+      // holds the walls and every annex.
+      const reach = rectOf(building, building.reach);
+      const parts: [string, Rect][] = [
+        ['walls', rectOf(building, building.footprint)],
+        ...building.annexes.map((annex): [string, Rect] => [annex.id, rectOf(building, annex)]),
+      ];
+      // (a part may stand exactly on the reach's edge: a hair of float slack)
+      const slack = 1e-6;
+      for (const [name, part] of parts) {
+        expect(part.x0, `${building.id} ${name} west`).toBeGreaterThanOrEqual(reach.x0 - slack);
+        expect(part.x1, `${building.id} ${name} east`).toBeLessThanOrEqual(reach.x1 + slack);
+        expect(part.z0, `${building.id} ${name} front`).toBeGreaterThanOrEqual(reach.z0 - slack);
+        expect(part.z1, `${building.id} ${name} back`).toBeLessThanOrEqual(reach.z1 + slack);
+      }
       expect(
         Math.abs(
           building.nativeDimensions.height - (bounds.size[1] * scale + building.placement.lift),
@@ -237,7 +249,7 @@ describe('the six placed Highwatch buildings', () => {
       // the look carries its default model's rows (the guild IS the look's own model)
       if (!OWN_MODEL_IDS.has(building.id)) {
         expect(
-          BAKED[`tidehold/highwatch/${modelIdOf(building).slice('tidehold/'.length)}`],
+          BAKED[`tidehold/harbour/${modelIdOf(building).slice('tidehold/harbour_alpine/'.length)}`],
         ).toEqual(baked);
       }
       const unit =
@@ -334,7 +346,8 @@ describe('the six placed Highwatch buildings', () => {
         'highwatch_counting_house:stall_barrels',
       ],
       highwatch_watch_house: ['highwatch_watch_house:tower'],
-      highwatch_smithy: ['highwatch_smithy:forge_shelter', 'highwatch_smithy:chimney'],
+      // the hand-built smithy carries no chimney breast outside its west wall
+      highwatch_smithy: ['highwatch_smithy:forge_shelter'],
       highwatch_guild: [
         'highwatch_guild:trophy_hall',
         'highwatch_guild:lantern_tower',
@@ -663,7 +676,7 @@ describe('Highwatch in WoC Studio', () => {
     // the older family keeps only Eastbrook and Fenbridge
     expect(
       authoredTownBuildingPlacements(WORLD_SEED).some((placement) =>
-        placement.assetId.startsWith('tidehold/highwatch/'),
+        placement.assetId.startsWith('tidehold/harbour_alpine/'),
       ),
     ).toBe(false);
   });
@@ -699,7 +712,7 @@ describe('Highwatch in WoC Studio', () => {
     expect(doc.promotedScenery.highwatchTown).toBe(true);
     // the painted buildings are in, the untouched kit houses are out
     const painted = doc.placements.filter((placement) =>
-      placement.assetId.startsWith('tidehold/highwatch/'),
+      placement.assetId.startsWith('tidehold/harbour_alpine/'),
     );
     // the five painted buildings and the guild
     expect(painted).toHaveLength(6);
@@ -719,7 +732,7 @@ describe('Highwatch in WoC Studio', () => {
     const map = loadPublishedMap();
     expect(map.promotedScenery).toMatchObject({ authoredTowns: true, highwatchTown: true });
     const placed = (map.placements ?? []).filter((placement) =>
-      placement.path.startsWith('/models/tidehold/highwatch/'),
+      placement.path.startsWith('/models/tidehold/harbour_alpine/'),
     );
     expect(placed.map((placement) => placement.path).sort()).toEqual(
       BUILDINGS.map((building) => building.assetId).sort(),

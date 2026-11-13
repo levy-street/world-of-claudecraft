@@ -30,6 +30,12 @@ import {
 import { targetHeightFor } from '../src/render/asset_scale';
 import { isEastbrookRebuildBuilding } from '../src/render/eastbrook_town';
 import { isFenbridgeRebuildBuilding } from '../src/render/fenbridge_town';
+import {
+  BANYAN_SCALE_BASE,
+  GREAT_TREE_SCALE_BASE,
+  GREAT_TREE_SCALE_SPREAD,
+  REALM_GREAT_TREE_SCALE,
+} from '../src/render/great_tree_look_core';
 import { isHighwatchRebuildBuilding } from '../src/render/highwatch_town';
 import { PROP_ASSET_DEFS, type PropKey } from '../src/render/props';
 import { EVERGARDEN_PROPS } from '../src/sim/content/evergarden';
@@ -266,10 +272,16 @@ describe('the families the editor drew too large', () => {
     if (!record) throw new Error('converted tree has no record');
     const worldScale =
       (targetHeightFor('/models/foliage/twisted_1.glb') / GREAT_TREE_MODEL.maxDim) * tree.scale;
-    // every zone module scales the raw model by 2.4 to 3.0 times r, or 6.5 for the realm's
+    // every zone module scales the raw model by great_tree_look_core's share of r (the
+    // banyans a touch broader), or the hand-set town scale for the realm's
+    const low = record.r * GREAT_TREE_SCALE_BASE;
+    const high = record.r * (BANYAN_SCALE_BASE + GREAT_TREE_SCALE_SPREAD);
     expect(
-      worldScale === 6.5 || (worldScale >= record.r * 2.4 && worldScale <= record.r * 3.0),
+      Math.abs(worldScale - REALM_GREAT_TREE_SCALE) < 1e-9 ||
+        (worldScale >= low - 1e-9 && worldScale <= high + 1e-9),
     ).toBe(true);
+    // a grand tree, never again the hundred-yard trunk: under fifty yards tall
+    expect(worldScale * GREAT_TREE_MODEL.maxDim).toBeLessThan(55);
   });
 
   it('converts only the giants a zone module draws (never the Nightbloom elders)', () => {

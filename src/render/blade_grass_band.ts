@@ -288,6 +288,12 @@ export function buildBladeGrassBand(
         // no band tufts floating over a boolean cut (mirrors the near carpet)
         if (ok) ok = !terrainCutAtHeight(x, z, h);
         if (ok) ok = Math.abs(terrainHeight(x + 0.9, z, seed) - h) < 0.55;
+        // ...and off true cliffs along z as well: with only the x probe every north or
+        // south facing rock face grew sprigs up its bare stone. The z limit is a cliff's
+        // (about 50 degrees), not the x probe's bank limit: hillsides that fall along z
+        // have always carried their meadow (Amberfall's dunes, the Thornpeak foothills),
+        // and stripping them left bare sand where the grass used to run to the water.
+        if (ok) ok = Math.abs(terrainHeight(x, z + 0.9, seed) - h) < 1.1;
         if (ok) {
           const edgeTaper = grassEdgeTaperAt(edgeTaperCtx, x, z, rd);
           if (r1 < baseCoverage * grassEdgeCoverageScale(edgeTaper)) {

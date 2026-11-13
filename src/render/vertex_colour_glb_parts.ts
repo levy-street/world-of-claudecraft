@@ -5,11 +5,15 @@
 // geometry dequantized into a chosen frame, and merge the collected geometries into one
 // mesh part per material. Extracted at the second vertex-coloured prop (the rule of
 // three: the ship's converter, transport_ship.ts, buckets by attribute layout too).
-// A painted material (one that carries a map: the Mirefen tavern's painted town maps) keeps
+// A painted material (one that carries a map: the Mirefen tavern's painted town maps, the
+// harbours' and the route marker's planking, fittings and stone) keeps
 // its map, and its normal map (at the source's normal scale) where the tier draws standard
 // materials, and its geometry keeps its UVs; the vertex colour is then the tint and baked
 // light over the paint, stored under a headroom its material's extras name
 // (`vertexColourScale`, multiplied back here). A texture-free GLB converts exactly as before.
+// Models that each carry their own copy of the SAME painted maps (the Wickharbor wharf and
+// harbor) can still draw with one material per name: a converter made with
+// `sharePaintedMapsByName` (below).
 // Nothing here runs per frame; callers build templates at world build.
 
 import * as THREE from 'three';
@@ -29,6 +33,27 @@ export interface VertexColourMaterialConverter {
   clear(): void;
 }
 
+export interface VertexColourMaterialConverterOptions {
+  /**
+   * Treat two painted sources of one material name as the same material when their maps
+   * carry the same name and size, whichever file each came from: the converted material
+   * then draws the FIRST source's map for both. For models built from one set of painted
+   * maps that each embed their own copy (the Wickharbor wharf and harbor wear the same
+   * planking, fittings and stone), so they keep drawing with the same material objects and
+   * the props static merge keeps batching them together. Off by default: a file that is
+   * another TEXTURE TIER of the same model names its maps the same and must convert anew
+   * (the Mirefen tavern's half and quarter files), and a map with no name is never shared.
+   */
+  sharePaintedMapsByName?: boolean;
+}
+
+/** What tells one painted map from another in a converter's cache. */
+function paintedMapIdentity(map: THREE.Texture, byName: boolean): string {
+  if (!byName || !map.name) return map.uuid;
+  const image = map.image as { width?: number; height?: number } | null | undefined;
+  return `named:${map.name}:${image?.width ?? 0}x${image?.height ?? 0}`;
+}
+
 /** Warm lantern panes and windows: the ferry's own glow (transport_ship.ts). */
 export const VERTEX_COLOUR_GLOW_EMISSIVE = 0xff9a3c;
 
@@ -40,7 +65,10 @@ export function vertexColourScaleOf(source: THREE.Material): number {
   return typeof scale === 'number' && Number.isFinite(scale) && scale > 0 ? scale : 1;
 }
 
-export function vertexColourMaterialConverter(): VertexColourMaterialConverter {
+export function vertexColourMaterialConverter(
+  options: VertexColourMaterialConverterOptions = {},
+): VertexColourMaterialConverter {
+  const byName = options.sharePaintedMapsByName === true;
   const cache = new Map<string, THREE.Material>();
   return {
     convert(source: THREE.Material): THREE.Material {
@@ -50,7 +78,7 @@ export function vertexColourMaterialConverter(): VertexColourMaterialConverter {
       // lambert tier draws no normal map
       const map = std.map ?? undefined;
       const normalMap = map && GFX.standardMaterials ? (std.normalMap ?? undefined) : undefined;
-      const key = `${source.name}|${GFX.standardMaterials ? 's' : 'l'}|${map?.uuid ?? ''}`;
+      const key = `${source.name}|${GFX.standardMaterials ? 's' : 'l'}|${map ? paintedMapIdentity(map, byName) : ''}`;
       const cached = cache.get(key);
       if (cached) return cached;
       const mat = surfaceMat({

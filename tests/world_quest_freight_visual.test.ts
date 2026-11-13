@@ -52,7 +52,7 @@ describe('world quest freight visual', () => {
 
   it('uses the shipped wagon, horse, and crate models', () => {
     expect(worldQuestFreightVisualInternalsForTest.assetUrls).toEqual({
-      wagon: '/models/biome/city_wagon.glb',
+      wagon: '/models/quest/freight_wagon.glb',
       horse: '/models/mounts/valorsteed.glb',
       crate: '/models/quest/supply_crate.glb',
     });

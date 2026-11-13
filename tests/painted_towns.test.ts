@@ -100,15 +100,21 @@ function expectPath(
 }
 
 /** A free spot for a body on the town's square: the hub centre, or the nearest
- *  unblocked point round it (a well or a stall may stand on the centre). */
+ *  unblocked point round it (a well or a stall may stand on the centre) that is
+ *  out of doors. A walk-in building's room is open floor to a body asked about
+ *  without a height (the hand-built lots bake no upper floor over their rooms,
+ *  as the release models did), and Bridgemere's hub centre lies inside its
+ *  island inn: the square is the ground outside every building's walls. */
 function squareSpot(town: PaintedTownLayout): { x: number; z: number } {
   const { x, z } = town.hub.center;
+  const indoors = (p: { x: number; z: number }) =>
+    town.buildings.some((building) => distancePointToObb(p, building.footprint) < 0.6);
   for (let r = 0; r <= 10; r += 0.5) {
     const steps = Math.max(1, Math.round((Math.PI * 2 * r) / 0.5));
     for (let i = 0; i < steps; i++) {
       const a = (i / steps) * Math.PI * 2;
       const p = { x: x + Math.cos(a) * r, z: z + Math.sin(a) * r };
-      if (!isBlocked(SEED, p.x, p.z, 0.6)) return p;
+      if (!isBlocked(SEED, p.x, p.z, 0.6) && !indoors(p)) return p;
     }
   }
   throw new Error(`${town.id}: no free spot within 10 yd of the hub`);
@@ -168,7 +174,9 @@ describe('the painted towns recipe', () => {
   it('gives every look model a Studio natural size, its default model size', () => {
     // a town building whose asset has no natural-size row is silently left out
     // of the Studio conversion (editor/feature_prop_placements.ts); a look is
-    // the default model re-textured, so it stands at the default model's size
+    // the default harbour model in another colour set (the hand-built lots of
+    // scripts/assets/eastbrook_houses/lots.py), so it stands at that model's
+    // size, measured off public/models/tidehold/harbour/<model>.glb
     for (const [look, models] of Object.entries(PAINTED_LOOK_MODELS)) {
       for (const model of models) {
         const building = paintedTownBuilding({
@@ -183,7 +191,9 @@ describe('the painted towns recipe', () => {
         });
         const id = building.assetId.replace(/^\/models\//, '').replace(/\.glb$/i, '');
         expect(TOWN_BUILDING_NATURAL[id], id).toBeDefined();
-        expect(TOWN_BUILDING_NATURAL[id], id).toEqual(TOWN_BUILDING_NATURAL[`tidehold/${model}`]);
+        expect(TOWN_BUILDING_NATURAL[id], id).toEqual(
+          TOWN_BUILDING_NATURAL[`tidehold/harbour/${model}`],
+        );
       }
     }
   });
@@ -203,7 +213,8 @@ describe('the painted towns recipe', () => {
     ).toThrow();
     const sealed = paintedTownBuilding({ ...base, model: 'house_c', look: 'highwatch' });
     expect(sealed.walkIn).toBe(false);
-    expect(sealed.assetId).toBe('/models/tidehold/highwatch/house_c.glb');
+    // the Highwatch look is the harbour set in its Alpine slate (PAINTED_LOOK_SETS)
+    expect(sealed.assetId).toBe('/models/tidehold/harbour_alpine/house_c.glb');
     const shop = paintedTownBuilding({ ...base, model: 'shop_b', look: 'default', scale: 1.5 });
     expect(shop.walkIn).toBe(true);
     expect(shop.placement).toMatchObject({ scale: 1.5, lift: -1.55 });

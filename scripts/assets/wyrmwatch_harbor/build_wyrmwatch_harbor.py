@@ -36,8 +36,13 @@ low tier keeps, so every solid is in a low-tier part):
     PathStoneA/B/C         three flagstones the runtime lays along the path to Wyrmwatch
                            (never drawn where they stand in the model)
 
-Everything is original procedural work for this project, in the Eastbrook ferry's palette and
-the harbor route marker's materials, so the harbor belongs to the ship and the sign.
+The geometry is original procedural work for this project, in the Eastbrook ferry's palette and
+the harbor route marker's materials, so the harbor belongs to the ship and the sign. Its timber, fittings and
+stone are PAINTED: they wear the Eastbrook ferry's maps (scripts/assets/eastbrook_ferry/tex,
+cut from the project's Eastbrook town paintings by paint_ferry.py), laid at world scale by
+the painted layer over shiplib (paintlib.py: every board, pile and post on one painted board
+with the grain along its length, the stone in level courses), and the vertex colours below
+tint them.
 """
 import json
 import math
@@ -51,7 +56,9 @@ sys.path.insert(0, HERE)
 
 import bpy  # noqa: E402
 from mathutils import Vector  # noqa: E402
-from shiplib import EDGE, FLAT, GLOW, IRON, ROPE, WOOD, P, Piece, empty, scale_color, triangles  # noqa: E402
+from paintlib import HarbourPiece as Piece  # noqa: E402
+from paintlib import harbour_materials, weathered  # noqa: E402
+from shiplib import EDGE, FLAT, GLOW, IRON, ROPE, WOOD, P, empty, scale_color, triangles  # noqa: E402
 
 import build_harbor_house as H  # noqa: E402
 
@@ -87,6 +94,14 @@ PAL = dict(
     shingle=[(0.46, 0.25, 0.18), (0.41, 0.22, 0.16), (0.5, 0.28, 0.2)],
     wall=[(0.6, 0.44, 0.3), (0.55, 0.4, 0.27), (0.63, 0.46, 0.31)],
 )
+
+# The timber above is the ferry's fresh orange-brown. A harbour's has stood in sun and salt:
+# every deck board, post, pile, rail and wall board is weathered to a sun-bleached grey-brown
+# (paintlib.weathered), and the roof shingles to a darker red-brown. The wharf and Wickharbor's
+# harbor read this same table.
+for _key in ('plank', 'deck', 'post', 'post_dark', 'pile', 'trim_dark', 'seam', 'wall'):
+    PAL[_key] = weathered(PAL[_key])
+PAL['shingle'] = weathered(PAL['shingle'], grey=0.35, lift=0.85)
 
 MATERIAL_SPECS = (
     # name, roughness, metallic, emission; indexed like shiplib (WOOD, IRON, STONE, ROPE, GLOW)
@@ -721,22 +736,11 @@ def build_stone(name, rx, rz, sides, seed):
 # Scene
 # ---------------------------------------------------------------------------
 def make_materials():
-    mats = []
-    for name, rough, metal, emission in MATERIAL_SPECS:
-        mat = bpy.data.materials.new(name)
-        mat.use_nodes = True
-        bsdf = mat.node_tree.nodes.get('Principled BSDF')
-        bsdf.inputs['Roughness'].default_value = rough
-        bsdf.inputs['Metallic'].default_value = metal
-        attr = mat.node_tree.nodes.new('ShaderNodeVertexColor')
-        attr.layer_name = 'Col'
-        mat.node_tree.links.new(attr.outputs['Color'], bsdf.inputs['Base Color'])
-        if emission:
-            mat.node_tree.links.new(attr.outputs['Color'], bsdf.inputs['Emission Color'])
-            bsdf.inputs['Emission Strength'].default_value = emission
-        mat.use_backface_culling = True
-        mats.append(mat)
-    return mats
+    """The five harbour materials, painted: the planking on the wood, the fittings map on
+    the iron, rubble on the stone (the Eastbrook ferry's maps, scripts/assets/eastbrook_ferry/
+    paintlib.py), the vertex colours tinting them; the rope and the glow wear no map. The
+    wharf, Wickharbor's harbor and the route marker draw with these same materials."""
+    return harbour_materials(MATERIAL_SPECS)
 
 
 CRITICAL = ('QuayDecks', 'StairFlights', 'Landings', 'Railings', 'HarborGate', 'Lanterns', 'Cargo') + H.HOUSE_PARTS
@@ -803,6 +807,7 @@ def export(path, objs):
         filepath=path, export_format='GLB', use_selection=True, export_apply=True, export_yup=True,
         export_extras=True, export_animations=False, export_cameras=False, export_lights=False,
         export_vertex_color='ACTIVE', export_all_vertex_colors=False, export_morph=False,
+        export_texcoords=True, export_image_format='WEBP', export_image_quality=92,
     )
     print('WROTE', path)
 

@@ -84,6 +84,7 @@ import {
   STOCK_LOOK_ID,
   skyUniformValues,
   stockLookFor,
+  ZONE_SUN,
   type ZoneLook,
 } from './zone_look_core';
 import { ZONE_LOOKS } from './zone_looks';
@@ -524,6 +525,10 @@ class PaletteLabRuntime implements PaletteLabApi {
       light.sunScale = look.light.sunScale;
       light.hemiScale = look.light.hemiScale;
       light.envScale = look.light.envScale;
+      // the zone's own sun (ZONE_SUN), unless the look turns it itself
+      const zoneSun = owner ? ZONE_SUN[owner.id] : undefined;
+      light.sunTurn = look.light.sunTurn ?? zoneSun?.turn;
+      light.sunElev = look.light.sunElev ?? zoneSun?.elev;
       BIOME_GOD_RAYS[biome] = look.godRays;
       hazePresets[biome] = {
         color: fog.color,

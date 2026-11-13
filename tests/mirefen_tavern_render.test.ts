@@ -262,10 +262,16 @@ describe('mirefen tavern painter', () => {
           return;
         }
         // the painted town's map (the loader names it after its image), a normal map on the
-        // standard tier only (the cloth and the props' atlas wear none), and the UVs it is laid on
+        // standard tier only (the cloth, the props' atlas and the kit's own rubble and slates
+        // wear none), and the UVs it is laid on
         expect(mat.map.name, mesh.name).toMatch(/^Tavern[A-Za-z]+_color$/);
         painted.add(mat.map.name);
-        const unbumped = ['TavernCloth_color', 'TavernProps_color'].includes(mat.map.name);
+        const unbumped = [
+          'TavernCloth_color',
+          'TavernProps_color',
+          'TavernStone_color',
+          'TavernRoof_color',
+        ].includes(mat.map.name);
         expect(!!mat.normalMap, mesh.name).toBe(standard && !unbumped);
         if (mat.normalMap) {
           expect(mat.normalMap.name).toBe(mat.map.name.replace('_color', '_normal'));

@@ -142,6 +142,38 @@ const ROSE_SKY = {
   intensity: 1.35,
 };
 
+// The daylight the painted towns were tuned under (Eastbrook's rig): a warm key, a pale cool
+// sky fill strong enough that a wall in shade still reads as stone, soft shadows and contact
+// shading. A zone that used to wear a dark or one-hue look
+// takes this light and keeps a ground of its own, so it still has its own colour.
+const PAINTED_DAY = {
+  fog: { color: 0xb6d6f0, near: 145, far: 780 },
+  light: {
+    hemiSky: 0xd8eeff,
+    hemiGround: 0x689656,
+    sun: 0xffe6bc,
+    sunScale: 1.35,
+    hemiScale: 3.4,
+    envScale: 1.68,
+  },
+  sky: ISLAND_SKY,
+  grade: HIGH_KEY,
+  bloom: { strength: 0.28, threshold: 1.38 },
+};
+// The day family's render arms written out in full (with the painted towns' softer shadow
+// and firmer contact shading), for a zone whose own family would otherwise be the moody one.
+const PAINTED_DAY_RENDER = {
+  rim: 0.35,
+  rimPower: 3.2,
+  aoTint: 0x385e9e,
+  aoScale: 1.25,
+  shadowStrength: 0.7,
+  meadowCoverage: 0.65,
+  meadowHeight: 1.15,
+  meadowWidth: 1.4,
+  canopyLift: 1.18,
+};
+
 const CURATED: Readonly<Record<string, readonly LookPatch[]>> = {
   // ---------------------------------------------------------------- vale ---
   eastbrook_vale: [
@@ -207,18 +239,23 @@ const CURATED: Readonly<Record<string, readonly LookPatch[]>> = {
         sand: 0xe4d4a8,
       },
       fog: { color: 0xb6d6f0, near: 145, far: 780 },
+      // A stronger, warmer sun than the original rig (sun 1.0 at 0xfff4e0, fill
+      // 3.95) over a little less sky fill, with SOFT shadows and contact shading.
+      // Chosen side by side: full-strength shadows read well under the old
+      // low buildings but put the square in the dark under the tall rebuilt ones.
       light: {
         hemiSky: 0xd8eeff,
         hemiGround: 0x689656,
-        sun: 0xfff4e0,
-        sunScale: 1.0,
-        hemiScale: 3.95,
+        sun: 0xffe6bc,
+        sunScale: 1.35,
+        hemiScale: 3.4,
         envScale: 1.68,
       },
       sky: ISLAND_SKY,
       water: LAGOON,
       grade: HIGH_KEY,
       bloom: { strength: 0.28, threshold: 1.38 },
+      render: { shadowStrength: 0.7, aoScale: 1.25 },
     },
     {
       id: 'painted-storybook',
@@ -367,6 +404,25 @@ const CURATED: Readonly<Record<string, readonly LookPatch[]>> = {
       grade: GOLDEN_HOUR,
       bloom: { strength: 0.6, threshold: 1.15 },
     },
+    {
+      // Chosen 2026-11-12: the painted daylight over Tropic Lagoon's own jade grass, coral
+      // sand and lagoon water. Under Tropic Lagoon's harder contrast and deeper shadows the
+      // town's walls in shade went near black; this keeps the island's colours and lets the
+      // shade read as stone.
+      id: 'island-noon',
+      name: 'Island Noon',
+      note: 'Soft bright island noon: jade grass, coral sand, a glowing lagoon, pale shade.',
+      ground: {
+        grass: 0x5aa844,
+        grassDark: 0x2f7a40,
+        grassYellow: 0x9cc456,
+        dirt: 0xa88458,
+        sand: 0xf4e4b6,
+      },
+      ...PAINTED_DAY,
+      water: LAGOON,
+      render: PAINTED_DAY_RENDER,
+    },
   ],
   proving_shore: [
     {
@@ -454,18 +510,23 @@ const CURATED: Readonly<Record<string, readonly LookPatch[]>> = {
         sand: 0xe4d4a8,
       },
       fog: { color: 0xb6d6f0, near: 145, far: 780 },
+      // A stronger, warmer sun than the original rig (sun 1.0 at 0xfff4e0, fill
+      // 3.95) over a little less sky fill, with SOFT shadows and contact shading.
+      // Chosen side by side: full-strength shadows read well under the old
+      // low buildings but put the square in the dark under the tall rebuilt ones.
       light: {
         hemiSky: 0xd8eeff,
         hemiGround: 0x689656,
-        sun: 0xfff4e0,
-        sunScale: 1.0,
-        hemiScale: 3.95,
+        sun: 0xffe6bc,
+        sunScale: 1.35,
+        hemiScale: 3.4,
         envScale: 1.68,
       },
       sky: ISLAND_SKY,
       water: LAGOON,
       grade: HIGH_KEY,
       bloom: { strength: 0.28, threshold: 1.38 },
+      render: { shadowStrength: 0.7, aoScale: 1.25 },
     },
     {
       id: 'painted-storybook',
@@ -588,18 +649,23 @@ const CURATED: Readonly<Record<string, readonly LookPatch[]>> = {
         sand: 0xe4d4a8,
       },
       fog: { color: 0xb6d6f0, near: 145, far: 780 },
+      // A stronger, warmer sun than the original rig (sun 1.0 at 0xfff4e0, fill
+      // 3.95) over a little less sky fill, with SOFT shadows and contact shading.
+      // Chosen side by side: full-strength shadows read well under the old
+      // low buildings but put the square in the dark under the tall rebuilt ones.
       light: {
         hemiSky: 0xd8eeff,
         hemiGround: 0x689656,
-        sun: 0xfff4e0,
-        sunScale: 1.0,
-        hemiScale: 3.95,
+        sun: 0xffe6bc,
+        sunScale: 1.35,
+        hemiScale: 3.4,
         envScale: 1.68,
       },
       sky: ISLAND_SKY,
       water: LAGOON,
       grade: HIGH_KEY,
       bloom: { strength: 0.28, threshold: 1.38 },
+      render: { shadowStrength: 0.7, aoScale: 1.25 },
     },
     {
       id: 'witchwater',
@@ -1036,6 +1102,25 @@ const CURATED: Readonly<Record<string, readonly LookPatch[]>> = {
         shadowAmt: 0.16,
       },
     },
+    {
+      // Chosen 2026-11-12: the painted daylight over Alpine Clear's own
+      // meadow and glacier water. Alpine Clear's bluer sky fill and blue shadow tint turned
+      // every stone wall in shade cobalt (Highwatch read as a blue town); under this light
+      // the same walls are grey stone and the meadows keep their mountain green.
+      id: 'highland-noon',
+      name: 'Highland Noon',
+      note: 'Bright thin mountain air with warm sun and pale shade: grey stone, fresh meadows.',
+      ground: {
+        grass: 0x6aa04e,
+        grassDark: 0x3e6e4a,
+        grassYellow: 0xa6b866,
+        dirt: 0x8a765a,
+        sand: 0xc8bea4,
+      },
+      ...PAINTED_DAY,
+      water: GLACIER,
+      render: PAINTED_DAY_RENDER,
+    },
   ],
   // ---------------------------------------------------------- the rest ---
   evergarden: [
@@ -1162,6 +1247,34 @@ const CURATED: Readonly<Record<string, readonly LookPatch[]>> = {
       water: GOLDEN_SEA,
       grade: GOLDEN_HOUR,
       bloom: { strength: 0.58, threshold: 1.16 },
+    },
+    {
+      // Chosen 2026-11-12: the garden under Galecrest's clear daylight
+      // with its own lawn and pond colours kept. Afternoon Reverie's lifted, low-contrast
+      // grade washed the whole zone out; this and the lawn's blades (foliage.ts
+      // GRASS_BIOME_DENSITY) are what brought it back.
+      id: 'garden-noon',
+      name: 'Garden Noon',
+      note: 'Clear high noon over the lawns: crisp light, deep sky, the garden in full colour.',
+      ground: {
+        grass: 0x7cbc5c,
+        grassDark: 0x4e9058,
+        grassYellow: 0xb8d47a,
+        dirt: 0xb09c7c,
+        sand: 0xeee4c8,
+      },
+      fog: { color: 0xb8dbf2, near: 170, far: 820 },
+      light: {
+        hemiSky: 0xd6ebff,
+        hemiGround: 0x6a8a52,
+        sun: 0xfff7e8,
+        sunScale: 1.06,
+        hemiScale: 4.56,
+        envScale: 1.8,
+      },
+      sky: ISLAND_SKY,
+      water: { deep: 0x165a86, shallow: 0x5ac0d0, sky: 0xd8eef8, scatter: 0x48aab8 },
+      grade: HIGH_KEY,
     },
   ],
   palmreach: [
@@ -1449,6 +1562,73 @@ const CURATED: Readonly<Record<string, readonly LookPatch[]>> = {
         lift: 0.01,
       },
     },
+    {
+      // Chosen 2026-11-12: Palmreach's bright noon over the Hollow's own
+      // grey-violet heath and rose water. Rosewater Twilight dyed the sky, the grass, the
+      // stone and the paths one pink; in clear light the heath keeps its heather colour and
+      // the town, the great tree and the cliffs each read as what they are. (No look changes
+      // this zone much: what holds it back is how its town and land lie, not their colour.)
+      id: 'heather-noon',
+      name: 'Heather Noon',
+      note: 'Clear noon over grey-violet heath and rose-tinted water; cool, open, unhurried.',
+      ground: {
+        grass: 0x7a8a72,
+        grassDark: 0x52566a,
+        grassYellow: 0xa89a8a,
+        dirt: 0x806874,
+        sand: 0xc6aebc,
+      },
+      fog: { color: 0xb6e6ee, near: 165, far: 660 },
+      light: {
+        hemiSky: 0xd8f6ff,
+        hemiGround: 0x4a8a5a,
+        sun: 0xfff8ea,
+        sunScale: 1.08,
+        hemiScale: 4.56,
+        envScale: 1.8,
+      },
+      sky: { zenith: 0x2a9aea, horizon: 0xe2f8fa, amount: 0.88, cloudKeep: 1 },
+      water: ROSE_SEA,
+      grade: { ...HIGH_KEY, saturation: 1.1, greenHue: 8 },
+    },
+    {
+      // Chosen 2026-11-13: the Hollow as a silver-violet heath under a
+      // soft violet sky (the Frostveil's Violet Whiteout light and palette, here over a
+      // meadow instead of snow: the blade carpet turns to pale lilac with white tips). It
+      // replaces Heather Noon, whose grey-green heath read as dull ground under a bright
+      // day: this is the one zone no clear-daylight look suited. The Hollow's own first
+      // look, the warm dusk it shipped with, is still in the list.
+      id: 'silver-heath',
+      name: 'Silver Heath',
+      note: 'Pale lilac heath with white tips under a soft violet sky; bright, veiled, dreamlike.',
+      ground: {
+        grass: 0xeeeaf6,
+        grassDark: 0xd2cce8,
+        grassYellow: 0xe2dcf0,
+        dirt: 0x9a94b4,
+        sand: 0xe8e2f2,
+      },
+      fog: { color: 0xc4bcdc, near: 90, far: 320 },
+      light: {
+        hemiSky: 0xc8c0ff,
+        hemiGround: 0x7a7298,
+        sun: 0xf4eeff,
+        sunScale: 0.85,
+        hemiScale: 2.69,
+        envScale: 1.3,
+      },
+      godRays: 0.3,
+      sky: { zenith: 0x7a74c0, horizon: 0xe2dcf2, amount: 0.86, cloudKeep: 0.9 },
+      water: VIOLET_POOL,
+      grade: {
+        ...HIGH_KEY,
+        temperature: -0.04,
+        tint: 0.12,
+        contrast: 0.92,
+        shadowTint: 0x5a4ab0,
+        lift: 0.06,
+      },
+    },
   ],
   nightbloom: [
     {
@@ -1619,6 +1799,45 @@ const CURATED: Readonly<Record<string, readonly LookPatch[]>> = {
         highlightAmt: 0.08,
       },
       bloom: { strength: 0.72, threshold: 1.04 },
+    },
+    {
+      // Chosen 2026-11-12: the painted daylight over Moonlit Teal's own
+      // ground. Fae Pink turned the whole zone one magenta (sky, grass, soil and stone);
+      // the teal meadow under a clear sky keeps Nightbloom strange and lets everything else
+      // keep its own colour. Natural green grounds suited the zone less than this teal.
+      id: 'teal-meadow',
+      name: 'Teal Meadow',
+      note: 'Clear daylight on a blue-teal moon meadow: strange, cool, and easy on the eye.',
+      // (Moonlit Teal's ground a step toward green, so the blades read as teal grass rather
+      // than blue, with a warm pale sand: its own blue-white sand turned every shore and
+      // flat into one cyan sheet.)
+      ground: {
+        grass: 0x58a69a,
+        grassDark: 0x35766e,
+        grassYellow: 0x8ecdb4,
+        dirt: 0x6b7f78,
+        sand: 0xe6e2cc,
+      },
+      ...PAINTED_DAY,
+      water: LAGOON,
+      render: PAINTED_DAY_RENDER,
+    },
+    {
+      // The zone's default. The teal meadow above suits a few places but not the zone as a
+      // whole.
+      id: 'fae-meadow',
+      name: 'Fae Meadow',
+      note: "Clear daylight over the Nightbloom's own pink-violet ground and violet water.",
+      ground: {
+        grass: 0xd88ad8,
+        grassDark: 0x9a5ab8,
+        grassYellow: 0xf0b0e0,
+        dirt: 0x9a6ab0,
+        sand: 0xf0c8ec,
+      },
+      ...PAINTED_DAY,
+      water: { deep: 0x2a1e5a, shallow: 0x7a6ac8, sky: 0xe8bce8, scatter: 0x8a6ad0 },
+      render: PAINTED_DAY_RENDER,
     },
   ],
   wraithwood: [
@@ -1797,6 +2016,27 @@ const CURATED: Readonly<Record<string, readonly LookPatch[]>> = {
         greenSat: 0.55,
       },
       bloom: { strength: 0.65, threshold: 1.05 },
+    },
+    {
+      // Chosen 2026-11-12: the painted daylight over Grave Mist's
+      // grey-green ground. The zone shipped with no look at all (the stock haunt rows), which
+      // drew it near black at noon. In clear light the dead trees, the graves and the crooked
+      // town carry the haunt.
+      id: 'thicket-day',
+      name: 'Thicket Daylight',
+      note: 'Clear, pale daylight through the dead wood: the haunt is in the shapes, not the dark.',
+      // (Grave Mist's grey-green grass over a LIGHTER earth: its near-black dirt and dark
+      // sand read as holes in the ground in daylight. Greener and purple grounds were tried
+      // and suited the wood less.)
+      ground: {
+        grass: 0x4e5e52,
+        grassDark: 0x323e3a,
+        grassYellow: 0x66705a,
+        dirt: 0x7a6a58,
+        sand: 0x9a9482,
+      },
+      ...PAINTED_DAY,
+      render: PAINTED_DAY_RENDER,
     },
   ],
   frostveil: [
@@ -2249,6 +2489,36 @@ const CURATED: Readonly<Record<string, readonly LookPatch[]>> = {
         contrast: 1.12,
       },
       bloom: { strength: 0.65, threshold: 1.06 },
+    },
+    {
+      // Chosen 2026-11-12: Amberfall's warm gold daylight over Sunbaked
+      // Badlands' ochre ground. Ashfall's grey murk hid the whole zone (every other look
+      // tried was clearer). The ash-grey ground was as good as this one under the new light
+      // but grew a dead mauve sward; the ochre reads as sun-scorched grassland, and the
+      // basalt town and the fires stand out against it.
+      id: 'ember-noon',
+      name: 'Ember Noon',
+      note: 'A hard gold sun on scorched ochre grassland: dry, clear, readable to the horizon.',
+      ground: {
+        grass: 0xbc9a52,
+        grassDark: 0x8a7a46,
+        grassYellow: 0xd8b860,
+        dirt: 0xb07446,
+        sand: 0xe6be86,
+      },
+      fog: { color: 0xc4def0, near: 130, far: 600 },
+      light: {
+        hemiSky: 0xd0e6ff,
+        hemiGround: 0x8a7238,
+        sun: 0xfff2d4,
+        sunScale: 1.08,
+        hemiScale: 4.32,
+        envScale: 1.8,
+      },
+      godRays: 0.9,
+      sky: ISLAND_SKY,
+      water: COBALT,
+      grade: { ...HIGH_KEY, saturation: 1.12, greenHue: -30, greenSat: 1.25, greenVal: 1.1 },
     },
   ],
 };

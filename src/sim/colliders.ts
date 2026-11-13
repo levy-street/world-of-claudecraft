@@ -637,7 +637,7 @@ function staticWorldColliders(seed: number): Collider[] {
       const camTop = topY(seed, x, z, MAZE_WALL_HEIGHT);
       const half = MAZE_CELL / 2;
       const depth = MAZE_WALL_DEPTH / 2;
-      // full height on purpose: a 6.1yd hedge is nobody's platform, so no
+      // full height on purpose: a clipped 2.75yd hedge is nobody's platform, so no
       // moveTopY and nothing to stand on or mantle
       if (piece.h) {
         out.push({ type: 'obb', x, z, hw: half, hd: depth, rot: 0, cameraTopY: camTop });

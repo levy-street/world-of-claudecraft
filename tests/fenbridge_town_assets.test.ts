@@ -884,7 +884,8 @@ describe('Fenbridge shipping asset family', () => {
     ]);
     // Every building the town stands is a painted Tidehold model instead.
     for (const building of FENBRIDGE_LAYOUT.buildings) {
-      expect(building.assetId, building.id).toMatch(/\/tidehold\/(?:fenrire\/)?[a-z_]+\.glb$/);
+      // (the harbour set in its moss colours: PAINTED_LOOK_SETS.fenrire)
+      expect(building.assetId, building.id).toMatch(/\/tidehold\/harbour_moss\/[a-z_]+\.glb$/);
     }
   });
 
@@ -898,7 +899,7 @@ describe('Fenbridge shipping asset family', () => {
     const { bank } = FENBRIDGE_LAYOUT.services;
     const bankBuilding = FENBRIDGE_BUILDINGS_BY_ID[bank.buildingId];
     expect(bankBuilding.id).toBe('fenbridge_gilded_strongbox');
-    expect(bankBuilding.assetId).toMatch(/\/tidehold\/(?:fenrire\/)?shop_a\.glb$/);
+    expect(bankBuilding.assetId).toMatch(/\/tidehold\/harbour_moss\/shop_a\.glb$/);
     expect(bank.entrance).toBe(bankBuilding.sockets.entrance);
     // the authored door (-1.6, -4.2) at the grand bank's 1.5
     const scale = bankBuilding.placement.scale;

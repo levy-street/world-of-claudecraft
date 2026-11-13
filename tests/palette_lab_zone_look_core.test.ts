@@ -158,7 +158,7 @@ describe('selections', () => {
     expect(text).toContain('BIOME_LIGHT.vale');
   });
 
-  it('resolves every default zone selection and switches Thornpeak between Alpine Clear (day) and Sky Island Gold (night)', () => {
+  it('resolves every default zone selection and switches Thornpeak between Highland Noon (day) and Sky Island Gold (night)', () => {
     for (const [zoneId, lookId] of Object.entries(DEFAULT_ZONE_SELECTIONS)) {
       const looks = ZONE_LOOKS[zoneId] ?? [];
       expect(
@@ -183,7 +183,7 @@ describe('selections', () => {
         DEFAULT_ZONE_NIGHT_SELECTIONS,
         false,
       ),
-    ).toBe('alpine-clear');
+    ).toBe('highland-noon');
     expect(
       resolveZoneLookId(
         'thornpeak_heights',
@@ -199,13 +199,13 @@ describe('selections', () => {
         DEFAULT_ZONE_NIGHT_SELECTIONS,
         false,
       ),
-    ).toBe('ashfall');
+    ).toBe('ember-noon');
     expect(
       resolveZoneLookId('drakelands', DEFAULT_ZONE_SELECTIONS, DEFAULT_ZONE_NIGHT_SELECTIONS, true),
     ).toBe('obsidian-teal');
     expect(
       resolveZoneLookId('frostveil', DEFAULT_ZONE_SELECTIONS, DEFAULT_ZONE_NIGHT_SELECTIONS, false),
-    ).toBe('glacier-teal');
+    ).toBe('violet-whiteout');
     expect(
       resolveZoneLookId('frostveil', DEFAULT_ZONE_SELECTIONS, DEFAULT_ZONE_NIGHT_SELECTIONS, true),
     ).toBe('violet-whiteout');

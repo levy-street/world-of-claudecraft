@@ -125,13 +125,16 @@ describe('the air of a walk-in placed building', () => {
     });
     const s = p.scale;
     const line = 9 + s + p.lift;
+    // the great inn's room as the hand-built lot gives it (MODEL_AIR.tavern_b, written from
+    // scripts/assets/eastbrook_houses/lots.py): a tenth of a yard inside its walls, from its
+    // deck to a tenth under its ceiling
     expect(skew?.boxes[0]).toEqual([
-      -11.0 * s,
-      12.15 * s,
+      -12.35 * s,
+      12.35 * s,
       line + 0.45 * s,
-      line + 5.0 * s,
-      -6.65 * s,
-      6.65 * s,
+      line + 5.25 * s,
+      -6.85 * s,
+      6.85 * s,
     ]);
     expect(skew?.openings).toEqual([{ box: 1, axis: 2, side: -1 }]);
   });
@@ -150,7 +153,10 @@ describe('the air of a walk-in placed building', () => {
       const deep =
         front.axis === 0 ? (box[0] + box[1]) / 2 - door.x : (box[4] + box[5]) / 2 - door.z;
       expect(Math.abs(across), building.id).toBeLessThan(0.01);
-      expect(Math.abs(deep), building.id).toBeLessThan(1);
+      // a lot's doorway air runs from a tenth of a yard outside the wall's face to 0.9 past
+      // its inner one (1.55 authored yards in all), so its middle stands 0.675 authored yards
+      // in from the socket on the wall's face: measured off MODEL_AIR for every model
+      expect(Math.abs(deep) / building.placement.scale, building.id).toBeCloseTo(0.675, 2);
       // the opening faces the standing point outside it
       const facing = building.frontStandingPoint;
       const centre = { x: (box[0] + box[1]) / 2, z: (box[4] + box[5]) / 2 };
@@ -386,15 +392,17 @@ describe('the authored air against each model baked collision', () => {
   // The largest dimension of each model at authored size, measured off the shipped GLB: the
   // placed-asset unit (a baked row is stored in multiples of it over 2.2), and the number the
   // towns' records carry as placement.modelSize.
+  // (the hand-built harbour lots: public/models/tidehold/harbour/<name>.glb, the guild under
+  // harbour_alpine; the same numbers src/editor/feature_prop_placements.ts lists per axis)
   const MODEL_SIZE: Readonly<Record<string, number>> = {
-    tavern_b: 30.262,
-    tavern: 22.6483,
-    bank: 22.6067,
-    hall: 30.4998,
-    shop_a: 16.2797,
-    shop_b: 18.7,
-    smithy: 19.797,
-    guild: 47.75,
+    tavern_b: 33.9854,
+    tavern: 27.6003,
+    bank: 25.5973,
+    hall: 30.2535,
+    shop_a: 20.21,
+    shop_b: 20.31,
+    smithy: 19.99,
+    guild: 41.8333,
   };
   // the sizes the towns stand the models at (authored size, and the grand towns' 1.2 to 1.5),
   // at every quarter turn (air in the world's axes) and at two of the free turns Eastbrook
@@ -410,26 +418,6 @@ describe('the authored air against each model baked collision', () => {
   ];
   /** The ground under a probe building's anchor. */
   const GROUND = 7.25;
-  /** The tall pieces a room's air is cut round, each named by a point inside its baked box at
-   *  authored size (x, y over the ground line, z): the lens never stands in one. */
-  const CUT_ROUND: Readonly<
-    Record<string, readonly (readonly [string, number, number, number])[]>
-  > = {
-    tavern_b: [['the chimney breast', -11.8, 2.5, -1]],
-    tavern: [
-      ['the chimney breast', -8.8, 2.5, 0],
-      ['the back-bar shelves', -2.4, 2, 5.4],
-      ['the back-bar shelves', 2.4, 2, 5.4],
-    ],
-    bank: [
-      ['a pillar', -4.6, 2.5, -2.2],
-      ['a pillar', 4.6, 2.5, -2.2],
-    ],
-    shop_a: [['the back shelves', 0, 2, 3.55]],
-    shop_b: [['the back shelves', -0.6, 2, 3.85]],
-    smithy: [['the forge hearth', -4.4, 2, 0]],
-  };
-
   /**
    * One model stood the way a town stands it, at `scale` and `turn` on GROUND: its camera air,
    * and the same building as the sim stands it (sim/town_walk_in.ts walkInPlacementFor) on the
@@ -440,7 +428,7 @@ describe('the authored air against each model baked collision', () => {
     const placement = { x: 31.5, z: -48.25, rotation: turn, scale, lift: -(scale + 0.05) };
     const record = {
       id: `probe_${name}`,
-      assetId: `/models/tidehold/${name}.glb`,
+      assetId: `/models/tidehold/harbour/${name}.glb`,
       walkIn: true,
       placement,
     };
@@ -479,7 +467,7 @@ describe('the authored air against each model baked collision', () => {
 
   function eachStanding(check: (name: string, scale: number, turn: number, at: string) => void) {
     for (const name of placedTownInteriorModels()) {
-      // the guild (its own model under tidehold/highwatch, several rooms off one hall) is
+      // the guild (its own model under tidehold/harbour_alpine, several rooms off one hall) is
       // pinned by its own block at the end of this file
       if (name === 'guild') continue;
       for (const scale of SCALES) {
@@ -534,36 +522,42 @@ describe('the authored air against each model baked collision', () => {
     });
   });
 
-  it('keeps every room clear of the hearths, shelves and pillars it is cut round', () => {
+  it('keeps every room free of tall pieces: only low furniture stands inside one', () => {
+    // The release models stood chimney breasts, back-bar shelves and pillars inside their
+    // rooms, and each room's air was cut round them. The hand-built lots furnish their rooms
+    // low (scripts/assets/eastbrook_houses/lots.py; kit.py notes each table, bench, counter,
+    // barrel and crate as solid, and a fireplace only up to its mantel). So every baked box
+    // whose middle stands inside a room is furniture the eye looks over, never masonry the
+    // lens could be walked into, and no room's air needs cutting.
+    // Authored yards over the ground line: the tallest piece is the chapel's altar, at 2.2.
+    const FURNITURE_TOP = 2.3;
+    let furniture = 0;
+    const pieces: Record<string, number> = {};
     eachStanding((name, scale, turn, at) => {
       const { air, walls, world } = stand(name, scale, turn);
-      for (const [what, x, y, z] of CUT_ROUND[name] ?? []) {
-        const p = world(x, y, z);
-        const solid = walls.filter((c) => wallHolds(c, p.x, p.y, p.z));
-        expect(solid.length, `${at}: ${what} is baked`).toBeGreaterThan(0);
-        for (const c of solid) {
-          if (c.type !== 'obb') continue;
-          // the baked box in the air's own axes (as it is for air in the world's)
-          const centre = airLocal(air, c.x, c.z);
-          const rot = c.rot - (air.frame?.yaw ?? 0);
-          const cos = Math.abs(Math.cos(rot));
-          const sin = Math.abs(Math.sin(rot));
-          const ex = c.hw * cos + c.hd * sin;
-          const ez = c.hw * sin + c.hd * cos;
-          const [y0, y1] = [c.baseY ?? -Infinity, c.moveTopY ?? Infinity];
-          for (const piece of air.boxes) {
-            const overlaps =
-              piece[0] < centre.x + ex &&
-              piece[1] > centre.x - ex &&
-              piece[2] < y1 &&
-              piece[3] > y0 &&
-              piece[4] < centre.z + ez &&
-              piece[5] > centre.z - ez;
-            expect(overlaps, `${at}: the air stands clear of ${what}`).toBe(false);
-          }
-        }
+      const line = world(0, 0, 0).y;
+      const room = air.boxes[0];
+      for (const c of walls) {
+        if (c.type !== 'obb') continue;
+        const centre = airLocal(air, c.x, c.z);
+        const inRoom =
+          centre.x > room[0] && centre.x < room[1] && centre.z > room[4] && centre.z < room[5];
+        if (!inRoom) continue;
+        furniture++;
+        pieces[name] = (pieces[name] ?? 0) + 1;
+        expect(
+          ((c.moveTopY ?? Infinity) - line) / scale,
+          `${at}: the piece standing inside the room`,
+        ).toBeLessThan(FURNITURE_TOP);
       }
     });
+    // never vacuous: the solid pieces each room holds, the same at every scale and turn it
+    // was stood at (measured off the baked rows; a refurnished room moves its number here)
+    const stands = SCALES.length * TURNS.length;
+    expect(
+      Object.fromEntries(Object.entries(pieces).map(([name, n]) => [name, n / stands])),
+    ).toEqual({ bank: 7, hall: 13, shop_a: 7, shop_b: 7, smithy: 4, tavern: 17, tavern_b: 25 });
+    expect(furniture).toBe(Object.values(pieces).reduce((sum, n) => sum + n, 0));
   });
 
   it('keeps each building one piece of air under the camera near-plane pad', () => {
@@ -733,8 +727,8 @@ describe('a walk-in painted building at any turn', () => {
         id: `turned_${name}`,
         assetId:
           name === 'guild'
-            ? '/models/tidehold/highwatch/guild.glb'
-            : `/models/tidehold/${name}.glb`,
+            ? '/models/tidehold/harbour_alpine/guild.glb'
+            : `/models/tidehold/harbour/${name}.glb`,
         walkIn: true,
         placement: { x: ANCHOR.x, z: ANCHOR.z, rotation, scale: SCALE, lift: -(SCALE + 0.05) },
       },
@@ -808,12 +802,13 @@ describe('a walk-in painted building at any turn', () => {
   });
 
   it('walks a player in through each door at a free turn, the camera following and keeping inside', () => {
-    // every opening: the front doors (along each model's own z) and the smithy's side arch onto
-    // its forge shelter (along its own x)
+    // every opening: each hand-built lot opens by its front door alone (along its own z).
+    // The release smithy also had a side arch onto its forge shelter; the hand-built one
+    // keeps that wall whole and its shelter outside, so no model has a second way in
     const doors = placedTownInteriorModels().flatMap((name) =>
       standAt(name, 0).openings.map((_, index) => ({ name, index })),
     );
-    expect(doors.length).toBeGreaterThan(placedTownInteriorModels().length);
+    expect(doors.length).toBe(placedTownInteriorModels().length);
     for (const { name, index } of doors) {
       const flat = standAt(name, 0);
       // the walk in through the twin's door (world axes), its feet on the door's floor
@@ -902,14 +897,15 @@ describe("the Highwatch guild's air against its baked collision", () => {
     readFileSync(path.join(__dirname, '..', 'data/asset_collision_overrides.json'), 'utf8'),
   ) as Record<string, { boxes: Row[]; ramps?: Row[] }>;
   // the largest dimension of each own-path model at authored size (the placed-asset unit)
-  const SIZE: Record<string, number> = { guild: 47.75 };
+  // (measured off public/models/tidehold/harbour_alpine/guild.glb, the hand-built guild)
+  const SIZE: Record<string, number> = { guild: 41.8333 };
   /** A model's air at authored size in its own axes: stood at the origin, unturned, its
    *  ground line on y 0. */
   function modelAir(name: string) {
     const air = placedTownCameraInterior(
       {
         id: `probe_${name}`,
-        assetId: `/models/tidehold/highwatch/${name}.glb`,
+        assetId: `/models/tidehold/harbour_alpine/${name}.glb`,
         walkIn: true,
         placement: { x: 0, z: 0, rotation: 0, scale: 1, lift: -1 },
       },
@@ -924,7 +920,7 @@ describe("the Highwatch guild's air against its baked collision", () => {
     (name) => {
       const air = modelAir(name);
       const unit = SIZE[name] / 2.2;
-      const rows = BAKED[`tidehold/highwatch/${name}`];
+      const rows = BAKED[`tidehold/harbour_alpine/${name}`];
       const boxes = rows.boxes.map((b) => {
         const c = Math.abs(Math.cos(b.ry ?? 0));
         const s = Math.abs(Math.sin(b.ry ?? 0));
@@ -961,7 +957,7 @@ describe("the Highwatch guild's air against its baked collision", () => {
       // would draw through
       const air = modelAir(name);
       const unit = SIZE[name] / 2.2;
-      const rows = BAKED[`tidehold/highwatch/${name}`];
+      const rows = BAKED[`tidehold/harbour_alpine/${name}`];
       const walls = rows.boxes
         .map((b) => ({
           x0: (b.x - b.hx) * unit,
@@ -972,7 +968,9 @@ describe("the Highwatch guild's air against its baked collision", () => {
           y1: (b.y + b.hy) * unit - 1,
         }))
         .filter((b) => b.y1 - b.y0 >= 5);
-      expect(walls.length).toBeGreaterThan(20);
+      // the hand-built guild bakes fourteen of them: its hall's and trophy hall's walls, the
+      // heads over its door and its arch, its tower and its two chimney stacks
+      expect(walls.length).toBe(14);
       const decks = (rows.ramps ?? []).map((r) => ({
         x0: (r.x - (r.ry ? r.hz : r.hx)) * unit,
         x1: (r.x + (r.ry ? r.hz : r.hx)) * unit,

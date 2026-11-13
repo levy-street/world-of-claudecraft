@@ -21,8 +21,8 @@ import { isSharedGeometry, isSharedMaterial } from '../src/render/shared_resourc
 
 const REPO_ROOT = path.join(__dirname, '..');
 const ASSET_PATH = path.join(REPO_ROOT, 'public/models/props/mailbox_pillar.glb');
-const ASSET_BYTES = 32_884;
-const ASSET_SHA256 = '5b96b24882f5d1c1f66d7da1c420ee1caa6422802ffb1bee4db78d788ceddcc3';
+const ASSET_BYTES = 94_276;
+const ASSET_SHA256 = '4316868bb3b5f060870049dccae68670d47c70f75c72d643c41a0d2eb17179ef';
 const SOURCE_FINGERPRINT = 'dfd5aa1e92619b97b4979851abfd51efbc70790cd70594b560f2752e79369809';
 let restoreGfx: (() => void) | null = null;
 
@@ -89,7 +89,12 @@ describe('Eastbrook Ravenpost mailbox pipeline', () => {
     });
   });
 
-  it('pins the optimized GLB structure, materials, sockets, bounds, and exact bytes', async () => {
+  it('pins the shipped painted model: bytes, sheets, structure, sockets and bounds', async () => {
+    // The shipped file is the hand-built painted mailbox now
+    // (scripts/assets/eastbrook_houses/props.py mailbox, written over this path by
+    // build_props.py on quarter-size maps and shipped by optimise.mjs). The procedural
+    // pipeline pinned above made the model it replaced and is kept as its record: do not
+    // run its optimizer spec over this file.
     await MeshoptDecoder.ready;
     const bytes = readFileSync(ASSET_PATH);
     expect(bytes.length).toBe(ASSET_BYTES);
@@ -104,160 +109,106 @@ describe('Eastbrook Ravenpost mailbox pipeline', () => {
       .registerDependencies({ 'meshopt.decoder': MeshoptDecoder });
     const document = await io.readBinary(bytes);
     const root = document.getRoot();
+    const shipping = ['EXT_meshopt_compression', 'KHR_mesh_quantization', 'KHR_texture_basisu'];
     expect(
       root
         .listExtensionsUsed()
         .map((extension) => extension.extensionName)
         .sort(),
-    ).toEqual(['EXT_meshopt_compression', 'KHR_mesh_quantization']);
+    ).toEqual(shipping);
     expect(
       root
         .listExtensionsRequired()
         .map((extension) => extension.extensionName)
         .sort(),
-    ).toEqual(['EXT_meshopt_compression', 'KHR_mesh_quantization']);
-    expect(root.listTextures()).toHaveLength(0);
+    ).toEqual(shipping);
+    // the kit's own painted sheets, each at a quarter of the props' usual size
+    expect(
+      root
+        .listTextures()
+        .map((texture) => [texture.getName(), texture.getMimeType(), texture.getSize()]),
+    ).toEqual([
+      ['stone', 'image/ktx2', [256, 256]],
+      ['trim', 'image/ktx2', [256, 256]],
+      ['slate', 'image/ktx2', [256, 256]],
+      ['timber', 'image/ktx2', [256, 256]],
+    ]);
     expect(root.listAnimations()).toHaveLength(0);
     expect(root.listSkins()).toHaveLength(0);
     expect(root.listCameras()).toHaveLength(0);
     expect(root.listScenes()).toHaveLength(1);
-    expect(root.listNodes()).toHaveLength(5);
+    expect(root.listNodes()).toHaveLength(3);
 
+    // one model named for its file, and beside it the two anchors the game reads
     const scene = root.listScenes()[0];
     expect(scene.listChildren().map((node) => node.getName())).toEqual([
-      'EastbrookRavenpostMailbox',
+      'mailbox_pillar',
+      'Socket_MailSlot',
+      'Socket_UnreadGlow',
     ]);
     const modelRoot = scene.listChildren()[0];
     expect(modelRoot.getTranslation()).toEqual([0, 0, 0]);
     expect(modelRoot.getRotation()).toEqual([0, 0, 0, 1]);
     expect(modelRoot.getScale()).toEqual([1, 1, 1]);
-    expect(modelRoot.getExtras()).toEqual({
-      sculptRuntime: {
-        schemaVersion: 1,
-        assetId: 'eastbrook-ravenpost-mailbox',
-        stage: 'final',
-        coordinateFrame: { front: '+Z', up: '+Y', right: '+X', units: 'world-yards' },
-        nativeBounds: { width: 1.65, height: 2.9, depth: 1.05 },
-        serviceCues: ['raven-crest', 'gold-mail-slot', 'cobalt-rain-hood', 'stone-footing'],
-        interaction: {
-          mode: 'mailbox-service-prop',
-          interactive: true,
-          authority: 'ground-object-entity',
-        },
-        collider: { shippingCollisionMesh: false },
-        destruction: { breakable: false, detachableParts: [] },
-        sockets: {
-          'mail-slot': {
-            nodeName: 'Socket_MailSlot',
-            position: [0, 1.9399999363997906, 0.4491666488183877],
-            purpose: 'mail service interaction cue',
-            interactive: true,
-          },
-          'unread-glow': {
-            nodeName: 'Socket_UnreadGlow',
-            position: [0, 1.619999946988864, 0.4783333143260752],
-            purpose: 'per-viewer unread mail effect anchor',
-            interactive: false,
-          },
-        },
-      },
-    });
 
-    const meshContracts = root
-      .listNodes()
-      .filter((node) => node.getMesh() !== null)
-      .map((node) => {
-        const mesh = node.getMesh();
-        if (!mesh) throw new Error(`${node.getName()} lost its mesh`);
-        expect(mesh.listPrimitives()).toHaveLength(1);
-        const primitive = mesh.listPrimitives()[0];
-        expect(primitive.getMode()).toBe(Primitive.Mode.TRIANGLES);
-        expect(primitive.listSemantics().sort()).toEqual(['COLOR_0', 'NORMAL', 'POSITION']);
-        const position = primitive.getAttribute('POSITION');
-        const normal = primitive.getAttribute('NORMAL');
-        const color = primitive.getAttribute('COLOR_0');
-        if (!position || !normal || !color) throw new Error(`${node.getName()} lost attributes`);
-        expect(position.getNormalized()).toBe(true);
-        expect(normal.getNormalized()).toBe(true);
-        expect(color.getNormalized()).toBe(true);
-        expect(position.getComponentType()).toBe(5122);
-        expect(normal.getComponentType()).toBe(5120);
-        expect(color.getComponentType()).toBe(5121);
-        return [
-          primitive.getMaterial()?.getName(),
-          (primitive.getIndices()?.getCount() ?? position.getCount()) / 3,
-        ] as const;
-      })
-      .sort(([left], [right]) => (left ?? '').localeCompare(right ?? ''));
-    expect(meshContracts).toEqual([
-      ['MailboxMetal', 304],
-      ['MailboxOpaque', 1336],
-    ]);
-    expect(meshContracts.reduce((sum, entry) => sum + entry[1], 0)).toBe(1640);
+    expect(root.listMeshes()).toHaveLength(1);
+    const primitives = root.listMeshes()[0].listPrimitives();
+    let triangles = 0;
+    for (const primitive of primitives) {
+      expect(primitive.getMode()).toBe(Primitive.Mode.TRIANGLES);
+      expect(primitive.listSemantics().sort()).toEqual([
+        'COLOR_0',
+        'NORMAL',
+        'POSITION',
+        'TEXCOORD_0',
+      ]);
+      const position = primitive.getAttribute('POSITION');
+      if (!position) throw new Error('the mailbox lost its positions');
+      triangles += (primitive.getIndices()?.getCount() ?? position.getCount()) / 3;
+    }
+    expect(triangles).toBe(564);
 
     const materials = new Map(
       root.listMaterials().map((material) => [material.getName(), material] as const),
     );
-    expect([...materials.keys()].sort()).toEqual(['MailboxMetal', 'MailboxOpaque']);
-    expect(materials.get('MailboxOpaque')?.getMetallicFactor()).toBe(0.02);
-    expect(materials.get('MailboxOpaque')?.getRoughnessFactor()).toBe(0.84);
-    expect(materials.get('MailboxMetal')?.getMetallicFactor()).toBe(0.62);
-    expect(materials.get('MailboxMetal')?.getRoughnessFactor()).toBe(0.42);
+    expect([...materials.keys()].sort()).toEqual(['eh_slate', 'eh_stone', 'eh_timber', 'eh_trim']);
+    expect(primitives.map((primitive) => primitive.getMaterial()?.getName()).sort()).toEqual(
+      [...materials.keys()].sort(),
+    );
     for (const material of materials.values()) {
-      expect(material.getBaseColorFactor()).toEqual([1, 1, 1, 1]);
-      expect(material.getBaseColorTexture()).toBeNull();
+      expect(material.getMetallicFactor()).toBe(0);
+      expect(material.getRoughnessFactor()).toBe(0.92);
+      expect(material.getBaseColorTexture()).not.toBeNull();
       expect(material.getMetallicRoughnessTexture()).toBeNull();
+      expect(material.getAlphaMode()).toBe('OPAQUE');
     }
 
+    // floor-seated and centred, inside the box the release mailbox filled
     const bounds = getBounds(scene);
     expect(bounds.min[0]).toBeCloseTo(-0.825, 3);
     expect(bounds.min[1]).toBeCloseTo(0, 3);
-    expect(bounds.min[2]).toBeCloseTo(-0.525, 3);
+    expect(bounds.min[2]).toBeCloseTo(-0.4198, 3);
     expect(bounds.max[0]).toBeCloseTo(0.825, 3);
-    expect(bounds.max[1]).toBeCloseTo(2.9, 3);
-    expect(bounds.max[2]).toBeCloseTo(0.525, 3);
+    expect(bounds.max[1]).toBeCloseTo(2.2434, 3);
+    expect(bounds.max[2]).toBeCloseTo(0.4198, 3);
+    expect(bounds.max[1]).toBeLessThanOrEqual(2.9);
+    expect(bounds.max[2]).toBeLessThanOrEqual(0.525);
 
+    // the mail slot and the unread glow: bare anchors on the front, inside the model
     const sockets = root
       .listNodes()
       .filter((node) => node.getName().startsWith('Socket_'))
       .map((node) => ({
         name: node.getName(),
-        translation: node.getTranslation(),
+        translation: node.getTranslation().map((value) => Math.round(value * 1e4) / 1e4),
         children: node.listChildren().length,
         mesh: node.getMesh(),
-        extras: node.getExtras(),
       }))
       .sort((left, right) => left.name.localeCompare(right.name));
     expect(sockets).toEqual([
-      {
-        name: 'Socket_MailSlot',
-        translation: [0, 1.9399999363997906, 0.4491666488183877],
-        children: 0,
-        mesh: null,
-        extras: {
-          sculptSocket: {
-            id: 'mail-slot',
-            purpose: 'mail service interaction cue',
-            interactive: true,
-          },
-        },
-      },
-      {
-        name: 'Socket_UnreadGlow',
-        translation: [0, 1.619999946988864, 0.4783333143260752],
-        children: 0,
-        mesh: null,
-        extras: {
-          sculptSocket: {
-            id: 'unread-glow',
-            purpose: 'per-viewer unread mail effect anchor',
-            interactive: false,
-          },
-        },
-      },
+      { name: 'Socket_MailSlot', translation: [0, 1.3075, 0.3097], children: 0, mesh: null },
+      { name: 'Socket_UnreadGlow', translation: [0, 1.3075, 0.3441], children: 0, mesh: null },
     ]);
-    expect(root.getExtras()).toEqual({ sourceFingerprint: SOURCE_FINGERPRINT });
-    expect(root.getAsset().extras).toEqual({ sourceFingerprint: SOURCE_FINGERPRINT });
   });
 });
 

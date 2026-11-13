@@ -79,16 +79,20 @@ describe('Eastbrook town preload', () => {
       // models arrive, one lot each, so the deduped set goes 10 to 9: the six
       // buildings, the monument, the market stall and the wall wing. The two
       // support models make 11.
+      // Re-pinned 2026-11-11 for the hand-built harbour lots: the same six rows
+      // name their models under /models/tidehold/harbour/ now
+      // (src/sim/eastbrook_layout.ts), in the same order, so only the six
+      // paths moved and every count holds.
       expect(newUrls).toHaveLength(9);
       expect(new Set(newUrls).size).toBe(9);
       expect(allUrls).toHaveLength(11);
       const placedUrls = [
-        '/models/tidehold/bank.glb',
-        '/models/tidehold/smithy.glb',
-        '/models/tidehold/tavern.glb',
-        '/models/tidehold/hall.glb',
-        '/models/tidehold/shop_a.glb',
-        '/models/tidehold/house_b.glb',
+        '/models/tidehold/harbour/bank.glb',
+        '/models/tidehold/harbour/smithy.glb',
+        '/models/tidehold/harbour/tavern.glb',
+        '/models/tidehold/harbour/hall.glb',
+        '/models/tidehold/harbour/shop_a.glb',
+        '/models/tidehold/harbour/house_b.glb',
       ];
       expect(newUrls.slice(0, placedUrls.length)).toEqual(placedUrls);
       expect(allUrls.filter((url) => url.startsWith('/models/tidehold/'))).toEqual(placedUrls);
@@ -101,7 +105,7 @@ describe('Eastbrook town preload', () => {
       );
       const loadedFiles = mocks.loadGltf.mock.calls.map(([url]) => url);
       expect(loadedFiles).toEqual(expectedFiles);
-      expect(loadedFiles[0]).toBe(`/models/tidehold/bank${placedFileSuffix}`);
+      expect(loadedFiles[0]).toBe(`/models/tidehold/harbour/bank${placedFileSuffix}`);
       expect(loadedFiles.filter((file) => file.endsWith('.half.glb'))).toHaveLength(
         placedFileSuffix === '.half.glb' ? placedUrls.length : 0,
       );

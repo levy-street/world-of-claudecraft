@@ -74,6 +74,19 @@ export function isPlacedBuildingInterior(object: THREE.Object3D): boolean {
   return false;
 }
 
+/** Whether a mesh is (part of) a painted lot's room: its inside walls, floor and ceiling in
+ *  one model part beside the single-sided shell (scripts/assets/eastbrook_houses/kit.py
+ *  writes it as `<model>_INT_L0`; a part of several materials loads as a group of that name
+ *  over one mesh a material). Hidden, every doorway and window of the house would show the
+ *  world behind it, so it is never one of the pieces the low tier stops drawing at a
+ *  distance. */
+export function isPlacedBuildingRoom(object: THREE.Object3D): boolean {
+  for (let node: THREE.Object3D | null = object; node; node = node.parent) {
+    if (/_INT_L0$/.test(node.name)) return true;
+  }
+  return false;
+}
+
 type PlacedSourceMaterial = THREE.Material & {
   map?: THREE.Texture | null;
   color?: THREE.Color;
@@ -134,7 +147,8 @@ export interface PlacedBuildingBuild {
   group: THREE.Group;
   /** One fade record per (material, mesh shape) of the building. */
   mats: OccluderFadeMat[];
-  /** Indoor furniture meshes (G_INT / *_INT_*) that only need to draw close up. */
+  /** Indoor furniture meshes (G_INT / *_INT_*) that only need to draw close up; never a
+   *  painted lot's room (isPlacedBuildingRoom), which is the house's inside walls. */
   interiors: THREE.Object3D[];
   /** World height of the model's top, for the camera-fade box. */
   topY: number;
@@ -168,7 +182,7 @@ export function buildPlacedTownBuilding(
   clone.traverse((child) => {
     if (!(child instanceof THREE.Mesh)) return;
     const isInterior = isPlacedBuildingInterior(child) || /_INT(?:_|$)/.test(child.name);
-    if (isInterior) interiors.push(child);
+    if (isInterior && !isPlacedBuildingRoom(child)) interiors.push(child);
     child.castShadow = !isInterior;
     child.receiveShadow = true;
     const list = Array.isArray(child.material) ? child.material : [child.material];

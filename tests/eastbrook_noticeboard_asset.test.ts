@@ -21,8 +21,8 @@ import { isSharedGeometry, isSharedMaterial } from '../src/render/shared_resourc
 
 const REPO_ROOT = path.join(__dirname, '..');
 const ASSET_PATH = path.join(REPO_ROOT, 'public/models/props/eastbrook_noticeboard.glb');
-const ASSET_BYTES = 24_684;
-const ASSET_SHA256 = 'b4d0e2660097825d9e1d3735ae220516b082c41cb46823d445738f518c84785a';
+const ASSET_BYTES = 58_024;
+const ASSET_SHA256 = '9972881bd536754290f0541d2381928fae65643d53f54bc2cd60b43f193c6153';
 const SOURCE_FINGERPRINT = '2f7e95846e303d87f96d6918dca1fd29a5b0b40a3266b0604ed366701201afc8';
 let restoreGfx: (() => void) | null = null;
 
@@ -145,7 +145,12 @@ describe('Eastbrook noticeboard shipping asset', () => {
     });
   });
 
-  it('pins exact optimized bytes, topology, materials, sockets, and centered floor bounds', async () => {
+  it('pins the shipped painted model: bytes, sheets, structure, sockets and bounds', async () => {
+    // The shipped file is the hand-built painted notice board now
+    // (scripts/assets/eastbrook_houses/props.py noticeboard, written over this path by
+    // build_props.py on quarter-size maps and shipped by optimise.mjs). The procedural
+    // pipeline pinned above made the model it replaced and is kept as its record: do not
+    // run its optimizer spec over this file.
     await MeshoptDecoder.ready;
     const bytes = readFileSync(ASSET_PATH);
     expect(bytes.length).toBe(ASSET_BYTES);
@@ -160,151 +165,99 @@ describe('Eastbrook noticeboard shipping asset', () => {
       .registerDependencies({ 'meshopt.decoder': MeshoptDecoder });
     const document = await io.readBinary(bytes);
     const root = document.getRoot();
+    const shipping = ['EXT_meshopt_compression', 'KHR_mesh_quantization', 'KHR_texture_basisu'];
     expect(
       root
         .listExtensionsUsed()
         .map((extension) => extension.extensionName)
         .sort(),
-    ).toEqual(['EXT_meshopt_compression', 'KHR_mesh_quantization']);
+    ).toEqual(shipping);
     expect(
       root
         .listExtensionsRequired()
         .map((extension) => extension.extensionName)
         .sort(),
-    ).toEqual(['EXT_meshopt_compression', 'KHR_mesh_quantization']);
-    expect(root.listTextures()).toHaveLength(0);
+    ).toEqual(shipping);
+    // the kit's own painted sheets, each at a quarter of the props' usual size
+    expect(
+      root
+        .listTextures()
+        .map((texture) => [texture.getName(), texture.getMimeType(), texture.getSize()]),
+    ).toEqual([
+      ['trim', 'image/ktx2', [256, 256]],
+      ['slate', 'image/ktx2', [256, 256]],
+    ]);
     expect(root.listAnimations()).toHaveLength(0);
     expect(root.listSkins()).toHaveLength(0);
     expect(root.listCameras()).toHaveLength(0);
     expect(root.listScenes()).toHaveLength(1);
-    expect(root.listNodes()).toHaveLength(5);
+    expect(root.listNodes()).toHaveLength(3);
 
+    // one model named for its file, and beside it the two anchors the game reads
     const scene = root.listScenes()[0];
-    expect(scene.listChildren().map((node) => node.getName())).toEqual(['EastbrookNoticeboard']);
+    expect(scene.listChildren().map((node) => node.getName())).toEqual([
+      'eastbrook_noticeboard',
+      'Socket_Interaction',
+      'Socket_Notices',
+    ]);
     const modelRoot = scene.listChildren()[0];
     expect(modelRoot.getTranslation()).toEqual([0, 0, 0]);
     expect(modelRoot.getRotation()).toEqual([0, 0, 0, 1]);
     expect(modelRoot.getScale()).toEqual([1, 1, 1]);
-    expect(modelRoot.getExtras()).toMatchObject({
-      sculptRuntime: {
-        stage: 'final',
-        source: 'deterministic-procedural-threejs',
-        frontAxis: [0, 0, 1],
-        collider: {
-          type: 'obb',
-          size: [2.4, 2.6, 0.6],
-          shippingCollisionMesh: false,
-        },
-        interaction: { mode: 'interactable-civic-prop', publicFacing: true },
-        destruction: { breakable: false, fractureGroup: null, detachableParts: [] },
-        serviceCues: [
-          'blue-rain-hood',
-          'blank-notices',
-          'original-eastbrook-shield-crest',
-          'gold-hardware',
-          'stone-feet',
-          'rear-braces',
-        ],
-      },
-    });
 
-    const primitiveContracts = root
-      .listMeshes()
-      .flatMap((mesh) =>
-        mesh.listPrimitives().map((primitive) => {
-          expect(primitive.getMode()).toBe(Primitive.Mode.TRIANGLES);
-          expect(primitive.listSemantics().sort()).toEqual(['COLOR_0', 'NORMAL', 'POSITION']);
-          const position = primitive.getAttribute('POSITION');
-          const normal = primitive.getAttribute('NORMAL');
-          const color = primitive.getAttribute('COLOR_0');
-          if (!position || !normal || !color) throw new Error('noticeboard lost vertex attributes');
-          expect(position.getNormalized()).toBe(true);
-          expect(normal.getNormalized()).toBe(true);
-          expect(color.getNormalized()).toBe(true);
-          expect(position.getComponentType()).toBe(5122);
-          expect(normal.getComponentType()).toBe(5120);
-          expect(color.getComponentType()).toBe(5121);
-          return [
-            primitive.getMaterial()?.getName(),
-            (primitive.getIndices()?.getCount() ?? position.getCount()) / 3,
-          ] as const;
-        }),
-      )
-      .sort(([left], [right]) => (left ?? '').localeCompare(right ?? ''));
-    expect(primitiveContracts).toEqual([
-      ['EastbrookNoticeboardHardware', 580],
-      ['EastbrookNoticeboardSurface', 604],
-    ]);
-    expect(primitiveContracts.reduce((sum, entry) => sum + entry[1], 0)).toBe(1_184);
+    expect(root.listMeshes()).toHaveLength(1);
+    const primitives = root.listMeshes()[0].listPrimitives();
+    let triangles = 0;
+    for (const primitive of primitives) {
+      expect(primitive.getMode()).toBe(Primitive.Mode.TRIANGLES);
+      expect(primitive.listSemantics().sort()).toEqual([
+        'COLOR_0',
+        'NORMAL',
+        'POSITION',
+        'TEXCOORD_0',
+      ]);
+      const position = primitive.getAttribute('POSITION');
+      if (!position) throw new Error('the notice board lost its positions');
+      triangles += (primitive.getIndices()?.getCount() ?? position.getCount()) / 3;
+    }
+    expect(triangles).toBe(566);
 
     const materials = new Map(
       root.listMaterials().map((material) => [material.getName(), material] as const),
     );
-    expect([...materials.keys()].sort()).toEqual([
-      'EastbrookNoticeboardHardware',
-      'EastbrookNoticeboardSurface',
-    ]);
-    expect(materials.get('EastbrookNoticeboardSurface')?.getMetallicFactor()).toBe(0);
-    expect(materials.get('EastbrookNoticeboardSurface')?.getRoughnessFactor()).toBe(0.84);
-    expect(materials.get('EastbrookNoticeboardHardware')?.getMetallicFactor()).toBe(0.62);
-    expect(materials.get('EastbrookNoticeboardHardware')?.getRoughnessFactor()).toBe(0.48);
+    expect([...materials.keys()].sort()).toEqual(['eh_slate', 'eh_trim']);
     for (const material of materials.values()) {
-      expect(material.getBaseColorFactor()).toEqual([1, 1, 1, 1]);
-      expect(material.getBaseColorTexture()).toBeNull();
+      expect(material.getMetallicFactor()).toBe(0);
+      expect(material.getRoughnessFactor()).toBe(0.92);
+      expect(material.getBaseColorTexture()).not.toBeNull();
       expect(material.getMetallicRoughnessTexture()).toBeNull();
+      expect(material.getAlphaMode()).toBe('OPAQUE');
     }
 
+    // floor-seated and centred, inside the box the release board filled
     const bounds = getBounds(scene);
     expect(bounds.min[0]).toBeCloseTo(-1.2, 3);
     expect(bounds.min[1]).toBeCloseTo(0, 3);
-    expect(bounds.min[2]).toBeCloseTo(-0.3, 3);
+    expect(bounds.min[2]).toBeCloseTo(-0.2402, 3);
     expect(bounds.max[0]).toBeCloseTo(1.2, 3);
-    expect(bounds.max[1]).toBeCloseTo(2.6, 3);
-    expect(bounds.max[2]).toBeCloseTo(0.3, 3);
+    expect(bounds.max[1]).toBeCloseTo(2.108, 3);
+    expect(bounds.max[2]).toBeCloseTo(0.2402, 3);
 
+    // where a reader stands and where the notices hang: bare anchors on the front
     const sockets = root
       .listNodes()
       .filter((node) => node.getName().startsWith('Socket_'))
       .map((node) => ({
         name: node.getName(),
-        translation: node.getTranslation(),
+        translation: node.getTranslation().map((value) => Math.round(value * 1e4) / 1e4),
         children: node.listChildren().length,
         mesh: node.getMesh(),
-        extras: node.getExtras(),
       }))
       .sort((left, right) => left.name.localeCompare(right.name));
     expect(sockets).toEqual([
-      {
-        name: 'Socket_Interaction',
-        translation: [0, 1.3, 0.31],
-        children: 0,
-        mesh: null,
-        extras: {
-          sculptSocket: {
-            id: 'interaction',
-            purpose: 'public-facing interaction anchor',
-            forward: [0, 0, 1],
-            interactive: true,
-          },
-        },
-      },
-      {
-        name: 'Socket_Notices',
-        translation: [0, 1.51, 0.15],
-        children: 0,
-        mesh: null,
-        extras: {
-          sculptSocket: {
-            id: 'notices',
-            purpose: 'future notice-content attachment anchor',
-            forward: [0, 0, 1],
-            interactive: false,
-          },
-        },
-      },
+      { name: 'Socket_Interaction', translation: [0, 0.8921, 0.2127], children: 0, mesh: null },
+      { name: 'Socket_Notices', translation: [0, 1.0362, 0.1029], children: 0, mesh: null },
     ]);
-    expect(root.getExtras()).toEqual({ sourceFingerprint: SOURCE_FINGERPRINT });
-    expect(root.getAsset().extras).toEqual({ sourceFingerprint: SOURCE_FINGERPRINT });
   });
 
   it('commits multi-angle construction, serialized, scale, collider, and comparison evidence', () => {

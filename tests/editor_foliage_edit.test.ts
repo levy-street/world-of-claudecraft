@@ -107,7 +107,13 @@ describe('ambientDecorationsToPlacements', () => {
     const before = generateDecorationsInBounds(20061, bounds);
     expect(before.length).toBeGreaterThan(1);
     const excluded = decorationKey(before[0]);
-    setActiveWorldContent({ ...BUILTIN_WORLD, decorationExclusions: [excluded] });
+    // beside the ones the built-in world already carries: its own exclusions stand inside
+    // these bounds now (the trees cleared for Eastbrook's placed houses), and replacing the
+    // list would bring those back
+    setActiveWorldContent({
+      ...BUILTIN_WORLD,
+      decorationExclusions: [...(BUILTIN_WORLD.decorationExclusions ?? []), excluded],
+    });
     const after = generateDecorationsInBounds(20061, bounds);
     expect(after).toHaveLength(before.length - 1);
     expect(after.some((decoration) => decorationKey(decoration) === excluded)).toBe(false);

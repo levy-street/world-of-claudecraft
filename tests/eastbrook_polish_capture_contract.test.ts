@@ -679,6 +679,7 @@ interface AttributionTargetFixture {
 // CPU-hygiene renderer leaf and the druid Cat Form renderer leaf compose in
 // one tree. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
+  // Re-minted for the painted town buildings and stood-down square dressing (eastbrook_layout.ts records, eastbrook_town.ts dressing gate). No capture was retaken.
   // Re-minted for Gourdlight Eve (feature/halloween-event): the seasonal decor's renderer wiring moved the renderer leaf, and again for its candle-light registry, for its field boss's effects layer, for its phase 3 rain and broom, and for the polish pass's scarecrow audio sink. No capture was retaken.
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -740,7 +741,8 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // No capture was retaken.
   // Re-minted for v0.45.4 graphics and dungeon loading optimizations in renderer.ts.
   // No capture was retaken.
-  'f79dd14b173b432d7056d797f2184116e645d03474c03ef9d8000cdeb5dd80b9';
+  // Re-minted for the per-zone sun: renderer.ts asks zone_sun.ts for the sun and moon of the zone it stands in. No capture was retaken.
+  '7c49acee907977cb7566ca0bdf357c3a93291c2beadadf996cddc03dd2c9b67f';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

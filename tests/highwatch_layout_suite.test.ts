@@ -119,12 +119,13 @@ describe('the Highwatch layout', () => {
     expect(
       BUILDINGS.map((building) => [building.id, building.assetId, building.kind, building.walkIn]),
     ).toEqual([
-      ['highwatch_summit_inn', '/models/tidehold/highwatch/tavern_b.glb', 'inn', true],
-      ['highwatch_gate_chapel', '/models/tidehold/highwatch/hall.glb', 'chapel', true],
-      ['highwatch_counting_house', '/models/tidehold/highwatch/shop_a.glb', 'house', true],
-      ['highwatch_watch_house', '/models/tidehold/highwatch/house_c.glb', 'house', false],
-      ['highwatch_smithy', '/models/tidehold/highwatch/smithy.glb', 'house', true],
-      ['highwatch_guild', '/models/tidehold/highwatch/guild.glb', 'house', true],
+      // Re-pinned 2026-11-11 for the hand-built harbour lots: Highwatch wears the alpine set
+      ['highwatch_summit_inn', '/models/tidehold/harbour_alpine/tavern_b.glb', 'inn', true],
+      ['highwatch_gate_chapel', '/models/tidehold/harbour_alpine/hall.glb', 'chapel', true],
+      ['highwatch_counting_house', '/models/tidehold/harbour_alpine/shop_a.glb', 'house', true],
+      ['highwatch_watch_house', '/models/tidehold/harbour_alpine/house_c.glb', 'house', false],
+      ['highwatch_smithy', '/models/tidehold/harbour_alpine/smithy.glb', 'house', true],
+      ['highwatch_guild', '/models/tidehold/harbour_alpine/guild.glb', 'house', true],
     ]);
     // stood GRAND: each at the scale that clears a door of about five yards
     // (highwatch_layout.ts), the footing buried and the ground line sunk 0.05

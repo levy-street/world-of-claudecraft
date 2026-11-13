@@ -10,6 +10,12 @@ import { distancePointToObb, type Obb2 } from './placed_town_kit';
 export const PAINTED_TOWN_SCATTER_PAD = 3;
 /** ...and a road lamp this far off it, so no post stands against a wall. */
 export const PAINTED_TOWN_LAMP_PAD = 1;
+/** ...and DRAWN ground dressing (a bush, a fern, a mushroom) this far off it: nothing roots
+ *  in a building's floor or leans through its wall. Asked by the renderer's dressing scatter
+ *  (render/foliage_dressing_spots.ts). The editor's copy of the field
+ *  (sim/ground_dressing.ts) does not ask it yet: the shipped default world bundle is baked
+ *  from that copy (tests/default_world_bundle.test.ts), so it changes with a bundle rebuild. */
+export const PAINTED_TOWN_DRESSING_PAD = 0.6;
 
 /** Each painted town that stands buildings, with one circle round every reach, so
  *  a point far from every town costs one distance test per town. Derived once from

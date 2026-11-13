@@ -15,18 +15,18 @@ export interface StreetlampFixtureMeasure {
 }
 
 export const STREETLAMP_FIXTURE: Readonly<Record<string, StreetlampFixtureMeasure>> = {
-  amberfall_crystal: { axis: [0.836, 0.0825], socket: [0.5758, 4.3429, 0.183], unitHeight: 2.2 },
+  amberfall_crystal: { axis: [0, 1.098], socket: [0, 4.0231, 0.7012], unitHeight: 2.2 },
   drakelands_brazier: { axis: [-0.0054, 0.0052], socket: [0.0054, 5.1018, -0.2422], unitHeight: 2.2 },
-  eastbrook_civic: { axis: [-0.0107, -0.0322], socket: [0, 4.5905, 0.0054], unitHeight: 2.2 },
-  evergarden_flower: { axis: [0, -0.0055], socket: [0.0107, 4.7304, -0.4037], unitHeight: 2.2 },
+  eastbrook_civic: { axis: [0, 0], socket: [0, 4.4452, 0], unitHeight: 2.2 },
+  evergarden_flower: { axis: [0, 0], socket: [0, 4.2127, 0], unitHeight: 2.2 },
   farshore_coral: { axis: [0.3605, 0.7912], socket: [0.5165, 4.2999, 0.5328], unitHeight: 2.2 },
-  frostveil_icicle: { axis: [0.0163, -0.027], socket: [0.0163, 4.4129, -0.027], unitHeight: 2.2 },
-  galecrest_mast: { axis: [-0.113, -1.3023], socket: [-0.113, 3.5087, -0.7911], unitHeight: 2.2 },
+  frostveil_icicle: { axis: [0, 0], socket: [0, 4.2127, 0], unitHeight: 2.2 },
+  galecrest_mast: { axis: [0, 1.095], socket: [0, 3.6811, 0.7449], unitHeight: 2.2 },
   mirefen_witchflame: { axis: [-0.0593, -1.0623], socket: [-0.0593, 3.8963, -0.5597], unitHeight: 2.2 },
-  nightbloom_moonflower: { axis: [-1.3135, -0.408], socket: [-0.6297, 4.1655, -0.183], unitHeight: 2.2 },
-  palmreach_totem: { axis: [1.0842, 0.086], socket: [0.764, 4.47, 0.086], unitHeight: 2.2 },
+  nightbloom_moonflower: { axis: [0, 1.3125], socket: [0, 4.0231, 0.7913], unitHeight: 2.2 },
+  palmreach_totem: { axis: [0, 1.1365], socket: [0, 4.0231, 0.5804], unitHeight: 2.2 },
   thornpeak_beacon: { axis: [-0.0217, 0.0267], socket: [-0.0217, 4.5637, 0.3283], unitHeight: 2.2 },
-  veiled_crystal: { axis: [1.03, -0.0528], socket: [0.8932, 3.7993, -0.0485], unitHeight: 2.2 },
-  willowfen_reed: { axis: [0, -0.3562], socket: [0, 3.8208, 0.0646], unitHeight: 2.2 },
-  wraithwood_ghost: { axis: [1.1485, 0.1239], socket: [0.9041, 3.7778, 0.1239], unitHeight: 2.2 },
+  veiled_crystal: { axis: [0, 1.0774], socket: [0, 3.8267, 0.6213], unitHeight: 2.2 },
+  willowfen_reed: { axis: [-0.0058, 1.2355], socket: [-0.0596, 4.4189, 0.6773], unitHeight: 2.2 },
+  wraithwood_ghost: { axis: [-0.1043, 1.2031], socket: [-0.1043, 4.3927, 0.7612], unitHeight: 2.2 },
 };

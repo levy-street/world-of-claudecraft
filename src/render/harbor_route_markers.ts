@@ -26,7 +26,11 @@
 // so the world-entry compile links them with the rest of the props, and their
 // distinct (geometry, material) programs join the props material prewarm
 // (harborRouteMarkerPrewarmParts) so a marker first seen after the curtain links
-// nothing in a live frame. Nothing here runs per frame.
+// nothing in a live frame. The model is PAINTED: its wood and fittings each carry a
+// small base-colour map (the Eastbrook ferry's planking and fittings), which the
+// shared converter (vertex_colour_glb_parts.ts) passes on with the meshes' `uv`
+// under the vertex-colour tint, from the first template on, so those same prewarm
+// twins link the mapped programs. Nothing here runs per frame.
 
 import * as THREE from 'three';
 import {

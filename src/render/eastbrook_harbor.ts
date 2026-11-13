@@ -12,6 +12,7 @@ import { EASTBROOK_HARBOR_DECKS } from '../sim/eastbrook_harbor';
 import type { GaleDeckDef } from '../sim/gale_harbor';
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
 import { buildDeckWood } from './deck_render';
+import { applySurfaceDetail } from './worn_stone';
 
 // merge a pile of box geometries into one mesh (position + normal only; the
 // gale_features.ts pattern, kept local like the original)
@@ -54,8 +55,13 @@ export function buildHarborWood(
   const group = new THREE.Group();
   group.name = name;
   if (!activeWorldIsBuiltinShaped()) return group;
-  const wood = new THREE.MeshStandardMaterial({ color: 0x8a6a4a, roughness: 0.9 });
-  const postWood = new THREE.MeshStandardMaterial({ color: 0x6b523d, roughness: 0.92 });
+  // Warm oiled boards on tarred piles, the colours of the painted quay props
+  // (scripts/assets/eastbrook_houses/props.py dock_platform), with the shared wood grain
+  // layer over them so the planks are not one flat brown.
+  const wood = new THREE.MeshStandardMaterial({ color: 0x86623f, roughness: 0.9 });
+  const postWood = new THREE.MeshStandardMaterial({ color: 0x4d382a, roughness: 0.92 });
+  applySurfaceDetail(wood, 'wood', { strength: 0.55 });
+  applySurfaceDetail(postWood, 'wood', { strength: 0.45 });
   const { planks, posts } = buildDeckWood(decks, (x, z) => terrainHeight(x, z, seed), WATER_LEVEL, {
     bollards: true,
   });

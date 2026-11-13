@@ -30,6 +30,8 @@ Original procedural work for this project, in the harbor's palette.
 """
 import math
 
+from paintlib import weathered
+
 HOUSE_PARTS = ('HouseFrame', 'HouseWallNorth', 'HouseWallSouth', 'HouseWallEast',
                'HouseWallWest', 'HouseRoof', 'HouseFurnishings')
 HOUSE_OPTIONAL = ('HouseClutter',)
@@ -59,6 +61,11 @@ HPAL = dict(
     boat=(0.46, 0.31, 0.2),
     boat_trim=(0.2, 0.34, 0.62),
 )
+
+# The house's outer boarding weathers with the harbour's timber (paintlib.weathered, as in
+# build_wyrmwatch_harbor.py); the floor, wainscot and beams indoors keep their warmth.
+for _key in ('board', 'gable'):
+    HPAL[_key] = weathered(HPAL[_key])
 
 # The zones' land on the wall map (content zone ids, muted like old chart inks)
 ZONE_LAND = {

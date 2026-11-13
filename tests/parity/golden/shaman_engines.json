@@ -11,8 +11,8 @@
     "Spiritmend Tidecall deposit and Cascading Mend consumption",
     "Shaman spec state in deterministic headless snapshots"
   ],
-  "draws": 2544,
-  "drawDigest": "1e89b053",
+  "draws": 2545,
+  "drawDigest": "1896e376",
   "frames": [
     {
       "tick": 0,
@@ -2653,8 +2653,8 @@
       "state": "7c137e0e",
       "events": "319f7fd1",
       "rng": {
-        "draws": 2502,
-        "digest": "c750cea2"
+        "draws": 2503,
+        "digest": "11a6c158"
       }
     },
     {
@@ -2664,8 +2664,8 @@
       "state": "f7fdcc6d",
       "events": "741638a5",
       "rng": {
-        "draws": 2544,
-        "digest": "1e89b053"
+        "draws": 2545,
+        "digest": "1896e376"
       },
       "label": "spiritmend-consume",
       "players": [
@@ -3538,8 +3538,8 @@
       "state": "f7fdcc6d",
       "events": "741638a5",
       "rng": {
-        "draws": 2544,
-        "digest": "1e89b053"
+        "draws": 2545,
+        "digest": "1896e376"
       },
       "label": "final",
       "players": [

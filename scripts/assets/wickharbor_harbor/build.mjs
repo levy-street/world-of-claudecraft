@@ -15,8 +15,23 @@ import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { dedup, meshopt, prune } from '@gltf-transform/functions';
 import { MeshoptDecoder, MeshoptEncoder } from 'meshoptimizer';
+import {
+  checkPaintedMaps,
+  checkShippedMaps,
+  fingerprintBody,
+  paintedMapInputs,
+  paintedMapTransforms,
+} from '../eastbrook_ferry/painted_maps.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
+
+/** The painted base-colour map each material wears (scripts/assets/eastbrook_ferry/
+ *  painted_maps.mjs: the ferry's own maps); the rope and the glow wear none. */
+const PAINTED_MAPS = {
+  HarborIron: 'ferry_fittings',
+  HarborStone: 'harbour_stone',
+  HarborWood: 'ferry_wood',
+};
 
 export const WICKHARBOR_HARBOR_ASSET = {
   source: 'scripts/assets/wickharbor_harbor/wickharbor_harbor_source.glb',
@@ -30,6 +45,7 @@ export const WICKHARBOR_HARBOR_ASSET = {
     'scripts/assets/wyrmwatch_harbor/build_wyrmwatch_harbor.py',
     'scripts/assets/wickharbor_harbor/layout.json',
     'scripts/assets/eastbrook_ferry/shiplib.py',
+    ...paintedMapInputs(PAINTED_MAPS),
     'scripts/assets/wickharbor_harbor/build.mjs',
   ],
   /** Named nodes the runtime depends on. */
@@ -45,17 +61,19 @@ export const WICKHARBOR_HARBOR_ASSET = {
     'HarborClutter',
   ],
   materials: ['HarborGlow', 'HarborIron', 'HarborRope', 'HarborStone', 'HarborWood'],
+  maps: PAINTED_MAPS,
+  /** No map ships larger than this on a side. */
+  maxMapSize: 512,
+  /** A map this model shows little of ships smaller: map name to pixels a side. */
+  mapSizes: { ferry_fittings: 256 },
 };
 
 export function sourceFingerprint(asset = WICKHARBOR_HARBOR_ASSET, root = ROOT) {
   const hash = createHash('sha256');
   for (const file of asset.inputs) {
     // Text inputs hash with normalized line endings so a Windows checkout and a Linux
-    // checkout agree; the source GLB is binary and hashes byte for byte.
-    const bytes = readFileSync(path.join(root, file));
-    const body = file.endsWith('.glb')
-      ? bytes
-      : Buffer.from(bytes.toString('utf8').replace(/\r\n/g, '\n'));
+    // checkout agree; the source GLB and the maps are binary and hash byte for byte.
+    const body = fingerprintBody(file, readFileSync(path.join(root, file)));
     hash.update(file).update('\0').update(body).update('\0');
   }
   return hash.digest('hex');
@@ -80,22 +98,22 @@ export async function buildWickharborHarbor(asset = WICKHARBOR_HARBOR_ASSET, roo
   if (JSON.stringify(materials) !== JSON.stringify(asset.materials)) {
     throw new Error(`Unexpected harbor materials: ${materials.join(', ')}`);
   }
-  if (
-    gltf.listTextures().length ||
-    gltf.listCameras().length ||
-    gltf.listSkins().length ||
-    gltf.listAnimations().length
-  ) {
-    throw new Error('The harbor ships texture-free, camera-free, unskinned and still');
+  if (gltf.listCameras().length || gltf.listSkins().length || gltf.listAnimations().length) {
+    throw new Error('The harbor ships camera-free, unskinned and still');
   }
+  // one painted base-colour map on each material that wears one, and no other texture
+  checkPaintedMaps(gltf, asset.maps);
   const extras = gltf.listScenes()[0]?.listChildren()[0]?.getExtras() ?? {};
   if (!extras.wickharborHarbor) throw new Error('WickharborHarbor_ROOT lost its extras');
   gltf.setExtras({ sourceFingerprint: sourceFingerprint(asset, root), authoring: 'Blender' });
   await doc.transform(
+    // prune also drops the texture coordinates of the map-free materials
     prune({ keepExtras: true, keepLeaves: true }),
     dedup(),
+    ...(await paintedMapTransforms(asset.maxMapSize, asset.mapSizes)),
     meshopt({ encoder: MeshoptEncoder, level: 'high' }),
   );
+  checkShippedMaps(gltf, asset.maxMapSize, asset.mapSizes);
   return io.writeBinary(doc);
 }
 

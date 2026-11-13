@@ -122,6 +122,36 @@ describe('vertex-coloured GLB parts', () => {
     expect(part.geometry.getAttribute('uv')?.count).toBe(geo.getAttribute('position').count * 2);
   });
 
+  it('shares painted maps by name only when asked: one material for two files of the same maps', () => {
+    withStandard(true);
+    const named = (name: string, size: number): THREE.MeshStandardMaterial => {
+      const mat = source('HarborWood', true);
+      (mat.map as THREE.Texture).name = name;
+      (mat.map as THREE.Texture).image = { width: size, height: size };
+      return mat;
+    };
+    const sharing = vertexColourMaterialConverter({ sharePaintedMapsByName: true });
+    const first = named('ferry_wood', 512);
+    const drawn = sharing.convert(first) as THREE.MeshStandardMaterial;
+    // a second file's copy of the same map: the first file's material, drawing the first map
+    expect(sharing.convert(named('ferry_wood', 512))).toBe(drawn);
+    expect(drawn.map).toBe(first.map);
+    // another map, another size of it (a texture tier), or a map with no name: never shared
+    expect(sharing.convert(named('harbour_stone', 512))).not.toBe(drawn);
+    expect(sharing.convert(named('ferry_wood', 256))).not.toBe(drawn);
+    const anonymous = sharing.convert(named('', 512));
+    expect(anonymous).not.toBe(drawn);
+    expect(sharing.convert(named('', 512))).not.toBe(anonymous);
+    // a converter that was not asked keeps one material per file
+    const plain = vertexColourMaterialConverter();
+    expect(plain.convert(named('ferry_wood', 512))).not.toBe(
+      plain.convert(named('ferry_wood', 512)),
+    );
+    // cleared with the rest of the cache
+    sharing.clear();
+    expect(sharing.convert(named('ferry_wood', 512))).not.toBe(drawn);
+  });
+
   it('draws no normal map where the tier draws lambert materials', () => {
     withStandard(false);
     const converter = vertexColourMaterialConverter();

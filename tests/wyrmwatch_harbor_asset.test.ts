@@ -31,19 +31,27 @@ import {
   HARBOR_HOUSE,
   HARBOR_HOUSE_FLOOR_ABOVE_WATER,
 } from '../src/sim/content/wyrmwatch_harbor_house';
+import { expectPaintedMaps } from './helpers/painted_glb';
 
 // The shipped Wyrmwatch cliff harbor GLB (public/models/props/wyrmwatch_harbor.glb), built in
 // Blender from the sim's own layout (scripts/assets/wyrmwatch_harbor/layout.json, exported from
 // src/sim/content/wyrmwatch_harbor.ts with the terrain under it) and shipped by build.mjs. Pins
 // the bytes, the source fingerprint, the layout's freshness against the sim and the terrain,
-// the named tier parts the runtime keeps or sheds, the five texture-free materials, the
+// the named tier parts the runtime keeps or sheds, the five materials and their painted maps, the
 // triangle budget, and the model's stamped numbers against the sim. Re-pin the sha256 and size
 // literals only with a re-export.
 
 const ROOT = path.join(__dirname, '..');
 const GLB = path.join(ROOT, WYRMWATCH_HARBOR_ASSET.target);
-const SHIPPED_SHA256 = 'cf8f016ea98ecc42dd8cb97e38e410d4fc09881092ece79611215211f7423fe6';
-const SHIPPED_BYTES = 463408;
+// Re-pinned for the PAINTED model: its wood, fittings and stone now wear the Eastbrook ferry's
+// maps (scripts/assets/eastbrook_ferry/paintlib.py), so the file carries KTX2 images and a
+// texture coordinate on every painted vertex. The geometry is the same triangle for triangle
+// (the triangle pins below did not move). Measured off the shipped file.
+const SHIPPED_SHA256 = 'ccd0bffc808edcfb67865e7ac7ee17fa472adbdcf41834c8e1b6372eca4afd9a';
+const SHIPPED_BYTES = 806680;
+/** The painted model stays a small download, and no one map weighs more than this. */
+const MAX_BYTES = 921600;
+const MAX_MAP_BYTES = 72 * 1024;
 /** Triangles per named part, from the Blender build report. */
 const TRIANGLES: Record<string, number> = {
   QuayDecks: 2052,
@@ -132,6 +140,7 @@ describe('wyrmwatch cliff harbor GLB', () => {
   it('ships the pinned bytes, in the media manifest', () => {
     const bytes = readFileSync(GLB);
     expect(bytes.length).toBe(SHIPPED_BYTES);
+    expect(bytes.length).toBeLessThan(MAX_BYTES);
     expect(createHash('sha256').update(bytes).digest('hex')).toBe(SHIPPED_SHA256);
     expect(bytes.toString('latin1')).toContain('EXT_meshopt_compression');
     expect(MEDIA_ASSETS['models/props/wyrmwatch_harbor.glb']).toMatch(
@@ -186,10 +195,11 @@ describe('wyrmwatch cliff harbor GLB', () => {
     expect(extras().pathStones).toEqual([...WYRMWATCH_PATH_STONE_PARTS]);
   });
 
-  it('shares five texture-free, vertex-coloured materials, and nothing animates', () => {
+  it('shares five vertex-coloured materials, three of them painted, and nothing animates', () => {
     const materials = doc.getRoot().listMaterials();
     expect(materials.map((m) => m.getName()).sort()).toEqual(WYRMWATCH_HARBOR_ASSET.materials);
-    expect(doc.getRoot().listTextures()).toHaveLength(0);
+    // painted: the planking, the fittings and the stone it has, each a small KTX2 map
+    expectPaintedMaps(doc, WYRMWATCH_HARBOR_ASSET, MAX_MAP_BYTES);
     expect(doc.getRoot().listSkins()).toHaveLength(0);
     expect(doc.getRoot().listAnimations()).toHaveLength(0);
     for (const mesh of doc.getRoot().listMeshes()) {

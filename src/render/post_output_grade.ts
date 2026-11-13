@@ -14,6 +14,7 @@ import {
   type Texture,
   type ToneMapping,
   Vector2,
+  Vector3,
   Vector4,
   type WebGLRenderer,
   type WebGLRenderTarget,
@@ -21,6 +22,7 @@ import {
 import { FullScreenQuad, Pass } from 'three/examples/jsm/postprocessing/Pass.js';
 import { PALETTE_GRADE_GLSL, paletteGradeUniforms } from './palette_lab';
 import { CEL_INK_GLSL } from './post_cel_ink_glsl';
+import { CLARITY_GLSL } from './post_clarity_glsl';
 import { FINITE_GUARD_GLSL } from './post_finite_guard_glsl';
 
 interface TimeUniform {
@@ -140,6 +142,10 @@ export const OUTPUT_GRADE_FRAGMENT_SHADER = /* glsl */ `
 
     return outputColor;
   }
+
+  #ifdef CLARITY_GRADE
+  ${CLARITY_GLSL}
+  #endif
 
   #ifdef FXAA_GRADE
     // Edge AA for the grade-only chain: NVIDIA FXAA 3.11 (Timothy Lottes)
@@ -285,6 +291,12 @@ export const OUTPUT_GRADE_FRAGMENT_SHADER = /* glsl */ `
       outputColor.rgb = fxaaFilter(inputUv, outputColor.rgb);
     #endif
 
+    #ifdef CLARITY_GRADE
+      // Clarity (post_clarity_glsl.ts). Only a grade WITHOUT the FXAA arm is built with it
+      // (clarity_core.ts clarityForGrade): the tail SMAA then smooths the clarified picture.
+      outputColor.rgb = clarityApply(outputColor.rgb, inputUv, uInputUvRect.zw);
+    #endif
+
     // quantizeHalf emulates a boundary the removed intermediate target used to
     // store. The FXAA arm resolves a NEW value rather than re-reading a stored
     // one, so on that path this is the grade's own entry quantize and nothing
@@ -355,6 +367,19 @@ export interface OutputGradeOptions {
    * grade pass of the chain draws the same look.
    */
   readonly paletteGrade?: boolean;
+  /**
+   * Compile in the clarity arm (clarity_core.ts, post_clarity_glsl.ts). Like the FXAA arm
+   * it is a define on this pass with taps on the same uInputUvRect remap and clamp.
+   */
+  readonly clarity?: GradeClarity;
+}
+
+/** The clarity arm's knobs (clarity_core.ts ClaritySettings). */
+export interface GradeClarity {
+  readonly amount: number;
+  /** Neighbourhood radius as a fraction of the rendered height. */
+  readonly radius: number;
+  readonly limit: number;
 }
 
 /** Where the grade's cel ink reads scene depth, and the look's knobs. */
@@ -381,11 +406,13 @@ export class OutputGradePass extends Pass {
     tCelDepth: { value: Texture | null };
     uCelInk: { value: Vector4 };
     uCelTap: { value: Vector2 };
+    uClarity: { value: Vector3 };
   };
   readonly material: RawShaderMaterial;
   readonly fsQuad: FullScreenQuad;
   readonly fxaa: boolean;
   private readonly celInk: GradeCelInk | null;
+  private readonly clarity: GradeClarity | null;
   private readonly paletteGrade: boolean;
   private outputColorSpace: string | null = null;
   private toneMapping: ToneMapping | null = null;
@@ -400,6 +427,7 @@ export class OutputGradePass extends Pass {
     this.hasPreparedBloom = bloomTexture !== null;
     this.fxaa = options.fxaa === true;
     this.celInk = options.celInk ?? null;
+    this.clarity = options.clarity ?? null;
     this.paletteGrade = options.paletteGrade === true;
     this.uniforms = {
       tDiffuse: { value: null },
@@ -413,6 +441,14 @@ export class OutputGradePass extends Pass {
       // x ink, y saturation, z camera near, w camera far
       uCelInk: { value: new Vector4(0, 1, 0.1, 1000) },
       uCelTap: { value: new Vector2(0, 0) },
+      // x amount, y limit, z radius as a fraction of the rendered height
+      uClarity: {
+        value: new Vector3(
+          this.clarity?.amount ?? 0,
+          this.clarity?.limit ?? 0,
+          this.clarity?.radius ?? 0,
+        ),
+      },
     };
     this.material = new RawShaderMaterial({
       name: 'OutputGradeShader',
@@ -437,7 +473,7 @@ export class OutputGradePass extends Pass {
   ): void {
     this.uniforms.tDiffuse.value = readBuffer.texture;
     this.uniforms.toneMappingExposure.value = renderer.toneMappingExposure;
-    if (this.fxaa) {
+    if (this.fxaa || this.clarity) {
       // The rendered sub-rect is made of the read target's own texels, so one
       // texel step there IS one texel step in the full target. Reading the size
       // off the buffer keeps the taps correct through every resize without a
@@ -462,6 +498,9 @@ export class OutputGradePass extends Pass {
       }
       if (this.celInk) {
         this.material.defines.CEL_INK = '';
+      }
+      if (this.clarity) {
+        this.material.defines.CLARITY_GRADE = '';
       }
       if (this.paletteGrade) {
         this.material.defines.PALETTE_GRADE = '';

@@ -21,8 +21,51 @@ import { dismissKtx2Source } from './ktx2_mip_release';
 const KIT_URL =
   /\/tidehold\/(?:house_[a-e]|tavern(?:_b)?|smithy|market|hall|shop_[ab]|bank)(?:\.parts)?(?:\.(?:half|quarter))?(?:\.[0-9a-f]+)?\.glb$/i;
 
+// The hand-built painted kit (scripts/assets/eastbrook_houses/) is the same case, larger:
+// every town building, placed house and prop of it is cut from one set of painted sheets,
+// and each GLB embeds its own copy of the sheets it wears, so before this a town held one
+// copy of every sheet per building on the GPU. Its buildings have folders of their own,
+// where every file is the kit's.
+const PAINTED_KIT_URL =
+  /\/models\/(?:tidehold\/harbour(?:_[a-z]+)?|eastbrook_houses)\/[a-z0-9_]+(?:\.(?:half|quarter))?(?:\.[0-9a-f]+)?\.glb$/i;
+// Its props stand in folders they share with other art, so there a file is the kit's
+// when its materials carry the kit's own names (kit.py make_material: `eh_` plus the sheet).
+const PAINTED_KIT_PROP_URL = /\/models\/(?:props|biome|quest)\/[a-z0-9_]+(?:\.[0-9a-f]+)?\.glb$/i;
+const PAINTED_KIT_MATERIAL = /^eh_/;
+
+// The kit's one-prop buildings (scripts/assets/eastbrook_houses/props_castle.py: crofts,
+// guardhouses, stables, forges, windmills, towers, the castle keeps and their walls) stand
+// in the biome folder under the `hex` families' names. The castle kit beside them (`kcas_`)
+// is not among them: its pieces also build the palaces' rooms.
+const PAINTED_KIT_PROP_BUILDING_URL =
+  /\/models\/biome\/hex[a-z]?_[a-z0-9_]+(?:\.[0-9a-f]+)?\.glb$/i;
+
+/** Whether a URL is one of the painted kit's BUILDINGS: a town lot in any colour set, a
+ *  placed house (in any texture tier) or a one-prop building. kit_shade_lift.ts lifts the
+ *  shaded stone of exactly these. */
+export function isPaintedKitBuildingUrl(url: string): boolean {
+  const clean = url.split('?')[0];
+  return PAINTED_KIT_URL.test(clean) || PAINTED_KIT_PROP_BUILDING_URL.test(clean);
+}
+
 export function isSharedKitTextureUrl(url: string): boolean {
-  return KIT_URL.test(url.split('?')[0]);
+  const clean = url.split('?')[0];
+  return KIT_URL.test(clean) || PAINTED_KIT_URL.test(clean);
+}
+
+/** Whether a loaded scene is one of the painted kit's props: a file from a folder the kit
+ *  shares with other art, wearing at least one of the kit's own materials. */
+export function isPaintedKitProp(scene: THREE.Object3D, url: string): boolean {
+  if (!PAINTED_KIT_PROP_URL.test(url.split('?')[0])) return false;
+  let kit = false;
+  scene.traverse((o) => {
+    if (kit) return;
+    const mesh = o as THREE.Mesh;
+    if (!mesh.isMesh) return;
+    const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+    kit = mats.some((mat) => !!mat && PAINTED_KIT_MATERIAL.test(mat.name));
+  });
+  return kit;
 }
 
 const SLOTS = ['map', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissiveMap', 'aoMap'] as const;
@@ -90,7 +133,8 @@ const canonical = new Map<string, TextureLike>();
 
 /** Swap every kit texture in `scene` for its first-loaded identical twin. */
 export function shareKitTextures(scene: THREE.Object3D | undefined, url: string): number {
-  if (!scene || typeof scene.traverse !== 'function' || !isSharedKitTextureUrl(url)) return 0;
+  if (!scene || typeof scene.traverse !== 'function') return 0;
+  if (!isSharedKitTextureUrl(url) && !isPaintedKitProp(scene, url)) return 0;
   let shared = 0;
   const dropped = new Set<TextureLike>();
   scene.traverse((o) => {

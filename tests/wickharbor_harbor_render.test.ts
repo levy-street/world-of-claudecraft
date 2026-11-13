@@ -1,8 +1,7 @@
-import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { MeshoptDecoder } from 'meshoptimizer';
 import type * as THREE from 'three';
-import { type GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { SRGBColorSpace } from 'three';
+import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { activateGfxProfile, GFX, type GfxTier, getActiveGfxProfile } from '../src/render/gfx';
 import {
@@ -16,6 +15,7 @@ import {
 } from '../src/render/wickharbor_wharf';
 import { WICKHARBOR_HARBOR_FRAME } from '../src/sim/content/wickharbor_harbor';
 import { WATER_LEVEL } from '../src/sim/world';
+import { expectPaintedMeshes, parsePaintedGlb } from './helpers/painted_glb';
 
 // Wickharbor's wooden harbor painter (src/render/wickharbor_harbor.ts) over the shipped GLB:
 // the model placed on the waterline at the harbor frame's origin, what each graphics tier really
@@ -59,28 +59,15 @@ function glowing(root: THREE.Object3D): number {
 }
 
 beforeAll(async () => {
-  await MeshoptDecoder.ready;
-  const bytes = readFileSync(GLB);
-  const ab = bytes.buffer.slice(
-    bytes.byteOffset,
-    bytes.byteOffset + bytes.byteLength,
-  ) as ArrayBuffer;
-  const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
-  gltf = await new Promise<GLTF>((resolve, reject) => loader.parse(ab, '', resolve, reject));
-  const wharfBytes = readFileSync(
+  // the painted maps are KTX2: Node gets stand-ins (helpers/painted_glb.ts)
+  gltf = await parsePaintedGlb(GLB);
+  wharfGltf = await parsePaintedGlb(
     path.join(
       __dirname,
       '..',
       'public',
       wickharborWharfInternalsForTest.assetUrl.replace(/^\//, ''),
     ),
-  );
-  const wharfAb = wharfBytes.buffer.slice(
-    wharfBytes.byteOffset,
-    wharfBytes.byteOffset + wharfBytes.byteLength,
-  ) as ArrayBuffer;
-  wharfGltf = await new Promise<GLTF>((resolve, reject) =>
-    loader.parse(wharfAb, '', resolve, reject),
   );
 });
 
@@ -160,10 +147,19 @@ describe('wickharbor harbor painter', () => {
         });
         return out;
       };
-      const harbor = materialsOf(buildWickharborHarbor());
-      const wharf = materialsOf(buildWickharborWharf());
+      const harborView = buildWickharborHarbor();
+      const wharfView = buildWickharborWharf();
+      const harbor = materialsOf(harborView);
+      const wharf = materialsOf(wharfView);
       expect(harbor.size).toBe(5);
       expect([...harbor].every((m) => wharf.has(m))).toBe(true);
+      // painted, and still one material each: each file embeds its own copy of the same
+      // three maps, and the two models draw the same three texture objects
+      const maps = expectPaintedMeshes(harborView, SRGBColorSpace);
+      expect(maps.size).toBe(3);
+      expect([...expectPaintedMeshes(wharfView, SRGBColorSpace)].every((t) => maps.has(t))).toBe(
+        true,
+      );
     }
   });
 

@@ -53,18 +53,20 @@ const QUEST_OBJECT_URLS: Record<string, string> = {
   soulshard_pillar: '/models/quest/bastion_ward_stone.glb',
   ogre_war_totem: '/models/quest/ogre_war_totem.glb',
   sanctum_key_shard: '/models/quest/sanctum_key_shard.glb',
-  grave_sir_aldren: '/models/dungeon/gravestone.glb',
-  grave_high_priest_malric: '/models/dungeon/gravestone.glb',
-  grave_captain_voss: '/models/dungeon/gravestone.glb',
+  // the three named graves: the painted kit's own stones (the graveyards' stones), a
+  // different one for each of the dead
+  grave_sir_aldren: '/models/props/gravestone_decorative.glb',
+  grave_high_priest_malric: '/models/props/gravestone_cross.glb',
+  grave_captain_voss: '/models/props/gravestone_bevel.glb',
   // The Proving Shore ferry bells (a clicked travel object, not a pickup):
   // the standing bell-on-frame prop the marsh dressing already ships.
   ps_ferry_bell: '/models/props/marsh_bell_gallows.glb',
-  leyline_cache: '/models/dungeon/chest.glb',
-  confection_game_box: '/models/dungeon/chest.glb',
+  leyline_cache: '/models/biome/kcas_chest.glb',
+  confection_game_box: '/models/biome/kcas_chest.glb',
   // Gourdlight Eve's dailies (content/gourdlight_eve_dailies.ts): a stray pumpkin from
   // Old Thatchgrin's patch, and a green-flamed cursed candle at a town lamp's foot
-  thatchgrin_patch_pumpkin: '/models/dungeon/pumpkin_orange.glb',
-  cursed_candle_stub: '/models/dungeon/skull_candle.glb',
+  thatchgrin_patch_pumpkin: '/models/quest/patch_pumpkin.glb',
+  cursed_candle_stub: '/models/biome/kcas_candle_triple.glb',
 };
 
 const QUEST_OBJECT_HEIGHTS: Record<string, number> = {

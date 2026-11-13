@@ -664,17 +664,21 @@ describe('the hold and the leash still rule a caster no route reaches', () => {
 // The same sight rule in the open world, on a world caster (Corrupted Priest
 // Malric's Mindfracture, an instant petSpell) with one of the world's own
 // props between him and his target: the authored quay watch tower (zone1
-// decorProp hexWatchtower at (-89, -41), r 2.4, h 12) stands 5 yd east of the
+// decorProp hexWatchtower at (-89, -41), r 2.4, h 12) stands 5 yd west of the
 // player's spot. The pair has moved twice: the prop 5 yd east of the origin
 // went when #4525 moved Eastbrook, and the Wolf Run garrison watch tower at
 // (27, -13) that replaced it went with the genshin artstyle merge
-// (8bff2cec638), so the pair now uses the same model on the quay. Out here no
+// (8bff2cec638), so the pair now uses the same model on the quay. It has also
+// turned round on that tower: the caster used to start 15 yd east of it, where
+// one of the placed quay houses stands now (the live-world document,
+// data/world_touchup/current.map.json), so he starts 15 yd west of it and the
+// player stands east. Out here no
 // route is planned (chase_route.ts keeps routes to instances): he closes
 // straight, the slide fan rounds the prop, and the leash and the stall are
 // what they always were.
 describe('in the open world', () => {
   const WORLD_SEED_WITH_PROP = 7788;
-  const SPOT = { x: -94, z: -41 };
+  const SPOT = { x: -84, z: -41 };
 
   function field(dist: number): { sim: Sim; player: Entity; caster: Entity } {
     const sim = new Sim({ seed: WORLD_SEED_WITH_PROP, playerClass: 'warrior' });
@@ -689,7 +693,7 @@ describe('in the open world', () => {
       sim.ctx.nextId++,
       template,
       5,
-      sim.ctx.groundPos(SPOT.x + dist, SPOT.z),
+      sim.ctx.groundPos(SPOT.x - dist, SPOT.z),
     );
     caster.hostile = true;
     caster.maxHp = 1e7;
@@ -736,7 +740,7 @@ describe('in the open world', () => {
   it('the leash still sends a caster home while it is looking for its line', () => {
     const { sim, caster } = field(20);
     // Dragged far past its leash: the first engaged tick ends the pull.
-    caster.spawnPos = { x: caster.pos.x + LEASH_DISTANCE + 10, y: caster.pos.y, z: caster.pos.z };
+    caster.spawnPos = { x: caster.pos.x - LEASH_DISTANCE - 10, y: caster.pos.y, z: caster.pos.z };
     caster.leashAnchor = null;
     sim.tick();
     expect(caster.aiState).toBe('evade');
