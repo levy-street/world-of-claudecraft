@@ -19,6 +19,7 @@ import {
   type AdornmentBody,
   createMoonwingPose,
   formAdornmentPlan,
+  moonwingFit,
   moonwingPoseInto,
 } from './form_adornment_core';
 import { MoonwingAdornment } from './moonwing_adornment';
@@ -50,8 +51,8 @@ export class FormAdornments {
   private suppressed = false;
   private disposed = false;
 
-  /** `model` holds the rig's bones; `body` decides the antlers
-   *  (form_adornment_core.formAdornmentPlan); `gate` reads the visual's
+  /** `model` holds the rig's bones; `body` decides the antlers and the fit
+   *  (form_adornment_core.formAdornmentPlan, moonwingFit); `gate` reads the visual's
    *  current compile gate, null in previews and tests (no hold). */
   constructor(
     private readonly model: THREE.Object3D,
@@ -74,7 +75,7 @@ export class FormAdornments {
     this.suppressed = ghosted;
     const plan = formAdornmentPlan(moonkin, this.body);
     if (plan.moonwing && !this.moonwing) {
-      const piece = new MoonwingAdornment(this.model, plan.antlers);
+      const piece = new MoonwingAdornment(this.model, plan.antlers, moonwingFit(this.body));
       this.moonwingElapsed = 0;
       // Every shift starts folded: the pose still holds the LAST form's
       // unfurled wings, which would pop the new pair open on its first frame.

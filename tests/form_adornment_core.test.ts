@@ -5,14 +5,21 @@
 import { describe, expect, it } from 'vitest';
 import {
   createMoonwingPose,
+  formAdornmentBody,
   formAdornmentPlan,
+  MOONWING_KAYKIT_FIT,
   MOONWING_UNFURL_SECONDS,
+  MOONWING_WOC_FIT,
+  moonwingFit,
   moonwingPoseInto,
 } from '../src/render/characters/form_adornment_core';
 
 describe('formAdornmentPlan', () => {
-  it('grows the antlers back only on a composed Moonwing body', () => {
-    expect(formAdornmentPlan(true, 'composed')).toEqual({ moonwing: true, antlers: true });
+  it('grows the antlers back only on a bare-headed Moonwing body', () => {
+    // A composed look and a WOC body both have a bare head to crown.
+    for (const body of ['composed', 'woc'] as const) {
+      expect(formAdornmentPlan(true, body)).toEqual({ moonwing: true, antlers: true });
+    }
     // The legacy druid.glb rig wears its own antlered hood, and a mech body is
     // a whole replacement: crescent and wings, never a second pair of antlers.
     for (const body of ['classRig', 'replacement'] as const) {
@@ -21,11 +28,59 @@ describe('formAdornmentPlan', () => {
   });
 
   it('wears nothing outside Moonwing, and plans no piece for any other form', () => {
-    for (const body of ['composed', 'classRig', 'replacement'] as const) {
+    for (const body of ['composed', 'woc', 'classRig', 'replacement'] as const) {
       // The whole plan, key for key: a piece planned for Gloamveil (the face
       // veil this core used to carry) would show up here as a third key.
       expect(formAdornmentPlan(false, body)).toEqual({ moonwing: false, antlers: false });
     }
+  });
+});
+
+describe('formAdornmentBody', () => {
+  it('reads a WOC def as a WOC body before anything else', () => {
+    // The live druid: a WOC def with no composed look. It used to fall through
+    // to `classRig` (KayKit offsets, no antlers), which floated the wings.
+    expect(formAdornmentBody(false, true, 'player_druid')).toBe('woc');
+    expect(formAdornmentBody(false, true, 'player_druid_female')).toBe('woc');
+    expect(formAdornmentBody(true, true, 'player_druid')).toBe('woc');
+  });
+
+  it('keeps the KayKit body kinds for every other rig', () => {
+    expect(formAdornmentBody(true, false, 'player_druid_modular')).toBe('composed');
+    expect(formAdornmentBody(false, false, 'player_mech')).toBe('replacement');
+    expect(formAdornmentBody(false, false, 'player_druid')).toBe('classRig');
+  });
+});
+
+describe('moonwingFit', () => {
+  it('keeps the authored KayKit placement on every KayKit body', () => {
+    for (const body of ['composed', 'classRig', 'replacement'] as const) {
+      expect(moonwingFit(body)).toBe(MOONWING_KAYKIT_FIT);
+    }
+    expect(MOONWING_KAYKIT_FIT).toEqual({
+      head: { y: 0, z: 0, scale: 1 },
+      wing: { x: 0.14, y: 0.12, z: -0.62, scale: 1 },
+    });
+  });
+
+  it('shrinks the pieces onto the WOC body and pulls them in to its bones', () => {
+    const fit = moonwingFit('woc');
+    expect(fit).toBe(MOONWING_WOC_FIT);
+    // The WOC back plate is about 0.09 behind the chest bone and the body is
+    // about 1.2 rig units tall: the wing root sits just behind the plate, by
+    // the spine, between the chest bone and the neck (0.13 above it).
+    expect(fit.wing.z).toBeLessThan(-0.08);
+    expect(fit.wing.z).toBeGreaterThan(-0.16);
+    expect(fit.wing.x).toBeGreaterThan(0);
+    expect(fit.wing.x).toBeLessThan(0.1);
+    expect(fit.wing.y).toBeGreaterThan(0);
+    expect(fit.wing.y).toBeLessThan(0.13);
+    // About half size: the KayKit body is about twice the WOC one in rig units.
+    expect(fit.wing.scale).toBeGreaterThan(0.35);
+    expect(fit.wing.scale).toBeLessThan(0.65);
+    // The WOC skull is an eighth the width of the KayKit head.
+    expect(fit.head.scale).toBeGreaterThan(0.12);
+    expect(fit.head.scale).toBeLessThan(0.35);
   });
 });
 

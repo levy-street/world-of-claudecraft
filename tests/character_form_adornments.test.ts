@@ -4,7 +4,8 @@
 // turns it into rig-parented pieces (form_adornments.ts). Pins, on the REAL
 // CharacterVisual over a mocked loader (the character_halo.test.ts rig):
 //  - the edge mounts and unmounts the set, and dispose() takes it down;
-//  - antlers only on a composed body (a fixed druid rig wears its own hood);
+//  - the druid's WOC body wears the set at the WOC fit, antlers included; a
+//    fixed KayKit rig keeps the KayKit fit and no antlers;
 //  - the pieces stay out of the body's overlay cycle: a ghost, stealth or Soul
 //    Rend swap, a weapon swap (rebuildCasters re-traverses the model) or the
 //    tint itself never mounts an effect clone on them, and they never cast
@@ -14,6 +15,8 @@
 //  - the first mount rides the visual's injected compile gate.
 import * as THREE from 'three';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { MOONWING_WOC_FIT } from '../src/render/characters/form_adornment_core';
+import { WING_ROOT } from '../src/render/characters/moonwing_adornment';
 import { failWocHeads, landWocBodies } from './helpers/woc_streamed';
 
 type Visual = import('../src/render/characters/visual').CharacterVisual;
@@ -82,29 +85,47 @@ function pieceNames(visual: Visual): string[] {
 }
 
 describe('CharacterVisual form adornments', () => {
-  it('mounts Moonwing on the edge, without antlers on the fixed druid rig', () => {
+  it('mounts Moonwing on the edge, antlered and at the WOC fit on the druid body', () => {
     const visual = new CharacterVisual('player_druid', 0xffffff, 0);
     expect(pieceNames(visual)).toEqual([]);
+    visual.setMoonkin(true);
+    // The live druid is a WOC body with no composed look: it still gets the
+    // antlers (its head is bare) and the WOC placement, never the KayKit one.
+    expect(pieceNames(visual)).toEqual([
+      'moonwing_antler_wraps',
+      'moonwing_antlers',
+      'moonwing_crescent',
+      'moonwing_wing_left_feathers',
+      'moonwing_wing_right_feathers',
+    ]);
+    const wing = visual.root.getObjectByName('moonwing_wing_right') as THREE.Object3D;
+    expect(wing.parent?.name).toBe('chest');
+    expect(wing.position.toArray()).toEqual([
+      MOONWING_WOC_FIT.wing.x,
+      MOONWING_WOC_FIT.wing.y,
+      MOONWING_WOC_FIT.wing.z,
+    ]);
+    expect(wing.scale.x).toBe(MOONWING_WOC_FIT.wing.scale);
+    const crown = visual.root.getObjectByName('moonwing_head') as THREE.Object3D;
+    expect(crown.parent?.name).toBe('head');
+    expect(crown.scale.x).toBe(MOONWING_WOC_FIT.head.scale);
+    visual.setMoonkin(false);
+    expect(pieceNames(visual)).toEqual([]);
+    visual.dispose();
+  });
+
+  it('leaves the antlers off a fixed KayKit rig and keeps its KayKit placement', () => {
+    // Bursar Fernando: a fixed KayKit rogue rig, neither WOC nor composed.
+    const visual = new CharacterVisual('npc_fernando', 0xffffff, 0);
     visual.setMoonkin(true);
     expect(pieceNames(visual)).toEqual([
       'moonwing_crescent',
       'moonwing_wing_left_feathers',
       'moonwing_wing_right_feathers',
     ]);
-    visual.setMoonkin(false);
-    expect(pieceNames(visual)).toEqual([]);
-    visual.dispose();
-  });
-
-  it('grows the antlers back on a composed body', () => {
-    const visual = new CharacterVisual('player_druid', 0xffffff, 0);
-    // The constructor keeps `look` only for a modular def, which a stubbed
-    // loader cannot assemble; set the field it would hold so the SAME wiring
-    // reads a composed body.
-    (visual as unknown as { look: unknown }).look = { app: {}, worn: {} };
-    visual.setMoonkin(true);
-    expect(pieceNames(visual)).toContain('moonwing_antlers');
-    expect(pieceNames(visual)).toContain('moonwing_antler_wraps');
+    const wing = visual.root.getObjectByName('moonwing_wing_right') as THREE.Object3D;
+    expect(wing.position.toArray()).toEqual([WING_ROOT.x, WING_ROOT.y, WING_ROOT.z]);
+    expect(wing.scale.toArray()).toEqual([1, 1, 1]);
     visual.dispose();
   });
 

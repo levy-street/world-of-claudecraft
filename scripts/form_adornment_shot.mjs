@@ -11,6 +11,10 @@
 // pins the camera (renderer.editorCam) on a front and a back three-quarter view
 // of the character. Seeds the lowest graphics preset first (the capture rule in
 // the pr-screenshots skill).
+//
+// Moonwing is shot on both WOC body fits, on foot and mounted (the wings ride
+// the `chest` bone, so the seat has to carry them). ONLY=moonwing (a scenario
+// name prefix) narrows the run.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -36,6 +40,34 @@ const SCENARIOS = [
     views: ['front', 'back'],
   },
   {
+    name: 'moonwing-female',
+    cls: 'druid',
+    spec: 'balance',
+    ability: 'moonkin_form',
+    aura: 'form_moonkin',
+    female: true,
+    views: ['front', 'back'],
+  },
+  {
+    name: 'moonwing-mounted',
+    cls: 'druid',
+    spec: 'balance',
+    ability: 'moonkin_form',
+    aura: 'form_moonkin',
+    mounted: true,
+    views: ['front', 'back'],
+  },
+  {
+    name: 'moonwing-female-mounted',
+    cls: 'druid',
+    spec: 'balance',
+    ability: 'moonkin_form',
+    aura: 'form_moonkin',
+    female: true,
+    mounted: true,
+    views: ['front', 'back'],
+  },
+  {
     name: 'gloamveil',
     cls: 'priest',
     spec: 'shadow',
@@ -46,9 +78,10 @@ const SCENARIOS = [
 ];
 
 // Camera offsets around the character, in facing-relative yaw (0 = in front).
+// Framed for the WOC body (about 2.9 yd tall, wings and antlers above it).
 const VIEWS = [
-  { name: 'front', yaw: 0.55, dist: 3.9, height: 1.1, lookY: 1.15 },
-  { name: 'back', yaw: Math.PI + 0.55, dist: 3.9, height: 1.3, lookY: 1.1 },
+  { name: 'front', yaw: -0.55, dist: 5.6, height: 1.5, lookY: 1.75 },
+  { name: 'back', yaw: Math.PI + 0.55, dist: 5.6, height: 1.7, lookY: 1.75 },
 ];
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -65,21 +98,27 @@ async function awaitWorldPainted(page) {
   );
 }
 
-async function frame(page, view) {
-  await page.evaluate((v) => {
-    const g = window.__game;
-    const p = g.sim.player;
-    const yaw = p.facing + v.yaw;
-    const target = g.renderer.camera.position.clone().set(p.pos.x, p.pos.y + v.lookY, p.pos.z);
-    const pos = target
-      .clone()
-      .set(
-        p.pos.x + Math.sin(yaw) * v.dist,
-        p.pos.y + v.height + 0.35,
-        p.pos.z + Math.cos(yaw) * v.dist,
-      );
-    g.renderer.editorCam = { target, pos };
-  }, view);
+// `lift` raises the whole framing (a rider sits a saddle's height up).
+async function frame(page, view, lift = 0) {
+  await page.evaluate(
+    (base, raise) => {
+      const v = { ...base, height: base.height + raise, lookY: base.lookY + raise };
+      const g = window.__game;
+      const p = g.sim.player;
+      const yaw = p.facing + v.yaw;
+      const target = g.renderer.camera.position.clone().set(p.pos.x, p.pos.y + v.lookY, p.pos.z);
+      const pos = target
+        .clone()
+        .set(
+          p.pos.x + Math.sin(yaw) * v.dist,
+          p.pos.y + v.height + 0.35,
+          p.pos.z + Math.cos(yaw) * v.dist,
+        );
+      g.renderer.editorCam = { target, pos };
+    },
+    view,
+    lift,
+  );
   await sleep(1500);
 }
 
@@ -105,7 +144,8 @@ const browser = await puppeteer.launch({
 });
 
 try {
-  for (const scenario of SCENARIOS) {
+  const only = process.env.ONLY ?? '';
+  for (const scenario of SCENARIOS.filter((entry) => entry.name.startsWith(only))) {
     const viewport = { width: 1600, height: 900 };
     const page = await browser.newPage();
     page.on('pageerror', (error) => console.log(`[pageerror] ${error.message}`));
@@ -116,7 +156,7 @@ try {
     await page.goto(url.href, { waitUntil: 'networkidle0', timeout: 120000 });
     const booted = await enterOfflineGame(page, {
       charClass: scenario.cls,
-      charName: scenario.name === 'moonwing' ? 'Fizban' : 'Faceless',
+      charName: scenario.cls === 'druid' ? 'Fizban' : 'Faceless',
       selectorTimeoutMs: 60000,
       gameBootTimeoutMs: 120000,
     });
@@ -137,21 +177,39 @@ try {
       p.gcdRemaining = 0;
       // Turned so the camera looks along the shore, away from the spawn NPCs.
       p.facing = p.prevFacing = 0.4 + Math.PI;
+      // The Body tab's female pick: the renderer rebuilds the view on the
+      // female WOC def (manifest.ts playerVisualKey).
+      if (s.female) p.modularAppearance = { ...(p.modularAppearance ?? {}), gender: 'female' };
       sim.castAbility(s.ability);
       g.hud.handleEvents(sim.drainEvents());
-      const v = g.renderer.views.get(p.id);
+      return { form: p.auras.some((a) => a.kind === s.aura) };
+    }, scenario);
+    if (!state.form) throw new Error(`${scenario.ability} did not apply ${scenario.aura}`);
+    if (scenario.mounted) {
+      await page.evaluate(() => {
+        const sim = window.__game.sim;
+        sim.players.get(sim.player.id).ridingTrained = true;
+        sim.toggleMounted();
+      });
+      await page.waitForFunction(() => !!window.__game.sim.player.mountKey, { timeout: 20000 });
+    }
+    // A female pick rebuilds the view on its own streamed body: wait for it.
+    await sleep(scenario.female ? 6000 : 0);
+    const rig = await page.evaluate((s) => {
+      const p = window.__game.sim.player;
       return {
+        key: window.__game.renderer.views.get(p.id)?.visual?.key ?? null,
         form: p.auras.some((a) => a.kind === s.aura),
-        key: v?.visual?.key ?? null,
+        mount: p.mountKey ?? null,
       };
     }, scenario);
-    console.log(`${scenario.name}: form=${state.form} rig=${state.key}`);
-    if (!state.form) throw new Error(`${scenario.ability} did not apply ${scenario.aura}`);
+    console.log(`${scenario.name}: form=${rig.form} rig=${rig.key} mount=${rig.mount}`);
+    if (!rig.form) throw new Error(`${scenario.name}: ${scenario.aura} did not survive the setup`);
     // Let the tint's effect-swap compile gate settle before the first capture.
     await sleep(4000);
     const views = VIEWS.filter((view) => scenario.views.includes(view.name));
     for (const view of views) {
-      await frame(page, view);
+      await frame(page, view, scenario.mounted ? 1.3 : 0);
       await capture(page, path.join(out, `${prefix}-${scenario.name}-${view.name}.png`), viewport);
     }
     await page.close();

@@ -17,12 +17,14 @@
 // Units are raw KayKit bone space (the halo's). Placement was measured against
 // the modular head (x +-0.45, crown ~0.81, hair to ~1.04, face at +z) and the
 // druid kit's back piece (chest space z down to -0.61), then tuned by capture
-// (scripts/form_adornment_shot.mjs).
+// (scripts/form_adornment_shot.mjs). A body of other proportions (the WOC
+// body) wears the same pieces through a MoonwingFit (form_adornment_core.ts):
+// an offset and a uniform scale on the head group and on each wing pivot.
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { surfaceMat } from '../gfx';
 import { markSharedGeometry } from '../shared_resource';
-import type { MoonwingPose } from './form_adornment_core';
+import { MOONWING_KAYKIT_FIT, type MoonwingFit, type MoonwingPose } from './form_adornment_core';
 import { crescentTexture, wingTexture } from './form_adornment_textures';
 import { markRigFx, rigGlowMaterial, tagStandInForTextureUpload } from './rig_fx';
 
@@ -40,8 +42,9 @@ const WRAP_COLOR = 0x6e4a2c;
 
 /** Crescent rest point between the antlers, head-bone space. */
 export const CRESCENT_REST = { y: 1.24, z: -0.05, size: 0.4 } as const;
-/** Wing root on the back, chest-bone space (x mirrors per side). */
-export const WING_ROOT = { x: 0.14, y: 0.12, z: -0.62 } as const;
+/** Wing root on the back of a KayKit body, chest-bone space (x mirrors per
+ *  side). */
+export const WING_ROOT = MOONWING_KAYKIT_FIT.wing;
 /** Wing swing about the spine, radians: folded along the back vs unfurled. */
 const WING_FOLDED = 1.25;
 const WING_OPEN = 0.42;
@@ -237,6 +240,17 @@ function mesh(
   return out;
 }
 
+/** The rig's bone of that name. A rig can carry other nodes named like a bone
+ *  (an armour slot wrapper, a head pack), so a real Bone wins; a rig built of
+ *  plain nodes (the prewarm stand-in) falls back to the first match. */
+function findBone(model: THREE.Object3D, name: string): THREE.Object3D | null {
+  let bone: THREE.Object3D | null = null;
+  model.traverse((node) => {
+    if (!bone && node.name === name && (node as THREE.Bone).isBone) bone = node;
+  });
+  return bone ?? model.getObjectByName(name) ?? null;
+}
+
 /** One rig's Moonwing pieces, attached to its bones until disposed. */
 export class MoonwingAdornment {
   readonly head: THREE.Group | null = null;
@@ -248,13 +262,20 @@ export class MoonwingAdornment {
   readonly roots: readonly THREE.Object3D[];
 
   /** `model` is the rig subtree holding the `head` and `chest` bones; a rig
-   *  missing one simply goes without those pieces. */
-  constructor(model: THREE.Object3D, antlers: boolean) {
+   *  missing one simply goes without those pieces. `fit` places and sizes the
+   *  pieces for the body's proportions. */
+  constructor(
+    model: THREE.Object3D,
+    antlers: boolean,
+    private readonly fit: MoonwingFit = MOONWING_KAYKIT_FIT,
+  ) {
     const k = moonwingKit();
-    const headBone = model.getObjectByName('head');
+    const headBone = findBone(model, 'head');
     if (headBone) {
       const head = markRigFx(new THREE.Group());
       head.name = 'moonwing_head';
+      head.position.set(0, fit.head.y, fit.head.z);
+      head.scale.setScalar(fit.head.scale);
       if (antlers) {
         const lit = antlerMaterials();
         head.add(mesh(k.antlerGeometry, lit.bone, 'moonwing_antlers'));
@@ -267,7 +288,7 @@ export class MoonwingAdornment {
       this.head = head;
       this.crescent = crescent;
     }
-    const chestBone = model.getObjectByName('chest');
+    const chestBone = findBone(model, 'chest');
     if (chestBone) {
       this.leftWing = this.attachWing(chestBone, -1, k.leftWingGeometry, k.wing);
       this.rightWing = this.attachWing(chestBone, 1, k.rightWingGeometry, k.wing);
@@ -285,7 +306,9 @@ export class MoonwingAdornment {
   ): THREE.Group {
     const pivot = markRigFx(new THREE.Group());
     pivot.name = side > 0 ? 'moonwing_wing_right' : 'moonwing_wing_left';
-    pivot.position.set(WING_ROOT.x * side, WING_ROOT.y, WING_ROOT.z);
+    const { x, y, z, scale } = this.fit.wing;
+    pivot.position.set(x * side, y, z);
+    pivot.scale.setScalar(scale);
     pivot.add(mesh(geometry, material, `${pivot.name}_feathers`, 1));
     chest.add(pivot);
     return pivot;

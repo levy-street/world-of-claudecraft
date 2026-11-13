@@ -15,18 +15,30 @@
 // how the pieces move are decisions a Vitest pins directly, while the THREE
 // builder (moonwing_adornment.ts) stays a thin painter over this math.
 
-/** What kind of body a rig is: a composed modular look, a fixed class rig
- *  (a character authored before the creator), or a whole replacement body
- *  (the Combat Mech skin). */
-export type AdornmentBody = 'composed' | 'classRig' | 'replacement';
+/** What kind of body a rig is: a composed modular look, a WOC body (the
+ *  realistic-proportion player body every class draws since the equipment
+ *  sets), a fixed class rig (a character authored before the creator), or a
+ *  whole replacement body (the Combat Mech skin). */
+export type AdornmentBody = 'composed' | 'woc' | 'classRig' | 'replacement';
+
+/** The body kind of a rig, from what its visual already knows: whether its
+ *  def is a WOC character, whether it composed a modular look, and its key.
+ *  The WOC test comes first: the skeleton decides the fit, and a WOC druid has
+ *  no composed look, so without it the rig would pass for a legacy class rig
+ *  (KayKit offsets, no antlers). */
+export function formAdornmentBody(composed: boolean, woc: boolean, key: string): AdornmentBody {
+  if (woc) return 'woc';
+  if (composed) return 'composed';
+  return key === 'player_mech' ? 'replacement' : 'classRig';
+}
 
 /** Which adornment pieces a character rig wears this frame. */
 export interface FormAdornmentPlan {
   /** Crescent and wings: every Moonwing rig (they float clear of any head). */
   moonwing: boolean;
-  /** Antlers: only a composed body. The legacy class rig (`player_druid`,
-   *  druid.glb) already wears its antlered hood, and a replacement body has no
-   *  druid head to crown. */
+  /** Antlers: a composed body and a WOC body, whose heads are bare. The
+   *  legacy class rig (druid.glb) already wears its antlered hood, and a
+   *  replacement body has no druid head to crown. */
   antlers: boolean;
 }
 
@@ -35,8 +47,49 @@ export interface FormAdornmentPlan {
 export function formAdornmentPlan(moonkin: boolean, body: AdornmentBody): FormAdornmentPlan {
   return {
     moonwing: moonkin,
-    antlers: moonkin && body === 'composed',
+    antlers: moonkin && (body === 'composed' || body === 'woc'),
   };
+}
+
+/** Where the Moonwing pieces sit on one body kind, and how large. The pieces
+ *  are authored once, in KayKit bone units (moonwing_adornment.ts); a fit
+ *  moves and uniformly scales them onto a body of other proportions. */
+export interface MoonwingFit {
+  /** The head group (antlers and crescent): its origin in head-bone space and
+   *  its uniform scale. */
+  readonly head: { readonly y: number; readonly z: number; readonly scale: number };
+  /** A wing's root in chest-bone space (x mirrors per side) and its uniform
+   *  scale. */
+  readonly wing: {
+    readonly x: number;
+    readonly y: number;
+    readonly z: number;
+    readonly scale: number;
+  };
+}
+
+/** The authoring fit: the KayKit Rig_Medium bodies (the composed look, the
+ *  legacy class rigs, the Combat Mech) the pieces were measured against. */
+export const MOONWING_KAYKIT_FIT: MoonwingFit = {
+  head: { y: 0, z: 0, scale: 1 },
+  wing: { x: 0.14, y: 0.12, z: -0.62, scale: 1 },
+};
+
+/** The WOC body, male and female fit alike. Its skeleton keeps the KayKit bone
+ *  names and axes but the body is about half the KayKit size in rig units
+ *  with a realistic small head, so the KayKit offsets leave the wings and the
+ *  crescent floating far off it at twice the size. Measured on the live rigs
+ *  (base_male.glb / base_female.glb with their heads): the back plate sits
+ *  about 0.09 behind the chest bone, the skull is 0.11 wide with its crown
+ *  0.15 above the head bone and its centre 0.04 ahead of it. */
+export const MOONWING_WOC_FIT: MoonwingFit = {
+  head: { y: -0.035, z: 0.045, scale: 0.25 },
+  wing: { x: 0.035, y: 0.07, z: -0.1, scale: 0.48 },
+};
+
+/** The fit a body kind wears the Moonwing pieces at. */
+export function moonwingFit(body: AdornmentBody): MoonwingFit {
+  return body === 'woc' ? MOONWING_WOC_FIT : MOONWING_KAYKIT_FIT;
 }
 
 /** The per-frame Moonwing pose, in the painter's own units. */

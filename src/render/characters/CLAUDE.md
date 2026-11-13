@@ -324,7 +324,12 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   painter, `moonwing_adornment.ts` (antlers, crescent, wings), with its canvas
   art in `form_adornment_textures.ts` and the shared marker and glow recipe in
   `rig_fx.ts`. Moonwing is the only form that wears one: Gloamveil's face veil
-  was sized for one head and is gone (see the Gloamveil entry above). Pieces
+  was sized for one head and is gone (see the Gloamveil entry above). The
+  pieces are authored once in KayKit bone units; a body of other proportions
+  wears them through a `MoonwingFit` (an offset and a uniform scale per bone,
+  `moonwingFit` in the core), so a new body kind gets a fit, never new
+  geometry: the WOC body (`formAdornmentBody` reads `def.wocCharacter`) is
+  about half the KayKit size with a small head. Pieces
   ride the rig's `head`/`chest` bones, carry the
   `weaponVfxMesh` marker so no overlay swap, spirit veil or caster sweep
   touches them, hide under a ghost or stealth body, and their shared kits are

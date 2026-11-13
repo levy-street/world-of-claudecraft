@@ -117,6 +117,7 @@ import {
   shadowProxyShown,
   shadowStandInShown,
 } from './far_lod_reveal_core';
+import { formAdornmentBody } from './form_adornment_core';
 import { FormAdornments } from './form_adornments';
 import { GestureMeshToggles } from './gesture_mesh_toggles';
 import {
@@ -3982,7 +3983,7 @@ export class CharacterVisual {
     if (this.disposed || (!this.formAdornments && !this.moonkin)) return;
     this.formAdornments ??= new FormAdornments(
       this.model,
-      this.look ? 'composed' : this.key === 'player_mech' ? 'replacement' : 'classRig',
+      formAdornmentBody(this.look !== null, this.def.wocCharacter !== undefined, this.key),
       () => this.farBakeGate,
     );
     this.formAdornments.sync(this.moonkin, this.ghosted);
