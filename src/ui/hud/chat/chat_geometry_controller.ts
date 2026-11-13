@@ -9,6 +9,7 @@ import {
   snapFrameSize,
   stepCoordToGridLine,
 } from '../../target_frame_pos';
+import { bindResizeHandleYield } from './chat_resize_handle_yield';
 import {
   anchorAdjustedChatBox,
   CHAT_BOX_LIMITS,
@@ -168,6 +169,10 @@ export class ChatGeometryController {
     const endMobileResize = (event: PointerEvent): void => this.onMobileResizeEnd(event);
     resizeHandle.addEventListener('pointerup', endMobileResize);
     resizeHandle.addEventListener('pointercancel', endMobileResize);
+    const ctxMenu = this.deps.document.getElementById('ctx-menu');
+    const Observer = (this.deps.window as { MutationObserver?: typeof MutationObserver })
+      .MutationObserver;
+    if (ctxMenu && Observer) bindResizeHandleYield(ctxMenu, resizeHandle, Observer);
     try {
       const savedBottom = this.deps.storage.getItem(MOBILE_CHAT_BOTTOM_KEY);
       if (savedBottom) {

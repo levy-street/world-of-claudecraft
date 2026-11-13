@@ -3094,6 +3094,16 @@
       0 0 0 1px color-mix(in srgb, var(--color-keyline) 40%, transparent),
       inset 0 1px 0 color-mix(in srgb, var(--color-white) 20%, transparent);
   }
+  /* While any #ctx-menu popup is open (the chat "+" Add channel menu, a chat name's
+     player menu), the handle steps aside. #ctx-menu lives inside #ui, whose stacking
+     context (z-index 10) sits below this body-level handle at 300, so no z-index on the
+     menu can lift it over the handle: on a short phone the handle covered the menu's
+     last row (Cancel) and ate its tap. chat_resize_handle_yield.ts mirrors the menu's
+     shown state onto the handle as .ctx-menu-yield (a class on the handle, never a
+     root :has()), and the handle returns the moment the menu closes. */
+  body.mobile-touch.mobile-chat-open .chat-mobile-resize.ctx-menu-yield {
+    display: none;
+  }
   /* The tab strip keeps its natural height; the log frame fills the rest of the panel
      (the ~4-line strip cap only applies while closed or peeking). */
   body.mobile-touch.mobile-chat-open #chatlog-tabs {
