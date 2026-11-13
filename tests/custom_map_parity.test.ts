@@ -1,9 +1,19 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { customMapToWorldContent, newCustomMap, newFlatCustomMap } from '../src/editor/custom_map';
+import {
+  customMapToWorldContent,
+  fenbridgeAlignedRoads,
+  newCustomMap,
+  newFlatCustomMap,
+} from '../src/editor/custom_map';
 import { isAuthoredTownBuildingDef } from '../src/sim/authored_town_buildings';
 import { isBlocked } from '../src/sim/colliders';
 import { clonePropsWithoutEastbrookLayout } from '../src/sim/custom_world_props';
-import { BUILTIN_WORLD, getActiveWorldContent, setActiveWorldContent } from '../src/sim/data';
+import {
+  BASE_WORLD,
+  BUILTIN_WORLD,
+  getActiveWorldContent,
+  setActiveWorldContent,
+} from '../src/sim/data';
 import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
 import { activeFenbridgeLayout } from '../src/sim/fenbridge_touchup';
 import { sanitizeMapDoc } from '../src/sim/map_doc';
@@ -203,6 +213,30 @@ describe('custom-map terrain seam', () => {
     // an empty-props map clones no records, so it carries no touch-up either
     const flat = customMapToWorldContent(newFlatCustomMap('Flat', 'flat', 0));
     expect(flat.fenbridgeTouchup).toBeUndefined();
+  });
+
+  it("seeds a new map's Fenbridge townsfolk and streets from the live layout", () => {
+    const map = newCustomMap('Fen', 'fen', 0);
+    const layout = activeFenbridgeLayout(BUILTIN_WORLD);
+    // every townsperson the touch-up moved stands at the live spot
+    expect(layout.services.npcs.length).toBeGreaterThan(0);
+    for (const npc of layout.services.npcs) {
+      const placed = map.content.npcs[npc.id];
+      expect(placed?.pos, npc.id).toEqual(BUILTIN_WORLD.npcs[npc.id]?.pos);
+      expect(placed?.pos, npc.id).not.toEqual(BASE_WORLD.npcs[npc.id]?.pos);
+    }
+    // the town's streets are the live ones; the rest of the network is the
+    // base world's, in its own order (road edits key on the index)
+    const hub = { x: 0, z: 300 };
+    const inTown = (road: readonly { x: number; z: number }[]) =>
+      road.some((p) => Math.hypot(p.x - hub.x, p.z - hub.z) < 90);
+    const roads = map.content.roads ?? [];
+    expect(roads).toEqual(fenbridgeAlignedRoads());
+    const key = (road: readonly { x: number; z: number }[]) => JSON.stringify(road);
+    expect(new Set(roads.filter(inTown).map(key))).toEqual(
+      new Set(BUILTIN_WORLD.roads.filter(inTown).map(key)),
+    );
+    expect(roads.filter((r) => !inTown(r))).toEqual(BASE_WORLD.roads.filter((r) => !inTown(r)));
   });
 
   it('ignores specialized muster-board collision in programmatic custom worlds', () => {

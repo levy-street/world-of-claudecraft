@@ -19,6 +19,7 @@ import {
   WORLD_MAX_Z,
   WORLD_MIN_Z,
 } from '../sim/data';
+import { FENBRIDGE_LAYOUT } from '../sim/fenbridge_layout';
 import { fluidVolumesFromPlacements } from '../sim/fluid_volumes';
 import {
   type AssetCollisionBox,
@@ -156,9 +157,12 @@ export function newCustomMap(name: string, id: string, now: number): CustomMap {
     content: {
       zones: deepClone(BASE_WORLD.zones as CustomMap['content']['zones']),
       camps: deepClone(BASE_WORLD.camps as CustomMap['content']['camps']),
-      npcs: deepClone(BASE_WORLD.npcs as CustomMap['content']['npcs']),
+      // The live world's NPCs: the touch-up moved Fenbridge's townsfolk with
+      // its buildings, and the projection resolves the town from that same
+      // touch-up, so they stand where its streets and doors are.
+      npcs: deepClone(BUILTIN_WORLD.npcs as CustomMap['content']['npcs']),
       objects: deepClone(BASE_WORLD.groundObjects as CustomMap['content']['objects']),
-      roads: deepClone(BASE_WORLD.roads as CustomMap['content']['roads']),
+      roads: deepClone(fenbridgeAlignedRoads() as CustomMap['content']['roads']),
     },
     terrainEdits: [],
     placements: [
@@ -184,6 +188,31 @@ export function newCustomMap(name: string, id: string, now: number): CustomMap {
     promotedScenery: Object.fromEntries(FEATURE_PROMOTIONS.map((family) => [family.flag, true])),
     propsMode: 'editable-all',
   };
+}
+
+/** How far from Fenbridge's hub a road counts as one of the town's streets. */
+const FENBRIDGE_STREET_REACH = 90;
+
+/**
+ * The base world's road network with Fenbridge's streets taken from the live
+ * world: the touch-up re-laid the town's streets along with its buildings and
+ * NPCs, so a new map's Fenbridge agrees with the live layout its projection
+ * resolves. Roads elsewhere stay the base world's: a new map forks the base
+ * world, and the live-world editor is where the rest of the rework is edited.
+ * The base roads keep their order (road edits key on the index); the live
+ * Fenbridge streets the base lacks follow them.
+ */
+export function fenbridgeAlignedRoads(): { x: number; z: number }[][] {
+  const hub = FENBRIDGE_LAYOUT.hub.center;
+  const inTown = (road: readonly { x: number; z: number }[]) =>
+    road.some((p) => Math.hypot(p.x - hub.x, p.z - hub.z) < FENBRIDGE_STREET_REACH);
+  const key = (road: readonly { x: number; z: number }[]) => JSON.stringify(road);
+  const live = new Set(BUILTIN_WORLD.roads.map(key));
+  const base = new Set(BASE_WORLD.roads.map(key));
+  return [
+    ...BASE_WORLD.roads.filter((road) => !inTown(road) || live.has(key(road))),
+    ...BUILTIN_WORLD.roads.filter((road) => inTown(road) && !base.has(key(road))),
+  ];
 }
 
 /** Requested dimensions for a sized blank map (yards). */

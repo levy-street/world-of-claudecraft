@@ -23,7 +23,7 @@ import { parseMap, serializeMap } from '../src/editor/persist';
 import { shiftMovedObjectInScene } from '../src/render/editor_api/moved_object_preview';
 import { FARM_PATCHES } from '../src/sim/content/farm_patches';
 import { HUB_TRAINING_DUMMY_ID } from '../src/sim/content/practice_dummies';
-import { DUNGEON_LIST, GATHER_NODES } from '../src/sim/data';
+import { BUILTIN_WORLD, DUNGEON_LIST, GATHER_NODES } from '../src/sim/data';
 import { freezeObjectMoves, type ObjectMoves } from '../src/sim/moved_objects';
 
 const BED_KEY = 'farmBed:bed_eastbrook_1';
@@ -191,11 +191,15 @@ describe('custom map: the moves ride the document, playtest and publish', () => 
     expect('objectMoves' in untouched).toBe(false);
   });
 
-  it('a linked map projects no moves (its objects stay put in the full world)', () => {
+  it('a linked map projects none of its own moves (its objects stay put in the full world)', () => {
     const map = newCustomMap('Linked', 'linked', 1);
     map.objectMoves = withObjectMovedTo(undefined, BED_KEY, { x: 5, z: 6 });
     map.worldAnchor = { x: -200, z: 800 };
-    expect(customMapToWorldContent(map).objectMoves).toBeUndefined();
+    // the live world's own moves stand around it (the built-in touch-up),
+    // never the map's
+    const moves = customMapToWorldContent(map).objectMoves;
+    expect(moves).toBe(BUILTIN_WORLD.objectMoves);
+    expect(moves?.[BED_KEY]).not.toEqual({ x: 5, z: 6 });
   });
 });
 
