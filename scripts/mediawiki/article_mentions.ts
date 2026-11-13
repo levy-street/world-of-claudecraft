@@ -16,7 +16,7 @@ function key(text: string) {
 
 // Preserve literal parentheses in player names, e.g. Membership Token (30 Days).
 const qualifier =
-  / \((?:Ability|Talent|Deed|Recipe|NPC|Mob|Equipment set|World Quest|Enchant|Collection|Weapon skin|Contract|Specialization|Augment|Mount|Hoard encounter|Crop|Rift floor|Combat pet|Work order|Clue hunt|Rift|Mount skin|Companion|Hoard|Power-up|Weekly Quest|Faction|Pet family|Delve companion|Delve|Ferry|(?:NPCs|Items|Enemies|Abilities) index)\)$/;
+  / \((?:Ability|Talent|Deed|Recipe|NPC|Mob|Equipment set|World Quest|Enchant|Collection|Weapon skin|Contract|Specialization|Augment|Mount|Hoard encounter|Crop|Rift floor|Combat pet|Work order|Clue hunt|Rift|Mount skin|Companion|Hoard|Power-up|Weekly Quest|Faction|Pet family|Delve companion|Delve|Ferry|Quest|Item|Heroic item|Heroic|Dungeon|Zone|Class|Guide|(?:NPCs|Items|Enemies|Abilities) index)(?:, [^()]+)?\)$/;
 const numbered = / \(\d+\)$/;
 const literal = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -190,6 +190,13 @@ export function linkArticleMentions(pages: Article[]): void {
       return text.replace(pattern, (label: string, offset: number) => {
         const alias = key(label);
         const options = aliases.get(alias)!;
+        // A list entry that is only a name (a point of interest, say) gives no clue
+        // about what it refers to, so a page that merely shares the name is not linked.
+        const at = cursor + offset;
+        const lineStart = page.text.lastIndexOf('\n', at - 1) + 1;
+        const lineEnd = page.text.indexOf('\n', at);
+        const line = page.text.slice(lineStart, lineEnd < 0 ? undefined : lineEnd).trim();
+        if (/^[*#] /.test(line) && line.slice(2).trim() === label) return label;
         const before = text.slice(Math.max(0, offset - 70), offset);
         const after = text.slice(offset + label.length, offset + label.length + 60);
         const wanted = contextCategory(before, after);

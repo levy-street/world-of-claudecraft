@@ -163,7 +163,7 @@ export const characterPaths: Record<string, PlayPath> = {
       'At rank four the item gets its Perfected bonus. Promoting uses up the deed and gives the item a legendary name and quality, with the same stats. A rank swap trades the ranks of the two items and binds both to you.',
   },
   Questing: {
-    where: `Look for a gold exclamation mark over an NPC or on the map (M). For example, ${atNpc('marshal_redbrook')} in Eastbrook Vale gives you [[Wolves at the Door]].`,
+    where: `Look for a gold exclamation mark over an NPC or on the map (M). For example, ${atNpc('marshal_redbrook')} in Eastbrook Vale gives you [[Wolves at the Door (Quest, Eastbrook Vale)|Wolves at the Door]].`,
     need: 'Be at least the quest’s level and finish any quests that must come before it. Its wiki page shows who gives it, what to do, where to go, a map, and who to take it back to.',
     steps: [
       'Stand near the quest giver and click them. Pick the quest by name and click Accept. Press L to open your quest log and see how much you still need to do.',

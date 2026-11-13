@@ -24,7 +24,7 @@ export interface AbilityPageTools {
 }
 interface TalentPageTools extends AbilityPageTools {
   add: (title: string, text: string, categories: string[]) => void;
-  unique: (title: string, used: Set<string>) => string;
+  unique: (title: string, used: Set<string>, hint?: string) => string;
   usedTitles: Set<string>;
 }
 export function affectedAbilities(effect: TalentEffect): string[] {
@@ -60,10 +60,16 @@ export function addTalentPages({
     const classLink = link(titleBy.class.get(id)!, CLASSES[id].name);
     const rows = ROW_TREES[id];
     for (const spec of cls.specs)
-      specs.set(id + '/' + spec.id, unique(spec.name + ' (Specialization)', usedTitles));
+      specs.set(
+        id + '/' + spec.id,
+        unique(spec.name + ' (Specialization)', usedTitles, CLASSES[id].name),
+      );
     for (const row of rows)
       for (const option of row.options)
-        talents.set(id + '/' + option.id, unique(option.name + ' (Talent)', usedTitles));
+        talents.set(
+          id + '/' + option.id,
+          unique(option.name + ' (Talent)', usedTitles, CLASSES[id].name),
+        );
     const specLinks = cls.specs.map((s) => link(specs.get(id + '/' + s.id)!, s.name));
     const choiceLink = (choice: { id: string; name: string }) =>
       link(talents.get(id + '/' + choice.id)!, choice.name);

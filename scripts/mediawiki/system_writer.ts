@@ -7,7 +7,7 @@ import { systemRouteMap } from './system_routes';
 /** A system and its entries share one index. Existing game entities resolve through the seed's title maps. */
 export interface SystemWikiContext {
   add(title: string, text: string, categories: string[]): void;
-  unique(title: string): string;
+  unique(title: string, hint?: string): string;
   titleBy: Record<'item' | 'npc' | 'mob' | 'zone' | 'dungeon', Map<string, string>> &
     Partial<Record<'recipe' | 'deed' | 'companion' | 'quest', Map<string, string>>>;
 }
@@ -41,7 +41,7 @@ export function systemWriter(ctx: SystemWikiContext) {
   const group = (name: string) => {
     let found = groups.get(name);
     if (!found) {
-      found = { name, title: ctx.unique(name), body: '', entries: new Map() };
+      found = { name, title: ctx.unique(name, 'Guide'), body: '', entries: new Map() };
       groups.set(name, found);
     }
     return found;

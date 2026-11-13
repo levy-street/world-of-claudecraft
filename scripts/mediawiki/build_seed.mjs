@@ -29,6 +29,8 @@ import { linkArticleMentions } from '../../scripts/mediawiki/article_mentions';
 import { tooltipCatalog } from '../../scripts/mediawiki/tooltip_catalog';
 import { ABILITIES, CLASSES, DUNGEON_LIST, ITEMS, MOBS, NPCS, QUESTS, ZONES, zoneContaining, BUILTIN_WORLD } from '../../src/sim/data';
 import { addCatalogPortals } from '../../scripts/mediawiki/catalog_portals';
+import { entityTitles } from '../../scripts/mediawiki/entity_titles';
+import { qualify } from '../../scripts/mediawiki/title_names';
 import { addZoneAndClassHubs } from '../../scripts/mediawiki/hub_portals';
 import { addQuestDirectory } from '../../scripts/mediawiki/quest_directory';
 import { subjects } from '../../mediawiki/reader/browse';
@@ -97,8 +99,10 @@ function add(title, text, cats = []) {
   pages.push({ title, text: text.trim() + '\\n\\n' + coreSystemRules(title, section, table) + categories(cats) });
 }
 
-function unique(base, used) {
+// A later page that shares a name says what it is (hint) before falling back to a number.
+function unique(base, used, hint) {
   if (!used.has(base)) { used.add(base); return base; }
+  if (hint && !used.has(qualify(base, hint))) { used.add(qualify(base, hint)); return qualify(base, hint); }
   let i = 2;
   while (used.has(base + ' (' + i + ')')) i++;
   const title = base + ' (' + i + ')';
@@ -109,19 +113,12 @@ function unique(base, used) {
 const usedTitles = new Set();
 const visibleAbilities = Object.entries(ABILITIES).filter(([, ability]) => ability.hiddenFromPlayer !== true);
 
-for (const [id, cls] of Object.entries(CLASSES)) titleBy.class.set(id, unique(cls.name, usedTitles));
-for (const [id, ability] of visibleAbilities) titleBy.ability.set(id, unique(ability.name + ' (Ability)', usedTitles));
-for (const zone of ZONES) titleBy.zone.set(zone.id, unique(zone.name, usedTitles));
-for (const dungeon of DUNGEON_LIST) titleBy.dungeon.set(dungeon.id, unique(dungeon.name, usedTitles));
-for (const [id, npc] of Object.entries(NPCS)) titleBy.npc.set(id, unique(npc.name + ' (NPC)', usedTitles));
-for (const [id, quest] of Object.entries(QUESTS)) titleBy.quest.set(id, unique(quest.name, usedTitles));
-for (const [id, mob] of Object.entries(MOBS)) titleBy.mob.set(id, unique(mob.name + ' (Mob)', usedTitles));
-for (const [id, item] of Object.entries(ITEMS)) titleBy.item.set(id, unique(item.name, usedTitles));
+for (const [kind, titles] of Object.entries(entityTitles(usedTitles))) for (const [id, title] of titles) titleBy[kind].set(id, title);
 
 const writer = { questMap, titleBy, section, link, bullets, table, add, unique, usedTitles };
 const dungeonWriter = {section, bullets, table, mob: id => link(titleBy.mob.get(id),MOBS[id]?.name ?? id)};
 const zoneForQuest = id => questZoneName(QUESTS[id]);
-const reserve = title => unique(title, usedTitles);
+const reserve = (title, hint) => unique(title, usedTitles, hint);
 add('MediaWiki:Common.css', css, []);
 add('Main Page', section('World of ClaudeCraft', 'Look up a reward, plan your character, or read about a boss fight before you go in. Every page explains how things work in this version of the game.') +
   subjects.map(([name,entries])=>section(name,bullets(entries.map(([title,label,description])=>link(title,label)+' · '+description)))).join('')+

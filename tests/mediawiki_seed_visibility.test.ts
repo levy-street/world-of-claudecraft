@@ -48,27 +48,30 @@ afterAll(() => {
 
 describe('MediaWiki ability visibility', () => {
   it('publishes exactly the player-visible abilities', () => {
-    const actualTitles = [...xml.matchAll(/<title>([^<]+ \(Ability\)(?: \(\d+\))?)<\/title>/g)]
-      .map((match) => match[1])
+    // Abilities that share a name are told apart by a qualifier, "(Ability, arcane)",
+    // never by a bare number.
+    const published = [...xml.matchAll(/<title>([^<]+ \(Ability(?:, [^<)]+)?\))<\/title>/g)].map(
+      (match) => match[1],
+    );
+    expect(new Set(published).size).toBe(published.length);
+    const actualTitles = published
+      .map((t) => t.replace(/ \(Ability, [^)]+\)$/, ' (Ability)'))
       .sort();
-    const titleCounts = new Map<string, number>();
     const expectedTitles = Object.values(ABILITIES)
       .filter((ability) => ability.hiddenFromPlayer !== true)
-      .map((ability) => {
-        const base = `${ability.name} (Ability)`.replace(
+      .map((ability) =>
+        `${ability.name} (Ability)`.replace(
           /[&<>"']/g,
           (char) =>
             ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' })[char] ??
             char,
-        );
-        const count = (titleCounts.get(base) ?? 0) + 1;
-        titleCounts.set(base, count);
-        return count === 1 ? base : `${base} (${count})`;
-      })
+        ),
+      )
       .sort();
 
     expect(actualTitles).toEqual(expectedTitles);
-    expect(xml).not.toContain('<title>Sacred Goad (Ability) (2)</title>');
+    expect(xml).not.toMatch(/<title>[^<]+ \(Ability\) \(\d+\)<\/title>/);
+    expect(xml).not.toMatch(/<title>Sacred Goad \(Ability, /);
     expect(xml).not.toContain('[[undefined]]');
   });
 

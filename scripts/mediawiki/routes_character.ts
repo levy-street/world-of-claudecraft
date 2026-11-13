@@ -32,7 +32,10 @@ export const characterRoutes: Record<string, SystemRoute> = {
     points: [
       marshal('Start', 'Example quest for XP'),
       wolf(1, 'Defeat Forest Wolves'),
-      marshal(1, 'Complete [[Wolves at the Door]] for quest XP'),
+      marshal(
+        1,
+        'Complete [[Wolves at the Door (Quest, Eastbrook Vale)|Wolves at the Door]] for quest XP',
+      ),
     ],
     notes: [
       'This map shows one way to earn XP in Eastbrook. For step 2, rest at any inn, then kill enemies to use up your rested XP. At the top level, you can claim Prestige on your character sheet wherever you are.',
@@ -164,7 +167,7 @@ export const characterRoutes: Record<string, SystemRoute> = {
   },
   Questing: {
     points: [
-      marshal('Start', 'Accept [[Wolves at the Door]]'),
+      marshal('Start', 'Accept [[Wolves at the Door (Quest, Eastbrook Vale)|Wolves at the Door]]'),
       ...questExample,
       marshal('Reward', 'Speak to the marshal and complete the quest'),
     ],
