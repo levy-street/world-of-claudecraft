@@ -892,10 +892,13 @@ describe('buildWeaponVfxPrewarmGroup', () => {
       'vfx_twinkles',
       'vfx_aurora',
       'vfx_arcs',
-      // the Smith's Heart raid families
+      // the Smith's Heart raid families. 'vfx_flames' is not listed: no catalog weapon draws
+      // flames since Hearthbrand lost its edge fire (the owner's call, 2026-11-13), so no live
+      // arrival can ask for that program. The family stays in weapon_vfx_raid_parts.ts (pinned
+      // by tests/weapon_vfx_raid_parts.test.ts), and a spec that uses it again is covered here
+      // by construction: this group is built from every WEAPON_VFX entry.
       'vfx_orbiters',
       'vfx_runeRing',
-      'vfx_flames',
       'vfx_vortex',
     ]) {
       expect(names, `${name} missing from the prewarm rigs`).toContain(name);

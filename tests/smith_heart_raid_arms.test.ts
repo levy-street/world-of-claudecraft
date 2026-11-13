@@ -270,9 +270,11 @@ describe('the assets the raid hands out', () => {
   it('gives each encounter its signature effect', () => {
     const fx = (model: string) => WEAPON_VFX[model].fx;
     const kinds = (model: string) => fx(model).map((c) => c.kind);
-    // the quarry: stone shards orbit the head under a ring of gold runes
+    // the quarry: amber seam-crystals like the crown's (the long faceted shard) orbit the head
+    // under a ring of gold runes
     const shards = fx('seamcaller_maul').find((c) => c.kind === 'orbiters');
-    expect(shards?.kind === 'orbiters' && shards.shape).toBe('rock');
+    expect(shards?.kind === 'orbiters' && shards.shape).toBe('ice');
+    expect(shards?.kind === 'orbiters' && shards.seams).toBe(0);
     expect(kinds('seamcaller_maul')).toContain('runeRing');
     // the storm: wind ribbons that streak, lightning, and the storm eye
     const wind = fx('squallcrest').filter((c) => c.kind === 'aurora');
@@ -284,9 +286,11 @@ describe('the assets the raid hands out', () => {
     const ice = fx('rimelight_staff').find((c) => c.kind === 'orbiters');
     expect(ice?.kind === 'orbiters' && ice.shape).toBe('ice');
     expect(kinds('rimelight_staff').filter((k) => k === 'runeRing')).toHaveLength(2);
-    // the heat: flames licking off both edges, and smoke that darkens
-    const flames = fx('hearthbrand').filter((c) => c.kind === 'flames');
-    expect(flames.some((c) => c.kind === 'flames' && c.spread > 0)).toBe(true);
+    // the heat: no fire on the edges; embers rise off the blade and circle the guard, and
+    // smoke that darkens
+    expect(kinds('hearthbrand')).not.toContain('flames');
+    expect(kinds('hearthbrand')).toContain('motes');
+    expect(fx('hearthbrand').some((c) => c.kind === 'drift' && c.vel[1] > 0)).toBe(true);
     expect(fx('hearthbrand').some((c) => c.kind === 'drift' && c.blend === 'smoke')).toBe(true);
     // the four elements: four gem lights in turn, one slot each, plus each element's own effect
     const gems = fx('duskwick_staff').filter(

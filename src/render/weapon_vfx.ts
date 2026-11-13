@@ -525,13 +525,13 @@ export interface WeaponVfxSpec {
 }
 
 /** The Heartmeld Staff's four gems on the Anvil's halo, in the order they light (weapon-local
- *  offsets from the halo's centre): quarry amber upper left, the gale upper right, frost lower
- *  right, fire lower left (scripts/assets/smith_heart_arms/build_heartmeld_staff.py). */
+ *  offsets from the halo's centre, measured on the shipped model): quarry amber upper left, the
+ *  gale upper right, frost lower right, fire lower left. */
 const HEARTMELD_GEMS = [
-  { dx: -0.195, dy: 0.195, color: 0xffb43a },
-  { dx: 0.195, dy: 0.195, color: 0x5effb0 },
-  { dx: 0.195, dy: -0.195, color: 0x4fb4ff },
-  { dx: -0.195, dy: -0.195, color: 0xff6a1e },
+  { dx: -0.22, dy: 0.205, color: 0xffb43a },
+  { dx: 0.22, dy: 0.205, color: 0x5effb0 },
+  { dx: 0.22, dy: -0.205, color: 0x4fb4ff },
+  { dx: -0.22, dy: -0.205, color: 0xff6a1e },
 ] as const;
 
 export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
@@ -1719,20 +1719,21 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
     ],
   },
 
-  // The Smith's Heart raid arms (scripts/assets/smith_heart_arms/), one per encounter, earned
-  // in the raid (content/weapon_skins.ts earnedFrom 'smiths_heart'). Each element draws on the
-  // raid's own VFX families (weapon_vfx_raid_parts.ts) on top of the catalog's: orbiting quarry
-  // shards and ice, rune rings, licking flames and a storm eye. Each emissive window is narrowed
-  // to the element its build paints, so the metal and stone stay metal and stone.
+  // The Smith's Heart raid arms (hand-painted Tripo models, see CREDITS.md), one per encounter,
+  // earned in the raid (content/weapon_skins.ts earnedFrom 'smiths_heart'). Each element draws
+  // on the raid's own VFX families (weapon_vfx_raid_parts.ts) on top of the catalog's: orbiting
+  // crystals and ice, rune rings and a storm eye. Each emissive window is narrowed to the
+  // element its texture paints, so the metal and stone stay metal and stone.
   //
-  // Seamcaller (the Hammer Council): a quarry-stone maul. Shards of the quarry orbit its head
-  // with gold seams burning in them, a ring of gold runes turns round the head, the cut runes
-  // breathe, gold motes circle against the shards, dust sifts down and sparks rise off the crown.
+  // Seamcaller (the Hammer Council): a quarry-stone maul. Amber seam-crystals like the ones on
+  // its crown orbit the head, a ring of gold runes turns round it, the blow gathers on both
+  // striking faces, gold motes circle against the crystals, dust sifts down and sparks rise off
+  // the crown.
   seamcaller_maul: {
     tier: 'epic',
     name: 'Seamcaller',
     type: 'mace',
-    lore: 'A great maul hewn from one block of dark quarry stone split by burning gold seams, a framed gold rune on both cheeks, gold-rimmed striking faces round burning amber, riveted gold bands, gold crest wings and amber seam-crystal growing from the crown.',
+    lore: "A great maul of dark quarry stone split by burning gold seams and strapped in riveted, knot-cut bronze, a framed mason's mark on both cheeks, bronze-ringed striking faces round burning amber, bronze horns and amber seam-crystal growing from the crown.",
     emissive: {
       hue: [30, 55],
       minS: 0.8,
@@ -1746,7 +1747,7 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
     shell: { color: 0xffb040, strength: 0.22, power: 2.8 },
     light: {
       color: 0xffb050,
-      at: { yF: 0.7 },
+      at: { yF: 0.72 },
       intensity: 7,
       distance: 6.5,
       flicker: 0.15,
@@ -1756,48 +1757,76 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
       // the seam-crystal on the crown, breathing
       {
         kind: 'coreSprite',
-        at: { yF: 0.8 },
+        at: { yF: 0.9 },
         size: 0.5,
         color: 0xffc24a,
         flare: 0.8,
         hz: 0.5,
         opacity: 0.6,
       },
-      // quarry shards orbiting the head, gold seams burning in them
+      // amber seam-crystals orbiting the head: the crown's own crystals, set loose (the long
+      // faceted shard, in the crown's amber). The head is 1.5 long and under 0.7 deep, so the
+      // path is an oval: it clears the striking faces along X and hugs the flanks along Z.
       {
         kind: 'orbiters',
-        at: { yF: 0.645 },
+        at: { yF: 0.7 },
         count: 7,
-        radius: [0.66, 0.8],
-        size: [0.13, 0.22],
-        speed: [0.5, 0.72],
-        spin: [0.5, 1.3],
+        radius: [0.92, 1.0],
+        depth: 0.57,
+        size: [0.2, 0.32],
+        speed: [0.4, 0.58],
+        spin: [0.2, 0.55],
         tilt: 0.22,
-        bob: 0.05,
-        shape: 'rock',
-        color: 0xa07a4c,
-        dark: 0x2e1f12,
-        glow: 0xffb428,
-        seams: 0.9,
-        opacity: 1,
+        bob: 0.06,
+        shape: 'ice',
+        color: 0xffb236,
+        dark: 0xb5560e,
+        glow: 0xffd27a,
+        seams: 0,
+        opacity: 0.6,
       },
       // a ring of gold runes turning round the head
       {
         kind: 'runeRing',
-        at: { yF: 0.645 },
+        at: { yF: 0.7 },
         axis: [1, 0, 0],
-        radius: 0.46,
+        radius: 0.54,
         width: 0.14,
         speed: 0.08,
         color: 0xff9a10,
         core: 0xffe9a0,
         opacity: 1.2,
       },
+      // the gathered blow turning on both striking faces
+      {
+        kind: 'vortex',
+        at: { yF: 0.7, dx: 0.79 },
+        axis: [1, 0, 0],
+        radius: 0.27,
+        arms: 3,
+        speed: 0.45,
+        twist: 1.1,
+        outer: 0xff8a10,
+        inner: 0xfff2c0,
+        opacity: 0.6,
+      },
+      {
+        kind: 'vortex',
+        at: { yF: 0.7, dx: -0.79 },
+        axis: [1, 0, 0],
+        radius: 0.27,
+        arms: 3,
+        speed: -0.45,
+        twist: 1.1,
+        outer: 0xff8a10,
+        inner: 0xfff2c0,
+        opacity: 0.6,
+      },
       // gold motes circling against the shards
       {
         kind: 'motes',
-        at: { yF: 0.645 },
-        radius: [0.38, 0.58],
+        at: { yF: 0.7 },
+        radius: [0.5, 0.74],
         count: 18,
         size: [0.02, 0.045],
         speed: [-0.9, -1.4],
@@ -1811,8 +1840,8 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
       {
         kind: 'drift',
         line: [
-          { yF: 0.6, dx: -0.3 },
-          { yF: 0.7, dx: 0.3 },
+          { yF: 0.62, dx: -0.4 },
+          { yF: 0.72, dx: 0.4 },
         ],
         count: 24,
         vel: [0, -0.28, 0],
@@ -1828,7 +1857,7 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
       // gold sparks rising off the crown
       {
         kind: 'drift',
-        line: [{ yF: 0.76 }, { yF: 0.86 }],
+        line: [{ yF: 0.86 }, { yF: 0.96 }],
         count: 18,
         vel: [0, 0.38, 0],
         spread: [0.08, 0.04, 0.08],
@@ -1842,7 +1871,7 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
       },
       {
         kind: 'twinkles',
-        surface: { yMinF: 0.55, count: 50 },
+        surface: { yMinF: 0.57, count: 50 },
         size: [0.035, 0.07],
         rate: [0.5, 1.3],
         color: 0xffdc90,
@@ -1852,13 +1881,15 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
   },
 
   // Squallcrest (the Guardian of the Breath): a storm blade. Wind wraps it in two streaking
-  // ribbons winding opposite ways, lightning crackles up the blade and leaps out to the gale
-  // vanes, the storm eye in the halo turns, and gusts tear up off the edge.
+  // ribbons winding opposite ways, slow lightning walks up the blade and out to the gale vanes,
+  // the storm eye turns on both faces of the gem, and gusts lift off the edge. Kept calm on
+  // purpose (the owner's call, 2026-11-13): few strikes a second and a steady light, so it
+  // never strobes.
   squallcrest: {
     tier: 'epic',
     name: 'Squallcrest',
     type: 'sword',
-    lore: 'A long storm-steel blade with lightning-bright edges, a forked bolt up a silver channel, wind fins hooked off its spine and an open silver halo round a storm-eye gem.',
+    lore: 'A long storm-steel blade with lightning-bright edges, a forked bolt up each face, wind fins hooked off one edge and a guard of swept silver wings round a storm-eye gem.',
     emissive: {
       hue: [180, 215],
       minS: 0.6,
@@ -1866,29 +1897,41 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
       whiteL: 0.97,
       tint: 0x6fdcff,
       intensity: 2.0,
-      pulse: 0.5,
-      pulseHz: 0.9,
+      pulse: 0.25,
+      pulseHz: 0.4,
     },
     shell: { color: 0x8fe6ff, strength: 0.55, power: 2.2 },
-    light: { color: 0x8fd8ff, at: { yF: 0.6 }, intensity: 8, distance: 7, flicker: 0.45, hz: 3.6 },
+    light: { color: 0x8fd8ff, at: { yF: 0.66 }, intensity: 8, distance: 7, flicker: 0.12, hz: 0.8 },
     fx: [
       {
         kind: 'coreSprite',
-        at: { yF: 0.244 },
-        size: 0.3,
+        at: { yF: 0.35 },
+        size: 0.26,
         color: 0xaee9ff,
-        flare: 0.9,
-        hz: 1.1,
+        flare: 0.5,
+        hz: 0.5,
         opacity: 0.6,
       },
-      // the storm eye turning in the halo
+      // the storm eye turning on both faces of the gem
       {
         kind: 'vortex',
-        at: { yF: 0.244 },
+        at: { yF: 0.35, dz: 0.112 },
         axis: [0, 0, 1],
-        radius: 0.17,
+        radius: 0.12,
         arms: 3,
-        speed: 0.6,
+        speed: 0.35,
+        twist: 1.2,
+        outer: 0x2f8fe0,
+        inner: 0xe8fbff,
+        opacity: 0.9,
+      },
+      {
+        kind: 'vortex',
+        at: { yF: 0.35, dz: -0.112 },
+        axis: [0, 0, 1],
+        radius: 0.12,
+        arms: 3,
+        speed: -0.35,
         twist: 1.2,
         outer: 0x2f8fe0,
         inner: 0xe8fbff,
@@ -1897,20 +1940,20 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
       // the wind: two streaking ribbons wound opposite ways round the blade
       {
         kind: 'aurora',
-        helix: { from: { yF: 0.3 }, to: { yF: 1.0 }, radius: 0.2, turns: 2.2 },
+        helix: { from: { yF: 0.44 }, to: { yF: 1.0 }, radius: 0.2, turns: 2.2 },
         width: 0.13,
         amp: 0.03,
-        speed: 1.4,
+        speed: 0.8,
         opacity: 1.2,
         colors: [0x9fd8ff, 0xffffff, 0x7fe0ff],
         streak: 7,
       },
       {
         kind: 'aurora',
-        helix: { from: { yF: 0.28 }, to: { yF: 0.95 }, radius: 0.27, turns: -1.7, phase: 2.2 },
+        helix: { from: { yF: 0.42 }, to: { yF: 0.96 }, radius: 0.27, turns: -1.7, phase: 2.2 },
         width: 0.1,
         amp: 0.035,
-        speed: 1.1,
+        speed: 0.65,
         opacity: 0.9,
         colors: [0xc8ecff, 0x6fd0ff, 0xe8fbff],
         streak: 5,
@@ -1918,14 +1961,14 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
       // lightning crackling up the blade
       {
         kind: 'arcs',
-        line: [{ yF: 0.3 }, { yF: 0.97 }],
-        count: 6,
-        radius: 0.12,
+        line: [{ yF: 0.45 }, { yF: 0.97 }],
+        count: 4,
+        radius: 0.11,
         length: 0.3,
         jitter: 0.06,
         width: 0.035,
-        rate: 11,
-        duty: 0.45,
+        rate: 2.2,
+        duty: 0.55,
         color: 0x4fb8ff,
         core: 0xf0fdff,
         opacity: 1,
@@ -1933,14 +1976,14 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
       // and leaping out from the halo to the gale vanes
       {
         kind: 'arcs',
-        line: [{ yF: 0.2 }, { yF: 0.3 }],
-        count: 3,
-        radius: 0.32,
+        line: [{ yF: 0.33 }, { yF: 0.4 }],
+        count: 2,
+        radius: 0.34,
         length: 0.9,
         jitter: 0.05,
         width: 0.03,
-        rate: 7,
-        duty: 0.35,
+        rate: 1.6,
+        duty: 0.45,
         color: 0x5fc0ff,
         core: 0xeafaff,
         opacity: 0.9,
@@ -1948,9 +1991,9 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
       // gusts tearing up off the edges
       {
         kind: 'drift',
-        line: [{ yF: 0.3 }, { yF: 0.95 }],
-        count: 32,
-        vel: [0, 0.9, 0],
+        line: [{ yF: 0.45 }, { yF: 0.96 }],
+        count: 28,
+        vel: [0, 0.55, 0],
         spread: [0.13, 0.04, 0.08],
         life: [0.5, 0.95],
         size: [0.015, 0.032],
@@ -1962,9 +2005,9 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
       },
       {
         kind: 'twinkles',
-        surface: { yMinF: 0.3, count: 60 },
+        surface: { yMinF: 0.42, count: 40 },
         size: [0.03, 0.065],
-        rate: [0.7, 1.8],
+        rate: [0.3, 0.8],
         color: 0xeafcff,
         star: true,
       },
@@ -1978,35 +2021,35 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
     tier: 'epic',
     name: 'Rimelight Staff',
     type: 'staff',
-    lore: 'A blue-steel shaft wound with silver filigree and bound in gem-set silver collars, crowned by four silver crescent blades cradling a great crystal of cold light amid a ring of lesser crystals, a splinter of ice hovering above.',
+    lore: 'A blue-steel shaft wound with silver filigree and bound in gem-set silver collars, crowned by four silver crescent blades cradling a great crystal of cold light amid a ring of lesser crystals.',
     emissive: {
       hue: [175, 215],
       minS: 0.5,
       minL: 0.55,
       whiteL: 0.97,
       tint: 0x7fe4ff,
-      intensity: 1.8,
+      intensity: 0.65,
       pulse: 0.35,
       pulseHz: 0.45,
     },
-    shell: { color: ICE.glow, strength: 0.45, power: 2.6 },
-    light: { color: ICE.glow, at: { yF: 0.88 }, intensity: 8, distance: 7, flicker: 0.12, hz: 0.5 },
+    shell: { color: ICE.glow, strength: 0.22, power: 2.6 },
+    light: { color: ICE.glow, at: { yF: 0.88 }, intensity: 2, distance: 7, flicker: 0.12, hz: 0.5 },
     fx: [
       {
         kind: 'coreSprite',
-        at: { yF: 0.878 },
-        size: 0.55,
+        at: { yF: 0.88 },
+        size: 0.42,
         color: ICE.core,
         flare: 0.7,
         hz: 0.5,
-        opacity: 0.65,
+        opacity: 0.24,
       },
       // shards of ice orbiting the crown
       {
         kind: 'orbiters',
-        at: { yF: 0.878 },
+        at: { yF: 0.88 },
         count: 6,
-        radius: [0.48, 0.58],
+        radius: [0.5, 0.6],
         size: [0.17, 0.26],
         speed: [0.42, 0.62],
         spin: [0.25, 0.7],
@@ -2022,9 +2065,9 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
       // two rings of frost runes turning round it at odd angles
       {
         kind: 'runeRing',
-        at: { yF: 0.878 },
+        at: { yF: 0.88 },
         axis: [0.12, 1, 0.2],
-        radius: 0.33,
+        radius: 0.44,
         width: 0.08,
         speed: 0.09,
         color: 0x5fd0ff,
@@ -2033,19 +2076,30 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
       },
       {
         kind: 'runeRing',
-        at: { yF: 0.81 },
+        at: { yF: 0.79 },
         axis: [-0.3, 1, -0.1],
-        radius: 0.22,
+        radius: 0.38,
         width: 0.06,
         speed: -0.14,
         color: 0x7fdcff,
         core: 0xffffff,
         opacity: 0.75,
       },
+      // cold light running down the shaft's silver spiral
+      {
+        kind: 'aurora',
+        helix: { from: { yF: 0.68 }, to: { yF: 0.12 }, radius: 0.1, turns: 3.5 },
+        width: 0.05,
+        amp: 0.01,
+        speed: 0.8,
+        opacity: 0.75,
+        colors: [0xbfeaff, 0xffffff, 0x7fd4ff],
+        streak: 3,
+      },
       // frost mist rolling off the crown and pouring down the shaft
       {
         kind: 'drift',
-        line: [{ yF: 0.74 }, { yF: 0.98 }],
+        line: [{ yF: 0.72 }, { yF: 0.98 }],
         count: 40,
         vel: [0, -0.2, 0],
         spread: [0.2, 0.06, 0.2],
@@ -2077,7 +2131,7 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
       },
       {
         kind: 'twinkles',
-        surface: { yMinF: 0.72, count: 60 },
+        surface: { yMinF: 0.7, count: 60 },
         size: [0.035, 0.07],
         rate: [0.5, 1.3],
         color: 0xdff6ff,
@@ -2086,9 +2140,10 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
     ],
   },
 
-  // Hearthbrand (the Guardian of the Heat): a molten blade. Flames lick up off both edges,
-  // embers boil off it, dark smoke curls from the point, sparks snap off the veins and the
-  // magma heart in the guard throbs.
+  // Hearthbrand (the Guardian of the Heat): a molten blade. No fire on the edges (the owner's
+  // call, 2026-11-13): the melt in the blade breathes slowly, embers rise off it and circle the
+  // horned guard, dark smoke curls from the point, sparks drift off the veins and the magma
+  // heart in the guard throbs. All of it slow.
   hearthbrand: {
     tier: 'epic',
     name: 'Hearthbrand',
@@ -2100,63 +2155,47 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
       minL: 0.45,
       whiteL: 0.97,
       tint: 0xff6a1e,
-      intensity: 2.2,
-      pulse: 0.35,
-      pulseHz: 1.2,
+      intensity: 1.7,
+      pulse: 0.4,
+      pulseHz: 0.35,
     },
     shell: { color: EMBER.glow, strength: 0.35, power: 2.6 },
-    light: { color: 0xff7a2a, at: { yF: 0.55 }, intensity: 8, distance: 7, flicker: 0.5, hz: 2.8 },
+    light: { color: 0xff7a2a, at: { yF: 0.7 }, intensity: 5, distance: 7, flicker: 0.18, hz: 0.7 },
     fx: [
       {
         kind: 'coreSprite',
-        at: { yF: 0.26 },
+        at: { yF: 0.35 },
         size: 0.3,
         color: EMBER.hot,
         flare: 0.6,
-        hz: 1.6,
+        hz: 0.6,
         opacity: 0.65,
       },
-      // flames licking up off both edges
+      // embers circling the horned guard
       {
-        kind: 'flames',
-        line: [{ yF: 0.32 }, { yF: 0.86 }],
-        count: 26,
-        spread: 0.122,
-        lean: 0.5,
-        height: [0.3, 0.55],
-        width: [0.14, 0.22],
-        rate: [0.9, 1.6],
-        hot: 0xfff0b0,
-        mid: 0xff8a1e,
-        tip: 0xb8260a,
+        kind: 'motes',
+        at: { yF: 0.36 },
+        radius: [0.3, 0.44],
+        count: 14,
+        size: [0.022, 0.05],
+        speed: [0.35, 0.6],
+        tilt: 0.35,
+        bob: 0.05,
+        colorA: 0xffd27a,
+        colorB: 0xff5a14,
         opacity: 0.95,
-      },
-      // the point burns too: a single row up the last of the blade
-      {
-        kind: 'flames',
-        line: [{ yF: 0.86 }, { yF: 0.99 }],
-        count: 4,
-        spread: 0,
-        lean: 0,
-        height: [0.26, 0.42],
-        width: [0.12, 0.18],
-        rate: [1.1, 1.7],
-        hot: 0xfff0b0,
-        mid: 0xff8a1e,
-        tip: 0xb8260a,
-        opacity: 0.85,
       },
       // embers boiling up off the whole blade
       {
         kind: 'drift',
-        line: [{ yF: 0.3 }, { yF: 1.0 }],
+        line: [{ yF: 0.5 }, { yF: 1.0 }],
         count: 50,
-        vel: [0, 0.5, 0],
-        spread: [0.14, 0.05, 0.08],
-        life: [0.9, 2.0],
+        vel: [0, 0.24, 0],
+        spread: [0.18, 0.05, 0.08],
+        life: [1.8, 3.6],
         size: [0.018, 0.042],
         grow: 0.1,
-        swirl: 0.16,
+        swirl: 0.09,
         colorA: EMBER.hot,
         colorB: EMBER.coal,
         opacity: 0.95,
@@ -2164,11 +2203,11 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
       // dark smoke curling off the point, drawn over the scene so it darkens it
       {
         kind: 'drift',
-        line: [{ yF: 0.75 }, { yF: 1.0 }],
+        line: [{ yF: 0.8 }, { yF: 1.0 }],
         count: 14,
-        vel: [0, 0.3, 0],
+        vel: [0, 0.16, 0],
         spread: [0.06, 0.05, 0.06],
-        life: [1.6, 2.6],
+        life: [2.6, 4.2],
         size: [0.12, 0.22],
         grow: 1.6,
         swirl: 0.14,
@@ -2177,12 +2216,12 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
         opacity: 0.32,
         blend: 'smoke',
       },
-      // sparks snapping off the veins and edges
+      // sparks drifting off the veins and edges
       {
         kind: 'twinkles',
-        surface: { yMinF: 0.3, count: 50 },
+        surface: { yMinF: 0.5, count: 40 },
         size: [0.03, 0.06],
-        rate: [0.9, 2.2],
+        rate: [0.3, 0.8],
         color: 0xffc070,
         star: true,
       },
@@ -2207,23 +2246,30 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
       tint: 0xffe0a0,
       // the four gems keep their own colours (fire, frost, gale, amber), only warmed a touch
       tintMix: 0.12,
-      intensity: 1.7,
+      intensity: 1.0,
       pulse: 0.3,
       pulseHz: 0.5,
     },
     shell: { color: 0xfff0d8, strength: 0.22, power: 2.6 },
-    light: { color: 0xffe0a0, at: { yF: 0.77 }, intensity: 8, distance: 7, flicker: 0.2, hz: 0.6 },
+    light: {
+      color: 0xffe0a0,
+      at: { yF: 0.77 },
+      intensity: 1.6,
+      distance: 7,
+      flicker: 0.2,
+      hz: 0.6,
+    },
     fx: [
       // the four gems, lighting in turn
       ...HEARTMELD_GEMS.map(
         (g, slot): WeaponVfxCoreSprite => ({
           kind: 'coreSprite',
           at: { yF: 0.768, dx: g.dx, dy: g.dy },
-          size: 0.5,
+          size: 0.3,
           color: g.color,
           flare: 0,
           hz: 0.9,
-          opacity: 1,
+          opacity: 0.85,
           seq: { slot, of: 4, hz: 0.3 },
         }),
       ),
@@ -2232,20 +2278,20 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
         kind: 'vortex',
         at: { yF: 0.768 },
         axis: [0, 0, 1],
-        radius: 0.22,
+        radius: 0.21,
         arms: 4,
         speed: 0.25,
         twist: 0.8,
         outer: 0xffb050,
-        inner: 0xffffff,
-        opacity: 0.4,
+        inner: 0xffe6b0,
+        opacity: 0.2,
       },
       // the ring of gold runes round the whole head
       {
         kind: 'runeRing',
         at: { yF: 0.768 },
         axis: [0, 0, 1],
-        radius: 0.43,
+        radius: 0.5,
         width: 0.09,
         speed: 0.06,
         color: 0xffc860,
@@ -2256,8 +2302,8 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
       {
         kind: 'aurora',
         helix: {
-          from: { yF: 0.768, dx: 0.2, dy: 0.08 },
-          to: { yF: 0.768, dx: 0.2, dy: 0.36 },
+          from: { yF: 0.768, dx: 0.22, dy: 0.08 },
+          to: { yF: 0.768, dx: 0.22, dy: 0.38 },
           radius: 0.09,
           turns: 1.6,
         },
@@ -2272,8 +2318,8 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
       {
         kind: 'drift',
         line: [
-          { yF: 0.768, dx: 0.2, dy: -0.2 },
-          { yF: 0.768, dx: 0.28, dy: -0.26 },
+          { yF: 0.768, dx: 0.22, dy: -0.2 },
+          { yF: 0.768, dx: 0.3, dy: -0.27 },
         ],
         count: 16,
         vel: [0, -0.3, 0],
@@ -2290,8 +2336,8 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
       {
         kind: 'drift',
         line: [
-          { yF: 0.768, dx: -0.22, dy: -0.22 },
-          { yF: 0.768, dx: -0.28, dy: -0.16 },
+          { yF: 0.768, dx: -0.225, dy: -0.2 },
+          { yF: 0.768, dx: -0.3, dy: -0.15 },
         ],
         count: 14,
         vel: [0, 0.4, 0],
@@ -2308,7 +2354,7 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
       {
         kind: 'motes',
         at: { yF: 0.768 },
-        radius: [0.32, 0.4],
+        radius: [0.36, 0.46],
         count: 12,
         heroCount: 4,
         size: [0.02, 0.04],
@@ -2322,7 +2368,7 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
       },
       {
         kind: 'twinkles',
-        surface: { yMinF: 0.62, count: 50 },
+        surface: { yMinF: 0.58, count: 50 },
         size: [0.03, 0.065],
         rate: [0.5, 1.2],
         color: 0xfff0d0,
@@ -4157,6 +4203,11 @@ export const WEAPON_VFX_DOUBLE_SIDED_SKINS: ReadonlySet<string> = new Set([
   'frostbite',
   'shard_of_everwinter',
   'forgeheart_stave',
+  'seamcaller_maul',
+  'squallcrest',
+  'rimelight_staff',
+  'hearthbrand',
+  'duskwick_staff',
 ]);
 
 /** Untextured, single-sided extra materials, by GLB material name. */
