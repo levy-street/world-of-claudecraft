@@ -1,8 +1,7 @@
-import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { MeshoptDecoder } from 'meshoptimizer';
 import type * as THREE from 'three';
-import { type GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { SRGBColorSpace } from 'three';
+import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { activateGfxProfile, GFX, type GfxTier, getActiveGfxProfile } from '../src/render/gfx';
 import {
@@ -12,6 +11,7 @@ import {
 } from '../src/render/wickharbor_wharf';
 import { WICKHARBOR_WHARF_ORIGIN } from '../src/sim/content/wickharbor_wharf';
 import { WATER_LEVEL } from '../src/sim/world';
+import { expectPaintedMeshes, parsePaintedGlb } from './helpers/painted_glb';
 
 // The Wickharbor ferry wharf painter (src/render/wickharbor_wharf.ts) over the shipped GLB:
 // the model placed on the waterline at the wharf origin, what each graphics tier really draws
@@ -54,14 +54,8 @@ function glowing(root: THREE.Object3D): number {
 }
 
 beforeAll(async () => {
-  await MeshoptDecoder.ready;
-  const bytes = readFileSync(GLB);
-  const ab = bytes.buffer.slice(
-    bytes.byteOffset,
-    bytes.byteOffset + bytes.byteLength,
-  ) as ArrayBuffer;
-  const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
-  gltf = await new Promise<GLTF>((resolve, reject) => loader.parse(ab, '', resolve, reject));
+  // the wharf's painted maps are KTX2: Node gets stand-ins (helpers/painted_glb.ts)
+  gltf = await parsePaintedGlb(GLB);
 });
 
 afterEach(() => {
@@ -119,6 +113,20 @@ describe('wickharbor wharf painter', () => {
         const label = `${tier} ${standardMaterials ? 'standard' : 'lambert'}`;
         expect(drawn.size, label).toBeGreaterThan(0);
         for (const m of drawn) expect(warmed.has(m), label).toBe(true);
+      }
+    }
+  });
+
+  it('draws painted on every tier and material family: planking, fittings and stone under the tint', () => {
+    for (const tier of ['low', 'high'] as const) {
+      for (const standardMaterials of [true, false]) {
+        activateGfxProfile({
+          ...originalProfile,
+          settings: { ...GFX, effectsTier: tier, standardMaterials },
+        });
+        internals.setLoadedGltfForTest(gltf);
+        const maps = expectPaintedMeshes(buildWickharborWharf(), SRGBColorSpace);
+        expect(maps.size, `${tier} ${standardMaterials}`).toBe(3);
       }
     }
   });

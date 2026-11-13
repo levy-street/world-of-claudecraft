@@ -11,6 +11,7 @@ import {
 import { targetHeightFor } from '../src/render/asset_scale';
 import { isEastbrookRebuildBuilding } from '../src/render/eastbrook_town';
 import { isFenbridgeRebuildBuilding } from '../src/render/fenbridge_town';
+import { greatTreeScale } from '../src/render/great_tree_look_core';
 import { isHighwatchRebuildBuilding } from '../src/render/highwatch_town';
 import { isPaintedTownRebuildBuilding } from '../src/render/painted_towns';
 import { pathCrossesFence } from '../src/sim/colliders';
@@ -102,13 +103,16 @@ describe('editable overworld scenery', () => {
     });
 
     // A Wraithwood elder, scaled as render/haunt_features.ts scales it:
-    // r * (2.4 + roll * 0.5) on the raw model, which PlacedAssetsView reaches
-    // through its targetHeightFor normalization.
+    // great_tree_look_core's share of r on the raw model, which PlacedAssetsView
+    // reaches through its targetHeightFor normalization.
     expect(tree.assetId).toBe('foliage/twisted_1');
     const raw =
       (targetHeightFor('/models/foliage/twisted_1.glb') / GREAT_TREE_MODEL.maxDim) * tree.scale;
-    expect(raw).toBeGreaterThanOrEqual(WRAITHWOOD_GIANT.r * 2.4 - 1e-9);
-    expect(raw).toBeLessThanOrEqual(WRAITHWOOD_GIANT.r * 2.9 + 1e-9);
+    expect(raw).toBeGreaterThanOrEqual(greatTreeScale(WRAITHWOOD_GIANT.r, 0) - 1e-9);
+    expect(raw).toBeLessThanOrEqual(greatTreeScale(WRAITHWOOD_GIANT.r, 1) + 1e-9);
+    // its root flare (1.5 model yards) stands on the trunk collider (1.45 times r)
+    expect(raw * 1.5).toBeGreaterThan(WRAITHWOOD_GIANT.r * 1.3);
+    expect(raw * 1.5).toBeLessThan(WRAITHWOOD_GIANT.r * 1.6);
     // the model keeps its authored proportions
     expect(tree.scaleX).toBe(1);
     expect(tree.scaleY).toBe(1);

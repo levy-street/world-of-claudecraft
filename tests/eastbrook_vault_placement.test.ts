@@ -67,8 +67,11 @@ afterEach(() => setActiveWorldContent(null));
 describe('the Weekly Vault model', () => {
   it("is the town-drawn hall's own shape, textured", async () => {
     const vault = await read('vault.glb');
-    // the same boxes eastbrook_weekly_vault.ts builds, triangle for triangle
-    expect(vault.triangles).toBe(WEEKLY_VAULT_TRIANGLES);
+    // The model is the ashlar hall the town once built box for box. The town now stands a
+    // hand-built strong-house on the spot, great round door and all, and draws nothing of
+    // its own there, so its triangle ledger is empty and this model keeps its own count.
+    expect(vault.triangles).toBe(4572);
+    expect(WEEKLY_VAULT_TRIANGLES).toBeLessThan(vault.triangles);
     // 14 x 12 yards on the ground, the door proud of the +Z face
     expect(vault.bounds.min[0]).toBeCloseTo(-VAULT.w / 2, 2);
     expect(vault.bounds.max[0]).toBeCloseTo(VAULT.w / 2, 2);
@@ -189,7 +192,13 @@ describe('the town-drawn hall', () => {
   };
 
   it('is built for the shipped world and for a document that only promoted the buildings', () => {
-    expect(meshCount(buildEastbrookWeeklyVault(() => 0).group)).toBe(8);
+    // In the shipped world the town draws nothing for the vault: the hall there is the
+    // hand-built strong-house the live touch-up document stands on the same spot, and its
+    // great round door is part of that model (promoted_scenery_gate.ts
+    // activeWorldStandsLiveTouchup).
+    expect(meshCount(buildEastbrookWeeklyVault(() => 0).group)).toBe(0);
+    // A document carries no touch-up, so one that did not take the vault over still gets
+    // the town's own ashlar hall, whole.
     setActiveWorldContent({ ...BUILTIN_WORLD, promotedScenery: { authoredTowns: true } });
     const built = buildEastbrookWeeklyVault(() => 0);
     expect(built.group.name).toBe('eastbrookBuilding:eastbrook_weekly_vault');

@@ -92,6 +92,10 @@ export const BIOME_LIGHT: Record<
     sunScale?: number;
     hemiScale?: number;
     envScale?: number;
+    /** Turn of this biome's sun arc about the vertical, degrees (zone_sun_core.ts). */
+    sunTurn?: number;
+    /** Noon elevation of this biome's sun, degrees; unset is the shared arc. */
+    sunElev?: number;
   }
 > = {
   vale: { hemiSky: 0xd8f2ff, hemiGround: 0x689656, sun: 0xfff5dc },

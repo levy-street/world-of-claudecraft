@@ -18,11 +18,10 @@ import {
   findCoplanarOverlaps,
   visibleOverlaps,
 } from '../scripts/assets/highwatch_guild/coplanar.mjs';
+import { TOWN_BUILDING_NATURAL } from '../src/editor/feature_prop_placements';
 import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
 import { isPlacedBuildingInterior } from '../src/render/eastbrook_placed_building';
-import { HIGHWATCH_GUILD_SIGN } from '../src/render/highwatch_guild_sign';
 import { placedTextureTierPath } from '../src/render/placed_texture_tier_core';
-import { HIGHWATCH_BUILDINGS_BY_ID } from '../src/sim/highwatch_layout';
 
 // The shipped Highwatch adventurers' guild, Lantern Hall (public/models/tidehold/highwatch/
 // guild.glb and its .half and .quarter texture tiers), built in Blender by
@@ -553,11 +552,13 @@ describe('the Highwatch guild GLB', () => {
   it('stands on a yard of footing, as wide and deep as its record reaches', () => {
     const bounds = getBounds(doc.getRoot().listScenes()[0]);
     expect(bounds.min[1]).toBeCloseTo(-1, 2);
-    const guild = HIGHWATCH_BUILDINGS_BY_ID.highwatch_guild;
-    const reach = guild.reach;
-    expect(bounds.max[0] - bounds.min[0]).toBeCloseTo(reach.halfWidth * 2, 2);
-    expect(bounds.max[2] - bounds.min[2]).toBeCloseTo(reach.halfDepth * 2, 2);
-    expect(bounds.max[1] - bounds.min[1]).toBeCloseTo(guild.nativeDimensions.height + 1.05, 2);
+    // Highwatch stands the hand-built Lantern Hall now (the harbour_alpine set), so the
+    // town's record no longer describes this file. It ships on as a Studio asset, at its
+    // own size: the row src/editor/feature_prop_placements.ts keeps for it.
+    const natural = TOWN_BUILDING_NATURAL['tidehold/highwatch/guild'];
+    expect(bounds.max[0] - bounds.min[0]).toBeCloseTo(natural.x, 2);
+    expect(bounds.max[2] - bounds.min[2]).toBeCloseTo(natural.z, 2);
+    expect(bounds.max[1] - bounds.min[1]).toBeCloseTo(natural.y, 2);
     // the yard in front (-z), the trophy hall behind
     expect(bounds.min[2]).toBeLessThan(-24);
     expect(bounds.max[2]).toBeGreaterThan(20);
@@ -576,9 +577,10 @@ describe('the Highwatch guild GLB', () => {
     // the belfry lantern stands over the great roof's ridge
     expect(extras.tower[1]).toBeGreaterThan(extras.hall.ridge);
     expect([...extras.trophies].sort()).toEqual([...GUILD_TROPHY_DUNGEONS].sort());
-    // the gateway's name board: the painted lettering stands where the model's board hangs,
-    // well over a player's head, a real gap proud of the board's faces
-    expect(extras.sign).toEqual({ ...HIGHWATCH_GUILD_SIGN });
+    // the gateway's name board of THIS model (the Studio asset): where its board hangs, well
+    // over a player's head, a real gap proud of the board's faces. Highwatch's own hall is
+    // the harbour_alpine guild now, and its board is pinned in highwatch_guild_sign.test.ts.
+    expect(extras.sign).toEqual({ x: -8, y: 4.05, z: -24.3, width: 5.6, height: 1.18, face: 0.14 });
     expect(extras.sign.y - extras.sign.height / 2).toBeGreaterThan(3);
     expect(extras.sign.face).toBeGreaterThanOrEqual(0.09 + 0.04);
   });

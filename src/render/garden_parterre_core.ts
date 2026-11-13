@@ -209,7 +209,7 @@ function dawnholdCourtTintAt(x: number, z: number): number {
  */
 export function parterreFlowerTintAt(x: number, z: number): number {
   if (inWispMazeFootprint(x, z, WISP_MAZE_CLEAR)) return -1;
-  // Dawnhold: nothing grows on the paved bailey, and the walled court south
+  // Dawnhold: no bed grows on the castle green, and the walled court south
   // of it is solid flower field. Both answered before the general plan.
   if (inDawnholdBailey(x, z, 1)) return -1;
   {
@@ -311,7 +311,7 @@ export function gardenMeadowTintAt(x: number, z: number): number {
   }
   if (inMazeRect(x, z)) return -1;
   if (inParterrePlot(x, z, 4)) return -1;
-  // Dawnhold's paved bailey and its walled court both carry their own
+  // Dawnhold's castle green and its walled court both carry their own
   // planting answer (none, and the court fields respectively): a wild
   // meadow drift must never wander across either floor
   if (inDawnholdBailey(x, z, 1) || inDawnholdCourt(x, z, -1)) return -1;
@@ -335,7 +335,7 @@ export function gardenMeadowTintAt(x: number, z: number): number {
 const SLOPE_EPS = 1.2;
 function flatDryLawn(x: number, z: number, seed: number): boolean {
   // the castle's own floors are never lawn: no bush is planted on the
-  // flagstone bailey or inside the flower court's walls
+  // castle green or inside the flower court's walls
   if (inDawnholdBailey(x, z, 1) || inDawnholdCourt(x, z, -1)) return false;
   const h = terrainHeight(x, z, seed);
   if (h < WATER_LEVEL + 1.6) return false;

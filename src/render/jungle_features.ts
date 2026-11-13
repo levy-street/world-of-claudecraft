@@ -22,6 +22,7 @@ import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { buildDeckWood } from './deck_render';
 import { GFX } from './gfx';
+import { BANYAN_SCALE_BASE, greatTreeScale } from './great_tree_look_core';
 import { activeWorldPromoted } from './promoted_scenery_gate';
 import { prepareSceneryGeometryLod } from './scenery_geometry_lod';
 import { buildStaticInstanceCells } from './static_instance_cells';
@@ -382,7 +383,7 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
       for (const t of trees) {
         const y = terrainHeight(t.x, t.z, seed);
         if (y < WATER_LEVEL) continue;
-        const scale = t.r * (2.5 + hash2(t.x, t.z, seed + 5201) * 0.5);
+        const scale = greatTreeScale(t.r, hash2(t.x, t.z, seed + 5201), BANYAN_SCALE_BASE);
         let banyan: THREE.Group | null = null;
         if (!trunksArePlacements) {
           banyan = new THREE.Group();

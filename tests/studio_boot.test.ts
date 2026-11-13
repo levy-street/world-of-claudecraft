@@ -109,9 +109,13 @@ describe('loadOfflineWorld', () => {
     expect(picked?.seed).toBe(entry?.seed);
     expect(picked?.world).toBe(await entry?.load());
     const paths = (picked?.world.placements ?? []).map((p) => p.path);
-    for (const name of ['smithy', 'tavern', 'hall', 'bank', 'shop_a', 'house_b', 'vault']) {
-      expect(paths, name).toContain(`/models/tidehold/${name}.glb`);
+    // Re-pinned 2026-11-11 for the hand-built harbour lots: the six town buildings are the
+    // lots of the harbour set, and the vault keeps the Tidehold model (no lot replaces it).
+    for (const name of ['smithy', 'tavern', 'hall', 'bank', 'shop_a', 'house_b']) {
+      expect(paths, name).toContain(`/models/tidehold/harbour/${name}.glb`);
+      expect(paths, name).not.toContain(`/models/tidehold/${name}.glb`);
     }
+    expect(paths, 'vault').toContain('/models/tidehold/vault.glb');
   });
 
   it('falls back to the built-in world, and says so, for an unpublished or failing map', async () => {

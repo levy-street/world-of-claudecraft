@@ -20,6 +20,7 @@
 // returns the already-linked program.
 
 import type * as THREE from 'three';
+import { reapplyKitShadeLiftToClone } from './assets/kit_shade_lift';
 import { reapplyTownSmartToClone } from './assets/town_smart_material';
 import { reattachBiomeHazeToClone } from './biome_haze_field';
 import { reapplyArmorDyeToClone } from './characters/armor_dye';
@@ -61,6 +62,13 @@ export function reattachClonedMaterialHooks(source: THREE.Material, clone: THREE
   // Right after the rim, where the rig factory attaches it (assets.ts
   // buildTintedClone): the dormant Gloamveil climb every lit rig material carries.
   reattachGloamClimbToClone(source, clone);
+  // The painted kit's shaded-stone lift (reads userData.kitShadeLift, which clone() did
+  // copy); a no-op for every other material. Ahead of every world-surface layer because
+  // the loader attaches it at parse, before any factory decorates the material, so on a
+  // source it is always the innermost of them. (No material carries both this and the
+  // town-smart layer: the lift is for the painted kit's `eh_stone`, the weathering layer
+  // for the older Tidehold kit.)
+  reapplyKitShadeLiftToClone(clone);
   reattachBiomeHazeToClone(source, clone);
   // Reads the JSON spec applySurfaceDetail records in userData, which clone()
   // did copy; a no-op for clones of undetailed materials.

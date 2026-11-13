@@ -183,6 +183,7 @@ export const KTX2_MIP_RELEASABLE_MODEL_ROOTS: readonly string[] = [
   'clutter',
   'drakelands_kit',
   'dungeon',
+  'eastbrook_houses',
   'foliage',
   'medieval_village_v2',
   'props',

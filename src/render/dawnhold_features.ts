@@ -22,13 +22,7 @@ import {
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { bannerClothMaterial, isBannerKey } from './castle_kit';
-import {
-  castlePavingMat,
-  castleStoneBox,
-  castleStoneMat,
-  FLAGSTONE_TILE_YD,
-  tileCastleUv,
-} from './castle_stone';
+import { castleStoneBox, castleStoneMat } from './castle_stone';
 import { PROP_ASSET_DEFS } from './props';
 
 const DAWNHOLD_KEYS = [
@@ -382,24 +376,13 @@ export function buildDawnholdFeatures(): DawnholdFeaturesView {
     group.add(mesh);
   }
 
-  // ---- the bailey: paved wall to wall. This is a garrison parade ground
-  // now, not a lawn, so one flagstone floor spans the whole inner court
-  // (a single textured plane, not a field of kit tiles: the buildings sit
-  // on top of it and the paving reads continuous under them) ----
+  // ---- the bailey: a castle green. The inner court is the garden's own lawn from
+  // wall to wall, mown grass up to the stone, with paving only where boots land inside
+  // the gate. (It was one flagstone plane across the whole court, a parade ground of pale
+  // three-yard slabs: the plainest ground in the Evergarden, and the court looks better
+  // with the lawn that lies under it showing instead.) ----
   {
-    const fx0 = DAWNHOLD.wx0 + DAWNHOLD.wallTh / 2;
     const fx1 = DAWNHOLD.wx1 - DAWNHOLD.wallTh / 2;
-    const fz0 = DAWNHOLD.wz0 + DAWNHOLD.wallTh / 2;
-    const fz1 = DAWNHOLD.wz1 - DAWNHOLD.wallTh / 2;
-    const fw = fx1 - fx0;
-    const fd = fz1 - fz0;
-    const floorGeo = new THREE.PlaneGeometry(fw, fd);
-    tileCastleUv(floorGeo, fw, fd, FLAGSTONE_TILE_YD);
-    const floor = new THREE.Mesh(floorGeo, castlePavingMat({ color: 0xb9b4ab }));
-    floor.rotation.x = -Math.PI / 2;
-    floor.position.set((fx0 + fx1) / 2, padY + 0.03, (fz0 + fz1) / 2);
-    floor.receiveShadow = true;
-    group.add(floor);
     // a dressed threshold apron inside each gate, where boots land
     put('kcasFloorLarge', { x: fx1 - M / 2, y: padY + 0.06, z: gm, rot: 0 });
   }

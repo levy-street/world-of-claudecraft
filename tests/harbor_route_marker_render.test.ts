@@ -1,8 +1,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { MeshoptDecoder } from 'meshoptimizer';
 import * as THREE from 'three';
-import { type GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import {
   activateGfxProfile,
@@ -21,6 +20,7 @@ import {
 import { HARBOR_ROUTE_MARKERS } from '../src/sim/content/harbor_route_markers';
 import { harborRouteMarkerYaw } from '../src/sim/harbor_route_markers';
 import { WORLD_SEED } from '../src/sim/world_seed';
+import { expectPaintedMeshes, parsePaintedGlb } from './helpers/painted_glb';
 
 // The harbor route marker painter (src/render/harbor_route_markers.ts) over the
 // shipped GLB: which parts each graphics tier really draws, the two destination
@@ -108,14 +108,8 @@ function triangles(root: THREE.Object3D, skipText = true): number {
 }
 
 beforeAll(async () => {
-  await MeshoptDecoder.ready;
-  const bytes = readFileSync(GLB);
-  const ab = bytes.buffer.slice(
-    bytes.byteOffset,
-    bytes.byteOffset + bytes.byteLength,
-  ) as ArrayBuffer;
-  const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
-  gltf = await new Promise<GLTF>((resolve, reject) => loader.parse(ab, '', resolve, reject));
+  // the marker's painted maps are KTX2: Node gets stand-ins (helpers/painted_glb.ts)
+  gltf = await parsePaintedGlb(GLB);
   (globalThis as { document?: unknown }).document = {
     createElement: fakeCanvas,
     addEventListener() {},
@@ -151,6 +145,24 @@ describe('harbor route marker painter: tiers', () => {
         if (m && (m.emissive?.getHex() ?? 0) !== 0) glows.add(m);
       });
       expect(glows.size, tier).toBe(tier === 'low' || tier === 'medium' ? 0 : 1);
+    }
+  });
+
+  it('draws painted on every tier and material family: planking and fittings under the tint', () => {
+    for (const tier of ['low', 'high'] as const) {
+      for (const standardMaterials of [true, false]) {
+        activateGfxProfile({
+          ...originalProfile,
+          settings: { ...GFX, effectsTier: tier, standardMaterials },
+        });
+        internals.setLoadedGltfForTest(gltf);
+        const sign = buildHarborRouteMarker(HARBOR_ROUTE_MARKERS[0], WORLD_SEED);
+        // the model's own two maps, beside the destination plate's canvas
+        const maps = [...expectPaintedMeshes(sign, THREE.SRGBColorSpace)].filter(
+          (map) => (map as THREE.CompressedTexture).isCompressedTexture,
+        );
+        expect(maps.length, `${tier} ${standardMaterials}`).toBe(2);
+      }
     }
   });
 

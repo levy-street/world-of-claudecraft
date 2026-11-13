@@ -75,6 +75,18 @@ describe('celShadingFromQuery', () => {
     expect(celShadingFromQuery('?cel=0', true)).toBeNull();
   });
 
+  it('leaves the light ramp out unless cellight=on asks for it', () => {
+    expect(CEL_SHADING_DEFAULTS.light).toBe(false);
+    expect(celShadingFromQuery('?cel=on')?.light).toBe(false);
+    expect(celShadingFromQuery('?cel=on&cellight=on')?.light).toBe(true);
+    expect(celShadingFromQuery('?cel=on&cellight=off')?.light).toBe(false);
+    expect(celShadingFromQuery('?cellight=on', true)?.light).toBe(true);
+    // anything else is the default, not an opt-in
+    expect(celShadingFromQuery('?cel=on&cellight=1')?.light).toBe(false);
+    // the ink and the saturation ride on, ramp or no ramp
+    expect(celShadingFromQuery('', true)).toMatchObject({ ink: 0.85, saturation: 1.12 });
+  });
+
   it('reads and clamps every tuning knob', () => {
     expect(
       celShadingFromQuery(
@@ -215,11 +227,14 @@ describe('installCelShading', () => {
   it('patches only for a look that keeps the light ramp', () => {
     const chunks = { lights_fragment_begin: STOCK_CHUNK };
     expect(installCelShading(null, chunks)).toBe(false);
+    // the default look keeps the ramp out, so it leaves the shared chunk alone
+    expect(installCelShading(CEL_SHADING_DEFAULTS, chunks)).toBe(false);
     expect(installCelShading({ ...CEL_SHADING_DEFAULTS, light: false }, chunks)).toBe(false);
     expect(chunks.lights_fragment_begin).toBe(STOCK_CHUNK);
-    expect(installCelShading(CEL_SHADING_DEFAULTS, chunks)).toBe(true);
+    const ramped = { ...CEL_SHADING_DEFAULTS, light: true };
+    expect(installCelShading(ramped, chunks)).toBe(true);
     expect(chunks.lights_fragment_begin).toContain(CEL_SHADING_PATCH_MARKER);
-    expect(installCelShading(CEL_SHADING_DEFAULTS, chunks)).toBe(false);
+    expect(installCelShading(ramped, chunks)).toBe(false);
   });
 });
 

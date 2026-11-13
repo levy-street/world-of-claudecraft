@@ -11,6 +11,7 @@ import { hash2 } from '../sim/rng';
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { greatTreeScale } from './great_tree_look_core';
 import { activeWorldPromoted } from './promoted_scenery_gate';
 import { applySurfaceDetail, GREAT_TREE_BARK_DETAIL, isBarkMaterialName } from './worn_stone';
 
@@ -95,9 +96,10 @@ export function buildHauntFeatures(
 
   // --- the giant trees: the Eldershine's twisted elder, grown grim ---
   // One clone per greatTrees record (the same spots the sim's trunk
-  // colliders use), scaled from the record's radius the way the Hollow's
-  // centerpiece is (r 2.6 = scale 6.5), turned and sized with a little
-  // hash jitter, and darkened toward dead grey-green. Materials are cloned
+  // colliders use), scaled from the record's radius (great_tree_look_core:
+  // a grand old tree whose root flare stands on its collider, no longer a
+  // hundred-yard trunk), turned and sized with a little hash jitter, and
+  // darkened toward dead grey-green. Materials are cloned
   // once per source material (the loader cache is immutable) and shared
   // across every tree here.
   {
@@ -121,7 +123,7 @@ export function buildHauntFeatures(
         if (y < WATER_LEVEL) continue;
         const tree = greatTreeScene.clone(true);
         tree.position.set(t.x, y - 0.2, t.z);
-        tree.scale.setScalar(t.r * (2.4 + hash2(t.x, t.z, seed + 4101) * 0.5));
+        tree.scale.setScalar(greatTreeScale(t.r, hash2(t.x, t.z, seed + 4101)));
         tree.rotation.y = hash2(t.z, t.x, seed + 4111) * Math.PI * 2;
         tree.traverse((obj) => {
           const mesh = obj as THREE.Mesh;

@@ -8,8 +8,8 @@
     "Cat Form fixed-cadence auto-attack: 1.0s swing timer, normalized mainhand weapon roll",
     "bear-form control swinging at half the equipped weapon speed on the same loadout"
   ],
-  "draws": 1493,
-  "drawDigest": "66ba649d",
+  "draws": 1508,
+  "drawDigest": "a370d762",
   "frames": [
     {
       "tick": 0,
@@ -296,8 +296,8 @@
       "state": "67b5eded",
       "events": "741638a5",
       "rng": {
-        "draws": 823,
-        "digest": "5399176b"
+        "draws": 822,
+        "digest": "ab804bab"
       }
     },
     {
@@ -307,8 +307,8 @@
       "state": "62a4557b",
       "events": "048b747f",
       "rng": {
-        "draws": 869,
-        "digest": "6e9bbcea"
+        "draws": 868,
+        "digest": "c9fbabd4"
       }
     },
     {
@@ -318,8 +318,8 @@
       "state": "cadfadc5",
       "events": "741ce20f",
       "rng": {
-        "draws": 925,
-        "digest": "81c6e78c"
+        "draws": 924,
+        "digest": "53e60df2"
       }
     },
     {
@@ -329,8 +329,8 @@
       "state": "cec1332c",
       "events": "741638a5",
       "rng": {
-        "draws": 988,
-        "digest": "085fb958"
+        "draws": 987,
+        "digest": "be37b4e9"
       }
     },
     {
@@ -340,8 +340,8 @@
       "state": "f7270e36",
       "events": "741638a5",
       "rng": {
-        "draws": 1053,
-        "digest": "3b65bc67"
+        "draws": 1052,
+        "digest": "6e24829f"
       }
     },
     {
@@ -351,63 +351,63 @@
       "state": "7127c763",
       "events": "741638a5",
       "rng": {
-        "draws": 1100,
-        "digest": "e2962881"
+        "draws": 1102,
+        "digest": "5843302a"
       }
     },
     {
       "tick": 155,
       "time": 7.75,
       "nextId": 1015,
-      "state": "c6962f63",
-      "events": "741ce20f",
+      "state": "6442735f",
+      "events": "ff61400d",
       "rng": {
-        "draws": 1163,
-        "digest": "4b3f1327"
+        "draws": 1167,
+        "digest": "df41d75c"
       }
     },
     {
       "tick": 160,
       "time": 8,
       "nextId": 1015,
-      "state": "bfc0176a",
-      "events": "048b747f",
+      "state": "6e06ffeb",
+      "events": "970f54b6",
       "rng": {
-        "draws": 1232,
-        "digest": "4ca89e45"
+        "draws": 1238,
+        "digest": "94c8f0aa"
       }
     },
     {
       "tick": 165,
       "time": 8.25,
       "nextId": 1015,
-      "state": "d7788fa7",
+      "state": "940a9c7a",
       "events": "741638a5",
       "rng": {
-        "draws": 1288,
-        "digest": "8a71350d"
+        "draws": 1293,
+        "digest": "21e18e92"
       }
     },
     {
       "tick": 170,
       "time": 8.5,
       "nextId": 1015,
-      "state": "7a92a890",
+      "state": "a60c368a",
       "events": "741638a5",
       "rng": {
-        "draws": 1360,
-        "digest": "dac3f4b6"
+        "draws": 1365,
+        "digest": "c98cb6fe"
       }
     },
     {
       "tick": 170,
       "time": 8.5,
       "nextId": 1015,
-      "state": "7a92a890",
+      "state": "a60c368a",
       "events": "741638a5",
       "rng": {
-        "draws": 1360,
-        "digest": "dac3f4b6"
+        "draws": 1365,
+        "digest": "c98cb6fe"
       },
       "label": "after-swings",
       "players": [
@@ -437,13 +437,13 @@
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 104
+            "damageDealt": 116
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 104
+              "dummyDamage": 116
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -556,13 +556,13 @@
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 122
+            "damageDealt": 123
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 122
+              "dummyDamage": 123
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -664,6 +664,19 @@
               "school": "physical",
               "sourceId": 1011,
               "value": 0.71
+            },
+            {
+              "duration": 10,
+              "empowerAbilities": [
+                "rejuvenation",
+                "barkskin"
+              ],
+              "id": "natures_boon",
+              "kind": "next_cast_free",
+              "name": "Nature's Boon",
+              "remaining": 9,
+              "school": "nature",
+              "sourceId": 1011
             }
           ],
           "autoAttack": true,
@@ -786,7 +799,7 @@
               "dru_loping_stride": 11.5
             }
           },
-          "resource": 25.237898,
+          "resource": 25.444766,
           "resourceType": "rage",
           "savedMana": 1073,
           "spawnPos": {
@@ -823,7 +836,7 @@
           "fallStartY": 0.552596,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 999896,
+          "hp": 999884,
           "id": 1013,
           "inCombat": true,
           "kind": "mob",
@@ -855,7 +868,7 @@
           "threat": [
             [
               1011,
-              123.836
+              137.894
             ]
           ],
           "weapon": {
@@ -873,7 +886,7 @@
           "fallStartY": 2.932068,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 999878,
+          "hp": 999877,
           "id": 1014,
           "inCombat": true,
           "kind": "mob",
@@ -905,7 +918,7 @@
           "threat": [
             [
               1012,
-              263.69
+              265.835
             ]
           ],
           "weapon": {
@@ -918,33 +931,33 @@
       "tick": 175,
       "time": 8.75,
       "nextId": 1015,
-      "state": "c8a38594",
+      "state": "c67b4d97",
       "events": "741638a5",
       "rng": {
-        "draws": 1420,
-        "digest": "a34ee4f0"
+        "draws": 1425,
+        "digest": "d5bcf642"
       }
     },
     {
       "tick": 180,
       "time": 9,
       "nextId": 1015,
-      "state": "9fb519cf",
+      "state": "3cb20ab9",
       "events": "741638a5",
       "rng": {
-        "draws": 1493,
-        "digest": "66ba649d"
+        "draws": 1508,
+        "digest": "a370d762"
       }
     },
     {
       "tick": 180,
       "time": 9,
       "nextId": 1015,
-      "state": "9fb519cf",
+      "state": "3cb20ab9",
       "events": "741638a5",
       "rng": {
-        "draws": 1493,
-        "digest": "66ba649d"
+        "draws": 1508,
+        "digest": "a370d762"
       },
       "label": "final",
       "players": [
@@ -974,13 +987,13 @@
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 104
+            "damageDealt": 116
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 104
+              "dummyDamage": 116
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -1093,13 +1106,13 @@
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 122
+            "damageDealt": 123
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 122
+              "dummyDamage": 123
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -1201,6 +1214,19 @@
               "school": "physical",
               "sourceId": 1011,
               "value": 0.71
+            },
+            {
+              "duration": 10,
+              "empowerAbilities": [
+                "rejuvenation",
+                "barkskin"
+              ],
+              "id": "natures_boon",
+              "kind": "next_cast_free",
+              "name": "Nature's Boon",
+              "remaining": 8.5,
+              "school": "nature",
+              "sourceId": 1011
             }
           ],
           "combatTimer": 1.5,
@@ -1320,7 +1346,7 @@
               "dru_loping_stride": 11
             }
           },
-          "resource": 25.237898,
+          "resource": 25.444766,
           "resourceType": "rage",
           "savedMana": 1073,
           "spawnPos": {
@@ -1357,7 +1383,7 @@
           "fallStartY": 0.552596,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 999896,
+          "hp": 999884,
           "id": 1013,
           "inCombat": true,
           "kind": "mob",
@@ -1389,7 +1415,7 @@
           "threat": [
             [
               1011,
-              123.836
+              137.894
             ]
           ],
           "weapon": {
@@ -1407,7 +1433,7 @@
           "fallStartY": 2.932068,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 999878,
+          "hp": 999877,
           "id": 1014,
           "inCombat": true,
           "kind": "mob",
@@ -1439,7 +1465,7 @@
           "threat": [
             [
               1012,
-              263.69
+              265.835
             ]
           ],
           "weapon": {

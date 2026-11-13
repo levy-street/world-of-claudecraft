@@ -101,10 +101,13 @@ export const SETTING_RANGES = {
   // pixels on a fixed pattern (the material stays opaque, so it needs no second
   // shader program), 1 blends it translucent. Both show the same 20 percent.
   ghostFade: { min: 0, max: 1, def: 1 },
-  // vertical camera field of view in degrees. def 60 keeps the shipped look;
-  // a wider FOV shows more of the world (good for situational awareness) while
-  // a narrower one zooms in. Purely a comfort/visibility preference.
-  cameraFov: { min: 55, max: 100, def: 60 },
+  // vertical camera field of view in degrees: a wider FOV shows more of the
+  // world (good for situational awareness) while a narrower one zooms in. A
+  // comfort/visibility preference. The default was 60 until the painted-world
+  // pass: at 72 a view takes in the sky and the country beyond the nearest wall
+  // or tree (66 changed too little to notice, and 80 added little over 72). A
+  // saved setting is kept; only the default moved.
+  cameraFov: { min: 55, max: 100, def: 72 },
   // Action Cam shoulder offset (render/action_cam_core.ts): -1 = full left,
   // 0 = centered behind the avatar, 1 = full right. Only read while the
   // actionCam boolean is on; remembered across toggles.

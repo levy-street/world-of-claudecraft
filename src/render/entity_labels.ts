@@ -32,7 +32,7 @@ export function harborDestinationLabel(dest: HarborRouteMarkerDestination): stri
   return dest.kind === 'zone' ? zoneDisplayName(dest.zone) : (poiMarkLabel(dest.mark) ?? '');
 }
 
-/** What Lantern Hall's gateway board reads (render/highwatch_guild_sign.ts): the guild's
+/** What Lantern Hall's name board reads (render/highwatch_guild_sign.ts): the guild's
  *  name and the line under it, both localized. */
 export function guildSignLabels(): { name: string; subtitle: string } {
   return { name: t('hudChrome.guildHall.title'), subtitle: t('hudChrome.guildHall.signSubtitle') };

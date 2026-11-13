@@ -819,6 +819,9 @@ describe('category policy', () => {
       // by the world renderer through the env-prop template cache
       'drakelands_kit',
       'dungeon',
+      // the hand-built painted houses and dressing the live-world document places
+      // (scripts/assets/eastbrook_houses/): world placements only, drawn by no second renderer
+      'eastbrook_houses',
       'foliage',
       'medieval_village_v2',
       'props',

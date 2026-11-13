@@ -11,17 +11,32 @@ import { EASTBROOK_FERRY_HULL } from '../src/sim/content/transport_ships';
 
 // The shipped Eastbrook ferry GLB (public/models/props/eastbrook_ferry.glb), built
 // from the Blender source by scripts/assets/eastbrook_ferry/build.mjs. Pins the
-// bytes, the hierarchy the runtime depends on, the five shared materials, the one
-// idle clip, the triangle budget of every level of detail, the source fingerprint,
-// and the agreement between the model's stamped layout and the sim's hull.
+// bytes, the hierarchy the runtime depends on, the five shared materials and the
+// three small painted maps they wear, the one idle clip, the triangle budget of
+// every level of detail, the source fingerprint, and the agreement between the
+// model's stamped layout and the sim's hull.
 // Re-pin the sha256 and size literals only together with a re-export.
 
 const ROOT = path.join(__dirname, '..');
 const GLB = path.join(ROOT, FERRY_ASSET.target);
-const SHIPPED_SHA256 = '1038ed4b3d602bd49113cb4aaf1a4ff6b05e6fcb025ba1f15aacfbb97d546311';
-const SHIPPED_BYTES = 559300;
-/** Triangles per level (and the gangplank), from the Blender build report. */
-const TRIANGLES = { LOD0: 28094, LOD1: 4138, LOD2: 219, LOD3: 89, Gangplank: 252 };
+// Re-pinned for the PAINTED ferry: the wood, the fittings and the cloth now wear a map
+// each (planking, gilding and iron, canvas) cut from the Eastbrook town paintings, so the
+// file carries three KTX2 images and a texture coordinate on every painted vertex.
+// Measured off the shipped file.
+const SHIPPED_SHA256 = '14a77024d8438afd3037fa9d345d87f22ad5017b7c67f8dee060c469837f1bc7';
+const SHIPPED_BYTES = 1282616;
+/** The whole painted ship stays a small download. */
+const MAX_BYTES = 1.6 * 1024 * 1024;
+/**
+ * Triangles per level (and the gangplank), from the Blender build report. LOD0 and LOD1
+ * fell with the repaint: the deck seams are painted lines now instead of modelled strips,
+ * and the carved relief figurehead is lighter than the modelled serpent it replaced, which
+ * more than pays for the stern windows' leading and the gilded stern lanterns.
+ */
+const TRIANGLES = { LOD0: 26648, LOD1: 3666, LOD2: 219, LOD3: 89, Gangplank: 252 };
+/** The largest side of any map, and the most bytes one may weigh. */
+const MAX_MAP_SIDE = 1024;
+const MAX_MAP_BYTES = 256 * 1024;
 
 let doc: Document;
 
@@ -62,6 +77,7 @@ describe('Eastbrook ferry GLB', () => {
   it('ships the pinned bytes, in the media manifest', () => {
     const bytes = readFileSync(GLB);
     expect(bytes.length).toBe(SHIPPED_BYTES);
+    expect(bytes.length).toBeLessThan(MAX_BYTES);
     expect(createHash('sha256').update(bytes).digest('hex')).toBe(SHIPPED_SHA256);
     expect(bytes.toString('latin1')).toContain('EXT_meshopt_compression');
     expect(MEDIA_ASSETS['models/props/eastbrook_ferry.glb']).toMatch(
@@ -100,10 +116,9 @@ describe('Eastbrook ferry GLB', () => {
     expect(node('Ship_Motion').getParentNode()?.getName()).toBe('TransportShip_ROOT');
   });
 
-  it('shares five texture-free materials, the cloth double sided', () => {
+  it('shares five materials, the cloth double sided', () => {
     const materials = doc.getRoot().listMaterials();
     expect(materials.map((m) => m.getName()).sort()).toEqual(FERRY_ASSET.materials);
-    expect(doc.getRoot().listTextures()).toHaveLength(0);
     expect(doc.getRoot().listSkins()).toHaveLength(0);
     for (const m of materials) {
       expect(m.getDoubleSided(), m.getName()).toBe(m.getName() === 'FerryCloth');
@@ -113,6 +128,54 @@ describe('Eastbrook ferry GLB', () => {
         expect(prim.getAttribute('COLOR_0'), mesh.getName()).not.toBeNull();
       }
     }
+  });
+
+  it('paints the wood, the fittings and the cloth with three small KTX2 maps', () => {
+    const root = doc.getRoot();
+    const textures = root.listTextures();
+    expect(textures.map((t) => t.getName()).sort()).toEqual([
+      'ferry_cloth',
+      'ferry_fittings',
+      'ferry_wood',
+    ]);
+    for (const texture of textures) {
+      const name = texture.getName();
+      expect(texture.getMimeType(), name).toBe('image/ktx2');
+      const size = texture.getSize();
+      if (!size) throw new Error(`${name} has no readable size`);
+      expect(size[0], name).toBe(size[1]);
+      expect([512, 1024], name).toContain(size[0]);
+      expect(size[0], name).toBeLessThanOrEqual(MAX_MAP_SIDE);
+      expect(texture.getImage()?.byteLength ?? Infinity, name).toBeLessThan(MAX_MAP_BYTES);
+    }
+    // a base colour and nothing else: no normal, roughness, occlusion or emissive map
+    const painted = FERRY_ASSET.maps;
+    expect(Object.keys(painted).sort()).toEqual(['FerryCloth', 'FerryIron', 'FerryWood']);
+    for (const material of root.listMaterials()) {
+      const name = material.getName();
+      expect(material.getBaseColorTexture()?.getName() ?? null, name).toBe(painted[name] ?? null);
+      expect(material.getNormalTexture(), name).toBeNull();
+      expect(material.getMetallicRoughnessTexture(), name).toBeNull();
+      expect(material.getOcclusionTexture(), name).toBeNull();
+      expect(material.getEmissiveTexture(), name).toBeNull();
+      // the vertex colour is the tint: the material itself stays white
+      expect(material.getBaseColorFactor(), name).toEqual([1, 1, 1, 1]);
+    }
+    // every painted primitive carries a texture coordinate; the rope and the glow carry none
+    let mapped = 0;
+    for (const mesh of root.listMeshes()) {
+      for (const prim of mesh.listPrimitives()) {
+        const name = prim.getMaterial()?.getName() ?? '';
+        const wantsUv = name in painted;
+        expect(prim.getAttribute('TEXCOORD_0') !== null, `${mesh.getName()}/${name}`).toBe(wantsUv);
+        if (wantsUv) mapped++;
+      }
+    }
+    expect(mapped).toBeGreaterThan(40);
+    // KTX2 is required, so a loader without a transcoder fails at parse, never draws black
+    expect(root.listExtensionsRequired().map((e) => e.extensionName)).toContain(
+      'KHR_texture_basisu',
+    );
   });
 
   it('holds each level of detail to its triangle budget', () => {

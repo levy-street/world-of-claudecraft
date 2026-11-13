@@ -129,12 +129,23 @@ function sourceAsset(withEmissive: boolean): THREE.Group {
 //   walls on the shell and the porch, the props on the furniture), the walls
 //   carrying the model's own colour map;
 // - one mesh under a G_INT node, the furniture that never casts a shadow.
+// Re-pinned 2026-11-11 for the hand-built harbour lots
+// (scripts/assets/eastbrook_houses/lots.py): a walk-in lot ships two meshes
+// and no G_INT, G_H1 or G_H2 group, `<model>_L0` (the outer shell) and
+// `<model>_INT_L0` (the room and its furniture), and three's loader hands each
+// over as a group of that name holding one mesh per primitive, `<model>_L0_1`
+// and on. The stand-in takes that shape, so the last point above now reads:
+// one mesh of the `lot_INT_L0` room, found by its own name (the `_INT` rule in
+// buildPlacedTownBuilding) with no G_INT node over it, the furniture that
+// never casts a shadow. The shell and the porch are the two pieces of
+// `lot_L0`. The G_INT rule, which the older models still take, stays pinned by
+// the builder's own suite (tests/eastbrook_placed_buildings.test.ts).
 const PLACED_FIXTURE_MIN = Object.freeze({ x: -2, y: -0.75, z: -3 });
 const PLACED_FIXTURE_MAX = Object.freeze({ x: 4, y: 4.25, z: 2 });
 const PLACED_FIXTURE_MESHES = Object.freeze([
-  { name: 'shell', material: 'PlacedWalls', castShadow: true },
-  { name: 'porch', material: 'PlacedWalls', castShadow: true },
-  { name: 'table', material: 'PlacedProps', castShadow: false },
+  { name: 'lot_L0_1', material: 'PlacedWalls', castShadow: true },
+  { name: 'lot_L0_2', material: 'PlacedWalls', castShadow: true },
+  { name: 'lot_INT_L0_1', material: 'PlacedProps', castShadow: false },
 ]);
 const PLACED_FIXTURE_MESH_NAMES = PLACED_FIXTURE_MESHES.map((mesh) => mesh.name);
 
@@ -142,20 +153,23 @@ function placedSourceAsset(): THREE.Group {
   const source = new THREE.Group();
   const walls = new THREE.MeshStandardMaterial({ color: 0x8899aa, map: new THREE.Texture() });
   walls.name = 'PlacedWalls';
+  const outer = new THREE.Group();
+  outer.name = 'lot_L0';
   const shell = new THREE.Mesh(new THREE.BoxGeometry(6, 5, 4).translate(1, 1.75, 0), walls);
-  shell.name = 'shell';
-  source.add(shell);
+  shell.name = 'lot_L0_1';
+  outer.add(shell);
   const porch = new THREE.Mesh(new THREE.BoxGeometry(2, 0.5, 1).translate(0, 0.25, -2.5), walls);
-  porch.name = 'porch';
-  source.add(porch);
-  const interior = new THREE.Group();
-  interior.name = 'G_INT_furniture';
+  porch.name = 'lot_L0_2';
+  outer.add(porch);
+  source.add(outer);
+  const room = new THREE.Group();
+  room.name = 'lot_INT_L0';
   const props = new THREE.MeshStandardMaterial({ color: 0x664422 });
   props.name = 'PlacedProps';
   const table = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1).translate(0, 0.5, 0), props);
-  table.name = 'table';
-  interior.add(table);
-  source.add(interior);
+  table.name = 'lot_INT_L0_1';
+  room.add(table);
+  source.add(room);
   return source;
 }
 
@@ -344,6 +358,10 @@ describe('Eastbrook town renderer', () => {
     // shadow. The builder itself is measured in
     // tests/eastbrook_placed_buildings.test.ts; this pins that the TOWN routes
     // every row through it.
+    // Re-pinned 2026-11-11 for the hand-built harbour lots: the furniture is
+    // the lot's `_INT_L0` room mesh now, found by its own name with no G_INT
+    // node over it (the stand-in above), and it is still the one thing that
+    // casts no shadow.
     expect(EASTBROOK_LAYOUT.buildings).toHaveLength(6);
     const placedMaterials: THREE.Material[] = [];
     for (const building of EASTBROOK_LAYOUT.buildings) {
@@ -432,10 +450,13 @@ describe('Eastbrook town renderer', () => {
     // No material is shared inside a building or across buildings.
     expect(new Set(placedMaterials).size).toBe(18);
 
-    expect(view.group.getObjectByName('eastbrookTownMicroOpaqueBatch')).toBeInstanceOf(THREE.Mesh);
-    expect(view.group.getObjectByName('eastbrookTownMicroEmissiveBatch')).toBeInstanceOf(
-      THREE.Mesh,
-    );
+    // Re-pinned 2026-11-11 for the hand-built harbour lots: the town batch no
+    // longer draws the square's benches, stalls and yard fences
+    // (activeWorldStandsLiveTouchup in src/render/eastbrook_town.ts; the painted
+    // props the live-world document places stand on the same spots). They
+    // were the whole micro batch, so neither micro batch is built.
+    expect(view.group.getObjectByName('eastbrookTownMicroOpaqueBatch')).toBeUndefined();
+    expect(view.group.getObjectByName('eastbrookTownMicroEmissiveBatch')).toBeUndefined();
     const wallBatches = meshesOf(view.group).filter(
       (mesh) => mesh.userData.eastbrookWallInstances,
     ) as THREE.InstancedMesh[];
@@ -500,12 +521,21 @@ describe('Eastbrook town renderer', () => {
     // opaque batch + the monument's 2 + the vault's 8). Buildings and roof-hide
     // targets are the six rows plus the vault: 12 to 7. These are the FIXTURE's
     // numbers; the shipped models draw their own mesh counts.
+    // Re-pinned 2026-11-11 for the hand-built harbour lots: the 2 micro
+    // batches are gone (above), and the town draws the Weekly Vault's round
+    // door alone, 3 meshes where the ashlar hall and its door were 8
+    // (activeWorldStandsLiveTouchup in src/render/eastbrook_weekly_vault.ts). So
+    // colorDraws goes 30 to 23 (18 placed + the monument's 2 + the door's 3)
+    // and shadowDraws 23 to 17 (12 placed + the monument's 2 + the door's 3;
+    // the micro opaque batch was the other caster). Buildings and roof-hide
+    // targets hold at 7: the vault keeps its slot. The door then moved into the
+    // strong-house's own model, so the town draws nothing for the vault: 20 and 14.
     expect(eastbrookTownDrawStats(view.group)).toMatchObject({
-      colorDraws: 30,
-      shadowDraws: 23,
+      colorDraws: 20,
+      shadowDraws: 14,
       buildingCount: 7,
       roofHideTargetCount: 7,
-      microBatchCount: 2,
+      microBatchCount: 0,
       wallBatchCount: 0,
       wallSegmentCount: 0,
       gateCount: 0,
@@ -513,57 +543,65 @@ describe('Eastbrook town renderer', () => {
   });
 
   it("draws each market stall's canopy in its own layout colour, never the model's flag", () => {
-    const sources = fixtureSources();
-    sources.set(EASTBROOK_STALL_ASSET_URL, stallSourceAsset());
-    const ground = 1.5;
-    const view = eastbrookTownInternalsForTest.buildFromSources(sources, () => ground, true);
-    const batch = view.group.getObjectByName('eastbrookTownMicroOpaqueBatch');
-    if (!(batch instanceof THREE.Mesh)) throw new Error('no micro opaque batch');
-    // The repaint is vertex data only: the batch keeps the attribute set the
-    // town material's program was linked for (an alpha lane or a new attribute
-    // would relink the whole batch).
-    expect(Object.keys(batch.geometry.attributes).sort()).toEqual([
-      'color',
-      'normal',
-      'position',
-      'uv',
-    ]);
-    const position = batch.geometry.getAttribute('position') as THREE.BufferAttribute;
-    const color = batch.geometry.getAttribute('color') as THREE.BufferAttribute;
-    expect(color.itemSize).toBe(3);
-    // No flag colour survives anywhere in the batch: blue and red were canopy only.
-    for (let index = 0; index < color.count; index++) {
-      expect(colorIs(color, index, CLOTH_BLUE), `vertex ${index}`).toBe(false);
-      expect(colorIs(color, index, CLOTH_RED), `vertex ${index}`).toBe(false);
-    }
-    const variants = EASTBROOK_LAYOUT.market.stalls.map((stall) =>
-      stallCanopyVariant(stall.canopyVariant),
-    );
-    expect(new Set(variants).size).toBe(2);
-    for (const stall of EASTBROOK_LAYOUT.market.stalls) {
-      const own = stallCanopyVariant(stall.canopyVariant);
-      const counts: Record<string, number> = { gold: 0, green: 0, cream: 0 };
-      for (let index = 0; index < position.count; index++) {
-        const dx = position.getX(index) - stall.position.x;
-        const dz = position.getZ(index) - stall.position.z;
-        if (Math.hypot(dx, dz) > 2) continue;
-        const height = position.getY(index) - ground;
-        for (const variant of ['gold', 'green'] as const) {
-          if (!colorIs(color, index, STALL_CANOPY_COLORS[variant])) continue;
-          counts[variant]++;
-          expect(height, `${stall.id} canopy height`).toBeGreaterThanOrEqual(STALL_CANOPY_MIN_Y);
-        }
-        if (colorIs(color, index, CLOTH_CREAM)) {
-          // The sack on the counter keeps its cream; the cream panel does not.
-          counts.cream++;
-          expect(height, `${stall.id} cream height`).toBeLessThan(STALL_CANOPY_MIN_Y);
-        }
+    // The built-in world stands the square's dressing down for its touch-up's painted props
+    // (promoted_scenery_gate.ts activeWorldStandsLiveTouchup), so the batch that draws the
+    // stalls is built in any other world: a Studio map that owns no dressing, as here.
+    setActiveWorldContent({ ...BUILTIN_WORLD, placements: [] });
+    try {
+      const sources = fixtureSources();
+      sources.set(EASTBROOK_STALL_ASSET_URL, stallSourceAsset());
+      const ground = 1.5;
+      const view = eastbrookTownInternalsForTest.buildFromSources(sources, () => ground, true);
+      const batch = view.group.getObjectByName('eastbrookTownMicroOpaqueBatch');
+      if (!(batch instanceof THREE.Mesh)) throw new Error('no micro opaque batch');
+      // The repaint is vertex data only: the batch keeps the attribute set the
+      // town material's program was linked for (an alpha lane or a new attribute
+      // would relink the whole batch).
+      expect(Object.keys(batch.geometry.attributes).sort()).toEqual([
+        'color',
+        'normal',
+        'position',
+        'uv',
+      ]);
+      const position = batch.geometry.getAttribute('position') as THREE.BufferAttribute;
+      const color = batch.geometry.getAttribute('color') as THREE.BufferAttribute;
+      expect(color.itemSize).toBe(3);
+      // No flag colour survives anywhere in the batch: blue and red were canopy only.
+      for (let index = 0; index < color.count; index++) {
+        expect(colorIs(color, index, CLOTH_BLUE), `vertex ${index}`).toBe(false);
+        expect(colorIs(color, index, CLOTH_RED), `vertex ${index}`).toBe(false);
       }
-      // Three panels of 24 corners, minus the corners two adjacent panels now
-      // share (same place, normal, colour and cell), all in the stall's own colour.
-      expect(counts[own], stall.id).toBeGreaterThan(24);
-      expect(counts[own === 'gold' ? 'green' : 'gold'], stall.id).toBe(0);
-      expect(counts.cream, stall.id).toBe(24);
+      const variants = EASTBROOK_LAYOUT.market.stalls.map((stall) =>
+        stallCanopyVariant(stall.canopyVariant),
+      );
+      expect(new Set(variants).size).toBe(2);
+      for (const stall of EASTBROOK_LAYOUT.market.stalls) {
+        const own = stallCanopyVariant(stall.canopyVariant);
+        const counts: Record<string, number> = { gold: 0, green: 0, cream: 0 };
+        for (let index = 0; index < position.count; index++) {
+          const dx = position.getX(index) - stall.position.x;
+          const dz = position.getZ(index) - stall.position.z;
+          if (Math.hypot(dx, dz) > 2) continue;
+          const height = position.getY(index) - ground;
+          for (const variant of ['gold', 'green'] as const) {
+            if (!colorIs(color, index, STALL_CANOPY_COLORS[variant])) continue;
+            counts[variant]++;
+            expect(height, `${stall.id} canopy height`).toBeGreaterThanOrEqual(STALL_CANOPY_MIN_Y);
+          }
+          if (colorIs(color, index, CLOTH_CREAM)) {
+            // The sack on the counter keeps its cream; the cream panel does not.
+            counts.cream++;
+            expect(height, `${stall.id} cream height`).toBeLessThan(STALL_CANOPY_MIN_Y);
+          }
+        }
+        // Three panels of 24 corners, minus the corners two adjacent panels now
+        // share (same place, normal, colour and cell), all in the stall's own colour.
+        expect(counts[own], stall.id).toBeGreaterThan(24);
+        expect(counts[own === 'gold' ? 'green' : 'gold'], stall.id).toBe(0);
+        expect(counts.cream, stall.id).toBe(24);
+      }
+    } finally {
+      setActiveWorldContent(null);
     }
   });
 
@@ -704,19 +742,31 @@ describe('Eastbrook town renderer', () => {
       if (!group) throw new Error(`renderer fixture lost ${building.id}`);
       return group;
     });
-    const micro = view.group.getObjectByName('eastbrookTownMicroOpaqueBatch');
-    if (!micro) throw new Error('renderer fixture lost the micro batch');
+    // Re-pinned 2026-11-11 for the hand-built harbour lots: the town batch no
+    // longer draws the square's benches, stalls and yard fences
+    // (activeWorldStandsLiveTouchup in src/render/eastbrook_town.ts), which were
+    // the whole micro batch, and the ring wall went before it, so the town
+    // holds no static batch at all. The witness this test kept beside the six
+    // rows was the micro opaque batch; it is the Weekly Vault's group now, the
+    // one root beside the six rows that the town's reveal shows and hides (the
+    // monument's two roots ride the key for their compile only).
+    expect(view.group.userData.microBatchNames).toEqual([]);
+    expect(view.group.userData.wallBatchNames).toEqual([]);
+    const vault = view.group.getObjectByName(
+      `eastbrookBuilding:${EASTBROOK_LAYOUT.weeklyVault.id}`,
+    );
+    if (!vault) throw new Error('renderer fixture lost the Weekly Vault');
     // The gate compiles the buildings WITH the batches: every building group
     // is a reveal root, so its unshared materials link before first draw.
     for (const group of buildingGroups) expect(view.staticRevealRoots()).toContain(group);
-    expect(view.staticRevealRoots()).toContain(micro);
+    expect(view.staticRevealRoots()).toContain(vault);
 
     // Camera outside the town cull radius, town and buildings inside the fog.
     const cullRadius = eastbrookTownInternalsForTest.townCullRadius;
     const approachX = cullRadius + 20;
     view.update(approachX, 2, 0, approachX - 5, 2, 0, 400, 0.05);
     expect(requested).toEqual(['eastbrook-town-static']);
-    expect(micro.visible).toBe(false);
+    expect(vault.visible).toBe(false);
     for (const group of buildingGroups) expect(group.visible).toBe(false);
 
     // Held frames never re-request; the settle reveals batches and buildings
@@ -726,7 +776,7 @@ describe('Eastbrook town renderer', () => {
     for (const group of buildingGroups) expect(group.visible).toBe(false);
     gate.settle('eastbrook-town-static');
     view.update(approachX, 2, 0, approachX - 5, 2, 0, 400, 0.05);
-    expect(micro.visible).toBe(true);
+    expect(vault.visible).toBe(true);
     for (const group of buildingGroups) expect(group.visible).toBe(true);
     view.setRevealGate(createRevealGateCore((key) => requested.push(`again:${key}`)));
     view.update(approachX, 2, 0, approachX - 5, 2, 0, 400, 0.05);
@@ -746,8 +796,16 @@ describe('Eastbrook town renderer', () => {
     const bankGroup = view.group.getObjectByName(`eastbrookBuilding:${bank.id}`);
     const other = EASTBROOK_LAYOUT.buildings[1];
     const otherGroup = view.group.getObjectByName(`eastbrookBuilding:${other.id}`);
-    const micro = view.group.getObjectByName('eastbrookTownMicroOpaqueBatch');
-    if (!bankGroup || !otherGroup || !micro) throw new Error('renderer fixture lost a town node');
+    // Re-pinned 2026-11-11 for the hand-built harbour lots: the town holds no
+    // static batch now (activeWorldStandsLiveTouchup in
+    // src/render/eastbrook_town.ts stood the micro batch down), so the third
+    // root this test watches, the micro opaque batch, is the Weekly Vault's
+    // group: the one root beside the six rows that the reveal shows and hides.
+    expect(view.group.userData.microBatchNames).toEqual([]);
+    const vault = view.group.getObjectByName(
+      `eastbrookBuilding:${EASTBROOK_LAYOUT.weeklyVault.id}`,
+    );
+    if (!bankGroup || !otherGroup || !vault) throw new Error('renderer fixture lost a town node');
 
     const cullRadius = eastbrookTownInternalsForTest.townCullRadius;
     const approachX = cullRadius + 20;
@@ -759,7 +817,7 @@ describe('Eastbrook town renderer', () => {
     expect(gate.state('eastbrook-town-static')).toBe('compiling');
     expect(bankGroup.visible).toBe(true);
     // Nothing else moved: the batches and the other buildings are still cold.
-    expect(micro.visible).toBe(false);
+    expect(vault.visible).toBe(false);
     expect(otherGroup.visible).toBe(false);
 
     // A revealed root is never taken back while the key is still held.
@@ -805,9 +863,22 @@ describe('Eastbrook town renderer', () => {
     view.update(x, 2, z, x, 2, z + 5, 200, 0.05);
     expect(bankGroup.visible).toBe(true);
     // The town key itself never warmed: this is the floor, not a reveal.
-    const micro = view.group.getObjectByName('eastbrookTownMicroOpaqueBatch');
-    if (!micro) throw new Error('renderer fixture lost the micro batch');
-    expect(micro.visible).toBe(false);
+    // Re-pinned 2026-11-11 for the hand-built harbour lots: the micro opaque
+    // batch that witnessed it is no longer built (activeWorldStandsLiveTouchup in
+    // src/render/eastbrook_town.ts), so the witness is every other root the
+    // town's reveal drives, the five other rows and the Weekly Vault: none
+    // stands at arm's length from the bank's centre, so each is still held.
+    expect(view.group.userData.microBatchNames).toEqual([]);
+    const held = [
+      ...EASTBROOK_LAYOUT.buildings.slice(1).map((building) => building.id),
+      EASTBROOK_LAYOUT.weeklyVault.id,
+    ].map((id) => {
+      const group = view.group.getObjectByName(`eastbrookBuilding:${id}`);
+      if (!group) throw new Error(`renderer fixture lost ${id}`);
+      return group;
+    });
+    expect(held).toHaveLength(6);
+    for (const group of held) expect(group.visible, group.name).toBe(false);
   });
 
   it('hands the gate its roots nearest to the camera first', () => {
@@ -835,8 +906,16 @@ describe('Eastbrook town renderer', () => {
     const view = eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
     const bank = EASTBROOK_LAYOUT.buildings[0];
     const bankGroup = view.group.getObjectByName(`eastbrookBuilding:${bank.id}`);
-    const micro = view.group.getObjectByName('eastbrookTownMicroOpaqueBatch') as THREE.Mesh;
-    if (!bankGroup || !micro) throw new Error('renderer fixture lost Eastbrook scene nodes');
+    // Re-pinned 2026-11-11 for the hand-built harbour lots: the micro batch
+    // this test held untouched is no longer built (activeWorldStandsLiveTouchup
+    // in src/render/eastbrook_town.ts). What the town still draws that is not
+    // a building volume is the Realm Builder monument, so its body is the
+    // witness now: the fixture's two meshes, never a roof-hide target.
+    expect(view.group.userData.microBatchNames).toEqual([]);
+    const monument = view.group.getObjectByName('eastbrookRealmBuilderMonumentFxBody');
+    if (!bankGroup || !monument) throw new Error('renderer fixture lost Eastbrook scene nodes');
+    const monumentMaterials = materialsOf(monument);
+    expect(monumentMaterials).toHaveLength(2);
     const bankMaterials = meshesOf(bankGroup).map((mesh) => mesh.material as THREE.Material);
     // Re-pinned 2026-10 for the Tidehold rebuild: the bank is a placed building
     // (src/render/eastbrook_placed_building.ts), so the volume that ghosts is
@@ -849,7 +928,6 @@ describe('Eastbrook town renderer', () => {
       opacity: material.opacity,
       depthWrite: material.depthWrite,
     }));
-    const microMaterial = micro.material as THREE.Material;
 
     // Occlusion snaps to the ghost target on its first positive-dt frame.
     view.update(45, 2, 45, bank.position.x, 2, bank.position.z, 200, 0.05);
@@ -868,12 +946,15 @@ describe('Eastbrook town renderer', () => {
         (material, i) => Math.abs(material.opacity - authored[i].opacity * 0.2) < 1e-9,
       ),
     ).toBe(true);
-    expect(microMaterial.opacity).toBe(1);
-    expect(microMaterial.depthWrite).toBe(true);
+    for (const material of monumentMaterials) {
+      expect(material.opacity).toBe(1);
+      expect(material.depthWrite).toBe(true);
+    }
 
     // Over the roof line the segment clears the building. The placed bank
     // stands 27.9 yd above its ground line where the kit shell stood 12.7, so
-    // the height is read off the record instead of the old literal 30.
+    // the height is read off the record instead of the old literal 30. (The
+    // hand-built harbour lot of 2026-11-11 stands 27.8 yd: same rule.)
     const overRoof = bank.nativeDimensions.height + 2;
     view.update(45, overRoof, 45, bank.position.x, overRoof, bank.position.z, 200, 10);
     expect(
@@ -884,7 +965,7 @@ describe('Eastbrook town renderer', () => {
           material.depthWrite === authored[i].depthWrite,
       ),
     ).toBe(true);
-    expect(microMaterial.opacity).toBe(1);
+    for (const material of monumentMaterials) expect(material.opacity).toBe(1);
   });
 
   it('ghosts a placed building from inside its wall box under its roof line, never from under its eaves', () => {
@@ -914,8 +995,16 @@ describe('Eastbrook town renderer', () => {
       () => groundY,
       true,
     );
-    const micro = view.group.getObjectByName('eastbrookTownMicroOpaqueBatch') as THREE.Mesh;
-    if (!micro) throw new Error('renderer fixture lost the micro batch');
+    // Re-pinned 2026-11-11 for the hand-built harbour lots: the merged
+    // microgeometry this test held solid is no longer built
+    // (activeWorldStandsLiveTouchup in src/render/eastbrook_town.ts), so the
+    // geometry that may never ghost is what the town still draws beside its
+    // buildings, the Realm Builder monument's body (the fixture's two meshes).
+    expect(view.group.userData.microBatchNames).toEqual([]);
+    const monument = view.group.getObjectByName('eastbrookRealmBuilderMonumentFxBody');
+    if (!monument) throw new Error('renderer fixture lost the monument');
+    const monumentMaterials = materialsOf(monument);
+    expect(monumentMaterials).toHaveLength(2);
     const fadeState = (materials: readonly THREE.Material[]): string => {
       if (materials.every((material) => !material.transparent && material.opacity === 1)) {
         return 'solid';
@@ -1030,9 +1119,12 @@ describe('Eastbrook town renderer', () => {
           `${building.id} camera over the roof`,
         ).toBe('ghost');
       }
-      // The merged microgeometry is never a roof-hide target.
-      expect((micro.material as THREE.Material).transparent).toBe(false);
-      expect((micro.material as THREE.Material).opacity).toBe(1);
+      // The monument is never a roof-hide target (it was the merged
+      // microgeometry that stood here before the batch went).
+      for (const material of monumentMaterials) {
+        expect(material.transparent).toBe(false);
+        expect(material.opacity).toBe(1);
+      }
     }
   });
 
@@ -1045,11 +1137,29 @@ describe('Eastbrook town renderer', () => {
     // box would pop the building out while part of it was still in view.
     const fogFar = 100;
     const view = eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
-    const micro = view.group.getObjectByName('eastbrookTownMicroOpaqueBatch');
-    if (!micro) throw new Error('renderer fixture lost the micro batch');
+    // Re-pinned 2026-11-11 for the hand-built harbour lots: the micro opaque
+    // batch that showed the town itself still in the fog is no longer built
+    // (activeWorldStandsLiveTouchup in src/render/eastbrook_town.ts), and the
+    // view draws nothing else off the town-wide circle. So that control is
+    // spelled out below: the camera still stands inside the town's circle
+    // (eastbrookFogVisible over townCullRadius, the test the view makes), and
+    // every OTHER building is drawn exactly when its own cull circle is in
+    // the fog, so no town-wide answer is hiding anything.
+    expect(view.group.userData.microBatchNames).toEqual([]);
+    const townCullRadius = eastbrookTownInternalsForTest.townCullRadius;
+    const cullRadiusOf = (candidate: PlacedBuilding): number =>
+      Math.hypot(
+        candidate.reach.center.x - candidate.position.x,
+        candidate.reach.center.z - candidate.position.z,
+      ) + Math.hypot(candidate.reach.halfWidth, candidate.reach.halfDepth);
+    const groupOf = (candidate: PlacedBuilding): THREE.Object3D => {
+      const found = view.group.getObjectByName(`eastbrookBuilding:${candidate.id}`);
+      if (!found) throw new Error(`renderer fixture lost ${candidate.id}`);
+      return found;
+    };
+    let othersDrawn = 0;
     for (const building of EASTBROOK_LAYOUT.buildings) {
-      const group = view.group.getObjectByName(`eastbrookBuilding:${building.id}`);
-      if (!group) throw new Error(`renderer fixture lost ${building.id}`);
+      const group = groupOf(building);
       const { position, reach } = building;
       const farCorner = Math.max(
         ...reachCorners(building).map((corner) =>
@@ -1070,28 +1180,53 @@ describe('Eastbrook town renderer', () => {
       // point the town-wide static cull measures from, so the town stays in
       // the fog and only the building's own cull can hide it.
       const length = Math.hypot(position.x, position.z);
-      const standAt = (distance: number): void => {
+      const standAt = (distance: number): { x: number; z: number } => {
         const x = position.x - (position.x / length) * distance;
         const z = position.z - (position.z / length) * distance;
         view.update(x, 5, z, x, 5, z, fogFar, 0.05);
+        return { x, z };
       };
       standAt(fogFar + farCorner - 0.01);
       expect(group.visible, `${building.id} far corner still in the fog`).toBe(true);
-      standAt(fogFar + widest + 0.01);
+      const camera = standAt(fogFar + widest + 0.01);
       expect(group.visible, `${building.id} past its cull radius`).toBe(false);
-      expect(micro.visible, `${building.id} town still in the fog`).toBe(true);
+      expect(
+        eastbrookFogVisible(camera.x, camera.z, 0, 0, fogFar, townCullRadius),
+        `${building.id} town still in the fog`,
+      ).toBe(true);
+      for (const other of EASTBROOK_LAYOUT.buildings) {
+        if (other === building) continue;
+        const drawn = eastbrookFogVisible(
+          camera.x,
+          camera.z,
+          other.position.x,
+          other.position.z,
+          fogFar,
+          cullRadiusOf(other),
+        );
+        expect(groupOf(other).visible, `${other.id} while ${building.id} is culled`).toBe(drawn);
+        if (drawn) othersDrawn++;
+      }
       standAt(fogFar + farCorner - 0.01);
       expect(group.visible, `${building.id} back inside the fog`).toBe(true);
     }
+    // The control is not vacuous: other buildings were drawn while one was culled.
+    expect(othersDrawn).toBeGreaterThan(0);
   });
 
   it('keeps all harbor town buildings and civic batches visible across a 360-degree camera orbit on Low (sceneryFar = 60)', () => {
     const view = eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
-    const micro = view.group.getObjectByName('eastbrookTownMicroOpaqueBatch');
+    // Re-pinned 2026-11-11 for the hand-built harbour lots: the town draws no
+    // civic batch any more (activeWorldStandsLiveTouchup in
+    // src/render/eastbrook_town.ts stood the micro batch down, and the ring
+    // wall went before it), so the batch this orbit kept in view is pinned as
+    // absent and the orbit watches the Weekly Vault and the six rows.
+    expect(view.group.userData.microBatchNames).toEqual([]);
+    expect(view.group.userData.wallBatchNames).toEqual([]);
     const vault = view.group.getObjectByName(
       `eastbrookBuilding:${EASTBROOK_LAYOUT.weeklyVault.id}`,
     );
-    if (!micro || !vault) throw new Error('renderer fixture lost Eastbrook nodes');
+    if (!vault) throw new Error('renderer fixture lost Eastbrook nodes');
     const buildingGroups = EASTBROOK_LAYOUT.buildings.map((building) => {
       const group = view.group.getObjectByName(`eastbrookBuilding:${building.id}`);
       if (!group) throw new Error(`renderer fixture lost ${building.id}`);
@@ -1106,7 +1241,6 @@ describe('Eastbrook town renderer', () => {
       const camX = eyeX + Math.cos(angle) * orbitRadius;
       const camZ = eyeZ + Math.sin(angle) * orbitRadius;
       view.update(camX, eyeY + 4, camZ, eyeX, eyeY, eyeZ, 60, 0.05);
-      expect(micro.visible).toBe(true);
       expect(vault.visible).toBe(true);
       for (const group of buildingGroups) expect(group.visible).toBe(true);
     }
@@ -1138,7 +1272,15 @@ describe('Eastbrook town renderer', () => {
     // three meshes each, so the census is 30: 18 placed meshes, the 2 micro
     // batches, the monument's 2 and the Weekly Vault's 8 (the last two were
     // already inside the 45).
-    expect(meshes).toHaveLength(30);
+    // Re-pinned 2026-11-11 for the hand-built harbour lots: the 2 micro
+    // batches are no longer built (activeWorldStandsLiveTouchup in
+    // src/render/eastbrook_town.ts: the square's benches, stalls and fences
+    // are painted props the live-world document places) and the Weekly Vault
+    // is its round door alone, 3 meshes of the old 8 (activeWorldStandsLiveTouchup in
+    // src/render/eastbrook_weekly_vault.ts). So the census is 23: 18 placed
+    // meshes, the monument's 2 and the door's 3. The door then moved into the
+    // strong-house's own model (its `V_GreatDoor` object), so the census is 20.
+    expect(meshes).toHaveLength(20);
     const placedBuildings = EASTBROOK_LAYOUT.buildings.filter((building) =>
       isPlacedBuildingAsset(building.assetId),
     );
@@ -1171,14 +1313,15 @@ describe('Eastbrook town renderer', () => {
     const hallMeshes = meshesOf(
       view.group.getObjectByName('eastbrookBuilding:eastbrook_weekly_vault') as THREE.Object3D,
     );
-    expect(hallMeshes).toHaveLength(8);
-    expect(
-      hallMeshes.every((mesh) => (mesh.material as THREE.Material).type === 'MeshLambertMaterial'),
-    ).toBe(true);
+    // The vault keeps its slot and draws nothing of the town's own: the hall and its
+    // great round door are the strong-house the live-world document stands there.
+    expect(hallMeshes).toHaveLength(0);
     const microBatchMeshes = templateMeshes.filter(
       (mesh) => !monumentMeshes.includes(mesh) && !hallMeshes.includes(mesh),
     );
-    expect(microBatchMeshes).toHaveLength(2);
+    // Re-pinned 2026-11-11: no micro batch is built (see the census above), so
+    // the two checks below run over none until the town draws one again.
+    expect(microBatchMeshes).toHaveLength(0);
     // The template pipeline swaps to shared Lambert vertex-color materials on
     // Low. The placed clones keep their OWN authored GLB materials on every
     // tier (their colour is in the models' painted atlases, not vertex
@@ -1240,8 +1383,10 @@ describe('Eastbrook town renderer', () => {
     }
     expect(new Set(placedMeshes.map((mesh) => mesh.material)).size).toBe(18);
     // The same counts as the Standard build pinned above: the tier swaps
-    // materials, never meshes or shadow casters.
-    expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 30, shadowDraws: 23 });
+    // materials, never meshes or shadow casters. (Re-pinned 2026-11-11 with
+    // that build: 30 and 23 became 23 and 17, then 20 and 14 when the vault's
+    // door moved into its model.)
+    expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 20, shadowDraws: 14 });
   });
 
   it('mirrors exactly the first real wall chord after each asymmetric gate socket', async () => {
@@ -1346,7 +1491,15 @@ describe('Eastbrook town renderer', () => {
       const emissiveMaterials = meshesOf(view.group)
         .filter((mesh) => mesh.name.includes('Emissive'))
         .map((mesh) => mesh.material as THREE.Material);
-      expect(emissiveMaterials.length).toBeGreaterThan(0);
+      // Re-pinned 2026-11-11 for the hand-built harbour lots: the one emissive
+      // town-material mesh the view drew was the micro emissive batch (the
+      // stalls' lanterns and crystals), and the town batch no longer draws
+      // the square dressing (activeWorldStandsLiveTouchup in
+      // src/render/eastbrook_town.ts), so the view holds none and the floor
+      // of at least one is an exact none. NOTHING BELOW RUNS while that
+      // holds: the checks stand for the day the town draws an emissive mesh
+      // again, when this count fails and goes back to a floor.
+      expect(emissiveMaterials.length).toBe(0);
       for (const material of emissiveMaterials) {
         expect(material.userData.vertexColorEmissive).toBe(
           vertexColorEmissiveInternalsForTest.programCacheKey,
@@ -1376,7 +1529,12 @@ describe('Eastbrook town renderer', () => {
     // Re-pinned 2026-08: only the 2 micro batches remain after the harbor
     // move's wall retirement (d19aa33f76,
     // docs/design/eastbrook-revamp/site-plan.md).
-    expect(staticBatches).toHaveLength(2);
+    // Re-pinned 2026-11-11 for the hand-built harbour lots: the town batch no
+    // longer draws the square's benches, stalls and yard fences
+    // (activeWorldStandsLiveTouchup in src/render/eastbrook_town.ts), which were
+    // the whole micro batch, so no static batch is left. The two culls below
+    // RUN OVER NONE while that holds: the count fails the day a batch returns.
+    expect(staticBatches).toHaveLength(0);
     view.update(1000, 5, 1000, 1000, 5, 1000, 100, 1);
     expect(staticBatches.every((mesh) => !mesh.visible)).toBe(true);
     view.update(0, 5, 0, 0, 5, 0, 100, 1);
@@ -1409,13 +1567,16 @@ describe('Eastbrook town renderer', () => {
     } finally {
       setActiveWorldContent(null);
     }
-    // and the shipped world, which promotes nothing, keeps the town-drawn hall
+    // and the shipped world, which promotes nothing, keeps the vault's slot under its own
+    // name with nothing of the town's drawn in it: the hall and its great round door are the
+    // strong-house the live-world document stands on the same spot
+    // (activeWorldStandsLiveTouchup in src/render/eastbrook_weekly_vault.ts).
     const shipped = eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
     expect(
       meshesOf(
         shipped.group.getObjectByName('eastbrookBuilding:eastbrook_weekly_vault') as THREE.Object3D,
       ),
-    ).toHaveLength(8);
+    ).toHaveLength(0);
   });
 
   it('stands the square dressing down for a document that owns it as placements', () => {
@@ -1439,10 +1600,13 @@ describe('Eastbrook town renderer', () => {
     } finally {
       setActiveWorldContent(null);
     }
+    // Re-pinned 2026-11-11 for the hand-built harbour lots: the shipped world
+    // stands the dressing down as well now (activeWorldStandsLiveTouchup in
+    // src/render/eastbrook_town.ts: the live-world document places painted
+    // benches, stalls and fences on the same spots), so it builds no micro
+    // opaque batch either, where it used to be the one that kept it.
     const shipped = eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
-    expect(shipped.group.getObjectByName('eastbrookTownMicroOpaqueBatch')).toBeInstanceOf(
-      THREE.Mesh,
-    );
+    expect(shipped.group.getObjectByName('eastbrookTownMicroOpaqueBatch')).toBeUndefined();
   });
 
   it('keeps the indoor camera to every walk-in building it stands, and drops the rooms with it', () => {
@@ -1608,19 +1772,25 @@ describe('Eastbrook repeated placement triangle budget', () => {
         .length * 12,
     );
     // The six shipped models, one instance each, measured off the files above.
+    // Re-pinned 2026-11-11 for the hand-built harbour lots: the six rows name
+    // the lots under /models/tidehold/harbour/ now (src/sim/eastbrook_layout.ts),
+    // each counted off its own shipped file, room and furniture included
+    // (14,161, 5,291, 12,844, 3,857, 7,210 and 2,765 on the release models,
+    // 46,128 between them).
     const placedRows = budget.assets.filter((asset) => isPlacedBuildingAsset(asset.assetUrl));
     expect(
       Object.fromEntries(placedRows.map((asset) => [asset.assetUrl, asset.trianglesPerInstance])),
     ).toEqual({
-      '/models/tidehold/bank.glb': 14_161,
-      '/models/tidehold/smithy.glb': 5_291,
-      '/models/tidehold/tavern.glb': 12_844,
-      '/models/tidehold/hall.glb': 3_857,
-      '/models/tidehold/shop_a.glb': 7_210,
-      '/models/tidehold/house_b.glb': 2_765,
+      '/models/tidehold/harbour/bank.glb': 9_222,
+      '/models/tidehold/harbour/smithy.glb': 6_319,
+      '/models/tidehold/harbour/tavern.glb': 11_521,
+      // (6_021 before the chapel got its lancets, rose window and open belfry)
+      '/models/tidehold/harbour/hall.glb': 6_386,
+      '/models/tidehold/harbour/shop_a.glb': 7_422,
+      '/models/tidehold/harbour/house_b.glb': 5_719,
     });
     expect(placedRows.every((asset) => asset.instances === 1)).toBe(true);
-    expect(placedRows.reduce((sum, asset) => sum + asset.repeatedTriangles, 0)).toBe(46_128);
+    expect(placedRows.reduce((sum, asset) => sum + asset.repeatedTriangles, 0)).toBe(46_589);
     // Re-minted 2026-08: the 26 retired wall instances took 5,356 triangles
     // with them in the harbor move (d19aa33f76,
     // docs/design/eastbrook-revamp/site-plan.md), then the owner's Galecrest
@@ -1656,13 +1826,28 @@ describe('Eastbrook repeated placement triangle budget', () => {
     // reasoning, and the two levers left unpulled, are on `hardCeiling` in
     // src/render/eastbrook_town.ts. The 33,000 target is unchanged and is now
     // missed by a wide margin rather than a narrow one.
-    expect(budget.assetTriangles).toBe(56_347);
+    // Re-pinned 2026-11-11 for the hand-built harbour lots, every figure
+    // counted off the shipped files: the six lots are 46,224 triangles where
+    // the release models were 46,128 (+96), and the yard fence was rebuilt at
+    // its own path, 92 triangles where it was 208, on its three instances
+    // (-348), so the aggregate moves 56,347 to 56,095. The Weekly Vault is its
+    // round door alone, so the procedural share moves 4,572 to 2,572
+    // (WEEKLY_VAULT_TRIANGLES in src/render/eastbrook_weekly_vault.ts) and the
+    // runtime total 60,919 to 58,667, further under the unchanged 64,000
+    // ceiling. The stall, bench and fence rows still count their layout
+    // instances (3,948 triangles between them) although the town batch stands
+    // them down (activeWorldStandsLiveTouchup in src/render/eastbrook_town.ts),
+    // which keeps this total an upper bound on what the town draws. The chapel
+    // then got its lancets, rose window and open belfry (+365): 56,460 and
+    // 59,032. The vault's round door then moved into the strong-house's own model, so
+    // the town draws nothing procedural: the share moves 2,572 to 0 and the total to 56,460.
+    expect(budget.assetTriangles).toBe(56_460);
     expect(budget.maximumFoundationTriangles).toBe(0);
-    expect(budget.proceduralTriangles).toBe(4_572);
+    expect(budget.proceduralTriangles).toBe(0);
     expect(budget.maximumRuntimeTriangles).toBe(
       budget.assetTriangles + budget.maximumFoundationTriangles + budget.proceduralTriangles,
     );
-    expect(budget.maximumRuntimeTriangles).toBe(60_919);
+    expect(budget.maximumRuntimeTriangles).toBe(56_460);
     expect(budget.hardCeiling).toBe(64_000);
     expect(
       budget.maximumRuntimeTriangles,

@@ -6,12 +6,13 @@ furniture reads right next to you). One storey for players, the common room open
 hammerbeam roof. Original work for this game: the plan, the model and its palette were authored
 here from a written brief, and it wears the painted town's own hand-painted maps; reference
 captures of classic inns were studied for mood and proportion only and never entered the build.
-The model was rebuilt in the painted world style (the team's painted world style guide), in the
-Fenrire look of the painted Fenbridge buildings beside it: the same plan, footprint, floors, seats
-and colliders, raised wall by wall in Blender as one settled, hand-built structure, at about two
-thirds of the triangles of the modelled build it replaced, its common room lined with an oak
-wainscot under plaster and the bare timbers that carry its roof, and dressed with some forty
-painted models (below).
+The model was rebuilt in the painted world style (the team's painted world style guide): the
+same plan, footprint, floors, seats and colliders, raised wall by wall in Blender as one settled,
+hand-built structure, at about two thirds of the triangles of the modelled build it replaced, its
+common room lined with an oak wainscot under plaster and the bare timbers that carry its roof,
+and dressed with some forty painted models (below). When Fenbridge's buildings became the
+hand-built painted kit's, its rubble, slates and oak were repainted in that kit's look
+(`scripts/assets/mirefen_tavern/kit_maps.mjs`) so it still stands as one of the town's own.
 
 ## Where and what
 
@@ -186,11 +187,13 @@ painted models (below).
   `inn_lights.py` the lights, `inn_grounds.py` the grounds and `tavern_dog.py` the dog, all on the
   hand-built kit `inn_kit.py`; `build.mjs` validates, fingerprints and compresses it). It can be
   raised wall by wall in a live Blender session too (`build_tavern.preview`). Vertex-coloured, and
-  painted like the town's painted buildings: each face wears one of the painted town's
-  hand-painted tiling maps in the Fenrire look the painted Fenbridge buildings beside it wear
-  (`tavern_texture.py`, `textures.json`, `tex/`: the Fenrire maps, the stone, oak and slates
-  lifted to draw as Fenbridge's do), at the town kit's repeat at the scale Fenbridge stands its
-  inn, laid once per smooth sheet (`tavern_texture.lay_sheet`: the faces of one solid and
+  painted like the town's painted buildings: each face wears a hand-painted tiling map
+  (`tavern_texture.py`, `textures.json`, `tex/`). Outside it stands in the look of the hand-built
+  painted kit Fenbridge's buildings wear now (`kit_maps.mjs`: the kit's own rubble and slates for
+  its moss set, and the tavern's oak regraded to the kit's red oak a shade darker); its limewash,
+  boards, dressed stone and cloth are the Fenrire maps it always wore, kept because the common
+  room looked better with them than with the kit's when the two were stood side by side. Every
+  map lies at the repeat the tavern was built with, laid once per smooth sheet (`tavern_texture.lay_sheet`: the faces of one solid and
   material that meet smoothly wear one projection, so a wall's faces share their plane's across
   parts and solids, the tower's drum and hat are laid round, and timber runs along its grain), so
   the map runs on across every bow and joint with no cut. Indoors the rubble wears the plain

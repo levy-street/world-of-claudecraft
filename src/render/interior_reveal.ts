@@ -38,6 +38,10 @@ export interface InteriorSpec {
    *  player arrives on it (SPACEY, 2026-09-11: "the assets on the floors
    *  should always load when the player is in the castle"). */
   keepStoreys?: boolean;
+  /** The model has no G_H2 group: its whole outer shell is one mesh (see
+   *  isRevealShellName), and that shell is what hides. For the hand-built
+   *  harbour lots, whose room is a mesh of its own under the shell. */
+  shell?: boolean;
 }
 
 export const INTERIOR_BUILDINGS: Readonly<Record<string, InteriorSpec>> = {
@@ -99,8 +103,41 @@ export const INTERIOR_BUILDINGS: Readonly<Record<string, InteriorSpec>> = {
   // in the sky. Same reason as the castle above.
 };
 
+// The hand-built harbour lots (scripts/assets/eastbrook_houses/lots.py), which every
+// town stands in its own colour set (/models/tidehold/harbour, harbour_moss, ...). A set
+// re-paints the same geometry, so one row per model serves them all. Each lot is two
+// meshes: the outer shell (walls, upper storey and roof in one piece) and the room with
+// its furniture, whose faces all look inward. From inside, hiding the shell alone opens
+// the room to the camera, the dollhouse the G_H2 convention gives the older models.
+// A volume is the lot's room in the model's own yards (build.py writes each lot's room to
+// tmp/eastbrook_houses/lots.json as its first air box), from the ground line to the
+// ceiling. Not registered, for the reasons given above for the models they replace: the
+// chapel (`hall`: the camera stays under its nine yard ceiling) and the cottages, which
+// are sealed; nor the guild hall, which never had a reveal.
+const HARBOUR_LOT = /^\/models\/tidehold\/harbour(?:_[a-z]+)?\/([a-z_]+)\.glb$/;
+const HARBOUR_INTERIORS: Readonly<Record<string, InteriorSpec>> = {
+  tavern: { shell: true, volumes: [{ x0: -9.35, x1: 9.35, y0: 0, y1: 5.25, z0: -5.85, z1: 5.85 }] },
+  tavern_b: {
+    shell: true,
+    volumes: [{ x0: -12.35, x1: 12.35, y0: 0, y1: 5.25, z0: -6.85, z1: 6.85 }],
+  },
+  bank: { shell: true, volumes: [{ x0: -8.35, x1: 8.35, y0: 0, y1: 5.45, z0: -5.6, z1: 5.6 }] },
+  shop_a: { shell: true, volumes: [{ x0: -4.85, x1: 4.85, y0: 0, y1: 4.25, z0: -3.55, z1: 3.55 }] },
+  shop_b: { shell: true, volumes: [{ x0: -4.05, x1: 4.05, y0: 0, y1: 4.25, z0: -3.85, z1: 3.85 }] },
+  smithy: { shell: true, volumes: [{ x0: -4.85, x1: 4.85, y0: 0, y1: 4.85, z0: -3.85, z1: 3.85 }] },
+};
+
 export function interiorSpecFor(path: string): InteriorSpec | null {
-  return INTERIOR_BUILDINGS[path] ?? null;
+  const listed = INTERIOR_BUILDINGS[path];
+  if (listed) return listed;
+  const lot = HARBOUR_LOT.exec(path);
+  return (lot && HARBOUR_INTERIORS[lot[1]]) || null;
+}
+
+/** Whether a node is a lot's outer shell: the kit names it `<model>_L0` and the room
+ *  `<model>_INT_L0` (scripts/assets/eastbrook_houses/kit.py finish). */
+export function isRevealShellName(name: string): boolean {
+  return /_L0$/.test(name) && !/_INT_L0$/.test(name);
 }
 
 /** 0 = outside, 1 = inside on the ground storey, 2 = inside above the split,

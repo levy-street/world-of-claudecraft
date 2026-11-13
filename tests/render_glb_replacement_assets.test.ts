@@ -619,8 +619,12 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
 
     const assetPath = path.join(publicDir, assetUrl.replace(/^\//, ''));
     const binary = readFileSync(assetPath).toString('latin1');
+    // The painted chest (scripts/assets/eastbrook_houses/props.py chest, written over
+    // this path by build_props.py and shipped by optimise.mjs): the kit's trim sheet as
+    // one KTX2 map and a meshopt stream, inside the release chest's 100 KB.
     expect(statSync(assetPath).size).toBeLessThanOrEqual(100 * 1024);
     expect(binary).toContain('EXT_meshopt_compression');
+    expect(binary).toContain('KHR_texture_basisu');
     expect(binary).not.toContain('KHR_draco_mesh_compression');
   });
 
@@ -643,9 +647,11 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
 
     expect(root.listAnimations()).toHaveLength(0);
     expect(root.listSkins()).toHaveLength(0);
-    expect(root.listTextures()).toHaveLength(0);
-    expect(root.listMaterials()).toHaveLength(4);
-    expect(primitives).toHaveLength(4);
+    // the painted chest is one mesh in the kit's trim sheet (the release chest was four
+    // texture-free materials on the town atlas): measured off the shipped file
+    expect(root.listTextures().map((texture) => texture.getName())).toEqual(['trim']);
+    expect(root.listMaterials().map((material) => material.getName())).toEqual(['eh_trim']);
+    expect(primitives).toHaveLength(1);
 
     const nativeHeight = bounds.max[1] - bounds.min[1];
     const runtimeScale = bankerChestPreloadInternalsForTest.targetHeight / nativeHeight;
@@ -677,7 +683,7 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
       triangleCount += (primitive.getIndices()?.getCount() ?? position.getCount()) / 3;
     }
 
-    expect(triangleCount).toBe(2048);
+    expect(triangleCount).toBe(144);
   });
 
   it('pins the Eastbrook Grand Armoury source fingerprint inputs and order', () => {

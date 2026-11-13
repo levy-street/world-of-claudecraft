@@ -206,12 +206,12 @@ const QUAY_PAD_EAST_EDGE = -85;
 describe('the six placed Eastbrook buildings', () => {
   it('are the painted Tidehold set, one building each', () => {
     expect(BUILDINGS.map((building) => [building.id, building.assetId, building.kind])).toEqual([
-      ['eastbrook_bank', '/models/tidehold/bank.glb', 'house'],
-      ['eastbrook_smithy', '/models/tidehold/smithy.glb', 'house'],
-      ['eastbrook_inn', '/models/tidehold/tavern.glb', 'inn'],
-      ['eastbrook_chapel', '/models/tidehold/hall.glb', 'chapel'],
-      ['eastbrook_apothecary', '/models/tidehold/shop_a.glb', 'house'],
-      ['eastbrook_quay_cottage', '/models/tidehold/house_b.glb', 'house'],
+      ['eastbrook_bank', '/models/tidehold/harbour/bank.glb', 'house'],
+      ['eastbrook_smithy', '/models/tidehold/harbour/smithy.glb', 'house'],
+      ['eastbrook_inn', '/models/tidehold/harbour/tavern.glb', 'inn'],
+      ['eastbrook_chapel', '/models/tidehold/harbour/hall.glb', 'chapel'],
+      ['eastbrook_apothecary', '/models/tidehold/harbour/shop_a.glb', 'house'],
+      ['eastbrook_quay_cottage', '/models/tidehold/harbour/house_b.glb', 'house'],
     ]);
     for (const building of BUILDINGS) {
       expect(isPlacedBuildingAsset(building.assetId), building.id).toBe(true);
@@ -271,7 +271,7 @@ describe('the six placed Eastbrook buildings', () => {
     // the inn's nudge is straight back from its door (local +Z)
     const inn = BUILDINGS.find((building) => building.id === 'eastbrook_inn');
     if (!inn) throw new Error('missing inn');
-    const tavern = theirs('tidehold/tavern');
+    const tavern = theirs('tidehold/harbour/tavern');
     const back = toModelAxes(inn, { x: tavern.x, z: tavern.z });
     expect(Math.abs(back.x)).toBeLessThan(0.01);
     expect(back.z).toBeCloseTo(-3.5, 1);
@@ -286,10 +286,13 @@ describe('the six placed Eastbrook buildings', () => {
   });
 
   it('stands each building at its own grand size: five yards of door for a 2.6 yd player', () => {
-    // Every building stands at the town's 1.3, which already clears a door of
-    // about five yards (the bank 5.7, the smithy 5.2, the inn 5.7, the chapel
-    // 6.5), except the apothecary's shop: its door is 3.25 yd at authored
-    // size, so it stands at 1.5 (4.9 yd), as Highwatch's counting house does.
+    // Every building stands at the town's 1.3 and the apothecary's shop at 1.5,
+    // as Highwatch's counting house does: the sizes the release models needed
+    // to clear a door of about five yards. A hand-built lot's doorway is the
+    // painted door surround, so its head stands 479/341 of its clear width
+    // over the floor (scripts/assets/eastbrook_houses/lots.py door_top). At
+    // these sizes that is a door of 5.1 yd on the smithy, 5.5 on the inn, 5.8
+    // on the chapel, 4.7 on the bank and 3.8 on the apothecary's shop.
     expect(BUILDINGS.map((building) => [building.id, building.placement.scale])).toEqual([
       ['eastbrook_bank', 1.3],
       ['eastbrook_smithy', 1.3],
@@ -298,12 +301,15 @@ describe('the six placed Eastbrook buildings', () => {
       ['eastbrook_apothecary', 1.5],
       ['eastbrook_quay_cottage', 1.3],
     ]);
+    // measured off each lot's baked rows (data/asset_collision_overrides.json):
+    // the lowest box over the doorway, above the threshold deck, at authored size
     const doorHeads: Record<string, number> = {
-      eastbrook_bank: 4.4,
-      eastbrook_smithy: 4.0,
-      eastbrook_inn: 4.4,
-      eastbrook_chapel: 5.0,
-      eastbrook_apothecary: 3.25,
+      // 1.4047 times each lot's door width (scripts/assets/eastbrook_houses/lots.py)
+      eastbrook_bank: 3.77,
+      eastbrook_smithy: 3.93,
+      eastbrook_inn: 4.21,
+      eastbrook_chapel: 5.03,
+      eastbrook_apothecary: 3.26,
     };
     for (const building of BUILDINGS.filter((candidate) => candidate.walkIn)) {
       const baked = BAKED[assetIdOf(building)];
@@ -359,18 +365,40 @@ describe('the six placed Eastbrook buildings', () => {
     expect(EASTBROOK_LAYOUT.weeklyVault.rot).toBe(placed?.rotY);
   });
 
-  it('reach across the whole model at the placed size, measured off the shipped file', () => {
+  it('reach over the ground each lot covers, with its height and size measured off the shipped file', () => {
     for (const building of BUILDINGS) {
       const bounds = boundsOf(building);
       const scale = building.placement.scale;
       const reach = rectOf(building, building.reach);
+      // The reach is the ground the building covers: the box the town cuts its
+      // terrain pads from (eastbrook_layout.ts padsOver). The hand-built lots
+      // stand on the release models' walls, so the records keep that ground
+      // where it was and the land under the town did not move; a lot's roof
+      // and jetty overhang it. It still holds the walls and every annex...
+      const parts: [string, Rect][] = [
+        ['walls', rectOf(building, building.footprint)],
+        ...building.annexes.map((annex): [string, Rect] => [annex.id, rectOf(building, annex)]),
+      ];
+      // (a part may stand exactly on the reach's edge: a hair of float slack)
+      const slack = 1e-6;
+      for (const [name, part] of parts) {
+        expect(part.x0, `${building.id} ${name} west`).toBeGreaterThanOrEqual(reach.x0 - slack);
+        expect(part.x1, `${building.id} ${name} east`).toBeLessThanOrEqual(reach.x1 + slack);
+        expect(part.z0, `${building.id} ${name} front`).toBeGreaterThanOrEqual(reach.z0 - slack);
+        expect(part.z1, `${building.id} ${name} back`).toBeLessThanOrEqual(reach.z1 + slack);
+      }
+      // ...and never runs a yard past the shipped model on any side, so it is
+      // still this building's own ground (measured: the inn's back, 0.98 yd)
       const measured: Rect = {
         x0: bounds.min[0] * scale,
         x1: bounds.max[0] * scale,
         z0: bounds.min[2] * scale,
         z1: bounds.max[2] * scale,
       };
-      expect(worstEdge(reach, measured), `${building.id} reach`).toBeLessThan(0.02);
+      expect(measured.x0 - reach.x0, `${building.id} reach west`).toBeLessThan(1);
+      expect(reach.x1 - measured.x1, `${building.id} reach east`).toBeLessThan(1);
+      expect(measured.z0 - reach.z0, `${building.id} reach front`).toBeLessThan(1);
+      expect(reach.z1 - measured.z1, `${building.id} reach back`).toBeLessThan(1);
       // the height the record reports is the part above the ground line
       expect(
         Math.abs(
@@ -425,9 +453,10 @@ describe('the six placed Eastbrook buildings', () => {
           const hi = side.along === 'z' ? box.z1 : box.x1;
           covered += Math.max(0, Math.min(hi, side.hi) - Math.max(lo, side.lo));
         }
-        // a door or a shopfront opens the wall line, never most of it
+        // a door or a shopfront opens the wall line, never most of it (the chapel's
+        // five-yard doors take 3.58 yd of its 12 yd gable front, the widest opening)
         expect(covered / (side.hi - side.lo), `${building.id} ${side.name} wall`).toBeGreaterThan(
-          0.8,
+          0.75,
         );
       }
       // the box sits well inside the reach on at least one side: it is not the eaves
@@ -609,7 +638,23 @@ describe('placed building collision in the built-in world', () => {
       const front = building.frontStandingPoint;
       expect(isBlocked(WORLD_SEED, front.x, front.z), `${building.id} front`).toBe(false);
       for (const annex of building.annexes) {
-        expect(isBlocked(WORLD_SEED, annex.center.x, annex.center.z), annex.id).toBe(true);
+        const middle = annex.center;
+        if (annex.id === 'eastbrook_smithy:forge_shelter') {
+          // the hand-built smithy keeps its forge shelter an open deck under a
+          // roof (scripts/assets/eastbrook_houses/lots.py smithy): a body
+          // steps up onto its boards, a third of a yard over the ground, and
+          // only the forge stack standing on them is solid
+          expect(isBlocked(WORLD_SEED, middle.x, middle.z), annex.id).toBe(false);
+          expect(
+            groundHeight(middle.x, middle.z, WORLD_SEED) -
+              terrainHeight(middle.x, middle.z, WORLD_SEED),
+            `${annex.id} deck`,
+          ).toBeCloseTo(0.3, 1);
+          const stack = localToWorld(anchor, building.placement.rotation, 13.7, 3.1);
+          expect(isBlocked(WORLD_SEED, stack.x, stack.z), `${annex.id} forge stack`).toBe(true);
+          continue;
+        }
+        expect(isBlocked(WORLD_SEED, middle.x, middle.z), annex.id).toBe(true);
       }
       // the back wall still stands, straight across from the door
       const back = localToWorld(anchor, building.placement.rotation, door.x, walls.z1 - 0.1);
@@ -705,8 +750,9 @@ describe('walking into the walk-in Eastbrook buildings', () => {
       expect(body.pos.y - terrainHeight(body.pos.x, body.pos.z, WORLD_SEED)).toBeGreaterThan(0.25);
 
       // and back out: turned round, the same door lets them down onto the street
+      // (three seconds: the door's stair reaches two yards and more out from the wall)
       body.facing = Math.atan2(start.x - body.pos.x, start.z - body.pos.z);
-      for (let i = 0; i < 20 * 2; i++) {
+      for (let i = 0; i < 20 * 3; i++) {
         Object.assign(meta.moveInput, { forward: true });
         sim.tick();
       }
@@ -899,7 +945,6 @@ describe('the ground under the placed buildings', () => {
       setActiveWorldContent(null);
     }
     expect(shaped).toBeGreaterThan(1000);
-    if (process.env.PRINT_STEEP) console.log(tooSteep.join(' | '));
     expect(tooSteep).toEqual([]);
   });
 

@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { MeshoptDecoder } from 'meshoptimizer';
 import type * as THREE from 'three';
+import { CompressedTexture, RGBA_S3TC_DXT1_Format, SRGBColorSpace } from 'three';
 import { type GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { ditherFadeUniform, setDitherFadeEnabledForTest } from '../src/render/occluder_dither_fade';
@@ -32,7 +33,8 @@ import {
 } from '../src/sim/transport_schedule';
 
 // The moored transport ship view (src/render/transport_ship.ts) over the shipped
-// Eastbrook ferry GLB: the static merge (a handful of draws per level), the live
+// Eastbrook ferry GLB: the static merge (a handful of draws per level), the painted
+// maps the wood, fittings and cloth wear under their vertex-colour tint, the live
 // sails, masts and flags, the level-of-detail switch, the idle clip and its
 // reduced-motion freeze, and the sail/mast fade when one stands between the eye
 // and the chase camera.
@@ -43,6 +45,18 @@ const Z = -54.8;
 const BASE_Y = -4.3;
 const internals = transportShipInternalsForTest;
 
+/**
+ * A stand-in for three's KTX2 loader (Node has no transcoder): every painted map the ferry
+ * carries (KHR_texture_basisu) arrives as a small compressed texture, so the painter's
+ * handling of the maps is the real one.
+ */
+const stubKtx2Loader = {
+  load(_url: string, onLoad: (texture: THREE.Texture) => void): void {
+    const level = { data: new Uint8Array(8), width: 4, height: 4 };
+    onLoad(new CompressedTexture([level], 4, 4, RGBA_S3TC_DXT1_Format));
+  },
+};
+
 async function loadGlb(): Promise<GLTF> {
   await MeshoptDecoder.ready;
   const bytes = readFileSync(path.join(__dirname, '..', 'public', URL.replace(/^\//, '')));
@@ -50,8 +64,18 @@ async function loadGlb(): Promise<GLTF> {
     bytes.byteOffset,
     bytes.byteOffset + bytes.byteLength,
   ) as ArrayBuffer;
-  const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
-  return new Promise<GLTF>((resolve, reject) => loader.parse(ab, '', resolve, reject));
+  // the loader reads an embedded image through `self.URL` (a browser global; Node has URL)
+  const scope = globalThis as { self?: unknown };
+  const hadSelf = 'self' in scope;
+  if (!hadSelf) scope.self = globalThis;
+  const loader = new GLTFLoader()
+    .setMeshoptDecoder(MeshoptDecoder)
+    .setKTX2Loader(stubKtx2Loader as unknown as Parameters<GLTFLoader['setKTX2Loader']>[0]);
+  try {
+    return await new Promise<GLTF>((resolve, reject) => loader.parse(ab, '', resolve, reject));
+  } finally {
+    if (!hadSelf) delete scope.self;
+  }
 }
 
 function build(): TransportShipView {
@@ -118,6 +142,48 @@ describe('transport ship view', () => {
       const m = mesh.material as THREE.MeshStandardMaterial;
       expect(m.vertexColors, mesh.name).toBe(true);
       expect(mesh.geometry.getAttribute('color'), mesh.name).toBeDefined();
+    }
+  });
+
+  it('paints the wood, the fittings and the cloth: a map on the material, uv on the mesh', () => {
+    const view = build();
+    const maps = new Set<THREE.Texture>();
+    let painted = 0;
+    let plain = 0;
+    for (const mesh of meshesUnder(view.group)) {
+      const m = mesh.material as THREE.MeshStandardMaterial;
+      const uv = mesh.geometry.getAttribute('uv');
+      // the map and the texture coordinate travel together, through the merge too
+      expect(uv !== undefined, mesh.name).toBe(m.map !== null);
+      // the vertex colour is the only tint: the material stays white over its map
+      expect(m.color.getHex(), mesh.name).toBe(0xffffff);
+      if (!m.map) {
+        plain++;
+        continue;
+      }
+      painted++;
+      maps.add(m.map);
+      expect(m.map.colorSpace, mesh.name).toBe(SRGBColorSpace);
+      expect(uv.itemSize, mesh.name).toBe(2);
+      expect(uv.count, mesh.name).toBe(mesh.geometry.getAttribute('position').count);
+      // dequantized by the merge and by nothing else: plain floats either way
+      expect(Number.isFinite(uv.getX(0)) && Number.isFinite(uv.getY(0)), mesh.name).toBe(true);
+    }
+    // three maps in all: planking, fittings, canvas; the rope and the glow wear none
+    expect(maps.size).toBe(3);
+    expect(painted).toBeGreaterThan(plain);
+    expect(plain).toBeGreaterThan(0);
+    for (const mesh of meshesUnder(view.group)) {
+      const m = mesh.material as THREE.MeshStandardMaterial;
+      if (internals.isGlowMaterial(m)) expect(m.map, mesh.name).toBeNull();
+    }
+    // every level of detail is painted, and the sails and masts with them
+    for (const name of [...internals.lodNames, ...internals.sailNames, ...internals.mastNames]) {
+      const node = view.group.getObjectByName(name) as THREE.Object3D;
+      const worn = meshesUnder(node).filter(
+        (mesh) => (mesh.material as THREE.MeshStandardMaterial).map,
+      );
+      expect(worn.length, name).toBeGreaterThan(0);
     }
   });
 

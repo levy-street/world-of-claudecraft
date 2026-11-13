@@ -13,9 +13,11 @@ import { OutputGradePass } from '../../src/render/post_output_grade';
 type Kind = 'standard' | 'lambert' | 'phong' | 'toon';
 const KINDS: readonly Kind[] = ['standard', 'lambert', 'phong', 'toon'];
 // Read BEFORE cel_shading.ts loads. Since the genshin overhaul (8bff2cec638)
-// the look is on by default (`?cel=off` opts out), and the module installs the
-// ramp at import, so a static import would hand this file a patched "stock"
-// chunk. Nothing imported above patches either chunk.
+// the look is on by default (`?cel=off` opts out) and the module installs what
+// the session asks for at import, so a static import could hand this file a
+// patched "stock" chunk. Nothing imported above patches either chunk. The light
+// ramp itself is opt-in (`?cellight=on`): the default look keeps the ink and
+// leaves the directional loop stock (CEL_SHADING_DEFAULTS.light is false).
 const STOCK_CHUNK = THREE.ShaderChunk.lights_fragment_begin;
 const STOCK_OPAQUE = THREE.ShaderChunk.opaque_fragment;
 const { installCelShading, syncCelMaterialInk } = await import('../../src/render/cel_shading');
@@ -100,8 +102,12 @@ function compileAll(renderer: THREE.WebGLRenderer): void {
 }
 
 describe('cel light ramp on a real WebGL context', () => {
-  it('installs the ramp by default on a page with no cel flag', () => {
-    expect(DEFAULT_INSTALL_CHUNK).not.toBe(STOCK_CHUNK);
+  it('leaves the directional loop stock by default on a page with no cel flag', () => {
+    expect(CEL_SHADING_DEFAULTS.light).toBe(false);
+    expect(DEFAULT_INSTALL_CHUNK).toBe(STOCK_CHUNK);
+    // and installing the defaults again patches nothing
+    expect(installCelShading(CEL_SHADING_DEFAULTS)).toBe(false);
+    expect(THREE.ShaderChunk.lights_fragment_begin).toBe(STOCK_CHUNK);
   });
 
   it('bands the sun where the stock chunk falls off with NL', () => {
@@ -116,7 +122,9 @@ describe('cel light ramp on a real WebGL context', () => {
     expect(stockHigh).toBeCloseTo(0.9, 2);
     expect(stockMid).toBeCloseTo(0.5, 2);
 
-    expect(installCelShading(CEL_SHADING_DEFAULTS)).toBe(true);
+    // the ramp is the `?cellight=on` session: the defaults with the light arm on
+    expect(installCelShading({ ...CEL_SHADING_DEFAULTS, light: true })).toBe(true);
+    expect(THREE.ShaderChunk.lights_fragment_begin).not.toBe(STOCK_CHUNK);
     const celErrors: string[] = [];
     const cel = makeRenderer(celErrors);
     const celHigh = lambertLevel(cel, 0.9);

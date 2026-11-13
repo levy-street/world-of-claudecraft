@@ -6,10 +6,11 @@ import { EASTBROOK_LAYOUT, localToWorld } from '../sim/eastbrook_layout';
 import { surfaceMat } from './gfx';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { type OccluderFadeMat, occluderFadeRecordFor } from './occluder_fade';
-import { activeWorldPromoted } from './promoted_scenery_gate';
+import { activeWorldPromoted, activeWorldStandsLiveTouchup } from './promoted_scenery_gate';
 
-// Pinned against the generated geometry by weekly_vault_building.test.ts.
-export const WEEKLY_VAULT_TRIANGLES = 4572;
+// What the town itself draws for the vault in the shipped world: nothing. The hall there is
+// the hand-built strong-house, great round door included (weekly_vault_building.test.ts).
+export const WEEKLY_VAULT_TRIANGLES = 0;
 
 /** Bakes one flat color into the geometry's vertex colors so the hall rides the
  *  town's material contract (a white material times the vertex color, the idiom
@@ -122,6 +123,16 @@ export function buildEastbrookWeeklyVault(groundAt: (x: number, z: number) => nu
   // lists stay aligned, but the slot is an empty group with nothing to fade.
   if (activeWorldPromoted('eastbrookVault')) {
     group.name = 'eastbrookWeeklyVaultStoodDown';
+    return { group, hideTarget: vaultHideTarget(group, mats, y) };
+  }
+  // In the built-in world the hall is the hand-built strong-house its live touch-up
+  // document stands on this spot (scripts/assets/eastbrook_houses/houses.py vault_house),
+  // and its great round door is part of that model (the `V_GreatDoor` object, built from
+  // the same painted parts as every door in town). The town keeps the slot and the record
+  // collider and draws nothing. Any other world still gets the town's own ashlar hall below.
+  if (activeWorldStandsLiveTouchup()) {
+    group.position.set(layout.x, y, layout.z);
+    group.rotation.y = layout.rot;
     return { group, hideTarget: vaultHideTarget(group, mats, y) };
   }
   // Substantial buried footing covers the site's shallow grade without floating edges.

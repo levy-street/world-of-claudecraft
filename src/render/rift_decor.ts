@@ -29,6 +29,22 @@ const DECOR_MODELS: Record<string, { url: string; height: number }> = {
   bone_throne: { url: '/models/props/bone_throne.glb', height: 2.2 },
 };
 
+/** The two palaces (Dawnhold Castle, the Last Keep) author their decor with
+ *  the citadel's keys, so the sim's colliders and spots are shared; they draw
+ *  each key as its own painted castle piece instead (a hearth for the forge,
+ *  a carved throne for the bone one), fitted to the same height. A key with no
+ *  row here keeps the citadel's model. */
+const PALACE_DECOR_MODELS: Record<string, { url: string; height: number }> = {
+  infernal_brazier: { url: '/models/biome/kcas_decor_brazier.glb', height: 1.6 },
+  infernal_altar: { url: '/models/biome/kcas_decor_altar.glb', height: 1.2 },
+  hell_forge: { url: '/models/biome/kcas_decor_hearth.glb', height: 2.2 },
+  hanging_cage: { url: '/models/biome/kcas_decor_cage.glb', height: 2.4 },
+  bone_pile: { url: '/models/biome/kcas_decor_rubble.glb', height: 0.7 },
+  infernal_statue: { url: '/models/biome/kcas_decor_statue.glb', height: 2.6 },
+  slag_cauldron: { url: '/models/biome/kcas_decor_cauldron.glb', height: 1.3 },
+  bone_throne: { url: '/models/biome/kcas_decor_throne.glb', height: 2.2 },
+};
+
 /** The arcane flame the rune pylons already use, re-tinted for the citadel's
  * braziers and the pentagram's five candles. Zero new assets. */
 const FLAME_URL = '/models/props/rift_flame.glb';
@@ -49,9 +65,12 @@ function markShared(gltf: Gltf): void {
 
 /** Load every model an authored floor's decor needs (once per process). A model
  * that fails to load resolves to null and its decor entry is simply skipped, so a
- * missing asset never breaks the floor. */
-export async function ensureInfernalDecorAssets(): Promise<void> {
+ * missing asset never breaks the floor. `palace` adds the painted castle pieces
+ * a palace draws in place of the citadel's: the citadel and the rift floors
+ * never draw those, so they never fetch them. */
+export async function ensureInfernalDecorAssets(palace = false): Promise<void> {
   const urls = [FLAME_URL, ...Object.values(DECOR_MODELS).map((m) => m.url)];
+  if (palace) urls.push(...Object.values(PALACE_DECOR_MODELS).map((m) => m.url));
   await Promise.all(
     urls.map(async (url) => {
       if (cache.has(url)) return;
@@ -164,14 +183,16 @@ function buildFlame(height: number, color: number): THREE.Object3D | null {
  * coordinates; the caller positions the group at the instance origin). `glow` adds
  * the interior's additive torch decal, so brazier light matches the room's torches.
  *
- * Call `ensureInfernalDecorAssets()` first; entries whose model is missing are
- * skipped rather than throwing. */
+ * Call `ensureInfernalDecorAssets()` first (with `palace` set for a palace, the
+ * same flag as here); entries whose model is missing are skipped rather than
+ * throwing. */
 export function buildInfernalDecor(
   group: THREE.Group,
   decor: readonly AuthoredDecor[],
   torch: { flame: number; light: number },
   glow: (x: number, z: number, color: number, y?: number, scale?: number) => void,
   liftAt?: (x: number, z: number) => number,
+  palace = false,
 ): void {
   for (const d of decor) {
     const y0 = liftAt?.(d.x, d.z) ?? 0;
@@ -203,7 +224,10 @@ export function buildInfernalDecor(
       group.add(rug);
       continue;
     }
-    const def = DECOR_MODELS[d.key];
+    // A palace draws its own piece for the key, and falls back to the
+    // citadel's when that piece did not load.
+    const painted = palace ? PALACE_DECOR_MODELS[d.key] : undefined;
+    const def = painted && cache.get(painted.url) ? painted : DECOR_MODELS[d.key];
     const gltf = def ? cache.get(def.url) : null;
     if (!def || !gltf) continue;
     const model = fitted(gltf, def.height * (d.scale ?? 1));

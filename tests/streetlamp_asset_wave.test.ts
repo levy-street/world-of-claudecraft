@@ -21,141 +21,176 @@ const SHIPPING_EXTENSIONS = [
   'KHR_texture_basisu',
 ] as const;
 
+// `kit` rows are the hand-built painted lamps (scripts/assets/eastbrook_houses/props_lamps.py
+// zone_lamp, built over the release path on quarter-size maps): they wear the kit's own
+// sheets, so their texture and material counts are their own, and every one burns a flame
+// behind glass. The other rows are the release's Tripo fixtures, kept where they looked
+// better than the kit's lamp, and in the Drakelands.
 const ACCEPTED_ASSETS = [
   {
     name: 'frostveil_ice_spire',
     height: 3.2,
     sha256: '607eaf953ec4454d0317ec0c0b490a2ba9096da4fc74d9e86caaa408ef05c5f4',
     materials: 1,
+    textures: 3,
     glass: false,
     socket: false,
     flame: false,
+    kit: false,
   },
   {
     name: 'streetlamp_amberfall_crystal',
     height: 5.5,
-    sha256: '0bc09ff610e99db7df715dbf5101e8517fd7e8d0278e2372755475be797c446f',
-    materials: 3,
+    sha256: 'c501b2402d74408fb6d84abb6c5a6665b22cc3240a5ae37f0c8a3ecbcd309d89',
+    materials: 4,
+    textures: 3,
     glass: true,
     socket: true,
-    flame: false,
+    flame: true,
+    kit: true,
   },
   {
     name: 'streetlamp_drakelands_brazier',
     height: 5.5,
     sha256: '9fe8cf7385bc3c794cbaf109b01a864392592e7c371d020c3114d14b070a654c',
     materials: 2,
+    textures: 3,
     glass: false,
     socket: true,
     flame: true,
+    kit: false,
   },
   {
     name: 'streetlamp_eastbrook_civic',
     height: 5.5,
-    sha256: '3b5160907428faeae3ad8379a8f325337ffd9c8c1f208a8598f6982bf20415e0',
-    materials: 3,
+    sha256: '892cc4a627f540bdfd88de2a57ab0016a0eaa46c3a66ef28b953cc8e15203ec4',
+    materials: 4,
+    textures: 3,
     glass: true,
     socket: true,
     flame: true,
+    kit: true,
   },
   {
     name: 'streetlamp_evergarden_flower',
     height: 5.5,
-    sha256: '84a3827897d07736c75e74e1392aa02c1af79c49466bf71a8f8c795fbac100a9',
-    materials: 3,
+    sha256: '463e9617c70fe98d1f236760dc2ce34d21bf87dbfac6d8c1d11b4e6bc1921950',
+    materials: 5,
+    textures: 4,
     glass: true,
     socket: true,
-    flame: false,
+    flame: true,
+    kit: true,
   },
   {
     name: 'streetlamp_farshore_coral',
     height: 5.5,
     sha256: '0033541a6120a4da5b17362f0dc37dfabdd6a8b7d1e20e3c2dd7f0cd67f79c11',
     materials: 3,
+    textures: 3,
     glass: true,
     socket: true,
     flame: false,
+    kit: false,
   },
   {
     name: 'streetlamp_frostveil_icicle',
     height: 5.5,
-    sha256: '85ac6e8f01443791b6ad253b0bae5bf810f1ce3340c4df43e8fcb01f07d041a0',
-    materials: 3,
+    sha256: '71648b51d8ba8d276ec9d37628570b7a5c6bc7c33dbc852955e5d3c2f39be9d6',
+    materials: 5,
+    textures: 4,
     glass: true,
     socket: true,
-    flame: false,
+    flame: true,
+    kit: true,
   },
   {
     name: 'streetlamp_galecrest_mast',
     height: 5.5,
-    sha256: '463796a266ae7a3e1992e02ea0de0a88db301b5c737c9606b20ef76d0c3b639f',
+    sha256: '13e199cf7ccd6a114faaf3b30ee6ec2d171485f300134619523b441cd29d1e5b',
     materials: 3,
+    textures: 2,
     glass: true,
     socket: true,
     flame: true,
+    kit: true,
   },
   {
     name: 'streetlamp_mirefen_witchflame',
     height: 5.5,
     sha256: 'bfb8da17a055a0b9cc6f53db6850b1ff41d378ac18467fd22afe71350fca769a',
     materials: 3,
+    textures: 3,
     glass: true,
     socket: true,
     flame: true,
+    kit: false,
   },
   {
     name: 'streetlamp_nightbloom_moonflower',
     height: 5.5,
-    sha256: '8e71c9717f93d0ff4a6e9ce9502741d9ca4c324a1f58a42984c926586481ef89',
-    materials: 3,
+    sha256: 'b29ab475d85234ba0ece99e15bd543139aab78452a6ab77def39891b05d5187a',
+    materials: 4,
+    textures: 3,
     glass: true,
     socket: true,
-    flame: false,
+    flame: true,
+    kit: true,
   },
   {
     name: 'streetlamp_palmreach_totem',
     height: 5.5,
-    sha256: 'a9555fe643d670e19b89c2036d678549c85a1859b6bacb7aa7d59e26252843ec',
-    materials: 2,
-    glass: false,
+    sha256: '0f387548729d1fee213fb7749723853709d9435b9ba32b72e75f791d6ee0afc0',
+    materials: 3,
+    textures: 2,
+    glass: true,
     socket: true,
     flame: true,
+    kit: true,
   },
   {
     name: 'streetlamp_thornpeak_beacon',
     height: 5.5,
     sha256: '2ee14635a078fa2cb10a8bd181877e63ec979797a51d81889b3dc1397de057a3',
     materials: 3,
+    textures: 3,
     glass: true,
     socket: true,
     flame: true,
+    kit: false,
   },
   {
     name: 'streetlamp_veiled_crystal',
     height: 5.5,
-    sha256: 'e54add53c52729a6219a2882c21ce02ea0c3d9cacb9948a4ab7c789e692bbb32',
-    materials: 3,
+    sha256: 'e75867d3820fb951ba0e9db2ec4c7ccb50a751844e3563fcb380a9d01ebf9e9b',
+    materials: 4,
+    textures: 3,
     glass: true,
     socket: true,
-    flame: false,
+    flame: true,
+    kit: true,
   },
   {
     name: 'streetlamp_willowfen_reed',
     height: 5.5,
-    sha256: '2ade5a40188423148f7c6c96da94a32919494c269c98f625dbe80c5f98f2a97c',
+    sha256: 'fec11b43a0af526618bdbf0f5ea377e8ee2abec534152b03f29736dc11be3a78',
     materials: 3,
+    textures: 2,
     glass: true,
     socket: true,
     flame: true,
+    kit: true,
   },
   {
     name: 'streetlamp_wraithwood_ghost',
     height: 5.5,
-    sha256: 'd6cf06f1a113d167a5a6fe6a37ccd089732be1c051ac49b67191ac1afb1b4c30',
-    materials: 3,
+    sha256: '0fe1ffd69277032fb0040f4855b57b8e40f4a12246bdfe08bc25d002a447d09d',
+    materials: 4,
+    textures: 3,
     glass: true,
     socket: true,
-    flame: false,
+    flame: true,
+    kit: true,
   },
 ] as const;
 
@@ -180,7 +215,7 @@ function glbJson(bytes: Buffer): GlbJson {
   ) as GlbJson;
 }
 
-describe('accepted Tripo streetlamp and Frostveil ice asset wave', () => {
+describe('accepted streetlamp and Frostveil ice asset wave', () => {
   it('keeps the runtime preload catalog exhaustive and tier independent', () => {
     const runtimeUrls = [
       ...Object.values(streetlampPreloadInternalsForTest.assetDefs).map((def) => def.url),
@@ -307,30 +342,22 @@ describe('accepted Tripo streetlamp and Frostveil ice asset wave', () => {
         `/media/models/props/${accepted.name}.${accepted.sha256.slice(0, 12)}.glb`,
       );
       expect(CREDITS).toContain(
-        `| Generated prop model (${accepted.name}) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |`,
+        accepted.kit
+          ? `| Hand-built prop model (${accepted.name}) | World of ClaudeCraft | Project-made: hand-built painted kit (\`scripts/assets/eastbrook_houses/\``
+          : `| Generated prop model (${accepted.name}) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |`,
       );
 
       const json = glbJson(bytes);
       expect([...(json.extensionsUsed ?? [])].sort()).toEqual(SHIPPING_EXTENSIONS);
       expect([...(json.extensionsRequired ?? [])].sort()).toEqual(SHIPPING_EXTENSIONS);
       expect(json.extensions ?? {}).not.toHaveProperty('KHR_lights_punctual');
-      expect(json.images).toEqual([
-        {
+      expect(json.images).toEqual(
+        Array.from({ length: accepted.textures }, () => ({
           bufferView: expect.any(Number),
           mimeType: 'image/ktx2',
           name: expect.any(String),
-        },
-        {
-          bufferView: expect.any(Number),
-          mimeType: 'image/ktx2',
-          name: expect.any(String),
-        },
-        {
-          bufferView: expect.any(Number),
-          mimeType: 'image/ktx2',
-          name: expect.any(String),
-        },
-      ]);
+        })),
+      );
       expect(json.animations ?? []).toHaveLength(0);
       expect(json.skins ?? []).toHaveLength(0);
       expect(json.cameras ?? []).toHaveLength(0);
@@ -339,7 +366,7 @@ describe('accepted Tripo streetlamp and Frostveil ice asset wave', () => {
       const root = document.getRoot();
       expect(root.listScenes()).toHaveLength(1);
       expect(root.listMeshes()).toHaveLength(1);
-      expect(root.listTextures()).toHaveLength(3);
+      expect(root.listTextures()).toHaveLength(accepted.textures);
 
       // Illumination is AUTHORED: a lamp carries its housing material plus the
       // named emitter (and pane, where the design has glass). The names are the
@@ -398,7 +425,7 @@ describe('accepted Tripo streetlamp and Frostveil ice asset wave', () => {
       expect((bounds.min[2] + bounds.max[2]) * 0.5, `${accepted.name} Z center`).toBeCloseTo(0, 3);
     }
 
-    expect(totalBytes).toBe(1_457_460);
+    expect(totalBytes).toBe(1_525_052);
     expect(totalBytes).toBeLessThanOrEqual(1.5 * 1024 * 1024);
   });
 });

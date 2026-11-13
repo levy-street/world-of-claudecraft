@@ -28,7 +28,7 @@ if (typeof window !== 'undefined') HIGHWATCH_TOWN.registerPreloads();
 
 export type HighwatchTownView = PlacedTownView;
 
-/** What the town adds to its own models: the guild's localized name on its gateway's board. */
+/** What the town adds to its own models: the guild's localized name on the board over its doors. */
 export function highwatchBuildingExtras(buildingId: string): THREE.Object3D[] {
   return buildingId === 'highwatch_guild' ? [buildHighwatchGuildSign()] : [];
 }

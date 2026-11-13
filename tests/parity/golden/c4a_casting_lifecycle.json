@@ -15,8 +15,8 @@
     "cancelCast fishing arm via dealDamage (FISHING_CAST_ID, not pushback)",
     "multi-class casters: mage/priest/warlock"
   ],
-  "draws": 2032,
-  "drawDigest": "6b97ec84",
+  "draws": 2030,
+  "drawDigest": "52ceb839",
   "frames": [
     {
       "tick": 0,
@@ -1550,30 +1550,30 @@
       "state": "1d7014ae",
       "events": "741638a5",
       "rng": {
-        "draws": 1697,
-        "digest": "08e8726f"
+        "draws": 1696,
+        "digest": "3f3dea58"
       }
     },
     {
       "tick": 205,
       "time": 10.25,
       "nextId": 1015,
-      "state": "433c586d",
-      "events": "a7333adc",
+      "state": "8fe4b24f",
+      "events": "f48478b8",
       "rng": {
-        "draws": 1739,
-        "digest": "de15aed7"
+        "draws": 1737,
+        "digest": "f65b1a38"
       }
     },
     {
       "tick": 206,
       "time": 10.3,
       "nextId": 1015,
-      "state": "6f91c13f",
+      "state": "1d90d1fb",
       "events": "a4062ea6",
       "rng": {
-        "draws": 1742,
-        "digest": "6e918777"
+        "draws": 1740,
+        "digest": "b6d1cc87"
       },
       "label": "priest-silence-cancel",
       "players": [
@@ -1604,7 +1604,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 133,
-            "damageTaken": 105
+            "damageTaken": 119
           },
           "craftDaily": {},
           "craftSkills": {},
@@ -1895,7 +1895,7 @@
           "fiveSecondRule": 0.8,
           "gcdRemaining": 0.7,
           "healPower": 29,
-          "hp": 19895,
+          "hp": 19881,
           "id": 1011,
           "inCombat": true,
           "kind": "player",
@@ -2134,55 +2134,55 @@
       "tick": 210,
       "time": 10.5,
       "nextId": 1015,
-      "state": "dbc7732e",
+      "state": "b61ff4a6",
       "events": "26d29560",
       "rng": {
-        "draws": 1780,
-        "digest": "47774984"
+        "draws": 1778,
+        "digest": "aaeb039f"
       }
     },
     {
       "tick": 215,
       "time": 10.75,
       "nextId": 1015,
-      "state": "14d327ea",
+      "state": "98348d78",
       "events": "9d27e0d7",
       "rng": {
-        "draws": 1808,
-        "digest": "7a1c4437"
+        "draws": 1806,
+        "digest": "0da5ecbe"
       }
     },
     {
       "tick": 220,
       "time": 11,
       "nextId": 1015,
-      "state": "49ec2026",
+      "state": "c4f88a56",
       "events": "741638a5",
       "rng": {
-        "draws": 1853,
-        "digest": "5d56aadd"
+        "draws": 1852,
+        "digest": "cc28865b"
       }
     },
     {
       "tick": 225,
       "time": 11.25,
       "nextId": 1015,
-      "state": "5765be3a",
+      "state": "4c99a1a0",
       "events": "741638a5",
       "rng": {
-        "draws": 1891,
-        "digest": "0b383e3b"
+        "draws": 1890,
+        "digest": "102c4107"
       }
     },
     {
       "tick": 228,
       "time": 11.4,
       "nextId": 1015,
-      "state": "f424a94e",
+      "state": "7a3d08b4",
       "events": "aef40fc0",
       "rng": {
-        "draws": 1918,
-        "digest": "64d95088"
+        "draws": 1919,
+        "digest": "473ccde6"
       },
       "label": "warlock-channel-pushback",
       "players": [
@@ -2213,7 +2213,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 133,
-            "damageTaken": 105
+            "damageTaken": 119
           },
           "craftDaily": {},
           "craftSkills": {},
@@ -2508,7 +2508,7 @@
           "fallStartY": -0.410344,
           "fiveSecondRule": 1.9,
           "healPower": 29,
-          "hp": 19895,
+          "hp": 19881,
           "id": 1011,
           "inCombat": true,
           "kind": "player",
@@ -2761,33 +2761,33 @@
       "tick": 230,
       "time": 11.5,
       "nextId": 1015,
-      "state": "4d0520d3",
+      "state": "e431bcb9",
       "events": "741638a5",
       "rng": {
-        "draws": 1938,
-        "digest": "b5bb98f7"
+        "draws": 1939,
+        "digest": "30ca8b06"
       }
     },
     {
       "tick": 235,
       "time": 11.75,
       "nextId": 1015,
-      "state": "05645635",
+      "state": "1a490559",
       "events": "98e65e44",
       "rng": {
-        "draws": 1982,
-        "digest": "9267b462"
+        "draws": 1980,
+        "digest": "f6f35b0d"
       }
     },
     {
       "tick": 236,
       "time": 11.8,
       "nextId": 1015,
-      "state": "001e5475",
+      "state": "713cd0c7",
       "events": "032f06ca",
       "rng": {
-        "draws": 1986,
-        "digest": "9cbea9bb"
+        "draws": 1983,
+        "digest": "07607153"
       },
       "label": "warlock-fishing-cancel",
       "players": [
@@ -2818,7 +2818,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 135,
-            "damageTaken": 105
+            "damageTaken": 119
           },
           "craftDaily": {},
           "craftSkills": {},
@@ -3113,7 +3113,7 @@
           "fallStartY": -0.410344,
           "fiveSecondRule": 2.3,
           "healPower": 29,
-          "hp": 19895,
+          "hp": 19881,
           "id": 1011,
           "inCombat": true,
           "kind": "player",
@@ -3359,22 +3359,22 @@
       "tick": 240,
       "time": 12,
       "nextId": 1015,
-      "state": "a4f8b89b",
+      "state": "05753115",
       "events": "741638a5",
       "rng": {
-        "draws": 2018,
-        "digest": "126e7c37"
+        "draws": 2015,
+        "digest": "ffd54c97"
       }
     },
     {
       "tick": 241,
       "time": 12.05,
       "nextId": 1015,
-      "state": "aaeb44eb",
+      "state": "e0d0b1df",
       "events": "741638a5",
       "rng": {
-        "draws": 2032,
-        "digest": "6b97ec84"
+        "draws": 2030,
+        "digest": "52ceb839"
       },
       "label": "final",
       "players": [
@@ -3405,7 +3405,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 135,
-            "damageTaken": 105
+            "damageTaken": 119
           },
           "craftDaily": {},
           "craftSkills": {},
@@ -3700,7 +3700,7 @@
           "fallStartY": -0.410344,
           "fiveSecondRule": 2.55,
           "healPower": 29,
-          "hp": 19895,
+          "hp": 19881,
           "id": 1011,
           "inCombat": true,
           "kind": "player",

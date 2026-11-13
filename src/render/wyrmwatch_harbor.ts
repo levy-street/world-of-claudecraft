@@ -17,7 +17,12 @@
 // material) programs join the props material prewarm (wyrmwatchHarborPrewarmParts), so
 // a harbor first seen after the curtain links nothing in a live frame. The materials are
 // the surface family's vertex-coloured standard/lambert (vertex_colour_glb_parts.ts,
-// shared with the route markers: the same programs). Nothing here runs per frame.
+// shared with the route markers: the same programs), PAINTED: the model's wood, fittings
+// and stone each carry a small base-colour map (the Eastbrook ferry's planking and
+// fittings, a rubble stone), which the converter passes on with the meshes' `uv`, the
+// vertex colours tinting it. The maps ride the materials from the first template on, so
+// the prewarm twins link the mapped programs (the house shell's fading clones carry the
+// same maps). Nothing here runs per frame.
 
 import * as THREE from 'three';
 import {

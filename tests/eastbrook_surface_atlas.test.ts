@@ -180,7 +180,14 @@ describe('Eastbrook shared surface atlas', () => {
     // replaced the eleven kit shells (src/render/eastbrook_placed_building.ts).
     // They bind their own painted maps, never the atlas, so the town's count
     // holds at 1.
-    const expectedBindings = [1, 1, 1];
+    // Re-pinned 2026-11-11 for the hand-built harbour lots: the town batch no
+    // longer draws the square's benches, stalls and yard fences
+    // (activeWorldStandsLiveTouchup in src/render/eastbrook_town.ts; the painted
+    // props the live-world document places stand on the same spots), and they
+    // were the whole eastbrookTownMicroOpaqueBatch, the town's last atlas
+    // binding: 1 became 0. The town root still records the atlas it was built
+    // with, and the Armoury and the banker chest still bind it once each.
+    const expectedBindings = [0, 1, 1];
 
     expect(maps.length).toBeGreaterThan(0);
     expect(new Set(maps)).toEqual(new Set([atlas]));

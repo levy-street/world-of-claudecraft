@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
+  isPaintedKitProp,
   isSharedKitTextureUrl,
   kitTextureKey,
   resetSharedKitTextures,
@@ -61,6 +62,53 @@ describe('shared kit textures', () => {
     expect(isSharedKitTextureUrl('/media/models/tidehold/tavern_b.3fa2c1d0e9ab.glb')).toBe(true);
     expect(isSharedKitTextureUrl('/models/tidehold/house_c.parts.glb')).toBe(true);
     expect(isSharedKitTextureUrl('/models/tidehold/castle_b.glb')).toBe(false);
+  });
+
+  it('takes the painted kit: its buildings by folder, its props by their materials', () => {
+    // every file of a harbour look folder and of the placed houses is the kit's
+    expect(isSharedKitTextureUrl('/models/tidehold/harbour/tavern.glb')).toBe(true);
+    expect(isSharedKitTextureUrl('/models/tidehold/harbour_moss/hall.half.glb')).toBe(true);
+    expect(isSharedKitTextureUrl('/models/tidehold/harbour_alpine/guild.quarter.glb')).toBe(true);
+    expect(isSharedKitTextureUrl('/media/models/tidehold/harbour/bank.3fa2c1d0e9ab.glb')).toBe(
+      true,
+    );
+    expect(isSharedKitTextureUrl('/models/eastbrook_houses/oriel_house.glb')).toBe(true);
+    // a prop folder holds other art too, so the URL alone never says yes
+    expect(isSharedKitTextureUrl('/models/props/well.glb')).toBe(false);
+    const named = (name: string): THREE.Group => {
+      const g = sceneWith(bc7(16, 5));
+      ((g.children[0] as THREE.Mesh).material as THREE.Material).name = name;
+      return g;
+    };
+    expect(isPaintedKitProp(named('eh_trim'), '/models/props/well.glb')).toBe(true);
+    expect(
+      isPaintedKitProp(named('eh_stone'), '/media/models/biome/kcas_wall.0123456789ab.glb'),
+    ).toBe(true);
+    expect(isPaintedKitProp(named('eh_trim'), '/models/quest/freight_wagon.glb')).toBe(true);
+    // a sculpted prop in the same folder, and the kit's name outside its folders
+    expect(isPaintedKitProp(named('tripo_material_1'), '/models/props/stag_shrine.glb')).toBe(
+      false,
+    );
+    expect(isPaintedKitProp(named('eh_trim'), '/models/creatures/wolf.glb')).toBe(false);
+  });
+
+  it('shares one sheet across two painted props and leaves a sculpted prop its own', () => {
+    const well = sceneWith(bc7(16, 9));
+    const cart = sceneWith(bc7(16, 9));
+    const shrine = sceneWith(bc7(16, 9));
+    for (const g of [well, cart])
+      ((g.children[0] as THREE.Mesh).material as THREE.Material).name = 'eh_trim';
+    ((shrine.children[0] as THREE.Mesh).material as THREE.Material).name = 'tripo_material_1';
+    expect(shareKitTextures(well, '/models/props/well.glb')).toBe(0);
+    expect(shareKitTextures(cart, '/models/props/cart.glb')).toBe(1);
+    expect(mapOf(cart, 0)).toBe(mapOf(well, 0));
+    const own = mapOf(shrine, 0);
+    expect(shareKitTextures(shrine, '/models/props/stag_shrine.glb')).toBe(0);
+    expect(mapOf(shrine, 0)).toBe(own);
+    // and a building of the kit joins the same pool
+    const tavern = sceneWith(bc7(16, 9));
+    expect(shareKitTextures(tavern, '/models/tidehold/harbour/tavern.glb')).toBe(1);
+    expect(mapOf(tavern, 0)).toBe(mapOf(well, 0));
   });
 
   it('keys by content, shape and sampling', () => {

@@ -49,7 +49,12 @@ import {
   grassPatchRadius,
   grassPatchSeed,
 } from './grass_patch';
-import { type InteriorSpec, interiorSpecFor, revealState } from './interior_reveal';
+import {
+  type InteriorSpec,
+  interiorSpecFor,
+  isRevealShellName,
+  revealState,
+} from './interior_reveal';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { applyMaterialFinishes, type MaterialSlot, materialSlots } from './material_finishes';
 import { mergeStaticMeshes } from './mesh_merge';
@@ -511,6 +516,15 @@ const STOREY_GROUP_NAMES: readonly string[] = ['G_H1', 'G_H2', 'G_H3', 'G_INT*',
 /** Furniture stays undrawn until someone is this close to the building's edge
  *  (or inside it). The market is never split: it is open to the street. */
 const INTERIOR_DRAW_RANGE = 50;
+
+/** The one-piece outer shell of a hand-built lot's clone (interior_reveal.ts). */
+function revealShellOf(model: THREE.Object3D): THREE.Object3D | null {
+  let shell: THREE.Object3D | null = null;
+  model.traverse((o) => {
+    if (!shell && isRevealShellName(o.name)) shell = o;
+  });
+  return shell;
+}
 
 /** The furniture groups of an interior building clone (G_INT_L0, G_INT_H1...). */
 function interiorGroups(model: THREE.Object3D): THREE.Object3D[] {
@@ -1437,7 +1451,8 @@ export class PlacedAssetsView {
           model,
           spec: revealSpec,
           h1: model.getObjectByName('G_H1') ?? null,
-          h2: model.getObjectByName('G_H2') ?? null,
+          // a harbour lot has no roof group: its one-piece shell hides instead
+          h2: model.getObjectByName('G_H2') ?? (revealSpec.shell ? revealShellOf(model) : null),
           h3: model.getObjectByName('G_H3') ?? null,
           state: 0,
           ints: interiorGroups(model),

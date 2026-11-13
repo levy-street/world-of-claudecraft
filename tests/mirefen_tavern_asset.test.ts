@@ -64,16 +64,16 @@ const GLB = path.join(ROOT, MIREFEN_TAVERN_ASSET.target);
 /** Each texture tier's file: its bytes and sha256 (the model first). */
 const SHIPPED: Record<MirefenTavernTier, { bytes: number; sha256: string }> = {
   full: {
-    bytes: 4925048,
-    sha256: 'bae959685a39caba2f939168544b06a52e952c0139b8052899bdffb870a4beee',
+    bytes: 4828792,
+    sha256: '5b5e53044ef8f6bd4bc69c3665ce54eab0897a2cefabae73ec28da830f8d9d79',
   },
   half: {
-    bytes: 2748272,
-    sha256: 'a2b207dc9b853fd9e33bbd7283cb65c7479003408c581293f5302c96290d865d',
+    bytes: 2723228,
+    sha256: '220258525a36433d16c7f92faa8b960761011d832a4acac85f3a80a61da8cbaa',
   },
   quarter: {
-    bytes: 2129852,
-    sha256: 'c2dc972d582a50609229d252d8ed61cb2e92ff343f3b946add37413d33732ceb',
+    bytes: 2121572,
+    sha256: '2589c02e50e0f28f9fde7255c56ffdea35dc78fc727990de58df81d03466bc1c',
   },
 };
 const TIERS = Object.keys(SHIPPED) as MirefenTavernTier[];
@@ -379,7 +379,9 @@ describe('mirefen tavern GLB', () => {
     const painted = MIREFEN_TAVERN_ASSET.painted;
     const normals = painted.filter((n) => TEXTURES.materials[n].normal).length;
     expect(root.listTextures()).toHaveLength(painted.length + normals);
-    expect(normals).toBe(6);
+    // (the kit's own rubble and slates are new paintings and carry no normal map:
+    // scripts/assets/mirefen_tavern/kit_maps.mjs)
+    expect(normals).toBe(4);
     expect(root.listSkins()).toHaveLength(0);
     expect(root.listAnimations()).toHaveLength(0);
     // the vertex colours on every face; UVs on a painted face only
@@ -707,8 +709,8 @@ describe('mirefen tavern GLB', () => {
   it('ships its texture tiers: the same model with every map at half and a quarter of its size', () => {
     const base = readGlb(GLB);
     const baseImages = images(base);
-    // the seven tiling colour maps, the props' atlas and the six normal maps
-    expect(baseImages).toHaveLength(14);
+    // the seven tiling colour maps, the props' atlas and the four normal maps
+    expect(baseImages).toHaveLength(12);
     for (const tier of TIERS.filter((t) => t !== 'full')) {
       const file = readGlb(tierFile(tier));
       expect(shape(file), tier).toBe(shape(base));

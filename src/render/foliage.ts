@@ -132,6 +132,8 @@ import {
   grassCardProgramCacheKey,
   grassCollapseBandFor,
 } from './grass_cap_collapse_core';
+import { cardFollowAt } from './grass_card_follow_core';
+import { grassCardTintRgb } from './grass_card_tint_core';
 import { createWorldGrassEdgeTaperContext, taperTuftScales } from './grass_edge_taper_core';
 import {
   attachGrassInteractionUniforms,
@@ -208,11 +210,15 @@ const GRASS_DENSITY_HIGH = 0.5;
 // per-biome bare/lush rules as the card tufts.
 export const GRASS_BIOME_DENSITY: Partial<Record<BiomeId, number>> = {
   frost: 0,
-  ember: 0, // the Drakelands are scorched waste: no blades in the cinders
+  // The Drakelands grow a thin, dry sward where their ground is grass (round Wyrmwatch and the
+  // gatewood); the cinder dunes and glass fields stay bare, since blades only root in soil
+  // the ground bake calls lush. Bare flat turf read as empty ground there.
+  ember: 0.85,
   haunt: 1.55,
-  // the Evergarden is mown lawn: no wild tufts, its flowers grow in the
-  // authored parterre beds instead (garden_parterre_core.ts)
-  garden: 0,
+  // The Evergarden's lawns are a full, even carpet of blades (its flowers grow in the
+  // authored parterre beds, garden_parterre_core.ts): a bare flat lawn read as empty ground,
+  // the barest stretch of the whole map, so the garden grows grass like every meadow.
+  garden: 1,
 };
 const GRASS_DENSITY_MULT_MAX = Math.max(1, ...Object.values(GRASS_BIOME_DENSITY));
 // Ground flowers never grow in these biomes (the Reach loses them with its
@@ -495,11 +501,7 @@ const GRASS_TINT: Record<BiomeId, number> = {
   garden: 0xd0eeb0, // mown lawn
   gale: 0xc0dc9e, // wind-silvered grass
 };
-// The cards are lit with up normals (see applyGrassShader), so no N.L
-// compensation is needed; match the 1.18 lift of the 3D blade carpet.
-const GRASS_TINT_GAIN: readonly [number, number, number] = [1.08, 1.0, 0.7];
-const tuftTintChannel = (ground: number, gain: number): number =>
-  Math.min(1, gain * (0.65 + 0.7 * ground));
+// (The lift itself, and the card's own colour on painted ground: grass_card_tint_core.ts.)
 const GRASS_ACCENT: Partial<Record<BiomeId, [number, number, number]>> = (() => {
   const vale = new THREE.Color(GRASS_TINT.vale);
   const out: Partial<Record<BiomeId, [number, number, number]>> = {};
@@ -1336,6 +1338,8 @@ const up = new THREE.Vector3(0, 1, 0);
 const v = new THREE.Vector3();
 const sv = new THREE.Vector3();
 const c = new THREE.Color();
+const cardTint: [number, number, number] = [1, 1, 1];
+const cardGain: [number, number, number] = [1, 1, 1];
 
 type MutableShadowVolume = {
   -readonly [K in keyof ShadowVolumeInput]: ShadowVolumeInput[K];
@@ -2895,7 +2899,7 @@ function buildGrassRing(
         if (insideAnyBuildingFootprint(activeContent.props.buildings, x, z, 0.85)) continue;
         // the stable yard is worked dirt; deck planks grow nothing through
         if (tuftBiome === 'gale' && (inStableYard(x, z) || onHarborDeck(x, z, seed))) continue;
-        // Dawnhold's bailey is paved wall to wall: no tuft, and so no flower
+        // Dawnhold's bailey is a mown castle green: no tuft card, and so no flower
         // anchor either (the anchors above are what bloom the garden pass)
         if (tuftBiome === 'garden' && inDawnholdBailey(x, z, 0.5)) continue;
         // the Willowfen grows no grass blades: each would-be tuft stays an
@@ -2910,11 +2914,8 @@ function buildGrassRing(
           im.setMatrixAt(n, m);
           const accent = GRASS_ACCENT[tuftBiome] ?? [1, 1, 1];
           groundGrassColorAt(x, z, seed, c);
-          c.setRGB(
-            tuftTintChannel(c.r, GRASS_TINT_GAIN[0] * accent[0]),
-            tuftTintChannel(c.g, GRASS_TINT_GAIN[1] * accent[1]),
-            tuftTintChannel(c.b, GRASS_TINT_GAIN[2] * accent[2]),
-          );
+          grassCardTintRgb(c.r, c.g, c.b, accent, cardTint, cardGain, cardFollowAt(x, z));
+          c.setRGB(cardTint[0], cardTint[1], cardTint[2]);
           // small enough to read as patches (the ground noise already
           // carries those) rather than per-tuft confetti
           c.offsetHSL(
@@ -2922,7 +2923,7 @@ function buildGrassRing(
             (hashAt(i, j, 4) - 0.5) * 0.04,
             (hashAt(i, j, 5) - 0.5) * 0.03,
           );
-          im.setColorAt(n, c);
+          im.setColorAt(n, c.setRGB(c.r * cardGain[0], c.g * cardGain[1], c.b * cardGain[2]));
           n++;
         }
         if (FLOWERLESS_BIOMES.has(tuftBiome)) continue;
@@ -3029,7 +3030,7 @@ function buildGrassRing(
             const fx = i * step + (hashAt(i + rep * 37, j, 15) - 0.5) * step * 1.5;
             const fz = j * step + (hashAt(i, j + rep * 37, 16) - 0.5) * step * 1.5;
             if (fx < minX || fx >= maxX || fz < minZ || fz >= maxZ) continue;
-            if (inDawnholdBailey(fx, fz, 0.5)) continue; // the paved parade ground
+            if (inDawnholdBailey(fx, fz, 0.5)) continue; // the mown castle green
             // beds and walk ribbons first, then the open-lawn meadow drifts
             let tint = parterreFlowerTintAt(fx, fz);
             if (tint < 0 && rep < 2) tint = gardenMeadowTintAt(fx, fz);

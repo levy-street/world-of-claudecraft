@@ -275,9 +275,9 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   crystalAmethystCluster: { url: '/models/props/crystal_amethyst_cluster.glb', kit: 'hollow' },
   crystalMoundCave: { url: '/models/props/crystal_mound_cave.glb', kit: 'hollow' },
   starHeartCrystal: { url: '/models/props/star_heart_crystal.glb', kit: 'hollow' },
-  kkWall: { url: '/models/dungeon/wall.glb', kit: 'dungeon' },
-  kkWallCracked: { url: '/models/dungeon/wall_cracked.glb', kit: 'dungeon' },
-  kkPillar: { url: '/models/dungeon/pillar.glb', kit: 'dungeon' },
+  kkWall: { url: '/models/biome/kcas_wall.glb', kit: 'kcas' },
+  kkWallCracked: { url: '/models/biome/kcas_wall_cracked.glb', kit: 'kcas' },
+  kkPillar: { url: '/models/biome/kcas_hall_pier.glb', kit: 'kcas' },
   // The Evergarden's built garden: KayKit Medieval Hexagon Pack buildings in
   // their green colorway (shipped by scripts/assets/specs/biome_packs.json,
   // authored at hex-tile scale so decorProps entries carry a scale) plus the
@@ -404,9 +404,9 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   kcasBannerRedShield: { url: '/models/biome/kcas_banner_red_shield.glb', kit: 'kcas' },
   kcasBannerRedTriple: { url: '/models/biome/kcas_banner_red_triple.glb', kit: 'kcas' },
   // the green colorway for Dawnhold (already-shipped dungeon-kit exports)
-  kcasBannerGreenA: { url: '/models/dungeon/banner_green.glb', kit: 'kcas' },
-  kcasBannerGreenShield: { url: '/models/dungeon/banner_shield_green.glb', kit: 'kcas' },
-  kcasBannerGreenTriple: { url: '/models/dungeon/banner_triple_green.glb', kit: 'kcas' },
+  kcasBannerGreenA: { url: '/models/biome/kcas_banner_green_a.glb', kit: 'kcas' },
+  kcasBannerGreenShield: { url: '/models/biome/kcas_banner_green_shield.glb', kit: 'kcas' },
+  kcasBannerGreenTriple: { url: '/models/biome/kcas_banner_green_triple.glb', kit: 'kcas' },
   kcasTorch: { url: '/models/biome/kcas_torch.glb', kit: 'kcas' },
   kcasTorchMounted: { url: '/models/biome/kcas_torch_mounted.glb', kit: 'kcas' },
   kcasRubbleLarge: { url: '/models/biome/kcas_rubble_large.glb', kit: 'kcas' },
@@ -424,36 +424,36 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   // buffet counters, candelabra, stores, and the chapel shrine. Instanced by
   // src/render/lastkeep_dressing.ts through this same registry (one preload
   // gate, one manifest surface).
-  kcasBedRoyal: { url: '/models/dungeon/bed_decorated.glb', kit: 'kcas' },
-  kcasBedDouble: { url: '/models/dungeon/bed_b_double.glb', kit: 'kcas' },
-  kcasBedSingle: { url: '/models/dungeon/bed_b_single.glb', kit: 'kcas' },
-  kcasBedBunk: { url: '/models/dungeon/bed_a_stacked.glb', kit: 'kcas' },
-  kcasBedCot: { url: '/models/dungeon/bed_a_single.glb', kit: 'kcas' },
-  kcasBedroll: { url: '/models/dungeon/bed_floor.glb', kit: 'kcas' },
-  kcasChair: { url: '/models/dungeon/chair.glb', kit: 'kcas' },
-  kcasStool: { url: '/models/dungeon/stool.glb', kit: 'kcas' },
-  kcasStoolRound: { url: '/models/dungeon/stool_round.glb', kit: 'kcas' },
-  kcasChest: { url: '/models/dungeon/chest.glb', kit: 'kcas' },
-  kcasTableRoundSmall: { url: '/models/dungeon/table_round_small.glb', kit: 'kcas' },
-  kcasTableRoundMedium: { url: '/models/dungeon/table_round_medium.glb', kit: 'kcas' },
+  kcasBedRoyal: { url: '/models/biome/kcas_bed_royal.glb', kit: 'kcas' },
+  kcasBedDouble: { url: '/models/biome/kcas_bed_double.glb', kit: 'kcas' },
+  kcasBedSingle: { url: '/models/biome/kcas_bed_single.glb', kit: 'kcas' },
+  kcasBedBunk: { url: '/models/biome/kcas_bed_bunk.glb', kit: 'kcas' },
+  kcasBedCot: { url: '/models/biome/kcas_bed_cot.glb', kit: 'kcas' },
+  kcasBedroll: { url: '/models/biome/kcas_bedroll.glb', kit: 'kcas' },
+  kcasChair: { url: '/models/biome/kcas_chair.glb', kit: 'kcas' },
+  kcasStool: { url: '/models/biome/kcas_stool.glb', kit: 'kcas' },
+  kcasStoolRound: { url: '/models/biome/kcas_stool_round.glb', kit: 'kcas' },
+  kcasChest: { url: '/models/biome/kcas_chest.glb', kit: 'kcas' },
+  kcasTableRoundSmall: { url: '/models/biome/kcas_table_round_small.glb', kit: 'kcas' },
+  kcasTableRoundMedium: { url: '/models/biome/kcas_table_round_medium.glb', kit: 'kcas' },
   // NOTE: the laid feast table (table_long_tablecloth_decorated_a) is already
   // registered above as kcasTableLong (/models/biome/kcas_table_long.glb), so
   // only the PLAIN clothed table is a new entry.
-  kcasTableCloth: { url: '/models/dungeon/table_long_tablecloth.glb', kit: 'kcas' },
-  kcasShelfLarge: { url: '/models/dungeon/shelf_large.glb', kit: 'kcas' },
-  kcasShelfSmall: { url: '/models/dungeon/shelf_small.glb', kit: 'kcas' },
-  kcasShelfBooks: { url: '/models/dungeon/shelf_small_books.glb', kit: 'kcas' },
-  kcasShelfCandles: { url: '/models/dungeon/shelf_small_candles.glb', kit: 'kcas' },
-  kcasBarA: { url: '/models/dungeon/bar_straight_a.glb', kit: 'kcas' },
-  kcasBarB: { url: '/models/dungeon/bar_straight_b.glb', kit: 'kcas' },
-  kcasBarC: { url: '/models/dungeon/bar_straight_c.glb', kit: 'kcas' },
-  kcasBartopMedium: { url: '/models/dungeon/bartop_a_medium.glb', kit: 'kcas' },
-  kcasCandleTriple: { url: '/models/dungeon/candle_triple.glb', kit: 'kcas' },
-  kcasCrateLarge: { url: '/models/dungeon/crate_large.glb', kit: 'kcas' },
-  kcasCrateSmall: { url: '/models/dungeon/crate_small.glb', kit: 'kcas' },
-  kcasCratesStacked: { url: '/models/dungeon/crates_stacked.glb', kit: 'kcas' },
-  kcasSwordShield: { url: '/models/dungeon/sword_shield.glb', kit: 'kcas' },
-  kcasShrine: { url: '/models/dungeon/shrine_candles.glb', kit: 'kcas' },
+  kcasTableCloth: { url: '/models/biome/kcas_table_cloth.glb', kit: 'kcas' },
+  kcasShelfLarge: { url: '/models/biome/kcas_shelf_large.glb', kit: 'kcas' },
+  kcasShelfSmall: { url: '/models/biome/kcas_shelf_small.glb', kit: 'kcas' },
+  kcasShelfBooks: { url: '/models/biome/kcas_shelf_books.glb', kit: 'kcas' },
+  kcasShelfCandles: { url: '/models/biome/kcas_shelf_candles.glb', kit: 'kcas' },
+  kcasBarA: { url: '/models/biome/kcas_bar_a.glb', kit: 'kcas' },
+  kcasBarB: { url: '/models/biome/kcas_bar_b.glb', kit: 'kcas' },
+  kcasBarC: { url: '/models/biome/kcas_bar_c.glb', kit: 'kcas' },
+  kcasBartopMedium: { url: '/models/biome/kcas_bartop.glb', kit: 'kcas' },
+  kcasCandleTriple: { url: '/models/biome/kcas_candle_triple.glb', kit: 'kcas' },
+  kcasCrateLarge: { url: '/models/biome/kcas_crate_large.glb', kit: 'kcas' },
+  kcasCrateSmall: { url: '/models/biome/kcas_crate_small.glb', kit: 'kcas' },
+  kcasCratesStacked: { url: '/models/biome/kcas_crates_stacked.glb', kit: 'kcas' },
+  kcasSwordShield: { url: '/models/biome/kcas_sword_shield.glb', kit: 'kcas' },
+  kcasShrine: { url: '/models/biome/kcas_shrine.glb', kit: 'kcas' },
   // The Drakelands castle bailey: KayKit Medieval Hexagon Pack buildings in the
   // red colorway (same drakelands_castle.json spec; hex-tile scale, so decor
   // entries carry scale like the other hex buildings).
@@ -674,6 +674,12 @@ const MAT_OVERRIDES: Record<
   'minerock:_defaultMat': { color: 0x6f7376 },
   // graveyard colormap is near-white; knock it toward weathered stone
   'grave:colormap': { color: 0xd2d2c8 },
+  // the hand-built painted kit (scripts/assets/eastbrook_houses/): its lanterns and its
+  // lit window panes burn warm, in whichever kit the prop is filed under
+  eh_parts_glow: { emissive: 0xff9a3c, emissiveIntensity: 1.5 },
+  eh_glass: { emissive: 0xffa348, emissiveIntensity: 1.2 },
+  // (a chapel's stained glass: the same panes in sapphire, lit cooler and lower)
+  eh_stained: { emissive: 0x6f9be0, emissiveIntensity: 0.8 },
   // muster camp: lantern glass and torch coals glow, the shardpike crystals shine cyan
   'muster:MusterGlow': { emissive: 0xff9a3c, emissiveIntensity: 1.6 },
   'muster:MusterCrystal': { emissive: 0x3fd8e8, emissiveIntensity: 1.3 },
@@ -862,12 +868,12 @@ function convertMaterial(
 // per material. Scoped to this list on purpose: the same kit's buildings read
 // correctly on the kit-wide routing today, and re-splitting all 65 of them
 // would churn the town's draw and material counts for no reported problem.
+// (The harbour boat and watch platform left this list when they became hand-painted
+// models with a material per surface.)
 const UV_SURFACE_SPLIT_KEYS: ReadonlySet<string> = new Set([
   'hexShipBlue',
   'hexShipRed',
   'hexShipGreen',
-  'hexBoat',
-  'hexWatchtower',
 ]);
 
 /** Detail family per UV group. Stone stays stone: on these models it is the
@@ -928,10 +934,7 @@ function splitGeometryBySurface(
 const UV_CELL_FIXES: Readonly<
   Record<string, { matchU: number; minV: number; maxV: number; shiftU: number }>
 > = Object.freeze({
-  // hull only: its cell is shared with nothing else on this mesh, and the
-  // blue cabin and grey fittings sample other columns, so they keep their
-  // authored colours.
-  seaBoatFishing: { matchU: 0.71868, minV: 0.77, maxV: 0.98, shiftU: 0.125 },
+  // (none today: the fishing boat that needed one is a hand-painted model now)
 });
 
 /** Apply the atlas-cell correction for a key, in place, if it has one. */

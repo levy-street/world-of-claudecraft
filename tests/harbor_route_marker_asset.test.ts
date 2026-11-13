@@ -19,18 +19,26 @@ import {
   HARBOR_ROUTE_MARKER_POST_RADIUS,
   HARBOR_ROUTE_MARKER_POST_TOP,
 } from '../src/sim/harbor_route_markers';
+import { expectPaintedMaps } from './helpers/painted_glb';
 
 // The shipped harbor route marker GLB (public/models/props/harbor_route_marker.glb), built
 // from the Blender source by scripts/assets/harbor_route_marker/build.mjs. Pins the bytes,
-// the named parts the runtime keeps or sheds per tier, the four texture-free materials,
+// the named parts the runtime keeps or sheds per tier, the four materials and their painted maps,
 // the triangle budget, the source fingerprint, the arrow's direction and the destination
 // plate the runtime writes on, and the agreement between the model's stamped numbers and
 // the sim's post collider. Re-pin the sha256 and size literals only with a re-export.
 
 const ROOT = path.join(__dirname, '..');
 const GLB = path.join(ROOT, HARBOR_ROUTE_MARKER_ASSET.target);
-const SHIPPED_SHA256 = '57f037b8b6b1b787cfc838dd9c5deaf9be8ce074dd043471a7de38df52caaf8f';
-const SHIPPED_BYTES = 51384;
+// Re-pinned for the PAINTED model: its wood, fittings and stone now wear the Eastbrook ferry's
+// maps (scripts/assets/eastbrook_ferry/paintlib.py), so the file carries KTX2 images and a
+// texture coordinate on every painted vertex. The geometry is the same triangle for triangle
+// (the triangle pins below did not move). Measured off the shipped file.
+const SHIPPED_SHA256 = '0ff6c2515005ffe795174d939efda1487bd2fb73dbcd63e5443cef1975bfade7';
+const SHIPPED_BYTES = 98960;
+/** The painted model stays a small download, and no one map weighs more than this. */
+const MAX_BYTES = 131072;
+const MAX_MAP_BYTES = 72 * 1024;
 /** Triangles per named part, from the Blender build report. */
 const TRIANGLES: Record<string, number> = {
   Post: 188,
@@ -79,6 +87,7 @@ describe('harbor route marker GLB', () => {
   it('ships the pinned bytes, in the media manifest', () => {
     const bytes = readFileSync(GLB);
     expect(bytes.length).toBe(SHIPPED_BYTES);
+    expect(bytes.length).toBeLessThan(MAX_BYTES);
     expect(createHash('sha256').update(bytes).digest('hex')).toBe(SHIPPED_SHA256);
     expect(bytes.toString('latin1')).toContain('EXT_meshopt_compression');
     expect(MEDIA_ASSETS['models/props/harbor_route_marker.glb']).toMatch(
@@ -132,10 +141,11 @@ describe('harbor route marker GLB', () => {
     });
   });
 
-  it('shares four texture-free, vertex-coloured materials, and nothing animates', () => {
+  it('shares four vertex-coloured materials, two of them painted, and nothing animates', () => {
     const materials = doc.getRoot().listMaterials();
     expect(materials.map((m) => m.getName()).sort()).toEqual(HARBOR_ROUTE_MARKER_ASSET.materials);
-    expect(doc.getRoot().listTextures()).toHaveLength(0);
+    // painted: the planking, the fittings and the stone it has, each a small KTX2 map
+    expectPaintedMaps(doc, HARBOR_ROUTE_MARKER_ASSET, MAX_MAP_BYTES);
     expect(doc.getRoot().listSkins()).toHaveLength(0);
     expect(doc.getRoot().listAnimations()).toHaveLength(0);
     for (const mesh of doc.getRoot().listMeshes()) {

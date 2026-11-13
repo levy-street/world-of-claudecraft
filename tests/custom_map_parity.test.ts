@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { isBlocked } from '../src/sim/colliders';
 import { clonePropsWithoutEastbrookLayout } from '../src/sim/custom_world_props';
 import { BUILTIN_WORLD, getActiveWorldContent, setActiveWorldContent } from '../src/sim/data';
-import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
+import { EASTBROOK_LAYOUT, localToWorld } from '../src/sim/eastbrook_layout';
 import { activeFenbridgeLayout } from '../src/sim/fenbridge_touchup';
 import { sanitizeMapDoc } from '../src/sim/map_doc';
 import type { WorldContent } from '../src/sim/types';
@@ -77,16 +77,34 @@ describe('custom-map terrain seam', () => {
     expect(bank).toBeDefined();
     expect(fenbridgeInn).toMatchObject({
       id: 'fenbridge_crooked_reed_inn',
-      // the painted tavern on the main street, stood grand (fenbridge_layout.ts)
-      assetId: expect.stringMatching(/\/tidehold\/(?:fenrire\/)?tavern\.glb$/),
+      // the painted tavern on the main street, stood grand (fenbridge_layout.ts).
+      // Re-pinned 2026-11-11 for the hand-built harbour lots: Fenbridge wears the moss set.
+      assetId: '/models/tidehold/harbour_moss/tavern.glb',
       x: authoredFenbridgeInn?.position.x,
       z: authoredFenbridgeInn?.position.z,
     });
-    if (!bank || !fenbridgeInn) return;
+    if (!bank || !fenbridgeInn || !authoredFenbridgeInn) return;
+    // Re-pinned 2026-11-11 for the hand-built harbour lots. A walk-in lot's middle is its
+    // open room (the release models read solid there only through their upper floors), so
+    // the proof that a building collides is its back wall: the middle of the wall opposite
+    // the door (the front is local -Z), a hand inside its outer face.
+    const backWall = (building: {
+      position: { x: number; z: number };
+      rotation: number;
+      nativeDimensions: { depth: number };
+    }) =>
+      localToWorld(
+        building.position,
+        building.rotation,
+        0,
+        building.nativeDimensions.depth / 2 - 0.15,
+      );
+    const bankWall = backWall(bank);
+    const innWall = backWall(authoredFenbridgeInn);
 
     setActiveWorldContent(null);
-    expect(isBlocked(SEED, bank.position.x, bank.position.z, 0.4)).toBe(true);
-    expect(isBlocked(SEED, fenbridgeInn.x, fenbridgeInn.z, 0.4)).toBe(true);
+    expect(isBlocked(SEED, bankWall.x, bankWall.z, 0.4)).toBe(true);
+    expect(isBlocked(SEED, innWall.x, innWall.z, 0.4)).toBe(true);
     expect(
       isBlocked(SEED, fenLayout.civic.cistern.position.x, fenLayout.civic.cistern.position.z, 0.4),
     ).toBe(true);
@@ -109,9 +127,9 @@ describe('custom-map terrain seam', () => {
           z === EASTBROOK_LAYOUT.services.graveyard.position.z,
       ),
     ).toBe(false);
-    expect(isBlocked(SEED, bank.position.x, bank.position.z, 0.4)).toBe(false);
+    expect(isBlocked(SEED, bankWall.x, bankWall.z, 0.4)).toBe(false);
     expect(props.buildings.some((building) => building.id === fenbridgeInn.id)).toBe(false);
-    expect(isBlocked(SEED, fenbridgeInn.x, fenbridgeInn.z, 0.4)).toBe(false);
+    expect(isBlocked(SEED, innWall.x, innWall.z, 0.4)).toBe(false);
     expect(props.wells.some((well) => well.id === fenLayout.civic.cistern.id)).toBe(false);
     expect(
       isBlocked(SEED, fenLayout.civic.cistern.position.x, fenLayout.civic.cistern.position.z, 0.4),

@@ -300,7 +300,11 @@ describe('Eastbrook Grand Armoury gameplay preservation', () => {
     expect(fenbridgeInn).toMatchObject({
       id: 'fenbridge_crooked_reed_inn',
       // the painted tavern on the main street, stood grand at 1.2 (fenbridge_layout.ts)
-      assetId: expect.stringMatching(/\/tidehold\/(?:fenrire\/)?tavern\.glb$/),
+      // Re-pinned 2026-11-11 for the hand-built harbour lots: Fenbridge stands
+      // the marsh colour set of the lots (PAINTED_SET in
+      // src/sim/fenbridge_layout.ts), so the inn is that set's tavern, named
+      // whole where the release pattern took the plain or the Fenrire file.
+      assetId: '/models/tidehold/harbour_moss/tavern.glb',
       x: 13.55,
       z: 298,
       w: 24,

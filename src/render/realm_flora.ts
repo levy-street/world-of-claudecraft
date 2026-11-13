@@ -35,6 +35,7 @@ import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { cloneGeometryForBake } from './geometry_bake_clone';
 import { GFX, surfaceMat } from './gfx';
+import { REALM_GREAT_TREE_ROT, REALM_GREAT_TREE_SCALE } from './great_tree_look_core';
 import { activeWorldPromoted } from './promoted_scenery_gate';
 import { MIST_DRIFT_AMPLITUDE, SEA_LIGHT_RAYS, SEA_MIST_BANKS } from './sea_mist_core';
 import {
@@ -1089,15 +1090,17 @@ export function buildRealmFlora(
 
   // The great tree of Eldershine, rising over the town square. Position and
   // trunk radius come from REALM_PROPS.greatTrees: the same record the sim's
-  // collision grid consumes, so the visual and the collider never drift.
+  // collision grid consumes, so the visual and the collider never drift. Its
+  // size is great_tree_look_core's: a grand tree with its crown in view from
+  // the square, where the old sixfold giant was a wall of bark across it.
   const treeSpot = renderGreatTrees ? REALM_PROPS.greatTrees?.[0] : undefined;
   if (greatTreeScene && treeSpot) {
     const tree = greatTreeScene.clone(true);
     const tx = treeSpot.x,
       tz = treeSpot.z;
     tree.position.set(tx, terrainHeight(tx, tz, seed) - 0.2, tz);
-    tree.scale.setScalar(6.5);
-    tree.rotation.y = 0.8;
+    tree.scale.setScalar(REALM_GREAT_TREE_SCALE);
+    tree.rotation.y = REALM_GREAT_TREE_ROT;
     // The loader cache is immutable: clone the trunk material before giving
     // the giant its coarse landmark bark grain (leaves keep the clean sheet).
     const barked = new Map<string, THREE.Material>();

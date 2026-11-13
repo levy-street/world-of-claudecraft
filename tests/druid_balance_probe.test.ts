@@ -169,13 +169,26 @@ const FERAL_LOADOUT = {
 // (the healer pieces' extra Spirit and Stamina are gone), still 7 payoffs.
 // RE-MEASURED 2026-10-14 after the v0.45 integration stack: moongrove kept
 // its damage/threat/payoff trace, while incoming settled back to 214.
+// RE-MEASURED 2026-11-11 for all three arms, when every town building on the
+// main map was rebuilt as a hand-built lot with a room of its own and the
+// props, lamps and castle pieces were remade (scripts/assets/eastbrook_houses/).
+// No druid, combat or tuning code moved: building annexes, prop colliders and
+// the trees and rocks cleared round the houses placed in Eastbrook are
+// world-gen inputs, so this seed's whole trace re-rolls. The "from" figures
+// are the release tree's own measurement on the day: moongrove
+// 6839/237/6840/7 to 6145/265/6146/7, wildfang 6358/206/7450.397/10 (the
+// release measured that inside the band of its pinned 6389/213/7486.7135/10)
+// to 6455/198/7564.0325/10, bruin 3254/159/12206.51375/6 to
+// 2956/134/10804.75625/6. The tank probe at 42920 moved inside its bands (wolf
+// incoming 216 to 218, bear 139 both times, threat product 214.5 and
+// Marrowbreak snap 1012.44 unchanged), so its figures stand.
 const LIVE_MOB_MEASURED = {
   // Release merge: the caster picker excludes healer gear; Bruin gains its new
   // double-swing/rage cadence. Authored-world wander also changes shared RNG.
   // Re-measured at 42420 with the unchanged 8% bands and exact payoff counts.
-  moongrove: { damage: 6839, incomingDamage: 237, threat: 6840, payoffs: 7 },
-  wildfang: { damage: 6389, incomingDamage: 213, threat: 7486.7135, payoffs: 10 },
-  bruin: { damage: 3254, incomingDamage: 159, threat: 12206.51375, payoffs: 6 },
+  moongrove: { damage: 6145, incomingDamage: 265, threat: 6146, payoffs: 7 },
+  wildfang: { damage: 6455, incomingDamage: 198, threat: 7564.0325, payoffs: 10 },
+  bruin: { damage: 2956, incomingDamage: 134, threat: 10804.75625, payoffs: 6 },
 } as const;
 const BRUIN_TANK_MEASURED = {
   wolfIncomingDamage: 216,

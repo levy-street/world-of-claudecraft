@@ -58,111 +58,123 @@ export interface PaintedModelSpec extends PlacedTownMeasurements {
 export const PAINTED_MODELS: Readonly<Record<PaintedModel, PaintedModelSpec>> = deepFreeze({
   // the big inn (Highwatch's): taproom, stair and loft, a turret at the front's corner
   tavern_b: {
-    reach: { x: 1.079, z: -0.864, width: 30.262, height: 22.351, depth: 20.428 },
+    reach: { x: 1.079, z: -0.864, width: 30.262, height: 24.9645, depth: 20.428 },
     walls: { x: 0, z: 0, width: 26, depth: 15 },
     annexes: [
       { name: 'turret', x: 13.5, z: -8.5, width: 3.8, depth: 3.8 },
       { name: 'chimney', x: -13.47, z: -1, width: 1, depth: 2.4 },
     ],
     doorX: -2,
+    modelSize: 33.9854,
     walkInAir: true,
   },
   // the inn of Eastbrook and Fenbridge, tavern_b's smaller sister
   tavern: {
-    reach: { x: 0.272, z: -0.05, width: 22.648, height: 18.78, depth: 16.8 },
+    reach: { x: 0.272, z: -0.05, width: 22.648, height: 21.56, depth: 16.8 },
     walls: { x: 0, z: 0, width: 20, depth: 13 },
     annexes: [
-      { name: 'front_bench', x: -5.1, z: -7.25, width: 5.4, depth: 0.9 },
-      { name: 'barrels', x: 10.9, z: -4.9, width: 1.1, depth: 2.3 },
+      { name: 'front_bench', x: -5.1, z: -7.25, width: 5.2, depth: 0.5 },
+      { name: 'barrels', x: 10.9, z: -4.9, width: 1.0, depth: 2.4 },
     ],
     doorX: 0,
+    modelSize: 27.6003,
     walkInAir: true,
   },
   // the chapel: nave and portal, the bell tower at the front's corner
   hall: {
-    reach: { x: 1.9255, z: -0.254, width: 18.851, height: 30.5, depth: 24.212 },
+    reach: { x: 1.9255, z: -0.254, width: 18.851, height: 29.542, depth: 24.212 },
     walls: { x: 0, z: 0, width: 12, depth: 22 },
     annexes: [
       { name: 'bell_tower', x: 8.25, z: -9, width: 5.4, depth: 5.4 },
       { name: 'notice_board', x: -4.2, z: -11.8, width: 1.8, depth: 0.6 },
     ],
     doorX: 0,
+    modelSize: 30.2535,
     walkInAir: true,
   },
   // the bank: the banking hall, the strongroom behind it, a turret on its corner
   bank: {
-    reach: { x: -0.7013, z: 0.7819, width: 22.6067, height: 22.5005, depth: 19.8387 },
+    reach: { x: -0.7013, z: 0.7819, width: 22.6067, height: 22.452, depth: 19.8387 },
     walls: { x: 0, z: 0, width: 18, depth: 12.4923 },
     annexes: [
       { name: 'strongroom', x: 0, z: 8.2, width: 5.8, depth: 3.9077 },
       { name: 'turret', x: -9.5923, z: -6.8462, width: 3.2308, depth: 3.2308 },
     ],
     doorX: 0,
+    modelSize: 25.5973,
     walkInAir: true,
   },
   // the goods shop with the coin-sack sign and a street counter
   shop_a: {
-    reach: { x: 0, z: -0.8, width: 13.004, height: 16.28, depth: 12.2 },
+    reach: { x: 0, z: -0.8, width: 13.004, height: 20.21, depth: 12.2 },
     walls: { x: 0, z: 0, width: 11, depth: 8.4 },
     annexes: [
       { name: 'stall_counter', x: 2.375, z: -5.925, width: 3.61, depth: 0.77 },
-      { name: 'stall_barrels', x: 4.885, z: -5.762, width: 1.477, depth: 2.169 },
+      { name: 'stall_barrels', x: 4.9, z: -5.775, width: 1.4, depth: 2.15 },
     ],
     doorX: -1.6,
+    modelSize: 20.21,
     walkInAir: true,
   },
   // the potion shop with the flask sign, a turret on its corner
   shop_b: {
-    reach: { x: 0.4745, z: -0.849, width: 13.649, height: 18.7, depth: 12.702 },
+    reach: { x: 0.4745, z: -0.849, width: 13.649, height: 20.31, depth: 12.702 },
     walls: { x: 0, z: 0, width: 9.4, depth: 9 },
     annexes: [{ name: 'turret', x: 5.19, z: -4.99, width: 2.66, depth: 2.66 }],
     doorX: -0.7,
+    modelSize: 20.31,
     walkInAir: true,
   },
-  // the smithy: the forge room, the open forge shelter at its +x end
+  // the smithy: the forge room, the open forge shelter at its +x end. (The hand-built
+  // lot's forge stack rises inside that shelter, solid in the lot's own collision rows;
+  // the model it replaced had a chimney outside the west wall, and its annex went with it.)
   smithy: {
-    reach: { x: 3.4285, z: -0.2955, width: 19.797, height: 12.781, depth: 11.69 },
+    reach: { x: 3.4285, z: -0.2955, width: 19.797, height: 17.94, depth: 11.69 },
     walls: { x: 0, z: 0, width: 11, depth: 9 },
-    annexes: [
-      { name: 'forge_shelter', x: 9.12, z: -0.08, width: 7.24, depth: 9.64 },
-      { name: 'chimney', x: -5.97, z: 1, width: 1, depth: 2 },
-    ],
+    annexes: [{ name: 'forge_shelter', x: 9.12, z: -0.08, width: 7.24, depth: 9.64 }],
     doorX: -1.2,
+    modelSize: 19.99,
     walkInAir: true,
   },
   // the cottages and the tower house are sealed: one storey of walls, no rooms
   house_a: {
-    reach: { x: 0.2145, z: 0, width: 11.763, height: 12.23, depth: 9.8 },
+    reach: { x: 0.2145, z: 0, width: 11.763, height: 16.41, depth: 9.8 },
     walls: { x: 0, z: 0, width: 9.36, depth: 7.96 },
     doorX: -1.4,
+    modelSize: 16.41,
     walkInAir: false,
   },
   house_b: {
-    reach: { x: -0.3041, z: 0, width: 15.0123, height: 15.9799, depth: 11.6997 },
+    reach: { x: -0.3041, z: 0, width: 15.0123, height: 17.01, depth: 11.6997 },
     walls: { x: 0, z: 0, width: 12.7538, depth: 8.5538 },
     annexes: [{ name: 'crates', x: -7.0308, z: -1.8231, width: 1.1538, depth: 2.2462 }],
     doorX: 0,
+    modelSize: 19.7713,
     walkInAir: false,
   },
   house_c: {
-    reach: { x: 0.386, z: 0.23, width: 12.764, height: 19.58, depth: 16.264 },
+    reach: { x: 0.386, z: 0.23, width: 12.764, height: 24.277, depth: 16.264 },
     walls: { x: 0, z: 0, width: 8.56, depth: 11.96 },
     annexes: [{ name: 'tower', x: 4.61, z: 6.31, width: 2.76, depth: 2.76 }],
     doorX: -1.6,
+    modelSize: 24.277,
     walkInAir: false,
   },
 });
 
-/** Where each look's files live (one `<model>.glb` per model, with its tiers). */
+/** Where each look's files live (one `<model>.glb` per model). Every look now draws
+ *  the hand-built harbour lots (scripts/assets/eastbrook_houses/lots.py) in the colour
+ *  set that carries the look's idea: the same models, their roof slate, timber and
+ *  stone repainted per set (COLOUR_SETS in that folder's build.py). */
 export const PAINTED_LOOK_SETS: Readonly<Record<PaintedLook, string>> = deepFreeze({
-  default: '/models/tidehold',
-  fenrire: '/models/tidehold/fenrire',
-  highwatch: '/models/tidehold/highwatch',
-  pantile: '/models/tidehold/pantile',
-  shakes: '/models/tidehold/shakes',
-  diamond: '/models/tidehold/diamond',
-  brick: '/models/tidehold/brick',
-  thatch: '/models/tidehold/thatch',
+  default: '/models/tidehold/harbour',
+  fenrire: '/models/tidehold/harbour_moss',
+  highwatch: '/models/tidehold/harbour_alpine',
+  pantile: '/models/tidehold/harbour_pantile',
+  shakes: '/models/tidehold/harbour_shakes',
+  diamond: '/models/tidehold/harbour_diamond',
+  brick: '/models/tidehold/harbour_brick',
+  thatch: '/models/tidehold/harbour_thatch',
 });
 
 /** The models each look was baked for. */

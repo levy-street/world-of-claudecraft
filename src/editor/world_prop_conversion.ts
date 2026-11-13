@@ -40,6 +40,12 @@ import {
   isFenbridgeRebuildStall,
   isFenbridgeRebuildWell,
 } from '../render/fenbridge_town';
+import {
+  BANYAN_SCALE_BASE,
+  greatTreeScale,
+  REALM_GREAT_TREE_ROT,
+  REALM_GREAT_TREE_SCALE,
+} from '../render/great_tree_look_core';
 import { isHighwatchRebuildBuilding } from '../render/highwatch_town';
 import { isPaintedTownRebuildBuilding } from '../render/painted_towns';
 import { PROP_NATURAL_SIZE } from '../render/prop_natural_size.generated';
@@ -239,26 +245,28 @@ function greatTreeLook(
   const is = (props: ZonePropsDef) =>
     (props.greatTrees ?? []).some((t) => t.x === tree.x && t.z === tree.z);
   const realm = REALM_PROPS.greatTrees?.[0];
-  if (realm && realm.x === tree.x && realm.z === tree.z) return { scale: 6.5, rot: 0.8 };
+  if (realm && realm.x === tree.x && realm.z === tree.z) {
+    return { scale: REALM_GREAT_TREE_SCALE, rot: REALM_GREAT_TREE_ROT };
+  }
   if (is(REALM_PROPS)) return null;
   if (is(PALMREACH_PROPS)) {
     // render/jungle_features.ts
     return {
-      scale: tree.r * (2.5 + hash2(tree.x, tree.z, seed + 5201) * 0.5),
+      scale: greatTreeScale(tree.r, hash2(tree.x, tree.z, seed + 5201), BANYAN_SCALE_BASE),
       rot: hash2(tree.z, tree.x, seed + 5211) * Math.PI * 2,
     };
   }
   if (is(EVERGARDEN_PROPS)) {
     // render/garden_features.ts
     return {
-      scale: tree.r * (2.4 + hash2(tree.x, tree.z, seed + 6301) * 0.5),
+      scale: greatTreeScale(tree.r, hash2(tree.x, tree.z, seed + 6301)),
       rot: hash2(tree.z, tree.x, seed + 6311) * Math.PI * 2,
     };
   }
   if (is(WRAITHWOOD_PROPS)) {
     // render/haunt_features.ts
     return {
-      scale: tree.r * (2.4 + hash2(tree.x, tree.z, seed + 4101) * 0.5),
+      scale: greatTreeScale(tree.r, hash2(tree.x, tree.z, seed + 4101)),
       rot: hash2(tree.z, tree.x, seed + 4111) * Math.PI * 2,
     };
   }

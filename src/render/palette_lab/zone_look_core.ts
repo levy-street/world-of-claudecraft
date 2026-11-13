@@ -20,6 +20,7 @@
 import type { BiomeId } from '../../sim/types';
 import { BIOME_FOG, BIOME_GOD_RAYS, BIOME_LIGHT } from '../outdoor_biome_presets';
 import { BIOME_PALETTE } from '../terrain_palette';
+import type { ZoneSun } from '../zone_sun_core';
 
 export interface LookGround {
   grass: number;
@@ -46,7 +47,34 @@ export interface LookLight {
   sunScale: number;
   hemiScale: number;
   envScale: number;
+  /** A look may turn the zone's sun arc itself (degrees about the vertical) and set its
+   *  noon elevation; unset, the zone's own sun stands (ZONE_SUN below). */
+  sunTurn?: number;
+  sunElev?: number;
 }
+
+/**
+ * Where each zone's sun stands (render/zone_sun_core.ts): the turn of its arc about the
+ * vertical and its noon elevation, both in degrees. It belongs to the ZONE, not to a colour
+ * look: it follows from how the zone's town and land lie, so every look of the zone wears
+ * it. Each was chosen in the running game, so that the fronts a traveller walks up to
+ * stand in the light. A zone not listed keeps the shared arc (0, about 41).
+ */
+export const ZONE_SUN: Readonly<Record<string, ZoneSun>> = {
+  eastbrook_vale: { turn: 90, elev: 52 },
+  mirefen_marsh: { turn: 90, elev: 52 },
+  thornpeak_heights: { turn: 225, elev: 52 },
+  veiled_hollow: { turn: 0, elev: 52 },
+  drakelands: { turn: 270, elev: 52 },
+  frostveil: { turn: 315, elev: 52 },
+  amberfall: { turn: 45, elev: 52 },
+  willowfen: { turn: 180, elev: 52 },
+  palmreach: { turn: 90, elev: 52 },
+  evergarden: { turn: 180, elev: 52 },
+  galecrest: { turn: 45, elev: 52 },
+  farshore_isle: { turn: 180, elev: 52 },
+  proving_shore: { turn: 45, elev: 52 },
+};
 
 export interface LookSky {
   /** DISPLAY colours (sRGB hex as seen) of the gradient's top and bottom. */
@@ -498,19 +526,29 @@ export type LookSelections = Record<string, string>;
 
 /** The chosen default look per zone (day / general). */
 export const DEFAULT_ZONE_SELECTIONS: Readonly<LookSelections> = {
-  proving_shore: 'skyward-isles',
+  // (Painted Storybook since 2026-11-13: the same bright coast a little richer.)
+  proving_shore: 'painted-storybook',
   eastbrook_vale: 'skyward-isles',
-  mirefen_marsh: 'jade-wetland',
-  thornpeak_heights: 'alpine-clear',
-  farshore_isle: 'tropic-lagoon',
+  // (Firefly Dusk since 2026-11-13: the marsh's own golden-hour look, in place of the
+  // high-key Jade Wetland the zone shipped with, whose lawn was the brightest green on the
+  // map. Misty Peat is still in the list.)
+  mirefen_marsh: 'firefly-dusk',
+  thornpeak_heights: 'highland-noon',
+  farshore_isle: 'island-noon',
   galecrest: 'skyward-isles',
-  evergarden: 'afternoon-reverie',
-  willowfen: 'spring-watercolour',
-  palmreach: 'lagoon-turquoise',
-  veiled_hollow: 'rosewater-twilight',
-  nightbloom: 'fae-pink',
-  drakelands: 'ashfall',
-  frostveil: 'glacier-teal',
+  evergarden: 'garden-noon',
+  willowfen: 'painted-storybook',
+  // (Deep Canopy since 2026-11-13, in place of Lagoon Turquoise. Coral Sunset is still in
+  // the list; this one keeps Palmreach a daylight jungle beside Mirefen's dusk.)
+  palmreach: 'deep-canopy',
+  veiled_hollow: 'silver-heath',
+  nightbloom: 'fae-meadow',
+  drakelands: 'ember-noon',
+  wraithwood: 'thicket-day',
+  // (Violet Whiteout by day as well as by night since 2026-11-12: Glacier Teal's bloom and
+  // lifted exposure turned the snow into one white glare that hid the town and the player;
+  // this one keeps the snow crisp with clean blue shadows.)
+  frostveil: 'violet-whiteout',
   amberfall: 'sky-island-gold',
 };
 

@@ -15,6 +15,7 @@ import { hash2 } from '../sim/rng';
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { castlePavingMat, castleStoneMat, STONE_TILE_YD } from './castle_stone';
 import { beamBetween, buildDeckWood } from './deck_render';
 import { GFX } from './gfx';
 
@@ -62,21 +63,26 @@ function mat(color: number, rough = 0.85): THREE.MeshStandardMaterial | THREE.Me
     : new THREE.MeshLambertMaterial({ color, flatShading: true });
 }
 
-// merge a pile of box geometries into one mesh (position + normal only)
+// merge a pile of box geometries into one mesh (position + normal, and uv when
+// every part carries one: the Beacon's masonry wears the castles' coursed stone)
 function mergeBoxes(parts: THREE.BufferGeometry[], material: THREE.Material): THREE.Mesh {
   let total = 0;
   for (const g of parts) total += g.getAttribute('position').count;
   const pos = new Float32Array(total * 3);
   const norm = new Float32Array(total * 3);
+  const withUv = parts.length > 0 && parts.every((g) => g.getAttribute('uv'));
+  const uv = withUv ? new Float32Array(total * 2) : null;
   let off = 0;
   for (const g of parts) {
     pos.set(g.getAttribute('position').array as Float32Array, off);
     norm.set(g.getAttribute('normal').array as Float32Array, off);
+    if (uv) uv.set(g.getAttribute('uv').array as Float32Array, (off / 3) * 2);
     off += g.getAttribute('position').count * 3;
   }
   const merged = new THREE.BufferGeometry();
   merged.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   merged.setAttribute('normal', new THREE.BufferAttribute(norm, 3));
+  if (uv) merged.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
   const mesh = new THREE.Mesh(merged, material);
   mesh.castShadow = true;
   mesh.receiveShadow = true;
@@ -116,8 +122,40 @@ export function buildGaleFeatures(seed: number): GaleFeaturesView {
     // disagree
     {
       const s = BEACON_SPIRAL;
-      const stone = mat(0x8f959c, 0.95);
-      const baseStone = mat(0x7c828a, 0.95); // a shade darker so the treads read on it
+      // The stair and the masonry under it wear the castles' coursed stone (castle_stone.ts):
+      // flat grey slabs read as blank card beside the painted tower drums they are bolted
+      // to. Every piece is mapped round the tower as ONE wall (wrapStoneUv below), so the
+      // courses run level across the fan of narrow piers instead of restarting on each.
+      // (the treads and balcony floors are laid flagstones; the walls under them coursed stone)
+      const stone = castlePavingMat({ color: 0xc2b49c, roughness: 0.95 });
+      // the town's own warm rubble tone, a shade darker so the treads read on it: in cool grey
+      // the tower was the one cold block on a warm coast
+      const baseStone = castleStoneMat({ color: 0x9c8468, roughness: 0.95 });
+      const TREAD_TILE_YD = 3.5;
+      const wrapStoneUv = (g: THREE.BufferGeometry): THREE.BufferGeometry => {
+        const pos = g.getAttribute('position');
+        const nor = g.getAttribute('normal');
+        const uv = g.getAttribute('uv');
+        for (let i = 0; i < pos.count; i++) {
+          const dx = pos.getX(i) - s.x;
+          const dz = pos.getZ(i) - s.z;
+          const r = Math.hypot(dx, dz) || 1;
+          // 1 on a face that looks out from the tower, 0 on one that runs out along a radius
+          const outward = Math.abs((nor.getX(i) * dx + nor.getZ(i) * dz) / r);
+          if (Math.abs(nor.getY(i)) > 0.7) {
+            // a tread or a top: laid flat, at a flagstone a stride wide
+            uv.setXY(i, dx / TREAD_TILE_YD, dz / TREAD_TILE_YD);
+          } else if (outward > 0.7) {
+            // unwrapped from the stair foot, where there is no masonry to show the seam
+            let a = Math.atan2(dx, dz) - s.a0;
+            a = ((a % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+            uv.setXY(i, (a * s.stairOut) / STONE_TILE_YD, pos.getY(i) / STONE_TILE_YD);
+          } else {
+            uv.setXY(i, r / STONE_TILE_YD, pos.getY(i) / STONE_TILE_YD);
+          }
+        }
+        return g;
+      };
       const iron = mat(0x4b4f56, 0.8);
       const slabs: THREE.BufferGeometry[] = [];
       const piers: THREE.BufferGeometry[] = [];
@@ -129,7 +167,7 @@ export function buildGaleFeatures(seed: number): GaleFeaturesView {
         const g = new THREE.BoxGeometry(w, 0.4, len);
         g.rotateY(yaw);
         g.translate(x, h - 0.18, z);
-        slabs.push(g.toNonIndexed());
+        slabs.push(wrapStoneUv(g.toNonIndexed()));
       };
       // The masonry the climb rides on. beaconSpiralLift is a single-valued
       // heightfield, so the ground under an elevated tread IS that tread's
@@ -152,7 +190,7 @@ export function buildGaleFeatures(seed: number): GaleFeaturesView {
         const g = new THREE.BoxGeometry(w, height, outR - innerR);
         g.rotateY(a);
         g.translate(x, bot + height / 2, z);
-        piers.push(g.toNonIndexed());
+        piers.push(wrapStoneUv(g.toNonIndexed()));
       };
       // whether an unwrapped angle sits on a balcony (wide band) or a flight
       const onBalcony = (a: number): boolean =>

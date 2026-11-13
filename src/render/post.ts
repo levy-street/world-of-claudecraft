@@ -4,6 +4,8 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import type { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { celShadingSettings } from './cel_shading';
+import { claritySettings } from './clarity';
+import { clarityForGrade } from './clarity_core';
 import type { DynamicResolutionRect } from './dynamic_resolution_core';
 import { GFX, sharedUniforms } from './gfx';
 import {
@@ -328,6 +330,13 @@ export function buildComposer(
           inkWidth: celLook.inkWidth,
         }
       : undefined;
+  // Clarity (clarity_core.ts) rides the grade the same way, on the tiers clarityForGrade
+  // names: the ones whose edge AA is the tail SMAA, never the shed's FXAA twin below.
+  const clarity =
+    clarityForGrade(claritySettings(), {
+      standardMaterials: GFX.standardMaterials,
+      gradeFxaa: plan.gradeFxaa,
+    }) ?? undefined;
   // Edge AA for the grade-only tiers lives INSIDE this pass. A tail pass would
   // be full-frame and cost the chain its dynamic-resolution region (see the AA
   // note above); the fused arm rides the grade's own uInputUvRect remap, so it
@@ -337,7 +346,7 @@ export function buildComposer(
   const grade = new OutputGradePass(
     sharedUniforms.uTime,
     bloom instanceof PreparedBloomPass ? bloom.bloomTexture : null,
-    { fxaa: plan.gradeFxaa, celInk, paletteGrade: paletteLabEnabled() },
+    { fxaa: plan.gradeFxaa, celInk, clarity, paletteGrade: paletteLabEnabled() },
   );
   labelGpuTimerPass(grade, 'grade');
   composer.addPass(grade);

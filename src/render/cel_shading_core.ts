@@ -27,7 +27,7 @@ export const CEL_SHADING_PATCH_MARKER = 'WOC_CEL_DIRECTIONAL_RAMP';
 
 /** The look the session runs. Every field is a design knob for the R&D pass. */
 export interface CelShadingSettings {
-  /** Whether the toon light ramp is patched in (`cellight=off` keeps the stock
+  /** Whether the toon light ramp is patched in (`cellight=on`; off keeps the stock
    *  lighting under the ink, the A/B arm that separates the two halves). */
   readonly light: boolean;
   /** 2 (lit / shadow) or 3 (lit / mid / shadow) light bands. */
@@ -50,7 +50,11 @@ export interface CelShadingSettings {
 }
 
 export const CEL_SHADING_DEFAULTS: CelShadingSettings = {
-  light: true,
+  // The two-band light ramp is OFF by default: the look is the ink line over the
+  // painted world's own smooth light. Stepped into two flat bands, every wall and
+  // slope in shade dropped to one fill tone and read flat. `cellight=on` brings it
+  // back.
+  light: false,
   bands: 2,
   edge: 0.12,
   lit: 0.9,
@@ -85,7 +89,7 @@ function readNumber(
 
 /**
  * The session's cel look from a `location.search` string, or null for the stock
- * look. `?cel=on` (or `1`) opts in; the tuning knobs are `cellight=off`, `celbands=2|3`, `celedge`,
+ * look. `?cel=on` (or `1`) opts in; the tuning knobs are `cellight=on|off`, `celbands=2|3`, `celedge`,
  * `cellit`, `celmid`, `celink`, `celinkwidth` and `celsat`.
  */
 export function celShadingFromQuery(search: string, defaultOn = false): CelShadingSettings | null {
@@ -93,9 +97,10 @@ export function celShadingFromQuery(search: string, defaultOn = false): CelShadi
   const mode = params.get('cel');
   if (defaultOn ? mode === 'off' || mode === '0' : mode !== 'on' && mode !== '1') return null;
   const d = CEL_SHADING_DEFAULTS;
+  const cellight = params.get('cellight');
   const lit = readNumber(params, 'cellit', d.lit, 0.2, 1.5);
   return {
-    light: params.get('cellight') !== 'off',
+    light: cellight === 'on' ? true : cellight === 'off' ? false : d.light,
     bands: params.get('celbands') === '3' ? 3 : 2,
     edge: readNumber(params, 'celedge', d.edge, 0.05, 0.9),
     lit,

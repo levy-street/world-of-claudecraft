@@ -52,11 +52,12 @@ const BAKED = JSON.parse(
   readFileSync(path.join(ROOT, 'data/asset_collision_overrides.json'), 'utf8'),
 ) as Record<string, { boxes: BakedBox[] }>;
 
-/** The model a record draws: a look (`tidehold/fenrire/x`) re-bakes the
- *  textures of `tidehold/x` on the same geometry, so it shares its rows. */
+/** The model a record draws: the hand-built harbour lot in its moss colours
+ *  (`tidehold/harbour_moss/x`), which carries its own baked rows: the default
+ *  harbour set's, the same geometry in other colours. */
 function modelIdOf(building: Building): string {
   const name = building.assetId.replace(/^.*\//, '').replace(/\.glb$/, '');
-  return `tidehold/${name}`;
+  return `tidehold/harbour_moss/${name}`;
 }
 
 /** A world point in the model's own axes (the inverse of localToWorld). */
@@ -159,11 +160,11 @@ const PLACED_TARGET_HEIGHT = 2.2;
 describe('the five placed Fenbridge buildings', () => {
   it('are the painted Tidehold set, one building per role', () => {
     expect(BUILDINGS.map((building) => [building.id, modelIdOf(building), building.kind])).toEqual([
-      ['fenbridge_warden_gatehouse', 'tidehold/house_a', 'house'],
-      ['fenbridge_crooked_reed_inn', 'tidehold/tavern', 'inn'],
-      ['fenbridge_lantern_chapel', 'tidehold/hall', 'chapel'],
-      ['fenbridge_moonwort_apothecary', 'tidehold/shop_b', 'house'],
-      ['fenbridge_gilded_strongbox', 'tidehold/shop_a', 'house'],
+      ['fenbridge_warden_gatehouse', 'tidehold/harbour_moss/house_a', 'house'],
+      ['fenbridge_crooked_reed_inn', 'tidehold/harbour_moss/tavern', 'inn'],
+      ['fenbridge_lantern_chapel', 'tidehold/harbour_moss/hall', 'chapel'],
+      ['fenbridge_moonwort_apothecary', 'tidehold/harbour_moss/shop_b', 'house'],
+      ['fenbridge_gilded_strongbox', 'tidehold/harbour_moss/shop_a', 'house'],
     ]);
     for (const building of BUILDINGS) {
       expect(isPlacedBuildingAsset(building.assetId), building.id).toBe(true);
@@ -199,20 +200,28 @@ describe('the five placed Fenbridge buildings', () => {
     }
   });
 
-  it('reach across the whole model, measured off the shipped file', () => {
+  it('reach over the ground each lot covers, with its height measured off the shipped file', () => {
     for (const building of BUILDINGS) {
       const bounds = boundsOf(building);
       const scale = building.placement.scale;
-      const measured: Rect = {
-        x0: bounds.min[0] * scale,
-        x1: bounds.max[0] * scale,
-        z0: bounds.min[2] * scale,
-        z1: bounds.max[2] * scale,
-      };
-      expect(
-        worstEdge(rectOf(building, building.reach), measured),
-        `${building.id} reach`,
-      ).toBeLessThan(0.02);
+      // The reach is the ground the building covers: the box the town cuts its
+      // terrain pads from. The hand-built lots stand on the release models'
+      // walls, so the records keep that ground where it was and the fen under
+      // the town did not move; a lot's roof and jetty overhang it. It still
+      // holds the walls and every annex (a part may stand exactly on the
+      // reach's edge: a hair of float slack).
+      const reach = rectOf(building, building.reach);
+      const parts: [string, Rect][] = [
+        ['walls', rectOf(building, building.footprint)],
+        ...building.annexes.map((annex): [string, Rect] => [annex.id, rectOf(building, annex)]),
+      ];
+      const slack = 1e-6;
+      for (const [name, part] of parts) {
+        expect(part.x0, `${building.id} ${name} west`).toBeGreaterThanOrEqual(reach.x0 - slack);
+        expect(part.x1, `${building.id} ${name} east`).toBeLessThanOrEqual(reach.x1 + slack);
+        expect(part.z0, `${building.id} ${name} front`).toBeGreaterThanOrEqual(reach.z0 - slack);
+        expect(part.z1, `${building.id} ${name} back`).toBeLessThanOrEqual(reach.z1 + slack);
+      }
       // the height the record reports is the part above the ground line
       expect(
         Math.abs(

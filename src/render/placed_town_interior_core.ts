@@ -50,140 +50,79 @@ export interface ModelAir {
   readonly openings: readonly { box: number; axis: 0 | 2; side: 1 | -1 }[];
 }
 
-/**
- * How far (yards at authored size) a strip of air cut round a hearth or shelves runs on into
- * the room beside it. The camera walks its ray through the air with every piece shrunk by its
- * near-plane pad (interiorCameraPadding: about 0.4 yd at the default field of view, past 0.7
- * at the widest the settings allow), so two pieces that only meet at a face leave a gap of
- * twice that between them: the ray of a player standing in the strip stopped short of the
- * room, and the camera fell back to a cramped framing beside the hearth. Overlapping by more
- * than both pads keeps the air one piece at any scale and nearly any field of view. (A strip
- * is only worth cutting where it is wider than both pads too: the smithy's corners either
- * side of its hearth, about a yard across, are left out for that.)
- */
-const JOIN_REACH = 1.5;
-
 /** The authored air per painted model (the geometry name, shared by every look). */
 const MODEL_AIR: Readonly<Record<string, ModelAir>> = {
   tavern_b: {
+    // the hand-built lot (scripts/assets/eastbrook_houses/lots.py): its room under the
+    // ceiling, then each doorway through its wall
     boxes: [
-      // the taproom: inner walls x +-12.4, z +-6.9, the deck at 0.45, under the beams that
-      // carry the upper floor's slab (5.36); the chimney breast (x -12.5 to -11.1, z -2.8
-      // to 0.8) stands in its -x end, so that strip is cut round it
-      [-11.0, 12.15, 0.45, 5.0, -6.65, 6.65],
-      // the front door through the front wall (z -7.5 to -6.9), its head at 4.85
-      [-3.5, -0.5, 0.45, 4.85, -7.6, -6.4],
-      // the stair well at the +x end, open from the taproom to the upper floor
-      [10.28, 12.15, 0.45, 9.65, -5.9, 3.5],
-      // the upper floor: over the slab (5.68) to the tie beams (9.65)
-      [-12.3, 12.3, 5.68, 9.65, -7.5, 7.5],
-      // the taproom's -x strip either side of the chimney breast (JOIN_REACH into the
-      // taproom: see there)
-      [-12.15, -11.0 + JOIN_REACH, 0.45, 5.0, -6.65, -2.95],
-      [-12.15, -11.0 + JOIN_REACH, 0.45, 5.0, 0.95, 6.65],
+      [-12.35, 12.35, 0.45, 5.25, -6.85, 6.85],
+      [-3.5, -0.5, 0.45, 4.6641, -7.6, -6.05],
     ],
     openings: [{ box: 1, axis: 2, side: -1 }],
   },
   tavern: {
+    // the hand-built lot (scripts/assets/eastbrook_houses/lots.py): its room under the
+    // ceiling, then each doorway through its wall
     boxes: [
-      // the taproom: inner walls x +-9.4, z +-5.9, the deck at 0.45, under the beams that
-      // carry the upper floor's slab (4.95 to 5.36); the hearth's chimney breast (x -9.5 to
-      // -8.1, z -1.8 to 1.8) stands in its -x end and the back-bar shelves (x 1.2 to 3.6
-      // either side, z 4.98 on) against its back wall, so it stops short of both
-      [-8.0, 9.15, 0.45, 5.0, -5.65, 4.88],
-      // the front door through the front wall (z -6.5 to -5.9), its head at 4.85
-      [-1.5, 1.5, 0.45, 4.85, -6.6, -5.4],
-      // the stair well at the +x end, open from the taproom to the upper floor
-      [7.28, 9.15, 0.45, 9.65, -4.9, 2.9],
-      // the upper floor: over the slab (5.68) to the tie beams (9.65)
-      [-9.3, 9.3, 5.68, 9.65, -6.5, 6.5],
-      // the taproom's -x strips either side of the chimney breast, and its back wall either
-      // side of the shelves and between them (JOIN_REACH into the taproom: see there)
-      [-9.15, -8.0 + JOIN_REACH, 0.45, 5.0, -5.65, -1.95],
-      [-9.15, -8.0 + JOIN_REACH, 0.45, 5.0, 1.95, 5.65],
-      [-8.0, -3.7, 0.45, 5.0, 4.88 - JOIN_REACH, 5.65],
-      [-1.1, 1.1, 0.45, 5.0, 4.88 - JOIN_REACH, 5.65],
-      [3.7, 9.15, 0.45, 5.0, 4.88 - JOIN_REACH, 5.65],
+      [-9.35, 9.35, 0.45, 5.25, -5.85, 5.85],
+      [-1.5, 1.5, 0.45, 4.6641, -6.6, -5.05],
     ],
     openings: [{ box: 1, axis: 2, side: -1 }],
   },
   bank: {
+    // the hand-built lot (scripts/assets/eastbrook_houses/lots.py): its room under the
+    // ceiling, then each doorway through its wall
     boxes: [
-      // the banking hall between its two pillars: inner walls x +-8.55, z +-5.8, the deck at
-      // 0.45, under the ceiling beams (5.43 to 5.83)
-      [-3.95, 3.95, 0.45, 5.45, -5.55, 5.55],
-      // the front door through the front wall (z -6.25 to -5.8), its head at 4.85
-      [-1.3, 1.3, 0.45, 4.85, -6.35, -5.3],
-      // the hall round its two pillars (x 4.05 to 5.15 either side, z -2.7 to -1.7, floor to
-      // ceiling): both sides past them, and the whole width before and behind them
-      [-8.3, -5.25, 0.45, 5.45, -5.55, 5.55],
-      [5.25, 8.3, 0.45, 5.45, -5.55, 5.55],
-      [-8.3, 8.3, 0.45, 5.45, -5.55, -2.8],
-      [-8.3, 8.3, 0.45, 5.45, -1.6, 5.55],
+      [-8.35, 8.35, 0.45, 5.45, -5.5962, 5.5962],
+      [-1.34, 1.34, 0.45, 4.2146, -6.3461, -4.7961],
     ],
     openings: [{ box: 1, axis: 2, side: -1 }],
   },
   hall: {
+    // the hand-built lot (scripts/assets/eastbrook_houses/lots.py): its room under the
+    // ceiling, then each doorway through its wall
     boxes: [
-      // the nave: inner walls x +-5.2, z +-10.2, the floor at 0.9, the wall plates at 9.3
-      [-4.95, 4.95, 0.9, 9.3, -9.95, 9.95],
-      // the portal through the front gable (z -11 to -10.2), its head at 5.9
-      [-1.6, 1.6, 0.9, 5.9, -11.1, -9.7],
+      [-5.35, 5.35, 0.9, 8.9, -10.35, 10.35],
+      [-1.79, 1.79, 0.9, 5.9288, -11.1, -9.55],
     ],
     openings: [{ box: 1, axis: 2, side: -1 }],
   },
   shop_a: {
+    // the hand-built lot (scripts/assets/eastbrook_houses/lots.py): its room under the
+    // ceiling, then each doorway through its wall
     boxes: [
-      // the counting room: inner walls x +-5.05, z +-3.75, the deck at 0.45, under the beams
-      // that carry the ceiling (4.23 to 4.63); its back shelves, z 3.33 to 3.75, stand in
-      // front of the back wall
-      [-4.8, 4.8, 0.45, 4.25, -3.5, 3.25],
-      // the front door through the shop front (z -4.2 to -3.75), its head at 3.7
-      [-2.5, -0.7, 0.45, 3.7, -4.3, -3.2],
+      [-4.85, 4.85, 0.45, 4.25, -3.55, 3.55],
+      [-2.76, -0.44, 0.45, 3.7089, -4.3, -2.75],
     ],
     openings: [{ box: 1, axis: 2, side: -1 }],
   },
   shop_b: {
+    // the hand-built lot (scripts/assets/eastbrook_houses/lots.py): its room under the
+    // ceiling, then each doorway through its wall
     boxes: [
-      // the shop: inner walls x +-4.25, z +-4.05, the deck at 0.45, under the beams that
-      // carry the ceiling (4.23 to 4.63); its back shelves, z 3.56 to 4.05, stand in front of
-      // the back wall
-      [-4.0, 4.0, 0.45, 4.25, -3.8, 3.46],
-      // the front door through the shop front (z -4.5 to -4.05), its head at 3.7
-      [-1.6, 0.2, 0.45, 3.7, -4.6, -3.5],
+      [-4.05, 4.05, 0.45, 4.25, -3.85, 3.85],
+      [-1.86, 0.46, 0.45, 3.7089, -4.6, -3.05],
     ],
     openings: [{ box: 1, axis: 2, side: -1 }],
   },
   smithy: {
+    // the hand-built lot (scripts/assets/eastbrook_houses/lots.py): its room under the
+    // ceiling, then each doorway through its wall
     boxes: [
-      // the forge room: inner walls x +-4.9, z +-3.9, the deck at 0.45, the ceiling 5.25;
-      // the hearth (x -4.9 to -3.98, four yards up) fills its -x end
-      [-3.85, 4.65, 0.45, 5.25, -3.65, 3.65],
-      // the front door through the front wall (z -4.5 to -3.9), its head at 4.45
-      [-2.6, 0.2, 0.45, 4.45, -4.6, -3.4],
-      // the side arch onto the forge shelter through the +x wall (x 4.9 to 5.5)
-      [4.4, 5.6, 0.45, 4.05, -1.2, 1.2],
+      [-4.85, 4.85, 0.45, 4.85, -3.85, 3.85],
+      [-2.6, 0.2, 0.45, 4.3831, -4.6, -3.05],
     ],
-    openings: [
-      { box: 1, axis: 2, side: -1 },
-      { box: 2, axis: 0, side: 1 },
-    ],
+    openings: [{ box: 1, axis: 2, side: -1 }],
   },
   guild: {
-    // scripts/assets/highwatch_guild/guild_plan.py: one storey, the floor at 0.6 everywhere
+    // the hand-built lot (scripts/assets/eastbrook_houses/lots.py): its room under the
+    // ceiling, then each doorway through its wall
     boxes: [
-      // the great hall: inner walls x +-14, z +-10, clear of the hearth's breast and the
-      // shelves on the right wall (x -12.7), under the chandeliers; the open roof's trusses
-      // all stand above 11.6. Its front face sits a hair past the quarter yard (-9.74) so a
-      // walk in at a free turn never lands on it exactly, where float rounding alone would
-      // decide whether the eye is in
-      [-12.45, 13.75, 0.6, 9.6, -9.74, 9.75],
-      // the front door through the front wall (z -10.9 to -10), its head at 6.2
-      [-1.6, 1.6, 0.6, 6.2, -11.0, -9.7],
-      // the round arch into the trophy hall, inside its curve, and the trophy hall under its
-      // tie beams, short of its hearth's breast
-      [-2.8, 2.8, 0.6, 7.4, 9.6, 11.2],
-      [-8.25, 8.25, 0.6, 9.1, 10.95, 18.55],
+      [-14.25, 14.25, 0.6, 10, -10.25, 10.25],
+      [-1.61, 1.61, 0.6, 5.1231, -11, -9.45],
+      [-2.8, 2.8, 0.6, 6.25, 9.45, 11.8],
+      [-8.6, 8.6, 0.6, 7.35, 11.15, 19.15],
     ],
     openings: [{ box: 1, axis: 2, side: -1 }],
   },

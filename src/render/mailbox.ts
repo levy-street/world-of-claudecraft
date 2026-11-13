@@ -7,6 +7,7 @@ import * as THREE from 'three';
 import { type LoadedGltf, loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import {
+  eastbrookMaterialUsesAtlas,
   eastbrookSurfaceAtlasMetadata,
   eastbrookSurfaceAtlasTexture,
   eastbrookSurfaceGeometry,
@@ -84,9 +85,15 @@ export function buildMailboxFromSource(
     if (Array.isArray(child.material)) {
       throw new Error('Ravenpost mailbox GLB must use one material per mesh');
     }
-    child.geometry = markSharedGeometry(adaptedGeometry(child.geometry, child.material));
+    // A hand-painted model (scripts/assets/eastbrook_houses/props.py) carries its own
+    // textures and coordinates: only a texture-free one is laid onto the town atlas.
+    const painted = !eastbrookMaterialUsesAtlas(child.material, atlas);
+    const paintedName = child.material.name.startsWith('eh_');
+    child.geometry = markSharedGeometry(
+      painted ? child.geometry.clone() : adaptedGeometry(child.geometry, child.material),
+    );
     child.material = markSharedMaterial(eastbrookSurfaceMaterial(child.material, atlas));
-    child.castShadow = child.material.name === 'MailboxOpaque';
+    child.castShadow = paintedName || child.material.name === 'MailboxOpaque';
     child.receiveShadow = true;
   });
 

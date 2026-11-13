@@ -348,10 +348,24 @@ describe('live-world touch-up pipeline', () => {
     });
 
     // 3. Added north cottages, Streetlamp 17, and 12 Fenbridge foliage placements exist and level terrain.
+    // Re-pinned 2026-11-11 for the hand-built harbour set: the document also stands the
+    // twenty sites of scripts/assets/eastbrook_houses/sites.json (Eastbrook's six placed
+    // houses, its square's stalls, benches and yard fences, Fenbridge's cistern, stall and
+    // muster board), so 16 became 36, and the north cottages are the moss set's house_a.
     const placements = WORLD_TOUCHUP.changes.placements ?? [];
-    expect(placements).toHaveLength(16);
+    expect(placements).toHaveLength(36);
+    expect(placements.filter((p) => p.path.startsWith('/models/eastbrook_houses/'))).toHaveLength(
+      20,
+    );
+    // of those twenty, only the five free-standing houses collide; the rest stand on a town
+    // record that already collides for them, and say so in the mode the sim reads first
+    const sites = (WORLD_TOUCHUP_SOURCE?.placements ?? []).filter((p) =>
+      p.assetId.startsWith('eastbrook_houses/'),
+    );
+    expect(sites.filter((p) => p.collisionMode === 'baked')).toHaveLength(5);
+    expect(sites.filter((p) => p.collisionMode === 'none' && p.collide === false)).toHaveLength(15);
     const sourceCottages = (WORLD_TOUCHUP_SOURCE?.placements ?? []).filter(
-      (p) => p.assetId === 'tidehold/fenrire/house_a' && p.z > 340,
+      (p) => p.assetId === 'tidehold/harbour_moss/house_a' && p.z > 340,
     );
     expect(sourceCottages.map((p) => p.uid)).toEqual([
       'd4a2522da25a',
@@ -359,7 +373,7 @@ describe('live-world touch-up pipeline', () => {
       '97310fe05757',
     ]);
     const northCottages = placements.filter(
-      (p) => p.path === '/models/tidehold/fenrire/house_a.glb',
+      (p) => p.path === '/models/tidehold/harbour_moss/house_a.glb',
     );
     expect(northCottages).toHaveLength(3);
     for (const cottage of northCottages) {

@@ -9,8 +9,8 @@
     "riftControlSuppressed: guard rolls drawn, effects skipped inside the window",
     "clearRiftBossDeathZones on boss death (riftDeathZoneClear emit + floor claim)"
   ],
-  "draws": 1377,
-  "drawDigest": "e83d02e4",
+  "draws": 1376,
+  "drawDigest": "00774f55",
   "frames": [
     {
       "tick": 0,
@@ -809,8 +809,8 @@
       "state": "f874b6f3",
       "events": "5892e82e",
       "rng": {
-        "draws": 1161,
-        "digest": "96aa8619"
+        "draws": 1160,
+        "digest": "690095f6"
       }
     },
     {
@@ -820,8 +820,8 @@
       "state": "f874b6f3",
       "events": "741638a5",
       "rng": {
-        "draws": 1161,
-        "digest": "96aa8619"
+        "draws": 1160,
+        "digest": "690095f6"
       },
       "label": "detonated",
       "players": [
@@ -1152,8 +1152,8 @@
       "state": "f3e877d2",
       "events": "fb526faf",
       "rng": {
-        "draws": 1226,
-        "digest": "0530985d"
+        "draws": 1225,
+        "digest": "da677b5b"
       }
     },
     {
@@ -1163,8 +1163,8 @@
       "state": "8eb16521",
       "events": "af39ce1a",
       "rng": {
-        "draws": 1295,
-        "digest": "f2a765d4"
+        "draws": 1294,
+        "digest": "0f037017"
       }
     },
     {
@@ -1174,8 +1174,8 @@
       "state": "4af7d018",
       "events": "741638a5",
       "rng": {
-        "draws": 1359,
-        "digest": "ec813109"
+        "draws": 1356,
+        "digest": "9c9ff56c"
       }
     },
     {
@@ -1185,8 +1185,8 @@
       "state": "0ff8fc76",
       "events": "741638a5",
       "rng": {
-        "draws": 1377,
-        "digest": "e83d02e4"
+        "draws": 1376,
+        "digest": "00774f55"
       },
       "label": "boss-dead-clear",
       "players": [
@@ -1523,8 +1523,8 @@
       "state": "0ff8fc76",
       "events": "741638a5",
       "rng": {
-        "draws": 1377,
-        "digest": "e83d02e4"
+        "draws": 1376,
+        "digest": "00774f55"
       },
       "label": "final",
       "players": [

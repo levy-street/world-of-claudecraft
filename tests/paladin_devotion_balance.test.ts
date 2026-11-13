@@ -61,10 +61,16 @@ const PRIORITY: Readonly<Record<PaladinSpec, readonly string[]>> = {
 // pines and bed-side decorations the renderer never drew, so their trunk
 // colliders are gone) forks it once more: protection 40.15 to 38.65; holy
 // and retribution unmoved.
+// The hand-built town lots and props fork it once more (every town building
+// rebuilt on the same walls with a room of its own, the props and castle
+// pieces remade, six houses placed in Eastbrook with the trees and rocks
+// round them cleared: annexes, prop colliders and cleared ground are world-gen
+// inputs, scripts/assets/eastbrook_houses/): holy 43 to 41.25, protection 41.7
+// to 38.65; retribution unmoved.
 // The wide 35-65s design band still holds.
 const EXPECTED_SECONDS: Readonly<Record<PaladinSpec, number>> = {
-  holy: 43,
-  protection: 41.7,
+  holy: 41.25,
+  protection: 38.65,
   retribution: 52.45,
 };
 

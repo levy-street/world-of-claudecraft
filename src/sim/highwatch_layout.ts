@@ -59,10 +59,10 @@ const COUNTING_HOUSE_SCALE = 1.5;
 const WATCH_HOUSE_SCALE = 1.4;
 const SMITHY_SCALE = 1.3;
 
-// The Highwatch look of the painted set: the same models and geometry as
-// /models/tidehold/, re-baked wearing the harbour colours with square slate
-// roofs and ashlar walls (cool granite under blue slate for the peaks).
-const PAINTED_SET = '/models/tidehold/highwatch';
+// The alpine colour set of the hand-built harbour lots (pale steel slate, dark
+// timber, cool granite for the peaks): the same models every town stands,
+// scripts/assets/eastbrook_houses/lots.py.
+const PAINTED_SET = '/models/tidehold/harbour_alpine';
 
 const EAST_FACING = Math.PI / 2; // the door looks east (-x), the model turned a quarter
 const WEST_FACING = -Math.PI / 2; // the door looks west (+x)
@@ -89,7 +89,7 @@ const INN = makePlacedTownBuilding(
     rotation: EAST_FACING,
     ...scalePlacedTownMeasurements(
       {
-        reach: { x: 1.079, z: -0.864, width: 30.262, height: 22.351, depth: 20.428 },
+        reach: { x: 1.079, z: -0.864, width: 30.262, height: 24.9645, depth: 20.428 },
         walls: { x: 0, z: 0, width: 26, depth: 15 },
         annexes: [
           // the round turret at the front's south corner
@@ -97,6 +97,7 @@ const INN = makePlacedTownBuilding(
           { name: 'chimney', x: -13.47, z: -1, width: 1, depth: 2.4 },
         ],
         doorX: -2,
+        modelSize: 33.9854,
       },
       INN_SCALE,
     ),
@@ -116,7 +117,7 @@ const CHAPEL = makePlacedTownBuilding(
     rotation: NORTH_FACING,
     ...scalePlacedTownMeasurements(
       {
-        reach: { x: 1.9255, z: -0.254, width: 18.851, height: 30.5, depth: 24.212 },
+        reach: { x: 1.9255, z: -0.254, width: 18.851, height: 29.542, depth: 24.212 },
         walls: { x: 0, z: 0, width: 12, depth: 22 },
         annexes: [
           // the bell tower at the front's east corner, over the gate
@@ -124,6 +125,7 @@ const CHAPEL = makePlacedTownBuilding(
           { name: 'notice_board', x: -4.2, z: -11.8, width: 1.8, depth: 0.6 },
         ],
         doorX: 0,
+        modelSize: 30.2535,
       },
       CHAPEL_SCALE,
     ),
@@ -142,13 +144,14 @@ const COUNTING_HOUSE = makePlacedTownBuilding(
     rotation: WEST_FACING,
     ...scalePlacedTownMeasurements(
       {
-        reach: { x: 0, z: -0.8, width: 13.004, height: 16.28, depth: 12.2 },
+        reach: { x: 0, z: -0.8, width: 13.004, height: 20.21, depth: 12.2 },
         walls: { x: 0, z: 0, width: 11, depth: 8.4 },
         annexes: [
           { name: 'stall_counter', x: 2.375, z: -5.925, width: 3.61, depth: 0.77 },
-          { name: 'stall_barrels', x: 4.885, z: -5.762, width: 1.477, depth: 2.169 },
+          { name: 'stall_barrels', x: 4.9, z: -5.775, width: 1.4, depth: 2.15 },
         ],
         doorX: -1.6,
+        modelSize: 20.21,
       },
       COUNTING_HOUSE_SCALE,
     ),
@@ -166,10 +169,11 @@ const WATCH_HOUSE = makePlacedTownBuilding(
     rotation: EAST_FACING,
     ...scalePlacedTownMeasurements(
       {
-        reach: { x: 0.386, z: 0.23, width: 12.764, height: 19.58, depth: 16.264 },
+        reach: { x: 0.386, z: 0.23, width: 12.764, height: 24.277, depth: 16.264 },
         walls: { x: 0, z: 0, width: 8.56, depth: 11.96 },
         annexes: [{ name: 'tower', x: 4.61, z: 6.31, width: 2.76, depth: 2.76 }],
         doorX: -1.6,
+        modelSize: 24.277,
       },
       WATCH_HOUSE_SCALE,
     ),
@@ -186,13 +190,11 @@ const SMITHY = makePlacedTownBuilding(
     rotation: SOUTH_FACING,
     ...scalePlacedTownMeasurements(
       {
-        reach: { x: 3.4285, z: -0.2955, width: 19.797, height: 12.781, depth: 11.69 },
+        reach: { x: 3.4285, z: -0.2955, width: 19.797, height: 17.94, depth: 11.69 },
         walls: { x: 0, z: 0, width: 11, depth: 9 },
-        annexes: [
-          { name: 'forge_shelter', x: 9.12, z: -0.08, width: 7.24, depth: 9.64 },
-          { name: 'chimney', x: -5.97, z: 1, width: 1, depth: 2 },
-        ],
+        annexes: [{ name: 'forge_shelter', x: 9.12, z: -0.08, width: 7.24, depth: 9.64 }],
         doorX: -1.2,
+        modelSize: 19.99,
       },
       SMITHY_SCALE,
     ),
@@ -203,8 +205,8 @@ const SMITHY = makePlacedTownBuilding(
 
 // The adventurers' guild, Lantern Hall, at the old stable yard where the Stormcrag road's spur
 // ends (the yard Marla's stables left when she moved to Galecrest): a walk-in hall of one
-// storey (scripts/assets/highwatch_guild/, built at its own grand size, so it stands at scale
-// 1), its door looking east down the spur at the town. Its great hall is the wall box; the
+// storey (the `guild` lot of scripts/assets/eastbrook_houses/lots.py, built at its own grand
+// size, so it stands at scale 1), its door looking east down the spur at the town. Its great hall is the wall box; the
 // trophy hall behind it, the lantern tower at the front's south corner and the two chimneys
 // are its solid annexes; the porch, the steps and the paved yard lie inside its reach. Its pad
 // and apron touch no camp's ground (the Stormcrag elementals' wander stops north of it, the
@@ -219,7 +221,7 @@ const GUILD = makePlacedTownBuilding(
     rotation: EAST_FACING,
     ...scalePlacedTownMeasurements(
       {
-        reach: { x: 2.825, z: -1.375, width: 39.05, height: 35.45, depth: 47.75 },
+        reach: { x: 2.825, z: -1.375, width: 39.05, height: 36.38, depth: 47.75 },
         walls: { x: 0, z: 0, width: 29.8, depth: 21.8 },
         annexes: [
           { name: 'trophy_hall', x: 0, z: 15.9, width: 18.8, depth: 10 },
@@ -228,6 +230,7 @@ const GUILD = makePlacedTownBuilding(
           { name: 'trophy_chimney', x: 0, z: 21.6, width: 2.2, depth: 1.4 },
         ],
         doorX: 0,
+        modelSize: 41.8333,
       },
       GUILD_SCALE,
     ),

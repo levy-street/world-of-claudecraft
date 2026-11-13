@@ -20,6 +20,7 @@
 import { DAY_NIGHT_CYCLE_MS } from '../sim/day_night';
 import type { BiomeId } from '../sim/types';
 import { clamp01 } from './num_clamp';
+import { turnAboutVertical } from './zone_sun_core';
 
 /** Full day-to-night-to-day period. Forty-five real minutes: long enough that a
  *  zone crossing is not outpaced by the sky (the old twenty felt frantic), still
@@ -538,24 +539,42 @@ const CELESTIAL_TILT_Z = 0.32;
 // 40 degrees rather than near the zenith, so the bodies stay inside the player's
 // (downward-looking) view band and cast readable medium-angle shadows.
 const CELESTIAL_ARC_HEIGHT = 0.28;
+/** The shared arc's noon elevation, in degrees (about 41). */
+export const CELESTIAL_NOON_ELEVATION_DEG =
+  (Math.atan2(CELESTIAL_ARC_HEIGHT, CELESTIAL_TILT_Z) * 180) / Math.PI;
 
 /** Unit direction toward the sun for a cycle phase: on the horizon at dawn
  *  (0.25), highest at noon (0.5), back to the horizon at dusk (0.75), and below
  *  the horizon through the night. The renderer places the key light and the sky
  *  sun disc along this, and the HUD is unaffected. */
-export function sunDirection(phase: number): [number, number, number] {
+export function sunDirection(
+  phase: number,
+  turnDeg = 0,
+  noonElevDeg = CELESTIAL_NOON_ELEVATION_DEG,
+): [number, number, number] {
   const a = (phase - 0.25) * 2 * Math.PI; // dawn 0, noon PI/2, dusk PI, midnight -PI/2
+  // A zone may stand its sun higher or lower at noon (zone_sun_core.ts): the arc's height
+  // for that elevation, the shared 0.28 for the shared one.
+  const height =
+    noonElevDeg === CELESTIAL_NOON_ELEVATION_DEG
+      ? CELESTIAL_ARC_HEIGHT
+      : CELESTIAL_TILT_Z * Math.tan((Math.min(80, Math.max(10, noonElevDeg)) * Math.PI) / 180);
   const x = Math.cos(a);
-  const y = Math.sin(a) * CELESTIAL_ARC_HEIGHT; // capped peak so it stays in view
+  const y = Math.sin(a) * height; // capped peak so it stays in view
   const z = CELESTIAL_TILT_Z;
   const len = Math.hypot(x, y, z);
-  return [x / len, y / len, z / len];
+  // ...and may turn the whole arc about the vertical, so its noon sun stands to another side.
+  return turnAboutVertical([x / len, y / len, z / len], turnDeg);
 }
 
 /** Unit direction toward the moon: the sun's antipode in the cycle, so it climbs
  *  the sky through the night while the sun is down and sets around dawn. */
-export function moonDirection(phase: number): [number, number, number] {
-  return sunDirection(phase + 0.5);
+export function moonDirection(
+  phase: number,
+  turnDeg = 0,
+  noonElevDeg = CELESTIAL_NOON_ELEVATION_DEG,
+): [number, number, number] {
+  return sunDirection(phase + 0.5, turnDeg, noonElevDeg);
 }
 
 /** How far above the horizon a body sits, 0 (at or below) to 1 (well up), from

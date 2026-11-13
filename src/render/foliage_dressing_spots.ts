@@ -6,6 +6,7 @@
 
 import { STABLE_PADDOCK } from '../sim/content/mounts';
 import { getActiveWorldContent, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../sim/data';
+import { PAINTED_TOWN_DRESSING_PAD, paintedTownReachCovers } from '../sim/decoration_exclusions';
 import { onFerryPier } from '../sim/ferry_piers';
 import { galeDeckSurface } from '../sim/gale_harbor';
 import type { BiomeId } from '../sim/types';
@@ -215,6 +216,9 @@ export function generateDressing(seed: number): DressingSpot[] {
       if (insideDressingExclusion(activeContent.zones, activeContent.camps, x, z)) continue;
       // the Highwatch guild's model brings its own floors, porch and yard: no scrub through them
       if (insideHighwatchGuildGround(x, z)) continue;
+      // nor through the floor of any painted town building: a fern grew up inside the
+      // Palmreach inn, whose lot stands outside the hub's own clearing
+      if (paintedTownReachCovers(x, z, PAINTED_TOWN_DRESSING_PAD)) continue;
       if (roadDistance(x, z) < 4) continue;
       const dressH = terrainHeight(x, z, seed);
       if (dressH < WATER_LEVEL + 1.2) continue;
@@ -233,6 +237,11 @@ export function generateDressing(seed: number): DressingSpot[] {
   }
   // the Evergarden's clipped hedges and rose centerpieces, laid out by the
   // parterre plan instead of the hash scatter above
-  out.push(...parterreBushSpots(seed));
+  // (a bush of a walk's row that the rebuilt town's larger houses now stand over is left out:
+  // the row carries on either side of the house)
+  for (const spot of parterreBushSpots(seed)) {
+    // (a hair's pad: the reach test is strict, and a point inside is at distance zero)
+    if (!paintedTownReachCovers(spot.x, spot.z, 0.01)) out.push(spot);
+  }
   return out;
 }

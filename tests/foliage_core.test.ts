@@ -5,8 +5,10 @@ import {
   insideDressingExclusion,
   insideEastbrookGrassExclusion,
   insideGrassHubExclusion,
+  insidePavedGrassExclusion,
 } from '../src/render/foliage_core';
 import { BUILTIN_WORLD, PROPS } from '../src/sim/data';
+import { DAWNHOLD, DAWNHOLD_COURT } from '../src/sim/dawnhold_layout';
 import { EASTBROOK_LAYOUT, localToWorld } from '../src/sim/eastbrook_layout';
 import { HIGHWATCH_LAYOUT } from '../src/sim/highwatch_layout';
 import { tavernGroundsRects } from '../src/sim/mirefen_tavern_grounds';
@@ -495,5 +497,40 @@ describe('Eastbrook town grass exclusion', () => {
     expect(source).toMatch(
       /if \(insideEastbrookGrassExclusion\(townExclusions, x, z, GRASS_BUILDING_PADDING\)\)\s*continue;/,
     );
+  });
+});
+
+describe("Dawnhold's bailey is a castle green", () => {
+  // The bailey was one flagstone plane from wall to wall, and for a while every grass
+  // system kept off it. It is lawn again (dawnhold_features.ts lays no floor), so the blade
+  // carpets run through it like any other lawn of the garden.
+  it('is no paving anywhere in the inner court', () => {
+    const cx = (DAWNHOLD.wx0 + DAWNHOLD.wx1) / 2;
+    const cz = (DAWNHOLD.wz0 + DAWNHOLD.wz1) / 2;
+    expect(insidePavedGrassExclusion(cx, cz)).toBe(false);
+    // a point in the castle's west yard
+    expect(insidePavedGrassExclusion(249.89, 879.83)).toBe(false);
+    const reach = DAWNHOLD.wallTh / 2 + 0.5;
+    expect(insidePavedGrassExclusion(DAWNHOLD.wx0 - reach + 0.01, cz)).toBe(false);
+    expect(insidePavedGrassExclusion(DAWNHOLD.wx1 + reach - 0.01, cz)).toBe(false);
+    // nor the walled flower court off the south wall
+    const courtX = (DAWNHOLD_COURT.x0 + DAWNHOLD_COURT.x1) / 2;
+    const courtZ = (DAWNHOLD.wz1 + DAWNHOLD_COURT.z1) / 2;
+    expect(insidePavedGrassExclusion(courtX, courtZ)).toBe(false);
+  });
+
+  it('lays no flagstone floor over the lawn, and both blade carpets still ask the rule', () => {
+    const features = readFileSync(
+      new URL('../src/render/dawnhold_features.ts', import.meta.url),
+      'utf8',
+    );
+    expect(features).not.toContain('castlePavingMat');
+    expect(features).not.toContain('PlaneGeometry');
+    // the threshold apron inside the gate stays: paving where boots land
+    expect(features).toContain("put('kcasFloorLarge'");
+    for (const file of ['blade_grass.ts', 'blade_grass_band.ts']) {
+      const source = readFileSync(new URL(`../src/render/${file}`, import.meta.url), 'utf8');
+      expect(source, file).toContain('insidePavedGrassExclusion(x, z)');
+    }
   });
 });

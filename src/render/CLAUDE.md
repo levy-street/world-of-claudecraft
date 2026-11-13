@@ -904,7 +904,7 @@ GPU work signs. Each rule names its seam and its guard.
   world renderer, and a per-site call is easy to miss on one of the others. Guard:
   `tests/final_color_nan_guard.test.ts`.
 - **Cel-shading R&D look (`?cel=on`, opt-in, reload to flip).** `cel_shading_core.ts`
-  reads the URL knobs (`cellight=off`, `celbands=2|3`, `celedge`, `cellit`, `celmid`,
+  reads the URL knobs (`cellight=on|off`, off by default, `celbands=2|3`, `celedge`, `cellit`, `celmid`,
   `celink`, `celinkwidth`, `celsat`) and builds the toon ramp, a patch over the
   DIRECTIONAL loop of `lights_fragment_begin` only (point lights and the hemisphere
   fill stay smooth); `cel_shading.ts` installs it at module scope (the template above).

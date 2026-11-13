@@ -209,9 +209,17 @@ describe('collision & terrain', () => {
   });
 
   it('resolvePosition pushes points out of colliders', () => {
-    const center = EASTBROOK_BUILDINGS_BY_ID.eastbrook_bank.position;
-    const inside = resolvePosition(SEED, center.x, center.z, 0.5);
-    expect(Math.abs(inside.x - center.x) + Math.abs(inside.z - center.z)).toBeGreaterThan(0.5);
+    // A point in the thickness of the bank's back wall. (The bank is a walk-in lot: the
+    // middle of its footprint is its own floor, where a body is in no collider at all.)
+    const { center, halfDepth, rotation } = EASTBROOK_BUILDINGS_BY_ID.eastbrook_bank.footprint;
+    const wall = {
+      x: center.x + Math.sin(rotation) * (halfDepth - 0.35),
+      z: center.z + Math.cos(rotation) * (halfDepth - 0.35),
+    };
+    const inside = resolvePosition(SEED, wall.x, wall.z, 0.5);
+    expect(Math.abs(inside.x - wall.x) + Math.abs(inside.z - wall.z)).toBeGreaterThan(0.5);
+    const floor = resolvePosition(SEED, center.x, center.z, 0.5);
+    expect(Math.abs(floor.x - center.x) + Math.abs(floor.z - center.z)).toBe(0);
     const open = resolvePosition(SEED, 0, -40, 0.5); // open road
     expect(open.x).toBe(0);
     expect(open.z).toBe(-40);

@@ -69,7 +69,7 @@ function backFaceSoup(box: THREE.BufferGeometry): number[] {
 // Pinned against the shipped public/models/biome/hexb_home_a.glb bytes: of
 // the seven detected window assemblies, five carry a qualifying recessed
 // glass plane; the other two go dark by design.
-const REAL_GLB_PANE_COUNT = 5;
+const REAL_GLB_PANE_COUNT = 0;
 
 describe('kit window pane core', () => {
   it('rejects a big wall slab component', () => {
@@ -189,7 +189,12 @@ describe('kit window pane core', () => {
     expect(panes[0].positions).toEqual(backFaceSoup(paneBox()));
   });
 
-  it('pins the exact pane set of the shipped hexb_home_a kit model', async () => {
+  it('finds no kit window assembly in the painted hexb_home_a, which lights its own glass', async () => {
+    // The hexb houses were one mesh of one palette material, their windows
+    // modelled in: this detector read the panes out of that geometry (five on
+    // hexb_home_a) so the town could light them. They are hand-painted models
+    // now, with the glass a material of its own, so the town must find nothing
+    // to add: a pane found here would be a second, misplaced glow.
     await MeshoptDecoder.ready;
     const io = new NodeIO()
       .registerExtensions(ALL_EXTENSIONS)
@@ -204,29 +209,13 @@ describe('kit window pane core', () => {
     if (!positions) throw new Error('hexb_home_a POSITION has no array');
     const indices = primitive.getIndices()?.getArray() ?? null;
 
-    const panes = kitWindowPanes(positions, position.getCount(), indices);
-    expect(panes).toHaveLength(REAL_GLB_PANE_COUNT);
-
-    for (const pane of panes) {
-      // A pane is a nonempty triangle soup whose every triangle lies in a
-      // plane facing along a horizontal axis (the assembly's thin axis).
-      expect(pane.positions.length).toBeGreaterThan(0);
-      expect(pane.positions.length % 9).toBe(0);
-      for (let triangle = 0; triangle < pane.positions.length / 9; triangle++) {
-        const base = triangle * 9;
-        const abx = pane.positions[base + 3] - pane.positions[base];
-        const aby = pane.positions[base + 4] - pane.positions[base + 1];
-        const abz = pane.positions[base + 5] - pane.positions[base + 2];
-        const acx = pane.positions[base + 6] - pane.positions[base];
-        const acy = pane.positions[base + 7] - pane.positions[base + 1];
-        const acz = pane.positions[base + 8] - pane.positions[base + 2];
-        const nx = aby * acz - abz * acy;
-        const ny = abz * acx - abx * acz;
-        const nz = abx * acy - aby * acx;
-        const length = Math.hypot(nx, ny, nz);
-        expect(length).toBeGreaterThan(0);
-        expect(Math.max(Math.abs(nx), Math.abs(nz)) / length).toBeGreaterThan(0.9);
-      }
-    }
+    expect(kitWindowPanes(positions, position.getCount(), indices)).toHaveLength(
+      REAL_GLB_PANE_COUNT,
+    );
+    const materials = document
+      .getRoot()
+      .listMaterials()
+      .map((material) => material.getName());
+    expect(materials).toContain('eh_glass');
   });
 });

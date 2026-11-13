@@ -99,18 +99,18 @@ export const STREETLAMP_COLLIDER_BAND = 2.4;
  * reaching head, which errs toward solid, the safe direction for collision.
  */
 export const STREETLAMP_COLLIDER_RADIUS: Readonly<Record<StreetlampStyleId, number>> = {
-  amberfall_crystal: 0.83,
+  amberfall_crystal: 0.82,
   drakelands_brazier: 0.79,
   eastbrook_civic: 0.45,
-  evergarden_flower: 0.85,
+  evergarden_flower: 0.66,
   farshore_coral: 1.0,
-  frostveil_icicle: 0.55,
-  galecrest_mast: 1.02,
+  frostveil_icicle: 0.46,
+  galecrest_mast: 0.74,
   mirefen_witchflame: 1.02,
-  nightbloom_moonflower: 1.06,
-  palmreach_totem: 0.72,
+  nightbloom_moonflower: 0.9,
+  palmreach_totem: 1.0,
   thornpeak_beacon: 1.08,
-  veiled_crystal: 0.69,
-  willowfen_reed: 0.82,
-  wraithwood_ghost: 0.93,
+  veiled_crystal: 0.89,
+  willowfen_reed: 1.01,
+  wraithwood_ghost: 1.08,
 };

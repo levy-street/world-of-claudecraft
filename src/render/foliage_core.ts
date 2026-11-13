@@ -21,6 +21,7 @@ import {
   onWildheartBasinEntranceCauseway,
   WILDHEART_BASIN_ENTRANCE_DUNGEON_ID,
 } from '../sim/wildheart_basin_entrance';
+import { insideFortressGrassKeepout } from './fortress_grass_keepout_core';
 import { onSanctumSealGateFloor } from './sanctum_seal_gate_core';
 
 /** The foliage placement hash: a deterministic [0, 1) value per (a, b, salt k).
@@ -72,6 +73,10 @@ export function insidePavedGrassExclusion(x: number, z: number): boolean {
     return true;
   }
   if (insideHighwatchGuildGround(x, z)) return true;
+  // (Dawnhold's bailey is a castle green, lawn from wall to wall: dawnhold_features.ts
+  // no longer paves it, so it is not paving here either and the blade carpet runs through.)
+  // the Drakelands fortress and the Last Keep keep the bare ground they were placed on
+  if (insideFortressGrassKeepout(x, z)) return true;
   // the Smith's Seal Gate: the frozen flags of its tunnel and lane
   const sanctum = DUNGEONS[SANCTUM_SEAL_GATE_DUNGEON_ID];
   return sanctum !== undefined && onSanctumSealGateFloor(activeDungeonDoorPos(sanctum), x, z, 0.2);
