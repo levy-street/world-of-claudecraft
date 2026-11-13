@@ -2991,7 +2991,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     specNotes: {
       assassination: 'Adds 1 Venom Ritual (max 6).',
       combat:
-        'While Redline is active, this button becomes Haymaker: 130% weapon damage plus 10, awards 2 combo points, and adds 1 Redline (max 4).',
+        'While Redline is active, this button becomes Haymaker: a heavier weapon strike that awards 2 combo points and adds 1 Redline (max 4).',
     },
   },
   eviscerate: {
@@ -3037,7 +3037,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       assassination:
         'At 6 Venom Ritual, this button becomes Venomrend: a strike that instantly deals all the damage your bleeds would still have dealt, plants a fresh venom wound, and restores 20 energy.',
       combat:
-        'Landing this with 4 or more combo points starts Redline for 8 sec: Wicked Slash becomes Haymaker and this button becomes Lights Out (45 plus 35 per combo point, hitting 25% harder for each Haymaker you throw during Redline, restores 25 energy). Spend it before Redline ends.',
+        'Landing this with 4 or more combo points starts Redline for 8 sec: Wicked Slash becomes Haymaker and this button becomes Lights Out (a finisher that hits 25% harder for each Haymaker you throw during Redline and restores 25 energy). Spend it before Redline ends.',
     },
   },
   backstab: {
@@ -5494,7 +5494,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Condemnation. Cannot be used at or below 20% health.',
+      'Sacrifices 12% of your maximum health to restore $b% of your maximum mana and generate 20 Condemnation. Cannot be used at or below 20% health.',
   },
   vicarious_suffering: {
     id: 'vicarious_suffering',
@@ -5763,8 +5763,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         effects: [{ type: 'lifeTap', hp: 85, mana: 85 }],
       },
     ],
-    description:
-      'Converts $d health into $d mana (50% more mana with Blood Credit). Fails if you have $d health or less.',
+    description: 'Converts $d health into $b mana. Fails if you have $d health or less.',
   },
   curse_of_agony: {
     id: 'curse_of_agony',
@@ -5913,7 +5912,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Curses your primary Evil Eye for 6 sec. Condemnation gains release a wave that damages up to 2 other enemies within 8 yd, at most once per second. Rank 2 extends it to 8 sec and 4 enemies.',
+      'Curses your primary Evil Eye for $t sec. Condemnation gains release a wave that damages up to 2 other enemies (4 from Rank 2) within 8 yd, at most once per second.',
   },
   umbral_anchor: {
     id: 'umbral_anchor',
@@ -6557,7 +6556,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // extendDot maxBonus, see abilityDurationValue): Moonscorch 2pc wearers
     // read 12 there, everyone else the base 6.
     description:
-      'Moonwing Form only. Strikes for $d Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest on the target by 6 sec, up to $t extra sec per Lunar Tempest application. At 3 Moontide, this button becomes Moonsurge: an instant strike for 136 to 162 Arcane damage (plus spell power) that spends all 3.',
+      'Moonwing Form only. Strikes for $d Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest on the target by 6 sec, up to $t extra sec per Lunar Tempest application. At 3 Moontide, this button becomes Moonsurge: an instant heavy Arcane strike that spends all 3.',
   },
   rejuvenation: {
     id: 'rejuvenation',
@@ -6726,7 +6725,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       'Your next melee swing deals $d extra damage and generates threat equal to 2.5 times its damage plus a small flat amount. Bruin Form only.',
     specNotes: {
       feral:
-        'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead heals you for 18% of your maximum health and refunds 15 rage.',
+        'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a heavy strike at high threat; below half health it instead heals you for 18% of your maximum health and refunds 15 rage.',
     },
   },
   growl: {
@@ -7029,7 +7028,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // this row breaks the en-vs-locale interpolation-parity guard
     // (tests/i18n_completeness.test.ts) for all 20 overlays, whose translations
     // carry no token. Same shape the flat 150 shipped with.
-    description: 'Your skin hardens like bark, increasing armor by 20% for 15 sec.',
+    description: 'Your skin hardens like bark, increasing armor by $b% for 15 sec.',
   },
   // Druid tank cooldown: a dodge-based defensive (distinct from Oakhide's armor
   // boost). Usable while shapeshifted so a bear tank pops it mid-fight; buff_dodge
@@ -7073,7 +7072,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description: 'Calls down a bolt of stellar fire, causing $d Arcane damage.',
     specNotes: {
       balance:
-        'In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant strike for 80 to 100 Nature damage plus a 45 burn over 9 sec, restoring 35 mana and spending all 3.',
+        'In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant Nature strike plus a burn over 9 sec, restoring 35 mana and spending all 3.',
     },
   },
   travel_form: {
@@ -7320,7 +7319,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'dot', total: 312, duration: 24, interval: 2, baseTotal: 72, perComboTotal: 48 },
     ],
     description:
-      'Finishing move that makes the target bleed every 2 sec for 24 sec: 72 damage plus 48 per combo point spent (5 combo points: $d total). Cat Form only.',
+      'Finishing move that makes the target bleed every 2 sec for 24 sec, dealing more damage for each combo point spent (5 combo points: $d total). Cat Form only.',
     specNotes: {
       feral: 'The landed hit adds 1 Old Blood (max 3).',
     },
@@ -8933,7 +8932,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [],
     description:
-      'Passive: when your Fire spells critically strike, the target burns for an extra 30% of the damage dealt over 6 sec. A new burn on a target that is already burning adds to the damage still owed and restarts the 6 sec timer. (Fire mastery)',
+      'Passive: when your Fire spells critically strike, the target burns for an extra 1.5% of the damage dealt per character level (30% at level 20) over 6 sec. A new burn on a target that is already burning adds to the damage still owed and restarts the 6 sec timer. (Fire mastery)',
   },
   hot_streak: {
     id: 'hot_streak',
@@ -9327,11 +9326,8 @@ function scaleEffect(
         : eff;
     case 'lifeTap':
       // Same policy as gainResource below: a health-to-mana conversion is
-      // economy, not damage. Scaling only the mana half would also break the
-      // authored hp == mana symmetry the Hard Bargain tooltip promises
-      // ("Converts {damage} health into {damage} mana"). Intentional yield
-      // scaling rides the per-ability buffPct (Blood Credit), applied at the
-      // effect_dispatch lifeTap arm.
+      // economy, not damage. Intentional yield scaling rides the per-ability
+      // buffPct (Blood Credit), resolved onto the mana half in applyTalentMods.
       return eff;
     case 'gainResource':
       // Resource generation is economy, not damage. Damage modifiers must not
@@ -9473,21 +9469,30 @@ export function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): voi
                 // the same resolved rate the dispatch consumes.
                 e.type === 'absorbSpentResource'
                 ? { ...e, mult: Math.round(e.mult * mul) }
-                : // Forgewall 2pc (Iron Resolve 20% to 25% of max health): a
-                  // shield's flat amount and its max-health fraction are both
-                  // buff-shaped, so the per-ability knob scales them and the
-                  // {damage} splice reads the same resolved fraction the
-                  // dispatch consumes.
-                  e.type === 'absorb'
-                  ? {
-                      ...e,
-                      amount: Math.round(e.amount * mul),
-                      casterMaxHpPct:
-                        e.casterMaxHpPct === undefined
-                          ? undefined
-                          : Math.round(e.casterMaxHpPct * mul * 10_000) / 10_000,
-                    }
-                  : e,
+                : // Blood Credit: more mana per Hard Bargain, same health
+                  // price. Resolved here so the tooltip's {buff} and the
+                  // dispatch read the one number.
+                  e.type === 'lifeTap'
+                  ? { ...e, mana: Math.round(e.mana * mul) }
+                  : // Blood Credit on Cruel Pact: the same buffPct on its
+                    // max-mana fraction, health price unchanged.
+                    e.type === 'afflictionCruelPact'
+                    ? { ...e, manaPctMax: e.manaPctMax * mul }
+                    : // Forgewall 2pc (Iron Resolve 20% to 25% of max health): a
+                      // shield's flat amount and its max-health fraction are both
+                      // buff-shaped, so the per-ability knob scales them and the
+                      // {damage} splice reads the same resolved fraction the
+                      // dispatch consumes.
+                      e.type === 'absorb'
+                      ? {
+                          ...e,
+                          amount: Math.round(e.amount * mul),
+                          casterMaxHpPct:
+                            e.casterMaxHpPct === undefined
+                              ? undefined
+                              : Math.round(e.casterMaxHpPct * mul * 10_000) / 10_000,
+                        }
+                      : e,
       );
     }
   }

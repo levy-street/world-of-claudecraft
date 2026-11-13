@@ -113,3 +113,34 @@ describe('Aegis of the First Dawn heal ranges', () => {
     expect(text).toContain('heals them for 132 to 165 more');
   });
 });
+
+describe('Blood Credit in the Hard Bargain and Cruel Pact tooltips', () => {
+  it('shows the resolved mana the cast actually restores', () => {
+    // Affliction trades Hard Bargain for Cruel Pact, so each reads its own spec.
+    const mods = (spec: string, credit: boolean) =>
+      computeTalentModifiers('warlock', {
+        ...emptyAllocation(),
+        spec,
+        rows: credit ? { 14: 'wlk_r14_ruin' } : {},
+      } as never);
+    const text = (id: string, m: TalentModifiers) => {
+      const res = known(id, m);
+      return abilityDisplayDescription(res, abilityEffectText(res));
+    };
+    // Rank 3 Hard Bargain: 85 health for 85 mana, 128 with Blood Credit
+    // (round(85 * 1.5)), the same 128 talent_nonwarrior_runtime_v026 casts.
+    expect(text('life_tap', mods('destruction', false))).toContain(
+      'Converts 85 health into 85 mana.',
+    );
+    expect(text('life_tap', mods('destruction', true))).toContain(
+      'Converts 85 health into 128 mana.',
+    );
+    expect(text('cruel_pact', mods('affliction', false))).toContain(
+      'restore 1.5% of your maximum mana',
+    );
+    expect(text('cruel_pact', mods('affliction', true))).toContain(
+      // 1.5% x 1.5 = 2.25%, shown at the tooltip's one-decimal precision.
+      'restore 2.3% of your maximum mana',
+    );
+  });
+});

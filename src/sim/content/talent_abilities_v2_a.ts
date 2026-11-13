@@ -214,7 +214,7 @@ export const TALENT_ABILITIES_V2_A = {
     // run by one pip (rogueEngineOnCast), feeding the Knockout cash-out.
     effects: [{ type: 'weaponStrike', bonus: 10, weaponMult: 1.3, normalized: true }],
     description:
-      'A heavy blow for 130% weapon damage plus 10. Awards 2 combo points and adds 1 Redline (max 4). (Thuggery)',
+      'A heavy blow for 130% weapon damage plus $d. Awards 2 combo points and adds 1 Redline (max 4). (Thuggery)',
   },
   knockout_blow: {
     id: 'knockout_blow',

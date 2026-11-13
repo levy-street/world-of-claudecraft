@@ -396,7 +396,7 @@ const classAbilityNamesEn = {
       [
         'ignition',
         'Ignition',
-        'Passive: when your Fire spells critically strike, the target burns for an extra 30% of the damage dealt over 6 sec. A new burn on a target that is already burning adds to the damage still owed and restarts the 6 sec timer. (Fire mastery)',
+        'Passive: when your Fire spells critically strike, the target burns for an extra 1.5% of the damage dealt per character level (30% at level 20) over 6 sec. A new burn on a target that is already burning adds to the damage still owed and restarts the 6 sec timer. (Fire mastery)',
       ],
       [
         'mass_barrier',
@@ -531,7 +531,7 @@ const classAbilityNamesEn = {
         {
           assassination: 'Adds 1 Venom Ritual (max 6).',
           combat:
-            'While Redline is active, this button becomes Haymaker: 130% weapon damage plus 10, awards 2 combo points, and adds 1 Redline (max 4).',
+            'While Redline is active, this button becomes Haymaker: a heavier weapon strike that awards 2 combo points and adds 1 Redline (max 4).',
         },
       ],
       [
@@ -542,13 +542,13 @@ const classAbilityNamesEn = {
           assassination:
             'At 6 Venom Ritual, this button becomes Venomrend: a strike that instantly deals all the damage your bleeds would still have dealt, plants a fresh venom wound, and restores 20 energy.',
           combat:
-            'Landing this with 4 or more combo points starts Redline for 8 sec: Wicked Slash becomes Haymaker and this button becomes Lights Out (45 plus 35 per combo point, hitting 25% harder for each Haymaker you throw during Redline, restores 25 energy). Spend it before Redline ends.',
+            'Landing this with 4 or more combo points starts Redline for 8 sec: Wicked Slash becomes Haymaker and this button becomes Lights Out (a finisher that hits 25% harder for each Haymaker you throw during Redline and restores 25 energy). Spend it before Redline ends.',
         },
       ],
       [
         'backstab',
         'Craven Thrust',
-        "Drive your dagger into the target's back for 150% weapon damage plus {damage}. Must be behind the target. Requires a dagger. Awards 1 combo point.",
+        "Drive your dagger into the target's back for {weaponPercent}% weapon damage plus {damage}. Must be behind the target. Requires a dagger. Awards 1 combo point.",
         {
           assassination:
             'Each strike adds 1 Venom Ritual (max 6) and refunds 15 energy. At 6 Venom Ritual, Dirt Nap becomes Venomrend (it deals all your remaining bleed damage at once).',
@@ -574,7 +574,7 @@ const classAbilityNamesEn = {
       [
         'ambush',
         "Lurker's Strike",
-        'Strike from the shadows for 250% weapon damage plus {damage}. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point.',
+        'Strike from the shadows for {weaponPercent}% weapon damage plus {damage}. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point.',
         {
           subtlety:
             'From Duskveil, double both the weapon damage and flat bonus, and gain 1 Gloam (max 3). Stealth still requires a dagger and attacking from behind. At 3 Gloam, using this without stealth costs nothing, spends all 3 Gloam and starts Shadow Veil for 6 sec. Veiled Edge adds 50% to its weapon damage, without increasing the flat bonus. Veiled Edge does not stack with the stealth bonus.',
@@ -704,7 +704,7 @@ const classAbilityNamesEn = {
         'Guardian Covenant',
         'Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected. Ascension raises the reduction to 30%.',
       ],
-      ['solar_step', 'Solar Step', 'Increase your movement speed by 150% for 2 sec.'],
+      ['solar_step', 'Solar Step', 'Increase your movement speed by 150% for {duration} sec.'],
       [
         'solar_invocation',
         'Solar Invocation',
@@ -713,12 +713,12 @@ const classAbilityNamesEn = {
       [
         'radiant_devotion',
         'Radiant Devotion',
-        'Increase the spell power of you and party members by 20 for 30 min. Replaces your own Dawn or Grace Devotion. Another Paladin casting Radiant Devotion refreshes it instead of stacking; a different Devotion coexists.',
+        'Increase the spell power of you and party members by {buff} for 30 min. Replaces your own Dawn or Grace Devotion. Another Paladin casting Radiant Devotion refreshes it instead of stacking; a different Devotion coexists.',
       ],
       [
         'dawn_devotion',
         'Dawn Devotion',
-        'Increase the attack power of you and party members by 40 for 30 min. Replaces your own Radiant or Grace Devotion. Another Paladin casting Dawn Devotion refreshes it instead of stacking; a different Devotion, and Warrior shouts, coexist.',
+        'Increase the attack power of you and party members by {buff} for 30 min. Replaces your own Radiant or Grace Devotion. Another Paladin casting Dawn Devotion refreshes it instead of stacking; a different Devotion, and Warrior shouts, coexist.',
       ],
       [
         'grace_devotion',
@@ -1139,7 +1139,7 @@ const classAbilityNamesEn = {
       [
         'life_tap',
         'Hard Bargain',
-        'Converts {damage} health into {damage} mana (50% more mana with Blood Credit). Fails if you have {damage} health or less.',
+        'Converts {damage} health into {buff} mana. Fails if you have {damage} health or less.',
       ],
       [
         'cursed_accomplice',
@@ -1159,7 +1159,7 @@ const classAbilityNamesEn = {
       [
         'litany_of_guilt',
         'Litany of Guilt',
-        'Curses your primary Evil Eye for 6 sec. Condemnation gains release a wave that damages up to 2 other enemies within 8 yards, at most once per second. Rank 2 extends it to 8 sec and 4 enemies.',
+        'Curses your primary Evil Eye for {duration} sec. Condemnation gains release a wave that damages up to 2 other enemies (4 from Rank 2) within 8 yards, at most once per second.',
       ],
       [
         'cinderhide',
@@ -1184,7 +1184,7 @@ const classAbilityNamesEn = {
       [
         'cruel_pact',
         'Cruel Pact',
-        'Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Condemnation. Cannot be used at or below 20% health.',
+        'Sacrifices 12% of your maximum health to restore {buff}% of your maximum mana and generate 20 Condemnation. Cannot be used at or below 20% health.',
       ],
       [
         'vicarious_suffering',
@@ -1254,7 +1254,7 @@ const classAbilityNamesEn = {
       [
         'moonseed',
         'Moonseed',
-        'Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest on the target by 6 sec, up to {duration} extra sec per Lunar Tempest application. At 3 Moontide, this button becomes Moonsurge: an instant strike for 136 to 162 Arcane damage (plus spell power) that spends all 3.',
+        'Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest on the target by 6 sec, up to {duration} extra sec per Lunar Tempest application. At 3 Moontide, this button becomes Moonsurge: an instant heavy Arcane strike that spends all 3.',
       ],
       [
         'rejuvenation',
@@ -1286,7 +1286,7 @@ const classAbilityNamesEn = {
         'Your next melee swing deals {damage} extra damage and generates threat equal to 2.5 times its damage plus a small flat amount. Bruin Form only.',
         {
           feral:
-            'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead heals you for 18% of your maximum health and refunds 15 rage.',
+            'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a heavy strike at high threat; below half health it instead heals you for 18% of your maximum health and refunds 15 rage.',
         },
       ],
       [
@@ -1340,7 +1340,11 @@ const classAbilityNamesEn = {
             'Each cast adds 1 Verdance (max 3), including a refresh of a bloom already ticking.',
         },
       ],
-      ['barkskin', 'Oakhide', 'Your skin hardens like bark, increasing armor by 20% for 15 sec.'],
+      [
+        'barkskin',
+        'Oakhide',
+        'Your skin hardens like bark, increasing armor by {buff}% for 15 sec.',
+      ],
       // Tank defensive cooldowns (paladin / druid), one distinct mechanic each.
       [
         'sacred_bulwark',
@@ -1358,7 +1362,7 @@ const classAbilityNamesEn = {
         'Calls down a bolt of stellar fire, causing {damage} Arcane damage.',
         {
           balance:
-            'In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant strike for 80 to 100 Nature damage plus a 45 burn over 9 sec, restoring 35 mana and spending all 3.',
+            'In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant Nature strike plus a burn over 9 sec, restoring 35 mana and spending all 3.',
         },
       ],
       [
@@ -1407,7 +1411,7 @@ const classAbilityNamesEn = {
       [
         'rip',
         'Bloodrift',
-        'Finishing move that makes the target bleed every 2 sec for 24 sec: 72 damage plus 48 per combo point spent (5 combo points: {damage} total). Cat Form only.',
+        'Finishing move that makes the target bleed every 2 sec for 24 sec, dealing more damage for each combo point spent (5 combo points: {damage} total). Cat Form only.',
         { feral: 'The landed hit adds 1 Old Blood (max 3).' },
       ],
       [
@@ -1934,7 +1938,7 @@ const classAbilityNamesEn = {
       [
         'avenging_wrath',
         'Zealwing',
-        'Unfurl physical wings of golden holy power, gaining 10 Devotion and doubling Devotion generated by your abilities for 15 sec. Also increases damage and healing done by 20%. Dawnreaver: enables Tolling Hammer against any target.',
+        'Unfurl physical wings of golden holy power, gaining 10 Devotion and doubling Devotion generated by your abilities for {duration} sec. Also increases damage and healing done by 20%. Dawnreaver: enables Tolling Hammer against any target.',
       ],
       ['berserk', 'Red Haze', 'Increases attack power by 70 for 15 sec. (Druid talent)'],
       [
@@ -2243,7 +2247,7 @@ const classAbilityNamesEn = {
       [
         'body_blow',
         'Haymaker',
-        'A heavy blow for 130% weapon damage plus 10. Awards 2 combo points and adds 1 Redline (max 4). (Thuggery)',
+        'A heavy blow for {weaponPercent}% weapon damage plus {damage}. Awards 2 combo points and adds 1 Redline (max 4). (Thuggery)',
       ],
       [
         'knockout_blow',
