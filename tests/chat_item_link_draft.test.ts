@@ -25,6 +25,7 @@ describe('item links in a chat draft', () => {
       setOpener: () => {},
       close: () => {},
       place: () => {},
+      keepOnScreen: () => {},
       bind: () => {},
     };
     const controller = new ChatWindowController({

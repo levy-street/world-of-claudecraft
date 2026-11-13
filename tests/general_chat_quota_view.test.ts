@@ -158,6 +158,7 @@ function makeChatWindow(activeTab: 'world' | 'general', chatLog: HTMLElement) {
       setOpener: () => {},
       close: () => {},
       place: () => {},
+      keepOnScreen: () => {},
       bind: () => {},
     },
     sendChat: () => {},

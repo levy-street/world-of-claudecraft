@@ -56,6 +56,10 @@ interface Harness {
   errors: string[];
   activateContextAction(action: string): void;
   shownPanes: HTMLElement[];
+  /** Every contextMenu.place call: the reserve and whether the box was shown yet. */
+  placements: { reserveBottom: number; minTop?: number; shown: boolean }[];
+  /** The menu's display at each contextMenu.keepOnScreen call. */
+  keptOnScreen: string[];
 }
 
 function makeHarness(
@@ -74,6 +78,8 @@ function makeHarness(
   const sent: string[] = [];
   const errors: string[] = [];
   const shownPanes: HTMLElement[] = [];
+  const placements: Harness['placements'] = [];
+  const keptOnScreen: string[] = [];
   let opener: HTMLElement | null = null;
   let handleContextAction: (action: string) => void = () => {};
   const contextMenu: ChatContextMenuPort = {
@@ -86,7 +92,12 @@ function makeHarness(
       menu.style.display = 'none';
       opener = null;
     },
-    place: () => {},
+    place: (_element, _x, _y, _reserveRight, reserveBottom, _minLeft, minTop) => {
+      placements.push({ reserveBottom, minTop, shown: menu.style.display === 'block' });
+    },
+    keepOnScreen: () => {
+      keptOnScreen.push(menu.style.display);
+    },
     bind: (onActivate) => {
       handleContextAction = onActivate;
     },
@@ -121,6 +132,8 @@ function makeHarness(
     sent,
     errors,
     shownPanes,
+    placements,
+    keptOnScreen,
     activateContextAction: (action) => handleContextAction(action),
   };
 }
@@ -636,6 +649,49 @@ describe('ChatWindowController', () => {
 
       expect(tabButton(harness, 'world').draggable).toBe(false);
     });
+  });
+});
+
+describe('ChatWindowController Add channel menu placement', () => {
+  // Touch rows carry a 40px floor (hud.mobile.css), so the eleven-row menu plus its
+  // title is taller than a landscape phone's ~360px CSS viewport. With the old fixed
+  // 320px reserve and no post-layout re-clamp, the box was seated under the tabs and
+  // its scroll end (Whisper, Cancel) stayed below the screen edge.
+  const MENU_ROWS = 11; // nine channels + Whisper + Cancel
+
+  it('on touch reserves the real row height and re-clamps the shown box on screen', () => {
+    const harness = makeHarness({}, null, true);
+    harness.controller.init();
+
+    addButton(harness).dispatchEvent(new Event('click'));
+
+    const placement = harness.placements.at(-1);
+    expect(placement).toBeDefined();
+    expect(placement?.reserveBottom).toBeGreaterThanOrEqual(MENU_ROWS * 40);
+    expect(placement?.minTop).toBe(8);
+    // The re-clamp runs once the box is displayed, so it measures the real box.
+    expect(harness.keptOnScreen).toEqual(['block']);
+  });
+
+  it('keeps the historical 320px desktop reserve', () => {
+    const harness = makeHarness();
+    harness.controller.init();
+
+    addButton(harness).dispatchEvent(new Event('click'));
+
+    expect(harness.placements.at(-1)?.reserveBottom).toBe(320);
+    expect(harness.keptOnScreen).toEqual(['block']);
+  });
+
+  it('selecting Whisper from the menu adds and selects the Whisper tab', () => {
+    const harness = makeHarness({}, null, true);
+    harness.controller.init();
+
+    addButton(harness).dispatchEvent(new Event('click'));
+    harness.activateContextAction('whisper');
+
+    expect(tabButton(harness, 'whisper').classList.contains('active')).toBe(true);
+    expect(harness.storage.getItem('woc_chat_active_tab')).toBe('whisper');
   });
 });
 
