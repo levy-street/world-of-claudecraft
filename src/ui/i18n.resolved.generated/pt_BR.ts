@@ -1443,23 +1443,23 @@ export const pt_BR: EnTranslations = {
         },
         "seamcaller_maul": {
           "name": "Seamcaller",
-          "look": "Two-handed maul hewn from one block of dark quarry stone split by burning gold seams, a framed gold rune on both cheeks, gold-rimmed striking faces round burning amber, riveted gold bands, gold crest wings, amber seam-crystal growing from the crown and a basalt haft bound in gold.",
-          "lore": "The Hammer Council sang the seam awake before they ever raised a hand against the raid, and the stone remembered every note. This maul was cut from the block their hammers split, and its runes still burn when it swings. Quarry shards circle the head as if the mountain wants them back. The runes and the circling stone are only a look."
+          "look": "Two-handed maul hewn from one block of dark quarry stone split by burning gold seams, a framed gold rune on both cheeks, gold-rimmed striking faces round burning amber, riveted gold bands, curved gold horns, amber seam-crystal growing from the crown and a braided leather haft bound in gold.",
+          "lore": "The Hammer Council sang the seam awake before they ever raised a hand against the raid, and the stone remembered every note. This maul was cut from the block their hammers split, and its runes still burn when it swings. Shards of seam-crystal circle the head as if the mountain wants them back. The runes and the circling crystal are only a look."
         },
         "squallcrest_sword": {
           "name": "Crista da Borrasca",
-          "look": "Long storm-steel blade with lightning-bright edges, a forked bolt in a silver channel up each face, wind fins hooked off the spine and an open silver halo round a storm-eye gem, swept back in gale vanes.",
-          "lore": "The Guardian of the Breath kept the air of the Heart moving, and when it fell the storm it carried did not scatter. It settled into this blade. Wind still winds round the steel and lightning still runs its edges, and those who carry it swear the eye in the halo watches the sky. The storm is only a look."
+          "look": "Long storm-steel blade with lightning-bright edges, a forked bolt up each cloud-etched face, wind fins hooked off the spine and a guard of silver wings spread round a storm-eye gem.",
+          "lore": "The Guardian of the Breath kept the air of the Heart moving, and when it fell the storm it carried did not scatter. It settled into this blade. Wind still winds round the steel and lightning still runs its edges, and those who carry it swear the eye in the guard watches the sky. The storm is only a look."
         },
         "rimelight_staff": {
           "name": "Cajado da Luz de Geada",
-          "look": "Blue-steel shaft wound with silver filigree and bound in gem-set silver collars, crowned by four silver crescent blades cradling a great crystal of cold light amid a ring of lesser crystals, a splinter of ice hovering above.",
+          "look": "Blue-steel shaft wound with silver filigree and bound in gem-set silver collars, crowned by four silver crescent blades cradling a great crystal of cold light amid a ring of lesser crystals, icicles hanging beneath.",
           "lore": "The Guardian of the Quench cooled every blade the Heart ever forged. Its crystal was the last thing to stop glowing when it fell, and the raid carried it out still cold enough to frost the hand. Ice circles the crown and runes of frost turn round it. The cold is only a look."
         },
         "hearthbrand_sword": {
           "name": "Marca da Lareira",
           "look": "Broad blade of cooled magma crust with molten edges, a net of ember veins cracked across both faces, an obsidian-toothed spine and a black iron guard swept into horns dripping melt round a magma heart.",
-          "lore": "The Guardian of the Heat was the fire the Heart was named for. When it guttered out, its last melt ran into a blade-shaped crack in the forge floor and cooled there, crust outside and fire within. The edges have never stopped burning. The flames are only a look."
+          "lore": "The Guardian of the Heat was the fire the Heart was named for. When it guttered out, its last melt ran into a blade-shaped crack in the forge floor and cooled there, crust outside and fire within. The edges have never stopped burning. The fire is only a look."
         },
         "duskwick_staff": {
           "name": "Heartmeld Staff",
