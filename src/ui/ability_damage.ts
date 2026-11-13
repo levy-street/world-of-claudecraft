@@ -342,6 +342,10 @@ export function abilityBuffValue(res: ResolvedAbility): number | null {
     // harvestPct as a whole percent, so the Grovespring 4pc's 75 shows live
     // for wearers the same way a talent-upgraded value would (base 60).
     if (eff.type === 'druidOverbloom') return Math.round(eff.harvestPct * 100);
+    // Hard Bargain's mana half, Blood Credit included (applyTalentMods).
+    if (eff.type === 'lifeTap') return eff.mana;
+    // Cruel Pact's max-mana percent, Blood Credit included.
+    if (eff.type === 'afflictionCruelPact') return Math.round(eff.manaPctMax * 10000) / 100;
     if (eff.type === 'selfBuff' || eff.type === 'buffTarget') {
       // form_fireball carries a 1+fraction speed multiplier; the tooltip's $b%
       // wants the whole-percent bonus (1.4 -> 40).

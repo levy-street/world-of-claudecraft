@@ -2005,9 +2005,9 @@ export function runEffects(
           ability: ability.name,
           kind: 'hit',
         });
-        // Improved Life Tap (a talent buffPct on the ability): more mana per
-        // tap, same health price, the classic shape.
-        const tapMana = Math.round(eff.mana * (1 + (mods.abilities[ability.id]?.buffPct ?? 0)));
+        // Blood Credit's buffPct is already resolved onto eff.mana
+        // (applyTalentMods): more mana per tap, same health price.
+        const tapMana = eff.mana;
         p.resource = Math.min(p.maxResource, p.resource + tapMana);
         // The sap is a MOMENT: the life-fountain burst sells health becoming power.
         ctx.emit({
@@ -4248,8 +4248,8 @@ export function runEffects(
         break;
       }
       case 'afflictionCruelPact': {
-        const manaPctMax = eff.manaPctMax * (1 + (mods.abilities[ability.id]?.buffPct ?? 0));
-        applyCruelPact(ctx, p, eff.healthPct, manaPctMax, eff.doom);
+        // Blood Credit's buffPct is already resolved onto eff.manaPctMax.
+        applyCruelPact(ctx, p, eff.healthPct, eff.manaPctMax, eff.doom);
         break;
       }
       case 'afflictionVicarious': {
