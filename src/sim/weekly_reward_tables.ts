@@ -197,20 +197,3 @@ export function weeklyAvailableBossTables(
     return items.length ? [{ ...table, items }] : [];
   });
 }
-
-/** An exhausted slot must not trap the week's other saved rewards. */
-export function weeklyBossChoiceExhausted(
-  batch: WeeklyVaultBatch,
-  choice: WeeklyChoice,
-  cls: PlayerClass,
-  lootSpec?: string,
-): boolean {
-  return (
-    !!batch.bossUnlocks &&
-    needsWeeklyBossTable(choice.pool) &&
-    !choice.itemId &&
-    !choice.fixed &&
-    !choice.opening &&
-    !weeklyAvailableBossTables(batch, choice, cls, lootSpec).length
-  );
-}

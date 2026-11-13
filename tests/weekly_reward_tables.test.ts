@@ -8,12 +8,12 @@ import { enterDungeon } from '../src/sim/instances/dungeons';
 import { freshInstanceSlot } from '../src/sim/instances/instance_slot';
 import { Sim } from '../src/sim/sim';
 import { ALL_CLASSES, IGNIVAR_BOSS_ID } from '../src/sim/types';
+import { weeklyChoiceExhausted } from '../src/sim/weekly_reward_availability';
 import {
   sanitizeWeeklyBossUnlocks,
   WEEKLY_BOSS_TABLES,
   weeklyAvailableBossTables,
   weeklyBossBodies,
-  weeklyBossChoiceExhausted,
   weeklyBossLootPool,
   weeklyBossTable,
 } from '../src/sim/weekly_reward_tables';
@@ -406,7 +406,7 @@ describe('weekly boss-table eligibility', () => {
     expect(sanitizeWeeklyRewards(publicState, true)!.vaults[0].choices[0].fixed).toBe(true);
     expect(sanitizeWeeklyRewards(publicState)!.vaults[0].choices[0].fixed).toBeUndefined();
     expect(
-      weeklyBossChoiceExhausted(publicState.vaults[0], publicState.vaults[0].choices[0], 'mage'),
+      weeklyChoiceExhausted(publicState.vaults[0], publicState.vaults[0].choices[0], 'mage', 20),
     ).toBe(false);
     const opening = prepareWeeklyRewardOpen(sim.ctx, '1000:0', pid)!;
     expect(opening.itemId).toBe(itemId);
@@ -419,7 +419,7 @@ describe('weekly boss-table eligibility', () => {
     batch.bossUnlocks = { vael_the_mistcaller: 1 };
     batch.choices = items.map((itemId) => ({ pool: 'dungeon', itemId, opened: true }));
     batch.choices.push({ pool: 'dungeon' });
-    expect(weeklyBossChoiceExhausted(batch, batch.choices.at(-1)!, 'mage')).toBe(true);
+    expect(weeklyChoiceExhausted(batch, batch.choices.at(-1)!, 'mage', 20)).toBe(true);
     sim.claimWeeklyReward('1000:0', pid);
     expect(state.vaults).toHaveLength(0);
     expect(sim.countItem(items[0], pid)).toBe(1);
