@@ -314,20 +314,27 @@ describe('the assets the raid hands out', () => {
     expect(WEAPON_VFX.duskwick_staff.emissive?.hue).toEqual([8, 215]);
   });
 
+  /** A shipped model's lowest and highest point along its length (each GLB is one node with
+   *  no transform, so the POSITION accessor bounds are the model's own). */
+  const yBounds = (model: string): { lo: number; hi: number } => {
+    const glb = join(ROOT, 'public', 'models', 'weapons', `${model}.glb`);
+    expect(existsSync(glb), glb).toBe(true);
+    const buf = readFileSync(glb);
+    const json = JSON.parse(buf.subarray(20, 20 + buf.readUInt32LE(12)).toString('utf8'));
+    let lo = Infinity;
+    let hi = -Infinity;
+    for (const mesh of json.meshes)
+      for (const prim of mesh.primitives) {
+        const acc = json.accessors[prim.attributes.POSITION];
+        lo = Math.min(lo, acc.min[1]);
+        hi = Math.max(hi, acc.max[1]);
+      }
+    return { lo, hi };
+  };
+
   it('ships each GLB at its grip family height, the Armory card and the bag preview', () => {
     for (const arm of ARMS) {
-      const glb = join(ROOT, 'public', 'models', 'weapons', `${arm.model}.glb`);
-      expect(existsSync(glb), glb).toBe(true);
-      const buf = readFileSync(glb);
-      const json = JSON.parse(buf.subarray(20, 20 + buf.readUInt32LE(12)).toString('utf8'));
-      let lo = Infinity;
-      let hi = -Infinity;
-      for (const mesh of json.meshes)
-        for (const prim of mesh.primitives) {
-          const acc = json.accessors[prim.attributes.POSITION];
-          lo = Math.min(lo, acc.min[1]);
-          hi = Math.max(hi, acc.max[1]);
-        }
+      const { lo, hi } = yBounds(arm.model);
       // grip at the origin; a sword under VAR_SWORD's 2.0 clamp (give or take its pommel), a
       // staff under VAR_STAFF's 2.4, the maul drawn at its scaled hammer clamp
       expect(lo, arm.model).toBeLessThan(0);
@@ -344,6 +351,23 @@ describe('the assets the raid hands out', () => {
         true,
       );
       expect(existsSync(join(ROOT, 'public', 'ui', 'weapons', `${arm.model}.jpg`))).toBe(true);
+    }
+  });
+
+  it("seats each fist on the weapon's wrapped grip", () => {
+    // The origin is the fist, so the foot's depth below it says where along the haft the hand
+    // closes. Each value is the leather wrap of the shipped model (the maul's and the staffs'
+    // wraps sit further up than a sword's). A re-export that moves one slides the hand off the
+    // grip without changing the span pinned above.
+    const FOOT: Record<string, number> = {
+      seamcaller_maul: -0.895,
+      squallcrest: -0.386,
+      rimelight_staff: -1.006,
+      hearthbrand: -0.423,
+      duskwick_staff: -1.072,
+    };
+    for (const arm of ARMS) {
+      expect(yBounds(arm.model).lo, arm.model).toBeCloseTo(FOOT[arm.model], 2);
     }
   });
 });

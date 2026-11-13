@@ -107,7 +107,7 @@ describe('the raid VFX families', () => {
     // a circle by default, so every existing rig keeps its path
     expect(build(ORBITERS).mats[0].uniforms.uDepth.value).toBe(1);
     // an oval for a head longer than it is deep; the number rides a uniform, never the source
-    const oval = build({ ...ORBITERS, depth: 0.57 } as WeaponVfxRaidComponent).mats[0];
+    const oval = build({ ...ORBITERS, depth: 0.57 }).mats[0];
     expect(oval.uniforms.uDepth.value).toBe(0.57);
     expect(oval.vertexShader).toBe(build(ORBITERS).mats[0].vertexShader);
     expect(oval.vertexShader).toContain('aOrbit.x * uDepth');

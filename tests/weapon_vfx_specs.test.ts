@@ -58,6 +58,17 @@ describe('WEAPON_VFX specs', () => {
       }
     }
   });
+
+  it('keeps an authored orbit depth above zero', () => {
+    // depth scales an orbit's reach along one axis: 0 flattens the ring to a line through its
+    // anchor and a negative value mirrors the path. Unset means a circle.
+    for (const [key, spec] of Object.entries(WEAPON_VFX)) {
+      for (const c of spec.fx) {
+        if (c.kind !== 'orbiters' || c.depth === undefined) continue;
+        expect(c.depth, `${key}: orbiters depth`).toBeGreaterThan(0);
+      }
+    }
+  });
 });
 
 describe('vfxSpecFor', () => {
