@@ -357,6 +357,7 @@ import {
 } from './list_read_guard';
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
 import { isPickAction } from './lockpick_action';
+import { LogoutTimers } from './logout_timer';
 import { mergeCustodyParcelOverlay } from './mail_custody_overlay';
 import { rearmMailPartitionsOnFailure, writeDirtyMailPartitions } from './mail_partition_rearm';
 import { dispatchMarketCommand, marketWirePromptCommand } from './market_commands';
@@ -1416,6 +1417,11 @@ function logSocialErr(err: unknown): void {
 export class GameServer {
   sim: Sim;
   clients = new Map<number, ClientSession>(); // by pid
+  readonly logouts = new LogoutTimers<ClientSession>(
+    (s, event) => this.send(s, { t: 'events', list: [event] }),
+    (s) => void this.leave(s, 'logout'),
+    (s, nowSec) => this.consumeLane(s, 'command', nowSec),
+  );
   private readonly vault: VaultGameServices; // Buried Hoard vault wiring (vault_game_services.ts)
   readonly membership: ReturnType<typeof createMembershipGameServices>;
   private readonly referral: ReferralGameAdapter;
@@ -2546,6 +2552,7 @@ export class GameServer {
           }
           this.recordPerfCaptureCallback(ticksRun);
           this.expireLinkdeadSessions();
+          this.logouts.tick(this.sim);
           this.storageRecoverySweep.run();
           // Anchor the achieved-rate meter to the wall clock (hrtime), never to
           // callback counts: late timer fires and the dt clamp are exactly the
@@ -5965,12 +5972,7 @@ export class GameServer {
     const msg = rawMsg as ClientMessage;
     const sim = this.sim;
     const pid = session.pid;
-    // Deliberate logout: a clean leave, unless a recent world fight holds the body like a closed
-    // tab. Either path marks the session, so the page reload's close is a socketClosed() no-op.
-    if (msg.t === 'logout') {
-      if (!holdWorldFightSession(this, session)) void this.leave(session, 'logout');
-      return;
-    }
+    if (msg.t === 'logout' && this.logouts.handle(sim, session, msg.cancel, receivedAtMs)) return;
     if (msg.t === 'input') {
       if (!this.consumeLane(session, 'movement', receivedAtMs / 1000)) return;
       if (session.spectating) return;

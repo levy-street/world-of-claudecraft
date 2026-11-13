@@ -21,7 +21,9 @@
 //   in-handler ladder (consumeChatToken), which stays the authoritative chat
 //   throttle and messaging; the ladder's cooldown copy still fires on the
 //   subset the lane passes.
-// - exempt, never lane-checked: t 'logout' (a clean leave always processes),
+// - exempt, never lane-checked: t 'logout' (the Log Out request always
+//   processes; its `cancel: true` form is a command, drawn by
+//   server/logout_timer.ts, because a cancelled countdown can be started again),
 //   cmd 'telemetry', and cmd 'challengeResponse'. Defense-in-depth token
 //   accounting: beats and challenge replies never compete for command-lane
 //   tokens, and never spend or refill lane state at all.
@@ -121,7 +123,7 @@ function isNameScreenCommand(record: Record<string, unknown>): boolean {
 export function classifyMsgLane(msg: unknown): MsgLaneClass {
   if (typeof msg !== 'object' || msg === null || Array.isArray(msg)) return 'command';
   const record = msg as Record<string, unknown>;
-  if (record.t === 'logout') return 'exempt';
+  if (record.t === 'logout') return record.cancel === true ? 'command' : 'exempt';
   if (record.t === 'input') return 'movement';
   if (record.t !== 'cmd') return 'command';
   if (record.cmd === 'chat') return 'chat';

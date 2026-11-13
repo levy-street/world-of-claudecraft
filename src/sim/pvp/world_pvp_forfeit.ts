@@ -112,11 +112,13 @@ export function forfeitWorldPvpFightOnDeparture(ctx: SimContext, pid: number): b
 /**
  * The departure hold: does a recent world fight keep `pid`'s body in the
  * world after they leave it? True for a living player who took or dealt a
- * world-hostile hit inside WORLD_PVP_DEPARTURE_HOLD_WINDOW. The host holds such
- * a logout like a closed client (the linkdead grace) instead of removing the
- * character at once, and refuses another character on the account while the
- * held body still answers true, so neither a logout nor a switch to an alt can
- * pull a fighter out of reach. Ask it AFTER the forfeit: a player that rule
+ * world-hostile hit inside WORLD_PVP_DEPARTURE_HOLD_WINDOW. The host holds a
+ * closed client, a dropped connection and a takeover in the world (the linkdead
+ * grace) instead of removing the character, and refuses another character on
+ * the account while the held body still answers true, so neither quitting the
+ * client nor a switch to an alt can pull a fighter out of reach. The Log Out
+ * button is the one clean way out: it waits its own countdown, which damage
+ * interrupts (../logout_delay.ts, server/logout_timer.ts). Ask it AFTER the forfeit: a player that rule
  * killed is a corpse and leaves freely. Duels, battlegrounds and arenas never
  * book a hit here (isWorldPvpHostile), so their own rules stay in charge.
  */

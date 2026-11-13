@@ -1391,6 +1391,27 @@ async function stageWheelBinds(page) {
 }
 
 export const TARGETS = [
+  // The Log Out countdown prompt (src/ui/logout_countdown_controller.ts). The
+  // server sends the `logout` events online; the offline client has no
+  // countdown, so the recipe hands the HUD the same event the server would,
+  // through the sim's own event bus, and shoots the whole HUD so the prompt is
+  // seen in place. On a base without the prompt the same recipe shoots the
+  // untouched HUD, which is the honest "before".
+  {
+    key: 'logout-countdown',
+    when: ['src/ui/logout_countdown_', 'server/logout_timer'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await dismissEntryOverlays(page);
+      await dismissArrivalGreeting(page);
+      await awaitVeilSettled(page);
+      await page.evaluate(() => {
+        window.__game?.sim?.emit?.({ type: 'logout', phase: 'started', seconds: 30 });
+      });
+      await pollForSize(page, '#prompt-stack .prompt', 6, 500);
+      return {};
+    },
+  },
   // The self portrait menu's dungeon difficulty rows after a refused change: the
   // group keeps a live Normal claim on its five-minute reset cooldown, so picking
   // Heroic is refused but stays selected, and the menu says the instances are

@@ -1153,6 +1153,10 @@ export const zh_TW: EnTranslations = {
       "busy": "請先完成目前動作再使用脫困。",
       "unavailable": "目前狀態下無法使用脫困。"
     },
+    "logout": {
+      "cancel": "取消",
+      "interrupted": "你受到了傷害，登出已中斷。"
+    },
     "fct": {
       "absorbed": "已吸收（{amount}）",
       "cheap": "費用降低!"
@@ -3878,6 +3882,12 @@ export const zh_TW: EnTranslations = {
       "linkHint": "Shift + 點擊可在聊天中連結該物品。"
     },
     "plurals": {
+      "logoutCountdown": {
+        "one": "{count} 秒後登出",
+        "few": "{count} 秒後登出",
+        "many": "{count} 秒後登出",
+        "other": "{count} 秒後登出"
+      },
       "itemHistoryEarlierHidden": {
         "one": "更早的 {count} 次轉手未顯示。",
         "few": "更早的 {count} 次轉手未顯示。",

@@ -171,11 +171,20 @@ ratings.
   `tests/world_pvp_forfeit.test.ts`, `tests/world_pvp_departure.test.ts`.
   The same file owns the departure HOLD, `worldPvpHoldsDeparture`: a living
   player with a world-hostile hit (taken or dealt, `WorldPvpBooks.lastFightAt`)
-  inside `WORLD_PVP_DEPARTURE_HOLD_WINDOW` is held in the world on a logout
-  (the server enters the linkdead grace instead of `leave()`), and while the
-  held body still answers true `planJoin` refuses the account's other
+  inside `WORLD_PVP_DEPARTURE_HOLD_WINDOW` is held in the world when they leave
+  WITHOUT the Log Out button (a closed client, a dropped connection, a
+  takeover: the server enters the linkdead grace instead of `leave()`), and
+  while the held body still answers true `planJoin` refuses the account's other
   characters. Asked AFTER the forfeit, so a forfeited corpse leaves freely.
-  Tests: `tests/world_pvp_logout_hold.test.ts`.
+  Tests: `tests/world_pvp_logout_hold.test.ts`. The Log Out button is the
+  clean way out instead: `src/sim/logout_delay.ts` `logoutDelaySeconds` reads
+  the same window to pick its countdown (none when safe and unflagged,
+  `LOGOUT_COMBAT_SECONDS` in combat, `LOGOUT_PVP_FLAGGED_SECONDS` flagged,
+  `LOGOUT_PVP_COMBAT_SECONDS` flagged with a recent world fight), the server
+  runs it, damage taken interrupts it and getting into worse trouble stretches
+  it (`server/logout_timer.ts`), and a fight still live when it ends is
+  forfeited by `leave()` like any departure.
+  Tests: `tests/logout_timer.test.ts`.
 - `warfare_quartermaster.ts` spawns Warmarshal Draven Kole, the Highwatch
   WARFARE honor vendor, under his RESERVED entity id
   (`WARFARE_QUARTERMASTER_ENTITY_ID`, `1_000_000_002`, the singleton band

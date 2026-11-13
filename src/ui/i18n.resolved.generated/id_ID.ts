@@ -1153,6 +1153,10 @@ export const id_ID: EnTranslations = {
       "busy": "Selesaikan tindakanmu saat ini sebelum menggunakan Lepaskan Diri.",
       "unavailable": "Lepaskan Diri tidak tersedia dalam keadaanmu saat ini."
     },
+    "logout": {
+      "cancel": "Cancel",
+      "interrupted": "Logout interrupted because you took damage."
+    },
     "fct": {
       "absorbed": "Terserap ({amount})",
       "cheap": "Lebih murah!"
@@ -3878,6 +3882,12 @@ export const id_ID: EnTranslations = {
       "linkHint": "Shift-klik untuk menautkan item ini di obrolan."
     },
     "plurals": {
+      "logoutCountdown": {
+        "one": "Logging out in {count} second",
+        "few": "Logging out in {count} seconds",
+        "many": "Logging out in {count} seconds",
+        "other": "Logging out in {count} seconds"
+      },
       "itemHistoryEarlierHidden": {
         "one": "{count} perpindahan sebelumnya tidak ditampilkan.",
         "few": "{count} perpindahan sebelumnya tidak ditampilkan.",

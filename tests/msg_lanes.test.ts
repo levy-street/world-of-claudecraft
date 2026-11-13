@@ -150,6 +150,9 @@ describe('classifyMsgLane mirrors the dispatch switch', () => {
 
   it('exempts logout, telemetry, and challengeResponse', () => {
     expect(classifyMsgLane({ t: 'logout' })).toBe('exempt');
+    // The cancel form can be repeated (a cancelled countdown starts again), so
+    // it is a command: server/logout_timer.ts draws the token.
+    expect(classifyMsgLane({ t: 'logout', cancel: true })).toBe('command');
     expect(classifyMsgLane({ t: 'cmd', cmd: 'telemetry' })).toBe('exempt');
     expect(classifyMsgLane({ t: 'cmd', cmd: 'challengeResponse' })).toBe('exempt');
   });

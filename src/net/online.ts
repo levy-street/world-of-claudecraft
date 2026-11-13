@@ -88,6 +88,7 @@ import {
   emptyMoveInput,
   type InvSlot,
   type ItemInstancePayload,
+  type LogoutEvent,
   type LootRollChoice,
   type LootRollGroupStatus,
   type LootRollPrompt,
@@ -242,6 +243,7 @@ import {
 } from './input_send_cadence';
 import { inputSignature } from './input_signature';
 import { copyPos, wrapAngle } from './interp_math';
+import { LogoutFlow } from './logout_flow';
 import { applyMaterialInventoryWire } from './material_inventory_wire';
 import { bagSocketPayload, materialStorageTransferPayload } from './material_storage_command';
 import {
@@ -1623,6 +1625,20 @@ export class ClientWorld extends ReconWireState implements IWorld {
   private readonly base: string;
   private readonly clientSeed: string;
   private eventQueue: SimEvent[] = [];
+  private onLoggedOut: (() => void) | null = null;
+  private readonly logoutFlow = new LogoutFlow({
+    send: (frame) => {
+      if (this.ws.readyState !== WebSocket.OPEN) return false;
+      this.ws.send(JSON.stringify(frame));
+      return true;
+    },
+    finish: () => {
+      this.endSession();
+      this.onLoggedOut?.();
+    },
+    setTimer: (run, ms) => window.setTimeout(run, ms),
+    clearTimer: (handle) => window.clearTimeout(handle as number),
+  });
   activeFrostRings: ActiveFrostRing[] = [];
   activeIgnivarMeteors: ActiveIgnivarMeteorWarning[] = [];
   activeNythraxisGraveEruptions: ActiveNythraxisGraveEruption[] = [];
@@ -1833,6 +1849,10 @@ export class ClientWorld extends ReconWireState implements IWorld {
     this.petSpecialCommandsSupported = false;
     this.worldInteractionRequests?.reset();
     this.vehicleSession = null;
+    // A Log Out countdown comes off the screen; an unanswered Log Out ends the session.
+    if (this.logoutFlow?.onSocketClosed()) {
+      this.eventQueue.push({ type: 'logout', phase: 'cancelled', reason: 'disconnected' });
+    }
     if (this.sessionEnded) return;
     // A pending reconnect timer means this close is a duplicate signal of the
     // SAME physical drop: on the zombie-socket path the visibility handler
@@ -1875,7 +1895,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     this.vehicleSession = null;
     // Flush a pending layout save BEFORE teardown, while the socket is still open
     // and `connected` is still true: close() calls this before ws.close() and
-    // sendLogout() calls it before the logout frame, so the final edit is not
+    // requestLogout() flushes before the logout frame, so the final edit is not
     // lost to a deliberate logout within the debounce window.
     this.actionBarUploader.flush();
     this.sessionEnded = true;
@@ -1907,10 +1927,19 @@ export class ClientWorld extends ReconWireState implements IWorld {
     this.ws.onclose = null;
     this.ws.close();
   }
-  // Signal a deliberate logout to the server so it skips linkdead grace and
-  // calls leave() immediately. Must be called before a page reload so the
-  // character is properly removed from the world instead of being held
-  // in-world for the 5-minute linkdead window.
+  // The Log Out button. The server answers with a countdown (in combat or
+  // flagged for PvP) or a finished logout; `onDone` runs once it is finished
+  // and the session has ended (logout_flow.ts).
+  requestLogout(onDone: () => void): void {
+    this.onLoggedOut = onDone;
+    this.actionBarUploader.flush(); // while the session can still save it
+    this.logoutFlow.request();
+  }
+  cancelLogout(): void {
+    this.logoutFlow.cancel();
+  }
+  // Tooling only (perf and screenshot scripts): end the session and send the frame
+  // without waiting; a character made to wait is held like any closed client.
   sendLogout(): void {
     this.endSession();
     if (this.ws.readyState === WebSocket.OPEN) {
@@ -2383,6 +2412,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         this.applySalvageResultEvent(ev as SimEvent);
         this.applyChatFlairEvent(ev as SimEvent);
         this.applyUnstuckEvent(ev as SimEvent);
+        if ((ev as SimEvent).type === 'logout') this.logoutFlow.onEvent(ev as LogoutEvent);
         this.applyPrestigeEvent(ev as SimEvent);
         this.applyGuildRenamedEvent(ev as SimEvent);
         this.eventQueue.push(ev as SimEvent);

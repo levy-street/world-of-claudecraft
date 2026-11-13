@@ -12,6 +12,7 @@ import { ActionBarLayoutUploader } from '../../src/net/action_bar_upload';
 import { emptyBuddySelfMirror } from '../../src/net/buddy_wire';
 import { EMPTY_MST_CRAFTS } from '../../src/net/crafting_wire';
 import { GuildBankLogMirror } from '../../src/net/guild_bank_log_mirror';
+import { LogoutFlow } from '../../src/net/logout_flow';
 import { ClientWorld } from '../../src/net/online';
 import { freshAccountLedger } from '../../src/sim/account_ledger';
 import { emptyAllocation, emptyModifiers } from '../../src/sim/content/talents';
@@ -310,6 +311,14 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   // to: their annotations contain `=>`, which the scrape's annotation group
   // could not cross. The AST-based sweep sees them.
   c.onDisconnect = null;
+  c.onLoggedOut = null;
+  // No socket here: a Log Out press would finish at once, and nothing presses it.
+  c.logoutFlow = new LogoutFlow({
+    send: () => false,
+    finish: () => {},
+    setTimer: () => 0,
+    clearTimer: () => {},
+  });
   c.onConnectionLost = null;
   c.onReconnected = null;
   c.onMovementWireNegotiated = null;

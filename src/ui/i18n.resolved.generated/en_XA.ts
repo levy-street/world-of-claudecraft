@@ -1153,6 +1153,10 @@ export const en_XA: EnTranslations = {
       "busy": "[Ƒíñíšĥ ýóúŕ çúŕŕéñţ áçţíóñ ƀéƒóŕé úšíñĝ Úñšţúçķ.]",
       "unavailable": "[Úñšţúçķ íš úñáʋáíļáƀļé íñ ýóúŕ çúŕŕéñţ šţáţé.]"
     },
+    "logout": {
+      "cancel": "[Çáñçéļ]",
+      "interrupted": "[Ļóĝóúţ íñţéŕŕúþţéð ƀéçáúšé ýóú ţóóķ ðáɱáĝé.]"
+    },
     "fct": {
       "absorbed": "[Áƀšóŕƀéð ({amount})]",
       "cheap": "[Çĥéáþ!]"
@@ -3878,6 +3882,12 @@ export const en_XA: EnTranslations = {
       "linkHint": "[Šĥíƒţ-çļíçķ ţó ļíñķ ţĥíš íţéɱ íñ çĥáţ.]"
     },
     "plurals": {
+      "logoutCountdown": {
+        "one": "[Ļóĝĝíñĝ óúţ íñ {count} šéçóñð]",
+        "few": "[Ļóĝĝíñĝ óúţ íñ {count} šéçóñðš]",
+        "many": "[Ļóĝĝíñĝ óúţ íñ {count} šéçóñðš]",
+        "other": "[Ļóĝĝíñĝ óúţ íñ {count} šéçóñðš]"
+      },
       "itemHistoryEarlierHidden": {
         "one": "[{count} éáŕļíéŕ ţŕáñšƒéŕ íš ñóţ šĥóŵñ.]",
         "few": "[{count} éáŕļíéŕ ţŕáñšƒéŕš áŕé ñóţ šĥóŵñ.]",

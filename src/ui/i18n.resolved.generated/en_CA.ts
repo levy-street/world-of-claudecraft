@@ -1153,6 +1153,10 @@ export const en_CA: EnTranslations = {
       "busy": "Finish your current action before using Unstuck.",
       "unavailable": "Unstuck is unavailable in your current state."
     },
+    "logout": {
+      "cancel": "Cancel",
+      "interrupted": "Logout interrupted because you took damage."
+    },
     "fct": {
       "absorbed": "Absorbed ({amount})",
       "cheap": "Cheap!"
@@ -3878,6 +3882,12 @@ export const en_CA: EnTranslations = {
       "linkHint": "Shift-click to link this item in chat."
     },
     "plurals": {
+      "logoutCountdown": {
+        "one": "Logging out in {count} second",
+        "few": "Logging out in {count} seconds",
+        "many": "Logging out in {count} seconds",
+        "other": "Logging out in {count} seconds"
+      },
       "itemHistoryEarlierHidden": {
         "one": "{count} earlier transfer is not shown.",
         "few": "{count} earlier transfers are not shown.",

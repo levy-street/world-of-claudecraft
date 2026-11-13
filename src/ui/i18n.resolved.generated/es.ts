@@ -1153,6 +1153,10 @@ export const es: EnTranslations = {
       "busy": "Termina tu acción actual antes de usar Desatascar.",
       "unavailable": "Desatascar no está disponible en tu estado actual."
     },
+    "logout": {
+      "cancel": "Cancel",
+      "interrupted": "Logout interrupted because you took damage."
+    },
     "fct": {
       "absorbed": "Absorbido ({amount})",
       "cheap": "¡Coste reducido!"
@@ -3878,6 +3882,12 @@ export const es: EnTranslations = {
       "linkHint": "Mayús+clic para enlazar este objeto en el chat."
     },
     "plurals": {
+      "logoutCountdown": {
+        "one": "Logging out in {count} second",
+        "few": "Logging out in {count} seconds",
+        "many": "Logging out in {count} seconds",
+        "other": "Logging out in {count} seconds"
+      },
       "itemHistoryEarlierHidden": {
         "one": "No se muestra {count} transferencia anterior.",
         "few": "No se muestran {count} transferencias anteriores.",

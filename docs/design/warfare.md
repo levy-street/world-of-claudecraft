@@ -644,6 +644,25 @@ alone is the owner's stated shape.
   freely, and a duel, battleground or arena is never a world fight, so their
   own desertion rules stay in charge (`tests/world_pvp_forfeit.test.ts`,
   `tests/world_pvp_departure.test.ts`).
+- Logging out (owner tuning). The Log Out button is the one clean way out of
+  the world, and it makes a player wait first: nothing when they are out of
+  combat with the flag off, `LOGOUT_COMBAT_SECONDS` in combat with the flag
+  off, `LOGOUT_PVP_FLAGGED_SECONDS` with the flag on, and
+  `LOGOUT_PVP_COMBAT_SECONDS` with the flag on and a world-hostile hit, taken
+  or dealt, inside `WORLD_PVP_DEPARTURE_HOLD_WINDOW`
+  (`src/sim/logout_delay.ts`). An unflagged player with such a hit (a
+  free-for-all zone fight) waits the combat length. Taking damage during the
+  wait cancels it, the player may cancel it themselves, and raising the flag
+  or opening a world fight mid-wait stretches it to the longer length,
+  measured from the press; the server owns the countdown
+  (`server/logout_timer.ts`). A player who presses Log Out and then closes the
+  client still waits it out as a body in the world. A fight still live when
+  the wait runs out is forfeited as above. Getting out any other way (closing the client, a dropped
+  connection, a takeover from another login) skips the countdown and keeps the
+  body in the world instead: the linkdead grace always, and for the whole
+  `WORLD_PVP_DEPARTURE_HOLD_WINDOW` after a world fight no other character on
+  the account can log in over it (`tests/logout_timer.test.ts`,
+  `tests/world_pvp_logout_hold.test.ts`).
 
 Deaths to a mob or the environment stake nothing, whatever the flag or the
 ground says. A flagged player inside a live battleground or arena is under that

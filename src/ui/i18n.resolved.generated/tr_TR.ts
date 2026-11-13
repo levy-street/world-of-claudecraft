@@ -1153,6 +1153,10 @@ export const tr_TR: EnTranslations = {
       "busy": "Kurtulmayı kullanmadan önce mevcut eylemini bitir.",
       "unavailable": "Kurtulma mevcut durumunda kullanılamaz."
     },
+    "logout": {
+      "cancel": "Cancel",
+      "interrupted": "Logout interrupted because you took damage."
+    },
     "fct": {
       "absorbed": "Emildi ({amount})",
       "cheap": "Daha ucuz!"
@@ -3878,6 +3882,12 @@ export const tr_TR: EnTranslations = {
       "linkHint": "Bu eşyayı sohbete bağlamak için Shift+tıkla."
     },
     "plurals": {
+      "logoutCountdown": {
+        "one": "Logging out in {count} second",
+        "few": "Logging out in {count} seconds",
+        "many": "Logging out in {count} seconds",
+        "other": "Logging out in {count} seconds"
+      },
       "itemHistoryEarlierHidden": {
         "one": "Önceki {count} aktarım gösterilmiyor.",
         "few": "Önceki {count} aktarım gösterilmiyor.",

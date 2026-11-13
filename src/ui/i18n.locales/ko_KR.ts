@@ -14656,6 +14656,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.standStillAnywhere': '제자리에 멈춘 뒤 갇힘 탈출을 사용하세요.',
   'hudChrome.unstuck.busy': '현재 행동을 끝낸 뒤 갇힘 탈출을 사용하세요.',
   'hudChrome.unstuck.unavailable': '현재 상태에서는 갇힘 탈출을 사용할 수 없습니다.',
+  'hudChrome.plurals.logoutCountdown.one': '{count}초 후 로그아웃합니다',
+  'hudChrome.plurals.logoutCountdown.few': '{count}초 후 로그아웃합니다',
+  'hudChrome.plurals.logoutCountdown.many': '{count}초 후 로그아웃합니다',
+  'hudChrome.plurals.logoutCountdown.other': '{count}초 후 로그아웃합니다',
+  'hudChrome.logout.cancel': '취소',
+  'hudChrome.logout.interrupted': '피해를 받아 로그아웃이 중단되었습니다.',
   // Wiki launcher confirm (M16 non-Latin fills).
   'hudChrome.wiki.confirmTitle': '위키를 열까요?',
   'hudChrome.wiki.confirmBody':

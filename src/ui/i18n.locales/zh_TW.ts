@@ -15621,6 +15621,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.standStillAnywhere': '請先停下再使用脫困。',
   'hudChrome.unstuck.busy': '請先完成目前動作再使用脫困。',
   'hudChrome.unstuck.unavailable': '目前狀態下無法使用脫困。',
+  'hudChrome.plurals.logoutCountdown.one': '{count} 秒後登出',
+  'hudChrome.plurals.logoutCountdown.few': '{count} 秒後登出',
+  'hudChrome.plurals.logoutCountdown.many': '{count} 秒後登出',
+  'hudChrome.plurals.logoutCountdown.other': '{count} 秒後登出',
+  'hudChrome.logout.cancel': '取消',
+  'hudChrome.logout.interrupted': '你受到了傷害，登出已中斷。',
   // Wiki launcher confirm (M16 non-Latin fills).
   'hudChrome.wiki.confirmTitle': '開啟維基？',
   'hudChrome.wiki.confirmBody': '將在瀏覽器中開啟 World of ClaudeCraft 維基，遊戲會繼續執行。',

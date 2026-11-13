@@ -1153,6 +1153,10 @@ export const de_DE: EnTranslations = {
       "busy": "Schließe deine aktuelle Aktion ab, bevor du Befreien benutzt.",
       "unavailable": "Befreien ist in deinem aktuellen Zustand nicht verfügbar."
     },
+    "logout": {
+      "cancel": "Cancel",
+      "interrupted": "Logout interrupted because you took damage."
+    },
     "fct": {
       "absorbed": "Absorbiert ({amount})",
       "cheap": "Günstiger!"
@@ -3878,6 +3882,12 @@ export const de_DE: EnTranslations = {
       "linkHint": "Umschalt-Klick, um diesen Gegenstand im Chat zu verlinken."
     },
     "plurals": {
+      "logoutCountdown": {
+        "one": "Logging out in {count} second",
+        "few": "Logging out in {count} seconds",
+        "many": "Logging out in {count} seconds",
+        "other": "Logging out in {count} seconds"
+      },
       "itemHistoryEarlierHidden": {
         "one": "{count} frühere Übergabe wird nicht angezeigt.",
         "few": "{count} frühere Übergaben werden nicht angezeigt.",

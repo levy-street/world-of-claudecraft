@@ -571,6 +571,12 @@ export const hudChromeStrings = {
     busy: 'Finish your current action before using Unstuck.',
     unavailable: 'Unstuck is unavailable in your current state.',
   },
+  // The Log Out countdown prompt (src/ui/logout_countdown_controller.ts): shown
+  // while a player in combat or flagged for PvP waits to leave the world.
+  logout: {
+    cancel: 'Cancel',
+    interrupted: 'Logout interrupted because you took damage.',
+  },
   // Floating combat text self-notes (proc consume labels, absorb readout).
   fct: {
     absorbed: 'Absorbed ({amount})',
@@ -4548,6 +4554,14 @@ export const hudChromeStrings = {
   // carry the real distinct forms only in the locales that need them (ru_RU). The
   // count is auto-supplied as {count}. Keep all four categories present per base.
   plurals: {
+    // The Log Out countdown prompt's one line ({count} pre-formatted), repainted
+    // each second the server counts down (logout_countdown_controller.ts).
+    logoutCountdown: {
+      one: 'Logging out in {count} second',
+      few: 'Logging out in {count} seconds',
+      many: 'Logging out in {count} seconds',
+      other: 'Logging out in {count} seconds',
+    },
     // The Item history prompt's rolled-off line (item_history_view.ts): how
     // many earlier hands fell off the bounded owner chain.
     itemHistoryEarlierHidden: {

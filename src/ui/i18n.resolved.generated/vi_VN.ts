@@ -1153,6 +1153,10 @@ export const vi_VN: EnTranslations = {
       "busy": "Hãy hoàn tất hành động hiện tại trước khi sử dụng Thoát Kẹt.",
       "unavailable": "Thoát Kẹt không khả dụng trong trạng thái hiện tại của bạn."
     },
+    "logout": {
+      "cancel": "Cancel",
+      "interrupted": "Logout interrupted because you took damage."
+    },
     "fct": {
       "absorbed": "Đã hấp thụ ({amount})",
       "cheap": "Giảm chi phí!"
@@ -3878,6 +3882,12 @@ export const vi_VN: EnTranslations = {
       "linkHint": "Shift-click để chia sẻ vật phẩm này trong khung chat."
     },
     "plurals": {
+      "logoutCountdown": {
+        "one": "Logging out in {count} second",
+        "few": "Logging out in {count} seconds",
+        "many": "Logging out in {count} seconds",
+        "other": "Logging out in {count} seconds"
+      },
       "itemHistoryEarlierHidden": {
         "one": "{count} lần chuyển trước đó không được hiển thị.",
         "few": "{count} lần chuyển trước đó không được hiển thị.",

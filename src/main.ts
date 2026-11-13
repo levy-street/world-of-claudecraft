@@ -2867,14 +2867,17 @@ async function startGame(
   // refs that only exist now (input/renderer) or are page-level (reload)
   hud.attachOptions({
     gliderPitchHold: (value) => input.setGliderPitchHold(value),
+    // Online the server answers first: at once when safe, after a countdown in
+    // combat or flagged for PvP. A finished logout is not a resumable drop.
     logout: () => {
-      // Signal the server to leave immediately, skipping the linkdead grace, so
-      // the character is not held in-world after a deliberate logout.
-      online?.sendLogout();
-      // A deliberate logout is not a resumable drop: forget the active session.
-      clearPlayMarker();
-      location.reload();
+      const done = (): void => {
+        clearPlayMarker();
+        location.reload();
+      };
+      if (online) online.requestLogout(done);
+      else done();
     },
+    cancelLogout: () => online?.cancelLogout(),
     captureKey: (cb) => input.captureNextKey(cb),
     settings,
     groundAimTargetAttackable: (targetId) =>

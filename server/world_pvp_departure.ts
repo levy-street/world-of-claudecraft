@@ -8,7 +8,7 @@ import type { ClientSession, GameServer } from './game';
  *  (src/sim/pvp/world_pvp_forfeit.ts owns the rule). Called from the two
  *  places every departure passes through: `socketClosed` (a closed client or
  *  a lost connection, before the linkdead grace begins) and `leave()` (a
- *  deliberate logout, every kick including the message-flood one, a takeover
+ *  deliberate logout once its countdown has run out, every kick including the message-flood one, a takeover
  *  from another login, the end of the linkdead grace). Both run it BEFORE the
  *  departure's save, so the death and the debit are what persist.
  *
@@ -26,18 +26,20 @@ export function forfeitWorldPvpFightOnSessionDeparture(
   return forfeitWorldPvpFightOnDeparture(sim.ctx, pid);
 }
 
-/** A deliberate logout: forfeit a live world fight first, then report whether
+/** An owner-requested departure that is not the Log Out button (a takeover
+ *  from another login): forfeit a live world fight first, then report whether
  *  a fight inside WORLD_PVP_DEPARTURE_HOLD_WINDOW still holds the body in the
  *  world. True means the caller enters the linkdead grace (`socketClosed`), as
  *  a closed client would, instead of leaving at once; false (no recent fight,
  *  the forfeit killed them, or a session that can never save again) means a
- *  clean leave. */
-export function worldFightHoldsLogout(sim: Sim, pid: number, canSave: boolean): boolean {
+ *  clean leave. The Log Out button never asks: it waits its own countdown and
+ *  then leaves cleanly (server/logout_timer.ts). */
+function worldFightHoldsTakeover(sim: Sim, pid: number, canSave: boolean): boolean {
   forfeitWorldPvpFightOnSessionDeparture(sim, pid, canSave);
   return canSave && worldPvpHoldsDeparture(sim.ctx, pid);
 }
 
-/** Owner-requested logout or takeover closes the transport but retains a held
+/** An owner-requested takeover closes the transport but retains a held
  *  body. Mark it linkdead before closing so the close event cannot tear it
  *  down. A takeover notice flushes before close, preserving the old client's
  *  return to character select; a fresh transport can resume the same body. */
@@ -46,7 +48,7 @@ export function holdWorldFightSession(
   session: ClientSession,
   notify?: () => void,
 ): boolean {
-  if (!worldFightHoldsLogout(server.sim, session.pid, !session.escrowQuarantined)) return false;
+  if (!worldFightHoldsTakeover(server.sim, session.pid, !session.escrowQuarantined)) return false;
   notify?.();
   if (server.socketClosed(session, session.ws)) session.ws.close();
   return true;

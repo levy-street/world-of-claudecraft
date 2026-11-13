@@ -1153,6 +1153,10 @@ export const da_DK: EnTranslations = {
       "busy": "Afslut din nuværende handling, før du bruger Frigørelse.",
       "unavailable": "Frigørelse er ikke tilgængelig i din nuværende tilstand."
     },
+    "logout": {
+      "cancel": "Cancel",
+      "interrupted": "Logout interrupted because you took damage."
+    },
     "fct": {
       "absorbed": "Absorberet ({amount})",
       "cheap": "Billigere!"
@@ -3878,6 +3882,12 @@ export const da_DK: EnTranslations = {
       "linkHint": "Shift-klik for at linke denne genstand i chatten."
     },
     "plurals": {
+      "logoutCountdown": {
+        "one": "Logging out in {count} second",
+        "few": "Logging out in {count} seconds",
+        "many": "Logging out in {count} seconds",
+        "other": "Logging out in {count} seconds"
+      },
       "itemHistoryEarlierHidden": {
         "one": "{count} tidligere overdragelse vises ikke.",
         "few": "{count} tidligere overdragelser vises ikke.",

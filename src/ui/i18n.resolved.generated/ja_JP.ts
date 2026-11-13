@@ -1153,6 +1153,10 @@ export const ja_JP: EnTranslations = {
       "busy": "現在の行動を終えてからスタック解除を使用してください。",
       "unavailable": "現在の状態ではスタック解除を使用できません。"
     },
+    "logout": {
+      "cancel": "キャンセル",
+      "interrupted": "ダメージを受けたため、ログアウトを中断しました。"
+    },
     "fct": {
       "absorbed": "吸収（{amount}）",
       "cheap": "低コスト!"
@@ -3878,6 +3882,12 @@ export const ja_JP: EnTranslations = {
       "linkHint": "Shift + クリックでこのアイテムをチャットにリンクします。"
     },
     "plurals": {
+      "logoutCountdown": {
+        "one": "{count}秒後にログアウトします",
+        "few": "{count}秒後にログアウトします",
+        "many": "{count}秒後にログアウトします",
+        "other": "{count}秒後にログアウトします"
+      },
       "itemHistoryEarlierHidden": {
         "one": "それ以前の {count} 件の譲渡は表示されません。",
         "few": "それ以前の {count} 件の譲渡は表示されません。",

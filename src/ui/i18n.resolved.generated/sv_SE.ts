@@ -1153,6 +1153,10 @@ export const sv_SE: EnTranslations = {
       "busy": "Avsluta din nuvarande handling innan du använder Fastna-hjälp.",
       "unavailable": "Fastna-hjälp är inte tillgänglig i ditt nuvarande tillstånd."
     },
+    "logout": {
+      "cancel": "Cancel",
+      "interrupted": "Logout interrupted because you took damage."
+    },
     "fct": {
       "absorbed": "Absorberat ({amount})",
       "cheap": "Billigare!"
@@ -3878,6 +3882,12 @@ export const sv_SE: EnTranslations = {
       "linkHint": "Skift-klicka för att länka det här föremålet i chatten."
     },
     "plurals": {
+      "logoutCountdown": {
+        "one": "Logging out in {count} second",
+        "few": "Logging out in {count} seconds",
+        "many": "Logging out in {count} seconds",
+        "other": "Logging out in {count} seconds"
+      },
       "itemHistoryEarlierHidden": {
         "one": "{count} tidigare överlåtelse visas inte.",
         "few": "{count} tidigare överlåtelser visas inte.",

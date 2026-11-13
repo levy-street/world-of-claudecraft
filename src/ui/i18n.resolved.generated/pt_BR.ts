@@ -1153,6 +1153,10 @@ export const pt_BR: EnTranslations = {
       "busy": "Termine sua ação atual antes de usar Desbloqueio.",
       "unavailable": "Desbloqueio não está disponível no seu estado atual."
     },
+    "logout": {
+      "cancel": "Cancel",
+      "interrupted": "Logout interrupted because you took damage."
+    },
     "fct": {
       "absorbed": "Absorvido ({amount})",
       "cheap": "Custo reduzido!"
@@ -3878,6 +3882,12 @@ export const pt_BR: EnTranslations = {
       "linkHint": "Shift-clique para vincular este item no chat."
     },
     "plurals": {
+      "logoutCountdown": {
+        "one": "Logging out in {count} second",
+        "few": "Logging out in {count} seconds",
+        "many": "Logging out in {count} seconds",
+        "other": "Logging out in {count} seconds"
+      },
       "itemHistoryEarlierHidden": {
         "one": "{count} transferência anterior não é exibida.",
         "few": "{count} transferências anteriores não são exibidas.",

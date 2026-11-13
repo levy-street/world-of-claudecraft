@@ -2,7 +2,8 @@
 // every departure the player controls, or cannot be told apart from one, runs
 // the sim's forfeit hook BEFORE the departure's save. Drives the real
 // GameServer session lifecycle: a dropped socket (a closed client or a lost
-// connection), a deliberate t:'logout', and a takeover from another login.
+// connection), a deliberate t:'logout' (once its countdown has run out), and a
+// takeover from another login.
 // The rule itself is pinned in tests/world_pvp_forfeit.test.ts.
 import { describe, expect, it, vi } from 'vitest';
 
@@ -27,6 +28,7 @@ vi.mock('../server/db', () => ({
 
 import { saveCharacterAndMarketState, saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer } from '../server/game';
+import { LOGOUT_PVP_COMBAT_SECONDS } from '../src/sim/logout_delay';
 import { WORLD_PVP_KILL_HONOR } from '../src/sim/pvp';
 import { WORLD_PVP_TOGGLE_COOLDOWN } from '../src/sim/pvp/world_pvp';
 import { groundHeight } from '../src/sim/world';
@@ -109,10 +111,27 @@ describe('a departure mid world fight forfeits it on the server', () => {
     });
   });
 
-  it("a deliberate t:'logout': the forfeit resolves before the leave", async () => {
+  it("a deliberate t:'logout': a fight still live when the countdown ends is forfeited before the leave", async () => {
     const { server, sim, winner, leaver } = midFight();
     const leaverMeta = sim.meta(leaver.pid)!;
+    // The Log Out button no longer leaves on the spot (server/logout_timer.ts):
+    // a flagged fighter waits out the countdown first, and nothing is forfeited yet.
     server.handleMessage(leaver, JSON.stringify({ t: 'logout' }));
+    expect(leaver.left).toBe(false);
+    expect(leaverMeta.worldPvp).toMatchObject({ deaths: 0 });
+    // The leaver keeps swinging through the wait (dealing a hit does not
+    // interrupt it), so the fight is still live when it runs out.
+    (sim as unknown as { time: number }).time += LOGOUT_PVP_COMBAT_SECONDS;
+    sim.ctx.dealDamage(
+      sim.entities.get(leaver.pid)!,
+      sim.entities.get(winner.pid)!,
+      5,
+      false,
+      'physical',
+      'Slam',
+      'hit',
+    );
+    server.logouts.tick(sim);
     expect(leaver.left).toBe(true);
     expect(leaverMeta.worldPvp).toMatchObject({ deaths: 1 });
     expect(sim.meta(winner.pid)!.honor).toBe(WORLD_PVP_KILL_HONOR);

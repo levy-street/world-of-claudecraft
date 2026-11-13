@@ -9350,6 +9350,21 @@ export type UnstuckCancelReason =
   | 'state_changed'
   | 'disconnected';
 
+/** Why a Log Out countdown ended without a logout: the player took damage,
+ *  pressed Cancel, or (client-side only) the connection dropped under it. */
+export type LogoutCancelReason = 'damaged' | 'cancelled' | 'disconnected';
+
+/** The Log Out button's countdown (src/sim/logout_delay.ts owns the length).
+ *  Sent by the server to the one session logging out, never emitted by the
+ *  sim: the offline world and the RL env have no departure to judge.
+ *  `started` opens a countdown (or re-opens it with a longer wait when the
+ *  player got into worse trouble); `countdown` is the once-a-second beat. */
+export type LogoutEvent =
+  | { type: 'logout'; phase: 'started'; seconds: number }
+  | { type: 'logout'; phase: 'countdown'; seconds: number }
+  | { type: 'logout'; phase: 'cancelled'; reason: LogoutCancelReason }
+  | { type: 'logout'; phase: 'completed' };
+
 export type UnstuckEvent =
   | { type: 'unstuck'; phase: 'started'; seconds: number }
   | { type: 'unstuck'; phase: 'countdown'; seconds: number }
@@ -9893,6 +9908,7 @@ export type SimEvent = { pid?: number } & (
   // penalty-free revive (corpse run, instance re-entry, delve reset) omits it.
   | { type: 'respawn'; sickness?: 'resurrection' }
   | UnstuckEvent
+  | LogoutEvent
   // itemId names the single item for buy/sell/buyback; it is omitted for the
   // bulk "sell all junk" sweep, which the client treats as a plain refresh signal.
   | { type: 'vendor'; action: 'buy' | 'sell' | 'buyback'; itemId?: string }

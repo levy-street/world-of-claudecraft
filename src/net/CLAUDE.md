@@ -21,6 +21,15 @@ tested sibling module here, never as more methods on `online.ts`. Exemplars
   can never drift (tests: `tests/char_sort.test.ts`, `tests/charselect_action.test.ts`).
 - `reconnect_policy.ts`: pure decision on whether an `error` frame during a reconnect
   is fatal or one of the two bounded transient classes (see Reconnect below).
+- `logout_flow.ts`: the client half of the Log Out button (`LogoutFlow`, behind
+  `requestLogout(onDone)` / `cancelLogout()`): the client only ASKS, and the session ends
+  when the server answers a `logout` event with phase `completed` (at once when safe, after
+  the server's countdown otherwise; `server/logout_timer.ts`). Socket-free and
+  timer-injected, with one fallback for a server that predates the countdown and never
+  answers (`LOGOUT_ACK_TIMEOUT_MS`, or a socket it closes without answering). Pressing Log Out
+  again while the countdown is up cancels it; a connection that drops mid-countdown takes
+  the prompt down and the ordinary reconnect runs (`tests/logout_flow.test.ts`,
+  `tests/logout_online.test.ts`).
 - `backoff.ts`: pure full-jitter reconnect schedule (`computeBackoffDelay`: 0.5x to
   1.5x of the exponential step, clamped at the max delay AFTER jitter, rng injected
   so tests pin exact delays; `tests/backoff.test.ts`).
@@ -194,8 +203,8 @@ over for good (retries exhausted, or a fatal server `error` frame).
   random spread in the same `reconnectTimer` slot, so foregrounded tabs do not
   stampede together) when a suspended mobile tab foregrounds, and drives the close
   path itself when `onclose` was never delivered (the zombie-socket case).
-  `sendLogout()` signals a deliberate logout so the server skips the linkdead grace;
-  call it before a page reload.
+  The Log Out button goes through `requestLogout(onDone)` (`logout_flow.ts`, above): the
+  page reloads only once the server has answered `completed`.
 Tests: `tests/linkdead.test.ts`, `tests/net_online_visibility_reconnect.test.ts`,
 `tests/entry_watch.test.ts`.
 A reload instead of an in-socket reconnect (the mobile WebView eviction case) is
