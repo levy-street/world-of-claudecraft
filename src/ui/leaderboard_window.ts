@@ -201,6 +201,14 @@ export class LeaderboardWindow {
     this.open();
   }
 
+  /** A language switch: repaint whichever board is shown (this window or its
+   *  World Quests rankings stand-in), so the Book of the Realm's Rankings tab
+   *  follows the locale like its five siblings. Self-gated on being open. */
+  relocalize(): void {
+    if (this.rankings?.isOpen) void this.rankings.render();
+    else if (this.isOpen) void this.render();
+  }
+
   /** The root a hub tab switch carries its position onto. */
   rootElement(): HTMLElement {
     return this.deps.root();

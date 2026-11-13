@@ -119,6 +119,9 @@ describe('char_window: WCAG 2.2 AA', () => {
 
 describe('char_window: paperdoll helm-visibility eye', () => {
   function renderHelmetSlot(helmSlotAvailable: boolean) {
+    return buildCharWindow(helmSlotAvailable).root;
+  }
+  function buildCharWindow(helmSlotAvailable: boolean, onClosed?: () => void) {
     let canvasContext: unknown;
     canvasContext = new Proxy(
       {},
@@ -174,10 +177,36 @@ describe('char_window: paperdoll helm-visibility eye', () => {
       moneyHtml: () => '',
       wornItemTooltip: () => '',
       attachTooltip: vi.fn(),
+      ...(onClosed ? { onClosed } : {}),
     });
     win.render();
-    return root;
+    return { root, win };
   }
+
+  // The host keys layout state on the sheet being open (the bags dock and the
+  // touch 50/50 split), so every close path must tell it: the X button used to
+  // close the sheet without a word and stranded both body classes.
+  it('tells the host after every close, the X button included, and only once per close', () => {
+    const onClosed = vi.fn();
+    const { root, win } = buildCharWindow(true, onClosed);
+    root.style.display = 'block';
+    root.querySelector<HTMLElement>('[data-close]')!.click();
+    expect(root.style.display).toBe('none');
+    expect(onClosed).toHaveBeenCalledOnce();
+    // Already closed: nothing to report.
+    win.close();
+    expect(onClosed).toHaveBeenCalledOnce();
+    win.toggle();
+    expect(win.isOpen).toBe(true);
+    expect(onClosed).toHaveBeenCalledOnce();
+    win.toggle();
+    expect(onClosed).toHaveBeenCalledTimes(2);
+    // A host with no hook still closes.
+    const bare = buildCharWindow(true);
+    bare.root.style.display = 'block';
+    bare.win.close();
+    expect(bare.win.isOpen).toBe(false);
+  });
 
   it('omits the eye for a class kit with no head piece to hide (issue: hide helmet does nothing)', () => {
     const root = renderHelmetSlot(false);

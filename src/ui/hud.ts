@@ -203,12 +203,7 @@ import { require2dContext } from './canvas_context';
 import { CardDuelWindow } from './card_duel_window';
 import { CastBarPainter, type CastBarPaintInput } from './cast_bar_painter';
 import { castDisplayName, targetCastDisplayName } from './cast_display_name';
-import {
-  type CharBagsPairingState,
-  charBagsDocked,
-  charBagsPaired,
-  charToggleBagsAction,
-} from './char_bags_pairing_core';
+import { type CharBagsPairingState, charToggleBagsAction } from './char_bags_pairing_core';
 import { charSheetRefreshSigFor } from './char_sheet_sig_core';
 import { type CharSkinPainterHost, paintCharSkinPicker } from './char_skin_window';
 import { charStatModel } from './char_stat_model_core';
@@ -1019,7 +1014,7 @@ import {
 } from './window_drag';
 import { isWindowDragHandle } from './window_drag_handle';
 import { makeWindowFocus } from './window_focus';
-import { syncWindowOpenBodyClasses } from './window_open_state';
+import { syncCharBagsBodyClasses, syncWindowOpenBodyClasses } from './window_open_state';
 import { installWindowReflow, rememberWindowPos, requestedWindowPos } from './window_reflow';
 import { placeWindow } from './window_reflow_core';
 import { installWindowResize, markResizableWindow } from './window_resize';
@@ -3603,7 +3598,6 @@ export class Hud {
       // Both route through the painter so focus returns to the opener (WCAG 2.2 AA).
       case 'char-window':
         this.charWindow.close();
-        this.syncCharBagsPairing();
         break;
       case 'inspect-window':
         this.inspectWindow.close();
@@ -5418,12 +5412,13 @@ export class Hud {
       harvest: this.harvestJournalWindow,
     }),
     touch: () => document.body.classList.contains('mobile-touch'),
+    beforeOpen: () => this.closeOtherWindows(),
   });
   private readonly professionsWindow = new ProfessionsWindow({
     ...this.presentationBag,
     root: () => $('#professions-window'),
     world: () => this.sim,
-    closeOthers: () => this.closeOtherWindows('#professions-window'),
+    closeOthers: () => this.professionsHub.prepare('overview'),
     hideTooltip: () => this.hideTooltip(),
     consumePeek: () => this.peekGuard.consume(),
     openWiki: () => this.openWiki(),
@@ -5450,7 +5445,7 @@ export class Hud {
   private readonly harvestJournalWindow = new HarvestJournalWindow({
     root: () => $('#harvest-journal-window'),
     world: () => this.sim,
-    closeOthers: () => this.closeOtherWindows('#harvest-journal-window'),
+    closeOthers: () => this.professionsHub.prepare('harvest'),
     ...this.windowFocus('#harvest-journal-window'),
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
     hubStrip: this.professionsHub.stripFor('harvest'),
@@ -5471,7 +5466,7 @@ export class Hud {
   private readonly perfectingWindow = new PerfectingWindow({
     ...this.presentationBag,
     world: () => this.sim,
-    closeOthers: () => this.closeOtherWindows('#perfecting-window'),
+    closeOthers: () => this.professionsHub.prepare('perfecting'),
     ...this.windowFocus('#perfecting-window'),
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
     hubStrip: this.professionsHub.stripFor('perfecting'),
@@ -5707,6 +5702,7 @@ export class Hud {
     root: () => $('#char-window'),
     world: () => this.sim,
     closeOthers: () => this.closeOtherWindows('#char-window'),
+    onClosed: () => this.syncCharBagsPairing(),
     hideTooltip: () => this.hideTooltip(),
     ...this.windowFocus('#char-window'),
     slotName: (slot) => itemSlotName(slot),
@@ -6892,6 +6888,7 @@ export class Hud {
     // kept the previous locale until the player happened to change something.
     // Each relocalize() is self-gated on its own window being open.
     this.reputationWindow.relocalize();
+    this.leaderboardWindow.relocalize();
     this.mailboxWindow.relocalize();
     this.socialWindow.relocalize();
     this.cosmeticsWindow.relocalize();
@@ -15016,7 +15013,7 @@ export class Hud {
   }
 
   private showCrafting(): void {
-    this.closeOtherWindows('#crafting-window');
+    this.professionsHub.prepare('crafting');
     this.renderCrafting();
     this.craftingOpenerFocus = this.craftingWindowFocus.captureFocus();
     this.focusManager.focusFirst($('#crafting-window'));
@@ -15903,9 +15900,7 @@ export class Hud {
   }
 
   private syncCharBagsPairing(): void {
-    const state = this.charBagsState();
-    document.body.classList.toggle('char-bags-paired', charBagsPaired(state));
-    document.body.classList.toggle('char-bags-docked', charBagsDocked(state));
+    syncCharBagsBodyClasses(this.charBagsState());
   }
 
   private renderCharPreview(): void {

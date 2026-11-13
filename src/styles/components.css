@@ -2522,18 +2522,25 @@
      694px is half of the sheet (1060) + gap (8) + bags (320); on a narrow
      screen both clamp to the 16px margin and the bags sit over the sheet's
      right edge rather than off screen. */
+  /* The dock is a fixed layout while it lasts, so its position beats the
+     inline left/top a past drag or the open cascade left on either window
+     (they return to that spot once undocked); hence !important on the
+     position properties only. */
   body.char-bags-docked:not(.mobile-touch) #char-window {
-    left: max(16px, calc(50% - 694px));
-    transform: none;
+    left: max(16px, calc(50% - 694px)) !important;
+    right: auto !important;
+    top: 12px !important;
+    bottom: auto !important;
+    transform: none !important;
   }
   body.char-bags-docked:not(.mobile-touch) #bags {
-    left: auto;
-    right: max(16px, calc(50% - 694px));
-    top: 12px;
-    bottom: auto;
+    left: auto !important;
+    right: max(16px, calc(50% - 694px)) !important;
+    top: 12px !important;
+    bottom: auto !important;
     width: 320px;
     max-height: calc(var(--app-vh, 100vh) / var(--window-scale) - 24px);
-    transform: none;
+    transform: none !important;
   }
   body:not(.mobile-touch) #char-window .char-stats-rail .stat-panel {
     padding: 8px 12px;

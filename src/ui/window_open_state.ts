@@ -17,6 +17,11 @@
 // shape, and a jsdom suite can drive THIS function against real DOM to pin
 // the class flips without constructing a Hud.
 
+import {
+  type CharBagsPairingState,
+  charBagsDocked,
+  charBagsPaired,
+} from './char_bags_pairing_core';
 import { isMobileFullscreenWindowOpen } from './mobile_fullscreen_window_core';
 import { OPTIONS_OPEN_CLASS, TRADE_AND_BAGS_OPEN_CLASS } from './root_state_classes';
 import { recordStoreStackSample } from './store_stack_diag';
@@ -26,6 +31,14 @@ import { stackedWindowsVisible } from './window_stack_state_core';
 // same one the trade-and-bags split dock used to read through a body :has().
 const windowOpenMarked = (id: string): boolean =>
   document.getElementById(id)?.getAttribute('data-window-open') === '1';
+
+/** The character sheet and bags pairing classes (char_bags_pairing_core.ts
+ *  decides): the touch 50/50 split and the desktop dock. Idempotent; Hud calls
+ *  it from every path that opens or closes either window. */
+export function syncCharBagsBodyClasses(state: CharBagsPairingState): void {
+  document.body.classList.toggle('char-bags-paired', charBagsPaired(state));
+  document.body.classList.toggle('char-bags-docked', charBagsDocked(state));
+}
 
 export function syncWindowOpenBodyClasses(isWindowVisible: (el: HTMLElement) => boolean): void {
   const windows = [...document.querySelectorAll<HTMLElement>('.window.panel')];

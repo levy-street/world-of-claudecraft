@@ -560,7 +560,10 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 17723 -> 17676 by the Rewards hub (menu consolidation step 7):
     // the hub and its three members build in hud/rewards/rewards_surfaces.ts,
     // and the store chest's dead spin-badge poll left with the daily spin.
-    ceiling: 17676,
+    // LOWERED 17676 -> 17671 at the menu consolidation review round: the
+    // character sheet and bags body classes moved to window_open_state.ts
+    // (syncCharBagsBodyClasses). wc -l, exact count.
+    ceiling: 17671,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

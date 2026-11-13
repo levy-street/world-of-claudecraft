@@ -7,13 +7,15 @@
 // hide, root). The controller never paints a member's body and never owns a
 // member's focus: each member's own open() records the opener and installs
 // its trap, and its close() releases and restores it. Switching tabs closes
-// the shown member FIRST (focus returns to the hub's original opener), then
-// opens the next one, which records that same opener, so Escape from any tab
-// lands focus back where the player started.
+// the shown member FIRST, inside withSynchronousFocusReturn so focus is back
+// on the hub's original opener before the next member opens and records that
+// same opener: Escape from any tab lands focus where the player started, and
+// no late focus return pulls the keyboard out of the tab just opened.
 //
 // Cold: no driver, no layout read. The one browser global it reaches is
 // localStorage for the per-device last-tab memory (UI_DOM_MODULES).
 
+import { withSynchronousFocusReturn } from '../../focus_manager';
 import { FOCUS_KEY_ATTR } from '../../focus_restore';
 import { t } from '../../i18n';
 import { focusActiveTab, wireTabStrip } from '../../tab_strip_painter';
@@ -129,7 +131,7 @@ export class WindowHubController<T extends string> {
     if (current !== null && current !== tab) {
       const from = this.deps.members()[current].rootElement();
       const carry = from ? windowHubPositionCarry(from.dataset, this.deps.touch()) : null;
-      this.deps.members()[current].close();
+      withSynchronousFocusReturn(() => this.deps.members()[current].close());
       const to = this.deps.members()[tab].rootElement();
       if (carry && to) applyPositionCarry(to, carry);
     }

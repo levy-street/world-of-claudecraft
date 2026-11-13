@@ -13,7 +13,7 @@ import {
   resetChatComposer,
 } from '../src/ui/chat_composer_focus_controller';
 import { TutorialOverlay } from '../src/ui/tutorial';
-import { syncWindowOpenBodyClasses } from '../src/ui/window_open_state';
+import { syncCharBagsBodyClasses, syncWindowOpenBodyClasses } from '../src/ui/window_open_state';
 
 const isVisible = (el: HTMLElement): boolean =>
   !el.hidden && getComputedStyle(el).display !== 'none';
@@ -324,5 +324,35 @@ describe('tutorial arrow writes', () => {
     r.tick();
     r.tick();
     expect(r.writes.slice(2)).toEqual(['display=none']);
+  });
+});
+
+// The character sheet and bags pairing classes: one writer (Hud calls it from
+// every open and close path of either window, the sheet's own onClosed hook
+// included), so a closed sheet can never leave the dock or the split behind.
+describe('character sheet and bags pairing classes', () => {
+  const open = {
+    touch: false,
+    charOpen: true,
+    bagsShown: true,
+    bankOpen: false,
+    vendorOpen: false,
+    marketOpen: false,
+  };
+  const classes = (): boolean[] =>
+    ['char-bags-docked', 'char-bags-paired'].map((name) => document.body.classList.contains(name));
+
+  it('docks on desktop, pairs on touch, and drops both the moment the sheet closes', () => {
+    syncCharBagsBodyClasses(open);
+    expect(classes()).toEqual([true, false]);
+    syncCharBagsBodyClasses({ ...open, charOpen: false });
+    expect(classes()).toEqual([false, false]);
+    syncCharBagsBodyClasses({ ...open, touch: true });
+    expect(classes()).toEqual([false, true]);
+    syncCharBagsBodyClasses({ ...open, touch: true, charOpen: false });
+    expect(classes()).toEqual([false, false]);
+    // Another cluster owns the bags companion: neither class.
+    syncCharBagsBodyClasses({ ...open, bankOpen: true });
+    expect(classes()).toEqual([false, false]);
   });
 });

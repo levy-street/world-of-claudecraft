@@ -137,6 +137,9 @@ export interface CharWindowDeps extends Omit<PainterHostPresentation, 'itemToolt
   world(): IWorld;
   closeOthers(): void;
   hideTooltip(): void;
+  /** Runs after EVERY close (the X button, Escape, the keybind), so the host
+   *  can drop the layout state it keyed on the sheet being open. */
+  onClosed?(): void;
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
   slotName(slot: EquipSlot): string;
@@ -232,6 +235,7 @@ export class CharWindow {
     this.deps.hideTooltip();
     this.deps.restoreFocus(this.openerFocus);
     this.openerFocus = null;
+    this.deps.onClosed?.();
   }
 
   renderIfOpen(): void {
