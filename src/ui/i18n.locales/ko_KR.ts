@@ -7705,7 +7705,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.galecrest.pois.7.label': '게일크레스트 마구간',
   'entities.zones.quartered_isle.name': '사분섬',
   'entities.zones.quartered_isle.welcome':
-    '오랜 경쟁이 이 섬을 넷으로 갈라놓았다. 섬 한가운데 언덕 위에서 라이벌무트가 아래의 투기장을 내려다본다.',
+    '오랜 경쟁이 이 섬을 넷으로 산산이 부쉈다. 라이벌무트는 회오리 봉우리 기슭, 전쟁이 벌어졌던 분화구 위에 자리 잡고 있다.',
   'entities.zones.quartered_isle.pois.0.label': '라이벌무트',
   'entities.zones.quartered_isle.pois.1.label': '도전자의 투기장',
   'entities.zones.quartered_isle.pois.2.label': '서리다리',
@@ -7713,6 +7713,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.quartered_isle.pois.4.label': '잿빛 상흔',
   'entities.zones.quartered_isle.pois.5.label': '융기석 황야',
   'entities.zones.quartered_isle.pois.6.label': '회오리 봉우리',
+  'entities.zones.quartered_isle.pois.7.label': '화빙 균열',
+  'entities.zones.quartered_isle.pois.8.label': '크레바스 지대',
+  'entities.zones.quartered_isle.pois.9.label': '서리유리 호수',
+  'entities.zones.quartered_isle.pois.10.label': '불길 수로',
+  'entities.zones.quartered_isle.pois.11.label': '유리 들판',
+  'entities.zones.quartered_isle.pois.12.label': '망치의 협곡',
+  'entities.zones.quartered_isle.pois.13.label': '솟구친 바위판',
+  'entities.zones.quartered_isle.pois.14.label': '쓰러진 거인',
   'entities.npcs.warden_coalfast.name': '숯불 워든',
   'entities.npcs.warden_coalfast.title': '보루 지휘관',
   'entities.npcs.warden_coalfast.greeting':
@@ -10534,7 +10542,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.galeBlurb':
     '바람이 한시도 쉬지 않는 바다 절벽과 울부짖는 구릉. 올드 비컨은 결코 꺼지지 않고, 윅하버는 문을 굳게 걸어 잠급니다.',
   'guide.worldPage.quarteredBlurb':
-    '오랜 경쟁으로 얼음, 불, 바위, 폭풍의 네 구역으로 찢긴 섬. 라이벌무트의 도전자들은 섬 한가운데 언덕에 마을을 세우고 그 기슭에 투기장을 두었다.',
+    '오랜 경쟁으로 얼음, 불, 바위, 폭풍의 네 구역으로 산산이 부서진 섬. 라이벌무트의 도전자들은 회오리 봉우리 기슭에 마을을 세우고, 전쟁이 벌어졌던 분화구에 투기장을 두었다.',
   'guide.worldPage.jungleBlurb':
     '야자수와 백사장, 요란한 새들이 뒤엉킨 열대의 밀림. 해변 마을 드리프트헤이븐이 물가에 불을 피워 둡니다.',
   'guide.worldPage.gardenBlurb':
@@ -10561,7 +10569,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '이곳의 바람은 단 한 번도 멎은 적이 없고, 올드 비컨은 단 한 번도 꺼진 적이 없다오. 여관 문은 들어온 뒤에 꼭 닫으시오.',
   'guide.worldPage.galeGreeter': '봉화지기, 윅하버',
   'guide.worldPage.quarteredGreeting':
-    '이 언덕을 오르는 일행은 모두 자기들이 투기장을 지켜 낼 거라고 맹세한다. 언덕이 솟으면 내려가서 증명해 봐라.',
+    '분화구로 내려가는 일행은 모두 자기들이 투기장을 지켜 낼 거라고 맹세한다. 언덕이 솟으면 내려가서 증명해 봐라.',
   'guide.worldPage.quarteredGreeter': '도전자, 라이벌무트',
   'guide.worldPage.jungleGreeting':
     '따뜻한 모래, 요란한 새들, 그리고 지평선을 삼키는 정글이라오. 해변에 불을 피워 두었으니, 부디 그 불가로 돌아오시오.',
@@ -10584,7 +10592,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.galePlaceNotes':
     '윅하버는 바람에 몸을 기울인 채 서 있습니다. 바람길은 절벽을 따라 들어오는 길이고, 울부짖는 구릉은 강풍 아래 나무 한 그루 없이 굽이칩니다. 올드 비컨은 누구도 기억하지 못할 만큼 오래 타올랐고, 절단 절벽은 물까지 곧장 떨어지며, 난파선 벌판은 이 해안을 정직하게 만듭니다. 그리고 거울 호수는 이 지역 전체에서 유일하게 고요한 것입니다.',
   'guide.worldPage.quarteredPlaceNotes':
-    '라이벌무트는 섬 한가운데 언덕 위에 서 있다. 서리다리는 서리장막 봉우리에서 해협을 건너 길을 잇고, 서리 빙붕은 그 아래 하얗고 차갑게 펼쳐진다. 도전자의 투기장은 언덕 기슭에서 다음 언덕의 왕을 기다리고, 잿빛 상흔은 드레이크랜드 쪽으로 연기를 피우며, 융기석 황야는 호박빛 가을터 쪽으로 솟구치고, 회오리 봉우리는 북쪽 해안 위에서 폭풍을 휘감는다.',
+    '라이벌무트는 회오리 봉우리 기슭, 평의회의 자리로 오르는 길이 시작되는 곳에 서 있다. 서리다리는 프로스트베일에서 해협을 건너 길을 잇고, 서리 빙붕은 그 아래 하얗고 차갑게 부서진 채 펼쳐진다. 도전자의 투기장은 옛 전쟁의 중심인 큰 분화구 바닥에서 다음 언덕의 왕을 기다리고, 잿빛 상흔은 드레이크랜드 쪽으로 연기를 피우며, 융기석 황야는 앰버폴 쪽으로 솟구치고, 회오리 봉우리는 그 모든 것 위에서 폭풍을 휘감는다.',
   'guide.worldPage.junglePlaceNotes':
     '드리프트헤이븐은 해변에 불을 피워 둡니다. 덩굴 어귀는 강이 초록 장벽과 만나는 곳이고, 야자 백사장은 파도를 따라 희고 따뜻하게 이어집니다. 에메랄드 밀림과 덩굴폭포 숲은 내륙을 삼키고, 사파이어 석호는 맑고 깊게 빛나며, 가라앉은 신상은 물밑에서 지켜봅니다.',
   'guide.worldPage.gardenPlaceNotes':
@@ -13756,6 +13764,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.bursar_aldous_crane.title': '도금 금고',
   'entities.npcs.bursar_aldous_crane.greeting':
     '어떤 상자든, 금궤든, 장신구든 도금 금고에 맡기시면 안전합니다.',
+  'entities.npcs.bursar_maud_ashby.name': '출납관 모드 애시비',
+  'entities.npcs.bursar_maud_ashby.title': '도금 금고',
+  'entities.npcs.bursar_maud_ashby.greeting':
+    '도금 금고는 이 섬에서도 당신의 물건을 안전하게 보관합니다.',
   'entities.items.furyforged_warhelm.name': '분노벼림 전투투구',
   'entities.items.furyforged_warspaulders.name': '분노벼림 전투어깨갑옷',
   'entities.items.furyforged_warplate.name': '분노벼림 전투흉갑',
@@ -18115,7 +18127,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '바람이 한시도 쉬지 않고, 윅하버가 문을 굳게 닫아거는 해안 절벽과 울부짖는 구릉.',
   'guide.home.world.quarteredName': '사분섬',
   'guide.home.world.quarteredBlurb':
-    '오랜 경쟁으로 넷으로 갈라진 섬. 라이벌무트가 언덕 위에서 모든 도전자가 차지하려는 투기장을 내려다본다.',
+    '오랜 경쟁으로 넷으로 산산이 부서진 섬. 라이벌무트가 폭풍 봉우리 기슭에서 모든 도전자가 차지하려는 분화구를 내려다본다.',
   'guide.home.world.galeName': '게일크레스트',
   'guide.home.world.gardenBlurb':
     '헤지윅과 분수 안뜰을 지나 들어서는, 아무도 본 적 없는 정원사가 여태 다듬고 있는 미로 정원의 나라.',

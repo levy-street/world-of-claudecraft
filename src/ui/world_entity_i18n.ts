@@ -507,6 +507,7 @@ const NPC_IDS = [
   'card_master', // Card Duel minigame queue desk (Eastbrook, zone 1)
   'bursar_petra_vell', // Gilded Strongbox banker (Fenbridge, zone 2)
   'bursar_aldous_crane', // Gilded Strongbox banker (Highwatch, zone 3)
+  'bursar_maud_ashby', // Gilded Strongbox banker (Rivalmoot, the Quartered Isle)
   'brother_aldric_raid', // dynamically-spawned raid turn-in NPC (Crypt of Nythraxis)
   'archivist_maelin_emberward', // dev-only Ignivar raid historian
   'archivist_maelin_ember_projection', // Maelin's instanced raid checkpoint projection

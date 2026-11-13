@@ -126,7 +126,9 @@ export const BIOME_LIGHT: Record<
   // the Galecrest: cool dawn light, sea-grey bounce off the downs
   gale: { hemiSky: 0xe2f0fc, hemiGround: 0x587c60, sun: 0xfff0d4 },
   // the Quartered Isle: neutral day light over a war-scarred stone bounce
-  quartered: { hemiSky: 0xdcecf8, hemiGround: 0x5e6450, sun: 0xfff0d8 },
+  // (its borrowed twilight sky is a strong blue: the sky's share of the
+  // ambient is held down so shaded stone keeps its own colour)
+  quartered: { hemiSky: 0xdcecf8, hemiGround: 0x5e6450, sun: 0xfff0d8, envScale: 0.7 },
   // paint-only biomes (map editor, never a built-in realm): beach reuses the
   // neutral vale grade, desert the amber warmth, volcano the ember glow, cave
   // the wraithwood gloom.

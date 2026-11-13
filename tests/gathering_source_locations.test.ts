@@ -276,12 +276,13 @@ describe('gathering source locations: fishing materials', () => {
     expect(info.kind).toBe('fishing');
     // eastbrook_vale carries its own table; mirefen_marsh/thornpeak_heights
     // carry their OWN distinct tables (no raw_mirror_trout row), so only the
-    // fallback zones plus eastbrook_vale itself should list it: 1 + 11.
+    // fallback zones plus eastbrook_vale itself should list it: 1 + 12 since
+    // the Quartered Isle's rod-tier row joined the fallback zones.
     const zoneIds = info.zones.map((z) => z.zoneId).sort();
     expect(zoneIds).toContain('eastbrook_vale');
     expect(zoneIds).not.toContain('mirefen_marsh');
     expect(zoneIds).not.toContain('thornpeak_heights');
-    expect(zoneIds.length).toBe(12);
+    expect(zoneIds.length).toBe(13);
     const eastbrook = info.zones.find((z) => z.zoneId === 'eastbrook_vale')!;
     expect(eastbrook.band).toBe(0);
     expect(eastbrook.minimumProficiency).toBe(FISHING_CATCH_BAND_THRESHOLDS[0]);
@@ -298,7 +299,8 @@ describe('gathering source locations: fishing materials', () => {
     // (band + 1), the stricter of that and any zone's own access tier.
     const stillmere = materialSourceInfo('raw_stillmere_salmon') as FishingMaterialSource;
     expect(stillmere.kind).toBe('fishing');
-    expect(stillmere.zones.length).toBe(14);
+    // 15 rod-tier zones since the Quartered Isle joined (was 14).
+    expect(stillmere.zones.length).toBe(15);
     for (const zone of stillmere.zones) {
       expect(zone.band, zone.zoneId).toBe(5);
       expect(zone.minimumProficiency, zone.zoneId).toBe(200);
@@ -307,7 +309,7 @@ describe('gathering source locations: fishing materials', () => {
     }
 
     const deepbarb = materialSourceInfo('raw_deepbarb_catfish') as FishingMaterialSource;
-    expect(deepbarb.zones.length).toBe(14);
+    expect(deepbarb.zones.length).toBe(15);
     for (const zone of deepbarb.zones) {
       expect(zone.band, zone.zoneId).toBe(3);
       expect(zone.minimumProficiency, zone.zoneId).toBe(200);
@@ -315,7 +317,7 @@ describe('gathering source locations: fishing materials', () => {
     }
 
     const hollowgill = materialSourceInfo('raw_hollowgill_sturgeon') as FishingMaterialSource;
-    expect(hollowgill.zones.length).toBe(14);
+    expect(hollowgill.zones.length).toBe(15);
     for (const zone of hollowgill.zones) {
       expect(zone.band, zone.zoneId).toBe(4);
       expect(zone.minimumProficiency, zone.zoneId).toBe(200);
@@ -339,7 +341,7 @@ describe('gathering source locations: fishing materials', () => {
     // hand-authored per-item registry: computed once via a cheap geometry
     // probe over declared lakes, never a Sim.
     const proven = fishingLocationProvenZoneIds();
-    expect(proven.size).toBe(14);
+    expect(proven.size).toBe(15); // the Quartered Isle's lake made fifteen
     expect([...proven].sort()).toEqual(Object.keys(FISHING_ZONE_ROD_TIERS).sort());
   });
 

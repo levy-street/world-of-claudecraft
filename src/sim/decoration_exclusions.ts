@@ -47,6 +47,7 @@ export function paintedTownReachCovers(x: number, z: number, pad: number): boole
 
 import { inParterrePlot } from './garden_parterre_plots';
 import { CHALLENGERS_RING } from './quartered_isle_terrain';
+import { inCinderscar, quarteredLandmarkClears } from './quartered_landmarks';
 import type { BiomeId } from './types';
 
 /** Authored clearings remove only named scatter, never terrain anchors or heights.
@@ -181,9 +182,10 @@ function activeWorldExclusionPoints(): readonly { x: number; z: number }[] {
   return pts;
 }
 
-/** Inside the Challengers' Ring out to its bank's foot. */
+/** Inside the Challengers' Ring out to its floor's ease (blendR, past the
+ *  bank's foot), the whole ground the arena applier shapes. */
 function challengersRingCovers(x: number, z: number): boolean {
-  return Math.hypot(x - CHALLENGERS_RING.x, z - CHALLENGERS_RING.z) < CHALLENGERS_RING.bankOuterR;
+  return Math.hypot(x - CHALLENGERS_RING.x, z - CHALLENGERS_RING.z) < CHALLENGERS_RING.blendR;
 }
 
 export function isExcludedDecoration(x: number, z: number): boolean {
@@ -200,6 +202,9 @@ export function isExcludedDecoration(x: number, z: number): boolean {
   // the Challengers' Ring is a cleared arena: no tree or rock stands on its
   // floor or its bank, so a King of the Hill contest is fought in the open
   if (challengersRingCovers(x, z) && isBuiltinWorldActive()) return true;
+  // the isle's landmarks keep their floors bare: the Gyre's path and crown,
+  // the scars' beds, the tarn's ice and the glass (quartered_landmarks.ts)
+  if (isBuiltinWorldActive() && quarteredLandmarkClears(x, z)) return true;
   if (activeWorldExclusionPoints().some((point) => Math.hypot(x - point.x, z - point.z) < 0.25)) {
     return true;
   }
@@ -219,6 +224,19 @@ export function isCuratedGardenScatter(
   biomeAt: (x: number, z: number) => BiomeId,
 ): boolean {
   return (kind === 'tree' && biomeAt(x, z) === 'garden') || inParterrePlot(x, z, 6);
+}
+
+/** Every kind-aware scatter clearing world.ts's decoration grid applies: the
+ *  Evergarden's curated trees and plots, and the Cinderscar, a burnt waste
+ *  where no tree of either kind stands (its stone stays). */
+export function isCuratedScatter(
+  kind: 'tree' | 'tree2' | 'rock',
+  x: number,
+  z: number,
+  biomeAt: (x: number, z: number) => BiomeId,
+): boolean {
+  if (kind !== 'rock' && isBuiltinWorldActive() && inCinderscar(x, z)) return true;
+  return isCuratedGardenScatter(kind, x, z, biomeAt);
 }
 
 /** Road lamps kept off authored clearings, matched to the exact planned site so no

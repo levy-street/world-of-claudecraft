@@ -9076,7 +9076,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.zones.galecrest.pois.7.label': '疾风崖马厩',
   'entities.zones.quartered_isle.name': '四分岛',
   'entities.zones.quartered_isle.welcome':
-    '一场古老的争斗将此岛一分为四。岛心山丘上的争锋镇，守望着山下的竞技场。',
+    '一场古老的争斗将这座岛屿击碎成四块。争锋镇守在旋风峰脚下，俯瞰着当年战争中心的陨坑。',
   'entities.zones.quartered_isle.pois.0.label': '争锋镇',
   'entities.zones.quartered_isle.pois.1.label': '挑战者竞技场',
   'entities.zones.quartered_isle.pois.2.label': '霜桥',
@@ -9084,6 +9084,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.zones.quartered_isle.pois.4.label': '烬痕',
   'entities.zones.quartered_isle.pois.5.label': '隆岩荒野',
   'entities.zones.quartered_isle.pois.6.label': '旋风峰',
+  'entities.zones.quartered_isle.pois.7.label': '火冰裂谷',
+  'entities.zones.quartered_isle.pois.8.label': '冰隙群',
+  'entities.zones.quartered_isle.pois.9.label': '霜镜湖',
+  'entities.zones.quartered_isle.pois.10.label': '焚流渠',
+  'entities.zones.quartered_isle.pois.11.label': '琉璃原',
+  'entities.zones.quartered_isle.pois.12.label': '铁锤峡',
+  'entities.zones.quartered_isle.pois.13.label': '隆起石板',
+  'entities.zones.quartered_isle.pois.14.label': '倒下的巨人',
   'entities.npcs.warden_coalfast.name': '守望者·煤耐',
   'entities.npcs.warden_coalfast.title': '堡垒指挥官',
   'entities.npcs.warden_coalfast.greeting':
@@ -11775,7 +11783,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.galeBlurb':
     '海崖与呼啸的丘陵，这里的风从不停歇，老灯塔的火从未熄灭，烛港的家家户户都把门关得严严实实。',
   'guide.worldPage.quarteredBlurb':
-    '一座被古老争斗撕裂成冰、火、岩、风四块地域的岛屿。争锋镇的挑战者们把城镇建在岛心的山丘上，把竞技场设在山脚下。',
+    '一座被古老争斗击碎成冰、火、岩、风四块地域的岛屿。争锋镇的挑战者们把城镇建在旋风峰脚下，把竞技场设在当年战争所在的陨坑里。',
   'guide.worldPage.jungleBlurb':
     '棕榈、白沙与喧闹鸟鸣交织的热带丛林，海滨小镇漂流港在沙滩上燃着一堆长明的篝火。',
   'guide.worldPage.gardenBlurb':
@@ -11801,7 +11809,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '这里的风从未停过一刻，老灯塔的火也从未熄过一次。进来后记得随手关上旅店的门。',
   'guide.worldPage.galeGreeter': '守塔人，烛港',
   'guide.worldPage.quarteredGreeting':
-    '每支登上这座山丘的队伍都发誓自己会守住竞技场。山丘升起时就下去，证明给我看。',
+    '每支走进陨坑的队伍都发誓自己会守住竞技场。山丘升起时就下去，证明给我看。',
   'guide.worldPage.quarteredGreeter': '一名挑战者，争锋镇',
   'guide.worldPage.jungleGreeting':
     '温暖的沙滩，喧闹的鸟鸣，还有吞没地平线的丛林。我们在海滩上留着一堆篝火；可要记得回到火边来。',
@@ -11824,7 +11832,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.galePlaceNotes':
     '烛港迎风而立。风道是进来的悬崖之路；啸风丘陵在狂风下光秃起伏；老灯塔燃烧的岁月已无人能说清；断崖直落入海；沉船滩让人不敢小看这段海岸；而镜湖是整个国度里唯一静止的东西。',
   'guide.worldPage.quarteredPlaceNotes':
-    '争锋镇坐落在岛心的山丘上。霜桥把道路从霜幕之境跨过海峡引来；白霜冰架在下方又白又冷地铺开；挑战者竞技场在山脚静候下一位山丘之王；烬痕向着龙裔荒原阴燃；隆岩荒野朝琥珀秋境隆起；旋风峰则在北岸上空卷动风暴。',
+    '争锋镇坐落在旋风峰脚下，通往议会之座的攀登之路从这里开始。霜桥把道路从霜幕之境跨过海峡引来；白霜冰架在下方又白又冷、支离破碎地铺开；挑战者竞技场在古老战争的中心、大陨坑的底部静候下一位山丘之王；烬痕向着龙裔荒原阴燃；隆岩荒野朝琥珀秋境隆起；旋风峰则在这一切之上卷动风暴。',
   'guide.worldPage.junglePlaceNotes':
     '漂流港在海滩上燃着篝火。缠木隘口是大河汇入绿墙之处；棕榈长滩沿着浪缘铺展，洁白而温暖；翠绿丛林与垂藤林吞没了内陆；蓝宝石潟湖清澈而幽深地发着光；而沉没神像则在水下静静注视。',
   'guide.worldPage.gardenPlaceNotes':
@@ -14770,6 +14778,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.bursar_aldous_crane.title': '镀金保险箱',
   'entities.npcs.bursar_aldous_crane.greeting':
     '每一只木箱、每一个钱柜、每一件饰物，交给镀金保险箱都万无一失。',
+  'entities.npcs.bursar_maud_ashby.name': '司库莫德·阿什比',
+  'entities.npcs.bursar_maud_ashby.title': '镀金保险箱',
+  'entities.npcs.bursar_maud_ashby.greeting': '镀金保险箱会妥善保管你的财物，在这座岛上也一样。',
   'entities.items.furyforged_warhelm.name': '怒铸战盔',
   'entities.items.furyforged_warspaulders.name': '怒铸战肩',
   'entities.items.furyforged_warplate.name': '怒铸战甲',
@@ -18941,7 +18952,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.home.world.galeBlurb': '海崖与呼啸的丘陵，这里的风从不停歇，而烛港把门关得紧紧的。',
   'guide.home.world.quarteredName': '四分岛',
   'guide.home.world.quarteredBlurb':
-    '一座被古老争斗一分为四的岛屿，争锋镇在山丘上俯瞰着每个挑战者都想夺下的竞技场。',
+    '一座被古老争斗击碎成四块的岛屿，争锋镇守在风暴之峰脚下，俯瞰着每个挑战者都想夺下的陨坑。',
   'guide.home.world.galeName': '疾风崖',
   'guide.home.world.gardenBlurb':
     '一片树篱迷宫般的国度，至今仍被谁也没见过的园丁修剪着，入口就在篱苑镇与它的喷泉庭院之后。',

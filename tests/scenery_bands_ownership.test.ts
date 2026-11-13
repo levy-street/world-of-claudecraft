@@ -7,6 +7,7 @@ import { collectSceneryPlacements } from '../src/render/scenery_bands/collect';
 import { SceneryIndexCache } from '../src/render/scenery_bands/geometry';
 import { lowSceneryBandMaterial, sceneryBandMaterial } from '../src/render/scenery_bands/material';
 import { SceneryNearSources } from '../src/render/scenery_bands/near';
+import { isSceneryBackdrop, SCENERY_BACKDROP_FLAG } from '../src/render/scenery_bands/policy_core';
 import { LowSceneryBands, sceneryBandsHost } from '../src/render/scenery_bands/session';
 import {
   sweepZoneFeatures,
@@ -30,6 +31,63 @@ function sources(): THREE.Group {
 }
 
 describe('scenery replacement ownership', () => {
+  it('never cuts or trims a sky backdrop group once the cheap bands are ready', async () => {
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera();
+    const webgl = {
+      shadowMap: { enabled: false },
+      render: vi.fn(),
+    } as unknown as THREE.WebGLRenderer;
+    const session = new LowSceneryBands({ run: async (work) => work() }, () => ({
+      scene,
+      camera,
+      webgl,
+      gate: async () => undefined,
+    }));
+    try {
+      const existing = sources();
+      scene.add(existing);
+      session.registerRoot(existing);
+      session.update(0, 0);
+      await vi.waitFor(() => expect(session.snapshot()).toMatchObject({ stage: 'ready' }));
+      session.update(0, 0);
+      // a dressing root with one ordinary group and one backdrop group
+      const dressing = new THREE.Group();
+      dressing.name = 'quartered-landmark-dressing';
+      const plain = sources();
+      plain.name = 'plain-dressing';
+      const backdrop = sources();
+      backdrop.name = 'sky-backdrop';
+      backdrop.userData[SCENERY_BACKDROP_FLAG] = true;
+      dressing.add(plain, backdrop);
+      scene.add(dressing);
+      session.registerRoot(dressing, true);
+      session.update(0, 0);
+      expect(session.cullFar(1000, plain)).toBe(60);
+      expect(session.cullFar(1000, backdrop)).toBe(1000);
+      expect(session.cullFar(1000, backdrop.children[0])).toBe(1000);
+      // the backdrop's meshes are never handed to the near trim
+      expect(session.ownsMesh(plain.children[0])).toBe(true);
+      expect(session.ownsMesh(backdrop.children[0])).toBe(false);
+      expect((backdrop.children[0] as THREE.InstancedMesh).count).toBe(3);
+    } finally {
+      session.dispose();
+    }
+  });
+
+  it('reads the backdrop flag off the node or any ancestor, and only a literal true', () => {
+    const outer = new THREE.Group();
+    const inner = new THREE.Group();
+    outer.add(inner);
+    expect(isSceneryBackdrop(inner)).toBe(false);
+    expect(isSceneryBackdrop(null)).toBe(false);
+    outer.userData[SCENERY_BACKDROP_FLAG] = 1;
+    expect(isSceneryBackdrop(inner)).toBe(false);
+    outer.userData[SCENERY_BACKDROP_FLAG] = true;
+    expect(isSceneryBackdrop(inner)).toBe(true);
+    expect(isSceneryBackdrop(outer)).toBe(true);
+  });
+
   it('uses the supplied scheduled gate without requiring parallel compile support', async () => {
     const root = new THREE.Group();
     const gate = vi.fn(async () => undefined);

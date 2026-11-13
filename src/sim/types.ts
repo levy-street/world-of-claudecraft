@@ -6534,6 +6534,13 @@ export interface ZoneDef {
   // of on a random open spot. The ground under it is authored level and clear
   // (tests pin it as a legal spot), so the stand is fair for every party.
   hillArena?: { x: number; z: number };
+  // This zone's rect CLAIMS any ground it overlaps in a neighbour's rect: the
+  // lookups (zoneAt, zoneContaining, activeZoneAt) resolve the overlap to this
+  // zone, border edges run along the claim's outline, and a column's look
+  // eases out across the claimed strip (columnBlendAt). The one zone allowed
+  // to overlap another; every other pair of rects stays disjoint (the Quartered
+  // Isle reaching into the Drakelands' and the Amberfall's inner edges).
+  claimsOverlap?: boolean;
 }
 
 // One end of a paired overworld portal. Walking within the pair's trigger

@@ -613,7 +613,7 @@ const FAR_FOREST_DENSITY: Partial<Record<BiomeId, number>> = {
   jungle: 0.72,
   garden: 0.4,
   gale: 0.1,
-  quartered: 0.2, // the Heavestone woods; the other quarters are open ground
+  quartered: 0.03, // a shattered waste: a dead tree here and there, no woods
 };
 
 /**

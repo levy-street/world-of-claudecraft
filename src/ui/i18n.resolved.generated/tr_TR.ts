@@ -9343,7 +9343,7 @@ export const tr_TR: EnTranslations = {
         "galeName": "Fırtına Sırtı",
         "galeBlurb": "Rüzgârın hiç dinmediği ve Wickharbor'un kapılarını sıkı sıkı kapattığı deniz kayalıkları ve uluyan bozkırlar.",
         "quarteredName": "The Quartered Isle",
-        "quarteredBlurb": "An island broken four ways by an old rivalry, where Rivalmoot keeps its hill above the ring every challenger comes to win.",
+        "quarteredBlurb": "An island shattered four ways by an old rivalry, where Rivalmoot keeps the foot of the storm peak above the crater every challenger comes to win.",
         "levelsCap": "Seviye {level}"
       },
       "group": {
@@ -10288,7 +10288,7 @@ export const tr_TR: EnTranslations = {
       "nightBlurb": "Çiçeklerin patikaları aydınlattığı ve Moonrest'in düş gören bir gökyüzü altında sessiz bir nöbet tuttuğu, yıldızlı gece yarısı diyarı.",
       "hauntBlurb": "Devasa ağaç tepelerinin altındaki lanetli bir orman, yolda tek dürüst ışığın Gibbetmere'in fenerleri olduğu.",
       "galeBlurb": "Rüzgarın hiç dinmediği, Eski Fener'in hiç sönmediği ve Wickharbor'un kapılarını sıkıca kapattığı deniz kayalıkları ve uluyan bozkırlar.",
-      "quarteredBlurb": "An island torn into four quarters of ice, fire, stone and storm by an old rivalry, with the challengers of Rivalmoot keeping their town on the hill at its heart and their ring at its foot.",
+      "quarteredBlurb": "An island shattered into four quarters of ice, fire, stone and storm by an old rivalry, with the challengers of Rivalmoot keeping their town at the foot of the Gyre and their ring in the crater where the war was fought.",
       "jungleBlurb": "Palmiyelerden, beyaz kumdan ve gürültücü kuşlardan oluşan tropikal bir sarmaşık, sahil kasabası Drifthaven'ın kıyıda bir ateş yaktığı.",
       "gardenBlurb": "Kimsenin görmediği bir bahçıvan tarafından hala budanmaya devam eden, Hedgewick ve onun çeşme avlularının ötesinden girilen bir çit labirenti bahçe diyarı.",
       "valeGreeting": "Kılıcını yakın tut. Vadi eski Vadi değil.",
@@ -10313,7 +10313,7 @@ export const tr_TR: EnTranslations = {
       "hauntGreeter": "Fener yakıcısı, Gibbetmere",
       "galeGreeting": "Rüzgar burada bir kez bile durmadı ve Eski Fener bir kez bile sönmedi. Han kapısını arkandan kapat.",
       "galeGreeter": "Fener bekçisi, Wickharbor",
-      "quarteredGreeting": "Every party that climbs this hill swears it will be the one to hold the ring. Go down when the hill rises and prove it.",
+      "quarteredGreeting": "Every party that comes down into the crater swears it will be the one to hold the ring. Go down when the hill rises and prove it.",
       "quarteredGreeter": "A challenger, Rivalmoot",
       "jungleGreeting": "Sıcak kum, gürültücü kuşlar ve ufku yutan bir orman. Sahilde bir ateş yakılı tutuyoruz; ona geri dönmeye çalış.",
       "jungleGreeter": "Liman amiri, Drifthaven",
@@ -10330,7 +10330,7 @@ export const tr_TR: EnTranslations = {
       "nightPlaceNotes": "Moonrest nöbeti tutar. Gece Kapısı gece yarısı ülkesine giden yoldur; Ay Kuyusu yanında durabileceğin yıldız ışığını barındırır; Gloamfield karanlıkta çiçek açar; Ebedi Nöbet hiç kımıldamadan gözetler; ve Uykusuz Höyük burada asla rüya görmeyen tek yerdir.",
       "hauntPlaceNotes": "Gibbetmere kendi fenerlerinin içine sinmiştir. Karga Kapısı, ormanın kasvetli ön kapısıdır; Dul Çalılığı ağlarla sıkıca örülüdür; Asılı Çayırlık ve Yas Taşı Şapeli ormanın en eski kederlerini barındırır; ve Avcının Açıklığı hala orada avlanan her neyse ona aittir.",
       "galePlaceNotes": "Wickharbor rüzgara doğru eğilir. Rüzgar Yolu içeri giden kayalık yoldur; Uluyan Bozkırlar fırtına altında ağaçsızca uzanır; Eski Fener herkesin hatırlayabildiği kadar uzun süredir yanmaktadır; Uçurum suya dik iner; Enkaz Tarlaları kıyıyı dürüst tutar; ve Ayna Gölü tüm diyardaki tek durgun şeydir.",
-      "quarteredPlaceNotes": "Rivalmoot stands on the hill at the island's heart. The Hoarbridge carries the road over the strait from the Frostveil; the Hoarshelf lies white and cold below; the Challengers' Ring waits level at the hill's foot for the next King of the Hill; the Cinderscar smoulders toward the Drakelands; the Heavestone Wilds heave toward the Amberfall; and the Gyre turns its storm above the north shore.",
+      "quarteredPlaceNotes": "Rivalmoot stands at the foot of the Gyre, where the climb to the council's seat begins. The Hoarbridge carries the road over the strait from the Frostveil; the Hoarshelf lies white, cold and broken below; the Challengers' Ring waits on the floor of the great crater, the old war's heart, for the next King of the Hill; the Cinderscar smoulders toward the Drakelands; the Heavestone Wilds heave toward the Amberfall; and the Gyre turns its storm above them all.",
       "junglePlaceNotes": "Drifthaven ateşini sahilde tutar. Sarmaşık Ağzı, nehrin yeşil duvarla buluştuğu yerdir; Palmiye Plajı dalgalar boyunca beyaz ve sıcak uzanır; Zümrüt Sarmaşık ve Sarmaşık Şelalesi iç kısmı yutar; Safir Lagünü berrak ve derin parıldar; ve Batık İdol suyun altından gözetler.",
       "gardenPlaceNotes": "Hedgewick, Bahçe Kapısı'nda bekler. Çiçek Terası Yolu kırpılmış renklerle çiçek açar; Şafak Kalesi yeni duvarların ardında şövalyelerini eğitir; Yaprak Gölcüğü yıl boyunca pembe tonlarda süzülür; Eski Değirmen kendi halka tarhlarını çevirir; Büyük Labirent her konuk için düzenini değiştirir, kemerlerini yapraklı tilkiler gözetler; Kuzey Karakolu çıkış yolunu korur; Zambak Çukuru bunların hepsinin ötesinde dinlenir; ve Çeşme Avlusu hala bahçenin kalbinde berrak akar.",
       "gladeTitle": "Sakin bir köşe: Parlakorman Açıklığı",
@@ -27016,6 +27016,11 @@ export const tr_TR: EnTranslations = {
         "title": "Yaldızlı Kasa",
         "greeting": "Her sandık, her çekmece, her biblo Yaldızlı Kasa'da güvendedir."
       },
+      "bursar_maud_ashby": {
+        "name": "Bursar Maud Ashby",
+        "title": "The Gilded Strongbox",
+        "greeting": "The Gilded Strongbox keeps your goods safe, even on the isle."
+      },
       "brother_aldric_raid": {
         "name": "Birader Aldric",
         "title": "Vadi Rahibi",
@@ -30392,7 +30397,7 @@ export const tr_TR: EnTranslations = {
       },
       "quartered_isle": {
         "name": "The Quartered Isle",
-        "welcome": "An old rivalry broke this island four ways. On the hill at its heart, Rivalmoot keeps watch over the ring below.",
+        "welcome": "An old rivalry shattered this island four ways. Rivalmoot keeps the foot of the Gyre, above the crater where the war was fought.",
         "pois": {
           "0": {
             "label": "Rivalmoot"
@@ -30414,6 +30419,30 @@ export const tr_TR: EnTranslations = {
           },
           "6": {
             "label": "The Gyre"
+          },
+          "7": {
+            "label": "The Fireice Rift"
+          },
+          "8": {
+            "label": "The Crevasses"
+          },
+          "9": {
+            "label": "The Rimeglass"
+          },
+          "10": {
+            "label": "The Burnways"
+          },
+          "11": {
+            "label": "The Glassfield"
+          },
+          "12": {
+            "label": "The Hammer's Cut"
+          },
+          "13": {
+            "label": "The Heaved Slabs"
+          },
+          "14": {
+            "label": "The Fallen Giant"
           }
         }
       },

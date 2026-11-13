@@ -153,6 +153,7 @@ import {
   reorderInstanceDataByStableRank,
 } from './perceptual_lod_core';
 import { collectBuildingImpostors } from './props';
+import { scatterRockTint } from './scatter_rock_tint_core';
 import { prepareSceneryDetailMesh } from './scenery_detail';
 import { makeShadowOnlyMaterial } from './shadow_only_material';
 import { freezeStaticMatrices } from './static_matrix';
@@ -209,15 +210,16 @@ const GRASS_DENSITY_HIGH = 0.5;
 export const GRASS_BIOME_DENSITY: Partial<Record<BiomeId, number>> = {
   frost: 0,
   ember: 0, // the Drakelands are scorched waste: no blades in the cinders
+  quartered: 0, // the Quartered Isle is a shattered waste: no blades on the broken plates
   haunt: 1.55,
   // the Evergarden is mown lawn: no wild tufts, its flowers grow in the
   // authored parterre beds instead (garden_parterre_core.ts)
   garden: 0,
 };
 const GRASS_DENSITY_MULT_MAX = Math.max(1, ...Object.values(GRASS_BIOME_DENSITY));
-// Ground flowers never grow in these biomes (the Reach loses them with its
-// grass anchors; the Wraithwood keeps grass but blooms nothing).
-const FLOWERLESS_BIOMES: ReadonlySet<BiomeId> = new Set(['frost', 'haunt']);
+// Ground flowers never grow in these biomes (the Reach loses them with its grass
+// anchors; the Wraithwood blooms nothing; the Quartered Isle is a waste).
+const FLOWERLESS_BIOMES: ReadonlySet<BiomeId> = new Set(['frost', 'haunt', 'quartered']);
 // Field biomes bloom in coarse drifts (the dusk realm's original treatment,
 // extended to the flower-field realms): dense hash-cell fields instead of the
 // sparse one-in-nine anchor blooms.
@@ -437,26 +439,6 @@ const OAK_TINT: Record<BiomeId, number> = {
   gale: 0x78b464, // stunted wind-bent crowns
   quartered: 0x9aa65a, // gold-touched crowns of the Heavestone woods
 };
-const ROCK_TINT: Record<BiomeId, number> = {
-  vale: 0x989a94,
-  marsh: 0x989a94,
-  peaks: 0x949ca8,
-  beach: 0xc2b89e,
-  desert: 0xb08d6a,
-  volcano: 0x4a4038,
-  cave: 0x6a6a66,
-  dusk: 0x8f88a6,
-  ember: 0x9a7a62,
-  frost: 0x9aa8b8,
-  amber: 0x9a8a70,
-  fen: 0x8e9688,
-  night: 0xa094c8,
-  haunt: 0x565a50,
-  jungle: 0x7e8a6a,
-  garden: 0xa2a49c, // marble and pale stone
-  gale: 0x929698, // salt-grey sea rock
-  quartered: 0x948c84, // heaved, weathered stone
-};
 const TRUNK_TINT: Record<BiomeId, number> = {
   vale: 0xecdfcc,
   marsh: 0xecdfcc,
@@ -585,7 +567,6 @@ const LEAF_TINT_SOFTEN_NIGHT = 0.15;
 const leafSoften = (biome: BiomeId): number =>
   biome === 'night' ? LEAF_TINT_SOFTEN_NIGHT : LEAF_TINT_SOFTEN;
 const BARK_TINT_SOFTEN = 0.85;
-const ROCK_TINT_SOFTEN = 0.45;
 
 // rocks only pick up the snow-dust colorway above the terrain snowline —
 // low-altitude peaks-biome foothills stay mossy/bare (white rocks on green
@@ -2019,10 +2000,9 @@ function buildTrees(
           // sink so undersides bury on slopes (geometry base is near y=0)
           m.compose(v.set(r.x, y - ROCK_SINK_UNITS * sy, r.z), q, sv.set(sxz1, sy, sxz2));
           rockMesh.setMatrixAt(i, m);
-          // low-altitude peaks rocks drop the icy blue-gray for a warm field
-          // stone — pale rocks on green foothill grass read as eggs
-          const rockHex = r.biome === 'peaks' && !isSnowy(r) ? 0x82847c : ROCK_TINT[r.biome];
-          rockMesh.setColorAt(i, softTint(r.x, r.z, rockHex, c, ROCK_TINT_SOFTEN));
+          // per-biome stone, warm foothill stone, Cinderscar basalt (scatter_rock_tint_core.ts)
+          const tint = scatterRockTint(r.biome, r.x, r.z, isSnowy(r));
+          rockMesh.setColorAt(i, softTint(r.x, r.z, tint.hex, c, tint.soften));
           // The rock's sprite mirrors the placement (yaw, footprint, seated
           // height, tint); the tilt folds into the baked views well enough at
           // the rock swap range, where a boulder is a handful of pixels.

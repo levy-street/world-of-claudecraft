@@ -9343,7 +9343,7 @@ export const fr_FR: EnTranslations = {
         "galeName": "La Crête du Vent",
         "galeBlurb": "Falaises marines et landes hurlantes où le vent ne se repose jamais et où Wickharbor ferme bien ses portes.",
         "quarteredName": "The Quartered Isle",
-        "quarteredBlurb": "An island broken four ways by an old rivalry, where Rivalmoot keeps its hill above the ring every challenger comes to win.",
+        "quarteredBlurb": "An island shattered four ways by an old rivalry, where Rivalmoot keeps the foot of the storm peak above the crater every challenger comes to win.",
         "levelsCap": "Niveau {level}"
       },
       "group": {
@@ -10288,7 +10288,7 @@ export const fr_FR: EnTranslations = {
       "nightBlurb": "Un royaume de minuit étoilé où des fleurs éclairent les chemins et où Moonrest maintient une veille silencieuse sous un ciel qui rêve.",
       "hauntBlurb": "Une forêt hantée sous des canopées géantes, où les lanternes de Gibbetmere sont la seule lumière honnête sur la route.",
       "galeBlurb": "Falaises marines et landes hurlantes où le vent ne se repose jamais, où le Vieux Phare ne s'éteint jamais, et où Wickharbor ferme bien ses portes.",
-      "quarteredBlurb": "An island torn into four quarters of ice, fire, stone and storm by an old rivalry, with the challengers of Rivalmoot keeping their town on the hill at its heart and their ring at its foot.",
+      "quarteredBlurb": "An island shattered into four quarters of ice, fire, stone and storm by an old rivalry, with the challengers of Rivalmoot keeping their town at the foot of the Gyre and their ring in the crater where the war was fought.",
       "jungleBlurb": "Un enchevêtrement tropical de palmiers, de sable blanc, et d'oiseaux bruyants, où la ville de plage de Drifthaven garde un feu allumé sur la grève.",
       "gardenBlurb": "Un royaume-jardin en labyrinthe de haies, encore taillé par nul jardinier vu de quiconque, dont l'entrée passe par Hedgewick et ses cours de fontaines.",
       "valeGreeting": "Gardez votre lame à portée. Le Val n'est plus ce qu'il était.",
@@ -10313,7 +10313,7 @@ export const fr_FR: EnTranslations = {
       "hauntGreeter": "Le lampiste, Gibbetmere",
       "galeGreeting": "Le vent ne s'est jamais arrêté ici, pas une seule fois, et le Vieux Phare ne s'est jamais éteint. Refermez la porte de l'auberge derrière vous.",
       "galeGreeter": "Le gardien du phare, Wickharbor",
-      "quarteredGreeting": "Every party that climbs this hill swears it will be the one to hold the ring. Go down when the hill rises and prove it.",
+      "quarteredGreeting": "Every party that comes down into the crater swears it will be the one to hold the ring. Go down when the hill rises and prove it.",
       "quarteredGreeter": "A challenger, Rivalmoot",
       "jungleGreeting": "Sable chaud, oiseaux bruyants, et une jungle qui dévore l'horizon. Nous gardons un feu allumé sur la plage ; essayez d'y revenir.",
       "jungleGreeter": "La capitaine du port, Drifthaven",
@@ -10330,7 +10330,7 @@ export const fr_FR: EnTranslations = {
       "nightPlaceNotes": "Moonrest veille. La Porte nocturne mène au pays de minuit ; la Source lunaire garde une lumière stellaire où l’on peut se tenir ; Gloamfield fleurit dans le noir ; la Vigile immobile ne bouge jamais et le Tumulus sans sommeil est le seul endroit qui ne rêve jamais.",
       "hauntPlaceNotes": "Gibbetmere se blottit dans ses lanternes. La Porte aux Corbeaux est la porte funeste du bois ; le Fourré des Veuves est tissé épais de toiles ; la Clairière Pendue et la Chapelle de Mournstone gardent les plus vieux chagrins de la forêt ; et la Clairière du Chasseur appartient à ce qui y chasse encore.",
       "galePlaceNotes": "Wickharbor se penche dans le vent. La Voie du Vent est la route de falaise qui mène ici ; les Landes Hurlantes roulent, sans arbres, sous la tempête ; le Vieux Phare brûle depuis aussi longtemps que quiconque s'en souvienne ; le Surplomb tombe à pic vers l'eau ; les Champs d'Épaves gardent la côte honnête ; et le Lac Miroir est la seule chose immobile dans tout le royaume.",
-      "quarteredPlaceNotes": "Rivalmoot stands on the hill at the island's heart. The Hoarbridge carries the road over the strait from the Frostveil; the Hoarshelf lies white and cold below; the Challengers' Ring waits level at the hill's foot for the next King of the Hill; the Cinderscar smoulders toward the Drakelands; the Heavestone Wilds heave toward the Amberfall; and the Gyre turns its storm above the north shore.",
+      "quarteredPlaceNotes": "Rivalmoot stands at the foot of the Gyre, where the climb to the council's seat begins. The Hoarbridge carries the road over the strait from the Frostveil; the Hoarshelf lies white, cold and broken below; the Challengers' Ring waits on the floor of the great crater, the old war's heart, for the next King of the Hill; the Cinderscar smoulders toward the Drakelands; the Heavestone Wilds heave toward the Amberfall; and the Gyre turns its storm above them all.",
       "junglePlaceNotes": "Drifthaven garde son feu sur la plage. L'Embouchure emmêlée est là où la rivière rencontre le mur vert ; la Grève des Palmes court blanche et chaude le long du ressac ; l'Enchevêtrement d'Émeraude et la Chute de Lianes engloutissent l'intérieur des terres ; le Lagon de Saphir luit clair et profond ; et l'Idole engloutie observe depuis sous l'eau.",
       "gardenPlaceNotes": "Hedgewick attend à la Porte du Jardin. L'Allée du Parterre fleurit en couleurs taillées ; le Château de Dawnhold entraîne ses chevaliers derrière des murs neufs ; le Bassin aux Pétales dérive en rose toute l'année ; le Vieux Moulin retourne son propre lit de fleurs ; le Grand Labyrinthe réarrange ses manières pour chaque visiteur, ses arcades surveillées par des renards feuillus ; le Guet du Nord garde la route de sortie ; le Bassin des Lys repose au-delà de tout cela ; et la Cour des Fontaines coule encore claire au cœur du jardin.",
       "gladeTitle": "Un coin paisible : la clairière de Brightwood",
@@ -27016,6 +27016,11 @@ export const fr_FR: EnTranslations = {
         "title": "Le Coffre doré",
         "greeting": "Chaque caisse, chaque coffret et chaque babiole est en sécurité au Coffre doré."
       },
+      "bursar_maud_ashby": {
+        "name": "Bursar Maud Ashby",
+        "title": "The Gilded Strongbox",
+        "greeting": "The Gilded Strongbox keeps your goods safe, even on the isle."
+      },
       "brother_aldric_raid": {
         "name": "Frère Aldric",
         "title": "Prêtre du Val",
@@ -30392,7 +30397,7 @@ export const fr_FR: EnTranslations = {
       },
       "quartered_isle": {
         "name": "The Quartered Isle",
-        "welcome": "An old rivalry broke this island four ways. On the hill at its heart, Rivalmoot keeps watch over the ring below.",
+        "welcome": "An old rivalry shattered this island four ways. Rivalmoot keeps the foot of the Gyre, above the crater where the war was fought.",
         "pois": {
           "0": {
             "label": "Rivalmoot"
@@ -30414,6 +30419,30 @@ export const fr_FR: EnTranslations = {
           },
           "6": {
             "label": "The Gyre"
+          },
+          "7": {
+            "label": "The Fireice Rift"
+          },
+          "8": {
+            "label": "The Crevasses"
+          },
+          "9": {
+            "label": "The Rimeglass"
+          },
+          "10": {
+            "label": "The Burnways"
+          },
+          "11": {
+            "label": "The Glassfield"
+          },
+          "12": {
+            "label": "The Hammer's Cut"
+          },
+          "13": {
+            "label": "The Heaved Slabs"
+          },
+          "14": {
+            "label": "The Fallen Giant"
           }
         }
       },

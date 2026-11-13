@@ -138,7 +138,7 @@ const BIOME_SKY_2K: Record<SkyKey, string> = {
   jungle: '/env/palmreach_day_2k.ktx2',
   garden: '/env/evergarden_day_2k.ktx2',
   gale: '/env/galecrest_day_2k.ktx2',
-  quartered: '/env/galecrest_day_2k.ktx2', // aliases the Galecrest sky
+  quartered: '/env/frost_twilight_2k.ktx2', // aliases the Frostveil's cold storm-blue sky
   farshore: '/env/farshore_day_2k.ktx2',
 };
 
@@ -160,7 +160,7 @@ const BIOME_SKY_1K: Record<SkyKey, string> = {
   jungle: '/env/palmreach_day_1k.ktx2',
   garden: '/env/evergarden_day_1k.ktx2',
   gale: '/env/galecrest_day_1k.ktx2',
-  quartered: '/env/galecrest_day_1k.ktx2',
+  quartered: '/env/frost_twilight_1k.ktx2',
   farshore: '/env/farshore_day_1k.ktx2',
 };
 
@@ -187,7 +187,7 @@ const BIOME_SKY_ENV: Record<SkyKey, string> = {
   jungle: '/env/palmreach_day_512.ktx2',
   garden: '/env/evergarden_day_512.ktx2',
   gale: '/env/galecrest_day_512.ktx2',
-  quartered: '/env/galecrest_day_512.ktx2',
+  quartered: '/env/frost_twilight_512.ktx2',
   farshore: '/env/farshore_day_512.ktx2',
 };
 

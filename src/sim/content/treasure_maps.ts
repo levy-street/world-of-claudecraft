@@ -220,6 +220,9 @@ export const TREASURE_SITES: readonly TreasureSiteDef[] = Object.freeze([
   { id: 'site_evergarden_north_road', zoneId: 'evergarden', x: 497, z: 798 },
   { id: 'site_farshore_east_road', zoneId: 'farshore_isle', x: 367, z: 25 },
   { id: 'site_farshore_south_road', zoneId: 'farshore_isle', x: 381, z: -41 },
+  { id: 'site_quartered_isle_hoarshelf_road', zoneId: 'quartered_isle', x: 30, z: 2030 },
+  { id: 'site_quartered_isle_cinderscar_road', zoneId: 'quartered_isle', x: 145, z: 2130 },
+  { id: 'site_quartered_isle_wilds_road', zoneId: 'quartered_isle', x: -160, z: 2290 },
 ]);
 
 export const TREASURE_SITES_BY_ID: Readonly<Record<string, TreasureSiteDef>> = Object.freeze(

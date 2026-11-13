@@ -1185,7 +1185,9 @@ describe('world-quest zone markers', () => {
       world.player.pos.z = (zone.zMin + zone.zMax) / 2;
       const model = buildOverworldMapModel({ ...input(world, 1), zone });
       expect(model.worldQuests.length, zone.id).toBe(
-        zone.id === 'proving_shore'
+        // The Quartered Isle has no world quest until its mobs land in phase 2
+        // (docs/prd/quartered-isle-zone.md), matching tests/world_quests.test.ts.
+        zone.id === 'proving_shore' || zone.id === 'quartered_isle'
           ? 0
           : zone.id === 'galecrest' || zone.id === 'evergarden'
             ? 2

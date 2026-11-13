@@ -230,6 +230,18 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   rockTallH: { url: '/models/props/rock_tall_h.glb', kit: 'minerock' },
   rockLargeD: { url: '/models/props/rock_large_d.glb', kit: 'minerock' },
   rockLargeF: { url: '/models/props/rock_large_f.glb', kit: 'minerock' },
+  // the Quartered Isle's generated stone (scripts/asset_pipeline, textures
+  // baked over Poly Haven CC0 detail): the Cinderscar's columns, rubble and
+  // lava vents, the Hoarshelf's snow floes and outcrop, the Wilds' sandstone
+  cinderColumnsTall: { url: '/models/props/cinder_columns_tall.glb', kit: 'qprops' },
+  cinderColumnRubble: { url: '/models/props/cinder_column_rubble.glb', kit: 'qprops' },
+  cinderLavaVent: { url: '/models/props/cinder_lava_vent.glb', kit: 'qprops' },
+  frostFloeSlab: { url: '/models/props/frost_floe_slab.glb', kit: 'qprops' },
+  frostFloeBroad: { url: '/models/props/frost_floe_broad.glb', kit: 'qprops' },
+  frostSnowOutcrop: { url: '/models/props/frost_snow_outcrop.glb', kit: 'qprops' },
+  heaveStrataLarge: { url: '/models/props/heave_strata_large.glb', kit: 'qprops' },
+  heaveStrataSmall: { url: '/models/props/heave_strata_small.glb', kit: 'qprops' },
+  heaveStrataRubble: { url: '/models/props/heave_strata_rubble.glb', kit: 'qprops' },
   mushroomRed: { url: '/models/props/mushroom_red.glb', kit: 'shroom' },
   mushroomTan: { url: '/models/props/mushroom_tan.glb', kit: 'shroom' },
   // The Mirefen mudfin huts (src/sim/mudfin_huts.ts): the art lead's painted
@@ -533,6 +545,17 @@ const LOW_TIER_PROP_KEYS: readonly PropKey[] = [
   'crateWooden',
   'barrel',
   'delveEntrance2', // delve entrance portal, a landmark, so keep it on low gfx too
+  // the Quartered Isle's stone: authored decor with colliders, drawn on every
+  // tier, so the low tier prewarms what blocks as well
+  'cinderColumnsTall',
+  'cinderColumnRubble',
+  'cinderLavaVent',
+  'frostFloeSlab',
+  'frostFloeBroad',
+  'frostSnowOutcrop',
+  'heaveStrataLarge',
+  'heaveStrataSmall',
+  'heaveStrataRubble',
   // The race fixtures are GAMEPLAY landmarks (players ride a timed course
   // against them), so every tier renders them: hiding one on low gfx would
   // break the gameplay-neutral graphics invariant.

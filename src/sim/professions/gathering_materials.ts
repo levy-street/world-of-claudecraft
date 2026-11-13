@@ -43,6 +43,7 @@ export const NODE_MATERIAL_TABLE: Record<GatherNodeType, Record<string, NodeMate
     palmreach: { itemId: 'thorium_ore', qtyByRarity: MATERIAL_QTY_BY_RARITY },
     evergarden: { itemId: 'thorium_ore', qtyByRarity: MATERIAL_QTY_BY_RARITY },
     farshore_isle: { itemId: 'iron_ore', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    quartered_isle: { itemId: 'thorium_ore', qtyByRarity: MATERIAL_QTY_BY_RARITY },
   },
   wood: {
     eastbrook_vale: { itemId: 'ironbark_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
@@ -59,6 +60,7 @@ export const NODE_MATERIAL_TABLE: Record<GatherNodeType, Record<string, NodeMate
     palmreach: { itemId: 'elderwood_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
     evergarden: { itemId: 'elderwood_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
     farshore_isle: { itemId: 'ashwood_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    quartered_isle: { itemId: 'elderwood_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
   },
   herb: {
     eastbrook_vale: { itemId: 'silverleaf_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
@@ -75,6 +77,7 @@ export const NODE_MATERIAL_TABLE: Record<GatherNodeType, Record<string, NodeMate
     palmreach: { itemId: 'sunpetal_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
     evergarden: { itemId: 'sunpetal_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
     farshore_isle: { itemId: 'goldleaf_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    quartered_isle: { itemId: 'sunpetal_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
   },
 };
 

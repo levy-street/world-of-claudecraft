@@ -237,6 +237,28 @@ describe('continentZoneAt: point hit-test', () => {
     expect(continentZoneAt(m.regions, q.mx, q.my)).toBe('eastbrook_vale');
   });
 
+  it('gives ground a claimsOverlap zone overlaps to the claimer, as zoneAt does', () => {
+    // Drakelands and Amberfall come BEFORE the quartered isle in zone order,
+    // so a plain first-match walk would hand them the isle's claimed flanks.
+    const at = (x: number, z: number) => {
+      const p = projectPoint(x, z, m.image);
+      return continentZoneAt(m.regions, p.mx, p.my);
+    };
+    for (const [x, z] of [
+      [215, 2200],
+      [-215, 2200],
+      [300, 2200],
+      [0, 0],
+      [-300, 2000],
+    ]) {
+      expect(at(x, z), `(${x}, ${z})`).toBe(zoneAt(x, z).id);
+    }
+    expect(at(215, 2200)).toBe('quartered_isle');
+    expect(at(-215, 2200)).toBe('quartered_isle');
+    expect(at(300, 2200)).toBe('drakelands');
+    expect(at(0, 0)).toBe('eastbrook_vale');
+  });
+
   it('returns null off the plate entirely', () => {
     expect(continentZoneAt(m.regions, -5, -5)).toBeNull();
     expect(continentZoneAt(m.regions, CANVAS + 5, CANVAS + 5)).toBeNull();

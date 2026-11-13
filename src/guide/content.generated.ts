@@ -2553,9 +2553,17 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "The Hoarshelf",
       "The Cinderscar",
       "The Heavestone Wilds",
-      "The Gyre"
+      "The Gyre",
+      "The Fireice Rift",
+      "The Crevasses",
+      "The Rimeglass",
+      "The Burnways",
+      "The Glassfield",
+      "The Hammer's Cut",
+      "The Heaved Slabs",
+      "The Fallen Giant"
     ],
-    "welcome": "An old rivalry broke this island four ways. On the hill at its heart, Rivalmoot keeps watch over the ring below.",
+    "welcome": "An old rivalry shattered this island four ways. Rivalmoot keeps the foot of the Gyre, above the crater where the war was fought.",
     "families": []
   }
 ];
@@ -18896,6 +18904,13 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "material": "Osmium Ore"
       },
       {
+        "zone": "The Quartered Isle",
+        "tier": 1,
+        "toolTier": 1,
+        "count": 2,
+        "material": "Osmium Ore"
+      },
+      {
         "zone": "The Veiled Hollow",
         "tier": 1,
         "toolTier": 1,
@@ -19106,6 +19121,13 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "material": "Highpine Log"
       },
       {
+        "zone": "The Quartered Isle",
+        "tier": 1,
+        "toolTier": 1,
+        "count": 2,
+        "material": "Highpine Log"
+      },
+      {
         "zone": "The Veiled Hollow",
         "tier": 1,
         "toolTier": 1,
@@ -19310,6 +19332,13 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
       },
       {
         "zone": "The Palmreach",
+        "tier": 1,
+        "toolTier": 1,
+        "count": 2,
+        "material": "Sunpetal Herb"
+      },
+      {
+        "zone": "The Quartered Isle",
         "tier": 1,
         "toolTier": 1,
         "count": 2,

@@ -45,7 +45,10 @@ import { type ImpactCraterTerrainBlend, impactCraterTerrainBlend } from './impac
 import { clamp01 } from './num_clamp';
 import {
   makeQuarterGroundLinear,
+  QUARTER_CLIFF_ROCK_SPLAT,
+  QUARTER_CLIFF_SHARE,
   quarteredBlendActive,
+  quarteredCliffAt,
   quarteredGroundAt,
 } from './quartered_ground_core';
 import { makeShoreProbe, type ShoreProbe, shoreWaterGate } from './shore_water_gate_core';
@@ -132,6 +135,8 @@ function syncZonePalettes(): void {
 // by the shared quarter field (quartered_ground_core.ts, which the far vista
 // reads too), so its strip palette is refilled per sample into this scratch.
 const quarteredLinear = makeQuarterGroundLinear();
+const quarteredCliff: [number, number, number] = [0, 0, 0];
+const quarteredCliffC = new THREE.Color();
 const quarteredPalette = {
   grass: new THREE.Color(),
   grassDark: new THREE.Color(),
@@ -532,7 +537,7 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
     rockTintW = t;
     cTmp.lerp(rockC, t);
     cTmp.lerp(duskCliffC, t * Math.max(0, 0.5 - rockStreak) * 0.45);
-    lerpSplat(w, 2, t);
+    lerpSplat(w, 2, biome === 'quartered' ? t * QUARTER_CLIFF_ROCK_SPLAT : t);
     // (the Great Maze's hedge walls are modeled props over flat lawn now:
     // no steep terrain faces remain inside the maze to restyle)
     // dusk sea cliffs read as dark weathered stone with pale strata bands, so
@@ -548,6 +553,11 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
       cTmp.lerp(duskCliffC, t * band * 0.22);
       cTmp.lerp(duskStrataC, t * (1 - band) * 0.24);
     }
+  }
+  // the Quartered Isle's crags wear their quarter's stone (quartered_ground_core.ts)
+  if (biome === 'quartered' && rockTintW > 0) {
+    const q = quarteredCliffAt(x, z, quarteredCliff);
+    cTmp.lerp(quarteredCliffC.setRGB(q[0], q[1], q[2]), rockTintW * QUARTER_CLIFF_SHARE);
   }
   // high ground (ridges, peaks) goes rocky then snowy (the Drakelands' high
   // rock reads as dark basalt instead, and its peaks never take snow). The snow

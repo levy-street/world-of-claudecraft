@@ -207,18 +207,30 @@ export function buildContinentMapModel(input: ContinentMapInput): ContinentMapMo
   };
 }
 
-/** The zone id whose region rect contains the canvas point, or null (the zones
- *  are disjoint rects, so at most one contains any point; first match wins). */
+// The zones whose rect wins the ground it overlaps in a neighbour's
+// (ZoneDef.claimsOverlap). Their regions are hit-tested first, as zoneAt does.
+const CLAIMING_ZONE_IDS: ReadonlySet<string> = new Set(
+  ZONES.filter((zone) => zone.claimsOverlap === true).map((zone) => zone.id),
+);
+
+/** The zone id whose region rect contains the canvas point, or null. The zone
+ *  rects are disjoint except where a claimsOverlap zone overlaps a neighbour;
+ *  that ground belongs to the claimer, so claiming regions are tested first,
+ *  then the rest in order (first match wins). */
 export function continentZoneAt(
   regions: readonly ContinentZoneRegion[],
   mx: number,
   my: number,
 ): string | null {
-  for (const region of regions) {
-    const { rect } = region;
-    if (mx >= rect.mx && mx <= rect.mx + rect.w && my >= rect.my && my <= rect.my + rect.h) {
-      return region.zoneId;
+  const contains = ({ rect }: ContinentZoneRegion): boolean =>
+    mx >= rect.mx && mx <= rect.mx + rect.w && my >= rect.my && my <= rect.my + rect.h;
+  if (CLAIMING_ZONE_IDS.size > 0) {
+    for (const region of regions) {
+      if (CLAIMING_ZONE_IDS.has(region.zoneId) && contains(region)) return region.zoneId;
     }
+  }
+  for (const region of regions) {
+    if (contains(region)) return region.zoneId;
   }
   return null;
 }

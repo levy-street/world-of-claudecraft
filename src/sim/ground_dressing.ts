@@ -46,7 +46,7 @@ const DRESS_DENSITY: Record<BiomeId, number> = {
   jungle: 0.5,
   garden: 0.4,
   gale: 0.32,
-  quartered: 0.24,
+  quartered: 0, // a shattered waste of bare sand, red rock and snow: no tufts
 };
 const DRESS_DENSITY_LOW_SCALE = 1.24;
 const DRESS_LOW_SCALE_BOOST = 1.08;

@@ -238,11 +238,13 @@ import {
   PROVING_SHORE_ZONE,
 } from './content/proving_shore';
 import {
+  QUARTERED_ISLE_NPCS,
   QUARTERED_ISLE_PORTALS,
   QUARTERED_ISLE_PROPS,
   QUARTERED_ISLE_ROADS,
   QUARTERED_ISLE_ZONE,
 } from './content/quartered_isle';
+import { QUARTERED_ISLE_SPIRES } from './content/quartered_spires';
 import { QUEST_CHOICE_REWARDS } from './content/quest_choice_rewards';
 import { QUEST_LEVELING_GEAR_ITEMS } from './content/quest_leveling_gear';
 import {
@@ -612,6 +614,9 @@ export const NPCS: Record<string, NpcDef> = {
   // Gourdlight Eve's keeper (content/gourdlight_eve.ts): a dynamic singleton under a
   // reserved id, raised only while the event runs (seasonal/seasonal_tick.ts).
   ...GOURDLIGHT_EVE_NPCS,
+  // Rivalmoot's townsfolk on the Quartered Isle (content/quartered_isle.ts):
+  // dynamic singletons under reserved ids (sim/rivalmoot_keepers.ts).
+  ...QUARTERED_ISLE_NPCS,
 };
 
 // Graveyards + the Spirit Healer: re-exported so the Sim and spirit.ts import the
@@ -984,7 +989,12 @@ export const PROPS: ZonePropsDef = mergeProps([
   GALECREST_PROPS,
   FARSHORE_PROPS,
   PROVING_SHORE_PROPS,
-  QUARTERED_ISLE_PROPS,
+  // the isle's spires and ruins join its props here, after the zone module has
+  // loaded: they are placed against its roads (content/quartered_spires.ts)
+  {
+    ...QUARTERED_ISLE_PROPS,
+    decorProps: [...(QUARTERED_ISLE_PROPS.decorProps ?? []), ...QUARTERED_ISLE_SPIRES],
+  },
 ]);
 
 function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
@@ -1332,6 +1342,8 @@ export function zoneXBounds(zone: ZoneDef): [number, number] {
 export function zoneAt(x: number, z: number): ZoneDef {
   const active = getActiveWorldContent().zones;
   const zones = active.length > 0 ? active : BUILTIN_WORLD.zones;
+  const claimed = claimingZoneAt(zones, x, z, zoneRectX);
+  if (claimed) return claimed;
   let fallback: ZoneDef | null = null;
   for (const zone of zones) {
     if (z >= zone.zMax) continue;
@@ -1343,12 +1355,59 @@ export function zoneAt(x: number, z: number): ZoneDef {
   return fallback ?? zones.reduce((a, b) => (b.zMax > a.zMax ? b : a));
 }
 
+function zoneRectX(zone: ZoneDef): [number, number] {
+  return [zone.xMin ?? STRIP_MIN_X, zone.xMax ?? STRIP_MAX_X];
+}
+
+// The claimsOverlap zones of a list, cached per list identity (the lists are
+// frozen content arrays). Empty for every list without a claiming zone, so
+// the lookups below cost one array-length check there.
+const claimingZonesCache = new WeakMap<readonly ZoneDef[], readonly ZoneDef[]>();
+function claimingZones(zones: readonly ZoneDef[]): readonly ZoneDef[] {
+  let claiming = claimingZonesCache.get(zones);
+  if (claiming === undefined) {
+    claiming = zones.filter((zone) => zone.claimsOverlap === true);
+    claimingZonesCache.set(zones, claiming);
+  }
+  return claiming;
+}
+
+/** The claimsOverlap zone whose rect contains (x, z), or null. Checked before
+ *  the ordinary rect walk so a claim wins the ground it overlaps in a
+ *  neighbour's rect (types.ts ZoneDef.claimsOverlap); with no claiming zone
+ *  in the list the walk below is unchanged. */
+function claimingZoneAt(
+  zones: readonly ZoneDef[],
+  x: number,
+  z: number,
+  bounds: (zone: ZoneDef) => [number, number],
+): ZoneDef | null {
+  const claiming = claimingZones(zones);
+  for (let i = 0; i < claiming.length; i++) {
+    const zone = claiming[i];
+    if (z < zone.zMin || z >= zone.zMax) continue;
+    const [x0, x1] = bounds(zone);
+    if (x >= x0 && x < x1) return zone;
+  }
+  return null;
+}
+
+/** True when (x, z) lies in ground some claimsOverlap zone (other than
+ *  `zone` itself) has claimed: the point is inside `zone`'s rect on paper but
+ *  belongs to the claimer. For callers that walk one zone's rect directly. */
+export function isClaimedFrom(zone: ZoneDef, x: number, z: number): boolean {
+  const claimer = claimingZoneAt(ZONES, x, z, zoneRectX);
+  return claimer !== null && claimer !== zone;
+}
+
 /** The map-UI zone lookup: same walk as zoneAt but over the ACTIVE zone list,
  *  so an authored map's own zones name the label/banner and frame the map
  *  window. Identical to zoneAt on the shipped world. */
 export function activeZoneAt(x: number, z: number): ZoneDef {
   const zones = activeZoneList();
   if (zones === ZONES) return zoneAt(x, z);
+  const claimed = claimingZoneAt(zones, x, z, zoneXBounds);
+  if (claimed) return claimed;
   let fallback: ZoneDef | null = null;
   let northmost: ZoneDef | null = null;
   for (const zone of zones) {
@@ -1371,6 +1430,8 @@ export function activeZoneAt(x: number, z: number): ZoneDef {
 // active world content so an editor play-test map can reshape lookups): a
 // custom play-test map's zones never redefine world policy.
 export function zoneContaining(x: number, z: number): ZoneDef | null {
+  const claimed = claimingZoneAt(ZONES, x, z, zoneRectX);
+  if (claimed) return claimed;
   for (const zone of ZONES) {
     if (z < zone.zMin || z >= zone.zMax) continue;
     const x0 = zone.xMin ?? STRIP_MIN_X;
@@ -1397,12 +1458,60 @@ function sm01(raw: number): number {
   return t * t * (3 - 2 * t);
 }
 
+// The claimsOverlap rects that bite into a column zone's inner edge (the
+// side facing the strip), cached per zone. Empty for every column no claim
+// reaches, which keeps their blend on the exact classic arithmetic.
+const columnClaimsCache = new WeakMap<ZoneDef, readonly ZoneDef[]>();
+function columnClaimsOf(zone: ZoneDef): readonly ZoneDef[] {
+  let claims = columnClaimsCache.get(zone);
+  if (claims === undefined) {
+    const [x0, x1] = zoneRectX(zone);
+    claims = claimingZones(ZONES).filter((claimer) => {
+      if (claimer === zone) return false;
+      const [c0, c1] = zoneRectX(claimer);
+      return c0 < x1 && c1 > x0 && claimer.zMin < zone.zMax && claimer.zMax > zone.zMin;
+    });
+    columnClaimsCache.set(zone, claims);
+  }
+  return claims;
+}
+
+// A column's inner edge with its neighbours' claims taken out: inside a
+// claim's z span the edge stands at the claim's far side, and across the
+// claim's z ends it eases back on the band window (-30/+35 yd), so the
+// column's look retreats smoothly instead of stepping at the claim corner.
+function claimedColumnEdges(
+  claims: readonly ZoneDef[],
+  x0: number,
+  x1: number,
+  zMin: number,
+  zMax: number,
+  z: number,
+): [number, number] {
+  const east = x0 >= STRIP_MAX_X;
+  let edge0 = x0;
+  let edge1 = x1;
+  for (const claimer of claims) {
+    const [c0, c1] = zoneRectX(claimer);
+    // An end the claim shares with the column (or overshoots) needs no ease.
+    const south = claimer.zMin > zMin ? sm01((z - (claimer.zMin - 30)) / 65) : 1;
+    const north = claimer.zMax < zMax ? 1 - sm01((z - (claimer.zMax - 30)) / 65) : 1;
+    const w = south * north;
+    if (w <= 0) continue;
+    if (east) edge0 = Math.max(edge0, x0 + (c1 - x0) * w);
+    else edge1 = Math.min(edge1, x1 - (x1 - c0) * w);
+  }
+  return [edge0, edge1];
+}
+
 // Blend weight of a column zone at a position: 1 deep inside its rect,
 // easing to 0 across the same -30/+35yd window the band cascades use, so a
 // column's palette/shape/sky arrives at exactly the rate a band's does.
 export function columnBlendAt(zone: ZoneDef, x: number, z: number): number {
-  const x0 = zone.xMin ?? STRIP_MIN_X;
-  const x1 = zone.xMax ?? STRIP_MAX_X;
+  const claims = columnClaimsOf(zone);
+  let x0 = zone.xMin ?? STRIP_MIN_X;
+  let x1 = zone.xMax ?? STRIP_MAX_X;
+  if (claims.length > 0) [x0, x1] = claimedColumnEdges(claims, x0, x1, zone.zMin, zone.zMax, z);
   const finite = Number.isFinite(x) && Number.isFinite(z);
   if (finite && (z <= zone.zMin - 30 || z >= zone.zMax + 35)) {
     // One zT sm01 arm is saturated at these bounds, so zT and the final

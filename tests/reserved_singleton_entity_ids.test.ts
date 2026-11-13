@@ -7,12 +7,19 @@ import {
   GOURDLIGHT_KEEPER_NPC_ID,
   GOURDLIGHT_KEEPER_POSTS,
 } from '../src/sim/content/gourdlight_eve';
-import { LAST_KEEP_SPIRIT_HEALER_ENTITY_ID } from '../src/sim/content/graveyards';
+import {
+  LAST_KEEP_SPIRIT_HEALER_ENTITY_ID,
+  RIVALMOOT_SPIRIT_HEALER_ENTITY_ID,
+} from '../src/sim/content/graveyards';
 import { HEALING_TRAINING_ENTITY_IDS } from '../src/sim/content/healing_training';
 import { HIGHWATCH_GUILD_ENTITY_IDS } from '../src/sim/content/highwatch_guild';
 import { CRUCIBLE_VENDOR_ENTITY_ID } from '../src/sim/content/ignivar_loot';
 import { TAVERN_KEEPER_ENTITY_ID, TAVERN_KEEPER_NPC_ID } from '../src/sim/content/mirefen_tavern';
 import { FURY_ENTITY_ID } from '../src/sim/content/pvp_honor';
+import {
+  RIVALMOOT_BURSAR_ENTITY_ID,
+  RIVALMOOT_BURSAR_NPC_ID,
+} from '../src/sim/content/quartered_isle';
 import { HARBOR_HOUSE_KEEPER_ENTITY_ID } from '../src/sim/content/wyrmwatch_harbor_house';
 import { WARFARE_QUARTERMASTER_ENTITY_ID } from '../src/sim/pvp/warfare_quartermaster';
 import { Sim } from '../src/sim/sim';
@@ -40,6 +47,8 @@ const RESERVED: Record<string, number> = {
   GOURDLIGHT_KEEPER_ENTITY_ID,
   GOURDLIGHT_KEEPER_FENBRIDGE_ENTITY_ID,
   GOURDLIGHT_KEEPER_HIGHWATCH_ENTITY_ID,
+  RIVALMOOT_SPIRIT_HEALER_ENTITY_ID,
+  RIVALMOOT_BURSAR_ENTITY_ID,
   ...Object.fromEntries(
     Object.entries(HEALING_TRAINING_ENTITY_IDS).map(([id, n]) => [`HEALING_TRAINING:${id}`, n]),
   ),
@@ -79,6 +88,17 @@ describe('reserved singleton entity ids', () => {
       );
       expect(copies, templateId).toHaveLength(1);
     }
+  });
+  it("Rivalmoot's bursar and Pale Keeper spawn under their reserved ids, and the bursar banks", () => {
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
+    expect(RIVALMOOT_BURSAR_ENTITY_ID).toBe(1_000_000_031);
+    expect(sim.entities.get(RIVALMOOT_BURSAR_ENTITY_ID)?.templateId).toBe(RIVALMOOT_BURSAR_NPC_ID);
+    expect(sim.bankerIds.filter((id) => id === RIVALMOOT_BURSAR_ENTITY_ID)).toHaveLength(1);
+    const copies = [...sim.entities.values()].filter(
+      (e) => e.kind === 'npc' && e.templateId === RIVALMOOT_BURSAR_NPC_ID,
+    );
+    expect(copies).toHaveLength(1);
+    expect(sim.entities.get(RIVALMOOT_SPIRIT_HEALER_ENTITY_ID)?.kind).toBe('npc');
   });
   it('the Gourdlight keeper spawns once per city stall, each under its own id, while the event runs, and only then', () => {
     const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });

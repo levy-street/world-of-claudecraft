@@ -111,8 +111,9 @@ describe('terrain region index', () => {
     // island's provingCoast and provingMoat, plus the release arm's
     // gardenwalkWestPass riding the v0.40.0 sync merge, plus the Thornpeak
     // hillside pocket's thornpeakPocketGrade, plus the Quartered Isle's
-    // quarteredShaping, quarteredCoast and quarteredArena.
-    expect(heightBody.match(/terrainRegionHas\(region, TERRAIN_APPLIER\./g)).toHaveLength(41);
+    // quarteredShaping, quarteredCoast and quarteredArena, plus its
+    // landmarks' quarteredLandmarks.
+    expect(heightBody.match(/terrainRegionHas\(region, TERRAIN_APPLIER\./g)).toHaveLength(42);
   });
 
   it('falls back to the full ordered scan for non-finite query coordinates', () => {

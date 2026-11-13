@@ -184,7 +184,7 @@ export const REALM_SKY_IRRADIANCE: Record<BiomeId, number> = {
   fen: 0.9541, // fen_day
   frost: 0.3977, // frost_twilight
   gale: 0.6586, // galecrest_day
-  quartered: 0.6586, // aliases galecrest_day
+  quartered: 0.3977, // aliases frost_twilight
   garden: 0.8111, // evergarden_day
   haunt: 0.3413, // wraithwood_gloom
   jungle: 0.8125, // palmreach_day

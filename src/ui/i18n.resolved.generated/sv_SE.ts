@@ -9343,7 +9343,7 @@ export const sv_SE: EnTranslations = {
         "galeName": "Stormkammen",
         "galeBlurb": "Havsklippor och tjutande hedar där vinden aldrig vilar och Vikhamn stänger sina dörrar hårt.",
         "quarteredName": "The Quartered Isle",
-        "quarteredBlurb": "An island broken four ways by an old rivalry, where Rivalmoot keeps its hill above the ring every challenger comes to win.",
+        "quarteredBlurb": "An island shattered four ways by an old rivalry, where Rivalmoot keeps the foot of the storm peak above the crater every challenger comes to win.",
         "levelsCap": "Nivå {level}"
       },
       "group": {
@@ -10288,7 +10288,7 @@ export const sv_SE: EnTranslations = {
       "nightBlurb": "Ett rike av stjärnklar midnatt där blommor lyser upp stigarna och Månvila håller en tyst vaka under en drömmande himmel.",
       "hauntBlurb": "En hemsökt skog under väldiga trädkronor, där Gibbetmeres lyktor är det enda ärliga ljuset på vägen.",
       "galeBlurb": "Havsklippor och tjutande kullar där vinden aldrig vilar, Den gamla vårdkasen aldrig slocknar, och Vikhamn stänger sina dörrar hårt.",
-      "quarteredBlurb": "An island torn into four quarters of ice, fire, stone and storm by an old rivalry, with the challengers of Rivalmoot keeping their town on the hill at its heart and their ring at its foot.",
+      "quarteredBlurb": "An island shattered into four quarters of ice, fire, stone and storm by an old rivalry, with the challengers of Rivalmoot keeping their town at the foot of the Gyre and their ring in the crater where the war was fought.",
       "jungleBlurb": "Ett tropiskt snår av palmer, vit sand och högljudda fåglar, med strandstaden Drivhamn som håller en eld tänd på stranden.",
       "gardenBlurb": "Ett labyrintträdgårdsrike som fortfarande klipps av ingen trädgårdsmästare någon har sett, du kommer in förbi Häckby och dess fontängårdar.",
       "valeGreeting": "Håll ditt svärd nära. Dalen är inte vad den var.",
@@ -10313,7 +10313,7 @@ export const sv_SE: EnTranslations = {
       "hauntGreeter": "Lyktändaren, Gibbetmere",
       "galeGreeting": "Vinden har aldrig en enda gång slutat blåsa här, och Den gamla vårdkasen har aldrig en enda gång slocknat. Stäng värdshusdörren efter dig.",
       "galeGreeter": "Vårdkasväktaren, Vikhamn",
-      "quarteredGreeting": "Every party that climbs this hill swears it will be the one to hold the ring. Go down when the hill rises and prove it.",
+      "quarteredGreeting": "Every party that comes down into the crater swears it will be the one to hold the ring. Go down when the hill rises and prove it.",
       "quarteredGreeter": "A challenger, Rivalmoot",
       "jungleGreeting": "Varm sand, högljudda fåglar och en djungel som äter upp horisonten. Vi håller en eld tänd på stranden; försök komma tillbaka till den.",
       "jungleGreeter": "Hamnfogden, Drivhamn",
@@ -10330,7 +10330,7 @@ export const sv_SE: EnTranslations = {
       "nightPlaceNotes": "Månvila håller vakan. Nattporten är vägen in i midnattslandet; Månbrunnen rymmer stjärnljus du kan stå bredvid; Skymningsfältet blommar i mörkret; Den stående vakan vakar utan att någonsin röra sig; och Den sömnlösa gravhögen är den enda platsen här som aldrig drömmer.",
       "hauntPlaceNotes": "Gibbetmere hukar innanför sina lyktor. Kråkporten är skogens bistra ytterdörr; Änkans snår är tätt spundet av nät; Den hängande gläntan och Sorgstenskapellet bevarar skogens äldsta sorger; och Jägarens röjning tillhör vad det än är som fortfarande jagar där.",
       "galePlaceNotes": "Vikhamn lutar sig mot vinden. Vindleden är klippvägen in; De tjutande kullarna rullar trädlösa under stormen; Den gamla vårdkasen har brunnit så länge någon kan minnas; Branten faller brant ner mot vattnet; Vrakfälten håller kusten ärlig; och Spegeltjärnen är det enda stillsamma i hela riket.",
-      "quarteredPlaceNotes": "Rivalmoot stands on the hill at the island's heart. The Hoarbridge carries the road over the strait from the Frostveil; the Hoarshelf lies white and cold below; the Challengers' Ring waits level at the hill's foot for the next King of the Hill; the Cinderscar smoulders toward the Drakelands; the Heavestone Wilds heave toward the Amberfall; and the Gyre turns its storm above the north shore.",
+      "quarteredPlaceNotes": "Rivalmoot stands at the foot of the Gyre, where the climb to the council's seat begins. The Hoarbridge carries the road over the strait from the Frostveil; the Hoarshelf lies white, cold and broken below; the Challengers' Ring waits on the floor of the great crater, the old war's heart, for the next King of the Hill; the Cinderscar smoulders toward the Drakelands; the Heavestone Wilds heave toward the Amberfall; and the Gyre turns its storm above them all.",
       "junglePlaceNotes": "Drivhamn håller sin eld på stranden. Snårmynningen är där floden möter den gröna muren; Palmstranden löper vit och varm längs bränningen; Smaragdsnåret och Rankfallet sväljer inlandet; Safirlagunen glöder klar och djup; och Den sjunkna avguden vakar från vattnets djup.",
       "gardenPlaceNotes": "Häckby väntar vid Trädgårdsporten. Parterrpromenaden blommar i klippt färgprakt; Gryningsborgen drillar sina riddare bakom nya murar; Kronbladsdammen driver rosa året runt; Den gamla kvarnen vänder sina egna rabatter; Den stora labyrinten omarrangerar sina vägar för varje gäst, dess valv vaktade av lövklädda rävar; Nordvakten håller utfartsvägen; Liljebassängen vilar bortom allt detta; och Fontängården rinner fortfarande klar vid trädgårdens hjärta.",
       "gladeTitle": "En stilla vrå: Brightwood Glade",
@@ -27016,6 +27016,11 @@ export const sv_SE: EnTranslations = {
         "title": "Förgyllda kassakistan",
         "greeting": "Varje låda, kista och krimskrams är i tryggt förvar hos Förgyllda kassakistan."
       },
+      "bursar_maud_ashby": {
+        "name": "Bursar Maud Ashby",
+        "title": "The Gilded Strongbox",
+        "greeting": "The Gilded Strongbox keeps your goods safe, even on the isle."
+      },
       "brother_aldric_raid": {
         "name": "Broder Aldric",
         "title": "Dalens präst",
@@ -30392,7 +30397,7 @@ export const sv_SE: EnTranslations = {
       },
       "quartered_isle": {
         "name": "The Quartered Isle",
-        "welcome": "An old rivalry broke this island four ways. On the hill at its heart, Rivalmoot keeps watch over the ring below.",
+        "welcome": "An old rivalry shattered this island four ways. Rivalmoot keeps the foot of the Gyre, above the crater where the war was fought.",
         "pois": {
           "0": {
             "label": "Rivalmoot"
@@ -30414,6 +30419,30 @@ export const sv_SE: EnTranslations = {
           },
           "6": {
             "label": "The Gyre"
+          },
+          "7": {
+            "label": "The Fireice Rift"
+          },
+          "8": {
+            "label": "The Crevasses"
+          },
+          "9": {
+            "label": "The Rimeglass"
+          },
+          "10": {
+            "label": "The Burnways"
+          },
+          "11": {
+            "label": "The Glassfield"
+          },
+          "12": {
+            "label": "The Hammer's Cut"
+          },
+          "13": {
+            "label": "The Heaved Slabs"
+          },
+          "14": {
+            "label": "The Fallen Giant"
           }
         }
       },

@@ -11,7 +11,7 @@
 // keys off the nearest unbuilt CHUNK. The fog envelope constants stay here
 // because the biome presets are written against them.
 
-import { STRIP_MAX_X, STRIP_MIN_X } from '../sim/data';
+import { isClaimedFrom, STRIP_MAX_X, STRIP_MIN_X, zoneAt } from '../sim/data';
 import type { ZoneDef } from '../sim/types';
 import { streamableZones } from './island_isolation_core';
 
@@ -171,8 +171,35 @@ export function zonesWithinStreamingHorizon(
 export function zoneEntryPoint(zone: ZoneDef, x: number, z: number): { x: number; z: number } {
   const minX = zone.xMin ?? STRIP_MIN_X;
   const maxX = zone.xMax ?? STRIP_MAX_X;
-  return {
+  const entry = {
     x: Math.max(minX + 1, Math.min(maxX - 1, x)),
     z: Math.max(zone.zMin + 1, Math.min(zone.zMax - 1, z)),
   };
+  if (!isClaimedFrom(zone, entry.x, entry.z)) return entry;
+  // The nearest point sits in ground a claimsOverlap zone took from this one,
+  // so zoneAt resolves it to the claimer and the prepare would no-op exactly
+  // like the un-inset edge case above. Step one yard past the claimer's
+  // nearest edge that still lands inside this zone's inset rect.
+  const claimer = zoneAt(entry.x, entry.z);
+  const claimMinX = claimer.xMin ?? STRIP_MIN_X;
+  const claimMaxX = claimer.xMax ?? STRIP_MAX_X;
+  const escapes = [
+    { x: claimMaxX + 1, z: entry.z },
+    { x: claimMinX - 1, z: entry.z },
+    { x: entry.x, z: claimer.zMax + 1 },
+    { x: entry.x, z: claimer.zMin - 1 },
+  ];
+  let best = entry;
+  let bestDistance = Number.POSITIVE_INFINITY;
+  for (const exit of escapes) {
+    if (exit.x < minX + 1 || exit.x > maxX - 1) continue;
+    if (exit.z < zone.zMin + 1 || exit.z > zone.zMax - 1) continue;
+    if (isClaimedFrom(zone, exit.x, exit.z)) continue;
+    const distance = Math.abs(exit.x - entry.x) + Math.abs(exit.z - entry.z);
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      best = exit;
+    }
+  }
+  return best;
 }

@@ -53,5 +53,5 @@ export const MAILBOXES: MailboxDef[] = [
   { ...hubMailbox(PROVING_SHORE_ZONE, { x: -6, z: 6 }), facing: Math.PI },
   // Rivalmoot, at the plaza's east edge by the Cinderscar road. Under a stable
   // id (MailboxDef.entityId): appended after the allocator-numbered pillars.
-  { ...hubMailbox(QUARTERED_ISLE_ZONE, { x: 8, z: -6 }), entityId: 2_000_000_017 },
+  { ...hubMailbox(QUARTERED_ISLE_ZONE, { x: 5, z: -6 }), entityId: 2_000_000_017 },
 ];

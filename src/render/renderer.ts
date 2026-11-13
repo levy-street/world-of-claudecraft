@@ -712,6 +712,11 @@ import { type PriestMarkersVisual, syncPriestMarkersVisual } from './priest_mark
 import { pieceProgramSettle } from './program_variant_settle';
 import { buildPropMaterialPrewarmGroup, buildProps, propResidencySources } from './props';
 import {
+  buildQuarteredLandmarks,
+  type QuarteredLandmarkDressingView,
+  quarteredLandmarkLoadFor,
+} from './quartered_landmark_dressing';
+import {
   attachEntityViewBody,
   buildQuestCaravanBody,
   isQuestCaravanEntity,
@@ -1760,6 +1765,7 @@ export class Renderer {
   private jungleFeatures: JungleFeaturesView | null = null;
   private gardenFeatures: GardenFeaturesView | null = null;
   private galeFeatures: GaleFeaturesView | null = null;
+  private quarteredMarks: QuarteredLandmarkDressingView | null = null;
   private fogScratch = new THREE.Color();
   // Blue wash + bubbles (and the fog override) while the CAMERA is under a waterline.
   private underwaterView!: UnderwaterView;
@@ -3770,7 +3776,7 @@ export class Renderer {
     }
     const zone = zoneAt(x, z);
     const idlePace = opts?.pace === 'idle';
-    const kitLoad = drakelandsKitLoadFor(zone.biome);
+    const kitLoad = drakelandsKitLoadFor(zone.biome) ?? quarteredLandmarkLoadFor(zone.biome);
     const task = (async () => {
       const started = performance.now();
       onProgress?.(0, 100);
@@ -4264,6 +4270,12 @@ export class Renderer {
         if (!this.galeFeatures) {
           this.galeFeatures = this.timedBuild('buildGaleFeatures', buildGaleFeatures);
           this.attachZoneFeature(this.galeFeatures, false);
+        }
+        break;
+      case 'quartered':
+        if (!this.quarteredMarks) {
+          this.quarteredMarks = this.timedBuild('buildQuarteredLandmarks', buildQuarteredLandmarks);
+          this.attachZoneFeature(this.quarteredMarks);
         }
         break;
       default:

@@ -36,7 +36,7 @@ import {
 } from './data';
 import { dawnholdPadTarget, dawnholdPadWeight } from './dawnhold_layout';
 import { dockSurfaceHeight, onHarborPlanks } from './deck_surfaces';
-import { isCuratedGardenScatter, isExcludedDecoration } from './decoration_exclusions';
+import { isCuratedScatter, isExcludedDecoration } from './decoration_exclusions';
 import { dungeonFloorLift } from './dungeon_floor';
 import { dawnholdKeepLiftAt, lastKeepLiftAt } from './dungeon_layout';
 import { applyEastbrookVaultPad } from './eastbrook_vault_terrain';
@@ -52,9 +52,16 @@ import { GALE_DECK_FREEBOARD } from './gale_harbor';
 import { applyGliderApproachPath } from './glider_approach_path';
 import { instancedFieldHeight } from './instances/authored_field/registry';
 import { applyKeepSitePad, keepSitePadWeight } from './keep_site';
+import { boundedBlobs, metaballLandness } from './metaball_landness';
 import { decksMayStand, placementRampFloorAt, WALK_DECK_REACH } from './placement_ramps';
 import { planeFloorAt } from './plane_floor';
-import { applyChallengersRing, quarteredShapingOffset } from './quartered_isle_terrain';
+import {
+  applyChallengersRing,
+  columnSeamX,
+  isleClaimFade,
+  quarteredShapingOffset,
+} from './quartered_isle_terrain';
+import { applyQuarteredLandmarks } from './quartered_landmarks';
 import { reachDeckClear, reachDeckSurface } from './reach_decks';
 import { fbm2, hash2, noise2 } from './rng';
 import { carveSeaChannels } from './sea_channels';
@@ -367,95 +374,7 @@ const HOLLOW_BAYS = [
 ] as const;
 const HOLLOW_SEA_FLOOR = WATER_LEVEL - 5;
 
-// >0 on land, <0 at sea; the coast is the soft zero crossing. One metaball
-// evaluator shared by every northern realm's coastline (same math the Hollow
-// shipped with, extracted verbatim when the Drakelands and the Frostveil
-// added their own lobe tables).
-type CoastBlob = { readonly x: number; readonly z: number; readonly r: number };
-// One terrainHeight sample evaluates SEVERAL realms' landness at the same
-// (x, z) (its own coast, seam neighbours, the border seaGate, the open-sea
-// check), and the three fixed-seed fbm terms below depend only on (x, z),
-// never on the lobe tables. A last-point memo shares them across those calls:
-// pure caching of identical inputs, so every result stays bit-identical.
-let mbMemoX = Number.NaN;
-let mbMemoZ = Number.NaN;
-let mbMemoWX = 0;
-let mbMemoWZ = 0;
-let mbMemoRag = 0;
-// Per-table bounding box of every blob's reach, cached by array identity. A
-// warped point outside the box contributes zero from every blob (all d2 >= 1),
-// so the whole loop can be skipped bit-identically. terrainHeight consults
-// far realms' landness on most samples (border seaGates, the open-sea check),
-// which is exactly the always-outside case this gate removes.
-interface BlobBounds {
-  minX: number;
-  maxX: number;
-  minZ: number;
-  maxZ: number;
-}
-interface BoundedBlobs {
-  blobs: readonly CoastBlob[];
-  bounds: BlobBounds;
-}
-function boundedBlobs(blobs: readonly CoastBlob[]): BoundedBlobs {
-  const bounds = {
-    minX: Number.POSITIVE_INFINITY,
-    maxX: Number.NEGATIVE_INFINITY,
-    minZ: Number.POSITIVE_INFINITY,
-    maxZ: Number.NEGATIVE_INFINITY,
-  };
-  for (const blob of blobs) {
-    bounds.minX = Math.min(bounds.minX, blob.x - blob.r);
-    bounds.maxX = Math.max(bounds.maxX, blob.x + blob.r);
-    bounds.minZ = Math.min(bounds.minZ, blob.z - blob.r);
-    bounds.maxZ = Math.max(bounds.maxZ, blob.z + blob.r);
-  }
-  return { blobs, bounds };
-}
-function metaballLandness(lobes: BoundedBlobs, bays: BoundedBlobs, x: number, z: number): number {
-  // Organic coastlines: the raw metaball union reads as connecting circles,
-  // so the sample position is domain-warped by fixed-seed fbm (bending the
-  // blobs into peninsulas and coves) and the result gets a higher-frequency
-  // raggedness term (small capes and inlets). The seeds are CONSTANTS, not
-  // the world seed: landness must stay a pure fn of (x, z) because content
-  // tables, tests, and the sim's open-sea check were all placed against it.
-  if (x !== mbMemoX || z !== mbMemoZ) {
-    mbMemoX = x;
-    mbMemoZ = z;
-    mbMemoWX = x + (fbm2(x * 0.015, z * 0.015, 9101, 3) - 0.5) * 46;
-    mbMemoWZ = z + (fbm2(x * 0.015 + 73, z * 0.015 - 41, 9103, 3) - 0.5) * 46;
-    mbMemoRag = (fbm2(x * 0.05, z * 0.05, 9107, 2) - 0.5) * 0.2;
-  }
-  const wx = mbMemoWX;
-  const wz = mbMemoWZ;
-  let land = 0;
-  // Bounds are computed once beside each private coast table. Passing them
-  // directly avoids a WeakMap lookup on every terrain landness probe.
-  const lb = lobes.bounds;
-  if (wx >= lb.minX && wx <= lb.maxX && wz >= lb.minZ && wz <= lb.maxZ) {
-    for (const b of lobes.blobs) {
-      // |dx| >= r means d2 >= 1 regardless of dz: skip the divisions early
-      const dx = wx - b.x;
-      if (dx >= b.r || -dx >= b.r) continue;
-      const d2 = (dx / b.r) ** 2 + ((wz - b.z) / b.r) ** 2;
-      if (d2 < 1) land += (1 - d2) ** 2;
-    }
-  }
-  if (bays.blobs.length > 0) {
-    const bb = bays.bounds;
-    if (wx >= bb.minX && wx <= bb.maxX && wz >= bb.minZ && wz <= bb.maxZ) {
-      for (const b of bays.blobs) {
-        const dx = wx - b.x;
-        if (dx >= b.r || -dx >= b.r) continue;
-        const d2 = (dx / b.r) ** 2 + ((wz - b.z) / b.r) ** 2;
-        if (d2 < 1) land -= 1.4 * (1 - d2) ** 2;
-      }
-    }
-  }
-  land += mbMemoRag;
-  return land - 0.06;
-}
-
+// The shared coastline evaluator: metaball_landness.ts.
 const HOLLOW_LAND_FIELD = boundedBlobs(HOLLOW_LAND_LOBES);
 const HOLLOW_BAY_FIELD = boundedBlobs(HOLLOW_BAYS);
 export function hollowLandness(x: number, z: number): number {
@@ -1944,7 +1863,9 @@ function applyWorldEdgeSea(x: number, z: number, h: number): number {
   // ...blended across the west column seam so the margin's own onset never
   // steps at the Amberfall's northeast corner
   const northEnd =
-    AMBER_ZMAX + (WORLD_MAX_Z - AMBER_ZMAX) * smoothstep(STRIP_MIN_X - 12, STRIP_MIN_X + 12, x);
+    AMBER_ZMAX +
+    (WORLD_MAX_Z - AMBER_ZMAX) *
+      smoothstep(columnSeamX(-1, STRIP_MIN_X, z) - 12, columnSeamX(-1, STRIP_MIN_X, z) + 12, x);
   const dEdge = Math.min(dX, northEnd - z);
   if (dEdge > 190) return h;
   // two octaves of fixed-seed noise bend the shoreline into deep coves and
@@ -2044,7 +1965,8 @@ function applyAmberCoast(x: number, z: number, h: number): number {
   if (zSeam <= 0) return h;
   // the west column: cross-fade toward the strip at the border
   if (x < -566) return h; // nothing west of the world
-  const seam = 1 - smoothstep(STRIP_MIN_X - 8, STRIP_MIN_X + 8, x);
+  // ...handing the flank the isle claims over to the isle's own coast
+  const seam = (1 - smoothstep(STRIP_MIN_X - 8, STRIP_MIN_X + 8, x)) * (1 - isleClaimFade(x, z));
   if (seam <= 0) return h;
   const land = amberLandness(x, z);
   const t = smoothstep(0.02, 0.3, land);
@@ -2131,7 +2053,8 @@ function applyEmberCoast(x: number, z: number, h: number): number {
   if (zSeam <= 0) return h;
   // the east column: cross-fade toward the strip at the border
   if (x > 566) return h; // nothing east of the world (instance space far beyond)
-  const emberSeam = smoothstep(STRIP_MAX_X - 8, STRIP_MAX_X + 8, x);
+  // ...handing the flank the isle claims over to the isle's own coast
+  const emberSeam = smoothstep(STRIP_MAX_X - 8, STRIP_MAX_X + 8, x) * (1 - isleClaimFade(x, z));
   if (emberSeam <= 0) return h;
   const land = emberLandness(x, z);
   const t = smoothstep(0.02, 0.3, land);
@@ -2186,11 +2109,15 @@ function applyQuarteredCoast(x: number, z: number, h: number): number {
     smoothstep(FROST_ZMAX - 8, FROST_ZMAX + 8, z) *
     (1 - smoothstep(QUARTERED_ZMAX - 8, QUARTERED_ZMAX + 8, z));
   if (zSeam <= 0) return h;
-  const seam =
-    smoothstep(STRIP_MIN_X - 8, STRIP_MIN_X + 8, x) *
-    (1 - smoothstep(STRIP_MAX_X - 8, STRIP_MAX_X + 8, x));
+  // out to the claim's edges (x +-250), where the column coasts hand over
+  const seam = 1 - smoothstep(242, 258, Math.abs(x));
   if (seam <= 0) return h;
-  const land = quarteredLandness(x, z);
+  // the claimed flanks carry their mainlands' own shores in, so the isle's
+  // quarters fade into the Drakelands and the Amberfall over open land
+  const land = Math.max(
+    quarteredLandness(x, z),
+    x > STRIP_MAX_X - 8 ? emberLandness(x, z) : x < STRIP_MIN_X + 8 ? amberLandness(x, z) : -1,
+  );
   // a wider land ramp than the other coasts' (0.3): the isle's uplands stand
   // close to its shores, so the beach climbs over twice the run
   const t = smoothstep(0.02, 0.6, land);
@@ -4044,7 +3971,7 @@ function terrainHeightUnpadded(x: number, z: number, seed: number, skipEdits = f
   // lazily computed once per call: non-sealed ridges break at declared lakes
   let lakeGate = -1;
   for (const edge of BORDER_EDGES) {
-    if (edge.water) continue; // a strait border raises no range
+    if (edge.water || edge.open) continue; // a strait or a claim's open side raises no range
     const sigma = edge.sealed ? SEALED_RIDGE_SIGMA : RIDGE_SIGMA;
     const dPerp = Math.abs((edge.kind === 'h' ? z : x) - edge.at);
     // The window used to cut hard at 3 sigma, but the gaussian tail there is
@@ -4480,10 +4407,11 @@ function terrainHeightUnpadded(x: number, z: number, seed: number, skipEdits = f
   if (terrainRegionHas(region, TERRAIN_APPLIER.glacierTarnRamp)) {
     h = applyGlacierTarnRamp(x, z, h);
   }
-  // The Challengers' Ring's level floor and bank, in finished height space
-  // like the tarn ramp: the King of the Hill circle stands on even ground.
-  if (terrainRegionHas(region, TERRAIN_APPLIER.quarteredArena)) {
-    h = applyChallengersRing(x, z, h);
+  // The Challengers' Ring's floor, then the isle's landmarks (the Gyre's
+  // climb, the scars), in finished height space like the tarn ramp.
+  if (terrainRegionHas(region, TERRAIN_APPLIER.quarteredArena)) h = applyChallengersRing(x, z, h);
+  if (terrainRegionHas(region, TERRAIN_APPLIER.quarteredLandmarks)) {
+    h = applyQuarteredLandmarks(x, z, h);
   }
   // The Highwatch paddock is another authored level pull. It sits deep inside
   // Thornpeak, so it does not compete with a realm border or coast.
@@ -4589,6 +4517,7 @@ export function nearSteepWalls(x: number, z: number): boolean {
     return true; // within the world rim's margin
   }
   for (const edge of BORDER_EDGES) {
+    if (edge.water || edge.open) continue; // no ridge stands there, so no wall
     const sigma = edge.sealed ? SEALED_RIDGE_SIGMA : RIDGE_SIGMA;
     if (Math.abs((edge.kind === 'h' ? z : x) - edge.at) >= sigma * 4) continue;
     const along = edge.kind === 'h' ? x : z;
@@ -4964,6 +4893,10 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
     if (dawnholdPadWeight(gx, gz) > 0) return null;
     if (r > 0.3) return null;
     kind = r < 0.16 ? 'tree' : r < 0.2 ? 'tree2' : 'rock';
+  } else if (biome === 'quartered') {
+    // open waste round the isle's landmark stone: a rare boulder or dead tree
+    if (r > 0.03) return null;
+    kind = r < 0.003 ? 'tree2' : 'rock';
   } else if (biome === 'gale') {
     // wind-scoured downs: rock outcrops everywhere, and hardy windbreak
     // trees scattered across the open land between them
@@ -4986,7 +4919,7 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
   const oz = (hash2(Math.round(gx), Math.round(gz), seed + 91) - 0.5) * DECORATION_STEP;
   const x = gx + ox,
     z = gz + oz;
-  if (isExcludedDecoration(x, z) || isCuratedGardenScatter(kind, x, z, zoneBiomeAt)) return null;
+  if (isExcludedDecoration(x, z) || isCuratedScatter(kind, x, z, zoneBiomeAt)) return null;
   // The Galecrest paddock is a worked yard and race course. Keep the same
   // deterministic decoration field out of its apron so no tree becomes an
   // invisible obstacle across a jump line.

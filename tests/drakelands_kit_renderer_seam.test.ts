@@ -23,7 +23,11 @@ describe('renderer Drakelands kit seam', () => {
   const prepare = slice('  prepareZoneAt(', '\n  /** Stage wall-times');
 
   it('starts the kit load with the zone prepare, beside the terrain build', () => {
-    const loadAt = prepare.indexOf('const kitLoad = drakelandsKitLoadFor(zone.biome);');
+    // The Quartered Isle's landmark models ride the same await (one biome
+    // needs at most one of the two loads; quartered_landmark_dressing.ts).
+    const loadAt = prepare.indexOf(
+      'const kitLoad = drakelandsKitLoadFor(zone.biome) ?? quarteredLandmarkLoadFor(zone.biome);',
+    );
     const terrainAt = prepare.indexOf('await this.terrainView.ensureZone(');
     expect(loadAt).toBeGreaterThan(-1);
     expect(terrainAt).toBeGreaterThan(loadAt);

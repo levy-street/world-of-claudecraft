@@ -221,9 +221,12 @@ describe('world quest content', () => {
     });
     expect(new Set(WORLD_QUESTS.map((quest) => quest.id)).size).toBe(WORLD_QUESTS.length);
     // Every shipped map carries a world quest except the Proving Shore tutorial
-    // island, which teaches the basics and offers none.
+    // island, which teaches the basics and offers none, and the Quartered Isle,
+    // whose mobs land in phase 2 (docs/prd/quartered-isle-zone.md): no live
+    // targets yet, so no objective may be authored over them.
+    const WORLD_QUEST_FREE_ZONES = new Set(['proving_shore', 'quartered_isle']);
     expect(new Set(WORLD_QUESTS.map((quest) => quest.zoneId))).toEqual(
-      new Set(ZONES.map((zone) => zone.id).filter((id) => id !== 'proving_shore')),
+      new Set(ZONES.map((zone) => zone.id).filter((id) => !WORLD_QUEST_FREE_ZONES.has(id))),
     );
     const sim = new Sim({ seed: 123, playerClass: 'warrior', noPlayer: true });
     const zoneFrequency = new Map<string, number>();

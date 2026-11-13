@@ -97,7 +97,7 @@ export const OVERWORLD_GRAVEYARDS: GraveyardDef[] = [
   { id: LAST_KEEP_GRAVEYARD_ID, name: 'Last Keep Churchyard', x: 451, z: 2134 },
   // Rivalmoot's yard on the hilltop, beside the town's headstones
   // (QUARTERED_ISLE_PROPS.graveyards). Appended last, its keeper reserved.
-  { id: RIVALMOOT_GRAVEYARD_ID, name: 'Rivalmoot Rest', x: -14, z: 2258 },
+  { id: RIVALMOOT_GRAVEYARD_ID, name: 'Rivalmoot Rest', x: -30, z: 2240 },
 ];
 
 // The Spirit Healer NPC id (one shared template; every spawned angel carries this

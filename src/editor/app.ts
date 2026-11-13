@@ -9622,12 +9622,23 @@ export class EditorApp {
   }
 
   /** The zone (this map's own zone band) the editor camera is currently over,
-   *  matching sim `zoneAt`'s rect walk. Null only if the map has no zones. */
+   *  matching sim `zoneAt`'s claim-first rect walk. Null only if the map has
+   *  no zones. */
   private zoneAtEditorPoint(point: {
     x: number;
     z: number;
   }): CustomMap['content']['zones'][number] | null {
     const zones = this.map.content.zones;
+    // A claimsOverlap zone wins the ground it overlaps in a neighbour's rect,
+    // so it is tested before the ordered walk, as zoneAt does.
+    for (const zone of zones) {
+      if (zone.claimsOverlap !== true) continue;
+      const x0 = zone.xMin ?? STRIP_MIN_X;
+      const x1 = zone.xMax ?? STRIP_MAX_X;
+      if (point.z >= zone.zMin && point.z < zone.zMax && point.x >= x0 && point.x < x1) {
+        return zone;
+      }
+    }
     let fallback: (typeof zones)[number] | null = null;
     for (const zone of zones) {
       if (point.z >= zone.zMax) continue;

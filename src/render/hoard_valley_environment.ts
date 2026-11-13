@@ -30,6 +30,7 @@ const SKY_ANCHORS = Object.freeze({
   veiled_hollow: { x: -116, z: 1006 },
   evergarden: { x: 324, z: 851 },
   farshore_isle: { x: 367, z: 25 },
+  quartered_isle: { x: 30, z: 2030 }, // the isle's first dig site
 } satisfies Record<HoardValleyZoneId, { x: number; z: number }>);
 
 export interface HoardValleyEnvironment {

@@ -73,16 +73,28 @@ export function isolateViewDistance(rect: ZoneRect): number {
 }
 
 /**
- * The zone owning a point, by the sim's rect walk: containment first, else the
- * southmost band whose zMax lies beyond the point (the same clamp `zoneAt`
- * applies, so a placement nudged past an edge still files under a zone).
- * Null only when the map has no zones at all.
+ * The zone owning a point, by the sim's rect walk: a claimsOverlap zone that
+ * contains it first (it wins the ground it overlaps in a neighbour's rect),
+ * then containment in order, else the southmost band whose zMax lies beyond
+ * the point (the same clamp `zoneAt` applies, so a placement nudged past an
+ * edge still files under a zone). Null only when the map has no zones at all.
  */
 export function zoneIdForPoint(
-  zones: readonly { id: string; xMin?: number; xMax?: number; zMin: number; zMax: number }[],
+  zones: readonly {
+    id: string;
+    xMin?: number;
+    xMax?: number;
+    zMin: number;
+    zMax: number;
+    claimsOverlap?: boolean;
+  }[],
   x: number,
   z: number,
 ): string | null {
+  for (const zone of zones) {
+    if (zone.claimsOverlap !== true || z < zone.zMin || z >= zone.zMax) continue;
+    if (x >= (zone.xMin ?? STRIP_MIN_X) && x < (zone.xMax ?? STRIP_MAX_X)) return zone.id;
+  }
   let fallback: string | null = null;
   let fallbackZMax = Infinity;
   for (const zone of zones) {

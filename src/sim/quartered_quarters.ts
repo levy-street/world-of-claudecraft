@@ -21,11 +21,18 @@ export interface QuarterWeights {
 /** Each quarter's heart. +x is the Drakelands side (fire), -x the Amberfall
  *  side (earth), south the Frostveil side (ice), north the Gyre (wind). */
 export const QUARTER_CENTERS: Readonly<Record<QuarterId, { x: number; z: number }>> = {
-  ice: { x: 0, z: 2045 },
+  ice: { x: 0, z: 2030 },
   fire: { x: 125, z: 2190 },
   earth: { x: -125, z: 2190 },
   wind: { x: 0, z: 2355 },
 };
+
+/** The Hoarshelf runs the island's whole south shore, so the ice quarter has
+ *  a heart on each shoulder of the shelf as well as its centre. */
+const ICE_SHOULDERS = [
+  { x: -160, z: 2040 },
+  { x: 160, z: 2036 },
+] as const;
 
 /** How far (yards) one quarter's influence carries before the next takes
  *  over: smaller is a crisper seam. */
@@ -40,7 +47,7 @@ export function quarterWeightsAt(x: number, z: number): QuarterWeights {
     const dz = z - c.z;
     return Math.exp(-(dx * dx + dz * dz) * k);
   };
-  const ice = w(QUARTER_CENTERS.ice);
+  const ice = w(QUARTER_CENTERS.ice) + w(ICE_SHOULDERS[0]) + w(ICE_SHOULDERS[1]);
   const fire = w(QUARTER_CENTERS.fire);
   const earth = w(QUARTER_CENTERS.earth);
   const wind = w(QUARTER_CENTERS.wind);

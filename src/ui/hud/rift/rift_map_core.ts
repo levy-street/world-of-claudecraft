@@ -174,6 +174,7 @@ const RIFT_MAP_VALLEY_GROUND_BY_ZONE = Object.freeze({
   veiled_hollow: 'dark-forest',
   evergarden: 'moonlit-meadow',
   farshore_isle: 'coast',
+  quartered_isle: 'coast',
 } as const satisfies Readonly<Record<VaultZoneId, RiftMapValleyGround>>);
 
 /** Stable cartographic material for the frozen Buried Hoard zone set. */

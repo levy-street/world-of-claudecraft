@@ -2127,7 +2127,10 @@ const MONOLITHS: MonolithRow[] = [
     // The Quartered Isle's coast hooks rode in with the Frostveil and Amberfall
     // coast tables extracted to content/frost_coast.ts and content/amber_coast.ts
     // (the ember_coast.ts pattern), so the file shrank: exact count.
-    ceiling: 5127,
+    // The isle's claim seams and landmark applier rode in with the shared
+    // metaball coastline evaluator extracted to metaball_landness.ts: exact
+    // count, lowered.
+    ceiling: 5060,
     seam: 'zone/terrain data as content records; logic as sim sibling modules',
   },
   {
@@ -2333,7 +2336,9 @@ const MONOLITHS: MonolithRow[] = [
     // v0.45 integration sync at 78c350c8d55 into cel-shading-rnd:
     // parent pins 3996 and 3864; combined existing wiring,
     // exact merged count with no new coordinator behavior or slack.
-    ceiling: 3867,
+    // Lowered after moving the scatter boulders' tint table into
+    // src/render/scatter_rock_tint_core.ts (the Cinderscar's black basalt).
+    ceiling: 3846,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {

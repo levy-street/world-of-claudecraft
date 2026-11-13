@@ -55,6 +55,7 @@ import {
   gapDryFraction,
   gapSheetWorthBuilding,
   gapsAdjacentTo,
+  sheetRectsForZone,
   type WaterSheetRect,
   waterCoverageGaps,
   zoneSheetRects,
@@ -662,10 +663,11 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
   };
   const loadedZones = new Set<string>();
   const pendingZones = new Map<string, Promise<THREE.Mesh[]>>();
-  // The one front mesh ensureZone built for a given overworld zone (never a
-  // gap sheet: gaps belong to no zone). Lets unloadZone find exactly the
-  // mesh, underside twin and refit entry to release for that zone alone.
-  const zoneFrontMesh = new Map<string, THREE.Mesh>();
+  // The front meshes ensureZone built for a given overworld zone (never a
+  // gap sheet: gaps belong to no zone): one, or one per piece of a zone a
+  // claim cut. Lets unloadZone find exactly the meshes, underside twins and
+  // refit entries to release for that zone alone.
+  const zoneFrontMeshes = new Map<string, THREE.Mesh[]>();
   // Per-mesh in-place refit closures: re-seat y and recompute the shore-depth
   // attribute from the CURRENT terrain (build and setLevel share them). The
   // vertices never move (only the attribute + the mesh transform change), so
@@ -1180,24 +1182,34 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
       const scheduled = idlePace
         ? idleSlot(WATER_IDLE_TIMEOUT_MS)
         : new Promise<void>((resolve) => setTimeout(resolve, 0));
-      const zoneRect =
-        WATER_ZONE_RECTS.find((r) => r.id === zone.id) ??
-        ({
-          id: zone.id,
-          xMin: zone.xMin ?? -WORLD_SIZE / 2,
-          xMax: zone.xMax ?? WORLD_SIZE / 2,
-          zMin: zone.zMin,
-          zMax: zone.zMax,
-        } satisfies WaterSheetRect);
+      // One rect per zone, or several when a claimsOverlap zone cut this one
+      // (zoneSheetRects keeps the sheets disjoint).
+      const shipped = sheetRectsForZone(WATER_ZONE_RECTS, zone.id);
+      const zoneRects: WaterSheetRect[] =
+        shipped.length > 0
+          ? shipped
+          : [
+              {
+                id: zone.id,
+                xMin: zone.xMin ?? -WORLD_SIZE / 2,
+                xMax: zone.xMax ?? WORLD_SIZE / 2,
+                zMin: zone.zMin,
+                zMax: zone.zMax,
+              },
+            ];
       const task = scheduled
         .then(async () => {
-          const mesh = await buildSheet(zoneRect, {
-            slice: idlePace,
-            visible: !idlePace,
-            requireShore: false,
-          });
+          const built: THREE.Mesh[] = [];
+          for (const zoneRect of zoneRects) {
+            const mesh = await buildSheet(zoneRect, {
+              slice: idlePace,
+              visible: !idlePace,
+              requireShore: false,
+            });
+            if (mesh) built.push(mesh);
+          }
           loadedZones.add(zone.id);
-          if (mesh) zoneFrontMesh.set(zone.id, mesh);
+          if (built.length > 0) zoneFrontMeshes.set(zone.id, built);
           // Gap sheets belong to no zone, so nothing streams them. Build each
           // one alongside the first ADJACENT zone that prepares: the whole rule
           // stays inside this view (no renderer change) and a gap is ready
@@ -1209,12 +1221,14 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
           // 32k-vertex terrain bake (~5 terrainHeight samples per vertex) in
           // front of first paint. Sliced and detached, it lands a moment later
           // over water the player has not reached yet.
-          for (const gap of gapsAdjacentTo(builtGapRects(), zoneRect)) {
-            if (loadedZones.has(gap.id)) continue;
-            loadedZones.add(gap.id);
-            void buildSheet(gap, { slice: true, visible: true, requireShore: true });
+          for (const zoneRect of zoneRects) {
+            for (const gap of gapsAdjacentTo(builtGapRects(), zoneRect)) {
+              if (loadedZones.has(gap.id)) continue;
+              loadedZones.add(gap.id);
+              void buildSheet(gap, { slice: true, visible: true, requireShore: true });
+            }
           }
-          return mesh ? [mesh] : [];
+          return built;
         })
         .finally(() => pendingZones.delete(zone.id));
       pendingZones.set(zone.id, task);
@@ -1350,24 +1364,26 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
       // prepared, by which point its build task has already resolved), kept
       // so the method stays safe to call in any state.
       if (pendingZones.has(zoneId)) return;
-      const front = zoneFrontMesh.get(zoneId);
+      const zoneFronts = zoneFrontMeshes.get(zoneId);
       loadedZones.delete(zoneId);
-      if (!front) return;
-      zoneFrontMesh.delete(zoneId);
-      dropFront(front);
-      sheetFronts.delete(front);
-      const pairIndex = underPairs.findIndex((pair) => pair.front === front);
-      const under = pairIndex === -1 ? null : underPairs[pairIndex].under;
-      if (pairIndex !== -1) underPairs.splice(pairIndex, 1);
-      for (const mesh of under ? [front, under] : [front]) {
-        group.remove(mesh);
-        const meshIndex = meshes.indexOf(mesh);
-        if (meshIndex !== -1) meshes.splice(meshIndex, 1);
+      if (!zoneFronts) return;
+      zoneFrontMeshes.delete(zoneId);
+      for (const front of zoneFronts) {
+        dropFront(front);
+        sheetFronts.delete(front);
+        const pairIndex = underPairs.findIndex((pair) => pair.front === front);
+        const under = pairIndex === -1 ? null : underPairs[pairIndex].under;
+        if (pairIndex !== -1) underPairs.splice(pairIndex, 1);
+        for (const mesh of under ? [front, under] : [front]) {
+          group.remove(mesh);
+          const meshIndex = meshes.indexOf(mesh);
+          if (meshIndex !== -1) meshes.splice(meshIndex, 1);
+        }
+        // under shares front's geometry (addUnderside), so dispose it once.
+        front.geometry.dispose();
+        const refitIndex = refits.findIndex((entry) => entry.mesh === front);
+        if (refitIndex !== -1) refits.splice(refitIndex, 1);
       }
-      // under shares front's geometry (addUnderside), so dispose it once.
-      front.geometry.dispose();
-      const refitIndex = refits.findIndex((entry) => entry.mesh === front);
-      if (refitIndex !== -1) refits.splice(refitIndex, 1);
     },
     dispose(): void {
       // Best effort, step by step: one throwing release must not leak the
