@@ -6498,6 +6498,20 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "feat": true,
     "rewardTitle": "the Gourdsworn",
     "crest": "/ui/deeds/feat_gourdlight_eve_complete.webp"
+  },
+  {
+    "id": "chr_quartered_isle_gatherer",
+    "name": "Four Quarters' Bounty",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_quartered_isle_first_cast",
+    "name": "A Line Between the Quarters",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
   }
 ];
 

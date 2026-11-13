@@ -2052,11 +2052,12 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // + vault retune 119 + quiver 66 + quest shields 68. No storage limit changes.
     // Advanced riding adds the sparse ridingTier scalar (+15, PR 4390).
     // +166 with the Quartered Isle's six starter-kit node cooldowns.
-    expect(baselineBytes).toBe(261646);
+    // (+235 with the Quartered Isle's three deeds in the maximal book)
+    expect(baselineBytes).toBe(261881);
     expect(bytes - baselineBytes).toBe(8284);
     // 266,699 -> 266,721 with Wobbles the Slime's reins (+22, kept).
     // +166 with the Quartered Isle's six starter-kit node cooldowns.
-    expect(bytes).toBe(269930);
+    expect(bytes).toBe(270165);
     // Keep the warning threshold unchanged: saves above it remain whole.
     expect(bytes).toBeGreaterThan(CHARACTER_BLOB_WARN_BYTES);
     process.stdout.write(
@@ -2447,7 +2448,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // 249,984 -> 250,006 with Wobbles the Slime's reins (+22, kept).
     // Advanced riding adds the sparse ridingTier scalar (+15, PR 4390).
     // +166 with the Quartered Isle's six starter-kit node cooldowns.
-    expect(beforeReferralBytes).toBe(251081);
+    // (+235 with the Quartered Isle's three deeds in the maximal book)
+    expect(beforeReferralBytes).toBe(251316);
     expect(bytes - gourdlightEveBytes - stampCardBytes - beforeReferralBytes).toBe(122);
     expect(
       fieldBytes(beforeStampCards, 'deedStats') - fieldBytes(withoutReferral, 'deedStats'),
@@ -2474,7 +2476,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     const beforeMembershipBytes = Buffer.byteLength(JSON.stringify(withoutMembership), 'utf8');
     // 249,810 -> 249,832 with Wobbles the Slime's reins (+22, kept).
     // +166 with the Quartered Isle's six starter-kit node cooldowns.
-    expect(beforeMembershipBytes).toBe(250907);
+    expect(beforeMembershipBytes).toBe(251142);
     expect(beforeReferralBytes - beforeMembershipBytes).toBe(174);
     expect(
       fieldBytes(withoutReferral, 'deedStats') - fieldBytes(withoutMembership, 'deedStats'),
@@ -3003,7 +3005,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         15 +
         // Plus 166 for the Quartered Isle's six starter-kit gather nodes, each
         // on cooldown in this maximal fixture's nodeHarvestCooldowns. MEASURED.
-        166,
+        166 +
+        // Plus 235 for the Quartered Isle's three deeds this maximal fixture
+        // earns: the gatherer and first-cast chronicle pair, the four-branch
+        // Gilded Strongbox tour, and the marks they wait on. MEASURED.
+        235,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -3052,7 +3058,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // undercounted the merged tree).
       // deeds 1,572 -> 1,808 with Lantern Hall (#4530), its deed rows (+236 of the +281
       // above), MEASURED on the merged tree.
-      deeds: 2006,
+      // deeds 2,006 -> 2,131 and deedStats 21,080 -> 21,190 with the Quartered
+      // Isle's three deeds and the marks they wait on (the +235 above).
+      deeds: 2131,
       // deedStats +4,648 and reliquary +8,848 at the second release/v0.44.0 base
       // merge: Warfare Season 2's 139 item ids (the 13,496 attributed above).
       // deedStats 9,427 -> 14,446 at the choose-one leveling quest gear: its
@@ -3065,7 +3073,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // Then -> 21,354: the 36 legacy buddy item ids add 706 discovery bytes.
       // Then -> 21,373 with the Staff of Changing's discovery id (+19, PR 4281).
       // +18 for the sprite buddy's whistle id in itemsDiscovered: 21373 -> 21436.
-      deedStats: 21080,
+      deedStats: 21190,
       reliquary: 14565,
     });
     // Removing field_kit AND the Bramblehide release content reproduces the
@@ -3116,7 +3124,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // The sprite buddy's whistle id adds 18 (247,154).
       // Advanced riding contributes 15 bytes for the armed ridingTier scalar.
       // The Quartered Isle's six starter-kit node cooldowns add 166.
-    ).toBe(248211);
+      // Its three deeds and their marks add 235 (248,446), kept here.
+    ).toBe(248446);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -3159,7 +3168,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // reins_wobbles_slime adds 22 (249,994).
       // Advanced riding contributes the same 15 bytes here.
       // +166 with the Quartered Isle's six starter-kit node cooldowns.
-    ).toBe(251069);
+    ).toBe(251304);
     const priorContent = withoutCrucibleContent(withoutReferral);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -3310,8 +3319,12 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // scalar (250,273). Same 381-byte band.
     // RE-BASED for the Quartered Isle: up exactly 166 for its six starter-kit
     // node cooldowns in nodeHarvestCooldowns. Same 381-byte band.
-    expect(bytes - gourdlightEveBytes - stampCardBytes, reMint).toBeGreaterThan(250823);
-    expect(bytes - gourdlightEveBytes - stampCardBytes, reMint).toBeLessThan(251204);
+    // RE-BASED for the Quartered Isle's three deeds (the chronicle pair and the
+    // four-branch Gilded Strongbox tour) and the marks they wait on: 251,438
+    // bytes, up exactly 235 (deeds +125, deedStats +110). Floor at measurement
+    // minus 380, edge at measurement plus one: 251058..251439.
+    expect(bytes - gourdlightEveBytes - stampCardBytes, reMint).toBeGreaterThan(251058);
+    expect(bytes - gourdlightEveBytes - stampCardBytes, reMint).toBeLessThan(251439);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

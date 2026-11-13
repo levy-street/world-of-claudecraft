@@ -3455,6 +3455,7 @@ describe('Guide professions gathering accuracy', () => {
       7: 'seven',
       8: 'eight',
       12: 'twelve',
+      13: 'thirteen',
     };
     const castWord = words[firstCast.length];
     expect(castWord, `unmapped first-cast count ${firstCast.length}`).toBeDefined();

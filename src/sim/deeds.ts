@@ -390,6 +390,16 @@ export const ZONE_FISH: Record<string, readonly string[]> = {
     'raw_hollowgill_sturgeon',
     'raw_stillmere_salmon',
   ],
+  // The Quartered Isle's open water (its coast and the one unfrozen pool)
+  // draws the same Vale fallback table as the other starter-tier zones.
+  quartered_isle: [
+    'raw_mirror_trout',
+    'raw_river_perch',
+    'glimmerfin_koi',
+    'raw_deepbarb_catfish',
+    'raw_hollowgill_sturgeon',
+    'raw_stillmere_salmon',
+  ],
 };
 
 // Farming hub zones whose beds feed the chr_ first-harvest chronicle deeds:
