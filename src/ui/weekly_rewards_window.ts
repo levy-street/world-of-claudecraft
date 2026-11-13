@@ -1,5 +1,6 @@
-// Bank pane: rebuild only for ledger changes. Its cached countdown node receives
-// one elided text update from the existing bank slow-band refresh, no own driver.
+// The Weekly Vault sheet (the Rewards window's Vault tab): rebuild only for ledger
+// changes. Its cached countdown node receives one elided text update from the
+// slow-band refresh, no own driver.
 import { WEEKLY_BACKLOG_LIMIT } from '../sim/weekly_rewards';
 import type { IWorld } from '../world_api';
 import { chromeIconUrl } from './chrome_icon_art';
@@ -7,37 +8,24 @@ import { esc } from './esc';
 import { FOCUS_KEY_ATTR } from './focus_restore';
 import { formatNumber, t } from './i18n';
 import type { PainterHostPresentation } from './painter_host';
+import {
+  DEFAULT_WEEKLY_LOOT_SELECTION,
+  type WeeklyLootSelection,
+} from './weekly_loot_catalog_view';
 import { WeeklyRewardClaimController } from './weekly_reward_claim_controller';
-import { appendWeeklyLootCategory } from './weekly_reward_loot_catalog_controller';
+import { renderWeeklyLootCatalog } from './weekly_reward_loot_catalog_controller';
 import { appendWeeklyLootFocus } from './weekly_reward_loot_focus_controller';
 import { buildWeeklyRewardsView, weeklyCountdown } from './weekly_rewards_view';
 
 export const WEEKLY_TAB_ID = 'weekly-rewards-tab';
 export const WEEKLY_PANEL_ID = 'weekly-rewards-panel';
-/** Bind the bank host without losing its callback receiver. */
-export function createWeeklyRewardsTab(
-  host: PainterHostPresentation & {
-    world(): IWorld;
-    onInventoryChanged(): void;
-    hideTooltip(): void;
-  },
-  options?: { readOnly?: boolean },
-): WeeklyRewardsTab {
-  return new WeeklyRewardsTab(
-    {
-      world: () => host.world(),
-      presentation: host,
-      onInventoryChanged: () => host.onInventoryChanged(),
-      hideTooltip: () => host.hideTooltip(),
-    },
-    options,
-  );
-}
 export class WeeklyRewardsTab {
   private timer: HTMLElement | null = null;
   private timerText = '';
   private lastSignature = '';
   private expanded = new Set<string>();
+  /** The possible-loot picker's content and difficulty, kept across repaints. */
+  private lootSelection: WeeklyLootSelection = DEFAULT_WEEKLY_LOOT_SELECTION;
   private readonly claimFlow: WeeklyRewardClaimController;
   constructor(
     private readonly deps: {
@@ -46,9 +34,8 @@ export class WeeklyRewardsTab {
       onInventoryChanged(): void;
       hideTooltip?(): void;
     },
-    private readonly options?: { readOnly?: boolean },
   ) {
-    this.claimFlow = new WeeklyRewardClaimController(deps, options);
+    this.claimFlow = new WeeklyRewardClaimController(deps);
   }
   close(): void {
     this.claimFlow.close();
@@ -85,19 +72,17 @@ export class WeeklyRewardsTab {
   }
   renderInto(parent: HTMLElement): void {
     this.claimFlow.pause();
-    if (!this.options?.readOnly) {
-      // Discard a previously dragged bank's inline insets before using the large sheet.
-      for (const property of ['left', 'top', 'right', 'bottom', 'transform'])
-        parent.style.removeProperty(property);
-      delete parent.dataset.windowMoved;
-    }
+    // Discard a previously dragged window's inline insets before using the large sheet.
+    for (const property of ['left', 'top', 'right', 'bottom', 'transform'])
+      parent.style.removeProperty(property);
+    delete parent.dataset.windowMoved;
     const world = this.deps.world();
     const info = world.weeklyRewardInfo;
     this.timer = null;
     this.timerText = '';
     const panel = document.createElement('section');
     panel.id = WEEKLY_PANEL_ID;
-    panel.className = `weekly-rewards bank-scroll${this.options?.readOnly ? ' weekly-rewards--readonly' : ''}`;
+    panel.className = 'weekly-rewards bank-scroll';
     panel.setAttribute('role', 'region');
     panel.setAttribute('aria-label', t('hudChrome.weeklyRewards.title'));
     if (!info) {
@@ -115,9 +100,7 @@ export class WeeklyRewardsTab {
       info.playerLevel,
       !!info.state.vaults[0] && info.state.vaults[0].resetAtMs <= info.nowMs,
     ]);
-    const rows = buildWeeklyRewardsView(info, world.cfg.playerClass, {
-      catalog: this.options?.readOnly ? 'all' : 'eligible',
-    });
+    const rows = buildWeeklyRewardsView(info);
     panel.innerHTML = `<header class="weekly-rewards-header"><div class="weekly-vault-crest" aria-hidden="true"><img src="${chromeIconUrl('chest')}" alt="" draggable="false"></div><div class="weekly-vault-intro"><h2>${esc(t('hudChrome.weeklyRewards.title'))}</h2><p>${esc(t('hudChrome.weeklyRewards.intro'))}</p></div><div class="weekly-reset"><span>${esc(t('hudChrome.weeklyRewards.nextReset'))}</span><strong data-weekly-countdown role="timer"></strong></div></header>`;
     this.timer = panel.querySelector('[data-weekly-countdown]');
     this.refreshCountdown();
@@ -153,7 +136,7 @@ export class WeeklyRewardsTab {
     const toolbar = document.createElement('div');
     toolbar.className = 'weekly-vault-toolbar';
     toolbar.appendChild(status);
-    if (!this.options?.readOnly) appendWeeklyLootFocus(toolbar, world);
+    appendWeeklyLootFocus(toolbar, world);
     toolbar.appendChild(lootButton);
     panel.append(toolbar, allPools);
     if (info.state.overflowed || info.readyWeeks >= WEEKLY_BACKLOG_LIMIT) {
@@ -198,21 +181,21 @@ export class WeeklyRewardsTab {
           },
         )
         .join('')}</div></div>`;
-      appendWeeklyLootCategory(allPools, row, this.deps.presentation, this.expanded);
-
       tracks.appendChild(section);
     }
+    renderWeeklyLootCatalog(allPools, {
+      playerClass: world.cfg.playerClass,
+      lootSpec: info.state.lootSpec,
+      presentation: this.deps.presentation,
+      expanded: this.expanded,
+      selection: () => this.lootSelection,
+      select: (selection) => {
+        this.lootSelection = selection;
+      },
+    });
     const claimHost = document.createElement('div');
     panel.append(claimHost, tracks);
     parent.appendChild(panel);
-    if (this.options?.readOnly) {
-      this.claimFlow.close();
-      if (info.readyWeeks) {
-        const notice = document.createElement('p');
-        notice.className = 'weekly-preview-notice ui-card';
-        notice.textContent = t('hudChrome.weeklyRewards.previewClaimNotice');
-        claimHost.append(notice);
-      }
-    } else this.claimFlow.renderInto(claimHost, tracks);
+    this.claimFlow.renderInto(claimHost, tracks);
   }
 }

@@ -88,16 +88,19 @@ if (MOBILE) {
   const chat = await page.$('#chatlog-wrap');
   if (chat) await chat.screenshot({ path: `${OUT}/${TAG}-chat-frame.png` });
 
-  // Esc -> Interface (by its data-menu-action hook, never by index: the row
-  // order shifts by host) -> Chat (3rd tab, INTERFACE_TAB_ORDER).
+  // Esc -> Settings -> the Interface rail entry (by their data hooks, never by
+  // index: the row order shifts by host) -> Chat (3rd tab, INTERFACE_TAB_ORDER).
   await page.evaluate(() => {
     document.getElementById('tutorial-greeting')?.remove();
     window.__game?.hud?.toggleOptionsMenu?.();
   });
   await sleep(400);
-  await page.evaluate(() =>
-    document.querySelector('#options-menu .opt-btn[data-menu-action="interface"]')?.click(),
-  );
+  await page.evaluate(() => {
+    document.querySelector('#options-menu .opt-btn[data-menu-action="settings"]')?.click();
+    document
+      .querySelector('#options-menu .opt-rail-btn[data-settings-category="interface"]')
+      ?.click();
+  });
   await sleep(400);
   await page.evaluate(() => document.querySelectorAll('#options-menu .opt-tab')[2]?.click());
   await sleep(600);

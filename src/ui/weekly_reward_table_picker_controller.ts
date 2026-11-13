@@ -1,4 +1,10 @@
-import { type WeeklyRewardTableOption, weeklyTableSource } from '../sim/weekly_reward_options';
+import {
+  isWeeklyNormalTableId,
+  type WeeklyRewardTableOption,
+  weeklyNormalPool,
+  weeklyTableSource,
+  weeklyTableSourceId,
+} from '../sim/weekly_reward_options';
 import type { WeeklyChoice } from '../sim/weekly_rewards';
 import { tEntity } from './entity_i18n';
 import { FOCUS_KEY_ATTR } from './focus_restore';
@@ -14,7 +20,32 @@ export function weeklyRewardTableName(source: {
           ? 'hudChrome.weeklyRewards.pool.world'
           : 'hudChrome.weeklyRewards.pool.pvp',
       )
-    : tEntity({ kind: source.kind, id: source.id, field: 'name' });
+    : tEntity({ kind: source.kind, id: weeklyTableSourceId(source.id), field: 'name' });
+}
+
+export type WeeklyTableDifficulty = 'normal' | 'heroic';
+const TABLE_DIFFICULTIES: readonly WeeklyTableDifficulty[] = ['heroic', 'normal'];
+
+const normalBadge = (): HTMLSpanElement => {
+  const badge = document.createElement('span');
+  badge.className = 'weekly-difficulty weekly-difficulty-normal';
+  badge.textContent = t('hudChrome.weeklyRewards.normal');
+  return badge;
+};
+
+const tableDifficulty = (table: WeeklyRewardTableOption): WeeklyTableDifficulty =>
+  table.difficulty ?? 'heroic';
+
+/** The difficulty a Heroic vault's picker shows: the remembered pick while it
+ *  still has tables, else Heroic, else Normal once the Heroic tables run out. */
+export function weeklyPickerDifficulty(
+  tables: readonly WeeklyRewardTableOption[],
+  remembered?: WeeklyTableDifficulty,
+): WeeklyTableDifficulty {
+  const has = (difficulty: WeeklyTableDifficulty) =>
+    tables.some((table) => tableDifficulty(table) === difficulty);
+  if (remembered && has(remembered)) return remembered;
+  return has('heroic') || !has('normal') ? 'heroic' : 'normal';
 }
 
 const MENU_MAX_HEIGHT = 220;
@@ -30,6 +61,8 @@ interface WeeklyRewardTablePickerOptions {
   saving: boolean;
   onChange(): void;
   expanded: Set<number>;
+  /** The Normal or Heroic pick of each Heroic vault, kept across repaints. */
+  difficulties?: Map<number, WeeklyTableDifficulty>;
 }
 
 /** Selection is presentation state only; every submitted table is revalidated. */
@@ -42,6 +75,7 @@ export function appendWeeklyRewardTablePicker({
   saving,
   onChange,
   expanded,
+  difficulties = new Map(),
 }: WeeklyRewardTablePickerOptions): {
   canOpen(): boolean;
   selected(): string[] | undefined;
@@ -49,9 +83,19 @@ export function appendWeeklyRewardTablePicker({
 } {
   if (choice.fixed || choice.tableId || (choice.opened && choice.itemId)) {
     const source = weeklyTableSource(choice.tableId);
-    footer.textContent = source
+    const name = source
       ? weeklyRewardTableName(source)
       : t('hudChrome.weeklyRewards.previouslyRolled');
+    if (source && isWeeklyNormalTableId(source.id)) {
+      // A Heroic vault rolled on a Normal table: say so beside the source, as
+      // one footer item so the badge stays with the name when the row wraps.
+      const rolled = document.createElement('span');
+      rolled.className = 'weekly-rolled-source';
+      const label = document.createElement('span');
+      label.textContent = name;
+      rolled.append(label, normalBadge());
+      footer.replaceChildren(rolled);
+    } else footer.textContent = name;
     return { canOpen: () => true, selected: () => undefined, dispose: () => {} };
   }
   if (choice.pool === 'world' || choice.pool === 'pvp') {
@@ -65,10 +109,17 @@ export function appendWeeklyRewardTablePicker({
     };
   }
 
+  // Only a Heroic vault chooses a difficulty; one roll stays on one difficulty.
+  const choosesDifficulty = weeklyNormalPool(choice.pool) !== undefined;
+  let difficulty = weeklyPickerDifficulty(tables, difficulties.get(index));
+  const shown = () =>
+    choosesDifficulty ? tables.filter((table) => tableDifficulty(table) === difficulty) : tables;
   const previous = new Set(selections.get(index) ?? []);
   selections.set(
     index,
-    tables.filter((table) => previous.has(table.id)).map((table) => table.id),
+    shown()
+      .filter((table) => previous.has(table.id))
+      .map((table) => table.id),
   );
   const details = document.createElement('details');
   details.className = 'weekly-table-picker';
@@ -195,21 +246,15 @@ export function appendWeeklyRewardTablePicker({
     list.append(label);
     return input;
   };
-  const all = checkbox(t('hudChrome.weeklyRewards.selectAllTables'), `weekly-table-all:${index}`);
-  all.disabled ||= !tables.length;
-  const inputs = tables.map((table) => {
-    const input = checkbox(
-      weeklyRewardTableName(table),
-      `weekly-table-option:${index}:${table.id}`,
-    );
-    input.checked = (selections.get(index) ?? []).includes(table.id);
-    return { table, input };
-  });
+  let inputs: Array<{ table: WeeklyRewardTableOption; input: HTMLInputElement }> = [];
+  let all: HTMLInputElement | undefined;
   const update = () => {
     const ids = inputs.filter(({ input }) => input.checked).map(({ table }) => table.id);
     selections.set(index, ids);
-    all.checked = !!inputs.length && ids.length === inputs.length;
-    all.indeterminate = ids.length > 0 && ids.length < inputs.length;
+    if (all) {
+      all.checked = !!inputs.length && ids.length === inputs.length;
+      all.indeterminate = ids.length > 0 && ids.length < inputs.length;
+    }
     summary.textContent = ids.length
       ? t(
           ids.length === 1
@@ -218,18 +263,79 @@ export function appendWeeklyRewardTablePicker({
           { count: formatNumber(ids.length) },
         )
       : t('hudChrome.weeklyRewards.chooseTable');
+    // The closed menu must still say when a Heroic vault is set to roll Normal.
+    if (choosesDifficulty && difficulty === 'normal') {
+      const armed = document.createElement('span');
+      armed.className = 'weekly-rolled-source';
+      const label = document.createElement('span');
+      label.textContent = summary.textContent;
+      armed.append(label, normalBadge());
+      summary.replaceChildren(armed);
+    }
     onChange();
   };
-  all.addEventListener('change', () => {
-    for (const { input } of inputs) input.checked = all.checked;
-    update();
-  });
-  for (const { input } of inputs) input.addEventListener('change', update);
-  if (!tables.length) {
-    const empty = document.createElement('p');
-    empty.textContent = t('hudChrome.weeklyRewards.noLevelLoot');
-    list.append(empty);
-  }
+  const paintRows = (focusDifficulty = false) => {
+    list.replaceChildren();
+    if (choosesDifficulty) {
+      const group = document.createElement('div');
+      group.className = 'weekly-loot-picker weekly-table-difficulty';
+      group.setAttribute('role', 'group');
+      group.setAttribute('aria-label', t('hudChrome.weeklyRewards.catalogDifficulty'));
+      for (const id of TABLE_DIFFICULTIES) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'weekly-loot-choice ui-btn';
+        button.textContent = t(`hudChrome.weeklyRewards.${id}`);
+        button.disabled = disabled || !tables.some((table) => tableDifficulty(table) === id);
+        button.setAttribute(FOCUS_KEY_ATTR, `weekly-table-difficulty:${index}:${id}`);
+        button.setAttribute('aria-pressed', String(id === difficulty));
+        button.addEventListener('click', () => {
+          if (id === difficulty) return;
+          difficulty = id;
+          difficulties.set(index, id);
+          // Tables of the other difficulty leave the selection with the switch.
+          selections.set(index, []);
+          paintRows(true);
+          update();
+        });
+        // Keep activation keys out of the game hotkeys, as the summary does.
+        button.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' || event.key === ' ') event.stopPropagation();
+        });
+        group.append(button);
+        // The pressed button was replaced by this repaint: hand focus to its
+        // successor so the menu keeps keyboard focus inside itself.
+        if (focusDifficulty && id === difficulty)
+          queueMicrotask(() => {
+            if (!disposed && button.isConnected) button.focus({ preventScroll: true });
+          });
+      }
+      list.append(group);
+    }
+    const rows = shown();
+    all = checkbox(t('hudChrome.weeklyRewards.selectAllTables'), `weekly-table-all:${index}`);
+    all.disabled ||= !rows.length;
+    const selectAll = all;
+    inputs = rows.map((table) => {
+      const input = checkbox(
+        weeklyRewardTableName(table),
+        `weekly-table-option:${index}:${table.id}`,
+      );
+      input.checked = (selections.get(index) ?? []).includes(table.id);
+      input.addEventListener('change', update);
+      return { table, input };
+    });
+    selectAll.addEventListener('change', () => {
+      for (const { input } of inputs) input.checked = selectAll.checked;
+      update();
+    });
+    if (!rows.length) {
+      const empty = document.createElement('p');
+      empty.textContent = t('hudChrome.weeklyRewards.noLevelLoot');
+      list.append(empty);
+    }
+  };
+  paintRows();
   details.append(summary, list);
   footer.replaceChildren(details);
   update();

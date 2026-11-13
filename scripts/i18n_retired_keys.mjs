@@ -387,6 +387,149 @@ export const RETIRED_KEYS = [
   'guide.combat.unstuckBody',
   'guide.commandsPage.unstuck',
   'guide.glossary.unstuckDef',
+  // -- v0.46.0 Professions hub. The Harvest Journal became a tab of the Professions
+  // window and Shift+K no longer ships as a default keybind, so the guide's controls
+  // page dropped its row (the action stays rebindable from the keybind options).
+  'guide.controls.harvestJournal',
+  // -- v0.46.0 menu consolidation. The Book of the Realm, Activities and Social
+  // hubs absorbed these windows' keys (Shift+X, Shift+O, K, U no longer ship as
+  // defaults; Shift+Z and Shift+I name their hubs), and the Event Calendar
+  // window left the game with its I key, so the controls page and the social
+  // page dropped these rows.
+  'guide.controls.deeds',
+  'guide.controls.reliquary',
+  'guide.controls.leaderboard',
+  'guide.controls.calendar',
+  'guide.controls.dungeonFinder',
+  'guide.controls.discord',
+  'guide.social.calendarHeading',
+  'guide.social.calendarBodyDoubleHonor',
+  // -- v0.46.0 menu consolidation, the HUD side. The Event Calendar window left the
+  // game (its guild booking strings live on in the Social Guild tab, so only these
+  // window-only rows retire), the Character sheet lost its Skills, Reputation and
+  // Currencies tabs, and the Groups bell now opens Activities under a successor label.
+  'hudChrome.calendar.close',
+  'hudChrome.calendar.dayAria',
+  'hudChrome.calendar.events.arenaClash.note',
+  'hudChrome.calendar.events.arenaClash.title',
+  'hudChrome.calendar.events.delveDay.note',
+  'hudChrome.calendar.events.delveDay.title',
+  'hudChrome.calendar.events.doubleHonor.note',
+  'hudChrome.calendar.events.doubleHonor.title',
+  'hudChrome.calendar.events.fishingDerby.note',
+  'hudChrome.calendar.events.fishingDerby.title',
+  'hudChrome.calendar.events.marketDay.note',
+  'hudChrome.calendar.events.marketDay.title',
+  'hudChrome.calendar.events.moongateCommunion.note',
+  'hudChrome.calendar.events.moongateCommunion.title',
+  'hudChrome.calendar.events.raidCall.note',
+  'hudChrome.calendar.events.raidCall.title',
+  'hudChrome.calendar.guildOnlyNote',
+  'hudChrome.calendar.keybindLabel',
+  'hudChrome.calendar.nextMonth',
+  'hudChrome.calendar.prevMonth',
+  'hudChrome.charSidebar.crafting',
+  'hudChrome.charSidebar.gathering',
+  'hudChrome.charSidebar.openProfessions',
+  'hudChrome.charSidebar.professions',
+  'hudChrome.charSidebar.reputation',
+  'hudChrome.charSidebar.skills',
+  'hudChrome.charSidebar.stats',
+  'hudChrome.expeditions.bellCount.one',
+  'hudChrome.expeditions.bellCount.other',
+  // -- v0.46.0 menu consolidation, guide prose (the reword-is-a-new-key convention):
+  // each key below described a rail button, a default key, or a window the hubs
+  // absorbed, so its reviewed overlay rows would keep rendering a false fact. The
+  // successor named after each arrow renders in its place, with its five non-Latin
+  // fills in the same change.
+  'guide.interfacePage.keyWindowsBody', // -> keyWindowsBodyHubs (not every window has a rail button)
+  'guide.interfacePage.winCharBody', // -> winCharBodyTwoTabs (two tabs, Cosmetics footer, C docks bags)
+  'guide.interfacePage.winBagsBody', // -> winBagsBodyWallet (the currencies wallet strip)
+  'guide.interfacePage.winProfessionsBody', // -> winProfessionsBodyHub (one tabbed window)
+  'guide.interfacePage.winCraftingBody', // -> winCraftingBodyTab (a tab of Professions)
+  'guide.interfacePage.winDeedsTitle', // -> winRealmTitle (Shift+Z opens the Book of the Realm)
+  'guide.interfacePage.winDeedsBody', // -> winRealmBody (its six tabs)
+  'guide.interfacePage.winSocialBody', // -> winSocialBodyEvents (guild Events, Discord strip)
+  'guide.interfacePage.winFinderTitle', // -> winActivitiesTitle (Shift+I opens Activities)
+  'guide.interfacePage.winFinderBody', // -> winActivitiesBody (its three tabs)
+  'guide.interfacePage.winMoreBodyNoValeCup', // -> winMoreBodyRankings (no K, no I calendar)
+  'guide.interfacePage.wikiBody', // -> wikiBodyGameMenu (no rail button, out of the More tray)
+  'guide.interfacePage.mobileBodyTwoPages', // -> mobileBodyGroupedMore (the grouped More tray)
+  'guide.interfacePage.railBody', // -> railBodyTwelve (the twelve-button rail)
+  'guide.social.emotesBodyNamedTarget', // -> emotesBodyMoreTray (no Emotes rail button)
+  'guide.social.guildBoardBody', // -> guildBoardBodyRankings (no Leaderboard window)
+  'guide.arenaPage.coliseumBody', // -> coliseumBodyActivities (no PvP rail button)
+  'guide.arenaPage.ladderBody', // -> ladderBodyBracketTab (no Leaderboard window)
+  'guide.thornhollowPage.queueBody', // -> queueBodyActivities (no PvP rail button)
+  'guide.factionsPage.readingBody', // -> readingBodyRealm (Reputation left the sheet)
+  'guide.deedsPage.bookBody', // -> bookBodyTitlesTab (Titles is its own tab)
+  'guide.deedsPage.standingsNote', // -> standingsNoteRankings (no Leaderboard window)
+  'guide.reliquaryPage.howBody', // -> howBodyRealmTab (Shift+X is not a default)
+  'guide.glossary.renownDef', // -> renownDefRankings (no Leaderboard window)
+  // -- v0.46.0 menu consolidation, steps 7 and 8. The WOC Store's daily-rewards
+  // body (the spin, tasks, leaderboard and wallet cards that stood in for a
+  // disabled store) is no longer a live feature and left with its views, and the
+  // World Map rail's Available Nearby list became the Quest Log's Available group.
+  'hudChrome.dailyRewards.close',
+  'hudChrome.dailyRewards.disabled',
+  'hudChrome.dailyRewards.disclaimer',
+  'hudChrome.dailyRewards.endsIn',
+  'hudChrome.dailyRewards.error',
+  'hudChrome.dailyRewards.history',
+  'hudChrome.dailyRewards.intro',
+  'hudChrome.dailyRewards.loading',
+  'hudChrome.dailyRewards.noHistory',
+  'hudChrome.dailyRewards.oneVsOneExcluded',
+  'hudChrome.dailyRewards.prize',
+  'hudChrome.dailyRewards.reason.banned',
+  'hudChrome.dailyRewards.reason.bannedUntil',
+  'hudChrome.dailyRewards.reason.eligible',
+  'hudChrome.dailyRewards.reason.no_wallet',
+  'hudChrome.dailyRewards.reason.price_unavailable',
+  'hudChrome.dailyRewards.reason.under_minimum',
+  'hudChrome.dailyRewards.remainingDaysHours',
+  'hudChrome.dailyRewards.remainingHoursMinutes',
+  'hudChrome.dailyRewards.remainingLessThanMinute',
+  'hudChrome.dailyRewards.remainingMinutes',
+  'hudChrome.dailyRewards.reset',
+  'hudChrome.dailyRewards.sol',
+  'hudChrome.dailyRewards.spinButton',
+  'hudChrome.dailyRewards.spinClaimed',
+  'hudChrome.dailyRewards.spinClose',
+  'hudChrome.dailyRewards.spinDialogTitle',
+  'hudChrome.dailyRewards.spinReady',
+  'hudChrome.dailyRewards.spinResult',
+  'hudChrome.dailyRewards.spinTitle',
+  'hudChrome.dailyRewards.taskMultiplier',
+  'hudChrome.dailyRewards.tasks',
+  'hudChrome.dailyRewards.title',
+  'hudChrome.dailyRewards.usd',
+  'hudChrome.dailyRewards.walletConnectBody',
+  'hudChrome.dailyRewards.walletConnectButton',
+  'hudChrome.dailyRewards.walletConnectTitle',
+  'hudChrome.dailyRewards.walletHoldBody',
+  'hudChrome.dailyRewards.walletHoldTitle',
+  'hudChrome.dailyRewards.walletPriceBody',
+  'hudChrome.dailyRewards.walletValue',
+  'hudChrome.mapAtlas.availableNearby',
+  'hudChrome.mapAtlas.noNearbyQuests',
+  // Guide prose for steps 7 and 8 (the reword-is-a-new-key convention): the rail
+  // gained Rewards, the More tray a Rewards group, the Quest Log an Available
+  // group, and the economy page's daily-rewards section left with the feature.
+  'guide.interfacePage.railBodyTwelve',
+  'guide.interfacePage.mobileBodyGroupedMore',
+  'guide.interfacePage.winQuestLogBody',
+  'guide.economy.dailyTitle',
+  'guide.economy.dailyBody',
+  // The Weekly Vault's possible-loot catalog became a content and difficulty
+  // picker over every table a vault can roll; its old per-pool rule lines left
+  // with the clears-only and preview lists they described.
+  'hudChrome.weeklyRewards.selectionPoolRule',
+  'hudChrome.weeklyRewards.previewPoolRule',
+  'hudChrome.weeklyRewards.worldPoolRule',
+  // The Vault's read-only mode (the Dungeon Finder's Vault tab) is gone, and
+  // with it the notice that pointed a read-only viewer at the keeper.
+  'hudChrome.weeklyRewards.previewClaimNotice',
 ];
 
 export const RETIRED_KEY_SET = new Set(RETIRED_KEYS);

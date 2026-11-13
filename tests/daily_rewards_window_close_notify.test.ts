@@ -63,7 +63,7 @@ function rootStub(): HTMLElement {
   } as unknown as HTMLElement;
 }
 
-function makeWindow() {
+function makeWindow(storeEnabled = true) {
   const root = rootStub();
   const onClose = vi.fn();
   const onVisibilityChange = vi.fn();
@@ -75,6 +75,7 @@ function makeWindow() {
     restoreFocus: () => undefined,
     onVisibilityChange,
     onClose,
+    storeEnabled: () => storeEnabled,
   });
   // The async render path is exercised elsewhere; stub it so toggle()/close()
   // drive only the open/closed transitions under test.
@@ -130,6 +131,18 @@ describe('DailyRewardsWindow close notification', () => {
     expect(onVisibilityChange).toHaveBeenCalledTimes(2);
   });
 
+  it('stays shut with no live store: there is no fallback body to show', () => {
+    // The daily spin, tasks and leaderboard body that once stood in for a
+    // disabled store is gone (menu consolidation step 7).
+    const { win, root, onVisibilityChange } = makeWindow(false);
+    win.toggle();
+    expect(win.isOpen).toBe(false);
+    expect(root.style.display).not.toBe('block');
+    expect(onVisibilityChange).not.toHaveBeenCalled();
+    win.openStore('memberships');
+    expect(win.isOpen).toBe(false);
+  });
+
   it('exposes isOpen so the opener can distinguish the toggle direction', () => {
     const { win } = makeWindow();
 
@@ -140,39 +153,5 @@ describe('DailyRewardsWindow close notification', () => {
     expect(win.isOpen).toBe(false);
     win.close();
     expect(win.isOpen).toBe(false);
-  });
-
-  it('renders the disabled state without depending on payout history', async () => {
-    const root = rootStub();
-    root.style.display = 'block';
-    const history = vi.fn(async () => {
-      throw new Error('history unavailable');
-    });
-    const onStatus = vi.fn();
-    const win = new DailyRewardsWindow({
-      root: () => root,
-      world: () =>
-        ({
-          ...worldStub(),
-          dailyRewards: async () => ({
-            ...(await worldStub().dailyRewards()),
-            enabled: false,
-          }),
-          dailyRewardHistory: history,
-        }) as IWorld,
-      closeOthers: () => undefined,
-      captureFocus: () => null,
-      restoreFocus: () => undefined,
-      onStatus,
-    });
-    const paint = vi
-      .spyOn(win as unknown as { paint(view: unknown): void }, 'paint')
-      .mockImplementation(() => undefined);
-
-    await win.render();
-
-    expect(history).not.toHaveBeenCalled();
-    expect(onStatus).toHaveBeenCalledOnce();
-    expect(paint).toHaveBeenCalledWith({ kind: 'disabled' });
   });
 });

@@ -18,7 +18,7 @@ export const arena: GuidePage = {
       <article class="guide-article guide-arena">
         ${pageHeader('guide.arenaPage.heading', 'guide.arenaPage.intro')}
         ${section('guide.arenaPage.duelsHeading', `<p>${esc(t('guide.arenaPage.duelsBody'))}</p>`)}
-        ${section('guide.arenaPage.coliseumHeading', `<p>${esc(t('guide.arenaPage.coliseumBody'))}</p>`)}
+        ${section('guide.arenaPage.coliseumHeading', `<p>${esc(t('guide.arenaPage.coliseumBodyActivities'))}</p>`)}
         ${section(
           'guide.arenaPage.rewardsHeading',
           // Retired and re-keyed at Phase 20 (the wiki completeness audit,
@@ -28,7 +28,7 @@ export const arena: GuidePage = {
           // nightly reset (src/sim/pvp/honor.ts).
           p('guide.arenaPage.rewardsBodyLossShare'),
         )}
-        ${section('guide.arenaPage.ladderHeading', `<p>${esc(t('guide.arenaPage.ladderBody'))}</p>`)}
+        ${section('guide.arenaPage.ladderHeading', `<p>${esc(t('guide.arenaPage.ladderBodyBracketTab'))}</p>`)}
         ${section(
           'guide.arenaPage.honorHeading',
           p('guide.arenaPage.honorBody') +

@@ -1,7 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { decodeWeeklyRewardInfo, sendWeekly } from '../src/net/weekly_rewards_wire';
 import { emptyWeeklyRewards } from '../src/sim/weekly_rewards';
-import { buildWeeklyRewardsView } from '../src/ui/weekly_rewards_view';
 import { bareClient } from './helpers/bare_client';
 
 describe('weekly reward wire', () => {
@@ -107,7 +106,7 @@ describe('weekly reward wire', () => {
       expect(decodeWeeklyRewardInfo({ ...info, playerLevel })).toBeNull();
     expect(decodeWeeklyRewardInfo(null)).toBeNull();
   });
-  it('keeps the current-week boss map through the online decoder and preview', () => {
+  it('keeps the current-week and lifetime boss maps through the online decoder', () => {
     const state = emptyWeeklyRewards(604800000);
     state.bossUnlocks = { morthen: 2, ysolei: 2 };
     state.weeklyBossUnlocks = { ysolei: 2 };
@@ -124,9 +123,7 @@ describe('weekly reward wire', () => {
       ),
     )!;
     expect(info.state.weeklyBossUnlocks).toEqual({ ysolei: 2 });
-    expect(
-      buildWeeklyRewardsView(info, 'mage')[1].pools[1].tables.map((table) => table.id),
-    ).toEqual(['drowned_temple']);
+    expect(info.state.bossUnlocks).toEqual({ morthen: 2, ysolei: 2 });
   });
   it('preserves a delta-omitted ledger and clears it when the keeper gate closes', () => {
     const client = bareClient(1);

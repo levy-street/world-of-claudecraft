@@ -99,7 +99,6 @@ import { svgIcon } from './ui_icons';
 import { unknownItemIconHtml } from './unknown_item_icon';
 import { hasVaultDepositable, vaultSpecialContentKey } from './vault_view';
 import { VAULT_PANEL_ID, VAULT_TAB_ID, VaultTab } from './vault_window';
-import { createWeeklyRewardsTab, type WeeklyRewardsTab } from './weekly_rewards_window';
 
 // Grace before a null bankInfo closes the window: online the bank mirror rides the
 // proximity snapshot, so it can lag the open by about a tick (copies the mailbox's
@@ -223,7 +222,6 @@ export type { BankTabId } from './bank_tabs_view';
 export class BankWindow {
   private opened = false;
   private lastSig = '';
-  private readonly weeklyPane: WeeklyRewardsTab;
   private openerFocus: HTMLElement | null = null;
   private openedAt = 0;
 
@@ -359,8 +357,6 @@ export class BankWindow {
   private rungAnnounceSeq = 0;
 
   constructor(private readonly deps: BankWindowDeps) {
-    this.weeklyPane = createWeeklyRewardsTab(this.deps);
-
     this.guildPane = new GuildBankTab({
       root: () => this.deps.root(),
       world: () => this.deps.world(),
@@ -467,21 +463,14 @@ export class BankWindow {
   // bookkeeping: re-capturing openerFocus could record a node INSIDE this window
   // (returned-to after close, i.e. destroyed), and a fresh render would tear an
   // open prompt down for no reason. Data changes ride refreshIfChanged.
-  open(initialTab?: 'rewards'): void {
-    if (this.opened) {
-      if ((this.tab === 'rewards') !== (initialTab === 'rewards')) {
-        this.tab = initialTab ?? 'personal';
-        this.render();
-      }
-      return;
-    }
-    if (initialTab) this.tab = initialTab;
+  open(): void {
+    if (this.opened) return;
     this.deps.closeOthers();
     this.openerFocus = this.deps.captureFocus();
     this.opened = true;
     this.lastSig = '';
     this.openedAt = performance.now();
-    if (!initialTab) accountBank.request(this.deps.world(), true);
+    accountBank.request(this.deps.world(), true);
     // Reset the one-per-open re-prompt cap on the way IN too: close() alone
     // leaves a refusal that resolved after the close holding the next open's cap.
     this.rungPurchase.resetRepromptCap();
@@ -497,7 +486,6 @@ export class BankWindow {
 
   close(): void {
     if (!this.opened) return;
-    this.weeklyPane.close();
     const el = this.deps.root();
     // A confirm / quantity prompt is a modal CHILD that sets #bank-window inert. The
     // window can be force-closed out from under it (Esc / keybind), a path that never
@@ -600,7 +588,7 @@ export class BankWindow {
       el.inert = false;
     }
     this.deps.hideTooltip();
-    markDialogRoot(el, { label: bankWindowTitle(this.tab) });
+    markDialogRoot(el, { label: bankWindowTitle() });
     // WHICH element scrolls depends on the viewport (bank_chrome_layout_core.ts):
     // the .bank-scroll region normally, the window itself in the short-phone
     // compact regime. Both are recreated or clamped by a rebuild, so both are
@@ -642,12 +630,12 @@ export class BankWindow {
     const vaultAvailable = this.deps.world().vaultInfo != null;
     if (!vaultAvailable && this.tab === 'vault') this.tab = 'personal';
     el.innerHTML =
-      `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(bankWindowTitle(this.tab))} <span class="panel-subtitle ui-win-sub">${this.tab === 'rewards' ? '' : esc(t('hudChrome.bank.subtitle'))}</span></span>` +
+      `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(bankWindowTitle())} <span class="panel-subtitle ui-win-sub">${esc(t('hudChrome.bank.subtitle'))}</span></span>` +
       `<button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hudChrome.bank.close'))}">${svgIcon('close')}</button></div>`;
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
     const accountAvailable = accountBank.available(this.deps.world());
     if (!accountAvailable && this.tab === 'account') this.tab = 'personal';
-    if (this.tab !== 'rewards' && (guildAvailable || vaultAvailable || accountAvailable)) {
+    if (guildAvailable || vaultAvailable || accountAvailable) {
       el.insertAdjacentHTML(
         'beforeend',
         bankTabsHtml(this.tab, {
@@ -674,13 +662,6 @@ export class BankWindow {
     // the pane onto another tab, where its firing would rebuild the whole
     // window for a line nobody can see.
     if (this.tab !== 'vault') this.vaultPane.pauseStatusTimer();
-    if (this.tab !== 'rewards') this.weeklyPane.close();
-    if (this.tab === 'rewards') {
-      this.weeklyPane.renderInto(el);
-      this.restoreScroll(el, prevScroll);
-      if (hadFocus) this.restoreControlFocus(el, focusKey);
-      return;
-    }
     if (this.tab === 'account') {
       accountBank.renderAccountBank(el, this.deps, () => this.render());
       el.querySelector('#bank-tab-account')?.setAttribute('aria-controls', 'account-bank-panel');
@@ -821,14 +802,6 @@ export class BankWindow {
   // player walks away from the banker (the mirror goes null past BANKER_RANGE).
   refreshIfChanged(): void {
     if (!this.opened) return;
-    if (this.tab === 'rewards') {
-      if (
-        !this.weeklyPane.refreshIfChanged(() => this.render()) &&
-        performance.now() - this.openedAt > BANK_INFO_GRACE_MS
-      )
-        this.close();
-      return;
-    }
     const info = this.deps.world().bankInfo;
     if (!info) {
       if (performance.now() - this.openedAt > BANK_INFO_GRACE_MS) this.close();

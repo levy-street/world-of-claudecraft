@@ -489,7 +489,7 @@ function installMobileControlDom(): {
     ['mobile-more', new FakeElement()],
     ['mobile-extra-controls', new FakeElement()],
     ['mobile-emote', new FakeElement()],
-    ['mobile-mounts', new FakeElement()],
+    ['mobile-menu-mount', new FakeElement()],
     ['mobile-discord', new FakeElement()],
     ['mobile-donate', new FakeElement()],
     ['mobile-wiki', new FakeElement()],
@@ -531,7 +531,7 @@ function installMobileControlDom(): {
     moreButton: elements.get('mobile-more')!,
     moreModal: elements.get('mobile-extra-controls')!,
     emoteButton: elements.get('mobile-emote')!,
-    mountButton: elements.get('mobile-mounts')!,
+    mountButton: elements.get('mobile-menu-mount')!,
     discordButton: elements.get('mobile-discord')!,
     donateButton: elements.get('mobile-donate')!,
     wikiButton: elements.get('mobile-wiki')!,
@@ -587,9 +587,16 @@ function mobileCallbacks() {
     onWocMarket: noop,
     onMountToggle: noop,
     onDeeds: noop,
+    onTitles: noop,
+    onReputation: noop,
+    onCardDuel: noop,
+    onCosmetics: noop,
     onReliquary: noop,
+    onRewards: noop,
     onLootExplorer: noop,
     onProfessions: noop,
+    onPerfecting: noop,
+    onHarvestJournal: noop,
     onNameplates: () => false,
     onMusic: () => true,
     onRecenterCamera: noop,
@@ -801,6 +808,25 @@ describe('MobileControls setActive draft survival', () => {
     setInterfaceMode('touch');
     controls.refreshInterfaceMode();
     expect(chatInput.value).toBe('');
+  });
+
+  // The Game Menu's Haptics row (src/ui/game_menu_hooks.ts) reads and flips the
+  // same state the tray button does, and gates on the touch layout being up.
+  it('exposes the touch gate and the one persisted haptics toggle the Game Menu row runs', () => {
+    installMobileControlDom();
+    setInterfaceMode('desktop');
+    const controls = new MobileControls(noopInputForActive(), mobileCallbacks());
+    controls.start();
+    expect(controls.touchActive).toBe(false);
+    setInterfaceMode('touch');
+    controls.refreshInterfaceMode();
+    expect(controls.touchActive).toBe(true);
+    const before = controls.hapticsEnabled;
+    expect(controls.toggleHaptics()).toBe(!before);
+    expect(controls.hapticsEnabled).toBe(!before);
+    expect(controls.toggleHaptics()).toBe(before);
+    expect(controls.hapticsEnabled).toBe(before);
+    setInterfaceMode('auto');
   });
 });
 
@@ -1289,7 +1315,9 @@ describe('MobileControls pointer lifecycle', () => {
     expect(opens).toBe(1);
   });
 
-  it('fires the mount callback when the More-tray Mount button is tapped', () => {
+  // The More tray's Mount tile left with the menu consolidation (a Quick
+  // Actions duplicate); the strip's Mount seat runs the same callback.
+  it('fires the mount callback when the Quick Actions Mount button is tapped', () => {
     const { mountButton } = installMobileControlDom();
     const input = {
       setTouchMove: () => {},

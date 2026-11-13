@@ -1,58 +1,33 @@
 // @vitest-environment jsdom
 import { describe, expect, it } from 'vitest';
 import {
-  dailyRewardsRemainingText,
-  dailyRewardsSummaryHtml,
+  dailyRewardsLoadingHtml,
+  dailyRewardsTitleHtml,
   wocStoreTabsHtml,
 } from '../src/ui/daily_rewards_chrome_view';
-import type { DailyRewardsView } from '../src/ui/daily_rewards_view';
 import { t } from '../src/ui/i18n';
 
-describe('daily reward summary', () => {
-  const resetAt = '2026-08-26T00:00:00.000Z';
-  const reset = Date.parse(resetAt);
-
-  it.each([
-    [reset + 1, 'hudChrome.dailyRewards.remainingLessThanMinute', {}],
-    [reset - 1, 'hudChrome.dailyRewards.remainingMinutes', { minutes: '1' }],
-    [
-      reset - 61 * 60_000,
-      'hudChrome.dailyRewards.remainingHoursMinutes',
-      { hours: '1', minutes: '1' },
-    ],
-  ] as const)('formats the countdown at %s from the supplied clock', (now, key, values) => {
-    expect(dailyRewardsRemainingText(resetAt, now)).toBe(t(key, values));
+// The window is the WOC Store only: the daily spin, tasks and leaderboard body
+// that once stood in for a disabled store is gone (menu consolidation step 7).
+describe('WOC Store shell', () => {
+  it('titles and closes the window as the WOC Store', () => {
+    const host = document.createElement('div');
+    host.innerHTML = dailyRewardsTitleHtml();
+    expect(host.querySelector('#daily-rewards-title')?.textContent).toBe(
+      t('hudChrome.wocStore.title'),
+    );
+    expect(host.querySelector('[data-close]')?.getAttribute('aria-label')).toBe(
+      t('hudChrome.wocStore.close'),
+    );
   });
 
-  it('renders unknown balances and retains the countdown target and eligibility state', () => {
-    const view = {
-      kind: 'ready',
-      locked: true,
-      lockReason: 'no_wallet',
-      status: {
-        resetAt,
-        prizePoolSol: null,
-        prizePoolUsd: 0,
-        score: 12,
-        eligibility: { reason: 'no_wallet', usdValue: null },
-      },
-    } as Extract<DailyRewardsView, { kind: 'ready' }>;
+  it('opens on the Store tabpanel with a decorative spinner', () => {
     const host = document.createElement('div');
-    host.innerHTML = dailyRewardsSummaryHtml(view, reset);
-    expect(
-      host
-        .querySelector('[data-daily-rewards-countdown]')
-        ?.getAttribute('data-daily-rewards-countdown'),
-    ).toBe(resetAt);
-    expect(host.querySelector('[data-daily-rewards-countdown]')?.textContent).toBe(
-      t('hudChrome.dailyRewards.endsIn', {
-        time: t('hudChrome.dailyRewards.remainingLessThanMinute'),
-      }),
-    );
-    expect(host.querySelectorAll('strong')[0].textContent).toBe(
-      t('hudChrome.dailyRewards.unknown'),
-    );
-    expect(host.querySelector('.dr-lock')).not.toBeNull();
+    host.innerHTML = dailyRewardsLoadingHtml();
+    const panel = host.querySelector('#woc-store-panel');
+    expect(panel?.getAttribute('role')).toBe('tabpanel');
+    expect(panel?.getAttribute('aria-labelledby')).toBe('woc-store-tab-store');
+    expect(panel?.querySelector('.cl-loading')?.getAttribute('aria-hidden')).toBe('true');
   });
 });
 

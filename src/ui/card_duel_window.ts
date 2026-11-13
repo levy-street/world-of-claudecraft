@@ -11,6 +11,7 @@ import type { IWorld } from '../world_api';
 import { buildCardDuelView, type CardDuelViewModel } from './card_duel_view';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
+import type { WindowHubStrip } from './hud/hub/window_hub_controller';
 import { formatNumber, t } from './i18n';
 import { svgIcon } from './ui_icons';
 
@@ -20,6 +21,9 @@ export interface CardDuelWindowDeps {
   closeOthers(): void;
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
+  /** The Activities strip (menu consolidation step 4), painted under the
+   *  title bar while this window is one of the hub's tabs. */
+  hubStrip?: WindowHubStrip;
 }
 
 export class CardDuelWindow {
@@ -30,6 +34,16 @@ export class CardDuelWindow {
 
   get isOpen(): boolean {
     return this.deps.root().style.display === 'block';
+  }
+
+  /** The root a hub tab switch carries its position onto. */
+  rootElement(): HTMLElement {
+    return this.deps.root();
+  }
+
+  /** Show the window (the Activities tab); already shown: nothing to do. */
+  open(): void {
+    if (!this.isOpen) this.toggle();
   }
 
   toggle(): void {
@@ -76,6 +90,7 @@ export class CardDuelWindow {
     this.lastSig = sig;
     const el = this.deps.root();
     el.innerHTML = this.html(view);
+    this.deps.hubStrip?.wire(el);
     this.wire(el, world);
   }
 
@@ -123,9 +138,11 @@ export class CardDuelWindow {
         `<div class="cd-counts ui-meta ui-muted ui-num">${counts}</div>` +
         forfeitBtn;
     }
+    const hub = this.deps.hubStrip;
     return (
-      `<div class="panel-title ui-win-head"><span id="card-duel-title" class="ui-win-title">${esc(t('cardDuel.title'))}</span>` +
-      `<button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('cardDuel.close'))}">${svgIcon('close')}</button></div>` +
+      `<div class="panel-title ui-win-head"><span id="card-duel-title" class="ui-win-title">${esc(hub ? hub.title() : t('cardDuel.title'))}</span>` +
+      `<button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(hub ? hub.closeLabel() : t('cardDuel.close'))}">${svgIcon('close')}</button></div>` +
+      (hub?.html() ?? '') +
       `<div class="cd-body">${body}</div>`
     );
   }

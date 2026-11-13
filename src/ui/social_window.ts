@@ -36,9 +36,16 @@ import { PRESENCE_MODES, type PresenceMode } from '../world_api/social_graph';
 import { formatCount } from './count_format';
 import { deedTitleText } from './deed_i18n';
 import { markDialogRoot } from './dialog_root';
+import { discordPresence, discordStatus, onDiscordStatusChange } from './discord_status';
 import { classDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { captureFormDraft, restoreFormDraft } from './form_draft';
+import {
+  canManageGuildEvents,
+  isoDayOf,
+  parseGuildEventDraft,
+  upcomingGuildEvents,
+} from './guild_events_view';
 import { loadGuildHideOffline, saveGuildHideOffline } from './guild_hide_offline';
 import {
   addGuildRank,
@@ -56,6 +63,7 @@ import { classColorCss } from './inspect_view';
 import { bindMobileFrameLongPress } from './mobile_frame_long_press';
 import { moneyHtml } from './money_html';
 import { localizeZone } from './server_i18n';
+import { buildSocialDiscordStrip } from './social_discord_strip_view';
 import {
   type SocialRowPlayer,
   socialRowMenuPoint,
@@ -147,6 +155,10 @@ const WHO_RETRY_SLOW_TICKS = 4;
 export interface SocialWindowDeps {
   /** The #social-window root (Hud owns the id; the painter stays instance-parameterized). */
   root(): HTMLElement;
+  /** The action that opens the full Discord panel (menu consolidation step 5:
+   *  the Discord strip at the foot of the window), or null on a build with
+   *  Discord off, which hides the strip. Read at paint time. */
+  discordHook?(): (() => void) | null;
   /** The live world (offline Sim or online ClientWorld mirror). */
   world(): IWorld;
   /** Close the other managed windows when this one opens. */
@@ -489,7 +501,11 @@ export class SocialWindow {
   private whoSeen: WhoRosterInfo | null = null;
   private whoAnswerSeq = 0;
 
-  constructor(private readonly deps: SocialWindowDeps) {}
+  constructor(private readonly deps: SocialWindowDeps) {
+    // The strip follows the Discord status and presence pushes on its own,
+    // repainting only itself (never the roster under a reading player).
+    onDiscordStatusChange(() => this.refreshDiscordStrip());
+  }
 
   get isOpen(): boolean {
     return this.deps.root().classList.contains('open');
@@ -755,8 +771,10 @@ export class SocialWindow {
       // The raid tab has no footer; the pledges and ranks tabs' actions all
       // live in the body (their editors + per-row decisions), so they take
       // none either.
-      (tab === 'raid' || tab === 'pledges' || tab === 'ranks' ? '' : online ? this.footer() : '');
+      (tab === 'raid' || tab === 'pledges' || tab === 'ranks' ? '' : online ? this.footer() : '') +
+      `<div class="soc-discord-strip"></div>`;
     this.wireChrome(el);
+    this.refreshDiscordStrip();
     // Delegate every row action to ONE listener on the persistent body, so a
     // content refresh (innerHTML swap) never re-attaches per-row handlers.
     const body = el.querySelector('.soc-body') as HTMLElement | null;
@@ -839,7 +857,7 @@ export class SocialWindow {
     }[] = [];
     for (const prev of Array.from(
       body.querySelectorAll<HTMLInputElement>(
-        'input[data-field="gmotd"], .soc-pledge-settings input[data-field], .soc-ranks input[data-field]',
+        'input[data-field="gmotd"], .soc-pledge-settings input[data-field], .soc-ranks input[data-field], .soc-guild-events input[data-field]',
       ),
     )) {
       const isCheckbox = prev.type === 'checkbox';
@@ -950,6 +968,15 @@ export class SocialWindow {
     }
     if (node.dataset.act === 'gmotd-save') {
       this.saveBillboard();
+      return;
+    }
+    if (node.dataset.act === 'guild-event-add') {
+      this.addGuildEvent();
+      return;
+    }
+    if (node.dataset.act === 'guild-event-del') {
+      const id = Number(node.dataset.event);
+      if (Number.isFinite(id)) this.deps.world().guildEventRemove(id);
       return;
     }
     if (node.dataset.act === 'pledge-settings-save') {
@@ -1260,7 +1287,95 @@ export class SocialWindow {
           : guildMemberRowHtml(item.row, now),
       )
       .join('');
-    return head + this.billboardHtml(g) + toggle + body;
+    return head + this.billboardHtml(g) + this.guildEventsHtml() + toggle + body;
+  }
+
+  // Guild events (menu consolidation step 4): the upcoming booked events,
+  // soonest first, plus the booking form for ranks holding the events
+  // permission. Event titles and notes are player text, escaped like the
+  // billboard. The form inputs carry data-field so a slow-band body refresh
+  // keeps a half-typed booking (the draft carry below).
+  private guildEventsHtml(): string {
+    const guild = this.deps.world().socialInfo?.guild ?? null;
+    if (!guild) return '';
+    const today = isoDayOf(Date.now());
+    const manage = canManageGuildEvents(guild);
+    const events = upcomingGuildEvents(guild.events, today);
+    if (events.length === 0 && !manage) return '';
+    const rows = events
+      .map((ev) => {
+        const date = formatDateTime(new Date(`${ev.day}T00:00:00Z`), {
+          dateStyle: 'medium',
+          timeZone: 'UTC',
+        });
+        const when =
+          ev.hour === null
+            ? t('hudChrome.calendar.allDay')
+            : formatDateTime(new Date(Date.UTC(1970, 0, 1, ev.hour)), {
+                hour: 'numeric',
+                minute: '2-digit',
+                timeZone: 'UTC',
+              });
+        return (
+          `<div class="cal-event guild ui-card"><span class="cal-dot guild"></span>` +
+          `<span class="cal-event-text"><span class="cal-event-title">${esc(ev.title)} <span class="cal-event-when">${esc(t('hudChrome.social.guildEvents.when', { date, time: when }))}</span></span>` +
+          (ev.note ? `<span class="cal-event-note">${esc(ev.note)}</span>` : '') +
+          (ev.createdBy
+            ? `<span class="cal-event-by">${esc(t('hudChrome.calendar.bookedBy', { name: ev.createdBy }))}</span>`
+            : '') +
+          `</span>` +
+          (manage
+            ? `<button type="button" class="cal-event-del ui-icon-btn" data-act="guild-event-del" data-event="${ev.id}" aria-label="${esc(t('hudChrome.calendar.deleteAria', { title: ev.title }))}">${svgIcon('close')}</button>`
+            : '') +
+          `</div>`
+        );
+      })
+      .join('');
+    const empty =
+      events.length === 0
+        ? `<div class="cal-empty">${esc(t('hudChrome.calendar.noEvents'))}</div>`
+        : '';
+    const form = manage
+      ? `<div class="cal-form ui-card">` +
+        `<span class="cal-form-title">${esc(t('hudChrome.calendar.bookTitle'))}</span>` +
+        `<input class="ui-input" type="text" maxlength="48" data-field="gev-title" placeholder="${esc(t('hudChrome.calendar.titlePlaceholder'))}" aria-label="${esc(t('hudChrome.calendar.titlePlaceholder'))}">` +
+        `<input class="ui-input" type="text" maxlength="160" data-field="gev-note" placeholder="${esc(t('hudChrome.calendar.notePlaceholder'))}" aria-label="${esc(t('hudChrome.calendar.notePlaceholder'))}">` +
+        `<div class="cal-form-row"><label>${esc(t('hudChrome.social.guildEvents.dateLabel'))} <input class="ui-input" type="date" min="${today}" value="${today}" data-field="gev-day"></label>` +
+        `<label>${esc(t('hudChrome.calendar.hourLabel'))} <input class="ui-input" type="number" min="0" max="23" data-field="gev-hour" placeholder="${esc(t('hudChrome.calendar.hourAllDay'))}"></label>` +
+        `<button type="button" class="cal-add-btn ui-btn ui-btn--red" data-act="guild-event-add">${esc(t('hudChrome.calendar.addButton'))}</button></div>` +
+        `</div>`
+      : '';
+    return (
+      `<section class="soc-guild-events ui-card" aria-label="${esc(t('hudChrome.social.guildEvents.heading'))}">` +
+      `<div class="soc-billboard-label">${esc(t('hudChrome.social.guildEvents.heading'))}</div>` +
+      rows +
+      empty +
+      form +
+      `</section>`
+    );
+  }
+
+  /** Book the form's event, or report bad input; the server answers with a
+   *  calendarResult the Hud logs. */
+  private addGuildEvent(): void {
+    const root = this.deps.root();
+    const field = (name: string) =>
+      root.querySelector<HTMLInputElement>(`.soc-guild-events input[data-field="${name}"]`)
+        ?.value ?? '';
+    const draft = parseGuildEventDraft(
+      {
+        day: field('gev-day'),
+        hour: field('gev-hour'),
+        title: field('gev-title'),
+        note: field('gev-note'),
+      },
+      isoDayOf(Date.now()),
+    );
+    if (!draft.ok) {
+      this.setNotice(t('hudChrome.calendar.result.badInput'), true);
+      return;
+    }
+    this.deps.world().guildEventCreate(draft.day, draft.hour, draft.title, draft.note);
   }
 
   // The guild billboard: the officer-set message pinned between the guild head
@@ -1469,6 +1584,40 @@ export class SocialWindow {
       })
       .join('');
     return `${head}<div class="soc-who-list" role="table" aria-label="${esc(t('hudChrome.social.who.tab'))}">${header}${body}</div>`;
+  }
+
+  /** Paint the Discord strip in place: link state, the online count, the
+   *  voice room, and the button that opens the full panel. Hidden when the
+   *  build has no Discord entry. */
+  private refreshDiscordStrip(): void {
+    const strip = this.deps.root().querySelector<HTMLElement>('.soc-discord-strip');
+    if (!strip) return;
+    const view = buildSocialDiscordStrip({
+      enabled: (this.deps.discordHook?.() ?? null) !== null,
+      status: discordStatus(),
+      presence: discordPresence(),
+    });
+    strip.hidden = !view.visible;
+    if (!view.visible) {
+      strip.innerHTML = '';
+      return;
+    }
+    const who =
+      view.username !== null
+        ? t('hudChrome.discord.linkedAs', { name: view.username })
+        : t('hudChrome.discord.cta.statsLoading');
+    const online = t('hudChrome.discord.online', { count: formatNumber(view.onlineCount) });
+    const voice =
+      view.voiceChannel !== null
+        ? ` <span class="soc-discord-voice">${esc(t('hudChrome.social.guildEvents.discordVoice', { channel: view.voiceChannel, count: formatNumber(view.voiceCount) }))}</span>`
+        : '';
+    strip.innerHTML =
+      `<span class="soc-discord-icon" aria-hidden="true">${svgIcon('discord')}</span>` +
+      `<span class="soc-discord-text"><span class="soc-discord-who">${esc(who)}</span> <span class="soc-discord-online">${esc(online)}</span>${voice}</span>` +
+      `<button type="button" class="ui-btn soc-discord-open" data-open-discord>${esc(t('hudChrome.discord.open'))}</button>`;
+    strip.querySelector('[data-open-discord]')?.addEventListener('click', () => {
+      this.deps.discordHook?.()?.();
+    });
   }
 
   // The add/action row changes with the tab (and guild membership). Inputs

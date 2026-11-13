@@ -121,6 +121,29 @@ export function canTakeFocus(el: HTMLElement | null): el is HTMLElement {
   return Boolean(el?.isConnected && el.getClientRects().length > 0);
 }
 
+// How many window-to-window handoffs are running (withSynchronousFocusReturn).
+// Module-level so the tab group that switches windows needs no manager handle:
+// every window on the page returns focus through restore() below.
+let synchronousReturnDepth = 0;
+
+/**
+ * Run a window-to-window handoff: `run` closes one window so another can open
+ * in its place (a hub tab switch). While it runs, restore() returns focus AT
+ * ONCE instead of a tick later, for two reasons. The window about to open reads
+ * the active element to record its opener, so the closing window's opener has
+ * to hold focus by then, or the new window records nothing and Escape from it
+ * returns nowhere. And a deferred return would land AFTER the new window took
+ * focus and pull the keyboard back out of it.
+ */
+export function withSynchronousFocusReturn(run: () => void): void {
+  synchronousReturnDepth++;
+  try {
+    run();
+  } finally {
+    synchronousReturnDepth--;
+  }
+}
+
 export class FocusManager {
   private readonly stack: TrapState[] = [];
   private listening = false;
@@ -138,7 +161,8 @@ export class FocusManager {
 
   /**
    * Return focus to target (or fallback), matching the old Hud.restoreFocus: deferred
-   * a tick so it wins over a close handler that is still settling the DOM.
+   * a tick so it wins over a close handler that is still settling the DOM. Inside a
+   * window-to-window handoff (withSynchronousFocusReturn) it runs at once instead.
    */
   restore(target: HTMLElement | null, fallback?: HTMLElement | null): void {
     const resolvedFallback = fallback ?? null;
@@ -148,7 +172,8 @@ export class FocusManager {
         ? resolvedFallback
         : null;
     if (!candidate) return;
-    window.setTimeout(() => candidate.focus(), 0);
+    if (synchronousReturnDepth > 0) candidate.focus();
+    else window.setTimeout(() => candidate.focus(), 0);
   }
 
   /**

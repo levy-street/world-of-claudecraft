@@ -6,15 +6,42 @@ import {
   WEEKLY_BOSS_TABLES,
   weeklyAvailableBossTables,
 } from './weekly_reward_tables';
-import { type WeeklyChoice, type WeeklyVaultBatch, weeklyLootPool } from './weekly_rewards';
+import {
+  type WeeklyChoice,
+  type WeeklyPoolId,
+  type WeeklyVaultBatch,
+  weeklyLootPool,
+} from './weekly_rewards';
 
 export interface WeeklyRewardTableOption {
+  /** The selection key: the source id, plus the Normal marker on an alternative. */
   id: string;
   kind: 'mob' | 'dungeon' | 'pool';
   items: string[];
+  /** Set only on the Normal table a Heroic vault may roll instead of its own. */
+  difficulty?: 'normal';
 }
 
-export const WEEKLY_TABLE_SELECTION_LIMIT = WEEKLY_BOSS_TABLES.length + 2;
+// A Heroic vault offers every boss table twice: at the earned difficulty under
+// the bare source id, and at Normal under the same id plus this marker.
+const NORMAL_TABLE_SUFFIX = ':normal';
+
+/** The Normal pool a Heroic vault may roll instead; undefined for every other pool. */
+export function weeklyNormalPool(pool: WeeklyPoolId): WeeklyPoolId | undefined {
+  return pool === 'raid_heroic' ? 'raid' : pool === 'dungeon_heroic' ? 'dungeon' : undefined;
+}
+
+export function isWeeklyNormalTableId(id: string): boolean {
+  return id.endsWith(NORMAL_TABLE_SUFFIX);
+}
+
+/** The boss or dungeon id behind a table id, with the Normal marker removed. */
+export function weeklyTableSourceId(id: string): string {
+  return isWeeklyNormalTableId(id) ? id.slice(0, -NORMAL_TABLE_SUFFIX.length) : id;
+}
+
+// Every boss table at both difficulties, plus the two pool tables.
+export const WEEKLY_TABLE_SELECTION_LIMIT = WEEKLY_BOSS_TABLES.length * 2 + 2;
 export const WEEKLY_REWARD_MAX_LEVEL_OFFSET = 3;
 
 /** Validate the bounded request before building collections or reading loot. */
@@ -32,8 +59,12 @@ export function weeklyTableSource(
 ): Pick<WeeklyRewardTableOption, 'id' | 'kind'> | undefined {
   if (typeof id !== 'string' || id.length > 128) return undefined;
   if (id === 'world' || id === 'pvp') return { id, kind: 'pool' };
-  if (WEEKLY_BOSS_TABLES.some((table) => table.bossId === id)) return { id, kind: 'mob' };
-  if (WEEKLY_BOSS_TABLES.some((table) => table.category === 'dungeon' && table.dungeonId === id))
+  // A Normal alternative keeps its marked id, so the saved source stays exact.
+  const sourceId = weeklyTableSourceId(id);
+  if (WEEKLY_BOSS_TABLES.some((table) => table.bossId === sourceId)) return { id, kind: 'mob' };
+  if (
+    WEEKLY_BOSS_TABLES.some((table) => table.category === 'dungeon' && table.dungeonId === sourceId)
+  )
     return { id, kind: 'dungeon' };
   return undefined;
 }
@@ -48,7 +79,7 @@ export function weeklyItemWithinLevel(itemId: string, level: number): boolean {
   );
 }
 
-/** Dungeon options include only cleared bosses at the earned difficulty. */
+/** Dungeon options include only cleared bosses; a Heroic vault lists both difficulties. */
 export function weeklyRewardTableOptions(
   batch: WeeklyVaultBatch,
   choice: WeeklyChoice,
@@ -69,8 +100,35 @@ export function weeklyFilterTablesByLevel(tables: WeeklyRewardTableOption[], lev
   });
 }
 
-/** Unreserved, class-compatible candidates before the current equip-level boundary. */
+/**
+ * Unreserved, class-compatible candidates before the current equip-level boundary.
+ * A Heroic vault also offers the Normal table of every boss it could roll on a
+ * Normal vault, so the player picks the difficulty; a Normal vault never offers
+ * Heroic tables.
+ */
 export function weeklyRewardTableCandidates(
+  batch: WeeklyVaultBatch,
+  choice: WeeklyChoice,
+  cls: PlayerClass,
+  lootSpec?: string,
+): WeeklyRewardTableOption[] {
+  const earned = weeklyPoolTableCandidates(batch, choice, cls, lootSpec);
+  const normalPool = weeklyNormalPool(choice.pool);
+  if (!normalPool) return earned;
+  return [
+    ...earned,
+    ...weeklyPoolTableCandidates(batch, { ...choice, pool: normalPool }, cls, lootSpec).map(
+      (table): WeeklyRewardTableOption => ({
+        ...table,
+        id: `${table.id}${NORMAL_TABLE_SUFFIX}`,
+        difficulty: 'normal',
+      }),
+    ),
+  ];
+}
+
+/** The candidates of exactly the choice's own pool, at that pool's difficulty. */
+export function weeklyPoolTableCandidates(
   batch: WeeklyVaultBatch,
   choice: WeeklyChoice,
   cls: PlayerClass,

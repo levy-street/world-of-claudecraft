@@ -544,6 +544,10 @@ export const pl_PL: EnTranslations = {
         "one": "Otwarte grupy: {count} powiadomienie",
         "other": "Otwarte grupy: powiadomienia: {count}"
       },
+      "activitiesBellCount": {
+        "one": "Open Activities: {count} notification",
+        "other": "Open Activities: {count} notifications"
+      },
       "alerts": "Powiadomienia",
       "groups": "Grupy",
       "rewards": "Nagrody",
@@ -813,6 +817,12 @@ export const pl_PL: EnTranslations = {
       "poolRule": "Każdy wymieniony przedmiot ma równe szanse. Przedmioty pasują do ograniczeń twojej klasy. Pokonane rajdy odblokowują ich łup na tej trudności. Legendarne przedmioty są wykluczane.",
       "selectionPoolRule": "Dla rajdów i lochów wybierz jedną lub więcej tabel przed otwarciem. Tabele lochów łączą szefów, których pokonałeś na tej trudności. Losowania nie zawierają duplikatów, legendarne przedmioty i sprzętu wymagającego więcej niż {maxLevelOffset} poziomów powyżej twojego poziomu.",
       "previewPoolRule": "Wszystkie tabele, z których mogą losować te skarbce. Pokonanie bossa na stałe odblokowuje jego łupy dla przyszłych skarbców. Tabela lochu obejmuje tylko pokonanych bossów, a zabicie na heroicznym odblokowuje też normalny. Losowania wykluczają już wylosowane przedmioty. Wyposażenie wymagające poziomu wyższego od twojego o więcej niż {maxLevelOffset} nie jest pokazywane.",
+      "catalogContent": "Content",
+      "catalogDifficulty": "Difficulty",
+      "catalogBossRule": "Every table a vault of this kind can roll, for your class and loot focus. When you open one, you choose from the bosses you defeated that week at this difficulty (a Heroic kill also unlocks Normal), and rolls exclude duplicates, legendary items and equipment requiring more than {maxLevelOffset} levels above your level.",
+      "catalogWorldRule": "Normal Nythraxis equipment for your class and loot focus. No raid clears required. Rolls exclude duplicates and equipment requiring more than {maxLevelOffset} levels above your level.",
+      "catalogPvpRule": "WARFARE equipment for your class and loot focus. Every listed item has an equal chance, and rolls exclude duplicates and equipment requiring more than {maxLevelOffset} levels above your level.",
+      "catalogEmpty": "Nothing in this loot fits your class.",
       "rare": "Rzadki",
       "epic": "Epicki",
       "unavailable": "Niedostępne",
@@ -1839,6 +1849,7 @@ export const pl_PL: EnTranslations = {
       "chat": "Przejdź do czatu"
     },
     "mobile": {
+      "groupRecord": "Record",
       "jump": "Skok",
       "leaderboard": "Rankingi",
       "dailyRewards": "Sklep",
@@ -2744,6 +2755,10 @@ export const pl_PL: EnTranslations = {
       "clickMoveRight": "Prawy przycisk",
       "version": "v{version} ({build})",
       "overlays": "Nakładki",
+      "settings": "Settings",
+      "settingsCategories": "Settings categories",
+      "helpWiki": "Help and Wiki",
+      "nameplates": "Nameplates",
       "browserEffects": "Efekty przeglądarki",
       "browserEffectsAuto": "Auto",
       "browserEffectsFull": "Pełne",
@@ -3606,6 +3621,7 @@ export const pl_PL: EnTranslations = {
       }
     },
     "currencies": {
+      "walletChipAria": "{name}: {amount}",
       "intro": "Żadne z nich nie zajmuje miejsca w plecaku. Monety zostają w plecaku jak zawsze.",
       "activities": "Zajęcia",
       "factions": "Frakcje",
@@ -3704,6 +3720,8 @@ export const pl_PL: EnTranslations = {
       "tierReachedLine": "Jesteś teraz {tier} z {faction}. Twój tytuł frakcji to teraz {title}."
     },
     "questLog": {
+      "available": "Available",
+      "offerMeta": "{zone} · {level}",
       "completed": "Zakończony",
       "zoneSummary": "{count} ({ready} gotowy)",
       "shiftHint": "Kliknij zadanie, przytrzymując klawisz Shift, aby połączyć je na czacie."
@@ -6032,6 +6050,12 @@ export const pl_PL: EnTranslations = {
         "none": "Nikt",
         "title": "Kto cię widzi jako online na listach przyjaciół i w rostrze gildii, twoją strefę i pozycję na mapie. Twoja drużyna cię zawsze widzi."
       },
+      "guildEvents": {
+        "heading": "Guild events",
+        "dateLabel": "Date",
+        "when": "{date}, {time}",
+        "discordVoice": "In {channel} ({count})"
+      },
       "billboard": {
         "label": "Tablica ogłoszeń gildii",
         "empty": "Na tablicy ogłoszeń nic jeszcze nie ma.",
@@ -6354,6 +6378,31 @@ export const pl_PL: EnTranslations = {
       "armorKitUse": "Użycie: Wzmacnia twój pancerz klatki piersiowej, zwiększając Pancerz o 12 na 1 godzinę.",
       "sharpeningStoneUse": "Użycie: Ostrzy twoją główną broń, zwiększając Moc Ataku o 6 na 30 min.",
       "manaElixirUse": "Użycie: Zwiększa Ducha o 6 na 1 godzinę."
+    },
+    "professionsHub": {
+      "tabOverview": "Overview"
+    },
+    "activities": {
+      "title": "Activities",
+      "close": "Close Activities",
+      "tabDungeons": "Dungeons and Raids",
+      "tabPvp": "PvP"
+    },
+    "rewards": {
+      "title": "Rewards",
+      "close": "Close Rewards",
+      "tabVault": "Vault",
+      "tabWeekly": "Weekly Quest",
+      "tabWorldQuests": "World Quests",
+      "weeklyPickAt": "Choose your quest with the emissary in {zone}."
+    },
+    "bookOfRealm": {
+      "title": "Book of the Realm",
+      "close": "Close the Book of the Realm",
+      "tabDeeds": "Deeds",
+      "tabTitles": "Titles",
+      "tabReputation": "Reputation",
+      "tabRankings": "Rankings"
     },
     "professions": {
       "title": "Zawody",
@@ -7591,6 +7640,7 @@ export const pl_PL: EnTranslations = {
       "distance": "{distance} jardów",
       "showRoute": "Pokaż trasę",
       "untrack": "Nieśledzone",
+      "openQuestLog": "Open Quest Log",
       "track": "Ścieżka",
       "worldQuests": {
         "heading": "Globalne misje na dzisiaj",
@@ -9687,31 +9737,45 @@ export const pl_PL: EnTranslations = {
       "chatBody": "Lewy dolny róg. Naciśnij Enter, aby zacząć pisać, i ponownie Enter, aby wysłać.\n\nDwie zakładki są tam zawsze: Czat, połączony zapis wszystkiego, co mówi się wokół ciebie, oraz Walka, pisemny zapis twoich starć. Przycisk plusa dodaje kolejne, po jednej na kanał: Mów, Krzycz, Drużyna, Ogólny, Świat, LFG, Gildia i Oficer, a do tego zakładkę Szept, która zbiera w jednym miejscu każdy szept, który wysyłasz i odbierasz. Pisanie w zakładce kanału wysyła wiadomość na ten kanał bez ponownego wpisywania komendy.\n\nCałe okno można przeciągnąć w inne miejsce i zmienić jego rozmiar, a ono zapamiętuje, gdzie je zostawiłeś.",
       "keyWindowsTitle": "Okna otwierane klawiszem",
       "keyWindowsBody": "Każde z nich ma domyślny klawisz i przycisk w szynie w prawym dolnym rogu. Naciśnij ten klawisz ponownie albo Esc, aby je zamknąć.",
+      "keyWindowsBodyHubs": "Each of these has a default key, and most also have a button in the rail in the bottom right corner. Several are tabbed windows that gather related panels together, and a key can open one straight onto its tab. Press the key again, or Esc, to close it.",
       "winCharTitle": "Ekran postaci (C)",
       "winCharBody": "Twój założony ekwipunek po jednej stronie, twoje atrybuty i statystyki, które one zasilają, po drugiej, z dymkiem przy każdej wartości, mówiącym, co ona daje twojej klasie. Znajdziesz tam też swój łączny Czas gry, z małym okiem obok, które ukrywa liczbę, gdy wolisz jej nie pokazywać, oraz przycisk, który tworzy twoją kartę gracza.",
+      "winCharBodyTwoTabs": "Two tabs, Character and Progression. Character shows your equipped gear on one side, your attributes and the stats they feed on the other, with a tooltip on every value that says what it does for your class. The sheet also carries your lifetime Time Played, with a small eye beside it that hides the number when you would rather not show it, and its footer holds the Cosmetics button and the button that composes your player card. On desktop, C opens your bags docked beside the sheet, so gear can be dragged straight onto your character.",
       "winBagsTitle": "Torby (B)",
       "winBagsBody": "Wszystko, co niesiesz, w jednym plecaku z czterema gniazdami na torby. Kategorie na górze zawężają widok do broni, pancerza, materiałów zużywalnych, materiałów, narzędzi, przedmiotów zadań albo wierzchowców, a pole wyszukiwania filtruje po nazwie. Lista rozwijana sortowania układa to, na co patrzysz, według najnowszych, jakości lub nazwy, a ten wybór jest zapamiętywany między sesjami. Osobny przycisk Sortuj porządkuje jednym kliknięciem prawdziwe komórki plecaka, czyszcząc kategorie i wyszukiwanie, więc widzisz cały uporządkowany plecak.",
+      "winBagsBodyWallet": "Everything you are carrying, in one pack with four bag sockets. Category chips across the top narrow it to weapons, armor, consumables, materials, tools, quest items, or mounts, and a search box filters by name. A sort dropdown reorders what you are looking at by most recent, quality, or name, and that choice is remembered between sessions. A separate Sort button tidies the real cells of the pack in one press, clearing the chips and the search so you see the whole tidied bag. Under the grid, a wallet strip shows the other currencies you hold, Honor and the marks you earn among them, each as a small chip with its count.",
       "winSpellbookTitle": "Księga zaklęć (P)",
       "winSpellbookBody": "Każda umiejętność twojej klasy, nauczona i wciąż przed tobą, w kolejności. To tu przeciągasz umiejętności na swoje paski akcji.",
       "winTalentsTitle": "Talenty (N)",
       "winTalentsBody": "Tu wybierasz swoją specjalizację oraz przechodzisz przez sześć rzędów talentów, z trzema opcjami do wyboru w każdym i opisem działania każdej z nich. Rzędy, do których jeszcze nie doszedłeś, widnieją obok tych, które możesz wybrać już teraz.",
       "winProfessionsTitle": "Profesje (Shift+P)",
       "winProfessionsBody": "Czego się nauczyłeś, jak biegły jesteś w każdym z zawodów i jak daleko każdy z nich może jeszcze zajść.",
+      "winProfessionsBodyHub": "One tabbed window for your trades. Overview shows what you have learned, how skilled you are at each, and how far each one can still go; Crafting, Perfecting, and the Harvest Journal sit beside it as tabs of the same window.",
       "winCraftingTitle": "Wytwarzanie (T)",
       "winCraftingBody": "Twoje przepisy, co każdy z nich wymaga i co możesz teraz wytworzyć z tego, co niesiesz.",
+      "winCraftingBodyTab": "The Crafting tab of the Professions window, which T opens directly: your recipes, what each one needs, and what you can make right now with what you are carrying.",
       "winQuestLogTitle": "Dziennik zadań (L)",
       "winQuestLogBody": "Każde zadanie, które przyjąłeś, jego historia, cele i twój postęp, z możliwością pokazania dowolnego z nich na mapie oraz wyboru, które zadania ma śledzić panel śledzenia zadań.",
+      "winQuestLogBodyAvailable": "Every quest you have taken, its story, its objectives, and your progress, with a way to show any of it on the map and to pick which quests your tracker follows. An Available group lists the quests on offer near you, each with a way to show its quest giver on the map.",
       "winDeedsTitle": "Księga Czynów (Shift+Z)",
       "winDeedsBody": "Zapis tego, czego dokonałeś, tytuły i Renoma, które ci to przyniosło, oraz to, co wciąż jest otwarte.",
+      "winRealmTitle": "Book of the Realm (Shift+Z)",
+      "winRealmBody": "Your permanent record, in one tabbed window. Deeds holds what you have done, the Renown it has paid you, and what is still open; Titles is where you pick the title you wear and the border that frames your nameplate; and The Reliquary, Reputation, the Loot Explorer, and Rankings, the realm standings, each have a tab of their own.",
+      "winRewardsTitle": "Rewards",
+      "winRewardsBody": "What you can claim, in one tabbed window behind the Rewards button in the rail, which shows a count when something is waiting. Vault is the Weekly Vault, whose rolls open at the Vault keeper; Weekly Quest shows the emissary's four offers, though you choose one by speaking to the emissary; and World Quests is today's board, with a way to show each quest on the map and the one replacement you get each day.",
       "winSocialTitle": "Znajomi i gildia (O)",
       "winSocialBody": "Zakładki dla twoich znajomych, twojej gildii i jej składu, twojego rajdu oraz graczy, których zignorowałeś lub zablokowałeś.",
+      "winSocialBodyEvents": "Tabs for your friends, your guild and its roster, your raid, and the players you have ignored or blocked. The Guild tab also keeps an Events list: officers and the Guild Master book dated events there, and every member sees them. A Discord strip at the foot of the window opens the Discord panel.",
       "winFinderTitle": "Wyszukiwarka lochów (Shift+I)",
       "winFinderBody": "Katalog zawartości grupowej, do której możesz dołączyć przez kolejkę. Zaznacz aktywności, które cię interesują, dołącz do kolejki samodzielnie albo wystaw ogłoszenie dla własnej grupy, i zaakceptuj, gdy grupa się zbierze.",
+      "winActivitiesTitle": "Activities (Shift+I)",
+      "winActivitiesBody": "Group content in one tabbed window, also opened by the Groups bell in the rail. Dungeons and Raids is the Dungeon Finder: tick the activities you want, join a queue on your own or post a listing for your own group, and accept when a group comes together. PvP, which G opens directly, holds the arenas and Thornhollow Fields, and Card Duel is where you queue for and play the Card Master's game.",
       "winMetersTitle": "Liczniki obrażeń (Shift+H)",
       "winMetersBody": "Obrażenia, leczenie i zagrożenie dla ciebie i wszystkich, którzy są z tobą, podzielone na odcinki, byś mógł spojrzeć wstecz na przedostatnią walkę. Panele leczenia i zagrożenia można wyciągnąć, aby stały osobno.",
       "winMoreTitle": "I kilka innych",
       "winMoreBody": "Mapa świata (M), okno PvP (G), Puchar Doliny (Y), Tabela wyników (K), Kalendarz wydarzeń (I) i koło emotek (X) działają tak samo. Tabeli wyników warto poświęcić chwilę przy pierwszej wizycie: ma zakładkę dla graczy, jedną dla gildii, jedną, która klasyfikuje całe konta według Renomy z Księgi Czynów, i jedną dla dziennych wyników.\n\nKliknij prawym przyciskiem innego gracza, na jego plakietce albo na jego imieniu na czacie, a Informacje o graczu otworzą kartę na jego temat: noszony przez niego ekwipunek, z dymkami, oraz publiczne dane jego postaci. To tylko podgląd, nic więcej, i wymaga, aby był wystarczająco blisko, byś go widział.",
       "winMoreBodyNoValeCup": "Mapa świata (M), okno PvP (G), tablica wyników (K) i kalendarz wydarzeń (I) działają tak samo. Wyjątkiem jest koło emotek (X): przytrzymaj klawisz, aby je otworzyć, a potem puść nad emotką, aby ją zagrać. Tablica wyników zasługuje na chwilę uwagi przy pierwszej wizycie: ma kartę graczy, kartę gildii, kartę szeregującą całe konta według Renomy z Księgi dokonań, kartę dziennych wyników oraz kartę Deweloperzy dla osób tworzących grę, obecną, dopóki nie wyłączysz opcji Pokazuj odznaki deweloperów.\n\nObierz innego gracza za cel i kliknij prawym przyciskiem jego ramkę celu, na dotyku dotknij jej dwa razy albo przytrzymaj, lub kliknij prawym przyciskiem jego imię na czacie, a Informacje o graczu otworzą kartę: noszony sprzęt z podpowiedziami oraz publiczne szczegóły postaci. To tylko podgląd. Sprzęt wymaga, aby gracz był wystarczająco blisko, by go zobaczyć. Gdy wyszukasz imię z czatu, a gracz jest daleko, dostaniesz tylko publiczną połowę karty: portret, imię, poziom, klasę i gildię.",
+      "winMoreBodyRankings": "The world map (M) works the same way. The emote wheel (X) is the exception: hold its key and the wheel appears, then let go over an emote to play it. The Rankings tab of the Book of the Realm is worth a moment on your first visit: it keeps a board for players, one for guilds, one that ranks whole accounts by Renown from their deeds, one for the daily standings, one for World Quests, and a Developers tab for the people who build the game, there unless you switch Show Developer Badges off.\n\nTarget another player and right-click the target frame (on touch, double-tap or long-press it), or right-click their name in chat, and Player Info opens a card on them: the gear they are wearing, with tooltips, and the public details of their character. It is a look, nothing more. The gear needs them close enough to see: look a name up from chat while they are far away and you get the public half of the card instead, their portrait, name, level, class, and guild.",
       "worldWindowsTitle": "Okna, które otwiera dla ciebie świat",
       "worldWindowsBody": "Niektórych okien nigdy nie otwierasz klawiszem: pojawiają się, gdy porozmawiasz z odpowiednią osobą albo klikniesz właściwą rzecz.\n\nKupiec otwiera okno sprzedawcy, z jego towarem do kupienia i zakładką Odkup, w której czeka to, co ostatnio sprzedałeś, na wypadek gdybyś zrobił to przez pomyłkę. Przy towarze stoi rząd przycisków ilości, więc stos reagentów kupujesz jednym kliknięciem po pięć albo dziesięć naraz zamiast dziesięciu osobnych kliknięć, a gdy żadna z tych liczb nie pasuje, jest tam też opcja własnej ilości. Trener klasy otwiera listę tego, czego możesz się nauczyć teraz, i tego, co wciąż przed tobą.\n\nBankier otwiera twój skarbiec, schowek z dodatkowymi miejscami, których możesz dokupić więcej. Jeśli twoja gildia otworzyła bank, druga zakładka pokazuje właśnie jego: każdy członek może zajrzeć do środka nawet bez uprawnień do wynoszenia czegokolwiek, więc nikt nie musi pytać, co gildia trzyma, rangi decydują, kto może wpłacać, wypłacać i przenosić złoto gildii, a dziennik zapisuje każdy ruch.\n\nSkrzynka Kruczej Poczty otwiera twoje listy, z tym, co przyszło, na jednej zakładce i formularzem do wysyłki na drugiej, razem z załącznikami. Rynek Świata u Kupca ma własne okno: przeglądanie i kupowanie na jednej zakładce, wystawianie własnego towaru na drugiej, a odbieranie tego, co się sprzedało, na trzeciej. Handel twarzą w twarz z innym graczem otwiera okno wymiany z osobną stroną dla każdego z was.",
       "worldWindowsBodyStationMaster": "Niektóre okna nie wymagają naciskania klawisza: otwierają się, gdy porozmawiasz z właściwą osobą albo klikniesz właściwą rzecz.\n\nKupiec otwiera okno sprzedawcy z towarem do kupienia oraz listą odkupienia na dole tego samego panelu, zawierającą ostatnio sprzedane rzeczy na wypadek pomyłki. Przy towarze jest rząd przycisków ilości, więc stos reagentów kupujesz jednym naciśnięciem po pięć albo dziesięć zamiast dziesięciu naciśnięć, a gdy żadna liczba nie pasuje, możesz podać własną. Umiejętności klasy nie potrzebują trenera, przychodzą z poziomami. Obecni trenerzy to rezydujący mistrzowie stanowisk rzemieślniczych, a Trening u jednego z nich otwiera receptury, których może cię teraz nauczyć, już znane oraz nadal zablokowane przez większą umiejętność.\n\nBankier otwiera bank z kartą Osobiste, przechowującą skarbiec z dodatkowymi miejscami, które możesz dokupować, i kartą Skarbiec, przechowującą materiały rzemieślnicze według rodzaju. Jeśli gildia otworzyła bank, pojawia się tam karta Gildia: każdy członek może zajrzeć bez pozwolenia na wyjęcie rzeczy, więc nie musi pytać, co trzyma gildia. Rangi decydują, kto może wpłacać, wypłacać i przenosić monety gildii, a dziennik zapisuje każdy ruch.\n\nSkrzynka Ravenpost otwiera listy, z odebraną pocztą na jednej karcie i formularzem wysyłania na drugiej, razem z załącznikami. Światowy rynek, u Kupca w Eastbrook albo Aukcjonera Vossa w Highwatch, ma własne okno: przeglądaj i kupuj na jednej karcie, wystawiaj towary na drugiej, a odbieraj sprzedane rzeczy na trzeciej. Bezpośrednia wymiana z innym graczem otwiera okno handlu z miejscem dla każdej strony.",
@@ -9721,11 +9785,16 @@ export const pl_PL: EnTranslations = {
       "playerCardBody": "Przycisk na ekranie postaci tworzy kartę gracza: obraz z bliskim ujęciem twojej postaci, noszonym przez ciebie ekwipunkiem i twoimi statystykami, gotowy do zapisania lub udostępnienia. To zdjęcie na pokaz nowego zestawu, które niczego w grze nie zmienia.",
       "wikiTitle": "Przycisk Wiki",
       "wikiBody": "Ta wiki jest w grze o jedno kliknięcie. Jej przycisk leży wśród innych w szynie w prawym dolnym rogu, ma swój wiersz w menu gry pod Esc, a na telefonie mieszka w tacy Więcej. Ponieważ jej otwarcie przekazuje cię do przeglądarki, przycisk zawsze najpierw prosi o potwierdzenie, więc przypadkowe stuknięcie podczas walki nigdy nie wyrwie cię z niej. Gra dalej działa w tle.",
+      "wikiBodyGameMenu": "This wiki is one click away in game. Its button sits in the Game Menu, which Esc opens on desktop and the Quick Actions control opens on touch. Because opening it hands you over to your browser, the button always asks you to confirm first, so an accidental tap in a fight can never pull you out of one. The game keeps running behind it.",
       "mobileTitle": "Na telefonie lub tablecie",
       "mobileBody": "Sterowanie dotykowe pojawia się samo, a układ dopasowuje się do twojego ekranu: kompaktowe rozmieszczenie na małym telefonie, standardowe na większym telefonie i przestronniejsze na tablecie.\n\nTwoje umiejętności leżą w pierścieniu zamiast w rzędzie cyfr: przycisk ataku z pięcioma przyciskami akcji obok niego oraz przełącznik stron, który przełącza pierścień przez resztę twoich slotów, aż do siedmiu stron, gdy masz włączone wszystkie trzy paski akcji. Wokół nich leżą przyciski, po które gracz dotykowy sięga najczęściej: zmiana celu, użycie tego, co jest przed tobą, i skok, a do tego wysuwany rząd twoich materiałów zużywalnych, który sam wypełnia się tym, co niesiesz.\n\nWzdłuż dolnej krawędzi leżą Czat, Społeczność, Zadania, Ustawienia i Więcej. Więcej otwiera tacę mieszczącą resztę twoich okien, w tym twoją postać, Wyszukiwarkę lochów, PvP, Puchar Doliny, emotki i tę wiki. Okna wypełniają tu cały ekran, zamiast unosić się nad nim.\n\nPrzesuwanie ramek jednostek to funkcja komputerowa: na dotyku układ sam je rozmieszcza.",
       "mobileBodyTwoPages": "Sterowanie dotykowe pojawia się samo, a układ dopasowuje się do ekranu: zwarty układ na małym telefonie, standardowy na większym i przestronniejszy na tablecie.\n\nUmiejętności są w pierścieniu zamiast w szeregu liczb: przycisk ataku i cztery przyciski akcji obok oraz przełącznik stron, który zmienia pierścień między jego {pages} stronami. Razem docierają do wszystkich {slots} miejsc umiejętności, niezależnie od tego, czy dodatkowe paski pulpitu są włączone. Piąte miejsce łuku pierścienia jest miejscem przedmiotów użytkowych: dotknij go, aby użyć umieszczonego przedmiotu, przytrzymaj albo przesuń do środka, aby otworzyć rząd wypełniany z noszonych rzeczy. Wokół pierścienia są przyciski najczęściej używane przez gracza dotykowego: zmiana celu, użycie rzeczy przed tobą i skok.\n\nJedna kontrolka Szybkich akcji znajduje się przy dolnej krawędzi zamiast szeregu przycisków. Otwiera wszystko inne: wierzchowca, czat, mapę, torby, społeczność, zadania, postać, księgę zaklęć, menu gry oraz pozycję Więcej z resztą okien, w tym Szukaczem lochów, PvP, emotkami i wiki. Okna wypełniają tutaj ekran zamiast unosić się nad nim.\n\nPrzesuwanie ramek jednostki jest funkcją pulpitu. Na dotyku układ umieszcza je za ciebie.",
       "railTitle": "Szyna przycisków",
-      "railBody": "W prawym dolnym rogu ekranu, daleko od minimapy, leży szyna małych kwadratowych przycisków, po jednym na okno, ułożonych w dwie krótkie kolumny obok siebie. Na większości z nich wypisany jest ich domyślny klawisz.\n\nPierwsza kolumna obejmuje twoją postać, Księgę zaklęć, talenty, Dziennik zadań, Księgę Czynów, Profesje, mapę świata, Torby i Wytwarzanie. Druga zaczyna się od Sklepu WOK i biegnie dalej przez PvP, Wyszukiwarkę lochów, Puchar Doliny, Pojedynek Karciany, Tabelę wyników, emotki, muzykę, Znajomych i gildię, tę wiki oraz menu gry. Kilka kolejnych dołącza do nich tylko wtedy, gdy mają zastosowanie."
+      "railBody": "W prawym dolnym rogu ekranu, daleko od minimapy, leży szyna małych kwadratowych przycisków, po jednym na okno, ułożonych w dwie krótkie kolumny obok siebie. Na większości z nich wypisany jest ich domyślny klawisz.\n\nPierwsza kolumna obejmuje twoją postać, Księgę zaklęć, talenty, Dziennik zadań, Księgę Czynów, Profesje, mapę świata, Torby i Wytwarzanie. Druga zaczyna się od Sklepu WOK i biegnie dalej przez PvP, Wyszukiwarkę lochów, Puchar Doliny, Pojedynek Karciany, Tabelę wyników, emotki, muzykę, Znajomych i gildię, tę wiki oraz menu gry. Kilka kolejnych dołącza do nich tylko wtedy, gdy mają zastosowanie.",
+      "mobileBodyGroupedMore": "Touch controls appear on their own, and the layout sizes itself to your screen: a compact arrangement on a small phone, a standard one on a larger phone, and a roomier one on a tablet.\n\nYour abilities sit in a ring rather than a number row: the attack button with four action buttons beside it, and a page toggle that swaps the ring between its {pages} pages, which together reach all {slots} of your ability slots whether or not the extra desktop bars are switched on. The fifth arc position of that ring is your consumables seat: tap it to use what is seated there, or hold it, or swipe it inward, to open a row that fills itself from what you are carrying. Around the ring sit the buttons a touch player reaches for most, swapping target, using what is in front of you, and jumping.\n\nOne Quick Actions control sits at the bottom edge in place of a row of buttons. It opens onto everything else: mount, chat, map, bags, social, quests, character, spellbook, game menu, and a More entry that sorts the rest of your windows into groups: Record (deeds, titles, the Reliquary, reputation, the Loot Explorer, and the rankings), Professions, Activities (dungeons and raids, PvP, and Card Duel), Character (emotes, talents, and cosmetics among them), and Store. The wiki and Discord sit in the game menu instead. Windows fill the screen here rather than floating over it.\n\nMoving your unit frames is a desktop thing: on touch the layout places them for you.",
+      "mobileBodyRewardsMore": "Touch controls appear on their own, and the layout sizes itself to your screen: a compact arrangement on a small phone, a standard one on a larger phone, and a roomier one on a tablet.\n\nYour abilities sit in a ring rather than a number row: the attack button with four action buttons beside it, and a page toggle that swaps the ring between its {pages} pages, which together reach all {slots} of your ability slots whether or not the extra desktop bars are switched on. The fifth arc position of that ring is your consumables seat: tap it to use what is seated there, or hold it, or swipe it inward, to open a row that fills itself from what you are carrying. Around the ring sit the buttons a touch player reaches for most, swapping target, using what is in front of you, and jumping.\n\nOne Quick Actions control sits at the bottom edge in place of a row of buttons. It opens onto everything else: mount, chat, map, bags, social, quests, character, spellbook, game menu, and a More entry that sorts the rest of your windows into groups: Record (deeds, titles, the Reliquary, reputation, the Loot Explorer, and the rankings), Professions, Activities (dungeons and raids, PvP, and Card Duel), Character (emotes, talents, and cosmetics among them), Rewards (the Vault, the weekly quest, and world quests), and Store. The wiki and Discord sit in the game menu instead. Windows fill the screen here rather than floating over it.\n\nMoving your unit frames is a desktop thing: on touch the layout places them for you.",
+      "railBodyTwelve": "Down in the bottom right corner of the screen, a long way from the minimap, sits a rail of small square buttons arranged in two short columns side by side. Most of them are printed with their default key.\n\nThe first column covers your character, bags, spellbook, talents, quest log, and world map. The second opens the Book of the Realm, your professions, Activities (the Groups bell), and friends and guild, then the WOC Store and the game menu. A few more join them only when they apply.",
+      "railBodyThirteen": "Down in the bottom right corner of the screen, a long way from the minimap, sits a rail of small square buttons arranged in two short columns side by side. Most of them are printed with their default key.\n\nThe first column covers your character, bags, spellbook, talents, quest log, world map, and Rewards. The second opens the Book of the Realm, your professions, Activities (the Groups bell), and friends and guild, then the WOC Store and the game menu. A few more join them only when they apply."
     },
     "commandsPage": {
       "intro": "Każde polecenie, jakie możesz wpisać na czacie, pogrupowane według przeznaczenia, wraz z jego krótkimi formami.",
@@ -9882,6 +9951,7 @@ export const pl_PL: EnTranslations = {
       "deedDef": "Osiągnięcie zapisane w Księdze Czynów. Zdobycie go daje Renomę, a niektóre przyznają kosmetyczny tytuł lub obramowanie plakietki z imieniem.",
       "renownTerm": "Renoma",
       "renownDef": "Życiowy wynik, na który składają się twoje czyny. Zawsze tylko rośnie, a królestwo prowadzi jego zestawienie w Rankingu.",
+      "renownDefRankings": "The lifetime score your deeds add up to. It only ever climbs, and the realm keeps standings of it on the Rankings tab of the Book of the Realm.",
       "heroicTerm": "Tryb heroiczny",
       "heroicDef": "Trudniejsza wersja lochu lub rajdu, dostrojona do wyposażonych drużyn endgame. Heroiczni bossowie upuszczają ulepszony łup, a ostatni boss płaci Znakami Heroicznymi.",
       "lockoutTerm": "Blokada",
@@ -10532,8 +10602,10 @@ export const pl_PL: EnTranslations = {
       "duelsBody": "Wyzwij dowolnego napotkanego gracza na przyjacielski pojedynek. Stawką jest tylko duma, więc to najprostszy sposób, by poznać starcie lub rozstrzygnąć przyjacielski spór.",
       "coliseumHeading": "Popielne Koloseum",
       "coliseumBody": "Koloseum to arena królestwa, gdzie mierzysz się z innymi graczami w rankingowych pojedynkach, jeden na jednego albo dwóch na dwóch. Każda kategoria trzyma własną tabelę, więc zwycięstwo podnosi cię po tej drabinie na oczach całego królestwa. Gra rankingowa otwiera się na 15. poziomie i dotyczy to również twojego partnera: jeśli któreś z was jest poniżej, kolejka pozostaje zamknięta, dopóki oboje nie spełnicie wymogu. Całe gracz kontra gracz mieszka za jednym przyciskiem oznaczonym PvP: otwórz go i wybierz zakładkę, Pola Ciernistej Kotliny, jeden na jednego albo dwóch na dwóch, a potem zgłoś się sam albo ze swoim partnerem. Dopóki jesteś w kolejce albo w pojedynku, pozostałe zakładki są zablokowane, więc nigdy nie możesz stać w dwóch kolejkach naraz.",
+      "coliseumBodyActivities": "The Coliseum is the realm's arena, where you face other players in ranked matches, one on one or two on two. Each bracket keeps its own standing, so a win lifts you up that ladder for the whole realm to see. Ranked play opens at level 15, and that applies to your partner too: if either of you is below it, the queue stays closed until you both qualify. All of player versus player lives on the PvP tab of the Activities window, which G opens directly: pick a tab there, Thornhollow Fields, one on one, or two on two, then sign up alone or with your partner. While you are queued or in a match, the other tabs stay locked, so you can never sit in two queues at once.",
       "ladderHeading": "Wspinaczka po drabinie rankingowej",
       "ladderBody": "Rozgrywka rankingowa śledzi twoją pozycję w czasie. Sprawdź ranking, by zobaczyć, gdzie jesteś i kto dzierży szczyt królestwa.",
+      "ladderBodyBracketTab": "Ranked play tracks your standing over time. Each bracket keeps its ladder on its own tab of the PvP window, so check it to see where you sit and who holds the top of the realm.",
       "rewardsHeading": "Co płaci rozgrywka rankingowa",
       "rewardsBody": "Rankingowe zwycięstwo płaci Honor, walutę gracz kontra gracz, a porażka kosztuje cię jedynie ranking. Honor ma nagradzać prawdziwe starcia: pokonanie tego samego przeciwnika lub tej samej drużyny ponownie tego samego dnia nie płaci już nic więcej, długi zwycięski dzień płaci coraz mniej za każde kolejne zwycięstwo, a mecz zakończony walkowerem przeciwnika wciąż zmienia twój ranking, lecz nie płaci żadnego Honoru. Ten dzień należy do Honoru i odnawia się według własnego zegara, niezależnie od resetu instancji królestwa.",
       "rewardsBodyLossShare": "Zwycięstwo rankingowe daje Honor, walutę gracz kontra gracz, a porażka rozegrana do końca nadal daje jego mniejszą część, podobnie jak remis, więc jedynym prawdziwym kosztem porażki jest ranking. Honor ma nagradzać prawdziwe mecze: ponowne pokonanie tego samego przeciwnika albo tej samej drużyny tego samego dnia nie daje nic więcej, podobnie jak ponowna porażka z nimi. Długi dzień zwycięstw płaci pełną stawkę za pierwszy ciąg wygranych, potem ją zmniejsza o połowę, a jeszcze głębiej zmniejsza ponownie i pozostaje na tym poziomie. Mecz poddany przez przeciwnika nadal zmienia twój ranking, ale nie daje w ogóle Honoru. Ten dzień należy do królestwa i kończy się o nocnej godzinie resetu, tej samej granicy, przy której czyszczą się wszystkie dzienne blokady.",
@@ -10580,6 +10652,7 @@ export const pl_PL: EnTranslations = {
       "intro": "Rankingowa bitwa 5 na 5 o przechwycenie flagi, stoczona w otoczonej murem kotlinie w starodrzewiu poniżej Ciernistego Szczytu, gdzie dwie zrujnowane twierdze stają naprzeciw siebie na długości wąwozu, a między nimi leży starszy dziedziniec, którego żadna z nich nigdy nie zdobyła. Dwie drużyny po pięciu, dwie twierdze, jeden cel: ukraść wrogi sztandar i zanieść go do domu, zanim oni zaniosą wasz.",
       "queueHeading": "Dołączanie do kolejki",
       "queueBody": "Pola Ciernistej Kotliny otwierają się na 20. poziomie i każdy członek drużyny musi go osiągnąć, zanim drużyna będzie mogła się zgłosić. Otwórz przycisk PvP i wybierz zakładkę Pola Ciernistej Kotliny, czyli tę, na której się otwiera, a potem wejdź do kolejki sam albo przyprowadź drużynę do pięciu osób i zgłoście się razem: drużyny zawsze trzymane są w jednej ekipie, a pozostałe miejsca zapełniają samotni czempioni. Gdy dziesięciu jest gotowych, pojedynek sadza obie ekipy przy ich twierdzach na krótką zbiórkę, zanim flagi ruszą. Gdyby drużyna czterech albo pięciu miała inaczej stanąć naprzeciw samych zgłoszonych solo, dobieranie przytrzyma pojedynek na moment, by sprawdzić, czy pojawi się druga drużyna, więc drużyna tej wielkości czasem czeka kilka chwil dłużej, zanim bramy się otworzą. To czekanie jest krótkie i zawsze w końcu ustępuje, więc nikt przez nie nie utknie w kolejce.",
+      "queueBodyActivities": "Thornhollow Fields opens at level 20, and every member of a party has to meet it before the party can queue. Press G to open the PvP tab of the Activities window and pick the Thornhollow Fields tab, which comes first, then enter the queue solo, or bring a party of up to five and queue together: parties are always kept on one team, and the remaining seats fill with solo champions. When ten stand ready, the match seats both teams at their keeps for a short form-up before the flags go live. If a group of four or five would otherwise face nothing but solo queuers, the matchmaker holds the match briefly to see whether a second group turns up, so a party that size sometimes waits a few moments longer before the gates open. That wait is short and always gives way in the end, so nobody is left sitting in the queue for it.",
       "fieldHeading": "Pole bitwy",
       "fieldBody": "Otoczone murem, otwarte pole podzielone na trzy komory: każda drużyna ma własne pole przed swoją twierdzą, a między nimi leży otoczony murem Zrujnowany Dziedziniec. Dwa mury kurtynowe rozciągają się na całą szerokość, a każde przejście między komorami mija sporne przejście: szeroką główną bramę albo przedbramie, małe pomieszczenie okraczające mur, którego przesunięte względem siebie drzwi wymuszają zbaczanie obok zakątka na zasadzkę. Każda twierdza jest zamknięta poza swoim wejściem, więc każdy bieg z flagą zaczyna się i kończy przez to samo przejście, a niska barykada rozbija prostą szarżę na nie. Dziedziniec mieści ruinę w sercu kotliny i dwie flankujące Runy Pędu; pozostałe dwie czekają na podejściach do flag. Runa Bitwy lub Runa Osłony (więcej zadawanych obrażeń albo mniej otrzymywanych przez kilka sekund) czeka przy wejściu na dziedziniec od strony każdej głównej bramy: obie płyty otwierają mecz po tej samej stronie i zmieniają się przy każdym przejęciu.",
       "flagsHeading": "Flagi",
@@ -10618,6 +10691,7 @@ export const pl_PL: EnTranslations = {
       "quartermastersBody": "Każda frakcja utrzymuje kwatermistrzów na swoim hubie: Kwatermistrz Vaelen dla Straży Rozpaczy w Drifthaven, Templar Althea dla Zakonu Świętych w kaplicy Eastbrook, i Rzemieślnik Tobrin dla Automatonów w Wyrmwatch. Każdy sprzedaje mały magazyn biżuterii, zbroi, broni i torb, odblokowanych poziom po poziomie, gdy twoja reputacja z tą frakcją rośnie, i płaconych zwykłą monetą.",
       "readingHeading": "Gdzie go czytać",
       "readingBody": "Karta Reputacji arkusza postaci (C) pokazuje każdą frakcję z jej obecną reputacją, bar do następnego poziomu, i tytułem, którą ta reputacja ci zdobyła. Dziennik czatu raportuje każdy wzrost reputacji, jak ląduje, i osiągnięcie nowego poziomu wyświetla transparent świętowania na ekranie.",
+      "readingBodyRealm": "The Reputation tab of the Book of the Realm (Shift+Z) shows each faction with its current standing, a bar toward the next tier, and the title that standing has earned you. The chat log reports every standing gain as it lands, and reaching a new tier shows a celebration banner on screen.",
       "deedsHeading": "Czyny",
       "deedsBody": "Księga Czynów prowadzi też twoją reputację: osiągnięcie Zaufanego do frakcji i osiągnięcie Mistrza do frakcji każdy rejestruje czyn, a osiągnięcie Mistrza ze wszystkimi trzema jest czynem samym w sobie. Jak każdy czyn są to kosmetyki, nigdy moc, a Czyny Mistrza dają tytuł, który możesz nosić."
     },
@@ -10636,6 +10710,7 @@ export const pl_PL: EnTranslations = {
       "catalogHeading": "Pełny rejestr czynów",
       "catalogBody": "Oto wszystkie czyny, jakie mieści Księga, zebrane według kategorii. Te tajemne celowo pominięto: czekają, aż je odnajdziesz. Otwórz Księgę Czynów w grze, aby zobaczyć dokładnie, czego każdy z nich wymaga.",
       "standingsNote": "Sfery prowadzą bieżące zestawienie Renomy na każdym koncie: tablica rankinguje całe konta według łącznej Renomy zdobytej przez całe życie, licząc każdy czyn raz dla wszystkich postaci na koncie i pokazując wyłącznie Renomę, więc czyny bez niej nigdy nie ruszają tabeli, choć wliczają się do twojej Księgi. Aby zobaczyć, kto i gdzie stoi, otwórz Tablicę Wyników w grze i przejdź do zakładki Renomy; zestawienie jest tam, nie na wiki.",
+      "standingsNoteRankings": "The realms keep a running tally of Renown across every account: the board ranks whole accounts by lifetime Renown, counting each deed once across all your characters, and it shows Renown alone, so deeds that carry none never move the standings even though they count in your Book. To see who stands where, open the Rankings tab of the Book of the Realm in game and turn to its Renown board; the standings live there, not on the wiki.",
       "catHeading": "{label} ({count})",
       "colName": "Czyn",
       "colRenown": "Renoma",
@@ -10656,6 +10731,7 @@ export const pl_PL: EnTranslations = {
       },
       "bookHeading": "Wewnątrz Księgi",
       "bookBody": "Księga sortuje każdy czyn do kategorii, między którymi możesz się przełączać, z polem wyszukiwania i filtrami na wszystko: na to, co już zdobyłeś, na to, czego jeszcze nie zdobyłeś, oraz na te, które są prawie ukończone. Pasek Ostatnie przy górze mieści twoje najnowsze odblokowania, a kliknięcie jednego z nich przenosi prosto do jego karty, tak samo jak kliknięcie nazwy czynu wklejonej przez kogoś na czacie. Obok niego Prawie u celu wskazuje garstkę czynów najbliższych ukończenia. W królestwie każdy czyn niesie też swą rzadkość, odsetek poszukiwaczy przygód, którzy go zdobyli, dzięki czemu od razu widać, które są pospolite, a które to prawdziwa wspinaczka; świat offline nie ma populacji do zliczenia, więc nie pokazuje niczego. Na końcu listwy czeka półka Tytuły, gdzie wybierasz ten, który nosisz.",
+      "bookBodyTitlesTab": "The Book sorts every deed into categories you can flip between, with a search box and filters for everything, for what you have earned, for what you have not, and for the ones you are nearly done with. A Recent strip near the top holds your latest unlocks, and clicking one jumps straight to its card, as does clicking a deed name someone posts in chat. Beside it, Nearly there points you at the handful you are closest to finishing. Out in a realm each deed also carries its rarity, the share of adventurers who have earned it, so you can see at a glance which ones are common and which are a real climb; the offline world has no population to count, so it shows none. The titles and borders your deeds pay out have a tab of their own, Titles, beside Deeds in the Book of the Realm, with a picker for each: one for the title you wear, one for the border that frames your nameplate.",
       "platformHeading": "Osiągnięcia Steam i Epic",
       "platformBody": "Jeśli połączysz konto Steam lub Epic Games z poziomu launchera na komputer, zdobywane przez ciebie czyny są odzwierciedlane na zewnątrz jako osiągnięcia na tym koncie. Świat gry pozostaje najwyższym autorytetem: czyn zdobywasz tutaj, zostaje on zapisany na twojej postaci, a osiągnięcie pojawia się dopiero potem. Nie każdy czyn ma odpowiadające mu osiągnięcie, a jeśli któreś nie pojawi się od razu, dogoni cię przy najbliższym logowaniu. Połączenie konta to zawsze tylko powiązanie, nigdy sposób logowania."
     },
@@ -10663,6 +10739,7 @@ export const pl_PL: EnTranslations = {
       "intro": "Relikwiarz to muzeum wyjątkowych łupów, które skatalogowałeś: wyczekiwane okazy z lochów, trofea zawodowe, wierzchowce, wyglądy broni i tytuły. Idzie w parze z Księgą Czynów tak, jak sala trofeów idzie w parze z księgą osiągnięć.",
       "howHeading": "Jak działa kolekcja",
       "howBody": "Otwórz Relikwiarz w grze (domyślnie Shift+X). Każda półka zawiera strony z unikatowymi relikwiami. Sylwetka wypełnia się, gdy dowolna postać na twoim koncie zdobędzie ten przedmiot po raz pierwszy, a strona rozświetla się, gdy wypełniona jest każda relikwia na niej. Kilka stron nosi oznaczenie Wycofana lub Osobista: pozostają poza ukończeniem, więc nigdy nie blokują półki ani całego katalogu. Znaleziska pojawiają się od razu jako powiadomienie i odświeżają otwarte okno; postępy są wspólne dla wszystkich postaci na koncie, więc relikwia znaleziona przez jedną postać wypełnia stronę dla wszystkich.",
+      "howBodyRealmTab": "Open the Book of the Realm in game (default Shift+Z) and turn to its Reliquary tab. Each shelf holds pages of unique relics. Fill a silhouette when any character on your account obtains that piece for the first time, and illuminate a page when every relic on it is filled. A few pages are labeled Retired or Personal: they sit outside completion, so they never gate a shelf or the whole catalog. Live finds toast and refresh the open window; progress is shared by every character on the account, so a relic one character finds fills the page for all of them.",
       "ranksHeading": "Rangi Kustosza",
       "ranksBody": "Rangi Kustosza rosną wraz z każdą skatalogowaną wyjątkową relikwią i przyznają wyłącznie kosmetyczne tytuły oraz obramowania. Nigdy nie dają siły bojowej, szansy na łup ani rekompensaty za pecha. Wyglądy broni przypisane do konta nie liczą się do rangi Kustosza, dzięki czemu prestiż pozostaje związany z postacią, a relikwie z kart Wycofanych lub Osobistych również się do niej nie liczą.",
       "retiredTag": "Wycofana",
@@ -11336,6 +11413,7 @@ export const pl_PL: EnTranslations = {
       "slashBody": "Kilka codziennych komend warto zapamiętać: /w Imię wysyła szept, a /r odpowiada na ostatni otrzymany, /invite zaprasza kogoś do drużyny, /follow każe iść krok w krok za przyjacielem, /roll rzuca kośćmi na oczach grupy, /who pokazuje, kto jest online, a /afk oznacza cię jako nieobecnego. Wpisz /help w grze, by zobaczyć pełną listę.",
       "emotesBody": "Twoja postać potrafi też mówić bez słów: wpisz emotkę, taką jak /wave, /dance, /cheer lub /bow, najpierw obierz przyjaciela za cel, aby skierować ją do niego, albo przytrzymaj X, by otworzyć koło emotek dla szybkiego wyrazu nad głową.",
       "emotesBodyNamedTarget": "Twoja postać może też mówić bez słów: wpisz emotkę, taką jak /wave, /dance, /cheer albo /bow, dodaj imię, aby skierować ją do kogoś, jak w /wave Aleph, albo przytrzymaj X, domyślny klawisz koła emotek, aby otworzyć szybki wybór wyrazu nad głową. Przycisk Emotki na szynie przycisków okien albo pod Więcej na dotyku otwiera to samo koło.",
+      "emotesBodyMoreTray": "Your character can also speak without words: type an emote like /wave, /dance, /cheer, or /bow, add a name to aim it at someone, as in /wave Aleph, or hold X, the emote wheel's default key, to open the emote wheel for a quick overhead expression. On touch, the Emotes tile in the More tray opens the same wheel.",
       "calendarHeading": "Kalendarz wydarzeń",
       "calendarBody": "Naciśnij I, by otworzyć kalendarz wydarzeń. Zaznacza on dni królestwa, wokół których warto planować, cotygodniowe Wezwanie do Rajdu, Dzień Targowy, Starcie na Arenie i Zawody Wędkarskie, plus comiesięczny Dzień Wypraw i Komunię Księżycowej Bramy, i to właśnie tam gildie prowadzą swój terminarz: przywódca gildii i oficerowie mogą wpisywać na nim wydarzenia, a każdy członek widzi je na tej samej stronie. Dni królestwa to zachęta do zebrania się, a nie premia; nic w twojej postaci nie zmienia się przez to, że dzień jest zaznaczony.",
       "calendarBodyDoubleHonor": "Naciśnij I, aby otworzyć kalendarz wydarzeń. Oznacza dni królestwa, wokół których warto planować: cotygodniowe Wezwanie raidu, Dzień rynku, Starcie areny, Weekend podwójnego Honoru i Derby wędkarskie, a także comiesięczny Dzień wyprawy i Komunię Księżycowej Bramy. To również miejsce na grafik gildii: przywódca i oficerowie mogą rezerwować wydarzenia, a każdy członek widzi je na tej samej stronie. Dni królestwa są przypomnieniem, by się zebrać, a nie premią, z jednym wyjątkiem: przez cały Weekend podwójnego Honoru Honor na Polach Thornhollow płaci podwójnie, a rozegrana do końca porażka płaci jak zwycięstwo. Nic innego w postaci nie zmienia się dlatego, że dzień jest oznaczony.",
@@ -11355,6 +11433,7 @@ export const pl_PL: EnTranslations = {
       "finderMore": "Zobacz, co kryje się w każdym lochu",
       "blockBody": "Blokada to cięższe narzędzie, przeznaczone dla gracza, który nie chce dać ci spokoju. Blokada odcina jego zaproszenia, szepty i pocztę, a także czat, sprawia, że oboje stajecie się dla siebie niewidoczni w /who, i usuwa go z twojej listy przyjaciół, jeśli na niej był. Zablokuj z menu pod prawym przyciskiem na jego imieniu albo komendą /block, /unblock znosi blokadę, a /blocklist pokazuje, kto na niej jest.",
       "guildBoardBody": "Gildie też mają swój ranking. Okno Tablicy wyników trzyma tablicę Gildii obok tablic graczy, klasyfikując gildie według tego, co razem zdobyli ich członkowie, więc ruchliwa gildia może zobaczyć, gdzie stoi.",
+      "guildBoardBodyRankings": "Guilds are ranked too. The Rankings tab of the Book of the Realm keeps a Guilds board beside the player boards, ranking guilds on what their members have earned together, so a busy guild can see where it stands.",
       "guildBankHeading": "Bank gildii",
       "guildBankBody": "Gildia utrzymuje też własny skarbiec. Podejdź do bankiera w jednym z głównych miast, otwórz swój bank i przełącz się na zakładkę Gildia: znajdziesz tam skarbiec gildii oraz wspólną składnicę przedmiotów, które gildia posiada razem. Każdy członek może ją otworzyć i zobaczyć, co jest w środku, a panel jasno mówi, kto może zrobić więcej. Tylko przywódca gildii i oficerowie mogą działać, wkładając monety i dobra oraz je wydając, a każda wpłata i wypłata zapisywana jest w dzienniku, który gildia może odczytać, więc nic nie porusza się bez śladu.",
       "guildBankRulesBody": "Składnica przedmiotów zaczyna zamknięta. Oficer otwiera ją z własnej kieszeni, a gildia może później zapłacić ze skarbca, by ją poszerzyć. Przedmioty zadań, wszystko związane z duszą oraz ekwipunek, którego nie przyjmie Targ Świata, zostają poza nią, tak samo jak w przypadku poczty i Targu Świata, więc bank służy dobrom, które wciąż mogą zmieniać właściciela.",

@@ -554,7 +554,16 @@ const MONOLITHS: MonolithRow[] = [
     // Honor and companions. Measured after recovery integration, zero slack.
     // Main ce21c7a66f5 sync: parent pins 18043 (Halloween) and 17733 (main).
     // Exact combined count; the three seasonal wiring lines are preserved.
-    ceiling: 17736,
+    // LOWERED 17736 -> 17723 by the Professions hub (menu consolidation step 1):
+    // the tab group lives in hud/professions/professions_hub_controller.ts and
+    // the four member close cases fold into one hub close. wc -l, exact count.
+    // LOWERED 17723 -> 17676 by the Rewards hub (menu consolidation step 7):
+    // the hub and its three members build in hud/rewards/rewards_surfaces.ts,
+    // and the store chest's dead spin-badge poll left with the daily spin.
+    // LOWERED 17676 -> 17671 at the menu consolidation review round: the
+    // character sheet and bags body classes moved to window_open_state.ts
+    // (syncCharBagsBodyClasses). wc -l, exact count.
+    ceiling: 17671,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -595,6 +604,9 @@ const MONOLITHS: MonolithRow[] = [
     // wc -l on the tree merged with release/v0.44.0. Exact count, zero slack.
     // Lowered when Deepglass and the Tidehold city left the Studio merge for
     // their own PR (v0.45.0); wc -l on the tree. Exact count, zero slack.
+    // Held at 2807 when the full-screen Settings view landed (issue #1653): the
+    // main menu's paint moved out to src/ui/options_main_menu_controller.ts and
+    // paid for the rail's wiring (src/ui/options_settings_rail_controller.ts).
     ceiling: 2807,
     seam: 'a pure view model (src/ui/options_view.ts) painted with the shared settings_controls.ts builders; sub-panels as sibling modules',
   },

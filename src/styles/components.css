@@ -1924,18 +1924,6 @@
     color: var(--color-white);
     font-weight: normal;
   }
-  .char-gather-row {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    min-width: 0;
-  }
-  .char-gather-icon {
-    flex: 0 0 22px;
-    width: 22px;
-    height: 22px;
-    object-fit: contain;
-  }
   .char-archetype-title-crest {
     flex: 0 0 28px;
     width: 28px;
@@ -2529,6 +2517,31 @@
     top: 12px;
     max-height: calc(var(--app-vh, 100vh) / var(--window-scale) - 24px);
   }
+  /* Desktop C (menu consolidation step 3): the bags dock to the RIGHT of the
+     sheet, the pair centred together, the way the bank seats its companion.
+     694px is half of the sheet (1060) + gap (8) + bags (320); on a narrow
+     screen both clamp to the 16px margin and the bags sit over the sheet's
+     right edge rather than off screen. */
+  /* The dock is a fixed layout while it lasts, so its position beats the
+     inline left/top a past drag or the open cascade left on either window
+     (they return to that spot once undocked); hence !important on the
+     position properties only. */
+  body.char-bags-docked:not(.mobile-touch) #char-window {
+    left: max(16px, calc(50% - 694px)) !important;
+    right: auto !important;
+    top: 12px !important;
+    bottom: auto !important;
+    transform: none !important;
+  }
+  body.char-bags-docked:not(.mobile-touch) #bags {
+    left: auto !important;
+    right: max(16px, calc(50% - 694px)) !important;
+    top: 12px !important;
+    bottom: auto !important;
+    width: 320px;
+    max-height: calc(var(--app-vh, 100vh) / var(--window-scale) - 24px);
+    transform: none !important;
+  }
   body:not(.mobile-touch) #char-window .char-stats-rail .stat-panel {
     padding: 8px 12px;
   }
@@ -2571,114 +2584,6 @@
   }
   #char-window .pc-share-row {
     flex: 0 0 auto;
-  }
-  #char-window .char-skills {
-    display: grid;
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.6fr);
-    align-items: start;
-    gap: var(--spacing-md);
-    padding-top: var(--spacing-sm);
-  }
-  #char-window .char-skill-group {
-    min-width: 0;
-    padding: var(--spacing-md);
-  }
-  #char-window .char-skill-group h3 {
-    margin: 0 0 var(--spacing-md);
-    font-family: var(--font-display);
-    font-size: 21px;
-    color: var(--color-accent);
-  }
-  #char-window .char-skill-list {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-    margin: 0;
-    line-height: normal;
-  }
-  #char-window .char-skill-group--gathering .char-skill-list {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  #char-window .char-skill-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    min-width: 0;
-    min-height: 80px;
-    padding: 12px;
-  }
-  #char-window :is(.char-craft-icon, .char-gather-icon) {
-    width: 48px;
-    height: 48px;
-    flex: 0 0 48px;
-    margin: 0;
-    object-fit: contain;
-  }
-  #char-window .char-skill-copy {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: var(--spacing-sm);
-    min-width: 0;
-    flex: 1 1 auto;
-    font-size: 13px;
-    line-height: 1.4;
-  }
-  #char-window .char-skill-name {
-    grid-column: 1 / -1;
-    font-size: 15px;
-    font-weight: 600;
-    overflow-wrap: anywhere;
-  }
-  #char-window .char-skill-copy > b {
-    grid-column: 2;
-    grid-row: 2;
-    font-weight: 500;
-    color: var(--color-text-secondary);
-    font-variant-numeric: tabular-nums;
-  }
-  #char-window .char-skill-rail {
-    grid-column: 1;
-    grid-row: 2;
-    align-self: center;
-    position: relative;
-    height: 7px;
-    overflow: hidden;
-    border-radius: var(--radius-sm);
-    background: var(--color-bar-track);
-  }
-  #char-window .char-skill-rail > span {
-    display: block;
-    width: var(--char-skill-pct);
-    height: 100%;
-    background: var(--color-accent);
-  }
-  #char-window .char-open-professions {
-    grid-column: 1 / -1;
-    justify-self: end;
-    min-height: 44px;
-    padding-inline: var(--spacing-lg);
-    font-size: 14px;
-  }
-  @media (max-height: 850px) {
-    #char-window .char-skill-group {
-      padding: 12px;
-    }
-    #char-window .char-skill-group h3 {
-      margin-bottom: 12px;
-      font-size: 19px;
-    }
-    #char-window .char-skill-list {
-      gap: var(--spacing-sm);
-    }
-    #char-window .char-skill-row {
-      min-height: 64px;
-      padding: var(--spacing-sm);
-    }
-    #char-window :is(.char-craft-icon, .char-gather-icon) {
-      width: 40px;
-      height: 40px;
-      flex-basis: 40px;
-    }
   }
 
   /* ---------- spellbook ---------- */
@@ -2835,6 +2740,32 @@
   }
   .ql-group-line {
     cursor: default;
+  }
+  /* The Available group (menu consolidation step 8): an offer is a plain row,
+     not a selectable quest, so it is a title and meta line beside its own
+     Show on Map rather than a .ql-item button. */
+  .ql-offer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs);
+  }
+  .ql-offer-copy {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .ql-offer-title {
+    overflow-wrap: anywhere;
+  }
+  .ql-offer-meta {
+    font-size: 11px;
+  }
+  .ql-offer > .ui-btn {
+    flex: none;
+    margin-left: auto;
   }
 
   .ql-group-chevron {
@@ -5472,8 +5403,7 @@
   /* .lb-scope-note is the Renown tab's account-scope teaching line, visible
      on every deeds-board state (never a title-attr tooltip: touch has none). */
   .lb-total,
-  .lb-scope-note,
-  .dr-leaderboard-total {
+  .lb-scope-note {
     margin: 2px 0 8px;
     color: #b9ac82;
     font-size: 12px;
@@ -5858,468 +5788,9 @@
     max-height: 62vh;
     overflow-y: auto;
   }
-  .dr-summary {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-    padding: 8px;
-  }
-  .dr-summary div {
-    display: grid;
-    gap: 2px;
-    padding: 8px;
-  }
-  .dr-summary span,
-  .dr-tasks small {
-    color: var(--color-text-muted);
-    font-size: 11px;
-  }
-  .dr-tasks small {
-    display: grid;
-    gap: 2px;
-  }
-  .dr-tasks small em {
-    color: var(--color-deed-banner-text);
-    font-style: normal;
-  }
-  .dr-intro {
-    margin: 0 0 10px;
-    color: var(--color-text-secondary);
-    font-size: 12px;
-    line-height: 1.4;
-  }
-  .dr-disclaimer {
-    margin: -4px 0 10px;
-    color: var(--color-text-muted);
-    font-size: 11px;
-    line-height: 1.35;
-  }
-  .dr-summary strong {
-    color: var(--color-deed-banner-text);
-    font-size: 13px;
-  }
-  .dr-summary p {
-    grid-column: 1 / -1;
-    margin: 2px 0 0;
-    font-size: 12px;
-  }
-  .dr-summary .dr-countdown {
-    grid-column: 1 / -1;
-  }
-  .dr-summary .dr-countdown span {
-    color: var(--color-deed-banner-text);
-    font-size: 12px;
-  }
-  .dr-ok {
-    color: var(--color-text-success);
-  }
-  .dr-lock,
+
   .dr-error {
     color: var(--color-warning);
-  }
-  .dr-section {
-    margin-top: 10px;
-    padding: 10px;
-  }
-  .dr-wallet-card {
-    margin-top: 10px;
-    padding: 10px;
-  }
-  .dr-wallet-card h3 {
-    margin: 0 0 4px;
-    color: var(--gold);
-    font-family: var(--title-font);
-    font-size: 12px;
-    letter-spacing: 0.3px;
-  }
-  .dr-wallet-card p {
-    margin: 0 0 8px;
-    color: var(--color-text-secondary);
-    font-size: 12px;
-    line-height: 1.35;
-  }
-  .dr-wallet-card [data-wallet-connect] {
-    padding-right: 18px;
-    padding-left: 18px;
-  }
-  .dr-section h3 {
-    margin: 0 0 6px;
-    color: var(--gold);
-    font-family: var(--title-font);
-    font-size: 12px;
-    letter-spacing: 0.3px;
-  }
-  .dr-spin {
-    display: grid;
-    grid-template-columns: 76px 1fr;
-    gap: 10px;
-    align-items: center;
-    padding: 8px;
-  }
-  .dr-spin p {
-    margin: 0 0 8px;
-    color: var(--color-text-secondary);
-    font-size: 12px;
-  }
-  .dr-wheel {
-    display: grid;
-    place-items: center;
-    width: 64px;
-    aspect-ratio: 1;
-    border: 2px solid var(--color-deed-banner-border);
-    border-radius: 50%;
-    color: var(--color-deed-banner-text);
-    font-family: var(--title-font);
-    font-size: 18px;
-    background: var(--color-card-lo);
-  }
-  .dr-spin-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 60;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    background: radial-gradient(
-      120% 120% at 50% 0%,
-      color-mix(in srgb, var(--color-ink-deep) 82%, transparent),
-      color-mix(in srgb, var(--color-keyline) 93%, transparent) 70%
-    );
-  }
-  .dr-spin-overlay.open {
-    display: flex;
-  }
-  .dr-spin-stage {
-    position: relative;
-    display: grid;
-    place-items: center;
-    width: min(520px, calc(100vw - 32px));
-    aspect-ratio: 1;
-    opacity: 0;
-    transform: scale(0.74);
-    animation: dr-spin-stage-in 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-  .dr-spin-close {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    z-index: 5;
-  }
-  .dr-spin-pointer {
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    z-index: 3;
-    width: 0;
-    height: 0;
-    transform: translateX(-50%);
-    border-left: 18px solid transparent;
-    border-right: 18px solid transparent;
-    border-top: 32px solid var(--gold-dim);
-    filter: drop-shadow(0 2px 4px var(--color-keyline));
-  }
-  .dr-spin-wheel-big {
-    position: relative;
-    width: min(430px, 82vw);
-    aspect-ratio: 1;
-    border-radius: 50%;
-    border: 2px solid var(--border);
-    background:
-      radial-gradient(circle at 50% 50%, var(--color-card-lo) 0 21%, transparent 22%),
-      radial-gradient(
-        circle at 50% 50%,
-        transparent 0 54%,
-        color-mix(in srgb, var(--gold-dim) 19%, transparent) 55% 56%,
-        transparent 57%
-      ),
-      conic-gradient(
-        from -90deg,
-        color-mix(in srgb, var(--color-friendly) 30%, var(--color-card-lo)) 0deg 45deg,
-        color-mix(in srgb, var(--color-info) 30%, var(--color-card-lo)) 45deg 90deg,
-        color-mix(in srgb, var(--color-quality-epic) 30%, var(--color-card-lo)) 90deg 135deg,
-        color-mix(in srgb, var(--color-warning) 30%, var(--color-card-lo)) 135deg 180deg,
-        color-mix(in srgb, var(--color-friendly) 30%, var(--color-card-lo)) 180deg 225deg,
-        color-mix(in srgb, var(--color-info) 30%, var(--color-card-lo)) 225deg 270deg,
-        color-mix(in srgb, var(--color-quality-epic) 30%, var(--color-card-lo)) 270deg 315deg,
-        color-mix(in srgb, var(--color-warning) 30%, var(--color-card-lo)) 315deg 360deg
-      );
-    box-shadow:
-      0 0 0 8px var(--color-bg-input),
-      0 0 calc(34px * var(--fx-shadow, 1)) var(--color-keyline),
-      inset 0 0 34px var(--color-keyline),
-      inset 0 0 0 4px color-mix(in srgb, var(--gold-dim) 13%, transparent);
-    transform: rotate(calc(2160deg + var(--land-angle, 0deg)));
-    animation: dr-spin-wheel 5s cubic-bezier(0.16, 1, 0.3, 1) 700ms both;
-    will-change: transform;
-  }
-  .dr-spin-wheel-big::after {
-    content: "";
-    position: absolute;
-    inset: 23%;
-    border-radius: 50%;
-    border: 1px solid var(--border);
-    background: radial-gradient(circle, var(--color-card-hi), var(--color-keyline) 72%);
-    box-shadow: inset 0 0 20px var(--color-keyline);
-  }
-  .dr-spin-wheel-big span {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    z-index: 1;
-    width: 58px;
-    margin-left: -29px;
-    margin-top: -10px;
-    color: var(--color-text-secondary);
-    font-family: var(--title-font);
-    font-size: 13px;
-    text-align: center;
-    text-shadow: var(--title-shadow);
-    transform: rotate(calc(var(--i) * 45deg + 22.5deg)) translateY(-152px)
-      rotate(calc(var(--i) * -45deg - 22.5deg));
-  }
-  .dr-spin-result {
-    position: absolute;
-    z-index: 4;
-    display: grid;
-    place-items: center;
-    width: 168px;
-    height: 168px;
-    border-radius: 50%;
-    border: 1px solid var(--border);
-    background: var(--color-card-lo);
-    color: var(--tier-color);
-    font-family: var(--title-font);
-    font-size: 22px;
-    letter-spacing: 0.4px;
-    text-align: center;
-    text-shadow: var(--title-shadow);
-    opacity: 0;
-    transform: scale(0.72);
-    animation: dr-spin-result 620ms cubic-bezier(0.16, 1, 0.3, 1) 5.6s both;
-  }
-  .dr-spin-result::before {
-    content: "";
-    position: absolute;
-    inset: -18px;
-    border-radius: 50%;
-    border: 1px solid color-mix(in srgb, var(--tier-color) 70%, transparent);
-    opacity: 0;
-    transform: scale(0.7);
-    animation: dr-spin-ring 760ms cubic-bezier(0.16, 1, 0.3, 1) 5.62s both;
-  }
-  .dr-spin-result i,
-  .dr-spin-result b {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    opacity: 0;
-    background: var(--tier-color);
-    box-shadow: 0 0 calc(12px * var(--fx-shadow, 1)) var(--tier-color);
-  }
-  .dr-spin-result i {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    animation: dr-spin-particle 760ms cubic-bezier(0.16, 1, 0.3, 1) 5.62s both;
-  }
-  .dr-spin-result b {
-    width: 4px;
-    height: 14px;
-    border-radius: 4px;
-    transform: translate(-50%, -50%) scaleY(0.35);
-    animation: dr-spin-spark 840ms cubic-bezier(0.16, 1, 0.3, 1) 5.48s both;
-  }
-  .dr-spin-result i:nth-child(2) {
-    --tx: -96px;
-    --ty: -38px;
-  }
-  .dr-spin-result i:nth-child(3) {
-    --tx: -60px;
-    --ty: 78px;
-  }
-  .dr-spin-result i:nth-child(4) {
-    --tx: 8px;
-    --ty: -106px;
-  }
-  .dr-spin-result i:nth-child(5) {
-    --tx: 78px;
-    --ty: -70px;
-  }
-  .dr-spin-result i:nth-child(6) {
-    --tx: 104px;
-    --ty: 20px;
-  }
-  .dr-spin-result i:nth-child(7) {
-    --tx: 46px;
-    --ty: 92px;
-  }
-  .dr-spin-result i:nth-child(8) {
-    --tx: -110px;
-    --ty: 28px;
-  }
-  .dr-spin-result i:nth-child(9) {
-    --tx: 0;
-    --ty: 112px;
-  }
-  .dr-spin-result b:nth-of-type(1) {
-    --tx: -260px;
-    --ty: -14px;
-    --rot: 86deg;
-  }
-  .dr-spin-result b:nth-of-type(2) {
-    --tx: -146px;
-    --ty: -224px;
-    --rot: 28deg;
-  }
-  .dr-spin-result b:nth-of-type(3) {
-    --tx: 88px;
-    --ty: -248px;
-    --rot: -22deg;
-  }
-  .dr-spin-result b:nth-of-type(4) {
-    --tx: 270px;
-    --ty: -42px;
-    --rot: -82deg;
-  }
-  .dr-spin-result b:nth-of-type(5) {
-    --tx: 158px;
-    --ty: 218px;
-    --rot: -142deg;
-  }
-  .dr-spin-result b:nth-of-type(6) {
-    --tx: -114px;
-    --ty: 246px;
-    --rot: 152deg;
-  }
-  .dr-spin-result b:nth-of-type(7) {
-    --tx: -306px;
-    --ty: -76px;
-    --rot: 74deg;
-  }
-  .dr-spin-result b:nth-of-type(8) {
-    --tx: 230px;
-    --ty: 214px;
-    --rot: -132deg;
-  }
-  @keyframes dr-spin-stage-in {
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-  @keyframes dr-spin-wheel {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(calc(2160deg + var(--land-angle, 0deg)));
-    }
-  }
-  @keyframes dr-spin-result {
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-  @keyframes dr-spin-ring {
-    to {
-      opacity: 1;
-      transform: scale(1.08);
-    }
-  }
-  @keyframes dr-spin-particle {
-    55% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0;
-      transform: translate(calc(-50% + var(--tx, 0px)), calc(-50% + var(--ty, 0px))) scale(0.1);
-    }
-  }
-  @keyframes dr-spin-spark {
-    40% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0;
-      transform: translate(calc(-50% + var(--tx, 0px)), calc(-50% + var(--ty, 0px)))
-        rotate(var(--rot, 0deg)) scaleY(1);
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .dr-spin-stage,
-    .dr-spin-wheel-big,
-    .dr-spin-result,
-    .dr-spin-result::before,
-    .dr-spin-result i,
-    .dr-spin-result b {
-      animation-duration: 1ms;
-      animation-delay: 1ms;
-    }
-  }
-  body.reduce-motion .dr-spin-stage,
-  body.reduce-motion .dr-spin-wheel-big,
-  body.reduce-motion .dr-spin-result,
-  body.reduce-motion .dr-spin-result::before,
-  body.reduce-motion .dr-spin-result i,
-  body.reduce-motion .dr-spin-result b {
-    animation-duration: 1ms;
-    animation-delay: 1ms;
-  }
-  .dr-tasks {
-    display: grid;
-    gap: 5px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-  .dr-tasks li,
-  .dr-rank {
-    display: grid;
-    grid-template-columns: 86px 1fr 70px;
-    gap: 8px;
-    align-items: center;
-    padding: 6px 8px;
-    border-radius: var(--radius-xs);
-    background: color-mix(in srgb, var(--color-white) 3%, transparent);
-    font-size: 12px;
-  }
-  .dr-tasks li {
-    grid-template-columns: 1fr 1.5fr 58px;
-  }
-  .dr-tasks li.done {
-    outline: 1px solid var(--color-text-success);
-  }
-  .dr-tasks b,
-  .dr-rank strong {
-    color: var(--color-deed-banner-text);
-    text-align: right;
-  }
-  .dr-chest-toggle {
-    margin-top: 8px;
-  }
-  .dr-ranks {
-    display: grid;
-    gap: 4px;
-  }
-  .dr-leaderboard-ranks {
-    max-height: 222px;
-    overflow-y: auto;
-    padding-right: 2px;
-  }
-  .dr-rank span {
-    color: var(--color-text-muted);
-  }
-  .dr-rank b {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  .dr-rank.mine {
-    outline: 1px solid var(--color-deed-banner-border);
-    background: color-mix(in srgb, var(--gold) 13%, transparent);
   }
 
   /* ---------- claudium ---------- */
@@ -9403,6 +8874,34 @@
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
   }
+  /* The wallet strip (menu consolidation step 3): the currencies that left the
+     Character sheet, one wrapping chip row between the grid and the purse. */
+  #bags .bag-wallet {
+    flex: none;
+    margin-top: var(--spacing-xs);
+  }
+  #bags .bag-wallet[hidden] {
+    display: none;
+  }
+  #bags .bag-wallet-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+  }
+  #bags .bag-wallet-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+  }
+  #bags .bag-wallet-icon {
+    display: inline-flex;
+    width: 18px;
+    height: 18px;
+  }
+  #bags .bag-wallet-icon img {
+    width: 100%;
+    height: 100%;
+  }
   /* The purse is a real footer row seated on the window's bottom edge, ruled off
      from the grid above it, not a block floating in the empty tail of the list. */
   #bags .money {
@@ -11376,20 +10875,23 @@
      entry-card list, title picker, filter bar) over the IWorldDeeds facet.
      Progress bars and crest urls are build-time writes; the unearned-card
      crest desaturation is a class-driven CSS filter, never inline style. */
-  #deeds-window {
+  #deeds-window,
+  #titles-window {
     width: 940px;
     max-width: calc(100vw - 32px);
     height: 680px;
     max-height: calc(var(--app-vh, 100vh) - 32px);
     flex-direction: column;
   }
-  #deeds-window .panel-title {
+  #deeds-window .panel-title,
+  #titles-window .panel-title {
     flex: none;
     display: flex;
     align-items: center;
     gap: 8px;
   }
-  #deeds-window .panel-title > span {
+  #deeds-window .panel-title > span,
+  #titles-window .panel-title > span {
     flex: 1 1 auto;
     min-width: 0;
   }
@@ -13192,6 +12694,17 @@
     flex: 1 1 auto;
     min-width: 0;
   }
+  /* The window-hub strip (menu consolidation, src/ui/hud/hub/): the shared
+     tab row each member of a hub (Professions, Book of the Realm,
+     Activities) paints under its title bar, so the members read as one
+     tabbed window. The ui-tabs / ui-tab primitives own the look; this sets
+     only the strip's place in the column-flex window. */
+  .window-hub-tabs {
+    flex: none;
+    flex-wrap: wrap;
+    margin: var(--spacing-xs) 0 var(--spacing-sm);
+    border-bottom: 1px solid var(--border);
+  }
   /* ONE empty-state family for the professions windows (phase 14: the
      harvest journal's shape, the best of the four the family had grown, now
      the only one): a centered quiet block, optional small-caps title over a
@@ -14450,6 +13963,35 @@
     line-height: 1;
     padding: 0;
   }
+  /* The Discord strip (menu consolidation step 5): the foot of every tab, the
+     Discord window's rail button folded into Social. */
+  .soc-discord-strip {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-xs);
+    padding-top: var(--spacing-xs);
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .soc-discord-strip[hidden] {
+    display: none;
+  }
+  .soc-discord-icon {
+    display: inline-flex;
+    width: 18px;
+    height: 18px;
+    flex: none;
+  }
+  .soc-discord-text {
+    flex: 1 1 auto;
+    min-width: 0;
+    color: var(--color-text-secondary);
+  }
+  .soc-discord-open {
+    flex: none;
+  }
   .soc-notice {
     flex: none;
     display: none;
@@ -15266,13 +14808,9 @@
   .map-atlas-actions .ui-btn {
     min-width: 0;
   }
-  .map-atlas-nearby {
-    flex: 0 1 auto;
-    max-height: 148px;
-    overflow-y: auto;
-  }
-  /* The world-quest section (src/ui/hud/map/world_quest_rail_section.ts): the
-     same card rows as the tracked list, a state chip, and the faction name in
+  /* The world-quest board (src/ui/hud/map/world_quest_rail_section.ts, painted
+     by the Rewards hub's World Quests tab since menu consolidation step 7): the
+     same card rows as the map rail's tracked list, a state chip, and the faction name in
      the standing colour the Reputation tab uses. The reroll button is the gold
      primary because it is the section's one deliberate action; it stays
      disabled until a replaceable row is selected. */
@@ -15355,21 +14893,6 @@
   .map-atlas-wq-note {
     margin: 0;
     text-align: center;
-  }
-  .map-atlas-nearby-row {
-    width: 100%;
-    padding: 6px 2px;
-    display: flex;
-    justify-content: space-between;
-    gap: 8px;
-    border: 0;
-    border-bottom: 1px solid var(--color-border-showcase);
-    background: transparent;
-    color: var(--color-text-muted);
-    text-align: left;
-  }
-  .map-atlas-nearby-row > span:first-child {
-    color: var(--color-text-light);
   }
   .map-atlas-legend {
     display: flex;
@@ -15517,36 +15040,6 @@
     flex-direction: column;
     height: 820px;
     max-height: 88vh;
-  }
-  /* Inside the zoomed #ui: viewport lengths divide by --window-scale (raw vh
-     re-multiplies by the zoom and runs the vault off the bottom). The top is
-     the shared .window 10vh restated in the same units, so the sheet ends at
-     98% of the screen at any UI scale. */
-  #dungeon-finder-window.df-vault-mode {
-    top: calc(var(--app-vh, 100vh) * 0.1 / var(--window-scale));
-    width: min(980px, calc(var(--app-vw, 100vw) * 0.96 / var(--window-scale)));
-    height: min(780px, calc(var(--app-vh, 100vh) * 0.88 / var(--window-scale)));
-    max-height: min(780px, calc(var(--app-vh, 100vh) * 0.88 / var(--window-scale)));
-  }
-  .df-body-vault {
-    display: flex;
-    overflow: hidden;
-  }
-  .df-vault-container {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 auto;
-    min-height: 0;
-    min-width: 0;
-    overflow: hidden;
-  }
-  .df-vault-container .weekly-rewards {
-    flex: 1;
-    overflow-y: auto;
-    padding: 4px 12px 12px;
-  }
-  .weekly-preview-notice {
-    padding: 8px 14px;
   }
   #dungeon-finder-window:has(.df-body-catalogue) {
     --color-text-light: var(--color-finder-text);
@@ -15854,21 +15347,6 @@
     display: flex;
     overflow: hidden;
     container: finder-catalogue / inline-size;
-  }
-  .df-body-vault {
-    display: flex;
-    overflow-y: auto;
-  }
-  .df-vault-container {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 auto;
-    min-height: 0;
-  }
-  .df-vault-container .weekly-rewards {
-    flex: 1;
-    overflow-y: visible;
-    padding: 4px 12px 12px;
   }
   .df-cols {
     display: grid;
@@ -21237,6 +20715,86 @@
   body.mobile-touch #options-menu.gfx-wide .gfx-card-wide .set-rows {
     grid-template-columns: 1fr;
   }
+  /* The Game Menu's quick toggles and links (Nameplates, Music, Haptics,
+     Discord, Donate, the Steam wishlist; options_main_menu_controller.ts): a
+     compact two-column group under a hairline, ahead of Return to Game. The
+     label leads at the inline start so the On/Off status or the link chevron
+     (both pinned to the inline end) never sits on top of it. */
+  .opt-quick {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    margin-top: 4px;
+    padding-top: 10px;
+    border-top: 1px solid var(--gold-dim);
+  }
+  #options-menu .opt-quick > .opt-btn.ui-btn {
+    justify-content: flex-start;
+    text-align: start;
+    white-space: normal;
+    padding-inline: 10px 34px;
+  }
+  /* An odd row out (five rows on desktop: no Haptics) spans both columns, so
+     the longest label (the Steam wishlist) never runs under its chevron. */
+  /* Matches the `all: revert-layer` reset's id specificity, which would
+     otherwise wipe grid-column on the plate. */
+  #options-menu .opt-quick > .opt-btn.ui-btn:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+  .opt-btn-toggle[aria-pressed="false"] .opt-btn-status {
+    color: var(--color-text-muted);
+  }
+  /* The full-screen Settings view (issue #1653; options_settings_rail_controller.ts
+     over the pure options_settings_view.ts). The window fills the HUD, the
+     category rail runs down the inline start, and the open category's head,
+     body and foot fill the rest. The rail is placed absolutely inside the
+     root's inline-start padding rather than as a grid column, so every
+     sub-panel keeps appending its own children to the root unchanged. The
+     geometry is !important on purpose: the floating menu's spot rides inline
+     styles (OptionsWindowLayout, a title-bar drag, the resize grip) that an
+     ordinary rule cannot outrank, and the drag and resize gestures stand down
+     on .window-fullscreen (window_drag_handle.ts, window_resize.ts). The id
+     pair outranks the per-panel width rules (#options-menu:has(> ...)). */
+  #ui > #options-menu.options-settings {
+    --opt-rail-w: 220px;
+    inset: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    max-width: none !important;
+    max-height: none !important;
+    transform: none !important;
+    box-sizing: border-box;
+    border-radius: 0;
+    padding-inline-start: var(--opt-rail-w);
+  }
+  #options-menu.options-settings > .opt-rail {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    box-sizing: border-box;
+    width: var(--opt-rail-w);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 0 var(--window-pad, 12px) var(--window-pad, 12px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-inline-end: 1px solid var(--gold-dim);
+    background: var(--panel-base);
+  }
+  .opt-rail-title {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    min-height: var(--win-head-h);
+  }
+  #options-menu .opt-rail-btn.ui-btn {
+    flex: 0 0 auto;
+    width: 100%;
+    min-height: 40px;
+    margin: 0;
+    text-align: start;
+  }
   /* ---------- UI theme picker ---------- */
   .set-seg.theme-presets {
     flex-wrap: wrap;
@@ -23878,6 +23436,18 @@
     color: var(--wk-gilt-text);
     font-weight: 600;
   }
+  /* The Rewards hub opens the board read-only: the pick is made at the
+     emissary, so this line names where and offers the map. */
+  #weekly-quests-window .wk-remote {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-align: center;
+    color: var(--wk-violet-text);
+    margin: 0 0 clamp(8px, 1.2cqw, 16px);
+  }
   #weekly-quests-window .wk-cards {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -24249,118 +23819,9 @@
   #weekly-quests-window .wk-actions .wk-btn {
     flex: 1;
   }
-  #calendar-window {
-    width: 520px;
-    height: min(620px, calc(85vh - 24px));
-    display: none;
-    flex-direction: column;
-    overflow: hidden;
-    min-height: 0;
-  }
-  .cal-nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    margin: 2px 0 8px;
-  }
-  .cal-nav-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    cursor: var(--cursor-point);
-  }
-  .cal-nav-btn .ui-icon {
-    width: 12px;
-    height: 12px;
-  }
-  .cal-month-title {
-    font-family: var(--title-font);
-    font-size: 14.5px;
-    color: var(--gold);
-    text-transform: capitalize;
-  }
-  .cal-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 3px;
-  }
-  .cal-weekday {
-    text-align: center;
-    font-size: 10.5px;
-    color: var(--color-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    padding: 2px 0;
-  }
-  .cal-cell {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-    min-height: 40px;
-    padding: 4px 2px 3px;
-    background: color-mix(in srgb, var(--color-white) 2%, transparent);
-    border: 1px solid color-mix(in srgb, var(--color-white) 6%, transparent);
-    border-radius: 5px;
-    color: var(--color-text);
-    cursor: var(--cursor-point);
-    font-size: 12px;
-  }
-  .cal-cell:hover {
-    background: color-mix(in srgb, var(--color-white) 7%, transparent);
-    border-color: color-mix(in srgb, var(--gold-dim) 40%, transparent);
-  }
-  .cal-cell.out {
-    opacity: 0.35;
-  }
-  .cal-cell.today {
-    border-color: var(--gold-dim);
-  }
-  .cal-cell.sel {
-    background: color-mix(in srgb, var(--gold-dim) 12%, transparent);
-    border-color: var(--gold-dim);
-  }
-  .cal-daynum {
-    line-height: 1;
-  }
-  .cal-marks {
-    display: flex;
-    gap: 3px;
-    min-height: 6px;
-  }
-  .cal-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    flex: 0 0 auto;
-  }
-  .cal-dot.system {
-    background: var(--gold);
-  }
-  .cal-dot.guild {
-    /* matches the market tab pip: a UI accent green, not --color-friendly */
-    background: var(--color-friendly);
-  }
-  .cal-day-pane {
-    margin-top: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    overflow-y: auto;
-    min-height: 0;
-    flex: 1;
-  }
-  .cal-day-title {
-    font-family: var(--title-font);
-    font-size: 12.5px;
-    color: var(--color-accent);
-    border-bottom: 1px solid color-mix(in srgb, var(--color-white) 8%, transparent);
-    padding-bottom: 4px;
-    text-transform: capitalize;
-  }
+  /* The guild Events list and booking form in the Social window's Guild tab
+     (menu consolidation step 4, which removed the Event Calendar window).
+     The cal- names are kept from the calendar it came from. */
   .cal-event {
     display: flex;
     align-items: flex-start;
@@ -26515,6 +25976,52 @@
      #loot-explorer-window overrides in hud.mobile.css (@layer hud-mobile),
      silently defeating the mobile sizing/scrolling rules for this window. */
 @layer components {
+  /* The Book of the Realm's Reputation tab (menu consolidation step 2): the
+     sheet's faction cards on their own root, sized like the Loot Explorer and
+     scrolling in the body. */
+  #reputation-window {
+    width: min(90vw, 640px);
+    height: min(85vh, 640px);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+  }
+  #reputation-window .reputation-window-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+  /* The Rewards hub's World Quests tab (menu consolidation step 7): the board
+     that sat on the World Map rail, on its own root, the Reputation window's
+     shape. Each open row carries a Show on Map beside its card. */
+  #world-quests-window {
+    width: min(90vw, 560px);
+    height: min(85vh, 640px);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+  }
+  #world-quests-window .world-quests-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 4px 12px 12px;
+  }
+  .map-atlas-wq-row {
+    display: flex;
+    align-items: stretch;
+    gap: 6px;
+  }
+  .map-atlas-wq-row > .map-atlas-wq {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .map-atlas-wq-row > .map-atlas-wq-map {
+    flex: none;
+    align-self: center;
+  }
   #loot-explorer-window {
     width: min(90vw, 760px);
     height: min(85vh, 760px);
@@ -26691,7 +26198,7 @@
     white-space: nowrap;
   }
   /* ---------- weekly rewards ---------- */
-  body.weekly-vault-open #bank-window {
+  #weekly-vault-window {
     left: calc(var(--app-vw, 100vw) * 0.04 / var(--window-scale));
     top: calc(var(--app-vh, 100vh) * 0.04 / var(--window-scale));
     right: auto;
@@ -26703,6 +26210,13 @@
     transform: none;
     box-sizing: border-box;
     overflow: hidden;
+    /* The column #bank-window gave the sheet when it borrowed that root: title
+       bar, then the Rewards strip, then the scrolling panel. */
+    flex-direction: column;
+  }
+  #weekly-vault-window > .panel-title,
+  #weekly-vault-window > .rewards-hub-tabs {
+    flex: none;
   }
   .weekly-rewards {
     display: flex;
@@ -27043,9 +26557,53 @@
     outline-offset: -2px;
   }
   .weekly-possible-loot {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    display: flex;
+    flex-direction: column;
     gap: var(--spacing-sm);
+  }
+  /* The possible-loot pickers: content first, then Normal or Heroic for raids
+     and dungeons, so one pool shows at a time. */
+  .weekly-loot-pickers {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-sm) var(--spacing-md);
+  }
+  .weekly-loot-picker {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+  }
+  .weekly-loot-choice {
+    min-height: 36px;
+    height: auto;
+    padding: var(--spacing-xs) 14px;
+    white-space: normal;
+  }
+  /* The library's pressed fill carries the text colour; the accent only marks
+     the edge, so the label never sits gold on gold. */
+  .weekly-loot-choice[aria-pressed="true"] {
+    border-color: var(--color-accent);
+    box-shadow: inset 0 -2px 0 var(--color-accent);
+  }
+  /* Forced colors strip the fill and the inset edge, so the pressed choice
+     would read the same as the rest: pin it to the system highlight pair
+     (the .vendor-qty-btn precedent). */
+  @media (forced-colors: active) {
+    .weekly-loot-choice[aria-pressed="true"] {
+      background: Highlight;
+      color: HighlightText;
+      forced-color-adjust: none;
+    }
+  }
+  .weekly-loot-tables {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+    align-items: start;
+    gap: var(--spacing-sm);
+  }
+  .weekly-loot-tables .weekly-loot-table {
+    margin-top: 0;
   }
   .weekly-possible-loot[hidden] {
     display: none;
@@ -28014,26 +27572,6 @@
     align-self: flex-start;
     padding: 10px 22px;
   }
-  .weekly-preview-notice {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    padding: 8px 14px;
-    background: var(--color-ink-deep);
-    border: 1px solid var(--color-accent);
-    color: var(--color-accent);
-    font-size: 13px;
-    border-radius: var(--radius-sm);
-  }
-  .weekly-preview-notice-icon {
-    display: inline-flex;
-    align-items: center;
-    color: var(--color-accent);
-  }
-  .weekly-preview-notice-icon .ui-icon {
-    width: 20px;
-    height: 20px;
-  }
   .weekly-claim-tracks {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -28143,9 +27681,22 @@
   .weekly-table-option input {
     flex: 0 0 auto;
   }
-  .weekly-loot-category {
-    min-width: 0;
-    padding: 12px;
+  /* A Heroic vault's Normal or Heroic choice, above its table list. */
+  .weekly-loot-picker.weekly-table-difficulty {
+    display: flex;
+    padding: var(--spacing-xs) var(--spacing-xs) var(--spacing-sm);
+  }
+  /* The source of a Heroic vault that rolled Normal, and the summary text of
+     one set to: the Normal badge stays beside the text as one flex item. */
+  .weekly-rolled-source {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-xs);
+  }
+  .weekly-table-difficulty > .weekly-loot-choice {
+    flex: 1 1 0;
+    min-height: 44px;
   }
   .weekly-loot-table {
     margin-top: 8px;
@@ -28242,12 +27793,14 @@
     justify-content: flex-end;
   }
   @media (min-width: 1100px) and (min-height: 700px) {
-    /* #bank-window lives inside the zoomed #ui (`zoom: var(--ui-scale)`), so
+    /* #weekly-vault-window lives inside the zoomed #ui (`zoom: var(--ui-scale)`), so
        every viewport length divides by --window-scale, exactly as the base
        rule above does: raw vw/vh here re-multiply by the zoom and push the
        vault off-screen at any UI scale above 1. The 1080px cap is an author
-       length (already zoom space) and centres against the scaled viewport. */
-    body.weekly-vault-open #bank-window {
+       length (already zoom space) and centres against the scaled viewport.
+       (#weekly-vault-window is the Rewards hub's Vault tab, menu
+       consolidation step 7; the sheet used to borrow #bank-window.) */
+    #weekly-vault-window {
       left: calc(var(--app-vw, 100vw) * 0.02 / var(--window-scale));
       top: max(
         calc(var(--app-vh, 100vh) * 0.02 / var(--window-scale)),
@@ -28339,9 +27892,8 @@
        below derives from this container's height, so on a short scaled
        viewport (this media gate reads the real, unzoomed viewport) the tracks
        hold their size and the panel scrolls instead of collapsing every vault
-       to a sliver. Scoped to the bank sheet; the Dungeon Finder's read-only
-       vault keeps its fit-to-window sizing. */
-    body.weekly-vault-open #bank-window .weekly-tracks {
+       to a sliver. */
+    #weekly-vault-window .weekly-tracks {
       min-height: 480px;
     }
     .weekly-track,

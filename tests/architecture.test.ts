@@ -346,7 +346,6 @@ const UI_PURE_CORES = [
   'src/ui/proc_overlay_view.ts',
   'src/ui/chat_ignore_core.ts',
   'src/ui/daily_rewards_chrome_view.ts',
-  'src/ui/daily_rewards_launcher_core.ts',
   'src/ui/death_recap_view.ts',
   'src/ui/death_screen_view.ts',
   'src/ui/char_bags_pairing_core.ts',
@@ -505,6 +504,7 @@ const UI_PURE_CORES = [
   'src/ui/storage_rung_echo_core.ts',
   'src/ui/vault_view.ts',
   'src/ui/weekly_rewards_view.ts',
+  'src/ui/weekly_loot_catalog_view.ts',
   'src/ui/bank_tabs_view.ts',
   'src/ui/character_membership_view.ts',
   'src/ui/account_bank_view.ts',
@@ -515,6 +515,8 @@ const UI_PURE_CORES = [
   'src/ui/weapon_proc_view.ts',
   'src/ui/controller_options_view.ts',
   'src/ui/options_view.ts',
+  // The full-screen Settings view's category rail model (issue #1653).
+  'src/ui/options_settings_view.ts',
   'src/ui/hud/loot_explorer/loot_explorer_view.ts',
   'src/ui/hud/vendor/vendor_view.ts',
   'src/ui/hud/vendor/heroic_vendor_view.ts',
@@ -534,18 +536,6 @@ const UI_PURE_CORES = [
   // armory_card_view twin for the account-mount SKUs.
   'src/ui/store_mount_card_view.ts',
   'src/ui/mount_inspect_view.ts',
-  'src/ui/daily_rewards_reason_view.ts',
-  // The daily-rewards spin wheel's markup and its landing geometry (Bank Storage
-  // phase 17). The overlay ELEMENT lives in the thin painter beside it.
-  'src/ui/daily_rewards_spin_view.ts',
-  // The rewards tab's leaderboard and payout-history panels, pure functions of the
-  // wire records (Bank Storage phase 17's review round, which spent the room the
-  // spin extraction bought and paid for it here rather than raising a ceiling).
-  'src/ui/daily_rewards_ranks_view.ts',
-  // The rewards tab's wallet LOCK card, a pure three-way branch on the lock reason
-  // (Bank Storage phase 17's review round, paying for a comment correction the way
-  // the phase paid for everything else).
-  'src/ui/daily_rewards_wallet_card_view.ts',
   'src/ui/woc_store_view.ts',
   // The banker rung purchase's copy mappers and its second price tag's markup
   // (Bank Storage phase 13), the charter_card_view twin one surface over.
@@ -603,6 +593,16 @@ const UI_PURE_CORES = [
   'src/ui/hud/professions/farming_view.ts',
   'src/ui/hud/professions/farming_plant_sheet_view.ts',
   'src/ui/hud/professions/harvest_journal_view.ts',
+  'src/ui/hud/professions/professions_hub_view.ts',
+  'src/ui/hud/hub/window_hub_view.ts',
+  'src/ui/hud/hub/book_of_realm_view.ts',
+  'src/ui/hud/hub/activities_view.ts',
+  // Rewards (menu consolidation step 7): the hub spec, the rail pill's counts
+  // and the Show on Map points.
+  'src/ui/hud/rewards/rewards_view.ts',
+  // The Quest Log's Available group (menu consolidation step 8): the nearby
+  // offers that were the World Map rail's list, with the giver's position.
+  'src/ui/hud/quest/available_quests_view.ts',
   'src/ui/hud/professions/harvest_preference_view.ts',
   'src/ui/hud/professions/perfecting_view.ts',
   'src/ui/hud/professions/perfecting_swap_view.ts',
@@ -658,7 +658,8 @@ const UI_PURE_CORES = [
   'src/ui/woc_market_view.ts',
   'src/ui/mailbox_view.ts',
   'src/ui/mail_parcel_sources_view.ts',
-  'src/ui/calendar_view.ts',
+  'src/ui/guild_events_view.ts',
+  'src/ui/social_discord_strip_view.ts',
   'src/ui/char_view.ts',
   // Gearscore: the average worn item level (character sheet + inspect).
   'src/ui/gear_score_view.ts',
@@ -758,7 +759,6 @@ const UI_PURE_CORES = [
   'src/ui/leaderboard_podium_view.ts',
   'src/ui/leaderboard_podium_html.ts',
   'src/ui/leaderboard_board_html.ts',
-  'src/ui/daily_rewards_view.ts',
   'src/ui/deed_border_view.ts',
   'src/ui/deed_heraldry_plaque_core.ts',
   'src/ui/deeds_view.ts',
@@ -3174,9 +3174,9 @@ const UI_DOM_MODULES = [
   'src/ui/bank_window_lifecycle.ts',
   'src/ui/account_bank_window.ts',
   'src/ui/friendship_armour_claim.ts',
-  'src/ui/bank_window_focus.ts',
   'src/ui/breath_bar.ts',
-  'src/ui/calendar_window.ts',
+  'src/ui/hud/reputation/reputation_window.ts',
+  'src/ui/hud/rewards/weekly_vault_window.ts',
   'src/ui/hud/action_bar/action_bar_bind_banner.ts',
   'src/ui/weekly_quests_window.ts',
   'src/ui/hud/guild_hall/guild_hall_window.ts',
@@ -3209,6 +3209,11 @@ const UI_DOM_MODULES = [
   // click handler and a class.
   'src/ui/host_diag_section_controller.ts',
   'src/ui/options_main_menu_controller.ts',
+  // The Settings view's category rail: mints the <nav> and its buttons
+  // (createElement); the decisions live in the pure options_settings_view.ts.
+  'src/ui/options_settings_rail_controller.ts',
+  // The Game Menu's quick links: the donate hop opens a tab (window.open).
+  'src/ui/game_menu_hooks.ts',
   'src/ui/hud/talking_head/talking_head_controller.ts',
   // Composes the dungeon prompt painters (they mount the DOM) and reads the UI
   // clock once a frame for the Sanctum's Ice Slab cover hint; the decisions
@@ -3225,14 +3230,6 @@ const UI_DOM_MODULES = [
   'src/ui/touch_peek.ts',
   'src/ui/hud/professions/crafting_window.ts',
   'src/ui/hud/professions/commission_order_window.ts',
-  // The spin celebration's live element: created, listened to, mounted on
-  // document.body and torn down (Bank Storage phase 17). Its markup and geometry
-  // are in the pure src/ui/daily_rewards_spin_view.ts. Named `_controller` so the
-  // painter gate's filename sweep keeps the cold contract this code held while it
-  // lived in the window, WITHOUT the stricter facet-routed contract a `_painter`
-  // carries or the by-name sweep that would drop this very row. The double
-  // coverage is the deliberate one this file's own header describes.
-  'src/ui/daily_rewards_spin_controller.ts',
   'src/ui/store_subscription.ts',
   // The rotating promo card above chat: it owns its DOM, a rotation interval,
   // a retire-guard clock read and the prefers-reduced-motion query.
@@ -3377,6 +3374,10 @@ const UI_DOM_MODULES = [
   // (a bare setTimeout sat in the sweep's blind spot, the whole-branch
   // review's note).
   'src/ui/hud/professions/professions_window.ts',
+  // The shared window-hub tab group (Professions, Book of the Realm,
+  // Activities): reaches localStorage for the per-device last-tab memory (the
+  // crafting_tab_pref precedent).
+  'src/ui/hud/hub/window_hub_controller.ts',
   'src/ui/raid_boss_guide_window.ts',
   'src/ui/raid_boss_guide_model_controller.ts',
   'src/ui/hud/chat/ready_check_leader_window.ts',

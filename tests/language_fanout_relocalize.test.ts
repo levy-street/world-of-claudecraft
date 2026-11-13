@@ -28,7 +28,6 @@ import type { Keybinds } from '../src/game/keybinds';
 import type { Renderer } from '../src/render/renderer';
 import { PLAYER_START } from '../src/sim/data';
 import type { InvSlot } from '../src/sim/types';
-import { CalendarWindow, type CalendarWindowDeps } from '../src/ui/calendar_window';
 import { CardDuelWindow, type CardDuelWindowDeps } from '../src/ui/card_duel_window';
 import { DelveTrackerController } from '../src/ui/hud/delve/delve_tracker_controller';
 import { LockpickWindow } from '../src/ui/hud/delve/lockpick_window';
@@ -222,75 +221,10 @@ describe('#2529 mailbox: an open Send tab re-localizes without losing the letter
 });
 
 // ---------------------------------------------------------------------------
-// 2. Calendar (named by #2529)
+// 2. The Calendar left the game (menu consolidation step 4); its guild-event
+//    booking form now lives in the Social window's Guild tab, whose
+//    relocalize and draft carry are pinned in section 3.
 // ---------------------------------------------------------------------------
-
-function calendarWorld(): IWorld {
-  return {
-    socialInfo: {
-      guild: { name: 'Ashen Vow', rank: 'leader', members: [], events: [] },
-    },
-    guildEventCreate: () => {},
-    guildEventRemove: () => {},
-  } as unknown as IWorld;
-}
-
-function openCalendar(): { win: CalendarWindow; root: HTMLElement } {
-  const root = mount('calendar-window');
-  const noop = (): void => {};
-  const deps: CalendarWindowDeps = {
-    root: () => root,
-    world: () => calendarWorld(),
-    closeOthers: noop,
-    captureFocus: () => null,
-    restoreFocus: noop,
-    showError: noop,
-  };
-  const win = new CalendarWindow(deps);
-  win.open();
-  return { win, root };
-}
-
-describe('#2529 calendar: an open month re-localizes without losing the booking draft', () => {
-  it('holds the old locale through refreshIfChanged, then relocalizes and keeps the form', () => {
-    const heading = bilingual('hudChrome.calendar.bookTitle');
-    const { win, root } = openCalendar();
-    const bookTitle = (): string =>
-      root.querySelector('.cal-form-title')?.textContent?.trim() ?? '';
-    // open() clears the signature, so the first poll after it always rebuilds.
-    // Settle that in English first, or the staleness arm below measures the open
-    // path rather than the elision.
-    win.refreshIfChanged();
-    expect(bookTitle(), 'the guild-master booking form did not render').toBe(heading.en);
-
-    const title = root.querySelector<HTMLInputElement>('#cal-ev-title') as HTMLInputElement;
-    const note = root.querySelector<HTMLInputElement>('#cal-ev-note') as HTMLInputElement;
-    const hour = root.querySelector<HTMLInputElement>('#cal-ev-hour') as HTMLInputElement;
-    title.value = 'Molten Core';
-    note.value = 'Bring fire resist';
-    hour.value = '20';
-
-    setLanguage(OTHER);
-    win.refreshIfChanged();
-    expect(bookTitle(), 'the calendar repainted itself: this arm no longer proves the gap').toBe(
-      heading.en,
-    );
-
-    win.relocalize();
-    expect(bookTitle()).toBe(heading.other);
-    expect(root.querySelector<HTMLInputElement>('#cal-ev-title')?.value).toBe('Molten Core');
-    expect(root.querySelector<HTMLInputElement>('#cal-ev-note')?.value).toBe('Bring fire resist');
-    expect(root.querySelector<HTMLInputElement>('#cal-ev-hour')?.value).toBe('20');
-
-    // Re-latched, not cleared: a second rebuild would wipe the restored draft.
-    const kept = root.querySelector('#cal-ev-title');
-    win.refreshIfChanged();
-    expect(
-      root.querySelector('#cal-ev-title'),
-      'the calendar rebuilt again on unchanged data',
-    ).toBe(kept);
-  });
-});
 
 // ---------------------------------------------------------------------------
 // 3. Social (named by #2529)
@@ -814,16 +748,6 @@ describe('#2529 tutorial: the coachmark card re-localizes mid-step', () => {
 // this file green.
 describe('#2529 a closed surface paints nothing when the fan-out reaches it', () => {
   const cases: ReadonlyArray<[string, () => HTMLElement]> = [
-    [
-      'calendar',
-      () => {
-        const { win, root } = openCalendar();
-        win.close();
-        root.innerHTML = '';
-        win.relocalize();
-        return root;
-      },
-    ],
     [
       'mailbox',
       () => {

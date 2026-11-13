@@ -1,6 +1,7 @@
 // The options window's title-bar Back control ([data-back]) is wired in ONE
-// place: the render() dispatcher, after it calls the active sub-view renderer
-// (options_window.ts, the comment above the querySelector spells it out). A
+// place: viewShell(), which every sub-view mounts its shell through, so a
+// self-repaint (a key capture) keeps a live Back (options_window.ts, the
+// comment above the querySelector spells it out). A
 // sub-view REBUILD that invokes its own render<Sub>() directly re-mints the
 // title bar via innerHTML and destroys that wiring, leaving a Back button that
 // looks fine and does nothing until the window is closed and reopened. That
@@ -64,8 +65,12 @@ describe('options window back-control wiring', () => {
     }
   });
 
-  it('render() is still the one wirer of [data-back]', () => {
-    const wirings = source.match(/\[data-back\]'\)\?\.addEventListener/g) ?? [];
-    expect(wirings).toHaveLength(1);
+  it('viewShell() is still the one wirer of [data-back]', () => {
+    const lookups = source.match(/querySelector\('\[data-back\]'\)/g) ?? [];
+    expect(lookups).toHaveLength(1);
+    const shell = source.slice(source.indexOf('  private viewShell('));
+    const body = shell.slice(0, shell.indexOf('\n  }\n'));
+    expect(body).toContain("querySelector('[data-back]')");
+    expect(body).toContain("back?.addEventListener('click', () => this.goBack());");
   });
 });

@@ -46,7 +46,6 @@ import {
 } from '../server/daily_rewards';
 import { resetDailyRewardSeedGateForTests } from '../server/daily_rewards_seed_gate';
 import { REALM } from '../server/realm';
-import { buildDailyRewardsView, dailyRewardTaskDescription } from '../src/ui/daily_rewards_view';
 
 class FakeDailyRewardDb implements DailyRewardDb {
   banReason: string | null = null;
@@ -1944,44 +1943,6 @@ describe('daily rewards', () => {
     expect(requestedConfigDays).toEqual(['2026-07-01']);
   });
 
-  it('builds a locked view for non-eligible status', () => {
-    const status = {
-      enabled: true,
-      day: '2026-06-30',
-      resetAt: '2026-07-01T00:00:00.000Z',
-      prizePoolUsd: 150,
-      prizePoolSol: 1,
-      eligibility: {
-        eligible: false,
-        reason: 'under_minimum' as const,
-        walletPubkey: 'Wallet',
-        wocBalance: 1,
-        wocUsdPrice: 1,
-        usdValue: 1,
-        minUsd: 20,
-      },
-      score: 0,
-      rank: null,
-      spin: { claimed: false, points: null, outcomeKey: null, claimedAt: null },
-      tasks: [],
-      leaderboard: [],
-      leaderboardTotal: 0,
-    };
-    const view = buildDailyRewardsView({
-      kind: 'status',
-      history: { payouts: [] },
-      status,
-    });
-    expect(view).toMatchObject({ kind: 'ready', locked: true, lockReason: 'under_minimum' });
-    expect(
-      buildDailyRewardsView({
-        kind: 'status',
-        history: { payouts: [] },
-        status: { ...status, enabled: false },
-      }),
-    ).toEqual({ kind: 'disabled' });
-  });
-
   it('stops status reads, spins, and point accrual while daily rewards are disabled', async () => {
     resetDailyRewardPriceCacheForTests();
     stubRewardConfig({ enabled: false });
@@ -2466,21 +2427,5 @@ describe('daily rewards', () => {
       ]);
       expect(result.leaderboardTotal).toBe(1);
     });
-  });
-
-  it('marks Arena and Vale Cup task descriptions with the 1v1 restriction', () => {
-    const restriction = '1v1 matches do not grant daily reward points.';
-    expect(dailyRewardTaskDescription('arena_result', 'Complete arena matches.', restriction)).toBe(
-      `Complete arena matches. ${restriction}`,
-    );
-    expect(
-      dailyRewardTaskDescription('vale_cup_result', 'Win Vale Cup matches.', restriction),
-    ).toBe(`Win Vale Cup matches. ${restriction}`);
-    expect(dailyRewardTaskDescription('quest_completion', 'Complete quests.', restriction)).toBe(
-      'Complete quests.',
-    );
-    expect(dailyRewardTaskDescription('delve_clear', 'Complete delves.', restriction)).toBe(
-      'Complete delves.',
-    );
   });
 });

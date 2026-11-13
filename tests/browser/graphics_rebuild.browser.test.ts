@@ -235,9 +235,11 @@ describe('Options live graphics rebuild transaction', () => {
       }),
     );
 
+    // Settings from the Game Menu, then the Graphics rail entry (issue #1653).
     const openGraphics = (): void => {
-      const button = [...root.querySelectorAll<HTMLButtonElement>('.opt-btn')].find(
-        (candidate) => candidate.textContent === t('hud.options.graphics'),
+      root.querySelector<HTMLButtonElement>('.opt-btn[data-menu-action="settings"]')?.click();
+      const button = root.querySelector<HTMLButtonElement>(
+        '.opt-rail-btn[data-settings-category="graphics"]',
       );
       expect(button).toBeTruthy();
       button?.click();

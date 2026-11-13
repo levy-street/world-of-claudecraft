@@ -54,6 +54,12 @@ export const hudChromeStrings = {
       one: 'Open Groups: {count} notification',
       other: 'Open Groups: {count} notifications',
     },
+    // The bell opens Activities since the menu consolidation (successor of
+    // bellCount, which named the old Groups window).
+    activitiesBellCount: {
+      one: 'Open Activities: {count} notification',
+      other: 'Open Activities: {count} notifications',
+    },
     alerts: 'Alerts',
     groups: 'Groups',
     rewards: 'Rewards',
@@ -1305,6 +1311,8 @@ export const hudChromeStrings = {
   // On-screen / mobile control labels and their accessible names. char/bags/music
   // reuse existing keys (hud.keybinds.actions.*, hud.options.music) at the call site.
   mobile: {
+    // The More tray's first group heading (menu consolidation step 5).
+    groupRecord: 'Record',
     jump: 'Jump',
     leaderboard: 'Ranks',
     dailyRewards: 'Store',
@@ -2863,6 +2871,14 @@ export const hudChromeStrings = {
     // The Game Menu row (and its sub-view title) that holds the three on-screen
     // overlay panels: Auras, Cooldown Manager and Performance Overlay.
     overlays: 'Overlays',
+    // The Game Menu's Settings row, the full-screen Settings view's rail
+    // heading, and the rail's accessible name (issue #1653).
+    settings: 'Settings',
+    settingsCategories: 'Settings categories',
+    // The Game Menu's help row (the confirm-first wiki hop).
+    helpWiki: 'Help and Wiki',
+    // The Game Menu's world-nameplates toggle (moved off the mobile More tray).
+    nameplates: 'Nameplates',
     // Adaptive browser-effects tier control (Graphics panel). Auto detects the
     // browser engine/version + device; the rest pin the CSS-effects tier.
     browserEffects: 'Browser Effects',
@@ -4128,6 +4144,8 @@ export const hudChromeStrings = {
     },
   },
   currencies: {
+    // The Bags wallet strip (menu consolidation step 3): one chip's name.
+    walletChipAria: '{name}: {amount}',
     intro: 'None of these take bag space. Coin stays in your bag as always.',
     activities: 'Activities',
     factions: 'Factions',
@@ -4241,6 +4259,9 @@ export const hudChromeStrings = {
     tierReachedLine: 'You are now {tier} with the {faction}. Your faction title is now {title}.',
   },
   questLog: {
+    // Menu consolidation step 8: nearby quest offers, moved off the map rail.
+    available: 'Available',
+    offerMeta: '{zone} · {level}',
     completed: 'Completed',
     zoneSummary: '{count} ({ready} ready)',
     shiftHint: 'Shift-click a quest to link it in chat.',
@@ -8005,6 +8026,17 @@ export const hudChromeStrings = {
     // links) pinned atop the Guild tab. Rendered as plain escaped text only,
     // deliberately (player-controlled; never linkified). {name} in setBy is the
     // setter's character name, spliced verbatim.
+    // Guild events (menu consolidation step 4): the booking list that moved
+    // here from the removed Event Calendar window. The form and row strings
+    // reuse the hudChrome.calendar.* keys it came with.
+    guildEvents: {
+      heading: 'Guild events',
+      dateLabel: 'Date',
+      // An event row's date and time, joined.
+      when: '{date}, {time}',
+      // The Social window's Discord strip: the featured voice room and its head count.
+      discordVoice: 'In {channel} ({count})',
+    },
     billboard: {
       label: 'Guild Billboard',
       empty: 'Nothing on the billboard yet.',
@@ -8666,6 +8698,43 @@ export const hudChromeStrings = {
     sharpeningStoneUse:
       'Use: Sharpens your main hand weapon, increasing Attack Power by 6 for 30 min.',
     manaElixirUse: 'Use: Increases Spirit by 6 for 1 hour.',
+  },
+  // The Professions hub (menu consolidation step 1): the shared tab strip
+  // over the four professions windows. The other three tabs reuse their
+  // former window titles (crafting/perfecting/harvestJournal .title).
+  professionsHub: {
+    tabOverview: 'Overview',
+  },
+  // Activities (menu consolidation step 4): one tabbed window over the group
+  // content windows (Dungeon Finder, PvP, Card Duel); the Groups bell is its
+  // launcher.
+  activities: {
+    title: 'Activities',
+    close: 'Close Activities',
+    tabDungeons: 'Dungeons and Raids',
+    tabPvp: 'PvP',
+  },
+  // Rewards (menu consolidation step 7): one tabbed window for the weekly
+  // Vault, the emissary's weekly quest and today's world quests.
+  rewards: {
+    title: 'Rewards',
+    close: 'Close Rewards',
+    tabVault: 'Vault',
+    tabWeekly: 'Weekly Quest',
+    tabWorldQuests: 'World Quests',
+    weeklyPickAt: 'Choose your quest with the emissary in {zone}.',
+  },
+  // Book of the Realm (menu consolidation step 2): one tabbed window over the
+  // permanent record (Deeds, Titles, Reliquary, Reputation, Loot Explorer,
+  // Rankings). The absorbed windows keep their own titles as tab labels where
+  // those are short; these are the hub's own words.
+  bookOfRealm: {
+    title: 'Book of the Realm',
+    close: 'Close the Book of the Realm',
+    tabDeeds: 'Deeds',
+    tabTitles: 'Titles',
+    tabReputation: 'Reputation',
+    tabRankings: 'Rankings',
   },
   // Professions window (Professions 2.0): the read-only craft-wheel
   // window. Craft and pair NAMES resolve through craftName / archetypePair
@@ -10683,6 +10752,7 @@ export const hudChromeStrings = {
     // flip local quest tracking share them: the atlas rail's Untrack button and
     // the quest log's per-quest toggle, which is the way back from untracked.
     untrack: 'Untrack',
+    openQuestLog: 'Open Quest Log',
     track: 'Track',
     // The rail's world-quest section (src/ui/hud/map/world_quest_rail_*): the
     // day's board, the shared marker selection, and the one daily replacement,

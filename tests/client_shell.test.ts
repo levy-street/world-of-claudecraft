@@ -837,7 +837,10 @@ describe('client HTML shell', () => {
     // The sibling cold windows route the same way; lock the family so a future case is not
     // left on an inline hide that drops focus.
     expect(cmBody).toContain('this.socialWindow.close();');
-    expect(cmBody).toContain('this.arenaWindow.close();');
+    // The hub members (menu consolidation) close through their hub, which
+    // calls the shown member's own painter close().
+    expect(cmBody).toContain('this.activitiesHub.close();');
+    expect(cmBody).toContain('this.bookHub.close();');
     expect(cmBody).toContain('this.talentsWindow.close();');
     expect(cmBody).toContain('this.spellbookWindow.close();');
     // Bags is the NON-MODAL companion (no trap), but still returns focus via close().
@@ -1287,83 +1290,38 @@ describe('client HTML shell', () => {
     expect(html).toContain('aria-label="Quest Log"');
   });
 
-  it('offers Discord and Donate entries in the mobile drawer of BOTH entries', () => {
-    // Mobile has no keyboard, so the U-key Discord panel toggle is unreachable;
-    // this drawer button is the touch path to Discord (the account panel when
-    // available, else the community invite). Donate mirrors the desktop shell's
-    // Ko-fi community link.
+  it('moves Discord off the rail and the tray into the Social strip (menu consolidation)', () => {
+    // The Discord window lost its rail button, its U default and its More-tray
+    // tile; the Social window's foot carries a Discord strip whose button opens
+    // the same panel (openDiscordEntry: the account panel when logged in, else
+    // the community invite). Donate left the tray for the Game Menu.
     for (const [name, entry] of [
       ['index.html', html],
       ['play.html', playHtml],
     ] as const) {
-      expect(entry, name).toContain('id="mobile-discord"');
-      // Carries the icon hook (hydrateIcons swaps [data-icon] for the inline SVG).
-      expect(entry, name).toMatch(/id="mobile-discord"[^>]*data-icon="discord"/);
-      // Starts hidden; main.ts reveals it at boot on any build with Discord UI
-      // enabled (it stays hidden in the native-app build).
-      expect(entry, name).toMatch(/id="mobile-discord"\s+hidden/);
-      expect(entry, name).toContain('id="mobile-donate"');
-      expect(entry, name).toMatch(/id="mobile-donate"[^>]*data-icon="donate"/);
-      // Donate is never gated on the web: no hidden attribute on it.
-      expect(entry, name).not.toMatch(/id="mobile-donate"\s+hidden/);
-    }
-    // The native-app build strips every donation link (store payment-steering
-    // policy); the tray entry joins the same suppression block as the desktop
-    // .donate links in hud.css.
-    expect(hudCss).toContain('body.native-app #mobile-donate,');
-    // The tap targets: the account panel with the invite as the logged-out /
-    // offline fallback (discordInviteUrl() itself falls back to
-    // DEFAULT_DISCORD_INVITE_URL in discord_status.ts), and the Ko-fi page,
-    // pinned to the shells' URLs.
-    expect(mainTs).toContain("const DONATE_URL = 'https://ko-fi.com/worldofclaudecraft';");
-    expect(mainTs).toContain("window.open(discordInviteUrl(), '_blank', 'noopener,noreferrer');");
-    expect(mainTs).toContain(
-      "onDonate: () => window.open(DONATE_URL, '_blank', 'noopener,noreferrer'),",
-    );
-    // Two Ko-fi taps per entry (the marketing donate-cta and the mobile
-    // drawer): the in-game community tray's third one left with the tray's
-    // GitHub/Donate links (owner request, the tray is wishlist-only now).
-    for (const [name, entry] of [
-      ['index.html', html],
-      ['play.html', playHtml],
-    ] as const) {
-      expect(entry.match(/href="https:\/\/ko-fi\.com\/worldofclaudecraft"/g), name).toHaveLength(2);
+      expect(entry, name).not.toContain('id="mm-discord"');
+      expect(entry, name).not.toContain('id="mobile-discord"');
+      expect(entry, name).not.toContain('id="mobile-donate"');
       expect(entry, name).not.toContain('https://github.com/sponsors/levy-street');
     }
-  });
-
-  it('offers a desktop micro-menu Discord entry in BOTH entries (not keybind-only)', () => {
-    // Before this, linking Discord was reachable only via the undocumented 'U'
-    // keybind: no menu item, button, or keybind-list mention told a desktop
-    // player the feature existed. #mm-discord in the micro-menu (alongside
-    // #mm-social, #mm-valecup, ...) gives it a visible, clickable affordance
-    // that mirrors the mobile tray's #mobile-discord button.
-    for (const [name, entry] of [
-      ['index.html', html],
-      ['play.html', playHtml],
-    ] as const) {
-      expect(entry, name).toContain('id="mm-discord"');
-      expect(entry, name).toMatch(/id="mm-discord"[^>]*data-icon="discord"/);
-      // Starts hidden; main.ts reveals it at boot on any build with Discord UI
-      // enabled, mirroring #mobile-discord's own gating.
-      expect(entry, name).toMatch(/id="mm-discord"\s+hidden/);
-      // Shows the 'U' default keybind as a discoverability hint, same as every
-      // other micro-menu button (#mm-social shows 'o', #mm-valecup shows 'y').
-      expect(entry, name).toMatch(
-        /id="mm-discord"[^>]*>\s*<span class="keybind ui-keycap">u<\/span>/,
-      );
-    }
-    // main.ts wires the click through the Hud's discord hook (attachDiscordHook)
-    // to openDiscordEntry, the SAME entry point the mobile tray uses: it opens
-    // the panel when logged in and falls through to the community invite
-    // otherwise, so the desktop button is a live affordance offline too. The
-    // hook is attached unconditionally (not inside `if (online)`), else the
-    // button would render visible but no-op offline.
-    expect(mainTs).toMatch(
-      /hud\.attachDiscordHook\(\(\) => openDiscordEntry\(\)\);\s*\n\s*if \(online\) \{/,
+    // The donate hop is shared by the Game Menu's Donate row, so it lives in
+    // src/ui/game_menu_hooks.ts (the marketing donate-cta keeps its Ko-fi link
+    // on index; nothing else in the game shell links it).
+    const gameMenuHooks = readFileSync(
+      new URL('../src/ui/game_menu_hooks.ts', import.meta.url),
+      'utf8',
     );
-    expect(mainTs).toContain('function syncDiscordEntries(): void {');
-    expect(mainTs).toContain("const desktopBtn = document.getElementById('mm-discord');");
+    expect(gameMenuHooks).toContain(
+      "export const DONATE_URL = 'https://ko-fi.com/worldofclaudecraft';",
+    );
+    expect(gameMenuHooks).toContain("window.open(DONATE_URL, '_blank', 'noopener,noreferrer');");
+    expect(mainTs).toContain("window.open(discordInviteUrl(), '_blank', 'noopener,noreferrer');");
+    // The hook is attached only where the build ships Discord, so the strip is
+    // hidden (never a dead button) on a Discord-off build.
+    expect(mainTs).toContain(
+      'if (DISCORD_BUILD_ENABLED) hud.attachDiscordHook(() => openDiscordEntry());',
+    );
+    expect(hudTs).toContain('discordHook: () => this.discordHook,');
   });
 
   it('seats the consumables control in the ring and its row beside it, in BOTH entries', () => {
@@ -1808,8 +1766,15 @@ describe('client HTML shell', () => {
   });
 
   it('keeps the game menu free of duplicate and dev-only entries', () => {
-    const interfaceEntries = optionsViewTs.match(/labelKey: 'hud\.options\.interface'/g) ?? [];
-    expect(interfaceEntries).toHaveLength(1);
+    // The settings categories live in the Settings view's rail model now
+    // (issue #1653): exactly one Interface category there, none left on the
+    // Game Menu root.
+    const railTs = readFileSync(
+      new URL('../src/ui/options_settings_view.ts', import.meta.url),
+      'utf8',
+    );
+    expect(railTs.match(/'hud\.options\.interface'/g) ?? []).toHaveLength(1);
+    expect(optionsViewTs).not.toMatch(/labelKey: 'hud\.options\.interface'/);
     expect(optionsViewTs).not.toContain('Skin Select (dev)');
     expect(hudTs).not.toContain('Skin Select (dev)');
   });
@@ -2349,14 +2314,35 @@ describe('client HTML shell', () => {
       );
     }
     expect(html).toContain('<div id="mobile-extra-grid">');
-    // Daily Rewards, the Book of Deeds, Mount / Dismount, and Crafting ride the More grid in BOTH
+    // The tray is a grouped deep-link index (menu consolidation step 5) in BOTH
     // entries (play.html historically lags index.html; these pins keep them in
-    // step).
+    // step): six group headings (Rewards joined in step 7), the hub tabs'
+    // tiles, and none of the Quick Actions duplicates (Mount, Map, Bags,
+    // Character, Spellbook).
     for (const entry of [html, playHtml]) {
-      expect(entry).toContain('id="mobile-daily-rewards"');
-      expect(entry).toContain('id="mobile-deeds"');
-      expect(entry).toContain('id="mobile-mounts"');
-      expect(entry).toContain('id="mobile-crafting"');
+      expect(entry.match(/class="mobile-extra-group"/g)).toHaveLength(6);
+      for (const id of [
+        'mobile-rewards-vault',
+        'mobile-rewards-weekly',
+        'mobile-rewards-world-quests',
+        'mobile-daily-rewards',
+        'mobile-deeds',
+        'mobile-titles',
+        'mobile-crafting',
+        'mobile-cardduel',
+        'mobile-cosmetics',
+      ]) {
+        expect(entry, id).toContain(`id="${id}"`);
+      }
+      for (const id of [
+        'mobile-mounts',
+        'mobile-map',
+        'mobile-bags',
+        'mobile-char',
+        'mobile-spellbook',
+      ]) {
+        expect(entry, id).not.toContain(`id="${id}"`);
+      }
     }
     expect(hudMobileCss).not.toContain('body.mobile-touch.mobile-more-open #mobile-controls');
     expect(html).toContain('</div>\n  </section>\n      <div id="mobile-extra-controls"');

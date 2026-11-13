@@ -1215,12 +1215,14 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
     // markup), never on a frame and never on either interval below. The count is
     // what makes a THIRD read a conscious act.
     reflowAllow: { '.scrollTop': 2 },
-    driverAllow: { setInterval: 2 },
+    // ONE interval since menu consolidation step 7: the 30s countdown tick
+    // served the daily spin body, which is gone with the feature.
+    driverAllow: { setInterval: 1 },
     drivers: [
       {
         driver: 'setInterval',
         everyMs: 15_000,
-        why: 'the reward-state refresh: re-fetch status + history and repaint the open window. Its per-tick body is the `isOpen` guard and a call into renderCurrent, the SAME entry point an open or a tab switch takes, so the DOM cost below is the guard only.',
+        why: 'the store refresh: re-fetch the open tab and repaint the open window. Its per-tick body is the `isOpen` guard and a call into renderCurrent, the SAME entry point an open or a tab switch takes, so the DOM cost below is the guard only.',
         stopsAt: {
           renderCurrent:
             "the window's ordinary full re-render, shared with toggle() / openStore() / a tab click. Counting a render path per driver would re-run the argument the cold bucket settled (a count over a render churns on every edit and never moves when the real hazard lands); what this entry holds is that the 15s tick does nothing EXTRA on its way there.",
@@ -1230,21 +1232,6 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
         // in this file are half write-backs. It works as a change detector either way.
         writeAllow: { '.style': 1 },
         queryAllow: {},
-        idlAllow: {},
-        reflowAllow: {},
-      },
-      {
-        driver: 'setInterval',
-        everyMs: 30_000,
-        why: 'the countdown tick: rewrite the "ends in" labels so the open window does not show a stale time. Reaches the `isOpen` guard plus paintCountdowns and its remainingText formatter.',
-        // `.style` is the isOpen guard again; `.textContent` is the countdown label, which
-        // genuinely differs every tick, so it is an unelided write ON PURPOSE at 30s cadence;
-        // `.dataset` is the read of the reset timestamp off each node.
-        writeAllow: { '.style': 1, '.textContent': 1, '.dataset': 1 },
-        // ONE subtree walk per tick to find the countdown nodes. It is a re-query rather than
-        // a cached ref because the nodes are replaced by every repaint of the window; at 30s
-        // that is cheap, and the count is what makes a second one a conscious act.
-        queryAllow: { '.querySelectorAll': 1 },
         idlAllow: {},
         reflowAllow: {},
       },
@@ -1323,13 +1310,21 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
     ],
   },
   { file: 'reliquary_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
+  // The Rewards hub's Vault tab (menu consolidation step 7): the scroll pair the
+  // bank's rewards tab held, read before a signature repaint and written back
+  // after, so a claim or a reveal does not throw the player to the top.
+  {
+    file: 'hud/rewards/weekly_vault_window.ts',
+    reflowAllow: { '.scrollTop': 2 },
+    driverAllow: {},
+  },
   { file: 'hud/cosmetics/cosmetics_window.ts', reflowAllow: {}, driverAllow: {} },
   // Cold rebuild only, after the unchanged-signature return: preserve the rail
   // and detail scroll positions plus the unified Groups body across structural updates.
-  // The remote Vault adds one scroll read/restore pair when a changed signature
-  // rebuilds its nested panel. Unchanged frames return before these accesses;
-  // the countdown updates in place without reading scroll position.
-  { file: 'dungeon_finder_window.ts', reflowAllow: { '.scrollTop': 8 }, driverAllow: {} },
+  // Unchanged frames return before these accesses; the countdown updates in
+  // place without reading scroll position. (The read-only Vault pane's pair
+  // left with the Vault tab, menu consolidation step 7.)
+  { file: 'dungeon_finder_window.ts', reflowAllow: { '.scrollTop': 6 }, driverAllow: {} },
   // The lockpick clock: a 100ms tick that repaints the remaining-time bar for the duration
   // of one attempt, generation-guarded and cleared on stop. The fastest module-owned driver
   // in the bucket, and the reason setInterval is counted rather than banned.
@@ -1868,14 +1863,6 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
     expect(controllers).toContain('hud/chat/chat_geometry_controller.ts');
     expect(COLD_PAINTERS).toContain('hud/map/map_marker_interaction_controller.ts');
     expect(COLD_PAINTERS).toContain('hud/fiesta/fiesta_controller.ts');
-    // Bank Storage phase 17's extraction, named here because its FILENAME is the
-    // whole reason it holds the cold contract. The spin overlay's code held it
-    // inside src/ui/daily_rewards_window.ts; the extraction would have shed it
-    // under a name outside this sweep, which is what the header above calls the
-    // point of the widening. Renaming the file back sheds the contract silently
-    // (the only other red is a missing-path row a contributor would simply edit),
-    // so the membership is pinned rather than the regex.
-    expect(COLD_PAINTERS).toContain('daily_rewards_spin_controller.ts');
   });
 
   // The cold contract. Swept as ONE test per matcher family over the whole bucket rather
@@ -2036,7 +2023,6 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
       'gather_node_tooltip_controller.ts#0',
       'world_quest_ley_window.ts#0',
       'daily_rewards_window.ts#0',
-      'daily_rewards_window.ts#1',
       'hud/professions/harvest_journal_window.ts#0',
       'hud/professions/perfecting_window.ts#0',
       'hud/delve/lockpick_window.ts#0',

@@ -98,7 +98,7 @@ describe('options window wiki row', () => {
     } as never);
 
     (window as unknown as { renderMain(): void }).renderMain();
-    const button = root.findButton(t('nav.wiki'));
+    const button = root.findButton(t('hudChrome.options.helpWiki'));
     expect(button).not.toBeNull();
 
     button?.click();

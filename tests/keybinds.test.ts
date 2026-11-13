@@ -137,11 +137,25 @@ describe('registry', () => {
         defaults: [`F${n + 1}`],
       });
     }
-    // Discord is a rebindable Interface window toggle (default U).
-    const discord = BIND_ACTIONS.find((a) => a.id === 'discord');
-    expect(discord?.category).toBe('Interface');
-    expect(discord?.kind).toBe('edge');
-    expect(discord?.defaults).toEqual(['KeyU']);
+    // The menu consolidation (2026-11-04) folded these windows into hubs (the
+    // Book of the Realm, Activities, Social's Discord strip): each stays a
+    // rebindable Interface action with NO default key, so K, U, Shift+X,
+    // Shift+O and Shift+Y are free. The Event Calendar action is gone with
+    // its window, so bare I is free too.
+    for (const id of ['discord', 'leaderboard', 'reliquary', 'lootExplorer', 'cosmetics']) {
+      const action = BIND_ACTIONS.find((a) => a.id === id);
+      expect(action?.category, id).toBe('Interface');
+      expect(action?.kind, id).toBe('edge');
+      expect(action?.defaults, id).toEqual([]);
+    }
+    expect(BIND_ACTIONS.find((a) => a.id === 'calendar')).toBeUndefined();
+    // The hubs keep their keys: Shift+I is Activities (id dungeonFinder, so a
+    // saved binding keeps working), G stays the PvP opener.
+    expect(BIND_ACTIONS.find((a) => a.id === 'dungeonFinder')).toMatchObject({
+      label: 'Activities',
+      defaults: ['Shift+KeyI'],
+    });
+    expect(BIND_ACTIONS.find((a) => a.id === 'arena')?.defaults).toEqual(['KeyG']);
     const metersIndex = BIND_ACTIONS.findIndex((a) => a.id === 'meters');
     const targetAuras = BIND_ACTIONS[metersIndex + 1];
     expect(targetAuras).toMatchObject({
@@ -151,9 +165,10 @@ describe('registry', () => {
       kind: 'edge',
       defaults: ['Shift+KeyJ'],
     });
-    // The Book of Deeds is a rebindable Interface toggle on the shifted layer of
-    // KeyZ, like Damage Meters does on H and the Shift+digit secondary bar.
+    // The Book of the Realm (id deeds) is a rebindable Interface toggle on the
+    // shifted layer of KeyZ, like Damage Meters does on H.
     const deeds = BIND_ACTIONS.find((a) => a.id === 'deeds');
+    expect(deeds?.label).toBe('Book of the Realm');
     expect(deeds?.category).toBe('Interface');
     expect(deeds?.kind).toBe('edge');
     expect(deeds?.defaults).toEqual(['Shift+KeyZ']);
@@ -171,29 +186,16 @@ describe('registry', () => {
     expect(hideUi?.category).toBe('Interface');
     expect(hideUi?.kind).toBe('edge');
     expect(hideUi?.defaults).toEqual(['Alt+KeyZ']);
-    // The Harvest Journal is a rebindable Interface toggle on the shifted layer
-    // of KeyK (Shift+H and Shift+J, its own initials, are Damage Meters and
-    // Target Buffs/Debuffs); bare KeyK stays the Leaderboard, so the two share
-    // the physical key across layers and never collide.
-    const journal = BIND_ACTIONS.find((a) => a.id === 'harvestJournal');
-    expect(journal?.category).toBe('Interface');
-    expect(journal?.kind).toBe('edge');
-    expect(journal?.defaults).toEqual(['Shift+KeyK']);
-    // Perfecting is a rebindable Interface toggle on the shifted layer of KeyT
-    // (Crafting's letter; its own initial is the Spellbook bare and Professions
-    // shifted), so the crafting family's endgame window sits over Crafting and
-    // the two share the physical key across layers without colliding.
-    const perfecting = BIND_ACTIONS.find((a) => a.id === 'perfecting');
-    expect(perfecting?.category).toBe('Interface');
-    expect(perfecting?.kind).toBe('edge');
-    expect(perfecting?.defaults).toEqual(['Shift+KeyT']);
-    // Loot Explorer is a rebindable Interface toggle on the shifted layer of
-    // KeyO (bare KeyO is free), matching the collection/catalog convention
-    // every other shifted-letter window uses.
-    const lootExplorer = BIND_ACTIONS.find((a) => a.id === 'lootExplorer');
-    expect(lootExplorer?.category).toBe('Interface');
-    expect(lootExplorer?.kind).toBe('edge');
-    expect(lootExplorer?.defaults).toEqual(['Shift+KeyO']);
+    // The Harvest Journal and Perfecting are Professions hub tabs (menu
+    // consolidation step 1): rebindable Interface actions that open the hub on
+    // their tab, with NO default key (Shift+K and Shift+T are freed; Shift+P
+    // opens the hub and T lands on its Crafting tab).
+    for (const id of ['harvestJournal', 'perfecting']) {
+      const tab = BIND_ACTIONS.find((a) => a.id === id);
+      expect(tab?.category, id).toBe('Interface');
+      expect(tab?.kind, id).toBe('edge');
+      expect(tab?.defaults, id).toEqual([]);
+    }
   });
 
   it('gives every shipped default code to exactly one action per layer', () => {
@@ -239,7 +241,9 @@ describe('Keybinds defaults', () => {
     expect(kb.actionForCode('Equal')).toBe('slot11');
     expect(kb.actionForCode('KeyH')).toBe('targetFriendly');
     expect(kb.actionForCode('KeyJ')).toBe('targetFriendlyNext');
-    expect(kb.actionForCode('KeyU')).toBe('discord');
+    for (const freed of ['KeyU', 'KeyK', 'KeyI', 'Shift+KeyX', 'Shift+KeyO', 'Shift+KeyY']) {
+      expect(kb.actionForCode(freed), freed).toBe(null);
+    }
     expect(kb.actionForCode('KeyT')).toBe('crafting');
     expect(kb.actionForCode('KeyY')).toBe(null);
     // Bare Z sheathes; the Book of Deeds ships on the shifted layer of the same key.

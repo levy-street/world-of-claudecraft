@@ -1421,8 +1421,16 @@ describe('Input Escape handling', () => {
 });
 
 describe('Input Discord keybind', () => {
-  it("dispatches onUiKey('discord') for the default U key", () => {
-    const { cb, windowListeners } = makeInput();
+  // Menu consolidation: Discord ships no default key any more (the Social
+  // window's Discord strip is its launcher); a player binding still works.
+  it("dispatches onUiKey('discord') for a player-bound key, and nothing for U by default", () => {
+    const fresh = makeInput();
+    fresh.windowListeners.get('keydown')!({ code: 'KeyU', repeat: false });
+    expect(fresh.cb.onUiKey).not.toHaveBeenCalledWith('discord');
+
+    const keybinds = new Keybinds();
+    expect(keybinds.bind('discord', 0, 'KeyU')).toBe(true);
+    const { cb, windowListeners } = makeInput(undefined, keybinds);
 
     windowListeners.get('keydown')!({ code: 'KeyU', repeat: false });
 
@@ -1430,7 +1438,9 @@ describe('Input Discord keybind', () => {
   });
 
   it('is a normal interface key: suppressed while a modal blocks game keys', () => {
-    const { cb, windowListeners } = makeInput();
+    const keybinds = new Keybinds();
+    expect(keybinds.bind('discord', 0, 'KeyU')).toBe(true);
+    const { cb, windowListeners } = makeInput(undefined, keybinds);
     (cb as any).canUseGameKeys = vi.fn(() => false);
 
     windowListeners.get('keydown')!({ code: 'KeyU', repeat: false });
@@ -1522,8 +1532,12 @@ describe('Input Harvest Journal, Perfecting, and Loot Explorer keybinds', () => 
   // OSSBrain PR3781 added Loot Explorer, and both land in the same
   // dispatchEdge switch in main.ts's onUiKey union. A dropped case here would
   // silently eat the keypress with no compile error.
-  it("dispatches onUiKey('harvestJournal') for the default Shift+K chord", () => {
-    const { cb, windowListeners } = makeInput();
+  // Harvest Journal and Perfecting ship NO default since they became
+  // Professions hub tabs; a player who binds one still reaches its case.
+  it("dispatches onUiKey('harvestJournal') for a player-bound chord", () => {
+    const keybinds = new Keybinds();
+    expect(keybinds.bind('harvestJournal', 0, 'Shift+KeyK')).toBe(true);
+    const { cb, windowListeners } = makeInput(undefined, keybinds);
 
     windowListeners.get('keydown')!({
       code: 'KeyK',
@@ -1534,8 +1548,10 @@ describe('Input Harvest Journal, Perfecting, and Loot Explorer keybinds', () => 
     expect(cb.onUiKey).toHaveBeenCalledWith('harvestJournal');
   });
 
-  it("dispatches onUiKey('perfecting') for the default Shift+T chord", () => {
-    const { cb, windowListeners } = makeInput();
+  it("dispatches onUiKey('perfecting') for a player-bound chord", () => {
+    const keybinds = new Keybinds();
+    expect(keybinds.bind('perfecting', 0, 'Shift+KeyT')).toBe(true);
+    const { cb, windowListeners } = makeInput(undefined, keybinds);
 
     windowListeners.get('keydown')!({
       code: 'KeyT',
@@ -1546,8 +1562,21 @@ describe('Input Harvest Journal, Perfecting, and Loot Explorer keybinds', () => 
     expect(cb.onUiKey).toHaveBeenCalledWith('perfecting');
   });
 
-  it("dispatches onUiKey('lootExplorer') for the default Shift+O chord", () => {
+  it('dispatches nothing for the freed Shift+K and Shift+T chords by default', () => {
     const { cb, windowListeners } = makeInput();
+    for (const code of ['KeyK', 'KeyT']) {
+      windowListeners.get('keydown')!({ code, repeat: false, shiftKey: true });
+    }
+    expect(cb.onUiKey).not.toHaveBeenCalledWith('harvestJournal');
+    expect(cb.onUiKey).not.toHaveBeenCalledWith('perfecting');
+  });
+
+  // Menu consolidation: the Loot Explorer is a Book of the Realm tab and ships
+  // no default chord; a player binding still dispatches it.
+  it("dispatches onUiKey('lootExplorer') for a player-bound Shift+O chord", () => {
+    const keybinds = new Keybinds();
+    expect(keybinds.bind('lootExplorer', 0, 'Shift+KeyO')).toBe(true);
+    const { cb, windowListeners } = makeInput(undefined, keybinds);
 
     windowListeners.get('keydown')!({
       code: 'KeyO',

@@ -354,7 +354,6 @@ describe('mobile window coverage (Phase 5 parity)', () => {
 
   it('each Phase 5 sheeted window carries a mobile-touch rule', () => {
     const phase5 = [
-      'calendar-window',
       'crafting-window',
       'mailbox-window',
       'emote-editor',

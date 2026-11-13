@@ -1,6 +1,6 @@
 import { STORAGE_SKU_LIST } from '../sim/content/storage_charters';
 import type { SubscriptionStoreHooks } from '../subscription_contract';
-import type { DailyRewardHistory, DailyRewardStatus, IWorld } from '../world_api';
+import type { IWorld } from '../world_api';
 import { armorySectionHtml } from './armory_card_view';
 import { ArmoryInspect } from './armory_inspect';
 import {
@@ -14,20 +14,9 @@ import { CharterFitMemory } from './charter_fit_memory';
 import type { StoreSpendResult } from './claudium_purchase_bridge';
 import {
   dailyRewardsLoadingHtml,
-  dailyRewardsRemainingText,
-  dailyRewardsSummaryHtml,
   dailyRewardsTitleHtml,
   wocStoreTabsHtml,
 } from './daily_rewards_chrome_view';
-import { dailyRewardsHistoryHtml, dailyRewardsLeaderboardHtml } from './daily_rewards_ranks_view';
-import { SpinOverlay } from './daily_rewards_spin_controller';
-import { spinSectionHtml } from './daily_rewards_spin_view';
-import {
-  buildDailyRewardsView,
-  type DailyRewardsView,
-  dailyRewardTaskDescription,
-} from './daily_rewards_view';
-import { dailyRewardsWalletCardHtml } from './daily_rewards_wallet_card_view';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
 import { captureFocusKey, findFocusKey, focusedWithin, focusKeyAttr } from './focus_restore';
@@ -111,8 +100,8 @@ export interface DailyRewardsWindowDeps {
   onVisibilityChange?(): void;
   /** Fired once per actual close (not when already closed). */
   onClose?(): void;
-  onStatus?(status: DailyRewardStatus): void;
-  onWalletConnect?(): void;
+  /** Whether the economy hooks are live (claudium_purchase_bridge.ts); with no
+   *  store there is nothing for this window to show, so it stays shut. */
   storeEnabled?(): boolean;
   storeSnapshot?(): Promise<ReturnType<typeof dailyRewardsStoreSnapshot>>;
   spendStoreItem?(
@@ -133,14 +122,11 @@ export interface DailyRewardsWindowDeps {
 export class DailyRewardsWindow {
   private openerFocus: HTMLElement | null = null;
   private poll: number | null = null;
-  private countdownPoll: number | null = null;
   private renderSeq = 0;
-  private lastHistory: DailyRewardHistory = { payouts: [] };
-  // The spin celebration's element, owned by its own painter
-  // (src/ui/daily_rewards_spin_controller.ts) beside the pure wheel core.
-  private readonly spinOverlay = new SpinOverlay();
-  // 'rewards' is only the store-disabled fallback; the store itself has no rewards tab.
-  private tab: 'store' | 'memberships' | 'rewards' = 'store';
+  // The daily spin, tasks and leaderboard body that once stood in for a
+  // disabled store is gone (no longer a live feature, menu consolidation
+  // step 7): the window is the WOC Store, its Store and Memberships tabs.
+  private tab: 'store' | 'memberships' = 'store';
   private storeBalance: number | null = null;
   private storeItems: WocStoreItemInput[] = [];
   private armorySections: ArmorySection[] = [];
@@ -293,11 +279,11 @@ export class DailyRewardsWindow {
       this.close();
       return;
     }
+    if (!this.storeEnabled()) return;
     this.openerFocus = this.deps.captureFocus();
     this.deps.closeOthers();
     this.invalidateStoreSurface();
     const root = this.deps.root();
-    if (!this.storeEnabled()) this.tab = 'rewards';
     root.style.display = 'block';
     this.deps.onVisibilityChange?.();
     this.ensureShell();
@@ -310,9 +296,6 @@ export class DailyRewardsWindow {
     this.poll = window.setInterval(() => {
       if (this.isOpen) void this.renderCurrent(null, { background: true });
     }, 15_000);
-    this.countdownPoll = window.setInterval(() => {
-      if (this.isOpen) this.paintCountdowns();
-    }, 30_000);
   }
 
   close(): void {
@@ -325,10 +308,6 @@ export class DailyRewardsWindow {
       window.clearInterval(this.poll);
       this.poll = null;
     }
-    if (this.countdownPoll !== null) {
-      window.clearInterval(this.countdownPoll);
-      this.countdownPoll = null;
-    }
     this.invalidateStoreSurface();
     root.style.display = 'none';
     // A purchase-result band is about the attempt the player just made, not a
@@ -340,7 +319,6 @@ export class DailyRewardsWindow {
     this.charterFit.forgetRefusals();
     // Same bounding, one visit: a stash is about an attempt inside this visit.
     this.charterFocus.clear();
-    this.spinOverlay.close();
     this.armoryInspect?.close();
     this.mountInspect?.close();
     this.deps.restoreFocus(this.openerFocus);
@@ -349,48 +327,13 @@ export class DailyRewardsWindow {
     this.deps.onClose?.();
   }
 
-  async render(focus: 'open' | null = null): Promise<void> {
-    const root = this.deps.root();
-    const seq = ++this.renderSeq;
-    this.ensureShell();
-    if (focus === 'open') (root.querySelector('[data-close]') as HTMLElement | null)?.focus();
-    let status: DailyRewardStatus | null = null;
-    let history: DailyRewardHistory = { payouts: [] };
-    try {
-      status = await this.deps.world().dailyRewards();
-      if (status.enabled === false) {
-        if (!this.isOpen || seq !== this.renderSeq) return;
-        this.deps.onStatus?.(status);
-        this.paint(buildDailyRewardsView({ kind: 'status', status, history }));
-        return;
-      }
-      history = await this.deps.world().dailyRewardHistory();
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'daily rewards unavailable';
-      if (seq === this.renderSeq) this.paint(buildDailyRewardsView({ kind: 'error', message }));
-      return;
-    }
-    if (!this.isOpen || seq !== this.renderSeq) return;
-    this.lastHistory = history;
-    this.deps.onStatus?.(status);
-    this.paint(buildDailyRewardsView({ kind: 'status', status, history }));
-    this.paintCountdowns();
-  }
-
   private ensureShell(): void {
     const root = this.deps.root();
-    const storeEnabled = this.storeEnabled();
     markDialogRoot(root, { labelledBy: 'daily-rewards-title' });
-    if (root.querySelector('.woc-store-body') && root.dataset.storeEnabled === String(storeEnabled))
-      return;
-    if (!storeEnabled) this.tab = 'rewards';
-    root.dataset.storeEnabled = String(storeEnabled);
-    root.innerHTML =
-      dailyRewardsTitleHtml(storeEnabled) +
-      (storeEnabled ? wocStoreTabsHtml() : '') +
-      dailyRewardsLoadingHtml(storeEnabled);
+    if (root.querySelector('.woc-store-body')) return;
+    root.innerHTML = dailyRewardsTitleHtml() + wocStoreTabsHtml() + dailyRewardsLoadingHtml();
     root.querySelector('[data-close]')?.addEventListener('click', () => this.close());
-    if (storeEnabled) this.wireTabs(root);
+    this.wireTabs(root);
   }
 
   private wireTabs(root: HTMLElement): void {
@@ -429,26 +372,16 @@ export class DailyRewardsWindow {
     focus: 'open' | null,
     opts: { background?: boolean } = {},
   ): Promise<void> {
-    if (!this.storeEnabled()) this.tab = 'rewards';
     this.syncTabs();
     if (this.tab === 'store') {
       await this.renderStore(focus, opts);
       return;
     }
-    if (this.tab === 'memberships') {
-      await this.renderMemberships(focus, opts);
-      return;
-    }
-    await this.render(focus);
+    await this.renderMemberships(focus, opts);
   }
 
   private syncTabs(): void {
-    if (!this.storeEnabled()) {
-      this.tab = 'rewards';
-      this.deps.root().classList.remove('store-active');
-      return;
-    }
-    this.deps.root().classList.toggle('store-active', this.tab !== 'rewards');
+    this.deps.root().classList.add('store-active');
     const panel = this.deps.root().querySelector<HTMLElement>('.woc-store-body');
     panel?.setAttribute(
       'aria-labelledby',
@@ -1158,92 +1091,7 @@ export class DailyRewardsWindow {
     this.deps.openClaudium?.(() => this.openStore());
   }
 
-  private paint(view: DailyRewardsView): void {
-    const body = this.deps.root().querySelector<HTMLElement>('.dr-body');
-    if (!body) return;
-    // The same body hosts both tabs. Mark it as non-store content so returning
-    // to the Store tab always restores its markup even when its model is unchanged.
-    this.paintedStoreBody = null;
-    if (view.kind === 'loading') {
-      body.innerHTML = `<div class="dr-empty" role="status">${esc(t('hudChrome.dailyRewards.loading'))}</div>`;
-      return;
-    }
-    if (view.kind === 'error') {
-      body.innerHTML = `<div class="dr-empty dr-error" role="alert">${esc(t('hudChrome.dailyRewards.error'))}</div>`;
-      return;
-    }
-    if (view.kind === 'disabled') {
-      body.innerHTML = `<div class="dr-empty" role="status">${esc(t('hudChrome.dailyRewards.disabled'))}</div>`;
-      return;
-    }
-    body.innerHTML =
-      dailyRewardsSummaryHtml(view, Date.now()) +
-      dailyRewardsWalletCardHtml(view) +
-      spinSectionHtml(view) +
-      this.tasksHtml(view) +
-      dailyRewardsLeaderboardHtml(view.status) +
-      dailyRewardsHistoryHtml(view.history);
-    body.querySelector<HTMLButtonElement>('[data-spin]')?.addEventListener('click', () => {
-      void this.spin();
-    });
-    body
-      .querySelector<HTMLButtonElement>('[data-wallet-connect]')
-      ?.addEventListener('click', () => {
-        this.deps.onWalletConnect?.();
-      });
-  }
-
-  private async spin(): Promise<void> {
-    const body = this.deps.root().querySelector<HTMLElement>('.dr-body');
-    const button = body?.querySelector<HTMLButtonElement>('[data-spin]');
-    if (button) button.disabled = true;
-    try {
-      const result = await this.deps.world().spinDailyReward();
-      this.spinOverlay.open(result.awardedPoints);
-      this.deps.onStatus?.(result);
-      this.paint(
-        buildDailyRewardsView({ kind: 'status', status: result, history: this.lastHistory }),
-      );
-    } catch {
-      await this.render(null);
-      return;
-    }
-  }
-
   private storeEnabled(): boolean {
     return this.deps.storeEnabled?.() ?? this.deps.storeSnapshot !== undefined;
-  }
-
-  private paintCountdowns(): void {
-    const root = this.deps.root();
-    root.querySelectorAll<HTMLElement>('[data-daily-rewards-countdown]').forEach((el) => {
-      const resetAt = el.dataset.dailyRewardsCountdown;
-      if (!resetAt) return;
-      el.textContent = t('hudChrome.dailyRewards.endsIn', {
-        time: dailyRewardsRemainingText(resetAt, Date.now()),
-      });
-    });
-  }
-
-  private tasksHtml(view: Extract<DailyRewardsView, { kind: 'ready' }>): string {
-    const rows = view.status.tasks
-      .map((task) => {
-        const multiplier =
-          typeof task.multiplier === 'number' && Number.isFinite(task.multiplier)
-            ? `<em>${esc(t('hudChrome.dailyRewards.taskMultiplier', { multiplier: formatNumber(task.multiplier, { maximumFractionDigits: 2 }) }))}</em>`
-            : '';
-        const description = dailyRewardTaskDescription(
-          task.type,
-          task.description,
-          t('hudChrome.dailyRewards.oneVsOneExcluded'),
-        );
-        return `<li class="${task.completed ? 'done' : ''}"><span>${esc(task.title)}</span><small><span>${esc(description)}</span>${multiplier}</small><b>${formatNumber(task.points, { maximumFractionDigits: 0 })}</b></li>`;
-      })
-      .join('');
-    return (
-      `<section class="dr-section ui-card"><h3>${esc(t('hudChrome.dailyRewards.tasks'))}</h3>` +
-      `<ul class="dr-tasks">${rows}</ul>` +
-      `</section>`
-    );
   }
 }

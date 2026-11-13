@@ -105,24 +105,20 @@ describe('char_view: paperdoll data model', () => {
 });
 
 describe('char_view: sidebar tabs', () => {
-  it('models the Stats, Progression, and Skills tabs with one selected tab', () => {
-    expect(CHARACTER_SIDEBAR_TABS).toEqual([
-      'stats',
-      'reputation',
-      'currencies',
-      'progression',
-      'skills',
-    ]);
+  it('models the Character (stats) and Progression tabs with one selected tab', () => {
+    // The menu consolidation took the sheet to two tabs: Skills left with the
+    // Professions hub, Reputation moved to the Book of the Realm, Currencies to
+    // the Bags wallet strip.
+    expect(CHARACTER_SIDEBAR_TABS).toEqual(['stats', 'progression']);
     expect(buildCharacterSidebarView('progression')).toEqual({
       selected: 'progression',
       tabs: [
         { id: 'stats', selected: false },
-        { id: 'reputation', selected: false },
-        { id: 'currencies', selected: false },
         { id: 'progression', selected: true },
-        { id: 'skills', selected: false },
       ],
     });
+    expect(buildCharacterSidebarView('reputation').selected).toBe('stats');
+    expect(buildCharacterSidebarView('currencies').selected).toBe('stats');
   });
 
   it('fails closed to Stats for an absent or stale tab id', () => {

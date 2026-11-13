@@ -31,7 +31,7 @@ export interface BindAction {
   label: string;
   category: string;
   kind: BindKind;
-  defaults: string[]; // 1 or 2 codes; index 0 = primary, 1 = secondary
+  defaults: string[]; // 0 to 2 codes (0 = unbound by default); index 0 = primary, 1 = secondary
   // When true this action is exempt from the classic-style "one code per action"
   // uniqueness sweep: its code may deliberately overlap another action's. Used
   // by Attack Move, whose default (A) intentionally shadows Turn Left while the
@@ -328,12 +328,23 @@ export const BIND_ACTIONS: BindAction[] = [
     defaults: ['KeyG'],
   },
   {
-    // Shift+KeyI: bare KeyI belongs to Calendar (unchanged).
+    // Activities (menu consolidation, 2026-11-04): the Groups hub (Dungeons
+    // and Raids, PvP, Card Duel) on its last tab. The id stays dungeonFinder so
+    // a saved binding keeps working.
     id: 'dungeonFinder',
-    label: 'Dungeon Finder',
+    label: 'Activities',
     category: 'Interface',
     kind: 'edge',
     defaults: ['Shift+KeyI'],
+  },
+  {
+    // Rewards (menu consolidation step 7): the Vault, the weekly quest and
+    // today's world quests. Rebindable, no default key.
+    id: 'rewards',
+    label: 'Rewards',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: [],
   },
   // Mount / dismount toggle: Backquote avoids the release-owned KeyZ layers
   // for weapon sheathing and the Book of Deeds.
@@ -344,39 +355,38 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['Backquote'],
   },
+  // The menu consolidation (2026-11-04) folded these windows into hubs (the
+  // Book of the Realm, Activities, Social), so they no longer ship a default
+  // key: K, U, Shift+X, Shift+O and Shift+Y are free. Each action stays
+  // rebindable, opens its hub on that tab, and a saved binding keeps working.
   {
     id: 'leaderboard',
     label: 'Leaderboard',
     category: 'Interface',
     kind: 'edge',
-    defaults: ['KeyK'],
-  },
-  {
-    id: 'calendar',
-    label: 'Event Calendar',
-    category: 'Interface',
-    kind: 'edge',
-    defaults: ['KeyI'],
+    defaults: [],
   },
   {
     id: 'discord',
     label: 'Discord',
     category: 'Interface',
     kind: 'edge',
-    defaults: ['KeyU'],
+    defaults: [],
   },
-  // The Book of Deeds parks on the shifted layer of KeyZ, like Damage Meters
-  // does on H and the Shift+digit secondary bar. Rebindable like any other action.
+  // The Book of the Realm (Deeds, Titles, Reliquary, Reputation, Loot
+  // Explorer, Rankings) parks on the shifted layer of KeyZ, like Damage Meters
+  // does on H. The id stays deeds so a saved binding keeps working.
   {
     id: 'deeds',
-    label: 'Book of Deeds',
+    label: 'Book of the Realm',
     category: 'Interface',
     kind: 'edge',
     defaults: ['Shift+KeyZ'],
   },
   // Professions parks on the shifted layer of KeyP like Deeds does on Z:
   // every bare letter default is already taken, and Shift+P keeps the
-  // Spellbook's plain P untouched. Rebindable like any action.
+  // Spellbook's plain P untouched. It opens the Professions hub (Overview,
+  // Crafting, Perfecting, Harvest Journal) on its last tab. Rebindable.
   {
     id: 'professions',
     label: 'Professions',
@@ -384,54 +394,47 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['Shift+KeyP'],
   },
-  // The Reliquary parks on Shift+X: bare KeyX is the emote wheel; Shift+X was
-  // free and sits beside Deeds (Shift+Z) on the shifted letter row.
   {
     id: 'reliquary',
     label: 'The Reliquary',
     category: 'Interface',
     kind: 'edge',
-    defaults: ['Shift+KeyX'],
+    defaults: [],
   },
-  // The Harvest Journal parks on Shift+K. Its own initials are both spoken
-  // for on the shifted layer (Shift+H is Damage Meters, Shift+J is Target
-  // Buffs and Debuffs), and K is the free key next to them; bare KeyK stays
-  // the Leaderboard. Rebindable like any action.
+  // The Harvest Journal and Perfecting are tabs of the Professions hub (menu
+  // consolidation, 2026-11-04): Shift+P opens the hub and T lands on its
+  // Crafting tab, so neither tab ships a default key any more (Shift+K and
+  // Shift+T are no longer defaults; a saved binding keeps working). Both
+  // actions stay rebindable and open the hub straight on their tab.
   {
     id: 'harvestJournal',
     label: 'Harvest Journal',
     category: 'Interface',
     kind: 'edge',
-    defaults: ['Shift+KeyK'],
+    defaults: [],
   },
-  // Perfecting parks on the shifted layer of KeyT, Crafting's letter: bare
-  // KeyT is Crafting, its own initial is spoken for on both layers (bare P is
-  // the Spellbook, Shift+P is Professions), and Perfecting is the crafting
-  // family's endgame surface, so it sits over Crafting the way Professions
-  // sits over the Spellbook. Rebindable like any action.
   {
     id: 'perfecting',
     label: 'Perfecting',
     category: 'Interface',
     kind: 'edge',
-    defaults: ['Shift+KeyT'],
+    defaults: [],
   },
-  // Loot Explorer parks on Shift+O: bare KeyO is free, and Shift+O keeps the
-  // shifted-letter-row convention every other collection/catalog window uses.
   {
     id: 'lootExplorer',
     label: 'Loot Explorer',
     category: 'Interface',
     kind: 'edge',
-    defaults: ['Shift+KeyO'],
+    defaults: [],
   },
-  // Cosmetics uses Shift+Y; Shift+K belongs to the Harvest Journal.
+  // Cosmetics keeps its window, opened from the Character sheet footer and the
+  // mobile More tray; it no longer ships a default key.
   {
     id: 'cosmetics',
     label: 'Cosmetics',
     category: 'Interface',
     kind: 'edge',
-    defaults: ['Shift+KeyY'],
+    defaults: [],
   },
   {
     id: 'chat',

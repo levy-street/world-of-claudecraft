@@ -8,7 +8,7 @@
 // cold. `Hud.update()` polls about half of them. `spellbookWindow.tickOpen()` runs EVERY
 // FRAME while the window is open; arena / dungeon_finder / card_duel `render()` on
 // the 250 ms band behind only a display check; social / market / mailbox / bank / bags /
-// deeds / professions / calendar get `refreshIfChanged()` on the 500 ms band.
+// deeds / professions / reputation get `refreshIfChanged()` on the 500 ms band.
 //
 // The repo's intended pattern is POLL CHEAPLY, REBUILD ON A SIGNATURE CHANGE, and it works.
 // What was missing is that nothing said WHICH windows are on a poll, on which band, or behind
@@ -303,13 +303,6 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     gate: '',
     surface: 'chrome',
     why: 'the minimap instance difficulty badge and tooltip, value-diffed',
-  },
-  {
-    call: 'this.dailyRewardsLauncher.refresh',
-    band: 'slow',
-    gate: '',
-    surface: 'chrome',
-    why: 'the daily-rewards launcher button state (not the window). Bank Storage phase 15 moved the poll state machine out of hud.ts into daily_rewards_launcher_core.ts, where its throttle is executed-tested; a chrome row carries no guard field, so the pin lives there rather than here',
   },
   {
     call: 'this.maybeRestoreActionBarLayout',
@@ -1394,12 +1387,55 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the market window',
   },
   {
+    call: 'this.rewards.recount',
+    band: 'slow',
+    gate: '',
+    surface: 'none',
+    why: "recounts the Rewards rail pill (menu consolidation step 7) from the same reads the hub's tabs paint; no DOM write, the rail painter shows it on the medium band",
+  },
+  {
+    call: 'this.rewards.vault.refreshIfChanged',
+    band: 'slow',
+    gate: 'this.rewards.vault.isOpen',
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'weekly_rewards_window.ts',
+      proof: 'if (signature !== this.lastSignature) {',
+    },
+    why: "the Rewards hub's Vault tab (the weekly rewards sheet, once the Bank's Rewards tab)",
+  },
+  {
     call: 'this.weeklyQuestsWindow.refreshIfChanged',
     band: 'slow',
     gate: 'this.weeklyQuestsWindow.isOpen',
     surface: 'window',
     guard: { kind: 'module', module: 'weekly_quests_window.ts', proof: SIG_RETURN },
-    why: 'the weekly emissary window (charge progress and the reset clock, minute-granular)',
+    why: "the weekly emissary window, also the Rewards hub's Weekly Quest tab (charge progress and the reset clock, minute-granular)",
+  },
+  {
+    call: 'this.rewards.worldQuests.refreshIfChanged',
+    band: 'slow',
+    gate: 'this.rewards.worldQuests.isOpen',
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'hud/rewards/world_quests_window.ts',
+      proof: 'if (this.signature(this.view()) === this.lastSig) return;',
+    },
+    why: "the Rewards hub's World Quests tab (the day's board, once on the World Map rail; the expiry countdown is minute-granular)",
+  },
+  {
+    call: 'this.questlogWindow.refreshIfChanged',
+    band: 'slow',
+    gate: 'this.questlogWindow.isOpen',
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'hud/quest/questlog_window.ts',
+      proof: 'if (offersSig(this.offers()) === this.lastOffersSig) return;',
+    },
+    why: "the Quest Log's Available group (menu consolidation step 8): repaints when the set of nearby offers changes, never as the player walks",
   },
   {
     call: 'this.guildHallWindow.refreshIfChanged',
@@ -1485,6 +1521,14 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     surface: 'window',
     guard: { kind: 'module', module: 'deeds_window.ts', proof: SIG_RETURN },
     why: 'the Book of Deeds window',
+  },
+  {
+    call: 'this.titlesWindow.refreshIfChanged',
+    band: 'slow',
+    gate: 'this.titlesWindow.isOpen',
+    surface: 'window',
+    guard: { kind: 'module', module: 'deeds_window.ts', proof: SIG_RETURN },
+    why: "the Book of the Realm's Titles tab (a second DeedsWindow in titles mode)",
   },
   {
     call: 'this.cosmeticsWindow.refreshIfChanged',
@@ -1606,12 +1650,16 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'seats #right-tracker-stack below the minimap column, whose rendered height moves with the zone label and mobile chrome scale; a bounded layout read, elided write (tracker_stack_anchor.ts owns the cadence contract)',
   },
   {
-    call: 'this.calendarWindow.refreshIfChanged',
+    call: 'this.reputationWindow.refreshIfChanged',
     band: 'slow',
-    gate: 'this.calendarWindow.isOpen',
+    gate: 'this.reputationWindow.isOpen',
     surface: 'window',
-    guard: { kind: 'module', module: 'calendar_window.ts', proof: SIG_RETURN },
-    why: 'the guild calendar window',
+    guard: {
+      kind: 'module',
+      module: 'hud/reputation/reputation_window.ts',
+      proof: 'if (this.bodyHtml() === this.lastBody) return;',
+    },
+    why: "the Book of the Realm's Reputation tab (the body string is its signature)",
   },
   {
     call: 'this.updateMailIndicator',
@@ -1974,7 +2022,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // chrome 99 -> 100: the dungeon objectives tracker's medium-band paint
       // (hud/dungeon/dungeon_tracker_painter.ts), facet-routed like the deed strip.
       // window 53 -> 54: Lantern Hall's guild window (hud/guild_hall/guild_hall_window.ts).
-    ).toEqual({ window: 55, chrome: 101, none: 21 });
+    ).toEqual({ window: 59, chrome: 100, none: 22 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1999,7 +2047,9 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // refreshing instead of only closing.
       // The courier window owns both revision and content signature guards.
       // Lantern Hall's guild window owns its signature guard (hud/guild_hall/).
-      module: 32,
+      // The menu consolidation: the Book of the Realm's Titles tab (a second
+      // DeedsWindow) adds a row; the Reputation window replaces the Calendar's.
+      module: 36,
       // Phase 20's refreshCharSheetIfChanged and its siblings. Their latches are
       // HUD fields (lastCharSheetSig et al) because the cold char_window painter
       // holds no signature of its own to diff. The release's trade row left this
@@ -2043,12 +2093,14 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     ).toEqual(
       [
         'arena_window.ts: if (ravenriftSig === this.lastSig) return;',
+        'hud/reputation/reputation_window.ts: if (this.bodyHtml() === this.lastBody) return;',
         'hud/referral_cards/referral_cards_controller.ts: if (this.lastRevision === revision && this.lastFriendshipInviter === inviter) return;',
         'bags_window.ts: if (!bagsMoneyRowStale(el.style.display, this.deps.world().copper, this.lastMoneyCopper)) return;',
         'bank_window.ts: if (sig === this.lastSig) return;',
-        'calendar_window.ts: if (sig === this.lastSig) return;',
         'card_duel_window.ts: if (sig === this.lastSig) return;',
         'daily_rewards_window.ts: if (!this.charterFit.changedFrom(this.deps.world().bankPurchasedSlots)) return;',
+        'deeds_window.ts: if (sig === this.lastSig) return;',
+        // The Book of the Realm's Titles tab is a second DeedsWindow in titles mode.
         'deeds_window.ts: if (sig === this.lastSig) return;',
         'dungeon_finder_proposal_popup.ts: if (view.sig !== this.lastSig) {',
         'dungeon_finder_window.ts: if (sig === this.lastSig) {',
@@ -2088,6 +2140,10 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         'spellbook_window.ts: if (this.knownChanged(this.deps.world().known)) {',
         'target_auras_window.ts: if (this.cleared) return;',
         'weekly_quests_window.ts: if (sig === this.lastSig) return;',
+        // The Rewards hub's Vault and World Quests tabs (menu consolidation step 7).
+        'weekly_rewards_window.ts: if (signature !== this.lastSignature) {',
+        'hud/rewards/world_quests_window.ts: if (this.signature(this.view()) === this.lastSig) return;',
+        'hud/quest/questlog_window.ts: if (offersSig(this.offers()) === this.lastOffersSig) return;',
         'hud/guild_hall/guild_hall_window.ts: if (sig === this.lastSig) return;',
         'woc_market_window.ts: if (sig === this.lastSig && !this.walletRepaintDue) return;',
       ].sort(),

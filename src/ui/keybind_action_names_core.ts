@@ -53,7 +53,8 @@ export const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   targetAuras: 'hudChrome.targetAuras.keybindLabel',
   social: 'hud.keybinds.actions.social',
   arena: 'hud.keybinds.actions.arena',
-  dungeonFinder: 'hudChrome.finder.title',
+  dungeonFinder: 'hudChrome.activities.title',
+  rewards: 'hudChrome.rewards.title',
   chat: 'hud.keybinds.actions.chat',
   // Combat/social target + emote-wheel actions. English-only chrome keys (the
   // `hud` catalog domain is tsc-locked to inline per-locale blocks).
@@ -87,10 +88,9 @@ export const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   // map and fell back to the raw English BIND_ACTIONS labels).
   talents: 'game.talents.title',
   leaderboard: 'game.leaderboard.title',
-  calendar: 'hudChrome.calendar.keybindLabel',
   crafting: 'hudChrome.crafting.title',
   mount: 'hudChrome.keybinds.mount',
-  deeds: 'hudChrome.deeds.title',
+  deeds: 'hudChrome.bookOfRealm.title',
   professions: 'hudChrome.professions.title',
   reliquary: 'hudChrome.reliquary.title',
   cosmetics: 'hudChrome.cosmetics.title',

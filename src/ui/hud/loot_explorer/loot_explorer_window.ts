@@ -42,6 +42,7 @@ import { statNameKey } from '../../stat_tooltip_view';
 import { focusActiveTab, wireTabStrip } from '../../tab_strip_painter';
 import { tabStripHtml, tabStripModel } from '../../tab_strip_view';
 import { svgIcon } from '../../ui_icons';
+import type { WindowHubStrip } from '../hub/window_hub_controller';
 import {
   buildLootExplorerIndex,
   filterLootExplorerItems,
@@ -62,6 +63,9 @@ type LootExplorerTab = 'items' | 'encounters';
 export interface LootExplorerWindowDeps extends PainterHostPresentation {
   /** The #loot-explorer-window root (Hud owns the id). */
   root(): HTMLElement;
+  /** The Book of the Realm strip (menu consolidation step 2), painted under
+   *  the title bar while this window is one of the hub's tabs. */
+  hubStrip?: WindowHubStrip;
   closeOthers(): void;
   hideTooltip(): void;
   captureFocus(): HTMLElement | null;
@@ -274,6 +278,11 @@ export class LootExplorerWindow {
 
   constructor(private readonly deps: LootExplorerWindowDeps) {}
 
+  /** The root a hub tab switch carries its position onto. */
+  rootElement(): HTMLElement {
+    return this.deps.root();
+  }
+
   get isOpen(): boolean {
     return this.opened;
   }
@@ -360,10 +369,13 @@ export class LootExplorerWindow {
   private render(): void {
     this.deps.hideTooltip();
     const el = this.deps.root();
-    markDialogRoot(el, { label: t('hudChrome.lootExplorer.title') });
+    const hub = this.deps.hubStrip;
+    const title = hub ? hub.title() : t('hudChrome.lootExplorer.title');
+    markDialogRoot(el, { label: title });
     el.innerHTML =
-      `<div class="panel-title"><span>${esc(t('hudChrome.lootExplorer.title'))}</span>` +
-      `<button type="button" class="x-btn" data-close data-focus-key="close" aria-label="${esc(t('hudChrome.lootExplorer.close'))}">${svgIcon('close')}</button></div>` +
+      `<div class="panel-title"><span>${esc(title)}</span>` +
+      `<button type="button" class="x-btn" data-close data-focus-key="close" aria-label="${esc(hub ? hub.closeLabel() : t('hudChrome.lootExplorer.close'))}">${svgIcon('close')}</button></div>` +
+      (hub?.html() ?? '') +
       `<div class="loot-explorer-toolbar">` +
       `<input type="search" class="loot-explorer-search" data-search data-focus-key="search" value="${esc(this.search)}" placeholder="${esc(t('hudChrome.lootExplorer.searchPlaceholder'))}" aria-label="${esc(t('hudChrome.lootExplorer.searchAria'))}">` +
       `<select class="loot-explorer-filter" data-filter="category" data-focus-key="filter:category" aria-label="${esc(t('hudChrome.lootExplorer.filterCategoryAria'))}">${optionsHtml(LOOT_EXPLORER_CATEGORIES, this.filters.category, (c) => t(categoryLabelKey(c)))}</select>` +
@@ -392,6 +404,7 @@ export class LootExplorerWindow {
   }
 
   private wireChrome(el: HTMLElement): void {
+    this.deps.hubStrip?.wire(el);
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
     wireTabStrip(el, 'loot-explorer-tab', (id, focusFollow) => {
       this.tab = id as LootExplorerTab;

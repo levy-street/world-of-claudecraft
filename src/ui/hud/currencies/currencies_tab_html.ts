@@ -70,6 +70,45 @@ function factionRow(row: FactionCurrencyRow): string {
   return `<div class="char-cur-row is-faction is-${esc(row.factionId)}"><span class="char-cur-icon">${currencyIconHtml(curId)}</span><span class="char-cur-copy"><b>${esc(t(FACTION_CURRENCY_NAME_KEY[row.factionId]))}</b><span class="char-cur-note">${esc(t(FACTION_CURRENCY_NOTE_KEY[row.factionId]))}</span></span><span class="char-cur-value"><span class="char-cur-amount">${esc(whole(row.amount))}</span></span></div>`;
 }
 
+function walletChip(cls: string, iconHtml: string, name: string, amount: number): string {
+  const label = t('hudChrome.currencies.walletChipAria', { name, amount: whole(amount) });
+  return `<span class="bag-wallet-chip ui-chip is-${esc(cls)}" role="img" aria-label="${esc(label)}" title="${esc(label)}"><span class="bag-wallet-icon" aria-hidden="true">${iconHtml}</span><span class="bag-wallet-amount" aria-hidden="true">${esc(whole(amount))}</span></span>`;
+}
+
+/**
+ * The Bags window's wallet strip (menu consolidation step 3): every activity
+ * and faction currency as one compact chip row under the bag grid, so none of
+ * them has to sit in the bags to be seen. $WOC is left out: the money row
+ * beneath already carries its balance chip. The returned string is also the
+ * strip's repaint signature (the window compares it on the slow band).
+ */
+export function currenciesWalletHtml(world: IWorld): string {
+  const view = buildCurrenciesView({
+    heroicMarks: world.heroicMarks,
+    honor: world.honor,
+    lifetimeHonor: world.lifetimeHonor,
+    delveMarks: world.delveMarks,
+    factionCurrencies: world.factionCurrencies,
+    woc: { enabled: false, balance: null, verified: false },
+  });
+  const chips = [
+    ...view.activities
+      .filter((row) => row.id !== 'woc_token' && row.amount !== null)
+      .map((row) => walletChip(row.id, icon(row.id), t(NAME_KEY[row.id]), row.amount ?? 0)),
+    ...view.factions.map((row) =>
+      walletChip(
+        row.factionId,
+        currencyIconHtml(FACTION_CURRENCY_IDS[row.factionId]),
+        t(FACTION_CURRENCY_NAME_KEY[row.factionId]),
+        row.amount,
+      ),
+    ),
+  ];
+  return chips.length === 0
+    ? ''
+    : `<div class="bag-wallet-chips" role="group" aria-label="${esc(t('hudChrome.charSidebar.currencies'))}">${chips.join('')}</div>`;
+}
+
 /** The whole sidebar body for the Currencies tab. */
 export function currenciesTabHtml(world: IWorld): string {
   const view = buildCurrenciesView({

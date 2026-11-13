@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <title>Rewards launcher icon source</title>
+  <!-- Rewards hub rosette, chrome launcher style (the crown's palette and
+       outline weight): a gold medal on two red ribbon tails, top-left light.
+       The title serves the a11y lint on this SOURCE file only; the shipped
+       asset is the keyed WebP. -->
+  <defs>
+    <clipPath id="medalClip">
+      <circle cx="64" cy="50" r="34"/>
+    </clipPath>
+  </defs>
+  <!-- ribbon tails, drawn first so the medal overlaps their tops -->
+  <g stroke="#1a0f08" stroke-width="3.5" stroke-linejoin="round">
+    <path d="M44 70 L30 116 L44 108 L54 120 L66 78 Z" fill="#b83030"/>
+    <path d="M84 70 L98 116 L84 108 L74 120 L62 78 Z" fill="#a02828"/>
+  </g>
+  <g stroke="none">
+    <path d="M44 72 L34 108 L40 104 L50 74 Z" fill="#e05858" opacity="0.85"/>
+    <path d="M82 74 L92 108 L86 106 L78 78 Z" fill="#701818" opacity="0.8"/>
+    <path d="M47 96 L60 92 L58 98 L45 102 Z" fill="#801818" opacity="0.6"/>
+  </g>
+  <!-- scalloped rosette rim -->
+  <g stroke="#1a0f08" stroke-width="3.5" stroke-linejoin="round">
+    <path d="M64 8 L71 15 L81 12 L84 22 L94 24 L93 34 L101 40 L96 49 L101 58 L93 64 L94 74
+             L84 76 L81 86 L71 83 L64 90 L57 83 L47 86 L44 76 L34 74 L35 64 L27 58 L32 49
+             L27 40 L35 34 L34 24 L44 22 L47 12 L57 15 Z" fill="#c89838"/>
+    <circle cx="64" cy="50" r="34" fill="#e0b848"/>
+  </g>
+  <!-- medal shading, clipped inside the disc -->
+  <g stroke="none" clip-path="url(#medalClip)">
+    <path d="M26 14 L76 14 L48 88 L26 88 Z" fill="#ecc858" opacity="0.95"/>
+    <path d="M80 18 L102 18 L102 90 L60 90 Z" fill="#b88838" opacity="0.85"/>
+    <circle cx="52" cy="36" r="10" fill="#f8e0a0" opacity="0.55"/>
+  </g>
+  <!-- inner ring and star -->
+  <circle cx="64" cy="50" r="23" fill="none" stroke="#906820" stroke-width="3"/>
+  <path d="M64 33 L69.3 44 L81 45.5 L72.3 53.6 L74.6 65.3 L64 59.4 L53.4 65.3 L55.7 53.6
+           L47 45.5 L58.7 44 Z" fill="#f8e8b8" stroke="#1a0f08" stroke-width="2.6" stroke-linejoin="round"/>
+  <path d="M64 36 L67.5 44.5 L60 45 Z" fill="#ffffff" opacity="0.8"/>
+  <circle cx="44" cy="30" r="2.6" fill="#f8f0d0"/>
+</svg>

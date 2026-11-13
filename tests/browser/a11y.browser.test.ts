@@ -102,6 +102,8 @@ function leaderboardWindow(leaderboard: () => Promise<LeaderboardPage>): {
   const win = new LeaderboardWindow(
     stubDeps({
       root: () => root,
+      // stubDeps answers every missing dep with a no-op; outside a hub there is no strip.
+      hubStrip: undefined,
       world: () =>
         ({
           realm: 'Claudemoon',
@@ -215,6 +217,8 @@ describe('axe: pvp window', () => {
     new ArenaWindow(
       stubDeps({
         root: () => root,
+        // stubDeps answers every missing dep with a no-op; outside a hub there is no strip.
+        hubStrip: undefined,
         world: () =>
           ({
             arenaInfo: null,
@@ -268,7 +272,8 @@ describe('axe: quest log window', () => {
           ({
             cfg: { playerClass: 'warrior' },
             talents: { spec: null },
-            player: { name: 'Aurelia' },
+            player: { name: 'Aurelia', pos: { x: 0, y: 0, z: 0 } },
+            questState: () => 'unavailable',
             questLog: new Map([[questId, progress]]),
             questsDone: new Set<string>(),
           }) as never,
@@ -344,23 +349,40 @@ describe('axe: options menu', () => {
     await expectClean(root);
   });
 
+  // The settings categories live in the full-screen Settings view's rail
+  // (issue #1653): Settings from the Game Menu, then the category's rail button.
+  function openCategory(root: HTMLElement, category: string): void {
+    root.querySelector<HTMLElement>('.opt-btn[data-menu-action="settings"]')?.click();
+    root.querySelector<HTMLElement>(`.opt-rail-btn[data-settings-category="${category}"]`)?.click();
+  }
+
   it('Overlays sub-view is clean (labelled title that resolves)', async () => {
     const { root, win } = optionsWindow();
     win.toggle();
-    root.querySelector<HTMLElement>('.opt-btn[data-menu-action="overlays"]')?.click();
+    openCategory(root, 'overlays');
     expect(root.querySelector('#options-title')?.textContent).toBe(t('hudChrome.options.overlays'));
     expect(root.getAttribute('aria-labelledby')).toBe('options-title');
+    // The category rail is a named landmark with the open category marked current.
+    const rail = root.querySelector('nav.opt-rail');
+    expect(rail?.getAttribute('aria-label')).toBe(t('hudChrome.options.settingsCategories'));
+    expect(
+      rail?.querySelector('[aria-current="page"]')?.getAttribute('data-settings-category'),
+    ).toBe('overlays');
     await expectClean(root);
   });
 
   it('Performance sub-view names the dialog with aria-label, no dangling idref', async () => {
     const { root, win } = optionsWindow();
     win.toggle(); // main menu first
-    // Navigate to the Performance sub-view the real way: Overlays, then its entry. Its
+    // Navigate to the Performance sub-view the real way: Settings, the Overlays
+    // rail entry, then its row. Its
     // title comes from the self-contained perf panel (no id=options-title), so the dialog
     // must name itself via aria-label, NOT keep the now-dangling aria-labelledby.
-    const overlaysBtn = root.querySelector<HTMLElement>('.opt-btn[data-menu-action="overlays"]');
-    expect(overlaysBtn, 'overlays menu entry present').toBeTruthy();
+    root.querySelector<HTMLElement>('.opt-btn[data-menu-action="settings"]')?.click();
+    const overlaysBtn = root.querySelector<HTMLElement>(
+      '.opt-rail-btn[data-settings-category="overlays"]',
+    );
+    expect(overlaysBtn, 'overlays rail entry present').toBeTruthy();
     overlaysBtn?.click();
     const perfBtn = Array.from(root.querySelectorAll<HTMLElement>('.opt-btn')).find(
       (b) => b.textContent === t('hudChrome.perf.title'),
@@ -392,6 +414,8 @@ describe('axe: options menu', () => {
     const hooks = {
       settings,
       onSettingChange: () => {},
+      // The Settings view opens on Graphics before the rail reaches Interface.
+      graphicsApplied: () => normalizeGraphicsSettingsSnapshot({}),
       theme: {
         get: () => ({ preset: 'classic', custom: {} }),
         setPreset: () => {},
@@ -421,10 +445,7 @@ describe('axe: options menu', () => {
       root.querySelector<HTMLButtonElement>(`[data-setting-key="${key}"]`);
 
     win.toggle();
-    const interfaceButton = Array.from(root.querySelectorAll<HTMLButtonElement>('.opt-btn')).find(
-      (button) => button.textContent === t('hud.options.interface'),
-    );
-    interfaceButton?.click();
+    openCategory(root, 'interface');
     // The Interface panel is tabbed; the surviving auto-attack toggles live
     // under Combat.
     root.querySelector<HTMLButtonElement>('.opt-tab[data-tab="combat"]')?.click();
@@ -495,10 +516,11 @@ describe('axe: options menu', () => {
     );
 
     win.toggle();
-    const graphicsButton = Array.from(root.querySelectorAll<HTMLButtonElement>('.opt-btn')).find(
-      (button) => button.textContent === t('hud.options.graphics'),
+    root.querySelector<HTMLElement>('.opt-btn[data-menu-action="settings"]')?.click();
+    const graphicsButton = root.querySelector<HTMLButtonElement>(
+      '.opt-rail-btn[data-settings-category="graphics"]',
     );
-    expect(graphicsButton, 'main menu renders the Graphics entry').toBeTruthy();
+    expect(graphicsButton, 'the Settings rail renders the Graphics entry').toBeTruthy();
     graphicsButton?.click();
 
     // The dependent control starts DISABLED: the draft matches the applied
@@ -1271,6 +1293,8 @@ describe('axe: professions window tool-effect controls', () => {
     const win = new ProfessionsWindow(
       stubDeps({
         root: () => root,
+        // stubDeps answers every missing dep with a no-op; outside the hub there is no strip.
+        hubStrip: undefined,
         world: () => world as never,
         consumePeek: () => false,
         itemIcon: () => '<img alt="">',
@@ -1388,6 +1412,8 @@ describe('axe: harvest journal rows and the ready status line', () => {
     const win = new HarvestJournalWindow(
       stubDeps({
         root: () => root,
+        // stubDeps answers every missing dep with a no-op; outside the hub there is no strip.
+        hubStrip: undefined,
         world: () => world as never,
       }),
     );
@@ -1537,6 +1563,8 @@ describe('axe: reliquary window search, filters, and relic grid', () => {
     const win = new ReliquaryWindow(
       stubDeps({
         root: () => root,
+        // stubDeps answers every missing dep with a no-op; outside a hub there is no strip.
+        hubStrip: undefined,
         world: () => reliquaryWorld() as never,
         consumePeek: () => false,
         itemIcon: () => '<img alt="">',

@@ -132,7 +132,6 @@ import {
 import { maxBuyCount } from '../sim/vendor_buy_stack';
 import type { SubscriptionStoreHooks } from '../subscription_contract';
 import {
-  type DailyRewardStatus,
   type IWorld,
   isOverheadEmoteId,
   OVERHEAD_EMOTES,
@@ -200,12 +199,11 @@ export type { BannerVariant } from './banner_queue';
 import { blockLandingLogKey } from './block_landing_feedback_core';
 import { BootcampOverlay } from './bootcamp';
 import { buddyDisplayName, buddyEventLogArgs } from './buddy_event_lines';
-import { CalendarWindow } from './calendar_window';
 import { require2dContext } from './canvas_context';
 import { CardDuelWindow } from './card_duel_window';
 import { CastBarPainter, type CastBarPaintInput } from './cast_bar_painter';
 import { castDisplayName, targetCastDisplayName } from './cast_display_name';
-import { charBagsPaired } from './char_bags_pairing_core';
+import { type CharBagsPairingState, charToggleBagsAction } from './char_bags_pairing_core';
 import { charSheetRefreshSigFor } from './char_sheet_sig_core';
 import { type CharSkinPainterHost, paintCharSkinPicker } from './char_skin_window';
 import { charStatModel } from './char_stat_model_core';
@@ -257,7 +255,6 @@ import { formatMinimapCoords } from './coords';
 import { formatCount } from './count_format';
 import { classCrestId } from './crest_icon_art';
 import { hydrateCrestImageFallbacks } from './crest_image_fallback';
-import { DailyRewardsLauncherPoll } from './daily_rewards_launcher_core';
 import { DailyRewardsWindow, type StoreSpendResult } from './daily_rewards_window';
 import { DayNightDialPainter } from './day_night_dial_painter';
 import { DeathRecapDialog } from './death_recap_dialog';
@@ -494,6 +491,7 @@ import {
   crossHotbarResolvers,
   crossHotbarSeedActions,
 } from './hud/cross_hotbar';
+import { currenciesWalletHtml } from './hud/currencies/currencies_tab_html';
 import { createDeathPromptView, PvpResurrectPrompt, updateDeathPromptView } from './hud/death';
 import { DelveBoardController } from './hud/delve/delve_board_controller';
 import { DelveMapPainter } from './hud/delve/delve_map_painter';
@@ -509,6 +507,9 @@ import { FiestaController } from './hud/fiesta/fiesta_controller';
 import { GuildBoardWindow } from './hud/guild_board';
 import { GuildHallWindow } from './hud/guild_hall';
 import { buildHillBarView, HillBar } from './hud/hill';
+import { ACTIVITIES, type ActivitiesTab } from './hud/hub/activities_view';
+import { BOOK_OF_REALM, type BookOfRealmTab } from './hud/hub/book_of_realm_view';
+import { WindowHubController } from './hud/hub/window_hub_controller';
 import { LootRollController } from './hud/loot/loot_roll_controller';
 import { lootSettingsView } from './hud/loot/loot_settings_view';
 import { renderLootSettingsWindow } from './hud/loot/loot_settings_window';
@@ -612,6 +613,8 @@ import {
 } from './hud/professions/profession_log_tones';
 import { buildProfessionTutorialModel } from './hud/professions/profession_tutorial_view';
 import { renderProfessionTutorial } from './hud/professions/profession_tutorial_window';
+import { ProfessionsHubController } from './hud/professions/professions_hub_controller';
+import type { ProfessionsHubTab } from './hud/professions/professions_hub_view';
 import { ProfessionsWindow } from './hud/professions/professions_window';
 import { recipePatternTooltipLines } from './hud/professions/recipe_pattern_tooltip_view';
 import {
@@ -633,6 +636,8 @@ import { QuestLogWindow } from './hud/quest/questlog_window';
 import { createReferralCardsHud } from './hud/referral_cards/referral_cards_hud_controller';
 import { paintFactionTierCelebrations } from './hud/reputation/faction_tier_celebration_painter';
 import { advanceFactionTierObservation } from './hud/reputation/faction_tier_celebration_view';
+import { ReputationWindow } from './hud/reputation/reputation_window';
+import { createRewardsSurfaces, type RewardsTab } from './hud/rewards';
 import { RiftMapPainter } from './hud/rift';
 import { RiftFloorTrackerController } from './hud/rift/rift_floor_tracker_controller';
 import { RiftForgeWindow, riftForgeInReach } from './hud/rift_forge';
@@ -1001,7 +1006,6 @@ import { requestWalletVerify } from './wallet_verify_request';
 import { weaponProcEffectText } from './weapon_proc_text';
 import { weaponProcLines } from './weapon_proc_view';
 import { weaponTypeLabelKey } from './weapon_type_label';
-import { WeeklyQuestsWindow } from './weekly_quests_window';
 import { promptWikiVisit } from './wiki_link';
 import {
   installWindowDrag,
@@ -1010,7 +1014,7 @@ import {
 } from './window_drag';
 import { isWindowDragHandle } from './window_drag_handle';
 import { makeWindowFocus } from './window_focus';
-import { syncWindowOpenBodyClasses } from './window_open_state';
+import { syncCharBagsBodyClasses, syncWindowOpenBodyClasses } from './window_open_state';
 import { installWindowReflow, rememberWindowPos, requestedWindowPos } from './window_reflow';
 import { placeWindow } from './window_reflow_core';
 import { installWindowResize, markResizableWindow } from './window_resize';
@@ -1397,14 +1401,9 @@ export class Hud {
   private readonly itemDragState = new ItemDragState();
   private suppressNextActionClick = false;
   private optionsHooks: OptionsHooks | null = null;
-  // The world-quest board opener: opens the map and unfolds the atlas rail on
-  // the release's mapAtlasSidebarCollapsed preference (the toggle lives in
-  // the rail, src/ui/map_sidebar_controller.ts).
+  // The atlas rail's fold on the touch HUD: folded every time the map opens.
   private readonly mapSidebarCollapse = new MapSidebarCollapse({
     settings: trackerCollapseSettings(() => this.optionsHooks, 'mapAtlasSidebarCollapsed'),
-    mapOpen: () => $('#map-window').style.display === 'block',
-    openMap: () => this.toggleMap(),
-    onChange: () => this.updateMapWindow(),
   });
   private reportHooks: ReportHooks | null = null;
   private bugReportHooks: BugReportHooks | null = null;
@@ -2122,7 +2121,7 @@ export class Hud {
   private lastHudSlowAt = 0;
   private dailyRewardsButtonEl: HTMLButtonElement | null = null;
   private storePromoCard: StorePromoCardController | null = null;
-  // Mobile More-tray entry mirroring the desktop chest button's hidden/spin-ready
+  // Mobile More-tray entry mirroring the desktop chest button's hidden
   // state (folded off the top-right rail so it never overlaps the buff/debuff bars).
   private mobileDailyRewardsButtonEl: HTMLButtonElement | null = null;
   // Per-element tier cadence stamps (graphics-tier knobs). Each gates a
@@ -2413,15 +2412,7 @@ export class Hud {
       click: () => audio.click(),
       onRepaintMap: () => this.repaintOpenMap(),
       onShowRoute: (route) => this.showFinderOnMap(route.x, route.z),
-      worldQuests: {
-        selectedId: () => this.mapMarkerInteraction.selectedWorldQuestId,
-        select: (questId) => {
-          this.mapMarkerInteraction.selectWorldQuest(questId);
-        },
-        confirmDialog: (title, body, okText, cancelText, onOk) =>
-          this.confirmDialog(title, body, okText, cancelText, onOk),
-        nowMs: () => Date.now(),
-      },
+      openQuestLog: () => this.questlogWindow.isOpen || this.toggleQuestLog(),
       settings: trackerCollapseSettings(() => this.optionsHooks, 'mapAtlasSidebarCollapsed'),
     });
     this.fiesta = new FiestaController({
@@ -2491,7 +2482,7 @@ export class Hud {
       openUnbind: (npcId) => this.openUnbind(npcId),
       openCrafting: (craftId) => this.openCrafting(craftId),
       openMarket: () => this.openMarket(),
-      openWorldQuestBoard: () => this.mapSidebarCollapse.openBoard(),
+      openWorldQuestBoard: () => this.rewards.hub.open('worldQuests'),
       openDelveBoard: (npcId) => this.openDelveBoard(npcId),
       openCardDuel: () => this.toggleCardDuel(),
       onOpenChange: (open) => this.onQuestDialogStateChange?.(open),
@@ -2734,7 +2725,6 @@ export class Hud {
       if (
         target &&
         (this.emoteWheelEl?.contains(target) ||
-          document.getElementById('mm-emote')?.contains(target) ||
           document.getElementById('mobile-emote')?.contains(target))
       )
         return;
@@ -2856,9 +2846,8 @@ export class Hud {
       this.dailyRewardsButtonEl = dailyRewardsButton;
       this.mobileDailyRewardsButtonEl = mobileDailyRewardsButton;
       dailyRewardsButton.innerHTML =
-        '<img class="daily-rewards-icon" src="/ui/daily-rewards/treasure_chest.webp" alt="" draggable="false" decoding="async"><span class="daily-reward-count ui-badge ui-badge--corner" aria-hidden="true">1</span>';
+        '<img class="daily-rewards-icon" src="/ui/daily-rewards/treasure_chest.webp" alt="" draggable="false" decoding="async">';
       this.syncDailyRewardsSurfaceLabels();
-      dailyRewardsButton.classList.remove('spin-ready');
       this.applyDailyRewardsChestButtonVisibility();
       dailyRewardsButton.addEventListener('pointerdown', (event) => {
         event.preventDefault();
@@ -2871,7 +2860,6 @@ export class Hud {
         event.preventDefault();
         event.stopPropagation();
       });
-      this.dailyRewardsLauncher.refresh(true);
     }
     this.clock24 = (() => {
       try {
@@ -2928,12 +2916,8 @@ export class Hud {
     $('#mm-town-focus')?.addEventListener('click', () => this.toggleTownFocus());
     $('#mm-quest').addEventListener('click', () => this.toggleQuestLog());
     $('#mm-deeds').addEventListener('click', () => this.toggleDeeds());
-    $('#mm-reliquary')?.addEventListener('click', () => this.toggleReliquary());
-    $('#mm-loot-explorer')?.addEventListener('click', () => this.toggleLootExplorer());
-    $('#mm-cosmetics')?.addEventListener('click', () => this.cosmeticsWindow.toggle());
     $('#mm-professions').addEventListener('click', () => this.toggleProfessions());
-    $('#mm-harvest-journal')?.addEventListener('click', () => this.toggleHarvestJournal());
-    $('#mm-perfecting')?.addEventListener('click', () => this.togglePerfecting());
+    $('#mm-rewards').addEventListener('click', () => this.toggleRewards());
     // The always-on tracker headers share one delegation contract
     // (tracker_header_wiring.ts): a click or Enter/Space on the header flips
     // the persisted collapse, stopped before the game binds hijack the focused
@@ -3163,7 +3147,6 @@ export class Hud {
     $('#map-level-toggle').addEventListener('click', () => this.toggleMapLevel());
 
     $('#mm-bag').addEventListener('click', () => this.toggleBags());
-    $('#mm-crafting').addEventListener('click', () => this.toggleCrafting());
     // Drop an equipped piece dragged out of the paperdoll onto the bags window.
     const bagsEl = $('#bags');
     bagsEl.addEventListener('dragover', (e) => {
@@ -3199,23 +3182,12 @@ export class Hud {
     });
     $('#mm-social').addEventListener('click', () => this.toggleSocial());
     $('#mm-options')?.addEventListener('click', () => this.toggleOptionsMenu());
-    $('#mm-wiki')?.addEventListener('click', () => this.openWiki());
-    $('#mm-arena').addEventListener('click', () => this.toggleArena());
-    $('#mm-dfinder').addEventListener('click', () => this.toggleDungeonFinder());
-    $('#mm-cardduel').addEventListener('click', () => this.toggleCardDuel());
-    $('#mm-leaderboard').addEventListener('click', () => this.toggleLeaderboard());
     $('#mm-wocmarket')?.addEventListener('click', () => this.toggleWocMarket());
     // The mobile More tray launcher (#mobile-wocmarket) binds through
     // MobileControls like its tray siblings, so tapping it runs the tray's
     // modal handoff (closeMoreModal plus the focus-return establishment); a
     // raw listener here left the tray's aria-modal trap live behind the
     // window (PR 3606 review).
-    $('#mm-discord')?.addEventListener('click', () => this.discordHook?.());
-    const emoteBtn = $('#mm-emote');
-    emoteBtn.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      this.toggleEmoteWheel();
-    });
     const startZone = zoneAt(sim.player.pos.x, sim.player.pos.z);
     const startZoneName = zoneDisplayName(startZone.id);
     this.lastZoneId = startZone.id;
@@ -3318,6 +3290,7 @@ export class Hud {
       // Piggyback the resize-grip stamp on this one observer (window_resize.ts
       // deliberately runs no body-wide observer of its own).
       markResizableWindow(el);
+      return el;
     };
     this.windowObserver = new MutationObserver((mutations) => {
       const windowsToSync = new Set<HTMLElement>();
@@ -3325,7 +3298,8 @@ export class Hud {
         if (m.type === 'childList') {
           m.addedNodes.forEach((node) => {
             if (!(node instanceof HTMLElement)) return;
-            if (node.matches('.window.panel')) observeWindow(node);
+            // Synced once too: a root minted already shown has no style record.
+            if (node.matches('.window.panel')) windowsToSync.add(observeWindow(node));
             node.querySelectorAll<HTMLElement>('.window.panel').forEach(observeWindow);
           });
           continue;
@@ -3425,8 +3399,6 @@ export class Hud {
       (el.id === 'vendor-window' || el.id === 'bags')
     )
       return;
-    // Fixed vault and bank layouts must not inherit cascaded window positions.
-    if (el.id === 'bank-window' && document.body.classList.contains('weekly-vault-open')) return;
     if (
       document.body.classList.contains('bank-open') &&
       (el.id === 'bank-window' || el.id === 'bags')
@@ -3441,6 +3413,8 @@ export class Hud {
       (el.id === 'market-window' || el.id === 'bags')
     )
       return;
+    const charDock = document.body.classList.contains('char-bags-docked'); // desktop C dock
+    if (charDock && (el.id === 'char-window' || el.id === 'bags')) return;
     const openCount = [...document.querySelectorAll<HTMLElement>('.window.panel')].filter(
       (win) => win !== el && this.isWindowVisible(win),
     ).length;
@@ -3624,7 +3598,6 @@ export class Hud {
       // Both route through the painter so focus returns to the opener (WCAG 2.2 AA).
       case 'char-window':
         this.charWindow.close();
-        this.syncCharBagsPairing();
         break;
       case 'inspect-window':
         this.inspectWindow.close();
@@ -3654,27 +3627,24 @@ export class Hud {
       case 'courier-window':
         this.courierWindow.close();
         break;
+      case 'weekly-vault-window':
       case 'weekly-quests-window':
-        this.weeklyQuestsWindow.close();
+      case 'world-quests-window':
+        this.rewards.hub.close();
         break;
       case 'guild-hall-window':
         this.guildHallWindow.close();
         break;
-      case 'calendar-window':
-        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
-        this.calendarWindow.close();
-        break;
       case 'deeds-window':
-        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
-        this.deedsWindow.close();
-        break;
+      case 'titles-window':
       case 'reliquary-window':
-        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
-        this.reliquaryWindow.close();
-        break;
+      case 'reputation-window':
       case 'loot-explorer-window':
-        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
-        this.lootExplorerWindow.close();
+      case 'leaderboard-window':
+      case 'world-quest-leaderboard-window':
+        // The Book of the Realm's members: the hub closes the shown one
+        // through its own painter, so focus returns to the opener.
+        this.bookHub.close();
         break;
       case 'cosmetics-window':
         this.cosmeticsWindow.close();
@@ -3683,41 +3653,31 @@ export class Hud {
         this.worldQuestPuzzleWindow.close();
         break;
       case 'professions-window':
-        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
-        this.professionsWindow.close();
+      case 'harvest-journal-window':
+      case 'perfecting-window':
+      case 'crafting-window':
+        // The Professions hub's members: the hub closes the shown one through
+        // its own painter (focus returns, the 1 Hz clocks disarm, an open
+        // Perfecting naming prompt tears down inert-safe).
+        this.professionsHub.close();
         break;
       case 'harvest-preference-window':
         // Route through the controller so focus returns to the opener
         // (WCAG 2.2 AA) and the visit is invalidated (Intentional Gathering PR3).
         this.harvestPreferenceController.close();
         break;
-      case 'harvest-journal-window':
-        // Route through the painter: focus returns (WCAG 2.2 AA), clock disposed.
-        this.harvestJournalWindow.close();
-        break;
       case 'plant-sheet-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.plantSheetWindow.close();
         break;
-      case 'perfecting-window':
-        // Route through the painter: focus returns (WCAG 2.2 AA), the 1 Hz
-        // clock disarms, and an open naming prompt tears down inert-safe.
-        this.perfectingWindow.close();
-        break;
       case 'arena-window':
-        // Route through the painter so focus returns to the opener (WCAG 2.2 AA),
-        // consistent with the toggle / X close path.
-        this.arenaWindow.close();
-        break;
       case 'dungeon-finder-window':
-        this.dungeonFinderWindow.close();
+      case 'card-duel-window':
+        // Activities' members: the hub closes the shown one through its painter.
+        this.activitiesHub.close();
         break;
       case 'raid-boss-guide-window':
         this.raidBossGuideWindow.close();
-        break;
-      case 'card-duel-window':
-        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
-        this.cardDuelWindow.close();
         break;
       case 'vendor-window':
         this.closeVendor();
@@ -3735,9 +3695,6 @@ export class Hud {
         break;
       case 'town-focus-window':
         this.closeTownFocus();
-        break;
-      case 'crafting-window':
-        this.closeCrafting();
         break;
       case 'commission-board-window':
         this.closeCommissionBoard();
@@ -3792,10 +3749,6 @@ export class Hud {
         break;
       case 'referral-cards-window':
         this.referralCards.close();
-        break;
-      case 'world-quest-leaderboard-window':
-      case 'leaderboard-window':
-        this.leaderboardWindow.close();
         break;
       case 'guild-board-window':
         this.guildBoardWindow.close();
@@ -5183,6 +5136,7 @@ export class Hud {
   // reads the world and routes shared whisper, prompt and focus chrome through closures.
   private readonly socialWindow = new SocialWindow({
     root: () => $('#social-window'),
+    discordHook: () => this.discordHook,
     world: () => this.sim,
     closeOthers: () => this.closeOtherWindows('#social-window'),
     hideTooltip: () => this.hideTooltip(),
@@ -5218,6 +5172,7 @@ export class Hud {
     root: () => $('#bags'),
     world: () => this.sim,
     wocBalanceHtml: () => this.wocBalanceHtml(),
+    walletHtml: () => currenciesWalletHtml(this.sim),
     claudiumLauncherHtml: () => this.claudiumLauncherHtml(),
     openClaudium: () => this.toggleClaudium(),
     openWallet: requestWalletVerify,
@@ -5398,36 +5353,78 @@ export class Hud {
     closeOthers: () => this.closeOtherWindows('#courier-window'),
     hideTooltip: () => this.hideTooltip(),
   });
-  // Book of Deeds window painter (deeds_view.ts core + deeds_window.ts
-  // painter): the deed catalog browser and title picker over the IWorldDeeds
-  // facet. A standalone trapping window (windowFocus), not a docked
-  // companion; onWatchChanged repaints the HUD tracker immediately so a
-  // watch toggle never waits for the slow band.
+  // The Book of the Realm (src/ui/hud/hub/): members' closeOthers route through
+  // bookHub.prepare, so even a deep link shows one tab at a time.
+  private readonly bookHub = new WindowHubController(BOOK_OF_REALM, {
+    members: () => ({
+      deeds: this.deedsWindow,
+      titles: this.titlesWindow,
+      reliquary: this.reliquaryWindow,
+      reputation: this.reputationWindow,
+      lootExplorer: this.lootExplorerWindow,
+      rankings: this.leaderboardWindow.hubMember,
+    }),
+    touch: () => document.body.classList.contains('mobile-touch'),
+    beforeOpen: () => this.closeOtherWindows(),
+  });
   private readonly deedsWindow = new DeedsWindow({
     ...this.presentationBag,
     root: () => $('#deeds-window'),
     world: () => this.sim,
-    closeOthers: () => this.closeOtherWindows('#deeds-window'),
+    closeOthers: () => this.bookHub.prepare('deeds'),
     hideTooltip: () => this.hideTooltip(),
     consumePeek: () => this.peekGuard.consume(),
     ...this.windowFocus('#deeds-window'),
     onWatchChanged: () => this.updateDeedTracker(),
+    hubStrip: this.bookHub.stripFor('deeds'),
   });
-  // Professions window painter (professions_view.ts core + the composed
-  // profession_identity_view model + professions_window.ts painter): the
-  // craft-wheel identity browser over IWorldProfessions, plus the tool-effect
-  // slot/recharge senders the acquisition craft opened. A standalone
-  // trapping window (windowFocus), the deeds shape exactly.
+  private readonly titlesWindow = new DeedsWindow({
+    ...this.presentationBag,
+    root: () => $('#titles-window'),
+    world: () => this.sim,
+    closeOthers: () => this.bookHub.prepare('titles'),
+    hideTooltip: () => this.hideTooltip(),
+    consumePeek: () => this.peekGuard.consume(),
+    ...this.windowFocus('#titles-window'),
+    onWatchChanged: () => this.updateDeedTracker(),
+    hubStrip: this.bookHub.stripFor('titles'),
+    mode: 'titles',
+  });
+  private readonly reputationWindow = new ReputationWindow({
+    root: () => $('#reputation-window'),
+    world: () => this.sim,
+    closeOthers: () => this.bookHub.prepare('reputation'),
+    ...this.windowFocus('#reputation-window'),
+    hubStrip: this.bookHub.stripFor('reputation'),
+  });
+  // The Professions hub (menu consolidation step 1): one tabbed window over
+  // the four professions windows, which keep their own ids and roots.
+  private readonly professionsHub = new ProfessionsHubController({
+    members: () => ({
+      overview: this.professionsWindow,
+      crafting: {
+        isOpen: this.craftingWindowEl?.style.display === 'flex',
+        open: () => this.showCrafting(),
+        close: () => this.closeCrafting(),
+        rootElement: () => this.craftingWindowEl,
+      },
+      perfecting: this.perfectingWindow,
+      harvest: this.harvestJournalWindow,
+    }),
+    touch: () => document.body.classList.contains('mobile-touch'),
+    beforeOpen: () => this.closeOtherWindows(),
+  });
   private readonly professionsWindow = new ProfessionsWindow({
     ...this.presentationBag,
     root: () => $('#professions-window'),
     world: () => this.sim,
-    closeOthers: () => this.closeOtherWindows('#professions-window'),
+    closeOthers: () => this.professionsHub.prepare('overview'),
     hideTooltip: () => this.hideTooltip(),
     consumePeek: () => this.peekGuard.consume(),
     openWiki: () => this.openWiki(),
     ...this.windowFocus('#professions-window'),
-    openHarvestJournal: () => this.harvestJournalWindow.open(),
+    openHarvestJournal: () => this.professionsHub.open('harvest'),
+    hubStrip: this.professionsHub.stripFor('overview'),
     harvestBody: () => this.lootWindow.openHarvestBodyChoice(),
     openHarvestPreference: () => this.harvestPreferenceController.open(),
   });
@@ -5448,9 +5445,10 @@ export class Hud {
   private readonly harvestJournalWindow = new HarvestJournalWindow({
     root: () => $('#harvest-journal-window'),
     world: () => this.sim,
-    closeOthers: () => this.closeOtherWindows('#harvest-journal-window'),
+    closeOthers: () => this.professionsHub.prepare('harvest'),
     ...this.windowFocus('#harvest-journal-window'),
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
+    hubStrip: this.professionsHub.stripFor('harvest'),
   });
   // The plant sheet painter (farming_plant_sheet_view.ts core + its painter):
   // the bed-verbs plant window. Cold, paint-on-open; farm events feed it.
@@ -5468,9 +5466,10 @@ export class Hud {
   private readonly perfectingWindow = new PerfectingWindow({
     ...this.presentationBag,
     world: () => this.sim,
-    closeOthers: () => this.closeOtherWindows('#perfecting-window'),
+    closeOthers: () => this.professionsHub.prepare('perfecting'),
     ...this.windowFocus('#perfecting-window'),
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
+    hubStrip: this.professionsHub.stripFor('perfecting'),
   });
   // The Reliquary window painter (reliquary_view.ts core + reliquary_window.ts
   // painter): Overview + shelf chrome over IWorldReliquary. A standalone
@@ -5491,7 +5490,8 @@ export class Hud {
     ...this.presentationBag,
     root: () => $('#reliquary-window'),
     world: () => this.sim,
-    closeOthers: () => this.closeOtherWindows('#reliquary-window'),
+    closeOthers: () => this.bookHub.prepare('reliquary'),
+    hubStrip: this.bookHub.stripFor('reliquary'),
     hideTooltip: () => this.hideTooltip(),
     consumePeek: () => this.peekGuard.consume(),
     ...this.windowFocus('#reliquary-window'),
@@ -5511,7 +5511,8 @@ export class Hud {
   private readonly lootExplorerWindow = new LootExplorerWindow({
     ...this.presentationBag,
     root: () => $('#loot-explorer-window'),
-    closeOthers: () => this.closeOtherWindows('#loot-explorer-window'),
+    closeOthers: () => this.bookHub.prepare('lootExplorer'),
+    hubStrip: this.bookHub.stripFor('lootExplorer'),
     hideTooltip: () => this.hideTooltip(),
     ...this.windowFocus('#loot-explorer-window'),
   });
@@ -5567,22 +5568,24 @@ export class Hud {
     ],
     uiScale: () => getUiScale(),
   }).anchor;
-  // Event calendar window painter (calendar_view.ts month-grid core +
-  // calendar_window.ts painter). System events expand from data rules; guild
-  // events read the socialInfo mirror and book/remove through IWorld.
-  private readonly calendarWindow = new CalendarWindow({
-    root: () => $('#calendar-window'),
+  // Rewards (menu consolidation step 7): Vault, Weekly Quest and World Quests.
+  readonly rewards = createRewardsSurfaces({
     world: () => this.sim,
-    closeOthers: () => this.closeOtherWindows('#calendar-window'),
-    ...this.windowFocus('#calendar-window'),
-    showError: (text) => this.showError(text),
+    root: (selector) => $(selector),
+    focus: (selector) => this.windowFocus(selector),
+    presentation: this.presentationBag,
+    touch: () => document.body.classList.contains('mobile-touch'),
+    beforeOpen: () => this.closeOtherWindows(),
+    onInventoryChanged: () => this.renderBags(),
+    hideTooltip: () => this.hideTooltip(),
+    showOnMap: (x, z) => this.showFinderOnMap(x, z),
+    selectedWorldQuest: () => this.mapMarkerInteraction.selectedWorldQuestId,
+    selectWorldQuest: (questId) => this.mapMarkerInteraction.selectWorldQuest(questId),
+    confirmDialog: (title, body, ok, cancel, onOk) =>
+      this.confirmDialog(title, body, ok, cancel, onOk),
+    nowMs: () => Date.now(),
   });
-  private readonly weeklyQuestsWindow = new WeeklyQuestsWindow({
-    root: () => $('#weekly-quests-window'),
-    world: () => this.sim,
-    closeOthers: () => this.closeOtherWindows('#weekly-quests-window'),
-    ...this.windowFocus('#weekly-quests-window'),
-  });
+  private readonly weeklyQuestsWindow = this.rewards.weekly;
   private readonly guildHallWindow = new GuildHallWindow({
     root: () => $('#guild-hall-window'),
     world: () => this.sim,
@@ -5596,12 +5599,23 @@ export class Hud {
   // arena_window.ts painter). It owns the selected bracket, the all-time-ladder
   // cache + fetch throttle, the render-skip signature, and focus-return; Hud
   // forwards the keybind toggle and drives render() from the mediumHud band.
+  // Activities (menu consolidation step 4): the Groups bell's tabbed window.
+  private readonly activitiesHub = new WindowHubController(ACTIVITIES, {
+    members: () => ({
+      dungeons: this.dungeonFinderWindow,
+      pvp: this.arenaWindow,
+      cardDuel: this.cardDuelWindow,
+    }),
+    touch: () => document.body.classList.contains('mobile-touch'),
+    beforeOpen: () => this.closeOtherWindows(),
+  });
   private readonly arenaWindow = new ArenaWindow({
     root: () => $('#arena-window'),
     world: () => this.sim,
     writers: this.writerFacet,
-    closeOthers: () => this.closeOtherWindows('#arena-window'),
+    closeOthers: () => this.activitiesHub.prepare('pvp'),
     ...this.windowFocus('#arena-window'),
+    hubStrip: this.activitiesHub.stripFor('pvp'),
   });
 
   private readonly finderSurfaces = createFinderSurfaces({
@@ -5610,12 +5624,13 @@ export class Hud {
     root: (selector) => $(selector),
     focus: (selector) => this.windowFocus(selector),
     world: () => this.sim,
-    closeOthers: (selector) => this.closeOtherWindows(selector),
+    closeOthers: () => this.activitiesHub.prepare('dungeons'),
+    hubStrip: this.activitiesHub.stripFor('dungeons'),
     hideTooltip: () => this.hideTooltip(),
     showOnMap: (x, z) => this.showFinderOnMap(x, z),
     hasBossGuide: RaidBossGuideWindow.hasJournal,
     openBossGuide: (d, m, diff) => this.raidBossGuideWindow.openJournal(d, m, diff),
-    openFinder: () => this.toggleDungeonFinder(),
+    openFinder: () => this.activitiesHub.toggle('dungeons'),
     maskPlayerText: (note) => this.maskChat(note),
     // An applicant in view gets the live card; anyone else their finder snapshot.
     inspectPlayer: (pid, profile) =>
@@ -5644,15 +5659,14 @@ export class Hud {
     root: () => $('#bg-proposal-popup'),
     world: () => this.sim,
   });
-  // Card Duel window painter (card_duel_view.ts model + card_duel_window.ts
-  // painter, the ValeCupWindow shape scaled down). The Card Master NPC's gossip
-  // menu AND the persistent #mm-cardduel micromenu button both toggle it (a card
-  // plays without proximity once matched); rendered from the mediumHud band, auto-opened on match start.
+  // Card Duel (Activities' third tab): opened from the hub or the Card Master's
+  // gossip; rendered from the mediumHud band, auto-opened on match start.
   private readonly cardDuelWindow = new CardDuelWindow({
     root: () => $('#card-duel-window'),
     world: () => this.sim,
-    closeOthers: () => this.closeOtherWindows('#card-duel-window'),
+    closeOthers: () => this.activitiesHub.prepare('cardDuel'),
     ...this.windowFocus('#card-duel-window'),
+    hubStrip: this.activitiesHub.stripFor('cardDuel'),
   });
 
   // Thornhollow Fields in-match scoreboard strip + wave-respawn overlay (self-mounting, elided writers).
@@ -5688,6 +5702,7 @@ export class Hud {
     root: () => $('#char-window'),
     world: () => this.sim,
     closeOthers: () => this.closeOtherWindows('#char-window'),
+    onClosed: () => this.syncCharBagsPairing(),
     hideTooltip: () => this.hideTooltip(),
     ...this.windowFocus('#char-window'),
     slotName: (slot) => itemSlotName(slot),
@@ -5728,7 +5743,7 @@ export class Hud {
       void this.playerCard.open();
     },
     openPrestige: () => this.openPrestigeDialog(),
-    openDeeds: () => this.openDeeds(),
+    openDeeds: () => this.openDeeds('titles'),
     openCosmetics: () => this.cosmeticsWindow.open(),
     openReliquary: () => this.openReliquary(),
     dragState: this.itemDragState,
@@ -5832,14 +5847,13 @@ export class Hud {
       localStorage.setItem('chatClock', clock);
     },
   });
-  // Leaderboard window painter (leaderboard_view.ts async-free core + leaderboard_
-  // window.ts painter). It owns the page index + focus opener and the one
-  // consumed-new signature: it awaits the paged leaderboard() and renders the page
-  // (or the loading / empty / error state). All closures are lazy.
+  // Rankings (the Book of the Realm tab): the async-free leaderboard_view core
+  // plus this painter, which awaits the paged leaderboard() per board.
   private readonly leaderboardWindow = new LeaderboardWindow({
     root: () => $('#leaderboard-window'),
     world: () => this.sim,
-    closeOthers: () => this.closeOtherWindows('#leaderboard-window'),
+    closeOthers: () => this.bookHub.prepare('rankings'),
+    hubStrip: this.bookHub.stripFor('rankings'),
     ...this.windowFocus('#leaderboard-window'),
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
     showDevBadges: () => this.optionsHooks?.settings.get('showDevBadges') ?? true,
@@ -5917,10 +5931,6 @@ export class Hud {
     root: () => $('#daily-rewards-window'),
     world: () => this.sim,
     closeOthers: () => this.closeOtherWindows('#daily-rewards-window'),
-    // A status delivered here is as fresh as a fetch, so the poll adopts it.
-    onStatus: (status) => this.dailyRewardsLauncher.observeFresh(status),
-    onClose: () => this.dailyRewardsLauncher.refresh(true),
-    onWalletConnect: requestWalletVerify,
     ...this.claudiumPurchase,
     subscriptionHooks: () => this.claudiumHooks?.subscription,
     storeSnapshot: async () => {
@@ -6780,7 +6790,9 @@ export class Hud {
     this.relocalizeCoordinatorMemos();
     this.syncDailyRewardsSurfaceLabels();
     this.wocMarketWindow.relocalize();
+    this.rewards.vault.relocalize();
     this.weeklyQuestsWindow.relocalize();
+    this.rewards.worldQuests.relocalize();
     this.guildHallWindow.relocalize();
     // Self-gated on its own open check (root src/ui/CLAUDE.md); refreshes the
     // root accessible name and row labels, preserving the uncommitted draft
@@ -6838,6 +6850,7 @@ export class Hud {
     if (this.bankWindow.isOpen) this.bankWindow.render();
     if (this.courierWindow.isOpen()) this.courierWindow.render(true);
     if (this.deedsWindow.isOpen) this.deedsWindow.render();
+    if (this.titlesWindow.isOpen) this.titlesWindow.render();
     if (this.reliquaryWindow.isOpen) this.reliquaryWindow.render();
     if (this.professionsWindow.isOpen) this.professionsWindow.render();
     this.lootExplorerWindow.relocalize();
@@ -6874,7 +6887,8 @@ export class Hud {
     // one of these was rebuilding only when its own data moved, so an open one
     // kept the previous locale until the player happened to change something.
     // Each relocalize() is self-gated on its own window being open.
-    this.calendarWindow.relocalize();
+    this.reputationWindow.relocalize();
+    this.leaderboardWindow.relocalize();
     this.mailboxWindow.relocalize();
     this.socialWindow.relocalize();
     this.cosmeticsWindow.relocalize();
@@ -8358,8 +8372,7 @@ export class Hud {
   }
 
   private syncDailyRewardsSurfaceLabels(): void {
-    const storeEnabled = this.claudiumHooks !== null;
-    const titleKey = storeEnabled ? 'hudChrome.wocStore.title' : 'hudChrome.dailyRewards.title';
+    const titleKey = 'hudChrome.wocStore.title';
     const title = t(titleKey);
     for (const button of [this.dailyRewardsButtonEl, this.mobileDailyRewardsButtonEl]) {
       if (!button) continue;
@@ -8386,63 +8399,28 @@ export class Hud {
   private applyDailyRewardsChestButtonVisibility(show = this.showDailyRewardsChestButton()): void {
     const button = this.dailyRewardsButtonEl;
     if (!button) return;
-    const visible = this.dailyRewardsEnabled() && show;
+    // The chest opens the WOC Store and nothing else now (its daily-rewards
+    // stand-in is gone), so it shows only while the store's hooks are live.
+    const storeLive = this.dailyRewardsEnabled() && this.claudiumHooks !== null;
+    const visible = storeLive && show;
     button.toggleAttribute('hidden', !visible);
-    if (!visible) button.classList.remove('spin-ready');
     // The mobile More-tray entry is a menu row, not floating chrome: it stays
     // reachable whenever the feature itself is on, regardless of the
     // showDailyRewardsChestButton preference. Once promoted into the Seeker
     // shortcut grid, it becomes floating chrome and honors the same preference.
     const mobileButton = this.mobileDailyRewardsButtonEl;
-    const mobileVisible =
-      this.dailyRewardsEnabled() && (!this.mobileDailyRewardsButtonPromoted() || show);
+    const mobileVisible = storeLive && (!this.mobileDailyRewardsButtonPromoted() || show);
     mobileButton?.toggleAttribute('hidden', !mobileVisible);
-    if (!mobileVisible) mobileButton?.classList.remove('spin-ready');
   }
 
   setDailyRewardsChestButtonVisible(show: boolean): void {
     this.applyDailyRewardsChestButtonVisibility(show);
-    if (show) this.dailyRewardsLauncher.refresh(true);
   }
 
   setDailyRewardsChestButtonPreference(show: boolean): void {
     this.optionsHooks?.onSettingChange('showDailyRewardsChest', show);
     this.setDailyRewardsChestButtonVisible(show);
   }
-
-  private applyDailyRewardsLauncherStatus(status: DailyRewardStatus): void {
-    if (!this.dailyRewardsEnabled()) return;
-    const button = this.dailyRewardsButtonEl;
-    const spinReady =
-      status.enabled !== false && (!status.eligibility.eligible || !status.spin.claimed);
-    const mobileVisible =
-      !this.mobileDailyRewardsButtonPromoted() || this.showDailyRewardsChestButton();
-    this.mobileDailyRewardsButtonEl?.classList.toggle('spin-ready', mobileVisible && spinReady);
-    if (!button) return;
-    if (!this.showDailyRewardsChestButton()) {
-      button.hidden = true;
-      button.classList.remove('spin-ready');
-      return;
-    }
-    button.hidden = false;
-    button.classList.toggle('spin-ready', spinReady);
-  }
-
-  // The launcher's status poll (sequence guard, throttle stamp, fetch chain)
-  // lives beside its own predicate in daily_rewards_launcher_core.ts, the
-  // ClaudiumLauncherBalance precedent; the HUD keeps the DOM wiring only.
-  private readonly dailyRewardsLauncher = new DailyRewardsLauncherPoll({
-    enabled: () => this.dailyRewardsEnabled(),
-    mounted: () => !!(this.dailyRewardsButtonEl || this.mobileDailyRewardsButtonEl),
-    syncVisibility: () => this.applyDailyRewardsChestButtonVisibility(),
-    fetch: () => this.sim.dailyRewards(),
-    applyStatus: (status) => this.applyDailyRewardsLauncherStatus(status),
-    onFailure: () => {
-      this.dailyRewardsButtonEl?.classList.remove('spin-ready');
-      this.mobileDailyRewardsButtonEl?.classList.remove('spin-ready');
-    },
-    now: () => performance.now(),
-  });
 
   update(paint = true): void {
     const sim = this.sim;
@@ -8514,7 +8492,6 @@ export class Hud {
     this.bootcamp.update(sim, this.renderer, this.keybinds, this.optionsHooks?.gamepad ?? null);
     if (slowHud) this.updateRaidLockoutBadge();
     if (slowHud) this.updateInstanceDifficultyBadge();
-    if (slowHud) this.dailyRewardsLauncher.refresh();
     this.maybeRestoreActionBarLayout();
     this.resolvePendingLoadoutBar();
     this.syncActiveHotbarForm();
@@ -8533,6 +8510,7 @@ export class Hud {
       this.microMenuStatePainter.paint(
         this.microMenuStateView.tick(microMenuWindowOpen, {
           talentPoints: talGlow ? tp.total - tp.spent : 0,
+          rewards: this.rewards.claimCounts().total,
         }),
       );
     }
@@ -9330,6 +9308,7 @@ export class Hud {
     // the latch and repaints only its .money footer, never the whole grid.
     if (slowHud) this.bagsWindow.refreshIfChanged();
     if (slowHud && this.deedsWindow.isOpen) this.deedsWindow.refreshIfChanged();
+    if (slowHud && this.titlesWindow.isOpen) this.titlesWindow.refreshIfChanged();
     if (slowHud && this.reliquaryWindow.isOpen) this.reliquaryWindow.refreshIfChanged();
     if (slowHud && this.cosmeticsWindow.isOpen) this.cosmeticsWindow.refreshIfChanged();
     if (slowHud) this.refreshOpenProfessionSurfacesIfChanged();
@@ -9355,8 +9334,12 @@ export class Hud {
     if (slowHud) this.updateRecipeTracker();
     // Re-seat the tracker stack under the minimap column (bounded layout read).
     if (slowHud) this.trackerStackAnchor.apply();
-    if (slowHud && this.calendarWindow.isOpen) this.calendarWindow.refreshIfChanged();
+    if (slowHud && this.reputationWindow.isOpen) this.reputationWindow.refreshIfChanged();
+    if (slowHud) this.rewards.recount();
+    if (slowHud && this.rewards.vault.isOpen) this.rewards.vault.refreshIfChanged();
     if (slowHud && this.weeklyQuestsWindow.isOpen) this.weeklyQuestsWindow.refreshIfChanged();
+    if (slowHud && this.rewards.worldQuests.isOpen) this.rewards.worldQuests.refreshIfChanged();
+    if (slowHud && this.questlogWindow.isOpen) this.questlogWindow.refreshIfChanged();
     if (slowHud && this.guildHallWindow.isOpen) this.guildHallWindow.refreshIfChanged();
     if (slowHud) this.updateMailIndicator();
     if (slowHud) this.updateMarketIndicator();
@@ -10221,7 +10204,7 @@ export class Hud {
   // forwards the keybind toggle and drives the painter's redraw from the mediumHud
   // band while open. The in-match auto-close + the pinned banner stay here.
   toggleArena(): void {
-    this.arenaWindow.toggle();
+    this.activitiesHub.toggle('pvp');
   }
 
   toggleBattleground(): void {
@@ -10229,10 +10212,12 @@ export class Hud {
     this.arenaWindow.openTab('ravenrift');
   }
 
-  readonly toggleDungeonFinder = (): void => this.dungeonFinderWindow.toggle();
+  readonly toggleDungeonFinder = (): void => this.activitiesHub.toggle('dungeons');
+  readonly toggleActivities = (tab?: ActivitiesTab): void => this.activitiesHub.toggle(tab);
+  readonly toggleRewards = (tab?: RewardsTab): void => this.rewards.hub.toggle(tab);
 
   toggleCardDuel(): void {
-    this.cardDuelWindow.toggle();
+    this.activitiesHub.toggle('cardDuel');
   }
 
   // The pinned in-match banner: opponent name + countdown / live match timer.
@@ -10306,6 +10291,7 @@ export class Hud {
     this.mapZoneOverride = null;
     this.mapLevel = defaultMapLevel(mapWindowMode(this.sim)); // own instance plan, else zone
     this.mapHoverZone = null;
+    this.mapSidebarCollapse.foldOnOpen(this.isMobileLayout());
     el.style.display = 'block';
     this.updateMapWindow();
     this.syncAnyWindowOpenState();
@@ -11877,8 +11863,10 @@ export class Hud {
           this.openMailbox();
           break;
         case 'bank':
+          this.openBank();
+          break;
         case 'weekly_rewards':
-          this.openBank(ev.type === 'weekly_rewards' ? 'rewards' : undefined);
+          this.rewards.hub.open('vault');
           break;
         case 'courier':
           this.courierWindow.open();
@@ -11939,7 +11927,6 @@ export class Hud {
           } else {
             this.showError(t(CALENDAR_RESULT_KEYS[ev.code] ?? CALENDAR_RESULT_FALLBACK_KEY));
           }
-          this.calendarWindow.onCalendarResult(ev.code);
           break;
         }
         case 'motdResult': {
@@ -14704,9 +14691,8 @@ export class Hud {
   // -------------------------------------------------------------------------
   // Recipe training (Professions 2.0): a station master teaches
   // trainer-acquisition recipes for a tier-priced copper fee. Opens ONLY from
-  // the master's gossip dialog (no side-rail button; the rail is at
-  // capacity). The window is advisory: the server re-validates every gate on
-  // the train_recipe command and answers with the text-free trainResult event.
+  // the master's gossip dialog (no rail button). The window is advisory: the
+  // server re-validates every gate and answers with the trainResult event.
   // -------------------------------------------------------------------------
 
   openTrain(npcId: number): void {
@@ -14997,11 +14983,7 @@ export class Hud {
   // -------------------------------------------------------------------------
 
   toggleCrafting(): void {
-    if ($('#crafting-window').style.display === 'flex') {
-      this.closeCrafting();
-      return;
-    }
-    this.openCrafting();
+    this.professionsHub.toggle('crafting');
   }
 
   // `craftId` (the gossip dialog's Crafting shortcut on a station master)
@@ -15020,25 +15002,21 @@ export class Hud {
       this.selectedCraftTab = craftId;
       this.persistCraftingTab();
     }
-    this.closeOtherWindows('#crafting-window');
-    this.renderCrafting();
-    // AFTER the paint, the train / unbind ordering (see toggleTownFocus):
-    // captureFocus records the opener and installs the trap over a root that
-    // is by then populated and displayed. #crafting-window now installs its
-    // own trap (this change), so the craftId branch below only needs to move
-    // focus onto the selected tab within that trap, not chase it back from body.
-    this.craftingOpenerFocus = this.craftingWindowFocus.captureFocus();
+    this.professionsHub.open('crafting');
     if (craftId !== undefined) {
       const scroller = $('#crafting-window').querySelector('.crafting-body');
       if (scroller) scroller.scrollTop = 0;
-      // The gossip route reaches here after the dialog released its focus
-      // trap WITHOUT restoring (the successor-window premise): land keyboard
-      // focus on the selected tab (onSelectCraft's refocus target) after the
-      // crafting trap is installed so the handoff never strands focus on body.
+      // The gossip route arrives with the dialog's trap released WITHOUT a
+      // restore: land focus on the selected craft tab so it never sits on body.
       ($('#crafting-window').querySelector('.crafting-tab.sel') as HTMLElement | null)?.focus();
-    } else {
-      this.focusManager.focusFirst($('#crafting-window'));
     }
+  }
+
+  private showCrafting(): void {
+    this.professionsHub.prepare('crafting');
+    this.renderCrafting();
+    this.craftingOpenerFocus = this.craftingWindowFocus.captureFocus();
+    this.focusManager.focusFirst($('#crafting-window'));
   }
 
   /** Live craft-cast session for the open crafting window: the entity cast
@@ -15182,6 +15160,7 @@ export class Hud {
         onClose: () => this.closeCrafting(),
         onOpenOrders: () => this.openCommissionBoard(),
         onOpenPerfecting: () => this.openPerfecting(),
+        hubStrip: this.professionsHub.stripFor('crafting'),
         commissionChecked: (recipeId) => this.craftCommissionOptIn.has(recipeId),
         onToggleCommission: (recipeId, on) => {
           if (on) this.craftCommissionOptIn.add(recipeId);
@@ -15389,17 +15368,10 @@ export class Hud {
   // class drives the side-by-side desktop layout, and the bags window is force-opened
   // so items can be withdrawn into it. closeBank routes through the painter (which
   // fires onClosed) so focus returns to the opener (WCAG 2.4.3).
-  openBank(tab?: 'rewards'): void {
-    // Weekly rewards own the screen; ordinary bank storage keeps its bags companion.
+  openBank(): void {
     if (this.vendorOpen) this.closeVendor();
     if (this.openHeroicVendorNpcId !== null) this.closeHeroicVendor();
-    openBankCompanion(
-      this.bankWindow,
-      $('#bags'),
-      () => this.bagsWindow.close(),
-      () => this.renderBags(),
-      tab,
-    );
+    openBankCompanion(this.bankWindow, $('#bags'), () => this.renderBags());
   }
 
   closeBank(): void {
@@ -15432,46 +15404,38 @@ export class Hud {
     this.syncCharBagsPairing();
   }
 
-  // The Book of Deeds trio (keybind toggle, chronicler/char-panel opens, Esc
-  // close). open() takes an optional section so a chronicler lands on the
-  // Chronicles category.
+  // Book of the Realm entry points. openDeeds takes an optional section so a
+  // chronicler lands on Chronicles; 'titles' is the Titles tab. The Book's key
+  // (toggleDeeds, Shift+Z) opens it on the last tab.
   openDeeds(category?: DeedDisplayCategory | 'titles'): void {
-    this.deedsWindow.open(category);
+    this.bookHub.open(category === 'titles' ? 'titles' : 'deeds');
+    if (category && category !== 'titles') this.deedsWindow.open(category);
   }
 
   closeDeeds(): void {
-    this.deedsWindow.close();
+    this.bookHub.close();
   }
 
-  toggleDeeds(): void {
-    this.deedsWindow.toggle();
+  toggleDeeds(tab?: BookOfRealmTab): void {
+    this.bookHub.toggle(tab);
   }
 
-  get deedsWindowOpen(): boolean {
-    return this.deedsWindow.isOpen;
+  // Professions hub entry points: every opener lands on the hub at its tab.
+  toggleProfessions(tab?: ProfessionsHubTab): void {
+    this.professionsHub.toggle(tab);
   }
 
-  // The Professions window entry point (keybind, minimap, and More-tray all
-  // toggle; Esc closes via the managed-window case directly). Open/close/isOpen
-  // wrappers land only when a consumer lands with them.
-  toggleProfessions(): void {
-    this.professionsWindow.toggle();
-  }
-
-  // The Reliquary window entry point (keybind, minimap, and More-tray all
-  // toggle; Esc closes via the managed-window case directly). open() is used
-  // by the character-sheet launch button so a second click never closes it.
+  // The Book's Reliquary tab (open() for the sheet's button: never closes).
   openReliquary(): void {
-    this.reliquaryWindow.open();
+    this.bookHub.open('reliquary');
   }
 
   toggleReliquary(): void {
-    this.reliquaryWindow.toggle();
+    this.bookHub.toggle('reliquary');
   }
 
-  // The Harvest Journal keybind entry (the professions row opens it directly).
   toggleHarvestJournal(): void {
-    this.harvestJournalWindow.toggle();
+    this.professionsHub.toggle('harvest');
   }
 
   // The bed choice route: planting and deliberate crop harvesting.
@@ -15479,20 +15443,16 @@ export class Hud {
     this.plantSheetWindow.open(bedId);
   }
 
-  // The Perfecting window entry points (the crafting window's title-bar
-  // button and its apex-row links open; Esc closes via the managed-window
-  // case; the reliquary-shaped toggle is what the side-rail tile and the
-  // keybind both call, both shipped in this unit).
   openPerfecting(): void {
-    this.perfectingWindow.open();
+    this.professionsHub.open('perfecting');
   }
 
   togglePerfecting(): void {
-    this.perfectingWindow.toggle();
+    this.professionsHub.toggle('perfecting');
   }
 
   toggleLootExplorer(): void {
-    this.lootExplorerWindow.toggle();
+    this.bookHub.toggle('lootExplorer');
   }
 
   toggleCosmetics(): void {
@@ -15588,18 +15548,6 @@ export class Hud {
     this.updateRecipeTracker();
   }
 
-  toggleCalendar(): void {
-    this.calendarWindow.toggle();
-  }
-
-  closeCalendar(): void {
-    this.calendarWindow.close();
-  }
-
-  get calendarWindowOpen(): boolean {
-    return this.calendarWindow.isOpen;
-  }
-
   // -------------------------------------------------------------------------
   // Bags
   // -------------------------------------------------------------------------
@@ -15635,7 +15583,6 @@ export class Hud {
       this.syncCharBagsPairing();
       return;
     }
-    if (document.body.classList.contains('weekly-vault-open')) this.closeBank();
     this.closeOtherWindows('#bags');
     // Record the opener (the minimap bag button / keybind focus) for the focus return.
     this.bagsWindow.noteOpener();
@@ -15931,7 +15878,9 @@ export class Hud {
   // -------------------------------------------------------------------------
 
   toggleChar(): void {
+    const wasDocked = document.body.classList.contains('char-bags-docked');
     this.charWindow.toggle();
+    if (charToggleBagsAction(this.charBagsState(), wasDocked)) this.toggleBags();
     this.syncCharBagsPairing();
   }
 
@@ -15939,16 +15888,19 @@ export class Hud {
   // charBagsPaired decides), so the bags do not sit ON TOP of the paperdoll and the
   // drag-to-equip gesture has a visible socket to land on. Called from every path
   // that opens or closes either window; idempotent, and a no-op on desktop.
-  private syncCharBagsPairing(): void {
-    const paired = charBagsPaired({
+  private charBagsState(): CharBagsPairingState {
+    return {
       touch: document.body.classList.contains('mobile-touch'),
       charOpen: this.charWindow.isOpen,
       bagsShown: bagsWindowShown($('#bags').style.display),
       bankOpen: this.bankWindow.isOpen,
       vendorOpen: this.vendorOpen,
       marketOpen: this.marketWindow.isOpen,
-    });
-    document.body.classList.toggle('char-bags-paired', paired);
+    };
+  }
+
+  private syncCharBagsPairing(): void {
+    syncCharBagsBodyClasses(this.charBagsState());
   }
 
   private renderCharPreview(): void {
@@ -16441,7 +16393,7 @@ export class Hud {
   // LeaderboardWindow (leaderboard_view.ts core + leaderboard_window.ts painter),
   // which consumes the paged leaderboard() and owns the page index + focus.
   toggleLeaderboard(): void {
-    this.leaderboardWindow.toggle();
+    this.bookHub.toggle('rankings');
   }
 
   /** The signpost guild board, opened by the noticeboard interaction (and the
@@ -16456,18 +16408,13 @@ export class Hud {
   }
 
   toggleDailyRewards(): void {
-    if (!this.dailyRewardsEnabled()) return;
+    if (!this.dailyRewardsEnabled() || !this.claudiumHooks) return;
     this.dailyRewardsWindow.toggle();
-    // Close refreshes via onClose; force only the open direction here. The open
-    // force stays as the fallback for tabs that render without a status fetch
-    // (the store tab), where no onStatus push would arrive.
-    if (this.dailyRewardsWindow.isOpen) this.dailyRewardsLauncher.refresh(true);
   }
 
   openWocStore(tab: 'store' | 'memberships' = 'store'): void {
     if (!this.dailyRewardsEnabled()) return;
     this.dailyRewardsWindow.openStore(tab);
-    this.dailyRewardsLauncher.refresh(true);
   }
 
   /** Inject the $WOC Exchange hooks (main.ts, online, browser web + website
@@ -16523,6 +16470,7 @@ export class Hud {
   attachClaudium(hooks: ClaudiumHooks): void {
     this.claudiumHooks = hooks;
     this.syncDailyRewardsSurfaceLabels();
+    this.applyDailyRewardsChestButtonVisibility();
     this.claudiumBalance.reset();
     this.claudiumBalance.refresh(true);
   }
@@ -17549,8 +17497,7 @@ export class Hud {
     this.bugReportHooks = hooks;
   }
 
-  // Wired by main.ts to toggleDiscordPanel, giving the desktop micro-menu
-  // (#mm-discord) a discoverable path to the same panel the 'U' keybind opens.
+  // Wired by main.ts to the Discord panel: the Social window's Discord strip.
   attachDiscordHook(toggle: () => void): void {
     this.discordHook = toggle;
   }
@@ -17606,9 +17553,8 @@ export class Hud {
     this.optionsWindow.toggle();
   }
 
-  /** Wiki launcher (#mm-wiki, the Esc-menu row, the mobile More tray): the
-   *  confirm-first external hop in src/ui/wiki_link.ts, riding the one shared
-   *  confirm-dialog family so focus trap and key activation are inherited. */
+  /** Wiki launcher (the Esc-menu row): the confirm-first external hop in
+   *  src/ui/wiki_link.ts, on the shared confirm-dialog family. */
   openWiki(): void {
     promptWikiVisit({
       confirm: (title, body, okText, cancelText, onOk) =>

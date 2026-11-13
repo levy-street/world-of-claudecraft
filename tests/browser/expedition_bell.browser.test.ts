@@ -64,7 +64,9 @@ function setup() {
     closeOthers: () => {},
     hideTooltip: () => {},
     showOnMap: () => {},
-    openFinder: vi.fn(),
+    // Hud routes the bell through the Activities hub, which opens this window;
+    // the rig has no hub, so it opens the window directly.
+    openFinder: () => surfaces.window.open(),
     maskPlayerText: (value) => value,
     inspectPlayer: vi.fn(),
     presentation: {

@@ -4,8 +4,8 @@
 // membership are all external account/network state, NOT world state, so (like
 // src/ui/wallet_balance.ts) they do not belong on IWorld. main.ts is the one
 // layer that knows both net and ui; it fetches this state over REST and pushes
-// it in here, and the HUD reads it out. A single listener re-renders the widget
-// when anything changes. src/ui never imports src/net, so these view-facing
+// it in here, and the HUD reads it out. Listeners re-render the widget and the
+// Social window's strip when anything changes. src/ui never imports src/net, so these view-facing
 // types are owned here.
 
 /** A member currently sitting in the featured Discord voice room. */
@@ -81,7 +81,10 @@ let enabled = false;
 let status: DiscordAccountStatus = UNLINKED;
 let presence: DiscordPresenceState = NO_PRESENCE;
 let inviteUrl = '';
-let listener: (() => void) | null = null;
+const listeners = new Set<() => void>();
+const notify = (): void => {
+  for (const cb of listeners) cb();
+};
 
 /** Whether the Discord feature is enabled in this client build. */
 export function discordUiEnabled(): boolean {
@@ -103,28 +106,32 @@ export function discordInviteUrl(): string {
 export function setDiscordUiEnabled(value: boolean): void {
   if (enabled === value) return;
   enabled = value;
-  listener?.();
+  notify();
 }
 
 export function setDiscordInviteUrl(value: string): void {
   if (inviteUrl === value) return;
   inviteUrl = value;
-  listener?.();
+  notify();
 }
 
 export function setDiscordStatus(value: DiscordAccountStatus | null): void {
   status = value ?? UNLINKED;
-  listener?.();
+  notify();
 }
 
 export function setDiscordPresence(value: DiscordPresenceState | null): void {
   presence = value ?? NO_PRESENCE;
-  listener?.();
+  notify();
 }
 
-/** Register the HUD's re-render hook (one consumer: the Discord widget). */
-export function onDiscordStatusChange(cb: () => void): void {
-  listener = cb;
+/** Register a re-render hook (the boot panel sync and the Social window's
+ *  strip both listen). Returns the unsubscribe. */
+export function onDiscordStatusChange(cb: () => void): () => void {
+  listeners.add(cb);
+  return () => {
+    listeners.delete(cb);
+  };
 }
 
 // ---------------------------------------------------------------------------

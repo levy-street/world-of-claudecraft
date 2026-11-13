@@ -190,7 +190,8 @@ describe('gamepad dispatch covers every action the controller panel offers', () 
     const body = dispatchBody();
     const arms: Array<[string, string]> = [
       ['crafting', 'hud.toggleCrafting();'],
-      ['dungeonFinder', 'hud.toggleDungeonFinder();'],
+      // Shift+I's action (id dungeonFinder) opens Activities on its last tab.
+      ['dungeonFinder', 'hud.toggleActivities();'],
     ];
     for (const [id, call] of arms) {
       const at = body.indexOf(`case '${id}'`);

@@ -40,15 +40,11 @@ export interface PaperdollView {
   weapons: PaperdollSlot[];
 }
 
-export type CharacterSidebarTab = 'stats' | 'progression' | 'skills' | 'reputation' | 'currencies';
+// The menu consolidation (2026-11-04) moved Reputation into the Book of the
+// Realm and Currencies into the Bags wallet strip, leaving the sheet itself.
+export type CharacterSidebarTab = 'stats' | 'progression';
 
-export const CHARACTER_SIDEBAR_TABS: readonly CharacterSidebarTab[] = [
-  'stats',
-  'reputation',
-  'currencies',
-  'progression',
-  'skills',
-];
+export const CHARACTER_SIDEBAR_TABS: readonly CharacterSidebarTab[] = ['stats', 'progression'];
 
 export interface CharacterSidebarView {
   selected: CharacterSidebarTab;

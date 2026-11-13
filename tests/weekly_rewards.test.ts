@@ -76,13 +76,16 @@ function prepareWeeklyRewardOpen(ctx: Sim['ctx'], key: string, pid: number) {
   const state = r.meta.weeklyRewards!;
   const batch = state.vaults[0];
   const choice = batch?.choices[Number(key.split(':')[1])];
+  // Every table at the vault's own difficulty: one roll never mixes difficulties.
   const tables = choice
     ? weeklyRewardTableOptions(
         { ...batch, bossUnlocks: batch.bossUnlocks ?? state.bossUnlocks },
         choice,
         r.meta.cls,
         r.e.level,
-      ).map((table) => table.id)
+      )
+        .filter((table) => !table.difficulty)
+        .map((table) => table.id)
     : [];
   return prepareOpen(ctx, key, pid, undefined, tables);
 }
@@ -416,16 +419,32 @@ describe('weekly vault choices', () => {
     ];
     meta.weeklyRewards = state;
     const batch = state.vaults[0];
-    openSelected(sim, '1000:0', pid);
+    const varkhul = 'varkhul_forgefather_of_the_last_flame';
+    const openOn = (index: number, table: string) => {
+      const opening = prepareOpen(sim.ctx, `1000:${index}`, pid, undefined, [table]);
+      if (opening) finishWeeklyRewardOpen(opening, true);
+    };
+    openOn(0, varkhul);
     const itemId = batch.choices[0].itemId;
     expect(itemId).toBeDefined();
     if (!itemId) throw new Error('Missing filtered Rogue reward');
-    for (let i = 1; i < 4; i++) openSelected(sim, `1000:${i}`, pid);
+    for (let i = 1; i < 4; i++) openOn(i, varkhul);
     expect(new Set(batch.choices.slice(0, 3).map((choice) => choice.itemId))).toEqual(
       new Set(['forgefathers_temper', 'heart_of_the_crucible', 'lastflame_core']),
     );
     expect(batch.choices[3].itemId).toBeUndefined();
-    expect(weeklyChoiceExhausted(batch, batch.choices[3], 'rogue', 20)).toBe(true);
+    // The Heroic table is spent, but a Heroic vault may still roll Normal, so
+    // the slot is only exhausted once the Normal table runs out as well.
+    const left = weeklyRewardTableOptions(batch, batch.choices[3], 'rogue', 20);
+    expect(left.map((table) => table.id)).toEqual([`${varkhul}:normal`]);
+    expect(weeklyChoiceExhausted(batch, batch.choices[3], 'rogue', 20)).toBe(false);
+    const normalLeft = left[0].items.length;
+    for (let n = 0; n < normalLeft; n++) batch.choices.push({ pool: 'raid_heroic' });
+    for (let i = 3; i < 4 + normalLeft; i++) openOn(i, `${varkhul}:normal`);
+    expect(batch.choices.slice(3, 3 + normalLeft).every((choice) => choice.itemId)).toBe(true);
+    expect(batch.choices[3].tableId).toBe(`${varkhul}:normal`);
+    expect(batch.choices[3 + normalLeft].itemId).toBeUndefined();
+    expect(weeklyChoiceExhausted(batch, batch.choices[3 + normalLeft], 'rogue', 20)).toBe(true);
     const before = sim.ctx.countItem(itemId, pid);
     sim.claimWeeklyReward('1000:0', pid);
     expect(state.vaults).toHaveLength(0);

@@ -156,3 +156,35 @@ describe('LeaderboardWindow: stale async board responses', () => {
     expect(playerPagesRequested[playerPagesRequested.length - 1]).toBe(0);
   });
 });
+
+// The Book of the Realm's Rankings tab follows a language switch like its five
+// sibling tabs: Hud.refreshLocalizedDynamicUi calls relocalize(), which repaints
+// whichever board is shown and nothing while closed.
+describe('LeaderboardWindow: relocalize', () => {
+  it('repaints the open board, and stays quiet while the window is closed', async () => {
+    const el = lbEl();
+    const leaderboard = vi.fn(async () => {
+      throw new Error('offline');
+    });
+    const w = new LeaderboardWindow(
+      fakeDeps(el, {
+        world: () =>
+          ({
+            realm: 'Testrealm',
+            player: { name: 'Hero', level: 10, githubLogin: null },
+            lifetimeXp: 500,
+            leaderboard,
+          }) as never,
+      }),
+    );
+    await w.render();
+    const painted = leaderboard.mock.calls.length;
+    expect(painted).toBeGreaterThan(0);
+    w.relocalize();
+    await vi.waitFor(() => expect(leaderboard.mock.calls.length).toBe(painted + 1));
+    el.style.display = 'none';
+    w.relocalize();
+    await Promise.resolve();
+    expect(leaderboard.mock.calls.length).toBe(painted + 1);
+  });
+});

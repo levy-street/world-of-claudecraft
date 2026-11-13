@@ -27,30 +27,19 @@ afterEach(() => {
 const NON_ENGLISH = supportedLanguages.filter((lang) => lang !== 'en' && lang !== 'en_CA');
 
 describe('Double Honor Weekend copy renders on a release build in every locale', () => {
-  it.each(NON_ENGLISH)('%s: the queue chip and calendar entry never throw', async (lang) => {
+  // The Event Calendar entry left with its window (menu consolidation); the
+  // Double Honor Weekend now shows only on the PvP tab's queue chip.
+  it.each(NON_ENGLISH)('%s: the queue chip never throws', async (lang) => {
     process.env.I18N_RELEASE = '1';
     await ensureLocaleLoaded(lang);
     setLanguage(lang);
 
     let chip = '';
-    let title = '';
-    let note = '';
     expect(() => {
       chip = t('hudChrome.bg.doubleHonorLine', { mult: DOUBLE_HONOR_MULTIPLIER });
-      title = t('hudChrome.calendar.events.doubleHonor.title');
-      note = t('hudChrome.calendar.events.doubleHonor.note');
     }, `${lang} must render the Double Honor Weekend copy, not blank the window`).not.toThrow();
 
-    // A same-as-English paste (the "transplant, not translate" trap the
-    // fill contract warns about) would clear the pending row and stop the
-    // throw above without actually localizing anything; catch that too.
-    expect(title, `${lang} doubleHonor.title must be localized, not the English source`).not.toBe(
-      'Double Honor Weekend',
-    );
     expect(chip.length, `${lang} doubleHonorLine must resolve to non-empty text`).toBeGreaterThan(
-      0,
-    );
-    expect(note.length, `${lang} doubleHonor.note must resolve to non-empty text`).toBeGreaterThan(
       0,
     );
   });

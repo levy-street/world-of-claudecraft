@@ -4,9 +4,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { NPCS, QUESTS, zoneAt } from '../src/sim/data';
-import type { QuestProgress, WorldQuestProgress } from '../src/sim/types';
-import { worldQuestCycleForResetDay } from '../src/sim/world_quest_rotation';
-import { activeWorldQuestsForCycle } from '../src/sim/world_quests';
+import type { QuestProgress } from '../src/sim/types';
 import { MapSidebarController } from '../src/ui/map_sidebar_controller';
 import { QuestTrackingState } from '../src/ui/quest_tracking_core';
 import type { IWorld } from '../src/world_api';
@@ -59,16 +57,29 @@ function makeHarness(alsoTracked: readonly string[] = []) {
   const storage = fakeStorage();
   const tracking = new QuestTrackingState(storage);
   const settings = fakeSettings();
+  const openQuestLog = vi.fn();
   const controller = new MapSidebarController({
     root: () => root,
     click,
     onRepaintMap,
     onShowRoute,
     tracking,
+    openQuestLog,
     settings,
   });
   controller.update(world, zoneAt(giver.pos.x, giver.pos.z));
-  return { root, controller, click, onRepaintMap, onShowRoute, world, tracking, storage, settings };
+  return {
+    root,
+    controller,
+    click,
+    onRepaintMap,
+    onShowRoute,
+    world,
+    tracking,
+    storage,
+    settings,
+    openQuestLog,
+  };
 }
 
 describe('map sidebar controller', () => {
@@ -83,7 +94,21 @@ describe('map sidebar controller', () => {
     expect(test.root.querySelector('[data-map-route]')).not.toBeNull();
     expect(test.root.querySelectorAll('.map-atlas-legend > span')).toHaveLength(5);
     expect(test.root.textContent).toContain('Tracked quests');
-    expect(test.root.textContent).toContain('Available nearby');
+    // Menu consolidation step 8: the rail is the map's legend plus one link.
+    // Untrack and the nearby offers live in the Quest Log, the world-quest
+    // board in the Rewards hub.
+    expect(test.root.querySelector('[data-map-open-questlog]')?.textContent).toBe('Open Quest Log');
+    expect(test.root.querySelector('[data-map-untrack]')).toBeNull();
+    expect(test.root.querySelector('.map-atlas-nearby')).toBeNull();
+    expect(test.root.querySelector('.map-atlas-wq-section')).toBeNull();
+    expect(test.root.textContent).not.toContain('Available nearby');
+  });
+
+  it('opens the Quest Log from its one link out', () => {
+    const test = makeHarness();
+    test.root.querySelector<HTMLElement>('[data-map-open-questlog]')?.click();
+    expect(test.openQuestLog).toHaveBeenCalledOnce();
+    expect(test.click).toHaveBeenCalled();
   });
 
   it('publishes filter changes and the selected quest route', () => {
@@ -148,50 +173,19 @@ describe('map sidebar controller', () => {
     expect(document.activeElement).toBe(outside);
   });
 
-  it('untracks a quest for real: the row LEAVES the rail, the quest is not abandoned', () => {
+  it('drops a row untracked in the Quest Log, and brings it back on re-track', () => {
+    // Untrack moved to the Quest Log (its Track/Untrack toggle writes the
+    // shared tracking set); the rail still honors that set as the map legend.
     const test = makeHarness();
-    const abandonQuest = vi.fn();
-    Object.assign(test.world, { abandonQuest });
     expect(test.root.querySelector('[data-map-quest="q_wolves"]')).not.toBeNull();
-
-    test.root.querySelector<HTMLElement>('[data-map-untrack]')?.click();
+    test.tracking.setTracked('q_wolves', false);
     test.controller.update(test.world, zoneAt(test.world.player.pos.x, test.world.player.pos.z));
-
-    // The regression this covers: the control used to clear the local selection
-    // only, leaving the same quest listed under "Tracked quests".
     expect(test.root.querySelector('[data-map-quest="q_wolves"]')).toBeNull();
     expect(test.root.textContent).toContain('No tracked quests');
-    expect(test.tracking.isTracked('q_wolves')).toBe(false);
-    expect(test.controller.shownRoute()).toBeNull();
-    expect(test.onRepaintMap).toHaveBeenCalled();
     // Presentation only: the sim's quest log is untouched.
-    expect(abandonQuest).not.toHaveBeenCalled();
     expect(test.world.questLog.has('q_wolves')).toBe(true);
-    expect(test.root.querySelector('[data-map-untrack]')?.hasAttribute('disabled')).toBe(true);
-  });
-
-  it('persists the untracked quest per character and reloads it on the next session', () => {
-    const test = makeHarness();
-    test.root.querySelector<HTMLElement>('[data-map-untrack]')?.click();
-
-    const reloaded = new QuestTrackingState(test.storage);
-    reloaded.useCharacter('warrior', 'Adventurer');
-    expect(reloaded.isTracked('q_wolves')).toBe(false);
-
-    // Another character on the same browser starts fully tracked.
-    const other = new QuestTrackingState(test.storage);
-    other.useCharacter('mage', 'Someone');
-    expect(other.isTracked('q_wolves')).toBe(true);
-  });
-
-  it('re-tracking (the quest log toggle) brings the row back to the rail', () => {
-    const test = makeHarness();
-    test.root.querySelector<HTMLElement>('[data-map-untrack]')?.click();
-    expect(test.root.querySelector('[data-map-quest="q_wolves"]')).toBeNull();
-
     test.tracking.setTracked('q_wolves', true);
     test.controller.update(test.world, zoneAt(test.world.player.pos.x, test.world.player.pos.z));
-
     // The rail's repaint signature carries the tracking revision, so nothing else
     // has to move for the row to come back.
     expect(test.root.querySelector('[data-map-quest="q_wolves"]')).not.toBeNull();
@@ -280,6 +274,7 @@ describe('map sidebar controller: rail collapse toggle', () => {
       click: vi.fn(),
       onRepaintMap: vi.fn(),
       onShowRoute: vi.fn(),
+      openQuestLog: vi.fn(),
       tracking: new QuestTrackingState(fakeStorage()),
       settings,
     });
@@ -299,114 +294,18 @@ describe('map sidebar controller: rail collapse toggle', () => {
 // positioned child resolves against the PADDING box, so an `inset: 0` pane
 // covers that band and the window stops being draggable at all. jsdom has no
 // layout, so this reads the shipped declarations instead of a computed rect.
-describe('map sidebar controller: the world-quest section', () => {
-  function makeWorldQuestHarness(
-    log: Array<[string, WorldQuestProgress['state']]> = [],
-    canReroll: () => { canReroll: boolean; reason?: string } = () => ({ canReroll: true }),
-  ) {
-    const root = document.createElement('aside');
-    document.body.appendChild(root);
-    const giver = NPCS[QUESTS.q_wolves.giverNpcId];
-    const cycle = worldQuestCycleForResetDay('2026-08-31');
-    const rerollWorldQuest = vi.fn(() => true);
-    const world = {
-      cfg: { playerClass: 'warrior' },
-      player: { name: 'Adventurer', level: 20, pos: { x: giver.pos.x, y: 0, z: giver.pos.z } },
-      questLog: new Map(),
-      questState: () => 'unavailable',
-      worldQuestCycle: cycle,
-      worldQuestLog: new Map(
-        log.map(([questId, state]) => [questId, { questId, count: 0, state }]),
-      ),
-      worldQuestExpiresAtMs: 10_000,
-      canRerollWorldQuest: canReroll,
-      rerollWorldQuest,
-    } as unknown as IWorld;
-    let selected: string | null = null;
-    const confirmDialog = vi.fn();
-    const onRepaintMap = vi.fn();
-    const controller = new MapSidebarController({
-      root: () => root,
-      click: vi.fn(),
-      onRepaintMap,
-      onShowRoute: vi.fn(),
-      settings: fakeSettings(),
-      tracking: new QuestTrackingState(fakeStorage()),
-      worldQuests: {
-        selectedId: () => selected,
-        select: (questId) => {
-          selected = questId;
-        },
-        confirmDialog,
-        nowMs: () => 4_000,
-      },
-    });
-    controller.update(world, zoneAt(giver.pos.x, giver.pos.z));
-    return {
-      root,
-      controller,
-      world,
-      confirmDialog,
-      onRepaintMap,
-      rerollWorldQuest,
-      cycle,
-      selectedId: () => selected,
-    };
-  }
-
-  it('renders the day board with its count and a disabled Replace button until a row is selected', () => {
-    const board = activeWorldQuestsForCycle(worldQuestCycleForResetDay('2026-08-31'));
-    const { root } = makeWorldQuestHarness([[board[0].id, 'completed']]);
-    const rows = root.querySelectorAll<HTMLElement>('[data-map-wq]');
-    expect(rows.length).toBe(board.length);
-    expect(root.querySelector('.map-atlas-wq-count')?.textContent).toBe(`1 / ${board.length}`);
-    expect(root.querySelector('.map-atlas-wq.is-completed')).not.toBeNull();
-    const button = root.querySelector<HTMLButtonElement>('[data-map-wq-reroll]');
-    expect(button?.disabled).toBe(true);
+describe('map sidebar controller: no world-quest board (menu consolidation step 7)', () => {
+  beforeEach(() => {
+    document.body.innerHTML = '';
   });
 
-  it('selecting a row shares the selection with the map and repaints it', () => {
-    const { root, onRepaintMap, selectedId } = makeWorldQuestHarness();
-    const first = root.querySelector<HTMLElement>('[data-map-wq]');
-    const questId = first?.dataset.mapWq ?? '';
-    first?.click();
-    expect(selectedId()).toBe(questId);
-    expect(onRepaintMap).toHaveBeenCalled();
-    expect(root.querySelector('.map-atlas-wq.is-selected')?.getAttribute('data-map-wq')).toBe(
-      questId,
-    );
-    expect(root.querySelector<HTMLButtonElement>('[data-map-wq-reroll]')?.disabled).toBe(false);
-    // The same row again clears the selection.
-    root.querySelector<HTMLElement>('[data-map-wq]')?.click();
-    expect(selectedId()).toBeNull();
-  });
-
-  it('Replace never reaches the world without the confirm dialog; confirming rerolls and clears the selection', () => {
-    const { root, confirmDialog, rerollWorldQuest, selectedId } = makeWorldQuestHarness();
-    root.querySelector<HTMLElement>('[data-map-wq]')?.click();
-    const questId = selectedId();
-    root.querySelector<HTMLElement>('[data-map-wq-reroll]')?.click();
-    expect(rerollWorldQuest).not.toHaveBeenCalled();
-    expect(confirmDialog).toHaveBeenCalledTimes(1);
-    const onOk = confirmDialog.mock.calls[0][4] as () => void;
-    onOk();
-    expect(rerollWorldQuest).toHaveBeenCalledWith(questId);
-    expect(selectedId()).toBeNull();
-  });
-
-  it('a refused reroll keeps the button disabled and names the reason by identity', () => {
-    const { root } = makeWorldQuestHarness([], () => ({
-      canReroll: false,
-      reason: 'Daily world quest reroll already used today.',
-    }));
-    root.querySelector<HTMLElement>('[data-map-wq]')?.click();
-    expect(root.querySelector<HTMLButtonElement>('[data-map-wq-reroll]')?.disabled).toBe(true);
-    expect(root.querySelector('.map-atlas-wq-note')?.textContent).toBe('Replacement used today');
-  });
-
-  it('a host without world quests omits the section entirely', () => {
-    const { root } = makeHarness();
-    expect(root.querySelector('.map-atlas-wq-section')).toBeNull();
+  it('paints no board, no Replace and no board rows: the Rewards hub owns them', () => {
+    const test = makeHarness();
+    expect(test.root.querySelector('[data-map-wq]')).toBeNull();
+    expect(test.root.querySelector('[data-map-wq-reroll]')).toBeNull();
+    const source = readFileSync(join(__dirname, '../src/ui/map_sidebar_controller.ts'), 'utf8');
+    expect(source).not.toContain('worldQuestRailSectionHtml');
+    expect(source).not.toContain('rerollWorldQuest');
   });
 });
 
@@ -477,8 +376,8 @@ describe('map sidebar controller: walking cadence', () => {
     document.body.innerHTML = '';
   });
 
-  /** The offers list is the only part of the rail that moves with the player, so
-   *  it needs live offers to be worth measuring (the default harness has none). */
+  /** Counts every innerHTML write on the rail root. With the nearby offers gone
+   *  (menu consolidation step 8) nothing on the rail moves with the player. */
   function walkingHarness() {
     const root = document.createElement('aside');
     document.body.appendChild(root);
@@ -497,6 +396,7 @@ describe('map sidebar controller: walking cadence', () => {
       onRepaintMap: vi.fn(),
       onShowRoute: vi.fn(),
       tracking: new QuestTrackingState(fakeStorage()),
+      openQuestLog: vi.fn(),
       settings: fakeSettings(),
     });
     const zone = zoneAt(giver.pos.x, giver.pos.z);
@@ -526,31 +426,14 @@ describe('map sidebar controller: walking cadence', () => {
     return { root, walk, writes };
   }
 
-  it('repaints nothing while the player walks a few yards', () => {
+  it('repaints nothing while the player walks, however far within the zone', () => {
     const test = walkingHarness();
     test.walk(0);
     expect(test.writes.count, 'the first update paints the rail').toBe(1);
-    expect(test.root.querySelectorAll('.map-atlas-nearby-row').length).toBeGreaterThan(0);
     const painted = test.root.firstElementChild;
-
     test.walk(3);
-
-    // A live distance moved every tick, so the rail used to rebuild its whole
-    // subtree four times a second while the player walked.
+    test.walk(30);
     expect(test.writes.count).toBe(1);
     expect(test.root.firstElementChild).toBe(painted);
-  });
-
-  it('repaints once the offers list actually reads differently', () => {
-    const test = walkingHarness();
-    test.walk(0);
-    const painted = test.root.firstElementChild;
-    const before = test.root.querySelector('.map-atlas-nearby-row')?.textContent;
-
-    test.walk(30);
-
-    expect(test.writes.count).toBe(2);
-    expect(test.root.firstElementChild).not.toBe(painted);
-    expect(test.root.querySelector('.map-atlas-nearby-row')?.textContent).not.toBe(before);
   });
 });

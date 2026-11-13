@@ -1,8 +1,14 @@
 // @vitest-environment happy-dom
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { weeklyRewardTableOptions } from '../src/sim/weekly_reward_options';
+import {
+  type WeeklyRewardTableOption,
+  weeklyRewardTableOptions,
+} from '../src/sim/weekly_reward_options';
 import type { WeeklyVaultBatch } from '../src/sim/weekly_rewards';
-import { appendWeeklyRewardTablePicker } from '../src/ui/weekly_reward_table_picker_controller';
+import {
+  appendWeeklyRewardTablePicker,
+  weeklyPickerDifficulty,
+} from '../src/ui/weekly_reward_table_picker_controller';
 
 const disposers: Array<() => void> = [];
 afterEach(() => {
@@ -226,6 +232,147 @@ describe('weekly table picker', () => {
     expect(s.footer.querySelector<HTMLElement>('.weekly-table-options')!.style.maxHeight).toBe(
       '220px',
     );
+  });
+  describe('a Heroic vault choosing its difficulty', () => {
+    const heroic = (saving = false) => {
+      const s = make();
+      s.batch.choices[0].pool = 'dungeon_heroic';
+      const difficulties = new Map<number, 'normal' | 'heroic'>();
+      const render = () => {
+        const picker = appendWeeklyRewardTablePicker({
+          footer: s.footer,
+          choice: s.batch.choices[0],
+          tables: weeklyRewardTableOptions(s.batch, s.batch.choices[0], 'mage', 20),
+          index: 0,
+          selections: s.selections,
+          saving,
+          onChange: s.changed,
+          expanded: s.expanded,
+          difficulties,
+        });
+        disposers.push(picker.dispose);
+        return picker;
+      };
+      const toggle = () => [
+        ...s.footer.querySelectorAll<HTMLButtonElement>('.weekly-table-difficulty button'),
+      ];
+      const pressed = () => toggle().map((b) => b.getAttribute('aria-pressed'));
+      // The table rows only: the first checkbox row is Select all.
+      const tableRows = () =>
+        [...s.footer.querySelectorAll('.weekly-table-option span')]
+          .slice(1)
+          .map((row) => row.textContent);
+      return { ...s, render, toggle, pressed, tableRows, difficulties };
+    };
+    it('switches between the Heroic and Normal tables, one difficulty per roll', () => {
+      const s = heroic();
+      let picker = s.render();
+      expect(s.footer.querySelector('.weekly-table-difficulty')!.getAttribute('aria-label')).toBe(
+        'Difficulty',
+      );
+      expect(s.toggle().map((b) => [b.textContent, b.getAttribute('aria-pressed')])).toEqual([
+        ['Heroic', 'true'],
+        ['Normal', 'false'],
+      ]);
+      // ysolei is the only Heroic clear; vael's dungeon was cleared on Normal only.
+      expect(s.tableRows()).toHaveLength(1);
+      s.inputs()[1].click();
+      expect(picker.selected()).toEqual(['drowned_temple']);
+      expect(s.footer.querySelector('summary .weekly-difficulty')).toBeNull();
+      s.toggle()[1].click();
+      expect(s.pressed()).toEqual(['false', 'true']);
+      expect(s.tableRows()).toHaveLength(2);
+      // The Heroic pick left with the switch, so one roll never mixes difficulties.
+      expect(picker.selected()).toEqual([]);
+      expect(picker.canOpen()).toBe(false);
+      s.inputs()[0].click();
+      expect(picker.selected()).toEqual(['sunken_bastion:normal', 'drowned_temple:normal']);
+      expect(picker.canOpen()).toBe(true);
+      // The closed menu still says the vault is set to roll Normal.
+      const summary = s.footer.querySelector('summary')!;
+      expect(summary.querySelector('.weekly-difficulty-normal')!.textContent).toBe('Normal');
+      expect(summary.textContent).toBe('2 tables selectedNormal');
+      picker.dispose();
+      picker = s.render();
+      expect(s.pressed()).toEqual(['false', 'true']);
+      expect(picker.selected()).toEqual(['sunken_bastion:normal', 'drowned_temple:normal']);
+      s.toggle()[0].click();
+      expect(picker.selected()).toEqual([]);
+      expect(s.footer.querySelector('summary .weekly-difficulty')).toBeNull();
+    });
+    it('keeps the open menu open and focused on the pressed button through a switch', async () => {
+      const s = heroic();
+      s.render();
+      const details = s.footer.querySelector('details')!;
+      details.open = true;
+      details.dispatchEvent(new Event('toggle'));
+      s.toggle()[1].focus();
+      s.toggle()[1].click();
+      await Promise.resolve();
+      expect(details.open).toBe(true);
+      expect(s.expanded.has(0)).toBe(true);
+      expect(document.activeElement).toBe(s.toggle()[1]);
+      expect(s.pressed()).toEqual(['false', 'true']);
+      // Activation keys never reach the game's hotkeys.
+      const bubbled = vi.fn();
+      document.addEventListener('keydown', bubbled);
+      for (const key of ['Enter', ' '])
+        s.toggle()[0].dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
+      document.removeEventListener('keydown', bubbled);
+      expect(bubbled).not.toHaveBeenCalled();
+    });
+    it('offers only the difficulty that has tables, and nothing while saving', () => {
+      const s = heroic();
+      // No Heroic clear at all: the Heroic vault can only roll Normal.
+      s.batch.bossUnlocks = { vael_the_mistcaller: 1 };
+      s.render();
+      expect(s.toggle().map((b) => b.disabled)).toEqual([true, false]);
+      expect(s.pressed()).toEqual(['false', 'true']);
+      expect(s.tableRows()).toHaveLength(1);
+      const saving = heroic(true);
+      saving.render();
+      expect(saving.toggle().map((b) => b.disabled)).toEqual([true, true]);
+    });
+    it('resolves the shown difficulty from the remembered pick and the tables left', () => {
+      const normal: WeeklyRewardTableOption = {
+        id: 'a:normal',
+        kind: 'mob',
+        items: ['x'],
+        difficulty: 'normal',
+      };
+      const earned: WeeklyRewardTableOption = { id: 'a', kind: 'mob', items: ['y'] };
+      expect(weeklyPickerDifficulty([earned, normal])).toBe('heroic');
+      expect(weeklyPickerDifficulty([earned, normal], 'normal')).toBe('normal');
+      expect(weeklyPickerDifficulty([normal])).toBe('normal');
+      // A remembered difficulty whose tables ran out falls back to the other.
+      expect(weeklyPickerDifficulty([normal], 'heroic')).toBe('normal');
+      expect(weeklyPickerDifficulty([earned], 'normal')).toBe('heroic');
+      expect(weeklyPickerDifficulty([], 'normal')).toBe('heroic');
+    });
+    it('marks a vault that rolled Normal beside its source, and gives a Normal vault no switch', () => {
+      const s = make();
+      s.render();
+      expect(s.footer.querySelector('.weekly-table-difficulty')).toBeNull();
+      s.batch.choices[0] = {
+        pool: 'dungeon_heroic',
+        tableId: 'sunken_bastion:normal',
+        itemId: 'x',
+        opened: true,
+      };
+      s.render();
+      // One footer item holds the name then the badge, so a later sibling (the
+      // rolled loot focus) cannot land between them.
+      expect(s.footer.children).toHaveLength(1);
+      const [name, badge] = [...s.footer.firstElementChild!.children];
+      expect(name.textContent!.length).toBeGreaterThan(0);
+      expect(name.textContent).not.toContain('normal');
+      expect(badge.className).toContain('weekly-difficulty-normal');
+      expect(badge.textContent).toBe('Normal');
+      s.batch.choices[0] = { ...s.batch.choices[0], tableId: 'sunken_bastion' };
+      s.render();
+      expect(s.footer.querySelector('.weekly-difficulty')).toBeNull();
+      expect(s.footer.textContent).toBe(name.textContent);
+    });
   });
   it('lists the sole World/PvP table and supplies it automatically when eligible', () => {
     const s = make();

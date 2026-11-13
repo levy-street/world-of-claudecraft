@@ -82,7 +82,6 @@ import {
 import { shaderWarmChoiceAvailable } from '../render/shader_warm_client';
 import { desktopBridge } from '../runtime';
 import type { IWorld } from '../world_api';
-import { appVersionInfo } from './app_version';
 import type { AuraOverlayHooks } from './aura_overlay_settings';
 import { bugReportErrorText } from './bug_report_error_text';
 import { controllerDeviceStatusView } from './controller_options_view';
@@ -121,8 +120,9 @@ import {
   buildChatWindowResetRow,
   buildInterfaceUnlockRow,
 } from './options_interface_rows';
-import { buildOptionsMenuList, type OptionsMenuRoutedAction } from './options_main_menu_controller';
+import { type OptionsMenuRoutedAction, paintOptionsMainMenu } from './options_main_menu_controller';
 import { OptionsOverlayPanels } from './options_overlay_panels';
+import { OptionsSettingsRail } from './options_settings_rail_controller';
 import { sliderFormatter } from './options_slider_format';
 import { optionsText } from './options_text_values';
 import {
@@ -133,7 +133,6 @@ import {
   buildControllerControls,
   buildGraphicsSections,
   buildInterfaceControls,
-  buildOptionsMenu,
   type ChoiceControl,
   copyGraphicsDraft,
   flattenGraphicsSections,
@@ -436,6 +435,12 @@ export class OptionsWindow {
     close: () => this.close(),
     route: (action) => this.routeMenuAction(action),
   });
+  // The Settings view's category rail (options_settings_rail_controller.ts).
+  private readonly settingsRail = new OptionsSettingsRail((view) => {
+    this.endKeybindSession();
+    this.routeMenuAction({ kind: 'goto', view });
+    this.settingsRail.focusCurrent(this.deps.root());
+  });
   // The element to refocus when the window closes (WCAG 2.2 AA focus return).
   private returnFocus: HTMLElement | null = null;
   // Tracked separately from the root's inline `display` (rather than reading
@@ -526,13 +531,7 @@ export class OptionsWindow {
     this.syncGpuBackendWatch();
     this.deps.root().removeAttribute('aria-busy');
     this.deps.root().style.display = 'none';
-    // A key capture armed from a row or the keyboard overview must not outlive
-    // the window: the one-shot would fire on the player's next in-game keypress.
-    if (this.capturingKey) this.deps.options()?.captureKey(null);
-    this.capturingKey = null;
-    this.conflictingKey = null;
-    this.keyboardBoard?.dispose();
-    this.keyboardBoard = null;
+    this.endKeybindSession();
     this.deps.options()?.perfOverlay.setPlacement(false);
     this.overlayPanels.close();
     this.deps.hideTooltip();
@@ -542,8 +541,17 @@ export class OptionsWindow {
     this.deps.restoreFocus(target);
   }
 
-  /** Called by main.ts when a drag settles on the live overlay: push the dropped
-   *  normalized position into the open panel's sliders so they do not lag the drag. */
+  // A key capture armed from a row or the keyboard overview must not outlive
+  // its panel (the window closing, or a rail press leaving Key Bindings): the
+  // one-shot would fire on the player's next in-game keypress.
+  private endKeybindSession(): void {
+    this.dropKeyCapture();
+    this.conflictingKey = null;
+    this.keyboardBoard?.dispose();
+    this.keyboardBoard = null;
+  }
+
+  /** main.ts, after an overlay drag settles: sync the open panel's sliders to it. */
   onPerfOverlayMoved(x: number, y: number): void {
     this.perfSettings?.syncPosition(x, y);
   }
@@ -579,6 +587,7 @@ export class OptionsWindow {
         : { labelledBy: 'options-title' },
     );
     const centre = this.layout.begin(el, this.view, this.interfaceTab, this.frameOptionsId);
+    this.settingsRail.sync(el, this.view);
     // The overlay is draggable only while the Performance sub-view is open.
     this.deps.options()?.perfOverlay.setPlacement(this.view === 'performance');
     this.overlayPanels.sync(this.view);
@@ -616,12 +625,6 @@ export class OptionsWindow {
       default:
         this.renderMain();
     }
-    // Every panelTitle() sub-view carries a [data-back] control in its title
-    // bar; wire it once here so a new sub-view cannot forget it. The main menu
-    // renders none (this no-ops) and Performance wires its own back listener in
-    // buildTitle (it rerender()s internally, which would drop a listener added
-    // here).
-    el.querySelector('[data-back]')?.addEventListener('click', () => this.goBack());
     // Every sub-view is a window shell now (head, one scrolling .ui-win-body,
     // an optional pinned foot), and a shell needs the inline flex: no stylesheet
     // display can outrank the inline one a `.window` is opened with, so the
@@ -660,11 +663,12 @@ export class OptionsWindow {
     this.frameOptionsId = null;
     audio.click();
     this.view = this.overlayPanels.parentView(this.view);
-    this.capturingKey = null;
-    this.conflictingKey = null;
+    this.endKeybindSession(); // Back out of Key Bindings disarms a capture, like the rail
     this.keybindNote = '';
     this.render();
-    this.deps.focusFirstInteractive(this.deps.root());
+    const row = this.deps.root().querySelector<HTMLElement>('[data-menu-action="settings"]');
+    if (row && this.view === 'main') row.focus();
+    else this.deps.focusFirstInteractive(this.deps.root());
   }
 
   private panelTitle(title: string): string {
@@ -678,35 +682,31 @@ export class OptionsWindow {
   }
 
   private renderMain(): void {
-    const el = this.deps.root();
-    const scroll = this.viewShell(t('hud.options.gameMenu'));
-    const entries = buildOptionsMenu({
-      bugReportAvailable: this.deps.bugReport() !== null,
-      // Frame editing is desktop-only: the same gate as the Frames tab's row,
-      // and the same union that raises the touch HUD (mobile_controls
-      // setActive), which is what Hud.toggleInterfaceUnlock refuses on.
-      interfaceUnlockAvailable: !(useTouchInterface() || isNativeAppShell()),
-      interfaceUnlocked: this.deps.isInterfaceUnlocked(),
-    });
-    const list = buildOptionsMenuList(entries, {
-      toggleInterfaceUnlock: () => this.deps.toggleInterfaceUnlock(),
-      dispatch: (action) => this.routeMenuAction(action),
-    });
-    scroll.appendChild(list);
-    // Running build, as small secondary text at the foot of the menu, so players can
-    // confirm their version without leaving the settings window (issue 1541).
-    const { version, build } = appVersionInfo();
-    const ver = document.createElement('div');
-    ver.className = 'opt-version';
-    ver.textContent = t('hudChrome.options.version', { version, build });
-    scroll.appendChild(ver);
-    el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
+    paintOptionsMainMenu(
+      this.viewShell(t('hud.options.gameMenu')),
+      {
+        bugReportAvailable: this.deps.bugReport() !== null,
+        interfaceUnlocked: this.deps.isInterfaceUnlocked(),
+      },
+      {
+        toggleInterfaceUnlock: () => this.deps.toggleInterfaceUnlock(),
+        dispatch: (a) => this.routeMenuAction(a),
+      },
+    );
+    this.deps
+      .root()
+      .querySelector('[data-close]')
+      ?.addEventListener('click', () => this.close());
   }
 
-  /** Route a main-menu press. The sub-views, the wiki hop, logout, unstuck and
-   *  close all mutate window state, so the list painter hands them back here. */
+  /** Route a main-menu press. Settings, the sub-views, the wiki hop, logout,
+   *  unstuck and close all mutate window state, so the list painter hands them
+   *  back here. Settings opens its rail's entry category, focus on the rail. */
   private routeMenuAction(a: OptionsMenuRoutedAction): void {
-    if (a.kind === 'goto') {
+    if (a.kind === 'settings') {
+      this.routeMenuAction({ kind: 'goto', view: this.settingsRail.entryCategory() });
+      this.settingsRail.focusCurrent(this.deps.root());
+    } else if (a.kind === 'goto') {
       this.view = a.view;
       this.keybindNote = '';
       this.render();
@@ -1048,7 +1048,13 @@ export class OptionsWindow {
 
   // The window shell (options_window_shell.ts): head, then the ONE scrolling body.
   private viewShell(title: string, bodyClass?: string): HTMLElement {
-    return mountViewShell(this.deps.root(), this.panelTitle(title), bodyClass);
+    const body = mountViewShell(this.deps.root(), this.panelTitle(title), bodyClass);
+    // [data-back] is wired on EVERY shell mount, so a self-repaint without
+    // render() (a key capture) keeps a live Back (Performance wires its own).
+    const back = this.deps.root().querySelector('[data-back]');
+    back?.addEventListener('click', () => this.goBack());
+    this.settingsRail.mount(this.deps.root(), this.view);
+    return body;
   }
 
   // Restore exactly these keys, re-apply them to their subsystem, then redraw.
@@ -1942,6 +1948,7 @@ export class OptionsWindow {
       closeIconHtml: svgIcon('close'),
       backIconHtml: svgIcon('prev'),
       hostDiag: { world: () => this.deps.world(), options: () => this.deps.options() },
+      afterRender: (root) => this.settingsRail.mount(root, this.view),
     };
   }
 

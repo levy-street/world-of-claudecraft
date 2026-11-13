@@ -25,8 +25,6 @@ async function rail(entry: string) {
     .content.querySelector<HTMLElement>('#side-buttons')!;
   document.body.append(document.importNode(root, true));
   const live = document.querySelector<HTMLElement>('#side-buttons')!;
-  // Discord is shown by the normal desktop bootstrap on enabled builds.
-  live.querySelector<HTMLButtonElement>('#mm-discord')!.hidden = false;
   live.querySelector<HTMLButtonElement>('#daily-rewards-button')!.innerHTML =
     '<img class="daily-rewards-icon" src="/ui/daily-rewards/treasure_chest.webp" alt="" draggable="false">';
   hydrateIcons(live);

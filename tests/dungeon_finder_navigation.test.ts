@@ -64,53 +64,11 @@ describe('simplified group navigation', () => {
     document.body.innerHTML = '';
   });
 
-  it('opens the remote vault preview from Groups and refreshes progress without enabling claims', () => {
-    const { root, world, window, click } = setup();
-    const state = emptyWeeklyRewards(604800000);
-    state.vaults = [{ resetAtMs: 1000, choices: [{ pool: 'world' }] }];
-    const info = {
-      state,
-      nowMs: 2000,
-      playerLevel: 20,
-      canClaim: true,
-      worldQuestsAvailable: true,
-      readyWeeks: 1,
-    };
-    const claim = vi.fn();
-    const open = vi.fn();
-    const focus = vi.fn();
-    Object.assign(world, {
-      weeklyRewardInfo: info,
-      claimWeeklyReward: claim,
-      openWeeklyReward: open,
-      setWeeklyLootSpec: focus,
-    });
-    click('[data-tab="vault"]');
-    expect(root.querySelector('#dfinder-title')?.textContent).toBe('The Weekly Vault');
-    expect(root.querySelector('.weekly-preview-notice')?.textContent).toContain(
-      'Visit the Vault Keeper',
-    );
-    expect(root.querySelector('.weekly-start-claim')).toBeNull();
-    expect(root.querySelector('.weekly-loot-focus')).toBeNull();
-    click('#weekly-possible-loot-button');
-    expect(root.querySelector('#weekly-pool-dungeon .weekly-loot')).not.toBeNull();
-    const panel = root.querySelector('#weekly-rewards-panel');
-    info.nowMs += 1000;
-    window.render();
-    expect(root.querySelector('#weekly-rewards-panel')).toBe(panel);
-    panel!.scrollTop = 240;
-    state.world = 2;
-    window.render();
-    expect(root.querySelector('.weekly-track-world .weekly-earned')).not.toBeNull();
-    expect(root.querySelector('#weekly-rewards-panel')?.scrollTop).toBe(240);
-    expect(root.querySelector('#weekly-possible-loot')?.hasAttribute('hidden')).toBe(false);
-    click('[data-tab="board"]');
+  it('offers no Vault preview: the Weekly Vault is the Rewards hub tab now', () => {
+    // Menu consolidation step 7: the finder's read-only Vault tab is gone.
+    const { root } = setup();
+    expect(root.querySelector('[data-tab="vault"]')).toBeNull();
     expect(root.querySelector('#weekly-rewards-panel')).toBeNull();
-    expect(root.querySelector('#dfinder-title')?.textContent).toBe('Groups');
-    expect(claim).not.toHaveBeenCalled();
-    expect(open).not.toHaveBeenCalled();
-    expect(focus).not.toHaveBeenCalled();
-    window.close();
   });
 
   it('opens groups without tabs or a creation form and returns from its secondary guide', () => {

@@ -191,8 +191,8 @@ const familyAllowed: AllowFn = anchoredAllow(FAMILY_ALLOWANCES, usedFamilyAnchor
 // distinctive price value, each anchored on the named constant sharing its
 // line. The exercised-allowance arm below reds if one goes stale.
 const TREE_ALLOWANCES: ReadonlyArray<[file: string, value: number, anchor: string]> = [
-  // Five minutes in milliseconds, twice: neither is money.
-  ['src/ui/daily_rewards_launcher_core.ts', 300000, 'DAILY_REWARDS_LAUNCHER_THROTTLE_MS'],
+  // Five minutes in milliseconds: not money. (Its twin, the daily-rewards
+  // launcher's throttle, left with the daily spin in menu consolidation step 7.)
   ['src/ui/hud/loot/loot_roll_controller.ts', 300000, 'MASTER_LOOT_DURATION_MS'],
   // The /dev gold prompt's input bound (dev-gated tooling, not a price render).
   ['src/ui/dev_command_view.ts', 100000, 'boundedInteger'],
@@ -372,9 +372,9 @@ describe('the literal scanner (positive controls through the real operator)', ()
     // exercised-anchor pins in arms (b)/(c).
     const probeUsed = new Set<string>();
     const probeAllow = anchoredAllow(TREE_ALLOWANCES, probeUsed);
-    const anchored = 'const DAILY_REWARDS_LAUNCHER_THROTTLE_MS = 300000;';
+    const anchored = 'const MASTER_LOOT_DURATION_MS = 300000;';
     const bare = 'const price = 300000;';
-    const rel = 'src/ui/daily_rewards_launcher_core.ts';
+    const rel = 'src/ui/hud/loot/loot_roll_controller.ts';
     expect(scanCode(prepare(anchored), banValues, rel, probeAllow, none)).toEqual([]);
     expect(probeUsed.size).toBe(1);
     const hits = scanCode(prepare(bare), banValues, rel, probeAllow, none);

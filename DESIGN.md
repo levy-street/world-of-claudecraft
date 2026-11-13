@@ -627,11 +627,43 @@ the collapse chevron.
 
 The existing `#side-buttons` rail stays at the bottom right. It is a two-column rail of
 34 x 30 `.ui-icon-btn--micro` buttons, with live `.ui-keycap` labels, `.ui-badge`
-notifications, and a gold selected ring while the destination window is open. Existing
-destinations and keybinds remain available.
+notifications, and a gold selected ring while the destination window is open.
 
 The proposed 3 x 2 launcher tile grid and the More hub are withdrawn. The micro menu does
 not become a card or a full-height backing rail.
+
+Amended at the menu consolidation (approved 2026-11-04): the rail carries FEWER WINDOWS,
+not a hub of launchers. Windows that belong to one system fold into one tabbed hub window
+with one rail button, and the absorbed windows keep their own ids and painters as the
+hub's tabs: every destination stays reachable, but no longer each from its own rail slot
+and its own key. The first hub is Professions (Shift+P: Overview, Crafting, Perfecting,
+Harvest Journal; T still lands on Crafting), so the Crafting, Perfecting and Harvest
+Journal buttons left the rail and Shift+T and Shift+K no longer ship as defaults (both
+actions stay rebindable, and a binding a player already saved keeps working). A hub button's selected ring lights while any of its tabs
+is open. Each later hub records itself here when it lands.
+
+The rest of the consolidation (2026-11-04) took the rail from 24 visible buttons to 12, still
+two columns of six: Character, Bags, Spellbook, Talents, Quest Log and World Map; then the
+Book of the Realm (Shift+Z: Deeds, Titles, Reliquary, Reputation, Loot Explorer, Rankings),
+Professions, Activities (the Groups bell, Shift+I: Dungeons and Raids, PvP with G landing
+there, Card Duel), Friends and Guild, the WOC Store chest, the Game Menu, and the $WOC
+Exchange when enabled. The Emotes, Wiki, Discord and Cosmetics buttons left the rail (the
+emote wheel stays on X and the touch tray, Discord is a strip in Social, Cosmetics opens from
+the sheet footer), the Calendar window left the game, and K, I, U, Shift+X, Shift+O and Shift+Y
+no longer ship as defaults. The mobile More tray keeps one tile per destination, grouped
+under Record, Professions, Activities, Character and Store headings, each opening its hub
+already on its tab, so a hub never costs a tap on a phone.
+
+Steps 7 and 8 (approved 2026-11-06) added Rewards as a plain rail button under the World Map
+(13 visible): one hub for what a player can claim, Vault (the weekly rewards sheet, which the
+Bank and the Dungeon Finder each painted before), Weekly Quest (the emissary's offers, read-only
+away from the emissary because the sim takes the pick only there) and World Quests (the day's
+board, moved off the World Map rail). Its corner pill counts only claimable rewards, ready Vault
+rolls and a finished weekly charge, from the same reads the tabs paint (world quests pay on
+completion, so they add nothing). It has no default
+key (the `rewards` action is rebindable). The WOC Store keeps the chest beacon as its own
+window; its daily-spin fallback body is gone. The More tray gained a Rewards group before
+Store.
 
 ### 7.10 Chat
 
@@ -766,18 +798,34 @@ Every window adopts the grammar; these carry specific intent:
   the existing `--bank-slot-quality` hook. Bank-docked behavior stays.
 - **Character** (`char_window.ts`): a sheet in four bands. The head; the body; a row
   of the five attribute tiles; and a footer that carries the tab strip (Character,
-  Reputation, Currencies, Progression, Professions) beside the Cosmetics and Share Player
-  Card actions. The Character tab keeps the paperdoll and seats the Offense, Defense and Specialization
-  boards in a rail at its right that scrolls on the wheel; every other tab takes the whole
-  body: Reputation (`src/ui/hud/reputation/`, one card per faction with the standing pill
-  and tier bar on the quality ramp), Currencies (`src/ui/hud/currencies/`, the activity
-  currencies and the faction rows), Progression (milestones, title, Reliquary and Time
-  Played) and Professions (the gathering and crafting boards). The Specialization board is
+  Progression) beside the Cosmetics and Share Player Card actions. The Character tab keeps the paperdoll and seats the Offense, Defense and Specialization
+  boards in a rail at its right that scrolls on the wheel; Progression takes the whole
+  body (milestones, title, Reliquary and Time Played). On desktop, C opens the sheet with
+  the bags docked at its right (`char_bags_pairing_core.ts` `charBagsDocked`); B still
+  opens the bags alone. The Specialization board is
   a readout only (spec, role, mastery): the talents window owns the picker. Stat labels
   remain muted with parchment values;
   `item_compare.ts` continues to provide success and danger deltas. (Amended at the
   world-quest reputation work: the earlier note seated Stats, Progression and Skills in a
-  300px side rail, which left no room for the reputation and currency surfaces.)
+  300px side rail, which left no room for the reputation and currency surfaces. Amended
+  again at the menu consolidation, 2026-11-04: the Professions tab left the sheet, because
+  the Professions hub's Overview tab owns the same gathering and crafting rows; then
+  Reputation moved to the Book of the Realm and Currencies to the Bags wallet strip,
+  leaving Character and Progression.)
+- **Bags wallet strip** (`src/ui/hud/currencies/currencies_tab_html.ts`
+  `currenciesWalletHtml`): the activity and faction currencies as one wrapping chip row
+  between the grid and the purse; $WOC stays on the purse's balance chip.
+- **Book of the Realm** and **Activities** (`src/ui/hud/hub/`): the same tab-group shell as
+  the Professions hub. The Book (Shift+Z) tabs Deeds, Titles, the Reliquary, Reputation,
+  the Loot Explorer and Rankings; Activities (the Groups bell, Shift+I) tabs Dungeons and
+  Raids, PvP and Card Duel. Every member's own open path routes through the hub, so a
+  deep link still shows one tab at a time.
+- **Professions hub** (`src/ui/hud/professions/professions_hub_*`): one tabbed window over
+  the four professions windows. Each member window paints the shared `ui-tabs` strip under
+  its title bar and shows the hub title; one member is shown at a time, a tab switch opens
+  the next member at the same position (desktop) and the hub remembers its last tab per
+  device. The crafting window's title-bar Perfecting button is not painted inside the hub,
+  because Perfecting is a sibling tab.
   ACCEPTED DEVIATION (stage and overlay): on pointer form factors the 3D model preview is
   the full-height stage of the equipment pane, and the two equipment slot columns float
   over its outer edges on a scrim (`--color-stage-overlay-scrim`), spanning the stage
@@ -800,21 +848,35 @@ Every window adopts the grammar; these carry specific intent:
   mid-screen.
 - **Quest log** (`src/ui/hud/quest/questlog_window.ts`): quests group by zone. Each zone
   shows its count and has a collapse control; the detail pane keeps tracked state and
-  reward sockets.
+  reward sockets. An Available group (the nearby offers that were the World Map rail's
+  list) sits after the zones, each offer with Show on Map at its giver.
 - **World map** (`map_window_view.ts`, `map_window_painter.ts`): the canvas sits in a
-  dark inset atlas frame beside a 300px side rail. The rail lists the zone's quests with
-  numbers matching the map badges, then the World Quests board (today's quests with their
-  state, the selected quest's daily reroll behind a confirmation dialog, never one click),
-  then Available Nearby; it also carries filters, legend, Show Route, and Untrack. A Side
-  panel button under the map-level toggle folds the rail away (`mapSidebarCollapsed`,
-  `src/ui/hud/map/map_sidebar_collapse.ts`) so the map takes the whole window. Map
-  controls use `.ui-disc`; pins stay on the `--color-map-*` tokens with quest pins vivid.
+  dark inset atlas frame beside a 300px side rail. The rail is the map's legend: the zone
+  header, the zone's tracked quests with numbers matching the map badges and Show Route,
+  the filters, the legend, and one Open Quest Log link (menu consolidation step 8). Untrack
+  and the nearby offers live in the Quest Log (its Track toggle and Available group), the
+  World Quests board in the Rewards hub. A Side panel button under the map-level toggle
+  folds the rail away (`mapSidebarCollapsed`, `src/ui/hud/map/map_sidebar_collapse.ts`)
+  so the map takes the whole window, and on the touch HUD the rail starts folded each time
+  the map opens. Map controls use `.ui-disc`; pins stay on the `--color-map-*` tokens with
+  quest pins vivid.
 - **Vendor** (`src/ui/hud/vendor/vendor_window.ts`): inventory uses a compact two-column
   `.ui-card` grid with sockets, price, stock state, and buy action composed from the shared
   primitives.
-- **Game Menu**: the Esc menu is a hub of full-width `.ui-btn` rows. Each destination opens
-  its per-view panel inside the same window grammar; return and destructive actions keep
-  their explicit hierarchy.
+- **Game Menu** (`options_main_menu_controller.ts` over `buildOptionsMenu` in
+  `options_view.ts`): the Esc menu is a short hub of full-width `.ui-btn` rows: Settings,
+  Unlock Interface (desktop), Help and Wiki, Report a Bug (online), Unstuck, Log Out, then
+  a compact two-column group of quick toggles and links (Nameplates, Music, Haptics on
+  touch, Discord, Donate, the Steam wishlist, each where it applies today), and Return to
+  Game last. Toggles carry `aria-pressed` plus a visible On/Off status; return and
+  destructive actions keep their explicit hierarchy.
+- **Settings view** (issue #1653; `options_settings_rail_controller.ts` over the pure
+  `options_settings_view.ts`): Settings opens a full-screen view (desktop and both touch
+  orientations) with a persistent category rail (Graphics, Interface, Key Bindings on
+  desktop only, Controller, Overlays, Audio, Transfer), so any category is one press from
+  any other; each category body is the existing sub-panel unchanged. The rail sits at the
+  inline start, and becomes a scrolling strip under the head on a portrait phone. Back
+  returns to the Game Menu; Esc and the close control return to the game.
 - **Store surfaces** (`daily_rewards_window.ts`, `woc_store_view.ts`,
   `claudium_window.ts`): product art provides the color; cards stay restrained blue-black
   with gold edges; rarity chips reuse the weapon-skin rarity colors; price and balance

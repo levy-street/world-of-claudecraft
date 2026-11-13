@@ -31,7 +31,7 @@ export const factions: GuidePage = {
           `${p('guide.factionsPage.tiersBody')}${p('guide.factionsPage.riftWatchTitles')}${p('guide.factionsPage.churchOrderTitles')}${p('guide.factionsPage.automatonsTitles')}`,
         )}
         ${section('guide.factionsPage.quartermastersHeading', p('guide.factionsPage.quartermastersBody'))}
-        ${section('guide.factionsPage.readingHeading', p('guide.factionsPage.readingBody'))}
+        ${section('guide.factionsPage.readingHeading', p('guide.factionsPage.readingBodyRealm'))}
         ${section('guide.factionsPage.deedsHeading', p('guide.factionsPage.deedsBody'))}
         ${related([
           { href: hrefFor('quests'), key: 'guide.nav.quests' },

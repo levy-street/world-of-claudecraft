@@ -55,7 +55,7 @@ export const social: GuidePage = {
           <h2>${esc(t('guide.social.chatHeading'))}</h2>
           <p>${esc(t('guide.social.chatBody'))}</p>
           <ul class="guide-list">${channels}</ul>
-          <p>${esc(t('guide.social.emotesBodyNamedTarget'))}</p>
+          <p>${esc(t('guide.social.emotesBodyMoreTray'))}</p>
           <p class="guide-section-more"><a href="${esc(hrefFor('reference/interface'))}">${esc(t('guide.social.chatMore'))}</a></p>
         </section>
 
@@ -101,7 +101,7 @@ export const social: GuidePage = {
           <h2>${esc(t('guide.social.guildHeading'))}</h2>
           <p>${esc(t('guide.social.guildBody'))}</p>
           <p>${esc(t('guide.social.guildChatBody'))}</p>
-          <p>${esc(t('guide.social.guildBoardBody'))}</p>
+          <p>${esc(t('guide.social.guildBoardBodyRankings'))}</p>
         </section>
 
         <section class="guide-block">
@@ -109,8 +109,6 @@ export const social: GuidePage = {
           <p>${esc(t('guide.social.guildBankBody'))}</p>
           <p>${esc(t('guide.social.guildBankRulesBody'))}</p>
         </section>
-
-        ${section('guide.social.calendarHeading', p('guide.social.calendarBodyDoubleHonor'))}
 
         <section class="guide-block">
           <h2>${esc(t('guide.social.etiquetteHeading'))}</h2>

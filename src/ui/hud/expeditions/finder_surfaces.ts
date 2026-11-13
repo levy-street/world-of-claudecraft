@@ -6,10 +6,13 @@ import { DungeonFinderWindow } from '../../dungeon_finder_window';
 import type { InspectRemoteProfile } from '../../inspect_window';
 import type { PainterHostPresentation, PainterHostWriters } from '../../painter_host';
 import type { WindowFocusBridge } from '../../window_focus';
+import type { WindowHubStrip } from '../hub/window_hub_controller';
 import { ExpeditionController } from './expedition_controller';
 
 interface FinderSurfaceHost {
   world(): IWorld;
+  /** The Activities hub strip for the Dungeons and Raids tab. */
+  hubStrip?: WindowHubStrip;
   root(selector: string): HTMLElement;
   focus(selector: string): WindowFocusBridge;
   closeOthers(selector: string): void;
@@ -38,6 +41,7 @@ export function createFinderSurfaces(host: FinderSurfaceHost) {
     hasBossGuide: host.hasBossGuide,
     openBossGuide: host.openBossGuide,
     ...host.focus('#dungeon-finder-window'),
+    hubStrip: host.hubStrip,
   });
   return {
     window,
@@ -48,7 +52,7 @@ export function createFinderSurfaces(host: FinderSurfaceHost) {
     expeditions: new ExpeditionController({
       world: host.world,
       writers: host.writers,
-      openFinder: () => window.open(),
+      openFinder: host.openFinder,
       openRecruitment: () => window.open('board'),
       notify: () => audio.duelChallenge(),
       maskPlayerText: host.maskPlayerText,

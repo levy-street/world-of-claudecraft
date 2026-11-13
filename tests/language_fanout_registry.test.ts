@@ -135,7 +135,10 @@ const FANOUT_ARMS: readonly string[] = [
   'this.hillBar.relocalize|',
   'this.syncDailyRewardsSurfaceLabels|',
   'this.wocMarketWindow.relocalize|',
+  // The Rewards hub's three tabs (menu consolidation step 7), each its own arm.
+  'this.rewards.vault.relocalize|',
   'this.weeklyQuestsWindow.relocalize|',
+  'this.rewards.worldQuests.relocalize|',
   'this.guildHallWindow.relocalize|',
   'this.storePromoCard.relocalize|',
   'this.refreshKeybindLabels|',
@@ -203,6 +206,8 @@ const FANOUT_ARMS: readonly string[] = [
   'this.bankWindow.render|this.bankWindow.isOpen',
   'this.courierWindow.render|this.courierWindow.isOpen()',
   'this.deedsWindow.render|this.deedsWindow.isOpen',
+  // The Book of the Realm's Titles tab: a second DeedsWindow in titles mode.
+  'this.titlesWindow.render|this.titlesWindow.isOpen',
   'this.professionsWindow.render|this.professionsWindow.isOpen',
   // The journal's relocalize gates itself (isOpen inside) and additionally
   // clears the standing ready announcement, whose text was minted in the OLD
@@ -243,7 +248,11 @@ const FANOUT_ARMS: readonly string[] = [
   'this.dungeonFinderProposalPopup.relocalize|',
   'this.bgProposalPopup.relocalize|',
   'this.questDialog.relocalize|',
-  'this.calendarWindow.relocalize|',
+  // The Book of the Realm's Reputation tab (self-gated on its open check).
+  'this.reputationWindow.relocalize|',
+  // The Book of the Realm's Rankings tab and its World Quests rankings
+  // stand-in: boards painted once per open or page turn (self-gated).
+  'this.leaderboardWindow.relocalize|',
   'this.mailboxWindow.relocalize|',
   'this.socialWindow.relocalize|',
   'this.cosmeticsWindow.relocalize|',
@@ -435,10 +444,16 @@ const ANSWERED: readonly AnsweredSurface[] = [
     why: 'the Skull Bag pane is mounted only inside the open bags window; the bags language arm rebuilds that window, remounts the pane, resets lastSignature, and repaints the title, row labels, aria labels and buttons in the new locale',
   },
   {
-    file: 'calendar_window.ts',
-    memos: ['lastSig'],
-    answer: 'this.calendarWindow.relocalize',
-    why: 'the visible month, the selected day and the guild-event mirror (#2529)',
+    file: 'hud/quest/questlog_window.ts',
+    memos: ['lastOffersSig'],
+    answer: 'this.questlogWindow.render',
+    why: "the Available group's offer set (quest ids only, no text); the fan-out's render() of the open log rebuilds it with fresh t() and re-latches the signature (menu consolidation step 8)",
+  },
+  {
+    file: 'hud/reputation/reputation_window.ts',
+    memos: ['lastBody'],
+    answer: 'this.reputationWindow.relocalize',
+    why: 'the body string it compares IS resolved text, but a locale switch is only seen on the next slow tick; relocalize repaints at once (menu consolidation step 2)',
   },
   {
     file: 'card_duel_window.ts',
@@ -553,8 +568,14 @@ const ANSWERED: readonly AnsweredSurface[] = [
   {
     file: 'weekly_rewards_window.ts',
     memos: ['lastSignature'],
-    answer: 'this.bankWindow.render',
-    why: 'the Weekly Vault pane (PR 4052) is a TAB of the bank window, not a window of its own: lastSignature digests the vault ledger, the ready weeks, the claim flag and the reset edge, none of them text. bankWindow.render() rebuilds the rewards tab through WeeklyRewardsTab.renderInto, which re-reads every t() label and re-latches the signature in the current language, so the bank arm answers it',
+    answer: 'this.rewards.vault.relocalize',
+    why: "the Weekly Vault pane is the Rewards hub's Vault tab (menu consolidation step 7; it was the Bank's Rewards tab): lastSignature digests the vault ledger, the ready weeks, the claim flag and the reset edge, none of them text. WeeklyVaultWindow.relocalize() self-gates on the open window and rebuilds through WeeklyRewardsTab.renderInto, which re-reads every t() label and re-latches the signature in the current language",
+  },
+  {
+    file: 'hud/rewards/world_quests_window.ts',
+    memos: ['lastSig'],
+    answer: 'this.rewards.worldQuests.relocalize',
+    why: "the Rewards hub's World Quests tab: lastSig digests the board rows, the countdown minute and the i18n revision; relocalize() self-gates on the open window and rebuilds once, re-latching the signature in the current language",
   },
   {
     file: 'weekly_quests_window.ts',
@@ -805,9 +826,9 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
   },
   {
     file: 'bags_window.ts',
-    memos: ['lastSortBaseline', 'ordinalCache'],
+    memos: ['lastSortBaseline', 'lastWalletHtml', 'ordinalCache'],
     reason:
-      'ordinalCache (surfaced by the member-compared gate widening: it is read as `this.ordinalCache?.inv !== inventory`, so the whole-field matcher never saw it) holds no text of any kind. It is `{ inv, map }`, keyed on the inventory ARRAY IDENTITY and mapping each slot object to its ordinal NUMBER, rebuilt whenever the array reference changes; a locale switch neither moves the key nor changes a value, and nothing localized is stored. lastSortBaseline gates nothing that is drawn: it decides only whether the one-shot sort settle ANIMATION plays on this paint (armed by the Sort button, compared against the press-time INVENTORY signature because online the tidied inventory arrives with the heavy self snapshot, not the press repaint). fillGrid rebuilds every cell unconditionally on every paint, and the bags fan-out arm (this.renderBags) already drives a wholesale repaint on a locale switch, so the window relocalizes by itself; the signature reads no text at all (item ids, counts, cell hints), so a locale switch cannot even move it.',
+      'lastWalletHtml (the wallet strip, menu consolidation step 3) stores the RESOLVED chip markup, so a locale switch changes the string it is compared against and the next slow-band refreshIfChanged repaints the strip by itself; the bags fan-out arm (this.renderBags) also rebuilds it at once. ordinalCache (surfaced by the member-compared gate widening: it is read as `this.ordinalCache?.inv !== inventory`, so the whole-field matcher never saw it) holds no text of any kind. It is `{ inv, map }`, keyed on the inventory ARRAY IDENTITY and mapping each slot object to its ordinal NUMBER, rebuilt whenever the array reference changes; a locale switch neither moves the key nor changes a value, and nothing localized is stored. lastSortBaseline gates nothing that is drawn: it decides only whether the one-shot sort settle ANIMATION plays on this paint (armed by the Sort button, compared against the press-time INVENTORY signature because online the tidied inventory arrives with the heavy self snapshot, not the press repaint). fillGrid rebuilds every cell unconditionally on every paint, and the bags fan-out arm (this.renderBags) already drives a wholesale repaint on a locale switch, so the window relocalizes by itself; the signature reads no text at all (item ids, counts, cell hints), so a locale switch cannot even move it.',
   },
   {
     file: 'deed_tracker_painter.ts',
@@ -1312,7 +1333,6 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
 
   it('finds every surface #2529 named, plus the ones the sweep itself turned up', () => {
     for (const file of [
-      'calendar_window.ts',
       'mailbox_window.ts',
       'social_window.ts',
       'card_duel_window.ts',

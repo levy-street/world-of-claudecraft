@@ -12,9 +12,11 @@ import { esc } from './esc';
 import { captureFocusKey, FOCUS_KEY_ATTR, findFocusKey } from './focus_restore';
 import { formatDateTime, formatNumber, t } from './i18n';
 import type { PainterHostPresentation } from './painter_host';
-import { svgIcon } from './ui_icons';
 import { weeklyLootSpecLabel } from './weekly_reward_loot_focus_controller';
-import { appendWeeklyRewardTablePicker } from './weekly_reward_table_picker_controller';
+import {
+  appendWeeklyRewardTablePicker,
+  type WeeklyTableDifficulty,
+} from './weekly_reward_table_picker_controller';
 import { showWeeklyRewardsReadyPrompt } from './weekly_rewards_ready_prompt';
 import {
   attachWeeklyVaultReveal,
@@ -33,6 +35,7 @@ export class WeeklyRewardClaimController {
   private revealed = new Set<number>();
   private tableSelections = new Map<number, string[]>();
   private tableExpanded = new Set<number>();
+  private tableDifficulties = new Map<number, WeeklyTableDifficulty>();
   private pending = new Set<number>();
   private revealProgress = new Map<number, WeeklyVaultRevealProgress>();
   private awaitingOpen = new Map<number, ReturnType<typeof setTimeout>>();
@@ -51,9 +54,6 @@ export class WeeklyRewardClaimController {
       presentation: PainterHostPresentation;
       onInventoryChanged(): void;
       hideTooltip?(): void;
-    },
-    private readonly options?: {
-      readOnly?: boolean;
     },
   ) {}
 
@@ -76,6 +76,7 @@ export class WeeklyRewardClaimController {
     this.pending.clear();
     this.tableSelections.clear();
     this.tableExpanded.clear();
+    this.tableDifficulties.clear();
     this.revealProgress.clear();
     for (const timer of this.awaitingOpen.values()) clearTimeout(timer);
     this.awaitingOpen.clear();
@@ -93,7 +94,6 @@ export class WeeklyRewardClaimController {
 
   private current(key: string): boolean {
     return (
-      !this.options?.readOnly &&
       this.owner === this.deps.world() &&
       this.deps.world().weeklyRewardInfo?.canClaim === true &&
       this.identity() === key
@@ -188,21 +188,8 @@ export class WeeklyRewardClaimController {
     host.replaceChildren();
     host.className = 'weekly-claim-flow';
     host.hidden = !batch;
-    progress.hidden = !this.options?.readOnly && !!batch && this.started;
+    progress.hidden = !!batch && this.started;
     if (!batch) return;
-
-    if (this.options?.readOnly) {
-      const notice = document.createElement('div');
-      notice.className = 'weekly-preview-notice ui-card';
-      notice.innerHTML = `<span class="weekly-preview-notice-icon" aria-hidden="true">${svgIcon('chest')}</span><span class="weekly-preview-notice-text">${esc(t('hudChrome.weeklyRewards.previewClaimNotice'))}</span>`;
-      const date = document.createElement('p');
-      date.className = 'weekly-claim-date';
-      date.textContent = t('hudChrome.weeklyRewards.completedWeek', {
-        date: formatDateTime(batch.resetAtMs, { dateStyle: 'medium' }),
-      });
-      host.append(notice, date);
-      return;
-    }
 
     const refresh = (focus?: string) => {
       this.renderInto(host, progress);
@@ -256,7 +243,7 @@ export class WeeklyRewardClaimController {
       this.startClaim = () => start.click();
       if (!start.disabled && !this.readyPromptShown) {
         this.dismissReadyPrompt = showWeeklyRewardsReadyPrompt(
-          host.closest<HTMLElement>('#bank-window') ?? host,
+          host.closest<HTMLElement>('#weekly-vault-window') ?? host,
           () => this.startClaim?.(),
           () => this.startButton?.focus(),
         );
@@ -351,6 +338,7 @@ export class WeeklyRewardClaimController {
             saving: this.awaitingOpen.has(index),
             onChange: () => syncAvailability(),
             expanded: this.tableExpanded,
+            difficulties: this.tableDifficulties,
           });
           this.disposers.push(picker.dispose);
           const item = choice.opened && choice.itemId ? ITEMS[choice.itemId] : undefined;

@@ -41,6 +41,7 @@ import {
   harvestPreferenceLocalSig,
   wireHarvestEntries,
 } from './professions_harvest_entry_controller';
+import type { ProfessionsHubStrip } from './professions_hub_controller';
 import {
   buildProfessionsView,
   type ProfessionsCraftRow,
@@ -48,8 +49,8 @@ import {
   type ProfessionsViewInput,
   type ProfessionsViewModel,
   professionsRefreshSig,
-  type RingArc,
   type RingLayout,
+  ringArcPath,
 } from './professions_view';
 
 // Ring node distance from the container center, in percent of the box
@@ -90,6 +91,8 @@ export interface ProfessionsWindowDeps extends PainterHostPresentation, HarvestE
   /** Hud's confirm-first external hop (src/ui/wiki_link.ts), the same one
    *  #mm-wiki and the Esc-menu row use. */
   openWiki(): void;
+  /** The Professions hub's shared tab strip, painted under the title bar. */
+  hubStrip?: ProfessionsHubStrip;
 }
 
 export class ProfessionsWindow {
@@ -111,6 +114,10 @@ export class ProfessionsWindow {
 
   get isOpen(): boolean {
     return this.opened;
+  }
+
+  rootElement(): HTMLElement {
+    return this.deps.root();
   }
 
   open(): void {
@@ -215,6 +222,7 @@ export class ProfessionsWindow {
     el.innerHTML =
       `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(t('hudChrome.professions.title'))}</span>` +
       `<button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hudChrome.professions.close'))}">${svgIcon('close')}</button></div>` +
+      (this.deps.hubStrip?.html() ?? '') +
       `<div class="prof-scroll">${harvestBodyEntryHtml(this.deps.harvestBody !== undefined)}${harvestPreferenceEntryHtml(this.deps.world().harvestPreference, this.deps.openHarvestPreference !== undefined)}${body}</div><div class="prof-footer"><span class="ui-muted">${esc(t('hudChrome.professions.retentionFooter'))}</span><button type="button" class="prof-wiki-link ui-btn" data-wiki-link data-focus-key="prof:wiki">${esc(t('hudChrome.professions.tutorialLink'))}</button></div>`;
 
     this.wire(el);
@@ -417,7 +425,7 @@ export class ProfessionsWindow {
     ];
     if (ring.pairArc !== null) {
       svgParts.push(
-        `<path class="prof-ring-arc" d="${this.arcPath(ring.pairArc)}" vector-effect="non-scaling-stroke"/>`,
+        `<path class="prof-ring-arc" d="${ringArcPath(ring.pairArc)}" vector-effect="non-scaling-stroke"/>`,
       );
     }
     if (ring.hobbyChord !== null) {
@@ -442,14 +450,6 @@ export class ProfessionsWindow {
       `<div class="prof-ring" role="img" aria-label="${esc(t('hudChrome.professions.ringAria'))}">` +
       `<svg class="prof-ring-svg" viewBox="-1.25 -1.25 2.5 2.5" aria-hidden="true" focusable="false">${svgParts.join('')}</svg>${nodes}</div></div>`
     );
-  }
-
-  private arcPath(arc: RingArc): string {
-    const x1 = Math.cos(arc.startAngle);
-    const y1 = Math.sin(arc.startAngle);
-    const x2 = Math.cos(arc.endAngle);
-    const y2 = Math.sin(arc.endAngle);
-    return `M ${x1.toFixed(4)} ${y1.toFixed(4)} A 1 1 0 0 1 ${x2.toFixed(4)} ${y2.toFixed(4)}`;
   }
 
   private craftsHtml(model: ProfessionsViewModel): string {
@@ -678,6 +678,7 @@ export class ProfessionsWindow {
   }
 
   private wire(el: HTMLElement): void {
+    this.deps.hubStrip?.wire(el);
     el.querySelector('[data-close]')?.addEventListener('click', () => {
       this.close();
       audio.click();

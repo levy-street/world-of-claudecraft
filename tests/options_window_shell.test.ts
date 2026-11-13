@@ -100,10 +100,11 @@ function openWindow(root: HTMLElement, overrides: Record<string, unknown> = {}):
   return window;
 }
 
-// By the row's data-menu-action hook, never by index: the main menu's order
-// shifts by host (the Unlock Interface row leads on desktop only).
+// Through the Esc menu's Settings row, then the category's rail button, both
+// by their data hooks, never by index: the menu's order shifts by host.
 function goTo(root: HTMLElement, view: string): void {
-  root.querySelector<HTMLButtonElement>(`.opt-btn[data-menu-action="${view}"]`)?.click();
+  root.querySelector<HTMLButtonElement>('.opt-btn[data-menu-action="settings"]')?.click();
+  root.querySelector<HTMLButtonElement>(`.opt-rail-btn[data-settings-category="${view}"]`)?.click();
 }
 
 const body = (root: HTMLElement) => root.querySelector<HTMLElement>(':scope > .ui-win-body');
@@ -206,14 +207,16 @@ describe('options window: the main menu', () => {
     setInterfaceMode('auto');
   });
 
-  it('leads with Unlock Interface on desktop and presses it through the seam', () => {
+  it('seats Unlock Interface after Settings on desktop and presses it through the seam', () => {
     let unlocked = false;
     const toggleInterfaceUnlock = vi.fn(() => {
       unlocked = !unlocked;
       return unlocked;
     });
     openWindow(root, { isInterfaceUnlocked: () => unlocked, toggleInterfaceUnlock });
-    const first = root.querySelector<HTMLButtonElement>('.opt-list .opt-btn');
+    const plates = root.querySelectorAll<HTMLButtonElement>('.opt-list > .opt-btn');
+    expect(plates[0]?.dataset.menuAction).toBe('settings');
+    const first = plates[1];
     expect(first?.dataset.menuAction).toBe('interfaceUnlock');
     expect(first?.textContent).toBe(t('hudChrome.interfaceUnlock.unlock'));
     first?.click();
@@ -227,13 +230,13 @@ describe('options window: the main menu', () => {
 
   it('reopens already relabelled Lock Interface while the frames are loose', () => {
     openWindow(root, { isInterfaceUnlocked: () => true });
-    const first = root.querySelector<HTMLButtonElement>('.opt-list .opt-btn');
+    const first = root.querySelectorAll<HTMLButtonElement>('.opt-list > .opt-btn')[1];
     expect(first?.dataset.menuAction).toBe('interfaceUnlock');
     expect(first?.textContent).toBe(t('hudChrome.interfaceUnlock.lock'));
     expect(first?.classList.contains('ui-btn--on')).toBe(true);
   });
 
-  it('omits the row wherever the touch HUD is active, where Key Bindings leads again', () => {
+  it('omits the row wherever the touch HUD is active, where Help and Wiki follows Settings', () => {
     // The same gate as the Frames tab's row, read live at paint, and the same
     // union that raises the touch HUD (which is what Hud.toggleInterfaceUnlock
     // refuses on): the player-chosen Touch interface mode, or the packaged
@@ -249,8 +252,9 @@ describe('options window: the main menu', () => {
       arm();
       openWindow(root);
       expect(root.querySelector('.opt-btn[data-menu-action="interfaceUnlock"]')).toBeNull();
-      const first = root.querySelector<HTMLButtonElement>('.opt-list .opt-btn');
-      expect(first?.dataset.menuAction).toBe('keybinds');
+      const plates = root.querySelectorAll<HTMLButtonElement>('.opt-list > .opt-btn');
+      expect(plates[0]?.dataset.menuAction).toBe('settings');
+      expect(plates[1]?.dataset.menuAction).toBe('wiki');
     }
     document.body.classList.remove('native-app');
   });

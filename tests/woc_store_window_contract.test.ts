@@ -107,7 +107,7 @@ const hudChromeCatalog = readSource('../src/ui/i18n.catalog/hud_chrome.ts');
 
 describe('WOC Store window contract', () => {
   it('opens on the Cosmetic Store tab beside Memberships, with no Daily Rewards tab', () => {
-    expect(storeWindow).toContain("private tab: 'store' | 'memberships' | 'rewards' = 'store'");
+    expect(storeWindow).toContain("private tab: 'store' | 'memberships' = 'store'");
     expect(dailyRewardsChrome).toContain('data-woc-store-tab="store"');
     expect(dailyRewardsChrome).toContain('data-woc-store-tab="memberships"');
     expect(dailyRewardsChrome).not.toContain('data-woc-store-tab="rewards"');
@@ -331,7 +331,6 @@ describe('WOC Store window contract', () => {
     expect(loading).toContain('cl-loading');
     expect(loading).toContain('cl-spinner');
     expect(loading).toContain("t('hudChrome.wocStore.loading')");
-    expect(loading).toContain("t('hudChrome.dailyRewards.loading')");
   });
 
   it('routes the Escape close of both store windows through their painters', () => {
@@ -376,17 +375,26 @@ describe('WOC Store window contract', () => {
       'private dailyRewardsEnabled(): boolean {\n    return this.features.dailyRewardsEnabled;',
     );
     expect(hud).toContain(
-      'toggleDailyRewards(): void {\n    if (!this.dailyRewardsEnabled()) return;',
+      'toggleDailyRewards(): void {\n    if (!this.dailyRewardsEnabled() || !this.claudiumHooks) return;',
+    );
+    // The chest opens the store and nothing else, so it shows only while the
+    // store's hooks are live (its daily-rewards stand-in is gone).
+    expect(hud).toContain(
+      'const storeLive = this.dailyRewardsEnabled() && this.claudiumHooks !== null;',
     );
     expect(hud).toContain("dailyRewardsButton?.setAttribute('hidden', '');");
     expect(hud).toContain("mobileDailyRewardsButton?.setAttribute('hidden', '');");
     expect(hud).toContain('if (!this.claudiumHooks) return;');
-    expect(hud).toContain("? 'hudChrome.wocStore.title'");
-    expect(hud).toContain(": 'hudChrome.dailyRewards.title';");
+    expect(hud).toContain("const titleKey = 'hudChrome.wocStore.title';");
     expect(hud).toContain('this.syncDailyRewardsSurfaceLabels();');
-    expect(storeWindow).toContain("if (!this.storeEnabled()) this.tab = 'rewards';");
-    expect(storeWindow).toContain("(storeEnabled ? wocStoreTabsHtml() : '')");
-    expect(storeWindow).toContain('dailyRewardsLoadingHtml(storeEnabled)');
+    // With no live store the window stays shut: there is no fallback body.
+    expect(storeWindow).toContain(
+      "openStore(tab: 'store' | 'memberships' = 'store'): void {\n    if (!this.storeEnabled()) return;",
+    );
+    expect(storeWindow).not.toContain("this.tab = 'rewards'");
+    expect(storeWindow).toContain(
+      'dailyRewardsTitleHtml() + wocStoreTabsHtml() + dailyRewardsLoadingHtml()',
+    );
   });
 
   it('refreshes only store balance and catalog while the WOC Store is open', () => {
@@ -428,23 +436,17 @@ describe('WOC Store window contract', () => {
     expect(bridge).toContain('storeEnabled: () => host.hooks() !== null');
     expect(hud).toContain('hooks: () => this.claudiumHooks');
     // The charter markup has exactly one emitter, and it is inside paintStore
-    // (the store-tab painter), never the rewards paint.
+    // (the store-tab painter).
     const paintStore = storeWindow.slice(
       anchor(storeWindow, 'private paintStore('),
       anchor(storeWindow, 'private replaceStoreBody('),
     );
     expect(paintStore).toContain('this.rebuildCharterSection();');
     expect(paintStore).toContain('charterSectionHtml(this.charterSection, this.charterInFlight)');
-    // Exactly one emitter, and it is that call: a second one, or one reached
-    // from the rewards paint, would put a real-money category somewhere the
-    // store gate does not cover.
+    // Exactly one emitter, and it is that call: a second one would put a
+    // real-money category somewhere the store gate does not cover.
     expect(storeWindow.match(/charterSectionHtml\(/g)).toHaveLength(1);
     expect(storeWindow).toContain("} from './charter_card_view';");
-    const rewardsPaint = storeWindow.slice(
-      anchor(storeWindow, 'private paint(view: DailyRewardsView)'),
-      anchor(storeWindow, 'private async spin('),
-    );
-    expect(rewardsPaint).not.toContain('charter');
   });
 
   it('keeps the banker ladder rungs out of the store catalog', () => {

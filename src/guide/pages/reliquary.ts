@@ -78,7 +78,7 @@ export const reliquary: GuidePage = {
 
         <section class="guide-block">
           <h2>${esc(t('guide.reliquaryPage.howHeading'))}</h2>
-          <p>${esc(t('guide.reliquaryPage.howBody'))}</p>
+          <p>${esc(t('guide.reliquaryPage.howBodyRealmTab'))}</p>
         </section>
 
         <section class="guide-block">
