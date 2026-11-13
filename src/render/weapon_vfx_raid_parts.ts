@@ -53,6 +53,11 @@ export interface WeaponVfxOrbiters {
   bob?: number;
   /** 'rock' a hewn quarry chunk with glowing seams, 'ice' a long faceted crystal. */
   shape: 'rock' | 'ice';
+  /** The orbit's reach along the plane's first axis as a fraction of `radius` (default 1, a
+   *  circle). Under the default +Y axis that axis is weapon Z, so a value below 1 draws an oval
+   *  that hugs a head longer than it is deep (the Seamcaller's) instead of standing off its
+   *  flanks by the head's full length. */
+  depth?: number;
   color: number;
   dark: number;
   glow: number;
@@ -247,12 +252,13 @@ function makeOrbiters(center: THREE.Vector3, c: WeaponVfxOrbiters): WeaponVfxRai
       uGlow: { value: new THREE.Color(c.glow) },
       uSeams: { value: c.seams ?? 0.5 },
       uIce: { value: c.shape === 'ice' ? 1 : 0 },
+      uDepth: { value: c.depth ?? 1 },
       uOpacity: { value: c.opacity ?? 1 },
       uCalm: { value: 0 },
     },
     vertexShader: `
       attribute vec4 aOrbit; attribute vec4 aTilt; attribute vec4 aSpin;
-      uniform float uTime; uniform vec3 uCenter; uniform mat3 uBasis;
+      uniform float uTime; uniform vec3 uCenter; uniform mat3 uBasis; uniform float uDepth;
       varying vec3 vN; varying vec3 vV; varying vec3 vLocal; varying float vSeed;
       mat3 rotAxis(vec3 a, float t) {
         float c = cos(t); float s = sin(t); float k = 1.0 - c;
@@ -262,7 +268,7 @@ function makeOrbiters(center: THREE.Vector3, c: WeaponVfxOrbiters): WeaponVfxRai
       }
       void main() {
         float ang = aOrbit.y + uTime * aOrbit.z;
-        vec3 p = vec3(cos(ang) * aOrbit.x, 0.0, sin(ang) * aOrbit.x);
+        vec3 p = vec3(cos(ang) * aOrbit.x * uDepth, 0.0, sin(ang) * aOrbit.x);
         float cx = cos(aTilt.x); float sx = sin(aTilt.x);
         p = vec3(p.x, p.y * cx - p.z * sx, p.y * sx + p.z * cx);
         float cz = cos(aTilt.y); float sz = sin(aTilt.y);
