@@ -16695,6 +16695,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.standStillAnywhere': 'Остановитесь, прежде чем выбираться.',
   'hudChrome.unstuck.busy': 'Завершите текущее действие, прежде чем выбираться.',
   'hudChrome.unstuck.unavailable': 'В текущем состоянии выбраться нельзя.',
+  'hudChrome.plurals.logoutCountdown.one': 'Выход из игры через {count} секунду',
+  'hudChrome.plurals.logoutCountdown.few': 'Выход из игры через {count} секунды',
+  'hudChrome.plurals.logoutCountdown.many': 'Выход из игры через {count} секунд',
+  'hudChrome.plurals.logoutCountdown.other': 'Выход из игры через {count} секунды',
+  'hudChrome.logout.cancel': 'Отмена',
+  'hudChrome.logout.interrupted': 'Выход из игры прерван: вы получили урон.',
   // Wiki launcher confirm (M16 non-Latin fills).
   'hudChrome.wiki.confirmTitle': 'Открыть вики?',
   'hudChrome.wiki.confirmBody':

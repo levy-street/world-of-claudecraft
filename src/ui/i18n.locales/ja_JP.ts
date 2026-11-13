@@ -14706,6 +14706,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.standStillAnywhere': '静止してからスタック解除を使用してください。',
   'hudChrome.unstuck.busy': '現在の行動を終えてからスタック解除を使用してください。',
   'hudChrome.unstuck.unavailable': '現在の状態ではスタック解除を使用できません。',
+  'hudChrome.plurals.logoutCountdown.one': '{count}秒後にログアウトします',
+  'hudChrome.plurals.logoutCountdown.few': '{count}秒後にログアウトします',
+  'hudChrome.plurals.logoutCountdown.many': '{count}秒後にログアウトします',
+  'hudChrome.plurals.logoutCountdown.other': '{count}秒後にログアウトします',
+  'hudChrome.logout.cancel': 'キャンセル',
+  'hudChrome.logout.interrupted': 'ダメージを受けたため、ログアウトを中断しました。',
   // Wiki launcher confirm (M16 non-Latin fills).
   'hudChrome.wiki.confirmTitle': 'Wikiを開きますか？',
   'hudChrome.wiki.confirmBody':

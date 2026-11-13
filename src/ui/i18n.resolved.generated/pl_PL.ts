@@ -1153,6 +1153,10 @@ export const pl_PL: EnTranslations = {
       "busy": "Zakończ bieżącą czynność, zanim użyjesz Wyzwolenia.",
       "unavailable": "Wyzwolenie jest niedostępne w twoim obecnym stanie."
     },
+    "logout": {
+      "cancel": "Cancel",
+      "interrupted": "Logout interrupted because you took damage."
+    },
     "fct": {
       "absorbed": "Pochłonięto ({amount})",
       "cheap": "Taniej!"
@@ -3878,6 +3882,12 @@ export const pl_PL: EnTranslations = {
       "linkHint": "Kliknij z Shift, aby wstawić link do tego przedmiotu na czacie."
     },
     "plurals": {
+      "logoutCountdown": {
+        "one": "Logging out in {count} second",
+        "few": "Logging out in {count} seconds",
+        "many": "Logging out in {count} seconds",
+        "other": "Logging out in {count} seconds"
+      },
       "itemHistoryEarlierHidden": {
         "one": "Nie pokazano {count} wcześniejszego przekazania.",
         "few": "Nie pokazano {count} wcześniejszych przekazań.",

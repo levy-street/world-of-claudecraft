@@ -534,6 +534,8 @@ describe('i18n CLDR pluralization', () => {
       'guildMembers',
       // The Item history prompt's rolled-off transfers line (item tracking).
       'itemHistoryEarlierHidden',
+      // The Log Out countdown prompt's one line (server/logout_timer.ts).
+      'logoutCountdown',
       'playersMatching',
       'playersOnline',
       'playtimeDays',

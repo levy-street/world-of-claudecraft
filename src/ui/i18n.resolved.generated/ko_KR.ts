@@ -1153,6 +1153,10 @@ export const ko_KR: EnTranslations = {
       "busy": "현재 행동을 끝낸 뒤 갇힘 탈출을 사용하세요.",
       "unavailable": "현재 상태에서는 갇힘 탈출을 사용할 수 없습니다."
     },
+    "logout": {
+      "cancel": "취소",
+      "interrupted": "피해를 받아 로그아웃이 중단되었습니다."
+    },
     "fct": {
       "absorbed": "흡수됨 ({amount})",
       "cheap": "비용 감소!"
@@ -3878,6 +3882,12 @@ export const ko_KR: EnTranslations = {
       "linkHint": "Shift + 클릭하면 이 아이템을 채팅에 연결합니다."
     },
     "plurals": {
+      "logoutCountdown": {
+        "one": "{count}초 후 로그아웃합니다",
+        "few": "{count}초 후 로그아웃합니다",
+        "many": "{count}초 후 로그아웃합니다",
+        "other": "{count}초 후 로그아웃합니다"
+      },
       "itemHistoryEarlierHidden": {
         "one": "이전 {count}건의 양도는 표시되지 않습니다.",
         "few": "이전 {count}건의 양도는 표시되지 않습니다.",

@@ -1,10 +1,14 @@
 // The world fight departure HOLD (server/world_pvp_departure.ts,
-// src/sim/pvp/world_pvp_forfeit.ts worldPvpHoldsDeparture): a deliberate
-// t:'logout' within WORLD_PVP_DEPARTURE_HOLD_WINDOW of a world-hostile hit,
-// taken or dealt, keeps the body in the world for the linkdead grace like a
-// closed client, and while the fight window is open no other character on the
-// account can log in and displace it. The forfeit (tests/world_pvp_departure
-// .test.ts) still runs first: a logout inside its own window dies instead.
+// src/sim/pvp/world_pvp_forfeit.ts worldPvpHoldsDeparture): a player who gets
+// out of the game WITHOUT the Log Out button (a closed client, a dropped
+// connection, a takeover from another login) within
+// WORLD_PVP_DEPARTURE_HOLD_WINDOW of a world-hostile hit, taken or dealt, has
+// their body kept in the world for the linkdead grace, and while the fight
+// window is open no other character on the account can log in and displace it.
+// The forfeit (tests/world_pvp_departure.test.ts) still runs first: leaving
+// inside its own window dies instead. The Log Out button is a different road
+// out: it waits a countdown and then leaves cleanly, with no hold
+// (server/logout_timer.ts, tests/logout_timer.test.ts).
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('../server/db', () => ({
@@ -88,10 +92,16 @@ function chase(runFor: number) {
 
 const PAST_FORFEIT = WORLD_PVP_ASSIST_WINDOW + 20;
 
-describe('a logout soon after a world fight holds the body in the world', () => {
+/** Leave the game without the Log Out button: the client is simply gone. */
+function closeClient(server: GameServer, session: ClientSession): boolean {
+  (session.ws as { readyState: number }).readyState = 3;
+  return server.socketClosed(session, session.ws);
+}
+
+describe('leaving without the Log Out button soon after a world fight holds the body', () => {
   it('past the forfeit window but inside the hold: the body stays, alive and linkdead', () => {
     const { server, sim, runner } = chase(PAST_FORFEIT);
-    server.handleMessage(runner, JSON.stringify({ t: 'logout' }));
+    expect(closeClient(server, runner)).toBe(true);
     expect(runner.left).toBe(false);
     expect(runner.linkdead).toBe(true);
     expect(runner.graceUntil).toBeGreaterThan(Date.now());
@@ -103,58 +113,40 @@ describe('a logout soon after a world fight holds the body in the world', () => 
 
   it('the one who dealt the hit is held too', () => {
     const { server, chaser } = chase(PAST_FORFEIT);
-    server.handleMessage(chaser, JSON.stringify({ t: 'logout' }));
+    expect(closeClient(server, chaser)).toBe(true);
     expect(chaser.left).toBe(false);
-    expect(chaser.linkdead).toBe(true);
+    expect(server.join(fakeWs(), 11, 104, 'Dalet', 'warrior', null)).toEqual({
+      error: WORLD_FIGHT_HOLD_JOIN_ERROR,
+    });
   });
 
-  it('closes the transport while keeping the held body in the world', () => {
-    const { server, runner } = chase(PAST_FORFEIT);
-    const ws = runner.ws;
-    server.handleMessage(runner, JSON.stringify({ t: 'logout' }));
-    expect(ws.close).toHaveBeenCalledOnce();
-    expect(runner.linkdead).toBe(true);
-    expect(runner.left).toBe(false);
-  });
-
-  it('ignores buffered logout frames while the body is linkdead', () => {
+  it('ignores a logout frame for a body that is already linkdead', () => {
     const { server, sim, runner } = chase(PAST_FORFEIT);
-    server.handleMessage(runner, JSON.stringify({ t: 'logout' }));
+    closeClient(server, runner);
     (sim as unknown as { time: number }).time += WORLD_PVP_DEPARTURE_HOLD_WINDOW;
     server.handleMessage(runner, JSON.stringify({ t: 'logout' }));
+    expect(server.logouts.isPending(runner)).toBe(false);
+    server.logouts.tick(sim);
     expect(runner.left).toBe(false);
     expect(runner.linkdead).toBe(true);
     expect(server.clients.get(runner.pid)).toBe(runner);
   });
 
-  it('inside the forfeit window the forfeit wins: the leaver dies and leaves at once', () => {
+  it('inside the forfeit window the forfeit wins: the leaver dies, and a corpse holds nothing', () => {
     const { server, sim, runner } = chase(1);
-    server.handleMessage(runner, JSON.stringify({ t: 'logout' }));
-    expect(runner.left).toBe(true);
+    closeClient(server, runner);
+    expect(sim.entities.get(runner.pid)!.dead).toBe(true);
     expect(sim.meta(runner.pid)!.worldPvp).toMatchObject({ deaths: 1 });
-  });
-
-  it('once the hold window has passed, a logout is a clean leave again', () => {
-    const { server, runner } = chase(WORLD_PVP_DEPARTURE_HOLD_WINDOW + 1);
-    server.handleMessage(runner, JSON.stringify({ t: 'logout' }));
+    expectJoined(server.join(fakeWs(), 12, 103, 'Gimel', 'warrior', null));
     expect(runner.left).toBe(true);
-    expect(runner.linkdead).toBe(false);
   });
 
-  it('a logout with no world fight at all is a clean leave', () => {
+  it('a closed client with no world fight at all is not held against an alt', () => {
     const server = new GameServer();
     const session = expectJoined(server.join(fakeWs(), 11, 101, 'Calm', 'warrior', null));
-    server.handleMessage(session, JSON.stringify({ t: 'logout' }));
+    closeClient(server, session);
+    expectJoined(server.join(fakeWs(), 11, 104, 'Dalet', 'warrior', null));
     expect(session.left).toBe(true);
-  });
-
-  it('the page reload that follows the logout does not end the hold', () => {
-    const { server, runner } = chase(PAST_FORFEIT);
-    server.handleMessage(runner, JSON.stringify({ t: 'logout' }));
-    (runner.ws as { readyState: number }).readyState = 3;
-    expect(server.socketClosed(runner, runner.ws)).toBe(false);
-    expect(runner.linkdead).toBe(true);
-    expect(runner.left).toBe(false);
   });
 });
 
@@ -180,7 +172,7 @@ describe('a held body cannot be pulled out by logging in another character', () 
 
   it('an alt on the same account is refused while the fight window is open', () => {
     const { server, runner } = chase(PAST_FORFEIT);
-    server.handleMessage(runner, JSON.stringify({ t: 'logout' }));
+    closeClient(server, runner);
     const alt = server.join(fakeWs(), 12, 103, 'Gimel', 'warrior', null);
     expect(alt).toEqual({ error: WORLD_FIGHT_HOLD_JOIN_ERROR });
     expect(runner.left).toBe(false);
@@ -188,23 +180,15 @@ describe('a held body cannot be pulled out by logging in another character', () 
 
   it('the held character itself logs straight back in (a resume)', () => {
     const { server, runner } = chase(PAST_FORFEIT);
-    server.handleMessage(runner, JSON.stringify({ t: 'logout' }));
+    closeClient(server, runner);
     const back = expectJoined(server.join(fakeWs(), 12, 102, 'Bet', 'shaman', null));
     expect(back).toBe(runner);
     expect(runner.linkdead).toBe(false);
   });
 
-  it('a closed tab mid chase is held the same way against an alt', () => {
-    const { server, runner } = chase(PAST_FORFEIT);
-    (runner.ws as { readyState: number }).readyState = 3;
-    expect(server.socketClosed(runner, runner.ws)).toBe(true);
-    const alt = server.join(fakeWs(), 12, 103, 'Gimel', 'warrior', null);
-    expect(alt).toEqual({ error: WORLD_FIGHT_HOLD_JOIN_ERROR });
-  });
-
   it('once the fight window closes, the alt logs in and displaces the held body', () => {
     const { server, sim, runner } = chase(PAST_FORFEIT);
-    server.handleMessage(runner, JSON.stringify({ t: 'logout' }));
+    closeClient(server, runner);
     (sim as unknown as { time: number }).time += WORLD_PVP_DEPARTURE_HOLD_WINDOW;
     expectJoined(server.join(fakeWs(), 12, 103, 'Gimel', 'warrior', null));
     expect(runner.left).toBe(true);

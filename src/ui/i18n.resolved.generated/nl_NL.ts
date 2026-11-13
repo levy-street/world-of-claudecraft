@@ -1153,6 +1153,10 @@ export const nl_NL: EnTranslations = {
       "busy": "Maak je huidige actie af voordat je Loskomen gebruikt.",
       "unavailable": "Loskomen is niet beschikbaar in je huidige toestand."
     },
+    "logout": {
+      "cancel": "Cancel",
+      "interrupted": "Logout interrupted because you took damage."
+    },
     "fct": {
       "absorbed": "Geabsorbeerd ({amount})",
       "cheap": "Goedkoper!"
@@ -3878,6 +3882,12 @@ export const nl_NL: EnTranslations = {
       "linkHint": "Shift-klik om dit voorwerp in de chat te delen."
     },
     "plurals": {
+      "logoutCountdown": {
+        "one": "Logging out in {count} second",
+        "few": "Logging out in {count} seconds",
+        "many": "Logging out in {count} seconds",
+        "other": "Logging out in {count} seconds"
+      },
       "itemHistoryEarlierHidden": {
         "one": "{count} eerdere overdracht wordt niet getoond.",
         "few": "{count} eerdere overdrachten worden niet getoond.",

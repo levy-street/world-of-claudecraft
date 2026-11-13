@@ -723,6 +723,7 @@ import { knownItemDef, ownEntry } from './known_item';
 import { LeaderboardWindow } from './leaderboard_window';
 import { ReannounceMarker } from './live_region_reannounce';
 import { chatBubbleKind, isCombatFlavorLog, logEventCue } from './log_event_route';
+import { LogoutCountdownController } from './logout_countdown_controller';
 import { craftedLineBody, lootQualityReceiptBody } from './loot_quality_receipt';
 import { lootQualityAriaName } from './loot_quality_view';
 import { lootRollWinBanner } from './loot_roll_win_view';
@@ -1033,6 +1034,7 @@ let lpAdvancedLast = -1;
 // perf_overlay_settings.ts alongside the panel that consumes it.
 export interface OptionsHooks {
   logout(): void;
+  cancelLogout(): void;
   gliderPitchHold?(value: -1 | 0 | 1): void;
   captureKey(cb: ((code: string | null) => void) | null): void;
   settings: Settings;
@@ -1508,6 +1510,11 @@ export class Hud {
   private bannerQueue: BannerQueue<BannerPayload> | undefined;
   private mountRaceInstructionTimer: number | undefined;
   private bannerSource: 'unstuck' | null = null;
+  private readonly logoutCountdown = new LogoutCountdownController(
+    () => this.optionsHooks?.cancelLogout(),
+    (text) => this.showError(text),
+    (text) => this.log(text, HUD_LOG.NOTICE),
+  );
   private pfLevelEl = $('#pf-level');
   // The portrait frame the Book of Deeds border paints on (both entry
   // documents carry the id); the unit_frame painter owns every write to it.
@@ -13010,6 +13017,9 @@ export class Hud {
           if (ev.sickness === 'resurrection')
             this.log(t('hud.system.respawnKeeperToll'), HUD_LOG.NOTICE);
           else this.log(t('hud.system.respawn'), HUD_LOG.GOOD);
+          break;
+        case 'logout':
+          this.logoutCountdown.apply(ev);
           break;
         case 'unstuck': {
           const feedback = unstuckFeedback(ev);

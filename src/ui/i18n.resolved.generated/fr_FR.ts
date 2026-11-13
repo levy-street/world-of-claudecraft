@@ -1153,6 +1153,10 @@ export const fr_FR: EnTranslations = {
       "busy": "Terminez votre action en cours avant d'utiliser le Déblocage.",
       "unavailable": "Le Déblocage n'est pas disponible dans votre état actuel."
     },
+    "logout": {
+      "cancel": "Cancel",
+      "interrupted": "Logout interrupted because you took damage."
+    },
     "fct": {
       "absorbed": "Absorbé ({amount})",
       "cheap": "Coût réduit !"
@@ -3878,6 +3882,12 @@ export const fr_FR: EnTranslations = {
       "linkHint": "Maj-clic pour lier cet objet dans le canal de discussion."
     },
     "plurals": {
+      "logoutCountdown": {
+        "one": "Logging out in {count} second",
+        "few": "Logging out in {count} seconds",
+        "many": "Logging out in {count} seconds",
+        "other": "Logging out in {count} seconds"
+      },
       "itemHistoryEarlierHidden": {
         "one": "{count} transfert antérieur n'est pas affiché.",
         "few": "{count} transferts antérieurs ne sont pas affichés.",

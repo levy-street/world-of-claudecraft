@@ -1153,6 +1153,10 @@ export const ru_RU: EnTranslations = {
       "busy": "Завершите текущее действие, прежде чем выбираться.",
       "unavailable": "В текущем состоянии выбраться нельзя."
     },
+    "logout": {
+      "cancel": "Отмена",
+      "interrupted": "Выход из игры прерван: вы получили урон."
+    },
     "fct": {
       "absorbed": "Поглощено ({amount})",
       "cheap": "Дешевле!"
@@ -3878,6 +3882,12 @@ export const ru_RU: EnTranslations = {
       "linkHint": "Shift + клик, чтобы вставить ссылку на этот предмет в чат."
     },
     "plurals": {
+      "logoutCountdown": {
+        "one": "Выход из игры через {count} секунду",
+        "few": "Выход из игры через {count} секунды",
+        "many": "Выход из игры через {count} секунд",
+        "other": "Выход из игры через {count} секунды"
+      },
       "itemHistoryEarlierHidden": {
         "one": "Ещё {count} ранняя передача не показана.",
         "few": "Ещё {count} ранние передачи не показаны.",

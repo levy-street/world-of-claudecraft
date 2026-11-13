@@ -9,25 +9,130 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.logout.cancel",
+    "hudChrome.logout.interrupted",
+    "hudChrome.plurals.logoutCountdown.few",
+    "hudChrome.plurals.logoutCountdown.many",
+    "hudChrome.plurals.logoutCountdown.one",
+    "hudChrome.plurals.logoutCountdown.other"
+  ],
+  "es_ES": [
+    "hudChrome.logout.cancel",
+    "hudChrome.logout.interrupted",
+    "hudChrome.plurals.logoutCountdown.few",
+    "hudChrome.plurals.logoutCountdown.many",
+    "hudChrome.plurals.logoutCountdown.one",
+    "hudChrome.plurals.logoutCountdown.other"
+  ],
+  "fr_FR": [
+    "hudChrome.logout.cancel",
+    "hudChrome.logout.interrupted",
+    "hudChrome.plurals.logoutCountdown.few",
+    "hudChrome.plurals.logoutCountdown.many",
+    "hudChrome.plurals.logoutCountdown.one",
+    "hudChrome.plurals.logoutCountdown.other"
+  ],
+  "fr_CA": [
+    "hudChrome.logout.cancel",
+    "hudChrome.logout.interrupted",
+    "hudChrome.plurals.logoutCountdown.few",
+    "hudChrome.plurals.logoutCountdown.many",
+    "hudChrome.plurals.logoutCountdown.one",
+    "hudChrome.plurals.logoutCountdown.other"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.logout.cancel",
+    "hudChrome.logout.interrupted",
+    "hudChrome.plurals.logoutCountdown.few",
+    "hudChrome.plurals.logoutCountdown.many",
+    "hudChrome.plurals.logoutCountdown.one",
+    "hudChrome.plurals.logoutCountdown.other"
+  ],
+  "de_DE": [
+    "hudChrome.logout.cancel",
+    "hudChrome.logout.interrupted",
+    "hudChrome.plurals.logoutCountdown.few",
+    "hudChrome.plurals.logoutCountdown.many",
+    "hudChrome.plurals.logoutCountdown.one",
+    "hudChrome.plurals.logoutCountdown.other"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.logout.cancel",
+    "hudChrome.logout.interrupted",
+    "hudChrome.plurals.logoutCountdown.few",
+    "hudChrome.plurals.logoutCountdown.many",
+    "hudChrome.plurals.logoutCountdown.one",
+    "hudChrome.plurals.logoutCountdown.other"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.logout.cancel",
+    "hudChrome.logout.interrupted",
+    "hudChrome.plurals.logoutCountdown.few",
+    "hudChrome.plurals.logoutCountdown.many",
+    "hudChrome.plurals.logoutCountdown.one",
+    "hudChrome.plurals.logoutCountdown.other"
+  ],
+  "nl_NL": [
+    "hudChrome.logout.cancel",
+    "hudChrome.logout.interrupted",
+    "hudChrome.plurals.logoutCountdown.few",
+    "hudChrome.plurals.logoutCountdown.many",
+    "hudChrome.plurals.logoutCountdown.one",
+    "hudChrome.plurals.logoutCountdown.other"
+  ],
+  "pl_PL": [
+    "hudChrome.logout.cancel",
+    "hudChrome.logout.interrupted",
+    "hudChrome.plurals.logoutCountdown.few",
+    "hudChrome.plurals.logoutCountdown.many",
+    "hudChrome.plurals.logoutCountdown.one",
+    "hudChrome.plurals.logoutCountdown.other"
+  ],
+  "id_ID": [
+    "hudChrome.logout.cancel",
+    "hudChrome.logout.interrupted",
+    "hudChrome.plurals.logoutCountdown.few",
+    "hudChrome.plurals.logoutCountdown.many",
+    "hudChrome.plurals.logoutCountdown.one",
+    "hudChrome.plurals.logoutCountdown.other"
+  ],
+  "tr_TR": [
+    "hudChrome.logout.cancel",
+    "hudChrome.logout.interrupted",
+    "hudChrome.plurals.logoutCountdown.few",
+    "hudChrome.plurals.logoutCountdown.many",
+    "hudChrome.plurals.logoutCountdown.one",
+    "hudChrome.plurals.logoutCountdown.other"
+  ],
+  "sv_SE": [
+    "hudChrome.logout.cancel",
+    "hudChrome.logout.interrupted",
+    "hudChrome.plurals.logoutCountdown.few",
+    "hudChrome.plurals.logoutCountdown.many",
+    "hudChrome.plurals.logoutCountdown.one",
+    "hudChrome.plurals.logoutCountdown.other"
+  ],
+  "vi_VN": [
+    "hudChrome.logout.cancel",
+    "hudChrome.logout.interrupted",
+    "hudChrome.plurals.logoutCountdown.few",
+    "hudChrome.plurals.logoutCountdown.many",
+    "hudChrome.plurals.logoutCountdown.one",
+    "hudChrome.plurals.logoutCountdown.other"
+  ],
+  "da_DK": [
+    "hudChrome.logout.cancel",
+    "hudChrome.logout.interrupted",
+    "hudChrome.plurals.logoutCountdown.few",
+    "hudChrome.plurals.logoutCountdown.many",
+    "hudChrome.plurals.logoutCountdown.one",
+    "hudChrome.plurals.logoutCountdown.other"
+  ]
 };

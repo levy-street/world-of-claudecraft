@@ -1153,6 +1153,10 @@ export const cs_CZ: EnTranslations = {
       "busy": "Dokonči svou současnou akci, než použiješ Vyproštění.",
       "unavailable": "Vyproštění není ve tvém současném stavu dostupné."
     },
+    "logout": {
+      "cancel": "Cancel",
+      "interrupted": "Logout interrupted because you took damage."
+    },
     "fct": {
       "absorbed": "Pohlceno ({amount})",
       "cheap": "Levnější!"
@@ -3878,6 +3882,12 @@ export const cs_CZ: EnTranslations = {
       "linkHint": "Shift + kliknutí vloží odkaz na tento předmět do chatu."
     },
     "plurals": {
+      "logoutCountdown": {
+        "one": "Logging out in {count} second",
+        "few": "Logging out in {count} seconds",
+        "many": "Logging out in {count} seconds",
+        "other": "Logging out in {count} seconds"
+      },
       "itemHistoryEarlierHidden": {
         "one": "{count} dřívější předání není zobrazeno.",
         "few": "{count} dřívější předání nejsou zobrazena.",

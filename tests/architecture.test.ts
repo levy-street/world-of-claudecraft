@@ -354,6 +354,7 @@ const UI_PURE_CORES = [
   'src/ui/equip_drop_core.ts',
   'src/ui/error_text_i18n_core.ts',
   'src/ui/held_loot_warning_view.ts',
+  'src/ui/logout_countdown_view.ts',
   'src/ui/loot_roll_win_view.ts',
   'src/ui/system_text_i18n.ts',
   'src/ui/general_chat_quota_view.ts',
@@ -3320,6 +3321,7 @@ const UI_DOM_MODULES = [
   'src/ui/market_orders_panel.ts',
   'src/ui/market_window.ts',
   'src/ui/woc_market_window.ts',
+  'src/ui/logout_countdown_controller.ts',
   'src/ui/material_sources_dialog.ts',
   // The Item history prompt (the sources dialog's #prompt-stack recipe).
   'src/ui/item_history_dialog.ts',
