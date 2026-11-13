@@ -16,15 +16,21 @@ export function isTravelFormAuraKind(kind: AuraKind): boolean {
   return kind === 'form_travel' || kind === 'form_fireball';
 }
 
-// Mount-safe forms: the caster forms that keep the body and only adorn it
-// (Moonwing Form, Gloamveil). A rider shifts into and out of them in the
-// saddle, and mounting leaves them on (mounts.ts). Every other form still
-// dismounts: Cat, Bruin, and Fleet swap the body for a creature rig, Fleet
-// and Ember Form carry a travel speed that would stack onto the mount's, and
-// Lich Form is a combat cooldown rather than a toggle.
+// Mount-safe forms: the caster forms that keep the whole spellbook (Moonwing
+// Form, Gloamveil, Sporemender Form). A rider shifts into and out of them in
+// the saddle, and mounting leaves them on (mounts.ts). Moonwing and Gloamveil
+// only adorn the body. Sporemender swaps it for a rig on foot, but that rig
+// has no seated pose, so the renderer keeps a rider on the base body
+// (render/characters/form_visual_selection_core.ts requestedCharacterForm) and
+// the form's slower pace is waived in the saddle (player_motion.ts). Every
+// other form still dismounts: Cat, Bruin, and Fleet are creature forms that
+// lock the spellbook, Fleet and Ember Form carry a travel speed that would
+// stack onto the mount's, and Lich Form is a combat cooldown rather than a
+// toggle.
 export const MOUNT_SAFE_FORM_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'form_moonkin',
   'form_shadow',
+  'form_sporemender',
 ]);
 
 export function isMountSafeFormAuraKind(kind: AuraKind): boolean {

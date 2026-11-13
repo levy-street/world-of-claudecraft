@@ -17,6 +17,8 @@
 //     the final speed by 0.8, after every buff and slow, so a Loping Stride
 //     burst or a snare still applies on top of the slower pace. Both hosts run
 //     that one kernel, so the online self extrapolator walks at the same pace.
+//     On foot only: the form is mount-safe (combat/forms.ts), and a mounted
+//     Sporemender rides at the mount's full speed.
 //   - shifting in grants Loping Stride, because the form button is one of the
 //     druid FORM_ABILITY_IDS in combat/druid_engines.ts.
 //   - every spell usable in caster form stays usable: the form is in neither

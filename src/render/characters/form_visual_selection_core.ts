@@ -187,7 +187,15 @@ export function characterFormMaskForAura(aura: AuraIdentity): number {
   return 0;
 }
 
-export function requestedCharacterForm(mask: number): CharacterFormVisual {
+/** The form flags a mounted rider keeps the BASE body under: the mount-safe
+ *  forms (sim combat/forms.ts MOUNT_SAFE_FORM_AURA_KINDS) that swap the body
+ *  for a rig on foot. Sporemender's rig has no seated pose, so a rider keeps
+ *  the body (the spore aura still draws) and the rig returns on dismount if
+ *  the form is still on. */
+export const CHARACTER_FORM_RIDER_BODY_MASK = CHARACTER_FORM_FLAG.sporemender;
+
+export function requestedCharacterForm(mask: number, mounted = false): CharacterFormVisual {
+  if (mounted) mask &= ~CHARACTER_FORM_RIDER_BODY_MASK;
   if (mask & CHARACTER_FORM_FLAG.sheep) return 'sheep';
   if (mask & CHARACTER_FORM_FLAG.bear) return 'bear';
   if (mask & CHARACTER_FORM_FLAG.cat) return 'cat';

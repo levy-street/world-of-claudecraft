@@ -172,8 +172,8 @@ const CARRYING_FREIGHT_MSG = "You can't ride while carrying freight.";
 /** Strip all active form auras (FORM_AURA_KINDS), ghost_wolf, and stealth from the
  *  entity, emitting aura-removal events for each one removed. Called before a mount
  *  summon starts so the player is never simultaneously shapeshifted/stealthed and
- *  mounting. The mount-safe forms (combat/forms.ts: Moonwing, Gloamveil) stay on:
- *  they only adorn the rider, who may shift into and out of them in the saddle
+ *  mounting. The mount-safe forms (combat/forms.ts: Moonwing, Gloamveil, Sporemender) stay on:
+ *  the rider keeps the body and may shift into and out of them in the saddle
  *  anyway (the cast path's dismount skips their toggle). Stealth is routed through the single `ctx.breakStealth` funnel (not
  *  spliced inline like the forms) until no stealth aura remains, so each aura's
  *  linger/aftereffect side effects fire exactly as they do for every other way

@@ -1,10 +1,12 @@
-// Mount-safe forms (combat/forms.ts MOUNT_SAFE_FORM_AURA_KINDS): Moonwing Form
-// and Gloamveil only adorn the body they keep, so a rider shifts into and out
-// of them in the saddle. Casting any other ability still dismounts, every
-// other form still dismounts, and mounting strips every other form while
-// leaving these two on. A druid shifting in the saddle gets no Loping Stride:
-// the sprint would stack onto the mount's speed on every toggle.
+// Mount-safe forms (combat/forms.ts MOUNT_SAFE_FORM_AURA_KINDS): Moonwing Form,
+// Gloamveil and Sporemender Form keep the spellbook, so a rider shifts into
+// and out of them in the saddle. Casting any other ability still dismounts,
+// every other form still dismounts, and mounting strips every other form while
+// leaving these three on. A druid shifting in the saddle gets no Loping Stride:
+// the sprint would stack onto the mount's speed on every toggle. Sporemender's
+// slower pace is waived in the saddle and returns on foot.
 import { describe, expect, it } from 'vitest';
+import { SPOREMENDER_MOVE_SPEED_MULT } from '../src/sim/combat/druid_sporemender';
 import {
   isMountSafeFormAuraKind,
   isMountSafeFormToggle,
@@ -67,8 +69,12 @@ const inForm = (e: Entity, kind: AuraKind) => e.auras.some((a) => a.kind === kin
 const hasLopingStride = (e: Entity) => e.auras.some((a) => a.id === 'loping_stride');
 
 describe('mount-safe form kinds (combat/forms.ts)', () => {
-  it('are exactly the two body-keeping caster forms, a subset of FORM_AURA_KINDS', () => {
-    expect([...MOUNT_SAFE_FORM_AURA_KINDS].sort()).toEqual(['form_moonkin', 'form_shadow']);
+  it('are exactly the three spellbook-keeping caster forms, a subset of FORM_AURA_KINDS', () => {
+    expect([...MOUNT_SAFE_FORM_AURA_KINDS].sort()).toEqual([
+      'form_moonkin',
+      'form_shadow',
+      'form_sporemender',
+    ]);
     for (const kind of MOUNT_SAFE_FORM_AURA_KINDS) expect(FORM_AURA_KINDS.has(kind)).toBe(true);
     for (const kind of ['form_bear', 'form_cat', 'form_travel', 'form_fireball', 'form_lich']) {
       expect(isMountSafeFormAuraKind(kind as AuraKind), kind).toBe(false);
@@ -78,6 +84,7 @@ describe('mount-safe form kinds (combat/forms.ts)', () => {
   it('classifies the shipped form buttons by what they resolve to', () => {
     expect(isMountSafeFormToggle(ABILITIES.moonkin_form)).toBe(true);
     expect(isMountSafeFormToggle(ABILITIES.shadowform)).toBe(true);
+    expect(isMountSafeFormToggle(ABILITIES.sporemender_form)).toBe(true);
     for (const id of [
       'bear_form',
       'cat_form',
@@ -178,6 +185,85 @@ describe('Moonwing Form in the saddle', () => {
     cast(sim, e, 'cat_form');
     expect(e.mountKey).toBe('');
     expect(inForm(e, 'form_cat')).toBe(true);
+  });
+});
+
+describe('Sporemender Form in the saddle', () => {
+  it('shifts in and out while mounted without dismounting', () => {
+    const { sim, pid, e } = rider('druid', 'restoration');
+    ride(sim, pid, e);
+
+    cast(sim, e, 'sporemender_form');
+    expect(e.mountKey).toBe(MOUNT);
+    expect(inForm(e, 'form_sporemender')).toBe(true);
+
+    cast(sim, e, 'sporemender_form');
+    expect(e.mountKey).toBe(MOUNT);
+    expect(inForm(e, 'form_sporemender')).toBe(false);
+  });
+
+  it('stays on through the mount summon, start to completion', () => {
+    const { sim, pid, e } = rider('druid', 'restoration');
+    cast(sim, e, 'sporemender_form');
+    expect(inForm(e, 'form_sporemender')).toBe(true);
+
+    sim.drainEvents();
+    expect(summonMountItem(sim.ctx, pid, MOUNT)).toBe(true);
+    finishSummon(sim, e);
+    const events = sim.drainEvents();
+
+    expect(e.mountKey).toBe(MOUNT);
+    expect(inForm(e, 'form_sporemender')).toBe(true);
+    const removal = events.find(
+      (ev) =>
+        ev.type === 'aura' && ev.targetId === pid && !ev.gained && ev.name === 'Sporemender Form',
+    );
+    expect(removal).toBeUndefined();
+  });
+
+  it('rides at the full mount speed, and walks at the slower pace again on foot', () => {
+    const { sim, pid, e } = rider('druid', 'restoration');
+    ride(sim, pid, e);
+    const mounted = moveSpeedMult(e);
+    expect(mounted).toBeCloseTo(1 + ridingMoveSpeedPct(1));
+
+    cast(sim, e, 'sporemender_form');
+    expect(inForm(e, 'form_sporemender')).toBe(true);
+    // No Loping Stride in the saddle, and no form pace cut: the mount's speed alone.
+    expect(hasLopingStride(e)).toBe(false);
+    expect(moveSpeedMult(e)).toBeCloseTo(mounted);
+
+    expect(toggleMount(sim.ctx, pid)).toBe(true);
+    expect(e.mountKey).toBe('');
+    expect(inForm(e, 'form_sporemender')).toBe(true);
+    expect(moveSpeedMult(e)).toBeCloseTo(SPOREMENDER_MOVE_SPEED_MULT);
+  });
+
+  it('shifting mid-summon neither cancels the channel nor is stripped at completion', () => {
+    const { sim, pid, e } = rider('druid', 'restoration');
+    expect(summonMountItem(sim.ctx, pid, MOUNT)).toBe(true);
+    expect(e.mountCastKey).toBe(MOUNT);
+
+    cast(sim, e, 'sporemender_form');
+    expect(e.mountCastKey).toBe(MOUNT);
+    expect((e.mountCastRemaining ?? 0) > 0).toBe(true);
+    expect(hasLopingStride(e)).toBe(false);
+
+    finishSummon(sim, e);
+    expect(e.mountKey).toBe(MOUNT);
+    expect(inForm(e, 'form_sporemender')).toBe(true);
+    expect(moveSpeedMult(e)).toBeCloseTo(1 + ridingMoveSpeedPct(1));
+  });
+
+  it('a heal cast in the form still dismounts the rider and keeps the form', () => {
+    const { sim, pid, e } = rider('druid', 'restoration');
+    ride(sim, pid, e);
+    cast(sim, e, 'sporemender_form');
+    expect(e.mountKey).toBe(MOUNT);
+
+    cast(sim, e, 'rejuvenation');
+    expect(e.mountKey).toBe('');
+    expect(inForm(e, 'form_sporemender')).toBe(true);
   });
 });
 

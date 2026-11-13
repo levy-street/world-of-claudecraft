@@ -125,6 +125,35 @@ describe('character form visual selection', () => {
     });
   });
 
+  it('keeps a mounted Sporemender on the base body, the rig returning on dismount', () => {
+    const mask = maskFor([{ kind: 'form_sporemender' }]);
+    expect(requestedCharacterForm(mask, true)).toBe('base');
+    // Even with the rig built and linked, the rider resolves to the body.
+    expect(
+      resolvedCharacterForm(requestedCharacterForm(mask, true), CHARACTER_FORM_READY.sporemender),
+    ).toBe('base');
+    expect(requestedCharacterForm(mask, false)).toBe('sporemender');
+    expect(requestedCharacterForm(mask)).toBe('sporemender');
+  });
+
+  it('mounted or not, every other form and control body still draws its rig', () => {
+    const cases: [{ kind: string; id?: string }, string][] = [
+      [{ kind: 'polymorph' }, 'sheep'],
+      [{ kind: 'form_bear' }, 'bear'],
+      [{ kind: 'form_cat' }, 'cat'],
+      [{ kind: 'form_travel' }, 'travel'],
+      [{ kind: 'form_fireball' }, 'fireball'],
+      [{ kind: 'form_lich' }, 'metamorph'],
+    ];
+    for (const [aura, form] of cases) {
+      expect(requestedCharacterForm(maskFor([aura]), true), aura.kind).toBe(form);
+    }
+    // A polymorphed rider in Sporemender still shows the sheep.
+    expect(
+      requestedCharacterForm(maskFor([{ kind: 'form_sporemender' }, { kind: 'polymorph' }]), true),
+    ).toBe('sheep');
+  });
+
   it('swaps a druid to the Sporemender rig only once that rig is built and linked', () => {
     const base = { root: { id: 'base-root' } };
     const spore = { root: { id: 'spore-root' } };

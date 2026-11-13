@@ -1917,7 +1917,7 @@ export function castAbility(
   notePetAssistCast(ctx, p, meta, target);
   // Auto-dismount when the player is mounted or mid-summon-channel and casts any
   // ability. The one exception is a mount-safe form toggle (combat/forms.ts:
-  // Moonwing, Gloamveil): it only adorns the rider, so it neither dismounts nor
+  // Moonwing, Gloamveil, Sporemender): the rider keeps the body, so it neither dismounts nor
   // cancels a summon in flight. Judged on the RESOLVED effects, so a press that
   // also strikes or heals is a real cast and still dismounts.
   if (!isMountSafeFormToggle(res)) {
