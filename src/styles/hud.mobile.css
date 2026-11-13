@@ -2997,11 +2997,18 @@
        tappable ABOVE the panel to close it. The bottom is player-resizable: dragging the
        bottom handle sets --mobile-chat-bottom (the bottom inset), clamped so the panel
        keeps a usable minimum height and never runs off-screen. top + bottom + height:auto
-       stretches the panel between them. Default bottom is small so the panel is big. */
+       stretches the panel between them. Default bottom is small so the panel is big.
+       The inset never drops below the resize handle's 30px (divided by --ui-scale: this
+       panel is inside the zoomed #ui, the handle is not), because the handle hangs BELOW
+       this edge and must neither cover the newest log line nor leave the screen. */
     top: calc(max(8px, env(safe-area-inset-top)) + 64px);
     bottom: calc(
-      env(safe-area-inset-bottom) +
-      clamp(12px, var(--mobile-chat-bottom, 52px), calc(100vh - 320px))
+      max(
+        30px /
+        var(--ui-scale, 1),
+        env(safe-area-inset-bottom) +
+        clamp(12px, var(--mobile-chat-bottom, 52px), calc(100vh - 320px))
+      )
     );
     transform: translateX(-50%);
     width: var(--mobile-chat-w);
@@ -3037,11 +3044,15 @@
     -webkit-appearance: none;
     appearance: none;
   }
-  /* Mobile chat resize handle (hud.ts creates it as a BODY-LEVEL element): a visible grab
-     bar pinned to the open panel's bottom edge via the SAME --mobile-chat-bottom var, so it
-     tracks the panel with no JS. A very high z-index keeps it above any overlay (the mystery
-     white bar included), and touch-action:none makes a drag a resize, not a scroll. Shown
-     only while the read panel is open. */
+  /* Mobile chat resize handle (chat_geometry_controller.ts creates it as a BODY-LEVEL
+     element): a visible grab bar pinned to the open panel's bottom edge via the SAME
+     --mobile-chat-bottom var, so it tracks the panel with no JS. A very high z-index keeps
+     it above any overlay (the mystery white bar included), and touch-action:none makes a
+     drag a resize, not a scroll. Shown only while the read panel is open.
+     The handle lives OUTSIDE the zoomed #ui while the panel lives inside it, so the
+     panel's edge and width are multiplied by --ui-scale here to land in the same real
+     pixels. It hangs fully BELOW that edge (edge - 30px), never straddling it: a
+     straddling handle, worse at the 0.85 phone scale, covered the newest chat line. */
   .chat-mobile-resize {
     display: none;
   }
@@ -3049,12 +3060,17 @@
     position: fixed;
     left: 50%;
     transform: translateX(-50%);
-    width: var(--mobile-chat-w);
-    /* Straddle the panel's bottom edge: the 30px bar is centred on the edge (edge - 15px). */
+    width: calc(var(--mobile-chat-w) * var(--ui-scale, 1));
+    /* Hang below the panel's bottom edge: the 30px bar's top meets the edge. */
     bottom: calc(
-      env(safe-area-inset-bottom) +
-      clamp(12px, var(--mobile-chat-bottom, 52px), calc(100vh - 320px)) -
-      15px
+      max(
+        30px /
+        var(--ui-scale, 1),
+        env(safe-area-inset-bottom) +
+        clamp(12px, var(--mobile-chat-bottom, 52px), calc(100vh - 320px))
+      ) *
+      var(--ui-scale, 1) -
+      30px
     );
     display: flex;
     align-items: center;
@@ -9723,8 +9739,12 @@
   body.mobile-touch.hud-mobile-compact.mobile-chat-open #chatlog-wrap {
     width: var(--mobile-chat-w);
     bottom: calc(
-      env(safe-area-inset-bottom) +
-      clamp(12px, var(--mobile-chat-bottom, 52px), calc(100vh - 320px))
+      max(
+        30px /
+        var(--ui-scale, 1),
+        env(safe-area-inset-bottom) +
+        clamp(12px, var(--mobile-chat-bottom, 52px), calc(100vh - 320px))
+      )
     );
   }
   body.mobile-touch.hud-mobile-compact.mobile-chat-open #chatlog-frame {

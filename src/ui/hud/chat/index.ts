@@ -1,5 +1,6 @@
 export * from './chat_announcer';
 export * from './chat_channels';
+export * from './chat_composer_open';
 export * from './chat_geometry_controller';
 export * from './chat_input_autosize';
 export * from './chat_line';

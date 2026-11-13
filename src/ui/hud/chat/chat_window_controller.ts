@@ -45,8 +45,20 @@ export interface ChatContextMenuPort {
     minLeft?: number,
     minTop?: number,
   ): void;
+  /**
+   * Hud's post-layout re-clamp (keepPopupOnScreen): pulls a laid-out box that
+   * still overflows the viewport back up/left. On touch the 40px row floor makes
+   * the channel menu taller than any fixed reserve, so this is what keeps its
+   * last rows (Whisper, Cancel) reachable.
+   */
+  keepOnScreen(element: HTMLElement): void;
   bind(onActivate: (action: string) => void): void;
 }
+
+/** Row heights used to RESERVE the channel menu's height before layout. */
+const CHANNEL_MENU_ROW_H_DESKTOP = 24;
+const CHANNEL_MENU_ROW_H_MOBILE = 44;
+const CHANNEL_MENU_CHROME_H = 32;
 
 export interface ChatWindowControllerDeps {
   document: Document;
@@ -531,8 +543,16 @@ export class ChatWindowController {
     html += item(WHISPER_TAB, WHISPER_TAB_LABEL_KEY);
     html += `<div class="ctx-item" data-act="close">${esc(t('hud.chat.context.cancel'))}</div>`;
     menu.innerHTML = html;
-    this.deps.contextMenu.place(menu, x, y, 170, 320, 0, 8);
+    // Every channel, Whisper and Cancel. Desktop keeps its historical 320px
+    // reserve; touch reserves its real 44px rows so the first placement already
+    // seats the box high enough, and keepOnScreen re-clamps the laid-out box.
+    const rows = CHAT_TAB_CHANNELS.length + 2;
+    const reserveBottom = this.deps.isMobileLayout()
+      ? CHANNEL_MENU_CHROME_H + rows * CHANNEL_MENU_ROW_H_MOBILE
+      : Math.max(320, CHANNEL_MENU_CHROME_H + rows * CHANNEL_MENU_ROW_H_DESKTOP);
+    this.deps.contextMenu.place(menu, x, y, 170, reserveBottom, 0, 8);
     menu.style.display = 'block';
+    this.deps.contextMenu.keepOnScreen(menu);
     this.deps.contextMenu.bind((action) => {
       if (!isChatOpenTab(action)) return;
       if (this.chatTabs.includes(action)) this.removeTab(action);

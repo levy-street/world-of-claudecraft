@@ -5,6 +5,10 @@ const mainTs = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8').
   /\r\n/g,
   '\n',
 );
+const composerOpenTs = readFileSync(
+  new URL('../src/ui/hud/chat/chat_composer_open.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
 // Mobile chat "centered + large + in front" fix. On touch, tapping the Chat button
 // used to open the log as a small strip pinned to the bottom-left corner (and the
 // composer sat BEHIND the #mobile-controls layer, z-index 25 vs 60). The fix makes
@@ -85,9 +89,11 @@ describe('mobile chat centered/large/in-front layout', () => {
     expect(input).toMatch(/position:\s*static/);
     expect(input).toMatch(/order:\s*-1/);
     expect(input).toMatch(/width:\s*100%/);
-    // The move is done in main.ts (a flow item inside the panel, not a sibling of #ui).
+    // The move is done for main.ts by the shared seat helper (a flow item inside the
+    // panel, not a sibling of #ui); the pre-filled Whisper open reuses the same helper.
     expect(mainTs).toContain('ensureMobileComposerInPanel');
-    expect(mainTs).toContain('wrap.insertBefore(chatInput, wrap.firstChild)');
+    expect(mainTs).toContain('seatComposerInMobilePanel(');
+    expect(composerOpenTs).toContain('wrap.insertBefore(input, wrap.firstChild)');
     // mobileControlsZ() stays referenced so the pinned control-layer z-index cannot drift
     // out from under the "panel paints in front" reasoning above.
     expect(mobileControlsZ()).toBe(60);
@@ -151,5 +157,25 @@ describe('mobile chat centered/large/in-front layout', () => {
     // above any overlay (so nothing can swallow the drag).
     expect(handle).toMatch(/touch-action:\s*none/);
     expect(Number(handle.match(/z-index:\s*(\d+)/)?.[1] ?? '0')).toBeGreaterThanOrEqual(200);
+  });
+
+  it('keeps the resize handle off the log: it hangs below the panel edge in real pixels', () => {
+    // The handle is body-level (unzoomed) while the panel sits inside the zoomed #ui, and
+    // it used to straddle the edge (edge - 15px) in unzoomed px: at the 0.85 phone UI
+    // Scale it covered the newest one or two chat lines.
+    const handle = ruleBody('body\\.mobile-touch\\.mobile-chat-open \\.chat-mobile-resize');
+    expect(handle).toMatch(/height:\s*30px/);
+    expect(handle).not.toMatch(/-\s*15px/);
+    // Edge converted into real px (* --ui-scale), then the full 30px handle below it.
+    expect(handle).toMatch(/\)\s*\*\s*var\(--ui-scale, 1\)\s*-\s*30px\s*\)/);
+    expect(handle).toMatch(/width:\s*calc\(var\(--mobile-chat-w\) \* var\(--ui-scale, 1\)\)/);
+    // Both open-panel seats keep their bottom inset at least one handle tall (in #ui px),
+    // so the hanging handle never leaves the screen.
+    for (const selector of [
+      'body\\.mobile-touch\\.mobile-chat-open #chatlog-wrap',
+      'body\\.mobile-touch\\.hud-mobile-compact\\.mobile-chat-open #chatlog-wrap',
+    ]) {
+      expect(ruleBody(selector)).toMatch(/max\(\s*30px\s*\/\s*var\(--ui-scale, 1\),/);
+    }
   });
 });

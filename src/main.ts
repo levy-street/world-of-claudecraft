@@ -544,6 +544,7 @@ import { installGraphicsRestoreNote } from './ui/graphics_restore_note_controlle
 import { loadHighscoresInto } from './ui/highscore_board';
 import { type ClaudiumHooks, Hud } from './ui/hud';
 import { resolveActionBarVisibility } from './ui/hud/action_bar/action_bar_visibility_core';
+import { seatComposerInMobilePanel } from './ui/hud/chat/chat_composer_open';
 import { autosizeChatInput } from './ui/hud/chat/chat_input_autosize';
 import { wireSkinPicker } from './ui/hud/cosmetics/skin_picker';
 import {
@@ -1670,12 +1671,8 @@ async function startGame(
   // (above the tabs + log), so on mobile it lives INSIDE #chatlog-wrap as its first child
   // rather than as an absolutely-positioned sibling. Move it there once, lazily, the first
   // time chat opens (idempotent; a no-op on desktop and after the first move).
-  const ensureMobileComposerInPanel = (): void => {
-    if (!document.body.classList.contains('mobile-touch')) return;
-    const wrap = document.getElementById('chatlog-wrap');
-    if (!wrap || chatInput.parentElement === wrap) return;
-    wrap.insertBefore(chatInput, wrap.firstChild);
-  };
+  const ensureMobileComposerInPanel = (): void =>
+    seatComposerInMobilePanel(document.body, document.getElementById('chatlog-wrap'), chatInput);
   function openChat(): void {
     // reflect the active/sticky send channel in the placeholder (e.g. "Message World")
     // and tint the input text to that channel's color

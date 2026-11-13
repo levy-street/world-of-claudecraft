@@ -465,7 +465,7 @@ import {
 } from './hud/battleground';
 import { BgProposalPopup } from './hud/battleground/battleground_proposal_popup';
 import { openBuddyMenu as openBuddyMenuPopup } from './hud/buddy_menu';
-import { ChatAnnouncer, ChatScrollFollow } from './hud/chat';
+import { ChatAnnouncer, ChatScrollFollow, openChatComposerWithText } from './hud/chat';
 import { chatChannelColor } from './hud/chat/chat_channels';
 import { ChatGeometryController } from './hud/chat/chat_geometry_controller';
 import {
@@ -2616,6 +2616,7 @@ export class Hud {
         close: () => this.closeContextMenu(),
         place: (element, x, y, reserveRight, reserveBottom, minLeft, minTop) =>
           this.placePopupAt(element, x, y, reserveRight, reserveBottom, minLeft, minTop),
+        keepOnScreen: (element) => this.keepPopupOnScreen(element),
         bind: (onActivate) => this.bindContextMenuActions(onActivate),
       },
       sendChat: (line) => this.sim.chat(line),
@@ -17433,16 +17434,15 @@ export class Hud {
   }
 
   // Open the chat bar pre-filled with a whisper to this player (classic-MMO-style DM).
+  // On touch it opens the chat panel first, like the Chat button (chat_composer_open.ts).
   private startWhisper(name: string): void {
     if (!name || name === this.sim.player.name) return;
-    const input = $('#chat-input') as unknown as HTMLTextAreaElement;
-    input.value = `/w ${name} `;
-    input.style.display = 'block';
-    input.focus();
-    input.setSelectionRange(input.value.length, input.value.length);
-    // Re-anchor + autosize the bar for the pre-filled value even if it was
-    // already open (focus alone won't re-fire); main.ts listens for 'input'.
-    input.dispatchEvent(new Event('input'));
+    openChatComposerWithText(`/w ${name} `, {
+      body: document.body,
+      wrap: document.getElementById('chatlog-wrap'),
+      input: $('#chat-input') as unknown as HTMLTextAreaElement,
+      applyPresentation: () => this.applyChatInputPresentation(),
+    });
   }
 
   // -------------------------------------------------------------------------
