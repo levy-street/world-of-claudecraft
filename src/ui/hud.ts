@@ -12133,6 +12133,7 @@ export class Hud {
                   ev.classId,
                 );
                 audio.whisper();
+                this.chatWindow.noteWhisperReceived();
               }
               break;
             case 'general':

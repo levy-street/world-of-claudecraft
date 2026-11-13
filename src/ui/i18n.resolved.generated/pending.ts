@@ -9,25 +9,85 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.mobile.whisperUnreadDesc",
+    "hudChrome.mobile.whisperUnreadOverflow"
+  ],
+  "es_ES": [
+    "hudChrome.mobile.whisperUnreadDesc",
+    "hudChrome.mobile.whisperUnreadOverflow"
+  ],
+  "fr_FR": [
+    "hudChrome.mobile.whisperUnreadDesc",
+    "hudChrome.mobile.whisperUnreadOverflow"
+  ],
+  "fr_CA": [
+    "hudChrome.mobile.whisperUnreadDesc",
+    "hudChrome.mobile.whisperUnreadOverflow"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "hudChrome.mobile.whisperUnreadDesc",
+    "hudChrome.mobile.whisperUnreadOverflow"
+  ],
+  "de_DE": [
+    "hudChrome.mobile.whisperUnreadDesc",
+    "hudChrome.mobile.whisperUnreadOverflow"
+  ],
+  "zh_CN": [
+    "hudChrome.mobile.whisperUnreadDesc",
+    "hudChrome.mobile.whisperUnreadOverflow"
+  ],
+  "zh_TW": [
+    "hudChrome.mobile.whisperUnreadDesc",
+    "hudChrome.mobile.whisperUnreadOverflow"
+  ],
+  "ko_KR": [
+    "hudChrome.mobile.whisperUnreadDesc",
+    "hudChrome.mobile.whisperUnreadOverflow"
+  ],
+  "ja_JP": [
+    "hudChrome.mobile.whisperUnreadDesc",
+    "hudChrome.mobile.whisperUnreadOverflow"
+  ],
+  "pt_BR": [
+    "hudChrome.mobile.whisperUnreadDesc",
+    "hudChrome.mobile.whisperUnreadOverflow"
+  ],
+  "ru_RU": [
+    "hudChrome.mobile.whisperUnreadDesc",
+    "hudChrome.mobile.whisperUnreadOverflow"
+  ],
+  "cs_CZ": [
+    "hudChrome.mobile.whisperUnreadDesc",
+    "hudChrome.mobile.whisperUnreadOverflow"
+  ],
+  "nl_NL": [
+    "hudChrome.mobile.whisperUnreadDesc",
+    "hudChrome.mobile.whisperUnreadOverflow"
+  ],
+  "pl_PL": [
+    "hudChrome.mobile.whisperUnreadDesc",
+    "hudChrome.mobile.whisperUnreadOverflow"
+  ],
+  "id_ID": [
+    "hudChrome.mobile.whisperUnreadDesc",
+    "hudChrome.mobile.whisperUnreadOverflow"
+  ],
+  "tr_TR": [
+    "hudChrome.mobile.whisperUnreadDesc",
+    "hudChrome.mobile.whisperUnreadOverflow"
+  ],
+  "sv_SE": [
+    "hudChrome.mobile.whisperUnreadDesc",
+    "hudChrome.mobile.whisperUnreadOverflow"
+  ],
+  "vi_VN": [
+    "hudChrome.mobile.whisperUnreadDesc",
+    "hudChrome.mobile.whisperUnreadOverflow"
+  ],
+  "da_DK": [
+    "hudChrome.mobile.whisperUnreadDesc",
+    "hudChrome.mobile.whisperUnreadOverflow"
+  ]
 };

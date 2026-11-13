@@ -1873,6 +1873,8 @@ export const es: EnTranslations = {
       "quickActionsAria": "Acciones rápidas. Toca para abrir la fila de montura, chat, mapa, bolsas y más, o mantén pulsado y desliza a la derecha para elegir una.",
       "quickActionsAriaTap": "Acciones rápidas. Toca para abrir la fila de montura, chat, mapa, bolsas y más, luego toca un elemento. Toca el control de nuevo para cerrarlo.",
       "quickActionsLabel": "Acciones",
+      "whisperUnreadOverflow": "{count}+",
+      "whisperUnreadDesc": "{channel}: {count}",
       "stanceRadial": "Actitudes",
       "stanceAnchorAria": "Actitud: {stance}. Toca para abrir el anillo de actitudes, luego elige otra actitud.",
       "stanceAnchorEmptyAria": "Sin actitud. Toca para abrir el anillo de actitudes, luego elige una actitud.",

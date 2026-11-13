@@ -1873,6 +1873,8 @@ export const da_DK: EnTranslations = {
       "quickActionsAria": "Hurtige Handlinger. Tryk for at åbne rækken med ridedyr, chat, kort, tasker og mere, eller hold nede og stryg til højre for at vælge en.",
       "quickActionsAriaTap": "Hurtige Handlinger. Tryk for at åbne rækken med ridedyr, chat, kort, tasker og mere, og tryk så på en genstand. Tryk på kontrollen igen for at lukke.",
       "quickActionsLabel": "Handlinger",
+      "whisperUnreadOverflow": "{count}+",
+      "whisperUnreadDesc": "{channel}: {count}",
       "stanceRadial": "Stillinger",
       "stanceAnchorAria": "Stilling: {stance}. Tryk for at åbne stillingsringen, og vælg så en anden stilling.",
       "stanceAnchorEmptyAria": "Ingen stilling. Tryk for at åbne stillingsringen, og vælg så en stilling.",

@@ -1873,6 +1873,8 @@ export const ja_JP: EnTranslations = {
       "quickActionsAria": "クイック操作。タップすると騎乗、チャット、地図、バッグなどの操作列が開きます。長押しして右にスワイプすると項目を選べます。",
       "quickActionsAriaTap": "クイック操作。タップすると騎乗、チャット、地図、バッグなどの操作列が開き、項目をタップして選びます。もう一度タップすると閉じます。",
       "quickActionsLabel": "操作",
+      "whisperUnreadOverflow": "{count}+",
+      "whisperUnreadDesc": "{channel}: {count}",
       "stanceRadial": "スタンス",
       "stanceAnchorAria": "スタンス：{stance}。タップしてスタンスリングを開き、別のスタンスを選びます。",
       "stanceAnchorEmptyAria": "スタンスなし。タップしてスタンスリングを開き、スタンスを選びます。",

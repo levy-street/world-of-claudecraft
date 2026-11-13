@@ -1873,6 +1873,8 @@ export const pt_BR: EnTranslations = {
       "quickActionsAria": "Ações Rápidas. Toque para abrir a fileira de montaria, chat, mapa, bolsas e mais, ou segure e deslize para a direita para escolher uma.",
       "quickActionsAriaTap": "Ações Rápidas. Toque para abrir a fileira de montaria, chat, mapa, bolsas e mais, depois toque em um item. Toque no controle novamente para fechar.",
       "quickActionsLabel": "Ações",
+      "whisperUnreadOverflow": "{count}+",
+      "whisperUnreadDesc": "{channel}: {count}",
       "stanceRadial": "Posturas",
       "stanceAnchorAria": "Postura: {stance}. Toque para abrir o anel de posturas, depois escolha outra postura.",
       "stanceAnchorEmptyAria": "Nenhuma postura. Toque para abrir o anel de posturas, depois escolha uma postura.",

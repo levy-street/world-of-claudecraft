@@ -1873,6 +1873,8 @@ export const id_ID: EnTranslations = {
       "quickActionsAria": "Aksi Cepat. Ketuk untuk membuka baris tunggangan, obrolan, peta, tas, dan lainnya, atau tahan dan geser ke kanan untuk memilih salah satunya.",
       "quickActionsAriaTap": "Aksi Cepat. Ketuk untuk membuka baris tunggangan, obrolan, peta, tas, dan lainnya, lalu ketuk salah satu item. Ketuk kontrolnya lagi untuk menutup.",
       "quickActionsLabel": "Aksi",
+      "whisperUnreadOverflow": "{count}+",
+      "whisperUnreadDesc": "{channel}: {count}",
       "stanceRadial": "Kuda-kuda",
       "stanceAnchorAria": "Kuda-kuda: {stance}. Ketuk untuk membuka cincin kuda-kuda, lalu pilih kuda-kuda lain.",
       "stanceAnchorEmptyAria": "Tidak ada kuda-kuda. Ketuk untuk membuka cincin kuda-kuda, lalu pilih sebuah kuda-kuda.",

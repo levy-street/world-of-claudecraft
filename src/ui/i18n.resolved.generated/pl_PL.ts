@@ -1873,6 +1873,8 @@ export const pl_PL: EnTranslations = {
       "quickActionsAria": "Szybkie akcje. Dotknij, aby otworzyć rząd wierzchowca, czatu, mapy, toreb i więcej, albo przytrzymaj i przeciągnij w prawo, aby wybrać jedną z nich.",
       "quickActionsAriaTap": "Szybkie akcje. Dotknij, aby otworzyć rząd wierzchowca, czatu, mapy, toreb i więcej, a potem dotknij wybranej pozycji. Dotknij przycisku ponownie, aby zamknąć.",
       "quickActionsLabel": "Akcje",
+      "whisperUnreadOverflow": "{count}+",
+      "whisperUnreadDesc": "{channel}: {count}",
       "stanceRadial": "Postawy",
       "stanceAnchorAria": "Postawa: {stance}. Dotknij, aby otworzyć krąg postaw, a następnie wybierz inną postawę.",
       "stanceAnchorEmptyAria": "Brak postawy. Dotknij, aby otworzyć krąg postaw, a następnie wybierz postawę.",

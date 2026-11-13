@@ -1873,6 +1873,8 @@ export const en: EnTranslations = {
       "quickActionsAria": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, or hold and swipe right to pick one.",
       "quickActionsAriaTap": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, then tap an item. Tap the control again to close.",
       "quickActionsLabel": "Actions",
+      "whisperUnreadOverflow": "{count}+",
+      "whisperUnreadDesc": "{channel}: {count}",
       "stanceRadial": "Stances",
       "stanceAnchorAria": "Stance: {stance}. Tap to open the stance ring, then pick another stance.",
       "stanceAnchorEmptyAria": "No stance. Tap to open the stance ring, then pick a stance.",
