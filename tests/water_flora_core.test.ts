@@ -36,14 +36,22 @@ describe('water flora placement core', () => {
     // farshore lagoon): one new region, 3 lilies and 5 reeds on the new
     // water, and farshore_isle becomes the walk's last zone. The first-spot
     // coordinate pin is untouched, so the pre-existing walk is proven
-    // unmoved.
-    expect(regions.length).toBe(10);
-    expect(regions.reduce((n, r) => n + r.lilies.length, 0)).toBe(75);
-    expect(regions.reduce((n, r) => n + r.reeds.length, 0)).toBe(131);
+    // unmoved. Re-minted again for the Quartered Isle: one new region, 4
+    // lilies and 5 reeds on the isle's one open pool, and quartered_isle
+    // becomes the walk's last zone; every earlier region is unchanged.
+    expect(regions.length).toBe(11);
+    expect(regions.reduce((n, r) => n + r.lilies.length, 0)).toBe(79);
+    expect(regions.reduce((n, r) => n + r.reeds.length, 0)).toBe(134);
+    const farshore = regions[regions.length - 2];
+    expect([farshore.zoneId, farshore.lilies.length, farshore.reeds.length]).toEqual([
+      'farshore_isle',
+      3,
+      5,
+    ]);
     const first = regions[0].lilies[0] ?? regions[0].reeds[0];
     expect(first.x).toBeCloseTo(-97.7536, 3);
     expect(first.z).toBeCloseTo(98.1021, 3);
-    expect(regions[regions.length - 1].zoneId).toBe('farshore_isle');
+    expect(regions[regions.length - 1].zoneId).toBe('quartered_isle');
   });
 
   it('places flora on the temperate lakes', () => {

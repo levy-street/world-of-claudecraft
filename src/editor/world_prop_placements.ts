@@ -36,6 +36,7 @@ import {
   terrainHeight,
 } from '../sim/world';
 import { WORLD_SEED } from '../sim/world_seed';
+import { carriesBuiltinZones } from './builtin_zone_match_core';
 import { isConvertedGreatTree, worldMajorPropPlacements } from './world_prop_conversion';
 
 const MIN_AXIS_SCALE = 0.05;
@@ -1032,11 +1033,7 @@ export function repairLegacyWorldPropFit(map: {
   meta: { seed: number };
 }): number {
   if (map.propsMode !== 'editable-all' || map.presentationMode !== undefined) return 0;
-  const builtinIds = BUILTIN_WORLD.zones.map((zone) => zone.id);
-  if (
-    map.content.zones.length !== builtinIds.length ||
-    !map.content.zones.every((zone, index) => zone.id === builtinIds[index])
-  ) {
+  if (!carriesBuiltinZones(map.content.zones, BUILTIN_WORLD.zones)) {
     return 0;
   }
   const byName = (list: MapPlacement[]) => new Map(list.map((p) => [p.name ?? '', p] as const));
@@ -1085,11 +1082,7 @@ export function promoteMajorWorldProps(map: {
 }): boolean {
   if (map.propsMode === 'empty' || map.propsMode === 'editable-all') return false;
   if (map.presentationMode !== undefined) return false;
-  const builtinIds = BUILTIN_WORLD.zones.map((zone) => zone.id);
-  if (
-    map.content.zones.length !== builtinIds.length ||
-    !map.content.zones.every((zone, index) => zone.id === builtinIds[index])
-  ) {
+  if (!carriesBuiltinZones(map.content.zones, BUILTIN_WORLD.zones)) {
     return false;
   }
   const sourceProps =
@@ -1116,11 +1109,7 @@ export function promoteEditablePalms(map: {
   if (map.placements.some((placement) => /^biome\/beach_palm_[123]$/.test(placement.assetId))) {
     return false;
   }
-  const builtinIds = BUILTIN_WORLD.zones.map((zone) => zone.id);
-  if (
-    map.content.zones.length !== builtinIds.length ||
-    !map.content.zones.every((zone, index) => zone.id === builtinIds[index])
-  ) {
+  if (!carriesBuiltinZones(map.content.zones, BUILTIN_WORLD.zones)) {
     return false;
   }
   const palms = reachPalmSpots(map.meta.seed).map((palm, index): MapPlacement => {
@@ -1324,11 +1313,7 @@ export function promoteFarshorePalms(map: {
   ) {
     return false;
   }
-  const builtinIds = BUILTIN_WORLD.zones.map((zone) => zone.id);
-  if (
-    map.content.zones.length !== builtinIds.length ||
-    !map.content.zones.every((zone, index) => zone.id === builtinIds[index])
-  ) {
+  if (!carriesBuiltinZones(map.content.zones, BUILTIN_WORLD.zones)) {
     return false;
   }
   const palms = farshorePalmPlacements(map.meta.seed);
@@ -1351,11 +1336,7 @@ export function promoteWillows(map: {
 }): boolean {
   if (map.propsMode !== 'editable-all' || map.presentationMode !== undefined) return false;
   if (map.placements.some((placement) => placement.assetId === 'props/willow_tree')) return false;
-  const builtinIds = BUILTIN_WORLD.zones.map((zone) => zone.id);
-  if (
-    map.content.zones.length !== builtinIds.length ||
-    !map.content.zones.every((zone, index) => zone.id === builtinIds[index])
-  ) {
+  if (!carriesBuiltinZones(map.content.zones, BUILTIN_WORLD.zones)) {
     return false;
   }
   const willows = willowPropPlacements(map.meta.seed);
@@ -1383,11 +1364,7 @@ export function promoteStreetlamps(map: {
   if (map.placements.some((placement) => placement.assetId.startsWith('props/streetlamp_'))) {
     return false;
   }
-  const builtinIds = BUILTIN_WORLD.zones.map((zone) => zone.id);
-  if (
-    map.content.zones.length !== builtinIds.length ||
-    !map.content.zones.every((zone, index) => zone.id === builtinIds[index])
-  ) {
+  if (!carriesBuiltinZones(map.content.zones, BUILTIN_WORLD.zones)) {
     return false;
   }
   const lamps = streetlampPropPlacements(map.meta.seed);

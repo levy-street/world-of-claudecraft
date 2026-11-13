@@ -16,7 +16,7 @@ import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
 import { FENBRIDGE_LAYOUT } from '../src/sim/fenbridge_layout';
 import { HIGHWATCH_LAYOUT } from '../src/sim/highwatch_layout';
 import { loadPublishedMap } from '../src/sim/maps/eastbrook_rebuild.generated';
-import { PAINTED_TOWNS } from '../src/sim/painted_towns';
+import { PAINTED_TOWNS, RIVALMOOT_LAYOUT } from '../src/sim/painted_towns';
 import { decksMayStand } from '../src/sim/placement_ramps';
 import { nearTownWalkIn, townWalkInPlacements, walkInPlacementFor } from '../src/sim/town_walk_in';
 import type { BuildingDef, WorldContent } from '../src/sim/types';
@@ -169,8 +169,19 @@ describe('the walk-in town placement', () => {
     ).toEqual([]);
     // The published map promotes the three original towns, but leaves the
     // other painted towns as built-in records with their own walk-in floors.
+    // (it was saved before the Quartered Isle existed, so it carries no
+    // Rivalmoot and stands none of its floors)
+    const rivalmoot = new Set(RIVALMOOT_LAYOUT.buildings.map((building) => building.id));
+    expect(rivalmoot.size).toBeGreaterThan(0);
     expect(townWalkInPlacements(loadPublishedMap()).map((p) => p.path)).toEqual(
-      PAINTED_WALK_IN_PATHS,
+      BUILTIN_WORLD.props.buildings
+        .filter(
+          (record) =>
+            record.id !== undefined &&
+            PAINTED_WALK_IN_IDS.has(record.id) &&
+            !rivalmoot.has(record.id),
+        )
+        .map((record) => record.assetId),
     );
   });
 

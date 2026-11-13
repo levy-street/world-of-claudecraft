@@ -326,9 +326,22 @@ describe('content referential integrity', () => {
     for (const a of ZONES) {
       for (const b of ZONES) {
         if (a.id >= b.id) continue;
+        // a claiming zone (the Quartered Isle) takes the ground it overlaps
+        // in a neighbour's rect on purpose: zoneAt tests it first
+        if (a.claimsOverlap === true || b.claimsOverlap === true) continue;
         const overlap = x0(a) < x1(b) && x1(a) > x0(b) && a.zMin < b.zMax && a.zMax > b.zMin;
         expect(overlap, `${a.id} and ${b.id} rects must not overlap`).toBe(false);
       }
+    }
+    // exactly one zone claims, and only over the two columns beside it
+    const claiming = ZONES.filter((zn) => zn.claimsOverlap === true);
+    expect(claiming.map((zn) => zn.id)).toEqual(['quartered_isle']);
+    for (const c of claiming) {
+      const hit = ZONES.filter(
+        (zn) =>
+          zn !== c && x0(zn) < x1(c) && x1(zn) > x0(c) && zn.zMin < c.zMax && zn.zMax > c.zMin,
+      );
+      expect(hit.map((zn) => zn.id).sort()).toEqual(['amberfall', 'drakelands']);
     }
     const stripMin = strip[0].zMin;
     const stripMax = strip[strip.length - 1].zMax;

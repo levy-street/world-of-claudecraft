@@ -16,10 +16,13 @@
 
 import { describe, expect, it } from 'vitest';
 import { WORLD_MAX_X } from '../src/sim/data';
+import { GYRE_PEAK } from '../src/sim/quartered_landmarks';
 import { groundHeight, terrainHeight, WATER_LEVEL, waterLevelAt } from '../src/sim/world';
 
 // The production seed: the reported cliffs are seed-pinned world geometry.
 const SEED = 20061;
+// How far either side of its axis the Gyre's flank reaches the north shore.
+const GYRE_FOOT = 60;
 
 function ride(x: number, z: number): number {
   return Math.max(groundHeight(x, z, SEED), waterLevelAt(x, z, SEED));
@@ -95,7 +98,10 @@ describe('the world edges end in coast, not cliff', () => {
     sweep('amber north', (d, x) => [x, 2380 - d], -530, -190);
     // the strait's two shores: the Reach's north coast and the isle's south one
     sweep('frost north bay', (d, x) => [x, 2040 - d], -170, 170);
-    sweep('isle north', (d, x) => [x, 2420 - d], -170, 170);
+    // (the Gyre's own north face is a sea cliff by design, a peak standing
+    // on the shore: the sweep covers the open coast either side of its foot)
+    sweep('isle north west', (d, x) => [x, 2420 - d], -170, GYRE_PEAK.x - GYRE_FOOT);
+    sweep('isle north east', (d, x) => [x, 2420 - d], GYRE_PEAK.x + GYRE_FOOT, 170);
     expect(bad, bad.slice(0, 10).join('\n')).toEqual([]);
   });
 
