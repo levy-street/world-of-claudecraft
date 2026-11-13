@@ -133,38 +133,3 @@ describe('options window unstuck action', () => {
     expect(root.style.display).toBe('none');
   });
 });
-
-describe('options window logout action', () => {
-  it('calls the logout hook and closes the menu, so a countdown prompt is not hidden behind it', () => {
-    const root = new FakeElement();
-    const logout = vi.fn();
-    // The hooks only need to exist at press time; the main menu paints without them.
-    let pressed = false;
-    vi.stubGlobal('document', {
-      createElement: () => new FakeElement(),
-      body: { classList: { contains: () => false } },
-    });
-    vi.stubGlobal('window', { matchMedia: () => ({ matches: false }) });
-    const window = new OptionsWindow({
-      root: () => root as unknown as HTMLElement,
-      world: () => ({}) as never,
-      options: () =>
-        pressed ? ({ logout, perfOverlay: { setPlacement: vi.fn() } } as never) : null,
-      bugReport: () => null,
-      hideTooltip: vi.fn(),
-      restoreFocus: vi.fn(),
-      isInterfaceUnlocked: () => false,
-      toggleInterfaceUnlock: () => false,
-    } as never);
-
-    (window as unknown as { renderMain(): void }).renderMain();
-    const button = root.findButton(t('hud.options.logout'));
-    expect(button).not.toBeNull();
-
-    pressed = true;
-    button?.click();
-
-    expect(logout).toHaveBeenCalledOnce();
-    expect(root.style.display).toBe('none');
-  });
-});

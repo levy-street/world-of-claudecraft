@@ -714,7 +714,6 @@ export class OptionsWindow {
       this.deps.openWiki();
     } else if (a.kind === 'logout') {
       this.deps.options()?.logout();
-      this.close(); // a countdown may follow: get the menu out of its way
     } else if (a.kind === 'unstuck') {
       this.deps.world().unstuck();
       this.close();

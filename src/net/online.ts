@@ -1850,7 +1850,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     this.worldInteractionRequests?.reset();
     this.vehicleSession = null;
     // A Log Out countdown comes off the screen; an unanswered Log Out ends the session.
-    if (this.logoutFlow.onSocketClosed()) {
+    if (this.logoutFlow?.onSocketClosed()) {
       this.eventQueue.push({ type: 'logout', phase: 'cancelled', reason: 'disconnected' });
     }
     if (this.sessionEnded) return;
