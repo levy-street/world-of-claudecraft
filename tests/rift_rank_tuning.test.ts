@@ -47,7 +47,9 @@ import {
   generateRiftPlan,
   isSetPieceSeed,
   riftFloorCount,
+  riftRolledFloorCount,
 } from '../src/sim/rift/rift_gen';
+import { riftCacheCopper } from '../src/sim/rift/rift_lockpick';
 import { makeVaultSeed } from '../src/sim/rift/vault_seed';
 import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
@@ -1011,6 +1013,36 @@ describe('rift ranks: an S-rank rift is capped at 3 floors', () => {
     expect([1, 2, 3, 4, 5, 6, 7, 8].map((s) => riftFloorCount(s, 25))).toEqual([
       4, 5, 3, 6, 4, 5, 6, 6,
     ]);
+  });
+
+  it('the lockpick cache pays on the uncapped roll, so S pays what it did before the cap', () => {
+    const MULT = { low: 1, medium: 1.5, premium: 2.2 } as const;
+    let longer = 0;
+    for (let s = 1; s <= 120; s++) {
+      // The pre-cap roll, read at A where no cap applies (same seed, same roll).
+      const rolled = riftFloorCount(s, 25);
+      expect(riftRolledFloorCount(s, 28), `seed ${s}`).toBe(rolled);
+      if (rolled > RIFT_S_FLOOR_CAP) longer++;
+      for (const tier of ['low', 'medium', 'premium'] as const) {
+        expect(riftCacheCopper({ seed: s, baseLevel: 28 }, tier), `S seed ${s} ${tier}`).toBe(
+          Math.round((28 + rolled) * 90 * MULT[tier]),
+        );
+        // Below S the roll IS the floor count, so nothing changes there.
+        expect(riftCacheCopper({ seed: s, baseLevel: 25 }, tier), `A seed ${s} ${tier}`).toBe(
+          Math.round((25 + riftFloorCount(s, 25)) * 90 * MULT[tier]),
+        );
+      }
+    }
+    expect(longer).toBeGreaterThan(50);
+    // Literal anchor: seed 4 rolls 6 floors, so its S cache pays (28 + 6) * 90.
+    expect(riftCacheCopper({ seed: 4, baseLevel: 28 }, 'low')).toBe(3060);
+    // The citadel and a Buried Hoard keep their own depths.
+    let citadel = -1;
+    for (let s = 1; s < 400 && citadel < 0; s++) if (isSetPieceSeed(s)) citadel = s;
+    expect(riftCacheCopper({ seed: citadel, baseLevel: 20 }, 'low')).toBe((20 + 2) * 90);
+    expect(riftCacheCopper({ seed: makeVaultSeed(3, 7919), baseLevel: 28 }, 'low')).toBe(
+      (28 + 1) * 90,
+    );
   });
 
   it('a Buried Hoard opened at S level is still one room', () => {

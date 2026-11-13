@@ -62,7 +62,9 @@ Rifts are group content at every rank including C.
 
 Rank also bounds the length of the descent at the top: an S-rank rift never
 runs more floors than `RIFT_S_FLOOR_CAP` (`rift/ranks.ts`), while C, B and A
-keep the generator's full procedural range.
+keep the generator's full procedural range. The cap shortens the run, not the
+payout: the lockpick cache still pays on the length the seed rolled
+(`riftRolledFloorCount`, `riftCacheCopper`).
 
 The ladder is calibrated onto the v0.30 dungeon ladder: C is a normal dungeon
 (normal Gravewyrm Sanctum's own line), B is the heroic five-man line at 1.0x, A

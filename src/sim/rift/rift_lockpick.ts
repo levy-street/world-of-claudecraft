@@ -29,6 +29,7 @@ import {
 } from '../lockpick';
 import type { SimContext } from '../sim_context';
 import { DT, dist2d, type Entity } from '../types';
+import { riftRolledFloorCount } from './rift_gen';
 import type { RiftInstance } from './types';
 
 // Rifts are endgame content, so their caches use the harder 16-wide "heroic" board.
@@ -248,6 +249,19 @@ export function riftLockpickAbort(
   });
 }
 
+/** Copper an opened rift cache pays its picker. Spoils scale with the rift's
+ * ROLLED depth, not the floors it runs: an S-rank rift is capped to
+ * RIFT_S_FLOOR_CAP floors but its cache still pays for the full descent its
+ * seed rolled. Pure over the descriptor. */
+export function riftCacheCopper(
+  inst: Pick<RiftInstance, 'seed' | 'baseLevel'>,
+  lootTier: LockSession['lootTier'],
+): number {
+  const mult = lootTier === 'premium' ? 2.2 : lootTier === 'medium' ? 1.5 : 1;
+  const depth = riftRolledFloorCount(inst.seed, inst.baseLevel);
+  return Math.round((inst.baseLevel + depth) * 90 * mult);
+}
+
 function riftLockpickSucceed(ctx: SimContext, inst: RiftInstance, session: LockSession): void {
   session.state = 'SUCCESS';
   const cache = ctx.entities.get(session.chestId);
@@ -260,8 +274,7 @@ function riftLockpickSucceed(ctx: SimContext, inst: RiftInstance, session: LockS
   }
   // Spoils scale with the run depth and the ante's loot tier. Copper goes straight
   // to the picker's purse (Heroic Marks are the boss-kill reward, not this cache).
-  const mult = session.lootTier === 'premium' ? 2.2 : session.lootTier === 'medium' ? 1.5 : 1;
-  const copper = Math.round((inst.baseLevel + inst.floorCount) * 90 * mult);
+  const copper = riftCacheCopper(inst, session.lootTier);
   const meta = ctx.players.get(session.ownerId);
   if (meta) meta.copper += copper;
   ctx.emit({
