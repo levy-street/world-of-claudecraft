@@ -12,7 +12,11 @@ import {
   type ChatContextMenuPort,
   ChatWindowController,
 } from '../src/ui/hud/chat/chat_window_controller';
-import { WHISPER_UNREAD_BADGE_CLASS } from '../src/ui/hud/chat/whisper_unread_badge';
+import {
+  WHISPER_UNREAD_BADGE_CLASS,
+  WHISPER_UNREAD_DESC_ID,
+} from '../src/ui/hud/chat/whisper_unread_badge';
+import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
 
 // The real ChatWindowController over a jsdom document carrying the Quick
 // Actions seat the unread box hangs over. `noteChatReceived(channel)` is the
@@ -128,6 +132,7 @@ describe('unread chat box on the touch HUD', () => {
     expect(row('party').getAttribute('aria-label')).toBe('Party: 3');
     expect(row('whisper').getAttribute('aria-label')).toBe('Whisper: 1');
     expect(head().getAttribute('aria-label')).toBe('Chat: 4');
+    expect(box()?.getAttribute('aria-label')).toBe('Chat');
     expect(row('party').textContent).toContain('Party');
     expect(row('party').style.getPropertyValue('--chat-unread-color')).toBe('#7fd4ff');
     expect(row('whisper').style.getPropertyValue('--chat-unread-color')).toBe('#ff80ff');
@@ -251,6 +256,55 @@ describe('unread chat box on the touch HUD', () => {
     // The opener toggles, so a second click would have closed the panel.
     expect(document.body.classList.contains('mobile-chat-open')).toBe(true);
     expect(activeTab()).toBe('party');
+  });
+
+  it('hands focus to the tab it opened when the activated row clears itself', async () => {
+    chat = await remount(['party']);
+    receive(chat, 'party', 2);
+    row('party').focus();
+    row('party').click();
+    expect(boxShown()).toBe(false);
+    const active = document.activeElement as HTMLElement | null;
+    expect(active?.classList.contains('chat-tab')).toBe(true);
+    expect(active?.dataset.tab).toBe('party');
+  });
+
+  it('names the group once: the header carries the total, the group only the title', () => {
+    receive(chat, 'whisper', 2);
+    expect(box()?.getAttribute('aria-label')).toBe('Chat');
+    expect(head().getAttribute('aria-label')).toBe('Chat: 2');
+  });
+
+  it('repaints the box and the badge in the new language on a language switch', async () => {
+    receive(chat, 'whisper', 12);
+    receive(chat, 'party', 3);
+    const badge = (): string | null =>
+      document.querySelector(`#mobile-menu-anchor > .${WHISPER_UNREAD_BADGE_CLASS}`)?.textContent ??
+      null;
+    expect(row('party').getAttribute('aria-label')).toBe('Party: 3');
+    expect(badge()).toBe('9+');
+    await ensureLocaleLoaded('de_DE');
+    setLanguage('de_DE');
+    try {
+      // Nothing repaints until the shell announces the switch.
+      expect(row('party').getAttribute('aria-label')).toBe('Party: 3');
+      document.dispatchEvent(new CustomEvent('woc:languagechange'));
+      const party = t('hud.core.chatChannels.names.party');
+      const whisper = t('hud.chat.context.whisper');
+      const title = t('hud.core.mobileChat');
+      expect(row('party').getAttribute('aria-label')).toBe(`${party}: 3`);
+      expect(row('party').textContent).toContain(party);
+      expect(row('whisper').getAttribute('aria-label')).toBe(`${whisper}: 12`);
+      expect(head().getAttribute('aria-label')).toBe(`${title}: 15`);
+      expect(box()?.getAttribute('aria-label')).toBe(title);
+      expect(document.getElementById(WHISPER_UNREAD_DESC_ID)?.textContent).toBe(`${whisper}: 12`);
+      // The switch must actually have changed something, or this proves nothing.
+      expect([party, whisper, title]).not.toEqual(['Party', 'Whisper', 'Chat']);
+    } finally {
+      setLanguage('en');
+      document.dispatchEvent(new CustomEvent('woc:languagechange'));
+    }
+    expect(row('party').getAttribute('aria-label')).toBe('Party: 3');
   });
 
   it('never shows on desktop', () => {

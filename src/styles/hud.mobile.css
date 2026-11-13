@@ -1889,14 +1889,16 @@
      bottom-centre cluster (player frame, cast bar). Those all live in #ui,
      which stacks ABOVE this whole layer, so the box can sit under one of them
      in a crowded raid but can never cover it.
-     It grows away from the move wheel (right; left under the mirror) and its
-     lift scales with --btn-scale, the same scale the control grows by.
+     It grows away from the move wheel (right; left under the mirror). Its lift
+     is the seat's own height (so it also clears the daily chest a Seeker build
+     stacks over the control) plus what --btn-scale adds to the control, which
+     scales about its bottom edge without changing the seat's layout height.
      Steady by design: no pulse, slide or scale, so the only motion is the
      shared idle fade, which the reduced-motion block below switches off. */
   body.mobile-touch #chat-unread-box {
     position: absolute;
     left: 0;
-    bottom: calc(100% * var(--btn-scale, 1) + 8px);
+    bottom: calc(100% + var(--menu-btn-size) * (var(--btn-scale, 1) - 1) + 8px);
     display: flex;
     flex-direction: column;
     align-items: stretch;
@@ -1934,10 +1936,6 @@
   body.mobile-touch #chat-unread-box button[hidden] {
     display: none;
   }
-  body.mobile-touch #chat-unread-box button:focus-visible {
-    outline: 2px solid var(--gold);
-    outline-offset: -2px;
-  }
   body.mobile-touch #chat-unread-box .chat-unread-plate {
     display: flex;
     flex: 1 1 auto;
@@ -1963,6 +1961,27 @@
     border-radius: 50%;
     background: var(--chat-unread-color, var(--color-mobile-btn-ink));
     box-shadow: 0 0 0 1px var(--color-keyline);
+  }
+  /* Each channel's mark has its own SHAPE as well as its own hue (whisper a
+     disc, party a square, general a diamond), because the compact pills drop
+     the names: without it a lone pill would be told apart by colour alone.
+     forced-colors replaces the palette wholesale, so there the mark is drawn
+     as an outline in the system text colour and the shape carries it. */
+  body.mobile-touch #chat-unread-box [data-chan="party"] .chat-unread-dot {
+    border-radius: 1px;
+  }
+  body.mobile-touch #chat-unread-box [data-chan="general"] .chat-unread-dot {
+    border-radius: 1px;
+    transform: rotate(45deg);
+  }
+  @media (forced-colors: active) {
+    body.mobile-touch #chat-unread-box .chat-unread-dot {
+      border: 2px solid CanvasText;
+      box-shadow: none;
+    }
+    body.mobile-touch #chat-unread-box .chat-unread-plate {
+      border-color: CanvasText;
+    }
   }
   body.mobile-touch #chat-unread-box .chat-unread-name {
     flex: 1 1 auto;
@@ -9828,7 +9847,8 @@
   body.mobile-touch .bar-editor-cell:focus-visible,
   body.mobile-touch .bar-editor-tab:focus-visible,
   body.mobile-touch .bar-editor-clear:focus-visible,
-  body.mobile-touch .spell-hotbar-assign:focus-visible {
+  body.mobile-touch .spell-hotbar-assign:focus-visible,
+  body.mobile-touch #chat-unread-box button:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
   }

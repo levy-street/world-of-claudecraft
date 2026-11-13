@@ -738,6 +738,31 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
     expect(keys).not.toContain('note:hudChrome.options.touchPreciseAimNote');
   });
 
+  it('offers the unread chat box rows on touch only, with the General row off by default', () => {
+    const source = makeSource({ graphicsPreset: 4 }, { chatUnreadBox: true });
+    const touch = buildGraphicsControls(source, { touch: true, nativeShell: false });
+    const keys = keysOf(touch);
+    const at = keys.indexOf('chatUnreadBox');
+    expect(at).toBeGreaterThan(keys.indexOf('touchTapMenus'));
+    expect(keys[at + 1]).toBe('note:hudChrome.options.chatUnreadBoxNote');
+    expect(keys[at + 2]).toBe('chatUnreadBoxGeneral');
+    const row = (key: string) => touch.find((c) => c.control === 'boolToggle' && c.key === key);
+    expect(row('chatUnreadBox')).toMatchObject({
+      labelKey: 'hudChrome.options.chatUnreadBox',
+      on: true,
+    });
+    expect(row('chatUnreadBoxGeneral')).toMatchObject({
+      labelKey: 'hudChrome.options.chatUnreadBoxGeneral',
+      on: false,
+    });
+    // The shipped defaults: the box on, its General row off.
+    expect(BOOL_SETTINGS.chatUnreadBox.def).toBe(true);
+    expect(BOOL_SETTINGS.chatUnreadBoxGeneral.def).toBe(false);
+    const desktop = keysOf(buildGraphicsControls(source, { touch: false, nativeShell: false }));
+    expect(desktop).not.toContain('chatUnreadBox');
+    expect(desktop).not.toContain('chatUnreadBoxGeneral');
+  });
+
   it('gives mobile touch toggles their correct i18n keys', () => {
     const controls = buildGraphicsControls(
       makeSource({ graphicsPreset: 4 }, { touchPreciseGroundAim: true }),

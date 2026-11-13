@@ -45,7 +45,11 @@ describe('unread chat box seat', () => {
   it('hangs over the Quick Actions seat, out of flow, anchored by its bottom edge', () => {
     const box = ruleBody(BOX);
     expect(box).toMatch(/position:\s*absolute/);
-    expect(box).toMatch(/bottom:\s*calc\(100% \* var\(--btn-scale, 1\) \+ 8px\)/);
+    // The seat's own height (anchor, plus the Seeker chest when one is stacked
+    // over it) plus the growth --btn-scale adds to the anchor about its bottom.
+    expect(box).toMatch(
+      /bottom:\s*calc\(100% \+ var\(--menu-btn-size\) \* \(var\(--btn-scale, 1\) - 1\) \+ 8px\)/,
+    );
     expect(box).not.toMatch(/\btop:/);
     // It grows AWAY from the move wheel, which sits on the seat's other side.
     expect(box).toMatch(/left:\s*0;/);
@@ -113,6 +117,20 @@ describe('unread chat box seat', () => {
     expect(compact).toMatch(/display:\s*none/);
   });
 
+  it('tells the channels apart by shape, not hue alone, and survives forced colors', () => {
+    expect(ruleBody(`${BOX} [data-chan="party"] .chat-unread-dot`)).toMatch(/border-radius:\s*1px/);
+    expect(ruleBody(`${BOX} [data-chan="general"] .chat-unread-dot`)).toMatch(
+      /transform:\s*rotate\(45deg\)/,
+    );
+    expect(css).toMatch(
+      /@media \(forced-colors: active\) \{\s*body\.mobile-touch #chat-unread-box \.chat-unread-dot \{\s*border:\s*2px solid CanvasText;/,
+    );
+    // The box joins the shared touch focus ring rather than minting its own.
+    expect(css).toMatch(
+      /body\.mobile-touch #chat-unread-box button:focus-visible \{\s*outline:\s*2px solid var\(--color-border-focus\);/,
+    );
+  });
+
   it('is steady: no animation, and the idle fade is off under reduced motion', () => {
     const start = css.indexOf('/* Unread chat box (chat_unread_box.ts)');
     const end = css.indexOf('/* The cancel X sits directly ON the control', start);
@@ -152,7 +170,12 @@ describe('unread chat box seat', () => {
     const targetBottom = Math.max(...targetBands);
 
     /** The box's top edge, in px from the viewport TOP, with every row lit. */
-    function boxTop(tier: 'compact' | 'standard' | 'tablet', vh: number, btnScale: number): number {
+    function boxTop(
+      tier: 'compact' | 'standard' | 'tablet',
+      vh: number,
+      btnScale: number,
+      stackedAbove = 0,
+    ): number {
       const seat = seatTerms(
         tier === 'compact' ? COMPACT_SEAT : tier === 'tablet' ? TABLET_SEAT : SEAT,
       );
@@ -167,7 +190,7 @@ describe('unread chat box seat', () => {
       const seatBottom = seat.inset + btnScale * (seat.centre * chrome - menu / 2);
       // Compact drops the header; the other tiers carry it above the rows.
       const rows = CHAT_UNREAD_CHANNELS.length + (tier === 'compact' ? 0 : 1);
-      return vh - (seatBottom + menu * btnScale + lift + rows * rowHeight);
+      return vh - (seatBottom + menu * btnScale + stackedAbove + lift + rows * rowHeight);
     }
 
     it('reads a plausible target band out of the stylesheet', () => {
@@ -210,5 +233,20 @@ describe('unread chat box seat', () => {
         }
       });
     }
+
+    it('still clears it on a Seeker build, where the daily chest is stacked over the control', () => {
+      const chest = ruleBody(
+        'body.mobile-touch.seeker-wallet-enabled\n    #mobile-combat-controls\n    #mobile-daily-rewards:not([hidden])',
+      );
+      const stacked =
+        px(chest, /\bheight:\s*(\d+)px/) +
+        px(ruleBody('body.mobile-touch #mobile-combat-controls'), /gap:\s*(\d+)px/);
+      // The Seeker phone is about 400 CSS px tall in landscape.
+      for (const scale of scales) {
+        expect(boxTop('compact', 400, scale, stacked), `button scale ${scale}`).toBeGreaterThan(
+          targetBottom + 16,
+        );
+      }
+    });
   });
 });

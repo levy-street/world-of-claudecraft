@@ -1396,6 +1396,9 @@ export const hudChromeStrings = {
     // (whisper_unread_badge.ts). Overflow is the capped badge text ("9+");
     // Desc is the aria-describedby text, composed from the existing Whisper tab
     // label so every locale reads natively with no new prose to translate.
+    // Both are ALSO used by the unread chat box (chat_unread_box.ts) for its
+    // Party, General and header lines, so they must stay channel-neutral: only
+    // the placeholders and punctuation, never a word about whispers.
     whisperUnreadOverflow: '{count}+',
     whisperUnreadDesc: '{channel}: {count}',
     // The touch stance control: ONE circle on the button row wearing the stance

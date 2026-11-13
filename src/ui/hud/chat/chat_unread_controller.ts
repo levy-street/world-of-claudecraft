@@ -30,6 +30,8 @@ const CHAT_OPEN_CLASS = 'mobile-chat-open';
 const CHAT_PEEK_CLASS = 'mobile-chatlog-peek';
 /** The Quick Actions strip's Chat seat: the real button that opens chat. */
 const CHAT_OPENER_ID = 'mobile-menu-chat';
+/** The selected chat tab: where focus goes when a tapped row clears itself. */
+const ACTIVE_TAB_SELECTOR = '#chatlog-tabs .chat-tab.active';
 
 export interface ChatUnreadControllerDeps {
   document: Document;
@@ -103,11 +105,18 @@ export class ChatUnreadController {
    *  button so the touch controls run their own open path. */
   private open(channel: ChatUnreadChannel | null): void {
     const { document } = this.deps;
+    // Reading the row clears it, which hides the button that was just
+    // activated. A keyboard or switch user must not be dropped on <body>, so
+    // focus follows them to the tab they landed on.
+    const hadFocus = this.box.holdsFocus();
     this.deps.selectTab(chatUnreadTapTab(channel, this.deps.openTabs()));
     if (!document.body.classList.contains(CHAT_OPEN_CLASS)) {
       document.getElementById(CHAT_OPENER_ID)?.click();
     }
     this.sync();
+    if (hadFocus && !this.box.holdsFocus()) {
+      document.querySelector<HTMLElement>(ACTIVE_TAB_SELECTOR)?.focus();
+    }
   }
 
   private view(): ChatViewState {

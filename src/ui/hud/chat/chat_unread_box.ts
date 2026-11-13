@@ -12,10 +12,17 @@
 // tier the names and the header drop and each row is a dot-and-count pill, so
 // the footprint stays exactly as wide as the control beneath it.
 //
+// Bare-named on purpose, like whisper_unread_badge.ts beside it: it is neither
+// a window nor a painter on the PainterHost seam (its composition point is
+// ChatWindowController, which holds no facet), it is repainted only by chat
+// events, and it takes no layout read and arms no driver. Registered in
+// tests/architecture.test.ts UI_DOM_MODULES.
+//
 // Every row is a real button: a tap selects that channel's tab and opens chat
 // (the controller decides which tab). The accessible name carries the channel
 // and the count, so the compact pills are never colour-only to a screen reader.
 
+import { focusedWithin } from '../../focus_restore';
 import { formatNumber, type TranslationKey, t } from '../../i18n';
 import { bindTouchTap } from '../../touch_tap';
 import { chatChannelColor, chatOpenTabLabelKey } from './chat_channels';
@@ -81,7 +88,9 @@ export class ChatUnreadBox {
     const title = t(TITLE_KEY);
     const total = chatUnreadTotal(rows);
     this.write(this.head, title, total);
-    setAttr(root, 'aria-label', this.describe(title, total));
+    // The group is named by the title alone: the header button already reads
+    // the title with the total, and the same string twice is announced twice.
+    setAttr(root, 'aria-label', title);
     for (const channel of CHAT_UNREAD_CHANNELS) {
       const nodes = this.rows.get(channel);
       if (!nodes) continue;
@@ -96,6 +105,15 @@ export class ChatUnreadBox {
     setText(nodes.name, name);
     setText(nodes.count, this.pillText(count));
     setAttr(nodes.button, 'aria-label', this.describe(name, count));
+  }
+
+  /** True while focus sits on one of the box's own buttons AND that button is
+   *  still on screen. A browser moves focus off a button the moment it is
+   *  hidden; a hidden button that still holds focus counts as not held too. */
+  holdsFocus(): boolean {
+    if (!this.root || this.root.hidden) return false;
+    const active = focusedWithin(this.root);
+    return active !== null && !active.hidden;
   }
 
   private pillText(count: number): string {
