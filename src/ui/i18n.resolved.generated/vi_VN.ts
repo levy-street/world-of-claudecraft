@@ -2913,7 +2913,10 @@ export const vi_VN: EnTranslations = {
       "touchPreciseAim": "Ngắm Mặt Đất Chính Xác",
       "touchPreciseAimNote": "Ngắm trước khi thi triển các phép nhắm xuống đất. Tắt để thi triển ngay lập tức tại điểm được gợi ý.",
       "touchTapMenus": "Chạm để mở menu",
-      "touchTapMenusNote": "Mở các nút điều khiển hành động, vật phẩm tiêu hao và menu bằng một cú chạm thay vì vuốt. Chạm vào một mục để dùng nó, chạm lại vào nút điều khiển để thực hiện hành động thông thường của nó, hoặc chạm ra ngoài để đóng lại."
+      "touchTapMenusNote": "Mở các nút điều khiển hành động, vật phẩm tiêu hao và menu bằng một cú chạm thay vì vuốt. Chạm vào một mục để dùng nó, chạm lại vào nút điều khiển để thực hiện hành động thông thường của nó, hoặc chạm ra ngoài để đóng lại.",
+      "chatUnreadBox": "Unread chat box",
+      "chatUnreadBoxNote": "Shows unread whispers and party chat above the Actions button. Tap a line to open that chat.",
+      "chatUnreadBoxGeneral": "Count General chat in the box"
     },
     "talentRows": {
       "tab": "Lựa chọn",

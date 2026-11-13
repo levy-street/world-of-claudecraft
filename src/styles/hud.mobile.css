@@ -1878,6 +1878,131 @@
   body.mobile-touch .mobile-menu-item.has-whisper-unread {
     overflow: visible;
   }
+  /* Unread chat box (chat_unread_box.ts): one row per channel with lines
+     received since the player last looked at it, under a "Chat" header with the
+     total. It is a child of the Quick Actions seat and hangs over that column,
+     out of flow so a wide row can never push the control sideways.
+     Why here: the band above the control is the one this layout already keeps
+     free in every tier (the seat's column-reverse note above), it is the left
+     thumb's own band, and it is as far as the HUD gets from the top-left
+     column (target frame, its aura strip, the party stack) and clear of the
+     bottom-centre cluster (player frame, cast bar). Those all live in #ui,
+     which stacks ABOVE this whole layer, so the box can sit under one of them
+     in a crowded raid but can never cover it.
+     It grows away from the move wheel (right; left under the mirror) and its
+     lift scales with --btn-scale, the same scale the control grows by.
+     Steady by design: no pulse, slide or scale, so the only motion is the
+     shared idle fade, which the reduced-motion block below switches off. */
+  body.mobile-touch #chat-unread-box {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% * var(--btn-scale, 1) + 8px);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    pointer-events: auto;
+    transition: opacity 0.35s ease;
+  }
+  body.mobile-touch.mobile-left-handed #chat-unread-box {
+    left: auto;
+    right: 0;
+  }
+  /* Out of the way whenever its job is done or its band is taken: with nothing
+     unread, while chat is open (the tab strip carries the counts there), and
+     while the Quick Actions row is open (its caption uses this band). */
+  body.mobile-touch #chat-unread-box[hidden],
+  body.mobile-touch.mobile-chat-open #chat-unread-box,
+  body.mobile-touch #mobile-menu-anchor[aria-expanded="true"] ~ #chat-unread-box {
+    display: none;
+  }
+  /* Each row is a full 40px touch target; the glass plate inside it is the
+     visible part, so stacked rows read as separate lines with air between. */
+  body.mobile-touch #chat-unread-box button {
+    display: flex;
+    align-items: center;
+    min-width: 44px;
+    min-height: 40px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--color-mobile-btn-ink);
+    font: inherit;
+    cursor: var(--cursor-point);
+    touch-action: manipulation;
+  }
+  body.mobile-touch #chat-unread-box button[hidden] {
+    display: none;
+  }
+  body.mobile-touch #chat-unread-box button:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: -2px;
+  }
+  body.mobile-touch #chat-unread-box .chat-unread-plate {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: 6px;
+    min-height: 28px;
+    padding: 0 6px 0 8px;
+    border: 1px solid var(--mobile-glass-border);
+    border-radius: 14px;
+    background: var(--mobile-glass-bg);
+    -webkit-backdrop-filter: blur(var(--mobile-glass-blur, 8px));
+    backdrop-filter: blur(var(--mobile-glass-blur, 8px));
+    box-shadow: var(--mobile-btn-shadow);
+    font-size: 12px;
+    font-weight: bold;
+    text-shadow: var(--title-shadow);
+    white-space: nowrap;
+  }
+  body.mobile-touch #chat-unread-box .chat-unread-dot {
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--chat-unread-color, var(--color-mobile-btn-ink));
+    box-shadow: 0 0 0 1px var(--color-keyline);
+  }
+  body.mobile-touch #chat-unread-box .chat-unread-name {
+    flex: 1 1 auto;
+    max-width: 96px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+  }
+  body.mobile-touch #chat-unread-box .chat-unread-row .chat-unread-name {
+    color: var(--chat-unread-color, inherit);
+  }
+  body.mobile-touch #chat-unread-box .chat-unread-count {
+    flex: none;
+    text-shadow: none;
+  }
+  /* Short screens (every hand-held phone in landscape): the header and the
+     names drop and each row is a dot-and-count pill, so the stack is exactly as
+     wide as the control under it and at most three pills tall. The button keeps
+     the channel and the count as its accessible name. */
+  body.mobile-touch.hud-mobile-compact #chat-unread-box .chat-unread-head,
+  body.mobile-touch.hud-mobile-compact #chat-unread-box .chat-unread-name {
+    display: none;
+  }
+  body.mobile-touch.hud-mobile-compact #chat-unread-box {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+  body.mobile-touch.hud-mobile-compact #chat-unread-box .chat-unread-plate {
+    justify-content: center;
+    padding: 0 5px;
+  }
+  body.mobile-touch.mobile-chrome-idle #chat-unread-box {
+    opacity: 0.5;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    body.mobile-touch #chat-unread-box {
+      transition: none;
+    }
+  }
   /* The cancel X sits directly ON the control, which puts it left of the whole
      row once it is open: releasing where the gesture started is the way out, so
      the target is a place the thumb never had to leave. */

@@ -2913,7 +2913,10 @@ export const it_IT: EnTranslations = {
       "touchPreciseAim": "Puntamento a terra preciso",
       "touchPreciseAimNote": "Mira prima di lanciare gli incantesimi a terra. Disattiva per lanciare istantaneamente nel punto suggerito.",
       "touchTapMenus": "Menu al tocco",
-      "touchTapMenusNote": "Apri i controlli di azione, consumabili e menu con un tocco invece che con uno scorrimento. Tocca un elemento per usarlo, tocca di nuovo il controllo per la sua azione abituale, oppure tocca fuori per chiudere."
+      "touchTapMenusNote": "Apri i controlli di azione, consumabili e menu con un tocco invece che con uno scorrimento. Tocca un elemento per usarlo, tocca di nuovo il controllo per la sua azione abituale, oppure tocca fuori per chiudere.",
+      "chatUnreadBox": "Unread chat box",
+      "chatUnreadBoxNote": "Shows unread whispers and party chat above the Actions button. Tap a line to open that chat.",
+      "chatUnreadBoxGeneral": "Count General chat in the box"
     },
     "talentRows": {
       "tab": "Scelte",

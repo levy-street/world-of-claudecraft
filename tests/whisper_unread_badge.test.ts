@@ -12,7 +12,7 @@ import {
 } from '../src/ui/hud/chat/whisper_unread_badge';
 
 // The real ChatWindowController over a jsdom document carrying the three touch
-// controls that lead to chat. `noteWhisperReceived()` is the one call hud.ts
+// controls that lead to chat. `noteChatReceived('whisper')` is the call hud.ts
 // makes from its received-whisper branch (pinned in whisper_unread_core.test.ts).
 
 function mount(tabs: string[] = []): ChatWindowController {
@@ -79,7 +79,7 @@ describe('unread-whisper badge on the touch chat controls', () => {
 
   it('badges every control that leads to chat when a whisper arrives with chat closed', () => {
     expect(badgeTexts()).toEqual([null, null, null]);
-    chat.noteWhisperReceived();
+    chat.noteChatReceived('whisper');
     expect(badgeTexts()).toEqual(['1', '1', '1']);
     for (const id of WHISPER_UNREAD_HOST_IDS) {
       const host = document.getElementById(id) as HTMLElement;
@@ -91,19 +91,19 @@ describe('unread-whisper badge on the touch chat controls', () => {
   });
 
   it('increments per whisper and caps the text at 9+', () => {
-    chat.noteWhisperReceived();
-    chat.noteWhisperReceived();
-    chat.noteWhisperReceived();
+    chat.noteChatReceived('whisper');
+    chat.noteChatReceived('whisper');
+    chat.noteChatReceived('whisper');
     expect(badgeTexts()).toEqual(['3', '3', '3']);
-    for (let i = 0; i < 9; i++) chat.noteWhisperReceived();
+    for (let i = 0; i < 9; i++) chat.noteChatReceived('whisper');
     expect(badgeTexts()).toEqual(['9+', '9+', '9+']);
     // One badge per control, however many whispers arrived.
     expect(document.querySelectorAll(`.${WHISPER_UNREAD_BADGE_CLASS}`)).toHaveLength(3);
   });
 
   it('describes the count to assistive tech without touching the accessible names', () => {
-    chat.noteWhisperReceived();
-    chat.noteWhisperReceived();
+    chat.noteChatReceived('whisper');
+    chat.noteChatReceived('whisper');
     const description = document.getElementById(WHISPER_UNREAD_DESC_ID);
     expect(description?.hidden).toBe(true);
     expect(description?.textContent).toBe('Whisper: 2');
@@ -119,8 +119,8 @@ describe('unread-whisper badge on the touch chat controls', () => {
   });
 
   it('clears everything once chat opens on the All tab', async () => {
-    chat.noteWhisperReceived();
-    chat.noteWhisperReceived();
+    chat.noteChatReceived('whisper');
+    chat.noteChatReceived('whisper');
     document.body.classList.add('mobile-chat-open');
     await settle();
     expect(badgeTexts()).toEqual([null, null, null]);
@@ -133,7 +133,7 @@ describe('unread-whisper badge on the touch chat controls', () => {
   });
 
   it('also clears on the read-only log peek', async () => {
-    chat.noteWhisperReceived();
+    chat.noteChatReceived('whisper');
     document.body.classList.add('mobile-chatlog-peek');
     await settle();
     expect(badgeTexts()).toEqual([null, null, null]);
@@ -142,7 +142,7 @@ describe('unread-whisper badge on the touch chat controls', () => {
   it('does not badge a whisper that lands in an open All log', async () => {
     document.body.classList.add('mobile-chat-open');
     await settle();
-    chat.noteWhisperReceived();
+    chat.noteChatReceived('whisper');
     expect(badgeTexts()).toEqual([null, null, null]);
   });
 
@@ -152,7 +152,7 @@ describe('unread-whisper badge on the touch chat controls', () => {
     tab('say').click();
     document.body.classList.add('mobile-chat-open');
     await settle();
-    chat.noteWhisperReceived();
+    chat.noteChatReceived('whisper');
     expect(badgeTexts()).toEqual(['1', '1', '1']);
     // Closing and reopening on Say still shows nothing of the whisper.
     document.body.classList.remove('mobile-chat-open');
@@ -168,21 +168,21 @@ describe('unread-whisper badge on the touch chat controls', () => {
     chat = mount(['whisper']);
     document.body.classList.add('mobile-touch');
     tab('whisper').click();
-    chat.noteWhisperReceived();
+    chat.noteChatReceived('whisper');
     expect(badgeTexts()).toEqual(['1', '1', '1']);
   });
 
   it('never badges on desktop', () => {
     document.body.classList.remove('mobile-touch');
-    chat.noteWhisperReceived();
-    chat.noteWhisperReceived();
+    chat.noteChatReceived('whisper');
+    chat.noteChatReceived('whisper');
     expect(badgeTexts()).toEqual([null, null, null]);
     expect(document.querySelector(`.${WHISPER_UNREAD_BADGE_CLASS}`)).toBeNull();
   });
 
   it('skips a control the build does not ship', () => {
     document.getElementById('mobile-chat')?.remove();
-    chat.noteWhisperReceived();
+    chat.noteChatReceived('whisper');
     expect(badgeTexts()).toEqual(['1', '1', null]);
   });
 });

@@ -2913,7 +2913,10 @@ export const pt_BR: EnTranslations = {
       "touchPreciseAim": "Mira Precisa no Chão",
       "touchPreciseAimNote": "Mire antes de conjurar feitiços de área no chão. Desative para conjurar instantaneamente no ponto sugerido.",
       "touchTapMenus": "Menus por toque",
-      "touchTapMenusNote": "Abra os controles de ação, consumíveis e menu com um toque em vez de um deslize. Toque em um item para usá-lo, toque no controle novamente para sua ação usual, ou toque fora para fechar."
+      "touchTapMenusNote": "Abra os controles de ação, consumíveis e menu com um toque em vez de um deslize. Toque em um item para usá-lo, toque no controle novamente para sua ação usual, ou toque fora para fechar.",
+      "chatUnreadBox": "Unread chat box",
+      "chatUnreadBoxNote": "Shows unread whispers and party chat above the Actions button. Tap a line to open that chat.",
+      "chatUnreadBoxGeneral": "Count General chat in the box"
     },
     "talentRows": {
       "tab": "Escolhas",

@@ -2913,7 +2913,10 @@ export const pl_PL: EnTranslations = {
       "touchPreciseAim": "Precyzyjne celowanie naziemne",
       "touchPreciseAimNote": "Celuj przed rzuceniem zaklęć naziemnych. Wyłącz, aby rzucać natychmiast w sugerowany punkt.",
       "touchTapMenus": "Dotykowe menu",
-      "touchTapMenusNote": "Otwieraj kontrolki akcji, materiałów zużywalnych i menu dotknięciem zamiast przeciągnięciem. Dotknij pozycji, aby jej użyć, dotknij kontrolki ponownie, aby wykonać jej zwykłe działanie, albo dotknij poza nią, aby zamknąć."
+      "touchTapMenusNote": "Otwieraj kontrolki akcji, materiałów zużywalnych i menu dotknięciem zamiast przeciągnięciem. Dotknij pozycji, aby jej użyć, dotknij kontrolki ponownie, aby wykonać jej zwykłe działanie, albo dotknij poza nią, aby zamknąć.",
+      "chatUnreadBox": "Unread chat box",
+      "chatUnreadBoxNote": "Shows unread whispers and party chat above the Actions button. Tap a line to open that chat.",
+      "chatUnreadBoxGeneral": "Count General chat in the box"
     },
     "talentRows": {
       "tab": "Wybory",

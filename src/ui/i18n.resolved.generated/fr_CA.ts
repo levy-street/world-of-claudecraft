@@ -2913,7 +2913,10 @@ export const fr_CA: EnTranslations = {
       "touchPreciseAim": "Ciblage au sol précis",
       "touchPreciseAimNote": "Visez avant de lancer les sorts au sol. Désactivez pour lancer instantanément au point suggéré.",
       "touchTapMenus": "Menus par appui",
-      "touchTapMenusNote": "Ouvrez les contrôles d'action, de consommables et de menu d'une pression au lieu d'un glissement. Touchez un élément pour l'utiliser, touchez à nouveau le contrôle pour son action habituelle, ou touchez à l'extérieur pour fermer."
+      "touchTapMenusNote": "Ouvrez les contrôles d'action, de consommables et de menu d'une pression au lieu d'un glissement. Touchez un élément pour l'utiliser, touchez à nouveau le contrôle pour son action habituelle, ou touchez à l'extérieur pour fermer.",
+      "chatUnreadBox": "Unread chat box",
+      "chatUnreadBoxNote": "Shows unread whispers and party chat above the Actions button. Tap a line to open that chat.",
+      "chatUnreadBoxGeneral": "Count General chat in the box"
     },
     "talentRows": {
       "tab": "Choix",

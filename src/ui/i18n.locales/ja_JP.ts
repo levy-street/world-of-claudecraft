@@ -4226,6 +4226,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.touchTapMenus': 'タップメニュー',
   'hudChrome.options.touchTapMenusNote':
     'アクション、消耗品、メニューの各コントロールをスワイプではなくタップで開きます。項目をタップすると使用し、コントロールをもう一度タップすると通常の動作を行い、外側をタップすると閉じます。',
+  'hudChrome.options.chatUnreadBox': '未読チャットボックス',
+  'hudChrome.options.chatUnreadBoxNote':
+    '未読のささやきとパーティチャットを「操作」ボタンの上に表示します。行をタップするとそのチャットを開きます。',
+  'hudChrome.options.chatUnreadBoxGeneral': '一般チャットもボックスに数える',
   'hudChrome.options.itemLevelLine': 'アイテムレベル {level}',
   'hudChrome.options.itemScoreLine': 'スコア {score}',
   'hudChrome.landing.highContrast': '高コントラスト',

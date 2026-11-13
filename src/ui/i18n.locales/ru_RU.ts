@@ -6034,6 +6034,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.touchTapMenus': 'Меню по нажатию',
   'hudChrome.options.touchTapMenusNote':
     'Открывайте элементы действий, расходников и меню нажатием вместо смахивания. Нажмите на предмет, чтобы использовать его, нажмите на элемент ещё раз для обычного действия или нажмите за его пределами, чтобы закрыть.',
+  'hudChrome.options.chatUnreadBox': 'Окно непрочитанного чата',
+  'hudChrome.options.chatUnreadBoxNote':
+    'Показывает непрочитанный шёпот и чат группы над кнопкой «Действия». Нажмите на строку, чтобы открыть этот чат.',
+  'hudChrome.options.chatUnreadBoxGeneral': 'Учитывать общий чат в окне',
   'hudChrome.options.itemLevelLine': 'Уровень предмета {level}',
   'hudChrome.options.itemScoreLine': 'Оценка {score}',
   'hudChrome.landing.highContrast': 'Высокая контрастность',

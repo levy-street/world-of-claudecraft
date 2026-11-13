@@ -11,28 +11,46 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "hudChrome.mobile.whisperUnreadDesc",
-    "hudChrome.mobile.whisperUnreadOverflow"
+    "hudChrome.mobile.whisperUnreadOverflow",
+    "hudChrome.options.chatUnreadBox",
+    "hudChrome.options.chatUnreadBoxGeneral",
+    "hudChrome.options.chatUnreadBoxNote"
   ],
   "es_ES": [
     "hudChrome.mobile.whisperUnreadDesc",
-    "hudChrome.mobile.whisperUnreadOverflow"
+    "hudChrome.mobile.whisperUnreadOverflow",
+    "hudChrome.options.chatUnreadBox",
+    "hudChrome.options.chatUnreadBoxGeneral",
+    "hudChrome.options.chatUnreadBoxNote"
   ],
   "fr_FR": [
     "hudChrome.mobile.whisperUnreadDesc",
-    "hudChrome.mobile.whisperUnreadOverflow"
+    "hudChrome.mobile.whisperUnreadOverflow",
+    "hudChrome.options.chatUnreadBox",
+    "hudChrome.options.chatUnreadBoxGeneral",
+    "hudChrome.options.chatUnreadBoxNote"
   ],
   "fr_CA": [
     "hudChrome.mobile.whisperUnreadDesc",
-    "hudChrome.mobile.whisperUnreadOverflow"
+    "hudChrome.mobile.whisperUnreadOverflow",
+    "hudChrome.options.chatUnreadBox",
+    "hudChrome.options.chatUnreadBoxGeneral",
+    "hudChrome.options.chatUnreadBoxNote"
   ],
   "en_CA": [],
   "it_IT": [
     "hudChrome.mobile.whisperUnreadDesc",
-    "hudChrome.mobile.whisperUnreadOverflow"
+    "hudChrome.mobile.whisperUnreadOverflow",
+    "hudChrome.options.chatUnreadBox",
+    "hudChrome.options.chatUnreadBoxGeneral",
+    "hudChrome.options.chatUnreadBoxNote"
   ],
   "de_DE": [
     "hudChrome.mobile.whisperUnreadDesc",
-    "hudChrome.mobile.whisperUnreadOverflow"
+    "hudChrome.mobile.whisperUnreadOverflow",
+    "hudChrome.options.chatUnreadBox",
+    "hudChrome.options.chatUnreadBoxGeneral",
+    "hudChrome.options.chatUnreadBoxNote"
   ],
   "zh_CN": [
     "hudChrome.mobile.whisperUnreadDesc",
@@ -52,7 +70,10 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "pt_BR": [
     "hudChrome.mobile.whisperUnreadDesc",
-    "hudChrome.mobile.whisperUnreadOverflow"
+    "hudChrome.mobile.whisperUnreadOverflow",
+    "hudChrome.options.chatUnreadBox",
+    "hudChrome.options.chatUnreadBoxGeneral",
+    "hudChrome.options.chatUnreadBoxNote"
   ],
   "ru_RU": [
     "hudChrome.mobile.whisperUnreadDesc",
@@ -60,34 +81,58 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "cs_CZ": [
     "hudChrome.mobile.whisperUnreadDesc",
-    "hudChrome.mobile.whisperUnreadOverflow"
+    "hudChrome.mobile.whisperUnreadOverflow",
+    "hudChrome.options.chatUnreadBox",
+    "hudChrome.options.chatUnreadBoxGeneral",
+    "hudChrome.options.chatUnreadBoxNote"
   ],
   "nl_NL": [
     "hudChrome.mobile.whisperUnreadDesc",
-    "hudChrome.mobile.whisperUnreadOverflow"
+    "hudChrome.mobile.whisperUnreadOverflow",
+    "hudChrome.options.chatUnreadBox",
+    "hudChrome.options.chatUnreadBoxGeneral",
+    "hudChrome.options.chatUnreadBoxNote"
   ],
   "pl_PL": [
     "hudChrome.mobile.whisperUnreadDesc",
-    "hudChrome.mobile.whisperUnreadOverflow"
+    "hudChrome.mobile.whisperUnreadOverflow",
+    "hudChrome.options.chatUnreadBox",
+    "hudChrome.options.chatUnreadBoxGeneral",
+    "hudChrome.options.chatUnreadBoxNote"
   ],
   "id_ID": [
     "hudChrome.mobile.whisperUnreadDesc",
-    "hudChrome.mobile.whisperUnreadOverflow"
+    "hudChrome.mobile.whisperUnreadOverflow",
+    "hudChrome.options.chatUnreadBox",
+    "hudChrome.options.chatUnreadBoxGeneral",
+    "hudChrome.options.chatUnreadBoxNote"
   ],
   "tr_TR": [
     "hudChrome.mobile.whisperUnreadDesc",
-    "hudChrome.mobile.whisperUnreadOverflow"
+    "hudChrome.mobile.whisperUnreadOverflow",
+    "hudChrome.options.chatUnreadBox",
+    "hudChrome.options.chatUnreadBoxGeneral",
+    "hudChrome.options.chatUnreadBoxNote"
   ],
   "sv_SE": [
     "hudChrome.mobile.whisperUnreadDesc",
-    "hudChrome.mobile.whisperUnreadOverflow"
+    "hudChrome.mobile.whisperUnreadOverflow",
+    "hudChrome.options.chatUnreadBox",
+    "hudChrome.options.chatUnreadBoxGeneral",
+    "hudChrome.options.chatUnreadBoxNote"
   ],
   "vi_VN": [
     "hudChrome.mobile.whisperUnreadDesc",
-    "hudChrome.mobile.whisperUnreadOverflow"
+    "hudChrome.mobile.whisperUnreadOverflow",
+    "hudChrome.options.chatUnreadBox",
+    "hudChrome.options.chatUnreadBoxGeneral",
+    "hudChrome.options.chatUnreadBoxNote"
   ],
   "da_DK": [
     "hudChrome.mobile.whisperUnreadDesc",
-    "hudChrome.mobile.whisperUnreadOverflow"
+    "hudChrome.mobile.whisperUnreadOverflow",
+    "hudChrome.options.chatUnreadBox",
+    "hudChrome.options.chatUnreadBoxGeneral",
+    "hudChrome.options.chatUnreadBoxNote"
   ]
 };

@@ -2913,7 +2913,10 @@ export const de_DE: EnTranslations = {
       "touchPreciseAim": "Präzises Bodenzielen",
       "touchPreciseAimNote": "Vor dem Wirken von Bodenzaubern zielen. Deaktivieren, um sofort am vorgeschlagenen Punkt zu wirken.",
       "touchTapMenus": "Menüs antippen",
-      "touchTapMenusNote": "Öffne die Aktions-, Verbrauchsgüter- und Menüsteuerung mit einem Tipp statt mit einem Wischen. Tippe einen Gegenstand an, um ihn zu benutzen, tippe die Steuerung erneut an für ihre übliche Aktion, oder tippe außerhalb, um zu schließen."
+      "touchTapMenusNote": "Öffne die Aktions-, Verbrauchsgüter- und Menüsteuerung mit einem Tipp statt mit einem Wischen. Tippe einen Gegenstand an, um ihn zu benutzen, tippe die Steuerung erneut an für ihre übliche Aktion, oder tippe außerhalb, um zu schließen.",
+      "chatUnreadBox": "Unread chat box",
+      "chatUnreadBoxNote": "Shows unread whispers and party chat above the Actions button. Tap a line to open that chat.",
+      "chatUnreadBoxGeneral": "Count General chat in the box"
     },
     "talentRows": {
       "tab": "Auswahl",

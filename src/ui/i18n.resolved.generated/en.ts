@@ -2913,7 +2913,10 @@ export const en: EnTranslations = {
       "touchPreciseAim": "Precise Ground Targeting",
       "touchPreciseAimNote": "Aim before casting ground spells. Turn off to cast instantly at the suggested point.",
       "touchTapMenus": "Tap menus",
-      "touchTapMenusNote": "Open the action, consumable and menu controls with a tap instead of a swipe. Tap an item to use it, tap the control again for its usual action, or tap outside to close."
+      "touchTapMenusNote": "Open the action, consumable and menu controls with a tap instead of a swipe. Tap an item to use it, tap the control again for its usual action, or tap outside to close.",
+      "chatUnreadBox": "Unread chat box",
+      "chatUnreadBoxNote": "Shows unread whispers and party chat above the Actions button. Tap a line to open that chat.",
+      "chatUnreadBoxGeneral": "Count General chat in the box"
     },
     "talentRows": {
       "tab": "Choices",

@@ -2913,7 +2913,10 @@ export const es: EnTranslations = {
       "touchPreciseAim": "Apuntado preciso en el suelo",
       "touchPreciseAimNote": "Apunta antes de lanzar hechizos de área en el suelo. Desactívalo para lanzar al instante en el punto sugerido.",
       "touchTapMenus": "Menús al tocar",
-      "touchTapMenusNote": "Abre los controles de acción, consumibles y menú con un toque en lugar de un deslizamiento. Toca un elemento para usarlo, toca el control de nuevo para su acción habitual, o toca fuera para cerrar."
+      "touchTapMenusNote": "Abre los controles de acción, consumibles y menú con un toque en lugar de un deslizamiento. Toca un elemento para usarlo, toca el control de nuevo para su acción habitual, o toca fuera para cerrar.",
+      "chatUnreadBox": "Unread chat box",
+      "chatUnreadBoxNote": "Shows unread whispers and party chat above the Actions button. Tap a line to open that chat.",
+      "chatUnreadBoxGeneral": "Count General chat in the box"
     },
     "talentRows": {
       "tab": "Opciones",

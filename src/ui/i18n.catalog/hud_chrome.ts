@@ -3254,6 +3254,12 @@ export const hudChromeStrings = {
     touchTapMenus: 'Tap menus',
     touchTapMenusNote:
       'Open the action, consumable and menu controls with a tap instead of a swipe. Tap an item to use it, tap the control again for its usual action, or tap outside to close.',
+    // The touch HUD's unread chat box (chat_unread_box.ts): the show/hide switch,
+    // its description, and the opt-in General row (off by default).
+    chatUnreadBox: 'Unread chat box',
+    chatUnreadBoxNote:
+      'Shows unread whispers and party chat above the Actions button. Tap a line to open that chat.',
+    chatUnreadBoxGeneral: 'Count General chat in the box',
   },
   // Choice-row talents (the rows tab in the talents window). The row OPTION
   // names/descriptions are sim content (English source, localized with the

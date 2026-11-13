@@ -5696,6 +5696,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.touchTapMenus': '點擊選單',
   'hudChrome.options.touchTapMenusNote':
     '用點擊代替滑動來開啟動作、消耗品與選單控制項。點擊項目即可使用，再次點擊控制項執行其一般操作，點擊外部則關閉。',
+  'hudChrome.options.chatUnreadBox': '未讀聊天框',
+  'hudChrome.options.chatUnreadBoxNote':
+    '在「操作」按鈕上方顯示未讀的密語與隊伍聊天。點擊某一列即可開啟對應的聊天。',
+  'hudChrome.options.chatUnreadBoxGeneral': '在聊天框中計入綜合頻道',
   'hudChrome.options.itemLevelLine': '物品等級 {level}',
   'hudChrome.options.itemScoreLine': '評分 {score}',
   'hudChrome.landing.highContrast': '高對比度',

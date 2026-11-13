@@ -12068,6 +12068,7 @@ export class Hud {
                 ev.fromTitle,
                 ev.classId,
               );
+              if (ev.fromPid !== this.sim.playerId) this.chatWindow.noteChatReceived('party');
               break;
             case 'battleground':
               this.chatLogFrom(
@@ -12133,7 +12134,7 @@ export class Hud {
                   ev.classId,
                 );
                 audio.whisper();
-                this.chatWindow.noteWhisperReceived();
+                this.chatWindow.noteChatReceived('whisper');
               }
               break;
             case 'general':
@@ -12147,6 +12148,7 @@ export class Hud {
                 ev.fromTitle,
                 ev.classId,
               );
+              if (ev.fromPid !== this.sim.playerId) this.chatWindow.noteChatReceived('general');
               break;
             case 'world':
               this.chatLogFrom(

@@ -2913,7 +2913,10 @@ export const da_DK: EnTranslations = {
       "touchPreciseAim": "Præcis jordsigtning",
       "touchPreciseAimNote": "Sigt, før du kaster jordbesværgelser. Slå fra for at kaste øjeblikkeligt på det foreslåede punkt.",
       "touchTapMenus": "Tryk-menuer",
-      "touchTapMenusNote": "Åbn kontrollerne for kamphandlinger, forbrugsvarer og menu med et tryk i stedet for et strøg. Tryk på en genstand for at bruge den, tryk på kontrollen igen for dens sædvanlige handling, eller tryk udenfor for at lukke."
+      "touchTapMenusNote": "Åbn kontrollerne for kamphandlinger, forbrugsvarer og menu med et tryk i stedet for et strøg. Tryk på en genstand for at bruge den, tryk på kontrollen igen for dens sædvanlige handling, eller tryk udenfor for at lukke.",
+      "chatUnreadBox": "Unread chat box",
+      "chatUnreadBoxNote": "Shows unread whispers and party chat above the Actions button. Tap a line to open that chat.",
+      "chatUnreadBoxGeneral": "Count General chat in the box"
     },
     "talentRows": {
       "tab": "Valg",

@@ -27,7 +27,8 @@ import {
   WHISPER_TAB,
   WHISPER_TAB_LABEL_KEY,
 } from './chat_channels';
-import { WhisperUnreadBadge } from './whisper_unread_badge';
+import { ChatUnreadController } from './chat_unread_controller';
+import { isChatUnreadChannel } from './chat_unread_core';
 
 const CHAT_TABS_KEY = 'woc_chat_tabs';
 const CHAT_ACTIVE_TAB_KEY = 'woc_chat_active_tab';
@@ -95,17 +96,20 @@ export class ChatWindowController {
   // so a tab moved by drag or reorder stays the keyboard focus target.
   private rovingChatTab: ChatTabId | null = null;
   private readonly unreadTabs = new Map<ChatOpenTab, number>();
-  // The touch HUD's unread-whisper count on the controls that open chat. A
-  // second counter beside `unreadTabs` because that map only tracks OPEN channel
-  // tabs that are not active: it has no entry for All, and none at all while the
-  // Whisper tab is not open, which is exactly when a closed chat hides a whisper.
-  private readonly whisperUnread: WhisperUnreadBadge;
+  // The touch HUD's unread counts (the whisper badge on the controls that open
+  // chat, and the unread box). A second counter beside `unreadTabs` because that
+  // map only tracks OPEN channel tabs that are not active: it has no entry for
+  // All, and none at all while a channel's tab is not open, which is exactly
+  // when a closed chat hides a line.
+  private readonly chatUnread: ChatUnreadController;
 
   constructor(private readonly deps: ChatWindowControllerDeps) {
-    this.whisperUnread = new WhisperUnreadBadge({
+    this.chatUnread = new ChatUnreadController({
       document: deps.document,
       isTouchLayout: () => deps.isMobileLayout(),
       activeTab: () => this.activeChatTab,
+      openTabs: () => this.chatTabs,
+      selectTab: (tab) => this.selectTab(tab, true),
     });
   }
 
@@ -134,12 +138,14 @@ export class ChatWindowController {
     }
     this.renderTabs();
     this.selectTab(this.activeChatTab, false);
-    this.whisperUnread.start();
+    this.chatUnread.start();
   }
 
-  /** A whisper arrived FROM another player (never the sender's own "To X" echo). */
-  noteWhisperReceived(): void {
-    this.whisperUnread.noteReceived();
+  /** A chat line arrived FROM another player on `channel` (never the player's
+   *  own line or the "To X" whisper echo). Channels the touch unread surfaces
+   *  do not track are ignored. */
+  noteChatReceived(channel: string): void {
+    if (isChatUnreadChannel(channel)) this.chatUnread.noteReceived(channel);
   }
 
   syncTabsForInput(typed: string): void {
@@ -506,7 +512,7 @@ export class ChatWindowController {
     this.updateActiveTabStyles();
     if (persist) this.persist();
     this.applyInputPresentation();
-    this.whisperUnread.sync();
+    this.chatUnread.sync();
     this.deps.afterTabShown?.(showCombat ? this.deps.combatLog : this.deps.chatLog);
   }
 

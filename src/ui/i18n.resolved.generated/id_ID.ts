@@ -2913,7 +2913,10 @@ export const id_ID: EnTranslations = {
       "touchPreciseAim": "Pembidikan Tanah Presisi",
       "touchPreciseAimNote": "Bidik dulu sebelum merapal mantra area tanah. Nonaktifkan untuk merapal seketika pada titik yang disarankan.",
       "touchTapMenus": "Ketuk untuk Menu",
-      "touchTapMenusNote": "Buka kontrol aksi, barang habis pakai, dan menu dengan ketukan, bukan geseran. Ketuk sebuah item untuk memakainya, ketuk kontrolnya lagi untuk aksi biasanya, atau ketuk di luar untuk menutup."
+      "touchTapMenusNote": "Buka kontrol aksi, barang habis pakai, dan menu dengan ketukan, bukan geseran. Ketuk sebuah item untuk memakainya, ketuk kontrolnya lagi untuk aksi biasanya, atau ketuk di luar untuk menutup.",
+      "chatUnreadBox": "Unread chat box",
+      "chatUnreadBoxNote": "Shows unread whispers and party chat above the Actions button. Tap a line to open that chat.",
+      "chatUnreadBoxGeneral": "Count General chat in the box"
     },
     "talentRows": {
       "tab": "Pilihan",
