@@ -250,6 +250,9 @@ const FANOUT_ARMS: readonly string[] = [
   'this.questDialog.relocalize|',
   // The Book of the Realm's Reputation tab (self-gated on its open check).
   'this.reputationWindow.relocalize|',
+  // The Book of the Realm's Rankings tab and its World Quests rankings
+  // stand-in: boards painted once per open or page turn (self-gated).
+  'this.leaderboardWindow.relocalize|',
   'this.mailboxWindow.relocalize|',
   'this.socialWindow.relocalize|',
   'this.cosmeticsWindow.relocalize|',
