@@ -27,7 +27,9 @@ tests that pin them.
   or a step-in-order sequence), optional lava / rolling-boulder hazards, an
   always-available way-out beacon, and the boss on the last floor. See "Floor
   variety" below. `generateRiftPlan(seed, baseLevel)` names the rift and gives its
-  floor count.
+  floor count: a procedural rift rolls its length from the seed, and an S-rank
+  rift is held to `RIFT_S_FLOOR_CAP` (`rift/ranks.ts`), pinned by
+  `tests/rift_rank_tuning.test.ts`.
 - **Determinism invariant.** The generator uses its OWN `Rng` seeded from the
   descriptor, NEVER the live sim rng, so generating a rift never perturbs the
   global draw order the rest of the sim depends on. (Rift content is also never in

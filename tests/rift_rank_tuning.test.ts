@@ -32,6 +32,7 @@ import {
   RIFT_HEROIC_TUNING,
   RIFT_NONLETHAL_MECHANIC_CAP_PCT,
   RIFT_RANK_MECHANIC_BUDGET,
+  RIFT_S_FLOOR_CAP,
   RIFT_S_ZONE_TEMPO,
   type RiftSpawnRole,
   riftFloorLevel,
@@ -41,7 +42,15 @@ import {
   riftRoleDamageMultiplier,
   riftRoleHealthMultiplier,
 } from '../src/sim/rift/ranks';
-import { generateRiftFloor, isSetPieceSeed, riftFloorCount } from '../src/sim/rift/rift_gen';
+import {
+  generateRiftFloor,
+  generateRiftPlan,
+  isSetPieceSeed,
+  riftFloorCount,
+  riftRolledFloorCount,
+} from '../src/sim/rift/rift_gen';
+import { riftCacheCopper } from '../src/sim/rift/rift_lockpick';
+import { makeVaultSeed } from '../src/sim/rift/vault_seed';
 import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
@@ -938,6 +947,118 @@ describe('rift ranks: B/A/S rifts are never shorter than 3 floors', () => {
     const floor = generateRiftFloor(seed, 28, 0);
     // S-rank is flat 23 on every floor.
     for (const sp of floor.spawns) expect(sp.level).toBe(23);
+  });
+});
+
+describe('rift ranks: an S-rank rift is capped at 3 floors', () => {
+  it('pins the cap literal', () => {
+    expect(RIFT_S_FLOOR_CAP).toBe(3);
+  });
+
+  it('every S-rank seed runs exactly 3 floors, including seeds that roll longer below S', () => {
+    let longerBelowS = 0;
+    for (let s = 1; s <= 300; s++) {
+      // 28 is the natural S portal level; 30 is a /dev portal banded into S.
+      for (const baseLevel of [28, 30]) {
+        expect(riftFloorCount(s, baseLevel), `seed ${s} base ${baseLevel}`).toBe(3);
+        expect(generateRiftPlan(s, baseLevel).floorCount).toBe(3);
+      }
+      if (riftFloorCount(s, 25) > 3) longerBelowS++;
+    }
+    // The cap is doing real work: most seeds roll past 3 at the uncapped ranks.
+    expect(longerBelowS).toBeGreaterThan(150);
+  });
+
+  it('the third S floor is the boss floor, and a deeper index clamps onto it', () => {
+    let seed = -1;
+    for (let s = 1; s < 400 && seed < 0; s++) if (riftFloorCount(s, 25) === 6) seed = s;
+    expect(seed, 'a seed that rolls 6 floors at A').toBeGreaterThan(0);
+    // The same seed one rank down still runs its full 6 floors, boss on the sixth.
+    expect(generateRiftFloor(seed, 25, 2).isBoss).toBe(false);
+    expect(generateRiftFloor(seed, 25, 5).isBoss).toBe(true);
+    for (const index of [0, 1]) {
+      const floor = generateRiftFloor(seed, 28, index);
+      expect(floor.floorCount).toBe(3);
+      expect(floor.isBoss, `floor ${index}`).toBe(false);
+    }
+    const last = generateRiftFloor(seed, 28, 2);
+    expect(last.floorCount).toBe(3);
+    expect(last.isBoss).toBe(true);
+    expect(last.spawns.some((sp) => sp.boss)).toBe(true);
+    expect(generateRiftFloor(seed, 28, 5).floorIndex).toBe(2);
+  });
+
+  it('C, B and A keep the full 3 to 6 floor range', () => {
+    for (const baseLevel of [20, 22, 25]) {
+      const counts = new Set<number>();
+      for (let s = 1; s <= 300; s++) {
+        if (baseLevel === 20 && isSetPieceSeed(s)) continue;
+        counts.add(riftFloorCount(s, baseLevel));
+      }
+      expect([...counts].sort(), `base ${baseLevel}`).toEqual([3, 4, 5, 6]);
+    }
+  });
+
+  it("the cap leaves every seed's own roll alone below S", () => {
+    // One seed, one roll: B and A read the same count, and so does C wherever
+    // it runs procedural. S is that same roll, clamped.
+    for (let s = 1; s <= 300; s++) {
+      const rolled = riftFloorCount(s, 25);
+      expect(riftFloorCount(s, 22), `seed ${s} B`).toBe(rolled);
+      if (!isSetPieceSeed(s)) expect(riftFloorCount(s, 20), `seed ${s} C`).toBe(rolled);
+      expect(riftFloorCount(s, 28), `seed ${s} S`).toBe(Math.min(rolled, RIFT_S_FLOOR_CAP));
+    }
+    // Literal anchors read off the generator before the cap existed, so a
+    // reshuffled stream cannot pass by agreeing with itself.
+    expect([1, 2, 3, 4, 5, 6, 7, 8].map((s) => riftFloorCount(s, 25))).toEqual([
+      4, 5, 3, 6, 4, 5, 6, 6,
+    ]);
+  });
+
+  it('the lockpick cache pays on the uncapped roll, so S pays what it did before the cap', () => {
+    const MULT = { low: 1, medium: 1.5, premium: 2.2 } as const;
+    let longer = 0;
+    for (let s = 1; s <= 120; s++) {
+      // The pre-cap roll, read at A where no cap applies (same seed, same roll).
+      const rolled = riftFloorCount(s, 25);
+      expect(riftRolledFloorCount(s, 28), `seed ${s}`).toBe(rolled);
+      if (rolled > RIFT_S_FLOOR_CAP) longer++;
+      for (const tier of ['low', 'medium', 'premium'] as const) {
+        expect(riftCacheCopper({ seed: s, baseLevel: 28 }, tier), `S seed ${s} ${tier}`).toBe(
+          Math.round((28 + rolled) * 90 * MULT[tier]),
+        );
+        // Below S the roll IS the floor count, so nothing changes there.
+        expect(riftCacheCopper({ seed: s, baseLevel: 25 }, tier), `A seed ${s} ${tier}`).toBe(
+          Math.round((25 + riftFloorCount(s, 25)) * 90 * MULT[tier]),
+        );
+      }
+    }
+    expect(longer).toBeGreaterThan(50);
+    // Literal anchor: seed 4 rolls 6 floors, so its S cache pays (28 + 6) * 90.
+    expect(riftCacheCopper({ seed: 4, baseLevel: 28 }, 'low')).toBe(3060);
+    // The citadel and a Buried Hoard keep their own depths.
+    let citadel = -1;
+    for (let s = 1; s < 400 && citadel < 0; s++) if (isSetPieceSeed(s)) citadel = s;
+    expect(riftCacheCopper({ seed: citadel, baseLevel: 20 }, 'low')).toBe((20 + 2) * 90);
+    expect(riftCacheCopper({ seed: makeVaultSeed(3, 7919), baseLevel: 28 }, 'low')).toBe(
+      (28 + 1) * 90,
+    );
+  });
+
+  it('a Buried Hoard opened at S level is still one room', () => {
+    for (const tier of [0, 1, 2, 3] as const) {
+      const seed = makeVaultSeed(tier, 7919 * (tier + 1));
+      expect(riftFloorCount(seed, 28), `tier ${tier}`).toBe(1);
+    }
+  });
+
+  it('a live S-rank run reports 3 floors on the instance', () => {
+    let seed = -1;
+    for (let s = 1; s < 400 && seed < 0; s++) if (riftFloorCount(s, 25) === 6) seed = s;
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true });
+    sim.setPlayerLevel(20);
+    sim.enterRift(seed, 28, sim.player.id);
+    expect(active(sim).floorCount).toBe(3);
   });
 });
 

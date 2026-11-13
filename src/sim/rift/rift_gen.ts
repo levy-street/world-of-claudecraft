@@ -29,7 +29,13 @@ import { Rng } from '../rng';
 import { authoredLiftAt } from './authored';
 import { riftMinSpawnZ } from './entry_clearance';
 import { buildHoardValleyLayout } from './hoard_valley';
-import { RIFT_RANK_BASE_LEVEL, riftFloorLevel, riftHeroicTuningFor } from './ranks';
+import {
+  RIFT_RANK_BASE_LEVEL,
+  RIFT_S_FLOOR_CAP,
+  riftFloorLevel,
+  riftHeroicTuningFor,
+  riftRankForBaseLevel,
+} from './ranks';
 import { buildStyle, mixSeed } from './style';
 import type {
   RiftFloorPlan,
@@ -106,15 +112,30 @@ export function isSetPieceRift(seed: number, baseLevel: number): boolean {
   return isSetPieceSeed(seed) && riftHeroicTuningFor(baseLevel) === null;
 }
 
-/** How many floors this rift runs (deterministic from the descriptor). The
- * authored set-piece descends from the citadel halls into the pit; every
- * procedural rift (including any B/A/S run) is 3 to 6 floors. `baseLevel`
- * defaults to the C-rank baseline for legacy seed-only callers. */
-export function riftFloorCount(seed: number, baseLevel: number = RIFT_RANK_BASE_LEVEL.C): number {
+/** The descent length this descriptor ROLLS, before any rank cap: the citadel's
+ * 2, a treasure vault's 1, else 3 to 6 from the seed's own stream. It is the
+ * rift's reward depth: the lockpick cache pays on it (rift_lockpick.ts
+ * riftCacheCopper), so capping how long S runs does not cut what S pays.
+ * `baseLevel` defaults to the C-rank baseline for legacy seed-only callers. */
+export function riftRolledFloorCount(
+  seed: number,
+  baseLevel: number = RIFT_RANK_BASE_LEVEL.C,
+): number {
   if (isSetPieceRift(seed, baseLevel)) return INFERNAL_FLOOR_COUNT;
   // A treasure vault is one room: the boss waits at the far end of it.
   if (vaultSeedTier(seed) !== null) return 1;
   return new Rng(mixSeed(seed, 0x510f)).int(MIN_FLOORS, MAX_FLOORS);
+}
+
+/** How many floors this rift runs (deterministic from the descriptor): the
+ * rolled length, with an S-rank rift held to RIFT_S_FLOOR_CAP. The cap clamps
+ * the roll instead of narrowing its range, so the draw and every C/B/A count
+ * stay exactly as they were. */
+export function riftFloorCount(seed: number, baseLevel: number = RIFT_RANK_BASE_LEVEL.C): number {
+  const rolled = riftRolledFloorCount(seed, baseLevel);
+  return riftRankForBaseLevel(Math.round(baseLevel)) === 'S'
+    ? Math.min(rolled, RIFT_S_FLOOR_CAP)
+    : rolled;
 }
 
 function themeForFloor(seed: number, floorIndex: number): RiftTheme {
