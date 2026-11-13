@@ -2913,10 +2913,7 @@ export const ko_KR: EnTranslations = {
       "touchPreciseAim": "정밀 지면 지정",
       "touchPreciseAimNote": "지면 주문은 조준한 뒤 시전합니다. 끄면 추천 지점에 즉시 시전합니다.",
       "touchTapMenus": "탭 메뉴",
-      "touchTapMenusNote": "스와이프 대신 탭으로 행동, 소모품, 메뉴 컨트롤을 엽니다. 항목을 탭하면 사용하고, 컨트롤을 다시 탭하면 기본 동작을 실행하며, 바깥을 탭하면 닫힙니다.",
-      "chatUnreadBox": "읽지 않은 채팅 상자",
-      "chatUnreadBoxNote": "읽지 않은 귓속말과 파티 채팅을 실행 버튼 위에 표시합니다. 줄을 탭하면 해당 채팅이 열립니다.",
-      "chatUnreadBoxGeneral": "일반 채팅도 상자에 집계"
+      "touchTapMenusNote": "스와이프 대신 탭으로 행동, 소모품, 메뉴 컨트롤을 엽니다. 항목을 탭하면 사용하고, 컨트롤을 다시 탭하면 기본 동작을 실행하며, 바깥을 탭하면 닫힙니다."
     },
     "talentRows": {
       "tab": "선택",

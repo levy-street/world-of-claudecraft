@@ -2,12 +2,9 @@
 //
 // On touch the chat panel is closed most of the time, so a received whisper
 // lands in a log nobody is looking at. whisper_unread_badge.ts paints a count
-// on the controls that open chat. The COUNT itself (when a whisper counts as
-// unread and when it clears) is the shared counter in chat_unread_core.ts,
-// which also feeds the unread box; this file only decides what the badge prints.
-//
-// Whispers ONLY, by design: General/World/Party traffic would keep a badge lit
-// permanently, and a badge that is always lit says nothing.
+// on the controls that open chat. The COUNT itself (what counts as unread and
+// when it clears) is the counter in chat_unread_core.ts; this file only decides
+// what the badge prints.
 
 /** The highest count the badge prints as a number; above it the badge reads "9+". */
 export const WHISPER_UNREAD_BADGE_CAP = 9;

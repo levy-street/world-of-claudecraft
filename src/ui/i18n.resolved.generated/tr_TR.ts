@@ -2913,10 +2913,7 @@ export const tr_TR: EnTranslations = {
       "touchPreciseAim": "Hassas Yer Hedeflemesi",
       "touchPreciseAimNote": "Yere büyü yapmadan önce nişan al. Önerilen noktada anında büyü yapmak için kapat.",
       "touchTapMenus": "Dokunmatik menüler",
-      "touchTapMenusNote": "Eylem, sarf malzemesi ve menü denetimlerini kaydırma yerine dokunarak aç. Kullanmak için bir ögeye dokun, olağan eylemi için denetime tekrar dokun, ya da kapatmak için dışarıya dokun.",
-      "chatUnreadBox": "Unread chat box",
-      "chatUnreadBoxNote": "Shows unread whispers and party chat above the Actions button. Tap a line to open that chat.",
-      "chatUnreadBoxGeneral": "Count General chat in the box"
+      "touchTapMenusNote": "Eylem, sarf malzemesi ve menü denetimlerini kaydırma yerine dokunarak aç. Kullanmak için bir ögeye dokun, olağan eylemi için denetime tekrar dokun, ya da kapatmak için dışarıya dokun."
     },
     "talentRows": {
       "tab": "Seçimler",

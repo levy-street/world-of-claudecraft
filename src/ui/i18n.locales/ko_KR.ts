@@ -4200,10 +4200,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.touchTapMenus': '탭 메뉴',
   'hudChrome.options.touchTapMenusNote':
     '스와이프 대신 탭으로 행동, 소모품, 메뉴 컨트롤을 엽니다. 항목을 탭하면 사용하고, 컨트롤을 다시 탭하면 기본 동작을 실행하며, 바깥을 탭하면 닫힙니다.',
-  'hudChrome.options.chatUnreadBox': '읽지 않은 채팅 상자',
-  'hudChrome.options.chatUnreadBoxNote':
-    '읽지 않은 귓속말과 파티 채팅을 실행 버튼 위에 표시합니다. 줄을 탭하면 해당 채팅이 열립니다.',
-  'hudChrome.options.chatUnreadBoxGeneral': '일반 채팅도 상자에 집계',
   'hudChrome.options.itemLevelLine': '아이템 레벨 {level}',
   'hudChrome.options.itemScoreLine': '점수 {score}',
   'hudChrome.landing.highContrast': '고대비',

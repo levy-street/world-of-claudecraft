@@ -2913,10 +2913,7 @@ export const sv_SE: EnTranslations = {
       "touchPreciseAim": "Exakt markriktning",
       "touchPreciseAimNote": "Sikta innan du kastar markbesvärjelser. Stäng av för att kasta omedelbart på den föreslagna punkten.",
       "touchTapMenus": "Tryckmenyer",
-      "touchTapMenusNote": "Öppna handlings-, förbruknings- och menykontrollerna med ett tryck i stället för ett svep. Tryck på ett föremål för att använda det, tryck på kontrollen igen för dess vanliga funktion, eller tryck utanför för att stänga.",
-      "chatUnreadBox": "Unread chat box",
-      "chatUnreadBoxNote": "Shows unread whispers and party chat above the Actions button. Tap a line to open that chat.",
-      "chatUnreadBoxGeneral": "Count General chat in the box"
+      "touchTapMenusNote": "Öppna handlings-, förbruknings- och menykontrollerna med ett tryck i stället för ett svep. Tryck på ett föremål för att använda det, tryck på kontrollen igen för dess vanliga funktion, eller tryck utanför för att stänga."
     },
     "talentRows": {
       "tab": "Val",

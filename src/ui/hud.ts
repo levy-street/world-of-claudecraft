@@ -12148,7 +12148,6 @@ export class Hud {
                 ev.fromTitle,
                 ev.classId,
               );
-              if (ev.fromPid !== this.sim.playerId) this.chatWindow.noteChatReceived('general');
               break;
             case 'world':
               this.chatLogFrom(

@@ -6,7 +6,7 @@ import {
 } from '../src/ui/hud/chat/whisper_unread_core';
 
 // The badge's print rule. The count it prints is the whisper slot of the
-// shared unread counter, whose rules are pinned in chat_unread_core.test.ts.
+// unread counter, whose rules are pinned in chat_unread_core.test.ts.
 
 describe('whisper unread badge print rule', () => {
   it('prints the count up to the cap, then the overflow form', () => {
@@ -34,16 +34,14 @@ describe('hud.ts wiring', () => {
     expect(note).toBeGreaterThan(otherwise);
   });
 
-  it('reports party and general lines only when another player sent them', () => {
-    for (const channel of ['party', 'general']) {
-      const start = hud.indexOf(`case '${channel}':`, hud.indexOf("case 'chat': {"));
-      const branch = hud.slice(start, hud.indexOf('break;', start));
-      expect(branch).toContain(
-        `if (ev.fromPid !== this.sim.playerId) this.chatWindow.noteChatReceived('${channel}');`,
-      );
-      expect(hud.split(`noteChatReceived('${channel}')`).length - 1).toBe(1);
-    }
-    // No other channel feeds the touch unread surfaces.
-    expect(hud.split('noteChatReceived(').length - 1).toBe(3);
+  it('reports party lines only when another player sent them, and never General', () => {
+    const start = hud.indexOf("case 'party':", hud.indexOf("case 'chat': {"));
+    const branch = hud.slice(start, hud.indexOf('break;', start));
+    expect(branch).toContain(
+      "if (ev.fromPid !== this.sim.playerId) this.chatWindow.noteChatReceived('party');",
+    );
+    // Whisper and party are the only channels that feed the touch unread badge.
+    expect(hud.split('noteChatReceived(').length - 1).toBe(2);
+    expect(hud).not.toContain("noteChatReceived('general')");
   });
 });

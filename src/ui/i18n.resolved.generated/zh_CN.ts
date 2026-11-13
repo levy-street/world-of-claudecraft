@@ -2913,10 +2913,7 @@ export const zh_CN: EnTranslations = {
       "touchPreciseAim": "精确地面选点",
       "touchPreciseAimNote": "施放地面法术前先瞄准。关闭后会立即在建议位置施放。",
       "touchTapMenus": "点击菜单",
-      "touchTapMenusNote": "用点击代替滑动来打开动作、消耗品和菜单控件。点击条目即可使用，再次点击控件执行其常用操作，点击外部则关闭。",
-      "chatUnreadBox": "未读聊天框",
-      "chatUnreadBoxNote": "在“操作”按钮上方显示未读的密语和小队聊天。点击某一行即可打开对应的聊天。",
-      "chatUnreadBoxGeneral": "在聊天框中统计综合频道"
+      "touchTapMenusNote": "用点击代替滑动来打开动作、消耗品和菜单控件。点击条目即可使用，再次点击控件执行其常用操作，点击外部则关闭。"
     },
     "talentRows": {
       "tab": "抉择",

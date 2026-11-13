@@ -888,9 +888,6 @@ export function buildGraphicsSections(
         note('hudChrome.options.touchPreciseAimNote'),
         boolToggle(s, 'touchTapMenus', 'hudChrome.options.touchTapMenus'),
         note('hudChrome.options.touchTapMenusNote'),
-        boolToggle(s, 'chatUnreadBox', 'hudChrome.options.chatUnreadBox'),
-        note('hudChrome.options.chatUnreadBoxNote'),
-        boolToggle(s, 'chatUnreadBoxGeneral', 'hudChrome.options.chatUnreadBoxGeneral'),
       ],
     });
   }

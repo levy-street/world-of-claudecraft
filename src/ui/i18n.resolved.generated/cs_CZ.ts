@@ -2913,10 +2913,7 @@ export const cs_CZ: EnTranslations = {
       "touchPreciseAim": "Přesné zaměřování na zem",
       "touchPreciseAimNote": "Zaměř, než sešleš kouzlo na zem. Vypnutím sešleš okamžitě na navržený bod.",
       "touchTapMenus": "Menu klepnutím",
-      "touchTapMenusNote": "Otevírej ovladače akcí, spotřebních předmětů a menu klepnutím místo přejetím. Klepni na položku, ať ji použiješ, klepni na ovladač znovu pro jeho obvyklou akci, nebo klepni mimo něj, ať ho zavřeš.",
-      "chatUnreadBox": "Unread chat box",
-      "chatUnreadBoxNote": "Shows unread whispers and party chat above the Actions button. Tap a line to open that chat.",
-      "chatUnreadBoxGeneral": "Count General chat in the box"
+      "touchTapMenusNote": "Otevírej ovladače akcí, spotřebních předmětů a menu klepnutím místo přejetím. Klepni na položku, ať ji použiješ, klepni na ovladač znovu pro jeho obvyklou akci, nebo klepni mimo něj, ať ho zavřeš."
     },
     "talentRows": {
       "tab": "Volby",

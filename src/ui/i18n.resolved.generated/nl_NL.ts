@@ -2913,10 +2913,7 @@ export const nl_NL: EnTranslations = {
       "touchPreciseAim": "Nauwkeurig Grondmikken",
       "touchPreciseAimNote": "Mik voordat je grondspreuken werpt. Zet dit uit om direct op het voorgestelde punt te werpen.",
       "touchTapMenus": "Tik voor menu's",
-      "touchTapMenusNote": "Open de actie-, verbruiksartikelen- en menuknoppen met een tik in plaats van een veeg. Tik op een item om het te gebruiken, tik nogmaals op de knop voor de gebruikelijke actie, of tik buiten het venster om te sluiten.",
-      "chatUnreadBox": "Unread chat box",
-      "chatUnreadBoxNote": "Shows unread whispers and party chat above the Actions button. Tap a line to open that chat.",
-      "chatUnreadBoxGeneral": "Count General chat in the box"
+      "touchTapMenusNote": "Open de actie-, verbruiksartikelen- en menuknoppen met een tik in plaats van een veeg. Tik op een item om het te gebruiken, tik nogmaals op de knop voor de gebruikelijke actie, of tik buiten het venster om te sluiten."
     },
     "talentRows": {
       "tab": "Keuzes",

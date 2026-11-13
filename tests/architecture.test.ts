@@ -3267,7 +3267,6 @@ const UI_DOM_MODULES = [
   'src/ui/hud/action_bar/action_bar_toggle_controller.ts',
   'src/ui/hud/chat/chat_geometry_controller.ts',
   'src/ui/hud/chat/chat_window_controller.ts',
-  'src/ui/hud/chat/chat_unread_box.ts',
   'src/ui/hud/chat/chat_unread_controller.ts',
   'src/ui/hud/chat/whisper_unread_badge.ts',
   'src/ui/hud/cosmetics/skin_event_controller.ts',

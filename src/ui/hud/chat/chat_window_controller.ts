@@ -96,8 +96,8 @@ export class ChatWindowController {
   // so a tab moved by drag or reorder stays the keyboard focus target.
   private rovingChatTab: ChatTabId | null = null;
   private readonly unreadTabs = new Map<ChatOpenTab, number>();
-  // The touch HUD's unread counts (the whisper badge on the controls that open
-  // chat, and the unread box). A second counter beside `unreadTabs` because that
+  // The touch HUD's unread counts (the badge on the controls that open chat).
+  // A second counter beside `unreadTabs` because that
   // map only tracks OPEN channel tabs that are not active: it has no entry for
   // All, and none at all while a channel's tab is not open, which is exactly
   // when a closed chat hides a line.
@@ -108,8 +108,6 @@ export class ChatWindowController {
       document: deps.document,
       isTouchLayout: () => deps.isMobileLayout(),
       activeTab: () => this.activeChatTab,
-      openTabs: () => this.chatTabs,
-      selectTab: (tab) => this.selectTab(tab, true),
     });
   }
 

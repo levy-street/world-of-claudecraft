@@ -377,14 +377,6 @@ export const BOOL_SETTINGS = {
   // path-based flick, and it is also the answer for players who cannot hold and
   // drag reliably.
   touchTapMenus: { def: false },
-  // on by default: the touch HUD's unread chat box over the Quick Actions
-  // control, one row per channel with lines received since the player last
-  // looked at it (whispers and party chat). Ignored on desktop, where the chat
-  // log is always on screen.
-  chatUnreadBox: { def: true },
-  // off by default: also count General chat in that box. Off because on a busy
-  // realm the General count never stops climbing.
-  chatUnreadBoxGeneral: { def: false },
   // on by default: mask configured swear words in chat with ****. Purely a
   // local display choice; the server sends raw text and each client decides.
   // (Slurs are blocked server-side regardless and never reach here.)
