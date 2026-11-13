@@ -113,6 +113,23 @@ describe('deriveEmissiveTexels', () => {
     expect(emissive[2]).toBeGreaterThan(emissive[0]);
   });
 
+  it('keeps a texel near its own colour under a low tintMix (a multi-colour window)', () => {
+    // The Heartmeld Staff's window spans four painted gems: graded at the default 0.62 a warm
+    // fire texel would be pulled to the azure tint; at 0.12 it stays red-dominant.
+    const fire: [number, number, number] = [255, 90, 20];
+    const wide: WeaponEmissiveWindow = { ...FROST, hue: [8, 215], minS: 0.5, minL: 0.4 };
+    const graded = rgba(fire);
+    deriveEmissiveTexels(graded, rgba(fire), wide, TINT);
+    const kept = rgba(fire);
+    deriveEmissiveTexels(kept, rgba(fire), { ...wide, tintMix: 0.12 }, TINT);
+    expect(graded[2]).toBeGreaterThan(graded[0]);
+    expect(kept[0]).toBeGreaterThan(kept[2]);
+    // and an absent tintMix grades exactly like the authored default
+    const explicit = rgba(fire);
+    deriveEmissiveTexels(explicit, rgba(fire), { ...wide, tintMix: 0.62 }, TINT);
+    expect([...explicit]).toEqual([...graded]);
+  });
+
   it('walks every texel of a multi-texel buffer independently', () => {
     const { emissive, albedo } = derive([
       [51, 187, 255],
@@ -149,6 +166,7 @@ describe('weaponEmissiveSignature / weaponEmissiveCacheKey', () => {
       { ...FROST_SPEC, intensity: 1.01 },
       { ...FROST_SPEC, pulse: 0.31 },
       { ...FROST_SPEC, pulseHz: 0.56 },
+      { ...FROST_SPEC, tintMix: 0.12 },
     ];
     for (const variant of variants) {
       expect(weaponEmissiveSignature(variant), JSON.stringify(variant)).not.toBe(base);
@@ -157,6 +175,12 @@ describe('weaponEmissiveSignature / weaponEmissiveCacheKey', () => {
     // can collide onto one cached texture pair.
     const keys = new Set(variants.map((spec) => weaponEmissiveSignature(spec)));
     expect(keys.size).toBe(variants.length);
+  });
+
+  it('keeps every existing key when tintMix is not authored', () => {
+    expect(weaponEmissiveSignature(FROST_SPEC)).toBe(
+      '150:245:0.18:0.5:0.85:0.4:6737151:1:0.3:0.55',
+    );
   });
 
   it('separates the source map from the spec in the key', () => {

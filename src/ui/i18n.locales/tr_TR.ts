@@ -24324,30 +24324,13 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wildheartAlert.stalkedLine':
     'Isırıklarından kaçmak için jaguardan koş. Sürü Bağını kırmak için Canavar Efendisinden uzağa çek',
   'hudChrome.wildheartAlert.stalkedTitle': 'İzleniyorsun!',
-  'hudChrome.wocStore.skins.duskwick_staff.look':
-    'Demirle bağlanmış iki bükülü kara ahşap kol; tepesinde iki kıvrık boynuz arasında mor alacakaranlık alevi yakan açık demir fener, tabanından sallanan zincirler.',
-  'hudChrome.wocStore.skins.duskwick_staff.lore':
-    'Salondaki bir fener dışında hepsi parlak yanar. Alacakaranlık alevi gece salonu korumak için yakıldı; diğerlerinin ışık verdiği yerde gölge yayar. Garrick fitilini kendisi keser. Duman ve mor parıltı yalnızca görünümdür.',
-  'hudChrome.wocStore.skins.duskwick_staff.name': 'Alacakaranlık Fitili Asası',
-  'hudChrome.wocStore.skins.hearthbrand_sword.look':
-    'Ocak sıcağı kenarlı, karartılmış çelikten alev dalgalı bıçak; iki yüzünde dallanan erimiş damar, yanan taş çevresinde bronz alev kabza siperi, koyu kan kırmızısı sap.',
-  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
-    'Fener Salonunda, kurulduğundan beri sönmemiş ocak vardır; Garrick Holt bu bıçağın onun közlerinde soğutulduğuna yemin eder. Taşıyan üyeler, en soğuk nöbette bile sapın sıcak kaldığını söyler. Kenarlarındaki ateş yalnızca görünümdür.',
   'hudChrome.wocStore.skins.hearthbrand_sword.name': 'Ocak Damgası',
   'hudChrome.wocStore.skins.lantern_hall_sword.look':
     'Kor fener ateşi yivli geniş çelik bıçak, yaldızlı yanlar, çapraz siperde yanan kafesli fener, mavi deri sap.',
   'hudChrome.wocStore.skins.lantern_hall_sword.lore':
     'Garrick Holt bu bıçağı yabancıya satmaz. Fener Salonunun sözleşmelerini hafta hafta tutan üyelere gider; her seferinde aynı sözlerle verir: siperdeki fener salonun kendi ocağından yakılır; nereye taşırsan salon seninle gelir. Yivdeki ateş yalnızca görünümdür. Asıl olan sözdür.',
   'hudChrome.wocStore.skins.lantern_hall_sword.name': 'Fener Salonunun Kılıcı',
-  'hudChrome.wocStore.skins.rimelight_staff.look':
-    'Gümüş bağlı, parlayan kırağı sarılı soluk gövde; tepesinde parçalı buz tacı içinde büyük soğuk ışık kristali tutan gümüş pençe, yakasından sarkan buz sarkıtları.',
-  'hudChrome.wocStore.skins.rimelight_staff.lore':
-    'Fener Salonunun kış nöbetçileri ana yolda böyle asalar taşırdı; taçları karda kaybolan yolcular için yanardı. Garrick, fazla mührü olan üyeler için rafta bir tane tutar. Buz ve soğuk ışığı yalnızca görünümdür.',
   'hudChrome.wocStore.skins.rimelight_staff.name': 'Kırağı Işığı Asası',
-  'hudChrome.wocStore.skins.squallcrest_sword.look':
-    'Kırılan dalga kadar parlak kenarlı uzun deniz mavisi bıçak; çatallı yıldırım tutan fırtına kanalı, tabanında yaldızlı dalga, bir kenarında yüzgeç, fırtına incisi çevresinde yaldızlı dalga siperi.',
-  'hudChrome.wocStore.skins.squallcrest_sword.lore':
-    'Lonca için yelken açan kaptan bu bıçağı, direğini koparıp gemisini çan gibi çınlatan sağanaktan getirdi. Garrick yalnızca mühürle satar, her alıcıyı fırtına öncesi uğuldadığı konusunda uyarır. Yıldırım ve deniz ışığı yalnızca görünümdür.',
   'hudChrome.wocStore.skins.squallcrest_sword.name': 'Sağanak Tepesi',
   'dungeonGuide.drownedTemple.accept.1': 'Teşekkürler. Arkandan yürüyüp yoluna çıkmayacağım.',
   'dungeonGuide.drownedTemple.accept.2': 'Sonunda aşağı iniyorum. Yürü. Yetişirim.',

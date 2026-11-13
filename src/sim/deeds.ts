@@ -39,6 +39,7 @@ import { pointsSpent } from './content/talents';
 import { ITEMS, MOBS, zoneAt } from './data';
 import { canWearDevBadgeTitle, devBadgeTitleTier } from './dev_badge_titles';
 import { onKillForGuildContracts } from './guild_contracts';
+import { instanceHalfWidthOf } from './instances/instance_footprint';
 import { MUSTER_PIKE_MAX_LEVEL } from './lance_balance_core';
 import { LAUNCH_PAPERDOLL_SLOTS } from './launch_paperdoll_slots';
 import { emitReferralBossEvidence } from './referral_evidence';
@@ -57,6 +58,7 @@ import {
 import { RESURRECTION_SICKNESS_ID } from './resurrection';
 import type { ArenaMatch, InstanceSlot, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
+import { healSmithHeartRewards, paySmithHeartDeedReward } from './smith_heart_feat_rewards';
 import {
   type DamageEventKind,
   DEED_STAT_KEYS,
@@ -164,6 +166,8 @@ export const FINAL_BOSS_DUNGEONS: Record<string, string> = {
   // recipient set, the wildheart precedent.
   ignivar_herald_of_the_last_flame: 'ignivar_raid_arena',
   varkhul_forgefather_of_the_last_flame: 'ignivar_inner_crucible',
+  // The Smith's Heart: its final boss clears the raid (dgn_smith_heart reads the record).
+  heart_masterless_strength: 'smith_heart',
 };
 
 // Perfection tasks: zero player deaths inside the boss's heroic instance
@@ -819,6 +823,9 @@ export function grantDeed(
   // at their next login). The grant is idempotent and draws no rng.
   const buddyReward = BUDDY_DEED_REWARDS[deedId];
   if (buddyReward) grantBuddy(ctx, meta.entityId, buddyReward);
+  // The Smith's Heart's feats pay a weapon appearance and the meta a mount, retro included
+  // (src/sim/smith_heart_feat_rewards.ts). Idempotent, draws no rng.
+  paySmithHeartDeedReward(ctx, meta, deedId);
   // Horizons titles score catalogRankOwned. Live grant of a title relic can
   // cross a Curator threshold; keep display rank and zero-Renown bridges aligned
   // without waiting for join retro. The rank bridges for ranks 2 to 4 are
@@ -1509,6 +1516,9 @@ export function seedItemDiscovery(ctx: SimContext, meta: PlayerMeta): void {
  *    (docs/design/deeds.md rule 5) and dead-end feat_book_complete. The deed
  *    is granted rather than left stranded. */
 export function retroFallbackGrants(ctx: SimContext, meta: PlayerMeta, player: Entity): void {
+  // The Smith's Heart's deed rewards heal at every join (a delivery the bags refused, an
+  // offline mirror that lost an appearance): src/sim/smith_heart_feat_rewards.ts.
+  healSmithHeartRewards(ctx, meta);
   // Proof: every craft skill except enchanting only ever comes from
   // successful crafts, so a positive value on any other craft proves the
   // first craft happened before the counter existed. Enchanting is excluded
@@ -1650,7 +1660,9 @@ export function onPlayerDeathForDeeds(ctx: SimContext, e: Entity): void {
   for (const inst of ctx.instances) {
     if (inst.partyKey === null) continue;
     const origin = ctx.instanceOriginOf(inst);
-    const inBand = Math.abs(e.pos.x - origin.x) < 120 && Math.abs(e.pos.z - origin.z) < 250;
+    const inBand =
+      Math.abs(e.pos.x - origin.x) < instanceHalfWidthOf(inst.dungeonId) &&
+      Math.abs(e.pos.z - origin.z) < 250;
     for (const mobId of inst.mobIds) {
       const boss = ctx.entities.get(mobId);
       if (!boss || boss.dead) continue;
@@ -1741,11 +1753,13 @@ export function onDeathlessRageResolvedForDeeds(ctx: SimContext, boss: Entity): 
 // use the kill-credit eligible snapshot instead, exactly like XP).
 function playersInInstance(ctx: SimContext, inst: InstanceSlot): PlayerMeta[] {
   const origin = ctx.instanceOriginOf(inst);
+  const halfWidth = instanceHalfWidthOf(inst.dungeonId);
   const out: PlayerMeta[] = [];
   for (const meta of ctx.players.values()) {
     const e = ctx.entities.get(meta.entityId);
     if (!e) continue;
-    if (Math.abs(e.pos.x - origin.x) < 120 && Math.abs(e.pos.z - origin.z) < 250) out.push(meta);
+    if (Math.abs(e.pos.x - origin.x) < halfWidth && Math.abs(e.pos.z - origin.z) < 250)
+      out.push(meta);
   }
   return out;
 }

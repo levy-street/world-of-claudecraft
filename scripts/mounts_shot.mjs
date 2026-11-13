@@ -77,6 +77,7 @@ await page.evaluate(() => {
     'reins_referral_raptor',
     'reins_lanternback_troll',
     'reins_lantern_hall_destrier',
+    'reins_quarryheart_charger',
     'reins_wobbles_slime',
     'reins_nightwing_chimera',
     'reins_emberbristle_broom',

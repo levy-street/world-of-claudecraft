@@ -18616,6 +18616,10 @@
   #wildheart-alert,
   #sanctum-alert,
   #crypt-alert,
+  #heart-council-alert,
+  #heart-quench-alert,
+  #heart-final-alert,
+  #heart-knot-alert,
   #temple-alert,
   #kit-use-prompt {
     bottom: calc(260px + var(--castbar-h) + 14px);
@@ -18626,6 +18630,10 @@
   body.show-actionbar3 #wildheart-alert,
   body.show-actionbar3 #sanctum-alert,
   body.show-actionbar3 #crypt-alert,
+  body.show-actionbar3 #heart-council-alert,
+  body.show-actionbar3 #heart-quench-alert,
+  body.show-actionbar3 #heart-final-alert,
+  body.show-actionbar3 #heart-knot-alert,
   body.show-actionbar3 #temple-alert,
   body.show-actionbar3 #kit-use-prompt {
     bottom: calc(312px + var(--castbar-h) + 14px);
@@ -18636,6 +18644,10 @@
   body.mobile-touch #wildheart-alert,
   body.mobile-touch #sanctum-alert,
   body.mobile-touch #crypt-alert,
+  body.mobile-touch #heart-council-alert,
+  body.mobile-touch #heart-quench-alert,
+  body.mobile-touch #heart-final-alert,
+  body.mobile-touch #heart-knot-alert,
   body.mobile-touch #temple-alert,
   body.mobile-touch #kit-use-prompt {
     bottom: 56%;
@@ -19054,6 +19066,674 @@
   }
   body.mobile-touch #wildheart-alert {
     min-width: min(420px, calc(100vw - 32px));
+  }
+
+  /* ---------- The Smith's Heart's Hammer Council alert (the rock, the wake, the Weight, Resonance) ---------- */
+  /* Self-mounted by the shared encounter alert painter
+     (encounter_alert_painter.ts) under its own id, from src/ui/hud/dungeon/council_alert_view.ts.
+     It never takes the pointer. The state is carried by the text too: the
+     rock to share throbs in the soak gold, the wake sits in the vein's ochre,
+     the Weight in the hostile tone, a climbing crack in the hostile tone. */
+  #heart-council-alert {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-gold);
+  }
+  #heart-council-alert .fa-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-gold);
+  }
+  #heart-council-alert .fa-line {
+    font-size: 14px;
+  }
+  #heart-council-alert .fa-hint {
+    display: none;
+  }
+  #heart-council-alert .fa-bar {
+    --bar-h: 12px;
+    --bar-color: var(--color-gold);
+    width: 100%;
+  }
+  #heart-council-alert .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #heart-council-alert.is-rock {
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #heart-council-alert.is-weight,
+  #heart-council-alert.is-rush {
+    border-color: var(--color-hostile);
+  }
+  #heart-council-alert.is-weight .fa-title,
+  #heart-council-alert.is-rush .fa-title,
+  #heart-council-alert.is-weight .fa-fill,
+  #heart-council-alert.is-rush .fa-fill {
+    color: var(--color-hostile);
+    --bar-color: var(--color-hostile);
+  }
+  #heart-council-alert.is-resonance {
+    border-color: var(--color-energy);
+  }
+  #heart-council-alert.is-resonance .fa-title,
+  #heart-council-alert.is-resonance .fa-fill {
+    color: var(--color-energy);
+    --bar-color: var(--color-energy);
+  }
+  /* Mountain's Rush on YOU: the one mark that kills, so it leaves the slot for the
+     screen's upper middle, big, red and throbbing for the whole bar (the owner's
+     playtest of 2026-11-12: the slot's panel went unnoticed). The raid sees the
+     red arrow over the marked player (council_rush_arrow.ts); this is the marked
+     player's own call, on every graphics tier. */
+  #heart-council-alert.is-rush,
+  body.show-actionbar3 #heart-council-alert.is-rush,
+  body.mobile-touch #heart-council-alert.is-rush {
+    top: 22%;
+    bottom: auto;
+    min-width: min(560px, calc(100vw - 32px));
+    padding: 14px 28px 16px;
+    border-width: 3px;
+    background: color-mix(in srgb, var(--color-hostile-rim) 55%, transparent);
+    animation: heart-rush-throb 0.55s ease-in-out infinite alternate;
+  }
+  #heart-council-alert.is-rush .fa-title {
+    font-size: 44px;
+    line-height: 1.05;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-shadow:
+      0 0 14px color-mix(in srgb, var(--color-hostile) 85%, transparent),
+      0 2px 0 var(--color-hostile-rim);
+  }
+  #heart-council-alert.is-rush .fa-bar {
+    --bar-h: 16px;
+  }
+  #heart-council-alert.is-rush .fa-bar-label {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-hostile);
+  }
+  body.mobile-touch #heart-council-alert.is-rush .fa-title {
+    font-size: 30px;
+  }
+  @keyframes heart-rush-throb {
+    from {
+      transform: translateX(-50%) scale(1);
+      box-shadow: 0 0 10px color-mix(in srgb, var(--color-hostile) 45%, transparent);
+    }
+    to {
+      transform: translateX(-50%) scale(1.06);
+      box-shadow: 0 0 36px color-mix(in srgb, var(--color-hostile) 90%, transparent);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #heart-council-alert {
+      animation: none;
+    }
+    #heart-council-alert.is-rush,
+    body.show-actionbar3 #heart-council-alert.is-rush,
+    body.mobile-touch #heart-council-alert.is-rush {
+      animation: none;
+      box-shadow: 0 0 28px color-mix(in srgb, var(--color-hostile) 80%, transparent);
+    }
+  }
+  /* The in-game Reduce Motion setting holds the throb too. */
+  body.reduce-motion #heart-council-alert.is-rush,
+  body.reduce-motion.show-actionbar3 #heart-council-alert.is-rush,
+  body.reduce-motion.mobile-touch #heart-council-alert.is-rush {
+    animation: none;
+    box-shadow: 0 0 28px color-mix(in srgb, var(--color-hostile) 80%, transparent);
+  }
+
+  /* ---------- The Smith's Heart's Guardian of the Quench cold bar ---------- */
+  /* Self-mounted by the shared encounter alert painter
+     (encounter_alert_painter.ts) under its own id, from
+     src/ui/hud/dungeon/quench_alert_view.ts: the player's own cold, the whole
+     fight, on every graphics tier (never hidden by the hints setting). It
+     never takes the pointer. The state is carried by the text too: the cold
+     rises in the frost tone, freezing and the freeze in the hostile tone, the
+     huddle's warmth in the gold, the water in the mana blue. */
+  #heart-quench-alert {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-debuff-frost);
+  }
+  #heart-quench-alert .fa-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-debuff-frost);
+  }
+  #heart-quench-alert .fa-line {
+    font-size: 14px;
+  }
+  #heart-quench-alert .fa-hint {
+    display: none;
+  }
+  #heart-quench-alert .fa-bar {
+    --bar-h: 14px;
+    --bar-color: var(--color-debuff-frost);
+    width: 100%;
+  }
+  #heart-quench-alert .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #heart-quench-alert.is-warm {
+    border-color: var(--color-gold);
+  }
+  #heart-quench-alert.is-warm .fa-title,
+  #heart-quench-alert.is-warm .fa-fill {
+    color: var(--color-gold);
+    --bar-color: var(--color-gold);
+  }
+  #heart-quench-alert.is-freezing,
+  #heart-quench-alert.is-frozen,
+  #heart-quench-alert.is-marked,
+  #heart-quench-alert.is-rime {
+    border-color: var(--color-hostile);
+  }
+  #heart-quench-alert.is-freezing .fa-title,
+  #heart-quench-alert.is-frozen .fa-title,
+  #heart-quench-alert.is-marked .fa-title,
+  #heart-quench-alert.is-rime .fa-title,
+  #heart-quench-alert.is-freezing .fa-fill,
+  #heart-quench-alert.is-frozen .fa-fill,
+  #heart-quench-alert.is-marked .fa-fill {
+    color: var(--color-hostile);
+    --bar-color: var(--color-hostile);
+  }
+  /* Living Rime: the bar is the crust's healing left, drawn in the frost
+     tone as it drains; the title in the hostile tone tells its carrier to
+     leave the group. */
+  #heart-quench-alert.is-rime .fa-fill {
+    color: var(--color-debuff-frost);
+    --bar-color: var(--color-debuff-frost);
+  }
+  #heart-quench-alert.is-freezing,
+  #heart-quench-alert.is-rime {
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #heart-quench-alert.is-water {
+    border-color: var(--color-mana);
+  }
+  #heart-quench-alert.is-water .fa-title,
+  #heart-quench-alert.is-water .fa-fill {
+    color: var(--color-mana);
+    --bar-color: var(--color-mana);
+  }
+  body.mobile-touch #heart-quench-alert {
+    min-width: min(340px, calc(100vw - 32px));
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #heart-quench-alert {
+      animation: none;
+    }
+  }
+  /* Docked on the player frame (dungeon_prompts.ts quenchDock; the owner's
+     rule of 2026-11-04: no box in the middle of the screen). A compact frost
+     bar riding just above the frame like a secondary resource bar: a frost
+     crystal icon and a small title on the left, the bar with its numbers on
+     the right, the state carried by colour, icon and the title's words. The
+     instruction line is dropped (the world shows what to do); the freeze
+     pulses the bar's edge, never anything over the screen's middle. */
+  #player-frame > #heart-quench-alert {
+    --qa-tone: var(--color-debuff-frost);
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: auto;
+    bottom: calc(100% + 6px);
+    transform: none;
+    min-width: 0;
+    max-width: none;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 8px 2px 26px;
+    border-width: 1px;
+    border-color: var(--qa-tone);
+    text-align: left;
+  }
+  #player-frame > #heart-quench-alert::before {
+    content: "";
+    position: absolute;
+    left: 7px;
+    top: 50%;
+    width: 13px;
+    height: 13px;
+    transform: translateY(-50%);
+    clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+    background: radial-gradient(circle, var(--color-text-light) 0 22%, var(--qa-tone) 60%);
+  }
+  #player-frame > #heart-quench-alert .fa-title {
+    flex: 0 0 auto;
+    max-width: 46%;
+    overflow: hidden;
+    font-size: 11px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--qa-tone);
+  }
+  #player-frame > #heart-quench-alert .fa-line {
+    display: none;
+  }
+  #player-frame > #heart-quench-alert .fa-bar {
+    --bar-h: 10px;
+    --bar-color: var(--qa-tone);
+    flex: 1 1 auto;
+    width: auto;
+  }
+  #player-frame > #heart-quench-alert .fa-bar-label {
+    flex: 0 0 auto;
+    font-size: 10px;
+    white-space: nowrap;
+  }
+  #player-frame > #heart-quench-alert.is-warm {
+    --qa-tone: var(--color-gold);
+  }
+  #player-frame > #heart-quench-alert.is-freezing,
+  #player-frame > #heart-quench-alert.is-frozen,
+  #player-frame > #heart-quench-alert.is-marked {
+    --qa-tone: var(--color-hostile);
+  }
+  #player-frame > #heart-quench-alert.is-water {
+    --qa-tone: var(--color-mana);
+  }
+  #player-frame > #heart-quench-alert.is-freezing {
+    animation: none;
+  }
+  #player-frame > #heart-quench-alert.is-frozen {
+    animation: heart-quench-dock-pulse 0.7s ease-in-out infinite alternate;
+  }
+  @keyframes heart-quench-dock-pulse {
+    from {
+      box-shadow: 0 0 0 0 transparent;
+    }
+    to {
+      box-shadow: 0 0 10px 1px var(--qa-tone);
+    }
+  }
+  body.mobile-touch #player-frame > #heart-quench-alert {
+    left: -4px;
+    right: auto;
+    width: min(220px, 60vw);
+    min-width: 0;
+    bottom: calc(100% + 10px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #player-frame > #heart-quench-alert.is-frozen {
+      animation: none;
+    }
+  }
+  body.mobile-touch #heart-council-alert {
+    min-width: min(420px, calc(100vw - 32px));
+  }
+
+  /* ---------- The Smith's Heart's Masterless Strength alert (the cold, the ember, the lightning, Crushed) ---------- */
+  /* Self-mounted by the shared encounter alert painter
+     (encounter_alert_painter.ts) under its own id, from
+     src/ui/hud/dungeon/final_alert_view.ts: what the final fight asks of the
+     local player, on every graphics tier (never hidden by the hints setting).
+     It never takes the pointer. The state is carried by the text too: the
+     cold in the frost tone, freezing and the freeze in the hostile tone, the
+     Ember Mark in the fire tone, Drawn Lightning in the storm's violet,
+     Crushed in the Hammer's gold. */
+  /* The Knotted Gale (Mythic, knot_alert_view.ts): Portal A in the storm's teal,
+     Portal B in its violet, Portal C in spring green, Portal D in rose (the
+     floor's colours), the load in gold, the lip in
+     the hostile tone. The panel is the throw's button while the player carries. */
+  #heart-knot-alert {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-debuff-frost);
+  }
+  #heart-knot-alert.is-pressable {
+    pointer-events: auto;
+    cursor: pointer;
+  }
+  #heart-knot-alert.is-portalB {
+    border-color: var(--color-debuff-shadow);
+  }
+  /* Phase 2's second pair: Portal C in spring green, Portal D in rose. */
+  #heart-knot-alert.is-portalC {
+    border-color: var(--color-knot-portal-c);
+  }
+  #heart-knot-alert.is-portalD {
+    border-color: var(--color-knot-portal-d);
+  }
+  #heart-knot-alert.is-carry {
+    border-color: var(--color-gold-300);
+  }
+  #heart-knot-alert.is-lip {
+    border-color: var(--color-debuff-fire);
+  }
+  #heart-knot-alert .fa-title {
+    font-size: 18px;
+    font-weight: 700;
+  }
+  #heart-knot-alert .fa-hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  #heart-knot-alert .fa-bar {
+    --bar-h: 12px;
+    --bar-color: var(--color-debuff-frost);
+    width: 100%;
+  }
+  #heart-knot-alert.is-portalB .fa-bar {
+    --bar-color: var(--color-debuff-shadow);
+  }
+  #heart-knot-alert.is-portalC .fa-bar {
+    --bar-color: var(--color-knot-portal-c);
+  }
+  #heart-knot-alert.is-portalD .fa-bar {
+    --bar-color: var(--color-knot-portal-d);
+  }
+  #heart-knot-alert.is-carry .fa-bar {
+    --bar-color: var(--color-gold-300);
+  }
+  #heart-knot-alert.is-lip .fa-bar {
+    --bar-color: var(--color-debuff-fire);
+  }
+  #heart-knot-alert .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  /* The Smith's Heart's short alerts (2026-11-09): a title over the bar and
+     its number, no sentence under it. The number (the seconds left, or a
+     gauge's value) sits under the bar, in steady-width digits. */
+  #heart-council-alert .fa-bar-label,
+  #heart-final-alert .fa-bar-label,
+  #heart-knot-alert .fa-bar-label {
+    font-size: 13px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  #heart-final-alert {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-debuff-frost);
+    --final-alert-tone: var(--color-debuff-frost);
+  }
+  #heart-final-alert.is-ember {
+    --final-alert-tone: var(--color-debuff-fire);
+  }
+  #heart-final-alert.is-drawn {
+    --final-alert-tone: var(--color-debuff-shadow);
+  }
+  #heart-final-alert.is-crushed,
+  #heart-final-alert.is-weight {
+    --final-alert-tone: var(--color-gold);
+  }
+  #heart-final-alert.is-coal {
+    --final-alert-tone: var(--color-hostile);
+  }
+  #heart-final-alert.is-tether {
+    --final-alert-tone: var(--color-debuff-frost);
+  }
+  #heart-final-alert.is-freezing,
+  #heart-final-alert.is-frozen {
+    --final-alert-tone: var(--color-hostile);
+  }
+  #heart-final-alert {
+    border-color: var(--final-alert-tone);
+  }
+  #heart-final-alert .fa-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--final-alert-tone);
+  }
+  #heart-final-alert .fa-line {
+    font-size: 14px;
+  }
+  #heart-final-alert .fa-hint {
+    display: none;
+  }
+  #heart-final-alert .fa-bar {
+    --bar-h: 14px;
+    --bar-color: var(--final-alert-tone);
+    width: 100%;
+  }
+  #heart-final-alert .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #heart-final-alert.is-freezing,
+  #heart-final-alert.is-ember,
+  #heart-final-alert.is-drawn,
+  #heart-final-alert.is-coal,
+  #heart-final-alert.is-tether {
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  body.mobile-touch #heart-final-alert {
+    min-width: min(340px, calc(100vw - 32px));
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #heart-final-alert {
+      animation: none;
+    }
+  }
+
+  /* ---------- The Masterless Strength's Overload bars (the raid HUD) ---------- */
+  /* Self-mounted by src/ui/hud/dungeon/heart_overload_painter.ts from
+     heart_overload_view.ts while the final fight runs: four bars in one row
+     at the top of the screen, over the raid warnings, one per quarter in its
+     vein's tone, the quarter the boss drinks lit and framed, a bar near its
+     burst throbbing in the hostile tone; the foot says Taking Root's seconds
+     (or that it can be dragged), Vein-Shaken's and Heart Unbound's. Every
+     tier, never hidden by the hints setting; it never takes the pointer. The
+     state is carried by text too (each bar prints its percent). */
+  #heart-overload {
+    position: absolute;
+    left: 50%;
+    top: 8px;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    z-index: 31;
+    padding: 6px 12px 8px;
+    max-width: calc(100vw - 32px);
+    pointer-events: none;
+    user-select: none;
+    color: var(--color-text-light);
+    border: 1px solid var(--color-gold-700);
+  }
+  #heart-overload .ho-title {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--color-gold);
+  }
+  #heart-overload .ho-rows {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(72px, 112px));
+    gap: 8px;
+  }
+  #heart-overload .ho-row {
+    --ho-tone: var(--color-gold);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    align-items: center;
+    gap: 2px 6px;
+    padding: 3px 5px 4px;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    opacity: 0.72;
+  }
+  #heart-overload .ho-row.is-breath {
+    --ho-tone: var(--color-debuff-shadow);
+  }
+  #heart-overload .ho-row.is-quench {
+    --ho-tone: var(--color-debuff-frost);
+  }
+  #heart-overload .ho-row.is-hammer {
+    --ho-tone: var(--color-gold-500);
+  }
+  #heart-overload .ho-row.is-heat {
+    --ho-tone: var(--color-debuff-fire);
+  }
+  #heart-overload .ho-row.is-active {
+    opacity: 1;
+    border-color: var(--ho-tone);
+    box-shadow: 0 0 8px var(--ho-tone);
+  }
+  #heart-overload .ho-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ho-tone);
+  }
+  #heart-overload .ho-pct {
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+  #heart-overload .ho-bar {
+    --bar-h: 9px;
+    --bar-color: var(--ho-tone);
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+  #heart-overload .ho-fill {
+    width: 0;
+    transition: width 200ms linear;
+  }
+  #heart-overload .ho-row.is-danger .ho-pct,
+  #heart-overload .ho-row.is-danger .ho-label {
+    color: var(--color-hostile);
+  }
+  #heart-overload .ho-row.is-danger .ho-bar {
+    --bar-color: var(--color-hostile);
+  }
+  #heart-overload .ho-row.is-danger.is-active {
+    animation: bce-throb 0.7s ease-in-out infinite alternate;
+  }
+  #heart-overload .ho-foot {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    font-size: 12px;
+  }
+  #heart-overload .ho-root.is-rooted {
+    color: var(--color-gold);
+    font-weight: 700;
+  }
+  #heart-overload .ho-shaken,
+  #heart-overload .ho-unbound {
+    color: var(--color-hostile);
+    font-weight: 700;
+  }
+  /* Part 2: through an intermission the bars hold still (dimmed, no
+     motion) and the quarters whose Splinters live are lit; in the final
+     phase the bars are off and the enrage's line takes their place; the
+     poured elements read on their own line. */
+  #heart-overload.is-frozen .ho-row {
+    opacity: 0.5;
+  }
+  #heart-overload.is-frozen .ho-fill {
+    transition: none;
+  }
+  #heart-overload .ho-row.is-awake {
+    opacity: 1;
+    border-color: var(--ho-tone);
+    box-shadow: 0 0 10px var(--ho-tone);
+  }
+  #heart-overload.is-off .ho-rows {
+    display: none;
+  }
+  #heart-overload .ho-phase {
+    color: var(--color-gold);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  #heart-overload .ho-phase.is-urgent {
+    color: var(--color-hostile);
+    animation: bce-throb 0.7s ease-in-out infinite alternate;
+  }
+  #heart-overload .ho-splinters {
+    color: var(--color-text-light);
+    font-weight: 700;
+  }
+  #heart-overload .ho-poured {
+    text-align: center;
+    font-size: 12px;
+    color: var(--color-debuff-fire);
+  }
+  body.mobile-touch #heart-overload {
+    top: 4px;
+    padding: 4px 8px 6px;
+  }
+  body.mobile-touch #heart-overload .ho-rows {
+    grid-template-columns: repeat(4, minmax(56px, 1fr));
+    gap: 4px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #heart-overload .ho-row,
+    #heart-overload .ho-phase {
+      animation: none;
+    }
   }
 
   /* ---------- The Gravewyrm Sanctum's alert (the chains, the meltwater, the lake) ---------- */

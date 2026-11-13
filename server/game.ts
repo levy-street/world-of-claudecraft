@@ -47,7 +47,7 @@ import { lootHasGoneFfa } from '../src/sim/loot/loot_ffa';
 import type { MarketQuery } from '../src/sim/market_query';
 import { unequipWornMechChroma } from '../src/sim/mech_chroma_ownership';
 import {
-  partyFrameAbsorb,
+  partyFrameAbsorbs,
   partyFrameAggroTargets,
   partyFrameIncomingHeals,
   partyFrameRole,
@@ -3206,6 +3206,7 @@ export class GameServer {
       updateLive: (cosmetics) => this.cosmetics.updateLive(accountId, cosmetics),
     });
     this.cosmetics.applyQuestLockouts(pid, accountCosmetics);
+    this.cosmetics.grantDeedRewardSkins(accountId, this.sim.meta(pid)?.deedsEarned.keys() ?? []);
     // Seed the account-wide weapon-skin loadout onto the fresh sim entity so the
     // applied skin shows from the first snapshot (owned skins only).
     this.sim.setWeaponSkinLoadout(pid, ownedWeaponSkinLoadout(accountCosmetics));
@@ -8756,7 +8757,7 @@ export class GameServer {
             z: round2(pos.z),
             inCombat: e.inCombat ? 1 : 0,
             group: party.raidGroups.get(mPid) ?? 1,
-            absorb: partyFrameAbsorb(e.auras),
+            ...partyFrameAbsorbs(e.auras),
             role: partyFrameRole(meta.talentMods.role, meta.cls, e.auras),
             spec: meta.talentMods.spec ?? meta.talents.spec ?? null,
             // Effective health Rewind could currently restore to this member
@@ -8828,6 +8829,7 @@ export class GameServer {
           else deedUnlocks.set(s, [ev.deedId]);
           // Account ledger fan-out to sibling sessions (retro included: still a fact).
           this.ledger.noteDeedEarned(s, ev.deedId);
+          this.cosmetics.grantDeedRewardSkins(s.accountId, [ev.deedId]);
           // Marquee unlocks fan out to guildmates and followers, and
           // feed-worthy unlocks (titles, borders, the first koi) to the
           // Discord activity feed; retro unlocks NEVER fan out anywhere (a

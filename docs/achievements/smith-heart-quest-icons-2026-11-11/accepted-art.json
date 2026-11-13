@@ -1,0 +1,25 @@
+{
+  "batchId": "smith-heart-quest-icons-2026-11-11",
+  "styleContract": "woc-item-icon-v1",
+  "items": [
+    {
+      "itemId": "remnant_of_the_masterless_strength",
+      "model": "gpt-image-2 (ElevenLabs creative flow)",
+      "generationId": "flJZrUB5HbnAOsHFwJjH",
+      "prompt": "Classic dark-fantasy MMORPG painted inventory icon, square composition, premium hand-painted classic fantasy MMO rendering. Subject: a single jagged shard of dark mountain basalt, roughly fist sized, cracked open; inside its fractures four veins of light twist together: white-gold fire, storm-blue lightning, pale ice-blue frost and warm ochre earth glow, meeting at a small bright core. Faint wisps of escaping essence curl off the top edge. One centered complete subject in the middle of the image with generous dark margins on all sides, readable three-quarter view. Warm key light from the top-left, cool deep shadow toward bottom-right, tactile stone texture with crisp edge highlights, restrained magical glow that supports the silhouette. Opaque low-key painted vignette ground in deep charcoal and umber with subtle atmosphere and a soft contact shadow. No text, no letters, no frame, no border, no UI, no watermark, no transparency, no hands.",
+      "originalSha256": "a17618f74a3fdc2d8bd1abe35464055fbdfea47e4dbd06d71d1b6a433dbf8a24",
+      "framing": "16:9 original centre-cropped to 880 px wide, padded to a square with a blurred, darkened extension of its own ground, resized to the 512 master",
+      "masterSha256": "6912da2e6f111e4a07cc2a223395de9376fc0262ad21ff8530acacab408c2657"
+    },
+    {
+      "itemId": "coffer_of_the_highwatch_vigil",
+      "model": "gpt-image-2.5-sunburst (ElevenLabs creative flow)",
+      "generationId": "ZgAuDinsWLWlr2P1fwEu",
+      "prompt": "Classic dark-fantasy MMORPG painted inventory icon, square, premium hand-painted classic fantasy MMO rendering. Subject: a sturdy small coffer of dark oak bound with iron straps and corner plates, a soldierly watch-order chest; the lid is closed and sealed with a large disc of deep red wax stamped with a simple watchtower emblem (no letters), a short iron hasp, worn wood grain and scuffed metal. Three-quarter view showing the lid and front, closure clearly readable. One centered complete subject filling about 72 percent of the square with safe padding. Warm key light from the top-left, cool deep shadow toward bottom-right, controlled metal edge highlights, warm leather and wood wear. Opaque low-key painted vignette ground in deep charcoal and navy with subtle atmosphere and a soft contact shadow. No text, no letters, no numbers, no frame, no border, no UI, no watermark, no transparency.",
+      "originalSha256": "1292328a726c4ec2163eb5542641b696a47b9f7cfd2fc7b145418c8f1d3d40ff",
+      "framing": "16:9 original cropped to 1100 px wide, padded to a square with a blurred, darkened extension of its own ground, resized to the 512 master",
+      "masterSha256": "97bc55a24e44232132d508c74933b39e7c2e62d839bc060ec8966c75923381dc"
+    }
+  ],
+  "review": "Inspected at 512 and 128; the wax seal's tower and the shard's four veins carry each item's identity; no text, frame or transparency."
+}

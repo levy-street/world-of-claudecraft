@@ -3,7 +3,8 @@
 // Gravewyrm Sanctum's sanctum_alert_view.ts), each under its own root id and
 // kind list (AlertLook). A self-mounted panel in the dungeon prompts' slot
 // (low over the action bar), shown while a mechanic asks something of the
-// local player: the title, the line saying what to do, an optional hint and
+// local player: the title, the line saying what to do (none when the view
+// gives none), an optional hint and
 // the bar (with the words a view prints on it). A view may mark the panel
 // pressable: then the whole panel is a button, and a tap (or a click) is the
 // interact press. The skeleton is built once; every per-frame value rides the
@@ -64,6 +65,9 @@ export class EncounterAlert {
     w.toggleClass(root, 'is-pressable', view.pressable);
     w.setText(slots.title, view.title);
     w.setText(slots.line, view.line);
+    // A view may give no line (the Smith's Heart's short alerts): no blank row.
+    // A style prop, never setDisplay: the line's single slot is its text's.
+    w.setStyleProp(slots.line, 'display', view.line ? 'block' : 'none');
     w.setDisplay(slots.hint, view.hint ? 'flex' : 'none');
     w.setText(slots.hintText, view.hint);
     w.setText(slots.key, view.key);

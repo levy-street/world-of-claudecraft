@@ -1,14 +1,14 @@
 {
   "version": 2,
   "meta": {
-    "id": "live-42722-5ac5a288-c5a98e78-157d-421e9565-e4972e75",
+    "id": "live-429e3-d3d61074-6e9ec3a4-157d-421e9565-e4972e75",
     "name": "Live world",
     "description": "",
     "createdAt": 0,
     "updatedAt": 0,
     "seed": 20061,
     "parentId": "",
-    "overworldBase": "42722-5ac5a288-c5a98e78",
+    "overworldBase": "429e3-d3d61074-6e9ec3a4",
     "overworldRevision": "157d-421e9565-e4972e75"
   },
   "content": {
@@ -5949,6 +5949,34 @@
           "writ_of_the_hollow_grin",
           "reins_emberbristle_broom"
         ],
+        "dynamic": true
+      },
+      "heart_captain_thessaly": {
+        "id": "heart_captain_thessaly",
+        "name": "Captain Thessaly",
+        "title": "Highwatch Captain",
+        "pos": {
+          "x": 0,
+          "z": 0
+        },
+        "facing": 0,
+        "color": 8753822,
+        "questIds": [],
+        "greeting": "Keep your feet, $C. When the bellows breathes, step into my calm and let the wind break on us.",
+        "dynamic": true
+      },
+      "heart_warden_ada_collier": {
+        "id": "heart_warden_ada_collier",
+        "name": "Warden Ada Collier",
+        "title": "Vigil of Highwatch",
+        "pos": {
+          "x": 0,
+          "z": 0
+        },
+        "facing": 0,
+        "color": 8359053,
+        "questIds": ["q_heart_what_the_heart_let_go"],
+        "greeting": "Forty generations of the Vigil watched this mountain without knowing why. Now we know, $C. Mind what you wake in there.",
         "dynamic": true
       }
     },

@@ -14,6 +14,20 @@ import { waterLevelAt } from '../sim/world';
 import { SANCTUM_FOG_COLOR } from './gravewyrm_sanctum/sanctum_plan_core';
 import { applyIgnivarRaidFog, ignivarRaidFogStateForInterior } from './ignivar_raid_environment';
 import type { FogSceneState } from './interior_light_rig';
+import {
+  SMITH_HEART_BREATH_FOG,
+  SMITH_HEART_CORE_FOG,
+  SMITH_HEART_HAMMER_FOG,
+  SMITH_HEART_HEAT_FOG,
+  SMITH_HEART_QUENCH_FOG,
+  SMITH_HEART_RING_FOG,
+  smithHeartCameraInBreath,
+  smithHeartCameraInHammer,
+  smithHeartCameraInHeart,
+  smithHeartCameraInHeat,
+  smithHeartCameraInQuench,
+  smithHeartCameraInRing,
+} from './smith_heart/heart_environment';
 import { BASIN_FOG_COLOR } from './wildheart_basin/basin_plan_core';
 
 /** The Hollow Crypt's night fog colour (its sky dome fades to it at the horizon). */
@@ -66,8 +80,57 @@ export function resolveFogScene(
   // The Hollow Crypt is open-air too, but at night under its OWN sky: the
   // world dome hides and the interior group carries the moonlit sky.
   const inHollowCrypt = interior === 'hollow_crypt';
+  // The Smith's Heart: the Heart (its separate final room) has its own
+  // ember-night state; the main map borrows the Sunken Bastion's storm-dusk
+  // fog and light rig (its interior carries its own storm sky) until the
+  // per-room phases give each vein its own.
+  const inSmithHeartCore = interior === 'smith_heart' && smithHeartCameraInHeart(cam.x, cam.z);
+  // Its Hammer vein has its own warm quarry dusk (phase 2B).
+  const inSmithHeartHammer =
+    interior === 'smith_heart' && !inSmithHeartCore && smithHeartCameraInHammer(cam.x, cam.z);
+  // And the Breath its own storm summit light (phase 2G), which wins over
+  // the Ring's north of its mouth.
+  const inSmithHeartBreath =
+    interior === 'smith_heart' &&
+    !inSmithHeartCore &&
+    !inSmithHeartHammer &&
+    smithHeartCameraInBreath(cam.x, cam.z);
+  // And the Quench its own cold lake light (phase 2H), which wins over the
+  // Ring's east of its mouth.
+  const inSmithHeartQuench =
+    interior === 'smith_heart' &&
+    !inSmithHeartCore &&
+    !inSmithHeartHammer &&
+    !inSmithHeartBreath &&
+    smithHeartCameraInQuench(cam.x, cam.z);
+  // And the Heat the Hearth's own light (phase 2I), which wins over the
+  // Ring's west of its mouth.
+  const inSmithHeartHeat =
+    interior === 'smith_heart' &&
+    !inSmithHeartCore &&
+    !inSmithHeartHammer &&
+    !inSmithHeartBreath &&
+    !inSmithHeartQuench &&
+    smithHeartCameraInHeat(cam.x, cam.z);
+  // And the Ring round the seal its own (phase 2F).
+  const inSmithHeartRing =
+    interior === 'smith_heart' &&
+    !inSmithHeartCore &&
+    !inSmithHeartHammer &&
+    !inSmithHeartBreath &&
+    !inSmithHeartQuench &&
+    !inSmithHeartHeat &&
+    smithHeartCameraInRing(cam.x, cam.z);
   // The Sunken Bastion: open-air at storm-tide dusk under its own sky.
-  const inSunkenBastion = interior === 'sunken_bastion';
+  const inSunkenBastion =
+    interior === 'sunken_bastion' ||
+    (interior === 'smith_heart' &&
+      !inSmithHeartCore &&
+      !inSmithHeartHammer &&
+      !inSmithHeartRing &&
+      !inSmithHeartBreath &&
+      !inSmithHeartQuench &&
+      !inSmithHeartHeat);
   // The Drowned Temple: open-air at night over its lagoon, under its own sky.
   const inDrownedTemple = interior === 'drowned_temple';
   // The Gravewyrm Sanctum: open-air at polar dusk under its own sky.
@@ -90,21 +153,33 @@ export function resolveFogScene(
                 ? 'wildheartBasin'
                 : inHollowCrypt
                   ? 'hollowCrypt'
-                  : inSunkenBastion
-                    ? 'sunkenBastion'
-                    : inDrownedTemple
-                      ? 'drownedTemple'
-                      : inGravewyrmSanctum
-                        ? 'gravewyrmSanctum'
-                        : inLastKeep
-                          ? 'lastkeep'
-                          : inDawnhold
-                            ? 'dawnhold'
-                            : inside
-                              ? 'dungeon'
-                              : camY < waterLevelAt(cam.x, cam.z, seed) - 0.05
-                                ? 'underwater'
-                                : 'outdoor';
+                  : inSmithHeartCore
+                    ? 'smithHeartCore'
+                    : inSmithHeartHammer
+                      ? 'smithHeartHammer'
+                      : inSmithHeartRing
+                        ? 'smithHeartRing'
+                        : inSmithHeartBreath
+                          ? 'smithHeartBreath'
+                          : inSmithHeartQuench
+                            ? 'smithHeartQuench'
+                            : inSmithHeartHeat
+                              ? 'smithHeartHeat'
+                              : inSunkenBastion
+                                ? 'sunkenBastion'
+                                : inDrownedTemple
+                                  ? 'drownedTemple'
+                                  : inGravewyrmSanctum
+                                    ? 'gravewyrmSanctum'
+                                    : inLastKeep
+                                      ? 'lastkeep'
+                                      : inDawnhold
+                                        ? 'dawnhold'
+                                        : inside
+                                          ? 'dungeon'
+                                          : camY < waterLevelAt(cam.x, cam.z, seed) - 0.05
+                                            ? 'underwater'
+                                            : 'outdoor';
   return { interior, desired };
 }
 
@@ -155,6 +230,42 @@ export function applyFogScenePreset(
     fog.color.setHex(HOLLOW_CRYPT_FOG_COLOR);
     fog.near = 70;
     fog.far = 460;
+  } else if (desired === 'smithHeartCore') {
+    // The Heart: an ember-violet night air inside the mountain, pushed past
+    // the platform and its chasm so the chains read up to the crown.
+    fog.color.setHex(SMITH_HEART_CORE_FOG.color);
+    fog.near = SMITH_HEART_CORE_FOG.near;
+    fog.far = SMITH_HEART_CORE_FOG.far;
+  } else if (desired === 'smithHeartHammer') {
+    // The Hammer vein: quarry dust lit amber by the low sun, thin across the
+    // pit, thickening past the terraces into the fissure's far rock.
+    fog.color.setHex(SMITH_HEART_HAMMER_FOG.color);
+    fog.near = SMITH_HEART_HAMMER_FOG.near;
+    fog.far = SMITH_HEART_HAMMER_FOG.far;
+  } else if (desired === 'smithHeartRing') {
+    // The Ring: a cool neutral air, thin across the hub so the seal and the
+    // vein mouths read crisp.
+    fog.color.setHex(SMITH_HEART_RING_FOG.color);
+    fog.near = SMITH_HEART_RING_FOG.near;
+    fog.far = SMITH_HEART_RING_FOG.far;
+  } else if (desired === 'smithHeartBreath') {
+    // The Breath: a cool storm air over the summit, thin across the
+    // Cornice, the far crests going pale into the weather.
+    fog.color.setHex(SMITH_HEART_BREATH_FOG.color);
+    fog.near = SMITH_HEART_BREATH_FOG.near;
+    fog.far = SMITH_HEART_BREATH_FOG.far;
+  } else if (desired === 'smithHeartQuench') {
+    // The Quench: a cold pale-blue mist sinking with the vein, thin across
+    // the lake, the far walls and the falls softening into it.
+    fog.color.setHex(SMITH_HEART_QUENCH_FOG.color);
+    fog.near = SMITH_HEART_QUENCH_FOG.near;
+    fog.far = SMITH_HEART_QUENCH_FOG.far;
+  } else if (desired === 'smithHeartHeat') {
+    // The Heat: a warm smoke haze down the fissure, thin across the Forge,
+    // the far walls going into it.
+    fog.color.setHex(SMITH_HEART_HEAT_FOG.color);
+    fog.near = SMITH_HEART_HEAT_FOG.near;
+    fog.far = SMITH_HEART_HEAT_FOG.far;
   } else if (desired === 'sunkenBastion') {
     // Storm-tide sea fog: grey-green and heavy low over the water, pushed back
     // far enough that the whole headland climbs out of it from the landing and

@@ -186,6 +186,7 @@ import { createTurnInPlaceState, stepTurnInPlace } from './turn_in_place_core';
 import { warriorActionBlend } from './warrior_action_blend';
 import { WarriorActionProps } from './warrior_action_props';
 import { WarriorBodyEffects } from './warrior_body_effects';
+import { easeSink } from './water_sink_core';
 import { SPIN_ATTACK_VISUAL_DURATION, weaponAttackStyle } from './weapon_attack_style_core';
 import { fixedHandPropsShown, swappedClip, weaponLoadout } from './weapon_loadout_core';
 import {
@@ -1161,6 +1162,9 @@ export class CharacterVisual {
   // into so a shed step allocates nothing.
   private weaponVfxAuthored: Partial<WeaponVfxTuning> = {};
   private weaponVfxShed = 1;
+  // The reduced-motion setting update() last saw, handed to every weapon-skin rig so it caps
+  // its flashes (WeaponVfxHandle.setCalm is write-elided, so the per-frame push costs nothing).
+  private weaponVfxCalm = false;
   private readonly weaponVfxTuningScratch: WeaponVfxTuning = { ...DEFAULT_TUNING };
   /** Long-hair secondary motion (modular styles with sway morphs; empty and
    *  free on every other rig). */
@@ -1311,6 +1315,9 @@ export class CharacterVisual {
   private readonly harvestRecoil = new HarvestRecoil();
   private auraGlowColor = 0xffffff;
   private auraGlowIntensity = 0;
+  /** The drawn sink into water (setWaterSink) and where it is easing to. */
+  private waterSink = 0;
+  private waterSinkTarget = 0;
 
   private baseState: BaseState = 'idle';
   /** The seat facts of the last update (AnimState.seat): which chair clips the sit and
@@ -1497,6 +1504,9 @@ export class CharacterVisual {
   private meshToggles: GestureMeshToggles | null = null;
   /** VisualDef.glowPulses: the emissive map flared by gestures (glow_pulse.ts). */
   private glowPulse: GlowPulse | null = null;
+  /** Bound once: the glow pulse's own material test, handed to the glaze. */
+  private readonly glowPulseTakes = (src: THREE.Material): boolean =>
+    this.glowPulse?.takes(src) ?? false;
   /** VisualDef.turnRate / ClipMap.turn: the rooted body's drawn heading
    *  (turn_in_place_core.ts). */
   private readonly turnState = createTurnInPlaceState();
@@ -1608,7 +1618,9 @@ export class CharacterVisual {
       if (this.def.dials?.length) this.dials = new BoneDials(this.model, this.def.dials);
       if (this.def.meshToggles?.length)
         this.meshToggles = new GestureMeshToggles(this.model, this.def.meshToggles);
-      if (this.def.glowPulses?.pulses.length) this.glowPulse = new GlowPulse(this.def.glowPulses);
+      // A set with no gesture pulses still drives its death fade (the Quench trash's light going out).
+      if (this.def.glowPulses?.pulses.length || this.def.glowPulses?.deathFade !== undefined)
+        this.glowPulse = new GlowPulse(this.def.glowPulses);
       if (key === 'form_metamorph') {
         this.metamorphLeftWing = this.model.getObjectByName('metamorph_wing_left_hinge') ?? null;
         this.metamorphRightWing = this.model.getObjectByName('metamorph_wing_right_hinge') ?? null;
@@ -1860,11 +1872,14 @@ export class CharacterVisual {
   /** `animate=false` skips mixer integration (distance throttling); state
    *  edges still latch so the pose catches up when the entity nears. */
   update(dt: number, s: AnimState, animate: boolean, reducedMotion = false): void {
+    this.weaponVfxCalm = reducedMotion;
     this.clock += dt;
     if (this.currentIsOneShot && this.currentOneShotIsAttack && this.def.clips.combatIdle) {
       this.braceUntil = extendBrace(this.braceUntil, this.clock);
     }
     if (this.surfaceResponse.update(dt, this.root, this.height)) this.applyVisualMaterials();
+    if (this.waterSink !== this.waterSinkTarget)
+      this.waterSink = easeSink(this.waterSink, this.waterSinkTarget, dt);
     // A streamed armor file that landed (or a better tier of one): the dressing
     // attaches it (at once with no work queue behind this body, else as a unit
     // of it), and the re-dress that follows is here, on the per-frame path.
@@ -1893,6 +1908,10 @@ export class CharacterVisual {
     // owns the materials until it ends, and re-applies them itself then).
     if (this.glowPulse?.step(dt, s.dead) && !this.surfaceResponse.active)
       this.applyVisualMaterials();
+    // ...but the surface clones then carry the pulse's level (a dead body's
+    // glow keeps fading under the Quench statue's glaze).
+    if (this.glowPulse && this.surfaceResponse.active)
+      this.surfaceResponse.emissiveScale(this.glowPulse.scale, this.glowPulseTakes);
     // A transparent effect whose clones finished linking: swap them in HERE,
     // on the per-frame path, never in the gate callback (see effectSwapSettled).
     if (this.effectSwapSettled) this.commitPendingEffectSwap();
@@ -2029,8 +2048,8 @@ export class CharacterVisual {
       } else if (baseChanged && previousBase === 'sleep' && this.wakeAction()) {
         // The dawn rise. Leaving the sleep loop plays the authored wake ONCE (it begins
         // in the sleep pose, so the hand-off is a continuation rather than a cut) and
-        // onFinished fades it into whatever base the machine now wants; an interrupting
-        // one-shot (a hit, an attack) simply replaces it, as with any other one-shot.
+        // onFinished fades it into whatever base the machine now wants. An attack cuts it
+        // like any other one-shot; a hit waits it out (playHit holds off during a one-shot).
         // Ahead of the idle-breaker arm below: leaving 'sleep' is a BASE change, so the
         // rig is never mid-fidget here, and the ordering keeps the rise unmissable.
         this.playOneShot(this.def.clips.wake as string, 1);
@@ -2298,7 +2317,9 @@ export class CharacterVisual {
     // as the character falling off the wall. Authored maps only: the built-in
     // world keeps the upright body it shipped with.
     this.poseWrap.rotation.z = isBuiltinWorldActive() ? 0 : (s.bankRoll ?? 0) * (1 - climb);
+    // (the rig root is the mount seat's; a body sunk in water rides the pose)
     this.poseWrap.position.y =
+      -this.waterSink +
       this.swimBlend * (swimRise + Math.sin(this.swimBobTime * 2 + this.bobPhase) * 0.08) +
       // Compress at the start of the pull, back to neutral as the body rises.
       CLIMB_BODY_DUCK * climb * (1 - env01(this.climbPhase, 0.1, 0.55));
@@ -2889,6 +2910,13 @@ export class CharacterVisual {
     return this.currentIsOneShot;
   }
 
+  /** The rig holds its sleep loop. The renderer keeps presenting it through a death whose
+   *  collapse waits for the killing blade (contact_queue.ts heldUntilCollapse): the sim clears
+   *  a corpse's sleep on the death tick, which would otherwise read as the wake edge. */
+  get sleeping(): boolean {
+    return this.baseState === 'sleep';
+  }
+
   /** A channel-start event can arrive just before its authoritative entity
    * snapshot. Enter the looping cast pose immediately and interrupt any short
    * projectile one-shot that would otherwise mask the first part of the channel. */
@@ -3193,7 +3221,10 @@ export class CharacterVisual {
   }
 
   playHit(): void {
+    // A sleeper does not flinch: a blow that wakes a dormant heap reaches the client before
+    // (or with) the bit that ends its sleep, and the wake one-shot then blocks it as above.
     if (this.deadLock || this.currentIsOneShot || this.hitCooldown > 0) return;
+    if (this.baseState === 'sleep') return;
     const clips = this.def.clips.hit;
     if (!clips || clips.length === 0) return;
     this.hitCooldown = HIT_REACT_COOLDOWN;
@@ -3334,6 +3365,20 @@ export class CharacterVisual {
     if (this.root.rotation.x === pitch && this.root.rotation.z === roll) return;
     this.root.rotation.x = pitch;
     this.root.rotation.z = roll;
+  }
+
+  /** A rig that owns materials of its own on this visual (the Quarryheart Charger's body,
+   *  quarryheart_charger_fx.ts) swaps them in through here: the snapshot an effect overlay or a
+   *  material commit restores becomes the rig's material, not the GLB's, and a mesh that must never
+   *  cast (light-only wind) leaves the caster set, whose shadow flag this visual owns. */
+  adoptMeshMaterial(mesh: THREE.Mesh, material: THREE.Material, castsShadow: boolean): void {
+    this.originalMaterials.set(mesh, material);
+    mesh.material = material;
+    if (castsShadow) return;
+    mesh.userData.shadowCaster = false;
+    mesh.castShadow = false;
+    const at = this.casters.indexOf(mesh);
+    if (at >= 0) this.casters.splice(at, 1);
   }
 
   setShadow(on: boolean): void {
@@ -3864,9 +3909,33 @@ export class CharacterVisual {
    *  no glow pulse, turn or entrance carries over from the last one. */
   resetForReuse(): void {
     this.turnState.seeded = false;
+    this.waterSink = 0;
+    this.waterSinkTarget = 0;
     this.entranceFor = undefined;
     this.wasSwimming = false;
+    // A body parked asleep starts again from its idle, like a fresh build: its next owner's
+    // first frame must never read as the sleep-to-awake edge, which would replay the whole
+    // wake on a mob already fighting.
+    if (this.baseState === 'sleep') {
+      this.baseState = 'idle';
+      this.fadeTo(this.baseAction(), 0, false);
+    }
     if (this.glowPulse?.reset() && !this.disposed) this.applyVisualMaterials();
+  }
+
+  /** Draw the body this far down into water it fell into (the Quench's
+   *  holes, smith_heart_fx/quench_glaze_core.ts quenchSinkOf), eased per frame;
+   *  0 stands it back on its feet. Presentation only. */
+  setWaterSink(depth: number): void {
+    this.waterSinkTarget = Math.max(0, depth);
+  }
+
+  /** A frost glaze held on the body's own material (the Quench's cold,
+   *  smith_heart_fx/quench_glaze_core.ts), or null to release it. Re-mounts
+   *  only on the on/off edge; while held, only its uniform moves. */
+  setFrostGlaze(glaze: { height: number; glow: number; bite: number; alpha: number } | null): void {
+    if (this.disposed) return;
+    if (this.surfaceResponse.setGlaze(glaze)) this.applyVisualMaterials();
   }
 
   clearElementResponse(): void {
@@ -4990,7 +5059,10 @@ export class CharacterVisual {
     // A veil that drops the weapon-skin VFX hides them and holds the light at 0.
     if (this.veilDrops('weaponVfx')) return;
     this.applyWeaponVfxShed(shed);
-    for (const handle of this.weaponVfx) handle.update(dt);
+    for (const handle of this.weaponVfx) {
+      handle.setCalm(this.weaponVfxCalm);
+      handle.update(dt);
+    }
   }
 
   // Write-elided: setTuning walks every part and rewrites its materials, so the
@@ -5098,7 +5170,7 @@ export class CharacterVisual {
     this.runeTintMaterials.clear();
     this.petrifiedMaterials.clear();
     this.auraGlowMaterials.clear();
-    this.surfaceResponse.materials.clear();
+    this.surfaceResponse.forget();
     this.glowPulse?.forget();
   }
 
@@ -6123,7 +6195,9 @@ export class CharacterVisual {
     this.beginAction(
       a,
       prev,
-      name === this.def.clips.rushArrival ? 0.04 : warriorActionBlend(this.key, name, ONESHOT_FADE),
+      name === this.def.clips.rushArrival
+        ? 0.04
+        : (this.def.clips.oneShotFade?.[name] ?? warriorActionBlend(this.key, name, ONESHOT_FADE)),
     );
     this.current = a;
     this.currentIsOneShot = true;

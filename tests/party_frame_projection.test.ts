@@ -177,3 +177,43 @@ describe('PartyFrameProjectionCache', () => {
     expect(projected).toEqual([11, 22, 44]);
   });
 });
+
+describe('PartyFrameProjectionCache: the heal absorb', () => {
+  it('carries the member heal absorb the shared helper produced through the cache', async () => {
+    const { partyFrameAbsorbs } = await import('../src/sim/party_frame_info');
+    const auras = [aura({ id: 'smith_heart_quench_rime', kind: 'heal_absorb', value: 420 })];
+    const cache = new PartyFrameProjectionCache();
+    cache.beginBroadcast();
+    const info = cache.forViewer({ ...party, members: [11] }, 11, (pid) => ({
+      member: {
+        pid,
+        name: 'Carrier',
+        cls: 'mage' as const,
+        level: 60,
+        hp: 800,
+        mhp: 1_000,
+        res: 0,
+        mres: 0,
+        rtype: null,
+        x: 0,
+        z: 0,
+        dead: 0,
+        inCombat: 1,
+        group: 1 as const,
+        ...partyFrameAbsorbs(auras),
+      },
+      auras,
+    }));
+    expect(info.members[0].healAbsorb).toBe(420);
+    expect(info.members[0].absorb).toBe(0);
+    // Broken: the field leaves the wire entirely, so the client reads none.
+    auras[0].value = 0;
+    cache.beginBroadcast();
+    const { auras: _rows, healAbsorb: _was, ...base } = info.members[0];
+    const after = cache.forViewer({ ...party, members: [11] }, 11, (pid) => ({
+      member: { ...base, pid, ...partyFrameAbsorbs(auras) },
+      auras,
+    }));
+    expect(after.members[0]).not.toHaveProperty('healAbsorb');
+  });
+});

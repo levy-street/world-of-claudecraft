@@ -33,6 +33,32 @@ For reference-image reconstruction and procedural GLB authoring, read the living
 - **`build_foliage.mjs`** is a superset for `foliage.json`: adds `weld + simplify`
   (target `ratio`), strips constant-white `COLOR_0`, and hue-rotates leaf textures
   via `recolor` rules. Use this only for foliage.
+- **`slim_rig_source.mjs`** is the pre-step for creature rigs whose clips need more than
+  the optimizer's default resample: an item names its raw export as `rigSource`, and the
+  step writes a thinned copy (`resampleTolerance`, `dropStillChannels`, `materialName`) to
+  the item's `src` before `build_assets.mjs` reads it (the `heart_*` specs are the users;
+  the header has the three-command recipe). Per-family knobs land here or in a superset
+  script, never in `build_assets.mjs` (fingerprinted, see below).
+- **`smith_heart_hammer_colossi/`** rebuilds the Smith's Quarry statues from their ChatGPT
+  turnaround sheets: split, Tripo P2 multiview, normalize and project-bake in Blender, ChatGPT's
+  recolour applied as a fitted colour grade (so the UV islands never move), then its spec and the
+  KTX2 step. Recipe and source records: `docs/design/raid/kit/hammer_colossi_src/README.md`.
+- **`smith_heart_breath_env_kit/`** prepares and ships the Breath vein's painted kit: the ChatGPT
+  paintings sized, the Tripo atlases graded onto the storm's ramp (`prepare_sources.mjs`), then the
+  Blender build, `build.mjs` and the KTX2 step. The sheets go through the colossi's `split_views.mjs`
+  and `tripo_views.mjs`. Recipe and source records: `docs/design/raid/kit/breath_env_src/README.md`.
+- **`smith_heart_quench_env_kit/`** prepares and ships the Quench vein's painted kit (the whole
+  ice realm): the ChatGPT paintings sized and the stone ones taken toward the slate, the Tripo
+  atlases graded by what a texel is (`quench_grade.mjs`: rock, ice, snow, coals), then the Blender
+  build, `build.mjs` and the KTX2 step. Recipe and source records, the arena concept included:
+  `docs/design/raid/kit/quench_env_src/README.md`.
+- **`smith_heart_heat_env_kit/`** prepares and ships the Heat vein's painted kit (the Hearth): the
+  ChatGPT paintings sized and taken toward charcoal, the Tripo atlases graded onto the sooted basalt
+  ramp (`heat_grade.mjs`: a warm texel keeps its fire only inside a broad warm region or as the
+  molten's saturated core, so the sheets' baked orange rim light goes to the basalt), then the
+  Blender build, `build.mjs` and the KTX2 step. Recipe and source records, both arena concepts
+  included: `docs/design/raid/kit/heat_env_src/README.md`. The four painted kits ship through one
+  step, `lib/ship_env_kit.mjs`, and build in Blender on `docs/design/raid/kit/env_kit_blender.py`.
 - **`build_battleground_map.mjs`** (+ `battleground/`, own CLAUDE.md) builds the Thornhollow Fields
   field's map document from the combat plan plus the Thornhollow art kit, and
   `compile_thornhollow.mjs` compiles that document into `src/sim/thornhollow_field.generated.ts`.
@@ -141,3 +167,6 @@ For reference-image reconstruction and procedural GLB authoring, read the living
 ## Never
 - Don't add `simplify` to a `character`/`static` item in `build_assets.mjs`, that's
   exactly why `build_foliage.mjs` exists separately.
+- Don't add per-asset options to `build_assets.mjs` at all: its bytes are a fingerprinted
+  input of every Eastbrook-era asset, so any edit re-mints that whole family. Use a
+  pre-step (`slim_rig_source.mjs`) or a superset script instead.

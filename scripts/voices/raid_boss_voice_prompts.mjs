@@ -153,3 +153,341 @@ export const RAID_BOSS_VOICE_PROMPTS = [
     guidanceScale: 0.78,
   },
 ];
+
+// The Smith's Heart's Hammer Council (src/sim/encounters/smith_heart/
+// council_voice.ts COUNCIL_LINES): one audition brief per member, its preview
+// the member's own lines in the order a pull hears them. Auditions only, like
+// the briefs above: nothing here is finalized until the designer picks a
+// candidate (node scripts/audition_raid_boss_voices.mjs --set council).
+
+const COUNCIL_REFS = [
+  'docs/design/raid/smith_heart.md',
+  'src/render/smith_heart_fx/council_bodies_core.ts',
+];
+
+/** @type {RaidBossVoicePrompt[]} */
+export const HAMMER_COUNCIL_VOICE_PROMPTS = [
+  {
+    npcId: 'heart-guardian',
+    takeId: 'quarry-colossus',
+    name: 'Guardian of the Hammer, Quarry Colossus',
+    voiceDescription:
+      'Native English, male-presenting, ageless. Perfect audio quality. Persona: the Guardian of ' +
+      'the Hammer, a vast golem of carved quarry stone that has kept a mountain forge for ' +
+      'centuries. Emotion: patient, immovable, then thunderous. A non-human voice: a very low, ' +
+      'slow bass with a gravel surface and a faint hollow resonance, as if the words are spoken ' +
+      'from inside a stone chest. Each phrase is short and deliberate, consonants landing like ' +
+      'set blocks, long pauses between sentences. Never a clean human narrator, never a robot, ' +
+      'never a growling beast: an ancient guardian who does not need to shout until the ' +
+      'mountain answers him.',
+    previewText: [
+      "[slow, a low stone rumble] Strangers in the Quarry. The Hammer's strength does not yield to flesh.",
+      '[thunderous] The mountain answers me! Hide, if the stone will have you!',
+      '[quiet, grinding] The stone remembers. What was theirs is mine.',
+      '[cold, from far inside the rock] I am the stone now. My wrath has no body left to fail.',
+      '[fading] My strength... I give it to the stone.',
+      "[a last breath of dust] The Hammer's strength... is yours to carry.",
+    ].join(' '),
+    visualReferences: COUNCIL_REFS,
+    guidanceScale: 0.7,
+  },
+  {
+    npcId: 'heart-singer',
+    takeId: 'resonant-seam',
+    name: 'The Seam Singer, Resonant Seam',
+    voiceDescription:
+      'Native English, female-presenting, ageless. Perfect audio quality. Persona: the Seam ' +
+      'Singer, a tall, slender being of stone and glowing amber crystal whose voice is the ' +
+      'humming of an ore seam deep in a mountain. Emotion: serene, eerie, quietly cruel. A ' +
+      'non-human voice: a clear, low alto with a soft crystalline shimmer and a faint natural ' +
+      'echo, as if each word rings inside a cave. Slow, melodic phrasing that almost sings, ' +
+      'breathy hushes, then a sudden cutting edge on commands. Never a sweet human singer, never ' +
+      'a whisper-only ghost, never robotic.',
+    previewText: [
+      '[softly, almost singing] Hear the seam sing? It has waited so long for your voices.',
+      '[rising to a ringing command] Sing with me, and break!',
+      '[a calm hush] The stone remembers. Listen, it still sings.',
+      '[echoing, inside the stone] Listen. In the stone, my song never ends.',
+      '[a fading note] My song... runs into the rock...',
+      '[gently] Hush now. The seam is still.',
+    ].join(' '),
+    visualReferences: COUNCIL_REFS,
+    guidanceScale: 0.65,
+  },
+];
+
+// The whole Smith's Heart raid (docs/design/raid/smith_heart.md section 7):
+// a second take for each Council member and two for each guardian and the
+// Masterless Strength, every preview its own lines in the order a pull hears
+// them. The Council's first takes above stay in the audition, so every boss
+// is judged on several candidates
+// (node scripts/audition_raid_boss_voices.mjs --set heart).
+
+const HEART_REFS = ['docs/design/raid/smith_heart.md'];
+
+const GUARDIAN_PREVIEW = [
+  "[a slow, heavy growl] Strangers in the Quarry. The Hammer's strength does not yield to flesh.",
+  '[a war cry] The mountain answers me! Hide, if the stone will have you!',
+  '[grim] Stand in my path, then. The mountain does not turn aside.',
+  '[cold contempt] Crushed, as ore beneath the hammer.',
+  '[thunderous] Then let the whole Quarry fall!',
+  "[a last breath of dust] The Hammer's strength... is yours to carry.",
+].join(' ');
+
+const SINGER_PREVIEW = [
+  '[softly, almost singing] Hear the seam sing? It has waited so long for your voices.',
+  '[a ringing command] Sing with me, and break!',
+  '[delighted] Wake, sleeping stone. Rise where they stand!',
+  '[a sweet, cruel lilt] Hear that? One note fewer.',
+  '[echoing] Listen. In the stone, my song never ends.',
+  '[a fading note] My song... runs into the rock...',
+].join(' ');
+
+const BREATH_PREVIEW = [
+  '[vast, unhurried] You climbed to the top of the mountain to steal its breath? Then breathe with me.',
+  '[drawing breath, hushed] Come closer. All of you.',
+  '[a roaring gale] Enough breath. Now the storm!',
+  '[booming] Hear the summit roar!',
+  '[cold] Another one given to the wind.',
+  '[fading on a last breath] The Breath... goes back... to the mountain...',
+].join(' ');
+
+const QUENCH_PREVIEW = [
+  '[cold, very calm] Warm blood on my lake. It will not stay warm for long.',
+  '[a frozen whisper] Frozen through. Now break.',
+  '[a ringing command] Blades of the Smith, wake! Hunt them across the ice!',
+  '[exhaling frost] Breathe in the deep cold.',
+  '[quiet, final] Tempered... and broken.',
+  '[letting go] The cold... lets go... The Quench is yours.',
+].join(' ');
+
+const HEAT_PREVIEW = [
+  '[ancient, warm] You walk into the first flame. Nothing leaves it unchanged.',
+  '[a booming roar] I rise with the first fire!',
+  '[rising] The Hearth turns! Keep pace with it, or burn!',
+  '[satisfied] Another spark goes home to the flame.',
+  '[fierce] Ash, all of you. The Hearth burns on.',
+  '[sinking, gentle] The flame... sinks back... into the stone. Carry it well.',
+].join(' ');
+
+const MASTERLESS_PREVIEW = [
+  '[immense, slow] Who wakes the heart of the mountain?',
+  '[a grinding command] Stone, rise. Bind to us.',
+  "[a colossal roar] We are the Smith's strength, and we have no master!",
+  '[cold] You carry the four veins in your blood. We will take them back, and seal the mountain over you.',
+  '[thunderous] Enough! Every vein at once!',
+  '[fading, almost tender] The hand... was never coming back.',
+].join(' ');
+
+/** @type {RaidBossVoicePrompt[]} */
+export const SMITH_HEART_NEW_VOICE_PROMPTS = [
+  {
+    npcId: 'heart-guardian',
+    takeId: 'bedrock-warlord',
+    name: 'Guardian of the Hammer, Bedrock Warlord',
+    voiceDescription:
+      'Native English, male-presenting, ageless. Perfect audio quality. Persona: the Guardian of ' +
+      'the Hammer, a war-leader of living quarry stone the size of a gatehouse, who has struck ' +
+      'the mountain for an age. Emotion: martial, proud, crushing. A non-human voice: a huge, ' +
+      'chesty basso profundo with a coarse gravel grain, every word struck like a hammer on rock, ' +
+      'clipped battle commands, a war cry that fills a quarry. Slow and heavy when he speaks, ' +
+      'explosive when he shouts. Never a human soldier, never a robot, never a snarling beast.',
+    previewText: GUARDIAN_PREVIEW,
+    visualReferences: COUNCIL_REFS,
+    guidanceScale: 0.72,
+  },
+  {
+    npcId: 'heart-singer',
+    takeId: 'cavern-choir',
+    name: 'The Seam Singer, Cavern Choir',
+    voiceDescription:
+      'Native English, female-presenting, ageless. Perfect audio quality. Persona: the Seam ' +
+      'Singer, a slender spirit of amber crystal grown in a mountain seam, whose speech is half ' +
+      'song. Emotion: hypnotic, wistful, then piercing. A non-human voice: a high, pure mezzo ' +
+      'with a glassy ring and a long cave reverberation, phrases that rise and fall like a chant, ' +
+      'soft sung vowels, a bright cutting edge when she commands the stone. Light and airy where ' +
+      'the Guardian is heavy. Never a pop singer, never a whisper-only ghost, never robotic.',
+    previewText: SINGER_PREVIEW,
+    visualReferences: COUNCIL_REFS,
+    guidanceScale: 0.66,
+  },
+  {
+    npcId: 'heart-breath',
+    takeId: 'summit-gale',
+    name: 'Guardian of the Breath, Summit Gale',
+    voiceDescription:
+      'Native English, male-presenting, ageless. Perfect audio quality. Persona: the Guardian of ' +
+      'the Breath, a living bellows of storm granite on a mountain summit, its mouth a horn of ' +
+      'stone the wind blows through. Emotion: vast, exultant, merciless. A non-human voice: a ' +
+      'deep, open, airy baritone carried on breath, long exhaled vowels like wind across a ' +
+      'cliff, hushed and close on the indrawn breath, then a booming roar like a gale tearing ' +
+      'over a ridge. Unhurried, sweeping phrasing. Never a human narrator, never a whisper-only ' +
+      'ghost, never robotic.',
+    previewText: BREATH_PREVIEW,
+    visualReferences: HEART_REFS,
+    guidanceScale: 0.68,
+  },
+  {
+    npcId: 'heart-breath',
+    takeId: 'storm-horn',
+    name: 'Guardian of the Breath, Storm Horn',
+    voiceDescription:
+      'Native English, genderless, ancient. Perfect audio quality. Persona: the Guardian of the ' +
+      'Breath, a colossus of storm stone and crystal that breathes the mountain wind and wakes ' +
+      'the thunder. Emotion: wild, proud, elemental. A non-human voice: a resonant, hollow tenor ' +
+      'with a howling, horn-like timbre and rushing air around every word, as if spoken through ' +
+      'a great stone horn; sudden thunderous bursts on commands, a sighing hush between them. ' +
+      'Never a human actor, never a monster growl, never robotic.',
+    previewText: BREATH_PREVIEW,
+    visualReferences: HEART_REFS,
+    guidanceScale: 0.66,
+  },
+  {
+    npcId: 'heart-quench',
+    takeId: 'glacier-matron',
+    name: 'Guardian of the Quench, Glacier Matron',
+    voiceDescription:
+      'Native English, female-presenting, ageless. Perfect audio quality. Persona: the Guardian ' +
+      'of the Quench, a giant of frost-bound granite and clear lake ice who keeps the frozen ' +
+      'lake where the smith once tempered his blades. Emotion: glacial, patient, pitiless. A ' +
+      'non-human voice: a low, cold contralto, very calm and very slow, crisp consonants like ' +
+      'cracking ice, a breathy frost on every exhale, a deep lake stillness behind each line; it ' +
+      'rises to a hard, ringing command. Never a sweet human woman, never a witch cackle, never ' +
+      'robotic.',
+    previewText: QUENCH_PREVIEW,
+    visualReferences: HEART_REFS,
+    guidanceScale: 0.66,
+  },
+  {
+    npcId: 'heart-quench',
+    takeId: 'rime-sovereign',
+    name: 'Guardian of the Quench, Rime Sovereign',
+    voiceDescription:
+      'Native English, male-presenting, ageless. Perfect audio quality. Persona: the Guardian ' +
+      'of the Quench, a towering ice colossus crowned with frozen blades, warden of the frozen ' +
+      'lake where steel was tempered. Emotion: austere, unhurried, deadly. A non-human voice: a ' +
+      'deep, glassy bass-baritone with a brittle crystalline edge, slow measured words that hiss ' +
+      'like hot steel plunged into water, long frozen silences, a hollow echo of a vast ice ' +
+      'cavern. Never a human narrator, never a growl, never robotic.',
+    previewText: QUENCH_PREVIEW,
+    visualReferences: HEART_REFS,
+    guidanceScale: 0.66,
+  },
+  // The Quencher, the ice queen of her own model (2026-11-08): three regal
+  // takes of an ancient queen of the lake, calm, cold and commanding.
+  {
+    npcId: 'heart-quench',
+    takeId: 'ice-queen',
+    name: 'Guardian of the Quench, Ice Queen',
+    voiceDescription:
+      'Native English, female, ageless. Perfect audio quality. Persona: the Guardian of the ' +
+      'Quench, an ancient ice queen, a regal giantess of dark stone in a gown of ice with a crown ' +
+      'of ice shards, who cooled every blade the smith forged in her lake. Emotion: calm, cold, ' +
+      'commanding, utterly certain. A rich, low mezzo-soprano, poised and imperious, every word ' +
+      'measured and crystal clear, a faint frosty breath between lines; she never hurries; her ' +
+      'command rings like ice cracking across a lake. Regal, never a witch, never a whisper ' +
+      'throughout, never robotic.',
+    previewText: QUENCH_PREVIEW,
+    visualReferences: HEART_REFS,
+    guidanceScale: 0.7,
+  },
+  {
+    npcId: 'heart-quench',
+    takeId: 'frozen-sovereign',
+    name: 'Guardian of the Quench, Frozen Sovereign',
+    voiceDescription:
+      'Native English, female, ageless. Perfect audio quality. Persona: an ancient queen of ice ' +
+      'who has ruled a frozen lake since the first steel was tempered in it. Emotion: majestic, ' +
+      'serene, pitiless. A deep, velvety contralto with royal gravity, slow and deliberate, the ' +
+      'stillness of deep winter in every pause, a soft resonance as if spoken in a vast frozen ' +
+      'hall; her commands are sharp and absolute. A queen, never a hag, never sweet, never ' +
+      'robotic.',
+    previewText: QUENCH_PREVIEW,
+    visualReferences: HEART_REFS,
+    guidanceScale: 0.7,
+  },
+  {
+    npcId: 'heart-quench',
+    takeId: 'lake-empress',
+    name: 'Guardian of the Quench, Lake Empress',
+    voiceDescription:
+      'Native English, female, ageless. Perfect audio quality. Persona: the empress of a frozen ' +
+      'lake, an immortal ice queen crowned in frost, elegant and dangerous. Emotion: cold, ' +
+      'composed, faintly amused, then fierce. A clear, cool, elegant alto with a crystalline ' +
+      'edge, precise diction, a hint of an icy shimmer on long vowels, the calm of someone who ' +
+      'has never lost; it rises to a ringing, imperious command. Regal and cold, never a witch ' +
+      'cackle, never breathy, never robotic.',
+    previewText: QUENCH_PREVIEW,
+    visualReferences: HEART_REFS,
+    guidanceScale: 0.7,
+  },
+  {
+    npcId: 'heart-heat',
+    takeId: 'hearth-titan',
+    name: 'Guardian of the Heat, Hearth Titan',
+    voiceDescription:
+      'Native English, male-presenting, primordial. Perfect audio quality. Persona: the ' +
+      'Guardian of the Heat, a giant of black basalt and white-gold crystal sunk to its waist in ' +
+      'the first wellspring of fire, seven times the height of a man. Emotion: ancient, warm, ' +
+      'overwhelming, then furious. A non-human voice: an enormous, resonant bass with a deep ' +
+      'chest roar and a crackling, ember-dry texture, slow words that swell like a furnace ' +
+      'breathing, a booming roar when the fire rises. Never a human villain, never a demon, ' +
+      'never robotic.',
+    previewText: HEAT_PREVIEW,
+    visualReferences: HEART_REFS,
+    guidanceScale: 0.7,
+  },
+  {
+    npcId: 'heart-heat',
+    takeId: 'wellspring-colossus',
+    name: 'Guardian of the Heat, Wellspring Colossus',
+    voiceDescription:
+      'Native English, male-presenting, primordial. Perfect audio quality. Persona: the ' +
+      'Guardian of the Heat, a colossus of basalt with white fire for a heart, keeper of the ' +
+      "smith's first flame. Emotion: solemn, wrathful, majestic. A non-human voice: a very deep, " +
+      'rumbling basso with a rough, smoky rasp and a roaring heat behind every vowel, ' +
+      'deliberate and grand like an old god speaking from a pit of fire, hard explosive ' +
+      'consonants, sudden blasts of rage. Never a human actor, never a monster, never robotic.',
+    previewText: HEAT_PREVIEW,
+    visualReferences: HEART_REFS,
+    guidanceScale: 0.68,
+  },
+  {
+    npcId: 'heart-masterless',
+    takeId: 'mountain-heart',
+    name: 'The Masterless Strength, Mountain Heart',
+    voiceDescription:
+      'Native English, genderless, older than the world. Perfect audio quality. Persona: the ' +
+      'heart of a mountain, a vast crystal binding a colossus of floating rock, the four ' +
+      'strengths of a vanished smith speaking as one, always "we". Emotion: colossal, hollow, ' +
+      'relentless. A non-human voice: an immense, slow, cavernous bass that seems to come from ' +
+      'deep underground, a crystalline ring over it and stone grinding beneath; each word is a ' +
+      'decree, long pauses like a great heartbeat, overwhelming roars. Never a human narrator, ' +
+      'never a monster, never robotic.',
+    previewText: MASTERLESS_PREVIEW,
+    visualReferences: HEART_REFS,
+    guidanceScale: 0.7,
+  },
+  {
+    npcId: 'heart-masterless',
+    takeId: 'four-vein-chorus',
+    name: 'The Masterless Strength, Four-Vein Chorus',
+    voiceDescription:
+      'Native English, genderless, primordial. Perfect audio quality. Persona: a living ' +
+      'mountain heart of crystal whose voice is four elemental strengths speaking together. ' +
+      'Emotion: vast, cold, absolute, with buried grief. A non-human voice: a deep, resonant, ' +
+      'layered voice like a choir of one, booming low register, a hollow cathedral echo, a ' +
+      'humming crystal overtone and the rumble of shifting rock beneath, slow and ceremonial, ' +
+      'erupting into overwhelming fury. Never a human actor, never a demon, never robotic.',
+    previewText: MASTERLESS_PREVIEW,
+    visualReferences: HEART_REFS,
+    guidanceScale: 0.68,
+  },
+];
+
+/** Every audition the Smith's Heart's voices are chosen from: the Council's
+ *  first takes and the new ones. */
+export const SMITH_HEART_VOICE_PROMPTS = [
+  ...HAMMER_COUNCIL_VOICE_PROMPTS,
+  ...SMITH_HEART_NEW_VOICE_PROMPTS,
+];

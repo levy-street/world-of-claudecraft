@@ -21,6 +21,11 @@ import type {
   CryptBossFightState,
   KnellwyrmKnellState,
 } from './encounters/hollow_crypt/boss_state';
+import type { BreathFightState } from './encounters/smith_heart/breath_state';
+import type { CouncilFightState } from './encounters/smith_heart/council_state';
+import type { FinalFightState } from './encounters/smith_heart/final_state';
+import type { HeatFightState } from './encounters/smith_heart/heat_state';
+import type { QuenchFightState } from './encounters/smith_heart/quench_state';
 import type { GrassClearCircle } from './grass_clear';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 import type { MapObjectives } from './map_objectives';
@@ -1129,7 +1134,10 @@ export type ItemUse =
   | { type: 'armorKit' }
   // A container: using it hands the owner its contents and consumes one unit
   // (src/sim/emissary_cache.ts owns the one container shipped so far).
-  | { type: 'container'; container: 'emissary_cache' | 'gourdlight_pouch' | 'thatchgrin_sack' }
+  | {
+      type: 'container';
+      container: 'emissary_cache' | 'gourdlight_pouch' | 'thatchgrin_sack' | 'smith_heart_coffer';
+    }
   // A seasonal event toy (src/sim/seasonal/seasonal_items.ts): the worn pumpkin
   // head toggle and the Jar of Mischief. Refused while its event is closed.
   | {
@@ -2385,6 +2393,24 @@ export interface MobTemplate {
     /** Lie down EXACTLY on the spawn point, facing `Entity.bedFacing`: a bed that is a
      *  fixed prop (his pole) rather than open ground. */
     snapToBed?: boolean;
+  };
+  /**
+   * Dormant: the mob is born asleep and lies where it spawned until something wakes it
+   * (mob/dormant.ts): a hostile player inside its aggro radius, a blow, or a pull through
+   * its pack. Asleep it stays hostile and attackable (unlike a slumbering boss), wearing a
+   * ward that stops `ward` of every blow, shown on its frame as `auraName`. Woken, it stands
+   * up for `riseSeconds` with its AI held and the ward still on (the renderer plays
+   * ClipMap.wake on the asleep-to-awake edge, so the hold is that clip's length and no step
+   * skates the pose), then the ward lifts and it fights. An evade home puts it back to
+   * sleep. Inert for every mob without it; draws no rng.
+   */
+  dormant?: {
+    /** Seconds the body takes to stand up: the AI is held and the ward stays on. */
+    riseSeconds: number;
+    /** The share of every blow the ward stops, asleep and rising (0.95: 95 percent). */
+    ward: number;
+    /** The ward's name on the frame (localized client-side, sim_i18n.ts). */
+    auraName: string;
   };
   /**
    * Seconds of spacing between this mob's boss mechanics, and the opt-in that turns
@@ -4948,6 +4974,11 @@ export interface TrashKitCast {
   /** Heroic only: on normal the driver never starts this cast (the Gravecaller
    *  Adept's Grave Bolt, which its normal volley replaces). */
   heroicOnly?: boolean;
+  /** The driver never starts this cast: the body's own encounter module runs
+   *  it (the Hammer Council's Mountain's Wrath, encounters/smith_heart). The
+   *  record stays the cast's declaration, which the renderer reads for its
+   *  look (the nova's sight field) and its numbers. */
+  encounterDriven?: boolean;
 }
 
 /**
@@ -6274,7 +6305,11 @@ export type DungeonGateKind =
   // taut as a walkway.
   | 'ice_wall'
   | 'chain_gate'
-  | 'chain_bridge';
+  | 'chain_bridge'
+  // The Smith's Heart: a slab of living stone that splits, and a forge seal
+  // of runed bronze that opens.
+  | 'stone_slab'
+  | 'forge_seal';
 
 /**
  * An in-dungeon gate or encounter seal (instances/dungeon_gates.ts): one
@@ -6299,6 +6334,10 @@ export interface DungeonGateDef {
    *  engaged: BOSS_ROOM_SEAL_DELAY_SECONDS into the fight, or at once if the
    *  boss reaches the doorway first (instances/dungeon_gates.ts). */
   sealWhileEngaged?: string;
+  /** Further bodies of the same fight (templates) whose engagement holds the
+   *  seal too: a boss of several bodies (the Smith's Heart's Hammer Council)
+   *  keeps its room sealed while ANY of them fights, whichever falls first. */
+  sealWithBodies?: readonly string[];
   /** English log line when the gate first opens (sim_i18n EXACT map). */
   openText?: string;
 }
@@ -6340,7 +6379,24 @@ export interface DungeonObjectSpawn {
     | 'crypt_lady_lantern_lit'
     // The Gravewyrm Sanctum's story markers (encounters/gravewyrm_sanctum/
     // story.ts): the Calving Face's crack step rides the template id.
-    | 'sanctum_story_0';
+    | 'sanctum_story_0'
+    // The Smith's Heart's seal markers (encounters/smith_heart/seal.ts): the
+    // lit veins ride the template id.
+    | 'smith_heart_seal_0'
+    // The Smith's Heart's quarry columns, the Hammer Council's starting
+    // pillars (encounters/smith_heart/council_pillars.ts): the integrity left
+    // rides the template id, and each stands as a combat wall.
+    | 'sh_council_pillar_2'
+    // The Storm Cornice's wind (encounters/smith_heart/breath_gale.ts): its
+    // phase, bearing and length ride the template id.
+    | 'sh_breath_wind_still_0_0'
+    // The Smith's four blades sunk in the Frozen Lake (encounters/smith_heart/
+    // quench_blades.ts): sunk, waking, floating or flying rides the template
+    // id, and each (but a flying one) stands as a combat wall.
+    | 'sh_quench_blade_sunk'
+    // The first wellspring in the Hearth (encounters/smith_heart/heat.ts):
+    // calm or overflowing rides the template id.
+    | 'sh_heat_well_calm';
   dungeonId?: string;
   /**
    * This object is an encounter mechanic players INTERACT with, never a pickup, even
@@ -6399,6 +6455,7 @@ export interface DungeonDef {
     | 'sunken_bastion'
     | 'drowned_temple'
     | 'gravewyrm_sanctum'
+    | 'smith_heart'
     | 'lastkeep'
     | 'dawnhold';
   /**
@@ -8405,6 +8462,32 @@ export interface Entity extends ClientMirroredEntityFields {
    *  gravewyrm_sanctum: the Sledge Tusker, and the bosses in phase B). Sim
    *  authority only; the client reads the fight from casts, auras and objects. */
   sanctumFight?: SanctumFightState;
+  /** The Smith's Heart's Hammer Council fight (encounters/smith_heart/
+   *  council.ts): ONE state object shared by the Guardian and the Seam
+   *  Singer while they fight. Sim authority only; the client reads
+   *  the fight from casts, auras, the energy bar and the pillar objects. */
+  smithHeartFight?: CouncilFightState;
+  /** The Smith's Heart's Guardian of the Breath fight (encounters/smith_heart/
+   *  breath.ts), on the guardian. Sim authority only; the client reads the
+   *  fight from the wind object, the bars, the auras and the fight's objects. */
+  smithHeartBreath?: BreathFightState;
+  /** The Smith's Heart's Guardian of the Quench's fight state (on the
+   *  guardian: encounters/smith_heart/quench.ts). Server-local sim state:
+   *  the client reads the fight from auras, bars and the fight's objects. */
+  smithHeartQuench?: QuenchFightState;
+  /** Effective healing this body received and the tick it was last noted
+   *  (combat/heal_taken.ts: what the Guardian of the Quench's Living Warmth
+   *  reads once a tick). Transient sim state: never persisted, never wired. */
+  healTakenTick?: number;
+  healTakenAmount?: number;
+  /** The Smith's Heart's Guardian of the Heat's fight state (on the guardian:
+   *  encounters/smith_heart/heat.ts). Server-local sim state: the client
+   *  reads the fight from its resource, auras, bars and the fight's objects. */
+  smithHeartHeat?: HeatFightState;
+  /** The Smith's Heart's Masterless Strength's fight state (on the boss:
+   *  encounters/smith_heart/final.ts). Server-local sim state: the client
+   *  reads the fight from the boss's auras, bars and the fight's objects. */
+  smithHeartFinal?: FinalFightState;
   /** A dead trash-kit mob's burst in the making (MobTemplate.trashKit.deathBurst,
    *  mob/trash_kit/death_burst.ts): seconds left, its floor ring, and whether it
    *  has gone off. A death cloud (trashKit.deathCloud, wildheart_kit.ts) rides
@@ -8515,6 +8598,9 @@ export interface Entity extends ClientMirroredEntityFields {
   // shown to this player, so the 20 Hz walk-in door trigger does not spam the
   // toast (instances/ignivar_entry.ts).
   ignivarEntryDeniedAt?: number;
+  // Sim time of the last "an encounter is in progress" door refusal shown to
+  // this released spirit, throttled the same way (instances/encounter_lock.ts).
+  encounterLockNoticeAt?: number;
   // Sim time of the last "the forge doors hold fast" Ignivar exit denial shown
   // to this player while a boss fight seals the room, throttled the same way:
   // the 20 Hz exit-portal walk-in trigger must not spam the toast
@@ -8574,11 +8660,15 @@ export interface Entity extends ClientMirroredEntityFields {
   warpathPhase?: 'focus' | 'travel' | 'wreck';
   warpathTimer?: number;
   // Slumber state (mob/slumber.ts): true while a `slumber` template sleeps through the
-  // night. Only ever defined on such a mob (the same defined-vs-undefined discipline as
-  // the warpath fields), mirrored to clients so the rig can lie down and wake with him.
+  // night, and while a `dormant` template lies waiting to be woken (mob/dormant.ts). Only
+  // ever defined on such a mob (the same defined-vs-undefined discipline as the warpath
+  // fields), mirrored to clients so the rig can lie down and wake with him.
   asleep?: boolean;
   /** Seconds left in the dawn rise (mob/slumber.ts): the AI is held while it runs. */
   slumberRise?: number;
+  /** Seconds left standing up after a `dormant` template is woken (mob/dormant.ts): the
+   *  AI is held and the ward stays on while it runs. Defined only on such a mob. */
+  dormantRise?: number;
   /** A /dev wake or sleep holding him against the clock until it agrees (mob/slumber.ts). */
   slumberDevHold?: 'awake' | 'asleep';
   /** The facing a `slumber.snapToBed` sleeper is laid down with (his spawn's), so a body
@@ -10450,7 +10540,8 @@ export type SimEvent = { pid?: number } & (
       // blast radius in yards; when set the renderer flashes a terrain-draped
       // AoE ring of this size under the burst so the impact area reads clearly
       radius?: number;
-      // 'orb' only: unit drift direction, yards-per-second speed, and lifetime
+      // 'orb' (and the Hammer Council's Mountain's Rush wind-up cue, its fixed
+      // line): unit drift direction, yards-per-second speed, and lifetime
       // in seconds of the roaming visual
       dirX?: number;
       dirZ?: number;

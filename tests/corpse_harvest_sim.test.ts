@@ -2562,8 +2562,15 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     // tests/gathering.test.ts. Plus buddy_sprites, the flame-sprite pair: 300.
     // Retiring buddy_sapling leaves 299. Zulgar's Hunting Spear is an encounter
     // object without harvest components, bringing the merged roster to 300.
-    // The four Halloween encounter templates are untagged too.
-    expect(Object.keys(MOBS).length - tagged.length).toBe(304);
+    // The Smith's Heart raid (content/smith_heart.ts) adds fifteen untagged
+    // templates, like every dungeon template: eight vein warders and callers,
+    // the six bosses of the Council and the guardians, and the final boss: 315.
+    // The Guardian of the Heat's four untagged adds (Wellspawn, Wellkeeper,
+    // Seedflame, Rolling Cinder): 319.
+    // The Masterless Strength's four Splinters and the Hammer Council's Stone
+    // Prison block, untagged too: 324. The four Halloween encounter templates
+    // are untagged too: 328.
+    expect(Object.keys(MOBS).length - tagged.length).toBe(328);
     withMixedTemplates(() => {
       const mixed = mixedTemplates();
       expect(mixed.map(([id]) => id).sort()).toEqual(

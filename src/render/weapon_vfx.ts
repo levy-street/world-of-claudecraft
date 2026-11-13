@@ -38,6 +38,12 @@ import {
   type WeaponEmissiveTint,
   weaponEmissiveCacheKey,
 } from './weapon_vfx_emissive_core';
+import {
+  makeRaidPart,
+  RAID_TUNE_KEY_BY_KIND,
+  type WeaponVfxRaidComponent,
+} from './weapon_vfx_raid_parts';
+import { weaponVfxSeqLevel } from './weapon_vfx_seq_core';
 import { applyRiggedWornDetail } from './worn_stone';
 
 // ---------------------------------------------------------------------------
@@ -83,6 +89,9 @@ export interface WeaponVfxEmissiveSpec {
   intensity: number;
   pulse: number;
   pulseHz: number;
+  /** How far each glowing texel is graded toward `tint` (default 0.62; see
+   *  weapon_vfx_emissive_core.ts). */
+  tintMix?: number;
 }
 
 export interface WeaponVfxShellSpec {
@@ -257,6 +266,7 @@ const TUNE_KEY_BY_KIND: Record<string, keyof WeaponVfxTuning | undefined> = {
   arcs: 'sparkle',
   shell: 'shell',
   pool: 'pool',
+  ...RAID_TUNE_KEY_BY_KIND,
 };
 
 // ---------------------------------------------------------------------------
@@ -382,9 +392,13 @@ export interface WeaponVfxCoreSprite {
   at: WeaponVfxAnchor;
   size: number;
   color: number;
+  /** The star flare's extra size over `size` (default 0.5); 0 draws no flare sprite at all. */
   flare?: number;
   hz?: number;
   opacity?: number;
+  /** Light in turn with sibling sprites: slot `slot` of `of`, a full round every 1 / `hz`
+   *  seconds. The lit sprite swells and brightens, the rest bank down (never out). */
+  seq?: { slot: number; of: number; hz: number };
 }
 
 export interface WeaponVfxMotes {
@@ -430,6 +444,9 @@ export interface WeaponVfxAurora {
   /** The ribbon's three-stop gradient. Absent, the Fallen Star's gold, violet and teal. Uniforms
    *  only, so a recoloured ribbon links the same program as every other aurora. */
   colors?: [number, number, number];
+  /** Wind streaks: dashes racing along the ribbon (0, the default, is a smooth ribbon). The
+   *  value is the dash count along it. A uniform, so a streaked ribbon links the same program. */
+  streak?: number;
 }
 
 export interface WeaponVfxDrift {
@@ -492,7 +509,8 @@ export type WeaponVfxComponent =
   | WeaponVfxAurora
   | WeaponVfxDrift
   | WeaponVfxTwinkles
-  | WeaponVfxArcs;
+  | WeaponVfxArcs
+  | WeaponVfxRaidComponent;
 
 export interface WeaponVfxSpec {
   tier: WeaponVfxTierName;
@@ -505,6 +523,16 @@ export interface WeaponVfxSpec {
   light?: Partial<WeaponVfxLightSpec> & { at?: WeaponVfxAnchor };
   fx: WeaponVfxComponent[];
 }
+
+/** The Heartmeld Staff's four gems on the Anvil's halo, in the order they light (weapon-local
+ *  offsets from the halo's centre, measured on the shipped model): quarry amber upper left, the
+ *  gale upper right, frost lower right, fire lower left. */
+const HEARTMELD_GEMS = [
+  { dx: -0.22, dy: 0.205, color: 0xffb43a },
+  { dx: 0.22, dy: 0.205, color: 0x5effb0 },
+  { dx: 0.22, dy: -0.205, color: 0x4fb4ff },
+  { dx: -0.22, dy: -0.205, color: 0xff6a1e },
+] as const;
 
 export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
   ice_fang: {
@@ -1691,207 +1719,383 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
     ],
   },
 
-  // The four elemental arms built for Lantern Hall (scripts/assets/lantern_hall_arms/), now
-  // RESERVED as loot for a future raid (content/weapon_skins.ts earnedFrom 'future_raid'): epic
-  // showpieces, each window narrowed to the element its build paints, so the metal stays metal.
-  // Hearthbrand: a forge-hot flame-waved blade. Its edges and the seam up its heart burn, embers
-  // pour off it and the air above it shimmers with heat; the light gutters like a fire.
-  hearthbrand: {
+  // The Smith's Heart raid arms (hand-painted Tripo models, see CREDITS.md), one per encounter,
+  // earned in the raid (content/weapon_skins.ts earnedFrom 'smiths_heart'). Each element draws
+  // on the raid's own VFX families (weapon_vfx_raid_parts.ts) on top of the catalog's: orbiting
+  // crystals and ice, rune rings and a storm eye. Each emissive window is narrowed to the
+  // element its texture paints, so the metal and stone stay metal and stone.
+  //
+  // Seamcaller (the Hammer Council): a quarry-stone maul. Amber seam-crystals like the ones on
+  // its crown orbit the head, a ring of gold runes turns round it, the blow gathers on both
+  // striking faces, gold motes circle against the crystals, dust sifts down and sparks rise off
+  // the crown.
+  seamcaller_maul: {
     tier: 'epic',
-    name: 'Hearthbrand',
-    type: 'sword',
-    lore: 'A flame-waved blade of blackened steel, forge-hot along both edges, a molten seam branching up its heart and a guard of bronze flames round a burning stone.',
+    name: 'Seamcaller',
+    type: 'mace',
+    lore: "A great maul of dark quarry stone split by burning gold seams and strapped in riveted, knot-cut bronze, a framed mason's mark on both cheeks, bronze-ringed striking faces round burning amber, bronze horns and amber seam-crystal growing from the crown.",
     emissive: {
-      hue: [8, 52],
-      minS: 0.7,
-      minL: 0.35,
+      hue: [30, 55],
+      minS: 0.8,
+      minL: 0.55,
       whiteL: 0.97,
-      tint: 0xff6a1e,
-      intensity: 1.9,
-      pulse: 0.3,
-      pulseHz: 1.1,
+      tint: 0xffb030,
+      intensity: 2.0,
+      pulse: 0.45,
+      pulseHz: 0.5,
     },
-    shell: { color: EMBER.glow, strength: 0.32, power: 2.8 },
-    light: { color: 0xff7a2a, at: { yF: 0.55 }, intensity: 8, distance: 7, flicker: 0.5, hz: 2.8 },
+    shell: { color: 0xffb040, strength: 0.22, power: 2.8 },
+    light: {
+      color: 0xffb050,
+      at: { yF: 0.72 },
+      intensity: 7,
+      distance: 6.5,
+      flicker: 0.15,
+      hz: 0.6,
+    },
     fx: [
-      // the stone in the guard, breathing like a coal
+      // the seam-crystal on the crown, breathing
       {
         kind: 'coreSprite',
-        at: { yF: 0.27 },
-        size: 0.28,
-        color: EMBER.hot,
-        flare: 0.6,
-        hz: 1.6,
+        at: { yF: 0.9 },
+        size: 0.5,
+        color: 0xffc24a,
+        flare: 0.8,
+        hz: 0.5,
         opacity: 0.6,
       },
-      // embers boiling up off the whole blade
+      // amber seam-crystals orbiting the head: the crown's own crystals, set loose (the long
+      // faceted shard, in the crown's amber). The head is 1.5 long and under 0.7 deep, so the
+      // path is an oval: it clears the striking faces along X and hugs the flanks along Z.
       {
-        kind: 'drift',
-        line: [{ yF: 0.3 }, { yF: 1.0 }],
-        count: 46,
-        vel: [0, 0.42, 0],
-        spread: [0.12, 0.05, 0.08],
-        life: [0.9, 2.0],
-        size: [0.018, 0.042],
-        grow: 0.1,
-        swirl: 0.12,
-        colorA: EMBER.hot,
-        colorB: EMBER.coal,
+        kind: 'orbiters',
+        at: { yF: 0.7 },
+        count: 7,
+        radius: [0.92, 1.0],
+        depth: 0.57,
+        size: [0.2, 0.32],
+        speed: [0.4, 0.58],
+        spin: [0.2, 0.55],
+        tilt: 0.22,
+        bob: 0.06,
+        shape: 'ice',
+        color: 0xffb236,
+        dark: 0xb5560e,
+        glow: 0xffd27a,
+        seams: 0,
+        opacity: 0.6,
+      },
+      // a ring of gold runes turning round the head
+      {
+        kind: 'runeRing',
+        at: { yF: 0.7 },
+        axis: [1, 0, 0],
+        radius: 0.54,
+        width: 0.14,
+        speed: 0.08,
+        color: 0xff9a10,
+        core: 0xffe9a0,
+        opacity: 1.2,
+      },
+      // the gathered blow turning on both striking faces
+      {
+        kind: 'vortex',
+        at: { yF: 0.7, dx: 0.79 },
+        axis: [1, 0, 0],
+        radius: 0.27,
+        arms: 3,
+        speed: 0.45,
+        twist: 1.1,
+        outer: 0xff8a10,
+        inner: 0xfff2c0,
+        opacity: 0.6,
+      },
+      {
+        kind: 'vortex',
+        at: { yF: 0.7, dx: -0.79 },
+        axis: [1, 0, 0],
+        radius: 0.27,
+        arms: 3,
+        speed: -0.45,
+        twist: 1.1,
+        outer: 0xff8a10,
+        inner: 0xfff2c0,
+        opacity: 0.6,
+      },
+      // gold motes circling among the crystals
+      {
+        kind: 'motes',
+        at: { yF: 0.7 },
+        radius: [0.5, 0.74],
+        count: 18,
+        size: [0.02, 0.045],
+        speed: [-0.9, -1.4],
+        tilt: 0.5,
+        bob: 0.06,
+        colorA: 0xffd27a,
+        colorB: 0xffa530,
         opacity: 0.95,
       },
-      // the heat shimmer: big faint flame-coloured puffs rising and spreading
+      // quarry dust sifting off the head
       {
         kind: 'drift',
-        line: [{ yF: 0.35 }, { yF: 0.95 }],
-        count: 18,
-        vel: [0, 0.32, 0],
-        spread: [0.08, 0.04, 0.06],
-        life: [0.8, 1.4],
-        size: [0.12, 0.22],
-        grow: 1.4,
-        swirl: 0.06,
-        colorA: 0xff8a2a,
-        colorB: 0xff4a10,
-        opacity: 0.16,
+        line: [
+          { yF: 0.62, dx: -0.4 },
+          { yF: 0.72, dx: 0.4 },
+        ],
+        count: 24,
+        vel: [0, -0.28, 0],
+        spread: [0.1, 0.05, 0.12],
+        life: [1.6, 2.8],
+        size: [0.06, 0.13],
+        grow: 1.1,
+        swirl: 0.08,
+        colorA: 0xd8c29c,
+        colorB: 0x9a8466,
+        opacity: 0.2,
       },
-      // sparks snapping off the edges
+      // gold sparks rising off the crown
+      {
+        kind: 'drift',
+        line: [{ yF: 0.86 }, { yF: 0.96 }],
+        count: 18,
+        vel: [0, 0.38, 0],
+        spread: [0.08, 0.04, 0.08],
+        life: [1.0, 1.9],
+        size: [0.018, 0.034],
+        grow: 0.1,
+        swirl: 0.14,
+        colorA: 0xffe39a,
+        colorB: 0xffb030,
+        opacity: 0.95,
+      },
       {
         kind: 'twinkles',
-        surface: { yMinF: 0.3, count: 40 },
-        size: [0.03, 0.06],
-        rate: [0.9, 2.2],
-        color: 0xffc070,
+        surface: { yMinF: 0.57, count: 50 },
+        size: [0.035, 0.07],
+        rate: [0.5, 1.3],
+        color: 0xffdc90,
         star: true,
       },
     ],
   },
 
-  // Squallcrest: a sea-storm blade. The refined shimmer is the point: a bright rim over the
-  // whole blade, glints running its length, a tidal ribbon of sea light winding up it, spray
-  // drifting off, and lightning crackling between its edges.
+  // Squallcrest (the Guardian of the Breath): a storm blade. Wind wraps it in two streaking
+  // ribbons winding opposite ways, slow lightning walks up the blade and out along the guard's
+  // wings,
+  // the storm eye turns on both faces of the gem, and gusts lift off the edge. Kept calm on
+  // purpose (the owner's call, 2026-11-13): few strikes a second and a steady light, so it
+  // never strobes.
   squallcrest: {
     tier: 'epic',
     name: 'Squallcrest',
     type: 'sword',
-    lore: 'A long sea-blue blade whose edges run bright as a breaking wave, a storm channel up its heart, a gilt wave over the ricasso, a dorsal fin down one edge and a guard of gilt breakers round a storm pearl.',
+    lore: 'A long storm-steel blade with lightning-bright edges, a forked bolt up each face, wind fins hooked off one edge and a guard of swept silver wings round a storm-eye gem.',
     emissive: {
       hue: [180, 215],
       minS: 0.6,
-      minL: 0.45,
+      minL: 0.55,
       whiteL: 0.97,
-      tint: 0x5fd8ff,
-      intensity: 1.7,
-      pulse: 0.4,
-      pulseHz: 0.7,
+      tint: 0x6fdcff,
+      intensity: 2.0,
+      pulse: 0.25,
+      pulseHz: 0.4,
     },
-    shell: { color: 0x7fe0ff, strength: 0.6, power: 2.2 },
-    light: { color: 0x7fd4ff, at: { yF: 0.6 }, intensity: 8, distance: 7, flicker: 0.4, hz: 3.4 },
+    shell: { color: 0x8fe6ff, strength: 0.55, power: 2.2 },
+    light: { color: 0x8fd8ff, at: { yF: 0.66 }, intensity: 8, distance: 7, flicker: 0.12, hz: 0.8 },
     fx: [
       {
         kind: 'coreSprite',
-        at: { yF: 0.28 },
+        at: { yF: 0.35 },
         size: 0.26,
-        color: 0x9fe8ff,
-        flare: 0.7,
-        hz: 0.9,
-        opacity: 0.55,
+        color: 0xaee9ff,
+        flare: 0.5,
+        hz: 0.5,
+        opacity: 0.6,
       },
-      // the tide: a ribbon of sea light winding up the blade
+      // the storm eye turning on both faces of the gem
+      {
+        kind: 'vortex',
+        at: { yF: 0.35, dz: 0.112 },
+        axis: [0, 0, 1],
+        radius: 0.12,
+        arms: 3,
+        speed: 0.35,
+        twist: 1.2,
+        outer: 0x2f8fe0,
+        inner: 0xe8fbff,
+        opacity: 0.9,
+      },
+      {
+        kind: 'vortex',
+        at: { yF: 0.35, dz: -0.112 },
+        axis: [0, 0, 1],
+        radius: 0.12,
+        arms: 3,
+        speed: -0.35,
+        twist: 1.2,
+        outer: 0x2f8fe0,
+        inner: 0xe8fbff,
+        opacity: 0.9,
+      },
+      // the wind: two streaking ribbons wound opposite ways round the blade
       {
         kind: 'aurora',
-        helix: { from: { yF: 0.3 }, to: { yF: 0.98 }, radius: 0.16, turns: 1.4 },
-        width: 0.1,
-        amp: 0.04,
-        speed: 0.9,
-        opacity: 0.5,
-        colors: [0x3fa8ff, 0xbff4ff, 0x2fe0d0],
+        helix: { from: { yF: 0.44 }, to: { yF: 1.0 }, radius: 0.2, turns: 2.2 },
+        width: 0.13,
+        amp: 0.03,
+        speed: 0.8,
+        opacity: 1.2,
+        colors: [0x9fd8ff, 0xffffff, 0x7fe0ff],
+        streak: 7,
       },
-      // lightning leaping between the edges
+      {
+        kind: 'aurora',
+        helix: { from: { yF: 0.42 }, to: { yF: 0.96 }, radius: 0.27, turns: -1.7, phase: 2.2 },
+        width: 0.1,
+        amp: 0.035,
+        speed: 0.65,
+        opacity: 0.9,
+        colors: [0xc8ecff, 0x6fd0ff, 0xe8fbff],
+        streak: 5,
+      },
+      // lightning crackling up the blade
       {
         kind: 'arcs',
-        line: [{ yF: 0.32 }, { yF: 0.95 }],
+        line: [{ yF: 0.45 }, { yF: 0.97 }],
         count: 4,
-        radius: 0.13,
-        length: 0.28,
+        radius: 0.11,
+        length: 0.3,
+        jitter: 0.06,
+        width: 0.035,
+        rate: 2.2,
+        duty: 0.55,
+        color: 0x4fb8ff,
+        core: 0xf0fdff,
+        opacity: 1,
+      },
+      // and leaping out from the storm eye along the guard's wings
+      {
+        kind: 'arcs',
+        line: [{ yF: 0.33 }, { yF: 0.4 }],
+        count: 2,
+        radius: 0.34,
+        length: 0.9,
         jitter: 0.05,
         width: 0.03,
-        rate: 9,
+        rate: 1.6,
         duty: 0.45,
-        color: 0x4fb8ff,
+        color: 0x5fc0ff,
         core: 0xeafaff,
-        opacity: 0.95,
+        opacity: 0.9,
       },
-      // sea spray drifting off and falling
+      // gusts tearing up off the edges
       {
         kind: 'drift',
-        line: [{ yF: 0.35 }, { yF: 1.0 }],
-        count: 30,
-        vel: [0, -0.18, 0],
-        spread: [0.14, 0.05, 0.1],
-        life: [1.4, 2.6],
-        size: [0.02, 0.045],
-        grow: 0.2,
-        swirl: 0.1,
-        colorA: 0xdff8ff,
-        colorB: 0x6fd0ff,
-        opacity: 0.7,
+        line: [{ yF: 0.45 }, { yF: 0.96 }],
+        count: 28,
+        vel: [0, 0.55, 0],
+        spread: [0.13, 0.04, 0.08],
+        life: [0.5, 0.95],
+        size: [0.015, 0.032],
+        grow: 0.3,
+        swirl: 0.25,
+        colorA: 0xe8fbff,
+        colorB: 0x8fd8ff,
+        opacity: 0.8,
       },
-      // the refined shimmer: glints running the whole blade
       {
         kind: 'twinkles',
-        surface: { yMinF: 0.3, count: 70 },
+        surface: { yMinF: 0.42, count: 40 },
         size: [0.03, 0.065],
-        rate: [0.7, 1.8],
-        color: 0xe6fbff,
+        rate: [0.3, 0.8],
+        color: 0xeafcff,
         star: true,
       },
     ],
   },
 
-  // The Rimelight Staff: a crown of ice round a crystal of cold light. Frost mist rolls off
-  // the crown and pours down, ice dust falls, glints wink on the shards, and three motes of
-  // frost circle the light.
+  // The Rimelight Staff (the Guardian of the Quench): a frost staff. Shards of ice orbit its
+  // crown, two rings of frost runes turn round it at odd angles, the frozen core burns cold,
+  // mist pours down the shaft and snow drifts round the head.
   rimelight_staff: {
     tier: 'epic',
     name: 'Rimelight Staff',
     type: 'staff',
-    lore: 'A pale shaft bound in silver and wound with rime, crowned by a silver claw holding a great crystal of cold light inside a crown of ice shards.',
+    lore: 'A blue-steel shaft wound with silver filigree and bound in gem-set silver collars, crowned by four silver crescent blades cradling a great crystal of cold light amid a ring of lesser crystals.',
     emissive: {
       hue: [175, 215],
       minS: 0.5,
       minL: 0.55,
       whiteL: 0.97,
       tint: 0x7fe4ff,
-      intensity: 1.5,
-      pulse: 0.3,
+      intensity: 0.65,
+      pulse: 0.35,
       pulseHz: 0.45,
     },
-    shell: { color: ICE.glow, strength: 0.45, power: 2.6 },
-    light: { color: ICE.glow, at: { yF: 0.88 }, intensity: 8, distance: 7, flicker: 0.12, hz: 0.5 },
+    shell: { color: ICE.glow, strength: 0.22, power: 2.6 },
+    light: { color: ICE.glow, at: { yF: 0.88 }, intensity: 2, distance: 7, flicker: 0.12, hz: 0.5 },
     fx: [
       {
         kind: 'coreSprite',
         at: { yF: 0.88 },
-        size: 0.5,
+        size: 0.42,
         color: ICE.core,
-        flare: 0.6,
+        flare: 0.7,
         hz: 0.5,
-        opacity: 0.6,
+        opacity: 0.24,
+      },
+      // shards of ice orbiting the crown
+      {
+        kind: 'orbiters',
+        at: { yF: 0.88 },
+        count: 6,
+        radius: [0.5, 0.6],
+        size: [0.17, 0.26],
+        speed: [0.42, 0.62],
+        spin: [0.25, 0.7],
+        tilt: 0.3,
+        bob: 0.04,
+        shape: 'ice',
+        color: 0xc8f2ff,
+        dark: 0x3a7fb8,
+        glow: 0x9fe8ff,
+        seams: 0,
+        opacity: 1,
+      },
+      // two rings of frost runes turning round it at odd angles
+      {
+        kind: 'runeRing',
+        at: { yF: 0.88 },
+        axis: [0.12, 1, 0.2],
+        radius: 0.44,
+        width: 0.08,
+        speed: 0.09,
+        color: 0x5fd0ff,
+        core: 0xeaffff,
+        opacity: 0.85,
       },
       {
-        kind: 'motes',
-        at: { yF: 0.88 },
-        radius: [0.26, 0.36],
-        count: 10,
-        heroCount: 3,
-        size: [0.02, 0.045],
-        heroSize: 0.09,
-        speed: [0.5, 1.0],
-        tilt: 0.35,
-        bob: 0.04,
-        colorA: ICE.core,
-        colorB: ICE.white,
-        opacity: 0.9,
+        kind: 'runeRing',
+        at: { yF: 0.79 },
+        axis: [-0.3, 1, -0.1],
+        radius: 0.38,
+        width: 0.06,
+        speed: -0.14,
+        color: 0x7fdcff,
+        core: 0xffffff,
+        opacity: 0.75,
+      },
+      // cold light running down the shaft's silver spiral
+      {
+        kind: 'aurora',
+        helix: { from: { yF: 0.68 }, to: { yF: 0.12 }, radius: 0.1, turns: 3.5 },
+        width: 0.05,
+        amp: 0.01,
+        speed: 0.8,
+        opacity: 0.75,
+        colors: [0xbfeaff, 0xffffff, 0x7fd4ff],
+        streak: 3,
       },
       // frost mist rolling off the crown and pouring down the shaft
       {
@@ -1908,27 +2112,27 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
         colorB: 0x7fd4ff,
         opacity: 0.2,
       },
-      // ice dust falling round the head
+      // snow drifting round the head
       {
         kind: 'drift',
         line: [
-          { yF: 0.7, dx: -0.25 },
-          { yF: 1.0, dx: 0.25 },
+          { yF: 0.72, dx: -0.35 },
+          { yF: 1.0, dx: 0.35 },
         ],
-        count: 30,
-        vel: [0, -0.3, 0],
-        spread: [0.22, 0.06, 0.22],
-        life: [2.6, 4.4],
-        size: [0.02, 0.05],
+        count: 40,
+        vel: [0, -0.24, 0],
+        spread: [0.3, 0.06, 0.3],
+        life: [2.6, 4.6],
+        size: [0.02, 0.045],
         grow: 0,
-        swirl: 0.05,
+        swirl: 0.12,
         colorA: ICE.white,
         colorB: ICE.glow,
-        opacity: 0.85,
+        opacity: 0.9,
       },
       {
         kind: 'twinkles',
-        surface: { yMinF: 0.68, count: 60 },
+        surface: { yMinF: 0.7, count: 60 },
         size: [0.035, 0.07],
         rate: [0.5, 1.3],
         color: 0xdff6ff,
@@ -1937,90 +2141,238 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
     ],
   },
 
-  // The Duskwick Staff: an open iron lantern burning a violet dusk-flame. Dark smoke curls up
-  // out of the cage (drawn over the scene, so it darkens what is behind it), violet wisps wind
-  // round the head, and dim sparks drift up out of the flame.
-  duskwick_staff: {
+  // Hearthbrand (the Guardian of the Heat): a molten blade. No fire on the edges (the owner's
+  // call, 2026-11-13): the melt in the blade breathes slowly, embers rise off it and circle the
+  // horned guard, dark smoke curls from the point, sparks drift off the veins and the magma
+  // heart in the guard throbs. All of it slow.
+  hearthbrand: {
     tier: 'epic',
-    name: 'Duskwick Staff',
-    type: 'staff',
-    lore: 'A shaft of two twisted black-wood strands bound in iron, crowned by an open iron lantern burning a violet dusk-flame between two curling horns.',
+    name: 'Hearthbrand',
+    type: 'sword',
+    lore: 'A broad blade of cooled magma crust with molten edges, a net of ember veins cracked across both faces, an obsidian-toothed spine and a black iron guard swept into horns dripping melt round a magma heart.',
     emissive: {
-      hue: [260, 300],
-      minS: 0.6,
+      hue: [8, 52],
+      minS: 0.7,
       minL: 0.45,
       whiteL: 0.97,
-      tint: 0xa040ff,
-      intensity: 1.8,
+      tint: 0xff6a1e,
+      intensity: 1.7,
       pulse: 0.4,
-      pulseHz: 0.6,
+      pulseHz: 0.35,
     },
-    shell: { color: 0x8a3cff, strength: 0.4, power: 2.4 },
-    light: {
-      color: 0x9a50ff,
-      at: { yF: 0.82 },
-      intensity: 7,
-      distance: 6.5,
-      flicker: 0.35,
-      hz: 1.8,
-    },
+    shell: { color: EMBER.glow, strength: 0.35, power: 2.6 },
+    light: { color: 0xff7a2a, at: { yF: 0.7 }, intensity: 5, distance: 7, flicker: 0.18, hz: 0.7 },
     fx: [
       {
         kind: 'coreSprite',
-        at: { yF: 0.82 },
-        size: 0.42,
-        color: 0xb070ff,
-        flare: 0.55,
-        hz: 0.8,
-        opacity: 0.6,
+        at: { yF: 0.35 },
+        size: 0.3,
+        color: EMBER.hot,
+        flare: 0.6,
+        hz: 0.6,
+        opacity: 0.65,
       },
-      // the dark smoke: slow black-violet puffs rising out of the cage and spreading
+      // embers circling the horned guard
+      {
+        kind: 'motes',
+        at: { yF: 0.36 },
+        radius: [0.3, 0.44],
+        count: 14,
+        size: [0.022, 0.05],
+        speed: [0.35, 0.6],
+        tilt: 0.35,
+        bob: 0.05,
+        colorA: 0xffd27a,
+        colorB: 0xff5a14,
+        opacity: 0.95,
+      },
+      // embers drifting slowly up off the blade
       {
         kind: 'drift',
-        line: [{ yF: 0.78 }, { yF: 0.95 }],
-        count: 26,
-        vel: [0, 0.22, 0],
-        spread: [0.08, 0.05, 0.08],
-        life: [2.2, 3.6],
-        size: [0.16, 0.3],
+        line: [{ yF: 0.5 }, { yF: 1.0 }],
+        count: 50,
+        vel: [0, 0.24, 0],
+        spread: [0.18, 0.05, 0.08],
+        life: [1.8, 3.6],
+        size: [0.018, 0.042],
+        grow: 0.1,
+        swirl: 0.09,
+        colorA: EMBER.hot,
+        colorB: EMBER.coal,
+        opacity: 0.95,
+      },
+      // dark smoke curling off the point, drawn over the scene so it darkens it
+      {
+        kind: 'drift',
+        line: [{ yF: 0.8 }, { yF: 1.0 }],
+        count: 14,
+        vel: [0, 0.16, 0],
+        spread: [0.06, 0.05, 0.06],
+        life: [2.6, 4.2],
+        size: [0.12, 0.22],
         grow: 1.6,
         swirl: 0.14,
-        colorA: 0x0c0614,
-        colorB: 0x1c0c2c,
-        opacity: 0.5,
+        colorA: 0x1a0d08,
+        colorB: 0x2a140a,
+        opacity: 0.32,
         blend: 'smoke',
       },
-      // violet wisps winding round the lantern
+      // sparks drifting off the veins and edges
+      {
+        kind: 'twinkles',
+        surface: { yMinF: 0.5, count: 40 },
+        size: [0.03, 0.06],
+        rate: [0.3, 0.8],
+        color: 0xffc070,
+        star: true,
+      },
+    ],
+  },
+
+  // The Heartmeld Staff (the Masterless Strength), model id duskwick_staff: the four elements
+  // on the Anvil's halo. Its four gems light in turn (quarry amber, gale, frost, fire), each
+  // with its own effect: dust sifting off the amber, a gust winding round the gale gem, snow
+  // falling from the frost, flames and embers off the fire. Round the whole head a ring of gold
+  // runes turns, the gathered strength spins in the heart, and motes of all four circle it.
+  duskwick_staff: {
+    tier: 'legendary',
+    name: 'Heartmeld Staff',
+    type: 'staff',
+    lore: "A forge-bronze haft set with courses of quarry stone, crowned by the Anvil's gold halo holding the four veins of the Heart, amber, gale, frost and fire, round a white-gold core.",
+    emissive: {
+      hue: [8, 215],
+      minS: 0.7,
+      minL: 0.5,
+      whiteL: 0.97,
+      tint: 0xffe0a0,
+      // the four gems keep their own colours (fire, frost, gale, amber), only warmed a touch
+      tintMix: 0.12,
+      intensity: 1.0,
+      pulse: 0.3,
+      pulseHz: 0.5,
+    },
+    shell: { color: 0xfff0d8, strength: 0.22, power: 2.6 },
+    light: {
+      color: 0xffe0a0,
+      at: { yF: 0.77 },
+      intensity: 1.6,
+      distance: 7,
+      flicker: 0.2,
+      hz: 0.6,
+    },
+    fx: [
+      // the four gems, lighting in turn
+      ...HEARTMELD_GEMS.map(
+        (g, slot): WeaponVfxCoreSprite => ({
+          kind: 'coreSprite',
+          at: { yF: 0.768, dx: g.dx, dy: g.dy },
+          size: 0.3,
+          color: g.color,
+          flare: 0,
+          hz: 0.9,
+          opacity: 0.85,
+          seq: { slot, of: 4, hz: 0.3 },
+        }),
+      ),
+      // the gathered strength turning in the heart
+      {
+        kind: 'vortex',
+        at: { yF: 0.768 },
+        axis: [0, 0, 1],
+        radius: 0.21,
+        arms: 4,
+        speed: 0.25,
+        twist: 0.8,
+        outer: 0xffb050,
+        inner: 0xffe6b0,
+        opacity: 0.2,
+      },
+      // the ring of gold runes round the whole head
+      {
+        kind: 'runeRing',
+        at: { yF: 0.768 },
+        axis: [0, 0, 1],
+        radius: 0.5,
+        width: 0.09,
+        speed: 0.06,
+        color: 0xffc860,
+        core: 0xffffff,
+        opacity: 0.75,
+      },
+      // the gale: a gust winding round the wind gem
       {
         kind: 'aurora',
-        helix: { from: { yF: 0.66 }, to: { yF: 1.0 }, radius: 0.22, turns: 1.2 },
-        width: 0.09,
-        amp: 0.05,
-        speed: 0.6,
-        opacity: 0.45,
-        colors: [0x5a1ea8, 0xc080ff, 0x3a1070],
+        helix: {
+          from: { yF: 0.768, dx: 0.22, dy: 0.08 },
+          to: { yF: 0.768, dx: 0.22, dy: 0.38 },
+          radius: 0.09,
+          turns: 1.6,
+        },
+        width: 0.035,
+        amp: 0.02,
+        speed: 1.6,
+        opacity: 0.8,
+        colors: [0x9effd8, 0xffffff, 0x6fe8c0],
+        streak: 4,
       },
-      // dim violet sparks drifting up out of the flame
+      // the frost: snow falling from the frost gem
       {
         kind: 'drift',
-        line: [{ yF: 0.75 }, { yF: 0.92 }],
-        count: 22,
-        vel: [0, 0.28, 0],
-        spread: [0.06, 0.04, 0.06],
-        life: [1.4, 2.6],
-        size: [0.018, 0.04],
-        grow: 0.2,
+        line: [
+          { yF: 0.768, dx: 0.22, dy: -0.2 },
+          { yF: 0.768, dx: 0.3, dy: -0.27 },
+        ],
+        count: 16,
+        vel: [0, -0.3, 0],
+        spread: [0.06, 0.03, 0.06],
+        life: [1.4, 2.4],
+        size: [0.018, 0.035],
+        grow: 0,
+        swirl: 0.1,
+        colorA: 0xffffff,
+        colorB: 0x9fdcff,
+        opacity: 0.95,
+      },
+      // the fire: embers rising off the fire gem
+      {
+        kind: 'drift',
+        line: [
+          { yF: 0.768, dx: -0.225, dy: -0.2 },
+          { yF: 0.768, dx: -0.3, dy: -0.15 },
+        ],
+        count: 14,
+        vel: [0, 0.4, 0],
+        spread: [0.04, 0.03, 0.04],
+        life: [0.8, 1.6],
+        size: [0.016, 0.03],
+        grow: 0.1,
         swirl: 0.12,
-        colorA: 0xc080ff,
-        colorB: 0x7a30e0,
-        opacity: 0.85,
+        colorA: EMBER.hot,
+        colorB: EMBER.coal,
+        opacity: 0.95,
+      },
+      // motes of all four circling the halo
+      {
+        kind: 'motes',
+        at: { yF: 0.768 },
+        radius: [0.36, 0.46],
+        count: 12,
+        heroCount: 4,
+        size: [0.02, 0.04],
+        heroSize: 0.07,
+        speed: [0.6, 0.9],
+        tilt: 0.25,
+        bob: 0.03,
+        colorA: 0xffe0a0,
+        colorB: 0x9fe8ff,
+        opacity: 0.9,
       },
       {
         kind: 'twinkles',
-        surface: { yMinF: 0.7, count: 36 },
-        size: [0.03, 0.06],
-        rate: [0.4, 1.0],
-        color: 0xd0a0ff,
+        surface: { yMinF: 0.58, count: 50 },
+        size: [0.03, 0.065],
+        rate: [0.5, 1.2],
+        color: 0xfff0d0,
         star: true,
       },
     ],
@@ -2744,7 +3096,7 @@ type VfxMaterial = THREE.Material & { uniforms?: Record<string, THREE.IUniform> 
 interface VfxPart {
   node: THREE.Object3D | null;
   mats: VfxMaterial[];
-  update?: (t: number) => void;
+  update?: (t: number, calm: boolean) => void;
   extraDispose?: () => void;
   kind?: string;
   baseOpacities?: number[];
@@ -2960,10 +3312,11 @@ function makeTwinkles(root: THREE.Object3D, b: THREE.Box3, c: WeaponVfxTwinkles)
       uMap: { value: c.star ? starFlareTex() : softDiscTex() },
       uColor: { value: new THREE.Color(c.color) },
       uOpacity: { value: 1 },
+      uCalm: { value: 0 },
     },
     vertexShader: `
       attribute float aSeed; attribute float aSize; attribute float aRate;
-      uniform float uTime; uniform float uScale; uniform float uMaxPx;
+      uniform float uTime; uniform float uScale; uniform float uMaxPx; uniform float uCalm;
       varying float vI;
       void main() {
         // clamp() is load-bearing: GLSL leaves the precision of sin() to the
@@ -2971,7 +3324,8 @@ function makeTwinkles(root: THREE.Object3D, b: THREE.Box3, c: WeaponVfxTwinkles)
         // arithmetic. pow() of a negative base is NaN, and one NaN here is a
         // hard-edged black rectangle once the bloom blurs it.
         float w = clamp(0.5 + 0.5 * sin(uTime * aRate * 6.2831 + aSeed * 6.2831), 0.0, 1.0);
-        vI = pow(w, 9.0);
+        // reduced motion: a soft shimmer instead of the star's blink
+        vI = mix(pow(w, 9.0), 0.25 + 0.2 * w, uCalm);
         vec4 mv = modelViewMatrix * vec4(position, 1.0);
         gl_PointSize = min(aSize * uScale * (0.55 + 0.45 * vI) / max(0.15, -mv.z), uMaxPx);
         gl_Position = projectionMatrix * mv;
@@ -3078,6 +3432,8 @@ function makeAurora(b: THREE.Box3, c: WeaponVfxAurora): VfxPart | null {
       uColA: { value: new THREE.Color(c.colors?.[0] ?? STAR.gold) },
       uColB: { value: new THREE.Color(c.colors?.[1] ?? STAR.violet) },
       uColC: { value: new THREE.Color(c.colors?.[2] ?? STAR.teal) },
+      uStreak: { value: c.streak ?? 0 },
+      uCalm: { value: 0 },
     },
     vertexShader: `
       attribute vec3 aNorm;
@@ -3089,7 +3445,8 @@ function makeAurora(b: THREE.Box3, c: WeaponVfxAurora): VfxPart | null {
         gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
       }`,
     fragmentShader: `
-      uniform float uTime; uniform float uOpacity;
+      uniform float uTime; uniform float uOpacity; uniform float uStreak; uniform float uSpeed;
+      uniform float uCalm;
       uniform vec3 uColA; uniform vec3 uColB; uniform vec3 uColC;
       varying vec2 vUv;
       void main() {
@@ -3099,7 +3456,12 @@ function makeAurora(b: THREE.Box3, c: WeaponVfxAurora): VfxPart | null {
         float ends = pow(max(0.0, sin(3.14159 * vUv.x)), 0.75);
         float edge = pow(max(0.0, 1.0 - abs(vUv.y * 2.0 - 1.0)), 1.6);
         float shim = 0.72 + 0.28 * sin(uTime * 1.1 + vUv.x * 8.0);
-        float a = ends * edge * shim * uOpacity;
+        // wind streaks: dashes racing along the ribbon, thinning toward its edges
+        // reduced motion: the dashes drift instead of racing
+        float race = mod(uTime, 512.0) * uSpeed * mix(9.0, 1.5, uCalm);
+        float dash = smoothstep(0.25, 0.85, 0.5 + 0.5 * sin(vUv.x * uStreak * 6.2831 - race));
+        float streak = mix(1.0, dash * 1.5, step(0.5, uStreak));
+        float a = ends * edge * shim * streak * uOpacity;
         gl_FragColor = vec4(c * a, a);
       }`,
   });
@@ -3168,6 +3530,7 @@ function makeArcs(b: THREE.Box3, c: WeaponVfxArcs): VfxPart {
       uColor: { value: new THREE.Color(c.color) },
       uCore: { value: new THREE.Color(c.core) },
       uOpacity: { value: c.opacity ?? 1 },
+      uCalm: { value: 0 },
     },
     // The strike counter wraps (mod 997) so the hash input stays small: sin() of a large float
     // loses its low bits and a long session would freeze every bolt in place.
@@ -3175,11 +3538,12 @@ function makeArcs(b: THREE.Box3, c: WeaponVfxArcs): VfxPart {
       attribute float aBolt; attribute float aSeg; attribute float aSide; attribute float aPlane;
       uniform float uTime; uniform vec3 uA; uniform vec3 uB; uniform float uRadius;
       uniform float uLen; uniform float uJitter; uniform float uWidth; uniform float uRate;
-      uniform float uDuty;
+      uniform float uDuty; uniform float uCalm;
       varying float vSide; varying float vOn; varying float vU;
       float h(float n) { return fract(sin(n * 12.9898 + 4.1414) * 43758.5453); }
       void main() {
-        float strike = mod(floor(uTime * uRate + h(aBolt * 3.7) * 9.0), 997.0);
+        // reduced motion: the bolts re-strike at a fifth of the rate (no strobing)
+        float strike = mod(floor(uTime * uRate * (1.0 - 0.8 * uCalm) + h(aBolt * 3.7) * 9.0), 997.0);
         float key = aBolt * 31.0 + strike * 7.0;
         vOn = step(h(key + 5.0), uDuty);
         float u = aSeg / ${ARC_SEGMENTS.toFixed(1)};
@@ -3206,12 +3570,13 @@ function makeArcs(b: THREE.Box3, c: WeaponVfxArcs): VfxPart {
       }`,
     fragmentShader: `
       uniform vec3 uColor; uniform vec3 uCore; uniform float uOpacity; uniform float uTime;
+      uniform float uCalm;
       varying float vSide; varying float vOn; varying float vU;
       void main() {
         float d = abs(vSide);
         float core = 1.0 - smoothstep(0.0, 0.35, d);
         float glow = 1.0 - smoothstep(0.2, 1.0, d);
-        float flick = 0.75 + 0.25 * sin(uTime * 61.0 + vU * 9.0);
+        float flick = mix(0.75 + 0.25 * sin(uTime * 61.0 + vU * 9.0), 0.8, uCalm);
         float a = (core + glow * 0.6) * vOn * uOpacity * flick;
         gl_FragColor = vec4(mix(uColor, uCore, core) * a, a);
       }`,
@@ -3300,16 +3665,32 @@ function makeCoreSprite(b: THREE.Box3, c: WeaponVfxCoreSprite): VfxPart {
   };
   const op = c.opacity ?? 0.8;
   const glow = mkSprite(softDiscTex(), c.size, op);
-  const flare = mkSprite(starFlareTex(), c.size * (1 + (c.flare ?? 0.5)), op * 0.85);
-  group.add(glow, flare);
+  // `flare: 0` draws the soft glow alone: one draw instead of two, for a rig that lights several
+  const flare =
+    c.flare === 0 ? null : mkSprite(starFlareTex(), c.size * (1 + (c.flare ?? 0.5)), op * 0.85);
+  group.add(glow);
+  if (flare) group.add(flare);
+  const seq = c.seq;
+  const tint = new THREE.Color(c.color);
   return {
     node: group,
-    mats: [glow.material, flare.material],
-    update: (t: number) => {
+    mats: flare ? [glow.material, flare.material] : [glow.material],
+    update: (t: number, calm: boolean) => {
       const pulse = 0.86 + 0.14 * Math.sin(t * (c.hz ?? 0.7) * Math.PI * 2);
-      glow.scale.setScalar(c.size * pulse);
-      flare.scale.setScalar(c.size * (1 + (c.flare ?? 0.5)) * (2 - pulse));
-      flare.material.rotation = t * 0.22;
+      // in turn: a smooth lobe once a round, centred on this sprite's slot (a slower round, at
+      // a steadier swell, under reduced motion)
+      const lit = seq ? weaponVfxSeqLevel(t, seq.slot, seq.of, calm ? seq.hz * 0.4 : seq.hz) : 1;
+      const swell = seq ? 0.55 + 0.75 * lit : 1;
+      glow.scale.setScalar(c.size * pulse * swell);
+      if (flare) {
+        flare.scale.setScalar(c.size * (1 + (c.flare ?? 0.5)) * (2 - pulse) * swell);
+        flare.material.rotation = t * 0.22;
+      }
+      if (seq) {
+        const k = 0.3 + 0.7 * lit;
+        glow.material.color.copy(tint).multiplyScalar(k);
+        flare?.material.color.copy(tint).multiplyScalar(k);
+      }
     },
   };
 }
@@ -3438,6 +3819,10 @@ export interface WeaponVfxHandle {
   setTuning(next: Partial<WeaponVfxTuning>): void;
   setBackdropVisible(v: boolean): void;
   setPixelScale(devicePxHeight: number): void;
+  /** Reduced motion: caps every flash (strike rates, blinks, flicker, the running rune light,
+   *  wind dashes, sprites lighting in turn, the cast light's flicker).
+   *  Write-elided, so a per-frame caller costs nothing while the setting holds. */
+  setCalm(on: boolean): void;
   update(dt: number): void;
   dispose(): void;
 }
@@ -3570,6 +3955,9 @@ export function createWeaponVfx(
     else if (c.kind === 'aurora') part = makeAurora(b, c);
     else if (c.kind === 'coreSprite') part = makeCoreSprite(b, c);
     else if (c.kind === 'arcs') part = makeArcs(b, c);
+    else if (c.kind === 'flames') {
+      part = makeRaidPart(c, resolvePoint(b, c.line[0]), resolvePoint(b, c.line[1]));
+    } else part = makeRaidPart(c, resolvePoint(b, c.at), null);
     if (part) {
       if (part.node) part.node.name = `vfx_${c.kind}`;
       part.kind = c.kind;
@@ -3638,6 +4026,7 @@ export function createWeaponVfx(
   // must run at most once: a second call would strip a reference another live
   // wearer of the same skin still depends on.
   let rigDisposed = false;
+  let calm = false;
 
   return {
     group,
@@ -3667,12 +4056,19 @@ export function createWeaponVfx(
         if (m.uniforms?.uMaxPx) m.uniforms.uMaxPx.value = maxPx;
       }
     },
+    setCalm(on: boolean) {
+      if (on === calm) return;
+      calm = on;
+      for (const m of allMats) {
+        if (m.uniforms?.uCalm) m.uniforms.uCalm.value = on ? 1 : 0;
+      }
+    },
     update(dt: number) {
       time += dt;
       for (const m of allMats) {
         if (m.uniforms?.uTime) m.uniforms.uTime.value = time;
       }
-      for (const p of parts) p.update?.(time);
+      for (const p of parts) p.update?.(time, calm);
       const e = eSpec;
       const glowPulse = 1 - e.pulse / 2 + (e.pulse / 2) * Math.sin(time * e.pulseHz * Math.PI * 2);
       for (const { prev } of emissives) {
@@ -3681,10 +4077,12 @@ export function createWeaponVfx(
         }
       }
       if (light) {
+        // reduced motion holds the cast light near steady
+        const flicker = calm ? lightSpec.flicker * 0.15 : lightSpec.flicker;
         const flick =
           1 -
-          lightSpec.flicker +
-          lightSpec.flicker *
+          flicker +
+          flicker *
             (0.6 * Math.sin(time * lightSpec.hz * 6.4) +
               0.4 * Math.sin(time * lightSpec.hz * 17.3));
         light.intensity = lightSpec.intensity * flick * tuning.light;
@@ -3806,6 +4204,11 @@ export const WEAPON_VFX_DOUBLE_SIDED_SKINS: ReadonlySet<string> = new Set([
   'frostbite',
   'shard_of_everwinter',
   'forgeheart_stave',
+  'seamcaller_maul',
+  'squallcrest',
+  'rimelight_staff',
+  'hearthbrand',
+  'duskwick_staff',
 ]);
 
 /** Untextured, single-sided extra materials, by GLB material name. */

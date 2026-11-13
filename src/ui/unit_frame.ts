@@ -31,6 +31,14 @@ import {
   absorbBarView,
   absorbBarViewInto,
 } from './absorb_bar';
+import {
+  HEAL_ABSORB_OFF,
+  type HealAbsorbBarInput,
+  type HealAbsorbBarView,
+  healAbsorbBarView,
+  healAbsorbBarViewInto,
+  newHealAbsorbBarView,
+} from './heal_absorb_bar_view';
 import { formatNumber } from './i18n';
 
 // The absorb-total suffix appended to hpText ("523 / 600 (60)") runs through
@@ -116,6 +124,14 @@ export interface UnitFrameDescriptor {
    *  absorbBarView, or null for no shield (e.g. a dead target). The player passes
    *  its own entity (a structural AbsorbBarInput). */
   absorb: AbsorbBarInput | null;
+  /** The heal-absorb input (heal_absorb_bar_view.ts): the hatched segment over
+   *  current health plus the healing-left number. Omitted means "read it from
+   *  `absorb`", which for the player and target frames IS the live entity (its
+   *  auras carry each heal absorb's value), so those instances need no extra
+   *  wiring. A party row passes its own `{ hp, maxHp, healTotal }` because its
+   *  shield input carries no auras and is nulled by the Show Absorb Shields
+   *  option, which must never hide a heal absorb (it is actionable). */
+  healAbsorb?: HealAbsorbBarInput | null;
   /** The unit is dead (party styles the frame; a dead target also reads "Dead" via
    *  hpText). The player frame is never dead-styled. */
   dead: boolean;
@@ -165,6 +181,8 @@ export interface UnitFrameView {
   absorbSizeFrac: number;
   /** The shield reaches/passes the bar's right edge (fully shielded). */
   absorbOvershield: boolean;
+  /** The heal-absorb overlay (segment edges + the healing-left number). */
+  healAbsorb: Readonly<HealAbsorbBarView>;
   dead: boolean;
   outOfRange: boolean;
   /** The raid marker index (0..7) to show beside the portrait, or null when the
@@ -175,6 +193,7 @@ export interface UnitFrameView {
 export interface UnitFrameBuffer {
   view: UnitFrameView;
   absorb: AbsorbBarView;
+  healAbsorb: HealAbsorbBarView;
   absorbTextBase: string;
   absorbTextTotal: number;
   absorbText: string;
@@ -201,6 +220,7 @@ const HIDDEN: UnitFrameView = {
   absorbStartFrac: 0,
   absorbSizeFrac: 0,
   absorbOvershield: false,
+  healAbsorb: HEAL_ABSORB_OFF,
   dead: false,
   outOfRange: false,
   raidMarker: null,
@@ -241,6 +261,13 @@ export function absorbSegmentTransform(startFrac: number, sizeFrac: number, scal
   return `translateX(${startFrac * 100}%) ${scale}`;
 }
 
+// The heal-absorb input: the descriptor's own when it supplies one (party rows,
+// and null to switch it off), else the shield input, which for the player and
+// target frames is the live entity carrying the heal_absorb auras.
+function healAbsorbInput(d: UnitFrameDescriptor): HealAbsorbBarInput | null {
+  return d.healAbsorb !== undefined ? d.healAbsorb : d.absorb;
+}
+
 /**
  * Derive a unit frame's paint values from its descriptor. Pure, allocation-light
  * (one returned object, or the shared HIDDEN constant when absent), deterministic.
@@ -271,6 +298,7 @@ export function unitFrameView(d: UnitFrameDescriptor): UnitFrameView {
     absorbStartFrac: absorb.startFrac,
     absorbSizeFrac: absorb.sizeFrac,
     absorbOvershield: absorb.overshield,
+    healAbsorb: healAbsorbBarView(healAbsorbInput(d)),
     dead: d.dead,
     outOfRange: d.outOfRange,
     raidMarker: d.raidMarker ?? null,
@@ -299,6 +327,7 @@ export function newUnitFrameBuffer(): UnitFrameBuffer {
       absorbStartFrac: 0,
       absorbSizeFrac: 0,
       absorbOvershield: false,
+      healAbsorb: HEAL_ABSORB_OFF,
       dead: false,
       outOfRange: false,
       raidMarker: null,
@@ -310,6 +339,7 @@ export function newUnitFrameBuffer(): UnitFrameBuffer {
       sizeFrac: 0,
       overshield: false,
     },
+    healAbsorb: newHealAbsorbBarView(),
     absorbTextBase: '',
     absorbTextTotal: 0,
     absorbText: '',
@@ -341,6 +371,7 @@ export function unitFrameViewInto(buffer: UnitFrameBuffer, d: UnitFrameDescripto
     out.absorbStartFrac = 0;
     out.absorbSizeFrac = 0;
     out.absorbOvershield = false;
+    out.healAbsorb = healAbsorbBarViewInto(buffer.healAbsorb, null);
     out.dead = false;
     out.outOfRange = false;
     out.raidMarker = null;
@@ -375,6 +406,7 @@ export function unitFrameViewInto(buffer: UnitFrameBuffer, d: UnitFrameDescripto
   out.absorbStartFrac = absorb.startFrac;
   out.absorbSizeFrac = absorb.sizeFrac;
   out.absorbOvershield = absorb.overshield;
+  out.healAbsorb = healAbsorbBarViewInto(buffer.healAbsorb, healAbsorbInput(d));
   out.dead = d.dead;
   out.outOfRange = d.outOfRange;
   out.raidMarker = d.raidMarker ?? null;

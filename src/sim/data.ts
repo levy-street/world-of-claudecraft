@@ -258,6 +258,17 @@ import {
 } from './content/recipes';
 import { RIFT_ITEMS } from './content/rift/items';
 import { HOARD_MOBS, RIFT_MOBS } from './content/rift/mobs';
+import {
+  SMITH_HEART_DUNGEON_DEFS,
+  SMITH_HEART_MOBS,
+  SMITH_HEART_NPCS,
+} from './content/smith_heart';
+import {
+  SMITH_HEART_REWARD_ITEMS,
+  SMITH_HEART_REWARD_NPCS,
+  SMITH_HEART_REWARD_QUEST_ORDER,
+  SMITH_HEART_REWARD_QUESTS,
+} from './content/smith_heart_rewards';
 import { SUNKEN_BASTION_MOBS } from './content/sunken_bastion';
 import { SUNKEN_BASTION_ITEMS } from './content/sunken_bastion_items';
 import {
@@ -488,6 +499,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   GOURDLIGHT_EVE_ITEMS,
   GOURDLIGHT_SCARECROW_ITEMS,
   GOURDLIGHT_DAILY_ITEMS,
+  SMITH_HEART_REWARD_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
@@ -515,6 +527,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...REALM_MOBS,
   ...DRAKELANDS_MOBS,
   ...WILDHEART_MOBS,
+  ...SMITH_HEART_MOBS,
   ...HOLLOW_CRYPT_MOBS,
   ...HOLLOW_CRYPT_TRASH_MOBS,
   ...SUNKEN_BASTION_MOBS,
@@ -605,6 +618,11 @@ export const NPCS: Record<string, NpcDef> = {
   // Gourdlight Eve's keeper (content/gourdlight_eve.ts): a dynamic singleton under a
   // reserved id, raised only while the event runs (seasonal/seasonal_tick.ts).
   ...GOURDLIGHT_EVE_NPCS,
+  // The Smith's Heart's Captain Thessaly (content/smith_heart.ts): dynamic,
+  // spawned per claim on the Storm Cornice, appended last so no placed NPC moves.
+  ...SMITH_HEART_NPCS,
+  // Warden Collier, the essence quest's giver at the raid's entrance (dynamic, per claim).
+  ...SMITH_HEART_REWARD_NPCS,
 };
 
 // Graveyards + the Spirit Healer: re-exported so the Sim and spirit.ts import the
@@ -639,6 +657,7 @@ export const QUESTS: Record<string, QuestDef> = {
   ...HUB_PRACTICE_QUESTS,
   ...GOURDLIGHT_EVE_QUESTS,
   ...GOURDLIGHT_DAILY_QUESTS,
+  ...SMITH_HEART_REWARD_QUESTS,
 };
 
 // The choose-one leveling gear rides on the quest records (QuestDef.choiceRewards),
@@ -670,6 +689,7 @@ export const QUEST_ORDER: string[] = [
   // the seasonal events' quests (open only while their event runs)
   ...Object.keys(GOURDLIGHT_EVE_QUESTS),
   ...Object.keys(GOURDLIGHT_DAILY_QUESTS),
+  ...SMITH_HEART_REWARD_QUEST_ORDER,
 ];
 
 // The Book of Deeds catalog (content/deeds.ts) is deliberately NOT re-exported
@@ -1553,6 +1573,7 @@ export const DUNGEONS: Record<string, DungeonDef> = {
   ...DUNGEON_DEFS,
   ...TEMPLE_DUNGEON_DEFS,
   ...WILDHEART_DUNGEON_DEFS,
+  ...SMITH_HEART_DUNGEON_DEFS,
 };
 
 export const DUNGEON_LIST: DungeonDef[] = Object.values(DUNGEONS).sort((a, b) => a.index - b.index);

@@ -13,6 +13,7 @@
 import type * as THREE from 'three';
 import type { CharacterVisual } from './characters/visual';
 import type { GoblinRocketSledFx } from './goblin_rocket_sled_fx';
+import type { QuarryheartChargerFx } from './quarryheart_charger_fx';
 import { type RickshawMountViewState, releaseRickshawMountState } from './rickshaw_mount';
 import type { VehicleSuspensionRig } from './vehicle_suspension_fx';
 
@@ -22,6 +23,7 @@ export interface MountVisualHost extends RickshawMountViewState {
   mountVisual: CharacterVisual | null;
   mountVisualKey: string;
   goblinRocketSledFx: GoblinRocketSledFx | null;
+  quarryheartFx?: QuarryheartChargerFx | null;
   mountSuspension: VehicleSuspensionRig | null | undefined;
 }
 
@@ -33,6 +35,8 @@ export interface MountVisualHost extends RickshawMountViewState {
 export function releaseMountFx(view: MountVisualHost): void {
   view.goblinRocketSledFx?.dispose();
   view.goblinRocketSledFx = null;
+  view.quarryheartFx?.dispose();
+  view.quarryheartFx = null;
 }
 
 /** Drops the mount FX controller, the mount rig, and the diffed key.

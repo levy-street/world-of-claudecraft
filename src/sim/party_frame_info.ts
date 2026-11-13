@@ -6,6 +6,7 @@ import { isPlayingDead } from './combat/hunter_play_dead';
 import { rewindHealAmount } from './combat/rewind';
 import { MENDING_CURRENT_ID } from './combat/shaman_spiritmend';
 import type { Role } from './content/talents';
+import { QUENCH_AURAS } from './encounters/smith_heart/quench_ids';
 import type { SimContext } from './sim_context';
 import type { AbilityEffect, Aura, Entity, PlayerClass } from './types';
 import { PARTY_MEMBER_AURA_CAP } from './types';
@@ -27,10 +28,15 @@ export interface PreparedPartyFrameAura {
   sourceId: number;
 }
 
+/** A pool a raid frame badges as a whole percent of the member's maximum
+ * health: Mending Current's banked healing, and the healing Living Rime still
+ * needs before it breaks (the Guardian of the Quench's heal absorb). */
+const POOL_BADGE_IDS: ReadonlySet<string> = new Set([MENDING_CURRENT_ID, QUENCH_AURAS.rime]);
+
 /** Perform the relevance, priority, and summary work once before applying a
  * viewer-specific Temporal Echo visibility filter. */
 function mendingPoolPct(aura: Aura, maxHp: number | undefined): number | undefined {
-  if (aura.id !== MENDING_CURRENT_ID || aura.value <= 0 || !maxHp || maxHp <= 0) return undefined;
+  if (!POOL_BADGE_IDS.has(aura.id) || aura.value <= 0 || !maxHp || maxHp <= 0) return undefined;
   return Math.max(1, Math.min(100, Math.round((aura.value / maxHp) * 100)));
 }
 
@@ -112,6 +118,26 @@ export function partyFrameAbsorb(auras: readonly Aura[]): number {
     if (aura.kind === 'absorb') total += Math.max(0, aura.value);
   }
   return total;
+}
+
+/** Remaining heal absorb (Living Rime, Stone Shell, the necrotic blights): the
+ *  healing the member must take before their health moves again. */
+export function partyFrameHealAbsorb(auras: readonly Aura[]): number {
+  let total = 0;
+  for (const aura of auras) {
+    if (aura.kind === 'heal_absorb') total += Math.max(0, aura.value);
+  }
+  return total;
+}
+
+/** Both absorb totals a party row draws, in wire shape: the shield total always
+ *  rides, the heal absorb only while one is up (an older client or snapshot
+ *  without it reads "none"). One spread at both hosts' member projection, so the
+ *  offline row and the server party wire can never disagree on either total. */
+export function partyFrameAbsorbs(auras: readonly Aura[]): { absorb: number; healAbsorb?: number } {
+  const absorb = partyFrameAbsorb(auras);
+  const healAbsorb = partyFrameHealAbsorb(auras);
+  return healAbsorb > 0 ? { absorb, healAbsorb } : { absorb };
 }
 
 /** Entity ids currently tanking at least one living hostile mob. */
@@ -203,7 +229,7 @@ export function collectPartyInfo(ctx: SimContext): PartyInfo | null {
               z: e.pos.z,
               inCombat: e.inCombat ? 1 : 0,
               group: party.raidGroups.get(mPid) ?? 1,
-              absorb: partyFrameAbsorb(e.auras),
+              ...partyFrameAbsorbs(e.auras),
               role: partyFrameRole(meta.talentMods.role, meta.cls, e.auras),
               spec: meta.talentMods.spec ?? meta.talents.spec ?? null,
               // Effective health Rewind could currently restore to this member

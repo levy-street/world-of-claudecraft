@@ -160,8 +160,8 @@ import {
   setCharacterCullShadow,
 } from './character_cull_core';
 import {
+  applyCharacterBodyTints,
   type CharacterWeaponAura,
-  characterRuneTintColor,
   characterVeilboundState,
   characterWeaponAuraInto,
   characterWeaponAuraMode,
@@ -883,6 +883,7 @@ import { refreshTextureAnisotropy } from './texture_anisotropy';
 import { runTexturePrepLane } from './texture_prep_lane';
 import { sweepMaterialTextures, sweepObjectTextures } from './texture_prewarm';
 import { TextureResidencyLedger } from './texture_residency_ledger';
+import { thrownHopLift } from './thrown_hop';
 import {
   groundSpeedFromFrame,
   hasTravelFormAura,
@@ -3057,7 +3058,7 @@ export class Renderer {
         this.scene,
         this.groundSample,
         this.worldCompileGate(),
-        this.sim, (amount) => this.addShake(amount), () => this.reducedMotion(), (id, gesture) => this.triggerAttack(id, gesture),
+        this.sim, (amount) => this.addShake(amount), () => this.reducedMotion(), (id, gesture) => this.triggerAttack(id, gesture), (id) => this.views.get(id)?.group.position,
       );
     });
     this.hillRingVisuals = new HillRingVisuals(this.scene, gate, (x, z) =>
@@ -9863,7 +9864,9 @@ export class Renderer {
       // entities interpolate on their own measured cadence via
       // remoteEntityAlpha (unknown-cadence fallback).
       const rp = entityRenderPose(sim, e, ea, isSelf ? selfPos : null, v);
-      const { x, y, z, deck } = rp; // a passenger rides the drawn deck (deck_frame.ts)
+      const hop = thrownHopLift(v, e.auras, this.time); // a thrown body's arc (thrown_hop.ts)
+      const { x, z, deck } = rp; // a passenger rides the drawn deck (deck_frame.ts)
+      const y = rp.y + hop;
       v.group.position.set(x, y, z);
       let facing = rp.facing;
       if (ignivarBossFacingLocked(e)) facing = e.facing;
@@ -10303,7 +10306,7 @@ export class Renderer {
       // Metamorphosis is no longer a tint on the base rig: it has its own lazy
       // CharacterVisual driven by formVisibility.metamorph above.
       active.setAscended(veilboundState !== 'none');
-      active.setRuneTint(characterRuneTintColor(e));
+      applyCharacterBodyTints(active, e, performance.now() / 1000);
       // saddle lift: the rider (click proxy included, a root child) sits at
       // the seat height while mounted; 0 whenever the mount is absent/hidden.
       // seatFwd slides the rider along facing onto saddles that sit off the
@@ -10473,9 +10476,10 @@ export class Renderer {
       const airborne =
         !visuallyDead &&
         !swimming &&
-        (animFromDisplay && this.selfRender.predictor && !inRift
-          ? !this.selfRender.predictor.onGround
-          : !e.onGround || v.airborneHeurFrames >= 2);
+        (hop > 0 ||
+          (animFromDisplay && this.selfRender.predictor && !inRift
+            ? !this.selfRender.predictor.onGround
+            : !e.onGround || v.airborneHeurFrames >= 2));
       // Grounded presentation polish, both display-only (see the cores).
       // Vertical smoothing absorbs the step-up the solver performs inside a
       // single tick, so the body strides onto a kerb instead of teleporting up
@@ -10571,7 +10575,7 @@ export class Renderer {
       applyLocoDirection(st, loco, ghostWolf);
       st.dead = visuallyDead;
       st.casting = characterCasting;
-      st.asleep = e.asleep === true; // in bed (mob/slumber.ts): the sleep loop holds
+      st.asleep = heldUntilCollapse(deathHeld, e.asleep === true && !visuallyDead, active.sleeping);
       // Which ability, so the pose layer can tell a drawn shot from a pet
       // utility cast (tame_beast is a 6s cast; a bow must not sit aimed for it).
       st.castingAbility = characterCasting ? (e.castingAbility ?? null) : null;

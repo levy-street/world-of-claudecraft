@@ -21,6 +21,7 @@ import { GoblinRocketSledFx } from './goblin_rocket_sled_fx';
 import { attachMountGlows, disposeMountGlows, type MountGlows } from './mount_glow';
 import { attachMountLamps, disposeMountLamps, type MountLamps } from './mount_lamps';
 import type { MountVisualSpec } from './mount_visuals';
+import { QuarryheartChargerFx } from './quarryheart_charger_fx';
 import {
   attachPullerIfRickshaw,
   preloadPullerIfRickshaw,
@@ -43,6 +44,8 @@ export interface MountViewState extends RickshawMountViewState {
    *  renderer's light budget and need no reconcile. */
   mountGlows: MountGlows | null;
   goblinRocketSledFx: GoblinRocketSledFx | null;
+  /** The Quarryheart Charger's body rig (quarryheart_charger_fx.ts), for that mount alone. */
+  quarryheartFx?: QuarryheartChargerFx | null;
   mountCompilePending: boolean;
   /** Resolved seat bone, cached across frames (cleared on a mount swap). */
   mountSeatBone: THREE.Object3D | null;
@@ -70,6 +73,8 @@ export interface MountViewHost {
 function releaseSledFx(v: MountViewState): void {
   v.goblinRocketSledFx?.dispose();
   v.goblinRocketSledFx = null;
+  v.quarryheartFx?.dispose();
+  v.quarryheartFx = null;
 }
 
 function teardown(v: MountViewState, host: MountViewHost): void {
@@ -154,6 +159,15 @@ export function syncMountVisual(
   // links behind it at the first sighting instead of in the first moving frame.
   if (spec.visualKey === 'mount_goblin_rocket_sled') {
     v.goblinRocketSledFx = GoblinRocketSledFx.create(v.mountVisual.root);
+  }
+  // The charger's own materials (the plate float, the heartbeat, the wind) swap in here, before
+  // the gate, so they link behind it; the arrival starts if the summon edge is fresh.
+  if (spec.fx === 'quarryheart') {
+    v.quarryheartFx = QuarryheartChargerFx.create(
+      v.mountVisual.root,
+      v.mountSummonAt === undefined ? null : performance.now() / 1000 - v.mountSummonAt,
+      v.mountVisual,
+    );
   }
   gateMountSwapOnCompile(v, v.mountVisual.root, host.gateSwapFlagOnCompile);
 }

@@ -9,28 +9,68 @@ import { type WeaponVfxTierName, type WeaponVfxTuning, WORLD_TUNING } from './we
 
 export const WEAPON_VFX_TUNING: Record<string, Partial<WeaponVfxTuning>> = {
   // Populated by the inspector Save VFX button, keyed by weapon model basename.
-  // The elemental arms (reserved for a future raid): dialled hot on purpose (showpieces), the
-  // painted element at full glow, its particles and rim above the epic baseline, the cast light
-  // kept near it so a wearer lights the ground at their feet without washing out a crowd.
-  hearthbrand: { glow: 2, light: 0.6, core: 1.2, mist: 1.4, sparkle: 1.6, shell: 1.5 },
-  squallcrest: { glow: 2, light: 0.6, core: 1.2, aurora: 1.3, mist: 1.3, sparkle: 1.8, shell: 1.8 },
+  // The Smith's Heart raid arms, repainted 2026-11-13 (Tripo models with hand-painted textures).
+  // Their specs in weapon_vfx.ts are authored at the look the owner signed off, so every
+  // channel rides at 1 except bloom and, on the maul and the two swords, the cast light. A row
+  // replaces the tier's world baseline outright, so each 1 is written out: it holds the
+  // effect at its authored strength instead of the tier's dimmer default. The cast light stays
+  // low in the hand, so a wearer lights the ground at their feet without washing out a crowd
+  // (the two staffs' lights are already authored low, a pale crown burns out next to a bright
+  // one, so theirs ride at 1). Bloom is read by the Armory preview only; it sits at the store
+  // card's strength (0.55) less a fifth, the owner's call, over the tier's own strength:
+  // 0.44 / 0.9 for the epics, 0.44 / 1.1 for the legendary.
+  seamcaller_maul: {
+    glow: 1,
+    bloom: 0.49,
+    light: 0.35,
+    core: 1,
+    motes: 1,
+    aurora: 1,
+    mist: 1,
+    sparkle: 1,
+    shell: 1,
+  },
+  squallcrest: {
+    glow: 1,
+    bloom: 0.49,
+    light: 0.4,
+    core: 1,
+    aurora: 1,
+    mist: 1,
+    sparkle: 1,
+    shell: 1,
+  },
   rimelight_staff: {
-    glow: 2,
-    light: 0.6,
-    core: 1.2,
-    motes: 1.2,
-    mist: 1.3,
-    sparkle: 1.6,
-    shell: 1.5,
+    glow: 1,
+    bloom: 0.49,
+    light: 1,
+    core: 1,
+    motes: 1,
+    aurora: 1,
+    mist: 1,
+    sparkle: 1,
+    shell: 1,
+  },
+  hearthbrand: {
+    glow: 1,
+    bloom: 0.49,
+    light: 0.56,
+    core: 1,
+    motes: 1,
+    mist: 1,
+    sparkle: 1,
+    shell: 1,
   },
   duskwick_staff: {
-    glow: 2,
-    light: 0.6,
-    core: 1.2,
-    aurora: 1.3,
-    mist: 1.3,
-    sparkle: 1.5,
-    shell: 1.5,
+    glow: 1,
+    bloom: 0.4,
+    light: 1,
+    core: 1,
+    motes: 1,
+    aurora: 1,
+    mist: 1,
+    sparkle: 1,
+    shell: 1,
   },
   winterbite: {
     glow: 2,

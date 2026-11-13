@@ -9,9 +9,14 @@
 // lake) and the Hollow Crypt's (crypt_alert_view.ts on the same family: the
 // grave mark, the Frozen Embrace, the Bride's Lament, the Open Grave, the
 // Burning Knell's half, Grasp of the Grave, the Reap, the Toll and Harmony
-// readouts, the Rite's candles and the Bound Souls) and the Drowned Temple's
+// readouts, the Rite's candles and the Bound Souls), the Drowned Temple's
 // (temple_alert_view.ts on the same family: Choirmother Selthe's Score, its
-// melody, its answer and her broken voice), plus the trash engine's
+// melody, its answer and her broken voice) and the Smith's Heart's Hammer
+// Council's (council_alert_view.ts: the rock, the wake, the Weight,
+// Resonance), its Guardian of the Quench's cold bar (quench_alert_view.ts:
+// the player's own gauge, never advisory) and its Masterless Strength's
+// (final_alert_view.ts: the cold, the ember, the lightning, Crushed; never
+// advisory), plus the trash engine's
 // use prompt (kit_use_prompt_view.ts on the same family: a Soul Brazier to kick
 // over, a Remembrance Candle to relight, a Hunting Spear to pull out). It owns
 // no DOM itself; it builds
@@ -21,6 +26,10 @@
 // Sanctum, Crypt, Wildheart and Temple alerts and the use prompt keep their
 // scenes off the roster (sanctum_alert_scene_core.ts, crypt_alert_scene_core.ts,
 // wildheart_alert_scene_core.ts, temple_alert_scene_core.ts, KitUseSceneScan).
+//
+// Beside the slot it paints the Masterless Strength's raid HUD, the four
+// Overload bars at the top of the screen (heart_overload_view.ts and
+// heart_overload_painter.ts), on every tier and whatever the hints setting.
 //
 // The prompts share one slot over the action bar, so the use prompt gives way
 // to every encounter prompt above it (a strike to dodge or a cage to break
@@ -39,6 +48,11 @@
 import { BASTION_ALERT_KINDS, buildBastionAlertView } from './bastion_alert_view';
 import { type CageEscapeDeps, CageEscapePrompt } from './cage_escape_painter';
 import { buildCageEscapeView } from './cage_escape_view';
+import {
+  buildCouncilAlertView,
+  COUNCIL_ALERT_KINDS,
+  councilRushMarked,
+} from './council_alert_view';
 import { CryptAlertSceneScan, type CryptSceneEntity } from './crypt_alert_scene_core';
 import {
   buildCryptAlertView,
@@ -52,14 +66,24 @@ import {
   usePromptYields,
 } from './dungeon_prompt_policy_core';
 import { EncounterAlert } from './encounter_alert_painter';
+import { buildFinalAlertView, FINAL_ALERT_KINDS } from './final_alert_view';
 import { GaolChainAlert } from './gaol_chain_painter';
 import { buildGaolChainView, type GaolChainEntity } from './gaol_chain_view';
+import { HeartOverloadPanel } from './heart_overload_painter';
+import {
+  buildOverloadView,
+  HeartFinalScan,
+  makeOverloadView,
+  type OverloadBoss,
+} from './heart_overload_view';
 import {
   buildKitUsePromptView,
   KIT_USE_PROMPT_KINDS,
   type KitUseBody,
   KitUseSceneScan,
 } from './kit_use_prompt_view';
+import { buildKnotAlertView, KNOT_ALERT_KINDS } from './knot_alert_view';
+import { buildQuenchAlertView, QUENCH_ALERT_KINDS } from './quench_alert_view';
 import { SanctumAlertSceneScan, type SanctumSceneEntity } from './sanctum_alert_scene_core';
 import { buildSanctumAlertView, SANCTUM_ALERT_KINDS } from './sanctum_alert_view';
 import { TempleAlertSceneScan, type TempleSceneEntity } from './temple_alert_scene_core';
@@ -108,7 +132,8 @@ export interface DungeonPromptsFrame {
         CryptSceneEntity &
         WildheartSceneEntity &
         TempleSceneEntity &
-        KitUseBody
+        KitUseBody &
+        OverloadBoss
     >;
     entityRosterVersion: number;
     /** Select a body (the use prompt's press targets the body, then interacts). */
@@ -132,6 +157,13 @@ export class DungeonPrompts {
   private readonly sanctum: EncounterAlert;
   private readonly sanctumScene = new SanctumAlertSceneScan();
   private readonly crypt: EncounterAlert;
+  private readonly council: EncounterAlert;
+  private readonly quench: EncounterAlert;
+  private readonly final: EncounterAlert;
+  private readonly knot: EncounterAlert;
+  private readonly overload: HeartOverloadPanel;
+  private readonly overloadView = makeOverloadView();
+  private readonly finalScan = new HeartFinalScan();
   private readonly cryptScene = new CryptAlertSceneScan();
   private readonly temple: EncounterAlert;
   private readonly templeScene = new TempleAlertSceneScan();
@@ -150,6 +182,10 @@ export class DungeonPrompts {
     wildheart: false,
     sanctum: false,
     crypt: false,
+    council: false,
+    quench: false,
+    final: false,
+    knot: false,
     temple: false,
     cryptSoft: false,
     wildheartSoft: false,
@@ -178,6 +214,33 @@ export class DungeonPrompts {
       className: 'ui-panel-strong encounter-alert crypt-alert',
       kinds: CRYPT_ALERT_KINDS,
     });
+    this.council = new EncounterAlert(deps, {
+      id: 'heart-council-alert',
+      className: 'ui-panel-strong encounter-alert heart-council-alert',
+      kinds: COUNCIL_ALERT_KINDS,
+    });
+    // The cold bar is the player's own gauge, read the whole fight: docked on
+    // the player frame like a secondary resource bar (never the screen's
+    // middle; the owner's rule of 2026-11-04), the HUD layer the fallback.
+    this.quench = new EncounterAlert(
+      { ...deps, layer: () => quenchDock(deps.layer()) },
+      {
+        id: 'heart-quench-alert',
+        className: 'ui-panel-strong encounter-alert heart-quench-alert',
+        kinds: QUENCH_ALERT_KINDS,
+      },
+    );
+    this.final = new EncounterAlert(deps, {
+      id: 'heart-final-alert',
+      className: 'ui-panel-strong encounter-alert heart-final-alert',
+      kinds: FINAL_ALERT_KINDS,
+    });
+    this.knot = new EncounterAlert(deps, {
+      id: 'heart-knot-alert',
+      className: 'ui-panel-strong encounter-alert heart-knot-alert',
+      kinds: KNOT_ALERT_KINDS,
+    });
+    this.overload = new HeartOverloadPanel(deps);
     this.temple = new EncounterAlert(deps, {
       id: 'temple-alert',
       className: 'ui-panel-strong encounter-alert temple-alert',
@@ -263,6 +326,34 @@ export class DungeonPrompts {
         })
       : HINT_HIDDEN;
     const cryptSoft = crypt.visible && CRYPT_SOFT_ALERT_KINDS.has(crypt.kind);
+    // Mountain's Rush on the player is never advisory: the one council mark that kills.
+    const council = dungeonPromptEnabled('council', hints, councilRushMarked(p.auras))
+      ? buildCouncilAlertView({ auras: p.auras })
+      : HINT_HIDDEN;
+    this.council.paint(council);
+    // The cold bar is the player's own gauge: never hidden by the hints.
+    const quench = dungeonPromptEnabled('quench', hints)
+      ? buildQuenchAlertView({ auras: p.auras, dead: p.dead })
+      : HINT_HIDDEN;
+    this.quench.paint(quench);
+    // The Masterless Strength's alert: the player's own gauge and marks,
+    // never advisory; its raid HUD beside the slot.
+    const final = dungeonPromptEnabled('final', hints)
+      ? buildFinalAlertView({ auras: p.auras, dead: p.dead })
+      : HINT_HIDDEN;
+    this.final.paint(final);
+    // The Knotted Gale's part in the fight (the panel is the throw's button).
+    const knot = dungeonPromptEnabled('knot', hints)
+      ? buildKnotAlertView({
+          auras: p.auras,
+          pos: p.pos,
+          dead: p.dead,
+          interactKey: f.interactKey,
+          touch: f.touch,
+        })
+      : HINT_HIDDEN;
+    this.knot.paint(knot);
+    this.overload.paint(buildOverloadView(this.finalScan.frame(f.world), this.overloadView));
     const temple = dungeonPromptEnabled('temple', hints)
       ? buildTempleAlertView({
           selfPos: p.pos,
@@ -280,6 +371,11 @@ export class DungeonPrompts {
     slot.wildheart = wildheart.visible;
     slot.sanctum = sanctum.visible;
     slot.crypt = crypt.visible;
+    // The Rush's alert leaves the slot for the screen's upper middle: it holds no slot.
+    slot.council = council.visible && council.kind !== 'rush';
+    slot.quench = quench.visible;
+    slot.final = final.visible;
+    slot.knot = knot.visible;
     slot.temple = temple.visible;
     slot.cryptSoft = cryptSoft;
     slot.wildheartSoft = wildheartSoft;
@@ -308,7 +404,18 @@ export class DungeonPrompts {
     this.wildheart.dispose();
     this.sanctum.dispose();
     this.crypt.dispose();
+    this.council.dispose();
+    this.quench.dispose();
+    this.final.dispose();
+    this.knot.dispose();
+    this.overload.dispose();
     this.temple.dispose();
     this.kitUse.dispose();
   }
+}
+
+/** Where the Quench cold bar docks: the player frame when the HUD has one,
+ *  else the HUD layer itself. */
+export function quenchDock(layer: HTMLElement | null): HTMLElement | null {
+  return layer?.ownerDocument.getElementById('player-frame') ?? layer;
 }

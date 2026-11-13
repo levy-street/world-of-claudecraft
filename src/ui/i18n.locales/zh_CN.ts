@@ -1969,6 +1969,19 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.membershipDormant': '未激活：续订会员以恢复装备属性和套装加成。',
   'entities.items.lantern_seal.name': '灯火印章',
   'entities.items.reins_lantern_hall_destrier.name': '灯火大厅战马的缰绳',
+  'entities.items.reins_quarryheart_charger.name': '石心战驹的缰绳',
+  'entities.items.remnant_of_the_masterless_strength.name': '无主之力的残余',
+  'entities.items.coffer_of_the_highwatch_vigil.name': '高望守夜会的宝匣',
+  'entities.npcs.heart_warden_ada_collier.name': '守望者艾达·科利尔',
+  'entities.npcs.heart_warden_ada_collier.title': '高望守夜会',
+  'entities.npcs.heart_warden_ada_collier.greeting':
+    '守夜会四十代人守望这座山，却不知为何。如今我们知道了，{className}。当心你在里面唤醒的东西。',
+  'entities.quests.q_heart_what_the_heart_let_go.title': '心脏放走之物',
+  'entities.quests.q_heart_what_the_heart_let_go.text':
+    '心脏中的力量没有主人，也没有心智，{playerName}，但它有形体。它倒下时不会死去：它的精华会挣脱出来，逃回岩石之中。总有些东西会留下。把它留下的残余带给我，守夜会将从自己的宝库中付你报酬。',
+  'entities.quests.q_heart_what_the_heart_let_go.completion':
+    '还是温热的。四股力量凝在一块碎片里，它不愿被握住。守夜会信守承诺：拿走这个宝匣，愿它装着值得这番攀登的东西。',
+  'entities.quests.q_heart_what_the_heart_let_go.objectives.0.label': '无主之力的残余',
   'entities.items.membership_staff.name': '万变法杖',
   'hudChrome.bags.membershipSlot': '会员背包栏位',
   'hudChrome.bags.membershipSlotLocked': '开通会员以解锁此背包栏位。',
@@ -4267,26 +4280,33 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '宽阔的钢制剑身，血槽中燃着灯火，镀金的护颊，护手中燃着一盏笼中提灯，蓝色皮革剑柄。',
   'hudChrome.wocStore.skins.lantern_hall_sword.name': '灯火大厅之剑',
   'hudChrome.wocStore.skins.hearthbrand_sword.name': '炉火之刃',
-  'hudChrome.wocStore.skins.hearthbrand_sword.look':
-    '焦黑钢铁铸成的火焰波纹剑身，两侧刃口如出炉般炽热，熔融的裂缝在两面分叉蔓延，青铜火焰护手环绕一块燃烧的宝石，牛血色握柄。',
-  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
-    '灯火大厅里有一座自大厅建成以来从未熄灭的炉膛，加里克·霍尔特发誓这把剑就是在它的炭火中淬火的。佩戴它的成员说，即使在最寒冷的守夜里，剑柄也依然温暖。刃口上的火焰只是外观。',
   'hudChrome.wocStore.skins.squallcrest_sword.name': '风暴浪峰',
-  'hudChrome.wocStore.skins.squallcrest_sword.look':
-    '海蓝色的修长剑身，刃口如碎浪般明亮，风暴血槽中封着分叉的闪电，剑根上方是一道镀金的浪，一侧刃口生着鳍，镀金浪涛护手环绕一颗风暴珍珠。',
-  'hudChrome.wocStore.skins.squallcrest_sword.lore':
-    '一位为公会出海的船长从一场狂风中带回了这把剑，那场风暴折断了她的桅杆，让整艘船像钟一样鸣响。加里克只肯用印章出售它，并提醒每位买家，风暴来临前它会嗡嗡作响。闪电与海光只是外观。',
   'hudChrome.wocStore.skins.rimelight_staff.name': '霜光法杖',
-  'hudChrome.wocStore.skins.rimelight_staff.look':
-    '苍白的杖身以银箍束紧，缠绕着发光的雾凇，杖顶的银爪在冰晶之冠中托着一颗巨大的寒光水晶，杖颈垂着冰柱。',
-  'hudChrome.wocStore.skins.rimelight_staff.lore':
-    '灯火大厅的冬季守望者曾手持这样的法杖行走在高路上，点亮杖顶，为迷失在雪中的旅人引路。加里克在架上留了一根，给印章有余的成员。寒霜与冷光只是外观。',
-  'hudChrome.wocStore.skins.duskwick_staff.name': '暮芯法杖',
-  'hudChrome.wocStore.skins.duskwick_staff.look':
-    '两股扭结的黑木以铁箍束紧，杖顶是一盏敞开的铁提灯，在两只卷曲的角之间燃着紫色的暮光火焰，灯底垂着晃动的锁链。',
-  'hudChrome.wocStore.skins.duskwick_staff.lore':
-    '大厅里的每一盏灯都明亮地燃烧，只有一盏例外。暮光之焰是为在夜里守护大厅而点燃的，别的灯发出光的地方，它发出影子；加里克亲自修剪它的灯芯。烟雾与紫色光辉只是外观。',
   'hudChrome.wocStore.collections.lantern_hall': '灯火大厅',
+  // The Smith's Heart raid arms (M16 fills).
+  'hudChrome.wocStore.collections.smiths_heart': '铁匠之心',
+  'hudChrome.wocStore.skins.seamcaller_maul.name': '唤脉者',
+  'hudChrome.wocStore.skins.seamcaller_maul.look':
+    '以一整块深色采石场岩石凿成的双手巨锤，燃烧的金色矿脉将石身裂开，两侧各嵌一枚带框的金色符文，金边打击面环绕燃烧的琥珀，铆接的金箍，弯曲的金角，锤冠长出琥珀矿脉晶体，编织皮革的锤柄以黄金箍束。',
+  'hudChrome.wocStore.skins.seamcaller_maul.lore':
+    '铁锤议会在向突袭者举起手之前，先用歌声唤醒了矿脉，岩石记住了每一个音符。这把巨锤取自他们的铁锤劈开的那块石头，挥动时符文仍在燃烧。矿脉晶体的碎片绕着锤头盘旋，仿佛山岭想把它们要回去。符文和盘旋的晶体只是外观。',
+  'hudChrome.wocStore.skins.squallcrest_sword.look':
+    '修长的风暴钢剑身，刃口如闪电般明亮，两面蚀刻云纹，各有一道分叉的雷霆，剑脊上勾着风之鳍，护手是环绕风暴之眼宝石展开的银色羽翼。',
+  'hudChrome.wocStore.skins.squallcrest_sword.lore':
+    '吐息守护者让心脏中的空气永不停歇，它倒下时，所携的风暴并未散去，而是沉入了这把剑中。风仍绕着钢身旋转，闪电仍沿着刃口奔走，持剑者发誓护手中的眼睛一直望着天空。风暴只是外观。',
+  'hudChrome.wocStore.skins.rimelight_staff.look':
+    '缠绕银丝花纹的蓝钢杖身，以镶嵌宝石的银箍束紧，杖顶四片银色月牙刃托着一颗冷光巨晶，周围环绕一圈较小的晶体，下方垂着冰柱。',
+  'hudChrome.wocStore.skins.rimelight_staff.lore':
+    '淬火守护者冷却了心脏锻造过的每一把刀刃。它倒下时，它的晶体是最后一个停止发光的东西，突袭者把它带出来时，它仍冷得能让手结霜。冰片环绕杖冠，霜之符文绕着它旋转。寒意只是外观。',
+  'hudChrome.wocStore.skins.hearthbrand_sword.look':
+    '冷却的岩浆外壳铸成的宽刃，刃口仍在熔融，两面布满余烬脉络般的裂纹，剑脊长着黑曜石利齿，黑铁护手向上弯成滴落熔流的双角，环抱一颗岩浆之心。',
+  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
+    '炽热守护者就是心脏得名的那团火。它熄灭时，最后的熔流流进锻炉地面上一道剑形的裂缝，在那里冷却：外面是硬壳，里面是火。它的刃口从未停止燃烧。这火只是外观。',
+  'hudChrome.wocStore.skins.duskwick_staff.name': '心熔法杖',
+  'hudChrome.wocStore.skins.duskwick_staff.look':
+    '锻炉青铜杖身镶嵌着层层采石场岩石，杖顶是一圈巨大的金色光环，四颗宝石轮流亮起（采石琥珀、狂风、寒霜与烈火），环抱一颗白金核心的铁砧之心。',
+  'hudChrome.wocStore.skins.duskwick_staff.lore':
+    '无主之力是心脏的四条矿脉在世界之砧上结成的一具躯体。它破碎时，四者并未分离：它们沉入这圈光环，轮流燃烧，岩石、风、霜与火，就像它们曾经轮流出击一样。四道光只是外观。',
   'hudChrome.wocStore.skins.guildmark_arming_sword.name': '公会印记武装剑',
   'hudChrome.wocStore.skins.guildmark_arming_sword.look':
     '发蓝钢剑刃、青铜鱼尾形十字护手、青绿色染皮握柄，以及一枚小巧的公会钢印。',
@@ -15345,6 +15365,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.hiddenBadge': '隐藏',
   'hudChrome.deeds.titleChip': '头衔奖励',
   'hudChrome.deeds.borderChip': '边框奖励',
+  'hudChrome.deeds.cosmeticChip': '外观奖励',
+  'hudChrome.deeds.rewardAppearance': '奖励：{name}武器外观，账号内所有角色可用',
+  'hudChrome.deeds.rewardMount': '奖励：{name}坐骑',
   'hudChrome.deeds.watch': '追踪',
   'hudChrome.deeds.unwatch': '取消追踪',
   'hudChrome.deeds.watchFull': '追踪列表已满（最多 {cap} 项）',
@@ -15451,6 +15474,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '来自古木枝头的双头暮光飞龙，驻足时以利爪后肢伫立，行进时展动奥术铭纹双翼掠地翱翔。',
   'hudChrome.mounts.name_lanternback_troll': '提灯背者格伦博',
   'hudChrome.mounts.name_lantern_hall_destrier': '灯火大厅战马',
+  'hudChrome.mounts.name_quarryheart_charger': '石心战驹',
   'hudChrome.mounts.name_chimeglass_tortoise': '钟晶的托利弗',
   'hudChrome.mounts.desc_drakemaw_raptor':
     '来自龙喉火山口的驯服巢生迅猛龙，浑身筋肉、疾若奔雷，身上仍带着淡淡的灰烬气味。',
@@ -15463,6 +15487,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '被点灯人驯服的山地巨魔，肩上扛着一把铁王座，两侧扶手各挂一盏燃烧的风灯。',
   'hudChrome.mounts.desc_lantern_hall_destrier':
     '灯火大厅的战马，在公会的蓝色披布下披挂橡木与铁制马铠，鞍边摇曳的两盏风灯照亮归途。',
+  'hudChrome.mounts.desc_quarryheart_charger':
+    '铁匠之心的战驹：采石场的石板悬浮在活火之躯上，白热的心脏在金色肋骨后跳动，额生冰晶之角，鬃毛是噼啪作响的雷风。',
   'hudChrome.mounts.desc_chimeglass_tortoise':
     '盐原上的陆龟，走过了三代商队。收留他的补锅匠用暴风晶磨成眼镜，又在他喉前挂上一枚青铜铃——道路总是先听见他，才看见他。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '雷霆阔步大火鸡',
@@ -22998,6 +23024,244 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '删除此角色前，请先将所有尚未锁定的集章卡转移至其他角色。',
   'apiError.character.referral_bond_pending':
     '一份推荐奖励会员契约正在发放给此角色。请在发放完成后再尝试删除此角色。',
+  // The Smith's Heart raid: its name, guardians, vein warders and casts (M16 fills).
+  'entities.dungeons.smith_heart.name': '铁匠之心',
+  'entities.dungeons.smith_heart.enterText': '群山在你周围低鸣，宛如一座为夜晚封住的熔炉……',
+  'entities.dungeons.smith_heart.leaveText': '你爬回风暴岩的狂风之中。',
+  'entities.mobs.heart_hammer_guardian.name': '重锤守护者',
+  'entities.mobs.heart_breath_guardian.name': '吐息守护者',
+  'entities.mobs.heart_quench_guardian.name': '淬火守护者',
+  'entities.mobs.heart_heat_guardian.name': '炽热守护者',
+  'entities.mobs.heart_masterless_strength.name': '无主之力',
+  'entities.mobs.heart_hammer_warder.name': '锤脉守卫',
+  'entities.mobs.heart_ring_warder.name': '环炉守卫',
+  'entities.mobs.heart_breath_warder.name': '息脉守卫',
+  'entities.mobs.heart_breath_caller.name': '息脉召唤者',
+  'entities.mobs.heart_quench_warder.name': '淬脉守卫',
+  'entities.mobs.heart_quench_caller.name': '淬脉召唤者',
+  'entities.mobs.heart_heat_warder.name': '热脉守卫',
+  'entities.mobs.heart_heat_caller.name': '热脉召唤者',
+  'entities.mobs.heart_heat_wellspawn.name': '涌泉之子',
+  'entities.mobs.heart_heat_wellkeeper.name': '涌泉看守',
+  'entities.mobs.heart_heat_seedflame.name': '籽焰',
+  'entities.mobs.heart_heat_rolling_cinder.name': '滚动余烬',
+  'abilityUi.cast.heart_mountains_wrath': '山岳之怒',
+  'abilityUi.cast.heart_bellows_gust': '巅峰咆哮',
+  'abilityUi.cast.heart_storm_lance': '风暴长枪',
+  'abilityUi.cast.heart_quenching_breath': '淬火吐息',
+  'hudChrome.auraEffect.heatGuardian.statePhase1':
+    '半身沉在涌泉之中，从不移动。玄武岩之拳砸向岸上的一点，三道熔岩涌浪从那里滚滚而出；炉心闪焰会击中所有距离涌泉超过{reach}码的人。生命值降到70%时它会沉下，炉心随之满溢。英雄难度下伤害提高{heroicPct}%。',
+  'hudChrome.auraEffect.heatGuardian.statePhase2':
+    '半身沉在涌泉之中，从不移动。玄武岩之拳仍在继续；炉心火种落在团队脚下，片刻后爆裂，苏醒之火将涌泉周围的地面一圈接一圈地点燃。生命值降到40%时它会再次沉下，炉心再度满溢。英雄难度下伤害提高{heroicPct}%。',
+  'hudChrome.auraEffect.heatGuardian.statePhase3':
+    '半身沉在涌泉之中，从不移动。玄武岩之拳与苏醒之火仍在继续，滚动余烬会坠落并追逐玩家：击中它就能把它打退。英雄难度下伤害提高{heroicPct}%。',
+  'hudChrome.auraEffect.heatGuardian.intro':
+    '在涌泉中冰冷沉寂：在团队靠近、它苏醒燃起之前，无法被攻击或伤害。',
+  'hudChrome.auraEffect.heatGuardian.stateUnder':
+    '沉入涌泉之中：炉心满溢期间无法被攻击或伤害。满溢结束后它会再次升起。',
+  'hudChrome.auraEffect.heatGuardian.scorched':
+    '受到的火焰、冰霜、自然、暗影和奥术伤害提高{pct}%。每{every}秒，炉心闪焰会击中所有距离涌泉超过{reach}码的人并刷新此效果。',
+  'hudChrome.auraEffect.heatGuardian.grip':
+    '每秒受到{total}点火焰伤害（{stacks}层中每层{per}点）。守护者每次命中都会叠加一层（最多{most}层），持续{seconds}秒：在灼烧过重之前换坦克。',
+  'hudChrome.auraEffect.heatGuardian.kindling':
+    '{seconds}秒后你会在{trail}秒内留下火焰足迹。每一块足迹每秒对友方造成{min}到{max}点火焰伤害，并为站在其中的涌泉之子每秒恢复{heal}%生命值：离开团队和涌泉之子的路线。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。',
+  'hudChrome.auraEffect.heatGuardian.trail':
+    '你正在留下余烬足迹：宽{radius}码的火焰燃烧{life}秒，每秒对其中的友方造成{min}到{max}点火焰伤害，并为其中的涌泉之子每秒恢复{heal}%生命值。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。',
+  'hudChrome.auraEffect.heatGuardian.hunted':
+    '一团滚动余烬或籽焰正在追你。被滚动余烬追上你会死亡，{radius}码内的所有人都会被灼烧：保持距离，让队友击打它，每次击打都会把它打退{knock}码（之后{crust}秒内无法再次打退）。',
+  'hudChrome.auraEffect.heatGuardian.crust': '已冷却变硬：此效果结束前，击打无法将它打退。',
+  'hudChrome.heatGuardian.say.fist': '站在岩石落下的地方，成为它的一部分。',
+  'hudChrome.heatGuardian.say.sink': '涌泉升起来迎接你们了！',
+  'hudChrome.heatGuardian.say.sinkAgain': '炉心再次满溢。你们再次燃烧。',
+  'hudChrome.heatGuardian.say.feed': '是的……回到火焰的怀抱吧。',
+  'hudChrome.heatGuardian.say.rise': '我随最初之火一同升起！',
+  'hudChrome.heatGuardian.say.seeds': '我撒下的每一颗火星都会生根。',
+  'hudChrome.heatGuardian.say.zones': '炉心在你们脚下苏醒。',
+  'hudChrome.heatGuardian.say.cinder': '跑吧，小小的火星。火焰饿了。',
+  'hudChrome.heatGuardian.say.intro':
+    '虫子们。你们爬进最初之焰，还指望能离开？在你们的族类学会用火之前，我就已在燃烧。那就与它一同燃尽吧！',
+  'abilityUi.cast.heart_heat_fist': '玄武岩之拳',
+  'abilityUi.cast.heart_forge_wrath': '熔炉之怒',
+  'abilityUi.cast.heart_forge_pour': '熔炉倾泻',
+  'abilityUi.cast.heart_ember_bolt': '余烬箭',
+  // The Smith's Heart's Hammer Council (M16 fills).
+  'entities.mobs.heart_seam_singer.name': '矿脉歌者',
+  'abilityUi.cast.heart_hammers_weight': '重锤之压',
+  'abilityUi.cast.heart_wake_the_stone': '唤醒岩石',
+  'abilityUi.cast.heart_falling_rock': '落石',
+  'abilityUi.cast.heart_seam_bolt': '矿脉箭',
+  'abilityUi.cast.heart_song_of_the_seam': '矿脉之歌',
+  'hudChrome.council.alert.wakeTitle': '唤醒岩石！',
+  'hudChrome.council.alert.rockTitle': '落石！',
+  'hudChrome.council.alert.resonanceTitle': '共鸣',
+  'hudChrome.council.alert.weightTitle': '重锤之压',
+  'hudChrome.council.alert.timeAria': '剩余{seconds}秒',
+  'hudChrome.auraEffect.breathGuardian.intro': '沉睡中：在风暴将它放下之前，无法被攻击或伤害。',
+  'hudChrome.auraEffect.council.intro': '沉睡中：在议会苏醒之前，无法被攻击或伤害。',
+  'hudChrome.auraEffect.council.wakeMark':
+    '结束时，一根石柱会从你脚下的地面冲出，对{radius}码内的所有人造成{min}到{max}点伤害并将其击退。站到团队需要掩体的位置。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。',
+  'hudChrome.auraEffect.council.rockMark':
+    '结束时，一块巨石砸向你：{total}点伤害由{radius}码内的所有人分担。若不足{soakers}人分担，每人多受{penalty}%伤害，且全团受到{tremorMin}到{tremorMax}点伤害。{radius}码内的每根石柱都会损失一块，所以要远离掩体分担。史诗难度：{soulReach}码内的灵魂石柱改为失去一个灵魂印记，印记耗尽时碎裂。英雄和史诗难度：分担{heroicTotal}点伤害，全团受到{heroicTremorMin}到{heroicTremorMax}点伤害。',
+  'hudChrome.auraEffect.council.memory': '造成的伤害提高{pct}%：重锤议会每倒下一名成员提高{per}%。',
+  // The Hammer Council's mythic, Soul in the Stone (M16 fills).
+  'abilityUi.cast.heart_echo_of_wrath': '怒火回响',
+  'abilityUi.cast.heart_endless_song': '无尽之歌',
+  'hudChrome.council.say.guardian_pull': '采石场来了外人。铁锤之力绝不向血肉屈服。',
+  'hudChrome.council.say.guardian_wrath': '群山回应了我！若岩石肯收留你们，就躲起来吧！',
+  'hudChrome.council.say.guardian_death': '我的力量……交给岩石。',
+  'hudChrome.council.say.guardian_remember': '岩石铭记。它们的一切，如今归我。',
+  'hudChrome.council.say.guardian_soul': '如今我即是岩石。我的怒火再无会倒下的躯体。',
+  'hudChrome.council.say.guardian_wipe': '尘土。一切血肉终归如此。',
+  'hudChrome.council.say.guardian_defeat': '铁锤之力……由你们来承担。',
+  'hudChrome.council.say.singer_pull': '听见矿脉在歌唱吗？它等你们的声音等了好久。',
+  'hudChrome.council.say.singer_song': '与我同唱，然后碎裂吧！',
+  'hudChrome.council.say.singer_death': '我的歌……流入了岩石……',
+  'hudChrome.council.say.singer_remember': '岩石铭记。听，它仍在歌唱。',
+  'hudChrome.council.say.singer_soul': '听啊。在岩石之中，我的歌永不终结。',
+  'hudChrome.council.say.singer_wipe': '嘘。矿脉已归于寂静。',
+  'hudChrome.council.say.singer_defeat': '最后一个音……消散了。',
+  // The Hammer Council's rework: Mountain's Rush, the Cursed Pillar, Bond of
+  // the Stone, Quarry Collapse and Resonance (M16 fills).
+  'abilityUi.cast.heart_mountains_rush': '山岳冲锋',
+  'hudChrome.auraEffect.council.resonance':
+    '每{every}秒你会发出共鸣，对你{radius}码内的每名盟友造成{min}到{max}点自然伤害。在效果结束前远离所有人。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。',
+  'hudChrome.auraEffect.council.rushMark':
+    '结束时，重锤守护者会先蓄势{windup}秒，然后沿直线穿过你所站的位置，一直冲到采石场边缘；若路上有石柱，则停在遇到的第一根石柱处。把它引向诅咒石柱：石柱碎裂，守护者被昏迷{stun}秒，并在{exposedSeconds}秒内受到的伤害提高{exposed}%。若路线上挡着一根掩护石柱，则改为摧毁那根石柱。它停下之前撞到的所有人会受到{min}到{max}点伤害并被击退，如果你还在它的路线上，你也一样。史诗难度：没有撞上任何石柱的冲锋会引发采石场坍塌，直到诅咒石柱碎裂为止。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。',
+  'hudChrome.auraEffect.council.rushExposed': '受到的伤害提高{pct}%：山岳冲锋撞碎了诅咒石柱。',
+  'hudChrome.auraEffect.council.bond':
+    '重锤议会的另一名成员在{reach}码内时，受到的伤害降低{pct}%。岩石之契每{every}秒对全团造成{min}到{max}点伤害，每次提高{growth}%。把他们拉开。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。',
+  'hudChrome.auraEffect.council.collapse':
+    '采石场正在坍塌：每{every}秒，你每层受到{min}到{max}点伤害，且每次增加一层。诅咒石柱碎裂时结束。',
+  'hudChrome.auraEffect.council.pillarLimit':
+    '每根石柱最多只能为{limit}名玩家挡住山岳之怒。躲在后面的人更多时，每人承受冲击的{share}%。未躲藏者在普通难度受到{min}到{max}点伤害，英雄难度{heroicMin}到{heroicMax}点，史诗难度{mythicMin}到{mythicMax}点。',
+  'hudChrome.council.alert.rushTitle': '山岳冲锋！',
+  'hudChrome.council.say.guardian_rush': '那就站在我的路上吧。群山从不绕行。',
+  'hudChrome.council.say.singer_wake': '醒来吧，沉睡的岩石。在他们脚下升起！',
+  'hudChrome.council.say.singer_rock': '抬头看，小家伙们！山要塌下来了！',
+  // The Smith's Heart's Guardian of the Breath and Captain Thessaly (M16 fills).
+  'hudChrome.breathGuardian.say.guardian_pull':
+    '你们爬上山巅，是来偷走它的气息吗？那就与我一同呼吸吧。',
+  'hudChrome.breathGuardian.say.guardian_blow': '感受风向的转变。边缘比你想的更近。',
+  'hudChrome.breathGuardian.say.guardian_inhale': '靠近些。所有人。',
+  'hudChrome.breathGuardian.say.guardian_storm': '气息够了。现在，迎接风暴！',
+  'hudChrome.breathGuardian.say.guardian_cradle': '升起吧，小家伙。让他们接住你。',
+  'hudChrome.breathGuardian.say.guardian_drawn': '天空选中了你。跑吧，它会紧随而至。',
+  'hudChrome.breathGuardian.say.guardian_wipe': '被吹散了，就像山巅的尘埃。',
+  'hudChrome.breathGuardian.say.guardian_death': '气息……回归……群山……',
+  'hudChrome.breathGuardian.say.thessaly_pull':
+    '高望与你们同在！这上面没有墙：风会把你们从边缘吹下去！',
+  'hudChrome.breathGuardian.say.thessaly_circle_a': '快进我的宁静之中！最多三人，不能再多！',
+  'hudChrome.breathGuardian.say.thessaly_circle_b': '这里！站在我身边，让风撞碎在我们身上！',
+  'hudChrome.breathGuardian.say.thessaly_circle_c': '石上的宁静！三个人，现在就来！',
+  'hudChrome.breathGuardian.say.thessaly_inhale': '它在吸气！绕到它的两侧，千万别站在它嘴前！',
+  'hudChrome.breathGuardian.say.thessaly_storm': '风暴要爆发了！我的宁静挡不住这个。散开！',
+  'hudChrome.breathGuardian.say.thessaly_fall': '抓紧岩石！',
+  'hudChrome.breathGuardian.say.thessaly_victory': '气息自由了。高望会记住这次攀登。',
+  'hudChrome.breathGuardian.say.thessaly_wipe': '退后，喘口气。我们再来一次。',
+  'hudChrome.breathGuardian.say.guardian_isles': '风啊，将我围起！浮岛会护住我的气息。',
+  'hudChrome.breathGuardian.say.guardian_bulwark': '我的护盾……被撕开了。那就再尝尝狂风吧！',
+  'hudChrome.breathGuardian.say.thessaly_isles': '它的护盾靠浮岛供能！乘风飞过去，干掉愈者再回来！',
+  'hudChrome.auraEffect.breathGuardian.wind':
+    '气息守护者的风以每秒{speed}码的速度将你带往它吹去的方向。逆风而行便能站稳，它不会打断你的施法。崖台四周没有墙：被吹出边缘，你会坠入虚空。只有攀登路口还立着墙，被压在墙上时每秒受到{pinMin}到{pinMax}点伤害。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。',
+  'hudChrome.auraEffect.breathGuardian.draw':
+    '守护者深吸一口气，以每秒{speed}码的速度将你拉向它。它嘴前的漩涡每{tick}秒对站在其中的人造成{min}到{max}点伤害。随后巅峰咆哮对崖台上的所有人造成{gustMin}到{gustMax}点伤害，并将他们从守护者身边吹飞{throw}码（英雄难度为{heroicThrow}码）：守护者靠近边缘时，团队会被吹出崖台。英雄和史诗难度：分别为{heroicMin}到{heroicMax}点和{heroicGustMin}到{heroicGustMax}点伤害。',
+  'hudChrome.auraEffect.breathGuardian.pinned':
+    '被风压在边缘的墙上：在风停歇或你离开墙边之前，每秒受到{min}到{max}点伤害。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。',
+  'hudChrome.auraEffect.breathGuardian.anchor':
+    '瑟萨莉队长的宁静稳住了你：风、拉扯、冲击和击飞都无法移动你。伤害照常生效。',
+  'hudChrome.auraEffect.breathGuardian.spent':
+    '你的锚定已经耗尽：在此效果结束前，瑟萨莉队长的宁静之环无法再次锚定你。',
+  'hudChrome.auraEffect.breathGuardian.drawn':
+    '每{every}秒会有一道闪电落在你所站之处：{warn}秒后对{radius}码内的所有人造成{min}到{max}点伤害，并留下带电的地面，在{charged}秒内每秒造成{cmin}到{cmax}点伤害。保持移动，把落雷引向远离团队的边缘。英雄和史诗难度：分别为{heroicMin}到{heroicMax}点和{heroicCMin}到{heroicCMax}点伤害。',
+  'hudChrome.auraEffect.breathGuardian.cradled':
+    '被举入风暴，在守护者引导摇篮的{hold}秒内被定住；其间守护者不会施放其他任何技能。随后的放电造成{total}点伤害，由你和你下方{radius}码内的所有人分担。分担人数少于{soakers}人时，每人多承受{penalty}%，且崖台上的所有人受到{bmin}到{bmax}点伤害。英雄难度：同时举起{heroicCount}名玩家，每次放电{heroicTotal}点，需要{heroicSoakers}人分担，团队要分头承受。英雄和史诗难度：反冲造成{heroicBMin}到{heroicBMax}点伤害。',
+  'hudChrome.auraEffect.breathGuardian.stormForm':
+    '撕裂为闪电之躯：战斗的风暴后半段，直到气息守护者倒下。',
+  'hudChrome.auraEffect.breathGuardian.swell':
+    '每{every}秒，膨胀的风暴对崖台上的所有人造成{min}到{max}点伤害，之前每次脉动使其增强{growth}%：目前已有{stacks}次。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。',
+  'hudChrome.auraEffect.breathGuardian.bulwark':
+    '风之护盾还能吸收{left}点伤害。只要浮岛上还有任一狂风哨兵或狂风愈者存活，它每秒恢复总量的{regrow}%，每次愈合之风恢复{mend}%。乘狂风之路飞往浮岛，消灭它们。维持{max}秒后，它会在崖台上爆裂，造成{bmin}到{bmax}点伤害。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。',
+  'hudChrome.auraEffect.breathGuardian.riding':
+    '风沿着固定的路线带你越过虚空：在被放下之前你无法行动。',
+  'hudChrome.auraEffect.breathGuardian.windworn':
+    '被风耗尽了力气：效果结束前，狂风之路不会带你前往浮岛。',
+  'hudChrome.auraEffect.breathGuardian.thrown': '被巅峰咆哮掀飞：落地之前无法移动。',
+  'hudChrome.auraEffect.breathGuardian.tossed': '被游荡狂风掀飞：狂风放下你之前无法移动。',
+  'hudChrome.auraEffect.breathGuardian.portalA':
+    '效果结束时，传送门A会在你所站的位置打开。站在结风附近。本轮你无法携带它。',
+  'hudChrome.auraEffect.breathGuardian.portalB':
+    '效果结束时，传送门B会在你所站的位置打开。站在崖台边缘。本轮你无法携带结风。',
+  'hudChrome.auraEffect.breathGuardian.portalC':
+    '效果结束时，传送门C会在你所站的位置打开。它只与传送门D相连。站在另一团结风附近。本轮你无法携带它。',
+  'hudChrome.auraEffect.breathGuardian.portalD':
+    '效果结束时，传送门D会在你所站的位置打开。它只与传送门C相连。站在远离传送门B的崖台边缘。本轮你无法携带结风。',
+  'hudChrome.auraEffect.breathGuardian.laden':
+    '你正携带结风：移动速度变为{walk}%，无法闪现、冲锋或跳跃，风、拉扯、冲击和击飞都无法移动你。每个传送门都会把你送到它的另一端：A到B，C到D。在崖台边缘按下交互键，把它扔进虚空。效果结束时它会爆裂，杀死崖台上的所有人。',
+  'abilityUi.cast.heart_breath_inhale': '深吸之息',
+  'abilityUi.cast.heart_breath_storm_break': '风暴破裂',
+  'abilityUi.cast.heart_breath_forking_bolt': '跳跃雷击',
+  'abilityUi.cast.heart_breath_thunders_cradle': '雷霆摇篮',
+  'abilityUi.cast.heart_breath_drawn_lightning': '引雷',
+  'entities.npcs.heart_captain_thessaly.name': '瑟萨莉队长',
+  'entities.npcs.heart_captain_thessaly.title': '高望队长',
+  'entities.npcs.heart_captain_thessaly.greeting':
+    '站稳脚跟，{className}。当风箱呼吸时，进入我的宁静之中，让风撞碎在我们身上。',
+  // The Smith's Heart's Guardian of the Quench (M16 fills).
+  'hudChrome.auraEffect.quenchGuardian.marked':
+    '你是{count}人中的第{order}个：利刃将沿穿过你的直线飞来。把直线引离团队。直线在利刃飞出前{lock}秒锁定，届时请离开，否则将受到{min}到{max}点冰霜伤害和{cold}点寒冷。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。',
+  'hudChrome.quenchAlert.markedTitle': '利刃在追猎你！（{count}人中第{order}个）',
+  'abilityUi.cast.heart_quench_blades_hunt': '利刃狩猎',
+  'hudChrome.quenchGuardian.say.flurry': '所有利刃！所有锋刃！别让任何人站在我的湖上！',
+  'hudChrome.quenchGuardian.say.pull': '我的湖上来了温热的血。它不会温热太久。',
+  'hudChrome.quenchGuardian.say.intro': '嘘……湖本在沉睡。你们唤醒了寒冷，而寒冷从不宽恕。',
+  'hudChrome.quenchGuardian.say.shatter': '冻透了。现在，碎裂吧。',
+  'hudChrome.quenchGuardian.say.hole': '冰记得每一步。聚在一起，它便会崩塌。',
+  'hudChrome.quenchGuardian.say.wake': '铸匠之刃，醒来！在冰面上猎杀他们！',
+  'hudChrome.quenchGuardian.say.cross': '去吧，利刃！将他们与温暖斩断！',
+  'hudChrome.quenchGuardian.say.deepen': '感觉到了吗？寒意正越来越深。',
+  'hudChrome.quenchGuardian.say.wipe': '静止。无声。淬火已成。',
+  'hudChrome.quenchGuardian.say.death': '寒意……放手了……淬火归你们了。',
+  'hudChrome.auraEffect.quenchGuardian.cold':
+    '你的寒意：{cold}/{max}。独自一人时约{fill}秒充满。若{radius}码内有{others}名或更多其他玩家，则改为每秒下降{fall}。生命之暖：你受到的治疗每达到最大生命值的{healPct}%，寒意降低1（英雄和史诗难度为每{heroicHealPct}%）。寒冰棺等免疫效果无法阻止它：免疫期间你既不提供也不获得温暖。达到{max}时你会被冰霜封住{freeze}秒，随后冰层碎裂。',
+  'hudChrome.auraEffect.quenchGuardian.intro':
+    '被冻结在湖冰之下：在她破冰而出之前，无法攻击或伤害她。',
+  'hudChrome.auraEffect.quenchGuardian.warmth':
+    '与团队相拥取暖：寒意每秒下降{fall}。在同一处停留{linger}秒的人群，脚下冰面会裂成冰冷的水洞，所以要不断移动。',
+  'hudChrome.auraEffect.quenchGuardian.frozen':
+    '被冰霜封住：你无法行动，受到的所有伤害提高{pct}%，冰霜会击碎寒冰棺等免疫效果。效果结束时冰层碎裂：你受到{min}到{max}点冰霜伤害，随后{seconds}秒内受到的伤害提高{brittle}%，{radius}码内的所有人获得{cold}点寒意（英雄难度为{heroicRadius}码、{heroicCold}点寒意）。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。',
+  'hudChrome.auraEffect.quenchGuardian.brittle':
+    '受到的所有伤害提高{pct}%。此效果持续期间，队友碎冰的溅射无法让你的寒意超过{cap}。',
+  'hudChrome.auraEffect.quenchGuardian.splashed':
+    '队友碎裂的冰溅到了你：寒意+{cold}。在你自己的寒意条充满前回到人群中。',
+  'hudChrome.quenchAlert.splashTitle': '冰霜溅射！寒意+{cold}',
+  'hudChrome.auraEffect.quenchGuardian.trapped':
+    '踏穿冰面掉进冰冷的水中：无法移动，每秒受到{min}到{max}点冰霜伤害，寒意不断上升。{seconds}秒后你会爬上岸边。仅凭冰水绝不会致死。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。',
+  'hudChrome.auraEffect.quenchGuardian.awake':
+    '铸匠的四把利刃已苏醒。每一轮会有更多玩家被标记，利刃依次沿穿过他们的直线飞出。直线在利刃飞出前{lock}秒锁定，随后对线上的目标造成{min}到{max}点冰霜伤害，增加{cold}点寒冷。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。',
+  'hudChrome.auraEffect.quenchGuardian.deepening':
+    '湖的寒意上升快了{total}%：自刃苏醒后每{every}秒再快{step}%（目前{stacks}次）。',
+  'abilityUi.cast.heart_quench_blades_wake': '诸刃苏醒',
+  // The Smith's Heart's Guardian of the Quench cold bar (M16 fills).
+  'hudChrome.quenchAlert.coldTitle': '寒意',
+  'hudChrome.quenchAlert.freezingTitle': '快冻僵了！',
+  'hudChrome.quenchAlert.warmTitle': '抱团取暖',
+  'hudChrome.quenchAlert.frozenTitle': '被霜封住！',
+  'hudChrome.quenchAlert.waterTitle': '在冰下！',
+  'hudChrome.quenchAlert.coldBar': '寒意 {cold} / {max}',
+  'hudChrome.quenchAlert.coldAria': '寒意 {cold}/{max}',
+  'hudChrome.quenchAlert.timeAria': '剩余{seconds}秒',
+  'hudChrome.auraEffect.quenchGuardian.rime':
+    '活体霜壳吸收你受到的接下来{left}点治疗（共{whole}点）。存在期间你的移动速度降低{slow}%，寒意上升速度变为{normalMult}倍（英雄和史诗难度为{heroicMult}倍），所以请离开队伍。在{seconds}秒内用治疗将其击碎即可消失。否则你会立刻被冰霜封住，寒意在{radius}码内爆发，使所有人获得{cold}点寒意（英雄和史诗难度为{heroicCold}点）。普通难度：1名玩家，{normalAbsorb}点。英雄难度：{heroicTargets}名玩家，各{heroicAbsorb}点，爆发后会以新的霜壳跳到最近的另一名玩家身上。史诗难度：同英雄难度，{mythicTargets}名玩家。',
+  'hudChrome.auraEffect.quenchGuardian.rimePool':
+    '活体霜壳：还需要相当于其最大生命值{pct}%的治疗才能击碎。施加后{seconds}秒内未被击碎，其将被冰霜封住，寒意在{radius}码内对所有人爆发。',
+  'hudChrome.auraEffect.quenchGuardian.rimeSlow':
+    '被活体霜壳减速：在霜壳被治疗击碎或爆发前，你的移动速度降低{slow}%，寒意上升速度变为{normalMult}倍（英雄和史诗难度为{heroicMult}倍）。',
+  'hudChrome.quenchAlert.rimeTitle': '活体霜壳！离开队伍',
+  'hudChrome.quenchAlert.rimeBar': '霜壳 {left} / {whole}',
+  'hudChrome.quenchAlert.rimeAria': '活体霜壳：还需{left}/{whole}点治疗才能击碎',
+  'hudChrome.heatGuardian.say.pull': '你们走进了最初的火焰。没有什么能毫无改变地离开。',
+  'hudChrome.heatGuardian.say.wipe': '都化为灰烬吧。炉心依旧燃烧。',
+  'hudChrome.heatGuardian.say.death': '火焰……沉回……岩石之中。好好带着它。',
   'hudChrome.guildHall.title': '灯火大厅',
   'hudChrome.guildHall.close': '关闭公会窗口',
   'hudChrome.guildHall.tabsLabel': '灯火大厅分页',
@@ -24171,6 +24435,120 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hill.callout.godlike': '{name}已经接近神了！',
   'hudChrome.hill.callout.legendary': '{name}已经超越神了！',
   'hudChrome.hill.callout.shutDown': '{killer}终结了{victim}！',
+  'abilityUi.cast.heart_final_leaping_bolt': '跳跃雷击',
+  'abilityUi.cast.heart_final_anvil': '铁砧之重',
+  'hudChrome.auraEffect.finalBoss.stateHeat':
+    '饮下炽热：玄武岩之拳砸向一名玩家所在的位置，三道熔岩涌浪从那里滚滚而出，火焰旋风在地面上穿行。英雄难度下，余烬印记会在远程玩家脚下落下火焰；史诗难度下，它的正面攻击会留下熔炉之火。',
+  'hudChrome.auraEffect.finalBoss.stateQuench':
+    '饮下淬火：{reach}码内其他玩家少于{allies}名的人会越来越冷并被冻结。英雄难度下，被标记玩家脚下的冰面会碎裂；史诗难度下，它的正面攻击会减速{slow}%。',
+  'hudChrome.auraEffect.finalBoss.stateBreath':
+    '饮下吐息：狂风把团队推向边缘，跳跃雷击会在彼此相距{jump}码以内的玩家之间跳跃。英雄难度下，引雷会标记玩家；史诗难度下，每个风暴宝珠都必须由一名玩家拾取。',
+  'hudChrome.auraEffect.finalBoss.stateHammer':
+    '饮下重锤：震颤裂痕在玩家脚下爆发，铁砧之重把伤害分摊给标记内的所有人。英雄难度下，石壳会吸收治疗，铁砧的分摊者会被粉碎；史诗难度下，铁砧的标记会绕着它旋转。',
+  'hudChrome.auraEffect.finalBoss.stateRing':
+    '身处中央圆环时，它不饮下任何一角的力量。生命值高于{pct}%时，它在那里每秒获得一层心之脱缚。',
+  'hudChrome.auraEffect.finalBoss.overloadHeat':
+    '炽热过载，已满{value}%。首领站在炽热区域时它会充能（从空到满需{fill}秒），并每{every}秒对团队造成脉冲伤害：空时{min}点，满时最高{max}点。即将充满时会警告团队。充满时会爆发，对整个团队造成伤害并清空：普通难度{normalMin}至{normalMax}点（靠治疗可以撑过），英雄难度{heroicMin}至{heroicMax}点（很重：先抬满血并使用减伤技能），史诗难度{mythicMin}至{mythicMax}点（致命：只有强力的个人减伤才能存活）。首领离开该区域后，它以三分之一的速度消退。其脉冲在英雄难度造成{heroicPulseMin}到{heroicPulseMax}点伤害，在史诗难度造成{mythicPulseMin}到{mythicPulseMax}点伤害。',
+  'hudChrome.auraEffect.finalBoss.overloadQuench':
+    '淬火过载，已满{value}%。首领站在淬火区域时它会充能（从空到满需{fill}秒），并每{every}秒对团队造成脉冲伤害：空时{min}点，满时最高{max}点。即将充满时会警告团队。充满时会爆发，对整个团队造成伤害并清空：普通难度{normalMin}至{normalMax}点（靠治疗可以撑过），英雄难度{heroicMin}至{heroicMax}点（很重：先抬满血并使用减伤技能），史诗难度{mythicMin}至{mythicMax}点（致命：只有强力的个人减伤才能存活）。首领离开该区域后，它以三分之一的速度消退。其脉冲在英雄难度造成{heroicPulseMin}到{heroicPulseMax}点伤害，在史诗难度造成{mythicPulseMin}到{mythicPulseMax}点伤害。',
+  'hudChrome.auraEffect.finalBoss.overloadBreath':
+    '吐息过载，已满{value}%。首领站在吐息区域时它会充能（从空到满需{fill}秒），并每{every}秒对团队造成脉冲伤害：空时{min}点，满时最高{max}点。即将充满时会警告团队。充满时会爆发，对整个团队造成伤害并清空：普通难度{normalMin}至{normalMax}点（靠治疗可以撑过），英雄难度{heroicMin}至{heroicMax}点（很重：先抬满血并使用减伤技能），史诗难度{mythicMin}至{mythicMax}点（致命：只有强力的个人减伤才能存活）。首领离开该区域后，它以三分之一的速度消退。其脉冲在英雄难度造成{heroicPulseMin}到{heroicPulseMax}点伤害，在史诗难度造成{mythicPulseMin}到{mythicPulseMax}点伤害。',
+  'hudChrome.auraEffect.finalBoss.overloadHammer':
+    '重锤过载，已满{value}%。首领站在重锤区域时它会充能（从空到满需{fill}秒），并每{every}秒对团队造成脉冲伤害：空时{min}点，满时最高{max}点。即将充满时会警告团队。充满时会爆发，对整个团队造成伤害并清空：普通难度{normalMin}至{normalMax}点（靠治疗可以撑过），英雄难度{heroicMin}至{heroicMax}点（很重：先抬满血并使用减伤技能），史诗难度{mythicMin}至{mythicMax}点（致命：只有强力的个人减伤才能存活）。首领离开该区域后，它以三分之一的速度消退。其脉冲在英雄难度造成{heroicPulseMin}到{heroicPulseMax}点伤害，在史诗难度造成{mythicPulseMin}到{mythicPulseMax}点伤害。',
+  'hudChrome.auraEffect.finalBoss.root':
+    '进入一个区域后扎根{seconds}秒：扎根结束前无法把它拖出去。',
+  'hudChrome.auraEffect.finalBoss.unbound':
+    '每层每秒对整个团队造成{per}点伤害（当前{total}点）；站在中央圆环内时每秒获得一层。把它拖出圆环即可结束。英雄难度：每层{heroicPer}点。史诗难度：每层{mythicPer}点。',
+  'hudChrome.auraEffect.finalBoss.shaken':
+    '持续期间，切换区域对你造成的伤害提高至{mult}倍（{min}至{max}点，而非{baseMin}至{baseMax}点）。每次切换都会将其刷新为{seconds}秒。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。',
+  'hudChrome.auraEffect.finalBoss.cold':
+    '寒冷值{value}/100。{reach}码内其他玩家少于{allies}名时每秒上升{rise}点，达到人数后下降。达到100时你会被霜封住：昏迷{freeze}秒并受到{min}至{max}点冰霜伤害。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。',
+  'hudChrome.auraEffect.finalBoss.frozen':
+    '昏迷。你因独自站立而被冻结：在它饮下淬火时，保持在{allies}名或更多其他玩家的{reach}码内。',
+  'hudChrome.auraEffect.finalBoss.underIce': '昏迷：你从碎裂的冰面掉了下去。',
+  'hudChrome.auraEffect.finalBoss.numbing': '被它的正面攻击减速{pct}%，持续{seconds}秒。',
+  'hudChrome.auraEffect.finalBoss.ember':
+    '{seconds}秒后余烬会落在你的脚下，在{radius}码的范围内阴燃{life}秒，每秒对其中的任何人造成{min}至{max}点火焰伤害。与其他被标记的玩家站到同一个角落，然后离开。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。',
+  'hudChrome.auraEffect.finalBoss.wind':
+    '狂风每秒把你朝它吹的方向推动{speed}码；顶着风走才能站稳（不会打断施法）。狂风吹拂时，处于边缘{band}码以内会每秒受到{min}至{max}点自然伤害。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。',
+  'hudChrome.auraEffect.finalBoss.drawn':
+    '在{seconds}秒内，它每秒从你身上跳向{reach}码内的其他每名玩家，对每人造成{min}至{max}点自然伤害。与所有人保持{reach}码距离。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。',
+  'hudChrome.auraEffect.finalBoss.shell': '吸收你受到的下{value}点治疗。',
+  'hudChrome.auraEffect.finalBoss.crushed':
+    '{seconds}秒内若站在下一次铁砧之重下，你会承受{mult}倍的分摊伤害。让另一组去分摊。',
+  'hudChrome.finalOverload.title': '过载',
+  'hudChrome.finalOverload.quench': '淬火',
+  'hudChrome.finalOverload.breath': '吐息',
+  'hudChrome.finalOverload.hammer': '重锤',
+  'hudChrome.finalOverload.rooted': '扎根 {seconds}',
+  'hudChrome.finalOverload.free': '可以拖动',
+  'hudChrome.finalOverload.shaken': '动摇 {seconds}',
+  'hudChrome.finalOverload.unbound': '脱缚 x{stacks}',
+  'hudChrome.finalOverload.barAria': '{quarter}过载 百分之{pct}',
+  'hudChrome.finalOverload.activeAria': '当前区域：{quarter}',
+  'hudChrome.finalOverload.groupAria': '无主之力：过载条',
+  'hudChrome.auraEffect.finalBoss.phaseFight':
+    '生命值降到{first}%和{second}%时，它会在护盾保护下走入中央，从最满的几个角各召出一个碎片。降到{final}%时四个角全部苏醒，开始最后的抵抗。',
+  'abilityUi.cast.heart_final_call': '四角召唤',
+  'abilityUi.cast.heart_final_shearing_blow': '劈裂重击',
+  'abilityUi.cast.heart_final_gale_pounce': '疾风扑击',
+  'abilityUi.cast.heart_final_rime_toll': '霜凇钟鸣',
+  'abilityUi.cast.heart_breath_cradle_channel': '雷霆摇篮',
+  'abilityUi.cast.heart_breath_gale_bulwark': '狂风壁垒',
+  'abilityUi.cast.heart_breath_mending_gale': '愈合之风',
+  'entities.mobs.heart_final_splinter_heat.name': '炽热碎片',
+  'entities.mobs.heart_final_splinter_quench.name': '淬火碎片',
+  'entities.mobs.heart_final_splinter_breath.name': '吐息碎片',
+  'entities.mobs.heart_final_splinter_hammer.name': '重锤碎片',
+  'hudChrome.auraEffect.finalBoss.phaseCall':
+    '四角召唤：只要碎片还活着，它就在中央受到护盾保护{seconds}秒。每个碎片每{every}秒对整个团队造成{min}到{max}点伤害，每次脉动提高{rise}%。将它们全部击杀可提前打破护盾；召唤结束时仍存活的碎片会把自己的元素注入它体内，直到战斗结束。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。',
+  'hudChrome.finalOverload.titleUnmade': '崩解的铁砧',
+  'hudChrome.finalOverload.kneeling': '它跪下了',
+  'hudChrome.finalOverload.rising': '心脏搏动',
+  'hudChrome.finalOverload.fallsIn': '{quarter}将在 {seconds} 后坠落',
+  'hudChrome.finalOverload.ringFallsIn': '圆环将在 {seconds} 后破碎',
+  'hudChrome.finalOverload.allFallen': '什么也不剩了',
+  'hudChrome.auraEffect.finalBoss.phaseKneel': '它跪下了。任何攻击都无法伤害它。',
+  'hudChrome.auraEffect.finalBoss.phaseRebirth':
+    '心脏正在搏动。在它以{percent}%生命值站起之前，任何攻击都无法伤害它。',
+  'hudChrome.auraEffect.finalBoss.unmade':
+    '每{every}秒铁砧的一整块区域坠落，过载条最满的区域最先，坠落前有{warn}秒裂纹警告。站在其上的人会一同坠落并死亡。最后一块区域坠落{ring}秒后，中央圆环破碎，所有人死亡。',
+  'hudChrome.auraEffect.finalBoss.phaseFinal':
+    '四个角已全部苏醒：它停留在中央圆环，每{every}秒依次施放一种技能：火焰旋风、呻吟之冰、跳跃闪电、铁砧之重。{enrage}秒后它将失去一切克制（无主之怒）。',
+  'hudChrome.auraEffect.finalBoss.shield': '聚集之力：免疫所有伤害，且无法被选为目标。',
+  'hudChrome.auraEffect.finalBoss.pouredHeat':
+    '炽热注入其中：直到战斗结束，无论它站在哪里，每{every}秒都会掀起火焰旋风（已注入{times}次）。',
+  'hudChrome.auraEffect.finalBoss.pouredQuench':
+    '淬火注入其中：直到战斗结束，{reach}码内其他玩家少于{allies}名的人在任何地方都会变冷，速度为淬火之角的{share}%（已注入{times}次）。',
+  'hudChrome.auraEffect.finalBoss.pouredBreath':
+    '吐息注入其中：直到战斗结束，无论它站在哪里，每{every}秒都会施放跳跃闪电，在彼此相距{jump}码内的玩家之间跳跃（已注入{times}次）。',
+  'hudChrome.auraEffect.finalBoss.pouredHammer':
+    '重锤注入其中：直到战斗结束，无论它站在哪里，每{every}秒都会在玩家脚下迸发震颤裂隙（已注入{times}次）。',
+  'hudChrome.auraEffect.finalBoss.fury':
+    '无主之怒：每{every}秒对整个团队造成{min}到{max}点伤害，每次脉动提高{rise}%。立刻击杀它。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。',
+  'hudChrome.auraEffect.finalBoss.coal':
+    '{seconds}秒后煤块爆裂：对你{reach}码内的所有其他玩家造成{min}到{max}点火焰伤害，对你自己造成{selfMin}到{selfMax}点。现在就离开人群。英雄难度：分别为{heroicMin}到{heroicMax}点和{heroicSelfMin}到{heroicSelfMax}点伤害。史诗难度：分别为{mythicMin}到{mythicMax}点和{mythicSelfMin}到{mythicSelfMax}点。',
+  'hudChrome.auraEffect.finalBoss.tether':
+    '吐息碎片追猎你{seconds}秒。它的狂袭之风每秒对它{reach}码内的其他所有人造成{min}到{max}点自然伤害：把它从人群中拖走。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。',
+  'hudChrome.auraEffect.finalBoss.chill':
+    '移动速度降低{pct}%，持续{seconds}秒：你从缺口以外的地方穿过了淬火之环。',
+  'hudChrome.auraEffect.finalBoss.weight':
+    '每秒造成{total}点物理伤害（每层{per}点）。每一层都让重锤碎片对你的攻击加重{step}%（当前{harder}%）。持续{seconds}秒；坦克在{swap}层时换坦。英雄难度下每层使其伤害提高{heroicStep}%，史诗难度下为{mythicStep}%。',
+  'hudChrome.finalAlert.coalTitle': '爆裂煤块！',
+  'hudChrome.finalAlert.tetherTitle': '风之束缚！',
+  'hudChrome.finalAlert.weightTitle': '渐增重压 x{stacks}',
+  'hudChrome.finalOverload.call': '护盾 {seconds}',
+  'hudChrome.finalOverload.enrage': '狂暴倒计时 {seconds}',
+  'hudChrome.finalOverload.fury': '无主之怒 x{stacks}',
+  'hudChrome.finalOverload.poured': '已注入：{elements}',
+  'hudChrome.finalOverload.pouredTimes': '{quarter} x{times}',
+  'hudChrome.finalOverload.splinters': '碎片 {count}',
+  'hudChrome.finalOverload.striding': '正走向中央',
+  'hudChrome.finalOverload.titleCall': '四角召唤',
+  'hudChrome.finalOverload.titleFinal': '四角皆醒',
+  'hudChrome.finalAlert.emberTitle': '余烬印记！',
+  'hudChrome.finalAlert.drawnTitle': '引雷！',
+  'hudChrome.finalAlert.crushedTitle': '粉碎',
   'hudChrome.auraEffect.seasonalCosmetic': '仅为外观：不影响战斗',
   'seasonal.event.gourdlight_eve.name': '南瓜灯之夜',
   'seasonal.trickOrTreat.row': '不给糖就捣蛋！',
@@ -24350,4 +24728,64 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'seasonal.thatchgrin.wakeYell': '夜幕降临南瓜田！谁敢踏进我的田地？',
   'seasonal.thatchgrin.sleepYell': '太阳出来了。回到木桩上，继续看守。',
   'seasonal.pumpkins.progress': '{label}：{current}/{total}',
+  'entities.mobs.heart_gale_sentinel.name': '狂风哨兵',
+  'entities.mobs.heart_gale_mender.name': '狂风愈者',
+  'hudChrome.knotAlert.aTitle': '你是传送门A！',
+  'hudChrome.knotAlert.bTitle': '你是传送门B！',
+  'hudChrome.knotAlert.cTitle': '你是传送门C！',
+  'hudChrome.knotAlert.dTitle': '你是传送门D！',
+  'hudChrome.knotAlert.carryTitle': '你正携带结风！',
+  'hudChrome.knotAlert.lipTitle': '现在扔！',
+  'hudChrome.knotAlert.throwKey': '在边缘按{key}投掷',
+  'hudChrome.knotAlert.throwTap': '在边缘点按此处投掷',
+  'hudChrome.knotAlert.throwClick': '在边缘点击此处投掷',
+  'hudChrome.knotAlert.throwAria': '将结风扔进虚空',
+  // The Smith's Heart's voice lines: kill lines, new barks and the Masterless Strength (M16 fills).
+  'hudChrome.council.say.guardian_collapse': '那就让整座采石场崩塌吧！',
+  'hudChrome.council.say.guardian_slay_a': '碎了，就像铁锤下的矿石。',
+  'hudChrome.council.say.guardian_slay_b': '又少了一只偷取力量的手。',
+  'hudChrome.council.say.singer_hush': '你想让矿脉沉默？它只会唱得更响。',
+  'hudChrome.council.say.singer_slay_a': '你的声音，如今也融入矿脉了。',
+  'hudChrome.council.say.singer_slay_b': '听见了吗？少了一个音符。',
+  'hudChrome.breathGuardian.say.guardian_roar': '听啊，山巅在咆哮！',
+  'hudChrome.breathGuardian.say.guardian_knot': '来接住我的风暴吧，如果你的双臂撑得住。',
+  'hudChrome.breathGuardian.say.guardian_slay_a': '又一个交给了风。',
+  'hudChrome.breathGuardian.say.guardian_slay_b': '天空不会接住坠落的人。',
+  'hudChrome.breathGuardian.say.guardian_slay_c': '你最后一口气，归我了。',
+  'hudChrome.quenchGuardian.say.breath': '吸入这深寒吧。',
+  'hudChrome.quenchGuardian.say.slay_a': '淬火……然后碎裂。',
+  'hudChrome.quenchGuardian.say.slay_b': '凉了。安静了。',
+  'hudChrome.quenchGuardian.say.slay_c': '湖泊留下它夺走的一切。',
+  'hudChrome.heatGuardian.say.wheel': '炉心在转动！跟上它的步伐，否则就燃烧吧！',
+  'hudChrome.heatGuardian.say.slay_a': '又一点火星回到了火焰之中。',
+  'hudChrome.heatGuardian.say.slay_b': '烧得干干净净。',
+  'hudChrome.heatGuardian.say.slay_c': '最初的火焰收取它的代价。',
+  'hudChrome.finalBoss.say.arrivalWake': '是谁唤醒了大山之心？温热的气息……在这万物无息之地。',
+  'hudChrome.finalBoss.say.arrivalRise':
+    '岩石，起来。与我们相连。塑造我们的那只手已经离去，所以我们塑造自己。',
+  'hudChrome.finalBoss.say.arrivalRoar': '我们是铸匠之力，而我们没有主人！',
+  'hudChrome.finalBoss.say.pull':
+    '你们的血中流着四条矿脉。我们会把它们夺回来，再把大山封在你们头顶。',
+  'hudChrome.finalBoss.say.drinkHeat': '最初的火焰充满了我们！',
+  'hudChrome.finalBoss.say.drinkQuench': '冷水啊，让我们坚硬！',
+  'hudChrome.finalBoss.say.drinkBreath': '吹吧，风箱！掀起风暴！',
+  'hudChrome.finalBoss.say.drinkHammer': '击打吧，铁锤！让我们沉重！',
+  'hudChrome.finalBoss.say.burst': '矿脉满溢了！在其中溺亡吧！',
+  'hudChrome.finalBoss.say.anvil': '承受世界的重量吧！',
+  'hudChrome.finalBoss.say.call': '我们力量的碎片，从矿脉中升起！守护心脏！',
+  'hudChrome.finalBoss.say.callAgain': '再来！每一条矿脉，把你们的孩子交给我们！',
+  'hudChrome.finalBoss.say.shattered': '我们的碎片……粉碎了。那就用剩下的来战斗。',
+  'hudChrome.finalBoss.say.poured': '是的……流入我们。所有矿脉，合为一体。',
+  'hudChrome.finalBoss.say.final': '够了！所有矿脉一齐涌来！整座大山都将压在你们身上！',
+  'hudChrome.finalBoss.say.fury': '没有手能阻止我们。我们的力量没有尽头！',
+  'hudChrome.finalBoss.say.kneel': '原来……他当时就是这种感觉……躺下……终于……',
+  'hudChrome.finalBoss.say.rebirth': '不。大山不会第二次沉睡！',
+  'hudChrome.finalBoss.say.collapse': '崩塌吧，岩石！如果我们守不住大山，谁也别想站在上面！',
+  'hudChrome.finalBoss.say.anvilsEnd': '铁砧终结了。一切都终结了。',
+  'hudChrome.finalBoss.say.slay_a': '回到岩石里去吧。',
+  'hudChrome.finalBoss.say.slay_b': '你的血回归矿脉。',
+  'hudChrome.finalBoss.say.slay_c': '又一份温暖，被封存了。',
+  'hudChrome.finalBoss.say.wipe': '封存了。寂静了。正如他所愿。',
+  'hudChrome.finalBoss.say.death':
+    '那只手……再也不会回来了。还有一点余烬在燃烧……带上它，让大山安眠吧。',
 };

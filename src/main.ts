@@ -144,6 +144,7 @@ import {
   activePvpOpponentIds,
   handlePickedEntity,
   isAttackableEntity,
+  pickedEntityApproachPoint,
   shouldApproachPickedEntity,
   shouldDeferPickedCorpseToGatherNode,
 } from './game/interactions';
@@ -3445,8 +3446,7 @@ async function startGame(
         const hostile = isAttackableEntity(e, world.playerId, activePvpOpponentIds(world));
         renderer.spawnClickMarker(e.pos.x, e.pos.z, hostile);
       }
-      // The configured click-to-move mouse button approaches the entity while the
-      // regular click handler still performs target/interact behavior.
+      // The click-to-move button approaches the entity; the click handler still interacts.
       if (
         isClickMoveButton &&
         shouldApproachPickedEntity(
@@ -3457,7 +3457,7 @@ async function startGame(
           localPartyMemberIds(world.partyInfo),
         )
       ) {
-        const target = resolvedClickMoveTarget({ x: e.pos.x, z: e.pos.z });
+        const target = resolvedClickMoveTarget(pickedEntityApproachPoint(e));
         input.setClickMoveTarget(target, 3.5, e.id, clickMovePathTo(target));
       }
     }

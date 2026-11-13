@@ -1,6 +1,7 @@
 import type { corpseLootAvailability } from '../../../game/corpse_loot_availability';
 import { HARVEST_BODY_RANGE, pickHarvestBody } from '../../../game/harvest_body_pick';
 import { ITEMS } from '../../../sim/data';
+import { corpseLootDistance } from '../../../sim/loot/corpse_loot_reach';
 import { lootQualityTier } from '../../../sim/loot_quality';
 import type { MaterialComposition } from '../../../sim/material_sources';
 import type { ItemInstancePayload } from '../../../sim/types';
@@ -112,6 +113,10 @@ export interface LootWindowControllerDeps {
 
 /** The corpse popup's range gate, in yards (the coordinator's proximity band). */
 const CORPSE_POPUP_RANGE = HARVEST_BODY_RANGE;
+// A corpse popup closes once the player drifts CORPSE_POPUP_RANGE from where the
+// body is looted (sim/loot/corpse_loot_reach.ts corpseLootDistance: a big body's
+// edge, a guardian's coffer spot), so a body looted from its edge or its coffer
+// never closes the popup it just opened.
 
 /** The identity of the focused control inside the corpse popup, carried across
  *  a body rebuild. Role-keyed rather than `data-focus-key`: the picker's
@@ -214,7 +219,7 @@ export class LootWindowController {
       !mob ||
       world.player.dead ||
       !mob.lootable ||
-      this.distanceFromPlayer(mob) > CORPSE_POPUP_RANGE
+      corpseLootDistance(mob, world.player.pos) > CORPSE_POPUP_RANGE
     ) {
       return;
     }
@@ -506,7 +511,11 @@ export class LootWindowController {
     }
     const world = this.deps.world();
     const mob = world.entities.get(this.mobId);
-    if (world.player.dead || !mob?.lootable || this.distanceFromPlayer(mob) > CORPSE_POPUP_RANGE) {
+    if (
+      world.player.dead ||
+      !mob?.lootable ||
+      corpseLootDistance(mob, world.player.pos) > CORPSE_POPUP_RANGE
+    ) {
       this.close();
       return null;
     }

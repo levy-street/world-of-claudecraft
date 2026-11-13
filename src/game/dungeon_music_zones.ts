@@ -6,6 +6,9 @@ const DUNGEON_MUSIC: Record<string, MusicZone> = {
   hollow_crypt: 'dungeon_hollow_crypt',
   sunken_bastion: 'dungeon_sunken_bastion',
   gravewyrm_sanctum: 'dungeon_gravewyrm_sanctum',
+  // The Smith's Heart scores with its own halls theme; inside, the area table
+  // (smith_heart_music.ts) decides, this row is the entry fallback.
+  smith_heart: 'dungeon_smith_heart',
   ignivar_forge_approach: 'ignivar_forge_approach',
   ignivar_raid_arena: 'ignivar_raid_arena',
   ignivar_molten_assembly: 'ignivar_forge_approach',

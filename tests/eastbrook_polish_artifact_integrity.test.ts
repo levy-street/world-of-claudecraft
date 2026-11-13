@@ -1438,7 +1438,11 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // No capture was retaken.
   // Re-minted for v0.45.4 graphics and dungeon loading optimizations in renderer.ts.
   // No capture was retaken.
-  '4f474fa63f385a9500a579234fa54bb0347928db42b34bce32c8b908ea32f6db';
+  // Re-minted for the Smith's Heart raid's renderer wiring (its death-zone and
+  // drawn-position hooks). No capture was retaken.
+  // Re-minted for the Smith's Heart raid's dormant warders (a sleeping body's heap held
+  // until its killing blow) over the Quench queen's renderer wiring. No capture was retaken.
+  'f6a693a9555f8686c10f248a395086525dda7a387f2fe87333f53385978e959e';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -1496,7 +1500,11 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // No capture was retaken.
   // Re-minted for v0.45.4 graphics and dungeon loading optimizations in renderer.ts.
   // No capture was retaken.
-  'f79dd14b173b432d7056d797f2184116e645d03474c03ef9d8000cdeb5dd80b9';
+  // Re-minted for the Smith's Heart raid's renderer wiring (its death-zone and
+  // drawn-position hooks). No capture was retaken.
+  // Re-minted for the Smith's Heart raid's dormant warders (a sleeping body's heap held
+  // until its killing blow) over the Quench queen's renderer wiring. No capture was retaken.
+  '158f70500fec6fac2fae6e98047bc7d940ab56c34758596f7115f88e49628ca1';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2905,7 +2913,11 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // release/v0.45.3: recomputed from the swept evidence. No capture was retaken.
       // v0.45.4 graphics and dungeon loading optimizations in renderer.ts:
       // recomputed from the swept evidence. No capture was retaken.
-    ).toBe('cac822feca2db6382e3569357b7b23fab2f038db18acfc98cc07412512475032');
+      // The Smith's Heart raid's renderer wiring: recomputed from the swept
+      // evidence. No capture was retaken.
+      // The Smith's Heart raid's dormant warders over the Quench queen: recomputed from the
+      // swept evidence. No capture was retaken.
+    ).toBe('2f76b105fc1c0203c79da519184aab047cf470c14bade5193d21953301b56d2d');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

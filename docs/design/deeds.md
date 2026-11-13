@@ -238,6 +238,19 @@ completionist trap that drags veterans back through the tutorial. If the
 island ever gains real conquerable content (a rare, a delve), that content
 authors deeds like any other.
 
+One deferral, not an exemption: **the Smith's Heart** raid ships dev-gated
+(`SMITH_HEART_PLAYABLE = false` in `src/sim/content/smith_heart.ts`: no
+overworld door, no loot, hidden from the Guide). Its seven deeds (the clear,
+five encounter feats paying the raid's weapon appearances, and the meta paying
+the Quarryheart Charger; `src/sim/content/smith_heart_rewards.ts`) are authored
+now but carry `hidden: SMITH_HEART_DEEDS_HIDDEN`: invisible until earned, out of
+the Guide and every public surface, out of Book completion, so no player sees a
+deed they cannot earn while dev testers can earn and inspect them. They are the
+one off-prefix hidden set (`tests/deeds_content.test.ts` pins it), and they
+unhide in the change that flips the flag; `tests/smith_heart_launch_guard.test.ts`
+reds if the flag flips with them still hidden, without real loot, or without the
+appearances' Reliquary rows.
+
 ## The account ledger (the Book is account-wide)
 
 The Book of Deeds is shared across every character on an account, and every

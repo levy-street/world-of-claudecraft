@@ -176,6 +176,11 @@ const AUTHORED_ATLAS_DEFS = [
   'mob_ignivar_ember_sentinel',
   'mob_ignivar_cinder_artificer',
   'mob_healing_tide_totem',
+  // the Smith's Heart's Masterless Strength (its own rigged model)
+  'smith_heart_masterless_strength',
+  'smith_heart_heat_guardian',
+  'smith_heart_breath_guardian',
+  'smith_heart_quench_guardian',
   'mob_hoard_abyssal_maw',
   'mob_hoard_hoarfrost_warden',
   'mob_hoard_emberforge_tyrant',
@@ -222,6 +227,9 @@ const AUTHORED_ATLAS_DEFS = [
   'mount_lanternback_troll',
   'mount_nightwing_chimera',
   'mount_wobbles_slime',
+  // The Smith's Heart's Quarryheart Charger (parked: only the dev-gated raid's meta deed
+  // grants its reins), a Blender build with its own authored atlas.
+  'mount_quarryheart_charger',
   // the Blender-built dungeon bosses and bodies: the Sunken Bastion's Vael,
   // Iron Cage, Drowned Anchor and Gaol Turnkey, and the Hollow Crypt's Lich
   // Bishop (Morthen); and the Bastion's sculpted drowned (the Revenant first)
@@ -347,6 +355,33 @@ const AUTHORED_ATLAS_DEFS = [
   'wildheart_sunbone_totem',
   // its Dread Totem (scripts/assets/wildheart_sunbone_totem, both Blender bodies)
   'wildheart_sunbone_dread_totem',
+  // the Hammer Vein Warder's body (scripts/assets/specs/heart_hammer_warder.json)
+  'smith_heart_hammer_warder',
+  // the Guardian of the Hammer's body, built as the Slabwright's
+  // (scripts/assets/specs/heart_slabwright.json)
+  'smith_heart_hammer_guardian',
+  // the Seam Singer's body (scripts/assets/specs/heart_seam_singer.json)
+  'smith_heart_seam_singer',
+  // the Quench Vein Warder's and Caller's bodies (scripts/assets/specs/heart_quench_warder.json,
+  // heart_quench_caller.json)
+  'smith_heart_quench_warder',
+  'smith_heart_quench_caller',
+  // the raid's own trash and add bodies (scripts/assets/specs/heart_<name>.json,
+  // src/render/characters/smith_heart_trash_looks.ts)
+  'smith_heart_ring_warder',
+  'smith_heart_breath_warder',
+  'smith_heart_breath_caller',
+  'smith_heart_gale_sentinel',
+  'smith_heart_gale_mender',
+  'smith_heart_heat_warder',
+  'smith_heart_heat_caller',
+  'smith_heart_wellspawn',
+  'smith_heart_wellkeeper',
+  'smith_heart_seedflame',
+  'smith_heart_splinter_hammer',
+  'smith_heart_splinter_breath',
+  'smith_heart_splinter_quench',
+  'smith_heart_splinter_heat',
 ];
 
 describe('authored surfaces', () => {

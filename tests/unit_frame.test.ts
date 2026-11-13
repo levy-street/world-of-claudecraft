@@ -15,6 +15,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import type { Aura } from '../src/sim/types';
+import { HEAL_ABSORB_OFF } from '../src/ui/heal_absorb_bar_view';
 import {
   absorbSegmentTransform,
   newUnitFrameBuffer,
@@ -105,6 +106,7 @@ describe('unitFrameView: the present / hidden gate', () => {
       absorbStartFrac: 0,
       absorbSizeFrac: 0,
       absorbOvershield: false,
+      healAbsorb: HEAL_ABSORB_OFF,
       dead: false,
       outOfRange: false,
       raidMarker: null,

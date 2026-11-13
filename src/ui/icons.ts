@@ -2817,6 +2817,10 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   dgn_crypt_lantern: r('holy', 'holyGold', ['candle', { p: 'shield', ...BR }], ['glow']),
   dgn_crypt_embrace: r('frost', 'ice', ['hand', { p: 'snowflake', ...BR }], ['sparkle']),
   dgn_crypt_rime_path: r('frost', 'ice', ['snowflake', { p: 'boot', ...BR }], ['motion']),
+  // The Guardian of the Quench's Living Rime (encounters/smith_heart/quench_rime.ts):
+  // the crust that drinks healing (a frozen heart, cracking) and its slow.
+  heart_quench_rime: r('frost', 'ice', ['heart', { p: 'snowflake', ...BR }], ['crack']),
+  heart_quench_rime_slow: r('frost', 'ice', ['snowflake', { p: 'boot', ...BR }], ['motion']),
   dgn_crypt_bridal_freeze: r(
     'frost',
     'silverWhite',
@@ -5905,6 +5909,15 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'feat_guild_writ_runner',
   'feat_guild_hallsworn',
   'feat_guild_of_lantern_hall',
+  // The Smith's Heart's seven (hidden while the raid is dev-gated): the dungeon crest until
+  // their paintings are commissioned.
+  'dgn_smith_heart',
+  'dgn_heart_council_feat',
+  'dgn_heart_breath_feat',
+  'dgn_heart_quench_feat',
+  'dgn_heart_heat_feat',
+  'dgn_heart_final_feat',
+  'dgn_heart_meta',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

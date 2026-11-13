@@ -340,6 +340,13 @@ export class TelegraphKit {
     }
   }
 
+  /** Slide an already draped fan to (x, y, z) without re-sampling the floor:
+   *  for a fan riding a moving unit between drapes (its owner re-drapes once
+   *  it has slid far enough for the floor under it to change). */
+  placeFan(f: TelegraphFan, x: number, y: number, z: number): void {
+    f.group.position.set(x, y + LIFT, z);
+  }
+
   /** Paint a fan's layers for this frame. */
   paintFan(f: TelegraphFan, p: TelegraphPaint): void {
     const look = telegraphLook(p.fill, p.clock, this.detail, this.look);

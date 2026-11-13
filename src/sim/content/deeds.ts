@@ -18,6 +18,12 @@ import {
   GOURDLIGHT_KNOCK_MARKS,
   GOURDLIGHT_META_TITLE,
 } from './gourdlight_eve_deeds';
+import { SMITH_HEART_DUNGEON, SMITH_HEART_PLAYABLE } from './smith_heart';
+import {
+  SMITH_HEART_CLEAR_DEED,
+  SMITH_HEART_FEAT_DEEDS,
+  SMITH_HEART_META_DEED,
+} from './smith_heart_rewards';
 
 // The current content era. Bumped ONLY by the maintainer at era boundaries;
 // feats gated on an era stay visible afterward as history markers and a
@@ -29,6 +35,10 @@ export const DEEDS_ERA = 'first_era';
 // is why it carries 0 Renown and feat status). Populated below, after the
 // table literal, so it always matches the shipped catalog exactly.
 const BOOK_COMPLETE_REQUIREMENTS: string[] = [];
+
+/** The Smith's Heart's deeds stay hidden (invisible until earned) while the raid is
+ *  dev-gated; they unhide in the change that flips SMITH_HEART_PLAYABLE. */
+export const SMITH_HEART_DEEDS_HIDDEN = !SMITH_HEART_PLAYABLE;
 
 export const DEEDS: Record<string, DeedDef> = {
   prog_first_steps: {
@@ -4120,6 +4130,86 @@ export const DEEDS: Record<string, DeedDef> = {
     trigger: { kind: 'visits', markIds: [...GOURDLIGHT_EVE_MARKS] },
     feat: true,
     reward: { kind: 'title', text: GOURDLIGHT_META_TITLE },
+  },
+  // ---- The Smith's Heart (content/smith_heart_rewards.ts) ----
+  // HIDDEN while the raid is dev-gated (SMITH_HEART_DEEDS_HIDDEN): no player can earn them
+  // yet, and a hidden deed is invisible until earned, stripped from the Guide and every
+  // public surface, so none of them shows as unearnable. Flipping SMITH_HEART_PLAYABLE
+  // unhides all seven in the same change (tests/smith_heart_launch_guard.test.ts).
+  // Each feat is granted by encounters/smith_heart/feats.ts at its boss's fall and pays
+  // that encounter's weapon appearance (src/sim/smith_heart_feat_rewards.ts); the meta pays
+  // the Quarryheart Charger. Cosmetic only, like every deed reward.
+  [SMITH_HEART_CLEAR_DEED]: {
+    id: SMITH_HEART_CLEAR_DEED,
+    name: 'The Heart Stills',
+    desc: "Defeat the Masterless Strength in the Smith's Heart on any difficulty.",
+    category: 'dungeon',
+    renown: 25,
+    trigger: { kind: 'dungeonClears', dungeonId: SMITH_HEART_DUNGEON, count: 1 },
+    hidden: SMITH_HEART_DEEDS_HIDDEN,
+  },
+  [SMITH_HEART_FEAT_DEEDS.hammer_council]: {
+    id: SMITH_HEART_FEAT_DEEDS.hammer_council,
+    name: 'Charge Through the Curse',
+    desc: "Defeat the Hammer Council with every Mountain's Rush shattering the cursed pillar and striking no raider on its way, the marked one included, and with the Guardian of the Hammer and the Seam Singer falling within 15 seconds of each other. A Rush that stops at another pillar, or meets none, fails it.",
+    category: 'dungeon',
+    renown: 25,
+    trigger: { kind: 'manual' },
+    hidden: SMITH_HEART_DEEDS_HIDDEN,
+  },
+  [SMITH_HEART_FEAT_DEEDS.breath]: {
+    id: SMITH_HEART_FEAT_DEEDS.breath,
+    name: 'Keep Your Feet',
+    desc: 'Defeat the Guardian of the Breath without any raider falling from the Storm Cornice or an Island of the Wind during the fight, and with every Gale Bulwark broken by the raid before it bursts on its own.',
+    category: 'dungeon',
+    renown: 25,
+    trigger: { kind: 'manual' },
+    hidden: SMITH_HEART_DEEDS_HIDDEN,
+  },
+  [SMITH_HEART_FEAT_DEEDS.quench]: {
+    id: SMITH_HEART_FEAT_DEEDS.quench,
+    name: 'No One Left in the Cold',
+    desc: 'Defeat the Guardian of the Quench without any raider being Encased in Rime, whether by a full cold bar, a shatter or an unhealed Living Rime, and without any ice blade striking a raider.',
+    category: 'dungeon',
+    renown: 25,
+    trigger: { kind: 'manual' },
+    hidden: SMITH_HEART_DEEDS_HIDDEN,
+  },
+  [SMITH_HEART_FEAT_DEEDS.heat]: {
+    id: SMITH_HEART_FEAT_DEEDS.heat,
+    name: 'Turn Back the Cinders',
+    desc: 'Defeat the Guardian of the Heat without any Rolling Cinder reaching the raider it hunts.',
+    category: 'dungeon',
+    renown: 25,
+    trigger: { kind: 'manual' },
+    hidden: SMITH_HEART_DEEDS_HIDDEN,
+  },
+  [SMITH_HEART_FEAT_DEEDS.masterless]: {
+    id: SMITH_HEART_FEAT_DEEDS.masterless,
+    name: 'Kept From the Brim',
+    desc: 'Defeat the Masterless Strength without any of its four Overload bars bursting and without any raider dying during the fight.',
+    category: 'dungeon',
+    renown: 25,
+    trigger: { kind: 'manual' },
+    hidden: SMITH_HEART_DEEDS_HIDDEN,
+  },
+  [SMITH_HEART_META_DEED]: {
+    id: SMITH_HEART_META_DEED,
+    name: 'Heir to the Smith',
+    desc: "Earn all five of the Smith's Heart's encounter deeds: Charge Through the Curse, Keep Your Feet, No One Left in the Cold, Turn Back the Cinders and Kept From the Brim.",
+    category: 'dungeon',
+    renown: 50,
+    trigger: {
+      kind: 'meta',
+      deedIds: [
+        SMITH_HEART_FEAT_DEEDS.hammer_council,
+        SMITH_HEART_FEAT_DEEDS.breath,
+        SMITH_HEART_FEAT_DEEDS.quench,
+        SMITH_HEART_FEAT_DEEDS.heat,
+        SMITH_HEART_FEAT_DEEDS.masterless,
+      ],
+    },
+    hidden: SMITH_HEART_DEEDS_HIDDEN,
   },
 };
 

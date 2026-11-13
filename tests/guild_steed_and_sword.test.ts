@@ -116,8 +116,8 @@ describe('the catalog records', () => {
       earnedFrom: 'lantern_hall',
     });
     expect(STORE_WEAPON_SKIN_LIST.some((s) => s.id === LANTERN_HALL_SWORD_SKIN_ID)).toBe(false);
-    // the store skips five: the guild's earned blade and four arms reserved for a future raid
-    expect(STORE_WEAPON_SKIN_LIST.length).toBe(Object.keys(WEAPON_SKINS).length - 5);
+    // the store skips six: the guild's earned blade and the five Smith's Heart raid arms
+    expect(STORE_WEAPON_SKIN_LIST.length).toBe(Object.keys(WEAPON_SKINS).length - 6);
   });
 });
 

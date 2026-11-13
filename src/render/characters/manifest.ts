@@ -215,6 +215,9 @@ import { SANCTUM_BOSS_LOOKS, SANCTUM_BOSS_MOB_KEYS } from './sanctum_boss_looks'
 import { SANCTUM_MOB_KEYS, sanctumCreatureLooks } from './sanctum_creature_looks';
 import { seasonalTrickLooks } from './seasonal_trick_looks';
 import type { SeatClipSet } from './seat_clips';
+import { SMITH_HEART_BOSS_LOOKS } from './smith_heart_boss_looks';
+import { SMITH_HEART_PLACEHOLDER_LOOKS } from './smith_heart_placeholder_looks';
+import { SMITH_HEART_TRASH_LOOKS } from './smith_heart_trash_looks';
 import type { WeaponLoadout } from './weapon_loadout_core';
 import { WILDHEART_MOB_KEYS, wildheartPlaceholderLooks } from './wildheart_creature_looks';
 import { type WocFit, wocAnimsUrl, wocBaseUrl } from './woc_armor_core';
@@ -475,6 +478,11 @@ export interface ClipMap {
    *  are held until the listed contact (attack_swing_core.ts contactDelaySec; the FCT painter
    *  and contact_queue.ts). Absent or unlisted = the effects play at once. */
   contacts?: Readonly<Record<string, readonly number[]>>;
+  /** Seconds a named one-shot crossfades in over, in place of the standard one-shot fade
+   *  (0.1 s). For a blow whose contact is its first frame, played on the event that lands it
+   *  from a pose already low over its mark (the Quench queen's StrikeSlam): a short fade puts
+   *  the fists on the ice on the damage's own frame. Absent = the standard fade. */
+  oneShotFade?: Readonly<Record<string, number>>;
   /** Clips minted at load by cutting a GLB clip in two at `at` seconds, under
    *  the given names, for a cast that must HOLD one half and release the other
    *  (the hunter's timed shots: the aim half is the generic cast clip held at
@@ -3435,6 +3443,34 @@ export const VISUALS: Record<string, VisualDef> = {
     runRef: 13.4,
     lazyPreload: true,
   },
+  // The Quarryheart Charger (scripts/assets/quarryheart_charger/, ship_charger.mjs): the Smith's
+  // Heart raid's reward, floating quarry-stone plates over a body of living fire, built at game
+  // scale so `height` is its own Idle height (CHARGER_REPORT). Every clip is authored by the build
+  // (charger_rig.py): the gait refs are its planted-hoof speeds (stride / (duty x period)), so a
+  // mounted gallop plants its hooves. `land` opts it into the held jump (Jump held on its tucked
+  // airborne pose, Land on touchdown); Rear is the standing jump's flourish (mount_rear_core.ts).
+  // Death holds Idle: a ridden mount never plays one. Its plate float, heartbeat and wind mane are
+  // shader work on its own materials (quarryheart_charger_fx.ts), not clips.
+  mount_quarryheart_charger: {
+    url: `${MOUNTS_DIR}/quarryheart_charger.glb`,
+    height: 4.9338,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      walkBack: 'WalkBack',
+      jump: 'Jump',
+      land: 'Land',
+      flourish: 'Rear',
+      attack: [],
+      death: 'Idle',
+    },
+    walkRef: 2.04,
+    runRef: 12.55,
+    walkBackRef: 5.45,
+    authoredAtlas: true,
+    lazyPreload: true,
+  },
   mount_grag_bear: {
     url: `${MOUNTS_DIR}/grag_bear.glb`,
     height: 4.0,
@@ -4244,6 +4280,155 @@ export const VISUALS: Record<string, VisualDef> = {
     animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.4,
+  },
+  // The Hammer Vein Warder (the Smith's Heart's first trash, design doc section 4), the
+  // raid's first body of its own: Tripo P2 from the concept sheet, one UV island per rock on a
+  // 1024 ETC1S atlas painted over in ChatGPT, and a stone rig built in Blender (every rock rigid to
+  // one bone, the bend kept in the crevices between rocks). Attack is the right fist slammed
+  // into the floor, Attack2 a wide left hook, Cleave (Stone Sweep, the template's arcCleave,
+  // through its brood_cleave cue) both fists swept low across the front. All three land at
+  // 1.0 s, the longest a contact is held (../contact_queue.ts CONTACT_HOLD_MAX_SEC), and play
+  // at 1x. walkRef and runRef are the planted-foot readings of scripts/anim/measure_gait.mjs at
+  // the drawn height and the template's scale of 2.04. The template chases at 4.2 yd/s, which
+  // Run covers at about 1.35x, so the gait lets Run in below the default threshold: that speed
+  // would otherwise play Walk, whose rate cap cannot reach it. Death kneels, then topples, also
+  // at 1x. Height is the measured mid-idle height. It is dormant until the raid reaches it
+  // (src/sim/mob/dormant.ts): Sleep holds the heap of rock that Awaken stands up from (the loop
+  // starts and ends on Awaken's first frame), and Awaken plays once on the asleep-to-awake edge
+  // at 1x, as long as the sim holds its AI. No flourish: it revives asleep, so a respawn goes
+  // straight back to the heap, and standing up belongs to the wake edge alone.
+  smith_heart_hammer_warder: {
+    url: `${CREATURES}/heart_hammer_warder.glb`,
+    height: 2.17,
+    clips: {
+      idle: 'Idle',
+      idleVariants: ['IdleFidget'],
+      idleVariantCadence: { everySec: 18, jitterSec: 12 },
+      combatIdle: 'CombatIdle',
+      stunned: 'Stunned',
+      turn: 'Turn',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      attackByAbility: { brood_cleave: 'Cleave' },
+      contacts: { Attack: [1.0], Attack2: [1.0], Cleave: [1.0] },
+      hit: ['Hit', 'Hit2'],
+      death: 'Death',
+      sleep: 'Sleep',
+      wake: 'Awaken',
+    },
+    attackTimeScale: 1,
+    deathTimeScale: 1,
+    turnRate: 3,
+    walkRef: 1.35,
+    runRef: 3.1,
+    gait: { runEnter: 3.2, runExit: 2.6 },
+    gaitWindDown: true,
+    authoredAtlas: true,
+  },
+  // The Quench Vein Warder (the Quench's packs, design doc section 4): the Hammer Vein Warder's body
+  // plan in bright glacier ice that pops against the Quench's night. Tripo P2 from its ChatGPT sheet,
+  // one UV island per ice plate on a 1024 atlas repainted in ChatGPT, a glow map of its own (its crack
+  // lines, eyes and heart crystal hot, the rest of the ice softly lit from inside), and a rig of rigid
+  // plates on one welded skin: every plate on one bone, only the vertices on a seam shared by the two
+  // bones either side, so no seam ever opens into a gap and no plate stretches. Its clips are the
+  // Hammer Warder's body language on this body's joints (contacts at 1.0 s, played at 1x), plus its
+  // own: it creaks as it stands, and it dies on its face, whole. Rime Sweep (the template's arcCleave,
+  // through its brood_cleave cue) swings Cleave and flares its cracks as it lands. walkRef is Walk's
+  // planted-foot speed at its drawn size. It does not run, it skates: low, shoving off side to side on
+  // the ice with the gliding foot planted under it, so its feet slide by design and the stride reads at
+  // any chase speed; runRef plays it at 0.75x at the template's 7.2 yd/s, a heavy body's slow shove. Its
+  // glow goes out as it dies.
+  smith_heart_quench_warder: {
+    url: `${CREATURES}/heart_quench_warder.glb`,
+    // Drawn big (looks only, the template keeps its scale and reach): 3.8 at the template's 1.7 is
+    // about 6.5 yd, some two and a quarter players, still under its guardian.
+    height: 3.8,
+    clips: {
+      idle: 'Idle',
+      idleVariants: ['IdleFidget'],
+      idleVariantCadence: { everySec: 18, jitterSec: 12 },
+      combatIdle: 'CombatIdle',
+      stunned: 'Stunned',
+      turn: 'Turn',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      attackByAbility: { brood_cleave: 'Cleave' },
+      contacts: { Attack: [1.0], Attack2: [1.0], Cleave: [1.0] },
+      hit: ['Hit', 'Hit2'],
+      death: 'Death',
+    },
+    attackTimeScale: 1,
+    deathTimeScale: 1,
+    turnRate: 3,
+    walkRef: 1.97,
+    runRef: 9.6,
+    gait: { runEnter: 2.4, runExit: 1.9 },
+    gaitWindDown: true,
+    authoredAtlas: true,
+    glowPulses: {
+      pulses: [
+        { gesture: 'brood_cleave', delay: 0.8, rise: 0.15, hold: 0.25, fall: 0.8, peak: 2.2 },
+      ],
+      deathFade: 2.5,
+    },
+  },
+  // The Quench Vein Caller (the Quench's packs): a hooded frost caster of glacier ice with a snow
+  // mantle, a crown of ice shards behind its hood and a frost orb floating over each palm (the orbs
+  // modelled in Blender, Tripo dropped the sheet's flat swirls). Tripo P2 from its ChatGPT sheet, a
+  // repainted 1024 atlas and a glow map (the orbs, eyes and cracks hot), rigged like the Warder: rigid
+  // plates on one welded skin, the crown shards and the orbs on their own. It
+  // floats: every clip lifts it a quarter of a yard over the floor on its robe of ice shards, so no
+  // foot can slide (runRef is the template's 7 yd/s at 1x). Its light melee lands at 0.62 s (the left
+  // orb punched out) and 0.66 s (the right claw raked down). Rime Bolt plays CastBolt locked to the
+  // 2 s bar: both orbs leave the palms and orbit into one point of cold between its hands, then are
+  // flung at the bar's end, vanish into the bolt and grow back over its palms as the clip plays out.
+  // Its death throws its head back, drops it, scatters its crown and rolls its orbs away; its glow
+  // goes out as it dies.
+  smith_heart_quench_caller: {
+    url: `${CREATURES}/heart_quench_caller.glb`,
+    // Drawn big (looks only): 3.6 at the template's 1.3 is about 4.7 yd, floating half a yard up.
+    height: 3.6,
+    clips: {
+      idle: 'Idle',
+      idleVariants: ['IdleFidget'],
+      idleVariantCadence: { everySec: 16, jitterSec: 10 },
+      combatIdle: 'CombatIdle',
+      stunned: 'Stunned',
+      turn: 'Turn',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      contacts: { Attack: [0.62], Attack2: [0.66] },
+      cast: 'CastBolt',
+      castByAbility: { heart_rime_bolt: 'CastBolt' },
+      castPlayOut: ['CastBolt'],
+      hit: ['Hit', 'Hit2'],
+      death: 'Death',
+    },
+    castClipSync: ['heart_rime_bolt'],
+    attackTimeScale: 1,
+    deathTimeScale: 1,
+    turnRate: 3,
+    walkRef: 3.5,
+    runRef: 7,
+    gaitWindDown: true,
+    authoredAtlas: true,
+    glowPulses: { pulses: [], deathFade: 2 },
+  },
+  // The Hammer Council's two (the Guardian of the Hammer, the Seam Singer)
+  // live in smith_heart_boss_looks.ts with the raid's other boss models.
+  // The Guardian of the Heat's Rolling Cinder (design doc 7.4): a bodyless
+  // target, its click capsule, nameplate and bars round the great ball of the
+  // first flame the raid's own effects draw (smith_heart_fx/heat_cinder_fx.ts).
+  smith_heart_rolling_cinder: {
+    url: `${CREATURES}/golelingevolved.glb`,
+    height: 1.9,
+    clips: ELEMENTAL_FLOATING,
+    animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
+    bodyless: true,
+    clickRadius: 2.2,
   },
   mob_ignivar: {
     url: `${CREATURES}/ignivar_herald.glb`,
@@ -8187,6 +8372,10 @@ Object.assign(VISUALS, wildheartPlaceholderLooks(VISUALS));
 Object.assign(VISUALS, sanctumCreatureLooks(VISUALS));
 // The Gravewyrm Sanctum's three bosses (sanctum_boss_looks.ts).
 Object.assign(VISUALS, SANCTUM_BOSS_LOOKS);
+// The Smith's Heart's own boss models (smith_heart_boss_looks.ts).
+Object.assign(VISUALS, SMITH_HEART_BOSS_LOOKS);
+// The Smith's Heart's own trash and add bodies (smith_heart_trash_looks.ts).
+Object.assign(VISUALS, SMITH_HEART_TRASH_LOOKS);
 // Gourdlight Eve's trick bodies, the bat and the skeleton (seasonal_trick_looks.ts).
 Object.assign(VISUALS, seasonalTrickLooks(VISUALS));
 
@@ -8478,6 +8667,7 @@ const MOB_KEYS: Record<string, string> = {
   ...WILDHEART_MOB_KEYS,
   ...SANCTUM_MOB_KEYS,
   ...SANCTUM_BOSS_MOB_KEYS,
+  ...SMITH_HEART_PLACEHOLDER_LOOKS,
   ...Object.fromEntries(
     ALL_CLASSES.map((cls) => [`tideglass_reflection_${cls}`, `temple_reflection_${cls}`]),
   ),
@@ -8614,6 +8804,11 @@ const NPC_KEYS: Record<string, string> = {
   marshal_redbrook: 'npc_knight',
   warden_fenwick: 'npc_knight',
   captain_thessaly: 'npc_knight',
+  // Captain Thessaly at the head of the Storm Cornice (the Smith's Heart's
+  // Guardian of the Breath): the same captain, the same knight.
+  heart_captain_thessaly: 'npc_knight',
+  // Warden Ada Collier at the Smith's Heart's Cleft: the same Vigil's knight.
+  heart_warden_ada_collier: 'npc_knight',
   // The two WARFARE quartermasters (one stock, two placements). Both sell the
   // game's most prestigious armor and both fell through to the tinted villager
   // body before this, which read as a townsperson selling epics; the armored

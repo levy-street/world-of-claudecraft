@@ -16,6 +16,7 @@ import {
   WEAPON_SKINS,
 } from '../src/sim/content/weapon_skins';
 import type { GuildAccountPort } from '../src/sim/guild_quartermaster';
+import { smithHeartSkinsForDeeds } from '../src/sim/smith_heart_feat_rewards';
 import type { Entity, SkinCatalog, WeaponSkinLoadout, WeaponSkinType } from '../src/sim/types';
 import type { AccountCosmetics } from '../src/world_api';
 import {
@@ -212,6 +213,19 @@ export class AccountCosmeticsService {
       'weaponSkinIds',
       grantAccountWeaponSkins,
     );
+  }
+
+  /** Weapon appearances a character's EARNED deeds pay (the Smith's Heart's feats,
+   *  src/sim/smith_heart_feat_rewards.ts): persisted into the same rollback-safe
+   *  account_weapon_cosmetics row and pushed live. The one grant lane those reserved skins
+   *  have (never the economy or store paths, which isGrantableWeaponSkin still refuses):
+   *  the ids come only from deeds the sim granted, so a client cannot name one. Called on
+   *  every deedUnlocked and at every join over the character's earned set, so a lost write
+   *  heals at the next login. Idempotent (current and pending ids are skipped). */
+  grantDeedRewardSkins(accountId: number, deedIds: Iterable<string>): void {
+    const skins = smithHeartSkinsForDeeds(deedIds);
+    if (skins.length === 0) return;
+    this.grantSkins(accountId, skins, 'weaponSkinIds', grantAccountWeaponSkins);
   }
 
   /** Mount skins (src/sim/content/mount_skins.ts): the same account-wide mirror

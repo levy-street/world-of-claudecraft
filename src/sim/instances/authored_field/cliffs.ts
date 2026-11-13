@@ -34,6 +34,17 @@ export interface FieldCliffRun {
   style: FieldEdgeStyle;
   /** The surface whose outline produced this run. */
   surface: string;
+  /** A lip over the void inside one of the field's `lipOpenings`: no wall
+   *  stands here (field_colliders.ts builds none), a body falls off it. */
+  open?: true;
+}
+
+/** Is a cliff sample at (x, z), its low side at `low`, inside one of the
+ *  field's lip openings (a break in the wall over the void)? Pure. */
+export function lipOpenAt(def: AuthoredFieldDef, x: number, z: number, low: number): boolean {
+  if (!def.lipOpenings || low > def.voidHeight + 1) return false;
+  for (const o of def.lipOpenings) if ((x - o.x) ** 2 + (z - o.z) ** 2 <= o.r * o.r) return true;
+  return false;
 }
 
 const SAMPLE_STEP = 1;
@@ -91,6 +102,7 @@ export function authoredFieldCliffRuns(def: AuthoredFieldDef): FieldCliffRun[] {
       let runHigh = 0;
       let runLow = 0;
       let runSign = 0;
+      let runOpen = false;
       const flush = (endIdx: number): void => {
         if (runStart < 0) return;
         const t0 = runStart / samples;
@@ -112,6 +124,7 @@ export function authoredFieldCliffRuns(def: AuthoredFieldDef): FieldCliffRun[] {
           nz: nz * runSign,
           style: high.edge ?? 'rock',
           surface: high.id,
+          ...(runOpen ? { open: true as const } : {}),
         });
         runStart = -1;
       };
@@ -125,12 +138,14 @@ export function authoredFieldCliffRuns(def: AuthoredFieldDef): FieldCliffRun[] {
         const key = keyOf(sx, sz);
         const wall = Math.abs(diff) > def.cliffStep && !claimed.has(key);
         const sign = diff > 0 ? 1 : -1;
-        if (wall && runStart >= 0 && sign !== runSign) flush(k - 1);
+        const open = wall && lipOpenAt(def, sx, sz, Math.min(hIn, hOut));
+        if (wall && runStart >= 0 && (sign !== runSign || open !== runOpen)) flush(k - 1);
         if (wall) {
           claimed.add(key);
           if (runStart < 0) {
             runStart = k;
             runSign = sign;
+            runOpen = open;
             runHigh = Math.max(hIn, hOut);
             runLow = Math.min(hIn, hOut);
           }

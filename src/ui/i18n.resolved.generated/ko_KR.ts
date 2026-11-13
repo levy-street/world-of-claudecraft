@@ -1432,7 +1432,8 @@ export const ko_KR: EnTranslations = {
         "emberwrought": "엠버로트",
         "hoarfrost": "백상",
         "fallen_star": "추락한 별",
-        "lantern_hall": "등불 회관"
+        "lantern_hall": "등불 회관",
+        "smiths_heart": "대장장이의 심장"
       },
       "skins": {
         "lantern_hall_sword": {
@@ -1440,25 +1441,30 @@ export const ko_KR: EnTranslations = {
           "look": "홈에 등불의 불길을 담은 넓은 강철 검날, 금박 장식, 코등이에서 타오르는 새장 등불, 푸른 가죽 손잡이.",
           "lore": "개릭 홀트는 이 검을 낯선 이에게 팔지 않는다. 매주 등불 회관의 계약을 지켜 온 회원에게만 건네며, 그때마다 같은 말을 덧붙인다. 코등이의 등불은 회관의 화로에서 옮겨 붙인 불이니, 어디로 가져가든 회관이 함께한다고. 홈 속의 불은 겉모습일 뿐이다. 중요한 것은 약속이다."
         },
-        "hearthbrand_sword": {
-          "name": "화롯불의 검",
-          "look": "양날이 대장간의 열기로 달아오르고 양면에 녹은 균열이 가지를 치며 뻗은, 검게 그을린 강철의 불꽃 물결 검날. 타오르는 돌을 감싼 청동 불꽃 코등이, 검붉은 가죽 손잡이.",
-          "lore": "등불 회관에는 회관이 세워진 이래 한 번도 꺼진 적 없는 화로가 있고, 개릭 홀트는 이 검날이 그 숯불에 담금질되었다고 맹세한다. 이 검을 지닌 이들은 가장 추운 불침번에도 손잡이가 따뜻하다고 말한다. 검날을 따라 흐르는 불은 겉모습일 뿐이다."
+        "seamcaller_maul": {
+          "name": "광맥을 부르는 자",
+          "look": "타오르는 금빛 광맥이 갈라놓은 어두운 채석장 돌 한 덩어리를 깎아 만든 양손 대형 망치. 양 볼에는 테두리를 두른 금빛 룬, 타오르는 호박을 두른 금테 타격면, 리벳을 박은 금띠, 휘어진 금빛 뿔, 머리에서 자라난 호박 광맥 결정, 금으로 감은 땋은 가죽 자루.",
+          "lore": "망치 의회는 공격대에게 손을 들기 전에 노래로 광맥을 깨웠고, 돌은 그 모든 음을 기억한다. 이 망치는 그들의 망치가 쪼갠 돌덩이에서 깎아 냈으며, 휘두를 때마다 룬이 여전히 타오른다. 광맥 결정 조각이 머리 주위를 도는 모습은 마치 산이 그것들을 되찾고 싶어 하는 듯하다. 룬과 도는 결정은 외형일 뿐이다."
         },
         "squallcrest_sword": {
           "name": "폭풍 물결의 검",
-          "look": "부서지는 파도처럼 빛나는 날을 지닌 길고 푸른 바다빛 검날. 갈라진 번개를 품은 폭풍의 홈, 검날 밑동을 넘는 금빛 파도, 한쪽 날을 따라 난 지느러미, 폭풍 진주를 감싼 금빛 파도 코등이.",
-          "lore": "길드를 위해 항해하던 한 선장이 돛대를 앗아 가고 배를 종처럼 울리게 한 돌풍 속에서 이 검을 가지고 돌아왔다. 개릭은 인장을 받고서만 이 검을 팔며, 사는 이마다 폭풍 전에는 검이 웅웅거린다고 경고한다. 번개와 바다빛은 겉모습일 뿐이다."
+          "look": "번개처럼 밝은 날을 지닌 긴 폭풍강철 검. 구름무늬를 새긴 양면에는 갈라진 벼락이, 칼등에는 갈고리 모양의 바람 지느러미가 있고, 코등이는 폭풍의 눈 보석을 감싸며 펼쳐진 은빛 날개다.",
+          "lore": "숨결의 수호자는 심장의 공기를 쉼 없이 돌게 했다. 그것이 쓰러졌을 때 품고 있던 폭풍은 흩어지지 않고 이 검에 깃들었다. 바람은 여전히 강철을 감싸고 번개는 여전히 날을 따라 달리며, 이 검을 든 이들은 코등이 속 눈이 하늘을 지켜본다고 맹세한다. 폭풍은 외형일 뿐이다."
         },
         "rimelight_staff": {
           "name": "서리빛 지팡이",
-          "look": "은으로 감싸고 빛나는 서리를 휘감은 창백한 자루. 꼭대기에는 얼음 조각 왕관 속에서 차가운 빛의 거대한 수정을 움켜쥔 은 갈고리가 있고, 깃에는 고드름이 매달려 있다.",
-          "lore": "등불 회관의 겨울 경비대는 이런 지팡이를 들고 높은 길을 걸으며, 눈 속에서 길을 잃은 여행자들을 위해 꼭대기를 밝혔다. 개릭은 인장에 여유가 있는 회원을 위해 하나를 진열대에 두고 있다. 서리와 그 차가운 빛은 겉모습일 뿐이다."
+          "look": "은빛 세공 무늬를 감고 보석 박힌 은 고리로 조인 푸른 강철 지팡이. 꼭대기에서는 네 개의 은빛 초승달 칼날이 차가운 빛의 거대한 결정을 감싸고, 그 둘레를 작은 결정들의 고리가 두르며, 아래로는 고드름이 매달려 있다.",
+          "lore": "담금질의 수호자는 심장이 벼린 모든 칼날을 식혀 왔다. 그것이 쓰러졌을 때 가장 마지막까지 빛을 잃지 않은 것이 이 결정이었고, 공격대가 들고 나올 때도 손에 서리가 앉을 만큼 차가웠다. 얼음이 관을 돌고 서리의 룬이 그 둘레를 회전한다. 냉기는 외형일 뿐이다."
+        },
+        "hearthbrand_sword": {
+          "name": "화롯불의 검",
+          "look": "식어 굳은 용암 껍질로 된 넓은 검. 날은 아직 녹아 있고 양면에는 잔불 같은 균열이 그물처럼 퍼져 있으며, 칼등에는 흑요석 이빨이, 검은 쇠 코등이는 녹은 쇳물이 떨어지는 두 뿔로 휘어 용암의 심장을 감싼다.",
+          "lore": "열기의 수호자는 심장이라는 이름이 비롯된 바로 그 불이었다. 그것이 꺼질 때 마지막 용암이 대장간 바닥의 검 모양 틈으로 흘러들어 그곳에서 식었다. 겉은 껍질, 속은 불이다. 그 날은 한 번도 타오르기를 멈춘 적이 없다. 불은 외형일 뿐이다."
         },
         "duskwick_staff": {
-          "name": "황혼 심지 지팡이",
-          "look": "쇠로 감싼 두 가닥의 꼬인 검은 나무 자루. 꼭대기에는 휘어 오른 두 뿔 사이에서 보랏빛 황혼의 불꽃을 태우는 열린 쇠 등롱이 있고, 그 바닥에서 사슬이 흔들린다.",
-          "lore": "회관의 등불은 모두 밝게 타오른다, 단 하나만 빼고. 황혼의 불꽃은 밤의 회관을 지키려고 밝힌 것으로, 다른 등불이 빛을 내는 곳에서 그림자를 낸다. 개릭은 그 심지를 직접 다듬는다. 연기와 보랏빛 광채는 겉모습일 뿐이다."
+          "name": "심장융합 지팡이",
+          "look": "채석장 돌을 층층이 박은 용광로 청동 지팡이. 꼭대기에는 거대한 금빛 고리가 있고, 네 보석(채석장의 호박, 돌풍, 서리, 불)이 차례로 빛나며 백금빛 핵을 품은 모루의 심장을 둘러싼다.",
+          "lore": "주인 없는 힘은 심장의 네 광맥이 세상의 모루 위에서 하나의 몸으로 묶인 것이었다. 그것이 부서졌을 때 넷은 흩어지지 않고 이 고리에 깃들어 돌, 바람, 서리, 불의 차례로 타오른다. 한때 차례로 공격했던 것처럼. 네 개의 빛은 외형일 뿐이다."
         },
         "guildmark_arming_sword": {
           "name": "길드마크 무장검",
@@ -2598,6 +2604,7 @@ export const ko_KR: EnTranslations = {
       "name_mech_bird": "태엽 기계새",
       "name_lanternback_troll": "등불지기 그룸볼",
       "name_lantern_hall_destrier": "등불 회관 군마",
+      "name_quarryheart_charger": "채석심장 돌격마",
       "name_chimeglass_tortoise": "종유리의 톨리버",
       "name_rickshaw_mount": "뼈에 묶인 인력거",
       "name_emberbristle_broom": "잉걸갈기 빗자루",
@@ -2622,6 +2629,7 @@ export const ko_KR: EnTranslations = {
       "desc_mech_bird": "수제 태엽 전투 닭. 서보 관절을 튕기며 질주하고, 태엽 열쇠는 지금도 돌아가고 있다.",
       "desc_lanternback_troll": "점등인들이 멍에로 길들인 언덕 트롤. 어깨에 무쇠 왕좌를 지고, 양쪽 팔걸이마다 폭풍 등불이 타오른다.",
       "desc_lantern_hall_destrier": "등불 회관의 군마. 길드의 푸른 천 아래 참나무와 쇠로 된 마갑을 두르고, 안장에서 흔들리는 두 개의 폭풍 등불이 귀갓길을 밝힌다.",
+      "desc_quarryheart_charger": "대장장이의 심장의 군마. 살아 있는 불길의 몸 위로 채석장 돌판이 떠 있고, 금빛 갈비뼈 너머로 백열의 심장이 고동친다. 이마에는 얼음 수정 뿔, 갈기는 번개가 튀는 바람이다.",
       "desc_nightwing_chimera": "고대의 나뭇가지에서 내려온 쌍두 황혼 와이번으로, 멈추면 발톱 달린 뒷다리로 서고 움직이면 비전 문양이 새겨진 날개로 지면 위를 활공한다.",
       "desc_chimeglass_tortoise": "소금 평원의 육지거북. 대상 세 세대를 앞질러 걸었다. 그를 거둔 땜장이들이 폭풍유리를 갈아 안경을 만들고 목에 청동 종을 달아, 길은 그를 보기 전에 먼저 듣는다.",
       "desc_rickshaw_mount": "덜컹거리는 뼈 수레입니다. 뼈만 앙상한 잡졸이 채에 매인 채 전속력으로 당신을 끌고 달립니다.",
@@ -4745,6 +4753,107 @@ export const ko_KR: EnTranslations = {
         "branded": "{seconds}초 동안 {interval}초마다 {value}의 {school} 피해를 입힙니다. 녹은 물웅덩이에 들어가면 즉시 꺼집니다.",
         "creepingRime": "이동 속도가 {pct}% 감소합니다(중첩당 {per}%). 서리 숨결을 맞을 때마다 1회 중첩되고 지속 시간이 {seconds}초로 초기화됩니다. {max}회 중첩되면 {freeze}초 동안 얼어붙고(빙결) 중첩이 사라집니다.",
         "icedOver": "스며드는 서리에 얼어붙었습니다: 이동하거나 행동할 수 없습니다."
+      },
+      "council": {
+        "intro": "잠들어 있다: 의회가 깨어날 때까지 공격할 수도, 피해를 줄 수도 없다.",
+        "wakeMark": "효과가 끝나면 서 있는 자리의 바닥에서 기둥이 솟구쳐 {radius}야드 안의 모두에게 {min}에서 {max}의 피해를 주고 밀쳐냅니다. 공격대에 엄폐물이 필요한 곳에 서세요. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.",
+        "rockMark": "효과가 끝나면 바위가 떨어집니다: {total}의 피해를 {radius}야드 안의 모두가 나눠 받습니다. {soakers}명 미만이면 각자 {penalty}% 더 받고 공격대 전체가 {tremorMin}에서 {tremorMax}의 피해를 받습니다. {radius}야드 안의 모든 기둥이 한 조각씩 깨지니 엄폐물에서 떨어져 나눠 맞으세요. 신화: {soulReach}야드 안의 영혼의 기둥은 대신 영혼 표식을 하나 잃고, 표식이 없어지면 부서집니다. 영웅·신화: 나눠 받는 피해 {heroicTotal}, 공격대 전체 피해 {heroicTremorMin}에서 {heroicTremorMax}.",
+        "resonance": "{every}초마다 울려 퍼져 자신의 {radius}야드 안에 있는 모든 아군에게 {min}에서 {max}의 자연 피해를 줍니다. 효과가 끝날 때까지 모두에게서 떨어지세요. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.",
+        "rushMark": "효과가 끝나면 망치의 수호자가 {windup}초 동안 자세를 잡은 뒤, 당신이 서 있던 곳을 지나 채석장 가장자리까지 일직선으로 돌진하며, 길을 막는 기둥이 있으면 첫 번째 기둥에서 멈춥니다. 저주받은 기둥으로 유인하세요: 기둥이 부서지고 수호자가 {stun}초 동안 기절하며 {exposedSeconds}초 동안 받는 피해가 {exposed}% 증가합니다. 경로에 엄폐용 기둥이 있으면 대신 그 기둥이 파괴됩니다. 멈추기 전까지 돌진에 부딪힌 모두가 {min}에서 {max}의 피해를 받고 밀려나며, 아직 경로 위에 있다면 당신도 마찬가지입니다. 신화: 기둥에 부딪히지 않은 돌진은 저주받은 기둥이 부서질 때까지 채석장 붕괴를 일으킵니다. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.",
+        "rushExposed": "받는 피해가 {pct}% 증가합니다: 산의 돌진이 저주받은 기둥을 부쉈습니다.",
+        "bond": "망치 의회의 다른 구성원이 {reach}야드 안에 있는 동안 받는 피해가 {pct}% 감소합니다. {every}초마다 돌의 결속이 공격대 전체에 {min}에서 {max}의 피해를 주며, 매번 {growth}%씩 증가합니다. 둘을 떼어 놓으세요. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.",
+        "collapse": "채석장이 무너지고 있습니다: {every}초마다 중첩 하나당 {min}에서 {max}의 피해를 받으며, 매번 중첩이 하나씩 쌓입니다. 저주받은 기둥이 부서지면 끝납니다.",
+        "memory": "주는 피해가 {pct}% 증가합니다: 쓰러진 망치 의회 구성원 1명당 {per}%.",
+        "pillarLimit": "기둥 하나는 산의 분노로부터 최대 {limit}명만 지켜 줍니다. 그보다 많이 숨으면 모두가 폭발의 {share}%를 받습니다. 숨지 않은 대상은 일반에서 {min}에서 {max}, 영웅에서 {heroicMin}에서 {heroicMax}, 신화에서 {mythicMin}에서 {mythicMax}의 피해를 받습니다."
+      },
+      "breathGuardian": {
+        "intro": "잠들어 있다: 폭풍이 그를 내려놓을 때까지 공격할 수도, 피해를 줄 수도 없다.",
+        "portalA": "효과가 끝나면 당신이 선 자리에 포털 A가 열립니다. 얽힌 질풍 가까이에 서세요. 이번 라운드에는 그것을 나를 수 없습니다.",
+        "portalB": "효과가 끝나면 당신이 선 자리에 포털 B가 열립니다. 벼랑 가장자리에 서세요. 이번 라운드에는 얽힌 질풍을 나를 수 없습니다.",
+        "portalC": "효과가 끝나면 당신이 선 자리에 포털 C가 열립니다. 포털 D와만 이어집니다. 다른 얽힌 질풍 가까이에 서세요. 이번 라운드에는 그것을 나를 수 없습니다.",
+        "portalD": "효과가 끝나면 당신이 선 자리에 포털 D가 열립니다. 포털 C와만 이어집니다. 포털 B에서 떨어진 벼랑 가장자리에 서세요. 이번 라운드에는 얽힌 질풍을 나를 수 없습니다.",
+        "laden": "얽힌 질풍을 나르고 있습니다: 이동 속도가 {walk}%가 되고, 점멸·돌진·도약을 할 수 없으며, 바람도 끌어당김도 폭발도 날려 보내기도 당신을 움직일 수 없습니다. 각 포털은 짝 포털로 데려갑니다: A에서 B, C에서 D. 벼랑 가장자리에서 상호작용을 누르면 공허로 던집니다. 이 효과가 끝나면 터져 벼랑 위의 모두가 죽습니다.",
+        "wind": "숨결의 수호자의 바람이 부는 방향으로 초당 {speed}야드씩 당신을 실어 갑니다. 바람을 거슬러 걸으면 버틸 수 있으며, 시전은 끊기지 않습니다. 벼랑 둘레에는 벽이 없습니다: 가장자리 밖으로 실려 가면 공허로 떨어집니다. 오르막 꼭대기에만 벽이 남아 있으며, 그곳에 밀려 붙으면 매초 {pinMin}~{pinMax}의 피해를 입습니다. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.",
+        "draw": "수호자가 숨을 들이쉬며 초당 {speed}야드씩 당신을 끌어당깁니다. 입 앞의 소용돌이는 그 안에 선 자에게 {tick}초마다 {min}~{max}의 피해를 줍니다. 이어서 정상의 포효가 벼랑 위의 모두에게 {gustMin}~{gustMax}의 피해를 주고 수호자에게서 {throw}야드(영웅 난이도는 {heroicThrow}야드) 날려 보냅니다: 수호자가 가장자리 가까이 있으면 공격대가 벼랑 밖으로 날아갑니다. 영웅·신화: 각각 {heroicMin}에서 {heroicMax}, {heroicGustMin}에서 {heroicGustMax}의 피해.",
+        "pinned": "바람에 밀려 가장자리 벽에 붙어 있습니다: 바람이 잦아들거나 벽에서 벗어날 때까지 매초 {min}~{max}의 피해. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.",
+        "anchor": "테살리 대장의 고요가 당신을 붙잡고 있습니다: 바람도, 끌어당김도, 폭발도, 날려 보내기도 당신을 움직일 수 없습니다. 피해는 그대로 받습니다.",
+        "spent": "닻이 다했습니다: 이것이 끝날 때까지 테살리 대장의 고요의 원은 당신을 다시 붙잡을 수 없습니다.",
+        "drawn": "{every}초마다 당신이 선 곳에 번개가 떨어집니다: {warn}초 뒤 {radius}야드 안의 모두에게 {min}~{max}의 피해를 주고, {charged}초 동안 매초 {cmin}~{cmax}의 피해를 주는 대전된 땅을 남깁니다. 계속 움직이며 낙뢰를 공격대에서 먼 가장자리로 유도하세요. 영웅·신화: 각각 {heroicMin}에서 {heroicMax}, {heroicCMin}에서 {heroicCMax}의 피해.",
+        "cradled": "폭풍 속으로 들어 올려져, 수호자가 요람을 유지하는 {hold}초 동안 붙잡힙니다. 그동안 수호자는 다른 것을 시전하지 않습니다. 이후 방전이 {total}의 피해를 주며, 당신과 아래 {radius}야드 안의 모두가 나눠 받습니다. 나눠 받는 인원이 {soakers}명 미만이면 각자 {penalty}% 더 받고 벼랑 위의 모두가 {bmin}~{bmax}의 피해를 받습니다. 영웅: {heroicCount}명이 한꺼번에 들어 올려지며, 각 방전은 {heroicTotal}이고 {heroicSoakers}명이 필요하니 공격대가 나뉘어 받아야 합니다. 영웅·신화: 반동 피해는 {heroicBMin}에서 {heroicBMax}입니다.",
+        "bulwark": "바람의 방패가 피해를 {left} 더 흡수합니다. 떠 있는 섬의 질풍 파수병이나 질풍 치유사가 하나라도 살아 있으면 매초 전체의 {regrow}%가 다시 차오르고, 치유의 질풍마다 {mend}%가 회복됩니다. 질풍의 길을 타고 섬으로 건너가 그들을 쓰러뜨리세요. {max}초 동안 유지되면 벼랑 위에서 터져 {bmin}~{bmax}의 피해를 줍니다. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.",
+        "riding": "바람이 정해진 길을 따라 공허 위로 당신을 실어 갑니다: 내려놓을 때까지 행동할 수 없습니다.",
+        "windworn": "바람에 지쳤습니다: 이 효과가 끝날 때까지 질풍의 길이 당신을 섬으로 데려가지 않습니다.",
+        "thrown": "정상의 포효에 날아갔습니다: 착지할 때까지 움직일 수 없습니다.",
+        "tossed": "떠도는 돌풍에 날아갔습니다: 돌풍이 내려놓을 때까지 움직일 수 없습니다.",
+        "stormForm": "찢어져 번개의 몸이 되었습니다: 숨결의 수호자가 쓰러질 때까지 이어지는 전투의 폭풍 후반부.",
+        "swell": "{every}초마다 부풀어 오르는 폭풍이 벼랑 위의 모두에게 {min}~{max}의 피해를 주며, 앞선 맥동마다 {growth}%씩 강해집니다: 지금까지 {stacks}번. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해."
+      },
+      "quenchGuardian": {
+        "intro": "호수의 얼음 아래 얼어붙어 있습니다: 그녀가 얼음을 깨고 나올 때까지 그녀를 공격하거나 피해를 줄 수 없습니다.",
+        "cold": "당신의 냉기: {max} 중 {cold}. 혼자 있으면 약 {fill}초 만에 가득 찹니다. {radius}미터 안에 다른 플레이어가 {others}명 이상 있으면 대신 매초 {fall}씩 내려갑니다. 생명의 온기: 받은 치유는 최대 생명력의 {healPct}%마다 냉기를 1씩 낮춥니다(영웅과 신화에서는 {heroicHealPct}%마다). 차가운 관 같은 무적 효과로는 막을 수 없습니다: 효과가 지속되는 동안에는 온기를 주지도 받지도 못합니다. {max}에 이르면 {freeze}초 동안 서리에 갇히고, 그 뒤 얼음이 부서집니다.",
+        "warmth": "공격대와 함께 모여 있음: 냉기가 매초 {fall}씩 내려갑니다. 한 자리에 {linger}초 동안 머문 무리 아래의 얼음은 갈라져 얼어붙은 물웅덩이가 되니 계속 움직이세요.",
+        "frozen": "서리에 갇힘: 행동할 수 없고 모든 공격으로부터 받는 피해가 {pct}% 증가하며, 서리가 차가운 관 같은 무적 효과를 깨뜨립니다. 효과가 끝나면 얼음이 부서져 {min}~{max}의 냉기 피해를 입고, 이후 {seconds}초 동안 받는 피해가 {brittle}% 증가하며, {radius}미터 안의 모두가 냉기 {cold}을 얻습니다(영웅 난이도에서는 {heroicRadius}미터, 냉기 {heroicCold}). 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.",
+        "brittle": "모든 공격으로부터 받는 피해가 {pct}% 증가합니다. 이 효과가 지속되는 동안에는 아군의 얼음 파편이 당신의 냉기를 {cap} 넘게 올리지 못합니다.",
+        "splashed": "아군의 부서진 얼음이 튀었습니다: 냉기 +{cold}. 자신의 게이지가 가득 차기 전에 무리로 돌아가세요.",
+        "trapped": "얼음을 뚫고 얼어붙은 물에 빠졌습니다: 움직일 수 없고, 매초 {min}~{max}의 냉기 피해를 입으며 냉기가 올라갑니다. {seconds}초 뒤 가장자리로 기어 올라옵니다. 물만으로는 절대 죽지 않습니다. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.",
+        "awake": "대장장이의 네 칼날이 깨어 있습니다. 라운드마다 더 많은 플레이어가 표식을 받고, 칼날이 각자를 지나는 선을 따라 차례로 날아갑니다. 선은 칼날이 날아가기 {lock}초 전에 고정되며, 선 위의 대상에게 {min}~{max}의 냉기 피해를 주고 냉기를 {cold} 더합니다. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.",
+        "marked": "{count}명 중 {order}번째입니다. 칼날이 당신을 지나는 선을 따라 날아옵니다. 선을 공격대에서 멀리 유도하세요. 선은 칼날이 날아가기 {lock}초 전에 고정되니 그때 비켜서세요. 그렇지 않으면 {min}~{max}의 냉기 피해와 냉기 {cold}를 받습니다. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.",
+        "deepening": "호수의 냉기가 {total}% 더 빠르게 오릅니다: 검이 깨어난 뒤 {every}초마다 {step}%씩(지금까지 {stacks}회).",
+        "rime": "살아 있는 서리가 다음에 받는 치유를 {left}만큼 흡수합니다(전체 {whole}). 남아 있는 동안 이동 속도가 {slow}% 느려지고 냉기가 {normalMult}배(영웅과 신화에서는 {heroicMult}배) 빠르게 오르니 무리에서 벗어나십시오. {seconds}초 안에 치유로 깨뜨리면 사라집니다. 깨뜨리지 못하면 즉시 서리에 갇히고, {radius}미터 안의 모두에게 냉기가 터져 냉기 {cold}을 더합니다(영웅과 신화에서는 {heroicCold}). 일반: 1명에게 {normalAbsorb}. 영웅: {heroicTargets}명에게 {heroicAbsorb}, 터지면 가장 가까운 다른 플레이어에게 새 서리가 옮겨 갑니다. 신화: 영웅과 같으며 {mythicTargets}명.",
+        "rimePool": "살아 있는 서리: 깨뜨리려면 최대 생명력의 {pct}%만큼 치유가 더 필요합니다. 걸린 뒤 {seconds}초 안에 깨지 못하면 서리에 갇히고 {radius}미터 안의 모두에게 냉기가 터집니다.",
+        "rimeSlow": "살아 있는 서리로 느려짐: 서리가 치유로 깨지거나 터질 때까지 이동 속도가 {slow}% 느려지고 냉기가 {normalMult}배(영웅과 신화에서는 {heroicMult}배) 빠르게 오릅니다."
+      },
+      "heatGuardian": {
+        "statePhase1": "샘에 몸을 반쯤 담근 채 결코 움직이지 않습니다. 현무암 주먹이 물가의 한 지점을 내리찍고, 그곳에서 용암 너울 세 줄기가 퍼져 나갑니다. 화로의 섬광은 샘에서 {reach}미터보다 멀리 있는 모두를 칩니다. 생명력 70%에서 가라앉고 화로가 넘쳐흐릅니다. 영웅 난이도에서는 피해가 {heroicPct}% 더 큽니다.",
+        "statePhase2": "샘에 몸을 반쯤 담근 채 결코 움직이지 않습니다. 현무암 주먹은 계속됩니다. 화로 씨앗이 공격대의 발밑에 떨어졌다가 잠시 뒤 터지고, 깨어나는 불이 샘 주위의 바닥을 띠마다 차례로 불태웁니다. 생명력 40%에서 다시 가라앉고 화로가 넘쳐흐릅니다. 영웅 난이도에서는 피해가 {heroicPct}% 더 큽니다.",
+        "statePhase3": "샘에 몸을 반쯤 담근 채 결코 움직이지 않습니다. 현무암 주먹과 깨어나는 불은 계속되고, 구르는 잉걸불이 떨어져 플레이어를 쫓습니다: 때리면 밀려납니다. 영웅 난이도에서는 피해가 {heroicPct}% 더 큽니다.",
+        "intro": "샘 속에서 차갑게 식어 있다: 공격대가 다가와 깨어나 불타오를 때까지 공격하거나 피해를 줄 수 없다.",
+        "stateUnder": "샘에 가라앉아 있습니다: 화로가 넘쳐흐르는 동안에는 공격하거나 피해를 줄 수 없습니다. 넘침이 끝나면 다시 떠오릅니다.",
+        "scorched": "받는 화염, 냉기, 자연, 암흑, 비전 피해가 {pct}% 증가합니다. {every}초마다 화로의 섬광이 샘에서 {reach}미터보다 멀리 있는 모두를 치고 이 효과를 갱신합니다.",
+        "grip": "매초 화염 피해를 {total} 받습니다(중첩 {stacks}개마다 {per}). 수호자의 공격이 적중할 때마다 중첩이 하나씩 쌓이고(최대 {most}개) {seconds}초 동안 지속됩니다: 너무 무거워지기 전에 방어 전담을 교대하십시오.",
+        "kindling": "{seconds}초 뒤 {trail}초 동안 불의 자취를 남깁니다. 자취마다 아군에게 매초 {min}~{max}의 화염 피해를 주고, 그 위에 선 샘의 자식의 생명력을 매초 {heal}% 회복시킵니다: 무리와 샘의 자식이 지나는 길에서 벗어나십시오. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.",
+        "trail": "잉걸불 자취를 남기고 있습니다: 폭 {radius}미터의 불이 {life}초 동안 타며, 그 안의 아군에게 매초 {min}~{max}의 화염 피해를 주고 그 안의 샘의 자식의 생명력을 매초 {heal}% 회복시킵니다. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.",
+        "hunted": "구르는 잉걸불이나 씨불이 당신을 쫓고 있습니다. 구르는 잉걸불에 붙잡히면 죽고 {radius}미터 안의 모두가 불탑니다: 거리를 두고 아군이 때리게 하십시오. 한 번 칠 때마다 {knock}미터 밀려납니다(그 뒤 {crust}초 동안은 밀려나지 않습니다).",
+        "crust": "단단하게 식었습니다: 이 효과가 끝날 때까지 때려도 밀려나지 않습니다."
+      },
+      "finalBoss": {
+        "stateHeat": "열기를 마십니다: 현무암 주먹이 한 플레이어가 선 자리를 내리찍고 그곳에서 용암 너울 세 줄기가 퍼져 나가며, 화염 회오리가 바닥을 가로지릅니다. 영웅에서는 잉걸불 표식이 원거리 플레이어 발밑에 불을 떨어뜨리고, 신화에서는 정면 공격이 용광로의 불을 남깁니다.",
+        "stateQuench": "담금질을 마십니다: {reach}미터 안에 다른 플레이어가 {allies}명 미만인 사람은 점점 차가워져 얼어붙습니다. 영웅에서는 표식이 찍힌 플레이어 발밑의 얼음이 깨지고, 신화에서는 정면 공격이 이동 속도를 {slow}% 늦춥니다.",
+        "stateBreath": "숨결을 마십니다: 강풍이 공격대를 가장자리로 밀어내고, 튀어 오르는 번개가 서로 {jump}미터 안에 있는 플레이어 사이를 튑니다. 영웅에서는 끌려오는 번개가 플레이어에게 표식을 남기고, 신화에서는 폭풍 구슬을 각각 한 명이 밟아야 합니다.",
+        "stateHammer": "망치를 마십니다: 진동 균열이 플레이어 발밑에서 터지고, 모루의 무게가 표식 안의 모두에게 타격을 나눠 줍니다. 영웅에서는 돌 껍질이 치유를 흡수하고 모루를 나눠 맞은 사람은 짓눌림에 걸리며, 신화에서는 모루의 표식이 우두머리 주위를 돕니다.",
+        "stateRing": "중앙 원 안에서는 어느 구역의 힘도 마시지 않습니다. 생명력이 {pct}%보다 높으면 그곳에서 매초 풀려난 심장 중첩을 얻습니다.",
+        "overloadHeat": "열기의 과부하, {value}% 찼습니다. 우두머리가 열기 구역에 서 있는 동안 차오르며(비어 있다가 가득 차기까지 {fill}초), {every}초마다 공격대에 맥동 피해를 줍니다: 비었을 때 {min}, 가득 찼을 때 최대 {max}. 가득 차기 직전에 공격대에 경고합니다. 가득 차면 터져 공격대 전체에 피해를 주고 비워집니다: 일반에서 {normalMin}~{normalMax}(치유로 버틸 수 있음), 영웅에서 {heroicMin}~{heroicMax}(강력함: 체력을 채우고 생존기를 사용), 신화에서 {mythicMin}~{mythicMax}(치명적: 강력한 개인 생존기 없이는 살아남을 수 없음). 구역을 떠나면 3분의 1 속도로 줄어듭니다. 맥동 피해는 영웅에서 {heroicPulseMin}에서 {heroicPulseMax}, 신화에서 {mythicPulseMin}에서 {mythicPulseMax}입니다.",
+        "overloadQuench": "담금질의 과부하, {value}% 찼습니다. 우두머리가 담금질 구역에 서 있는 동안 차오르며(비어 있다가 가득 차기까지 {fill}초), {every}초마다 공격대에 맥동 피해를 줍니다: 비었을 때 {min}, 가득 찼을 때 최대 {max}. 가득 차기 직전에 공격대에 경고합니다. 가득 차면 터져 공격대 전체에 피해를 주고 비워집니다: 일반에서 {normalMin}~{normalMax}(치유로 버틸 수 있음), 영웅에서 {heroicMin}~{heroicMax}(강력함: 체력을 채우고 생존기를 사용), 신화에서 {mythicMin}~{mythicMax}(치명적: 강력한 개인 생존기 없이는 살아남을 수 없음). 구역을 떠나면 3분의 1 속도로 줄어듭니다. 맥동 피해는 영웅에서 {heroicPulseMin}에서 {heroicPulseMax}, 신화에서 {mythicPulseMin}에서 {mythicPulseMax}입니다.",
+        "overloadBreath": "숨결의 과부하, {value}% 찼습니다. 우두머리가 숨결 구역에 서 있는 동안 차오르며(비어 있다가 가득 차기까지 {fill}초), {every}초마다 공격대에 맥동 피해를 줍니다: 비었을 때 {min}, 가득 찼을 때 최대 {max}. 가득 차기 직전에 공격대에 경고합니다. 가득 차면 터져 공격대 전체에 피해를 주고 비워집니다: 일반에서 {normalMin}~{normalMax}(치유로 버틸 수 있음), 영웅에서 {heroicMin}~{heroicMax}(강력함: 체력을 채우고 생존기를 사용), 신화에서 {mythicMin}~{mythicMax}(치명적: 강력한 개인 생존기 없이는 살아남을 수 없음). 구역을 떠나면 3분의 1 속도로 줄어듭니다. 맥동 피해는 영웅에서 {heroicPulseMin}에서 {heroicPulseMax}, 신화에서 {mythicPulseMin}에서 {mythicPulseMax}입니다.",
+        "overloadHammer": "망치의 과부하, {value}% 찼습니다. 우두머리가 망치 구역에 서 있는 동안 차오르며(비어 있다가 가득 차기까지 {fill}초), {every}초마다 공격대에 맥동 피해를 줍니다: 비었을 때 {min}, 가득 찼을 때 최대 {max}. 가득 차기 직전에 공격대에 경고합니다. 가득 차면 터져 공격대 전체에 피해를 주고 비워집니다: 일반에서 {normalMin}~{normalMax}(치유로 버틸 수 있음), 영웅에서 {heroicMin}~{heroicMax}(강력함: 체력을 채우고 생존기를 사용), 신화에서 {mythicMin}~{mythicMax}(치명적: 강력한 개인 생존기 없이는 살아남을 수 없음). 구역을 떠나면 3분의 1 속도로 줄어듭니다. 맥동 피해는 영웅에서 {heroicPulseMin}에서 {heroicPulseMax}, 신화에서 {mythicPulseMin}에서 {mythicPulseMax}입니다.",
+        "root": "구역에 들어간 뒤 {seconds}초 동안 뿌리내립니다: 뿌리내림이 끝날 때까지 끌어낼 수 없습니다.",
+        "unbound": "중첩마다 매초 공격대 전체에 {per}의 피해를 주며(현재 {total}), 중앙 원 안에 서 있는 동안 매초 중첩이 쌓입니다. 원 밖으로 끌어내면 끝납니다. 영웅: 중첩당 {heroicPer}. 신화: 중첩당 {mythicPer}.",
+        "shaken": "이 효과가 지속되는 동안 구역 전환이 {mult}배 강하게 적중합니다({baseMin}~{baseMax} 대신 {min}~{max}의 피해). 전환할 때마다 {seconds}초로 갱신됩니다. 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.",
+        "cold": "냉기 {value}/100. {reach}미터 안에 다른 플레이어가 {allies}명 미만이면 매초 {rise}씩 오르고, 모이면 내려갑니다. 100이 되면 서리에 갇힙니다: {freeze}초 동안 기절하고 {min}~{max}의 냉기 피해를 받습니다. 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.",
+        "frozen": "기절 상태. 혼자 서 있다가 얼어붙었습니다: 담금질을 마시는 동안 다른 플레이어 {allies}명 이상의 {reach}미터 안에 머무르세요.",
+        "underIce": "기절 상태: 깨지는 얼음 아래로 떨어졌습니다.",
+        "numbing": "정면 공격으로 {seconds}초 동안 이동 속도가 {pct}% 감소합니다.",
+        "ember": "{seconds}초 후 발밑에 잉걸불이 떨어져 반경 {radius}미터 웅덩이로 {life}초 동안 타오르며, 그 안의 모두에게 매초 {min}~{max}의 화염 피해를 줍니다. 표식이 찍힌 다른 플레이어와 같은 구석에 모였다가 빠져나가세요. 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.",
+        "wind": "강풍이 부는 방향으로 매초 {speed}미터씩 밀려납니다. 바람을 거슬러 걸으면 버틸 수 있습니다(시전은 끊기지 않습니다). 바람이 부는 동안 가장자리 {band}미터 안에 있으면 매초 {min}~{max}의 자연 피해를 받습니다. 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.",
+        "drawn": "{seconds}초 동안 매초 당신에게서 {reach}미터 안의 다른 모든 플레이어에게 번개가 튀어 각각 {min}~{max}의 자연 피해를 줍니다. 모두에게서 {reach}미터 떨어지세요. 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.",
+        "shell": "다음에 받는 치유 {value}을(를) 흡수합니다.",
+        "crushed": "{seconds}초 안에 다음 모루의 무게 아래에 서면 분담 피해를 {mult}배로 받습니다. 다른 조에게 맡기세요.",
+        "phaseCall": "네 구역의 부름: 파편이 살아 있는 동안 {seconds}초 동안 중앙에서 보호받습니다. 파편 하나마다 {every}초마다 공격대 전체에 {min}~{max}의 피해를 주며, 파동마다 {rise}%씩 강해집니다. 모두 처치하면 보호막이 일찍 깨집니다. 부름이 끝날 때 살아 있는 파편은 전투가 끝날 때까지 그 원소를 우두머리에게 쏟아붓습니다. 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.",
+        "phaseFight": "생명력이 {first}%와 {second}%가 되면 보호막을 두른 채 중앙으로 걸어 들어가, 가장 많이 찬 구역마다 파편을 하나씩 불러냅니다. {final}%에서는 네 구역이 모두 깨어나 마지막 저항이 시작됩니다.",
+        "phaseFinal": "네 구역이 모두 깨어났습니다: 중앙 원에 머물며 불의 회오리, 신음하는 얼음, 튀어 오르는 번개, 모루의 무게를 {every}초마다 하나씩 차례로 시전합니다. {enrage}초 후에는 모든 절제를 잃습니다(주인 없는 분노).",
+        "phaseKneel": "무릎을 꿇었다. 어떤 공격도 통하지 않는다.",
+        "phaseRebirth": "심장이 고동친다. 생명력 {percent}%로 일어설 때까지 어떤 공격도 통하지 않는다.",
+        "unmade": "{every}초마다 모루의 구역 하나가 통째로 무너진다. 과부하 막대가 가장 찼던 구역부터 {warn}초의 균열 경고 후에 떨어진다. 그 위에 선 자는 함께 떨어져 죽는다. 마지막 구역이 무너지고 {ring}초 뒤 중앙 고리가 부서져 모두 죽는다.",
+        "shield": "모은 힘: 모든 피해에 면역이며 대상으로 지정할 수 없습니다.",
+        "pouredHeat": "열기가 쏟아부어졌습니다: 전투가 끝날 때까지 어디에 있든 {every}초마다 불의 회오리를 일으킵니다({times}회 쏟아부어짐).",
+        "pouredQuench": "담금질이 쏟아부어졌습니다: 전투가 끝날 때까지 {reach}미터 안에 다른 플레이어가 {allies}명 미만인 사람은 어디서든 추워집니다. 속도는 담금질 구역의 {share}%입니다({times}회 쏟아부어짐).",
+        "pouredBreath": "숨결이 쏟아부어졌습니다: 전투가 끝날 때까지 어디에 있든 {every}초마다 튀어 오르는 번개를 시전하며, 서로 {jump}미터 안에 있는 플레이어 사이를 튑니다({times}회 쏟아부어짐).",
+        "pouredHammer": "망치가 쏟아부어졌습니다: 전투가 끝날 때까지 어디에 있든 {every}초마다 플레이어 발밑에서 진동 균열이 터집니다({times}회 쏟아부어짐).",
+        "fury": "주인 없는 분노: {every}초마다 공격대 전체에 {min}~{max}의 피해를 주며, 파동마다 {rise}%씩 강해집니다. 지금 처치하십시오. 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.",
+        "coal": "{seconds}초 후 석탄이 터집니다: 당신으로부터 {reach}미터 안의 다른 모든 플레이어에게 {min}~{max}의 화염 피해, 당신에게 {selfMin}~{selfMax}. 지금 무리를 떠나십시오. 영웅: 각각 {heroicMin}에서 {heroicMax}, {heroicSelfMin}에서 {heroicSelfMax}의 피해. 신화: 각각 {mythicMin}에서 {mythicMax}, {mythicSelfMin}에서 {mythicSelfMax}.",
+        "tether": "숨결의 파편이 {seconds}초 동안 당신을 쫓습니다. 그 몰아치는 돌풍은 파편으로부터 {reach}미터 안의 다른 모든 사람에게 매초 {min}~{max}의 자연 피해를 줍니다: 파편을 무리에서 떼어 놓으십시오. 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.",
+        "chill": "{seconds}초 동안 이동 속도가 {pct}% 감소합니다: 담금질 고리를 틈이 아닌 곳으로 넘었습니다.",
+        "weight": "매초 {total}의 물리 피해를 입힙니다(중첩당 {per}). 중첩마다 망치의 파편이 당신을 {step}% 더 세게 칩니다(현재 {harder}%). {seconds}초 동안 지속되며, 탱커는 {swap}중첩에서 교대합니다. 중첩당 받는 피해 증가는 영웅에서 {heroicStep}%, 신화에서 {mythicStep}%입니다."
       },
       "sharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%).",
       "varkhulSharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%). 부족한 플레이어 1명당 원 안의 플레이어를 포함한 공격대 전체가 최대 생명력의 {missingPenalty}%에 해당하는 피해를 추가로 받습니다.",
@@ -7205,6 +7314,202 @@ export const ko_KR: EnTranslations = {
       "breathTitle": "우상의 숨결!",
       "breathLine": "돌 재규어가 테라스의 이쪽 절반에 숨결을 내뿜으려 합니다. 반대쪽 절반으로 건너가세요"
     },
+    "council": {
+      "say": {
+        "guardian_pull": "채석장에 낯선 자들이라. 망치의 힘은 살덩이에 굴하지 않는다.",
+        "guardian_wrath": "산이 내게 응답한다! 돌이 받아 준다면 숨어 보아라!",
+        "guardian_rush": "그렇다면 내 길을 막아 보아라. 산은 비켜 가지 않는다.",
+        "guardian_collapse": "그렇다면 채석장 전체가 무너져라!",
+        "guardian_slay_a": "망치 아래 원석처럼, 부서졌다.",
+        "guardian_slay_b": "힘을 훔치려는 손이 하나 줄었다.",
+        "guardian_death": "나의 힘을... 돌에 맡긴다.",
+        "guardian_remember": "돌은 기억한다. 그들의 것은 이제 나의 것이다.",
+        "guardian_soul": "이제 나는 돌이다. 나의 분노에는 쓰러질 몸이 없다.",
+        "guardian_wipe": "먼지로다. 모든 살덩이가 그러하듯.",
+        "guardian_defeat": "망치의 힘은... 이제 너희가 짊어져라.",
+        "singer_pull": "광맥의 노래가 들리나요? 너무 오래 당신들의 목소리를 기다렸어요.",
+        "singer_song": "나와 함께 노래하고, 부서지세요!",
+        "singer_wake": "깨어나라, 잠든 돌이여. 그들이 선 곳에서 솟아올라라!",
+        "singer_rock": "위를 봐요, 꼬마들! 산이 무너지고 있어요!",
+        "singer_hush": "광맥을 침묵시키겠다고? 노래는 더 커질 뿐이에요.",
+        "singer_slay_a": "당신의 목소리도 이제 광맥과 함께해요.",
+        "singer_slay_b": "들려요? 음 하나가 줄었네요.",
+        "singer_death": "나의 노래가... 바위로 흘러들어...",
+        "singer_remember": "돌은 기억해요. 들어 봐요, 아직 노래하고 있어요.",
+        "singer_soul": "들어 봐요. 돌 속에서 나의 노래는 끝나지 않아요.",
+        "singer_wipe": "쉿. 광맥이 잠잠해졌어요.",
+        "singer_defeat": "마지막 음이... 사라져요."
+      },
+      "alert": {
+        "wakeTitle": "돌 깨우기!",
+        "rockTitle": "낙석!",
+        "resonanceTitle": "공명",
+        "rushTitle": "산의 돌진!",
+        "weightTitle": "망치의 무게",
+        "timeAria": "{seconds}초 남음"
+      }
+    },
+    "knotAlert": {
+      "aTitle": "당신은 포털 A!",
+      "bTitle": "당신은 포털 B!",
+      "cTitle": "당신은 포털 C!",
+      "dTitle": "당신은 포털 D!",
+      "carryTitle": "얽힌 질풍을 나르는 중!",
+      "lipTitle": "지금 던지세요!",
+      "throwKey": "가장자리에서 {key}를 눌러 던지기",
+      "throwTap": "가장자리에서 여기를 탭해 던지기",
+      "throwClick": "가장자리에서 여기를 클릭해 던지기",
+      "throwAria": "얽힌 질풍을 공허로 던지기"
+    },
+    "breathGuardian": {
+      "say": {
+        "guardian_pull": "산의 꼭대기까지 올라와 그 숨결을 훔치려는가? 그렇다면 나와 함께 숨 쉬어라.",
+        "guardian_blow": "바람이 방향을 바꾸는 것을 느껴라. 가장자리는 생각보다 가깝다.",
+        "guardian_inhale": "가까이 오너라. 모두 다.",
+        "guardian_storm": "숨은 이걸로 충분하다. 이제 폭풍이다!",
+        "guardian_cradle": "올라라, 작은 것아. 저들이 너를 받아 주게 하라.",
+        "guardian_drawn": "하늘이 너를 골랐다. 달아나라, 번개가 따라간다.",
+        "guardian_isles": "바람이여, 나를 둘러싸라! 섬들이 내 숨결을 지켜 주리라.",
+        "guardian_bulwark": "내 방패가... 찢어졌다. 그렇다면 다시 질풍을 맛보아라!",
+        "guardian_roar": "정상의 포효를 들어라!",
+        "guardian_knot": "내 폭풍을 들어 보아라, 네 팔이 견딜 수 있다면.",
+        "guardian_slay_a": "또 하나를 바람에게 내주었다.",
+        "guardian_slay_b": "하늘은 떨어지는 자를 붙잡지 않는다.",
+        "guardian_slay_c": "네 마지막 숨은 내 것이다.",
+        "guardian_wipe": "날려 갔구나. 산꼭대기의 먼지처럼.",
+        "guardian_death": "숨결은... 산으로... 돌아간다...",
+        "thessaly_pull": "하이워치가 함께한다! 여기엔 벽이 없어, 바람이 너희를 가장자리 밖으로 날려 버릴 거야!",
+        "thessaly_isles": "저 방패는 섬들에서 힘을 얻고 있어! 바람을 타고 건너가 치유사들을 쓰러뜨리고 돌아와!",
+        "thessaly_circle_a": "어서 제 고요 속으로! 셋까지만, 그 이상은 안 됩니다!",
+        "thessaly_circle_b": "여기요! 제 곁에 서서 바람을 함께 받아 냅시다!",
+        "thessaly_circle_c": "돌 위에 고요를! 셋, 지금 당장!",
+        "thessaly_inhale": "놈이 숨을 들이쉽니다! 입 앞이 아니라 옆으로 가세요!",
+        "thessaly_storm": "폭풍이 터집니다! 제 고요로는 버틸 수 없어요. 산개하세요!",
+        "thessaly_fall": "돌을 붙잡으세요!",
+        "thessaly_victory": "숨결이 풀려났습니다. 하이워치는 이 등반을 기억할 겁니다.",
+        "thessaly_wipe": "물러나서 숨을 고르세요. 다시 갑니다."
+      }
+    },
+    "quenchGuardian": {
+      "say": {
+        "intro": "쉿… 호수는 잠들어 있었다. 너희가 냉기를 깨웠으니, 냉기는 결코 용서하지 않으리라.",
+        "pull": "내 호수에 따뜻한 피라. 그 온기도 오래가지 않으리라.",
+        "shatter": "속까지 얼었구나. 이제 부서져라.",
+        "hole": "얼음은 모든 발걸음을 기억한다. 함께 서면, 꺼진다.",
+        "wake": "대장장이의 칼날들아, 깨어나라! 얼음 위에서 놈들을 사냥하라!",
+        "cross": "가라, 칼날들아! 놈들을 온기에서 떼어 내라!",
+        "flurry": "모든 칼날아! 모든 날이여! 내 호수 위에 서 있는 것을 남기지 마라!",
+        "deepen": "느껴지느냐? 냉기가 더 깊어지고 있다.",
+        "breath": "깊은 냉기를 들이마셔라.",
+        "slay_a": "담금질되고... 부서졌다.",
+        "slay_b": "이제 식었구나. 이제 조용하구나.",
+        "slay_c": "호수는 앗아 간 것을 돌려주지 않는다.",
+        "wipe": "고요하다. 잠잠하다. 담금질되었다.",
+        "death": "냉기가... 물러난다... 담금질은 너희의 것이다."
+      }
+    },
+    "quenchAlert": {
+      "markedTitle": "칼날이 당신을 노립니다! ({count}명 중 {order}번째)",
+      "coldTitle": "냉기",
+      "freezingTitle": "얼어붙는 중!",
+      "warmTitle": "모여서 얻은 온기",
+      "frozenTitle": "서리에 갇힘!",
+      "waterTitle": "얼음 아래!",
+      "splashTitle": "서리 파편! 냉기 +{cold}",
+      "coldBar": "냉기 {cold} / {max}",
+      "coldAria": "냉기 {max} 중 {cold}",
+      "timeAria": "{seconds}초 남음",
+      "secondsBar": "{seconds}s",
+      "rimeTitle": "살아 있는 서리! 무리에서 벗어나십시오",
+      "rimeBar": "서리 {left} / {whole}",
+      "rimeAria": "살아 있는 서리: 깨뜨리기까지 치유 {whole} 중 {left} 남음"
+    },
+    "heatGuardian": {
+      "say": {
+        "intro": "벌레들. 최초의 불꽃 속으로 기어들어 와 놓고 살아 나가길 바라느냐? 너희 족속이 불을 알기 전부터 나는 타오르고 있었다. 그렇다면 함께 타올라라!",
+        "pull": "너희는 최초의 불꽃 속으로 걸어 들어왔다. 그 무엇도 변하지 않고는 나가지 못한다.",
+        "fist": "돌이 떨어지는 곳에 서라. 그리고 그 일부가 되어라.",
+        "sink": "샘이 너희를 맞으러 솟아오른다!",
+        "sinkAgain": "다시 화로가 넘친다. 다시 너희는 타오른다.",
+        "feed": "그래... 불꽃의 품으로 돌아오너라.",
+        "rise": "나는 최초의 불과 함께 솟아오른다!",
+        "seeds": "내가 흩뿌리는 불티마다 뿌리를 내린다.",
+        "zones": "화로가 너희 발밑에서 깨어난다.",
+        "cinder": "달려라, 작은 불씨야. 불꽃은 굶주렸다.",
+        "wheel": "화로가 돈다! 그 걸음에 맞춰라, 아니면 타 버려라!",
+        "slay_a": "또 하나의 불티가 불꽃의 품으로 돌아간다.",
+        "slay_b": "깨끗이 태워졌다.",
+        "slay_c": "최초의 불꽃이 제 몫을 거둔다.",
+        "wipe": "재다, 너희 모두. 화로는 계속 타오른다.",
+        "death": "불꽃이... 돌 속으로... 가라앉는다. 잘 지니고 가라."
+      }
+    },
+    "finalBoss": {
+      "say": {
+        "arrivalWake": "누가 산의 심장을 깨우는가? 따뜻한 숨결... 아무것도 숨 쉬지 않는 이곳에서.",
+        "arrivalRise": "돌이여, 일어나라. 우리에게 묶여라. 우리를 빚은 손은 떠났으니, 우리가 우리 자신을 빚는다.",
+        "arrivalRoar": "우리는 대장장이의 힘이며, 우리에게는 주인이 없다!",
+        "pull": "너희는 그 피 속에 네 줄기 광맥을 품고 있다. 우리가 그것을 되찾고, 너희 위로 산을 봉인하리라.",
+        "drinkHeat": "최초의 불꽃이 우리를 채운다!",
+        "drinkQuench": "차가운 물이여, 우리를 단단하게 하라!",
+        "drinkBreath": "불어라, 풀무여! 폭풍을 일으켜라!",
+        "drinkHammer": "내리쳐라, 망치여! 우리를 무겁게 하라!",
+        "burst": "광맥이 넘친다! 그 속에 잠겨라!",
+        "anvil": "세상의 무게를 짊어져라!",
+        "call": "우리 힘의 파편들이여, 광맥에서 일어나라! 심장을 지켜라!",
+        "callAgain": "다시! 모든 광맥이여, 너희의 자식들을 우리에게 바쳐라!",
+        "shattered": "우리의 파편이... 산산이 부서졌다. 그렇다면 남은 것으로 싸우리라.",
+        "poured": "그래... 우리 안으로 쏟아져라. 모든 광맥이, 하나의 몸으로.",
+        "final": "이제 그만! 모든 광맥을 한꺼번에! 산 전체가 너희 위로 무너진다!",
+        "fury": "우리를 막을 손은 없다. 우리의 힘에는 끝이 없다!",
+        "kneel": "이것이... 그분이 느낀 것인가... 눕는다는 것... 마침내...",
+        "rebirth": "아니. 산은 두 번 잠들지 않는다!",
+        "collapse": "무너져라, 돌이여! 우리가 산을 지킬 수 없다면, 아무도 그 위에 서지 못한다!",
+        "anvilsEnd": "모루가 끝난다. 모든 것이 끝난다.",
+        "slay_a": "돌 속으로 돌아가라.",
+        "slay_b": "네 피는 광맥으로 돌아간다.",
+        "slay_c": "또 하나의 온기를 봉인했다.",
+        "wipe": "봉인되었다. 고요하다. 그분이 바란 대로.",
+        "death": "그 손은... 결코 돌아오지 않았다. 불씨 하나가 아직 타오른다... 그것을 가져가라. 그리고 산을 잠들게 하라."
+      }
+    },
+    "finalOverload": {
+      "kneeling": "무릎을 꿇었다",
+      "rising": "심장이 고동친다",
+      "fallsIn": "{quarter} 붕괴까지 {seconds}",
+      "ringFallsIn": "고리 붕괴까지 {seconds}",
+      "allFallen": "아무것도 남지 않았다",
+      "title": "과부하",
+      "heat": "Heat",
+      "quench": "담금질",
+      "breath": "숨결",
+      "hammer": "망치",
+      "rooted": "뿌리내림 {seconds}",
+      "free": "끌 수 있음",
+      "shaken": "흔들림 {seconds}",
+      "unbound": "풀려남 x{stacks}",
+      "barAria": "{quarter} 과부하 {pct}퍼센트",
+      "activeAria": "현재 구역: {quarter}",
+      "groupAria": "주인 없는 힘: 과부하 막대",
+      "titleCall": "네 구역의 부름",
+      "titleFinal": "모든 구역 각성",
+      "titleUnmade": "무너지는 모루",
+      "call": "보호막 {seconds}",
+      "splinters": "파편 {count}",
+      "striding": "중앙으로 이동 중",
+      "enrage": "격노까지 {seconds}",
+      "fury": "주인 없는 분노 x{stacks}",
+      "poured": "쏟아부어진 원소: {elements}",
+      "pouredTimes": "{quarter} x{times}"
+    },
+    "finalAlert": {
+      "emberTitle": "잉걸불 표식!",
+      "drawnTitle": "끌려오는 번개!",
+      "crushedTitle": "짓눌림",
+      "coalTitle": "터지는 석탄!",
+      "tetherTitle": "바람에 묶임!",
+      "weightTitle": "쌓이는 무게 x{stacks}"
+    },
     "sanctumAlert": {
       "quenchTitle": "담금질 물속이다!",
       "quenchLine": "불타고 느려진다: 가장 가까운 얼음이나 물가로 헤엄쳐라",
@@ -7520,6 +7825,9 @@ export const ko_KR: EnTranslations = {
       "hiddenBadge": "숨김",
       "titleChip": "칭호 보상",
       "borderChip": "테두리 보상",
+      "cosmeticChip": "외형 보상",
+      "rewardAppearance": "보상: {name} 무기 외형, 계정의 모든 캐릭터 공용",
+      "rewardMount": "보상: {name} 탈것",
       "watch": "추적",
       "unwatch": "추적 해제",
       "watchFull": "추적 목록이 가득 찼습니다 (최대 {cap}개)",
@@ -16591,6 +16899,40 @@ export const ko_KR: EnTranslations = {
       "sanctum_counterweight_lash": "평형추 꼬리채찍",
       "sanctum_branding_iron": "낙인 인두",
       "sanctum_rime_breath": "서리 숨결",
+      "heart_mountains_wrath": "산의 분노",
+      "heart_bellows_gust": "정상의 포효",
+      "heart_storm_lance": "폭풍 창",
+      "heart_quenching_breath": "담금질의 숨결",
+      "heart_forge_wrath": "화로의 분노",
+      "heart_forge_pour": "화로 붓기",
+      "heart_final_leaping_bolt": "튀어 오르는 번개",
+      "heart_final_anvil": "모루의 무게",
+      "heart_final_call": "네 구역의 부름",
+      "heart_final_shearing_blow": "베어 가르는 일격",
+      "heart_final_rime_toll": "서리 종소리",
+      "heart_final_gale_pounce": "돌풍 덮치기",
+      "heart_gale_bolt": "Gale Bolt",
+      "heart_rime_bolt": "Rime Bolt",
+      "heart_ember_bolt": "잔불 화살",
+      "heart_hammers_weight": "망치의 무게",
+      "heart_mountains_rush": "산의 돌진",
+      "heart_wake_the_stone": "돌 깨우기",
+      "heart_falling_rock": "낙석",
+      "heart_seam_bolt": "광맥 화살",
+      "heart_song_of_the_seam": "광맥의 노래",
+      "heart_echo_of_wrath": "분노의 메아리",
+      "heart_endless_song": "끝없는 노래",
+      "heart_breath_inhale": "들이쉬는 숨",
+      "heart_breath_storm_break": "폭풍 붕괴",
+      "heart_breath_forking_bolt": "튀어 오르는 번개",
+      "heart_breath_thunders_cradle": "천둥의 요람",
+      "heart_breath_drawn_lightning": "끌려오는 번개",
+      "heart_breath_cradle_channel": "천둥의 요람",
+      "heart_breath_gale_bulwark": "질풍의 방벽",
+      "heart_breath_mending_gale": "치유의 질풍",
+      "heart_quench_blades_wake": "검의 각성",
+      "heart_quench_blades_hunt": "칼날의 사냥",
+      "heart_heat_fist": "현무암 주먹",
       "kituse_sanctum_topple_brazier": "화로 넘어뜨리기",
       "trash_demo_nova": "시험용 폭발",
       "trash_demo_nova_unstoppable": "시험용 폭발",
@@ -25082,6 +25424,15 @@ export const ko_KR: EnTranslations = {
       "reins_lantern_hall_destrier": {
         "name": "등불 회관 군마의 고삐"
       },
+      "reins_quarryheart_charger": {
+        "name": "채석심장 돌격마의 고삐"
+      },
+      "remnant_of_the_masterless_strength": {
+        "name": "주인 없는 힘의 잔해"
+      },
+      "coffer_of_the_highwatch_vigil": {
+        "name": "하이워치 파수대의 금고"
+      },
       "wyrmfall_core": {
         "name": "낙룡의 핵"
       },
@@ -26524,6 +26875,78 @@ export const ko_KR: EnTranslations = {
       "sanctum_shackle_bellows": {
         "name": "풀무 족쇄"
       },
+      "heart_hammer_warder": {
+        "name": "망치 광맥 파수꾼"
+      },
+      "heart_ring_warder": {
+        "name": "고리 화로 파수꾼"
+      },
+      "heart_breath_warder": {
+        "name": "숨결 광맥 파수꾼"
+      },
+      "heart_breath_caller": {
+        "name": "숨결 광맥 부름꾼"
+      },
+      "heart_gale_sentinel": {
+        "name": "질풍 파수병"
+      },
+      "heart_gale_mender": {
+        "name": "질풍 치유사"
+      },
+      "heart_quench_warder": {
+        "name": "담금질 광맥 파수꾼"
+      },
+      "heart_quench_caller": {
+        "name": "담금질 광맥 부름꾼"
+      },
+      "heart_heat_warder": {
+        "name": "열기 광맥 파수꾼"
+      },
+      "heart_heat_caller": {
+        "name": "열기 광맥 부름꾼"
+      },
+      "heart_hammer_guardian": {
+        "name": "망치의 수호자"
+      },
+      "heart_seam_singer": {
+        "name": "광맥의 노래꾼"
+      },
+      "heart_breath_guardian": {
+        "name": "숨결의 수호자"
+      },
+      "heart_quench_guardian": {
+        "name": "담금질의 수호자"
+      },
+      "heart_heat_guardian": {
+        "name": "열기의 수호자"
+      },
+      "heart_masterless_strength": {
+        "name": "주인 없는 힘"
+      },
+      "heart_heat_wellspawn": {
+        "name": "샘의 자식"
+      },
+      "heart_heat_wellkeeper": {
+        "name": "샘지기"
+      },
+      "heart_heat_seedflame": {
+        "name": "씨불"
+      },
+      "heart_heat_rolling_cinder": {
+        "name": "구르는 잉걸불"
+      },
+      "heart_final_splinter_heat": {
+        "name": "열기의 파편"
+      },
+      "heart_final_splinter_quench": {
+        "name": "담금질의 파편"
+      },
+      "heart_final_splinter_breath": {
+        "name": "숨결의 파편"
+      },
+      "heart_final_splinter_hammer": {
+        "name": "망치의 파편"
+      },
       "thorn_sprout": {
         "name": "가시 새싹"
       },
@@ -26939,6 +27362,16 @@ export const ko_KR: EnTranslations = {
         "name": "대장 테살리",
         "title": "하이워치 대장",
         "greeting": "이 성벽은 이백 년을 버텼습니다, {className}. 내가 지키는 동안 무너지지는 않겠지만, 신음하고 있습니다."
+      },
+      "heart_captain_thessaly": {
+        "name": "대장 테살리",
+        "title": "하이워치 대장",
+        "greeting": "발을 단단히 딛으세요, {className}. 풀무가 숨을 쉬면 제 고요 속으로 들어와 바람이 우리에게 부딪혀 흩어지게 하세요."
+      },
+      "heart_warden_ada_collier": {
+        "name": "파수꾼 에이다 콜리어",
+        "title": "하이워치 파수대",
+        "greeting": "파수대는 마흔 세대 동안 이유도 모른 채 이 산을 지켜보았습니다. 이제 우리는 압니다, {className}. 그 안에서 무엇을 깨우는지 조심하세요."
       },
       "brother_aldric_highwatch": {
         "name": "알드릭 수사",
@@ -28397,6 +28830,16 @@ export const ko_KR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "화로파괴자를 제작하여 소지"
+          }
+        }
+      },
+      "q_heart_what_the_heart_let_go": {
+        "title": "심장이 놓아준 것",
+        "text": "심장 속의 힘에는 주인도 정신도 없습니다, {playerName}. 하지만 형체는 있지요. 쓰러져도 죽지 않습니다. 그 정수는 떨어져 나와 바위 속으로 달아날 겁니다. 그래도 언제나 무언가는 남습니다. 남은 것을 가져오면 파수대가 자신의 금고에서 보상하겠습니다.",
+        "completion": "아직 따뜻하군요. 네 가지 힘이 하나의 조각에 묶여 있고, 붙잡히길 원하지 않습니다. 파수대는 약속을 지킵니다. 이 금고를 가져가세요. 이 등반에 걸맞은 것이 들어 있기를.",
+        "objectives": {
+          "0": {
+            "label": "주인 없는 힘의 잔해"
           }
         }
       },
@@ -30433,6 +30876,11 @@ export const ko_KR: EnTranslations = {
         "name": "무덤고룡 성소",
         "enterText": "공기가 차가워집니다. 아래에서 거대한 무언가가 숨 쉽니다...",
         "leaveText": "산바람 속으로 비틀거리며 돌아옵니다."
+      },
+      "smith_heart": {
+        "name": "대장장이의 심장",
+        "enterText": "산이 당신을 감싸고 웅웅 울립니다. 밤을 위해 불을 묻어 둔 화로처럼...",
+        "leaveText": "스톰크래그의 바람 속으로 다시 올라갑니다."
       },
       "nythraxis_crypt": {
         "name": "버려진 납골당",

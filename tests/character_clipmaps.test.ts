@@ -210,6 +210,9 @@ function requiredClipNames(clips: ClipMap): string[] {
     // halves ride `<clip>#main`/`#off`, minted from their clip at load, never shipped)
     ...(clips.dualWieldPair ?? []),
     ...Object.keys(clips.contacts ?? {}).filter((name) => !name.includes('#')),
+    // a one-shot's own crossfade is keyed by its clip name: a typo would silently
+    // fall back to the standard fade
+    ...Object.keys(clips.oneShotFade ?? {}),
     // snap-in entries name clips too: a typo would bring the crossfaded,
     // looping rise back (a figure popping in upright, then dropping)
     ...(clips.castSnapIn ?? []),
@@ -232,6 +235,8 @@ const NON_CLIP_FIELDS = new Set<keyof ClipMap>([
   // clip), the idle-variant cadence (seconds), and the shout's overhead emote id
   // (null = no gesture).
   'contacts',
+  // per-clip one-shot crossfade seconds (numbers keyed by clip)
+  'oneShotFade',
   'idleVariantCadence',
   // The sprite buddy's idle-pool scheduling flags (booleans).
   'idleVariantsOnLoopSeam',
@@ -343,6 +348,7 @@ const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
   'stowPlaysWhole',
   'dualWieldPair',
   'contacts',
+  'oneShotFade',
   'seat',
 ]);
 

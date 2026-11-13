@@ -649,6 +649,8 @@ describe('the sanctioned fresh-loot grant sites', () => {
         'professions/crafting.ts',
         'quests/quest_commands.ts',
         'rift/runs.ts',
+        // The Smith's Heart essence quest's coffer (one Normal raid piece).
+        'smith_heart_essence_chest.ts',
         'weekly_rewards.ts',
         'world_quest_reward_mail.ts',
       ].sort(),
@@ -665,6 +667,8 @@ describe('the sanctioned fresh-loot grant sites', () => {
         'quests/quest_commands.ts',
         'rift/hoard_reward_roll.ts',
         'rift/runs.ts',
+        // The Smith's Heart essence quest's coffer (one Normal raid piece).
+        'smith_heart_essence_chest.ts',
         'weekly_rewards.ts',
         'world_quest_reward_mail.ts',
       ].sort(),

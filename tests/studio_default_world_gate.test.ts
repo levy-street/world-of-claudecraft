@@ -31,7 +31,7 @@ import { LEDGE_GRAB_MIN } from '../src/sim/physics/ledge';
 import { traversalBand } from '../src/sim/traversal_band';
 import { WORLD_BOSSES } from '../src/sim/world_boss';
 
-// The release/v0.45.0 dungeon roster, by id and index (index 6 is unused). An
+// The built-in dungeon roster, by id and index (index 6 is unused). An
 // authored map registers no dungeon of its own, so the roster never changes.
 const RELEASE_DUNGEONS = [
   'hollow_crypt#0',
@@ -48,6 +48,9 @@ const RELEASE_DUNGEONS = [
   'ignivar_inner_crucible#12',
   'ignivar_molten_assembly#13',
   'ignivar_forge_lift#14',
+  // The Smith's Heart raid (content/smith_heart.ts), a built-in dungeon
+  // whose entry is still dev-gated; an authored map adds nothing here either.
+  'smith_heart#15',
 ];
 
 const STUDIO_ITEM_IDS = ['brimming_waterskin', 'duneblade_token'];

@@ -1,0 +1,30 @@
+{
+  "statues": [
+    {
+      "raw": "tmp/hammer_colossi/keeper/raw.glb",
+      "node": "Env_ColossusKeeper",
+      "material": "env_colossus_keeper",
+      "height": 28.8,
+      "minY": -1,
+      "yaw": -90
+    },
+    {
+      "raw": "tmp/hammer_colossi/waking/raw.glb",
+      "node": "Env_ColossusWaking",
+      "material": "env_colossus_waking",
+      "height": 29,
+      "minY": -1,
+      "yaw": -90
+    },
+    {
+      "raw": "tmp/hammer_colossi/bearer/raw.glb",
+      "node": "Env_ColossusBearer",
+      "material": "env_colossus_bearer",
+      "height": 29,
+      "minY": -1,
+      "yaw": -90
+    }
+  ],
+  "out": "tmp/asset_src/smith_heart_hammer_colossi_src_tripo.glb",
+  "renders": "tmp/hammer_colossi/renders"
+}

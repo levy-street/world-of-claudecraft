@@ -8,6 +8,10 @@ import { SFX_CONFORMANCE_FFPROBE_PATH } from '../scripts/sfx/ffmpeg_paths.mjs';
 import { yellKey } from '../scripts/voices/extra_lines.mjs';
 import { VOICE_LINES } from '../src/game/voice_manifest.generated';
 import { IGNIVAR_DIALOGUE_LINES } from '../src/sim/encounters/ignivar_dialogue';
+import {
+  SMITH_HEART_VOICE_LINES,
+  SMITH_HEART_VOICES,
+} from '../src/sim/encounters/smith_heart/voice_lines';
 import { VARKHUL_DIALOGUE_LINES } from '../src/sim/encounters/varkhul_dialogue';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -28,10 +32,20 @@ const voiceFiles = execFileSync(
   .filter((file) => existsSync(join(repoRoot, file)))
   .sort();
 
-const PACKS = [
+/** The Smith's Heart's own raid voices (Thessaly's folder holds her other
+ *  lines too: her raid lines are held by tests/smith_heart_voice.test.ts). */
+const HEART_PACKS = Object.values(SMITH_HEART_VOICES)
+  .filter((voice) => voice !== SMITH_HEART_VOICES.thessaly)
+  .map((boss) => ({
+    boss,
+    lines: SMITH_HEART_VOICE_LINES.filter((l) => l.voiceNpc === boss).map((l) => l.text),
+  }));
+
+const PACKS: readonly { boss: string; lines: readonly string[] }[] = [
   { boss: 'ignivar', lines: IGNIVAR_DIALOGUE_LINES },
   { boss: 'varkhul', lines: VARKHUL_DIALOGUE_LINES },
-] as const;
+  ...HEART_PACKS,
+];
 
 interface AudioProbe {
   streams: Array<{

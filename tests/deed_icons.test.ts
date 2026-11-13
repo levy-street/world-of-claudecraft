@@ -385,10 +385,11 @@ describe('Book of Deeds webp icons', () => {
     // + the five-dungeon rework (PR 4359) on the v0.45.0 integration: 346.
     // Integration 45's art completion paints all 346 of its deeds; Lantern Hall's six (its three
     // contract milestones and three quartermaster titles) join after it, on the pending ledger.
-    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(369);
+    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(376);
     expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(356);
-    expect(DEED_ART_PENDING_IDS).toHaveLength(13);
-    expect(DEED_ART_PENDING_IDS.at(-1)).toBe('feat_guild_of_lantern_hall');
+    // + the Smith's Heart's seven, pending on the dungeon crest: 20, the meta last.
+    expect(DEED_ART_PENDING_IDS).toHaveLength(20);
+    expect(DEED_ART_PENDING_IDS.at(-1)).toBe('dgn_heart_meta');
     expect(DEED_ART_PENDING_IDS.slice(0, 7)).toEqual([
       'prog_titan',
       'pvp_flag_1h',

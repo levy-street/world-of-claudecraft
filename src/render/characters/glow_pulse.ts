@@ -14,12 +14,17 @@ import { cloneMaterialWithHooks } from '../material_clone_hooks';
 import {
   type GlowPulseSet,
   glowPulseLevel,
+  glowPulseShade,
   glowPulseSpan,
   glowPulsesFor,
   glowPulseTakes,
 } from './glow_pulse_core';
 
-type Emissive = THREE.Material & { emissiveMap?: THREE.Texture | null; emissiveIntensity?: number };
+type Emissive = THREE.Material & {
+  emissiveMap?: THREE.Texture | null;
+  emissiveIntensity?: number;
+  color?: THREE.Color;
+};
 
 export class GlowPulse {
   /** Source material to its glowing clone (disposed with the visual). */
@@ -32,6 +37,8 @@ export class GlowPulse {
   private readonly hits: number[] = [];
   private deadFor = -1;
   private level = 1;
+  /** The base-colour multiplier (glow_pulse_core.ts glowPulseShade). */
+  private shade = 1;
   /** The clones are mounted (a pulse runs or the death fade holds). */
   active = false;
 
@@ -62,14 +69,29 @@ export class GlowPulse {
     const fading = this.deadFor >= 0;
     const want = running || fading;
     const level = glowPulseLevel(this.set, this.ages, this.deadFor);
-    if (want && level !== this.level) {
+    const shade = glowPulseShade(this.set, this.ages);
+    if (want && (level !== this.level || shade !== this.shade)) {
       this.level = level;
+      this.shade = shade;
       for (let i = 0; i < this.srcs.length; i++) this.write(this.srcs[i], this.clones[i]);
     }
     if (want === this.active) return false;
     this.active = want;
-    if (!want) this.level = 1;
+    if (!want) {
+      this.level = 1;
+      this.shade = 1;
+    }
     return true;
+  }
+
+  /** The level the clones are written at (1 when no pulse or fade runs). */
+  get scale(): number {
+    return this.active ? this.level : 1;
+  }
+
+  /** Does the pulse flare `src` (its emissive map, or a named glow material)? */
+  takes(src: THREE.Material): boolean {
+    return glowPulseTakes(this.set, src.name, !!(src as Emissive).emissiveMap);
   }
 
   /** The clone to mount over `src` (an emissive-mapped material glows, and
@@ -93,6 +115,7 @@ export class GlowPulse {
     this.ages.fill(-1);
     this.deadFor = -1;
     this.level = 1;
+    this.shade = 1;
     const was = this.active;
     this.active = false;
     return was;
@@ -107,5 +130,8 @@ export class GlowPulse {
 
   private write(src: THREE.Material, clone: THREE.Material): void {
     (clone as Emissive).emissiveIntensity = ((src as Emissive).emissiveIntensity ?? 1) * this.level;
+    const from = (src as Emissive).color;
+    const to = (clone as Emissive).color;
+    if (from && to) to.copy(from).multiplyScalar(this.shade);
   }
 }

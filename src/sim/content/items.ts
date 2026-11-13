@@ -438,6 +438,22 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     buyValue: 0,
   },
+  // The Smith's Heart raid's reward mount (content/mounts.ts SMITHS_HEART_META_MOUNT): granted
+  // only by the raid's meta-achievement (src/sim/smith_heart_feat_rewards.ts). Soulbound like every achievement reward: it stays with the character who cleared
+  // the raid, never traded, mailed, listed, sold or destroyed.
+  reins_quarryheart_charger: {
+    id: 'reins_quarryheart_charger',
+    name: 'Reins of the Quarryheart Charger',
+    kind: 'mount',
+    mount: 'quarryheart_charger',
+    quality: 'epic',
+    soulbound: true,
+    noVendorSell: true,
+    noDiscard: true,
+    noMarketList: true,
+    noSalvage: true,
+    sellValue: 0,
+  },
   // Annual membership reward, delivered only after verified payment. It can never leave the
   // account: the same protected flags as referral reins, plus an account mount entitlement.
   reins_nightwing_chimera: {

@@ -28,6 +28,7 @@ import { MEMBERSHIP_XP_MULTIPLIER } from '../content/membership';
 import { ABILITIES, DELVES, GROUP_XP_BONUS, ITEMS, MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { reflectionIgnoresHit } from '../encounters/drowned_temple/reflection_guard';
+import { heatCinderHitPoints } from '../encounters/smith_heart/heat_cinder_ward';
 import { bastionWardHitPoints } from '../encounters/sunken_bastion/ward_hits';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
@@ -277,6 +278,15 @@ export function dealDamage(
   const bastionWard = bastionWardHitPoints(source, target);
   if (bastionWard !== null) {
     amount = bastionWard;
+    resolvedHpLoss = true;
+    alreadyFinal = true;
+  }
+  // The Smith's Heart's Rolling Cinder is a ward while it rolls
+  // (encounters/smith_heart/heat_cinder_ward.ts): a strike lands one point
+  // (the encounter reads it as the hit that knocks it back).
+  const cinderWard = heatCinderHitPoints(source, target, direct);
+  if (cinderWard !== null) {
+    amount = cinderWard;
     resolvedHpLoss = true;
     alreadyFinal = true;
   }
@@ -1527,6 +1537,10 @@ export function handleDeath(
   // Death cannot shed persistent death penalties or encounter-owned unbreakable
   // control. The encounter script remains responsible for releasing its markers.
   e.auras = aurasSurvivingDeath(e.auras);
+  // A dormant mob killed through its ward dies awake: no sleep bit or rise rides its corpse
+  // onto the wire or into the next life (mob/dormant.ts).
+  if (e.asleep) e.asleep = false;
+  if (e.dormantRise) e.dormantRise = 0;
   e.ccDr.clear();
   stopChannelVisual(ctx, e);
   emitRainOfFireStop(ctx, e);

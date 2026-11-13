@@ -151,6 +151,9 @@ export const WEAPON_GRIP_OVERRIDES: Record<string, WeaponGripOverride> = {
   // carries the bulk); the 180 yaw about the haft is the owner's final pick
   // for how the head reads at rest.
   hammer_varkhul: { rot: [0, 180, 0], rotOffhand: [0, 0, 0], scale: 1.66 },
+  // Seamcaller (Smith's Heart): a 2.73-long file (pommel to the tips of its crown crystals) on
+  // the 1.5 hammer clamp, drawn at 2.25, a heroic maul still under the Varkhul benchmark.
+  seamcaller_maul: { scale: 1.5 },
   // The starter staff. Its file is turned head-up about the grip so the crook rides
   // over the shoulder in the carry (the carry reads the file, not this table). In the
   // HAND the owner wants the crook at the front end, so the hand alone turns it back.

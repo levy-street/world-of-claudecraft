@@ -5,6 +5,7 @@ import { isInvestigationNpc } from '../sim/content/world_quest_investigation';
 import { isShadowNpc, SHADOW_NPC_ID } from '../sim/content/world_quest_shadow';
 import { isLootableBody } from '../sim/corpse_loot_state';
 import { ESCORTS } from '../sim/data';
+import { corpseLootApproachPoint, corpseLootDistance } from '../sim/loot/corpse_loot_reach';
 import { kitUsableNow } from '../sim/mob/trash_kit/encounter_use';
 import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
 import {
@@ -210,6 +211,15 @@ export function objectInteractionRange(entity: Pick<Entity, 'templateId'>): numb
   return INTERACT_RANGE;
 }
 
+/** Where a click-to-move approach of a picked entity walks: a lootable body's
+ *  loot spot when it has one (a Smith's Heart guardian's coffer), else the
+ *  entity itself. */
+export function pickedEntityApproachPoint(entity: Entity): { x: number; z: number } {
+  return isLootableBody(entity)
+    ? corpseLootApproachPoint(entity)
+    : { x: entity.pos.x, z: entity.pos.z };
+}
+
 /** Whether an otherwise incomplete entity click represents a useful movement intent. */
 export function shouldApproachPickedEntity(
   player: Entity,
@@ -223,7 +233,7 @@ export function shouldApproachPickedEntity(
   if (entity.dead) {
     return (
       isLootableBody(entity) &&
-      d > INTERACT_RANGE + 1 &&
+      corpseLootDistance(entity, player.pos) > INTERACT_RANGE + 1 &&
       corpseLootAvailability(entity, player.id, harvestStateReliable, partyMemberIds).canOpen
     );
   }
@@ -297,7 +307,9 @@ export function handlePickedEntity(
         hud.showError(tSim('error.cantWhileDead'));
         return false;
       }
-      if (d <= INTERACT_RANGE + 1) {
+      // A big body is looted from its edge, a guardian from its coffer's spot
+      // too (sim/loot/corpse_loot_reach.ts corpseLootDistance).
+      if (corpseLootDistance(e, world.player.pos) <= INTERACT_RANGE + 1) {
         if (
           !corpseLootAvailability(
             e,
