@@ -23,7 +23,11 @@ describe('renderer Drakelands kit seam', () => {
   const prepare = slice('  prepareZoneAt(', '\n  /** Stage wall-times');
 
   it('starts the kit load with the zone prepare, beside the terrain build', () => {
-    const loadAt = prepare.indexOf('const kitLoad = drakelandsKitLoadFor(zone.biome);');
+    // The Quartered Isle's landmark models ride the same await (one biome
+    // needs at most one of the two loads; quartered_landmark_dressing.ts).
+    const loadAt = prepare.indexOf(
+      'const kitLoad = drakelandsKitLoadFor(zone.biome) ?? quarteredLandmarkLoadFor(zone.biome);',
+    );
     const terrainAt = prepare.indexOf('await this.terrainView.ensureZone(');
     expect(loadAt).toBeGreaterThan(-1);
     expect(terrainAt).toBeGreaterThan(loadAt);
@@ -64,7 +68,7 @@ describe('renderer Drakelands kit seam', () => {
     );
     const zonesAt = body.indexOf('const zones = this.sim.cfg.world?.zones ?? ZONES;');
     const recheckAt = body.indexOf(
-      'const kitHolds = drakelandsKitRecheck(zones, cameraX, cameraZ, horizon, this.visibleZoneCheck);',
+      'const kitHolds = zoneKitRecheck(zones, cameraX, cameraZ, horizon, this.visibleZoneCheck);',
     );
     const nearAt = body.indexOf('this.visibleZonePrepareQueue = zonesWithinStreamingHorizon(');
     expect(guardAt).toBeGreaterThan(-1);
@@ -75,7 +79,18 @@ describe('renderer Drakelands kit seam', () => {
     expect(body.slice(nearAt)).toMatch(
       /zonesWithinStreamingHorizon\(\s*zones,\s*cameraX,\s*cameraZ,\s*horizon,\s*forwardX,\s*forwardZ,/,
     );
-    expect(source.match(/drakelandsKitRecheck\(/g)?.length).toBe(1);
+    // one kit step for every held biome: the Drakelands kit and the Quartered
+    // Isle's landmark assets (quartered_landmark_lane.ts composes the two)
+    expect(source.match(/zoneKitRecheck\(/g)?.length).toBe(1);
+    expect(source).not.toContain('drakelandsKitRecheck(');
+    const lane = readFileSync(
+      new URL('../src/render/quartered_landmark_lane.ts', import.meta.url),
+      'utf8',
+    );
+    expect(lane).toContain(
+      'const drakelandsHolds = drakelandsKitRecheck(zones, cameraX, cameraZ, horizon, recheck);',
+    );
+    expect(lane).toContain('return (biome) => drakelandsHolds(biome) || heldForAssets(biome);');
   });
 
   it('keeps a zone that awaits the kit out of the one-at-a-time lane', () => {

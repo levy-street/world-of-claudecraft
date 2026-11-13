@@ -6451,7 +6451,11 @@ export type BiomeId =
   | 'haunt'
   | 'jungle'
   | 'garden'
-  | 'gale';
+  | 'gale'
+  // the Quartered Isle: four war-scarred quarters (ice, fire, earth, wind)
+  // around Rivalmoot's hill; the render tables read a quarter weight from
+  // position (src/sim/quartered_quarters.ts) to blend each quarter's look
+  | 'quartered';
 
 export interface ZoneDef {
   id: string;
@@ -6510,6 +6514,10 @@ export interface ZoneDef {
   // The zone's southern border ridge has NO road pass and is raised past the
   // climbable slope: the zone is reachable only by portal (see world.ts).
   sealedSouthBorder?: boolean;
+  // The zone's southern border is a STRAIT, not a range: the shared edge (and
+  // its pass) still exists, but no ridge rises along it, so neither shore of
+  // the sound is lifted (the Quartered Isle over the Hoarbridge strait).
+  waterSouthBorder?: boolean;
   // Where the road pass through the zone's SOUTHERN border ridge sits (x).
   // Defaults to 0 (the original zones' central road); the Drakelands set it
   // to the Pale Causeway's head so the Wyrmgate opens where the road arrives.
@@ -6521,6 +6529,18 @@ export interface ZoneDef {
   // SimConfig.respawnSeconds still wins over it, and a MobTemplate.respawnSeconds
   // still wins over both.
   trashRespawnSeconds?: number;
+  // A dedicated King of the Hill arena (src/sim/pvp/hill.ts): when the
+  // schedule raises a hill in this zone it always stands centred here instead
+  // of on a random open spot. The ground under it is authored level and clear
+  // (tests pin it as a legal spot), so the stand is fair for every party.
+  hillArena?: { x: number; z: number };
+  // This zone's rect CLAIMS any ground it overlaps in a neighbour's rect: the
+  // lookups (zoneAt, zoneContaining, activeZoneAt) resolve the overlap to this
+  // zone, border edges run along the claim's outline, and a column's look
+  // eases out across the claimed strip (columnBlendAt). The one zone allowed
+  // to overlap another; every other pair of rects stays disjoint (the Quartered
+  // Isle reaching into the Drakelands' and the Amberfall's inner edges).
+  claimsOverlap?: boolean;
 }
 
 // One end of a paired overworld portal. Walking within the pair's trigger
@@ -12283,6 +12303,11 @@ export interface MailboxDef {
    *  object by its facing). Omitted means the default 0 the pillars have
    *  always had; content sets it only where a slot faces the wrong way. */
   facing?: number;
+  /** A stable entity id at or above STATIC_WORLD_SERVICE_ENTITY_ID_MIN, for a
+   *  mailbox added after the shipped ones: the shipped pillars draw from the
+   *  sequential allocator in list order, so a new one there would shift the id
+   *  of every entity created after it (the parity goldens pin them). */
+  entityId?: number;
 }
 
 // The Eastbrook Vale Realm Builder monument. One singleton static service, so

@@ -9342,6 +9342,8 @@ export const nl_NL: EnTranslations = {
         "gardenBlurb": "Een heggendoolhofrijk dat nog altijd wordt gesnoeid door geen tuinman die ooit is gezien, bereikt voorbij Haagwijk en zijn fonteinhoven.",
         "galeName": "De Windkam",
         "galeBlurb": "Zeekliffen en Huilende Heuvels waar de wind nooit rust en Wijkhaven zijn deuren potdicht houdt.",
+        "quarteredName": "The Quartered Isle",
+        "quarteredBlurb": "An island shattered four ways by an old rivalry, where Rivalmoot keeps the foot of the storm peak above the crater every challenger comes to win.",
         "levelsCap": "Niveau {level}"
       },
       "group": {
@@ -10286,6 +10288,7 @@ export const nl_NL: EnTranslations = {
       "nightBlurb": "Een rijk van sterrige middernacht waar bloemen de paden verlichten en Maanrust een stille wake houdt onder een dromende hemel.",
       "hauntBlurb": "Een spookbos onder reusachtige bladerdaken, waar de lantaarns van Galgenmeer het enige eerlijke licht op de weg zijn.",
       "galeBlurb": "Zeekliffen en huilende heuvels waar de wind nooit rust, het Oude Baken nooit dooft, en Wijkhaven zijn deuren stevig sluit.",
+      "quarteredBlurb": "An island shattered into four quarters of ice, fire, stone and storm by an old rivalry, with the challengers of Rivalmoot keeping their town at the foot of the Gyre and their ring in the crater where the war was fought.",
       "jungleBlurb": "Een tropische wirwar van palmen, wit zand en luidruchtige vogels, met het strandstadje Drijfhaven dat een vuur brandend houdt op het strand.",
       "gardenBlurb": "Een doolhoftuinrijk dat nog altijd wordt gesnoeid door geen tuinman die iemand ooit heeft gezien, betreden voorbij Haagwijk en zijn fonteinhoven.",
       "valeGreeting": "Houd je kling dichtbij. Het Dal is niet meer wat het was.",
@@ -10310,6 +10313,8 @@ export const nl_NL: EnTranslations = {
       "hauntGreeter": "De lantaarnopsteker, Galgenmeer",
       "galeGreeting": "De wind is hier nog nooit gestopt, en het Oude Baken is nog nooit gedoofd. Doe de herbergdeur achter je dicht.",
       "galeGreeter": "De bakenwachter, Wijkhaven",
+      "quarteredGreeting": "Every party that comes down into the crater swears it will be the one to hold the ring. Go down when the hill rises and prove it.",
+      "quarteredGreeter": "A challenger, Rivalmoot",
       "jungleGreeting": "Warm zand, luidruchtige vogels, en een jungle die de horizon verslindt. We houden een vuur brandend op het strand; probeer erbij terug te komen.",
       "jungleGreeter": "De havenmeesteres, Drijfhaven",
       "gardenGreeting": "Iemand snoeit nog altijd de heggen, hoewel er al honderd jaar geen tuinman is gezien. Let op met het doolhof: het let op jou terug.",
@@ -10325,6 +10330,7 @@ export const nl_NL: EnTranslations = {
       "nightPlaceNotes": "Maanrust houdt de wacht. De Nachtpoort is de weg naar het middernachtland; de Maanbron bevat sterrenlicht waar je naast kunt staan; Schemerakker bloeit in het donker; de Staande Wachting waakt zonder ooit te bewegen; en de Slapeloze grafheuvel is de ene plek hier die nooit droomt.",
       "hauntPlaceNotes": "Galgenmeer hurkt binnen zijn lantaarns. Ravenpoort is de grimmige voordeur van het woud; Tansydoorn is dichtgesponnen met web; de Hangende Open plek en de Mournstone-kapel bewaren het oudste verdriet van het bos; en de Jagersklaring behoort toe aan wat daar nog jaagt.",
       "galePlaceNotes": "Wijkhaven leunt tegen de wind. De Windweg is de klifweg naar binnen; de Huilende Heuvels rollen boomloos onder de storm; het Oude Baken brandt al zolang niemand zich kan herinneren; de Scheur valt loodrecht naar het water; de Wrakvelden houden de kust eerlijk; en de Spiegelplas is het enige stille ding in het hele rijk.",
+      "quarteredPlaceNotes": "Rivalmoot stands at the foot of the Gyre, where the climb to the council's seat begins. The Hoarbridge carries the road over the strait from the Frostveil; the Hoarshelf lies white, cold and broken below; the Challengers' Ring waits on the floor of the great crater, the old war's heart, for the next King of the Hill; the Cinderscar smoulders toward the Drakelands; the Heavestone Wilds heave toward the Amberfall; and the Gyre turns its storm above them all.",
       "junglePlaceNotes": "Drijfhaven houdt zijn vuur brandend op het strand. De Warmond is waar de rivier de groene muur ontmoet; het Palmstrand loopt wit en warm langs de branding; de Smaragdwarboel en de Rankval verslinden het binnenland; de Saffieren Lagune gloeit helder en diep; en het Verzonken Afgodsbeeld waakt van onder het water.",
       "gardenPlaceNotes": "Haagwijk wacht bij de Tuinpoort. De Parterrewandeling bloeit in geknipte kleur; Kasteel Dageraad drilt zijn ridders achter nieuwe muren; de Bloesemvijver drijft het hele jaar door roze; de Oude Molen keert zijn eigen ringbedden om; het Grote Doolhof herschikt zijn gangen voor elke gast, zijn bogen bewaakt door loofvossen; de Noordwacht bewaakt de uitgaande weg; het Lelie-Bekken rust voorbij dat alles; en het Fonteinhof stroomt nog altijd helder in het hart van de tuin.",
       "gladeTitle": "Een rustig hoekje: Brightwood Glade",
@@ -11116,6 +11122,10 @@ export const nl_NL: EnTranslations = {
         "logging": "Je eerste grondstoffenpunt van een beroep verdient Vruchten van het Veld, en de grens van 100 in Houtkap schrijft Kernhouthakker in. 100 bereiken in drie van Mijnbouw, Houtkap, Kruidenkunde en Vissen voegt Meesterverzamelaar toe bij 25 Roem, en een slag in oud kernhout legt zijn eigen verzamelaarsmerk vast. Daden zijn titels en Roem, nooit macht.",
         "herbalism": "Je eerste grondstoffenpunt van een beroep verdient Vruchten van het Veld, en de grens van 100 in Kruidenkunde schrijft Meester van de Weide in. 100 bereiken in drie van Mijnbouw, Houtkap, Kruidenkunde en Vissen voegt Meesterverzamelaar toe bij 25 Roem, en een maanverlichte bloem legt zijn eigen verzamelaarsmerk vast. Daden zijn titels en Roem, nooit macht.",
         "fishing": "De mijlpaal van 100 schrijft Oude Zout in en 200 schrijft Meesterhengelaar in met zijn titel, de absolute top van de hengelaarskunst; Vissen telt ook mee voor Meesterverzamelaar, verdiend bij 100 in drie willekeurige verzamelvakken. Een eerste vis uit de wateren van elk van zes zones vult een eigen pagina, de drie kernlandzones en daarbuiten Het Wilgenveen, De Windkam en De Verrekust, en de Zonglinstering-Koi legt Glinstering van Hoop vast, dus reizigers met een hengel in hun bagage vullen hun boek sneller dan ze verwachten.",
+        "miningWithIsle": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Mining inscribes Ore in the Blood. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and cracking a pristine vein records its own collector's mark. Thirteen zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. None of these grant power: deeds are titles and Renown, a record of the roads you have walked.",
+        "loggingWithIsle": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Logging inscribes Heartwood Hewer. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and a strike of ancient heartwood records its own collector's mark. Thirteen zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
+        "herbalismWithIsle": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Herbalism inscribes Master of the Meadow. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and a moonlit bloom records its own collector's mark. Thirteen zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
+        "fishingWithIsle": "The 100 milestone inscribes Old Salt and 200 inscribes Master Angler with its title, the very top of the angler's art; Fishing also counts toward Master Gatherer, earned at 100 in any three gathering trades. A first fish from each of thirteen zones' waters fills its own page, the three heartland zones and the Willowfen, the Galecrest, the Farshore, the Frostveil, the Amberfall, the Nightbloom, the Wraithwood, the Palmreach, the Evergarden, and the Quartered Isle beyond them, and the Sunglint Koi records Glimmer of Hope, so travelers with a pole in their pack fill their book faster than they expect.",
         "farming": "Farming keeps no deeds of its own yet: now that its beds and crops are in the ground, the milestone and cap deeds that mark the other trades arrive in a later patch. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power.",
         "farmingSown": "Landbouw heeft nu een eigen plank in het Boek der Daden. Zaaiwerk begint markeert je eerste geplante gewas en vier kroniekpagina's markeren een eerste bloeiende oogst op elke bedlocatie, van de Oostbeekvallei tot Evergaarde. Een gouden oogst legt zijn eigen verzamelaarsmerk zonder Roem vast en landbouwvaardigheid telt mee voor Meesterverzamelaar, verdiend op 100 in drie verzamelambachten. Elke vore gevuld brengt de hele voorraad op één pagina: kweek elk gewas dat de vier tuinen dragen en de verzameling sluit. Het sluitstuk erboven is Oogstmeester, de titel van het ambacht op landbouwvaardigheid 100. Nu berg- en parterrezaad op de toonbanken van hun boeren ligt, kun je die klim vandaag voltooien. Daden zijn alleen titels en Roem, nooit macht."
       },
@@ -27010,6 +27020,11 @@ export const nl_NL: EnTranslations = {
         "title": "De Vergulde Geldkist",
         "greeting": "Elke kist, koffer en snuisterij is veilig bij de Vergulde Geldkist."
       },
+      "bursar_maud_ashby": {
+        "name": "Bursar Maud Ashby",
+        "title": "The Gilded Strongbox",
+        "greeting": "The Gilded Strongbox keeps your goods safe, even on the isle."
+      },
       "brother_aldric_raid": {
         "name": "Broeder Aldric",
         "title": "Priester van het Dal",
@@ -30381,6 +30396,57 @@ export const nl_NL: EnTranslations = {
           },
           "4": {
             "label": "De Hindernisbaan"
+          }
+        }
+      },
+      "quartered_isle": {
+        "name": "The Quartered Isle",
+        "welcome": "An old rivalry shattered this island four ways. Rivalmoot keeps the foot of the Gyre, above the crater where the war was fought.",
+        "pois": {
+          "0": {
+            "label": "Rivalmoot"
+          },
+          "1": {
+            "label": "The Challengers' Ring"
+          },
+          "2": {
+            "label": "The Hoarbridge"
+          },
+          "3": {
+            "label": "The Hoarshelf"
+          },
+          "4": {
+            "label": "The Cinderscar"
+          },
+          "5": {
+            "label": "The Heavestone Wilds"
+          },
+          "6": {
+            "label": "The Gyre"
+          },
+          "7": {
+            "label": "The Fireice Rift"
+          },
+          "8": {
+            "label": "The Crevasses"
+          },
+          "9": {
+            "label": "The Rimeglass"
+          },
+          "10": {
+            "label": "The Burnways"
+          },
+          "11": {
+            "label": "The Glassfield"
+          },
+          "12": {
+            "label": "The Hammer's Cut"
+          },
+          "13": {
+            "label": "The Heaved Slabs"
+          },
+          "14": {
+            "label": "The Fallen Giant"
           }
         }
       },

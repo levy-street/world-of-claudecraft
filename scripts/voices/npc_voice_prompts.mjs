@@ -1084,6 +1084,9 @@ export const VOICE_PROMPTS = [
 // Recurring NPC records → the base voice that speaks for them. gen_npc_lines.mjs
 // consults this so every Aldric/Maren/Halven zone variant reuses one designed voice.
 export const VOICE_ALIAS = {
+  // Rivalmoot's bursar on the Quartered Isle borrows the Fenbridge branch's
+  // performance (the same house, the same register) until her own is rendered.
+  bursar_maud_ashby: 'bursar_petra_vell',
   glider_instructor: 'trader_wilkes',
   glider_apprentice: 'apprentice_wren',
   // Valerie borrows the existing scout performance for this covert operation.

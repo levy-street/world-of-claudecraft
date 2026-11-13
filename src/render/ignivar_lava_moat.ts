@@ -148,6 +148,17 @@ function lavaMaterial(textures: IgnivarLavaMoatTextures, lowGfx: boolean): THREE
   return material;
 }
 
+/** The moat's lava surface material (shared, cached per texture and tier).
+ *  The Quartered Isle's fissure melt wears it too (quartered_landmark_dressing.ts),
+ *  so both read as one lava. Its UVs are the mesh's own xz, so a world-placed
+ *  mesh gets world-anchored lava. */
+export function ignivarLavaSurfaceMaterial(
+  textures: IgnivarLavaMoatTextures,
+  lowGfx: boolean,
+): THREE.ShaderMaterial {
+  return lavaMaterial(textures, lowGfx);
+}
+
 interface Segment {
   a: { x: number; z: number };
   b: { x: number; z: number };

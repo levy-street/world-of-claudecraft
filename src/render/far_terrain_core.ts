@@ -43,6 +43,11 @@ import { groundPaletteFor, groundPaletteVersion } from './ground_palette_overrid
 import { islandHorizonHaze, islandIsolationActive } from './island_isolation_core';
 import { clamp01 } from './num_clamp';
 import {
+  makeQuarterGroundLinear,
+  quarteredBlendActive,
+  quarteredGroundAt,
+} from './quartered_ground_core';
+import {
   makeShoreProbe,
   SHORE_BAND_HEIGHT,
   type ShoreProbe,
@@ -502,8 +507,14 @@ const farPaletteScratch: FarPalette = {
   sand: [0, 0, 0],
 };
 
-const stripPalette = (zn: (typeof ZONES)[number]): FarPalette =>
-  zoneFarPalettes[ZONES.indexOf(zn)] ?? zoneFarPalettes[0];
+// The Quartered Isle's ground blends its four quarters by position, through
+// the same pure core the near chunks read (quartered_ground_core.ts).
+const quarteredFarScratch: FarPalette = makeQuarterGroundLinear();
+
+const stripPalette = (zn: (typeof ZONES)[number], x: number, z: number): FarPalette =>
+  quarteredBlendActive(zn.id, zn.biome)
+    ? quarteredGroundAt(x, z, quarteredFarScratch)
+    : (zoneFarPalettes[ZONES.indexOf(zn)] ?? zoneFarPalettes[0]);
 
 /** The same strip-cascade plus column blend paletteAt uses in terrain.ts,
  *  over linear triples. Writes into the module scratch (hot loop). */
@@ -537,7 +548,7 @@ function farPaletteAt(x: number, z: number): FarPalette {
     return out;
   }
   syncZoneFarPalettes();
-  const first = stripPalette(STRIP_ZONES[0]);
+  const first = stripPalette(STRIP_ZONES[0], x, z);
   copy3(out.grass, first.grass);
   copy3(out.grassDark, first.grassDark);
   copy3(out.grassYellow, first.grassYellow);
@@ -548,7 +559,7 @@ function farPaletteAt(x: number, z: number): FarPalette {
     const t = clamp01((z - (b - 30)) / 65);
     const tt = t * t * (3 - 2 * t);
     if (tt <= 0) break;
-    const next = stripPalette(STRIP_ZONES[i + 1]);
+    const next = stripPalette(STRIP_ZONES[i + 1], x, z);
     lerp3(out.grass, next.grass, tt);
     lerp3(out.grassDark, next.grassDark, tt);
     lerp3(out.grassYellow, next.grassYellow, tt);
@@ -558,7 +569,7 @@ function farPaletteAt(x: number, z: number): FarPalette {
   for (const col of COLUMN_ZONES) {
     const t = columnBlendAt(col, x, z);
     if (t <= 0) continue;
-    const p = stripPalette(col);
+    const p = stripPalette(col, x, z);
     lerp3(out.grass, p.grass, t);
     lerp3(out.grassDark, p.grassDark, t);
     lerp3(out.grassYellow, p.grassYellow, t);
@@ -602,6 +613,7 @@ const FAR_FOREST_DENSITY: Partial<Record<BiomeId, number>> = {
   jungle: 0.72,
   garden: 0.4,
   gale: 0.1,
+  quartered: 0.03, // a shattered waste: a dead tree here and there, no woods
 };
 
 /**

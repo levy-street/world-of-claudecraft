@@ -531,6 +531,22 @@ If you are unsure whether you may use an asset, or you want permission for
 something this file marks as restricted, ask first: tony@levystreet.com.
 | Ley Beam Alignment celestial frame and crystal heart (`public/ui/minigames/ley-*-v1.webp`) | World of ClaudeCraft | Project art generated with OpenAI built-in image generation, optimized to WebP; [provenance and prompts](docs/screenshots/ley-beam-v1/art-provenance.md) | Project asset | With the project only |
 | Generated prop model (spore_burster) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D image-to-model from a project concept; cap spots baked into the texture locally) | Project asset | With the project only |
+| Generated prop model (cinder_columns_tall) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated prop model (cinder_column_rubble) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated prop model (cinder_lava_vent) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated prop model (frost_floe_slab) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated prop model (frost_floe_broad) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated prop model (frost_snow_outcrop) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated prop model (heave_strata_large) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated prop model (heave_strata_small) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated prop model (heave_strata_rubble) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated prop model (sky_isle_pines) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated prop model (sky_isle_twin) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated prop model (sky_isle_slab) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated prop model (sky_isle_spire) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated prop model (sky_isle_terraced) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated prop model (sky_isle_crag) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Stone, snow and sandstone detail baked into the Quartered Isle props above (textures rock_face, rock_face_03, dark_rock_02, snow_02, sandstone_cracks) | Poly Haven | https://polyhaven.com | CC0 | Baked in Blender over the generated textures |
 
 ### Orbital Lightning
 

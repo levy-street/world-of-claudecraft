@@ -9342,6 +9342,8 @@ export const pl_PL: EnTranslations = {
         "gardenBlurb": "Kraina żywopłotowego labiryntu, wciąż przycinana przez ogrodnika, którego nikt nigdy nie widział, do której wchodzi się przez Hedgewick i jego dziedzińce z fontannami.",
         "galeName": "Wichrowy Grzbiet",
         "galeBlurb": "Nadmorskie klify i wyjące wzgórza, gdzie wiatr nigdy nie odpoczywa, a Wickharbor szczelnie zamyka swoje drzwi.",
+        "quarteredName": "The Quartered Isle",
+        "quarteredBlurb": "An island shattered four ways by an old rivalry, where Rivalmoot keeps the foot of the storm peak above the crater every challenger comes to win.",
         "levelsCap": "Poziom {level}"
       },
       "group": {
@@ -10286,6 +10288,7 @@ export const pl_PL: EnTranslations = {
       "nightBlurb": "Kraina gwiaździstej północy, gdzie kwiaty oświetlają ścieżki, a Moonrest utrzymuje ciche czuwanie pod śniącym niebem.",
       "hauntBlurb": "Nawiedzony las pod olbrzymimi koronami drzew, gdzie latarnie Gibbetmere są jedynym uczciwym światłem na drodze.",
       "galeBlurb": "Nadmorskie klify i wyjące wzgórza, gdzie wiatr nigdy nie odpoczywa, Stara Latarnia nigdy nie gaśnie, a Wickharbor szczelnie zamyka swoje drzwi.",
+      "quarteredBlurb": "An island shattered into four quarters of ice, fire, stone and storm by an old rivalry, with the challengers of Rivalmoot keeping their town at the foot of the Gyre and their ring in the crater where the war was fought.",
       "jungleBlurb": "Tropikalna gęstwina palm, białego piasku i głośnych ptaków, gdzie nadmorskie miasteczko Drifthaven utrzymuje ognisko na plaży.",
       "gardenBlurb": "Ogrodowa kraina żywopłotowego labiryntu, wciąż przycinana przez ogrodnika, którego nikt nigdy nie widział, do której wchodzi się przez Hedgewick i jego dziedzińce z fontannami.",
       "valeGreeting": "Trzymaj ostrze blisko. Dolina nie jest już tym, czym była.",
@@ -10310,6 +10313,8 @@ export const pl_PL: EnTranslations = {
       "hauntGreeter": "Latarnik, Gibbetmere",
       "galeGreeting": "Wiatr nigdy tu nie ustał, a Stara Latarnia nigdy nie zgasła. Zamknij za sobą drzwi karczmy.",
       "galeGreeter": "Strażnik latarni, Wickharbor",
+      "quarteredGreeting": "Every party that comes down into the crater swears it will be the one to hold the ring. Go down when the hill rises and prove it.",
+      "quarteredGreeter": "A challenger, Rivalmoot",
       "jungleGreeting": "Ciepły piasek, głośne ptaki i dżungla, która pochłania horyzont. Utrzymujemy ognisko na plaży; spróbuj do niego wrócić.",
       "jungleGreeter": "Kapitanka portu, Drifthaven",
       "gardenGreeting": "Ktoś wciąż przycina żywopłoty, choć od stu lat nikt nie widział ogrodnika. Uważaj na labirynt: on też uważa na ciebie.",
@@ -10325,6 +10330,7 @@ export const pl_PL: EnTranslations = {
       "nightPlaceNotes": "Moonrest utrzymuje czuwanie. Nocna Brama to droga do krainy północy; Księżycowa Studnia zawiera światło gwiazd, przy którym możesz stanąć; Gloamfield kwitnie w ciemności; Wieczne Czuwanie obserwuje, nigdy się nie poruszając; a Bezsenny Kurhan to jedyne miejsce tutaj, które nigdy nie śni.",
       "hauntPlaceNotes": "Gibbetmere kuli się we własnych latarniach. Wronia Brama to ponure wejście do lasu; Gąszcz Wdowy jest gęsto oplątany pajęczyną; Polana Wisielców i Kaplica Kamienia Żałoby kryją najstarsze żale lasu; a Polana Łowczego należy do tego, co wciąż tam poluje.",
       "galePlaceNotes": "Wickharbor pochyla się pod wiatr. Wietrzny Szlak to klifowa droga prowadząca do środka; Wyjące Wzgórza toczą się bezdrzewne pod wichrem; Stara Latarnia płonie odkąd ktokolwiek pamięta; Urwisko opada stromo ku wodzie; Pola Wraków utrzymują wybrzeże w uczciwości; a Lustrzane Jeziorko to jedyna nieruchoma rzecz w całej krainie.",
+      "quarteredPlaceNotes": "Rivalmoot stands at the foot of the Gyre, where the climb to the council's seat begins. The Hoarbridge carries the road over the strait from the Frostveil; the Hoarshelf lies white, cold and broken below; the Challengers' Ring waits on the floor of the great crater, the old war's heart, for the next King of the Hill; the Cinderscar smoulders toward the Drakelands; the Heavestone Wilds heave toward the Amberfall; and the Gyre turns its storm above them all.",
       "junglePlaceNotes": "Drifthaven utrzymuje swoje ognisko na plaży. Ujście Gęstwiny to miejsce, gdzie rzeka spotyka zieloną ścianę; Palmowa Plaża ciągnie się biało i ciepło wzdłuż fal; Szmaragdowa Gęstwina i Wodospad Pnączy pochłaniają wnętrze wyspy; Szafirowa Laguna jarzy się czysto i głęboko; a Zatopiony Idol obserwuje spod wody.",
       "gardenPlaceNotes": "Hedgewick czeka przy Bramie Ogrodu. Aleja Parterowa kwitnie w przyciętych barwach; Zamek Brzasku musztruje swoich rycerzy za nowymi murami; Staw Płatków dryfuje różowo przez cały rok; Stary Młyn obraca własne kręgi grządek; Wielki Labirynt zmienia swoje układy dla każdego gościa, a jego łuki obserwują liściaste lisy; Północna Strażnica strzeże drogi wyjścia; Kotlina Lilii spoczywa poza tym wszystkim; a Dziedziniec Fontanny wciąż płynie czysto w sercu ogrodu.",
       "gladeTitle": "Cichy zakątek: Brightwood Glade",
@@ -11116,6 +11122,10 @@ export const pl_PL: EnTranslations = {
         "logging": "Pierwszy węzeł jakiegokolwiek zawodu przynosi czyn Plony Pola, a osiągnięcie limitu 100 w drwalstwie wpisuje tytuł Rąbiarz Twardego Drewna. Osiągnięcie 100 w dowolnych trzech spośród górnictwa, drwalstwa, zielarstwa i wędkarstwa daje Mistrza Zbieracza za 25 Renomy, a uderzenie w starożytne twarde drewno zapisuje własny znak kolekcjonera. Czyny to wyłącznie tytuły i Renoma, nigdy moc.",
         "herbalism": "Pierwszy węzeł jakiegokolwiek zawodu przynosi czyn Plony Pola, a osiągnięcie limitu 100 w zielarstwie wpisuje tytuł Mistrz Łąki. Osiągnięcie 100 w dowolnych trzech spośród górnictwa, drwalstwa, zielarstwa i wędkarstwa daje Mistrza Zbieracza za 25 Renomy, a zebranie rozkwitłego w blasku księżyca ziela zapisuje własny znak kolekcjonera. Czyny to wyłącznie tytuły i Renoma, nigdy moc.",
         "fishing": "Kamień milowy 100 wpisuje Starego Solonego, a 200 wpisuje Mistrza Wędkarstwa wraz z jego tytułem, absolutny szczyt sztuki wędkarskiej; Wędkarstwo liczy się też do Mistrza Zbieracza, zdobywanego przy 100 w dowolnych trzech fachach zbierackich. Pierwsza ryba z wód każdej z sześciu stref wypełnia własną stronę, trzy strefy serca królestwa oraz Wierzbowe Mokradła, Wichrowy Grzbiet i Dalekie Wybrzeże poza nimi, a Karpik Słonecznoblask zapisuje Przebłysk Nadziei, więc podróżnicy z wędką w plecaku zapełniają swoją księgę szybciej, niż się spodziewają.",
+        "miningWithIsle": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Mining inscribes Ore in the Blood. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and cracking a pristine vein records its own collector's mark. Thirteen zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. None of these grant power: deeds are titles and Renown, a record of the roads you have walked.",
+        "loggingWithIsle": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Logging inscribes Heartwood Hewer. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and a strike of ancient heartwood records its own collector's mark. Thirteen zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
+        "herbalismWithIsle": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Herbalism inscribes Master of the Meadow. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and a moonlit bloom records its own collector's mark. Thirteen zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
+        "fishingWithIsle": "The 100 milestone inscribes Old Salt and 200 inscribes Master Angler with its title, the very top of the angler's art; Fishing also counts toward Master Gatherer, earned at 100 in any three gathering trades. A first fish from each of thirteen zones' waters fills its own page, the three heartland zones and the Willowfen, the Galecrest, the Farshore, the Frostveil, the Amberfall, the Nightbloom, the Wraithwood, the Palmreach, the Evergarden, and the Quartered Isle beyond them, and the Sunglint Koi records Glimmer of Hope, so travelers with a pole in their pack fill their book faster than they expect.",
         "farming": "Farming keeps no deeds of its own yet: now that its beds and crops are in the ground, the milestone and cap deeds that mark the other trades arrive in a later patch. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power.",
         "farmingSown": "Rolnictwo ma teraz własną półkę w Księdze dokonań. Od siewu się zaczyna oznacza pierwszą zasadzoną uprawę, a cztery strony kroniki oznaczają pierwszy udany zbiór na każdym miejscu grządek, od doliny Eastbrook do Wiecznego Ogrodu. Złoty zbiór zapisuje własny znak kolekcjonera bez Renomy, a biegłość Rolnictwa liczy się do Mistrza zbieractwa, zdobywanego przy 100 w dowolnych trzech profesjach zbierackich. Każda bruzda wypełniona zbiera cały spis na jednej stronie: wyhoduj każdą uprawę czterech ogrodów, a kolekcja się zamknie. Nad nią jest Mistrz plonów, tytuł profesji przy biegłości 100, a dzięki nasionom górskim i parterowym na ladach farmerów możesz ukończyć tę drogę dziś. Dokonania są tylko tytułami i Renomą, nigdy mocą."
       },
@@ -27010,6 +27020,11 @@ export const pl_PL: EnTranslations = {
         "title": "Złocona Szkatuła",
         "greeting": "Każda skrzynia, kufer i błyskotka są bezpieczne w Złoconej Szkatule."
       },
+      "bursar_maud_ashby": {
+        "name": "Bursar Maud Ashby",
+        "title": "The Gilded Strongbox",
+        "greeting": "The Gilded Strongbox keeps your goods safe, even on the isle."
+      },
       "brother_aldric_raid": {
         "name": "Brat Aldric",
         "title": "Kapłan Doliny",
@@ -30381,6 +30396,57 @@ export const pl_PL: EnTranslations = {
           },
           "4": {
             "label": "Tor Przeszkód"
+          }
+        }
+      },
+      "quartered_isle": {
+        "name": "The Quartered Isle",
+        "welcome": "An old rivalry shattered this island four ways. Rivalmoot keeps the foot of the Gyre, above the crater where the war was fought.",
+        "pois": {
+          "0": {
+            "label": "Rivalmoot"
+          },
+          "1": {
+            "label": "The Challengers' Ring"
+          },
+          "2": {
+            "label": "The Hoarbridge"
+          },
+          "3": {
+            "label": "The Hoarshelf"
+          },
+          "4": {
+            "label": "The Cinderscar"
+          },
+          "5": {
+            "label": "The Heavestone Wilds"
+          },
+          "6": {
+            "label": "The Gyre"
+          },
+          "7": {
+            "label": "The Fireice Rift"
+          },
+          "8": {
+            "label": "The Crevasses"
+          },
+          "9": {
+            "label": "The Rimeglass"
+          },
+          "10": {
+            "label": "The Burnways"
+          },
+          "11": {
+            "label": "The Glassfield"
+          },
+          "12": {
+            "label": "The Hammer's Cut"
+          },
+          "13": {
+            "label": "The Heaved Slabs"
+          },
+          "14": {
+            "label": "The Fallen Giant"
           }
         }
       },

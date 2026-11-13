@@ -7748,6 +7748,24 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.galecrest.pois.5.label': 'レックフィールズ',
   'entities.zones.galecrest.pois.6.label': 'ミラーターン',
   'entities.zones.galecrest.pois.7.label': 'ゲイルクレストの厩舎',
+  'entities.zones.quartered_isle.name': '四分の島',
+  'entities.zones.quartered_isle.welcome':
+    '古き争いがこの島を四つに砕いた。ライバルムートは旋風の峰のふもと、戦いの中心だったクレーターを見下ろす地に立つ。',
+  'entities.zones.quartered_isle.pois.0.label': 'ライバルムート',
+  'entities.zones.quartered_isle.pois.1.label': '挑戦者の闘技場',
+  'entities.zones.quartered_isle.pois.2.label': '霜の橋',
+  'entities.zones.quartered_isle.pois.3.label': '霜の岩棚',
+  'entities.zones.quartered_isle.pois.4.label': '燼の傷跡',
+  'entities.zones.quartered_isle.pois.5.label': '隆起岩の荒野',
+  'entities.zones.quartered_isle.pois.6.label': '旋風の峰',
+  'entities.zones.quartered_isle.pois.7.label': '炎氷の裂け目',
+  'entities.zones.quartered_isle.pois.8.label': 'クレバス群',
+  'entities.zones.quartered_isle.pois.9.label': '霧氷の鏡湖',
+  'entities.zones.quartered_isle.pois.10.label': '焦熱の水路',
+  'entities.zones.quartered_isle.pois.11.label': '玻璃の原',
+  'entities.zones.quartered_isle.pois.12.label': '鎚の切り通し',
+  'entities.zones.quartered_isle.pois.13.label': '隆起した岩盤',
+  'entities.zones.quartered_isle.pois.14.label': '倒れた巨人',
   'entities.npcs.warden_coalfast.name': '守将コールファスト',
   'entities.npcs.warden_coalfast.title': '要塞司令官',
   'entities.npcs.warden_coalfast.greeting':
@@ -10557,6 +10575,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '巨大な樹冠に覆われた呪われた森。街道でまともな光といえば、ギベットミアのランタンだけです。',
   'guide.worldPage.galeBlurb':
     '風のやむことのない海崖と咆哮の丘陵。古き烽火台の火は決して消えず、ウィックハーバーは扉を固く閉ざしています。',
+  'guide.worldPage.quarteredBlurb':
+    '古き争いによって氷、炎、岩、嵐の四つの地に砕かれた島。ライバルムートの挑戦者たちは旋風の峰のふもとに町を構え、戦いの中心だったクレーターに闘技場を置いている。',
   'guide.worldPage.jungleBlurb':
     'ヤシと白砂、騒がしい鳥たちの南国の密林。浜の町ドリフトヘイヴンが、渚に火を灯し続けています。',
   'guide.worldPage.gardenBlurb':
@@ -10582,6 +10602,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.galeGreeting':
     'ここでは風は一度たりともやんだことがなく、古き烽火台の火は一度たりとも消えたことがない。宿の扉はしっかり閉めてくれ。',
   'guide.worldPage.galeGreeter': '烽火の番人、ウィックハーバー',
+  'guide.worldPage.quarteredGreeting':
+    'クレーターに降りる一行は皆、闘技場を守り抜くのは自分たちだと誓う。丘が立ち上がったら降りて、それを証明してみせろ。',
+  'guide.worldPage.quarteredGreeter': '挑戦者、ライバルムート',
   'guide.worldPage.jungleGreeting':
     '温かい砂、騒がしい鳥、そして地平線を飲み込むジャングル。浜辺には火を灯してある。必ずそこへ帰ってくるんだよ。',
   'guide.worldPage.jungleGreeter': '港の女主人、ドリフトヘイヴン',
@@ -10602,6 +10625,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ギベットミアはランタンの内側に身を寄せ合っています。鴉の門は森の陰気な玄関口。寡婦蜘蛛の茂みは蜘蛛の糸が厚く張られています。首吊りの林間と嘆き石の礼拝堂は森の最も古い悲しみを抱え、狩人の空き地は、今もそこで狩りを続ける何者かのものです。',
   'guide.worldPage.galePlaceNotes':
     'ウィックハーバーは風に身を傾けています。風の道は崖沿いの入り口の道。咆哮の丘陵は強風の下、木一本なくうねっています。古き烽火台は誰も知らぬ昔から燃え続け、断ち崖は水面まで垂直に落ち込み、難破船の野はこの海岸の油断ならなさを物語ります。そして鏡の山湖は、このレルムでただ一つ静止しているものです。',
+  'guide.worldPage.quarteredPlaceNotes':
+    'ライバルムートは旋風の峰のふもと、評議会の座への登り道が始まる場所に立つ。霜の橋がフロストヴェイルから海峡を越えて道を渡し、霜の岩棚が白く冷たく砕けて広がる。挑戦者の闘技場は古き戦いの中心である大クレーターの底で次の丘の王を待ち、燼の傷跡はドレイクランドへとくすぶり、隆起岩の荒野はアンバーフォールへと盛り上がり、旋風の峰はそのすべての上で嵐を巡らせている。',
   'guide.worldPage.junglePlaceNotes':
     'ドリフトヘイヴンは浜辺の火を守っています。タングルマウスは川が緑の壁とぶつかる場所。パームストランドは白く温かな砂浜となって波打ち際に続きます。エメラルドの密林とヴァインフォールは内陸を飲み込み、サファイアの礁湖は澄んで深く輝き、沈んだ偶像は水の底からこちらを見つめています。',
   'guide.worldPage.gardenPlaceNotes':
@@ -13787,6 +13812,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.bursar_aldous_crane.title': '金張りの金庫',
   'entities.npcs.bursar_aldous_crane.greeting':
     'どんな木箱も、金櫃も、装身具も、金張りの金庫にお預けいただければ安全です。',
+  'entities.npcs.bursar_maud_ashby.name': '出納官モード・アシュビー',
+  'entities.npcs.bursar_maud_ashby.title': '金張りの金庫',
+  'entities.npcs.bursar_maud_ashby.greeting':
+    '金張りの金庫は、この島でもあなたの品を安全にお預かりします。',
   'entities.items.furyforged_warhelm.name': '憤怒鋳りの戦兜',
   'entities.items.furyforged_warspaulders.name': '憤怒鋳りの戦肩当て',
   'entities.items.furyforged_warplate.name': '憤怒鋳りの戦鎧',
@@ -16560,6 +16589,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'どの採集職でも最初の採取でFruits of the Fieldを、薬草学100でMaster of the Meadowを刻みます。採集職のうち三つで100に達するとMaster Gatherer（名声25）。moonlit bloomを摘めば専用の収集印も。功績は称号と名声のみで、力は与えません。',
   'guide.profPages.gatherDeeds.fishing':
     '熟練100でOld Saltを、200でMaster Anglerとその称号を刻みます。釣り人の頂点です。釣りもMaster Gatherer（三職100）に数えられます。各地方の水域で最初の一匹を釣ればそれぞれのページが埋まり、日映えの錦鯉を釣ればGlimmer of Hopeが記されます。杖を荷物に忍ばせる旅人は、思いのほか早く功績の書を満たします。',
+  'guide.profPages.gatherDeeds.miningWithIsle':
+    'どの採集職でも最初の採取でFruits of the Fieldを、採掘100でOre in the Bloodを刻みます。採集職のうち三つで100に達するとMaster Gatherer（名声25）。pristine veinを掘り当てれば専用の収集印も。功績は称号と名声のみで、力は与えません。',
+  'guide.profPages.gatherDeeds.loggingWithIsle':
+    'どの採集職でも最初の採取でFruits of the Fieldを、伐採100でHeartwood Hewerを刻みます。採集職のうち三つで100に達するとMaster Gatherer（名声25）。ancient heartwoodを切り出せば専用の収集印も。功績は称号と名声のみで、力は与えません。',
+  'guide.profPages.gatherDeeds.herbalismWithIsle':
+    'どの採集職でも最初の採取でFruits of the Fieldを、薬草学100でMaster of the Meadowを刻みます。採集職のうち三つで100に達するとMaster Gatherer（名声25）。moonlit bloomを摘めば専用の収集印も。功績は称号と名声のみで、力は与えません。',
+  'guide.profPages.gatherDeeds.fishingWithIsle':
+    '熟練100でOld Saltを、200でMaster Anglerとその称号を刻みます。釣り人の頂点です。釣りもMaster Gatherer（三職100）に数えられます。各地方の水域で最初の一匹を釣ればそれぞれのページが埋まり、日映えの錦鯉を釣ればGlimmer of Hopeが記されます。杖を荷物に忍ばせる旅人は、思いのほか早く功績の書を満たします。',
   'guide.profPages.gatherDeeds.farming':
     '農耕には専用の功績がまだありません。畑と作物が根付いた今、他の職を彩る到達と上限の功績は今後の更新で加わります。熟練はすでにMaster Gatherer（いずれか三職で100）に数えられるため、農夫もそのページを皆と同じように埋められます。功績は称号と名声だけを与え、力を与えることはありません。',
   'guide.profPages.gatherDeeds.farmingSown':
@@ -18143,6 +18180,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.home.world.farshoreName': '遠つ岸',
   'guide.home.world.galeBlurb':
     '風がひとときも休まぬ海食崖と、吠えたける丘陵。ウィックハーバーは戸をきつく閉ざしている。',
+  'guide.home.world.quarteredName': '四分の島',
+  'guide.home.world.quarteredBlurb':
+    '古き争いに四つに砕かれた島。ライバルムートが嵐の峰のふもとから、挑戦者たちの目指すクレーターを見下ろす。',
   'guide.home.world.galeName': 'ゲイルクレスト',
   'guide.home.world.gardenBlurb':
     '誰ひとり姿を見たことのない庭師が、今も刈り込みを続ける生け垣の迷路の領域。ヘッジウィックと噴水の中庭を抜けた先にある。',

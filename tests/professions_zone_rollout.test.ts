@@ -74,6 +74,9 @@ const PROFESSIONS_ZONE_ROLLOUT: Readonly<Record<string, RolloutState>> = {
   evergarden: 'starter',
   galecrest: 'starter',
   farshore_isle: 'starter',
+  // The Quartered Isle ships the expansion zones' two-per-type tier-1 starter
+  // nodes and tier-1 water, with no catch table, station or tool vendor.
+  quartered_isle: 'starter',
   // The tutorial island ships professions-FREE by design (the R37 default):
   // its chain pays the copper for the tier-1 tool kit, and the vale's own
   // counters sell it. Every absence arm below enforces the 'none' row.
@@ -119,9 +122,10 @@ describe('the R37 professions zone-rollout guard', () => {
     expect([...ZONES.map((z) => z.id)].sort()).toEqual(
       [...Object.keys(PROFESSIONS_ZONE_ROLLOUT)].sort(),
     );
-    expect(ZONES.length).toBe(15);
+    // 16 and 12 since the Quartered Isle joined ZONES on a 'starter' row.
+    expect(ZONES.length).toBe(16);
     expect(ROLLED_OUT.size).toBe(3);
-    expect(STARTER_ZONES.size).toBe(11);
+    expect(STARTER_ZONES.size).toBe(12);
     // The 'none' state is real, not decorative: the Proving Shore ships on
     // it, and this arm keeps the complete-filter honest against a bare key
     // read that would sweep a professions-free zone as rolled out.
@@ -174,6 +178,7 @@ describe('the R37 professions zone-rollout guard', () => {
       evergarden: 2,
       galecrest: 6,
       farshore_isle: 6,
+      quartered_isle: 2,
     };
     expect(new Set(Object.keys(STARTER_NODES_PER_TYPE))).toEqual(STARTER_ZONES);
     for (const zoneId of STARTER_ZONES) {

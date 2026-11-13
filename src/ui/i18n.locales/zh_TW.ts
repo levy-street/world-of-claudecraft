@@ -9076,6 +9076,24 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.zones.galecrest.pois.5.label': '沉船灘',
   'entities.zones.galecrest.pois.6.label': '鏡湖',
   'entities.zones.galecrest.pois.7.label': '疾風崖馬廄',
+  'entities.zones.quartered_isle.name': '四分島',
+  'entities.zones.quartered_isle.welcome':
+    '一場古老的爭鬥將這座島嶼擊碎成四塊。爭鋒鎮守在旋風峰腳下，俯瞰著當年戰爭中心的隕坑。',
+  'entities.zones.quartered_isle.pois.0.label': '爭鋒鎮',
+  'entities.zones.quartered_isle.pois.1.label': '挑戰者競技場',
+  'entities.zones.quartered_isle.pois.2.label': '霜橋',
+  'entities.zones.quartered_isle.pois.3.label': '白霜冰架',
+  'entities.zones.quartered_isle.pois.4.label': '燼痕',
+  'entities.zones.quartered_isle.pois.5.label': '隆岩荒野',
+  'entities.zones.quartered_isle.pois.6.label': '旋風峰',
+  'entities.zones.quartered_isle.pois.7.label': '火冰裂谷',
+  'entities.zones.quartered_isle.pois.8.label': '冰隙群',
+  'entities.zones.quartered_isle.pois.9.label': '霜鏡湖',
+  'entities.zones.quartered_isle.pois.10.label': '焚流渠',
+  'entities.zones.quartered_isle.pois.11.label': '琉璃原',
+  'entities.zones.quartered_isle.pois.12.label': '鐵鎚峽',
+  'entities.zones.quartered_isle.pois.13.label': '隆起石板',
+  'entities.zones.quartered_isle.pois.14.label': '倒下的巨人',
   'entities.npcs.warden_coalfast.name': '守望者 煤堅',
   'entities.npcs.warden_coalfast.title': '堡壘指揮官',
   'entities.npcs.warden_coalfast.greeting':
@@ -11763,6 +11781,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.hauntBlurb': '巨大樹冠之下的一片鬧鬼森林，絞湖鎮的燈籠是路上唯一可信的光。',
   'guide.worldPage.galeBlurb':
     '海崖與呼嘯的丘陵，這裡的風從不停歇，老燈塔從不熄滅，燭港則緊閉門戶。',
+  'guide.worldPage.quarteredBlurb':
+    '一座被古老爭鬥擊碎成冰、火、岩、風四塊地域的島嶼。爭鋒鎮的挑戰者們把城鎮建在旋風峰腳下，把競技場設在當年戰爭所在的隕坑裡。',
   'guide.worldPage.jungleBlurb':
     '棕櫚、白沙與喧鬧群鳥交織的熱帶叢林，海濱小鎮漂流港在沙灘上燃著一堆火。',
   'guide.worldPage.gardenBlurb':
@@ -11787,6 +11807,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.galeGreeting':
     '這裡的風從未停過一次，老燈塔也從未熄過一次。進了旅店，記得隨手關上門。',
   'guide.worldPage.galeGreeter': '燈塔看守人，燭港',
+  'guide.worldPage.quarteredGreeting':
+    '每支走進隕坑的隊伍都發誓自己會守住競技場。山丘升起時就下去，證明給我看。',
+  'guide.worldPage.quarteredGreeter': '一名挑戰者，爭鋒鎮',
   'guide.worldPage.jungleGreeting':
     '溫暖的沙、喧鬧的鳥，還有一片吞沒地平線的叢林。我們在海灘上燃著一堆火；盡量活著回到火邊來。',
   'guide.worldPage.jungleGreeter': '港務長，漂流港',
@@ -11807,6 +11830,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '絞湖鎮蜷縮在自己的燈籠之中。鴉門是這片森林陰森的正門；寡婦棘叢被蛛網織得密不透風；吊影林地與哀石禮拜堂守著森林最古老的悲慟；獵手林隙則屬於那仍在其中狩獵的東西。',
   'guide.worldPage.galePlaceNotes':
     '燭港迎著風而立。風道是進來的懸崖之路；嘯風丘陵在狂風下光禿起伏，寸樹不生；老燈塔燃燒了多久，沒有人說得清；斷崖筆直墜入水中；沉船灘讓這片海岸不敢說謊；鏡湖則是整個國度裡唯一靜止的事物。',
+  'guide.worldPage.quarteredPlaceNotes':
+    '爭鋒鎮坐落在旋風峰腳下，通往議會之座的攀登之路從這裡開始。霜橋把道路從霜幕之境跨過海峽引來；白霜冰架在下方又白又冷、支離破碎地鋪開；挑戰者競技場在古老戰爭的中心、大隕坑的底部靜候下一位山丘之王；燼痕向著龍裔荒原陰燃；隆岩荒野朝琥珀秋境隆起；旋風峰則在這一切之上捲動風暴。',
   'guide.worldPage.junglePlaceNotes':
     '漂流港在海灘上燃著火堆。纏木隘口是河流與綠牆相會之處；棕櫚長灘沿著浪花鋪展，潔白而溫暖；翠綠叢林與垂藤林吞沒了內陸；藍寶石潟湖清澈幽深地發著光；沉沒神像則自水下注視著一切。',
   'guide.worldPage.gardenPlaceNotes':
@@ -14753,6 +14778,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.bursar_aldous_crane.title': '鍍金保險箱',
   'entities.npcs.bursar_aldous_crane.greeting':
     '每一只木箱、每一個錢櫃、每一件飾物，交給鍍金保險箱都萬無一失。',
+  'entities.npcs.bursar_maud_ashby.name': '司庫莫德·艾許比',
+  'entities.npcs.bursar_maud_ashby.title': '鍍金保險箱',
+  'entities.npcs.bursar_maud_ashby.greeting': '鍍金保險箱會妥善保管你的財物，在這座島上也一樣。',
   'entities.items.furyforged_warhelm.name': '怒鑄戰盔',
   'entities.items.furyforged_warspaulders.name': '怒鑄戰肩',
   'entities.items.furyforged_warplate.name': '怒鑄戰甲',
@@ -17409,6 +17437,14 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '任意行業的第一次採集獲得Fruits of the Field，藥草學100上限銘刻Master of the Meadow。任意三項採集行業達到100可得Master Gatherer（25聲望），採下月光綻放另有收藏印記。功業只有頭銜與聲望，永不賦予力量。',
   'guide.profPages.gatherDeeds.fishing':
     '釣魚100熟練銘刻Old Salt，200銘刻Master Angler及其頭銜，垂釣技藝的頂點；釣魚同樣計入Master Gatherer（任意三項採集達到100）。在每個區域的水域釣起第一條魚各有其頁，釣起日輝錦鯉則記下Glimmer of Hope。',
+  'guide.profPages.gatherDeeds.miningWithIsle':
+    '任意行業的第一次採集獲得Fruits of the Field，採礦100上限銘刻Ore in the Blood。任意三項採集行業達到100可得Master Gatherer（25聲望），鑿開純淨礦脈另有收藏印記。功業只有頭銜與聲望，永不賦予力量。',
+  'guide.profPages.gatherDeeds.loggingWithIsle':
+    '任意行業的第一次採集獲得Fruits of the Field，伐木100上限銘刻Heartwood Hewer。任意三項採集行業達到100可得Master Gatherer（25聲望），劈出遠古心材另有收藏印記。功業只有頭銜與聲望，永不賦予力量。',
+  'guide.profPages.gatherDeeds.herbalismWithIsle':
+    '任意行業的第一次採集獲得Fruits of the Field，藥草學100上限銘刻Master of the Meadow。任意三項採集行業達到100可得Master Gatherer（25聲望），採下月光綻放另有收藏印記。功業只有頭銜與聲望，永不賦予力量。',
+  'guide.profPages.gatherDeeds.fishingWithIsle':
+    '釣魚100熟練銘刻Old Salt，200銘刻Master Angler及其頭銜，垂釣技藝的頂點；釣魚同樣計入Master Gatherer（任意三項採集達到100）。在每個區域的水域釣起第一條魚各有其頁，釣起日輝錦鯉則記下Glimmer of Hope。',
   'guide.profPages.gatherDeeds.farming':
     '耕作暫無專屬功業：如今田畦與作物已經紮根，標記其他行業的里程碑與上限功業將隨後續更新一併到來。它的熟練已經計入Master Gatherer（任意三項採集達到100），耕作者能像旁人一樣填滿那一頁。功業只給頭銜與名望，絕不給予力量。',
   'guide.profPages.gatherDeeds.farmingSown':
@@ -18926,6 +18962,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '沙洲彼端的一座島嶼，天空在裂隙原野之上撕裂而開，而鷗港為每一道裂口敲響它的鐘。',
   'guide.home.world.farshoreName': '遠岸',
   'guide.home.world.galeBlurb': '海崖與呼嘯的丘原，這裡的風從不歇息，燭港則緊閉門扉。',
+  'guide.home.world.quarteredName': '四分島',
+  'guide.home.world.quarteredBlurb':
+    '一座被古老爭鬥擊碎成四塊的島嶼，爭鋒鎮守在風暴之峰腳下，俯瞰著每個挑戰者都想奪下的隕坑。',
   'guide.home.world.galeName': '疾風崖',
   'guide.home.world.gardenBlurb':
     '一座樹籬迷宮的國度，至今仍被修剪得整整齊齊，卻沒有人見過那位園丁；入口就在籬苑鎮與它的噴泉庭院之後。',

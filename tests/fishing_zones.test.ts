@@ -75,6 +75,7 @@ const EXPANSION_ZONE_IDS = [
   'evergarden',
   'galecrest',
   'farshore_isle',
+  'quartered_isle',
 ];
 const KOI = 'glimmerfin_koi';
 const JUNK_ROWS: Record<string, string[]> = {
@@ -192,7 +193,8 @@ describe('the rod a zone takes', () => {
       expect(rodTierRequiredForZone(zoneId), zoneId).toBe(highestNodeTierIn(zoneId));
       checked += 1;
     }
-    expect(checked).toBe(14);
+    // 15 since the Quartered Isle joined the starter-kit zones.
+    expect(checked).toBe(15);
     // And the ladder really is a ladder, so the loop above is not three copies
     // of one number.
     expect(rodTierRequiredForZone('eastbrook_vale')).toBe(1);
@@ -1422,11 +1424,11 @@ describe('every rod-tier row stands on real water and a real schedule row', () =
         if (spotForLake(zone.id, lake) === null) dead.push(`${zone.id}:${lake.x},${lake.z}`);
       }
     }
-    expect(checked).toBe(14);
+    expect(checked).toBe(15); // the Quartered Isle's lake made fifteen
     // Per-LAKE non-vacuity (the QA round): the zone count alone let a zone
     // quietly shed lakes (willowfen alone declares 19), shrinking the sweep
     // with a green suite. A lake added or removed anywhere re-mints this.
-    expect(lakesChecked).toBe(61);
+    expect(lakesChecked).toBe(62); // plus the Quartered Isle's lake
     expect(dead.sort()).toEqual(DECORATIVE_LAKES);
   });
 
@@ -1506,7 +1508,7 @@ describe('every rod-tier row stands on real water and a real schedule row', () =
         worstZone = zone.id;
       }
     }
-    expect(measured).toBe(14);
+    expect(measured).toBe(15); // the Quartered Isle's lake made fifteen
     expect(worstZone).toBe('galecrest');
     expect(worst).toBeLessThanOrEqual(240);
     // The ceiling bites, per the prose above. Subsumption note (the QA

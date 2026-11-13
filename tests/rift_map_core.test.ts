@@ -435,6 +435,7 @@ describe('rift map live model', () => {
       ['veiled_hollow', 'dark-forest'],
       ['evergarden', 'moonlit-meadow'],
       ['farshore_isle', 'coast'],
+      ['quartered_isle', 'coast'],
     ]);
   });
 

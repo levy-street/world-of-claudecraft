@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { NPCS, QUESTS, zoneAt } from '../src/sim/data';
+import { afterEach, describe, expect, it } from 'vitest';
+import { BUILTIN_WORLD, NPCS, QUESTS, setActiveWorldContent, ZONES, zoneAt } from '../src/sim/data';
 import type { QuestProgress } from '../src/sim/types';
 import {
   buildMapSidebarView,
@@ -286,6 +286,57 @@ describe.each([
 // rail a brand new Map of brand new QuestProgress objects on every snapshot, so a
 // core that leaned on object identity would renumber or lose the selection between
 // two mirrors of the SAME server state.
+describe('map sidebar nearby offers under a claimsOverlap zone', () => {
+  afterEach(() => setActiveWorldContent(null));
+
+  // One quest giver dropped at each probe point, offering q_wolves under a
+  // per-point npc id, so the rail's zone filter alone decides who lists it.
+  const PROBES: Array<[number, number]> = [
+    [215, 2200],
+    [-215, 2200],
+    [300, 2200],
+  ];
+  const zoneById = (id: string) => {
+    const zone = ZONES.find((z) => z.id === id);
+    if (!zone) throw new Error(`no zone ${id}`);
+    return zone;
+  };
+  const listedIn = (zoneId: string): string[] => {
+    const giver = NPCS[QUESTS.q_wolves.giverNpcId];
+    const npcs = { ...BUILTIN_WORLD.npcs };
+    for (const [x, z] of PROBES) {
+      npcs[`probe_${x}_${z}`] = { ...giver, id: `probe_${x}_${z}`, pos: { x, z } };
+    }
+    setActiveWorldContent({ ...BUILTIN_WORLD, npcs });
+    const zone = zoneById(zoneId);
+    const w = {
+      player: { name: 'Adventurer', pos: { x: 0, y: 0, z: 2200 } },
+      questLog: new Map(),
+      questState: (questId: string) => (questId === 'q_wolves' ? 'available' : 'unavailable'),
+    } as unknown as IWorld;
+    const model = buildMapSidebarView({
+      world: w,
+      zone,
+      filters: DEFAULT_MAP_ATLAS_FILTERS,
+      selectedQuestId: null,
+    });
+    // The distance names which giver the row came from (nearest wins).
+    return model.nearby.map((quest) => `${quest.questId}@${Math.round(quest.distance)}`);
+  };
+
+  it('lists a giver in claimed ground under the claimer only', () => {
+    expect(zoneAt(215, 2200).id).toBe('quartered_isle');
+    expect(zoneAt(-215, 2200).id).toBe('quartered_isle');
+    expect(zoneAt(300, 2200).id).toBe('drakelands');
+    // The isle lists the nearer claimed giver (215 yd from the player).
+    expect(listedIn('quartered_isle')).toEqual(['q_wolves@215']);
+    // Drakelands skips the claimed giver at x 215 and lists the one at x 300.
+    expect(listedIn('drakelands')).toEqual(['q_wolves@300']);
+    // Amberfall's only probe giver sits in the claim, so q_wolves is not listed.
+    expect(listedIn('amberfall').filter((row) => row.startsWith('q_wolves'))).toEqual([]);
+  });
+});
+
 describe('map sidebar view across consecutive ClientWorld mirrors', () => {
   it('keeps numbering and selection stable when every progress object is replaced', () => {
     const qlog = [progress('q_wolves', 'active', 2), progress('q_boars', 'active', 1)];

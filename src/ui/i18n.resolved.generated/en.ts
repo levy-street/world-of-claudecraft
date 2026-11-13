@@ -9342,6 +9342,8 @@ export const en: EnTranslations = {
         "gardenBlurb": "A hedge-maze realm still trimmed by no gardener anyone has seen, entered past Hedgewick and its fountain courts.",
         "galeName": "The Galecrest",
         "galeBlurb": "Sea-cliffs and howling downs where the wind never rests and Wickharbor shuts its doors tight.",
+        "quarteredName": "The Quartered Isle",
+        "quarteredBlurb": "An island shattered four ways by an old rivalry, where Rivalmoot keeps the foot of the storm peak above the crater every challenger comes to win.",
         "levelsCap": "Level {level}"
       },
       "group": {
@@ -10286,6 +10288,7 @@ export const en: EnTranslations = {
       "nightBlurb": "A realm of starry midnight where flowers light the paths and Moonrest keeps a quiet vigil under a dreaming sky.",
       "hauntBlurb": "A haunted forest under giant canopies, where the lanterns of Gibbetmere are the only honest light on the road.",
       "galeBlurb": "Sea-cliffs and howling downs where the wind never rests, the Old Beacon never goes out, and Wickharbor shuts its doors tight.",
+      "quarteredBlurb": "An island shattered into four quarters of ice, fire, stone and storm by an old rivalry, with the challengers of Rivalmoot keeping their town at the foot of the Gyre and their ring in the crater where the war was fought.",
       "jungleBlurb": "A tropical tangle of palms, white sand, and loud birds, with the beach-town of Drifthaven keeping a fire lit on the strand.",
       "gardenBlurb": "A hedge-maze garden realm still trimmed by no gardener anyone has seen, entered past Hedgewick and its fountain courts.",
       "valeGreeting": "Keep your blade close. The Vale is not what it was.",
@@ -10310,6 +10313,8 @@ export const en: EnTranslations = {
       "hauntGreeter": "The lamplighter, Gibbetmere",
       "galeGreeting": "The wind has never once stopped here, and the Old Beacon has never once gone out. Close the inn door behind you.",
       "galeGreeter": "The beacon-keeper, Wickharbor",
+      "quarteredGreeting": "Every party that comes down into the crater swears it will be the one to hold the ring. Go down when the hill rises and prove it.",
+      "quarteredGreeter": "A challenger, Rivalmoot",
       "jungleGreeting": "Warm sand, loud birds, and a jungle that eats the horizon. We keep a fire lit on the beach; try to come back to it.",
       "jungleGreeter": "The harbormistress, Drifthaven",
       "gardenGreeting": "Someone is still trimming the hedges, though no gardener has been seen for a hundred years. Mind the maze: it minds you back.",
@@ -10325,6 +10330,7 @@ export const en: EnTranslations = {
       "nightPlaceNotes": "Moonrest keeps the vigil. The Nightgate is the way into the midnight country; the Moonspring holds starlight you can stand beside; Gloamfield blooms in the dark; the Standing Vigil watches without ever moving; and the Sleepless Barrow is the one place here that never dreams.",
       "hauntPlaceNotes": "Gibbetmere huddles inside its lanterns. The Crowgate is the wood's grim front door; Widow's Thicket is spun thick with web; the Hanging Glade and the Mournstone Chapel keep the forest's oldest griefs; and the Huntsman's Clearing belongs to whatever still hunts there.",
       "galePlaceNotes": "Wickharbor leans into the wind. The Windway is the cliff road in; the Howling Downs roll treeless under the gale; the Old Beacon has burned for as long as anyone can say; the Shear drops sheer to the water; the Wreckfields keep the coast honest; and the Mirror Tarn is the one still thing in the whole realm.",
+      "quarteredPlaceNotes": "Rivalmoot stands at the foot of the Gyre, where the climb to the council's seat begins. The Hoarbridge carries the road over the strait from the Frostveil; the Hoarshelf lies white, cold and broken below; the Challengers' Ring waits on the floor of the great crater, the old war's heart, for the next King of the Hill; the Cinderscar smoulders toward the Drakelands; the Heavestone Wilds heave toward the Amberfall; and the Gyre turns its storm above them all.",
       "junglePlaceNotes": "Drifthaven keeps its fire on the beach. The Tanglemouth is where the river meets the green wall; the Palmstrand runs white and warm along the surf; the Emerald Tangle and the Vinefall swallow the interior; the Sapphire Lagoon glows clear and deep; and the Sunken Idol watches from beneath the water.",
       "gardenPlaceNotes": "Hedgewick waits at the Garden Gate. The Parterre Walk blooms in clipped color; Dawnhold Castle drills its knights behind new walls; the Petal Pond drifts pink the year round; the Old Mill turns over its own ring beds; the Great Maze rearranges its manners for every guest, its arches watched by leafy foxes; the North Watch keeps the exit road; the Lily Basin rests beyond it all; and the Fountain Court still runs clear at the garden heart.",
       "gladeTitle": "A quiet corner: Brightwood Glade",
@@ -11116,6 +11122,10 @@ export const en: EnTranslations = {
         "logging": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Logging inscribes Heartwood Hewer. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and a strike of ancient heartwood records its own collector's mark. Twelve zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
         "herbalism": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Herbalism inscribes Master of the Meadow. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and a moonlit bloom records its own collector's mark. Twelve zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
         "fishing": "The 100 milestone inscribes Old Salt and 200 inscribes Master Angler with its title, the very top of the angler's art; Fishing also counts toward Master Gatherer, earned at 100 in any three gathering trades. A first fish from each of twelve zones' waters fills its own page, the three heartland zones and the Willowfen, the Galecrest, the Farshore, the Frostveil, the Amberfall, the Nightbloom, the Wraithwood, the Palmreach, and the Evergarden beyond them, and the Sunglint Koi records Glimmer of Hope, so travelers with a pole in their pack fill their book faster than they expect.",
+        "miningWithIsle": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Mining inscribes Ore in the Blood. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and cracking a pristine vein records its own collector's mark. Thirteen zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. None of these grant power: deeds are titles and Renown, a record of the roads you have walked.",
+        "loggingWithIsle": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Logging inscribes Heartwood Hewer. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and a strike of ancient heartwood records its own collector's mark. Thirteen zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
+        "herbalismWithIsle": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Herbalism inscribes Master of the Meadow. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and a moonlit bloom records its own collector's mark. Thirteen zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
+        "fishingWithIsle": "The 100 milestone inscribes Old Salt and 200 inscribes Master Angler with its title, the very top of the angler's art; Fishing also counts toward Master Gatherer, earned at 100 in any three gathering trades. A first fish from each of thirteen zones' waters fills its own page, the three heartland zones and the Willowfen, the Galecrest, the Farshore, the Frostveil, the Amberfall, the Nightbloom, the Wraithwood, the Palmreach, the Evergarden, and the Quartered Isle beyond them, and the Sunglint Koi records Glimmer of Hope, so travelers with a pole in their pack fill their book faster than they expect.",
         "farming": "Farming keeps no deeds of its own yet: now that its beds and crops are in the ground, the milestone and cap deeds that mark the other trades arrive in a later patch. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power.",
         "farmingSown": "Farming keeps its own shelf in the Book of Deeds now. Sow It Begins marks your first planted crop, and four chronicle pages mark a first thriving harvest at each of the bed sites, from Eastbrook Vale to the Evergarden. A golden harvest records its own zero-Renown collector's mark, and proficiency in Farming counts toward Master Gatherer, earned at 100 in any three gathering trades. Every Furrow Filled gathers the whole roster onto one page: grow every crop the four gardens carry and the collection closes. The capstone above it is Harvestmaster, the trade's 100-proficiency title, and with the mountain and parterre seeds now on their farmers' counters it is a climb you can finish today. Deeds are titles and Renown only, never power."
       },
@@ -27010,6 +27020,11 @@ export const en: EnTranslations = {
         "title": "The Gilded Strongbox",
         "greeting": "Every crate, coffer, and trinket is safe with the Gilded Strongbox."
       },
+      "bursar_maud_ashby": {
+        "name": "Bursar Maud Ashby",
+        "title": "The Gilded Strongbox",
+        "greeting": "The Gilded Strongbox keeps your goods safe, even on the isle."
+      },
       "brother_aldric_raid": {
         "name": "Brother Aldric",
         "title": "Priest of the Vale",
@@ -30381,6 +30396,57 @@ export const en: EnTranslations = {
           },
           "4": {
             "label": "The Gauntlet"
+          }
+        }
+      },
+      "quartered_isle": {
+        "name": "The Quartered Isle",
+        "welcome": "An old rivalry shattered this island four ways. Rivalmoot keeps the foot of the Gyre, above the crater where the war was fought.",
+        "pois": {
+          "0": {
+            "label": "Rivalmoot"
+          },
+          "1": {
+            "label": "The Challengers' Ring"
+          },
+          "2": {
+            "label": "The Hoarbridge"
+          },
+          "3": {
+            "label": "The Hoarshelf"
+          },
+          "4": {
+            "label": "The Cinderscar"
+          },
+          "5": {
+            "label": "The Heavestone Wilds"
+          },
+          "6": {
+            "label": "The Gyre"
+          },
+          "7": {
+            "label": "The Fireice Rift"
+          },
+          "8": {
+            "label": "The Crevasses"
+          },
+          "9": {
+            "label": "The Rimeglass"
+          },
+          "10": {
+            "label": "The Burnways"
+          },
+          "11": {
+            "label": "The Glassfield"
+          },
+          "12": {
+            "label": "The Hammer's Cut"
+          },
+          "13": {
+            "label": "The Heaved Slabs"
+          },
+          "14": {
+            "label": "The Fallen Giant"
           }
         }
       },

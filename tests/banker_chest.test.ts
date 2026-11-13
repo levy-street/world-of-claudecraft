@@ -42,6 +42,8 @@ describe('banker chest classification', () => {
       'bursar_aldous_crane',
       // the Proving Shore tutorial island's strongbox desk
       'bursar_wick',
+      // Rivalmoot's counting house on the Quartered Isle
+      'bursar_maud_ashby',
     ]);
     for (const templateId of bankerIds) {
       expect(isBankerNpcForRender(banker(templateId))).toBe(true);

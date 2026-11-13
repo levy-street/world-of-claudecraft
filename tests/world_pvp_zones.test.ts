@@ -10,7 +10,7 @@ import { worldPvpZonePolicyAt, worldPvpZonePolicyOf } from '../src/sim/pvp/world
 
 const SANCTUARIES = ['proving_shore'];
 const FREE_FOR_ALL: string[] = [];
-const HILL_ZONES = ['drakelands', 'frostveil', 'amberfall'];
+const HILL_ZONES = ['drakelands', 'frostveil', 'amberfall', 'quartered_isle'];
 
 describe('the zone table', () => {
   it('pins the only sanctuary and no permanent free-for-all zones', () => {
@@ -30,15 +30,15 @@ describe('the zone table', () => {
     }
   });
 
-  it('the three northern hill zones use the ordinary contested policy', () => {
+  it('the four northern hill zones use the ordinary contested policy', () => {
     const northmost = [...ZONES].sort((a, b) => b.zMax - a.zMax);
     expect(
       northmost
-        .slice(0, 3)
+        .slice(0, HILL_ZONES.length)
         .map((z) => z.id)
         .sort(),
     ).toEqual([...HILL_ZONES].sort());
-    // Exactly these three carry the policy: no other zone is free-for-all.
+    // No zone is free-for-all: the hill zones keep the contested rule.
     expect(
       ZONES.filter((z) => z.worldPvp === 'ffa')
         .map((z) => z.id)

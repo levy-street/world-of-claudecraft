@@ -25,6 +25,7 @@ function maxOwnedCellOvershoot(): number {
     maxX: zone.xMax ?? STRIP_MAX_X,
     minZ: zone.zMin,
     maxZ: zone.zMax,
+    claimsOverlap: zone.claimsOverlap,
   }));
   const chunksX = Math.ceil((WORLD_MAX_X * 2) / CHUNK_SIZE);
   const chunksZ = Math.ceil((WORLD_MAX_Z - WORLD_MIN_Z) / CHUNK_SIZE);

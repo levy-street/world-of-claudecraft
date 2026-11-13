@@ -398,6 +398,9 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
  * otherwise, so a floor mechanic cannot ship outside the ladder unnoticed.
  */
 const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
+  // the Quartered Isle's cloud bank: upright cards far up in the sky under the
+  // floating islands, never on the floor
+  'src/render/quartered_floating_isles.ts',
   // the seasonal candle halos: camera-facing sprites at a candle's height, never on
   // the floor (their ground pools take the floor ladder through floorVfxRenderOrder)
   'src/render/seasonal_decor_lights.ts',

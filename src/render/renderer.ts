@@ -337,7 +337,7 @@ import {
 } from './door_portal';
 import { watchDevicePixelRatio } from './dpr_watch';
 import { DrainChannelStopLatch, drainChannelVisualPlan } from './drain_channel_visual_core';
-import { drakelandsKitLoadFor, drakelandsKitRecheck } from './drakelands_kit_lane';
+import { drakelandsKitLoadFor } from './drakelands_kit_lane';
 import { createLogicalFrameDrawStats, type LogicalFrameDrawStats } from './draw_stats_core';
 import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
 import { DynamicEntityAmbienceSources } from './dynamic_entity_ambience';
@@ -711,6 +711,11 @@ import { prewarmStandInEntity } from './prewarm_stand_in_entity';
 import { type PriestMarkersVisual, syncPriestMarkersVisual } from './priest_markers_visual';
 import { pieceProgramSettle } from './program_variant_settle';
 import { buildPropMaterialPrewarmGroup, buildProps, propResidencySources } from './props';
+import {
+  buildQuarteredLandmarks,
+  type QuarteredLandmarkDressingView,
+} from './quartered_landmark_dressing';
+import { quarteredLandmarkLoadFor, zoneKitRecheck } from './quartered_landmark_lane';
 import {
   attachEntityViewBody,
   buildQuestCaravanBody,
@@ -1760,6 +1765,7 @@ export class Renderer {
   private jungleFeatures: JungleFeaturesView | null = null;
   private gardenFeatures: GardenFeaturesView | null = null;
   private galeFeatures: GaleFeaturesView | null = null;
+  private quarteredMarks: QuarteredLandmarkDressingView | null = null;
   private fogScratch = new THREE.Color();
   // Blue wash + bubbles (and the fog override) while the CAMERA is under a waterline.
   private underwaterView!: UnderwaterView;
@@ -3770,7 +3776,7 @@ export class Renderer {
     }
     const zone = zoneAt(x, z);
     const idlePace = opts?.pace === 'idle';
-    const kitLoad = drakelandsKitLoadFor(zone.biome);
+    const kitLoad = drakelandsKitLoadFor(zone.biome) ?? quarteredLandmarkLoadFor(zone.biome);
     const task = (async () => {
       const started = performance.now();
       onProgress?.(0, 100);
@@ -4017,7 +4023,7 @@ export class Renderer {
     this.skyResidency.updateSkyResidency(cameraX, cameraZ);
     // The ACTIVE world's zones, never the module list.
     const zones = this.sim.cfg.world?.zones ?? ZONES;
-    const kitHolds = drakelandsKitRecheck(zones, cameraX, cameraZ, horizon, this.visibleZoneCheck);
+    const kitHolds = zoneKitRecheck(zones, cameraX, cameraZ, horizon, this.visibleZoneCheck);
     const forwardX = this.cameraLookAt.x - cameraX;
     const forwardZ = this.cameraLookAt.z - cameraZ;
     // The ACTIVE zone list, not the shipped one: an authored map's background
@@ -4264,6 +4270,12 @@ export class Renderer {
         if (!this.galeFeatures) {
           this.galeFeatures = this.timedBuild('buildGaleFeatures', buildGaleFeatures);
           this.attachZoneFeature(this.galeFeatures, false);
+        }
+        break;
+      case 'quartered':
+        if (!this.quarteredMarks) {
+          this.quarteredMarks = this.timedBuild('buildQuarteredLandmarks', buildQuarteredLandmarks);
+          this.attachZoneFeature(this.quarteredMarks);
         }
         break;
       default:

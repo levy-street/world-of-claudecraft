@@ -78,4 +78,9 @@ export const GOURDLIGHT_PUMPKINS: readonly GourdlightPumpkin[] = [
   { id: 'farshore_isle_4', zoneId: 'farshore_isle', x: 391, z: -81 }, // The Sundered Cliffs
   { id: 'farshore_isle_5', zoneId: 'farshore_isle', x: 447, z: 65 }, // The Riftfields
   { id: 'willowfen_5', zoneId: 'willowfen', x: -343, z: 376 }, // Bridgemere outskirts
+  { id: 'quartered_isle_1', zoneId: 'quartered_isle', x: 80, z: 2260 }, // Rivalmoot's east slope
+  { id: 'quartered_isle_2', zoneId: 'quartered_isle', x: -10, z: 2020 }, // The Hoarshelf
+  { id: 'quartered_isle_3', zoneId: 'quartered_isle', x: 124, z: 2186 }, // The Cinderscar
+  { id: 'quartered_isle_4', zoneId: 'quartered_isle', x: -90, z: 2200 }, // The Heavestone Wilds
+  { id: 'quartered_isle_5', zoneId: 'quartered_isle', x: -120, z: 2280 }, // The Fallen Giant
 ];

@@ -70,3 +70,20 @@ export function palmBudgetTree(
       (rootName === 'jungle-features' && materialName === 'Atlas'))
   );
 }
+
+/** The userData flag a zone-feature group sets to opt out of Low's full-detail
+ *  cutoff: a sky backdrop (the Quartered Isle's floating isles) is drawn only
+ *  from afar, has no replacement band, and is a few thousand triangles, so
+ *  cutting it at the near radius would erase it on Low for nothing. */
+export const SCENERY_BACKDROP_FLAG = 'sceneryBackdrop';
+
+interface FlaggedNode {
+  userData: Record<string, unknown>;
+  parent: FlaggedNode | null;
+}
+
+/** True when the node or any ancestor carries SCENERY_BACKDROP_FLAG. */
+export function isSceneryBackdrop(node: FlaggedNode | null | undefined): boolean {
+  for (let n = node; n; n = n.parent) if (n.userData[SCENERY_BACKDROP_FLAG] === true) return true;
+  return false;
+}

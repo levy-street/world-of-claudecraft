@@ -37,6 +37,7 @@ import { PAINTED_TOWNS } from '../sim/painted_towns';
 import type { ZonePropsDef } from '../sim/types';
 import { terrainHeight } from '../sim/world';
 import { authoredTownDressingPlacements } from './authored_town_dressing_placements';
+import { carriesBuiltinZones } from './builtin_zone_match_core';
 import { decorPropPlacements, worldMajorPropPlacements } from './world_prop_placements';
 
 /** targetHeightFor() for every /models/props/ path this module emits. */
@@ -539,11 +540,7 @@ export function promoteFeatureDressing(map: {
   // Builtin zone identity, id-for-id (the promoteMajorWorldProps gate): the
   // spot generators read the ACTIVE world's terrain/roads, so only a
   // builtin-shaped map can trust their output.
-  const builtinIds = BUILTIN_WORLD.zones.map((zone) => zone.id);
-  if (
-    map.content.zones.length !== builtinIds.length ||
-    !map.content.zones.every((zone, index) => zone.id === builtinIds[index])
-  ) {
+  if (!carriesBuiltinZones(map.content.zones, BUILTIN_WORLD.zones)) {
     return 0;
   }
   let promoted = 0;

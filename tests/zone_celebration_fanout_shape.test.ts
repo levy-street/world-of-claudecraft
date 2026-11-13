@@ -385,8 +385,11 @@ describe('the scan premise: one celebration walks the whole roster, one zoneAt p
   // premise of that number the way the cadence constant and the realm cap are of
   // the two records above. tests/professions_zone_rollout.test.ts pins the roster
   // for its own reasons; this one routes a sixteenth zone back to this record.
-  it('the zone list the per-player cost is indexed over holds fifteen entries', () => {
-    expect(ZONES).toHaveLength(15);
+  // Sixteen since the Quartered Isle joined ZONES (appended last, so it adds one
+  // iteration only for a player standing on it; the measured figures above
+  // were taken on fifteen and stand as an upper-band record within one entry).
+  it('the zone list the per-player cost is indexed over holds sixteen entries', () => {
+    expect(ZONES).toHaveLength(16);
   });
 
   /** Drive `fire` with the fixture's entity reads and zoneAt calls counted. The

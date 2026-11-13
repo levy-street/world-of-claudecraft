@@ -1,8 +1,10 @@
 // Per-player environmental damage, the one tick step for the hazards the world
 // itself deals: the breath/drown DEPTH clock (breath.ts) and damaging fluid
 // pools (lava, acid, spectral; Studio 'fluid/<kind>' placements resolved by
-// fluid_volumes.ts). Runs for every player, dead ones included (breath's own
-// reset branch needs that; the fluid step skips the dead itself).
+// fluid_volumes.ts), plus the one ground the world itself makes slick (the
+// Quartered Isle's frozen lakes, quartered_frozen_lakes.ts). Runs for every
+// player, dead ones included (breath's own reset branch needs that; the fluid
+// and ice steps handle the dead themselves).
 //
 // Fluid pools are fully independent of the map-wide water level and of the
 // swim system. The built-in world carries no fluid volumes, so the fluid step
@@ -12,6 +14,7 @@
 import { updateBreath } from './breath';
 import { getActiveWorldContent } from './data';
 import { damagingFluidAt } from './fluid_volumes';
+import { updateFrozenLakeSlick } from './quartered_frozen_lakes';
 import type { SimContext } from './sim_context';
 import { DT, type Entity } from './types';
 import { terrainHeight } from './world';
@@ -42,8 +45,10 @@ export function updateFluidDamage(ctx: SimContext, p: Entity): void {
 }
 
 /** The per-player environmental damage step the tick coordinator calls:
- *  breath first (its drown pulse can kill), then the fluid pools. */
+ *  breath first (its drown pulse can kill), then the fluid pools, then the
+ *  frozen lakes' slick (draws no rng). */
 export function updateEnvironmentDamage(ctx: SimContext, p: Entity): void {
   updateBreath(ctx, p);
   updateFluidDamage(ctx, p);
+  updateFrozenLakeSlick(p);
 }

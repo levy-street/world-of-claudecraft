@@ -44,6 +44,25 @@ describe('zoneIdForPoint', () => {
     expect(zoneIdForPoint(ZONES, 400, 150)).toBe('mid');
   });
 
+  it('files ground a claimsOverlap zone overlaps under the claimer', () => {
+    // Laid out like the quartered isle: the claimed column rects come first.
+    const zones = [
+      { id: 'vale', zMin: 1820, zMax: 1960 },
+      { id: 'drakelands', xMin: 180, xMax: 540, zMin: 1820, zMax: 2420 },
+      { id: 'amberfall', xMin: -540, xMax: -180, zMin: 1820, zMax: 2380 },
+      { id: 'quartered_isle', xMin: -250, xMax: 250, zMin: 1960, zMax: 2420, claimsOverlap: true },
+    ];
+    expect(zoneIdForPoint(zones, 215, 2200)).toBe('quartered_isle');
+    expect(zoneIdForPoint(zones, -215, 2200)).toBe('quartered_isle');
+    expect(zoneIdForPoint(zones, 300, 2200)).toBe('drakelands');
+    expect(zoneIdForPoint(zones, 215, 1900)).toBe('drakelands');
+    expect(zoneIdForPoint(zones, 0, 1900)).toBe('vale');
+    // Without the claim the classic first-match walk is unchanged.
+    const unclaimed = zones.map((zone) => ({ ...zone, claimsOverlap: false }));
+    expect(zoneIdForPoint(unclaimed, 215, 2200)).toBe('drakelands');
+    expect(zoneIdForPoint(unclaimed, -215, 2200)).toBe('amberfall');
+  });
+
   it('files far-north points under the northmost zone, not nowhere', () => {
     expect(zoneIdForPoint(ZONES, 0, 999)).toBe('north');
     expect(zoneIdForPoint([], 0, 0)).toBeNull();

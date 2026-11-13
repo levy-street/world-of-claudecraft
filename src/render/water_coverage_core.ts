@@ -40,6 +40,11 @@ export interface WaterSheetRect {
   readonly xMax: number;
   readonly zMin: number;
   readonly zMax: number;
+  /** Set only on the pieces of a zone whose rect a claimsOverlap zone cut
+   *  (see zoneSheetRects): each piece needs its own id so the chop feather
+   *  reads the seam between two pieces as sheet-abutting, and this names the
+   *  zone that streams them all. A whole zone plane leaves it unset. */
+  readonly zoneId?: string;
 }
 
 /**
@@ -104,6 +109,9 @@ export interface CoverageZone {
   readonly zMax: number;
   readonly xMin?: number;
   readonly xMax?: number;
+  /** ZoneDef.claimsOverlap: this zone wins the ground its rect overlaps in a
+   *  neighbour's, so the neighbour's sheet is cut around it. */
+  readonly claimsOverlap?: boolean;
 }
 
 export interface CoverageBounds {
@@ -126,13 +134,96 @@ function rectOf(zone: CoverageZone, stripMinX: number, stripMaxX: number): Water
   };
 }
 
-/** Every zone's rect, with the strip default applied, in zone order. */
+/**
+ * `rect` minus `hole`, as at most four disjoint rects: the full-height strips
+ * west and east of the hole, then the strips south and north of it within the
+ * hole's x span. Degenerate pieces are dropped. Returns null when the two do
+ * not overlap in area, so the caller keeps the original rect object.
+ */
+function subtractRect(
+  rect: WaterSheetRect,
+  hole: WaterSheetRect,
+): Omit<WaterSheetRect, 'id'>[] | null {
+  const ix0 = Math.max(rect.xMin, hole.xMin);
+  const ix1 = Math.min(rect.xMax, hole.xMax);
+  const iz0 = Math.max(rect.zMin, hole.zMin);
+  const iz1 = Math.min(rect.zMax, hole.zMax);
+  if (ix1 - ix0 < MIN_RECT_SIDE || iz1 - iz0 < MIN_RECT_SIDE) return null;
+  const pieces = [
+    { xMin: rect.xMin, xMax: ix0, zMin: rect.zMin, zMax: rect.zMax },
+    { xMin: ix1, xMax: rect.xMax, zMin: rect.zMin, zMax: rect.zMax },
+    { xMin: ix0, xMax: ix1, zMin: rect.zMin, zMax: iz0 },
+    { xMin: ix0, xMax: ix1, zMin: iz1, zMax: rect.zMax },
+  ];
+  return pieces.filter((p) => p.xMax - p.xMin >= MIN_RECT_SIDE && p.zMax - p.zMin >= MIN_RECT_SIDE);
+}
+
+/**
+ * Every zone's sheet rects, with the strip default applied, in zone order.
+ *
+ * The sheets must stay DISJOINT: two sheets over the same water draw the sea
+ * twice and the chop feather misreads the overlap. A claimsOverlap zone owns
+ * the ground its rect shares with a neighbour (zoneAt resolves it there), so
+ * the CLAIMED zones' sheets are cut around the claimer rather than the other
+ * way round: the claimer keeps one sheet that streams with it, matching who
+ * owns the ground. A cut zone becomes several pieces, each with its own id
+ * (`<zone>#<n>`) and `zoneId` naming the zone; every zone no claim touches
+ * keeps its single rect exactly as before.
+ */
 export function zoneSheetRects(
   zones: readonly CoverageZone[],
   stripMinX: number,
   stripMaxX: number,
 ): WaterSheetRect[] {
-  return zones.map((zone) => rectOf(zone, stripMinX, stripMaxX));
+  const rects = zones.map((zone) => rectOf(zone, stripMinX, stripMaxX));
+  const claimers = rects.filter((_, i) => zones[i].claimsOverlap === true);
+  if (claimers.length === 0) return rects;
+  const out: WaterSheetRect[] = [];
+  rects.forEach((rect, i) => {
+    // A claimer yields only to claimers listed before it, the order zoneAt
+    // tests them in; every other zone yields to all of them.
+    const holes =
+      zones[i].claimsOverlap === true ? claimers.slice(0, claimers.indexOf(rect)) : claimers;
+    let pieces: Omit<WaterSheetRect, 'id'>[] = [rect];
+    let cut = false;
+    for (const hole of holes) {
+      const next: Omit<WaterSheetRect, 'id'>[] = [];
+      for (const piece of pieces) {
+        const rest = subtractRect({ ...piece, id: rect.id }, hole);
+        if (rest === null) {
+          next.push(piece);
+        } else {
+          cut = true;
+          next.push(...rest);
+        }
+      }
+      pieces = next;
+    }
+    if (!cut) {
+      out.push(rect);
+      return;
+    }
+    pieces.forEach((piece, n) => {
+      out.push({
+        id: `${rect.id}#${n}`,
+        xMin: piece.xMin,
+        xMax: piece.xMax,
+        zMin: piece.zMin,
+        zMax: piece.zMax,
+        zoneId: rect.id,
+      });
+    });
+  });
+  return out;
+}
+
+/** The sheet rects `zoneSheetRects` produced for one zone: its single plane,
+ *  or every piece of it a claim cut. Empty when the zone has none. */
+export function sheetRectsForZone(
+  sheets: readonly WaterSheetRect[],
+  zoneId: string,
+): WaterSheetRect[] {
+  return sheets.filter((rect) => (rect.zoneId ?? rect.id) === zoneId);
 }
 
 /**
@@ -155,7 +246,9 @@ export function waterCoverageGaps(
   stripMinX: number,
   stripMaxX: number,
 ): WaterSheetRect[] {
-  const rects = zoneSheetRects(zones, stripMinX, stripMaxX);
+  // The UNCUT zone rects: a claim only moves ground between zones, so their
+  // union (all a gap is measured against) and their edge lines are unchanged.
+  const rects = zones.map((zone) => rectOf(zone, stripMinX, stripMaxX));
   const cut = (lo: number, hi: number, lines: number[]): number[] => {
     const inside = lines.filter((v) => v > lo + MIN_RECT_SIDE && v < hi - MIN_RECT_SIDE);
     return [...new Set([lo, ...inside, hi])].sort((a, b) => a - b);

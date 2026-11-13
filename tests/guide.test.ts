@@ -681,7 +681,15 @@ describe('Guide bestiary completeness', () => {
 
   it('gives every zone a non-empty resident family list drawn from the bestiary', () => {
     const familyNames = new Set(GUIDE_FAMILIES.map((f) => f.family));
+    // The Quartered Isle's first pass is its land, town and arena; its
+    // quarters' foes arrive in the next content pass (docs/prd/quartered-isle-zone.md).
+    // Remove it from this list the moment it gains its first camp.
+    const UNSETTLED = new Set(['quartered_isle']);
     for (const z of GUIDE_ZONES) {
+      if (UNSETTLED.has(z.id)) {
+        expect(z.families, `zone ${z.id} has residents now: drop it from UNSETTLED`).toEqual([]);
+        continue;
+      }
       expect(z.families.length, `zone ${z.id} lists no resident families`).toBeGreaterThan(0);
       for (const fam of z.families) {
         expect(familyNames.has(fam), `zone ${z.id} lists unknown family ${fam}`).toBe(true);
@@ -2895,7 +2903,10 @@ describe('Guide professions gathering accuracy', () => {
   it('never enumerates the Master Gatherer roster in the deed prose', () => {
     setLanguage('en');
     for (const id of GATHERING_PROFESSION_IDS) {
-      const body = t(`guide.profPages.gatherDeeds.${id}` as never);
+      // the live leaf per trade: farming's is farmingSown, the other four their
+      // *WithIsle successors (professions_gathering.ts deedsSection)
+      const leaf = id === 'farming' ? 'farmingSown' : `${id}WithIsle`;
+      const body = t(`guide.profPages.gatherDeeds.${leaf}` as never);
       expect(body.length, id).toBeGreaterThan(0);
       expect(body, `gatherDeeds.${id} enumerates the gathering roster`).not.toMatch(
         /any three of/i,
@@ -3447,17 +3458,26 @@ describe('Guide professions gathering accuracy', () => {
       7: 'seven',
       8: 'eight',
       12: 'twelve',
+      13: 'thirteen',
     };
     const castWord = words[firstCast.length];
     expect(castWord, `unmapped first-cast count ${firstCast.length}`).toBeDefined();
-    expect(guideStrings.profPages.gatherDeeds.fishing).toContain(
+    expect(guideStrings.profPages.gatherDeeds.fishingWithIsle).toContain(
       `each of ${castWord} zones' waters`,
     );
+    // the sentence's own list names every first-cast zone it counts: the three
+    // heartland zones stand as one phrase, the rest by name
+    const named = (
+      guideStrings.profPages.gatherDeeds.fishingWithIsle.match(
+        / the [A-Z][A-Za-z]+(?: Isle)?(?=,| beyond)/g,
+      ) ?? []
+    ).length;
+    expect(named + 3).toBe(firstCast.length);
     const chronWord = words[chronicles.length];
     expect(chronWord, `unmapped gatherer-chronicle count ${chronicles.length}`).toBeDefined();
     const chronSentence = `${(chronWord as string)[0].toUpperCase()}${(chronWord as string).slice(1)} zones keep a gatherer's chronicle page apiece`;
     for (const trade of ['mining', 'logging', 'herbalism'] as const) {
-      expect(guideStrings.profPages.gatherDeeds[trade]).toContain(chronSentence);
+      expect(guideStrings.profPages.gatherDeeds[`${trade}WithIsle`]).toContain(chronSentence);
     }
   });
 

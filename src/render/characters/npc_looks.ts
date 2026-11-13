@@ -2617,6 +2617,20 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
     },
     props: 'tome',
   },
+  // Bursar Maud Ashby, The Gilded Strongbox (Rivalmoot).
+  bursar_maud_ashby: {
+    cls: 'rogue',
+    app: {
+      gender: 'female',
+      ...head('waves', 'none', 'soft_arch', 'almond', 'default', 'full', 'default', 'lobes'),
+      ...skin(26, 0.4, 0.6),
+      ...hair(18, 0.55, 0.22),
+      ...eyes(150, 0.4, 0.35),
+      headShape: shape({ eyeSpacing: 0.24, eyeSize: 0.12, eyeTilt: 0.2, chinWidth: 0.55 }),
+      bodyScale: 1,
+    },
+    props: 'none',
+  },
   // Ferryman Odo, Keeper of the Crossing.
   ferryman_odo: {
     cls: 'druid',

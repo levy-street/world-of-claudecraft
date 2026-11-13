@@ -18,6 +18,7 @@ import { buildGiantSprites, type GiantSprites } from './giants';
 import { lowSceneryBandMaterial } from './material';
 import { SceneryNearSources } from './near';
 import {
+  isSceneryBackdrop,
   LOW_SCENERY_BUDGET,
   lowSceneryRepresentation,
   palmBudgetTree,
@@ -113,8 +114,11 @@ export class LowSceneryBands {
   registerRoot(root: THREE.Object3D, zoneFeature = false): void {
     if (this.disposed || this.roots.has(root)) return;
     if (zoneFeature) this.zoneRoots.add(root);
+    // A sky backdrop keeps its whole population: Low never trims it to the
+    // near radius (it has no replacement band to stand in for the rest).
     root.traverse((node) => {
-      if ((node as THREE.Mesh).isMesh) this.registerMesh(node as THREE.Mesh);
+      if ((node as THREE.Mesh).isMesh && !isSceneryBackdrop(node))
+        this.registerMesh(node as THREE.Mesh);
     });
     this.roots.add(root);
     // Other zone dressing participates in the original-scene cutoff, but
@@ -130,6 +134,7 @@ export class LowSceneryBands {
   }
   cullFar(distance: number, group?: THREE.Object3D): number {
     if (this.getHost().outdoor?.() === false) return distance;
+    if (isSceneryBackdrop(group)) return distance;
     // Cull groups may be children of a registered source. Until its replacement
     // gate completes, preserve the native sweep horizon for that source only.
     for (let root = group; root; root = root.parent ?? undefined) {

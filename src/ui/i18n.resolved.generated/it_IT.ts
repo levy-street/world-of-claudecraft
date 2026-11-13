@@ -9342,6 +9342,8 @@ export const it_IT: EnTranslations = {
         "gardenBlurb": "Un regno-giardino labirinto di siepi ancora potato da nessun giardiniere che qualcuno abbia mai visto, a cui si accede oltre Hedgewick e le sue corti di fontane.",
         "galeName": "Galecrest",
         "galeBlurb": "Scogliere marine e colline ululanti dove il vento non si ferma mai, e Wickharbor chiude bene le sue porte.",
+        "quarteredName": "The Quartered Isle",
+        "quarteredBlurb": "An island shattered four ways by an old rivalry, where Rivalmoot keeps the foot of the storm peak above the crater every challenger comes to win.",
         "levelsCap": "Livello {level}"
       },
       "group": {
@@ -10286,6 +10288,7 @@ export const it_IT: EnTranslations = {
       "nightBlurb": "Un regno di mezzanotte stellata dove i fiori illuminano i sentieri e Moonrest veglia in silenzio sotto un cielo che sogna.",
       "hauntBlurb": "Una foresta infestata sotto chiome gigantesche, dove le lanterne di Gibbetmere sono l’unica luce onesta sulla strada.",
       "galeBlurb": "Scogliere marine e colline ululanti dove il vento non si ferma mai, il Vecchio Faro non si spegne mai, e Wickharbor chiude bene le sue porte.",
+      "quarteredBlurb": "An island shattered into four quarters of ice, fire, stone and storm by an old rivalry, with the challengers of Rivalmoot keeping their town at the foot of the Gyre and their ring in the crater where the war was fought.",
       "jungleBlurb": "Un intreccio tropicale di palme, sabbia bianca e uccelli chiassosi, con la città-spiaggia di Drifthaven che tiene un fuoco acceso sulla riva.",
       "gardenBlurb": "Un regno-giardino labirinto di siepi ancora potato da nessun giardiniere che qualcuno abbia mai visto, a cui si accede oltre Hedgewick e le sue corti di fontane.",
       "valeGreeting": "Tieni la lama a portata. La Valle non è più quella di un tempo.",
@@ -10310,6 +10313,8 @@ export const it_IT: EnTranslations = {
       "hauntGreeter": "Il lampionaio, Gibbetmere",
       "galeGreeting": "Il vento non ha mai smesso di soffiare qui, e il Vecchio Faro non si è mai spento. Chiudi la porta della locanda dietro di te.",
       "galeGreeter": "Il guardiano del faro, Wickharbor",
+      "quarteredGreeting": "Every party that comes down into the crater swears it will be the one to hold the ring. Go down when the hill rises and prove it.",
+      "quarteredGreeter": "A challenger, Rivalmoot",
       "jungleGreeting": "Sabbia calda, uccelli chiassosi, e una giungla che divora l’orizzonte. Teniamo un fuoco acceso sulla spiaggia; cerca di tornarci.",
       "jungleGreeter": "La capitana del porto, Drifthaven",
       "gardenGreeting": "Qualcuno sta ancora potando le siepi, eppure nessun giardiniere è stato visto da cent’anni. Fai attenzione al labirinto: anch’esso fa attenzione a te.",
@@ -10325,6 +10330,7 @@ export const it_IT: EnTranslations = {
       "nightPlaceNotes": "Moonrest mantiene la veglia. La Porta della Notte è la via d’accesso alla terra di mezzanotte; il Pozzo della Luna custodisce una luce stellare accanto alla quale puoi restare; Gloamfield fiorisce nel buio; la Veglia Perenne osserva senza mai muoversi; e il Tumulo Insonne è l’unico luogo qui che non sogna mai.",
       "hauntPlaceNotes": "Gibbetmere si raccoglie tra le sue lanterne. La Porta dei Corvi è la tetra porta d’ingresso del bosco; il Boschetto della Vedova è fitto di ragnatele; la Radura degli Impiccati e la Cappella di Mournstone custodiscono i lutti più antichi della foresta; e la Radura del Cacciatore appartiene a qualunque cosa cacci ancora lì.",
       "galePlaceNotes": "Wickharbor si piega contro il vento. La Via del Vento è la strada sulla scogliera che vi conduce; le Colline Ululanti si estendono spoglie sotto la tempesta; il Vecchio Faro arde da quando chiunque possa ricordare; lo Strapiombo precipita a picco sull’acqua; i Campi dei Relitti tengono onesta la costa; e il Laghetto Specchio è l’unica cosa immobile in tutto il regno.",
+      "quarteredPlaceNotes": "Rivalmoot stands at the foot of the Gyre, where the climb to the council's seat begins. The Hoarbridge carries the road over the strait from the Frostveil; the Hoarshelf lies white, cold and broken below; the Challengers' Ring waits on the floor of the great crater, the old war's heart, for the next King of the Hill; the Cinderscar smoulders toward the Drakelands; the Heavestone Wilds heave toward the Amberfall; and the Gyre turns its storm above them all.",
       "junglePlaceNotes": "Drifthaven tiene il suo fuoco sulla spiaggia. La Foce Aggrovigliata è dove il fiume incontra la muraglia verde; la Spiaggia delle Palme corre bianca e calda lungo la risacca; il Groviglio di Smeraldo e il Vinefall inghiottono l’interno; la Laguna di Zaffiro risplende limpida e profonda; e l’Idolo Sommerso veglia da sotto l’acqua.",
       "gardenPlaceNotes": "Hedgewick attende al Cancello del Giardino. Il Viale del Parterre fiorisce in colori ben potati; il Castello di Dawnhold addestra i suoi cavalieri dietro mura nuove; lo Stagno dei Petali fluttua rosa tutto l’anno; il Vecchio Mulino gira sopra le proprie aiuole ad anello; il Grande Labirinto cambia le sue vie per ogni ospite, i suoi archi vegliati da volpi di foglie; la Vedetta del Nord custodisce la strada d’uscita; il Bacino dei Gigli riposa oltre ogni cosa; e la Corte della Fontana scorre ancora limpida nel cuore del giardino.",
       "gladeTitle": "Un angolo quieto: la Radura di Brightwood",
@@ -11116,6 +11122,10 @@ export const it_IT: EnTranslations = {
         "logging": "Il tuo primo nodo di qualsiasi professione guadagna Frutti del Campo, e il massimo di 100 in Boscaiolia iscrive Taglialegna Cuore di Legno. Raggiungere 100 in qualsiasi tre tra Mineria, Boscaiolia, Erboristeria e Pesca aggiunge Maestro Raccoglitore a 25 Rinomanza, e un colpo di antico cuore di legno registra il proprio segno del collezionista. Le Imprese sono solo titoli e Rinomanza, mai potere.",
         "herbalism": "Il tuo primo nodo di qualsiasi professione guadagna Frutti del Campo, e il massimo di 100 in Erboristeria iscrive Maestro del Prato. Raggiungere 100 in qualsiasi tre tra Mineria, Boscaiolia, Erboristeria e Pesca aggiunge Maestro Raccoglitore a 25 Rinomanza, e un fiore lunare in fiore registra il proprio segno del collezionista. Le Imprese sono solo titoli e Rinomanza, mai potere.",
         "fishing": "Il traguardo dei 100 iscrive Vecchio Sale e quello dei 200 iscrive Maestro Pescatore con il suo titolo, il vertice assoluto dell'arte del pescatore; la Pesca conta anche per Maestro Raccoglitore, guadagnato a 100 in tre qualsiasi dei mestieri di raccolta. Un primo pesce dalle acque di ciascuna di sei zone riempie una pagina propria, le tre zone centrali più il Willowfen, il Galecrest e Farshore oltre di esse, e il Koi del Bagliore Solare registra Barlume di Speranza, così i viaggiatori con una canna nello zaino riempiono il loro libro più in fretta di quanto si aspettino.",
+        "miningWithIsle": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Mining inscribes Ore in the Blood. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and cracking a pristine vein records its own collector's mark. Thirteen zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. None of these grant power: deeds are titles and Renown, a record of the roads you have walked.",
+        "loggingWithIsle": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Logging inscribes Heartwood Hewer. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and a strike of ancient heartwood records its own collector's mark. Thirteen zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
+        "herbalismWithIsle": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Herbalism inscribes Master of the Meadow. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and a moonlit bloom records its own collector's mark. Thirteen zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
+        "fishingWithIsle": "The 100 milestone inscribes Old Salt and 200 inscribes Master Angler with its title, the very top of the angler's art; Fishing also counts toward Master Gatherer, earned at 100 in any three gathering trades. A first fish from each of thirteen zones' waters fills its own page, the three heartland zones and the Willowfen, the Galecrest, the Farshore, the Frostveil, the Amberfall, the Nightbloom, the Wraithwood, the Palmreach, the Evergarden, and the Quartered Isle beyond them, and the Sunglint Koi records Glimmer of Hope, so travelers with a pole in their pack fill their book faster than they expect.",
         "farming": "Farming keeps no deeds of its own yet: now that its beds and crops are in the ground, the milestone and cap deeds that mark the other trades arrive in a later patch. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power.",
         "farmingSown": "L’Agricoltura ha ora una propria sezione nel Libro delle Gesta. La Semina Iniziale segna la prima coltura piantata e quattro pagine della cronaca segnano il primo raccolto riuscito in ciascun sito di aiuole, dalla Valle di Eastbrook a Evergarden. Un raccolto dorato registra il proprio segno da collezionista con zero Fama, e la competenza in Agricoltura conta per Maestro Raccoglitore, ottenuto a 100 in tre professioni di raccolta qualsiasi. Ogni Solco Riempito riunisce l’intero elenco in una pagina: fai crescere ogni coltura portata dai quattro giardini e la raccolta si chiude. Sopra c’è Maestro del Raccolto, il titolo della professione a competenza 100, e ora che i semi montani e della parterre sono sui banchi dei loro contadini puoi completare la salita oggi. Le gesta sono solo titoli e Fama, mai potere."
       },
@@ -27010,6 +27020,11 @@ export const it_IT: EnTranslations = {
         "title": "Il Forziere Dorato",
         "greeting": "Ogni cassa, scrigno e ninnolo è al sicuro presso il Forziere Dorato."
       },
+      "bursar_maud_ashby": {
+        "name": "Bursar Maud Ashby",
+        "title": "The Gilded Strongbox",
+        "greeting": "The Gilded Strongbox keeps your goods safe, even on the isle."
+      },
       "brother_aldric_raid": {
         "name": "Fratello Aldric",
         "title": "Sacerdote della Valle",
@@ -30381,6 +30396,57 @@ export const it_IT: EnTranslations = {
           },
           "4": {
             "label": "La Corsa a Ostacoli"
+          }
+        }
+      },
+      "quartered_isle": {
+        "name": "The Quartered Isle",
+        "welcome": "An old rivalry shattered this island four ways. Rivalmoot keeps the foot of the Gyre, above the crater where the war was fought.",
+        "pois": {
+          "0": {
+            "label": "Rivalmoot"
+          },
+          "1": {
+            "label": "The Challengers' Ring"
+          },
+          "2": {
+            "label": "The Hoarbridge"
+          },
+          "3": {
+            "label": "The Hoarshelf"
+          },
+          "4": {
+            "label": "The Cinderscar"
+          },
+          "5": {
+            "label": "The Heavestone Wilds"
+          },
+          "6": {
+            "label": "The Gyre"
+          },
+          "7": {
+            "label": "The Fireice Rift"
+          },
+          "8": {
+            "label": "The Crevasses"
+          },
+          "9": {
+            "label": "The Rimeglass"
+          },
+          "10": {
+            "label": "The Burnways"
+          },
+          "11": {
+            "label": "The Glassfield"
+          },
+          "12": {
+            "label": "The Hammer's Cut"
+          },
+          "13": {
+            "label": "The Heaved Slabs"
+          },
+          "14": {
+            "label": "The Fallen Giant"
           }
         }
       },

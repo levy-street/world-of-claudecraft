@@ -181,6 +181,39 @@ describe('owningRectIndex (terrain chunk cell -> building zone)', () => {
   it('reports -1 for an empty rect list', () => {
     expect(owningRectIndex(0, 0, [])).toBe(-1);
   });
+
+  // The quartered isle's claim, laid out in zone order: the claimed column
+  // rects come FIRST, so a plain first-containing walk would hand them the
+  // overlap.
+  const DRAKELANDS: WorldRect = { minX: 180, maxX: 540, minZ: 1820, maxZ: 2420 };
+  const AMBERFALL: WorldRect = { minX: -540, maxX: -180, minZ: 1820, maxZ: 2380 };
+  const ISLE: WorldRect = {
+    minX: -250,
+    maxX: 250,
+    minZ: 1960,
+    maxZ: 2420,
+    claimsOverlap: true,
+  };
+  const CLAIM_RECTS = [STRIP, DRAKELANDS, AMBERFALL, ISLE];
+
+  it('gives ground a claimsOverlap rect overlaps to the claimer', () => {
+    expect(owningRectIndex(215, 2200, CLAIM_RECTS)).toBe(3);
+    expect(owningRectIndex(-215, 2200, CLAIM_RECTS)).toBe(3);
+  });
+
+  it('leaves the claimed rects their ground outside the claim', () => {
+    expect(owningRectIndex(300, 2200, CLAIM_RECTS)).toBe(1);
+    expect(owningRectIndex(215, 1900, CLAIM_RECTS)).toBe(1);
+    expect(owningRectIndex(-300, 2200, CLAIM_RECTS)).toBe(2);
+    expect(owningRectIndex(0, 0, CLAIM_RECTS)).toBe(0);
+    expect(owningRectIndex(-510, 150, CLAIM_RECTS)).toBe(0);
+  });
+
+  it('is unchanged when the overlapping rect does not claim', () => {
+    const unclaimed = [STRIP, DRAKELANDS, AMBERFALL, { ...ISLE, claimsOverlap: false }];
+    expect(owningRectIndex(215, 2200, unclaimed)).toBe(1);
+    expect(owningRectIndex(-215, 2200, unclaimed)).toBe(2);
+  });
 });
 
 describe('rectDistance', () => {

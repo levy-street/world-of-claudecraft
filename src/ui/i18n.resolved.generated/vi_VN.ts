@@ -9342,6 +9342,8 @@ export const vi_VN: EnTranslations = {
         "gardenBlurb": "Một cõi giới vườn mê cung hàng rào vẫn được xén tỉa gọn gàng dù chưa ai từng thấy bóng dáng một người làm vườn nào, bước vào qua khỏi Hedgewick và những sân đài phun nước của nó.",
         "galeName": "Đỉnh Gió Lộng",
         "galeBlurb": "Những vách đá ven biển và cao nguyên lộng gió nơi cơn gió chẳng bao giờ ngơi nghỉ, và Wickharbor thì luôn đóng chặt cửa nẻo.",
+        "quarteredName": "The Quartered Isle",
+        "quarteredBlurb": "An island shattered four ways by an old rivalry, where Rivalmoot keeps the foot of the storm peak above the crater every challenger comes to win.",
         "levelsCap": "Cấp {level}"
       },
       "group": {
@@ -10286,6 +10288,7 @@ export const vi_VN: EnTranslations = {
       "nightBlurb": "Một cõi giới của đêm khuya lấp lánh sao trời, nơi hoa lá thắp sáng những lối đi và Moonrest lặng lẽ canh giữ dưới bầu trời đang say giấc mộng.",
       "hauntBlurb": "Một khu rừng ma ám dưới những tán cây khổng lồ, nơi những ngọn đèn lồng của Gibbetmere là thứ ánh sáng chân thật duy nhất trên con đường.",
       "galeBlurb": "Những vách đá ven biển và cao nguyên lộng gió nơi cơn gió chẳng bao giờ ngơi nghỉ, Hải Đăng Cổ chẳng bao giờ tắt, và Wickharbor thì luôn đóng chặt cửa nẻo.",
+      "quarteredBlurb": "An island shattered into four quarters of ice, fire, stone and storm by an old rivalry, with the challengers of Rivalmoot keeping their town at the foot of the Gyre and their ring in the crater where the war was fought.",
       "jungleBlurb": "Một mớ bòng bong nhiệt đới của những rặng cọ, cát trắng và tiếng chim ríu rít vang xa, cùng thị trấn ven biển Drifthaven vẫn giữ ngọn lửa cháy sáng trên bãi cát.",
       "gardenBlurb": "Một cõi giới vườn mê cung hàng rào vẫn được xén tỉa gọn gàng dù chưa ai từng thấy bóng dáng một người làm vườn nào, bước vào qua khỏi Hedgewick và những sân đài phun nước của nó.",
       "valeGreeting": "Hãy giữ lưỡi kiếm bên mình. Thung Lũng không còn như xưa nữa.",
@@ -10310,6 +10313,8 @@ export const vi_VN: EnTranslations = {
       "hauntGreeter": "Người Thắp Đèn, Gibbetmere",
       "galeGreeting": "Ở đây gió chưa từng một lần ngừng thổi, và Hải Đăng Cổ chưa từng một lần tắt lửa. Nhớ đóng cửa quán trọ lại sau lưng nhé.",
       "galeGreeter": "Người Giữ Hải Đăng, Wickharbor",
+      "quarteredGreeting": "Every party that comes down into the crater swears it will be the one to hold the ring. Go down when the hill rises and prove it.",
+      "quarteredGreeter": "A challenger, Rivalmoot",
       "jungleGreeting": "Cát ấm, tiếng chim ríu rít, và một khu rừng rậm nuốt trọn cả chân trời. Chúng tôi luôn giữ một ngọn lửa cháy trên bãi biển; cố mà quay về với nó nhé.",
       "jungleGreeter": "Nữ Quản Cảng, Drifthaven",
       "gardenGreeting": "Vẫn có ai đó đang xén tỉa hàng rào, dù đã cả trăm năm nay chẳng ai thấy bóng dáng người làm vườn. Hãy cẩn thận với mê cung: nó cũng đang để mắt tới bạn đấy.",
@@ -10325,6 +10330,7 @@ export const vi_VN: EnTranslations = {
       "nightPlaceNotes": "Moonrest giữ vững buổi canh thức. Nightgate là lối vào miền đất nửa đêm; Moonspring lưu giữ ánh sao mà bạn có thể đứng cạnh bên; Gloamfield nở hoa trong bóng tối; Đài Canh Thức Bất Động dõi trông mà chẳng bao giờ lay động; còn Gò Mộ Không Ngủ là nơi duy nhất ở đây chẳng bao giờ chìm vào giấc mộng.",
       "hauntPlaceNotes": "Gibbetmere co cụm bên trong vòng đèn lồng của mình. Crowgate là cánh cửa u ám của khu rừng; Bụi Rậm Của Góa Phụ giăng kín tơ nhện dày đặc; Khoảng Rừng Treo và Nhà Nguyện Mournstone giữ lại những nỗi đau cổ xưa nhất của khu rừng; còn Bãi Trống Của Thợ Săn thuộc về bất cứ thứ gì vẫn còn săn đuổi nơi đó.",
       "galePlaceNotes": "Wickharbor nghiêng mình đón gió. Windway là con đường vách đá dẫn vào; Cao Nguyên Gào Thét trải dài trọc lóc dưới cơn cuồng phong; Hải Đăng Cổ đã cháy sáng lâu đến mức không ai còn nhớ nổi từ bao giờ; Shear đổ dốc thẳng đứng xuống mặt nước; Wreckfields giữ cho bờ biển này luôn thành thật; còn Hồ Gương là thứ duy nhất còn tĩnh lặng trong cả cõi này.",
+      "quarteredPlaceNotes": "Rivalmoot stands at the foot of the Gyre, where the climb to the council's seat begins. The Hoarbridge carries the road over the strait from the Frostveil; the Hoarshelf lies white, cold and broken below; the Challengers' Ring waits on the floor of the great crater, the old war's heart, for the next King of the Hill; the Cinderscar smoulders toward the Drakelands; the Heavestone Wilds heave toward the Amberfall; and the Gyre turns its storm above them all.",
       "junglePlaceNotes": "Drifthaven giữ ngọn lửa của mình trên bãi biển. Tanglemouth là nơi dòng sông gặp bức tường xanh thẳm; Palmstrand chạy dài trắng xóa và ấm áp dọc theo sóng biển; Rừng Rậm Ngọc Lục Bảo và Vinefall nuốt trọn vùng nội địa; Đầm Phá Lam Ngọc tỏa sáng trong vắt và sâu thẳm; còn Tượng Thần Chìm dõi theo từ dưới làn nước.",
       "gardenPlaceNotes": "Hedgewick chờ đợi ngay tại Cổng Vườn. Lối Đi Bồn Hoa nở rộ sắc màu được xén tỉa gọn gàng; Lâu Đài Dawnhold vẫn huấn luyện hiệp sĩ sau những bức tường mới; Ao Cánh Hoa trôi dạt sắc hồng quanh năm; Cối Xay Cũ vẫn tự xoay vòng luống hoa của riêng nó; Đại Mê Cung thay đổi cách cư xử cho từng vị khách, những vòm cổng của nó được canh giữ bởi lũ cáo lá; Trạm Gác Phương Bắc trấn giữ con đường ra; Bồn Hoa Huệ nghỉ ngơi phía sau tất cả; và Sân Đài Phun Nước vẫn chảy trong vắt tại trái tim khu vườn.",
       "gladeTitle": "Một góc tĩnh lặng: Brightwood Glade",
@@ -11116,6 +11122,10 @@ export const vi_VN: EnTranslations = {
         "logging": "Lần đầu tiên bạn thu hoạch điểm tài nguyên của bất kỳ nghề nào sẽ đạt được thành tích Hoa Quả Của Đồng Ruộng, và giới hạn 100 trong Đốn Gỗ khắc ghi danh hiệu Thợ Chặt Cốt Lõi. Đạt 100 trong bất kỳ ba trong số Khai Khoáng, Đốn Gỗ, Thảo Dược Học, và Câu Cá thêm danh hiệu Thợ Thu Thập Thành Thạo với 25 Danh Vọng, và một khúc gỗ cốt lõi cổ xưa sẽ ghi lại dấu ấn sưu tập riêng của nó. Thành tích chỉ là danh hiệu và Danh Vọng, không bao giờ là sức mạnh.",
         "herbalism": "Lần đầu tiên bạn thu hoạch điểm tài nguyên của bất kỳ nghề nào sẽ đạt được thành tích Hoa Quả Của Đồng Ruộng, và giới hạn 100 trong Thảo Dược Học khắc ghi danh hiệu Người Thành Thạo Đồng Nội. Đạt 100 trong bất kỳ ba trong số Khai Khoáng, Đốn Gỗ, Thảo Dược Học, và Câu Cá thêm danh hiệu Thợ Thu Thập Thành Thạo với 25 Danh Vọng, và một bông hoa nở dưới ánh trăng sẽ ghi lại dấu ấn sưu tập riêng của nó. Thành tích chỉ là danh hiệu và Danh Vọng, không bao giờ là sức mạnh.",
         "fishing": "Cột mốc 100 khắc ghi Lão Muối và 200 khắc ghi Ngư Sư Thành Thạo cùng danh hiệu của nó, đỉnh cao nhất của nghệ thuật câu cá; Câu Cá cũng tính cho Thợ Thu Thập Thành Thạo, kiếm được khi đạt 100 ở bất kỳ ba nghề thu thập nào. Con cá đầu tiên từ vùng nước của mỗi khu vực trong sáu khu vực lấp đầy một trang riêng, ba vùng lõi cùng Đầm Liễu, Đỉnh Gió Lộng, và Bờ Biển Xa Xôi ở xa hơn, còn Cá Koi Ánh Nắng thì ghi Tia Hy Vọng, nên những lữ khách mang theo cần câu trong hành trang lấp đầy sách của mình nhanh hơn họ tưởng.",
+        "miningWithIsle": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Mining inscribes Ore in the Blood. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and cracking a pristine vein records its own collector's mark. Thirteen zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. None of these grant power: deeds are titles and Renown, a record of the roads you have walked.",
+        "loggingWithIsle": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Logging inscribes Heartwood Hewer. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and a strike of ancient heartwood records its own collector's mark. Thirteen zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
+        "herbalismWithIsle": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Herbalism inscribes Master of the Meadow. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and a moonlit bloom records its own collector's mark. Thirteen zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
+        "fishingWithIsle": "The 100 milestone inscribes Old Salt and 200 inscribes Master Angler with its title, the very top of the angler's art; Fishing also counts toward Master Gatherer, earned at 100 in any three gathering trades. A first fish from each of thirteen zones' waters fills its own page, the three heartland zones and the Willowfen, the Galecrest, the Farshore, the Frostveil, the Amberfall, the Nightbloom, the Wraithwood, the Palmreach, the Evergarden, and the Quartered Isle beyond them, and the Sunglint Koi records Glimmer of Hope, so travelers with a pole in their pack fill their book faster than they expect.",
         "farming": "Farming keeps no deeds of its own yet: now that its beds and crops are in the ground, the milestone and cap deeds that mark the other trades arrive in a later patch. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power.",
         "farmingSown": "Nông Nghiệp giờ có một ngăn riêng trong Sổ Chiến Công. Bắt Đầu Gieo Hạt ghi cây đầu tiên, bốn trang biên niên ghi vụ thu hoạch đầu tiên thành công tại từng nơi có luống, từ Eastbrook Vale đến Evergarden. Thu hoạch vàng ghi dấu thu thập không Danh Tiếng riêng, kỹ năng Nông Nghiệp tính vào Bậc Thầy Thu Thập, đạt 100 ở bất kỳ ba nghề thu thập nào. Mỗi Rãnh Đầy Đủ gom cả danh sách vào một trang: trồng mọi cây bốn khu vườn mang và bộ sưu tập khép lại. Phía trên là Bậc Thầy Mùa Gặt, danh hiệu nghề ở kỹ năng 100, và giờ hạt núi cùng vườn đã ở quầy nông dân nên có thể hoàn thành ngay. Chiến công chỉ là danh hiệu và Danh Tiếng, không bao giờ là sức mạnh."
       },
@@ -27010,6 +27020,11 @@ export const vi_VN: EnTranslations = {
         "title": "Két Sắt Mạ Vàng",
         "greeting": "Mọi thùng hàng, rương tiền, và món trang sức đều an toàn trong tay Két Sắt Mạ Vàng."
       },
+      "bursar_maud_ashby": {
+        "name": "Bursar Maud Ashby",
+        "title": "The Gilded Strongbox",
+        "greeting": "The Gilded Strongbox keeps your goods safe, even on the isle."
+      },
       "brother_aldric_raid": {
         "name": "Tu Huynh Aldric",
         "title": "Tu Sĩ Thung Lũng",
@@ -30381,6 +30396,57 @@ export const vi_VN: EnTranslations = {
           },
           "4": {
             "label": "Vòng Khổ Luyện"
+          }
+        }
+      },
+      "quartered_isle": {
+        "name": "The Quartered Isle",
+        "welcome": "An old rivalry shattered this island four ways. Rivalmoot keeps the foot of the Gyre, above the crater where the war was fought.",
+        "pois": {
+          "0": {
+            "label": "Rivalmoot"
+          },
+          "1": {
+            "label": "The Challengers' Ring"
+          },
+          "2": {
+            "label": "The Hoarbridge"
+          },
+          "3": {
+            "label": "The Hoarshelf"
+          },
+          "4": {
+            "label": "The Cinderscar"
+          },
+          "5": {
+            "label": "The Heavestone Wilds"
+          },
+          "6": {
+            "label": "The Gyre"
+          },
+          "7": {
+            "label": "The Fireice Rift"
+          },
+          "8": {
+            "label": "The Crevasses"
+          },
+          "9": {
+            "label": "The Rimeglass"
+          },
+          "10": {
+            "label": "The Burnways"
+          },
+          "11": {
+            "label": "The Glassfield"
+          },
+          "12": {
+            "label": "The Hammer's Cut"
+          },
+          "13": {
+            "label": "The Heaved Slabs"
+          },
+          "14": {
+            "label": "The Fallen Giant"
           }
         }
       },

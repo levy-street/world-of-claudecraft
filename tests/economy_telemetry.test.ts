@@ -108,6 +108,7 @@ describe('harvest band classification (zone-keyed, R3)', () => {
       'galecrest',
       'farshore_isle',
       'proving_shore', // the tutorial island: 15th zone, 15th band
+      'quartered_isle', // the Quartered Isle: 16th zone, 16th band
     ]);
   });
 

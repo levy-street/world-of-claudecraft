@@ -141,6 +141,7 @@ const BIOME_HEX: Record<BiomeId, [number, number, number]> = {
   jungle: [63, 112, 64],
   garden: [111, 168, 94],
   gale: [127, 154, 143],
+  quartered: [150, 136, 108],
 };
 const WATER_DEEP: [number, number, number] = [30, 58, 92];
 const WATER_SHALLOW: [number, number, number] = [47, 95, 134];

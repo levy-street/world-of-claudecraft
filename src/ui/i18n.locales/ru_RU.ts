@@ -9577,6 +9577,24 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.zones.galecrest.pois.5.label': 'Поля Кораблекрушений',
   'entities.zones.galecrest.pois.6.label': 'Зеркальное Озеро',
   'entities.zones.galecrest.pois.7.label': 'Конюшни Гейлкреста',
+  'entities.zones.quartered_isle.name': 'Четырёхчастный остров',
+  'entities.zones.quartered_isle.welcome':
+    'Давнее соперничество раскололо этот остров на четыре части. Ривалмут стоит у подножия Вихревого пика, над кратером, где шла война.',
+  'entities.zones.quartered_isle.pois.0.label': 'Ривалмут',
+  'entities.zones.quartered_isle.pois.1.label': 'Арена претендентов',
+  'entities.zones.quartered_isle.pois.2.label': 'Иневый мост',
+  'entities.zones.quartered_isle.pois.3.label': 'Иневый шельф',
+  'entities.zones.quartered_isle.pois.4.label': 'Пепельный шрам',
+  'entities.zones.quartered_isle.pois.5.label': 'Дебри Вздыбленного камня',
+  'entities.zones.quartered_isle.pois.6.label': 'Вихревой пик',
+  'entities.zones.quartered_isle.pois.7.label': 'Огнеледяной разлом',
+  'entities.zones.quartered_isle.pois.8.label': 'Трещины',
+  'entities.zones.quartered_isle.pois.9.label': 'Иневое Зерцало',
+  'entities.zones.quartered_isle.pois.10.label': 'Огненные русла',
+  'entities.zones.quartered_isle.pois.11.label': 'Стеклянное поле',
+  'entities.zones.quartered_isle.pois.12.label': 'Разрез Молота',
+  'entities.zones.quartered_isle.pois.13.label': 'Вздыбленные плиты',
+  'entities.zones.quartered_isle.pois.14.label': 'Павший великан',
   'entities.npcs.warden_coalfast.name': 'Смотритель Хладоуголь',
   'entities.npcs.warden_coalfast.title': 'Комендант редута',
   'entities.npcs.warden_coalfast.greeting':
@@ -12517,6 +12535,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Населённый призраками лес под исполинскими кронами, где фонари Гиббетмира, единственный честный свет на дороге.',
   'guide.worldPage.galeBlurb':
     'Морские утёсы и воющие холмы, где ветер не знает покоя, Старый Маяк никогда не гаснет, а Викхарбор крепко запирает свои двери.',
+  'guide.worldPage.quarteredBlurb':
+    'Остров, расколотый давним соперничеством на четыре края: льда, огня, камня и бури. Претенденты Ривалмута держат свой город у подножия Вихревого пика, а арену в кратере, где шла война.',
   'guide.worldPage.jungleBlurb':
     'Тропическое сплетение пальм, белого песка и громких птиц, где пляжный городок Дрифтхейвен держит костёр на берегу.',
   'guide.worldPage.gardenBlurb':
@@ -12542,6 +12562,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.galeGreeting':
     'Ветер здесь не стихал ни разу, и Старый Маяк ни разу не гас. Закрой за собой дверь таверны.',
   'guide.worldPage.galeGreeter': 'Смотритель маяка, Викхарбор',
+  'guide.worldPage.quarteredGreeting':
+    'Каждый отряд, что спускается в кратер, клянётся удержать арену. Когда холм восстанет, спустись и докажи это.',
+  'guide.worldPage.quarteredGreeter': 'Претендент, Ривалмут',
   'guide.worldPage.jungleGreeting':
     'Тёплый песок, громкие птицы и джунгли, пожирающие горизонт. Мы держим костёр на берегу; постарайся к нему вернуться.',
   'guide.worldPage.jungleGreeter': 'Хозяйка гавани, Дрифтхейвен',
@@ -12562,6 +12585,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Гиббетмир жмётся к своим фонарям. Вороньи Врата, это мрачная парадная дверь леса; Вдовья Чаща густо оплетена паутиной; Висельная Поляна и Часовня Скорбного Камня хранят самые старые скорби этого леса; а Поляна Ловчего принадлежит тому, что до сих пор там охотится.',
   'guide.worldPage.galePlaceNotes':
     'Викхарбор стоит, накренившись против ветра. Ветровой Проход, это дорога по утёсам на входе; Воющие Холмы катятся под бурей без единого дерева; Старый Маяк горит столько, сколько кто-либо может припомнить; Отвесный Срез обрывается прямо к воде; Поля Кораблекрушений держат побережье в строгости; а Зеркальное Озеро, единственная неподвижная вещь во всём этом краю.',
+  'guide.worldPage.quarteredPlaceNotes':
+    'Ривалмут стоит у подножия Вихревого пика, там, где начинается подъём к престолу совета. Иневый мост ведёт дорогу через пролив из Морозного Предела; Иневый шельф лежит внизу, белый, холодный и расколотый; Арена претендентов ждёт следующего Короля горы на дне большого кратера, сердца старой войны; Пепельный шрам тлеет в сторону Земель Драконов; Дебри Вздыбленного камня вздымаются к Янтарной Пади; а Вихревой пик кружит свою бурю над всем этим.',
   'guide.worldPage.junglePlaceNotes':
     'Дрифтхейвен держит костёр на берегу. Заросшее Устье, это место, где река встречает зелёную стену; Пальмовая Коса тянется белой тёплой полосой вдоль прибоя; Изумрудная Чаща и Лианопад поглощают всё, что дальше от берега; Сапфировая Лагуна светится, прозрачная и глубокая; а Затонувший Идол наблюдает из-под воды.',
   'guide.worldPage.gardenPlaceNotes':
@@ -15744,6 +15769,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.bursar_aldous_crane.title': 'Золочёный сундук',
   'entities.npcs.bursar_aldous_crane.greeting':
     'Любой ящик, ларец и безделушка в Золочёном сундуке в полной сохранности.',
+  'entities.npcs.bursar_maud_ashby.name': 'Казначей Мод Эшби',
+  'entities.npcs.bursar_maud_ashby.title': 'Золочёный сундук',
+  'entities.npcs.bursar_maud_ashby.greeting':
+    'Золочёный сундук сохранит ваше добро даже на этом острове.',
   'entities.items.furyforged_warhelm.name': 'Боевой шлем яростной ковки',
   'entities.items.furyforged_warspaulders.name': 'Боевые наплечники яростной ковки',
   'entities.items.furyforged_warplate.name': 'Боевой панцирь яростной ковки',
@@ -18721,6 +18750,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Ваша первая жила любого ремесла зарабатывает Fruits of the Field, а предел в 100 в Herbalism вписывает Master of the Meadow. Достижение 100 в любых трех собирательских ремеслах добавляет Master Gatherer при 25 Известности, а moonlit bloom записывает собственную коллекционную отметку. Деяния, это только титулы и Известность, никогда не сила.',
   'guide.profPages.gatherDeeds.fishing':
     'Рубеж в 100 вписывает Old Salt, а 200 вписывает Master Angler с его титулом, самую вершину искусства рыбака; Fishing также засчитывается в Master Gatherer, зарабатываемый при 100 в любых трех собирательских ремеслах. Первая рыба из вод каждой зоны заполняет свою страницу, а Кои солнечного блика записывает Glimmer of Hope, так что путники с удочкой в котомке заполняют книгу быстрее, чем ожидают.',
+  'guide.profPages.gatherDeeds.miningWithIsle':
+    'Ваша первая жила любого ремесла зарабатывает Fruits of the Field, а предел в 100 в Mining вписывает Ore in the Blood. Достижение 100 в любых трех собирательских ремеслах добавляет Master Gatherer при 25 Известности, а вскрытие pristine vein записывает собственную коллекционную отметку. Ничто из этого не дает силы: деяния, это титулы и Известность, летопись дорог, что вы прошли.',
+  'guide.profPages.gatherDeeds.loggingWithIsle':
+    'Ваша первая жила любого ремесла зарабатывает Fruits of the Field, а предел в 100 в Logging вписывает Heartwood Hewer. Достижение 100 в любых трех собирательских ремеслах добавляет Master Gatherer при 25 Известности, а срез ancient heartwood записывает собственную коллекционную отметку. Деяния, это только титулы и Известность, никогда не сила.',
+  'guide.profPages.gatherDeeds.herbalismWithIsle':
+    'Ваша первая жила любого ремесла зарабатывает Fruits of the Field, а предел в 100 в Herbalism вписывает Master of the Meadow. Достижение 100 в любых трех собирательских ремеслах добавляет Master Gatherer при 25 Известности, а moonlit bloom записывает собственную коллекционную отметку. Деяния, это только титулы и Известность, никогда не сила.',
+  'guide.profPages.gatherDeeds.fishingWithIsle':
+    'Рубеж в 100 вписывает Old Salt, а 200 вписывает Master Angler с его титулом, самую вершину искусства рыбака; Fishing также засчитывается в Master Gatherer, зарабатываемый при 100 в любых трех собирательских ремеслах. Первая рыба из вод каждой зоны заполняет свою страницу, а Кои солнечного блика записывает Glimmer of Hope, так что путники с удочкой в котомке заполняют книгу быстрее, чем ожидают.',
   'guide.profPages.gatherDeeds.farming':
     'У земледелия пока нет собственных деяний: теперь, когда грядки и культуры укоренились, вехи и деяния предела, что отмечают другие ремесла, придут с одним из будущих обновлений. Его мастерство уже засчитывается в Master Gatherer, зарабатываемый при 100 в любых трех собирательских ремеслах, так что земледелец заполнит эту страницу наравне со всеми. Деяния дают только титулы и известность, но никогда не силу.',
   'guide.profPages.gatherDeeds.farmingSown':
@@ -20212,6 +20249,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.home.world.farshoreName': 'Дальний Берег',
   'guide.home.world.galeBlurb':
     'Морские утёсы и воющие холмы, где ветер не стихает ни на миг, а Викхарбор наглухо запирает двери.',
+  'guide.home.world.quarteredName': 'Четырёхчастный остров',
+  'guide.home.world.quarteredBlurb':
+    'Остров, расколотый давним соперничеством на четыре части: Ривалмут стоит у подножия грозового пика над кратером, за который бьётся каждый претендент.',
   'guide.home.world.galeName': 'Гейлкрест',
   'guide.home.world.gardenBlurb':
     'Царство живых изгородей, которые до сих пор подстригает садовник, которого никто и никогда не видел; вход туда лежит за Хеджвиком и его фонтанными дворами.',

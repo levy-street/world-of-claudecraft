@@ -49,6 +49,8 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 
 const SEED = WORLD_SEED;
 const PUBLIC = new URL('../public', import.meta.url);
+// Towns built new on ground no kit town ever stood on: nothing to replace.
+const BUILT_NEW = new Set<string>(['rivalmoot']);
 
 /** Every point of an OBB on a grid of `step` (edges included). */
 function samplesOf(obb: Obb2, step = 0.5): { x: number; z: number }[] {
@@ -263,7 +265,8 @@ function describePaintedTown(town: PaintedTownLayout): void {
     });
 
     it('replaced its kit records, and the zone file carries exactly the layout', () => {
-      expect(town.replacedKitBuildings.length).toBeGreaterThan(0);
+      // a town built new (no kit town stood there before) replaced nothing
+      if (!BUILT_NEW.has(town.id)) expect(town.replacedKitBuildings.length).toBeGreaterThan(0);
       for (const def of paintedTownBuildingDefs(town)) {
         expect(zoneRecords, def.id).toContainEqual(def);
       }

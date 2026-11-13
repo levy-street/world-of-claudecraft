@@ -2124,7 +2124,15 @@ const MONOLITHS: MonolithRow[] = [
     // Merge of the four dungeon entrances (#4478): both parents' additions combine
     // (ours is the palm scatter's decoration exclusion check), exact merged count,
     // within the release/v0.45.0 ceiling the branch was held to.
-    ceiling: 5133,
+    // The Quartered Isle's coast hooks rode in with the Frostveil and Amberfall
+    // coast tables extracted to content/frost_coast.ts and content/amber_coast.ts
+    // (the ember_coast.ts pattern), so the file shrank: exact count.
+    // The isle's claim seams and landmark applier rode in with the shared
+    // metaball coastline evaluator extracted to metaball_landness.ts: exact
+    // count, lowered. The runtime biome id list then moved to biome_ids.ts as
+    // an exhaustive record (a biome missing from it downgraded its zone to
+    // 'vale' on a saved-map round trip): exact count, lowered again.
+    ceiling: 5038,
     seam: 'zone/terrain data as content records; logic as sim sibling modules',
   },
   {
@@ -2330,7 +2338,9 @@ const MONOLITHS: MonolithRow[] = [
     // v0.45 integration sync at 78c350c8d55 into cel-shading-rnd:
     // parent pins 3996 and 3864; combined existing wiring,
     // exact merged count with no new coordinator behavior or slack.
-    ceiling: 3867,
+    // Lowered after moving the scatter boulders' tint table into
+    // src/render/scatter_rock_tint_core.ts (the Cinderscar's black basalt).
+    ceiling: 3846,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {

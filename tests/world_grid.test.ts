@@ -64,13 +64,18 @@ describe('the continent derives the right border set', () => {
     });
   });
 
-  it('has twelve horizontal borders and sixteen column edges', () => {
+  it('has fifteen horizontal borders and eighteen column edges', () => {
     // the Farshore adds a v-edge against the vale and an h-line under the
     // Galecrest: both are open-sea borders with no isthmus (ferry only); the
     // Proving Shore mirrors both on the east column (v-edge against the
-    // vale, h-line under the Willowfen), open sea with the ferry portal only
-    expect(edges.filter((e) => e.kind === 'h').length).toBe(12);
-    expect(edges.filter((e) => e.kind === 'v').length).toBe(16);
+    // vale, h-line under the Willowfen), open sea with the ferry portal only;
+    // the Quartered Isle adds the Hoarbridge h-line over the Reach and a
+    // v-edge against each of the Drakelands and the Amberfall; its claim on
+    // the columns' inner 70yd (claimsOverlap) moves those v-edges out to
+    // x +-250 and adds a strait h-line under each claimed flank, where the
+    // columns' southern ground meets the isle
+    expect(edges.filter((e) => e.kind === 'h').length).toBe(15);
+    expect(edges.filter((e) => e.kind === 'v').length).toBe(18);
   });
 
   it('every crossing sits where the atlas says', () => {
@@ -93,6 +98,12 @@ describe('the continent derives the right border set', () => {
     expect(findH(1260, -540, -330), 'the Nightgate (jungle to dark)').toBeTruthy();
     expect(findH(1820, 180, 404), 'the Wyrmroad (wood to waste)').toBeTruthy();
     expect(findH(1820, -540, -350), 'the gold road (dark to autumn)').toBeTruthy();
+    expect(findH(1960, -180, 22), 'the Hoarbridge (frost to the isle)').toBeTruthy();
+    expect(findV(250, 1960, 2064), 'the Cinderscar crossing (isle to waste)').toBeTruthy();
+    expect(findV(-250, 1960, 2244), 'the Heavestone crossing (autumn to isle)').toBeTruthy();
+    // the claimed flanks' south lines are strait, like the Hoarbridge's
+    expect(findH(1960, 180, 22)?.water, 'the east flank strait').toBe(true);
+    expect(findH(1960, -250, 22)?.water, 'the west flank strait').toBe(true);
   });
 
   it('the sealed Hollow wall survives, bounded to the strip', () => {
@@ -118,7 +129,9 @@ describe('the continent derives the right border set', () => {
     for (const z of [2000, 2300]) {
       expect(worldXBoundsAt(z)).toEqual({ min: -540, max: 540 });
     }
-    expect(worldXBoundsAt(2400)).toEqual({ min: 180, max: 540 });
+    // north of the Amberfall's end the row is the isle (out to its claimed
+    // west flank) and the Drakelands
+    expect(worldXBoundsAt(2400)).toEqual({ min: -250, max: 540 });
   });
 
   it('reuses frozen row bounds and invalidates them on a content generation change', () => {
@@ -205,7 +218,7 @@ describe('the interior waters are landlocked', () => {
     for (const [x, z] of [
       [-560, 1200],
       [560, 1200],
-      [0, 2100],
+      [0, 2412], // past the Quartered Isle's north shore
       [-560, 2300],
     ]) {
       expect(terrainHeight(x, z, 20061), `ocean at ${x},${z}`).toBeLessThan(WATER_LEVEL);

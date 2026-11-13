@@ -705,9 +705,10 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 346, its 24 pending on the dungeon crest.
     // 352 with Lantern Hall's six after the integration45 backlog supplied all 57 formerly
     // missing crests: only the six, on the pending ledger, have no painting.
-    expect(DEED_ORDER).toHaveLength(369);
+    // 372 with the Quartered Isle's three (chronicle pair and the four-branch bank tour), all pending.
+    expect(DEED_ORDER).toHaveLength(372);
     // Release adds Titan, five PvP streak titles and the Hard wisp maze (7).
-    expect(DEED_ART_PENDING.size).toBe(13);
+    expect(DEED_ART_PENDING.size).toBe(16);
     for (const id of [
       'feat_gourdlight_doorsteps',
       'feat_gourdlight_errands',
