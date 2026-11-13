@@ -1873,6 +1873,8 @@ export const ko_KR: EnTranslations = {
       "quickActionsAria": "빠른 실행. 탭하면 탈것, 채팅, 지도, 가방 등의 실행 줄이 열리고, 길게 누른 뒤 오른쪽으로 밀면 항목을 선택할 수 있습니다.",
       "quickActionsAriaTap": "빠른 실행. 탭하면 탈것, 채팅, 지도, 가방 등의 실행 줄이 열리며, 항목을 탭해 선택합니다. 컨트롤을 다시 탭하면 닫힙니다.",
       "quickActionsLabel": "실행",
+      "whisperUnreadOverflow": "{count}+",
+      "whisperUnreadDesc": "{channel}: {count}",
       "stanceRadial": "태세",
       "stanceAnchorAria": "태세: {stance}. 탭하여 태세 링을 열고 다른 태세를 선택하세요.",
       "stanceAnchorEmptyAria": "태세 없음. 탭하여 태세 링을 열고 태세를 선택하세요.",

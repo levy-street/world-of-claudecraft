@@ -1873,6 +1873,8 @@ export const fr_FR: EnTranslations = {
       "quickActionsAria": "Actions rapides. Touchez pour ouvrir la rangée montures, discussion, carte, sacs et plus encore, ou maintenez et glissez vers la droite pour en choisir une.",
       "quickActionsAriaTap": "Actions rapides. Touchez pour ouvrir la rangée montures, discussion, carte, sacs et plus encore, puis touchez un élément. Touchez à nouveau le contrôle pour fermer.",
       "quickActionsLabel": "Actions",
+      "whisperUnreadOverflow": "{count}+",
+      "whisperUnreadDesc": "{channel}: {count}",
       "stanceRadial": "Postures",
       "stanceAnchorAria": "Posture : {stance}. Touchez pour ouvrir la roue des postures, puis choisissez une autre posture.",
       "stanceAnchorEmptyAria": "Aucune posture. Touchez pour ouvrir la roue des postures, puis choisissez une posture.",

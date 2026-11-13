@@ -1873,6 +1873,8 @@ export const it_IT: EnTranslations = {
       "quickActionsAria": "Azioni Rapide. Tocca per aprire la fila di cavalcatura, chat, mappa, borse e altro, oppure tieni premuto e scorri verso destra per sceglierne una.",
       "quickActionsAriaTap": "Azioni Rapide. Tocca per aprire la fila di cavalcatura, chat, mappa, borse e altro, poi tocca un elemento. Tocca di nuovo il controllo per chiudere.",
       "quickActionsLabel": "Azioni",
+      "whisperUnreadOverflow": "{count}+",
+      "whisperUnreadDesc": "{channel}: {count}",
       "stanceRadial": "Posizioni",
       "stanceAnchorAria": "Posizione: {stance}. Tocca per aprire l'anello delle posizioni, poi scegli un'altra posizione.",
       "stanceAnchorEmptyAria": "Nessuna posizione. Tocca per aprire l'anello delle posizioni, poi scegli una posizione.",

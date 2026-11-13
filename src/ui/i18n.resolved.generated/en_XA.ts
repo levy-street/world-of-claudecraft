@@ -1873,6 +1873,8 @@ export const en_XA: EnTranslations = {
       "quickActionsAria": "[Ɋúíçķ Áçţíóñš. Ţáþ ţó óþéñ ţĥé ŕóŵ óƒ ɱóúñţ, çĥáţ, ɱáþ, ƀáĝš áñð ɱóŕé, óŕ ĥóļð áñð šŵíþé ŕíĝĥţ ţó þíçķ óñé.]",
       "quickActionsAriaTap": "[Ɋúíçķ Áçţíóñš. Ţáþ ţó óþéñ ţĥé ŕóŵ óƒ ɱóúñţ, çĥáţ, ɱáþ, ƀáĝš áñð ɱóŕé, ţĥéñ ţáþ áñ íţéɱ. Ţáþ ţĥé çóñţŕóļ áĝáíñ ţó çļóšé.]",
       "quickActionsLabel": "[Áçţíóñš]",
+      "whisperUnreadOverflow": "[{count}+]",
+      "whisperUnreadDesc": "[{channel}: {count}]",
       "stanceRadial": "[Šţáñçéš]",
       "stanceAnchorAria": "[Šţáñçé: {stance}. Ţáþ ţó óþéñ ţĥé šţáñçé ŕíñĝ, ţĥéñ þíçķ áñóţĥéŕ šţáñçé.]",
       "stanceAnchorEmptyAria": "[Ñó šţáñçé. Ţáþ ţó óþéñ ţĥé šţáñçé ŕíñĝ, ţĥéñ þíçķ á šţáñçé.]",

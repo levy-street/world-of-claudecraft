@@ -9,6 +9,7 @@ import {
   chatOpenTabLabelKey,
   composeChatLine,
   composeWhisperReply,
+  DEFAULT_CHAT_TABS,
   isChatOpenTab,
   isChatTabChannel,
   parseChatTabs,
@@ -166,11 +167,21 @@ describe('chat channel tabs — pure model', () => {
     });
 
     it('is defensive against corrupt, malformed, or forward-version blobs', () => {
-      expect(parseChatTabs(null)).toEqual([]);
+      expect(parseChatTabs('')).toEqual([]);
       expect(parseChatTabs('not json')).toEqual([]);
       expect(parseChatTabs('{"a":1}')).toEqual([]); // not an array
       // 'whisper' is a valid (filter-only) tab now; 'bogus'/42 are still dropped
       expect(parseChatTabs('["world","bogus","whisper",42]')).toEqual(['world', 'whisper']);
+    });
+
+    it('defaults to a Whisper tab only when nothing was ever saved', () => {
+      expect(DEFAULT_CHAT_TABS).toEqual([WHISPER_TAB]);
+      expect(parseChatTabs(null)).toEqual([WHISPER_TAB]);
+      // A fresh copy each time: the caller mutates its list.
+      expect(parseChatTabs(null)).not.toBe(parseChatTabs(null));
+      // Any saved value wins, including "the player closed every tab".
+      expect(parseChatTabs('[]')).toEqual([]);
+      expect(parseChatTabs('["party"]')).toEqual(['party']);
     });
 
     it('round-trips the whisper collector tab alongside channels', () => {

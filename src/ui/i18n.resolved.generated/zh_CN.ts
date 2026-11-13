@@ -1873,6 +1873,8 @@ export const zh_CN: EnTranslations = {
       "quickActionsAria": "快捷操作。点按打开坐骑、聊天、地图、背包等操作行，或按住并向右滑动进行选择。",
       "quickActionsAriaTap": "快捷操作。点按打开坐骑、聊天、地图、背包等操作行，然后点按其中一项。再次点按该控件可关闭。",
       "quickActionsLabel": "操作",
+      "whisperUnreadOverflow": "{count}+",
+      "whisperUnreadDesc": "{channel}: {count}",
       "stanceRadial": "姿态",
       "stanceAnchorAria": "姿态：{stance}。点按打开姿态环，然后选择其他姿态。",
       "stanceAnchorEmptyAria": "无姿态。点按打开姿态环，然后选择一种姿态。",

@@ -1873,6 +1873,8 @@ export const nl_NL: EnTranslations = {
       "quickActionsAria": "Snelacties. Tik om de rij met rijdier, chat, kaart, tassen en meer te openen, of houd vast en veeg naar rechts om er een te kiezen.",
       "quickActionsAriaTap": "Snelacties. Tik om de rij met rijdier, chat, kaart, tassen en meer te openen, tik dan op een item. Tik nogmaals op de knop om te sluiten.",
       "quickActionsLabel": "Acties",
+      "whisperUnreadOverflow": "{count}+",
+      "whisperUnreadDesc": "{channel}: {count}",
       "stanceRadial": "Houdingen",
       "stanceAnchorAria": "Houding: {stance}. Tik om de houdingsring te openen en kies dan een andere houding.",
       "stanceAnchorEmptyAria": "Geen houding. Tik om de houdingsring te openen en kies dan een houding.",

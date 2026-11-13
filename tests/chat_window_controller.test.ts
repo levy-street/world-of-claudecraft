@@ -236,8 +236,34 @@ describe('ChatWindowController', () => {
     expect(harness.shownPanes.at(-1)).toBe(harness.combatLog);
   });
 
-  it('mirrors typed joins without sending a duplicate command or changing the send tab', () => {
+  it('gives a player with no saved layout a Whisper tab, without selecting or saving it', () => {
     const harness = makeHarness();
+    harness.controller.init();
+
+    expect(tabButton(harness, 'whisper').textContent).toBe(t('hud.chat.context.whisper'));
+    expect(tabButton(harness, 'all').classList.contains('active')).toBe(true);
+    expect(harness.controller.composeSend('hello')).toBe('/say hello');
+    // Nothing is written until the player changes something themselves.
+    expect(harness.storage.getItem('woc_chat_tabs')).toBeNull();
+  });
+
+  it('leaves every saved layout as it is, including one with all tabs closed', () => {
+    const emptied = makeHarness({ woc_chat_tabs: '[]' });
+    emptied.controller.init();
+    expect(tabsBar(emptied).children.some((child) => child.dataset.tab === 'whisper')).toBe(false);
+
+    const arranged = makeHarness({ woc_chat_tabs: '["party","world"]' });
+    arranged.controller.init();
+    expect(
+      tabsBar(arranged)
+        .children.map((child) => child.dataset.tab)
+        .filter((id) => id !== undefined),
+    ).toEqual(['all', 'combat', 'party', 'world']);
+    expect(arranged.storage.getItem('woc_chat_tabs')).toBe('["party","world"]');
+  });
+
+  it('mirrors typed joins without sending a duplicate command or changing the send tab', () => {
+    const harness = makeHarness({ woc_chat_tabs: '[]' });
     harness.controller.init();
 
     harness.controller.syncTabsForInput('/join world');

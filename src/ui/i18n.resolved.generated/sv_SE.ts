@@ -1873,6 +1873,8 @@ export const sv_SE: EnTranslations = {
       "quickActionsAria": "Snabbhandlingar. Tryck för att öppna raden med riddjur, chatt, karta, väskor och mer, eller håll nedtryckt och svep höger för att välja en.",
       "quickActionsAriaTap": "Snabbhandlingar. Tryck för att öppna raden med riddjur, chatt, karta, väskor och mer, tryck sedan på ett alternativ. Tryck på kontrollen igen för att stänga.",
       "quickActionsLabel": "Handlingar",
+      "whisperUnreadOverflow": "{count}+",
+      "whisperUnreadDesc": "{channel}: {count}",
       "stanceRadial": "Ställningar",
       "stanceAnchorAria": "Ställning: {stance}. Tryck för att öppna ställningsringen, välj sedan en annan ställning.",
       "stanceAnchorEmptyAria": "Ingen ställning. Tryck för att öppna ställningsringen, välj sedan en ställning.",

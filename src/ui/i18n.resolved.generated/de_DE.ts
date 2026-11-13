@@ -1873,6 +1873,8 @@ export const de_DE: EnTranslations = {
       "quickActionsAria": "Schnellaktionen. Tippen öffnet die Reihe mit Reittier, Chat, Karte, Taschen und mehr, oder halte gedrückt und wische nach rechts, um eines auszuwählen.",
       "quickActionsAriaTap": "Schnellaktionen. Tippen öffnet die Reihe mit Reittier, Chat, Karte, Taschen und mehr, dann tippe einen Eintrag an. Tippe die Steuerung erneut an, um sie zu schließen.",
       "quickActionsLabel": "Aktionen",
+      "whisperUnreadOverflow": "{count}+",
+      "whisperUnreadDesc": "{channel}: {count}",
       "stanceRadial": "Haltungen",
       "stanceAnchorAria": "Haltung: {stance}. Tippen öffnet den Haltungsring, dann wähle eine andere Haltung.",
       "stanceAnchorEmptyAria": "Keine Haltung. Tippen öffnet den Haltungsring, dann wähle eine Haltung.",

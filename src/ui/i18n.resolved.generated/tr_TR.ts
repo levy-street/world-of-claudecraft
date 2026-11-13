@@ -1873,6 +1873,8 @@ export const tr_TR: EnTranslations = {
       "quickActionsAria": "Hızlı Eylemler. Binek, sohbet, harita, çantalar ve dahasının satırını açmak için dokun, ya da birini seçmek için basılı tutup sağa kaydır.",
       "quickActionsAriaTap": "Hızlı Eylemler. Binek, sohbet, harita, çantalar ve dahasının satırını açmak için dokun, sonra bir ögeye dokun. Kapatmak için denetime tekrar dokun.",
       "quickActionsLabel": "Eylemler",
+      "whisperUnreadOverflow": "{count}+",
+      "whisperUnreadDesc": "{channel}: {count}",
       "stanceRadial": "Duruşlar",
       "stanceAnchorAria": "Duruş: {stance}. Duruş çemberini açmak için dokun, ardından başka bir duruş seç.",
       "stanceAnchorEmptyAria": "Duruş yok. Duruş çemberini açmak için dokun, ardından bir duruş seç.",

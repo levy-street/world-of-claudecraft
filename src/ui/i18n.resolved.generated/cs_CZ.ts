@@ -1873,6 +1873,8 @@ export const cs_CZ: EnTranslations = {
       "quickActionsAria": "Rychlé akce. Klepnutím otevřeš řadu jízdního zvířete, chatu, mapy, batohů a dalšího, nebo podržením a přejetím doprava jednu vyber.",
       "quickActionsAriaTap": "Rychlé akce. Klepnutím otevřeš řadu jízdního zvířete, chatu, mapy, batohů a dalšího, pak klepni na položku. Dalším klepnutím na ovladač ji zavřeš.",
       "quickActionsLabel": "Akce",
+      "whisperUnreadOverflow": "{count}+",
+      "whisperUnreadDesc": "{channel}: {count}",
       "stanceRadial": "Postoje",
       "stanceAnchorAria": "Postoj: {stance}. Klepnutím otevřeš kruh postojů a vyber jiný postoj.",
       "stanceAnchorEmptyAria": "Žádný postoj. Klepnutím otevřeš kruh postojů a vyber postoj.",

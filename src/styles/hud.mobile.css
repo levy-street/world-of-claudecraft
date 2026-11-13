@@ -1855,6 +1855,30 @@
       0 0 12px color-mix(in srgb, var(--gold) 67%, transparent),
       inset 0 0 8px color-mix(in srgb, var(--gold) 33%, transparent);
   }
+  /* Unread chat badge (whisper_unread_badge.ts) on the controls that lead to
+     chat: the Quick Actions anchor, the strip's Chat seat and the More tray's
+     Chat button. It composes the .ui-badge--corner primitive and only swaps the
+     fill for a chat channel color (whisper while a whisper is unread, else
+     party), which the painter hands over as
+     --whisper-unread-color so the color keeps its one home in chat_channels.ts.
+     Steady by design: no pulse or scale (the motion-sickness rule), so there is
+     nothing to switch off under prefers-reduced-motion, and it recedes with its
+     button under the idle fade like the rest of this chrome. The two flow
+     buttons need a positioning context for the corner seat; the strip item is
+     already absolute and only has to stop clipping its corner. */
+  body.mobile-touch .whisper-unread-badge {
+    background: var(--whisper-unread-color, var(--color-danger));
+    color: var(--color-keyline);
+    text-shadow: none;
+    pointer-events: none;
+  }
+  body.mobile-touch #mobile-menu-anchor.has-whisper-unread,
+  body.mobile-touch #mobile-chat.has-whisper-unread {
+    position: relative;
+  }
+  body.mobile-touch .mobile-menu-item.has-whisper-unread {
+    overflow: visible;
+  }
   /* The cancel X sits directly ON the control, which puts it left of the whole
      row once it is open: releasing where the gesture started is the way out, so
      the target is a place the thumb never had to leave. */

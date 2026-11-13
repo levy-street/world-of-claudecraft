@@ -16268,6 +16268,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.mobile.targetCycle'
   | 'hudChrome.mobile.targetCycleShort'
   | 'hudChrome.mobile.toggleHaptics'
+  | 'hudChrome.mobile.whisperUnreadDesc'
+  | 'hudChrome.mobile.whisperUnreadOverflow'
   | 'hudChrome.mobile.wocMarket'
   | 'hudChrome.mountRace.cancelButton'
   | 'hudChrome.mountRace.finished'

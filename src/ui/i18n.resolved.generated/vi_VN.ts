@@ -1873,6 +1873,8 @@ export const vi_VN: EnTranslations = {
       "quickActionsAria": "Hành Động Nhanh. Chạm để mở hàng vật cưỡi, trò chuyện, bản đồ, túi đồ và nhiều hơn nữa, hoặc giữ và vuốt sang phải để chọn một mục.",
       "quickActionsAriaTap": "Hành Động Nhanh. Chạm để mở hàng vật cưỡi, trò chuyện, bản đồ, túi đồ và nhiều hơn nữa, rồi chạm vào một mục. Chạm lại vào nút điều khiển để đóng.",
       "quickActionsLabel": "Hành Động",
+      "whisperUnreadOverflow": "{count}+",
+      "whisperUnreadDesc": "{channel}: {count}",
       "stanceRadial": "Thế Đứng",
       "stanceAnchorAria": "Thế đứng: {stance}. Chạm để mở vòng thế đứng, rồi chọn một thế đứng khác.",
       "stanceAnchorEmptyAria": "Chưa có thế đứng. Chạm để mở vòng thế đứng, rồi chọn một thế đứng.",
