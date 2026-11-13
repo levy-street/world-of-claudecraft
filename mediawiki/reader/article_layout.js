@@ -154,6 +154,9 @@ export function layoutArticle(view, page, wide, zoneName) {
     facts.remove();
     heading.remove();
   }
+  // See-also notes are not part of the article text; lift them out before the lead is found.
+  const hatnotes = [...article.querySelectorAll(':scope > p.hatnote')];
+  for (const note of hatnotes) note.remove();
   const stats = statStrip(article, headings);
   const lead = extractLead(article, headings);
   if (lead) {
@@ -220,6 +223,7 @@ export function layoutArticle(view, page, wide, zoneName) {
   organizeReferenceDetails(article);
   const toc = contents(article, page.title, wide);
   const front = element('div', 'wiki-opening');
+  front.append(...hatnotes);
   if (stats) front.append(stats);
   if (introduction) front.append(introduction);
   if (toc) front.append(toc);

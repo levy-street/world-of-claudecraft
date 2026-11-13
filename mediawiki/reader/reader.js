@@ -162,6 +162,11 @@ function renderBody(body, mapUrl, indexIcon, directoryClass, groupTile) {
       );
       continue;
     }
+    // A leading colon is a hatnote: a see-also line that sits above the article.
+    if (line.startsWith(":''")) {
+      output.push('<p class="hatnote">' + inline(line.slice(1)) + '</p>');
+      continue;
+    }
     output.push('<p>' + inline(line) + '</p>');
   }
   return { markup: output.join(''), headings };

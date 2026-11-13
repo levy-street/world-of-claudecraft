@@ -30,6 +30,7 @@ import { tooltipCatalog } from '../../scripts/mediawiki/tooltip_catalog';
 import { ABILITIES, CLASSES, DUNGEON_LIST, ITEMS, MOBS, NPCS, QUESTS, ZONES, zoneContaining, BUILTIN_WORLD } from '../../src/sim/data';
 import { addCatalogPortals } from '../../scripts/mediawiki/catalog_portals';
 import { entityTitles } from '../../scripts/mediawiki/entity_titles';
+import { addDisambiguation, articleName } from '../../scripts/mediawiki/disambiguation';
 import { qualify } from '../../scripts/mediawiki/title_names';
 import { addZoneAndClassHubs } from '../../scripts/mediawiki/hub_portals';
 import { addQuestDirectory } from '../../scripts/mediawiki/quest_directory';
@@ -232,6 +233,7 @@ for(const page of pages) {
   if(path) page.text = '<woc-art path="' + path + '" />\\n' + page.text;
 }
 linkArticleMentions(pages);
+pages.push(...addDisambiguation(pages, articleName));
 const seedTimestamp = process.env.MEDIAWIKI_SEED_TIMESTAMP ?? '2026-11-05T00:00:01Z';
 const now = new Date(seedTimestamp).toISOString().replace(/\\.\\d{3}Z$/, 'Z');
 const body = pages.map((page, index) => \`

@@ -60,13 +60,21 @@ export function entityTitles(used: Set<string>): Record<Kind, Map<string, string
         : 'levels ' + mob.minLevel + ' to ' + mob.maxLevel;
     add('mob', id, mob.name + ' (Mob)', ['', own, levels, own && own + ', ' + levels]);
   }
+  // An item with a Heroic twin of the same name is the Normal one; otherwise it is the Item.
+  const heroicNames = new Set(
+    Object.values(ITEMS)
+      .filter((i) => i.heroicOf || i.heroic)
+      .map((i) => i.name),
+  );
   for (const [id, item] of Object.entries(ITEMS)) {
     const heroic = !!(item.heroicOf || item.heroic);
     add(
       'item',
       id,
       item.name,
-      heroic ? ['Heroic', 'Heroic item', 'Heroic, ' + idQualifier(id, item.name)] : ['', 'Item'],
+      heroic
+        ? ['Heroic', 'Heroic item', 'Heroic, ' + idQualifier(id, item.name)]
+        : [heroicNames.has(item.name) ? 'Normal' : 'Item', 'Item'],
     );
   }
 
