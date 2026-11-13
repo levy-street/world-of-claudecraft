@@ -1822,7 +1822,7 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
         inner: 0xfff2c0,
         opacity: 0.6,
       },
-      // gold motes circling against the shards
+      // gold motes circling among the crystals
       {
         kind: 'motes',
         at: { yF: 0.7 },
@@ -1881,7 +1881,8 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
   },
 
   // Squallcrest (the Guardian of the Breath): a storm blade. Wind wraps it in two streaking
-  // ribbons winding opposite ways, slow lightning walks up the blade and out to the gale vanes,
+  // ribbons winding opposite ways, slow lightning walks up the blade and out along the guard's
+  // wings,
   // the storm eye turns on both faces of the gem, and gusts lift off the edge. Kept calm on
   // purpose (the owner's call, 2026-11-13): few strikes a second and a steady light, so it
   // never strobes.
@@ -1973,7 +1974,7 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
         core: 0xf0fdff,
         opacity: 1,
       },
-      // and leaping out from the halo to the gale vanes
+      // and leaping out from the storm eye along the guard's wings
       {
         kind: 'arcs',
         line: [{ yF: 0.33 }, { yF: 0.4 }],
@@ -2185,7 +2186,7 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
         colorB: 0xff5a14,
         opacity: 0.95,
       },
-      // embers boiling up off the whole blade
+      // embers drifting slowly up off the blade
       {
         kind: 'drift',
         line: [{ yF: 0.5 }, { yF: 1.0 }],

@@ -7,7 +7,9 @@
 //   runeRing  a ring of procedurally drawn rune glyphs turning about an axis, a light running
 //             round it glyph by glyph.
 //   flames    tongues of fire licking off a line (a blade's edges), each an axial billboard whose
-//             shape is a scrolling value noise, born and dying on its own clock.
+//             shape is a scrolling value noise, born and dying on its own clock. No catalog spec
+//             draws it today (Hearthbrand gave its flames up, 2026-11-13); the kind stays
+//             buildable, and the prewarm picks it up again the moment a spec names it.
 //   vortex    a spinning spiral disc (a storm eye, a gathering of the elements).
 //
 // The contract every other weapon-VFX family keeps, kept here too:

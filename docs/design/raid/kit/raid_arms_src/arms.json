@@ -1,0 +1,90 @@
+{
+  "seamcaller_maul": {
+    "source": "tmp/raid_arms_painted/models/seamcaller_maul/texture/textured.glb",
+    "yaw": -90,
+    "span": 2.73,
+    "gripFrac": 0.31,
+    "fistY": -0.0485,
+    "gripBand": [0.24, 0.38],
+    "glowGate": {
+      "hue": [30, 55],
+      "vivid": 0.4,
+      "capS": 0.68,
+      "minL": 0.55
+    }
+  },
+  "squallcrest": {
+    "source": "tmp/raid_arms_painted/models/squallcrest/texture/textured.glb",
+    "yaw": 90,
+    "span": 2.01,
+    "gripFrac": 0.172,
+    "fistY": -0.0402,
+    "gripBand": [0.12, 0.22],
+    "glowGate": {
+      "hue": [180, 215],
+      "vivid": 0.3,
+      "capS": 0.48,
+      "minL": 0.55,
+      "ramp": 0.08
+    },
+    "tone": {
+      "knee": 0.42,
+      "cap": 0.7
+    }
+  },
+  "rimelight_staff": {
+    "source": "tmp/raid_arms_painted/models/rimelight_staff/texture/textured.glb",
+    "yaw": -90,
+    "span": 2.395,
+    "gripFrac": 0.345,
+    "fistY": -0.18,
+    "gripBand": [0.3, 0.39],
+    "glowGate": {
+      "hue": [175, 215],
+      "vivid": 0.28,
+      "capS": 0.38,
+      "minL": 0.55,
+      "ramp": 0.08
+    },
+    "tone": {
+      "knee": 0.42,
+      "cap": 0.68
+    },
+    "toneVivid": {
+      "knee": 0.5,
+      "cap": 0.8
+    }
+  },
+  "hearthbrand": {
+    "source": "tmp/raid_arms_painted/models/hearthbrand/texture/textured.glb",
+    "yaw": -90,
+    "span": 2.015,
+    "gripFrac": 0.19,
+    "fistY": -0.0402,
+    "gripBand": [0.12, 0.25],
+    "glowGate": {
+      "hue": [8, 52],
+      "vivid": 0.55,
+      "capS": 0.58,
+      "minL": 0.45
+    }
+  },
+  "duskwick_staff": {
+    "source": "tmp/raid_arms_painted/models/duskwick_staff/texture/textured.glb",
+    "yaw": -90,
+    "span": 2.38,
+    "gripFrac": 0.375,
+    "fistY": -0.18,
+    "gripBand": [0.33, 0.42],
+    "glowGate": {
+      "hue": [8, 215],
+      "vivid": 0.58,
+      "capS": 0.58,
+      "minL": 0.5
+    },
+    "tone": {
+      "knee": 0.42,
+      "cap": 0.66
+    }
+  }
+}
