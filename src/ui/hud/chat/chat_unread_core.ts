@@ -13,7 +13,7 @@
 // Touch only. Desktop keeps its log on screen and its per-tab badges
 // (ChatWindowController.unreadTabs), so nothing is counted there.
 
-import type { ChatTabId } from './chat_channels';
+import type { ChatOpenTab, ChatTabId } from './chat_channels';
 
 /** The channels that are counted, in PRIORITY order: whisper leads because it
  *  is the one addressed to the player alone. */
@@ -93,4 +93,18 @@ export function chatUnreadDot(counts: ChatUnreadCounts): ChatUnreadDot | null {
     lead ??= channel;
   }
   return lead === null ? null : { total, lead };
+}
+
+/** The tab chat lands on when it is opened with something unread: the tab that
+ *  holds the message. Whispers first (their own tab when the player has it
+ *  open), else party (same rule), and All whenever that tab is not open, since
+ *  All shows every channel. Null when nothing is unread: the player's own tab
+ *  choice is left alone. */
+export function chatUnreadOpenTab(
+  counts: ChatUnreadCounts,
+  openTabs: readonly ChatOpenTab[],
+): ChatTabId | null {
+  const lead = chatUnreadDot(counts)?.lead;
+  if (lead === undefined) return null;
+  return openTabs.includes(lead) ? lead : 'all';
 }

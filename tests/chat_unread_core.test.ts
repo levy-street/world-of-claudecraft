@@ -7,6 +7,7 @@ import {
   chatUnreadAfterReceive,
   chatUnreadAfterViewChange,
   chatUnreadDot,
+  chatUnreadOpenTab,
   isChatUnreadChannel,
   NO_CHAT_UNREAD,
 } from '../src/ui/hud/chat/chat_unread_core';
@@ -127,5 +128,29 @@ describe('the badge the counts light', () => {
     expect(chatUnreadDot(counts({ whisper: 1, party: 40 }))?.lead).toBe('whisper');
     expect(chatUnreadDot(counts({ whisper: 1 }))?.lead).toBe('whisper');
     expect(chatUnreadDot(counts({ party: 1 }))?.lead).toBe('party');
+  });
+});
+
+describe('the tab chat opens on when something is unread', () => {
+  it('leaves the tab alone when nothing is unread', () => {
+    expect(chatUnreadOpenTab(counts(), ['whisper', 'party'])).toBeNull();
+  });
+
+  it('lands on the Whisper tab for an unread whisper, whispers before party', () => {
+    expect(chatUnreadOpenTab(counts({ whisper: 1 }), ['say', 'whisper'])).toBe('whisper');
+    expect(chatUnreadOpenTab(counts({ whisper: 1, party: 9 }), ['party', 'whisper'])).toBe(
+      'whisper',
+    );
+  });
+
+  it('lands on the Party tab when only party chat is unread', () => {
+    expect(chatUnreadOpenTab(counts({ party: 2 }), ['whisper', 'party'])).toBe('party');
+  });
+
+  it('falls back to All when the tab that holds the message is not open', () => {
+    expect(chatUnreadOpenTab(counts({ whisper: 1 }), ['say'])).toBe('all');
+    expect(chatUnreadOpenTab(counts({ party: 2 }), ['whisper'])).toBe('all');
+    // An unread whisper never lands on Party, where it would not show.
+    expect(chatUnreadOpenTab(counts({ whisper: 1, party: 2 }), ['party'])).toBe('all');
   });
 });

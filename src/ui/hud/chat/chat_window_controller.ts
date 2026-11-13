@@ -102,12 +102,20 @@ export class ChatWindowController {
   // All, and none at all while a channel's tab is not open, which is exactly
   // when a closed chat hides a line.
   private readonly chatUnread: ChatUnreadController;
+  // Who a plain line typed on the whisper collector reaches: the sender of the
+  // last whisper RECEIVED this session, which is exactly the `/r` target the
+  // sim and the server keep. Shown in the composer prompt so the recipient is
+  // on screen before the first key. Null until a whisper arrives (and after a
+  // reload), where the prompt falls back to the channel name.
+  private whisperReplyName: string | null = null;
 
   constructor(private readonly deps: ChatWindowControllerDeps) {
     this.chatUnread = new ChatUnreadController({
       document: deps.document,
       isTouchLayout: () => deps.isMobileLayout(),
       activeTab: () => this.activeChatTab,
+      openTabs: () => this.chatTabs,
+      selectTab: (tab) => this.selectTab(tab, true),
     });
   }
 
@@ -140,9 +148,13 @@ export class ChatWindowController {
   }
 
   /** A chat line arrived FROM another player on `channel` (never the player's
-   *  own line or the "To X" whisper echo). Channels the touch unread surfaces
-   *  do not track are ignored. */
-  noteChatReceived(channel: string): void {
+   *  own line or the "To X" whisper echo); `from` is the sender's name.
+   *  Channels the touch unread badge does not track are ignored. */
+  noteChatReceived(channel: string, from?: string): void {
+    if (channel === WHISPER_TAB && from && from !== this.whisperReplyName) {
+      this.whisperReplyName = from;
+      this.applyInputPresentation();
+    }
     if (isChatUnreadChannel(channel)) this.chatUnread.noteReceived(channel);
   }
 
@@ -251,9 +263,13 @@ export class ChatWindowController {
   // Placeholder for the chat input reflecting the active tab and sticky target.
   activePlaceholder(): string {
     const target = this.effectiveSendTarget();
-    // The whisper collector (its own tab, or a sticky `/r` reply) prompts "Whisper".
+    // The whisper collector (its own tab, or a sticky `/r` reply) names WHO the
+    // reply reaches ("Message Alice") once a whisper has arrived, so nobody
+    // answers the wrong player; before that it prompts "Whisper".
     if (target === WHISPER_TAB) {
-      return t('hud.core.chatChannels.sendingTo', { channel: t(WHISPER_TAB_LABEL_KEY) });
+      return t('hud.core.chatChannels.sendingTo', {
+        channel: this.whisperReplyName ?? t(WHISPER_TAB_LABEL_KEY),
+      });
     }
     // A channel-bound tab keeps its "Message {channel}" prompt (unchanged, incl. a
     // Say tab). On the All/combat views a non-say sticky channel surfaces the same

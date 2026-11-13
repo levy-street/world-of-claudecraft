@@ -146,7 +146,7 @@ describe('unread chat badge on the touch chat controls', () => {
     expect(badgeTexts()).toEqual([null, null, null]);
   });
 
-  it('stays lit while chat is open on a tab that hides whispers, until one that shows them', async () => {
+  it('stays lit while chat is open on a tab that hides whispers, until chat reopens', async () => {
     chat = mount(['say', 'whisper']);
     document.body.classList.add('mobile-touch');
     tab('say').click();
@@ -154,13 +154,13 @@ describe('unread chat badge on the touch chat controls', () => {
     await settle();
     chat.noteChatReceived('whisper');
     expect(badgeTexts()).toEqual(['1', '1', '1']);
-    // Closing and reopening on Say still shows nothing of the whisper.
+    // Closing leaves it lit; reopening lands on the tab that shows the whisper.
     document.body.classList.remove('mobile-chat-open');
     await settle();
+    expect(badgeTexts()).toEqual(['1', '1', '1']);
     document.body.classList.add('mobile-chat-open');
     await settle();
-    expect(badgeTexts()).toEqual(['1', '1', '1']);
-    tab('whisper').click();
+    expect(tab('whisper').classList.contains('active')).toBe(true);
     expect(badgeTexts()).toEqual([null, null, null]);
   });
 
@@ -212,6 +212,97 @@ describe('unread chat badge on the touch chat controls', () => {
       chat.noteChatReceived(channel);
     }
     expect(badgeTexts()).toEqual([null, null, null]);
+  });
+
+  describe('opening chat while the badge is lit', () => {
+    const activeTab = (): string | undefined =>
+      document.querySelector<HTMLElement>('#chatlog-tabs .chat-tab.active')?.dataset.tab;
+    const open = async (): Promise<void> => {
+      document.body.classList.add('mobile-chat-open');
+      await settle();
+    };
+    const remount = (tabs: string[]): void => {
+      chat = mount(tabs);
+      document.body.classList.add('mobile-touch');
+    };
+
+    it('lands on the Whisper tab for an unread whisper and clears the badge', async () => {
+      remount(['say', 'party', 'whisper']);
+      tab('say').click();
+      chat.noteChatReceived('party');
+      chat.noteChatReceived('whisper', 'Alice');
+      await open();
+      expect(activeTab()).toBe('whisper');
+      // The party line is still waiting behind the Whisper tab.
+      expect(badgeTexts()).toEqual(['1', '1', '1']);
+    });
+
+    it('lands on the Party tab when only party chat is unread', async () => {
+      remount(['say', 'party', 'whisper']);
+      tab('say').click();
+      chat.noteChatReceived('party');
+      await open();
+      expect(activeTab()).toBe('party');
+      expect(badgeTexts()).toEqual([null, null, null]);
+    });
+
+    it('lands on All when the player has no tab for the message', async () => {
+      remount(['say']);
+      tab('say').click();
+      chat.noteChatReceived('whisper', 'Alice');
+      await open();
+      expect(activeTab()).toBe('all');
+      expect(badgeTexts()).toEqual([null, null, null]);
+    });
+
+    it('leaves the tab alone when nothing is unread', async () => {
+      remount(['say', 'whisper']);
+      tab('say').click();
+      await open();
+      expect(activeTab()).toBe('say');
+    });
+
+    it('does not move the tab for a line that arrives while chat is already open', async () => {
+      remount(['say', 'whisper']);
+      tab('say').click();
+      await open();
+      chat.noteChatReceived('whisper', 'Alice');
+      await settle();
+      expect(activeTab()).toBe('say');
+      expect(badgeTexts()).toEqual(['1', '1', '1']);
+    });
+
+    it('leaves the read-only log peek on the tab it was on', async () => {
+      remount(['say', 'whisper']);
+      tab('say').click();
+      chat.noteChatReceived('whisper', 'Alice');
+      document.body.classList.add('mobile-chatlog-peek');
+      await settle();
+      expect(activeTab()).toBe('say');
+    });
+
+    it('names who a reply on the Whisper tab reaches, and never focuses the composer', async () => {
+      remount(['say', 'whisper']);
+      tab('say').click();
+      const input = document.getElementById('chat-input') as HTMLTextAreaElement;
+      chat.noteChatReceived('whisper', 'Alice');
+      await open();
+      expect(activeTab()).toBe('whisper');
+      expect(input.placeholder).toBe('Message Alice');
+      expect(document.activeElement).not.toBe(input);
+      // A later whisper from someone else moves the reply target, and the
+      // prompt follows it at once.
+      chat.noteChatReceived('whisper', 'Bob');
+      expect(input.placeholder).toBe('Message Bob');
+      expect(chat.composeSend('hi')).toBe('/r hi');
+    });
+
+    it('prompts with the channel name until a whisper has arrived', () => {
+      remount(['whisper']);
+      tab('whisper').click();
+      const input = document.getElementById('chat-input') as HTMLTextAreaElement;
+      expect(input.placeholder).toBe('Message Whisper');
+    });
   });
 
   it('never badges on desktop', () => {

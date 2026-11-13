@@ -23,12 +23,12 @@ describe('hud.ts wiring', () => {
   const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
 
   it('reports a whisper only from the RECEIVED branch, never the "To X" echo', () => {
-    expect(hud.split("noteChatReceived('whisper')").length - 1).toBe(1);
+    expect(hud.split("noteChatReceived('whisper'").length - 1).toBe(1);
     const start = hud.indexOf("case 'whisper':");
     const branch = hud.slice(start, hud.indexOf('break;', start));
     const echo = branch.indexOf('CHAT_TEMPLATE_KEYS.toWhisper');
     const otherwise = branch.indexOf('else {');
-    const note = branch.indexOf("this.chatWindow.noteChatReceived('whisper');");
+    const note = branch.indexOf("this.chatWindow.noteChatReceived('whisper', ev.from);");
     expect(echo).toBeGreaterThan(-1);
     expect(otherwise).toBeGreaterThan(echo);
     expect(note).toBeGreaterThan(otherwise);

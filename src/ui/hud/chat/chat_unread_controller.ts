@@ -5,16 +5,19 @@
 // ChatWindowController owns this and reports received lines and tab switches.
 // Chat opening and closing is read off the body classes the touch controls
 // already toggle, so no touch-input file needs to know about the badge.
+// Opening chat while the badge is lit lands on the tab that holds the unread
+// message (chatUnreadOpenTab), so the player never has to hunt for it.
 // Event-driven only (one MutationObserver on the body class, one listener):
 // no frame loop, no timer, no layout read.
 
-import type { ChatTabId } from './chat_channels';
+import type { ChatOpenTab, ChatTabId } from './chat_channels';
 import {
   type ChatUnreadChannel,
   type ChatUnreadCounts,
   type ChatViewState,
   chatUnreadAfterReceive,
   chatUnreadAfterViewChange,
+  chatUnreadOpenTab,
   NO_CHAT_UNREAD,
 } from './chat_unread_core';
 import { WhisperUnreadBadge } from './whisper_unread_badge';
@@ -26,11 +29,15 @@ export interface ChatUnreadControllerDeps {
   document: Document;
   isTouchLayout(): boolean;
   activeTab(): ChatTabId;
+  /** The channel tabs the player has open, in strip order. */
+  openTabs(): readonly ChatOpenTab[];
+  selectTab(tab: ChatTabId): void;
 }
 
 export class ChatUnreadController {
   private counts: ChatUnreadCounts = NO_CHAT_UNREAD;
   private readonly badge: WhisperUnreadBadge;
+  private chatOpen = false;
 
   constructor(private readonly deps: ChatUnreadControllerDeps) {
     this.badge = new WhisperUnreadBadge(deps.document);
@@ -61,6 +68,20 @@ export class ChatUnreadController {
 
   /** The view changed: clear every channel that is now on screen. */
   sync(): void {
+    const open = this.deps.document.body.classList.contains(CHAT_OPEN_CLASS);
+    const opened = open && !this.chatOpen;
+    this.chatOpen = open;
+    if (opened && this.deps.isTouchLayout()) {
+      // The chat panel just came up with something unread: land on the tab
+      // that holds it. Selecting a tab re-enters sync(), which clears it. The
+      // read-only log peek is left where it is (it has no tab strip to show
+      // where the player landed).
+      const tab = chatUnreadOpenTab(this.counts, this.deps.openTabs());
+      if (tab !== null && tab !== this.deps.activeTab()) {
+        this.deps.selectTab(tab);
+        return;
+      }
+    }
     this.counts = chatUnreadAfterViewChange(this.counts, this.view());
     this.paint();
   }
