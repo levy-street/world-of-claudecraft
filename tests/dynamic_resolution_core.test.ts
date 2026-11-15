@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  DYNAMIC_RENDER_SCALE_ABSOLUTE_MIN,
   dynamicResolutionAllocationScale,
   dynamicResolutionGovernorRange,
   dynamicResolutionRect,
@@ -123,12 +124,33 @@ describe('dynamic resolution renderer policy', () => {
 
   it('opens supported chains only between the floor and manual ceiling', () => {
     expect(dynamicResolutionGovernorRange(true, 0.9, 0.6, 0.9)).toEqual({
-      minRenderScale: 0.68,
+      minRenderScale: 0.6,
       maxRenderScale: 0.9,
     });
     expect(dynamicResolutionGovernorRange(true, 0.5, 0.68, 0.5)).toEqual({
       minRenderScale: 0.5,
       maxRenderScale: 0.5,
     });
+  });
+
+  it("honors the tier's own floor below the 0.68 default, never under the absolute minimum", () => {
+    // Low on a phone or tablet asks for 0.55 (gfx.ts minRenderScaleMobile); the old
+    // 0.68 clamp overrode it and left a GPU-bound Mali tablet at 21 FPS turning.
+    expect(dynamicResolutionGovernorRange(true, 1, 0.55, 1).minRenderScale).toBe(0.55);
+    expect(dynamicResolutionGovernorRange(true, 1, 0.3, 1).minRenderScale).toBe(
+      DYNAMIC_RENDER_SCALE_ABSOLUTE_MIN,
+    );
+    expect(dynamicResolutionGovernorRange(true, 1, Number.NaN, 1).minRenderScale).toBe(
+      MIN_DYNAMIC_RENDER_SCALE,
+    );
+    const rect = dynamicResolutionRect({
+      logicalWidth: 1408,
+      logicalHeight: 880,
+      pixelRatio: 1.48,
+      renderScale: 0.4,
+      maxRenderScale: 1,
+      minRenderScale: 0.55,
+    });
+    expect(rect.renderScale).toBe(0.55);
   });
 });

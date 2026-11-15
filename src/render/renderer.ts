@@ -346,7 +346,6 @@ import {
   dynamicResolutionGovernorRange,
   dynamicResolutionRect,
   initialEffectiveRenderScale,
-  MIN_DYNAMIC_RENDER_SCALE,
 } from './dynamic_resolution_core';
 import { buildEastbrookTownView, type EastbrookTownView } from './eastbrook_town';
 import { RendererEditorApi, type RendererEditorHost } from './editor_api';
@@ -3570,7 +3569,7 @@ export class Renderer {
         pixelRatio: Math.min(window.devicePixelRatio, GFX.pixelRatioCap),
         renderScale: this.effectiveRenderScale,
         maxRenderScale: this.renderBudgetMaxScale(),
-        minRenderScale: Math.max(MIN_DYNAMIC_RENDER_SCALE, this.renderBudgetMinScale()),
+        minRenderScale: this.renderBudgetMinScale(),
       });
       post.setRenderRegion(rect);
       this.renderPixelHeight = rect.renderHeight;
