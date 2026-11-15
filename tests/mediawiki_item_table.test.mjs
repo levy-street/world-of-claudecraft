@@ -1,11 +1,6 @@
 // @vitest-environment happy-dom
 import { expect, it } from 'vitest';
-import {
-  compareCells,
-  enhanceItemTable,
-  statNames,
-  styleSwitchRows,
-} from '../mediawiki/reader/item_table.js';
+import { compareCells, enhanceItemTable, statNames } from '../mediawiki/reader/item_table.js';
 
 const build = () => {
   const holder = document.createElement('div');
@@ -66,19 +61,4 @@ it('sorts by a column, then reverses on a second click', () => {
   quality.click();
   expect(names(table)).toEqual(['Ash Belt', 'Coral Girdle', 'Bone Girdle']);
   expect(level.parentNode.getAttribute('aria-sort')).toBe('none');
-});
-
-it('turns a switch row into buttons and marks the current page', () => {
-  const root = document.createElement('div');
-  root.innerHTML =
-    '<article><p><a href="#Items">Back to items</a></p><p><strong>Slot:</strong> <strong>Belts</strong> · <a href="#Footwear">Footwear</a> · <a href="#Gloves">Gloves</a></p><p><strong>Note:</strong> plain text stays a paragraph.</p></article>';
-  styleSwitchRows(root);
-  const rows = root.querySelectorAll('.gear-switch');
-  expect(rows).toHaveLength(1);
-  expect(rows[0].querySelector('.gear-switch-label').textContent).toBe('Slot');
-  const options = [...rows[0].querySelectorAll('.gear-switch-option')];
-  expect(options.map((o) => o.textContent)).toEqual(['Belts', 'Footwear', 'Gloves']);
-  expect(options[0].getAttribute('aria-current')).toBe('page');
-  expect(options[1].getAttribute('href')).toBe('#Footwear');
-  expect(root.querySelectorAll('article > p')).toHaveLength(2);
 });

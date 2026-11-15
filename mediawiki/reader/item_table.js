@@ -97,34 +97,6 @@ export function enhanceItemTable(table) {
   apply();
 }
 
-/**
- * A paragraph such as "Slot: Belts · Footwear · Gloves" becomes a row of buttons that
- * switch page in place. The entry in bold is the page the reader is on.
- */
-export function styleSwitchRows(root) {
-  for (const p of root.querySelectorAll('p')) {
-    const label = p.firstElementChild;
-    if (label?.tagName !== 'STRONG' || !label.textContent.endsWith(':')) continue;
-    const options = [...p.children].slice(1);
-    if (!options.length || !options.every((el) => el.matches('a, strong'))) continue;
-    const row = node('nav', 'gear-switch');
-    row.setAttribute('aria-label', 'Switch ' + label.textContent.slice(0, -1).toLowerCase());
-    row.append(node('span', 'gear-switch-label', label.textContent.slice(0, -1)));
-    for (const option of options) {
-      if (option.tagName === 'A') {
-        option.className = 'gear-switch-option';
-        row.append(option);
-      } else {
-        const current = node('span', 'gear-switch-option gear-switch-current', option.textContent);
-        current.setAttribute('aria-current', 'page');
-        row.append(current);
-      }
-    }
-    p.replaceWith(row);
-  }
-}
-
 export function enhanceItemTables(root) {
-  styleSwitchRows(root);
   for (const table of root.querySelectorAll('table.item-table')) enhanceItemTable(table);
 }
