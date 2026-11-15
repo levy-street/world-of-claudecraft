@@ -7,6 +7,7 @@ import {
 } from '../../src/sim/content/talents';
 import { ABILITIES, CLASSES } from '../../src/sim/data';
 import { specBaselineDescription } from '../../src/ui/talent_i18n';
+import { renameSpecTags } from './ability_description';
 
 export interface AbilityPageTools {
   titleBy: {
@@ -126,7 +127,7 @@ export function addTalentPages({
         const alternatives = row.options.filter((o) => o !== option).map(choiceLink);
         add(
           talents.get(id + '/' + option.id)!,
-          section('Effect', option.description) +
+          section('Effect', renameSpecTags(option.description, id)) +
             section(
               'At a glance',
               table([

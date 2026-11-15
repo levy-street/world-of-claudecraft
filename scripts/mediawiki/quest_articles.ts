@@ -15,13 +15,14 @@ import {
   questTurnInNpcIds,
   TICK_RATE,
 } from '../../src/sim/types';
+import { type TranslationKey, t } from '../../src/ui/i18n';
 import { questObjectiveText } from './article_editorial';
 import { type ArticleTools, append, lines, recipeLabel, ref, words } from './entity_format';
 import { itemNpcPoints } from './item_npc_route';
 import { type QuestRoute, questRoute } from './quest_route';
 
 /** Event ids read as titles ("gourdlight_eve" is the page "Gourdlight Eve"). */
-const eventName = (id: string) => words(id).replace(/(^| )[a-z]/g, (c) => c.toUpperCase());
+const eventName = (id: string) => t(`seasonal.event.${id}.name` as TranslationKey);
 
 function contact(
   w: ArticleTools,
@@ -86,7 +87,9 @@ function target(w: ArticleTools, o: QuestObjective): string {
       return recipeLabel(w, o.recipeId);
 
     case 'gather':
-      return o.itemId ? ref(w, 'item', o.itemId) : words(o.nodeType!);
+      return o.itemId
+        ? ref(w, 'item', o.itemId)
+        : t(`hudChrome.gathering.nodeName.${o.nodeType}` as TranslationKey);
 
     default:
       return '';
@@ -295,7 +298,7 @@ export function addQuestArticles(w: ArticleTools, itemSources: Map<string, Set<s
           action =
             (o.action === 'plant' ? 'Plant' : 'Harvest') +
             ' ' +
-            (o.cropId ? words(o.cropId) : 'a crop') +
+            (o.cropId ? (ITEMS[o.cropId]?.name ?? 'a crop') : 'a crop') +
             ' ' +
             n +
             ' time' +

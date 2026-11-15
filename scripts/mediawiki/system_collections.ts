@@ -37,6 +37,12 @@ import { deedLead, deedRequirements } from './deed_requirements';
 import { retiredDeedActivity } from './system_availability';
 import { heading, list, percent, type SystemWriter, words } from './system_writer';
 
+/** A delve's in-game name; the id only if the delve is unknown. */
+const delveName = (id: string): string => DELVE_LIST.find((d) => d.id === id)?.name ?? words(id);
+const delveTierLabel = (delveId: string, tierId: string): string =>
+  DELVE_LIST.find((d) => d.id === delveId)?.tiers.find((t) => t.id === tierId)?.label ??
+  words(tierId);
+
 export function addExpeditionCollections(w: SystemWriter) {
   const item = (id: string) => w.entity('item', id, ITEMS[id]?.name);
   const mob = (id: string) => w.entity('mob', id, MOBS[id]?.name);
@@ -199,7 +205,7 @@ export function addExpeditionCollections(w: SystemWriter) {
       'Collection',
       page.desc ?? '',
       'Shelf: ' +
-        words(page.shelf) +
+        guideStrings.reliquaryPage.shelf[page.shelf] +
         '.' +
         (page.excludeFromCompletion
           ? ` This ${page.excludeFromCompletion} page does not count toward completion percentages.`
@@ -225,7 +231,9 @@ export function addExpeditionCollections(w: SystemWriter) {
                 case 'quest':
                   return w.entity('quest', h.sourceId, QUESTS[h.sourceId]?.name);
                 default:
-                  return `${words(h.sourceKind)} (${words(h.sourceId)})`;
+                  return h.sourceKind === 'delve'
+                    ? delveName(h.sourceId)
+                    : `${words(h.sourceKind)} (${words(h.sourceId)})`;
               }
             });
             return `${name}: ${routes.join(' or ')}.`;
@@ -281,9 +289,9 @@ export function addExpeditionCollections(w: SystemWriter) {
                 ? ' To unlock this tier, you need ' +
                   t.unlock.clears +
                   ' clear(s) of ' +
-                  words(t.unlock.delveId) +
+                  delveName(t.unlock.delveId) +
                   ' at ' +
-                  words(t.unlock.tierId) +
+                  delveTierLabel(t.unlock.delveId, t.unlock.tierId) +
                   '.'
                 : ''),
           ),

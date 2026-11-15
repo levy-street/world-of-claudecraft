@@ -193,11 +193,12 @@ const zoneDirectories = addQuestDirectory({ ...writer, reserve });
 addZoneAndClassHubs({ ...writer, reserve });
 const raidParents = addDungeonCatalog({ ...writer, reserve });
 
+const BIOME_LABELS = { vale: 'Green vale', marsh: 'Marshland', peaks: 'Mountain peaks', beach: 'Beach', desert: 'Desert', volcano: 'Volcanic land', cave: 'Caverns', dusk: 'Dusklands', ember: 'Ember lands', frost: 'Frozen reach', amber: 'Autumn woods', fen: 'Fenland', night: 'Night lands', haunt: 'Haunted ground', jungle: 'Jungle', garden: 'Gardens', gale: 'Windswept coast' };
 for (const zone of ZONES) {
   const npcs = Object.keys(NPCS).filter((id) => homeZones(id).some((z) => z.id === zone.id)).map((id) => titleBy.npc.get(id));
   const quests = Object.keys(QUESTS).filter((id) => !QUESTS[id].seasonalEvent && zoneForQuest(id) === zone.name).map((id) => titleBy.quest.get(id));
   add(titleBy.zone.get(zone.id), section('Overview', zone.welcome) + section('Facts', table([
-    ['Level range', zone.levelRange[0] === zone.levelRange[1] ? String(zone.levelRange[0]) : zone.levelRange[0] + '-' + zone.levelRange[1]], ['Hub', zone.hub.name], ['Biome', zone.biome], ['Graveyard', zone.graveyard.x + ', ' + zone.graveyard.z],
+    ['Level range', zone.levelRange[0] === zone.levelRange[1] ? String(zone.levelRange[0]) : zone.levelRange[0] + '-' + zone.levelRange[1]], ['Hub', zone.hub.name], ['Biome', BIOME_LABELS[zone.biome] ?? 'Wilds'], ['Graveyard', zone.graveyard.x + ', ' + zone.graveyard.z],
   ])) + section('Points of interest', bullets(zone.pois.map((poi) => poi.label))) + section('NPCs', bullets(npcs.map((title) => link(title)))) + section('Quests starting here', (zoneDirectories.has(zone.name) ? link(zoneDirectories.get(zone.name), 'See all quests in ' + zone.name) + '\\n\\n' : '') + bullets(quests.map((title) => link(title)))), ['Zones', zone.biome]);
 }
 

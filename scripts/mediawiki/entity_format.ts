@@ -11,6 +11,7 @@ import {
   ZONES,
 } from '../../src/sim/data';
 import type { QuestRoute } from './quest_route';
+import { wikiProfessionName } from './wiki_item_kind';
 
 export type ArticleKind =
   | 'class'
@@ -63,7 +64,12 @@ export const recipes = new Map(ALL_RECIPES.map((r) => [r.id, r]));
 export function recipeLabel(w: ArticleTools, id: string): string {
   const r = recipes.get(id);
   return r
-    ? ref(w, 'item', r.resultItemId) + ' (' + words(r.professionId) + ', skill ' + r.skillReq + ')'
+    ? ref(w, 'item', r.resultItemId) +
+        ' (' +
+        wikiProfessionName(r.professionId) +
+        ', skill ' +
+        r.skillReq +
+        ')'
     : (ENCHANTS[id]?.name ?? words(id));
 }
 export function append(index: Map<string, Set<string>>, id: string, text: string) {

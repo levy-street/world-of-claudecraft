@@ -1,8 +1,9 @@
 import { canEquipItem } from '../../src/sim/equipment_rules';
 import { ALL_CLASSES, type ItemDef, type PlayerClass } from '../../src/sim/types';
 import { requiredClassesForTooltip } from '../../src/ui/item_class_restriction';
-import { type ArticleTools, ref, words } from './entity_format';
+import { type ArticleTools, ref } from './entity_format';
 import type { RoutePoint } from './quest_map';
+import { wikiArmorTypeName } from './wiki_item_kind';
 
 export interface ItemAcquisition {
   title: string;
@@ -24,7 +25,7 @@ export function addAcquisition(
 /**
  * The `requiredClass` list on an item means two different things in the game.
  *
- * For shields, held offhands, class-locked sets and weapons it is the real rule:
+ * For shields, orbs, tomes, quivers, class-locked sets and weapons it is the real rule:
  * `canEquipItem` (src/sim/equipment_rules.ts) lets only those classes equip it.
  * For ordinary cloth, leather, mail and plate armor `canEquipItem` ignores it and
  * lets every class that can wear the armor type equip the piece. There the list only
@@ -43,7 +44,7 @@ export function classUseNote(w: ArticleTools, item: ItemDef): string | null {
   const canEquip = ALL_CLASSES.filter((c) => canEquipItem(c, item));
   const extra = canEquip.filter((c) => !meant.includes(c));
   if (!extra.length) return 'Only these classes can use it: ' + list(canEquip) + '.';
-  const wear = words(item.kind === 'armor' && item.armorType ? item.armorType : 'this');
+  const wear = item.kind === 'armor' && item.armorType ? wikiArmorTypeName(item.armorType) : 'this';
   return (
     'This piece is made for these classes: ' +
     list(meant) +

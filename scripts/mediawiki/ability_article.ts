@@ -11,9 +11,14 @@ import {
 import { ABILITIES, CLASSES, QUESTS } from '../../src/sim/data';
 import type { ResolvedAbility } from '../../src/sim/resolved_ability';
 import { type AbilityDef, GCD, MAX_LEVEL, MELEE_RANGE, MIN_GCD } from '../../src/sim/types';
+import { type TranslationKey, t } from '../../src/ui/i18n';
 import { abilityIndexGroup, itemActionSource, MEMBERSHIP_GROUP } from './ability_access';
 import { referenceAbility, specializationExamples } from './ability_builds';
-import { mediawikiAbilityDescription, wikiAbilityText } from './ability_description';
+import {
+  mediawikiAbilityDescription,
+  renameSpecTags,
+  wikiAbilityText,
+} from './ability_description';
 import { mergeRankText, rankValues } from './ability_ranks';
 import { abilityScalingLines } from './ability_scaling';
 import { type AbilityPageTools, affectedAbilities } from './talent_articles';
@@ -32,6 +37,32 @@ export function abilityResource(def: AbilityDef): string {
 }
 function clean(s: string): string {
   return s.replaceAll('_', ' ');
+}
+// The name a buff or aura shows on the player's buff bar. The aura kind is an internal key.
+const AURA_NAMES: Record<string, string> = {
+  old_blood: 'Old Blood',
+  verdance: 'Verdance',
+  moontide: 'Moontide',
+  form_moonkin: 'Moonwing Form',
+  form_sporemender: 'Sporemender Form',
+  gloomtithe: 'Gloomtithe',
+  processional_grace: 'Processional Grace',
+  spirit_bomb_charge: 'Tithe Bomb',
+  victory_rush: "Victor's Surge",
+  icicles: 'Icicles',
+  affliction_doom: 'Condemnation',
+  redline: 'Redline',
+  venom_ritual: 'Venom Ritual',
+  stealth: 'Duskveil',
+  buff_speed: 'a speed bonus',
+  imbue: 'a weapon imbue',
+  hot: 'a heal over time',
+};
+function auraName(kind: string): string {
+  return AURA_NAMES[kind] ?? clean(kind);
+}
+function schoolName(school: string): string {
+  return t(`hudChrome.auraEffect.school.${school}` as TranslationKey);
 }
 function replacementRules(def: AbilityDef) {
   const r = def.actionReplacement;
@@ -147,7 +178,7 @@ export function abilityArticle(
     rankValues(rankSections.map(value));
   // The headline numbers, shown as a strip under the title.
   const stats: string[][] = [];
-  const details: string[][] = [['School', clean(def.school)]];
+  const details: string[][] = [['School', schoolName(def.school)]];
   if (!def.passive) {
     const costs = perRank((res) => res.cost);
     stats.push([
@@ -230,14 +261,14 @@ export function abilityArticle(
     );
   if (def.requiresAuraKind)
     requirements.push(
-      `You need ${def.requiresAuraStacks ?? 1} stack(s) of ${clean(def.requiresAuraKind)} on you${def.requiresOwnAura ? ', put there by you' : ''}.`,
+      `You need ${def.requiresAuraStacks ?? 1} stack(s) of ${auraName(def.requiresAuraKind)} on you${def.requiresOwnAura ? ', put there by you' : ''}.`,
     );
   if (def.spendsCombo)
     requirements.push(
       `Uses up your combo points on the target.${def.comboOptional ? ' You can still use it with zero points.' : ''}`,
     );
   if (def.awardsCombo) requirements.push(`Gives ${def.awardsCombo} combo point(s) when it hits.`);
-  if (def.ruinCost) requirements.push(`Also costs ${def.ruinCost} Ruin.`);
+  if (def.ruinCost) requirements.push(`Also costs ${def.ruinCost} Wrack.`);
   if (def.devotionCost) requirements.push(`Also costs ${def.devotionCost} Devotion.`);
   if (def.soulFragmentCost) requirements.push(`Also costs ${def.soulFragmentCost} Soul Fragments.`);
   if (def.castWhileMoving) requirements.push('You can cast while moving.');
@@ -250,9 +281,9 @@ export function abilityArticle(
     );
   for (const r of replacementRules(def)) {
     const gates = [
-      r.auraKind ? `${r.minStacks ?? 1} stack(s) of ${clean(r.auraKind)}` : '',
-      r.actorAuraKind ? clean(r.actorAuraKind) : '',
-      r.absentAuraKind ? 'no ' + clean(r.absentAuraKind) : '',
+      r.auraKind ? `${r.minStacks ?? 1} stack(s) of ${auraName(r.auraKind)}` : '',
+      r.actorAuraKind ? auraName(r.actorAuraKind) : '',
+      r.absentAuraKind ? 'no ' + auraName(r.absentAuraKind) : '',
     ].filter(Boolean);
     requirements.push(
       'This button turns into ' +
@@ -318,7 +349,7 @@ export function abilityArticle(
           ' (level ' +
           row.level +
           '): ' +
-          option.description,
+          renameSpecTags(option.description, def.class),
       );
     }
   if (buildRules.length)

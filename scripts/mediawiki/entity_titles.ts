@@ -10,13 +10,26 @@ import {
   zoneContaining,
 } from '../../src/sim/data';
 import { questZoneName } from './quest_articles';
-import { assignTitles, idQualifier, type TitleEntry } from './title_names';
+import { assignTitles, type TitleEntry } from './title_names';
 
 type Kind = 'class' | 'ability' | 'zone' | 'dungeon' | 'npc' | 'quest' | 'mob' | 'item';
 
 const present = (hints: (string | undefined | false)[]) => [
   ...new Set(hints.filter((h): h is string => typeof h === 'string')),
 ];
+
+// Words of an id that are not a game name, so they never go into a title.
+const SKIP_WORDS = new Set(['shadow', 'mistcaller', 'marrow', 'watch']);
+
+/** Like idQualifier, but in game words: a class id becomes the class name, an internal
+ *  event or old-name word is dropped, and "head left" reads "Left head". */
+function gameQualifier(id: string, name: string): string {
+  const said = new Set(name.toLowerCase().split(/[^a-z0-9]+/));
+  let parts = id.split('_').filter((w) => w && !said.has(w) && !SKIP_WORDS.has(w));
+  if (parts.length === 2 && parts[0] === 'head') parts = [parts[1], parts[0]];
+  const text = parts.map((w) => CLASSES[w]?.name ?? w).join(' ');
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
 
 /** The page title of every class, ability, zone, dungeon, NPC, quest, creature and item.
  *  A shared name is told apart by what the thing is, never by a bare number. */
@@ -31,7 +44,10 @@ export function entityTitles(used: Set<string>): Record<Kind, Map<string, string
       add('ability', id, ability.name + ' (Ability)', [
         '',
         CLASSES[ability.class]?.name,
-        idQualifier(id, ability.name),
+        CLASSES[ability.class]?.name +
+          ', ' +
+          (ability.castTime > 0 ? ability.castTime + ' sec cast' : 'instant'),
+        gameQualifier(id, ability.name),
       ]);
   for (const zone of ZONES) add('zone', zone.id, zone.name, ['', 'Zone']);
   for (const dungeon of DUNGEON_LIST) add('dungeon', dungeon.id, dungeon.name, ['', 'Dungeon']);
@@ -40,7 +56,7 @@ export function entityTitles(used: Set<string>): Record<Kind, Map<string, string
     const place =
       (posted ? zoneContaining(npc.pos.x, npc.pos.z)?.name : undefined) ??
       DUNGEON_LIST.find((d) => d.npcs?.some((s) => s.npcId === id))?.name;
-    const own = idQualifier(id, npc.name);
+    const own = gameQualifier(id, npc.name);
     add('npc', id, npc.name + ' (NPC)', ['', place, place && own && place + ', ' + own, own]);
   }
   for (const [id, quest] of Object.entries(QUESTS)) {
@@ -53,7 +69,7 @@ export function entityTitles(used: Set<string>): Record<Kind, Map<string, string
     ]);
   }
   for (const [id, mob] of Object.entries(MOBS)) {
-    const own = idQualifier(id, mob.name);
+    const own = gameQualifier(id, mob.name);
     const levels =
       mob.minLevel === mob.maxLevel
         ? 'level ' + mob.minLevel
@@ -73,7 +89,7 @@ export function entityTitles(used: Set<string>): Record<Kind, Map<string, string
       id,
       item.name,
       heroic
-        ? ['Heroic', 'Heroic item', 'Heroic, ' + idQualifier(id, item.name)]
+        ? ['Heroic', 'Heroic item', 'Heroic, ' + gameQualifier(id, item.name)]
         : [heroicNames.has(item.name) ? 'Normal' : 'Item', 'Item'],
     );
   }

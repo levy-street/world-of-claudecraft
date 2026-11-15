@@ -5,6 +5,7 @@ import { itemCombatTooltipLines } from '../../src/ui/item_combat_tooltip_view';
 import { itemArtPath } from './article_art';
 import type { ArticleTools } from './entity_format';
 import { offhandSection } from './item_catalog_groups';
+import { wikiArmorTypeName, wikiQualityName } from './wiki_item_kind';
 
 // Gear is browsed in layers: slot, then armor type, then quality. Every layer lists its
 // items in a table of stats that the reader can sort and filter.
@@ -19,7 +20,6 @@ export interface GearItem {
 }
 
 const QUALITY_ORDER = ['poor', 'common', 'uncommon', 'rare', 'epic', 'legendary'];
-const capital = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const lower = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
 const plain = (html: string) =>
   html
@@ -50,7 +50,7 @@ export function gearStats(item: ItemDef) {
 export const gearType = (item: ItemDef) =>
   item.kind === 'weapon'
     ? ''
-    : offhandSection(item) || (item.armorType ? capital(item.armorType) : '');
+    : offhandSection(item) || (item.armorType ? wikiArmorTypeName(item.armorType) : '');
 const quality = (item: ItemDef) => item.quality ?? 'common';
 
 export function gearTable(items: GearItem[], weapon: boolean): string {
@@ -70,7 +70,7 @@ export function gearTable(items: GearItem[], weapon: boolean): string {
         '|' +
         entry.name +
         ']]';
-      const common = [cell, String(requiredLevelFor(item)), capital(quality(item))];
+      const common = [cell, String(requiredLevelFor(item)), wikiQualityName(item.quality)];
       return (
         '|-\n| ' +
         (weapon
@@ -128,9 +128,11 @@ export function addGearPages(
     return [...groups]
       .sort(([a], [b]) => QUALITY_ORDER.indexOf(a) - QUALITY_ORDER.indexOf(b))
       .map(([q, members]) => {
-        const child = w.reserve(capital(q) + ' ' + lower(label) + ' (Items index)');
+        const child = w.reserve(
+          wikiQualityName(q as ItemDef['quality']) + ' ' + lower(label) + ' (Items index)',
+        );
         page(child, parent, members, '', []);
-        return w.link(child, capital(q)) + count(members.length);
+        return w.link(child, wikiQualityName(q as ItemDef['quality'])) + count(members.length);
       });
   };
   const types = new Map<string, GearItem[]>();

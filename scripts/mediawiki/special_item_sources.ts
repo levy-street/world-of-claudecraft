@@ -59,7 +59,8 @@ import { Rng } from '../../src/sim/rng';
 import type { PlayerClass } from '../../src/sim/types';
 import { materialHintKey } from '../../src/ui/hud/professions/material_hint_view';
 import { t } from '../../src/ui/i18n';
-import { type ArticleTools, append, pct, ref, words } from './entity_format';
+import { type ArticleTools, append, pct, ref } from './entity_format';
+import { guildContractKindName, wikiRatingName } from './wiki_item_kind';
 
 export function indexSpecialItemSources(w: ArticleTools, sources: Map<string, Set<string>>) {
   const add = (id: string, s: string) => append(sources, id, s);
@@ -107,7 +108,7 @@ export function indexSpecialItemSources(w: ArticleTools, sources: Map<string, Se
       'Personal loot on the body for the first group to clear a natural rift that is rank A or S, or that has a crafting material bias of at least 0.5. Each player in turn gets the next gem color. Put it in a Riftbound ring socket for ' +
         RIFT_GEM_RATING +
         ' ' +
-        words(RIFT_GEM_RATING_STAT[id]) +
+        wikiRatingName(RIFT_GEM_RATING_STAT[id]) +
         '.',
     );
   // The medium chest selects exactly one of two uncommon pieces with its first
@@ -231,7 +232,7 @@ export function indexSpecialItemSources(w: ArticleTools, sources: Map<string, Se
     LANTERN_SEAL_ITEM_ID,
     'Finish guild contracts. Seals for each type of contract: ' +
       Object.entries(GUILD_CONTRACT_SEALS)
-        .map(([kind, count]) => words(kind) + ' ' + count)
+        .map(([kind, count]) => guildContractKindName(kind) + ' ' + count)
         .join(', ') +
       '.',
   );

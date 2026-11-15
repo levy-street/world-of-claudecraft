@@ -73,7 +73,7 @@ export const characterPaths: Record<string, PlayPath> = {
       'Press P to open the spellbook on a character who has learned a pet summon. A Hunter can follow [[Hunter pets]] to tame a beast instead.',
     need: 'You need the class, specialization and level that the summon ability asks for. Its tooltip shows the cost and cast time. A cosmetic companion (one that is only for show) uses a different slot.',
     steps: [
-      'Drag your summon ability to an action bar and use it. For example, a Frost mage who has learned Summon Water Elemental can cast it this way.',
+      'Drag your summon ability to an action bar and use it. For example, a Cryomancy mage who has learned Summon Water Elemental can cast it this way.',
       'If you can control the pet, target an enemy. Click Attack on the pet bar to send the pet. Or choose Assist and attack the enemy yourself. Choose Passive to stop the pet from starting new fights on its own.',
       'Use the commands that pet has. For example, click Water Jet on the elemental’s bar to aim it at one enemy. Right-click Water Jet to turn automatic use on or off.',
     ],

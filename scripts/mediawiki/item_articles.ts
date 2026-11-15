@@ -46,6 +46,7 @@ import {
   MASTERWROUGHT_LEGENDARY_CAP,
   weaponHand,
 } from '../../src/sim/equipment_rules';
+import { FACTIONS } from '../../src/sim/factions';
 import { itemLevel } from '../../src/sim/item_level';
 import { requiredLevelFor } from '../../src/sim/item_level_req';
 import { gatheringSupplyHintsForItem } from '../../src/sim/professions/gathering_supply';
@@ -73,12 +74,23 @@ import {
   trinketTooltipLineTexts,
 } from '../../src/ui/trinket_tooltip_view';
 import { indexActivityItems } from './activity_item_sources';
-import { type ArticleTools, append, lines, pct, recipeLabel, ref, words } from './entity_format';
+import { type ArticleTools, append, lines, pct, recipeLabel, ref } from './entity_format';
 import { itemAcquisitionArticle, itemAcquisitionIndex } from './item_acquisition';
 import { type DropSource, dropSourceTable } from './loot_table';
 import { indexSpecialItemSources } from './special_item_sources';
 import { vendorOfferText } from './vendor_offer';
-import { wikiItemKind } from './wiki_item_kind';
+import {
+  titleWords,
+  wikiArmorTypeName,
+  wikiChromaName,
+  wikiEventName,
+  wikiItemKind,
+  wikiProfessionName,
+  wikiQualityName,
+  wikiReliquarySource,
+  wikiStandingTierName,
+  wikiStationName,
+} from './wiki_item_kind';
 
 // Each reused HUD builder emits escaped single-line divs. Keep their player-facing
 
@@ -194,7 +206,7 @@ function effects(w: ArticleTools, item: ItemDef): string[] {
       (item.kind === 'food' ? 'Finish the meal to gain ' : 'Gain ') +
         buff.value +
         ' ' +
-        (statNames[buff.kind.replace('buff_', '')] ?? words(buff.kind)) +
+        (statNames[buff.kind.replace('buff_', '')] ?? titleWords(buff.kind.replace('buff_', ''))) +
         ' for ' +
         buff.duration +
         ' sec. ' +
@@ -222,7 +234,8 @@ function effects(w: ArticleTools, item: ItemDef): string[] {
 
   if (item.kind === 'buddy') out.push('Unlocks the companion ' + BUDDIES[item.buddy].name + '.');
 
-  if (item.kind === 'buddy_cosmetic') out.push('Companion cosmetic: ' + words(item.cosmetic) + '.');
+  if (item.kind === 'buddy_cosmetic')
+    out.push('Companion cosmetic: ' + titleWords(item.cosmetic) + '.');
 
   if (item.kind === 'recipe')
     out.push(
@@ -286,11 +299,11 @@ function effects(w: ArticleTools, item: ItemDef): string[] {
           'Tier ' +
             use.tier +
             ' ' +
-            words(use.professionId) +
+            wikiProfessionName(use.professionId) +
             ' tool. To use it, you need ' +
             wieldRequirementFor(use.professionId, use.tier) +
             ' ' +
-            words(use.professionId) +
+            wikiProfessionName(use.professionId) +
             ' proficiency (your skill level in it). ' +
             (use.professionId === 'fishing'
               ? 'Cast into water you can fish in, and reel in when a fish bites.'
@@ -381,7 +394,9 @@ function effects(w: ArticleTools, item: ItemDef): string[] {
         break;
 
       case 'mechChroma': {
-        out.push('Use to unlock the ' + words(use.chromaId) + ' mech color on your account.');
+        out.push(
+          'Use to unlock the ' + wikiChromaName(use.chromaId) + ' mech color on your account.',
+        );
         const chroma = MECH_CHROMAS.find((c) => c.id === use.chromaId);
         if (chroma)
           out.push(
@@ -417,7 +432,7 @@ function effects(w: ArticleTools, item: ItemDef): string[] {
       case 'placeMobileStation':
         out.push(
           'Set down a ' +
-            words(use.stationCraftId) +
+            wikiProfessionName(use.stationCraftId) +
             ' workstation where you stand, for ' +
             MOBILE_CRAFTING_STATION_DURATION_TICKS / TICK_RATE / 60 +
             ' minutes. Your party can use it too. You can use this item again.',
@@ -554,14 +569,14 @@ export function addItemArticles(
       'Craft ' +
         r.resultCount +
         ' with ' +
-        words(r.professionId) +
+        wikiProfessionName(r.professionId) +
         ' (needs skill ' +
         r.skillReq +
         ')' +
         '. Ingredients, before any discounts: ' +
         r.reagents.map((a) => a.count + ' ' + ref(w, 'item', a.itemId)).join(', ') +
         '.' +
-        (r.stationType ? ' Station: ' + words(r.stationType) + '.' : ''),
+        (r.stationType ? ' Station: ' + wikiStationName(r.stationType) + '.' : ''),
     );
 
     for (const a of r.reagents)
@@ -580,9 +595,7 @@ export function addItemArticles(
             sources,
             r.itemId,
             'Reliquary source: ' +
-              (kind
-                ? ref(w, kind, hint.sourceId)
-                : words(hint.sourceKind) + ' / ' + words(hint.sourceId)) +
+              (kind ? ref(w, kind, hint.sourceId) : wikiReliquarySource(hint)) +
               '.',
           );
         }
@@ -596,7 +609,7 @@ export function addItemArticles(
 
     const facts: [string, string][] = [
       ['Type', kind],
-      ['Quality', quality],
+      ['Quality', wikiQualityName(item.quality)],
       ['Stack limit', String(stackSizeOf(item))],
       [
         'Sell value',
@@ -630,7 +643,8 @@ export function addItemArticles(
         facts.push(['Made for', meant.map((c) => ref(w, 'class', c)).join(', ')]);
     } else if (item.requiredLevel) facts.push(['Required level', String(item.requiredLevel)]);
 
-    if (item.kind === 'armor' && item.armorType) facts.push(['Armor type', words(item.armorType)]);
+    if (item.kind === 'armor' && item.armorType)
+      facts.push(['Armor type', wikiArmorTypeName(item.armorType)]);
 
     if (item.kind === 'weapon')
       facts.push(
@@ -656,11 +670,11 @@ export function addItemArticles(
     if (g)
       facts.push([
         'Faction vendor requirement',
-        g.standingTier +
+        wikiStandingTierName(g.standingTier) +
           ' (' +
           g.requiredStanding +
           ' standing)' +
-          (g.factionId ? ' with ' + words(g.factionId) : '') +
+          (g.factionId ? ' with ' + FACTIONS[g.factionId].name : '') +
           ', ' +
           g.currencyCost +
           ' marks.',
@@ -684,7 +698,7 @@ export function addItemArticles(
 
     if (rules.length) facts.push(['Restrictions', rules.join('. ') + '.']);
 
-    if (item.seasonalEvent) facts.push(['Event', words(item.seasonalEvent)]);
+    if (item.seasonalEvent) facts.push(['Event', wikiEventName(item.seasonalEvent)]);
 
     const availability = RETIRED_HEROIC_ITEMS[item.id]
       ? "'''Retired gear.''' This used to drop on Heroic, but it no longer drops. Copies people already have still work."
@@ -707,7 +721,7 @@ export function addItemArticles(
           ? 'Harvest the bodies of defeated creatures. Set your harvest preference to ' +
               ref(w, 'item', h.corpsePreferenceItemId) +
               '.'
-          : 'Gather it with ' + words(h.familyId) + '.',
+          : 'Gather it with ' + wikiProfessionName(h.familyId) + '.',
       );
 
     const season = seasonalItemSourceText(item);

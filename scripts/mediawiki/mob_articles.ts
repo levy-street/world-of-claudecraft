@@ -24,6 +24,7 @@ import { resolveScarecrowField } from '../../src/sim/seasonal/scarecrow_field';
 import type { LootEntry } from '../../src/sim/types';
 import { WORLD_BOSS_CORPSE_SECONDS, WORLD_BOSSES } from '../../src/sim/world_boss';
 import { WORLD_SEED } from '../../src/sim/world_seed';
+import { type TranslationKey, t } from '../../src/ui/i18n';
 import { rankValues } from './ability_ranks';
 import { itemArtPath, mobArtPath } from './article_art';
 import { companionBossSources, companionByCreature, companionRollText } from './companion_sources';
@@ -57,8 +58,7 @@ function lootLine(w: ArticleTools, entry: LootEntry, heroicOnly: boolean, upgrad
     conditions.push('only while you need it for ' + ref(w, 'quest', entry.questId));
   if (entry.normalOnly) conditions.push('Normal only');
   if (heroicOnly) conditions.push('Heroic only');
-  if (entry.rollGroup)
-    conditions.push('shares one roll with the ' + words(entry.rollGroup) + ' pool');
+  if (entry.rollGroup) conditions.push('shares one roll with the other drops in its group');
   if (entry.unlessOwned) conditions.push('only if you do not already have it');
   if (entry.unlessOwnedItem)
     conditions.push('only if you do not have ' + ref(w, 'item', entry.unlessOwnedItem));
@@ -69,6 +69,11 @@ function lootLine(w: ArticleTools, entry: LootEntry, heroicOnly: boolean, upgrad
   );
 }
 const capital = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+/** The family name the HUD tooltip shows (the guide bestiary label). */
+const mobFamilyName = (family: string): string =>
+  family === 'demon' ? 'Demons' : t(('guide.family.' + family + '.name') as TranslationKey);
+/** A seasonal event id read as its title: "gourdlight_eve" is "Gourdlight Eve". */
+const eventName = (id: string): string => words(id).replace(/(^| )[a-z]/g, (c) => c.toUpperCase());
 
 // The same facts as lootLine, split into the columns of the loot table.
 function lootRow(
@@ -189,7 +194,7 @@ export function addMobArticles(
       continue;
     }
     const facts: [string, string][] = [
-      ['Family', words(m.family)],
+      ['Family', mobFamilyName(m.family)],
       ['Base swing interval', m.attackSpeed + ' sec'],
       ['Movement speed', m.moveSpeed + ' yd per sec'],
       ['Base detection radius', m.aggroRadius + ' yd'],
@@ -245,7 +250,7 @@ export function addMobArticles(
       ]);
     if (m.hardLeashRadius) facts.push(['Maximum chase from home', m.hardLeashRadius + ' yd']);
     if (m.requiresQuestId) facts.push(['Associated quest', ref(w, 'quest', m.requiresQuestId)]);
-    if (m.seasonalEvent) facts.push(['Event', words(m.seasonalEvent)]);
+    if (m.seasonalEvent) facts.push(['Event', eventName(m.seasonalEvent)]);
     if (m.xpMult !== undefined) facts.push(['Experience multiplier', String(m.xpMult)]);
     const stats: [string, string][] = [];
     const byLevel: { level: number; hp: number; armor: number; damage: string }[] = [];
@@ -413,9 +418,9 @@ export function addMobArticles(
       w.section(
         'Overview',
         m.name +
-          ' belongs to the ' +
-          words(m.family) +
-          ' family.' +
+          ' is one of the ' +
+          mobFamilyName(m.family) +
+          '.' +
           (isEncounterProp(m.id)
             ? ' It is a prop in an encounter. It is not an enemy and it does not attack you.'
             : ''),

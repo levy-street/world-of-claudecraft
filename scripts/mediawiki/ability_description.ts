@@ -2,6 +2,7 @@
 // live tooltip placeholder in game, but label its zero-power reference total in
 // the article and explain the same per-tick rounding that combat uses.
 import { hunterTrapBleedAmounts } from '../../src/sim/combat/hunter_trap_bleed';
+import { TALENTS } from '../../src/sim/content/talents';
 import { ABILITIES } from '../../src/sim/data';
 import type { ResolvedAbility } from '../../src/sim/resolved_ability';
 import type { AbilityDef } from '../../src/sim/types';
@@ -37,8 +38,24 @@ function orbDamageText(res: ResolvedAbility): string {
   return orb ? `${orb.min} to ${orb.max}` : '';
 }
 
-function reconcile(res: ResolvedAbility, text: string): string {
+/** Game text tags a specialization by its old id, such as "(Fury)" or "(Affliction; ...)".
+ *  The wiki names the specialization the way the game does, for example Bloodrush. */
+export function renameSpecTags(text: string, cls: string): string {
   let out = text;
+  for (const spec of (TALENTS as Record<string, (typeof TALENTS)[keyof typeof TALENTS]>)[cls]
+    ?.specs ?? []) {
+    const id = spec.id === 'prot' ? 'protection' : spec.id;
+    const old = id.charAt(0).toUpperCase() + id.slice(1);
+    if (old === spec.name) continue;
+    out = out.replaceAll('(' + old + ')', '(' + spec.name + ')');
+    out = out.replaceAll('(' + old + ';', '(' + spec.name + ';');
+    out = out.replaceAll('(' + old + ' signature)', '(' + spec.name + ' signature)');
+  }
+  return out;
+}
+
+function reconcile(res: ResolvedAbility, text: string): string {
+  let out = renameSpecTags(text, res.def.class);
   const strikes = res.effects.filter((e) => e.type === 'weaponStrike');
   if (
     strikes.length &&

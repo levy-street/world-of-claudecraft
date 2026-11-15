@@ -25,6 +25,7 @@ import { addDisenchantAcquisitions } from './item_disenchant';
 import { itemNpcPoints } from './item_npc_route';
 import type { RoutePoint } from './quest_map';
 import { vendorOfferText } from './vendor_offer';
+import { wikiProfessionName, wikiStationName } from './wiki_item_kind';
 
 function location(points: RoutePoint[]): string {
   return points
@@ -196,7 +197,7 @@ export function vendorCraftAcquisitions(w: ArticleTools): Map<string, ItemAcquis
     if (trainer)
       learned.push(
         'When your ' +
-          words(recipe.professionId) +
+          wikiProfessionName(recipe.professionId) +
           ' skill is ' +
           tierForSkill(recipe.skillReq) * TIER_SKILL_STEP +
           ' or higher, talk to ' +
@@ -240,7 +241,7 @@ export function vendorCraftAcquisitions(w: ArticleTools): Map<string, ItemAcquis
         step: 3,
         frame: 'Overworld',
         ...bench.pos,
-        label: words(bench.type) + ' · craft here',
+        label: wikiStationName(bench.type) + ' · craft here',
       });
       points.push({
         step: 'Reward',
@@ -250,7 +251,12 @@ export function vendorCraftAcquisitions(w: ArticleTools): Map<string, ItemAcquis
       });
     }
     addAcquisition(index, recipe.resultItemId, {
-      title: 'Craft with ' + words(recipe.professionId) + ' (recipe skill ' + recipe.skillReq + ')',
+      title:
+        'Craft with ' +
+        wikiProfessionName(recipe.professionId) +
+        ' (recipe skill ' +
+        recipe.skillReq +
+        ')',
       steps: [
         learned.join(' '),
         'Collect the ingredients for one craft: ' +
@@ -260,11 +266,11 @@ export function vendorCraftAcquisitions(w: ArticleTools): Map<string, ItemAcquis
           ? 'Stand within ' +
             STATION_RADIUS +
             ' yards of a ' +
-            words(recipe.stationType!) +
+            wikiStationName(recipe.stationType!) +
             ' station. Use one shown on the map, or a matching mobile station. '
           : 'You do not need a station for this recipe. ') +
           'Open Crafting (T). Pick ' +
-          words(recipe.professionId) +
+          wikiProfessionName(recipe.professionId) +
           ', then the recipe for ' +
           itemLink(recipe.resultItemId) +
           ', and choose Craft. Wait for the cast to finish. Its base time is ' +
@@ -284,9 +290,9 @@ export function vendorCraftAcquisitions(w: ArticleTools): Map<string, ItemAcquis
         ...(combo
           ? [
               'You need ' +
-                words(combo.craftA) +
+                wikiProfessionName(combo.craftA) +
                 ' and ' +
-                words(combo.craftB) +
+                wikiProfessionName(combo.craftB) +
                 ' as your major pair, with both at tier ' +
                 combo.minTier +
                 ' (skill ' +

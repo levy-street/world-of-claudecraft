@@ -5,9 +5,9 @@ import { type ArticleTools, ref } from './entity_format';
 import { addAcquisition, type ItemAcquisition } from './item_acquisition_types';
 
 const MATERIAL_INPUTS: Record<string, string> = {
-  arcane_dust: 'common or uncommon weapons, armor or held offhands',
-  arcane_essence: 'rare weapons, armor or held offhands',
-  arcane_shard: 'epic or legendary weapons, armor or held offhands',
+  arcane_dust: 'common or uncommon weapons, armor, orbs, tomes or quivers',
+  arcane_essence: 'rare weapons, armor, orbs, tomes or quivers',
+  arcane_shard: 'epic or legendary weapons, armor, orbs, tomes or quivers',
   resonant_thread: 'rare, epic or legendary cloth armor',
   resonant_hide: 'rare, epic or legendary leather armor',
   resonant_links: 'rare, epic or legendary mail armor',
@@ -73,7 +73,7 @@ export function addDisenchantAcquisitions(
         id === 'arcane_dust'
           ? 'To work out the dust, take the level needed to equip the piece, divide by 10 and drop any remainder. A common piece gives 2 plus that number. An uncommon piece gives 3 plus that number. Either way, there is a 50% chance of 1 extra. For example, a common piece that needs level 25 gives 4 or 5 dust. The confirm box shows the two amounts your piece can give.'
           : id === 'arcane_essence' || id === 'arcane_shard'
-            ? 'Each piece that works always gives exactly 1 of this material. Rare or better cloth, leather, mail and weapons also give their matching Resonant material. Jewelry with no armor type and held offhands do not give a Resonant material.'
+            ? 'Each piece that works always gives exactly 1 of this material. Rare or better cloth, leather, mail and weapons also give their matching Resonant material. Jewelry with no armor type and orbs, tomes and quivers do not give a Resonant material.'
             : 'A rare piece always gives exactly 1 of this material. An epic or legendary piece gives 1 or 2, with a 50% chance of each. You also get 1 ' +
               ref(w, 'item', 'arcane_essence') +
               ' from rare gear or 1 ' +

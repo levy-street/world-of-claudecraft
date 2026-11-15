@@ -15,6 +15,7 @@ import { weaponHand } from '../../src/sim/equipment_rules';
 import { npcRoleFor } from '../../src/sim/npc_role';
 import { WORLD_PVP_SKULL_BAG_ITEM_ID } from '../../src/sim/pvp/world_pvp_trophy';
 import { type ItemDef, type MobFamily, questTurnInNpcIds } from '../../src/sim/types';
+import { craftNameKey, craftNameText } from '../../src/ui/hud/professions/craft_name_view';
 import { abilityIndexGroup, MEMBERSHIP_GROUP } from './ability_access';
 import { type ClassAbilityGroup, classAbilityGroup } from './class_ability_sections';
 import { creatureRole, FRIENDLY_GROUPS, ROLE_SECTIONS } from './creature_role';
@@ -136,7 +137,11 @@ function itemPortal(w: Writer) {
   for (const recipe of ALL_RECIPES)
     for (const reagent of recipe.reagents) {
       const crafts = ingredients.get(reagent.itemId) ?? new Set<string>();
-      crafts.add(display(recipe.professionId));
+      crafts.add(
+        craftNameKey(recipe.professionId)
+          ? craftNameText(recipe.professionId)
+          : display(recipe.professionId),
+      );
       ingredients.set(reagent.itemId, crafts);
     }
   for (const [id, title] of w.titleBy.item) {

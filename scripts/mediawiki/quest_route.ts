@@ -30,6 +30,7 @@ import {
   ITEMS,
   MOBS,
   NPCS,
+  ZONES,
   zoneContaining,
 } from '../../src/sim/data';
 import {
@@ -45,6 +46,7 @@ import {
 import { practiceDummyPos } from '../../src/sim/moved_objects';
 import { nodeMaterialFor } from '../../src/sim/professions/gathering_materials';
 import { fineGradeReachable, fineMaterialFor } from '../../src/sim/professions/material_grades';
+import type { StationType } from '../../src/sim/professions/stations';
 import { resolveScarecrowField } from '../../src/sim/seasonal/scarecrow_field';
 import { gourdlightDailySites } from '../../src/sim/seasonal_daily_sites';
 import { resolvedKeeperPosts } from '../../src/sim/seasonal_keeper_posts';
@@ -53,7 +55,15 @@ import { SIGNPOST_NOTICEBOARD_ID } from '../../src/sim/tutorial/signpost_read';
 import { type QuestDef, questTurnInNpcIds } from '../../src/sim/types';
 import { WORLD_BOSSES } from '../../src/sim/world_boss';
 import { WORLD_SEED } from '../../src/sim/world_seed';
+import { stationNameText } from '../../src/ui/hud/professions/station_name_view';
+import { type TranslationKey, t } from '../../src/ui/i18n';
 import { recipes, words } from './entity_format';
+
+/** The game's own bed line: the garden's zone plus the bed's 1-based position. */
+function farmBedLabel(patch: { zoneId: string }, index: number): string {
+  const zone = ZONES.find((z) => z.id === patch.zoneId);
+  return t('hudChrome.harvestJournal.bedLine', { zone: zone?.name ?? '', index: index + 1 });
+}
 
 type Step = 'Start' | 'Hand-in' | number;
 type Position = { x: number; z: number };
@@ -193,7 +203,10 @@ export function questRoute(quest: QuestDef): QuestRoute {
       const base = nodeMaterialFor(n.type, n.zoneId).itemId;
       if (id && base !== id && !(fineMaterialFor(base) === id && fineGradeReachable(base, n.tier)))
         continue;
-      point(n.pos, words(n.type) + ' node, tier ' + n.tier);
+      point(
+        n.pos,
+        t(`hudChrome.gathering.nodeName.${n.type}` as TranslationKey) + ', tier ' + n.tier,
+      );
     }
   }
   function craft(id: string) {
@@ -210,7 +223,7 @@ export function questRoute(quest: QuestDef): QuestRoute {
         ' (amounts before any bonuses).',
     );
     for (const s of world.services?.stations ?? [])
-      if (s.type === type) point(s.pos, words(s.type) + ' station');
+      if (s.type === type) point(s.pos, stationNameText(s.type as StationType));
   }
   npc(quest.giverNpcId);
   for (const [i, o] of quest.objectives.entries()) {
@@ -252,7 +265,9 @@ export function questRoute(quest: QuestDef): QuestRoute {
               ' minutes for it to grow, then harvest it.',
           );
           for (const patch of farmPatchesInActiveWorld())
-            for (const bed of patch.beds) point(bed, words(patch.id) + ' farm bed');
+            patch.beds.forEach((bed, i) => {
+              point(bed, farmBedLabel(patch, i));
+            });
         }
         if (Object.values(HARVEST_COMPONENT_ITEMS).includes(o.itemId)) {
           const origin = points.find((p) => p.step === 'Start');
@@ -306,7 +321,9 @@ export function questRoute(quest: QuestDef): QuestRoute {
       case 'farm':
         for (const p of farmPatchesInActiveWorld())
           if (!o.patchId || o.patchId === p.id)
-            for (const b of p.beds) point(b, words(p.id) + ' farm bed');
+            p.beds.forEach((b, i) => {
+              point(b, farmBedLabel(p, i));
+            });
         break;
       case 'escort': {
         const e = ESCORTS[o.escortId];

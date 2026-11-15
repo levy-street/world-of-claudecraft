@@ -1,3 +1,4 @@
+import { MOBS } from '../../src/sim/data';
 import type { MobTemplate } from '../../src/sim/types';
 import { pct, words } from './entity_format';
 
@@ -91,7 +92,38 @@ const omitted = new Set([
   'icon',
   'templateId',
   'ability',
+  'auraId',
+  'freezeAuraId',
+  'objectTemplate',
+  'launch',
+  'kind',
+  'snapToBed',
+  'awakeAt',
 ]);
+// Traits whose data carries no name of its own, in the words a player would use.
+const traitNames: Record<string, string> = {
+  summonAdds: 'Calls for help',
+  desperateHeal: 'Desperate heal',
+  mechanicLevelScale: 'Level scaling',
+  rangedMechanics: 'Ranged attacks',
+  trashKit: 'Special attacks',
+  petCleave: 'Companion cleave',
+  petRanged: 'Companion ranged attack',
+  petSpell: 'Companion spell',
+  petChainPull: 'Companion chain pull',
+  frenzyOnHit: 'Frenzy on hit',
+  aoePulse: 'Area pulse',
+  aoeSlow: 'Area slow',
+  deathZoneCast: 'Death zone',
+  deathZoneStrike: 'Death zone strike',
+  bigCast: 'Big cast',
+  stoneskin: 'Stoneskin',
+};
+function traitLabel(k: string): string {
+  const w = traitNames[k] ?? words(k);
+  return w.charAt(0).toUpperCase() + w.slice(1);
+}
+const skipped = (key: string) => omitted.has(key) || /Yell$/.test(key);
 const units: Record<string, string> = {
   every: 'between uses',
   interval: 'between ticks',
@@ -125,6 +157,9 @@ const labels: Record<string, string> = {
   dmgIncrease: 'extra damage taken',
   critDamage: 'extra critical damage taken',
   miss: 'extra miss chance',
+  spellVuln: 'spell vulnerability',
+  mobId: 'creature',
+  hatchMobId: 'creature',
 };
 const ratios = new Set([
   'chance',
@@ -146,7 +181,7 @@ function value(k: string, v: unknown): string {
   if (Array.isArray(v)) return v.map((x) => value(k, x)).join(', ');
   if (typeof v === 'object' && v)
     return Object.entries(v)
-      .filter(([key]) => !omitted.has(key))
+      .filter(([key]) => !skipped(key))
       .map(([key, x]) => param(key, x))
       .join(', ');
   if (typeof v === 'number') {
@@ -154,7 +189,8 @@ function value(k: string, v: unknown): string {
     if (k in units || /Seconds$/.test(k)) return v + ' sec';
     if (/range|radius|distance/i.test(k)) return v + ' yd';
   }
-  return typeof v === 'string' ? v.replace(/_/g, ' ') : String(v);
+  if (typeof v === 'string') return MOBS[v]?.name ?? v.replace(/_/g, ' ');
+  return String(v);
 }
 function param(k: string, v: unknown): string {
   return (labels[k] ?? units[k] ?? words(k)) + ' ' + value(k, v);
@@ -190,9 +226,9 @@ export function mobMechanicLines(m: MobTemplate): string[] {
       );
     } else if (traits[k]) {
       const params = Object.entries(v)
-        .filter(([key]) => !omitted.has(key))
+        .filter(([key]) => !skipped(key))
         .map(([key, x]) => param(key, x));
-      const prefix = v.name ?? words(k)[0].toUpperCase() + words(k).slice(1);
+      const prefix = v.name ?? traitLabel(k);
       out.push(prefix + '. ' + traits[k] + (params.length ? ' ' + params.join(', ') + '.' : ''));
     }
   }
@@ -206,7 +242,7 @@ export function mobMechanicLines(m: MobTemplate): string[] {
   if (m.rankMechanics?.length)
     out.push(
       'In Rifts, each rank adds the next attack on this list. Rank C uses the first one, B the first two, A the first three and S the first four: ' +
-        m.rankMechanics.map(words).join(', ') +
+        m.rankMechanics.map((r) => traitLabel(r).toLowerCase()).join(', ') +
         '.',
     );
   return out;

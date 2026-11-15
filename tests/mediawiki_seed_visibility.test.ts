@@ -243,6 +243,47 @@ describe('pages agree with themselves', () => {
   });
 });
 
+describe('game names, not internal names', () => {
+  // The names the specializations had before they were renamed; the ids still use them.
+  const oldSpecs = [
+    'Protection',
+    'Retribution',
+    'Restoration',
+    'Enhancement',
+    'Affliction',
+    'Destruction',
+    'Demonology',
+    'Marksmanship',
+    'Survival',
+    'Beast Mastery',
+    'Assassination',
+    'Subtlety',
+    'Discipline',
+    'Balance',
+    'Feral',
+    'Arms',
+    'Fury',
+  ].join('|');
+  it('never names a specialization by its old or internal name', () => {
+    // A tag such as "(Protection)" or "(Fury signature)", or "Protection paladin".
+    const tag = new RegExp('\\((?:' + oldSpecs + ')(?: signature)?[;)]', 'g');
+    const withClass = new RegExp(
+      '\\b(?:' +
+        oldSpecs +
+        ') (?:warrior|paladin|hunter|rogue|priest|shaman|mage|warlock|druid)\\b',
+      'gi',
+    );
+    expect(xml.match(tag) ?? []).toEqual([]);
+    expect(xml.match(withClass) ?? []).toEqual([]);
+    // The paladin tank specialization goes by its game name.
+    expect(xml).toContain('<title>Faithwarden (Specialization)</title>');
+  });
+  it('shows info rows with the game label, not a lowercase code id', () => {
+    for (const row of ['Quality', 'Armor type', 'Family', 'School', 'Biome'])
+      expect(xml.match(new RegExp('! ' + row + '\\n\\| [a-z]', 'g')) ?? [], row).toEqual([]);
+  });
+});
+
 describe('the encyclopedia hover catalog', () => {
   it('maps every item and visible ability to its reserved article title', () => {
     const expected = xml

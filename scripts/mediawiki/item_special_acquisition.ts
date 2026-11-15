@@ -50,11 +50,12 @@ import { RETIRED_ZONE1_ITEM_IDS } from '../../src/sim/removed_zone1_content';
 import { gourdlightDailySites } from '../../src/sim/seasonal_daily_sites';
 import { resolvedKeeperPosts } from '../../src/sim/seasonal_keeper_posts';
 import { WORLD_SEED } from '../../src/sim/world_seed';
-import { type ArticleTools, pct, ref, words } from './entity_format';
+import { type ArticleTools, pct, ref } from './entity_format';
 import { addAcquisition, type ItemAcquisition } from './item_acquisition_types';
 import type { RoutePoint } from './quest_map';
 import { npcPin, worldPin } from './system_route_points';
 import { systemRoutes } from './system_routes';
+import { guildContractKindName } from './wiki_item_kind';
 
 export function addSpecialAcquisitions(w: ArticleTools, index: Map<string, ItemAcquisition[]>) {
   const add = (id: string, source: ItemAcquisition) => addAcquisition(index, id, source);
@@ -266,7 +267,7 @@ export function addSpecialAcquisitions(w: ArticleTools, index: Map<string, ItemA
   add(SUNDERED_ESSENCE_ITEM_ID, {
     title: 'Sunder raid equipment',
     steps: [
-      'Put an epic raid weapon, armor piece or held offhand in your bags. Gear from Normal and Heroic raids counts. Epics that only come from dungeons, crafted gear, recipes and materials do not count.',
+      'Put an epic raid weapon, armor piece, orb, tome or quiver in your bags. Gear from Normal and Heroic raids counts. Epics that only come from dungeons, crafted gear, recipes and materials do not count.',
       'Open the menu for that item in your bags and select Sunder. Pick the copy you want to use up, then wait for the cast to finish.',
       'The gear you picked is destroyed and you get ' +
         SUNDERED_ESSENCE_YIELD +
@@ -313,7 +314,7 @@ export function addSpecialAcquisitions(w: ArticleTools, index: Map<string, ItemA
     details: [
       'Seals for each contract: ' +
         Object.entries(GUILD_CONTRACT_SEALS)
-          .map(([kind, n]) => words(kind) + ' ' + n)
+          .map(([kind, n]) => guildContractKindName(kind) + ' ' + n)
           .join(', ') +
         '. The notices change at the weekly reset.',
     ],

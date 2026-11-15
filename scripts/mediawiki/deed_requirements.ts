@@ -1,3 +1,4 @@
+import { POWERUPS_BY_ID } from '../../src/sim/content/augments';
 import { DEEDS } from '../../src/sim/content/deeds';
 import { FARM_CROPS } from '../../src/sim/content/farm_crops';
 import { TRANSPORT_ROUTES } from '../../src/sim/content/transport_ships';
@@ -160,7 +161,11 @@ function visitInstruction(w: SystemWriter, mark: string): string {
         '.'
       );
     case 'fiesta':
-      return 'Collect the ' + words(id.replace(/^pow_/, '')) + ' power-up in Fiesta.';
+      return (
+        'Collect the ' +
+        (POWERUPS_BY_ID[id]?.name ?? words(id.replace(/^pow_/, ''))) +
+        ' power-up in Fiesta.'
+      );
     case 'ferry': {
       for (const route of TRANSPORT_ROUTES)
         for (const from of route.berths)

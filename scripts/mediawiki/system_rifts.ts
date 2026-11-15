@@ -116,6 +116,13 @@ const marks: Partial<Record<ReturnType<typeof hoardBossKit>, HoardBossCueVariant
   mimic: ['mimic-coins'],
 };
 
+/** The character sheet's names for the three rating stats a rift gem can add. */
+const RATING_NAMES: Record<string, string> = {
+  critRating: 'Crit Rating',
+  hasteRating: 'Haste Rating',
+  hitRating: 'Hit Rating',
+};
+
 export function addRiftAndHoardRules(w: SystemWriter) {
   const item = (id: string) => w.entity('item', id, ITEMS[id]?.name);
   const mob = (id: string) => w.entity('mob', id, MOBS[id]?.name);
@@ -183,7 +190,9 @@ export function addRiftAndHoardRules(w: SystemWriter) {
     'Rift Forge',
     `Carry a Riftbound band in your bags and stand within ${RIFT_FORGE_RANGE} yards of the Riftwright. There are ${RIFT_BAND_MAX_UPGRADE} upgrades. In order, they cost ${Array.from({ length: RIFT_BAND_MAX_UPGRADE }, (_, i) => riftUpgradeCost(i)).join(', ')} Rift Essence. Each upgrade raises the item level by one, up to the band's limit. A gem in a socket adds ${RIFT_GEM_RATING} rating. If every socket is full, adding a new gem destroys the oldest gem in the band. The new gem takes its place.`,
     list(
-      Object.entries(RIFT_GEM_RATING_STAT).map(([id, stat]) => `${item(id)} adds ${words(stat)}.`),
+      Object.entries(RIFT_GEM_RATING_STAT).map(
+        ([id, stat]) => `${item(id)} adds ${RATING_NAMES[stat] ?? words(stat)}.`,
+      ),
     ),
   );
   w.describe(

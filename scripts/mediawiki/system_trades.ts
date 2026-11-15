@@ -26,7 +26,9 @@ import {
   TIER_SKILL_STEP,
   tierForSkill,
 } from '../../src/sim/professions/wheel';
+import { itemSlotLabel } from '../../src/ui/item_slot_labels';
 import { heading, list, percent, type SystemWriter, words } from './system_writer';
+import { titleWords } from './wiki_item_kind';
 
 export function addTradeSkills(w: SystemWriter) {
   const item = (id: string) => w.entity('item', id, ITEMS[id]?.name);
@@ -329,6 +331,7 @@ export function addTradeSkills(w: SystemWriter) {
     int: 'Intellect',
     spi: 'Spirit',
     sta: 'Stamina',
+    armor: 'Armor',
   };
   for (const e of Object.values(ENCHANTS)) {
     w.article(
@@ -336,7 +339,9 @@ export function addTradeSkills(w: SystemWriter) {
       e.name,
       'Enchant',
       'Put this on ' +
-        words(e.itemSlot) +
+        'the ' +
+        itemSlotLabel(e.itemSlot) +
+        ' slot' +
         (e.weaponHand ? ' (two-handed weapons only)' : '') +
         '. ' +
         (e.skillReq
@@ -346,7 +351,9 @@ export function addTradeSkills(w: SystemWriter) {
         (e.acquisition ? 'Learn the formula first.' : 'You know it automatically.'),
       e.description ?? '',
       list(
-        Object.entries(e.statBonus).map(([stat, v]) => `+${v} ${statNames[stat] ?? words(stat)}`),
+        Object.entries(e.statBonus).map(
+          ([stat, v]) => `+${v} ${statNames[stat] ?? titleWords(stat)}`,
+        ),
       ),
       ...(e.weaponProc
         ? [
