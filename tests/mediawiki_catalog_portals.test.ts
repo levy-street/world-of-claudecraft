@@ -53,7 +53,9 @@ describe('catalog portals', () => {
           const listed = targets(pages.get(child)!);
           expect(listed, child).toContain(root);
           expect(listed.length, child).toBeGreaterThan(1);
-          return listed.filter((title) => title !== root);
+          // A gear page also links the narrower pages under it (type, quality); those are
+          // directories, not destinations.
+          return listed.filter((title) => title !== root && !pages.has(title));
         }),
       );
       // Enemies lists only hostile creatures; companions, pets, dummies and escorts are
@@ -177,5 +179,40 @@ describe('catalog portals', () => {
       const section = index.split('== ' + want + ' ==')[1]?.split('\n== ')[0] ?? '';
       expect(section, def.id).toContain('ability/' + def.id);
     }
+  });
+});
+
+describe('layered gear pages', () => {
+  it('lets a reader click from a slot to an armor type to a quality, with a stat table at each step', () => {
+    const slot = pages.get('reserved/Belts (Items index)')!;
+    expect(slot).toContain('== By type ==');
+    expect(slot).toContain('[[reserved/Mail belts (Items index)|Mail]]');
+    expect(slot).toContain('! Item !! Level !! Quality !! Type !! Armor !! Stats');
+    const mail = pages.get('reserved/Mail belts (Items index)')!;
+    expect(mail).toContain('== By quality ==');
+    const epic = pages.get('reserved/Epic mail belts (Items index)')!;
+    expect(epic).toContain('[[reserved/Mail belts (Items index)|Back to mail belts]]');
+    // Every row of the narrowest page is an epic mail belt, and each has a link to its item.
+    const rows = epic.split('\n').filter((l) => l.startsWith('| '));
+    expect(rows.length).toBeGreaterThan(0);
+    for (const row of rows) {
+      const cells = row.split(' || ');
+      expect(cells[2], row).toBe('Epic');
+      expect(cells[3], row).toBe('Mail');
+      expect(cells[0], row).toMatch(/\[\[item\//);
+    }
+    // The narrower pages add up to the slot.
+    const count = (text: string) => text.split('\n').filter((l) => l.startsWith('| ')).length;
+    const types = [...slot.matchAll(/\[\[(reserved\/\w+ belts \(Items index\))\|/g)].map(
+      (m) => m[1],
+    );
+    expect(types.reduce((sum, t) => sum + count(pages.get(t)!), 0)).toBe(count(slot));
+  });
+  it('gives weapons damage columns in place of armor', () => {
+    const weapons = pages.get('reserved/Two-handed weapons (Items index)')!;
+    expect(weapons).toContain(
+      '! Item !! Level !! Quality !! Damage !! Speed !! Damage per second !! Stats',
+    );
+    expect(weapons).toContain('== By quality ==');
   });
 });

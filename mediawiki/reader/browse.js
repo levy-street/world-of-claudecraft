@@ -51,7 +51,7 @@ export function displayTitle(title) {
 export function tilePreview(text, limit = 3) {
   const names = [];
   for (const match of text.matchAll(
-    /^\* (?:<woc-art [^>]*\/> )?\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/gm,
+    /^(?:\*|\|) (?:<woc-art [^>]*\/> )?\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/gm,
   )) {
     const name = match[2] ?? match[1];
     if (!names.includes(name)) names.push(name);
@@ -113,6 +113,10 @@ export function browseTrails(pages) {
     for (const line of page.text.split('\n')) {
       if (line.startsWith('* ')) {
         const child = directoryLink(line.slice(2));
+        if (child) links.push(child);
+      } else if (line.startsWith('| ') && page.categories.includes('Portals')) {
+        // A directory can list its entries as table rows; the first cell names the entry.
+        const child = directoryLink(line.slice(2).replace(/^<woc-art [^>]*\/> /, ''));
         if (child) links.push(child);
       } else if (TABLE_HUBS.has(page.title) && /^[|!]/.test(line)) {
         for (const m of line.matchAll(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g))

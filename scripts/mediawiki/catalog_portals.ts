@@ -21,6 +21,7 @@ import { creatureRole, FRIENDLY_GROUPS, ROLE_SECTIONS } from './creature_role';
 import { raidName, raidRooms } from './dungeon_catalog';
 import { type ArticleTools, words } from './entity_format';
 import { itemPlacement, offhandSection } from './item_catalog_groups';
+import { addGearPages } from './item_tables';
 import { npcServiceLabel } from './npc_service';
 import { wikiItemKind } from './wiki_item_kind';
 
@@ -28,7 +29,8 @@ type Writer = Pick<ArticleTools, 'add' | 'section' | 'bullets' | 'link' | 'title
   reserve(title: string): string;
 };
 type Root = 'Items' | 'Mobs' | 'Abilities' | 'NPCs';
-type Member = { title: string; name: string; section: string; key?: string };
+type Member = { title: string; name: string; section: string; key?: string; id?: string };
+type Builder = (title: string, members: Member[]) => void;
 
 const display = (value: string) => {
   const s = words(value);
@@ -43,7 +45,12 @@ function catalog(w: Writer, root: Root, intro: string, order: string[] = []) {
     return i < 0 ? order.length : i;
   };
   const groups = new Map<string, Map<string, Map<string, Member>>>();
+  const builders = new Map<string, Builder>();
   return {
+    /** Lets one group write its own page (and pages under it) instead of a plain list. */
+    build(facet: string, label: string, builder: Builder) {
+      builders.set(facet + '|' + label, builder);
+    },
     file(facet: string, label: string, member: Member) {
       const buckets = groups.get(facet) ?? new Map<string, Map<string, Member>>();
       const entries = buckets.get(label) ?? new Map<string, Member>();
@@ -57,6 +64,12 @@ function catalog(w: Writer, root: Root, intro: string, order: string[] = []) {
         const children: string[] = [];
         for (const [label, members] of [...buckets].sort(([a], [b]) => collate(a, b))) {
           const title = w.reserve(label + ' (' + rootLabel(root) + ' index)');
+          const custom = builders.get(facet + '|' + label);
+          if (custom) {
+            custom(title, [...members.values()]);
+            children.push(w.link(title, label) + ' (' + members.size + ')');
+            continue;
+          }
           const grouped = new Map<string, string[]>();
           for (const m of [...members.values()].sort(
             (a, b) => collate(a.name, b.name) || collate(a.title, b.title),
@@ -127,7 +140,12 @@ function itemPortal(w: Writer) {
     }
   for (const [id, title] of w.titleBy.item) {
     const item = ITEMS[id];
-    const entry = { title, name: itemName(item), section: display(item.quality ?? 'common') };
+    const entry = {
+      title,
+      name: itemName(item),
+      section: display(item.quality ?? 'common'),
+      id,
+    };
     if (item.kind === 'armor' || item.kind === 'held_offhand') {
       const slot = gearSlots[item.slot ?? 'offhand'];
       c.file('Armor, jewelry and off-hands', slot, {
@@ -153,6 +171,22 @@ function itemPortal(w: Writer) {
     for (const craft of ingredients.get(id) ?? [])
       c.file('Ingredients by profession', craft + ' ingredients', entry);
   }
+  // Gear is browsed in layers (slot, type, quality), each with a sortable stat table.
+  const gear = (facet: string, label: string, weapon: boolean) =>
+    c.build(facet, label, (title, members) =>
+      addGearPages(
+        w,
+        title,
+        label,
+        members.map((m) => ({ id: m.id!, title: m.title, name: m.name })),
+        weapon,
+        'Items',
+      ),
+    );
+  for (const slot of new Set(Object.values(gearSlots)))
+    gear('Armor, jewelry and off-hands', slot, false);
+  for (const hands of ['Main-hand weapons', 'One-handed weapons', 'Two-handed weapons'])
+    gear('Weapons', hands, true);
   c.publish();
 }
 

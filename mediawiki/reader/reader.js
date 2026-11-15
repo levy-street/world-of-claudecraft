@@ -11,6 +11,7 @@ import {
 import { directoryArt } from './directory_art.js';
 import { layoutDirectory } from './directory_layout.js';
 import { mountWikiTooltips } from './hover_tooltip.js';
+import { enhanceItemTables } from './item_table.js';
 import { renderMath, renderScale } from './math.js';
 import { mountRelatedPages, relatedPageIndex } from './related_pages.js';
 import { tooltipLookup } from './tooltip_content.js';
@@ -113,6 +114,11 @@ function renderBody(body, mapUrl, indexIcon, directoryClass, groupTile) {
       continue;
     }
     if (line.startsWith('{|')) {
+      // Keep the table's own class (item-table, loot-table) so it can be styled and enhanced.
+      const tableClass = (/class="([\w -]+)"/.exec(line)?.[1] ?? '')
+        .split(' ')
+        .filter((name) => name && name !== 'wikitable')
+        .join(' ');
       const rows = [];
       let cells = [];
       while (++i < lines.length) {
@@ -127,7 +133,13 @@ function renderBody(body, mapUrl, indexIcon, directoryClass, groupTile) {
             cells.push('<' + tag + '>' + inline(cell.trim()) + '</' + tag + '>');
         }
       }
-      output.push('<div class="scroll"><table>' + rows.join('') + '</table></div>');
+      output.push(
+        '<div class="scroll"><table' +
+          (tableClass ? ' class="' + tableClass + '"' : '') +
+          '>' +
+          rows.join('') +
+          '</table></div>',
+      );
       continue;
     }
     if (/^\* |^# /.test(line)) {
@@ -278,7 +290,8 @@ export async function openReader({ seedUrl, packed, cardsUrl, packedCards, asset
     const tileArt = new Map();
     for (const [title, page] of pages) {
       if (!isDirectory(page)) continue;
-      for (const match of page.text.matchAll(/^\* \[\[([^\]|]+)/gm)) {
+      // A group's picture is the first entry it lists, in a bullet list or a table.
+      for (const match of page.text.matchAll(/^(?:\*|\|) (?:<woc-art [^>]*\/> )?\[\[([^\]|]+)/gm)) {
         const art = pages.get(match[1])?.art;
         if (art) {
           tileArt.set(title, art);
@@ -547,6 +560,7 @@ export async function openReader({ seedUrl, packed, cardsUrl, packedCards, asset
           wideNav.matches,
           page.categories.find((c) => pages.get(c)?.categories.includes('Zones')),
         );
+      enhanceItemTables(view);
       if (current !== 'All Pages') mountRelatedPages(view, page, related, pages);
       loadArt();
       for (const a of view.querySelectorAll('[data-part]')) {

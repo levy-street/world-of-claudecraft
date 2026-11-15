@@ -1496,3 +1496,113 @@ body[data-woc-site] .searchbox #lookup {
 #view .hatnote em {
   font-style: normal;
 }
+
+/* Item tables on catalog pages: filter bar, sortable headings, compact stat rows. */
+.item-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  margin: 14px 0 12px;
+}
+#view .item-filter-search {
+  flex: 1 1 220px;
+  max-width: 320px;
+  padding: 8px 12px;
+  color: var(--text);
+  background: var(--field);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font: inherit;
+}
+.item-filter-count {
+  color: var(--text-dim);
+  font-size: 15px;
+}
+.item-filter-stats {
+  display: flex;
+  flex: 1 1 100%;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+#view .item-filter-chip {
+  padding: 4px 12px;
+  color: var(--text-dim);
+  background: var(--bg-2);
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  font: 500 14px / 1.4 var(--font-ui);
+  cursor: pointer;
+}
+#view .item-filter-chip[aria-pressed="true"] {
+  color: var(--bg);
+  background: var(--gold);
+  border-color: var(--gold);
+}
+#view table.item-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--border-soft);
+}
+#view table.item-table th {
+  padding: 0;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+#view table.item-table .item-sort {
+  width: 100%;
+  padding: 9px 12px;
+  color: var(--gold);
+  background: none;
+  border: 0;
+  font: 600 12px / 1.3 var(--font-ui);
+  letter-spacing: 0.06em;
+  text-align: left;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+#view table.item-table th[aria-sort="ascending"] .item-sort::after {
+  content: " \25B2";
+}
+#view table.item-table th[aria-sort="descending"] .item-sort::after {
+  content: " \25BC";
+}
+#view table.item-table td {
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--border-soft);
+  vertical-align: middle;
+  font-variant-numeric: tabular-nums;
+}
+#view table.item-table tr:nth-child(odd) td {
+  background: var(--bg-2);
+}
+#view table.item-table td:first-child {
+  min-width: 220px;
+  font-weight: 600;
+}
+#view table.item-table td:last-child {
+  color: var(--text-dim);
+  font-size: 15px;
+}
+#view table.item-table td:first-child {
+  white-space: nowrap;
+}
+#view table.item-table td:first-child span {
+  display: inline-block;
+  max-width: 230px;
+  vertical-align: middle;
+  white-space: normal;
+}
+#view table.item-table .ability-icon {
+  width: 28px;
+  height: 28px;
+  margin-right: 10px;
+  vertical-align: middle;
+  border: 1px solid var(--border-soft);
+  border-radius: 4px;
+}
+#view table.item-table tr[hidden] {
+  display: none;
+}
