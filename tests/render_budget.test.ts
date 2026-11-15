@@ -268,6 +268,11 @@ describe('render budget governor', () => {
       tier: 'low',
       budget: GFX_BUDGETS.low,
       enabled: true,
+      // The recovery ladder is under test, and its setup floors resolution with an
+      // overload that does not depend on pixels: the resolution-cut experiment
+      // (resolution_effect_probe_core.ts) would rightly undo those cuts, so it is
+      // off here; tests/render_budget_resolution_probe.test.ts owns it.
+      resolutionEffectProbe: false,
     });
     governor.reset(1, 0.65, 1);
     governor.update(sample({ dt: 0.6 }));

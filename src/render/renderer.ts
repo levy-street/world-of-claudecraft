@@ -739,6 +739,7 @@ import {
   gpuPrepMode,
   postShedLevelPin,
   renderLayerDisabled,
+  resolutionEffectProbeEnabled,
   terrainDetailLevelPin,
 } from './render_dev_flags';
 import {
@@ -2240,6 +2241,8 @@ export class Renderer {
       terrainDetail: GFX,
       pinnedDetailLevel: terrainDetailLevelPin(),
       pinnedPostLevel: postShedLevelPin(),
+      resolutionEffectProbe: resolutionEffectProbeEnabled(),
+      awaitReveal: true,
     });
     this.renderBudgetState = this.renderBudgetGovernor.reset(
       this.effectiveRenderScale,
@@ -4504,6 +4507,7 @@ export class Renderer {
 
   /** Diagnostic-only lifecycle boundary, called immediately before curtain fade. */
   markGpuHitchReveal(): void {
+    this.renderBudgetGovernor.noteReveal();
     this.gpuHitchCompileLifecycle?.markReveal();
     markPrewarmPacingReveal(this.gpuHitchPacing, this.lastPrewarmStats);
     liveProgramWatch.armLiveProgramWatch(this.webgl);
@@ -4684,6 +4688,8 @@ export class Renderer {
     sample.createdViews = this.lastFrameStats.createdViews;
     sample.minRenderScale = resolutionRange.minRenderScale;
     sample.maxRenderScale = resolutionRange.maxRenderScale;
+    sample.programCount = info.programs?.length ?? 0; // preparation-frame mark (render_budget.ts)
+    sample.covered = arrivalCoverActive();
     const state = this.renderBudgetGovernor.update(sample, this.renderBudgetState);
     // Pressure follows the governor: while it is shedding quality, cosmetic
     // preparation waits. The budget's frame boundary is fed in sync() instead,

@@ -91,6 +91,11 @@ function lowGovernor(): RenderBudgetGovernor {
     tier: 'low',
     budget: GFX_BUDGETS.low,
     enabled: true,
+    // The recovery ladder is under test, and its setup floors resolution with an
+    // overload that does not depend on pixels: the resolution-cut experiment
+    // (resolution_effect_probe_core.ts) would rightly undo those cuts, so it is
+    // off here; tests/render_budget_resolution_probe.test.ts owns it.
+    resolutionEffectProbe: false,
   });
   governor.reset(1, LOW_MIN_RENDER_SCALE, 1);
   return governor;
@@ -111,6 +116,11 @@ function highGovernor(): RenderBudgetGovernor {
     tier: 'high',
     budget: GFX_BUDGETS.high,
     enabled: true,
+    // The recovery ladder is under test, and its setup floors resolution with an
+    // overload that does not depend on pixels: the resolution-cut experiment
+    // (resolution_effect_probe_core.ts) would rightly undo those cuts, so it is
+    // off here; tests/render_budget_resolution_probe.test.ts owns it.
+    resolutionEffectProbe: false,
   });
   governor.reset(1, MIN_RENDER_SCALE, 1);
   return governor;
