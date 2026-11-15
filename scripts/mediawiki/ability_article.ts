@@ -2,21 +2,25 @@ import { replaceResolvedAbility } from '../../src/sim/combat/action_replacement'
 import { druidFormEntryTarget } from '../../src/sim/combat/druid_form_entry';
 import { requiredForms } from '../../src/sim/combat/form_requirement';
 import { getItemCooldownDuration } from '../../src/sim/content/item_cooldowns';
-import { ROW_TREES, specSignatureIds, TALENTS } from '../../src/sim/content/talents';
+import {
+  ROW_TREES,
+  SPEC_UNLOCK_LEVEL,
+  specSignatureIds,
+  TALENTS,
+} from '../../src/sim/content/talents';
 import { ABILITIES, CLASSES, QUESTS } from '../../src/sim/data';
 import type { ResolvedAbility } from '../../src/sim/resolved_ability';
 import { type AbilityDef, GCD, MAX_LEVEL, MELEE_RANGE, MIN_GCD } from '../../src/sim/types';
-import { abilityDisplayDescription, abilityEffectText } from '../../src/ui/ability_description';
 import { abilityIndexGroup, itemActionSource, MEMBERSHIP_GROUP } from './ability_access';
 import { referenceAbility, specializationExamples } from './ability_builds';
-import { mediawikiAbilityDescription } from './ability_description';
+import { mediawikiAbilityDescription, wikiAbilityText } from './ability_description';
 import { mergeRankText, rankValues } from './ability_ranks';
 import { abilityScalingLines } from './ability_scaling';
 import { type AbilityPageTools, affectedAbilities } from './talent_articles';
 
 function description(res: ResolvedAbility): string {
   if (res.def.id === 'bear_trap') return mediawikiAbilityDescription(res.def);
-  return abilityDisplayDescription(res, abilityEffectText(res));
+  return wikiAbilityText(res);
 }
 export function abilityResource(def: AbilityDef): string {
   const entry = def.class === 'druid' ? druidFormEntryTarget(def.id) : null;
@@ -100,7 +104,7 @@ export function abilityArticle(
       'First rank',
       'Level ' +
         (signatures.length && !CLASSES[def.class].abilities.includes(def.id)
-          ? '5 (specialization grant)'
+          ? SPEC_UNLOCK_LEVEL + ' (specialization grant)'
           : rankLevel),
     ]);
   if (signatures.length)
@@ -117,8 +121,10 @@ export function abilityArticle(
     ]);
   if (sourceActions.length)
     grantRows.push(['Changes from', sourceActions.map((a) => abilityLink(a.id)).join(', ')]);
-  if (def.specs?.length)
-    grantRows.push(['Available specializations', def.specs.map(specLink).join(', ')]);
+  // A signature spec is already named on the "Signature of" row above.
+  const otherSpecs = (def.specs ?? []).filter((id) => !signatures.some((s) => s.id === id));
+  if (otherSpecs.length)
+    grantRows.push(['Available specializations', otherSpecs.map(specLink).join(', ')]);
   if (def.excludeSpecs?.length)
     grantRows.push([
       'Unavailable after choosing',

@@ -233,7 +233,7 @@ export const characterPaths: Record<string, PlayPath> = {
   },
   'Allied Hearthstone': {
     where: `Visit ${atNpc('npc_church_order_quartermaster')} at the Eastbrook chapel, ${atNpc('npc_rift_watch_quartermaster')} in Drifthaven, or ${atNpc('npc_automaton_quartermaster')} at Wyrmwatch.`,
-    need: 'Reach Vanguard standing (13,000) with an allied faction. Bring 100 of that faction’s currency: Order Crests, Rift Watch Marks or Automaton Cogs. You can only carry one Allied Hearthstone.',
+    need: 'Reach 13,000 standing (the Vanguard tier) with an allied faction. Bring 100 of that faction’s currency: Order Crests, Rift Watch Marks or Automaton Cogs. You can only carry one Allied Hearthstone.',
     steps: [
       'Open the quartermaster’s shop and buy an [[Allied Hearthstone]]. Then pick the place you want as your home. Talk to that place’s quartermaster and choose Attune my Allied Hearthstone here.',
       'When you want to go back, leave combat and use the stone from your bags or action bar. Wait for the 10-second cast to finish.',

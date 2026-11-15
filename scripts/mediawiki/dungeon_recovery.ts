@@ -1,4 +1,5 @@
 import { DUNGEON_CHECKPOINTS } from '../../src/sim/content/dungeon_checkpoints';
+import { MOBS } from '../../src/sim/data';
 import type { DungeonDef } from '../../src/sim/types';
 import type { ArticleTools } from './entity_format';
 import { questMap } from './quest_map';
@@ -24,7 +25,9 @@ export function dungeonRecovery(
               ', ' +
               checkpoint.pos.z +
               '). Defeat ' +
-              checkpoint.bosses.map((id) => w.link(w.titleBy.mob.get(id)!)).join(', ') +
+              checkpoint.bosses
+                .map((id) => w.link(w.titleBy.mob.get(id)!, MOBS[id]?.name))
+                .join(', ') +
               '. These gates must be open: ' +
               checkpoint.gates
                 .map((id) => dungeon.gates?.find((g) => g.id === id)?.name ?? id)

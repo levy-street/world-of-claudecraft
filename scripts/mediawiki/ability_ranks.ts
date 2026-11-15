@@ -4,7 +4,7 @@
 // A value is a number (with an optional "to" range or % sign), a whole formula or a
 // whole link. Formulas and links are kept in one piece so a slash never lands inside one.
 const VALUE =
-  /(<woc-math[^>]*>[\s\S]*?<\/woc-math>|\[\[[^\]]*\]\]|\d[\d,]*(?:\.\d+)?%?(?: to \d[\d,]*(?:\.\d+)?%?)?)/;
+  /(<woc-math[^>]*>[\s\S]*?<\/woc-math>|\[\[[^\]]*\]\]|\d+(?:,\d{3})*(?:\.\d+)?%?(?: to \d+(?:,\d{3})*(?:\.\d+)?%?)?)/;
 
 /** Joins values that are not all the same with " / ", in rank order. */
 export function rankValues(values: readonly (string | number)[]): string {

@@ -17,7 +17,11 @@ import {
 } from '../../src/sim/types';
 import { questObjectiveText } from './article_editorial';
 import { type ArticleTools, append, lines, recipeLabel, ref, words } from './entity_format';
+import { itemNpcPoints } from './item_npc_route';
 import { type QuestRoute, questRoute } from './quest_route';
+
+/** Event ids read as titles ("gourdlight_eve" is the page "Gourdlight Eve"). */
+const eventName = (id: string) => words(id).replace(/(^| )[a-z]/g, (c) => c.toUpperCase());
 
 function contact(
   w: ArticleTools,
@@ -29,10 +33,16 @@ function contact(
   return ids
     .map((id) => {
       const name = npcs[id]?.name;
+      // Two contacts can share a name (both Brother Alderics), so with several contacts a
+      // stop counts for this one only if it is one of this contact's own posts.
+      const own = ids.length > 1 ? itemNpcPoints('Reward', id) : [];
       const locations = route.points.filter(
         (p) =>
           p.step === step &&
-          (ids.length === 1 || (name && (p.label === name || p.label.startsWith(name + ' (')))),
+          (ids.length === 1 ||
+            (name &&
+              (p.label === name || p.label.startsWith(name + ' (')) &&
+              own.some((o) => Math.abs(o.x - p.x) < 0.01 && Math.abs(o.z - p.z) < 0.01))),
       );
       const stops = locations.map((p) => {
         const place =
@@ -95,7 +105,7 @@ export function addQuestArticles(w: ArticleTools, itemSources: Map<string, Set<s
         ? `'''Unavailable for new starts.''' The quest giver only offers this quest while ${ref(w, 'dungeon', quest.gatedWithDungeon!)} is open for it.`
         : quest.seasonalEvent
           ? "'''Seasonal quest.''' The quest giver only offers it during " +
-            words(quest.seasonalEvent) +
+            eventName(quest.seasonalEvent) +
             '.'
           : '';
     const route = questRoute(quest);
@@ -137,7 +147,7 @@ export function addQuestArticles(w: ArticleTools, itemSources: Map<string, Set<s
         'New players cannot take it. You can finish it if it is already in your log.',
       ]);
 
-    if (quest.seasonalEvent) facts.push(['Event', words(quest.seasonalEvent)]);
+    if (quest.seasonalEvent) facts.push(['Event', eventName(quest.seasonalEvent)]);
 
     if (quest.shareable === false)
       facts.push([

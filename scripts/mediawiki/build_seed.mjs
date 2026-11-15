@@ -42,7 +42,7 @@ import { abilityArticle } from '../../scripts/mediawiki/ability_article';
 import { addTalentPages } from '../../scripts/mediawiki/talent_articles';
 import { addSystemArticles } from '../../scripts/mediawiki/system_articles';
 import { addEntityArticles, questZoneName } from '../../scripts/mediawiki/entity_articles';
-import { npcArticle } from '../../scripts/mediawiki/npc_article';
+import { homeZones, npcArticle } from '../../scripts/mediawiki/npc_article';
 import { dungeonDetails } from '../../scripts/mediawiki/dungeon_article';
 import { addDungeonCatalog } from '../../scripts/mediawiki/dungeon_catalog';
 import { dungeonRecovery } from '../../scripts/mediawiki/dungeon_recovery';
@@ -194,10 +194,10 @@ addZoneAndClassHubs({ ...writer, reserve });
 const raidParents = addDungeonCatalog({ ...writer, reserve });
 
 for (const zone of ZONES) {
-  const npcs = Object.entries(BUILTIN_WORLD.npcs).filter(([, npc]) => (!npc.dynamic || npc.fixedPost) && zoneContaining(npc.pos.x,npc.pos.z)?.id === zone.id).map(([id]) => titleBy.npc.get(id));
+  const npcs = Object.keys(NPCS).filter((id) => homeZones(id).some((z) => z.id === zone.id)).map((id) => titleBy.npc.get(id));
   const quests = Object.keys(QUESTS).filter((id) => !QUESTS[id].seasonalEvent && zoneForQuest(id) === zone.name).map((id) => titleBy.quest.get(id));
   add(titleBy.zone.get(zone.id), section('Overview', zone.welcome) + section('Facts', table([
-    ['Level range', zone.levelRange[0] + '-' + zone.levelRange[1]], ['Hub', zone.hub.name], ['Biome', zone.biome], ['Graveyard', zone.graveyard.x + ', ' + zone.graveyard.z],
+    ['Level range', zone.levelRange[0] === zone.levelRange[1] ? String(zone.levelRange[0]) : zone.levelRange[0] + '-' + zone.levelRange[1]], ['Hub', zone.hub.name], ['Biome', zone.biome], ['Graveyard', zone.graveyard.x + ', ' + zone.graveyard.z],
   ])) + section('Points of interest', bullets(zone.pois.map((poi) => poi.label))) + section('NPCs', bullets(npcs.map((title) => link(title)))) + section('Quests starting here', (zoneDirectories.has(zone.name) ? link(zoneDirectories.get(zone.name), 'See all quests in ' + zone.name) + '\\n\\n' : '') + bullets(quests.map((title) => link(title)))), ['Zones', zone.biome]);
 }
 
@@ -207,7 +207,7 @@ for (const [id, cls] of Object.entries(CLASSES)) {
 
 for (const dungeon of DUNGEON_LIST) {
   const bosses = dungeon.spawns.map((s) => MOBS[s.mobId]).filter((mob) => mob?.boss);
-  add(titleBy.dungeon.get(dungeon.id), (raidParents.has(dungeon.id) ? 'Part of ' + link(raidParents.get(dungeon.id)) + '. See the raid overview for its entrance, complete route and encounters.\\n\\n' : '') + section('Overview', dungeon.enterText) + dungeonDetails(dungeon,dungeonWriter) + section('Bosses', bullets(bosses.map((mob) => link(titleBy.mob.get(mob.id), mob.name)))) + dungeonRecovery(dungeon, writer) + section('Spawn list', bullets(dungeon.spawns.map((spawn) => link(titleBy.mob.get(spawn.mobId), MOBS[spawn.mobId]?.name ?? spawn.mobId) + ' at ' + spawn.x + ', ' + spawn.z))), ['Dungeons', ...(raidParents.has(dungeon.id) ? [raidParents.get(dungeon.id)] : [])]);
+  add(titleBy.dungeon.get(dungeon.id), (raidParents.has(dungeon.id) ? 'Part of ' + link(raidParents.get(dungeon.id)) + '. See the raid overview for its entrance, complete route and encounters.\\n\\n' : '') + section('Overview', dungeon.enterText) + dungeonDetails(dungeon,dungeonWriter) + (bosses.length && !dungeonDetails(dungeon,dungeonWriter).includes('== Encounters ==') ? section('Bosses', bullets(bosses.map((mob) => link(titleBy.mob.get(mob.id), mob.name)))) : '') + dungeonRecovery(dungeon, writer) + (dungeon.spawns.length ? section('Spawn list', bullets(dungeon.spawns.map((spawn) => link(titleBy.mob.get(spawn.mobId), MOBS[spawn.mobId]?.name ?? spawn.mobId) + ' at ' + spawn.x + ', ' + spawn.z))) : ''), ['Dungeons', ...(raidParents.has(dungeon.id) ? [raidParents.get(dungeon.id)] : [])]);
 }
 
 for (const [id,npc] of Object.entries(NPCS)) {

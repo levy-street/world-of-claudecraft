@@ -2,7 +2,7 @@ import { BUDDIES } from '../../src/sim/content/buddies';
 import { TUG_HONOR_OFFER } from '../../src/sim/content/buddy_offers';
 import { HEROIC_VENDOR_STOCK } from '../../src/sim/content/heroic_vendor';
 import { CRUCIBLE_VENDOR_STOCK } from '../../src/sim/content/ignivar_loot';
-import { BUILTIN_WORLD, ITEMS, QUESTS, zoneContaining } from '../../src/sim/data';
+import { BUILTIN_WORLD, ITEMS, NPCS, QUESTS, zoneContaining } from '../../src/sim/data';
 import { npcRoleFor } from '../../src/sim/npc_role';
 import { type NpcDef, questTurnInNpcIds } from '../../src/sim/types';
 import { npcDisplayTitle } from '../../src/ui/entity_display_core';
@@ -10,6 +10,25 @@ import { type ArticleTools, ref } from './entity_format';
 import { itemNpcPoints } from './item_npc_route';
 import { npcServiceLabel } from './npc_service';
 import { vendorOfferText } from './vendor_offer';
+
+/**
+ * The zones an NPC is found in. This is every overworld post the page lists. An NPC that is
+ * only there during its activity has no listed post, so it falls back to its authored spot.
+ * The zone page and the NPC page both read this, so they always name the same zones.
+ */
+export function homeZones(id: string) {
+  const zones = new Map<string, NonNullable<ReturnType<typeof zoneContaining>>>();
+  const points = itemNpcPoints('Reward', id);
+  for (const p of points) {
+    const z = p.frame === 'Overworld' ? zoneContaining(p.x, p.z) : undefined;
+    if (z) zones.set(z.id, z);
+  }
+  if (points.length) return [...zones.values()];
+  const n = BUILTIN_WORLD.npcs[id] ?? NPCS[id];
+  const posted = !!n && (n.pos.x !== 0 || n.pos.z !== 0);
+  const z = posted ? zoneContaining(n.pos.x, n.pos.z) : undefined;
+  return z ? [z] : [];
+}
 
 export function npcArticle(template: NpcDef, w: ArticleTools) {
   const n = BUILTIN_WORLD.npcs[template.id] ?? template;
@@ -30,7 +49,13 @@ export function npcArticle(template: NpcDef, w: ArticleTools) {
           );
         })
         .join('; ')
-    : 'Appears during its activity.';
+    : homeZones(n.id).length
+      ? 'Appears during its activity, in ' +
+        homeZones(n.id)
+          .map((z) => z.name)
+          .join(' and ') +
+        '.'
+      : 'Appears during its activity.';
   const role = npcRoleFor(n);
   const facts: [string, string][] = [
     ['Title', npcDisplayTitle(n.id)],

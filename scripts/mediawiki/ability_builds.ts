@@ -5,7 +5,7 @@ import { CLASSES, QUESTS } from '../../src/sim/data';
 import { createPlayer } from '../../src/sim/entity';
 import type { ResolvedAbility } from '../../src/sim/resolved_ability';
 import { type AbilityDef, MAX_LEVEL, type PlayerClass } from '../../src/sim/types';
-import { abilityDisplayDescription, abilityEffectText } from '../../src/ui/ability_description';
+import { wikiAbilityText } from './ability_description';
 
 export function referenceAbility(def: AbilityDef): ResolvedAbility {
   return {
@@ -52,11 +52,12 @@ export function specializationExamples(base: ResolvedAbility): [string, string][
     entries = resolveClass(cls);
     cache.set(cls, entries);
   }
+  const round = (n: number) => Number(n.toFixed(2));
   function text(ab: ResolvedAbility): string {
-    const baseText = abilityDisplayDescription(ab, abilityEffectText(ab, zero), zero);
-    const powered = abilityDisplayDescription(ab, abilityEffectText(ab, sample), sample);
+    const baseText = wikiAbilityText(ab, zero);
+    const powered = wikiAbilityText(ab, sample);
     const lines = [
-      `'''Cost''' ${ab.cost} · '''Cast''' ${ab.def.channel ? ab.def.channel.duration + ' sec channel' : ab.castTime ? ab.castTime + ' sec cast' : 'instant'} · '''Cooldown''' ${ab.cooldown ? ab.cooldown + ' sec cooldown' : 'none'}.`,
+      `'''Cost''' ${round(ab.cost)} · '''Cast''' ${ab.def.channel ? ab.def.channel.duration + ' sec channel' : ab.castTime ? round(ab.castTime) + ' sec cast' : 'instant'} · '''Cooldown''' ${ab.cooldown ? round(ab.cooldown) + ' sec cooldown' : 'none'}.`,
     ];
     if (ab.charges && ab.charges > 1) lines.push(`Holds ${ab.charges} charges.`);
     for (const e of ab.effects) {

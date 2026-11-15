@@ -7,7 +7,7 @@ import { resolveScarecrowField } from '../../src/sim/seasonal/scarecrow_field';
 import { WORLD_BOSSES } from '../../src/sim/world_boss';
 import { WORLD_SEED } from '../../src/sim/world_seed';
 import { type ArticleTools, pct, ref } from './entity_format';
-import { addAcquisition, type ItemAcquisition } from './item_acquisition_types';
+import { addAcquisition, classUseNote, type ItemAcquisition } from './item_acquisition_types';
 import type { RoutePoint } from './quest_map';
 import { questRoute } from './quest_route';
 import { entranceRoute } from './rotating_routes';
@@ -155,7 +155,9 @@ export function dropAcquisitions(w: ArticleTools): Map<string, ItemAcquisition[]
           ? 'Heroic'
           : entry.normalOnly || shifted
             ? 'Normal'
-            : 'ordinary';
+            : instanced
+              ? 'Normal and Heroic'
+              : 'ordinary';
         const where = ref(w, 'mob', mob.id);
         const row = mode.entries.filter((e) => e.rollGroup === entry.rollGroup);
         const rules = [
@@ -216,12 +218,8 @@ export function dropAcquisitions(w: ArticleTools): Map<string, ItemAcquisition[]
           );
         if (mob.worldBoss && entry.maxPlayerLevel !== undefined)
           rules.push('Only characters at level ' + entry.maxPlayerLevel + ' or lower can get it.');
-        if (ITEMS[id].requiredClass?.length)
-          rules.push(
-            'Only these classes can use it: ' +
-              ITEMS[id].requiredClass!.map((c) => ref(w, 'class', c)).join(', ') +
-              '.',
-          );
+        const classNote = classUseNote(w, ITEMS[id]);
+        if (classNote) rules.push(classNote);
         let points = routeCache.get(mode.heroic);
         if (!points) {
           points = locations(mob.id, mode.heroic);

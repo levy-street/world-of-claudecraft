@@ -82,13 +82,15 @@ describe('catalog portals', () => {
       'fisher_bram',
       'yumi_cat',
       'muster_footman',
+      // Props you interact with in a fight are objectives, not enemies.
+      'tolling_bell',
       'vision_aldren_warrior',
     ]) {
       expect(creatureRole(id), id).not.toBe('enemy');
       expect(enemyPages, id).not.toContain('mob/' + id);
     }
     // Encounter objects and bosses are fought, so they stay enemies.
-    for (const id of ['spider_egg', 'nythraxis_bone_spike', 'tolling_bell'])
+    for (const id of ['spider_egg', 'nythraxis_bone_spike'])
       expect(creatureRole(id), id).toBe('enemy');
     expect(creatureRole(Object.values(MOBS).find((m) => m.boss)!.id)).toBe('enemy');
     expect(pages.get('Mobs')).not.toContain('Friendly creatures');

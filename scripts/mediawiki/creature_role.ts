@@ -46,6 +46,16 @@ const QUEST_VISIONS = new Set([
 ]);
 const delveCompanions = new Set(Object.values(DELVE_COMPANIONS).map((c) => c.mobTemplateId));
 
+// Bodies the game spawns as part of a fight but never as something that fights you: a
+// "usable" prop you channel on (Hunting Spear, Remembrance Candle, Soul Brazier), the Tolling
+// Bell projectile (spawned non-hostile, src/sim/content/delves/mobs.ts tolling_bell) and the
+// Brood Clutch egg (spawned non-hostile and damage immune, src/sim/rift/hoard_boss.ts).
+const INERT_ENCOUNTER_BODIES = new Set(['tolling_bell', 'hoard_brood_egg']);
+export function isEncounterProp(id: string): boolean {
+  const m = MOBS[id];
+  return !!m && (INERT_ENCOUNTER_BODIES.has(id) || !!m.trashKit?.usable);
+}
+
 export function creatureRole(id: string): CreatureRole {
   const m = MOBS[id];
   if (companionByCreature.has(id)) return 'companion';
@@ -55,7 +65,7 @@ export function creatureRole(id: string): CreatureRole {
   if (m?.ambient) return 'wildlife';
   if (ESCORT_NPC_TEMPLATE_IDS.has(id)) return 'escort';
   if (m?.musterSoldier || QUEST_VISIONS.has(id)) return 'ally';
-  if (id === YUMI_TEMPLATE_ID) return 'objective';
+  if (id === YUMI_TEMPLATE_ID || isEncounterProp(id)) return 'objective';
   return 'enemy';
 }
 

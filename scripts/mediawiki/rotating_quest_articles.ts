@@ -123,7 +123,12 @@ export function addRotatingQuests({
           'Objective',
           t(`hudChrome.weekly.kinds.${quest.kind}.goal`, { count: quest.count }),
         ) +
-        section('Walkthrough', weeklyRoute(quest)) +
+        section(
+          'Walkthrough',
+          weeklyRoute(quest, (id, name) =>
+            titleBy.mob.get(id) ? link(titleBy.mob.get(id)!, name) : name,
+          ),
+        ) +
         section(
           'How it works',
           'Choose one charge from ' +

@@ -38,7 +38,8 @@ export function addTradeSkills(w: SystemWriter) {
   const recipeTitles = new Map<string, string>();
   const stationLocation = (station: (typeof STATIONS)[number]) => {
     const location = GUIDE_PROF_STATIONS.stations.find((s) => s.id === station.id);
-    return `${location?.hub ?? w.entity('zone', station.zoneId)}, x ${station.pos.x}, z ${station.pos.z}`;
+    const round = (n: number) => Math.round(n * 10) / 10;
+    return `${location?.hub ?? w.entity('zone', station.zoneId)}, x ${round(station.pos.x)}, z ${round(station.pos.z)}`;
   };
   const patterns = new Map<string, string[]>();
   for (const definition of Object.values(ITEMS)) {
@@ -122,7 +123,7 @@ export function addTradeSkills(w: SystemWriter) {
         ]),
       ),
       trainer
-        ? `Talk to ${w.entity('npc', trainer.masterNpcId)} at ${stationLocation(trainer)}. Once your ${words(r.professionId)} skill is ${tier * TIER_SKILL_STEP} or higher, choose Training and learn the recipe for ${trainingFeeFor(r)} copper.`
+        ? `Talk to ${w.entity('npc', trainer.masterNpcId)}, who works at the ${words(trainer.type)} station at ${stationLocation(trainer)}. Once your ${words(r.professionId)} skill is ${tier * TIER_SKILL_STEP} or higher, choose Training and learn the recipe for ${trainingFeeFor(r)} copper.`
         : '',
       patternNames?.length
         ? `Use ${patternNames.join(' or ')} to learn this recipe. Follow the item link to see where to get it.`
@@ -200,7 +201,7 @@ export function addTradeSkills(w: SystemWriter) {
     list(
       STATIONS.map(
         (s) =>
-          `${words(s.type)}: ${w.entity('npc', s.masterNpcId)} at ${stationLocation(s)} in ${w.entity('zone', s.zoneId)}.`,
+          `${words(s.type)}: station at ${stationLocation(s)}, in ${w.entity('zone', s.zoneId)}. Master: ${w.entity('npc', s.masterNpcId)}.`,
       ),
     ),
   );

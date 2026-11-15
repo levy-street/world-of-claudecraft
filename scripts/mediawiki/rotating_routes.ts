@@ -452,7 +452,11 @@ export function entranceRoute(dest: DungeonDef): DungeonDef[] {
   }
   return path;
 }
-export function weeklyRoute(quest: WeeklyQuestDef) {
+/** `bossLink` names the final boss in each route line; a bare boss name can match a quest page of the same name. */
+export function weeklyRoute(
+  quest: WeeklyQuestDef,
+  bossLink: (mobId: string, name: string) => string = (_id, name) => name,
+) {
   const npc = WEEKLY_EMISSARY_NPC_DEF;
   const points: RoutePoint[] = [{ step: 'Start', label: npc.name, frame: 'Overworld', ...npc.pos }];
   let detail = '';
@@ -493,7 +497,7 @@ export function weeklyRoute(quest: WeeklyQuestDef) {
           x: spawn.x,
           z: spawn.z,
         });
-      routes.push(route.map((d) => d.name).join(' → ') + ' → ' + bossName);
+      routes.push(route.map((d) => d.name).join(' → ') + ' → ' + bossLink(bossId, bossName));
     }
     detail =
       'Earn ' +

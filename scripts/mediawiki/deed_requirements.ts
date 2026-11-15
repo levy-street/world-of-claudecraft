@@ -228,6 +228,9 @@ const checkedList = (lines: string[], need = lines.length) =>
 export function deedLead(deed: DeedDef): string {
   const t = deed.trigger;
   if (t.kind === 'manual') return '';
+  // The game text for Double Digits says level 10 unlocks talents, but talent rows
+  // open from level 5 (ROW_LEVELS in src/sim/content/talent_rows.ts), so state only the goal.
+  if (deed.id === 'prog_double_digits') return 'Reach level 10.';
   if (t.kind !== 'meta') return deed.desc;
   const quests = t.questIds?.length ?? 0;
   const deeds = t.deedIds.length;

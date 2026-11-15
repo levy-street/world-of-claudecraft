@@ -218,7 +218,9 @@ export function addSpecialAcquisitions(w: ArticleTools, index: Map<string, ItemA
       objective:
         'Once both of those characters are level 12 or higher, defeat ' +
         ref(w, 'mob', 'vael_the_mistcaller') +
-        ' together in the Fogbinder. You must both be inside and both get credit for the kill. Handing in the matching quest while in a party also works.',
+        ' together in ' +
+        ref(w, 'dungeon', 'sunken_bastion') +
+        '. You must both be inside and both get credit for the kill. Handing in the matching quest while in a party also works.',
     },
     {
       id: REFERRAL_SLIME_REINS,

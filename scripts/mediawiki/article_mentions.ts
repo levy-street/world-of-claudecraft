@@ -16,7 +16,7 @@ function key(text: string) {
 
 // Preserve literal parentheses in player names, e.g. Membership Token (30 Days).
 const qualifier =
-  / \((?:Ability|Talent|Deed|Recipe|NPC|Mob|Equipment set|World Quest|Enchant|Collection|Weapon skin|Contract|Specialization|Augment|Mount|Hoard encounter|Crop|Rift floor|Combat pet|Work order|Clue hunt|Rift|Mount skin|Companion|Hoard|Power-up|Weekly Quest|Faction|Pet family|Delve companion|Delve|Ferry|Quest|Item|Heroic item|Heroic|Dungeon|Zone|Class|Guide|(?:NPCs|Items|Enemies|Abilities) index)(?:, [^()]+)?\)$/;
+  / \((?:Ability|Talent|Deed|Recipe|NPC|Mob|Equipment set|World Quest|Enchant|Collection|Weapon skin|Contract|Specialization|Augment|Mount|Hoard encounter|Crop|Rift floor|Combat pet|Work order|Clue hunt|Rift|Mount skin|Companion|Hoard|Power-up|Weekly Quest|Faction|Pet family|Delve companion|Delve|Ferry|Quest|Item|Heroic item|Heroic|Normal|Dungeon|Zone|Class|Guide|(?:NPCs|Items|Enemies|Abilities) index)(?:, [^()]+)?\)$/;
 const numbered = / \(\d+\)$/;
 /** The name a page shares with others: its title without the kind in brackets. */
 export const sharedName = (title: string) => title.replace(numbered, '').replace(qualifier, '');

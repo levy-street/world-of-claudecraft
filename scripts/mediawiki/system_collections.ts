@@ -90,7 +90,7 @@ export function addExpeditionCollections(w: SystemWriter) {
         s.weaponType +
         '. It changes how your equipped weapon looks. The weapon keeps all its stats.',
       offer
-        ? `Buy from the Lantern Hall quartermaster for ${offer.seals} Lantern Seals.`
+        ? `Buy from the Lantern Hall quartermaster for ${offer.seals} Lantern ${offer.seals === 1 ? 'Seal' : 'Seals'}.`
         : `Available from the Season ${s.season} Armory.`,
       copy.look,
     );
@@ -309,7 +309,7 @@ export function addExpeditionCollections(w: SystemWriter) {
         (c.taskDeedId ? `${DEEDS[c.taskDeedId].desc} ` : '') +
         'The contract gives ' +
         c.seals +
-        ' Lantern Seals.',
+        (c.seals === 1 ? ' Lantern Seal.' : ' Lantern Seals.'),
     );
   }
   for (const c of CLUE_HUNTS) {

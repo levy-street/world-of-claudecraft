@@ -623,6 +623,11 @@ export function addItemArticles(
           ? 'All classes'
           : cs.map((c) => ref(w, 'class', c)).join(', '),
       ]);
+
+      const meant = item.requiredClass ?? [];
+
+      if (meant.length && cs.some((c) => !meant.includes(c)))
+        facts.push(['Made for', meant.map((c) => ref(w, 'class', c)).join(', ')]);
     } else if (item.requiredLevel) facts.push(['Required level', String(item.requiredLevel)]);
 
     if (item.kind === 'armor' && item.armorType) facts.push(['Armor type', words(item.armorType)]);
@@ -639,7 +644,7 @@ export function addItemArticles(
       );
 
     if (vendorStock.has(item.id) && (item.buyValue ?? 0) > 0 && !item.teachesRiding)
-      facts.push(['Vendor copper price per unit', w.money(item.buyValue)]);
+      facts.push(['Vendor price per unit', w.money(item.buyValue)]);
 
     if (item.priceHonor) facts.push(['Honor cost', String(item.priceHonor)]);
 
@@ -713,7 +718,9 @@ export function addItemArticles(
       (availability ? availability + '\n\n' : '') +
         w.section(
           'Overview',
-          item.name +
+          // A name shared with another page would be auto-linked to a twin (the Normal
+          // page linking its own name to the Heroic page), so link to this page itself.
+          (w.titleBy.item.get(item.id) === item.name ? item.name : ref(w, 'item', item.id)) +
             ' is ' +
             (/^[aeiou]/i.test(quality) ? 'an ' : 'a ') +
             quality +

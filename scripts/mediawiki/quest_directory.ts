@@ -78,7 +78,10 @@ export function addQuestDirectory(w: Writer) {
     .sort(byProgress);
   const zoneTitles = new Map<string, string>();
   function row({ quest: q }: Entry) {
-    const detail = [NPCS[q.giverNpcId]?.name];
+    // Link the giver by its own page: several NPCs share a name (the Brother Alderics).
+    const giver = NPCS[q.giverNpcId];
+    const giverTitle = giver && w.titleBy.npc.get(giver.id);
+    const detail = [giverTitle ? w.link(giverTitle, giver.name) : giver?.name];
     if (q.requiresQuest) detail.push('after ' + QUESTS[q.requiresQuest].name);
     if (q.requiredClass?.length)
       detail.push(q.requiredClass.map((c) => CLASSES[c].name).join(', '));

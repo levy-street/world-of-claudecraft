@@ -22,6 +22,7 @@ import { raidName, raidRooms } from './dungeon_catalog';
 import { type ArticleTools, words } from './entity_format';
 import { itemPlacement, offhandSection } from './item_catalog_groups';
 import { addGearPages } from './item_tables';
+import { homeZones } from './npc_article';
 import { npcServiceLabel } from './npc_service';
 import { wikiItemKind } from './wiki_item_kind';
 
@@ -310,13 +311,14 @@ function npcPortal(w: Writer) {
     const service = role ? npcServiceLabel(role) : 'Other residents';
     // A system-spawned NPC still stands at its authored post. The origin is the
     // placeholder for NPCs with no post (raid walk-ins, the spirit healer).
-    const posted = n.pos.x !== 0 || n.pos.z !== 0;
-    const zone = posted ? zoneContaining(n.pos.x, n.pos.z)?.name : undefined;
+    // The same zones the NPC's own page names, so the index and the page always agree.
+    const zones = homeZones(id).map((z) => z.name);
+    const zone = zones[0];
     const rooms = DUNGEON_LIST.filter((d) => d.npcs?.some((s) => s.npcId === id)).map(
       (d) => d.name,
     );
     const entry = { title, name: n.name, section: zone ?? rooms[0] ?? 'Activities' };
-    if (zone) c.file('Zones', zone, { ...entry, section: service });
+    for (const name of zones) c.file('Zones', name, { ...entry, section: service });
     for (const room of rooms) c.file('Dungeons and raids', room, { ...entry, section: service });
     if (!zone && !rooms.length)
       c.file('Other locations', 'Events and activities', { ...entry, section: service });

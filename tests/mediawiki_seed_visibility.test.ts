@@ -207,6 +207,42 @@ describe('headline numbers', () => {
   });
 });
 
+describe('pages agree with themselves', () => {
+  const plain = (text: string) =>
+    text
+      .replace(/\[\[(?:[^\]|]*\|)?([^\]]+)\]\]/g, '$1')
+      .split(', ')
+      .sort();
+  it('never says an item is locked to fewer classes than its info box lets equip it', () => {
+    const pages = xml
+      .split('<page>')
+      .slice(1)
+      .map((p) => p.replaceAll('&quot;', '"'));
+    let checked = 0;
+    for (const page of pages) {
+      const locked = /Only these classes can use it: ([^\n.]+)\./.exec(page);
+      const equip = /! Can equip\n\| ([^\n]+)/.exec(page);
+      if (!locked || !equip) continue;
+      checked++;
+      expect(plain(locked[1]), page.slice(0, 80)).toEqual(plain(equip[1]));
+    }
+    expect(checked).toBeGreaterThan(50);
+    // Armor meant for one class but wearable by others says so in both places.
+    const chain = pages.find((p) => p.includes('<title>Stormkindled Chain</title>'))!;
+    expect(chain).toContain('! Made for\n| [[Shaman]]');
+    expect(chain).toContain('It is not locked to them.');
+    expect(chain).not.toContain('Only these classes can use it');
+  });
+  it('lists every Finder encounter on a dungeon page, matching the hub count', () => {
+    const crypt = xml.split('<page>').find((p) => p.includes('<title>The Hollow Crypt</title>'))!;
+    const encounters = crypt.split('== Encounters ==')[1].split('\n== ')[0];
+    const hub = xml.split('<page>').find((p) => p.includes('<title>Dungeons</title>'))!;
+    const stated = Number(/\[\[The Hollow Crypt\]\][^\n]*· (\d+) encounters/.exec(hub)![1]);
+    expect(encounters.split('\n').filter((l) => /^[*#] /.test(l))).toHaveLength(stated);
+    expect(crypt).not.toContain('== Bosses ==');
+  });
+});
+
 describe('the encyclopedia hover catalog', () => {
   it('maps every item and visible ability to its reserved article title', () => {
     const expected = xml

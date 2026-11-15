@@ -48,6 +48,8 @@ export function classAbilityGroup(def: AbilityDef): ClassAbilityGroup {
   if (replacementTargets.has(cls + '/' + def.id)) return 'Conditional replacements';
   return 'Additional class actions';
 }
+const RANK_ONE_NOTE =
+  'Cost, cast time and cooldown below are for rank 1. Open an ability to see its higher ranks.';
 type Entry = { name: string; level: number; line: string; specIds: string[] };
 
 // Cost and cast time at rank 1, so a spellbook can be compared without opening each page.
@@ -58,11 +60,13 @@ function glance(def: AbilityDef): string {
     : def.cost
       ? def.cost + ' ' + abilityResource(def)
       : 'free';
-  const cast = def.channel
-    ? def.channel.duration + ' sec channel'
-    : def.castTime > 0
-      ? def.castTime + ' sec cast'
-      : 'instant';
+  const cast = def.onNextSwing
+    ? 'next swing'
+    : def.channel
+      ? def.channel.duration + ' sec channel'
+      : def.castTime > 0
+        ? def.castTime + ' sec cast'
+        : 'instant';
   return ' · ' + cost + ' · ' + cast + (def.cooldown ? ' · ' + def.cooldown + ' sec cooldown' : '');
 }
 
@@ -83,7 +87,7 @@ export function classAbilitySections(
     const talents = ROW_TREES[cls].flatMap((row) =>
       row.options
         .filter((o) => o.effect.grant?.ability === id)
-        .map((o) => ({ name: o.name, level: row.level })),
+        .map((o) => ({ id: o.id, name: o.name, level: row.level })),
     );
     const group = classAbilityGroup(def);
     let detail = '';
@@ -91,7 +95,12 @@ export function classAbilitySections(
     if (group === 'Membership ability') detail = 'Active membership';
     else if (group === 'Quest abilities') detail = QUESTS[def.requiresQuest!]?.name ?? '';
     else if (group === 'Talent choices') {
-      detail = talents.map((o) => o.name + ' (level ' + o.level + ')').join(' or ');
+      detail = talents
+        .map((o) => {
+          const page = titleBy.talent?.get(cls + '/' + o.id);
+          return (page ? link(page, o.name) : o.name) + ' (level ' + o.level + ')';
+        })
+        .join(' or ');
       level = Math.min(...talents.map((o) => o.level));
     } else if (group === 'Class spellbook') detail = 'Level ' + def.learnLevel;
     const path = wikiAbilityArtPath(id);
@@ -127,9 +136,9 @@ export function classAbilitySections(
           const heading = title ? link(title, spec.name) : spec.name;
           return ['=== ' + heading + ' ===\n' + bullets(lines)];
         });
-        return section(group, subsections.join('\n\n'));
+        return section(group, RANK_ONE_NOTE + '\n\n' + subsections.join('\n\n'));
       }
-      return section(group, bullets(entries.map((e) => e.line)));
+      return section(group, RANK_ONE_NOTE + '\n' + bullets(entries.map((e) => e.line)));
     })
     .join('');
 }

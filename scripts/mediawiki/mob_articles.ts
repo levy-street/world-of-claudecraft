@@ -27,7 +27,7 @@ import { WORLD_SEED } from '../../src/sim/world_seed';
 import { rankValues } from './ability_ranks';
 import { itemArtPath, mobArtPath } from './article_art';
 import { companionBossSources, companionByCreature, companionRollText } from './companion_sources';
-import { creatureRole, FRIENDLY_GROUPS } from './creature_role';
+import { creatureRole, FRIENDLY_GROUPS, isEncounterProp } from './creature_role';
 import { journalArticles } from './encounter_articles';
 import { type ArticleTools, append, lines, pct, ref, words } from './entity_format';
 import { type DropSource, type LootRow, lootTables } from './loot_table';
@@ -201,6 +201,7 @@ export function addMobArticles(
           m.elite && 'elite',
           m.rare && 'rare',
           creatureRole(m.id) !== 'enemy' && creatureRole(m.id),
+          isEncounterProp(m.id) && 'encounter prop',
         ]
           .filter(Boolean)
           .join(', ') || 'ordinary',
@@ -409,7 +410,16 @@ export function addMobArticles(
           ? 'Numbers separated by slashes go with the levels in the same order.'
           : '';
     const info =
-      w.section('Overview', m.name + ' belongs to the ' + words(m.family) + ' family.') +
+      w.section(
+        'Overview',
+        m.name +
+          ' belongs to the ' +
+          words(m.family) +
+          ' family.' +
+          (isEncounterProp(m.id)
+            ? ' It is a prop in an encounter. It is not an enemy and it does not attack you.'
+            : ''),
+      ) +
       (glance.length ? w.section('At a glance', w.table(glance)) : '') +
       w.section('Facts', w.table(facts)) +
       w.section(

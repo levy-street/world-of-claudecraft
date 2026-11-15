@@ -44,7 +44,13 @@ export function classHubRows(w: Pick<Writer, 'link' | 'titleBy'>): string[] {
         w.link(w.titleBy.class.get(id)!),
         ...(cls.resourceType ? ['Resource: ' + capitalize(cls.resourceType)] : []),
         'Roles: ' + roles.join(', '),
-        'Specializations: ' + specs.map((s) => s.name).join(', '),
+        'Specializations: ' +
+          specs
+            .map((s) => {
+              const page = (w.titleBy as { spec?: Map<string, string> }).spec?.get(id + '/' + s.id);
+              return page ? w.link(page, s.name) : s.name;
+            })
+            .join(', '),
       ].join(' · ');
     });
 }

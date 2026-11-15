@@ -18,6 +18,8 @@ const esc = (s: string) =>
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;');
 const fmt = (n: number) => Number(n.toFixed(3));
+/** Written coordinates use two decimals, the same as the Quest brief and the NPC pages. */
+const yd = (n: number) => Number(n.toFixed(2));
 const marker = (step: RoutePoint['step']) =>
   step === 'Start' ? 'S' : step === 'Hand-in' ? 'H' : step === 'Reward' ? 'R' : String(step);
 
@@ -121,7 +123,7 @@ export function questMap(
       const steps = stepLabels.join('/');
       const badge = steps.length > 12 ? stepLabels.slice(0, 3).join('/') + '/+' : steps;
       const descriptions = [...new Set(same.map((p) => p.label))].join(' / ');
-      const label = steps + ' · ' + descriptions + ' (' + fmt(p.x) + ', ' + fmt(p.z) + ')';
+      const label = steps + ' · ' + descriptions + ' (' + yd(p.x) + ', ' + yd(p.z) + ')';
       const radius = Math.max(...same.map((p) => p.radius ?? 0));
       if (radius > 0)
         pins.push(
@@ -154,9 +156,9 @@ export function questMap(
       // One line per thing to do at this spot: its number, where, then what to do there.
       const where =
         ' (' +
-        fmt(p.x) +
+        yd(p.x) +
         ', ' +
-        fmt(p.z) +
+        yd(p.z) +
         ')' +
         (radius ? ', search within ' + fmt(radius) + ' yards' : '');
       for (const text of new Set(same.map((q) => q.label))) {

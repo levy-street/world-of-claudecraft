@@ -134,7 +134,7 @@ export function addSystemArticles(ctx: SystemWikiContext): string[] {
   w.describe('Ashen Coliseum', arena.coliseumBody, arena.ladderBody, arena.rewardsBodyLossShare);
   w.describe(
     'Honor and Warfare gear',
-    'Honor is a currency you earn from PvP activities that give it. Your character sheet counts it apart from your gold. Both quartermasters sell the same things. Check the price on each item: Season 1 starter gear costs gold, but everything else costs Honor, including the two Warfare trinkets.',
+    "Honor is a currency you earn from PvP activities that give it. Your character sheet counts it apart from your gold. Both quartermasters sell the same things. Check the price on each item. Season 1 starter gear costs gold, and that includes some trinkets and rings. Other items cost Honor: the Honor armor sets, the Vanguard weapons, rings and pendants, the two Warfare trinkets ([[Medallion of Defiance]] and [[Duelist's Brand]]) and a bag.",
     arena.warfareBodyStatsStay,
     arena.warfareTradeBodyRatingSpent,
   );
@@ -336,7 +336,10 @@ export function addSystemArticles(ctx: SystemWikiContext): string[] {
     'Faction standing',
     guide.factionsPage.earningBody,
     guide.factionsPage.weeklyBody,
-    guide.factionsPage.quartermastersBody,
+    guide.factionsPage.quartermastersBody.replace(
+      'and paid for in ordinary coin.',
+      "and paid for with that faction's own currency: Order Crests, Rift Watch Marks or Automaton Cogs.",
+    ),
     'At level 15, the most standing you can have is ' +
       maxStandingForLevel(15) +
       '. From level 16, the most is ' +

@@ -1,4 +1,5 @@
 import { HEROIC_DUNGEON_TUNING } from '../../src/sim/content/dungeon_difficulty';
+import { FINDER_ACTIVITIES } from '../../src/sim/content/dungeon_finder';
 import type { DungeonDef } from '../../src/sim/types';
 
 interface Writer {
@@ -8,9 +9,34 @@ interface Writer {
   mob(id: string): string;
 }
 
+// Heroic multipliers are stored as raw ratios (1.6666666666666667); show them rounded.
+const times = (value: number) => String(Number(value.toFixed(3)));
+const levelBand = (min: number, max: number) => (min === max ? String(min) : min + ' to ' + max);
+
 export function dungeonDetails(dungeon: DungeonDef, { section, bullets, table, mob }: Writer) {
+  // The Dungeon Finder's own list for this dungeon (five-player dungeons and the solo crypt;
+  // a raid's rooms are covered by the raid guide).
+  const finder = FINDER_ACTIVITIES.filter((a) => a.dungeonId === dungeon.id && a.kind !== 'raid');
   const rows = [
-    ['Suggested group', dungeon.suggestedPlayers + ' players'],
+    [
+      'Suggested group',
+      dungeon.suggestedPlayers + (dungeon.suggestedPlayers === 1 ? ' player' : ' players'),
+    ],
+    ...(finder.length
+      ? [
+          [
+            'Finder levels',
+            finder
+              .map(
+                (a) =>
+                  (a.difficulty === 'heroic' ? 'Heroic' : 'Normal') +
+                  ': ' +
+                  levelBand(a.minLevel, a.maxLevel),
+              )
+              .join('; '),
+          ],
+        ]
+      : []),
     [
       'Entrance',
       dungeon.overworldDoor === false
@@ -23,6 +49,26 @@ export function dungeonDetails(dungeon: DungeonDef, { section, bullets, table, m
     ],
   ];
   let text = section('Entry', table(rows));
+  if (finder.length) {
+    const encounters = finder[0].encounters;
+    text += section(
+      'Encounters',
+      'The Dungeon Finder lists ' +
+        encounters.length +
+        (encounters.length === 1 ? ' encounter' : ' encounters') +
+        ' here, in this order.\n\n' +
+        bullets(
+          encounters.map(
+            (e, i) =>
+              mob(e.mobId) +
+              ' · Encounter ' +
+              (i + 1) +
+              (e.final ? ', the final boss' : '') +
+              (e.summoned ? ', appears when you set it off' : ''),
+          ),
+        ),
+    );
+  }
   if (dungeon.bossChainPull)
     text += section(
       'Pulling the final boss',
@@ -63,10 +109,10 @@ export function dungeonDetails(dungeon: DungeonDef, { section, bullets, table, m
           h.marksPerParticipant + ' for each player who can get them, given at the final boss.',
         ],
         ['Enemy level', String(h.level)],
-        ['Default health', h.healthMultiplier + ' × base'],
-        ['Default melee damage', h.damageMultiplier + ' × base'],
-        ['Summoned add melee damage', h.addDamageMultiplier + ' × base'],
-        ['Armor', h.armorMultiplier + ' × base'],
+        ['Default health', times(h.healthMultiplier) + ' × base'],
+        ['Default melee damage', times(h.damageMultiplier) + ' × base'],
+        ['Summoned add melee damage', times(h.addDamageMultiplier) + ' × base'],
+        ['Armor', times(h.armorMultiplier) + ' × base'],
         ...Object.keys({
           ...h.healthMultiplierByMob,
           ...h.damageMultiplierByMob,
@@ -81,7 +127,9 @@ export function dungeonDetails(dungeon: DungeonDef, { section, bullets, table, m
             ['Burn damage', h.burnDamageMultiplierByMob?.[id]],
           ]
             .filter((pair) => pair[1] != null)
-            .map(([name, value]) => name + ' × ' + value + ' instead of the default')
+            .map(
+              ([name, value]) => name + ' × ' + times(value as number) + ' instead of the default',
+            )
             .join(', '),
         ]),
       ]),
