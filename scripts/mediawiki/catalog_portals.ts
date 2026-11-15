@@ -21,7 +21,7 @@ import { creatureRole, FRIENDLY_GROUPS, ROLE_SECTIONS } from './creature_role';
 import { raidName, raidRooms } from './dungeon_catalog';
 import { type ArticleTools, words } from './entity_format';
 import { itemPlacement, offhandSection } from './item_catalog_groups';
-import { addGearPages } from './item_tables';
+import { addGearPages, type GearGroup } from './item_tables';
 import { npcServiceLabel } from './npc_service';
 import { wikiItemKind } from './wiki_item_kind';
 
@@ -172,22 +172,23 @@ function itemPortal(w: Writer) {
       c.file('Ingredients by profession', craft + ' ingredients', entry);
   }
   // Gear is browsed in layers (slot, type, quality), each with a sortable stat table.
+  const gearGroups: GearGroup[] = [];
   const gear = (facet: string, label: string, weapon: boolean) =>
-    c.build(facet, label, (title, members) =>
-      addGearPages(
-        w,
+    c.build(facet, label, (title, members) => {
+      gearGroups.push({
         title,
-        label,
-        members.map((m) => ({ id: m.id!, title: m.title, name: m.name })),
+        slot: label,
+        items: members.map((m) => ({ id: m.id!, title: m.title, name: m.name })),
         weapon,
-        'Items',
-      ),
-    );
+      });
+    });
   for (const slot of new Set(Object.values(gearSlots)))
     gear('Armor, jewelry and off-hands', slot, false);
   for (const hands of ['Main-hand weapons', 'One-handed weapons', 'Two-handed weapons'])
     gear('Weapons', hands, true);
   c.publish();
+  // Written after the hub so every slot title is known and pages can link across slots.
+  addGearPages(w, gearGroups, 'Items');
 }
 
 const families: Record<MobFamily, string> = {

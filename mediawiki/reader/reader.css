@@ -1616,3 +1616,43 @@ body[data-woc-site] #view table.item-table {
 #view table.item-table tr[hidden] {
   display: none;
 }
+
+/* Switch rows on gear pages: jump to another slot, type or quality without going back. */
+.directory-intro:has(.gear-switch) {
+  font-size: 16px;
+}
+.gear-switch {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 10px;
+}
+.gear-switch-label {
+  flex: 0 0 64px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+#view .gear-switch-option {
+  padding: 5px 13px;
+  color: var(--text-dim);
+  background: var(--bg-2);
+  border: 1px solid var(--border-soft);
+  border-radius: 4px;
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+}
+#view a.gear-switch-option:hover {
+  color: var(--text);
+  border-color: var(--gold-dim);
+}
+#view .gear-switch-current {
+  color: var(--bg);
+  background: var(--gold);
+  border-color: var(--gold);
+  font-weight: 600;
+}

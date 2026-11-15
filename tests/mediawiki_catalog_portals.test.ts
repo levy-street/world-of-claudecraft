@@ -203,10 +203,29 @@ describe('layered gear pages', () => {
     }
     // The narrower pages add up to the slot.
     const count = (text: string) => text.split('\n').filter((l) => l.startsWith('| ')).length;
-    const types = [...slot.matchAll(/\[\[(reserved\/\w+ belts \(Items index\))\|/g)].map(
+    const byType = slot.split('== By type ==')[1].split('== By quality ==')[0];
+    const types = [...byType.matchAll(/\[\[(reserved\/\w+ belts \(Items index\))\|/g)].map(
       (m) => m[1],
     );
+    expect(types).toHaveLength(3);
     expect(types.reduce((sum, t) => sum + count(pages.get(t)!), 0)).toBe(count(slot));
+  });
+  it('offers every other slot, type and quality from inside a page, keeping the current filters', () => {
+    const epic = pages.get('reserved/Epic mail belts (Items index)')!;
+    const row = (name: string) =>
+      epic.split('\n').find((l) => l.startsWith("'''" + name + ":'''"))!;
+    // Switching slot keeps Epic and Mail where that page exists.
+    expect(row('Slot')).toContain("'''Belts'''");
+    expect(row('Slot')).toContain('[[reserved/Epic mail footwear (Items index)|Footwear]]');
+    // Jewelry has no armor type, so the nearest page keeps the quality only.
+    expect(row('Slot')).toContain('[[reserved/Epic rings (Items index)|Rings]]');
+    expect(row('Type')).toContain('[[reserved/Epic belts (Items index)|All]]');
+    expect(row('Type')).toContain("'''Mail'''");
+    expect(row('Quality')).toContain('[[reserved/Mail belts (Items index)|All]]');
+    expect(row('Quality')).toContain("'''Epic'''");
+    // Every page a switch row points at exists.
+    for (const [, target] of epic.matchAll(/\[\[(reserved\/[^|\]]+ \(Items index\))\|/g))
+      expect(pages.has(target), target).toBe(true);
   });
   it('gives weapons damage columns in place of armor', () => {
     const weapons = pages.get('reserved/Two-handed weapons (Items index)')!;
