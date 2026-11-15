@@ -1553,6 +1553,8 @@ body[data-woc-site] .searchbox #lookup {
 }
 #view table.item-table .item-sort {
   width: 100%;
+  overflow-wrap: normal;
+  word-break: normal;
   padding: 9px 12px;
   color: var(--gold);
   background: none;
@@ -1570,7 +1572,7 @@ body[data-woc-site] .searchbox #lookup {
   content: " \25BC";
 }
 #view table.item-table td {
-  padding: 7px 12px;
+  padding: 7px 10px;
   border-bottom: 1px solid var(--border-soft);
   vertical-align: middle;
   font-variant-numeric: tabular-nums;
@@ -1578,28 +1580,36 @@ body[data-woc-site] .searchbox #lookup {
 #view table.item-table tr:nth-child(odd) td {
   background: var(--bg-2);
 }
+/* The site sets every table to equal fixed columns; an item table sizes to its content. */
+body[data-woc-site] #view table.item-table {
+  table-layout: auto;
+}
 #view table.item-table td:first-child {
-  min-width: 220px;
+  width: 28%;
+  min-width: 190px;
+  padding-right: 20px;
   font-weight: 600;
 }
+/* The icon floats left and the name wraps beside it, inside the cell. */
+#view table.item-table td:first-child span {
+  display: block;
+  overflow: hidden;
+  min-height: 28px;
+  padding-top: 2px;
+}
 #view table.item-table td:last-child {
+  min-width: 150px;
   color: var(--text-dim);
   font-size: 15px;
 }
-#view table.item-table td:first-child {
+#view table.item-table td:not(:first-child):not(:last-child) {
   white-space: nowrap;
 }
-#view table.item-table td:first-child span {
-  display: inline-block;
-  max-width: 230px;
-  vertical-align: middle;
-  white-space: normal;
-}
 #view table.item-table .ability-icon {
+  float: left;
   width: 28px;
   height: 28px;
-  margin-right: 10px;
-  vertical-align: middle;
+  margin: 0 12px 0 0;
   border: 1px solid var(--border-soft);
   border-radius: 4px;
 }
