@@ -22,7 +22,7 @@
 // applied 1:1 (so any drag speed stays glued to the camera) while just the
 // leftover discontinuity from engaging decays under the cap.
 
-export const SELF_TURN_MAX_RATE = 10; // rad/sec cap on camera-driven model yaw
+export const SELF_TURN_MAX_RATE = 20; // rad/sec cap on camera-driven model yaw
 export const MAX_FRAME_DT = 1 / 30; // clamp long frames so a hitch cannot over-rotate
 // Override is considered converged onto the sim facing once within this gap, at
 // which point the renderer drops it and hands control back to the interpolated

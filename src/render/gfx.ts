@@ -1964,7 +1964,7 @@ export function resolveDefaultGraphicsPreset(hints: GfxRuntimeHints): number {
   const gpu = classifyGpuRenderer(hints.gpuRenderer);
   const mem = hints.deviceMemory; // GiB, Chromium-only (clamped, max ~8); undefined elsewhere
   const cores = hints.hardwareConcurrency; // logical cores, or undefined
-  const isMobile = hints.maxTouchPoints > 0 && (hints.coarsePointer || hints.narrowViewport);
+  const isMobile = hints.maxTouchPoints > 0 && hints.coarsePointer;
   // Corroborating RAM/core signal (or deviceMemory simply unreported, as on Firefox): only ever
   // used to RAISE the strong-desktop tier to ultra, never to demote.
   const ampleOrUnknownMem =
