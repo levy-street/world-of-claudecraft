@@ -367,9 +367,10 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     crowdShare: 0.5,
     risenPulseMin: 14,
     risenPulseMax: 16,
-    // The fifth Wrath (about 4:55), past the 4 to 5 minute target (was the
-    // fourth, about 3:56: the balance pass of 2026-11-12).
-    enrageAfterWraths: 5,
+    // The sixth Wrath (about 5:55) since the parse-calibrated pass of
+    // 2026-11-16: its +20 percent pools carried the bot raid past the fifth
+    // (4:55, the balance pass of 2026-11-12; the fourth, 3:56, before it).
+    enrageAfterWraths: 6,
     heirRiseWarn: 2,
     heirFillSeconds: 35,
     rockOutlivesSinger: false,

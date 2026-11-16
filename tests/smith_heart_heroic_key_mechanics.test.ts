@@ -105,7 +105,8 @@ describe("Smith's Heart Heroic: Mountain's Wrath kills whoever does not hide", (
 
 describe("Smith's Heart Heroic: the Council's soft enrage comes after the lethal Wraths' window", () => {
   it('Normal speeds up after 5 Wraths, Heroic after 8, Mythic after 6 (2026-11-12)', () => {
-    expect(COUNCIL_DIFFICULTY.normal.enrageAfterWraths).toBe(5);
+    // The sixth since the parse-calibrated pass of 2026-11-16 (the fifth before).
+    expect(COUNCIL_DIFFICULTY.normal.enrageAfterWraths).toBe(6);
     expect(COUNCIL_DIFFICULTY.heroic.enrageAfterWraths).toBe(8);
     expect(COUNCIL_DIFFICULTY.mythic.enrageAfterWraths).toBe(6);
     // Each tier's row is what the fight reads: Normal's fourth Wrath no

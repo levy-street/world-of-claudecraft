@@ -1717,7 +1717,7 @@ minutes for humans: the Hammer Council 2.0, the Breath 1.79, the Quench 2.17, th
 Masterless Strength 2.28 (Mythic the same, never less than Heroic). Both rows are the
 parse-calibrated pass of 2026-11-16 below. Heroic's key mechanics kill when
 ignored: Mountain's Wrath kills whoever no pillar hides (`wrathMult` 6.3 since the owner's
-review of 2026-11-09, section 7.1), the Council's soft enrage waits for 8 Wraths (5 on Normal,
+review of 2026-11-09, section 7.1), the Council's soft enrage waits for 8 Wraths (6 on Normal since 2026-11-16,
 6 on Mythic), and the Quench's shatter lands twice as hard (`shatterMult` 2, Mythic too). Every
 number and why: the pass's notes (E:/woc/entregas/raid_corazon/heroico/NOTAS.md, "Segunda
 vuelta", outside the repo).
@@ -1775,6 +1775,9 @@ fights here, 73 on the Quench (no pressure on its healers). So:
   Guardian on the new pools): Stone Thrum and the cursed pillar a tenth lighter on Heroic only
   (`risenPulseMin`/`Max` 14 to 16 to 12.6 to 14.4, `cursedPulseMin`/`Max` 40 to 48 to 36 to 43.2;
   Mythic keeps its rows).
+- The Council's Normal soft enrage comes with the 6th Wrath (about 5:55; was the 5th, 4:55): the
+  bot check wiped right at the 5th Wrath with the Guardian still near full, and the +20 percent
+  pools put a decent human raid near that line.
 - Every aura tooltip names the resolved Normal value too (`src/ui/*_aura_effect.ts`, Normal's
   factor no longer 1).
 
@@ -1797,7 +1800,7 @@ harness.
 | One wipe | The fight ends when no living member fights: a fallen member stands up whole at its place (`Entity.regrown`: no reward twice), the five columns stand whole again, the risen and cursed pillars, marks, rubble, Weight, Bond and stacks go | `council.ts` (`resetCouncil`), `council_pillars.ts` (`restorePillars`) |
 | One kill | Complete only when both are dead: the Slab (`the_slab` waits on `SMITH_HEART_COUNCIL`), the heart seal's Hammer vein (`smithHeartVeinWon`), the death checkpoints and every credit wait on both; the risen pillars sink back into the floor and the carved columns stand in their sockets again | `content/smith_heart.ts`, `seal.ts`, `council_pillars.ts` (`settlePillars`) |
 | Pillars | The five carved columns (claim objects at `QUARRY_PILLAR_SPOTS`) plus the risen ones, at most 7 standing (the cursed pillar is outside the cap). A carved column has 2 integrity and a risen pillar 1 (`councilPillarFull`), in its template id; each stands as a round combat wall (`COMBAT_WALL_SHAPES`) that blocks bodies and the Wrath's sight line, offline and online. Cracked to 0 by the rock it falls: rubble lies 8 s and bites 90 to 110 a second. A pillar the Wrath or the Rush takes whole leaves rubble that only looks the part | `council_pillars.ts` |
-| Energy | 0 to 100, full in 55 s; the holder's energy bar is its resource; after the 5th Wrath on Normal (the 8th on Heroic, the 6th on Mythic: each tier's `enrageAfterWraths`) it fills 2.5 times faster (the soft enrage) | `council_wrath.ts` |
+| Energy | 0 to 100, full in 55 s; the holder's energy bar is its resource; after the 6th Wrath on Normal (the 5th until the pass of 2026-11-16; the 8th on Heroic, the 6th on Mythic: each tier's `enrageAfterWraths`) it fills 2.5 times faster (the soft enrage) | `council_wrath.ts` |
 | Mountain's Wrath | At 100 (cast id kept, `heart_mountains_wrath`): a 4 s bar, then 440 to 520 to everyone in the Quarry (45 yd) the caster can see (Heroic and Mythic: 3,465 to 4,095, `wrathMult` 6.3; see "The lethal Wrath" below), and then EVERY pillar in the Quarry shatters, carved columns and risen alike (a mythic soul pillar alone stands). The columns teach the first Wrath; it takes them for the rest of the pull (the columns crumble in the world: from now on only pillars raised by Wake the Stone can shield the raid from Mountain's Wrath; no banner says so, by the owner's rule of 2026-11-03). Each landing brings the next Wake due 6 s later (`wakeAfterWrath`) | `council_wrath.ts` (`landWrath`) |
 | Narrow Shelter (Normal 5, Heroic 4, Mythic 3) | One pillar shields only so many players from the Wrath; with more behind it each of them takes a share of the blast (each tier's `crowdShare`: half on Normal, a fifth on Heroic and Mythic, 693 to 819, about 50 to 60 percent of a Heroic-geared cloth body: it hurts, it never wipes on its own). A risen pillar's shadow (2.2 yd round) fits five side by side a stride behind it (pinned per tier). The caster wears the limit through its bar (`heart_narrow_shelter`, `value2`) | `council_wrath.ts`, `council_limit_fx.ts` |
 | Hammer's Weight | The Guardian's: every 18 s (first at 10) a 1.5 s bar at the tank, then 2.2 times a swing through armor and +100 percent physical damage taken for 25 s: swap tanks | `council_wrath.ts` |
