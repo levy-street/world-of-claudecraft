@@ -73,6 +73,36 @@ VITE_API_ORIGIN=http://192.168.1.247 npm run native:sync
 Replace the IP with the Mac's current Wi-Fi/LAN address. Do not use
 `localhost` for a physical phone; that resolves to the phone itself.
 
+## iOS startup and scene lifecycle
+
+The iOS shell uses a single application scene. `ios/App/App/Info.plist` declares
+the scene and its `Main` storyboard; UIKit creates the window and the custom
+`AppViewController`, which registers the native plugins. `SceneDelegate.swift`
+owns the window, scene diagnostics, and cold/warm URL and universal-link
+forwarding through Capacitor's `ApplicationDelegateProxy`. Do not construct a
+second bridge or repost the UIKit application notifications consumed by the
+existing Capacitor plugins.
+
+Apps built with the iOS 27 SDK must adopt the scene lifecycle or UIKit terminates
+them during startup. An archive compiling successfully does not validate launch.
+See [Apple's migration guide](https://developer.apple.com/documentation/technotes/tn3187-migrating-to-the-uikit-scene-based-life-cycle).
+
+Before uploading an iOS build:
+
+- Launch the Release build on iOS 27 or later and confirm the native login screen
+  renders, including on an update over an existing installation.
+- Background and reopen it; confirm rendering and online reconnection resume.
+- Open the app's custom URL scheme both while running and after termination.
+  Verify `appUrlOpen` and `App.getLaunchUrl()` delivery, then complete the Discord
+  and Apple authentication flows on a signed physical-device build.
+- Confirm landscape layout on iPhone and iPad, and verify an offline launch.
+- Preserve the Swift package lockfile when archiving. For command-line builds,
+  pass `-disableAutomaticPackageResolution -onlyUsePackageVersionsFromResolvedFile`
+  to prevent unrelated dependency updates.
+
+The manifest and callback wiring guards live in
+`tests/ios_scene_lifecycle.test.ts`; native runtime checks remain required.
+
 ## Android Distribution Flavors, Signing, and Play Integrity
 
 Android has two distribution flavors with different packaged capabilities:
