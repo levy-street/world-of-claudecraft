@@ -7,7 +7,7 @@
 // through the PainterHost writers the way every per-frame painter does. The
 // cadence is what makes that acceptable, and it is the whole argument: the rail
 // repaints only when the map redraw path runs or the player clicks a chip, a
-// quest row, Show Route or Untrack. It is never on the frame band, so there is
+// quest row, Show Route, Track or Untrack. It is never on the frame band, so there is
 // no per-frame write budget to blow and no skip-rate to hold. `lastHtml` below
 // is the write elision that keeps an unchanged rail free, and `lastSig` (the
 // bucketed view plus the i18n revision) stops an unchanged rail from paying the
@@ -26,7 +26,7 @@ import { questObjectiveLabel, questTitle } from './entity_display_core';
 import { zoneDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { worldQuestRailSectionHtml } from './hud/map/world_quest_rail_section';
-import { buildWorldQuestRailView } from './hud/map/world_quest_rail_view';
+import { buildWorldQuestRailView, worldQuestMapPosition } from './hud/map/world_quest_rail_view';
 import { formatNumber, getI18nRevision, type TranslationKey, t } from './i18n';
 import { ownEntry } from './known_item';
 import {
@@ -41,7 +41,7 @@ import {
 } from './map_sidebar_view';
 import { type QuestTrackingState, sharedQuestTracking } from './quest_tracking_core';
 import { svgIcon } from './ui_icons';
-import { worldQuestDisplayName } from './world_quest_view';
+import { worldQuestDef, worldQuestDisplayName } from './world_quest_view';
 
 const FILTERS: readonly MapAtlasFilterId[] = [
   'quests',
@@ -71,6 +71,10 @@ const FOCUS_ATTRS = [
   'data-map-quest',
   'data-map-route',
   'data-map-untrack',
+  'data-map-wq',
+  'data-map-wq-route',
+  'data-map-wq-track',
+  'data-map-wq-reroll',
 ] as const;
 
 /** Which control held focus, as an attribute plus its value (null for the two
@@ -112,6 +116,8 @@ export interface MapSidebarControllerDeps {
   worldQuests?: {
     selectedId(): string | null;
     select(questId: string | null): void;
+    /** Show the quest's zone map with the quest selected (a rail row pick). */
+    focus(questId: string): void;
     confirmDialog(
       title: string,
       body: string,
@@ -128,6 +134,9 @@ export class MapSidebarController {
   private filters: MapAtlasFilters = { ...DEFAULT_MAP_ATLAS_FILTERS };
   private selectedQuestId: string | null = null;
   private route: MapAtlasRoute | null = null;
+  /** The world-quest Show Route target (the WQ section's own button). At most
+   *  one of `route` and `wqRoute` is set: the map draws a single route line. */
+  private wqRoute: MapAtlasRoute | null = null;
   private initializedSelection = false;
   private world: IWorld | null = null;
   private zone: ZoneDef | null = null;
@@ -156,7 +165,7 @@ export class MapSidebarController {
   }
 
   shownRoute(): MapAtlasRoute | null {
-    return this.route;
+    return this.route ?? this.wqRoute;
   }
 
   update(world: IWorld, zone: ZoneDef): void {
@@ -211,12 +220,31 @@ export class MapSidebarController {
     return root;
   }
 
-  /** The world-quest section's two controls: select a row (shared with the map
-   *  marker selection) and replace the selected quest, always behind the confirm. */
+  /** The world-quest section's controls: select a row (shared with the map
+   *  marker selection, and it opens the quest's zone map), track or route to the
+   *  selected quest, and replace it, always behind the confirm. */
   private handleWorldQuestClick(target: HTMLElement): boolean {
     const wq = this.deps.worldQuests;
     const world = this.world;
     if (!wq || !world) return false;
+    if (target.closest('[data-map-wq-track], [data-map-wq-route]')) {
+      const selected = wq.selectedId();
+      const quest = selected ? worldQuestDef(selected) : null;
+      if (!selected || !quest) return true;
+      this.deps.click();
+      if (target.closest('[data-map-wq-track]')) {
+        const tracking = this.tracking();
+        tracking.setWorldQuestTracked(selected, !tracking.isWorldQuestTracked(selected));
+        this.deps.onRepaintMap();
+      } else {
+        const at = worldQuestMapPosition(quest);
+        this.route = null;
+        this.wqRoute = { questId: selected, x: at.x, z: at.z };
+        this.deps.onShowRoute(this.wqRoute);
+      }
+      this.render();
+      return true;
+    }
     const reroll = target.closest<HTMLElement>('[data-map-wq-reroll]');
     if (reroll) {
       const questId = reroll.dataset.mapWqReroll ?? '';
@@ -240,8 +268,12 @@ export class MapSidebarController {
     if (!row) return false;
     const questId = row.dataset.mapWq ?? '';
     this.deps.click();
-    wq.select(wq.selectedId() === questId ? null : questId);
-    this.deps.onRepaintMap();
+    if (wq.selectedId() === questId) {
+      wq.select(null);
+      this.deps.onRepaintMap();
+    } else {
+      wq.focus(questId); // selects it and opens its zone (repaints the map)
+    }
     this.render();
     return true;
   }
@@ -273,11 +305,22 @@ export class MapSidebarController {
           worldQuestExpiresAtMs: world.worldQuestExpiresAtMs,
           playerLevel: world.player.level,
           selectedWorldQuestId: wq.selectedId(),
+          trackedWorldQuestIds: tracking.trackedWorldQuestIds(),
           canReroll: world.canRerollWorldQuest
             ? (questId) => world.canRerollWorldQuest?.(questId) ?? { canReroll: false }
             : undefined,
         })
       : null;
+    // Pins from an older board (the daily reset, a replacement) are dropped
+    // here, never on an empty board: an unknown cycle must not wipe them.
+    if (wqView && wqView.rows.length > 0) {
+      tracking.retainTrackedWorldQuests(new Set(wqView.rows.map((row) => row.questId)));
+    }
+    // A world-quest route follows its selection: picking another quest, or
+    // clearing the pick, drops the line.
+    if (this.wqRoute !== null && wqView?.selection?.questId !== this.wqRoute.questId) {
+      this.wqRoute = null;
+    }
     const collapsed = this.deps.settings.collapsed();
     const signature = mapSidebarSignature(model, {
       shownRouteQuestId: this.route?.questId ?? null,
@@ -288,7 +331,11 @@ export class MapSidebarController {
       // The world-quest section: its rows plus the expiry countdown's minute,
       // so the countdown moves once a minute and never per update.
       worldQuests: wqView
-        ? { view: wqView, minute: Math.floor(Math.max(0, wqView.expiresAtMs - nowMs) / 60_000) }
+        ? {
+            view: wqView,
+            minute: Math.floor(Math.max(0, wqView.expiresAtMs - nowMs) / 60_000),
+            routeQuestId: this.wqRoute?.questId ?? null,
+          }
         : null,
       sidebarCollapsed: collapsed,
     });
@@ -343,7 +390,7 @@ export class MapSidebarController {
       `<div class="map-atlas-filters ui-seg" role="group" aria-label="${esc(t('hudChrome.mapAtlas.filtersAria'))}">${filters}</div>` +
       `<section class="map-atlas-section"><h3 class="map-atlas-heading">${esc(t('hudChrome.mapAtlas.trackedQuests'))}</h3><div class="map-atlas-quest-list">${quests || `<p class="map-atlas-empty">${esc(t('hudChrome.mapAtlas.noTrackedQuests'))}</p>`}</div></section>` +
       `<div class="map-atlas-actions"><button type="button" class="map-atlas-route ui-btn ui-btn--red" data-map-route aria-pressed="${this.route?.questId === model.selectedQuestId}"${model.route ? '' : ' disabled'}>${esc(t('hudChrome.mapAtlas.showRoute'))}</button><button type="button" class="map-atlas-untrack ui-btn" data-map-untrack${model.selectedQuestId ? '' : ' disabled'}>${esc(t('hudChrome.mapAtlas.untrack'))}</button></div>` +
-      (wqView ? worldQuestRailSectionHtml(wqView, nowMs) : '') +
+      (wqView ? worldQuestRailSectionHtml(wqView, nowMs, this.wqRoute !== null) : '') +
       `<section class="map-atlas-section map-atlas-nearby"><h3 class="map-atlas-heading is-secondary">${esc(t('hudChrome.mapAtlas.availableNearby'))}</h3>${nearby || `<p class="map-atlas-empty">${esc(t('hudChrome.mapAtlas.noNearbyQuests'))}</p>`}</section>` +
       `<footer class="map-atlas-legend"><span><i class="map-atlas-legend-mark is-dungeon" aria-hidden="true"></i>${esc(t('hudChrome.mapAtlas.legend.dungeon'))}</span><span><i class="map-atlas-legend-mark is-ore" aria-hidden="true"></i>${esc(t('hudChrome.mapAtlas.legend.ore'))}</span><span><i class="map-atlas-legend-mark is-herb" aria-hidden="true"></i>${esc(t('hudChrome.mapAtlas.legend.herb'))}</span><span><i class="map-atlas-legend-mark is-mail" aria-hidden="true"></i>${esc(t('hudChrome.mapAtlas.legend.mail'))}</span><span><i class="map-atlas-legend-mark is-passage" aria-hidden="true"></i>${esc(t('hudChrome.mapAtlas.legend.passage'))}</span></footer>` +
       `</div>`;
@@ -395,6 +442,7 @@ export class MapSidebarController {
           : null;
       if (route) {
         this.route = route;
+        this.wqRoute = null;
         this.deps.click();
         this.deps.onShowRoute(route);
         this.render();

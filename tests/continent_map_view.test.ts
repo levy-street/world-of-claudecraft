@@ -13,14 +13,28 @@ import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 import { TRANSPORT_ROUTES } from '../src/sim/content/transport_ships';
-import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_X, WORLD_MIN_Z, ZONES, zoneAt } from '../src/sim/data';
+import {
+  activeOverworldDungeons,
+  WORLD_MAX_X,
+  WORLD_MAX_Z,
+  WORLD_MIN_X,
+  WORLD_MIN_Z,
+  ZONES,
+  zoneAt,
+} from '../src/sim/data';
 import { emptyTransportFerryView } from '../src/sim/transport_schedule';
+import type { WorldQuestProgress } from '../src/sim/types';
+import { worldQuestCycleForResetDay } from '../src/sim/world_quest_rotation';
+import { activeWorldQuestsForCycle } from '../src/sim/world_quests';
 import {
   buildContinentMapModel,
   CONTINENT_FALLBACK_ASPECT,
   type ContinentMapInput,
+  continentDungeonAt,
   continentZoneAt,
 } from '../src/ui/continent_map_view';
+import { worldQuestMapPosition } from '../src/ui/hud/map/world_quest_rail_view';
+import { overworldDungeonPortals } from '../src/ui/map_dungeon_portals';
 import type { IWorld } from '../src/world_api';
 
 const CANVAS = 560;
@@ -465,4 +479,102 @@ describe('King of the Hill continent marker', () => {
       expect(buildContinentMapModel(input(world, 1)).hill).toBeNull();
     },
   );
+});
+
+describe('buildContinentMapModel: world quests', () => {
+  const cycle = worldQuestCycleForResetDay('2026-08-31');
+  const board = activeWorldQuestsForCycle(cycle);
+  const withBoard = (
+    shape: 'sim' | 'client',
+    level: number,
+    log: Map<string, WorldQuestProgress> = new Map(),
+  ): IWorld => {
+    const world = worldAt(shape, 0, 0) as unknown as Record<string, unknown> & {
+      player: Record<string, unknown>;
+    };
+    world.player.level = level;
+    world.worldQuestCycle = cycle;
+    world.worldQuestLog = log;
+    return world as unknown as IWorld;
+  };
+
+  it('is empty with no cycle (an older server), like the zone map', () => {
+    const model = buildContinentMapModel(input(worldAt('sim', 0, 0), CONTINENT_FALLBACK_ASPECT));
+    expect(model.worldQuests).toEqual([]);
+  });
+
+  it.each(['sim', 'client'] as const)(
+    'projects every eligible quest on the board at its map point for a %s world',
+    (shape) => {
+      const model = buildContinentMapModel(input(withBoard(shape, 80), CONTINENT_FALLBACK_ASPECT));
+      expect(model.worldQuests.map((m) => m.questId)).toEqual(board.map((q) => q.id));
+      for (const marker of model.worldQuests) {
+        const quest = board.find((q) => q.id === marker.questId);
+        if (!quest) throw new Error('unknown quest');
+        const at = worldQuestMapPosition(quest);
+        const want = projectPoint(at.x, at.z, model.image);
+        expect(marker.mx).toBeCloseTo(want.mx, 6);
+        expect(marker.my).toBeCloseTo(want.my, 6);
+        expect(marker.radius).toBe(0);
+        expect(marker.state).toBe('available');
+      }
+    },
+  );
+
+  it('drops completed quests and those above the character level, and marks active ones', () => {
+    const [done, active] = board;
+    const log = new Map<string, WorldQuestProgress>([
+      [done.id, { questId: done.id, count: done.count, state: 'completed' } as WorldQuestProgress],
+      [active.id, { questId: active.id, count: 0, state: 'active' } as WorldQuestProgress],
+    ]);
+    const model = buildContinentMapModel(
+      input(withBoard('sim', 80, log), CONTINENT_FALLBACK_ASPECT),
+    );
+    expect(model.worldQuests.some((m) => m.questId === done.id)).toBe(false);
+    expect(model.worldQuests.find((m) => m.questId === active.id)?.state).toBe('active');
+
+    const low = buildContinentMapModel(input(withBoard('sim', 0), CONTINENT_FALLBACK_ASPECT));
+    const lowIds = new Set(low.worldQuests.map((m) => m.questId));
+    for (const quest of board) expect(lowIds.has(quest.id)).toBe(quest.minLevel <= 0);
+  });
+});
+
+describe('buildContinentMapModel: dungeon entrances', () => {
+  it.each(['sim', 'client'] as const)(
+    'projects every overworld dungeon door the zone map pins, for a %s world',
+    (shape) => {
+      const model = buildContinentMapModel(input(worldAt(shape, 0, 0), CONTINENT_FALLBACK_ASPECT));
+      const doors = overworldDungeonPortals(
+        activeOverworldDungeons(),
+        Number.NEGATIVE_INFINITY,
+        Number.POSITIVE_INFINITY,
+      );
+      expect(model.dungeons.map((d) => d.dungeonId)).toEqual(doors.map((d) => d.id));
+      expect(model.dungeons.length).toBeGreaterThan(0);
+      for (const [index, door] of doors.entries()) {
+        const want = projectPoint(door.x, door.z, model.image);
+        expect(model.dungeons[index].mx).toBeCloseTo(want.mx, 6);
+        expect(model.dungeons[index].my).toBeCloseTo(want.my, 6);
+      }
+    },
+  );
+
+  it('draws none when the map rail turns the Dungeons layer off', () => {
+    const model = buildContinentMapModel({
+      ...input(worldAt('sim', 0, 0), CONTINENT_FALLBACK_ASPECT),
+      showDungeons: false,
+    });
+    expect(model.dungeons).toEqual([]);
+  });
+
+  it('hit-tests the nearest door within the radius, and nothing outside it', () => {
+    const doors = [
+      { dungeonId: 'a', mx: 100, my: 100 },
+      { dungeonId: 'b', mx: 108, my: 100 },
+    ];
+    expect(continentDungeonAt(doors, 101, 100, 10)).toBe('a');
+    expect(continentDungeonAt(doors, 106, 100, 10)).toBe('b');
+    expect(continentDungeonAt(doors, 100, 130, 10)).toBe(null);
+    expect(continentDungeonAt([], 100, 100, 10)).toBe(null);
+  });
 });

@@ -4,6 +4,7 @@ import { worldQuestCycleForResetDay } from '../src/sim/world_quest_rotation';
 import { activeWorldQuestsForCycle } from '../src/sim/world_quests';
 import {
   buildWorldQuestRailView,
+  worldQuestMapPosition,
   worldQuestRerollReason,
 } from '../src/ui/hud/map/world_quest_rail_view';
 
@@ -182,5 +183,53 @@ describe('world quest rail view', () => {
     expect(view.rows.find((row) => row.questId === target.id)?.state).toBe('completed');
     expect(view.completed).toBe(1);
     expect(view.reroll.reason).toBe('completed');
+  });
+});
+
+describe('world quest rail view: track and route from the list', () => {
+  it('has no selection controls with nothing selected', () => {
+    const view = buildWorldQuestRailView({
+      worldQuestCycle: cycle,
+      worldQuestLog: new Map(),
+      worldQuestExpiresAtMs: 0,
+      playerLevel: 20,
+      selectedWorldQuestId: null,
+    });
+    expect(view.selection).toBe(null);
+    expect(view.rows.every((row) => row.tracked === false)).toBe(true);
+  });
+
+  it('marks pinned rows and gives the selected row its route point and track state', () => {
+    const quest = board[1];
+    const view = buildWorldQuestRailView({
+      worldQuestCycle: cycle,
+      worldQuestLog: new Map(),
+      worldQuestExpiresAtMs: 0,
+      playerLevel: 20,
+      selectedWorldQuestId: quest.id,
+      trackedWorldQuestIds: new Set([quest.id]),
+    });
+    expect(view.rows.find((row) => row.questId === quest.id)?.tracked).toBe(true);
+    expect(view.rows.filter((row) => row.tracked)).toHaveLength(1);
+    const at = worldQuestMapPosition(quest);
+    expect(view.selection).toEqual({
+      questId: quest.id,
+      tracked: true,
+      x: at.x,
+      z: at.z,
+      completed: false,
+    });
+  });
+
+  it('flags a completed selection so its controls can stand down', () => {
+    const quest = board[0];
+    const view = buildWorldQuestRailView({
+      worldQuestCycle: cycle,
+      worldQuestLog: log([[quest.id, 'completed']]),
+      worldQuestExpiresAtMs: 0,
+      playerLevel: 20,
+      selectedWorldQuestId: quest.id,
+    });
+    expect(view.selection?.completed).toBe(true);
   });
 });

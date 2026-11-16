@@ -14,6 +14,22 @@ export interface TrackerCollapseSettingsPort {
   setCollapsed(collapsed: boolean): void;
 }
 
+/** The quest tracker's two persisted collapses: the Quests section, and the
+ *  World Quests section's own (QuestTrackerSettingsPort). */
+export function questTrackerCollapseSettings(
+  hooks: () => OptionsHooks | null,
+): TrackerCollapseSettingsPort & {
+  worldQuestsCollapsed(): boolean;
+  setWorldQuestsCollapsed(collapsed: boolean): void;
+} {
+  const worldQuests = trackerCollapseSettings(hooks, 'worldQuestTrackerCollapsed');
+  return {
+    ...trackerCollapseSettings(hooks, 'questTrackerCollapsed'),
+    worldQuestsCollapsed: worldQuests.collapsed,
+    setWorldQuestsCollapsed: worldQuests.setCollapsed,
+  };
+}
+
 export function trackerCollapseSettings(
   hooks: () => OptionsHooks | null,
   key: BoolSettingKey,

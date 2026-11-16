@@ -8,11 +8,11 @@ import type { QuestObjectiveRef } from '../../../sim/quest_targets';
 import { type ItemDef, questObjectiveRequired } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
 import type { ContinentZoneRegion } from '../../continent_map_view';
-import { tEntity, zoneDisplayName } from '../../entity_i18n';
+import { dungeonDisplayName, tEntity, zoneDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { ferryPortSummary, ferryPortTooltipHtml } from '../../ferry_port_map_core';
 import { gatherNodeTooltipHtml } from '../../gather_node_tooltip_controller';
-import { formatNumber, t } from '../../i18n';
+import { formatNumber, getI18nRevision, t } from '../../i18n';
 import { type MapGatherTipMemo, resolveGatherTipMemo } from '../../map_gather_tip_memo';
 import type {
   MapFarmPatchMarker,
@@ -34,6 +34,7 @@ import {
 } from '../../world_quest_view';
 import { stationNameText } from '../professions/crafting_window';
 import { buildGatherNodeTooltip } from '../professions/gathering_view';
+import { worldQuestRewardLineHtml } from '../quest/world_quest_reward_line';
 import { worldQuestTooltipHtml } from './world_quest_tooltip_html';
 import { buildWorldQuestTooltip } from './world_quest_tooltip_view';
 
@@ -71,6 +72,11 @@ export interface MapMarkerTooltipContentDeps {
 
 export class MapMarkerTooltipContent {
   private gatherMemo: MapGatherTipMemo | null = null;
+  // The tracker's reward lines, per quest, keyed on everything the rewards read
+  // (the cycle picks the day's item and Honor slots; level and class scale and
+  // pick them) plus the locale. The tracker repaints on the frame band, so an
+  // unchanged line must not rebuild the reward model every update.
+  private readonly rewardLines = new Map<string, { key: string; html: string }>();
 
   constructor(
     private readonly world: IWorld,
@@ -115,6 +121,12 @@ export class MapMarkerTooltipContent {
     return `<div class="tt-title">${esc(t('worldContent.farmPatchName'))}</div>`;
   }
 
+  // Tooltip body for a hovered dungeon gate on the continent overview: its
+  // localized name, with the map legend's "Dungeon" under it.
+  continentDungeon(dungeonId: string): string {
+    return `<div class="tt-title">${esc(dungeonDisplayName(dungeonId))}</div><div class="tt-sub">${esc(t('hudChrome.mapAtlas.legend.dungeon'))}</div>`;
+  }
+
   // Tooltip body for a hovered zone region on the continent overview: the zone's
   // localized name plus its suggested level band (from the region's levelRange).
   continentZone(zoneId: string, regions: readonly ContinentZoneRegion[]): string {
@@ -155,11 +167,17 @@ export class MapMarkerTooltipContent {
   }
 
   worldQuest(marker: MapWorldQuestMarker, nowMs: number): string {
-    const quest = worldQuestDef(marker.questId);
+    return this.worldQuestCard(marker.questId, nowMs);
+  }
+
+  /** The world-quest card by id: the map marker's tooltip, also shown when the
+   *  tracker's reward line is hovered. */
+  worldQuestCard(questId: string, nowMs: number): string {
+    const quest = worldQuestDef(questId);
     if (!quest) return '';
     const model = buildWorldQuestTooltip({
       quest,
-      progressCount: this.world.worldQuestLog.get(marker.questId)?.count ?? 0,
+      progressCount: this.world.worldQuestLog.get(questId)?.count ?? 0,
       playerLevel: this.world.player.level,
       playerClass: this.world.cfg.playerClass,
       cycle: this.world.worldQuestCycle,
@@ -167,6 +185,30 @@ export class MapMarkerTooltipContent {
       nowMs,
     });
     return worldQuestTooltipHtml(model, this.deps);
+  }
+
+  /** The tracker's compact reward line for one world quest (memoized). */
+  worldQuestRewardLine(questId: string): string {
+    const world = this.world;
+    const key = `${world.worldQuestCycle}|${world.player.level}|${world.cfg.playerClass}|${getI18nRevision()}`;
+    const hit = this.rewardLines.get(questId);
+    if (hit && hit.key === key) return hit.html;
+    const quest = worldQuestDef(questId);
+    const html = quest
+      ? worldQuestRewardLineHtml(
+          buildWorldQuestTooltip({
+            quest,
+            progressCount: 0,
+            playerLevel: world.player.level,
+            playerClass: world.cfg.playerClass,
+            cycle: world.worldQuestCycle,
+            expiresAtMs: 0,
+            nowMs: 0,
+          }).rewards,
+        )
+      : '';
+    this.rewardLines.set(questId, { key, html });
+    return html;
   }
 
   /** Plain-text counterpart used by the map's always-present screen-reader summary. */

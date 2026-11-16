@@ -4,6 +4,8 @@ import { QUESTS, WORLD_QUESTS, WORLD_QUESTS_BY_ID } from '../src/sim/data';
 import { createForgeWorkshop } from '../src/sim/minigames/forge_workshop';
 import { createGliderFlightState, scoreGliderFlight } from '../src/sim/minigames/glider_flight';
 import type { QuestProgress, WeeklyQuestProgress, WorldQuestProgress } from '../src/sim/types';
+import { worldQuestCycleForResetDay } from '../src/sim/world_quest_rotation';
+import { activeWorldQuestsForCycle } from '../src/sim/world_quests';
 import * as questStrip from '../src/ui/hud/quest/quest_strip_controller';
 import { QuestTrackerController } from '../src/ui/hud/quest/quest_tracker_controller';
 import { makeWriterFacet } from '../src/ui/painter_host';
@@ -53,6 +55,8 @@ function harness(
   worldEntries: WorldQuestProgress[] = [],
   clueHunt: { huntId: string; step: number } | null = null,
   weeklyQuest: WeeklyQuestProgress | null = null,
+  worldExtra: Record<string, unknown> = {},
+  extraDeps: Partial<ConstructorParameters<typeof QuestTrackerController>[0]> = {},
 ) {
   // The World Quests section lists a quest only while the player stands in
   // its area, so the rig's player stands at the first world quest's centre.
@@ -81,7 +85,11 @@ function harness(
     }),
   };
   const docState: { activeElement: unknown } = { activeElement: header };
+  const listeners = new Map<string, (event: unknown) => void>();
   const element = {
+    addEventListener: (type: string, handler: (event: unknown) => void) => {
+      listeners.set(type, handler);
+    },
     get innerHTML() {
       return html;
     },
@@ -121,15 +129,18 @@ function harness(
         worldQuestLog,
         clueHunt,
         weeklyQuest,
+        ...worldExtra,
       }) as unknown as Pick<IWorld, 'questLog' | 'cfg' | 'player' | 'worldQuestLog' | 'clueHunt'>,
     settings,
     tracking,
     questTitle: (questId) => `title:${questId}`,
     objectiveLabel: (questId, index) => `objective:${questId}:${index}`,
     click,
+    ...extraDeps,
   });
   return {
     controller,
+    listeners,
     setWeeklyQuest: (next: WeeklyQuestProgress | null) => {
       weeklyQuest = next;
     },
@@ -606,6 +617,76 @@ describe('QuestTrackerController', () => {
     expect(test.html()).toContain(worldQuestDisplayName(quest.id));
     test.controller.update(31_000 + 5_000);
     expect(test.html()).not.toContain(worldQuestDisplayName(quest.id));
+  });
+
+  it('keeps a world quest pinned from the map listed outside its area until it completes', () => {
+    const quest = WORLD_QUESTS.find((entry) => entry.id === 'wq_eastbrook_bandits');
+    if (!quest) throw new Error('missing Eastbrook bandit fixture');
+    const entry: WorldQuestProgress = { questId: quest.id, count: 3, state: 'active' };
+    const test = harness([], [entry]);
+    test.tracking.setWorldQuestTracked(quest.id, true);
+    const row = `${worldQuestObjectiveLabel(quest.id)}: 3/${quest.count}`;
+    test.playerPos.x = quest.area.x + quest.area.radius + 500;
+    test.controller.update(0);
+    expect(test.html()).toContain(row);
+    test.controller.update(60_000);
+    expect(test.html()).toContain(row);
+    // Completed: the usual grace, then it leaves the section, pinned or not.
+    entry.state = 'completed';
+    entry.count = quest.count;
+    test.controller.update(61_000);
+    expect(test.html()).toContain(worldQuestDisplayName(quest.id));
+    test.controller.update(61_000 + 5_000);
+    expect(test.html()).not.toContain(worldQuestDisplayName(quest.id));
+  });
+
+  it('lists a pinned world quest the player has not started yet, at 0, when it is on the board', () => {
+    const cycle = worldQuestCycleForResetDay('2026-08-31');
+    const quest = activeWorldQuestsForCycle(cycle)[0];
+    const row = `${worldQuestObjectiveLabel(quest.id)}: 0/${quest.count}`;
+    const onBoard = harness([], [], null, null, { worldQuestCycle: cycle });
+    onBoard.tracking.setWorldQuestTracked(quest.id, true);
+    onBoard.controller.update(0);
+    expect(onBoard.html()).toContain(worldQuestDisplayName(quest.id));
+    if (quest.count > 1) expect(onBoard.html()).toContain(row);
+    // No cycle (an older server): a pin is never shown as a phantom row.
+    const noCycle = harness();
+    noCycle.tracking.setWorldQuestTracked(quest.id, true);
+    noCycle.controller.update(0);
+    expect(noCycle.html()).not.toContain(worldQuestDisplayName(quest.id));
+  });
+
+  it("puts each open world quest's reward line under it and shows the card while it is hovered", () => {
+    const quest = WORLD_QUESTS.find((entry) => entry.id === 'wq_eastbrook_bandits');
+    if (!quest) throw new Error('missing Eastbrook bandit fixture');
+    const entry: WorldQuestProgress = { questId: quest.id, count: 2, state: 'active' };
+    const rewards = {
+      line: vi.fn((id: string) => `<span class="qt-wq-reward">line:${id}</span>`),
+      card: vi.fn((id: string) => `card:${id}`),
+      paint: vi.fn(),
+      hide: vi.fn(),
+    };
+    const test = harness([], [entry], null, null, {}, { worldQuestRewards: rewards });
+    test.controller.update(0);
+    expect(test.html()).toContain(
+      `<div class="qt-wq-rewards ui-meta" data-qt-wq-rewards="${quest.id}">`,
+    );
+    expect(test.html()).toContain(`line:${quest.id}`);
+    // Hover the line with a mouse: the full card paints at the pointer.
+    const line = { dataset: { qtWqRewards: quest.id }, contains: () => false };
+    const target = { closest: () => line };
+    test.listeners.get('pointerover')?.({ pointerType: 'mouse', target, clientX: 5, clientY: 6 });
+    expect(rewards.paint).toHaveBeenCalledWith(`card:${quest.id}`, 5, 6);
+    // Leaving it hides the card; a touch pointer never opens it.
+    test.listeners.get('pointerout')?.({ relatedTarget: null });
+    expect(rewards.hide).toHaveBeenCalledTimes(1);
+    test.listeners.get('pointerover')?.({ pointerType: 'touch', target, clientX: 5, clientY: 6 });
+    expect(rewards.paint).toHaveBeenCalledTimes(1);
+    // A completed quest drops its line.
+    entry.state = 'completed';
+    entry.count = quest.count;
+    test.controller.update(1_000);
+    expect(test.html()).not.toContain(`line:${quest.id}`);
   });
 
   it('gives world quests their own "World Quests" section after the Quests section', () => {

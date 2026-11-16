@@ -15312,6 +15312,19 @@
     );
     box-shadow: inset 3px 0 0 var(--gold);
   }
+  /* Pinned to the HUD tracker from the map: a gold bar on the right edge, so it
+     reads alongside the selection bar on the left. */
+  .map-atlas-wq.is-tracked {
+    box-shadow: inset -3px 0 0 var(--gold-dim);
+  }
+  .map-atlas-wq.is-selected.is-tracked {
+    box-shadow:
+      inset 3px 0 0 var(--gold),
+      inset -3px 0 0 var(--gold-dim);
+  }
+  .map-atlas-wq-select-actions {
+    margin-top: 6px;
+  }
   .map-atlas-wq.is-completed,
   .map-atlas-wq.is-below-level {
     opacity: 0.6;

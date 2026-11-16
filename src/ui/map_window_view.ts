@@ -47,7 +47,7 @@ import type {
 import type { Decoration } from '../sim/world';
 import { WORLD_BOSSES, worldBossLockoutId } from '../sim/world_boss';
 import { playerActiveWorldQuests } from '../sim/world_quest_reroll';
-import type { FriendInfo, IWorld } from '../world_api';
+import type { IWorld } from '../world_api';
 import { buildCastlePlanMarkers, type CastlePlanMarker } from './castle_plan_core';
 import { dungeonMapActive } from './dungeon_map_view';
 import { FERRY_PORTS, type FerryPortMapMarker } from './ferry_port_map_core';
@@ -730,7 +730,8 @@ export interface MapPlayerMarker {
   angle: number;
 }
 
-/** An online ally dot: friends win ties over guild members (dedup by id). */
+/** An online friend or guild ally dot. No longer plotted (the world map shows
+ *  party/raid members only), so the model's `allies` is always empty. */
 export interface MapAllyMarker {
   mx: number;
   my: number;
@@ -1377,52 +1378,24 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
 
   // Party members (issue 2652): the minimap's already-consumed
   // partyInfo.members, projected the same way as every other in-zone marker.
-  // Self is excluded (the player already has its own arrow); gated on `labels`
-  // like the ally dots above, since a party marker also carries a name label.
-  // Built before the ally loop so `partyNames` can gate it (see below).
+  // Self is excluded (the player already has its own arrow); gated on `labels`,
+  // since a party marker also carries a name label.
   const party: MapPartyMarker[] = [];
-  const partyNames = new Set<string>();
   const partyInfo = world.partyInfo;
   if (filters.players && labels && partyInfo) {
     for (const m of partyInfo.members) {
       if (m.pid === p.id) continue;
-      partyNames.add(m.name);
       if (!inZone(m.x, m.z) || !inView(m.x, m.z)) continue;
       const { mx, my } = toMap(m.x, m.z);
       party.push({ mx, my, name: m.name, cls: m.cls, dead: m.dead !== 0 });
     }
   }
 
-  // Friends (green) and guild members (blue), plotted from the live positions the
-  // server streams for online allies. socialInfo is null offline, so this is
-  // online-only; friends are plotted first and win ties (dedup by id). A friend
-  // or guildmate who is also a party member is skipped here: the party loop
-  // above already draws them with their class color, matching how
-  // minimap_markers.ts excludes partyPids from its entity loop to avoid the
-  // same double dot.
+  // Friend-list and guild players are NOT plotted: the world map shows the
+  // people you are grouped with (the party/raid loop above), not everyone on
+  // your social lists. The ally family stays in the model for the painter and
+  // the screen-reader summary, and is always empty.
   const allies: MapAllyMarker[] = [];
-  const social = world.socialInfo;
-  if (filters.players && labels && social) {
-    const selfName = p.name;
-    const drawn = new Set<number>();
-    const plotAlly = (m: FriendInfo, kind: 'friend' | 'guild'): void => {
-      if (
-        !m.online ||
-        m.x === undefined ||
-        m.z === undefined ||
-        m.name === selfName ||
-        drawn.has(m.id) ||
-        partyNames.has(m.name)
-      )
-        return;
-      if (!inZone(m.x, m.z) || !inView(m.x, m.z)) return;
-      drawn.add(m.id);
-      const { mx, my } = toMap(m.x, m.z);
-      allies.push({ mx, my, name: m.name, kind });
-    };
-    for (const f of social.friends) plotAlly(f, 'friend');
-    if (social.guild) for (const m of social.guild.members) plotAlly(m, 'guild');
-  }
 
   // A navigation badge authored on a named place (a delve door on its hill)
   // paints after and centered on the POI label baseline; the badge allocator's

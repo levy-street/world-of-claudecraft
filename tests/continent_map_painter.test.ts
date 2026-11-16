@@ -38,6 +38,9 @@ const CONTINENT_COLOR_TOKENS = [
   '--color-map-region-hover-fill',
   '--color-map-region-current-fill',
   '--color-map-region-current-label',
+  '--color-map-portal-dot',
+  '--color-map-quest-badge-fill',
+  '--color-map-quest-badge-text',
 ];
 
 // The classColor resolver every ContinentMapPainter call site now takes (issue
@@ -333,6 +336,39 @@ describe('continent_map_painter: ferry markers', () => {
   });
 });
 
+// The dungeon gates' fallback dot (no marker art in this rig).
+const DUNGEON_DOT = 'paint:--color-map-portal-dot';
+
+describe('continent_map_painter: dungeon gates', () => {
+  it('draws one fallback dot per overworld door before any live marker, and hit-tests them', () => {
+    const trace = newTrace();
+    installStyleGlobals(trace);
+    const painter = new ContinentMapPainter(classColor);
+    painter.paintContinent(fakeContinentContext(trace), continentWorld(), {
+      canvasSize: 560,
+      hoveredZoneId: null,
+    });
+    const dots = trace.arcFills.filter((fill) => fill === DUNGEON_DOT).length;
+    expect(dots).toBeGreaterThan(0);
+    // The gates draw before the you-are-here dot, which stays last.
+    expect(trace.arcFills.at(-1)).toBe('paint:--color-map-player');
+    expect(trace.arcFills.slice(0, dots).every((fill) => fill === DUNGEON_DOT)).toBe(true);
+  });
+
+  it('draws no gate when the Dungeons layer is off', () => {
+    const trace = newTrace();
+    installStyleGlobals(trace);
+    const painter = new ContinentMapPainter(classColor);
+    painter.paintContinent(fakeContinentContext(trace), continentWorld(), {
+      canvasSize: 560,
+      hoveredZoneId: null,
+      showDungeons: false,
+    });
+    expect(trace.arcFills).not.toContain(DUNGEON_DOT);
+    expect(painter.dungeonAt(0, 0)).toBe(null);
+  });
+});
+
 describe('continent_map_painter: party markers', () => {
   it('fills a class color per living member, the dead token for a fallen one, and self last', () => {
     const trace = newTrace();
@@ -345,7 +381,8 @@ describe('continent_map_painter: party markers', () => {
 
     // Roster order, then the player's own dot LAST so self draws on top of a
     // stacked group. Self never mints a party dot, so 'color:warrior' is absent.
-    expect(trace.arcFills).toEqual([
+    // (The dungeon-gate fallback dots draw earlier, under every live marker.)
+    expect(trace.arcFills.filter((fill) => fill !== DUNGEON_DOT)).toEqual([
       'color:mage',
       'paint:--color-map-party-dead',
       'paint:--color-map-player',
@@ -362,7 +399,9 @@ describe('continent_map_painter: party markers', () => {
     });
 
     // Only the you-are-here dot: no class color and no dead token anywhere.
-    expect(trace.arcFills).toEqual(['paint:--color-map-player']);
+    expect(trace.arcFills.filter((fill) => fill !== DUNGEON_DOT)).toEqual([
+      'paint:--color-map-player',
+    ]);
   });
 });
 

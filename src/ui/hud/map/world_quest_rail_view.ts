@@ -4,9 +4,10 @@
 // credit progress), each row's state, the selected row (shared with the map's
 // marker selection), and whether the one daily replacement is still available.
 // DOM-free and clock-free; the controller hands in `nowMs` and the world.
+import { GLIDER_NPC_DEF } from '../../../sim/content/world_quest_glider';
 import type { FactionId } from '../../../sim/factions';
 import { worldQuestFaction } from '../../../sim/factions';
-import type { WorldQuestProgress } from '../../../sim/types';
+import type { WorldQuestDef, WorldQuestProgress } from '../../../sim/types';
 import { playerActiveWorldQuests } from '../../../sim/world_quest_reroll';
 import { worldQuestReadsActive, worldQuestReadsCompleted } from '../../world_quest_progress_state';
 
@@ -22,6 +23,20 @@ export interface WorldQuestRailRow {
   readonly replacement: boolean;
   /** True when the character's level is below the quest's minimum. */
   readonly belowLevel: boolean;
+  /** Pinned to the HUD tracker from the map (quest_tracking_core). */
+  readonly tracked: boolean;
+}
+
+/** The selected row's map controls: Track / Untrack and Show Route. */
+export interface WorldQuestRailSelectionView {
+  readonly questId: string;
+  readonly tracked: boolean;
+  /** Where Show Route points, in world coordinates: the quest area's center
+   *  (the glider lesson at its NPC), the same point both maps draw the emblem. */
+  readonly x: number;
+  readonly z: number;
+  /** A completed quest has nothing left to track or walk to. */
+  readonly completed: boolean;
 }
 
 /** The sim's refusal reasons, re-localized by identity (never shown as English). */
@@ -50,6 +65,8 @@ export interface WorldQuestRailView {
   readonly total: number;
   readonly expiresAtMs: number;
   readonly reroll: WorldQuestRailRerollView;
+  /** The selected row's track/route state, or null when nothing is selected. */
+  readonly selection: WorldQuestRailSelectionView | null;
 }
 
 export interface WorldQuestRailInput {
@@ -60,6 +77,8 @@ export interface WorldQuestRailInput {
   readonly worldQuestExpiresAtMs: number;
   readonly playerLevel: number;
   readonly selectedWorldQuestId: string | null;
+  /** World quests pinned to the tracker (quest_tracking_core); absent reads as none. */
+  readonly trackedWorldQuestIds?: ReadonlySet<string>;
   /** The host's authoritative check (IWorld.canRerollWorldQuest); absent on a host without it. */
   readonly canReroll?: (questId: string) => { canReroll: boolean; reason?: string };
 }
@@ -81,6 +100,11 @@ export function worldQuestRerollReason(text: string | undefined): WorldQuestRero
   return REASON_BY_TEXT.get(text) ?? 'unknown';
 }
 
+/** The world point a world quest's emblem and Show Route use. */
+export function worldQuestMapPosition(quest: WorldQuestDef): { x: number; z: number } {
+  return quest.objective.type === 'glider' ? GLIDER_NPC_DEF.pos : quest.area;
+}
+
 export function buildWorldQuestRailView(input: WorldQuestRailInput): WorldQuestRailView {
   const replacements = input.worldQuestReplacements ?? {};
   const replacementIds = new Set(Object.values(replacements));
@@ -91,6 +115,8 @@ export function buildWorldQuestRailView(input: WorldQuestRailInput): WorldQuestR
       })
     : [];
   const rows: WorldQuestRailRow[] = [];
+  const tracked = input.trackedWorldQuestIds;
+  let selection: WorldQuestRailSelectionView | null = null;
   let completed = 0;
   for (const quest of board) {
     const progress = input.worldQuestLog.get(quest.id);
@@ -108,7 +134,18 @@ export function buildWorldQuestRailView(input: WorldQuestRailInput): WorldQuestR
       selected: quest.id === input.selectedWorldQuestId,
       replacement: replacementIds.has(quest.id),
       belowLevel: input.playerLevel < quest.minLevel,
+      tracked: tracked?.has(quest.id) === true,
     });
+    if (quest.id === input.selectedWorldQuestId) {
+      const at = worldQuestMapPosition(quest);
+      selection = {
+        questId: quest.id,
+        tracked: tracked?.has(quest.id) === true,
+        x: at.x,
+        z: at.z,
+        completed: state === 'completed',
+      };
+    }
   }
   const usedToday =
     Boolean(input.worldQuestCycle) && input.worldQuestRerollCycle === input.worldQuestCycle;
@@ -127,5 +164,12 @@ export function buildWorldQuestRailView(input: WorldQuestRailInput): WorldQuestR
       usedToday,
     };
   }
-  return { rows, completed, total: rows.length, expiresAtMs: input.worldQuestExpiresAtMs, reroll };
+  return {
+    rows,
+    completed,
+    total: rows.length,
+    expiresAtMs: input.worldQuestExpiresAtMs,
+    reroll,
+    selection,
+  };
 }

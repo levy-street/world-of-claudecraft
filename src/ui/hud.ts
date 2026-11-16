@@ -252,7 +252,7 @@ import {
   relabelCompassMarks,
 } from './compass_strip_painter';
 import { ContinentMapPainter } from './continent_map_painter';
-import { type ContinentZoneRegion, continentZoneAt } from './continent_map_view';
+import type { ContinentZoneRegion } from './continent_map_view';
 import { formatMinimapCoords } from './coords';
 import { formatCount } from './count_format';
 import { classCrestId } from './crest_icon_art';
@@ -520,6 +520,7 @@ import {
   MapMarkerInteractionController,
   MapMarkerTooltipContent,
 } from './hud/map';
+import { bindContinentMapInput } from './hud/map/continent_map_input_wiring';
 import { MapSidebarCollapse } from './hud/map/map_sidebar_collapse';
 import { resolveMapZone } from './hud/map/map_zone_focus_core';
 import { refreshSideButtonLabels } from './hud/menu/side_buttons';
@@ -977,7 +978,7 @@ import { TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap } from './touch_tap';
 import { buildTownFocusView, stepTownFocus, townFocusRenderSig } from './town_focus_view';
 import { renderTownFocusWindow } from './town_focus_window';
-import { trackerCollapseSettings } from './tracker_collapse_settings';
+import { questTrackerCollapseSettings, trackerCollapseSettings } from './tracker_collapse_settings';
 import { wireTrackerHeader } from './tracker_header_wiring';
 import { installTrackerStackAnchor } from './tracker_stack_anchor';
 import { stageTradeOffer, tradeOfferHeadroom } from './trade_view';
@@ -1019,6 +1020,7 @@ import { promptWocMarketBrowserVisit, wocMarketToggleAction } from './woc_market
 import { type WocMarketHooks, WocMarketWindow } from './woc_market_window';
 import { installWorldDropTarget } from './world_drop_target';
 import { WorldQuestPuzzleWindow } from './world_quest_puzzle_window';
+import { worldQuestDef } from './world_quest_view';
 import { formatXp, type XpBarView, xpBarView } from './xp_bar';
 import { XpBarPainter } from './xp_bar_painter';
 import { YumiMatchPainter } from './yumi_match_painter';
@@ -2418,6 +2420,7 @@ export class Hud {
         select: (questId) => {
           this.mapMarkerInteraction.selectWorldQuest(questId);
         },
+        focus: (questId) => this.focusWorldQuestOnMap(questId),
         confirmDialog: (title, body, okText, cancelText, onOk) =>
           this.confirmDialog(title, body, okText, cancelText, onOk),
         nowMs: () => Date.now(),
@@ -2445,17 +2448,17 @@ export class Hud {
       element: $('#qt-body'),
       document,
       world: () => this.sim,
-      settings: {
-        ...trackerCollapseSettings(() => this.optionsHooks, 'questTrackerCollapsed'),
-        worldQuestsCollapsed: () =>
-          (this.optionsHooks?.settings.get('worldQuestTrackerCollapsed') ?? false) === true,
-        setWorldQuestsCollapsed: (collapsed) =>
-          this.optionsHooks?.settings.set('worldQuestTrackerCollapsed', collapsed),
-      },
+      settings: questTrackerCollapseSettings(() => this.optionsHooks),
       questTitle,
       objectiveLabel: questObjectiveLabel,
       click: () => audio.click(),
       dungeonRow: () => this.dungeonTracker.stripQuest(),
+      worldQuestRewards: {
+        line: (questId) => this.mapMarkerTooltipContent.worldQuestRewardLine(questId),
+        card: (questId) => this.mapMarkerTooltipContent.worldQuestCard(questId, Date.now()),
+        paint: (html, x, y) => this.paintTooltipAt(html, x, y),
+        hide: () => this.hideTooltip(),
+      },
     });
     this.questDialog = new QuestDialogController({
       element: $('#quest-dialog'),
@@ -3090,75 +3093,28 @@ export class Hud {
     mapCanvas.addEventListener('pointerup', endMapTap);
     mapCanvas.addEventListener('pointercancel', endMapTap);
 
-    // Continent overview interactions. These are separate from the per-zone
-    // pan/zoom/tooltip handlers above, which early-return at the continent level.
-    // Right-click (or the level-toggle button) zooms out to the overview; a mouse
-    // hover highlights the zone under the cursor and shows its name + level band;
-    // a left-click / tap on a region opens that zone's detail map.
-    const canvasPoint = (clientX: number, clientY: number): { cx: number; cy: number } => {
-      const rect = mapCanvas.getBoundingClientRect();
-      return {
-        cx: ((clientX - rect.left) * mapCanvas.width) / rect.width,
-        cy: ((clientY - rect.top) * mapCanvas.height) / rect.height,
-      };
-    };
-    let continentTipShown = false;
-    const hideContinentTip = (): void => {
-      if (!continentTipShown) return;
-      continentTipShown = false;
-      this.hideTooltip();
-    };
-    mapCanvas.addEventListener('contextmenu', (ev) => {
-      ev.preventDefault(); // suppress the browser menu; right-click changes level
-      this.toggleMapLevel();
-    });
-    mapCanvas.addEventListener('click', (ev) => {
-      if (
-        this.mapLevel === 'continent' &&
-        showMapTipAt(ev.clientX, ev.clientY, this.isMobileLayout())
-      )
-        return;
-      if (this.mapLevel === 'zone') {
-        if (this.mapMarkerInteraction.selectWorldQuestAt(mapCanvas, ev.clientX, ev.clientY)) {
-          this.updateMapWindow();
-        }
-        return;
-      }
-      const { cx, cy } = canvasPoint(ev.clientX, ev.clientY);
-      const zoneId = continentZoneAt(this.continentRegions, cx, cy);
-      if (zoneId) {
-        hideContinentTip();
-        this.openZoneFromContinent(zoneId);
-      }
-    });
-    mapCanvas.addEventListener('pointermove', (ev) => {
-      if (this.mapLevel !== 'continent' || ev.pointerType !== 'mouse') return;
-      if (showMapTipAt(ev.clientX, ev.clientY)) return;
-      hideMapAreaTip();
-      const { cx, cy } = canvasPoint(ev.clientX, ev.clientY);
-      const zoneId = continentZoneAt(this.continentRegions, cx, cy);
-      if (zoneId !== this.mapHoverZone) {
-        this.mapHoverZone = zoneId; // repaint the highlight (+ cursor via updateMapWindow)
-        this.updateMapWindow();
-      }
-      if (zoneId) {
-        this.paintTooltipAt(
-          this.mapMarkerTooltipContent.continentZone(zoneId, this.continentRegions),
-          ev.clientX,
-          ev.clientY,
-        );
-        continentTipShown = true;
-      } else {
-        hideContinentTip();
-      }
-    });
-    mapCanvas.addEventListener('pointerleave', (ev) => {
-      if (ev.pointerType !== 'mouse') return;
-      hideContinentTip();
-      if (this.mapLevel === 'continent' && this.mapHoverZone !== null) {
-        this.mapHoverZone = null;
-        this.updateMapWindow();
-      }
+    // Level-aware click, right-click and world-map hover (continent_map_input_wiring.ts).
+    bindContinentMapInput({
+      canvas: mapCanvas,
+      markers: this.mapMarkerInteraction,
+      tooltips: this.mapMarkerTooltipContent,
+      continent: this.continentPainter,
+      world: () => this.sim,
+      level: () => this.mapLevel,
+      setLevel: (level) => this.setMapLevel(level),
+      isMobileLayout: () => this.isMobileLayout(),
+      regions: () => this.continentRegions,
+      hoverZone: () => this.mapHoverZone,
+      setHoverZone: (zoneId) => {
+        this.mapHoverZone = zoneId;
+      },
+      repaint: () => this.updateMapWindow(),
+      showMarkerTip: (x, y, touch) => showMapTipAt(x, y, touch),
+      hideMarkerTip: hideMapAreaTip,
+      paintTooltip: (html, x, y) => this.paintTooltipAt(html, x, y),
+      hideTooltip: () => this.hideTooltip(),
+      openZone: (zoneId) => this.openZoneFromContinent(zoneId),
+      focusWorldQuest: (questId) => this.focusWorldQuestOnMap(questId),
     });
     $('#map-level-toggle').addEventListener('click', () => this.toggleMapLevel());
 
@@ -4937,7 +4893,9 @@ export class Hud {
   // Continent overview painter (the world map's "zoom out to the whole world"
   // level). Loads the painted world_overview plate once; redraws from the
   // mediumHud band like the per-zone map. classCss colors its party dots too.
-  private readonly continentPainter = new ContinentMapPainter(classCss);
+  private readonly continentPainter = new ContinentMapPainter(classCss, () =>
+    this.mapMarkerArt.sprite('dungeon-entrance', 'minimapDungeon'),
+  );
   // The aura strips are the keyed-pool aura painter, two instances of the
   // auras_view core + AurasPainter: the player buff bar (#buff-bar, mode
   // 'all') and the target strip (#tf-debuffs, mode 'all' too: a target's buffs AND
@@ -10319,6 +10277,15 @@ export class Hud {
     this.setMapLevel(nextMapLevel(mode, this.mapLevel, remoteInstanceAnchor(this.sim) !== null));
   }
 
+  // Show a world quest on its zone map with it selected: the rail's row click
+  // and the world map's emblem click. Never teleports; reuses the zone override.
+  private focusWorldQuestOnMap(questId: string): void {
+    const quest = worldQuestDef(questId);
+    if (!quest) return;
+    this.mapMarkerInteraction.selectWorldQuest(questId);
+    this.openZoneFromContinent(quest.zoneId);
+  }
+
   private setMapLevel(level: MapLevel): void {
     if (this.mapLevel === level) return;
     this.mapLevel = level;
@@ -10486,9 +10453,10 @@ export class Hud {
       const result = this.continentPainter.paintContinent(ctx, this.sim, {
         canvasSize: S,
         hoveredZoneId: this.mapHoverZone,
+        showDungeons: this.mapSidebar.filterState().dungeons,
       });
       this.continentRegions = result.regions;
-      this.mapMarkerInteraction.setContinentPorts(result.ports);
+      this.mapMarkerInteraction.setContinentPorts(result.ports, result.worldQuests);
       canvas.style.cursor = this.mapHoverZone ? 'pointer' : 'default';
       this.setText(summaryEl, t('hudChrome.continentMap.summary'));
       this.setText(

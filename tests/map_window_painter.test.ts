@@ -693,7 +693,9 @@ describe('map_window_painter: cadence + cached background preserved', () => {
     expect(markerInteraction).toContain('this.services = EMPTY_MARKERS;');
     expect(markerInteraction).toContain('this.navigation = EMPTY_MARKERS;');
     expect(hud.match(/this\.clearMapHitState\(canvas\);/g)).toHaveLength(4);
-    expect(hud).toContain('this.mapMarkerInteraction.setContinentPorts(result.ports)');
+    expect(hud).toContain(
+      'this.mapMarkerInteraction.setContinentPorts(result.ports, result.worldQuests)',
+    );
     expect(markerInteraction).toContain('this.clear();');
     // The gather-tip resolve memo resets inside the shared clear and beside the
     // overworld store, bounding its staleness at the same
@@ -1014,8 +1016,6 @@ function expectedLabels(): Set<string> {
     ...overworldDungeonPortals(DUNGEON_LIST, LABEL_ZONE.zMin, LABEL_ZONE.zMax).map((portal) =>
       dungeonName(portal.id),
     ),
-    'FriendA',
-    'GuildB',
     '1', // the single active quest's badge number
   ]);
 }
@@ -2026,14 +2026,15 @@ describe('map_window_painter: painted stable marker sprites', () => {
     const liveDots = trace.fills.filter(
       (fill) => liveDotStyles.has(fill.style) && fill.commands.join() === 'arc',
     );
-    expect(liveDots).toHaveLength(4);
-    expect(liveDots.map((fill) => fill.args[2])).toEqual([6, 6, 6, 6]);
+    // Two party members; the online friend and guildmate get no dot.
+    expect(liveDots).toHaveLength(2);
+    expect(liveDots.map((fill) => fill.args[2])).toEqual([6, 6]);
     const liveOutlines = [player, ...liveDots].map((fill) => {
       const stroke = trace.strokes.find((candidate) => candidate.at > (fill?.at ?? Infinity));
       return { style: stroke?.style, lineWidth: stroke?.lineWidth };
     });
     expect(liveOutlines).toEqual(
-      Array.from({ length: 5 }, () => ({
+      Array.from({ length: 3 }, () => ({
         style: 'paint:--color-map-outline',
         lineWidth: 4,
       })),
@@ -2055,7 +2056,7 @@ describe('map_window_painter: painted stable marker sprites', () => {
     expect(labelFont(LABEL_ZONE.name)).toBe('bold 24px Georgia');
     expect(labelFont(LABEL_ZONE.pois[0].label)).toBe('bold 20px Georgia');
     expect(labelFont(portalLabelText())).toBe('bold 18px Georgia');
-    expect(labelFont('FriendA')).toBe('bold 16px Georgia');
+    expect(labelFont('FriendA')).toBeUndefined();
     expect(labelFont('Ally')).toBe('bold 16px Georgia');
     expect(labelFont('1')).toBe('bold 18px Georgia');
     const labelOutline = (text: string): number | undefined =>
@@ -2063,7 +2064,6 @@ describe('map_window_painter: painted stable marker sprites', () => {
     expect(labelOutline(LABEL_ZONE.name)).toBe(4.5);
     expect(labelOutline(LABEL_ZONE.pois[0].label)).toBe(4.5);
     expect(labelOutline(portalLabelText())).toBe(4.5);
-    expect(labelOutline('FriendA')).toBe(4);
     expect(labelOutline('Ally')).toBe(4);
     const titleBlit = trace.blits.find((entry) => spriteText(entry.sprite) === LABEL_ZONE.name);
     expect(titleBlit && blitAnchor(titleBlit)).toEqual({ x: 280, y: 30 });
@@ -2169,11 +2169,11 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
     expect(anchorOf(LABEL_ZONE.pois[0].label)).toEqual(at(model.pois[0].mx, model.pois[0].my));
     // Dungeon name: 12px above its standard-profile portal badge.
     expect(anchorOf(portalLabelText())).toEqual(at(model.portals[0].mx, model.portals[0].my - 12));
-    // Ally names: 8px above their dots, one per ally.
-    const friend = model.allies.find((a) => a.name === 'FriendA');
-    const guild = model.allies.find((a) => a.name === 'GuildB');
-    expect(anchorOf('FriendA')).toEqual(at(friend?.mx ?? 0, (friend?.my ?? 0) - 8));
-    expect(anchorOf('GuildB')).toEqual(at(guild?.mx ?? 0, (guild?.my ?? 0) - 8));
+    // Friend-list and guild players get no name label (no dot either).
+    expect(model.allies).toEqual([]);
+    expect(
+      trace.blits.some((blit) => ['FriendA', 'GuildB'].includes(spriteText(blit.sprite))),
+    ).toBe(false);
     // Badge number: lifted 4px above its disc centre.
     expect(anchorOf('1')).toEqual(at(model.questAreas[0].mx, model.questAreas[0].my + 4));
   });
@@ -2212,17 +2212,7 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
       { op: 'stroke', color: 'paint:--color-map-outline', text: LABEL_ZONE.name },
       { op: 'fill', color: 'paint:--color-map-label', text: LABEL_ZONE.name },
     ]);
-    const friend = trace.sprites.find((s) => spriteText(s) === 'FriendA');
-    expect(friend?.ink.map(inkStyle)).toEqual([
-      { op: 'stroke', color: 'paint:--color-map-outline', text: 'FriendA' },
-      { op: 'fill', color: 'paint:--color-map-ally-friend', text: 'FriendA' },
-    ]);
-    const guild = trace.sprites.find((s) => spriteText(s) === 'GuildB');
-    expect(guild?.ink.map(inkStyle)[1]).toEqual({
-      op: 'fill',
-      color: 'paint:--color-map-ally-guild',
-      text: 'GuildB',
-    });
+    expect(trace.sprites.some((s) => spriteText(s) === 'FriendA')).toBe(false);
     const poi = trace.sprites.find((s) => spriteText(s) === LABEL_ZONE.pois[0].label);
     expect(poi?.ink.map(inkStyle)).toEqual([
       { op: 'stroke', color: 'paint:--color-map-outline', text: LABEL_ZONE.pois[0].label },
@@ -2279,14 +2269,13 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
       1 + // the zone title
       drawnLabelPois().length + // hidden POIs draw no label, see expectedLabels
       overworldDungeonPortals(DUNGEON_LIST, LABEL_ZONE.zMin, LABEL_ZONE.zMax).length +
-      2 + // the two allies
       badges;
     expect(trace.blits).toHaveLength(expected);
     // The rounding rationale hangs on smoothing staying ON for the terrain blit.
     expect(ctx.imageSmoothingEnabled).toBe(true);
   });
 
-  it('colors each ally dot by its own relationship', () => {
+  it('draws no friend-list or guild dots: the zone map shows the party only', () => {
     const trace = newTrace();
     installMapStyleGlobals(trace);
     setActiveWorldContent(BUILTIN_WORLD);
@@ -2297,14 +2286,11 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
       labelPaintOptions(),
     );
 
-    // The model plots friends before guild members, so the dot fills follow.
-    const allyDots = trace.fills
-      .filter((fill) => fill.style.endsWith('ally-friend') || fill.style.endsWith('ally-guild'))
-      .map(({ style, commands }) => ({ style, commands }));
-    expect(allyDots).toEqual([
-      { style: 'paint:--color-map-ally-friend', commands: ['arc'] },
-      { style: 'paint:--color-map-ally-guild', commands: ['arc'] },
-    ]);
+    // labelWorld has an online friend and an online guildmate in the zone.
+    const allyDots = trace.fills.filter(
+      (fill) => fill.style.endsWith('ally-friend') || fill.style.endsWith('ally-guild'),
+    );
+    expect(allyDots).toEqual([]);
   });
 
   it.each([

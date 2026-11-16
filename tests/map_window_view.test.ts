@@ -772,10 +772,10 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     ]);
   });
 
-  it('dedups allies by id (friend wins ties) and orders friends before guild (zoomed in)', () => {
+  it('plots no friend-list or guild players, only the party (zoomed in)', () => {
+    // The fixture has an online friend and two online guildmates in the zone.
     const model = buildOverworldMapModel(input(makeOverworldWorld('sim'), LABELS_ZOOM));
-    expect(model.allies.map((a) => a.kind)).toEqual(['friend', 'guild']);
-    expect(model.allies.map((a) => a.name)).toEqual(['FriendA', 'GuildB']);
+    expect(model.allies).toEqual([]);
   });
 
   it('is empty solo / with no party formed', () => {

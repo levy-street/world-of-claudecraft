@@ -11,6 +11,8 @@ import {
   QuestTrackingState,
   questUntrackStorageKey,
   serializeUntrackedQuestIds,
+  WORLD_QUEST_TRACK_KEY_PREFIX,
+  worldQuestTrackStorageKey,
 } from '../src/ui/quest_tracking_core';
 
 /** A minimal in-memory Storage stand-in; `rows` is the assertion surface. */
@@ -138,5 +140,54 @@ describe('quest_tracking_core: the live set', () => {
     expect(hostile.untrackedIds().size).toBe(0);
     hostile.setTracked('q_intro', false);
     expect(hostile.isTracked('q_intro')).toBe(false);
+  });
+});
+
+describe('quest_tracking_core: world quests pinned from the map', () => {
+  it('starts with nothing pinned, pins and unpins per character, and persists', () => {
+    const storage = fakeStorage();
+    const state = new QuestTrackingState(storage);
+    state.useCharacter('mage', 'Ione');
+    expect(state.trackedWorldQuestIds().size).toBe(0);
+    const rev = state.revision();
+    state.setWorldQuestTracked('wq_a', true);
+    expect(state.isWorldQuestTracked('wq_a')).toBe(true);
+    expect(state.revision()).toBe(rev + 1);
+    const key = worldQuestTrackStorageKey('mage', 'Ione');
+    expect(key.startsWith(WORLD_QUEST_TRACK_KEY_PREFIX)).toBe(true);
+    expect(storage.rows.get(key)).toBe('["wq_a"]');
+    // A no-op change never moves the revision.
+    state.setWorldQuestTracked('wq_a', true);
+    expect(state.revision()).toBe(rev + 1);
+
+    const other = new QuestTrackingState(storage);
+    other.useCharacter('mage', 'Someone');
+    expect(other.isWorldQuestTracked('wq_a')).toBe(false);
+    const again = new QuestTrackingState(storage);
+    again.useCharacter('mage', 'Ione');
+    expect(again.isWorldQuestTracked('wq_a')).toBe(true);
+  });
+
+  it('keeps the pins apart from the quest-log exclusion list', () => {
+    const state = new QuestTrackingState(fakeStorage());
+    state.useCharacter('mage', 'Ione');
+    state.setWorldQuestTracked('wq_a', true);
+    expect(state.isTracked('wq_a')).toBe(true);
+    expect(state.untrackedIds().size).toBe(0);
+  });
+
+  it('drops pins that left the board, and only bumps the revision when one did', () => {
+    const storage = fakeStorage();
+    const state = new QuestTrackingState(storage);
+    state.useCharacter('mage', 'Ione');
+    state.setWorldQuestTracked('wq_a', true);
+    state.setWorldQuestTracked('wq_old', true);
+    const rev = state.revision();
+    state.retainTrackedWorldQuests(new Set(['wq_a', 'wq_b']));
+    expect([...state.trackedWorldQuestIds()]).toEqual(['wq_a']);
+    expect(state.revision()).toBe(rev + 1);
+    expect(storage.rows.get(worldQuestTrackStorageKey('mage', 'Ione'))).toBe('["wq_a"]');
+    state.retainTrackedWorldQuests(new Set(['wq_a']));
+    expect(state.revision()).toBe(rev + 1);
   });
 });

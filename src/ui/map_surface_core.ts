@@ -99,6 +99,17 @@ export function nextMapLevel(
   return isInstanceMode(mode) || hasRemoteInstance ? 'instance' : 'zone';
 }
 
+/**
+ * The level a right-click on the map climbs to: instance plan -> zone map ->
+ * world map. The world map is the top, so a right-click there does nothing
+ * (null) rather than wrapping back down to a zone the player did not pick.
+ */
+export function mapLevelUp(surface: MapLevel): MapLevel | null {
+  if (surface === 'instance') return 'zone';
+  if (surface === 'zone') return 'continent';
+  return null;
+}
+
 /** Visible label for the toggle: names the surface a press switches TO. */
 export function mapLevelToggleKey(
   mode: MapWindowMode,
