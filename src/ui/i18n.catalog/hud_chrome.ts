@@ -10434,7 +10434,9 @@ export const hudChromeStrings = {
     rimeBar: 'Rime {left} / {whole}',
     rimeAria: 'Living Rime: {left} of {whole} healing left to break it',
     // Rime-Tempered at its swap count (quench_temper.ts): the tank's own call.
-    temperedTitle: 'Rime-Tempered x{stacks}: swap tanks!',
+    // Short: it rides the docked cold bar's small title (the stacks read on
+    // the debuff and its tooltip).
+    temperedTitle: 'Swap tanks! x{stacks}',
   },
   // The Smith's Heart's Guardian of the Heat (encounters/smith_heart/heat*.ts):
   // what the guardian SAYS (heat_voice.ts HEAT_LINES, the same English). Its

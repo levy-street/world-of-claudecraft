@@ -26576,5 +26576,5 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   "hudChrome.knotAlert.batteredTitle": "Избит ветром x{stacks}: смена танков!",
   "hudChrome.knotAlert.chargedTitle": "Заряжен громом x{stacks}: смена танков!",
   "hudChrome.knotAlert.ruinTitle": "Удар мехов сбросит вас с края!",
-  "hudChrome.quenchAlert.temperedTitle": "Закалён инеем x{stacks}: смена танков!",
+  "hudChrome.quenchAlert.temperedTitle": "Смена танков! x{stacks}",
 };

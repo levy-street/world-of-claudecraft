@@ -7432,7 +7432,7 @@ export const vi_VN: EnTranslations = {
       "rimeTitle": "Living Rime! Leave the group",
       "rimeBar": "Rime {left} / {whole}",
       "rimeAria": "Living Rime: {left} of {whole} healing left to break it",
-      "temperedTitle": "Rime-Tempered x{stacks}: swap tanks!"
+      "temperedTitle": "Swap tanks! x{stacks}"
     },
     "heatGuardian": {
       "say": {

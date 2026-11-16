@@ -26160,5 +26160,5 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.knotAlert.batteredTitle': '바람에 시달림 x{stacks}: 탱커 교대!',
   'hudChrome.knotAlert.chargedTitle': '천둥 충전 x{stacks}: 탱커 교대!',
   'hudChrome.knotAlert.ruinTitle': '풀무 강타가 당신을 가장자리 밖으로 날립니다!',
-  'hudChrome.quenchAlert.temperedTitle': '서리 담금질 x{stacks}: 탱커 교대!',
+  'hudChrome.quenchAlert.temperedTitle': '탱커 교대! x{stacks}',
 };

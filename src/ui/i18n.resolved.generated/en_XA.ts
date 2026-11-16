@@ -7432,7 +7432,7 @@ export const en_XA: EnTranslations = {
       "rimeTitle": "[Ļíʋíñĝ Ŕíɱé! Ļéáʋé ţĥé ĝŕóúþ]",
       "rimeBar": "[Ŕíɱé {left} / {whole}]",
       "rimeAria": "[Ļíʋíñĝ Ŕíɱé: {left} óƒ {whole} ĥéáļíñĝ ļéƒţ ţó ƀŕéáķ íţ]",
-      "temperedTitle": "[Ŕíɱé-Ţéɱþéŕéð ẋ{stacks}: šŵáþ ţáñķš!]"
+      "temperedTitle": "[Šŵáþ ţáñķš! ẋ{stacks}]"
     },
     "heatGuardian": {
       "say": {

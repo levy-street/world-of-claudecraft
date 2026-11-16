@@ -7432,7 +7432,7 @@ export const ko_KR: EnTranslations = {
       "rimeTitle": "살아 있는 서리! 무리에서 벗어나십시오",
       "rimeBar": "서리 {left} / {whole}",
       "rimeAria": "살아 있는 서리: 깨뜨리기까지 치유 {whole} 중 {left} 남음",
-      "temperedTitle": "서리 담금질 x{stacks}: 탱커 교대!"
+      "temperedTitle": "탱커 교대! x{stacks}"
     },
     "heatGuardian": {
       "say": {

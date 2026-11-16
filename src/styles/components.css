@@ -19380,6 +19380,12 @@
   #player-frame > #heart-quench-alert.is-water {
     --qa-tone: var(--color-mana);
   }
+  /* Rime-Tempered at its swap count: the docked bar in the hostile tone,
+     pulsing like the freeze it warns of. */
+  #player-frame > #heart-quench-alert.is-tempered {
+    --qa-tone: var(--color-hostile);
+    animation: heart-quench-dock-pulse 0.7s ease-in-out infinite alternate;
+  }
   #player-frame > #heart-quench-alert.is-freezing {
     animation: none;
   }

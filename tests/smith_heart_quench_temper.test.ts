@@ -258,7 +258,7 @@ describe('Rime-Tempered: what the tank reads', () => {
     });
     if (!three.visible) throw new Error('hidden');
     expect(three.kind).toBe('tempered');
-    expect(three.title).toBe('Rime-Tempered x3: swap tanks!');
+    expect(three.title).toBe('Swap tanks! x3');
     // The bar stays the cold.
     expect(three.progress).toBeCloseTo(0.6);
     // The freeze still outranks it.

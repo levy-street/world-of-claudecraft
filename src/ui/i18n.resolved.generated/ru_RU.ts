@@ -7432,7 +7432,7 @@ export const ru_RU: EnTranslations = {
       "rimeTitle": "Живая изморозь! Отойдите от группы",
       "rimeBar": "Изморозь {left} / {whole}",
       "rimeAria": "Живая изморозь: осталось пробить {left} из {whole} ед. исцеления",
-      "temperedTitle": "Закалён инеем x{stacks}: смена танков!"
+      "temperedTitle": "Смена танков! x{stacks}"
     },
     "heatGuardian": {
       "say": {

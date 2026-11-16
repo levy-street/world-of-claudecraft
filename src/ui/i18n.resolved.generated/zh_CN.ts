@@ -7432,7 +7432,7 @@ export const zh_CN: EnTranslations = {
       "rimeTitle": "活体霜壳！离开队伍",
       "rimeBar": "霜壳 {left} / {whole}",
       "rimeAria": "活体霜壳：还需{left}/{whole}点治疗才能击碎",
-      "temperedTitle": "霜淬 x{stacks}：换坦！"
+      "temperedTitle": "换坦！x{stacks}"
     },
     "heatGuardian": {
       "say": {

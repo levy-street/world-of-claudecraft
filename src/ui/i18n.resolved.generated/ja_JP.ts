@@ -7432,7 +7432,7 @@ export const ja_JP: EnTranslations = {
       "rimeTitle": "生ける霧氷！グループから離れろ",
       "rimeBar": "霧氷 {left} / {whole}",
       "rimeAria": "生ける霧氷：砕くまで残り{left}/{whole}の回復",
-      "temperedTitle": "霧氷の焼き入れ x{stacks}：タンク交代！"
+      "temperedTitle": "タンク交代！x{stacks}"
     },
     "heatGuardian": {
       "say": {

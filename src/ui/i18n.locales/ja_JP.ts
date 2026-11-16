@@ -26150,5 +26150,5 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.knotAlert.batteredTitle': '風に打たれた x{stacks}：タンク交代！',
   'hudChrome.knotAlert.chargedTitle': '雷を帯びた x{stacks}：タンク交代！',
   'hudChrome.knotAlert.ruinTitle': 'ふいごの一撃で縁の外へ飛ばされる！',
-  'hudChrome.quenchAlert.temperedTitle': '霧氷の焼き入れ x{stacks}：タンク交代！',
+  'hudChrome.quenchAlert.temperedTitle': 'タンク交代！x{stacks}',
 };

@@ -24805,5 +24805,5 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.knotAlert.batteredTitle': '风蚀 x{stacks}：换坦！',
   'hudChrome.knotAlert.chargedTitle': '雷霆缠身 x{stacks}：换坦！',
   'hudChrome.knotAlert.ruinTitle': '风箱重击会把你掀出边缘！',
-  'hudChrome.quenchAlert.temperedTitle': '霜淬 x{stacks}：换坦！',
+  'hudChrome.quenchAlert.temperedTitle': '换坦！x{stacks}',
 };

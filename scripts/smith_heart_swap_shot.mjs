@@ -151,6 +151,14 @@ try {
       },
       [O.x, O.z, tid, x, z],
     );
+  /** The world drawn (no loading screen) and settled. */
+  const ready = async () => {
+    await page.waitForFunction(
+      () => !document.querySelector('#loading-screen')?.classList.contains('visible'),
+      { timeout: 240000, polling: 500 },
+    );
+    await sleep(Number(process.env.SHOT_SETTLE ?? 5000));
+  };
   const shoot = async (name) => {
     const buf = await page.screenshot();
     fs.mkdirSync(OUT, { recursive: true });
@@ -173,6 +181,7 @@ try {
         for (const e of window.__game.world.entities.values())
           if (e.smithHeartQuench) Object.assign(e.smithHeartQuench, { breathTimer: 999 });
       });
+      await ready();
       await chat('/dev heart quench temper 3', 1600);
     },
     // Bellows Blow at four stacks on Heroic: the wedge runs off the Cornice
@@ -195,13 +204,14 @@ try {
               blowTimer: 999,
             });
       });
+      await ready();
       await chat('/dev heart breath swap 4', 900);
     },
     // A blow's throw mid-slide (two stacks: 15 yd), its burst and its trail.
     async '03_aliento_empujon'() {
       await chat('/dev heart breath reset', 800);
       await chat('/dev heart breath pull', 1200);
-      await place([CORNICE.x - 6, CORNICE.z], [CORNICE.x, CORNICE.z], 1.9, 0.5, 22);
+      await place([CORNICE.x - 6, CORNICE.z], [CORNICE.x, CORNICE.z], 1.35, 0.85, 30);
       await holdBoss('heart_breath_guardian', CORNICE.x, CORNICE.z);
       await page.evaluate(() => {
         for (const e of window.__game.world.entities.values())
@@ -213,6 +223,7 @@ try {
               blowTimer: 999,
             });
       });
+      await ready();
       await chat('/dev heart breath swap 2', 1500 + 350);
     },
   };
