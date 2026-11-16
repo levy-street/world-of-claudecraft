@@ -79230,7 +79230,7 @@ Use the [[Dungeon Finder]] to form a group. Read [[Heroic difficulty]] before a 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2850">&lt;woc-art path=&quot;/map_bg/eastbrook_vale.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2826">&lt;woc-art path=&quot;/map_bg/eastbrook_vale.webp&quot; /&gt;
 == Overview ==
 Find [[Marshal Redbrook (NPC)|Marshal Redbrook]] in town - he has work for you.
 
@@ -79242,9 +79242,6 @@ Find [[Marshal Redbrook (NPC)|Marshal Redbrook]] in town - he has work for you.
 |-
 ! Hub
 | Eastbrook
-|-
-! Biome
-| Green vale
 |-
 ! Graveyard
 | 39.5, -99.3
@@ -79365,7 +79362,7 @@ Find [[Marshal Redbrook (NPC)|Marshal Redbrook]] in town - he has work for you.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2026">&lt;woc-art path=&quot;/map_bg/mirefen_marsh.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2003">&lt;woc-art path=&quot;/map_bg/mirefen_marsh.webp&quot; /&gt;
 == Overview ==
 Report to [[Warden Fenwick (NPC)|Warden Fenwick]] at the Fenbridge gate.
 
@@ -79377,9 +79374,6 @@ Report to [[Warden Fenwick (NPC)|Warden Fenwick]] at the Fenbridge gate.
 |-
 ! Hub
 | Fenbridge
-|-
-! Biome
-| Marshland
 |-
 ! Graveyard
 | -18, 286
@@ -79473,7 +79467,7 @@ Report to [[Warden Fenwick (NPC)|Warden Fenwick]] at the Fenbridge gate.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2276">&lt;woc-art path=&quot;/map_bg/thornpeak_heights.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2248">&lt;woc-art path=&quot;/map_bg/thornpeak_heights.webp&quot; /&gt;
 == Overview ==
 [[Captain Thessaly (NPC)|Captain Thessaly]] holds the wall at Highwatch - barely.
 
@@ -79485,9 +79479,6 @@ Report to [[Warden Fenwick (NPC)|Warden Fenwick]] at the Fenbridge gate.
 |-
 ! Hub
 | Highwatch
-|-
-! Biome
-| Mountain peaks
 |-
 ! Graveyard
 | 15, 645
@@ -79587,7 +79578,7 @@ Report to [[Warden Fenwick (NPC)|Warden Fenwick]] at the Fenbridge gate.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1247">&lt;woc-art path=&quot;/map_bg/veiled_hollow.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1224">&lt;woc-art path=&quot;/map_bg/veiled_hollow.webp&quot; /&gt;
 == Overview ==
 The air hums with old magic. Seek [[Keeper Saelwyn (NPC)|Keeper Saelwyn]] beneath the great tree of Eldershine.
 
@@ -79599,9 +79590,6 @@ The air hums with old magic. Seek [[Keeper Saelwyn (NPC)|Keeper Saelwyn]] beneat
 |-
 ! Hub
 | Eldershine
-|-
-! Biome
-| Dusklands
 |-
 ! Graveyard
 | -60, 1004
@@ -79664,7 +79652,7 @@ The air hums with old magic. Seek [[Keeper Saelwyn (NPC)|Keeper Saelwyn]] beneat
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1004">&lt;woc-art path=&quot;/map_bg/drakelands.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="979">&lt;woc-art path=&quot;/map_bg/drakelands.webp&quot; /&gt;
 == Overview ==
 Hot wind rolls off the wastes ahead. Dragons wheel over the Drakemaw, and troll fires burn in the dunes.
 
@@ -79676,9 +79664,6 @@ Hot wind rolls off the wastes ahead. Dragons wheel over the Drakemaw, and troll 
 |-
 ! Hub
 | Wyrmwatch
-|-
-! Biome
-| Ember lands
 |-
 ! Graveyard
 | 422, 1885
@@ -79732,7 +79717,7 @@ Hot wind rolls off the wastes ahead. Dragons wheel over the Drakemaw, and troll 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1044">&lt;woc-art path=&quot;/map_bg/frostveil.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1018">&lt;woc-art path=&quot;/map_bg/frostveil.webp&quot; /&gt;
 == Overview ==
 Snow swallows every sound. Under the dancing lights, the cold itself feels awake.
 
@@ -79744,9 +79729,6 @@ Snow swallows every sound. Under the dancing lights, the cold itself feels awake
 |-
 ! Hub
 | Icemantle
-|-
-! Biome
-| Frozen reach
 |-
 ! Graveyard
 | -34, 1576
@@ -79801,7 +79783,7 @@ Snow swallows every sound. Under the dancing lights, the cold itself feels awake
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="931">&lt;woc-art path=&quot;/map_bg/amberfall.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="905">&lt;woc-art path=&quot;/map_bg/amberfall.webp&quot; /&gt;
 == Overview ==
 Every leaf here burns gold and red, yet none ever fall. The lanterns of Lanternmere are lit for you.
 
@@ -79813,9 +79795,6 @@ Every leaf here burns gold and red, yet none ever fall. The lanterns of Lanternm
 |-
 ! Hub
 | Lanternmere
-|-
-! Biome
-| Autumn woods
 |-
 ! Graveyard
 | -336, 2050
@@ -79866,7 +79845,7 @@ Every leaf here burns gold and red, yet none ever fall. The lanterns of Lanternm
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="873">&lt;woc-art path=&quot;/map_bg/willowfen.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="852">&lt;woc-art path=&quot;/map_bg/willowfen.webp&quot; /&gt;
 == Overview ==
 The fen hums with dragonflies and bees. Cross the bridge into Bridgemere and rest your feet awhile.
 
@@ -79878,9 +79857,6 @@ The fen hums with dragonflies and bees. Cross the bridge into Bridgemere and res
 |-
 ! Hub
 | Bridgemere
-|-
-! Biome
-| Fenland
 |-
 ! Graveyard
 | -344, 306
@@ -79930,7 +79906,7 @@ The fen hums with dragonflies and bees. Cross the bridge into Bridgemere and res
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="925">&lt;woc-art path=&quot;/map_bg/nightbloom.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="900">&lt;woc-art path=&quot;/map_bg/nightbloom.webp&quot; /&gt;
 == Overview ==
 Past the Nightgate the air itself dreams. Follow the flower-light to Moonrest, and mind the sleeping world that hangs in the sky.
 
@@ -79942,9 +79918,6 @@ Past the Nightgate the air itself dreams. Follow the flower-light to Moonrest, a
 |-
 ! Hub
 | Moonrest
-|-
-! Biome
-| Night lands
 |-
 ! Graveyard
 | -388, 1402
@@ -79994,7 +79967,7 @@ Past the Nightgate the air itself dreams. Follow the flower-light to Moonrest, a
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="953">&lt;woc-art path=&quot;/map_bg/wraithwood.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="925">&lt;woc-art path=&quot;/map_bg/wraithwood.webp&quot; /&gt;
 == Overview ==
 The canopy closes over the road like a lid. Keep to the lanterns of Gibbetmere, and do not answer if the wood calls your name.
 
@@ -80006,9 +79979,6 @@ The canopy closes over the road like a lid. Keep to the lanterns of Gibbetmere, 
 |-
 ! Hub
 | Gibbetmere
-|-
-! Biome
-| Haunted ground
 |-
 ! Graveyard
 | 378, 1412
@@ -80059,7 +80029,7 @@ The canopy closes over the road like a lid. Keep to the lanterns of Gibbetmere, 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="990">&lt;woc-art path=&quot;/map_bg/palmreach.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="970">&lt;woc-art path=&quot;/map_bg/palmreach.webp&quot; /&gt;
 == Overview ==
 Warm sand, loud birds, and a jungle that eats the horizon. Drifthaven keeps a fire lit on the beach for you.
 
@@ -80071,9 +80041,6 @@ Warm sand, loud birds, and a jungle that eats the horizon. Drifthaven keeps a fi
 |-
 ! Hub
 | Drifthaven
-|-
-! Biome
-| Jungle
 |-
 ! Graveyard
 | -318, 802
@@ -80126,7 +80093,7 @@ Warm sand, loud birds, and a jungle that eats the horizon. Drifthaven keeps a fi
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1075">&lt;woc-art path=&quot;/map_bg/evergarden.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1054">&lt;woc-art path=&quot;/map_bg/evergarden.webp&quot; /&gt;
 == Overview ==
 Someone is still trimming the hedges, though no gardener has been seen for a hundred years. Mind the maze: it minds you back.
 
@@ -80138,9 +80105,6 @@ Someone is still trimming the hedges, though no gardener has been seen for a hun
 |-
 ! Hub
 | Hedgewick
-|-
-! Biome
-| Gardens
 |-
 ! Graveyard
 | 309, 793
@@ -80196,7 +80160,7 @@ Someone is still trimming the hedges, though no gardener has been seen for a hun
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1080">&lt;woc-art path=&quot;/map_bg/galecrest.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1051">&lt;woc-art path=&quot;/map_bg/galecrest.webp&quot; /&gt;
 == Overview ==
 The wind has never once stopped here, and the Old Beacon has never once gone out. Wickharbor asks only that you close the inn door behind you.
 
@@ -80208,9 +80172,6 @@ The wind has never once stopped here, and the Old Beacon has never once gone out
 |-
 ! Hub
 | Wickharbor
-|-
-! Biome
-| Windswept coast
 |-
 ! Graveyard
 | 404, 344
@@ -80267,7 +80228,7 @@ The wind has never once stopped here, and the Old Beacon has never once gone out
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1126">&lt;woc-art path=&quot;/map_bg/farshore_isle.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1102">&lt;woc-art path=&quot;/map_bg/farshore_isle.webp&quot; /&gt;
 == Overview ==
 Cross the sandbar and Gullhaven&apos;s bell will find you before the town does. The breaks tear open without warning, and the redoubt holds its shore against whatever pours through. They have been waiting a long while for someone like you.
 
@@ -80279,9 +80240,6 @@ Cross the sandbar and Gullhaven&apos;s bell will find you before the town does. 
 |-
 ! Hub
 | Gullhaven
-|-
-! Biome
-| Green vale
 |-
 ! Graveyard
 | 290, 86
@@ -80335,7 +80293,7 @@ Cross the sandbar and Gullhaven&apos;s bell will find you before the town does. 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1173">&lt;woc-art path=&quot;/map_bg/proving_shore.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1149">&lt;woc-art path=&quot;/map_bg/proving_shore.webp&quot; /&gt;
 == Overview ==
 The Proving Shore asks nothing of you but time. Learn the camp, strike the effigies, walk the wreck line and, when you are ready, [[Ferryman Odo (NPC)|Ferryman Odo]] will see you across to the vale. You can also ring the bell to go to the vale directly.
 
@@ -80347,9 +80305,6 @@ The Proving Shore asks nothing of you but time. Learn the camp, strike the effig
 |-
 ! Hub
 | Dawnrest Camp
-|-
-! Biome
-| Green vale
 |-
 ! Graveyard
 | -324, 58

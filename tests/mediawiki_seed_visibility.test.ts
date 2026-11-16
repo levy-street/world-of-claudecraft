@@ -279,7 +279,9 @@ describe('game names, not internal names', () => {
     expect(xml).toContain('<title>Faithwarden (Specialization)</title>');
   });
   it('shows info rows with the game label, not a lowercase code id', () => {
-    for (const row of ['Quality', 'Armor type', 'Family', 'School', 'Biome'])
+    // Zones have no player-facing biome name, so zone pages carry no Biome row.
+    expect(xml).not.toContain('! Biome');
+    for (const row of ['Quality', 'Armor type', 'Family', 'School'])
       expect(xml.match(new RegExp('! ' + row + '\\n\\| [a-z]', 'g')) ?? [], row).toEqual([]);
   });
 });
