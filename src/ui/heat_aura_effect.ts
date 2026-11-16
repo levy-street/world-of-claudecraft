@@ -24,8 +24,10 @@ import { tierRange } from './heart_tier_damage';
 const KEY = 'hudChrome.auraEffect.heatGuardian';
 
 const pct = (frac: number): number => Math.round(Math.abs(frac) * 100);
-/** Heroic's extra damage, as a percent. */
-const HEROIC_PCT = pct(HEAT_DIFFICULTY.heroic.damageMult - 1);
+/** Normal's damage factor (x1.15 since the parse-calibrated pass of 2026-11-16). */
+const NM = HEAT_DIFFICULTY.normal.damageMult;
+/** Heroic's extra damage over Normal's, as a percent. */
+const HEROIC_PCT = pct(HEAT_DIFFICULTY.heroic.damageMult / NM - 1);
 
 /** The guardian's state aura's line: its stage, else its phase. */
 function stateDescriptor(a: AuraEffectInput): AuraEffectDescriptor {

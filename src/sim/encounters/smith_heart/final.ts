@@ -132,6 +132,7 @@ import {
 import type { FinalFightState, FinalKitClocks } from './final_state';
 import { finalSay, freshFinalVoice, stepFinalVoice } from './final_voice';
 import { applyTierHealth, restoreTierHealth, tierPoolMult } from './tier_health';
+import { applyTierSwing, restoreTierSwing } from './tier_swing';
 
 // ---- the dev difficulty switch ------------------------------------------------------------
 
@@ -401,6 +402,7 @@ function reHome(ctx: SimContext, inst: InstanceSlot, boss: Entity): void {
 function resetFinal(ctx: SimContext, inst: InstanceSlot, boss: Entity): void {
   clearFight(ctx, inst, boss, boss.smithHeartFinal ?? null);
   restoreTierHealth(boss, boss.smithHeartFinal?.basePool);
+  restoreTierSwing(boss, boss.smithHeartFinal?.baseSwing);
   boss.smithHeartFinal = undefined;
   reHome(ctx, inst, boss);
 }
@@ -421,6 +423,7 @@ function beginFinal(ctx: SimContext, inst: InstanceSlot, boss: Entity): FinalFig
     boss,
     tierPoolMult(inst, FINAL_DIFFICULTY[st.difficulty].healthMult),
   );
+  st.baseSwing = applyTierSwing(boss, FINAL_DIFFICULTY[st.difficulty].swingMult);
   boss.smithHeartFinal = st;
   const s = scopeOf(ctx, inst, st, boss);
   watchZone(s, true);

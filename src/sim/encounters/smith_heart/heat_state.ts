@@ -12,6 +12,7 @@ import type {
   HeatStage,
   HeatZoneState,
 } from './heat_ids';
+import type { TierSwingBase } from './tier_swing';
 import type { SlainWatch } from './voice_slain';
 
 /** A bar the guardian runs for the fight. */
@@ -164,6 +165,8 @@ export interface HeatFightState {
   difficulty: HeatDifficulty;
   /** The boss's pool before its tier's (tier_health.ts), given back at a reset. */
   basePool?: number;
+  /** The boss's swing before its tier's (tier_swing.ts), given back at a reset. */
+  baseSwing?: TierSwingBase;
   /** The guardian has fallen and the end was resolved. */
   finished: boolean;
   /** This pull's watch on the encounter's feat (feat_attempt.ts), created on first touch. */

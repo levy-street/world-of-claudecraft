@@ -164,7 +164,7 @@ describe('Hammer Council tooltips and names', () => {
     });
     const resText = t(res?.key as never, res?.nums as never);
     expect(resText).toContain(`${T.resonanceRadius} yd`);
-    expect(resText).toContain(String(T.resonanceMin));
+    expect(resText).toContain(String(Math.round(T.resonanceMin * 1.15)));
     expect(resText).not.toMatch(/\{\w+\}/);
     const rush = auraEffectDescriptor({
       id: COUNCIL_AURAS.rushMark,
@@ -174,7 +174,7 @@ describe('Hammer Council tooltips and names', () => {
     const rushText = t(rush?.key as never, rush?.nums as never);
     expect(rushText).toContain(`${T.rushStunSeconds} sec`);
     expect(rushText).toContain(`${Math.round(T.rushExposed * 100)}%`);
-    expect(rushText).toContain(String(T.rushMin));
+    expect(rushText).toContain(String(Math.round(T.rushMin * 1.15)));
     expect(rushText).not.toMatch(/\{\w+\}/);
     for (const id of [COUNCIL_AURAS.bond, COUNCIL_AURAS.collapse, COUNCIL_AURAS.rushExposed]) {
       const d = auraEffectDescriptor({ id, kind: 'vulnerability', value: 0.5 });

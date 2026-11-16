@@ -1710,10 +1710,12 @@ least Heroic's multiplier). Calibrated to a decent human raid with the bot raid
 damage, so a human kill takes about 0.65 of the bots' time, and a bot fight on a 0.65 pool
 (`/dev heart pool 0.65`, the bots' `POOL=0.65`) runs on a human raid's clock. Normal (fresh
 level-20 gear) aims at 4 to 5 minutes for humans (6 to 7 for the bots), held where the bots
-still kill it before the soft enrage: the Guardian 54,000, the Seam Singer 46,000, the Breath
-80,000, the Quench 112,000, the Heat 77,000, the Masterless Strength 72,000. Heroic (the previous
-tier's best gear) aims at 6 to 7 minutes for humans: the Hammer Council 1.85, the Breath 1.65,
-the Quench 2.0, the Heat 1.2, the Masterless Strength 2.1. Heroic's key mechanics kill when
+still kill it before the soft enrage: the Guardian 64,800, the Seam Singer 55,200, the Breath
+96,000, the Quench 134,400, the Heat 92,400, the Masterless Strength 86,400 (template bases,
+times the elite factor 2.3 in the world). Heroic (the previous tier's best gear) aims at 6 to 7
+minutes for humans: the Hammer Council 2.0, the Breath 1.79, the Quench 2.17, the Heat 1.3, the
+Masterless Strength 2.28 (Mythic the same, never less than Heroic). Both rows are the
+parse-calibrated pass of 2026-11-16 below. Heroic's key mechanics kill when
 ignored: Mountain's Wrath kills whoever no pillar hides (`wrathMult` 6.3 since the owner's
 review of 2026-11-09, section 7.1), the Council's soft enrage waits for 8 Wraths (5 on Normal,
 6 on Mythic), and the Quench's shatter lands twice as hard (`shatterMult` 2, Mythic too). Every
@@ -1736,6 +1738,40 @@ smaller), Normal's Overload pulse rises by 45 at a full bar (Heroic and Mythic k
 `pulseRise`, each tier's row), Normal's Anvil splits 5,600 (6,600 on Heroic and Mythic: `anvilTotal`, step 2 of the proposal after the bots won 1 Normal fight in 6), and Normal's missed Anvil strikes 1,000 to 1,100 (Heroic and
 Mythic keep 1,500 to 1,600: `anvilMissMin`/`anvilMissMax`). The Quench's Mythic shatter is
 Heroic's x2 (it had been left at x1).
+
+**The parse-calibrated pass of 2026-11-16** (owner-approved; the parses and the bot runs live
+outside the repo, E:/woc/entregas/raid_corazon/parses_varkhul/ and
+E:/woc/entregas/raid_corazon/ajuste_1116/INFORME.md). The first real parses of the previous
+tier (Varkhul and the Herald, 120 kills each) put a human raid at about 1,400 damage a second on
+Normal (eight players) and 1,500 on Heroic (ten), against the about 1,170 this calibration
+assumed (the bots' damage over 0.65), and the raid will come in Varkhul's gear: the pools were
+short. The same parses put the damage a raid takes there at about 200 a second on Normal and 220
+on Heroic for Varkhul, 310 and 345 for the Herald; the bot raid took 165 to 190 on most Normal
+fights here, 73 on the Quench (no pressure on its healers). So:
+
+- Health: every boss +20 percent on Normal (the template bases above, 54,000 to 64,800 and so on)
+  and +30 percent on Heroic (each `healthMult` times 1.30/1.20: the Council 1.85 to 2.0, the
+  Breath 1.65 to 1.79, the Quench 2.0 to 2.17, the Heat 1.2 to 1.3, the Masterless Strength 2.1 to
+  2.28), Mythic at Heroic's. The adds whose health is the tier's ride along: the Splinters
+  (`addHealth`: Normal 5,000 to 6,000, Heroic 5,500 to 7,150, Mythic's 7,500 kept) and the
+  isles' Sentinel and Mender (`addHealthMult`, Normal 1.2 and Heroic and Mythic 1.625; they rode
+  `damageMult` before). The bots' `POOL` factor and `tier_health.ts` are untouched.
+- Damage the raid takes (each tier's `damageMult`, and the boss's own swing through the new
+  `swingMult`, applied at the pull by `encounters/smith_heart/tier_swing.ts`, since the template
+  swing is the same on every tier): +15 percent on every Normal fight; the Quench's Normal 2.5
+  times (her swing, Quenching Breath, Crossing Blade, Freezing Water) so its healers work; on
+  Heroic the Breath +25 percent, the Quench +25 percent, the Heat +15 percent (no Heroic parse:
+  Normal's call), the Council and the Masterless Strength unchanged. The Breath's, the Quench's
+  and the Heat's Mythic rows follow Heroic's (each is "Heroic whole"); the Council's and the final
+  boss's Mythic are unchanged.
+- The lethal punishments stay where they were: each row's `punishMult` (the old `damageMult`)
+  carries Mountain's Wrath and its heir's, Falling Rock and its tremor, Thunder's Cradle's
+  discharge, the Basalt Fist (the Heat's and the final boss's), Weight of the Anvil and its miss,
+  and Shearing Blow; the Quench's Shattering Cold keeps its total through `shatterMult` (Normal
+  only +15 percent, Heroic and Mythic unchanged at 2.5 times the tuning); the falls and the
+  Rolling Cinder's catch kill on their own. The Overload bursts keep their per-tier numbers.
+- Every aura tooltip names the resolved Normal value too (`src/ui/*_aura_effect.ts`, Normal's
+  factor no longer 1).
 
 ### 7.1 The Hammer Council (always first)
 

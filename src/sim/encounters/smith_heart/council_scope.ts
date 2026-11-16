@@ -148,6 +148,17 @@ export function roll(s: CouncilScope, body: Entity, min: number, max: number): n
   return Math.max(1, Math.round(s.ctx.rng.range(min, max) * damageMult(s, body)));
 }
 
+/** A lethal punishment's damage factor (Mountain's Wrath, Falling Rock): the
+ *  tier's `punishMult` in place of its damageMult, and the body's own. */
+export function punishMult(s: CouncilScope, body: Entity): number {
+  return s.rules.punishMult * (body.mechanicDamageMult ?? 1);
+}
+
+/** A lethal punishment's roll, at `punishMult`. */
+export function punishRoll(s: CouncilScope, body: Entity, min: number, max: number): number {
+  return Math.max(1, Math.round(s.ctx.rng.range(min, max) * punishMult(s, body)));
+}
+
 /** Hold a member where its bar began (the mob AI may have walked it). */
 export function holdPlantedAt(
   ctx: SimContext,

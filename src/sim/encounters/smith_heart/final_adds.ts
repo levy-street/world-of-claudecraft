@@ -71,6 +71,7 @@ import {
   living,
   local,
   pickPlayers,
+  punishMult,
   putMarker,
   roll,
   spawnFightObject,
@@ -341,8 +342,8 @@ function landShear(s: FinalScope, a: FinalAdd, e: Entity): Entity[] {
   for (const p of struck) {
     const tank = p.id === a.barTarget;
     const amount = tank
-      ? roll(s, P.shearTankMin, P.shearTankMax)
-      : roll(s, P.shearOtherMin, P.shearOtherMax);
+      ? roll(s, P.shearTankMin, P.shearTankMax, punishMult(s))
+      : roll(s, P.shearOtherMin, P.shearOtherMax, punishMult(s));
     addHit(s, e, p, amount, N.shear, VEIN_SCHOOL[a.vein]);
   }
   return struck;
@@ -401,7 +402,8 @@ export function stepCoals(s: FinalScope): void {
       if (o.id === p.id) continue;
       const r = at(s, o);
       if (Math.hypot(r.x - q.x, r.z - q.z) > P.coalReach) continue;
-      addHit(s, from, o, roll(s, P.coalMin, P.coalMax), N.coal, 'fire');
+      // Standing by a bursting coal: a punishment (punishMult).
+      addHit(s, from, o, roll(s, P.coalMin, P.coalMax, punishMult(s)), N.coal, 'fire');
     }
   }
   ph.coals = keep;

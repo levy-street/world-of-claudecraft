@@ -187,7 +187,7 @@ function wakeIsle(s: BreathScope, i: number): void {
   const spots = isleSpots()[i];
   const o = ctx.instanceOriginOf(inst);
   const difficulty = inst.difficulty ?? 'normal';
-  const hpMult = s.rules.damageMult;
+  const hpMult = s.rules.addHealthMult;
   (['sentinel', 'mender'] as const).forEach((role, k) => {
     const template = MOBS[ISLE_MOBS[role]];
     if (!template) return;

@@ -9,6 +9,7 @@ import type { SmithHeartFeatAttempt } from './feat_attempt';
 import type { FinalDifficulty, FinalPoolKind } from './final_ids';
 import type { FinalStage } from './final_phase_ids';
 import type { FinalVoiceWatch } from './final_voice';
+import type { TierSwingBase } from './tier_swing';
 
 /** A bar in flight on the boss. */
 export interface FinalBar {
@@ -225,6 +226,8 @@ export interface FinalFightState {
   difficulty: FinalDifficulty;
   /** The boss's pool before its tier's (tier_health.ts), given back at a reset. */
   basePool?: number;
+  /** The boss's swing before its tier's (tier_swing.ts), given back at a reset. */
+  baseSwing?: TierSwingBase;
   finished: boolean;
   /** This pull's watch on the encounter's feat (feat_attempt.ts: a raider's death breaks it),
    *  created on first touch. */

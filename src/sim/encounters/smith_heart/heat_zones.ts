@@ -23,6 +23,7 @@ import {
   fireHit,
   type HeatScope,
   livePlayers,
+  punishMult,
   roll,
   spawnFightObject,
 } from './heat_scope';
@@ -89,8 +90,9 @@ export function stepZones(s: HeatScope): void {
         z.tick = T.zoneTick;
         setZone(s, z);
         cueAt(s, HEAT_CUES.ignite, HEARTH_WELL.x, HEARTH_WELL.z, ZONE_BANDS[z.band][1]);
+        // The ignite on whoever stayed in the band: a punishment (punishMult).
         for (const p of inZone(s, z.band))
-          fireHit(s, p, roll(s, T.zoneMin, T.zoneMax), HEAT_NAMES.zone);
+          fireHit(s, p, roll(s, T.zoneMin, T.zoneMax, punishMult(s)), HEAT_NAMES.zone);
       }
       keep.push(z);
       continue;

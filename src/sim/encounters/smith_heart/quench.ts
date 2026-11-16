@@ -115,6 +115,7 @@ import type { QuenchFightState } from './quench_state';
 import { watchStrikeWindup } from './quench_strike_windup';
 import { quenchSay, watchQuenchSlain } from './quench_voice';
 import { applyTierHealth, restoreTierHealth, tierPoolMult } from './tier_health';
+import { applyTierSwing, restoreTierSwing } from './tier_swing';
 import { freshSlainWatch } from './voice_slain';
 
 // ---- the dev difficulty switch ------------------------------------------------------------
@@ -322,6 +323,7 @@ function resetQuench(ctx: SimContext, inst: InstanceSlot, boss: Entity): void {
   const st = boss.smithHeartQuench ?? null;
   clearFight(ctx, inst, boss, st);
   restoreTierHealth(boss, st?.basePool);
+  restoreTierSwing(boss, st?.baseSwing);
   boss.smithHeartQuench = undefined;
 }
 
@@ -354,6 +356,7 @@ function beginQuench(ctx: SimContext, inst: InstanceSlot, boss: Entity): QuenchF
     boss,
     tierPoolMult(inst, QUENCH_DIFFICULTY[st.difficulty].healthMult),
   );
+  st.baseSwing = applyTierSwing(boss, QUENCH_DIFFICULTY[st.difficulty].swingMult);
   boss.smithHeartQuench = st;
   const s = scopeOf(ctx, inst, st, boss);
   raiseRim(s);

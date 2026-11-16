@@ -40,7 +40,15 @@ import {
 } from './council_ids';
 import { collapsePillar, councilPillars, pillarBetween } from './council_pillars';
 import { breakCursed } from './council_rush';
-import { beginBar, type CouncilScope, jobHolder, living, memberFree, roll } from './council_scope';
+import {
+  beginBar,
+  type CouncilScope,
+  jobHolder,
+  living,
+  memberFree,
+  punishRoll,
+  roll,
+} from './council_scope';
 import { councilSay } from './council_voice';
 
 /** Every member carries the energy bar's frame; only the Wrath's holder's
@@ -136,8 +144,8 @@ function wearPillarLimit(s: CouncilScope, caster: Entity): void {
  *  pipeline's own rule) or its heir's lighter one. */
 function wrathRoll(s: CouncilScope, caster: Entity, heir: boolean): number {
   const amount = heir
-    ? roll(s, caster, T.heirWrathMin, T.heirWrathMax)
-    : roll(s, caster, T.wrathMin, T.wrathMax);
+    ? punishRoll(s, caster, T.heirWrathMin, T.heirWrathMax)
+    : punishRoll(s, caster, T.wrathMin, T.wrathMax);
   return Math.round(amount * (heir ? s.rules.heirWrathMult : s.rules.wrathMult));
 }
 
@@ -249,7 +257,15 @@ export function landWeight(s: CouncilScope, g: Entity, targetId: number | null):
     fx: 'nova',
     ability: COUNCIL_CASTS.weight,
   });
-  heavySwing(s.ctx, g, tank, T.weightMult * s.rules.damageMult, COUNCIL_NAMES.weight);
+  // A swing: the weapon already carries the tier's swingMult (tier_swing.ts),
+  // so the mechanics' factor rides on top of it only past that raise.
+  heavySwing(
+    s.ctx,
+    g,
+    tank,
+    (T.weightMult * s.rules.damageMult) / s.rules.swingMult,
+    COUNCIL_NAMES.weight,
+  );
   if (tank.dead) return;
   s.ctx.applyAura(tank, {
     id: COUNCIL_AURAS.weight,

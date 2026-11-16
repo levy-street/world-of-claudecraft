@@ -53,6 +53,7 @@ import {
   moveFightObject,
   onFloor,
   pickPlayers,
+  punishMult,
   putMarker,
   roll,
   spawnFightObject,
@@ -170,13 +171,19 @@ export function landAnvil(s: FinalScope): Entity[] {
   });
   if (under.length === 0) {
     for (const p of livePlayers(s))
-      hit(s, p, roll(s, s.rules.anvilMissMin, s.rules.anvilMissMax), FINAL_NAMES.anvil, 'physical');
+      hit(
+        s,
+        p,
+        roll(s, s.rules.anvilMissMin, s.rules.anvilMissMax, punishMult(s)),
+        FINAL_NAMES.anvil,
+        'physical',
+      );
     return [];
   }
   for (const p of under) {
     const crushed = s.rules.crushed && auraOf(p, FINAL_AURAS.crushed) !== undefined;
     const share = anvilShare(under.length, crushed, s.rules.anvilTotal);
-    hit(s, p, roll(s, share * 0.95, share * 1.05), FINAL_NAMES.anvil, 'physical');
+    hit(s, p, roll(s, share * 0.95, share * 1.05, punishMult(s)), FINAL_NAMES.anvil, 'physical');
   }
   if (s.rules.crushed)
     for (const p of under)

@@ -133,6 +133,7 @@ import {
 import { breakFeat, COUNCIL_FEAT_FALL_WINDOW, countFeat } from './feat_attempt';
 import { settleSmithHeartFeat } from './feats';
 import { applyTierHealth, restoreTierHealth, tierPoolMult } from './tier_health';
+import { applyTierSwing, restoreTierSwing } from './tier_swing';
 import { freshSlainWatch } from './voice_slain';
 
 // ---- the dev difficulty switches ------------------------------------------------------
@@ -495,6 +496,7 @@ function resetCouncil(ctx: SimContext, inst: InstanceSlot, bodies: CouncilBodies
     dropAuraById(b, COUNCIL_AURAS.rushExposed);
     if (b.dead && anyAlive) regrowHead(ctx, b, 1);
     restoreTierHealth(b, st?.basePools?.[r]);
+    restoreTierSwing(b, st?.baseSwings?.[r]);
     b.resource = 0;
   }
   attach(bodies, undefined);
@@ -541,10 +543,14 @@ function beginCouncil(
 ): CouncilFightState {
   const st = freshState(councilDifficulty(inst));
   const mult = tierPoolMult(inst, COUNCIL_DIFFICULTY[st.difficulty].healthMult);
+  const swing = COUNCIL_DIFFICULTY[st.difficulty].swingMult;
   st.basePools = {};
+  st.baseSwings = {};
   for (const r of COUNCIL_ROLES) {
     const b = bodies[r];
-    if (b) st.basePools[r] = applyTierHealth(b, mult);
+    if (!b) continue;
+    st.basePools[r] = applyTierHealth(b, mult);
+    st.baseSwings[r] = applyTierSwing(b, swing);
   }
   // A member already down when the pull began (a dev kill) has fallen.
   for (const r of COUNCIL_ROLES) if (bodies[r] && !living(bodies[r])) st.fallen.push(r);

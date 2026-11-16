@@ -219,6 +219,15 @@ export type FinalDifficulty = 'normal' | 'heroic' | 'mythic';
 export interface FinalDifficultyRules {
   /** Every mechanic's damage, on top of the claim's own multiplier. */
   damageMult: number;
+  /** A lethal punishment's damage factor, in place of damageMult (Weight of
+   *  the Anvil, its miss, the Basalt Fist, the Splinters' Shearing Blow, Bursting Coal on the others): the
+   *  parse-calibrated pass of 2026-11-16 raised the raid's damage and left
+   *  these where they were (the tier's old damageMult). */
+  punishMult: number;
+  /** The boss's own swing (its weapon, so its swing cleave too) against the
+   *  template's, set at the pull (tier_swing.ts). The template swing is one
+   *  for every tier, so each tier's raise lives here (the pass of 2026-11-16). */
+  swingMult: number;
   /** The boss's health pool against the template's, set at the pull
    *  (tier_health.ts). */
   healthMult: number;
@@ -263,7 +272,12 @@ export interface FinalDifficultyRules {
 
 export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyRules>> = {
   normal: {
-    damageMult: 1,
+    // The parse-calibrated pass of 2026-11-16: the raid's damage and the
+    // swing +15 percent (was 1); the Anvil, its miss, the Basalt Fist and
+    // Shearing Blow where they were (punishMult).
+    damageMult: 1.15,
+    punishMult: 1,
+    swingMult: 1.15,
     healthMult: 1,
     burstTier: 'survivable',
     switchShock: false,
@@ -285,9 +299,13 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
   heroic: {
     // 1.2 until the Heroic pass of 2026-11-05: the bot raid in the previous
     // tier's best came out of the 70 percent call too low to outlast the
-    // Overload pulses, Vein Shock and the Anvil on two healers.
+    // Overload pulses, Vein Shock and the Anvil on two healers. Unchanged
+    // by the pass of 2026-11-16; its pool x2.1 to x2.28 (+30 percent with
+    // the base's +20).
     damageMult: 1.1,
-    healthMult: 2.1,
+    punishMult: 1.1,
+    swingMult: 1,
+    healthMult: 2.28,
     burstTier: 'heavy',
     switchShock: true,
     embers: true,
@@ -306,8 +324,11 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     anvilTotal: 6600,
   },
   mythic: {
+    // Its pool Heroic's (x2.28 since 2026-11-16); its damage unchanged.
     damageMult: 1.3,
-    healthMult: 2.1,
+    punishMult: 1.3,
+    swingMult: 1,
+    healthMult: 2.28,
     burstTier: 'lethal',
     switchShock: true,
     embers: true,

@@ -289,6 +289,15 @@ export interface CouncilDifficultyRules {
   pillarPulse: boolean;
   /** Every mechanic's damage, on top of the claim's own multiplier. */
   damageMult: number;
+  /** A lethal punishment's damage factor, in place of damageMult (Mountain's
+   *  Wrath and its heir's, Falling Rock and its tremor): the parse-calibrated
+   *  pass of 2026-11-16 raised the raid's damage and left these where they
+   *  were (the tier's old damageMult). */
+  punishMult: number;
+  /** The boss's own swing (its weapon, so its swing cleave too) against the
+   *  template's, set at the pull (tier_swing.ts). The template swing is one
+   *  for every tier, so each tier's raise lives here (the pass of 2026-11-16). */
+  swingMult: number;
   /** The boss's health pool against the template's, set at the pull
    *  (tier_health.ts). */
   healthMult: number;
@@ -347,7 +356,11 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     floorAvoidsWrath: true,
     songAfterWrath: true,
     pillarPulse: false,
-    damageMult: 1,
+    // The parse-calibrated pass of 2026-11-16: the raid's damage and the
+    // swing +15 percent (was 1), the Wrath and the rock where they were.
+    damageMult: 1.15,
+    punishMult: 1,
+    swingMult: 1.15,
     healthMult: 1,
     wrathMult: 1,
     heirWrathMult: 1,
@@ -371,8 +384,12 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     floorAvoidsWrath: false,
     songAfterWrath: false,
     pillarPulse: true,
+    // Unchanged by the pass of 2026-11-16 (its damage already the raid's
+    // hardest); its pool x1.85 to x2.0 (+30 percent with the base's +20).
     damageMult: 1.25,
-    healthMult: 1.85,
+    punishMult: 1.25,
+    swingMult: 1,
+    healthMult: 2.0,
     wrathMult: 6.3,
     heirWrathMult: 2,
     crowdShare: 0.2,
@@ -397,7 +414,9 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     songAfterWrath: false,
     pillarPulse: true,
     damageMult: 1.25,
-    healthMult: 1.85,
+    punishMult: 1.25,
+    swingMult: 1,
+    healthMult: 2.0,
     wrathMult: 6.3,
     heirWrathMult: 2,
     crowdShare: 0.2,

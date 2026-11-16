@@ -117,13 +117,15 @@ describe('part 2: tooltips', () => {
   it('the call, the final phase, the shield, the fury', () => {
     const call = say({ id: A.phase, kind: 'internal_cd', value: FINAL_STAGE_CODES.call });
     expect(call).toContain(`${P.callSeconds} sec`);
-    expect(call).toContain(`${P.splinterMin} to ${P.splinterMax}`);
+    // Normal's resolved range (its damage x1.15 since 2026-11-16).
+    const nm = (v: number) => Math.round(v * 1.15);
+    expect(call).toContain(`${nm(P.splinterMin)} to ${nm(P.splinterMax)}`);
     const fin = say({ id: A.phase, kind: 'internal_cd', value: FINAL_STAGE_CODES.final });
     expect(fin).toContain(`one every ${P.mixEvery} sec`);
     expect(fin).toContain(`After ${P.enrageAfter} sec`);
     expect(say({ id: A.shield, kind: 'internal_cd' })).toContain('immune');
     expect(say({ id: A.fury, kind: 'internal_cd', value: 1 })).toContain(
-      `${P.furyMin} to ${P.furyMax}`,
+      `${nm(P.furyMin)} to ${nm(P.furyMax)}`,
     );
     // The quarter fight's stage says when the next stages come.
     const fight = say({ id: A.phase, kind: 'internal_cd', value: FINAL_STAGE_CODES.fight });

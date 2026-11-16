@@ -53,6 +53,7 @@ import {
   onFloor,
   overTheVoid,
   pickPlayers,
+  punishMult,
   putMarker,
   roll,
   spawnFightObject,
@@ -128,7 +129,7 @@ export function landFist(s: FinalScope): Entity[] {
     const here = at(s, p);
     if (Math.hypot(here.x - f.x, here.z - f.z) > T.fistR) continue;
     struck.push(p);
-    hit(s, p, roll(s, T.fistMin, T.fistMax), FINAL_NAMES.fist, 'fire');
+    hit(s, p, roll(s, T.fistMin, T.fistMax, punishMult(s)), FINAL_NAMES.fist, 'fire');
   }
   f.lanes.forEach((laneId, i) => {
     st.swells.push({

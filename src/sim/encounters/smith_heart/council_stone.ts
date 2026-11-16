@@ -61,6 +61,8 @@ import {
   living,
   memberFree,
   pickMarks,
+  punishMult,
+  punishRoll,
   roll,
 } from './council_scope';
 import { strikeSoulPip } from './council_soul';
@@ -252,7 +254,7 @@ export function stepRock(s: CouncilScope): number {
     (p) => !p.dead && Math.hypot(p.pos.x - at.x, p.pos.z - at.z) <= T.rockRadius + 1e-6,
   );
   const share = fallingRockShare(under.length, T.rockTotal);
-  const each = Math.max(1, Math.round(share.each * damageMult(s, source)));
+  const each = Math.max(1, Math.round(share.each * punishMult(s, source)));
   for (const p of under) {
     s.ctx.dealDamage(source, p, each, false, 'physical', COUNCIL_NAMES.rock, 'hit', true);
   }
@@ -262,7 +264,7 @@ export function stepRock(s: CouncilScope): number {
       s.ctx.dealDamage(
         source,
         p,
-        roll(s, source, T.rockTremorMin, T.rockTremorMax),
+        punishRoll(s, source, T.rockTremorMin, T.rockTremorMax),
         false,
         'physical',
         COUNCIL_NAMES.rockTremor,

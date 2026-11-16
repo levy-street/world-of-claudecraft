@@ -124,6 +124,12 @@ export function damageMult(s: Pick<HeatScope, 'rules' | 'boss'>): number {
   return s.rules.damageMult * (s.boss.mechanicDamageMult ?? 1);
 }
 
+/** A lethal punishment's damage factor (Basalt Fist): the tier's `punishMult` in
+ *  place of its damageMult, and the body's own. */
+export function punishMult(s: Pick<HeatScope, 'rules' | 'boss'>): number {
+  return s.rules.punishMult * (s.boss.mechanicDamageMult ?? 1);
+}
+
 /** A mechanic's damage roll (the only rng the fight draws). */
 export function roll(s: HeatScope, min: number, max: number, mult = damageMult(s)): number {
   return Math.max(1, Math.round(s.ctx.rng.range(min, max) * mult));

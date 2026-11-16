@@ -21,13 +21,19 @@ import { tierRange, tierValue } from './heart_tier_damage';
 const KEY = 'hudChrome.auraEffect.council';
 
 const pct = (frac: number): number => Math.round(Math.abs(frac) * 100);
+/** Normal's damage factor (x1.15 since the parse-calibrated pass of 2026-11-16). */
+const NM = COUNCIL_DIFFICULTY.normal.damageMult;
 /** Heroic's damage factor; Mythic shares it (pinned), so one range names both. */
 const HM = COUNCIL_DIFFICULTY.heroic.damageMult;
+/** Normal's and Heroic's lethal-punishment factor (Falling Rock and its
+ *  tremor; council_scope.ts punishMult). */
+const NP = COUNCIL_DIFFICULTY.normal.punishMult;
+const HP = COUNCIL_DIFFICULTY.heroic.punishMult;
 /** A Wrath endpoint on a tier, rounded in the fight's two steps
- *  (council_wrath.ts wrathRoll: the damage roll, then the Wrath factor). */
-const wrath = (value: number, tier: 'heroic' | 'mythic'): number =>
+ *  (council_wrath.ts wrathRoll: the punishment roll, then the Wrath factor). */
+const wrath = (value: number, tier: 'normal' | 'heroic' | 'mythic'): number =>
   tierValue(
-    tierValue(value, COUNCIL_DIFFICULTY[tier].damageMult),
+    tierValue(value, COUNCIL_DIFFICULTY[tier].punishMult),
     COUNCIL_DIFFICULTY[tier].wrathMult,
   );
 
@@ -53,8 +59,8 @@ export function councilAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescr
         key: `${KEY}.wakeMark`,
         nums: {
           radius: T.riseKnockRadius,
-          min: T.riseMin,
-          max: T.riseMax,
+          min: tierValue(T.riseMin, NM),
+          max: tierValue(T.riseMax, NM),
           ...tierRange('heroic', T.riseMin, T.riseMax, HM),
         },
       };
@@ -62,15 +68,15 @@ export function councilAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescr
       return {
         key: `${KEY}.rockMark`,
         nums: {
-          total: T.rockTotal,
+          total: tierValue(T.rockTotal, NP),
           radius: T.rockRadius,
           soakers: T.rockMinSoakers,
           penalty: pct(T.rockPenaltyMult - 1),
-          tremorMin: T.rockTremorMin,
-          tremorMax: T.rockTremorMax,
+          tremorMin: tierValue(T.rockTremorMin, NP),
+          tremorMax: tierValue(T.rockTremorMax, NP),
           soulReach: T.soulRockReach,
-          heroicTotal: tierValue(T.rockTotal, HM),
-          ...tierRange('heroicTremor', T.rockTremorMin, T.rockTremorMax, HM),
+          heroicTotal: tierValue(T.rockTotal, HP),
+          ...tierRange('heroicTremor', T.rockTremorMin, T.rockTremorMax, HP),
         },
       };
     case COUNCIL_AURAS.resonance:
@@ -78,8 +84,8 @@ export function councilAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescr
         key: `${KEY}.resonance`,
         nums: {
           every: T.resonanceEvery,
-          min: T.resonanceMin,
-          max: T.resonanceMax,
+          min: tierValue(T.resonanceMin, NM),
+          max: tierValue(T.resonanceMax, NM),
           radius: a.value2 && a.value2 > 0 ? a.value2 : T.resonanceRadius,
           ...tierRange('heroic', T.resonanceMin, T.resonanceMax, HM),
         },
@@ -92,8 +98,8 @@ export function councilAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescr
           stun: T.rushStunSeconds,
           exposed: pct(T.rushExposed),
           exposedSeconds: T.rushExposedSeconds,
-          min: T.rushMin,
-          max: T.rushMax,
+          min: tierValue(T.rushMin, NM),
+          max: tierValue(T.rushMax, NM),
           ...tierRange('heroic', T.rushMin, T.rushMax, HM),
         },
       };
@@ -106,8 +112,8 @@ export function councilAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescr
           pct: pct(T.bondWard),
           reach: T.bondReach,
           every: T.bondPulseEvery,
-          min: T.bondPulseMin,
-          max: T.bondPulseMax,
+          min: tierValue(T.bondPulseMin, NM),
+          max: tierValue(T.bondPulseMax, NM),
           ...tierRange('heroic', T.bondPulseMin, T.bondPulseMax, HM),
           growth: pct(T.bondPulseGrowth),
         },
@@ -136,8 +142,8 @@ export function councilAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescr
         nums: {
           limit: a.value2 ?? 0,
           share: pct(crowdShareFor(a.value2)),
-          min: T.wrathMin,
-          max: T.wrathMax,
+          min: wrath(T.wrathMin, 'normal'),
+          max: wrath(T.wrathMax, 'normal'),
           heroicMin: wrath(T.wrathMin, 'heroic'),
           heroicMax: wrath(T.wrathMax, 'heroic'),
           mythicMin: wrath(T.wrathMin, 'mythic'),

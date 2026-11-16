@@ -71,7 +71,9 @@ describe('Guardian of the Breath: tooltips and names', () => {
     });
     expect(wind?.key).toBe('hudChrome.auraEffect.breathGuardian.wind');
     expect(say(wind)).toContain(`${BREATH_DIFFICULTY.heroic.windSpeed} yd a second`);
-    expect(say(wind)).toContain(`${T.pinMin} to ${T.pinMax}`);
+    // Normal's resolved range (x1.15 since 2026-11-16).
+    const nm = (v: number) => Math.round(v * BREATH_DIFFICULTY.normal.damageMult);
+    expect(say(wind)).toContain(`${nm(T.pinMin)} to ${nm(T.pinMax)}`);
     const draw = auraEffectDescriptor({
       id: WIND_PULL_AURA,
       kind: 'internal_cd',

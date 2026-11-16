@@ -136,10 +136,15 @@ describe("Smith's Heart Heroic: the Council's soft enrage comes after the lethal
 });
 
 describe("Smith's Heart Heroic: the Quench's shatter lands twice as hard", () => {
-  it('the tier factor: Heroic and Mythic 2 (Mythic since 2026-11-12), Normal untouched', () => {
-    expect(QUENCH_DIFFICULTY.normal.shatterMult).toBe(1);
-    expect(QUENCH_DIFFICULTY.heroic.shatterMult).toBe(2);
-    expect(QUENCH_DIFFICULTY.mythic.shatterMult).toBe(2);
+  it('the shatter in all: Heroic and Mythic 2.5 times the tuning, Normal 1.15 (2026-11-16)', () => {
+    // damage x shatter: Heroic 1.25 x 2 before the pass of 2026-11-16, which
+    // raised Heroic's damage 25 percent and left the shatter where it was.
+    const k = (tier: 'normal' | 'heroic' | 'mythic') =>
+      QUENCH_DIFFICULTY[tier].damageMult * QUENCH_DIFFICULTY[tier].shatterMult;
+    expect(k('normal')).toBeCloseTo(1.15, 6);
+    expect(k('heroic')).toBeCloseTo(2.5, 6);
+    expect(k('mythic')).toBeCloseTo(2.5, 6);
+    expect(k('heroic') / k('normal')).toBeGreaterThan(2);
   });
 
   for (const tier of ['normal', 'heroic', 'mythic'] as const) {

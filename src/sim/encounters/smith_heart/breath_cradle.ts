@@ -180,7 +180,8 @@ export function dischargeCradles(s: BreathScope): Entity[][] {
       s.ctx.dealDamage(
         s.boss,
         p,
-        Math.max(1, Math.round(share.each * s.rules.damageMult * (s.boss.mechanicDamageMult ?? 1))),
+        // A lethal punishment when too few share it: the tier's punishMult.
+        Math.max(1, Math.round(share.each * s.rules.punishMult * (s.boss.mechanicDamageMult ?? 1))),
         false,
         'nature',
         BREATH_NAMES.cradle,

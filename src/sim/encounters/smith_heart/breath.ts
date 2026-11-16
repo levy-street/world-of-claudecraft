@@ -109,6 +109,7 @@ import { stepOverLip, stepVoidDeaths, tetherGuardian } from './breath_void';
 import { breakFeat } from './feat_attempt';
 import { settleSmithHeartFeat } from './feats';
 import { applyTierHealth, restoreTierHealth, tierPoolMult } from './tier_health';
+import { applyTierSwing, restoreTierSwing } from './tier_swing';
 import { freshSlainWatch } from './voice_slain';
 
 // ---- the dev difficulty switch ------------------------------------------------------------
@@ -322,6 +323,7 @@ function resetBreath(ctx: SimContext, inst: InstanceSlot, boss: Entity): void {
   const st = boss.smithHeartBreath ?? null;
   clearFight(ctx, inst, boss, st);
   restoreTierHealth(boss, st?.basePool);
+  restoreTierSwing(boss, st?.baseSwing);
   boss.smithHeartBreath = undefined;
 }
 
@@ -347,6 +349,7 @@ function beginBreath(ctx: SimContext, inst: InstanceSlot, boss: Entity): BreathF
     boss,
     tierPoolMult(inst, BREATH_DIFFICULTY[st.difficulty].healthMult),
   );
+  st.baseSwing = applyTierSwing(boss, BREATH_DIFFICULTY[st.difficulty].swingMult);
   boss.smithHeartBreath = st;
   setWind({ ctx, inst, st }, 'calm', T.firstGather, 0);
   breathSay({ ctx, inst, st }, boss, 'guardian', 'pull');

@@ -76,12 +76,14 @@ describe("Smith's Heart tooltips: resolved damage per difficulty", () => {
 
   it("the Council's marks say Heroic's resolved range, not a percent", () => {
     const wake = say({ id: COUNCIL_AURAS.wakeMark, kind: 'internal_cd' });
-    expect(wake).toContain(`${CT.riseMin} to ${CT.riseMax} damage`);
+    // Normal's x1.15 since the pass of 2026-11-16: 120 to 150 at x1.15.
+    expect(wake).toContain('138 to 173 damage');
     // 120 to 150 at x1.25.
     expect(wake).toContain('Heroic and Mythic: 150 to 188 damage.');
     expect(wake).not.toMatch(/% more damage/);
     const rock = say({ id: COUNCIL_AURAS.rockMark, kind: 'internal_cd' });
     expect(rock).toContain(
+      // The rock is a punishment: Heroic's punishMult, its old damageMult.
       `Heroic and Mythic: ${tierValue(CT.rockTotal, 1.25)} damage shared, and ` +
         `${tierValue(CT.rockTremorMin, 1.25)} to ${tierValue(CT.rockTremorMax, 1.25)} to the raid.`,
     );
@@ -114,7 +116,8 @@ describe("Smith's Heart tooltips: resolved damage per difficulty", () => {
   it("the Breath's cradle resolves its Heroic discharge and backlash", () => {
     const cradled = say({ id: BREATH_AURAS.cradled, kind: 'stun' });
     const h = BREATH_DIFFICULTY.heroic;
-    expect(cradled).toContain(`each discharge ${tierValue(h.cradleTotal, h.damageMult)} wanting`);
+    // The discharge is a punishment (punishMult, x1.25); the backlash the raid's damage.
+    expect(cradled).toContain(`each discharge ${tierValue(h.cradleTotal, h.punishMult)} wanting`);
     expect(cradled).toContain(
       `the backlash deals ${tierValue(BT.backlashMin, h.damageMult)} to ` +
         `${tierValue(BT.backlashMax, h.damageMult)} damage.`,

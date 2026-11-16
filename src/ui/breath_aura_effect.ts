@@ -27,8 +27,13 @@ const KEY = 'hudChrome.auraEffect.breathGuardian';
 const pct = (frac: number): number => Math.round(Math.abs(frac) * 100);
 /** A load's walk with no tier on it (a stale mirror): Mythic's, the slower. */
 const KNOT_WALK = BREATH_KNOT.mythic.walkMult;
+/** Normal's damage factor (x1.15 since the parse-calibrated pass of 2026-11-16). */
+const NM = BREATH_DIFFICULTY.normal.damageMult;
 /** Heroic's damage factor; Mythic shares it (pinned), so one range names both. */
 const HM = BREATH_DIFFICULTY.heroic.damageMult;
+/** The Cradle's discharge rides the lethal-punishment factor (breath_cradle.ts). */
+const NP = BREATH_DIFFICULTY.normal.punishMult;
+const HP = BREATH_DIFFICULTY.heroic.punishMult;
 
 /** The fight's aura's descriptor, or null when `a` is not one of them. */
 export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor | null {
@@ -42,8 +47,8 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
         key: `${KEY}.wind`,
         nums: {
           speed: a.value2 ?? BREATH_DIFFICULTY.normal.windSpeed,
-          pinMin: T.pinMin,
-          pinMax: T.pinMax,
+          pinMin: tierValue(T.pinMin, NM),
+          pinMax: tierValue(T.pinMax, NM),
           ...tierRange('heroic', T.pinMin, T.pinMax, HM),
         },
       };
@@ -52,11 +57,11 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
         key: `${KEY}.draw`,
         nums: {
           speed: a.value3 ?? T.pullSpeed,
-          min: T.vortexMin,
-          max: T.vortexMax,
+          min: tierValue(T.vortexMin, NM),
+          max: tierValue(T.vortexMax, NM),
           tick: T.vortexTick,
-          gustMin: T.gustMin,
-          gustMax: T.gustMax,
+          gustMin: tierValue(T.gustMin, NM),
+          gustMax: tierValue(T.gustMax, NM),
           throw: BREATH_DIFFICULTY.normal.gustThrow,
           heroicThrow: BREATH_DIFFICULTY.heroic.gustThrow,
           ...tierRange('heroic', T.vortexMin, T.vortexMax, HM),
@@ -66,7 +71,11 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
     case BREATH_AURAS.pinned:
       return {
         key: `${KEY}.pinned`,
-        nums: { min: T.pinMin, max: T.pinMax, ...tierRange('heroic', T.pinMin, T.pinMax, HM) },
+        nums: {
+          min: tierValue(T.pinMin, NM),
+          max: tierValue(T.pinMax, NM),
+          ...tierRange('heroic', T.pinMin, T.pinMax, HM),
+        },
       };
     case BREATH_AURAS.portalA:
       return { key: `${KEY}.portalA` };
@@ -90,11 +99,11 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
         nums: {
           every: T.drawnStrikeEvery,
           warn: T.drawnWarn,
-          min: T.drawnMin,
-          max: T.drawnMax,
+          min: tierValue(T.drawnMin, NM),
+          max: tierValue(T.drawnMax, NM),
           radius: T.drawnR,
-          cmin: T.chargedMin,
-          cmax: T.chargedMax,
+          cmin: tierValue(T.chargedMin, NM),
+          cmax: tierValue(T.chargedMax, NM),
           charged: T.chargedSeconds,
           ...tierRange('heroic', T.drawnMin, T.drawnMax, HM),
           ...tierRange('heroicC', T.chargedMin, T.chargedMax, HM),
@@ -105,15 +114,15 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
         key: `${KEY}.cradled`,
         nums: {
           hold: T.cradleHold,
-          total: BREATH_DIFFICULTY.normal.cradleTotal,
-          heroicTotal: tierValue(BREATH_DIFFICULTY.heroic.cradleTotal, HM),
+          total: tierValue(BREATH_DIFFICULTY.normal.cradleTotal, NP),
+          heroicTotal: tierValue(BREATH_DIFFICULTY.heroic.cradleTotal, HP),
           radius: T.cradleR,
           soakers: BREATH_DIFFICULTY.normal.cradleSoakers,
           heroicSoakers: BREATH_DIFFICULTY.heroic.cradleSoakers,
           heroicCount: BREATH_DIFFICULTY.heroic.cradleCount,
           penalty: pct(T.cradlePenaltyMult - 1),
-          bmin: T.backlashMin,
-          bmax: T.backlashMax,
+          bmin: tierValue(T.backlashMin, NM),
+          bmax: tierValue(T.backlashMax, NM),
           ...tierRange('heroicB', T.backlashMin, T.backlashMax, HM),
         },
       };
@@ -125,8 +134,8 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
           regrow: pct(IT.regrowShare),
           mend: pct(IT.mendShare),
           max: IT.bulwarkMax,
-          bmin: IT.burstMin,
-          bmax: IT.burstMax,
+          bmin: tierValue(IT.burstMin, NM),
+          bmax: tierValue(IT.burstMax, NM),
           ...tierRange('heroic', IT.burstMin, IT.burstMax, HM),
         },
       };
@@ -145,8 +154,8 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
         key: `${KEY}.swell`,
         nums: {
           every: T.swellEvery,
-          min: T.swellMin,
-          max: T.swellMax,
+          min: tierValue(T.swellMin, NM),
+          max: tierValue(T.swellMax, NM),
           ...tierRange('heroic', T.swellMin, T.swellMax, HM),
           growth: pct(BREATH_DIFFICULTY.normal.swellGrowth),
           heroicGrowth: pct(BREATH_DIFFICULTY.heroic.swellGrowth),

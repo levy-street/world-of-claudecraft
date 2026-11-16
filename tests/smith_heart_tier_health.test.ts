@@ -13,6 +13,7 @@ import {
   HEAT_DIFFICULTY,
   QUENCH_DIFFICULTY,
 } from '../src/sim/encounters/smith_heart';
+import { FINAL_PHASE_DIFFICULTY } from '../src/sim/encounters/smith_heart/final_phase_ids';
 import { applyTierHealth, restoreTierHealth } from '../src/sim/encounters/smith_heart/tier_health';
 import type { Entity } from '../src/sim/types';
 import { quenchFight } from './helpers/quench_fight';
@@ -56,16 +57,63 @@ describe("Smith's Heart: a boss's pool per tier", () => {
     }
   });
 
-  it('the balance pass of 2026-11-12: the Quench and the Heat pools per tier', () => {
+  it('the parse-calibrated pass of 2026-11-16: every pool per tier', () => {
     const hp = (id: string) => SMITH_HEART_MOBS[id].hpBase;
-    expect(hp('heart_quench_guardian')).toBe(112000);
-    expect(QUENCH_DIFFICULTY.heroic.healthMult).toBe(2);
-    expect(QUENCH_DIFFICULTY.mythic.healthMult).toBe(2);
-    expect(hp('heart_heat_guardian')).toBe(77000);
-    expect(HEAT_DIFFICULTY.heroic.healthMult).toBe(1.2);
-    expect(HEAT_DIFFICULTY.mythic.healthMult).toBe(1.2);
-    // The Heat's Heroic pool stays about where it was (64,000 x 1.45 = 92,800).
-    expect(Math.abs(77000 * 1.2 - 92800)).toBeLessThan(500);
+    // Normal: the template bases, each +20 percent over the 2026-11-12 pass.
+    const normal: Record<string, [number, number]> = {
+      heart_hammer_guardian: [54000, 64800],
+      heart_seam_singer: [46000, 55200],
+      heart_breath_guardian: [80000, 96000],
+      heart_quench_guardian: [112000, 134400],
+      heart_heat_guardian: [77000, 92400],
+      heart_masterless_strength: [72000, 86400],
+    };
+    for (const [id, [was, now]] of Object.entries(normal)) {
+      expect(hp(id), id).toBe(now);
+      expect(now / was, id).toBeCloseTo(1.2, 6);
+    }
+    // Heroic: +30 percent over the old Heroic pool (the base's +20 percent
+    // times the multiplier's 1.30/1.20), within a hundredth.
+    const heroic: [string, readonly string[], number, number][] = [
+      [
+        'council',
+        ['heart_hammer_guardian', 'heart_seam_singer'],
+        1.85,
+        COUNCIL_DIFFICULTY.heroic.healthMult,
+      ],
+      ['breath', ['heart_breath_guardian'], 1.65, BREATH_DIFFICULTY.heroic.healthMult],
+      ['quench', ['heart_quench_guardian'], 2.0, QUENCH_DIFFICULTY.heroic.healthMult],
+      ['heat', ['heart_heat_guardian'], 1.2, HEAT_DIFFICULTY.heroic.healthMult],
+      ['final', ['heart_masterless_strength'], 2.1, FINAL_DIFFICULTY.heroic.healthMult],
+    ];
+    expect(heroic.map(([k, , , m]) => [k, m])).toEqual([
+      ['council', 2.0],
+      ['breath', 1.79],
+      ['quench', 2.17],
+      ['heat', 1.3],
+      ['final', 2.28],
+    ]);
+    for (const [key, ids, oldMult, mult] of heroic) {
+      const was = ids.reduce((sum, id) => sum + normal[id][0], 0) * oldMult;
+      const now = ids.reduce((sum, id) => sum + normal[id][1], 0) * mult;
+      expect(Math.abs(now / was - 1.3), key).toBeLessThan(0.01);
+    }
+    // Mythic: Heroic's pool on every boss.
+    for (const rows of [
+      COUNCIL_DIFFICULTY,
+      BREATH_DIFFICULTY,
+      QUENCH_DIFFICULTY,
+      HEAT_DIFFICULTY,
+      FINAL_DIFFICULTY,
+    ])
+      expect(rows.mythic.healthMult).toBe(rows.heroic.healthMult);
+    // The adds whose health is the tier's: the Splinters and the isles' adds.
+    expect(FINAL_PHASE_DIFFICULTY.normal.addHealth).toBe(6000);
+    expect(FINAL_PHASE_DIFFICULTY.heroic.addHealth).toBe(7150);
+    expect(FINAL_PHASE_DIFFICULTY.mythic.addHealth).toBeGreaterThanOrEqual(7150);
+    expect(BREATH_DIFFICULTY.normal.addHealthMult).toBe(1.2);
+    expect(BREATH_DIFFICULTY.heroic.addHealthMult).toBe(1.625);
+    expect(BREATH_DIFFICULTY.mythic.addHealthMult).toBe(1.625);
   });
 
   it('a Heroic pull of the Quench takes the tier pool; the wipe gives the template pool back', () => {

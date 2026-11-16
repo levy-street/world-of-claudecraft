@@ -32,6 +32,8 @@ import { tierRange, tierValue } from './heart_tier_damage';
 const KEY = 'hudChrome.auraEffect.finalBoss';
 
 const pct = (frac: number): number => Math.round(Math.abs(frac) * 100);
+/** Normal's damage factor (x1.15 since the parse-calibrated pass of 2026-11-16). */
+const NM = FINAL_DIFFICULTY.normal.damageMult;
 /** Heroic's and Mythic's damage factors (they differ on this fight). */
 const HM = FINAL_DIFFICULTY.heroic.damageMult;
 const MM = FINAL_DIFFICULTY.mythic.damageMult;
@@ -89,8 +91,8 @@ export function finalAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescrip
         value: Math.max(0, Math.min(100, Math.round(a.value ?? 0))),
         fill: O.fillSeconds,
         every: O.pulseEvery,
-        min: O.pulseMin,
-        max: fullPulse('normal'),
+        min: tierValue(O.pulseMin, NM),
+        max: tierValue(fullPulse('normal'), NM),
         normalMin: O.burst.normal.min,
         normalMax: O.burst.normal.max,
         heroicMin: O.burst.heroic.min,
@@ -111,8 +113,8 @@ export function finalAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescrip
       return {
         key: `${KEY}.unbound`,
         nums: {
-          per: T.unboundPerStack,
-          total: T.unboundPerStack * stacks,
+          per: tierValue(T.unboundPerStack, NM),
+          total: tierValue(T.unboundPerStack, NM) * stacks,
           heroicPer: tierValue(T.unboundPerStack, HM),
           mythicPer: tierValue(T.unboundPerStack, MM),
         },
@@ -140,8 +142,8 @@ export function finalAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescrip
           allies: T.coldAllies,
           reach: T.coldReach,
           freeze: T.freezeSeconds,
-          min: T.freezeMin,
-          max: T.freezeMax,
+          min: tierValue(T.freezeMin, NM),
+          max: tierValue(T.freezeMax, NM),
           ...tiers(T.freezeMin, T.freezeMax),
         },
       };
@@ -188,8 +190,8 @@ export function finalAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescrip
         nums: {
           speed: a.value2 ?? T.windSpeed,
           band: T.rimBand,
-          min: T.rimMin,
-          max: T.rimMax,
+          min: tierValue(T.rimMin, NM),
+          max: tierValue(T.rimMax, NM),
           ...tiers(T.rimMin, T.rimMax),
         },
       };

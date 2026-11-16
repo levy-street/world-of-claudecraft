@@ -292,8 +292,9 @@ export const FINAL_PHASE_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalPhase
   normal: {
     adds: 2,
     // 6,500 until the balance pass of 2026-11-12: Normal's Splinter took
-    // longer to clear at its tier's damage than Heroic's, with worse gear.
-    addHealth: 5000,
+    // longer to clear at its tier's damage than Heroic's, with worse gear;
+    // 5,000 to 6,000 with the boss's own +20 percent (2026-11-16).
+    addHealth: 6000,
     coalMarks: 1,
     ringGaps: 3,
     weightStep: 0.15,
@@ -306,8 +307,9 @@ export const FINAL_PHASE_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalPhase
     // (Splintered Strength, growing each pulse) outran a decent raid's two
     // healers inside 25 s while its damage needed 32 s to clear them; 5,500
     // ends the call before the pulses run away, still more to kill than
-    // Normal's two (5,000 each since 2026-11-12).
-    addHealth: 5500,
+    // Normal's two (5,000 each since 2026-11-12). 5,500 to 7,150 with the
+    // boss's own +30 percent (2026-11-16; Mythic's 7,500 stays above it).
+    addHealth: 7150,
     coalMarks: 1,
     ringGaps: 2,
     weightStep: 0.18,

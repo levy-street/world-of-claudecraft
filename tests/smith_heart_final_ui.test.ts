@@ -121,8 +121,9 @@ describe('The Masterless Strength: tooltips', () => {
     const bar = say({ id: overloadAuraId('quench'), kind: 'internal_cd', value: 40 });
     expect(bar).toContain('40% full');
     expect(bar).toContain(`${O.fillSeconds} sec`);
-    // A full Normal bar's top roll: 40 x (1 + 45 / 35), the live rise (2026-11-12).
-    expect(bar).toContain('up to 91 when full');
+    // A full Normal bar's top roll: 40 x (1 + 45 / 35), the live rise
+    // (2026-11-12), at Normal's x1.15 (2026-11-16): 91 x 1.15.
+    expect(bar).toContain('up to 105 when full');
     // The burst per difficulty: survivable, heavy, lethal.
     const n = (v: number) => String(v);
     expect(bar).toContain(`${n(O.burst.normal.min)} to ${n(O.burst.normal.max)} damage on Normal`);
@@ -130,7 +131,7 @@ describe('The Masterless Strength: tooltips', () => {
     expect(bar).toContain(`${n(O.burst.mythic.min)} to ${n(O.burst.mythic.max)} on Mythic (lethal`);
     expect(say({ id: FINAL_AURAS.root, kind: 'root' })).toContain(`${T.rootSeconds} sec`);
     expect(say({ id: FINAL_AURAS.unbound, kind: 'internal_cd', stacks: 3 })).toContain(
-      `(${T.unboundPerStack * 3} now)`,
+      `(${Math.round(T.unboundPerStack * 1.15) * 3} now)`,
     );
     expect(say({ id: FINAL_AURAS.shaken, kind: 'internal_cd' })).toContain(`${T.shakenMult} times`);
     expect(say({ id: FINAL_AURAS.cold, kind: 'internal_cd', value: 55 })).toContain('Cold 55');

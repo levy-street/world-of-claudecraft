@@ -248,9 +248,22 @@ export interface BreathDifficultyRules {
   gustThrow: number;
   /** Every mechanic's damage, on top of the claim's own multiplier. */
   damageMult: number;
+  /** A lethal punishment's damage factor, in place of damageMult (Thunder's
+   *  Cradle's discharge; the void's fall kills on its own): the
+   *  parse-calibrated pass of 2026-11-16 raised the raid's damage and left
+   *  these where they were (the tier's old damageMult). */
+  punishMult: number;
+  /** The boss's own swing (its weapon, so its swing cleave too) against the
+   *  template's, set at the pull (tier_swing.ts). The template swing is one
+   *  for every tier, so each tier's raise lives here (the pass of 2026-11-16). */
+  swingMult: number;
   /** The boss's health pool against the template's, set at the pull
    *  (tier_health.ts). */
   healthMult: number;
+  /** The Islands of the Wind's adds' health against ISLE_TUNING's: Normal
+   *  1.2 and Heroic and Mythic 1.625 since 2026-11-16 (it rode damageMult,
+   *  1 and 1.25, before: the boss's own +20 and +30 percent on it). */
+  addHealthMult: number;
   /** An anchor that ran out leaves its player spent (no circle for a while). */
   calmSpent: boolean;
   /** Loose gales wander the Cornice after each indrawn breath. */
@@ -314,8 +327,13 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
   normal: {
     windSpeed: 3.2,
     gustThrow: 26,
-    damageMult: 1,
+    // The parse-calibrated pass of 2026-11-16: the raid's damage and the
+    // swing +15 percent (was 1), the Cradle's discharge where it was.
+    damageMult: 1.15,
+    punishMult: 1,
+    swingMult: 1.15,
     healthMult: 1,
+    addHealthMult: 1.2,
     calmSpent: false,
     looseGales: false,
     stormGusts: false,
@@ -331,8 +349,14 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
   heroic: {
     windSpeed: 4.4,
     gustThrow: 30,
-    damageMult: 1.25,
-    healthMult: 1.65,
+    // The pass of 2026-11-16: the raid's damage +25 percent (1.25 to
+    // 1.5625) and the swing's, the Cradle's discharge where it was; its pool
+    // x1.65 to x1.79 (+30 percent with the base's +20).
+    damageMult: 1.5625,
+    punishMult: 1.25,
+    swingMult: 1.25,
+    healthMult: 1.79,
+    addHealthMult: 1.625,
     calmSpent: true,
     looseGales: true,
     stormGusts: true,
@@ -350,8 +374,12 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
   mythic: {
     windSpeed: 4.4,
     gustThrow: 30,
-    damageMult: 1.25,
-    healthMult: 1.65,
+    // Heroic's numbers of 2026-11-16 (the heroic row whole).
+    damageMult: 1.5625,
+    punishMult: 1.25,
+    swingMult: 1.25,
+    healthMult: 1.79,
+    addHealthMult: 1.625,
     calmSpent: true,
     looseGales: true,
     stormGusts: true,

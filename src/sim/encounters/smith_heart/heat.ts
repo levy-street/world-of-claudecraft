@@ -28,8 +28,8 @@
 //
 // Difficulty: the claim's, with a dev switch for a run while the raid has no
 // heroic tier of its own. Heroic and mythic end with phase 3 like normal;
-// their pressure is the overflows' adds, the Seedflames, faster cinders and a
-// quarter more damage. Mythic is a prototype behind its own switch and, for
+// their pressure is the overflows' adds, the Seedflames, faster cinders and
+// more damage (Normal's x1.15, Heroic's x1.4375 since 2026-11-16). Mythic is a prototype behind its own switch and, for
 // heroic whole plus the Wheel of the Hearth (heat_ids.ts HEAT_DIFFICULTY, heat_wheel.ts).
 //
 // Deterministic: every pick is hashed or ordered; the only rng draws are the
@@ -111,6 +111,7 @@ import {
 import { startWheel, stepWheel } from './heat_wheel';
 import { clearZones, startZones, stepZones } from './heat_zones';
 import { applyTierHealth, restoreTierHealth, tierPoolMult } from './tier_health';
+import { applyTierSwing, restoreTierSwing } from './tier_swing';
 import { freshSlainWatch } from './voice_slain';
 
 // ---- the dev difficulty switch ------------------------------------------------------------
@@ -473,6 +474,7 @@ function clearFight(
 function resetHeat(ctx: SimContext, inst: InstanceSlot, boss: Entity): void {
   clearFight(ctx, inst, boss, boss.smithHeartHeat ?? null);
   restoreTierHealth(boss, boss.smithHeartHeat?.basePool);
+  restoreTierSwing(boss, boss.smithHeartHeat?.baseSwing);
   boss.smithHeartHeat = undefined;
 }
 
@@ -493,6 +495,7 @@ function beginHeat(ctx: SimContext, inst: InstanceSlot, boss: Entity): HeatFight
     boss,
     tierPoolMult(inst, HEAT_DIFFICULTY[st.difficulty].healthMult),
   );
+  st.baseSwing = applyTierSwing(boss, HEAT_DIFFICULTY[st.difficulty].swingMult);
   boss.smithHeartHeat = st;
   const s = scopeOf(ctx, inst, st, boss);
   showState(s);

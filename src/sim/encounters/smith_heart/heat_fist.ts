@@ -48,6 +48,7 @@ import {
   local,
   moveFightObject,
   pickPlayers,
+  punishMult,
   roll,
   spawnFightObject,
 } from './heat_scope';
@@ -141,7 +142,7 @@ export function landFist(s: HeatScope): Entity[] {
     const here = at(s, p);
     if (Math.hypot(here.x - f.x, here.z - f.z) > T.fistR) continue;
     hit.push(p);
-    fireHit(s, p, roll(s, T.fistMin, T.fistMax), HEAT_NAMES.fist);
+    fireHit(s, p, roll(s, T.fistMin, T.fistMax, punishMult(s)), HEAT_NAMES.fist);
   }
   f.lanes.forEach((laneId, i) => {
     st.swells.push({

@@ -396,8 +396,10 @@ describe('Hammer Council: Resonance is a spread', () => {
     expect(hitsOf(ev, COUNCIL_NAMES.resonance, carrier.id).length).toBe(0);
     expect(hitsOf(ev, COUNCIL_NAMES.resonance, far.id).length).toBe(0);
     for (const amount of hitsOf(ev, COUNCIL_NAMES.resonance, near.id)) {
-      expect(amount).toBeGreaterThanOrEqual(T.resonanceMin);
-      expect(amount).toBeLessThanOrEqual(T.resonanceMax);
+      // Normal's damage factor on top (x1.15 since 2026-11-16).
+      const nm = COUNCIL_DIFFICULTY.normal.damageMult;
+      expect(amount).toBeGreaterThanOrEqual(Math.round(T.resonanceMin * nm));
+      expect(amount).toBeLessThanOrEqual(Math.round(T.resonanceMax * nm));
     }
     // The pillar it stood by is whole.
     expect(f.pillars().every((p) => p.integrity === councilPillarFull(false))).toBe(true);

@@ -66,7 +66,10 @@ describe('Guardian of the Heat: tooltips and names', () => {
     expect(text).not.toMatch(/\{\w+\}/);
     return text;
   };
-  const heroicPct = Math.round((HEAT_DIFFICULTY.heroic.damageMult - 1) * 100);
+  // Heroic's damage over Normal's (both raised on 2026-11-16: 25 percent).
+  const heroicPct = Math.round(
+    (HEAT_DIFFICULTY.heroic.damageMult / HEAT_DIFFICULTY.normal.damageMult - 1) * 100,
+  );
 
   it("the guardian's state says its phase, never a fourth, and its sinking", () => {
     const state = (value: number, value2: number) =>

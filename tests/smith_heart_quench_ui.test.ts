@@ -75,7 +75,10 @@ describe('Guardian of the Quench: tooltips and names', () => {
     expect(c).toContain(`within ${T.warmR} yd of ${T.warmNeed} or more`);
     expect(c).toContain(`by ${T.coldFall} every second`);
     const frozen = say(auraEffectDescriptor({ id: QUENCH_AURAS.frozen, kind: 'stun', value: 0 }));
-    expect(frozen).toContain(`${T.shatterMin} to ${T.shatterMax}`);
+    const nk = QUENCH_DIFFICULTY.normal.damageMult * QUENCH_DIFFICULTY.normal.shatterMult;
+    expect(frozen).toContain(
+      `${Math.round(T.shatterMin * nk)} to ${Math.round(T.shatterMax * nk)}`,
+    );
     expect(frozen).toContain(`within ${QUENCH_DIFFICULTY.normal.splashR} yd`);
     expect(frozen).toContain(`${QUENCH_DIFFICULTY.heroic.splashR} yd`);
     const brittle = say(
@@ -87,13 +90,14 @@ describe('Guardian of the Quench: tooltips and names', () => {
     );
     expect(brittle).toContain(`${Math.round(T.brittlePct * 100)}% more damage`);
     const trapped = say(auraEffectDescriptor({ id: QUENCH_AURAS.trapped, kind: 'root', value: 0 }));
-    expect(trapped).toContain(`${T.trapMin} to ${T.trapMax}`);
+    const nm = (v: number) => Math.round(v * QUENCH_DIFFICULTY.normal.damageMult);
+    expect(trapped).toContain(`${nm(T.trapMin)} to ${nm(T.trapMax)}`);
     expect(trapped).toContain('never kills');
     const awake = say(
       auraEffectDescriptor({ id: QUENCH_AURAS.awake, kind: 'internal_cd', value: 0 }),
     );
     expect(awake).toContain(`${T.slashLock} sec before`);
-    expect(awake).toContain(`${T.crossMin} to ${T.crossMax}`);
+    expect(awake).toContain(`${nm(T.crossMin)} to ${nm(T.crossMax)}`);
     const marked = say(
       auraEffectDescriptor({
         id: QUENCH_AURAS.marked,
@@ -104,7 +108,7 @@ describe('Guardian of the Quench: tooltips and names', () => {
     );
     expect(marked).toContain('number 2 of 3');
     expect(marked).toContain(`${T.slashLock} sec before`);
-    expect(marked).toContain(`${T.crossMin} to ${T.crossMax}`);
+    expect(marked).toContain(`${nm(T.crossMin)} to ${nm(T.crossMax)}`);
     const deep = say(
       auraEffectDescriptor({
         id: QUENCH_AURAS.deepening,

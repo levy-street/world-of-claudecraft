@@ -328,7 +328,11 @@ describe('Quench frost pass: the harsher freeze', () => {
 
   it('the shatter is never lethal alone on Normal for a topped-up level-20 cloth body, but hurts', () => {
     const CLOTH = 1135;
-    expect(T.shatterMax * QUENCH_DIFFICULTY.normal.damageMult).toBeLessThan(CLOTH * 0.4);
+    // Normal's shatter in all: damage x shatter, 1.15 since the pass of
+    // 2026-11-16 (Normal's damage x2.5, its shatter only +15 percent).
+    const N = QUENCH_DIFFICULTY.normal;
+    const nk = N.damageMult * N.shatterMult;
+    expect(T.shatterMax * nk).toBeLessThan(CLOTH * 0.45);
     // Heroic's is twice as hard (shatterMult): a heavy hit, still short of a kill.
     const H = QUENCH_DIFFICULTY.heroic;
     expect(T.shatterMax * H.damageMult * H.shatterMult).toBeLessThan(CLOTH * 0.9);
@@ -346,9 +350,9 @@ describe('Quench frost pass: the harsher freeze', () => {
     expect(a.dead).toBe(false);
     const dealt = hitsOf(out, QUENCH_NAMES.shatter, a.id);
     expect(dealt.length).toBe(1);
-    expect(dealt[0]).toBeGreaterThanOrEqual(T.shatterMin - 1);
+    expect(dealt[0]).toBeGreaterThanOrEqual(Math.floor(T.shatterMin * nk) - 1);
     // On the plain body: the freeze's double damage is gone before the hit.
-    expect(dealt[0]).toBeLessThanOrEqual(T.shatterMax * QUENCH_DIFFICULTY.normal.damageMult + 1);
+    expect(dealt[0]).toBeLessThanOrEqual(Math.ceil(T.shatterMax * nk) + 1);
   });
 });
 
@@ -513,7 +517,10 @@ describe('Quench frost pass: dev verbs and the own alert', () => {
     };
     const frozen = say(QUENCH_AURAS.frozen, 6);
     expect(frozen).toContain(`${Math.round(T.frozenPct * 100)}% more damage`);
-    expect(frozen).toContain(`${T.shatterMin} to ${T.shatterMax}`);
+    const nk = QUENCH_DIFFICULTY.normal.damageMult * QUENCH_DIFFICULTY.normal.shatterMult;
+    expect(frozen).toContain(
+      `${Math.round(T.shatterMin * nk)} to ${Math.round(T.shatterMax * nk)}`,
+    );
     expect(frozen).toContain(
       `${Math.round(T.brittlePct * 100)}% more damage for ${T.brittleSeconds} sec`,
     );

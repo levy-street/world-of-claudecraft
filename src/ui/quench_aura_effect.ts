@@ -17,7 +17,7 @@ import {
   QUENCH_TUNING as T,
 } from '../sim/encounters/smith_heart/quench_ids';
 import type { AuraEffectDescriptor, AuraEffectInput } from './aura_effect';
-import { tierRange } from './heart_tier_damage';
+import { tierRange, tierValue } from './heart_tier_damage';
 
 const KEY = 'hudChrome.auraEffect.quenchGuardian';
 const N = QUENCH_DIFFICULTY.normal;
@@ -27,10 +27,12 @@ const M = QUENCH_DIFFICULTY.mythic;
 const warmthPer = (rate: number): number => Math.round(1 / rate);
 
 const pct = (frac: number): number => Math.round(Math.abs(frac) * 100);
+/** Normal's damage factor (x2.5 since the parse-calibrated pass of 2026-11-16). */
+const NM = QUENCH_DIFFICULTY.normal.damageMult;
 /** Heroic's damage factor; Mythic shares it (pinned), so one range names both. */
 const HM = QUENCH_DIFFICULTY.heroic.damageMult;
 /** The shatter's factor per tier: damage times the tier's own shatter factor. */
-const shatterMult = (tier: 'heroic' | 'mythic'): number =>
+const shatterMult = (tier: 'normal' | 'heroic' | 'mythic'): number =>
   QUENCH_DIFFICULTY[tier].damageMult * QUENCH_DIFFICULTY[tier].shatterMult;
 /** Seconds to fill the bar alone, whole. */
 const FILL_SECONDS = Math.round(T.coldMax / T.coldRise);
@@ -63,8 +65,8 @@ export function quenchAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
         key: `${KEY}.frozen`,
         nums: {
           pct: pct(T.frozenPct),
-          min: T.shatterMin,
-          max: T.shatterMax,
+          min: tierValue(T.shatterMin, shatterMult('normal')),
+          max: tierValue(T.shatterMax, shatterMult('normal')),
           brittle: pct(T.brittlePct),
           seconds: T.brittleSeconds,
           radius: QUENCH_DIFFICULTY.normal.splashR,
@@ -86,8 +88,8 @@ export function quenchAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
       return {
         key: `${KEY}.trapped`,
         nums: {
-          min: T.trapMin,
-          max: T.trapMax,
+          min: tierValue(T.trapMin, NM),
+          max: tierValue(T.trapMax, NM),
           ...tierRange('heroic', T.trapMin, T.trapMax, HM),
           seconds: T.trapSeconds,
         },
@@ -101,8 +103,8 @@ export function quenchAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
         key: `${KEY}.awake`,
         nums: {
           lock: T.slashLock,
-          min: T.crossMin,
-          max: T.crossMax,
+          min: tierValue(T.crossMin, NM),
+          max: tierValue(T.crossMax, NM),
           cold: T.crossCold,
           ...tierRange('heroic', T.crossMin, T.crossMax, HM),
         },
@@ -114,8 +116,8 @@ export function quenchAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
           order: a.value ?? 1,
           count: a.value2 ?? 1,
           lock: T.slashLock,
-          min: T.crossMin,
-          max: T.crossMax,
+          min: tierValue(T.crossMin, NM),
+          max: tierValue(T.crossMax, NM),
           cold: T.crossCold,
           ...tierRange('heroic', T.crossMin, T.crossMax, HM),
         },

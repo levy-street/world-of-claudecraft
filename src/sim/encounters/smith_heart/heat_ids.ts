@@ -208,6 +208,16 @@ export type HeatDifficulty = 'normal' | 'heroic' | 'mythic';
 export interface HeatDifficultyRules {
   /** Every mechanic's damage, on top of the claim's own multiplier. */
   damageMult: number;
+  /** A lethal punishment's damage factor, in place of damageMult (Basalt
+   *  Fist, Wakefire's and the Wheel's ignite; a Rolling Cinder's catch kills
+   *  on its own): the parse-calibrated
+   *  pass of 2026-11-16 raised the raid's damage and left these where they
+   *  were (the tier's old damageMult). */
+  punishMult: number;
+  /** The boss's own swing (its weapon, so its swing cleave too) against the
+   *  template's, set at the pull (tier_swing.ts). The template swing is one
+   *  for every tier, so each tier's raise lives here (the pass of 2026-11-16). */
+  swingMult: number;
   /** The boss's health pool against the template's, set at the pull
    *  (tier_health.ts). */
   healthMult: number;
@@ -231,7 +241,11 @@ export interface HeatDifficultyRules {
 
 export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRules>> = {
   normal: {
-    damageMult: 1,
+    // The parse-calibrated pass of 2026-11-16: the raid's damage and the
+    // swing +15 percent (was 1), the Basalt Fist where it was.
+    damageMult: 1.15,
+    punishMult: 1,
+    swingMult: 1.15,
     healthMult: 1,
     overflowAdds: false,
     seedHatch: false,
@@ -244,10 +258,15 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     cinderLateEvery: 20,
   },
   heroic: {
-    damageMult: 1.25,
+    // The pass of 2026-11-16 (no Heroic parse yet: Normal's call): the
+    // raid's damage and the swing +15 percent (1.25 to 1.4375), the Basalt
+    // Fist where it was; its pool x1.2 to x1.3.
+    damageMult: 1.4375,
+    punishMult: 1.25,
+    swingMult: 1.15,
     // 1.45 to 1.2 with the base raised to 77,000 (2026-11-12): the Heroic
     // pool stays about where it was (92,800 to 92,400 base).
-    healthMult: 1.2,
+    healthMult: 1.3,
     overflowAdds: true,
     seedHatch: true,
     bolts: 3,
@@ -258,8 +277,11 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
   },
   // Heroic whole, plus the Wheel of the Hearth.
   mythic: {
-    damageMult: 1.25,
-    healthMult: 1.2,
+    // Heroic's numbers of 2026-11-16 (the heroic row whole).
+    damageMult: 1.4375,
+    punishMult: 1.25,
+    swingMult: 1.15,
+    healthMult: 1.3,
     overflowAdds: true,
     seedHatch: true,
     bolts: 3,

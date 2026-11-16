@@ -7,6 +7,7 @@
 import type { BreathDifficulty, BreathWindPhase } from './breath_ids';
 import type { BreathShove } from './breath_shove';
 import type { SmithHeartFeatAttempt } from './feat_attempt';
+import type { TierSwingBase } from './tier_swing';
 import type { SlainWatch } from './voice_slain';
 
 /** The wind's clock (phase 1, and the heroic gusts of phase 2). */
@@ -189,6 +190,8 @@ export interface BreathFightState {
   difficulty: BreathDifficulty;
   /** The boss's pool before its tier's (tier_health.ts), given back at a reset. */
   basePool?: number;
+  /** The boss's swing before its tier's (tier_swing.ts), given back at a reset. */
+  baseSwing?: TierSwingBase;
   /** The guardian has fallen and the end was resolved. */
   finished: boolean;
   /** This pull's watch on the encounter's feat (feat_attempt.ts), created on first touch. */

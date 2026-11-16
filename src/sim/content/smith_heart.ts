@@ -326,10 +326,11 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // ---- the four guardians ------------------------------------------------------------
   // The Hammer Council (design doc 7.1, encounters/smith_heart/council.ts):
   // two stone beings sharing the Hammer's strength, one pull, one wipe, one
-  // kill. Every number is a SKETCH (bot-measured): the Guardian 54,000 and
-  // the Seam Singer 46,000 base, about 230,000 together after the elite
-  // factor (x2.3) on Normal and x1.85 on Heroic (tier_health.ts), for a 4 to
-  // 5 minute human Normal kill (design doc 7, "Pools per tier"). Each carries the Wrath's declaration (`nova`,
+  // kill. Every number is a SKETCH (bot-measured): the Guardian 64,800 and
+  // the Seam Singer 55,200 base, about 276,000 together after the elite
+  // factor (x2.3) on Normal and x2.0 on Heroic (tier_health.ts), for a 4 to
+  // 5 minute human Normal kill (design doc 7, "Pools per tier"; 54,000 and
+  // 46,000 with Heroic's x1.85 until the parse-calibrated pass of 2026-11-16). Each carries the Wrath's declaration (`nova`,
   // encounter-driven: the council casts it, never the trash engine), so the
   // sight field draws for whichever of them holds the Wrath.
   // The Guardian of the Hammer: a stone titan half-fused with the floor, the
@@ -337,7 +338,7 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // Rush). Hammerfall, its
   // frontal arc, stays: it reads well and keeps the raid off the tank's side.
   heart_hammer_guardian: {
-    ...boss('heart_hammer_guardian', 'Guardian of the Hammer', 54000, 0x8a6430, 3.2),
+    ...boss('heart_hammer_guardian', 'Guardian of the Hammer', 64800, 0x8a6430, 3.2),
     ccImmune: true,
     slowImmune: true,
     arcCleave: { every: 3, arcDeg: 110, range: 9, mult: 0.7, name: 'Hammerfall' },
@@ -354,7 +355,7 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // pressure is her bars. She carries the heir's Wrath declaration (the
   // Guardian fallen, she takes the Wrath).
   heart_seam_singer: {
-    ...boss('heart_seam_singer', 'The Seam Singer', 46000, 0xd8a24a, 2.0),
+    ...boss('heart_seam_singer', 'The Seam Singer', 55200, 0xd8a24a, 2.0),
     ccImmune: true,
     slowImmune: true,
     dmgBase: 24,
@@ -373,14 +374,14 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // Wind (its blows across the Cornice, the gaps in the rim, Thessaly's
   // circles, the indrawn breath and the exhale), at half health the storm
   // breaks, phase 2 the Storm. Every number a SKETCH (bot-measured, never
-  // with players): 80,000 base (about 184,000 after the elite factor) for a
-  // 4 to 5 minute Normal fight; Heroic's own multiplier is its difficulty
-  // row's (tier_health.ts). Bellows Gust is the exhale
+  // with players): 96,000 base (about 221,000 after the elite factor; 80,000
+  // until the parse-calibrated pass of 2026-11-16) for a 4 to 5 minute Normal
+  // fight; Heroic's own multiplier is its difficulty row's (tier_health.ts). Bellows Gust is the exhale
   // now (encounter-driven: the fight casts it after the indrawn breath; its
   // record stays the look's numbers: the whole Cornice, the throw). Storm
   // Lance stays the trash kit's own line, on its own clock.
   heart_breath_guardian: {
-    ...boss('heart_breath_guardian', 'Guardian of the Breath', 80000, 0x5ab8e8, 3.4),
+    ...boss('heart_breath_guardian', 'Guardian of the Breath', 96000, 0x5ab8e8, 3.4),
     ccImmune: true,
     slowImmune: true,
     // Its own model stands some eighteen yards tall: melee strikes the body of
@@ -420,14 +421,15 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // metal. "Together, but not for too long": the cold bar, the huddle's
   // warmth and the ice it breaks, at half health the Smith's four blades
   // awake and echo its attacks. Every number a SKETCH (bot-measured, never
-  // with players): 112,000 base (about 258,000 after the elite factor) for a
-  // 4 to 5 minute Normal fight (raised from 62,000 on 2026-11-12); Heroic's own multiplier is its difficulty
-  // row's (tier_health.ts). Tempering Strike stays its
+  // with players): 134,400 base (about 309,000 after the elite factor) for a
+  // 4 to 5 minute Normal fight (62,000 until 2026-11-12, 112,000 until the
+  // parse-calibrated pass of 2026-11-16); Heroic's own multiplier is its
+  // difficulty row's (tier_health.ts). Tempering Strike stays its
   // swing cleave (the fight watches for it to raise the echoes); Quenching
   // Breath is encounter-driven (the fight starts and lands it on its own
   // clock; the record keeps the look's numbers).
   heart_quench_guardian: {
-    ...boss('heart_quench_guardian', 'Guardian of the Quench', 112000, 0x9ad8ff, 3),
+    ...boss('heart_quench_guardian', 'Guardian of the Quench', 134400, 0x9ad8ff, 3),
     ccImmune: true,
     slowImmune: true,
     // Her own model stands some eleven yards tall: her fists settle the tank
@@ -463,14 +465,15 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // Hearth. "The well of the first flame": Basalt Fist and its Molten Swells,
   // Hearth Flare, two overflows, Hearthseeds, Wakefire and the Rolling
   // Cinders (heroic adds the overflows' adds and the Seedflames). Every number a
-  // SKETCH (bot-measured, never with players): 77,000 base (about 177,000
-  // after the elite factor, raised from 64,000 on 2026-11-12) for a 4 to 5 minute Normal fight, like the other
-  // guardians; Heroic's own multiplier is its difficulty row's. Its body reaches the wellspring's lip
+  // SKETCH (bot-measured, never with players): 92,400 base (about 212,500
+  // after the elite factor; 64,000 until 2026-11-12, 77,000 until the
+  // parse-calibrated pass of 2026-11-16) for a 4 to 5 minute Normal fight,
+  // like the other guardians; Heroic's own multiplier is its difficulty row's. Its body reaches the wellspring's lip
   // (bodyRadius: melee strikes it from the shore); Cinder Grip is its own
   // stacking burn on every landed swing (the stackPoison seam), so the tanks
   // swap; every other mechanic is the encounter's.
   heart_heat_guardian: {
-    ...boss('heart_heat_guardian', 'Guardian of the Heat', 77000, 0xffe6a0, HEAT_GUARDIAN_SCALE),
+    ...boss('heart_heat_guardian', 'Guardian of the Heat', 92400, 0xffe6a0, HEAT_GUARDIAN_SCALE),
     ccImmune: true,
     slowImmune: true,
     bodyRadius: HEARTH_WELL.r,
@@ -583,9 +586,9 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // encounter's (encounters/smith_heart/final*.ts): the four quarters' rules
   // and kits. Its own swing cleave, Forge Fist, is its frontal (Mythic's Heat
   // quarter leaves fire where it strikes, the Quench's slows); the sketch's
-  // Forge Wrath and Forge Pour are gone. Health a SKETCH: 72,000 base (about
-  // 166,000 after the elite factor), the guardians' anchor scaled for the
-  // raid's last fight. It cannot be controlled or slowed: only its own Taking
+  // Forge Wrath and Forge Pour are gone. Health a SKETCH: 86,400 base (about
+  // 199,000 after the elite factor; 72,000 until the parse-calibrated pass of
+  // 2026-11-16), the guardians' anchor scaled for the raid's last fight. It cannot be controlled or slowed: only its own Taking
   // Root holds it.
   // Its Splinters (part 2, encounters/smith_heart/final_adds.ts): one rises
   // out of each awakened quarter as an intermission's call begins.
@@ -608,7 +611,7 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
     },
   },
   heart_masterless_strength: {
-    ...boss('heart_masterless_strength', 'The Masterless Strength', 72000, 0xd8c8a0, 3.6),
+    ...boss('heart_masterless_strength', 'The Masterless Strength', 86400, 0xd8c8a0, 3.6),
     // Its essence flees at its fall; the remnant it leaves is a personal quest drop for
     // everyone on the entrance's essence quest (content/smith_heart_rewards.ts).
     loot: [{ itemId: SMITH_HEART_ESSENCE_ITEM, chance: 1, questId: SMITH_HEART_ESSENCE_QUEST }],

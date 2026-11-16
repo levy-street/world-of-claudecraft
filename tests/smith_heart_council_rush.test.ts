@@ -389,7 +389,7 @@ describe('the cursed pillar', () => {
     const heroic = amounts('heroic');
     expect(normal.length).toBeGreaterThan(0);
     expect(heroic.length).toBeGreaterThan(0);
-    expect(Math.max(...normal)).toBeLessThanOrEqual(n.cursedPulseMax);
+    expect(Math.max(...normal)).toBeLessThanOrEqual(Math.round(n.cursedPulseMax * n.damageMult));
     expect(Math.min(...heroic)).toBeGreaterThanOrEqual(Math.floor(h.cursedPulseMin * h.damageMult));
   });
 

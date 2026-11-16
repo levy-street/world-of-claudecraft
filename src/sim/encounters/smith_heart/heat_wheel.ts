@@ -30,6 +30,7 @@ import {
   fireHit,
   type HeatScope,
   livePlayers,
+  punishMult,
   roll,
   spawnFightObject,
 } from './heat_scope';
@@ -142,7 +143,7 @@ export function stepWheel(s: HeatScope): void {
       dropFightObject(s.ctx, s.inst, round.safeId);
       cueAt(s, HEAT_CUES.ignite, HEARTH_WELL.x, HEARTH_WELL.z, T.wheelOuter);
       for (const p of inRed(s, round))
-        fireHit(s, p, roll(s, T.wheelMin, T.wheelMax), HEAT_NAMES.wheel);
+        fireHit(s, p, roll(s, T.wheelMin, T.wheelMax, punishMult(s)), HEAT_NAMES.wheel);
       keep.push(round);
       if (st.wheelNext < st.wheelSafes.length) beginRound(s, st.wheelSafes[st.wheelNext++]);
       continue;

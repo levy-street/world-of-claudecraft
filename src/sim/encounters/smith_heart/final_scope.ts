@@ -195,6 +195,12 @@ export function damageMult(s: Pick<FinalScope, 'rules' | 'boss'>): number {
   return s.rules.damageMult * (s.boss.mechanicDamageMult ?? 1);
 }
 
+/** A lethal punishment's damage factor (Weight of the Anvil, the Basalt Fist, Shearing Blow): the tier's `punishMult` in
+ *  place of its damageMult, and the body's own. */
+export function punishMult(s: Pick<FinalScope, 'rules' | 'boss'>): number {
+  return s.rules.punishMult * (s.boss.mechanicDamageMult ?? 1);
+}
+
 /** A mechanic's damage roll (the only rng the fight draws). */
 export function roll(s: FinalScope, min: number, max: number, mult = damageMult(s)): number {
   return Math.max(1, Math.round(s.ctx.rng.range(min, max) * mult));

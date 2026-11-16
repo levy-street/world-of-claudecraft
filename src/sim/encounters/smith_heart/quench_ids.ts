@@ -193,6 +193,10 @@ export type QuenchDifficulty = 'normal' | 'heroic' | 'mythic';
 export interface QuenchDifficultyRules {
   /** Every mechanic's damage, on top of the claim's own multiplier. */
   damageMult: number;
+  /** The boss's own swing (its weapon, so its swing cleave too) against the
+   *  template's, set at the pull (tier_swing.ts). The template swing is one
+   *  for every tier, so each tier's raise lives here (the pass of 2026-11-16). */
+  swingMult: number;
   /** The boss's health pool against the template's, set at the pull
    *  (tier_health.ts). */
   healthMult: number;
@@ -227,9 +231,14 @@ export interface QuenchDifficultyRules {
 
 export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficultyRules>> = {
   normal: {
-    damageMult: 1,
+    // The parse-calibrated pass of 2026-11-16: the bot raid took about 73
+    // damage a second here against 165 to 190 on every other Normal fight,
+    // so her swing, Quenching Breath, Crossing Blade and Freezing Water hit
+    // 2.5 times as hard (was 1); the shatter only +15 percent (2.5 x 0.46).
+    damageMult: 2.5,
+    swingMult: 2.5,
     healthMult: 1,
-    shatterMult: 1,
+    shatterMult: 0.46,
     splashR: 6,
     splashCold: 35,
     slashMarksLake: 1,
@@ -245,11 +254,15 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
   },
   // Contagious cold: a shatter splashes further and harder.
   heroic: {
-    damageMult: 1.25,
+    // The pass of 2026-11-16: the raid's damage and her swing +25 percent
+    // (1.25 to 1.5625), Shattering Cold where it was (2.5 in all: shatterMult
+    // 2 to 1.6, already what kills most); its pool x2.0 to x2.17.
+    damageMult: 1.5625,
+    swingMult: 1.25,
     // 2.2 to 2.0 with the base raised to 112,000 (the balance pass of
     // 2026-11-12): about 6 to 7 minutes at human pace.
-    healthMult: 2.0,
-    shatterMult: 2,
+    healthMult: 2.17,
+    shatterMult: 1.6,
     splashR: 10,
     splashCold: 55,
     slashMarksLake: 2,
@@ -267,10 +280,12 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
   },
   // Every round one blade, slash after slash from where the last one ended.
   mythic: {
-    damageMult: 1.25,
-    healthMult: 2.0,
+    // Heroic's numbers of 2026-11-16 (the heroic row whole).
+    damageMult: 1.5625,
+    swingMult: 1.25,
+    healthMult: 2.17,
     // Heroic's doubled shatter (never softer than Heroic, 2026-11-12).
-    shatterMult: 2,
+    shatterMult: 1.6,
     splashR: 10,
     splashCold: 55,
     slashMarksLake: 2,

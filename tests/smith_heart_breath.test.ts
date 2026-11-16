@@ -633,11 +633,15 @@ describe('Guardian of the Breath: the swelling storm per tier', () => {
       return hits;
     };
     const [n] = late(false);
-    expect(n).toBeGreaterThanOrEqual(Math.floor(T.swellMin * 4.2) - 1);
-    expect(n).toBeLessThanOrEqual(Math.ceil(T.swellMax * 4.2) + 1);
+    // Each tier's damage factor on top (Normal x1.15, Heroic x1.5625 since
+    // the parse-calibrated pass of 2026-11-16).
+    const nm = BREATH_DIFFICULTY.normal.damageMult;
+    const hm = BREATH_DIFFICULTY.heroic.damageMult;
+    expect(n).toBeGreaterThanOrEqual(Math.floor(T.swellMin * 4.2 * nm) - 1);
+    expect(n).toBeLessThanOrEqual(Math.ceil(T.swellMax * 4.2 * nm) + 1);
     const [h] = late(true);
-    expect(h).toBeGreaterThanOrEqual(Math.floor(T.swellMin * 2.6 * 1.25) - 1);
-    expect(h).toBeLessThanOrEqual(Math.ceil(T.swellMax * 2.6 * 1.25) + 1);
+    expect(h).toBeGreaterThanOrEqual(Math.floor(T.swellMin * 2.6 * hm) - 1);
+    expect(h).toBeLessThanOrEqual(Math.ceil(T.swellMax * 2.6 * hm) + 1);
   });
 });
 

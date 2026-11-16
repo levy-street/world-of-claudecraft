@@ -111,7 +111,7 @@ describe('Stone Thrum: risen pillars ring on the whole raid', () => {
     expect(thrumCues(ev)).toEqual([]);
   });
 
-  it('normal: one risen pillar rings 14 to 16 on every player, every 2 s', () => {
+  it('normal: one risen pillar rings 16 to 18 (14 to 16 at x1.15) on every player, every 2 s', () => {
     const f = pulled(4);
     raise(f, 1);
     ring(f);
@@ -119,8 +119,8 @@ describe('Stone Thrum: risen pillars ring on the whole raid', () => {
     for (const p of f.players) {
       const hits = hitsOf(ev, COUNCIL_NAMES.risenPulse, p.id);
       expect(hits.length, p.name).toBe(1);
-      expect(hits[0]).toBeGreaterThanOrEqual(14);
-      expect(hits[0]).toBeLessThanOrEqual(16);
+      expect(hits[0]).toBeGreaterThanOrEqual(16);
+      expect(hits[0]).toBeLessThanOrEqual(18);
     }
     expect(thrumCues(ev).length).toBe(1);
   });
@@ -136,8 +136,8 @@ describe('Stone Thrum: risen pillars ring on the whole raid', () => {
     for (const p of f.players) {
       const hits = hitsOf(ev, COUNCIL_NAMES.risenPulse, p.id);
       expect(hits.length).toBe(1);
-      expect(hits[0]).toBeGreaterThanOrEqual(14 * 4);
-      expect(hits[0]).toBeLessThanOrEqual(16 * 4);
+      expect(hits[0]).toBeGreaterThanOrEqual(Math.floor(14 * 4 * 1.15));
+      expect(hits[0]).toBeLessThanOrEqual(Math.ceil(16 * 4 * 1.15));
     }
     const cued = new Set(thrumCues(ev).map((e) => (e as { sourceId: number }).sourceId));
     const risen = f.pillars().filter((p) => p.risen);
