@@ -182,6 +182,30 @@ describe('entry crash guard: diagnostic checkpoints', () => {
     expect(diagnostics?.field48).toBeUndefined();
   });
 
+  it('retains the failing prewarm operation when a render snapshot fills the key budget', () => {
+    const snapshot = Object.fromEntries(
+      Array.from({ length: 48 }, (_, index) => [`render${index}`, index]),
+    );
+    stampEntryProbe(1, NOW);
+    stampEntryCheckpoint('prewarm-start', NOW + 1, {
+      ...snapshot,
+      prewarmEntry: 'prepare-zones',
+      prewarmCategory: 'world',
+    });
+    const recovery = planEntryCrashRecovery(localStorage.getItem(ENTRY_PROBE_KEY), NOW + 100);
+    if (!recovery) throw new Error('expected a recovery report');
+    persistEntryRecoveryLog(recovery, NOW + 100);
+    const diagnostics = parseEntryRecoveryLog(
+      localStorage.getItem(ENTRY_RECOVERY_LOG_KEY),
+    )?.diagnostics;
+    expect(diagnostics).toMatchObject({
+      prewarmEntry: 'prepare-zones',
+      prewarmCategory: 'world',
+      render0: 0,
+    });
+    expect(Object.keys(diagnostics ?? {})).toHaveLength(48);
+  });
+
   it('keeps all storage writes fail-soft', () => {
     Object.defineProperty(globalThis, 'localStorage', {
       configurable: true,

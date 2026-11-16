@@ -135,7 +135,14 @@ function isEntryCheckpoint(value: unknown): value is EntryCheckpoint {
 function sanitizeDiagnostics(value: unknown): EntryDiagnostics | undefined {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return undefined;
   const diagnostics: EntryDiagnostics = {};
-  for (const [key, field] of Object.entries(value).slice(0, ENTRY_DIAGNOSTIC_MAX_KEYS)) {
+  // The render snapshot can fill the budget before the caller appends the
+  // operation being warmed. Keep that evidence through both probe and recovery
+  // parsing, without increasing the bounded storage payload.
+  const isOperation = (key: string): boolean => key === 'prewarmEntry' || key === 'prewarmCategory';
+  const fields = Object.entries(value).sort(
+    ([a], [b]) => Number(isOperation(b)) - Number(isOperation(a)),
+  );
+  for (const [key, field] of fields.slice(0, ENTRY_DIAGNOSTIC_MAX_KEYS)) {
     if (!key || key.length > 64) continue;
     if (typeof field === 'string') {
       diagnostics[key] = field.slice(0, ENTRY_DIAGNOSTIC_STRING_MAX);
