@@ -6730,12 +6730,12 @@ export class Renderer {
             sleep(budgetMs).then(() => 'timeout' as const),
           ]);
           if (outcome === 'timeout') compileTimedOut = true;
-          // Deferred mode: the units above settled on three's unconditional
-          // true while their links still queue in the GPU process. One fence
-          // behind them all lands that backlog here, under the cover, never on
-          // the first live frame (link_fence_proof.ts).
+          // Deferred mode: the units settled on three's unconditional true while their
+          // links still queue in the GPU process. One fence behind them all lands that
+          // backlog under the cover, bounded like the race above (link_fence_proof.ts).
           if (this.linkGateMode === 'deferred' && !linkFenceDisabled()) {
-            const fence = await awaitLinkFence(this.webgl.getContext());
+            const fenceBudgetMs = Math.max(0, compileAwaitDeadline - performance.now());
+            const fence = await awaitLinkFence(this.webgl.getContext(), undefined, fenceBudgetMs);
             fenceDetail = `;fence=${fence.proved ? 'proved' : 'unproved'}:${roundMs(fence.waitedMs)}`;
           }
           compileMs = roundMs(performance.now() - compileStart);

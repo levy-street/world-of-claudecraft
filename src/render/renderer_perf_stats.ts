@@ -183,7 +183,7 @@ export interface RendererPerfStats {
     links: number;
     waits: number;
     /** Deferred mode's link proof (link_fence_proof.ts). */
-    fence?: { fences: number; proved: number; unproved: number; maxWaitMs: number };
+    fence?: { fences: number; proved: number; unproved: number; slow: number; maxWaitMs: number };
   };
   castVfx: CastVfxReadinessSnapshot;
   entryDetailHorizon: EntryDetailHorizonSnapshot;

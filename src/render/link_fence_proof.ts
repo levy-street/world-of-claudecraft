@@ -16,9 +16,18 @@
 // a non-blocking client-side query (WebGL updates it between tasks), polled
 // from a timer, never from the draw path.
 //
-// Fail-soft: a context without fences (WebGL1, a stub), a lost context, or a
-// fence that never signals within LINK_FENCE_MAX_MS resolves unproved, which
-// is exactly the behaviour before this proof existed.
+// Fail-soft: a context without fences (WebGL1, a stub) resolves unproved at
+// once, which is exactly the behaviour before this proof existed, and a lost
+// context resolves unproved (linkAcrossContextLoss links again on the live one).
+//
+// A gate's fence has NO time limit. An unproved answer would let the gate's
+// settle record programs as linked that nobody proved, and the first draw or
+// uniform read of one still queued would block the frame behind the whole
+// backlog; and src/render/CLAUDE.md forbids a tuned timer inside a gate: a hold
+// ends on evidence (the signal), a context loss, or the gate's own watchdog.
+// Only a caller with its own deadline passes `maxMs` (the loading screen's one
+// fence, bounded by what is left of its compile budget). A fence still pending
+// at LINK_FENCE_SLOW_MS is counted once as slow, for the readouts.
 
 export const GL_SYNC_GPU_COMMANDS_COMPLETE = 0x9117;
 export const GL_SYNC_STATUS = 0x9114;
@@ -26,9 +35,9 @@ export const GL_SIGNALED = 0x9119;
 
 /** First poll delay, and the spacing of every later poll. */
 export const LINK_FENCE_POLL_MS = 8;
-/** Give up waiting and resolve unproved (a wedged driver must not park a
- *  gate forever; the gate's own watchdog is the backstop past this). */
-export const LINK_FENCE_MAX_MS = 4000;
+/** A fence still pending this long counts once as slow (telemetry only: it
+ *  ends nothing). */
+export const LINK_FENCE_SLOW_MS = 4000;
 
 /** The slice of a WebGL2 context the proof needs. */
 export interface LinkFenceGl {
@@ -55,13 +64,14 @@ export interface LinkFenceResult {
   waitedMs: number;
 }
 
-const stats = { fences: 0, proved: 0, unproved: 0, maxWaitMs: 0 };
+const stats = { fences: 0, proved: 0, unproved: 0, slow: 0, maxWaitMs: 0 };
 
 /** Counters for perfStats (renderer_perf_stats.ts linkGate.fence). */
 export function linkFenceStats(): {
   fences: number;
   proved: number;
   unproved: number;
+  slow: number;
   maxWaitMs: number;
 } {
   return { ...stats, maxWaitMs: Math.round(stats.maxWaitMs) };
@@ -72,6 +82,7 @@ export function resetLinkFenceStatsForTests(): void {
   stats.fences = 0;
   stats.proved = 0;
   stats.unproved = 0;
+  stats.slow = 0;
   stats.maxWaitMs = 0;
 }
 
@@ -85,11 +96,14 @@ function finish(result: LinkFenceResult): LinkFenceResult {
 /**
  * Issue a fence behind everything submitted so far and resolve once it
  * signals. Call it synchronously right after the compile is issued, so the
- * fence lands directly behind that compile's links.
+ * fence lands directly behind that compile's links. Without `maxMs` it waits
+ * for the signal (or a context loss) however long that takes; with it, it
+ * resolves unproved once `maxMs` has passed.
  */
 export function awaitLinkFence(
   gl: LinkFenceGl | null | undefined,
   scheduler: LinkFenceScheduler = defaultScheduler,
+  maxMs: number = Number.POSITIVE_INFINITY,
 ): Promise<LinkFenceResult> {
   if (!gl || typeof gl.fenceSync !== 'function' || typeof gl.getSyncParameter !== 'function') {
     return Promise.resolve({ proved: false, waitedMs: 0 });
@@ -114,6 +128,7 @@ export function awaitLinkFence(
       // a context on its way out: nothing to free
     }
   };
+  let countedSlow = false;
   return new Promise((resolve) => {
     const poll = (): void => {
       const waitedMs = scheduler.now() - start;
@@ -135,7 +150,11 @@ export function awaitLinkFence(
         resolve(finish({ proved: true, waitedMs }));
         return;
       }
-      if (waitedMs >= LINK_FENCE_MAX_MS) {
+      if (!countedSlow && waitedMs >= LINK_FENCE_SLOW_MS) {
+        countedSlow = true;
+        stats.slow++;
+      }
+      if (waitedMs >= maxMs) {
         release();
         resolve(finish({ proved: false, waitedMs }));
         return;

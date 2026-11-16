@@ -17,7 +17,11 @@ import {
   setCompileArmObserver,
   underRenderTarget,
 } from '../src/render/compile_arms';
-import { GL_SIGNALED, LINK_FENCE_POLL_MS } from '../src/render/link_fence_proof';
+import {
+  GL_SIGNALED,
+  LINK_FENCE_POLL_MS,
+  LINK_FENCE_SLOW_MS,
+} from '../src/render/link_fence_proof';
 import { armLinkPacing, linkPacingStats } from '../src/render/link_slot_pacer';
 
 interface Stub {
@@ -384,6 +388,25 @@ describe('deferred-mode link proof', () => {
       'target:live',
       'fence',
     ]);
+    expect(done).toBe(false);
+    signal();
+    await vi.advanceTimersByTimeAsync(LINK_FENCE_POLL_MS);
+    expect(done).toBe(true);
+  });
+
+  it('a fence that takes longer than the slow mark still holds the link unsettled', async () => {
+    // The old 4 s cap settled the arm unproved, so the gate's settle recorded
+    // the programs as linked while they could still be queued.
+    vi.useFakeTimers();
+    const s = stub({ offscreen: false });
+    const signal = withFence(s);
+    setCompileArmLinkPacing(true, {});
+    armLinkPacing();
+    let done = false;
+    void linkColorPrograms(s.host, meshRoot().root, false).then(() => {
+      done = true;
+    });
+    await vi.advanceTimersByTimeAsync(LINK_FENCE_SLOW_MS * 2);
     expect(done).toBe(false);
     signal();
     await vi.advanceTimersByTimeAsync(LINK_FENCE_POLL_MS);

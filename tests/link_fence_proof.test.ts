@@ -3,8 +3,8 @@ import {
   awaitLinkFence,
   GL_SIGNALED,
   GL_SYNC_STATUS,
-  LINK_FENCE_MAX_MS,
   LINK_FENCE_POLL_MS,
+  LINK_FENCE_SLOW_MS,
   type LinkFenceGl,
   type LinkFenceScheduler,
   linkFenceStats,
@@ -104,19 +104,39 @@ describe('link fence proof', () => {
     expect(f.log).toContain('status');
   });
 
-  it('gives up unproved past the cap instead of parking forever', async () => {
+  it('a gate fence never gives up: it waits past the slow mark for the signal', async () => {
+    // An unproved answer would let the gate record programs as linked that are
+    // still queued; a gate's hold ends on evidence or its own watchdog.
     const c = clock();
     const f = fenceGl();
     let result: { proved: boolean } | null = null;
     void awaitLinkFence(f.gl, c.scheduler).then((r) => {
       result = r;
     });
-    await c.advance(LINK_FENCE_MAX_MS - LINK_FENCE_POLL_MS);
+    await c.advance(LINK_FENCE_SLOW_MS * 3);
+    expect(result).toBeNull();
+    expect(f.log).not.toContain('delete');
+    // counted once as slow, for the readouts
+    expect(linkFenceStats()).toMatchObject({ slow: 1, unproved: 0, proved: 0 });
+    f.signal();
+    await c.advance(LINK_FENCE_POLL_MS);
+    expect(result).toMatchObject({ proved: true });
+    expect(linkFenceStats()).toMatchObject({ slow: 1, proved: 1 });
+  });
+
+  it('with a caller deadline it resolves unproved at that deadline and frees the fence', async () => {
+    const c = clock();
+    const f = fenceGl();
+    let result: { proved: boolean } | null = null;
+    void awaitLinkFence(f.gl, c.scheduler, 100).then((r) => {
+      result = r;
+    });
+    await c.advance(100 - LINK_FENCE_POLL_MS);
     expect(result).toBeNull();
     await c.advance(LINK_FENCE_POLL_MS * 2);
     expect(result).toMatchObject({ proved: false });
     expect(f.log.at(-1)).toBe('delete');
-    expect(linkFenceStats().unproved).toBe(1);
+    expect(linkFenceStats()).toMatchObject({ unproved: 1, slow: 0 });
   });
 
   it('resolves unproved at once without fences (WebGL1, a stub)', async () => {
