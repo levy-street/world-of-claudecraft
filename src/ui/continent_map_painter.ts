@@ -32,9 +32,11 @@ import { buildLandMaskCanvas } from './continent_land_mask';
 import {
   buildContinentMapModel,
   CONTINENT_FALLBACK_ASPECT,
+  type ContinentDungeonMarker,
   type ContinentMapModel,
   type ContinentRect,
   type ContinentZoneRegion,
+  continentDungeonAt,
 } from './continent_map_view';
 import { zoneDisplayName } from './entity_i18n';
 import type { FerryPortMapMarker } from './ferry_port_map_core';
@@ -82,6 +84,14 @@ const FERRY_PORT_MARKER_SIZE = 18;
 // smaller, so the overview reads as the same mark without crowding the labels.
 const WORLD_QUEST_EMBLEM_RADIUS = 8;
 const WORLD_QUEST_EMBLEM_LINE_WIDTH = 1.5;
+// Dungeon entrances: the zone map's gate art at its minimap size (18px, the zone
+// map draws 20), with the zone map's purple dot as the fallback before it loads.
+const DUNGEON_ICON_SIZE = 18;
+const DUNGEON_DOT_RADIUS = 4.5;
+const DUNGEON_DOT_LINE_WIDTH = 1.5;
+// Hover reach around a gate, in canvas pixels (mouse, and a wider touch tap).
+const DUNGEON_HIT_RADIUS = 11;
+const DUNGEON_TOUCH_HIT_RADIUS = 20;
 
 // The --color-map-* design tokens the painter resolves once per redraw. The
 // label/outline/player group is shared with the per-zone map painter; the ocean
@@ -96,6 +106,7 @@ const CONTINENT_COLOR_TOKENS = {
   worldQuestAvailable: '--color-map-world-quest-available',
   questBadgeFill: '--color-map-quest-badge-fill',
   questBadgeText: '--color-map-quest-badge-text',
+  portalDot: '--color-map-portal-dot',
   partyDead: '--color-map-party-dead',
   regionHoverFill: '--color-map-region-hover-fill',
   regionCurrentFill: '--color-map-region-current-fill',
@@ -111,6 +122,8 @@ export interface ContinentPaintOptions {
   canvasSize: number;
   /** The zone id under the cursor, or null (drives the hover highlight). */
   hoveredZoneId: string | null;
+  /** The map rail's Dungeons layer; absent reads as on. */
+  showDungeons?: boolean;
 }
 
 export interface ContinentPaintResult {
@@ -142,11 +155,23 @@ export class ContinentMapPainter {
   // WASH_CACHE_LIMIT, which is above the two a single frame can ask for (the
   // current zone and the hovered one) so neither evicts the other.
   private readonly washes = new Map<string, HTMLCanvasElement>();
+  /** The last redraw's dungeon gates, for the map window's hover (dungeonAt). */
+  private dungeons: readonly ContinentDungeonMarker[] = [];
 
   /** classColor resolves a party member's class to its display color (issue
    *  2652), the same resolver Hud threads into MinimapPainter / DelveMapPainter
    *  / MapWindowPainter, so a member reads as the same color on every surface. */
-  constructor(private readonly classColor: (cls: string) => string) {}
+  constructor(
+    private readonly classColor: (cls: string) => string,
+    /** The shared map-marker art (map_marker_icon_loader.ts); null until it decodes. */
+    private readonly dungeonSprite: () => CanvasImageSource | null = () => null,
+  ) {}
+
+  /** The dungeon gate under a canvas-pixel point on the last redraw, or null. */
+  dungeonAt(mx: number, my: number, touch = false): string | null {
+    const radius = touch ? DUNGEON_TOUCH_HIT_RADIUS : DUNGEON_HIT_RADIUS;
+    return continentDungeonAt(this.dungeons, mx, my, radius);
+  }
 
   private ensureArt(): void {
     if (this.artState !== 'idle') return;
@@ -264,7 +289,9 @@ export class ContinentMapPainter {
       canvasSize: opts.canvasSize,
       contentAspect,
       hoveredZoneId: opts.hoveredZoneId,
+      showDungeons: opts.showDungeons,
     });
+    this.dungeons = model.dungeons;
     const colors = this.resolveColors();
     this.draw(ctx, model, opts.canvasSize, colors);
     return { regions: model.regions, ports: model.ports, worldQuests: model.worldQuests };
@@ -320,6 +347,25 @@ export class ContinentMapPainter {
 
     for (const port of model.ports) {
       drawFerryPortMapMarker(ctx, port, FERRY_PORT_MARKER_SIZE, colors.player, colors.outline);
+    }
+
+    // Dungeon entrances, under the world quests so an emblem on a door stays on top.
+    if (model.dungeons.length > 0) {
+      const sprite = this.dungeonSprite();
+      const half = DUNGEON_ICON_SIZE / 2;
+      ctx.fillStyle = colors.portalDot;
+      ctx.strokeStyle = colors.outline;
+      ctx.lineWidth = DUNGEON_DOT_LINE_WIDTH;
+      for (const door of model.dungeons) {
+        if (sprite) {
+          ctx.drawImage(sprite, Math.round(door.mx - half), Math.round(door.my - half));
+          continue;
+        }
+        ctx.beginPath();
+        ctx.arc(door.mx, door.my, DUNGEON_DOT_RADIUS, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+      }
     }
 
     // World quests: the zone map's emblem, a little smaller, over the labels so

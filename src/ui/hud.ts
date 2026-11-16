@@ -744,7 +744,6 @@ import {
   defaultMapLevel,
   type MapLevel,
   mapLevelToggleKey,
-  mapLevelUp,
   nextMapLevel,
   remoteInstanceAnchor,
   resolveMapSurface,
@@ -3097,25 +3096,23 @@ export class Hud {
     // Level-aware click, right-click and world-map hover (continent_map_input_wiring.ts).
     bindContinentMapInput({
       canvas: mapCanvas,
+      markers: this.mapMarkerInteraction,
+      tooltips: this.mapMarkerTooltipContent,
+      continent: this.continentPainter,
+      world: () => this.sim,
       level: () => this.mapLevel,
+      setLevel: (level) => this.setMapLevel(level),
       isMobileLayout: () => this.isMobileLayout(),
       regions: () => this.continentRegions,
       hoverZone: () => this.mapHoverZone,
       setHoverZone: (zoneId) => {
-        this.mapHoverZone = zoneId; // repaint the highlight (+ cursor via updateMapWindow)
-        this.updateMapWindow();
+        this.mapHoverZone = zoneId;
       },
+      repaint: () => this.updateMapWindow(),
       showMarkerTip: (x, y, touch) => showMapTipAt(x, y, touch),
       hideMarkerTip: hideMapAreaTip,
-      worldQuestAt: (x, y) => this.mapMarkerInteraction.worldQuestAt(mapCanvas, x, y),
-      selectWorldQuestAt: (x, y) => {
-        if (this.mapMarkerInteraction.selectWorldQuestAt(mapCanvas, x, y)) this.updateMapWindow();
-      },
-      zoneTooltip: (zoneId) =>
-        this.mapMarkerTooltipContent.continentZone(zoneId, this.continentRegions),
       paintTooltip: (html, x, y) => this.paintTooltipAt(html, x, y),
       hideTooltip: () => this.hideTooltip(),
-      levelUp: () => this.mapLevelUp(),
       openZone: (zoneId) => this.openZoneFromContinent(zoneId),
       focusWorldQuest: (questId) => this.focusWorldQuestOnMap(questId),
     });
@@ -4896,7 +4893,9 @@ export class Hud {
   // Continent overview painter (the world map's "zoom out to the whole world"
   // level). Loads the painted world_overview plate once; redraws from the
   // mediumHud band like the per-zone map. classCss colors its party dots too.
-  private readonly continentPainter = new ContinentMapPainter(classCss);
+  private readonly continentPainter = new ContinentMapPainter(classCss, () =>
+    this.mapMarkerArt.sprite('dungeon-entrance', 'minimapDungeon'),
+  );
   // The aura strips are the keyed-pool aura painter, two instances of the
   // auras_view core + AurasPainter: the player buff bar (#buff-bar, mode
   // 'all') and the target strip (#tf-debuffs, mode 'all' too: a target's buffs AND
@@ -10278,14 +10277,6 @@ export class Hud {
     this.setMapLevel(nextMapLevel(mode, this.mapLevel, remoteInstanceAnchor(this.sim) !== null));
   }
 
-  // Right-click on the map canvas: climb one level, never wrap (map_surface_core).
-  private mapLevelUp(): void {
-    const mode = mapWindowMode(this.sim);
-    const surface = resolveMapSurface(mode, this.mapLevel, remoteInstanceAnchor(this.sim) !== null);
-    const next = mapLevelUp(surface);
-    if (next) this.setMapLevel(next);
-  }
-
   // Show a world quest on its zone map with it selected: the rail's row click
   // and the world map's emblem click. Never teleports; reuses the zone override.
   private focusWorldQuestOnMap(questId: string): void {
@@ -10462,6 +10453,7 @@ export class Hud {
       const result = this.continentPainter.paintContinent(ctx, this.sim, {
         canvasSize: S,
         hoveredZoneId: this.mapHoverZone,
+        showDungeons: this.mapSidebar.filterState().dungeons,
       });
       this.continentRegions = result.regions;
       this.mapMarkerInteraction.setContinentPorts(result.ports, result.worldQuests);

@@ -19,6 +19,7 @@
 
 import { GLIDER_NPC_DEF } from '../sim/content/world_quest_glider';
 import {
+  activeOverworldDungeons,
   STRIP_MAX_X,
   STRIP_MIN_X,
   WORLD_MAX_X,
@@ -32,6 +33,7 @@ import {
 import { playerActiveWorldQuests } from '../sim/world_quest_reroll';
 import type { IWorld } from '../world_api';
 import { FERRY_PORTS, type FerryPortMapMarker } from './ferry_port_map_core';
+import { overworldDungeonPortals } from './map_dungeon_portals';
 import type { MapWorldQuestMarker } from './map_window_view';
 import { worldQuestReadsActive, worldQuestReadsCompleted } from './world_quest_progress_state';
 
@@ -73,6 +75,16 @@ export interface ContinentPartyMarker {
   dead: boolean;
 }
 
+/** A dungeon entrance on the continent overview: the same overworld doors the
+ *  zone map pins (map_dungeon_portals.ts), identity only. The name is not drawn
+ *  at this scale (the zone labels already fill the cells); hovering one shows
+ *  it (continentDungeonAt + the map window's tooltip). */
+export interface ContinentDungeonMarker {
+  dungeonId: string;
+  mx: number;
+  my: number;
+}
+
 /** Everything the painter draws for one continent-overview frame, all in
  *  canvas-pixel space and derived purely from the world layout + the player. */
 export interface ContinentMapModel {
@@ -92,6 +104,8 @@ export interface ContinentMapModel {
    *  the reward tooltip resolve exactly as they do there. Completed quests and
    *  quests above the player's level are left out, as on the zone map. */
   worldQuests: MapWorldQuestMarker[];
+  /** Every overworld dungeon entrance, or none when the map's Dungeons layer is off. */
+  dungeons: ContinentDungeonMarker[];
   /** The zone id the player currently stands in (the on-canvas subtitle). */
   currentZoneId: string;
   hill: { mx: number; my: number; phase: 'warning' | 'active' } | null;
@@ -109,6 +123,8 @@ export interface ContinentMapInput {
   contentAspect: number;
   /** The zone id under the cursor (hover), or null. */
   hoveredZoneId: string | null;
+  /** The map rail's Dungeons layer; absent reads as on. */
+  showDungeons?: boolean;
 }
 
 /** Aspect (width / height) used to lay out the regions when no art has decoded
@@ -236,9 +252,37 @@ export function buildContinentMapModel(input: ContinentMapInput): ContinentMapMo
     party,
     ports,
     worldQuests,
+    dungeons:
+      input.showDungeons === false
+        ? []
+        : overworldDungeonPortals(
+            activeOverworldDungeons(),
+            Number.NEGATIVE_INFINITY,
+            Number.POSITIVE_INFINITY,
+          )
+            .filter((door) => inWorld(door.x, door.z))
+            .map((door) => ({ dungeonId: door.id, ...toMap(door.x, door.z) })),
     currentZoneId,
     hill: hill && inWorld(hill.x, hill.z) ? { ...toMap(hill.x, hill.z), phase: hill.phase } : null,
   };
+}
+
+/** The dungeon entrance nearest the canvas point within `radius` px, or null. */
+export function continentDungeonAt(
+  dungeons: readonly ContinentDungeonMarker[],
+  mx: number,
+  my: number,
+  radius: number,
+): string | null {
+  let best: string | null = null;
+  let bestD2 = radius * radius;
+  for (const door of dungeons) {
+    const d2 = (door.mx - mx) ** 2 + (door.my - my) ** 2;
+    if (d2 > bestD2) continue;
+    bestD2 = d2;
+    best = door.dungeonId;
+  }
+  return best;
 }
 
 /** The zone id whose region rect contains the canvas point, or null (the zones

@@ -8,7 +8,7 @@ import type { QuestObjectiveRef } from '../../../sim/quest_targets';
 import { type ItemDef, questObjectiveRequired } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
 import type { ContinentZoneRegion } from '../../continent_map_view';
-import { tEntity, zoneDisplayName } from '../../entity_i18n';
+import { dungeonDisplayName, tEntity, zoneDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { ferryPortSummary, ferryPortTooltipHtml } from '../../ferry_port_map_core';
 import { gatherNodeTooltipHtml } from '../../gather_node_tooltip_controller';
@@ -113,6 +113,12 @@ export class MapMarkerTooltipContent {
   // what tells the four sites apart. Same shape as service() above.
   farm(_marker: MapFarmPatchMarker): string {
     return `<div class="tt-title">${esc(t('worldContent.farmPatchName'))}</div>`;
+  }
+
+  // Tooltip body for a hovered dungeon gate on the continent overview: its
+  // localized name, with the map legend's "Dungeon" under it.
+  continentDungeon(dungeonId: string): string {
+    return `<div class="tt-title">${esc(dungeonDisplayName(dungeonId))}</div><div class="tt-sub">${esc(t('hudChrome.mapAtlas.legend.dungeon'))}</div>`;
   }
 
   // Tooltip body for a hovered zone region on the continent overview: the zone's

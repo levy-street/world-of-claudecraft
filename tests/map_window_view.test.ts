@@ -772,11 +772,10 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     ]);
   });
 
-  it('plots guild members only: friend-list entries get no dot (zoomed in)', () => {
-    // FriendA is on the friend list AND in the guild, so it still shows, as guild.
+  it('plots no friend-list or guild players, only the party (zoomed in)', () => {
+    // The fixture has an online friend and two online guildmates in the zone.
     const model = buildOverworldMapModel(input(makeOverworldWorld('sim'), LABELS_ZOOM));
-    expect(model.allies.map((a) => a.kind)).toEqual(['guild', 'guild']);
-    expect(model.allies.map((a) => a.name)).toEqual(['FriendA', 'GuildB']);
+    expect(model.allies).toEqual([]);
   });
 
   it('is empty solo / with no party formed', () => {
