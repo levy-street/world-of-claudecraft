@@ -24838,7 +24838,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.breathGuardian.stormForm':
     'Разорван и обращён в тело из молний: штормовая половина боя, пока Страж Дыхания не падёт.',
   'hudChrome.auraEffect.breathGuardian.swell':
-    'Каждые {every} сек. разрастающаяся буря наносит от {min} до {max} урона всем на Карнизе, на {growth}% больше за каждый предыдущий импульс: уже {stacks}. Героический и мифический режимы: от {heroicMin} до {heroicMax} урона.',
+    'Каждые {every} сек. разрастающаяся буря наносит от {min} до {max} урона всем на Карнизе, на {growth}% больше за каждый предыдущий импульс: уже {stacks}. Героический и мифический режимы: от {heroicMin} до {heroicMax} урона, на {heroicGrowth}% больше за каждый предыдущий импульс.',
   'hudChrome.auraEffect.breathGuardian.bulwark': 'Щит ветра поглотит ещё {left} урона. Пока жив хоть один Часовой шквала или Целитель шквала на парящих островах, он восстанавливает {regrow}% своей прочности в секунду, а каждый Целящий шквал возвращает {mend}%. Летите по Пути шквала на острова и сразите их. Если щит продержится {max} сек., он взорвётся над Карнизом, нанеся от {bmin} до {bmax} урона. Героический и мифический режимы: от {heroicMin} до {heroicMax} урона.',
   'hudChrome.auraEffect.breathGuardian.riding': 'Ветер несёт вас над пустотой по заданному пути: вы не можете действовать, пока он вас не опустит.',
   'hudChrome.auraEffect.breathGuardian.windworn': 'Измотан ветром: пока эффект не закончится, Путь шквала не перенесёт вас на острова.',
@@ -26564,4 +26564,17 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finalBoss.say.slay_c': 'Ещё одно тепло запечатано.',
   'hudChrome.finalBoss.say.wipe': 'Запечатано. Тихо. Как он и хотел.',
   'hudChrome.finalBoss.say.death': 'Рука... так и не вернулась. Один уголёк ещё горит... Возьмите его и дайте горе уснуть.',
+  // The Smith's Heart tank swaps (quench_temper.ts, breath_blow.ts).
+  "abilityUi.cast.heart_breath_bellows_blow": "Удар мехов",
+  "abilityUi.cast.heart_breath_thunder_lash": "Громовой хлыст",
+  "hudChrome.auraEffect.breathGuardian.blown": "Отброшен Ударом мехов: вы не можете двигаться, пока не приземлитесь.",
+  "hudChrome.auraEffect.breathGuardian.blowMark": "Когда заклинание закончится, Удар мехов поразит вас: от {min} до {max} ед. урона от сил природы, и он отбросит вас на {yards} м прямо прочь от Стража Дыхания. Героический и эпохальный: от {heroicMin} до {heroicMax} ед. урона.",
+  "hudChrome.auraEffect.breathGuardian.blowMarkRuin": "Когда заклинание закончится, Удар мехов поразит вас: от {min} до {max} ед. урона от сил природы, и он сбросит вас с Карниза прямо прочь от Стража Дыхания. Удержать вас может только якорь капитана Тессали. Героический и эпохальный: от {heroicMin} до {heroicMax} ед. урона.",
+  "hudChrome.auraEffect.breathGuardian.battered": "Следующий Удар мехов отбросит вас на {next} м прямо прочь от Стража Дыхания ({stacks} зарядов: каждый отбрасывает дальше). Каждый Удар мехов по вам добавляет заряд и возвращает длительность к {seconds} сек. Меняйтесь танками на {swap} зарядах. На героическом и эпохальном удар на {heroicRuin} зарядах сбрасывает вас с Карниза; на обычном он всегда останавливается у края.",
+  "hudChrome.auraEffect.breathGuardian.thunderLaden": "Получаемый урон от сил природы и другой магии увеличен на {pct}% ({per}% за каждый из {stacks} зарядов). Каждый Громовой хлыст по вам наносит от {min} до {max} ед. урона от сил природы, добавляет заряд и возвращает длительность к {seconds} сек. Начиная с {draw} зарядов, каждая Скачущая молния перескакивает и на вас. Меняйтесь танками на {swap} зарядах. Героический и эпохальный: от {heroicMin} до {heroicMax} ед. урона.",
+  "hudChrome.auraEffect.quenchGuardian.tempered": "Закаляющий удар закалил вас {stacks} раз: ваш холод не опускается ниже {floor}, а получаемый урон от магии льда увеличен на {pct}%. Каждый Закаляющий удар по вам добавляет заряд ({cold} холода и {per}% урона от магии льда за каждый) и возвращает длительность к {seconds} сек. Меняйтесь танками на {swap} зарядах. На героическом и эпохальном {heroicMax} зарядов держат ваш холод на {max}, и вы замерзаете; на обычном не более {normalMax} зарядов ({normalFloor} холода).",
+  "hudChrome.knotAlert.batteredTitle": "Избит ветром x{stacks}: смена танков!",
+  "hudChrome.knotAlert.chargedTitle": "Заряжен громом x{stacks}: смена танков!",
+  "hudChrome.knotAlert.ruinTitle": "Удар мехов сбросит вас с края!",
+  "hudChrome.quenchAlert.temperedTitle": "Закалён инеем x{stacks}: смена танков!",
 };

@@ -23194,7 +23194,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.breathGuardian.stormForm':
     '撕裂為閃電之軀：戰鬥的風暴後半段，直到氣息守護者倒下。',
   'hudChrome.auraEffect.breathGuardian.swell':
-    '每{every}秒，膨脹的風暴對崖台上的所有人造成{min}到{max}點傷害，之前每次脈動使其增強{growth}%：目前已有{stacks}次。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。',
+    '每{every}秒，膨脹的風暴對崖台上的所有人造成{min}到{max}點傷害，之前每次脈動使其增強{growth}%：目前已有{stacks}次。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害，之前每次脈動增強{heroicGrowth}%。',
   'hudChrome.auraEffect.breathGuardian.bulwark':
     '風之護盾還能吸收{left}點傷害。只要浮島上還有任一狂風哨兵或狂風癒者存活，它每秒恢復總量的{regrow}%，每次癒合之風恢復{mend}%。乘狂風之路飛往浮島，消滅它們。維持{max}秒後，它會在崖台上爆裂，造成{bmin}到{bmax}點傷害。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。',
   'hudChrome.auraEffect.breathGuardian.riding':
@@ -24807,4 +24807,22 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finalBoss.say.wipe': '封存了。寂靜了。正如他所願。',
   'hudChrome.finalBoss.say.death':
     '那隻手……再也不會回來了。還有一點餘燼在燃燒……帶上它，讓大山安眠吧。',
+  // The Smith's Heart tank swaps (quench_temper.ts, breath_blow.ts).
+  'abilityUi.cast.heart_breath_bellows_blow': '風箱重擊',
+  'abilityUi.cast.heart_breath_thunder_lash': '雷霆鞭笞',
+  'hudChrome.auraEffect.breathGuardian.blown': '被風箱重擊掀飛：落地之前無法移動。',
+  'hudChrome.auraEffect.breathGuardian.blowMark':
+    '施法結束時風箱重擊命中你：造成{min}到{max}點自然傷害，並將你徑直向遠離氣息守護者的方向掀飛{yards}碼。英雄和史詩難度：{heroicMin}到{heroicMax}點傷害。',
+  'hudChrome.auraEffect.breathGuardian.blowMarkRuin':
+    '施法結束時風箱重擊命中你：造成{min}到{max}點自然傷害，並將你徑直向遠離氣息守護者的方向掀出崖台。只有瑟薩莉隊長的錨定能讓你站穩。英雄和史詩難度：{heroicMin}到{heroicMax}點傷害。',
+  'hudChrome.auraEffect.breathGuardian.battered':
+    '你的下一次風箱重擊會將你徑直向遠離氣息守護者的方向掀飛{next}碼（{stacks}層：每層都讓它掀得更遠）。每次命中你的風箱重擊都會疊加一層，並將持續時間重置為{seconds}秒。達到{swap}層時換坦。英雄和史詩難度下，{heroicRuin}層時的重擊會將你掀出崖台；普通難度下它總會在邊緣前停下。',
+  'hudChrome.auraEffect.breathGuardian.thunderLaden':
+    '你受到的自然及其他魔法傷害提高{pct}%（{stacks}層，每層{per}%）。每次命中你的雷霆鞭笞造成{min}到{max}點自然傷害，疊加一層，並將持續時間重置為{seconds}秒。達到{draw}層起，每道跳躍雷擊也會跳到你身上。達到{swap}層時換坦。英雄和史詩難度：{heroicMin}到{heroicMax}點傷害。',
+  'hudChrome.auraEffect.quenchGuardian.tempered':
+    '淬火打擊已淬鍊你{stacks}次：你的寒意不會低於{floor}，你受到的冰霜傷害提高{pct}%。每次命中你的淬火打擊都會疊加一層（每層{cold}點寒意和{per}%冰霜傷害），並將持續時間重置為{seconds}秒。達到{swap}層時換坦。英雄和史詩難度下，{heroicMax}層會將你的寒意維持在{max}，你會被凍結；普通難度最多{normalMax}層（{normalFloor}點寒意）。',
+  'hudChrome.knotAlert.batteredTitle': '風蝕 x{stacks}：換坦！',
+  'hudChrome.knotAlert.chargedTitle': '雷霆纏身 x{stacks}：換坦！',
+  'hudChrome.knotAlert.ruinTitle': '風箱重擊會把你掀出邊緣！',
+  'hudChrome.quenchAlert.temperedTitle': '霜淬 x{stacks}：換坦！',
 };

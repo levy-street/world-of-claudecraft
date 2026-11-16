@@ -10,6 +10,8 @@
 //             I freeze: the chain, and its bound
 //   huddle    every other player on the lake gathered round me (a ring of
 //             2.5 yd): the huddle's warmth with nobody else at the keys
+//   temper    Tempering Strike tempers me <n> times (default 1): the
+//             Rime-Tempered stacks, their cold floor, the swap alert
 //
 // Zero rng: the shatter's hit is the fight's own roll.
 
@@ -18,6 +20,7 @@ import type { Entity } from '../../types';
 import { chillOf, freezePlayer, shatter } from './quench_cold';
 import { QUENCH_TUNING as T } from './quench_ids';
 import { putMarker, type QuenchScope } from './quench_scope';
+import { temper } from './quench_temper';
 
 /** The stasis Cold Coffin casts (content/classes.ts ice_block): its id,
  *  kind and duration, self-sourced and breakable as the real one is. */
@@ -57,6 +60,16 @@ export function quenchColdDev(
     }
     freezePlayer(s, me);
     return `You freeze with ${k} other(s) at ${Math.round(n)} cold: watch the chain (it stays bounded).`;
+  }
+  if (verb === 'temper') {
+    const n = arg === undefined ? 1 : Number(arg);
+    if (!Number.isInteger(n) || n < 1) return null;
+    let stacks = 0;
+    for (let i = 0; i < n && !me.dead; i++) stacks = temper(s, me);
+    if (chillOf(s, me.id).frozen > 0) return 'The rime takes you: frozen solid, the stacks spent.';
+    return stacks > 0
+      ? `Rime-Tempered x${stacks}: your cold holds at ${Math.min(T.coldMax, stacks * s.rules.temperCold)} or more.`
+      : 'The rime took you: frozen solid.';
   }
   if (verb === 'huddle') {
     const others = s.players.filter((p) => p.id !== me.id && !p.dead);

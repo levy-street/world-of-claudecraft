@@ -2821,6 +2821,29 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   // the crust that drinks healing (a frozen heart, cracking) and its slow.
   heart_quench_rime: r('frost', 'ice', ['heart', { p: 'snowflake', ...BR }], ['crack']),
   heart_quench_rime_slow: r('frost', 'ice', ['snowflake', { p: 'boot', ...BR }], ['motion']),
+  // The tank swaps (quench_temper.ts, breath_blow.ts): Rime-Tempered (a
+  // tempered fist in the frost), Wind-Battered (a shield in the wind),
+  // Thunder-Laden (a bolt on a shield), Bellows Blow's mark and throw.
+  heart_quench_tempered: r('frost', 'ice', ['fist', { p: 'snowflake', ...BR }], ['crack']),
+  heart_breath_wind_battered: r(
+    'storm',
+    'silverWhite',
+    ['shield', { p: 'wing', ...BR }],
+    ['motion'],
+  ),
+  heart_breath_thunder_laden: r(
+    'storm',
+    'shadowPurple',
+    ['shield', { p: 'bolt', ...BR }],
+    ['arcs'],
+  ),
+  heart_breath_blow_mark: r(
+    'storm',
+    'silverWhite',
+    ['wing', { p: 'crosshair', ...BR }],
+    ['motion'],
+  ),
+  heart_breath_blow_thrown: r('storm', 'silverWhite', ['wing', { p: 'boot', ...BR }], ['motion']),
   dgn_crypt_bridal_freeze: r(
     'frost',
     'silverWhite',

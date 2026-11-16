@@ -22674,7 +22674,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.breathGuardian.stormForm':
     '裂けて雷の体となった：息吹の守護者が倒れるまで続く、戦いの嵐の後半。',
   'hudChrome.auraEffect.breathGuardian.swell':
-    '{every}秒ごとに膨れ上がる嵐が岩棚の全員に{min}から{max}のダメージを与え、前の脈動ごとに{growth}%ずつ強くなる：これまでに{stacks}回。ヒロイック・ミシック：{heroicMin}から{heroicMax}のダメージ。',
+    '{every}秒ごとに膨れ上がる嵐が岩棚の全員に{min}から{max}のダメージを与え、前の脈動ごとに{growth}%ずつ強くなる：これまでに{stacks}回。ヒロイック・ミシック：{heroicMin}から{heroicMax}のダメージ、前の脈動ごとに{heroicGrowth}%ずつ強くなる。',
   'hudChrome.auraEffect.breathGuardian.bulwark':
     '風の盾があと{left}のダメージを吸収する。浮島の疾風の哨兵か疾風の癒し手が一体でも生きている間、毎秒その全体の{regrow}%が回復し、癒しの疾風のたびに{mend}%回復する。疾風の道に乗って浮島へ渡り、彼らを倒せ。{max}秒保たれると、岩棚の上で炸裂し{bmin}から{bmax}のダメージを与える。ヒロイック・ミシック：{heroicMin}から{heroicMax}のダメージ。',
   'hudChrome.auraEffect.breathGuardian.riding':
@@ -26132,4 +26132,23 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finalBoss.say.wipe': '封じられた。静まった。あの方の望んだとおりに。',
   'hudChrome.finalBoss.say.death':
     'あの手は……二度と戻らなかった。ひとつの残り火が、まだ燃えている……それを持って行け。そして山を眠らせよ。',
+  // The Smith's Heart tank swaps (quench_temper.ts, breath_blow.ts).
+  'abilityUi.cast.heart_breath_bellows_blow': 'ふいごの一撃',
+  'abilityUi.cast.heart_breath_thunder_lash': '雷の鞭',
+  'hudChrome.auraEffect.breathGuardian.blown':
+    'ふいごの一撃に吹き飛ばされた：着地するまで動けない。',
+  'hudChrome.auraEffect.breathGuardian.blowMark':
+    '詠唱が終わるとふいごの一撃があなたに当たる：{min}～{max}の自然ダメージを受け、息吹の守護者からまっすぐ{yards}ヤード吹き飛ばされる。ヒロイックとミシック：{heroicMin}～{heroicMax}のダメージ。',
+  'hudChrome.auraEffect.breathGuardian.blowMarkRuin':
+    '詠唱が終わるとふいごの一撃があなたに当たる：{min}～{max}の自然ダメージを受け、息吹の守護者からまっすぐ岩棚の外へ吹き飛ばされる。踏みとどまれるのはテサリー隊長の錨だけ。ヒロイックとミシック：{heroicMin}～{heroicMax}のダメージ。',
+  'hudChrome.auraEffect.breathGuardian.battered':
+    '次のふいごの一撃は、あなたを息吹の守護者からまっすぐ{next}ヤード吹き飛ばす（{stacks}スタック：1つごとにさらに遠くへ）。あなたに当たるふいごの一撃ごとに1スタック増え、効果時間が{seconds}秒に戻る。{swap}スタックでタンクを交代しよう。ヒロイックとミシックでは{heroicRuin}スタック時の一撃で岩棚の外へ飛ばされる。ノーマルでは必ず縁の手前で止まる。',
+  'hudChrome.auraEffect.breathGuardian.thunderLaden':
+    '受ける自然ダメージとその他の魔法ダメージが{pct}%増える（{stacks}スタック、1つにつき{per}%）。あなたに当たる雷の鞭ごとに{min}～{max}の自然ダメージを受け、1スタック増え、効果時間が{seconds}秒に戻る。{draw}スタック以上では、跳ねる雷撃がすべてあなたにも跳ぶ。{swap}スタックでタンクを交代しよう。ヒロイックとミシック：{heroicMin}～{heroicMax}のダメージ。',
+  'hudChrome.auraEffect.quenchGuardian.tempered':
+    '焼き入れの一撃に{stacks}回鍛えられた：冷気は{floor}より下がらず、受ける冷気ダメージが{pct}%増える。あなたに当たる焼き入れの一撃ごとに1スタック増え（1つにつき冷気{cold}と冷気ダメージ{per}%）、効果時間が{seconds}秒に戻る。{swap}スタックでタンクを交代しよう。ヒロイックとミシックでは{heroicMax}スタックで冷気が{max}に保たれ、凍りつく。ノーマルは最大{normalMax}スタック（冷気{normalFloor}）。',
+  'hudChrome.knotAlert.batteredTitle': '風に打たれた x{stacks}：タンク交代！',
+  'hudChrome.knotAlert.chargedTitle': '雷を帯びた x{stacks}：タンク交代！',
+  'hudChrome.knotAlert.ruinTitle': 'ふいごの一撃で縁の外へ飛ばされる！',
+  'hudChrome.quenchAlert.temperedTitle': '霧氷の焼き入れ x{stacks}：タンク交代！',
 };

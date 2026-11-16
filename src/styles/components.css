@@ -19282,6 +19282,18 @@
   #heart-quench-alert.is-rime {
     animation: bce-throb 0.9s ease-in-out infinite alternate;
   }
+  /* Rime-Tempered at its swap count (quench_temper.ts): the tank's call to
+     swap, the title in the hostile tone over the cold bar in the frost tone. */
+  #heart-quench-alert.is-tempered {
+    border-color: var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #heart-quench-alert.is-tempered .fa-title {
+    color: var(--color-hostile);
+  }
+  #heart-quench-alert.is-tempered .fa-fill {
+    --bar-color: var(--color-debuff-frost);
+  }
   #heart-quench-alert.is-water {
     border-color: var(--color-mana);
   }
@@ -19479,6 +19491,27 @@
   }
   #heart-knot-alert.is-lip .fa-bar {
     --bar-color: var(--color-debuff-fire);
+  }
+  /* The tank swap (breath_blow.ts): Wind-Battered in the storm's teal,
+     Thunder-Laden in its violet, a ruinous Bellows Blow in the hostile tone;
+     each title in the hostile tone (the tank's call to swap). */
+  #heart-knot-alert.is-charged {
+    border-color: var(--color-debuff-shadow);
+  }
+  #heart-knot-alert.is-charged .fa-bar {
+    --bar-color: var(--color-debuff-shadow);
+  }
+  #heart-knot-alert.is-ruin {
+    border-color: var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #heart-knot-alert.is-ruin .fa-bar {
+    --bar-color: var(--color-hostile);
+  }
+  #heart-knot-alert.is-battered .fa-title,
+  #heart-knot-alert.is-charged .fa-title,
+  #heart-knot-alert.is-ruin .fa-title {
+    color: var(--color-hostile);
   }
   #heart-knot-alert .fa-fill {
     width: 0;

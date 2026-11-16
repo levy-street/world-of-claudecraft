@@ -24,7 +24,9 @@
 //    with their warning), the charged ground (danger), the Thunder's Cradle
 //    (the soak's gold, filling with its hold), the leaping bolt's reach round
 //    its target while its bar runs, the cradle's spot under its target while
-//    its bar runs;
+//    its bar runs, Bellows Blow's throw (a wedge from the tank straight away
+//    from the guardian, its length the throw's, lethal-toned when it goes off
+//    the Cornice) and Thunder Lash's mark while theirs run;
 //  - on players: the anchored a mint ring at their feet, the pinned an arc at
 //    their feet facing the wall, the marked conductor a beacon of lightning
 //    over them, the lifted a crown of storm.
@@ -113,6 +115,11 @@ const SCAN_SEC = 0.1;
 const STORM_BLUE = 0x2f7dff;
 const BEAM_POINTS = 10;
 const T = BREATH_TUNING;
+/** Bellows Blow's wedge (degrees), its longest drawn reach (yards: the
+ *  ruinous throw's reads as the edge it crosses), and Thunder Lash's mark. */
+const BLOW_WEDGE_DEG = 26;
+const BLOW_WEDGE_MAX = 40;
+const BLOW_MARK_R = 2.5;
 
 // ---- shaders ---------------------------------------------------------------------------
 
@@ -1163,9 +1170,23 @@ export class BreathFightFx {
       this.sparksAt(fxAnchor(dst).x, fxAnchor(dst).y + 1.2, fxAnchor(dst).z, 10);
     } else if (ev.ability === BREATH_CUES.anchor && src && dst) {
       this.beam(src, dst, ANCHOR_BEAM_SECONDS, 1.4, C.calm);
-    } else if (ev.ability === BREATH_CUES.toss && dst) {
-      // The shove: its burst, its slide's trail and a light kick (breath_toss_fx.ts).
+    } else if ((ev.ability === BREATH_CUES.toss || ev.ability === BREATH_CUES.blow) && dst) {
+      // The shove: its burst, its slide's trail and a light kick
+      // (breath_toss_fx.ts); Bellows Blow's throw of its tank too.
       this.toss.blow(world, src, dst);
+    } else if (
+      (ev.ability === BREATH_CUES.thunder || ev.ability === BREATH_CUES.thunderDraw) &&
+      dst
+    ) {
+      // Thunder Lash on the tank (from the guardian), a Leaping Bolt drawn on
+      // to a Thunder-Laden player (from the last struck): the fork's beam.
+      this.beam(
+        src ?? dst,
+        dst,
+        FORK_BEAM_SECONDS,
+        src && src.templateId === BREATH_GUARDIAN ? 4.5 : 1.3,
+      );
+      this.sparksAt(fxAnchor(dst).x, fxAnchor(dst).y + 1.2, fxAnchor(dst).z, 10);
     } else if (ev.ability === BREATH_CUES.swell && src) {
       // The storm swells: a ring rolling over the whole Cornice.
       this.particles.shockRing(fxAnchor(src).x, fxAnchor(src).z, 0xbfefff, 46, 1.6);
@@ -1950,12 +1971,19 @@ export class BreathFightFx {
   }
 
   /** The bars' footprints round their target: the leaping bolt's jump reach,
-   *  the cradle's spot, the conductor's mark, while each bar runs. */
+   *  the cradle's spot, the conductor's mark, Thunder Lash's mark, while each
+   *  bar runs; Bellows Blow's throw as a narrow wedge from its tank straight
+   *  away from the guardian, as long as the throw (its mark aura's value),
+   *  in the lethal tone when it will carry the tank off the Cornice. */
   private paintBars(world: IWorld): void {
     const g = this.guardianId >= 0 ? world.entities.get(this.guardianId) : undefined;
     const slot = this.barFans[0];
     const id = g?.castingAbility;
     const target = g && g.castTargetId !== null ? world.entities.get(g.castTargetId) : undefined;
+    let blow: { value?: number; value2?: number } | undefined;
+    if (id === BREATH_CASTS.blow && target)
+      for (const a of target.auras) if (a.id === BREATH_AURAS.blowMark) blow = a;
+    const ruin = (blow?.value2 ?? 0) > 0;
     const r =
       id === BREATH_CASTS.fork
         ? FORK_REACH
@@ -1963,28 +1991,50 @@ export class BreathFightFx {
           ? T.cradleR
           : id === BREATH_CASTS.drawn
             ? T.drawnR
-            : 0;
+            : id === BREATH_CASTS.thunder
+              ? BLOW_MARK_R
+              : id === BREATH_CASTS.blow
+                ? Math.max(BLOW_MARK_R, Math.min(BLOW_WEDGE_MAX, blow?.value ?? 0))
+                : 0;
     if (!g || g.dead || !target || r <= 0) {
       slot.fan.group.visible = false;
       slot.id = -1;
       return;
     }
-    if (slot.template !== id) {
-      slot.template = id ?? '';
+    const look = id === BREATH_CASTS.blow ? `${id}:${ruin ? 1 : 0}` : (id ?? '');
+    if (slot.template !== look) {
+      slot.template = look;
       const color =
-        id === BREATH_CASTS.fork ? C.danger : id === BREATH_CASTS.cradle ? C.soak : C.lethal;
-      this.kit.layOutFan(slot.fan, 360, { color, accent: C.accent });
+        id === BREATH_CASTS.fork
+          ? C.danger
+          : id === BREATH_CASTS.cradle
+            ? C.soak
+            : id === BREATH_CASTS.blow && !ruin
+              ? C.danger
+              : C.lethal;
+      this.kit.layOutFan(slot.fan, id === BREATH_CASTS.blow ? BLOW_WEDGE_DEG : 360, {
+        color,
+        accent: C.accent,
+      });
       if (this.barPaint)
         this.paints.setLook(
           this.barPaint,
-          id === BREATH_CASTS.fork ? 'fork' : id === BREATH_CASTS.cradle ? 'cradle' : 'drawnBar',
+          id === BREATH_CASTS.fork
+            ? 'fork'
+            : id === BREATH_CASTS.cradle
+              ? 'cradle'
+              : id === BREATH_CASTS.blow
+                ? 'gale'
+                : 'drawnBar',
         );
     }
     slot.fan.group.visible = true;
     const fill = g.castTotal > 0 ? Math.max(0, Math.min(1, 1 - g.castRemaining / g.castTotal)) : 1;
     const targetAt = fxAnchor(target);
     const y = this.groundY(targetAt.x, targetAt.z);
-    this.kit.drapeFan(slot.fan, this.groundY, targetAt.x, y, targetAt.z, 0, r);
+    const yaw =
+      id === BREATH_CASTS.blow ? Math.atan2(targetAt.x - g.pos.x, targetAt.z - g.pos.z) : 0;
+    this.kit.drapeFan(slot.fan, this.groundY, targetAt.x, y, targetAt.z, yaw, r);
     this.kit.paintFan(slot.fan, { fill, clock: this.clock, range: r });
   }
 

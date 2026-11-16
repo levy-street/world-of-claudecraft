@@ -4785,8 +4785,13 @@ export const ko_KR: EnTranslations = {
         "windworn": "바람에 지쳤습니다: 이 효과가 끝날 때까지 질풍의 길이 당신을 섬으로 데려가지 않습니다.",
         "thrown": "정상의 포효에 날아갔습니다: 착지할 때까지 움직일 수 없습니다.",
         "tossed": "떠도는 돌풍에 날아갔습니다: 돌풍이 내려놓을 때까지 움직일 수 없습니다.",
+        "blown": "풀무 강타에 날아갔습니다: 착지할 때까지 움직일 수 없습니다.",
+        "blowMark": "시전이 끝나면 풀무 강타가 당신을 강타합니다: {min}~{max}의 자연 피해를 입고 숨결의 수호자 반대 방향으로 곧장 {yards}야드 날아갑니다. 영웅 및 신화: {heroicMin}~{heroicMax}의 피해.",
+        "blowMarkRuin": "시전이 끝나면 풀무 강타가 당신을 강타합니다: {min}~{max}의 자연 피해를 입고 숨결의 수호자 반대 방향으로 곧장 벼랑 밖으로 날아갑니다. 테살리 대장의 닻만이 당신을 붙잡아 줍니다. 영웅 및 신화: {heroicMin}~{heroicMax}의 피해.",
+        "battered": "다음 풀무 강타는 당신을 숨결의 수호자 반대 방향으로 곧장 {next}야드 날려 보냅니다({stacks}중첩: 중첩마다 더 멀리). 당신을 맞히는 풀무 강타마다 1중첩이 쌓이고 지속시간이 {seconds}초로 초기화됩니다. {swap}중첩에서 탱커를 교대하세요. 영웅 및 신화에서는 {heroicRuin}중첩일 때의 강타가 당신을 벼랑 밖으로 날려 보냅니다. 일반에서는 항상 가장자리 앞에서 멈춥니다.",
+        "thunderLaden": "받는 자연 피해와 기타 마법 피해가 {pct}% 증가합니다({stacks}중첩, 중첩당 {per}%). 당신을 맞히는 천둥 채찍마다 {min}~{max}의 자연 피해를 입고 1중첩이 쌓이며 지속시간이 {seconds}초로 초기화됩니다. {draw}중첩부터는 모든 튀어 오르는 번개가 당신에게도 튑니다. {swap}중첩에서 탱커를 교대하세요. 영웅 및 신화: {heroicMin}~{heroicMax}의 피해.",
         "stormForm": "찢어져 번개의 몸이 되었습니다: 숨결의 수호자가 쓰러질 때까지 이어지는 전투의 폭풍 후반부.",
-        "swell": "{every}초마다 부풀어 오르는 폭풍이 벼랑 위의 모두에게 {min}~{max}의 피해를 주며, 앞선 맥동마다 {growth}%씩 강해집니다: 지금까지 {stacks}번. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해."
+        "swell": "{every}초마다 부풀어 오르는 폭풍이 벼랑 위의 모두에게 {min}~{max}의 피해를 주며, 앞선 맥동마다 {growth}%씩 강해집니다: 지금까지 {stacks}번. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해, 앞선 맥동마다 {heroicGrowth}%씩 강해집니다."
       },
       "quenchGuardian": {
         "intro": "호수의 얼음 아래 얼어붙어 있습니다: 그녀가 얼음을 깨고 나올 때까지 그녀를 공격하거나 피해를 줄 수 없습니다.",
@@ -4801,7 +4806,8 @@ export const ko_KR: EnTranslations = {
         "deepening": "호수의 냉기가 {total}% 더 빠르게 오릅니다: 검이 깨어난 뒤 {every}초마다 {step}%씩(지금까지 {stacks}회).",
         "rime": "살아 있는 서리가 다음에 받는 치유를 {left}만큼 흡수합니다(전체 {whole}). 남아 있는 동안 이동 속도가 {slow}% 느려지고 냉기가 {normalMult}배(영웅과 신화에서는 {heroicMult}배) 빠르게 오르니 무리에서 벗어나십시오. {seconds}초 안에 치유로 깨뜨리면 사라집니다. 깨뜨리지 못하면 즉시 서리에 갇히고, {radius}미터 안의 모두에게 냉기가 터져 냉기 {cold}을 더합니다(영웅과 신화에서는 {heroicCold}). 일반: 1명에게 {normalAbsorb}. 영웅: {heroicTargets}명에게 {heroicAbsorb}, 터지면 가장 가까운 다른 플레이어에게 새 서리가 옮겨 갑니다. 신화: 영웅과 같으며 {mythicTargets}명.",
         "rimePool": "살아 있는 서리: 깨뜨리려면 최대 생명력의 {pct}%만큼 치유가 더 필요합니다. 걸린 뒤 {seconds}초 안에 깨지 못하면 서리에 갇히고 {radius}미터 안의 모두에게 냉기가 터집니다.",
-        "rimeSlow": "살아 있는 서리로 느려짐: 서리가 치유로 깨지거나 터질 때까지 이동 속도가 {slow}% 느려지고 냉기가 {normalMult}배(영웅과 신화에서는 {heroicMult}배) 빠르게 오릅니다."
+        "rimeSlow": "살아 있는 서리로 느려짐: 서리가 치유로 깨지거나 터질 때까지 이동 속도가 {slow}% 느려지고 냉기가 {normalMult}배(영웅과 신화에서는 {heroicMult}배) 빠르게 오릅니다.",
+        "tempered": "담금질 일격에 {stacks}번 담금질되었습니다: 냉기가 {floor} 아래로 내려가지 않고, 받는 냉기 피해가 {pct}% 증가합니다. 당신을 맞히는 담금질 일격마다 1중첩이 쌓이고(중첩당 냉기 {cold}, 냉기 피해 {per}%) 지속시간이 {seconds}초로 초기화됩니다. {swap}중첩에서 탱커를 교대하세요. 영웅 및 신화에서는 {heroicMax}중첩이 냉기를 {max}로 유지해 얼어붙습니다. 일반은 최대 {normalMax}중첩(냉기 {normalFloor})입니다."
       },
       "heatGuardian": {
         "statePhase1": "샘에 몸을 반쯤 담근 채 결코 움직이지 않습니다. 현무암 주먹이 물가의 한 지점을 내리찍고, 그곳에서 용암 너울 세 줄기가 퍼져 나갑니다. 화로의 섬광은 샘에서 {reach}미터보다 멀리 있는 모두를 칩니다. 생명력 70%에서 가라앉고 화로가 넘쳐흐릅니다. 영웅 난이도에서는 피해가 {heroicPct}% 더 큽니다.",
@@ -7359,7 +7365,10 @@ export const ko_KR: EnTranslations = {
       "throwKey": "가장자리에서 {key}를 눌러 던지기",
       "throwTap": "가장자리에서 여기를 탭해 던지기",
       "throwClick": "가장자리에서 여기를 클릭해 던지기",
-      "throwAria": "얽힌 질풍을 공허로 던지기"
+      "throwAria": "얽힌 질풍을 공허로 던지기",
+      "batteredTitle": "바람에 시달림 x{stacks}: 탱커 교대!",
+      "chargedTitle": "천둥 충전 x{stacks}: 탱커 교대!",
+      "ruinTitle": "풀무 강타가 당신을 가장자리 밖으로 날립니다!"
     },
     "breathGuardian": {
       "say": {
@@ -7422,7 +7431,8 @@ export const ko_KR: EnTranslations = {
       "secondsBar": "{seconds}s",
       "rimeTitle": "살아 있는 서리! 무리에서 벗어나십시오",
       "rimeBar": "서리 {left} / {whole}",
-      "rimeAria": "살아 있는 서리: 깨뜨리기까지 치유 {whole} 중 {left} 남음"
+      "rimeAria": "살아 있는 서리: 깨뜨리기까지 치유 {whole} 중 {left} 남음",
+      "temperedTitle": "서리 담금질 x{stacks}: 탱커 교대!"
     },
     "heatGuardian": {
       "say": {
@@ -16928,6 +16938,8 @@ export const ko_KR: EnTranslations = {
       "heart_breath_thunders_cradle": "천둥의 요람",
       "heart_breath_drawn_lightning": "끌려오는 번개",
       "heart_breath_cradle_channel": "천둥의 요람",
+      "heart_breath_bellows_blow": "풀무 강타",
+      "heart_breath_thunder_lash": "천둥 채찍",
       "heart_breath_gale_bulwark": "질풍의 방벽",
       "heart_breath_mending_gale": "치유의 질풍",
       "heart_quench_blades_wake": "검의 각성",

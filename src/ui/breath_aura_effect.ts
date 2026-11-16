@@ -145,6 +145,48 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
       return { key: `${KEY}.windworn` };
     case BREATH_AURAS.thrown:
       return { key: `${KEY}.thrown` };
+    case BREATH_AURAS.blown:
+      return { key: `${KEY}.blown` };
+    // The tank swap (breath_blow.ts): the live tier's numbers ride the auras.
+    case BREATH_AURAS.blowMark:
+      return {
+        key: (a.value2 ?? 0) > 0 ? `${KEY}.blowMarkRuin` : `${KEY}.blowMark`,
+        nums: {
+          yards: Math.round(a.value ?? 0),
+          min: tierValue(T.blowHitMin, NM),
+          max: tierValue(T.blowHitMax, NM),
+          ...tierRange('heroic', T.blowHitMin, T.blowHitMax, HM),
+        },
+      };
+    case BREATH_AURAS.battered:
+      return {
+        key: `${KEY}.battered`,
+        nums: {
+          stacks: Math.max(1, a.stacks ?? 1),
+          next: Math.round(a.value ?? 0),
+          seconds: T.blowStackSeconds,
+          swap: a.value3 ?? BREATH_DIFFICULTY.normal.blowSwap,
+          heroicRuin: BREATH_DIFFICULTY.heroic.blowThrow.length - 1,
+        },
+      };
+    case BREATH_AURAS.thunderLaden: {
+      const stacks = Math.max(1, a.stacks ?? 1);
+      const total = a.value ?? BREATH_DIFFICULTY.normal.thunderPct * stacks;
+      return {
+        key: `${KEY}.thunderLaden`,
+        nums: {
+          stacks,
+          pct: pct(total),
+          per: pct(total / stacks),
+          seconds: T.thunderSeconds,
+          draw: a.value2 ?? BREATH_DIFFICULTY.normal.thunderDraw,
+          swap: a.value3 ?? BREATH_DIFFICULTY.normal.thunderSwap,
+          min: tierValue(T.thunderMin, NM),
+          max: tierValue(T.thunderMax, NM),
+          ...tierRange('heroic', T.thunderMin, T.thunderMax, HM),
+        },
+      };
+    }
     case BREATH_AURAS.tossed:
       return { key: `${KEY}.tossed` };
     case BREATH_AURAS.stormForm:

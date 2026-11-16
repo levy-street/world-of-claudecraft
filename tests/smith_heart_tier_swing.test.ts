@@ -36,14 +36,14 @@ describe("Smith's Heart: a boss's swing per tier", () => {
     expect([e.weapon.min, e.weapon.max]).toEqual([200, 300]);
   });
 
-  it('a Normal pull of the Quench swings twice as hard; the wipe gives the swing back', () => {
+  it('a Normal pull of the Quench swings 1.75 times as hard; the wipe gives the swing back', () => {
     const f = quenchFight(3);
     const { min, max } = f.boss().weapon;
     expect(f.dev('/dev heart quench pull')).toBe(true);
     f.tick(2);
     expect(f.state()?.difficulty).toBe('normal');
     const k = QUENCH_DIFFICULTY.normal.swingMult;
-    expect(k).toBe(2);
+    expect(k).toBe(1.75);
     expect(f.boss().weapon.min).toBe(Math.round(min * k));
     expect(f.boss().weapon.max).toBe(Math.round(max * k));
     for (const p of f.players) f.sim.ctx.handleDeath(p, f.boss());
@@ -64,27 +64,28 @@ describe("Smith's Heart: a boss's swing per tier", () => {
 });
 
 describe("Smith's Heart: the pass of 2026-11-16's damage per tier", () => {
-  it('Normal: the raid +15 percent on every fight, the Quench twice', () => {
+  it('Normal: the raid +15 percent on every fight, the Quench 1.75 times (the tank swap pass)', () => {
     for (const rows of [COUNCIL_DIFFICULTY, BREATH_DIFFICULTY, HEAT_DIFFICULTY, FINAL_DIFFICULTY]) {
       expect(rows.normal.damageMult).toBe(1.15);
       expect(rows.normal.swingMult).toBe(1.15);
       expect(rows.normal.punishMult).toBe(1);
     }
-    expect(QUENCH_DIFFICULTY.normal.damageMult).toBe(2);
+    expect(QUENCH_DIFFICULTY.normal.damageMult).toBe(1.75);
     // The shatter only +15 percent on Normal.
     const shatter = QUENCH_DIFFICULTY.normal.damageMult * QUENCH_DIFFICULTY.normal.shatterMult;
     expect(shatter).toBeCloseTo(1.15, 6);
   });
 
-  it('Heroic: the Council and the final boss unchanged, the Breath and the Quench +25, the Heat +15', () => {
+  it('Heroic: the Council and the final boss unchanged, the Breath +25, the Quench at Normal, the Heat +15', () => {
     expect(COUNCIL_DIFFICULTY.heroic.damageMult).toBe(1.25);
     expect(COUNCIL_DIFFICULTY.heroic.swingMult).toBe(1);
     expect(FINAL_DIFFICULTY.heroic.damageMult).toBe(1.1);
     expect(FINAL_DIFFICULTY.heroic.swingMult).toBe(1);
     expect(BREATH_DIFFICULTY.heroic.damageMult).toBeCloseTo(1.25 * 1.25, 6);
     expect(BREATH_DIFFICULTY.heroic.swingMult).toBe(1.25);
-    expect(QUENCH_DIFFICULTY.heroic.damageMult).toBeCloseTo(1.25 * 1.25, 6);
-    expect(QUENCH_DIFFICULTY.heroic.swingMult).toBe(1.25);
+    // The tank swap pass: no Heroic hit of the Quench below Normal's 1.75.
+    expect(QUENCH_DIFFICULTY.heroic.damageMult).toBe(QUENCH_DIFFICULTY.normal.damageMult);
+    expect(QUENCH_DIFFICULTY.heroic.swingMult).toBe(QUENCH_DIFFICULTY.normal.swingMult);
     expect(HEAT_DIFFICULTY.heroic.damageMult).toBeCloseTo(1.25 * 1.15, 6);
     expect(HEAT_DIFFICULTY.heroic.swingMult).toBe(1.15);
     // Shattering Cold on Heroic keeps its total (2.5 times the tuning).

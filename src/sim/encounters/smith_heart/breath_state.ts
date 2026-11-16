@@ -244,6 +244,11 @@ export interface BreathFightState {
   cradles: BreathCradle[];
   isles: BreathIsles;
   drawn: BreathDrawn | null;
+  /** The tank swap (breath_blow.ts): seconds to the next Bellows Blow (the
+   *  Wind) and Thunder Lash (the Storm), and the blows' throws in flight. */
+  blowTimer: number;
+  thunderTimer: number;
+  blowSlides: BreathShove[];
   /** Heroic and Mythic: the Knotted Gale's round, its clock and the rounds so far. */
   heart: BreathHeart | null;
   heartTimer: number;

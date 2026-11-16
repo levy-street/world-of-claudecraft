@@ -20,6 +20,8 @@
 //                 as its wearer freezes, stays frozen or shatters.
 //   Deepening     through phase 2 the cold rises faster every 20 s, without
 //                 end (a stack on the guardian): the soft enrage.
+//   Tempered      Rime-Tempered (quench_temper.ts) holds its tank's bar at
+//                 its floor, and the freeze spends its stacks.
 //   Living Rime   while it holds (quench_rime.ts), its carrier's bar rises
 //                 the tier's rimeColdMult times as fast (twice on Normal,
 //                 half again on Heroic and Mythic; alone, as the rime sends
@@ -41,6 +43,7 @@ import {
   QUENCH_CUES,
   QUENCH_NAMES,
   QUENCH_TUNING as T,
+  temperFloor,
 } from './quench_ids';
 import {
   at,
@@ -140,6 +143,9 @@ export function freezePlayer(s: QuenchScope, p: Entity): void {
     undispellable: true,
   });
   brittle(s, p, T.frozenPct, T.freezeSeconds);
+  // The ice spends Rime-Tempered (quench_temper.ts): a tank thawed from it
+  // starts clean.
+  dropAura(p, QUENCH_AURAS.tempered);
   showCold(s, p, 0, 0);
   s.ctx.emit({
     type: 'spellfx',
@@ -280,7 +286,10 @@ export function stepCold(s: QuenchScope): void {
     const step = st.flurry && raw > 0 ? 0 : raw;
     setWarm(s, p, !trapped && !sealed && others >= T.warmNeed);
     const cap = trapped ? T.coldMax - 1 : T.coldMax;
-    c.cold = Math.max(0, Math.min(cap, c.cold + step * DT));
+    // Rime-Tempered holds the bar at its floor (quench_temper.ts): a huddle
+    // warms the tank no lower.
+    const floor = temperFloor(p.auras, s.rules.temperCold);
+    c.cold = Math.max(Math.min(floor, cap), Math.min(cap, c.cold + step * DT));
     if (!trapped && c.cold >= T.coldMax - 1e-9) {
       freezePlayer(s, p);
       continue;
@@ -333,4 +342,5 @@ export function clearColdMarks(e: Entity): void {
   dropAura(e, QUENCH_AURAS.frozen);
   dropAura(e, QUENCH_AURAS.brittle);
   dropAura(e, QUENCH_AURAS.splashed);
+  dropAura(e, QUENCH_AURAS.tempered);
 }

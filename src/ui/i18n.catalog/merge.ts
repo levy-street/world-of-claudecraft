@@ -838,6 +838,9 @@ const mergeStringsEn = {
       heart_breath_thunders_cradle: "Thunder's Cradle",
       heart_breath_drawn_lightning: 'Drawn Lightning',
       heart_breath_cradle_channel: "Thunder's Cradle",
+      // The tank swap's bars (breath_blow.ts).
+      heart_breath_bellows_blow: 'Bellows Blow',
+      heart_breath_thunder_lash: 'Thunder Lash',
       // The Islands of the Wind (breath_isle_ids.ts ISLE_CASTS): the guardian's
       // Bulwark is never kicked; the Gale Mender's Mending Gale can be.
       heart_breath_gale_bulwark: 'Gale Bulwark',

@@ -4785,8 +4785,13 @@ export const zh_TW: EnTranslations = {
         "windworn": "被風耗盡了力氣：效果結束前，狂風之路不會帶你前往浮島。",
         "thrown": "被巔峰咆哮掀飛：落地之前無法移動。",
         "tossed": "被遊蕩狂風掀飛：狂風放下你之前無法移動。",
+        "blown": "被風箱重擊掀飛：落地之前無法移動。",
+        "blowMark": "施法結束時風箱重擊命中你：造成{min}到{max}點自然傷害，並將你徑直向遠離氣息守護者的方向掀飛{yards}碼。英雄和史詩難度：{heroicMin}到{heroicMax}點傷害。",
+        "blowMarkRuin": "施法結束時風箱重擊命中你：造成{min}到{max}點自然傷害，並將你徑直向遠離氣息守護者的方向掀出崖台。只有瑟薩莉隊長的錨定能讓你站穩。英雄和史詩難度：{heroicMin}到{heroicMax}點傷害。",
+        "battered": "你的下一次風箱重擊會將你徑直向遠離氣息守護者的方向掀飛{next}碼（{stacks}層：每層都讓它掀得更遠）。每次命中你的風箱重擊都會疊加一層，並將持續時間重置為{seconds}秒。達到{swap}層時換坦。英雄和史詩難度下，{heroicRuin}層時的重擊會將你掀出崖台；普通難度下它總會在邊緣前停下。",
+        "thunderLaden": "你受到的自然及其他魔法傷害提高{pct}%（{stacks}層，每層{per}%）。每次命中你的雷霆鞭笞造成{min}到{max}點自然傷害，疊加一層，並將持續時間重置為{seconds}秒。達到{draw}層起，每道跳躍雷擊也會跳到你身上。達到{swap}層時換坦。英雄和史詩難度：{heroicMin}到{heroicMax}點傷害。",
         "stormForm": "撕裂為閃電之軀：戰鬥的風暴後半段，直到氣息守護者倒下。",
-        "swell": "每{every}秒，膨脹的風暴對崖台上的所有人造成{min}到{max}點傷害，之前每次脈動使其增強{growth}%：目前已有{stacks}次。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。"
+        "swell": "每{every}秒，膨脹的風暴對崖台上的所有人造成{min}到{max}點傷害，之前每次脈動使其增強{growth}%：目前已有{stacks}次。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害，之前每次脈動增強{heroicGrowth}%。"
       },
       "quenchGuardian": {
         "intro": "被凍結在湖冰之下：在她破冰而出之前，無法攻擊或傷害她。",
@@ -4801,7 +4806,8 @@ export const zh_TW: EnTranslations = {
         "deepening": "湖的寒意上升快了{total}%：自刃甦醒後每{every}秒再快{step}%（目前{stacks}次）。",
         "rime": "活體霜殼吸收你受到的接下來{left}點治療（共{whole}點）。存在期間你的移動速度降低{slow}%，寒意上升速度變為{normalMult}倍（英雄和傳奇難度為{heroicMult}倍），所以請離開隊伍。在{seconds}秒內用治療將其擊碎即可消失。否則你會立刻被冰霜封住，寒意在{radius}碼內爆發，使所有人獲得{cold}點寒意（英雄和傳奇難度為{heroicCold}點）。普通難度：1名玩家，{normalAbsorb}點。英雄難度：{heroicTargets}名玩家，各{heroicAbsorb}點，爆發後會以新的霜殼跳到最近的另一名玩家身上。傳奇難度：同英雄難度，{mythicTargets}名玩家。",
         "rimePool": "活體霜殼：還需要相當於其最大生命值{pct}%的治療才能擊碎。施加後{seconds}秒內未被擊碎，其將被冰霜封住，寒意在{radius}碼內對所有人爆發。",
-        "rimeSlow": "被活體霜殼減速：在霜殼被治療擊碎或爆發前，你的移動速度降低{slow}%，寒意上升速度變為{normalMult}倍（英雄和傳奇難度為{heroicMult}倍）。"
+        "rimeSlow": "被活體霜殼減速：在霜殼被治療擊碎或爆發前，你的移動速度降低{slow}%，寒意上升速度變為{normalMult}倍（英雄和傳奇難度為{heroicMult}倍）。",
+        "tempered": "淬火打擊已淬鍊你{stacks}次：你的寒意不會低於{floor}，你受到的冰霜傷害提高{pct}%。每次命中你的淬火打擊都會疊加一層（每層{cold}點寒意和{per}%冰霜傷害），並將持續時間重置為{seconds}秒。達到{swap}層時換坦。英雄和史詩難度下，{heroicMax}層會將你的寒意維持在{max}，你會被凍結；普通難度最多{normalMax}層（{normalFloor}點寒意）。"
       },
       "heatGuardian": {
         "statePhase1": "半身沉在湧泉之中，從不移動。玄武岩之拳砸向岸上的一點，三道熔岩湧浪從那裡滾滾而出；爐心閃焰會擊中所有距離湧泉超過{reach}碼的人。生命值降到70%時它會沉下，爐心隨之滿溢。英雄難度下傷害提高{heroicPct}%。",
@@ -7359,7 +7365,10 @@ export const zh_TW: EnTranslations = {
       "throwKey": "在邊緣按{key}投擲",
       "throwTap": "在邊緣點按此處投擲",
       "throwClick": "在邊緣點擊此處投擲",
-      "throwAria": "將結風扔進虛空"
+      "throwAria": "將結風扔進虛空",
+      "batteredTitle": "風蝕 x{stacks}：換坦！",
+      "chargedTitle": "雷霆纏身 x{stacks}：換坦！",
+      "ruinTitle": "風箱重擊會把你掀出邊緣！"
     },
     "breathGuardian": {
       "say": {
@@ -7422,7 +7431,8 @@ export const zh_TW: EnTranslations = {
       "secondsBar": "{seconds}s",
       "rimeTitle": "活體霜殼！離開隊伍",
       "rimeBar": "霜殼 {left} / {whole}",
-      "rimeAria": "活體霜殼：還需{left}/{whole}點治療才能擊碎"
+      "rimeAria": "活體霜殼：還需{left}/{whole}點治療才能擊碎",
+      "temperedTitle": "霜淬 x{stacks}：換坦！"
     },
     "heatGuardian": {
       "say": {
@@ -16928,6 +16938,8 @@ export const zh_TW: EnTranslations = {
       "heart_breath_thunders_cradle": "雷霆搖籃",
       "heart_breath_drawn_lightning": "引雷",
       "heart_breath_cradle_channel": "雷霆搖籃",
+      "heart_breath_bellows_blow": "風箱重擊",
+      "heart_breath_thunder_lash": "雷霆鞭笞",
       "heart_breath_gale_bulwark": "狂風壁壘",
       "heart_breath_mending_gale": "癒合之風",
       "heart_quench_blades_wake": "諸刃甦醒",

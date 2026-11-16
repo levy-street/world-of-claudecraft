@@ -29,6 +29,9 @@
 //                      1 (Heroic 2, Mythic 3) players (quench_rime.ts): heal
 //                      it through in 10 s or its carrier freezes and the cold
 //                      bursts round them (Heroic: it leaps on).
+//   Rime-Tempered      Tempering Strike stacks on the tank: each stack holds
+//                      its cold up and raises its Frost damage taken; Heroic's
+//                      fifth freezes it (quench_temper.ts): the tanks swap.
 //   Living Warmth      healing a player receives lowers their cold
 //                      (quench_life_warmth.ts; half on Heroic).
 //   Heroic             a shatter splashes further and harder (contagious cold).
@@ -113,6 +116,7 @@ import {
 import { clearSlashes, startSlashes, stepSlashes } from './quench_slash';
 import type { QuenchFightState } from './quench_state';
 import { watchStrikeWindup } from './quench_strike_windup';
+import { watchTemperingStrike } from './quench_temper';
 import { quenchSay, watchQuenchSlain } from './quench_voice';
 import { applyTierHealth, restoreTierHealth, tierPoolMult } from './tier_health';
 import { applyTierSwing, restoreTierSwing } from './tier_swing';
@@ -398,6 +402,7 @@ export function tickQuenchGuardian(ctx: SimContext, inst: InstanceSlot): void {
   st.clock += DT;
   stepRim(s);
   stepBar(s);
+  watchTemperingStrike(s);
   stepLifeWarmth(s);
   stepCold(s);
   stepRime(s);

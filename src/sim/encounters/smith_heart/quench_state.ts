@@ -165,6 +165,9 @@ export interface QuenchFightState {
   /** Tempering Strike's wind-up already cued for the swing under way
    *  (quench_strike_windup.ts); absent: never. */
   strikeWound?: boolean;
+  /** The swing kernel's cleave count last tick (quench_temper.ts: a reset
+   *  to 0 is Tempering Strike landing); absent: 0. */
+  cleaveSeen?: number;
   /** Lines said this pull: `<moment>` to the fight clock. */
   said: Record<string, number>;
   /** The players seen dead this pull and the pull's deaths (the kill lines'

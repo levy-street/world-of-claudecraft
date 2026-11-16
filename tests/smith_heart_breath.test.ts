@@ -258,6 +258,11 @@ describe('Guardian of the Breath: the push, the rim and the gaps', () => {
           f.tick(20);
           const boss = f.boss();
           expect(boss.inCombat).toBe(true);
+          // The tank swap's blow held off: its aura's stat recalc gives a
+          // test body its real (level 1) pool back, and this test keeps
+          // nobody alive by hand.
+          const st = f.state();
+          if (st) st.blowTimer = 999;
           const a = (gap.deg * Math.PI) / 180;
           f.put(walker, gap.x - Math.sin(a) * 4, gap.z - Math.cos(a) * 4);
           walker.facing = a;

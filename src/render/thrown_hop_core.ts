@@ -1,5 +1,5 @@
 // The hop of a body an encounter THROWS (render-only): the Guardian of the
-// Breath's Summit Roar and its loose gales slide a struck body along the floor
+// Breath's Summit Roar, its loose gales and its Bellows Blow slide a struck body along the floor
 // (sim/encounters/smith_heart/breath_shove.ts, an ease that starts fast and
 // settles), and the sim keeps that body on the floor the whole way. Drawn
 // flat it read as a sled, not a blow (Jose's playtest of 2026-11-07), so the
@@ -21,6 +21,8 @@ import { BREATH_AURAS, BREATH_TUNING as T } from '../sim/encounters/smith_heart/
 /** Each throwing hold aura's hop: its seconds (its slide's) and its height (yards). */
 export const THROWN_HOPS: Readonly<Record<string, { seconds: number; height: number }>> = {
   [BREATH_AURAS.thrown]: { seconds: T.roarSlide, height: 1.6 },
+  // Bellows Blow's throw (breath_blow.ts): the Roar's blow on one body.
+  [BREATH_AURAS.blown]: { seconds: T.roarSlide, height: 1.6 },
   [BREATH_AURAS.tossed]: { seconds: T.galeSlide, height: 0.7 },
 };
 

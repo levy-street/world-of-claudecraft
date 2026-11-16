@@ -160,6 +160,29 @@ export function quenchAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
           heroicMult: H.rimeColdMult,
         },
       };
+    // Rime-Tempered (quench_temper.ts): the live tier's numbers ride the
+    // aura (`value` the Frost damage taken, `value2` the cold a stack,
+    // `value3` the swap count); the tiers' limits come from the rows.
+    case QUENCH_AURAS.tempered: {
+      const stacks = Math.max(1, a.stacks ?? 1);
+      const perStack = a.value2 ?? N.temperCold;
+      return {
+        key: `${KEY}.tempered`,
+        nums: {
+          stacks,
+          floor: Math.min(T.coldMax, stacks * perStack),
+          pct: pct(a.value ?? N.temperFrost * stacks),
+          cold: perStack,
+          per: pct((a.value ?? N.temperFrost * stacks) / stacks),
+          seconds: T.temperSeconds,
+          swap: a.value3 ?? N.temperSwap,
+          heroicMax: H.temperMax,
+          max: T.coldMax,
+          normalMax: N.temperMax,
+          normalFloor: N.temperMax * N.temperCold,
+        },
+      };
+    }
     case QUENCH_AURAS.deepening:
       return {
         key: `${KEY}.deepening`,

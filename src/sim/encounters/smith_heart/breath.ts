@@ -23,6 +23,11 @@
 //                          (breath_storm.ts).
 //   The Storm (50 to 0)    the Leaping Bolt, the Thunder's Cradle, Drawn
 //                          Lightning, the swelling storm; heroic's short gusts.
+//   The tank swap          Bellows Blow in the Wind (a throw that grows with
+//                          Wind-Battered: Heroic's fifth goes off the
+//                          Cornice), Thunder Lash in the Storm (Thunder-Laden:
+//                          more Nature damage, Leaping Bolts drawn to it):
+//                          breath_blow.ts.
 //   One wipe               the fight ends when the guardian stops fighting:
 //                          the wind still, every circle, anchor, mark, gale,
 //                          strike and patch gone, the lifted set down, the
@@ -46,6 +51,15 @@ import type { SimContext } from '../../sim_context';
 import { clearThreat } from '../../threat';
 import { DT, type Entity } from '../../types';
 import { claimBoss, clearCastIf } from '../sunken_bastion/claim';
+import {
+  clearBlow,
+  landBlow,
+  landThunder,
+  setBlowStacksForDev,
+  startBlow,
+  startBlowBars,
+  stepBlow,
+} from './breath_blow';
 import { dischargeCradles, landCradle, startCradle } from './breath_cradle';
 import {
   clearGales,
@@ -186,6 +200,9 @@ function freshState(boss: Entity, difficulty: BreathDifficulty): BreathFightStat
     isles: { next: 0, round: null, adds: [], paths: [], homes: [], rides: [], grace: {} },
     roar: null,
     drawn: null,
+    blowTimer: T.blowFirst,
+    thunderTimer: T.thunderFirst,
+    blowSlides: [],
     heart: null,
     heartTimer: T.heartFirst,
     heartRuns: 0,
@@ -242,6 +259,12 @@ function landBar(s: BreathScope): void {
     case BREATH_CASTS.drawn:
       landDrawn(s, bar.targetId);
       return;
+    case BREATH_CASTS.blow:
+      landBlow(s, bar.targetId);
+      return;
+    case BREATH_CASTS.thunder:
+      landThunder(s, bar.targetId);
+      return;
   }
 }
 
@@ -255,6 +278,9 @@ function stepBar(s: BreathScope): void {
   if (b.castingAbility !== bar.castId) {
     s.st.bar = null;
     s.st.gap = T.barGap;
+    // A cut Bellows Blow leaves no telegraph on its tank.
+    const t = bar.targetId !== null ? s.ctx.entities.get(bar.targetId) : undefined;
+    if (t) dropAura(t, BREATH_AURAS.blowMark);
     return;
   }
   holdPlanted(s);
@@ -293,6 +319,7 @@ function clearFight(
     if (st.roar) clearShoves({ ctx }, st.roar.slides);
     st.roar = null;
     st.pinned = {};
+    clearBlow({ ctx }, st, corniceListeners(ctx, inst));
   }
   clearWindAuras(ctx, inst, boss.id);
   clearAnchors(corniceListeners(ctx, inst), st);
@@ -312,6 +339,8 @@ function clearFight(
     BREATH_CASTS.cradle,
     BREATH_CASTS.cradleHold,
     BREATH_CASTS.drawn,
+    BREATH_CASTS.blow,
+    BREATH_CASTS.thunder,
   );
   dropAura(boss, BREATH_AURAS.stormForm);
   dropAura(boss, BREATH_AURAS.swell);
@@ -399,11 +428,13 @@ export function tickBreathGuardian(ctx: SimContext, inst: InstanceSlot): void {
   if (islesDue(s)) startIsles(s);
   stepIsles(s);
   stepStorm(s);
+  stepBlow(s);
   stepHeart(s);
   stepOverLip(s);
   watchBreathSlain(s);
   startWindBars(s);
   startStormBars(s);
+  startBlowBars(s);
 }
 
 // ---- dev ----------------------------------------------------------------------------------
@@ -561,6 +592,16 @@ export function breathDevTrigger(
     cutBar(s);
     s.boss.castingAbility = null;
     return startDrawn(s) ? 'Drawn Lightning.' : 'Nobody to mark (or one is already marked).';
+  }
+  if (verb === 'swap') {
+    // `swap [n]` (`blow` is the wind's verb): n stacks set on the guardian's tank first, then its swap
+    // bar (Bellows Blow in the Wind, Thunder Lash in the Storm).
+    const n = arg === undefined ? 0 : Number(arg);
+    if (!Number.isInteger(n) || n < 0) return null;
+    cutBar(s);
+    s.boss.castingAbility = null;
+    if (n > 0) setBlowStacksForDev(s, n);
+    return startBlow(s) ? 'The guardian turns on its tank.' : 'It holds no tank on the Cornice.';
   }
   return null;
 }

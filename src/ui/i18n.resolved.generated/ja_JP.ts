@@ -4785,8 +4785,13 @@ export const ja_JP: EnTranslations = {
         "windworn": "風に疲れ果てた：これが切れるまで、疾風の道はあなたを浮島へ運ばない。",
         "thrown": "頂の咆哮に吹き飛ばされた：着地するまで動けない。",
         "tossed": "吹きすさぶ旋風に吹き飛ばされた：突風が収まるまで動けない。",
+        "blown": "ふいごの一撃に吹き飛ばされた：着地するまで動けない。",
+        "blowMark": "詠唱が終わるとふいごの一撃があなたに当たる：{min}～{max}の自然ダメージを受け、息吹の守護者からまっすぐ{yards}ヤード吹き飛ばされる。ヒロイックとミシック：{heroicMin}～{heroicMax}のダメージ。",
+        "blowMarkRuin": "詠唱が終わるとふいごの一撃があなたに当たる：{min}～{max}の自然ダメージを受け、息吹の守護者からまっすぐ岩棚の外へ吹き飛ばされる。踏みとどまれるのはテサリー隊長の錨だけ。ヒロイックとミシック：{heroicMin}～{heroicMax}のダメージ。",
+        "battered": "次のふいごの一撃は、あなたを息吹の守護者からまっすぐ{next}ヤード吹き飛ばす（{stacks}スタック：1つごとにさらに遠くへ）。あなたに当たるふいごの一撃ごとに1スタック増え、効果時間が{seconds}秒に戻る。{swap}スタックでタンクを交代しよう。ヒロイックとミシックでは{heroicRuin}スタック時の一撃で岩棚の外へ飛ばされる。ノーマルでは必ず縁の手前で止まる。",
+        "thunderLaden": "受ける自然ダメージとその他の魔法ダメージが{pct}%増える（{stacks}スタック、1つにつき{per}%）。あなたに当たる雷の鞭ごとに{min}～{max}の自然ダメージを受け、1スタック増え、効果時間が{seconds}秒に戻る。{draw}スタック以上では、跳ねる雷撃がすべてあなたにも跳ぶ。{swap}スタックでタンクを交代しよう。ヒロイックとミシック：{heroicMin}～{heroicMax}のダメージ。",
         "stormForm": "裂けて雷の体となった：息吹の守護者が倒れるまで続く、戦いの嵐の後半。",
-        "swell": "{every}秒ごとに膨れ上がる嵐が岩棚の全員に{min}から{max}のダメージを与え、前の脈動ごとに{growth}%ずつ強くなる：これまでに{stacks}回。ヒロイック・ミシック：{heroicMin}から{heroicMax}のダメージ。"
+        "swell": "{every}秒ごとに膨れ上がる嵐が岩棚の全員に{min}から{max}のダメージを与え、前の脈動ごとに{growth}%ずつ強くなる：これまでに{stacks}回。ヒロイック・ミシック：{heroicMin}から{heroicMax}のダメージ、前の脈動ごとに{heroicGrowth}%ずつ強くなる。"
       },
       "quenchGuardian": {
         "intro": "湖の氷の下に凍りついている：氷を破って現れるまで、攻撃もダメージも受けない。",
@@ -4801,7 +4806,8 @@ export const ja_JP: EnTranslations = {
         "deepening": "湖の冷気の上昇が{total}%速くなっている：剣が目覚めてから{every}秒ごとに{step}%ずつ（これまでに{stacks}回）。",
         "rime": "生ける霧氷が、次に受ける回復を{left}吸収する（全体で{whole}）。残っている間、移動速度が{slow}%低下し、冷気が{normalMult}倍の速さで上がる（ヒロイックとミシックでは{heroicMult}倍）ので、グループから離れろ。{seconds}秒以内に回復で砕けば消える。砕けなければ即座に霜に閉ざされ、{radius}ヤード以内の全員に冷気が弾けて{cold}を加える（ヒロイックとミシックでは{heroicCold}）。ノーマル：1人に{normalAbsorb}。ヒロイック：{heroicTargets}人に{heroicAbsorb}、弾けると最も近い別のプレイヤーに新たな霧氷が移る。ミシック：ヒロイックと同じで{mythicTargets}人。",
         "rimePool": "生ける霧氷：砕くにはあと最大体力の{pct}%分の回復が必要。付与から{seconds}秒以内に砕けなければ、霜に閉ざされ、{radius}ヤード以内の全員に冷気が弾ける。",
-        "rimeSlow": "生ける霧氷で鈍っている：霧氷が回復で砕けるか弾けるまで、移動速度が{slow}%低下し、冷気が{normalMult}倍の速さで上がる（ヒロイックとミシックでは{heroicMult}倍）。"
+        "rimeSlow": "生ける霧氷で鈍っている：霧氷が回復で砕けるか弾けるまで、移動速度が{slow}%低下し、冷気が{normalMult}倍の速さで上がる（ヒロイックとミシックでは{heroicMult}倍）。",
+        "tempered": "焼き入れの一撃に{stacks}回鍛えられた：冷気は{floor}より下がらず、受ける冷気ダメージが{pct}%増える。あなたに当たる焼き入れの一撃ごとに1スタック増え（1つにつき冷気{cold}と冷気ダメージ{per}%）、効果時間が{seconds}秒に戻る。{swap}スタックでタンクを交代しよう。ヒロイックとミシックでは{heroicMax}スタックで冷気が{max}に保たれ、凍りつく。ノーマルは最大{normalMax}スタック（冷気{normalFloor}）。"
       },
       "heatGuardian": {
         "statePhase1": "湧泉に半身を沈め、決して動かない。玄武岩の拳が岸の一点を打ち砕き、そこから溶岩のうねりが三方へ広がる。炉床の閃火は湧泉から{reach}ヤードより遠くにいる全員を撃つ。体力70%で沈み、炉床があふれ出す。ヒロイックでは与えるダメージが{heroicPct}%増える。",
@@ -7359,7 +7365,10 @@ export const ja_JP: EnTranslations = {
       "throwKey": "縁で{key}を押して投げる",
       "throwTap": "縁でここをタップして投げる",
       "throwClick": "縁でここをクリックして投げる",
-      "throwAria": "結ばれた疾風を虚空へ投げ込む"
+      "throwAria": "結ばれた疾風を虚空へ投げ込む",
+      "batteredTitle": "風に打たれた x{stacks}：タンク交代！",
+      "chargedTitle": "雷を帯びた x{stacks}：タンク交代！",
+      "ruinTitle": "ふいごの一撃で縁の外へ飛ばされる！"
     },
     "breathGuardian": {
       "say": {
@@ -7422,7 +7431,8 @@ export const ja_JP: EnTranslations = {
       "secondsBar": "{seconds}s",
       "rimeTitle": "生ける霧氷！グループから離れろ",
       "rimeBar": "霧氷 {left} / {whole}",
-      "rimeAria": "生ける霧氷：砕くまで残り{left}/{whole}の回復"
+      "rimeAria": "生ける霧氷：砕くまで残り{left}/{whole}の回復",
+      "temperedTitle": "霧氷の焼き入れ x{stacks}：タンク交代！"
     },
     "heatGuardian": {
       "say": {
@@ -16928,6 +16938,8 @@ export const ja_JP: EnTranslations = {
       "heart_breath_thunders_cradle": "雷のゆりかご",
       "heart_breath_drawn_lightning": "招雷",
       "heart_breath_cradle_channel": "雷のゆりかご",
+      "heart_breath_bellows_blow": "ふいごの一撃",
+      "heart_breath_thunder_lash": "雷の鞭",
       "heart_breath_gale_bulwark": "疾風の防壁",
       "heart_breath_mending_gale": "癒しの疾風",
       "heart_quench_blades_wake": "剣の目覚め",

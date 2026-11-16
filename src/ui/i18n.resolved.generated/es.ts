@@ -4785,6 +4785,11 @@ export const es: EnTranslations = {
         "windworn": "Worn out by the wind: no Gale Path will carry you to the isles until this ends.",
         "thrown": "Thrown by the Summit Roar: you cannot move until the throw sets you down.",
         "tossed": "Tossed by a Loose Gale: you cannot move until the gust sets you down.",
+        "blown": "Thrown by Bellows Blow: you cannot move until the throw sets you down.",
+        "blowMark": "Bellows Blow strikes you when the cast ends: {min} to {max} Nature damage, and it throws you {yards} yd straight away from the Guardian of the Breath. Heroic and Mythic: {heroicMin} to {heroicMax} damage.",
+        "blowMarkRuin": "Bellows Blow strikes you when the cast ends: {min} to {max} Nature damage, and it throws you off the Cornice, straight away from the Guardian of the Breath. Only Captain Thessaly's anchor keeps your feet. Heroic and Mythic: {heroicMin} to {heroicMax} damage.",
+        "battered": "Your next Bellows Blow throws you {next} yd straight away from the Guardian of the Breath ({stacks} stacks: each one throws it further). Each Bellows Blow on you adds a stack and resets this to {seconds} sec. Swap tanks at {swap} stacks. On Heroic and Mythic, the blow at {heroicRuin} stacks throws you off the Cornice; on Normal it always stops short of the edge.",
+        "thunderLaden": "You take {pct}% more Nature and other magic damage ({per}% for each of {stacks} stacks). Each Thunder Lash on you deals {min} to {max} Nature damage, adds a stack and resets this to {seconds} sec. From {draw} stacks, every Leaping Bolt also leaps to you. Swap tanks at {swap} stacks. Heroic and Mythic: {heroicMin} to {heroicMax} damage.",
         "stormForm": "Torn open into a body of lightning: the Storm half of the fight, until the Guardian of the Breath falls.",
         "swell": "Every {every} sec the swelling storm deals {min} to {max} damage to everyone on the Cornice, {growth}% more for every pulse before it: {stacks} so far. Heroic and Mythic: {heroicMin} to {heroicMax} damage, {heroicGrowth}% more for every pulse before it."
       },
@@ -4801,7 +4806,8 @@ export const es: EnTranslations = {
         "deepening": "The lake's cold rises {total}% faster: {step}% more every {every} sec since the blades woke ({stacks} so far).",
         "rime": "Living Rime absorbs the next {left} healing you receive ({whole} in all). While it holds you move {slow}% slower and your cold rises {normalMult} times as fast ({heroicMult} times on Heroic and Mythic), so leave the group. Heal it through within {seconds} sec and it falls away. If not, you are Encased in Rime at once and the cold bursts on everyone within {radius} yd, adding {cold} cold ({heroicCold} on Heroic and Mythic). Normal: {normalAbsorb} on one player. Heroic: {heroicAbsorb} on {heroicTargets} players, and a burst leaps to the nearest other player with a fresh crust. Mythic: as Heroic, on {mythicTargets} players.",
         "rimePool": "Living Rime: {pct}% of their maximum health in healing still to break it. Not healed through within {seconds} sec of landing, they freeze and the cold bursts on everyone within {radius} yd.",
-        "rimeSlow": "Slowed by Living Rime: you move {slow}% slower and your cold rises {normalMult} times as fast ({heroicMult} times on Heroic and Mythic) until the crust is healed through or bursts."
+        "rimeSlow": "Slowed by Living Rime: you move {slow}% slower and your cold rises {normalMult} times as fast ({heroicMult} times on Heroic and Mythic) until the crust is healed through or bursts.",
+        "tempered": "Tempering Strike tempered you {stacks} times: your cold cannot fall below {floor}, and you take {pct}% more Frost damage. Each Tempering Strike on you adds a stack ({cold} cold and {per}% Frost damage each) and resets this to {seconds} sec. Swap tanks at {swap} stacks. On Heroic and Mythic, {heroicMax} stacks hold your cold at {max} and you freeze solid; Normal stops at {normalMax} stacks ({normalFloor} cold)."
       },
       "heatGuardian": {
         "statePhase1": "Half sunk in its wellspring: it never moves. Basalt Fist slams a spot on the shore and three Molten Swells roll out from it, and Hearth Flare strikes everyone farther than {reach} yd from the wellspring. At 70% health it sinks and the Hearth overflows. Heroic deals {heroicPct}% more damage.",
@@ -7359,7 +7365,10 @@ export const es: EnTranslations = {
       "throwKey": "Press {key} at the edge to throw",
       "throwTap": "Tap here at the edge to throw",
       "throwClick": "Click here at the edge to throw",
-      "throwAria": "Throw the Knotted Gale into the void"
+      "throwAria": "Throw the Knotted Gale into the void",
+      "batteredTitle": "Wind-Battered x{stacks}: swap tanks!",
+      "chargedTitle": "Thunder-Laden x{stacks}: swap tanks!",
+      "ruinTitle": "Bellows Blow throws you off the edge!"
     },
     "breathGuardian": {
       "say": {
@@ -7422,7 +7431,8 @@ export const es: EnTranslations = {
       "secondsBar": "{seconds}s",
       "rimeTitle": "Living Rime! Leave the group",
       "rimeBar": "Rime {left} / {whole}",
-      "rimeAria": "Living Rime: {left} of {whole} healing left to break it"
+      "rimeAria": "Living Rime: {left} of {whole} healing left to break it",
+      "temperedTitle": "Rime-Tempered x{stacks}: swap tanks!"
     },
     "heatGuardian": {
       "say": {
@@ -16928,6 +16938,8 @@ export const es: EnTranslations = {
       "heart_breath_thunders_cradle": "Thunder's Cradle",
       "heart_breath_drawn_lightning": "Drawn Lightning",
       "heart_breath_cradle_channel": "Thunder's Cradle",
+      "heart_breath_bellows_blow": "Bellows Blow",
+      "heart_breath_thunder_lash": "Thunder Lash",
       "heart_breath_gale_bulwark": "Gale Bulwark",
       "heart_breath_mending_gale": "Mending Gale",
       "heart_quench_blades_wake": "The Blades Wake",

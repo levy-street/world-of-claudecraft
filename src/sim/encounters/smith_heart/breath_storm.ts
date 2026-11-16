@@ -25,6 +25,7 @@
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { DT, type Entity } from '../../types';
+import { drawBolts } from './breath_blow';
 import { cradled, releaseCradles, startCradle, stepCradles } from './breath_cradle';
 import { clearWindAuras, setWind, thessalyOf } from './breath_gale';
 import { barrageSpot, breathHash } from './breath_geometry';
@@ -278,6 +279,8 @@ export function landFork(s: BreathScope, targetId: number | null): Entity[] {
     );
     from = p;
   }
+  // Thunder-Laden draws the bolt on after its path (breath_blow.ts).
+  drawBolts(s, path, T.forkMin, T.forkMax);
   return path;
 }
 

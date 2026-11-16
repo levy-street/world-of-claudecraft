@@ -1677,6 +1677,12 @@ const baseEnTable = {
   // Living Rime (quench_rime.ts) and Living Warmth (quench_life_warmth.ts).
   'aura.heartLivingRime': 'Living Rime',
   'mechanic.heartLivingWarmth': 'Living Warmth',
+  // The tank swaps (quench_temper.ts, breath_blow.ts).
+  'aura.heartRimeTempered': 'Rime-Tempered',
+  'mechanic.heartBellowsBlow': 'Bellows Blow',
+  'aura.heartWindBattered': 'Wind-Battered',
+  'mechanic.heartThunderLash': 'Thunder Lash',
+  'aura.heartThunderLaden': 'Thunder-Laden',
   // The Guardian of the Heat (encounters/smith_heart/heat_ids.ts HEAT_NAMES):
   // its damage, aura and object names. EXACT through the mechanic reverse map.
   'mechanic.heartFirstWellspring': 'The First Wellspring',
@@ -27218,6 +27224,11 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Deepening Cold': 'aura.heartDeepeningCold',
   'Living Rime': 'aura.heartLivingRime',
   'Living Warmth': 'mechanic.heartLivingWarmth',
+  'Rime-Tempered': 'aura.heartRimeTempered',
+  'Bellows Blow': 'mechanic.heartBellowsBlow',
+  'Wind-Battered': 'aura.heartWindBattered',
+  'Thunder Lash': 'mechanic.heartThunderLash',
+  'Thunder-Laden': 'aura.heartThunderLaden',
   'The First Wellspring': 'mechanic.heartFirstWellspring',
   'Wellspring Fire': 'mechanic.heartWellspringFire',
   'The First Flame': 'aura.heartFirstFlame',

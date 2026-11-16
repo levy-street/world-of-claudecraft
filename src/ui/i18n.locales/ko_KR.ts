@@ -22650,7 +22650,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.breathGuardian.stormForm':
     '찢어져 번개의 몸이 되었습니다: 숨결의 수호자가 쓰러질 때까지 이어지는 전투의 폭풍 후반부.',
   'hudChrome.auraEffect.breathGuardian.swell':
-    '{every}초마다 부풀어 오르는 폭풍이 벼랑 위의 모두에게 {min}~{max}의 피해를 주며, 앞선 맥동마다 {growth}%씩 강해집니다: 지금까지 {stacks}번. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
+    '{every}초마다 부풀어 오르는 폭풍이 벼랑 위의 모두에게 {min}~{max}의 피해를 주며, 앞선 맥동마다 {growth}%씩 강해집니다: 지금까지 {stacks}번. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해, 앞선 맥동마다 {heroicGrowth}%씩 강해집니다.',
   'hudChrome.auraEffect.breathGuardian.bulwark':
     '바람의 방패가 피해를 {left} 더 흡수합니다. 떠 있는 섬의 질풍 파수병이나 질풍 치유사가 하나라도 살아 있으면 매초 전체의 {regrow}%가 다시 차오르고, 치유의 질풍마다 {mend}%가 회복됩니다. 질풍의 길을 타고 섬으로 건너가 그들을 쓰러뜨리세요. {max}초 동안 유지되면 벼랑 위에서 터져 {bmin}~{bmax}의 피해를 줍니다. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
   'hudChrome.auraEffect.breathGuardian.riding':
@@ -26142,4 +26142,23 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finalBoss.say.wipe': '봉인되었다. 고요하다. 그분이 바란 대로.',
   'hudChrome.finalBoss.say.death':
     '그 손은... 결코 돌아오지 않았다. 불씨 하나가 아직 타오른다... 그것을 가져가라. 그리고 산을 잠들게 하라.',
+  // The Smith's Heart tank swaps (quench_temper.ts, breath_blow.ts).
+  'abilityUi.cast.heart_breath_bellows_blow': '풀무 강타',
+  'abilityUi.cast.heart_breath_thunder_lash': '천둥 채찍',
+  'hudChrome.auraEffect.breathGuardian.blown':
+    '풀무 강타에 날아갔습니다: 착지할 때까지 움직일 수 없습니다.',
+  'hudChrome.auraEffect.breathGuardian.blowMark':
+    '시전이 끝나면 풀무 강타가 당신을 강타합니다: {min}~{max}의 자연 피해를 입고 숨결의 수호자 반대 방향으로 곧장 {yards}야드 날아갑니다. 영웅 및 신화: {heroicMin}~{heroicMax}의 피해.',
+  'hudChrome.auraEffect.breathGuardian.blowMarkRuin':
+    '시전이 끝나면 풀무 강타가 당신을 강타합니다: {min}~{max}의 자연 피해를 입고 숨결의 수호자 반대 방향으로 곧장 벼랑 밖으로 날아갑니다. 테살리 대장의 닻만이 당신을 붙잡아 줍니다. 영웅 및 신화: {heroicMin}~{heroicMax}의 피해.',
+  'hudChrome.auraEffect.breathGuardian.battered':
+    '다음 풀무 강타는 당신을 숨결의 수호자 반대 방향으로 곧장 {next}야드 날려 보냅니다({stacks}중첩: 중첩마다 더 멀리). 당신을 맞히는 풀무 강타마다 1중첩이 쌓이고 지속시간이 {seconds}초로 초기화됩니다. {swap}중첩에서 탱커를 교대하세요. 영웅 및 신화에서는 {heroicRuin}중첩일 때의 강타가 당신을 벼랑 밖으로 날려 보냅니다. 일반에서는 항상 가장자리 앞에서 멈춥니다.',
+  'hudChrome.auraEffect.breathGuardian.thunderLaden':
+    '받는 자연 피해와 기타 마법 피해가 {pct}% 증가합니다({stacks}중첩, 중첩당 {per}%). 당신을 맞히는 천둥 채찍마다 {min}~{max}의 자연 피해를 입고 1중첩이 쌓이며 지속시간이 {seconds}초로 초기화됩니다. {draw}중첩부터는 모든 튀어 오르는 번개가 당신에게도 튑니다. {swap}중첩에서 탱커를 교대하세요. 영웅 및 신화: {heroicMin}~{heroicMax}의 피해.',
+  'hudChrome.auraEffect.quenchGuardian.tempered':
+    '담금질 일격에 {stacks}번 담금질되었습니다: 냉기가 {floor} 아래로 내려가지 않고, 받는 냉기 피해가 {pct}% 증가합니다. 당신을 맞히는 담금질 일격마다 1중첩이 쌓이고(중첩당 냉기 {cold}, 냉기 피해 {per}%) 지속시간이 {seconds}초로 초기화됩니다. {swap}중첩에서 탱커를 교대하세요. 영웅 및 신화에서는 {heroicMax}중첩이 냉기를 {max}로 유지해 얼어붙습니다. 일반은 최대 {normalMax}중첩(냉기 {normalFloor})입니다.',
+  'hudChrome.knotAlert.batteredTitle': '바람에 시달림 x{stacks}: 탱커 교대!',
+  'hudChrome.knotAlert.chargedTitle': '천둥 충전 x{stacks}: 탱커 교대!',
+  'hudChrome.knotAlert.ruinTitle': '풀무 강타가 당신을 가장자리 밖으로 날립니다!',
+  'hudChrome.quenchAlert.temperedTitle': '서리 담금질 x{stacks}: 탱커 교대!',
 };

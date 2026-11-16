@@ -61,6 +61,12 @@ export const BREATH_CASTS = {
   cradleHold: 'heart_breath_cradle_channel',
   /** Phase 2: a player marked to draw the lightning to their feet. */
   drawn: 'heart_breath_drawn_lightning',
+  /** Phase 1, the tank swap: a blow of wind at the tank that throws it
+   *  further for every Wind-Battered stack it carries (breath_blow.ts). */
+  blow: 'heart_breath_bellows_blow',
+  /** Phase 2, the same swap: a lash of lightning at the tank that leaves it
+   *  Thunder-Laden (breath_blow.ts). */
+  thunder: 'heart_breath_thunder_lash',
 } as const;
 
 /** The auras the fight puts on players and on the guardian. The kernel's
@@ -103,6 +109,22 @@ export const BREATH_AURAS = {
    *  still air, or waking with the scene's clock in `remaining` and
    *  `duration`). */
   intro: 'heart_breath_intro',
+  /** Wind-Battered (breath_blow.ts): Bellows Blow's stacks on the tank
+   *  (`stacks`; `value` the next blow's throw in yards, `value2` 1 when that
+   *  throw is the ruinous one, `value3` the tier's swap count). */
+  battered: 'heart_breath_wind_battered',
+  /** Thunder-Laden (breath_blow.ts): Thunder Lash's stacks on the tank
+   *  (`stacks`; `value` the magic damage taken, a `spellvuln`; `value2` the
+   *  tier's `thunderDraw`, from which every Leaping Bolt leaps to them too;
+   *  `value3` the tier's swap count). */
+  thunderLaden: 'heart_breath_thunder_laden',
+  /** Bellows Blow's telegraph on the tank while the bar runs: `value` the
+   *  yards it will throw them, `value2` 1 when that throw is the ruinous
+   *  one (it carries them off the Cornice), 0 else. */
+  blowMark: 'heart_breath_blow_mark',
+  /** Thrown by Bellows Blow: the slide's unbreakable root (breath_shove.ts),
+   *  as the Summit Roar's `thrown` is its own. */
+  blown: 'heart_breath_blow_thrown',
 } as const;
 
 /** The fight's object templates (their radius rides `scale`). */
@@ -187,6 +209,14 @@ export const BREATH_CUES = {
   portalHopPair2: 'heart_breath_portal_hop_2',
   /** A Knotted Gale goes into the void (spellfxAt 'burst' at the lip). */
   knotThrow: 'heart_breath_knot_throw',
+  /** Bellows Blow lands (spellfx 'nova' from the guardian on the tank): the
+   *  burst of wind through the body along its throw (the loose gale's toss
+   *  dressing, breath_toss_fx.ts). */
+  blow: 'heart_breath_blow',
+  /** Thunder Lash lands (spellfx 'beam' from the guardian to the tank). */
+  thunder: 'heart_breath_thunder',
+  /** A Leaping Bolt leaps on to a Thunder-Laden player (spellfx 'beam'). */
+  thunderDraw: 'heart_breath_thunder_draw',
   /** A Knotted Gale bursts (spellfxAt 'nova', radius = the Cornice). */
   knotBurst: 'heart_breath_knot_burst',
 } as const;
@@ -221,6 +251,12 @@ export const BREATH_NAMES = {
   /** The entrance's marker (the Hammer Vein Warder's sleep and the council's
    *  share the name and its catalog row). */
   intro: 'Dormant',
+  /** The tank swap (breath_blow.ts; IP-checked 2026-11-16,
+   *  docs/design/naming-audit.md). */
+  blow: 'Bellows Blow',
+  battered: 'Wind-Battered',
+  thunder: 'Thunder Lash',
+  thunderLaden: 'Thunder-Laden',
 } as const;
 
 /** The English line the carrier reads crossing the portals (re-localized by
@@ -291,6 +327,22 @@ export interface BreathDifficultyRules {
   /** The Knotted Gale (breath_heart.ts): its balls, portals and carriers, or
    *  null for a tier without it (Normal). */
   stormHeart: BreathKnotRules | null;
+  /** The tank swap (breath_blow.ts). Bellows Blow's throw by the
+   *  Wind-Battered stacks the tank already carries (the last entry for any
+   *  more), whether the throw always stops short of the lip (Normal: it
+   *  displaces, never kills), the most stacks, and the count the tanks are
+   *  told to swap at (the alert, the bots). */
+  blowThrow: readonly number[];
+  blowSafe: boolean;
+  blowMax: number;
+  blowSwap: number;
+  /** Thunder Lash: the magic damage each Thunder-Laden stack adds, the most
+   *  stacks, the swap count, and the stacks from which every Leaping Bolt
+   *  leaps to them too. */
+  thunderPct: number;
+  thunderMax: number;
+  thunderSwap: number;
+  thunderDraw: number;
 }
 
 /** One tier's Knotted Gale (Jose's calls of 2026-11-07 and 2026-11-08). No
@@ -345,6 +397,15 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
     isleCount: 1,
     windwornSeconds: 0,
     stormHeart: null,
+    // A swap asked for: the blow displaces, never throws off the Cornice.
+    blowThrow: [3, 5, 7, 9, 10, 11],
+    blowSafe: true,
+    blowMax: 6,
+    blowSwap: 4,
+    thunderPct: 0.08,
+    thunderMax: 6,
+    thunderSwap: 4,
+    thunderDraw: 4,
   },
   heroic: {
     windSpeed: 4.4,
@@ -368,6 +429,16 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
     isleCount: 2,
     windwornSeconds: 0,
     stormHeart: BREATH_KNOT.heroic,
+    // The fifth blow (four stacks on) throws the tank off the Cornice from
+    // anywhere on it: swap at 3.
+    blowThrow: [6, 10, 15, 22, 60],
+    blowSafe: false,
+    blowMax: 5,
+    blowSwap: 3,
+    thunderPct: 0.2,
+    thunderMax: 8,
+    thunderSwap: 3,
+    thunderDraw: 3,
   },
   // Heroic whole (the circle rule included), with its own harder Knotted
   // Gale and Windworn (one ride per player per round of isles: two groups).
@@ -391,6 +462,16 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
     isleCount: 2,
     windwornSeconds: 150,
     stormHeart: BREATH_KNOT.mythic,
+    // The fifth blow (four stacks on) throws the tank off the Cornice from
+    // anywhere on it: swap at 3.
+    blowThrow: [6, 10, 15, 22, 60],
+    blowSafe: false,
+    blowMax: 5,
+    blowSwap: 3,
+    thunderPct: 0.2,
+    thunderMax: 8,
+    thunderSwap: 3,
+    thunderDraw: 3,
   },
 };
 
@@ -535,6 +616,31 @@ export const BREATH_TUNING = {
   barGap: 1.2,
   /** How far below the Cornice a fallen body is dead for sure (yards). */
   voidDepth: 25,
+  // The tank swap (breath_blow.ts): Bellows Blow in the Wind, Thunder Lash
+  // in the Storm, each a bar at the tank, its first after the pull (or the
+  // storm's barrage), then this often; its stacks last this long after the
+  // last (a tank the guardian stops striking loses them all); the Normal
+  // throw stops this far in from any lip.
+  blowFirst: 8,
+  blowEvery: 10,
+  blowCast: 1.5,
+  blowHitMin: 200,
+  blowHitMax: 240,
+  blowStackSeconds: 25,
+  blowLipMargin: 3,
+  /** The ruinous throw's slide runs at this pace (yards a second, half the
+   *  Summit Roar's): a body carried off the lip leaves it slowly and falls
+   *  by the Cornice, where the void counts it (a fast one sails past its
+   *  reach). */
+  blowPace: 15,
+  /** The ruinous throw runs this far past the floor's edge on its line. */
+  blowPastLip: 4,
+  thunderFirst: 6,
+  thunderEvery: 10,
+  thunderCast: 1.5,
+  thunderMin: 220,
+  thunderMax: 260,
+  thunderSeconds: 25,
   // Heroic and Mythic: the Knotted Gale (breath_heart.ts). The numbers that
   // differ by tier (the fuse, the walk, how many balls) are the tier row's
   // (BreathDifficultyRules.stormHeart); these are shared.

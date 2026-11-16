@@ -12,6 +12,8 @@
 //    until their slash has landed;
 //  - encased in rime (the freeze): the bar is the time to the shatter;
 //  - under the ice (the water): the bar is the time to the climb out;
+//  - Rime-Tempered at the tier's swap count (the aura's `value3`): the cold
+//    bar keeps its place, its title says the stacks and to swap tanks;
 //  - Living Rime on them: the bar is the healing left to break it (it drains
 //    as the healers land), its label the number; the seconds before it
 //    bursts read on the debuff's own timer.
@@ -25,7 +27,15 @@ import { QUENCH_AURAS, QUENCH_TUNING as T } from '../../../sim/encounters/smith_
 import { formatNumber, t } from '../../i18n';
 import type { EncounterAlertHidden, EncounterAlertLive } from './encounter_alert_view';
 
-export type QuenchAlertKind = 'cold' | 'freezing' | 'warm' | 'frozen' | 'water' | 'marked' | 'rime';
+export type QuenchAlertKind =
+  | 'cold'
+  | 'freezing'
+  | 'warm'
+  | 'frozen'
+  | 'water'
+  | 'marked'
+  | 'rime'
+  | 'tempered';
 
 /** Every kind class the painter toggles (the CSS keys on them). */
 export const QUENCH_ALERT_KINDS: readonly QuenchAlertKind[] = [
@@ -36,6 +46,7 @@ export const QUENCH_ALERT_KINDS: readonly QuenchAlertKind[] = [
   'water',
   'marked',
   'rime',
+  'tempered',
 ];
 
 /** Past this much cold (of 100) a rising bar is urgent. */
@@ -52,6 +63,8 @@ interface AlertAura {
   duration?: number;
   value?: number;
   value2?: number;
+  value3?: number;
+  stacks?: number;
 }
 
 export interface QuenchAlertInput {
@@ -148,19 +161,28 @@ export function buildQuenchAlertView(input: QuenchAlertInput): QuenchAlertView {
   if (!cold) return HIDDEN;
   const value = Math.max(0, Math.min(T.coldMax, cold.value ?? 0));
   const falling = (cold.value2 ?? 1) < 0;
-  const kind: QuenchAlertKind = falling
-    ? 'warm'
-    : value >= QUENCH_FREEZING_AT
-      ? 'freezing'
-      : 'cold';
+  // Rime-Tempered at its tier's swap count: the tank's own call to swap.
+  const tempered = auraOf(input.auras, QUENCH_AURAS.tempered);
+  const temperStacks = Math.round(tempered?.stacks ?? 0);
+  const swapDue =
+    tempered !== null && temperStacks >= Math.max(1, tempered.value3 ?? Number.POSITIVE_INFINITY);
+  const kind: QuenchAlertKind = swapDue
+    ? 'tempered'
+    : falling
+      ? 'warm'
+      : value >= QUENCH_FREEZING_AT
+        ? 'freezing'
+        : 'cold';
   const splash = auraOf(input.auras, QUENCH_AURAS.splashed);
-  const title = splash
-    ? t('hudChrome.quenchAlert.splashTitle', { cold: whole(splash.value ?? 0) })
-    : kind === 'warm'
-      ? t('hudChrome.quenchAlert.warmTitle')
-      : kind === 'freezing'
-        ? t('hudChrome.quenchAlert.freezingTitle')
-        : t('hudChrome.quenchAlert.coldTitle');
+  const title = swapDue
+    ? t('hudChrome.quenchAlert.temperedTitle', { stacks: whole(temperStacks) })
+    : splash
+      ? t('hudChrome.quenchAlert.splashTitle', { cold: whole(splash.value ?? 0) })
+      : kind === 'warm'
+        ? t('hudChrome.quenchAlert.warmTitle')
+        : kind === 'freezing'
+          ? t('hudChrome.quenchAlert.freezingTitle')
+          : t('hudChrome.quenchAlert.coldTitle');
   const n = whole(value);
   const max = whole(T.coldMax);
   return {

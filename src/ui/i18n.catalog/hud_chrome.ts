@@ -5990,6 +5990,15 @@ export const hudChromeStrings = {
       windworn: 'Worn out by the wind: no Gale Path will carry you to the isles until this ends.',
       thrown: 'Thrown by the Summit Roar: you cannot move until the throw sets you down.',
       tossed: 'Tossed by a Loose Gale: you cannot move until the gust sets you down.',
+      blown: 'Thrown by Bellows Blow: you cannot move until the throw sets you down.',
+      blowMark:
+        'Bellows Blow strikes you when the cast ends: {min} to {max} Nature damage, and it throws you {yards} yd straight away from the Guardian of the Breath. Heroic and Mythic: {heroicMin} to {heroicMax} damage.',
+      blowMarkRuin:
+        "Bellows Blow strikes you when the cast ends: {min} to {max} Nature damage, and it throws you off the Cornice, straight away from the Guardian of the Breath. Only Captain Thessaly's anchor keeps your feet. Heroic and Mythic: {heroicMin} to {heroicMax} damage.",
+      battered:
+        'Your next Bellows Blow throws you {next} yd straight away from the Guardian of the Breath ({stacks} stacks: each one throws it further). Each Bellows Blow on you adds a stack and resets this to {seconds} sec. Swap tanks at {swap} stacks. On Heroic and Mythic, the blow at {heroicRuin} stacks throws you off the Cornice; on Normal it always stops short of the edge.',
+      thunderLaden:
+        'You take {pct}% more Nature and other magic damage ({per}% for each of {stacks} stacks). Each Thunder Lash on you deals {min} to {max} Nature damage, adds a stack and resets this to {seconds} sec. From {draw} stacks, every Leaping Bolt also leaps to you. Swap tanks at {swap} stacks. Heroic and Mythic: {heroicMin} to {heroicMax} damage.',
       stormForm:
         'Torn open into a body of lightning: the Storm half of the fight, until the Guardian of the Breath falls.',
       swell:
@@ -6021,6 +6030,8 @@ export const hudChromeStrings = {
         'Living Rime: {pct}% of their maximum health in healing still to break it. Not healed through within {seconds} sec of landing, they freeze and the cold bursts on everyone within {radius} yd.',
       rimeSlow:
         'Slowed by Living Rime: you move {slow}% slower and your cold rises {normalMult} times as fast ({heroicMult} times on Heroic and Mythic) until the crust is healed through or bursts.',
+      tempered:
+        'Tempering Strike tempered you {stacks} times: your cold cannot fall below {floor}, and you take {pct}% more Frost damage. Each Tempering Strike on you adds a stack ({cold} cold and {per}% Frost damage each) and resets this to {seconds} sec. Swap tanks at {swap} stacks. On Heroic and Mythic, {heroicMax} stacks hold your cold at {max} and you freeze solid; Normal stops at {normalMax} stacks ({normalFloor} cold).',
     },
     // The Smith's Heart's Guardian of the Heat (src/ui/heat_aura_effect.ts).
     heatGuardian: {
@@ -10341,6 +10352,10 @@ export const hudChromeStrings = {
     throwTap: 'Tap here at the edge to throw',
     throwClick: 'Click here at the edge to throw',
     throwAria: 'Throw the Knotted Gale into the void',
+    // The tank swap (breath_blow.ts): the tank's own call.
+    batteredTitle: 'Wind-Battered x{stacks}: swap tanks!',
+    chargedTitle: 'Thunder-Laden x{stacks}: swap tanks!',
+    ruinTitle: 'Bellows Blow throws you off the edge!',
   },
   breathGuardian: {
     say: {
@@ -10418,6 +10433,8 @@ export const hudChromeStrings = {
     rimeTitle: 'Living Rime! Leave the group',
     rimeBar: 'Rime {left} / {whole}',
     rimeAria: 'Living Rime: {left} of {whole} healing left to break it',
+    // Rime-Tempered at its swap count (quench_temper.ts): the tank's own call.
+    temperedTitle: 'Rime-Tempered x{stacks}: swap tanks!',
   },
   // The Smith's Heart's Guardian of the Heat (encounters/smith_heart/heat*.ts):
   // what the guardian SAYS (heat_voice.ts HEAT_LINES, the same English). Its

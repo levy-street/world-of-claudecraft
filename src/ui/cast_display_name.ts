@@ -225,6 +225,8 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.heart_breath_cradle_channel': true,
   'abilityUi.cast.heart_breath_gale_bulwark': true,
   'abilityUi.cast.heart_breath_mending_gale': true,
+  'abilityUi.cast.heart_breath_bellows_blow': true,
+  'abilityUi.cast.heart_breath_thunder_lash': true,
   'abilityUi.cast.heart_quench_blades_wake': true,
   'abilityUi.cast.heart_quench_blades_hunt': true,
   'abilityUi.cast.heart_heat_fist': true,

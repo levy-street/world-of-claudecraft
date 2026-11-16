@@ -80,6 +80,11 @@ export const QUENCH_AURAS = {
   rime: 'heart_quench_rime',
   /** Living Rime's slow on its carrier (`value` the speed multiplier). */
   rimeSlow: 'heart_quench_rime_slow',
+  /** Rime-Tempered (quench_temper.ts): Tempering Strike's stacks on the tank
+   *  (`stacks`; `value` the magic damage taken, a `spellvuln`; `value2` the
+   *  tier's `temperCold`, `value3` its swap count). Each stack holds the
+   *  tank's cold at least `temperCold` a stack. */
+  tempered: 'heart_quench_tempered',
   /** On the guardian until her entrance has played (quench_intro.ts):
    *  `value` quench_intro_plan.ts QUENCH_INTRO_STAGES (frozen under the ice,
    *  or waking with the scene's clock in `remaining` and `duration`). */
@@ -177,6 +182,9 @@ export const QUENCH_NAMES = {
   blade: "Smith's Blade",
   rim: 'Shore Ice',
   rime: 'Living Rime',
+  /** Tempering Strike's stacks on the tank (quench_temper.ts; IP-checked
+   *  2026-11-16, docs/design/naming-audit.md). */
+  tempered: 'Rime-Tempered',
   /** Healing received lowers the receiver's cold (quench_life_warmth.ts):
    *  a fight rule, named on the cold's tooltip and in the guide. */
   lifeWarmth: 'Living Warmth',
@@ -227,6 +235,14 @@ export interface QuenchDifficultyRules {
   /** Living Warmth (quench_life_warmth.ts): cold taken off per 1% of the
    *  receiver's maximum health healed (effective healing only). */
   lifeWarmth: number;
+  /** Rime-Tempered (quench_temper.ts): the cold a stack holds the tank's bar
+   *  at (at least), the magic damage each stack adds, the most stacks, and
+   *  the count the tanks are told to swap at (the alert, the bots). A floor
+   *  of `temperCold * temperMax` at 100 freezes the tank on that stack. */
+  temperCold: number;
+  temperFrost: number;
+  temperMax: number;
+  temperSwap: number;
 }
 
 export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficultyRules>> = {
@@ -234,13 +250,14 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
     // The parse-calibrated pass of 2026-11-16: the bot raid took about 73
     // damage a second here against 165 to 190 on every other Normal fight,
     // so her swing, Quenching Breath, Crossing Blade and Freezing Water hit
-    // twice as hard (was 1; the asked 2.5 wiped the bot raid at 58 percent
-    // on 250 a second, a frozen body's Crossing Blade one-shotting cloth);
-    // the shatter only +15 percent (2 x 0.575).
-    damageMult: 2,
-    swingMult: 2,
+    // harder (was 1; the asked 2.5 wiped the bot raid at 58 percent on 250 a
+    // second; 2 the same day; 1.75 with the tank swap of 2026-11-16, the
+    // tank now taking Rime-Tempered on top); the shatter only +15 percent
+    // (1.75 x 0.657).
+    damageMult: 1.75,
+    swingMult: 1.75,
     healthMult: 1,
-    shatterMult: 0.575,
+    shatterMult: 1.15 / 1.75,
     splashR: 6,
     splashCold: 35,
     slashMarksLake: 1,
@@ -253,18 +270,24 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
     rimeLeap: false,
     rimeColdMult: 2,
     lifeWarmth: 0.5,
+    // A swap asked for, never forced: six stacks hold the bar at 72 at most.
+    temperCold: 12,
+    temperFrost: 0.06,
+    temperMax: 6,
+    temperSwap: 4,
   },
   // Contagious cold: a shatter splashes further and harder.
   heroic: {
     // The pass of 2026-11-16: the raid's damage and her swing +25 percent
-    // (1.25 to 1.5625), Shattering Cold where it was (2.5 in all: shatterMult
-    // 2 to 1.6, already what kills most); its pool x2.0 to x2.17.
-    damageMult: 1.5625,
-    swingMult: 1.25,
+    // (1.25 to 1.5625), Shattering Cold where it was (2.5 in all, already
+    // what kills most); its pool x2.0 to x2.17. The tank swap the same day:
+    // every hit at least Normal's (1.75), the shatter still 2.5 in all.
+    damageMult: 1.75,
+    swingMult: 1.75,
     // 2.2 to 2.0 with the base raised to 112,000 (the balance pass of
     // 2026-11-12): about 6 to 7 minutes at human pace.
     healthMult: 2.17,
-    shatterMult: 1.6,
+    shatterMult: 2.5 / 1.75,
     splashR: 10,
     splashCold: 55,
     slashMarksLake: 2,
@@ -279,15 +302,20 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
     // (the owner's call of 2026-11-09).
     rimeColdMult: 1.5,
     lifeWarmth: 0.25,
+    // The fifth stack holds the bar at 100: the tank freezes. Swap at 3.
+    temperCold: 20,
+    temperFrost: 0.12,
+    temperMax: 5,
+    temperSwap: 3,
   },
   // Every round one blade, slash after slash from where the last one ended.
   mythic: {
     // Heroic's numbers of 2026-11-16 (the heroic row whole).
-    damageMult: 1.5625,
-    swingMult: 1.25,
+    damageMult: 1.75,
+    swingMult: 1.75,
     healthMult: 2.17,
     // Heroic's doubled shatter (never softer than Heroic, 2026-11-12).
-    shatterMult: 1.6,
+    shatterMult: 2.5 / 1.75,
     splashR: 10,
     splashCold: 55,
     slashMarksLake: 2,
@@ -301,6 +329,10 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
     rimeLeap: true,
     rimeColdMult: 1.5,
     lifeWarmth: 0.25,
+    temperCold: 20,
+    temperFrost: 0.12,
+    temperMax: 5,
+    temperSwap: 3,
   },
 };
 
@@ -379,6 +411,10 @@ export const QUENCH_TUNING = {
   /** Seconds before the cleaving swing her wind-up is cued (the body's
    *  StrikeWind clip slams one second in). */
   strikeWindup: 1,
+  /** Rime-Tempered's life: each Tempering Strike refreshes it, so a tank the
+   *  guardian stops striking loses every stack this long after the last
+   *  (a strike lands about every 10 s). */
+  temperSeconds: 25,
   // Phase 2: the deepening cold (the soft enrage).
   deepenEvery: 20,
   deepenStep: 0.1,
@@ -440,6 +476,21 @@ export function deepenMult(stacks: number): number {
 export function coldStep(others: number, mult = 1): number {
   const T = QUENCH_TUNING;
   return others >= T.warmNeed ? -T.coldFall : T.coldRise * mult;
+}
+
+/** Rime-Tempered's stacks among `auras` (0 without it). Pure. */
+export function temperStacks(auras: readonly { id: string; stacks?: number }[]): number {
+  const a = auras.find((x) => x.id === QUENCH_AURAS.tempered);
+  return a ? Math.max(1, a.stacks ?? 1) : 0;
+}
+
+/** The cold a body wearing `auras` has its bar held at (at least) by its
+ *  Rime-Tempered stacks, `perStack` a stack (the tier's temperCold). Pure. */
+export function temperFloor(
+  auras: readonly { id: string; stacks?: number }[],
+  perStack: number,
+): number {
+  return Math.min(QUENCH_TUNING.coldMax, temperStacks(auras) * perStack);
 }
 
 /** A small integer hash (no rng in a pick). */

@@ -68,6 +68,11 @@ export const BREATH_CUE_SOUNDS: Readonly<Record<string, readonly BreathSound[]>>
   [BREATH_CUES.tear]: [S('tear', 1, 'source')],
   [BREATH_CUES.swell]: [S('swell', 0.55, 'source', 1, 1.5)],
   [BREATH_CUES.toss]: [S('toss', 0.85, 'target', 1, 0.25)],
+  // The tank swap (breath_blow.ts): the blow is a heavier toss, the lash
+  // and a bolt drawn to the Thunder-Laden the fork's zap.
+  [BREATH_CUES.blow]: [S('roar_hit', 1, 'target', 0.9, 0.25), S('toss', 0.8, 'target', 0.85, 0.25)],
+  [BREATH_CUES.thunder]: [S('fork', 1, 'target', 0.85, 0.2)],
+  [BREATH_CUES.thunderDraw]: [S('fork', 0.85, 'target', 1, 0.07)],
   [BREATH_CUES.calmLand]: [S('calm_land', 0.8, 'point')],
   // The Knotted Gale (mythic): its own takes.
   [BREATH_CUES.knotLand]: [S('knot_spawn', 1, 'point', 1, 0.3)],
