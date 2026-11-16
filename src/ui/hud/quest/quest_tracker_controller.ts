@@ -4,6 +4,7 @@ import { QUESTS, WORLD_QUESTS_BY_ID, zoneAt } from '../../../sim/data';
 import { questObjectiveRequired } from '../../../sim/types';
 import { wispMazeActionsLocked } from '../../../sim/wisp_maze_action_lock';
 import { positionInWorldQuestArea } from '../../../sim/world_quest_area';
+import { playerActiveWorldQuests } from '../../../sim/world_quest_reroll';
 import type { IWorld } from '../../../world_api';
 import { esc } from '../../esc';
 import { HAUNTED_PUMPKIN_TRACKER_ID, hauntedPumpkinTrackerRow } from '../../haunted_pumpkin_view';
@@ -54,7 +55,13 @@ export interface QuestTrackerControllerDeps {
     Partial<
       Pick<
         IWorld,
-        'abandonQuest' | 'clueHunt' | 'activeSeasonalEvent' | 'hauntedPumpkinsFound' | 'weeklyQuest'
+        | 'abandonQuest'
+        | 'clueHunt'
+        | 'activeSeasonalEvent'
+        | 'hauntedPumpkinsFound'
+        | 'weeklyQuest'
+        | 'worldQuestCycle'
+        | 'worldQuestReplacements'
       >
     >;
   /** Injectable tracking set; production leaves it out and shares the HUD's one. */
@@ -89,6 +96,10 @@ export class QuestTrackerController {
   private lastNow = 0;
   /** Area and completion grace for the World Quests section (presentation only). */
   private readonly worldQuestVisibility = createWorldQuestTrackerVisibility();
+  /** worldQuestBoard's memo: today's board ids and the inputs they came from. */
+  private board: ReadonlySet<string> = new Set();
+  private boardCycle: string | null = null;
+  private boardReplacements: IWorld['worldQuestReplacements'] = undefined;
 
   // The repaint memo compares against the LAST BUILT html, never the live
   // innerHTML: overlays decorate the painted rows in place (the island
@@ -173,8 +184,13 @@ export class QuestTrackerController {
           : [],
       });
     }
+    // World quests the player pinned from the map (quest_tracking_core): listed
+    // wherever the player stands, until they complete.
+    const trackedWorld = tracking.trackedWorldQuestIds();
     for (const progress of worldQuestLog.values()) {
+      const pinned = trackedWorld.has(progress.questId);
       if (
+        !pinned &&
         progress.state !== 'active' &&
         // A just-completed quest keeps its row for the completion grace; the
         // visibility core drops it (and never lists one completed earlier).
@@ -206,7 +222,9 @@ export class QuestTrackerController {
       // WoW style: listed only while the player is in the quest's area, with
       // a grace on leaving and on completion. Display only: the progress on
       // the log entry is untouched, so 5/10 is still 5/10 on the way back.
-      const inArea = positionInWorldQuestArea(world.player.pos, quest);
+      // A pinned quest reads as in its area, so it keeps the same completion
+      // grace as one the player is standing in.
+      const inArea = pinned || positionInWorldQuestArea(world.player.pos, quest);
       if (
         !this.worldQuestVisibility.visible(
           progress.questId,
@@ -255,6 +273,28 @@ export class QuestTrackerController {
                 },
               ],
       });
+    }
+    // A pinned quest the player has not started yet has no log entry: list it
+    // at 0 so tracking it from the map shows up at once. Only today's board
+    // (pins from an older cycle are pruned by the map rail) and only quests the
+    // character's level allows, matching what the map offers.
+    if (trackedWorld.size > 0) {
+      const board = this.worldQuestBoard(world);
+      for (const questId of trackedWorld) {
+        if (worldQuestLog.has(questId) || !board.has(questId)) continue;
+        const quest = ownEntry(WORLD_QUESTS_BY_ID, questId);
+        if (!quest || world.player.level < quest.minLevel) continue;
+        quests.push({
+          id: questId,
+          number: quests.length + 1,
+          worldQuest: true,
+          title: worldQuestDisplayName(questId),
+          complete: false,
+          objectives: [
+            { label: worldQuestObjectiveLabel(questId), current: 0, total: quest.count },
+          ],
+        });
+      }
     }
     this.worldQuestVisibility.retain(new Set(worldQuestLog.keys()));
     // The active Clue Scroll hunt rides the tracker as one row: the hunt's
@@ -381,6 +421,27 @@ export class QuestTrackerController {
    *  the section whose header was activated. */
   toggleHeader(header: HTMLElement): void {
     this.toggleCollapsed(questTrackerSectionOf(header.dataset.qtSection));
+  }
+
+  /** Today's board ids, memoized on the cycle and the replacement map's
+   *  identity so a frame with pinned quests does not rebuild the board. */
+  private worldQuestBoard(
+    world: Partial<Pick<IWorld, 'worldQuestCycle' | 'worldQuestReplacements'>>,
+  ): ReadonlySet<string> {
+    const cycle = world.worldQuestCycle ?? '';
+    const replacements = world.worldQuestReplacements;
+    if (cycle === this.boardCycle && replacements === this.boardReplacements) return this.board;
+    this.boardCycle = cycle;
+    this.boardReplacements = replacements;
+    this.board = new Set(
+      cycle
+        ? playerActiveWorldQuests({
+            worldQuestCycle: cycle,
+            worldQuestReplacements: { ...(replacements ?? {}) },
+          }).map((quest) => quest.id)
+        : [],
+    );
+    return this.board;
   }
 
   private worldQuestsCollapsed(): boolean {

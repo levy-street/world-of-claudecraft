@@ -85,6 +85,7 @@ import {
 } from './map_window_view';
 import { sharedQuestTracking } from './quest_tracking_core';
 import { TextSpriteCache, type TextSpriteStyle } from './text_sprite_cache';
+import { drawWorldQuestEmblem } from './world_quest_emblem_painter';
 
 // Label / title typography (Georgia, matching the inline site verbatim).
 const TITLE_FONT = 'bold 16px Georgia';
@@ -123,10 +124,6 @@ const QUEST_BADGE_GAP = 2; // px between badges when one area serves two quests
 const QUEST_BADGE_LINE_WIDTH = 1.5;
 const QUEST_BADGE_TEXT_LIFT = 4; // px above the arc center to optically center digits
 const WORLD_QUEST_BADGE_OUTER_ADD = 2;
-const WORLD_QUEST_BADGE_INNER_RATIO = 0.62;
-const WORLD_QUEST_STAR_RADIUS_RATIO = 0.72;
-const WORLD_QUEST_STAR_CORNER_RATIO = 0.34;
-const WORLD_QUEST_CHECK_WIDTH_RATIO = 0.22;
 // Zone-map gathering fallbacks mirror the loader's cached state grammar while
 // an image is loading or unavailable. The normal painted path is one blit.
 const GATHER_READY_RADIUS_RATIO = 0.275;
@@ -984,61 +981,16 @@ export class MapWindowPainter {
       }
     }
 
-    // Circular world-quest emblem. An available quest is blue with a dark
-    // center; an active quest switches to the gold/bright completion grammar.
+    // Circular world-quest emblem (world_quest_emblem_painter.ts, shared with
+    // the continent overview, which draws it a little smaller).
     for (const marker of model.worldQuests) {
-      const outer = geometry.questBadgeRadius + WORLD_QUEST_BADGE_OUTER_ADD;
-      const inner = outer * WORLD_QUEST_BADGE_INNER_RATIO;
-      ctx.fillStyle =
-        marker.state === 'active' ? colors.questBadgeFill : colors.worldQuestAvailable;
-      ctx.strokeStyle = colors.outline;
-      ctx.lineWidth = geometry.questBadgeLineWidth;
-      ctx.beginPath();
-      ctx.arc(marker.mx, marker.my, outer, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
-
-      ctx.fillStyle = marker.state === 'active' ? colors.player : colors.questBadgeText;
-      ctx.beginPath();
-      ctx.arc(marker.mx, marker.my, inner, 0, Math.PI * 2);
-      ctx.fill();
-
-      if (marker.state === 'active') {
-        ctx.strokeStyle = colors.questBadgeText;
-        ctx.lineWidth = Math.max(2, inner * WORLD_QUEST_CHECK_WIDTH_RATIO);
-        ctx.beginPath();
-        ctx.moveTo(marker.mx - inner * 0.55, marker.my);
-        ctx.lineTo(marker.mx - inner * 0.12, marker.my + inner * 0.45);
-        ctx.lineTo(marker.mx + inner * 0.62, marker.my - inner * 0.45);
-        ctx.stroke();
-        continue;
-      }
-
-      const star = inner * WORLD_QUEST_STAR_RADIUS_RATIO;
-      ctx.fillStyle = colors.worldQuestAvailable;
-      ctx.beginPath();
-      ctx.moveTo(marker.mx, marker.my - star);
-      ctx.lineTo(
-        marker.mx + star * WORLD_QUEST_STAR_CORNER_RATIO,
-        marker.my - star * WORLD_QUEST_STAR_CORNER_RATIO,
+      drawWorldQuestEmblem(
+        ctx,
+        marker,
+        geometry.questBadgeRadius + WORLD_QUEST_BADGE_OUTER_ADD,
+        geometry.questBadgeLineWidth,
+        colors,
       );
-      ctx.lineTo(marker.mx + star, marker.my);
-      ctx.lineTo(
-        marker.mx + star * WORLD_QUEST_STAR_CORNER_RATIO,
-        marker.my + star * WORLD_QUEST_STAR_CORNER_RATIO,
-      );
-      ctx.lineTo(marker.mx, marker.my + star);
-      ctx.lineTo(
-        marker.mx - star * WORLD_QUEST_STAR_CORNER_RATIO,
-        marker.my + star * WORLD_QUEST_STAR_CORNER_RATIO,
-      );
-      ctx.lineTo(marker.mx - star, marker.my);
-      ctx.lineTo(
-        marker.mx - star * WORLD_QUEST_STAR_CORNER_RATIO,
-        marker.my - star * WORLD_QUEST_STAR_CORNER_RATIO,
-      );
-      ctx.closePath();
-      ctx.fill();
     }
 
     // The fixed-position world boss has no disclosure area. A purple badge and

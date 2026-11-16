@@ -18,6 +18,18 @@ import { safeLocalStorage } from './safe_local_storage';
 /** Prefix of the per-character localStorage row. */
 export const QUEST_UNTRACK_KEY_PREFIX = 'woc_untracked_quests';
 
+/** Prefix of the per-character row of world quests the player pinned to the
+ *  tracker from the map. Unlike the quest log's EXCLUSION list above, this one
+ *  is an INCLUSION list: a world quest lists in the tracker on its own only
+ *  while the player stands in its area, and tracking it keeps it listed
+ *  everywhere until it completes. */
+export const WORLD_QUEST_TRACK_KEY_PREFIX = 'woc_tracked_world_quests';
+
+/** The persisted tracked-world-quest row's key for one character. */
+export function worldQuestTrackStorageKey(playerClass: string, playerName: string): string {
+  return `${WORLD_QUEST_TRACK_KEY_PREFIX}_${playerClass}_${playerName}`;
+}
+
 /** The persisted row's key for one character. */
 export function questUntrackStorageKey(playerClass: string, playerName: string): string {
   return `${QUEST_UNTRACK_KEY_PREFIX}_${playerClass}_${playerName}`;
@@ -53,6 +65,8 @@ export function serializeUntrackedQuestIds(ids: Iterable<string>): string {
 export class QuestTrackingState {
   private key = '';
   private untracked = new Set<string>();
+  private worldKey = '';
+  private trackedWorld = new Set<string>();
   private rev = 0;
   private playerClass = '';
   private playerName = '';
@@ -81,6 +95,15 @@ export class QuestTrackingState {
       /* storage unavailable: start fully tracked */
     }
     this.untracked = parseUntrackedQuestIds(raw);
+    this.worldKey = worldQuestTrackStorageKey(playerClass, playerName);
+    let worldRaw: string | null = null;
+    try {
+      worldRaw = this.storage?.getItem(this.worldKey) ?? null;
+    } catch {
+      /* storage unavailable: nothing pinned */
+    }
+    // Same row shape (a string array), so the same tolerant parser applies.
+    this.trackedWorld = parseUntrackedQuestIds(worldRaw);
     this.rev++;
   }
 
@@ -103,6 +126,39 @@ export class QuestTrackingState {
     this.persist();
   }
 
+  /** The world quests pinned to the tracker, live: read per build, never retained. */
+  trackedWorldQuestIds(): ReadonlySet<string> {
+    return this.trackedWorld;
+  }
+
+  isWorldQuestTracked(questId: string): boolean {
+    return this.trackedWorld.has(questId);
+  }
+
+  /** Pin or unpin one world quest. A no-op change never bumps the revision. */
+  setWorldQuestTracked(questId: string, tracked: boolean): void {
+    if (tracked === this.trackedWorld.has(questId)) return;
+    if (tracked) this.trackedWorld.add(questId);
+    else this.trackedWorld.delete(questId);
+    this.rev++;
+    this.persistWorld();
+  }
+
+  /** Drop pins for quests that left today's board (the daily reset or a
+   *  replacement), so the stored row never grows across days. The caller only
+   *  calls this with a non-empty board: an unknown cycle must not wipe pins. */
+  retainTrackedWorldQuests(boardIds: ReadonlySet<string>): void {
+    let changed = false;
+    for (const id of this.trackedWorld) {
+      if (boardIds.has(id)) continue;
+      this.trackedWorld.delete(id);
+      changed = true;
+    }
+    if (!changed) return;
+    this.rev++;
+    this.persistWorld();
+  }
+
   revision(): number {
     return this.rev;
   }
@@ -111,6 +167,15 @@ export class QuestTrackingState {
     if (this.key === '') return;
     try {
       this.storage?.setItem(this.key, serializeUntrackedQuestIds(this.untracked));
+    } catch {
+      /* storage unavailable (private mode): the choice still holds in-session */
+    }
+  }
+
+  private persistWorld(): void {
+    if (this.worldKey === '') return;
+    try {
+      this.storage?.setItem(this.worldKey, serializeUntrackedQuestIds(this.trackedWorld));
     } catch {
       /* storage unavailable (private mode): the choice still holds in-session */
     }

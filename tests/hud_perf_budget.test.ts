@@ -946,6 +946,8 @@ const CANVAS_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'hill_map_marker_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'ferry_port_map_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'continent_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
+  // the world-quest emblem both map levels draw: handed its context and its colors
+  { file: 'world_quest_emblem_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/delve/delve_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'hud/rift/rift_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'hud/battleground/battleground_atlas_marks_painter.ts', allow: {}, reflowAllow: {} },

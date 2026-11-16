@@ -13,6 +13,7 @@ import {
   drawableInstanceAt,
   isInstanceMode,
   mapLevelToggleKey,
+  mapLevelUp,
   nextMapLevel,
   remoteInstanceAnchor,
   resolveMapSurface,
@@ -125,5 +126,18 @@ describe('map surface: from-outside anchor from the party roster', () => {
       null,
     );
     expect(remoteInstanceAnchor(worldWithParty([{ pid: 5, x: 20, z: 30 }]))).toBe(null);
+  });
+});
+
+describe('map surface: right-click climbs one level and never wraps', () => {
+  // Player report: right-clicking the world map dropped them into a zone map
+  // they never picked (the old right-click was the toggle's full cycle).
+  it('climbs instance plan -> zone map -> world map', () => {
+    expect(mapLevelUp('instance')).toBe('zone');
+    expect(mapLevelUp('zone')).toBe('continent');
+  });
+
+  it('does nothing on the world map', () => {
+    expect(mapLevelUp('continent')).toBe(null);
   });
 });

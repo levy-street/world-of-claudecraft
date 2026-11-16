@@ -17,6 +17,7 @@
 // DOM-free / i18n-free / deterministic so tests/continent_map_view.test.ts can
 // drive it directly with both a Sim-shaped and a ClientWorld-mirror-shaped stub.
 
+import { GLIDER_NPC_DEF } from '../sim/content/world_quest_glider';
 import {
   STRIP_MAX_X,
   STRIP_MIN_X,
@@ -28,8 +29,11 @@ import {
   type ZoneDef,
   zoneAt,
 } from '../sim/data';
+import { playerActiveWorldQuests } from '../sim/world_quest_reroll';
 import type { IWorld } from '../world_api';
 import { FERRY_PORTS, type FerryPortMapMarker } from './ferry_port_map_core';
+import type { MapWorldQuestMarker } from './map_window_view';
+import { worldQuestReadsActive, worldQuestReadsCompleted } from './world_quest_progress_state';
 
 /** An axis-aligned rectangle in canvas-pixel space. */
 export interface ContinentRect {
@@ -83,6 +87,11 @@ export interface ContinentMapModel {
   party: ContinentPartyMarker[];
   /** Ferry landing markers, projected through the continent's art bounds. */
   ports: FerryPortMapMarker[];
+  /** Today's open world quests across every zone, the same set and the same
+   *  marker shape the per-zone map draws for its own zone, so hover, click and
+   *  the reward tooltip resolve exactly as they do there. Completed quests and
+   *  quests above the player's level are left out, as on the zone map. */
+  worldQuests: MapWorldQuestMarker[];
   /** The zone id the player currently stands in (the on-canvas subtitle). */
   currentZoneId: string;
   hill: { mx: number; my: number; phase: 'warning' | 'active' } | null;
@@ -196,12 +205,37 @@ export function buildContinentMapModel(input: ContinentMapInput): ContinentMapMo
           return { ...port, mx, my };
         });
 
+  // World quests: the character's board (rerolled slots included), projected at
+  // the quest area's center (the glider lesson at its NPC). Radius 0: at this
+  // scale the objective ring would be a speck, so only the emblem draws.
+  const worldQuests: MapWorldQuestMarker[] = [];
+  const playerLevel = Number.isFinite(p.level) ? p.level : 0;
+  for (const quest of playerActiveWorldQuests({
+    worldQuestCycle: world.worldQuestCycle,
+    worldQuestReplacements: { ...(world.worldQuestReplacements ?? {}) },
+  })) {
+    if (playerLevel < quest.minLevel) continue;
+    const progress = world.worldQuestLog?.get(quest.id);
+    if (worldQuestReadsCompleted(progress)) continue;
+    const position = quest.objective.type === 'glider' ? GLIDER_NPC_DEF.pos : quest.area;
+    if (!inWorld(position.x, position.z)) continue;
+    const { mx, my } = toMap(position.x, position.z);
+    worldQuests.push({
+      questId: quest.id,
+      mx,
+      my,
+      radius: 0,
+      state: worldQuestReadsActive(progress) ? 'active' : 'available',
+    });
+  }
+
   return {
     image: { mx: imageX, my: imageY, w: imageW, h: imageH },
     regions,
     player,
     party,
     ports,
+    worldQuests,
     currentZoneId,
     hill: hill && inWorld(hill.x, hill.z) ? { ...toMap(hill.x, hill.z), phase: hill.phase } : null,
   };

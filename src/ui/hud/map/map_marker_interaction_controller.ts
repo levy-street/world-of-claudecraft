@@ -181,11 +181,20 @@ export class MapMarkerInteractionController {
     }
   }
 
-  setContinentPorts(ports: readonly MapNavigationMarker[]): void {
+  /** The continent overview's hoverable markers: ferry ports and today's world
+   *  quests (the same tooltip the zone map shows). The world-quest selection is
+   *  kept, so a quest picked from the rail survives a trip through the overview. */
+  setContinentPorts(
+    ports: readonly MapNavigationMarker[],
+    worldQuests: readonly MapWorldQuestMarker[] = EMPTY_MARKERS,
+  ): void {
     const tip = this.activePortTip;
+    const selected = this.selectedWorldQuestId;
     this.clear();
     this.activePortTip = tip;
+    this.selectedWorldQuestId = selected;
     this.navigation = ports;
+    this.worldQuests = worldQuests;
     this.refreshPortTooltip();
   }
 
@@ -202,16 +211,26 @@ export class MapMarkerInteractionController {
     touch = false,
   ): boolean {
     if (canvas !== this.geometryCanvas || !this.geometry.ready) return false;
+    const marker = this.worldQuestAt(canvas, clientX, clientY, touch);
+    return this.selectWorldQuest(marker?.questId ?? null);
+  }
+
+  /** The world-quest emblem under a client point, or null (a world boss on top
+   *  of it wins, as on the zone map). Used by the continent overview's click. */
+  worldQuestAt(
+    canvas: HTMLCanvasElement,
+    clientX: number,
+    clientY: number,
+    touch = false,
+  ): MapWorldQuestMarker | null {
+    if (canvas !== this.geometryCanvas || !this.geometry.ready) return null;
     const mx = (clientX - this.geometry.clientLeft) * this.geometry.backingPerClientX;
     const my = (clientY - this.geometry.clientTop) * this.geometry.backingPerClientY;
     const radius = touch
       ? MAP_TOUCH_POINT_HIT_RADIUS_CSS_PX * this.geometry.backingPerCssPx
       : MAP_NPC_GLYPH_HIT_RADIUS;
-    if (worldBossMarkerAt(this.worldBosses, mx, my, radius)) {
-      return this.selectWorldQuest(null);
-    }
-    const marker = worldQuestMarkerAt(this.worldQuests, mx, my, radius);
-    return this.selectWorldQuest(marker?.questId ?? null);
+    if (worldBossMarkerAt(this.worldBosses, mx, my, radius)) return null;
+    return worldQuestMarkerAt(this.worldQuests, mx, my, radius);
   }
 
   clear(): void {
@@ -241,12 +260,9 @@ export class MapMarkerInteractionController {
     this.services = model.services;
     this.farmPatches = model.farmPatches;
     this.navigation = model.navigation;
-    if (
-      this.selectedWorldQuestId &&
-      !this.worldQuests.some((marker) => marker.questId === this.selectedWorldQuestId)
-    ) {
-      this.selectedWorldQuestId = null;
-    }
+    // The selection is kept even when this zone draws no marker for it: the map
+    // rail lists every zone's world quests and selects from there, and the
+    // selected quest's Track, Show Route and Replace controls act on it.
     this.clearMemo();
     this.refreshPortTooltip();
   }

@@ -1393,13 +1393,14 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     }
   }
 
-  // Friends (green) and guild members (blue), plotted from the live positions the
-  // server streams for online allies. socialInfo is null offline, so this is
-  // online-only; friends are plotted first and win ties (dedup by id). A friend
-  // or guildmate who is also a party member is skipped here: the party loop
-  // above already draws them with their class color, matching how
-  // minimap_markers.ts excludes partyPids from its entity loop to avoid the
-  // same double dot.
+  // Guild members (blue), plotted from the live positions the server streams
+  // for online allies. socialInfo is null offline, so this is online-only.
+  // Friend-list entries are NOT plotted: the world map shows the people you are
+  // grouped with (the party/raid loop above) and your guild, not everyone on
+  // your friend list. A friend who is also a guildmate still shows as guild. A
+  // guildmate who is also a party member is skipped here: the party loop above
+  // already draws them with their class color, matching how minimap_markers.ts
+  // excludes partyPids from its entity loop to avoid the same double dot.
   const allies: MapAllyMarker[] = [];
   const social = world.socialInfo;
   if (filters.players && labels && social) {
@@ -1420,7 +1421,6 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
       const { mx, my } = toMap(m.x, m.z);
       allies.push({ mx, my, name: m.name, kind });
     };
-    for (const f of social.friends) plotAlly(f, 'friend');
     if (social.guild) for (const m of social.guild.members) plotAlly(m, 'guild');
   }
 

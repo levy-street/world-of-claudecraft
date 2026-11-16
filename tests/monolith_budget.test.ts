@@ -554,7 +554,10 @@ const MONOLITHS: MonolithRow[] = [
     // Honor and companions. Measured after recovery integration, zero slack.
     // Main ce21c7a66f5 sync: parent pins 18043 (Halloween) and 17733 (main).
     // Exact combined count; the three seasonal wiring lines are preserved.
-    ceiling: 17736,
+    // LOWERED 17736 -> 17701 by the world map rework: the level-aware map canvas
+    // click, right-click and continent hover handlers moved out to
+    // src/ui/hud/map/continent_map_input_wiring.ts. Exact count, zero slack.
+    ceiling: 17701,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

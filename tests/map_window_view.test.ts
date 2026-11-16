@@ -772,9 +772,10 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     ]);
   });
 
-  it('dedups allies by id (friend wins ties) and orders friends before guild (zoomed in)', () => {
+  it('plots guild members only: friend-list entries get no dot (zoomed in)', () => {
+    // FriendA is on the friend list AND in the guild, so it still shows, as guild.
     const model = buildOverworldMapModel(input(makeOverworldWorld('sim'), LABELS_ZOOM));
-    expect(model.allies.map((a) => a.kind)).toEqual(['friend', 'guild']);
+    expect(model.allies.map((a) => a.kind)).toEqual(['guild', 'guild']);
     expect(model.allies.map((a) => a.name)).toEqual(['FriendA', 'GuildB']);
   });
 

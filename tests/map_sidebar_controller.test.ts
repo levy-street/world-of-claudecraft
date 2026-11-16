@@ -7,6 +7,7 @@ import { NPCS, QUESTS, zoneAt } from '../src/sim/data';
 import type { QuestProgress, WorldQuestProgress } from '../src/sim/types';
 import { worldQuestCycleForResetDay } from '../src/sim/world_quest_rotation';
 import { activeWorldQuestsForCycle } from '../src/sim/world_quests';
+import { worldQuestMapPosition } from '../src/ui/hud/map/world_quest_rail_view';
 import { MapSidebarController } from '../src/ui/map_sidebar_controller';
 import { QuestTrackingState } from '../src/ui/quest_tracking_core';
 import type { IWorld } from '../src/world_api';
@@ -325,18 +326,26 @@ describe('map sidebar controller: the world-quest section', () => {
     let selected: string | null = null;
     const confirmDialog = vi.fn();
     const onRepaintMap = vi.fn();
+    const onShowRoute = vi.fn();
+    const tracking = new QuestTrackingState(fakeStorage());
+    // Hud's focus selects the quest and opens its zone, which repaints the map.
+    const focus = vi.fn((questId: string) => {
+      selected = questId;
+      onRepaintMap();
+    });
     const controller = new MapSidebarController({
       root: () => root,
       click: vi.fn(),
       onRepaintMap,
-      onShowRoute: vi.fn(),
+      onShowRoute,
       settings: fakeSettings(),
-      tracking: new QuestTrackingState(fakeStorage()),
+      tracking,
       worldQuests: {
         selectedId: () => selected,
         select: (questId) => {
           selected = questId;
         },
+        focus,
         confirmDialog,
         nowMs: () => 4_000,
       },
@@ -350,6 +359,9 @@ describe('map sidebar controller: the world-quest section', () => {
       onRepaintMap,
       rerollWorldQuest,
       cycle,
+      focus,
+      onShowRoute,
+      tracking,
       selectedId: () => selected,
     };
   }
@@ -366,10 +378,12 @@ describe('map sidebar controller: the world-quest section', () => {
   });
 
   it('selecting a row shares the selection with the map and repaints it', () => {
-    const { root, onRepaintMap, selectedId } = makeWorldQuestHarness();
+    const { root, onRepaintMap, selectedId, focus } = makeWorldQuestHarness();
     const first = root.querySelector<HTMLElement>('[data-map-wq]');
     const questId = first?.dataset.mapWq ?? '';
     first?.click();
+    // The pick goes through the host's focus: it opens that quest's zone map.
+    expect(focus).toHaveBeenCalledWith(questId);
     expect(selectedId()).toBe(questId);
     expect(onRepaintMap).toHaveBeenCalled();
     expect(root.querySelector('.map-atlas-wq.is-selected')?.getAttribute('data-map-wq')).toBe(
@@ -402,6 +416,51 @@ describe('map sidebar controller: the world-quest section', () => {
     root.querySelector<HTMLElement>('[data-map-wq]')?.click();
     expect(root.querySelector<HTMLButtonElement>('[data-map-wq-reroll]')?.disabled).toBe(true);
     expect(root.querySelector('.map-atlas-wq-note')?.textContent).toBe('Replacement used today');
+  });
+
+  it('Track and Show Route stay disabled until a row is selected', () => {
+    const { root } = makeWorldQuestHarness();
+    expect(root.querySelector<HTMLButtonElement>('[data-map-wq-track]')?.disabled).toBe(true);
+    expect(root.querySelector<HTMLButtonElement>('[data-map-wq-route]')?.disabled).toBe(true);
+  });
+
+  it('tracks the selected quest from the list, and untracks it again', () => {
+    const { root, tracking, selectedId, onRepaintMap } = makeWorldQuestHarness();
+    root.querySelector<HTMLElement>('[data-map-wq]')?.click();
+    const questId = selectedId() ?? '';
+    onRepaintMap.mockClear();
+    root.querySelector<HTMLElement>('[data-map-wq-track]')?.click();
+    expect(tracking.isWorldQuestTracked(questId)).toBe(true);
+    expect(onRepaintMap).toHaveBeenCalled();
+    const track = root.querySelector<HTMLButtonElement>('[data-map-wq-track]');
+    expect(track?.getAttribute('aria-pressed')).toBe('true');
+    expect(track?.textContent).toBe('Untrack');
+    expect(root.querySelector('.map-atlas-wq.is-tracked')?.getAttribute('data-map-wq')).toBe(
+      questId,
+    );
+    root.querySelector<HTMLElement>('[data-map-wq-track]')?.click();
+    expect(tracking.isWorldQuestTracked(questId)).toBe(false);
+  });
+
+  it('shows the route to the selected quest from the list, and hands the map its point', () => {
+    const { root, controller, onShowRoute, selectedId } = makeWorldQuestHarness();
+    root.querySelector<HTMLElement>('[data-map-wq]')?.click();
+    const questId = selectedId() ?? '';
+    root.querySelector<HTMLElement>('[data-map-wq-route]')?.click();
+    const quest = activeWorldQuestsForCycle(worldQuestCycleForResetDay('2026-08-31')).find(
+      (q) => q.id === questId,
+    );
+    expect(quest).toBeDefined();
+    if (!quest) return;
+    const at = worldQuestMapPosition(quest);
+    expect(onShowRoute).toHaveBeenCalledWith({ questId, x: at.x, z: at.z });
+    expect(controller.shownRoute()).toEqual({ questId, x: at.x, z: at.z });
+    expect(
+      root.querySelector<HTMLButtonElement>('[data-map-wq-route]')?.getAttribute('aria-pressed'),
+    ).toBe('true');
+    // Clearing the pick drops the route line with it.
+    root.querySelector<HTMLElement>('.map-atlas-wq.is-selected')?.click();
+    expect(controller.shownRoute()).toBeNull();
   });
 
   it('a host without world quests omits the section entirely', () => {

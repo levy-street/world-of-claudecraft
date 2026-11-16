@@ -1,8 +1,10 @@
 // The map rail's world-quest section painter: a cold string builder the
 // MapSidebarController splices between the tracked-quest actions and the
 // "available nearby" list. Every value passes through esc() and every string is
-// a catalog key; the row and button carry data attributes the controller's one
-// click dispatcher reads (`data-map-wq`, `data-map-wq-reroll`).
+// a catalog key; the row and buttons carry data attributes the controller's one
+// click dispatcher reads (`data-map-wq`, `data-map-wq-track`, `data-map-wq-route`,
+// `data-map-wq-reroll`). Track / Untrack and Show Route act on the selected row,
+// the same pattern as the tracked-quest list above it.
 
 import { zoneDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
@@ -23,6 +25,7 @@ function rowHtml(row: WorldQuestRailRow): string {
     `is-${row.state}`,
     row.selected ? 'is-selected' : '',
     row.belowLevel ? 'is-below-level' : '',
+    row.tracked ? 'is-tracked' : '',
   ]
     .filter(Boolean)
     .join(' ');
@@ -37,7 +40,26 @@ function rowHtml(row: WorldQuestRailRow): string {
 }
 
 /** The section's markup: heading with the day's count, the rows, the reroll control. */
-export function worldQuestRailSectionHtml(view: WorldQuestRailView, nowMs: number): string {
+/** The selected row's Track / Untrack and Show Route buttons (disabled with no
+ *  selection, or once the selected quest is done). */
+function selectionActionsHtml(view: WorldQuestRailView, routeShown: boolean): string {
+  const sel = view.selection;
+  const live = sel !== null && !sel.completed;
+  const disabled = live ? '' : ' disabled';
+  const trackKey: TranslationKey = sel?.tracked
+    ? 'hudChrome.mapAtlas.untrack'
+    : 'hudChrome.mapAtlas.track';
+  const route = `<button type="button" class="map-atlas-route ui-btn ui-btn--red" data-map-wq-route aria-pressed="${live && routeShown}"${disabled}>${esc(t('hudChrome.mapAtlas.showRoute'))}</button>`;
+  const track = `<button type="button" class="map-atlas-untrack ui-btn" data-map-wq-track aria-pressed="${sel?.tracked === true}"${disabled}>${esc(t(trackKey))}</button>`;
+  return `<div class="map-atlas-actions map-atlas-wq-select-actions">${route}${track}</div>`;
+}
+
+/** `routeShown`: the map currently draws the route to the selected world quest. */
+export function worldQuestRailSectionHtml(
+  view: WorldQuestRailView,
+  nowMs: number,
+  routeShown = false,
+): string {
   const count = t('hudChrome.mapAtlas.worldQuests.count', {
     done: whole(view.completed),
     total: whole(view.total),
@@ -56,5 +78,5 @@ export function worldQuestRailSectionHtml(view: WorldQuestRailView, nowMs: numbe
       ? t(`hudChrome.mapAtlas.worldQuests.rerollReason.${reroll.reason}` as TranslationKey)
       : t('hudChrome.mapAtlas.worldQuests.rerollNote');
   const button = `<button type="button" class="map-atlas-wq-reroll ui-btn ui-btn--gold" data-map-wq-reroll="${esc(reroll.questId ?? '')}"${reroll.canReroll ? '' : ' disabled'}>${esc(t('hudChrome.mapAtlas.worldQuests.reroll'))}</button>`;
-  return `<section class="map-atlas-section map-atlas-wq-section"><h3 class="map-atlas-heading">${esc(t('hudChrome.mapAtlas.worldQuests.heading'))} <span class="map-atlas-wq-count">${esc(count)}</span></h3>${expiry}<div class="map-atlas-wq-list">${list}</div><div class="map-atlas-wq-actions">${button}<p class="map-atlas-wq-note ui-meta ui-muted">${esc(note)}</p></div></section>`;
+  return `<section class="map-atlas-section map-atlas-wq-section"><h3 class="map-atlas-heading">${esc(t('hudChrome.mapAtlas.worldQuests.heading'))} <span class="map-atlas-wq-count">${esc(count)}</span></h3>${expiry}<div class="map-atlas-wq-list">${list}</div>${selectionActionsHtml(view, routeShown)}<div class="map-atlas-wq-actions">${button}<p class="map-atlas-wq-note ui-meta ui-muted">${esc(note)}</p></div></section>`;
 }

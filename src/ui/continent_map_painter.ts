@@ -41,6 +41,8 @@ import type { FerryPortMapMarker } from './ferry_port_map_core';
 import { drawFerryPortMapMarker } from './ferry_port_map_painter';
 import { drawHillMapMarker } from './hill_map_marker_painter';
 import { t } from './i18n';
+import type { MapWorldQuestMarker } from './map_window_view';
+import { drawWorldQuestEmblem } from './world_quest_emblem_painter';
 
 // Typography (Georgia, matching the per-zone map painter).
 const TITLE_FONT = 'bold 16px Georgia';
@@ -76,6 +78,10 @@ const HERE_RING_LINE_WIDTH = 2;
 const PARTY_DOT_RADIUS = 3;
 const PARTY_DOT_LINE_WIDTH = 1.5;
 const FERRY_PORT_MARKER_SIZE = 18;
+// World-quest emblems: the zone map's emblem (outer radius 11) drawn a little
+// smaller, so the overview reads as the same mark without crowding the labels.
+const WORLD_QUEST_EMBLEM_RADIUS = 8;
+const WORLD_QUEST_EMBLEM_LINE_WIDTH = 1.5;
 
 // The --color-map-* design tokens the painter resolves once per redraw. The
 // label/outline/player group is shared with the per-zone map painter; the ocean
@@ -88,6 +94,8 @@ const CONTINENT_COLOR_TOKENS = {
   outline: '--color-map-outline',
   player: '--color-map-player',
   worldQuestAvailable: '--color-map-world-quest-available',
+  questBadgeFill: '--color-map-quest-badge-fill',
+  questBadgeText: '--color-map-quest-badge-text',
   partyDead: '--color-map-party-dead',
   regionHoverFill: '--color-map-region-hover-fill',
   regionCurrentFill: '--color-map-region-current-fill',
@@ -110,6 +118,8 @@ export interface ContinentPaintResult {
   regions: ContinentZoneRegion[];
   /** Ferry markers used by the map window's port hover hit-test. */
   ports: FerryPortMapMarker[];
+  /** World-quest emblems, for the same hover tooltip and click the zone map has. */
+  worldQuests: MapWorldQuestMarker[];
 }
 
 /**
@@ -257,7 +267,7 @@ export class ContinentMapPainter {
     });
     const colors = this.resolveColors();
     this.draw(ctx, model, opts.canvasSize, colors);
-    return { regions: model.regions, ports: model.ports };
+    return { regions: model.regions, ports: model.ports, worldQuests: model.worldQuests };
   }
 
   private draw(
@@ -310,6 +320,18 @@ export class ContinentMapPainter {
 
     for (const port of model.ports) {
       drawFerryPortMapMarker(ctx, port, FERRY_PORT_MARKER_SIZE, colors.player, colors.outline);
+    }
+
+    // World quests: the zone map's emblem, a little smaller, over the labels so
+    // a quest sitting near a zone's center stays visible and hoverable.
+    for (const marker of model.worldQuests) {
+      drawWorldQuestEmblem(
+        ctx,
+        marker,
+        WORLD_QUEST_EMBLEM_RADIUS,
+        WORLD_QUEST_EMBLEM_LINE_WIDTH,
+        colors,
+      );
     }
 
     // Party members (issue 2652): one class-colored dot per member (the dead
