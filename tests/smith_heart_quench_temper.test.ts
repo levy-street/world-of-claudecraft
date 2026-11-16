@@ -56,15 +56,27 @@ function huddleRound(f: QuenchFight, e: Entity): void {
 }
 
 describe('Rime-Tempered: the rows', () => {
-  it('Heroic freezes on the fifth stack (20 a stack), Normal caps at 72 (12 x 6)', () => {
+  it('Heroic freezes on the fifth stack (15 a stack), Normal caps at 72 (12 x 6)', () => {
     const N = QUENCH_DIFFICULTY.normal;
     const H = QUENCH_DIFFICULTY.heroic;
     expect(N).toMatchObject({ temperCold: 12, temperMax: 6, temperSwap: 4, temperFrost: 0.06 });
-    expect(H).toMatchObject({ temperCold: 20, temperMax: 5, temperSwap: 3, temperFrost: 0.12 });
+    expect(H).toMatchObject({
+      temperCold: 15,
+      temperMax: 5,
+      temperSwap: 3,
+      temperFrost: 0.12,
+      temperFreezes: true,
+    });
+    expect(N.temperFreezes).toBe(false);
     expect(N.temperCold * N.temperMax).toBeLessThan(T.coldMax);
-    expect(H.temperCold * H.temperMax).toBe(T.coldMax);
     // Mythic is Heroic's swap whole.
-    for (const k of ['temperCold', 'temperFrost', 'temperMax', 'temperSwap'] as const)
+    for (const k of [
+      'temperCold',
+      'temperFrost',
+      'temperMax',
+      'temperSwap',
+      'temperFreezes',
+    ] as const)
       expect(QUENCH_DIFFICULTY.mythic[k]).toBe(H[k]);
     expect(temperFloor([{ id: QUENCH_AURAS.tempered, stacks: 3 }], 20)).toBe(60);
     expect(temperFloor([], 20)).toBe(0);
@@ -100,11 +112,11 @@ describe('Rime-Tempered: the stacks', () => {
       expect(a?.kind).toBe('spellvuln');
       expect(a?.value).toBeCloseTo(0.12 * k, 6);
       expect(a?.undispellable).toBe(true);
-      expect(f.cold(p)).toBeGreaterThanOrEqual(20 * k);
+      expect(f.cold(p)).toBeGreaterThanOrEqual(15 * k);
     }
-    // A huddle warms no lower than the floor (80 at four stacks).
+    // A huddle warms no lower than the floor (60 at four stacks).
     f.tick(ticks(5));
-    expect(f.cold(p)).toBeGreaterThanOrEqual(80);
+    expect(f.cold(p)).toBeGreaterThanOrEqual(60);
     expect(isFrozen(s, p.id)).toBe(false);
     temper(s, p);
     expect(isFrozen(s, p.id)).toBe(true);
@@ -145,7 +157,7 @@ describe('Rime-Tempered: the stacks', () => {
       f.tick(ticks(1));
       if (i === 5) floorSeen = f.cold(p) ?? 0;
     }
-    expect(floorSeen).toBeGreaterThanOrEqual(40);
+    expect(floorSeen).toBeGreaterThanOrEqual(30);
     expect(stacks(p)).toBe(0);
     st.chill[p.id] = { cold: 0, frozen: 0 };
     f.tick(1);
@@ -225,12 +237,12 @@ describe('Rime-Tempered: what the tank reads', () => {
     expect(d?.key).toBe('hudChrome.auraEffect.quenchGuardian.tempered');
     const text = t(d?.key as never, d?.nums as never);
     expect(text).toContain('tempered you 2 times');
-    expect(text).toContain('cannot fall below 40');
+    expect(text).toContain('cannot fall below 30');
     expect(text).toContain('24% more Frost damage');
-    expect(text).toContain('(20 cold and 12% Frost damage each)');
+    expect(text).toContain('(15 cold and 12% Frost damage each)');
     expect(text).toContain(`resets this to ${T.temperSeconds} sec`);
     expect(text).toContain('Swap tanks at 3 stacks');
-    expect(text).toContain('5 stacks hold your cold at 100 and you freeze solid');
+    expect(text).toContain('stack 5 fills your cold to 100 and you freeze solid');
     expect(text).toContain('Normal stops at 6 stacks (72 cold)');
     expect(localizeSimAuraName('Rime-Tempered')).toBe('Rime-Tempered');
   });

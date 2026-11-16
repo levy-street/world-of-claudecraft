@@ -237,12 +237,13 @@ export interface QuenchDifficultyRules {
   lifeWarmth: number;
   /** Rime-Tempered (quench_temper.ts): the cold a stack holds the tank's bar
    *  at (at least), the magic damage each stack adds, the most stacks, and
-   *  the count the tanks are told to swap at (the alert, the bots). A floor
-   *  of `temperCold * temperMax` at 100 freezes the tank on that stack. */
+   *  the count the tanks are told to swap at (the alert, the bots), and
+   *  whether the last stack freezes the tank solid (Heroic and Mythic). */
   temperCold: number;
   temperFrost: number;
   temperMax: number;
   temperSwap: number;
+  temperFreezes: boolean;
 }
 
 export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficultyRules>> = {
@@ -275,6 +276,7 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
     temperFrost: 0.06,
     temperMax: 6,
     temperSwap: 4,
+    temperFreezes: false,
   },
   // Contagious cold: a shatter splashes further and harder.
   heroic: {
@@ -302,11 +304,14 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
     // (the owner's call of 2026-11-09).
     rimeColdMult: 1.5,
     lifeWarmth: 0.25,
-    // The fifth stack holds the bar at 100: the tank freezes. Swap at 3.
-    temperCold: 20,
+    // The fifth stack freezes the tank solid. Swap at 3. 15 a stack (20 until
+    // the bot raid of 2026-11-16: with Quenching Breath's +20 on top, a tank
+    // at three froze before the swap could land).
+    temperCold: 15,
     temperFrost: 0.12,
     temperMax: 5,
     temperSwap: 3,
+    temperFreezes: true,
   },
   // Every round one blade, slash after slash from where the last one ended.
   mythic: {
@@ -329,10 +334,11 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
     rimeLeap: true,
     rimeColdMult: 1.5,
     lifeWarmth: 0.25,
-    temperCold: 20,
+    temperCold: 15,
     temperFrost: 0.12,
     temperMax: 5,
     temperSwap: 3,
+    temperFreezes: true,
   },
 };
 

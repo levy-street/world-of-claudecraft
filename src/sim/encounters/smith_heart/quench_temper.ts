@@ -9,8 +9,7 @@
 //                     `temperCold` a stack (a huddle warms it no lower), and
 //                     adds the tier's `temperFrost` to the magic damage they
 //                     take (a `spellvuln`: every hit of this fight is Frost).
-//   Heroic, Mythic    20 a stack: the fifth stack holds the bar at 100 and
-//                     the tank freezes solid (quench_cold.ts `freezePlayer`,
+//   Heroic, Mythic    15 a stack, and the fifth stack freezes the tank solid (quench_cold.ts `freezePlayer`,
 //                     the fight's own threat: the rime cracks any immunity,
 //                     double damage taken). The tanks swap at 3.
 //   Normal            12 a stack, six at most (72): a swap asked for, never a
@@ -24,7 +23,7 @@
 // the guardian's aggro target that tick. Zero rng.
 
 import type { Entity } from '../../types';
-import { addCold, chillOf, isFrozen } from './quench_cold';
+import { addCold, chillOf, freezePlayer, isFrozen } from './quench_cold';
 import {
   QUENCH_AURAS,
   QUENCH_NAMES,
@@ -66,6 +65,12 @@ export function temper(s: QuenchScope, p: Entity): number {
       school: 'frost',
       undispellable: true,
     });
+  }
+  // Heroic and Mythic: the last stack freezes the tank solid (the freeze
+  // spends the stacks).
+  if (r.temperFreezes && stacks >= r.temperMax) {
+    freezePlayer(s, p);
+    return stacks;
   }
   const floor = temperFloor(p.auras, r.temperCold);
   const c = chillOf(s, p.id);

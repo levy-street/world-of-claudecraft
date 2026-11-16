@@ -6031,7 +6031,7 @@ export const hudChromeStrings = {
       rimeSlow:
         'Slowed by Living Rime: you move {slow}% slower and your cold rises {normalMult} times as fast ({heroicMult} times on Heroic and Mythic) until the crust is healed through or bursts.',
       tempered:
-        'Tempering Strike tempered you {stacks} times: your cold cannot fall below {floor}, and you take {pct}% more Frost damage. Each Tempering Strike on you adds a stack ({cold} cold and {per}% Frost damage each) and resets this to {seconds} sec. Swap tanks at {swap} stacks. On Heroic and Mythic, {heroicMax} stacks hold your cold at {max} and you freeze solid; Normal stops at {normalMax} stacks ({normalFloor} cold).',
+        'Tempering Strike tempered you {stacks} times: your cold cannot fall below {floor}, and you take {pct}% more Frost damage. Each Tempering Strike on you adds a stack ({cold} cold and {per}% Frost damage each) and resets this to {seconds} sec. Swap tanks at {swap} stacks. On Heroic and Mythic, stack {heroicMax} fills your cold to {max} and you freeze solid; Normal stops at {normalMax} stacks ({normalFloor} cold).',
     },
     // The Smith's Heart's Guardian of the Heat (src/ui/heat_aura_effect.ts).
     heatGuardian: {
