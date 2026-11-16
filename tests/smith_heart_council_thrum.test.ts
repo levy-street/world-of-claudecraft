@@ -94,10 +94,12 @@ describe('Stone Thrum: risen pillars ring on the whole raid', () => {
     const h = COUNCIL_DIFFICULTY.heroic;
     const m = COUNCIL_DIFFICULTY.mythic;
     expect([n.risenPulseMin, n.risenPulseMax]).toEqual([14, 16]);
-    expect([h.risenPulseMin, h.risenPulseMax]).toEqual([14, 16]);
+    // Heroic a tenth lighter since 2026-11-16 (the bot raid short of half
+    // the Guardian on the new pools); Mythic keeps Normal's base.
+    expect([h.risenPulseMin, h.risenPulseMax]).toEqual([12.6, 14.4]);
     expect([m.risenPulseMin, m.risenPulseMax]).toEqual([14, 16]);
-    expect(h.risenPulseMin * h.damageMult).toBeCloseTo(17.5);
-    expect(h.risenPulseMax * h.damageMult).toBeCloseTo(20);
+    expect(h.risenPulseMin * h.damageMult).toBeCloseTo(15.75);
+    expect(h.risenPulseMax * h.damageMult).toBeCloseTo(18);
     expect(m.risenPulseMin * m.damageMult).toBeGreaterThanOrEqual(h.risenPulseMin * h.damageMult);
     expect(T.risenPulseEvery).toBe(2);
   });

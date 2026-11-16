@@ -234,11 +234,13 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
     // The parse-calibrated pass of 2026-11-16: the bot raid took about 73
     // damage a second here against 165 to 190 on every other Normal fight,
     // so her swing, Quenching Breath, Crossing Blade and Freezing Water hit
-    // 2.5 times as hard (was 1); the shatter only +15 percent (2.5 x 0.46).
-    damageMult: 2.5,
-    swingMult: 2.5,
+    // twice as hard (was 1; the asked 2.5 wiped the bot raid at 58 percent
+    // on 250 a second, a frozen body's Crossing Blade one-shotting cloth);
+    // the shatter only +15 percent (2 x 0.575).
+    damageMult: 2,
+    swingMult: 2,
     healthMult: 1,
-    shatterMult: 0.46,
+    shatterMult: 0.575,
     splashR: 6,
     splashCold: 35,
     slashMarksLake: 1,

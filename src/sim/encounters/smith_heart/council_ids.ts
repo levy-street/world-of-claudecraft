@@ -394,17 +394,20 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     heirWrathMult: 2,
     crowdShare: 0.2,
     // Normal's Stone Thrum before the tier's 1.25 (was 19 to 21, which rode
-    // 68% over Normal: the balance pass of 2026-11-12).
-    risenPulseMin: 14,
-    risenPulseMax: 16,
+    // 68% over Normal: the balance pass of 2026-11-12), less a tenth since
+    // the pass of 2026-11-16 (the bot raid on the +30 percent pools wiped
+    // short of half the Guardian: 14 to 16 before).
+    risenPulseMin: 12.6,
+    risenPulseMax: 14.4,
     enrageAfterWraths: 8,
     heirRiseWarn: 2,
     heirFillSeconds: 35,
     rockOutlivesSinger: false,
     soulInTheStone: false,
     pillarLimit: 4,
-    cursedPulseMin: 40,
-    cursedPulseMax: 48,
+    // A tenth off on 2026-11-16 too (40 to 48 before).
+    cursedPulseMin: 36,
+    cursedPulseMax: 43.2,
     missCollapse: false,
   },
   // Everything heroic has, the inheritances stronger, and the souls.

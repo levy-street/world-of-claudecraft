@@ -27,7 +27,7 @@ const M = QUENCH_DIFFICULTY.mythic;
 const warmthPer = (rate: number): number => Math.round(1 / rate);
 
 const pct = (frac: number): number => Math.round(Math.abs(frac) * 100);
-/** Normal's damage factor (x2.5 since the parse-calibrated pass of 2026-11-16). */
+/** Normal's damage factor (x2 since the parse-calibrated pass of 2026-11-16). */
 const NM = QUENCH_DIFFICULTY.normal.damageMult;
 /** Heroic's damage factor; Mythic shares it (pinned), so one range names both. */
 const HM = QUENCH_DIFFICULTY.heroic.damageMult;

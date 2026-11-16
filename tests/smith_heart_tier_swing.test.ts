@@ -36,14 +36,14 @@ describe("Smith's Heart: a boss's swing per tier", () => {
     expect([e.weapon.min, e.weapon.max]).toEqual([200, 300]);
   });
 
-  it('a Normal pull of the Quench swings 2.5 times as hard; the wipe gives the swing back', () => {
+  it('a Normal pull of the Quench swings twice as hard; the wipe gives the swing back', () => {
     const f = quenchFight(3);
     const { min, max } = f.boss().weapon;
     expect(f.dev('/dev heart quench pull')).toBe(true);
     f.tick(2);
     expect(f.state()?.difficulty).toBe('normal');
     const k = QUENCH_DIFFICULTY.normal.swingMult;
-    expect(k).toBe(2.5);
+    expect(k).toBe(2);
     expect(f.boss().weapon.min).toBe(Math.round(min * k));
     expect(f.boss().weapon.max).toBe(Math.round(max * k));
     for (const p of f.players) f.sim.ctx.handleDeath(p, f.boss());
@@ -64,13 +64,13 @@ describe("Smith's Heart: a boss's swing per tier", () => {
 });
 
 describe("Smith's Heart: the pass of 2026-11-16's damage per tier", () => {
-  it('Normal: the raid +15 percent on every fight, the Quench 2.5 times', () => {
+  it('Normal: the raid +15 percent on every fight, the Quench twice', () => {
     for (const rows of [COUNCIL_DIFFICULTY, BREATH_DIFFICULTY, HEAT_DIFFICULTY, FINAL_DIFFICULTY]) {
       expect(rows.normal.damageMult).toBe(1.15);
       expect(rows.normal.swingMult).toBe(1.15);
       expect(rows.normal.punishMult).toBe(1);
     }
-    expect(QUENCH_DIFFICULTY.normal.damageMult).toBe(2.5);
+    expect(QUENCH_DIFFICULTY.normal.damageMult).toBe(2);
     // The shatter only +15 percent on Normal.
     const shatter = QUENCH_DIFFICULTY.normal.damageMult * QUENCH_DIFFICULTY.normal.shatterMult;
     expect(shatter).toBeCloseTo(1.15, 6);
