@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
+  FRAME_CADENCE_AUTO_EPOCH,
   frameCadenceAutoMemoryKey,
   localFrameCadenceAutoMemory,
   parseFrameCadenceAutoRecord,
@@ -28,6 +29,19 @@ describe('automatic frame rate limit memory', () => {
     expect(frameCadenceAutoMemoryKey(1, 59.94)).toBe(frameCadenceAutoMemoryKey(1, 60.02));
     expect(frameCadenceAutoMemoryKey(1, 60)).not.toBe(frameCadenceAutoMemoryKey(1, 144));
     expect(frameCadenceAutoMemoryKey(1, 60)).not.toBe(frameCadenceAutoMemoryKey(3, 60));
+  });
+
+  it('keys on the build epoch, so a release that changes what a device holds judges it again', () => {
+    // A phone capped at 30 before a performance release must not start capped
+    // after it: every verdict stored under an older epoch, or under the key
+    // shape from before the epoch existed, misses.
+    expect(frameCadenceAutoMemoryKey(1, 60)).toBe(`e${FRAME_CADENCE_AUTO_EPOCH}|1|60`);
+    const preEpoch = { v: 2, key: '1|60', ceiling: 30, confirmed: true, failStreak: 0 };
+    expect(parseFrameCadenceAutoRecord(preEpoch, frameCadenceAutoMemoryKey(1, 60))).toBeNull();
+    const legacy = { key: '1|60', ceiling: 30 };
+    expect(parseFrameCadenceAutoRecord(legacy, frameCadenceAutoMemoryKey(1, 60))).toBeNull();
+    const older = { ...preEpoch, key: `e${FRAME_CADENCE_AUTO_EPOCH - 1}|1|60` };
+    expect(parseFrameCadenceAutoRecord(older, frameCadenceAutoMemoryKey(1, 60))).toBeNull();
   });
 
   it('round-trips a verdict on the same display, and forgets it on another', () => {
