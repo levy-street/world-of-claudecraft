@@ -79,6 +79,10 @@ export const quench = {
   title: 'Guardian of the Quench',
   tids: { guardian: 'heart_quench_guardian' },
   tp: '/dev heart tp lake',
+  // Rime-Tempered (quench_temper.ts): the tanks swap at the tier's count
+  // (the aura's value3: 3 on Heroic, 4 on Normal).
+  swapAura: QUENCH_AURAS.tempered,
+  swapStacks: 3,
   resetGrace: 8000,
   // Living Warmth: healing a wounded player lowers their cold, so a healer
   // heals the coldest wounded first (a full-health one gains nothing).
@@ -214,10 +218,14 @@ export const quench = {
     if (me && rimeOut(me) && IGNORE !== 'rime') return null;
     if (IGNORE === 'huddle') return null;
     const gi = groupOf(b);
-    if (gi < 0 || b.spec.key === 'mt') return null;
+    if (gi < 0 || (b.spec.key === 'mt' && !st.mainTankPid)) return null;
     if (gi === 0) {
-      // The tank's huddle: the others close at the main tank's sides and back.
-      const mt = world.bots.find((x) => x.spec.key === 'mt');
+      // The tank's huddle: the others close at the main tank's sides and back
+      // (the tank holding her now: the swap hands her to the other).
+      const mt =
+        world.bots.find((x) => x.pid === st.mainTankPid) ??
+        world.bots.find((x) => x.spec.key === 'mt');
+      if (mt === b) return null;
       const g = world.mobs.guardian;
       const t = mt?.self && !mt.self.dead ? mt.self : null;
       if (!t || !alive(g)) return null;
@@ -229,7 +237,8 @@ export const quench = {
       // tank's neighbours stood 6 to 7 yd off and he froze).
       const r = Math.max(4, hypot(g, t));
       const f = Math.atan2(t.x - g.x, t.z - g.z);
-      const off = { ot: 0.72, rogue: 0.86, arms: 1.0 }[b.spec.key] ?? 0.86;
+      // The tank off duty takes the second tank's place, whichever it is.
+      const off = b.spec.role === 'tank' ? 0.72 : ({ rogue: 0.86, arms: 1.0 }[b.spec.key] ?? 0.86);
       return add(g, { x: Math.sin(f + off), z: Math.cos(f + off) }, Math.max(3.5, r - 2));
     }
     const c = huddleSpot(world, st, gi);

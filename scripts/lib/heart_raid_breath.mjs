@@ -97,6 +97,10 @@ export const breath = {
   key: 'breath',
   title: 'Guardian of the Breath',
   tids: { guardian: 'heart_breath_guardian' },
+  // The tank swap (breath_blow.ts): Wind-Battered in the Wind, Thunder-Laden
+  // in the Storm, each at the tier's count (the aura's value3).
+  swapAura: [BREATH_AURAS.battered, BREATH_AURAS.thunderLaden],
+  swapStacks: 3,
   tp: '/dev heart tp cornice',
   resetGrace: 9000,
   setup(diff) {

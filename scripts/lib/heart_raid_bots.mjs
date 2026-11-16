@@ -1244,17 +1244,20 @@ function sightTargets(world, st, b, boss) {
 // ---- tanks -----------------------------------------------------------------------------
 
 /** The generic tank plan: the main tank holds role[0], the off-tank every
- *  other body and the adds; a swap aura (`boss.swapAura`, at
- *  `boss.swapStacks` stacks) hands role[0] to the clear tank. */
+ *  other body and the adds; a swap aura (`boss.swapAura`, one id or a list,
+ *  at the aura's own swap count in `value3` when it carries one, else
+ *  `boss.swapStacks`) hands role[0] to the clear tank. */
 export function tankAssign(world, st, b, me) {
   const boss = world.boss;
   const tanks = world.living().filter((p) => p.tank);
   const main = world.roles[0];
   const holderOf = (m) => (m?.aggro != null ? (world.players.get(m.aggro) ?? null) : null);
-  const heavy = (p) => {
-    const a = boss.swapAura ? auraOf(p, boss.swapAura) : null;
-    return !!a && (a.stacks ?? 1) >= (boss.swapStacks ?? 1);
-  };
+  const swapIds = boss.swapAura ? [boss.swapAura].flat() : [];
+  const heavy = (p) =>
+    swapIds.some((id) => {
+      const a = auraOf(p, id);
+      return !!a && (a.stacks ?? 1) >= (a.value3 ?? boss.swapStacks ?? 1);
+    });
   let mainTank = tanks.find((p) => p.pid === st.mainTankPid) ?? null;
   const g = world.mobs[main];
   if (!mainTank)
