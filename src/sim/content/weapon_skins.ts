@@ -344,10 +344,10 @@ export const WEAPON_SKINS: Record<string, WeaponSkinDef> = {
     earnedFrom: 'lantern_hall',
   },
   // ── Smith's Heart (earned): one appearance per encounter of the raid ──
-  // Built by scripts/assets/smith_heart_arms/, each with its element's VFX row
-  // (src/render/weapon_vfx.ts). Hearthbrand, Squallcrest, the Rimelight Staff and the
-  // duskwick_staff model were first made for Lantern Hall and held back for this raid; the raid
-  // reforged them, and the ids stay frozen (duskwick_staff is now the Heartmeld Staff).
+  // Hand-painted models (reference turnarounds reconstructed with Tripo, see CREDITS.md), each
+  // with its element's VFX row (src/render/weapon_vfx.ts). Hearthbrand, Squallcrest, the
+  // Rimelight Staff and the duskwick_staff model were first made for Lantern Hall and held back
+  // for this raid; the ids stay frozen (duskwick_staff is the Heartmeld Staff).
   seamcaller_maul: {
     id: 'seamcaller_maul',
     collection: 'smiths_heart',

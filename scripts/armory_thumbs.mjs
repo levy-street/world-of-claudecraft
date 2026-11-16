@@ -30,7 +30,23 @@ const bundled = await esbuild.build({
   bundle: true,
   format: 'iife',
   platform: 'browser',
-  define: { 'import.meta.env.DEV': 'true', 'import.meta.env.PROD': 'false' },
+  define: {
+    'import.meta.env.DEV': 'true',
+    'import.meta.env.PROD': 'false',
+    // The VFX rig's imports now read these too. An IIFE has no import.meta, so an undefined
+    // one throws at module scope and the page never signals ready (esbuild matches full
+    // member paths, so each field is named; the guard below catches a raw leftover).
+    'import.meta.env.TEST': 'false',
+    'import.meta.env.VITE_API_ORIGIN': 'undefined',
+    'import.meta.env.VITE_DESKTOP_APP': 'undefined',
+    'import.meta.env.VITE_DESKTOP_API_ORIGIN': 'undefined',
+    'import.meta.env.VITE_DESKTOP_RELATIVE_API': 'undefined',
+    'import.meta.env.VITE_NATIVE_APP': 'undefined',
+    // three's KTX2Loader builds its default transcoder URLs from import.meta.url at module
+    // scope and throws on an undefined base. Any absolute URL does: attachKtx2 points the
+    // loader at /basis/ on the harness origin.
+    'import.meta.url': JSON.stringify('http://127.0.0.1/__armory/'),
+  },
   write: false,
   logLevel: 'silent',
 });
