@@ -81,6 +81,9 @@ const INVENTORY: Record<string, Answer> = {
   'src/render/scenery_detail_batches.ts:ready': {
     exempt: 'mounted scene content, relinked by visible and resident scene restoration',
   },
+  'src/render/zone_feature_builds.ts:ready': {
+    exempt: 'CPU: feature views prebuilt in idle slices, not attached or uploaded yet',
+  },
   'src/render/post_shed.ts:twinReady': { reset: 'post-shed' },
   'src/render/interior_encounter_prewarm_pass.ts:startedByHost': {
     exempt:

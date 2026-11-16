@@ -378,7 +378,10 @@ describe('runBackgroundPrewarm', () => {
     expect(zonePrewarm).toContain('warmChildUnits: (group, child) =>');
     expect(zoneMethod).toContain('this.webgl.initTexture(texture)');
     expect(zoneMethod).toContain('this.renderBoundedPrewarmRoot(group, child)');
-    expect(prepareMethod).toContain('const featureGroups = this.lastAttachedFeatureGroups.slice()');
+    // The features attach in their own lane (idle-sliced off the gating path),
+    // which hands back the groups this zone attached.
+    expect(prepareMethod).toContain('return this.lastAttachedFeatureGroups.slice();');
+    expect(prepareMethod).toContain('const featureGroups = await features;');
     const hideAt = prepareMethod.indexOf('withHiddenPrewarmGroups(featureGroups');
     const queueAt = prepareMethod.indexOf('this.backgroundGpuWork.run(', hideAt);
     expect(hideAt).toBeGreaterThan(-1);
