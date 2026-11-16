@@ -1284,3 +1284,44 @@ collision/movement.
   every rung, dwells, restores and dwells again, and only an unmoved cadence latches the
   cap; a moved one is refused and the session sheds under the normal rules, ending in
   the `floored` reason once nothing is left (`tests/render_budget_frame_cap.test.ts`).
+  **One-off costs are not render load.** A sample is read NEUTRALLY (its timings replaced
+  by the running averages, so every rule and clock runs but the spike neither degrades a rung,
+  starts a submit-stall hold, moves an average, nor credits or resets recovery) when it is:
+  a **preparation frame**, a span whose `info.programs.length` (`sample.programCount`, read at
+  the top of the callback, the boundary its dt and the previous callback's submit share) rose
+  AND that actually spiked (three links a cold program synchronously at first draw, inside
+  submit), bounded by `PREPARATION_EXEMPT_MAX_SHARE` of recent time (a 0.35 s EMA) so a long
+  burst or a material-churn bug cannot hide real load; or a **covered frame**: under
+  `arrivalCoverActive()` (`sample.covered`: world entry, a blocking teleport arrival, a context
+  restore), for `REVEAL_GRACE_S` after the cover drops (the first revealed frames pay the
+  curtain fade and the HUD's first layout and paint), and, with `awaitReveal` (the renderer
+  sets it), for every frame before the first `noteReveal()` (`markGpuHitchReveal` calls it),
+  bounded by `PRE_REVEAL_MAX_S` for a host that never reveals (the editor viewport): the frame
+  loop starts under the loading screen two frames before the entry cover is raised. Covered
+  frames have no share bound. Not covered by design: texture uploads (Chrome uploads
+  asynchronously, so the count rises a frame before the cost), a raced pending link (the count
+  rose when a gate submitted it), and the chosen-cadence miss share, which still counts a
+  neutralized spike once inside its own window. Before this, one cold link or the first
+  revealed frame on a phone held the resolution floor and a 24 to 30 s hold for whole sessions.
+  **A resolution cut must pay for itself** (`resolution_effect_probe_core.ts`): every cut by
+  `degrade()` starts an A/B/A experiment (cut, restore the previous level, cut again, each arm a
+  0.5 s settle plus a 1.5 s median of the governor's own frame cost, neutral frames excluded),
+  and the cut is kept only if the restored arm costs at least `RESOLUTION_EFFECT_MIN_MS` and
+  `RESOLUTION_EFFECT_MIN_SHARE` more than the average of the two cut arms; otherwise it is undone
+  and the rung locked out for `RESOLUTION_LOCKOUT_S` (a cap probe's exhaustive shed ignores the
+  lockout). A kept cut lets the next `RESOLUTION_TRUSTED_CUTS` cuts inside `RESOLUTION_TRUST_S`
+  skip the experiment, so a misjudged keep walks the scale down at most that far before the next
+  experiment; too little clean evidence keeps the cut (the old behaviour). While an experiment
+  runs the governor holds every other rung still and never reports itself at baseline
+  (`atBaseline`, which the frame-rate ceiling reads); the frame-cap probe, a changed resolution
+  range or a real submit stall cancels it, keeping the cut (the stall then sheds on the same
+  frame). An urgent frame alone does not: phones cross that line while turning, and cancelling
+  there would leave most cuts unjudged. The floor is the tier's own (`GFX.budget.minRenderScale*`,
+  `DYNAMIC_RENDER_SCALE_ABSOLUTE_MIN` under it), no longer a global 0.68. On a GPU-bound device the restored arm is a visible 1.5 s at the previous
+  scale. `resolutionEffectProbe: false` (and `?resprobe=off`, `render_dev_flags.ts`) turns it
+  off; the recovery-ladder tests in `tests/render_budget_recovery.test.ts` do, because their
+  setup floors resolution with a pixel-independent overload. State: `preparationFrames`, `preparationShare`, `coveredFrames`,
+  `resolutionProbe`, `resolutionCuts{Kept,Reverted,Unjudged,Cancelled}`,
+  `resolutionLockoutSeconds`, `resolutionLastGainMs` (all on `perfStats().renderBudget` and the
+  beacon's `rawSummary.rendererBudget`). Tests: `tests/render_budget_preparation.test.ts`,
+  `tests/render_budget_resolution_probe.test.ts`, `tests/resolution_effect_probe_core.test.ts`.

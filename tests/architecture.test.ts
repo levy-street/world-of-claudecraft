@@ -1388,6 +1388,8 @@ const RENDER_PURE_CORES = [
   'src/render/frame_present.ts',
   'src/render/self_motion_rift_lift.ts',
   'src/render/shadow_cadence_core.ts',
+  // whether a render-scale cut made the frame cheaper on this device (render_budget.ts)
+  'src/render/resolution_effect_probe_core.ts',
   'src/render/shadow_extent_core.ts',
   'src/render/shadow_texel_snap_core.ts',
   'src/render/terrain_detail_shed_core.ts',

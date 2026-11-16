@@ -210,6 +210,17 @@ export function postShedLevelPin(): number | null {
   return postShedPin;
 }
 
+const resolutionProbeOff = ((): boolean => {
+  if (typeof location === 'undefined') return false;
+  return new URLSearchParams(location.search).get('resprobe') === 'off';
+})();
+
+/** False under `?resprobe=off`: the governor's resolution-cut experiment
+ *  (resolution_effect_probe_core.ts) is skipped, the A/B arm that prices it. */
+export function resolutionEffectProbeEnabled(): boolean {
+  return !resolutionProbeOff;
+}
+
 const gpuTimer = ((): boolean => {
   if (typeof location === 'undefined') return false;
   return new URLSearchParams(location.search).get('gputimer') === '1';

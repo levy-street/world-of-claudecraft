@@ -1,4 +1,12 @@
+/** The automatic floor when the caller names none. A tier's own floor
+ *  (`GFX.budget.minRenderScaleMobile` / `Desktop`) replaces it: Low on a phone or
+ *  tablet asks for 0.55, and a GPU-bound Mali tablet measured 2026-11-15 needs
+ *  that room (town turns 21 FPS at 0.68, up to 30 at 0.55). The governor's
+ *  resolution test keeps a cut only where it makes the frame cheaper, so a
+ *  CPU-bound device is not pushed down for nothing. */
 export const MIN_DYNAMIC_RENDER_SCALE = 0.68;
+/** No floor, from any tier or caller, goes under this. */
+export const DYNAMIC_RENDER_SCALE_ABSOLUTE_MIN = 0.5;
 
 export interface DynamicResolutionInput {
   logicalWidth: number;
@@ -77,7 +85,7 @@ export function dynamicResolutionGovernorRange(
   const max = clampedRenderScale(maxRenderScale, effective);
   const requestedMin = Number.isFinite(minRenderScale) ? minRenderScale : MIN_DYNAMIC_RENDER_SCALE;
   return {
-    minRenderScale: Math.min(max, Math.max(MIN_DYNAMIC_RENDER_SCALE, requestedMin)),
+    minRenderScale: Math.min(max, Math.max(DYNAMIC_RENDER_SCALE_ABSOLUTE_MIN, requestedMin)),
     maxRenderScale: max,
   };
 }
@@ -90,7 +98,10 @@ export function dynamicResolutionRect(input: DynamicResolutionInput): DynamicRes
   const requestedMin = Number.isFinite(input.minRenderScale)
     ? input.minRenderScale
     : MIN_DYNAMIC_RENDER_SCALE;
-  const minRenderScale = Math.min(maxRenderScale, Math.max(0.5, requestedMin));
+  const minRenderScale = Math.min(
+    maxRenderScale,
+    Math.max(DYNAMIC_RENDER_SCALE_ABSOLUTE_MIN, requestedMin),
+  );
   const requestedScale = Number.isFinite(input.renderScale) ? input.renderScale : maxRenderScale;
   const renderScale = Math.min(maxRenderScale, Math.max(minRenderScale, requestedScale));
   const targetWidth = devicePixels(logicalWidth * pixelRatio * maxRenderScale);

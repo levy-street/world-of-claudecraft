@@ -1,4 +1,5 @@
 import { chosenCadenceFrameMs, NO_CHOSEN_CADENCE } from './chosen_cadence_pressure_core';
+import { DYNAMIC_RENDER_SCALE_ABSOLUTE_MIN } from './dynamic_resolution_core';
 import { GFX_BUCKET_BANDS, type GfxBucketBands, type GfxRuntimeBudget, type GfxTier } from './gfx';
 import {
   type PostShedChain,
@@ -6,6 +7,16 @@ import {
   postShedStepDown,
   postShedStepUp,
 } from './post_shed_core';
+import {
+  advanceResolutionProbe,
+  cancelResolutionProbe,
+  createResolutionProbe,
+  noteResolutionCut,
+  type ResolutionProbePhase,
+  type ResolutionProbeState,
+  resolutionCutAllowed,
+  resolutionProbeBusy,
+} from './resolution_effect_probe_core';
 import {
   createTerrainDetailShedState,
   resetTerrainDetailShed,
@@ -88,6 +99,25 @@ export interface RenderBudgetState {
   stallHoldSeconds: number;
   stableSeconds: number;
   cooldownSeconds: number;
+  /** Preparation frames read with neutralized timings since the last reset (see
+   *  RenderBudgetSample.programCount); the program-count baseline itself spans
+   *  resets, since it counts the context, not the governor. */
+  preparationFrames?: number;
+  /** Recent share of samples that were preparation frames (EMA, 0..1). Above
+   *  PREPARATION_EXEMPT_MAX_SHARE the exemption stops. */
+  preparationShare?: number;
+  /** Covered frames read neutrally since the last reset. */
+  coveredFrames?: number;
+  /** Resolution-cut experiments (resolution_effect_probe_core.ts): the running
+   *  phase, how many cuts paid off and were kept, how many bought nothing and
+   *  were undone, the lockout a revert started, and the last measured gain. */
+  resolutionProbe?: ResolutionProbePhase;
+  resolutionCutsUnjudged?: number;
+  resolutionCutsCancelled?: number;
+  resolutionCutsKept?: number;
+  resolutionCutsReverted?: number;
+  resolutionLockoutSeconds?: number;
+  resolutionLastGainMs?: number;
   levels: RenderBudgetLevels;
   caps: RenderBudgetCaps;
 }
@@ -113,12 +143,42 @@ export interface RenderBudgetSample {
    *  headroom goes to the cadence and not to quality that would fail its next
    *  return trial (frame_cadence_auto_core.ts owns the hierarchy). */
   holdRecovery?: boolean;
+  /** The WebGL context's linked-program count (`info.programs.length`), read at
+   *  the top of the callback: the same boundary the sample's dt and the previous
+   *  callback's submit share, so a rise means THIS sample's span linked a program.
+   *  That marks a PREPARATION FRAME: three links a cold program synchronously at
+   *  its first draw, inside submit, and reading that one-off spike as render load
+   *  is what held a phone at the resolution floor for a whole session while its
+   *  camera turned toward unseen scenery (measured 2026-11-11 on a Snapdragon
+   *  7s Gen 3 phone and an RTX 3070). Absent, the governor behaves as before.
+   *  Texture creation is deliberately NOT a mark: Chrome uploads asynchronously,
+   *  so the cost often lands a frame after the count rises. Nor does it cover a
+   *  raced pending link (a gate submitted the program earlier, the count rose then,
+   *  and a live draw blocks on it later): that stall is still read as load. */
+  programCount?: number;
+  /** A loading screen covers the world (arrival_cover.ts `arrivalCoverActive`:
+   *  world entry, a blocking teleport arrival, a context restore): the frame is
+   *  preparation by design and nobody sees it. Read neutrally like a preparation
+   *  frame, with no share bound, since a long curtain is the expected case. A
+   *  1.04 s covered prewarm frame just before the entry reveal used to start a
+   *  30 s submit-stall hold that covered the first half minute of play. */
+  covered?: boolean;
 }
 
 export interface RenderBudgetGovernorOptions {
   tier: GfxTier;
   budget: GfxRuntimeBudget;
   enabled: boolean;
+  /** Judge every resolution cut by whether it made the frame cheaper
+   *  (resolution_effect_probe_core.ts). Default on; `?resprobe=off`
+   *  (render_dev_flags.ts) is the A/B arm that prices it. */
+  resolutionEffectProbe?: boolean;
+  /** Read every frame as covered until noteReveal() (bounded by
+   *  PRE_REVEAL_MAX_S): the game's frame loop starts under the loading screen,
+   *  before the entry cover is raised, and its first full draw is unseen. The
+   *  renderer sets it; a governor built without it reads its first frames as
+   *  before. */
+  awaitReveal?: boolean;
   /** The session's own static terrain-detail request (the three `GFX` knobs,
    *  snapshotted here): the shed is admitted when it sits above the floor
    *  (an Advanced session on tier high may dial relief 3 and 4 taps) or when
@@ -313,6 +373,28 @@ const SUBMIT_STALL_URGENT_HOLD_SECONDS: Record<GfxTier, number> = {
   insane: 12,
 };
 const SUBMIT_STALL_RECOVERY_CEILING_MS = 42;
+/** A preparation frame is neutralized only while such frames stay occasional:
+ *  above this recent share they are read as ordinary frames again, so a material
+ *  churn bug or a device that is genuinely overloaded while it streams can never
+ *  blind the governor. A burst longer than about a quarter second (zone entry, a
+ *  context-restore relink) therefore falls back to the old reading after its
+ *  start. */
+export const PREPARATION_EXEMPT_MAX_SHARE = 0.5;
+/** Seconds after the cover drops that still read as covered. The first frames of
+ *  a revealed world pay one-off presentation costs (the curtain fading, the HUD
+ *  laid out and painted for the first time, the first full draw): measured on the
+ *  calibrated desktop proxy, the first revealed frame cost about 1 s, almost all
+ *  of it main-thread work outside the game's JavaScript, and it started a 24 s
+ *  submit-stall hold that the cover alone did not prevent. */
+export const REVEAL_GRACE_S = 2;
+/** Upper bound on the pre-reveal window of a governor that awaits a reveal
+ *  (`awaitReveal`), so a host that never reveals (the map editor's viewport)
+ *  gets an ordinary governor after it. A phone's entry from renderer creation to
+ *  reveal measured well under this. */
+export const PRE_REVEAL_MAX_S = 120;
+/** Time constant of that share, in seconds, so the bound means the same span of
+ *  play at 60 Hz and at 144 Hz. */
+const PREPARATION_SHARE_TAU_S = 0.35;
 const EXTERNAL_FRAME_CAP_MIN_MS = 28;
 const EXTERNAL_FRAME_CAP_MAX_MS = 48;
 /** Consecutive frames the cap candidate may fail before a latched cap or a
@@ -371,6 +453,17 @@ export class RenderBudgetGovernor {
   private stallHoldSeconds = 0;
   private stableSeconds = 0;
   private cooldownSeconds = 0;
+  private lastProgramCount = -1;
+  private preparationShare = 0;
+  private preparationFrames = 0;
+  private coveredFrames = 0;
+  private revealGraceS = 0;
+  private preRevealS = 0;
+  private awaitingReveal = false;
+  private probeRangeMin = Number.NaN;
+  private probeRangeMax = Number.NaN;
+  private resolutionProbe: ResolutionProbeState = createResolutionProbe();
+  private readonly resolutionProbeEnabled: boolean;
   private levels: RenderBudgetLevels = {
     grass: 1,
     foliage: 1,
@@ -387,6 +480,9 @@ export class RenderBudgetGovernor {
   private readonly pinnedPostLevel: number | null;
 
   constructor(options: RenderBudgetGovernorOptions) {
+    this.resolutionProbeEnabled = options.resolutionEffectProbe !== false;
+    this.preRevealS = options.awaitReveal === true ? PRE_REVEAL_MAX_S : 0;
+    this.awaitingReveal = options.awaitReveal === true;
     this.tier = options.tier;
     this.budget = options.budget;
     this.enabled = options.enabled;
@@ -460,6 +556,10 @@ export class RenderBudgetGovernor {
     this.recentSubmitStalls = 0;
     this.lastSubmitStallMs = 0;
     this.stallHoldSeconds = 0;
+    this.preparationShare = 0;
+    this.preparationFrames = 0;
+    this.coveredFrames = 0;
+    this.resolutionProbe = createResolutionProbe();
     this.stableSeconds = 0;
     this.cooldownSeconds = this.enabled ? 0.5 : 0;
     this.pressure = 0;
@@ -485,6 +585,16 @@ export class RenderBudgetGovernor {
         stallHoldSeconds: 0,
         stableSeconds: 0,
         cooldownSeconds: 0,
+        preparationFrames: 0,
+        preparationShare: 0,
+        coveredFrames: 0,
+        resolutionProbe: 'idle',
+        resolutionCutsKept: 0,
+        resolutionCutsReverted: 0,
+        resolutionCutsUnjudged: 0,
+        resolutionCutsCancelled: 0,
+        resolutionLockoutSeconds: 0,
+        resolutionLastGainMs: 0,
         levels: copyLevels(this.levels),
         caps: copyCaps(this.caps),
       } satisfies RenderBudgetState);
@@ -506,6 +616,16 @@ export class RenderBudgetGovernor {
     state.stallHoldSeconds = round2(this.stallHoldSeconds);
     state.stableSeconds = round2(this.stableSeconds);
     state.cooldownSeconds = round2(this.cooldownSeconds);
+    state.preparationFrames = this.preparationFrames;
+    state.preparationShare = round2(this.preparationShare);
+    state.coveredFrames = this.coveredFrames;
+    state.resolutionProbe = this.resolutionProbe.phase;
+    state.resolutionCutsKept = this.resolutionProbe.kept;
+    state.resolutionCutsReverted = this.resolutionProbe.reverted;
+    state.resolutionCutsUnjudged = this.resolutionProbe.unjudged;
+    state.resolutionCutsCancelled = this.resolutionProbe.cancelled;
+    state.resolutionLockoutSeconds = round2(this.resolutionProbe.lockoutS);
+    state.resolutionLastGainMs = this.resolutionProbe.lastGainMs;
     state.levels.grass = round2(this.levels.grass);
     state.levels.foliage = round2(this.levels.foliage);
     state.levels.vfx = round2(this.levels.vfx);
@@ -526,15 +646,79 @@ export class RenderBudgetGovernor {
     return state;
   }
 
+  /** Cancel a running resolution experiment and hold its cut. */
+  private cancelResolutionExperiment(minRenderScale: number, maxRenderScale: number): void {
+    const keep = cancelResolutionProbe(this.resolutionProbe);
+    if (keep !== null) {
+      this.levels.resolution = Math.min(maxRenderScale, Math.max(minRenderScale, keep));
+    }
+  }
+
+  /** The world was revealed (the loading screen lifts): the pre-reveal window
+   *  ends and the reveal grace starts. */
+  noteReveal(): void {
+    if (this.awaitingReveal) this.revealGraceS = REVEAL_GRACE_S;
+    this.awaitingReveal = false;
+    this.preRevealS = 0;
+  }
+
+  /** Whether this sample's span linked a program. The first reading only arms
+   *  the baseline; a falling count (a dispose, or a context restore that starts a
+   *  fresh count at zero) re-arms it and is not preparation. */
+  private notePreparation(sample: RenderBudgetSample): boolean {
+    const programs = sample.programCount;
+    if (programs === undefined || !Number.isFinite(programs)) return false;
+    const prepared = this.lastProgramCount >= 0 && programs > this.lastProgramCount;
+    this.lastProgramCount = programs;
+    return prepared;
+  }
+
   update(sample: RenderBudgetSample, out?: RenderBudgetState): RenderBudgetState {
     if (!Number.isFinite(sample.dt) || sample.dt <= 0) return this.state(out);
+    // A preparation frame keeps every rule and clock of an ordinary reading
+    // (stall-pressure decay, holds, cooldowns, the detail dwell, the cap probe,
+    // draw and grass pressure) but its TIMINGS are replaced by the running
+    // averages: the spike is a one-off link that shedding cannot make cheaper,
+    // so it must neither degrade, start a stall hold, move either average, nor
+    // count as recovery headroom (stableSeconds is held, not credited or reset).
+    // A covered frame is neutral the same way, with no share bound, and is no
+    // evidence about the live share either.
+    const prepared = this.notePreparation(sample);
+    const preReveal = this.preRevealS > 0;
+    if (preReveal) this.preRevealS = Math.max(0, this.preRevealS - sample.dt);
+    if (sample.covered === true) this.revealGraceS = REVEAL_GRACE_S;
+    else if (this.revealGraceS > 0) this.revealGraceS = Math.max(0, this.revealGraceS - sample.dt);
+    const covered = (sample.covered === true || preReveal || this.revealGraceS > 0) && this.enabled;
+    if (!covered) {
+      const shareStep = 1 - Math.exp(-sample.dt / PREPARATION_SHARE_TAU_S);
+      this.preparationShare += ((prepared ? 1 : 0) - this.preparationShare) * shareStep;
+    }
+    // Only a link frame that actually SPIKED is neutralized: a link that cost
+    // nothing hides nothing worth hiding, and real load landing on the frames of a
+    // steady background link stream must still be read.
+    const spiked =
+      sample.submitMs >= SUBMIT_STALL_MS ||
+      Math.max(sample.frameMs, sample.totalMs) >= this.budget.urgentFrameMs;
+    const neutralPreparation =
+      !covered &&
+      prepared &&
+      spiked &&
+      this.enabled &&
+      this.preparationShare <= PREPARATION_EXEMPT_MAX_SHARE;
+    const neutral = covered || neutralPreparation;
+    if (covered) this.coveredFrames++;
+    else if (neutralPreparation) this.preparationFrames++;
     const chosenMissShare = sample.chosenCadenceMissShare ?? NO_CHOSEN_CADENCE;
     const chosenCadence = chosenMissShare >= 0;
-    const frameMs = chosenCadence
-      ? chosenCadenceFrameMs(chosenMissShare, this.budget.dropFrameMs, this.budget.recoverFrameMs)
-      : Math.min(250, Math.max(0, sample.frameMs));
-    const totalMs = Math.min(250, Math.max(0, sample.totalMs));
-    const rawSubmitMs = Math.max(0, sample.submitMs);
+    const frameMs = neutral
+      ? this.frameMsEma
+      : chosenCadence
+        ? chosenCadenceFrameMs(chosenMissShare, this.budget.dropFrameMs, this.budget.recoverFrameMs)
+        : Math.min(250, Math.max(0, sample.frameMs));
+    const totalMs = neutral
+      ? Math.min(this.frameMsEma, Math.min(250, Math.max(0, sample.totalMs)))
+      : Math.min(250, Math.max(0, sample.totalMs));
+    const rawSubmitMs = neutral ? this.submitMsEma : Math.max(0, sample.submitMs);
     const submitMs = Math.min(250, rawSubmitMs);
     const frameCost = Math.max(frameMs, totalMs);
     this.frameMsEma += (frameCost - this.frameMsEma) * 0.08;
@@ -554,12 +738,39 @@ export class RenderBudgetGovernor {
       return this.state(out);
     }
 
-    const minRenderScale = Math.min(sample.maxRenderScale, Math.max(0.5, sample.minRenderScale));
+    const minRenderScale = Math.min(
+      sample.maxRenderScale,
+      Math.max(DYNAMIC_RENDER_SCALE_ABSOLUTE_MIN, sample.minRenderScale),
+    );
     const maxRenderScale = Math.max(minRenderScale, Math.min(1, sample.maxRenderScale));
     this.levels.resolution = Math.min(
       maxRenderScale,
       Math.max(minRenderScale, this.levels.resolution),
     );
+    // Judge a running resolution cut on the very reading the governor degrades
+    // on (frameCost); neutral frames are not evidence. A cut that bought nothing
+    // is undone here, and the rung stays locked out of the ladder for a while.
+    // Cancel a running experiment (keeping the cut) when something else takes the
+    // resolution level: the frame-cap probe, or a changed resolution range (a post
+    // chain that turned dynamic resolution off collapses both arms to one level).
+    const rangeMoved =
+      minRenderScale !== this.probeRangeMin || maxRenderScale !== this.probeRangeMax;
+    this.probeRangeMin = minRenderScale;
+    this.probeRangeMax = maxRenderScale;
+    if (this.capProbe || rangeMoved)
+      this.cancelResolutionExperiment(minRenderScale, maxRenderScale);
+    const probeStep = advanceResolutionProbe(
+      this.resolutionProbe,
+      Math.max(frameMs, totalMs),
+      sample.dt,
+      !neutral,
+    );
+    if (probeStep.setLevel !== null) {
+      this.levels.resolution = Math.min(
+        maxRenderScale,
+        Math.max(minRenderScale, probeStep.setLevel),
+      );
+    }
 
     if (this.capRefused) this.capRefusedAgeS += sample.dt;
     if (this.cooldownSeconds > 0) {
@@ -647,6 +858,7 @@ export class RenderBudgetGovernor {
       !this.capRefused &&
       this.capProbe === null
     ) {
+      this.cancelResolutionExperiment(minRenderScale, maxRenderScale);
       this.capProbe = { phase: 'shed', settleS: 0, emaFloor: 0, shedMoved: false };
       if (this.capProbeOrigin === null) this.capProbeOrigin = copyLevels(this.levels);
     }
@@ -696,7 +908,18 @@ export class RenderBudgetGovernor {
     // The probe's two dwells hold the ladder still (the restored levels
     // would be shed on the spot otherwise); a real submit stall still wins.
     const probeDwell = this.advanceCapProbe(sample.dt, minRenderScale, maxRenderScale);
+    // A resolution experiment owns the ladder like the cap probe's dwells do: the
+    // arms must differ in resolution only (resolution_effect_probe_core.ts). A real
+    // submit stall still wins, as it does over the dwells: it ends the experiment
+    // with its cut held and the ladder sheds on this frame. An urgent frame alone
+    // does not: a phone crosses that line routinely while turning, and cancelling
+    // there would keep most cuts unjudged, the very thing the experiment prevents.
+    if (submitStall && resolutionProbeBusy(this.resolutionProbe)) {
+      this.cancelResolutionExperiment(minRenderScale, maxRenderScale);
+    }
+    const experimenting = resolutionProbeBusy(this.resolutionProbe);
     if (
+      !experimenting &&
       (submitStall || overBudget) &&
       (submitStall || this.cooldownSeconds <= 0) &&
       (submitStall || !probeDwell)
@@ -778,7 +1001,8 @@ export class RenderBudgetGovernor {
       sample.triangles <= this.caps.targetTriangles * 0.9 &&
       sample.grassVisibleTufts <= this.caps.targetGrassTufts * 0.9;
 
-    if (canRecover) {
+    // A neutral frame holds stableSeconds: it is no evidence either way.
+    if (canRecover && !neutral && !experimenting) {
       this.stableSeconds += sample.dt;
       if (this.stableSeconds >= this.budget.recoverStableSeconds && this.cooldownSeconds <= 0) {
         const changed = this.recover(maxRenderScale, canEnrich);
@@ -793,7 +1017,7 @@ export class RenderBudgetGovernor {
           return this.state(out);
         }
       }
-    } else {
+    } else if (!neutral && !experimenting) {
       this.stableSeconds = 0;
     }
 
@@ -1014,7 +1238,16 @@ export class RenderBudgetGovernor {
       eligible = true;
       if (this.pinnedPostLevel == null && this.stepPostShed(-1)) changed = true;
       const resolutionStep = urgent ? this.budget.urgentDropStep : this.budget.dropStep;
-      if (this.reduceLevel('resolution', minRenderScale, resolutionStep)) changed = true;
+      const resolutionBefore = this.levels.resolution;
+      const cutAllowed = exhaustive
+        ? !resolutionProbeBusy(this.resolutionProbe)
+        : resolutionCutAllowed(this.resolutionProbe);
+      if (cutAllowed && this.reduceLevel('resolution', minRenderScale, resolutionStep)) {
+        changed = true;
+        if (this.resolutionProbeEnabled && !exhaustive && !this.capProbe) {
+          noteResolutionCut(this.resolutionProbe, resolutionBefore, this.levels.resolution);
+        }
+      }
     }
     return changed ? 'changed' : eligible ? 'exhausted' : 'idle';
   }
@@ -1025,6 +1258,9 @@ export class RenderBudgetGovernor {
    *  disabled governor never took anything. */
   atBaseline(maxRenderScale: number): boolean {
     if (!this.enabled) return true;
+    // The restored arm of a resolution experiment can sit at full scale for a
+    // moment: that is no evidence of headroom for the frame-rate ceiling.
+    if (resolutionProbeBusy(this.resolutionProbe)) return false;
     // A recover step is a one-frame reading of a governor that is doing well.
     if (this.mode === 'degrading') return false;
     if (this.reason !== 'stable' && this.reason !== 'recover') return false;
@@ -1053,7 +1289,11 @@ export class RenderBudgetGovernor {
     // scale: each rung back is a whole pass returning, so it waits for the
     // cheaper restores to prove their headroom first.
     if (this.pinnedPostLevel == null && this.stepPostShed(1)) return true;
-    if (this.raiseLevel('resolution', maxRenderScale, this.budget.recoverStep)) return true;
+    if (
+      !resolutionProbeBusy(this.resolutionProbe) &&
+      this.raiseLevel('resolution', maxRenderScale, this.budget.recoverStep)
+    )
+      return true;
     if (!allowAboveBaseline) return false;
     if (this.raiseLevel('foliage', this.bands.foliage.max, 0.08)) return true;
     if (this.raiseLevel('vfx', this.bands.vfx.max, 0.08)) return true;
