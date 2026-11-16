@@ -145,6 +145,17 @@ export interface GpuWorkAdmission {
    *  not spend the curtain accumulating deferrals it never earned and then
    *  admit as `starvation` on the first live frame after the drop. */
   agesDeferral?(candidate: GpuWorkAdmissionCandidate): boolean;
+  /** One rendered frame began, before refused candidates age and the loop is
+   *  woken: a policy whose answer depends on frames elapsing (the deferred link
+   *  pacing, link_frame_ledger.ts) advances here, on the queue's own clock.
+   *  Returning true asks for `frameEnded` once this frame's task is over. */
+  noteFrame?(): boolean | void;
+  /** The frame a `noteFrame` asked about has ended: its callbacks ran, so its
+   *  draws are recorded and its present issued. Called from a task of its own
+   *  (the queue's `afterFrame`), and the parked loop is woken right after, so a
+   *  unit the policy held for the frame's task starts in the gap before the
+   *  next frame. */
+  frameEnded?(): void;
   /** The main-thread cost the admitted unit's synchronous prologue really had,
    *  reported the moment it returns so a second admission in the same frame
    *  prices the smaller headroom it actually has. Called for the released-tail
@@ -175,6 +186,16 @@ export interface GpuWorkRunOptions {
    *  with other units like any microtask work, but it books in no unit's
    *  syncMs, so keep it small. */
   releaseTail?: boolean;
+}
+
+/** The label of the unit whose work() is executing SYNCHRONOUSLY right now,
+ *  across every queue in the page (JavaScript runs one at a time), or null. A
+ *  compile arm reads it to say which unit kind issued a link
+ *  (link_frame_ledger.ts); it is null in every awaited tail. */
+let runningUnitLabel: string | null = null;
+
+export function runningGpuWorkLabel(): string | null {
+  return runningUnitLabel;
 }
 
 function pendingKinds(
@@ -485,6 +506,10 @@ export function createBackgroundGpuQueue(opts?: {
   /** Per-frame budget. Absent, the queue starts every unit as soon as its turn
    *  comes, which is the behaviour every host had before this seam. */
   admission?: GpuWorkAdmission;
+  /** Runs `fn` in a task after the current one (GpuWorkAdmission.frameEnded).
+   *  Default: a zero-delay timer, which a browser runs after the frame's
+   *  rendering update, present included. */
+  afterFrame?: (fn: () => void) => void;
 }): BackgroundGpuQueue {
   const now = opts?.now ?? ((): number => performance.now());
   const slowestLimit = Math.max(1, opts?.slowestLimit ?? DEFAULT_SLOWEST_LIMIT);
@@ -493,6 +518,7 @@ export function createBackgroundGpuQueue(opts?: {
   const tailLimit = Math.max(1, opts?.tailLimit ?? DEFAULT_TAIL_LIMIT);
   const frameGapIgnoreMs = Math.max(1, opts?.frameGapIgnoreMs ?? DEFAULT_FRAME_GAP_IGNORE_MS);
   const admission = opts?.admission;
+  const afterFrame = opts?.afterFrame ?? ((fn: () => void): void => void setTimeout(fn, 0));
   const pending: PendingGpuWork<unknown>[] = [];
   const slowest: GpuWorkUnitStat[] = [];
   const blockiest: GpuWorkUnitStat[] = [];
@@ -512,6 +538,8 @@ export function createBackgroundGpuQueue(opts?: {
   let admissionParks = 0;
   let selectionPass = 0;
   let admissionNotify: (() => void) | null = null;
+  /** A frameEnded hop is scheduled and has not run yet. */
+  let frameEndPending = false;
   // True while the drain loop is parked waiting for a cap slot. Read at enqueue
   // so a unit arriving mid-park is attributed the wait it really had.
   let parkedOnTailCap = false;
@@ -872,7 +900,13 @@ export function createBackgroundGpuQueue(opts?: {
       let released = false;
       let charged = false;
       try {
-        const returned = next.work();
+        runningUnitLabel = next.label;
+        let returned: unknown;
+        try {
+          returned = next.work();
+        } finally {
+          runningUnitLabel = null;
+        }
         syncMs = now() - unit.startedAt;
         // Charged whether or not the tail is released, and whether or not the
         // admission is armed yet: the ledger learns from boot units too.
@@ -962,6 +996,14 @@ export function createBackgroundGpuQueue(opts?: {
     },
     noteFrame(atMs: number): void {
       if (admission) {
+        if (admission.noteFrame?.() === true && !frameEndPending) {
+          frameEndPending = true;
+          afterFrame(() => {
+            frameEndPending = false;
+            admission.frameEnded?.();
+            wakeAdmission();
+          });
+        }
         // A refused candidate ages in FRAMES, which is the unit the starvation
         // bound counts in, and the new frame re-opens the budget: wake the loop
         // so it reconsiders everything it parked on. The policy may decline

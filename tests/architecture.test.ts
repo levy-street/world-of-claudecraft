@@ -909,8 +909,6 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 const RENDER_PURE_CORES = [
   // whether and how compile gates run without parallel compile (renderer.ts)
   'src/render/link_gate_mode_core.ts',
-  // deferred-mode link pacing, one new link per frame (compile_arms.ts)
-  'src/render/paced_link_core.ts',
   'src/render/courier_visual_core.ts',
   // the lantern horse's ember rates and hoof-strike weight (mount_embers.ts)
   'src/render/mount_embers_core.ts',

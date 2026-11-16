@@ -10,17 +10,10 @@
 // asks for.
 
 import type * as THREE from 'three';
+import { runningGpuWorkLabel } from './background_gpu_queue';
 import { linkAcrossContextLoss } from './context_generation';
 import { awaitLinkFence, type LinkFenceGl } from './link_fence_proof';
-import {
-  linkFrameUsed,
-  linkPacingActive,
-  linkSlot,
-  noteLink,
-  passLinkSlot,
-  setLinkPacingEnabled,
-} from './link_slot_pacer';
-import { type LinkLane, type PacedLinkHost, pacedCompile } from './paced_link_core';
+import { linkPacingActive, noteLink, setLinkPacingEnabled } from './link_frame_ledger';
 import { prewarmDepthMaterial } from './prewarm_depth_material';
 
 /** The renderer surface both arms drive. `compileAsync` is the link; the
@@ -33,8 +26,8 @@ export interface CompileArmRenderer {
     camera: THREE.Camera,
     targetScene?: THREE.Scene | null,
   ): Promise<THREE.Object3D>;
-  /** The program list, read by the deferred-mode pacing to see whether a
-   *  compile linked anything. */
+  /** The program list, read to see whether a compile linked anything (the
+   *  deferred-mode pacing, link_frame_ledger.ts). */
   info?: { programs?: readonly unknown[] | null };
 }
 
@@ -84,11 +77,12 @@ export type CompileArmObserver = (root: THREE.Object3D, arm: 'color' | 'shadow')
 
 let armObserver: CompileArmObserver | null = null;
 
-/** Deferred link-gate mode (link_gate_mode_core.ts): each arm compile runs
- *  under the frame rule (paced_link_core.ts) and resolves only once a fence
- *  issued behind it signals (link_fence_proof.ts). Called by every Renderer
- *  constructor, so a second renderer in the page (the editor, a rebuild)
- *  starts disarmed and with its own mode. */
+/** Deferred link-gate mode (link_gate_mode_core.ts): each arm compile reports
+ *  its links to the frame ledger (link_frame_ledger.ts, which the queue's
+ *  admission paces on) and resolves only once a fence issued behind it signals
+ *  (link_fence_proof.ts). Called by every Renderer constructor, so a second
+ *  renderer in the page (the editor, a rebuild) starts disarmed and with its own
+ *  mode. */
 let fenceProof = false;
 let pacingOwner: object | null = null;
 export function setCompileArmLinkPacing(
@@ -102,52 +96,35 @@ export function setCompileArmLinkPacing(
   setLinkPacingEnabled(on);
 }
 
-/** A renderer going away: stand the pacing down and release its parked
- *  compiles, unless a newer renderer already took the pacer over. */
+/** A renderer going away: stand the pacing down, unless a newer renderer
+ *  already took it over. */
 export function releaseCompileArmLinkPacing(owner: object): void {
   if (pacingOwner !== owner) return;
   setCompileArmLinkPacing(false);
 }
 
-const PACER: PacedLinkHost = {
-  paced: linkPacingActive,
-  frameUsed: linkFrameUsed,
-  slot: linkSlot,
-  noteLink,
-  passSlot: passLinkSlot,
-};
-
-/** Run one arm compile under the frame rule and await it. `issue` is the
- *  synchronous prologue (three's compileAsync call, made under the arm's
- *  state, which is restored before it returns); its promise is awaited here,
- *  after the state is restored, as the unpaced arms always did. In deferred
- *  mode, once the world is revealed and no arrival cover is up, the fence is
- *  issued in the same synchronous step, directly behind the compile's links,
- *  and the arm settles only on its signal: three's own answer is an
- *  unconditional true on such a context (link_fence_proof.ts). */
-async function pacedArmCompile<T>(
-  host: CompileArmHost,
-  issue: () => T,
-  lane: LinkLane,
-): Promise<Awaited<T>> {
+/** Run one arm compile and await it. `issue` is the synchronous prologue
+ *  (three's compileAsync call, made under the arm's state, which is restored
+ *  before it returns); it runs at once, inside the queue unit that called the
+ *  arm, so the queue times it and its budget prices it. Whether it may run in
+ *  this frame was the queue admission's decision (link_frame_ledger.ts), never
+ *  a wait in here. The programs it created are reported to the ledger with the
+ *  running unit's label. In deferred mode, once the world is revealed and no
+ *  arrival cover is up, the fence is issued in the same synchronous step,
+ *  directly behind the compile's links, and the arm settles only on its signal:
+ *  three's own answer is an unconditional true on such a context
+ *  (link_fence_proof.ts). */
+async function armCompile<T>(host: CompileArmHost, issue: () => T): Promise<Awaited<T>> {
   const webgl = host.webgl();
-  let fence: Promise<unknown> | null = null;
-  const result = await pacedCompile(
-    PACER,
-    () => {
-      const before = webgl.info?.programs?.length ?? 0;
-      const value = issue();
-      const created = Math.max(0, (webgl.info?.programs?.length ?? 0) - before);
-      // In the world only: under the loading screen a fence per unit would
-      // stall the submission behind every link, so the boot compile waits on
-      // ONE fence behind all of its units instead (renderer.ts
-      // programs.compile).
-      if (fenceProof && linkPacingActive()) fence = linkProof(host, created);
-      return { value, created };
-    },
-    lane,
-  );
-  const value = await result.value;
+  const before = webgl.info?.programs?.length ?? 0;
+  const pending = issue();
+  const created = Math.max(0, (webgl.info?.programs?.length ?? 0) - before);
+  noteLink(created, runningGpuWorkLabel());
+  // In the world only: under the loading screen a fence per unit would stall
+  // the submission behind every link, so the boot compile waits on ONE fence
+  // behind all of its units instead (renderer.ts programs.compile).
+  const fence = fenceProof && linkPacingActive() ? linkProof(host, created) : null;
+  const value = await pending;
   if (fence) await fence;
   return value;
 }
@@ -220,20 +197,16 @@ export async function linkColorPrograms(
   host: CompileArmHost,
   root: THREE.Object3D,
   includeOffscreenVariant: boolean,
-  lane: LinkLane = 'gate',
 ): Promise<void> {
   armObserver?.(root, 'color');
   // A link that straddled a context loss is linked again on the live context
   // (context_generation.ts): its first answer proves nothing there.
   await linkAcrossContextLoss(host.webgl(), async () => {
     for (const target of colorArmTargets(host, includeOffscreenVariant)) {
-      await pacedArmCompile(
-        host,
-        () =>
-          underRenderTarget(host, target, () =>
-            host.webgl().compileAsync(root, host.camera(), host.scene()),
-          ),
-        lane,
+      await armCompile(host, () =>
+        underRenderTarget(host, target, () =>
+          host.webgl().compileAsync(root, host.camera(), host.scene()),
+        ),
       );
     }
   });
@@ -329,19 +302,15 @@ export function runShadowArm<T>(
 export async function linkShadowPrograms(
   host: CompileArmHost,
   root: THREE.Object3D,
-  lane: LinkLane = 'gate',
 ): Promise<void> {
   await linkAcrossContextLoss(host.webgl(), async () => {
     // Told inside the arm, so a root with nothing to link announces nothing.
     // A null arm (nothing to prepare) resolves to null at once.
-    await pacedArmCompile(
-      host,
-      () =>
-        runShadowArm(host, root, (target, camera, scene) => {
-          armObserver?.(root, 'shadow');
-          return host.webgl().compileAsync(target, camera, scene);
-        }),
-      lane,
+    await armCompile(host, () =>
+      runShadowArm(host, root, (target, camera, scene) => {
+        armObserver?.(root, 'shadow');
+        return host.webgl().compileAsync(target, camera, scene);
+      }),
     );
   });
 }

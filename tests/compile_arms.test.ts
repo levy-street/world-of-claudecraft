@@ -5,6 +5,7 @@
 
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { createBackgroundGpuQueue, GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
 import {
   type CompileArmHost,
   colorArmTargets,
@@ -22,7 +23,11 @@ import {
   LINK_FENCE_POLL_MS,
   LINK_FENCE_SLOW_MS,
 } from '../src/render/link_fence_proof';
-import { armLinkPacing, linkPacingStats } from '../src/render/link_slot_pacer';
+import {
+  armLinkPacing,
+  linkPacingStats,
+  resetLinkPacingForTests,
+} from '../src/render/link_frame_ledger';
 
 interface Stub {
   host: CompileArmHost;
@@ -479,5 +484,54 @@ describe('deferred-mode link proof', () => {
     await vi.advanceTimersByTimeAsync(LINK_FENCE_POLL_MS * 30);
     expect(later.log).not.toContain('fence');
     expect(laterDone).toBe(true);
+  });
+});
+
+describe('deferred-mode link pacing in the arms', () => {
+  afterEach(() => resetLinkPacingForTests());
+
+  it('reports each link with the queue unit that issued it, and never waits for a frame itself', async () => {
+    // The pacing is the queue admission's decision (link_frame_ledger.ts): the
+    // arm links at once, inside the unit that called it, so the queue times
+    // the compile and its priority order picks who links next.
+    resetLinkPacingForTests();
+    const s = stub({ offscreen: false });
+    setCompileArmLinkPacing(true, {});
+    armLinkPacing();
+    const queue = createBackgroundGpuQueue();
+    await queue.run(
+      () => linkColorPrograms(s.host, meshRoot().root, false),
+      GPU_WORK_PRIORITY.LIVE_VIEW,
+      'live-gate:wolf',
+    );
+    expect(linkPacingStats()).toMatchObject({
+      links: 1,
+      linkingKinds: ['live-gate'],
+      owedFrames: 1,
+    });
+
+    // A frame is owed, and a second compile still issues synchronously.
+    void linkColorPrograms(s.host, meshRoot().root, false);
+    expect(s.compileAsync).toHaveBeenCalledTimes(2);
+    // outside any unit it owes frames but teaches no kind
+    expect(linkPacingStats()).toMatchObject({
+      links: 2,
+      linkingKinds: ['live-gate'],
+      owedFrames: 2,
+    });
+  });
+
+  it('a cache hit reports nothing', async () => {
+    resetLinkPacingForTests();
+    const s = stub({ offscreen: false, links: false });
+    setCompileArmLinkPacing(true, {});
+    armLinkPacing();
+    const queue = createBackgroundGpuQueue();
+    await queue.run(
+      () => linkColorPrograms(s.host, meshRoot().root, false),
+      GPU_WORK_PRIORITY.LIVE_VIEW,
+      'live-gate:wolf',
+    );
+    expect(linkPacingStats()).toMatchObject({ links: 0, linkingKinds: [], owedFrames: 0 });
   });
 });

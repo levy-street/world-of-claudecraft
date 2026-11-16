@@ -1069,7 +1069,10 @@ const MONOLITHS: MonolithRow[] = [
     // feature prebuild wiring (zone_feature_builds.ts). Exact count.
     // Lowered again when station props and farm patches moved onto
     // attachZoneFeature (one call instead of category, add). Exact count.
-    ceiling: 12178,
+    // Lowered again when the deferred link pacing moved into the queue
+    // admission (link_frame_ledger.ts) and the arms lost their lane argument.
+    // Exact count.
+    ceiling: 12176,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

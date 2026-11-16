@@ -508,7 +508,12 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   bound, and arms only once the frame clock runs, with `?prep=legacy` restoring
   the old ADMISSION only (every unit admitted at once, the ledger still
   learning); the reveal-gate policy has no legacy arm and keeps revealing
-  piecewise under its soft deadline whatever that flag says. The touch tail runs as one budgeted queue
+  piecewise under its soft deadline whatever that flag says. In deferred
+  link-gate mode the same admission also paces shader LINKS, one admitted link
+  per frame, issued after the frame's present (`link_frame_ledger.ts`: the
+  arms report links, the admission holds the kinds known to link): that hold
+  answers before the budget, so `?prep=legacy` keeps it, and it is the only
+  link pacing there is, never a scheduler beside the queue. The touch tail runs as one budgeted queue
   unit PER PROGRAM (`linked_program_touch_lane.ts`) on the live gates, on the
   reveal host, and on the world-entry compile lane. Each of those three once
   ended at the shadow arm and left its programs paying the uniform-table round

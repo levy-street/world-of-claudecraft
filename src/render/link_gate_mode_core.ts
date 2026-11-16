@@ -20,8 +20,8 @@
 // renderer's `compileGatesSupported`): the same machinery, where three reports
 // a program ready as soon as its link is issued (it has no completion query to
 // ask), the gate's touch tail, which reads the program's uniform tables, is
-// what waits for the link to finish, and the compile arms pace new links to one
-// per frame (paced_link_core.ts), because the GPU process runs them in order.
+// what waits for the link to finish, and the queue admits new links at one per
+// frame (link_frame_ledger.ts), because the GPU process runs them in order.
 // The BULK lanes stay off there as before (`asyncCompileSupported`: the boot
 // manifest's compile entries, the background zone prewarm, the self-spirit
 // warm): measured on the desktop proxy, the zone prewarm alone queued 340 to

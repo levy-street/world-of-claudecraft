@@ -51,8 +51,9 @@ type CompileRoot = (root: THREE.Object3D) => Promise<void>;
 const colourArm =
   (host: CompileArmHost): CompileRoot =>
   (root) =>
-    // A bulk lane: in deferred mode a waiting reveal links first.
-    linkColorPrograms(host, root, false, 'bulk');
+    // A bulk lane: a waiting reveal still links first, by the queue's
+    // priority order (link_frame_ledger.ts).
+    linkColorPrograms(host, root, false);
 
 /** One unit linking `root` through the colour arm (the canvas variant: the
  *  pools draw in the world pass), which records its root's programs as linked

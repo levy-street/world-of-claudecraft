@@ -399,17 +399,18 @@ describe('runBackgroundPrewarm', () => {
     // The target is bound, the op (compileAsync's synchronous prologue) runs,
     // the previous target is restored in the finally, and only then does the
     // link get awaited: no throwaway target is held across a live frame. The
-    // colour arm's compile is issued inside the paced helper's synchronous
-    // issue step (paced_link_core.ts), which awaits the link only after
-    // underRenderTarget has returned.
+    // colour arm's compile is issued inside armCompile's synchronous issue
+    // step, which awaits the link only after underRenderTarget has returned.
     const setTargetAt = compileMethod.indexOf('webgl.setRenderTarget(target);');
     const opAt = compileMethod.indexOf('return op();', setTargetAt);
     const restoreAt = compileMethod.indexOf('webgl.setRenderTarget(previousTarget);', opAt);
     const awaitAt = compileMethod.indexOf(
-      'await pacedArmCompile(host, () =>\n        underRenderTarget(host, target, () =>',
+      'await armCompile(host, () =>\n        underRenderTarget(host, target, () =>',
       restoreAt,
     );
-    expect(compileMethod).toContain('return await result.value;');
+    const issueAt = compileMethod.indexOf('const pending = issue();');
+    expect(issueAt).toBeGreaterThan(-1);
+    expect(compileMethod.indexOf('const value = await pending;', issueAt)).toBeGreaterThan(issueAt);
     const compileAt = compileMethod.indexOf(
       'host.webgl().compileAsync(root, host.camera(), host.scene())',
       awaitAt,

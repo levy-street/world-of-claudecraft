@@ -527,13 +527,13 @@ import { legendaryRegaliaActive, legendaryRegaliaEmitDt } from './legendary_rega
 import { stepLichHeartbeat } from './lich_audio_state_core';
 import { LightPulses, lightPulsePoolSize } from './light_pulses';
 import { awaitLinkFence, linkFenceStats } from './link_fence_proof';
+import { armLinkPacing, linkPacingStats } from './link_frame_ledger';
 import { type LinkGateMode, resolveLinkGateMode } from './link_gate_mode_core';
 import {
   createPrewarmPacing,
   markPrewarmPacingReveal,
   type PrewarmPacingHandle,
 } from './link_rate_budget';
-import { armLinkPacing, linkPacingStats } from './link_slot_pacer';
 import { liveMaterialProperties } from './linked_program_touch';
 import { runWorldGateTouchLane } from './linked_program_touch_lane';
 import { diffComposedLook, diffWornArmor } from './live_look_diff';
@@ -621,7 +621,6 @@ import {
   lowSunIntensity,
   terrainFillBoostTarget,
 } from './outdoor_light_rig_core';
-import type { LinkLane } from './paced_link_core';
 import { buildPlacedTownViews, type PlacedTownView } from './painted_towns';
 import {
   PALADIN_AEGIS_DOME_RADIUS,
@@ -4516,7 +4515,7 @@ export class Renderer {
     };
   }
 
-  /** Diagnostic-only lifecycle boundary, called immediately before curtain fade. */
+  /** A world reveal, right before the curtain fades: diagnostics and link pacing arm. */
   markGpuHitchReveal(): void {
     this.gpuHitchCompileLifecycle?.markReveal();
     markPrewarmPacingReveal(this.gpuHitchPacing, this.lastPrewarmStats);
@@ -5278,9 +5277,8 @@ export class Renderer {
   private compilePrewarmColorPrograms(
     root: THREE.Object3D,
     includeOffscreenVariant: boolean,
-    lane: LinkLane = 'gate',
   ): Promise<void> {
-    return linkColorPrograms(this.compileArms, root, includeOffscreenVariant, lane);
+    return linkColorPrograms(this.compileArms, root, includeOffscreenVariant);
   }
 
   /** Link the depth twins of every mesh under the root, under the shadow
@@ -5688,7 +5686,7 @@ export class Renderer {
         batchSize: compileBatchRoots,
         sharedDedupe: compileDedupe,
         // A bulk lane once resumed: in deferred mode a waiting gate links first.
-        compileColor: (root) => this.compilePrewarmColorPrograms(root, false, 'bulk'),
+        compileColor: (root) => this.compilePrewarmColorPrograms(root, false),
         compileShadow: (root) => this.compileShadowPrograms(root),
         onCompiledRoot: () => compiledPrewarmRoots++,
         tail: entryCompileTail(this.webgl, this.prewarmDepthMaterials, this.backgroundGpuWork),
@@ -6649,9 +6647,9 @@ export class Renderer {
         // a synchronous traversal, so the live resume lane must never receive
         // this.scene or another whole manifest entry.
         resumeUnits: () => {
-          // Deferred mode resumes too: its units link through the paced arms
-          // (paced_link_core.ts), one linking compile per frame, so the static
-          // scene the camera has not faced yet links before the first turn.
+          // Deferred mode resumes too: the queue admits its units at one linking
+          // compile per frame (link_frame_ledger.ts), so the static scene the
+          // camera has not faced yet links before the first turn.
           if (!this.compileGatesSupported || !this.webgl.compileAsync) return [];
           deferPoolPublication = poolsAwaitPublication();
           // Already-submitted groups are in flight off-thread; resuming them
@@ -11919,7 +11917,7 @@ export class Renderer {
   /** Release host-owned workers, overlay canvases, and document listeners. */
   dispose(): void {
     setBuildSpanSink(null);
-    // Release every compile parked on the link pacer (link_slot_pacer.ts).
+    // Stand the deferred link pacing down (link_frame_ledger.ts).
     releaseCompileArmLinkPacing(this);
     this.cancelTerrainStreaming();
     this.localVisuals.dispose();
