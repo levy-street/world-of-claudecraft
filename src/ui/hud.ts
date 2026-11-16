@@ -978,7 +978,7 @@ import { TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap } from './touch_tap';
 import { buildTownFocusView, stepTownFocus, townFocusRenderSig } from './town_focus_view';
 import { renderTownFocusWindow } from './town_focus_window';
-import { trackerCollapseSettings } from './tracker_collapse_settings';
+import { questTrackerCollapseSettings, trackerCollapseSettings } from './tracker_collapse_settings';
 import { wireTrackerHeader } from './tracker_header_wiring';
 import { installTrackerStackAnchor } from './tracker_stack_anchor';
 import { stageTradeOffer, tradeOfferHeadroom } from './trade_view';
@@ -2448,17 +2448,17 @@ export class Hud {
       element: $('#qt-body'),
       document,
       world: () => this.sim,
-      settings: {
-        ...trackerCollapseSettings(() => this.optionsHooks, 'questTrackerCollapsed'),
-        worldQuestsCollapsed: () =>
-          (this.optionsHooks?.settings.get('worldQuestTrackerCollapsed') ?? false) === true,
-        setWorldQuestsCollapsed: (collapsed) =>
-          this.optionsHooks?.settings.set('worldQuestTrackerCollapsed', collapsed),
-      },
+      settings: questTrackerCollapseSettings(() => this.optionsHooks),
       questTitle,
       objectiveLabel: questObjectiveLabel,
       click: () => audio.click(),
       dungeonRow: () => this.dungeonTracker.stripQuest(),
+      worldQuestRewards: {
+        line: (questId) => this.mapMarkerTooltipContent.worldQuestRewardLine(questId),
+        card: (questId) => this.mapMarkerTooltipContent.worldQuestCard(questId, Date.now()),
+        paint: (html, x, y) => this.paintTooltipAt(html, x, y),
+        hide: () => this.hideTooltip(),
+      },
     });
     this.questDialog = new QuestDialogController({
       element: $('#quest-dialog'),

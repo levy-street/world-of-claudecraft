@@ -76,6 +76,17 @@ export interface QuestTrackerControllerDeps {
    * tracker of its own at the top of the stack, so it never joins these rows.
    */
   dungeonRow?(): TrackedQuest | null;
+  /**
+   * World-quest rewards in the World Quests section: a compact reward line under
+   * each quest, and the map's full reward card while that line is hovered. Absent
+   * on a host that does not wire it (the section then lists title + objectives).
+   */
+  worldQuestRewards?: {
+    line(questId: string): string;
+    card(questId: string): string;
+    paint(html: string, clientX: number, clientY: number): void;
+    hide(): void;
+  };
 }
 
 /** Owns quest tracker projection, collapse persistence, and elided DOM updates.
@@ -124,6 +135,31 @@ export class QuestTrackerController {
       deps.world().abandonQuest?.(WISP_MAZE_QUEST_ID),
     );
     this.strip = buildQuestStrip({ writers: deps.writers, click: () => this.deps.click() });
+    this.bindRewardHover();
+  }
+
+  /** Hovering a world quest's reward line shows the full reward card. One
+   *  delegated listener pair on the tracker body, which survives every repaint. */
+  private bindRewardHover(): void {
+    const rewards = this.deps.worldQuestRewards;
+    if (!rewards) return;
+    const element = this.deps.element;
+    let shown: HTMLElement | null = null;
+    element.addEventListener('pointerover', (event) => {
+      if ((event as PointerEvent).pointerType !== 'mouse') return;
+      const line = (event.target as HTMLElement).closest?.<HTMLElement>('[data-qt-wq-rewards]');
+      if (!line || line === shown) return;
+      shown = line;
+      const { clientX, clientY } = event as PointerEvent;
+      rewards.paint(rewards.card(line.dataset.qtWqRewards ?? ''), clientX, clientY);
+    });
+    element.addEventListener('pointerout', (event) => {
+      if (!shown) return;
+      const to = (event as PointerEvent).relatedTarget as Node | null;
+      if (to && shown.contains(to)) return;
+      shown = null;
+      rewards.hide();
+    });
   }
 
   /** Language switch: the desktop rows already re-resolve unconditionally in
@@ -503,6 +539,10 @@ export class QuestTrackerController {
     let rows = '';
     for (const quest of view.quests) {
       rows += `<div class="qt-title qt-wq-title ui-cin">${esc(quest.title)}${this.completeTag(quest.complete)}</div>`;
+      const rewardLine = quest.complete ? '' : (this.deps.worldQuestRewards?.line(quest.id) ?? '');
+      if (rewardLine) {
+        rows += `<div class="qt-wq-rewards ui-meta" data-qt-wq-rewards="${esc(quest.id)}">${rewardLine}</div>`;
+      }
       for (const objective of quest.objectives) {
         // A movement lesson instruction reads in full; a counted objective
         // carries its tally inline ("Bandits defeated: 2/10").

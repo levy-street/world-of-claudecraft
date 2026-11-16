@@ -6504,6 +6504,51 @@
     pointer-events: none;
     cursor: default;
   }
+  /* A world quest's reward line (world_quest_reward_line.ts): one small chip
+     per reward, left-aligned under the title. Unlike the click-through title it
+     takes the pointer, because hovering it opens the full reward card; it stays
+     short (icons + numbers), so it does not reach the rail icons beside the
+     tracker the way a long title would. */
+  #quest-tracker .qt-wq-rewards {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px 9px;
+    width: fit-content;
+    max-width: 100%;
+    margin: 1px 0 3px 8px;
+    font-size: 11px;
+    color: var(--color-text-light);
+    pointer-events: auto;
+    cursor: help;
+  }
+  #quest-tracker .qt-wq-reward {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+  }
+  #quest-tracker .qt-wq-reward-icon {
+    width: 14px;
+    height: 14px;
+    border-radius: 2px;
+    object-fit: cover;
+  }
+  #quest-tracker .qt-wq-reward.is-item img,
+  #quest-tracker .qt-wq-reward.is-item canvas {
+    width: 16px;
+    height: 16px;
+  }
+  #quest-tracker .qt-wq-reward .coin {
+    width: 10px;
+    height: 10px;
+    margin-left: 1px;
+  }
+  #quest-tracker .qt-wq-xp-orb {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, var(--color-xp), var(--color-xp-deep));
+  }
   /* Bag-hover highlight: matching quest title while a quest stack is hovered
      in bags. Information-add, always-on (no --fx gate). Quest gold wash, not
      a second yellow. Shape of the title row is unchanged. */

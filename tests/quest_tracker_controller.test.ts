@@ -56,6 +56,7 @@ function harness(
   clueHunt: { huntId: string; step: number } | null = null,
   weeklyQuest: WeeklyQuestProgress | null = null,
   worldExtra: Record<string, unknown> = {},
+  extraDeps: Partial<ConstructorParameters<typeof QuestTrackerController>[0]> = {},
 ) {
   // The World Quests section lists a quest only while the player stands in
   // its area, so the rig's player stands at the first world quest's centre.
@@ -84,7 +85,11 @@ function harness(
     }),
   };
   const docState: { activeElement: unknown } = { activeElement: header };
+  const listeners = new Map<string, (event: unknown) => void>();
   const element = {
+    addEventListener: (type: string, handler: (event: unknown) => void) => {
+      listeners.set(type, handler);
+    },
     get innerHTML() {
       return html;
     },
@@ -131,9 +136,11 @@ function harness(
     questTitle: (questId) => `title:${questId}`,
     objectiveLabel: (questId, index) => `objective:${questId}:${index}`,
     click,
+    ...extraDeps,
   });
   return {
     controller,
+    listeners,
     setWeeklyQuest: (next: WeeklyQuestProgress | null) => {
       weeklyQuest = next;
     },
@@ -647,6 +654,39 @@ describe('QuestTrackerController', () => {
     noCycle.tracking.setWorldQuestTracked(quest.id, true);
     noCycle.controller.update(0);
     expect(noCycle.html()).not.toContain(worldQuestDisplayName(quest.id));
+  });
+
+  it("puts each open world quest's reward line under it and shows the card while it is hovered", () => {
+    const quest = WORLD_QUESTS.find((entry) => entry.id === 'wq_eastbrook_bandits');
+    if (!quest) throw new Error('missing Eastbrook bandit fixture');
+    const entry: WorldQuestProgress = { questId: quest.id, count: 2, state: 'active' };
+    const rewards = {
+      line: vi.fn((id: string) => `<span class="qt-wq-reward">line:${id}</span>`),
+      card: vi.fn((id: string) => `card:${id}`),
+      paint: vi.fn(),
+      hide: vi.fn(),
+    };
+    const test = harness([], [entry], null, null, {}, { worldQuestRewards: rewards });
+    test.controller.update(0);
+    expect(test.html()).toContain(
+      `<div class="qt-wq-rewards ui-meta" data-qt-wq-rewards="${quest.id}">`,
+    );
+    expect(test.html()).toContain(`line:${quest.id}`);
+    // Hover the line with a mouse: the full card paints at the pointer.
+    const line = { dataset: { qtWqRewards: quest.id }, contains: () => false };
+    const target = { closest: () => line };
+    test.listeners.get('pointerover')?.({ pointerType: 'mouse', target, clientX: 5, clientY: 6 });
+    expect(rewards.paint).toHaveBeenCalledWith(`card:${quest.id}`, 5, 6);
+    // Leaving it hides the card; a touch pointer never opens it.
+    test.listeners.get('pointerout')?.({ relatedTarget: null });
+    expect(rewards.hide).toHaveBeenCalledTimes(1);
+    test.listeners.get('pointerover')?.({ pointerType: 'touch', target, clientX: 5, clientY: 6 });
+    expect(rewards.paint).toHaveBeenCalledTimes(1);
+    // A completed quest drops its line.
+    entry.state = 'completed';
+    entry.count = quest.count;
+    test.controller.update(1_000);
+    expect(test.html()).not.toContain(`line:${quest.id}`);
   });
 
   it('gives world quests their own "World Quests" section after the Quests section', () => {
