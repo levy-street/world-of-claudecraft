@@ -162,6 +162,40 @@ describe('render budget: resolution cuts must pay for themselves', () => {
     expect(state.levels.resolution).toBe(Math.min(cut, 0.8));
   });
 
+  it('a submit stall mid-experiment ends it, keeps the cut and sheds on the same frame', () => {
+    const g = settledGovernor();
+    let state = g.update(sample(16));
+    // start an experiment
+    for (let i = 0; i < 30 && state.resolutionProbe === 'idle'; i++) state = g.update(sample(30));
+    expect(state.resolutionProbe).not.toBe('idle');
+    const cut = state.levels.resolution;
+    const before = { ...state.levels };
+    // a real stall (the governor's line is 120 ms of submit) during the experiment
+    state = g.update(sample(140, { totalMs: 139, submitMs: 130 }));
+    // The experiment ends unjudged with its cut held. The ladder then sheds on
+    // this same frame; with the other rungs already floored that shed is a
+    // further resolution cut, which starts its own experiment.
+    expect(state.resolutionCutsCancelled).toBe(1);
+    expect(state.resolutionCutsReverted).toBe(0);
+    expect(state.levels.resolution).toBeLessThanOrEqual(cut);
+    expect(state.reason).toBe('submit-stall');
+    const shed = (Object.keys(before) as (keyof typeof before)[]).some(
+      (k) => k !== 'resolution' && state.levels[k] < before[k],
+    );
+    expect(shed || state.levels.resolution < cut).toBe(true);
+  });
+
+  it('an urgent frame without a stall does not end the experiment', () => {
+    const g = settledGovernor();
+    let state = g.update(sample(16));
+    for (let i = 0; i < 30 && state.resolutionProbe === 'idle'; i++) state = g.update(sample(30));
+    expect(state.resolutionProbe).not.toBe('idle');
+    // well past Low's urgent frame line, but the submit is ordinary
+    state = g.update(sample(45, { totalMs: 44 }));
+    expect(state.resolutionProbe).not.toBe('idle');
+    expect(state.resolutionCutsCancelled).toBe(0);
+  });
+
   it('reports the probe in the state the perf readout and beacon carry', () => {
     const g = settledGovernor();
     const state = play(g, 0.2, () => 30);

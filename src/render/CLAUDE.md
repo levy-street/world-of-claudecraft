@@ -1309,14 +1309,18 @@ collision/movement.
   and the cut is kept only if the restored arm costs at least `RESOLUTION_EFFECT_MIN_MS` and
   `RESOLUTION_EFFECT_MIN_SHARE` more than the average of the two cut arms; otherwise it is undone
   and the rung locked out for `RESOLUTION_LOCKOUT_S` (a cap probe's exhaustive shed ignores the
-  lockout). A kept cut lets further cuts skip the experiment for `RESOLUTION_TRUST_S`; too little
-  clean evidence keeps the cut (the old behaviour). While an experiment runs the governor holds
-  every other rung still and never reports itself at baseline (`atBaseline`, which the
-  frame-rate ceiling reads); the frame-cap probe or a changed resolution range cancels it,
-  keeping the cut. On a GPU-bound device the restored arm is a visible 1.5 s at the previous
+  lockout). A kept cut lets the next `RESOLUTION_TRUSTED_CUTS` cuts inside `RESOLUTION_TRUST_S`
+  skip the experiment, so a misjudged keep walks the scale down at most that far before the next
+  experiment; too little clean evidence keeps the cut (the old behaviour). While an experiment
+  runs the governor holds every other rung still and never reports itself at baseline
+  (`atBaseline`, which the frame-rate ceiling reads); the frame-cap probe, a changed resolution
+  range or a real submit stall cancels it, keeping the cut (the stall then sheds on the same
+  frame). An urgent frame alone does not: phones cross that line while turning, and cancelling
+  there would leave most cuts unjudged. The floor is the tier's own (`GFX.budget.minRenderScale*`,
+  `DYNAMIC_RENDER_SCALE_ABSOLUTE_MIN` under it), no longer a global 0.68. On a GPU-bound device the restored arm is a visible 1.5 s at the previous
   scale. `resolutionEffectProbe: false` (and `?resprobe=off`, `render_dev_flags.ts`) turns it
-  off; four recovery-ladder tests do, because their setup floors resolution with a
-  pixel-independent overload. State: `preparationFrames`, `preparationShare`, `coveredFrames`,
+  off; the recovery-ladder tests in `tests/render_budget_recovery.test.ts` do, because their
+  setup floors resolution with a pixel-independent overload. State: `preparationFrames`, `preparationShare`, `coveredFrames`,
   `resolutionProbe`, `resolutionCuts{Kept,Reverted,Unjudged,Cancelled}`,
   `resolutionLockoutSeconds`, `resolutionLastGainMs` (all on `perfStats().renderBudget` and the
   beacon's `rawSummary.rendererBudget`). Tests: `tests/render_budget_preparation.test.ts`,

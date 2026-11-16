@@ -8,6 +8,7 @@ import {
   RESOLUTION_EFFECT_SETTLE_S,
   RESOLUTION_LOCKOUT_S,
   RESOLUTION_TRUST_S,
+  RESOLUTION_TRUSTED_CUTS,
   type ResolutionProbeState,
   type ResolutionProbeStep,
   resolutionCutAllowed,
@@ -143,6 +144,31 @@ describe('resolution effect probe (A/B/A inside the experiment)', () => {
     expect(p.phase).toBe('idle');
     for (let t = 0; t < RESOLUTION_TRUST_S + 1; t += DT) advanceResolutionProbe(p, 20, DT, true);
     expect(noteResolutionCut(p, 0.77, 0.7)).toBe(true);
+  });
+
+  it('a keep trusts only the next few cuts, so a misjudged keep cannot walk to the floor', () => {
+    // A load that jumped inside the restored arm makes a CPU-bound cut look like
+    // it paid off. The trust it earns lets RESOLUTION_TRUSTED_CUTS further cuts
+    // through unjudged, then the next cut, still inside RESOLUTION_TRUST_S, is
+    // judged again and undone on the CPU-bound frame.
+    const p = createResolutionProbe();
+    noteResolutionCut(p, 0.85, 0.77);
+    const misjudged = (level: number, t: number) => {
+      const restoredArm = t >= 2 && t < 4;
+      return restoredArm ? 40 : 30 + 0 * level;
+    };
+    expect(runProbe(p, 0.77, misjudged).step.verdict).toBe('keep');
+    let level = 0.77;
+    for (let i = 0; i < RESOLUTION_TRUSTED_CUTS; i++) {
+      expect(noteResolutionCut(p, level, level - 0.08)).toBe(false);
+      level -= 0.08;
+    }
+    expect(p.trustS).toBeGreaterThan(0);
+    expect(noteResolutionCut(p, level, level - 0.08)).toBe(true);
+    expect(runProbe(p, level - 0.08, cpuBound).step).toEqual({
+      setLevel: level,
+      verdict: 'revert',
+    });
   });
 
   it('the lockout expires, and the next cut is judged on what bounds the frame then', () => {

@@ -1,4 +1,5 @@
 import { chosenCadenceFrameMs, NO_CHOSEN_CADENCE } from './chosen_cadence_pressure_core';
+import { DYNAMIC_RENDER_SCALE_ABSOLUTE_MIN } from './dynamic_resolution_core';
 import { GFX_BUCKET_BANDS, type GfxBucketBands, type GfxRuntimeBudget, type GfxTier } from './gfx';
 import {
   type PostShedChain,
@@ -737,7 +738,10 @@ export class RenderBudgetGovernor {
       return this.state(out);
     }
 
-    const minRenderScale = Math.min(sample.maxRenderScale, Math.max(0.5, sample.minRenderScale));
+    const minRenderScale = Math.min(
+      sample.maxRenderScale,
+      Math.max(DYNAMIC_RENDER_SCALE_ABSOLUTE_MIN, sample.minRenderScale),
+    );
     const maxRenderScale = Math.max(minRenderScale, Math.min(1, sample.maxRenderScale));
     this.levels.resolution = Math.min(
       maxRenderScale,
@@ -905,7 +909,14 @@ export class RenderBudgetGovernor {
     // would be shed on the spot otherwise); a real submit stall still wins.
     const probeDwell = this.advanceCapProbe(sample.dt, minRenderScale, maxRenderScale);
     // A resolution experiment owns the ladder like the cap probe's dwells do: the
-    // arms must differ in resolution only (resolution_effect_probe_core.ts).
+    // arms must differ in resolution only (resolution_effect_probe_core.ts). A real
+    // submit stall still wins, as it does over the dwells: it ends the experiment
+    // with its cut held and the ladder sheds on this frame. An urgent frame alone
+    // does not: a phone crosses that line routinely while turning, and cancelling
+    // there would keep most cuts unjudged, the very thing the experiment prevents.
+    if (submitStall && resolutionProbeBusy(this.resolutionProbe)) {
+      this.cancelResolutionExperiment(minRenderScale, maxRenderScale);
+    }
     const experimenting = resolutionProbeBusy(this.resolutionProbe);
     if (
       !experimenting &&

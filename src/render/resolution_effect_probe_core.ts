@@ -20,9 +20,12 @@
 //
 // While an experiment runs the governor holds every other rung still
 // (render_budget.ts), so the arms differ in resolution only. On a GPU-bound
-// device the restored arm is visible: about 1.5 s back at the previous scale,
-// at most once per RESOLUTION_TRUST_S per descent, since a kept cut lets further
-// cuts in that window skip the experiment. A cut that bought nothing stays undone
+// device the restored arm is visible: about 1.5 s back at the previous scale.
+// A kept cut lets the next RESOLUTION_TRUSTED_CUTS cuts inside RESOLUTION_TRUST_S
+// skip the experiment, so a descent pays for one restored arm every few steps,
+// and a keep the arms misjudged (a load that jumped inside the restored arm) can
+// walk the scale down by at most that many unjudged steps before the next
+// experiment checks the level it reached. A cut that bought nothing stays undone
 // and the resolution rung is locked out for RESOLUTION_LOCKOUT_S; the lockout
 // expires because what bounds a frame changes with the scene. With too little
 // clean evidence the cut stands, which is the governor's behaviour before this
@@ -44,8 +47,11 @@ export const RESOLUTION_EFFECT_MIN_MS = 0.5;
 export const RESOLUTION_EFFECT_MIN_SHARE = 0.04;
 /** How long a reverted cut keeps the resolution rung out of the ladder. */
 export const RESOLUTION_LOCKOUT_S = 60;
-/** After a kept cut, how long further cuts skip the experiment. */
+/** After a kept cut, how long further cuts may skip the experiment. */
 export const RESOLUTION_TRUST_S = 30;
+/** After a kept cut, how many further cuts skip the experiment (inside
+ *  RESOLUTION_TRUST_S); the one after them is judged again. */
+export const RESOLUTION_TRUSTED_CUTS = 2;
 
 export type ResolutionProbePhase =
   | 'idle'
@@ -68,6 +74,8 @@ export interface ResolutionProbeState {
   recutReadings: number[];
   lockoutS: number;
   trustS: number;
+  /** Cuts the current trust may still let through unjudged. */
+  trustCuts: number;
   kept: number;
   reverted: number;
   unjudged: number;
@@ -93,6 +101,7 @@ export function createResolutionProbe(): ResolutionProbeState {
     recutReadings: [],
     lockoutS: 0,
     trustS: 0,
+    trustCuts: 0,
     kept: 0,
     reverted: 0,
     unjudged: 0,
@@ -142,7 +151,10 @@ export function noteResolutionCut(
   levelAfter: number,
 ): boolean {
   if (state.phase !== 'idle' || !(levelAfter < levelBefore)) return false;
-  if (state.trustS > 0) return false;
+  if (state.trustS > 0 && state.trustCuts > 0) {
+    state.trustCuts--;
+    return false;
+  }
   state.phase = 'settle-cut';
   state.phaseS = 0;
   state.levelBefore = levelBefore;
@@ -176,6 +188,7 @@ function verdict(state: ResolutionProbeState): ResolutionProbeStep {
   if (paidOff) {
     state.kept++;
     state.trustS = RESOLUTION_TRUST_S;
+    state.trustCuts = RESOLUTION_TRUSTED_CUTS;
     return { setLevel: state.levelAfter, verdict: 'keep' };
   }
   state.reverted++;
