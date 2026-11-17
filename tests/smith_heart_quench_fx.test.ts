@@ -16,6 +16,7 @@ import {
   BREATH_FROST_SECONDS,
   breathBlastLook,
   breathChargeLook,
+  breathFrost,
   QUENCH_GUARDIAN,
   QUENCHING_BREATH,
   quenchGuardianKit,
@@ -55,6 +56,15 @@ describe("the Quench guardian's effects", () => {
     expect(breathChargeLook(1).creep).toBe(1);
     expect(breathBlastLook(0.6).front).toBeCloseTo(1, 6);
     expect(breathBlastLook(BREATH_FROST_SECONDS + 0.1).frost).toBe(0);
+    // The frost fades as soon as the breath lands (the owner's call of
+    // 2026-11-17): whole at the hit, gone within half a second, never
+    // lying harmless on the floor for seconds.
+    expect(BREATH_FROST_SECONDS).toBeGreaterThanOrEqual(0.3);
+    expect(BREATH_FROST_SECONDS).toBeLessThanOrEqual(0.5);
+    expect(breathFrost(0)).toBe(1);
+    expect(breathFrost(BREATH_FROST_SECONDS / 2)).toBeLessThan(1);
+    expect(breathFrost(BREATH_FROST_SECONDS)).toBe(0);
+    expect(breathFrost(1)).toBe(0);
     expect(strikeLook(0).rise).toBe(0);
     expect(strikeLook(0.3).rise).toBe(1);
     expect(strikeLook(2).shatter).toBe(true);

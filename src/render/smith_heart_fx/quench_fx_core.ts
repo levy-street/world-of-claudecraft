@@ -91,9 +91,12 @@ export function breathGlints(progress: number): number {
 }
 
 /** Seconds the breath's freezing gust takes to sweep out to the cone's end,
- *  and the frost it leaves lies on the floor. */
+ *  and the frost it leaves fades from the floor: quickly, since the owner's
+ *  call of 2026-11-17 (it lay 3.2 s after the hit, harmless, and read as a
+ *  mechanic nobody could explain: every floor mark must still be able to
+ *  hurt). The telegraph before the hit is untouched. */
 export const BREATH_SWEEP_SECONDS = 0.6;
-export const BREATH_FROST_SECONDS = 3.2;
+export const BREATH_FROST_SECONDS = 0.4;
 
 /** The breath `elapsed` seconds after it landed: how far out its front has
  *  run (a share of the range), the mist's alpha, the frost's on the floor. */
@@ -109,10 +112,13 @@ export function breathBlastLook(elapsed: number): { front: number; mist: number;
   };
 }
 
-/** The frost the breath leaves on the floor `elapsed` seconds in (0..1). */
+/** The frost the breath leaves on the floor `elapsed` seconds in (0..1):
+ *  whole as it lands (the telegraph's creeping frost hands over to it),
+ *  faded out over BREATH_FROST_SECONDS. */
 export function breathFrost(elapsed: number): number {
   if (elapsed < 0) return 0;
-  return Math.max(0, Math.min(1, elapsed / 0.4)) * Math.max(0, 1 - elapsed / BREATH_FROST_SECONDS);
+  const t = Math.min(1, elapsed / BREATH_FROST_SECONDS);
+  return 1 - t * t * (3 - 2 * t);
 }
 
 /** Seconds Tempering Strike's ice stands in its arc before it shatters, and

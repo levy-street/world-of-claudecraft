@@ -593,7 +593,7 @@ export class QuenchFx {
     const R = this.sim.breathRange;
     const arcDeg = this.sim.breathArcDeg;
     const half = (arcDeg * Math.PI) / 360;
-    // The frost: the whole cone frosted, staying a while.
+    // The frost: the whole cone frosted as it lands, fading at once.
     this.layFrost(x, z, yaw, 'breath', 1, BREATH_FROST_SECONDS);
     // The freezing gust: mist billowing out along the cone, born clear of
     // the guardian's body (her face and heart stay seen through the blast)
