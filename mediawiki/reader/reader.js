@@ -292,7 +292,7 @@ export async function openReader({ seedUrl, packed, cardsUrl, packedCards, asset
       let text = artwork ? source.slice(artwork[0].length) : source;
       // The large model render, when a creature or NPC has one.
       const modelLine = text.match(
-        /^<woc-art path="(\/encyclopedia-stills\/[\w.-]+\.webp)" size="model" \/>\n/m,
+        /^<woc-art path="(\/(?:encyclopedia|guide)-stills\/[\w.-]+\.webp)" size="model" \/>\n/m,
       );
       const model = modelLine?.[1] ?? '';
       if (modelLine) text = text.replace(modelLine[0], '');

@@ -1046,15 +1046,25 @@ body[data-woc-site] .searchbox #lookup {
   place-items: center;
   padding: 12px;
 }
+/* A page whose art is a game icon shows it at its full 128px, framed like a bag slot. */
 #view .wiki-box-art .article-art {
-  width: 60px;
-  height: 60px;
+  width: 128px;
+  height: 128px;
+  padding: 6px;
+  object-fit: contain;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: radial-gradient(circle at 50% 40%, var(--panel), var(--bg-2) 75%);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 35%);
 }
 #view .wiki-box-art .article-art.wide {
   width: 100%;
   height: auto;
   max-height: 200px;
   object-fit: contain;
+  padding: 0;
+  background: none;
+  box-shadow: none;
 }
 #view .wiki-infobox .scroll {
   margin: 0;
@@ -1099,21 +1109,15 @@ body[data-woc-site] .searchbox #lookup {
   }
 }
 @media (max-width: 1049px) {
-  #view .wiki-box-art:has(.article-art:not(.wide, .model)) {
-    float: right;
-    padding: 5px 10px;
-    margin-top: -36px;
-  }
   #view .wiki-box-art .article-art:not(.wide, .model) {
-    width: 27px;
-    height: 27px;
+    width: 96px;
+    height: 96px;
   }
   #view .wiki-box-art .article-art.wide {
     max-height: 140px;
   }
   #view .wiki-infobox .wiki-box-title {
     text-align: left;
-    padding-right: 52px;
   }
   #view article.wiki-prose {
     display: flex;
@@ -1628,6 +1632,9 @@ body[data-woc-site] #view table.item-table {
   object-fit: contain;
   background: radial-gradient(circle at 50% 55%, var(--panel), var(--bg-2) 70%);
   border-radius: 4px;
+  padding: 0;
+  border: 0;
+  box-shadow: none;
 }
 #view .article-heading .article-art.model {
   width: 56px;
@@ -1664,4 +1671,24 @@ body[data-woc-site] #view table.item-table {
     width: 100%;
     max-width: 360px;
   }
+}
+
+/* Item quality on the info-box icon frame (the game's tokens.css quality colours). */
+#view .wiki-box-art .article-art[data-quality] {
+  border-width: 2px;
+}
+#view .wiki-box-art .article-art[data-quality="poor"] {
+  border-color: #9d9d9d;
+}
+#view .wiki-box-art .article-art[data-quality="uncommon"] {
+  border-color: #1eff00;
+}
+#view .wiki-box-art .article-art[data-quality="rare"] {
+  border-color: #0070dd;
+}
+#view .wiki-box-art .article-art[data-quality="epic"] {
+  border-color: #a335ee;
+}
+#view .wiki-box-art .article-art[data-quality="legendary"] {
+  border-color: #ff8000;
 }

@@ -181,6 +181,14 @@ export function layoutArticle(view, page, wide, zoneName) {
     box.setAttribute('aria-label', name);
     box.append(element('div', 'wiki-box-title', name));
     if (art) {
+      // An item's icon wears its quality colour on the frame, as in the game's bags.
+      const quality = [...(facts?.querySelectorAll('tr') ?? [])]
+        .find((row) => row.querySelector('th')?.textContent === 'Quality')
+        ?.querySelector('td')
+        ?.textContent.trim()
+        .toLowerCase();
+      if (kind === 'Items' && /^(?:poor|common|uncommon|rare|epic|legendary)$/.test(quality ?? ''))
+        art.dataset.quality = quality;
       const figure = element('div', 'wiki-box-art');
       figure.append(art);
       box.append(figure);

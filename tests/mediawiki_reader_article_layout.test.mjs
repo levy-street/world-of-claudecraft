@@ -77,3 +77,21 @@ it('gives a friendly or escort creature the creature info box', () => {
   expect(box.querySelector('.wiki-box-title').textContent).toBe('Creature information');
   expect(box.querySelector('.wiki-box-art img.model')).toBeTruthy();
 });
+
+it('frames an item icon in its quality colour', () => {
+  const view = document.createElement('main');
+  view.innerHTML =
+    '<div class="article-heading"><img class="article-art" alt=""><h1>A Blade</h1></div><article><p>A blade.</p><h2>Facts</h2><div class="scroll"><table><tbody><tr><th>Quality</th><td>Epic</td></tr></tbody></table></div></article>';
+  layoutArticle(view, { title: 'A Blade', categories: ['Items'] }, true);
+  expect(view.querySelector('.wiki-box-art img').dataset.quality).toBe('epic');
+});
+
+it('gives class and quest pages a large figure instead of an icon', () => {
+  const view = document.createElement('main');
+  view.innerHTML =
+    '<div class="article-heading"><img class="article-art model" alt=""><h1>Warrior</h1></div><article><p>Fights.</p><h2>Starting statistics</h2><div class="scroll"><table><tbody><tr><th>Strength</th><td>23</td></tr></tbody></table></div></article>';
+  layoutArticle(view, { title: 'Warrior', categories: ['Classes'] }, true);
+  const art = view.querySelector('.wiki-box-art img');
+  expect(art.classList.contains('model')).toBe(true);
+  expect(art.dataset.quality).toBeUndefined();
+});

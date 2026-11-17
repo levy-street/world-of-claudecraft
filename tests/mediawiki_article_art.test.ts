@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { articleArt, modelStills } from '../scripts/mediawiki/article_art';
-import { ABILITIES, ITEMS, MOBS, NPCS } from '../src/sim/data';
+import { ABILITIES, ITEMS, MOBS, NPCS, QUESTS } from '../src/sim/data';
 import { targetPortraitUrl } from '../src/ui/target_portrait_view';
 
 describe('Encyclopedia game artwork', () => {
@@ -63,6 +63,16 @@ describe('Encyclopedia game artwork', () => {
     // draws their authored face, hair and props.
     expect(models.get('npc/smith_haldren')).toBe('/encyclopedia-stills/npc__smith_haldren.webp');
     expect(models.get('mob/deacon_voss')).toBe('/encyclopedia-stills/mob__deacon_voss.webp');
+  });
+  it('shows the class figure on a class page and the quest giver on a quest page', () => {
+    const quest = Object.values(QUESTS).find((q) => q.giverNpcId === 'foreman_odell');
+    expect(quest).toBeTruthy();
+    const models = modelStills({
+      class: new Map([['warrior', 'Warrior']]),
+      quest: new Map([[quest!.id, 'A quest']]),
+    });
+    expect(models.get('Warrior')).toBe('/guide-stills/player_warrior.webp');
+    expect(models.get('A quest')).toBe('/encyclopedia-stills/npc__foreman_odell.webp');
   });
   it('never draws a character body with the simple model viewer', () => {
     // That viewer draws a player or NPC rig as a generic class body without its look.

@@ -69,7 +69,8 @@ export function mobArtPath(id: string): string {
 /** Large renders of each creature's and NPC's model, written by
  *  scripts/mediawiki/render_entity_stills.mjs, plus the NPCs and creatures on character
  *  bodies that scripts/wiki/render_character_stills.mjs draws with the game's own renderer
- *  (their authored faces, hair and props). Keyed by page title. */
+ *  (their authored faces, hair and props). A class page shows the Guide's figure of that
+ *  class, and a quest page the portrait of the character who gives it. Keyed by page title. */
 export function modelStills(titleBy: TitleMaps): Map<string, string> {
   const read = (file: string): Record<string, string> =>
     existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : {};
@@ -78,16 +79,22 @@ export function modelStills(titleBy: TitleMaps): Map<string, string> {
     ...read(join('scripts', 'mediawiki', 'entity_stills_characters.json')),
   };
   const byTitle = new Map<string, string>();
+  const add = (title: string | undefined, path: string | undefined) => {
+    if (
+      title &&
+      path &&
+      /^\/(?:encyclopedia|guide)-stills\/[\w.-]+\.webp$/.test(path) &&
+      existsSync(join('public', path.slice(1)))
+    )
+      byTitle.set(title, path);
+  };
   for (const kind of ['mob', 'npc'] as const)
-    for (const [id, title] of titleBy[kind] ?? []) {
-      const path = stills[kind + '/' + id];
-      if (
-        path &&
-        /^\/encyclopedia-stills\/[\w.-]+\.webp$/.test(path) &&
-        existsSync(join('public', path.slice(1)))
-      )
-        byTitle.set(title, path);
-    }
+    for (const [id, title] of titleBy[kind] ?? []) add(title, stills[kind + '/' + id]);
+  for (const [id, title] of titleBy.class ?? []) add(title, '/guide-stills/player_' + id + '.webp');
+  for (const [id, title] of titleBy.quest ?? []) {
+    const giver = QUESTS[id]?.giverNpcId;
+    if (giver) add(title, stills['npc/' + giver] ?? stills['mob/' + giver]);
+  }
   return byTitle;
 }
 

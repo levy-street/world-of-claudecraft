@@ -80506,7 +80506,8 @@ The Proving Shore asks nothing of you but time. Learn the camp, strike the effig
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="9467">&lt;woc-art path=&quot;/ui/classes/warrior.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="9533">&lt;woc-art path=&quot;/ui/classes/warrior.webp&quot; /&gt;
+&lt;woc-art path=&quot;/guide-stills/player_warrior.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Warrior is a class you can play. It uses rage to power its abilities. A new character of this class starts with [[Pitted Shortsword]].
 
@@ -80625,7 +80626,8 @@ Cost, cast time and cooldown below are for rank 1. Open an ability to see its hi
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="10627">&lt;woc-art path=&quot;/ui/classes/mage.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="10690">&lt;woc-art path=&quot;/ui/classes/mage.webp&quot; /&gt;
+&lt;woc-art path=&quot;/guide-stills/player_mage.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Mage is a class you can play. It uses mana to power its abilities. A new character of this class starts with [[Bogoak Staff]].
 
@@ -80754,7 +80756,8 @@ Cost, cast time and cooldown below are for rank 1. Open an ability to see its hi
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="7267">&lt;woc-art path=&quot;/ui/classes/rogue.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="7331">&lt;woc-art path=&quot;/ui/classes/rogue.webp&quot; /&gt;
+&lt;woc-art path=&quot;/guide-stills/player_rogue.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Rogue is a class you can play. It uses energy to power its abilities. A new character of this class starts with [[Rusty Dagger]].
 
@@ -80864,7 +80867,8 @@ Cost, cast time and cooldown below are for rank 1. Open an ability to see its hi
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="7981">&lt;woc-art path=&quot;/ui/classes/paladin.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="8047">&lt;woc-art path=&quot;/ui/classes/paladin.webp&quot; /&gt;
+&lt;woc-art path=&quot;/guide-stills/player_paladin.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Paladin is a class you can play. It uses mana to power its abilities. A new character of this class starts with [[Training Mace]].
 
@@ -80975,7 +80979,8 @@ Cost, cast time and cooldown below are for rank 1. Open an ability to see its hi
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="7828">&lt;woc-art path=&quot;/ui/classes/hunter.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="7893">&lt;woc-art path=&quot;/ui/classes/hunter.webp&quot; /&gt;
+&lt;woc-art path=&quot;/guide-stills/player_hunter.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Hunter is a class you can play. It uses focus to power its abilities. A new character of this class starts with [[Rusty Hatchet]].
 
@@ -81085,7 +81090,8 @@ Cost, cast time and cooldown below are for rank 1. Open an ability to see its hi
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="6131">&lt;woc-art path=&quot;/ui/classes/priest.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="6196">&lt;woc-art path=&quot;/ui/classes/priest.webp&quot; /&gt;
+&lt;woc-art path=&quot;/guide-stills/player_priest.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Priest is a class you can play. It uses mana to power its abilities. A new character of this class starts with [[Bogoak Staff]].
 
@@ -81183,7 +81189,8 @@ Cost, cast time and cooldown below are for rank 1. Open an ability to see its hi
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="6179">&lt;woc-art path=&quot;/ui/classes/shaman.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="6244">&lt;woc-art path=&quot;/ui/classes/shaman.webp&quot; /&gt;
+&lt;woc-art path=&quot;/guide-stills/player_shaman.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Shaman is a class you can play. It uses mana to power its abilities. A new character of this class starts with [[Training Mace]].
 
@@ -81283,7 +81290,8 @@ Cost, cast time and cooldown below are for rank 1. Open an ability to see its hi
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="9568">&lt;woc-art path=&quot;/ui/classes/warlock.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="9634">&lt;woc-art path=&quot;/ui/classes/warlock.webp&quot; /&gt;
+&lt;woc-art path=&quot;/guide-stills/player_warlock.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Warlock is a class you can play. It uses mana to power its abilities. A new character of this class starts with [[Bogoak Staff]].
 
@@ -81405,7 +81413,8 @@ Cost, cast time and cooldown below are for rank 1. Open an ability to see its hi
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="9829">&lt;woc-art path=&quot;/ui/classes/druid.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="9893">&lt;woc-art path=&quot;/ui/classes/druid.webp&quot; /&gt;
+&lt;woc-art path=&quot;/guide-stills/player_druid.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Druid is a class you can play. It uses mana to power its abilities. A new character of this class starts with [[Bogoak Staff]].
 
@@ -89671,7 +89680,8 @@ The gourds are lit and the lanterns are up, so it must be [[Gourdlight Eve]]. Kn
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="16014">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="16091">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__foreman_odell.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -89828,7 +89838,8 @@ See? Ore gathered and callus on your hands. Keep at the [[Mining|mining]], [[Log
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3864">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3942">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__farmer_jessica.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -89910,9 +89921,10 @@ There, your first crop in your own hands. It keeps growing while you are away, a
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3404">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3484">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Wolves at the Door (Quest, The Frostveil Reach)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__marshal_redbrook.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -89994,7 +90006,8 @@ Fine work. The road feels safer already.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3255">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3335">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__marshal_redbrook.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -90075,7 +90088,8 @@ So the old devil is dead at last. The stable boy will sleep easier, and so will 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3348">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3425">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__trader_wilkes.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -90154,7 +90168,8 @@ Ah, fine bristly hides! These will fetch a good price.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3362">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3440">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__apothecary_lin.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -90234,7 +90249,8 @@ Ugh, still twitching. Perfect. Here, you&apos;ve earned this.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3040">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3120">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__fisherman_brandt.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -90311,7 +90327,8 @@ Hah! That will teach them to mind their own mudholes.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2958">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3035">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__foreman_odell.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -90388,7 +90405,8 @@ Ha! Back to work, lads! You have my thanks, and my coin.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3590">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3668">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -90471,7 +90489,8 @@ May they rest now, and may the Light forgive whatever woke them.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3822">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3899">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__trader_wilkes.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -90554,7 +90573,8 @@ My crates! Barely a scratch on them. You are a wonder.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3372">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3450">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -90640,7 +90660,8 @@ This sigil... it bears the mark of the Gravecallers, a sect I had prayed was ext
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3666">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3744">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -90726,7 +90747,8 @@ These poor souls... and look here. Sexton Marrow, the chapel&apos;s own living c
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3667">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3745">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -90807,7 +90829,8 @@ The yard grows quieter, but the calling has not stopped. It rises from below now
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4325">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4403">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -90896,7 +90919,8 @@ It is done. The way below stands open... and may the Light forgive me for openin
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3286">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3364">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -90985,7 +91009,8 @@ The whispering has stopped. You have done what the whole Vale could not, adventu
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3263">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3341">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -91071,7 +91096,8 @@ So [[Sexton Marrow (NPC)|Marrow]] is free at last. Ring no bell for him: he hear
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3308">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3386">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -91155,7 +91181,8 @@ Morthen wrote to a &apos;Fogbinder&apos; in the northern fen. The sect is not de
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4185">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4263">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -91242,7 +91269,8 @@ The chapel yard grows quiet. You are ready for the words, adventurer, but [[The 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3617">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3697">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__marshal_redbrook.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -91327,7 +91355,8 @@ Ten fewer knives in the dark. Take this: you have earned it.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3322">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3402">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__marshal_redbrook.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -91408,7 +91437,8 @@ Gorrak is dead? Then the Vale is free of his shadow. You have done Eastbrook a g
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3238">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3318">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__marshal_redbrook.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -91492,7 +91522,8 @@ Mogger dead at last. Eastbrook&apos;s fields are safer, and you leave the Vale w
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="16588">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="16671">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__forgemistress_darva.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -91650,7 +91681,8 @@ Good ore, and good hands to work it. [[Weaponcrafting]] and [[Armorcrafting]] ar
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3786">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3864">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__weaver_ottilie.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -91731,7 +91763,8 @@ Even thread, even hand. [[Leatherworking]] and [[Tailoring]] are yours to carry 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4004">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4079">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__cook_marlow.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -91813,7 +91846,8 @@ Now that is a start with some meat on it. [[Alchemy]] and [[Cooking]] are yours 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="16869">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="16946">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__tinker_gizzel.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -91971,7 +92005,8 @@ HA. Reagents, real ones, and all your fingers still attached, good, good. [[Engi
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3468">&lt;woc-art path=&quot;/ui/map-markers/quest_repeat.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3551">&lt;woc-art path=&quot;/ui/map-markers/quest_repeat.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__forgemistress_darva.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -92053,7 +92088,8 @@ The rhythm is back in your hands. [[Weaponcrafting]] and [[Armorcrafting]] are y
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3065">&lt;woc-art path=&quot;/ui/map-markers/quest_repeat.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3143">&lt;woc-art path=&quot;/ui/map-markers/quest_repeat.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__weaver_ottilie.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -92134,7 +92170,8 @@ Steady again. [[Leatherworking]] and [[Tailoring]] return to your hands as major
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3261">&lt;woc-art path=&quot;/ui/map-markers/quest_repeat.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3336">&lt;woc-art path=&quot;/ui/map-markers/quest_repeat.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__cook_marlow.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -92216,7 +92253,8 @@ There is the old flavor. [[Alchemy]] and [[Cooking]] are back on your stove as m
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3086">&lt;woc-art path=&quot;/ui/map-markers/quest_repeat.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3163">&lt;woc-art path=&quot;/ui/map-markers/quest_repeat.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__tinker_gizzel.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -92297,9 +92335,10 @@ THERE it is, the itch is back in your hands. [[Engineering]] and [[Alchemy]], ma
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3635">&lt;woc-art path=&quot;/ui/map-markers/quest_repeat.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3718">&lt;woc-art path=&quot;/ui/map-markers/quest_repeat.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Forge Work Order (Work order)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__forgemistress_darva.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -92384,9 +92423,10 @@ Good weight, no slag. Here is your due. The forge will be hungry again soon enou
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4004">&lt;woc-art path=&quot;/ui/map-markers/quest_repeat.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4079">&lt;woc-art path=&quot;/ui/map-markers/quest_repeat.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Kitchens Work Order (Work order)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__cook_marlow.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -92470,9 +92510,10 @@ Now that is a full pantry. Here is your pay. Come back when your bags are heavy 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="8173">&lt;woc-art path=&quot;/ui/map-markers/quest_repeat.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="8248">&lt;woc-art path=&quot;/ui/map-markers/quest_repeat.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Kitchens Wheat Order (Work order)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__cook_marlow.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -92580,9 +92621,10 @@ Good dry grain, and plenty of it. There is your pay, counted out. When the next 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="8119">&lt;woc-art path=&quot;/ui/map-markers/quest_repeat.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="8194">&lt;woc-art path=&quot;/ui/map-markers/quest_repeat.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Kitchens Rice Order (Work order)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__cook_marlow.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -92690,9 +92732,10 @@ Plump and dry, every grain. Here is your coin. If the marsh keeps giving, so do 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3857">&lt;woc-art path=&quot;/ui/map-markers/quest_repeat.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3935">&lt;woc-art path=&quot;/ui/map-markers/quest_repeat.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Loom Work Order (Work order)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__weaver_ottilie.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -92776,9 +92819,10 @@ Fine silk, evenly spun. Your coin, exactly measured. The loom thanks you, and so
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3712">&lt;woc-art path=&quot;/ui/map-markers/quest_repeat.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3789">&lt;woc-art path=&quot;/ui/map-markers/quest_repeat.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Toolworks Work Order (Work order)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__tinker_gizzel.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -92863,7 +92907,8 @@ Perfect, perfect, straight grain, no rot. Here, your coin, see, I keep my word (
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="15792">&lt;woc-art path=&quot;/ui/map-markers/quest_repeat.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="15869">&lt;woc-art path=&quot;/ui/map-markers/quest_repeat.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__smith_haldren.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -93024,7 +93069,8 @@ A lighter choice, but a useful one. Follow that curiosity as far as rare work wi
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3408">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3486">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__warden_fenwick.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -93101,7 +93147,8 @@ Every spear I could spare is dug in around the Starfall Crater, adventurer, ring
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3680">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3760">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__muster_commander.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -93185,7 +93232,8 @@ You felt it bite, did you? On the real one that is fourteen breaths with the who
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3051">&lt;woc-art path=&quot;/ui/map-markers/quest_repeat.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3131">&lt;woc-art path=&quot;/ui/map-markers/quest_repeat.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__muster_commander.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -93267,7 +93315,8 @@ Down again, and you were in the fight that did it. Fenbridge will have my report
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3844">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3922">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -93349,7 +93398,8 @@ Morthen&apos;s writings named a master in the northern marsh, a &apos;Fogbinder.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2935">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3019">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__socketwright_skerrit.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -93425,7 +93475,8 @@ You felt it give, did you? Forty years of interest, paid through the socket. The
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3404">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3482">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__warden_fenwick.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -93503,7 +93554,8 @@ Twelve, and not a bite on you? The causeway breathes easier tonight.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3480">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3560">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__provisioner_hale.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -93582,7 +93634,8 @@ Good thick pelts, these. The causeway will outlast the both of us now.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4064">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4144">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__provisioner_hale.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -93666,9 +93719,10 @@ Waterlogged, but whole. Poor drivers... the fen keeps what it catches, adventure
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3703">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3783">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[The Codfather (Item)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__provisioner_hale.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -93746,7 +93800,8 @@ By the damp saints... [[The Codfather (Item)|The Codfather]] himself. Look at th
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3490">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3568">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__warden_fenwick.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -93827,7 +93882,8 @@ That will push them back to the mud for a while. But something set them digging,
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3728">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3810">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric_fen.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -93912,7 +93968,8 @@ Gravecaller work, older than Morthen, older than me. The sect did not begin in E
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3017">&lt;woc-art path=&quot;/ui/items/alien_armor_plate.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3099">&lt;woc-art path=&quot;/ui/items/alien_armor_plate.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric_fen.webp&quot; size=&quot;model&quot; /&gt;
 &apos;&apos;&apos;Retired quest.&apos;&apos;&apos; The quest giver does not offer it anymore. If it is already in your quest log, you can still finish it.
 
 == Quest brief ==
@@ -93993,7 +94050,8 @@ This is no weapon I know. Look at how the plates fold. It may be a rare piece of
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3824">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3902">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__warden_fenwick.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -94077,7 +94135,8 @@ Ruthless and thorough. If this marsh ever dries out, there&apos;s warden&apos;s 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3787">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3865">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__herbalist_yara.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -94161,9 +94220,10 @@ Whole sacs, every one. You have steadier hands than half the surgeons in the sou
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4144">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4222">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[The Broodmother (Mob)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__herbalist_yara.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -94247,7 +94307,8 @@ Dead? Truly dead? Then the thicket is just trees again. The Light bless your bla
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3545">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3627">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric_fen.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -94328,7 +94389,8 @@ Each one you fell is a stolen soul set free. But the one who drowned them is sti
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4075">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4157">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric_fen.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -94417,7 +94479,8 @@ As I feared. These censers burned grave-ash, not incense. Someone consecrated th
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3525">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3607">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric_fen.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -94498,7 +94561,8 @@ You give the dead more mercy than their masters ever did. Take this, you have mo
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3914">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3996">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric_fen.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -94582,7 +94646,8 @@ Kneel, adventurer, and read the words aloud. There. Do you feel it? The Light no
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3492">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3570">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__warden_fenwick.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -94663,7 +94728,8 @@ Trolls don&apos;t dig without a reason. Someone told them where to dig, and I&ap
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3694">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3769">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__scout_maren.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -94745,7 +94811,8 @@ Same maker as the banners in the cult camp. The trolls are hired shovels, nothin
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3271">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3351">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__provisioner_hale.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -94823,7 +94890,8 @@ That tusk is long as my forearm! The mules are avenged, and Fenbridge owes you a
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3623">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3698">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__scout_maren.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -94904,7 +94972,8 @@ Twelve robes face-down in the mud. Now they know the fen watches back.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4041">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4123">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric_fen.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -94991,7 +95060,8 @@ Every cipher is countersigned &apos;[[Deacon Voss (Mob)|Deacon Voss]]&apos;, and
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3410">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3488">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__warden_fenwick.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -95075,9 +95145,10 @@ Voss is dead and the mist over the camp is already thinning. You have broken the
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4062">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4144">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
 :&apos;&apos;Other pages have this name. See [[The Sunken Bastion (disambiguation)|all pages named The Sunken Bastion]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric_fen.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -95168,7 +95239,8 @@ The ward parts like rotten rope. The door stands open... and the dark below it i
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3477">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3552">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__scout_maren.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -95253,7 +95325,8 @@ Then his watch is finally over. I&apos;ll see his name cut into the gate myself.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3479">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3561">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric_fen.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -95339,9 +95412,10 @@ Vael is dead, and the mist is lifting for the first time in years. But Maren hea
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3550">&lt;woc-art path=&quot;/ui/map-markers/quest_repeat.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3625">&lt;woc-art path=&quot;/ui/map-markers/quest_repeat.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Tannery Work Order (Work order)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__tanner_hesk.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -95423,7 +95497,8 @@ Good hides. Fair pay. Again when you have more.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3935">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4017">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric_fen.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -95505,7 +95580,8 @@ Vael&apos;s last words have not left me, adventurer: the Wyrm stirs beneath the 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3437">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3517">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__captain_thessaly.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -95586,7 +95662,8 @@ Twelve fewer shadows on the ridge. The patrols will breathe easier tonight.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3682">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3764">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__quartermaster_bree.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -95668,7 +95745,8 @@ Thick as my arm, these. The watch will not freeze this year: take these treads f
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3711">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3791">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__captain_thessaly.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -95752,7 +95830,8 @@ Fourteen more, and still my patrols count fresh tracks by morning. My scout came
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3811">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3893">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__quartermaster_bree.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -95834,9 +95913,10 @@ Ten good pelts, thick as any I have... no, look at these, adventurer. Torn, half
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3379">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3459">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Old Cragmaw (Mob)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__captain_thessaly.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -95919,7 +95999,8 @@ Down at last. The mountain folk swore that cat would outlive the wall itself. Th
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3563">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3644">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__loremaster_caddis.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -96000,7 +96081,8 @@ Straight down, every shaft of it: burrowers do not dig like that on their own. I
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3992">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4074">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__quartermaster_bree.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -96083,7 +96165,8 @@ Still warm. The Loremaster says the glow matches no flame he knows of. I say it 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3561">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3646">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__scout_maren_highwatch.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -96164,7 +96247,8 @@ Twelve down, and still they are not pulling back. Whoever bought them paid in so
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4277">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4362">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__scout_maren_highwatch.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -96254,7 +96338,8 @@ Skull, hide... and look here: wyrm-scale bindings. These totems were gifts, adve
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3252">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3332">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__captain_thessaly.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -96334,7 +96419,8 @@ Bounty paid in full. The foothills are quieter. Now we deal with the ones doing 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3236">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3316">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__captain_thessaly.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -96417,9 +96503,10 @@ Ten crushers down. The war-camp is a body without a spine. Time to take the head
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3259">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3339">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Warlord Drogmar (Mob)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__captain_thessaly.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -96503,7 +96590,8 @@ Drogmar, dead in his own camp. The clans will scatter to the high passes: you ha
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3610">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3691">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__loremaster_caddis.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -96584,7 +96672,8 @@ The fragments hum like struck bells. The mountain is not angry, adventurer... it
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3704">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3785">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__loremaster_caddis.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -96666,7 +96755,8 @@ Each core leans the same way, like iron filings to a lodestone. They point south
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3380">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3461">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__loremaster_caddis.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -96744,7 +96834,8 @@ The heartshard! Still crackling. Magnificent. Take these leggings; I sized them 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4063">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4151">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric_highwatch.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -96826,7 +96917,8 @@ The wind is quieter. But what troubles me is not the chanting, adventurer. It is
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4292">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4380">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric_highwatch.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -96912,7 +97004,8 @@ This script... I last saw its like in [[Morthen&apos;s Grimoire|Morthen&apos;s g
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3541">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3629">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric_highwatch.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -96996,7 +97089,8 @@ Light forgive us. These hold the dead of the Vale and the fen, every corpse the 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3650">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3730">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__captain_thessaly.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -97077,7 +97171,8 @@ They were soldiers once, like mine. Whatever called them up has no respect for t
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3907">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3987">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__captain_thessaly.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -97160,7 +97255,8 @@ The fields lie still again. Take this: it was made for the defenders of the wall
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3876">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3964">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric_highwatch.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -97247,7 +97343,8 @@ Yes... a waking-litany, generations in the writing. They are close, adventurer. 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3908">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3996">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric_highwatch.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -97332,7 +97429,8 @@ They burn blue and clean: the mountain remembers its old oath. With these I can 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4499">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4587">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric_highwatch.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -97419,7 +97517,8 @@ Threnos is silent, and the kneeling has stopped, adventurer. We have not ended t
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4154">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4242">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric_highwatch.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -97508,9 +97607,10 @@ The shards sit true... and the gate knows its key. The way below stands open, ad
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3576">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3661">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
 :&apos;&apos;Other pages have this name. See [[The Bound Guardian|all pages named The Bound Guardian]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__scout_maren_highwatch.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -97595,7 +97695,8 @@ Korgath, broken at last. Even his chains deserved a kinder end than that. The wr
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3459">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3547">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric_highwatch.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -97681,9 +97782,10 @@ Velkhar is dead, and the rite is headless. But you felt it down there, did you n
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3614">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3702">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
 :&apos;&apos;Other pages have this name. See [[Korzul the Gravewyrm (disambiguation)|all pages named Korzul the Gravewyrm]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric_highwatch.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -97769,7 +97871,8 @@ It is over. The dead of three lands may rest, the mountain sleeps unhaunted, and
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3810">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3898">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric_highwatch.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -97851,7 +97954,8 @@ The same mark appears on every shard... a crown. I have seen this before, cut in
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3993">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4081">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric_highwatch.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -97940,7 +98044,8 @@ Aldren remained loyal, Malric refused to accept death, and Voss saw the danger b
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4159">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4247">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric_highwatch.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -98032,9 +98137,10 @@ The keystone halves fit together, and Voss&apos;s diary names what they sealed: 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4325">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4413">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
 :&apos;&apos;Other pages have this name. See [[The Bound Guardian|all pages named The Bound Guardian]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric_highwatch.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -98125,7 +98231,8 @@ The three relics tell the same story: Aldren fought to defend his king, Malric b
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3354">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3442">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric_highwatch.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -98207,9 +98314,10 @@ Then the crown is silent at last. Thornpeak will still carry its dead, but no ki
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="5367">&lt;woc-art path=&quot;/ui/map-markers/quest_repeat.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="5447">&lt;woc-art path=&quot;/ui/map-markers/quest_repeat.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Apothecary Work Order (Work order)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__alchemist_verane.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -98304,7 +98412,8 @@ Acceptable. Potent, and properly handled. Your payment, counted to the coin. Do 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4918">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="5000">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__stablemaster_marla.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -98392,7 +98501,8 @@ Up in one clean motion and a steady seat at the top. Well ridden, adventurer. Yo
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3756">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3838">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__tidewatcher_ondrel.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -98476,7 +98586,8 @@ A waking-prayer... to something they called [[The Drowned Moon|the Drowned Moon]
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3658">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3740">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__tidewatcher_ondrel.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -98561,7 +98672,8 @@ Ten back in the water. They feel no cold, adventurer, and no fear, only the pull
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4037">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4119">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__tidewatcher_ondrel.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -98648,9 +98760,10 @@ Pearls, knuckle-bones, a child&apos;s carved fish... grave-gifts, adventurer. Th
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3565">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3647">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Sethrael the Palecoil (Mob)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__tidewatcher_ondrel.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -98732,7 +98845,8 @@ Cold as the bottom of the world, and still it twitches. The shelf is clear, adve
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3315">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3397">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__tidewatcher_ondrel.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -98821,7 +98935,8 @@ The prayer falters... and for the first time in thirty nights, the mere is quiet
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3522">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3604">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__tidewatcher_ondrel.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -98907,7 +99022,8 @@ The altar is dark, the water is still, and the moon over the tarn is only the mo
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3566">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3644">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__keeper_saelwyn.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -98990,7 +99106,8 @@ Cold, every one of them. The Hollow has perhaps a season before the tear becomes
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3769">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3847">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__keeper_saelwyn.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -99075,7 +99192,8 @@ You did what I could not bear to. The gatherers still sing in the south rings; b
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3709">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3788">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__loremother_bryn.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -99161,7 +99279,8 @@ There. Cleansed, and quiet. Each one shows the same mark: the shadow flows FROM 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3638">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3716">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__keeper_saelwyn.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -99246,9 +99365,10 @@ Eight guardians, stilled. I remember when they were raised, adventurer. Do not l
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3262">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3340">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[The Waking Warden (Mob)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__keeper_saelwyn.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -99334,7 +99454,8 @@ The bell of its voice is silent. I felt it from here, like a weight lifted off t
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3115">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3193">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__keeper_saelwyn.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -99414,7 +99535,8 @@ I felt it close from here, gentle as dusk. The Hollow remembers its friends, adv
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3622">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3703">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__provisioner_fenna.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -99493,7 +99615,8 @@ Look how they hold the light! No flame, no smoke, just the glow. The Hollow prov
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3479">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3558">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__loremother_bryn.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -99572,7 +99695,8 @@ Soft as the first stars. Set them here by the altar; the shrine will do the rest
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3277">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3356">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__loremother_bryn.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -99650,7 +99774,8 @@ Thick and sound, all four. The salve will take a week to brew and a hundred year
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3754">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3833">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__archivist_tullo.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -99736,7 +99861,8 @@ An overlook, a court, and a forgotten corner... and all three verses of the seal
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3372">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3453">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__provisioner_fenna.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -99817,7 +99943,8 @@ The night market can open again. You have a customer for life, or at least a dis
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3520">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3599">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__archivist_tullo.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -99899,7 +100026,8 @@ Look at the striations! Autumn. The Hollow was sealed in autumn. Two hundred yea
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3543">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3622">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__loremother_bryn.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -99980,7 +100108,8 @@ The rings in the north are singing again tonight. Quietly, but singing.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3562">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3641">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__archivist_tullo.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -100061,7 +100190,8 @@ The echo grows fainter each time. Soon the court will hold nothing but wind and 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3102">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3183">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__provisioner_fenna.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -100141,7 +100271,8 @@ You look like someone who can handle more than wisps, adventurer. [[Huntsman Der
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3313">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3391">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__huntsman_deral.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -100227,7 +100358,8 @@ The shallows are just water again. I have watched that shell break better [[Hunt
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3441">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3519">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__huntsman_deral.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -100310,7 +100442,8 @@ So the First falls to the last. The herd is already calmer, do you feel it? You 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3642">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3725">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__gatecaptain_brannoc.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -100391,7 +100524,8 @@ Ten fewer blades in the dunes, and the muster fires burned lower last night. My 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3509">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3591">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__quartermaster_sela.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -100472,7 +100606,8 @@ Eight, and my drivers have stopped writing farewell letters before every run. Th
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3782">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3864">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__quartermaster_sela.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -100555,7 +100690,8 @@ Scorched black and every latch still holding. The smith gets his nails, the flet
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4445">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4528">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__gatecaptain_brannoc.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -100644,7 +100780,8 @@ Three banners snapping in the hot wind, right where my glass can find them. With
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3223">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3306">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__gatecaptain_brannoc.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -100728,7 +100865,8 @@ Something is pulling the ashbone east, adventurer, and I sent my best to learn w
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4502">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4578">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__scout_yerrin.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -100812,7 +100950,8 @@ Six brands, and one mark burned into every one of them. This is no raid muster, 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="6963">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="7039">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__scout_yerrin.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -100909,7 +101048,8 @@ Look at the underside of this one, adventurer: scorched in a spiral, and only on
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3871">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3947">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__scout_yerrin.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -100993,7 +101133,8 @@ The sky over the Drakemaw has been empty for two days, and now you walk through 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3177">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3252">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__scout_einna.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -101075,9 +101216,10 @@ The pass holds, then. [[Scout Einna (NPC)|Einna]] sits that waycamp through stor
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3587">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3664">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Wolves at the Door (Quest, Eastbrook Vale)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__warden_kaldra.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -101161,7 +101303,8 @@ Ten fewer shadows between here and the tarn. The woodcutters are already arguing
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3721">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3803">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__hearthkeeper_maeve.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -101243,7 +101386,8 @@ Fur like this is the only argument winter listens to. Take these treads, they ar
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3345">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3427">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__hearthkeeper_maeve.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -101325,9 +101469,10 @@ Still warm, every one. You have bought the lodge a whole winter of mercy, advent
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3328">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3405">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Lights over the Steps (Clue hunt)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__warden_kaldra.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -101412,7 +101557,8 @@ The aurora has burned green every night this month, and the old folk will not wa
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3335">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3413">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__aurorist_veyla.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -101493,7 +101639,8 @@ Six motes, still glowing. Look at them, adventurer: they pulse in time with each
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3658">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3736">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__aurorist_veyla.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -101574,7 +101721,8 @@ The night feels thinner already. Whatever wakes them is not done, but you have b
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3224">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3306">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__hearthkeeper_maeve.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -101654,7 +101802,8 @@ Old [[Trapper Brosk (NPC)|Brosk]] works the Shiverfen trapline west of here, and
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4103">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4180">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__trapper_brosk.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -101743,7 +101892,8 @@ Four good traps back and the reeds gone quiet. You trap with a heavier hand than
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4362">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4439">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__trapper_brosk.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -101828,7 +101978,8 @@ The girl is inside, wrapped in half my blankets and talking the stars out of the
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3656">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3733">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__warden_kaldra.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -101912,7 +102063,8 @@ Eight, and the dusk chorus is thinner for it. But howlers do not leave the peaks
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3484">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3561">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__warden_kaldra.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -101995,7 +102147,8 @@ When the wind dropped last night the whole village heard the silence where the R
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3205">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3286">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__waywatcher_sorrel.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -102077,7 +102230,8 @@ Quiet on the Goldmelt, and a traveler with snow in their hair to prove it. [[Way
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3123">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3201">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__reeve_ottoline.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -102157,7 +102311,8 @@ Ten, and the stores went untouched last night for the first time this season. Th
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3205">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3283">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__reeve_ottoline.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -102241,7 +102396,8 @@ The Reeve counts her carts, does she? Well, she can count them missing a while l
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4144">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4227">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__orchardist_pomeline.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -102327,7 +102483,8 @@ Four buckets back on their hooks and the rows gone quiet. You have a heavier han
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3747">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3830">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__orchardist_pomeline.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -102409,7 +102566,8 @@ Six clots, clean as poured honey. These gloves are stitched with the last batch,
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3368">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3450">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__ferrymaster_caddow.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -102494,7 +102652,8 @@ All three, and still burning. Ferry lanterns do not go out in water, adventurer.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3603">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3685">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__ferrymaster_caddow.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -102578,9 +102737,10 @@ Eight fewer shapes in the shallows, and the crossing ran on time today for the f
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3590">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3672">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[The Meredark (Mob)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__ferrymaster_caddow.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -102663,7 +102823,8 @@ The fog lifted off the Mere this morning, adventurer, and the whole town saw it.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3217">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3295">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__waykeeper_pell.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -102745,7 +102906,8 @@ A gentle country, [[The Willowfen|the Willowfen]], but gentle is not the same as
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4193">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4275">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__bridgewright_alden.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -102831,7 +102993,8 @@ Ten fewer sets of teeth in my moat. The skiffs sat their moorings all night for 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3584">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3666">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__bridgewright_alden.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -102914,7 +103077,8 @@ Look at that: clean bites, every one, but there is rope enough left to splice. Y
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4259">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4335">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__netter_maris.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -103001,7 +103165,8 @@ Six good eels, barely bruised. The smokehouse will smell like money by morning. 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4231">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4307">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__netter_maris.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -103087,7 +103252,8 @@ Three chests, and the coin still dry inside. The sprites will sulk in the withie
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3352">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3434">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__bridgewright_alden.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -103170,7 +103336,8 @@ You have heard it by now, adventurer: the snore. Slow and heavy, out past the Dr
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3402">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3478">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__mother_sedge.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -103254,7 +103421,8 @@ Six globes, still warm with dreaming. Give me till moonrise and I will have char
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3594">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3670">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__mother_sedge.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -103337,7 +103505,8 @@ Listen, adventurer. Nothing. The first true silence over this fen in thirty year
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3163">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3245">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__lamplighter_sorrel.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -103419,7 +103588,8 @@ The lamps still burn, and the road still carries strangers to us. [[Lamplighter 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3496">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3572">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__lira_dewsong.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -103503,7 +103673,8 @@ Ten striders fewer, and the herds already graze easier. The gardens keep their o
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3634">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3711">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__weaver_amelle.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -103585,7 +103756,8 @@ Silver as starlight and twice as soft. Here, adventurer: mitts from the last bat
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3502">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3578">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__lira_dewsong.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -103668,7 +103840,8 @@ Still glowing, every petal. The shrine will smell of night for a week, and Moonr
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3210">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3286">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__lira_dewsong.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -103751,7 +103924,8 @@ Lira sent you? Then the gardens feel it too. Sit by the glass a moment, adventur
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3445">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3527">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__astronomer_cassian.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -103836,7 +104010,8 @@ No doubt is left. Every bearing has crept toward the Sleepless Barrow, as if the
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4686">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4768">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__astronomer_cassian.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -103926,7 +104101,8 @@ Grave gold, still cold from the soil. The wights are not rising on their own, ad
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3561">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3643">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__astronomer_cassian.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -104009,7 +104185,8 @@ The stars have settled for the first time in a season, adventurer. The mounds ar
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3120">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3196">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__lampman_cobb.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -104091,7 +104268,8 @@ Hear that tolling, adventurer? That is Gibbetmere, up the north road, ringing it
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3582">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3659">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__sexton_marrow.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -104175,7 +104353,8 @@ Ten fewer weavers in the eaves. The lamplighters will walk their rounds tonight 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3712">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3787">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__widow_tansy.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -104257,7 +104436,8 @@ Six skeins, soft as a held breath. The dead will lie easier in this. Take these 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3453">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3528">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__widow_tansy.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -104340,7 +104520,8 @@ All four burning? Then breathe, adventurer. You did not hear it, but the whole v
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3224">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3301">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__sexton_marrow.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -104425,7 +104606,8 @@ South of here the Mournstone Chapel moulders by its black tarn, and one man stil
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3444">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3519">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__vicar_creel.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -104506,7 +104688,8 @@ Eight wardens laid down at last. I will not call it a mercy in daylight, but bet
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4058">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4133">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__vicar_creel.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -104594,7 +104777,8 @@ Three souls back under honest ground before nightfall. The shamblers will grow b
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4187">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4264">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__sexton_marrow.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -104678,7 +104862,8 @@ He came through the gate on his own two feet, swearing he will dig nothing deepe
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3514">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3589">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__vicar_creel.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -104761,7 +104946,8 @@ The horn stopped mid-note. Every bell in Gibbetmere rang once, on its own, and t
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3303">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3385">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__strandwatcher_pell.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -104844,9 +105030,10 @@ Out of the black trees and into the sun, adventurer. Follow the shore road north
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3477">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3558">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[The Wreck Line (Quest, The Proving Shore)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__salvage_boss_ryna.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -104931,7 +105118,8 @@ Salt-stained but sound, all three. The divers eat this month because of you, adv
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3474">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3555">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__salvage_boss_ryna.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -105012,7 +105200,8 @@ Ten fewer claws in the surf. My crews are already wading back out, and not one o
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4200">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4281">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__salvage_boss_ryna.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -105096,7 +105285,8 @@ Suli is by the fire, still swearing she could have swum it. You brought back the
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3495">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3575">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__pearlmother_isha.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -105177,7 +105367,8 @@ The racks stand and the gardens can be replanted. The boars did not choose to co
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3182">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3262">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__pearlmother_isha.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -105260,7 +105451,8 @@ The divers will not step past the treeline, adventurer, and I will not ask them 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3560">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3635">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__hermit_okku.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -105345,7 +105537,8 @@ Good, strong silk. My bells will sing a while longer, and nothing walks these pa
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4323">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4398">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__hermit_okku.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -105434,9 +105627,10 @@ Moss, pearl-shell, and boar blood, packed by fingers. Something in that ruin sti
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3489">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3564">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[The Idol Guardian (Mob)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__hermit_okku.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -105519,7 +105713,8 @@ You felled a thing the jungle itself would not touch. Look there, behind the ido
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3376">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3455">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__gatewarden_pell.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -105600,7 +105795,8 @@ Moved, did they. [[Gatewarden Pell (NPC)|Pell]] reports that every week, and eve
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4514">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4600">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__head_gardener_amaranth.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -105688,7 +105884,8 @@ Ten heaps of clippings where ten wolves stood. It should feel like gardening, ad
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3797">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3878">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__wickmother_sorrel.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -105773,7 +105970,8 @@ Six pairs, and my own among them, I would know the nick in the blade anywhere. H
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4206">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4287">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__wickmother_sorrel.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -105859,7 +106057,8 @@ Three carts back and the pegs full again. Let the little devils sulk in their he
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3389">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3475">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__head_gardener_amaranth.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -105943,7 +106142,8 @@ So the house finally sent someone. A hundred years I have walked these lawns, ad
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3628">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3704">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__gardener_yew.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -106025,7 +106225,8 @@ Look here: the leaves are curling in on themselves, every clipping the same. The
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3887">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3963">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__gardener_yew.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -106111,7 +106312,8 @@ Four rubbings, four sisters, and not one of them wept marble. The garden has tak
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3652">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3728">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__gardener_yew.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -106194,7 +106396,8 @@ I felt it, here, when he came apart. A hundred years of work, and you were right
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3198">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3275">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__watcher_maren.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -106275,7 +106478,8 @@ Over the pass on foot, in this weather? [[Watcher Maren (NPC)|Maren]] sends me f
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4011">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4093">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__harbormaster_odile.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -106358,7 +106562,8 @@ Fleece like this is why the rams stand out there fat and smug in weather that ki
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3616">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3698">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__harbormaster_odile.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -106442,7 +106647,8 @@ Ten fewer shells on my road, and the pots came up full this morning. The potmen 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3213">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3295">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__harbormaster_odile.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -106526,7 +106732,8 @@ Old [[Keeper Bram (NPC)|Bram]] keeps the Beacon on the high head northeast of to
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3573">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3648">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__keeper_bram.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -106612,7 +106819,8 @@ Four points of light on the cliff road, right where they belong. From up here it
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3450">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3525">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__keeper_bram.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -106693,7 +106901,8 @@ The lamp did not so much as gutter last night, first time in a month. The wind s
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3163">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3238">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__keeper_bram.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -106776,7 +106985,8 @@ From this lamp room I can see the whole coast, adventurer, and what I see in the
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="6667">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="6744">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__salvager_edda.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -106878,9 +107088,10 @@ Six crews quieter and three crates high and dry. You salvage with a heavier hand
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3584">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3661">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[The Wreck Warden (Mob)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__salvager_edda.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -106963,7 +107174,8 @@ The beach went silent the moment it fell, adventurer. First silence I have heard
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3348">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3426">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__bellkeeper_tam.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -107047,7 +107259,8 @@ The causeway holds, and [[Bellkeeper Tam (NPC)|Tam]] still has breath enough to 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3609">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3688">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__warden_coalfast.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -107131,7 +107344,8 @@ Ten fewer, and the field hands are already arguing over who walks out first. It 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3791">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3873">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__quartermaster_edda.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -107213,7 +107427,8 @@ Salt-pitted and break-scarred, and it will hold an edge all the same. Here, I li
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3403">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3481">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__bellkeeper_tam.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -107295,7 +107510,8 @@ Three voices, three answers, carried clean over the water. Sleep in Gullhaven to
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3194">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3273">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__warden_coalfast.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -107378,7 +107594,8 @@ The Warden sent you? Good. That means the town has finally started listening. No
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3839">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3914">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__mender_saul.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -107462,7 +107679,8 @@ Moss in one hand and a quieter shoreline in the other. You have restocked my who
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3974">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4049">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__fisher_nell.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -107546,7 +107764,8 @@ Bram! You brought him back to me whole, adventurer. We both wept and neither of 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3571">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3650">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__riftwatch_ollun.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -107630,7 +107849,8 @@ Eight nights of circling, ended in one. The fires burn steadier already, or perh
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3799">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3878">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__riftwatch_ollun.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -107714,7 +107934,8 @@ Every song this island sings ends on the same low note, and it comes from the Su
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3488">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3562">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__warden_tam.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -107793,7 +108014,8 @@ I clocked that run, adventurer, and I have failed faster feet. The Gauntlet is y
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4897">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4974">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__overseer_pell.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -107877,7 +108099,8 @@ One clean fell, and your grip already surer. Remember the feel of it, adventurer
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3232">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3312">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__drillmaster_rook.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -107956,7 +108179,8 @@ Now you are fighting instead of flailing. That row grows every level you take, a
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4192">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4272">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__drillmaster_rook.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -108038,9 +108262,10 @@ Three shells cracked and all your fingers kept: a fair first fight, adventurer. 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4126">&lt;woc-art path=&quot;/ui/items/mother_of_pearl.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4204">&lt;woc-art path=&quot;/ui/items/mother_of_pearl.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Mother of Pearl (Item)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__tidewarden_nel.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -108124,9 +108349,10 @@ The [[Lustrous Pearl]], pried off the old king of the shallows himself. My fathe
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4387">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4465">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[The Wreck Line (Quest, The Palmreach)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__tidewarden_nel.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -108211,7 +108437,8 @@ Rope, tar, and half a wheel of cheese the sea somehow spared: I will take the lo
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4635">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4718">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__quartermaster_finch.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -108296,7 +108523,8 @@ A fine pouch. Buckle it on if you have not already: press B to open your bags, t
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2775">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2855">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__instructor_maren.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -108375,7 +108603,8 @@ So now you know how word moves in the vale, adventurer: not by couriers, by boar
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2905">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2985">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__instructor_maren.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -108453,7 +108682,8 @@ And back you come, no worse for it. Remember what that felt like, adventurer, be
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2893">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2973">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__instructor_maren.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -108529,7 +108759,8 @@ There is nothing left on this shore you have not already run, beaten, opened, or
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="6795">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="6885">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__archivist_maelin_emberward.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -108639,7 +108870,8 @@ The echoes agree. Varkhul bound water from the dying Last Spring into living met
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3845">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3942">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__archivist_maelin_ember_projection.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -108733,7 +108965,8 @@ Ignivar was never merely a guardian. His heart was the key, and its final plates
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3983">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4080">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__archivist_maelin_ember_projection.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -108827,7 +109060,8 @@ The forge is silent at last. The spring may never recover, but Varkhul will shap
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4423">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4520">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__archivist_maelin_ember_projection.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -108927,7 +109161,8 @@ It still sings. Keep the ember: your hammer will need its voice. I have taught y
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4428">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4525">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__archivist_maelin_ember_projection.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -109024,7 +109259,8 @@ The spring&apos;s voice carries through the iron. What Varkhul chained, your han
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3190">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3270">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__drillmaster_hale.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -109104,7 +109340,8 @@ Ten blows, and now you know what they are worth. Every time you take a new weapo
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3385">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3465">&lt;woc-art path=&quot;/ui/map-markers/quest_available.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__drillmaster_hale.webp&quot; size=&quot;model&quot; /&gt;
 == Quest brief ==
 {| class=&quot;wikitable article-facts&quot;
 |-
@@ -109190,7 +109427,8 @@ Healed numbers, not hurt ones, but numbers all the same, adventurer. A healer wh
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="7330">&lt;woc-art path=&quot;/ui/items/gourdlight_treat_pouch.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="7411">&lt;woc-art path=&quot;/ui/items/gourdlight_treat_pouch.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__gourdlight_keeper.webp&quot; size=&quot;model&quot; /&gt;
 &apos;&apos;&apos;Seasonal quest.&apos;&apos;&apos; The quest giver only offers it during [[Gourdlight Eve]].
 
 == Quest brief ==
@@ -109297,7 +109535,8 @@ Five doors and you still have all your fingers. Here, a pouch of sweets for the 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="6005">&lt;woc-art path=&quot;/ui/items/gourdlight_treat_pouch.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="6086">&lt;woc-art path=&quot;/ui/items/gourdlight_treat_pouch.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__gourdlight_keeper.webp&quot; size=&quot;model&quot; /&gt;
 &apos;&apos;&apos;Seasonal quest.&apos;&apos;&apos; The quest giver only offers it during [[Gourdlight Eve]].
 
 == Quest brief ==
@@ -109399,7 +109638,8 @@ Five round ones, and not a bite out of any. That is pie for the whole Vale. Here
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="7357">&lt;woc-art path=&quot;/ui/items/gourdlight_treat_pouch.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="7438">&lt;woc-art path=&quot;/ui/items/gourdlight_treat_pouch.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__gourdlight_keeper.webp&quot; size=&quot;model&quot; /&gt;
 &apos;&apos;&apos;Seasonal quest.&apos;&apos;&apos; The quest giver only offers it during [[Gourdlight Eve]].
 
 == Quest brief ==
@@ -109506,7 +109746,8 @@ Three of them? I heard the cook drop a pan from across the square. Well done. He
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="7102">&lt;woc-art path=&quot;/ui/items/gourdlight_treat_pouch.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="7183">&lt;woc-art path=&quot;/ui/items/gourdlight_treat_pouch.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__gourdlight_keeper.webp&quot; size=&quot;model&quot; /&gt;
 &apos;&apos;&apos;Seasonal quest.&apos;&apos;&apos; The quest giver only offers it during [[Gourdlight Eve]].
 
 == Quest brief ==
@@ -109613,7 +109854,8 @@ Six stubs, cold as frost. Whoever lit them will have to try harder than that. Ta
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="7621">&lt;woc-art path=&quot;/ui/items/gourdlight_treat_pouch.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="7702">&lt;woc-art path=&quot;/ui/items/gourdlight_treat_pouch.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__gourdlight_keeper.webp&quot; size=&quot;model&quot; /&gt;
 &apos;&apos;&apos;Seasonal quest.&apos;&apos;&apos; The quest giver only offers it during [[Gourdlight Eve]].
 
 == Quest brief ==
@@ -109724,7 +109966,8 @@ Three towns in one night! Your boots have earned this more than you have.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4484">&lt;woc-art path=&quot;/ui/items/gourdlight_treat_pouch.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4565">&lt;woc-art path=&quot;/ui/items/gourdlight_treat_pouch.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__gourdlight_keeper.webp&quot; size=&quot;model&quot; /&gt;
 &apos;&apos;&apos;Seasonal quest.&apos;&apos;&apos; The quest giver only offers it during [[Gourdlight Eve]].
 
 == Quest brief ==
@@ -109817,7 +110060,8 @@ Black as a moonless field, and they smell of smoke already. The bonfire will be 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="5172">&lt;woc-art path=&quot;/ui/items/gourdlight_treat_pouch.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="5253">&lt;woc-art path=&quot;/ui/items/gourdlight_treat_pouch.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__gourdlight_keeper.webp&quot; size=&quot;model&quot; /&gt;
 &apos;&apos;&apos;Seasonal quest.&apos;&apos;&apos; The quest giver only offers it during [[Gourdlight Eve]].
 
 == Quest brief ==

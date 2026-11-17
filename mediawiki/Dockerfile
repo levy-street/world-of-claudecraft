@@ -10,6 +10,7 @@ COPY public/map_bg/ /var/www/html/resources/assets/game/map_bg/
 COPY public/ui/ /var/www/html/resources/assets/game/ui/
 COPY public/textures/loading/ /var/www/html/resources/assets/game/textures/loading/
 COPY public/encyclopedia-stills/ /var/www/html/resources/assets/game/encyclopedia-stills/
+COPY public/guide-stills/ /var/www/html/resources/assets/game/guide-stills/
 COPY public/encyclopedia-attacks/ /var/www/html/resources/assets/game/encyclopedia-attacks/
 COPY public/loading-screen.jpg /var/www/html/resources/assets/woc-loading-screen.jpg
 COPY public/woc_logo_square.webp /var/www/html/resources/assets/woc-logo-square.webp
