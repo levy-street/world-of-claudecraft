@@ -280,7 +280,9 @@ export function gapThreat(
   const len = Math.hypot(gx, gz) || 1;
   const cos = (d.x * gx + d.z * gz) / len;
   const k = smooth((cos - 0.35) / 0.55);
-  return phase === 'gather' || phase === 'gustgather' ? k * 0.6 : k;
+  // The gather burns nearly as hard as the blow (the team's review of
+  // 2026-11-17: a clear warning of where it will blow, on the longer gather).
+  return phase === 'gather' || phase === 'gustgather' ? k * 0.9 : k;
 }
 
 // ---- Thessaly's calm ----------------------------------------------------------------------

@@ -104,6 +104,7 @@ import {
   living,
 } from './breath_scope';
 import { clearShoves } from './breath_shove';
+import { startSkyVolley } from './breath_sky';
 import type { BreathFightState } from './breath_state';
 import {
   clearStorm,
@@ -190,6 +191,8 @@ function freshState(boss: Entity, difficulty: BreathDifficulty): BreathFightStat
     galeShoves: [],
     barrage: null,
     spots: [],
+    skyTimer: T.skyFirst,
+    skyVolleys: 0,
     forkTimer: T.forkFirst,
     cradleTimer: T.cradleFirst,
     drawnTimer: T.drawnFirst,
@@ -573,6 +576,10 @@ export function breathDevTrigger(
     return startInhale(s, true)
       ? 'The Guardian draws breath.'
       : 'The Guardian cannot draw breath now.';
+  }
+  if (verb === 'sky') {
+    const n = startSkyVolley(s);
+    return `Lightning falls from the sky (${n} strikes).`;
   }
   if (verb === 'tornado' || verb === 'gale') {
     startGales(s);

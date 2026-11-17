@@ -56,6 +56,7 @@ import {
   spawnBreathObject,
 } from './breath_scope';
 import { clearShoves } from './breath_shove';
+import { stepSky } from './breath_sky';
 import type { BreathFightState, BreathSpot } from './breath_state';
 import { clearCalm } from './breath_thessaly';
 import { breathSay } from './breath_voice';
@@ -111,8 +112,16 @@ export function landStorm(s: BreathScope): void {
   st.gustTimer = T.barrageSeconds + T.gustFirst;
 }
 
-function spawnStrike(s: BreathScope, x: number, z: number, kind: 'barrage' | 'drawn'): void {
-  const warn = kind === 'barrage' ? T.strikeWarn : T.drawnWarn;
+/** A strike's telegraphed spot (the barrage's, Drawn Lightning's, or a sky
+ *  strike's: a barrage strike on its own longer `warnSeconds`). */
+export function spawnStrike(
+  s: BreathScope,
+  x: number,
+  z: number,
+  kind: 'barrage' | 'drawn',
+  warnSeconds?: number,
+): void {
+  const warn = warnSeconds ?? (kind === 'barrage' ? T.strikeWarn : T.drawnWarn);
   const r = kind === 'barrage' ? T.strikeR : T.drawnR;
   const e = spawnBreathObject(
     s.ctx,
@@ -366,6 +375,7 @@ function stepSwell(s: BreathScope): void {
  *  still lands). */
 export function stepStorm(s: BreathScope): void {
   stepSpots(s);
+  stepSky(s);
   stepCradles(s);
   stepDrawn(s);
   if (s.st.half !== 'storm') return;

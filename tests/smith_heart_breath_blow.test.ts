@@ -63,6 +63,11 @@ function pulled(tier: 'normal' | 'heroic' = 'normal', n = 4): BreathFight {
   st.inhaleTimer = 999;
   st.circleTimer = 999;
   st.heartTimer = 999;
+  // The blows across the Cornice (much stronger since 2026-11-17: an idle
+  // body goes off the edge) and the sky strikes keep to their own tests.
+  st.wind.phase = 'calm';
+  st.wind.remaining = 999;
+  st.skyTimer = 999;
   return f;
 }
 

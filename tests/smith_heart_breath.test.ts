@@ -53,6 +53,9 @@ function pulled(n = 6, seed = 23): BreathFight {
   const f = breathFight(n, seed);
   expect(f.dev('/dev heart breath pull')).toBe(true);
   f.tick(2);
+  // The sky strikes (breath_sky.ts) keep to their own tests below.
+  const st = f.state();
+  if (st) st.skyTimer = 999;
   return f;
 }
 
@@ -63,11 +66,25 @@ function until(f: BreathFight, pred: () => boolean, seconds: number): SimEvent[]
   return out;
 }
 
+/** Hold the raid where it stands each tick (the blows since 2026-11-17 carry
+ *  an idle body off the Cornice: these tests watch the wind's clock). */
+function holdRaid(f: BreathFight): () => void {
+  const spots = f.players.map((p) => f.local(p));
+  return () => {
+    for (const [i, p] of f.players.entries()) f.put(p, spots[i].x, spots[i].z);
+  };
+}
+
 describe('Guardian of the Breath: the bellows breathes', () => {
-  it('telegraphs each blow, blows 10 s toward one bearing, falls calm, then turns', () => {
+  it('telegraphs each blow, blows toward one bearing, falls calm, then turns', () => {
     const f = pulled(4);
+    // The indrawn breath (every 30 s) keeps to its own tests.
+    const st0 = f.state();
+    if (st0) st0.inhaleTimer = 999;
+    const hold = holdRaid(f);
     const segs: { phase: string; bearing: number; ticks: number }[] = [];
-    for (let i = 0; i < 20 * 34; i++) {
+    for (let i = 0; i < 20 * 48; i++) {
+      hold();
       f.tick(1);
       const w = f.wind();
       if (!w) throw new Error('no wind');
@@ -77,7 +94,7 @@ describe('Guardian of the Breath: the bellows breathes', () => {
     }
     const blows = segs.filter((s) => s.phase === 'blow');
     expect(blows.length).toBeGreaterThanOrEqual(2);
-    // Every whole blow lasts its 10 s, a gather of the same bearing before it.
+    // Every whole blow lasts its whole blow, a gather of the same bearing before it.
     const st = f.state();
     if (!st) throw new Error('no state');
     blows.slice(0, 2).forEach((b, k) => {
@@ -93,25 +110,46 @@ describe('Guardian of the Breath: the bellows breathes', () => {
     for (const b of blows) expect(BLOW_BEARINGS).toContain(b.bearing);
   });
 
-  it('the calm shortens as its health drops, 5 s at full to 3 s at half', () => {
+  it('the calm shortens as its health drops, 12 s at full to 9 s at half', () => {
+    // The team's review of 2026-11-17: more time between the (much stronger) blows.
+    expect(T.calmMax).toBe(12);
+    expect(T.calmMin).toBe(9);
     expect(calmSeconds(1)).toBe(T.calmMax);
-    expect(calmSeconds(0.75)).toBeCloseTo(4, 9);
+    expect(calmSeconds(0.75)).toBeCloseTo(10.5, 9);
     expect(calmSeconds(0.5)).toBe(T.calmMin);
     expect(calmSeconds(0.2)).toBe(T.calmMin);
-    // In the fight: a blow ending at 60 percent leaves calm and gather 3.4 s.
+    // In the fight: a blow ending at 60 percent leaves calm and gather 9.6 s.
     const f = pulled(4);
-    until(f, () => f.wind()?.phase === 'blow', 8);
+    const st0 = f.state();
+    if (st0) st0.inhaleTimer = 999;
+    const hold = holdRaid(f);
+    until(
+      f,
+      () => {
+        hold();
+        return f.wind()?.phase === 'blow';
+      },
+      12,
+    );
     f.boss().hp = Math.round(f.boss().maxHp * 0.6);
-    until(f, () => f.wind()?.phase === 'calm', 12);
+    until(
+      f,
+      () => {
+        hold();
+        return f.wind()?.phase === 'calm';
+      },
+      12,
+    );
     let ticks = 0;
     until(
       f,
       () => {
+        hold();
         if (f.wind()?.phase === 'blow') return true;
         ticks++;
         return false;
       },
-      8,
+      14,
     );
     expect(ticks * DT).toBeCloseTo(calmSeconds(f.boss().hp / f.boss().maxHp), 1);
   });
@@ -652,12 +690,17 @@ describe('Guardian of the Breath: the swelling storm per tier', () => {
 
 describe('Guardian of the Breath: heroic', () => {
   it('pins the push per tier: normal as it was, heroic and mythic harder and still walkable', () => {
-    // Normal is exactly what Jose played; the harder tiers in the table.
-    expect(BREATH_DIFFICULTY.normal.windSpeed).toBe(3.2);
+    // The team's review of 2026-11-17: MUCH stronger (a blow left standing
+    // carries a body some forty yards, off the Cornice from its middle), with a
+    // longer warning and a longer calm; a run into it still gains ground.
+    expect(BREATH_DIFFICULTY.normal.windSpeed).toBe(5.8);
+    expect(T.gatherSeconds).toBe(5);
+    expect(T.blowSeconds).toBe(7);
+    expect(BREATH_DIFFICULTY.normal.windSpeed * T.blowSeconds).toBeGreaterThan(38);
     // The Summit Roar throws far since the rework (the team's feedback).
     expect(BREATH_DIFFICULTY.normal.gustThrow).toBe(26);
     for (const tier of ['heroic', 'mythic'] as const) {
-      expect(BREATH_DIFFICULTY[tier].windSpeed).toBe(4.4);
+      expect(BREATH_DIFFICULTY[tier].windSpeed).toBe(6.6);
       expect(BREATH_DIFFICULTY[tier].gustThrow).toBe(30);
     }
   });
@@ -702,9 +745,9 @@ describe('Guardian of the Breath: heroic', () => {
     expect(normal.drift).toBeCloseTo(BREATH_DIFFICULTY.normal.windSpeed, 0);
     expect(heroic.drift).toBeCloseTo(BREATH_DIFFICULTY.heroic.windSpeed, 0);
     expect(heroic.drift).toBeGreaterThan(normal.drift + 0.8);
-    // Against it a run still gains ground, with effort.
-    expect(heroic.headway).toBeGreaterThan(2);
-    expect(heroic.headway).toBeLessThan(normal.headway - 0.8);
+    // Against it a run still gains ground, barely.
+    expect(heroic.headway).toBeGreaterThan(0.1);
+    expect(heroic.headway).toBeLessThan(normal.headway - 0.5);
     expect(heroic.thrown).toBeGreaterThan(normal.thrown + 2);
   });
 

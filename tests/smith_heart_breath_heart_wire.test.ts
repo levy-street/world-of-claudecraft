@@ -88,6 +88,8 @@ describe('the Knotted Gale over the wire', () => {
     const mirror = () => client.entities.get(a.pid);
     const serverMe = sim.entities.get(a.pid);
     run(0.5);
+    // A calm first: the blows since 2026-11-17 would carry him off the edge.
+    sim.chat('/dev heart breath calm', a.pid);
 
     sim.chat('/dev heart breath heart', a.pid);
     run(0.5);

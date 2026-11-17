@@ -277,8 +277,9 @@ export type BreathDifficulty = 'normal' | 'heroic' | 'mythic';
 
 export interface BreathDifficultyRules {
   /** The blow's speed (yards a second; a run is 7, so a walker against it
-   *  still makes headway). Heroic's wind is the harder one (Jose's playtest:
-   *  normal stays as it was, heroic and mythic push noticeably harder). */
+   *  still makes headway). Heroic's wind is the harder one. The team's review
+   *  of 2026-11-17 made every tier MUCH stronger (3.2 and 4.4 before): a run
+   *  into it barely gains ground, a body left standing goes off the edge. */
   windSpeed: number;
   /** The exhale (Bellows Gust) throws everyone this far outward (yards). */
   gustThrow: number;
@@ -377,7 +378,7 @@ export const BREATH_KNOT: Readonly<Record<'heroic' | 'mythic', BreathKnotRules>>
 
 export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficultyRules>> = {
   normal: {
-    windSpeed: 3.2,
+    windSpeed: 5.8,
     gustThrow: 26,
     // The parse-calibrated pass of 2026-11-16: the raid's damage and the
     // swing +15 percent (was 1), the Cradle's discharge where it was.
@@ -408,7 +409,7 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
     thunderDraw: 4,
   },
   heroic: {
-    windSpeed: 4.4,
+    windSpeed: 6.6,
     gustThrow: 30,
     // The pass of 2026-11-16: the raid's damage +25 percent (1.25 to
     // 1.5625) and the swing's, the Cradle's discharge where it was; its pool
@@ -443,7 +444,7 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
   // Heroic whole (the circle rule included), with its own harder Knotted
   // Gale and Windworn (one ride per player per round of isles: two groups).
   mythic: {
-    windSpeed: 4.4,
+    windSpeed: 6.6,
     gustThrow: 30,
     // Heroic's numbers of 2026-11-16 (the heroic row whole).
     damageMult: 1.5625,
@@ -481,13 +482,17 @@ export const BREATH_TUNING = {
   // The wind (phase 1).
   /** Seconds from the pull to the first blow's telegraph. */
   firstGather: 3,
-  /** The telegraph before each blow: the coming wind drawn on the floor. */
-  gatherSeconds: 2.5,
-  blowSeconds: 10,
-  /** The calm after a blow (its telegraph included): 5 s at full health,
-   *  shortening to 3 s at half (calmSeconds). */
-  calmMax: 5,
-  calmMin: 3,
+  /** The telegraph before each blow: the coming wind drawn on the floor.
+   *  The team's review of 2026-11-17: a MUCH stronger blow (BREATH_DIFFICULTY
+   *  windSpeed: one left standing is carried some forty yards, off the
+   *  Cornice from its middle) with a longer warning and a longer calm, so
+   *  each blow is a reposition to the upwind side (was 2.5 s, 10 s, 5 to 3 s). */
+  gatherSeconds: 5,
+  blowSeconds: 7,
+  /** The calm after a blow (its telegraph included): 12 s at full health,
+   *  shortening to 9 s at half (calmSeconds). */
+  calmMax: 12,
+  calmMin: 9,
   /** Pressed against the rim's wall: a hit each second. */
   pinTick: 1,
   pinMin: 90,
@@ -515,8 +520,9 @@ export const BREATH_TUNING = {
   /** Heroic: no circle anchors the same player again for this long. */
   spentSeconds: 60,
   // The indrawn breath and the exhale (Bellows Gust).
-  inhaleFirst: 38,
-  inhaleEvery: 45,
+  // The team's review of 2026-11-17: more often (was 38 and 45 s).
+  inhaleFirst: 25,
+  inhaleEvery: 30,
   inhaleCast: 5,
   /** The pull toward the guardian (a run is 7: walking away barely holds). */
   pullSpeed: 5.5,
@@ -560,6 +566,16 @@ export const BREATH_TUNING = {
   strikeR: 3.5,
   strikeMin: 320,
   strikeMax: 380,
+  // Sky strikes (the team's review of 2026-11-17: "lightning strikes like
+  // meteors, in all phases"): in the Wind and the Storm alike, every
+  // `skyEvery` a volley of strikes from the sky on telegraphed spots (one
+  // under each of `skyMarks` hashed players, `skySpots` more hashed over the
+  // floor), each with the barrage's reach and hit, a longer warning.
+  skyFirst: 10,
+  skyEvery: 14,
+  skyWarn: 2.2,
+  skyMarks: 2,
+  skySpots: 2,
   // Phase 2: the Leaping Bolt.
   forkFirst: 6,
   forkEvery: 22,

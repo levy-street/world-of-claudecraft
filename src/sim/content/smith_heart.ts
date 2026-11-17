@@ -404,14 +404,16 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
       line: {
         castId: C.breathLance,
         name: 'Storm Lance',
-        castTime: 2,
-        every: 11,
+        // The team's review of 2026-11-17: faster, longer, stronger (was a
+        // 2 s bar every 11 s, 34 yd by 2.5, 240 to 280).
+        castTime: 1.5,
+        every: 9,
         first: 5,
         school: 'nature',
-        length: 34,
-        halfWidth: 2.5,
-        min: 240,
-        max: 280,
+        length: 60,
+        halfWidth: 3,
+        min: 380,
+        max: 440,
       },
     },
   },

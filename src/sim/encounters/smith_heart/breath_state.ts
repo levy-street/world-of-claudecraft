@@ -234,6 +234,9 @@ export interface BreathFightState {
   /** The storm breaking: the barrage's clock (seconds left, next volley). */
   barrage: { remaining: number; next: number; volleys: number } | null;
   spots: BreathSpot[];
+  /** Sky strikes (breath_sky.ts): seconds to the next volley, in both halves. */
+  skyTimer: number;
+  skyVolleys: number;
   forkTimer: number;
   cradleTimer: number;
   drawnTimer: number;

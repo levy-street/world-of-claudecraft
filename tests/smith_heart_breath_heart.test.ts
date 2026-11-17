@@ -1340,6 +1340,9 @@ describe("Captain Thessaly's circle: Jose's playtest of 2026-11-02", () => {
     const st = f.state();
     if (!st) throw new Error('no fight');
     st.circleTimer = 999;
+    // The (much stronger) blows would carry the idle raid off the edge.
+    st.wind.phase = 'calm';
+    st.wind.remaining = 999;
     const seen: { x: number; z: number }[] = [];
     for (let i = 0; i < 8; i++) {
       f.dev('/dev heart breath circle');
