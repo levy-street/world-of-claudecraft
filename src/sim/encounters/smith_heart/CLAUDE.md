@@ -9,8 +9,10 @@ Quench's, then the Heat's, then the Masterless Strength's, then the seal and the
 | Module | Role |
 |---|---|
 | `entry.ts` | The dev-only door while `SMITH_HEART_PLAYABLE` is false. |
-| `seal.ts` | The heart seal's veins, the portal bit and the arrival bit, derived every tick and carried on the seal markers' template ids; `smithHeartVeinWon` (the Hammer's vein waits on the whole council). |
-| `portal.ts` | The portal hop both ways, and the Heart's exit portal (open once the Masterless Strength falls: the seal markers' exit bit) back to the raid's entrance beside Warden Collier. |
+| `seal.ts` | The heart seal's value, carried on the seal markers' template ids: the veins, the charge (READY, bit 128: all four lit AND the Ring clear) and the exit, derived every tick, and the portal bit (16) and the arrival bit (32), KEPT by the markers (the portal bit is set only by a burst, `seal_burst.ts`, never by the veins and the Ring). `smithHeartProgress` (`ready`; `portalOpen` read off the claim's markers, so every consumer sees the sticky value); `smithHeartVeinWon` (the Hammer's vein waits on the whole council). Its tick also holds the markers non-lootable and runs the crystal's upkeep. |
+| `seal_crystal.ts` | The heart seal crystal as a claim object, a leaf under `seal.ts` (it imports nothing of the seal, so no cycle): `lootable` only while READY and not burst (a dark crystal is not clickable), `respawnTimer` held at infinity (the generic object sweep never re-arms it), its round combat wall (the Hammer Council's pillars' mechanism: `COMBAT_WALL_SHAPES` row, the `kitObject` wall state, `syncCombatWallCollision`; the online mirror rebuilds it from the entity), `retireSealCrystal` (the entity leaves the claim and its wall goes the same tick), the reach test (`INTERACT_RANGE` from its edge), `holdSealMarkerInert` (the marker at the dais centre shares its spot and would tie it in the interact scan). |
+| `seal_burst.ts` | The burst, above `seal.ts` and `seal_crystal.ts`: `pressSmithHeartSealCrystal` (the arm `interaction.ts` `pickUpObject` runs for the crystal's template: out of reach, dark, already burst, else bursts) and `burstSmithHeartSeal` (the PORTAL bit onto every marker AT ONCE, the crystal retired, one line to the claim; `/dev heart portal` is a forced burst through it). |
+| `portal.ts` | The portal hop both ways (the Ring's portal only once the crystal has burst), and the Heart's exit portal (open once the Masterless Strength falls: the seal markers' exit bit) back to the raid's entrance beside Warden Collier. |
 | `checkpoint_order.ts` | Leaf: the death checkpoints' kill order (recorded by the seal's tick, keyed by the claim and its exit) and the pure rule (`smithHeartCheckpointRooms`: the last kill's room first, the Heart first once all four are down). |
 | `checkpoint.ts` | The death checkpoints' candidates for `instances/dungeon_checkpoints.ts` (its `ORDERED_CHECKPOINTS`): the rooms in that order, the points (`content/smith_heart_checkpoints.ts`), the Heart only while the portal is open. |
 | `council_ids.ts` | Leaf: the council's template, cast, aura, object and cue ids, the per-difficulty rules (`COUNCIL_DIFFICULTY`: the mythic seam), the SKETCH tuning (`COUNCIL_TUNING`), the pillar template helpers, the soak's pure split. The content, the renderer, the HUD and the tests key on it; it imports nothing. |
@@ -135,7 +137,15 @@ Rules:
   whole on 2026-11-09: its mechanics read in the world; the yells carry the `*.say.*` keys and the
   marked player's own short alert sits over the action bar); the
   damage and aura names are matched by `src/ui/sim_i18n.ts`.
+- The heart seal crystal: one crystal at the dais centre,
+  charged by the four veins and pressed to burst into the portal. A marker is told by
+  `smithHeartSealMaskOf`'s parse, never by the `smith_heart_seal_` prefix alone (the
+  crystal's template, `smith_heart_seal_crystal`, shares it). A new reader of the seal
+  keeps the three layers apart: `seal_crystal.ts` never imports `seal.ts`.
 - Tests: `tests/smith_heart_checkpoints.test.ts` (the death checkpoints);
+  `tests/smith_heart_seal_crystal.test.ts` (the heart seal crystal: READY, the kept
+  portal bit, the press, the wall, determinism) and
+  `tests/smith_heart_seal_crystal_wire.test.ts` (the server to the online mirror);
   `tests/smith_heart_council.test.ts` (on `tests/helpers/council_fight.ts`),
   `tests/smith_heart_council_ui.test.ts`, `tests/smith_heart_gating.test.ts`,
   `tests/smith_heart_council_intro.test.ts` (the entrance),
