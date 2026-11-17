@@ -416,3 +416,42 @@ export function fightHash(a: number, b: number): number {
   h = Math.imul(h ^ (h >>> 13), 0xc2b2ae35) >>> 0;
   return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
 }
+
+/** How close (radians) a slash line's sim yaw must point at a marked player's
+ *  sim position for the line to count as still following them (unlocked). */
+export const LANE_TRACK_TOLERANCE = 0.1;
+
+/** A slash line's drawn yaw this frame. While the sim still swings the line
+ *  after its marked player (its yaw points at one of `marks`' SIM positions:
+ *  it has not locked), it is drawn at that player's DRAWN pose instead, so
+ *  the line rides the body on screen every frame rather than the 20 Hz
+ *  snapshot a step behind (the owner's online run of 2026-11-17: the line
+ *  trailed the marked, the local player most). Locked (no mark on its sim
+ *  yaw), the sim's own yaw. Pure. */
+export function laneDrawnYaw(
+  laneX: number,
+  laneZ: number,
+  simYaw: number,
+  marks: readonly { simX: number; simZ: number; drawnX: number; drawnZ: number }[],
+): number {
+  let best = -1;
+  let bestDiff = LANE_TRACK_TOLERANCE;
+  for (let i = 0; i < marks.length; i++) {
+    const m = marks[i];
+    const dx = m.simX - laneX;
+    const dz = m.simZ - laneZ;
+    if (dx * dx + dz * dz < 1e-4) continue;
+    const yaw = Math.atan2(dx, dz);
+    const diff = Math.abs(Math.atan2(Math.sin(yaw - simYaw), Math.cos(yaw - simYaw)));
+    if (diff <= bestDiff) {
+      bestDiff = diff;
+      best = i;
+    }
+  }
+  if (best < 0) return simYaw;
+  const m = marks[best];
+  const dx = m.drawnX - laneX;
+  const dz = m.drawnZ - laneZ;
+  if (dx * dx + dz * dz < 1e-4) return simYaw;
+  return Math.atan2(dx, dz);
+}

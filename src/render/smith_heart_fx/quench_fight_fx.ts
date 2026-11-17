@@ -68,6 +68,7 @@ import {
   frostCrystal,
   frostLook,
   holeLook,
+  laneDrawnYaw,
   QUENCH_FIGHT_POOLS as P,
   QUENCH_FIGHT_REACH,
   QUENCH_LAKE_CENTRE,
@@ -270,6 +271,12 @@ export class QuenchFightFx {
   private readonly particles: EngineParticles;
   private readonly kit: TelegraphKit;
   private readonly markArrows: CouncilRushArrow;
+  /** The marked players this scan, and their sim and drawn spots this frame
+   *  (laneDrawnYaw reads them; filled once a frame on the first line). */
+  private readonly markedIds: number[] = [];
+  private readonly markedSpots: { simX: number; simZ: number; drawnX: number; drawnZ: number }[] =
+    [];
+  private markedSeen = false;
   private readonly geometries: THREE.BufferGeometry[] = [];
   private readonly materials: THREE.Material[] = [];
   private readonly audio = new QuenchAudio(sfx);
@@ -759,6 +766,7 @@ export class QuenchFightFx {
     this.rimeIds.length = 0;
     this.guardianId = -1;
     this.markArrows.beginScan();
+    this.markedIds.length = 0;
     for (let i = 0; i < this.candidateIds.length; i++) {
       const e = world.entities.get(this.candidateIds[i]);
       if (!e) continue;
@@ -778,7 +786,10 @@ export class QuenchFightFx {
             this.trappedIds.push(e.id);
           else if (a.id === QUENCH_AURAS.rime && this.rimeIds.length < RIME_POOLS.carriers)
             this.rimeIds.push(e.id);
-          else if (a.id === QUENCH_AURAS.marked) this.markArrows.see(e.id);
+          else if (a.id === QUENCH_AURAS.marked) {
+            this.markArrows.see(e.id);
+            if (this.markedIds.length < QUENCH_MARK_ARROWS) this.markedIds.push(e.id);
+          }
         }
       }
     }
@@ -1004,7 +1015,9 @@ export class QuenchFightFx {
     this.holes.instanceMatrix.needsUpdate = true;
     this.holes.visible = h > 0;
     if (this.holes.instanceColor) this.holes.instanceColor.needsUpdate = true;
-    // The slashes' lines, each from its blade along its facing.
+    // The slashes' lines, each from its blade along its facing (riding the
+    // marked player's drawn body while it still follows them).
+    this.markedSeen = false;
     for (let li = 0; li < this.lanes.length; li++) {
       const l = this.lanes[li];
       const lane = l.id >= 0 ? world.entities.get(l.id) : undefined;
@@ -1023,7 +1036,7 @@ export class QuenchFightFx {
         lane.pos.x,
         ly,
         lane.pos.z,
-        lane.facing,
+        laneDrawnYaw(lane.pos.x, lane.pos.z, lane.facing, this.markedAt(world)),
         lof.length,
         T.laneHalf,
         { color: C.danger, accent: C.accent },
@@ -1373,6 +1386,33 @@ export class QuenchFightFx {
     });
     this.particles.shockRing(x, z, 0xe0f4ff, r * 1.6, 0.5);
     this.shakeNear(x, z, 0.35, 30);
+  }
+
+  /** The marked players' sim and drawn spots this frame (allocation-free
+   *  after the first frames). */
+  private markedAt(world: IWorld): readonly {
+    simX: number;
+    simZ: number;
+    drawnX: number;
+    drawnZ: number;
+  }[] {
+    if (this.markedSeen) return this.markedSpots;
+    this.markedSeen = true;
+    let n = 0;
+    for (const id of this.markedIds) {
+      const e = world.entities.get(id);
+      if (!e || e.dead) continue;
+      const at = fxAnchor(e);
+      if (n >= this.markedSpots.length)
+        this.markedSpots.push({ simX: 0, simZ: 0, drawnX: 0, drawnZ: 0 });
+      const m = this.markedSpots[n++];
+      m.simX = e.pos.x;
+      m.simZ = e.pos.z;
+      m.drawnX = at.x;
+      m.drawnZ = at.z;
+    }
+    this.markedSpots.length = n;
+    return this.markedSpots;
   }
 
   /** The ice breaking open: shards and spray burst up, a ring of white water. */
