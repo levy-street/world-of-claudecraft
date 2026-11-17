@@ -4,14 +4,13 @@
 // (`_weights`: hammer, breath, quench, heat; the white-gold heart is what is left of 1) and
 // its path (`_path`: 0 at the plinth's rim where its element's river arrives, 1 at the far
 // tips of that element's crystals):
-//   dark       smoky crystal, the painting at a fraction of its value, a breath of its
-//              element's colour at the rim;
+//   dark       the painting dimmed and cooled, its four hues still readable;
 //   climbing   an element's light flows in at the plinth's rim and runs out along its own
 //              crystals behind a white-hot front (`uFill` per element, 0 dark to 1 at the
-//              tips), the painting at full and over, the facets and the brightest texels in
-//              the element's colour;
+//              tips), the painting at full and over, in its OWN colours (ring_crystal_core.ts
+//              RING_CRYSTAL_LOOK: nothing washes the four elements out to one);
 //   the heart  the white-gold shaft glows with the four (`uCrown`);
-//   ready      the whole crystal swells and pulses white-gold (`uReady`);
+//   ready      the whole crystal breathes with a thin white-gold rim (`uReady`), its colours kept;
 //   the burst  the overload before the shatter whitens it (`uCharge`).
 // Built once per slot with the interior (hidden carriers link it; the painting uploads
 // with the gate). Opaque, drawn on every tier (it is the raid's progress and the way).
@@ -19,6 +18,7 @@
 import * as THREE from 'three';
 import { SMITH_HEART_VEIN_COLORS, SMITH_HEART_VEINS } from '../../sim/content/smith_heart_layout';
 import { sharedUniforms } from '../gfx';
+import { RING_CRYSTAL_LOOK as LOOK } from './ring_crystal_core';
 
 const VERT = /* glsl */ `
 attribute vec4 _weights;
@@ -44,6 +44,9 @@ uniform float uCrown;
 uniform float uReady;
 uniform float uCharge;
 uniform float uTime;
+uniform vec4 uLookA;
+uniform vec4 uLookB;
+uniform vec4 uLookC;
 uniform vec3 uColors[4];
 varying vec2 vUv;
 varying vec4 vW;
@@ -64,18 +67,32 @@ void main() {
   vec4 on = step(vec4(0.0001), uFill);
   vec4 reach = (vec4(1.0) - smoothstep(uFill - 0.05, uFill + 0.05, pv)) * on;
   vec4 front = smoothstep(vec4(0.09), vec4(0.0), abs(pv - uFill)) * on * (vec4(1.0) - step(vec4(0.999), uFill));
-  float glow = dot(vW, reach * uLevel) + crownW * uCrown;
+  float glow = dot(vW, reach * uLevel) + crownW * uCrown * uLookC.z;
   float lit = clamp(dot(vW, reach) + crownW * clamp(uCrown, 0.0, 1.0), 0.0, 1.0);
   float edge = dot(vW, front);
 
-  vec3 dormant = mix(vec3(lum), painted, 0.22) * vec3(0.3, 0.32, 0.38) + qCol * rim * 0.05;
-  float pulse = 0.9 + 0.1 * sin(uTime * 1.7 - vPath * 7.0);
-  vec3 burn = painted * (0.85 + 0.55 * glow) * pulse + qCol * (rim * 0.8 + pow(lum, 3.0) * 0.55) * glow;
+  // Dormant: the painting dimmed and cooled, its hues still readable.
+  vec3 dormant = mix(vec3(lum), painted, uLookA.y) * uLookA.x * vec3(0.86, 0.93, 1.08) + qCol * rim * 0.04;
+
+  // Lit: the painting at full colour (a touch more saturated), flaring with the glow. Every
+  // term is the painting's own colour, so the four elements stay four colours.
+  vec3 vivid = mix(vec3(lum), painted, uLookC.x);
+  float pulse = 1.0 + 0.05 * sin(uTime * 1.7 - vPath * 7.0);
+  vec3 burn = vivid * (uLookA.z + uLookA.w * glow) * pulse;
+  burn += vivid * vivid * (uLookB.x * glow);
+  burn += mix(vivid, vec3(1.0), 0.5) * pow(lum, 3.0) * uLookB.y * glow;
+  burn += mix(vivid, qCol, 0.3) * rim * uLookC.y * glow;
   vec3 col = mix(dormant, burn, lit);
-  col += mix(qCol, vec3(1.0, 0.96, 0.88), 0.7) * edge * 1.5;
-  float swell = uReady * (0.55 + 0.45 * sin(uTime * 2.6 - vPath * 4.0));
-  col += vec3(1.0, 0.9, 0.62) * swell * (0.16 + 0.55 * rim + 0.5 * lum * lum);
-  col = mix(col, vec3(1.0, 0.97, 0.9) * 2.2, uCharge * (0.35 + 0.5 * rim));
+  // The climbing front: white-hot, in the colour it is climbing through.
+  col += mix(vivid, vec3(1.0), 0.55) * edge * 1.1;
+
+  // Ready: the whole crystal breathes, its four colours kept, with a thin white-gold rim.
+  float breathe = 0.5 + 0.5 * sin(uTime * 2.4 - vPath * 3.0);
+  col *= 1.0 + uReady * uLookB.z * breathe;
+  col += vec3(1.0, 0.92, 0.7) * uReady * uLookB.w * rim * (0.45 + 0.55 * breathe);
+
+  // The overload before the shatter whitens it.
+  col = mix(col, vec3(1.0, 0.97, 0.9) * 2.0, uCharge * (0.35 + 0.5 * rim));
   gl_FragColor = vec4(col, 1.0);
   #include <colorspace_fragment>
 }`;
@@ -94,6 +111,18 @@ export function ringCrystalMaterial(map: THREE.Texture): THREE.ShaderMaterial {
       uReady: { value: 0 },
       uCharge: { value: 0 },
       uTime: sharedUniforms.uTime,
+      uLookA: {
+        value: new THREE.Vector4(
+          LOOK.dormantBright,
+          LOOK.dormantSat,
+          LOOK.litBright,
+          LOOK.glowGain,
+        ),
+      },
+      uLookB: {
+        value: new THREE.Vector4(LOOK.coreBurn, LOOK.whiteHot, LOOK.readyPulse, LOOK.readyRim),
+      },
+      uLookC: { value: new THREE.Vector4(LOOK.litSat, LOOK.rimGain, LOOK.heartGain, 0) },
       uColors: {
         value: SMITH_HEART_VEINS.map((v) => new THREE.Color(SMITH_HEART_VEIN_COLORS[v])),
       },
