@@ -2,12 +2,17 @@
 // Their grounded movement keeps momentum (player_motion.ts stepPlayerMotion):
 // the ground velocity steers toward what the keys ask for at only `grip` yards
 // a second per second, so a run takes a moment to build, a stop slides on, and
-// a turn swings wide. Speed never exceeds the ordinary run, so the server's
-// step check never reads a slide as a teleport.
+// a turn swings wide. The slide is capped at the run times the body's speed
+// multiplier: on ice that is the ordinary run, while the Gyre's gale lanes wear
+// the same aura as a speed buff (quartered_gyre_wind.ts) so their ride can top
+// out at three times it. Either way the server's step check never reads a
+// slide as a teleport: the aura is a movement override (below), and the step
+// check stands aside while one is on.
 //
-// The aura is the whole signal: an encounter puts it on whoever stands on its
-// ice (the Lady of the Bonechill's Rime Path and frozen ravine, encounters/
-// hollow_crypt), the wire mirrors it with every aura (value2 carries the grip),
+// The aura is the whole signal: whoever stands on the slick wears it (the Lady
+// of the Bonechill's Rime Path and frozen ravine, encounters/hollow_crypt; the
+// Quartered Isle's frozen lakes; the Gyre's gale lanes), the wire mirrors it
+// with every aura (value2 carries the grip),
 // and the shared kernel steps the slide on every host. Online, the slide's
 // ground velocity is state the reconcile wire does not carry, so the server
 // counts the ice as a movement override (server/movement_override_epoch.ts):
@@ -18,7 +23,10 @@
 
 import type { Entity } from './types';
 
-/** The aura id the motion kernel keys on (its kind is a quiet 'slow' of 1). */
+/** The aura id the motion kernel keys on. Its kind is the source's own: a
+ *  quiet 'slow' of 1 on ice, a 'buff_speed' on the Gyre's gale lanes (the
+ *  multiplier that sets the slide's ceiling). Readers key on the id, never the
+ *  kind. */
 export const SLIPPERY_GROUND_AURA = 'slippery_ground';
 /** Yards a second per second the ground velocity may change on ice when the
  *  aura names no grip (value2). */

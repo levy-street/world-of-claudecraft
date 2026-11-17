@@ -1506,6 +1506,10 @@ const RENDER_PURE_CORES = [
   'src/render/lava_chain_core.ts',
   'src/render/quartered_landmark_dressing_core.ts',
   'src/render/quartered_landmark_lane_core.ts',
+  // the Gyre's surface and wind: the cliff skin cut over the peak (gyre_surface.ts), and the
+  // wind's ribbons, leaves and pocket spirals (gyre_wind.ts)
+  'src/render/gyre_rock_skin_core.ts',
+  'src/render/gyre_wind_core.ts',
   'src/render/quartered_floating_debris_core.ts',
   'src/render/quartered_fissure_lava_core.ts',
   // the scatter boulders' biome and Cinderscar tint (foliage.ts)

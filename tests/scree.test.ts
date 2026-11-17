@@ -161,3 +161,29 @@ describe('cliff scree placement', () => {
     expect(screeSpotAt(SEED, ci, cj)?.baseY).toBeCloseTo(before.baseY + 20, 8);
   });
 });
+
+describe('cliff scree on the Quartered Isle', () => {
+  // the built-in world (the tests above leave a custom one active)
+  beforeEach(() => setActiveWorldContent(null));
+
+  it("lays no boulder on the isle's landmarks: the Gyre's climbing road and its open crown", async () => {
+    const { WORLD_SEED } = await import('../src/sim/world_seed');
+    const { GYRE_PEAK, quarteredLandmarkClears } = await import('../src/sim/quartered_landmarks');
+    // the whole storm peak, foot to crown
+    const spots = screeSpotsInBounds(WORLD_SEED, {
+      minX: GYRE_PEAK.x - 60,
+      maxX: GYRE_PEAK.x + 60,
+      minZ: GYRE_PEAK.z - 60,
+      maxZ: GYRE_PEAK.z + 60,
+    });
+    for (const s of spots) {
+      expect(quarteredLandmarkClears(s.x, s.z), `${s.x.toFixed(1)},${s.z.toFixed(1)}`).toBe(false);
+      // nothing on the crown's level top or its rim
+      expect(Math.hypot(s.x - GYRE_PEAK.x, s.z - GYRE_PEAK.z)).toBeGreaterThan(GYRE_PEAK.endR + 1);
+    }
+    // the mountain's faces between the turns still carry their rubble
+    expect(
+      spots.some((s) => Math.hypot(s.x - GYRE_PEAK.x, s.z - GYRE_PEAK.z) < GYRE_PEAK.startR),
+    ).toBe(true);
+  });
+});

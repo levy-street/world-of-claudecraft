@@ -213,6 +213,7 @@ const STONE_WALL_SCALE = 4.2;
 const STONE_MODULE_LEN = 1.155 * STONE_WALL_SCALE;
 const PALISADE_MODULE_LEN = 2.0;
 const PALISADE_SEG = 6.4;
+const STORM_MODULE_LEN = 6.0;
 const WOOD_FENCE_DEPTH = 0.35;
 
 /** render/props.ts's delve-approach rubble (rockLargeD), in the arch's frame. */
@@ -350,9 +351,13 @@ export function worldMajorPropPlacements(
     if (len <= 0) continue;
     const stone = f.kind === 'stone';
     const palisade = f.kind === 'palisade';
+    const storm = f.kind === 'storm';
     const n = Math.max(
       1,
-      Math.round(len / (stone ? STONE_MODULE_LEN : palisade ? PALISADE_SEG : 2.35)),
+      Math.round(
+        len /
+          (stone ? STONE_MODULE_LEN : palisade ? PALISADE_SEG : storm ? STORM_MODULE_LEN : 2.35),
+      ),
     );
     const dirx = (f.x2 - f.x1) / len;
     const dirz = (f.z2 - f.z1) / len;
@@ -383,6 +388,17 @@ export function worldMajorPropPlacements(
           euler: new THREE.Euler(-pitch, yaw, 0, 'YXZ'),
           scale: [STONE_WALL_SCALE, STONE_WALL_SCALE, segScale],
         });
+        continue;
+      }
+      if (storm) {
+        const p = add(propRand(mx, mz, 7) < 0.5 ? 'gyreStormWallA' : 'gyreStormWallB', name, root, {
+          x: mx,
+          y: (g0 + g1) / 2 - 0.2,
+          z: mz,
+          euler: new THREE.Euler(0, yaw, pitch, 'YZX'),
+          scale: [len / n / STORM_MODULE_LEN, 1, 1],
+        });
+        asFence(p, len / n, depth);
         continue;
       }
       if (palisade) {

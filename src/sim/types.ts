@@ -6681,8 +6681,10 @@ export interface ZonePropsDef {
     bare?: boolean;
   }[];
   // kind 'stone': the low scalloped KayKit stone wall (garden/path walls);
-  // kind 'palisade': the spiked KayKit log wall (raider camps); both keep
-  // the wood rail's run geometry and the same jumpable OBB
+  // kind 'palisade': the spiked KayKit log wall (raider camps); kind 'storm':
+  // the painted storm-granite railing along the Gyre's path (two models, laid
+  // in turn, length along local +x); all keep the wood rail's run geometry
+  // and the same jumpable OBB
   fences: {
     id?: string;
     assetId?: string;
@@ -6692,7 +6694,7 @@ export interface ZonePropsDef {
     z2: number;
     width?: number;
     height?: number;
-    kind?: 'stone' | 'palisade';
+    kind?: 'stone' | 'palisade' | 'storm';
   }[];
   /** Small authored solid OBB props, currently civic benches. */
   benches?: StaticObbPropDef[];
@@ -6751,6 +6753,12 @@ export interface ZonePropsDef {
      * colliding as a full-height wall. Requires `r` (or `hw`/`hd`) for the
      * footprint; omit for ordinary full-height or walk-through decor. */
     standableTop?: number;
+    /** A body this many yd above the piece's base passes over it: a tall solid
+     * piece a glide or a launch may cross (the Gyre's crags, stones and
+     * beacons) blocks only up to here instead of at any altitude. Not
+     * standable (that is `standableTop`); needs `r` or `hw`/`hd`. Absent: the
+     * piece blocks at every altitude, as ever. */
+    clearAbove?: number;
   }[];
 }
 
@@ -7411,6 +7419,10 @@ export interface HeroicLeapFlight {
   // A heal the body takes the moment it lands (the Muster Grapnel's haul,
   // combat/balgath_trinkets.ts), snapshotted at the throw from the thrower's power.
   landingHeal?: { sourceId: number; amount: number; name: string };
+  // Set only on a flight a released spirit takes on purpose (the Gyre's wind pads,
+  // quartered_gyre_pads.ts): a ghost flies it, while any other flight left on a dead
+  // body is dropped, so a stale arc from before the death never carries the spirit.
+  spiritFlight?: true;
 }
 
 export interface ValkyrsCallingFlight {

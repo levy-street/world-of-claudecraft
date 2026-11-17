@@ -1,10 +1,12 @@
 import {
   gatherNodesInActiveWorld,
   getActiveWorldContent,
+  isBuiltinWorldActive,
   WORLD_MAX_X,
   WORLD_MAX_Z,
   WORLD_MIN_Z,
 } from '../sim/data';
+import { quarteredLandmarkClears } from '../sim/quartered_landmarks';
 import { roadDistance, terrainHeight, waterLevel } from '../sim/world';
 
 // Cliff-scree placement for the renderer's moving detail grid. The rocks are
@@ -146,6 +148,10 @@ function computeSpot(seed: number, ci: number, cj: number): ScreeSpot | null {
     apron = true;
   }
   if (roadDistance(x, z) < 3) return null;
+  // never on the Quartered Isle's landmarks (the Gyre's path and crown, the rift's bed ...): the
+  // keep-out every other scatter honours (foliage_dressing_spots.ts, sim/ground_dressing.ts), so
+  // no boulder lies on the climb's road or the open crown
+  if (isBuiltinWorldActive() && quarteredLandmarkClears(x, z)) return null;
   for (const zone of getActiveWorldContent().zones) {
     const dx = x - zone.hub.x;
     const dz = z - zone.hub.z;

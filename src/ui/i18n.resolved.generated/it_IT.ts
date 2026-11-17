@@ -4732,6 +4732,9 @@ export const it_IT: EnTranslations = {
         "graspRoot": "Sei trattenuto dalle mani della tomba: non puoi muoverti per {seconds} s.",
         "knellAirborne": "Vola sopra l'Anello del Rito, fuori portata. Segna metà dell'anello per {mark} s, poi riversa fuoco spettrale su quella metà: da {min} a {max} danni da fuoco a chiunque vi si trovi. Incendia {breaths} metà a ogni volo, poi atterra."
       },
+      "quartered": {
+        "galeLane": "The gale carries you up the road to the Gyre's summit, even standing still: up to {speed} yd/sec, easing to {summit} yd/sec as you near the top. It keeps you on the road through every bend and jump. Strafe to cross the road, or move down it to walk against the wind. Casting is interrupted while it carries you. Lasts up to {linger} sec after you leave a gale lane, carrying you across the gaps between lanes."
+      },
       "sanctum": {
         "lockbound": "Subisce il {pct}% di danni in meno: {per}% per ogni catena ancora intatta. Spezza un Ceppo del Sigillo per far cadere la sua catena.",
         "enrage": "Infligge il {pct}% di danni in più.",

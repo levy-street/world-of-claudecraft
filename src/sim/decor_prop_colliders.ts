@@ -49,10 +49,14 @@ export function buildDecorPropColliders(seed: number, decorProps: DecorProp[]): 
       );
       continue;
     }
+    // standable: a top to land on; clearAbove: a finite height with nothing to stand on (the
+    // campfire's semantic, a body above it passes over)
     const stand =
-      d.standableTop === undefined
-        ? {}
-        : { moveTopY: supportBaseY + d.standableTop, standable: true as const };
+      d.standableTop !== undefined
+        ? { moveTopY: supportBaseY + d.standableTop, standable: true as const }
+        : d.clearAbove !== undefined
+          ? { moveTopY: supportBaseY + d.clearAbove }
+          : {};
     if (d.hw !== undefined && d.hd !== undefined) {
       out.push({
         type: 'obb',

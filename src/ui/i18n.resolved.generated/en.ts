@@ -4732,6 +4732,9 @@ export const en: EnTranslations = {
         "graspRoot": "Held by the grave's hands: unable to move for {seconds} sec.",
         "knellAirborne": "On the wing over the Rite Ring, out of reach. It marks half of the ring for {mark} sec, then pours ghost fire over that half: {min} to {max} Fire damage to everyone in it. It burns {breaths} halves each flight, then lands."
       },
+      "quartered": {
+        "galeLane": "The gale carries you up the road to the Gyre's summit, even standing still: up to {speed} yd/sec, easing to {summit} yd/sec as you near the top. It keeps you on the road through every bend and jump. Strafe to cross the road, or move down it to walk against the wind. Casting is interrupted while it carries you. Lasts up to {linger} sec after you leave a gale lane, carrying you across the gaps between lanes."
+      },
       "sanctum": {
         "lockbound": "Takes {pct}% less damage: {per}% for each of his chains that still holds. Break a Seal Shackle to drop its chain.",
         "enrage": "Deals {pct}% more damage.",

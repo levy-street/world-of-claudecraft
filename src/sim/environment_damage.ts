@@ -15,6 +15,7 @@ import { updateBreath } from './breath';
 import { getActiveWorldContent } from './data';
 import { damagingFluidAt } from './fluid_volumes';
 import { updateFrozenLakeSlick } from './quartered_frozen_lakes';
+import { updateGyreWind } from './quartered_gyre_wind_step';
 import type { SimContext } from './sim_context';
 import { DT, type Entity } from './types';
 import { terrainHeight } from './world';
@@ -46,9 +47,10 @@ export function updateFluidDamage(ctx: SimContext, p: Entity): void {
 
 /** The per-player environmental damage step the tick coordinator calls:
  *  breath first (its drown pulse can kill), then the fluid pools, then the
- *  frozen lakes' slick (draws no rng). */
+ *  frozen lakes' slick and the Gyre's wind (neither draws rng). */
 export function updateEnvironmentDamage(ctx: SimContext, p: Entity): void {
   updateBreath(ctx, p);
   updateFluidDamage(ctx, p);
   updateFrozenLakeSlick(p);
+  updateGyreWind(p, ctx);
 }

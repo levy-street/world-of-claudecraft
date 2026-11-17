@@ -5,9 +5,16 @@
 // stable yard and harbor-deck gates).
 
 import { STABLE_PADDOCK } from '../sim/content/mounts';
-import { getActiveWorldContent, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../sim/data';
+import {
+  getActiveWorldContent,
+  isBuiltinWorldActive,
+  WORLD_MAX_X,
+  WORLD_MAX_Z,
+  WORLD_MIN_Z,
+} from '../sim/data';
 import { onFerryPier } from '../sim/ferry_piers';
 import { galeDeckSurface } from '../sim/gale_harbor';
+import { quarteredLandmarkClears } from '../sim/quartered_landmarks';
 import type { BiomeId } from '../sim/types';
 import {
   roadDistance,
@@ -217,6 +224,9 @@ export function generateDressing(seed: number): DressingSpot[] {
       // the Highwatch guild's model brings its own floors, porch and yard: no scrub through them
       if (insideHighwatchGuildGround(x, z)) continue;
       if (roadDistance(x, z) < 4) continue;
+      // never on the Quartered Isle's landmarks (the Gyre's path and crown, the rift's bed ...):
+      // the twin of the sim scatter's keep-out, sim/ground_dressing.ts
+      if (isBuiltinWorldActive() && quarteredLandmarkClears(x, z)) continue;
       const dressH = terrainHeight(x, z, seed);
       if (dressH < WATER_LEVEL + 1.2) continue;
       if (terrainCutAtHeight(x, z, dressH)) continue;

@@ -4732,6 +4732,9 @@ export const tr_TR: EnTranslations = {
         "graspRoot": "Mezarın elleri tutuyor: {seconds} sn hareket edemez.",
         "knellAirborne": "Ayin Halkasının üzerinde kanatta, erişim dışında. Halkanın yarısını {mark} sn işaretler, sonra o yarıya hayalet ateşi döker: içindeki herkese {min} ile {max} arası Ateş hasarı. Her uçuşta {breaths} yarı yakıp iner."
       },
+      "quartered": {
+        "galeLane": "The gale carries you up the road to the Gyre's summit, even standing still: up to {speed} yd/sec, easing to {summit} yd/sec as you near the top. It keeps you on the road through every bend and jump. Strafe to cross the road, or move down it to walk against the wind. Casting is interrupted while it carries you. Lasts up to {linger} sec after you leave a gale lane, carrying you across the gaps between lanes."
+      },
       "sanctum": {
         "lockbound": "%{pct} daha az hasar alır: hâlâ tutan her zincir için %{per}. Zincirini düşürmek için Mühür Prangasını kır.",
         "enrage": "%{pct} daha fazla hasar verir.",

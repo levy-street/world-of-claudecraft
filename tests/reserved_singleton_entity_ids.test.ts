@@ -8,6 +8,7 @@ import {
   GOURDLIGHT_KEEPER_POSTS,
 } from '../src/sim/content/gourdlight_eve';
 import {
+  GYREFOOT_SPIRIT_HEALER_ENTITY_ID,
   LAST_KEEP_SPIRIT_HEALER_ENTITY_ID,
   RIVALMOOT_SPIRIT_HEALER_ENTITY_ID,
 } from '../src/sim/content/graveyards';
@@ -49,6 +50,7 @@ const RESERVED: Record<string, number> = {
   GOURDLIGHT_KEEPER_HIGHWATCH_ENTITY_ID,
   RIVALMOOT_SPIRIT_HEALER_ENTITY_ID,
   RIVALMOOT_BURSAR_ENTITY_ID,
+  GYREFOOT_SPIRIT_HEALER_ENTITY_ID,
   ...Object.fromEntries(
     Object.entries(HEALING_TRAINING_ENTITY_IDS).map(([id, n]) => [`HEALING_TRAINING:${id}`, n]),
   ),

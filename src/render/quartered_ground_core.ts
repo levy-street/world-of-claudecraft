@@ -16,6 +16,7 @@
 
 import { CHALLENGERS_RING } from '../sim/quartered_isle_terrain';
 import {
+  gyreGroundAt,
   QUARTERED_LANDMARK_BOUNDS,
   type QuarteredLandmarkTint,
   quarteredLandmarkTint,
@@ -98,6 +99,11 @@ export const QUARTER_CLIFF_HEX: Readonly<Record<QuarterId, number>> = {
   wind: 0x6a7074,
 };
 
+/** The Gyre's own crag stone, over the wind quarter's: the same cool wind-carved granite the
+ *  crags standing round it wear (a slate with a breath of lavender in it), so the peak's steep
+ *  faces and the painted rock on them read as one stone. */
+export const GYRE_CLIFF_HEX = 0x9fa3c8;
+
 /** The share of the terrain's slope rock a quartered cliff tint replaces. */
 export const QUARTER_CLIFF_SHARE = 0.85;
 
@@ -121,6 +127,46 @@ export function quarteredCliffAt(x: number, z: number, out: GroundTriple): Groun
     out[1] += c[1] * w[q];
     out[2] += c[2] * w[q];
   }
+  // the Gyre's faces wear the Gyre's own stone
+  gyreGroundAt(x, z, gyreCliffScratch);
+  const k = gyreCliffScratch.gyreRock;
+  if (k > 0) {
+    out[0] += (GYRE_CLIFF_LINEAR[0] - out[0]) * k;
+    out[1] += (GYRE_CLIFF_LINEAR[1] - out[1]) * k;
+    out[2] += (GYRE_CLIFF_LINEAR[2] - out[2]) * k;
+  }
+  return out;
+}
+const gyreCliffScratch = { gyreRock: 0, gyreWay: 0, gyreCap: 0 };
+
+/** How the textured tiers lay the Gyre's ground (terrain_chunk_build.ts): the peak is one mass of
+ *  granite painted through the grass layer, which takes the vertex tint at full strength (the
+ *  stone photo layers take a third of it, and drew the faces the same warm grey whatever the
+ *  palette), with a share of the stone layer back over it for grain and relief. */
+export const GYRE_GRASS_SPLAT = 0.85;
+export const GYRE_ROCK_SPLAT = 0.25;
+/** The path's ground is this much the pale sand layer (painted too, and the lightest layer). */
+export const GYRE_WAY_SAND_SPLAT = 0.35;
+
+export interface GyreSplat {
+  /** the weight to move toward the grass layer (the painted body), 0..1 */
+  grass: number;
+  /** then toward the rock layer, 0..1 */
+  rock: number;
+  /** then toward the sand layer (the path), 0..1 */
+  sand: number;
+  /** the whole body's weight (the stone tone field and the snow gate ride it) */
+  body: number;
+}
+
+/** The Gyre's splat shift at (x, z) for the textured tiers' vertex pass (written into `out`).
+ *  Zero off the peak and its foot. */
+export function quarteredGyreSplatAt(x: number, z: number, out: GyreSplat): GyreSplat {
+  gyreGroundAt(x, z, gyreCliffScratch);
+  out.body = gyreCliffScratch.gyreRock;
+  out.grass = GYRE_GRASS_SPLAT * gyreCliffScratch.gyreRock;
+  out.rock = GYRE_ROCK_SPLAT * gyreCliffScratch.gyreRock;
+  out.sand = GYRE_WAY_SAND_SPLAT * gyreCliffScratch.gyreWay;
   return out;
 }
 
@@ -149,6 +195,7 @@ const CLIFF_LINEAR: Readonly<Record<QuarterId, GroundTriple>> = {
   earth: quarterHexToLinear(QUARTER_CLIFF_HEX.earth),
   wind: quarterHexToLinear(QUARTER_CLIFF_HEX.wind),
 };
+const GYRE_CLIFF_LINEAR: GroundTriple = quarterHexToLinear(GYRE_CLIFF_HEX);
 
 function toLinear(p: QuarterGroundHexes): Record<(typeof TONES)[number], GroundTriple> {
   return {
@@ -257,8 +304,46 @@ export const LANDMARK_GROUND_PALETTES: Readonly<Record<SurfaceKey, QuarterGround
     dirt: 0x4c4f56,
     sand: 0x82858c,
   },
+  // the Gyre's storm granite, the stone of the painted Breath vein of the Smith's Heart (the
+  // crags standing round the peak wear it): a cool slate with lavender in its shade and a dull
+  // silver where the wind scours it, never the isle's khaki or olive
+  gyreRock: {
+    grass: 0x9fa3c8,
+    grassDark: 0x7e82a8,
+    grassYellow: 0xb4b8d8,
+    dirt: 0x8a8eb4,
+    sand: 0xa8acd0,
+  },
+  // the path: pale worn flagstone, paler than the rock either side so the climb reads from the
+  // plain far below
+  gyreWay: {
+    grass: 0xc8cae0,
+    grassDark: 0xaaaecc,
+    grassYellow: 0xdcdeee,
+    dirt: 0xb4b8d4,
+    sand: 0xd2d4e6,
+  },
+  // the crown's cap: the granite scoured pale and silver by the gale, toward the seat
+  gyreCap: {
+    grass: 0xdcdef0,
+    grassDark: 0xc0c4e0,
+    grassYellow: 0xecedf8,
+    dirt: 0xc8cce4,
+    sand: 0xe4e6f4,
+  },
 };
-const LANDMARK_KEYS: readonly SurfaceKey[] = ['ice', 'ember', 'glass', 'stone', 'basalt', 'moot'];
+const LANDMARK_KEYS: readonly SurfaceKey[] = [
+  'ice',
+  'ember',
+  'glass',
+  'stone',
+  'basalt',
+  'moot',
+  // the Gyre last, rock then cap then the path over both, so the climb stays legible to the top
+  'gyreRock',
+  'gyreCap',
+  'gyreWay',
+];
 const LANDMARK_LINEAR = {
   ice: toLinear(LANDMARK_GROUND_PALETTES.ice),
   ember: toLinear(LANDMARK_GROUND_PALETTES.ember),
@@ -266,6 +351,9 @@ const LANDMARK_LINEAR = {
   stone: toLinear(LANDMARK_GROUND_PALETTES.stone),
   basalt: toLinear(LANDMARK_GROUND_PALETTES.basalt),
   moot: toLinear(LANDMARK_GROUND_PALETTES.moot),
+  gyreRock: toLinear(LANDMARK_GROUND_PALETTES.gyreRock),
+  gyreWay: toLinear(LANDMARK_GROUND_PALETTES.gyreWay),
+  gyreCap: toLinear(LANDMARK_GROUND_PALETTES.gyreCap),
 };
 const tintScratch: QuarteredLandmarkTint = {
   fissure: 0,
@@ -275,6 +363,9 @@ const tintScratch: QuarteredLandmarkTint = {
   stone: 0,
   basalt: 0,
   moot: 0,
+  gyreRock: 0,
+  gyreWay: 0,
+  gyreCap: 0,
 };
 
 /** The shattered ground's fissure floors, one per quarter, blended by the

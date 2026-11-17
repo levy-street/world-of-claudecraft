@@ -39,7 +39,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.quarteredBlurb",
     "guide.worldPage.quarteredGreeter",
     "guide.worldPage.quarteredGreeting",
-    "guide.worldPage.quarteredPlaceNotes"
+    "guide.worldPage.quarteredPlaceNotes",
+    "hudChrome.auraEffect.quartered.galeLane"
   ],
   "es_ES": [
     "entities.npcs.bursar_maud_ashby.greeting",
@@ -71,7 +72,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.quarteredBlurb",
     "guide.worldPage.quarteredGreeter",
     "guide.worldPage.quarteredGreeting",
-    "guide.worldPage.quarteredPlaceNotes"
+    "guide.worldPage.quarteredPlaceNotes",
+    "hudChrome.auraEffect.quartered.galeLane"
   ],
   "fr_FR": [
     "entities.npcs.bursar_maud_ashby.greeting",
@@ -103,7 +105,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.quarteredBlurb",
     "guide.worldPage.quarteredGreeter",
     "guide.worldPage.quarteredGreeting",
-    "guide.worldPage.quarteredPlaceNotes"
+    "guide.worldPage.quarteredPlaceNotes",
+    "hudChrome.auraEffect.quartered.galeLane"
   ],
   "fr_CA": [
     "entities.npcs.bursar_maud_ashby.greeting",
@@ -135,7 +138,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.quarteredBlurb",
     "guide.worldPage.quarteredGreeter",
     "guide.worldPage.quarteredGreeting",
-    "guide.worldPage.quarteredPlaceNotes"
+    "guide.worldPage.quarteredPlaceNotes",
+    "hudChrome.auraEffect.quartered.galeLane"
   ],
   "en_CA": [],
   "it_IT": [
@@ -168,7 +172,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.quarteredBlurb",
     "guide.worldPage.quarteredGreeter",
     "guide.worldPage.quarteredGreeting",
-    "guide.worldPage.quarteredPlaceNotes"
+    "guide.worldPage.quarteredPlaceNotes",
+    "hudChrome.auraEffect.quartered.galeLane"
   ],
   "de_DE": [
     "entities.npcs.bursar_maud_ashby.greeting",
@@ -200,7 +205,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.quarteredBlurb",
     "guide.worldPage.quarteredGreeter",
     "guide.worldPage.quarteredGreeting",
-    "guide.worldPage.quarteredPlaceNotes"
+    "guide.worldPage.quarteredPlaceNotes",
+    "hudChrome.auraEffect.quartered.galeLane"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -236,7 +242,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.quarteredBlurb",
     "guide.worldPage.quarteredGreeter",
     "guide.worldPage.quarteredGreeting",
-    "guide.worldPage.quarteredPlaceNotes"
+    "guide.worldPage.quarteredPlaceNotes",
+    "hudChrome.auraEffect.quartered.galeLane"
   ],
   "ru_RU": [],
   "cs_CZ": [
@@ -269,7 +276,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.quarteredBlurb",
     "guide.worldPage.quarteredGreeter",
     "guide.worldPage.quarteredGreeting",
-    "guide.worldPage.quarteredPlaceNotes"
+    "guide.worldPage.quarteredPlaceNotes",
+    "hudChrome.auraEffect.quartered.galeLane"
   ],
   "nl_NL": [
     "entities.npcs.bursar_maud_ashby.greeting",
@@ -301,7 +309,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.quarteredBlurb",
     "guide.worldPage.quarteredGreeter",
     "guide.worldPage.quarteredGreeting",
-    "guide.worldPage.quarteredPlaceNotes"
+    "guide.worldPage.quarteredPlaceNotes",
+    "hudChrome.auraEffect.quartered.galeLane"
   ],
   "pl_PL": [
     "entities.npcs.bursar_maud_ashby.greeting",
@@ -333,7 +342,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.quarteredBlurb",
     "guide.worldPage.quarteredGreeter",
     "guide.worldPage.quarteredGreeting",
-    "guide.worldPage.quarteredPlaceNotes"
+    "guide.worldPage.quarteredPlaceNotes",
+    "hudChrome.auraEffect.quartered.galeLane"
   ],
   "id_ID": [
     "entities.npcs.bursar_maud_ashby.greeting",
@@ -365,7 +375,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.quarteredBlurb",
     "guide.worldPage.quarteredGreeter",
     "guide.worldPage.quarteredGreeting",
-    "guide.worldPage.quarteredPlaceNotes"
+    "guide.worldPage.quarteredPlaceNotes",
+    "hudChrome.auraEffect.quartered.galeLane"
   ],
   "tr_TR": [
     "entities.npcs.bursar_maud_ashby.greeting",
@@ -397,7 +408,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.quarteredBlurb",
     "guide.worldPage.quarteredGreeter",
     "guide.worldPage.quarteredGreeting",
-    "guide.worldPage.quarteredPlaceNotes"
+    "guide.worldPage.quarteredPlaceNotes",
+    "hudChrome.auraEffect.quartered.galeLane"
   ],
   "sv_SE": [
     "entities.npcs.bursar_maud_ashby.greeting",
@@ -429,7 +441,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.quarteredBlurb",
     "guide.worldPage.quarteredGreeter",
     "guide.worldPage.quarteredGreeting",
-    "guide.worldPage.quarteredPlaceNotes"
+    "guide.worldPage.quarteredPlaceNotes",
+    "hudChrome.auraEffect.quartered.galeLane"
   ],
   "vi_VN": [
     "entities.npcs.bursar_maud_ashby.greeting",
@@ -461,7 +474,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.quarteredBlurb",
     "guide.worldPage.quarteredGreeter",
     "guide.worldPage.quarteredGreeting",
-    "guide.worldPage.quarteredPlaceNotes"
+    "guide.worldPage.quarteredPlaceNotes",
+    "hudChrome.auraEffect.quartered.galeLane"
   ],
   "da_DK": [
     "entities.npcs.bursar_maud_ashby.greeting",
@@ -493,6 +507,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.quarteredBlurb",
     "guide.worldPage.quarteredGreeter",
     "guide.worldPage.quarteredGreeting",
-    "guide.worldPage.quarteredPlaceNotes"
+    "guide.worldPage.quarteredPlaceNotes",
+    "hudChrome.auraEffect.quartered.galeLane"
   ]
 };

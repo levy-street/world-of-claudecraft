@@ -181,7 +181,18 @@ describe("Rivalmoot's counting house", () => {
 });
 
 describe("Rivalmoot's paving", () => {
-  const tint = { fissure: 0, ice: 0, ember: 0, glass: 0, stone: 0, basalt: 0, moot: 0 };
+  const tint = {
+    fissure: 0,
+    ice: 0,
+    ember: 0,
+    glass: 0,
+    stone: 0,
+    basalt: 0,
+    moot: 0,
+    gyreRock: 0,
+    gyreWay: 0,
+    gyreCap: 0,
+  };
   const at = (r: number, bearing: number) => {
     quarteredLandmarkTint(H.x + Math.cos(bearing) * r, H.z + Math.sin(bearing) * r, tint);
     return tint.moot;

@@ -19,6 +19,7 @@
 import {
   CINDERSCAR_BURNWAYS,
   cinderscarMeltNear,
+  GYRE_PEAK,
   QUARTERED_FROZEN_LAKES,
   quarteredLandmarkClears,
 } from '../quartered_landmarks';
@@ -204,6 +205,10 @@ function buildLandmarkStone(): DecorProp[] {
   return out;
 }
 
+/** Needles keep this far from the Gyre's centre: past the outermost turn's face and the scree
+ *  that fades out beyond it, yards. */
+export const GYRE_NEEDLE_CLEAR_R = GYRE_PEAK.startR + GYRE_PEAK.pathW / 2 + 8;
+
 /** The storm-worn needles at the Gyre's foot: a sparse scatter of the kit
  *  spire, one cell in five. */
 function buildWindNeedles(): DecorProp[] {
@@ -214,6 +219,9 @@ function buildWindNeedles(): DecorProp[] {
       const x = (gi + 0.1 + 0.8 * hash3(gi, gj, 2)) * STEP;
       const z = (gj + 0.1 + 0.8 * hash3(gi, gj, 3)) * STEP;
       if (dominantQuarterAt(x, z) !== 'wind') continue;
+      // never on the peak itself or its scree: the Gyre wears its own painted crags
+      // (content/quartered_gyre_crags.ts), and a needle stood on its faces
+      if (Math.hypot(x - GYRE_PEAK.x, z - GYRE_PEAK.z) < GYRE_NEEDLE_CLEAR_R) continue;
       const r = hash3(gi, gj, 4);
       const kind: Kind = { key: 'rockTallH', scale: 3.2 + 2.2 * r, r: 1.6, h: 7.5 + 5 * r };
       if (!standable(x, z, (kind.r ?? 1) + 1.5)) continue;

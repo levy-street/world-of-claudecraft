@@ -22813,6 +22813,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '你承受的下一次新娘的哀歌伤害提高{pct}%：每层{per}%，最多{max}层。下一次请在墓灯光芒中承受。',
   'hudChrome.auraEffect.crypt.slippery':
     '在光滑的冰面上：你的速度每秒最多改变{grip}码/秒，所以起步缓慢，停下时会继续滑行，转向时会甩出大弧线。离开冰面就能重新站稳。',
+  'hudChrome.auraEffect.quartered.galeLane':
+    '狂风推着你沿山路向旋风峰顶前进，即使你站着不动也一样：速度最高可达{speed}码/秒，接近峰顶时逐渐减缓到{summit}码/秒。无论转弯还是跳跃，它都会让你留在路上。平移可以横穿道路，朝山下移动则可以逆风而行。被狂风推动时，施法会被打断。离开风道后最多持续{linger}秒，带你越过风道之间的空隙。',
   'hudChrome.auraEffect.crypt.harmony':
     '受到的伤害降低{pct}%：她每有一名存活的唱诗者就降低{per}%。先杀死唱诗者。',
   'hudChrome.auraEffect.crypt.crescendo':

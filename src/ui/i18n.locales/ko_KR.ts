@@ -22250,6 +22250,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '다음 신부의 애가로 받는 피해가 {pct}% 증가합니다: 중첩당 {per}%, 최대 {max}중첩. 다음 애가는 등불 빛 안에서 받으세요.',
   'hudChrome.auraEffect.crypt.slippery':
     '미끄러운 얼음 위: 속도가 매초 최대 {grip}미터/초씩만 바뀌므로 출발이 느리고, 멈추면 계속 미끄러지며, 방향을 틀면 크게 돌아갑니다. 얼음에서 벗어나면 다시 중심을 잡을 수 있습니다.',
+  'hudChrome.auraEffect.quartered.galeLane':
+    '돌풍이 회오리 봉우리 정상으로 가는 길을 따라 당신을 밀어 올립니다. 가만히 서 있어도 마찬가지이며, 속도는 최대 {speed}야드/초이고 정상에 가까워질수록 {summit}야드/초까지 줄어듭니다. 굽은 길에서도, 점프 중에도 길 위에 머무르게 해 줍니다. 평행 이동으로 길을 가로지르거나, 길 아래쪽으로 움직여 바람을 거슬러 걸을 수 있습니다. 바람에 실려 가는 동안에는 시전이 중단됩니다. 바람길을 벗어난 뒤에도 최대 {linger}초 동안 지속되어 바람길 사이의 틈을 건너게 해 줍니다.',
   'hudChrome.auraEffect.crypt.harmony':
     '받는 피해가 {pct}% 감소합니다: 살아 있는 성가대원 한 명마다 {per}%. 성가대원을 먼저 처치하세요.',
   'hudChrome.auraEffect.crypt.crescendo':

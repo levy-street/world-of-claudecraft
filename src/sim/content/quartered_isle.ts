@@ -15,9 +15,13 @@
 import { paintedTownBuildingDefs, RIVALMOOT_LAYOUT } from '../painted_towns';
 import { RIVALMOOT_NPC_PLACEMENTS_BY_ID } from '../painted_towns/rivalmoot';
 import { CHALLENGERS_RING } from '../quartered_isle_terrain';
-import { FIREICE_RIFT, GYRE_PEAK, gyrePathPoint, HAMMERS_CUT_CANYON } from '../quartered_landmarks';
+import { FIREICE_RIFT, HAMMERS_CUT_CANYON } from '../quartered_landmarks';
 import type { NpcDef, PortalDef, ZoneDef, ZonePropsDef } from '../types';
 import { emptyZoneProps } from '../types';
+import { GYREFOOT_REST } from './graveyards';
+import { councilSeatDecor, gyreFootPadDecor } from './quartered_council_seat';
+import { gyreCragDecor } from './quartered_gyre_crags';
+import { gyreRailFences } from './quartered_gyre_rails';
 import { QUARTERED_ISLE_LAKES } from './quartered_isle_ways';
 import { RIVALMOOT_DRESSING } from './quartered_rivalmoot_dressing';
 
@@ -112,43 +116,6 @@ function challengersRingWall(): ZonePropsDef['fences'] {
 type DecorProp = NonNullable<ZonePropsDef['decorProps']>[number];
 const round2 = (v: number) => Math.round(v * 100) / 100;
 
-/** The Gyre's way-markers: a cairn on the path's outer lip every so often,
- *  so the switchbacks read from below, and standing stones round the crown
- *  about the crystal where the council's seat will open. */
-function gyreMarkers(): DecorProp[] {
-  const out: DecorProp[] = [];
-  // one on each third of the climb: enough to read the path from below
-  for (let i = 3; i <= 9; i += 3) {
-    const p = gyrePathPoint(i / 10);
-    const dx = p.x - GYRE_PEAK.x;
-    const dz = p.z - GYRE_PEAK.z;
-    const r = Math.hypot(dx, dz);
-    const lip = (r + GYRE_PEAK.pathW / 2 - 0.9) / r;
-    out.push({
-      key: 'rockTallH',
-      x: round2(GYRE_PEAK.x + dx * lip),
-      z: round2(GYRE_PEAK.z + dz * lip),
-      rot: round2(i * 1.7),
-      r: 0.7,
-      h: 2,
-    });
-  }
-  for (let i = 0; i < 4; i++) {
-    const a = (i / 4) * Math.PI * 2 + 0.5;
-    out.push({
-      key: 'rockTallA',
-      x: round2(GYRE_PEAK.x + Math.cos(a) * 4),
-      z: round2(GYRE_PEAK.z + Math.sin(a) * 4),
-      rot: round2(a),
-      scale: 1.6,
-      r: 1,
-      h: 4,
-    });
-  }
-  out.push({ key: 'starHeartCrystal', x: GYRE_PEAK.x, z: GYRE_PEAK.z, rot: 0, r: 1.2, h: 2 });
-  return out;
-}
-
 /** Basalt teeth along the Fireice Rift's lips, alternating sides, the
  *  causeway left open. */
 function riftTeeth(): DecorProp[] {
@@ -207,7 +174,14 @@ function canyonVeins(): DecorProp[] {
 }
 
 export const QUARTERED_ISLE_DECOR: DecorProp[] = [
-  ...gyreMarkers(),
+  // the Gyre's crown and its climb: the Council's Seat gate on its open crown, and
+  // the way beacons up the path (content/quartered_council_seat.ts), and the foot
+  // pad's floor at Gyrefoot Rest (quartered_gyre_pads.ts)
+  ...councilSeatDecor(),
+  gyreFootPadDecor(),
+  // the Gyre's storm granite: crags round its foot and standing stones along its climb
+  // (content/quartered_gyre_crags.ts)
+  ...gyreCragDecor(),
   ...riftTeeth(),
   ...canyonVeins(),
   ...RIVALMOOT_DRESSING.decorProps,
@@ -248,13 +222,19 @@ export const QUARTERED_ISLE_PORTALS: PortalDef[] = [];
 export const QUARTERED_ISLE_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),
   buildings: [...paintedTownBuildingDefs(RIVALMOOT_LAYOUT)],
-  fences: challengersRingWall(),
+  // the Ring's wall, and the Gyre's railing along its outer lip, open only at the launch
+  // pockets (content/quartered_gyre_rails.ts)
+  fences: [...challengersRingWall(), ...gyreRailFences()],
   decorProps: QUARTERED_ISLE_DECOR,
   tents: [...RIVALMOOT_DRESSING.tents],
   campfires: [...RIVALMOOT_DRESSING.campfires],
   crates: [...RIVALMOOT_DRESSING.crates],
   wells: [...RIVALMOOT_DRESSING.wells],
   stalls: [...RIVALMOOT_DRESSING.stalls],
-  // Rivalmoot's headstones, beside the Pale Keeper (content/graveyards.ts)
-  graveyards: [{ x: -30, z: 2240 }],
+  // Rivalmoot's headstones, beside the Pale Keeper, and Gyrefoot Rest's at the Gyre's back foot
+  // (content/graveyards.ts)
+  graveyards: [
+    { x: -30, z: 2240 },
+    { x: GYREFOOT_REST.x, z: GYREFOOT_REST.z },
+  ],
 };

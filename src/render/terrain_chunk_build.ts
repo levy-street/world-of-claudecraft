@@ -44,12 +44,14 @@ import { groundPaletteFor, groundPaletteVersion } from './ground_palette_overrid
 import { type ImpactCraterTerrainBlend, impactCraterTerrainBlend } from './impact_terrain';
 import { clamp01 } from './num_clamp';
 import {
+  type GyreSplat,
   makeQuarterGroundLinear,
   QUARTER_CLIFF_ROCK_SPLAT,
   QUARTER_CLIFF_SHARE,
   quarteredBlendActive,
   quarteredCliffAt,
   quarteredGroundAt,
+  quarteredGyreSplatAt,
 } from './quartered_ground_core';
 import { makeShoreProbe, type ShoreProbe, shoreWaterGate } from './shore_water_gate_core';
 import { buildCutClip, CUT_CELL_KEEP, type CutClipResult } from './terrain_cut_clip_core';
@@ -137,6 +139,7 @@ function syncZonePalettes(): void {
 const quarteredLinear = makeQuarterGroundLinear();
 const quarteredCliff: [number, number, number] = [0, 0, 0];
 const quarteredCliffC = new THREE.Color();
+const gyreSplat: GyreSplat = { grass: 0, rock: 0, sand: 0, body: 0 };
 const quarteredPalette = {
   grass: new THREE.Color(),
   grassDark: new THREE.Color(),
@@ -606,6 +609,21 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
     }
     cTmp.lerp(snowCapC, snow);
     lerpSplat(w, 2, clamp01((h - highH) / 10) * 0.8);
+  }
+  // the Gyre is one mass of storm granite (quartered_ground_core.ts): painted through the grass
+  // layer, which takes the palette's tint at full strength, with a share of the stone photo layer
+  // back over it for grain, and the path part pale sand. After every rock and snow rule above, so
+  // the high-ground band neither greys its tint nor snows it.
+  if (biome === 'quartered') {
+    quarteredGyreSplatAt(x, z, gyreSplat);
+    if (gyreSplat.body > 0) {
+      lerpSplat(w, 0, gyreSplat.grass);
+      lerpSplat(w, 2, gyreSplat.rock);
+      lerpSplat(w, 3, gyreSplat.sand);
+      cTmp.lerp(grassC, gyreSplat.body * 0.92);
+      snow *= 1 - gyreSplat.body;
+      rockTintW = Math.max(rockTintW, gyreSplat.body);
+    }
   }
   // A 30yd stone-tone field over every rock-tinted vertex: whole faces
   // shift a shade lighter or darker at a scale that survives any view
