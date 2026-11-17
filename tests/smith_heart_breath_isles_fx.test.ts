@@ -14,6 +14,7 @@ import { SMITH_HEART_BREATH_KIT_PIECES } from '../scripts/assets/smith_heart_bre
 import {
   BULWARK_BANDS,
   BULWARK_DEBRIS,
+  BULWARK_PULSE,
   beamCutLook,
   bulwarkBandLife,
   bulwarkDebris,
@@ -168,6 +169,27 @@ describe('breath_isles_fx_core', () => {
     expect(half.solid).toBeLessThan(full.solid);
     expect(low.crack).toBeGreaterThan(half.crack);
     expect(low.solid).toBeGreaterThan(0.3);
+  });
+
+  it('the Bulwark holds its size (2 percent at most) and shows its breaking in its glow', () => {
+    // The owner's run of 2026-11-17: the inner sphere swelled and shrank
+    // 15 percent nonstop, faster as it broke.
+    expect(BULWARK_PULSE).toBeLessThanOrEqual(0.015);
+    const range = (left: number, of: (l: ReturnType<typeof bulwarkLook>) => number) => {
+      let lo = Infinity;
+      let hi = -Infinity;
+      for (let c = 0; c < 30; c += 0.05) {
+        const v = of(bulwarkLook(left, 100, c));
+        lo = Math.min(lo, v);
+        hi = Math.max(hi, v);
+      }
+      return hi - lo;
+    };
+    for (const left of [100, 50, 5]) expect(range(left, (l) => l.pulse)).toBeLessThanOrEqual(0.03);
+    // A full shield glows steady; a breaking one's glow trembles.
+    expect(range(100, (l) => l.glow)).toBeLessThan(1e-9);
+    expect(range(5, (l) => l.glow)).toBeGreaterThan(0.4);
+    expect(range(5, (l) => l.glow)).toBeGreaterThan(range(50, (l) => l.glow));
   });
 
   it("the Bulwark's vortex peels away band by band, its stones thinning", () => {

@@ -325,15 +325,26 @@ export function bulwarkLook(
   left: number,
   whole: number,
   clock: number,
-): { solid: number; crack: number; spin: number; pulse: number } {
+): { solid: number; crack: number; spin: number; pulse: number; glow: number } {
   const k = whole > 0 ? Math.max(0, Math.min(1, left / whole)) : 0;
+  const weak = 1 - k;
   return {
     solid: 0.35 + 0.65 * k,
-    crack: 1 - k,
+    crack: weak,
     spin: 0.6 + 1.4 * k,
-    pulse: 0.85 + 0.15 * Math.sin(clock * (2 + 3 * (1 - k))),
+    // Its size all but still (the owner's run of 2026-11-17: the sphere
+    // swelled and shrank 15 percent nonstop): a slow breath of 2 percent at
+    // most, never quicker as it breaks.
+    pulse: 1 + BULWARK_PULSE * Math.sin(clock * 0.9),
+    // The breaking reads in its light instead: the glow trembles, harder and
+    // faster as the shield thins (its cracks open with `crack`).
+    glow: 1 + 0.3 * weak * Math.sin(clock * (5 + 9 * weak)),
   };
 }
+
+/** The Bulwark's size breath: at most this share either way (2 percent
+ *  from its smallest to its largest). */
+export const BULWARK_PULSE = 0.01;
 
 /** The ride's flourish: how a rider's ribbons wrap them `k` (0 to 1) into
  *  the ride (tight and bright in the middle, loosening as it sets down). */

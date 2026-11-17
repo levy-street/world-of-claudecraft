@@ -316,7 +316,7 @@ export class BreathBulwarkFx {
       this.radius.value = this.R * 1.2;
       const su = this.shellMat.uniforms;
       this.shell.scale.set(1, 1.15, 1);
-      su.uSolid.value = 0.1 + 0.22 * k;
+      su.uSolid.value = (0.1 + 0.22 * k) * look.glow;
       su.uCrack.value = look.crack;
       su.uSpin.value = look.spin;
       su.uFlash.value = this.flash;
