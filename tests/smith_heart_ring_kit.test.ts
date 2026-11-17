@@ -37,10 +37,7 @@ import {
   HEART_ARRIVAL_SHAKES,
   HEART_PORTAL_OPEN,
   HEART_PORTAL_SHAKES,
-  heartQuarterPose,
   heartShakeDue,
-  heartShardCount,
-  heartShardPose,
 } from '../src/render/smith_heart/heart_portal_core';
 import {
   HEART_RIVER_RUN_SECONDS,
@@ -53,7 +50,6 @@ import {
   HEART_SEAL_ARRIVAL,
   HEART_SEAL_WAVE_SECONDS,
   heartSealArrivalWave,
-  heartSpireIgnite,
 } from '../src/render/smith_heart/heart_seal_core';
 import {
   planRingChannels,
@@ -75,7 +71,6 @@ import {
   RING_KIT_STAIRS,
   RING_MOUTHS,
   ringConduitLines,
-  ringSpireSpots,
 } from '../src/render/smith_heart/ring_kit_plan_core';
 import { SEAL_SHAKE_REACH, sealShakeFalloff } from '../src/render/smith_heart_fx/seal_shake';
 import {
@@ -85,7 +80,6 @@ import {
   RING_PACK_DEGREES,
   SEAL_DAIS,
   SMITH_HEART_FIELD,
-  SMITH_HEART_VEINS,
 } from '../src/sim/content/smith_heart_layout';
 import { authoredFieldHeight, authoredFieldSurfaceAt } from '../src/sim/instances/authored_field';
 
@@ -311,20 +305,7 @@ describe('Smith Heart Ring kit: the measures the plan relies on', () => {
     },
   );
 
-  it.skipIf(!haveKit)('shapes the seal: four quarters round the heart, flush on the dais', () => {
-    const q = shape('Kit_SealQuarter');
-    for (const p of q.points) {
-      const r = Math.hypot(p[0], p[2]);
-      expect(r).toBeGreaterThan(1.7);
-      expect(r).toBeLessThan(10);
-      // Its middle bearing is +Z, inside its own quarter (its side ribs
-      // close the gap to the next).
-      expect(p[2]).toBeGreaterThan(Math.abs(p[0]) - 0.45);
-    }
-    expect(q.max[1]).toBeLessThan(0.15);
-    const h = shape('Kit_SealHeart');
-    expect(Math.max(...h.points.map((p) => Math.hypot(p[0], p[2])))).toBeLessThanOrEqual(1.86);
-    expect(h.max[1]).toBeLessThan(0.15);
+  it.skipIf(!haveKit)('shapes the dais: its walk flush, the inverted mountain under it', () => {
     const d = shape('Kit_SealDais');
     // The dais's walk (and its landings out to the stairs) is flush.
     for (const p of d.points) {
@@ -335,17 +316,6 @@ describe('Smith Heart Ring kit: the measures the plan relies on', () => {
     expect(Math.max(...walk.map((p) => Math.abs(p[2])))).toBeCloseTo(RING_KIT_SIZES.apron, 0);
     // The inverted mountain under it.
     expect(d.min[1]).toBeLessThan(-40);
-  });
-
-  it.skipIf(!haveKit)('leans the spire in over the seal, its plinth inside its collider', () => {
-    const s = shape('Kit_SealSpire');
-    const tip = s.points.reduce((a, b) => (b[1] > a[1] ? b : a));
-    expect(tip[1]).toBeGreaterThan(15);
-    // In toward the seal: the piece's -Z (the runtime turns +Z outward).
-    expect(tip[2]).toBeLessThan(-2.6);
-    const tine = F.props.find((p) => p.kind === 'sh_portal_tine');
-    if (!tine?.r) throw new Error('no tine collider');
-    expect(reach('Kit_SealSpire', 2.2)).toBeLessThanOrEqual(tine.r + 0.6);
   });
 
   it.skipIf(!haveKit)('keeps every prop piece a body can touch within its collider', () => {
@@ -489,10 +459,6 @@ describe('ring_kit_plan_core: the Ring, its stairs and its mouths', () => {
         F.props.some((p) => p.kind === k),
         k,
       ).toBe(true);
-    // The spires: one per vein, round the seal.
-    const spires = ringSpireSpots();
-    expect(spires.map((s) => s.vein).sort()).toEqual([...SMITH_HEART_VEINS].sort());
-    for (const s of spires) expect(Math.hypot(s.x, s.z)).toBeCloseTo(15.5, 1);
   });
 
   it("flanks the three mouths with their vein's jambs, clear of the walk", () => {
@@ -556,46 +522,6 @@ describe('the seal and the portal: the moments', () => {
     expect(mid).toBeLessThan(1);
     expect(heartSealArrivalWave(HEART_SEAL_ARRIVAL + HEART_SEAL_WAVE_SECONDS + 0.1)).toBe(0);
     expect(heartSealArrivalWave(999)).toBe(0);
-  });
-
-  it('ignites a spire from its foot to its tip with its vein, a flare at the tip', () => {
-    expect(heartSpireIgnite(-1)).toEqual({ fill: 0, flare: 0 });
-    const early = heartSpireIgnite(1);
-    expect(early.fill).toBe(0);
-    const climbing = heartSpireIgnite(HEART_SEAL_ARRIVAL);
-    expect(climbing.fill).toBeGreaterThan(0);
-    expect(climbing.fill).toBeLessThan(1);
-    const top = heartSpireIgnite(HEART_SEAL_ARRIVAL + 0.7);
-    expect(top.fill).toBe(1);
-    expect(top.flare).toBeGreaterThan(0.5);
-    // A vein met lit long ago burns steady, no flare.
-    expect(heartSpireIgnite(999)).toEqual({ fill: 1, flare: 0 });
-  });
-
-  it('parts the quarters like petals as the seal splits', () => {
-    expect(heartQuarterPose(0)).toEqual({ out: 0, lift: 0, tilt: 0 });
-    const open = heartQuarterPose(1);
-    expect(open.out).toBeGreaterThan(3);
-    expect(open.tilt).toBeGreaterThan(0);
-    // Back down on the dais once open (a breath over it, never floating).
-    expect(open.lift).toBeLessThan(0.15);
-  });
-
-  it('bursts the shards out of the seams and turns them round the portal over every head', () => {
-    expect(heartShardCount(true)).toBeLessThan(heartShardCount(false));
-    for (let i = 0; i < heartShardCount(false); i++) {
-      expect(heartShardPose(i, -1).scale).toBe(0);
-      expect(heartShardPose(i, HEART_PORTAL_OPEN.charge * 0.5).scale).toBe(0);
-      const settled = heartShardPose(i, 60 + i);
-      expect(settled.scale).toBeGreaterThan(0.5);
-      expect(settled.y).toBeGreaterThan(6);
-      const r = Math.hypot(settled.x, settled.z);
-      expect(r).toBeGreaterThan(6);
-      expect(r).toBeLessThan(SEAL_DAIS.r);
-      // It keeps turning (the living portal).
-      const later = heartShardPose(i, 64 + i);
-      expect(Math.hypot(later.x - settled.x, later.z - settled.z)).toBeGreaterThan(0.2);
-    }
   });
 
   it("rides the river's surge with the light's front, then lets it go", () => {

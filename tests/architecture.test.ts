@@ -1101,6 +1101,7 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart/heart_walls_core.ts',
   'src/render/smith_heart/heart_rivers_core.ts',
   'src/render/smith_heart/heart_seal_core.ts',
+  'src/render/smith_heart/ring_crystal_core.ts',
   'src/render/smith_heart/heart_gates_core.ts',
   'src/render/smith_heart/heart_sightline_core.ts',
   // The Smith's Heart's portal moments (the opening, the hop, the area blend),

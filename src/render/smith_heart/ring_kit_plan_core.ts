@@ -71,7 +71,6 @@ export const RING_KIT_KINDS: ReadonlySet<string> = new Set([
   'sh_ring_pillar',
   'sh_ring_cairn',
   'sh_hammer_jamb',
-  'sh_portal_tine',
 ]);
 
 /** The kit's measures (yards at scale 1; pinned against the shipped GLB by
@@ -361,42 +360,8 @@ export function planRingStairs(): HeartKitPlacement[] {
   return out;
 }
 
-/** The spires' veins by bearing: each burns for the vein whose quarter of
- *  the seal it stands after, clockwise. */
-export const RING_SPIRE_VEINS: Readonly<Record<number, SmithHeartVein>> = {
-  45: 'breath',
-  134: 'quench',
-  226: 'hammer',
-  315: 'heat',
-};
-
-export interface RingSpireSpot {
-  x: number;
-  y: number;
-  z: number;
-  rot: number;
-  vein: SmithHeartVein;
-}
-
-/** The four crystal spires (the layout's `sh_portal_tine`), each turned so
- *  its crystal leans in over the seal. */
-export function ringSpireSpots(): RingSpireSpot[] {
-  return SMITH_HEART_FIELD.props
-    .filter((p) => p.kind === 'sh_portal_tine')
-    .map((p) => {
-      const deg = Math.round(((Math.atan2(p.x, p.z) * 180) / Math.PI + 360) % 360);
-      return {
-        x: p.x,
-        y: SEAL_DAIS.h,
-        z: p.z,
-        rot: Math.atan2(p.x - SEAL_DAIS.x, p.z - SEAL_DAIS.z),
-        vein: RING_SPIRE_VEINS[deg] ?? 'hammer',
-      };
-    });
-}
-
-/** The layout's props of the Ring fitted with their pieces (the spires'
- *  plinths and crystal are heart_seal.ts's), and the dais. */
+/** The layout's props of the Ring fitted with their pieces (the ring crystal on
+ *  the dais is ring_crystal.ts's), and the dais. */
 export function planRingProps(): HeartKitPlacement[] {
   const out: HeartKitPlacement[] = [
     { piece: 'Kit_SealDais', x: SEAL_DAIS.x, y: SEAL_DAIS.h, z: SEAL_DAIS.z, rot: 0 },

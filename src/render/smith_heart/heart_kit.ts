@@ -460,6 +460,12 @@ export function setHeartKitCompileGate(gate: HeartKitCompileGate | null): void {
   kitCompileGate = gate;
 }
 
+/** The live compile gate the renderer lent (null before it is lent): what a piece of the
+ *  raid that lands after its room (the ring crystal) links behind. */
+export function heartKitCompileGate(): HeartKitCompileGate | null {
+  return kitCompileGate;
+}
+
 /** Swap a group built before a kit landed for the kit's build the moment it
  *  lands (same materials, so no new program). `build` rebuilds it; the new
  *  build waits hidden behind the compile gate before it swaps in. */

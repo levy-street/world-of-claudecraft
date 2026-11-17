@@ -120,6 +120,7 @@ import {
 import { quenchRockPaintLayer } from './quench_env_rock_paint';
 import { dressQuench, ensureQuenchKit, QUENCH_KIT_KINDS, quenchKitReady } from './quench_kit';
 import { lakeIceMaterial } from './quench_lake_ice';
+import { ensureRingCrystal } from './ring_crystal';
 import {
   dressRing,
   ensureRingKit,
@@ -163,6 +164,7 @@ export async function buildSmithHeartInterior(
     ensureHeartKit(SMITH_HEART_GATE_KIT_URL),
     ensureHeartRoomKit(),
     ensureHeartFourSky(),
+    ensureRingCrystal(),
   ]);
   // The Ring kit draws the two stairs tread by tread and the dais's keel
   // (phase 2F); without it the field's own ramps and keel stand.
@@ -346,7 +348,7 @@ export async function buildSmithHeartInterior(
   const ringSet = buildRingSet(deps.lowGfx);
   group.add(ringSet.group);
   group.add(rivers.group);
-  const seal = buildHeartSeal(deps.lowGfx);
+  const seal = buildHeartSeal();
   group.add(seal.group);
   const portals = buildHeartPortals(deps.lowGfx, ground);
   group.add(portals.group);
@@ -445,7 +447,7 @@ export async function buildSmithHeartInterior(
       heartHopStage(hopAt < 0 ? -1 : now - hopAt, hop);
       rivers.update(view);
       ringSet.update(view);
-      seal.update(view, stage, view.portalSince);
+      seal.update(view);
       portals.update(stage, hop, hopSide, view.exitSince);
       portals.wash(hop.flash, local);
       gates.update();

@@ -993,11 +993,6 @@ const PIT_COLUMNS: FieldProp[] = QUARRY_PILLAR_SPOTS.map((p) => ({
  *  steps above, so the whole figure reads from the pit floor's camera. */
 export const QUARRY_COLOSSUS_OUT = 12;
 
-/** The four crystal spires on the Seal Dais (bearings, degrees): on the
- *  diagonals, the two southern ones turned a breath off them so the Ring's
- *  two ends (its arc's feet at 138 and 222) see past them to the portal. */
-export const RING_SPIRE_BEARINGS = [45, 134, 226, 315] as const;
-
 /** How far out from the Ring's centre the pack spots' cairns stand (on the
  *  walk, against its outer rim). */
 export const RING_CAIRN_R = 75.6;
@@ -1194,13 +1189,8 @@ const PROPS: FieldProp[] = [
     r: 1.5,
     h: 10,
   })),
-  // The Seal Dais: the four crystal spires of the portal's crown, on the
-  // diagonals (clear of the four rivers and the two stairs), each lighting
-  // with its vein.
-  ...RING_SPIRE_BEARINGS.map((deg) => {
-    const p = ringPoint(deg, 15.5);
-    return { kind: 'sh_portal_tine', x: p.x, z: p.z, rot: (deg * Math.PI) / 180, r: 1.6, h: 16 };
-  }),
+  // The Seal Dais: the ring crystal at its centre is the renderer's (its footprint is the
+  // sim's `SEAL_CRYSTAL` wall); the seal's own placeholder prop stands at the middle.
   { kind: 'sh_heart_seal', x: HEART_SEAL.x, z: HEART_SEAL.z, rot: 0 },
   // The Breath: wind shelters on the bridge's windward edge (phase 2 gusts
   // push the raid against them, never off the arch). The Cornice itself is
