@@ -49,6 +49,7 @@ import {
   inSealCrystalReach,
   isSealCrystalTemplate,
   pressSmithHeartSealCrystal,
+  SEAL_CRYSTAL_REACH,
   SMITH_HEART_PORTAL_BIT,
   SMITH_HEART_PORTAL_HOP_TEXT,
   SMITH_HEART_PORTAL_OPEN_LOG,
@@ -81,6 +82,10 @@ import type { InstanceSlot } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import { type Entity, INTERACT_RANGE, type SimEvent, type WorldContent } from '../src/sim/types';
 import { localizeSimText } from '../src/ui/sim_i18n';
+
+/** A spot a body can stand and press from: outside the wall (the rim and a body's
+ *  width), well inside the press's reach (a press counts from the crystal's edge). */
+const PRESS_Z = -(SEAL_CRYSTAL.r + PLAYER_BODY_RADIUS + 1.5);
 
 const WORLD: WorldContent = { ...BUILTIN_WORLD, camps: [], npcs: {}, groundObjects: [] };
 const DUNGEON = DUNGEONS[SMITH_HEART_DUNGEON];
@@ -203,7 +208,7 @@ afterEach(() => {
 describe('the crystal object', () => {
   it('is one claim object at the dais centre, appended LAST, never mistaken for a marker', () => {
     expect(SMITH_HEART_SEAL_CRYSTAL_TEMPLATE).toBe('smith_heart_seal_crystal');
-    expect(SEAL_CRYSTAL).toEqual({ x: 0, z: 0, r: 3.6 });
+    expect(SEAL_CRYSTAL).toEqual({ x: 0, z: 0, r: 8.5 });
     const objects = DUNGEON.objects ?? [];
     expect(objects[objects.length - 1]).toBe(SMITH_HEART_SEAL_CRYSTAL_OBJECT);
     expect(SMITH_HEART_SEAL_CRYSTAL_OBJECT).toMatchObject({
@@ -351,7 +356,7 @@ describe('the portal bit is kept, and only a burst sets it', () => {
   it('the press sets it at once on every marker, announces it once, and drops the crystal and its wall', () => {
     const { sim, pid, inst } = setup();
     winVeins(sim, inst, SMITH_HEART_VEINS);
-    put(sim, pid, inst, 0, -6);
+    put(sim, pid, inst, 0, PRESS_Z);
     const wallsBefore = combatWallsAt(originOf(inst).x, originOf(inst).z).length;
     const c = crystal(sim, inst);
     expect(crystalWall(inst)).toBeDefined();
@@ -377,7 +382,7 @@ describe('the portal bit is kept, and only a burst sets it', () => {
   it('is kept for the claim: later ticks, a fight that begins again, a kill again', () => {
     const { sim, pid, inst } = setup();
     winVeins(sim, inst, SMITH_HEART_VEINS);
-    put(sim, pid, inst, 0, -6);
+    put(sim, pid, inst, 0, PRESS_Z);
     expect(sim.pickUpObject(crystal(sim, inst).id, pid)).toBe(true);
     for (let i = 0; i < 100; i++) sim.tick();
     expect(markers(sim, inst).every((m) => m === BURST)).toBe(true);
@@ -415,7 +420,7 @@ describe('the portal bit is kept, and only a burst sets it', () => {
   it('a fresh claim is shut again', () => {
     const { sim, pid, inst } = setup();
     winVeins(sim, inst, SMITH_HEART_VEINS);
-    put(sim, pid, inst, 0, -6);
+    put(sim, pid, inst, 0, PRESS_Z);
     expect(sim.pickUpObject(crystal(sim, inst).id, pid)).toBe(true);
     freeInstance(sim.ctx, inst);
     sim.tick();
@@ -456,7 +461,7 @@ describe('the portal bit is kept, and only a burst sets it', () => {
 describe('the press', () => {
   it('a dark crystal answers with its line and changes nothing', () => {
     const { sim, pid, inst } = setup();
-    put(sim, pid, inst, 0, -6);
+    put(sim, pid, inst, 0, PRESS_Z);
     const c = crystal(sim, inst);
     // A non-lootable crystal is not clickable, so this is the direct pickup command.
     expect(sim.pickUpObject(c.id, pid)).toBe(false);
@@ -477,7 +482,8 @@ describe('the press', () => {
     winVeins(sim, inst, SMITH_HEART_VEINS);
     const c = crystal(sim, inst);
     const reach = INTERACT_RANGE + SEAL_CRYSTAL.r;
-    expect(reach).toBeCloseTo(8.6, 9);
+    expect(reach).toBeCloseTo(13.5, 9);
+    expect(SEAL_CRYSTAL_REACH).toBe(reach);
     // Far away on the Ring: too far, and nothing changes.
     put(sim, pid, inst, 0, 70);
     expect(sim.pickUpObject(c.id, pid)).toBe(false);
@@ -500,7 +506,7 @@ describe('the press', () => {
     winVeins(sim, inst, SMITH_HEART_VEINS);
     const c = crystal(sim, inst);
     const body = sim.ctx.entities.get(pid) as Entity;
-    put(sim, pid, inst, 0, -6);
+    put(sim, pid, inst, 0, PRESS_Z);
     body.dead = true;
     expect(sim.pickUpObject(c.id, pid)).toBe(false);
     expect(errors(sim.tick(), pid)).toContain("You can't do that while dead.");
@@ -516,7 +522,7 @@ describe('the press', () => {
   it('a player of another claim presses nothing of this one', () => {
     const { sim, pid, inst } = setup();
     winVeins(sim, inst, SMITH_HEART_VEINS);
-    put(sim, pid, inst, 0, -6);
+    put(sim, pid, inst, 0, PRESS_Z);
     // A stranger's own claim, one slot over, with its own crystal.
     const stranger = sim.addPlayer('mage', 'Stranger');
     expect(enterDungeon(sim.ctx, SMITH_HEART_DUNGEON, stranger)).toBe(true);
@@ -551,7 +557,7 @@ describe('the press', () => {
   it('a second press has nothing left to burst: no state change, no second line', () => {
     const { sim, pid, inst } = setup();
     winVeins(sim, inst, SMITH_HEART_VEINS);
-    put(sim, pid, inst, 0, -6);
+    put(sim, pid, inst, 0, PRESS_Z);
     const c = crystal(sim, inst);
     expect(sim.pickUpObject(c.id, pid)).toBe(true);
     sim.tick();
@@ -582,7 +588,7 @@ describe('the press', () => {
   it('draws no rng, in the press or in the tick', () => {
     const { sim, pid, inst } = setup();
     winVeins(sim, inst, SMITH_HEART_VEINS);
-    put(sim, pid, inst, 0, -6);
+    put(sim, pid, inst, 0, PRESS_Z);
     let draws = 0;
     const rng = sim.ctx.rng as Rng;
     rng.setObserver(() => {
@@ -608,7 +614,7 @@ describe('the wall', () => {
     if (!meta) throw new Error('no meta');
     const dist = () => Math.hypot(e.pos.x - o.x, e.pos.z - o.z);
     // Walking straight at it from the south halts at the rim plus the body.
-    put(sim, pid, inst, 0, -8);
+    put(sim, pid, inst, 0, -(SEAL_CRYSTAL.r + 4));
     e.facing = 0;
     e.prevFacing = 0;
     meta.moveInput.forward = true;
@@ -647,7 +653,7 @@ describe('the wall', () => {
     expect(Math.hypot(inside.x - o.x, inside.z - o.z)).toBeGreaterThanOrEqual(
       SEAL_CRYSTAL.r + PLAYER_BODY_RADIUS - 1e-6,
     );
-    put(sim, pid, inst, 0, -6);
+    put(sim, pid, inst, 0, PRESS_Z);
     expect(sim.pickUpObject(crystal(sim, inst).id, pid)).toBe(true);
     const clear = resolvePosition(seed, o.x + 1, o.z + 0.5, PLAYER_BODY_RADIUS);
     expect(clear.x).toBeCloseTo(o.x + 1, 9);
@@ -658,9 +664,10 @@ describe('the wall', () => {
     const { sim, pid, inst } = setup();
     winVeins(sim, inst, SMITH_HEART_VEINS);
     const a = sim.ctx.entities.get(pid) as Entity;
-    // A second body 16 yd across the crystal (only its place matters to the sight test).
-    const across = (): Entity => ({ ...a, pos: { ...a.pos, z: a.pos.z + 16 } }) as Entity;
-    put(sim, pid, inst, 0, -8);
+    // A second body across the crystal (only its place matters to the sight test).
+    const across = (): Entity =>
+      ({ ...a, pos: { ...a.pos, z: a.pos.z + 2 * (SEAL_CRYSTAL.r + 3) } }) as Entity;
+    put(sim, pid, inst, 0, -(SEAL_CRYSTAL.r + 3));
     expect(entityLineOfSightClear(sim.cfg.seed, a, across())).toBe(false);
     expect(sim.pickUpObject(crystal(sim, inst).id, pid)).toBe(true);
     expect(entityLineOfSightClear(sim.cfg.seed, a, across())).toBe(true);
@@ -673,7 +680,7 @@ describe('the wall', () => {
     const e = sim.ctx.entities.get(pid) as Entity;
     const meta = sim.meta(pid);
     if (!meta) throw new Error('no meta');
-    put(sim, pid, inst, 0, -8);
+    put(sim, pid, inst, 0, -(SEAL_CRYSTAL.r + 4));
     e.facing = 0;
     e.prevFacing = 0;
     meta.moveInput.forward = true;
@@ -734,8 +741,8 @@ describe('the wall', () => {
     for (const p of points) {
       expect(Math.hypot(p.x - SEAL_CRYSTAL.x, p.z - SEAL_CRYSTAL.z)).toBeGreaterThan(clear);
     }
-    // The portal's trigger reaches past the wall, so a body at the rim wants one step.
-    expect(RING_PORTAL.r).toBeGreaterThan(SEAL_CRYSTAL.r);
+    // The portal's whole trigger stands under the crystal: nobody reaches it before the burst.
+    expect(RING_PORTAL.r + PLAYER_BODY_RADIUS).toBeLessThan(SEAL_CRYSTAL.r);
   });
 });
 
@@ -753,7 +760,7 @@ describe('determinism and text', () => {
       if (t === 10) kill(sim, inst, veinKills('breath'));
       if (t === 15) kill(sim, inst, veinKills('quench'));
       if (t === 20) kill(sim, inst, veinKills('heat'));
-      if (t === 25) put(sim, pid, inst, 0, -6);
+      if (t === 25) put(sim, pid, inst, 0, PRESS_Z);
       if (t === 30) sim.pickUpObject(crystal(sim, inst).id, pid);
       if (t === 40) revive(sim, inst, veinKills('breath'));
       sim.tick();

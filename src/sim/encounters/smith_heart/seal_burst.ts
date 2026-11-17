@@ -18,6 +18,7 @@
 // Sits above seal.ts and seal_crystal.ts (it imports both; neither imports
 // it). Draws NO rng.
 
+import { SMITH_HEART_DUNGEON } from '../../content/smith_heart';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import type { Entity } from '../../types';
@@ -30,7 +31,12 @@ import {
   smithHeartReadyBitSet,
   writeSealMarkers,
 } from './seal';
-import { inSealCrystalReach, retireSealCrystal, sealCrystalClaim } from './seal_crystal';
+import {
+  inSealCrystalReach,
+  retireSealCrystal,
+  sealCrystalClaim,
+  sealCrystalOf,
+} from './seal_crystal';
 
 /** The English line a press on a crystal that is not charged answers with
  *  (re-localized by src/ui/sim_i18n.ts, EXACT matcher). */
@@ -76,4 +82,23 @@ export function pressSmithHeartSealCrystal(
     return false;
   }
   return burstSmithHeartSeal(ctx, inst);
+}
+
+/**
+ * The generic interact press (interaction.ts `interact`, asked before its scan):
+ * a living player within reach of a claim's crystal presses it, charged or dark,
+ * because the scan's plain interact range stops short of a plinth this wide. True
+ * when the press was the crystal's (it burst, or it answered with its line); false
+ * for a player out of every crystal's reach, whose press goes on to the scan. The
+ * caller has already turned the dead away.
+ */
+export function trySealCrystalInteract(ctx: SimContext, body: Entity, pid: number): boolean {
+  for (const inst of ctx.instances) {
+    if (inst.partyKey === null || inst.dungeonId !== SMITH_HEART_DUNGEON) continue;
+    const crystal = sealCrystalOf(ctx, inst);
+    if (!crystal || !inSealCrystalReach(ctx, inst, crystal, body)) continue;
+    pressSmithHeartSealCrystal(ctx, crystal, body, pid);
+    return true;
+  }
+  return false;
 }

@@ -54,6 +54,13 @@ import { dist2d, type Entity, INTERACT_RANGE } from '../../types';
  *  so it is given a lifetime no claim outlives). */
 const CRYSTAL_WALL_LIFE = 1e9;
 
+/** How far (yards, from its centre) a body can stand and still press the crystal:
+ *  the classic interact range measured from the crystal's EDGE (its wall keeps a
+ *  body a body's width off the rim, so a press from beside it counts). The sim's
+ *  press gate and the client's scan and click reach both read it
+ *  (src/game/interactions.ts objectInteractionRange). */
+export const SEAL_CRYSTAL_REACH = INTERACT_RANGE + SEAL_CRYSTAL.r;
+
 /** Is `templateId` the heart seal crystal's? */
 export function isSealCrystalTemplate(templateId: string): boolean {
   return templateId === SMITH_HEART_SEAL_CRYSTAL_TEMPLATE;
@@ -84,9 +91,8 @@ export function sealCrystalClaim(ctx: SimContext, crystal: Entity): InstanceSlot
   return null;
 }
 
-/** Is `body` inside the crystal's claim and within reach of the crystal? Reach
- *  is the classic interact range measured from the crystal's EDGE (its wall
- *  keeps a body a body's width off the rim, so a press from beside it counts). */
+/** Is `body` inside the crystal's claim and within reach of the crystal
+ *  (`SEAL_CRYSTAL_REACH`)? */
 export function inSealCrystalReach(
   ctx: SimContext,
   inst: InstanceSlot,
@@ -102,7 +108,7 @@ export function inSealCrystalReach(
     Math.abs(body.pos.z - o.z) >= 250
   )
     return false;
-  return dist2d(body.pos, crystal.pos) <= INTERACT_RANGE + SEAL_CRYSTAL.r;
+  return dist2d(body.pos, crystal.pos) <= SEAL_CRYSTAL_REACH;
 }
 
 /** Keep a seal marker (an inert anchor) out of the press: never lootable,

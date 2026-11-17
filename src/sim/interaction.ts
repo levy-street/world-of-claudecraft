@@ -44,7 +44,10 @@ import {
   tryStartNythraxisWardChannel,
 } from './encounters/nythraxis';
 import { tryThrowKnot } from './encounters/smith_heart/breath_heart';
-import { pressSmithHeartSealCrystal } from './encounters/smith_heart/seal_burst';
+import {
+  pressSmithHeartSealCrystal,
+  trySealCrystalInteract,
+} from './encounters/smith_heart/seal_burst';
 import { isSealCrystalTemplate } from './encounters/smith_heart/seal_crystal';
 import { tryCageStruggle } from './encounters/sunken_bastion/turnkey';
 import { trySpearWrench } from './encounters/wildheart_basin/zulgar_spear';
@@ -540,6 +543,9 @@ export function interact(
   if (trySpearWrench(ctx, p)) return;
   // Carrying a Knotted Gale: the press is the throw (at the lip of a gap).
   if (tryThrowKnot(ctx, p)) return;
+  // Beside the Smith's Heart's heart seal crystal: the press is the crystal's (its
+  // plinth is wider than the scan's plain interact range, seal_burst.ts).
+  if (trySealCrystalInteract(ctx, p, r.meta.entityId)) return;
   if (p.targetId !== null) {
     const target = ctx.entities.get(p.targetId);
     // A lootable body answers the press measured as its loot is (corpseLootDistance:

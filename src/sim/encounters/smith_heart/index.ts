@@ -150,10 +150,12 @@ export {
   burstSmithHeartSeal,
   pressSmithHeartSealCrystal,
   SMITH_HEART_SEAL_DARK_TEXT,
+  trySealCrystalInteract,
 } from './seal_burst';
 export {
   inSealCrystalReach,
   isSealCrystalTemplate,
+  SEAL_CRYSTAL_REACH,
   sealCrystalBurst,
   sealCrystalOf,
 } from './seal_crystal';
