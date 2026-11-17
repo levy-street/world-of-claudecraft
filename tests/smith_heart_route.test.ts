@@ -179,6 +179,9 @@ const SPOTS = {
   grandStair: { x: 0, z: -40 },
   northStair: { x: 0, z: 40 },
   dais: RING_PORTAL_LANDING,
+  // The portal's centre. The heart seal crystal's wall stands over it until a
+  // press bursts it, but that wall is dynamic (published per claim,
+  // seal_crystal.ts), so this walk over the static field reaches it.
   portal: RING_PORTAL,
   ring: ringPoint(0),
   b1: BREATH.b1,

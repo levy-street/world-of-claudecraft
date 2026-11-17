@@ -8,7 +8,9 @@ import { describe, expect, it, vi } from 'vitest';
 // is the existing `pickup` command; and the online client's wall follows the
 // mirrored entity (net/combat_wall_wire.ts), so it leaves with the entity the
 // snapshot after the burst. This drives the REAL server snapshot path into the
-// real online mirror (ClientWorld) and checks each. Db is mocked so no
+// real online mirror (ClientWorld) and checks each. The collision view is one
+// process-wide table the in-process server ALSO writes, so the client's wall is
+// read only after the shared table is cleared and the client alone publishes. Db is mocked so no
 // Postgres runs (mirrors smith_heart_council_soul_wire.test.ts).
 vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
@@ -97,14 +99,19 @@ describe('the heart seal crystal over the wire', () => {
       [...client.entities.values()]
         .filter((e: Entity) => e.kind === 'object' && smithHeartSealMaskOf(e.templateId) !== null)
         .map((e: Entity) => smithHeartSealMaskOf(e.templateId) as number);
-    const clientWall = () =>
-      combatWallsAt(o.x, o.z).find(
+    // The wall the CLIENT builds from its mirror: the table is shared with the
+    // in-process server, so clear it and let only the client publish.
+    const clientWall = () => {
+      clearCombatWallStateForTest();
+      syncClientCombatWalls(client);
+      return combatWallsAt(o.x, o.z).find(
         (w) =>
           w.type === 'circle' &&
           Math.abs(w.x - SEAL_CRYSTAL.x) < 1e-6 &&
           Math.abs(w.z - SEAL_CRYSTAL.z) < 1e-6 &&
           Math.abs(w.r - SEAL_CRYSTAL.r) < 1e-9,
       );
+    };
     const outcomes = (rid: number) =>
       others.filter((m) => m.t === 'commandOutcome' && m.rid === rid);
     const eventTexts = (type: string) =>

@@ -65,6 +65,7 @@ import {
   smithHeartSealTemplate,
   tickSmithHeartSeal,
 } from '../src/sim/encounters/smith_heart';
+import { writeSealMarkers } from '../src/sim/encounters/smith_heart/seal';
 import {
   COMBAT_WALL_SHAPES,
   clearCombatWallStateForTest,
@@ -396,6 +397,19 @@ describe('the portal bit is kept, and only a burst sets it', () => {
     expect(markers(sim, inst).every((m) => m === BURST)).toBe(true);
     // The crystal never stands again, nor does it ever offer a press.
     expect(sealCrystalOf(sim.ctx, inst)).toBeNull();
+  });
+
+  it("the seal's own tick retires the crystal of a claim whose markers carry the bit", () => {
+    const { sim, inst } = setup();
+    const c = crystal(sim, inst);
+    // The kept bit is the one fact the tick follows, whoever wrote it.
+    writeSealMarkers(sim.ctx, inst, SMITH_HEART_PORTAL_BIT);
+    expect(sealCrystalOf(sim.ctx, inst)).toBe(c);
+    sim.tick();
+    expect(sealCrystalOf(sim.ctx, inst)).toBeNull();
+    expect(sim.ctx.entities.has(c.id)).toBe(false);
+    expect(crystalWall(inst)).toBeUndefined();
+    expect(markers(sim, inst).every((m) => m === SMITH_HEART_PORTAL_BIT)).toBe(true);
   });
 
   it('a fresh claim is shut again', () => {

@@ -94,6 +94,9 @@ export function inSealCrystalReach(
   body: Entity,
 ): boolean {
   const o = ctx.instanceOriginOf(inst);
+  // The claim's envelope: the dungeon's half width in x and the slot's 250 yd
+  // half depth in z (the same shape instances/dungeons.ts instanceContains
+  // and the seal's own announce read).
   if (
     Math.abs(body.pos.x - o.x) >= instanceHalfWidthOf(inst.dungeonId) ||
     Math.abs(body.pos.z - o.z) >= 250
