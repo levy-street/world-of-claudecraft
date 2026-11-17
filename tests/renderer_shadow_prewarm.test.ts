@@ -50,6 +50,8 @@ function harness(compileAsync: (root: THREE.Object3D) => Promise<THREE.Object3D>
   const renderer = Object.create(Renderer.prototype) as ShadowPrewarmHarness &
     Record<string, unknown>;
   renderer.asyncCompileSupported = true;
+  // The shadow arm keys on the gates' switch (link_gate_mode_core.ts).
+  renderer.compileGatesSupported = true;
   renderer.prewarmDepthMaterials = new Map();
   renderer.prewarmRenderTarget = null;
   renderer.scene = new THREE.Scene();

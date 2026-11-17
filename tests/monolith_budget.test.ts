@@ -1064,7 +1064,15 @@ const MONOLITHS: MonolithRow[] = [
     // Exact count.
     // First-person camera integration extracts the spatial-audio listener.
     // Keep the release branch ceiling ratcheted down by the same eight lines.
-    ceiling: 12193,
+    // Lowered after moving the zone feature cull-group registration into
+    // zone_feature_sweep.ts (zoneFeatureEntriesFor) beside the idle-sliced
+    // feature prebuild wiring (zone_feature_builds.ts). Exact count.
+    // Lowered again when station props and farm patches moved onto
+    // attachZoneFeature (one call instead of category, add). Exact count.
+    // Lowered again when the deferred link pacing moved into the queue
+    // admission (link_frame_ledger.ts) and the arms lost their lane argument.
+    // Exact count.
+    ceiling: 12176,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

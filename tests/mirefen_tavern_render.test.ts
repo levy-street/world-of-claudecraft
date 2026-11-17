@@ -483,6 +483,18 @@ describe('mirefen tavern painter', () => {
     expect(shell.visible).toBe(true);
   });
 
+  it('stops drawing the whole tavern past the fog, model, wall fire and dog with the shell', () => {
+    withTier('high');
+    const root = buildMirefenTavern();
+    expect(root.getObjectByName('mirefenTavernModel')).toBeTruthy();
+    const far = tavernToWorld(0, 400);
+    updateMirefenTavernShell(far.x, 20, far.z, 0, 20, 0, 1 / 60, false, 120);
+    expect(root.visible).toBe(false);
+    const near = tavernToWorld(0, 60);
+    updateMirefenTavernShell(near.x, 20, near.z, 0, 20, 0, 1 / 60, false, 120);
+    expect(root.visible).toBe(true);
+  });
+
   it('lights the hearth, the wall fire, the chandelier, the lanterns, the stage, bar and nook', () => {
     withTier('high');
     buildMirefenTavern();

@@ -12,6 +12,7 @@
 // render/wickharbor_harbor.ts).
 import * as THREE from 'three';
 import { type GaleDeckDef, galeDeckSurfaceAt } from '../sim/gale_harbor';
+import { drainBuild, type SteppedBuild } from './stepped_build_core';
 
 // a box beam from p0 to p1 (long axis along the run, yaw/pitch aligned)
 export function beamBetween(
@@ -112,9 +113,25 @@ export function buildDeckWood(
     bollards?: boolean;
   } = {},
 ): DeckWood {
+  return drainBuild(buildDeckWoodSteps(decks, terrain, waterLevel, opts));
+}
+
+/** buildDeckWood as a stepped build (stepped_build_core.ts): yields after each
+ *  deck, so a zone builder streaming in over idle slices does not pay a whole
+ *  walkway network in one piece (Palm Reach's decks were a 28 ms piece). */
+export function* buildDeckWoodSteps(
+  decks: readonly GaleDeckDef[],
+  terrain: (x: number, z: number) => number,
+  waterLevel: number,
+  opts: {
+    railAll?: boolean;
+    bollards?: boolean;
+  } = {},
+): SteppedBuild<DeckWood> {
   const planks: THREE.BufferGeometry[] = [];
   const posts: THREE.BufferGeometry[] = [];
   for (const d of decks) {
+    yield;
     const dirx = Math.sin(d.rot);
     const dirz = Math.cos(d.rot);
     const pxu = dirz; // unit across (perp) axis

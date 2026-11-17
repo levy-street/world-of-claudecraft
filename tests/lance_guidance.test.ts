@@ -8,7 +8,12 @@
 // against a copied literal.
 import { beforeEach, describe, expect, it } from 'vitest';
 import { LANCE_THRUST_RANGE } from '../src/sim/lance_balance_core';
-import { LANCE_GUIDANCE_RANGE, lanceGuidanceFor } from '../src/sim/lance_guidance';
+import {
+  LANCE_GUIDANCE_RANGE,
+  lanceGuidanceFor,
+  lanceGuidanceTarget,
+  lanceTargetInReach,
+} from '../src/sim/lance_guidance';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import type { Entity } from '../src/sim/types';
@@ -145,5 +150,77 @@ describe('lanceGuidanceFor', () => {
     const rng = JSON.stringify((sim as unknown as { rng: unknown }).rng);
     for (let i = 0; i < 20; i++) guide();
     expect(JSON.stringify((sim as unknown as { rng: unknown }).rng)).toBe(rng);
+  });
+});
+
+describe('lanceGuidanceTarget (the one-pass lookup)', () => {
+  // It replaced `lanceTargetInReach(thrust) ?? lanceTargetInReach(wide)`, two full entity
+  // walks per call, on a path that runs every client frame and per player per broadcast.
+  // The pin: over a sweep of distances across BOTH bands, for two bosses and the drill
+  // yard's effigy, it names the very same target, kind and distance as the two-call form.
+  it('names exactly what the two-call lookup names, across both bands', () => {
+    const sim = new Sim({ seed: 5, playerClass: 'warrior', autoEquip: true });
+    sim.setPlayerLevel(20);
+    const internals = sim as unknown as {
+      ctx: SimContext;
+      spawnDevBoss(t: string, x: number, z: number): number;
+    };
+    const ctx = internals.ctx;
+    const spawn = (t: string, x: number, z: number) => {
+      const e = sim.entities.get(internals.spawnDevBoss(t, x, z));
+      if (!e) throw new Error(`no ${t}`);
+      return e;
+    };
+    const set = (e: Entity, x: number, z: number) => {
+      e.pos.x = x;
+      e.pos.z = z;
+      e.pos.y = terrainHeight(x, z, sim.cfg.seed);
+      e.prevPos = { ...e.pos };
+    };
+    const a = spawn(BALGATH, 0, 390);
+    const b = spawn(BALGATH, 0, 390);
+    // Any living body serves as the effigy here: the lookup reads it by id off the army.
+    const effigy = spawn('bogtoad', 0, 390);
+    ctx.musterArmy.effigyId = effigy.id;
+    const reference = (r: number) =>
+      lanceTargetInReach(ctx, sim.player, r) ??
+      lanceTargetInReach(ctx, sim.player, LANCE_GUIDANCE_RANGE);
+    const ds = [
+      0,
+      5,
+      LANCE_THRUST_RANGE - 0.5,
+      LANCE_THRUST_RANGE,
+      LANCE_THRUST_RANGE + 0.5,
+      45,
+      LANCE_GUIDANCE_RANGE - 0.5,
+      LANCE_GUIDANCE_RANGE,
+      LANCE_GUIDANCE_RANGE + 5,
+      400,
+    ];
+    const kinds = new Set<string>();
+    let cases = 0;
+    set(sim.player, 0, 390);
+    for (const da of ds) {
+      for (const db of [da, 12, 50, 400]) {
+        for (const de of ds) {
+          set(a, da, 390);
+          set(b, 0, 390 + db);
+          set(effigy, -de, 390);
+          b.asleep = db === 50;
+          const got = lanceGuidanceTarget(ctx, sim.player, LANCE_THRUST_RANGE);
+          const want = reference(LANCE_THRUST_RANGE);
+          expect(got?.kind).toBe(want?.kind);
+          expect(got?.mob.id).toBe(want?.mob.id);
+          expect(got?.distance).toBe(want?.distance);
+          kinds.add(want ? `${want.kind}:${want.distance < LANCE_THRUST_RANGE}` : 'none');
+          cases++;
+        }
+      }
+    }
+    // The sweep reached every arm: a near and a far boss, a near and a far effigy, nothing.
+    expect([...kinds].sort()).toEqual(
+      ['boss:false', 'boss:true', 'effigy:false', 'effigy:true', 'none'].sort(),
+    );
+    expect(cases).toBe(ds.length * 4 * ds.length);
   });
 });

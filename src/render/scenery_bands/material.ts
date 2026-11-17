@@ -16,6 +16,23 @@ export function lowSceneryBandMaterial(source: THREE.Material): THREE.Material {
   });
 }
 
+/** Whether a Low band material made from `source` still matches it in every
+ *  input that picks its program or texture. Sources can change after the band
+ *  material is made: procedural leaf cards get their atlas asynchronously
+ *  (tree_gen.ts), and a band material kept across windows would otherwise
+ *  draw them untextured for the rest of the session. */
+export function lowSceneryBandMaterialCurrent(
+  material: THREE.Material,
+  source: THREE.Material,
+): boolean {
+  const band = material as THREE.MeshLambertMaterial;
+  return (
+    band.map === ((source as THREE.MeshLambertMaterial).map ?? null) &&
+    band.alphaTest === source.alphaTest &&
+    band.side === source.side
+  );
+}
+
 const DECLARATIONS = `
 attribute vec3 sceneryLocalPosition;
 attribute vec3 sceneryLocalNormal;

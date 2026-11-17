@@ -312,10 +312,11 @@ describe('the battleground field stream gates every piece on the compile gate', 
     expect(end).toBeGreaterThan(-1);
     expect(renderer.slice(start, end)).toContain('compileGate: this.worldCompileGate(),');
     // The named helper carries the same substance the inline construction did:
-    // no gate at all on a context without KHR_parallel_shader_compile, so the
-    // pieces attach direct and link at their first draw.
-    expect(renderer, 'the gate must stay absent without parallel shader compile').toContain(
-      'return this.asyncCompileSupported ? (target) => this.compileGate(target) : undefined;',
+    // no gate at all when the link-gate mode is 'none' (link_gate_mode_core.ts:
+    // no compileAsync, or neither the parallel extension nor a deferred-capable
+    // engine), so the pieces attach direct and link at their first draw.
+    expect(renderer, 'the gate must stay absent when the gates are off').toContain(
+      'return this.compileGatesSupported ? (target) => this.compileGate(target) : undefined;',
     );
   });
 });

@@ -2,11 +2,13 @@
 // plain entry objects: the fog rule, the apparent-size reach with its
 // hysteresis, and the shadow flip on state changes only.
 import { readFileSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import * as THREE from 'three';
+import { describe, expect, it, vi } from 'vitest';
 import {
   sweepZoneFeatures,
   ZONE_FEATURE_EXTENT_KEY,
   type ZoneFeatureEntry,
+  zoneFeatureEntriesFor,
   zoneFeatureEntryFor,
 } from '../src/render/zone_feature_sweep';
 import {
@@ -220,5 +222,46 @@ describe('zone feature sweep module contract', () => {
   it('flips castShadow on a state change only, never as a steady per-frame traversal', () => {
     expect(source).toContain('isZoneFeatureShadowCasting(');
     expect(source).toContain('if (casting !== entry.shadowCasting)');
+  });
+});
+
+describe('zone feature entries at attach', () => {
+  it('measures each cull group once and reports an InstancedMesh with unseeded matrices', () => {
+    const seeded = new THREE.Group();
+    seeded.name = 'seeded';
+    const placed = new THREE.InstancedMesh(
+      new THREE.BoxGeometry(),
+      new THREE.MeshBasicMaterial(),
+      2,
+    );
+    placed.setMatrixAt(0, new THREE.Matrix4().makeTranslation(10, 0, 0));
+    placed.setMatrixAt(1, new THREE.Matrix4().makeTranslation(20, 0, 0));
+    seeded.add(placed);
+    const unseeded = new THREE.Group();
+    unseeded.name = 'flock';
+    // Factory zeros (the seabird-flock failure): placements never seeded.
+    const flock = new THREE.InstancedMesh(
+      new THREE.BoxGeometry(),
+      new THREE.MeshBasicMaterial(),
+      3,
+    );
+    flock.instanceMatrix.array.fill(0);
+    unseeded.add(flock);
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const measured: string[] = [];
+    try {
+      const entries = zoneFeatureEntriesFor([seeded, unseeded], (group) => {
+        measured.push(group.name);
+        return null;
+      });
+      expect(entries.map((entry) => entry.group)).toEqual([seeded, unseeded]);
+      expect(measured).toEqual(['seeded', 'flock']);
+      expect(error).toHaveBeenCalledOnce();
+      expect(String(error.mock.calls[0][0])).toContain(
+        '"flock" holds an InstancedMesh with unseeded',
+      );
+    } finally {
+      error.mockRestore();
+    }
   });
 });

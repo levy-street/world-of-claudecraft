@@ -219,7 +219,13 @@ export interface StationPropsView {
   flames: THREE.Mesh[];
   /** Kitchens fire lights; ride the renderer's fireLights flicker budget. */
   fireLights: THREE.PointLight[];
+  /** One group per STATION_CULL_CELL_YD cell, each a zone-feature cull group
+   *  (zone_feature_sweep.ts), so a hub past the fog stops drawing. */
+  cullGroups: THREE.Group[];
 }
+
+/** Side of the square cells station props are batched and fog-culled in. */
+export const STATION_CULL_CELL_YD = 180;
 
 // Local ground normal at (x, z), from a finite-difference terrainHeight sample.
 function groundNormal(x: number, z: number, seed: number): THREE.Vector3 {
@@ -240,17 +246,32 @@ export function buildStationProps(seed: number, stations: readonly StationDef[])
   group.name = 'stationProps';
   const flames: THREE.Mesh[] = [];
   const fireLights: THREE.PointLight[] = [];
-  if (stations.length === 0) return { group, flames, fireLights };
+  const cells = new Map<string, THREE.Group>();
+  if (stations.length === 0) return { group, flames, fireLights, cullGroups: [] };
+  const cellFor = (x: number, z: number): THREE.Group => {
+    const key = `${Math.floor(x / STATION_CULL_CELL_YD)}:${Math.floor(z / STATION_CULL_CELL_YD)}`;
+    let cell = cells.get(key);
+    if (!cell) {
+      cell = new THREE.Group();
+      cell.name = `stationProps:cell:${key}`;
+      cells.set(key, cell);
+      group.add(cell);
+    }
+    return cell;
+  };
 
   const flameGeo = stationFlameGeometry();
   const usePbr = GFX.standardMaterials;
 
   // Group placements per (kind x region cell) and instance one mesh per
   // model part: 18 per-placement GLB clones (a draw per primitive each)
-  // become one draw per (kind x part x hub cluster), and the per-cluster
-  // bounds keep off-screen hubs frustum-cullable (a single world-spanning
-  // batch would draw everywhere, forever).
-  const byKind = new Map<string, { kind: StationPropKind; mats: THREE.Matrix4[] }>();
+  // become one draw per (kind x part x hub cluster), and each cluster's cell
+  // group is a fog-cull group (a single world-spanning batch would draw
+  // everywhere, forever; frustum bounds alone still drew every hub in view).
+  const byKind = new Map<
+    string,
+    { kind: StationPropKind; cell: THREE.Group; mats: THREE.Matrix4[] }
+  >();
   const holderMatrix = new THREE.Matrix4();
   const one = new THREE.Vector3(1, 1, 1);
   const pos = new THREE.Vector3();
@@ -263,10 +284,11 @@ export function buildStationProps(seed: number, stations: readonly StationDef[])
     );
     const quat = tiltQuat.multiply(yawQuat);
     holderMatrix.compose(pos, quat, one);
-    const clusterKey = `${p.kind}:${Math.floor(p.x / 180)}:${Math.floor(p.z / 180)}`;
+    const cell = cellFor(p.x, p.z);
+    const clusterKey = `${p.kind}:${cell.name}`;
     const bucket = byKind.get(clusterKey);
     if (bucket) bucket.mats.push(holderMatrix.clone());
-    else byKind.set(clusterKey, { kind: p.kind, mats: [holderMatrix.clone()] });
+    else byKind.set(clusterKey, { kind: p.kind, cell, mats: [holderMatrix.clone()] });
     if (p.kind === 'campfire') {
       const holder = new THREE.Group();
       holder.position.copy(pos);
@@ -283,12 +305,12 @@ export function buildStationProps(seed: number, stations: readonly StationDef[])
       light.position.y = FIRE_LIGHT_Y;
       holder.add(light);
       fireLights.push(light);
-      group.add(holder);
+      cell.add(holder);
     }
   }
   const matrix = new THREE.Matrix4();
-  for (const { kind, mats: matrices } of byKind.values()) {
-    addInstancedParts(group, `stationProps:${kind}`, stationTemplateParts(kind), matrices, matrix);
+  for (const { kind, cell, mats: matrices } of byKind.values()) {
+    addInstancedParts(cell, `stationProps:${kind}`, stationTemplateParts(kind), matrices, matrix);
   }
-  return { group, flames, fireLights };
+  return { group, flames, fireLights, cullGroups: [...cells.values()] };
 }

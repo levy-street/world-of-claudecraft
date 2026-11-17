@@ -20,11 +20,12 @@ import {
 import { carryGeometryLod } from './assets/geometry_lod';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
-import { buildDeckWood } from './deck_render';
+import { buildDeckWoodSteps } from './deck_render';
 import { GFX } from './gfx';
 import { activeWorldPromoted } from './promoted_scenery_gate';
 import { prepareSceneryGeometryLod } from './scenery_geometry_lod';
 import { buildStaticInstanceCells } from './static_instance_cells';
+import { drainBuild, type SteppedBuild } from './stepped_build_core';
 import { applySurfaceDetail, GREAT_TREE_BARK_DETAIL, isBarkMaterialName } from './worn_stone';
 
 export interface JungleFeaturesView {
@@ -133,8 +134,16 @@ export interface Placement {
  * its exact (x, z), so a cliff face would throw it up the wall; isCliffFace
  * rejects those the same way it rejects the palm that carried them. */
 export function reachCoconutSpots(seed: number): Placement[] {
+  return drainBuild(reachCoconutSpotsSteps(seed));
+}
+
+/** reachCoconutSpots as a stepped build: yields after each palm (its cliff
+ *  checks sample the terrain several times per cluster; one call was a 19 ms
+ *  piece of the Palm Reach build). */
+export function* reachCoconutSpotsSteps(seed: number): SteppedBuild<Placement[]> {
   const spots: Placement[] = [];
   for (const sp of reachPalmSpots(seed)) {
+    yield;
     if (hash2(sp.x, sp.z, seed + 5301) > 0.55) continue;
     const n = 2 + Math.floor(hash2(sp.z, sp.x, seed + 5311) * 2);
     for (let k = 0; k < n; k++) {
@@ -215,6 +224,18 @@ function mat(color: number, rough = 0.85): THREE.MeshStandardMaterial | THREE.Me
 }
 
 export function buildJungleFeatures(seed: number): JungleFeaturesView {
+  return drainBuild(buildJungleFeaturesSteps(seed));
+}
+
+/** buildJungleFeatures as a stepped build (stepped_build_core.ts): yields per
+ *  palm variant and baked part, per prop part, per banyan and between the
+ *  families, so the renderer's streaming prepare spreads Palm Reach over idle
+ *  slices instead of one long frame (zone_feature_builds.ts). */
+export function* buildJungleFeaturesSteps(seed: number): SteppedBuild<JungleFeaturesView> {
+  // Read once: a stepped build must not mix two answers across its slices.
+  const promotedPalms = activeWorldPromoted('reachPalms');
+  const promotedCoconuts = activeWorldPromoted('jungleCoconuts');
+  const trunksArePlacements = activeWorldPromoted('greatTrees');
   const group = new THREE.Group();
   group.name = 'jungle-features';
   const coconutCells: THREE.InstancedMesh[] = [];
@@ -239,10 +260,11 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
     mesh.computeBoundingSphere();
     group.add(mesh);
   };
-  const instanceProp = (key: ReachPropKey, spots: Placement[]): void => {
+  const instanceProp = function* (key: ReachPropKey, spots: Placement[]): SteppedBuild<void> {
     const scene = propScenes[key];
     if (!scene || spots.length === 0) return;
     for (const part of extractParts(scene)) {
+      yield;
       if (key === 'coconuts') {
         const cells = buildStaticInstanceCells(part.geo, part.mat, spots, GFX.coconutCellSize);
         coconutCells.push(...cells);
@@ -258,7 +280,7 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
   // so the strand you walk matches the one the sim blocks. Skipped whole when
   // the document owns the strand as placements: drawing it here as well put a
   // second, unpickable palm inside every movable one. ---
-  if (!activeWorldPromoted('reachPalms')) {
+  if (!promotedPalms) {
     const byVariant: ReachPalm[][] = [[], [], []];
     for (const sp of reachPalmSpots(seed)) byVariant[sp.variant]?.push(sp);
     const m = new THREE.Matrix4();
@@ -266,10 +288,12 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
     const up = new THREE.Vector3(0, 1, 0);
     const v = new THREE.Vector3();
     const sc = new THREE.Vector3();
-    byVariant.forEach((list, variant) => {
+    for (const [variant, list] of byVariant.entries()) {
       const scene = palmScenes[variant];
-      if (!scene || list.length === 0) return;
+      if (!scene || list.length === 0) continue;
+      yield;
       for (const part of bakePalmParts(scene)) {
+        yield;
         const mesh = new THREE.InstancedMesh(part.geometry, part.material, list.length);
         list.forEach((sp, i) => {
           q.setFromAxisAngle(up, sp.rot);
@@ -283,12 +307,12 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
         mesh.computeBoundingSphere();
         group.add(mesh);
       }
-    });
+    }
   }
 
   // --- the fallen coconuts: clusters dropped around the palm trunks ---
   // Stands down when the document owns the coconut clusters as placements.
-  if (!activeWorldPromoted('jungleCoconuts')) instanceProp('coconuts', reachCoconutSpots(seed));
+  if (!promotedCoconuts) yield* instanceProp('coconuts', yield* reachCoconutSpotsSteps(seed));
 
   // --- the still water dressing: lily rafts and reeds on the lakes ---
   {
@@ -332,16 +356,17 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
         }
       }
     }
-    instanceProp('lilies', lilySpots);
-    instanceProp('reeds', reedSpots);
+    yield* instanceProp('lilies', lilySpots);
+    yield* instanceProp('reeds', reedSpots);
   }
 
+  yield;
   // --- the walkways: river bridges and lagoon decks on stilts, planked
   // and railed all round (the shared builder, REACH_DECKS underfoot) ---
   {
     const wood = mat(0x9a7f5e, 0.9);
     const postWood = mat(0x77604a, 0.92);
-    const { planks, posts } = buildDeckWood(
+    const { planks, posts } = yield* buildDeckWoodSteps(
       REACH_DECKS,
       (x, z) => terrainHeight(x, z, seed),
       WATER_LEVEL,
@@ -351,6 +376,7 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
     group.add(mergeBoxes(posts, postWood));
   }
 
+  yield;
   // --- the banyans: the twisted elder regrown lush, hung with vines ---
   {
     const lushened = new Map<string, THREE.Material>();
@@ -377,9 +403,9 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
     // stands down then: the buttress roots and the vine curtain are ground
     // dressing with no placement of their own, and a banyan without them reads
     // as a plain elder set down on the sand.
-    const trunksArePlacements = activeWorldPromoted('greatTrees');
     if (greatTreeScene) {
       for (const t of trees) {
+        yield;
         const y = terrainHeight(t.x, t.z, seed);
         if (y < WATER_LEVEL) continue;
         const scale = t.r * (2.5 + hash2(t.x, t.z, seed + 5201) * 0.5);
@@ -459,6 +485,7 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
     });
   }
 
+  yield;
   if (GFX.sceneryGeometryLodDistance > 0) prepareSceneryGeometryLod(group);
   return {
     group,

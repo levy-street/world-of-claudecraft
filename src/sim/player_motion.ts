@@ -200,11 +200,17 @@ export function swimSteerRate(steer: number | undefined): number {
   return SWIM_STEER_MIN_RATE + (1 - SWIM_STEER_MIN_RATE) * t;
 }
 
-/** True when the body is swimming with its feet BELOW the surface line. */
+/** True when the body is swimming with its feet BELOW the surface line.
+ *
+ *  The water line is tested BEFORE the ground is sampled: on dry land (no water
+ *  here, level -Infinity) or above the line the answer is false whatever the
+ *  ground, so the costly sample is skipped. The HUD's breath bar asks this every
+ *  frame, and the ground sample was most of a town frame's terrain cost. */
 export function isSubmerged(e: Entity, seed: number): boolean {
-  const ground = groundHeightAtBody(e.pos.x, e.pos.z, seed, e.pos.y);
   const level = waterLevelAt(e.pos.x, e.pos.z, seed);
-  return swimsAt(e.pos.y, ground, level) && e.pos.y < level - 0.75 - SWIM_SUBMERGE_EPS;
+  if (!(e.pos.y < level - 0.75 - SWIM_SUBMERGE_EPS)) return false;
+  const ground = groundHeightAtBody(e.pos.x, e.pos.z, seed, e.pos.y);
+  return swimsAt(e.pos.y, ground, level);
 }
 
 /** The swim test itself, over an ALREADY-sampled ground height and water level.
@@ -326,8 +332,12 @@ export function jumpMult(e: Entity): number {
 }
 
 export function isSwimming(e: Entity, seed: number): boolean {
+  // The water-line half of swimsAt first, as in isSubmerged: above it (or with
+  // no water here) the answer is false whatever the ground, so skip the sample.
+  const level = waterLevelAt(e.pos.x, e.pos.z, seed);
+  if (!(e.pos.y <= level - 0.75 + 0.15)) return false;
   const ground = groundHeightAtBody(e.pos.x, e.pos.z, seed, e.pos.y);
-  return swimsAt(e.pos.y, ground, waterLevelAt(e.pos.x, e.pos.z, seed));
+  return swimsAt(e.pos.y, ground, level);
 }
 
 export interface PlayerMotionDeps {

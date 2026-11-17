@@ -907,6 +907,8 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // post_bloom_shader_core is the host-agnostic GLSL source patch for the
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
+  // whether and how compile gates run without parallel compile (renderer.ts)
+  'src/render/link_gate_mode_core.ts',
   'src/render/courier_visual_core.ts',
   // the lantern horse's ember rates and hoof-strike weight (mount_embers.ts)
   'src/render/mount_embers_core.ts',
@@ -1413,6 +1415,8 @@ const RENDER_PURE_CORES = [
   'src/render/environment_transition_core.ts',
   'src/render/ground_tilt_core.ts',
   'src/render/grass_build_slicer_core.ts',
+  // resumable zone feature builds stepped across idle slices (zone_feature_builds.ts)
+  'src/render/stepped_build_core.ts',
   'src/render/grass_cap_collapse_core.ts',
   'src/render/grass_tuft_cards_core.ts',
   'src/render/step_smooth_core.ts',

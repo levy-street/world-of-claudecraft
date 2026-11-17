@@ -57,6 +57,8 @@ function harness(): CompileGateHarness & Record<string, unknown> {
   const renderer = Object.create(Renderer.prototype) as CompileGateHarness &
     Record<string, unknown>;
   renderer.asyncCompileSupported = true;
+  // the first-sight gates' own switch (link_gate_mode_core.ts)
+  renderer.compileGatesSupported = true;
   renderer.lifecycleGeneration = 7;
   renderer.shutdownStarted = false;
   // the shadow arm's depth-twin cache, read by every gate piece's variant settle
@@ -410,7 +412,7 @@ describe('Renderer live shader compile rejection recovery', () => {
 
   it('attaches a zone feature directly when async compile is unsupported', () => {
     const renderer = zoneFeatureHarness();
-    renderer.asyncCompileSupported = false;
+    renderer.compileGatesSupported = false;
     renderer.compileGate = () => {
       throw new Error('must not gate without async compile support');
     };
@@ -435,7 +437,7 @@ describe('Renderer live shader compile rejection recovery', () => {
     expect(ensureStart).toBeGreaterThan(-1);
     const ensureBody = rendererSource.slice(ensureStart, rendererSource.indexOf('}', ensureStart));
     expect(ensureBody).toContain(
-      'this.asyncCompileSupported ? (target) => this.compileGate(target) : undefined',
+      'this.compileGatesSupported ? (target) => this.compileGate(target) : undefined',
     );
     const dungeonSource = readFileSync(
       new URL('../src/render/dungeon.ts', import.meta.url),
@@ -1041,7 +1043,7 @@ describe('the far-bake compile gate handed to character visuals', () => {
       'private readonly farBakeGate: FarBakeGate = (target, onSettled) =>\n' +
         '    this.farBakeLane.enqueue(\n' +
         '      (settled) => this.gateSwapFlagOnCompile(target, settled),\n' +
-        '      () => onSettled(compileProof(this.asyncCompileSupported, this.webgl, target)),\n' +
+        '      () => onSettled(compileProof(this.compileGatesSupported, this.webgl, target)),\n' +
         '    );',
     );
     expect(rendererSource).toContain('private readonly farBakeLane = new SerialGateLane();');
@@ -1071,13 +1073,13 @@ describe('the far-bake compile gate handed to character visuals', () => {
         (settled) => renderer.gateSwapFlagOnCompile(target, settled),
         () =>
           onSettled(
-            compileProof(renderer.asyncCompileSupported as boolean, { properties }, target),
+            compileProof(renderer.compileGatesSupported as boolean, { properties }, target),
           ),
       );
     const settles: ((() => boolean) | undefined)[] = [];
     const material = new THREE.MeshBasicMaterial();
     const target = new THREE.Mesh(new THREE.BoxGeometry(), material);
-    renderer.asyncCompileSupported = false;
+    renderer.compileGatesSupported = false;
     farBakeGate(target, (ready) => settles.push(ready));
     await flushGate();
     expect(settles).toEqual([undefined]);
@@ -1085,7 +1087,7 @@ describe('the far-bake compile gate handed to character visuals', () => {
     expect(lane.pending).toBe(0);
     // with the extension the same gate compiles first, and its settle carries a proof to
     // read (false here: nothing recorded a linked program for the target)
-    renderer.asyncCompileSupported = true;
+    renderer.compileGatesSupported = true;
     farBakeGate(target, (ready) => settles.push(ready));
     await flushGate();
     await flushGate();

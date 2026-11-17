@@ -56,7 +56,7 @@ describe('constrained renderer integration', () => {
 
     expect(source).toContain('this.webgl.shadowMap.enabled = GFX.dynamicShadows;');
     expect(source).toContain('sun.castShadow = GFX.dynamicShadows;');
-    expect(source).toContain('shadowArm: () => GFX.dynamicShadows && this.asyncCompileSupported,');
+    expect(source).toContain('shadowArm: () => GFX.dynamicShadows && this.compileGatesSupported,');
     expect(prewarmMethod).toBeGreaterThanOrEqual(0);
     expect(prewarmGuard).toBeGreaterThan(prewarmMethod);
     expect(prewarmGuard).toBeLessThan(prewarmTraversal);
@@ -95,7 +95,7 @@ describe('constrained renderer integration', () => {
     }
     // sun.castShadow is assigned GFX.dynamicShadows and never reassigned, so the
     // prewarm gate above pins the same policy through the static preset knob.
-    expect(source).toContain('shadowArm: () => GFX.dynamicShadows && this.asyncCompileSupported,');
+    expect(source).toContain('shadowArm: () => GFX.dynamicShadows && this.compileGatesSupported,');
     expect(source).toContain('if (this.lowGfx && !this.sun.castShadow) return;');
     // The gather-node view runs its shadow shed off sun.castShadow itself (it
     // reads the flag inside update, never the governor), at both frame sites.

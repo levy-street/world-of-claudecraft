@@ -37,6 +37,7 @@ import { cloneGeometryForBake } from './geometry_bake_clone';
 import { GFX, surfaceMat } from './gfx';
 import { activeWorldPromoted } from './promoted_scenery_gate';
 import { MIST_DRIFT_AMPLITUDE, SEA_LIGHT_RAYS, SEA_MIST_BANKS } from './sea_mist_core';
+import { drainBuild, type SteppedBuild } from './stepped_build_core';
 import {
   applySurfaceDetail,
   applyWornStone,
@@ -169,6 +170,14 @@ export interface Placements {
 }
 
 export function placeFlora(seed: number): Placements {
+  return drainBuild(placeFloraSteps(seed));
+}
+
+/** placeFlora as a stepped build: yields after each placement grid column, so
+ *  a streaming prepare can spread it over idle slices (stepped_build_core.ts).
+ *  Nothing between yields reads the clock, so the placements are identical
+ *  however the slices fall. */
+export function* placeFloraSteps(seed: number): SteppedBuild<Placements> {
   const out: Placements = {
     mushrooms: [],
     crystals: [],
@@ -191,57 +200,13 @@ export function placeFlora(seed: number): Placements {
     return y;
   };
 
-  const pickTint = (table: number[], r: number): number =>
-    table[Math.floor(r * 997) % table.length];
-
-  // --- mushrooms + crystals + flowers on the main hash grid ---
-  for (let gx = -172; gx <= 172; gx += GRID_STEP) {
-    for (let gz = REALM_ZONE.zMin + 8; gz <= REALM_ZONE.zMax - 10; gz += GRID_STEP) {
-      const r = hash2(gx, gz, seed + 201);
-      const ox = (hash2(gx, gz, seed + 211) - 0.5) * GRID_STEP;
-      const oz = (hash2(gx, gz, seed + 221) - 0.5) * GRID_STEP;
-      const x = gx + ox,
-        z = gz + oz;
-      const dRoad = roadDistance(x, z);
-      const y = usable(x, z, 4.5);
-      if (y === null) continue;
-
-      const rot = hash2(gx, gz, seed + 231) * Math.PI * 2;
-      const variant = hash2(gx, gz, seed + 241) < 0.5 ? 0 : 1;
-      const area = areaAt(x, z, dRoad);
-      const shroomTint = pickTint(MUSHROOM_AREA_TINTS[area], r);
-      // giants read washed-out under pale tints: deepen theirs toward the hue
-      const giantTint = (() => {
-        const col = new THREE.Color(shroomTint);
-        const hsl = { h: 0, s: 0, l: 0 };
-        col.getHSL(hsl);
-        col.setHSL(hsl.h, Math.min(1, hsl.s * 1.9 + 0.12), Math.max(0.42, hsl.l * 0.82));
-        return col.getHex();
-      })();
-      const inShroomCountry = area === 'deep' || area === 'path';
-      const inCrystalCountry = area === 'shallows' || area === 'court';
-
-      const pushShroom = (scale: number) => {
-        // spore rings retired with the other small mushrooms (user pass,
-        // 2026-07): giants stand alone now
-        out.mushrooms.push({
-          x,
-          z,
-          y,
-          scale,
-          rot,
-          variant,
-          tint: scale >= 3.2 ? giantTint : shroomTint,
-        });
-      };
-
-      // Mushroom scatter fully retired (user pass, 2026-07): the hand-placed
-      // village giants carry the mushroom identity now.
-
-      // (duskbell flowers and starbuds retired in the same pass: the sprig
-      // silhouettes read as unfinished next to the modeled flora set)
-    }
-  }
+  // The main hash grid (mushrooms, crystals, duskbells, starbuds) is retired:
+  // every push in it was removed in the 2026-07 user passes (the hand-placed
+  // village giants and the generated crystal assets carry those identities),
+  // but the loop kept sampling road distance and terrain height for each of
+  // its thousands of cells, about a quarter of this zone's build on the
+  // streaming path, for nothing. Removing it left the placements byte-identical
+  // (checked across four seeds when it went).
 
   // (crystal formations: replaced by generated crystal assets, see decorProps)
 
@@ -253,6 +218,7 @@ export function placeFlora(seed: number): Placements {
   {
     const STONE_TINTS = [0x9aa0a6, 0x8b9096, 0xa8adb2, 0x7f8489];
     for (let gx = -168; gx <= 168; gx += 10) {
+      yield;
       for (let gz = REALM_ZONE.zMin + 16; gz <= REALM_ZONE.zMax - 20; gz += 10) {
         const r = hash2(gx, gz, seed + 491);
         if (r > 0.06) continue;
@@ -296,6 +262,7 @@ export function placeFlora(seed: number): Placements {
   // pile half-sunk at the waterline, stacks stand just offshore, and crest
   // teeth break the smooth silhouette. Beaches (gentle gradient) stay clean.
   for (let gx = -176; gx <= 176; gx += 5) {
+    yield;
     for (let gz = 948; gz <= 1436; gz += 5) {
       const x = gx + (hash2(gx, gz, seed + 1601) - 0.5) * 4;
       const z = gz + (hash2(gx, gz, seed + 1611) - 0.5) * 4;
@@ -665,10 +632,22 @@ export function buildRealmFlora(
   // The document may own the giants as placements (jungle_features doctrine).
   renderGreatTrees = !activeWorldPromoted('greatTrees'),
 ): RealmFloraView {
+  return drainBuild(buildRealmFloraSteps(seed, renderGreatTrees));
+}
+
+/** buildRealmFlora as a stepped build: the placement pass yields per grid
+ *  column and the build yields between its instanced families, so the
+ *  renderer's streaming prepare spreads Veiled Hollow over idle slices instead
+ *  of one long frame (renderer.ts ensureZoneFeatures). */
+export function* buildRealmFloraSteps(
+  seed: number,
+  renderGreatTrees = !activeWorldPromoted('greatTrees'),
+): SteppedBuild<RealmFloraView> {
+  const promotedBoulders = activeWorldPromoted('realmBoulders');
   const group = new THREE.Group();
   group.name = 'realm-flora';
   const glowLights: THREE.PointLight[] = [];
-  const spots = placeFlora(seed);
+  const spots = yield* placeFloraSteps(seed);
   const pulsing: { mat: THREE.MeshStandardMaterial | THREE.MeshLambertMaterial; base: number }[] =
     [];
 
@@ -722,6 +701,7 @@ export function buildRealmFlora(
     if (!parts) continue;
     const list = spots.mushrooms.filter((sp) => sp.variant === variant);
     for (const part of parts) {
+      yield;
       const mat = part.material.clone() as THREE.MeshStandardMaterial;
       if ('emissive' in mat) {
         mat.emissive = new THREE.Color(variant === 0 ? 0xff8fca : 0x8fe8d8);
@@ -777,6 +757,8 @@ export function buildRealmFlora(
     }
   }
 
+  yield;
+
   // --- crystals: dim faceted shell for depth, bright core for the glow,
   // both rooted into the ground and leaned with the slope ---
   const shellGeo = perFaceShade(crystalShellGeo(), 0.28, seed + 611);
@@ -807,6 +789,8 @@ export function buildRealmFlora(
   });
   instance(coreGeo, coreMat, spots.crystals, { sink: 0.28, tinted: true, leanInto: true });
 
+  yield;
+
   // --- duskbell flowers, four colorways ---
   const flowerGeo = duskbellGeo();
   for (let colorway = 0; colorway < FLOWER_TINTS.length; colorway++) {
@@ -831,6 +815,8 @@ export function buildRealmFlora(
     );
   }
 
+  yield;
+
   // --- weeping willows on the lakeshores ---
   const willow = willowGeo();
   instance(
@@ -845,6 +831,8 @@ export function buildRealmFlora(
     spots.willows,
     { castShadow: true },
   );
+
+  yield;
 
   // --- blossom trees, two pinks ---
   const blossom = blossomGeo();
@@ -869,6 +857,8 @@ export function buildRealmFlora(
     );
   }
 
+  yield;
+
   // --- boulders (bundled rock, natural stone; per-spot grey tints) ---
   const boulderParts = loadedParts.get(BOULDER_URL);
   if (boulderParts) {
@@ -886,10 +876,12 @@ export function buildRealmFlora(
       // Stands down when the document owns the boulders as placements (the
       // promoted-scenery contract; the promoted copies are the plain kit
       // rock without the granite regrade, the same rock the catalog places).
-      if (!activeWorldPromoted('realmBoulders'))
+      if (!promotedBoulders)
         instance(part.geometry, mat, spots.boulders, { sink: 0.12, castShadow: true });
     }
   }
+
+  yield;
 
   // --- the rugged coast: dark weathered rocks at the cliff bases, offshore
   // stacks, and a foam ring of breaking surf at each stack's foot ---
@@ -901,6 +893,7 @@ export function buildRealmFlora(
       const rocks = spots.seaRocks.filter((sp) => sp.variant === variant);
       const stacks = spots.seaStacks.filter((sp) => sp.variant === variant);
       for (const part of parts) {
+        yield;
         const mat = part.material.clone() as THREE.MeshStandardMaterial;
         if ('color' in mat) mat.color.multiply(new THREE.Color(SEA_STONE));
         if ('roughness' in mat) mat.roughness = 0.95;
@@ -953,6 +946,8 @@ export function buildRealmFlora(
   // bars under the dusk grade and poured straight at the new shrine; a real
   // animated falls can return as a water.ts feature)
 
+  yield;
+
   // The ocean's atmosphere: low mist banks over the far water, soft light
   // rays leaning from the sky, and a distant flock tracing slow circles.
   // All render-only sprites and primitives; they gently veil what lies
@@ -1003,6 +998,7 @@ export function buildRealmFlora(
         seaDrift.push({ mesh: mist, baseX: mx, speed: 0.4 + (Math.abs(mx) % 7) * 0.09 });
         group.add(mist);
       }
+      yield;
       // light rays: tall additive streaks leaning sunward over the water
       const rayCanvas = document.createElement('canvas');
       rayCanvas.width = 32;
@@ -1039,6 +1035,7 @@ export function buildRealmFlora(
           group.add(ray);
         }
       }
+      yield;
       // the horizon cloud bank: big painterly cumulus stacked low over the
       // the distant flock: simple chevron birds circling over the sound
       const wing = new THREE.BufferGeometry();
@@ -1087,6 +1084,8 @@ export function buildRealmFlora(
     }
   }
 
+  yield;
+
   // The great tree of Eldershine, rising over the town square. Position and
   // trunk radius come from REALM_PROPS.greatTrees: the same record the sim's
   // collision grid consumes, so the visual and the collider never drift.
@@ -1128,6 +1127,8 @@ export function buildRealmFlora(
     glowLights.push(canopyLight);
     group.add(canopyLight);
   }
+
+  yield;
 
   // Glow lights at the largest features (deterministic pick: the biggest
   // scales are the giants). They join the renderer's fireLights budget.

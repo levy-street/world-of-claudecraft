@@ -7,6 +7,7 @@ import {
   type GpuWorkAdmission,
   type GpuWorkAdmissionCandidate,
   isGpuQueueShutdown,
+  runningGpuWorkLabel,
 } from '../src/render/background_gpu_queue';
 import { withHiddenPrewarmGroups } from '../src/render/prewarm_pass';
 
@@ -1751,6 +1752,94 @@ describe('createBackgroundGpuQueue admission', () => {
       await settle();
     }
     expect(gate.seen.map((candidate) => candidate.deferredFrames)).toEqual([1, 2]);
+  });
+
+  it('names the running unit during its synchronous start only', async () => {
+    // A compile arm reads this to say which unit kind issued a link
+    // (link_frame_ledger.ts): a tail, a settled unit or a throw must not
+    // leave a label behind for an unrelated link to be charged to.
+    const queue = createBackgroundGpuQueue();
+    const seen: Array<string | null> = [];
+    let tailLabel: string | null | undefined;
+    await queue.run(
+      async () => {
+        seen.push(runningGpuWorkLabel());
+        await Promise.resolve();
+        tailLabel = runningGpuWorkLabel();
+      },
+      GPU_WORK_PRIORITY.LIVE_VIEW,
+      'live-gate:wolf',
+    );
+    await expect(
+      queue.run(
+        () => {
+          seen.push(runningGpuWorkLabel());
+          throw new Error('boom');
+        },
+        GPU_WORK_PRIORITY.LIVE_VIEW,
+        'live-gate:boom',
+      ),
+    ).rejects.toThrow('boom');
+    expect(seen).toEqual(['live-gate:wolf', 'live-gate:boom']);
+    expect(tailLabel).toBeNull();
+    expect(runningGpuWorkLabel()).toBeNull();
+  });
+
+  it('tells the admission each frame, the first one included', () => {
+    const gate = probe(() => true);
+    let frames = 0;
+    gate.admission.noteFrame = () => {
+      frames++;
+    };
+    const queue = createBackgroundGpuQueue({ admission: gate.admission });
+    queue.noteFrame(0);
+    queue.noteFrame(16);
+    queue.noteFrame(32);
+    expect(frames).toBe(3);
+  });
+
+  it('calls frameEnded in a task after the frame only when noteFrame asks, then reconsiders', async () => {
+    // The deferred link pacing holds a linking unit through the frame's task
+    // (link_frame_ledger.ts): the hop after the frame is what lets it start in
+    // the gap before the next frame instead of in front of this one's present.
+    let frameOpen = false;
+    let asks = false;
+    const ended: number[] = [];
+    const gate = probe(() => !frameOpen);
+    gate.admission.noteFrame = () => {
+      frameOpen = asks;
+      return asks;
+    };
+    gate.admission.frameEnded = () => {
+      frameOpen = false;
+      ended.push(ended.length);
+    };
+    const hops: Array<() => void> = [];
+    const queue = createBackgroundGpuQueue({
+      admission: gate.admission,
+      afterFrame: (fn) => hops.push(fn),
+    });
+    queue.noteFrame(0);
+    expect(hops).toHaveLength(0); // not asked
+
+    asks = true;
+    queue.noteFrame(16);
+    queue.noteFrame(17); // a second frame before the hop ran: one hop only
+    expect(hops).toHaveLength(1);
+    const ran: string[] = [];
+    const unit = queue.run(
+      () => {
+        ran.push('link');
+      },
+      GPU_WORK_PRIORITY.LIVE_VIEW,
+      'live-gate:wolf',
+    );
+    await settle();
+    expect(ran).toEqual([]); // held through the frame's task
+    hops.splice(0)[0]();
+    await unit;
+    expect(ended).toEqual([0]);
+    expect(ran).toEqual(['link']);
   });
 
   it('ages a refusal by default, with no agesDeferral installed', async () => {

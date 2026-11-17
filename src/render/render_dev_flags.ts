@@ -111,6 +111,14 @@
 //                  per-query cost and is fingerprint-grade, and it joins the
 //                  context's enabled extension set, so a session under this
 //                  flag is not a warm-cache twin of one without it.
+//   ?linkgate=off|deferred - the compile-gate mode on a context without
+//                  KHR_parallel_shader_compile (link_gate_mode_core.ts): off
+//                  turns every gate off there (the old behaviour), deferred
+//                  forces deferred gates on any engine. Measurement only.
+//   ?linkfence=off - deferred mode without its link fences (link_fence_proof.ts):
+//                  gates settle on three's own answer again. Measurement only.
+
+import { type LinkGateOverride, parseLinkGateOverride } from './link_gate_mode_core';
 
 /**
  * Sectors per axis each blade-grass pool splits its slot grid into. Four is
@@ -208,6 +216,29 @@ const postShedPin = ((): number | null => {
  *  otherwise not a number. */
 export function postShedLevelPin(): number | null {
   return postShedPin;
+}
+
+const linkGate = ((): LinkGateOverride => {
+  if (typeof location === 'undefined') return null;
+  return parseLinkGateOverride(new URLSearchParams(location.search).get('linkgate'));
+})();
+
+const linkFenceOff = ((): boolean => {
+  if (typeof location === 'undefined') return false;
+  return new URLSearchParams(location.search).get('linkfence') === 'off';
+})();
+
+/** True under `?linkfence=off`: deferred mode skips its link fences, for an A/B
+ *  of what the fences cost against what they prove (link_fence_proof.ts). */
+export function linkFenceDisabled(): boolean {
+  return linkFenceOff;
+}
+
+/** `?linkgate=off` turns the compile gates off on a context without the parallel
+ *  compile extension (the old behaviour); `?linkgate=deferred` forces deferred
+ *  gates on any engine. Measurement only (link_gate_mode_core.ts). */
+export function linkGateOverride(): LinkGateOverride {
+  return linkGate;
 }
 
 const gpuTimer = ((): boolean => {

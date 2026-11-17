@@ -253,6 +253,9 @@ export interface FarmPatchPropsView {
   /** bedId to its world seat, so the per-viewer half and the event flourishes
    *  never re-sample the terrain. */
   seats: Map<string, FarmBedSeat>;
+  /** One group per patch (its beds and its bin), each a zone-feature cull group
+   *  (zone_feature_sweep.ts), so a garden past the fog stops drawing. */
+  cullGroups: THREE.Group[];
 }
 
 /**
@@ -270,7 +273,8 @@ export function buildFarmPatchProps(
   // The editor's live bed drag re-seats the crops through this same map
   // (editor_api/moved_object_preview.ts), so a plot rebuilt later lands on it.
   group.userData.farmBedSeats = seats;
-  if (patches.length === 0) return { group, seats };
+  const cullGroups: THREE.Group[] = [];
+  if (patches.length === 0) return { group, seats, cullGroups };
 
   const matrix = new THREE.Matrix4();
   const holder = new THREE.Matrix4();
@@ -281,6 +285,10 @@ export function buildFarmPatchProps(
   const tint = new THREE.Color();
 
   for (const patch of patches) {
+    const patchGroup = new THREE.Group();
+    patchGroup.name = `farmPatches:patch:${patch.id}`;
+    group.add(patchGroup);
+    cullGroups.push(patchGroup);
     const palette = farmBiomePalette(patch.zoneId);
     const bedMatrices: THREE.Matrix4[] = [];
     for (const bed of patch.beds) {
@@ -305,7 +313,7 @@ export function buildFarmPatchProps(
       bedMatrices.push(holder.clone());
     }
     addInstancedParts(
-      group,
+      patchGroup,
       `farmPatches:bed:${patch.id}`,
       templateParts(FARM_BED_MODEL_URL, BED_HEIGHT, 0x8a6a4a),
       bedMatrices,
@@ -315,7 +323,7 @@ export function buildFarmPatchProps(
     // The editor's live preview addresses a bed's instance by its id: a map
     // that deleted a bed builds fewer instances than the content table.
     const bedIds = patch.beds.map((bed) => bed.id);
-    for (const child of group.children) {
+    for (const child of patchGroup.children) {
       if (child.name === `farmPatches:bed:${patch.id}`) child.userData.farmBedIds = bedIds;
     }
 
@@ -329,7 +337,7 @@ export function buildFarmPatchProps(
     pos.set(bin.x, binY, bin.z);
     holder.compose(pos, binQuat, one);
     addInstancedParts(
-      group,
+      patchGroup,
       `farmPatches:bin:${patch.id}`,
       templateParts(FARM_COMPOST_BIN_MODEL_URL, BIN_HEIGHT, 0x6f5a3e),
       [holder.clone()],
@@ -337,7 +345,7 @@ export function buildFarmPatchProps(
       tint.setHex(palette.wood),
     );
   }
-  return { group, seats };
+  return { group, seats, cullGroups };
 }
 
 /** One placed harvest feast's table meshes (Phase 12, the shared feast). A

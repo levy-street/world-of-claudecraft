@@ -79,12 +79,15 @@ import { occluderFadesDisabled } from './occluder_fade_core';
 import { isPaintedTownRebuildBuilding } from './painted_towns';
 import { type PropCellBounds, propCellKey, updatePropCell } from './prop_cell_core';
 import {
+  livePropCullTargets,
   newPropCullPass,
   type PropCullBounds,
   type PropCullRevealState,
+  type PropLiveCullable,
   propCullKey,
   propRevealRoots,
   updatePropCullables,
+  updatePropLiveCullables,
 } from './prop_cull_core';
 import type { RevealGateCore } from './reveal_gate_core';
 import {
@@ -102,6 +105,7 @@ import {
   type TransportShipView,
   transportShipPrewarmParts,
 } from './transport_ship';
+import { VisibleChildrenGroup } from './visible_children_group';
 import { buildWickharborHarbor, wickharborHarborPrewarmParts } from './wickharbor_harbor';
 import { buildWickharborWharf, wickharborWharfPrewarmParts } from './wickharbor_wharf';
 import { applySurfaceDetail, type WornFamilyPick, wornFamilyFor } from './worn_stone';
@@ -1106,6 +1110,18 @@ export function buildPropMaterialPrewarmGroup(): THREE.Group {
   }
   // ...and a sailing ship's wake and bow splash (ship_wake.ts): one points program
   for (const points of shipWakePrewarmParts()) place(points);
+  // ...and both kinds of live flame the props view culls by distance (prop_cull_core
+  // livePropCullTargets): a culled fire no longer links at entry from across the world,
+  // so the built-in world's legacy lathe and the shader flame with its core link here,
+  // each from its own builder so every program-key input matches the live one
+  place(
+    buildLegacyCampfireFlame(legacyCampfireFlameGeometry(), {
+      color: 0xffaa33,
+      emissive: 0xff6600,
+      emissiveIntensity: 1.4,
+    }),
+  );
+  place(buildCampfireFlame().flame);
   return group;
 }
 
@@ -1427,7 +1443,10 @@ export function buildProps(
   livePropMeshMatKeys.clear();
   livePropInstancedMatKeys.clear();
   const seed = world.cfg.seed;
-  const group = new THREE.Group();
+  // Most of its children are distance-culled at any moment (794 of 1,004 in
+  // town on the phone proxy), and the stock walk visited all 3,000-odd nodes
+  // under them every frame; this one skips a hidden child's subtree.
+  const group = new VisibleChildrenGroup({ walkHiddenOnce: true });
   const flames: THREE.Mesh[] = [];
   // Meshes the far-cell bake must never absorb because the renderer animates
   // them live (campfire flames, windmill sails): baking one freezes its pose
@@ -2753,6 +2772,17 @@ export function buildProps(
   const farCells = GFX.constrainedMemory ? [] : buildFarPropCells(group, hideables);
   const farCellsByKey = new Map(farCells.map((cell) => [cell.key, cell]));
   const cullablesByKey = new Map(cullables.map((cullable) => [cullable.key, cullable]));
+  // Live flames no hideable carries (the tavern's hearth and wall fires, the delve
+  // braziers) cull by distance too (prop_cull_core livePropCullTargets): their points
+  // are fixed, so each is read once here.
+  group.updateMatrixWorld(true);
+  const hideableGroups = new Set<THREE.Object3D>(hideables.map((h) => h.group));
+  const liveCullables: PropLiveCullable[] = livePropCullTargets(flames, hideableGroups, group).map(
+    (flame) => {
+      const at = flame.getWorldPosition(new THREE.Vector3());
+      return { x: at.x, z: at.z, obj: flame };
+    },
+  );
   prepareSceneryDetailRoot(group);
   const cullPass = newPropCullPass();
   let revealGate: RevealGateCore | null = null;
@@ -2805,6 +2835,7 @@ export function buildProps(
       }
       updateHarborHouseShell(camX, camY, camZ, eyeX, eyeY, eyeZ, dt, reducedMotion, structureFar);
       updateMirefenTavernShell(camX, camY, camZ, eyeX, eyeY, eyeZ, dt, reducedMotion, structureFar);
+      updatePropLiveCullables(liveCullables, cullX, cullZ, structureFar);
       // Band fog cull (prop_cull_core): a band's first reveal on a walking
       // approach holds until the gate has linked its programs, and an arrival
       // among the bands holds too, with its compiles submitted at the imminent

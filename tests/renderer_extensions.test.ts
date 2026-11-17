@@ -109,25 +109,33 @@ describe('the renderer sweeps its context before its first GPU work', () => {
 
   it('derives asyncCompileSupported from the sweep, never from compileAsync alone', () => {
     // The sweep's ordering pin above cannot see WHAT the renderer does with
-    // the answer, and that is the load-bearing half: a session that keeps
-    // compileAsync but drops `.parallelCompile` would gate every streamed
-    // piece on a call that never resolves off-thread, on exactly the hardware
-    // the gates exist to protect. Pinned as the whole assignment, inside a
-    // bounded slice, so neither half can be dropped in silence.
+    // the answer, and that is the load-bearing half. The gates now run in one
+    // of three modes (link_gate_mode_core.ts, its own contract test): with the
+    // parallel compile, deferred on a Chromium context without it (its GPU
+    // process links behind the command buffer, measured on a phone), or off.
+    // Pinned here: the mode is resolved from BOTH compileAsync and the
+    // watching sweep's answer, and both switches are derived from that mode
+    // and nothing else, so neither input can be dropped in silence: the bulk
+    // lanes (boot manifest, zone prewarm) only with the parallel compile, the
+    // first-sight gates in either mode.
     const source = rendererSource();
-    const at = source.indexOf('this.asyncCompileSupported =');
+    const at = source.indexOf('this.linkGateMode = resolveLinkGateMode({');
     expect(at).toBeGreaterThan(-1);
-    const end = source.indexOf(';', at);
+    const end = source.indexOf('});', at);
     expect(end).toBeGreaterThan(at);
-    const assignment = source.slice(at, end);
-    expect(assignment).toContain("typeof this.webgl.compileAsync === 'function'");
+    const resolution = source.slice(at, end);
+    expect(resolution).toContain("compileAsync: typeof this.webgl.compileAsync === 'function'");
     // The sweeping call is the WATCHING one: a renderer that swept without
     // installing the drift watch would be back to the silent failure, so the
     // two are one function and the pin names it.
-    expect(assignment).toContain('enableAndWatchRendererExtensions(this.webgl).parallelCompile');
+    expect(resolution).toContain(
+      'parallelExtension: enableAndWatchRendererExtensions(this.webgl).parallelCompile',
+    );
     expect(source, 'the renderer must not sweep without the drift watch').not.toContain(
       'enableRendererExtensions(',
     );
+    expect(source).toContain("this.asyncCompileSupported = this.linkGateMode === 'parallel';");
+    expect(source).toContain("this.compileGatesSupported = this.linkGateMode !== 'none';");
     // One derivation only: a second, laxer assignment elsewhere would win.
     expect(source.split('this.asyncCompileSupported =').length - 1).toBe(2);
     expect(source).toContain('this.asyncCompileSupported = false;');

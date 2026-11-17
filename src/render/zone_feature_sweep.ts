@@ -11,6 +11,7 @@ import { GFX } from './gfx';
 import { updateSceneryGeometryLod } from './scenery_geometry_lod';
 import {
   type FeatureFootprint,
+  hasUnseededInstanceMatrix,
   isZoneFeatureInReach,
   isZoneFeatureInRect,
   isZoneFeatureShadowCasting,
@@ -58,6 +59,35 @@ export function zoneFeatureEntryFor(
     shadowCasting: true,
     shadowCasters: null,
   };
+}
+
+/**
+ * The sweep entries of one attached feature view: each of its cull groups, or
+ * the view's own group. A view spanning several regions registers each child
+ * instead of the whole group, because one world-wide footprint can never be
+ * culled (water-flora was 10.96M triangles submitted from every realm).
+ * Footprints are measured ONCE here, at attach, so an InstancedMesh whose
+ * matrices are still factory zeros poisons the measurement silently (the
+ * seabird flock parked a footprint at the world origin this way): it is
+ * reported, and the entry is registered as measured.
+ */
+export function zoneFeatureEntriesFor(
+  groups: readonly THREE.Group[],
+  measure: (group: THREE.Group) => FeatureFootprint | null,
+): ZoneFeatureEntry[] {
+  return groups.map((group) => {
+    group.traverse((obj) => {
+      const inst = obj as THREE.InstancedMesh;
+      if (!inst.isInstancedMesh) return;
+      if (hasUnseededInstanceMatrix(inst.instanceMatrix.array, inst.count)) {
+        console.error(
+          `attachZoneFeature: "${group.name}" holds an InstancedMesh with unseeded ` +
+            'instance matrices; seed placements before attach or its cull footprint is wrong',
+        );
+      }
+    });
+    return zoneFeatureEntryFor(group, measure(group));
+  });
 }
 
 /**

@@ -51,6 +51,8 @@ type CompileRoot = (root: THREE.Object3D) => Promise<void>;
 const colourArm =
   (host: CompileArmHost): CompileRoot =>
   (root) =>
+    // A bulk lane: a waiting reveal still links first, by the queue's
+    // priority order (link_frame_ledger.ts).
     linkColorPrograms(host, root, false);
 
 /** One unit linking `root` through the colour arm (the canvas variant: the

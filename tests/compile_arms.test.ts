@@ -5,16 +5,29 @@
 
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { createBackgroundGpuQueue, GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
 import {
   type CompileArmHost,
   colorArmTargets,
   linkColorPrograms,
   linkShadowPrograms,
+  releaseCompileArmLinkPacing,
   runColorArm,
   runShadowArm,
+  setCompileArmLinkPacing,
   setCompileArmObserver,
   underRenderTarget,
 } from '../src/render/compile_arms';
+import {
+  GL_SIGNALED,
+  LINK_FENCE_POLL_MS,
+  LINK_FENCE_SLOW_MS,
+} from '../src/render/link_fence_proof';
+import {
+  armLinkPacing,
+  linkPacingStats,
+  resetLinkPacingForTests,
+} from '../src/render/link_frame_ledger';
 
 interface Stub {
   host: CompileArmHost;
@@ -28,7 +41,9 @@ interface Stub {
   settle: () => void;
 }
 
-function stub(options: { offscreen?: boolean; shadowArm?: boolean; defer?: boolean } = {}): Stub {
+function stub(
+  options: { offscreen?: boolean; shadowArm?: boolean; defer?: boolean; links?: boolean } = {},
+): Stub {
   const log: string[] = [];
   const liveTarget = { name: 'live' } as unknown as THREE.WebGLRenderTarget;
   const offscreenTarget = { name: 'offscreen' } as unknown as THREE.WebGLRenderTarget;
@@ -44,8 +59,11 @@ function stub(options: { offscreen?: boolean; shadowArm?: boolean; defer?: boole
   // frames later, so anything the arm restores AFTER the await is restored
   // while live frames are already drawing.
   const pending: Array<() => void> = [];
+  // Every compile links one new program, as a first sight does.
+  const programs: unknown[] = [];
   const compileAsync = vi.fn((root: THREE.Object3D, cam: THREE.Camera, target: THREE.Scene) => {
     log.push(`compile:${cam.name}:fog=${target.fog ? 'on' : 'off'}:target=${targetName()}`);
+    if (options.links ?? true) programs.push({});
     if (!options.defer) return Promise.resolve(root);
     return new Promise<THREE.Object3D>((resolve) => {
       pending.push(() => resolve(root));
@@ -59,6 +77,7 @@ function stub(options: { offscreen?: boolean; shadowArm?: boolean; defer?: boole
         log.push(`target:${targetName()}`);
       },
       compileAsync,
+      info: { programs },
     }),
     camera: () => camera,
     scene: () => scene,
@@ -97,6 +116,8 @@ function meshRoot(): { root: THREE.Group; meshes: THREE.Mesh[] } {
 // leave it behind for the next.
 afterEach(() => {
   setCompileArmObserver(null);
+  setCompileArmLinkPacing(false);
+  vi.useRealTimers();
 });
 
 describe('colour arm', () => {
@@ -329,5 +350,188 @@ describe('compile arm observer', () => {
     await linkShadowPrograms(live.host, root);
     expect(seen).toEqual(['shadow']);
     expect(live.compileAsync).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('deferred-mode link proof', () => {
+  /** A context whose fence signals only when told; its calls join the log. */
+  function withFence(s: Stub) {
+    let signalled = false;
+    s.host.context = () =>
+      ({
+        getContextAttributes: () => null,
+        getExtension: () => null,
+        fenceSync: () => {
+          s.log.push('fence');
+          return {};
+        },
+        getSyncParameter: () => (signalled ? GL_SIGNALED : 0),
+        deleteSync: () => {},
+        flush: () => {},
+      }) as never;
+    return () => {
+      signalled = true;
+    };
+  }
+
+  it('settles only once a fence issued right behind the compile signals', async () => {
+    // Without the parallel extension three's compileAsync resolves on its
+    // first poll while the link is still queued: the fence is the only proof.
+    vi.useFakeTimers();
+    const s = stub({ offscreen: false });
+    const signal = withFence(s);
+    setCompileArmLinkPacing(true, {});
+    armLinkPacing(); // the world revealed
+    let done = false;
+    void linkColorPrograms(s.host, meshRoot().root, false).then(() => {
+      done = true;
+    });
+    await vi.advanceTimersByTimeAsync(LINK_FENCE_POLL_MS * 10);
+    expect(s.log).toEqual([
+      'target:canvas',
+      'compile:world:fog=on:target=canvas',
+      'target:live',
+      'fence',
+    ]);
+    expect(done).toBe(false);
+    signal();
+    await vi.advanceTimersByTimeAsync(LINK_FENCE_POLL_MS);
+    expect(done).toBe(true);
+  });
+
+  it('a fence that takes longer than the slow mark still holds the link unsettled', async () => {
+    // The old 4 s cap settled the arm unproved, so the gate's settle recorded
+    // the programs as linked while they could still be queued.
+    vi.useFakeTimers();
+    const s = stub({ offscreen: false });
+    const signal = withFence(s);
+    setCompileArmLinkPacing(true, {});
+    armLinkPacing();
+    let done = false;
+    void linkColorPrograms(s.host, meshRoot().root, false).then(() => {
+      done = true;
+    });
+    await vi.advanceTimersByTimeAsync(LINK_FENCE_SLOW_MS * 2);
+    expect(done).toBe(false);
+    signal();
+    await vi.advanceTimersByTimeAsync(LINK_FENCE_POLL_MS);
+    expect(done).toBe(true);
+  });
+
+  it('issues no fence outside deferred mode', async () => {
+    const s = stub({ offscreen: false });
+    withFence(s);
+    await linkColorPrograms(s.host, meshRoot().root, false);
+    expect(s.log).not.toContain('fence');
+  });
+
+  it('issues no per-unit fence under the loading screen (one fence covers the boot)', async () => {
+    const s = stub({ offscreen: false });
+    withFence(s);
+    setCompileArmLinkPacing(true, {});
+    await linkColorPrograms(s.host, meshRoot().root, false);
+    expect(s.log).not.toContain('fence');
+  });
+
+  it('a renderer releases the pacer only while it still owns it', () => {
+    const first = {};
+    const second = {};
+    setCompileArmLinkPacing(true, first);
+    setCompileArmLinkPacing(true, second);
+    armLinkPacing();
+    releaseCompileArmLinkPacing(first);
+    // the newer renderer keeps its proof: the next link still fences
+    const s = stub({ offscreen: false });
+    withFence(s);
+    void linkColorPrograms(s.host, meshRoot().root, false);
+    expect(s.log).toContain('fence');
+    releaseCompileArmLinkPacing(second);
+    expect(linkPacingStats().active).toBe(false);
+    const after = stub({ offscreen: false });
+    withFence(after);
+    void linkColorPrograms(after.host, meshRoot().root, false);
+    expect(after.log).not.toContain('fence');
+  });
+
+  it('a cache hit issues no fence and waits only on the newest outstanding one', async () => {
+    vi.useFakeTimers();
+    const linker = stub({ offscreen: false });
+    const signal = withFence(linker);
+    setCompileArmLinkPacing(true, {});
+    armLinkPacing();
+    void linkColorPrograms(linker.host, meshRoot().root, false);
+    await vi.advanceTimersByTimeAsync(0);
+    // the hit (no new program) arrives while that link's fence is pending
+    const hit = stub({ offscreen: false, links: false });
+    withFence(hit);
+    let hitDone = false;
+    void linkColorPrograms(hit.host, meshRoot().root, false).then(() => {
+      hitDone = true;
+    });
+    await vi.advanceTimersByTimeAsync(LINK_FENCE_POLL_MS * 20);
+    expect(hit.log).not.toContain('fence');
+    expect(hitDone).toBe(false);
+    signal();
+    await vi.advanceTimersByTimeAsync(LINK_FENCE_POLL_MS * 30);
+    expect(hitDone).toBe(true);
+    // with every fence signalled, a hit waits on nothing
+    const later = stub({ offscreen: false, links: false });
+    withFence(later);
+    let laterDone = false;
+    void linkColorPrograms(later.host, meshRoot().root, false).then(() => {
+      laterDone = true;
+    });
+    await vi.advanceTimersByTimeAsync(LINK_FENCE_POLL_MS * 30);
+    expect(later.log).not.toContain('fence');
+    expect(laterDone).toBe(true);
+  });
+});
+
+describe('deferred-mode link pacing in the arms', () => {
+  afterEach(() => resetLinkPacingForTests());
+
+  it('reports each link with the queue unit that issued it, and never waits for a frame itself', async () => {
+    // The pacing is the queue admission's decision (link_frame_ledger.ts): the
+    // arm links at once, inside the unit that called it, so the queue times
+    // the compile and its priority order picks who links next.
+    resetLinkPacingForTests();
+    const s = stub({ offscreen: false });
+    setCompileArmLinkPacing(true, {});
+    armLinkPacing();
+    const queue = createBackgroundGpuQueue();
+    await queue.run(
+      () => linkColorPrograms(s.host, meshRoot().root, false),
+      GPU_WORK_PRIORITY.LIVE_VIEW,
+      'live-gate:wolf',
+    );
+    expect(linkPacingStats()).toMatchObject({
+      links: 1,
+      linkingKinds: ['live-gate'],
+      owedFrames: 1,
+    });
+
+    // A frame is owed, and a second compile still issues synchronously.
+    void linkColorPrograms(s.host, meshRoot().root, false);
+    expect(s.compileAsync).toHaveBeenCalledTimes(2);
+    // outside any unit it owes frames but teaches no kind
+    expect(linkPacingStats()).toMatchObject({
+      links: 2,
+      linkingKinds: ['live-gate'],
+      owedFrames: 2,
+    });
+  });
+
+  it('a cache hit reports nothing', async () => {
+    resetLinkPacingForTests();
+    const s = stub({ offscreen: false, links: false });
+    setCompileArmLinkPacing(true, {});
+    armLinkPacing();
+    const queue = createBackgroundGpuQueue();
+    await queue.run(
+      () => linkColorPrograms(s.host, meshRoot().root, false),
+      GPU_WORK_PRIORITY.LIVE_VIEW,
+      'live-gate:wolf',
+    );
+    expect(linkPacingStats()).toMatchObject({ links: 0, linkingKinds: [], owedFrames: 0 });
   });
 });

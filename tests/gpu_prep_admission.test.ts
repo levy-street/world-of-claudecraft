@@ -11,10 +11,17 @@ import {
 } from '../src/render/context_restore_hold';
 import { createGpuPrepAdmission } from '../src/render/gpu_prep_admission';
 import { createGpuPrepBudget } from '../src/render/gpu_prep_budget_core';
+import {
+  armLinkPacing,
+  noteLink,
+  resetLinkPacingForTests,
+  setLinkPacingEnabled,
+} from '../src/render/link_frame_ledger';
 
 afterEach(() => {
   resetArrivalCoverForTest();
   resetContextRestoreHoldForTest();
+  resetLinkPacingForTests();
 });
 
 describe('createGpuPrepAdmission', () => {
@@ -291,5 +298,57 @@ describe('createGpuPrepAdmission under a context restore hold', () => {
     };
     expect(run(true)).toEqual([true, false, false]);
     expect(run(false)).toEqual([true, true, false]);
+  });
+});
+
+describe('createGpuPrepAdmission link pacing', () => {
+  it('answers before the budget, so the legacy kill switch keeps it, and pays back on the queue frame', () => {
+    const budget = createGpuPrepBudget({ targetFrameMs: 16.7 });
+    const admission = createGpuPrepAdmission(budget);
+    budget.noteFrame(8);
+    budget.setLegacy(true);
+    setLinkPacingEnabled(true);
+    armLinkPacing();
+    noteLink(1, 'live-gate:wolf');
+    const reveal = {
+      label: 'live-gate:boar',
+      priority: GPU_WORK_PRIORITY.LIVE_VIEW,
+      deferredFrames: 0,
+    };
+
+    expect(admission.admit(reveal)).toBe(false);
+    // the budget was never asked: the refusal is the pacing's
+    expect(budget.snapshot().decisions.legacy).toBe(0);
+    // the actionable floor still goes, and a kind that never linked is free
+    expect(admission.admit({ ...reveal, priority: GPU_WORK_PRIORITY.ACTIONABLE_VIEW })).toBe(true);
+    expect(admission.admit({ ...reveal, label: 'upload:chunk' })).toBe(true);
+
+    // the frame's start pays the link back, but its task is still open: a
+    // link issued now would sit in front of this frame's present
+    expect(admission.noteFrame?.()).toBe(true);
+    expect(admission.admit(reveal)).toBe(false);
+    admission.frameEnded?.();
+    expect(admission.admit(reveal)).toBe(true);
+  });
+
+  it('does not age a candidate the link hold refused, and ages a budget refusal as before', () => {
+    const budget = createGpuPrepBudget({ targetFrameMs: 16.7 });
+    const admission = createGpuPrepAdmission(budget);
+    budget.noteFrame(8);
+    setLinkPacingEnabled(true);
+    armLinkPacing();
+    noteLink(2, 'live-gate:wolf');
+    const held = {
+      label: 'live-gate:boar',
+      priority: GPU_WORK_PRIORITY.LIVE_VIEW,
+      deferredFrames: 0,
+    };
+    const other = { ...held, label: 'reveal-gate:tavern:1' };
+
+    expect(admission.admit(held)).toBe(false);
+    // the queue pays the frame back, then asks about ageing each refusal
+    admission.noteFrame?.();
+    expect(admission.agesDeferral?.(held)).toBe(false);
+    expect(admission.agesDeferral?.(other)).toBe(true);
   });
 });

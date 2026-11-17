@@ -224,6 +224,8 @@ const TREE_ALLOWANCES: ReadonlyArray<[file: string, value: number, anchor: strin
   ['src/net/wallet_connect.ts', 120000, '}, 120000);'],
   // The bounded preparation retry delay, in milliseconds.
   ['src/render/ability_vfx/active_kit_prewarm.ts', 120000, 'ACTIVE_KIT_RETRY_DELAYS_MS'],
+  // The giant-tree sprite bake's abandon timeout, in milliseconds.
+  ['src/render/scenery_bands/session.ts', 120000, 'GIANTS_BAKE_TIMEOUT_MS'],
   // A render triangle budget, not money.
   ['src/render/render_budget.ts', 1600000, 'targetTriangles: 1600000'],
 ];

@@ -1,5 +1,9 @@
 import * as THREE from 'three';
 
+/** Stamped on a child the first time a walkHiddenOnce group walks it. */
+const WALKED = Symbol('visibleChildrenGroupWalked');
+type WalkStamped = THREE.Object3D & { [WALKED]?: true };
+
 /**
  * A Group whose per-frame world-matrix walk skips its HIDDEN children.
  *
@@ -22,8 +26,23 @@ import * as THREE from 'three';
  * unaffected. Should this group's OWN world matrix change while a child is
  * hidden, the child is marked dirty so its first visible walk re-multiplies
  * against the new parent instead of trusting a pre-move world matrix.
+ *
+ * `walkHiddenOnce` (the props root): a child is skipped only once it has been
+ * walked at least once, so a child attached hidden (a far prop the cull hid
+ * before the first render, a group a lazy build adds already culled) still
+ * gets one walk, its world matrices composed exactly as the stock walk's first
+ * frame would have composed them, and a reader of a hidden child's matrixWorld
+ * never sees the identity a never-walked node carries. Off by default: the
+ * pools park their slots from birth and refresh a slot themselves on reuse.
  */
 export class VisibleChildrenGroup extends THREE.Group {
+  private readonly walkHiddenOnce: boolean;
+
+  constructor(opts?: { walkHiddenOnce?: boolean }) {
+    super();
+    this.walkHiddenOnce = opts?.walkHiddenOnce === true;
+  }
+
   updateMatrixWorld(force?: boolean): void {
     if (this.matrixAutoUpdate) this.updateMatrix();
     if (this.matrixWorldNeedsUpdate || force) {
@@ -36,9 +55,42 @@ export class VisibleChildrenGroup extends THREE.Group {
     }
     const children = this.children;
     for (let i = 0, l = children.length; i < l; i++) {
-      const child = children[i];
+      const child = children[i] as WalkStamped;
       if (child.visible) child.updateMatrixWorld(force);
-      else if (force) child.matrixWorldNeedsUpdate = true;
+      else if (this.walkHiddenOnce && child[WALKED] !== true) {
+        child.updateMatrixWorld(force);
+        child[WALKED] = true;
+      } else if (force) child.matrixWorldNeedsUpdate = true;
     }
+  }
+}
+
+/**
+ * A Group whose per-frame world-matrix walk skips its WHOLE subtree while the
+ * group itself is hidden: VisibleChildrenGroup one level up, for a root the
+ * scene walks directly (the scene's own walk visits every child, hidden or
+ * not).
+ *
+ * Built for the zone prewarm grids (zone_prewarm_groups.ts): a hidden grid of
+ * creature rigs waits in the scene for the length of its background warm-up
+ * (paced links, idle slots), and the walk recomposed every one of its nodes
+ * on every frame, the largest share of the matrix pass a town frame paid on
+ * the desktop phone proxy (1,653 of 9,700 visits, all recomposed). The warm
+ * pass shows the group before it renders it, and that render's own walk
+ * composes the grid fresh.
+ *
+ * Contract: while hidden, the subtree's matrices go stale and nothing may read
+ * them (true for the prewarm grids: hidden means not drawn, never picked). A
+ * forced walk (a moving ancestor, an explicit freeze) is honored as before.
+ * Skipping marks the group dirty, so its first visible walk re-multiplies the
+ * whole subtree against the current parent chain.
+ */
+export class HiddenSubtreeGroup extends THREE.Group {
+  updateMatrixWorld(force?: boolean): void {
+    if (!this.visible && !force) {
+      this.matrixWorldNeedsUpdate = true;
+      return;
+    }
+    super.updateMatrixWorld(force);
   }
 }

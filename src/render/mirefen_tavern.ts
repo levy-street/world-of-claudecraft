@@ -186,6 +186,8 @@ interface ShellRecord {
 
 let shell: ShellRecord[] = [];
 let shellGroup: THREE.Group | null = null;
+/** The whole tavern (model, wall fire, dog, smoke): culled past the fog with the shell. */
+let tavernRoot: THREE.Group | null = null;
 /** The dog's breathing group, the chimney smoke and the wall fire (null when not built). */
 let dogGroup: THREE.Group | null = null;
 let smoke: TavernSmokeView | null = null;
@@ -359,6 +361,7 @@ export function buildMirefenTavern(): THREE.Group {
   model.rotation.y = TAVERN_YAW;
   model.userData.assetUrl = TAVERN_URL;
   group.add(model);
+  tavernRoot = group;
   // the indoor camera keeps to the tavern's air while the player is inside it
   registerCameraInterior(TAVERN_CAMERA_INTERIOR);
   return group;
@@ -503,7 +506,7 @@ function stepPart(
   }
 }
 
-/** Past the fog the shell stops drawing (and deciding): the tavern's reach from its anchor. */
+/** Past the fog the tavern stops drawing (and the shell deciding): its reach from its anchor. */
 export const MIREFEN_TAVERN_SHELL_CULL_SLACK = 40;
 
 /** Advance the shell one frame (props.ts update, with the frame's camera and eye). */
@@ -523,6 +526,9 @@ export function updateMirefenTavernShell(
   const reach = fogFar + MIREFEN_TAVERN_SHELL_CULL_SLACK;
   const far = (camX - ANCHOR.x) ** 2 + (camZ - ANCHOR.z) ** 2 > reach * reach;
   if (shellGroup && shellGroup.visible === far) shellGroup.visible = !far;
+  // ...and the rest of the tavern with it: the model, the wall fire and the dog drew from
+  // anywhere in the world (eleven-odd draws from the Eastbrook square, 420 yd away)
+  if (tavernRoot && tavernRoot.visible === far) tavernRoot.visible = !far;
   if (far) return;
   // warm the fade twins once the camera comes within reach of the tavern
   prefetchOccluderFadeWithin(allMats, ANCHOR.x, ANCHOR.z, camX, camZ);
@@ -569,6 +575,7 @@ export function clearMirefenTavernShell(): void {
   shell = [];
   allMats = [];
   shellGroup = null;
+  tavernRoot = null;
   dogGroup = null;
   smoke = null;
   wallFire?.dispose();

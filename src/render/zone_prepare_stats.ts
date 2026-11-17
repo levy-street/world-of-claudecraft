@@ -9,7 +9,10 @@
 // concurrently), so the stages do not sum to totalMs. Each is its own lane's
 // wall time, which is what the pacing work reads them for; the main-thread
 // share of a prepare is the feature builders, which the build ledger records
-// per builder (build_ledger_core `zone:features:<builder>`).
+// per builder (build_ledger_core `zone:features:<builder>`), and per idle
+// slice for a stepped builder a background prepare prebuilt
+// (zone_feature_builds.ts): there its count is slices and its max the worst
+// slice, not the whole build.
 
 import type { BuildLedger } from './build_ledger_core';
 import { renderLoadMeasure } from './load_marks';

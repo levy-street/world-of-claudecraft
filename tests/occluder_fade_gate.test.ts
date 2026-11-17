@@ -570,7 +570,7 @@ describe('wiring (source pins)', () => {
     expect(renderer.slice(foliageGate, install)).not.toContain('}');
     // ... and that pair sits inside the async-compile branch: no gate without
     // KHR_parallel_shader_compile, where the gate itself would be the stall.
-    const branch = renderer.lastIndexOf('if (this.asyncCompileSupported) {', install);
+    const branch = renderer.lastIndexOf('if (this.compileGatesSupported) {', install);
     expect(branch).toBeGreaterThan(-1);
     expect(renderer.slice(branch, install)).not.toContain('\n    }');
   });

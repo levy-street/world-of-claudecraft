@@ -13,8 +13,17 @@ import { type CharacterVisual, createCharacterVisual, visualAssetsResident } fro
 import { skinCount, visualKeyFor } from './characters/manifest';
 import { characterVisualPoolKey } from './characters/visual_pool';
 import type { PooledObjectView } from './ground_object_pool';
+import { idleSlot } from './idle_queue';
 import { buildGroundQuestObject, prewarmFarshoreSalvageObjects } from './quest_objects';
 import { setRenderCategory } from './renderer_diagnostics';
+import {
+  drainBuild,
+  IDLE_SLICE_MS,
+  IDLE_SLICE_TIMEOUT_MS,
+  runBuildInSlices,
+  type SteppedBuild,
+} from './stepped_build_core';
+import { HiddenSubtreeGroup } from './visible_children_group';
 
 const PREWARM_MOB_TEMPLATE_IDS = [
   'forest_wolf',
@@ -80,17 +89,59 @@ export interface ZonePrewarmGroupHost {
   templateIdsInZone(zone: ZoneDef, kind: 'mob' | 'npc'): string[];
   prewarmedMobTemplates: Set<string>;
   prewarmedNpcModels: Set<string>;
+  /** True once the renderer is shutting down: a sliced build stops. */
+  stopped?(): boolean;
 }
 
-export function buildEntityPrewarmGroup(
+/** How long a gating zone prewarm may spend building NPC rigs in one go. */
+const ZONE_PREWARM_BUILD_MS = 5000;
+
+type PrewarmGroup = { group: THREE.Group; pooled: { key: string; visual: CharacterVisual }[] };
+
+/**
+ * The mob and NPC prewarm groups of one zone prewarm. A BACKGROUND prewarm
+ * (the visible-zone streaming lane) builds them one rig per idle slice
+ * (stepped_build_core.ts, the zone feature lane's slice size): built in one
+ * call they were a single 40 ms frame on the desktop proxy each time a zone
+ * with new creatures came into view, the worst frame left on the walk. Sliced,
+ * the NPC build needs no wall-clock cap. A gating prewarm (behind the loading
+ * cover) builds both at once under that cap, as before. A shutdown mid-slice
+ * returns empty groups.
+ */
+export async function buildZonePrewarmGroups(
   host: object,
   zone: ZoneDef,
-): {
-  group: THREE.Group;
-  pooled: { key: string; visual: CharacterVisual }[];
-} {
+  opts?: { background?: boolean },
+): Promise<[PrewarmGroup, PrewarmGroup]> {
   const h = host as ZonePrewarmGroupHost;
-  const group = new THREE.Group();
+  if (!opts?.background) {
+    const deadline = performance.now() + ZONE_PREWARM_BUILD_MS;
+    return [
+      drainBuild(buildEntityPrewarmGroupSteps(h, zone)),
+      drainBuild(buildNpcPrewarmGroupSteps(h, zone, deadline)),
+    ];
+  }
+  const sliced = async <T extends PrewarmGroup>(steps: SteppedBuild<T>): Promise<PrewarmGroup> =>
+    (await runBuildInSlices(steps, IDLE_SLICE_MS, {
+      now: () => performance.now(),
+      yieldSlice: () => idleSlot(IDLE_SLICE_TIMEOUT_MS),
+      cancelled: () => h.stopped?.() === true,
+    })) ?? { group: new THREE.Group(), pooled: [] };
+  const mob = await sliced(buildEntityPrewarmGroupSteps(h, zone));
+  const npc = await sliced(buildNpcPrewarmGroupSteps(h, zone, Number.POSITIVE_INFINITY));
+  return [mob, npc];
+}
+
+export function buildEntityPrewarmGroup(host: object, zone: ZoneDef): PrewarmGroup {
+  return drainBuild(buildEntityPrewarmGroupSteps(host as ZonePrewarmGroupHost, zone));
+}
+
+/** buildEntityPrewarmGroup as a stepped build: yields after every rig. */
+export function* buildEntityPrewarmGroupSteps(
+  h: ZonePrewarmGroupHost,
+  zone: ZoneDef,
+): SteppedBuild<PrewarmGroup> {
+  const group = new HiddenSubtreeGroup();
   const pooled: { key: string; visual: CharacterVisual }[] = [];
   const p = h.sim.player;
   group.position.set(p.pos.x, p.pos.y, p.pos.z - 14);
@@ -101,7 +152,7 @@ export function buildEntityPrewarmGroup(
     group.add(obj);
     idx++;
   };
-  const build = (templateId: string, copies: number): void => {
+  const build = function* (templateId: string, copies: number): SteppedBuild<void> {
     const template = MOBS[templateId];
     if (!template) return;
     for (let i = 0; i < copies; i++) {
@@ -116,6 +167,7 @@ export function buildEntityPrewarmGroup(
       if (poolKey) pooled.push({ key: poolKey, visual });
       visual.root.visible = true;
       place(visual.root);
+      yield;
     }
   };
   // Warm only templates that can appear in this zone. The per-template set
@@ -123,7 +175,7 @@ export function buildEntityPrewarmGroup(
   for (const templateId of h.templateIdsInZone(zone, 'mob')) {
     if (h.prewarmedMobTemplates.has(templateId)) continue;
     const copies = PREWARM_MOB_COMMON_IDS.has(templateId) ? PREWARM_MOB_POOL_COPIES : 1;
-    build(templateId, copies);
+    yield* build(templateId, copies);
     h.prewarmedMobTemplates.add(templateId);
   }
   return { group, pooled };
@@ -136,13 +188,7 @@ export function buildEntityPrewarmGroup(
 // each: its body is seeded into the pool under that NPC's own template id. These
 // are NOT speculative rigs: each is a resident of the zone, built to be drawn, so
 // it asks for its own hairstyle and class set like any body entering view.
-export function buildNpcPrewarmGroup(
-  host: object,
-  zone: ZoneDef,
-  deadline: number,
-): {
-  group: THREE.Group;
-  pooled: { key: string; visual: CharacterVisual }[];
+export interface NpcPrewarmGroup extends PrewarmGroup {
   /** Ids whose model ended the loop warm: freshly built here, already warm
    *  from an earlier id or session pass, or with no static record to build.
    *  An asset-unavailable skip stays uncounted so warmed < planned reports
@@ -150,9 +196,23 @@ export function buildNpcPrewarmGroup(
   warmed: number;
   planned: number;
   trimmed: boolean;
-} {
-  const h = host as ZonePrewarmGroupHost;
-  const group = new THREE.Group();
+}
+
+export function buildNpcPrewarmGroup(
+  host: object,
+  zone: ZoneDef,
+  deadline: number,
+): NpcPrewarmGroup {
+  return drainBuild(buildNpcPrewarmGroupSteps(host as ZonePrewarmGroupHost, zone, deadline));
+}
+
+/** buildNpcPrewarmGroup as a stepped build: yields after every rig. */
+export function* buildNpcPrewarmGroupSteps(
+  h: ZonePrewarmGroupHost,
+  zone: ZoneDef,
+  deadline: number,
+): SteppedBuild<NpcPrewarmGroup> {
+  const group = new HiddenSubtreeGroup();
   const pooled: { key: string; visual: CharacterVisual }[] = [];
   const p = h.sim.player;
   group.position.set(p.pos.x, p.pos.y, p.pos.z - 24);
@@ -193,6 +253,7 @@ export function buildNpcPrewarmGroup(
     visual.root.position.set(((idx % 8) - 3.5) * 2.8, 0, Math.floor(idx / 8) * 2.8);
     group.add(visual.root);
     idx++;
+    yield;
   }
   return { group, pooled, warmed, planned: npcIds.length, trimmed };
 }
@@ -213,7 +274,7 @@ export function buildPlayerPrewarmGroup(
   trimmed: boolean;
 } {
   const h = host as ZonePrewarmGroupHost;
-  const group = new THREE.Group();
+  const group = new HiddenSubtreeGroup();
   const p = h.sim.player;
   group.position.set(p.pos.x, p.pos.y, p.pos.z - 21);
   setRenderCategory(group, 'prewarm');
@@ -298,7 +359,7 @@ export function buildPlayerPrewarmGroup(
 
 export function buildObjectPrewarmGroup(host: object): THREE.Group {
   const h = host as ZonePrewarmGroupHost;
-  const group = new THREE.Group();
+  const group = new HiddenSubtreeGroup();
   const p = h.sim.player;
   group.position.set(p.pos.x, p.pos.y, p.pos.z - 17);
   setRenderCategory(group, 'prewarm');

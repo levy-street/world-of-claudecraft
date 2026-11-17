@@ -378,7 +378,10 @@ describe('runBackgroundPrewarm', () => {
     expect(zonePrewarm).toContain('warmChildUnits: (group, child) =>');
     expect(zoneMethod).toContain('this.webgl.initTexture(texture)');
     expect(zoneMethod).toContain('this.renderBoundedPrewarmRoot(group, child)');
-    expect(prepareMethod).toContain('const featureGroups = this.lastAttachedFeatureGroups.slice()');
+    // The features attach in their own lane (idle-sliced off the gating path),
+    // which hands back the groups this zone attached.
+    expect(prepareMethod).toContain('return this.lastAttachedFeatureGroups.slice();');
+    expect(prepareMethod).toContain('const featureGroups = await features;');
     const hideAt = prepareMethod.indexOf('withHiddenPrewarmGroups(featureGroups');
     const queueAt = prepareMethod.indexOf('this.backgroundGpuWork.run(', hideAt);
     expect(hideAt).toBeGreaterThan(-1);
@@ -395,11 +398,19 @@ describe('runBackgroundPrewarm', () => {
     );
     // The target is bound, the op (compileAsync's synchronous prologue) runs,
     // the previous target is restored in the finally, and only then does the
-    // link get awaited: no throwaway target is held across a live frame.
+    // link get awaited: no throwaway target is held across a live frame. The
+    // colour arm's compile is issued inside armCompile's synchronous issue
+    // step, which awaits the link only after underRenderTarget has returned.
     const setTargetAt = compileMethod.indexOf('webgl.setRenderTarget(target);');
     const opAt = compileMethod.indexOf('return op();', setTargetAt);
     const restoreAt = compileMethod.indexOf('webgl.setRenderTarget(previousTarget);', opAt);
-    const awaitAt = compileMethod.indexOf('await underRenderTarget(host, target, () =>', restoreAt);
+    const awaitAt = compileMethod.indexOf(
+      'await armCompile(host, () =>\n        underRenderTarget(host, target, () =>',
+      restoreAt,
+    );
+    const issueAt = compileMethod.indexOf('const pending = issue();');
+    expect(issueAt).toBeGreaterThan(-1);
+    expect(compileMethod.indexOf('const value = await pending;', issueAt)).toBeGreaterThan(issueAt);
     const compileAt = compileMethod.indexOf(
       'host.webgl().compileAsync(root, host.camera(), host.scene())',
       awaitAt,

@@ -6,13 +6,18 @@
 // floor reveals instantly; a revealed band never consults again; no gate keeps
 // the historical immediate cull. Nothing here answers to a clock.
 
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { PROP_FAR_SWAP_DISTANCE, propCellKey, propCellNearKey } from '../src/render/prop_cell_core';
 import {
+  livePropCullTargets,
   newPropCullPass,
   PROP_CULL_REVEAL_NEAR_FRACTION,
   PROP_CULL_REVEAL_REACH,
+  PROP_LIVE_CULL_SLACK,
   type PropCullBounds,
+  type PropLiveCullable,
+  type PropLiveNode,
   propCullBoxDistanceSq,
   propCullConsultImminent,
   propCullInFog,
@@ -21,6 +26,7 @@ import {
   propRevealRoots,
   updatePropCullable,
   updatePropCullables,
+  updatePropLiveCullables,
 } from '../src/render/prop_cull_core';
 import { createRevealGateCore, type RevealGateCoreOptions } from '../src/render/reveal_gate_core';
 
@@ -248,10 +254,28 @@ describe('prop cull first-reveal policy', () => {
     expect(requested).toEqual(['cull:5']);
     // The floor also covers a first consult under a tightly clamped fog,
     // where half the fog would be a few yards: band at 30 under fogFar 45.
+    // It reveals at once AND requests its compile, so a band at arm's length
+    // that the camera is not facing links before the camera turns to it.
     const clamped = cullable(box(30, 130, -50, 50), 'cull:6');
     updatePropCullable(clamped, 0, 0, 45, 45 * 45, gate);
     expect(clamped.obj.visible).toBe(true);
-    expect(requested).toEqual(['cull:5']);
+    expect(requested).toEqual(['cull:5', 'cull:6']);
+    // Revealed and latched: the gate is never consulted for it again.
+    updatePropCullable(clamped, 0, 0, 45, 45 * 45, gate);
+    expect(requested).toEqual(['cull:5', 'cull:6']);
+  });
+
+  it('requests a reach-floor band NOT imminent, so no cover waits on it', () => {
+    // The band is already drawn: an imminent request would count it as a key
+    // the arrival cover waits on and rank it beside the keys the camera is
+    // actually among.
+    const requested: { key: string; imminent: boolean }[] = [];
+    const gate = createRevealGateCore((key, imminent) => requested.push({ key, imminent }));
+    const c = cullable(box(30, 130, -50, 50), 'cull:8');
+    updatePropCullable(c, 0, 0, 45, 45 * 45, gate);
+    expect(c.obj.visible).toBe(true);
+    expect(requested).toEqual([{ key: 'cull:8', imminent: false }]);
+    expect(gate.heldImminentKeys()).toBe(0);
   });
 
   it('keeps the historical immediate cull without a gate', () => {
@@ -392,3 +416,63 @@ describe('prop cull frame pass ordering', () => {
 function fogFarNearEdge(fogFar: number): number {
   return fogFar * PROP_CULL_REVEAL_NEAR_FRACTION;
 }
+
+describe('live props meshes no hideable carries', () => {
+  const node = (parent: PropLiveNode | null): PropLiveNode => ({ parent });
+
+  it('selects the flames outside every hideable, and only those', () => {
+    const root = node(null);
+    const hideable = node(root);
+    const holder = node(root);
+    const tavernHearth = node(holder); // under a plain holder
+    const guildHearth = node(node(holder)); // a flame body under its holder's group
+    const inCampfire = node(node(hideable)); // a campfire's own flame: its campfire culls it
+    const picked = livePropCullTargets(
+      [tavernHearth, inCampfire, guildHearth],
+      new Set([hideable]),
+      root,
+    );
+    expect(picked).toEqual([tavernHearth, guildHearth]);
+  });
+
+  it('every flame the cull may hide has a prewarm twin built by its own builder', () => {
+    const src = readFileSync(new URL('../src/render/props.ts', import.meta.url), 'utf8');
+    const prewarm = src.slice(src.indexOf('export function buildPropMaterialPrewarmGroup('));
+    const body = prewarm.slice(0, prewarm.indexOf('\n}\n'));
+    expect(body).toMatch(/place\(\s*buildLegacyCampfireFlame\(legacyCampfireFlameGeometry\(\)/);
+    expect(body).toMatch(/place\(buildCampfireFlame\(\)\.flame\);/);
+  });
+
+  it('hides a mesh at or past the structure fog plus its slack, and shows it inside', () => {
+    let writes = 0;
+    const obj = {
+      shown: true,
+      get visible() {
+        return this.shown;
+      },
+      set visible(v: boolean) {
+        writes++;
+        this.shown = v;
+      },
+    };
+    const list: PropLiveCullable[] = [{ x: 0, z: 0, obj }];
+    const far = 120;
+    const reach = far + PROP_LIVE_CULL_SLACK;
+    updatePropLiveCullables(list, reach - 0.5, 0, far);
+    expect(obj.visible).toBe(true);
+    expect(writes).toBe(0); // unchanged: no write
+    updatePropLiveCullables(list, reach, 0, far);
+    expect(obj.visible).toBe(false);
+    updatePropLiveCullables(list, 0, reach + 300, far);
+    expect(writes).toBe(1);
+    updatePropLiveCullables(list, 3, 4, far);
+    expect(obj.visible).toBe(true);
+    expect(writes).toBe(2);
+  });
+
+  it('props.ts runs the cull over its flames every frame against the structure fog', () => {
+    const src = readFileSync(new URL('../src/render/props.ts', import.meta.url), 'utf8');
+    expect(src).toMatch(/livePropCullTargets\(flames, hideableGroups, group\)/);
+    expect(src).toMatch(/updatePropLiveCullables\(liveCullables, cullX, cullZ, structureFar\);/);
+  });
+});

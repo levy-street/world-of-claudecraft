@@ -11,6 +11,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import type { AssembleOptions } from '../src/render/characters';
 import { Renderer } from '../src/render/renderer';
+import { ZoneFeatureBuilds } from '../src/render/zone_feature_builds';
 import type { Entity } from '../src/sim/types';
 
 const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
@@ -40,6 +41,9 @@ function rendererWithLedger(selfId: number) {
   renderer.sim = { player: { id: selfId }, cfg: { seed: 4242 } };
   renderer.views = views;
   renderer.buildLedger = { record };
+  // timedBuild times through the zone feature lane (zone_feature_builds.ts),
+  // a field initializer Object.create skips.
+  renderer.featureBuilds = new ZoneFeatureBuilds({ record, stopped: () => false });
   return { renderer, record, views };
 }
 
@@ -115,7 +119,7 @@ describe('the ledger producers and the arrival mark are wired in the renderer (s
       expect(name).toBe(fn);
     }
     expect(source).toContain(
-      'this.buildLedger.record(`zone:features:${name}`, performance.now() - started, started);',
+      'return this.featureBuilds.build(name, () => build(this.sim.cfg.seed));',
     );
   });
 

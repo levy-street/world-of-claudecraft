@@ -14,12 +14,31 @@ import {
   gpuPrepCoverAdmits,
   gpuPrepKindOfLabel,
 } from './gpu_prep_budget_core';
+import {
+  linkHeldSinceLastFrame,
+  linkHoldsCandidate,
+  noteLinkFrame,
+  noteLinkFrameEnded,
+} from './link_frame_ledger';
 
 /** Wrap a budget as the queue's admission: label to kind, priority to class,
- *  and a spend that both LEARNS the piece's real cost and charges the frame. */
+ *  and a spend that both LEARNS the piece's real cost and charges the frame.
+ *  The deferred link pacing (link_frame_ledger.ts) answers first: while issued
+ *  links still owe frames, or the frame's own task is still running, a unit of a
+ *  kind known to link waits for the gap after a frame that owes none, whatever
+ *  the budget would say (so `?prep=legacy` keeps it), and that wait does not
+ *  age it toward the budget's starvation bound. */
 export function createGpuPrepAdmission(budget: GpuPrepBudget): GpuWorkAdmission {
   return {
+    noteFrame(): boolean {
+      return noteLinkFrame();
+    },
+    frameEnded(): void {
+      noteLinkFrameEnded();
+    },
     admit(candidate): boolean {
+      const cls = gpuPrepClassForPriority(candidate.priority);
+      if (linkHoldsCandidate(candidate.label, cls === 'actionable')) return false;
       // Under the arrival curtain there is no frame to protect: the player is
       // looking at a loading screen, and every unit admitted now is one that
       // does not link inside a live frame after it lifts. The budget still
@@ -30,7 +49,7 @@ export function createGpuPrepAdmission(budget: GpuPrepBudget): GpuWorkAdmission 
       // cover has its own pacing lane and does not come through here.
       return budget.admit({
         kind: gpuPrepKindOfLabel(candidate.label),
-        cls: gpuPrepClassForPriority(candidate.priority),
+        cls,
         deferredFrames: candidate.deferredFrames,
         cover: arrivalCoverActive(),
         coverPaced: contextRestorePacingActive(),
@@ -38,6 +57,10 @@ export function createGpuPrepAdmission(budget: GpuPrepBudget): GpuWorkAdmission 
       }).admit;
     },
     agesDeferral(candidate): boolean {
+      // A link hold is a wait for the GPU process, not for headroom: ageing it
+      // would make the unit starvation-admissible, past the budget's headroom,
+      // the moment the hold lifts (link_frame_ledger.ts).
+      if (linkHeldSinceLastFrame(candidate.label)) return false;
       // A `cover-not-arrival` refusal is not a wait for headroom: the unit is
       // refused because the curtain's budget belongs to the arrival, and it
       // will be reconsidered on its own terms the moment the cover drops.

@@ -570,6 +570,41 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     expect(prewarmEntryRuns('textures.scene', p)).toBe(true);
   });
 
+  it('deferred Chromium submits the boot compile but keeps the whole-scene passes off', () => {
+    // Chromium without the extension links in its GPU process behind the
+    // command buffer (link_gate_mode_core.ts): issuing the scene's links under
+    // the loading screen is cheap and they finish there, while a whole-scene
+    // pass would wait for each link on the main thread.
+    for (const constrainedMemory of [false, true]) {
+      const p = resolvePrewarmPolicy({
+        ...BASE,
+        constrainedMemory,
+        asyncCompileSupported: false,
+        deferredLinkCompile: true,
+      });
+      expect(p.compileBeforeFirstFrame).toBe(true);
+      expect(p.skipMonolithCompile).toBe(false);
+      expect(p.skipFullScenePasses).toBe(true);
+      expect(prewarmEntryRuns('programs.compile', p)).toBe(true);
+      expect(prewarmEntryRuns('programs.compile-submit', p)).toBe(!constrainedMemory);
+      for (const id of BLOCKING_PREWARM_ENTRIES_WITHOUT_PARALLEL_COMPILE) {
+        if (id === 'programs.compile' || id === 'programs.compile-submit') continue;
+        expect(prewarmEntryRuns(id, p), id).toBe(false);
+      }
+    }
+    // Absent, or a non-Chromium browser without the extension: unchanged.
+    for (const deferredLinkCompile of [undefined, false]) {
+      const p = resolvePrewarmPolicy({
+        ...BASE,
+        constrainedMemory: true,
+        asyncCompileSupported: false,
+        deferredLinkCompile,
+      });
+      expect(p.skipMonolithCompile).toBe(true);
+      expect(prewarmEntryRuns('programs.compile', p)).toBe(false);
+    }
+  });
+
   it('matches the renderer real manifest order', () => {
     expect(parsedManifestEntries().map((entry) => entry.id)).toEqual(MANIFEST_IDS);
   });
@@ -1568,7 +1603,10 @@ describe('mandatory interaction-landmark prewarm', () => {
     const gate = renderer.slice(gateStart, gateEnd);
     expect(gateStart).toBeGreaterThan(-1);
     expect(gateEnd).toBeGreaterThan(gateStart);
-    expect(gate).toContain('if (!this.asyncCompileSupported) return null;');
+    // The short-circuit keys off the first-sight gates' switch, which is on
+    // with the parallel compile AND in the deferred Chromium mode
+    // (link_gate_mode_core.ts); only a browser with neither skips the gate.
+    expect(gate).toContain('if (!this.compileGatesSupported) return null;');
     expect(gate).toContain('this.compileGate(group, requiredForEntry)');
     expect(gate).toContain('view.compilePending = false;');
     expect(gate).toContain(

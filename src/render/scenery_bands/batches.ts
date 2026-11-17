@@ -25,6 +25,9 @@ export interface BandBuildOptions {
     mode: 'quality' | 'palm' | 'coarse';
   };
   material(source: THREE.Material): THREE.Material;
+  /** The band disposes the materials `material` returned (the default). A
+   *  caller that hands out materials it keeps across bands passes false. */
+  ownsMaterials?: boolean;
   /** Source shader hooks need authored coordinates; the selected Low
    * Lambert replacements consume the already transformed geometry. */
   localCoordinates?: boolean;
@@ -361,7 +364,7 @@ export async function buildSceneryBand(options: BandBuildOptions): Promise<Scene
   const dispose = (): void => {
     root.removeFromParent();
     for (const geometry of owned) geometry.dispose();
-    for (const material of materials) material.dispose();
+    if (options.ownsMaterials !== false) for (const material of materials) material.dispose();
     owned.clear();
     materials.length = 0;
   };

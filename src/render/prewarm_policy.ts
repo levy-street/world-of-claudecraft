@@ -172,6 +172,15 @@ export interface PrewarmPolicyInput {
   constrainedMemory: boolean;
   /** KHR_parallel_shader_compile is available (compileAsync links off-thread). */
   asyncCompileSupported: boolean;
+  /**
+   * Chromium without the extension (link_gate_mode_core.ts deferred mode):
+   * issuing a link costs the main thread about 2 ms and the GPU process links
+   * it behind the command buffer, so the boot compile may SUBMIT the scene's
+   * links under the loading screen (they finish there), while the whole-scene
+   * passes stay off, because a draw of an unlinked program waits for its link
+   * on the main thread. Optional: absent means false.
+   */
+  deferredLinkCompile?: boolean;
   /** LOW_GFX: the Lambert/no-shadow tier (its own smaller view budget already). */
   lowGfx: boolean;
   /** Keep desktop Insane's full manifest behind the entry cover instead of resuming it live. */
@@ -650,6 +659,8 @@ export async function withRestoredPrewarmState<T, R>(
  */
 export function resolvePrewarmPolicy(input: PrewarmPolicyInput): PrewarmPolicy {
   const { constrainedMemory, asyncCompileSupported, lowGfx } = input;
+  // Whether the boot compile may submit links at all (deferredLinkCompile).
+  const submitCompile = asyncCompileSupported || input.deferredLinkCompile === true;
   const baseMaxViews = lowGfx ? input.maxViewsLow : input.maxViewsHigh;
   if (!constrainedMemory) {
     return {
@@ -668,8 +679,8 @@ export function resolvePrewarmPolicy(input: PrewarmPolicyInput): PrewarmPolicy {
       // without changing which work the deadline admits.
       yieldBetweenEntries: true,
       linkPassPerEntry: false,
-      compileBeforeFirstFrame: asyncCompileSupported,
-      skipMonolithCompile: !asyncCompileSupported,
+      compileBeforeFirstFrame: submitCompile,
+      skipMonolithCompile: !submitCompile,
       skipFullScenePasses: !asyncCompileSupported,
       minimalManifest: false,
       textureBatchSize: 0,
@@ -693,8 +704,10 @@ export function resolvePrewarmPolicy(input: PrewarmPolicyInput): PrewarmPolicy {
     // extension is absent. Never enter that uninterruptible driver call inside the
     // loading gate; first-sight compile gates handle later streamed views instead.
     linkPassPerEntry: false,
-    compileBeforeFirstFrame: asyncCompileSupported,
-    skipMonolithCompile: !asyncCompileSupported,
+    // deferredLinkCompile is Chromium only: constrained WebKit, whose link is
+    // the synchronous block described above, keeps skipping the monolith.
+    compileBeforeFirstFrame: submitCompile,
+    skipMonolithCompile: !submitCompile,
     skipFullScenePasses: !asyncCompileSupported,
     minimalManifest: true,
     textureBatchSize: CONSTRAINED_TEXTURE_BATCH_SIZE,
@@ -762,10 +775,19 @@ export function nearbyPrewarmViewBudget(
 }
 
 /** True when this manifest entry runs under the given policy. */
+/** The compile entries submit links and render nothing, so they run without
+ *  the whole-scene passes whenever the policy keeps the monolith compile (the
+ *  deferred Chromium arm, PrewarmPolicyInput.deferredLinkCompile). */
+const SUBMIT_ONLY_COMPILE_ENTRIES: readonly string[] = [
+  'programs.compile-submit',
+  'programs.compile',
+];
+
 export function prewarmEntryRuns(id: string, policy: PrewarmPolicy): boolean {
   if (
     policy.skipFullScenePasses &&
-    BLOCKING_PREWARM_ENTRIES_WITHOUT_PARALLEL_COMPILE.includes(id)
+    BLOCKING_PREWARM_ENTRIES_WITHOUT_PARALLEL_COMPILE.includes(id) &&
+    !(SUBMIT_ONLY_COMPILE_ENTRIES.includes(id) && !policy.skipMonolithCompile)
   ) {
     return false;
   }

@@ -184,7 +184,21 @@ export function propCullReveal(
   if (!inFog) return 'hidden';
   if (state.revealed) return 'revealed';
   if (!gate) return 'revealed';
-  if (boxDistSq <= PROP_CULL_REVEAL_REACH * PROP_CULL_REVEAL_REACH) return 'revealed';
+  if (boxDistSq <= PROP_CULL_REVEAL_REACH * PROP_CULL_REVEAL_REACH) {
+    // Revealed at arm's length whatever the gate says (the fairness floor),
+    // but the consult still REQUESTS the band's compile. This cull
+    // is by distance, not by view, so a band inside the reach that three's
+    // frustum cull has not drawn yet (behind the camera) would otherwise link
+    // at the first frame a camera turn puts it on screen: measured on the
+    // reference phone, whose gates run deferred, the street lamps beside the
+    // town spot linked live on the first turn after 20 s of standing there.
+    // With the request they link while the player stands. Once, because the
+    // band latches `revealed` and is never consulted again. NOT imminent: the
+    // band is already drawn, so it must not count as a held key the arrival
+    // cover waits on, nor outrank the keys the camera is actually among.
+    gate.allow(state.key, false);
+    return 'revealed';
+  }
   const imminent = propCullConsultImminent(inFog, boxDistSq, fogFar, state, gate);
   return gate.allow(state.key, imminent) ? 'revealed' : 'held';
 }
@@ -271,5 +285,75 @@ export function updatePropCullables(
     const index = order[n];
     const c = cullables[index];
     applyPropCullReveal(c, propCullReveal(true, distSq[index], fogFar, c, gate));
+  }
+}
+
+// ---- live meshes no hideable carries -------------------------------------
+// The props root keeps some meshes live and unmerged (animated flames), and a
+// live mesh outside every hideable had no cull at all: the Mirefen tavern's
+// hearth and wall fires, the delve braziers and the Highwatch guild's hearths
+// drew from anywhere in the world (a town frame on Low drew them from 420 to
+// 750 yd, far past the fog). These
+// cull like a hideable does, by plain distance against the structure fog far.
+
+/** Reach past the structure fog far at which a live prop mesh stops drawing. */
+export const PROP_LIVE_CULL_SLACK = 40;
+
+/** One live mesh at a fixed world point, with the three object it toggles. */
+export interface PropLiveCullable {
+  readonly x: number;
+  readonly z: number;
+  readonly obj: { visible: boolean };
+}
+
+/** The slice of a scene node the target selection reads. */
+export interface PropLiveNode {
+  readonly parent: PropLiveNode | null;
+}
+
+/**
+ * The live flames the distance cull should own: every flame that sits under no
+ * hideable group up to `root` (a hideable's own cull already drops those, and a
+ * flame must never hide while its structure draws). Both flame kinds the props
+ * view keeps live have a twin in buildPropMaterialPrewarmGroup, so a flame's
+ * first reveal on an approach links nothing.
+ */
+export function livePropCullTargets<T extends PropLiveNode>(
+  flames: readonly T[],
+  hideableGroups: ReadonlySet<PropLiveNode>,
+  root: PropLiveNode,
+): T[] {
+  const out: T[] = [];
+  for (const flame of flames) {
+    let carried = false;
+    for (let o = flame.parent; o && o !== root; o = o.parent) {
+      if (hideableGroups.has(o)) {
+        carried = true;
+        break;
+      }
+    }
+    if (!carried) out.push(flame);
+  }
+  return out;
+}
+
+/**
+ * Per-frame pass: hide each live mesh at or beyond `far + PROP_LIVE_CULL_SLACK`
+ * of the cull origin, show it inside. Writes `visible` only when it changes.
+ */
+export function updatePropLiveCullables(
+  list: readonly PropLiveCullable[],
+  camX: number,
+  camZ: number,
+  far: number,
+): void {
+  const reach = far + PROP_LIVE_CULL_SLACK;
+  const reachSq = reach * reach;
+  for (let i = 0; i < list.length; i++) {
+    const c = list[i];
+    const dx = camX - c.x;
+    const dz = camZ - c.z;
+    const show = dx * dx + dz * dz < reachSq;
+    if (c.obj.visible !== show) c.obj.visible = show;
   }
 }

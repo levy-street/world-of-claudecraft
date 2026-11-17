@@ -11,11 +11,14 @@ import { fileURLToPath } from 'node:url';
 import * as THREE from 'three';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { PooledObjectView } from '../src/render/ground_object_pool';
+import { HiddenSubtreeGroup } from '../src/render/visible_children_group';
 import {
   buildEntityPrewarmGroup,
+  buildEntityPrewarmGroupSteps,
   buildNpcPrewarmGroup,
   buildObjectPrewarmGroup,
   buildPlayerPrewarmGroup,
+  buildZonePrewarmGroups,
   PREWARM_MOB_POOL_COPIES,
   PREWARM_OBJECT_ITEM_IDS,
   PREWARM_OBJECT_POOL_COPIES,
@@ -307,6 +310,52 @@ describe('buildObjectPrewarmGroup pooled copies and the point-light hide', () =>
   });
 });
 
+describe('zone prewarm rigs built one per idle slice off the gating path', () => {
+  const MOB_IDS = ['forest_wolf', 'rare_oddity'];
+
+  it('builds every grid as a group whose walk skips its subtree while hidden', () => {
+    const host = makeHost(MOB_IDS);
+    expect(buildEntityPrewarmGroup(host, ZONE).group).toBeInstanceOf(HiddenSubtreeGroup);
+    expect(buildNpcPrewarmGroup(host, ZONE, NO_DEADLINE).group).toBeInstanceOf(HiddenSubtreeGroup);
+  });
+
+  it('yields once per rig, so a slice holds at most one rig past its budget', () => {
+    const steps = buildEntityPrewarmGroupSteps(makeHost(MOB_IDS), ZONE);
+    let pieces = 0;
+    let result = steps.next();
+    while (!result.done) {
+      pieces++;
+      result = steps.next();
+    }
+    // forest_wolf is pooled PREWARM_MOB_POOL_COPIES deep, rare_oddity once
+    expect(pieces).toBe(PREWARM_MOB_POOL_COPIES + 1);
+    expect(result.value.group.children).toHaveLength(PREWARM_MOB_POOL_COPIES + 1);
+  });
+
+  it('builds the same mob and NPC groups sliced in the background as in one gating call', async () => {
+    const gating = await buildZonePrewarmGroups(makeHost(MOB_IDS), ZONE);
+    const gatingCalls = state.createCalls.slice();
+    state.createCalls.length = 0;
+    const sliced = await buildZonePrewarmGroups(makeHost(MOB_IDS), ZONE, { background: true });
+    expect(gatingCalls.length).toBeGreaterThan(0);
+    expect(state.createCalls).toEqual(gatingCalls);
+    expect(sliced[0].group.children).toHaveLength(gating[0].group.children.length);
+    expect(sliced[0].pooled.map((p) => p.key)).toEqual(gating[0].pooled.map((p) => p.key));
+    expect(sliced[1].group.children).toHaveLength(gating[1].group.children.length);
+  });
+
+  it('stops a background build once the renderer shuts down, keeping nothing', async () => {
+    let stopped = false;
+    const host = { ...makeHost(MOB_IDS), stopped: () => stopped };
+    const pending = buildZonePrewarmGroups(host, ZONE, { background: true });
+    stopped = true;
+    const [mobs, npcs] = await pending;
+    expect(mobs.group.children).toHaveLength(0);
+    expect(npcs.group.children).toHaveLength(0);
+    expect(state.createCalls).toEqual([]);
+  });
+});
+
 describe('the untyped host seam stays welded to the renderer', () => {
   // The builders take host: object and cast to ZonePrewarmGroupHost because
   // the consumed Renderer members are PRIVATE (structural typing cannot see
@@ -391,6 +440,7 @@ describe('the untyped host seam stays welded to the renderer', () => {
       'templateIdsInZone: (zone, kind) => this.templateIdsInZone(zone, kind),',
       'prewarmedMobTemplates: this.prewarmedMobTemplates,',
       'prewarmedNpcModels: this.prewarmedNpcModels,',
+      'stopped: () => this.shutdownStarted,',
     ]) {
       expect(adapter, `adapter binding missing: ${binding}`).toContain(binding);
     }
@@ -398,7 +448,7 @@ describe('the untyped host seam stays welded to the renderer', () => {
     // (lazy, so the adapter's `()` stays inside the capture).
     const builderCalls = [
       ...renderer.matchAll(
-        /\b(buildEntityPrewarmGroup|buildNpcPrewarmGroup|buildPlayerPrewarmGroup|buildObjectPrewarmGroup)\(([^\n]*?)(?:, |\);)/g,
+        /\b(buildEntityPrewarmGroup|buildNpcPrewarmGroup|buildPlayerPrewarmGroup|buildObjectPrewarmGroup|buildZonePrewarmGroups)\(([^\n]*?)(?:, |\);)/g,
       ),
     ];
     // Four builders, every call site: the adapter, never `this`.

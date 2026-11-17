@@ -78,6 +78,31 @@ export function lanceTargetInReach(ctx: SimContext, p: Entity, range: number): L
   return effigy ? { kind: 'effigy', ...effigy } : null;
 }
 
+/**
+ * What the guidance names: exactly `lanceTargetInReach(thrustRange) ??
+ * lanceTargetInReach(LANCE_GUIDANCE_RANGE)`, in ONE pass over the entities instead of two.
+ *
+ * The guidance runs every frame on the client and per player per broadcast on the server,
+ * and the boss lookup walks every entity. One walk at the wide band finds the nearest warded
+ * boss; when he stands inside the thrust's reach he is the same body the narrow walk would
+ * find (same filter, same strict comparison, same iteration order, so the same tie winner),
+ * and when he does not, the narrow walk would have found no boss and fallen to the effigy.
+ * Assumes `thrustRange <= LANCE_GUIDANCE_RANGE`, which the caller's reach always is.
+ */
+export function lanceGuidanceTarget(
+  ctx: SimContext,
+  p: Entity,
+  thrustRange: number,
+): LanceTarget | null {
+  const boss = nearestEyeWardTarget(ctx, p, LANCE_GUIDANCE_RANGE);
+  if (boss && boss.distance < thrustRange) return { kind: 'boss', ...boss };
+  const near = effigyInReach(ctx, ctx.musterArmy, p, thrustRange);
+  if (near) return { kind: 'effigy', ...near };
+  if (boss) return { kind: 'boss', ...boss };
+  const far = effigyInReach(ctx, ctx.musterArmy, p, LANCE_GUIDANCE_RANGE);
+  return far ? { kind: 'effigy', ...far } : null;
+}
+
 /** Seconds until a blinded ward re-forms, or 0. */
 function blindRemaining(ctx: SimContext, mob: Entity): number {
   return Math.max(0, (mob.eyeWardDownUntil ?? 0) - ctx.time);
@@ -89,11 +114,11 @@ function sealRemaining(ctx: SimContext, mob: Entity): number {
 }
 
 /**
- * The guidance for one player, or null when the pike is not in hand.
+ * The guidance for one player, or null when the player is not in the world.
  *
- * Null, not an all-false view, so the HUD's visibility test is the same one the bar already
- * uses: no pike, no prompt, and a player who never takes the quest is never told about a
- * mechanic they cannot perform.
+ * Computed whether or not the pike is in hand: the prompt decides what to show from the
+ * mainhand, and its one empty-handed rung (the drill yard's lantern-out line) reads this
+ * view, so the projection itself never gates on the pike.
  */
 export function lanceGuidanceFor(
   ctx: SimContext,
@@ -103,8 +128,7 @@ export function lanceGuidanceFor(
   const meta = ctx.players.get(pid);
   const p = ctx.entities.get(pid);
   if (!meta || !p) return null;
-  const found =
-    lanceTargetInReach(ctx, p, thrustRange) ?? lanceTargetInReach(ctx, p, LANCE_GUIDANCE_RANGE);
+  const found = lanceGuidanceTarget(ctx, p, thrustRange);
   if (!found) {
     return {
       targetPresent: false,

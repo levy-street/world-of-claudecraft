@@ -42,9 +42,11 @@ export function compileTargetPrepared(
   return true;
 }
 
-/** The proof a live gate's settle hands its caller: none on a host without
- *  parallel compile, whose gate settles at once over programs it never linked,
- *  so the thunk would read false forever where the draw links them anyway.
+/** The proof a live gate's settle hands its caller: none on a host whose
+ *  gates are off (link_gate_mode_core.ts mode 'none'), whose gate settles at
+ *  once over programs it never linked, so the thunk would read false forever
+ *  where the draw links them anyway. In deferred mode the gate settles only
+ *  once its link fence signalled (link_fence_proof.ts), so the proof holds.
  *  The thunk reads `webgl.properties` when called: a context restore replaces
  *  it, and the old one would prove programs of a dead context. */
 export function compileProof(

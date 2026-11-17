@@ -100,7 +100,7 @@ describe('reveal gate wiring (source pins)', () => {
 
   it('the renderer wires all four gates behind async-compile support', () => {
     const wiring = rendererSource.slice(
-      anchor(rendererSource, 'if (this.asyncCompileSupported) {\n      const revealHost ='),
+      anchor(rendererSource, 'if (this.compileGatesSupported) {\n      const revealHost ='),
       anchor(rendererSource, 'this.foliageRevealGate = createRevealGate') + 200,
     );
     expect(wiring).toContain('const revealHost = createRevealCompileHost({');

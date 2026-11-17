@@ -28,6 +28,7 @@ import { registerDeferredPreload } from './assets/preload';
 import { GFX, ZONE_FEATURE_CELL_SIZE } from './gfx';
 import { activeWorldPromoted } from './promoted_scenery_gate';
 import { renderLayerDisabled } from './render_dev_flags';
+import { drainBuild, type SteppedBuild } from './stepped_build_core';
 import { thinLeanDressing } from './zone_dressing_lod_core';
 import { partitionByCell } from './zone_feature_cells_core';
 import { ZONE_FEATURE_EXTENT_KEY } from './zone_feature_sweep';
@@ -78,8 +79,13 @@ export function fenFeaturesBuildOptions(): FenFeaturesBuildOptions {
   return { cellSize: renderLayerDisabled('fencells') ? 0 : ZONE_FEATURE_CELL_SIZE };
 }
 
-const FEN_ZMIN = 180;
-const FEN_ZMAX = 700;
+export const FEN_ZMIN = 180;
+export const FEN_ZMAX = 700;
+/** The fen's x extent, as the rock and placement passes read it. */
+export const FEN_XMIN = -540;
+export const FEN_XMAX = -180;
+/** Width of one rock-gathering piece of the stepped placement (yd). */
+const FEN_ROCK_STRIP = 60;
 
 // the five Willowfen prop models (built by build_willowfen_props.mjs)
 const FEN_PROP_URLS = {
@@ -185,17 +191,50 @@ function cellGeometry(source: THREE.BufferGeometry): THREE.BufferGeometry {
   return geo;
 }
 
+/** The fen's own scattered rocks (the obstacles fenFloraSpots keeps clear
+ *  of), gathered in x strips, one piece each: one call over the whole fen was
+ *  an 18 ms piece. The bounds are inclusive, so every strip but the last
+ *  drops its right edge, and the union is exactly the one-call set in another
+ *  order (only membership is read). Pinned by tests/fen_features_stepped.test.ts. */
+export function* fenRocksSteps(
+  seed: number,
+): SteppedBuild<ReturnType<typeof generateDecorationsInBounds>> {
+  const rocks: ReturnType<typeof generateDecorationsInBounds> = [];
+  for (let x0 = FEN_XMIN; x0 < FEN_XMAX; x0 += FEN_ROCK_STRIP) {
+    const x1 = Math.min(FEN_XMAX, x0 + FEN_ROCK_STRIP);
+    const strip = generateDecorationsInBounds(seed, {
+      minX: x0,
+      maxX: x1,
+      minZ: FEN_ZMIN,
+      maxZ: FEN_ZMAX,
+    });
+    for (const d of strip) if (d.kind === 'rock' && (x1 === FEN_XMAX || d.x < x1)) rocks.push(d);
+    yield;
+  }
+  return rocks;
+}
+
 /** The fen's modeled flora spots (lily rafts, shoreline reeds, mushroom
  *  clusters and their anchor logs) as ONE pure list shared by the builder
  *  below and the editor's placement promotion (the fen_willows contract).
  *  `y` is ABSOLUTE (lilies float at the waterline, not on terrain); the
  *  promotion converts to terrain-relative offsets itself. */
-export function fenFloraSpots(seed: number): {
+export interface FenFloraSpots {
   lilies: Placement[];
   reeds: Placement[];
   mushrooms: Placement[];
   logs: Placement[];
-} {
+}
+
+export function fenFloraSpots(seed: number): FenFloraSpots {
+  return drainBuild(fenFloraSpotsSteps(seed));
+}
+
+/** fenFloraSpots as a stepped build (stepped_build_core.ts): yields after each
+ *  rock strip and each patch grid column, so a streaming prepare can spread it
+ *  over idle slices. Nothing between yields reads the clock, so the spots are
+ *  identical however the slices fall. */
+export function* fenFloraSpotsSteps(seed: number): SteppedBuild<FenFloraSpots> {
   const hub = WILLOWFEN_ZONE.hub;
   // placement obstacles: authored props and the terrain's own scattered
   // rocks; nothing modeled may stand on any of them (only trees overlap)
@@ -209,12 +248,7 @@ export function fenFloraSpots(seed: number): {
     crates: zp.crates ?? [],
     fences: zp.fences ?? [],
   };
-  const fenRocks = generateDecorationsInBounds(seed, {
-    minX: -540,
-    maxX: -180,
-    minZ: FEN_ZMIN,
-    maxZ: FEN_ZMAX,
-  }).filter((d) => d.kind === 'rock');
+  const fenRocks = yield* fenRocksSteps(seed);
   const segDist = (x: number, z: number, f: { x1: number; z1: number; x2: number; z2: number }) => {
     const dx = f.x2 - f.x1;
     const dz = f.z2 - f.z1;
@@ -291,6 +325,7 @@ export function fenFloraSpots(seed: number): {
   const mushrooms: Placement[] = [];
   const logs: Placement[] = [];
   for (let gx = -520; gx <= -200; gx += 14) {
+    yield;
     for (let gz = FEN_ZMIN + 30; gz <= FEN_ZMAX - 60; gz += 14) {
       // a coarse patch gate: most cells stay empty, the rest clump
       if (hash2(gx, gz, seed + 2501) > 0.16) continue;
@@ -328,6 +363,20 @@ export function buildFenFeatures(
   seed: number,
   options: FenFeaturesBuildOptions = fenFeaturesBuildOptions(),
 ): FenFeaturesView {
+  return drainBuild(buildFenFeaturesSteps(seed, options));
+}
+
+/** buildFenFeatures as a stepped build: the placement yields per rock strip
+ *  and patch column, the build per family cell, so the renderer's streaming
+ *  prepare spreads the Willowfen over idle slices instead of one long frame
+ *  (zone_feature_builds.ts). */
+export function* buildFenFeaturesSteps(
+  seed: number,
+  options: FenFeaturesBuildOptions = fenFeaturesBuildOptions(),
+): SteppedBuild<FenFeaturesView> {
+  // Read once: a stepped build must not mix two answers across its slices.
+  const promotedWillows = activeWorldPromoted('willows');
+  const promotedFlora = activeWorldPromoted('fenFlora');
   const group = new THREE.Group();
   group.name = 'fen-features';
   const cullGroups: THREE.Group[] = [];
@@ -367,12 +416,12 @@ export function buildFenFeatures(
   // reach carries its largest instance's extent, so a one-off giant keeps
   // its whole cell out to the horizon and a clump of small ones sheds where
   // it is a few pixels
-  const instanceProp = (
+  const instanceProp = function* (
     key: FenPropKey,
     spots: readonly Placement[],
     split: boolean,
     sizeReach = false,
-  ): void => {
+  ): SteppedBuild<void> {
     const scene = propScenes[key];
     if (!scene || spots.length === 0) return;
     const { parts, extent } = extractParts(scene);
@@ -387,10 +436,14 @@ export function buildFenFeatures(
         group.add(parent);
         cullGroups.push(parent);
       }
-      for (const part of parts) instance(part.geo, part.mat, spots, parent);
+      for (const part of parts) {
+        instance(part.geo, part.mat, spots, parent);
+        yield;
+      }
       return;
     }
     for (const cell of partitionByCell(spots, options.cellSize)) {
+      yield;
       const cellGroup = new THREE.Group();
       cellGroup.name = `fen-features:${key}:${cell.key}`;
       for (const part of parts) {
@@ -414,9 +467,12 @@ export function buildFenFeatures(
   // are the sim's own colliders. The thin runs over the WHOLE family before
   // the cell split, so the surviving set does not depend on the cell size.
   const split = options.cellSize > 0;
-  const instanceDressing = (key: FenPropKey, spots: readonly Placement[]): void => {
+  const instanceDressing = function* (
+    key: FenPropKey,
+    spots: readonly Placement[],
+  ): SteppedBuild<void> {
     // sized: a dressing family opts into the apparent-size reach
-    instanceProp(key, thinLeanDressing(spots, GFX.leanFoliage), split, true);
+    yield* instanceProp(key, thinLeanDressing(spots, GFX.leanFoliage), split, true);
   };
 
   // --- the willows: instanced at the shared sim placements (fenWillowSpots
@@ -426,8 +482,8 @@ export function buildFenFeatures(
   // Split like the dressing, but NEVER given the apparent-size reach: the
   // trunks are the sim's colliders, so only the distance rule may hide them
   // (their size would carry them past every cull horizon anyway).
-  if (!activeWorldPromoted('willows')) {
-    instanceProp(
+  if (!promotedWillows) {
+    yield* instanceProp(
       'willow',
       fenWillowSpots(seed).map((w) => ({ x: w.x, y: w.y, z: w.z, s: w.s, rot: w.rot })),
       split,
@@ -437,23 +493,23 @@ export function buildFenFeatures(
   // --- the modeled flora (lilies, reeds, mushroom patches and their logs)
   // from the ONE shared spot list (fenFloraSpots), standing down together
   // when the document owns them as placements ---
-  if (!activeWorldPromoted('fenFlora')) {
-    const flora = fenFloraSpots(seed);
+  if (!promotedFlora) {
+    const flora = yield* fenFloraSpotsSteps(seed);
     // pure dressing (no collider, nothing to act on; 5-11k triangles each), so
     // a lean session draws an evenly thinned band, upstream's lean policy
     // (upstream's instanceDressing seam, pinned by tests/zone_dressing_lod_wiring).
     {
       const spots = flora.lilies;
-      instanceDressing('lilies', spots);
+      yield* instanceDressing('lilies', spots);
     }
     {
       const spots = flora.reeds;
-      instanceDressing('reeds', spots);
+      yield* instanceDressing('reeds', spots);
     }
     const mushroomSpots = flora.mushrooms;
-    instanceDressing('mushrooms', mushroomSpots);
+    yield* instanceDressing('mushrooms', mushroomSpots);
     const logSpots = flora.logs;
-    instanceDressing('log', logSpots);
+    yield* instanceDressing('log', logSpots);
   }
 
   return {

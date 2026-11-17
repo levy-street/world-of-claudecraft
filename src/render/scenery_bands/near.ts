@@ -29,6 +29,7 @@ export class SceneryNearSources {
   private cap = 0;
   private serial = 0;
   private exemptRoots?: ReadonlySet<THREE.Object3D>;
+  private exemptObjects?: ReadonlySet<THREE.Object3D>;
 
   register(root: THREE.Object3D, zoneFeature = false): void {
     if (
@@ -140,14 +141,24 @@ export class SceneryNearSources {
     }
   }
 
-  update(x: number, z: number, cap: number, exemptRoots?: ReadonlySet<THREE.Object3D>): void {
+  /** `exemptRoots` keep their whole native population; `exemptObjects`
+   *  (root children) keep only themselves, past the cap. */
+  update(
+    x: number,
+    z: number,
+    cap: number,
+    exemptRoots?: ReadonlySet<THREE.Object3D>,
+    exemptObjects?: ReadonlySet<THREE.Object3D>,
+  ): void {
     const changed =
       exemptRoots !== this.exemptRoots ||
+      exemptObjects !== this.exemptObjects ||
       cap !== this.cap ||
       !Number.isFinite(this.lastX) ||
       (cap > 0 && Math.hypot(x - this.lastX, z - this.lastZ) >= 4);
     this.cap = cap;
     this.exemptRoots = exemptRoots;
+    this.exemptObjects = exemptObjects;
     if (changed) {
       this.lastX = x;
       this.lastZ = z;
@@ -170,6 +181,7 @@ export class SceneryNearSources {
         source.visible &&
         (!cap ||
           exemptRoots?.has(source.root) ||
+          exemptObjects?.has(source.object) ||
           footprintDistance(source.bounds, x, z) <= cap + 4);
   }
 
