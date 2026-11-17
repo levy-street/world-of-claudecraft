@@ -16,9 +16,12 @@
 //                                    to h3, r1 to r8, b1 to b3, q1 to q3, f1
 //                                    to f3), every pack (trash), or all
 //   /dev heart gates                 open every gate of this run
-//   /dev heart portal                force the seal's portal open for this run
+//   /dev heart portal                burst the heart seal crystal now (a forced
+//                                    burst: the portal is open for this run
+//                                    whatever the veins say)
 //   /dev heart seal                  print the gating readout (mask, slabOpen,
-//                                    sealLit, ringClear, portalOpen, awake)
+//                                    sealLit, ringClear, ready, portalOpen,
+//                                    burst, awake)
 //   /dev heart arrival               replay the arrival scene: the heart goes
 //                                    back to sleep a moment and wakes again
 //                                    (with a living player in the Heart)
@@ -142,6 +145,7 @@ import {
   breathDevTrigger,
   breathGuardian,
   breathReadout,
+  burstSmithHeartSeal,
   COUNCIL_TEMPLATE_IDS,
   councilBodies,
   councilDevTrigger,
@@ -155,7 +159,7 @@ import {
   quenchReadout,
   replaySmithHeartArrivalForDev,
   SMITH_HEART_AWAKE_BIT,
-  setSmithHeartPortalDevOpen,
+  sealCrystalBurst,
   smithHeartProgress,
   smithHeartSealMaskOf,
   spendBreathIntro,
@@ -328,7 +332,7 @@ function heartAwake(ctx: SimContext, inst: InstanceSlot): boolean {
 /** The `/dev heart seal` readout line for one claim. */
 export function smithHeartSealReadout(ctx: SimContext, inst: InstanceSlot): string {
   const p = smithHeartProgress(ctx, inst);
-  return `[dev] Heart seal: mask ${p.mask}, slabOpen ${p.slabOpen}, sealLit ${p.sealLit}, ringClear ${p.ringClear}, portalOpen ${p.portalOpen}, awake ${heartAwake(ctx, inst)}.`;
+  return `[dev] Heart seal: mask ${p.mask}, slabOpen ${p.slabOpen}, sealLit ${p.sealLit}, ringClear ${p.ringClear}, ready ${p.ready}, portalOpen ${p.portalOpen}, burst ${sealCrystalBurst(ctx, inst)}, awake ${heartAwake(ctx, inst)}.`;
 }
 
 /** Handles `/dev heart ...`; returns false for any other line. */
@@ -426,7 +430,7 @@ export function handleSmithHeartDevChat(ctx: SimContext, raw: string, pid: numbe
   if (verb === 'portal') {
     const inst = ensureInside(ctx, pid);
     if (!inst) return true;
-    setSmithHeartPortalDevOpen(inst, true);
+    burstSmithHeartSeal(ctx, inst);
     log(ctx, pid, "[dev] The heart seal's portal is forced open for this run.");
     return true;
   }

@@ -131,6 +131,11 @@ export const RING_ARC = { fromDeg: 222, toDeg: 498 } as const;
 export const SEAL_DAIS = { x: 0, z: 0, r: 19, h: H.dais } as const;
 /** The seal at the dais's centre (render: the four-colour progress disc). */
 export const HEART_SEAL = { x: 0, z: 0, r: 9 } as const;
+/** The heart seal crystal at the dais's centre (encounters/smith_heart/
+ *  seal_crystal.ts): `r` is its footprint in yards. It stands as a solid
+ *  circle (a combat wall, instances/combat_wall_state.ts) until a player
+ *  presses it once all four veins burn, and the portal waits behind it. */
+export const SEAL_CRYSTAL = { x: 0, z: 0, r: 3.6 } as const;
 /** The portal the seal opens into (its walk-in trigger radius). */
 export const RING_PORTAL = { x: 0, z: 0, r: 4 } as const;
 /** Where the Heart's return portal sets the raid down: on the dais, facing

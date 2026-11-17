@@ -1,7 +1,8 @@
 // The Smith's Heart's portal hop (docs/design/raid/smith_heart.md, "The
-// portal"): the heart seal on the Ring's dais opens into a portal once all
-// four veins burn and the Ring is clear (seal.ts derives that and carries it
-// on the seal markers); walking into it sets a living player down on the
+// portal"): the heart seal crystal on the Ring's dais, charged once all four
+// veins burn and the Ring is clear, bursts when a player presses it
+// (seal_burst.ts) and the portal stands in its place (the markers' sticky
+// portal bit, seal.ts); walking into it sets a living player down on the
 // Heart's Arrival Terrace, a separate area of the same slot no floor joins
 // to the main map. The return portal on the terrace walks the raid back to
 // the dais at any time (a wipe's walk back, a corpse run's way out); it can
@@ -11,7 +12,8 @@
 //
 // A corpse run needs nothing more: a released spirit rises at the raid's
 // entrance (instances/dungeons.ts), walks the main map to the dais and steps
-// through, because a portal once open stays open for the claim's life.
+// through, because a portal once open stays open for the claim's life (the
+// crystal never stands again once it has burst).
 //
 // Draws ZERO rng (the shared displacement recipe, displacement.ts), and runs
 // once a tick per live claim from seal.ts tickSmithHeart.

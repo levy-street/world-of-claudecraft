@@ -126,11 +126,11 @@ export {
   SMITH_HEART_EXIT_BIT,
   SMITH_HEART_PORTAL_BIT,
   SMITH_HEART_PORTAL_OPEN_LOG,
+  SMITH_HEART_READY_BIT,
   SMITH_HEART_SEAL_FULL,
   SMITH_HEART_VEIN_BITS,
   SMITH_HEART_VEIN_LIT_LOG,
   type SmithHeartProgress,
-  setSmithHeartPortalDevOpen,
   smithHeartAwakeBitSet,
   smithHeartEarnedMask,
   smithHeartExitBitSet,
@@ -138,6 +138,7 @@ export {
   smithHeartPlayerInHeart,
   smithHeartPortalBitSet,
   smithHeartProgress,
+  smithHeartReadyBitSet,
   smithHeartSealMaskOf,
   smithHeartSealTemplate,
   smithHeartVeinLit,
@@ -145,3 +146,14 @@ export {
   tickSmithHeart,
   tickSmithHeartSeal,
 } from './seal';
+export {
+  burstSmithHeartSeal,
+  pressSmithHeartSealCrystal,
+  SMITH_HEART_SEAL_DARK_TEXT,
+} from './seal_burst';
+export {
+  inSealCrystalReach,
+  isSealCrystalTemplate,
+  sealCrystalBurst,
+  sealCrystalOf,
+} from './seal_crystal';

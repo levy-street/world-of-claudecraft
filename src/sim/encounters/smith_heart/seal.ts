@@ -1,7 +1,8 @@
 // The Smith's Heart's gating state (docs/design/raid/smith_heart.md, "Gating"):
-// which veins burn on the heart seal and whether the seal has opened into the
-// portal, derived every tick from the claim's own roster, never a timer and
-// never stored.
+// which veins burn on the heart seal, whether its crystal is charged and
+// whether the crystal has burst into the portal, carried on the claim's seal
+// markers; the veins and the charge are derived every tick from the claim's
+// own roster, never a timer.
 //
 //   the Hammer ALWAYS FIRST: the Hammer Council's fall (both: the Guardian
 //     and the Seam Singer) splits the Slab (the gate
@@ -10,27 +11,31 @@
 //     the Heat against each other (each arena's mouth waits only on its own
 //     vein's three packs);
 //   the seal: each guardian's death lights its vein's colour on the seal;
-//   the portal: with all four lit AND the Ring's eight packs dead, the seal
-//     opens into the portal to the Heart (portal.ts walks the raid through);
+//   the charge (READY): with all four lit AND the Ring clear, the heart seal
+//     crystal is charged and a player can press it (seal_crystal.ts);
+//   the portal: the press BURSTS the crystal (seal_burst.ts) and the portal
+//     to the Heart stands open (portal.ts walks the raid through). It is
+//     sticky, a bit the markers keep rather than derive, and set only by a
+//     burst: a seal lit and charged but never pressed stays shut;
 //   the exit (2026-11-17): the Masterless Strength fallen, the Heart's exit
 //     portal opens and walks the raid back to the entrance (portal.ts);
 //   the arrival (phase 2J): the first tick a living player stands in the
 //     Heart, the heart wakes (the renderer's arrival scene: the heart crystal
 //     rises and binds the room's rocks into the Masterless Strength's body).
-//     Presentation only: no mob, no damage, no gate reads it. It is the ONE
+//     Presentation only: no mob, no damage, no gate reads it. It is the other
 //     bit the markers keep rather than derive (a raid that walks back out
 //     leaves the heart awake), so it lives in the markers' own value and a
 //     fresh claim (markers at `smith_heart_seal_0`) starts asleep.
 //
 // Dead instance mobs stay dead for the claim's life, so a lit vein stays lit,
-// an opened portal stays open for the lockout, and a fresh claim (a reset)
-// starts dark and shut. The collision half is the shared gate engine
-// (instances/dungeon_gates.ts); THIS module owns the seal's colours and the
-// portal's state, carried in the template id of the run's seal markers
-// (content/smith_heart.ts SMITH_HEART_SEAL_MARKERS, spread so every walkable
-// point stands within interest range of one) so every client mirrors the seal
-// and the portal with no wire change, and the raid's lines as each vein
-// lights and as the portal opens.
+// a burst crystal stays burst (an opened portal stays open for the lockout),
+// and a fresh claim (a reset) starts dark and shut. The collision half is the
+// shared gate engine (instances/dungeon_gates.ts); THIS module owns the seal's
+// colours and the portal's state, carried in the template id of the run's seal
+// markers (content/smith_heart.ts SMITH_HEART_SEAL_MARKERS, spread so every
+// walkable point stands within interest range of one) so every client mirrors
+// the seal and the portal with no wire change, and the raid's lines as each
+// vein lights.
 //
 // Draws NO rng; reads the roster through the gate engine's placed-boss read.
 
@@ -60,6 +65,7 @@ import { beginArrivalVoice, stepArrivalVoice } from './final_voice';
 import { tickHeatGuardian } from './heat';
 import { tickSmithHeartPortal } from './portal';
 import { tickQuenchGuardian } from './quench';
+import { holdSealMarkerInert, tickSealCrystal } from './seal_crystal';
 
 /** Each vein's bit in the seal mask (the template id's number). */
 export const SMITH_HEART_VEIN_BITS: Readonly<Record<SmithHeartVein, number>> = {
@@ -70,7 +76,10 @@ export const SMITH_HEART_VEIN_BITS: Readonly<Record<SmithHeartVein, number>> = {
 };
 /** Every vein lit. */
 export const SMITH_HEART_SEAL_FULL = 15;
-/** The portal's bit: the seal has opened (all four lit and the Ring clear). */
+/** The portal's bit: the heart seal crystal has burst and the portal to the
+ *  Heart stands open. STICKY (kept by the markers, never derived): set only by
+ *  a burst (seal_burst.ts: the press, or `/dev heart portal`), so a seal lit
+ *  and charged but never pressed keeps the portal shut. */
 export const SMITH_HEART_PORTAL_BIT = 16;
 /** The arrival's bit (phase 2J): a living player has stood in the Heart.
  *  Kept by the markers for the claim's life once set. */
@@ -79,19 +88,27 @@ export const SMITH_HEART_AWAKE_BIT = 32;
  *  Strength has fallen, so the Heart's exit portal stands open (portal.ts).
  *  Derived every tick like the veins. */
 export const SMITH_HEART_EXIT_BIT = 64;
+/** The charge's bit: all four veins are lit AND the Ring is clear, so the heart
+ *  seal crystal is charged and a press bursts it. Derived every tick like the
+ *  veins, so it stays set after the burst. */
+export const SMITH_HEART_READY_BIT = 128;
 /** Every bit a marker can carry. */
 const MARKER_BITS =
-  SMITH_HEART_SEAL_FULL | SMITH_HEART_PORTAL_BIT | SMITH_HEART_AWAKE_BIT | SMITH_HEART_EXIT_BIT;
+  SMITH_HEART_SEAL_FULL |
+  SMITH_HEART_PORTAL_BIT |
+  SMITH_HEART_AWAKE_BIT |
+  SMITH_HEART_EXIT_BIT |
+  SMITH_HEART_READY_BIT;
 
-/** The seal marker template id for a marker value (lit veins plus the
- *  portal bit). */
+/** The seal marker template id for a marker value (the lit veins plus the
+ *  charge, portal, arrival and exit bits). */
 export function smithHeartSealTemplate(mask: number): string {
   return `${SMITH_HEART_SEAL_PREFIX}${mask & MARKER_BITS}`;
 }
 
-/** The value a seal marker's template id carries (lit-vein mask plus the
- *  portal bit), or null. Pure (the renderer reads the mirrored entity
- *  through it). */
+/** The value a seal marker's template id carries (the lit-vein mask plus the
+ *  charge, portal, arrival and exit bits), or null. Pure (the renderer reads
+ *  the mirrored entity through it). */
 export function smithHeartSealMaskOf(templateId: string): number | null {
   if (!templateId.startsWith(SMITH_HEART_SEAL_PREFIX)) return null;
   const n = Number(templateId.slice(SMITH_HEART_SEAL_PREFIX.length));
@@ -103,9 +120,15 @@ export function smithHeartVeinLit(mask: number, vein: SmithHeartVein): boolean {
   return (mask & SMITH_HEART_VEIN_BITS[vein]) !== 0;
 }
 
-/** Does a marker value say the portal is open? Pure. */
+/** Does a marker value say the portal is open (the crystal has burst)? Pure. */
 export function smithHeartPortalBitSet(mask: number): boolean {
   return (mask & SMITH_HEART_PORTAL_BIT) !== 0;
+}
+
+/** Does a marker value say the heart seal crystal is charged (all four veins
+ *  lit and the Ring clear)? Pure. */
+export function smithHeartReadyBitSet(mask: number): boolean {
+  return (mask & SMITH_HEART_READY_BIT) !== 0;
 }
 
 /** Does a marker value say the heart is awake (the raid has arrived)? Pure. */
@@ -145,21 +168,6 @@ export function smithHeartEarnedMask(ctx: SimContext, inst: InstanceSlot): numbe
     if (smithHeartVeinWon(ctx, inst, v)) mask |= SMITH_HEART_VEIN_BITS[v];
   }
   return mask;
-}
-
-/** Claims whose portal a dev playtest forced open (`/dev heart portal`),
- *  keyed by the claim's identity so a recycled slot never inherits it. */
-const devPortal = new WeakMap<InstanceSlot, number>();
-
-/** Force (or stop forcing) a live claim's portal open for a dev playtest.
- *  Dev-gated by its one caller (sim/dev/smith_heart_dev.ts). */
-export function setSmithHeartPortalDevOpen(inst: InstanceSlot, open: boolean): void {
-  if (open && inst.partyKey !== null && inst.exitId !== null) devPortal.set(inst, inst.exitId);
-  else devPortal.delete(inst);
-}
-
-function devPortalOpen(inst: InstanceSlot): boolean {
-  return inst.exitId !== null && devPortal.get(inst) === inst.exitId;
 }
 
 /** Claims whose arrival a dev playtest is replaying (`/dev heart arrival`):
@@ -218,8 +226,12 @@ export interface SmithHeartProgress {
   sealLit: boolean;
   /** The Ring's eight packs are dead. */
   ringClear: boolean;
-  /** The seal has opened into the portal to the Heart (seal lit and the Ring
-   *  clear, or forced open by `/dev heart portal`). */
+  /** The heart seal crystal is charged: all four veins lit and the Ring clear
+   *  (the markers' READY bit, derived every tick). A press bursts it. */
+  ready: boolean;
+  /** The crystal has burst and the portal to the Heart stands open: the
+   *  markers' STICKY portal bit, set only by a burst (seal_burst.ts), never by
+   *  the veins and the Ring alone. */
   portalOpen: boolean;
 }
 
@@ -227,12 +239,14 @@ export function smithHeartProgress(ctx: SimContext, inst: InstanceSlot): SmithHe
   const mask = smithHeartEarnedMask(ctx, inst);
   const ringClear = dungeonPacksDead(ctx, inst, SMITH_HEART_PACKS.ring);
   const sealLit = mask === SMITH_HEART_SEAL_FULL;
+  const markers = markerMask(ctx, inst);
   return {
     mask,
     slabOpen: smithHeartVeinLit(mask, 'hammer'),
     sealLit,
     ringClear,
-    portalOpen: (sealLit && ringClear) || devPortalOpen(inst),
+    ready: sealLit && ringClear,
+    portalOpen: markers !== null && smithHeartPortalBitSet(markers),
   };
 }
 
@@ -245,12 +259,13 @@ export const SMITH_HEART_VEIN_LIT_LOG: Readonly<Record<SmithHeartVein, string>> 
   heat: 'A white-gold light runs out of the Hearth toward the heart seal.',
 };
 
-/** The English line the raid reads when the seal opens into the portal. */
+/** The English line the raid reads when the heart seal crystal bursts (re-
+ *  localized by src/ui/sim_i18n.ts, EXACT matcher). */
 export const SMITH_HEART_PORTAL_OPEN_LOG =
-  'Four colours burn on the heart seal. It splits open, and a way down into the heart of the mountain whirls in its place.';
+  'The heart seal crystal shatters, and a way down into the heart of the mountain whirls open in its place.';
 
 /** The claim's seal markers' current value (the first marker's; all agree). */
-function markerMask(ctx: SimContext, inst: InstanceSlot): number | null {
+export function markerMask(ctx: SimContext, inst: InstanceSlot): number | null {
   for (const id of inst.objectIds) {
     const e = ctx.entities.get(id);
     const m = e ? smithHeartSealMaskOf(e.templateId) : null;
@@ -259,7 +274,8 @@ function markerMask(ctx: SimContext, inst: InstanceSlot): number | null {
   return null;
 }
 
-function announce(ctx: SimContext, inst: InstanceSlot, text: string): void {
+/** Tell every player standing in the claim a line of the seal's. */
+export function announce(ctx: SimContext, inst: InstanceSlot, text: string): void {
   const o = instanceOrigin(DUNGEONS[inst.dungeonId].index, inst.slot);
   const half = instanceHalfWidthOf(inst.dungeonId);
   for (const meta of ctx.players.values()) {
@@ -269,10 +285,24 @@ function announce(ctx: SimContext, inst: InstanceSlot, text: string): void {
   }
 }
 
+/** Write `value` onto every seal marker of the claim (their template id
+ *  carries it) and keep each marker out of the press (seal_crystal.ts). */
+export function writeSealMarkers(ctx: SimContext, inst: InstanceSlot, value: number): void {
+  const template = smithHeartSealTemplate(value);
+  for (const id of inst.objectIds) {
+    const e = ctx.entities.get(id);
+    if (!e || smithHeartSealMaskOf(e.templateId) === null) continue;
+    if (e.templateId !== template) e.templateId = template;
+    holdSealMarkerInert(e);
+  }
+}
+
 /**
- * One tick of one claim's seal: write the earned value (lit veins plus the
- * portal bit) onto every marker and tell the raid about each vein that lit
- * and the portal opening since the last tick. Returns the claim's current
+ * One tick of one claim's seal: write the value (the veins the claim has won,
+ * the charge, the kept portal and arrival bits, the exit) onto every marker,
+ * keep the crystal honest, and tell the raid about each vein that lit since
+ * the last tick. The portal bit is carried over from the markers, never
+ * derived: only a burst sets it (seal_burst.ts). Returns the claim's current
  * marker value, or null for a claim without markers.
  */
 export function tickSmithHeartSeal(ctx: SimContext, inst: InstanceSlot): number | null {
@@ -285,22 +315,17 @@ export function tickSmithHeartSeal(ctx: SimContext, inst: InstanceSlot): number 
   const exit = dungeonPlacedBossDead(ctx, inst, SMITH_HEART_FINAL_BOSS);
   const value =
     p.mask |
+    (p.ready ? SMITH_HEART_READY_BIT : 0) |
     (p.portalOpen ? SMITH_HEART_PORTAL_BIT : 0) |
     (awake ? SMITH_HEART_AWAKE_BIT : 0) |
     (exit ? SMITH_HEART_EXIT_BIT : 0);
+  writeSealMarkers(ctx, inst, value);
+  tickSealCrystal(ctx, inst, p.ready, p.portalOpen);
   if (value === before) return value;
-  const template = smithHeartSealTemplate(value);
-  for (const id of inst.objectIds) {
-    const e = ctx.entities.get(id);
-    if (e && smithHeartSealMaskOf(e.templateId) !== null) e.templateId = template;
-  }
   for (const v of SMITH_HEART_VEINS) {
     if (smithHeartVeinLit(value, v) && !smithHeartVeinLit(before, v)) {
       announce(ctx, inst, SMITH_HEART_VEIN_LIT_LOG[v]);
     }
-  }
-  if (smithHeartPortalBitSet(value) && !smithHeartPortalBitSet(before)) {
-    announce(ctx, inst, SMITH_HEART_PORTAL_OPEN_LOG);
   }
   // The heart wakes: its arrival lines follow over the scene.
   if (smithHeartAwakeBitSet(value) && !smithHeartAwakeBitSet(before)) beginArrivalVoice(ctx, inst);
@@ -309,7 +334,7 @@ export function tickSmithHeartSeal(ctx: SimContext, inst: InstanceSlot): number 
 
 /** One tick of every Smith's Heart claim (instances/dungeons.ts): the Hammer
  *  Council's fight, the seal (and the arrival), then the portal hops (the
- *  Ring's portal only while the seal stands open). The claim list is walked
+ *  Ring's portal only once the crystal has burst). The claim list is walked
  *  in place. */
 export function tickSmithHeart(ctx: SimContext): void {
   for (const inst of ctx.instances) {
