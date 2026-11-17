@@ -4,12 +4,17 @@
 // The prompts ask for a LEFT side view, but every sheet draws its profile facing image-right, which
 // shows the statue's RIGHT side: it is written as right.png, since feeding it to Tripo as the left
 // view would build the statue mirrored.
-//   node scripts/assets/smith_heart_hammer_colossi/split_views.mjs <sheet.png> <outDir>
+// A FOUR-view sheet (a quarter turn between views, left to right: front, left, back, right;
+// the sheet's second view shows the object's front on its LEFT, so it is the object's left
+// side) takes a third argument, 4, and writes front, left, back and right.
+//   node scripts/assets/smith_heart_hammer_colossi/split_views.mjs <sheet.png> <outDir> [views=3]
 import fs from 'node:fs';
 import sharp from 'sharp';
 
-const [sheet, outDir] = process.argv.slice(2);
-if (!sheet || !outDir) throw new Error('usage: split_views.mjs <sheet> <outDir>');
+const [sheet, outDir, viewsArg] = process.argv.slice(2);
+if (!sheet || !outDir) throw new Error('usage: split_views.mjs <sheet> <outDir> [views=3]');
+const COUNT = Number(viewsArg ?? 3);
+if (COUNT !== 3 && COUNT !== 4) throw new Error('views must be 3 or 4');
 const { data, info } = await sharp(sheet).removeAlpha().raw().toBuffer({ resolveWithObject: true });
 const W = info.width;
 const H = info.height;
@@ -58,10 +63,10 @@ for (const r of runs) {
 const figures = merged
   .filter((r) => r[1] - r[0] > W * 0.06)
   .sort((a, b) => b[1] - b[0] - (a[1] - a[0]))
-  .slice(0, 3)
+  .slice(0, COUNT)
   .sort((a, b) => a[0] - b[0]);
-if (figures.length !== 3)
-  throw new Error(`found ${figures.length} figures, wanted 3: ${JSON.stringify(merged)}`);
+if (figures.length !== COUNT)
+  throw new Error(`found ${figures.length} figures, wanted ${COUNT}: ${JSON.stringify(merged)}`);
 // One shared top and bottom over all three figures.
 let top = H;
 let bottom = 0;
@@ -76,12 +81,12 @@ const PAD = 12;
 top = Math.max(0, top - PAD);
 bottom = Math.min(H - 1, bottom + PAD);
 fs.mkdirSync(outDir, { recursive: true });
-const names = ['front', 'right', 'back'];
-for (let i = 0; i < 3; i++) {
+const names = COUNT === 4 ? ['front', 'left', 'back', 'right'] : ['front', 'right', 'back'];
+for (let i = 0; i < COUNT; i++) {
   const [x0, x1] = figures[i];
   // Pad, but never past the middle of the gap to a neighbour: no sliver of the next view.
   const lo = i > 0 ? Math.ceil((figures[i - 1][1] + x0) / 2) : 0;
-  const hi = i < 2 ? Math.floor((x1 + figures[i + 1][0]) / 2) : W - 1;
+  const hi = i < COUNT - 1 ? Math.floor((x1 + figures[i + 1][0]) / 2) : W - 1;
   const left = Math.max(lo, x0 - PAD);
   const width = Math.min(hi, x1 + PAD) - left + 1;
   const res = await sharp(sheet)

@@ -2,14 +2,15 @@
 // views/back.png (split_views.mjs) and writes raw.glb and job.json. The paid task id lands in
 // job.json the moment it exists, so a rerun after a crash resumes that task and never pays twice.
 // The key comes from the repo-root .env like every pipeline command (asset_pipeline/lib/env.mjs).
-//   node scripts/assets/smith_heart_hammer_colossi/tripo_views.mjs tmp/hammer_colossi/<name> [faceLimit=12000]
+//   node scripts/assets/smith_heart_hammer_colossi/tripo_views.mjs tmp/hammer_colossi/<name> [faceLimit=12000] [textureSize=1024]
 import fs from 'node:fs';
 import path from 'node:path';
 import * as tripo from '../../asset_pipeline/lib/tripo.mjs';
 
-if (!process.argv[2]) throw new Error('usage: tripo_views.mjs <jobDir> [faceLimit]');
+if (!process.argv[2]) throw new Error('usage: tripo_views.mjs <jobDir> [faceLimit] [textureSize]');
 const dir = path.resolve(process.argv[2]);
 const faceLimit = Number(process.argv[3] ?? 12000);
+const textureSize = Number(process.argv[4] ?? 1024);
 const ledger = path.join(dir, 'job.json');
 const job = fs.existsSync(ledger) ? JSON.parse(fs.readFileSync(ledger, 'utf8')) : {};
 let task;
@@ -20,15 +21,18 @@ if (job.taskId) {
   const views = {};
   for (const view of ['front', 'right', 'back'])
     views[view] = path.join(dir, 'views', `${view}.png`);
+  // A four-view sheet (split_views.mjs ... 4) also writes the object's left side.
+  const left = path.join(dir, 'views', 'left.png');
+  if (fs.existsSync(left)) views.left = left;
   ({ task } = await tripo.generateModelFromViews({
     views,
     model: tripo.MODEL_P2,
     faceLimit,
-    textureSize: 1024,
+    textureSize,
     textureQuality: 'standard',
     pbr: true,
     onTaskCreated: (id) => {
-      Object.assign(job, { taskId: id, model: tripo.MODEL_P2, faceLimit });
+      Object.assign(job, { taskId: id, model: tripo.MODEL_P2, faceLimit, textureSize });
       fs.writeFileSync(ledger, JSON.stringify(job, null, 2));
       console.log('task', id);
     },
