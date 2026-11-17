@@ -24796,6 +24796,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.say.singer_wake': 'Проснись, спящий камень. Восстань там, где они стоят!',
   'hudChrome.council.say.singer_rock': 'Посмотрите наверх, малыши! Гора падает!',
   // The Smith's Heart's Guardian of the Breath and Captain Thessaly (M16 fills).
+  'hudChrome.breathGuardian.say.guardian_intro':
+    'Вершина молчала целую вечность. Теперь она делает вдох, и небо дышит вместе с ней.',
   'hudChrome.breathGuardian.say.guardian_pull':
     'Вы взобрались на вершину горы, чтобы украсть её дыхание? Тогда дышите вместе со мной.',
   'hudChrome.breathGuardian.say.guardian_blow':

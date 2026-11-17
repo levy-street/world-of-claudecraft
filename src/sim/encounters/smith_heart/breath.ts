@@ -87,6 +87,7 @@ import {
   BREATH_TUNING as T,
 } from './breath_ids';
 import {
+  breathIntroJustSpoke,
   breathIntroReadout,
   replayBreathIntro,
   spendBreathIntro,
@@ -384,7 +385,8 @@ function beginBreath(ctx: SimContext, inst: InstanceSlot, boss: Entity): BreathF
   st.baseSwing = applyTierSwing(boss, BREATH_DIFFICULTY[st.difficulty].swingMult);
   boss.smithHeartBreath = st;
   setWind({ ctx, inst, st }, 'calm', T.firstGather, 0);
-  breathSay({ ctx, inst, st }, boss, 'guardian', 'pull');
+  // Straight after its entrance the pull line would follow the entrance's own.
+  if (!breathIntroJustSpoke(ctx, boss)) breathSay({ ctx, inst, st }, boss, 'guardian', 'pull');
   return st;
 }
 

@@ -39,6 +39,7 @@ import {
 import { QUENCH_LINES } from '../src/sim/encounters/smith_heart/quench_voice';
 import {
   SMITH_HEART_VOICE_LINES,
+  SMITH_HEART_VOICE_PENDING,
   SMITH_HEART_VOICES,
 } from '../src/sim/encounters/smith_heart/voice_lines';
 import {
@@ -266,7 +267,11 @@ describe('the voice pack', () => {
       readFileSync(join(repoRoot, 'scripts/voices/voice_ids.json'), 'utf8'),
     );
     expect(SMITH_HEART_VOICE_LINES.length).toBeGreaterThanOrEqual(100);
+    // Pending a clip (rendered with ElevenLabs on the owner's go): pinned,
+    // so a new line never slips through unvoiced.
+    expect([...SMITH_HEART_VOICE_PENDING]).toEqual(['breath.intro']);
     for (const line of SMITH_HEART_VOICE_LINES) {
+      if (SMITH_HEART_VOICE_PENDING.has(line.id)) continue;
       const packed = packLine(line);
       expect(packed.key, line.id).toBe(yellKey(line.text));
       expect(ids[line.voiceNpc], line.voiceNpc).toBeTruthy();

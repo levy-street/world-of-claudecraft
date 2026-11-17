@@ -23155,6 +23155,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.say.singer_wake': '醒來吧，沉睡的岩石。在他們腳下升起！',
   'hudChrome.council.say.singer_rock': '抬頭看，小傢伙們！山要塌下來了！',
   // The Smith's Heart's Guardian of the Breath and Captain Thessaly (M16 fills).
+  'hudChrome.breathGuardian.say.guardian_intro':
+    '山巔沉寂了一個紀元。如今它開始呼吸，天空也隨之呼吸。',
   'hudChrome.breathGuardian.say.guardian_pull':
     '你們爬上山巔，是來偷走它的氣息嗎？那就與我一同呼吸吧。',
   'hudChrome.breathGuardian.say.guardian_blow': '感受風向的轉變。邊緣比你想的更近。',

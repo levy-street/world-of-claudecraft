@@ -13730,6 +13730,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.breathGuardian.say.guardian_death'
   | 'hudChrome.breathGuardian.say.guardian_drawn'
   | 'hudChrome.breathGuardian.say.guardian_inhale'
+  | 'hudChrome.breathGuardian.say.guardian_intro'
   | 'hudChrome.breathGuardian.say.guardian_isles'
   | 'hudChrome.breathGuardian.say.guardian_knot'
   | 'hudChrome.breathGuardian.say.guardian_pull'

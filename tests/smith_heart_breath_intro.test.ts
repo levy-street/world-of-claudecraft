@@ -24,7 +24,7 @@ import {
   breathReadout,
   inBreathIntroReach,
 } from '../src/sim/encounters/smith_heart';
-import { breathLineKey } from '../src/sim/encounters/smith_heart/breath_voice';
+import { BREATH_LINES, breathLineKey } from '../src/sim/encounters/smith_heart/breath_voice';
 import { enterDungeon } from '../src/sim/instances/dungeons';
 import type { InstanceSlot } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
@@ -82,7 +82,7 @@ function claim(seed = 7) {
 }
 
 const intro = (e: Entity) => e.auras.find((a) => a.id === BREATH_AURAS.intro);
-/** Every boss yell in `ev` (the entrance says none). */
+/** Every boss yell in `ev`. */
 const yells = (ev: SimEvent[]) =>
   ev.filter((e) => e.type === 'chat' && (e as { channel?: string }).channel === 'yell');
 const pullLines = (ev: SimEvent[], pid?: number) =>
@@ -140,7 +140,7 @@ describe('the Guardian of the Breath waits in the still air', () => {
 });
 
 describe('the entrance', () => {
-  it('runs its clock on the aura, says nothing, and holds it out of every pull and blow', () => {
+  it('runs its clock on the aura, speaks its entrance line once, and holds it out of every pull and blow', () => {
     const c = claim();
     c.run(2);
     c.put(c.players[0], EDGE);
@@ -168,8 +168,12 @@ describe('the entrance', () => {
       if (i === 40) c.sim.ctx.dealDamage(c.players[1], b, 500, false, 'physical', 'Strike', 'hit');
     }
     expect(b.hp).toBe(hp0);
-    // Wind and thunder only: no voice.
-    expect(yells(ev)).toHaveLength(0);
+    // Its one entrance line (the owner's run of 2026-11-17), to each raider,
+    // at the tornado's burst, keyed for the client.
+    const lines = yells(ev) as unknown as { text: string; textKey: string; pid: number }[];
+    expect(lines).toHaveLength(c.players.length);
+    expect(lines.every((l) => l.text === BREATH_LINES.guardian.intro)).toBe(true);
+    expect(lines.every((l) => l.textKey === breathLineKey('guardian', 'intro'))).toBe(true);
     // The scene ends: handed back, no aura (a late joiner sees it floating).
     c.run(1);
     expect(breathIntroState(b).stage).toBe('done');
@@ -177,12 +181,12 @@ describe('the entrance', () => {
     expect(b.hostile).toBe(true);
     expect(b.damageImmune).toBe(false);
     expect(b.encounterHeld).toBe(false);
-    // The raider at its side pulls it the ordinary way, and its pull line is
-    // said (the entrance spoke none).
+    // The raider at its side pulls it the ordinary way; its pull line keeps
+    // quiet straight after the entrance's own (as the other guardians').
     const after = c.run(3);
     expect(b.smithHeartBreath).toBeDefined();
     expect(b.inCombat).toBe(true);
-    expect(pullLines(after, c.players[0].id)).toHaveLength(1);
+    expect(pullLines(after, c.players[0].id)).toHaveLength(0);
   });
 
   it('a raider who joins mid-scene reads it where it is off the aura', () => {

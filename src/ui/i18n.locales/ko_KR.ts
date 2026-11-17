@@ -22603,6 +22603,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.say.singer_wake': '깨어나라, 잠든 돌이여. 그들이 선 곳에서 솟아올라라!',
   'hudChrome.council.say.singer_rock': '위를 봐요, 꼬마들! 산이 무너지고 있어요!',
   // The Smith's Heart's Guardian of the Breath and Captain Thessaly (M16 fills).
+  'hudChrome.breathGuardian.say.guardian_intro':
+    '정상은 오랜 세월 침묵했다. 이제 숨을 들이쉬고, 하늘도 함께 숨 쉰다.',
   'hudChrome.breathGuardian.say.guardian_pull':
     '산의 꼭대기까지 올라와 그 숨결을 훔치려는가? 그렇다면 나와 함께 숨 쉬어라.',
   'hudChrome.breathGuardian.say.guardian_blow':

@@ -8,8 +8,8 @@
 // BREATH_INTRO.seconds, the guardian still held (no aggro reach, no target,
 // no harm, no swing), and at the end it is handed back hostile and
 // touchable; only then does the ordinary pull take it (a player inside its
-// aggro reach, or a blow). The scene says nothing (wind and thunder only),
-// so the pull keeps its own line. The cinematic is the renderer's
+// aggro reach, or a blow). Its line is yelled at BREATH_INTRO.speakAt (the
+// tornado's burst), and the pull's own line stays quiet just after it. The cinematic is the renderer's
 // (render/smith_heart_fx/breath_entrance_*.ts), read off one aura on the
 // guardian (BREATH_AURAS.intro: gathered, or waking with the scene's clock),
 // so a client that joins mid-scene picks it up where it is and one that
@@ -30,6 +30,7 @@ import { DT, type Entity } from '../../types';
 import { BREATH_AURAS, BREATH_NAMES } from './breath_ids';
 import { BREATH_INTRO, BREATH_INTRO_STAGES } from './breath_intro_plan';
 import { auraOf, dropAura, putMarker } from './breath_scope';
+import { breathYell } from './breath_voice';
 
 export type BreathIntroStage = 'dormant' | 'waking' | 'done';
 
@@ -39,6 +40,10 @@ export interface BreathIntroState {
   t: number;
   /** Seconds a replay holds it gathered before a waker counts (dormant). */
   hold: number;
+  /** It has spoken its entrance line this scene. */
+  spoke: boolean;
+  /** The sim time the scene ran out (the pull's quiet), -Infinity never. */
+  endedAt: number;
 }
 
 const intros = new WeakMap<Entity, BreathIntroState>();
@@ -47,7 +52,7 @@ const intros = new WeakMap<Entity, BreathIntroState>();
 export function breathIntroState(boss: Entity): BreathIntroState {
   let s = intros.get(boss);
   if (!s) {
-    s = { stage: 'dormant', t: 0, hold: 0 };
+    s = { stage: 'dormant', t: 0, hold: 0, spoke: false, endedAt: Number.NEGATIVE_INFINITY };
     intros.set(boss, s);
   }
   return s;
@@ -152,7 +157,12 @@ export function stepBreathIntro(
     return true;
   }
   s.t += DT;
+  if (!s.spoke && s.t >= BREATH_INTRO.speakAt - 1e-9) {
+    s.spoke = true;
+    breathYell({ ctx, inst }, boss, 'guardian', 'intro');
+  }
   if (s.t >= BREATH_INTRO.seconds - 1e-9) {
+    s.endedAt = ctx.time;
     finish(boss, s);
     return false;
   }
@@ -174,9 +184,17 @@ export function replayBreathIntro(boss: Entity): void {
   const s = breathIntroState(boss);
   s.stage = 'dormant';
   s.t = 0;
+  s.spoke = false;
   s.hold = BREATH_INTRO.replayHold;
   hold(boss);
   show(boss, s);
+}
+
+/** Did the entrance just speak (its scene ran out within `pullQuiet`)? The
+ *  pull's line keeps quiet then. */
+export function breathIntroJustSpoke(ctx: SimContext, boss: Entity): boolean {
+  const s = breathIntroState(boss);
+  return s.spoke && ctx.time - s.endedAt < BREATH_INTRO.pullQuiet;
 }
 
 /** The readout's entrance part. */

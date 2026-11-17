@@ -77,6 +77,7 @@ export const SMITH_HEART_DIRECTIONS = {
   'singer.wipe': '[gently, a lullaby]',
   'singer.defeat': '[a last fading note]',
   // The Guardian of the Breath: the summit's bellows.
+  'breath.intro': '[vast, slow, awakening]',
   'breath.pull': '[vast, unhurried]',
   'breath.blow': '[a low, rushing whisper]',
   'breath.inhale': '[drawing breath, hushed]',

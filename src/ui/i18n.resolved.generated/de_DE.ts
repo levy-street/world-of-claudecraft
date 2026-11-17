@@ -7372,6 +7372,7 @@ export const de_DE: EnTranslations = {
     },
     "breathGuardian": {
       "say": {
+        "guardian_intro": "The summit was silent for an age. Now it draws breath, and the sky breathes with it.",
         "guardian_pull": "You climbed to the top of the mountain to steal its breath? Then breathe with me.",
         "guardian_blow": "Feel the wind turn. The edge is closer than you think.",
         "guardian_inhale": "Come closer. All of you.",

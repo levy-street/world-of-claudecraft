@@ -5,7 +5,8 @@
 // as the key its voice clip is found by (scripts/voices/smith_heart_voice_pack.mjs).
 // Thessaly keeps the Highwatch captain's voice.
 //
-//   guardian   the pull, its first blow, each indrawn breath (at most once in
+//   guardian   its entrance (breath_intro.ts, as the tornado bursts), the
+//              pull (not straight after the entrance), its first blow, each indrawn breath (at most once in
 //              SAY_EVERY), the storm breaking, the cradle and the drawn
 //              lightning (once in SAY_EVERY each), the Summit Roar and
 //              the Knotted Gale (once in SAY_EVERY each), a player's
@@ -26,6 +27,7 @@ export type BreathSpeaker = 'guardian' | 'thessaly';
 
 /** The moments a speaker speaks at. */
 export type BreathMoment =
+  | 'intro'
   | 'pull'
   | 'blow'
   | 'inhale'
@@ -52,6 +54,7 @@ export type BreathMoment =
 export const BREATH_LINES: Readonly<Record<BreathSpeaker, Partial<Record<BreathMoment, string>>>> =
   {
     guardian: {
+      intro: 'The summit was silent for an age. Now it draws breath, and the sky breathes with it.',
       pull: 'You climbed to the top of the mountain to steal its breath? Then breathe with me.',
       blow: 'Feel the wind turn. The edge is closer than you think.',
       inhale: 'Come closer. All of you.',
@@ -109,8 +112,10 @@ const REPEATING: ReadonlySet<BreathMoment> = new Set([
   'knot',
 ]);
 
-/** Speak one line from `from` to everyone near the Cornice. */
-function yell(
+/** Speak one line from `from` to everyone near the Cornice (ungated: the
+ *  entrance's own line, said once by breath_intro.ts before any fight state
+ *  exists, rides it too). */
+export function breathYell(
   s: Pick<BreathScope, 'ctx' | 'inst'>,
   from: Entity,
   speaker: BreathSpeaker,
@@ -151,7 +156,7 @@ export function breathSay(
     if (said !== undefined && s.st.clock - said < SAY_EVERY - 1e-9) return false;
   } else if (said !== undefined) return false;
   s.st.said[tag] = s.st.clock;
-  yell(s, from, speaker, moment);
+  breathYell(s, from, speaker, moment);
   return true;
 }
 

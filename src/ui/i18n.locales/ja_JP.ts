@@ -22631,6 +22631,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.say.singer_wake': '目覚めなさい、眠れる石よ。彼らの足元から立ち上がれ！',
   'hudChrome.council.say.singer_rock': '上を見て、おちびさんたち！山が落ちてくるわ！',
   // The Smith's Heart's Guardian of the Breath and Captain Thessaly (M16 fills).
+  'hudChrome.breathGuardian.say.guardian_intro':
+    '頂は長き時を沈黙していた。今、それは息を吸い、空もまた共に息づく。',
   'hudChrome.breathGuardian.say.guardian_pull':
     '山の頂まで登り、その息吹を盗みに来たか？ならば我と共に息をせよ。',
   'hudChrome.breathGuardian.say.guardian_blow': '風が向きを変えるのを感じよ。縁は思うより近いぞ。',

@@ -3,7 +3,8 @@
 // sim's timeline (breath_intro.ts) and the renderer's scene (render/
 // smith_heart_fx/breath_entrance_core.ts) read the same clock off the same
 // constants, so the guardian is handed back to the fight exactly as the
-// scene ends. No voice: wind and thunder only.
+// scene ends. Its one line (the owner's run of 2026-11-17: the other
+// guardians speak in their entrances) rides the tornado's burst.
 //
 // Imports nothing (no SimContext, no rng, no clock).
 
@@ -24,6 +25,12 @@ export const BREATH_INTRO = {
   /** It is handed back to the fight: hostile, touchable, its aggro reach live
    *  again (the last thunderclap has just rolled). */
   seconds: 12,
+  /** It speaks its entrance line (breath_voice.ts 'intro') as the tornado
+   *  bursts and leaves it floating in the storm. */
+  speakAt: 6.5,
+  /** Its pull line stays quiet this long after the scene (it has just
+   *  spoken), as the other guardians' do. */
+  pullQuiet: 45,
   /** A dev replay holds it gathered this long before a waker can wake the
    *  Cornice again, so every client sees the calm first (a snapshot or
    *  two). */

@@ -7372,6 +7372,7 @@ export const ja_JP: EnTranslations = {
     },
     "breathGuardian": {
       "say": {
+        "guardian_intro": "頂は長き時を沈黙していた。今、それは息を吸い、空もまた共に息づく。",
         "guardian_pull": "山の頂まで登り、その息吹を盗みに来たか？ならば我と共に息をせよ。",
         "guardian_blow": "風が向きを変えるのを感じよ。縁は思うより近いぞ。",
         "guardian_inhale": "近う寄れ。皆、残らず。",

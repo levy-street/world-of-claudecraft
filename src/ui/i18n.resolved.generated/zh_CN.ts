@@ -7372,6 +7372,7 @@ export const zh_CN: EnTranslations = {
     },
     "breathGuardian": {
       "say": {
+        "guardian_intro": "山巅沉寂了一个纪元。如今它开始呼吸，天空也随之呼吸。",
         "guardian_pull": "你们爬上山巅，是来偷走它的气息吗？那就与我一同呼吸吧。",
         "guardian_blow": "感受风向的转变。边缘比你想的更近。",
         "guardian_inhale": "靠近些。所有人。",

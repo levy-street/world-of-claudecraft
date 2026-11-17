@@ -43,6 +43,14 @@ function rows(
   return out;
 }
 
+/** Lines with no clip rendered yet (the voice pipeline renders them next:
+ *  scripts/render_smith_heart_voice_pack.mjs). Until then the yell shows
+ *  without its voice; the tests hold every other line to its clip. */
+export const SMITH_HEART_VOICE_PENDING: ReadonlySet<string> = new Set([
+  // The Breath's entrance line (the owner's run of 2026-11-17).
+  'breath.intro',
+]);
+
 export const SMITH_HEART_VOICE_LINES: readonly SmithHeartVoiceLine[] = [
   ...rows(SMITH_HEART_VOICES.guardian, 'guardian', COUNCIL_LINES.guardian),
   ...rows(SMITH_HEART_VOICES.singer, 'singer', COUNCIL_LINES.singer),

@@ -7372,6 +7372,7 @@ export const ko_KR: EnTranslations = {
     },
     "breathGuardian": {
       "say": {
+        "guardian_intro": "정상은 오랜 세월 침묵했다. 이제 숨을 들이쉬고, 하늘도 함께 숨 쉰다.",
         "guardian_pull": "산의 꼭대기까지 올라와 그 숨결을 훔치려는가? 그렇다면 나와 함께 숨 쉬어라.",
         "guardian_blow": "바람이 방향을 바꾸는 것을 느껴라. 가장자리는 생각보다 가깝다.",
         "guardian_inhale": "가까이 오너라. 모두 다.",
