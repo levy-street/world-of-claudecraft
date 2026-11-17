@@ -42,12 +42,11 @@ describe('item_instance_glyph_mark', () => {
     expect(new Set([enchanted, signed, bound]).size).toBe(3);
   });
 
-  it('mints the generic wedge for an unclassified instanced payload', () => {
-    const html = instanceGlyphMarkHtml('generic');
-    expect(html).toContain('bi-instance');
-    expect(html).toContain('aria-hidden="true"');
-    expect(html).not.toContain('bi-glyph');
-    expect(html).not.toContain('bi-masterwork-seal');
+  it('mints no corner mark for an unclassified instanced payload', () => {
+    // The bare gold wedge is gone: a copy of no named kind paints nothing and
+    // relies on its accessible name and tooltip, exactly like a plain stack.
+    expect(instanceGlyphMarkHtml('generic')).toBe('');
+    expect(cornerMarkHtml('generic')).toBe('');
   });
 
   it('resolves payload to HTML through the pure kind priority', () => {

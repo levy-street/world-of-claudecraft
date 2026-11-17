@@ -1119,7 +1119,7 @@ export class BagsWindow {
       // Corner-glyph priority (bag_corner_mark_view.ts, composed from
       // bag_instance_glyph_view + bag_quest_mark_view + bag_fine_mark_view):
       // masterwork > quest seal > fine seal > enchanted / signed / bound >
-      // generic wedge. The fine rim/wash is independent of which seal wins the
+      // generic (no mark). The fine rim/wash is independent of which seal wins the
       // corner (a masterwork fine stack keeps its rim).
       const glyphKind = bagInstanceGlyphKind(s.instance, s.materialSources);
       const cornerMark = bagCornerMark(glyphKind, questMark, fineMark);
@@ -1148,7 +1148,7 @@ export class BagsWindow {
       );
       // Exactly one corner treatment ever renders (cornerMark is a single
       // discriminant): masterwork seal, quest seal, fine seal, or an instance
-      // glyph/tab, all minted through the shared cornerMarkHtml dispatch
+      // glyph, all minted through the shared cornerMarkHtml dispatch
       // (item_instance_glyph_mark.ts) so bank/guild-bank cells paint the same
       // art and no painter re-derives the corner from the raw glyph kind.
       // Composes with the bottom-right count badge, always visible without

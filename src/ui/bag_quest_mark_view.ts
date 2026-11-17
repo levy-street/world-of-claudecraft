@@ -20,7 +20,7 @@
 // on every graphics preset (no --fx gate), so it never becomes a fairness lever.
 //
 // Glyph priority (composed by the painter with bag_instance_glyph_view):
-//   masterwork > quest seal > enchanted / signed / bound > generic wedge.
+//   masterwork > quest seal > enchanted / signed / bound > generic (no mark).
 // Rim and wash always apply for any non-null mark kind.
 //
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).

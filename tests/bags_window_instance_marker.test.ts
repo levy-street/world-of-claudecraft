@@ -5,7 +5,7 @@
 // renders per stack, chosen by bag_instance_glyph_view.ts's kind priority: a
 // masterwork keeps the authored .bi-masterwork-seal, an enchanted / signed /
 // bound copy each gets its own .bi-glyph-<kind>, an instanced payload matching
-// none of those keeps the generic .bi-instance tab, and a plain stack renders
+// none of those paints no corner mark at all, and a plain stack renders
 // nothing. Every treatment composes with the count badge, the markup is static
 // (no hover, no graphics-tier gate), and the stylesheet contract is pinned
 // separately below.
@@ -141,7 +141,7 @@ describe('bag_instance_glyph_view: kind priority', () => {
     expect(bagInstanceGlyphKind(undefined)).toBeNull();
   });
 
-  it('an instanced payload matching no named kind keeps the generic tab', () => {
+  it('an instanced payload matching no named kind resolves to the generic kind', () => {
     expect(bagInstanceGlyphKind({ bindOnTrade: false })).toBe('generic');
   });
 
@@ -297,14 +297,11 @@ describe('bags grid instanced-slot marker', () => {
     expect(cells[0].querySelector('.bi-glyph-enchanted')).not.toBeNull();
     expect(cells[1].querySelector('.bi-glyph-signed')).not.toBeNull();
     expect(cells[2].querySelector('.bi-glyph-bound')).not.toBeNull();
-    // The unclassified payload keeps the pre-existing generic wedge.
-    expect(cells[3].querySelector('.bi-glyph')).toBeNull();
-    expect(cells[3].querySelector('.bi-instance')).not.toBeNull();
-    for (const cell of cells) {
-      const markers = cell.querySelectorAll(
-        '.bi-glyph, .bi-instance, .bi-masterwork-seal, .bi-quest-seal, .bi-fine-seal',
-      );
-      expect(markers.length).toBe(1);
+    // The unclassified payload paints no corner mark (the gold wedge is gone).
+    const MARKS = '.bi-glyph, .bi-instance, .bi-masterwork-seal, .bi-quest-seal, .bi-fine-seal';
+    expect(cells[3].querySelectorAll(MARKS).length).toBe(0);
+    for (const cell of [cells[0], cells[1], cells[2]]) {
+      expect(cell.querySelectorAll(MARKS).length).toBe(1);
     }
     // The three glyphs are genuinely different art, not one shape recolored.
     const svg = (i: number) => cells[i].querySelector('.bi-glyph svg')?.innerHTML ?? '';
@@ -320,7 +317,7 @@ describe('bags grid instanced-slot marker', () => {
     expect(cell?.querySelector('.bi-count')?.textContent).toContain('3');
   });
 
-  it('a masterwork uses the authored seal instead of the generic marker, never both', () => {
+  it('a masterwork wears the authored seal and no other corner mark', () => {
     const root = windowFor([
       {
         itemId: 'copper_ore',
@@ -340,7 +337,7 @@ describe('bags grid instanced-slot marker', () => {
     expect(cell?.getAttribute('aria-label')).not.toContain('maker-marked copy');
   });
 
-  it('a counted masterwork keeps its count badge without restoring the generic marker', () => {
+  it('a counted masterwork keeps its count badge beside the seal alone', () => {
     const root = windowFor([
       {
         itemId: 'copper_ore',
@@ -538,7 +535,7 @@ describe('bags grid fine-grade mark', () => {
     expect(cells[0].getAttribute('aria-label')).toBe(
       'Fine Copper Ore, quantity 1, maker-marked copy',
     );
-    // Fine + generic instanced payload: fine seal wins; no generic wedge.
+    // Fine + generic instanced payload: fine seal wins the corner.
     expect(cells[1].classList.contains('bag-fine')).toBe(true);
     expect(cells[1].querySelector('.bi-fine-seal')).not.toBeNull();
     expect(cells[1].querySelector('.bi-instance')).toBeNull();
@@ -573,18 +570,13 @@ describe('marker stylesheet contract (source pins)', () => {
   // jsdom gives import.meta.url an http URL, which readFileSync(new URL(...))
   // rejects (the vendor_window_painter precedent): resolve from __dirname.
   const components = readFileSync(join(__dirname, '../src/styles/components.css'), 'utf8');
-  const start = components.indexOf('.bag-item .bi-instance');
-  const block = components.slice(start, components.indexOf('}', start));
   const sealStart = components.indexOf('.bag-item .bi-masterwork-seal');
   const sealBlock = components.slice(sealStart, components.indexOf('}', sealStart));
 
-  it('is styled once, from a static color token, never an --fx-* tier knob', () => {
-    expect(start).toBeGreaterThan(-1);
-    expect(components.indexOf('.bag-item .bi-instance', start + 1)).toBe(-1);
-    expect(block).toContain('var(--color-accent)');
-    expect(block).not.toContain('--fx-');
-    // Always-on visibility: the marker never hides behind hover or media state.
-    expect(components).not.toContain('.bag-item:hover .bi-instance');
+  it('carries no rule for the removed generic wedge on any surface', () => {
+    // The wedge markup is gone (instanceGlyphMarkHtml('generic') is ''), so a
+    // surviving .bi-instance rule would be dead CSS inviting it back.
+    expect(components).not.toContain('.bi-instance');
   });
 
   it('keeps the authored masterwork seal a static 16px corner overlay', () => {
