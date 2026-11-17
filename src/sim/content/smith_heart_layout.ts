@@ -196,6 +196,16 @@ export const GRAND_STAIR = { halfWidth: 8, top: -58, foot: -SEAL_DAIS.r } as con
  *  walking round the Ring. Its fall is gentle (the Ring at 0 to the dais at
  *  -4 over the chasm), so it stays under every Ring eye's line to the seal. */
 export const NORTH_STAIR = { halfWidth: 8, top: RING.innerR, foot: SEAL_DAIS.r } as const;
+/** The East and West Stairs (the owner's review of 2026-11-18: "the bridges are too
+ *  thin, lets have the same bridges as the other two"): the dais's third and fourth
+ *  ways in, straight down from the Ring's inner edge at its east (the Quench's mouth)
+ *  and its west (the Heat's) to the dais, as broad as the Grand Stair and built the
+ *  same way (the Ring kit's stair modules). Each carries its vein's light-river down
+ *  its chute, as the North Stair carries the Breath's, where those two rivers used to
+ *  leap the open chasm along a thin conduit. A raid finishing in the east or the west
+ *  reaches the portal without walking round the Ring. */
+export const EAST_STAIR = { halfWidth: 8, top: RING.innerR, foot: SEAL_DAIS.r } as const;
+export const WEST_STAIR = { halfWidth: 8, top: RING.innerR, foot: SEAL_DAIS.r } as const;
 
 // ---- the main map: the Breath (north, high) -----------------------------------------
 
@@ -794,6 +804,27 @@ const AUTHORED_SURFACES: FieldSurface[] = [
       [0, NORTH_STAIR.foot - 4, H.dais],
     ],
     { stairs: true, edge: 'balustrade', halfWidth: NORTH_STAIR.halfWidth },
+  ),
+  // The East and West Stairs: the North Stair turned a quarter each way (x east, z north).
+  path(
+    'east_stair',
+    [
+      [EAST_STAIR.top + 4, 0, H.ring],
+      [EAST_STAIR.top, 0, H.ring],
+      [EAST_STAIR.foot + 4, 0, H.dais],
+      [EAST_STAIR.foot - 4, 0, H.dais],
+    ],
+    { stairs: true, edge: 'balustrade', halfWidth: EAST_STAIR.halfWidth },
+  ),
+  path(
+    'west_stair',
+    [
+      [-(WEST_STAIR.top + 4), 0, H.ring],
+      [-WEST_STAIR.top, 0, H.ring],
+      [-(WEST_STAIR.foot + 4), 0, H.dais],
+      [-(WEST_STAIR.foot - 4), 0, H.dais],
+    ],
+    { stairs: true, edge: 'balustrade', halfWidth: WEST_STAIR.halfWidth },
   ),
   balconyStair('balcony_stair_east', 172, 142),
   balconyStair('balcony_stair_west', 188, 218),

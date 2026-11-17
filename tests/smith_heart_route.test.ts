@@ -35,6 +35,7 @@ import {
 import {
   BREATH,
   CORNICE_GAPS,
+  EAST_STAIR,
   GALLERY_LANDINGS,
   GRAND_STAIR,
   HAMMER_PIT,
@@ -50,6 +51,7 @@ import {
   ringPoint,
   SMITH_HEART_BOSS_SPOTS,
   SMITH_HEART_FIELD,
+  WEST_STAIR,
 } from '../src/sim/content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import { authoredFieldHeight, authoredFieldSurfaceAt } from '../src/sim/instances/authored_field';
@@ -329,36 +331,77 @@ describe("the Smith's Heart route", () => {
     }
   });
 
-  it('reaches the dais by either stair alone, and by nothing else', () => {
+  it('reaches the dais by any one stair alone, and by nothing else', () => {
     const slabOpen = ['hammer_pit_mouth', 'the_slab'];
     // A stair taken away: its band across the chasm, a yard past each side.
-    const grand = (x: number, z: number) =>
-      Math.abs(x) <= GRAND_STAIR.halfWidth + 1 && z > GRAND_STAIR.top + 1 && z < GRAND_STAIR.foot;
-    const north = (x: number, z: number) =>
-      Math.abs(x) <= NORTH_STAIR.halfWidth + 1 && z < NORTH_STAIR.top - 1 && z > NORTH_STAIR.foot;
-    const ring = ringPoint(0, 70);
-    // Only the North Stair: from the Ring's north down to the portal.
-    expect(stepsTo(walkSteps(slabOpen, ring, grand), SPOTS.portal)).toBeGreaterThan(0);
-    // Only the Grand Stair: from the Balcony's tip down to the portal.
-    expect(stepsTo(walkSteps(slabOpen, SPOTS.balconyTip, north), SPOTS.portal)).toBeGreaterThan(0);
-    // Neither: the dais is an island (no other floor reaches it).
-    const both = (x: number, z: number) => grand(x, z) || north(x, z);
-    expect(stepsTo(walkSteps(slabOpen, ring, both), SPOTS.portal)).toBe(-1);
-    expect(stepsTo(walkSteps(slabOpen, SPOTS.balconyTip, both), SPOTS.portal)).toBe(-1);
+    const bands = {
+      grand: (x: number, z: number) =>
+        Math.abs(x) <= GRAND_STAIR.halfWidth + 1 && z > GRAND_STAIR.top + 1 && z < GRAND_STAIR.foot,
+      north: (x: number, z: number) =>
+        Math.abs(x) <= NORTH_STAIR.halfWidth + 1 && z < NORTH_STAIR.top - 1 && z > NORTH_STAIR.foot,
+      east: (x: number, z: number) =>
+        Math.abs(z) <= EAST_STAIR.halfWidth + 1 && x < EAST_STAIR.top - 1 && x > EAST_STAIR.foot,
+      west: (x: number, z: number) =>
+        Math.abs(z) <= WEST_STAIR.halfWidth + 1 && x > -WEST_STAIR.top + 1 && x < -WEST_STAIR.foot,
+    };
+    // Where a walker stands to take each: its stair's head.
+    const heads = {
+      grand: SPOTS.balconyTip,
+      north: ringPoint(0, 70),
+      east: ringPoint(90, 70),
+      west: ringPoint(270, 70),
+    };
+    type Stair = keyof typeof bands;
+    const stairs = Object.keys(bands) as Stair[];
+    const without = (kept: Stair | null) => (x: number, z: number) =>
+      stairs.some((s) => s !== kept && bands[s](x, z));
+    // Any one stair alone takes the walker down to the portal.
+    for (const kept of stairs) {
+      expect(
+        stepsTo(walkSteps(slabOpen, heads[kept], without(kept)), SPOTS.portal),
+        kept,
+      ).toBeGreaterThan(0);
+    }
+    // None of them: the dais is an island (no other floor reaches it).
+    for (const start of stairs) {
+      expect(stepsTo(walkSteps(slabOpen, heads[start], without(null)), SPOTS.portal), start).toBe(
+        -1,
+      );
+    }
   });
 
-  it('the North Stair cuts the walk from the Breath mouth to the portal', () => {
+  it('each Ring stair cuts the walk from its mouth to the portal', () => {
     const slabOpen = ['hammer_pit_mouth', 'the_slab'];
-    const mouth = ringPoint(0, 70);
-    const direct = stepsTo(walkSteps(slabOpen, mouth), SPOTS.portal);
-    // Straight down: about the Ring's radius (a hand of side steps allowed).
-    expect(direct).toBeGreaterThan(0);
-    expect(direct).toBeLessThan(80);
-    // Without it, round the Ring and over the Balcony: more than three times as far.
-    const north = (x: number, z: number) =>
-      Math.abs(x) <= NORTH_STAIR.halfWidth + 1 && z < NORTH_STAIR.top - 1 && z > NORTH_STAIR.foot;
-    const around = stepsTo(walkSteps(slabOpen, mouth, north), SPOTS.portal);
-    expect(around).toBeGreaterThan(direct * 3);
+    for (const [deg, band] of [
+      [
+        0,
+        (x: number, z: number) =>
+          Math.abs(x) <= NORTH_STAIR.halfWidth + 1 &&
+          z < NORTH_STAIR.top - 1 &&
+          z > NORTH_STAIR.foot,
+      ],
+      [
+        90,
+        (x: number, z: number) =>
+          Math.abs(z) <= EAST_STAIR.halfWidth + 1 && x < EAST_STAIR.top - 1 && x > EAST_STAIR.foot,
+      ],
+      [
+        270,
+        (x: number, z: number) =>
+          Math.abs(z) <= WEST_STAIR.halfWidth + 1 &&
+          x > -WEST_STAIR.top + 1 &&
+          x < -WEST_STAIR.foot,
+      ],
+    ] as const) {
+      const mouth = ringPoint(deg, 70);
+      const direct = stepsTo(walkSteps(slabOpen, mouth), SPOTS.portal);
+      // Straight down: about the Ring's radius (a hand of side steps allowed).
+      expect(direct, `${deg}`).toBeGreaterThan(0);
+      expect(direct, `${deg}`).toBeLessThan(80);
+      // Without it, round the Ring to another stair is more than twice as far.
+      const around = stepsTo(walkSteps(slabOpen, mouth, band), SPOTS.portal);
+      expect(around, `${deg}`).toBeGreaterThan(direct * 2);
+    }
   });
 
   it('never steps more than a body can climb between reached neighbours', () => {

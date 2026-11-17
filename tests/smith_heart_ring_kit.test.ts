@@ -53,7 +53,6 @@ import {
 } from '../src/render/smith_heart/heart_seal_core';
 import {
   planRingChannels,
-  planRingConduits,
   planRingEdges,
   planRingKit,
   planRingMouths,
@@ -62,7 +61,6 @@ import {
   planRingStairSteps,
   planRingStairs,
   RING_CHANNEL_BEARINGS,
-  RING_CONDUIT_SIZES,
   RING_KIT_FASCIA_DEPTH,
   RING_KIT_FASCIA_SURFACES,
   RING_KIT_KINDS,
@@ -70,16 +68,18 @@ import {
   RING_KIT_SIZES,
   RING_KIT_STAIRS,
   RING_MOUTHS,
-  ringConduitLines,
 } from '../src/render/smith_heart/ring_kit_plan_core';
 import { SEAL_SHAKE_REACH, sealShakeFalloff } from '../src/render/smith_heart_fx/seal_shake';
 import {
+  EAST_STAIR,
   LIGHT_RIVERS,
+  NORTH_STAIR,
   RING,
   RING_ARC,
   RING_PACK_DEGREES,
   SEAL_DAIS,
   SMITH_HEART_FIELD,
+  WEST_STAIR,
 } from '../src/sim/content/smith_heart_layout';
 import { authoredFieldHeight, authoredFieldSurfaceAt } from '../src/sim/instances/authored_field';
 
@@ -396,13 +396,18 @@ describe('ring_kit_plan_core: the Ring, its stairs and its mouths', () => {
         return s?.id === id;
       });
       expect(mine.length, id).toBeGreaterThan(6);
-      // Both sides (the outward normals point two ways).
-      const sides = new Set(mine.map((e) => Math.sign(Math.round(Math.sin(e.rot) * 10) || 1)));
-      if (id === 'grand_stair' || id === 'north_stair') expect(sides.size, id).toBe(2);
+      // Both sides (the outward normals point two ways across the stair's axis).
+      const across = id === 'east_stair' || id === 'west_stair' ? 'z' : 'x';
+      const sides = new Set(
+        mine.map((e) =>
+          Math.sign(Math.round((across === 'x' ? Math.sin(e.rot) : Math.cos(e.rot)) * 10) || 1),
+        ),
+      );
+      if (RING_KIT_STAIRS.includes(id)) expect(sides.size, id).toBe(2);
     }
   });
 
-  it('steps both stairs tread by tread on the walked ramp, half a riser either way', () => {
+  it('steps every stair tread by tread on the walked ramp, half a riser either way', () => {
     for (const id of RING_KIT_STAIRS) {
       const steps = planRingStairSteps(id);
       expect(steps.length, id).toBeGreaterThan(10);
@@ -419,9 +424,13 @@ describe('ring_kit_plan_core: the Ring, its stairs and its mouths', () => {
         expect(back - st.y, id).toBeCloseTo(st.rise / 2, 1);
       }
     }
-    // The Grand Stair in short treads, the gentle North Stair in long ones.
+    // The Grand Stair in short treads, the gentle Ring stairs in long ones.
     expect(planRingStairSteps('grand_stair').every((s) => !s.long)).toBe(true);
-    expect(planRingStairSteps('north_stair').every((s) => s.long)).toBe(true);
+    for (const id of ['north_stair', 'east_stair', 'west_stair'])
+      expect(
+        planRingStairSteps(id).every((s) => s.long),
+        id,
+      ).toBe(true);
     // Two side modules per tread, a chute down the middle on the ramp.
     const plan = planRingStairs();
     const treads = plan.filter((p) => p.piece.startsWith('Kit_StairTread'));
@@ -558,64 +567,74 @@ describe('the seal and the portal: the moments', () => {
   });
 });
 
-// The team's review of 2026-11-17: the Quench's and the Heat's light-rivers
-// crossed the chasm to the dais floating on nothing; each now runs in a stone
-// conduit carried on piers.
-describe('ring_kit_plan_core: the conduits over the chasm', () => {
-  it('lays one conduit under each floating river, from the Ring to the dais', () => {
-    const lines = ringConduitLines();
-    expect(lines.length).toBe(2);
-    const xs = lines.map((l) => Math.sign(l.ax)).sort();
-    expect(xs).toEqual([-1, 1]);
-    for (const l of lines) {
-      // From the Ring's inner lip down to the dais.
-      expect(Math.hypot(l.ax, l.az)).toBeGreaterThan(RING.innerR - 2);
-      expect(Math.hypot(l.bx, l.bz)).toBeLessThan(SEAL_DAIS.r + 2);
-      expect(l.ay).toBeGreaterThan(l.by);
+// The owner's review of 2026-11-18: the bridges the Quench's and the Heat's light-rivers
+// crossed on were too thin, so the dais gets the same broad stairs the Breath's river
+// has (the North Stair), one at the Ring's east and one at its west.
+describe('ring_kit_plan_core: the East and West Stairs are the North Stair turned', () => {
+  const STAIRS = [
+    { id: 'north_stair', axis: 'z', sign: 1, spec: NORTH_STAIR },
+    { id: 'east_stair', axis: 'x', sign: 1, spec: EAST_STAIR },
+    { id: 'west_stair', axis: 'x', sign: -1, spec: WEST_STAIR },
+  ] as const;
+  /** A point `d` yards from the seal along a stair's axis and `o` yards across it. */
+  const at = (st: (typeof STAIRS)[number], d: number, o = 0) =>
+    st.axis === 'z' ? { x: o, z: d } : { x: st.sign * d, z: o };
+
+  it('are the same stair: as broad, as long and as gentle, from the Ring to the dais', () => {
+    for (const st of STAIRS) {
+      expect(st.spec, st.id).toEqual({ halfWidth: 8, top: RING.innerR, foot: SEAL_DAIS.r });
+      const top = at(st, st.spec.top + 1);
+      const foot = at(st, st.spec.foot - 2);
+      expect(authoredFieldHeight(F, top.x, top.z), st.id).toBe(RING.h);
+      expect(authoredFieldHeight(F, foot.x, foot.z), st.id).toBe(SEAL_DAIS.h);
+      // Walkable the whole way and as wide as the Grand Stair, void either side of it.
+      for (let d = st.spec.top - 2; d > st.spec.foot + 1; d--) {
+        for (const o of [-st.spec.halfWidth + 0.5, 0, st.spec.halfWidth - 0.5]) {
+          const p = at(st, d, o);
+          expect(authoredFieldSurfaceAt(F, p.x, p.z)?.id, `${st.id} ${d} ${o}`).toBe(st.id);
+        }
+        for (const o of [-st.spec.halfWidth - 3, st.spec.halfWidth + 3]) {
+          const p = at(st, d, o);
+          expect(authoredFieldSurfaceAt(F, p.x, p.z), `${st.id} ${d} ${o}`).toBeNull();
+        }
+      }
+    }
+    expect(NORTH_STAIR.halfWidth * 2).toBeGreaterThanOrEqual(12);
+  });
+
+  it('are built tread by tread alike, in the long gentle treads, railed on both sides', () => {
+    const counts = STAIRS.map((st) => planRingStairSteps(st.id).length);
+    expect(new Set(counts).size).toBe(1);
+    for (const st of STAIRS) {
+      expect(
+        planRingStairSteps(st.id).every((x) => x.long),
+        st.id,
+      ).toBe(true);
+      expect(RING_KIT_STAIRS, st.id).toContain(st.id);
     }
   });
 
-  it('covers every floating stretch of the two rivers with span modules, piers beneath', () => {
-    const placed = planRingConduits();
-    const spans = placed.filter((p) => p.piece === 'Kit_ConduitSpan');
-    const piers = placed.filter((p) => p.piece === 'Kit_ConduitPier');
-    expect(piers.length).toBe(2 * RING_CONDUIT_SIZES.piers.length);
-    for (const l of ringConduitLines()) {
-      const len = Math.hypot(l.bx - l.ax, l.bz - l.az);
-      // Every yard of the line lies within a span's reach.
-      for (let s = 0; s <= len; s += 1) {
-        const x = l.ax + ((l.bx - l.ax) * s) / len;
-        const z = l.az + ((l.bz - l.az) * s) / len;
-        const covered = spans.some(
-          (p) =>
-            Math.hypot(p.x - x, p.z - z) <= (RING_CONDUIT_SIZES.span * (p.stretch ?? 1)) / 2 + 0.05,
-        );
-        expect(covered, `${x.toFixed(1)},${z.toFixed(1)}`).toBe(true);
-      }
-    }
-    // The bed follows the river's slope, the piers stand under the keel.
-    for (const p of spans) expect(p.shear ?? 0).toBeLessThan(0);
-    for (const p of piers) {
-      const under = spans.reduce((a, b) =>
-        Math.hypot(b.x - p.x, b.z - p.z) < Math.hypot(a.x - p.x, a.z - p.z) ? b : a,
+  it('carry the rivers down their chutes: the Quench from the east, the Heat from the west', () => {
+    for (const [vein, st] of [
+      ['quench', STAIRS[1]],
+      ['heat', STAIRS[2]],
+    ] as const) {
+      const river = LIGHT_RIVERS[vein];
+      // The river's last legs lie along the stair's axis, from the Ring in to the seal.
+      const onStair = river.filter(
+        (p) => Math.abs(p.z) < 1e-9 && Math.abs(p.x) <= RING.innerR && Math.abs(p.x) >= 9,
       );
-      expect(p.y).toBeLessThan(under.y - RING_CONDUIT_SIZES.keel + 1);
+      expect(onStair.length, vein).toBeGreaterThanOrEqual(2);
+      for (let d = st.spec.top - 1; d > st.spec.foot + 1; d -= 2) {
+        const p = at(st, d);
+        expect(authoredFieldSurfaceAt(F, p.x, p.z)?.id, `${vein} ${d}`).toBe(st.id);
+      }
     }
   });
 
-  it.skipIf(!haveKit)(
-    'ships the conduit pieces: stone with crystal, under budget, the span on its bed',
-    () => {
-      for (const name of ['Kit_ConduitSpan', 'Kit_ConduitPier']) {
-        const s = shape(name);
-        expect(s.materials.has('KitStone'), name).toBe(true);
-        expect(s.materials.has('KitGlow'), name).toBe(true);
-      }
-      const span = shape('Kit_ConduitSpan');
-      // Its lips under a hand over the bed (the river lies on it), its keel under.
-      expect(span.max[1]).toBeLessThan(0.3);
-      expect(span.min[1]).toBeLessThan(-RING_CONDUIT_SIZES.keel + 0.2);
-      expect(shape('Kit_ConduitPier').min[1]).toBeLessThan(-30);
-    },
-  );
+  it('leave no conduit over the chasm: the stairs are the way the light crosses', () => {
+    const pieces = new Set(planRingKit().map((p) => p.piece));
+    expect(pieces.has('Kit_ConduitSpan')).toBe(false);
+    expect(pieces.has('Kit_ConduitPier')).toBe(false);
+  });
 });

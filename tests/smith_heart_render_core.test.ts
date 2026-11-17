@@ -410,26 +410,16 @@ describe('heart_rivers_core: the floor light-rivers', () => {
       }
     });
   }
-  it('the Hammer and the Breath run down their stairs; the other two leap the chasm onto the dais', () => {
-    // The Hammer down the Grand Stair, the Breath down the North Stair: on
-    // the floor all the way.
-    for (const vein of ['hammer', 'breath'] as const) {
+  it('every river runs down its own stair to the dais, on the floor all the way', () => {
+    // The Hammer down the Grand Stair, the Breath down the North Stair, the Quench
+    // down the East Stair and the Heat down the West Stair (the owner's review of
+    // 2026-11-18: no river crosses the chasm on a thin bridge).
+    for (const vein of SMITH_HEART_VEINS) {
       const strip = planHeartRiver(LIGHT_RIVERS[vein], floorAt);
       expect(
         strip.points.every((q) => floorAt(q.x, q.z) !== null),
         vein,
       ).toBe(true);
-    }
-    for (const vein of ['quench', 'heat'] as const) {
-      const strip = planHeartRiver(LIGHT_RIVERS[vein], floorAt);
-      let bridged = 0;
-      for (const { x, y, z } of strip.points) {
-        if (floorAt(x, z) !== null) continue;
-        bridged++;
-        expect(y, vein).toBeGreaterThan(SEAL_DAIS.h);
-        expect(y, vein).toBeLessThan(RING.h + 1);
-      }
-      expect(bridged, vein).toBeGreaterThan(5);
     }
   });
   it('the light runs arena to seal on its own clock, whole when met already lit', () => {
