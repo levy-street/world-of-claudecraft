@@ -11,6 +11,9 @@
     "Chorus": "/encyclopedia-attacks/choirmother_selthe__chorus.webp",
     "Solo": "/encyclopedia-attacks/choirmother_selthe__solo.webp"
   },
+  "crypt_bone_brute": {
+    "Marrow Crush": "/encyclopedia-attacks/crypt_bone_brute__marrow_crush.webp"
+  },
   "crypt_knellwyrm": {
     "Barrowflame Breath": "/encyclopedia-attacks/crypt_knellwyrm__barrowflame_breath.webp",
     "Dread Bellow": "/encyclopedia-attacks/crypt_knellwyrm__dread_bellow.webp",
@@ -20,6 +23,15 @@
   "crypt_ossuary_drake": {
     "Barrowflame Breath": "/encyclopedia-attacks/crypt_ossuary_drake__barrowflame_breath.webp",
     "Wing Gust": "/encyclopedia-attacks/crypt_ossuary_drake__wing_gust.webp"
+  },
+  "crypt_ossuary_warrior": {
+    "Grave Cleave": "/encyclopedia-attacks/crypt_ossuary_warrior__grave_cleave.webp"
+  },
+  "drowned_templeguard": {
+    "Trident Sweep": "/encyclopedia-attacks/drowned_templeguard__trident_sweep.webp"
+  },
+  "drowned_watchman": {
+    "Halberd Sweep": "/encyclopedia-attacks/drowned_watchman__halberd_sweep.webp"
   },
   "gaol_turnkey": {
     "Iron Cage": "/encyclopedia-attacks/gaol_turnkey__iron_cage.webp"
@@ -36,7 +48,8 @@
   },
   "ignivar_herald_of_the_last_flame": {
     "Forge Wave": "/encyclopedia-attacks/ignivar_herald_of_the_last_flame__forge_wave.webp",
-    "Rain of Cinders": "/encyclopedia-attacks/ignivar_herald_of_the_last_flame__rain_of_cinders.webp"
+    "Rain of Cinders": "/encyclopedia-attacks/ignivar_herald_of_the_last_flame__rain_of_cinders.webp",
+    "Searing Torrent": "/encyclopedia-attacks/ignivar_herald_of_the_last_flame__searing_torrent.webp"
   },
   "knight_commander_olen": {
     "Hallowed Brine": "/encyclopedia-attacks/knight_commander_olen__hallowed_brine.webp",
@@ -51,6 +64,12 @@
     "Strain": "/encyclopedia-attacks/korgath_the_bound__strain.webp",
     "Threshold Charge": "/encyclopedia-attacks/korgath_the_bound__threshold_charge.webp"
   },
+  "korzul_the_gravewyrm": {
+    "Grave Breath": "/encyclopedia-attacks/korzul_the_gravewyrm__grave_breath.webp"
+  },
+  "lagoon_snapper": {
+    "Snap": "/encyclopedia-attacks/lagoon_snapper__snap.webp"
+  },
   "mere_hydra_head_center": {
     "Frostlocked Torrent": "/encyclopedia-attacks/mere_hydra_head_center__frostlocked_torrent.webp",
     "Toxic Rime": "/encyclopedia-attacks/mere_hydra_head_center__toxic_rime.webp",
@@ -64,6 +83,46 @@
     "Rite of the Unquiet": "/encyclopedia-attacks/morthen__rite_of_the_unquiet.webp",
     "Shadow Pulse": "/encyclopedia-attacks/morthen__shadow_pulse.webp"
   },
+  "rift_boss_arcane": {
+    "Arcane Annihilation": "/encyclopedia-attacks/rift_boss_arcane__arcane_annihilation.webp",
+    "Void Rift": "/encyclopedia-attacks/rift_boss_arcane__void_rift.webp"
+  },
+  "rift_boss_brute": {
+    "Earthshatter": "/encyclopedia-attacks/rift_boss_brute__earthshatter.webp",
+    "Final Judgment": "/encyclopedia-attacks/rift_boss_brute__final_judgment.webp",
+    "Seismic Stomp": "/encyclopedia-attacks/rift_boss_brute__seismic_stomp.webp"
+  },
+  "rift_boss_ember": {
+    "Cinder Wave": "/encyclopedia-attacks/rift_boss_ember__cinder_wave.webp",
+    "Core Meltdown": "/encyclopedia-attacks/rift_boss_ember__core_meltdown.webp",
+    "Magma Well": "/encyclopedia-attacks/rift_boss_ember__magma_well.webp"
+  },
+  "rift_boss_frost": {
+    "Absolute Zero": "/encyclopedia-attacks/rift_boss_frost__absolute_zero.webp",
+    "Glacial Burst": "/encyclopedia-attacks/rift_boss_frost__glacial_burst.webp",
+    "Glacial Grave": "/encyclopedia-attacks/rift_boss_frost__glacial_grave.webp"
+  },
+  "rift_boss_necro": {
+    "Death Sentence": "/encyclopedia-attacks/rift_boss_necro__death_sentence.webp",
+    "Soul Grave": "/encyclopedia-attacks/rift_boss_necro__soul_grave.webp"
+  },
+  "rift_boss_pitlord": {
+    "Hoof of Ruin": "/encyclopedia-attacks/rift_boss_pitlord__hoof_of_ruin.webp",
+    "Pitfire Ring": "/encyclopedia-attacks/rift_boss_pitlord__pitfire_ring.webp"
+  },
+  "rift_boss_storm": {
+    "Chain Lightning": "/encyclopedia-attacks/rift_boss_storm__chain_lightning.webp",
+    "Lightning Rod": "/encyclopedia-attacks/rift_boss_storm__lightning_rod.webp",
+    "Stormcaller's Wrath": "/encyclopedia-attacks/rift_boss_storm__stormcallers_wrath.webp"
+  },
+  "rift_boss_tide": {
+    "Abyssal Maw": "/encyclopedia-attacks/rift_boss_tide__abyssal_maw.webp",
+    "Crushing Depth": "/encyclopedia-attacks/rift_boss_tide__crushing_depth.webp"
+  },
+  "rift_boss_venom": {
+    "Broodmother's Mark": "/encyclopedia-attacks/rift_boss_venom__broodmothers_mark.webp",
+    "Venom Pool": "/encyclopedia-attacks/rift_boss_venom__venom_pool.webp"
+  },
   "rimeweb": {
     "Bride's Lament": "/encyclopedia-attacks/rimeweb__brides_lament.webp",
     "Frozen Embrace": "/encyclopedia-attacks/rimeweb__frozen_embrace.webp"
@@ -73,9 +132,13 @@
     "Measured for the Grave": "/encyclopedia-attacks/sexton_marrow__measured_for_the_grave.webp",
     "Shovelful": "/encyclopedia-attacks/sexton_marrow__shovelful.webp"
   },
+  "sledge_tusker": {
+    "Trample": "/encyclopedia-attacks/sledge_tusker__trample.webp"
+  },
   "the_gorgebloom": {
     "Gorge": "/encyclopedia-attacks/the_gorgebloom__gorge.webp",
     "Seed Rain": "/encyclopedia-attacks/the_gorgebloom__seed_rain.webp",
+    "Thorn Sprout": "/encyclopedia-attacks/the_gorgebloom__thorn_sprout.webp",
     "Vine Lash": "/encyclopedia-attacks/the_gorgebloom__vine_lash.webp"
   },
   "tideglass_colossus": {
@@ -90,10 +153,14 @@
     "Shadow Crossing": "/encyclopedia-attacks/vael_the_mistcaller__shadow_crossing.webp"
   },
   "varkhul_forgefather_of_the_last_flame": {
-    "Forgefather's Sweep": "/encyclopedia-attacks/varkhul_forgefather_of_the_last_flame__forgefathers_sweep.webp"
+    "Cinder Orbs": "/encyclopedia-attacks/varkhul_forgefather_of_the_last_flame__cinder_orbs.webp",
+    "Forgefather's Sweep": "/encyclopedia-attacks/varkhul_forgefather_of_the_last_flame__forgefathers_sweep.webp",
+    "Shared Pyre": "/encyclopedia-attacks/varkhul_forgefather_of_the_last_flame__shared_pyre.webp",
+    "Tempering Ray": "/encyclopedia-attacks/varkhul_forgefather_of_the_last_flame__tempering_ray.webp"
   },
   "wildheart_beastmaster": {
-    "Beast Pit Quake": "/encyclopedia-attacks/wildheart_beastmaster__beast_pit_quake.webp"
+    "Beast Pit Quake": "/encyclopedia-attacks/wildheart_beastmaster__beast_pit_quake.webp",
+    "Heel!": "/encyclopedia-attacks/wildheart_beastmaster__heel.webp"
   },
   "wildheart_high_priest": {
     "Hunter's Ambush": "/encyclopedia-attacks/wildheart_high_priest__hunters_ambush.webp",

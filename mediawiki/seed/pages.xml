@@ -118460,7 +118460,7 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="21174">&lt;woc-art path=&quot;/ui/mobs/varkhul_forgefather_of_the_last_flame.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="21844">&lt;woc-art path=&quot;/ui/mobs/varkhul_forgefather_of_the_last_flame.webp&quot; /&gt;
 &lt;woc-art path=&quot;/encyclopedia-stills/mob_varkhul_forgefather.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Varkhul, Forgefather of the Last Flame is one of the Elementals.
@@ -118535,10 +118535,10 @@ Varkhul cycles tank pressure, wide frontals, moving projectiles, group soaks, me
 
 * Maker&apos;s Brand. Varkhul strikes his current tank and applies a stacking effect that increases all damage taken from him. Tanks swap at 2 stacks. Healers prepare the incoming tank before Varkhul changes targets. (important)
 * &lt;woc-art path=&quot;/encyclopedia-attacks/varkhul_forgefather_of_the_last_flame__forgefathers_sweep.webp&quot; size=&quot;attack&quot; /&gt; Forgefather&apos;s Sweep. Varkhul releases a very wide frontal sweep that deals heavy fire damage to everyone in front of him. Keep Varkhul facing away from the group and move behind him as soon as the warning appears. (deadly)
-* Cinder Orbs. Marked non-tanks drop persistent cinder pools and release fire orbs in every direction. Red-hot Metal also absorbs incoming healing. Carry each mark to the room edge, separate the pools, then dodge the orbs as they cross the arena. Healers clear the absorb quickly. (deadly, important)
-* Shared Pyre. A moving circle follows one player without Red-hot Metal. Its damage is divided among players inside, and every missing player deals 15% maximum-health damage to the entire raid. Stack at least 4 players inside the circle and move with its target until the cast resolves. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/varkhul_forgefather_of_the_last_flame__cinder_orbs.webp&quot; size=&quot;attack&quot; /&gt; Cinder Orbs. Marked non-tanks drop persistent cinder pools and release fire orbs in every direction. Red-hot Metal also absorbs incoming healing. Carry each mark to the room edge, separate the pools, then dodge the orbs as they cross the arena. Healers clear the absorb quickly. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/varkhul_forgefather_of_the_last_flame__shared_pyre.webp&quot; size=&quot;attack&quot; /&gt; Shared Pyre. A moving circle follows one player without Red-hot Metal. Its damage is divided among players inside, and every missing player deals 15% maximum-health damage to the entire raid. Stack at least 4 players inside the circle and move with its target until the cast resolves. (important)
 * Forgestorm. Varkhul calls down 3 consecutive waves of marked meteor impacts across the arena. Watch each new set of ground warnings and move out before that wave lands. Do not return to a previous position without checking the next wave. (deadly)
-* Tempering Ray. A ray tracks a marked player for a long windup. The first other player between Varkhul and the target intercepts the hit and receives Tempered Wound. Assign a healthy player, usually the off-tank, to step into the line. Keep other players out and rotate interceptors while Tempered Wound is active. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/varkhul_forgefather_of_the_last_flame__tempering_ray.webp&quot; size=&quot;attack&quot; /&gt; Tempering Ray. A ray tracks a marked player for a long windup. The first other player between Varkhul and the target intercepts the hit and receives Tempered Wound. Assign a healthy player, usually the off-tank, to step into the line. Keep other players out and rotate interceptors while Tempered Wound is active. (important)
 * Anvil&apos;s Decree. Varkhul walks to the grand forge and strikes it 3 times, dealing increasing raid-wide damage. Group for raid healing and use defensive cooldowns for the final strike. (deadly, important)
 
 === Intermission: The Master&apos;s Assembly ===
@@ -118564,10 +118564,10 @@ Varkhul cycles tank pressure, wide frontals, moving projectiles, group soaks, me
 
 * Maker&apos;s Brand. Varkhul strikes his current tank and applies a stacking effect that increases all damage taken from him. Tanks swap at 2 stacks. Healers prepare the incoming tank before Varkhul changes targets. (important)
 * &lt;woc-art path=&quot;/encyclopedia-attacks/varkhul_forgefather_of_the_last_flame__forgefathers_sweep.webp&quot; size=&quot;attack&quot; /&gt; Forgefather&apos;s Sweep. Varkhul releases a very wide frontal sweep that deals nearly lethal fire damage to everyone in front of him. Keep Varkhul facing away from the group and move behind him as soon as the warning appears. (deadly)
-* Cinder Orbs. Marked non-tanks drop highly damaging persistent cinder pools and release dangerous fire orbs in every direction. Red-hot Metal also absorbs incoming healing. Carry each mark to the room edge, separate the pools, then dodge the orbs as they cross the arena. Healers clear the absorb quickly. (deadly, important)
-* Shared Pyre. A moving circle follows one player without Red-hot Metal and splits a larger hit. Every missing player also deals 15% maximum-health damage to the entire raid. Stack at least 4 players inside the circle and move with its target until the cast resolves. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/varkhul_forgefather_of_the_last_flame__cinder_orbs.webp&quot; size=&quot;attack&quot; /&gt; Cinder Orbs. Marked non-tanks drop highly damaging persistent cinder pools and release dangerous fire orbs in every direction. Red-hot Metal also absorbs incoming healing. Carry each mark to the room edge, separate the pools, then dodge the orbs as they cross the arena. Healers clear the absorb quickly. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/varkhul_forgefather_of_the_last_flame__shared_pyre.webp&quot; size=&quot;attack&quot; /&gt; Shared Pyre. A moving circle follows one player without Red-hot Metal and splits a larger hit. Every missing player also deals 15% maximum-health damage to the entire raid. Stack at least 4 players inside the circle and move with its target until the cast resolves. (important)
 * Forgestorm. Varkhul calls down 3 consecutive waves of marked meteor impacts that deal extreme damage. Watch each new set of ground warnings and move out before that wave lands. Do not return to a previous position without checking the next wave. (deadly)
-* Tempering Ray. A ray tracks a marked player for a long windup. The first other player between Varkhul and the target intercepts the hit and receives Tempered Wound. Assign a healthy player, usually the off-tank, to step into the line. Keep other players out and rotate interceptors while Tempered Wound is active. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/varkhul_forgefather_of_the_last_flame__tempering_ray.webp&quot; size=&quot;attack&quot; /&gt; Tempering Ray. A ray tracks a marked player for a long windup. The first other player between Varkhul and the target intercepts the hit and receives Tempered Wound. Assign a healthy player, usually the off-tank, to step into the line. Keep other players out and rotate interceptors while Tempered Wound is active. (important)
 * Anvil&apos;s Decree. Varkhul strikes the grand forge 3 times for increasing raid damage while marked meteors fall on players. Spread marked meteors away from the group while healers and defensive cooldowns cover all 3 strikes. (deadly, important)
 
 === Intermission: The Master&apos;s Assembly ===
@@ -119103,7 +119103,7 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="19483">&lt;woc-art path=&quot;/ui/mobs/ignivar_herald_of_the_last_flame.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="19703">&lt;woc-art path=&quot;/ui/mobs/ignivar_herald_of_the_last_flame.webp&quot; /&gt;
 &lt;woc-art path=&quot;/encyclopedia-stills/mob_ignivar.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Ignivar, Herald of the Last Flame is one of the Elementals.
@@ -119178,7 +119178,7 @@ Control Brand of the Pyre with the water conduits while handling Ignivar&apos;s 
 
 * Forge Strike. Ignivar strikes his current tank and applies Molten Armor, increasing damage taken from Ignivar. Tanks swap at 2 stacks. Healers prepare for the strike and the new tank&apos;s first melee swings. (important)
 * Brand of the Pyre. Ignivar marks non-tank players with persistent fire damage. Branded players also burn nearby allies. Spread out. Aim Searing Torrent into a ready water conduit, then have each marked player cross the activated water alone to cleanse. (cleansable, important)
-* Searing Torrent. Ignivar tracks a player, then releases a wide frontal blast. A ready water conduit struck by the blast becomes active for a short time. Aim the warning through exactly one ready conduit. Everyone else leaves the frontal before the cast completes. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/ignivar_herald_of_the_last_flame__searing_torrent.webp&quot; size=&quot;attack&quot; /&gt; Searing Torrent. Ignivar tracks a player, then releases a wide frontal blast. A ready water conduit struck by the blast becomes active for a short time. Aim the warning through exactly one ready conduit. Everyone else leaves the frontal before the cast completes. (deadly, important)
 * &lt;woc-art path=&quot;/encyclopedia-attacks/ignivar_herald_of_the_last_flame__rain_of_cinders.webp&quot; size=&quot;attack&quot; /&gt; Rain of Cinders. Three fire sectors and marked meteor impacts punish players who remain inside their warnings. Move into an unmarked gap and leave every meteor circle before impact. (deadly)
 * Revolving Inferno. Rotating fire rays sweep around Ignivar and repeatedly damage players who touch them. Move with the open space between rays. Do not cut through a ray, even with a fast movement ability. (deadly)
 * &lt;woc-art path=&quot;/encyclopedia-attacks/ignivar_herald_of_the_last_flame__forge_wave.webp&quot; size=&quot;attack&quot; /&gt; Forge Wave. An expanding wall of fire crosses the arena, leaving two opposite gaps and knocking back players it hits. Find either gap during the windup, align with it, and avoid being knocked toward the arena edge. (important)
@@ -119210,7 +119210,7 @@ Control Brand of the Pyre with the water conduits while handling Ignivar&apos;s 
 
 * Forge Strike. Ignivar strikes his current tank and applies Molten Armor, increasing damage taken from Ignivar. Tanks swap at 2 stacks. Healers prepare for the strike and the new tank&apos;s first melee swings. (important)
 * Brand of the Pyre. Ignivar marks non-tank players with persistent fire damage. Branded players also burn nearby allies. Spread out. Open a conduit with Searing Torrent and cleanse one marked player at a time. Every cleanse triggers raid-wide Cleansing Backlash. (cleansable, important)
-* Searing Torrent. Ignivar tracks a player, then releases a nearly lethal frontal blast. A ready water conduit struck by the blast becomes active for a short time. Aim the warning through exactly one ready conduit. Everyone else leaves the frontal before the cast completes. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/ignivar_herald_of_the_last_flame__searing_torrent.webp&quot; size=&quot;attack&quot; /&gt; Searing Torrent. Ignivar tracks a player, then releases a nearly lethal frontal blast. A ready water conduit struck by the blast becomes active for a short time. Aim the warning through exactly one ready conduit. Everyone else leaves the frontal before the cast completes. (deadly, important)
 * &lt;woc-art path=&quot;/encyclopedia-attacks/ignivar_herald_of_the_last_flame__rain_of_cinders.webp&quot; size=&quot;attack&quot; /&gt; Rain of Cinders. Three fire sectors and marked meteor impacts deal extreme damage to players who remain inside their warnings. Move into an unmarked gap and leave every meteor circle before impact. (deadly)
 * Revolving Inferno. Rotating fire rays sweep around Ignivar and inflict severe repeated damage on contact. Move with the open space between rays. Do not cut through a ray, even with a fast movement ability. (deadly)
 * &lt;woc-art path=&quot;/encyclopedia-attacks/ignivar_herald_of_the_last_flame__forge_wave.webp&quot; size=&quot;attack&quot; /&gt; Forge Wave. An expanding wall of fire crosses the arena, leaving two opposite gaps and knocking hit players much farther. Find either gap during the windup, align with it, and avoid being knocked toward the arena edge. (important)
@@ -122043,7 +122043,7 @@ The game rolls once for this group. At most &apos;&apos;&apos;one&apos;&apos;&ap
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="17821">&lt;woc-art path=&quot;/ui/mobs/korzul_the_gravewyrm.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="18011">&lt;woc-art path=&quot;/ui/mobs/korzul_the_gravewyrm.webp&quot; /&gt;
 :&apos;&apos;Other pages have this name. See [[Korzul the Gravewyrm (disambiguation)|all pages named Korzul the Gravewyrm]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/sanctum_korzul.webp&quot; size=&quot;model&quot; /&gt;
@@ -122120,7 +122120,7 @@ He bursts out of the ice and lands in the middle of the lake. His fight starts w
 
 * Breaking Ice. The lake is made of ice plates. His fire cracks an uncracked plate and breaks a cracked one. A cracked plate refreezes after 30 sec. A broken plate is open water. Spend ice on purpose: aim his fire at plates the group can afford to lose. (important)
 * Open Water. Standing in open water slows you by 50% and deals 60 damage per second. Stay on the ice. Leave the water at once if a shove puts you in it. (deadly)
-* Grave Breath. Every 15 sec, a 2 sec cast along the tank&apos;s line, then a 60 degree fire cone 30 yd past his body: 250 to 300 damage to everyone in it except the tank. Up to 3 plates under the cone burn, nearest first. Only the tank stands in front. The tank turns the breath toward ice the group can spare. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/korzul_the_gravewyrm__grave_breath.webp&quot; size=&quot;attack&quot; /&gt; Grave Breath. Every 15 sec, a 2 sec cast along the tank&apos;s line, then a 60 degree fire cone 30 yd past his body: 250 to 300 damage to everyone in it except the tank. Up to 3 plates under the cone burn, nearest first. Only the tank stands in front. The tank turns the breath toward ice the group can spare. (deadly, important)
 * Tail Sweep. Every 12 sec, a 1.2 sec cast, then his tail sweeps the 120 degrees behind him, 12 yd past his body: 200 to 240 damage and a knockback. Never stand behind him. Attack from his sides. (important)
 * Grave Inferno. Every 30 sec, and once at 50% health, he channels for 8 sec: 4 fire pulses within 14 yd, each stronger than the last (the last pulse deals 280 to 360). Pulse 2 cracks the plate under him and pulse 4 breaks it: when it breaks he is Doused and the channel ends. Get 14 yd away from him. Start him on a cracked plate and the channel ends at pulse 2. (deadly, important)
 
@@ -122157,7 +122157,7 @@ He bursts out of the ice and lands in the middle of the lake. His fight starts w
 
 * Breaking Ice. The lake is made of ice plates. His fire cracks an uncracked plate and breaks a cracked one. Deep Quench: on Heroic a cracked plate never refreezes. A broken plate is open water. Spend ice on purpose: aim his fire at plates the group can afford to lose. (important)
 * Open Water. Standing in open water slows you by 50% and deals 150 damage per second. Stay on the ice. Leave the water at once if a shove puts you in it. (deadly)
-* Grave Breath. Every 15 sec, a 2 sec cast along the tank&apos;s line, then a 60 degree fire cone 30 yd past his body: 625 to 750 damage to everyone in it except the tank. Up to 3 plates under the cone burn, nearest first. Only the tank stands in front. The tank turns the breath toward ice the group can spare. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/korzul_the_gravewyrm__grave_breath.webp&quot; size=&quot;attack&quot; /&gt; Grave Breath. Every 15 sec, a 2 sec cast along the tank&apos;s line, then a 60 degree fire cone 30 yd past his body: 625 to 750 damage to everyone in it except the tank. Up to 3 plates under the cone burn, nearest first. Only the tank stands in front. The tank turns the breath toward ice the group can spare. (deadly, important)
 * Tail Sweep. Every 12 sec, a 1.2 sec cast, then his tail sweeps the 120 degrees behind him, 12 yd past his body: 500 to 600 damage and a knockback. Never stand behind him. Attack from his sides. (important)
 * Grave Inferno. Every 30 sec, and once at 50% health, he channels for 8 sec: 4 fire pulses within 14 yd, each stronger than the last (the last pulse deals 700 to 900). Pulse 2 cracks the plate under him and pulse 4 breaks it: when it breaks he is Doused and the channel ends. Get 14 yd away from him. Start him on a cracked plate and the channel ends at pulse 2. (deadly, important)
 
@@ -125464,7 +125464,7 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2538">&lt;woc-art path=&quot;/ui/mobs/drowned_templeguard.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2633">&lt;woc-art path=&quot;/ui/mobs/drowned_templeguard.webp&quot; /&gt;
 &lt;woc-art path=&quot;/encyclopedia-stills/temple_templeguard.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Drowned Templeguard is one of the Undead.
@@ -125530,7 +125530,7 @@ For creatures in the outside world, these numbers already include level scaling.
 
 == Mechanics ==
 * [[Onrush (Ability)|Onrush]]. Charges a target within the listed distance and stuns it. min range 5 yd, max range 30 yd, cooldown 12 sec, stun 0.5 sec, school physical.
-* Trident Sweep. Breathes in a cone in front of it, damaging targets there. cast time 1.5 sec, between uses 12 sec, range 7 yd, arc deg 100, minimum damage 70, maximum damage 85, school physical.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/drowned_templeguard__trident_sweep.webp&quot; size=&quot;attack&quot; /&gt; Trident Sweep. Breathes in a cone in front of it, damaging targets there. cast time 1.5 sec, between uses 12 sec, range 7 yd, arc deg 100, minimum damage 70, maximum damage 85, school physical.
 * Special attacks. This fight uses these special attacks. line cast time 1.8 sec, between uses 14 sec, first 7, school physical, length 22, half width 1.3, minimum damage 60, maximum damage 70, temple guard singers [[Pale Choir Acolyte (Mob)|Pale Choir Acolyte]], [[Moonlit Siren (Mob)|Moonlit Siren]], range 8 yd, share 0.5.
 
 == Loot ==
@@ -130147,7 +130147,7 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3534">&lt;woc-art path=&quot;/ui/mobs/rift_boss_frost.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3807">&lt;woc-art path=&quot;/ui/mobs/rift_boss_frost.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Hoarfrost Warden (Hoard encounter)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/mob_hoard_hoarfrost_warden.webp&quot; size=&quot;model&quot; /&gt;
@@ -130223,12 +130223,12 @@ For creatures in the outside world, these numbers already include level scaling.
 |}
 
 == Mechanics ==
-* Glacial Burst. Damages targets in range. minimum damage 18, maximum damage 28, radius 12 yd, between uses 9 sec, school frost.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/rift_boss_frost__glacial_burst.webp&quot; size=&quot;attack&quot; /&gt; Glacial Burst. Damages targets in range. minimum damage 18, maximum damage 28, radius 12 yd, between uses 9 sec, school frost.
 * Howling Gale. Slows the movement of nearby enemies. radius 32 yd, multiplier 0.4, duration 4 sec, between uses 12 sec.
 * Glacial Carapace. Gets a shield that absorbs damage. amount 700, between uses 16 sec, duration 6 sec, school frost.
 * Whiteout. Slowly charges up an attack that hits an area. cast time 2.5 sec, between uses 16 sec, radius 14 yd, minimum damage 30, maximum damage 44, school frost.
-* Glacial Grave. Marks the ground under a player. Get out before the cast ends, or you die. cast time 4 sec, between uses 22 sec, radius 9 yd, school frost.
-* Absolute Zero. Marks an area that kills anyone inside. Get out before the cast ends. cast time 5 sec, between uses 26 sec, radius 11 yd, school frost.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/rift_boss_frost__glacial_grave.webp&quot; size=&quot;attack&quot; /&gt; Glacial Grave. Marks the ground under a player. Get out before the cast ends, or you die. cast time 4 sec, between uses 22 sec, radius 9 yd, school frost.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/rift_boss_frost__absolute_zero.webp&quot; size=&quot;attack&quot; /&gt; Absolute Zero. Marks an area that kills anyone inside. Get out before the cast ends. cast time 5 sec, between uses 26 sec, radius 11 yd, school frost.
 * Enrage. Becomes enraged when its health drops below the listed amount. triggers below health 30%, damage multiplier 1.4, attack speed multiplier 1.25.
 * Immune to crowd control.
 * Immune to movement slows.
@@ -130270,7 +130270,7 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3704">&lt;woc-art path=&quot;/ui/mobs/rift_boss_ember.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3972">&lt;woc-art path=&quot;/ui/mobs/rift_boss_ember.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Emberforge Tyrant (Hoard encounter)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/mob_hoard_emberforge_tyrant.webp&quot; size=&quot;model&quot; /&gt;
@@ -130348,11 +130348,11 @@ For creatures in the outside world, these numbers already include level scaling.
 == Mechanics ==
 * Pyroclasm. Slowly charges up an attack that hits an area. cast time 2.5 sec, between uses 14 sec, radius 14 yd, minimum damage 30, maximum damage 44, school fire.
 * Cinders. When its attack hits, it has a 40% chance to deal 12 damage every 2 sec for 8 sec.
-* Cinder Wave. Damages targets in range. minimum damage 16, maximum damage 24, radius 11 yd, between uses 10 sec, school fire.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/rift_boss_ember__cinder_wave.webp&quot; size=&quot;attack&quot; /&gt; Cinder Wave. Damages targets in range. minimum damage 16, maximum damage 24, radius 11 yd, between uses 10 sec, school fire.
 * Magma Crash. Stuns nearby enemies. radius 10 yd, between uses 13 sec, duration 1.2 sec, minimum damage 18, maximum damage 28, school fire.
 * Calls for help. Calls in helpers when its health drops to the listed amounts. creature [[Rift Spawnling (Mob)|Rift Spawnling]], count 2, health threshold 60%, 30%.
-* Magma Well. Marks the ground under a player. Get out before the cast ends, or you die. cast time 3.5 sec, between uses 22 sec, radius 9 yd, school fire.
-* Core Meltdown. Marks an area that kills anyone inside. Get out before the cast ends. cast time 4 sec, between uses 26 sec, radius 11 yd, school fire.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/rift_boss_ember__magma_well.webp&quot; size=&quot;attack&quot; /&gt; Magma Well. Marks the ground under a player. Get out before the cast ends, or you die. cast time 3.5 sec, between uses 22 sec, radius 9 yd, school fire.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/rift_boss_ember__core_meltdown.webp&quot; size=&quot;attack&quot; /&gt; Core Meltdown. Marks an area that kills anyone inside. Get out before the cast ends. cast time 4 sec, between uses 26 sec, radius 11 yd, school fire.
 * Enrage. Becomes enraged when its health drops below the listed amount. triggers below health 30%, damage multiplier 1.5, attack speed multiplier 1.3.
 * Immune to crowd control.
 * Immune to movement slows.
@@ -130394,7 +130394,7 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3802">&lt;woc-art path=&quot;/ui/mobs/rift_boss_venom.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3985">&lt;woc-art path=&quot;/ui/mobs/rift_boss_venom.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Broodmother Vysska (Hoard encounter)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/mob_spider__7cb342__s35.webp&quot; size=&quot;model&quot; /&gt;
@@ -130476,8 +130476,8 @@ For creatures in the outside world, these numbers already include level scaling.
 * Clinging Silk. Slows the movement of nearby enemies. radius 30 yd, multiplier 0.5, duration 4 sec, between uses 12 sec.
 * Venom Spray. Damages targets in range. minimum damage 16, maximum damage 26, radius 12 yd, between uses 9 sec, school nature.
 * Venom Deluge. Slowly charges up an attack that hits an area. cast time 2.2 sec, between uses 15 sec, radius 13 yd, minimum damage 26, maximum damage 38, school nature.
-* Venom Pool. Marks the ground under a player. Get out before the cast ends, or you die. cast time 4.5 sec, between uses 22 sec, radius 9 yd, school nature.
-* Broodmother&apos;s Mark. Marks an area that kills anyone inside. Get out before the cast ends. cast time 5 sec, between uses 26 sec, radius 11 yd, school nature.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/rift_boss_venom__venom_pool.webp&quot; size=&quot;attack&quot; /&gt; Venom Pool. Marks the ground under a player. Get out before the cast ends, or you die. cast time 4.5 sec, between uses 22 sec, radius 9 yd, school nature.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/rift_boss_venom__broodmothers_mark.webp&quot; size=&quot;attack&quot; /&gt; Broodmother&apos;s Mark. Marks an area that kills anyone inside. Get out before the cast ends. cast time 5 sec, between uses 26 sec, radius 11 yd, school nature.
 * Enrage. Becomes enraged when its health drops below the listed amount. triggers below health 30%, damage multiplier 1.4, attack speed multiplier 1.25.
 * Immune to crowd control.
 * Immune to movement slows.
@@ -130519,7 +130519,7 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3855">&lt;woc-art path=&quot;/ui/mobs/rift_boss_necro.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4035">&lt;woc-art path=&quot;/ui/mobs/rift_boss_necro.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Bonelord Xarreth (Hoard encounter)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/skel_minion__b9c4a8__s25.webp&quot; size=&quot;model&quot; /&gt;
@@ -130601,8 +130601,8 @@ For creatures in the outside world, these numbers already include level scaling.
 * Desperate heal. Heals itself once when its health drops past the listed amount. triggers below health 25%, maximum health restored 20%.
 * Marrow Harvest. Slowly charges up an attack that hits an area. cast time 2.5 sec, between uses 15 sec, radius 13 yd, minimum damage 26, maximum damage 40, school shadow.
 * Bone Storm. Damages targets in range. minimum damage 14, maximum damage 22, radius 11 yd, between uses 10 sec, school shadow.
-* Soul Grave. Marks the ground under a player. Get out before the cast ends, or you die. cast time 3.5 sec, between uses 22 sec, radius 9 yd, school shadow.
-* Death Sentence. Marks an area that kills anyone inside. Get out before the cast ends. cast time 4 sec, between uses 26 sec, radius 11 yd, school shadow.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/rift_boss_necro__soul_grave.webp&quot; size=&quot;attack&quot; /&gt; Soul Grave. Marks the ground under a player. Get out before the cast ends, or you die. cast time 3.5 sec, between uses 22 sec, radius 9 yd, school shadow.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/rift_boss_necro__death_sentence.webp&quot; size=&quot;attack&quot; /&gt; Death Sentence. Marks an area that kills anyone inside. Get out before the cast ends. cast time 4 sec, between uses 26 sec, radius 11 yd, school shadow.
 * Enrage. Becomes enraged when its health drops below the listed amount. triggers below health 30%, damage multiplier 1.4, attack speed multiplier 1.25.
 * Immune to crowd control.
 * Immune to movement slows.
@@ -130644,7 +130644,7 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3798">&lt;woc-art path=&quot;/ui/mobs/rift_boss_brute.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4071">&lt;woc-art path=&quot;/ui/mobs/rift_boss_brute.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Warlord Grask (Hoard encounter)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/mob_ogre__a07d4f__s12.webp&quot; size=&quot;model&quot; /&gt;
@@ -130720,14 +130720,14 @@ For creatures in the outside world, these numbers already include level scaling.
 |}
 
 == Mechanics ==
-* Seismic Stomp. Stuns nearby enemies. radius 12 yd, between uses 11 sec, duration 1.5 sec, minimum damage 24, maximum damage 36.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/rift_boss_brute__seismic_stomp.webp&quot; size=&quot;attack&quot; /&gt; Seismic Stomp. Stuns nearby enemies. radius 12 yd, between uses 11 sec, duration 1.5 sec, minimum damage 24, maximum damage 36.
 * Sweeping Arc. Its swing can also hit nearby targets. radius 9 yd, multiplier 0.6.
 * Rising Frenzy. Each melee hit that lands gives it more attack power and restarts the buff timer. attack power 40, stack limit 8, duration 8 sec.
 * Warlord&apos;s Bellow. Makes enemies in range run away in fear. radius 12 yd, between uses 15 sec, duration 2 sec, school physical.
 * Earthbreaker. Slowly charges up an attack that hits an area. cast time 2.8 sec, between uses 16 sec, radius 14 yd, minimum damage 32, maximum damage 48, school physical.
 * Desperate heal. Heals itself once when its health drops past the listed amount. triggers below health 30%, maximum health restored 15%.
-* Earthshatter. Marks the ground under a player. Get out before the cast ends, or you die. cast time 3.5 sec, between uses 22 sec, radius 9 yd, school physical.
-* Final Judgment. Marks an area that kills anyone inside. Get out before the cast ends. cast time 4 sec, between uses 26 sec, radius 11 yd, school physical.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/rift_boss_brute__earthshatter.webp&quot; size=&quot;attack&quot; /&gt; Earthshatter. Marks the ground under a player. Get out before the cast ends, or you die. cast time 3.5 sec, between uses 22 sec, radius 9 yd, school physical.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/rift_boss_brute__final_judgment.webp&quot; size=&quot;attack&quot; /&gt; Final Judgment. Marks an area that kills anyone inside. Get out before the cast ends. cast time 4 sec, between uses 26 sec, radius 11 yd, school physical.
 * Enrage. Becomes enraged when its health drops below the listed amount. triggers below health 30%, damage multiplier 1.5, attack speed multiplier 1.3.
 * Immune to crowd control.
 * Immune to movement slows.
@@ -130769,7 +130769,7 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3665">&lt;woc-art path=&quot;/ui/mobs/rift_boss_arcane.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3851">&lt;woc-art path=&quot;/ui/mobs/rift_boss_arcane.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Archon Nyxaris (Hoard encounter)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/mob_hoard_archon_nyxaris.webp&quot; size=&quot;model&quot; /&gt;
@@ -130850,8 +130850,8 @@ For creatures in the outside world, these numbers already include level scaling.
 * Mana Shield. Gets a shield that absorbs damage. amount 800, between uses 15 sec, duration 6 sec.
 * Temporal Drag. Slows the movement of nearby enemies. radius 30 yd, multiplier 0.5, duration 4 sec, between uses 13 sec.
 * Arcane [[Volley (Ability)|Volley]]. Damages targets in range. minimum damage 16, maximum damage 26, radius 12 yd, between uses 9 sec, school arcane.
-* Void Rift. Marks the ground under a player. Get out before the cast ends, or you die. cast time 3.5 sec, between uses 22 sec, radius 9 yd, school arcane.
-* Arcane Annihilation. Marks an area that kills anyone inside. Get out before the cast ends. cast time 4 sec, between uses 26 sec, radius 11 yd, school arcane.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/rift_boss_arcane__void_rift.webp&quot; size=&quot;attack&quot; /&gt; Void Rift. Marks the ground under a player. Get out before the cast ends, or you die. cast time 3.5 sec, between uses 22 sec, radius 9 yd, school arcane.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/rift_boss_arcane__arcane_annihilation.webp&quot; size=&quot;attack&quot; /&gt; Arcane Annihilation. Marks an area that kills anyone inside. Get out before the cast ends. cast time 4 sec, between uses 26 sec, radius 11 yd, school arcane.
 * Enrage. Becomes enraged when its health drops below the listed amount. triggers below health 30%, damage multiplier 1.4, attack speed multiplier 1.25.
 * Immune to crowd control.
 * Immune to movement slows.
@@ -130893,7 +130893,7 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3741">&lt;woc-art path=&quot;/ui/mobs/rift_boss_storm.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4021">&lt;woc-art path=&quot;/ui/mobs/rift_boss_storm.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Tempest Vharok (Hoard encounter)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/mob_hoard_tempest_vharok.webp&quot; size=&quot;model&quot; /&gt;
@@ -130969,14 +130969,14 @@ For creatures in the outside world, these numbers already include level scaling.
 |}
 
 == Mechanics ==
-* Chain Lightning. Damages targets in range. minimum damage 20, maximum damage 30, radius 13 yd, between uses 8 sec, school nature.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/rift_boss_storm__chain_lightning.webp&quot; size=&quot;attack&quot; /&gt; Chain Lightning. Damages targets in range. minimum damage 20, maximum damage 30, radius 13 yd, between uses 8 sec, school nature.
 * Thunder Slam. Knocks the target back. chance 30%, distance 9 yd.
 * Thunderclap. Stuns the target when its melee hit lands. chance 20%, duration 1.5 sec.
 * Thunderhead. Slowly charges up an attack that hits an area. cast time 2.4 sec, between uses 14 sec, radius 13 yd, minimum damage 28, maximum damage 42, school nature.
 * Galecrash. Stuns nearby enemies. radius 11 yd, between uses 12 sec, duration 1.2 sec, minimum damage 18, maximum damage 28, school nature.
 * Static Field. Slows the movement of nearby enemies. radius 30 yd, multiplier 0.55, duration 4 sec, between uses 12 sec.
-* Lightning Rod. Marks the ground under a player. Get out before the cast ends, or you die. cast time 4.5 sec, between uses 22 sec, radius 9 yd, school nature.
-* Stormcaller&apos;s Wrath. Marks an area that kills anyone inside. Get out before the cast ends. cast time 5 sec, between uses 26 sec, radius 11 yd, school nature.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/rift_boss_storm__lightning_rod.webp&quot; size=&quot;attack&quot; /&gt; Lightning Rod. Marks the ground under a player. Get out before the cast ends, or you die. cast time 4.5 sec, between uses 22 sec, radius 9 yd, school nature.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/rift_boss_storm__stormcallers_wrath.webp&quot; size=&quot;attack&quot; /&gt; Stormcaller&apos;s Wrath. Marks an area that kills anyone inside. Get out before the cast ends. cast time 5 sec, between uses 26 sec, radius 11 yd, school nature.
 * Enrage. Becomes enraged when its health drops below the listed amount. triggers below health 30%, damage multiplier 1.4, attack speed multiplier 1.25.
 * Immune to crowd control.
 * Immune to movement slows.
@@ -131018,7 +131018,7 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3591">&lt;woc-art path=&quot;/ui/mobs/rift_boss_tide.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3770">&lt;woc-art path=&quot;/ui/mobs/rift_boss_tide.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Abyssal Maw (Hoard encounter)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/mob_hoard_abyssal_maw.webp&quot; size=&quot;model&quot; /&gt;
@@ -131099,8 +131099,8 @@ For creatures in the outside world, these numbers already include level scaling.
 * Calls for help. Calls in helpers when its health drops to the listed amounts. creature [[Rift Spawnling (Mob)|Rift Spawnling]], count 2, health threshold 66%, 33%.
 * Riptide. Damages targets in range. minimum damage 16, maximum damage 26, radius 12 yd, between uses 10 sec, school frost.
 * Undertow. Slows the movement of nearby enemies. radius 30 yd, multiplier 0.5, duration 4 sec, between uses 12 sec.
-* Abyssal Maw. Marks the ground under a player. Get out before the cast ends, or you die. cast time 5 sec, between uses 22 sec, radius 9 yd, school frost.
-* Crushing Depth. Marks an area that kills anyone inside. Get out before the cast ends. cast time 5 sec, between uses 26 sec, radius 11 yd, school frost.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/rift_boss_tide__abyssal_maw.webp&quot; size=&quot;attack&quot; /&gt; Abyssal Maw. Marks the ground under a player. Get out before the cast ends, or you die. cast time 5 sec, between uses 22 sec, radius 9 yd, school frost.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/rift_boss_tide__crushing_depth.webp&quot; size=&quot;attack&quot; /&gt; Crushing Depth. Marks an area that kills anyone inside. Get out before the cast ends. cast time 5 sec, between uses 26 sec, radius 11 yd, school frost.
 * Enrage. Becomes enraged when its health drops below the listed amount. triggers below health 30%, damage multiplier 1.4, attack speed multiplier 1.25.
 * Immune to crowd control.
 * Immune to movement slows.
@@ -131261,7 +131261,7 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3398">&lt;woc-art path=&quot;/ui/mobs/rift_boss_pitlord.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3582">&lt;woc-art path=&quot;/ui/mobs/rift_boss_pitlord.webp&quot; /&gt;
 &lt;woc-art path=&quot;/encyclopedia-stills/mob_demonalt__ff3a1a__s35.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Azgorath, Lord of the Pit is one of the Demons.
@@ -131336,10 +131336,10 @@ For creatures in the outside world, these numbers already include level scaling.
 
 == Mechanics ==
 * Rain of Brimstone. Slowly charges up an attack that hits an area. cast time 3 sec, between uses 15 sec, radius 12 yd, minimum damage 32, maximum damage 46, school fire.
-* Hoof of Ruin. Stuns nearby enemies. radius 11 yd, between uses 13 sec, duration 1.5 sec, minimum damage 22, maximum damage 34.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/rift_boss_pitlord__hoof_of_ruin.webp&quot; size=&quot;attack&quot; /&gt; Hoof of Ruin. Stuns nearby enemies. radius 11 yd, between uses 13 sec, duration 1.5 sec, minimum damage 22, maximum damage 34.
 * Wing Buffet. Knocks the target back. chance 20%, distance 7 yd.
 * Calls for help. Calls in helpers when its health drops to the listed amounts. creature [[Rift Spawnling (Mob)|Rift Spawnling]], count 3, health threshold 60%, 30%.
-* Pitfire Ring. Damages targets in range. minimum damage 16, maximum damage 26, radius 12 yd, between uses 10 sec, school fire.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/rift_boss_pitlord__pitfire_ring.webp&quot; size=&quot;attack&quot; /&gt; Pitfire Ring. Damages targets in range. minimum damage 16, maximum damage 26, radius 12 yd, between uses 10 sec, school fire.
 * Enrage. Becomes enraged when its health drops below the listed amount. triggers below health 30%, damage multiplier 1.5, attack speed multiplier 1.3.
 * Immune to crowd control.
 * Immune to movement slows.
@@ -136360,7 +136360,7 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="11073">&lt;woc-art path=&quot;/ui/mobs/wildheart_beastmaster.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="11161">&lt;woc-art path=&quot;/ui/mobs/wildheart_beastmaster.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Fanglord Beastmaster (Contract)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/mob_wildheart_beastmaster.webp&quot; size=&quot;model&quot; /&gt;
@@ -136462,7 +136462,7 @@ One fight, two bodies. Their timers run the whole fight; there are no health pha
 * &lt;woc-art path=&quot;/encyclopedia-attacks/wildheart_beastmaster__beast_pit_quake.webp&quot; size=&quot;attack&quot; /&gt; Beast Pit Quake. Every 13 sec, a 1.5 sec cast, then everyone within 8 yd of the Beastmaster takes 450 to 550 damage. Everyone but the tank steps away from the Beastmaster. (important)
 * Call of the Hunt. Every 20 sec both beasts attack 20% faster for 7 sec. Tank and healer use a cooldown through it; the jaguar bites faster too.
 * Thickhide Ward. Every 18 sec the jaguar gains a shield that absorbs 900 damage for 8 sec. Hit the Beastmaster while the shield is up: the health pool is shared.
-* Heel!. Every 25 sec, a 2 sec cast on the jaguar, then it leaps back to the Beastmaster and the bond returns. Stun, incapacitate or transform the jaguar during the cast to cancel it. It only works if the jaguar is not already Wary of stuns. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/wildheart_beastmaster__heel.webp&quot; size=&quot;attack&quot; /&gt; Heel!. Every 25 sec, a 2 sec cast on the jaguar, then it leaps back to the Beastmaster and the bond returns. Stun, incapacitate or transform the jaguar during the cast to cancel it. It only works if the jaguar is not already Wary of stuns. (important)
 
 * tank: Pull the Beastmaster more than 20 yd from the jaguar at once and hold him there. After each Heel! drag him clear again.
 * healer: Watch the [[Stalk (Ability)|Stalk]] target: bites and bleeds land fast, faster during Call of the Hunt.
@@ -136670,7 +136670,7 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="10390">&lt;woc-art path=&quot;/ui/mobs/the_gorgebloom.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="10568">&lt;woc-art path=&quot;/ui/mobs/the_gorgebloom.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[The Gorgebloom (Contract)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/wildheart_gorgebloom.webp&quot; size=&quot;model&quot; /&gt;
@@ -136746,7 +136746,7 @@ It never moves. Its cast timers pause while another cast runs, so the listed cad
 
 * &lt;woc-art path=&quot;/encyclopedia-attacks/the_gorgebloom__seed_rain.webp&quot; size=&quot;attack&quot; /&gt; Seed Rain. Every 15 sec, a 1.5 sec cast, then 6 seedpods land, one on each loam bed. Stepping on a pod while not Pollinated stamps it out. A pod left alone sprouts a [[Thorn Sprout (Mob)|Thorn Sprout]] after 12 sec. Players who are not Pollinated walk over every pod quickly. Pollinated players stay off them. (important)
 * Pollinate. Every 10 sec, 2 players are Pollinated for 8 sec. A Pollinated player who touches a pod makes it sprout at once. Pollinated: keep off the pods until it wears off, and on Heroic away from allies. (important)
-* [[Thorn Sprout (Mob)|Thorn Sprout]]. An elite add that grows from a sprouted pod and attacks the nearest player. Sprouts wither when the Gorgebloom dies. The tank picks it up and damage dealers kill it. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/the_gorgebloom__thorn_sprout.webp&quot; size=&quot;attack&quot; /&gt; [[Thorn Sprout (Mob)|Thorn Sprout]]. An elite add that grows from a sprouted pod and attacks the nearest player. Sprouts wither when the Gorgebloom dies. The tank picks it up and damage dealers kill it. (important)
 * &lt;woc-art path=&quot;/encyclopedia-attacks/the_gorgebloom__vine_lash.webp&quot; size=&quot;attack&quot; /&gt; Vine Lash. Every 10 sec, a 1.5 sec cast aims a 30 yd lane, 4 yd wide, at a player (a non-tank when possible): 180 to 220 damage and a 2 sec root. Step sideways out of the lane before the cast ends. (important)
 * &lt;woc-art path=&quot;/encyclopedia-attacks/the_gorgebloom__gorge.webp&quot; size=&quot;attack&quot; /&gt; Gorge. Every 15 sec, a 1.5 sec cast on its target, then a bite for 2 times its melee hit and Digesting: 40 damage per second for 6 sec. It cannot be dodged by moving. Tank: use a defensive cooldown for it. Healers cover the Digesting damage. (deadly, important)
 * Bloom Spit. If its target stays out of its reach for 1.5 sec, it spits every 2 sec for 140 to 170 damage. The tank stays in melee range.
@@ -136766,7 +136766,7 @@ It never moves. Its cast timers pause while another cast runs, so the listed cad
 
 * &lt;woc-art path=&quot;/encyclopedia-attacks/the_gorgebloom__seed_rain.webp&quot; size=&quot;attack&quot; /&gt; Seed Rain. Every 15 sec, a 1.5 sec cast, then 6 seedpods land, one on each loam bed. Stepping on a pod while not Pollinated stamps it out. Burrowing Seeds: a pod left alone burrows after 6 sec and a [[Thorn Sprout (Mob)|Thorn Sprout]] rises next to the nearest player. Players who are not Pollinated walk over every pod quickly. Pollinated players stay off them. (important)
 * Pollinate. Every 10 sec, 2 players are Pollinated for 8 sec. A Pollinated player who touches a pod makes it sprout at once. Pollen Cloud: standing within 3 yd of a Pollinated player for 2 sec pollinates you too. Pollinated: keep off the pods until it wears off, and on Heroic away from allies. (important)
-* [[Thorn Sprout (Mob)|Thorn Sprout]]. An elite add that grows from a sprouted pod and attacks the nearest player. Sprouts wither when the Gorgebloom dies. The tank picks it up and damage dealers kill it. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/the_gorgebloom__thorn_sprout.webp&quot; size=&quot;attack&quot; /&gt; [[Thorn Sprout (Mob)|Thorn Sprout]]. An elite add that grows from a sprouted pod and attacks the nearest player. Sprouts wither when the Gorgebloom dies. The tank picks it up and damage dealers kill it. (important)
 * &lt;woc-art path=&quot;/encyclopedia-attacks/the_gorgebloom__vine_lash.webp&quot; size=&quot;attack&quot; /&gt; Vine Lash. Every 10 sec, a 1.5 sec cast aims a 30 yd lane, 4 yd wide, at a player (a non-tank when possible): 450 to 550 damage and a 2 sec root. Step sideways out of the lane before the cast ends. (important)
 * &lt;woc-art path=&quot;/encyclopedia-attacks/the_gorgebloom__gorge.webp&quot; size=&quot;attack&quot; /&gt; Gorge. Every 15 sec, a 1.5 sec cast on its target, then a bite for 2 times its melee hit and Digesting: 100 damage per second for 6 sec. It cannot be dodged by moving. Tank: use a defensive cooldown for it. Healers cover the Digesting damage. (deadly, important)
 * Bloom Spit. If its target stays out of its reach for 1.5 sec, it spits every 2 sec for 350 to 425 damage. The tank stays in melee range.
@@ -138687,7 +138687,7 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2192">&lt;woc-art path=&quot;/ui/mobs/crypt_ossuary_warrior.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2288">&lt;woc-art path=&quot;/ui/mobs/crypt_ossuary_warrior.webp&quot; /&gt;
 &lt;woc-art path=&quot;/encyclopedia-stills/crypt_skel_warrior.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Ossuary Warrior is one of the Undead.
@@ -138752,7 +138752,7 @@ For creatures in the outside world, these numbers already include level scaling.
 * [[The Hollow Crypt]].
 
 == Mechanics ==
-* Grave Cleave. Breathes in a cone in front of it, damaging targets there. cast time 1.6 sec, between uses 10 sec, range 8 yd, arc deg 110, minimum damage 16, maximum damage 24, school physical.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/crypt_ossuary_warrior__grave_cleave.webp&quot; size=&quot;attack&quot; /&gt; Grave Cleave. Breathes in a cone in front of it, damaging targets there. cast time 1.6 sec, between uses 10 sec, range 8 yd, arc deg 110, minimum damage 16, maximum damage 24, school physical.
 * Special attacks. This fight uses these special attacks. reassemble masters [[Gravecaller Necromancer (Mob)|Gravecaller Necromancer]], pile [[Stirring Bones (Mob)|Stirring Bones]], duration 8 sec, hp pct 0.33, heroic hp pct 0.5, rises 1, heroic rises 2.
 
 == Loot ==
@@ -139154,7 +139154,7 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1612">&lt;woc-art path=&quot;/ui/mobs/crypt_bone_brute.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1703">&lt;woc-art path=&quot;/ui/mobs/crypt_bone_brute.webp&quot; /&gt;
 &lt;woc-art path=&quot;/encyclopedia-stills/crypt_skel_brute.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Bone Brute is one of the Undead.
@@ -139213,7 +139213,7 @@ For creatures in the outside world, these numbers already include level scaling.
 |}
 
 == Mechanics ==
-* Marrow Crush. Breathes in a cone in front of it, damaging targets there. cast time 2 sec, between uses 12 sec, range 7 yd, arc deg 50, minimum damage 55, maximum damage 70, school physical.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/crypt_bone_brute__marrow_crush.webp&quot; size=&quot;attack&quot; /&gt; Marrow Crush. Breathes in a cone in front of it, damaging targets there. cast time 2 sec, between uses 12 sec, range 7 yd, arc deg 50, minimum damage 55, maximum damage 70, school physical.
 
 == Loot ==
 &apos;&apos;&apos;Separate rolls&apos;&apos;&apos;
@@ -139725,7 +139725,7 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2075">&lt;woc-art path=&quot;/ui/mobs/drowned_watchman.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2167">&lt;woc-art path=&quot;/ui/mobs/drowned_watchman.webp&quot; /&gt;
 &lt;woc-art path=&quot;/encyclopedia-stills/bastion_skel_watchman.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Drowned Watchman is one of the Undead.
@@ -139787,7 +139787,7 @@ For creatures in the outside world, these numbers already include level scaling.
 * [[The Sunken Bastion]].
 
 == Mechanics ==
-* Halberd Sweep. Breathes in a cone in front of it, damaging targets there. cast time 1.5 sec, between uses 11 sec, range 6 yd, arc deg 100, minimum damage 45, maximum damage 55, school physical.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/drowned_watchman__halberd_sweep.webp&quot; size=&quot;attack&quot; /&gt; Halberd Sweep. Breathes in a cone in front of it, damaging targets there. cast time 1.5 sec, between uses 11 sec, range 6 yd, arc deg 100, minimum damage 45, maximum damage 55, school physical.
 * Special attacks. This fight uses these special attacks. hook cast time 2 sec, between uses 15 sec, first 6, school physical, min range 8 yd, length 22, half width 1.2, minimum damage 10, maximum damage 14, stop 2.5, pull seconds 0.6 sec, heroic sweep in 0.6, wall radius 5 yd, reduction 0.25.
 
 == Loot ==
@@ -141174,7 +141174,7 @@ The game rolls once for this group. At most &apos;&apos;&apos;one&apos;&apos;&ap
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1998">&lt;woc-art path=&quot;/ui/mobs/lagoon_snapper.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2079">&lt;woc-art path=&quot;/ui/mobs/lagoon_snapper.webp&quot; /&gt;
 &lt;woc-art path=&quot;/encyclopedia-stills/temple_snapper.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Lagoon Snapper is one of the Beasts.
@@ -141236,7 +141236,7 @@ For creatures in the outside world, these numbers already include level scaling.
 * [[The Drowned Temple]].
 
 == Mechanics ==
-* Snap. Breathes in a cone in front of it, damaging targets there. cast time 1.5 sec, between uses 10 sec, range 6 yd, arc deg 90, minimum damage 80, maximum damage 100, school physical.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/lagoon_snapper__snap.webp&quot; size=&quot;attack&quot; /&gt; Snap. Breathes in a cone in front of it, damaging targets there. cast time 1.5 sec, between uses 10 sec, range 6 yd, arc deg 90, minimum damage 80, maximum damage 100, school physical.
 * Special attacks. This fight uses these special attacks. withdraw triggers below health 35%, duration 5 sec, reduction 0.6, temple whirlpool radius 8 yd, pull 2.5, heroic pull 3.5, core 3, tick 1, minimum damage 30, maximum damage 40, school frost.
 
 == Loot ==
@@ -144058,7 +144058,7 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="5554">&lt;woc-art path=&quot;/ui/mobs/sledge_tusker.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="5720">&lt;woc-art path=&quot;/ui/mobs/sledge_tusker.webp&quot; /&gt;
 &lt;woc-art path=&quot;/encyclopedia-stills/sanctum_sledge_tusker.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Sledge Tusker is one of the Beasts.
@@ -144131,7 +144131,7 @@ A house-sized tusker hauls a sledge of burning soul braziers up and down the Sle
 Two telegraphed attacks from the start: a frontal sweep and a charge down a painted lane.
 
 * Tusk Sweep. Every 12 sec, a 1.5 sec cast, then its tusks sweep a 120 degree cone in front of it, 10 yd past its body: 180 to 220 damage and a 8 yd knockback. The tank holds it facing away from the group. Everyone else attacks from its sides or rear. (important)
-* Trample. Every 16 sec, a 2 sec cast paints a 33.5 yd lane toward the farthest player, then it charges down the lane: 200 to 240 damage and a 1 sec knockdown to everyone in it. Step sideways out of the painted lane before the cast ends. The farthest player is the target, so ranged players keep room to side-step. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/sledge_tusker__trample.webp&quot; size=&quot;attack&quot; /&gt; Trample. Every 16 sec, a 2 sec cast paints a 33.5 yd lane toward the farthest player, then it charges down the lane: 200 to 240 damage and a 1 sec knockdown to everyone in it. Step sideways out of the painted lane before the cast ends. The farthest player is the target, so ranged players keep room to side-step. (deadly, important)
 
 === The Sledge Tips ===
 
@@ -144157,7 +144157,7 @@ A house-sized tusker hauls a sledge of burning soul braziers up and down the Sle
 Two telegraphed attacks from the start: a frontal sweep and a charge down a painted lane.
 
 * Tusk Sweep. Every 12 sec, a 1.5 sec cast, then its tusks sweep a 120 degree cone in front of it, 10 yd past its body: 450 to 550 damage and a 8 yd knockback. The tank holds it facing away from the group. Everyone else attacks from its sides or rear. (important)
-* Trample. Every 16 sec, a 2 sec cast paints a 33.5 yd lane toward the farthest player, then it charges down the lane: 500 to 600 damage and a 1 sec knockdown to everyone in it. Step sideways out of the painted lane before the cast ends. The farthest player is the target, so ranged players keep room to side-step. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/sledge_tusker__trample.webp&quot; size=&quot;attack&quot; /&gt; Trample. Every 16 sec, a 2 sec cast paints a 33.5 yd lane toward the farthest player, then it charges down the lane: 500 to 600 damage and a 1 sec knockdown to everyone in it. Step sideways out of the painted lane before the cast ends. The farthest player is the target, so ranged players keep room to side-step. (deadly, important)
 
 === The Sledge Tips ===
 

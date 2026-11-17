@@ -40,6 +40,9 @@ const rawDir = path.join(root, 'tmp', 'attacks', 'raw');
 const manifestPath = path.join(root, 'scripts', 'wiki', 'attack_snapshots.json');
 const OUT_PX = Number(process.env.ATTACK_PX || 384);
 const PORT = Number(process.env.ATTACK_PORT || 5241);
+// RETRY_REJECTED=1 captures ONLY the REJECTED entries again (for a fresh review) and keeps
+// them; take an entry off REJECTED once its new frame passes review.
+const RETRY_REJECTED = Boolean(process.env.RETRY_REJECTED);
 const only = process.env.ONLY ? new Set(process.env.ONLY.split(',')) : null;
 const TICK_HZ = 20;
 const VIEW = { width: 960, height: 640, deviceScaleFactor: 1 };
@@ -192,6 +195,14 @@ try {
       const boss =
         window.__attackProbe.bossId === null ? null : w.entities.get(window.__attackProbe.bossId);
       if (!p || !boss || boss.dead) return;
+      // Keep the boss on the player: a boss that drops its target stops casting.
+      if (!boss.inCombat || boss.targetId !== p.id) {
+        try {
+          w.ctx.aggroMob(boss, p, false);
+        } catch {
+          // A scripted boss may refuse; its own engage path holds it.
+        }
+      }
       p.vx = 0;
       p.vz = 0;
       if (p.dead) {
@@ -323,7 +334,7 @@ try {
     }
     const wantedNames = boss.attacks
       .map((a) => a.name)
-      .filter((n) => !REJECTED.has(`${boss.mobId}|${n}`));
+      .filter((n) => REJECTED.has(`${boss.mobId}|${n}`) === RETRY_REJECTED);
     const bossStart = Date.now();
     console.log(`\n${boss.mobId} (${boss.mobName}): ${wantedNames.length} attacks`);
     const row = { mobId: boss.mobId, total: boss.attacks.length, got: [], missed: [], why: '' };
@@ -336,7 +347,25 @@ try {
       await chat('/dev level 60');
       await chat('/dev god');
       if (lastDungeon === 'spawn') await chat('/dev despawn spawned');
-      if (stage) {
+      if (stage?.rift) {
+        // A rift boss in a real rift at its rank (rift_stage_page.js): only a boss a rift
+        // floor spawned runs its rank kit and draws its windup rings.
+        const staged = await page.evaluate(
+          async (id, rank, citadel) => {
+            const m = await import('/scripts/wiki/rift_stage_page.js');
+            await m.leaveAnyRift();
+            const s = m.seedFor(id, rank, citadel);
+            if (!s) return { error: 'no seed for this boss' };
+            return { ...m.stageRiftBoss(id, s.seed, s.baseLevel), seed: s.seed };
+          },
+          boss.mobId,
+          stage.rift.rank ?? 'S',
+          Boolean(stage.rift.citadel),
+        );
+        console.log(`  rift: ${JSON.stringify(staged)}`);
+        if (staged.error) throw new Error(`rift staging: ${staged.error}`);
+        lastDungeon = 'rift';
+      } else if (stage) {
         for (const line of stage.setup) {
           await chat(line);
           await sleep(400);
@@ -356,8 +385,34 @@ try {
       }
       await sleep(1500);
       await waitCurtain();
+      // Lines that need the player already inside (a dungeon spawn lands beside them).
+      for (const line of stage?.post ?? []) {
+        await chat(line);
+        await sleep(400);
+      }
       await runFor(stage?.settle ?? 1.5);
-      const found = await findBoss(boss.mobId);
+      if (process.env.DEBUG_SHOT) {
+        mkdirSync(rawDir, { recursive: true });
+        await page.screenshot({ path: path.join(rawDir, `stage_${boss.mobId}.png`) });
+      }
+      let found = await findBoss(boss.mobId);
+      // A boss that only engages close up (a landing cinematic, a flight): step in.
+      if (found && stage?.approach) {
+        await page.evaluate(
+          (id, d) => {
+            const w = window.__game.world;
+            const b = w.entities.get(id);
+            const p = w.player;
+            const g = w.ctx.groundPos(b.pos.x, b.pos.z + d);
+            p.pos = { ...g };
+            p.prevPos = { ...g };
+          },
+          found.id,
+          stage.approach,
+        );
+        await runFor(stage.approachSettle ?? 4);
+        found = await findBoss(boss.mobId);
+      }
       if (!found) {
         row.why = 'boss not found after staging';
         console.log(`  ${row.why}`);
@@ -412,7 +467,7 @@ try {
           castId: castIds[a.name] ?? a.castId,
           timer: a.timer,
           windup: a.windup,
-          fraction: a.castId || castIds[a.name] ? 0.6 : 0.5,
+          fraction: stage?.fractions?.[a.name] ?? (a.castId || castIds[a.name] ? 0.6 : 0.5),
         }));
       const idle = stage ? (stage.idle ?? 0) : 60;
       if (wanted.length && idle > 0) {
@@ -439,7 +494,8 @@ try {
 // manifest and from public/, so a rerun never ships a frame a human threw out.
 for (const [mobId, attacks] of Object.entries(manifest)) {
   for (const [name, url] of Object.entries(attacks)) {
-    if (!REJECTED.has(`${mobId}|${name}`) && (STAGES[mobId] || process.env.UNSTAGED)) continue;
+    const rejected = REJECTED.has(`${mobId}|${name}`) && !RETRY_REJECTED;
+    if (!rejected && (STAGES[mobId] || process.env.UNSTAGED)) continue;
     rmSync(path.join(root, 'public', url), { force: true });
     delete attacks[name];
   }
