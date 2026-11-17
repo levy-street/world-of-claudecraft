@@ -438,6 +438,11 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // the calm, split stone, rubble): each glow pass on its owner's glow rung,
   // over every char rung of that owner (painted_telegraph_core.ts).
   { file: 'src/render/smith_heart_fx/painted_telegraphs.ts', layer: 'encounter', strict: true },
+  // The Smith's Heart entrance and death cinematics that lay frost or ember on
+  // the floor through the ladder; their camera flash keeps a bare order.
+  { file: 'src/render/smith_heart_fx/heat_entrance_fx.ts', layer: 'encounter', strict: false },
+  { file: 'src/render/smith_heart_fx/quench_death_fx.ts', layer: 'encounter', strict: false },
+  { file: 'src/render/smith_heart_fx/quench_entrance_fx.ts', layer: 'encounter', strict: false },
   // the player's own ground aim guide (additive: it brightens what lies under it)
   { file: 'src/render/ground_aim_reticle_visual.ts', layer: 'reticle', strict: true },
 ];
@@ -452,6 +457,17 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
  * otherwise, so a floor mechanic cannot ship outside the ladder unnoticed.
  */
 const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
+  // The Smith's Heart boss entrance and death cinematics: storms, beams, bolts,
+  // bursts and a full-screen flash ordered among themselves, played while no
+  // floor mechanic is live (before the pull or after the kill)
+  'src/render/smith_heart_fx/breath_death_fx.ts',
+  'src/render/smith_heart_fx/breath_entrance_bolts.ts',
+  'src/render/smith_heart_fx/breath_entrance_fx.ts',
+  'src/render/smith_heart_fx/breath_entrance_storm.ts',
+  'src/render/smith_heart_fx/council_death_fx.ts',
+  'src/render/smith_heart_fx/council_entrance_fx.ts',
+  'src/render/smith_heart_fx/final_arrival_beam.ts',
+  'src/render/smith_heart_fx/final_death_fx.ts',
   // the Hammer vein's fire bowls: upright flames over bowls on a terrace, never on a floor
   'src/render/smith_heart/hammer_env_flames.ts',
   // The Quench's freeze: a crystal of ice round a frozen body, ordered after
