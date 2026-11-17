@@ -47,6 +47,8 @@ import { QUENCH_TELEGRAPH_GLOW_STEP } from './painted_telegraph_core';
 import { QuenchTelegraphs } from './painted_telegraphs';
 import { QUENCH_BODY_CLIP } from './quench_body_core';
 import { QUENCH_BREATH_COLORS } from './quench_breath_core';
+import { splitQuenchDecal } from './quench_floor_decal';
+import { QUENCH_FLOOR, quenchParticleSteps } from './quench_floor_ladder_core';
 import {
   BREATH_FROST_SECONDS,
   BREATH_SWEEP_SECONDS,
@@ -282,6 +284,7 @@ export class QuenchFx {
       () => this.rand(),
       () => this.reducedMotion(),
       hasDom ? getFlameTex() : null,
+      quenchParticleSteps('quench_fx'),
     );
     // The telegraph: the cone's footprint on every tier (the kit's curtain
     // only where the tier draws detail).
@@ -291,7 +294,7 @@ export class QuenchFx {
     // out from the maw with the bar, shards of ice along its flanks.
     const paints = new QuenchTelegraphs(QUENCH_TELEGRAPH_GLOW_STEP, this.materials);
     for (let i = 0; i < QUENCH_FX_POOLS.telegraphs; i++) {
-      const fan = this.kit.fan(10);
+      const fan = this.kit.fan(QUENCH_FLOOR.telegraphChar.step);
       paints.dress(fan, 'breath');
       this.fans.push(fan);
     }
@@ -324,7 +327,13 @@ export class QuenchFx {
       mesh.visible = false;
       mesh.frustumCulled = false;
       // Over the floor, under the telegraph's fill front.
-      mesh.renderOrder = floorVfxRenderOrder('encounter', 6);
+      // Two breaths' frost can cross: a commuting char and glow (the ladder).
+      splitQuenchDecal(
+        mesh,
+        QUENCH_FLOOR.frostChar.step,
+        QUENCH_FLOOR.frostGlow.step,
+        this.materials,
+      );
       this.root.add(mesh);
       this.frosts.push({
         mesh,

@@ -12,6 +12,7 @@
 
 import * as THREE from 'three';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
+import { QUENCH_FLOOR } from './quench_floor_ladder_core';
 import {
   newWindupLook,
   type QuenchWindupEnd,
@@ -168,7 +169,7 @@ export class QuenchStrikeWindup {
     this.ring.name = 'smithHeartQuenchWindupRing';
     this.ring.frustumCulled = false;
     this.ring.visible = false;
-    this.ring.renderOrder = floorVfxRenderOrder('encounter', 5);
+    this.ring.renderOrder = floorVfxRenderOrder('encounter', QUENCH_FLOOR.windupRing.step);
     parent.add(this.ring);
     this.spiralMat = new THREE.ShaderMaterial({
       name: 'smithHeartQuenchWindupSpiral',

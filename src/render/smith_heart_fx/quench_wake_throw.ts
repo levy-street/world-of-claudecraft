@@ -20,6 +20,8 @@
 import * as THREE from 'three';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import type { EngineParticles } from '../trash_engine_fx/engine_particles';
+import { splitQuenchDecal } from './quench_floor_decal';
+import { QUENCH_FLOOR } from './quench_floor_ladder_core';
 import { quenchSpikeGeometry } from './quench_spike_geometry';
 import {
   QUENCH_WAKE_COLORS as C,
@@ -259,7 +261,7 @@ export class QuenchWakeThrow {
       m.name = 'smithHeartQuenchWakeLine';
       m.frustumCulled = false;
       m.visible = false;
-      m.renderOrder = floorVfxRenderOrder('encounter', 6);
+      splitQuenchDecal(m, QUENCH_FLOOR.throwChar.step, QUENCH_FLOOR.throwGlow.step, materials);
       parent.add(m);
       this.lines.push(m);
       this.lineMats.push(mat);
@@ -291,7 +293,7 @@ export class QuenchWakeThrow {
     this.wave.name = 'smithHeartQuenchWakeWave';
     this.wave.frustumCulled = false;
     this.wave.visible = false;
-    this.wave.renderOrder = floorVfxRenderOrder('encounter', 5);
+    this.wave.renderOrder = floorVfxRenderOrder('encounter', QUENCH_FLOOR.throwWave.step);
     parent.add(this.wave);
     // The spikes and the crystals: one instanced draw.
     this.ring = quenchWakeRingSpikes(0x5a1e);

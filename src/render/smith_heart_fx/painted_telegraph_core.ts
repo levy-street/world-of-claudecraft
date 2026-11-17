@@ -41,6 +41,8 @@
 //
 // Three-free, DOM-free, deterministic.
 
+import { QUENCH_FLOOR } from './quench_floor_ladder_core';
+
 /** The paints. */
 export type TelegraphPaintKind =
   | 'bolt'
@@ -184,9 +186,9 @@ export const QUENCH_TELEGRAPH_LOOKS: Readonly<Record<QuenchTelegraphKind, Painte
 export const BREATH_TELEGRAPH_GLOW_STEP = 14;
 export const BREATH_GUST_GLOW_STEP = 15;
 export const COUNCIL_TELEGRAPH_GLOW_STEP = 17;
-/** The Quench's glow rung: over every char rung of its owners (QuenchFx's
- *  cone 10; QuenchFightFx's cracks 8, shatter rings 10, lanes 11). */
-export const QUENCH_TELEGRAPH_GLOW_STEP = 13;
+/** The Quench's glow rung: the ladder's (quench_floor_ladder_core.ts), over
+ *  its one telegraph char rung and every mark lying on the ice. */
+export const QUENCH_TELEGRAPH_GLOW_STEP = QUENCH_FLOOR.telegraphGlow.step;
 
 /** The crater a Falling Rock leaves where it lands (cosmetic: no threat
  *  colour on its edge, the soak is over): the rock's own size, split stone

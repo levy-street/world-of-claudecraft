@@ -123,6 +123,7 @@ import { QuenchBreathStreaks } from './quench_breath_streaks';
 import type { QuenchDeathBodyLook } from './quench_death_core';
 import { quenchDeathFor } from './quench_death_state';
 import { quenchEntranceFor } from './quench_entrance_state';
+import { quenchParticleSteps } from './quench_floor_ladder_core';
 import { QuenchRimeSteps } from './quench_rime_steps';
 import { holdQuenchStatueGlaze } from './quench_statue_glaze';
 import {
@@ -439,6 +440,7 @@ export class QuenchBody {
       () => this.rand(),
       () => this.reducedMotion(),
       hasDom ? getFlameTex() : null,
+      quenchParticleSteps('quench_body'),
     );
     this.rime = new QuenchRimeSteps(
       this.fx,

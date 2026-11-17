@@ -79,6 +79,7 @@ import {
   type WarmBody,
   warmthLinks,
 } from './quench_fight_fx_core';
+import { QUENCH_FLOOR, quenchParticleSteps } from './quench_floor_ladder_core';
 import { QuenchFrostFx } from './quench_frost_fx';
 import { QUENCH_RIME_POOLS as RIME_POOLS } from './quench_rime_core';
 import { QuenchRimeFx } from './quench_rime_fx';
@@ -101,12 +102,15 @@ const _zero = new THREE.Matrix4().makeScale(0, 0, 0);
 
 /** An instanced flat disc: its instance colour carries its parameters. */
 const DISC_VERT = /* glsl */ `
+${CAMERA_RELATIVE_GLSL}
 varying vec2 vXY;
 varying vec3 vP;
 void main() {
   vXY = position.xz;
   vP = instanceColor;
-  gl_Position = projectionMatrix * modelViewMatrix * instanceMatrix * vec4(position, 1.0);
+  // Camera-relative (world x ~ 119000: see quench_floor_ladder_core.ts).
+  vec4 wp = modelMatrix * instanceMatrix * vec4(position, 1.0);
+  gl_Position = projectionMatrix * wocCamRelView(wp.xyz);
 }
 `;
 /** A hole of freezing water (vP: churn, fresh, seed): a thin broken lip of
@@ -373,6 +377,7 @@ export class QuenchFightFx {
       () => this.rand(),
       () => this.reducedMotion(),
       hasDom ? getFlameTex() : null,
+      quenchParticleSteps('quench_fight_fx'),
     );
     this.kit = new TelegraphKit(this.root, this.detail);
     this.frost = new QuenchFrostFx(
@@ -404,14 +409,17 @@ export class QuenchFightFx {
         out.push({ fan, id: -1, born: 0, template: '' });
       }
     };
-    fans(P.cracks, 8, this.crackFans, 360, C.danger, 'crack');
-    fans(P.frozen, 10, this.splashFans, 360, C.danger, 'splash');
+    // Every telegraph's char on the ladder's one telegraph rung (they
+    // commute), its glow on the glow rung (quench_floor_ladder_core.ts).
+    const tele = QUENCH_FLOOR.telegraphChar.step;
+    fans(P.cracks, tele, this.crackFans, 360, C.danger, 'crack');
+    fans(P.frozen, tele, this.splashFans, 360, C.danger, 'splash');
     // Living Rime's ring is the shatter's (one language: cold about to burst).
     this.rime = new QuenchRimeFx(
       this.root,
       this.kit,
       () => {
-        const fan = this.kit.fan(10);
+        const fan = this.kit.fan(QUENCH_FLOOR.telegraphChar.step);
         this.kit.layOutFan(fan, 360, { color: C.danger, accent: C.accent });
         paints.dress(fan, 'splash');
         return fan;
@@ -420,7 +428,7 @@ export class QuenchFightFx {
       (x, z) => this.groundY(x, z),
     );
     for (let i = 0; i < P.lanes; i++) {
-      const lane = this.kit.lane(11);
+      const lane = this.kit.lane(QUENCH_FLOOR.telegraphChar.step);
       lane.group.visible = false;
       paints.dress(lane, 'slash');
       this.lanes.push({ lane, id: -1, born: 0 });
@@ -488,7 +496,7 @@ export class QuenchFightFx {
       ),
       P.holes,
       'smithHeartQuenchHoles',
-      3,
+      QUENCH_FLOOR.holes.step,
     );
     for (let i = 0; i < P.holes; i++) this.holeSlots.push({ id: -1, born: 0, template: '' });
     this.cracks = instanced(
@@ -501,7 +509,7 @@ export class QuenchFightFx {
       ),
       P.cracks,
       'smithHeartQuenchCrackWebs',
-      9,
+      QUENCH_FLOOR.crackWebs.step,
     );
     this.rimes = instanced(
       disc,
@@ -516,7 +524,7 @@ export class QuenchFightFx {
       ),
       P.bodies,
       'smithHeartQuenchRimes',
-      5,
+      QUENCH_FLOOR.rimes.step,
     );
     this.warms = instanced(
       disc,
@@ -528,7 +536,7 @@ export class QuenchFightFx {
       ),
       P.warm,
       'smithHeartQuenchWarmth',
-      6,
+      QUENCH_FLOOR.warmth.step,
     );
 
     // ---- the frost crystals on bodies, the threads of warmth ----

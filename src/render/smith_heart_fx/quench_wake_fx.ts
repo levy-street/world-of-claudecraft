@@ -17,6 +17,7 @@
 
 import * as THREE from 'three';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
+import { QUENCH_FLOOR } from './quench_floor_ladder_core';
 import {
   QUENCH_WAKE_COLORS as C,
   QUENCH_WAKE_COLUMN as COL,
@@ -300,7 +301,7 @@ export class QuenchWakeFx {
       return m;
     };
     this.foot = mk(footGeo, this.footMat, 'smithHeartQuenchWakeFoot');
-    this.foot.renderOrder = floorVfxRenderOrder('encounter', 5);
+    this.foot.renderOrder = floorVfxRenderOrder('encounter', QUENCH_FLOOR.wakeFoot.step);
     this.foot.scale.setScalar(COL.footR);
     this.shell = mk(shellGeo, this.shellMat, 'smithHeartQuenchWakeShell');
     this.core = mk(coreGeo, this.coreMat, 'smithHeartQuenchWakeCore');

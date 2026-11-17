@@ -11,17 +11,22 @@
 // allocation; no light.
 
 import * as THREE from 'three';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { QUENCH_RIME_LIFE, quenchRimeLook } from './quench_body_core';
+import { QUENCH_FLOOR } from './quench_floor_ladder_core';
 
 const VERT = /* glsl */ `
+${CAMERA_RELATIVE_GLSL}
 attribute vec2 aLook;
 varying vec2 vUv;
 varying vec2 vLook;
 void main() {
   vUv = uv * 2.0 - 1.0;
   vLook = aLook;
-  gl_Position = projectionMatrix * modelViewMatrix * instanceMatrix * vec4(position, 1.0);
+  // Camera-relative (world x ~ 119000: see quench_floor_ladder_core.ts).
+  vec4 wp = modelMatrix * instanceMatrix * vec4(position, 1.0);
+  gl_Position = projectionMatrix * wocCamRelView(wp.xyz);
 }
 `;
 const FRAG = /* glsl */ `
@@ -108,7 +113,7 @@ export class QuenchRimeSteps {
     this.mesh.name = 'smithHeartQuenchRime';
     this.mesh.frustumCulled = false;
     this.mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-    this.mesh.renderOrder = floorVfxRenderOrder('encounter', 0);
+    this.mesh.renderOrder = floorVfxRenderOrder('encounter', QUENCH_FLOOR.rimeSteps.step);
     this.mesh.count = 0;
     for (let i = 0; i < pool; i++) {
       this.rings.push({ x: 0, y: 0, z: 0, born: -99, spin: 0 });

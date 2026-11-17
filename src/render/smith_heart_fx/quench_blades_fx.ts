@@ -91,6 +91,7 @@ import {
   quenchClaimOrigin,
   wakeFillStep,
 } from './quench_fight_fx_core';
+import { QUENCH_FLOOR, quenchParticleSteps } from './quench_floor_ladder_core';
 
 const SCAN_SEC = 0.1;
 /** The kit piece leans this far toward its +x (quench_pieces.py BLADE_LEAN). */
@@ -218,6 +219,7 @@ export class QuenchBladesFx {
       () => this.rand(),
       () => this.reducedMotion(),
       hasDom ? getFlameTex() : null,
+      quenchParticleSteps('quench_blades_fx'),
     );
     this.glowTex = hasDom ? radialGlowTexture() : null;
     this.glowMats = BLADE_HOMES.map((_, i) =>
@@ -313,7 +315,7 @@ export class QuenchBladesFx {
       this.materials.push(socketMat);
       const socket = new THREE.Mesh(socketGeo, socketMat);
       socket.name = 'smithHeartQuenchBladeSocket';
-      socket.renderOrder = floorVfxRenderOrder('encounter', 1);
+      socket.renderOrder = floorVfxRenderOrder('encounter', QUENCH_FLOOR.bladeSockets.step);
       socket.visible = false;
       socket.frustumCulled = false;
       this.root.add(holder, socket);

@@ -37,11 +37,13 @@ import {
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { fxAnchor } from '../attached_fx_anchor';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { heartKitSlotMaterial } from '../smith_heart/heart_kit';
 import type { EngineParticles } from '../trash_engine_fx/engine_particles';
 import { QuenchEncaseFx } from './quench_encase_fx';
 import { QUENCH_FIGHT_COLORS as C, fightHash } from './quench_fight_fx_core';
+import { QUENCH_FLOOR } from './quench_floor_ladder_core';
 import {
   CHUNK_SECONDS,
   type ChunkPose,
@@ -80,12 +82,15 @@ const _sh = { side: 0, fwd: 0, h: 0, lean: 0, size: 0 };
 
 /** The huddle's ring on the ice (instanceColor: strength, members, seed). */
 const RING_VERT = /* glsl */ `
+${CAMERA_RELATIVE_GLSL}
 varying vec2 vXY;
 varying vec3 vP;
 void main() {
   vXY = position.xz;
   vP = instanceColor;
-  gl_Position = projectionMatrix * modelViewMatrix * instanceMatrix * vec4(position, 1.0);
+  // Camera-relative (world x ~ 119000: see quench_floor_ladder_core.ts).
+  vec4 wp = modelMatrix * instanceMatrix * vec4(position, 1.0);
+  gl_Position = projectionMatrix * wocCamRelView(wp.xyz);
 }
 `;
 const RING_FRAG = /* glsl */ `
@@ -214,7 +219,7 @@ export class QuenchFrostFx {
     this.rings = instanced(disc, ringMat, P.rings, 'smithHeartQuenchHuddleRings');
     for (let i = 0; i < P.rings; i++) this.rings.setColorAt(i, _c.setRGB(0, 0, 0));
     if (this.rings.instanceColor) this.rings.instanceColor.setUsage(THREE.DynamicDrawUsage);
-    this.rings.renderOrder = floorVfxRenderOrder('encounter', 7);
+    this.rings.renderOrder = floorVfxRenderOrder('encounter', QUENCH_FLOOR.huddleRings.step);
 
     // ---- the ice: spikes and chunks share the kit's ice ----
     const iceMat = heartKitSlotMaterial('ice');

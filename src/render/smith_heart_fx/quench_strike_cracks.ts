@@ -10,6 +10,8 @@
 
 import * as THREE from 'three';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
+import { splitQuenchDecal } from './quench_floor_decal';
+import { QUENCH_FLOOR } from './quench_floor_ladder_core';
 import {
   QUENCH_STRIKE_CRACKS as K,
   quenchStrikeCrackLook,
@@ -120,7 +122,12 @@ export class QuenchStrikeCracks {
       mesh.name = 'smithHeartQuenchStrikeCracks';
       mesh.frustumCulled = false;
       mesh.visible = false;
-      mesh.renderOrder = floorVfxRenderOrder('encounter', 6);
+      splitQuenchDecal(
+        mesh,
+        QUENCH_FLOOR.strikeCrackChar.step,
+        QUENCH_FLOOR.strikeCrackGlow.step,
+        materials,
+      );
       parent.add(mesh);
       this.cracks.push({ mesh, mat, born: -99, live: false });
     }
