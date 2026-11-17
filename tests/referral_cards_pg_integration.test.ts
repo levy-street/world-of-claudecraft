@@ -266,15 +266,85 @@ describe.skipIf(!url)('referral card PostgreSQL transactions', () => {
   });
   it('creates an idle card for summon and enforces cooldown across instances without accepting client time', async () => {
     await pool.query('DELETE FROM referral_cards');
-    expect(await store.summon(20, 10)).toBe(true);
-    expect(await store.summon(20, 10)).toBe(false);
-    expect(await store.summon(20, 30)).toBe(false);
+    expect(await store.summon(20, 10)).toEqual(expect.any(String));
+    expect(await store.summon(20, 10)).toBeNull();
+    expect(await store.summon(20, 30)).toBeNull();
     await pool.query(
       "UPDATE referral_cards SET inviter_summon_at=now()-interval '30 minutes 1 second'",
     );
-    expect(await store.summon(20, 10)).toBe(true);
+    expect(await store.summon(20, 10)).toEqual(expect.any(String));
     await pool.query('INSERT INTO account_blocks VALUES(20,10)');
-    expect(await store.summon(20, 20)).toBe(false);
+    expect(await store.summon(20, 20)).toBeNull();
+  });
+  it('refunds only the exact booking on the caller side of a summon cooldown', async () => {
+    // account_blocks has no FK to accounts, so the shared reset leaves a block behind.
+    await pool.query('DELETE FROM account_blocks');
+    await pool.query('DELETE FROM referral_cards');
+    const booked = async () =>
+      (
+        await pool.query(
+          'SELECT inviter_summon_at IS NOT NULL AS inviter, invitee_summon_at IS NOT NULL AS invitee FROM referral_cards WHERE link_id=20',
+        )
+      ).rows[0];
+    const inviter = await store.summon(20, 10);
+    const invitee = await store.summon(20, 20);
+    if (!inviter || !invitee) throw new Error('summon was not booked');
+    // The other side presenting this side's token clears nothing.
+    await store.refundSummon(20, 20, inviter);
+    expect(await booked()).toEqual({ inviter: true, invitee: true });
+    await store.refundSummon(20, 10, inviter);
+    expect(await booked()).toEqual({ inviter: false, invitee: true });
+    expect(await store.summon(20, 20)).toBeNull();
+    await store.refundSummon(20, 20, invitee);
+    expect(await booked()).toEqual({ inviter: false, invitee: false });
+  });
+  it('never lets a stale refund clear a later summon booking', async () => {
+    await pool.query('DELETE FROM account_blocks');
+    await pool.query('DELETE FROM referral_cards');
+    const first = await store.summon(20, 10);
+    if (!first) throw new Error('summon was not booked');
+    await store.refundSummon(20, 10, first);
+    const second = await store.summon(20, 10);
+    expect(second).toEqual(expect.any(String));
+    expect(second).not.toBe(first);
+    await store.refundSummon(20, 10, first);
+    expect(await store.summon(20, 10)).toBeNull();
+  });
+  it('refunds a booking across sessions with different date and time zone settings', async () => {
+    await pool.query('DELETE FROM account_blocks');
+    await pool.query('DELETE FROM referral_cards');
+    // Under this DateStyle a plain text cast prints the offset as "IST", which a
+    // default session reads as a different zone, so the token must not depend on it.
+    const odd = new Pool({
+      connectionString: url,
+      max: 2,
+      options: `-c search_path=${schema},public -c DateStyle=German -c TimeZone=Asia/Kolkata`,
+    });
+    try {
+      const oddStore = new PgReferralStore({
+        leaseHolder: 'test',
+        pool: odd,
+        save: async () => false,
+        saveOffline: async () => false,
+        grant: (before) => before,
+        move: (from, to) => ({ from, to }),
+      });
+      const cleared = async () =>
+        (await pool.query('SELECT inviter_summon_at FROM referral_cards WHERE link_id=20')).rows[0]
+          .inviter_summon_at === null;
+      const fromOdd = await oddStore.summon(20, 10);
+      if (!fromOdd) throw new Error('summon was not booked');
+      expect(fromOdd).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}Z$/);
+      expect(await cleared()).toBe(false);
+      await store.refundSummon(20, 10, fromOdd);
+      expect(await cleared()).toBe(true);
+      const fromDefault = await store.summon(20, 10);
+      if (!fromDefault) throw new Error('summon was not booked');
+      await oddStore.refundSummon(20, 10, fromDefault);
+      expect(await cleared()).toBe(true);
+    } finally {
+      await odd.end();
+    }
   });
   it('holds the live nonce lease through the reward commit against a simultaneous takeover', async () => {
     await store.mutate(20, 10, (s) =>
