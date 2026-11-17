@@ -48,6 +48,7 @@ import { packlordPetHasteMultiplier } from '../combat/hunter_packlord';
 import { hunterPetDamageMultiplier } from '../combat/hunter_shared';
 import { isMobSpellResisted } from '../combat/spell_resist';
 import { isDelvePos, MOBS } from '../data';
+import { gliderActionsLocked } from '../glider_action_lock';
 import { isEvadingWildMob } from '../mob/evade_immunity';
 import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import { isTrivialTo } from '../mob/targeting';
@@ -143,7 +144,11 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
   // auto_attack), so the moment you choose to fight the pet is back to normal on the
   // next tick. Mounting mid-fight is not a way in either, since the summon channel
   // cancels on entering combat (mounts.ts).
-  const travelling = ownerIsMounted(owner);
+  //
+  // A glider run is the same case (ownerIsTravelling): the owner is airborne and
+  // action-locked while the pet heels along the ground beneath the course, so a camp
+  // it body-pulled down there flagged the owner in combat and aborted the flight.
+  const travelling = ownerIsTravelling(ctx, owner);
   if (!travelling) pullNearbyMobs(ctx, pet);
 
   let target = pet.aggroTargetId !== null ? (ctx.entities.get(pet.aggroTargetId) ?? null) : null;
@@ -668,12 +673,26 @@ export function ownerIsMounted(owner: Entity): boolean {
   return (owner.mountKey ?? '') !== '';
 }
 
+/**
+ * Whether the owner is in transit rather than fighting: riding a mount, or airborne
+ * on a glider run (countdown or flying). The pet only heels for as long as this holds.
+ *
+ * The glider arm matters because the run aborts the moment its pilot is flagged in
+ * combat (world_quest_glider.ts), and the pilot cannot act to cause that themselves:
+ * the only way in was the pet pulling a camp under the course, and a pet's fight
+ * flags its owner (combat/engaged_combat.ts).
+ */
+export function ownerIsTravelling(ctx: SimContext, owner: Entity): boolean {
+  return ownerIsMounted(owner) || gliderActionsLocked(ctx.players.get(owner.id)?.worldQuestLog);
+}
+
 export function petPickTarget(ctx: SimContext, pet: Entity, owner: Entity): Entity | null {
   if (pet.petMode === 'passive') return null;
   // While the owner rides, the pet heels in every stance (see updatePet). Guarding
   // acquisition here as well as clearing the target there means a pet cannot pick a
-  // new one up mid-ride, in aggressive stance or by assisting.
-  if (ownerIsMounted(owner)) return null;
+  // new one up mid-ride, in aggressive stance or by assisting. The same holds for
+  // an owner on a glider run.
+  if (ownerIsTravelling(ctx, owner)) return null;
   // Assist never defends or roams: its one candidate is the owner's active target,
   // and only once the owner has cast on it (pet/pet_assist.ts).
   if (pet.petMode === 'assist') return petAssistPick(ctx, pet, owner);
