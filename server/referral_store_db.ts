@@ -411,7 +411,9 @@ export class PgReferralStore {
   }
 
   /** Books this side's summon cooldown. Returns the booked instant as an opaque
-   *  token for `refundSummon`, or null when the summon may not be booked. */
+   *  token for `refundSummon`, or null when the summon may not be booked. The
+   *  token is fixed-format UTC text with microseconds, so it names the same
+   *  instant on any pooled session whatever its DateStyle or TimeZone. */
   async summon(linkId: number, accountId: number): Promise<string | null> {
     return this.transaction(async (tx) => {
       const referral = await tx.query<{ referrer_account_id: number }>(
@@ -436,7 +438,9 @@ export class PgReferralStore {
         WHERE link_id=$1 AND (inviter_account_id=$2 OR link_id=$2)
           AND COALESCE(CASE WHEN inviter_account_id=$2 THEN inviter_summon_at ELSE invitee_summon_at END,
             '-infinity'::timestamptz) <= now() - interval '30 minutes'
-        RETURNING (CASE WHEN inviter_account_id=$2 THEN inviter_summon_at ELSE invitee_summon_at END)::text AS booked`,
+        RETURNING to_char(
+          (CASE WHEN inviter_account_id=$2 THEN inviter_summon_at ELSE invitee_summon_at END)
+            AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS booked`,
         [linkId, accountId],
       );
       return result.rows[0]?.booked ?? null;

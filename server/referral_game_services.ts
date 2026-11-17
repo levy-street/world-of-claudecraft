@@ -633,10 +633,12 @@ export class ReferralGameServices {
         // The cooldown is booked before the teleport so a summon can never land
         // unpaid. A booked summon that then moved nobody hands that booking back;
         // a refund that cannot be written leaves it spent, the fail-closed side.
+        // The refund gets its own deadline: a slow booking must not have already
+        // spent the job's shared budget by the time the refund asks for a permit.
         try {
           await this.host.withPermit(
             () => this.store.refundSummon(request.linkId, request.from.accountId, booked),
-            signal,
+            AbortSignal.timeout(5000),
           );
         } catch (error) {
           this.host.onError(error);

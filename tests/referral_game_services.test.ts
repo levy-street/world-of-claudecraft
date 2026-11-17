@@ -352,6 +352,22 @@ describe('referral game host', () => {
           return BOOKED;
         }),
     ],
+    [
+      'the two can no longer interact once the cooldown is booked',
+      (h: ReturnType<typeof setup>) =>
+        vi.mocked(h.store.summon).mockImplementation(async () => {
+          h.host.canInteract = () => false;
+          return BOOKED;
+        }),
+    ],
+    [
+      'the friend leaves while the cooldown is booking',
+      (h: ReturnType<typeof setup>) =>
+        vi.mocked(h.store.summon).mockImplementation(async () => {
+          h.b.left = true;
+          return BOOKED;
+        }),
+    ],
   ])('refunds the booked cooldown when %s', async (_name, arrange) => {
     const h = setup();
     await flush();
@@ -381,12 +397,21 @@ describe('referral game host', () => {
       void h.service.page(h.a);
       return BOOKED;
     });
+    const pagesBefore = vi.mocked(h.store.page).mock.calls.length;
     await h.service.command(h.b, {
       type: 'answerSummon',
       requestId: request.requestId,
       accept: true,
     });
     expect(h.store.refundSummon).toHaveBeenCalledExactlyOnceWith(20, 10, BOOKED);
+    // The reload really was queued behind the job: it runs exactly once, and only
+    // after the refund has been written.
+    await flush();
+    const pages = vi.mocked(h.store.page).mock;
+    expect(pages.calls.length).toBe(pagesBefore + 1);
+    expect(pages.invocationCallOrder.at(-1)).toBeGreaterThan(
+      vi.mocked(h.store.refundSummon).mock.invocationCallOrder[0],
+    );
   });
   it('still tells the summoner when the refund cannot be written', async () => {
     const h = setup();
@@ -419,6 +444,7 @@ describe('referral game host', () => {
     });
     expect(h.host.summon).not.toHaveBeenCalled();
     expect(h.store.refundSummon).not.toHaveBeenCalled();
+    expect(h.frames.get(100)?.notices.at(-1)).toMatchObject({ reason: 'unavailable' });
   });
   it('does not summon across a changed session or restricted destination', async () => {
     const h = setup();
