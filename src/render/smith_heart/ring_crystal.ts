@@ -31,6 +31,7 @@ import {
   ringCrystalKey,
   ringCrystalPieceKind,
   ringCrystalPiecePose,
+  ringCrystalPieceRole,
   ringCrystalTremble,
 } from './ring_crystal_core';
 import { ringCrystalMaterial } from './ring_crystal_material';
@@ -94,7 +95,11 @@ function bakeModel(scene: THREE.Object3D): CrystalModel | null {
     const centre = new THREE.Vector3();
     for (let i = 0; i < pos.count; i++) centre.add(new THREE.Vector3().fromBufferAttribute(pos, i));
     centre.divideScalar(Math.max(1, pos.count));
-    pieces.push({ kind, centre, geometry });
+    // The widest body piece is the grey core under the crystals (it vanishes at the burst).
+    let radius = 0;
+    for (let i = 0; i < pos.count; i++)
+      radius = Math.max(radius, Math.hypot(pos.getX(i) - centre.x, pos.getZ(i) - centre.z));
+    pieces.push({ kind: ringCrystalPieceRole(kind, radius), centre, geometry });
   });
   if (!map || pieces.length === 0) return null;
   // The pieces in their node order (a piece's index seeds its flight).

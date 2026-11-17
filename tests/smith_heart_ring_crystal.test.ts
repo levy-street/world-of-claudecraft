@@ -28,11 +28,13 @@ import {
   newRingCrystalState,
   RING_CRYSTAL,
   RING_CRYSTAL_CLICK,
+  RING_CRYSTAL_CORE_RADIUS,
   RING_CRYSTAL_READY_RISE,
   type RingCrystalPieceKind,
   ringCrystalKey,
   ringCrystalPieceKind,
   ringCrystalPiecePose,
+  ringCrystalPieceRole,
   ringCrystalState,
   ringCrystalTremble,
 } from '../src/render/smith_heart/ring_crystal_core';
@@ -168,8 +170,44 @@ describe('the crystal: the pieces fly', () => {
   it('throws every piece out of its place at the blast', () => {
     for (const [i, [kind, c]] of kinds.entries()) {
       const pose = ringCrystalPiecePose(i, kind, c, 0.3);
-      expect(Math.hypot(pose.dx, pose.dy, pose.dz), `${kind} ${i}`).toBeGreaterThan(1);
+      // The plinth's slabs slide and sink (a smaller move); the crystal's pieces are thrown.
+      expect(Math.hypot(pose.dx, pose.dy, pose.dz), `${kind} ${i}`).toBeGreaterThan(
+        kind === 'plinth' ? 0.8 : 1,
+      );
       expect(pose.visible).toBe(true);
+    }
+  });
+
+  it('classes a body piece wider than any cluster as the grey core', () => {
+    expect(ringCrystalPieceRole('body', RING_CRYSTAL_CORE_RADIUS + 0.1)).toBe('core');
+    expect(ringCrystalPieceRole('body', RING_CRYSTAL_CORE_RADIUS - 0.1)).toBe('body');
+    expect(ringCrystalPieceRole('plinth', 9)).toBe('plinth');
+    expect(ringCrystalPieceRole('heart', 9)).toBe('heart');
+  });
+
+  it('lets the grey core vanish in the flash where it stood, never thrown', () => {
+    const c = { x: 0, y: 4.7, z: 0 };
+    expect(ringCrystalPiecePose(6, 'core', c, -1).scale).toBe(1);
+    const early = ringCrystalPiecePose(6, 'core', c, 0.1);
+    expect([early.dx, early.dy, early.dz, early.rx, early.ry, early.rz]).toEqual([
+      0, 0, 0, 0, 0, 0,
+    ]);
+    expect(early.scale).toBeLessThan(1);
+    expect(early.scale).toBeGreaterThan(0.5);
+    const gone = ringCrystalPiecePose(6, 'core', c, 0.5);
+    expect(gone.visible).toBe(false);
+    expect(gone.scale).toBe(0);
+  });
+
+  it("sinks the plinth's slabs into the dais instead of throwing them up", () => {
+    for (const [i, [kind, c]] of kinds.entries()) {
+      if (kind !== 'plinth') continue;
+      // Never higher than a hand over where it stood, and under the dais by half a second.
+      let peak = 0;
+      for (let t = 0; t < 0.5; t += 0.02)
+        peak = Math.max(peak, ringCrystalPiecePose(i, kind, c, t).dy);
+      expect(peak, `${i}`).toBeLessThan(0.3);
+      expect(ringCrystalPiecePose(i, kind, c, 0.6).dy + c.y, `${i}`).toBeLessThan(-1);
     }
   });
 
@@ -399,6 +437,27 @@ describe('the crystal: the shipped GLB', () => {
       expect(tall).toBeGreaterThan(hearts / 2);
     },
   );
+
+  it.skipIf(!haveModel)('has one grey core wider than any cluster, and nothing else is', () => {
+    // The painter classes a body piece by how far its vertices reach from its centre
+    // (ring_crystal.ts bakeModel): the mass of dark rock under the crystals is the one piece
+    // the burst must not throw as a plate sixteen yards wide.
+    const radiusOf = (p: Piece): number => {
+      const n = p.verts.length;
+      const cx = p.verts.reduce((a, v) => a + v.p[0], 0) / n;
+      const cz = p.verts.reduce((a, v) => a + v.p[2], 0) / n;
+      return Math.max(...p.verts.map((v) => Math.hypot(v.p[0] - cx, v.p[2] - cz)));
+    };
+    const roles = pieces.map((p) => {
+      const kind = ringCrystalPieceKind(p.name);
+      if (!kind) throw new Error(p.name);
+      return ringCrystalPieceRole(kind, radiusOf(p));
+    });
+    expect(roles.filter((r) => r === 'core')).toHaveLength(1);
+    expect(roles.filter((r) => r === 'plinth')).toHaveLength(6);
+    expect(roles.filter((r) => r === 'body')).toHaveLength(13);
+    expect(roles.filter((r) => r === 'heart')).toHaveLength(1);
+  });
 
   it.skipIf(!haveModel)('ships the painting alone, as KTX2, on a material both sides draw', () => {
     expect(materialSlots).toHaveLength(1);

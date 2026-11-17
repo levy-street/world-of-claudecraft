@@ -182,7 +182,23 @@ export function ringCrystalTremble(charge: number): number {
 
 // ---- the burst's pieces --------------------------------------------------------------
 
-export type RingCrystalPieceKind = 'plinth' | 'body' | 'heart';
+export type RingCrystalPieceKind = 'plinth' | 'body' | 'heart' | 'core';
+
+/** A body piece wider than any cluster of crystals (yards from its centre to its furthest
+ *  vertex) is the model's grey core: the mass of dark rock under and between the crystals,
+ *  hidden while the crystal stands, a plate sixteen yards wide when thrown. */
+export const RING_CRYSTAL_CORE_RADIUS = 6;
+/** Seconds after the shatter that the core takes to vanish into the flash (it never flies). */
+const CORE_VANISH_SECONDS = 0.35;
+
+/** The motion a piece takes: its node's kind, or `core` for a body piece wider than
+ *  `RING_CRYSTAL_CORE_RADIUS`. */
+export function ringCrystalPieceRole(
+  kind: RingCrystalPieceKind,
+  radius: number,
+): RingCrystalPieceKind {
+  return kind === 'body' && radius > RING_CRYSTAL_CORE_RADIUS ? 'core' : kind;
+}
 
 /** A piece's displacement from its assembled place (yards), its turn (radians) and its
  *  scale; `visible` false once it is gone. */
@@ -245,20 +261,34 @@ export function ringCrystalPiecePose(
     out.visible = true;
     return out;
   }
+  if (kind === 'core') {
+    // The grey core goes in the flash: it stays where it stood and shrinks away.
+    out.dx = 0;
+    out.dy = 0;
+    out.dz = 0;
+    out.rx = 0;
+    out.ry = 0;
+    out.rz = 0;
+    out.scale = Math.max(0, 1 - ease(t / CORE_VANISH_SECONDS));
+    out.visible = out.scale > 0.001;
+    return out;
+  }
   const radial = Math.hypot(c.x, c.z);
   const ang0 =
     kind === 'heart' || radial < 0.8
       ? h01(i, 2) * Math.PI * 2
       : Math.atan2(c.x, c.z) + (h01(i, 1) - 0.5) * 0.5;
+  // The plinth's slabs crack apart and sink into the dais (a slide out, hardly any lift),
+  // never thrown up over the crystal's pieces: the crystal's pieces are the blast.
   const vh =
     kind === 'plinth'
-      ? 3.5 + 5 * h01(i, 3)
+      ? 2.5 + 2.5 * h01(i, 3)
       : kind === 'heart'
         ? 1.5 + 2 * h01(i, 3)
         : 5 + 8 * h01(i, 3);
   const vy =
     kind === 'plinth'
-      ? 5 + 6 * h01(i, 4)
+      ? 0.5 + 1.5 * h01(i, 4)
       : kind === 'heart'
         ? 24 + 6 * h01(i, 4)
         : 8 + 12 * h01(i, 4) + 6 * (c.y / RING_CRYSTAL.height);
