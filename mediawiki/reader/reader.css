@@ -1632,3 +1632,34 @@ body[data-woc-site] #view table.item-table {
   height: 56px;
   object-fit: contain;
 }
+
+/* A boss attack's in-game snapshot sits beside its line. */
+#view article ul:has(> li > .attack-shot) {
+  list-style: none;
+  padding-inline-start: 0;
+}
+#view article li:has(> .attack-shot) {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin: 12px 0;
+}
+#view .attack-shot {
+  width: 192px;
+  height: auto;
+  aspect-ratio: 660 / 500;
+  flex: none;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-2);
+}
+@media (max-width: 640px) {
+  #view article li:has(> .attack-shot) {
+    flex-direction: column;
+  }
+  #view .attack-shot {
+    width: 100%;
+    max-width: 360px;
+  }
+}

@@ -24,7 +24,7 @@
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="15945">/* =========================================================================
+      <text xml:space="preserve" bytes="16198">/* =========================================================================
    World of Claudecraft Wiki: &quot;Aged Grimoire&quot; theme for Vector 2022.
    Warm parchment reading surface, deep oak chrome, gold + wax-seal-red
    accents, elegant serif display headings.
@@ -679,6 +679,20 @@ body {
   max-width: 45%;
   height: auto;
   margin: 0 0 12px 16px;
+}
+
+/* A boss attack&apos;s in-game snapshot. */
+.woc-attack-art {
+  float: left;
+  width: 192px;
+  height: auto;
+  margin: 0 14px 8px 0;
+  border: 1px solid #3a3f4b;
+  border-radius: 4px;
+}
+li:has(&gt; .woc-attack-art) {
+  list-style: none;
+  overflow: hidden;
 }
 
 
@@ -112387,7 +112401,7 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="8113">&lt;woc-art path=&quot;/ui/mobs/balgath_cyclops.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="8296">&lt;woc-art path=&quot;/ui/mobs/balgath_cyclops.webp&quot; /&gt;
 &lt;woc-art path=&quot;/encyclopedia-stills/mob_balgath_cyclops__a8a496__s6.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Balgath, the One-Eyed Foreman is one of the Elementals.
@@ -112463,8 +112477,8 @@ For creatures in the outside world, these numbers already include level scaling.
 * Launch. Launches its target. distance 6 yd, up 11, out speed 7, edge scale 0.55.
 * Collateral. Can hit nearby creatures with its attacks. multiplier 0.34.
 * Barrowhide. Shields its eye until a condition in the fight is met. reduction 0.6, blind seconds 14 sec, refractory seconds 40 sec, blind name Blinded, yell range 160 yd.
-* Barrow Smash. Damages targets in range. minimum damage 36, maximum damage 50, radius 12 yd, between uses 14 sec, school physical, safe gap inner 0.4, outer 0.7.
-* Shockwave Stomp. Stuns nearby enemies. radius 7 yd, between uses 22 sec, duration 1.5 sec, minimum damage 18, maximum damage 28, school physical.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/balgath_cyclops__barrow_smash.webp&quot; size=&quot;attack&quot; /&gt; Barrow Smash. Damages targets in range. minimum damage 36, maximum damage 50, radius 12 yd, between uses 14 sec, school physical, safe gap inner 0.4, outer 0.7.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/balgath_cyclops__shockwave_stomp.webp&quot; size=&quot;attack&quot; /&gt; Shockwave Stomp. Stuns nearby enemies. radius 7 yd, between uses 22 sec, duration 1.5 sec, minimum damage 18, maximum damage 28, school physical.
 * Wake of the Fallen Star. Leaves dangerous ground behind its attack. between uses 40 sec, warn 2.5, crawl 2, hold 3, spacing 2, star x 149.5, z 295, star min reach 12, star max reach 45, fissures fan count 4, fan deg 105, reach past 25, min length 32, max length 70, ring count 5, ring length 34, jitter deg 5, half width 2.5, minimum damage 62, maximum damage 82, geysers targets 3, range 45 yd, radius 4.5 yd, along fraction 0.6, fissure radius 3.5 yd, minimum damage 46, maximum damage 62, pool duration 8 sec, between ticks 1 sec, minimum damage 12, maximum damage 18, meteors range 45 yd, duration 8 sec, wave min 0.5, wave max 0.7, per wave min 2, per wave max 3, minimum damage 36, maximum damage 48, school fire.
 * Barrowhide. Gets a shield that absorbs damage. amount 500, between uses 27 sec, duration 9 sec, school physical.
 * Backhand. Knocks the target back. chance 30%, distance 7 yd.
@@ -118033,7 +118047,7 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="20938">&lt;woc-art path=&quot;/ui/mobs/varkhul_forgefather_of_the_last_flame.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="21174">&lt;woc-art path=&quot;/ui/mobs/varkhul_forgefather_of_the_last_flame.webp&quot; /&gt;
 &lt;woc-art path=&quot;/encyclopedia-stills/mob_varkhul_forgefather.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Varkhul, Forgefather of the Last Flame is one of the Elementals.
@@ -118107,7 +118121,7 @@ Varkhul imprisoned the dying Last Spring to forge living metal, then created Ign
 Varkhul cycles tank pressure, wide frontals, moving projectiles, group soaks, meteor waves, and attacks from the grand anvil.
 
 * Maker&apos;s Brand. Varkhul strikes his current tank and applies a stacking effect that increases all damage taken from him. Tanks swap at 2 stacks. Healers prepare the incoming tank before Varkhul changes targets. (important)
-* Forgefather&apos;s Sweep. Varkhul releases a very wide frontal sweep that deals heavy fire damage to everyone in front of him. Keep Varkhul facing away from the group and move behind him as soon as the warning appears. (deadly)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/varkhul_forgefather_of_the_last_flame__forgefathers_sweep.webp&quot; size=&quot;attack&quot; /&gt; Forgefather&apos;s Sweep. Varkhul releases a very wide frontal sweep that deals heavy fire damage to everyone in front of him. Keep Varkhul facing away from the group and move behind him as soon as the warning appears. (deadly)
 * Cinder Orbs. Marked non-tanks drop persistent cinder pools and release fire orbs in every direction. Red-hot Metal also absorbs incoming healing. Carry each mark to the room edge, separate the pools, then dodge the orbs as they cross the arena. Healers clear the absorb quickly. (deadly, important)
 * Shared Pyre. A moving circle follows one player without Red-hot Metal. Its damage is divided among players inside, and every missing player deals 15% maximum-health damage to the entire raid. Stack at least 4 players inside the circle and move with its target until the cast resolves. (important)
 * Forgestorm. Varkhul calls down 3 consecutive waves of marked meteor impacts across the arena. Watch each new set of ground warnings and move out before that wave lands. Do not return to a previous position without checking the next wave. (deadly)
@@ -118136,7 +118150,7 @@ Varkhul imprisoned the dying Last Spring to forge living metal, then created Ign
 Varkhul cycles tank pressure, wide frontals, moving projectiles, group soaks, meteor waves, and attacks from the grand anvil.
 
 * Maker&apos;s Brand. Varkhul strikes his current tank and applies a stacking effect that increases all damage taken from him. Tanks swap at 2 stacks. Healers prepare the incoming tank before Varkhul changes targets. (important)
-* Forgefather&apos;s Sweep. Varkhul releases a very wide frontal sweep that deals nearly lethal fire damage to everyone in front of him. Keep Varkhul facing away from the group and move behind him as soon as the warning appears. (deadly)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/varkhul_forgefather_of_the_last_flame__forgefathers_sweep.webp&quot; size=&quot;attack&quot; /&gt; Forgefather&apos;s Sweep. Varkhul releases a very wide frontal sweep that deals nearly lethal fire damage to everyone in front of him. Keep Varkhul facing away from the group and move behind him as soon as the warning appears. (deadly)
 * Cinder Orbs. Marked non-tanks drop highly damaging persistent cinder pools and release dangerous fire orbs in every direction. Red-hot Metal also absorbs incoming healing. Carry each mark to the room edge, separate the pools, then dodge the orbs as they cross the arena. Healers clear the absorb quickly. (deadly, important)
 * Shared Pyre. A moving circle follows one player without Red-hot Metal and splits a larger hit. Every missing player also deals 15% maximum-health damage to the entire raid. Stack at least 4 players inside the circle and move with its target until the cast resolves. (important)
 * Forgestorm. Varkhul calls down 3 consecutive waves of marked meteor impacts that deal extreme damage. Watch each new set of ground warnings and move out before that wave lands. Do not return to a previous position without checking the next wave. (deadly)
@@ -118676,7 +118690,7 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="19053">&lt;woc-art path=&quot;/ui/mobs/ignivar_herald_of_the_last_flame.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="19483">&lt;woc-art path=&quot;/ui/mobs/ignivar_herald_of_the_last_flame.webp&quot; /&gt;
 &lt;woc-art path=&quot;/encyclopedia-stills/mob_ignivar.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Ignivar, Herald of the Last Flame is one of the Elementals.
@@ -118752,9 +118766,9 @@ Control Brand of the Pyre with the water conduits while handling Ignivar&apos;s 
 * Forge Strike. Ignivar strikes his current tank and applies Molten Armor, increasing damage taken from Ignivar. Tanks swap at 2 stacks. Healers prepare for the strike and the new tank&apos;s first melee swings. (important)
 * Brand of the Pyre. Ignivar marks non-tank players with persistent fire damage. Branded players also burn nearby allies. Spread out. Aim Searing Torrent into a ready water conduit, then have each marked player cross the activated water alone to cleanse. (cleansable, important)
 * Searing Torrent. Ignivar tracks a player, then releases a wide frontal blast. A ready water conduit struck by the blast becomes active for a short time. Aim the warning through exactly one ready conduit. Everyone else leaves the frontal before the cast completes. (deadly, important)
-* Rain of Cinders. Three fire sectors and marked meteor impacts punish players who remain inside their warnings. Move into an unmarked gap and leave every meteor circle before impact. (deadly)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/ignivar_herald_of_the_last_flame__rain_of_cinders.webp&quot; size=&quot;attack&quot; /&gt; Rain of Cinders. Three fire sectors and marked meteor impacts punish players who remain inside their warnings. Move into an unmarked gap and leave every meteor circle before impact. (deadly)
 * Revolving Inferno. Rotating fire rays sweep around Ignivar and repeatedly damage players who touch them. Move with the open space between rays. Do not cut through a ray, even with a fast movement ability. (deadly)
-* Forge Wave. An expanding wall of fire crosses the arena, leaving two opposite gaps and knocking back players it hits. Find either gap during the windup, align with it, and avoid being knocked toward the arena edge. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/ignivar_herald_of_the_last_flame__forge_wave.webp&quot; size=&quot;attack&quot; /&gt; Forge Wave. An expanding wall of fire crosses the arena, leaving two opposite gaps and knocking back players it hits. Find either gap during the windup, align with it, and avoid being knocked toward the arena edge. (important)
 
 === Intermission: Apocalypse ===
 
@@ -118784,9 +118798,9 @@ Control Brand of the Pyre with the water conduits while handling Ignivar&apos;s 
 * Forge Strike. Ignivar strikes his current tank and applies Molten Armor, increasing damage taken from Ignivar. Tanks swap at 2 stacks. Healers prepare for the strike and the new tank&apos;s first melee swings. (important)
 * Brand of the Pyre. Ignivar marks non-tank players with persistent fire damage. Branded players also burn nearby allies. Spread out. Open a conduit with Searing Torrent and cleanse one marked player at a time. Every cleanse triggers raid-wide Cleansing Backlash. (cleansable, important)
 * Searing Torrent. Ignivar tracks a player, then releases a nearly lethal frontal blast. A ready water conduit struck by the blast becomes active for a short time. Aim the warning through exactly one ready conduit. Everyone else leaves the frontal before the cast completes. (deadly, important)
-* Rain of Cinders. Three fire sectors and marked meteor impacts deal extreme damage to players who remain inside their warnings. Move into an unmarked gap and leave every meteor circle before impact. (deadly)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/ignivar_herald_of_the_last_flame__rain_of_cinders.webp&quot; size=&quot;attack&quot; /&gt; Rain of Cinders. Three fire sectors and marked meteor impacts deal extreme damage to players who remain inside their warnings. Move into an unmarked gap and leave every meteor circle before impact. (deadly)
 * Revolving Inferno. Rotating fire rays sweep around Ignivar and inflict severe repeated damage on contact. Move with the open space between rays. Do not cut through a ray, even with a fast movement ability. (deadly)
-* Forge Wave. An expanding wall of fire crosses the arena, leaving two opposite gaps and knocking hit players much farther. Find either gap during the windup, align with it, and avoid being knocked toward the arena edge. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/ignivar_herald_of_the_last_flame__forge_wave.webp&quot; size=&quot;attack&quot; /&gt; Forge Wave. An expanding wall of fire crosses the arena, leaving two opposite gaps and knocking hit players much farther. Find either gap during the windup, align with it, and avoid being knocked toward the arena edge. (important)
 
 === Intermission: Apocalypse ===
 
@@ -119420,7 +119434,7 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="9526">&lt;woc-art path=&quot;/ui/mobs/sexton_marrow.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="10066">&lt;woc-art path=&quot;/ui/mobs/sexton_marrow.webp&quot; /&gt;
 :&apos;&apos;Other pages have this name. See [[Sexton Marrow|all pages named Sexton Marrow]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/crypt_skel_sexton.webp&quot; size=&quot;model&quot; /&gt;
@@ -119494,14 +119508,14 @@ A raised gravedigger who measures players for graves. Every grave stays open, sl
 
 He digs graves under marked players and swings his shovel at the tank.
 
-* Shovelful. Every 11 sec, a 1.2 sec cast, then a shovel swing in an 80 degree cone 8 yd in front of him for 1.5 times his melee hit. Everyone hit has Dirt in the Eyes: 50% slower for 6 sec. Only the tank stands in front. The tank can step out during the cast. (important)
-* Measured for the Grave. Every 15 sec, a 1 sec cast marks a player. 4 sec later a grave caves in where they stand: 42 to 52 damage to everyone within 3 yd. The grave stays open for the fight: inside it you are 40% slower and take 9 damage per second. At most 8 graves; a new one fills in the oldest. Marked: walk to the edge of the yard before the grave opens. Never stand in an open grave. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/sexton_marrow__shovelful.webp&quot; size=&quot;attack&quot; /&gt; Shovelful. Every 11 sec, a 1.2 sec cast, then a shovel swing in an 80 degree cone 8 yd in front of him for 1.5 times his melee hit. Everyone hit has Dirt in the Eyes: 50% slower for 6 sec. Only the tank stands in front. The tank can step out during the cast. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/sexton_marrow__measured_for_the_grave.webp&quot; size=&quot;attack&quot; /&gt; Measured for the Grave. Every 15 sec, a 1 sec cast marks a player. 4 sec later a grave caves in where they stand: 42 to 52 damage to everyone within 3 yd. The grave stays open for the fight: inside it you are 40% slower and take 9 damage per second. At most 8 graves; a new one fills in the oldest. Marked: walk to the edge of the yard before the grave opens. Never stand in an open grave. (important)
 
 === The Burial Toll ===
 
 At 66% and 33% health he walks to the bell rope and rings the Burial Toll.
 
-* Burial Toll. He walks to the rope and rings the bell for 3 sec, immune to damage while he walks and rings. Then every player takes 30 to 38 damage, and every open grave raises a Restless Bones. Healers top everyone up before the last peal. The tank picks up the Restless Bones; damage dealers kill them. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/sexton_marrow__burial_toll.webp&quot; size=&quot;attack&quot; /&gt; Burial Toll. He walks to the rope and rings the bell for 3 sec, immune to damage while he walks and rings. Then every player takes 30 to 38 damage, and every open grave raises a Restless Bones. Healers top everyone up before the last peal. The tank picks up the Restless Bones; damage dealers kill them. (important)
 
 * tank: Keep him facing away from the group. Pick up every Restless Bones after a Burial Toll.
 * healer: Burial Toll hits the whole group. Graves slow and burn anyone in them, so help whoever is stuck in one.
@@ -119516,8 +119530,8 @@ A raised gravedigger who measures players for graves. Every grave stays open, sl
 
 He digs graves under marked players and swings his shovel at the tank.
 
-* Shovelful. Every 11 sec, a 1.2 sec cast, then a shovel swing in an 80 degree cone 8 yd in front of him for 1.5 times his melee hit. Everyone hit has Dirt in the Eyes: 50% slower for 6 sec. Only the tank stands in front. The tank can step out during the cast. (important)
-* Measured for the Grave. Every 15 sec, a 1 sec cast marks a player. 4 sec later a grave caves in where they stand: 252 to 312 damage to everyone within 3 yd. The grave stays open for the fight: inside it you are 40% slower and take 54 damage per second. At most 8 graves; a new one fills in the oldest. Marked: walk to the edge of the yard before the grave opens. Never stand in an open grave. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/sexton_marrow__shovelful.webp&quot; size=&quot;attack&quot; /&gt; Shovelful. Every 11 sec, a 1.2 sec cast, then a shovel swing in an 80 degree cone 8 yd in front of him for 1.5 times his melee hit. Everyone hit has Dirt in the Eyes: 50% slower for 6 sec. Only the tank stands in front. The tank can step out during the cast. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/sexton_marrow__measured_for_the_grave.webp&quot; size=&quot;attack&quot; /&gt; Measured for the Grave. Every 15 sec, a 1 sec cast marks a player. 4 sec later a grave caves in where they stand: 252 to 312 damage to everyone within 3 yd. The grave stays open for the fight: inside it you are 40% slower and take 54 damage per second. At most 8 graves; a new one fills in the oldest. Marked: walk to the edge of the yard before the grave opens. Never stand in an open grave. (important)
 * Gravedigger&apos;s Blow. Every 9 sec, a 0.8 sec cast at the tank: a melee hit that adds a stack of 6% more damage taken, up to 6 stacks (36%) for 20 sec. Tank: use cooldowns as the stacks rise. Healers watch the tank. (important)
 * Grave Vigor. While he stands inside an open grave he attacks 30% faster. The tank keeps him out of the graves.
 * Unquiet Earth. A player who stays 2 sec inside a grave raises a Restless Bones from it. That grave then rests for 8 sec. Leave graves at once.
@@ -119526,7 +119540,7 @@ He digs graves under marked players and swings his shovel at the tank.
 
 At 66% and 33% health he walks to the bell rope and rings the Burial Toll.
 
-* Burial Toll. He walks to the rope and rings the bell for 3 sec, immune to damage while he walks and rings. Then every player takes 198 to 251 damage, and every open grave raises a Restless Bones. Healers top everyone up before the last peal. The tank picks up the Restless Bones; damage dealers kill them. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/sexton_marrow__burial_toll.webp&quot; size=&quot;attack&quot; /&gt; Burial Toll. He walks to the rope and rings the bell for 3 sec, immune to damage while he walks and rings. Then every player takes 198 to 251 damage, and every open grave raises a Restless Bones. Healers top everyone up before the last peal. The tank picks up the Restless Bones; damage dealers kill them. (important)
 
 * tank: Keep him facing away from the group and out of every grave. Gravedigger&apos;s Blow stacks: use cooldowns as they rise.
 * healer: Burial Toll hits the whole group. Graves slow and burn anyone in them, so help whoever is stuck in one.
@@ -119644,7 +119658,7 @@ The game rolls once for this group. At most &apos;&apos;&apos;one&apos;&apos;&ap
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="11874">&lt;woc-art path=&quot;/ui/mobs/morthen.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="12634">&lt;woc-art path=&quot;/ui/mobs/morthen.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Morthen the Gravecaller (Contract)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/crypt_morthen_lich.webp&quot; size=&quot;model&quot; /&gt;
@@ -119718,21 +119732,21 @@ A lich bishop running a three-act rite. First he calls souls to empower him; at 
 
 He pulses shadow around himself and calls souls to feed him.
 
-* Shadow Pulse. Every 12 sec (9 sec in Last Rites), a 2 sec cast, then 24 to 30 damage to everyone within 12 yd. Everyone, the tank included, steps out to 12 yd before the cast ends. (important)
-* Gravecall. Every 15 sec a [[Bound Soul (Mob)|Bound Soul]] drifts from an alcove toward him. If it reaches him he gains 10% more damage per stack (up to 10) and heals 3% of his health. The first player it touches absorbs it instead: 12 to 16 damage. A spare player steps into each soul&apos;s path. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/morthen__shadow_pulse.webp&quot; size=&quot;attack&quot; /&gt; Shadow Pulse. Every 12 sec (9 sec in Last Rites), a 2 sec cast, then 24 to 30 damage to everyone within 12 yd. Everyone, the tank included, steps out to 12 yd before the cast ends. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/morthen__gravecall.webp&quot; size=&quot;attack&quot; /&gt; Gravecall. Every 15 sec a [[Bound Soul (Mob)|Bound Soul]] drifts from an alcove toward him. If it reaches him he gains 10% more damage per stack (up to 10) and heals 3% of his health. The first player it touches absorbs it instead: 12 to 16 damage. A spare player steps into each soul&apos;s path. (important)
 
 === The Rite of the Unquiet ===
 
 At 65% health he returns to the altar and becomes immune until all four candles burn again.
 
-* Rite of the Unquiet. He becomes immune and the 4 candles go dark. 2 Restless Bones climb out. Grave Chill hits everyone every second: 3 damage, rising by 1 every 5 sec, with no cap. Relight all four candles fast: the chill never stops rising. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/morthen__rite_of_the_unquiet.webp&quot; size=&quot;attack&quot; /&gt; Rite of the Unquiet. He becomes immune and the 4 candles go dark. 2 Restless Bones climb out. Grave Chill hits everyone every second: 3 damage, rising by 1 every 5 sec, with no cap. Relight all four candles fast: the chill never stops rising. (deadly, important)
 * Relight the Candles. Channel 4 sec at a candle (within 4 yd) to relight it. It costs the lighter 24% of their maximum health. When the fourth is lit he is stunned for 8 sec and takes 25% more damage. Split the candles between players with health to spare, and burst him in the stun. (important)
 
 === Last Rites ===
 
 At 35% health he takes up his scythe for the end of the fight.
 
-* Reap the Unquiet. Every 14 sec, a 2 sec cast at the tank, then a 120 degree scythe sweep 14 yd in front of him: 55 to 65 damage. Only the tank stands in front. The tank can sidestep during the cast. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/morthen__reap_the_unquiet.webp&quot; size=&quot;attack&quot; /&gt; Reap the Unquiet. Every 14 sec, a 2 sec cast at the tank, then a 120 degree scythe sweep 14 yd in front of him: 55 to 65 damage. Only the tank stands in front. The tank can sidestep during the cast. (important)
 
 * tank: Keep him facing away from the group, and step out of the Shadow Pulse with everyone else.
 * healer: Each candle costs the lighter a big share of their health and Grave Chill keeps rising: heal the lighters first.
@@ -119748,15 +119762,15 @@ A lich bishop running a three-act rite. First he calls souls to empower him; at 
 
 He pulses shadow around himself and calls souls to feed him.
 
-* Shadow Pulse. Every 12 sec (9 sec in Last Rites), a 2 sec cast, then 216 to 270 damage to everyone within 12 yd. Everyone, the tank included, steps out to 12 yd before the cast ends. (important)
-* Gravecall. Every 15 sec a [[Bound Soul (Mob)|Bound Soul]] drifts from an alcove toward him. If it reaches him he gains 10% more damage per stack (up to 10) and heals 3% of his health. The first player it touches absorbs it instead: 108 to 144 damage. A spare player steps into each soul&apos;s path. (important)
-* Grasp of the Grave. Every 16 sec a 4 yd ring appears under 2 players. 1.5 sec later hands erupt: everyone inside is rooted for 3 sec and takes 162 to 198 damage. Step out of the ring at once.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/morthen__shadow_pulse.webp&quot; size=&quot;attack&quot; /&gt; Shadow Pulse. Every 12 sec (9 sec in Last Rites), a 2 sec cast, then 216 to 270 damage to everyone within 12 yd. Everyone, the tank included, steps out to 12 yd before the cast ends. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/morthen__gravecall.webp&quot; size=&quot;attack&quot; /&gt; Gravecall. Every 15 sec a [[Bound Soul (Mob)|Bound Soul]] drifts from an alcove toward him. If it reaches him he gains 10% more damage per stack (up to 10) and heals 3% of his health. The first player it touches absorbs it instead: 108 to 144 damage. A spare player steps into each soul&apos;s path. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/morthen__grasp_of_the_grave.webp&quot; size=&quot;attack&quot; /&gt; Grasp of the Grave. Every 16 sec a 4 yd ring appears under 2 players. 1.5 sec later hands erupt: everyone inside is rooted for 3 sec and takes 162 to 198 damage. Step out of the ring at once.
 
 === The Rite of the Unquiet ===
 
 At 65% health he returns to the altar and becomes immune until all four candles burn again.
 
-* Rite of the Unquiet. He becomes immune and the 4 candles go dark. 2 Restless Bones climb out. Grave Chill hits everyone every second: 3 damage, rising by 1 every 5 sec, with no cap. Relight all four candles fast: the chill never stops rising. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/morthen__rite_of_the_unquiet.webp&quot; size=&quot;attack&quot; /&gt; Rite of the Unquiet. He becomes immune and the 4 candles go dark. 2 Restless Bones climb out. Grave Chill hits everyone every second: 3 damage, rising by 1 every 5 sec, with no cap. Relight all four candles fast: the chill never stops rising. (deadly, important)
 * Relight the Candles. Channel 4 sec at a candle (within 4 yd) to relight it. It costs the lighter 32% of their maximum health. When the fourth is lit he is stunned for 8 sec and takes 25% more damage. Split the candles between players with health to spare, and burst him in the stun. (important)
 * Name the Dead. The candles must be lit in an order shown by a gold beam from the ledger. A wrong candle snuffs the last one lit and burns the lighter for 252 to 288. Light only the candle the beam points at. (important)
 
@@ -119764,7 +119778,7 @@ At 65% health he returns to the altar and becomes immune until all four candles 
 
 At 35% health he takes up his scythe for the end of the fight.
 
-* Reap the Unquiet. Every 14 sec, a 2 sec cast at the tank, then a 120 degree scythe sweep 14 yd in front of him: 495 to 585 damage. Only the tank stands in front. The tank can sidestep during the cast. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/morthen__reap_the_unquiet.webp&quot; size=&quot;attack&quot; /&gt; Reap the Unquiet. Every 14 sec, a 2 sec cast at the tank, then a 120 degree scythe sweep 14 yd in front of him: 495 to 585 damage. Only the tank stands in front. The tank can sidestep during the cast. (important)
 
 * tank: Keep him facing away from the group, and step out of the Shadow Pulse with everyone else.
 * healer: Each candle costs the lighter a big share of their health and Grave Chill keeps rising: heal the lighters first.
@@ -120219,7 +120233,7 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="9934">&lt;woc-art path=&quot;/ui/mobs/knight_commander_olen.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="10532">&lt;woc-art path=&quot;/ui/mobs/knight_commander_olen.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Knight-Commander Olen (Contract)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/bastion_olen.webp&quot; size=&quot;model&quot; /&gt;
@@ -120294,16 +120308,16 @@ A fallen [[Paladin|paladin]] knight. His brine pools shield him, so the tank dra
 
 He casts one ability at a time; his timers pause during his casts.
 
-* Hallowed Brine. Every 14 sec, a 1.2 sec cast, then a 9 yd pool of holy brine under him for 15 sec: 18 damage per second to anyone in it. While he stands in any pool he takes 40% less damage. The tank drags him out of the pool. Everyone else steps out of it. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/knight_commander_olen__hallowed_brine.webp&quot; size=&quot;attack&quot; /&gt; Hallowed Brine. Every 14 sec, a 1.2 sec cast, then a 9 yd pool of holy brine under him for 15 sec: 18 damage per second to anyone in it. While he stands in any pool he takes 40% less damage. The tank drags him out of the pool. Everyone else steps out of it. (important)
 * Rebounding Bulwark. Every 18 sec, a 1.5 sec cast at a player who is not the tank. The shield hits them for 60 to 70, then rebounds to the nearest unhit player within 10 yd, up to 3 players. Stay spread: more than 10 yd from everyone else. (important)
-* Sentence of the Tide. Every 22 sec, a 1 sec cast marks a player who is not the tank. 5 sec later a column lands on them wherever they are: 110 to 125 damage to everyone within 6 yd. Marked: move away from the group before the column lands. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/knight_commander_olen__sentence_of_the_tide.webp&quot; size=&quot;attack&quot; /&gt; Sentence of the Tide. Every 22 sec, a 1 sec cast marks a player who is not the tank. 5 sec later a column lands on them wherever they are: 110 to 125 damage to everyone within 6 yd. Marked: move away from the group before the column lands. (deadly, important)
 * [[Reaping Arc (Ability)|Reaping Arc]]. Each of his melee hits also strikes every other player within 8 yd of the tank for 60% of the swing. Nobody but the tank stands within 8 yd of the tank.
 
 === Unbroken Oath ===
 
 At 50% health he kneels, immune, while Drowned Sergeants fight for him.
 
-* Unbroken Oath. Once, at 50% health: he kneels and channels for up to 60 sec, immune to damage, while 2 Drowned Sergeants rise and attack players who are not the tank. Kill them all and he is stunned for 4 sec and takes 20% more damage for 10 sec. The tank gathers the Sergeants; everyone kills them, then bursts Olen while he is stunned. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/knight_commander_olen__unbroken_oath.webp&quot; size=&quot;attack&quot; /&gt; Unbroken Oath. Once, at 50% health: he kneels and channels for up to 60 sec, immune to damage, while 2 Drowned Sergeants rise and attack players who are not the tank. Kill them all and he is stunned for 4 sec and takes 20% more damage for 10 sec. The tank gathers the Sergeants; everyone kills them, then bursts Olen while he is stunned. (important)
 
 * tank: Drag him out of every brine pool. Keep the group out of the 8 yd around you, where his swings splash.
 * healer: Rebounding Bulwark and Sentence of the Tide hit hardest when players stand together. Sergeants enrage at low health.
@@ -120318,16 +120332,16 @@ A fallen [[Paladin|paladin]] knight. His brine pools shield him, so the tank dra
 
 He casts one ability at a time; his timers pause during his casts.
 
-* Hallowed Brine. Every 14 sec, a 1.2 sec cast, then a 10 yd pool of holy brine under him for 15 sec: 156 damage per second to anyone in it. While he stands in any pool he takes 40% less damage. The tank drags him out of the pool. Everyone else steps out of it. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/knight_commander_olen__hallowed_brine.webp&quot; size=&quot;attack&quot; /&gt; Hallowed Brine. Every 14 sec, a 1.2 sec cast, then a 10 yd pool of holy brine under him for 15 sec: 156 damage per second to anyone in it. While he stands in any pool he takes 40% less damage. The tank drags him out of the pool. Everyone else steps out of it. (important)
 * Rebounding Bulwark. Every 18 sec, a 1.5 sec cast at a player who is not the tank. The shield hits them for 360 to 420, then rebounds to the nearest unhit player within 10 yd, up to 4 players. Stay spread: more than 10 yd from everyone else. (important)
-* Sentence of the Tide. Every 22 sec, a 1 sec cast marks a player who is not the tank. 5 sec later a column lands on them wherever they are: 660 to 750 damage to everyone within 8 yd. Marked: move away from the group before the column lands. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/knight_commander_olen__sentence_of_the_tide.webp&quot; size=&quot;attack&quot; /&gt; Sentence of the Tide. Every 22 sec, a 1 sec cast marks a player who is not the tank. 5 sec later a column lands on them wherever they are: 660 to 750 damage to everyone within 8 yd. Marked: move away from the group before the column lands. (deadly, important)
 * [[Reaping Arc (Ability)|Reaping Arc]]. Each of his melee hits also strikes every other player within 8 yd of the tank for 60% of the swing. Nobody but the tank stands within 8 yd of the tank.
 
 === Unbroken Oath ===
 
 At 50% health he kneels, immune, while Drowned Sergeants fight for him.
 
-* Unbroken Oath. Once, at 50% health: he kneels and channels for up to 60 sec, immune to damage, while 3 Drowned Sergeants rise and attack players who are not the tank. Kill them all and he is stunned for 4 sec and takes 20% more damage for 10 sec. The tank gathers the Sergeants; everyone kills them, then bursts Olen while he is stunned. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/knight_commander_olen__unbroken_oath.webp&quot; size=&quot;attack&quot; /&gt; Unbroken Oath. Once, at 50% health: he kneels and channels for up to 60 sec, immune to damage, while 3 Drowned Sergeants rise and attack players who are not the tank. Kill them all and he is stunned for 4 sec and takes 20% more damage for 10 sec. The tank gathers the Sergeants; everyone kills them, then bursts Olen while he is stunned. (important)
 
 * tank: Drag him out of every brine pool. Keep the group out of the 8 yd around you, where his swings splash.
 * healer: Rebounding Bulwark and Sentence of the Tide hit hardest when players stand together. Sergeants enrage at low health.
@@ -120443,7 +120457,7 @@ The game rolls once for this group. At most &apos;&apos;&apos;one&apos;&apos;&ap
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="11385">&lt;woc-art path=&quot;/ui/mobs/vael_the_mistcaller.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="11763">&lt;woc-art path=&quot;/ui/mobs/vael_the_mistcaller.webp&quot; /&gt;
 :&apos;&apos;Other pages have this name. See [[Vael the Fogbinder|all pages named Vael the Fogbinder]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/bastion_vael.webp&quot; size=&quot;model&quot; /&gt;
@@ -120518,8 +120532,8 @@ A hooded reaper. Three times in a row he rises from a shadow pool behind a playe
 
 He rises from the crown when a player steps onto it. At 60% and 30% health, 2 Drowned Thralls join the fight.
 
-* Mist Surge. A 1.5 sec cast, then 30 to 40 damage to everyone within 12 yd of him. Every 12 sec of open fight; every 8 sec below 25% health. Ranged players stay beyond 12 yd. (important)
-* Shadow Crossing. Every 20 sec he steps through the shadows up to 3 times in a row, each behind a different player: a pool opens 2.5 yd behind them, he rises, and sweeps a 150 degree arc 8 yd toward them: 60 to 70 damage. Marked by Death: move forward out of the sweep or behind the pool. Others never stand in front of the marked player. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/vael_the_mistcaller__mist_surge.webp&quot; size=&quot;attack&quot; /&gt; Mist Surge. A 1.5 sec cast, then 30 to 40 damage to everyone within 12 yd of him. Every 12 sec of open fight; every 8 sec below 25% health. Ranged players stay beyond 12 yd. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/vael_the_mistcaller__shadow_crossing.webp&quot; size=&quot;attack&quot; /&gt; Shadow Crossing. Every 20 sec he steps through the shadows up to 3 times in a row, each behind a different player: a pool opens 2.5 yd behind them, he rises, and sweeps a 150 degree arc 8 yd toward them: 60 to 70 damage. Marked by Death: move forward out of the sweep or behind the pool. Others never stand in front of the marked player. (deadly, important)
 
 === Fog Veil ===
 
@@ -120541,8 +120555,8 @@ A hooded reaper. Three times in a row he rises from a shadow pool behind a playe
 
 He rises from the crown when a player steps onto it. At 60% and 30% health, 2 Drowned Thralls join the fight.
 
-* Mist Surge. A 1.5 sec cast, then 180 to 240 damage to everyone within 12 yd of him. Every 12 sec of open fight; every 8 sec below 25% health. Ranged players stay beyond 12 yd. (important)
-* Shadow Crossing. Every 20 sec he steps through the shadows up to 3 times in a row, each behind a different player: a pool opens 2.5 yd behind them, he rises, and sweeps a 150 degree arc 8 yd toward them: 360 to 420 damage. Marked by Death: move forward out of the sweep or behind the pool. Others never stand in front of the marked player. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/vael_the_mistcaller__mist_surge.webp&quot; size=&quot;attack&quot; /&gt; Mist Surge. A 1.5 sec cast, then 180 to 240 damage to everyone within 12 yd of him. Every 12 sec of open fight; every 8 sec below 25% health. Ranged players stay beyond 12 yd. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/vael_the_mistcaller__shadow_crossing.webp&quot; size=&quot;attack&quot; /&gt; Shadow Crossing. Every 20 sec he steps through the shadows up to 3 times in a row, each behind a different player: a pool opens 2.5 yd behind them, he rises, and sweeps a 150 degree arc 8 yd toward them: 360 to 420 damage. Marked by Death: move forward out of the sweep or behind the pool. Others never stand in front of the marked player. (deadly, important)
 * Grave Shadow. Each shadow pool stays for 6 sec and burns anyone within 3 yd for 108 damage per second. Stay out of old pools.
 
 === Fog Veil ===
@@ -121071,7 +121085,7 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="16501">&lt;woc-art path=&quot;/ui/mobs/korgath_the_bound.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="17605">&lt;woc-art path=&quot;/ui/mobs/korgath_the_bound.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Korgath the Bound (Contract)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/sanctum_korgath.webp&quot; size=&quot;model&quot; /&gt;
@@ -121148,17 +121162,17 @@ He starts bound by 4 chains, one to each pillar. A Seal Shackle at each pillar h
 
 * Lockbound. Each intact chain cuts the damage he takes by 20%: 80% less damage while all four hold. Break chains to speed up the kill. Decide how many first: each one also frees an attack. (important)
 * Seal Shackles. A Seal Shackle stands at each pillar&apos;s foot. Shackles can&apos;t be attacked until Korgath is pulled. Killing one breaks its chain. While the Anvil chain holds he can&apos;t leave 10 yd of the terrace&apos;s middle. Damage dealers kill the Shackles of the chains you chose to break. The tank keeps Korgath in the middle meanwhile. (important)
-* Strain. While any chain holds: every 20 sec, a 2 sec cast, then a blast in a 8 yd ring around each pillar whose chain still holds: 180 to 220 damage and a knockback. It stops once all four chains are broken. Step away from every pillar with an intact chain before the cast ends. (deadly, important)
-* Shuddering Stomp. Every 12 sec, a 1.5 sec cast, then a ring 10 yd past his body: 190 to 285 damage to everyone inside. Ranged players stay outside the ring. Melee step out if they can; healers top up anyone it hits. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/korgath_the_bound__strain.webp&quot; size=&quot;attack&quot; /&gt; Strain. While any chain holds: every 20 sec, a 2 sec cast, then a blast in a 8 yd ring around each pillar whose chain still holds: 180 to 220 damage and a knockback. It stops once all four chains are broken. Step away from every pillar with an intact chain before the cast ends. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/korgath_the_bound__shuddering_stomp.webp&quot; size=&quot;attack&quot; /&gt; Shuddering Stomp. Every 12 sec, a 1.5 sec cast, then a ring 10 yd past his body: 190 to 285 damage to everyone inside. Ranged players stay outside the ring. Melee step out if they can; healers top up anyone it hits. (important)
 
 === Broken Chains ===
 
 Each broken chain frees one attack for the rest of the pull, even if the chain is later re-riveted.
 
-* Maul Arc. Hammer chain broken: every 10 sec, a 1.6 sec cast, then a 180 degree cleave in front of him, 8 yd past his body, for 1.3 times his melee hit. Only the tank stands in front. Everyone else moves behind him during the cast. (important)
-* Chain Flail. Tongs chain broken: every 14 sec, a 2 sec cast paints a 27.5 yd lane at the farthest player who is not the tank, then the whip hits everyone in it: 200 to 240 damage. Step sideways out of the lane before the cast ends. (deadly)
-* Threshold Charge. Anvil chain broken: he can leave the middle of the terrace. Every 18 sec, a 2 sec cast paints a 32.5 yd lane at the farthest player, then he charges down it: 180 to 220 damage and a knockback. Step out of the lane. While the Anvil chain holds he stays within 10 yd of the middle and never charges. (deadly)
-* Foreman&apos;s Bellow. Bellows chain broken: every 20 sec, a 2 sec cast, then 100 to 120 damage to everyone and a 6 yd shove away from him. It hits the whole group and cannot be avoided: healers top everyone up before it lands. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/korgath_the_bound__maul_arc.webp&quot; size=&quot;attack&quot; /&gt; Maul Arc. Hammer chain broken: every 10 sec, a 1.6 sec cast, then a 180 degree cleave in front of him, 8 yd past his body, for 1.3 times his melee hit. Only the tank stands in front. Everyone else moves behind him during the cast. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/korgath_the_bound__chain_flail.webp&quot; size=&quot;attack&quot; /&gt; Chain Flail. Tongs chain broken: every 14 sec, a 2 sec cast paints a 27.5 yd lane at the farthest player who is not the tank, then the whip hits everyone in it: 200 to 240 damage. Step sideways out of the lane before the cast ends. (deadly)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/korgath_the_bound__threshold_charge.webp&quot; size=&quot;attack&quot; /&gt; Threshold Charge. Anvil chain broken: he can leave the middle of the terrace. Every 18 sec, a 2 sec cast paints a 32.5 yd lane at the farthest player, then he charges down it: 180 to 220 damage and a knockback. Step out of the lane. While the Anvil chain holds he stays within 10 yd of the middle and never charges. (deadly)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/korgath_the_bound__foremans_bellow.webp&quot; size=&quot;attack&quot; /&gt; Foreman&apos;s Bellow. Bellows chain broken: every 20 sec, a 2 sec cast, then 100 to 120 damage to everyone and a 6 yd shove away from him. It hits the whole group and cannot be avoided: healers top everyone up before it lands. (important)
 
 === Enraged ===
 
@@ -121181,8 +121195,8 @@ He starts bound by 4 chains, one to each pillar. A Seal Shackle at each pillar h
 
 * Lockbound. Each intact chain cuts the damage he takes by 20%: 80% less damage while all four hold. Break chains to speed up the kill. Decide how many first: each one also frees an attack. (important)
 * Seal Shackles. A Seal Shackle stands at each pillar&apos;s foot. Shackles can&apos;t be attacked until Korgath is pulled. Killing one breaks its chain. While the Anvil chain holds he can&apos;t leave 10 yd of the terrace&apos;s middle. Damage dealers kill the Shackles of the chains you chose to break. The tank keeps Korgath in the middle meanwhile. (important)
-* Strain. While any chain holds: every 20 sec, a 2 sec cast, then a blast in a 8 yd ring around each pillar whose chain still holds: 450 to 550 damage and a knockback. It stops once all four chains are broken. Step away from every pillar with an intact chain before the cast ends. (deadly, important)
-* Shuddering Stomp. Every 12 sec, a 1.5 sec cast, then a ring 10 yd past his body: 475 to 713 damage to everyone inside. Ranged players stay outside the ring. Melee step out if they can; healers top up anyone it hits. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/korgath_the_bound__strain.webp&quot; size=&quot;attack&quot; /&gt; Strain. While any chain holds: every 20 sec, a 2 sec cast, then a blast in a 8 yd ring around each pillar whose chain still holds: 450 to 550 damage and a knockback. It stops once all four chains are broken. Step away from every pillar with an intact chain before the cast ends. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/korgath_the_bound__shuddering_stomp.webp&quot; size=&quot;attack&quot; /&gt; Shuddering Stomp. Every 12 sec, a 1.5 sec cast, then a ring 10 yd past his body: 475 to 713 damage to everyone inside. Ranged players stay outside the ring. Melee step out if they can; healers top up anyone it hits. (important)
 * Re-rivet. 25 sec after a chain breaks, a [[Broodsworn Goadsmith (Mob)|Broodsworn Goadsmith]] climbs over the rim behind its pillar, walks to the Shackle and channels Re-rivet for 6 sec. If it finishes, the chain and a fresh Shackle return with their 20% damage cut, but the freed attack stays. Interrupt, stun or kill the Goadsmith before the channel ends. (interruptible, important)
 * Last Link. While exactly one chain is left, Strain comes every 10 sec instead of every 20 sec. Break the last chain quickly, or stay ready to leave its pillar every 10 sec. (deadly)
 
@@ -121190,10 +121204,10 @@ He starts bound by 4 chains, one to each pillar. A Seal Shackle at each pillar h
 
 Each broken chain frees one attack for the rest of the pull, even if the chain is later re-riveted.
 
-* Maul Arc. Hammer chain broken: every 10 sec, a 1.6 sec cast, then a 180 degree cleave in front of him, 8 yd past his body, for 1.3 times his melee hit. Only the tank stands in front. Everyone else moves behind him during the cast. (important)
-* Chain Flail. Tongs chain broken: every 14 sec, a 2 sec cast paints a 27.5 yd lane at the farthest player who is not the tank, then the whip hits everyone in it: 500 to 600 damage. Step sideways out of the lane before the cast ends. (deadly)
-* Threshold Charge. Anvil chain broken: he can leave the middle of the terrace. Every 18 sec, a 2 sec cast paints a 32.5 yd lane at the farthest player, then he charges down it: 450 to 550 damage and a knockback. Step out of the lane. While the Anvil chain holds he stays within 10 yd of the middle and never charges. (deadly)
-* Foreman&apos;s Bellow. Bellows chain broken: every 20 sec, a 2 sec cast, then 250 to 300 damage to everyone and a 6 yd shove away from him. It hits the whole group and cannot be avoided: healers top everyone up before it lands. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/korgath_the_bound__maul_arc.webp&quot; size=&quot;attack&quot; /&gt; Maul Arc. Hammer chain broken: every 10 sec, a 1.6 sec cast, then a 180 degree cleave in front of him, 8 yd past his body, for 1.3 times his melee hit. Only the tank stands in front. Everyone else moves behind him during the cast. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/korgath_the_bound__chain_flail.webp&quot; size=&quot;attack&quot; /&gt; Chain Flail. Tongs chain broken: every 14 sec, a 2 sec cast paints a 27.5 yd lane at the farthest player who is not the tank, then the whip hits everyone in it: 500 to 600 damage. Step sideways out of the lane before the cast ends. (deadly)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/korgath_the_bound__threshold_charge.webp&quot; size=&quot;attack&quot; /&gt; Threshold Charge. Anvil chain broken: he can leave the middle of the terrace. Every 18 sec, a 2 sec cast paints a 32.5 yd lane at the farthest player, then he charges down it: 450 to 550 damage and a knockback. Step out of the lane. While the Anvil chain holds he stays within 10 yd of the middle and never charges. (deadly)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/korgath_the_bound__foremans_bellow.webp&quot; size=&quot;attack&quot; /&gt; Foreman&apos;s Bellow. Bellows chain broken: every 20 sec, a 2 sec cast, then 250 to 300 damage to everyone and a 6 yd shove away from him. It hits the whole group and cannot be avoided: healers top everyone up before it lands. (important)
 
 === Enraged ===
 
@@ -121360,7 +121374,7 @@ The game rolls once for this group. At most &apos;&apos;&apos;one&apos;&apos;&ap
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="12828">&lt;woc-art path=&quot;/ui/mobs/grand_necromancer_velkhar.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="13236">&lt;woc-art path=&quot;/ui/mobs/grand_necromancer_velkhar.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Grand Necromancer Velkhar (Contract)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/sanctum_velkhar.webp&quot; size=&quot;model&quot; /&gt;
@@ -121437,8 +121451,8 @@ Bonewalkers keep climbing out of the pools. At 66% and 33% health an extra wave 
 * Waking Thaw. Every 30 sec one pool&apos;s pyre roars and 2 Raised Bonewalkers climb out 1.5 sec later. The pools take turns. At 66% and 33% health, one more climbs out of each pool. The tank gathers them and drags them onto dry ice. Damage dealers kill them there. (important)
 * Held and Unquenched. A Bonewalker killed on dry ice is Held: it freezes into a statue and stays dead. One killed in meltwater sinks, then rises again 4 sec later at 60% health and heals Velkhar for 2% of his health. Kill Bonewalkers only on dry ice: never in a pool or on a meltwater strip. (deadly, important)
 * Grasp of the Thawed. A Bonewalker standing in meltwater deals 30% more damage. The tank keeps Bonewalkers out of the water. (important)
-* Soulfire Trench. Every 18 sec, a 2 sec cast paints a 4 yd lane from him toward a player who is not the tank, out to the vault&apos;s rim. Then 200 to 240 damage to everyone in it, and the lane stays meltwater for 20 sec. Step out of the lane. Do not kill Bonewalkers on the meltwater strip it leaves. (deadly, important)
-* Shadow [[Volley (Ability)|Volley]]. Every 12 sec, a 1.5 sec cast, then 90 to 110 shadow damage to everyone. It cannot be avoided: healers keep the whole group topped up.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/grand_necromancer_velkhar__soulfire_trench.webp&quot; size=&quot;attack&quot; /&gt; Soulfire Trench. Every 18 sec, a 2 sec cast paints a 4 yd lane from him toward a player who is not the tank, out to the vault&apos;s rim. Then 200 to 240 damage to everyone in it, and the lane stays meltwater for 20 sec. Step out of the lane. Do not kill Bonewalkers on the meltwater strip it leaves. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/grand_necromancer_velkhar__shadow_volley.webp&quot; size=&quot;attack&quot; /&gt; Shadow [[Volley (Ability)|Volley]]. Every 12 sec, a 1.5 sec cast, then 90 to 110 shadow damage to everyone. It cannot be avoided: healers keep the whole group topped up.
 
 * tank: Pick up every Bonewalker and drag it onto dry ice, out of the pools and the meltwater strips. In meltwater they hit 30% harder.
 * healer: Shadow [[Volley (Ability)|Volley]] hits everyone every 12 sec. Bonewalkers in meltwater hit 30% harder, so watch the tank when they reach water.
@@ -121456,8 +121470,8 @@ Bonewalkers keep climbing out of the pools. At 66% and 33% health an extra wave 
 * Waking Thaw. Every 30 sec one pool&apos;s pyre roars and 2 Raised Bonewalkers climb out 1.5 sec later. The pools take turns. At 66% and 33% health, one more climbs out of each pool. The tank gathers them and drags them onto dry ice. Damage dealers kill them there. (important)
 * Held and Unquenched. A Bonewalker killed on dry ice is Held: it freezes into a statue and stays dead. One killed in meltwater sinks, then rises again 4 sec later at 100% health and heals Velkhar for 2% of his health. Kill Bonewalkers only on dry ice: never in a pool or on a meltwater strip. (deadly, important)
 * Grasp of the Thawed. A Bonewalker standing in meltwater deals 30% more damage. The tank keeps Bonewalkers out of the water. (important)
-* Soulfire Trench. Every 18 sec, a 2 sec cast paints a 4 yd lane from him toward a player who is not the tank, out to the vault&apos;s rim. Then 500 to 600 damage to everyone in it, and the lane stays meltwater for 20 sec. Step out of the lane. Do not kill Bonewalkers on the meltwater strip it leaves. (deadly, important)
-* Shadow [[Volley (Ability)|Volley]]. Every 12 sec, a 1.5 sec cast, then 225 to 275 shadow damage to everyone. It cannot be avoided: healers keep the whole group topped up.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/grand_necromancer_velkhar__soulfire_trench.webp&quot; size=&quot;attack&quot; /&gt; Soulfire Trench. Every 18 sec, a 2 sec cast paints a 4 yd lane from him toward a player who is not the tank, out to the vault&apos;s rim. Then 500 to 600 damage to everyone in it, and the lane stays meltwater for 20 sec. Step out of the lane. Do not kill Bonewalkers on the meltwater strip it leaves. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/grand_necromancer_velkhar__shadow_volley.webp&quot; size=&quot;attack&quot; /&gt; Shadow [[Volley (Ability)|Volley]]. Every 12 sec, a 1.5 sec cast, then 225 to 275 shadow damage to everyone. It cannot be avoided: healers keep the whole group topped up.
 * Warm Hands. A Bonewalker that stands still for 3 sec melts a 3 yd meltwater puddle under itself for 8 sec. Keep the Bonewalkers moving, and never finish one off on top of a puddle. (important)
 * Twice-Woken. A Bonewalker that rises again comes back at full health and deals 25% more damage. Do not let any rise: kill them all on dry ice. (deadly)
 
@@ -125445,7 +125459,7 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="10799">&lt;woc-art path=&quot;/ui/mobs/choirmother_selthe.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="11143">&lt;woc-art path=&quot;/ui/mobs/choirmother_selthe.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Choirmother Selthe (Contract)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/temple_selthe.webp&quot; size=&quot;model&quot; /&gt;
@@ -125519,8 +125533,8 @@ Selthe never moves or melees. Stack for Chorus, leave the group for Solo, interr
 
 Her other attacks pause while the group answers the Score. Moonwater Bolts have no cast bar and cannot be interrupted.
 
-* Chorus. Every 25 sec a player who is not the tank is marked for 5 sec. When it ends, 400 damage is split evenly among everyone within 6 yd of them. Everyone stacks on the Chorus player, then leaves the spot before the Echo. (deadly, important)
-* Solo. 12 sec after each Chorus another player is marked for 5 sec. When it ends, the marked player and everyone within 8 yd take 150 damage each. Solo player: move away from everyone, then leave the spot. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/choirmother_selthe__chorus.webp&quot; size=&quot;attack&quot; /&gt; Chorus. Every 25 sec a player who is not the tank is marked for 5 sec. When it ends, 400 damage is split evenly among everyone within 6 yd of them. Everyone stacks on the Chorus player, then leaves the spot before the Echo. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/choirmother_selthe__solo.webp&quot; size=&quot;attack&quot; /&gt; Solo. 12 sec after each Chorus another player is marked for 5 sec. When it ends, the marked player and everyone within 8 yd take 150 damage each. Solo player: move away from everyone, then leave the spot. (important)
 * The Score. At 60% and 30% health, she becomes immune and plays 3, then 4 notes. Repeat them within 14, then 16 sec. A wrong tile deals 40 Frost damage and resets progress, not the timer. Timeout deals 150 to 170 Frost damage to everyone. Success stuns her for 4 sec and increases damage taken by 20% for 10 sec. Watch the melody, then step onto tiles in order. Alternate correct notes with another living player; a sole survivor can finish alone. Blocked steps are harmless. Step off and enter again to sound a tile, including one occupied before the answer begins. (important)
 * Moonwater Bolt. Between other casts, a bolt lands every 2.5 sec after a 1 sec visual warning, dealing 0.8 times her weapon damage as Frost. Interrupting Drowning Aria stops bolts and Aria for 3 sec. Keep the tank in her line of sight. Save interrupts for Drowning Aria.
 * Drowning Aria. Every 22 sec she channels a beam at a player who is not the tank for 5 sec: 5 pulses that grow from 30 to 70 on the same body. A player who steps into the beam takes the pulse instead, and the ramp starts over. Interrupt it, break her line of sight behind a lamp pillar, or step into the beam to share it. (interruptible, important)
@@ -125539,8 +125553,8 @@ Selthe never moves or melees. Stack for Chorus, leave the group for Solo, interr
 
 Her other attacks pause while the group answers the Score. Moonwater Bolts have no cast bar and cannot be interrupted.
 
-* Chorus. Every 25 sec a player who is not the tank is marked for 5 sec. When it ends, 1800 damage is split evenly among everyone within 6 yd of them. Echo: 4 sec later the same spot bursts again for 540 to each player still there, not split. Everyone stacks on the Chorus player, then leaves the spot before the Echo. (deadly, important)
-* Solo. Duet: Solo lands together with the Chorus, on a different player. When it ends, the marked player and everyone within 8 yd take 675 each, and 4 sec later the spot bursts again. Solo player: move away from everyone, then leave the spot. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/choirmother_selthe__chorus.webp&quot; size=&quot;attack&quot; /&gt; Chorus. Every 25 sec a player who is not the tank is marked for 5 sec. When it ends, 1800 damage is split evenly among everyone within 6 yd of them. Echo: 4 sec later the same spot bursts again for 540 to each player still there, not split. Everyone stacks on the Chorus player, then leaves the spot before the Echo. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/choirmother_selthe__solo.webp&quot; size=&quot;attack&quot; /&gt; Solo. Duet: Solo lands together with the Chorus, on a different player. When it ends, the marked player and everyone within 8 yd take 675 each, and 4 sec later the spot bursts again. Solo player: move away from everyone, then leave the spot. (important)
 * The Score. At 60% and 30% health, she becomes immune and plays 3, then 4 notes. Repeat them within 14, then 16 sec. A wrong tile deals 180 Frost damage and resets progress, not the timer. Timeout deals 675 to 765 Frost damage to everyone. Success stuns her for 4 sec and increases damage taken by 20% for 10 sec. Watch the melody, then step onto tiles in order. Alternate correct notes with another living player; a sole survivor can finish alone. Blocked steps are harmless. Step off and enter again to sound a tile, including one occupied before the answer begins. (important)
 * Moonwater Bolt. Between other casts, a bolt lands every 2.5 sec after a 1 sec visual warning, dealing 0.8 times her weapon damage as Frost. Interrupting Drowning Aria stops bolts and Aria for 3 sec. Keep the tank in her line of sight. Save interrupts for Drowning Aria.
 * Drowning Aria. Every 22 sec she channels a beam at a player who is not the tank for 5 sec: 5 pulses that grow from 135 to 315 on the same body. A player who steps into the beam takes the pulse instead, and the ramp starts over. Interrupt it, break her line of sight behind a lamp pillar, or step into the beam to share it. (interruptible, important)
@@ -125737,7 +125751,7 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="11505">&lt;woc-art path=&quot;/ui/mobs/ysolei.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="12139">&lt;woc-art path=&quot;/ui/mobs/ysolei.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Ysolei, Avatar of the Drowned Moon (Contract)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/temple_ysolei.webp&quot; size=&quot;model&quot; /&gt;
@@ -125813,15 +125827,15 @@ The Avatar of [[The Drowned Moon|the Drowned Moon]] pulls everyone in and crashe
 
 She never moves. Her reach is long: melee stands far from her centre.
 
-* Lunar Tide. Every 10 sec, a 1.5 sec cast, then 60 to 80 damage to everyone within 15 yd of her centre. Ranged players stay out; melee are always in range, so healers cover them.
-* Undertow. Every 25 sec she channels for 3 sec, dragging everyone toward her at 3.5 yd per second. Then Tidal Crash: 250 to 300 damage within 14 yd. Everyone, melee included, runs out toward dry ground during the channel; flood water slows you. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/ysolei__lunar_tide.webp&quot; size=&quot;attack&quot; /&gt; Lunar Tide. Every 10 sec, a 1.5 sec cast, then 60 to 80 damage to everyone within 15 yd of her centre. Ranged players stay out; melee are always in range, so healers cover them.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/ysolei__undertow.webp&quot; size=&quot;attack&quot; /&gt; Undertow. Every 25 sec she channels for 3 sec, dragging everyone toward her at 3.5 yd per second. Then Tidal Crash: 250 to 300 damage within 14 yd. Everyone, melee included, runs out toward dry ground during the channel; flood water slows you. (deadly, important)
 * Beckoning Moon. At 75% and 45% health she calls 3 Moonlight Tears that roll toward her. A tear that touches a player stops: 70 to 85 damage, plus 150% more for each Moonsear stack, which lasts 20 sec. A tear that reaches her gives her 10% more damage for the fight and heals her 2%. Body-block every tear, taking turns so nobody stacks Moonsear. (important)
 
 === Rising Tide ===
 
 At 66% health half of the island floods, and the flood switches sides.
 
-* Rising Tide. At 66% health half the island floods at once. Every 30 sec the flood switches sides, with a 10 sec shimmer first. In the water: 45 damage per second and 50% slower. Stay on the dry half and move when the other half shimmers. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/ysolei__rising_tide.webp&quot; size=&quot;attack&quot; /&gt; Rising Tide. At 66% health half the island floods at once. Every 30 sec the flood switches sides, with a 10 sec shimmer first. In the water: 45 damage per second and 50% slower. Stay on the dry half and move when the other half shimmers. (deadly, important)
 * [[Moonspawn (Mob)|Moonspawn]] Call. At 60% and 30% health she calls 2 [[Moonspawn (Mob)|Moonspawn]]. The tank picks them up and damage dealers kill them.
 * Drowned Wrath. Below 30% health its melee attacks deal 40% more damage and come 30% faster, for the rest of the fight. Tank and healer save their defensive and healing cooldowns for this phase. Everyone else pushes damage to end it fast. (important)
 
@@ -125829,7 +125843,7 @@ At 66% health half of the island floods, and the flood switches sides.
 
 At 20% health she calls the moon down.
 
-* Falling Moon. A 12 sec cast behind a ward worth 6% of her health. Break the ward in time: she is stunned for 5 sec and takes 25% more damage. If the ward holds: 300 to 340 damage to everyone on the island, and she deals 20% more damage for the rest of the fight. Every damage dealer hits her ward; healers prepare for the impact. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/ysolei__falling_moon.webp&quot; size=&quot;attack&quot; /&gt; Falling Moon. A 12 sec cast behind a ward worth 6% of her health. Break the ward in time: she is stunned for 5 sec and takes 25% more damage. If the ward holds: 300 to 340 damage to everyone on the island, and she deals 20% more damage for the rest of the fight. Every damage dealer hits her ward; healers prepare for the impact. (deadly, important)
 
 * tank: Pick up every [[Moonspawn (Mob)|Moonspawn]]. Run out of the Undertow with everyone.
 * healer: Lunar Tide hits melee every cast. Tears add Moonsear stacks: heal whoever blocked one.
@@ -125844,15 +125858,15 @@ The Avatar of [[The Drowned Moon|the Drowned Moon]] pulls everyone in and crashe
 
 She never moves. Her reach is long: melee stands far from her centre.
 
-* Lunar Tide. Every 10 sec, a 1.5 sec cast, then 300 to 400 damage to everyone within 15 yd of her centre. Ranged players stay out; melee are always in range, so healers cover them.
-* Undertow. Every 25 sec she channels for 3 sec, dragging everyone toward her. Then Tidal Crash: 1250 to 1500 damage within 14 yd. Riptide: a pool opens where each player stood, burning 200 per second for 10 sec. Everyone, melee included, runs out toward dry ground during the channel; flood water slows you. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/ysolei__lunar_tide.webp&quot; size=&quot;attack&quot; /&gt; Lunar Tide. Every 10 sec, a 1.5 sec cast, then 300 to 400 damage to everyone within 15 yd of her centre. Ranged players stay out; melee are always in range, so healers cover them.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/ysolei__undertow.webp&quot; size=&quot;attack&quot; /&gt; Undertow. Every 25 sec she channels for 3 sec, dragging everyone toward her. Then Tidal Crash: 1250 to 1500 damage within 14 yd. Riptide: a pool opens where each player stood, burning 200 per second for 10 sec. Everyone, melee included, runs out toward dry ground during the channel; flood water slows you. (deadly, important)
 * Beckoning Moon. At 75% and 45% health she calls 4 Moonlight Tears that roll toward her. A tear that touches a player stops: 350 to 425 damage plus 150% more per Moonsear stack, and leaves Spilled Moonlight burning 150 per second. A tear that reaches her gives her 10% more damage and heals her 2%. Body-block every tear, taking turns so nobody stacks Moonsear. (important)
 
 === Rising Tide ===
 
 At 66% health half of the island floods, and the flood switches sides.
 
-* Rising Tide. At 66% health half the island floods at once. Every 30 sec the flood switches sides. In the water: 225 damage per second and 50% slower. Drowned Moon: every 20 sec a [[Moonspawn (Mob)|Moonspawn]] climbs out of the flooded half. Stay on the dry half and move when the other half shimmers. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/ysolei__rising_tide.webp&quot; size=&quot;attack&quot; /&gt; Rising Tide. At 66% health half the island floods at once. Every 30 sec the flood switches sides. In the water: 225 damage per second and 50% slower. Drowned Moon: every 20 sec a [[Moonspawn (Mob)|Moonspawn]] climbs out of the flooded half. Stay on the dry half and move when the other half shimmers. (deadly, important)
 * [[Moonspawn (Mob)|Moonspawn]] Call. At 60% and 30% health she calls 2 [[Moonspawn (Mob)|Moonspawn]]. The tank picks them up and damage dealers kill them.
 * Drowned Wrath. Below 30% health its melee attacks deal 40% more damage and come 30% faster, for the rest of the fight. Tank and healer save their defensive and healing cooldowns for this phase. Everyone else pushes damage to end it fast. (important)
 
@@ -125860,7 +125874,7 @@ At 66% health half of the island floods, and the flood switches sides.
 
 At 20% health she calls the moon down.
 
-* Falling Moon. A 10 sec cast behind a ward worth 6% of her health. Break the ward in time: she is stunned for 5 sec and takes 25% more damage. If the ward holds: 1500 to 1700 damage to everyone on the island, and she deals 20% more damage for the rest of the fight. Every damage dealer hits her ward; healers prepare for the impact. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/ysolei__falling_moon.webp&quot; size=&quot;attack&quot; /&gt; Falling Moon. A 10 sec cast behind a ward worth 6% of her health. Break the ward in time: she is stunned for 5 sec and takes 25% more damage. If the ward holds: 1500 to 1700 damage to everyone on the island, and she deals 20% more damage for the rest of the fight. Every damage dealer hits her ward; healers prepare for the impact. (deadly, important)
 
 * tank: Pick up every [[Moonspawn (Mob)|Moonspawn]]. Run out of the Undertow with everyone.
 * healer: Lunar Tide hits melee every cast. Tears add Moonsear stacks: heal whoever blocked one.
@@ -135601,7 +135615,7 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="6497">&lt;woc-art path=&quot;/ui/mobs/great_saurian.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="6685">&lt;woc-art path=&quot;/ui/mobs/great_saurian.webp&quot; /&gt;
 &lt;woc-art path=&quot;/encyclopedia-stills/wildheart_great_saurian.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Great Saurian is one of the Beasts.
@@ -135674,7 +135688,7 @@ A house-sized war-beast carrying a howdah walks a loop across the river ford. Pa
 From the pull it alternates a tail sweep behind it and a stomp around it. Only one strike runs at a time.
 
 * Tail Swipe. Every 12 sec, a 1 sec cast, then its tail sweeps a 120 degree cone behind it, out to 12 yd from its centre: 180 to 220 damage and a 8 yd knockback. Never stand behind it. Attack from its sides. (important)
-* Earthshaking Stomp. Every 16 sec, a 2 sec cast, then everyone within 12 yd of its centre takes 160 to 200 damage and is knocked down for 1 sec. Everyone who can leaves the ring before the cast ends. The tank takes it; healers top the tank up after. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/great_saurian__earthshaking_stomp.webp&quot; size=&quot;attack&quot; /&gt; Earthshaking Stomp. Every 16 sec, a 2 sec cast, then everyone within 12 yd of its centre takes 160 to 200 damage and is knocked down for 1 sec. Everyone who can leaves the ring before the cast ends. The tank takes it; healers top the tank up after. (important)
 
 === The Howdah Breaks ===
 
@@ -135703,7 +135717,7 @@ A house-sized war-beast carrying a howdah walks a loop across the river ford. Pa
 From the pull it alternates a tail sweep behind it and a stomp around it. Only one strike runs at a time.
 
 * Tail Swipe. Every 12 sec, a 1 sec cast, then its tail sweeps a 120 degree cone behind it, out to 12 yd from its centre: 450 to 550 damage and a 8 yd knockback. Never stand behind it. Attack from its sides. (important)
-* Earthshaking Stomp. Every 16 sec, a 2 sec cast, then everyone within 12 yd of its centre takes 400 to 500 damage and is knocked down for 1 sec. Everyone who can leaves the ring before the cast ends. The tank takes it; healers top the tank up after. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/great_saurian__earthshaking_stomp.webp&quot; size=&quot;attack&quot; /&gt; Earthshaking Stomp. Every 16 sec, a 2 sec cast, then everyone within 12 yd of its centre takes 400 to 500 damage and is knocked down for 1 sec. Everyone who can leaves the ring before the cast ends. The tank takes it; healers top the tank up after. (important)
 
 === The Howdah Breaks ===
 
@@ -135927,7 +135941,7 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="10875">&lt;woc-art path=&quot;/ui/mobs/wildheart_beastmaster.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="11073">&lt;woc-art path=&quot;/ui/mobs/wildheart_beastmaster.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Fanglord Beastmaster (Contract)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/mob_wildheart_beastmaster.webp&quot; size=&quot;model&quot; /&gt;
@@ -136005,7 +136019,7 @@ One fight, two bodies. Their timers run the whole fight; there are no health pha
 * Shared Health. The two bodies share one health pool: damage on either counts the same, and when one dies the other dies too. Hit whichever body is safest to reach. Nothing is lost by switching targets.
 * [[Stalk (Ability)|Stalk]]. The jaguar marks a player who is not the master&apos;s tank and hunts them for 10 sec, ignoring taunts. In reach it bites every 2 sec: 120 to 150 damage, then a bleed of 20 every 2 sec for 6 sec. Then it picks new prey. Marked: run, and lead the jaguar away from the Beastmaster. Others slow, root or stun it. (deadly, important)
 * Wary. Each kind of control (stun, root, slow) lands on the jaguar once, then that kind fails on it for 20 sec. Incapacitates, fears and polymorphs count as stuns. Take turns: one root, then one slow, then one stun, instead of three of the same. (important)
-* Beast Pit Quake. Every 13 sec, a 1.5 sec cast, then everyone within 8 yd of the Beastmaster takes 180 to 220 damage. Everyone but the tank steps away from the Beastmaster. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/wildheart_beastmaster__beast_pit_quake.webp&quot; size=&quot;attack&quot; /&gt; Beast Pit Quake. Every 13 sec, a 1.5 sec cast, then everyone within 8 yd of the Beastmaster takes 180 to 220 damage. Everyone but the tank steps away from the Beastmaster. (important)
 * Call of the Hunt. Every 20 sec both beasts attack 20% faster for 7 sec. Tank and healer use a cooldown through it; the jaguar bites faster too.
 * Thickhide Ward. Every 18 sec the jaguar gains a shield that absorbs 600 damage for 8 sec. Hit the Beastmaster while the shield is up: the health pool is shared.
 
@@ -136026,7 +136040,7 @@ One fight, two bodies. Their timers run the whole fight; there are no health pha
 * Shared Health. The two bodies share one health pool: damage on either counts the same, and when one dies the other dies too. Hit whichever body is safest to reach. Nothing is lost by switching targets.
 * [[Stalk (Ability)|Stalk]]. The jaguar marks a player who is not the master&apos;s tank and hunts them for 10 sec, ignoring taunts. In reach it bites every 2 sec: 300 to 375 damage, then a bleed of 50 every 2 sec for 6 sec. Then it picks new prey. Marked: run, and lead the jaguar away from the Beastmaster. Others slow, root or stun it. (deadly, important)
 * Wary. Each kind of control (stun, root, slow) lands on the jaguar once, then that kind fails on it for 20 sec. Incapacitates, fears and polymorphs count as stuns. Take turns: one root, then one slow, then one stun, instead of three of the same. (important)
-* Beast Pit Quake. Every 13 sec, a 1.5 sec cast, then everyone within 8 yd of the Beastmaster takes 450 to 550 damage. Everyone but the tank steps away from the Beastmaster. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/wildheart_beastmaster__beast_pit_quake.webp&quot; size=&quot;attack&quot; /&gt; Beast Pit Quake. Every 13 sec, a 1.5 sec cast, then everyone within 8 yd of the Beastmaster takes 450 to 550 damage. Everyone but the tank steps away from the Beastmaster. (important)
 * Call of the Hunt. Every 20 sec both beasts attack 20% faster for 7 sec. Tank and healer use a cooldown through it; the jaguar bites faster too.
 * Thickhide Ward. Every 18 sec the jaguar gains a shield that absorbs 900 damage for 8 sec. Hit the Beastmaster while the shield is up: the health pool is shared.
 * Heel!. Every 25 sec, a 2 sec cast on the jaguar, then it leaps back to the Beastmaster and the bond returns. Stun, incapacitate or transform the jaguar during the cast to cancel it. It only works if the jaguar is not already Wary of stuns. (important)
@@ -136237,7 +136251,7 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="9882">&lt;woc-art path=&quot;/ui/mobs/the_gorgebloom.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="10390">&lt;woc-art path=&quot;/ui/mobs/the_gorgebloom.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[The Gorgebloom (Contract)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/wildheart_gorgebloom.webp&quot; size=&quot;model&quot; /&gt;
@@ -136311,11 +136325,11 @@ A rooted man-eating flower rains seedpods on the loam beds around it. Players wi
 
 It never moves. Its cast timers pause while another cast runs, so the listed cadences are the shortest gaps.
 
-* Seed Rain. Every 15 sec, a 1.5 sec cast, then 6 seedpods land, one on each loam bed. Stepping on a pod while not Pollinated stamps it out. A pod left alone sprouts a [[Thorn Sprout (Mob)|Thorn Sprout]] after 12 sec. Players who are not Pollinated walk over every pod quickly. Pollinated players stay off them. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/the_gorgebloom__seed_rain.webp&quot; size=&quot;attack&quot; /&gt; Seed Rain. Every 15 sec, a 1.5 sec cast, then 6 seedpods land, one on each loam bed. Stepping on a pod while not Pollinated stamps it out. A pod left alone sprouts a [[Thorn Sprout (Mob)|Thorn Sprout]] after 12 sec. Players who are not Pollinated walk over every pod quickly. Pollinated players stay off them. (important)
 * Pollinate. Every 10 sec, 2 players are Pollinated for 8 sec. A Pollinated player who touches a pod makes it sprout at once. Pollinated: keep off the pods until it wears off, and on Heroic away from allies. (important)
 * [[Thorn Sprout (Mob)|Thorn Sprout]]. An elite add that grows from a sprouted pod and attacks the nearest player. Sprouts wither when the Gorgebloom dies. The tank picks it up and damage dealers kill it. (important)
-* Vine Lash. Every 10 sec, a 1.5 sec cast aims a 30 yd lane, 4 yd wide, at a player (a non-tank when possible): 180 to 220 damage and a 2 sec root. Step sideways out of the lane before the cast ends. (important)
-* Gorge. Every 15 sec, a 1.5 sec cast on its target, then a bite for 2 times its melee hit and Digesting: 40 damage per second for 6 sec. It cannot be dodged by moving. Tank: use a defensive cooldown for it. Healers cover the Digesting damage. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/the_gorgebloom__vine_lash.webp&quot; size=&quot;attack&quot; /&gt; Vine Lash. Every 10 sec, a 1.5 sec cast aims a 30 yd lane, 4 yd wide, at a player (a non-tank when possible): 180 to 220 damage and a 2 sec root. Step sideways out of the lane before the cast ends. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/the_gorgebloom__gorge.webp&quot; size=&quot;attack&quot; /&gt; Gorge. Every 15 sec, a 1.5 sec cast on its target, then a bite for 2 times its melee hit and Digesting: 40 damage per second for 6 sec. It cannot be dodged by moving. Tank: use a defensive cooldown for it. Healers cover the Digesting damage. (deadly, important)
 * Bloom Spit. If its target stays out of its reach for 1.5 sec, it spits every 2 sec for 140 to 170 damage. The tank stays in melee range.
 
 * tank: Stay in melee: walking away earns Bloom Spit. Use a cooldown for every Gorge and pick up each [[Thorn Sprout (Mob)|Thorn Sprout]].
@@ -136331,11 +136345,11 @@ A rooted man-eating flower rains seedpods on the loam beds around it. Players wi
 
 It never moves. Its cast timers pause while another cast runs, so the listed cadences are the shortest gaps.
 
-* Seed Rain. Every 15 sec, a 1.5 sec cast, then 6 seedpods land, one on each loam bed. Stepping on a pod while not Pollinated stamps it out. Burrowing Seeds: a pod left alone burrows after 6 sec and a [[Thorn Sprout (Mob)|Thorn Sprout]] rises next to the nearest player. Players who are not Pollinated walk over every pod quickly. Pollinated players stay off them. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/the_gorgebloom__seed_rain.webp&quot; size=&quot;attack&quot; /&gt; Seed Rain. Every 15 sec, a 1.5 sec cast, then 6 seedpods land, one on each loam bed. Stepping on a pod while not Pollinated stamps it out. Burrowing Seeds: a pod left alone burrows after 6 sec and a [[Thorn Sprout (Mob)|Thorn Sprout]] rises next to the nearest player. Players who are not Pollinated walk over every pod quickly. Pollinated players stay off them. (important)
 * Pollinate. Every 10 sec, 2 players are Pollinated for 8 sec. A Pollinated player who touches a pod makes it sprout at once. Pollen Cloud: standing within 3 yd of a Pollinated player for 2 sec pollinates you too. Pollinated: keep off the pods until it wears off, and on Heroic away from allies. (important)
 * [[Thorn Sprout (Mob)|Thorn Sprout]]. An elite add that grows from a sprouted pod and attacks the nearest player. Sprouts wither when the Gorgebloom dies. The tank picks it up and damage dealers kill it. (important)
-* Vine Lash. Every 10 sec, a 1.5 sec cast aims a 30 yd lane, 4 yd wide, at a player (a non-tank when possible): 450 to 550 damage and a 2 sec root. Step sideways out of the lane before the cast ends. (important)
-* Gorge. Every 15 sec, a 1.5 sec cast on its target, then a bite for 2 times its melee hit and Digesting: 100 damage per second for 6 sec. It cannot be dodged by moving. Tank: use a defensive cooldown for it. Healers cover the Digesting damage. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/the_gorgebloom__vine_lash.webp&quot; size=&quot;attack&quot; /&gt; Vine Lash. Every 10 sec, a 1.5 sec cast aims a 30 yd lane, 4 yd wide, at a player (a non-tank when possible): 450 to 550 damage and a 2 sec root. Step sideways out of the lane before the cast ends. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/the_gorgebloom__gorge.webp&quot; size=&quot;attack&quot; /&gt; Gorge. Every 15 sec, a 1.5 sec cast on its target, then a bite for 2 times its melee hit and Digesting: 100 damage per second for 6 sec. It cannot be dodged by moving. Tank: use a defensive cooldown for it. Healers cover the Digesting damage. (deadly, important)
 * Bloom Spit. If its target stays out of its reach for 1.5 sec, it spits every 2 sec for 350 to 425 damage. The tank stays in melee range.
 
 * tank: Stay in melee: walking away earns Bloom Spit. Use a cooldown for every Gorge and pick up each [[Thorn Sprout (Mob)|Thorn Sprout]].
@@ -136528,7 +136542,7 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="13446">&lt;woc-art path=&quot;/ui/mobs/wildheart_high_priest.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="14512">&lt;woc-art path=&quot;/ui/mobs/wildheart_high_priest.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Zulgar, Voice of the Basin (Contract)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/mob_wildheart_high_priest.webp&quot; size=&quot;model&quot; /&gt;
@@ -136601,8 +136615,8 @@ The high [[Priest|priest]] of the basin. A steady fight with a telegraphed ring,
 
 He fights in melee and pulses a ring around himself.
 
-* [[Wildheart (Ability)|Wildheart]] Pulse. Every 12 sec, a 1.5 sec cast hits everyone within 14 yd for 170 to 243 damage. Pinned players take 1.5 times this damage at any distance. Everyone but the tank leaves the ring before the cast ends. (important)
-* [[Hunting Spear (Mob)|Hunting Spear]]. A 1.5 sec cast pins a non-tank player, or the tank if nobody else remains. The root lasts up to 10 sec and deals 15 damage every 1 sec. Target the spear and interact within 4 yd to pull it out in 1.5 sec. Damage does not interrupt the pull. If nobody else stands free on the terrace, the victim can interact to escape in 3 sec. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/wildheart_high_priest__wildheart_pulse.webp&quot; size=&quot;attack&quot; /&gt; [[Wildheart (Ability)|Wildheart]] Pulse. Every 12 sec, a 1.5 sec cast hits everyone within 14 yd for 170 to 243 damage. Pinned players take 1.5 times this damage at any distance. Everyone but the tank leaves the ring before the cast ends. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/wildheart_high_priest__hunting_spear.webp&quot; size=&quot;attack&quot; /&gt; [[Hunting Spear (Mob)|Hunting Spear]]. A 1.5 sec cast pins a non-tank player, or the tank if nobody else remains. The root lasts up to 10 sec and deals 15 damage every 1 sec. Target the spear and interact within 4 yd to pull it out in 1.5 sec. Damage does not interrupt the pull. If nobody else stands free on the terrace, the victim can interact to escape in 3 sec. (important)
 * Jaguar Roar. Each melee hit has a 22% chance to knock the player he hits back 7 yd. The tank keeps open ground behind them.
 
 === Spirit of the Hunt ===
@@ -136610,14 +136624,14 @@ He fights in melee and pulses a ring around himself.
 At 70% and 40% health he becomes a jaguar spirit for 20 sec and chases a marked player.
 
 * Spirit of the Hunt. At 70% and 40% health: a 1.5 sec cast, then for 20 sec he hunts one marked player (the Prey, never the tank while others stand). He runs 10% faster than a player, ignores taunts and does not attack. If he catches the Prey: 500 damage and a 2 sec stun, then he picks new prey. A mauled player is safe for 5 sec. Prey: run through lit sun glyphs to slow him. Everyone else slows, roots and stuns him while he hunts. (deadly, important)
-* Sun Glyphs. The 6 glyphs start dark. While he hunts, an unmarked player lights one by standing on it for 2 sec. If no unmarked player remains, Prey can light it in 1 sec. Moving off resets progress. Crossing a lit glyph slows him by 60% and increases damage taken by 25% for 3 sec. The glyph cannot be relit for 8 sec; he cannot be struck by another glyph for 5 sec. During the hunt, stuns last half as long. Unmarked players light glyphs ahead of the Prey. Lead him through them, then attack during Sunstruck. Glyphs go dark when the hunt ends. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/wildheart_high_priest__sun_glyphs.webp&quot; size=&quot;attack&quot; /&gt; Sun Glyphs. The 6 glyphs start dark. While he hunts, an unmarked player lights one by standing on it for 2 sec. If no unmarked player remains, Prey can light it in 1 sec. Moving off resets progress. Crossing a lit glyph slows him by 60% and increases damage taken by 25% for 3 sec. The glyph cannot be relit for 8 sec; he cannot be struck by another glyph for 5 sec. During the hunt, stuns last half as long. Unmarked players light glyphs ahead of the Prey. Lead him through them, then attack during Sunstruck. Glyphs go dark when the hunt ends. (important)
 
 === The Idol Wakes ===
 
 At 30% health, he stays a jaguar spirit until defeated. The tank can also become Prey.
 
-* The Idol Wakes. He picks new Prey every 8 sec, then turns toward them for 1.5 sec before chasing. Prey: run through lit sun glyphs to slow him. Everyone else slows, roots and stuns him while he hunts. (important)
-* Idol&apos;s Breath. Every 10 sec, one half of the terrace is marked for 5 sec, then everyone in that half takes 300 to 360 Nature damage. Breaths alternate halves. Cross to the unmarked half before the warning ends. The centre line is safe. On Heroic, the breath also extinguishes lit glyphs in its half; they can be relit immediately. (deadly)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/wildheart_high_priest__the_idol_wakes.webp&quot; size=&quot;attack&quot; /&gt; The Idol Wakes. He picks new Prey every 8 sec, then turns toward them for 1.5 sec before chasing. Prey: run through lit sun glyphs to slow him. Everyone else slows, roots and stuns him while he hunts. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/wildheart_high_priest__idols_breath.webp&quot; size=&quot;attack&quot; /&gt; Idol&apos;s Breath. Every 10 sec, one half of the terrace is marked for 5 sec, then everyone in that half takes 300 to 360 Nature damage. Breaths alternate halves. Cross to the unmarked half before the warning ends. The centre line is safe. On Heroic, the breath also extinguishes lit glyphs in its half; they can be relit immediately. (deadly)
 
 * tank: Keep open ground behind you for Jaguar Roar. When the hunt ends he comes back to you: be ready to take him.
 * healer: [[Wildheart (Ability)|Wildheart]] Pulse hits anyone left in the ring. A Maul is a big single hit: top up the Prey.
@@ -136630,8 +136644,8 @@ The high [[Priest|priest]] of the basin. A steady fight with a telegraphed ring,
 
 He fights in melee and pulses a ring around himself.
 
-* [[Wildheart (Ability)|Wildheart]] Pulse. Every 12 sec, a 1.5 sec cast hits everyone within 14 yd for 425 to 608 damage. Pinned players take 1.5 times this damage at any distance. Everyone but the tank leaves the ring before the cast ends. (important)
-* [[Hunting Spear (Mob)|Hunting Spear]]. A 1.5 sec cast pins a non-tank player, or the tank if nobody else remains. The root lasts up to 10 sec and deals 38 damage every 1 sec. Target the spear and interact within 4 yd to pull it out in 1.5 sec. Damage does not interrupt the pull. If nobody else stands free on the terrace, the victim can interact to escape in 3 sec. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/wildheart_high_priest__wildheart_pulse.webp&quot; size=&quot;attack&quot; /&gt; [[Wildheart (Ability)|Wildheart]] Pulse. Every 12 sec, a 1.5 sec cast hits everyone within 14 yd for 425 to 608 damage. Pinned players take 1.5 times this damage at any distance. Everyone but the tank leaves the ring before the cast ends. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/wildheart_high_priest__hunting_spear.webp&quot; size=&quot;attack&quot; /&gt; [[Hunting Spear (Mob)|Hunting Spear]]. A 1.5 sec cast pins a non-tank player, or the tank if nobody else remains. The root lasts up to 10 sec and deals 38 damage every 1 sec. Target the spear and interact within 4 yd to pull it out in 1.5 sec. Damage does not interrupt the pull. If nobody else stands free on the terrace, the victim can interact to escape in 3 sec. (important)
 * Jaguar Roar. Each melee hit has a 22% chance to knock the player he hits back 7 yd. The tank keeps open ground behind them.
 
 === Spirit of the Hunt ===
@@ -136639,15 +136653,15 @@ He fights in melee and pulses a ring around himself.
 At 70% and 40% health he becomes a jaguar spirit for 20 sec and chases a marked player.
 
 * Spirit of the Hunt. At 70% and 40% health: a 1.5 sec cast, then for 20 sec he hunts the Prey. Twin Prey: two players are marked and he switches between them every 6 sec. He runs 10% faster than a player, ignores taunts and does not attack. If he catches a Prey: 1250 damage and a 2 sec stun. Prey: run through lit sun glyphs to slow him. Everyone else slows, roots and stuns him while he hunts. (deadly, important)
-* Sun Glyphs. The 6 glyphs start dark. While he hunts, an unmarked player lights one by standing on it for 2 sec. If no unmarked player remains, Prey can light it in 1 sec. Moving off resets progress. Crossing a lit glyph slows him by 60% and increases damage taken by 25% for 3 sec. The glyph cannot be relit for 8 sec; he cannot be struck by another glyph for 5 sec. During the hunt, stuns last half as long. Unmarked players light glyphs ahead of the Prey. Lead him through them, then attack during Sunstruck. Glyphs go dark when the hunt ends. (important)
-* [[Hunter]]&apos;s Ambush. After each hunt he vanishes for 2 sec. A 6 yd circle marks the farthest player, giving a 1.5 sec warning, then he lands there: 625 to 750 damage to everyone inside. Get out of the circle. (deadly)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/wildheart_high_priest__sun_glyphs.webp&quot; size=&quot;attack&quot; /&gt; Sun Glyphs. The 6 glyphs start dark. While he hunts, an unmarked player lights one by standing on it for 2 sec. If no unmarked player remains, Prey can light it in 1 sec. Moving off resets progress. Crossing a lit glyph slows him by 60% and increases damage taken by 25% for 3 sec. The glyph cannot be relit for 8 sec; he cannot be struck by another glyph for 5 sec. During the hunt, stuns last half as long. Unmarked players light glyphs ahead of the Prey. Lead him through them, then attack during Sunstruck. Glyphs go dark when the hunt ends. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/wildheart_high_priest__hunters_ambush.webp&quot; size=&quot;attack&quot; /&gt; [[Hunter]]&apos;s Ambush. After each hunt he vanishes for 2 sec. A 6 yd circle marks the farthest player, giving a 1.5 sec warning, then he lands there: 625 to 750 damage to everyone inside. Get out of the circle. (deadly)
 
 === The Idol Wakes ===
 
 At 30% health, he stays a jaguar spirit until defeated. The tank can also become Prey.
 
-* The Idol Wakes. He marks a fresh pair every 12 sec and switches between them every 6 sec. Each switch gives the new Prey 1.5 sec before he chases. Prey: run through lit sun glyphs to slow him. Everyone else slows, roots and stuns him while he hunts. (important)
-* Idol&apos;s Breath. Every 10 sec, one half of the terrace is marked for 5 sec, then everyone in that half takes 750 to 900 Nature damage. Breaths alternate halves. Cross to the unmarked half before the warning ends. The centre line is safe. On Heroic, the breath also extinguishes lit glyphs in its half; they can be relit immediately. (deadly)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/wildheart_high_priest__the_idol_wakes.webp&quot; size=&quot;attack&quot; /&gt; The Idol Wakes. He marks a fresh pair every 12 sec and switches between them every 6 sec. Each switch gives the new Prey 1.5 sec before he chases. Prey: run through lit sun glyphs to slow him. Everyone else slows, roots and stuns him while he hunts. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/wildheart_high_priest__idols_breath.webp&quot; size=&quot;attack&quot; /&gt; Idol&apos;s Breath. Every 10 sec, one half of the terrace is marked for 5 sec, then everyone in that half takes 750 to 900 Nature damage. Breaths alternate halves. Cross to the unmarked half before the warning ends. The centre line is safe. On Heroic, the breath also extinguishes lit glyphs in its half; they can be relit immediately. (deadly)
 
 * tank: Keep open ground behind you for Jaguar Roar. When the hunt ends he comes back to you: be ready to take him.
 * healer: [[Wildheart (Ability)|Wildheart]] Pulse hits anyone left in the ring. A Maul is a big single hit: top up the Prey.
@@ -137678,7 +137692,7 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="9320">&lt;woc-art path=&quot;/ui/mobs/rimeweb.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="9654">&lt;woc-art path=&quot;/ui/mobs/rimeweb.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Lady of the Bonechill (Contract)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/crypt_lady_bonechill.webp&quot; size=&quot;model&quot; /&gt;
@@ -137752,9 +137766,9 @@ A ghost bride whose wail hurts everyone who is not sheltered by a grave lantern.
 
 Three grave lanterns stand around the ravine. Her path turns to slippery ice.
 
-* Bride&apos;s Lament. Every 22 sec, a 3 sec cast, then 60 to 75 damage to every player not sheltered by a lantern. Each hit adds a stack of Lingering Lament: 50% more Lament damage per stack, for 45 sec, up to 3 stacks. Stand in a lit lantern&apos;s light before the cast ends. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/rimeweb__brides_lament.webp&quot; size=&quot;attack&quot; /&gt; Bride&apos;s Lament. Every 22 sec, a 3 sec cast, then 60 to 75 damage to every player not sheltered by a lantern. Each hit adds a stack of Lingering Lament: 50% more Lament damage per stack, for 45 sec, up to 3 stacks. Stand in a lit lantern&apos;s light before the cast ends. (deadly, important)
 * Grave Lanterns. A lit lantern shelters up to 2 players within 4.5 yd from the Lament. A lantern that sheltered anyone goes dark for 28 sec, so it is still dark at the next Lament. Plan who uses which lantern, and rotate to a lit one for each Lament. (important)
-* Frozen Embrace. Every 30 sec she seizes a player who is not the tank, lifts them into the air and holds them. Deal 6% of her health within 9.5 sec to make her set them down gently. Otherwise she drops them: 150 to 180 damage. Everyone bursts her as soon as she grabs someone. Healers top up the held player. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/rimeweb__frozen_embrace.webp&quot; size=&quot;attack&quot; /&gt; Frozen Embrace. Every 30 sec she seizes a player who is not the tank, lifts them into the air and holds them. Deal 6% of her health within 9.5 sec to make her set them down gently. Otherwise she drops them: 150 to 180 damage. Everyone bursts her as soon as she grabs someone. Healers top up the held player. (deadly, important)
 * Rime Path. She leaves slippery ice where she drifts; each patch lasts 25 sec. On ice you slide and turn slowly. Avoid her trail when you need to move fast.
 
 === Bridal Freeze ===
@@ -137776,9 +137790,9 @@ A ghost bride whose wail hurts everyone who is not sheltered by a grave lantern.
 
 Three grave lanterns stand around the ravine. Her path turns to slippery ice.
 
-* Bride&apos;s Lament. Every 22 sec, a 3 sec cast, then 300 to 375 damage to every player not sheltered by a lantern. Each hit adds a stack of Lingering Lament: 50% more Lament damage per stack, for 45 sec, up to 3 stacks. Stand in a lit lantern&apos;s light before the cast ends. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/rimeweb__brides_lament.webp&quot; size=&quot;attack&quot; /&gt; Bride&apos;s Lament. Every 22 sec, a 3 sec cast, then 300 to 375 damage to every player not sheltered by a lantern. Each hit adds a stack of Lingering Lament: 50% more Lament damage per stack, for 45 sec, up to 3 stacks. Stand in a lit lantern&apos;s light before the cast ends. (deadly, important)
 * Grave Lanterns. A lit lantern shelters up to 2 players within 4.5 yd from the Lament. A lantern that sheltered anyone goes dark for 28 sec. On Heroic a lit lantern also burns out on its own after 30 sec and stays dark for 10 sec. Plan who uses which lantern, and rotate to a lit one for each Lament. (important)
-* Frozen Embrace. Every 30 sec she seizes 2 players who are not the tank, lifts them into the air and holds them. Deal 4.41% of her health within 9.5 sec to make her set them down gently. Otherwise she drops them: 750 to 900 damage. Everyone bursts her as soon as she grabs someone. Healers top up the held player. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/rimeweb__frozen_embrace.webp&quot; size=&quot;attack&quot; /&gt; Frozen Embrace. Every 30 sec she seizes 2 players who are not the tank, lifts them into the air and holds them. Deal 4.41% of her health within 9.5 sec to make her set them down gently. Otherwise she drops them: 750 to 900 damage. Everyone bursts her as soon as she grabs someone. Healers top up the held player. (deadly, important)
 * Rime Path. She leaves slippery ice where she drifts; each patch lasts 25 sec. On ice you slide and turn slowly. Avoid her trail when you need to move fast.
 
 === Bridal Freeze ===
@@ -137899,7 +137913,7 @@ The game rolls once for this group. At most &apos;&apos;&apos;one&apos;&apos;&ap
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="8645">&lt;woc-art path=&quot;/ui/mobs/cantor_ilvane.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="9007">&lt;woc-art path=&quot;/ui/mobs/cantor_ilvane.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Cantor Ilvane (Contract)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/crypt_skel_cantor.webp&quot; size=&quot;model&quot; /&gt;
@@ -137974,8 +137988,8 @@ A choir mistress guarded by two Hollow Choristers who shield her while they live
 She sings from the loft with two Hollow Choristers at her side.
 
 * Harmony. Each living Chorister cuts the damage she takes by 30%: 60% while both stand. Kill the Choristers first. (important)
-* Dirge of the Hollow. Every 16 sec, a 2.5 sec cast. If it finishes, everyone who can see her takes 105 to 125 damage and is silenced for 4 sec. After an interrupt she sings no Dirge for 3 sec. Interrupt it, or break line of sight behind a pillar before the cast ends. (interruptible, important)
-* Bone Organ. Every 26 sec she walks to the organ and plays 2 waves of note lanes down the loft. Each lane shows for 1.6 sec, then bursts: 100 to 115 damage. Stand between the first lanes, then step into a lane that has already burst. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/cantor_ilvane__dirge_of_the_hollow.webp&quot; size=&quot;attack&quot; /&gt; Dirge of the Hollow. Every 16 sec, a 2.5 sec cast. If it finishes, everyone who can see her takes 105 to 125 damage and is silenced for 4 sec. After an interrupt she sings no Dirge for 3 sec. Interrupt it, or break line of sight behind a pillar before the cast ends. (interruptible, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/cantor_ilvane__bone_organ.webp&quot; size=&quot;attack&quot; /&gt; Bone Organ. Every 26 sec she walks to the organ and plays 2 waves of note lanes down the loft. Each lane shows for 1.6 sec, then bursts: 100 to 115 damage. Stand between the first lanes, then step into a lane that has already burst. (deadly, important)
 
 === Crescendo ===
 
@@ -137997,8 +138011,8 @@ A choir mistress guarded by two Hollow Choristers who shield her while they live
 She sings from the loft with two Hollow Choristers at her side.
 
 * Harmony. Each living Chorister cuts the damage she takes by 30%: 60% while both stand. Kill the Choristers first. (important)
-* Dirge of the Hollow. Every 16 sec, a 2.5 sec cast. If it finishes, everyone who can see her takes 840 to 1000 damage and is silenced for 4 sec. After an interrupt she sings no Dirge for 3 sec. Interrupt it, or break line of sight behind a pillar before the cast ends. (interruptible, important)
-* Bone Organ. Every 26 sec she walks to the organ and plays 2 waves of note lanes down the loft. Each lane shows for 1.6 sec, then bursts: 800 to 920 damage. Stand between the first lanes, then step into a lane that has already burst. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/cantor_ilvane__dirge_of_the_hollow.webp&quot; size=&quot;attack&quot; /&gt; Dirge of the Hollow. Every 16 sec, a 2.5 sec cast. If it finishes, everyone who can see her takes 840 to 1000 damage and is silenced for 4 sec. After an interrupt she sings no Dirge for 3 sec. Interrupt it, or break line of sight behind a pillar before the cast ends. (interruptible, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/cantor_ilvane__bone_organ.webp&quot; size=&quot;attack&quot; /&gt; Bone Organ. Every 26 sec she walks to the organ and plays 2 waves of note lanes down the loft. Each lane shows for 1.6 sec, then bursts: 800 to 920 damage. Stand between the first lanes, then step into a lane that has already burst. (deadly, important)
 * Encore. A Chorister that stays dead 10 sec while its partner still stands rises again at full health. Kill both Choristers within 10 sec of each other. (important)
 * Unbroken Verse. Every 3 Dirge is an Unbroken Verse: it cannot be interrupted. Hide behind a pillar for it. (deadly)
 
@@ -138118,7 +138132,7 @@ The game rolls once for this group. At most &apos;&apos;&apos;one&apos;&apos;&ap
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="6041">&lt;woc-art path=&quot;/ui/mobs/crypt_knellwyrm.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="6861">&lt;woc-art path=&quot;/ui/mobs/crypt_knellwyrm.webp&quot; /&gt;
 &lt;woc-art path=&quot;/encyclopedia-stills/mob_crypt_knellwyrm.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Knellwyrm is one of the Undead.
@@ -138177,7 +138191,7 @@ For creatures in the outside world, these numbers already include level scaling.
 |}
 
 == Mechanics ==
-* Barrowflame Breath. Breathes in a cone in front of it, damaging targets there. cast time 2 sec, between uses 13 sec, range 14 yd, arc deg 70, minimum damage 30, maximum damage 38, school fire.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/crypt_knellwyrm__barrowflame_breath.webp&quot; size=&quot;attack&quot; /&gt; Barrowflame Breath. Breathes in a cone in front of it, damaging targets there. cast time 2 sec, between uses 13 sec, range 14 yd, arc deg 70, minimum damage 30, maximum damage 38, school fire.
 * Special attacks. This fight uses these special attacks. tail lash cast time 1 sec, between uses 10 sec, first 7, school physical, range 10 yd, arc deg 120, minimum damage 20, maximum damage 28, wing gust cast time 1.5 sec, between uses 19 sec, first 11, school physical, radius 10 yd, knockback 8, minimum damage 12, maximum damage 18.
 * Immune to crowd control.
 * Immune to movement slows.
@@ -138189,11 +138203,11 @@ Morthen&apos;s dying rite lights a pyre, and a bone wyrm lands in it. It fights 
 
 It glides in out of reach and lands in the ring with a burst of fire.
 
-* Pyre Strafe. Every 26 sec it marks a 6 yd lane through a player for 2.5 sec, then flies it pouring fire: 35 to 45 damage to everyone in it. The lane keeps burning for 10 sec: 14 damage per second. Step sideways out of the marked lane and stay off the burning ground. (deadly, important)
-* Dread Bellow. Every 30 sec, a 2 sec cast, then 12 to 18 damage and a 10 yd knockback within 14 yd. Afterwards it takes 25% more damage for 8 sec. Do not get knocked into a burning lane. Spend cooldowns in the window after. (important)
-* Barrowflame Breath. Every 13 sec, a 2 sec cast, then fire in a 70 degree cone, 14 yd in front of it: 30 to 38 damage. Its facing locks for the cast. Only the tank stands in front. Everyone else stays at its sides. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/crypt_knellwyrm__pyre_strafe.webp&quot; size=&quot;attack&quot; /&gt; Pyre Strafe. Every 26 sec it marks a 6 yd lane through a player for 2.5 sec, then flies it pouring fire: 35 to 45 damage to everyone in it. The lane keeps burning for 10 sec: 14 damage per second. Step sideways out of the marked lane and stay off the burning ground. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/crypt_knellwyrm__dread_bellow.webp&quot; size=&quot;attack&quot; /&gt; Dread Bellow. Every 30 sec, a 2 sec cast, then 12 to 18 damage and a 10 yd knockback within 14 yd. Afterwards it takes 25% more damage for 8 sec. Do not get knocked into a burning lane. Spend cooldowns in the window after. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/crypt_knellwyrm__barrowflame_breath.webp&quot; size=&quot;attack&quot; /&gt; Barrowflame Breath. Every 13 sec, a 2 sec cast, then fire in a 70 degree cone, 14 yd in front of it: 30 to 38 damage. Its facing locks for the cast. Only the tank stands in front. Everyone else stays at its sides. (important)
 * Tail Lash. Every 10 sec when someone stands behind it: a 1 sec cast, then a 120 degree sweep 10 yd behind it for 20 to 28 damage. Never stand behind it.
-* Wing Gust. Every 19 sec when someone is close: a 1.5 sec cast, then everyone within 10 yd takes 12 to 18 damage and is knocked back 8 yd. Expect the knockback; keep your back away from edges.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/crypt_knellwyrm__wing_gust.webp&quot; size=&quot;attack&quot; /&gt; Wing Gust. Every 19 sec when someone is close: a 1.5 sec cast, then everyone within 10 yd takes 12 to 18 damage and is knocked back 8 yd. Expect the knockback; keep your back away from edges.
 
 * tank: Keep it facing away from the group, and turn it out of burning lanes.
 * healer: Pyre Strafe and Dread Bellow are the spikes; heal anyone knocked into a burning lane.
@@ -138206,11 +138220,11 @@ Morthen&apos;s dying rite lights a pyre, and a bone wyrm lands in it. It fights 
 
 It glides in out of reach and lands in the ring with a burst of fire.
 
-* Pyre Strafe. Every 26 sec it marks a 6 yd lane through a player for 2.5 sec, then flies it pouring fire: 700 to 900 damage to everyone in it. The lane keeps burning for 10 sec: 280 damage per second. Step sideways out of the marked lane and stay off the burning ground. (deadly, important)
-* Dread Bellow. Every 30 sec, a 2 sec cast, then 240 to 360 damage and a 10 yd knockback within 14 yd. Afterwards it takes 25% more damage for 8 sec. Do not get knocked into a burning lane. Spend cooldowns in the window after. (important)
-* Barrowflame Breath. Every 13 sec, a 2 sec cast, then fire in a 70 degree cone, 14 yd in front of it: 600 to 760 damage. Its facing locks for the cast. Only the tank stands in front. Everyone else stays at its sides. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/crypt_knellwyrm__pyre_strafe.webp&quot; size=&quot;attack&quot; /&gt; Pyre Strafe. Every 26 sec it marks a 6 yd lane through a player for 2.5 sec, then flies it pouring fire: 700 to 900 damage to everyone in it. The lane keeps burning for 10 sec: 280 damage per second. Step sideways out of the marked lane and stay off the burning ground. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/crypt_knellwyrm__dread_bellow.webp&quot; size=&quot;attack&quot; /&gt; Dread Bellow. Every 30 sec, a 2 sec cast, then 240 to 360 damage and a 10 yd knockback within 14 yd. Afterwards it takes 25% more damage for 8 sec. Do not get knocked into a burning lane. Spend cooldowns in the window after. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/crypt_knellwyrm__barrowflame_breath.webp&quot; size=&quot;attack&quot; /&gt; Barrowflame Breath. Every 13 sec, a 2 sec cast, then fire in a 70 degree cone, 14 yd in front of it: 600 to 760 damage. Its facing locks for the cast. Only the tank stands in front. Everyone else stays at its sides. (important)
 * Tail Lash. Every 10 sec when someone stands behind it: a 1 sec cast, then a 120 degree sweep 10 yd behind it for 400 to 560 damage. Never stand behind it.
-* Wing Gust. Every 19 sec when someone is close: a 1.5 sec cast, then everyone within 10 yd takes 240 to 360 damage and is knocked back 8 yd. Expect the knockback; keep your back away from edges.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/crypt_knellwyrm__wing_gust.webp&quot; size=&quot;attack&quot; /&gt; Wing Gust. Every 19 sec when someone is close: a 1.5 sec cast, then everyone within 10 yd takes 240 to 360 damage and is knocked back 8 yd. Expect the knockback; keep your back away from edges.
 * Burning Knell. Every 55 sec it flies up out of reach and breathes fire over half the ring 3 times. Each half is marked 4.5 sec before the fire: 1000 to 1120 damage to everyone in it. Run to the unmarked half of the ring every time. (deadly, important)
 
 * tank: Keep it facing away from the group, and turn it out of burning lanes.
@@ -139084,7 +139098,7 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4720">&lt;woc-art path=&quot;/ui/mobs/crypt_ossuary_drake.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="5202">&lt;woc-art path=&quot;/ui/mobs/crypt_ossuary_drake.webp&quot; /&gt;
 &lt;woc-art path=&quot;/encyclopedia-stills/mob_crypt_drake.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Ossuary Drake is one of the Undead.
@@ -139146,7 +139160,7 @@ For creatures in the outside world, these numbers already include level scaling.
 * [[The Hollow Crypt]].
 
 == Mechanics ==
-* Barrowflame Breath. Breathes in a cone in front of it, damaging targets there. cast time 2 sec, between uses 12 sec, range 14 yd, arc deg 70, minimum damage 26, maximum damage 34, school fire.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/crypt_ossuary_drake__barrowflame_breath.webp&quot; size=&quot;attack&quot; /&gt; Barrowflame Breath. Breathes in a cone in front of it, damaging targets there. cast time 2 sec, between uses 12 sec, range 14 yd, arc deg 70, minimum damage 26, maximum damage 34, school fire.
 * Special attacks. This fight uses these special attacks. land duration 2.2 sec, scorch duration 5 sec, tick 1, minimum damage 6, maximum damage 9, school fire, tail lash cast time 1 sec, between uses 9 sec, first 6, school physical, range 10 yd, arc deg 120, minimum damage 18, maximum damage 26, wing gust cast time 1.5 sec, between uses 16 sec, first 10, school physical, radius 10 yd, knockback 8, minimum damage 10, maximum damage 16.
 
 == Normal encounter ==
@@ -139156,9 +139170,9 @@ A skeletal drake flies a loop high over the Processional. Walk under it and it l
 
 It lands where it is pulled and fights on the ground.
 
-* Barrowflame Breath. Every 12 sec, a 2 sec cast, then fire in a 70 degree cone, 14 yd in front of it: 26 to 34 damage. Its facing locks for the cast. Only the tank stands in front. Everyone else stays at its sides. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/crypt_ossuary_drake__barrowflame_breath.webp&quot; size=&quot;attack&quot; /&gt; Barrowflame Breath. Every 12 sec, a 2 sec cast, then fire in a 70 degree cone, 14 yd in front of it: 26 to 34 damage. Its facing locks for the cast. Only the tank stands in front. Everyone else stays at its sides. (important)
 * Tail Lash. Every 9 sec when someone stands behind it: a 1 sec cast, then a 120 degree sweep 10 yd behind it for 18 to 26 damage. Never stand behind it.
-* Wing Gust. Every 16 sec when someone is close: a 1.5 sec cast, then everyone within 10 yd takes 10 to 16 damage and is knocked back 8 yd. Expect the knockback; keep your back away from edges.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/crypt_ossuary_drake__wing_gust.webp&quot; size=&quot;attack&quot; /&gt; Wing Gust. Every 16 sec when someone is close: a 1.5 sec cast, then everyone within 10 yd takes 10 to 16 damage and is knocked back 8 yd. Expect the knockback; keep your back away from edges.
 
 * tank: Turn it so the breath points away from the group, and move it off any burning ground on Heroic.
 * healer: The breath and the wing gust are the damage spikes. Stand at its side.
@@ -139171,9 +139185,9 @@ A skeletal drake flies a loop high over the Processional. Walk under it and it l
 
 It lands where it is pulled and fights on the ground.
 
-* Barrowflame Breath. Every 12 sec, a 2 sec cast, then fire in a 70 degree cone, 14 yd in front of it: 520 to 680 damage. Its facing locks for the cast. Only the tank stands in front. Everyone else stays at its sides. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/crypt_ossuary_drake__barrowflame_breath.webp&quot; size=&quot;attack&quot; /&gt; Barrowflame Breath. Every 12 sec, a 2 sec cast, then fire in a 70 degree cone, 14 yd in front of it: 520 to 680 damage. Its facing locks for the cast. Only the tank stands in front. Everyone else stays at its sides. (important)
 * Tail Lash. Every 9 sec when someone stands behind it: a 1 sec cast, then a 120 degree sweep 10 yd behind it for 360 to 520 damage. Never stand behind it.
-* Wing Gust. Every 16 sec when someone is close: a 1.5 sec cast, then everyone within 10 yd takes 200 to 320 damage and is knocked back 8 yd. Expect the knockback; keep your back away from edges.
+* &lt;woc-art path=&quot;/encyclopedia-attacks/crypt_ossuary_drake__wing_gust.webp&quot; size=&quot;attack&quot; /&gt; Wing Gust. Every 16 sec when someone is close: a 1.5 sec cast, then everyone within 10 yd takes 200 to 320 damage and is knocked back 8 yd. Expect the knockback; keep your back away from edges.
 * Barrow Embers. The ground under each breath keeps burning for 5 sec: 120 to 180 damage per second to anyone on it. Move the drake off the burning ground and step out of it.
 
 * tank: Turn it so the breath points away from the group, and move it off any burning ground on Heroic.
@@ -139961,7 +139975,7 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="7069">&lt;woc-art path=&quot;/ui/mobs/gaol_turnkey.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="7237">&lt;woc-art path=&quot;/ui/mobs/gaol_turnkey.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Gaol Turnkey (Contract)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/bastion_turnkey.webp&quot; size=&quot;model&quot; /&gt;
@@ -140036,7 +140050,7 @@ The gaol keeper locks players in Iron Cages. The prisoner breaks out by pressing
 
 He cages players on a steady timer and frees the prisoners at half health.
 
-* [[Iron Cage (Mob)|Iron Cage]]. Every 24 sec, a 1.6 sec cast, then a cage drops on a player who is not the tank, stunning them. The cage has 16 points: each press of the interact key by the prisoner breaks 1, each hit from an ally breaks 2, and it slowly mends. After 10 sec the cage crushes the prisoner for 30% of their maximum health. Caged: press the interact key fast. Everyone else hits the cage to break it. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/gaol_turnkey__iron_cage.webp&quot; size=&quot;attack&quot; /&gt; [[Iron Cage (Mob)|Iron Cage]]. Every 24 sec, a 1.6 sec cast, then a cage drops on a player who is not the tank, stunning them. The cage has 16 points: each press of the interact key by the prisoner breaks 1, each hit from an ally breaks 2, and it slowly mends. After 10 sec the cage crushes the prisoner for 30% of their maximum health. Caged: press the interact key fast. Everyone else hits the cage to break it. (deadly, important)
 * Open the Cells. At 50% health he lets 2 Shackled Prisoners out. At a quarter health their chains snap and they leave the fight. Bring them to a quarter health; you do not need to kill them.
 
 * tank: Hold him and the prisoners; the cages never target you.
@@ -140050,7 +140064,7 @@ The gaol keeper locks players in Iron Cages. The prisoner breaks out by pressing
 
 He cages players on a steady timer and frees the prisoners at half health.
 
-* [[Iron Cage (Mob)|Iron Cage]]. Every 24 sec, a 1.6 sec cast, then cages drop on 2 players who are not the tank. Each cage has 20 points: each press of the interact key by the prisoner breaks 1, each hit from an ally breaks 2. Inside, rising brine drains health every second. After 10 sec the cage crushes for 45% of maximum health. Caged: press the interact key fast. Everyone else hits the cage to break it. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/gaol_turnkey__iron_cage.webp&quot; size=&quot;attack&quot; /&gt; [[Iron Cage (Mob)|Iron Cage]]. Every 24 sec, a 1.6 sec cast, then cages drop on 2 players who are not the tank. Each cage has 20 points: each press of the interact key by the prisoner breaks 1, each hit from an ally breaks 2. Inside, rising brine drains health every second. After 10 sec the cage crushes for 45% of maximum health. Caged: press the interact key fast. Everyone else hits the cage to break it. (deadly, important)
 * Open the Cells. At 50% health he lets 2 Shackled Prisoners out. At a quarter health their chains snap and they leave the fight. Bring them to a quarter health; you do not need to kill them.
 
 * tank: Hold him and the prisoners; the cages never target you.
@@ -140317,7 +140331,7 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4712">&lt;woc-art path=&quot;/ui/mobs/turretback_hermit.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4898">&lt;woc-art path=&quot;/ui/mobs/turretback_hermit.webp&quot; /&gt;
 &lt;woc-art path=&quot;/encyclopedia-stills/mob_turretback.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Shipwreck Captain is one of the Undead.
@@ -140391,7 +140405,7 @@ A hovering ghost captain patrols the Lower Bailey moat, and the drawbridge stays
 His first move comes 3 sec after the pull, then Spectral Broadside, Cursed Anchor and Phantom Boarding in turn, 3.5 sec apart. He stands still during each move.
 
 * Spectral Broadside. After a 2.4 sec warning, 5 parallel lanes 28 yd long fire at once: 90 to 110 damage to anyone in a lane. Stand in a gap between the lanes. (deadly, important)
-* Cursed Anchor. After a 2 sec warning, a cursed anchor is hauled 24 yd back along its lane over 2 sec, hitting everyone it passes: 50 to 60 damage. Leave the lane before it fires. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/turretback_hermit__cursed_anchor.webp&quot; size=&quot;attack&quot; /&gt; Cursed Anchor. After a 2 sec warning, a cursed anchor is hauled 24 yd back along its lane over 2 sec, hitting everyone it passes: 50 to 60 damage. Leave the lane before it fires. (important)
 * Phantom Boarding. After a 2 sec warning, everyone in an 18 yd lane takes 50 to 60 damage and he dashes along it. Step aside from the lane. (important)
 * Wreckbound Sailors. At 60% and 30% health, 2 Wreckbound Sailors join the fight. A sailor bursts with soul energy shortly after it dies. The tank picks them up. Step away from a sailor that just died.
 
@@ -140407,7 +140421,7 @@ A hovering ghost captain patrols the Lower Bailey moat, and the drawbridge stays
 His first move comes 3 sec after the pull, then Spectral Broadside, Cursed Anchor and Phantom Boarding in turn, 3.5 sec apart. He stands still during each move.
 
 * Spectral Broadside. After a 2.4 sec warning, 5 parallel lanes 28 yd long fire at once: 720 to 880 damage to anyone in a lane. Stand in a gap between the lanes. (deadly, important)
-* Cursed Anchor. After a 2 sec warning, a cursed anchor is hauled 24 yd back along its lane over 2 sec, hitting everyone it passes: 400 to 480 damage. Leave the lane before it fires. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/turretback_hermit__cursed_anchor.webp&quot; size=&quot;attack&quot; /&gt; Cursed Anchor. After a 2 sec warning, a cursed anchor is hauled 24 yd back along its lane over 2 sec, hitting everyone it passes: 400 to 480 damage. Leave the lane before it fires. (important)
 * Phantom Boarding. After a 2 sec warning, everyone in an 18 yd lane takes 400 to 480 damage and he dashes along it. Step aside from the lane. (important)
 * Wreckbound Sailors. At 60% and 30% health, 2 Wreckbound Sailors join the fight. A sailor bursts with soul energy shortly after it dies. The tank picks them up. Step away from a sailor that just died.
 
@@ -140531,7 +140545,7 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="8386">&lt;woc-art path=&quot;/ui/mobs/gaoler_ossick.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="8566">&lt;woc-art path=&quot;/ui/mobs/gaoler_ossick.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Gaoler Ossick (Contract)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/bastion_ossick.webp&quot; size=&quot;model&quot; /&gt;
@@ -140605,7 +140619,7 @@ The gaoler hooks a player with his anchor and reels them toward the drowning pit
 
 At 60% and 30% health, 3 Shackled Prisoners come out of the cells each time.
 
-* [[Drowned Anchor (Mob)|Drowned Anchor]]. Every 24 sec, a 1.8 sec cast, then a player who is not the tank is hooked. After 1.5 sec the chain reels them toward the pit. Escape: reach within 3 yd of a lit Mooring Post at least 6 yd from where you were hooked (that post goes dark for 30 sec), or the group lands 12 hits on the anchor. Reaching the pit: 60% of maximum health and a 3 sec stun. Hooked: run to a lit post early. Everyone else hits the anchor. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/gaoler_ossick__drowned_anchor.webp&quot; size=&quot;attack&quot; /&gt; [[Drowned Anchor (Mob)|Drowned Anchor]]. Every 24 sec, a 1.8 sec cast, then a player who is not the tank is hooked. After 1.5 sec the chain reels them toward the pit. Escape: reach within 3 yd of a lit Mooring Post at least 6 yd from where you were hooked (that post goes dark for 30 sec), or the group lands 12 hits on the anchor. Reaching the pit: 60% of maximum health and a 3 sec stun. Hooked: run to a lit post early. Everyone else hits the anchor. (deadly, important)
 * Shackle Pair. Every 28 sec, a 1.2 sec cast chains two players together for 12 sec. Every second they stand more than 8 yd apart, both take 40 to 50 damage. Chained: stay within 8 yd of your partner. (important)
 * Gaoler&apos;s Cudgel. Every 12 sec, a 1 sec cast at the tank: 1.5 times his melee hit, ignoring armor, and 30% slower movement for 6 sec. Tank: use a cooldown. Healers expect the hit. (important)
 
@@ -140622,7 +140636,7 @@ The gaoler hooks a player with his anchor and reels them toward the drowning pit
 
 At 60% and 30% health, 3 Shackled Prisoners come out of the cells each time.
 
-* [[Drowned Anchor (Mob)|Drowned Anchor]]. Every 24 sec, a 1.8 sec cast, then a player who is not the tank is hooked; the anchor&apos;s landing hits everyone else within 6 yd for 300 to 360. After 1.5 sec the chain reels them toward the pit. Escape: a lit Mooring Post at least 6 yd away, or 16 hits on the anchor. Reaching the pit: 80% of maximum health and a 3 sec stun. Hooked: run to a lit post early. Everyone else hits the anchor. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/gaoler_ossick__drowned_anchor.webp&quot; size=&quot;attack&quot; /&gt; [[Drowned Anchor (Mob)|Drowned Anchor]]. Every 24 sec, a 1.8 sec cast, then a player who is not the tank is hooked; the anchor&apos;s landing hits everyone else within 6 yd for 300 to 360. After 1.5 sec the chain reels them toward the pit. Escape: a lit Mooring Post at least 6 yd away, or 16 hits on the anchor. Reaching the pit: 80% of maximum health and a 3 sec stun. Hooked: run to a lit post early. Everyone else hits the anchor. (deadly, important)
 * Shackle Pair. Every 28 sec, a 1.2 sec cast chains two players together for 12 sec. Every second they stand more than 6 yd apart, both take 240 to 300 damage. Chained: stay within 6 yd of your partner. (important)
 * Gaoler&apos;s Cudgel. Every 12 sec, a 1 sec cast at the tank: 1.5 times his melee hit, ignoring armor, and 30% slower movement for 6 sec. Tank: use a cooldown. Healers expect the hit. (important)
 
@@ -141307,7 +141321,7 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="9808">&lt;woc-art path=&quot;/ui/mobs/mere_hydra_head_center.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="10592">&lt;woc-art path=&quot;/ui/mobs/mere_hydra_head_center.webp&quot; /&gt;
 :&apos;&apos;Other pages have this name. See [[Mere Hydra|all pages named Mere Hydra]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/temple_hydra_head.webp&quot; size=&quot;model&quot; /&gt;
@@ -141383,7 +141397,7 @@ The left head breathes ice, the centre spits venom, the right sends water.
 
 * Three Heads. A dead head passes its element to the next head, and every living head deals 15% more damage per dead head. A dead head grows back after 20 sec at 50% health while another head lives. Bring all three heads down together and finish them within 20 sec. (important)
 * Freezing Breath. Every 12 sec, a 2 sec cast at a player who is not the tank, then a 60 degree ice cone 18 yd long: 110 to 130 damage and 70% slower for 4 sec. Step out of the cone. (important)
-* Venom Spit. Every 10 sec, up to 3 pools of 4 yd under different players burst after 1.5 sec: 60 to 75 damage, then venom burns there for 6 sec at 20 per second. Spread out, then step out of the pools. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/mere_hydra_head_center__venom_spit.webp&quot; size=&quot;attack&quot; /&gt; Venom Spit. Every 10 sec, up to 3 pools of 4 yd under different players burst after 1.5 sec: 60 to 75 damage, then venom burns there for 6 sec at 20 per second. Spread out, then step out of the pools. (important)
 * Crushing Torrent. Every 12 sec, a 2 sec cast aims a 26 yd lane at a player who is not the tank: 90 to 110 damage and an 8 yd shove. Step sideways out of the lane. (important)
 * Tsunami. First at 24 sec, then 40 sec after the previous wave ends: a 4.5 sec cast while the heads take 75% less damage, then a wave crashes over half the pool: 160 to 190 damage and a 10 yd shove. Move to the other half, behind a rim column, or behind an Ice Wall. Do not burn the heads while they are submerged. (deadly, important)
 
@@ -141391,9 +141405,9 @@ The left head breathes ice, the centre spits venom, the right sends water.
 
 24 sec after each wave two heads combine, always in the order Frostlocked Torrent, Venom Current, Toxic Rime.
 
-* Frostlocked Torrent. A lane at a player: 90 to 110 damage and a 2 sec freeze. It leaves an Ice Wall for 20 sec: standing up to 9 yd behind it shelters you from the next wave, which shatters it. Dodge the lane, then use the wall as cover from the Tsunami. (important)
-* Venom Current. Venom pools swell to 5.25 yd and slide 7 yd outward from the pool centre, burning 30 per second. Step aside from the slide path. (important)
-* Toxic Rime. Venom pools freeze into crystals that burst after 4 sec: 100 to 120 damage within 6 yd. Move away from every crystal before it bursts. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/mere_hydra_head_center__frostlocked_torrent.webp&quot; size=&quot;attack&quot; /&gt; Frostlocked Torrent. A lane at a player: 90 to 110 damage and a 2 sec freeze. It leaves an Ice Wall for 20 sec: standing up to 9 yd behind it shelters you from the next wave, which shatters it. Dodge the lane, then use the wall as cover from the Tsunami. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/mere_hydra_head_center__venom_current.webp&quot; size=&quot;attack&quot; /&gt; Venom Current. Venom pools swell to 5.25 yd and slide 7 yd outward from the pool centre, burning 30 per second. Step aside from the slide path. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/mere_hydra_head_center__toxic_rime.webp&quot; size=&quot;attack&quot; /&gt; Toxic Rime. Venom pools freeze into crystals that burst after 4 sec: 100 to 120 damage within 6 yd. Move away from every crystal before it bursts. (important)
 
 * tank: Hold the heads you can reach; their attacks aim at the others.
 * healer: Tsunami and the combined breaths are the spikes. Every dead head makes the others hit harder.
@@ -141410,7 +141424,7 @@ The left head breathes ice, the centre spits venom, the right sends water.
 
 * Three Heads. A dead head passes its element to the next head, and every living head deals 15% more damage per dead head. A dead head grows back after 20 sec at 25.84% health while another head lives. Bring all three heads down together and finish them within 20 sec. (important)
 * Freezing Breath. Every 12 sec, a 2 sec cast at a player who is not the tank, then a 60 degree ice cone 18 yd long: 660 to 780 damage and 70% slower for 4 sec. Step out of the cone. (important)
-* Venom Spit. Every 10 sec, up to 3 pools of 4 yd under different players burst after 1.5 sec: 360 to 450 damage, then venom burns there for 6 sec at 120 per second. Spread out, then step out of the pools. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/mere_hydra_head_center__venom_spit.webp&quot; size=&quot;attack&quot; /&gt; Venom Spit. Every 10 sec, up to 3 pools of 4 yd under different players burst after 1.5 sec: 360 to 450 damage, then venom burns there for 6 sec at 120 per second. Spread out, then step out of the pools. (important)
 * Crushing Torrent. Every 12 sec, a 2 sec cast aims a 26 yd lane at a player who is not the tank: 540 to 660 damage and an 8 yd shove. Step sideways out of the lane. (important)
 * Tsunami. First at 24 sec, then 40 sec after the previous wave ends: a 4.5 sec cast while the heads take 75% less damage, then a wave crashes over half the pool: 960 to 1140 damage and a shove. Backwash: 3.5 sec later it rolls over the other half. Move to the other half, behind a rim column, or behind an Ice Wall. Do not burn the heads while they are submerged. (deadly, important)
 
@@ -141418,9 +141432,9 @@ The left head breathes ice, the centre spits venom, the right sends water.
 
 10 sec and 24 sec after each wave two heads combine, in the order Frostlocked Torrent, Venom Current, Toxic Rime.
 
-* Frostlocked Torrent. A lane at a player: 540 to 660 damage and a 2 sec freeze. It leaves an Ice Wall: standing behind it shelters you from the next wave. When it shatters, anyone within 2.5 yd of the wall takes 360 to 450. Dodge the lane, then use the wall as cover from the Tsunami. (important)
-* Venom Current. Venom pools swell to 5.25 yd and slide 7 yd outward from the pool centre, burning 180 per second. Step aside from the slide path. (important)
-* Toxic Rime. Venom pools freeze into crystals that burst after 4 sec: 600 to 720 damage within 6 yd. Move away from every crystal before it bursts. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/mere_hydra_head_center__frostlocked_torrent.webp&quot; size=&quot;attack&quot; /&gt; Frostlocked Torrent. A lane at a player: 540 to 660 damage and a 2 sec freeze. It leaves an Ice Wall: standing behind it shelters you from the next wave. When it shatters, anyone within 2.5 yd of the wall takes 360 to 450. Dodge the lane, then use the wall as cover from the Tsunami. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/mere_hydra_head_center__venom_current.webp&quot; size=&quot;attack&quot; /&gt; Venom Current. Venom pools swell to 5.25 yd and slide 7 yd outward from the pool centre, burning 180 per second. Step aside from the slide path. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/mere_hydra_head_center__toxic_rime.webp&quot; size=&quot;attack&quot; /&gt; Toxic Rime. Venom pools freeze into crystals that burst after 4 sec: 600 to 720 damage within 6 yd. Move away from every crystal before it bursts. (important)
 
 * tank: Hold the heads you can reach; their attacks aim at the others.
 * healer: Tsunami and the combined breaths are the spikes. Every dead head makes the others hit harder.
@@ -141613,7 +141627,7 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="9166">&lt;woc-art path=&quot;/ui/mobs/tideglass_colossus.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="9556">&lt;woc-art path=&quot;/ui/mobs/tideglass_colossus.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Tideglass Colossus (Contract)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/temple_colossus.webp&quot; size=&quot;model&quot; /&gt;
@@ -141687,9 +141701,9 @@ A walking glass giant. At three health marks every player gets a mirror copy tha
 
 It plants its feet for every cast and never leaves the terrace.
 
-* Moonlight Lance. Every 12 sec, a 2 sec cast aims a 30 yd lane at a player who is not the tank: 90 to 110 damage. Step sideways out of the lane. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/tideglass_colossus__moonlight_lance.webp&quot; size=&quot;attack&quot; /&gt; Moonlight Lance. Every 12 sec, a 2 sec cast aims a 30 yd lane at a player who is not the tank: 90 to 110 damage. Step sideways out of the lane. (important)
 * Resonant Slam. Every 14 sec, a 1.5 sec cast, then 70 to 90 damage and an 8 yd knockback within 12 yd. Melee can step out; healers cover the tank.
-* Tideglass Fracture. First at 20 sec, then every 32 sec: the floor splits into 8 slices for 3 rounds. Each round some slices glow red and explode 2.5 sec later: 120 to 130 damage. The centre explodes every round. Move to a clear slice every round, and stay out of the centre. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/tideglass_colossus__tideglass_fracture.webp&quot; size=&quot;attack&quot; /&gt; Tideglass Fracture. First at 20 sec, then every 32 sec: the floor splits into 8 slices for 3 rounds. Each round some slices glow red and explode 2.5 sec later: 120 to 130 damage. The centre explodes every round. Move to a clear slice every round, and stay out of the centre. (deadly, important)
 
 === Prism Flare ===
 
@@ -141711,9 +141725,9 @@ A walking glass giant. At three health marks every player gets a mirror copy tha
 
 It plants its feet for every cast and never leaves the terrace.
 
-* Moonlight Lance. Every 12 sec, a 2 sec cast aims a 30 yd lane at a player who is not the tank: 450 to 550 damage. Step sideways out of the lane. (important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/tideglass_colossus__moonlight_lance.webp&quot; size=&quot;attack&quot; /&gt; Moonlight Lance. Every 12 sec, a 2 sec cast aims a 30 yd lane at a player who is not the tank: 450 to 550 damage. Step sideways out of the lane. (important)
 * Resonant Slam. Every 14 sec, a 1.5 sec cast, then 350 to 450 damage and an 8 yd knockback within 12 yd. Melee can step out; healers cover the tank.
-* Tideglass Fracture. First at 20 sec, then every 32 sec: the floor splits into 8 slices for 3 rounds. Each round some slices glow red and explode 2 sec later: 600 to 650 damage. The centre explodes every round. Move to a clear slice every round, and stay out of the centre. (deadly, important)
+* &lt;woc-art path=&quot;/encyclopedia-attacks/tideglass_colossus__tideglass_fracture.webp&quot; size=&quot;attack&quot; /&gt; Tideglass Fracture. First at 20 sec, then every 32 sec: the floor splits into 8 slices for 3 rounds. Each round some slices glow red and explode 2 sec later: 600 to 650 damage. The centre explodes every round. Move to a clear slice every round, and stay out of the centre. (deadly, important)
 
 === Prism Flare ===
 

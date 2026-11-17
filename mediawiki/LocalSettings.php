@@ -71,11 +71,12 @@ $wgHooks['BeforePageDisplay'][] = static function ( OutputPage $out, Skin $skin 
 $wgHooks['ParserFirstCallInit'][] = static function ( $parser ) use ( $wgScriptPath ) {
     $parser->setHook( 'woc-art', static function ( $input, $args ) use ( $wgScriptPath ) {
         $path = $args['path'] ?? '';
-        if ( !preg_match( '~^/(?:ui|map_bg|textures/loading|encyclopedia-stills)/[A-Za-z0-9_./-]+\.(?:webp|png|jpg)$~D', $path ) ) {
+        if ( !preg_match( '~^/(?:ui|map_bg|textures/loading|encyclopedia-stills|encyclopedia-attacks)/[A-Za-z0-9_./-]+\.(?:webp|png|jpg)$~D', $path ) ) {
             return '';
         }
         $size = $args['size'] ?? '';
-        $class = $size === 'icon' ? 'woc-inline-art' : ( $size === 'model' ? 'woc-model-art' : 'woc-page-art' );
+        $classes = [ 'icon' => 'woc-inline-art', 'model' => 'woc-model-art', 'attack' => 'woc-attack-art' ];
+        $class = $classes[ $size ] ?? 'woc-page-art';
         return '<img class="' . $class . '" alt="" src="' . htmlspecialchars( $wgScriptPath . '/resources/assets/game' . $path, ENT_QUOTES ) . '">';
     } );
     // Formulas: frac(top, bottom) is a stacked fraction and pow(base, exponent) a

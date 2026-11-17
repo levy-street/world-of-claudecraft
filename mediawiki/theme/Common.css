@@ -654,3 +654,17 @@ body {
   height: auto;
   margin: 0 0 12px 16px;
 }
+
+/* A boss attack's in-game snapshot. */
+.woc-attack-art {
+  float: left;
+  width: 192px;
+  height: auto;
+  margin: 0 14px 8px 0;
+  border: 1px solid #3a3f4b;
+  border-radius: 4px;
+}
+li:has(> .woc-attack-art) {
+  list-style: none;
+  overflow: hidden;
+}

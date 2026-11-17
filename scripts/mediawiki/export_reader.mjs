@@ -29,7 +29,7 @@ const paths = new Set([
   ),
   ...Array.from(
     body.matchAll(
-      /&lt;woc-art path=&quot;([^&]+)&quot;(?: size=&quot;(?:icon|model)&quot;)? \/&gt;/g,
+      /&lt;woc-art path=&quot;([^&]+)&quot;(?: size=&quot;(?:icon|model|attack)&quot;)? \/&gt;/g,
     ),
     (m) => m[1],
   ),

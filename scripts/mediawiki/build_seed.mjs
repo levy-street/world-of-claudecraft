@@ -37,6 +37,7 @@ import { addQuestDirectory } from '../../scripts/mediawiki/quest_directory';
 import { subjects } from '../../mediawiki/reader/browse';
 import { abilityIndexGroup } from '../../scripts/mediawiki/ability_access';
 import { articleArt, modelStills } from '../../scripts/mediawiki/article_art';
+import { attackShots, withAttackShots } from '../../scripts/mediawiki/attack_art';
 import { classAbilitySections } from '../../scripts/mediawiki/class_ability_sections';
 import { abilityArticle } from '../../scripts/mediawiki/ability_article';
 import { addTalentPages } from '../../scripts/mediawiki/talent_articles';
@@ -229,7 +230,10 @@ add('All Pages',[...letters].map(([letter,titles])=>section(letter,bullets(title
 
 const illustrations = articleArt(titleBy);
 const models = modelStills(titleBy);
+const attacks = attackShots(titleBy);
 for(const page of pages) {
+  const shots = attacks.get(page.title);
+  if(shots) page.text = withAttackShots(page.text, shots);
   // A large model render rides second, after the icon line the lists and tiles use.
   const model = models.get(page.title);
   if(model) page.text = '<woc-art path="' + model + '" size="model" />\\n' + page.text;

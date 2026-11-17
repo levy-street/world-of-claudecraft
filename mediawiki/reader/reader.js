@@ -63,6 +63,11 @@ function inline(s) {
   }
   const icon = s.match(/^<woc-art path="(\/ui\/[A-Za-z0-9_/-]+\.webp)" size="icon" \/>\s*/);
   if (icon) s = s.slice(icon[0].length);
+  // An in-game snapshot of a boss attack, set beside the attack's line.
+  const shot = s.match(
+    /^<woc-art path="(\/encyclopedia-attacks\/[\w.-]+\.webp)" size="attack" \/>\s*/,
+  );
+  if (shot) s = s.slice(shot[0].length);
   s = s
     .replace(
       /<woc-math(?: label="([^"]*)")?(?: note="([^"]*)")?>([\s\S]*?)<\/woc-math>/g,
@@ -78,6 +83,14 @@ function inline(s) {
     .replace(/&#39;&#39;&#39;(.*?)&#39;&#39;&#39;/g, '<strong>$1</strong>')
     .replace(/&#39;&#39;(.*?)&#39;&#39;/g, '<em>$1</em>')
     .replace(/\uE000(\d+)\uE001/g, (_, i) => tokens[Number(i)]);
+  if (shot)
+    return (
+      '<img class="attack-shot" data-game-art="' +
+      escapeHtml(shot[1]) +
+      '" alt="" width="192" height="146" loading="lazy" decoding="async"><span>' +
+      content +
+      '</span>'
+    );
   if (!icon) return content;
   return (
     '<img class="ability-icon" data-game-art="' +

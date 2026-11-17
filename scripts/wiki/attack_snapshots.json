@@ -1,0 +1,112 @@
+{
+  "balgath_cyclops": {
+    "Barrow Smash": "/encyclopedia-attacks/balgath_cyclops__barrow_smash.webp",
+    "Shockwave Stomp": "/encyclopedia-attacks/balgath_cyclops__shockwave_stomp.webp"
+  },
+  "cantor_ilvane": {
+    "Bone Organ": "/encyclopedia-attacks/cantor_ilvane__bone_organ.webp",
+    "Dirge of the Hollow": "/encyclopedia-attacks/cantor_ilvane__dirge_of_the_hollow.webp"
+  },
+  "choirmother_selthe": {
+    "Chorus": "/encyclopedia-attacks/choirmother_selthe__chorus.webp",
+    "Solo": "/encyclopedia-attacks/choirmother_selthe__solo.webp"
+  },
+  "crypt_knellwyrm": {
+    "Barrowflame Breath": "/encyclopedia-attacks/crypt_knellwyrm__barrowflame_breath.webp",
+    "Dread Bellow": "/encyclopedia-attacks/crypt_knellwyrm__dread_bellow.webp",
+    "Pyre Strafe": "/encyclopedia-attacks/crypt_knellwyrm__pyre_strafe.webp",
+    "Wing Gust": "/encyclopedia-attacks/crypt_knellwyrm__wing_gust.webp"
+  },
+  "crypt_ossuary_drake": {
+    "Barrowflame Breath": "/encyclopedia-attacks/crypt_ossuary_drake__barrowflame_breath.webp",
+    "Wing Gust": "/encyclopedia-attacks/crypt_ossuary_drake__wing_gust.webp"
+  },
+  "gaol_turnkey": {
+    "Iron Cage": "/encyclopedia-attacks/gaol_turnkey__iron_cage.webp"
+  },
+  "gaoler_ossick": {
+    "Drowned Anchor": "/encyclopedia-attacks/gaoler_ossick__drowned_anchor.webp"
+  },
+  "grand_necromancer_velkhar": {
+    "Shadow Volley": "/encyclopedia-attacks/grand_necromancer_velkhar__shadow_volley.webp",
+    "Soulfire Trench": "/encyclopedia-attacks/grand_necromancer_velkhar__soulfire_trench.webp"
+  },
+  "great_saurian": {
+    "Earthshaking Stomp": "/encyclopedia-attacks/great_saurian__earthshaking_stomp.webp"
+  },
+  "ignivar_herald_of_the_last_flame": {
+    "Forge Wave": "/encyclopedia-attacks/ignivar_herald_of_the_last_flame__forge_wave.webp",
+    "Rain of Cinders": "/encyclopedia-attacks/ignivar_herald_of_the_last_flame__rain_of_cinders.webp"
+  },
+  "knight_commander_olen": {
+    "Hallowed Brine": "/encyclopedia-attacks/knight_commander_olen__hallowed_brine.webp",
+    "Sentence of the Tide": "/encyclopedia-attacks/knight_commander_olen__sentence_of_the_tide.webp",
+    "Unbroken Oath": "/encyclopedia-attacks/knight_commander_olen__unbroken_oath.webp"
+  },
+  "korgath_the_bound": {
+    "Chain Flail": "/encyclopedia-attacks/korgath_the_bound__chain_flail.webp",
+    "Foreman's Bellow": "/encyclopedia-attacks/korgath_the_bound__foremans_bellow.webp",
+    "Maul Arc": "/encyclopedia-attacks/korgath_the_bound__maul_arc.webp",
+    "Shuddering Stomp": "/encyclopedia-attacks/korgath_the_bound__shuddering_stomp.webp",
+    "Strain": "/encyclopedia-attacks/korgath_the_bound__strain.webp",
+    "Threshold Charge": "/encyclopedia-attacks/korgath_the_bound__threshold_charge.webp"
+  },
+  "mere_hydra_head_center": {
+    "Frostlocked Torrent": "/encyclopedia-attacks/mere_hydra_head_center__frostlocked_torrent.webp",
+    "Toxic Rime": "/encyclopedia-attacks/mere_hydra_head_center__toxic_rime.webp",
+    "Venom Current": "/encyclopedia-attacks/mere_hydra_head_center__venom_current.webp",
+    "Venom Spit": "/encyclopedia-attacks/mere_hydra_head_center__venom_spit.webp"
+  },
+  "morthen": {
+    "Grasp of the Grave": "/encyclopedia-attacks/morthen__grasp_of_the_grave.webp",
+    "Gravecall": "/encyclopedia-attacks/morthen__gravecall.webp",
+    "Reap the Unquiet": "/encyclopedia-attacks/morthen__reap_the_unquiet.webp",
+    "Rite of the Unquiet": "/encyclopedia-attacks/morthen__rite_of_the_unquiet.webp",
+    "Shadow Pulse": "/encyclopedia-attacks/morthen__shadow_pulse.webp"
+  },
+  "rimeweb": {
+    "Bride's Lament": "/encyclopedia-attacks/rimeweb__brides_lament.webp",
+    "Frozen Embrace": "/encyclopedia-attacks/rimeweb__frozen_embrace.webp"
+  },
+  "sexton_marrow": {
+    "Burial Toll": "/encyclopedia-attacks/sexton_marrow__burial_toll.webp",
+    "Measured for the Grave": "/encyclopedia-attacks/sexton_marrow__measured_for_the_grave.webp",
+    "Shovelful": "/encyclopedia-attacks/sexton_marrow__shovelful.webp"
+  },
+  "the_gorgebloom": {
+    "Gorge": "/encyclopedia-attacks/the_gorgebloom__gorge.webp",
+    "Seed Rain": "/encyclopedia-attacks/the_gorgebloom__seed_rain.webp",
+    "Vine Lash": "/encyclopedia-attacks/the_gorgebloom__vine_lash.webp"
+  },
+  "tideglass_colossus": {
+    "Moonlight Lance": "/encyclopedia-attacks/tideglass_colossus__moonlight_lance.webp",
+    "Tideglass Fracture": "/encyclopedia-attacks/tideglass_colossus__tideglass_fracture.webp"
+  },
+  "turretback_hermit": {
+    "Cursed Anchor": "/encyclopedia-attacks/turretback_hermit__cursed_anchor.webp"
+  },
+  "vael_the_mistcaller": {
+    "Mist Surge": "/encyclopedia-attacks/vael_the_mistcaller__mist_surge.webp",
+    "Shadow Crossing": "/encyclopedia-attacks/vael_the_mistcaller__shadow_crossing.webp"
+  },
+  "varkhul_forgefather_of_the_last_flame": {
+    "Forgefather's Sweep": "/encyclopedia-attacks/varkhul_forgefather_of_the_last_flame__forgefathers_sweep.webp"
+  },
+  "wildheart_beastmaster": {
+    "Beast Pit Quake": "/encyclopedia-attacks/wildheart_beastmaster__beast_pit_quake.webp"
+  },
+  "wildheart_high_priest": {
+    "Hunter's Ambush": "/encyclopedia-attacks/wildheart_high_priest__hunters_ambush.webp",
+    "Hunting Spear": "/encyclopedia-attacks/wildheart_high_priest__hunting_spear.webp",
+    "Idol's Breath": "/encyclopedia-attacks/wildheart_high_priest__idols_breath.webp",
+    "Sun Glyphs": "/encyclopedia-attacks/wildheart_high_priest__sun_glyphs.webp",
+    "The Idol Wakes": "/encyclopedia-attacks/wildheart_high_priest__the_idol_wakes.webp",
+    "Wildheart Pulse": "/encyclopedia-attacks/wildheart_high_priest__wildheart_pulse.webp"
+  },
+  "ysolei": {
+    "Falling Moon": "/encyclopedia-attacks/ysolei__falling_moon.webp",
+    "Lunar Tide": "/encyclopedia-attacks/ysolei__lunar_tide.webp",
+    "Rising Tide": "/encyclopedia-attacks/ysolei__rising_tide.webp",
+    "Undertow": "/encyclopedia-attacks/ysolei__undertow.webp"
+  }
+}
