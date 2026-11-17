@@ -218,3 +218,36 @@ describe('layered gear pages', () => {
     expect(weapons).toContain('== By quality ==');
   });
 });
+
+describe('rift and hoard bosses', () => {
+  it('gives rift and hoard bosses their own lists, grouped by floor or hoard', () => {
+    const hub = pages.get('Mobs')!;
+    expect(hub).toContain('== Rift and hoard bosses ==');
+    const rift = pages.get('reserved/Rift bosses (Enemies index)')!;
+    const hoard = pages.get('reserved/Hoard bosses (Enemies index)')!;
+    expect(rift).toContain('== Frostbound ==');
+    expect(rift).toContain('== Infernal Citadel ==');
+    expect(rift).toContain('mob/rift_boss_pitlord');
+    expect(rift).toContain('mob/rift_boss_ritualist');
+    expect(hoard).toContain('== Cave hoards (common and rare maps) ==');
+    expect(hoard).toContain('== Valley hoards (epic and legendary maps) ==');
+    expect(hoard).toContain('mob/hoard_boss_mimic');
+  });
+  it('sorts the Bosses list by where each boss is fought', () => {
+    const bosses = pages.get('reserved/Bosses (Enemies index)')!;
+    const sections = [...bosses.matchAll(/^== (.+) ==$/gm)].map((m) => m[1]);
+    for (const name of [
+      'Dungeon bosses',
+      'Raid bosses',
+      'Rift bosses',
+      'Hoard bosses',
+      'World bosses',
+    ])
+      expect(sections, name).toContain(name);
+    expect(sections).not.toContain('Other bosses');
+    const section = (name: string) => bosses.split('== ' + name + ' ==')[1].split('\n== ')[0];
+    expect(section('Rift bosses')).toContain('mob/rift_boss_frost');
+    expect(section('Hoard bosses')).toContain('mob/hoard_boss_bat');
+    expect(section('Dungeon bosses')).not.toContain('mob/hoard_boss_bat');
+  });
+});

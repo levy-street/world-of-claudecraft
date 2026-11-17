@@ -70,6 +70,7 @@ import {
   riftUpgradeCost,
 } from '../../src/sim/rift/progression';
 import type { HoardBossCueVariant } from '../../src/sim/rift/types';
+import { CAVE_HOARD, hoardBosses, riftBosses, VALLEY_HOARD } from './boss_groups';
 import { heading, list, percent, type SystemWriter, words } from './system_writer';
 
 function hoardKitGuide(boss: string) {
@@ -224,6 +225,35 @@ export function addRiftAndHoardRules(w: SystemWriter) {
   w.describe(
     'Buried hoards',
     `The map owner gets ${percent(VAULT_OWNER_COPPER_BONUS)} more copper than a guest. If you win gear, there is a ${percent(HOARD_LOOT_CLASS_BIAS)} chance it is picked from items you can use, if the boss has any. Otherwise, every item on that boss's list has the same chance. Each map opens a private hoard. Common and rare maps lead into a cave. Epic and legendary maps lead into an open valley. The map's rarity sets how hard the fight is. This stays the same even if the number of living players changes.`,
+  );
+  // The guardians, grouped by the kind of hoard, so a boss can be found from this page.
+  const guardianList = (place: string) =>
+    list(
+      hoardBosses()
+        .filter((b) => b.place === place)
+        .map(
+          (b) =>
+            `${mob(b.mobId)} · [[${MOBS[b.mobId].name} (Hoard encounter)|how the fight works]]`,
+        ),
+    );
+  w.describe(
+    'Buried hoards',
+    heading(
+      'Hoard bosses',
+      'Every hoard is guarded by one boss. Each map picks its own. Open a boss for its stats and loot, or the fight guide for what it does.\n\n' +
+        `'''${CAVE_HOARD}'''\n\n` +
+        guardianList(CAVE_HOARD) +
+        `\n\n'''${VALLEY_HOARD}'''\n\n` +
+        guardianList(VALLEY_HOARD),
+    ),
+  );
+  w.describe(
+    'Rifts',
+    heading(
+      'Rift bosses',
+      'The boss waits on the last floor. Which boss you meet depends on the floor theme. The Infernal Citadel has two.\n\n' +
+        list(riftBosses().map((b) => `${mob(b.mobId)} · [[${b.place} (Rift floor)|${b.place}]]`)),
+    ),
   );
   for (const theme of [...RIFT_THEMES, ...CAVE_THEMES]) {
     const small = CAVE_THEMES.includes(theme),

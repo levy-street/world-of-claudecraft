@@ -17,6 +17,7 @@ import { WORLD_PVP_SKULL_BAG_ITEM_ID } from '../../src/sim/pvp/world_pvp_trophy'
 import { type ItemDef, type MobFamily, questTurnInNpcIds } from '../../src/sim/types';
 import { craftNameKey, craftNameText } from '../../src/ui/hud/professions/craft_name_view';
 import { abilityIndexGroup, MEMBERSHIP_GROUP } from './ability_access';
+import { hoardBosses, riftBosses } from './boss_groups';
 import { type ClassAbilityGroup, classAbilityGroup } from './class_ability_sections';
 import { creatureRole, FRIENDLY_GROUPS, ROLE_SECTIONS } from './creature_role';
 import { raidName, raidRooms } from './dungeon_catalog';
@@ -214,9 +215,37 @@ function enemyPortal(w: Writer) {
   const c = catalog(
     w,
     'Mobs',
-    'Find an enemy by its family, how tough it is, or the dungeon or raid it is in. One enemy can be in more than one list. Companions, pets, practice targets and people you escort are not here. They are listed with the friendly characters under NPCs.',
-    ['Creature families', 'Encounter rank', 'Dungeon spawn lists', 'Raid spawn lists'],
+    'Find an enemy by its family, how tough it is, or the dungeon, raid, rift or buried hoard it is in. One enemy can be in more than one list. Companions, pets, practice targets and people you escort are not here. They are listed with the friendly characters under NPCs.',
+    [
+      'Creature families',
+      'Encounter rank',
+      'Rift and hoard bosses',
+      'Dungeon spawn lists',
+      'Raid spawn lists',
+    ],
   );
+  // A raid's rooms are one place to a player; list their spawns under the raid.
+  const raidOf = new Map<string, string>();
+  for (const a of FINDER_ACTIVITIES.filter((f) => f.kind === 'raid'))
+    for (const room of raidRooms(a)) raidOf.set(room.id, raidName(a));
+  // Where each boss is fought, so the Bosses list is grouped by activity.
+  const rift = riftBosses();
+  const hoard = hoardBosses();
+  const dungeonOf = new Map<string, string>();
+  for (const d of DUNGEON_LIST)
+    for (const spawn of d.spawns)
+      if (!dungeonOf.has(spawn.mobId))
+        dungeonOf.set(spawn.mobId, raidOf.has(d.id) ? 'Raid bosses' : 'Dungeon bosses');
+  const bossGroups = (id: string): string[] => {
+    const groups = [
+      ...(MOBS[id].worldBoss ? ['World bosses'] : []),
+      ...(dungeonOf.has(id) ? [dungeonOf.get(id)!] : []),
+      ...(rift.some((b) => b.mobId === id) ? ['Rift bosses'] : []),
+      ...(hoard.some((b) => b.mobId === id) ? ['Hoard bosses'] : []),
+    ];
+    // Anything left is a boss fought out in the world (a zone or quest boss).
+    return groups.length ? groups : ['Open world bosses'];
+  };
   for (const [id, title] of w.titleBy.mob) {
     if (creatureRole(id) !== 'enemy') continue;
     const m = MOBS[id];
@@ -231,15 +260,28 @@ function enemyPortal(w: Writer) {
           : 'Normal enemies';
     c.file('Creature families', family, { ...entry, section: rank });
     // A boss can also be elite or rare; list it under every rank a player might search.
-    if (m.boss) c.file('Encounter rank', 'Bosses', entry);
+    if (m.boss)
+      for (const group of bossGroups(id))
+        c.file('Encounter rank', 'Bosses', { ...entry, section: group, key: title + '@' + group });
     if (m.elite) c.file('Encounter rank', 'Elites', entry);
     if (m.rare) c.file('Encounter rank', 'Rare enemies', entry);
     if (!m.boss && !m.elite && !m.rare) c.file('Encounter rank', 'Normal enemies', entry);
   }
-  // A raid's rooms are one place to a player; list their spawns under the raid.
-  const raidOf = new Map<string, string>();
-  for (const a of FINDER_ACTIVITIES.filter((f) => f.kind === 'raid'))
-    for (const room of raidRooms(a)) raidOf.set(room.id, raidName(a));
+  // Rift and hoard bosses get their own lists, by the floor or the kind of hoard.
+  for (const [label, bosses] of [
+    ['Rift bosses', rift],
+    ['Hoard bosses', hoard],
+  ] as const)
+    for (const b of bosses) {
+      const title = w.titleBy.mob.get(b.mobId);
+      if (title)
+        c.file('Rift and hoard bosses', label, {
+          title,
+          name: MOBS[b.mobId].name,
+          section: b.place,
+          key: title + '@' + b.place,
+        });
+    }
   for (const d of DUNGEON_LIST)
     for (const spawn of d.spawns) {
       const m = MOBS[spawn.mobId],

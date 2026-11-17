@@ -286,6 +286,20 @@ describe('game names, not internal names', () => {
   });
 });
 
+describe('boss sections on activity pages', () => {
+  it('lists the hoard bosses on Buried hoards and the rift bosses on Rifts', () => {
+    const page = (title: string) =>
+      xml.split('<page>').find((p) => p.includes('<title>' + title + '</title>'))!;
+    const hoards = page('Buried hoards').split('== Hoard bosses ==')[1].split('\n== ')[0];
+    expect(hoards.match(/^\* /gm)).toHaveLength(12);
+    expect(hoards).toContain('Cave hoards (common and rare maps)');
+    expect(hoards).toContain('(Hoard encounter)|how the fight works]]');
+    const rifts = page('Rifts').split('== Rift bosses ==')[1].split('\n== ')[0];
+    expect(rifts.match(/^\* /gm)).toHaveLength(10);
+    expect(rifts).toContain('(Rift floor)|');
+  });
+});
+
 describe('the encyclopedia hover catalog', () => {
   it('maps every item and visible ability to its reserved article title', () => {
     const expected = xml
