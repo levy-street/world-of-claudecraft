@@ -542,6 +542,8 @@ function stepLive(s: BreathScope, rules: BreathKnotRules, heart: BreathHeart): v
 /** Phase 1's clock: never into the indrawn breath, nor so near it that a whole
  *  fuse would run into it. */
 function windClear(st: BreathFightState, rules: BreathKnotRules): boolean {
+  // Never while the Islands of the Wind are up (the raid split to the isles).
+  if (st.isles.round) return false;
   const ph = st.wind.phase;
   if (ph === 'inhale' || ph === 'exhale') return false;
   return st.inhaleTimer > rules.fuse + 1 && st.heartRuns < rules.windRuns;

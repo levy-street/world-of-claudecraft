@@ -113,11 +113,13 @@ function bulwarkOf(b: Entity) {
 // ---- the round ------------------------------------------------------------------------------
 
 /** Is a round due now (a mark crossed in the Wind half, the guardian free,
- *  no indrawn breath running)? */
+ *  no indrawn breath running, and no Knotted Gale in play: the round waits
+ *  for the ball to be thrown or to burst, the owner's call of 2026-11-17)? */
 export function islesDue(s: BreathScope): boolean {
   const st = s.st;
   const marks = s.rules.isleAt;
   if (st.half !== 'wind' || st.isles.round || st.isles.next >= marks.length) return false;
+  if (st.heart) return false;
   if (st.wind.phase === 'inhale' || st.wind.phase === 'exhale') return false;
   return s.boss.hp <= s.boss.maxHp * marks[st.isles.next] && guardianFree(s);
 }
