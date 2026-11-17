@@ -20,6 +20,7 @@ import {
 } from '../src/sim/encounters/smith_heart';
 import { shoveEase, shoveStep } from '../src/sim/encounters/smith_heart/breath_shove';
 import { DT, type Entity } from '../src/sim/types';
+import { WIND_BLAST_AURA } from '../src/sim/wind_drift';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import { t } from '../src/ui/i18n';
 import { type BreathFight, breathFight } from './helpers/breath_fight';
@@ -261,7 +262,9 @@ describe("the Summit Roar's throw is a blow", () => {
     expect(T.roarSlide).toBeGreaterThanOrEqual(1);
   });
 
-  it('a struck body is thrown its whole way, fast first and settling, then lets go', () => {
+  it('a struck body is blasted out, fast by the maw and easing, never held', () => {
+    // The owner's call of 2026-11-17: the Roar throws no one (its slide is
+    // the loose gales' alone now); its blast carries the body, a wind.
     const f = pulled();
     const b = f.boss();
     const C = BREATH.cornice;
@@ -274,28 +277,27 @@ describe("the Summit Roar's throw is a blow", () => {
     f.dev('/dev heart breath roar');
     const steps: number[] = [];
     let start: { x: number; z: number } | null = null;
-    let prev = f.local(p);
-    for (let k = 0; k < ticks(T.inhaleCast + T.gustCast + T.roarSlide + 2); k++) {
+    for (let k = 0; k < ticks(T.inhaleCast + T.gustCast + 8); k++) {
       if (!start) f.put(p, C.x + 4, C.z);
-      prev = f.local(p);
+      const prev = f.local(p);
       f.tick(1, true);
-      const sliding = f.state()?.roar?.slides.some((sl) => sl.id === p.id) ?? false;
-      const now = f.local(p);
-      if (sliding || (start && has(p, BREATH_AURAS.thrown))) {
+      expect(has(p, BREATH_AURAS.thrown)).toBe(false);
+      if (p.auras.some((a) => a.id === WIND_BLAST_AURA)) {
         start ??= prev;
+        const now = f.local(p);
         steps.push(Math.hypot(now.x - prev.x, now.z - prev.z));
       } else if (start) break;
     }
-    if (!start) throw new Error('never thrown');
-    const thrown = steps.reduce((a, v) => a + v, 0);
+    if (!start) throw new Error('never blasted');
+    const carried = steps.reduce((a, v) => a + v, 0);
     const end = f.local(p);
-    // Straight away from the guardian, its whole throw (no wall out there).
-    expect(end.x - (start as { x: number }).x).toBeGreaterThan(thrown * 0.95);
-    expect(thrown).toBeGreaterThan(20);
-    const mean = thrown / steps.length;
-    expect(steps[0]).toBeGreaterThan(mean * 2);
-    expect(steps[steps.length - 1]).toBeLessThan(mean * 0.25);
-    // The hold goes the tick the throw settles: no stall on the feet.
-    expect(has(p, BREATH_AURAS.thrown)).toBe(false);
+    // Straight away from the guardian (east), far.
+    expect(end.x - (start as { x: number }).x).toBeGreaterThan(carried * 0.9);
+    expect(carried).toBeGreaterThan(20);
+    // Fast by the maw, easing farther out (its first second against its
+    // second: the kernel's falloff).
+    const moving = steps.filter((v) => v > 1e-6);
+    const pace = (from: number) => moving.slice(from, from + 10).reduce((a, v) => a + v, 0);
+    expect(pace(0)).toBeGreaterThan(pace(20) * 1.25);
   });
 });

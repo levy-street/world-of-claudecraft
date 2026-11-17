@@ -697,11 +697,16 @@ describe('Guardian of the Breath: heroic', () => {
     expect(T.gatherSeconds).toBe(5);
     expect(T.blowSeconds).toBe(7);
     expect(BREATH_DIFFICULTY.normal.windSpeed * T.blowSeconds).toBeGreaterThan(38);
-    // The Summit Roar throws far since the rework (the team's feedback).
-    expect(BREATH_DIFFICULTY.normal.gustThrow).toBe(26);
+    // The Summit Roar throws no one since the owner's call of 2026-11-17:
+    // its blast carries them (tests/smith_heart_breath_roar_blast.test.ts).
+    expect(BREATH_DIFFICULTY.normal.gustThrow).toBe(0);
+    expect(BREATH_DIFFICULTY.normal.blastSpeed).toBe(12);
+    expect(BREATH_DIFFICULTY.normal.blastSeconds).toBe(5);
     for (const tier of ['heroic', 'mythic'] as const) {
       expect(BREATH_DIFFICULTY[tier].windSpeed).toBe(6.6);
-      expect(BREATH_DIFFICULTY[tier].gustThrow).toBe(30);
+      expect(BREATH_DIFFICULTY[tier].gustThrow).toBe(0);
+      expect(BREATH_DIFFICULTY[tier].blastSpeed).toBe(14);
+      expect(BREATH_DIFFICULTY[tier].blastSeconds).toBe(6);
     }
   });
 

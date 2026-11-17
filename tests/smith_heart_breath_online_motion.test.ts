@@ -22,6 +22,7 @@ import {
   BREATH_TUNING as T,
 } from '../src/sim/encounters/smith_heart';
 import { DT } from '../src/sim/types';
+import { WIND_BLAST_AURA } from '../src/sim/wind_drift';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import { t } from '../src/ui/i18n';
 import { type BreathFight, breathFight } from './helpers/breath_fight';
@@ -120,7 +121,10 @@ describe('the Breath moves bodies the online client can draw', () => {
     expect(s.movementOverrideEpoch).toBe(startEpoch);
   });
 
-  it("the Summit Roar's slide holds the override while the throw slides", () => {
+  it("the Summit Roar's blast is predicted: no override, no epoch edge, every step a wind's", () => {
+    // The owner's call of 2026-11-17: the Roar's slid throw (a root the
+    // override stood the client down for) read jerky online; its blast is the
+    // shared kernel's wind (wind_drift.ts), stepped by both hosts.
     const f = pulled(4);
     const b = f.boss();
     const C = BREATH.cornice;
@@ -134,28 +138,29 @@ describe('the Breath moves bodies the online client can draw', () => {
     const w = watch(f, s);
     f.dev('/dev heart breath roar');
     let landed = false;
-    let sliding = 0;
-    let bumpsWhileSliding = 0;
+    let blasted = 0;
     let last = -1;
-    for (let k = 0; k < ticks(T.inhaleCast + T.gustCast + 3); k++) {
+    let bumps = 0;
+    for (let k = 0; k < ticks(T.inhaleCast + T.gustCast + 5); k++) {
       if (!landed) f.put(near, C.x + 4, C.z);
+      const before = s.movementOverrideEpoch;
       const ev = w.tick();
-      if (ev.some((e) => e.type === 'spellfx' && e.ability === BREATH_CUES.gust)) landed = true;
-      const inSlide = f.state()?.roar?.slides.some((sl) => sl.id === near.id) ?? false;
-      if (inSlide) {
-        sliding++;
-        expect(s.movementOverrideActive).toBe(true);
-        expect(near.auras.some((a) => a.id === BREATH_AURAS.thrown)).toBe(true);
-        if (last >= 0 && s.movementOverrideEpoch !== last) bumpsWhileSliding++;
+      if (ev.some((e) => e.type === 'spellfx' && e.ability === BREATH_CUES.gust)) {
+        landed = true;
+        last = s.movementOverrideEpoch;
+        continue;
       }
-      last = s.movementOverrideEpoch;
+      if (!landed) continue;
+      if (near.auras.some((a) => a.id === WIND_BLAST_AURA)) {
+        blasted++;
+        expect(s.movementOverrideActive).toBe(false);
+        expect(near.auras.some((a) => a.id === BREATH_AURAS.thrown)).toBe(false);
+        if (s.movementOverrideEpoch !== before) bumps++;
+      }
     }
-    expect(sliding).toBeGreaterThan(ticks(T.roarSlide) / 2);
-    // The first slide tick may bump (the throw begins); after it, none.
-    expect(bumpsWhileSliding).toBeLessThanOrEqual(1);
-    // Landed: the hold goes, the player steers again.
-    expect(near.auras.some((a) => a.id === BREATH_AURAS.thrown)).toBe(false);
-    expect(s.movementOverrideActive).toBe(false);
+    expect(last).toBeGreaterThanOrEqual(0);
+    expect(blasted).toBeGreaterThan(ticks(3));
+    expect(bumps).toBe(0);
   });
 
   it('the throw says its rule', () => {

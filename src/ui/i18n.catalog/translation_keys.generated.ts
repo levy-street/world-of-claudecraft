@@ -12747,6 +12747,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.auraEffect.brainFreeze'
   | 'hudChrome.auraEffect.breathGuardian.anchor'
   | 'hudChrome.auraEffect.breathGuardian.battered'
+  | 'hudChrome.auraEffect.breathGuardian.blast'
   | 'hudChrome.auraEffect.breathGuardian.blowMark'
   | 'hudChrome.auraEffect.breathGuardian.blowMarkRuin'
   | 'hudChrome.auraEffect.breathGuardian.blown'

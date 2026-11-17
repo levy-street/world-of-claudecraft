@@ -289,8 +289,18 @@ export interface BreathDifficultyRules {
    *  of 2026-11-17 made every tier MUCH stronger (3.2 and 4.4 before): a run
    *  into it barely gains ground, a body left standing goes off the edge. */
   windSpeed: number;
-  /** The exhale (Bellows Gust) throws everyone this far outward (yards). */
+  /** The exhale (Bellows Gust) throws everyone this far outward (yards):
+   *  0 since the owner's call of 2026-11-17, the Roar's blast carries them
+   *  instead (a slid throw left no answer, and read jerky online). */
   gustThrow: number;
+  /** The Roar's blast (wind_drift.ts WIND_BLAST_AURA): its speed by the
+   *  guardian (yd/s, easing off outward), and how long it blows on each
+   *  body (s). Tuned so a body left standing after the pull is carried off
+   *  the Cornice, and one that runs straight back against it at once holds
+   *  some 12 (Normal) or 17 (Heroic) yards out; a late start is carried far
+   *  toward the rim (tests/smith_heart_breath_roar_blast.test.ts). */
+  blastSpeed: number;
+  blastSeconds: number;
   /** Every mechanic's damage, on top of the claim's own multiplier. */
   damageMult: number;
   /** A lethal punishment's damage factor, in place of damageMult (Thunder's
@@ -387,7 +397,9 @@ export const BREATH_KNOT: Readonly<Record<'heroic' | 'mythic', BreathKnotRules>>
 export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficultyRules>> = {
   normal: {
     windSpeed: 5.8,
-    gustThrow: 26,
+    gustThrow: 0,
+    blastSpeed: 12,
+    blastSeconds: 5,
     // The parse-calibrated pass of 2026-11-16: the raid's damage and the
     // swing +15 percent (was 1), the Cradle's discharge where it was.
     damageMult: 1.15,
@@ -421,7 +433,9 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
   },
   heroic: {
     windSpeed: 6.6,
-    gustThrow: 30,
+    gustThrow: 0,
+    blastSpeed: 14,
+    blastSeconds: 6,
     // The pass of 2026-11-16: the raid's damage +25 percent (1.25 to
     // 1.5625) and the swing's, the Cradle's discharge where it was; its pool
     // x1.65 to x1.79 (+30 percent with the base's +20).
@@ -459,7 +473,9 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
   // Gale and Windworn (one ride per player per round of isles: two groups).
   mythic: {
     windSpeed: 6.6,
-    gustThrow: 30,
+    gustThrow: 0,
+    blastSpeed: 14,
+    blastSeconds: 6,
     // Heroic's numbers of 2026-11-16 (the heroic row whole).
     damageMult: 1.5625,
     punishMult: 1.25,

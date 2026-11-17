@@ -16,11 +16,18 @@
 // client stands its prediction down once and draws the slide, instead of a
 // server-driven step every tick bumping the override epoch (a jerky throw).
 // The slide itself is breath_shove.ts' (shared with the loose gales' toss).
+// The owner's call of 2026-11-17 (no moment made anyone fear the fall): the
+// throw is gone (every tier's gustThrow is 0) and the wave sets a BLAST on
+// each body it reaches (wind_drift.ts WIND_BLAST_AURA), strongest by the maw
+// and easing outward: whoever runs straight back against it at once holds,
+// whoever stands is carried over the rim. The anchored and the carrier keep
+// their feet.
 // Zero rng but the damage rolls (in player order, as each is struck).
 
 import { DT } from '../../types';
+import { WIND_BLAST_AURA } from '../../wind_drift';
 import { BREATH_AURAS, BREATH_CUES, BREATH_NAMES, BREATH_TUNING as T } from './breath_ids';
-import { type BreathScope, livePlayers, roll } from './breath_scope';
+import { type BreathScope, heldFast, livePlayers, putMarker, roll } from './breath_scope';
 import { beginShove, stepShoves } from './breath_shove';
 import { breathSay } from './breath_voice';
 
@@ -94,6 +101,16 @@ export function stepRoar(s: BreathScope): void {
       );
       // The anchored and the carrier keep their feet (the blow still lands).
       if (shove) w.slides.push(shove);
+      // The blast: from the maw outward, easing with the distance, for the
+      // tier's seconds (wind_drift.ts: both hosts step it, so it is
+      // predicted online, never a server-driven slide). Run straight back
+      // against it at once and you hold; stand and it carries you off.
+      if (!heldFast(p) && p.carriedBy === undefined && s.rules.blastSpeed > 0)
+        putMarker(p, WIND_BLAST_AURA, BREATH_NAMES.gust, s.rules.blastSeconds, b.id, {
+          value: w.x,
+          value2: w.z,
+          value3: s.rules.blastSpeed,
+        });
     }
   }
   stepShoves(s, w.slides);

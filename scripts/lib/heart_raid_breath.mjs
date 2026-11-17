@@ -42,6 +42,7 @@ import {
   ISLE_MOBS,
   isleCircleOf,
 } from '../../src/sim/encounters/smith_heart/breath_isle_ids';
+import { BLAST_FALLOFF, WIND_BLAST_AURA } from '../../src/sim/wind_drift';
 import {
   add,
   alive,
@@ -58,7 +59,10 @@ import {
 } from './heart_raid_bots.mjs';
 
 const RULES = BREATH_DIFFICULTY[DIFF];
-const THROW = RULES.gustThrow;
+// How far out the Roar leaves a body that runs straight back against its
+// blast at once (its throw, 0 since 2026-11-17, and where the blast falls
+// to a run: wind_drift.ts), plus a margin for the bots' late start.
+const THROW = RULES.gustThrow + (RULES.blastSpeed - 7) / BLAST_FALLOFF + 3;
 const WIND = RULES.windSpeed;
 const PORTAL_TIDS = {
   [BREATH_OBJECTS.portalA]: 'A',
@@ -506,6 +510,10 @@ function duty(world, st, b, me) {
   const knot = knotDuty(world, st, b, me);
   if (knot) return knot;
   const g = world.mobs.guardian;
+  // The Roar's blast: run straight back against it at once (the owner's call
+  // of 2026-11-17: whoever stands is carried off the Cornice).
+  if (alive(g) && hasAura(me, WIND_BLAST_AURA) && IGNORE !== 'roar')
+    return { goal: { x: g.x, z: g.z }, tol: 4, duty: 'blast' };
   // The indrawn breath and the Roar: a bearing whose throw lands on the floor.
   if (
     alive(g) &&

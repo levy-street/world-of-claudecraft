@@ -5974,7 +5974,7 @@ export const hudChromeStrings = {
       laden:
         'You carry a Knotted Gale: you walk at {walk}% speed, you cannot blink, charge or leap, and no wind, pull, blast or throw can move you. Press Interact at the edge of the Cornice to throw it into the void. A portal is a shortcut: walk into one and you come out at its partner (A to B; on Mythic, C to D too). When this ends it bursts and kills everyone on the Cornice.',
       wind: "The Guardian of the Breath's wind carries you {speed} yd a second the way it blows. Walk against it to hold your ground; it does not interrupt your casts. No wall stands round the Cornice: carried off its edge, you fall into the void. Only by the head of the climb does a wall still stand, and pressed against it you take {pinMin} to {pinMax} damage every second. Heroic and Mythic: {heroicMin} to {heroicMax} damage.",
-      draw: 'The Guardian draws breath and pulls you toward it, {speed} yd a second. Its vortex deals {min} to {max} damage every {tick} sec to whoever stands before its mouth. Then Summit Roar deals {gustMin} to {gustMax} damage to everyone on the Cornice and throws them {throw} yd away from it ({heroicThrow} on Heroic): with the Guardian near the edge, that throws the raid off the Cornice. Heroic and Mythic: {heroicMin} to {heroicMax} and {heroicGustMin} to {heroicGustMax} damage respectively.',
+      draw: "The Guardian draws breath and pulls you toward it, {speed} yd a second. Its vortex deals {min} to {max} damage every {tick} sec to whoever stands before its mouth. Then Summit Roar deals {gustMin} to {gustMax} damage to everyone on the Cornice and its blast drives them away from it, {throw} yd a second at its mouth ({heroicThrow} on Heroic), easing farther out, for a few seconds: run straight back against it at once, or stand in Thessaly's anchor, or it carries you off the Cornice. Heroic and Mythic: {heroicMin} to {heroicMax} and {heroicGustMin} to {heroicGustMax} damage respectively.",
       pinned:
         "Pressed against the rim's wall by the wind: {min} to {max} damage every second until the wind falls calm or you walk clear of the wall. Heroic and Mythic: {heroicMin} to {heroicMax} damage.",
       anchor:
@@ -5991,6 +5991,8 @@ export const hudChromeStrings = {
         'The wind carries you over the void on a fixed path: you cannot act until it sets you down.',
       windworn: 'Worn out by the wind: no Gale Path will carry you to the isles until this ends.',
       thrown: 'Thrown by the Summit Roar: you cannot move until the throw sets you down.',
+      blast:
+        "The Summit Roar's blast drives you away from the Guardian, {speed} yd a second at its mouth, easing farther out, for {seconds} sec in all. Run straight back against it, or stand in Thessaly's anchor, or it carries you off the Cornice.",
       tossed: 'Tossed by a Loose Gale: you cannot move until the gust sets you down.',
       blown: 'Thrown by Bellows Blow: you cannot move until the throw sets you down.',
       blowMark:

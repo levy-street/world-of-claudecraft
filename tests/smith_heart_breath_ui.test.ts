@@ -80,8 +80,8 @@ describe('Guardian of the Breath: tooltips and names', () => {
       value: 0,
       value3: T.pullSpeed,
     });
-    expect(say(draw)).toContain(`${BREATH_DIFFICULTY.normal.gustThrow} yd away`);
-    expect(say(draw)).toContain(`${BREATH_DIFFICULTY.heroic.gustThrow} on Heroic`);
+    expect(say(draw)).toContain(`${BREATH_DIFFICULTY.normal.blastSpeed} yd a second at its mouth`);
+    expect(say(draw)).toContain(`${BREATH_DIFFICULTY.heroic.blastSpeed} on Heroic`);
     const anchor = auraEffectDescriptor({ id: BREATH_AURAS.anchor, kind: 'internal_cd', value: 0 });
     expect(say(anchor)).toContain('Damage still lands');
     const drawn = auraEffectDescriptor({ id: BREATH_AURAS.drawn, kind: 'internal_cd', value: 0 });

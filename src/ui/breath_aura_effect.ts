@@ -18,7 +18,7 @@ import {
   BREATH_TUNING as T,
 } from '../sim/encounters/smith_heart/breath_ids';
 import { ISLE_AURAS, ISLE_TUNING as IT } from '../sim/encounters/smith_heart/breath_isle_ids';
-import { WIND_DRIFT_AURA, WIND_PULL_AURA } from '../sim/wind_drift';
+import { WIND_BLAST_AURA, WIND_DRIFT_AURA, WIND_PULL_AURA } from '../sim/wind_drift';
 import type { AuraEffectDescriptor, AuraEffectInput } from './aura_effect';
 import { tierRange, tierValue } from './heart_tier_damage';
 
@@ -52,6 +52,18 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
           ...tierRange('heroic', T.pinMin, T.pinMax, HM),
         },
       };
+    case WIND_BLAST_AURA:
+      return {
+        key: `${KEY}.blast`,
+        nums: {
+          speed: a.value3 ?? BREATH_DIFFICULTY.normal.blastSpeed,
+          // The tier rides the speed (the wire carries no tier).
+          seconds:
+            a.value3 === BREATH_DIFFICULTY.heroic.blastSpeed
+              ? BREATH_DIFFICULTY.heroic.blastSeconds
+              : BREATH_DIFFICULTY.normal.blastSeconds,
+        },
+      };
     case WIND_PULL_AURA:
       return {
         key: `${KEY}.draw`,
@@ -62,8 +74,8 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
           tick: T.vortexTick,
           gustMin: tierValue(T.gustMin, NM),
           gustMax: tierValue(T.gustMax, NM),
-          throw: BREATH_DIFFICULTY.normal.gustThrow,
-          heroicThrow: BREATH_DIFFICULTY.heroic.gustThrow,
+          throw: BREATH_DIFFICULTY.normal.blastSpeed,
+          heroicThrow: BREATH_DIFFICULTY.heroic.blastSpeed,
           ...tierRange('heroic', T.vortexMin, T.vortexMax, HM),
           ...tierRange('heroicGust', T.gustMin, T.gustMax, HM),
         },

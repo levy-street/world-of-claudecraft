@@ -16,6 +16,7 @@ import {
   ROAR_SPEED,
   ROAR_THROW,
   ROAR_TRAIL_SECONDS,
+  roarCarry,
   roarLanding,
   roarReach,
   roarWaveLook,
@@ -60,21 +61,22 @@ describe('the Summit Roar: its look', () => {
 });
 
 describe('the Summit Roar: where it flings you', () => {
-  it('throws straight away from the guardian, by the longest throw of any tier', () => {
-    expect(ROAR_THROW).toBe(
-      Math.max(BREATH_DIFFICULTY.normal.gustThrow, BREATH_DIFFICULTY.heroic.gustThrow),
-    );
+  it('marks where the blast carries a body that stands, straight away from the guardian', () => {
+    // The owner's call of 2026-11-17: no throw on any tier; the blast carries.
+    expect(ROAR_THROW).toBe(0);
     const at = roarLanding(0, 192, 0, 198);
     expect(at.x).toBeCloseTo(0, 6);
-    expect(at.z).toBeCloseTo(192 - ROAR_THROW, 6);
+    expect(at.z).toBeCloseTo(192 - roarCarry(6), 6);
+    // The hardest tier's carry: a stander by the maw goes some forty yards
+    // or more, and less the farther out it already stands (the blast eases).
+    expect(roarCarry(6)).toBeGreaterThan(40);
+    expect(roarCarry(20)).toBeLessThan(roarCarry(6));
   });
 
-  it('reads safe with floor behind you and over the void with the rim behind you', () => {
-    // East of the guardian, close in: the throw east lands on the Cornice.
+  it('lands a stander by the rim, or over the void when the rim lies behind it', () => {
+    // By the maw, east (the Cornice's longest reach): carried to its rim.
     const near = roarLanding(6, 198, 0, 198);
-    expect(inBreathArena(near.x, near.z)).toBe(true);
-    expect(near.overVoid).toBe(false);
-    // Out by the east rim: the same throw carries the body off the Cornice.
+    expect(near.x).toBeGreaterThan(40);
     const far = roarLanding(30, 198, 0, 198);
     expect(inBreathArena(far.x, far.z)).toBe(false);
     expect(far.overVoid).toBe(true);

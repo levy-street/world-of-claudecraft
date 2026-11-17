@@ -23181,6 +23181,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.breathGuardian.say.thessaly_isles': '它的護盾靠浮島供能！乘風飛過去，解決癒者再回來！',
   'hudChrome.auraEffect.breathGuardian.wind':
     '氣息守護者的風以每秒{speed}碼的速度將你帶往它吹去的方向。逆風而行便能站穩，它不會打斷你的施法。崖台四周沒有牆：被吹出邊緣，你會墜入虛空。只有攀登路口還立著牆，被壓在牆上時每秒受到{pinMin}到{pinMax}點傷害。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。',
+  'hudChrome.auraEffect.breathGuardian.blast':
+    '巔峰咆哮的狂風將你吹離守護者：在其口前每秒{speed}碼，越遠越弱，共持續{seconds}秒。立刻逆風直奔回去，或站進塞薩莉的錨點，否則會被吹下飛簷。',
   'hudChrome.auraEffect.breathGuardian.draw':
     '守護者深吸一口氣，以每秒{speed}碼的速度將你拉向它。它嘴前的漩渦每{tick}秒對站在其中的人造成{min}到{max}點傷害。隨後巔峰咆哮對崖台上的所有人造成{gustMin}到{gustMax}點傷害，並將他們從守護者身邊吹飛{throw}碼（英雄難度為{heroicThrow}碼）：守護者靠近邊緣時，團隊會被吹出崖台。英雄和傳奇難度：分別為{heroicMin}到{heroicMax}點和{heroicGustMin}到{heroicGustMax}點傷害。',
   'hudChrome.auraEffect.breathGuardian.pinned':

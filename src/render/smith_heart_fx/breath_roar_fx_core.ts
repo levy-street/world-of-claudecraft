@@ -12,6 +12,7 @@
 
 import { inBreathArena } from '../../sim/encounters/smith_heart/breath_geometry';
 import { BREATH_DIFFICULTY, BREATH_TUNING as T } from '../../sim/encounters/smith_heart/breath_ids';
+import { blastStandingReach } from '../../sim/wind_drift';
 import { breathGuardianKit } from './breath_fx_core';
 
 /** How far the wave runs (the guardian's reach: the Cornice from its maw)
@@ -44,25 +45,42 @@ export function roarWaveLook(
 }
 
 /** The Roar's longest throw on any tier (the client cannot tell the tier,
- *  so the landing it shows is the farthest one: a spot that reads safe is). */
+ *  so the landing it shows is the farthest one: a spot that reads safe is).
+ *  0 since the owner's call of 2026-11-17: the blast carries the body. */
 export const ROAR_THROW = Math.max(
   BREATH_DIFFICULTY.normal.gustThrow,
   BREATH_DIFFICULTY.heroic.gustThrow,
   BREATH_DIFFICULTY.mythic.gustThrow,
 );
 
-/** Where the Roar throws a body standing at claim-local (px, pz) with the
- *  guardian at (gx, gz): straight away from the guardian, `ROAR_THROW` yards
- *  (the sim's own rule, breath_roar.ts), and whether that spot lies off the
- *  Cornice (over the void). The local player's landing marker while it draws
- *  breath (the Heroic readability pass of 2026-11-05: nothing showed where
- *  the blow flings you, so a body by an open lip read as safe). */
+/** The hardest blast on any tier (speed and seconds), for the same reason. */
+const BLAST = (['normal', 'heroic', 'mythic'] as const).reduce(
+  (m, k) =>
+    BREATH_DIFFICULTY[k].blastSpeed * BREATH_DIFFICULTY[k].blastSeconds > m.speed * m.seconds
+      ? { speed: BREATH_DIFFICULTY[k].blastSpeed, seconds: BREATH_DIFFICULTY[k].blastSeconds }
+      : m,
+  { speed: 0, seconds: 0 },
+);
+
+/** How far the Roar carries a body that STANDS `d` yards from the guardian:
+ *  its throw, then the blast's whole carry (wind_drift.ts). */
+export function roarCarry(d: number): number {
+  return blastStandingReach(BLAST.speed, BLAST.seconds, d + ROAR_THROW) - d;
+}
+
+/** Where the Roar carries a body standing at claim-local (px, pz) with the
+ *  guardian at (gx, gz) if it does not run: straight away from the guardian,
+ *  `roarCarry` yards (the sim's own rule, breath_roar.ts), and whether that
+ *  path crosses off the Cornice (over the void). The local player's landing
+ *  marker while it draws breath (the Heroic readability pass of 2026-11-05:
+ *  nothing showed where the blow flings you, so a body by an open lip read
+ *  as safe). */
 export function roarLanding(
   px: number,
   pz: number,
   gx: number,
   gz: number,
-  throwYd: number = ROAR_THROW,
+  throwYd: number = roarCarry(Math.hypot(px - gx, pz - gz)),
 ): { x: number; z: number; overVoid: boolean } {
   const dx = px - gx;
   const dz = pz - gz;
@@ -73,8 +91,8 @@ export function roarLanding(
   const z = pz + uz * throwYd;
   // The whole path, not just its end: a throw over a bay lands in the void.
   let overVoid = false;
-  for (let k = 1; k <= 6 && !overVoid; k++) {
-    const f = k / 6;
+  for (let k = 1; k <= 12 && !overVoid; k++) {
+    const f = k / 12;
     if (!inBreathArena(px + ux * throwYd * f, pz + uz * throwYd * f)) overVoid = true;
   }
   return { x, z, overVoid };

@@ -22661,6 +22661,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'あの盾は浮島から力を得ている！ 風に乗って渡り、癒し手を倒して戻ってこい！',
   'hudChrome.auraEffect.breathGuardian.wind':
     '息吹の守護者の風が、吹く方向へ毎秒{speed}ヤードあなたを運ぶ。風に逆らって歩けば踏みとどまれ、詠唱は中断されない。岩棚の周りに壁はない：縁から運び出されれば虚空へ落ちる。壁が残るのは登り口の上だけで、そこに押しつけられると毎秒{pinMin}から{pinMax}のダメージを受ける。ヒロイック・ミシック：{heroicMin}から{heroicMax}のダメージ。',
+  'hudChrome.auraEffect.breathGuardian.blast':
+    'サミットロアの突風があなたをガーディアンから吹き飛ばす：口元では毎秒{speed}ヤード、離れるほど弱まり、合計{seconds}秒続く。すぐに風に逆らってまっすぐ戻るか、セサリーの錨に立つこと。さもなければコーニスから吹き落とされる。',
   'hudChrome.auraEffect.breathGuardian.draw':
     '守護者が息を吸い込み、あなたを毎秒{speed}ヤード引き寄せる。口の前の渦は、そこに立つ者に{tick}秒ごとに{min}から{max}のダメージを与える。その後、頂の咆哮が岩棚の全員に{gustMin}から{gustMax}のダメージを与え、守護者から{throw}ヤード（ヒロイックでは{heroicThrow}ヤード）吹き飛ばす：守護者が縁の近くにいれば、レイドは岩棚の外へ放り出される。ヒロイック・ミシック：それぞれ{heroicMin}から{heroicMax}、{heroicGustMin}から{heroicGustMax}のダメージ。',
   'hudChrome.auraEffect.breathGuardian.pinned':

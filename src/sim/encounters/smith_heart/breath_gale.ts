@@ -38,7 +38,7 @@
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { DT, type Entity } from '../../types';
-import { WIND_DRIFT_AURA, WIND_PULL_AURA } from '../../wind_drift';
+import { WIND_BLAST_AURA, WIND_DRIFT_AURA, WIND_PULL_AURA } from '../../wind_drift';
 import { looseGalePos, pinnedAgainstRim } from './breath_geometry';
 import {
   BREATH_AURAS,
@@ -219,6 +219,8 @@ function syncWindAuras(s: BreathScope): void {
     const held = heldFast(p) || p.carriedBy !== undefined;
     if (held || !blowing) dropAura(p, WIND_DRIFT_AURA);
     if (held || !pulling) dropAura(p, WIND_PULL_AURA);
+    // An anchor caught mid-blast holds the body from then on.
+    if (held) dropAura(p, WIND_BLAST_AURA);
     if (held) continue;
     if (blowing)
       keepWind(s, p, WIND_DRIFT_AURA, BREATH_NAMES.wind, {
@@ -234,16 +236,12 @@ function syncWindAuras(s: BreathScope): void {
   }
 }
 
-/** Take the wind and pull auras one guardian put on `p` off it. */
+const WIND_AURA_IDS = new Set([WIND_DRIFT_AURA, WIND_PULL_AURA, WIND_BLAST_AURA]);
+
+/** Take the wind, pull and blast auras one guardian put on `p` off it. */
 function dropWindFrom(p: Entity, sourceId: number): void {
-  if (
-    p.auras.some(
-      (a) => (a.id === WIND_DRIFT_AURA || a.id === WIND_PULL_AURA) && a.sourceId === sourceId,
-    )
-  )
-    p.auras = p.auras.filter(
-      (a) => !((a.id === WIND_DRIFT_AURA || a.id === WIND_PULL_AURA) && a.sourceId === sourceId),
-    );
+  if (p.auras.some((a) => WIND_AURA_IDS.has(a.id) && a.sourceId === sourceId))
+    p.auras = p.auras.filter((a) => !(WIND_AURA_IDS.has(a.id) && a.sourceId === sourceId));
 }
 
 /** The wind presses a body against the rim's wall: a hit each second. */

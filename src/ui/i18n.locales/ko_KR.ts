@@ -22637,6 +22637,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '저 방패는 섬들에서 힘을 얻고 있어! 바람을 타고 건너가 치유사들을 쓰러뜨리고 돌아와!',
   'hudChrome.auraEffect.breathGuardian.wind':
     '숨결의 수호자의 바람이 부는 방향으로 초당 {speed}야드씩 당신을 실어 갑니다. 바람을 거슬러 걸으면 버틸 수 있으며, 시전은 끊기지 않습니다. 벼랑 둘레에는 벽이 없습니다: 가장자리 밖으로 실려 가면 공허로 떨어집니다. 오르막 꼭대기에만 벽이 남아 있으며, 그곳에 밀려 붙으면 매초 {pinMin}~{pinMax}의 피해를 입습니다. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
+  'hudChrome.auraEffect.breathGuardian.blast':
+    '정상의 포효의 돌풍이 당신을 수호자에게서 밀어냅니다: 입 앞에서는 초당 {speed}미터, 멀어질수록 약해지며 모두 {seconds}초 동안 지속됩니다. 즉시 바람을 거슬러 곧장 돌아가거나 세살리의 닻에 서세요. 그러지 않으면 처마 밖으로 날려갑니다.',
   'hudChrome.auraEffect.breathGuardian.draw':
     '수호자가 숨을 들이쉬며 초당 {speed}야드씩 당신을 끌어당깁니다. 입 앞의 소용돌이는 그 안에 선 자에게 {tick}초마다 {min}~{max}의 피해를 줍니다. 이어서 정상의 포효가 벼랑 위의 모두에게 {gustMin}~{gustMax}의 피해를 주고 수호자에게서 {throw}야드(영웅 난이도는 {heroicThrow}야드) 날려 보냅니다: 수호자가 가장자리 가까이 있으면 공격대가 벼랑 밖으로 날아갑니다. 영웅·신화: 각각 {heroicMin}에서 {heroicMax}, {heroicGustMin}에서 {heroicGustMax}의 피해.',
   'hudChrome.auraEffect.breathGuardian.pinned':
