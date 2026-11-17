@@ -57,6 +57,8 @@ import { GFX } from '../gfx';
 import { getFlameTex } from '../ignivar_fire_vfx';
 import { setRenderCategory } from '../renderer_diagnostics';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
+import { type WindFieldLook, windFieldLook } from './breath_fight_fx_core';
+import { BreathWindStreaks } from './breath_wind_streaks';
 import { anvilUnder } from './final_anvil_core';
 import { FinalAnvilFx } from './final_anvil_fx';
 import {
@@ -203,6 +205,27 @@ export class FinalKitFx {
   private originX = 0;
   private originZ = 0;
   private windHeading = 0;
+  /** Bellows Wind over the WHOLE Anvil (the team's review of 2026-11-17: it
+   *  carries everyone, so it reads everywhere, never only in the Breath's
+   *  quarter): the Breath guardian's own streaks of wind, under an
+   *  instance-local group placed at the slot's origin. */
+  private readonly windLocal = new THREE.Group();
+  private readonly windStreaks: BreathWindStreaks;
+  private readonly windLook: WindFieldLook = {
+    dust: 0,
+    strength: 0,
+    debris: 0,
+    speed: 0,
+    front: -1,
+    inward: false,
+  };
+  private readonly windDir = { x: 0, z: 1 };
+  private readonly windFocus = new THREE.Vector2();
+  private windTemplate = '';
+  private windSince = 0;
+  private windFlow = 0;
+  private windStrength = 0;
+  private windWasOn = false;
 
   constructor(
     scene: THREE.Scene,
@@ -437,6 +460,18 @@ export class FinalKitFx {
     );
     this.rim = mesh(rimGeo, this.rimMat, 'smithHeartFinalRimBand');
     this.rim.renderOrder = floorVfxRenderOrder('encounter', F.rim);
+    // The gale's streaks over the whole platform (built here with the root,
+    // so its one gated attach links them; floor height set as the wind shows).
+    this.windLocal.name = 'smithHeartFinalWind';
+    this.root.add(this.windLocal);
+    this.windStreaks = new BreathWindStreaks(
+      this.windLocal,
+      this.uTime,
+      detail,
+      0,
+      { x: HEART_ROOM.x, z: HEART_ROOM.z, rx: HEART_ROOM.r, rz: HEART_ROOM.r },
+      'smithHeartFinalWindStreaks',
+    );
     const veins = {
       uHeat: { value: new THREE.Color(C.heat) },
       uQuench: { value: new THREE.Color(C.quench) },
@@ -678,7 +713,7 @@ export class FinalKitFx {
     this.scan(world, dt);
     for (const el of ELEMENTS) for (const s of this.pools[el]) s.seen = false;
     this.anvilFx.begin(this.clock, dt);
-    this.paintObjects(world);
+    this.paintObjects(world, dt);
     this.anvilFx.end();
     this.paintMarks(world);
     this.paintBoss(world);
@@ -771,7 +806,7 @@ export class FinalKitFx {
     s.d.fan.group.visible = true;
   }
 
-  private paintObjects(world: IWorld): void {
+  private paintObjects(world: IWorld, dt: number): void {
     let whirl = 0;
     let orb = 0;
     let wind: Entity | null = null;
@@ -942,25 +977,56 @@ export class FinalKitFx {
       ob.ring.visible = false;
     }
     this.galeBlowing = blowing;
-    this.paintWind(wind);
+    this.paintWind(wind, dt);
   }
 
   /** The gale: its rim band (every tier) and its streaks racing the way it
    *  blows. */
-  private paintWind(wind: Entity | null): void {
+  private paintWind(wind: Entity | null, dt = 0): void {
     if (!wind) {
       this.rim.visible = false;
+      if (this.windWasOn) {
+        this.windWasOn = false;
+        this.windStrength = 0;
+        this.windStreaks.paint(0, this.windDir, false, this.windFocus, this.windFlow, -1);
+      }
       return;
     }
     const blowing = finalObjectKind(wind.templateId) === 'windBlow';
     this.windHeading = wind.facing;
     const cx = this.originX + HEART_ROOM.x;
     const cz = this.originZ + HEART_ROOM.z;
+    // The streaks: the coming wind gathering behind a front rolling over the
+    // whole floor from upwind, then the blow racing across all of it, the
+    // way the kernel pushes (sim convention: toward (sin h, cos h)).
+    if (wind.templateId !== this.windTemplate) {
+      this.windTemplate = wind.templateId;
+      this.windSince = this.clock;
+    }
+    const secs = finalObjectSeconds(wind.templateId);
+    const fill = secs > 0 ? Math.min(1, (this.clock - this.windSince) / secs) : 1;
+    const look = windFieldLook(blowing ? 'blow' : 'gather', fill, this.windLook);
+    this.windDir.x = Math.sin(this.windHeading);
+    this.windDir.z = Math.cos(this.windHeading);
+    this.windFlow = (this.windFlow + look.speed * dt) % 9000;
+    this.windStrength += (look.strength - this.windStrength) * Math.min(1, dt * 4);
+    this.windLocal.position.set(this.originX, this.groundY(cx, cz) + 0.1, this.originZ);
+    this.windStreaks.paint(
+      Math.max(0.35, this.windStrength),
+      this.windDir,
+      false,
+      this.windFocus,
+      this.windFlow,
+      look.front,
+    );
+    this.windWasOn = true;
     this.rim.position.set(cx, this.groundY(cx, cz) + 0.08, cz);
     this.rimMat.uniforms.uHeading.value = this.windHeading;
     this.rimMat.uniforms.uAlpha.value = blowing ? 1 : 0.45 + 0.25 * Math.sin(this.clock * 8);
     this.rim.visible = true;
-    const n = blowing ? 6 : 1;
+    // The dust: over the whole platform, thick through the blow, a first
+    // stir through the gather.
+    const n = blowing ? 14 : 4;
     const sx = Math.sin(this.windHeading);
     const sz = Math.cos(this.windHeading);
     for (let i = 0; i < n; i++) {
@@ -1173,6 +1239,7 @@ export class FinalKitFx {
   private leave(): void {
     this.active = false;
     this.rosterSeen = Number.NaN;
+    this.paintWind(null);
     for (const el of ELEMENTS)
       for (const s of this.pools[el]) {
         s.key = 0;
@@ -1204,6 +1271,7 @@ export class FinalKitFx {
     this.audio.dispose();
     this.root.removeFromParent();
     this.particles.dispose();
+    this.windStreaks.dispose();
     this.anvilFx.dispose();
     this.kit.dispose();
     this.arcsMesh.dispose();

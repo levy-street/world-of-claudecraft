@@ -1,5 +1,6 @@
 // The streaks of wind in the air over the Storm Cornice (a part of
-// BreathFightFx, docs/design/raid/smith_heart.md section 7.2): long thin
+// BreathFightFx; FinalKitFx lays the same over the Anvil of the World for the
+// Masterless Strength's Bellows Wind, docs/design/raid/smith_heart.md section 7.2): long thin
 // ribbons racing downwind at every height from the floor to a few yards up,
 // white at their heads, slate at their tails, wavering as they run, over the
 // whole Cornice (never only round the player), behind the gather's rolling
@@ -104,8 +105,17 @@ export class BreathWindStreaks {
   private readonly geo: THREE.InstancedBufferGeometry;
   private readonly mat: THREE.ShaderMaterial;
 
-  /** Under `parent` (instance-local coordinates, its floor at `floorY`). */
-  constructor(parent: THREE.Object3D, uTime: { value: number }, detail: boolean, floorY: number) {
+  /** Under `parent` (instance-local coordinates, its floor at `floorY`),
+   *  over `field` (an ellipse: the Storm Cornice by default; the Masterless
+   *  Strength's Bellows Wind lays them over the Anvil of the World). */
+  constructor(
+    parent: THREE.Object3D,
+    uTime: { value: number },
+    detail: boolean,
+    floorY: number,
+    field: { x: number; z: number; rx: number; rz: number } = BREATH.cornice,
+    name = 'smithHeartBreathWindStreaks',
+  ) {
     const count = detail ? WIND_STREAKS.detail : WIND_STREAKS.low;
     const pos: number[] = [];
     const idx: number[] = [];
@@ -127,9 +137,9 @@ export class BreathWindStreaks {
     this.geo.setAttribute('aSeed', new THREE.InstancedBufferAttribute(seeds, 4));
     this.geo.setIndex(idx);
     this.geo.instanceCount = count;
-    const C0 = BREATH.cornice;
+    const C0 = field;
     this.mat = new THREE.ShaderMaterial({
-      name: 'smithHeartBreathWindStreaks',
+      name,
       uniforms: {
         uTime,
         uFlowT: { value: 0 },
@@ -152,7 +162,7 @@ export class BreathWindStreaks {
       side: THREE.DoubleSide,
     });
     this.mesh = new THREE.Mesh(this.geo, this.mat);
-    this.mesh.name = 'smithHeartBreathWindStreaks';
+    this.mesh.name = name;
     this.mesh.position.y = floorY;
     this.mesh.frustumCulled = false;
     this.mesh.visible = false;

@@ -328,6 +328,17 @@ describe('FinalKitFx over a fake world', () => {
     expect(visibleNamed(root, 'smithHeartFinalShell')).toBe(1);
     expect(visibleNamed(root, 'smithHeartFinalAnvil')).toBe(1);
     expect(visibleNamed(root, 'smithHeartFinalRimBand')).toBe(1);
+    // Bellows Wind's streaks over the WHOLE platform (the team's review of
+    // 2026-11-17), running the way the kernel pushes: east for a facing of
+    // pi/2 (sim convention: toward (sin h, cos h)), over the Anvil's disc.
+    expect(visibleNamed(root, 'smithHeartFinalWindStreaks')).toBe(1);
+    const streaks = root?.getObjectByName('smithHeartFinalWindStreaks') as THREE.Mesh;
+    const su = (streaks.material as THREE.ShaderMaterial).uniforms;
+    expect((su.uDir.value as THREE.Vector2).x).toBeCloseTo(1, 5);
+    expect((su.uDir.value as THREE.Vector2).y).toBeCloseTo(0, 5);
+    expect((su.uRadii.value as THREE.Vector2).x).toBe(HEART_ROOM.r);
+    expect((su.uCentre.value as THREE.Vector2).x).toBe(HEART_ROOM.x);
+    expect(su.uStrength.value).toBeGreaterThan(0.3);
     expect(visibleNamed(root, 'smithHeartFinalRootSpikes')).toBe(1);
     expect(visibleNamed(root, 'smithHeartFinalUnbound')).toBe(1);
     // A leap of lightning on its cue, claimed.
