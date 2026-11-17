@@ -45,6 +45,9 @@ describe("the Smith's Heart's pools for a 1,400 DPS raid", () => {
       const tiers = ['normal', 'heroic', 'mythic'] as const;
       const target = [255, 300, 420];
       tiers.forEach((t, i) => {
+        // The owner's call of 2026-11-17: the Heat and the final take bigger
+        // Heroic and Mythic pools (checked below); their Normal keeps the clock.
+        if ((b.name === 'heat' || b.name === 'final') && t !== 'normal') return;
         // The final's Mythic rebirth (1 to 20 percent) is a fifth more pool.
         const extra = b.name === 'final' && t === 'mythic' ? 1.19 : 1;
         const seconds = (base * b.rows[t].healthMult * extra) / DPS + b.down[i];
@@ -53,6 +56,28 @@ describe("the Smith's Heart's pools for a 1,400 DPS raid", () => {
       });
     });
   }
+
+  it('the Heat matches the Council and the Quench; the final tops every boss by about 15 percent', () => {
+    const at = (ids: string[], m: number) => pool(ids) * m;
+    const others = (t: 'heroic' | 'mythic') => [
+      at(['heart_hammer_guardian', 'heart_seam_singer'], COUNCIL_DIFFICULTY[t].healthMult),
+      at(['heart_breath_guardian'], BREATH_DIFFICULTY[t].healthMult),
+      at(['heart_quench_guardian'], QUENCH_DIFFICULTY[t].healthMult),
+      at(['heart_heat_guardian'], HEAT_DIFFICULTY[t].healthMult),
+    ];
+    for (const t of ['heroic', 'mythic'] as const) {
+      const heat = at(['heart_heat_guardian'], HEAT_DIFFICULTY[t].healthMult);
+      const quench = at(['heart_quench_guardian'], QUENCH_DIFFICULTY[t].healthMult);
+      expect(Math.abs(heat / quench - 1), t).toBeLessThan(0.01);
+      // The final's whole (its Mythic rebirth from 1 to 20 percent counted).
+      const whole =
+        at(['heart_masterless_strength'], FINAL_DIFFICULTY[t].healthMult) *
+        (t === 'mythic' ? 1.19 : 1);
+      const top = Math.max(...others(t));
+      expect(whole / top, t).toBeGreaterThan(1.12);
+      expect(whole / top, t).toBeLessThan(1.18);
+    }
+  });
 
   it("the Heroic Quench is about 420,000 (the owner's anchor)", () => {
     const hp = pool(['heart_quench_guardian']) * QUENCH_DIFFICULTY.heroic.healthMult;

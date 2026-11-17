@@ -88,8 +88,8 @@ describe("Smith's Heart: a boss's pool per tier", () => {
       ['council', 1.18, 1.65],
       ['breath', 1.09, 1.61],
       ['quench', 1.18, 1.65],
-      ['heat', 1.22, 1.81],
-      ['final', 1.14, 1.35],
+      ['heat', 1.47, 2.06],
+      ['final', 1.525, 1.8],
     ]);
     // The adds whose health is the tier's: the Splinters and the isles' adds.
     expect(FINAL_PHASE_DIFFICULTY.normal.addHealth).toBe(6000);

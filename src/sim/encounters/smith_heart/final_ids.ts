@@ -311,7 +311,8 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     // The pools of 2026-11-17 (real parses: a human raid of ten deals about
     // 1,400 DPS; Normal about 4 to 4.5 minutes of uptime, Heroic about 5,
     // Mythic about 7, the fight's own downtime counted; smith_heart.md).
-    healthMult: 1.14,
+    // The owner's call of 2026-11-17: the biggest pool of the raid, about 15 percent over the next (its Mythic rebirth counted).
+    healthMult: 1.525,
     burstTier: 'heavy',
     switchShock: true,
     embers: true,
@@ -337,7 +338,8 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     // The pools of 2026-11-17 (real parses: a human raid of ten deals about
     // 1,400 DPS; Normal about 4 to 4.5 minutes of uptime, Heroic about 5,
     // Mythic about 7, the fight's own downtime counted; smith_heart.md).
-    healthMult: 1.35,
+    // The owner's call of 2026-11-17: the biggest pool of the raid, about 15 percent over the next (its Mythic rebirth counted).
+    healthMult: 1.8,
     burstTier: 'lethal',
     switchShock: true,
     embers: true,

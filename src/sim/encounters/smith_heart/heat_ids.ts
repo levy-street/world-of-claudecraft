@@ -272,7 +272,8 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     // The pools of 2026-11-17 (real parses: a human raid of ten deals about
     // 1,400 DPS; Normal about 4 to 4.5 minutes of uptime, Heroic about 5,
     // Mythic about 7, the fight's own downtime counted; smith_heart.md).
-    healthMult: 1.22,
+    // The owner's call of 2026-11-17: the Council's and the Quench's pool.
+    healthMult: 1.47,
     overflowAdds: true,
     seedHatch: true,
     bolts: 3,
@@ -290,7 +291,8 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     // The pools of 2026-11-17 (real parses: a human raid of ten deals about
     // 1,400 DPS; Normal about 4 to 4.5 minutes of uptime, Heroic about 5,
     // Mythic about 7, the fight's own downtime counted; smith_heart.md).
-    healthMult: 1.81,
+    // The owner's call of 2026-11-17: the Council's and the Quench's pool.
+    healthMult: 2.06,
     overflowAdds: true,
     seedHatch: true,
     bolts: 3,
