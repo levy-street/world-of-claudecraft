@@ -22220,6 +22220,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.realmBuilder.close': 'Закрыть',
   'worldContent.realmBuilderMonumentName': 'Памятник зодчим королевства',
   'worldContent.musterRackName': 'Оружейная стойка ополчения',
+  'worldContent.heartSealCrystalName': 'Кристалл печати сердца',
+  'worldContent.heartSealCrystalInteract': 'Кристалл печати сердца: нажмите F, чтобы разбить',
   'hudChrome.talkingHead.label': 'Диалог',
   'hudChrome.hubLesson.target': 'Сначала возьми манекен в цель.',
   'hudChrome.hubLesson.openWindow': 'Открой {meters}.',

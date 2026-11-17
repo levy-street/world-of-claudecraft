@@ -1055,6 +1055,8 @@ type WorldEntityTranslations = {
     farmPatchName: string;
     realmBuilderMonumentName: string;
     musterRackName: string;
+    heartSealCrystalName: string;
+    heartSealCrystalInteract: string;
   };
   entities: {
     mobs: MobTranslations;
@@ -1193,6 +1195,8 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
       farmPatchName: 'Garden Beds',
       realmBuilderMonumentName: 'Realm Builder Monument',
       musterRackName: 'Muster Weapon Rack',
+      heartSealCrystalName: 'The Heart Seal Crystal',
+      heartSealCrystalInteract: 'The Heart Seal Crystal: Press F to break it',
     },
     entities: { mobs, npcs, quests, zones, dungeons, delves, letters },
   };

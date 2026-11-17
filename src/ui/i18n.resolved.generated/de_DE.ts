@@ -31621,6 +31621,8 @@ export const de_DE: EnTranslations = {
     "noticeboardName": "Anschlagtafel",
     "farmPatchName": "Gartenbeete",
     "realmBuilderMonumentName": "Reichsbauer-Denkmal",
-    "musterRackName": "Waffenständer des Aufgebots"
+    "musterRackName": "Waffenständer des Aufgebots",
+    "heartSealCrystalName": "The Heart Seal Crystal",
+    "heartSealCrystalInteract": "The Heart Seal Crystal: Press F to break it"
   }
 };

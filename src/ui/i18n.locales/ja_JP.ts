@@ -20129,6 +20129,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.realmBuilder.close': '閉じる',
   'worldContent.realmBuilderMonumentName': '王国建設者の記念碑',
   'worldContent.musterRackName': '召集兵団の武器棚',
+  'worldContent.heartSealCrystalName': '心臓の封印水晶',
+  'worldContent.heartSealCrystalInteract': '心臓の封印水晶：Fで砕く',
   'hudChrome.talkingHead.label': '会話',
   'hudChrome.hubLesson.target': 'まずダミーを標的にしよう。',
   'hudChrome.hubLesson.openWindow': '{meters}を開こう。',

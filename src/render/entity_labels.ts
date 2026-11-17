@@ -7,6 +7,7 @@
 import type { HarborRouteMarkerDestination } from '../sim/content/harbor_route_markers';
 import { IGNIVAR_LORE_OBJECTS } from '../sim/content/ignivar_raid_lore';
 import { MUSTER_RACK_TEMPLATE_ID } from '../sim/content/mirefen_muster';
+import { isSealCrystalTemplate } from '../sim/encounters/smith_heart/seal_crystal';
 import { type Entity, REALM_BUILDER_MONUMENT_TEMPLATE_ID } from '../sim/types';
 import { investigationObjectLabel } from '../ui/entity_display_core';
 import { dungeonDisplayName, poiMarkLabel, tEntity, zoneDisplayName } from '../ui/entity_i18n';
@@ -56,6 +57,15 @@ export function objectDisplayName(entity: Entity): string {
   // never the item it hands out.
   if (entity.templateId === MUSTER_RACK_TEMPLATE_ID) {
     return t('worldContent.musterRackName');
+  }
+  // The Smith's Heart's heart seal crystal: the name while it is dark, the call to action
+  // while it is charged (the sim keeps it lootable only then, seal_crystal.ts).
+  if (isSealCrystalTemplate(entity.templateId)) {
+    return t(
+      entity.lootable
+        ? 'worldContent.heartSealCrystalInteract'
+        : 'worldContent.heartSealCrystalName',
+    );
   }
   if (entity.templateId === 'soulwell') {
     return tEntity({ kind: 'ability', id: 'soulwell', field: 'name' });

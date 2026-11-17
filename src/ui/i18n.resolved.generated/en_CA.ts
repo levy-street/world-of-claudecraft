@@ -31621,6 +31621,8 @@ export const en_CA: EnTranslations = {
     "noticeboardName": "Notice Board",
     "farmPatchName": "Garden Beds",
     "realmBuilderMonumentName": "Realm Builder Monument",
-    "musterRackName": "Muster Weapon Rack"
+    "musterRackName": "Muster Weapon Rack",
+    "heartSealCrystalName": "The Heart Seal Crystal",
+    "heartSealCrystalInteract": "The Heart Seal Crystal: Press F to break it"
   }
 };
