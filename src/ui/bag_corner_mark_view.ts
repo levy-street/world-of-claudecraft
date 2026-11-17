@@ -35,8 +35,9 @@ export type BagCornerMark =
 /** Which corner treatment wins the cell's top-left corner. Masterwork keeps
  *  its authored seal over everything; quest purpose outranks the fine grade;
  *  the fine seal outranks every remaining per-copy glyph and the generic
- *  wedge. Rim/wash classes are decided separately (bagRimClasses): a fine
- *  stack keeps its rim even when the masterwork seal wins the corner. */
+ *  kind (which paints nothing). Rim/wash classes are decided separately
+ *  (bagRimClasses): a fine stack keeps its rim even when the masterwork seal
+ *  wins the corner. */
 export function bagCornerMark(
   glyphKind: BagInstanceGlyphKind,
   questMark: BagQuestMarkKind,

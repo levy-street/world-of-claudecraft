@@ -195,6 +195,15 @@ describe('guild bank grid instanced-slot marker', () => {
     expect(cell.getAttribute('aria-label')).toBe(`${plainName}, quantity 1, maker-marked copy`);
   });
 
+  it('an instanced copy of no named kind paints no corner mark', () => {
+    // The gold wedge is gone on every surface; the cell keeps its per-copy
+    // accessible name (signed and generic share the maker-marked wording).
+    const root = harness([{ itemId: plainId, count: 1, instance: { bindOnTrade: false } }]);
+    const cell = cellsOf(root)[0];
+    expect(cell.querySelectorAll('.bi-glyph, .bi-instance, .bi-masterwork-seal').length).toBe(0);
+    expect(cell.getAttribute('aria-label')).toBe(`${plainName}, quantity 1, maker-marked copy`);
+  });
+
   it('dormant outranks the per-copy flag while both marks coexist', () => {
     // A soulbound def is dormant (pipe-refused) in the guild bank; give it a
     // masterwork payload so the aria branch has to CHOOSE. The lock is the

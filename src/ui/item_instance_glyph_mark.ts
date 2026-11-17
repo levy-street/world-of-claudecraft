@@ -3,7 +3,8 @@
 // priorities live in the pure cores (bag_instance_glyph_view.ts for per-copy
 // kinds, bag_corner_mark_view.ts for the cross-mark corner priority); this is
 // the thin markup so every surface paints the same masterwork seal,
-// enchanted/signed/bound glyph, generic wedge, or fine-grade seal. Marks are
+// enchanted/signed/bound glyph, or fine-grade seal. An instanced copy of no
+// named kind (the 'generic' arm) paints no corner mark at all. Marks are
 // aria-hidden: the cell's accessible name carries the per-copy fact via
 // INSTANCE_GLYPH_ARIA_KEYS (or the unknown-id siblings); the fine grade needs
 // no aria arm because the item NAME carries the grade word in every locale.
@@ -24,7 +25,7 @@ import type { TranslationKey } from './i18n';
 import { svgIcon, type UiIconName } from './ui_icons';
 
 // Procedural chrome glyph each non-masterwork kind paints. Masterwork keeps its
-// authored seal image; generic keeps the CSS wedge. No binary asset is added.
+// authored seal image; generic paints nothing. No binary asset is added.
 const GLYPH_ICONS: Readonly<Record<'enchanted' | 'signed' | 'bound', UiIconName>> = {
   enchanted: 'enchant-rune',
   signed: 'makers-mark',
@@ -72,15 +73,17 @@ export function lockMarkHtml(locked: boolean): string {
   return `<span class="bi-lock-seal" aria-hidden="true">${svgIcon('lock')}</span>`;
 }
 
-/** Corner-mark HTML for one resolved kind, or '' when null (plain fungible). */
+/** Corner-mark HTML for one resolved kind, or '' when null (plain fungible)
+ *  or generic (an instanced copy of no named kind). */
 export function instanceGlyphMarkHtml(kind: BagInstanceGlyphKind): string {
   if (kind === null) return '';
   if (kind === 'masterwork') {
     return `<img class="bi-masterwork-seal" src="${MASTERWORK_SEAL_IMAGE_URL}" alt="" aria-hidden="true" draggable="false">`;
   }
-  if (kind === 'generic') {
-    return '<span class="bi-instance" aria-hidden="true"></span>';
-  }
+  // An instanced copy of no named kind wears no corner mark: the bare gold
+  // wedge it used to paint said nothing about WHY the copy was special. Its
+  // cell keeps the per-copy accessible name and the tooltip keeps the detail.
+  if (kind === 'generic') return '';
   return `<span class="bi-glyph bi-glyph-${kind}" aria-hidden="true">${svgIcon(GLYPH_ICONS[kind])}</span>`;
 }
 

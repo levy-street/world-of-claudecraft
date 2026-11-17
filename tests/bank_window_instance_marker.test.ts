@@ -2,7 +2,7 @@
 //
 // Bank grid instanced-slot markers (Professions 2.0): a banked masterwork must
 // keep the authored seal, and every other per-copy kind (enchanted / signed /
-// bound / generic) must paint the same corner mark bags use. Drives the real
+// bound / generic) must paint the same corner treatment bags use. Drives the real
 // BankWindow painter against a stubbed IWorld bank mirror (the bank_window_search_reset
 // harness idiom). CSS coverage for bank-item shares the bags stylesheet pins.
 
@@ -159,11 +159,12 @@ describe('bank grid instanced-slot marker', () => {
     expect(cells[0].querySelector('.bi-glyph-enchanted')).not.toBeNull();
     expect(cells[1].querySelector('.bi-glyph-signed')).not.toBeNull();
     expect(cells[2].querySelector('.bi-glyph-bound')).not.toBeNull();
-    expect(cells[3].querySelector('.bi-instance')).not.toBeNull();
     expect(cells[4].querySelector('.bi-masterwork-seal')).not.toBeNull();
-    for (const cell of cells) {
-      const markers = cell.querySelectorAll('.bi-glyph, .bi-instance, .bi-masterwork-seal');
-      expect(markers.length).toBe(1);
+    // The unclassified payload paints no corner mark (the gold wedge is gone).
+    const MARKS = '.bi-glyph, .bi-instance, .bi-masterwork-seal';
+    expect(cells[3].querySelectorAll(MARKS).length).toBe(0);
+    for (const cell of [cells[0], cells[1], cells[2], cells[4]]) {
+      expect(cell.querySelectorAll(MARKS).length).toBe(1);
     }
     // Exact strings, not regexes: the unknown-key siblings carry the same
     // per-kind tail wording, so only the full string (display name included)
@@ -192,7 +193,7 @@ describe('bank grid instanced-slot marker', () => {
     );
   });
 
-  it('a counted masterwork keeps its count badge without restoring the generic marker', () => {
+  it('a counted masterwork keeps its count badge beside the seal alone', () => {
     const root = windowFor([
       slot('copper_ore', { rolled: { masterwork: true, stats: { sta: 1 } } }, 2),
     ]);
@@ -291,7 +292,7 @@ describe('bank-item instance mark stylesheet contract', () => {
     expect(components).toMatch(/\.bag-item \.bi-glyph,\s*\.bank-item \.bi-glyph,/);
     expect(components).toMatch(/\.bag-item \.bi-fine-seal,\s*\.bank-item \.bi-fine-seal \{/);
     expect(components).toMatch(/\.bag-item\.bag-fine,\s*\.bank-item\.bag-fine \{/);
-    expect(components).toMatch(/\.bag-item \.bi-instance,\s*\.bank-item \.bi-instance \{/);
+    expect(components).not.toContain('.bi-instance');
     expect(components).not.toContain('.bank-item:hover .bi-masterwork-seal');
     expect(components).not.toContain('.bank-item:hover .bi-glyph');
     // Tokenized per-kind tints ride the same bag tokens. Each rule is sliced

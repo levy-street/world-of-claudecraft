@@ -13,8 +13,8 @@
 //                    rolled.stats copy without the masterwork flag)
 //   3. signed      - a maker's mark (instance.signer)
 //   4. bound       - the Maker's Bond (bindOnTrade, or already boundTo someone)
-//   5. generic     - an instanced copy carrying none of the above; keeps the
-//                    pre-existing wedge so no payload silently loses its marker
+//   5. generic     - an instanced copy carrying none of the above; paints no
+//                    corner mark, but keeps its per-copy accessible name
 // The glyph is information-ADD and aria-hidden: the accessible name and the
 // tooltip carry the semantics, and it renders identically on every graphics
 // preset (no --fx gate), so it never becomes a fairness lever.

@@ -336,8 +336,9 @@ follow the root `extract-and-test` skill for the move-not-rewrite mechanics. The
   `ActionBarPainter` from a new bar descriptor (`hud/action_bar/action_bar_view.ts` +
   `action_bar_painter.ts`).
 - **Item-cell marks are an ALL-SURFACES family, never a one-window feature.** Every mark an
-  owned item stack wears (the masterwork seal, the enchanted/signed/bound glyphs, the generic
-  instance wedge, the fine-grade rim + seal, and any future grade/purpose/per-copy mark) paints
+  owned item stack wears (the masterwork seal, the enchanted/signed/bound glyphs, the
+  fine-grade rim + seal, and any future grade/purpose/per-copy mark; an instanced copy of no
+  named kind deliberately wears none) paints
   identically on EVERY surface that renders owned stacks: the bag grid, the personal bank grid,
   the guild bank grid, and the Materials Vault row strip (`vault_window.ts` wires the full
   family). A new mark, or a new surface that shows owned stacks, wires all of

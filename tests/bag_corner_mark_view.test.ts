@@ -24,7 +24,7 @@ describe('bag_corner_mark_view: corner priority', () => {
     }
   });
 
-  it('fine outranks every per-copy glyph and the generic wedge', () => {
+  it('fine outranks every per-copy glyph and the generic kind', () => {
     expect(bagCornerMark(null, null, true)).toBe('fine');
     for (const glyph of ['enchanted', 'signed', 'bound', 'generic'] as const) {
       expect(bagCornerMark(glyph, null, true), glyph).toBe('fine');

@@ -9651,28 +9651,11 @@
       0 0 3px #000;
     pointer-events: none;
   }
-  /* Instanced-copy marker (Professions 2.0): a static gold corner
-     tab, now the FALLBACK for an instanced stack whose payload matches none of
-     the named kinds below. Always visible on the cell itself on desktop and
-     touch (information-add, identical on every graphics preset, so no --fx-*
-     gate). Top-left, clear of the bottom-right count badge. */
-  .vault-row .bi-instance,
-  .bag-item .bi-instance,
-  .bank-item .bi-instance {
-    position: absolute;
-    top: 1px;
-    left: 1px;
-    width: 11px;
-    height: 11px;
-    clip-path: polygon(0 0, 100% 0, 0 100%);
-    background: var(--color-accent);
-    pointer-events: none;
-  }
   /* Per-kind corner glyphs: the enchanted / signed / bound copies each get their
      own procedural chrome glyph in the same top-left corner, so the marker says
      WHICH kind of special copy this is instead of only that it is one. Same
-     always-on, preset-independent contract as .bi-instance above (no --fx-*
-     gate, no hover reveal); the tooltip carries the semantics, the glyph is
+     always-on contract on every graphics preset (no --fx-* gate, no hover
+     reveal); the tooltip carries the semantics, the glyph is
      aria-hidden. Colors come from tokens, never a literal in the painter.
      The BOX is shared by every 12px chrome-SVG corner mark (per-copy glyphs,
      quest seal, fine seal): top-left, clear of the bottom-right count badge,
@@ -11173,7 +11156,6 @@
      cell, and a vault row is a wide flex button, so the placement is stated
      here against the row's padding box, over the leading item icon's corner
      (the row is position: relative for exactly this). */
-  .vault-row .bi-instance,
   .vault-row .bi-glyph,
   .vault-row .bi-fine-seal {
     position: absolute;
@@ -11359,9 +11341,6 @@
     .woc-store-global-result.failure {
       border-color: Highlight;
       color: CanvasText;
-    }
-    .vault-row .bi-instance {
-      background: CanvasText;
     }
     .vault-row .bi-glyph,
     .vault-row .bi-fine-seal,
