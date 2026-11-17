@@ -6034,6 +6034,7 @@ export class Hud {
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
     hideTooltip: () => this.hideTooltip(),
     barActions: () => this.hotbarActions,
+    wornTrinketId: () => this.sim.equipment.trinket,
     sourceSlotCount: () => MOBILE_ACTION_SOURCE_SLOT_COUNT,
     editAllowed: () => isActionBarEditAllowed(this.actionBarsLocked(), 'drop'),
     placeAbility: (abilityId, slot) => {
@@ -6932,7 +6933,6 @@ export class Hud {
   }
 
   private abilityTooltip(res: ResolvedAbility): string {
-    // The Trinket spell reads as the trinket a press would use.
     const trinket = trinketSpellItem(res.def.id, this.sim.equipment.trinket);
     if (trinket) return this.itemTooltip(trinket) + itemInBagsLine(0, true);
     const a = res.def;

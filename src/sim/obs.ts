@@ -8,6 +8,7 @@ import {
 } from './combat/necromancy_dominion';
 import { canUseForbiddenReflection } from './combat/warlock_talents';
 import { noticeboardDefByEntityId } from './content/noticeboards';
+import { TRINKET_SPELL_ID } from './content/trinket_spell';
 import { corpseInteractionAvailability } from './corpse_interaction';
 import { CLASSES, ITEMS, QUEST_ORDER, QUESTS, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from './data';
 import {
@@ -131,7 +132,11 @@ export function applyAction(sim: Sim, action: number): void {
       break;
     default: {
       if (name.startsWith('ability_')) {
-        sim.castAbilityBySlot(parseInt(name.slice(8), 10) - 1);
+        const slot = parseInt(name.slice(8), 10) - 1;
+        // The Trinket spell is a player convenience, not an RL action: its slot
+        // stays the empty no-op it was before the spell existed (see the
+        // matching observation arm below).
+        if (sim.known[slot]?.def.id !== TRINKET_SPELL_ID) sim.castAbilityBySlot(slot);
       }
     }
   }
@@ -194,7 +199,10 @@ export function encodeObs(sim: Sim): number[] {
   let dominionComposition: number | null = null;
   for (let i = 0; i < ABILITY_SLOTS; i++) {
     const known = sim.known[i];
-    if (!known) {
+    // The Trinket spell reads as an empty slot: it sits after the class kit, in
+    // the slot the next learned ability takes, so exposing it would hand the
+    // agent an action whose index moves with every level.
+    if (!known || known.def.id === TRINKET_SPELL_ID) {
       obs.push(0, 0);
       continue;
     }

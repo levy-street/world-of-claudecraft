@@ -754,7 +754,8 @@ export function createActionBarView(
         }
 
         if (item !== null) {
-          const count = countRawInSlots(world.inventory, item.id);
+          // The Trinket spell's trinket is worn, never counted: skip the bag scan.
+          const count = ownItem ? countRawInSlots(world.inventory, item.id) : 0;
           // A trinket is used where it is worn: its slot reads the equipment and
           // its own use cooldown instead of the bag count (trinket_slot_core.ts).
           const trinket = trinketSlotState(item.id, world.wornTrinketId, player.cooldowns);

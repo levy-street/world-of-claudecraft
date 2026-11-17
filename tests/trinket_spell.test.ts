@@ -1,6 +1,7 @@
 // The Trinket spell (src/sim/content/trinket_spell.ts): the class-neutral
 // ability every character knows, whose press uses whichever trinket is worn
 // (src/sim/combat/trinkets.ts castTrinketSpell), against a real Sim.
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { buildClientAbilityPresentation } from '../src/net/ability_presentation';
 import { TRINKET_EQUIP_LOCKOUT } from '../src/sim/combat/trinkets';
@@ -9,7 +10,10 @@ import { emptyAllocation } from '../src/sim/content/talents';
 import { TRINKET_SPELL, TRINKET_SPELL_ID } from '../src/sim/content/trinket_spell';
 import { TRINKET_AURA, TRINKET_SPECS, trinketCooldownKey } from '../src/sim/content/trinkets';
 import { membershipAbilities } from '../src/sim/membership_abilities';
-import { Sim } from '../src/sim/sim';
+import { ACTIONS, applyAction, encodeObs } from '../src/sim/obs';
+import { type CharacterState, Sim } from '../src/sim/sim';
+import { clearFiestaAugments, fiestaApplyAugments } from '../src/sim/social/fiesta';
+import { migrateCharacterTalentsV2 } from '../src/sim/talent_save_migration';
 import { trinketSpellItemId, withTrinketSpell } from '../src/sim/trinket_spell';
 import type { Entity, PlayerClass, SimEvent } from '../src/sim/types';
 
@@ -189,5 +193,85 @@ describe('casting the Trinket spell', () => {
     sim.castAbility(TRINKET_SPELL_ID);
     expect(errors(sim.drainEvents())).toEqual(['You are dead.']);
     expect(sim.player.cooldowns.has(trinketCooldownKey('wayfarers_lodestone'))).toBe(false);
+  });
+});
+
+describe('every way the known list is rebuilt keeps the spell', () => {
+  it('survives the Fiesta augment rebuilds, so a bout never unlearns it', () => {
+    const sim = fresh();
+    const meta = sim.players.get(sim.player.id);
+    if (!meta) throw new Error('no player meta');
+    fiestaApplyAugments(meta, sim.player);
+    expect(knownIds(sim).filter((id) => id === TRINKET_SPELL_ID)).toHaveLength(1);
+    clearFiestaAugments(meta, sim.player);
+    expect(knownIds(sim).filter((id) => id === TRINKET_SPELL_ID)).toHaveLength(1);
+    // And the server still answers the press after the rebuild.
+    wear(sim, 'wayfarers_lodestone');
+    sim.castAbility(TRINKET_SPELL_ID);
+    expect(errors(sim.drainEvents())).toEqual([]);
+    expect(aura(sim.player, TRINKET_AURA.sprint)?.kind).toBe('buff_speed');
+  });
+
+  it('casts by known-list slot, the path the online castSlot command takes', () => {
+    const sim = fresh();
+    wear(sim, 'wayfarers_lodestone');
+    sim.castAbilityBySlot(knownIds(sim).indexOf(TRINKET_SPELL_ID));
+    expect(aura(sim.player, TRINKET_AURA.sprint)?.kind).toBe('buff_speed');
+  });
+});
+
+describe('a saved loadout bar through the talent save migration', () => {
+  const fixture = JSON.parse(
+    readFileSync(new URL('./fixtures/v025_warrior_character.json', import.meta.url), 'utf8'),
+  ) as { state: CharacterState };
+
+  function migratedBar(bar: (string | null)[]): (string | null)[] {
+    const legacy = structuredClone(fixture.state);
+    legacy.loadouts = [
+      { name: 'Old', alloc: structuredClone(legacy.talents ?? emptyAllocation()), bar },
+    ];
+    legacy.activeLoadout = 0;
+    return migrateCharacterTalentsV2('warrior', legacy).loadouts?.[0].bar ?? [];
+  }
+
+  it('keeps a placed Trinket spell where the player put it', () => {
+    const bar = migratedBar(['battle_shout', null, null, TRINKET_SPELL_ID]);
+    expect(bar[3]).toBe(TRINKET_SPELL_ID);
+    expect(bar.filter((id) => id === TRINKET_SPELL_ID)).toHaveLength(1);
+  });
+
+  it('never seeds one onto a bar that did not hold it', () => {
+    expect(migratedBar(['battle_shout'])).not.toContain(TRINKET_SPELL_ID);
+  });
+});
+
+describe('the RL environment', () => {
+  // The spell sits after the class kit, in the slot the next learned ability
+  // takes. To an agent it must stay the empty slot it was before the spell.
+  it('observes the Trinket slot as empty and treats its action as a no-op', () => {
+    const withTrinket = fresh();
+    wear(withTrinket, 'wayfarers_lodestone');
+    const bare = fresh();
+    const slot = knownIds(withTrinket).indexOf(TRINKET_SPELL_ID);
+    expect(slot).toBeGreaterThan(0);
+    expect(knownIds(bare).indexOf(TRINKET_SPELL_ID)).toBe(slot);
+
+    // A ready trinket changes nothing an agent can see in the ability block.
+    const a = encodeObs(withTrinket);
+    const b = encodeObs(bare);
+    expect(a).toHaveLength(b.length);
+    const differing = a.flatMap((v, i) => (v === b[i] ? [] : [i]));
+    // Whatever differs (gear stats from the worn trinket) is identical with the
+    // spell slot's own pair forced empty: prove the pair itself by toggling it.
+    withTrinket.player.cooldowns.set(trinketCooldownKey('wayfarers_lodestone'), 30);
+    const cooling = encodeObs(withTrinket);
+    expect(cooling.flatMap((v, i) => (v === b[i] ? [] : [i]))).toEqual(differing);
+    withTrinket.player.cooldowns.delete(trinketCooldownKey('wayfarers_lodestone'));
+
+    const action = ACTIONS.indexOf(`ability_${slot + 1}`);
+    expect(action).toBeGreaterThan(0);
+    applyAction(withTrinket, action);
+    expect(aura(withTrinket.player, TRINKET_AURA.sprint)).toBeUndefined();
+    expect(withTrinket.player.cooldowns.has(trinketCooldownKey('wayfarers_lodestone'))).toBe(false);
   });
 });

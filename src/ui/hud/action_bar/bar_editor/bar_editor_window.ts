@@ -34,6 +34,7 @@ import { svgIcon } from '../../../ui_icons';
 import type { HotbarAction } from '../hotbar';
 import { MOBILE_ACTION_BUTTONS } from '../mobile_action_page_view';
 import { petSlotIconId, petSlotText } from '../pet_slot_core';
+import { trinketSpellItem } from '../trinket_spell_core';
 import {
   armBarEditorAbility,
   BAR_EDITOR_DIRECTION_KEYS,
@@ -62,6 +63,9 @@ export interface BarEditorWindowDeps {
   hideTooltip(): void;
   /** The bar's LIVE slot array (index 0 = barSlot 1), as Hud holds it. */
   barActions(): readonly HotbarAction[];
+  /** The item id in the player's trinket slot, so a Trinket spell cell shows the
+   *  trinket the live bar shows (trinket_spell_core.ts). Absent: the spell's own. */
+  wornTrinketId?(): string | null | undefined;
   /** Configurable source slots the editor may bind, which is the live ring's own
    *  span: the same cells, so anything bindable here is castable there. */
   sourceSlotCount(): number;
@@ -378,6 +382,8 @@ export class BarEditorWindow {
       return item ? itemDisplayName(item) : null;
     }
     if (action.type === 'pet') return t(petSlotText(action.id).name);
+    const trinket = trinketSpellItem(action.id, this.deps.wornTrinketId?.());
+    if (trinket) return itemDisplayName(trinket);
     const def = ABILITIES[action.id];
     return def ? abilityDisplayName(def) : null;
   }
@@ -385,6 +391,10 @@ export class BarEditorWindow {
   private iconBackground(action: HotbarAction): string {
     if (action === null) return '';
     if (action.type === 'pet') return `url(${iconDataUrl('ability', petSlotIconId(action.id))})`;
+    if (action.type === 'ability') {
+      const trinket = trinketSpellItem(action.id, this.deps.wornTrinketId?.());
+      if (trinket) return `url(${iconDataUrl('item', trinket.id)})`;
+    }
     return `url(${iconDataUrl(action.type === 'item' ? 'item' : 'ability', action.id)})`;
   }
 }
