@@ -119847,7 +119847,7 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="10062">&lt;woc-art path=&quot;/ui/mobs/sexton_marrow.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="10172">&lt;woc-art path=&quot;/ui/mobs/sexton_marrow.webp&quot; /&gt;
 :&apos;&apos;Other pages have this name. See [[Sexton Marrow|all pages named Sexton Marrow]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/crypt_skel_sexton.webp&quot; size=&quot;model&quot; /&gt;
@@ -119930,9 +119930,13 @@ At 66% and 33% health he walks to the bell rope and rings the Burial Toll.
 
 * &lt;woc-art path=&quot;/encyclopedia-attacks/sexton_marrow__burial_toll.webp&quot; size=&quot;attack&quot; /&gt; Burial Toll. He walks to the rope and rings the bell for 3 sec, immune to damage while he walks and rings. Then every player takes 30 to 38 damage, and every open grave raises a Restless Bones. Healers top everyone up before the last peal. The tank picks up the Restless Bones; damage dealers kill them. (important)
 
+=== Tips by role ===
+
 * tank: Keep him facing away from the group. Pick up every Restless Bones after a Burial Toll.
 * healer: Burial Toll hits the whole group. Graves slow and burn anyone in them, so help whoever is stuck in one.
 * damage: When marked, carry the grave to the yard&apos;s edge. After each Toll, kill the Restless Bones, then return to [[Sexton Marrow (NPC)|Marrow]].
+
+=== Your choice ===
 
 * Where do the graves go? Graves dug at the edge of the yard leave the middle free to fight and dodge in. Every open grave anywhere raises a Restless Bones at the next Toll, up to 8 at once.
 
@@ -119955,11 +119959,17 @@ At 66% and 33% health he walks to the bell rope and rings the Burial Toll.
 
 * &lt;woc-art path=&quot;/encyclopedia-attacks/sexton_marrow__burial_toll.webp&quot; size=&quot;attack&quot; /&gt; Burial Toll. He walks to the rope and rings the bell for 3 sec, immune to damage while he walks and rings. Then every player takes 198 to 251 damage, and every open grave raises a Restless Bones. Healers top everyone up before the last peal. The tank picks up the Restless Bones; damage dealers kill them. (important)
 
+=== Tips by role ===
+
 * tank: Keep him facing away from the group and out of every grave. Gravedigger&apos;s Blow stacks: use cooldowns as they rise.
 * healer: Burial Toll hits the whole group. Graves slow and burn anyone in them, so help whoever is stuck in one.
 * damage: When marked, carry the grave to the yard&apos;s edge. After each Toll, kill the Restless Bones, then return to [[Sexton Marrow (NPC)|Marrow]].
 
+=== Your choice ===
+
 * Where do the graves go? Graves dug at the edge of the yard leave the middle free to fight and dodge in. Every open grave anywhere raises a Restless Bones at the next Toll, up to 8 at once. On Heroic a grave near the tank also speeds Marrow up.
+
+=== Heroic changes ===
 
 * Every ability on this page hits 6 times as hard as on Normal.
 * Gravedigger&apos;s Blow: a tank hit that stacks 6% more damage taken.
@@ -120071,7 +120081,7 @@ The game rolls once for this group. At most &apos;&apos;&apos;one&apos;&apos;&ap
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="12626">&lt;woc-art path=&quot;/ui/mobs/morthen.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="12736">&lt;woc-art path=&quot;/ui/mobs/morthen.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Morthen the Gravecaller (Contract)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/crypt_morthen_lich.webp&quot; size=&quot;model&quot; /&gt;
@@ -120161,9 +120171,13 @@ At 35% health he takes up his scythe for the end of the fight.
 
 * &lt;woc-art path=&quot;/encyclopedia-attacks/morthen__reap_the_unquiet.webp&quot; size=&quot;attack&quot; /&gt; Reap the Unquiet. Every 14 sec, a 2 sec cast at the tank, then a 120 degree scythe sweep 14 yd in front of him: 55 to 65 damage. Only the tank stands in front. The tank can sidestep during the cast. (important)
 
+=== Tips by role ===
+
 * tank: Keep him facing away from the group, and step out of the Shadow Pulse with everyone else.
 * healer: Each candle costs the lighter a big share of their health and Grave Chill keeps rising: heal the lighters first.
 * damage: Body-block the Bound Souls, relight candles in the Rite, then burst him while he is stunned.
+
+=== Your choice ===
 
 * How many lighters? Several players relighting at once ends the Rite sooner, before Grave Chill climbs. Each lighter pays 24% of their maximum health per candle while the chill keeps rising.
 * Block the souls? A blocked soul never reaches him: no damage stack and no heal. The blocker takes the soul&apos;s damage. Every soul that gets through adds 10% damage and heals him 3%.
@@ -120193,12 +120207,18 @@ At 35% health he takes up his scythe for the end of the fight.
 
 * &lt;woc-art path=&quot;/encyclopedia-attacks/morthen__reap_the_unquiet.webp&quot; size=&quot;attack&quot; /&gt; Reap the Unquiet. Every 14 sec, a 2 sec cast at the tank, then a 120 degree scythe sweep 14 yd in front of him: 495 to 585 damage. Only the tank stands in front. The tank can sidestep during the cast. (important)
 
+=== Tips by role ===
+
 * tank: Keep him facing away from the group, and step out of the Shadow Pulse with everyone else.
 * healer: Each candle costs the lighter a big share of their health and Grave Chill keeps rising: heal the lighters first.
 * damage: Body-block the Bound Souls and dodge Grasp of the Grave. In the Rite, follow the gold beam to the right candle.
 
+=== Your choice ===
+
 * How many lighters? Several players relighting at once ends the Rite sooner, before Grave Chill climbs. Each lighter pays 24% of their maximum health per candle while the chill keeps rising.
 * Block the souls? A blocked soul never reaches him: no damage stack and no heal. The blocker takes the soul&apos;s damage. Every soul that gets through adds 10% damage and heals him 3%.
+
+=== Heroic changes ===
 
 * Every ability on this page hits 9 times as hard as on Normal.
 * Name the Dead: the candles must be lit in the order the ledger shows.
@@ -120646,7 +120666,7 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="10528">&lt;woc-art path=&quot;/ui/mobs/knight_commander_olen.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="10638">&lt;woc-art path=&quot;/ui/mobs/knight_commander_olen.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Knight-Commander Olen (Contract)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/bastion_olen.webp&quot; size=&quot;model&quot; /&gt;
@@ -120732,9 +120752,13 @@ At 50% health he kneels, immune, while Drowned Sergeants fight for him.
 
 * &lt;woc-art path=&quot;/encyclopedia-attacks/knight_commander_olen__unbroken_oath.webp&quot; size=&quot;attack&quot; /&gt; Unbroken Oath. Once, at 50% health: he kneels and channels for up to 60 sec, immune to damage, while 2 Drowned Sergeants rise and attack players who are not the tank. Kill them all and he is stunned for 4 sec and takes 20% more damage for 10 sec. The tank gathers the Sergeants; everyone kills them, then bursts Olen while he is stunned. (important)
 
+=== Tips by role ===
+
 * tank: Drag him out of every brine pool. Keep the group out of the 8 yd around you, where his swings splash.
 * healer: Rebounding Bulwark and Sentence of the Tide hit hardest when players stand together. Sergeants enrage at low health.
 * damage: Stay spread, more than 10 yd apart, and away from the tank. In the Oath, kill the Sergeants first.
+
+=== Your choice ===
 
 * Stack or spread? Spread out and Rebounding Bulwark, Sentence of the Tide and [[Reaping Arc (Ability)|Reaping Arc]] each hit only one player. Anyone within 10 yd of a struck player takes the rebound, and anyone within 8 yd of the tank takes the splash.
 
@@ -120756,11 +120780,17 @@ At 50% health he kneels, immune, while Drowned Sergeants fight for him.
 
 * &lt;woc-art path=&quot;/encyclopedia-attacks/knight_commander_olen__unbroken_oath.webp&quot; size=&quot;attack&quot; /&gt; Unbroken Oath. Once, at 50% health: he kneels and channels for up to 60 sec, immune to damage, while 3 Drowned Sergeants rise and attack players who are not the tank. Kill them all and he is stunned for 4 sec and takes 20% more damage for 10 sec. The tank gathers the Sergeants; everyone kills them, then bursts Olen while he is stunned. (important)
 
+=== Tips by role ===
+
 * tank: Drag him out of every brine pool. Keep the group out of the 8 yd around you, where his swings splash.
 * healer: Rebounding Bulwark and Sentence of the Tide hit hardest when players stand together. Sergeants enrage at low health.
 * damage: Stay spread, more than 10 yd apart, and away from the tank. In the Oath, kill the Sergeants first.
 
+=== Your choice ===
+
 * Stack or spread? Spread out and Rebounding Bulwark, Sentence of the Tide and [[Reaping Arc (Ability)|Reaping Arc]] each hit only one player. Anyone within 10 yd of a struck player takes the rebound, and anyone within 8 yd of the tank takes the splash.
+
+=== Heroic changes ===
 
 * Every ability on this page hits 6 times as hard as on Normal.
 * Brine pools are 10 yd, the shield rebounds to 4 players, the Sentence column is 8 yd, and 3 Sergeants rise.
@@ -120870,7 +120900,7 @@ The game rolls once for this group. At most &apos;&apos;&apos;one&apos;&apos;&ap
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="11759">&lt;woc-art path=&quot;/ui/mobs/vael_the_mistcaller.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="11869">&lt;woc-art path=&quot;/ui/mobs/vael_the_mistcaller.webp&quot; /&gt;
 :&apos;&apos;Other pages have this name. See [[Vael the Fogbinder|all pages named Vael the Fogbinder]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/bastion_vael.webp&quot; size=&quot;model&quot; /&gt;
@@ -120955,9 +120985,13 @@ At 70% and 40% health he hides among identical copies.
 * Gathering Fog. He hides, then four figures rise around the crown: Vael and three Fog Shades. All four sing the Drowning Hymn for 18 sec, hurting everyone more each second. The Fogbeacon&apos;s beam sweeps every 4 sec: the real Vael lights up. Deal 5% of his health to him to break the veil: he is stunned for 4 sec and takes 20% more damage for 10 sec. Watch the beam, then everyone hits only the real Vael. (deadly, important)
 * Fogburst. Any hit on a Fog Shade bursts it: 50 to 60 damage and a 2 sec stun to players within 6 yd of it. Do not hit a copy: wait for the beam. (important)
 
+=== Tips by role ===
+
 * tank: Pick up the Drowned Thralls. During the veil, help find the real Vael.
 * healer: The Drowning Hymn ramps on everyone until the veil breaks. Mist Surge hits everyone within 12 yd of him.
 * damage: When Marked by Death, move forward or behind the pool. In the veil, hit only the figure the beam lights.
+
+=== Your choice ===
 
 * Wait for the beam, or guess? Waiting for the beam puts every hit on the real Vael and breaks the veil sooner. Every second of the veil the hymn hurts more. Guessing wrong bursts a copy: damage and a stun around it.
 
@@ -120979,11 +121013,17 @@ At 70% and 40% health he hides among identical copies.
 * Gathering Fog. He hides, then four figures rise around the crown: Vael and three Fog Shades, drifting one place every 5 sec. All four sing the Drowning Hymn for 18 sec. The Fogbeacon&apos;s beam shows the real Vael. Deal 5% of his health to him to break the veil: a 4 sec stun and 20% more damage taken for 10 sec. Watch the beam, then everyone hits only the real Vael. (deadly, important)
 * Fogburst. Any hit on a Fog Shade bursts it: 300 to 360 damage and a 2 sec stun to players within 6 yd, and a [[Drowned Thrall (Mob)|Drowned Thrall]] rises where it stood. Do not hit a copy: wait for the beam. (important)
 
+=== Tips by role ===
+
 * tank: Pick up the Drowned Thralls. During the veil, help find the real Vael.
 * healer: The Drowning Hymn ramps on everyone until the veil breaks. Mist Surge hits everyone within 12 yd of him.
 * damage: When Marked by Death, move forward or behind the pool, and avoid old pools. In the veil, hit only the figure the beam lights.
 
+=== Your choice ===
+
 * Wait for the beam, or guess? Waiting for the beam puts every hit on the real Vael and breaks the veil sooner. Every second of the veil the hymn hurts more. Guessing wrong bursts a copy, which stuns players near it and leaves a [[Drowned Thrall (Mob)|Drowned Thrall]].
+
+=== Heroic changes ===
 
 * Every ability on this page hits 6 times as hard as on Normal.
 * Grave Shadow: each shadow pool keeps burning for 6 sec.
@@ -121498,7 +121538,7 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="17601">&lt;woc-art path=&quot;/ui/mobs/korgath_the_bound.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="17711">&lt;woc-art path=&quot;/ui/mobs/korgath_the_bound.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Korgath the Bound (Contract)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/sanctum_korgath.webp&quot; size=&quot;model&quot; /&gt;
@@ -121593,9 +121633,13 @@ Below 30% health the boss enrages for the rest of the fight.
 
 * Enraged. Below 30% health its melee attacks deal 50% more damage and come 30% faster, for the rest of the fight. Tank and healer save their defensive and healing cooldowns for this phase. Everyone else pushes damage to end it fast. (important)
 
+=== Tips by role ===
+
 * tank: Hold him in the middle, facing away from the group. Once the Hammer chain breaks, Maul Arc hits everything in front of him. Until the Anvil chain breaks he cannot leave 10 yd of the middle.
 * healer: Strain, Shuddering Stomp and every freed attack land hard. Each chain left on makes the fight longer; each chain broken adds an attack to heal through.
 * damage: Kill Shackles to break the chains you chose, then burn Korgath. Step out of painted lanes and away from pillars that still hold a chain.
+
+=== Your choice ===
 
 * How many chains do you break? Each broken chain removes 20% of his damage cut: from 80% with all four chains, down to none. The fight gets much shorter. Each broken chain frees one attack for the rest of the pull. Hammer: Maul Arc. Tongs: Chain Flail. Anvil: Threshold Charge, and he can leave the middle. Bellows: Foreman&apos;s Bellow.
 
@@ -121628,11 +121672,17 @@ Below 30% health the boss enrages for the rest of the fight.
 
 * Enraged. Below 30% health its melee attacks deal 50% more damage and come 30% faster, for the rest of the fight. Tank and healer save their defensive and healing cooldowns for this phase. Everyone else pushes damage to end it fast. (important)
 
+=== Tips by role ===
+
 * tank: Hold him in the middle, facing away from the group. Once the Hammer chain breaks, Maul Arc hits everything in front of him. Until the Anvil chain breaks he cannot leave 10 yd of the middle.
 * healer: Strain, Shuddering Stomp and every freed attack land hard. Each chain left on makes the fight longer; each chain broken adds an attack to heal through.
 * damage: Kill Shackles to break the chains you chose, then burn Korgath. Stop every Goadsmith before its Re-rivet ends. Step out of painted lanes and away from pillars that still hold a chain.
 
+=== Your choice ===
+
 * How many chains do you break? Each broken chain removes 20% of his damage cut: from 80% with all four chains, down to none. The fight gets much shorter. Each broken chain frees one attack for the rest of the pull. Hammer: Maul Arc. Tongs: Chain Flail. Anvil: Threshold Charge, and he can leave the middle. Bellows: Foreman&apos;s Bellow. A Goadsmith also comes to re-rivet each broken chain.
+
+=== Heroic changes ===
 
 * Every ability on this page hits 2.5 times as hard as on Normal.
 * Re-rivet: 25 sec after a chain breaks, a Goadsmith tries to restore it. Interrupt, stun or kill it.
@@ -121787,7 +121837,7 @@ The game rolls once for this group. At most &apos;&apos;&apos;one&apos;&apos;&ap
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="13232">&lt;woc-art path=&quot;/ui/mobs/grand_necromancer_velkhar.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="13342">&lt;woc-art path=&quot;/ui/mobs/grand_necromancer_velkhar.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Grand Necromancer Velkhar (Contract)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/sanctum_velkhar.webp&quot; size=&quot;model&quot; /&gt;
@@ -121867,9 +121917,13 @@ Bonewalkers keep climbing out of the pools. At 66% and 33% health an extra wave 
 * &lt;woc-art path=&quot;/encyclopedia-attacks/grand_necromancer_velkhar__soulfire_trench.webp&quot; size=&quot;attack&quot; /&gt; Soulfire Trench. Every 18 sec, a 2 sec cast paints a 4 yd lane from him toward a player who is not the tank, out to the vault&apos;s rim. Then 200 to 240 damage to everyone in it, and the lane stays meltwater for 20 sec. Step out of the lane. Do not kill Bonewalkers on the meltwater strip it leaves. (deadly, important)
 * &lt;woc-art path=&quot;/encyclopedia-attacks/grand_necromancer_velkhar__shadow_volley.webp&quot; size=&quot;attack&quot; /&gt; Shadow [[Volley (Ability)|Volley]]. Every 12 sec, a 1.5 sec cast, then 90 to 110 shadow damage to everyone. It cannot be avoided: healers keep the whole group topped up.
 
+=== Tips by role ===
+
 * tank: Pick up every Bonewalker and drag it onto dry ice, out of the pools and the meltwater strips. In meltwater they hit 30% harder.
 * healer: Shadow [[Volley (Ability)|Volley]] hits everyone every 12 sec. Bonewalkers in meltwater hit 30% harder, so watch the tank when they reach water.
 * damage: Kill Bonewalkers only on dry ice, then return to Velkhar. Step out of the Soulfire Trench lane.
+
+=== Your choice ===
 
 * Where do the dead fall? A Bonewalker killed on dry ice is gone for good: fewer adds and a cleaner fight. Killed in meltwater, it rises again and heals Velkhar for 2% of his health each time. Dragging them to dry ice costs time, so plan the kill spot before you burn them.
 
@@ -121888,11 +121942,17 @@ Bonewalkers keep climbing out of the pools. At 66% and 33% health an extra wave 
 * Warm Hands. A Bonewalker that stands still for 3 sec melts a 3 yd meltwater puddle under itself for 8 sec. Keep the Bonewalkers moving, and never finish one off on top of a puddle. (important)
 * Twice-Woken. A Bonewalker that rises again comes back at full health and deals 25% more damage. Do not let any rise: kill them all on dry ice. (deadly)
 
+=== Tips by role ===
+
 * tank: Pick up every Bonewalker and drag it onto dry ice, out of the pools and the meltwater strips. Keep them moving: one that stands still melts a puddle under itself.
 * healer: Shadow [[Volley (Ability)|Volley]] hits everyone every 12 sec. Bonewalkers in meltwater hit 30% harder, so watch the tank when they reach water.
 * damage: Kill Bonewalkers only on dry ice, then return to Velkhar. Step out of the Soulfire Trench lane.
 
+=== Your choice ===
+
 * Where do the dead fall? A Bonewalker killed on dry ice is gone for good: fewer adds and a cleaner fight. Killed in meltwater, it rises again and heals Velkhar for 2% of his health each time. Dragging them to dry ice costs time, so plan the kill spot before you burn them.
+
+=== Heroic changes ===
 
 * Every ability on this page hits 2.5 times as hard as on Normal.
 * Warm Hands: a Bonewalker that stands still for 3 sec melts a meltwater puddle.
@@ -122043,7 +122103,7 @@ The game rolls once for this group. At most &apos;&apos;&apos;one&apos;&apos;&ap
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="18003">&lt;woc-art path=&quot;/ui/mobs/korzul_the_gravewyrm.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="18113">&lt;woc-art path=&quot;/ui/mobs/korzul_the_gravewyrm.webp&quot; /&gt;
 :&apos;&apos;Other pages have this name. See [[Korzul the Gravewyrm (disambiguation)|all pages named Korzul the Gravewyrm]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/sanctum_korzul.webp&quot; size=&quot;model&quot; /&gt;
@@ -122141,9 +122201,13 @@ After the second flight: Grave Breath every 12 sec and Wing Gale every 20 sec on
 * Enraged. Below 30% health its melee attacks deal 50% more damage and come 30% faster, for the rest of the fight. Tank and healer save their defensive and healing cooldowns for this phase. Everyone else pushes damage to end it fast. (important)
 * No Ice Left. If every plate is broken, he hovers over the open water and breathes without pause. Never run out of ice: it ends the fight in a wipe. (deadly)
 
+=== Tips by role ===
+
 * tank: Turn Grave Breath onto ice the group can spare, never across the group. Move him onto a cracked plate before a Grave Inferno to cut it short.
 * healer: Grave Inferno pulses grow fast: make sure everyone leaves. Plunging Fire, Crashing Descent and every knockback into water hit hard.
 * damage: Never stand in front of him or behind him. With Wyrm&apos;s Eye, take it to an uncracked plate away from the group. Kill the Scaleguards during flights.
+
+=== Your choice ===
 
 * Which ice do you spend? Aim his breath, his Plunging Fire and his landing at chosen plates and the rest of the lake stays safe to stand on. Every broken plate is open water, and each one lets a Scaleguard climb out at his next flight (up to 3). With no ice left he breathes without pause.
 * Douse the Inferno? With him on a cracked plate, pulse 2 breaks it, he is Doused and Grave Inferno ends early, before the strongest pulses. That plate is gone for good. Left on uncracked ice, the channel runs to pulse 4 and still breaks the plate.
@@ -122178,12 +122242,18 @@ After the second flight: Grave Breath every 12 sec and Wing Gale every 20 sec on
 * Enraged. Below 30% health its melee attacks deal 50% more damage and come 30% faster, for the rest of the fight. Tank and healer save their defensive and healing cooldowns for this phase. Everyone else pushes damage to end it fast. (important)
 * No Ice Left. If every plate is broken, he hovers over the open water and breathes without pause. Never run out of ice: it ends the fight in a wipe. (deadly)
 
+=== Tips by role ===
+
 * tank: Turn Grave Breath onto ice the group can spare, never across the group. Move him onto a cracked plate before a Grave Inferno to cut it short.
 * healer: Grave Inferno pulses grow fast: make sure everyone leaves. Plunging Fire, Crashing Descent and every knockback into water hit hard.
 * damage: Never stand in front of him or behind him. Two players get Wyrm&apos;s Eye at once: each takes it to a different uncracked plate away from the group. Kill the Scaleguards during flights.
 
+=== Your choice ===
+
 * Which ice do you spend? Aim his breath, his Plunging Fire and his landing at chosen plates and the rest of the lake stays safe to stand on. Every broken plate is open water, and each one lets a Scaleguard climb out at his next flight (up to 3). With no ice left he breathes without pause.
 * Douse the Inferno? With him on a cracked plate, pulse 2 breaks it, he is Doused and Grave Inferno ends early, before the strongest pulses. That plate is gone for good. Left on uncracked ice, the channel runs to pulse 4 and still breaks the plate.
+
+=== Heroic changes ===
 
 * Every ability on this page hits 2.5 times as hard as on Normal.
 * Deep Quench: a cracked plate never refreezes.
@@ -125872,7 +125942,7 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="11139">&lt;woc-art path=&quot;/ui/mobs/choirmother_selthe.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="11249">&lt;woc-art path=&quot;/ui/mobs/choirmother_selthe.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Choirmother Selthe (Contract)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/temple_selthe.webp&quot; size=&quot;model&quot; /&gt;
@@ -125953,9 +126023,13 @@ Her other attacks pause while the group answers the Score. Moonwater Bolts have 
 * Drowning Aria. Every 22 sec she channels a beam at a player who is not the tank for 5 sec: 5 pulses that grow from 30 to 70 on the same body. A player who steps into the beam takes the pulse instead, and the ramp starts over. Interrupt it, break her line of sight behind a lamp pillar, or step into the beam to share it. (interruptible, important)
 * Mere Surge. Every 18 sec, a 3 sec cast aimed at a player who is not the tank, then a 60 degree wave 30 yd long: 110 to 130 damage and an 8 yd knockback. Step sideways out of the wedge. (important)
 
+=== Tips by role ===
+
 * tank: Stand where she can see you so her bolts go to you; nothing else needs a tank here.
 * healer: Watch the Aria target and anyone caught alone by Chorus. During the Score, help sing the next note and heal mistakes.
 * damage: Stack for Chorus, scatter from Solo, kick the aria and step out of Mere Surge.
+
+=== Your choice ===
 
 * Kick the aria, or soak it? An interrupt or a pillar ends the beam at once. Stepping into the beam restarts its ramp on you. A kicked aria silences her bolts too for a moment, but if nobody acts the full ramp lands on one player.
 
@@ -125973,11 +126047,17 @@ Her other attacks pause while the group answers the Score. Moonwater Bolts have 
 * Drowning Aria. Every 22 sec she channels a beam at a player who is not the tank for 5 sec: 5 pulses that grow from 135 to 315 on the same body. A player who steps into the beam takes the pulse instead, and the ramp starts over. Interrupt it, break her line of sight behind a lamp pillar, or step into the beam to share it. (interruptible, important)
 * Mere Surge. Every 18 sec, a 3 sec cast aimed at a player who is not the tank, then a 60 degree wave 30 yd long: 495 to 585 damage and an 8 yd knockback. Step sideways out of the wedge. (important)
 
+=== Tips by role ===
+
 * tank: Stand where she can see you so her bolts go to you; nothing else needs a tank here.
 * healer: Watch the Aria target and anyone caught alone by Chorus. During the Score, help sing the next note and heal mistakes.
 * damage: Stack for Chorus and scatter from Solo at the same time, then leave both spots before the Echo. Kick the aria.
 
+=== Your choice ===
+
 * Kick the aria, or soak it? An interrupt or a pillar ends the beam at once. Stepping into the beam restarts its ramp on you. A kicked aria silences her bolts too for a moment, but if nobody acts the full ramp lands on one player.
+
+=== Heroic changes ===
 
 * Every ability on this page hits 4.5 times as hard as on Normal.
 * Duet: Chorus and Solo land at the same time on two players.
@@ -126164,7 +126244,7 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="12135">&lt;woc-art path=&quot;/ui/mobs/ysolei.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="12245">&lt;woc-art path=&quot;/ui/mobs/ysolei.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Ysolei, Avatar of the Drowned Moon (Contract)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/temple_ysolei.webp&quot; size=&quot;model&quot; /&gt;
@@ -126258,9 +126338,13 @@ At 20% health she calls the moon down.
 
 * &lt;woc-art path=&quot;/encyclopedia-attacks/ysolei__falling_moon.webp&quot; size=&quot;attack&quot; /&gt; Falling Moon. A 12 sec cast behind a ward worth 6% of her health. Break the ward in time: she is stunned for 5 sec and takes 25% more damage. If the ward holds: 300 to 340 damage to everyone on the island, and she deals 20% more damage for the rest of the fight. Every damage dealer hits her ward; healers prepare for the impact. (deadly, important)
 
+=== Tips by role ===
+
 * tank: Pick up every [[Moonspawn (Mob)|Moonspawn]]. Run out of the Undertow with everyone.
 * healer: Lunar Tide hits melee every cast. Tears add Moonsear stacks: heal whoever blocked one.
 * damage: Run from every Undertow, block tears in turns, kill [[Moonspawn (Mob)|Moonspawn]], and burn the ward of the Falling Moon.
+
+=== Your choice ===
 
 * Block the tears, or let them through? A blocked tear never reaches her: no 10% damage bonus for her and no 2% heal. The blocker takes the hit and a Moonsear stack: the next tear on them hits 150% harder. Take turns.
 
@@ -126289,11 +126373,17 @@ At 20% health she calls the moon down.
 
 * &lt;woc-art path=&quot;/encyclopedia-attacks/ysolei__falling_moon.webp&quot; size=&quot;attack&quot; /&gt; Falling Moon. A 10 sec cast behind a ward worth 6% of her health. Break the ward in time: she is stunned for 5 sec and takes 25% more damage. If the ward holds: 1500 to 1700 damage to everyone on the island, and she deals 20% more damage for the rest of the fight. Every damage dealer hits her ward; healers prepare for the impact. (deadly, important)
 
+=== Tips by role ===
+
 * tank: Pick up every [[Moonspawn (Mob)|Moonspawn]]. Run out of the Undertow with everyone.
 * healer: Lunar Tide hits melee every cast. Tears add Moonsear stacks: heal whoever blocked one.
 * damage: Run from every Undertow and its Riptide pools, block tears in turns, kill [[Moonspawn (Mob)|Moonspawn]], and burn the Falling Moon ward fast.
 
+=== Your choice ===
+
 * Block the tears, or let them through? A blocked tear never reaches her: no 10% damage bonus for her and no 2% heal. The blocker takes the hit and a Moonsear stack: the next tear on them hits 150% harder. Take turns.
+
+=== Heroic changes ===
 
 * Every ability on this page hits 5 times as hard as on Normal.
 * Riptide: each Undertow leaves burning pools where players stood.
@@ -136034,7 +136124,7 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="6681">&lt;woc-art path=&quot;/ui/mobs/great_saurian.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="6791">&lt;woc-art path=&quot;/ui/mobs/great_saurian.webp&quot; /&gt;
 &lt;woc-art path=&quot;/encyclopedia-stills/wildheart_great_saurian.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Great Saurian is one of the Beasts.
@@ -136122,9 +136212,13 @@ Below 20% health it enrages for the rest of the fight.
 
 * Enraged. Below 20% health everything it does deals 30% more damage: melee, Tail Swipe and Earthshaking Stomp. Tank and healer save their defensive and healing cooldowns for this phase. Everyone else pushes damage to end it fast. (important)
 
+=== Tips by role ===
+
 * tank: Keep it facing away from the group so nobody ends up behind its tail. Pick up the [[Howdah Hexcaller (Mob)|Howdah Hexcaller]] the moment it lands.
 * healer: Earthshaking Stomp knocks everyone near it down, so heal the tank after each one. Save a cooldown for the enrage.
 * damage: Stay at its sides, out of the tail cone and the stomp ring. At half health, interrupt Ancestral Sap or kill the rider.
+
+=== Your choice ===
 
 * Rider first, or Saurian first? Killing the rider ends its heals for good: each Ancestral Sap restores 4% of the Saurian every 7 sec. While you kill the rider the Saurian keeps sweeping and stomping. Leave the rider up and someone must interrupt every heal.
 
@@ -136151,11 +136245,17 @@ Below 20% health it enrages for the rest of the fight.
 
 * Enraged. Below 20% health everything it does deals 30% more damage: melee, Tail Swipe and Earthshaking Stomp. Tank and healer save their defensive and healing cooldowns for this phase. Everyone else pushes damage to end it fast. (important)
 
+=== Tips by role ===
+
 * tank: Keep it facing away from the group so nobody ends up behind its tail. Pick up the [[Howdah Hexcaller (Mob)|Howdah Hexcaller]] the moment it lands.
 * healer: Earthshaking Stomp knocks everyone near it down, so heal the tank after each one. Save a cooldown for the enrage.
 * damage: Stay at its sides, out of the tail cone and the stomp ring. At half health, interrupt Ancestral Sap or kill the rider.
 
+=== Your choice ===
+
 * Rider first, or Saurian first? Killing the rider ends its heals for good: each Ancestral Sap restores 4% of the Saurian every 7 sec. While you kill the rider the Saurian keeps sweeping and stomping. Leave the rider up and someone must interrupt every heal.
+
+=== Heroic changes ===
 
 * Every ability on this page hits 2.5 times as hard as on Normal.
 
@@ -136360,7 +136460,7 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="11156">&lt;woc-art path=&quot;/ui/mobs/wildheart_beastmaster.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="11266">&lt;woc-art path=&quot;/ui/mobs/wildheart_beastmaster.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Fanglord Beastmaster (Contract)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/mob_wildheart_beastmaster.webp&quot; size=&quot;model&quot; /&gt;
@@ -136442,9 +136542,13 @@ One fight, two bodies. Their timers run the whole fight; there are no health pha
 * Call of the Hunt. Every 20 sec both beasts attack 20% faster for 7 sec. Tank and healer use a cooldown through it; the jaguar bites faster too.
 * Thickhide Ward. Every 18 sec the jaguar gains a shield that absorbs 600 damage for 8 sec. Hit the Beastmaster while the shield is up: the health pool is shared.
 
+=== Tips by role ===
+
 * tank: Pull the Beastmaster more than 15 yd from the jaguar at once and hold him there, facing away from the group.
 * healer: Watch the [[Stalk (Ability)|Stalk]] target: bites and bleeds land fast, faster during Call of the Hunt.
 * damage: Hit whichever body is safest. When stalked, run the jaguar away from the master; otherwise rotate slows, roots and stuns on it.
+
+=== Your choice ===
 
 * Control the jaguar now, or save it? Slows, roots and stuns keep the jaguar off its prey and away from the Beastmaster. Each kind of control works once, then fails for 20 sec, so spending all three at once leaves nothing for the next hunt.
 
@@ -136464,11 +136568,17 @@ One fight, two bodies. Their timers run the whole fight; there are no health pha
 * Thickhide Ward. Every 18 sec the jaguar gains a shield that absorbs 900 damage for 8 sec. Hit the Beastmaster while the shield is up: the health pool is shared.
 * &lt;woc-art path=&quot;/encyclopedia-attacks/wildheart_beastmaster__heel.webp&quot; size=&quot;attack&quot; /&gt; Heel! Every 25 sec, a 2 sec cast on the jaguar, then it leaps back to the Beastmaster and the bond returns. Stun, incapacitate or transform the jaguar during the cast to cancel it. It only works if the jaguar is not already Wary of stuns. (important)
 
+=== Tips by role ===
+
 * tank: Pull the Beastmaster more than 20 yd from the jaguar at once and hold him there. After each Heel! drag him clear again.
 * healer: Watch the [[Stalk (Ability)|Stalk]] target: bites and bleeds land fast, faster during Call of the Hunt.
 * damage: Hit whichever body is safest. Keep a stun ready for every Heel! cast, and rotate slows and roots on the jaguar.
 
+=== Your choice ===
+
 * Control the jaguar now, or save it? Slows, roots and stuns keep the jaguar off its prey and away from the Beastmaster. Each kind of control works once, then fails for 20 sec. Spend your stun early and nothing can cancel the next Heel!.
+
+=== Heroic changes ===
 
 * Every ability on this page hits 2.5 times as hard as on Normal.
 * Frenzied Bond: Pack Bond reaches 20 yd.
@@ -136670,7 +136780,7 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="10564">&lt;woc-art path=&quot;/ui/mobs/the_gorgebloom.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="10674">&lt;woc-art path=&quot;/ui/mobs/the_gorgebloom.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[The Gorgebloom (Contract)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/wildheart_gorgebloom.webp&quot; size=&quot;model&quot; /&gt;
@@ -136751,9 +136861,13 @@ It never moves. Its cast timers pause while another cast runs, so the listed cad
 * &lt;woc-art path=&quot;/encyclopedia-attacks/the_gorgebloom__gorge.webp&quot; size=&quot;attack&quot; /&gt; Gorge. Every 15 sec, a 1.5 sec cast on its target, then a bite for 2 times its melee hit and Digesting: 40 damage per second for 6 sec. It cannot be dodged by moving. Tank: use a defensive cooldown for it. Healers cover the Digesting damage. (deadly, important)
 * Bloom Spit. If its target stays out of its reach for 1.5 sec, it spits every 2 sec for 140 to 170 damage. The tank stays in melee range.
 
+=== Tips by role ===
+
 * tank: Stay in melee: walking away earns Bloom Spit. Use a cooldown for every Gorge and pick up each [[Thorn Sprout (Mob)|Thorn Sprout]].
 * healer: Gorge is the big hit on the tank, followed by Digesting. Vine Lash roots and hurts whoever stands in its lane.
 * damage: If you are not Pollinated, stamp out pods between attacks. Step out of Vine Lash and kill any [[Thorn Sprout (Mob)|Thorn Sprout]] fast.
+
+=== Your choice ===
 
 * Who stamps the seeds? Every pod stamped out is one less elite [[Thorn Sprout (Mob)|Thorn Sprout]], and the fight stays on the flower. Running to the beds costs damage and melee time, and a Pollinated player who touches a pod sprouts it at once.
 
@@ -136771,11 +136885,17 @@ It never moves. Its cast timers pause while another cast runs, so the listed cad
 * &lt;woc-art path=&quot;/encyclopedia-attacks/the_gorgebloom__gorge.webp&quot; size=&quot;attack&quot; /&gt; Gorge. Every 15 sec, a 1.5 sec cast on its target, then a bite for 2 times its melee hit and Digesting: 100 damage per second for 6 sec. It cannot be dodged by moving. Tank: use a defensive cooldown for it. Healers cover the Digesting damage. (deadly, important)
 * Bloom Spit. If its target stays out of its reach for 1.5 sec, it spits every 2 sec for 350 to 425 damage. The tank stays in melee range.
 
+=== Tips by role ===
+
 * tank: Stay in melee: walking away earns Bloom Spit. Use a cooldown for every Gorge and pick up each [[Thorn Sprout (Mob)|Thorn Sprout]].
 * healer: Gorge is the big hit on the tank, followed by Digesting. Vine Lash roots and hurts whoever stands in its lane.
 * damage: If you are not Pollinated, stamp out pods between attacks. Step out of Vine Lash and kill any [[Thorn Sprout (Mob)|Thorn Sprout]] fast.
 
+=== Your choice ===
+
 * Who stamps the seeds? Every pod stamped out is one less elite [[Thorn Sprout (Mob)|Thorn Sprout]], and the fight stays on the flower. Running to the beds costs damage and melee time, and a Pollinated player who touches a pod sprouts it at once.
+
+=== Heroic changes ===
 
 * Every ability on this page hits 2.5 times as hard as on Normal.
 * Burrowing Seeds: an untouched pod burrows after 6 sec and its Sprout rises next to the nearest player.
@@ -136961,7 +137081,7 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="14512">&lt;woc-art path=&quot;/ui/mobs/wildheart_high_priest.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="14580">&lt;woc-art path=&quot;/ui/mobs/wildheart_high_priest.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Zulgar, Voice of the Basin (Contract)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/mob_wildheart_high_priest.webp&quot; size=&quot;model&quot; /&gt;
@@ -137052,6 +137172,8 @@ At 30% health, he stays a jaguar spirit until defeated. The tank can also become
 * &lt;woc-art path=&quot;/encyclopedia-attacks/wildheart_high_priest__the_idol_wakes.webp&quot; size=&quot;attack&quot; /&gt; The Idol Wakes. He picks new Prey every 8 sec, then turns toward them for 1.5 sec before chasing. Prey: run through lit sun glyphs to slow him. Everyone else slows, roots and stuns him while he hunts. (important)
 * &lt;woc-art path=&quot;/encyclopedia-attacks/wildheart_high_priest__idols_breath.webp&quot; size=&quot;attack&quot; /&gt; Idol&apos;s Breath. Every 10 sec, one half of the terrace is marked for 5 sec, then everyone in that half takes 300 to 360 Nature damage. Breaths alternate halves. Cross to the unmarked half before the warning ends. The centre line is safe. On Heroic, the breath also extinguishes lit glyphs in its half; they can be relit immediately. (deadly)
 
+=== Tips by role ===
+
 * tank: Keep open ground behind you for Jaguar Roar. When the hunt ends he comes back to you: be ready to take him.
 * healer: [[Wildheart (Ability)|Wildheart]] Pulse hits anyone left in the ring. A Maul is a big single hit: top up the Prey.
 * damage: Leave the pulse ring. During the hunt, slow, root and stun him to protect the Prey, and run through lit glyphs if you are the Prey.
@@ -137082,9 +137204,13 @@ At 30% health, he stays a jaguar spirit until defeated. The tank can also become
 * &lt;woc-art path=&quot;/encyclopedia-attacks/wildheart_high_priest__the_idol_wakes.webp&quot; size=&quot;attack&quot; /&gt; The Idol Wakes. He marks a fresh pair every 12 sec and switches between them every 6 sec. Each switch gives the new Prey 1.5 sec before he chases. Prey: run through lit sun glyphs to slow him. Everyone else slows, roots and stuns him while he hunts. (important)
 * &lt;woc-art path=&quot;/encyclopedia-attacks/wildheart_high_priest__idols_breath.webp&quot; size=&quot;attack&quot; /&gt; Idol&apos;s Breath. Every 10 sec, one half of the terrace is marked for 5 sec, then everyone in that half takes 750 to 900 Nature damage. Breaths alternate halves. Cross to the unmarked half before the warning ends. The centre line is safe. On Heroic, the breath also extinguishes lit glyphs in its half; they can be relit immediately. (deadly)
 
+=== Tips by role ===
+
 * tank: Keep open ground behind you for Jaguar Roar. When the hunt ends he comes back to you: be ready to take him.
 * healer: [[Wildheart (Ability)|Wildheart]] Pulse hits anyone left in the ring. A Maul is a big single hit: top up the Prey.
 * damage: Leave the pulse ring. During the hunt, slow, root and stun him to protect both Prey. After each hunt, get out of the Ambush circle.
+
+=== Heroic changes ===
 
 * Every ability on this page hits 2.5 times as hard as on Normal.
 * Twin Prey: two players are hunted; he switches every 6 sec.
@@ -138111,7 +138237,7 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="9650">&lt;woc-art path=&quot;/ui/mobs/rimeweb.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="9760">&lt;woc-art path=&quot;/ui/mobs/rimeweb.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Lady of the Bonechill (Contract)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/crypt_lady_bonechill.webp&quot; size=&quot;model&quot; /&gt;
@@ -138196,9 +138322,13 @@ At 50% health the whole ravine floor freezes for the rest of the fight.
 
 * Bridal Freeze. At 50% health, a 2.5 sec cast, then the whole floor becomes slippery ice for the rest of the fight. It cancels a Lament already being cast. Move earlier: on ice it takes longer to reach a lantern. (important)
 
+=== Tips by role ===
+
 * tank: Keep her near the middle so every lantern stays in reach for the group.
 * healer: Unsheltered players take the Lament and gain stacks. The held player takes damage while she holds them.
 * damage: Burst her the moment she seizes someone. Rotate between lit lanterns for each Lament.
+
+=== Your choice ===
 
 * Who takes the Lament? Using all three lanterns shelters up to 2 players each, so nobody takes this Lament. Used lanterns are still dark at the next Lament, so someone takes it then, and each stack of Lingering Lament adds 50% damage.
 
@@ -138220,11 +138350,17 @@ At 50% health the whole ravine floor freezes for the rest of the fight.
 
 * Bridal Freeze. At 50% health, a 2.5 sec cast, then the whole floor becomes slippery ice for the rest of the fight. It cancels a Lament already being cast. Move earlier: on ice it takes longer to reach a lantern. (important)
 
+=== Tips by role ===
+
 * tank: Keep her near the middle so every lantern stays in reach for the group.
 * healer: Unsheltered players take the Lament and gain stacks. The held player takes damage while she holds them.
 * damage: Burst her the moment she seizes someone. Rotate between lit lanterns for each Lament.
 
+=== Your choice ===
+
 * Who takes the Lament? Using all three lanterns shelters up to 2 players each, so nobody takes this Lament. Used lanterns are still dark at the next Lament, so someone takes it then, and each stack of Lingering Lament adds 50% damage.
+
+=== Heroic changes ===
 
 * Every ability on this page hits 5 times as hard as on Normal.
 * Frozen Embrace seizes 2 players at once.
@@ -138332,7 +138468,7 @@ The game rolls once for this group. At most &apos;&apos;&apos;one&apos;&apos;&ap
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="9003">&lt;woc-art path=&quot;/ui/mobs/cantor_ilvane.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="9113">&lt;woc-art path=&quot;/ui/mobs/cantor_ilvane.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Cantor Ilvane (Contract)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/crypt_skel_cantor.webp&quot; size=&quot;model&quot; /&gt;
@@ -138416,9 +138552,13 @@ At 30% health she sings faster and the organ plays a third wave.
 
 * Crescendo. Below 30% health the Dirge takes 1.8 sec and comes every 11 sec, and the organ plays 3 waves. The third wave reuses the first wave&apos;s lanes. Kick every Dirge, and step back out of the first lanes for the third wave. (important)
 
+=== Tips by role ===
+
 * tank: Hold the Choristers together so they can be killed fast, then take Ilvane.
 * healer: A completed Dirge silences you too: hide behind a pillar if no one can kick it.
 * damage: Kill the Choristers first, interrupt the Dirge, and dodge the organ lanes.
+
+=== Your choice ===
 
 * Kick it or hide? An interrupt stops the Dirge and keeps her quiet for 3 sec. Hiding behind a pillar costs uptime. A missed kick silences and hurts everyone in sight.
 
@@ -138441,11 +138581,17 @@ At 30% health she sings faster and the organ plays a third wave.
 
 * Crescendo. Below 30% health the Dirge takes 1.8 sec and comes every 11 sec, and the organ plays 3 waves. The third wave reuses the first wave&apos;s lanes. Kick every Dirge, and step back out of the first lanes for the third wave. (important)
 
+=== Tips by role ===
+
 * tank: Hold the Choristers together so they can be killed fast, then take Ilvane.
 * healer: A completed Dirge silences you too: hide behind a pillar if no one can kick it.
 * damage: Kill both Choristers within 10 sec of each other, kick the Dirge, and hide from every Unbroken Verse.
 
+=== Your choice ===
+
 * Kick it or hide? An interrupt stops the Dirge and keeps her quiet for 3 sec. Hiding behind a pillar costs uptime. A missed kick silences and hurts everyone in sight.
+
+=== Heroic changes ===
 
 * Every ability on this page hits 8 times as hard as on Normal.
 * Encore: a Chorister dead 10 sec while its partner lives rises again.
@@ -138551,7 +138697,7 @@ The game rolls once for this group. At most &apos;&apos;&apos;one&apos;&apos;&ap
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="6861">&lt;woc-art path=&quot;/ui/mobs/crypt_knellwyrm.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="6929">&lt;woc-art path=&quot;/ui/mobs/crypt_knellwyrm.webp&quot; /&gt;
 &lt;woc-art path=&quot;/encyclopedia-stills/mob_crypt_knellwyrm.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Knellwyrm is one of the Undead.
@@ -138628,6 +138774,8 @@ It glides in out of reach and lands in the ring with a burst of fire.
 * Tail Lash. Every 10 sec when someone stands behind it: a 1 sec cast, then a 120 degree sweep 10 yd behind it for 20 to 28 damage. Never stand behind it.
 * &lt;woc-art path=&quot;/encyclopedia-attacks/crypt_knellwyrm__wing_gust.webp&quot; size=&quot;attack&quot; /&gt; Wing Gust. Every 19 sec when someone is close: a 1.5 sec cast, then everyone within 10 yd takes 12 to 18 damage and is knocked back 8 yd. Expect the knockback; keep your back away from edges.
 
+=== Tips by role ===
+
 * tank: Keep it facing away from the group, and turn it out of burning lanes.
 * healer: Pyre Strafe and Dread Bellow are the spikes; heal anyone knocked into a burning lane.
 * damage: Step out of marked lanes and spend cooldowns after each Dread Bellow.
@@ -138646,9 +138794,13 @@ It glides in out of reach and lands in the ring with a burst of fire.
 * &lt;woc-art path=&quot;/encyclopedia-attacks/crypt_knellwyrm__wing_gust.webp&quot; size=&quot;attack&quot; /&gt; Wing Gust. Every 19 sec when someone is close: a 1.5 sec cast, then everyone within 10 yd takes 240 to 360 damage and is knocked back 8 yd. Expect the knockback; keep your back away from edges.
 * Burning Knell. Every 55 sec it flies up out of reach and breathes fire over half the ring 3 times. Each half is marked 4.5 sec before the fire: 1000 to 1120 damage to everyone in it. Run to the unmarked half of the ring every time. (deadly, important)
 
+=== Tips by role ===
+
 * tank: Keep it facing away from the group, and turn it out of burning lanes.
 * healer: Pyre Strafe and Dread Bellow are the spikes; heal anyone knocked into a burning lane.
 * damage: Step out of marked lanes, and during Burning Knell run to the safe half every time.
+
+=== Heroic changes ===
 
 * Every ability on this page hits 20 times as hard as on Normal.
 * Burning Knell: it takes flight and breathes over half the ring 3 times.
@@ -139518,7 +139670,7 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="5202">&lt;woc-art path=&quot;/ui/mobs/crypt_ossuary_drake.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="5270">&lt;woc-art path=&quot;/ui/mobs/crypt_ossuary_drake.webp&quot; /&gt;
 &lt;woc-art path=&quot;/encyclopedia-stills/mob_crypt_drake.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Ossuary Drake is one of the Undead.
@@ -139594,6 +139746,8 @@ It lands where it is pulled and fights on the ground.
 * Tail Lash. Every 9 sec when someone stands behind it: a 1 sec cast, then a 120 degree sweep 10 yd behind it for 18 to 26 damage. Never stand behind it.
 * &lt;woc-art path=&quot;/encyclopedia-attacks/crypt_ossuary_drake__wing_gust.webp&quot; size=&quot;attack&quot; /&gt; Wing Gust. Every 16 sec when someone is close: a 1.5 sec cast, then everyone within 10 yd takes 10 to 16 damage and is knocked back 8 yd. Expect the knockback; keep your back away from edges.
 
+=== Tips by role ===
+
 * tank: Turn it so the breath points away from the group, and move it off any burning ground on Heroic.
 * healer: The breath and the wing gust are the damage spikes. Stand at its side.
 * damage: Attack from its sides: never in front, never behind.
@@ -139610,9 +139764,13 @@ It lands where it is pulled and fights on the ground.
 * &lt;woc-art path=&quot;/encyclopedia-attacks/crypt_ossuary_drake__wing_gust.webp&quot; size=&quot;attack&quot; /&gt; Wing Gust. Every 16 sec when someone is close: a 1.5 sec cast, then everyone within 10 yd takes 200 to 320 damage and is knocked back 8 yd. Expect the knockback; keep your back away from edges.
 * Barrow Embers. The ground under each breath keeps burning for 5 sec: 120 to 180 damage per second to anyone on it. Move the drake off the burning ground and step out of it.
 
+=== Tips by role ===
+
 * tank: Turn it so the breath points away from the group, and move it off any burning ground on Heroic.
 * healer: The breath and the wing gust are the damage spikes. Stand at its side.
 * damage: Attack from its sides: never in front, never behind.
+
+=== Heroic changes ===
 
 * Every ability on this page hits 20 times as hard as on Normal.
 * Barrow Embers: each breath leaves the ground burning for 5 sec.
@@ -140395,7 +140553,7 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="7237">&lt;woc-art path=&quot;/ui/mobs/gaol_turnkey.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="7305">&lt;woc-art path=&quot;/ui/mobs/gaol_turnkey.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Gaol Turnkey (Contract)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/bastion_turnkey.webp&quot; size=&quot;model&quot; /&gt;
@@ -140473,6 +140631,8 @@ He cages players on a steady timer and frees the prisoners at half health.
 * &lt;woc-art path=&quot;/encyclopedia-attacks/gaol_turnkey__iron_cage.webp&quot; size=&quot;attack&quot; /&gt; [[Iron Cage (Mob)|Iron Cage]]. Every 24 sec, a 1.6 sec cast, then a cage drops on a player who is not the tank, stunning them. The cage has 16 points: each press of the interact key by the prisoner breaks 1, each hit from an ally breaks 2, and it slowly mends. After 10 sec the cage crushes the prisoner for 30% of their maximum health. Caged: press the interact key fast. Everyone else hits the cage to break it. (deadly, important)
 * Open the Cells. At 50% health he lets 2 Shackled Prisoners out. At a quarter health their chains snap and they leave the fight. Bring them to a quarter health; you do not need to kill them.
 
+=== Tips by role ===
+
 * tank: Hold him and the prisoners; the cages never target you.
 * healer: Top up caged players: the crush is a share of their health.
 * damage: Switch to every cage at once and hit it until it breaks.
@@ -140487,9 +140647,13 @@ He cages players on a steady timer and frees the prisoners at half health.
 * &lt;woc-art path=&quot;/encyclopedia-attacks/gaol_turnkey__iron_cage.webp&quot; size=&quot;attack&quot; /&gt; [[Iron Cage (Mob)|Iron Cage]]. Every 24 sec, a 1.6 sec cast, then cages drop on 2 players who are not the tank. Each cage has 20 points: each press of the interact key by the prisoner breaks 1, each hit from an ally breaks 2. Inside, rising brine drains health every second. After 10 sec the cage crushes for 45% of maximum health. Caged: press the interact key fast. Everyone else hits the cage to break it. (deadly, important)
 * Open the Cells. At 50% health he lets 2 Shackled Prisoners out. At a quarter health their chains snap and they leave the fight. Bring them to a quarter health; you do not need to kill them.
 
+=== Tips by role ===
+
 * tank: Hold him and the prisoners; the cages never target you.
 * healer: Top up caged players: the crush is a share of their health.
 * damage: Switch to every cage at once and hit it until it breaks.
+
+=== Heroic changes ===
 
 * Every ability on this page hits 6 times as hard as on Normal.
 * [[Iron Cage (Mob)|Iron Cage]] locks 2 players at once.
@@ -140751,7 +140915,7 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4898">&lt;woc-art path=&quot;/ui/mobs/turretback_hermit.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="4966">&lt;woc-art path=&quot;/ui/mobs/turretback_hermit.webp&quot; /&gt;
 &lt;woc-art path=&quot;/encyclopedia-stills/mob_turretback.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Shipwreck Captain is one of the Undead.
@@ -140829,6 +140993,8 @@ His first move comes 3 sec after the pull, then Spectral Broadside, Cursed Ancho
 * Phantom Boarding. After a 2 sec warning, everyone in an 18 yd lane takes 50 to 60 damage and he dashes along it. Step aside from the lane. (important)
 * Wreckbound Sailors. At 60% and 30% health, 2 Wreckbound Sailors join the fight. A sailor bursts with soul energy shortly after it dies. The tank picks them up. Step away from a sailor that just died.
 
+=== Tips by role ===
+
 * tank: Keep him in place and pick up the Wreckbound Sailors. His lanes aim at the others, not at you.
 * healer: Spectral Broadside hits hardest: heal whoever stood in a lane.
 * damage: Watch the floor: every move is drawn before it fires. Stand in the Broadside gaps.
@@ -140845,9 +141011,13 @@ His first move comes 3 sec after the pull, then Spectral Broadside, Cursed Ancho
 * Phantom Boarding. After a 2 sec warning, everyone in an 18 yd lane takes 400 to 480 damage and he dashes along it. Step aside from the lane. (important)
 * Wreckbound Sailors. At 60% and 30% health, 2 Wreckbound Sailors join the fight. A sailor bursts with soul energy shortly after it dies. The tank picks them up. Step away from a sailor that just died.
 
+=== Tips by role ===
+
 * tank: Keep him in place and pick up the Wreckbound Sailors. His lanes aim at the others, not at you.
 * healer: Spectral Broadside hits hardest: heal whoever stood in a lane.
 * damage: Watch the floor: every move is drawn before it fires. Stand in the Broadside gaps.
+
+=== Heroic changes ===
 
 * Every ability on this page hits 8 times as hard as on Normal.
 
@@ -140965,7 +141135,7 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="8562">&lt;woc-art path=&quot;/ui/mobs/gaoler_ossick.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="8672">&lt;woc-art path=&quot;/ui/mobs/gaoler_ossick.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Gaoler Ossick (Contract)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/bastion_ossick.webp&quot; size=&quot;model&quot; /&gt;
@@ -141043,9 +141213,13 @@ At 60% and 30% health, 3 Shackled Prisoners come out of the cells each time.
 * Shackle Pair. Every 28 sec, a 1.2 sec cast chains two players together for 12 sec. Every second they stand more than 8 yd apart, both take 40 to 50 damage. Chained: stay within 8 yd of your partner. (important)
 * Gaoler&apos;s Cudgel. Every 12 sec, a 1 sec cast at the tank: 1.5 times his melee hit, ignoring armor, and 30% slower movement for 6 sec. Tank: use a cooldown. Healers expect the hit. (important)
 
+=== Tips by role ===
+
 * tank: Hold him near the middle and pick up the prisoners. Gaoler&apos;s Cudgel ignores your armor.
 * healer: Watch hooked and chained players; the pit takes a large share of health.
 * damage: Hit the anchor the moment someone is hooked. When chained, stay close to your partner.
+
+=== Your choice ===
 
 * Run to a post, or break the chain? A lit post frees the hooked player alone, so the group keeps attacking. The post must be at least 6 yd away and goes dark for 30 sec. Once the chain is short, no post is in reach and only breaking it works.
 
@@ -141060,11 +141234,17 @@ At 60% and 30% health, 3 Shackled Prisoners come out of the cells each time.
 * Shackle Pair. Every 28 sec, a 1.2 sec cast chains two players together for 12 sec. Every second they stand more than 6 yd apart, both take 240 to 300 damage. Chained: stay within 6 yd of your partner. (important)
 * Gaoler&apos;s Cudgel. Every 12 sec, a 1 sec cast at the tank: 1.5 times his melee hit, ignoring armor, and 30% slower movement for 6 sec. Tank: use a cooldown. Healers expect the hit. (important)
 
+=== Tips by role ===
+
 * tank: Hold him near the middle and pick up the prisoners. Gaoler&apos;s Cudgel ignores your armor.
 * healer: Watch hooked and chained players; the pit takes a large share of health.
 * damage: Hit the anchor the moment someone is hooked. When chained, stay close to your partner.
 
+=== Your choice ===
+
 * Run to a post, or break the chain? A lit post frees the hooked player alone, so the group keeps attacking. The post must be at least 6 yd away and goes dark for 30 sec. Once the chain is short, no post is in reach and only breaking it works.
+
+=== Heroic changes ===
 
 * Every ability on this page hits 6 times as hard as on Normal.
 * Anchor Crash: the anchor hits everyone within 6 yd of the hooked player.
@@ -141741,7 +141921,7 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="10588">&lt;woc-art path=&quot;/ui/mobs/mere_hydra_head_center.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="10698">&lt;woc-art path=&quot;/ui/mobs/mere_hydra_head_center.webp&quot; /&gt;
 :&apos;&apos;Other pages have this name. See [[Mere Hydra|all pages named Mere Hydra]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/temple_hydra_head.webp&quot; size=&quot;model&quot; /&gt;
@@ -141829,9 +142009,13 @@ The left head breathes ice, the centre spits venom, the right sends water.
 * &lt;woc-art path=&quot;/encyclopedia-attacks/mere_hydra_head_center__venom_current.webp&quot; size=&quot;attack&quot; /&gt; Venom Current. Venom pools swell to 5.25 yd and slide 7 yd outward from the pool centre, burning 30 per second. Step aside from the slide path. (important)
 * &lt;woc-art path=&quot;/encyclopedia-attacks/mere_hydra_head_center__toxic_rime.webp&quot; size=&quot;attack&quot; /&gt; Toxic Rime. Venom pools freeze into crystals that burst after 4 sec: 100 to 120 damage within 6 yd. Move away from every crystal before it bursts. (important)
 
+=== Tips by role ===
+
 * tank: Hold the heads you can reach; their attacks aim at the others.
 * healer: Tsunami and the combined breaths are the spikes. Every dead head makes the others hit harder.
 * damage: Spread damage evenly so all three heads fall within 20 sec of each other. Stop during each Tsunami.
+
+=== Your choice ===
 
 * Which head dies first? Killing all three together ends the fight; any order works if they die close together. Each dead head makes the others deal 15% more damage and grows back after 20 sec, and the last head left carries every element.
 
@@ -141856,11 +142040,17 @@ The left head breathes ice, the centre spits venom, the right sends water.
 * &lt;woc-art path=&quot;/encyclopedia-attacks/mere_hydra_head_center__venom_current.webp&quot; size=&quot;attack&quot; /&gt; Venom Current. Venom pools swell to 5.25 yd and slide 7 yd outward from the pool centre, burning 180 per second. Step aside from the slide path. (important)
 * &lt;woc-art path=&quot;/encyclopedia-attacks/mere_hydra_head_center__toxic_rime.webp&quot; size=&quot;attack&quot; /&gt; Toxic Rime. Venom pools freeze into crystals that burst after 4 sec: 600 to 720 damage within 6 yd. Move away from every crystal before it bursts. (important)
 
+=== Tips by role ===
+
 * tank: Hold the heads you can reach; their attacks aim at the others.
 * healer: Tsunami and the combined breaths are the spikes. Every dead head makes the others hit harder.
 * damage: Spread damage evenly so all three heads fall within 20 sec of each other. Stop during each Tsunami.
 
+=== Your choice ===
+
 * Which head dies first? Killing all three together ends the fight; any order works if they die close together. Each dead head makes the others deal 15% more damage and grows back after 20 sec, and the last head left carries every element.
+
+=== Heroic changes ===
 
 * Every ability on this page hits 6 times as hard as on Normal.
 * A regrown head returns at 25.84% health, and each wave sends a backwash.
@@ -142047,7 +142237,7 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="9552">&lt;woc-art path=&quot;/ui/mobs/tideglass_colossus.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="9662">&lt;woc-art path=&quot;/ui/mobs/tideglass_colossus.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Tideglass Colossus (Contract)]].&apos;&apos;
 
 &lt;woc-art path=&quot;/encyclopedia-stills/temple_colossus.webp&quot; size=&quot;model&quot; /&gt;
@@ -142132,9 +142322,13 @@ At 75%, 50% and 25% health it summons Tideglass Reflections.
 * Prism Flare. A 2 sec channel, then every player gets a Tideglass Reflection with 8% of its health that hunts them. You cannot damage your own Reflection. Kill each other&apos;s Reflections: never your own. (important)
 * Prism Ward. Each living Reflection cuts the damage the Colossus takes by 10%, up to 50%. Clear the Reflections, then return to the Colossus. (important)
 
+=== Tips by role ===
+
 * tank: Pick up the Colossus again after each flare; it walks its target down.
 * healer: Reflections hit their owners. Tideglass Fracture punishes anyone left on a red slice.
 * damage: At each flare kill a teammate&apos;s Reflection, then move slice by slice in the Fracture.
+
+=== Your choice ===
 
 * Kill the Reflections, or the Colossus? Killing the copies removes up to 50% damage reduction and stops them hunting. Time on copies is time off the Colossus, and on Heroic each copy bursts when it breaks.
 
@@ -142158,11 +142352,17 @@ At 75%, 50% and 25% health it summons Tideglass Reflections.
 * Shattering Glass. When a Reflection breaks, everyone within 4 yd of it takes 400 damage. Do not stand next to a Reflection that is about to die.
 * Swapped Images. Every 8 sec the Reflections swap owners, so who can hit which copy changes. Check again which copy you can hit after each swap. (important)
 
+=== Tips by role ===
+
 * tank: Pick up the Colossus again after each flare; it walks its target down.
 * healer: Reflections hit their owners. Tideglass Fracture punishes anyone left on a red slice.
 * damage: At each flare kill a teammate&apos;s Reflection; after a swap, check again. Do not stand by a dying copy.
 
+=== Your choice ===
+
 * Kill the Reflections, or the Colossus? Killing the copies removes up to 50% damage reduction and stops them hunting. Time on copies is time off the Colossus, and on Heroic each copy bursts when it breaks.
+
+=== Heroic changes ===
 
 * Every ability on this page hits 5 times as hard as on Normal.
 * Shattering Glass: a breaking Reflection hurts everyone within 4 yd.
@@ -144058,7 +144258,7 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="5720">&lt;woc-art path=&quot;/ui/mobs/sledge_tusker.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="5788">&lt;woc-art path=&quot;/ui/mobs/sledge_tusker.webp&quot; /&gt;
 &lt;woc-art path=&quot;/encyclopedia-stills/sanctum_sledge_tusker.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Sledge Tusker is one of the Beasts.
@@ -144145,6 +144345,8 @@ Below 20% health it enrages for the rest of the fight.
 
 * Enraged. Below 20% health it deals 30% more damage for the rest of the fight. Save healing and defensive cooldowns for the last stretch and finish it fast. (important)
 
+=== Tips by role ===
+
 * tank: Hold it facing away from the group and keep still, so the sweep cone never swings into allies. Expect a knockback with every Tusk Sweep.
 * healer: Tusk Sweep and Trample are the damage spikes. Stand to its side, not at the far edge where Trample aims, and keep a cooldown for its enrage below 20%.
 * damage: Attack from the sides or rear. Watch the floor for the painted lane and step out of it. At half health, leave the fire behind it.
@@ -144171,9 +144373,13 @@ Below 20% health it enrages for the rest of the fight.
 
 * Enraged. Below 20% health it deals 30% more damage for the rest of the fight. Save healing and defensive cooldowns for the last stretch and finish it fast. (important)
 
+=== Tips by role ===
+
 * tank: Hold it facing away from the group and keep still, so the sweep cone never swings into allies. Expect a knockback with every Tusk Sweep.
 * healer: Tusk Sweep and Trample are the damage spikes. Stand to its side, not at the far edge where Trample aims, and keep a cooldown for its enrage below 20%.
 * damage: Attack from the sides or rear. Watch the floor for the painted lane and step out of it. At half health, leave the fire behind it.
+
+=== Heroic changes ===
 
 * Every ability on this page hits 2.5 times as hard as on Normal.
 

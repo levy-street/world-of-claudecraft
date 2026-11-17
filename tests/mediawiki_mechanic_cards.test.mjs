@@ -52,6 +52,8 @@ describe('Encyclopedia mechanic cards', () => {
       'Deadly',
       'Important',
     ]);
+    expect(card.classList.contains('is-deadly')).toBe(true);
+    expect(card.classList.contains('is-important')).toBe(false);
     expect(card.querySelector('.mechanic-stats')).toBeNull();
     expect(card.querySelector('.mechanic-text').textContent).toBe(
       'Every 20 sec, a 2 sec cast, then a blast: 180 to 220 damage. Step away.',

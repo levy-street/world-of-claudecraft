@@ -36,6 +36,7 @@ export function organizeReferenceDetails(article) {
 
 // Boss fights are spoilers: how a boss works stays closed until the reader asks for it.
 const ENCOUNTER_HEADINGS = [
+  'Encounter',
   'Normal encounter',
   'Heroic encounter',
   'Boss encounters',

@@ -4,6 +4,7 @@
 
 const SECTIONS = new Set([
   'Mechanics',
+  'Encounter',
   'Normal encounter',
   'Heroic encounter',
   'Boss encounters',
@@ -104,12 +105,16 @@ export function mechanicCard(li) {
     name.append(' ', tag('mechanic-flag flag-' + flag, flag[0].toUpperCase() + flag.slice(1)));
   const prose = document.createElement('p');
   prose.className = 'mechanic-text';
-  prose.innerHTML = text;
+  // "Last Link: with one chain left, ..." starts its sentence once the label is lifted off.
+  prose.innerHTML = text.replace(/^[a-z]/, (letter) => letter.toUpperCase());
   body.append(name, prose);
   if (stats) body.append(stats);
   li.replaceChildren(...(shot ? [shot] : []), body);
   li.classList.add('mechanic-card');
   if (shot) li.classList.add('has-shot');
+  // The card's edge shows how much the attack matters: deadly, then important.
+  if (flags.includes('deadly')) li.classList.add('is-deadly');
+  else if (flags.includes('important')) li.classList.add('is-important');
   return true;
 }
 

@@ -1,8 +1,10 @@
 // Turns the "Normal loot" and "Heroic loot" subsections of a creature page into two tabs,
 // so a reader sees one difficulty at a time. Also marks the small titles above each table.
+import { makeTabs } from './tabs.js';
+
 const TABS = ['Normal loot', 'Heroic loot'];
 
-function sectionNodes(heading) {
+export function sectionNodes(heading) {
   const nodes = [];
   for (
     let node = heading.nextElementSibling;
@@ -31,42 +33,19 @@ export function layoutLoot(article) {
     node = node.nextElementSibling;
   }
   if (headings.length < 2) return;
-  const tabs = document.createElement('div');
-  tabs.className = 'loot-tabs';
-  tabs.setAttribute('role', 'tablist');
-  tabs.setAttribute('aria-label', 'Loot by difficulty');
-  const panels = headings.map((heading, index) => {
-    const panel = document.createElement('div');
-    panel.className = 'loot-panel';
-    panel.setAttribute('role', 'tabpanel');
-    panel.id = 'loot-panel-' + index;
-    panel.append(...sectionNodes(heading));
-    const tab = document.createElement('button');
-    tab.type = 'button';
-    tab.className = 'loot-tab';
-    tab.setAttribute('role', 'tab');
-    tab.setAttribute('aria-controls', panel.id);
-    tab.textContent = heading.textContent.replace(' loot', '');
-    tabs.append(tab);
-    return panel;
-  });
-  const select = (active) => {
-    [...tabs.children].forEach((tab, index) => {
-      tab.setAttribute('aria-selected', String(index === active));
-      tab.tabIndex = index === active ? 0 : -1;
-      panels[index].hidden = index !== active;
-    });
-  };
-  [...tabs.children].forEach((tab, index) => {
-    tab.addEventListener('click', () => select(index));
-    tab.addEventListener('keydown', (event) => {
-      if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
-      const next = (index + (event.key === 'ArrowRight' ? 1 : panels.length - 1)) % panels.length;
-      select(next);
-      tabs.children[next].focus();
-    });
-  });
+  const { tabs, panels } = makeTabs(
+    headings.map((heading) => ({
+      label: heading.textContent.replace(' loot', ''),
+      nodes: sectionNodes(heading),
+    })),
+    {
+      label: 'Loot by difficulty',
+      idPrefix: 'loot-panel-',
+      tabClass: 'loot-tab',
+      panelClass: 'loot-panel',
+      listClass: 'loot-tabs',
+    },
+  );
   headings[0].before(tabs, ...panels);
   for (const heading of headings) heading.remove();
-  select(0);
 }

@@ -1697,48 +1697,68 @@ body[data-woc-site] #view table.item-table {
    and labelled numbers; bare traits gather into one row of tags under the cards. */
 #view article ul.mechanic-list {
   display: grid;
-  gap: 10px;
-  margin: 12px 0 18px;
+  gap: 12px;
+  max-width: none;
+  margin: 14px 0 6px;
   padding: 0;
   list-style: none;
 }
 #view article ul.mechanic-list > li {
+  max-width: none;
   margin: 0;
 }
 #view article li.mechanic-card {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 14px;
-  padding: 12px 14px;
+  gap: 16px;
+  padding: 14px 16px;
   border: 1px solid var(--border);
-  border-left: 3px solid var(--gold-dim);
-  border-radius: 5px;
-  background: var(--panel);
+  border-left: 4px solid var(--border);
+  border-radius: 6px;
+  background: linear-gradient(180deg, var(--panel), var(--bg-2));
+  box-shadow: 0 1px 0 rgb(0 0 0 / 25%);
+}
+#view article li.mechanic-card.is-important {
+  border-left-color: var(--gold-dim);
+}
+#view article li.mechanic-card.is-deadly {
+  border-left-color: var(--bad);
 }
 #view article li.mechanic-card.has-shot {
-  grid-template-columns: 192px minmax(0, 1fr);
+  grid-template-columns: 232px minmax(0, 1fr);
   align-items: start;
 }
+#view article li.mechanic-card .attack-shot {
+  width: 232px;
+  border-radius: 5px;
+}
 #view .mechanic-name {
-  display: block;
-  margin-bottom: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
   color: var(--gold);
-  font-size: 1.02rem;
+  font: 600 1.08rem / 1.3 var(--font-display);
   letter-spacing: 0.02em;
 }
 #view .mechanic-text {
+  max-width: 70ch;
   margin: 0;
+  line-height: 1.6;
 }
 #view .mechanic-stats {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin: 10px 0 0;
+  margin: 12px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-soft);
 }
 #view .mechanic-stats > div {
   display: flex;
   gap: 5px;
-  padding: 3px 8px;
+  padding: 3px 9px;
   border: 1px solid var(--border-soft);
   border-radius: 999px;
   background: var(--bg-2);
@@ -1760,6 +1780,7 @@ body[data-woc-site] #view table.item-table {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+  padding-top: 2px;
 }
 #view article li.mechanic-traits > span {
   padding: 3px 10px;
@@ -1769,11 +1790,73 @@ body[data-woc-site] #view table.item-table {
   font-size: 0.86rem;
 }
 #view article li.mechanic-note {
-  padding: 8px 14px;
-  border-left: 3px solid var(--border);
+  padding: 10px 14px;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
   color: var(--text-dim);
 }
+
+/* The encounter: one section, Normal and Heroic tabs, a block per phase. */
+#view .wiki-spoiler {
+  padding: 0 20px 18px;
+}
+#view .wiki-spoiler > summary {
+  margin: 0 -20px 16px;
+}
+#view .wiki-spoiler > :not(summary) {
+  margin-inline: 0;
+}
+#view .wiki-spoiler > :last-child {
+  margin-bottom: 0;
+}
+#view .encounter-tabs {
+  margin-top: 4px;
+}
+#view .encounter-panel {
+  padding-top: 14px;
+}
+#view .wiki-prose .encounter-overview {
+  max-width: 74ch;
+  margin: 0 0 18px;
+  padding: 12px 16px;
+  border-radius: 6px;
+  background: var(--panel);
+  font-size: 1.04rem;
+  line-height: 1.65;
+}
+#view .encounter-phase {
+  margin: 22px 0 0;
+}
+#view .encounter-phase > h3 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 8px;
+  color: var(--gold);
+  font: 600 1.2rem / 1.3 var(--font-display);
+  letter-spacing: 0.03em;
+}
+#view .encounter-phase > h3::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--gold-dim), transparent);
+}
+#view .wiki-prose .encounter-summary {
+  margin: 0 0 4px;
+  color: var(--text-dim);
+}
+#view .encounter-extra > h3 {
+  font-size: 1.05rem;
+  color: var(--text);
+}
 @media (max-width: 640px) {
+  #view .wiki-spoiler {
+    padding: 0 12px 14px;
+  }
+  #view .wiki-spoiler > summary {
+    margin: 0 -12px 14px;
+  }
   #view article li.mechanic-card.has-shot {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -1893,4 +1976,15 @@ body[data-woc-site] #view table.item-table {
   #view .mechanic-role {
     justify-self: start;
   }
+}
+
+/* Role labels in their usual group-finder colours. */
+#view .mechanic-role.role-tank {
+  color: #6fa8ff;
+}
+#view .mechanic-role.role-healer {
+  color: var(--good);
+}
+#view .mechanic-role.role-damage {
+  color: var(--bad);
 }

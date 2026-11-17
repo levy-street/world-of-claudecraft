@@ -52,6 +52,7 @@ export function journalArticles(w: ArticleTools): Map<string, string> {
         }
         if (view.tips?.length)
           blocks.push(
+            '=== Tips by role ===',
             w.bullets(
               view.tips.map(
                 (tip) => tip.role + ': ' + prose(tip.key, tip.values, tip.percentValues),
@@ -60,6 +61,7 @@ export function journalArticles(w: ArticleTools): Map<string, string> {
           );
         if (view.choices?.length)
           blocks.push(
+            '=== Your choice ===',
             w.bullets(
               view.choices.map((c) =>
                 [
@@ -72,6 +74,7 @@ export function journalArticles(w: ArticleTools): Map<string, string> {
           );
         if (tier === 'heroic' && view.heroicNotes?.length)
           blocks.push(
+            '=== Heroic changes ===',
             w.bullets(view.heroicNotes.map((n) => prose(n.key, n.values, n.percentValues))),
           );
         result.set(

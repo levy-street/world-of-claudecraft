@@ -1,4 +1,5 @@
 import { hideSpoilers, organizeReferenceDetails } from './article_disclosures.js';
+import { layoutEncounter } from './encounter_layout.js';
 import { layoutLoot } from './loot_tabs.js';
 import { layoutMechanics } from './mechanic_cards.js';
 
@@ -232,6 +233,7 @@ export function layoutArticle(view, page, wide, zoneName) {
     }
   }
   layoutLoot(article);
+  layoutEncounter(article);
   hideSpoilers(article, page);
   layoutMechanics(article);
   organizeReferenceDetails(article);
