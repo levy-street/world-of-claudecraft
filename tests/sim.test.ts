@@ -792,6 +792,8 @@ describe('leveling', () => {
       'heroic_strike',
       'battle_shout',
       'battle_stance',
+      // The class-neutral Trinket spell, after the kit (src/sim/trinket_spell.ts).
+      'use_trinket',
     ]);
     const _events: any[] = [];
     (sim as any).grantXp(xpForLevel(1) + xpForLevel(2) + xpForLevel(3) + 10);
