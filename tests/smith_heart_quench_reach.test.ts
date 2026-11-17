@@ -34,10 +34,13 @@ describe('the Guardian of the Quench reaches as big as she is drawn', () => {
     expect(SMITH_HEART_MOBS[QUENCH_GUARDIAN].scale).toBe(QUENCH_BODY_SCALE);
   });
 
-  it('is reached by short-reach abilities from her body edge, melee keeps its own reach', () => {
-    // Plain melee already reaches past her edge from her pivot: unchanged.
-    expect(bodyEdgeMeleeRange(QUENCH_GUARDIAN)).toBeLessThanOrEqual(MELEE_RANGE);
-    expect(effectivePlayerAttackRange(target, MELEE_RANGE)).toBe(MELEE_RANGE);
+  it('is reached by short-reach abilities and by melee from her body edge', () => {
+    // The owner's online run of 2026-11-17 widened her (2 to 2.35 yd): melee
+    // now reaches her from a step past its own 5 yards from her pivot.
+    expect(bodyEdgeMeleeRange(QUENCH_GUARDIAN)).toBeGreaterThan(MELEE_RANGE);
+    expect(effectivePlayerAttackRange(target, MELEE_RANGE)).toBe(
+      bodyEdgeMeleeRange(QUENCH_GUARDIAN),
+    );
     expect(effectivePlayerAttackRange(target, 8)).toBe(8 + QUENCH_BODY_RADIUS);
     // A long-range spell keeps its own range.
     expect(effectivePlayerAttackRange(target, 30)).toBe(30);

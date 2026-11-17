@@ -138,11 +138,12 @@ describe('the Guardian of the Quench model', () => {
     expect(crown / PLAYER).toBeLessThan(6.2);
     // Clearly bigger than the provisional body (2.3 x 3: three and a half players).
     expect(crown).toBeGreaterThan(2.3 * 3 * 1.4);
-    // The radius sits inside the gown's hem all round her.
+    // The radius sits at the gown's flared hem all round her (a hand past
+    // its sockets since the review of 2026-11-17 widened it).
     for (const id of QUENCH_HEM) {
       const s = QUENCH_SOCKETS.find((x) => x.id === id);
       const r = Math.hypot(s?.at[0] ?? 0, s?.at[2] ?? 0) * QUENCH_YD_PER_UNIT;
-      expect(QUENCH_BODY_RADIUS, id).toBeLessThan(r + 0.6);
+      expect(QUENCH_BODY_RADIUS, id).toBeLessThan(r + 0.8);
     }
   });
 

@@ -34,8 +34,10 @@ export const QUENCH_GUARDIAN = 'heart_quench_guardian';
  *  (render/smith_heart_fx/quench_body_core.ts). Her fists settle the tank at its
  *  edge (3.5 yards off, not the scale's 8.8) and short-reach abilities reach
  *  her from it; plain melee keeps its own 5 yards from her pivot, already past
- *  this edge (player_attack_reach.ts bodyEdgeMeleeRange). */
-export const QUENCH_BODY_RADIUS = 2;
+ *  this edge (player_attack_reach.ts bodyEdgeMeleeRange). The owner's online
+ *  run of 2026-11-17 asked for it a little wider (2 to 2.35, +17.5 percent),
+ *  so melee reaches her from a step further out. */
+export const QUENCH_BODY_RADIUS = 2.35;
 
 // ---- casts, auras, objects, cues --------------------------------------------------
 
