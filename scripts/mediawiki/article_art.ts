@@ -67,12 +67,16 @@ export function mobArtPath(id: string): string {
 }
 
 /** Large renders of each creature's and NPC's model, written by
- *  scripts/mediawiki/render_entity_stills.mjs. Keyed by page title. */
+ *  scripts/mediawiki/render_entity_stills.mjs, plus the NPCs and creatures on character
+ *  bodies that scripts/wiki/render_character_stills.mjs draws with the game's own renderer
+ *  (their authored faces, hair and props). Keyed by page title. */
 export function modelStills(titleBy: TitleMaps): Map<string, string> {
-  const file = join('scripts', 'mediawiki', 'entity_stills.json');
-  const stills: Record<string, string> = existsSync(file)
-    ? JSON.parse(readFileSync(file, 'utf8'))
-    : {};
+  const read = (file: string): Record<string, string> =>
+    existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : {};
+  const stills = {
+    ...read(join('scripts', 'mediawiki', 'entity_stills.json')),
+    ...read(join('scripts', 'mediawiki', 'entity_stills_characters.json')),
+  };
   const byTitle = new Map<string, string>();
   for (const kind of ['mob', 'npc'] as const)
     for (const [id, title] of titleBy[kind] ?? []) {

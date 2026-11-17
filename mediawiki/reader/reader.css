@@ -1099,12 +1099,12 @@ body[data-woc-site] .searchbox #lookup {
   }
 }
 @media (max-width: 1049px) {
-  #view .wiki-box-art:has(.article-art:not(.wide)) {
+  #view .wiki-box-art:has(.article-art:not(.wide, .model)) {
     float: right;
     padding: 5px 10px;
     margin-top: -36px;
   }
-  #view .wiki-box-art .article-art:not(.wide) {
+  #view .wiki-box-art .article-art:not(.wide, .model) {
     width: 27px;
     height: 27px;
   }
@@ -1619,6 +1619,8 @@ body[data-woc-site] #view table.item-table {
 
 /* A creature's or NPC's model render fills the info box instead of a small icon. */
 #view .wiki-box-art .article-art.model {
+  display: block;
+  margin-inline: auto;
   width: 100%;
   max-width: 300px;
   height: auto;

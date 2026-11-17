@@ -83097,7 +83097,8 @@ The forge-lift shudders and sinks; hammerfall rises to meet you.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="397">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="473">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__the_merchant.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Welcome to the [[World Market]], champion. Buy from every adventurer in the realm, or set out your own wares and let coin find you.
 
@@ -83131,7 +83132,8 @@ Welcome to the [[World Market]], champion. Buy from every adventurer in the real
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="638">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="718">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__marshal_redbrook.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Keep your blade close, champion. The Vale is not what it was.
 
@@ -83176,7 +83178,8 @@ Keep your blade close, champion. The Vale is not what it was.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1096">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1173">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__trader_wilkes.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Fresh bread, clean water, fair prices. What can I get you?
 
@@ -83235,7 +83238,8 @@ Fresh bread, clean water, fair prices. What can I get you?
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="364">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="442">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__apothecary_lin.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Careful where you step in the northeastern woods, friend.
 
@@ -83272,9 +83276,10 @@ Careful where you step in the northeastern woods, friend.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="892">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="970">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
 :&apos;&apos;Other pages have this name. See [[Brother Aldric|all pages named Brother Aldric]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 The Light keep you. Even the dead find no rest here of late.
 
@@ -83328,7 +83333,8 @@ The Light keep you. Even the dead find no rest here of late.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="746">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="823">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__smith_haldren.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Mind the sparks, champion. Good steel is the difference between a scar and a grave.
 
@@ -83377,7 +83383,8 @@ Mind the sparks, champion. Good steel is the difference between a scar and a gra
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="499">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="579">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__fisherman_brandt.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Blrb-glub... sorry, been listening to those fish-men too long.
 
@@ -83421,7 +83428,8 @@ Blrb-glub... sorry, been listening to those fish-men too long.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="425">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="502">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__foreman_odell.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Whole dig&apos;s crawling with those dirt-caked vermin!
 
@@ -83460,7 +83468,8 @@ Whole dig&apos;s crawling with those dirt-caked vermin!
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="334">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="420">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__eastbrook_vault_keeper.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Your weekly rewards await. Choose one item from your earned choices after the Crucible reset.
 
@@ -83491,7 +83500,8 @@ Your weekly rewards await. Choose one item from your earned choices after the Cr
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="325">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="404">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__bursar_fernando.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Welcome to the Gilded Strongbox. Your goods rest safe behind our locks.
 
@@ -83525,7 +83535,8 @@ Welcome to the Gilded Strongbox. Your goods rest safe behind our locks.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="325">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="400">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__card_master.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Care for a Card Duel? Best of three, winner takes the bragging rights.
 
@@ -83559,7 +83570,8 @@ Care for a Card Duel? Best of three, winner takes the bragging rights.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="336">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="415">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__chronicler_saul.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Every deed worth doing is worth writing down twice, adventurer: once for the ledger and once for the fireside.
 
@@ -83590,7 +83602,8 @@ Every deed worth doing is worth writing down twice, adventurer: once for the led
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="687">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="770">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__forgemistress_darva.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 The forge answers to me, champion. Bring good ore and it will answer to you too.
 
@@ -83639,7 +83652,8 @@ The forge answers to me, champion. Bring good ore and it will answer to you too.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="943">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1018">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__cook_marlow.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Nothing leaves my kitchens half-cooked, champion. Sit, eat, then get back out there.
 
@@ -83695,7 +83709,8 @@ Nothing leaves my kitchens half-cooked, champion. Sit, eat, then get back out th
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="784">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="862">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__weaver_ottilie.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Mind the threads, champion. A steady hand at the loom beats a strong one.
 
@@ -83747,7 +83762,8 @@ Mind the threads, champion. A steady hand at the loom beats a strong one.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="722">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="799">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__tinker_gizzel.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Springs, sprockets, and sharp edges, champion: the toolworks has whatever your hands lack.
 
@@ -83797,7 +83813,8 @@ Springs, sprockets, and sharp edges, champion: the toolworks has whatever your h
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="858">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="936">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__farmer_jessica.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Good soil and fair weather, adventurer. Buy a seed from me, sow it in one of those beds, and go about your day. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the [[Farming]] row of your [[Professions]] window) lists every planted bed and its timer.
 
@@ -83845,7 +83862,8 @@ Good soil and fair weather, adventurer. Buy a seed from me, sow it in one of tho
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="664">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="742">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__warden_fenwick.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Hold at the gate, champion. Past those reeds, the fen does the killing for us.
 
@@ -83892,7 +83910,8 @@ Hold at the gate, champion. Past those reeds, the fen does the killing for us.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="462">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="546">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__socketwright_skerrit.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Forty years since I ground that eye and set it in his socket, and never a day paid. You want to hurt the Foreman, champion? Aim for my work.
 
@@ -83929,9 +83948,10 @@ Forty years since I ground that eye and set it in his socket, and never a day pa
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="997">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1079">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
 :&apos;&apos;Other pages have this name. See [[Brother Aldric|all pages named Brother Aldric]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric_fen.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 The Light keep you above the water, adventurer. The dead in this fen do not sleep: they wade.
 
@@ -83985,7 +84005,8 @@ The Light keep you above the water, adventurer. The dead in this fen do not slee
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1580">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1660">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__provisioner_hale.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Dry boots, dry bread, dry powder: at Fenbridge you get two of the three on a good day.
 
@@ -84056,7 +84077,8 @@ Dry boots, dry bread, dry powder: at Fenbridge you get two of the three on a goo
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="427">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="505">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__herbalist_yara.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Mind the thicket west of the road. The webs are thick as sailcloth this season.
 
@@ -84095,9 +84117,10 @@ Mind the thicket west of the road. The webs are thick as sailcloth this season.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="609">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="684">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Scout Maren (NPC, Thornpeak Heights)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__scout_maren.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Quiet feet and a short blade keep you breathing out here. Speak quick, for I am due back in the reeds.
 
@@ -84138,7 +84161,8 @@ Quiet feet and a short blade keep you breathing out here. Speak quick, for I am 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="339">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="420">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__bursar_petra_vell.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 The Gilded Strongbox keeps clean ledgers and cleaner vaults. What shall we stow for you?
 
@@ -84172,7 +84196,8 @@ The Gilded Strongbox keeps clean ledgers and cleaner vaults. What shall we stow 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="315">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="400">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__chronicler_osric_fenn.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Mind the damp on the pages, adventurer. The fen eats more books than readers ever will.
 
@@ -84203,7 +84228,8 @@ Mind the damp on the pages, adventurer. The fen eats more books than readers eve
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="639">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="714">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__tanner_hesk.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 A hide is only as good as its tanning, champion. The vats are ready when you are.
 
@@ -84249,7 +84275,8 @@ A hide is only as good as its tanning, champion. The vats are ready when you are
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="558">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="635">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__farmer_teasel.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 [[Marsh Rice|Marsh rice]] and [[Bog Beet Seed|bog beet seed]], champion, and compost to feed them. The paddies drain slow, so mind where you tread.
 
@@ -84289,7 +84316,8 @@ A hide is only as good as its tanning, champion. The vats are ready when you are
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="500">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="580">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__muster_commander.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 [[Pikes First|Pikes first]], champion, then everyone. That is the whole of it, and it has kept this camp alive.
 
@@ -84329,7 +84357,8 @@ A hide is only as good as its tanning, champion. The vats are ready when you are
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="789">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="869">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__captain_thessaly.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Two hundred years this wall has held, champion. It will not break on my watch, but it groans.
 
@@ -84381,9 +84410,10 @@ Two hundred years this wall has held, champion. It will not break on my watch, b
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1335">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1423">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
 :&apos;&apos;Other pages have this name. See [[Brother Aldric|all pages named Brother Aldric]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric_highwatch.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 From a chapel yard in the Vale to the roof of the world... the trail we have followed ends here. I can feel the mountain listening.
 
@@ -84446,9 +84476,10 @@ From a chapel yard in the Vale to the roof of the world... the trail we have fol
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="519">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="602">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
 :&apos;&apos;Other pages have this name. See [[Brother Aldric|all pages named Brother Aldric]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_aldric_raid.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 From a chapel yard in the Vale to the roof of the world... the trail we have followed ends here. I can feel the mountain listening.
 
@@ -84482,9 +84513,10 @@ From a chapel yard in the Vale to the roof of the world... the trail we have fol
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="718">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="803">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Scout Maren (NPC, Mirefen Marsh)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__scout_maren_highwatch.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 I tracked cultists through the fen at your side, and the trail led here. The peaks are worse, champion. Stay sharp.
 
@@ -84525,7 +84557,8 @@ I tracked cultists through the fen at your side, and the trail led here. The pea
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1586">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1668">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__quartermaster_bree.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Wool, hardtack, and steel-shod boots: Highwatch runs on all three, and I am short of everything.
 
@@ -84595,7 +84628,8 @@ Wool, hardtack, and steel-shod boots: Highwatch runs on all three, and I am shor
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="548">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="624">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__armorer_hode.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Forge is hot and the grindstone is turning. If it cuts, I sell it.
 
@@ -84636,7 +84670,8 @@ Forge is hot and the grindstone is turning. If it cuts, I sell it.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2345">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2429">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__heroic_quartermaster.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Proof of the heroic depths buys the finest rings and pendants in Highwatch. Show me your marks.
 
@@ -84712,7 +84747,8 @@ Proof of the heroic depths buys the finest rings and pendants in Highwatch. Show
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="9780">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="9866">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__warmarshal_draven_kole.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Honor is the only coin I take, and the Warfare stores are mine to guard. Earn your rank on the field and I will armor you for the next one.
 
@@ -84947,7 +84983,8 @@ Honor is the only coin I take, and the Warfare stores are mine to guard. Earn yo
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="547">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="628">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__loremaster_caddis.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Mind the loose shale, champion. The mountain has been... restless of late. I intend to learn why.
 
@@ -84990,7 +85027,8 @@ Mind the loose shale, champion. The mountain has been... restless of late. I int
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="385">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="464">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__auctioneer_voss.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 The [[World Market]] is open here too, champion. Buy from every adventurer in the realm, or set out your own wares.
 
@@ -85024,7 +85062,8 @@ The [[World Market]] is open here too, champion. Buy from every adventurer in th
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="321">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="404">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__bursar_aldous_crane.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Every crate, coffer, and trinket is safe with the Gilded Strongbox.
 
@@ -85058,7 +85097,8 @@ Every crate, coffer, and trinket is safe with the Gilded Strongbox.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="906">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="988">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__stablemaster_marla.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Every rider walks in on two legs, champion. I will not hand you the reins until you can sit the [[Valorsteed (Mount)|Valorsteed]] without kissing the dirt, and [[The Galecrest|the Galecrest]] wind shows no mercy to a bad seat.
 
@@ -85102,7 +85142,8 @@ Every rider walks in on two legs, champion. I will not hand you the reins until 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="315">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="403">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__chronicler_edda_hartwell.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 The mountain forgets nothing, adventurer, and neither do I. Let us see what you have done.
 
@@ -85133,7 +85174,8 @@ The mountain forgets nothing, adventurer, and neither do I. Let us see what you 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="666">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="746">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__alchemist_verane.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Measure twice and pour once, champion. The apothecary has no patience for spilled reagents.
 
@@ -85180,7 +85222,8 @@ Measure twice and pour once, champion. The apothecary has no patience for spille
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="677">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="754">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__farmer_hollis.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 The terraces give what the mountain allows, champion. I sell seed and compost, and if a crop of yours comes up withered I will work the husks back into good soil for you.
 
@@ -85222,7 +85265,8 @@ The terraces give what the mountain allows, champion. I sell seed and compost, a
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="705">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="787">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__tidewatcher_ondrel.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 The mere drinks the moonlight, champion, and gives back the drowned. I have watched that gate for thirty nights, and tonight it is open.
 
@@ -85269,7 +85313,8 @@ The mere drinks the moonlight, champion, and gives back the drowned. I have watc
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="9686">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="9754">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__fury.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 The sands remember every victory. Spend your honor well.
 
@@ -85504,9 +85549,10 @@ The sands remember every victory. Spend your honor well.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="353">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="431">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Brother Halven (NPC, Mirefen Marsh)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_halven.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 [[The Reliquary|The reliquary]] below has shifted again.
 
@@ -85537,9 +85583,10 @@ The sands remember every victory. Spend your honor well.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="408">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="492">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Brother Halven (NPC, Eastbrook Vale)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__brother_halven_marsh.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 The trail led north. Another reliquary, another rite. Choose your tier, and I&apos;ll hold the rope until you return.
 
@@ -85570,7 +85617,8 @@ The trail led north. Another reliquary, another rite. Choose your tier, and I&ap
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="595">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="673">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__keeper_saelwyn.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Few of your kind have stood beneath these boughs, champion. Walk gently, and be welcome.
 
@@ -85615,7 +85663,8 @@ Few of your kind have stood beneath these boughs, champion. Walk gently, and be 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="563">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="642">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__loremother_bryn.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Every light in this valley remembers something, adventurer. Help me listen.
 
@@ -85658,7 +85707,8 @@ Every light in this valley remembers something, adventurer. Help me listen.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="839">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="920">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__provisioner_fenna.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Bread still warm, water still sweet. The Hollow provides, and so do I.
 
@@ -85710,7 +85760,8 @@ Bread still warm, water still sweet. The Hollow provides, and so do I.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="486">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="564">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__wardsmith_orun.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 These forges cooled centuries ago, champion, but their work still holds an edge.
 
@@ -85749,7 +85800,8 @@ These forges cooled centuries ago, champion, but their work still holds an edge.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="537">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="616">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__archivist_tullo.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 The monuments out there have not spoken to anyone in an age. Perhaps they were waiting for fresh ears.
 
@@ -85790,7 +85842,8 @@ The monuments out there have not spoken to anyone in an age. Perhaps they were w
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="490">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="568">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__huntsman_deral.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Quiet now. The herd knows every sound this valley makes, and so do I.
 
@@ -85830,7 +85883,8 @@ Quiet now. The herd knows every sound this valley makes, and so do I.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="509">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="592">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__gatecaptain_brannoc.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Wyrmwatch holds the gate. Has held it forty years. It will hold it tonight.
 
@@ -85871,7 +85925,8 @@ Wyrmwatch holds the gate. Has held it forty years. It will hold it tonight.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="456">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="538">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__quartermaster_sela.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Every crate in this yard crossed forty miles of ash to get here. Treat them kindly.
 
@@ -85910,7 +85965,8 @@ Every crate in this yard crossed forty miles of ash to get here. Treat them kind
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="493">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="569">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__scout_yerrin.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Keep low. Sound carries strangely off the glass, and the gate below has ears.
 
@@ -85951,7 +86007,8 @@ Keep low. Sound carries strangely off the glass, and the gate below has ears.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="648">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="725">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__warden_kaldra.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Mind the benches, stranger. The snow keeps what it takes.
 
@@ -85994,7 +86051,8 @@ Mind the benches, stranger. The snow keeps what it takes.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="503">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="585">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__hearthkeeper_maeve.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Come in off the cold. The lodge fire never goes out, so long as I draw breath.
 
@@ -86034,7 +86092,8 @@ Come in off the cold. The lodge fire never goes out, so long as I draw breath.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="337">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="412">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__scout_einna.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 You walked the pass alive. Good. Icemantle should hear of it.
 
@@ -86068,7 +86127,8 @@ You walked the pass alive. Good. Icemantle should hear of it.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="488">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="566">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__aurorist_veyla.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Hush. The lights are speaking tonight, and they do not repeat themselves.
 
@@ -86109,7 +86169,8 @@ Hush. The lights are speaking tonight, and they do not repeat themselves.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="451">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="528">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__trapper_brosk.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Fen took three of my lines this week. Fen never took a line in twenty years.
 
@@ -86148,7 +86209,8 @@ Fen took three of my lines this week. Fen never took a line in twenty years.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="461">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="539">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__reeve_ottoline.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Welcome to Lanternmere, where the harvest never ends and neither does the work.
 
@@ -86187,7 +86249,8 @@ Welcome to Lanternmere, where the harvest never ends and neither does the work.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="361">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="442">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__waywatcher_sorrel.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Snow behind you, gold ahead. Few walk the Goldmelt twice, so make the crossing count.
 
@@ -86221,7 +86284,8 @@ Snow behind you, gold ahead. Few walk the Goldmelt twice, so make the crossing c
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="522">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="604">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__ferrymaster_caddow.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Fog is on the Mere again. When the lanterns go out on the water, wise folk stay ashore.
 
@@ -86262,7 +86326,8 @@ Fog is on the Mere again. When the lanterns go out on the water, wise folk stay 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="494">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="577">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__orchardist_pomeline.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Mind where you step. Every root in these rows is older than the town, and they remember.
 
@@ -86302,7 +86367,8 @@ Mind where you step. Every root in these rows is older than the town, and they r
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="353">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="431">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__waykeeper_pell.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Down the Steps and into the soft country. Mind where you plant your boots.
 
@@ -86336,7 +86402,8 @@ Down the Steps and into the soft country. Mind where you plant your boots.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="494">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="576">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__bridgewright_alden.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Every plank in this town is mine to keep, and the fen chews on all of them.
 
@@ -86377,7 +86444,8 @@ Every plank in this town is mine to keep, and the fen chews on all of them.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="452">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="528">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__netter_maris.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Smell that? Smoked eel. Half this town stands on stilts I bought with it.
 
@@ -86416,7 +86484,8 @@ Smell that? Smoked eel. Half this town stands on stilts I bought with it.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="468">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="544">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__mother_sedge.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 The willows told me you were coming before your boots left the bridge.
 
@@ -86456,7 +86525,8 @@ The willows told me you were coming before your boots left the bridge.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="361">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="443">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__lamplighter_sorrel.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Mind the lamps, friend. Past this gate the sun gives up and the flowers take over.
 
@@ -86490,7 +86560,8 @@ Mind the lamps, friend. Past this gate the sun gives up and the flowers take ove
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="491">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="567">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__lira_dewsong.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Welcome to Moonrest, where the flowers do our dawning for us.
 
@@ -86531,7 +86602,8 @@ Welcome to Moonrest, where the flowers do our dawning for us.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="392">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="469">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__weaver_amelle.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Feel that? Moonfleece on the loom. Warmer than any fire you have sat beside.
 
@@ -86568,7 +86640,8 @@ Feel that? Moonfleece on the loom. Warmer than any fire you have sat beside.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="534">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="616">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__astronomer_cassian.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Hush now. The sky never dawns here, so it never stops talking either.
 
@@ -86610,7 +86683,8 @@ Hush now. The sky never dawns here, so it never stops talking either.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="365">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="441">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__lampman_cobb.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Stay in the lamplight, friend. The wood counts everyone who passes the gate.
 
@@ -86644,9 +86718,10 @@ Stay in the lamplight, friend. The wood counts everyone who passes the gate.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="584">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="661">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
 :&apos;&apos;Other pages have this name. See [[Sexton Marrow|all pages named Sexton Marrow]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__sexton_marrow.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 We bury them deep here, and we ring the bells so they remember to stay down.
 
@@ -86687,7 +86762,8 @@ We bury them deep here, and we ring the bells so they remember to stay down.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="456">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="531">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__widow_tansy.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 A candle for every grave, and not one may go out. Not one, do you hear me?
 
@@ -86726,7 +86802,8 @@ A candle for every grave, and not one may go out. Not one, do you hear me?
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="544">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="619">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__vicar_creel.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 The chapel fell years ago. The dead beneath it did not notice, and so I stayed.
 
@@ -86768,7 +86845,8 @@ The chapel fell years ago. The dead beneath it did not notice, and so I stayed.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="365">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="447">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__strandwatcher_pell.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Out of the black trees at last. Breathe, stranger, the sun holds this side of the pass.
 
@@ -86802,7 +86880,8 @@ Out of the black trees at last. Breathe, stranger, the sun holds this side of th
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="716">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="797">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__salvage_boss_ryna.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 A champion with working arms, good. [[The Wreck Line (Quest, The Palmreach)|The wreck line]] pays well, if the crabs leave you enough fingers to count it.
 
@@ -86844,7 +86923,8 @@ A champion with working arms, good. [[The Wreck Line (Quest, The Palmreach)|The 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="430">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="510">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__pearlmother_isha.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 The sea gives, the sand keeps, and the jungle takes. Stay on the strand, stranger.
 
@@ -86882,7 +86962,8 @@ The sea gives, the sand keeps, and the jungle takes. Stay on the strand, strange
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="555">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="630">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__hermit_okku.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Quiet now. The drums count everything that walks under the trees, and they have already counted you.
 
@@ -86924,7 +87005,8 @@ Quiet now. The drums count everything that walks under the trees, and they have 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="364">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="443">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__gatewarden_pell.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Mind how you go on the lawns. The garden keeps them trimmed, and it likes them tidy.
 
@@ -86958,7 +87040,8 @@ Mind how you go on the lawns. The garden keeps them trimmed, and it likes them t
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="493">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="579">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__head_gardener_amaranth.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Do not mind the shadows under my eyes. Someone has to stay awake while the garden dreams.
 
@@ -86997,7 +87080,8 @@ Do not mind the shadows under my eyes. Someone has to stay awake while the garde
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="505">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="586">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__wickmother_sorrel.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Come in, sit, there is cordial on the fire. Just keep a hand on anything iron: the gnomes are light-fingered of late.
 
@@ -87036,7 +87120,8 @@ Come in, sit, there is cordial on the fire. Just keep a hand on anything iron: t
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="597">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="673">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__gardener_yew.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Hand me that barrow, would you? These lawns do not walk themselves, whatever the hamlet thinks.
 
@@ -87078,7 +87163,8 @@ Hand me that barrow, would you? These lawns do not walk themselves, whatever the
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="693">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="771">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__farmer_verbena.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Mind the edging, adventurer, these beds are the pride of the parterre. Seed and compost are what I sell, and I will turn any [[Withered Husks|withered husks]] you carry into more of it.
 
@@ -87120,7 +87206,8 @@ Mind the edging, adventurer, these beds are the pride of the parterre. Seed and 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="353">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="430">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__watcher_maren.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Mind your footing past the gate. The wind up here takes hats first and questions never.
 
@@ -87154,7 +87241,8 @@ Mind your footing past the gate. The wind up here takes hats first and questions
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="523">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="605">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__harbormaster_odile.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Every boat in this cove owes the Old Beacon its keel. Speak quick, the tide will not wait.
 
@@ -87195,7 +87283,8 @@ Every boat in this cove owes the Old Beacon its keel. Speak quick, the tide will
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="519">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="594">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__keeper_bram.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Nine and thirty years this lamp has burned on my watch. It will not go dark on yours.
 
@@ -87236,7 +87325,8 @@ Nine and thirty years this lamp has burned on my watch. It will not go dark on y
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="464">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="541">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__salvager_edda.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Wreckwood, rope, and dead men&apos;s cargo. The sea pays my wage, when the Warden lets it.
 
@@ -87276,7 +87366,8 @@ Wreckwood, rope, and dead men&apos;s cargo. The sea pays my wage, when the Warde
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="551">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="630">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__warden_coalfast.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 The breaks do not care that Gullhaven is small, champion. We hold this shore, or there is no shore left to hold. Stand with us and I will not forget it.
 
@@ -87316,7 +87407,8 @@ The breaks do not care that Gullhaven is small, champion. We hold this shore, or
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="518">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="597">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__riftwatch_ollun.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Every break sings before it opens, if you have the ear for it. I can hear three of them stirring on the island right now, and one of them is close.
 
@@ -87355,7 +87447,8 @@ Every break sings before it opens, if you have the ear for it. I can hear three 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="446">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="528">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__quartermaster_edda.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Steel and salt, champion, it is all I have left to hand out. Take it and make the breaks regret opening where I could reach them.
 
@@ -87392,7 +87485,8 @@ Steel and salt, champion, it is all I have left to hand out. Take it and make th
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="492">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="567">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__mender_saul.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 I have set more bones this one month than in ten years of mending [[Fishing|fishing]] falls. The breaks do not leave much of what they take. Come back to me whole, if you can manage it.
 
@@ -87429,7 +87523,8 @@ I have set more bones this one month than in ten years of mending [[Fishing|fish
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="543">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="621">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__bellkeeper_tam.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 The bell is the only warning the breaks give us, champion. One toll for the fields, two for the cliffs, three when it is close enough that running will not help. Keep an ear on it, and it may keep you whole.
 
@@ -87467,7 +87562,8 @@ The bell is the only warning the breaks give us, champion. One toll for the fiel
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="469">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="544">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__fisher_nell.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 It opened right where the nets dry. Right there, where I stood every morning of my life. I do not go down to the shore anymore. I do not go much of anywhere anymore.
 
@@ -87504,7 +87600,8 @@ It opened right where the nets dry. Right there, where I stood every morning of 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="400">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="481">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__riftwright_maelis.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 A Riftbound band remembers the break that made it, champion. Bring me the band, and the essence the breaks shed, and I will teach it to remember more.
 
@@ -87538,7 +87635,8 @@ A Riftbound band remembers the break that made it, champion. Bring me the band, 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="463">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="540">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__wayfarer_bryn.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Eastbrook takes all comers, friend. And for the unsteady, there is always [[The Proving Shore|the Proving Shore]]: the [[Ferry Bell|ferry bell]] down on the quay rings you across any day of the year, and its twin on the island rings you home.
 
@@ -87569,7 +87667,8 @@ Eastbrook takes all comers, friend. And for the unsteady, there is always [[The 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="596">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="676">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__instructor_maren.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Every hero the vale has ever thanked stood where you stand now, champion, and not one of them knew which end of a blade to hold. That is what this shore is for. Ask, practice, and fail where failing is free.
 
@@ -87610,7 +87709,8 @@ Every hero the vale has ever thanked stood where you stand now, champion, and no
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="824">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="907">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__quartermaster_finch.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 My counter keeps exactly one thing for sale, adventurer: a spare pouch for what you pick up along the way, when your lesson calls for it. Everything else here is salvage bound for the vale. Coin buys the pouch, and work earns the coin. That is the whole economy, and it never gets more complicated. Only bigger.
 
@@ -87653,7 +87753,8 @@ My counter keeps exactly one thing for sale, adventurer: a spare pouch for what 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="448">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="523">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__bursar_wick.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 The Gilded Strongbox keeps a desk even here, adventurer. Whatever you deposit with me waits in the same vault behind every bursar in every town, safe from wolves, water, and your own worse judgment.
 
@@ -87687,7 +87788,8 @@ The Gilded Strongbox keeps a desk even here, adventurer. Whatever you deposit wi
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="696">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="772">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__ferryman_odo.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Fresh off the crossing, adventurer? [[Warden Tam (NPC)|Warden Tam]] keeps the Gauntlet on the strand just south of my pier: run his lanes first and your legs will thank you. Every keeper on this shore hands you to the next when your work is done, and the card at the top of your screen always knows the way. When the vale calls you back, ring the bell standing beside my pier and the crossing will set you down in Eastbrook town.
 
@@ -87721,7 +87823,8 @@ Fresh off the crossing, adventurer? [[Warden Tam (NPC)|Warden Tam]] keeps the Ga
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="434">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="508">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__warden_tam.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 These lanes are the Gauntlet, adventurer, and every adventurer the vale respects has run them. The lantern posts stay lit all night, so the lanes never close.
 
@@ -87755,7 +87858,8 @@ These lanes are the Gauntlet, adventurer, and every adventurer the vale respects
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="498">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="575">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__overseer_pell.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 I clock every run that comes down these lanes, adventurer, and I have seen far worse footwork. The path behind me climbs to the practice yard: that is where footwork turns into swordwork.
 
@@ -87792,7 +87896,8 @@ I clock every run that comes down these lanes, adventurer, and I have seen far w
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="492">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="572">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__drillmaster_rook.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Straw first, shells second, adventurer. An effigy teaches your arm the swing; the scuttlers down the strand teach it to land on something that minds.
 
@@ -87831,7 +87936,8 @@ Straw first, shells second, adventurer. An effigy teaches your arm the swing; th
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="608">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="686">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__tidewarden_nel.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 The tide takes and the tide pays, adventurer. I keep the tally of both: what the scuttlers pinch off the wrecks, and what honest hands carry back up this path.
 
@@ -87870,7 +87976,8 @@ The tide takes and the tide pays, adventurer. I keep the tally of both: what the
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="392">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="482">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__archivist_maelin_emberward.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Every hammer mark in this place is a sentence. Help me read what Varkhul tried to hide.
 
@@ -87904,7 +88011,8 @@ Every hammer mark in this place is a sentence. Help me read what Varkhul tried t
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="780">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="877">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__archivist_maelin_ember_projection.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 The embers carry Maelin&apos;s voice forward through the forge.
 
@@ -87948,7 +88056,8 @@ The embers carry Maelin&apos;s voice forward through the forge.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="10962">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="11048">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__crucible_quartermaster.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 The forge marks its own. Bring me a sigil from the Crucible and I will fit you for war.
 
@@ -88141,7 +88250,8 @@ The forge marks its own. Bring me a sigil from the Crucible and I will fit you f
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="309">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="386">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__spirit_healer.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Rest now, spirit. I can return you to your body, but the crossing back leaves you weak.
 
@@ -88172,7 +88282,8 @@ Rest now, spirit. I can return you to your body, but the crossing back leaves yo
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="582">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="662">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__drillmaster_hale.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 That dummy behind me never swings back and never goes down, champion. What matters is the tally: your Damage Meters count every blow you land on it. Target it and open the meters, and I will walk you through the rest.
 
@@ -88211,7 +88322,8 @@ That dummy behind me never swings back and never goes down, champion. What matte
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="381">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="467">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__calligraphy_instructor.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 A steady step makes a steady line. Teach my apprentices a triangle, a square, and an advanced rune.
 
@@ -88242,7 +88354,8 @@ A steady step makes a steady line. Teach my apprentices a triangle, a square, an
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="316">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="404">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__calligraphy_apprentice_1.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 I keep turning too soon. Will you show me where the corners belong?
 
@@ -88273,7 +88386,8 @@ I keep turning too soon. Will you show me where the corners belong?
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="321">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="409">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__calligraphy_apprentice_2.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 A triangle first, then a square, then a rune. One steady step at a time!
 
@@ -88304,7 +88418,8 @@ A triangle first, then a square, then a rune. One steady step at a time!
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="330">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="410">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__forge_instructor.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Help me finish a shield! Click the supplies I call for. Quick hands earn a better medal.
 
@@ -88335,7 +88450,8 @@ Help me finish a shield! Click the supplies I call for. Quick hands earn a bette
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="503">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="583">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__wisp_maze_keeper.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Thieves hid their stolen gold all through my maze, and the shadows guard it now. Recover every coin purse. Avoid the guardians, or take a radiant wisp to banish them. Three lost lives return you to the entrance, but the purses you gathered remain safe.
 
@@ -88366,7 +88482,8 @@ Thieves hid their stolen gold all through my maze, and the shadows guard it now.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="343">&lt;woc-art path=&quot;/ui/weekly/emissary.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="422">&lt;woc-art path=&quot;/ui/weekly/emissary.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__weekly_emissary.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 The Vale keeps a ledger of deeds, and I keep the ledger. Pick one charge for the week, see it through, and the purse is yours.
 
@@ -88397,7 +88514,8 @@ The Vale keeps a ledger of deeds, and I keep the ledger. Pick one charge for the
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="464">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="546">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__shadow_cloak_scout.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Borrow my duskweave cloak. Slip in behind each dispatch carrier and lift his orders. Stay out of the lantern beams: a lantern guard sees straight through the enchantment, and a carrier feels you if you brush against him.
 
@@ -88428,9 +88546,10 @@ Borrow my duskweave cloak. Slip in behind each dispatch carrier and lift his ord
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="392">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="474">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
 :&apos;&apos;Other pages have this name. See [[Dispatch Guard|all pages named Dispatch Guard]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__shadow_guard_north.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 These sealed orders are for the captain. Keep your distance.
 
@@ -88461,9 +88580,10 @@ These sealed orders are for the captain. Keep your distance.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="373">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="455">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
 :&apos;&apos;Other pages have this name. See [[Dispatch Guard|all pages named Dispatch Guard]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__shadow_guard_south.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 I have a dispatch to deliver. Move along.
 
@@ -88494,9 +88614,10 @@ I have a dispatch to deliver. Move along.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="381">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="462">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
 :&apos;&apos;Other pages have this name. See [[Dispatch Guard|all pages named Dispatch Guard]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__shadow_guard_east.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 No delays. The watch is waiting for these orders.
 
@@ -88527,9 +88648,10 @@ No delays. The watch is waiting for these orders.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="371">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="452">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
 :&apos;&apos;Other pages have this name. See [[Dispatch Guard|all pages named Dispatch Guard]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__shadow_guard_west.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Official business. Keep the path clear.
 
@@ -88560,9 +88682,10 @@ Official business. Keep the path clear.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="383">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="466">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Lantern Sentry (NPC, Eastbrook Vale, North)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__shadow_sentry_south.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 My lantern reveals more than shadows. Stay where I can see you.
 
@@ -88593,9 +88716,10 @@ My lantern reveals more than shadows. Stay where I can see you.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="357">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="440">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Lantern Sentry (NPC, Eastbrook Vale, South)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__shadow_sentry_north.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Nothing slips past the lantern watch.
 
@@ -88626,9 +88750,10 @@ Nothing slips past the lantern watch.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="370">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="451">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Lantern Watchman (NPC, Eastbrook Vale, East)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__shadow_watch_west.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Hold there. The lantern sees what the eye misses.
 
@@ -88659,9 +88784,10 @@ Hold there. The lantern sees what the eye misses.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="352">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="433">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Lantern Watchman (NPC, Eastbrook Vale, West)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__shadow_watch_east.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Nobody crosses my light unseen.
 
@@ -88692,7 +88818,8 @@ Nobody crosses my light unseen.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="401">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="482">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__glider_instructor.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 The thermals howling off the cliffs of The Shear are fierce today. Ready to strap into the mechanical glider and test your wings through the slalom course?
 
@@ -88723,7 +88850,8 @@ The thermals howling off the cliffs of The Shear are fierce today. Ready to stra
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="352">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="433">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__glider_apprentice.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Great flight down the canyon. Speak with me whenever you need a magical updraft back to Zephyr at The Shear.
 
@@ -88754,7 +88882,8 @@ Great flight down the canyon. Speak with me whenever you need a magical updraft 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="422">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="505">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__infiltrator_captain.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 A creature has stolen a soldier&apos;s face. Read the standing orders and the watch ledger, question all four guards, then come back and name the one whose story contradicts our records.
 
@@ -88785,7 +88914,8 @@ A creature has stolen a soldier&apos;s face. Read the standing orders and the wa
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="260">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="341">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__infiltrator_nella.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Reporting for duty.
 
@@ -88816,7 +88946,8 @@ Reporting for duty.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="260">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="340">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__infiltrator_orin.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Reporting for duty.
 
@@ -88847,7 +88978,8 @@ Reporting for duty.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="260">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="340">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__infiltrator_bram.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Reporting for duty.
 
@@ -88878,7 +89010,8 @@ Reporting for duty.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="260">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="341">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__infiltrator_tessa.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Reporting for duty.
 
@@ -88909,7 +89042,8 @@ Reporting for duty.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3412">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3504">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__npc_rift_watch_quartermaster.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 [[Rift Watch (Faction)|The Rift Watch]] protects the shore and watches the deep tears. Our stores are open to those of recognized standing.
 
@@ -88963,7 +89097,8 @@ Reporting for duty.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2823">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2917">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__npc_church_order_quartermaster.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Walk in the Light of the Dawn. [[Church Order (Faction)|The Church Order]] supplies those who stand with us in service.
 
@@ -89017,7 +89152,8 @@ Walk in the Light of the Dawn. [[Church Order (Faction)|The Church Order]] suppl
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2611">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2702">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__npc_automaton_quartermaster.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Precision gears, forged steel, and calibrated power. Authorized operators may draw from our inventory.
 
@@ -89070,7 +89206,8 @@ Precision gears, forged steel, and calibrated power. Authorized operators may dr
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="376">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="457">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__npc_wq_taskmaster.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 The allied factions post assignments across the realm every day. If an assignment does not suit your skills, you may request one daily reassignment.
 
@@ -89101,7 +89238,8 @@ The allied factions post assignments across the realm every day. If an assignmen
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="562">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="645">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__harbormaster_tamsin.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Come in off the quay and warm your hands. The ship at our pier sails up the long east coast to Wickharbor and back again. Far to the west, the other ferry runs between Eastbrook and [[The Nightbloom|the Nightbloom]]. The map on the wall shows both crossings. Rest by the fire before the climb to Wyrmwatch.
 
@@ -89132,7 +89270,8 @@ Come in off the quay and warm your hands. The ship at our pier sails up the long
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="490">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="580">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__guildmaster_hesper_dunmore.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Welcome to Lantern Hall, champion. Tobias keeps the week&apos;s contracts on the board, Garrick trades our seals for honors worth wearing, and Mira will find you a party for any door below the mountain. Bring back a trophy and it hangs in the hall behind me.
 
@@ -89163,7 +89302,8 @@ Welcome to Lantern Hall, champion. Tobias keeps the week&apos;s contracts on the
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="331">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="421">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__contract_clerk_tobias_wren.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Three contracts a week, posted every reset. No signing, no fees: see one through and the seals are yours.
 
@@ -89194,7 +89334,8 @@ Three contracts a week, posted every reset. No signing, no fees: see one through
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="359">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="455">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__guild_quartermaster_garrick_holt.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Seals for honors, friend. Nothing on my shelves will sharpen a blade, but every hall in Highwatch will know where you earned it.
 
@@ -89225,7 +89366,8 @@ Seals for honors, friend. Nothing on my shelves will sharpen a blade, but every 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="344">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="440">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__guild_recruiter_mira_fairweather.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Looking for a party? Every crypt, bastion and temple on this map has a name on my list. Tell me where you are headed.
 
@@ -89256,7 +89398,8 @@ Looking for a party? Every crypt, bastion and temple on this map has a name on m
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="516">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="595">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__cantor_laverock.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 I was the youngest voice of the Pale Choir. On the night of the rite I did not drink, and I ran. Every full moon since, I hear them singing under the water. I must see her before I die. Let me walk behind you. I will not fight, and I will not slow you.
 
@@ -89287,7 +89430,8 @@ I was the youngest voice of the Pale Choir. On the night of the rite I did not d
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="820">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="900">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__innkeeper_maudie.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Come in out of the damp, friend, and mind the step down to the fire. The kettle is on, the benches are warm, and the rooms upstairs are dry. Travelers from Fenbridge swear the marsh road is quiet by day, but nobody walks it after dark. Sit a while and rest your feet.
 
@@ -89329,7 +89473,8 @@ Come in out of the damp, friend, and mind the step down to the fire. The kettle 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="420">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="501">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__patron_amos_eelby.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Pull up a bench, champion. Grissel here swears the big eel under Fenbridge is a myth. I&apos;ve had my hand on him twice. Twice! Slippery as a tax collector, and near as long as this bench.
 
@@ -89360,7 +89505,8 @@ Pull up a bench, champion. Grissel here swears the big eel under Fenbridge is a 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="446">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="535">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__patron_grissel_sedgeworth.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Don&apos;t mind Amos. Forty years cutting peat and I&apos;ve pulled more strange things out of this bog than he&apos;s pulled eels: boots, bones, a helmet with the head still worried about it. Warm yourself, the fire&apos;s free.
 
@@ -89391,7 +89537,8 @@ Don&apos;t mind Amos. Forty years cutting peat and I&apos;ve pulled more strange
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="401">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="481">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__patron_ned_oxley.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Drove forty head down the causeway and lost two to the mire before Fenbridge. Maudie&apos;s ale is the only thing on this road that never lets a man down. Buy your own, mind.
 
@@ -89422,7 +89569,8 @@ Drove forty head down the causeway and lost two to the mire before Fenbridge. Ma
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="426">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="511">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__patron_hester_quillby.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 Every map of this marsh I&apos;ve ever bought was wrong within a season. The water moves the paths, and the paths move the water. So I draw my own, and I sit here where it&apos;s dry while the ink sets.
 
@@ -89453,7 +89601,8 @@ Every map of this marsh I&apos;ve ever bought was wrong within a season. The wat
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2167">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2248">&lt;woc-art path=&quot;/ui/crests/status/npc.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/npc__gourdlight_keeper.webp&quot; size=&quot;model&quot; /&gt;
 == Greeting ==
 The gourds are lit and the lanterns are up, so it must be [[Gourdlight Eve]]. Knock on the doors of the townsfolk in Eastbrook, Fenbridge and Highwatch, and say the words: trick or treat. Most will hand you a sweet. A few will play a trick on you. Bring the sweets to me, at any of my stalls, and I will trade you something to wear.
 
@@ -110517,7 +110666,8 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3144">&lt;woc-art path=&quot;/ui/mobs/mogger.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="3214">&lt;woc-art path=&quot;/ui/mobs/mogger.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__mogger.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Mogger is one of the Humanoids.
 
@@ -110640,7 +110790,8 @@ The game rolls once for this group. At most &apos;&apos;&apos;one&apos;&apos;&ap
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1345">&lt;woc-art path=&quot;/ui/mobs/mogger_lackey.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1422">&lt;woc-art path=&quot;/ui/mobs/mogger_lackey.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__mogger_lackey.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Mogger Lackey is one of the Humanoids.
 
@@ -111053,7 +111204,8 @@ The game rolls once for this group. At most &apos;&apos;&apos;one&apos;&apos;&ap
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2316">&lt;woc-art path=&quot;/ui/mobs/vale_bandit.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2391">&lt;woc-art path=&quot;/ui/mobs/vale_bandit.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__vale_bandit.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Vale Bandit is one of the Humanoids.
 
@@ -111503,7 +111655,8 @@ The game rolls once for this group. At most &apos;&apos;&apos;one&apos;&apos;&ap
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2242">&lt;woc-art path=&quot;/ui/mobs/gorrak.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2312">&lt;woc-art path=&quot;/ui/mobs/gorrak.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__gorrak.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Gorrak the Ruthless is one of the Humanoids.
 
@@ -113106,7 +113259,8 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2551">&lt;woc-art path=&quot;/ui/mobs/gravecaller_cultist.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2634">&lt;woc-art path=&quot;/ui/mobs/gravecaller_cultist.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__gravecaller_cultist.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Gravecaller Cultist is one of the Humanoids.
 
@@ -113211,7 +113365,8 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2250">&lt;woc-art path=&quot;/ui/mobs/gravecaller_summoner.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2334">&lt;woc-art path=&quot;/ui/mobs/gravecaller_summoner.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__gravecaller_summoner.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Gravecaller Summoner is one of the Humanoids.
 
@@ -113310,7 +113465,8 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2399">&lt;woc-art path=&quot;/ui/mobs/gravecaller_mender.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2481">&lt;woc-art path=&quot;/ui/mobs/gravecaller_mender.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__gravecaller_mender.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Gravecaller Mender is one of the Humanoids.
 
@@ -113410,7 +113566,8 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2744">&lt;woc-art path=&quot;/ui/mobs/sister_nhalia.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2821">&lt;woc-art path=&quot;/ui/mobs/sister_nhalia.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__sister_nhalia.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Sister Nhalia is one of the Humanoids.
 
@@ -113524,7 +113681,8 @@ The game rolls once for this group. At most &apos;&apos;&apos;one&apos;&apos;&ap
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1390">&lt;woc-art path=&quot;/ui/mobs/nhalia_mourner.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1468">&lt;woc-art path=&quot;/ui/mobs/nhalia_mourner.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__nhalia_mourner.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Nhalia Mourner is one of the Humanoids.
 
@@ -113602,7 +113760,8 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2150">&lt;woc-art path=&quot;/ui/mobs/deacon_voss.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2225">&lt;woc-art path=&quot;/ui/mobs/deacon_voss.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__deacon_voss.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Deacon Voss is one of the Humanoids.
 
@@ -113805,7 +113964,8 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="933">&lt;woc-art path=&quot;/ui/mobs/muster_footman.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1011">&lt;woc-art path=&quot;/ui/mobs/muster_footman.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__muster_footman.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Muster Footman is one of the Humanoids.
 
@@ -113877,7 +114037,8 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="935">&lt;woc-art path=&quot;/ui/mobs/muster_chaplain.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1014">&lt;woc-art path=&quot;/ui/mobs/muster_chaplain.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__muster_chaplain.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Muster Chaplain is one of the Humanoids.
 
@@ -113949,7 +114110,8 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="935">&lt;woc-art path=&quot;/ui/mobs/muster_sergeant.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1014">&lt;woc-art path=&quot;/ui/mobs/muster_sergeant.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__muster_sergeant.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Muster Sergeant is one of the Humanoids.
 
@@ -114021,7 +114183,8 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="941">&lt;woc-art path=&quot;/ui/mobs/muster_drillmaster.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1023">&lt;woc-art path=&quot;/ui/mobs/muster_drillmaster.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__muster_drillmaster.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Muster Drillmaster is one of the Humanoids.
 
@@ -115606,7 +115769,8 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2803">&lt;woc-art path=&quot;/ui/mobs/wyrmcult_zealot.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2882">&lt;woc-art path=&quot;/ui/mobs/wyrmcult_zealot.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__wyrmcult_zealot.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Broodsworn Zealot is one of the Humanoids.
 
@@ -115714,7 +115878,8 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2420">&lt;woc-art path=&quot;/ui/mobs/wyrmcult_necromancer.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2504">&lt;woc-art path=&quot;/ui/mobs/wyrmcult_necromancer.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__wyrmcult_necromancer.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Broodsworn Necromancer is one of the Humanoids.
 
@@ -115817,7 +115982,8 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2008">&lt;woc-art path=&quot;/ui/mobs/threnos_first_voice.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2091">&lt;woc-art path=&quot;/ui/mobs/threnos_first_voice.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__threnos_first_voice.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Threnos the First Voice is one of the Humanoids.
 
@@ -116320,7 +116486,8 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="911">&lt;woc-art path=&quot;/ui/mobs/vision_aldren_warrior.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="996">&lt;woc-art path=&quot;/ui/mobs/vision_aldren_warrior.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__vision_aldren_warrior.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Vision of Captain Aldren is one of the Humanoids.
 
@@ -116389,7 +116556,8 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="912">&lt;woc-art path=&quot;/ui/mobs/vision_malric_mage.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="994">&lt;woc-art path=&quot;/ui/mobs/vision_malric_mage.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__vision_malric_mage.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Vision of High Priest Malric is one of the Humanoids.
 
@@ -116458,7 +116626,8 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="919">&lt;woc-art path=&quot;/ui/mobs/vision_deathstalker_voss.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1007">&lt;woc-art path=&quot;/ui/mobs/vision_deathstalker_voss.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__vision_deathstalker_voss.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Vision of Royal Assassin Voss is one of the Humanoids.
 
@@ -126177,7 +126346,8 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1609">&lt;woc-art path=&quot;/ui/mobs/reliquary_gravecall_acolyte.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1700">&lt;woc-art path=&quot;/ui/mobs/reliquary_gravecall_acolyte.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__reliquary_gravecall_acolyte.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Gravecall Acolyte is one of the Humanoids.
 
@@ -126542,7 +126712,8 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1783">&lt;woc-art path=&quot;/ui/mobs/drowned_cantor.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1861">&lt;woc-art path=&quot;/ui/mobs/drowned_cantor.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__drowned_cantor.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Drowned Cantor is one of the Undead.
 
@@ -127258,7 +127429,8 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1376">&lt;woc-art path=&quot;/ui/mobs/sister_nhalia_drowned_canticle.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1470">&lt;woc-art path=&quot;/ui/mobs/sister_nhalia_drowned_canticle.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__sister_nhalia_drowned_canticle.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Sister Nhalia, the Drowned Canticle is one of the Undead.
 
@@ -127345,9 +127517,10 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="983">&lt;woc-art path=&quot;/ui/mobs/edda_reedhand.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1060">&lt;woc-art path=&quot;/ui/mobs/edda_reedhand.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Edda Reedhand (Delve companion)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__edda_reedhand.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Edda Reedhand is one of the Humanoids.
 
@@ -127416,9 +127589,10 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="981">&lt;woc-art path=&quot;/ui/mobs/acolyte_tessa.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1058">&lt;woc-art path=&quot;/ui/mobs/acolyte_tessa.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[Acolyte Tessa (Delve companion)]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__acolyte_tessa.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Acolyte Tessa is one of the Humanoids.
 
@@ -129619,7 +129793,8 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2085">&lt;woc-art path=&quot;/ui/mobs/rift_pact_acolyte.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2166">&lt;woc-art path=&quot;/ui/mobs/rift_pact_acolyte.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__rift_pact_acolyte.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Pact Acolyte is one of the Undead.
 
@@ -138922,7 +139097,8 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1990">&lt;woc-art path=&quot;/ui/mobs/crypt_crow_caller.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2071">&lt;woc-art path=&quot;/ui/mobs/crypt_crow_caller.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__crypt_crow_caller.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Crow Caller is one of the Humanoids.
 
@@ -141854,10 +142030,10 @@ The game rolls once for this group. At most &apos;&apos;&apos;one&apos;&apos;&ap
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1217">&lt;woc-art path=&quot;/ui/mobs/tideglass_reflection.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1204">&lt;woc-art path=&quot;/ui/mobs/tideglass_reflection.webp&quot; /&gt;
 :&apos;&apos;Other pages have this name. See [[Tideglass Reflection|all pages named Tideglass Reflection]].&apos;&apos;
 
-&lt;woc-art path=&quot;/encyclopedia-stills/temple_reflection_warrior__7fb2ff__s88.webp&quot; size=&quot;model&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__tideglass_reflection.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Tideglass Reflection is one of the Elementals.
 
@@ -141936,10 +142112,10 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1225">&lt;woc-art path=&quot;/ui/mobs/tideglass_reflection_warrior.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1220">&lt;woc-art path=&quot;/ui/mobs/tideglass_reflection_warrior.webp&quot; /&gt;
 :&apos;&apos;Other pages have this name. See [[Tideglass Reflection|all pages named Tideglass Reflection]].&apos;&apos;
 
-&lt;woc-art path=&quot;/encyclopedia-stills/temple_reflection_warrior__7fb2ff__s88.webp&quot; size=&quot;model&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__tideglass_reflection_warrior.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Tideglass Reflection is one of the Elementals.
 
@@ -142018,10 +142194,10 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1225">&lt;woc-art path=&quot;/ui/mobs/tideglass_reflection_paladin.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1220">&lt;woc-art path=&quot;/ui/mobs/tideglass_reflection_paladin.webp&quot; /&gt;
 :&apos;&apos;Other pages have this name. See [[Tideglass Reflection|all pages named Tideglass Reflection]].&apos;&apos;
 
-&lt;woc-art path=&quot;/encyclopedia-stills/temple_reflection_paladin__7fb2ff__s88.webp&quot; size=&quot;model&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__tideglass_reflection_paladin.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Tideglass Reflection is one of the Elementals.
 
@@ -142100,10 +142276,10 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1223">&lt;woc-art path=&quot;/ui/mobs/tideglass_reflection_hunter.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1218">&lt;woc-art path=&quot;/ui/mobs/tideglass_reflection_hunter.webp&quot; /&gt;
 :&apos;&apos;Other pages have this name. See [[Tideglass Reflection|all pages named Tideglass Reflection]].&apos;&apos;
 
-&lt;woc-art path=&quot;/encyclopedia-stills/temple_reflection_hunter__7fb2ff__s88.webp&quot; size=&quot;model&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__tideglass_reflection_hunter.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Tideglass Reflection is one of the Elementals.
 
@@ -142182,10 +142358,10 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1221">&lt;woc-art path=&quot;/ui/mobs/tideglass_reflection_rogue.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1216">&lt;woc-art path=&quot;/ui/mobs/tideglass_reflection_rogue.webp&quot; /&gt;
 :&apos;&apos;Other pages have this name. See [[Tideglass Reflection|all pages named Tideglass Reflection]].&apos;&apos;
 
-&lt;woc-art path=&quot;/encyclopedia-stills/temple_reflection_rogue__7fb2ff__s88.webp&quot; size=&quot;model&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__tideglass_reflection_rogue.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Tideglass Reflection is one of the Elementals.
 
@@ -142264,10 +142440,10 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1223">&lt;woc-art path=&quot;/ui/mobs/tideglass_reflection_priest.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1218">&lt;woc-art path=&quot;/ui/mobs/tideglass_reflection_priest.webp&quot; /&gt;
 :&apos;&apos;Other pages have this name. See [[Tideglass Reflection|all pages named Tideglass Reflection]].&apos;&apos;
 
-&lt;woc-art path=&quot;/encyclopedia-stills/temple_reflection_priest__7fb2ff__s88.webp&quot; size=&quot;model&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__tideglass_reflection_priest.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Tideglass Reflection is one of the Elementals.
 
@@ -142346,10 +142522,10 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1223">&lt;woc-art path=&quot;/ui/mobs/tideglass_reflection_shaman.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1218">&lt;woc-art path=&quot;/ui/mobs/tideglass_reflection_shaman.webp&quot; /&gt;
 :&apos;&apos;Other pages have this name. See [[Tideglass Reflection|all pages named Tideglass Reflection]].&apos;&apos;
 
-&lt;woc-art path=&quot;/encyclopedia-stills/temple_reflection_shaman__7fb2ff__s88.webp&quot; size=&quot;model&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__tideglass_reflection_shaman.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Tideglass Reflection is one of the Elementals.
 
@@ -142428,10 +142604,10 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1219">&lt;woc-art path=&quot;/ui/mobs/tideglass_reflection_mage.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1214">&lt;woc-art path=&quot;/ui/mobs/tideglass_reflection_mage.webp&quot; /&gt;
 :&apos;&apos;Other pages have this name. See [[Tideglass Reflection|all pages named Tideglass Reflection]].&apos;&apos;
 
-&lt;woc-art path=&quot;/encyclopedia-stills/temple_reflection_mage__7fb2ff__s88.webp&quot; size=&quot;model&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__tideglass_reflection_mage.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Tideglass Reflection is one of the Elementals.
 
@@ -142510,10 +142686,10 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1225">&lt;woc-art path=&quot;/ui/mobs/tideglass_reflection_warlock.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1220">&lt;woc-art path=&quot;/ui/mobs/tideglass_reflection_warlock.webp&quot; /&gt;
 :&apos;&apos;Other pages have this name. See [[Tideglass Reflection|all pages named Tideglass Reflection]].&apos;&apos;
 
-&lt;woc-art path=&quot;/encyclopedia-stills/temple_reflection_warlock__7fb2ff__s88.webp&quot; size=&quot;model&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__tideglass_reflection_warlock.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Tideglass Reflection is one of the Elementals.
 
@@ -142592,10 +142768,10 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1221">&lt;woc-art path=&quot;/ui/mobs/tideglass_reflection_druid.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1216">&lt;woc-art path=&quot;/ui/mobs/tideglass_reflection_druid.webp&quot; /&gt;
 :&apos;&apos;Other pages have this name. See [[Tideglass Reflection|all pages named Tideglass Reflection]].&apos;&apos;
 
-&lt;woc-art path=&quot;/encyclopedia-stills/temple_reflection_druid__7fb2ff__s88.webp&quot; size=&quot;model&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__tideglass_reflection_druid.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Tideglass Reflection is one of the Elementals.
 
@@ -144260,7 +144436,8 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="904">&lt;woc-art path=&quot;/ui/mobs/apprentice_wren.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="983">&lt;woc-art path=&quot;/ui/mobs/apprentice_wren.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__apprentice_wren.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Apprentice Wren is one of the Humanoids.
 
@@ -146192,7 +146369,8 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="910">&lt;woc-art path=&quot;/ui/mobs/gravedigger_mosley.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="992">&lt;woc-art path=&quot;/ui/mobs/gravedigger_mosley.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__gravedigger_mosley.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Gravedigger Mosley is one of the Humanoids.
 
@@ -146637,7 +146815,8 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="906">&lt;woc-art path=&quot;/ui/mobs/castaway_navigator.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="988">&lt;woc-art path=&quot;/ui/mobs/castaway_navigator.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__castaway_navigator.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Navigator Suli is one of the Humanoids.
 
@@ -146888,7 +147067,8 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2056">&lt;woc-art path=&quot;/ui/mobs/hedge_knight.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2132">&lt;woc-art path=&quot;/ui/mobs/hedge_knight.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__hedge_knight.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Dawnhold Knight is one of the Humanoids.
 
@@ -147630,9 +147810,10 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1720">&lt;woc-art path=&quot;/ui/mobs/the_wreck_warden.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1800">&lt;woc-art path=&quot;/ui/mobs/the_wreck_warden.webp&quot; /&gt;
 :&apos;&apos;Another page has this name: [[The Wreck Warden]].&apos;&apos;
 
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__the_wreck_warden.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 [[The Wreck Warden]] is one of the Undead.
 
@@ -148207,7 +148388,8 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="892">&lt;woc-art path=&quot;/ui/mobs/fisher_bram.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="967">&lt;woc-art path=&quot;/ui/mobs/fisher_bram.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__fisher_bram.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Fisher Bram is one of the Humanoids.
 
@@ -148552,7 +148734,8 @@ Each row has its own roll, so you can get several of these from one kill.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1995">&lt;woc-art path=&quot;/ui/mobs/eastbrook_freight_caravan.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="2084">&lt;woc-art path=&quot;/ui/mobs/eastbrook_freight_caravan.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__eastbrook_freight_caravan.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Eastbrook Freight Caravan is one of the Humanoids.
 
@@ -148666,7 +148849,8 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1076">&lt;woc-art path=&quot;/ui/mobs/willowfen_remedy_caravan.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1164">&lt;woc-art path=&quot;/ui/mobs/willowfen_remedy_caravan.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__willowfen_remedy_caravan.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Willowfen Remedy Caravan is one of the Humanoids.
 
@@ -148738,7 +148922,8 @@ For creatures in the outside world, these numbers already include level scaling.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1246">&lt;woc-art path=&quot;/ui/mobs/frostveil_supply_caravan.webp&quot; /&gt;
+      <text xml:space="preserve" bytes="1334">&lt;woc-art path=&quot;/ui/mobs/frostveil_supply_caravan.webp&quot; /&gt;
+&lt;woc-art path=&quot;/encyclopedia-stills/mob__frostveil_supply_caravan.webp&quot; size=&quot;model&quot; /&gt;
 == Overview ==
 Frostveil Supply Caravan is one of the Humanoids.
 

@@ -6,6 +6,7 @@ const factSections = {
   Zones: 'Facts',
   Items: 'Facts',
   Mobs: 'Facts',
+  'Friendly creatures': 'Facts',
   Classes: 'Starting statistics',
   NPCs: 'Details',
   Abilities: 'Learn and use',
@@ -17,6 +18,7 @@ const boxTitles = {
   Zones: 'Zone information',
   Items: 'Item information',
   Mobs: 'Creature information',
+  'Friendly creatures': 'Creature information',
   Classes: 'Class information',
   NPCs: 'Character information',
   Abilities: 'Ability information',
@@ -140,7 +142,9 @@ export function layoutArticle(view, page, wide, zoneName) {
     pageHeading = view.querySelector('.article-heading');
   article.classList.add('wiki-prose');
   pageHeading.classList.add('wiki-title');
-  const kind = page.categories[0];
+  // The page's kind is its first category the layout knows, so a later category that
+  // has its own info box still wins over a leading topic one.
+  const kind = page.categories.find((c) => c in boxTitles) ?? page.categories[0];
   const headings = [...article.children].filter((e) => e.tagName === 'H2');
   const heading = headings.find((el) => el.textContent === factSections[kind]);
   const factNodes = sectionBody(heading);

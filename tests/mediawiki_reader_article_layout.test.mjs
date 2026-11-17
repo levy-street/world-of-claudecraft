@@ -59,3 +59,21 @@ it('lifts ability stats into a strip of label and value pairs under the title', 
   expect([...view.querySelectorAll('h2')].map((h) => h.textContent)).not.toContain('Ability stats');
   expect(view.querySelector('.ability-stats').closest('.wiki-opening')).toBeTruthy();
 });
+
+it('gives a friendly or escort creature the creature info box', () => {
+  const view = document.createElement('main');
+  view.innerHTML =
+    '<div class="article-heading"><img class="article-art model" alt=""><h1>A Caravan (Mob)</h1></div><article><p>A caravan.</p><h2>Facts</h2><div class="scroll"><table><tbody><tr><th>Family</th><td>Humanoids</td></tr></tbody></table></div></article>';
+  layoutArticle(
+    view,
+    {
+      title: 'A Caravan (Mob)',
+      // The real page order: no Mobs category at all.
+      categories: ['Escorts and objectives', 'Friendly creatures'],
+    },
+    true,
+  );
+  const box = view.querySelector('.wiki-infobox');
+  expect(box.querySelector('.wiki-box-title').textContent).toBe('Creature information');
+  expect(box.querySelector('.wiki-box-art img.model')).toBeTruthy();
+});

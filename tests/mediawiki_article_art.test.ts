@@ -47,22 +47,32 @@ describe('Encyclopedia game artwork', () => {
     for (const path of new Set(art.values()))
       expect(existsSync(join('public', path.slice(1))), path).toBe(true);
   });
-  it('gives creature pages a shipped model render, never a borrowed character body', () => {
+  it('gives creature and NPC pages a shipped model render', () => {
     const map = (records: Record<string, unknown>, prefix: string) =>
       new Map(Object.keys(records).map((id) => [id, prefix + id]));
     const models = modelStills({ mob: map(MOBS, 'mob/'), npc: map(NPCS, 'npc/') });
-    expect(models.size).toBeGreaterThan(100);
+    expect(models.size).toBeGreaterThan(400);
     for (const [title, path] of models) {
       expect(path, title).toMatch(/^\/encyclopedia-stills\/[\w.-]+\.webp$/);
       expect(existsSync(join('public', path.slice(1))), path).toBe(true);
-      // A player or NPC rig would draw a generic class body, not the creature.
-      expect(path, title).not.toMatch(/\/(?:player|npc)_/);
     }
-    // NPCs wear authored looks this renderer cannot draw, so they keep their icon.
-    expect([...models.keys()].some((title) => title.startsWith('npc/'))).toBe(false);
     expect(models.get('mob/rift_boss_frost')).toBe(
       '/encyclopedia-stills/mob_hoard_hoarfrost_warden.webp',
     );
+    // NPCs and creatures on character bodies come from the game's own renderer, which
+    // draws their authored face, hair and props.
+    expect(models.get('npc/smith_haldren')).toBe('/encyclopedia-stills/npc__smith_haldren.webp');
+    expect(models.get('mob/deacon_voss')).toBe('/encyclopedia-stills/mob__deacon_voss.webp');
+  });
+  it('never draws a character body with the simple model viewer', () => {
+    // That viewer draws a player or NPC rig as a generic class body without its look.
+    const viewer: Record<string, string> = JSON.parse(
+      readFileSync('scripts/mediawiki/entity_stills.json', 'utf8'),
+    );
+    for (const [key, path] of Object.entries(viewer)) {
+      expect(path, key).not.toMatch(/\/(?:player|npc)_/);
+      expect(key, key).not.toMatch(/^npc\//);
+    }
   });
 });
 
