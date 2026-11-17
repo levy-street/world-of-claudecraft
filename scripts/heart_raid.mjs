@@ -19,6 +19,11 @@
 //   JOIN        a character name: the raid leader invites it, the bots wait for
 //               it at the boss and pull when it says "pull" in raid chat (or attacks)
 //   JOIN_ROLE   dps | healer | tank: which bot steps out for the human
+//   REPEAT      1 (the default with JOIN): after a wipe or a kill the bots stay,
+//               reset the encounter, bring everyone (the human too, from
+//               anywhere: /dev heart regroup) back alive and whole to the boss
+//               and wait for the next "pull"; each attempt writes its own log.
+//               0: one fight, then the bots log out
 //   GEAR        kit (the fresh level-20 preset, default) | bis (top-parse)
 //   MAX_SECONDS the fight's time limit (default 720)
 //   LOG_DIR     where the fight logs go (default tmp/heart_raid)

@@ -47,6 +47,12 @@ export const BASE = process.env.SERVER_URL ?? 'http://localhost:8787';
 export const DIFF = (process.env.DIFF ?? 'normal').toLowerCase();
 if (!['normal', 'heroic', 'mythic'].includes(DIFF)) throw new Error(`DIFF: ${DIFF}`);
 export const JOIN = (process.env.JOIN ?? '').trim();
+/** REPEAT=1 (the default with JOIN): after a wipe or a kill the bots stay,
+ *  bring the raid (the human too) back alive and whole to the boss, reset
+ *  the encounter and wait for the next "pull"; each attempt writes its own
+ *  log. REPEAT=0 ends the run after one fight. */
+export const REPEAT = (process.env.REPEAT ?? (JOIN ? '1' : '0')) !== '0';
+let attempt = 1;
 export const JOIN_ROLE = (process.env.JOIN_ROLE ?? 'dps').toLowerCase();
 /** The raid's gear: a Heroic or Mythic raid wears the previous tier's best
  *  (`bis`: the top Nythraxis parse loadouts), a Normal raid the fresh level-20
@@ -261,23 +267,6 @@ async function raidMain(boss) {
     throw new Error(`raid not formed: ${JSON.stringify(party())?.slice(0, 300)}`);
   console.log(`raid formed: ${party().members.length} members`);
 
-  if (JOIN) {
-    leader.chat(`/invite ${JOIN}`);
-    console.log(`\n>>> ${JOIN}: accept the raid invite (sent by ${leader.name}).`);
-    const asked = Date.now();
-    let lastAsk = Date.now();
-    while (!humanMember(leader, JOIN)) {
-      if (Date.now() - asked > 15 * 60_000) throw new Error(`${JOIN} never joined the raid`);
-      if (Date.now() - lastAsk > 45_000) {
-        leader.chat(`/invite ${JOIN}`);
-        lastAsk = Date.now();
-      }
-      drainAll(bots);
-      await sleep(500);
-    }
-    console.log(`${JOIN} is in the raid.`);
-  }
-
   // A fresh run of the Smith's Heart for every boss (no fight state left
   // over from an earlier one), then the boss's own dev setup.
   leader.chat('/dev heart reset');
@@ -294,10 +283,29 @@ async function raidMain(boss) {
   await flushAll(bots);
   await sleep(600);
 
+  // The human is invited only now, with the run already made: whatever they
+  // do (accept and stay outside, enter on their own, even reset), the
+  // leader's regroup brings them into this run at the boss.
   if (JOIN) {
-    console.log(
-      `\n>>> ${JOIN}: come into the Smith's Heart (type /dev heart enter). The bots wait for you there and follow you to the boss (or type ${boss.tp}).`,
-    );
+    leader.chat(`/invite ${JOIN}`);
+    console.log(`\n>>> ${JOIN}: accept the raid invite (sent by ${leader.name}).`);
+    const asked = Date.now();
+    let lastAsk = Date.now();
+    while (!humanMember(leader, JOIN)) {
+      if (Date.now() - asked > 15 * 60_000) throw new Error(`${JOIN} never joined the raid`);
+      if (Date.now() - lastAsk > 45_000) {
+        leader.chat(`/invite ${JOIN}`);
+        lastAsk = Date.now();
+      }
+      drainAll(bots);
+      await sleep(500);
+    }
+    console.log(`${JOIN} is in the raid.`);
+  }
+  if (JOIN) {
+    leader.chat(`/dev heart regroup ${areaOf(boss)}`);
+    await flushAll(bots);
+    console.log(`\n>>> ${JOIN}: the bots brought you to the boss (no command needed).`);
     await waitForHumanInside(bots, leader);
   }
   for (const b of bots) b.chat(boss.tp);
@@ -318,21 +326,84 @@ async function raidMain(boss) {
   }
   log(`${boss.title}: arena at (${world.center.x.toFixed(1)}, ${world.center.z.toFixed(1)})`);
   if (JOIN) await followHuman(world, bots, leader);
-  await prepullBuffs(world, bots, byKey);
-  if (JOIN) {
-    leader.chat(`/p Ready. ${JOIN}: say "pull" in raid chat, or hit the boss.`);
-    console.log(`\n>>> ${JOIN}: say "pull" in raid chat (or attack the boss) to start.`);
-    await waitForPullCall(world, bots);
+  let current = world;
+  for (;;) {
+    await prepullBuffs(current, bots, byKey);
+    if (JOIN) {
+      leader.chat(`/p Ready. ${JOIN}: say "pull" in raid chat, or hit the boss.`);
+      console.log(`\n>>> ${JOIN}: say "pull" in raid chat (or attack the boss) to start.`);
+      await waitForPullCall(current, bots);
+    }
+    await waitEntrance(current, bots, byKey, boss);
+    const st = await fight(current, bots, byKey, boss);
+    const report = writeReport(current, st, boss);
+    if (JOIN) leader.chat(`/p ${st.result === 'kill' ? 'Boss down.' : 'Wipe.'} Log: ${report}`);
+    if (!REPEAT) break;
+    current = await regroup(bots, leader, boss);
   }
-  await waitEntrance(world, bots, byKey, boss);
-  const st = await fight(world, bots, byKey, boss);
-  const report = writeReport(world, st, boss);
-  if (JOIN) leader.chat(`/p ${st.result === 'kill' ? 'Boss down.' : 'Wipe.'} Log: ${report}`);
   for (const b of bots) b.stop();
   await sleep(600);
   for (const b of bots) b.close();
   await sleep(300);
   process.exit(0);
+}
+
+/** The boss's dev tp area (its `tp` line's last word). */
+function areaOf(boss) {
+  return boss.tp.trim().split(/\s+/).pop();
+}
+
+/** REPEAT: after a fight, a fresh run (the encounter and its boss whole
+ *  again) and the raid (the human too, from anywhere) back alive, whole and
+ *  cooled down at the boss; a fresh log and a fresh read of the arena for
+ *  the next attempt. */
+async function regroup(bots, leader, boss) {
+  attempt++;
+  for (const b of bots) b.stop?.();
+  await sleep(2500);
+  // A fresh run (a killed boss stands again), the bots back in it, the boss's
+  // own setup; then everyone, the human too, regrouped at the boss.
+  for (const b of bots) b.chat('/dev revive');
+  await flushAll(bots);
+  leader.chat('/dev heart reset');
+  await flushAll(bots);
+  await sleep(800);
+  for (const b of bots.slice(1)) b.chat('/dev heart enter');
+  await flushAll(bots);
+  await sleep(800);
+  for (const line of boss.setup(DIFF)) leader.chat(line);
+  leader.chat(`/dev heart pool ${POOL}`);
+  await flushAll(bots);
+  await sleep(800);
+  leader.chat(`/dev heart regroup ${areaOf(boss)}`);
+  for (const b of bots) {
+    b.chat('/dev revive');
+    b.chat('/dev heal');
+    b.chat('/dev resource');
+    b.chat('/dev cooldowns');
+    b.chat('/dev combatreset');
+  }
+  await flushAll(bots);
+  await sleep(1500);
+  lines.length = 0;
+  fightStart = null;
+  pullCalled = false;
+  for (const b of bots) {
+    b.goal = null;
+    b.why = {};
+    b.ticks = 0;
+    b.movingTicks = 0;
+    b.castTicks = 0;
+    b.sentCount = {};
+    b.potions = 0;
+  }
+  log(`attempt ${attempt}: the raid regrouped at the boss`);
+  const world = new RaidWorld(bots, leader, boss);
+  for (let i = 0; i < 30 && !world.center; i++) {
+    world.read();
+    if (!world.center) await sleep(200);
+  }
+  return world;
 }
 
 export async function flushAll(bots) {
@@ -1649,7 +1720,7 @@ function writeReport(world, st, boss) {
   const stamp = new Date().toISOString().replace(/[-:]/g, '').replace('T', '-').slice(0, 13);
   const file = path.join(
     LOG_DIR,
-    `${boss.key}_${DIFF}${IGNORE ? `_ignore-${IGNORE}` : ''}${process.env.START ? `_start${process.env.START}` : ''}${POOL !== 1 ? `_pool${POOL}` : ''}_${stamp}${BOT_TAG ? `_${BOT_TAG}` : ''}.txt`,
+    `${boss.key}_${DIFF}${IGNORE ? `_ignore-${IGNORE}` : ''}${process.env.START ? `_start${process.env.START}` : ''}${POOL !== 1 ? `_pool${POOL}` : ''}_${stamp}${BOT_TAG ? `_${BOT_TAG}` : ''}${REPEAT ? `_try${attempt}` : ''}.txt`,
   );
   fs.writeFileSync(file, `${lines.join('\n')}\n`);
   console.log(`\nfight log written: ${file}`);

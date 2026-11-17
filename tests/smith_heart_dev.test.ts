@@ -35,7 +35,7 @@ import { dungeonGateState } from '../src/sim/instances/dungeon_gates';
 import { enterDungeon } from '../src/sim/instances/dungeons';
 import type { InstanceSlot } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
-import type { SimEvent } from '../src/sim/types';
+import type { Entity, SimEvent } from '../src/sim/types';
 
 const DUNGEON = DUNGEONS[SMITH_HEART_DUNGEON];
 const gate = (id: string) => {
@@ -321,5 +321,37 @@ describe('/dev heart', () => {
     expect(enterDungeon(sim.ctx, SMITH_HEART_DUNGEON, sim.player.id)).toBe(false);
     expect(enterDungeon(sim.ctx, SMITH_HEART_DUNGEON, sim.player.id, true)).toBe(false);
     expect(claim()).toBeNull();
+  });
+});
+
+// The bot raid's quick restart (scripts/heart_raid.mjs REPEAT): the leader's
+// `/dev heart regroup <area>` brings every party member back alive and
+// whole to that spot of the leader's run, the human included, whether dead,
+// a ghost or standing in another copy of the raid.
+describe('/dev heart regroup', () => {
+  it("revives and gathers the whole party, whole, at the area of the issuer's run", () => {
+    const sim = new Sim({ seed: 17, playerClass: 'warrior', autoEquip: false, devCommands: true });
+    const lead = sim.player.id;
+    const other = sim.addPlayer('mage', 'Joiner');
+    sim.partyInvite(other, lead);
+    sim.partyAccept(other);
+    expect(sim.ctx.partyOf(lead)?.members).toContain(other);
+    const dev = (line: string, pid = lead) => handleSmithHeartDevChat(sim.ctx, line, pid);
+    dev('/dev heart enter');
+    // The joiner went in on their own first: a copy of their own.
+    dev('/dev heart reset', other);
+    const o = sim.ctx.entities.get(other) as Entity;
+    sim.ctx.handleDeath(o, null);
+    expect(o.dead).toBe(true);
+    const me = sim.ctx.entities.get(lead) as Entity;
+    me.hp = 1;
+    expect(dev('/dev heart regroup lake')).toBe(true);
+    for (const e of [me, o]) {
+      expect(e.dead).toBe(false);
+      expect(e.hp).toBe(e.maxHp);
+      expect(Math.hypot(e.pos.x - me.pos.x, e.pos.z - me.pos.z)).toBeLessThan(3);
+    }
+    // An unknown area is refused.
+    expect(dev('/dev heart regroup nowhere')).toBe(true);
   });
 });
