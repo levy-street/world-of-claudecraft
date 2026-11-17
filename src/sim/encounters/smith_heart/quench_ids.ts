@@ -430,8 +430,12 @@ export const QUENCH_TUNING = {
   // its half width, its hit.
   slashFirst: 8,
   slashAfterWake: 6,
-  slashEveryLake: 20,
-  slashEveryAwake: 15,
+  // The team's review of 2026-11-17: about half the wait it was (20 and 15 s),
+  // and quicker as the guardian weakens (slashEvery: a soft enrage, down to
+  // `slashPaceMin` of the wait at no health).
+  slashEveryLake: 10,
+  slashEveryAwake: 7.5,
+  slashPaceMin: 0.6,
   slashLock: 0.8,
   slashFly: 0.35,
   slashGap: 0.6,
@@ -557,4 +561,15 @@ export function laneOf(
   const length = Number(l);
   if (!Number.isInteger(n) || n < 0 || !Number.isInteger(length) || length < 0) return null;
   return { state, seconds: n / 10, length };
+}
+
+/** The wait between two rounds of slashes (seconds) with `half`'s blades
+ *  awake at `hpFrac` of the guardian's health: the half's wait at full
+ *  health, quickening linearly to `slashPaceMin` of it at none (the team's
+ *  review of 2026-11-17: the blades move far more, faster on lower health). */
+export function slashEvery(half: 'lake' | 'wake' | 'awake', hpFrac: number): number {
+  const T = QUENCH_TUNING;
+  const base = half === 'lake' ? T.slashEveryLake : T.slashEveryAwake;
+  const k = Math.max(0, Math.min(1, hpFrac));
+  return base * (T.slashPaceMin + (1 - T.slashPaceMin) * k);
 }

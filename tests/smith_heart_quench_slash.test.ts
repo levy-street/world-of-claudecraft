@@ -19,6 +19,7 @@ import {
   QUENCH_OBJECTS,
   segmentDistance,
   slashEase,
+  slashEvery,
   slashLine,
   QUENCH_TUNING as T,
 } from '../src/sim/encounters/smith_heart';
@@ -177,6 +178,45 @@ describe('Guardian of the Quench: the marks', () => {
     f.tick(ticks(QUENCH_DIFFICULTY.normal.slashAim + T.slashFly + T.slashGap) + 4);
     expect(st.slash).toBeNull();
     expect(st.slashTimer).toBeGreaterThan(T.slashEveryLake - 1);
+  });
+});
+
+// The team's review of 2026-11-17: the blades move about twice as often and
+// quicken as the guardian weakens (a soft enrage).
+describe('Guardian of the Quench: the blades quicken', () => {
+  it('waits about half what it did, shorter with less health, never below its floor', () => {
+    // The old waits were 20 s (two blades) and 15 s (four).
+    expect(slashEvery('lake', 1)).toBeCloseTo(10);
+    expect(slashEvery('awake', 1)).toBeCloseTo(7.5);
+    // Monotone: less health, a shorter wait.
+    let last = Number.POSITIVE_INFINITY;
+    for (let hp = 1; hp >= -1e-9; hp -= 0.1) {
+      const w = slashEvery('awake', hp);
+      expect(w).toBeLessThanOrEqual(last + 1e-9);
+      last = w;
+    }
+    expect(slashEvery('awake', 0)).toBeCloseTo(7.5 * T.slashPaceMin);
+    expect(slashEvery('lake', 0.5)).toBeCloseTo(10 * (T.slashPaceMin + (1 - T.slashPaceMin) * 0.5));
+    // Out-of-range health clamps.
+    expect(slashEvery('lake', 2)).toBeCloseTo(slashEvery('lake', 1));
+    expect(slashEvery('lake', -1)).toBeCloseTo(slashEvery('lake', 0));
+  });
+
+  it("a round ends on the paced wait read from the guardian's health", () => {
+    const f = twoAwake(4);
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    const boss = f.boss();
+    boss.hp = Math.round(boss.maxHp * 0.6);
+    st.slashTimer = 0.2;
+    f.tick(ticks(0.3));
+    expect(st.slash).not.toBeNull();
+    f.tick(ticks(QUENCH_DIFFICULTY.normal.slashAim + T.slashFly + T.slashGap) + 4);
+    expect(st.slash).toBeNull();
+    const want = slashEvery('lake', boss.hp / boss.maxHp);
+    expect(want).toBeLessThan(T.slashEveryLake);
+    expect(st.slashTimer).toBeGreaterThan(want - 0.5);
+    expect(st.slashTimer).toBeLessThanOrEqual(want + 1e-6);
   });
 });
 

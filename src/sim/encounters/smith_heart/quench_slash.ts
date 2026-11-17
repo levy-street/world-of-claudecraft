@@ -25,6 +25,7 @@ import {
   QUENCH_NAMES,
   quenchHash,
   slashEase,
+  slashEvery,
   QUENCH_TUNING as T,
 } from './quench_ids';
 import {
@@ -143,7 +144,7 @@ function endRound(s: QuenchScope): void {
     if (p) dropAura(p, QUENCH_AURAS.marked);
   }
   s.st.slash = null;
-  s.st.slashTimer = s.st.half === 'lake' ? T.slashEveryLake : T.slashEveryAwake;
+  s.st.slashTimer = slashEvery(s.st.half, s.boss.hp / Math.max(1, s.boss.maxHp));
 }
 
 /** Begin the line for the mark at `slash.step`, or end the round. */
