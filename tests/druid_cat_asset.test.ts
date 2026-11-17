@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { type Animation, type Node, NodeIO, type Root } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
@@ -95,7 +96,7 @@ beforeAll(async () => {
     await new NodeIO()
       .registerExtensions(ALL_EXTENSIONS)
       .registerDependencies({ 'meshopt.decoder': MeshoptDecoder })
-      .read(FILE.pathname)
+      .read(fileURLToPath(FILE))
   ).getRoot();
 });
 
