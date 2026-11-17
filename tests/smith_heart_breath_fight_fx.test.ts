@@ -233,8 +233,9 @@ describe('smith_heart_breath_audio_core', () => {
     const catalog = new Set(SFX.map((e: { key: string }) => e.key));
     for (const key of BREATH_SFX_KEYS) expect(catalog.has(key), key).toBe(true);
     // The fight's fifteen first takes, the Knotted Gale's, the isles' and the
-    // Summit Roar's sixteen, and the shared storm mark.
-    expect(BREATH_SFX_KEYS.length).toBe(32);
+    // Summit Roar's sixteen, the shared storm mark, and the marks' alarm
+    // (the Rush's horn, the owner's run of 2026-11-17).
+    expect(BREATH_SFX_KEYS.length).toBe(33);
     for (const cue of Object.keys(BREATH_CUE_SOUNDS)) expect(breathSoundClaims(cue)).toBe(true);
     // Every Knotted Gale and isle cue sounds its own take (none borrowed).
     for (const cue of [

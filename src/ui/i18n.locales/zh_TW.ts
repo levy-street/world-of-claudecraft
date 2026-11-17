@@ -23189,6 +23189,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '瑟薩莉隊長的寧靜穩住了你：風、拉扯、衝擊和擊飛都無法移動你。傷害照常生效。',
   'hudChrome.auraEffect.breathGuardian.spent':
     '你的錨定已經耗盡：在此效果結束前，瑟薩莉隊長的寧靜之環無法再次錨定你。',
+  'hudChrome.auraEffect.breathGuardian.skyMark':
+    '{warn}秒後，閃電會劈向此效果施加時你所站的位置：{radius}碼內造成{min}到{max}點傷害。走出圓圈。英雄和史詩：{heroicMin}到{heroicMax}點傷害。',
   'hudChrome.auraEffect.breathGuardian.drawn':
     '每{every}秒會有一道閃電落在你所站之處：{warn}秒後對{radius}碼內的所有人造成{min}到{max}點傷害，並留下帶電的地面，在{charged}秒內每秒造成{cmin}到{cmax}點傷害。保持移動，把落雷引向遠離團隊的邊緣。英雄和傳奇難度：分別為{heroicMin}到{heroicMax}點和{heroicCMin}到{heroicCMax}點傷害。',
   'hudChrome.auraEffect.breathGuardian.cradled':

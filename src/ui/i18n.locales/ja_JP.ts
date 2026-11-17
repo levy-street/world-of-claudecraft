@@ -22669,6 +22669,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'テサリー隊長の凪があなたを支えている：風も吸引も爆風も吹き飛ばしも、あなたを動かせない。ダメージは受ける。',
   'hudChrome.auraEffect.breathGuardian.spent':
     '錨の効果が切れた：これが消えるまで、テサリー隊長の凪の円はあなたを再び支えられない。',
+  'hudChrome.auraEffect.breathGuardian.skyMark':
+    'これが付与された時に立っていた場所に{warn}秒後に雷が落ちる：{radius}ヤード以内に{min}～{max}のダメージ。円から出ること。ヒロイックとミシック：{heroicMin}～{heroicMax}のダメージ。',
   'hudChrome.auraEffect.breathGuardian.drawn':
     '{every}秒ごとに足元へ雷が落ちる：{warn}秒後、{radius}ヤード以内の全員に{min}から{max}のダメージを与え、{charged}秒間毎秒{cmin}から{cmax}のダメージを与える帯電した地面を残す。動き続け、落雷を味方から離れた縁へ導こう。ヒロイック・ミシック：それぞれ{heroicMin}から{heroicMax}、{heroicCMin}から{heroicCMax}のダメージ。',
   'hudChrome.auraEffect.breathGuardian.cradled':

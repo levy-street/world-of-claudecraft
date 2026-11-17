@@ -93,6 +93,17 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
       return { key: `${KEY}.anchor` };
     case BREATH_AURAS.spent:
       return { key: `${KEY}.spent` };
+    case BREATH_AURAS.skyMark:
+      return {
+        key: `${KEY}.skyMark`,
+        nums: {
+          warn: T.skyWarn,
+          min: tierValue(T.strikeMin, NM),
+          max: tierValue(T.strikeMax, NM),
+          radius: T.strikeR,
+          ...tierRange('heroic', T.strikeMin, T.strikeMax, HM),
+        },
+      };
     case BREATH_AURAS.drawn:
       return {
         key: `${KEY}.drawn`,

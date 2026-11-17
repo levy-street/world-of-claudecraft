@@ -5961,6 +5961,8 @@ export const hudChromeStrings = {
     // The entrance's marker is wordy (M16): non-Latin fills in the overlays.
     breathGuardian: {
       intro: 'Dormant: cannot be attacked or harmed until the storm sets it down.',
+      skyMark:
+        'Lightning strikes where you stood when this was laid, in {warn} sec: {min} to {max} damage within {radius} yd. Step out of its circle. Heroic and Mythic: {heroicMin} to {heroicMax} damage.',
       portalA:
         'When this ends, Portal A opens exactly where you stand. Stand near the Knotted Gale. You cannot carry it this round.',
       portalB:

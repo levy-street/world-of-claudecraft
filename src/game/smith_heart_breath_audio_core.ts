@@ -33,6 +33,7 @@ import {
   BREATH_CASTS,
   BREATH_CUES,
   BREATH_DEV_CUES,
+  BREATH_TARGETED_CASTS,
   type BreathWindPhase,
 } from '../sim/encounters/smith_heart/breath_ids';
 import { ISLE_AURAS, ISLE_CUES } from '../sim/encounters/smith_heart/breath_isle_ids';
@@ -186,6 +187,24 @@ export const BREATH_MARK_SOUNDS: Readonly<Record<string, HeartMarkSound>> = {
 /** The aura a rider wears through the ride (its loop in their ears). */
 export const BREATH_RIDING_AURA = ISLE_AURAS.riding;
 
+/** The marks' alarm in the marked player's own ear, over their sting: the
+ *  Rush's war horn (smith_heart_council_audio_core.ts RUSH_MARK_ALARM), on a
+ *  sky strike's mark and Drawn Lightning (the owner's run of 2026-11-17). */
+export const BREATH_MARK_ALARM: Readonly<Record<string, HeartMarkSound>> = {
+  [BREATH_AURAS.skyMark]: { key: 'ui_aura_blaring_horn', gain: 1, rate: 1 },
+  [BREATH_AURAS.drawn]: { key: 'ui_aura_blaring_horn', gain: 1, rate: 1 },
+};
+
+/** The same horn when a bar aimed at one player (Storm Lance, Leaping Bolt)
+ *  begins at the local player, in their ear alone. */
+export const BREATH_BAR_ALARM: HeartMarkSound = { key: 'ui_aura_blaring_horn', gain: 1, rate: 1 };
+
+/** Is the bar `bar` (just begun, aimed at `targetId`) the local player's
+ *  (`meId`) alarm? Pure. */
+export function barAlarmDue(bar: string, targetId: number | null, meId: number | null): boolean {
+  return meId !== null && targetId === meId && BREATH_TARGETED_CASTS.includes(bar);
+}
+
 /** Every sample the fight plays, for preloading once. */
 export const BREATH_SFX_KEYS: readonly string[] = [
   ...new Set([
@@ -193,6 +212,7 @@ export const BREATH_SFX_KEYS: readonly string[] = [
     ...Object.values(BREATH_BAR_SOUNDS).map((s) => s.key),
     ...Object.values(BREATH_WIND_SOUNDS).map((s) => s.key),
     ...Object.values(BREATH_MARK_SOUNDS).map((s) => s.key),
+    BREATH_BAR_ALARM.key,
     BREATH_KNOT_SOUNDS.carry.key,
     BREATH_KNOT_SOUNDS.fuse.key,
     BREATH_RIDE_LOOP.key,

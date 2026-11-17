@@ -23173,6 +23173,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '瑟萨莉队长的宁静稳住了你：风、拉扯、冲击和击飞都无法移动你。伤害照常生效。',
   'hudChrome.auraEffect.breathGuardian.spent':
     '你的锚定已经耗尽：在此效果结束前，瑟萨莉队长的宁静之环无法再次锚定你。',
+  'hudChrome.auraEffect.breathGuardian.skyMark':
+    '{warn}秒后，闪电会劈向此效果施加时你所站的位置：{radius}码内造成{min}到{max}点伤害。走出圆圈。英雄和史诗：{heroicMin}到{heroicMax}点伤害。',
   'hudChrome.auraEffect.breathGuardian.drawn':
     '每{every}秒会有一道闪电落在你所站之处：{warn}秒后对{radius}码内的所有人造成{min}到{max}点伤害，并留下带电的地面，在{charged}秒内每秒造成{cmin}到{cmax}点伤害。保持移动，把落雷引向远离团队的边缘。英雄和史诗难度：分别为{heroicMin}到{heroicMax}点和{heroicCMin}到{heroicCMax}点伤害。',
   'hudChrome.auraEffect.breathGuardian.cradled':

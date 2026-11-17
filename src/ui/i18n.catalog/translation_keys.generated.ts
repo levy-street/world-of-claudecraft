@@ -12762,6 +12762,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.auraEffect.breathGuardian.portalC'
   | 'hudChrome.auraEffect.breathGuardian.portalD'
   | 'hudChrome.auraEffect.breathGuardian.riding'
+  | 'hudChrome.auraEffect.breathGuardian.skyMark'
   | 'hudChrome.auraEffect.breathGuardian.spent'
   | 'hudChrome.auraEffect.breathGuardian.stormForm'
   | 'hudChrome.auraEffect.breathGuardian.swell'

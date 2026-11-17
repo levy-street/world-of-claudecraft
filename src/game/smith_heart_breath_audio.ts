@@ -8,14 +8,17 @@
 import type { BreathWindPhase } from '../sim/encounters/smith_heart/breath_ids';
 import type { Entity, SimEvent } from '../sim/types';
 import {
+  BREATH_BAR_ALARM,
   BREATH_BAR_SOUNDS,
   BREATH_CUE_SOUNDS,
   BREATH_KNOT_SOUNDS,
+  BREATH_MARK_ALARM,
   BREATH_MARK_SOUNDS,
   BREATH_RIDE_LOOP,
   BREATH_RIDING_AURA,
   BREATH_SFX_KEYS,
   BREATH_WIND_SOUNDS,
+  barAlarmDue,
   breathBarRate,
   knotFuseWarnDue,
   windPhaseSound,
@@ -73,6 +76,8 @@ export class BreathAudio {
   private bar = '';
   private barTotal = 0;
   private readonly marks = new HeartMarkEar(BREATH_MARK_SOUNDS);
+  /** A mark's alarm over its sting (BREATH_MARK_ALARM). */
+  private readonly alarm = new HeartMarkEar(BREATH_MARK_ALARM);
 
   constructor(private readonly sink: BreathAudioSink) {}
 
@@ -163,6 +168,14 @@ export class BreathAudio {
     if (bar !== this.bar || (bar !== '' && total !== this.barTotal)) {
       this.bar = bar;
       this.barTotal = total;
+      // A bar aimed at the local player: the horn in their ear alone.
+      if (me && !me.dead && barAlarmDue(bar, guardian?.castTargetId ?? null, me.id))
+        this.sink.playAt(BREATH_BAR_ALARM.key, me.pos.x, me.pos.y + 1.6, me.pos.z, {
+          gain: BREATH_BAR_ALARM.gain,
+          cooldown: 0.4,
+          jitter: false,
+          priority: true,
+        });
       const sound = bar ? BREATH_BAR_SOUNDS[bar] : undefined;
       if (sound && guardian)
         this.sink.playAt(sound.key, guardian.pos.x, guardian.pos.y + 2, guardian.pos.z, {
@@ -174,6 +187,7 @@ export class BreathAudio {
         });
     }
     this.marks.update(me, this.sink);
+    this.alarm.update(me, this.sink);
     this.updateRide(me);
     this.updateKnot(knot);
   }

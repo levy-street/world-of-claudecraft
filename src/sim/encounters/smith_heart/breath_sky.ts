@@ -3,7 +3,8 @@
 // Storm half alike (never while the storm breaks, nor through its barrage,
 // which already rains strikes), every `skyEvery` seconds a volley falls from
 // the sky: a telegraphed spot under each of `skyMarks` hashed players (where
-// they stand as it is laid: they step out of it) and `skySpots` more hashed
+// they stand as it is laid: they step out of it; each wears the mark,
+// BREATH_AURAS.skyMark, for the warning) and `skySpots` more hashed
 // over the Cornice's floor, each the barrage's own strike (its reach, its
 // hit, its look) on the longer `skyWarn` warning.
 //
@@ -13,8 +14,8 @@
 
 import { DT } from '../../types';
 import { barrageSpot } from './breath_geometry';
-import { BREATH_TUNING as T } from './breath_ids';
-import { type BreathScope, local, pickMarks } from './breath_scope';
+import { BREATH_AURAS, BREATH_NAMES, BREATH_TUNING as T } from './breath_ids';
+import { type BreathScope, local, pickMarks, putMarker } from './breath_scope';
 import { spawnStrike } from './breath_storm';
 
 /** Lay one volley now. Returns how many strikes it laid (the tests read it). */
@@ -27,6 +28,10 @@ export function startSkyVolley(s: BreathScope): number {
   for (const p of pickMarks(s, T.skyMarks)) {
     const at = local(s.ctx, s.inst, p);
     spawnStrike(s, at.x, at.z, 'barrage', T.skyWarn);
+    // The mark: the arrow over them the whole raid sees, their own alarm.
+    putMarker(p, BREATH_AURAS.skyMark, BREATH_NAMES.skyMark, T.skyWarn, s.boss.id, {
+      school: 'nature',
+    });
     n++;
   }
   for (let k = 0; k < T.skySpots; k++) {

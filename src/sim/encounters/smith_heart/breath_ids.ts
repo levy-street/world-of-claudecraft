@@ -69,6 +69,10 @@ export const BREATH_CASTS = {
   thunder: 'heart_breath_thunder_lash',
 } as const;
 
+/** The guardian's bars aimed at one player who must move (the arrow over
+ *  them, their alarm: the owner's run of 2026-11-17). */
+export const BREATH_TARGETED_CASTS: readonly string[] = [BREATH_CASTS.lance, BREATH_CASTS.fork];
+
 /** The auras the fight puts on players and on the guardian. The kernel's
  *  wind and pull auras are wind_drift.ts's (WIND_DRIFT_AURA, WIND_PULL_AURA). */
 export const BREATH_AURAS = {
@@ -80,6 +84,9 @@ export const BREATH_AURAS = {
   pinned: 'heart_breath_pinned',
   /** The marked conductor: a strike falls at their feet every 2 s. */
   drawn: 'heart_breath_drawn_lightning',
+  /** A sky strike's mark (breath_sky.ts): lightning falls where this player
+   *  stood as it was laid, on its warning (the arrow over them, their alarm). */
+  skyMark: 'heart_breath_sky_mark',
   /** Lifted into the storm (an unbreakable stun while it holds them). */
   cradled: 'heart_breath_cradled',
   /** On the guardian through phase 2: its body of lightning. */
@@ -238,6 +245,7 @@ export const BREATH_NAMES = {
   cradle: "Thunder's Cradle",
   backlash: 'Cradle Backlash',
   drawn: 'Drawn Lightning',
+  skyMark: 'Sky Strike',
   charged: 'Charged Ground',
   stormForm: 'Storm Unbound',
   swell: 'Swelling Storm',

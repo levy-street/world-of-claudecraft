@@ -69,6 +69,7 @@ import { getFlameTex } from '../ignivar_fire_vfx';
 import { setRenderCategory } from '../renderer_diagnostics';
 import { radialGlowTexture } from '../textures';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
+import { BREATH_ARROWS, breathArrowMark, breathTargetedBar } from './breath_arrow_core';
 import {
   ANCHOR_BEAM_SECONDS,
   bearingDir,
@@ -107,6 +108,7 @@ import { BreathIslesFx } from './breath_isles_fx';
 import { BreathRoarFx } from './breath_roar_fx';
 import { BreathTossFx } from './breath_toss_fx';
 import { BreathWindStreaks } from './breath_wind_streaks';
+import { CouncilRushArrow } from './council_rush_arrow';
 import { BREATH_TELEGRAPH_GLOW_STEP, type BreathTelegraphKind } from './painted_telegraph_core';
 import { BreathTelegraphs, type PaintedFan } from './painted_telegraphs';
 
@@ -508,6 +510,12 @@ export class BreathFightFx {
   private readonly geometries: THREE.BufferGeometry[] = [];
   private readonly materials: THREE.Material[] = [];
   private readonly audio = new BreathAudio(sfx);
+  /** The Rush's red arrow over each player a mechanic has singled out to
+   *  move (the owner's run of 2026-11-17): a sky strike's mark and Drawn
+   *  Lightning (auras), and the target of a bar aimed at one player (Storm
+   *  Lance, Leaping Bolt). Built in the constructor with the root. */
+  private auraArrows!: CouncilRushArrow;
+  private barArrows!: CouncilRushArrow;
   private readonly glowTex: THREE.Texture | null;
   // The wind's field and the gaps' lips (instance-local, under `local`).
   private readonly field: THREE.Mesh;
@@ -636,6 +644,22 @@ export class BreathFightFx {
     this.glowTex = hasDom ? radialGlowTexture() : null;
     this.kit = new TelegraphKit(this.root, this.detail);
     this.paints = new BreathTelegraphs(BREATH_TELEGRAPH_GLOW_STEP, this.materials);
+    this.auraArrows = new CouncilRushArrow(
+      this.root,
+      this.uTime,
+      this.geometries,
+      this.materials,
+      breathArrowMark,
+      BREATH_ARROWS,
+    );
+    this.barArrows = new CouncilRushArrow(
+      this.root,
+      this.uTime,
+      this.geometries,
+      this.materials,
+      (e) => this.barMark(e),
+      1,
+    );
     this.local.name = 'smithHeartBreathLocal';
     this.local.visible = false;
     this.root.add(this.local);
@@ -1233,6 +1257,9 @@ export class BreathFightFx {
       !!meE && !!this.origin && Math.abs(meE.pos.y - this.local.position.y - CORNICE_FLOOR_H) < 6;
     this.roar.update(world, g0, onCornice, dt, this.origin);
     this.toss.update(world, dt);
+    // The arrows over every player a mechanic has singled out to move.
+    this.auraArrows.update(world.entities, this.clock, this.reducedMotion());
+    this.barArrows.update(world.entities, this.clock, this.reducedMotion());
     this.updateBolts();
     this.particles.update(this.clock);
     const guardian = this.guardianId >= 0 ? (world.entities.get(this.guardianId) ?? null) : null;
@@ -1258,6 +1285,13 @@ export class BreathFightFx {
       meE ?? null,
       this.heart.heard,
     );
+  }
+
+  /** A bar the guardian aims at `e` (its clock), else null. */
+  private barMark(e: Entity): { remaining: number; duration: number } | null {
+    const g = this.guardianId >= 0 ? this.world?.entities.get(this.guardianId) : undefined;
+    if (!g || g.dead || g.castTargetId !== e.id || breathTargetedBar(g) === null) return null;
+    return { remaining: g.castRemaining, duration: Math.max(0.01, g.castTotal) };
   }
 
   // ---- the scan -------------------------------------------------------------------------
@@ -1299,6 +1333,8 @@ export class BreathFightFx {
     this.anchorMarks.begin();
     this.pinnedMarks.begin();
     this.drawnMarks.begin();
+    this.auraArrows.beginScan();
+    this.barArrows.beginScan();
     for (let i = 0; i < this.candidateIds.length; i++) {
       const e = world.entities.get(this.candidateIds[i]);
       if (!e) continue;
@@ -1323,7 +1359,10 @@ export class BreathFightFx {
         for (const a of e.auras) {
           if (a.id === BREATH_AURAS.anchor) this.anchorMarks.take(e.id);
           else if (a.id === BREATH_AURAS.pinned) this.pinnedMarks.take(e.id);
-          else if (a.id === BREATH_AURAS.drawn) this.drawnMarks.take(e.id);
+          else if (a.id === BREATH_AURAS.drawn) {
+            this.drawnMarks.take(e.id);
+            this.auraArrows.see(e.id);
+          } else if (a.id === BREATH_AURAS.skyMark) this.auraArrows.see(e.id);
           else if (a.id === BREATH_AURAS.cradled) this.cradledIds.push(e.id);
           else if (!this.isles.takeAura(e, a.id)) this.heart.takeAura(e, a.id);
         }
@@ -1334,6 +1373,12 @@ export class BreathFightFx {
     this.anchorMarks.end();
     this.pinnedMarks.end();
     this.drawnMarks.end();
+    this.auraArrows.endScan();
+    // A bar aimed at one player (Storm Lance, Leaping Bolt): its target.
+    const g = this.guardianId >= 0 ? world.entities.get(this.guardianId) : undefined;
+    if (g && breathTargetedBar(g) !== null && g.castTargetId !== null)
+      this.barArrows.see(g.castTargetId);
+    this.barArrows.endScan();
     this.assign(world);
   }
 

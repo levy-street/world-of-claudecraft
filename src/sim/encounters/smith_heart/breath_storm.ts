@@ -406,5 +406,8 @@ export function clearStorm(ctx: SimContext, inst: InstanceSlot, st: BreathFightS
     if (t) dropAura(t, BREATH_AURAS.drawn);
     st.drawn = null;
   }
-  for (const p of corniceListeners(ctx, inst)) dropAura(p, BREATH_AURAS.drawn);
+  for (const p of corniceListeners(ctx, inst)) {
+    dropAura(p, BREATH_AURAS.drawn);
+    dropAura(p, BREATH_AURAS.skyMark);
+  }
 }

@@ -1651,6 +1651,7 @@ const baseEnTable = {
   'mechanic.heartThundersCradle': "Thunder's Cradle",
   'mechanic.heartCradleBacklash': 'Cradle Backlash',
   'mechanic.heartDrawnLightning': 'Drawn Lightning',
+  'mechanic.heartSkyStrike': 'Sky Strike',
   'aura.heartStormUnbound': 'Storm Unbound',
   'mechanic.heartSwellingStorm': 'Swelling Storm',
   // The Islands of the Wind (encounters/smith_heart/breath_isle_ids.ts
@@ -27204,6 +27205,7 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   "Thunder's Cradle": 'mechanic.heartThundersCradle',
   'Cradle Backlash': 'mechanic.heartCradleBacklash',
   'Drawn Lightning': 'mechanic.heartDrawnLightning',
+  'Sky Strike': 'mechanic.heartSkyStrike',
   'Storm Unbound': 'aura.heartStormUnbound',
   'Swelling Storm': 'mechanic.heartSwellingStorm',
   'Gale Bulwark': 'aura.heartGaleBulwark',

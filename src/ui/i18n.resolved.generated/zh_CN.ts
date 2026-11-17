@@ -4768,6 +4768,7 @@ export const zh_CN: EnTranslations = {
       },
       "breathGuardian": {
         "intro": "沉睡中：在风暴将它放下之前，无法被攻击或伤害。",
+        "skyMark": "{warn}秒后，闪电会劈向此效果施加时你所站的位置：{radius}码内造成{min}到{max}点伤害。走出圆圈。英雄和史诗：{heroicMin}到{heroicMax}点伤害。",
         "portalA": "效果结束时，传送门A会在你所站的位置打开。站在结风附近。本轮你无法携带它。",
         "portalB": "效果结束时，传送门B会在你所站的位置打开。站在崖台边缘。本轮你无法携带结风。",
         "portalC": "效果结束时，传送门C会在你所站的位置打开。它只与传送门D相连。站在另一团结风附近。本轮你无法携带它。",

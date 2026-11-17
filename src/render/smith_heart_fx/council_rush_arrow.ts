@@ -118,11 +118,22 @@ interface ArrowSlot {
 
 const _look: RushArrowLook = { y: 0, glow: 1, scale: 1 };
 
-function markOf(e: Entity | undefined, auraId: string) {
-  if (!e || e.dead) return null;
-  const auras = e.auras;
-  for (let i = 0; i < auras.length; i++) if (auras[i].id === auraId) return auras[i];
-  return null;
+/** A mark's clock: how long it has left of how long it runs. */
+export interface ArrowMark {
+  remaining: number;
+  duration: number;
+}
+
+/** What marks a player for an arrow: an aura on them (its clock), or any
+ *  other read (a bar aimed at them: the bar's clock). */
+export type ArrowMarkOf = (e: Entity) => ArrowMark | null;
+
+function auraMark(auraId: string): ArrowMarkOf {
+  return (e) => {
+    const auras = e.auras;
+    for (let i = 0; i < auras.length; i++) if (auras[i].id === auraId) return auras[i];
+    return null;
+  };
 }
 
 /** The card's size in yards: the arrow plus its glow's margin all round. */
@@ -131,16 +142,19 @@ const CARD_H = RUSH_ARROW.length + RUSH_ARROW.margin * 2;
 
 export class CouncilRushArrow {
   private readonly slots: ArrowSlot[] = [];
+  private readonly markOf: ArrowMarkOf;
 
   constructor(
     root: THREE.Group,
     uTime: { value: number },
     geometries: THREE.BufferGeometry[],
     materials: THREE.Material[],
-    /** The mark aura it rides (the Rush's by default) and how many at once. */
-    private readonly auraId: string = COUNCIL_AURAS.rushMark,
+    /** The mark it rides (the Rush's aura by default: an aura id, or a read
+     *  of the player) and how many at once. */
+    mark: string | ArrowMarkOf = COUNCIL_AURAS.rushMark,
     pool: number = POOL,
   ) {
+    this.markOf = typeof mark === 'string' ? auraMark(mark) : mark;
     // One quad; the vertex shader lays it out in view space from its uvs.
     const quad = new THREE.PlaneGeometry(1, 1, 1, 1);
     geometries.push(quad);
@@ -209,7 +223,7 @@ export class CouncilRushArrow {
     for (const s of this.slots) {
       if (s.playerId < 0) continue;
       const p = entities.get(s.playerId);
-      const mark = markOf(p, this.auraId);
+      const mark = p && !p.dead ? this.markOf(p) : null;
       if (!p || !mark) {
         this.free(s);
         continue;

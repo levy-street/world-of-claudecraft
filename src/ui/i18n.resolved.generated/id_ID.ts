@@ -4768,6 +4768,7 @@ export const id_ID: EnTranslations = {
       },
       "breathGuardian": {
         "intro": "Dormant: cannot be attacked or harmed until the storm sets it down.",
+        "skyMark": "Lightning strikes where you stood when this was laid, in {warn} sec: {min} to {max} damage within {radius} yd. Step out of its circle. Heroic and Mythic: {heroicMin} to {heroicMax} damage.",
         "portalA": "When this ends, Portal A opens exactly where you stand. Stand near the Knotted Gale. You cannot carry it this round.",
         "portalB": "When this ends, Portal B opens exactly where you stand. Stand at the edge of the Cornice. You cannot carry the Knotted Gale this round.",
         "portalC": "When this ends, Portal C opens exactly where you stand. It links to Portal D only. Stand near the other Knotted Gale. You cannot carry it this round.",

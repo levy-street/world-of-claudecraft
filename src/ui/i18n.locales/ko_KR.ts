@@ -22645,6 +22645,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '테살리 대장의 고요가 당신을 붙잡고 있습니다: 바람도, 끌어당김도, 폭발도, 날려 보내기도 당신을 움직일 수 없습니다. 피해는 그대로 받습니다.',
   'hudChrome.auraEffect.breathGuardian.spent':
     '닻이 다했습니다: 이것이 끝날 때까지 테살리 대장의 고요의 원은 당신을 다시 붙잡을 수 없습니다.',
+  'hudChrome.auraEffect.breathGuardian.skyMark':
+    '이것이 걸렸을 때 서 있던 자리에 {warn}초 후 번개가 떨어집니다: {radius}미터 안에 {min}~{max}의 피해. 원 밖으로 나가세요. 영웅 및 신화: {heroicMin}~{heroicMax}의 피해.',
   'hudChrome.auraEffect.breathGuardian.drawn':
     '{every}초마다 당신이 선 곳에 번개가 떨어집니다: {warn}초 뒤 {radius}야드 안의 모두에게 {min}~{max}의 피해를 주고, {charged}초 동안 매초 {cmin}~{cmax}의 피해를 주는 대전된 땅을 남깁니다. 계속 움직이며 낙뢰를 공격대에서 먼 가장자리로 유도하세요. 영웅·신화: 각각 {heroicMin}에서 {heroicMax}, {heroicCMin}에서 {heroicCMax}의 피해.',
   'hudChrome.auraEffect.breathGuardian.cradled':
