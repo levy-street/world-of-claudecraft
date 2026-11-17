@@ -119,7 +119,7 @@ describe('/dev heart', () => {
     expect(sim.player.pos.x - o.x).toBeCloseTo(SMITH_HEART_ANCHORS.forge.x, 3);
   });
 
-  it('kill hammer opens the Slab on the next tick; guardians light the seal; trash opens the portal', () => {
+  it('kill hammer opens the Slab on the next tick; guardians light the seal and open the portal', () => {
     const { sim, dev, claim } = devSim();
     dev('/dev heart enter');
     const inst = claim();
@@ -137,20 +137,15 @@ describe('/dev heart', () => {
 
     dev('/dev heart kill guardians');
     sim.tick();
+    // The Ring holds no packs since the team's review of 2026-11-17: the four
+    // veins alone open the portal.
     const masks = sealMasks(sim, inst);
     expect(masks.length).toBeGreaterThan(0);
-    expect(masks.every((t) => t === 'smith_heart_seal_15')).toBe(true);
-    let p = smithHeartProgress(sim.ctx, inst);
+    expect(masks.every((t) => t === 'smith_heart_seal_31')).toBe(true);
+    const p = smithHeartProgress(sim.ctx, inst);
     expect(p.sealLit).toBe(true);
-    expect(p.ringClear).toBe(false);
-    expect(p.portalOpen).toBe(false);
-
-    dev('/dev heart kill trash');
-    sim.tick();
-    p = smithHeartProgress(sim.ctx, inst);
     expect(p.ringClear).toBe(true);
     expect(p.portalOpen).toBe(true);
-    expect(sealMasks(sim, inst).every((t) => t === 'smith_heart_seal_31')).toBe(true);
   });
 
   it('portal forces the seal open for the run, and the hop then works', () => {
@@ -193,13 +188,13 @@ describe('/dev heart', () => {
         const mob = sim.ctx.entities.get(inst.mobIds[i]);
         return mob !== undefined && !mob.dead;
       }).length;
-    expect(alive('r3')).toBe(3);
-    dev('/dev heart kill pack r3');
-    expect(alive('r3')).toBe(0);
-    expect(alive('r4')).toBe(3);
+    expect(alive('h1')).toBe(3);
+    dev('/dev heart kill pack h1');
+    expect(alive('h1')).toBe(0);
+    expect(alive('h2')).toBe(3);
     dev('/dev heart kill pack zz9');
     dev('/dev heart kill nobody');
-    expect(alive('r4')).toBe(3);
+    expect(alive('h2')).toBe(3);
   });
 
   it('seal prints the gating readout as a dev log line', () => {
@@ -212,7 +207,7 @@ describe('/dev heart', () => {
     dev('/dev heart seal');
     const lines = logs(sim.tick()).filter((t) => t.startsWith('[dev] Heart seal'));
     expect(lines).toEqual([
-      '[dev] Heart seal: mask 0, slabOpen false, sealLit false, ringClear false, portalOpen false, awake false.',
+      '[dev] Heart seal: mask 0, slabOpen false, sealLit false, ringClear true, portalOpen false, awake false.',
     ]);
     dev('/dev heart kill all');
     sim.tick();
@@ -255,7 +250,7 @@ describe('/dev heart', () => {
       mask: 0,
       slabOpen: false,
       sealLit: false,
-      ringClear: false,
+      ringClear: true,
       portalOpen: false,
     });
     expect(sealMasks(sim, fresh).every((t) => t === `${SMITH_HEART_SEAL_PREFIX}0`)).toBe(true);

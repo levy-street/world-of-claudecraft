@@ -328,7 +328,10 @@ describe("each Splinter's signature", () => {
     const ev = f.tick(sec(P.coalSeconds + 0.2));
     const others = f.players.filter((p) => p !== marked[0]);
     expect(hits(ev, N.coal, others[0].id)[0]?.amount ?? 0).toBeGreaterThan(P.coalMin * 0.9);
-    expect(aura(marked[0], A.coal)).toBeUndefined();
+    // The mark burst and went (a fresh one the fight's own clock laid since
+    // would be whole again).
+    const left = aura(marked[0], A.coal);
+    expect(left === undefined || left.remaining > P.coalSeconds - 0.5).toBe(true);
   });
 
   it('the Quench: Rime Toll rung out hits the raid; kicked, it does not', () => {

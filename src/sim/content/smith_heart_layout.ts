@@ -389,6 +389,15 @@ const TU = (() => {
 function towardHeart(s: number): { x: number; z: number } {
   return { x: HEART_TERRACE.x + TU.x * s, z: HEART_TERRACE.z + TU.z * s };
 }
+/** The way out (the team's review of 2026-11-17): once the Masterless
+ *  Strength falls, an exit portal opens on the far side of the platform from
+ *  the Arrival Terrace, between the Breath's and the Quench's altars, well in
+ *  from the rim; it walks the raid back to the entrance (HEART_EXIT_LANDING). */
+export const HEART_EXIT_PORTAL = {
+  x: HEART_ROOM.x + TU.x * 44,
+  z: HEART_ROOM.z + TU.z * 44,
+  r: 3.5,
+} as const;
 /** The Heart Bridge's gate: sealed behind the raid while the final boss fights. */
 export const HEART_BRIDGE_GATE = { ...towardHeart(22), dx: TU.x, dz: TU.z } as const;
 
@@ -423,6 +432,11 @@ export const SMITH_HEART_BOSS_SPOTS = {
    *  stands a little behind the Guardian, well inside the ring of columns. */
   seamSinger: { x: HAMMER_PIT.x + 3, z: HAMMER_PIT.z + 9 },
 } as const;
+
+/** Where the Heart's exit portal sets the raid down: the raid's entrance,
+ *  beside Warden Collier (content/smith_heart_rewards.ts), facing her. Clear
+ *  of the dungeon's own exit (SMITH_HEART_ANCHORS.exit). */
+export const HEART_EXIT_LANDING = { x: -196, z: -210, facing: Math.atan2(5, 4) } as const;
 
 /** Named anchors: the entry, dev teleports and the renderer's set pieces. */
 export const SMITH_HEART_ANCHORS = {

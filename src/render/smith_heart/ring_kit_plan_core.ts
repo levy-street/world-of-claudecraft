@@ -28,6 +28,7 @@
 
 import {
   BALCONY,
+  LIGHT_RIVERS,
   RING,
   RING_ARC,
   ringPoint,
@@ -40,6 +41,7 @@ import type { FieldPathSurface } from '../../sim/instances/authored_field/types'
 import { planFieldEdgePieces } from '../authored_field/field_edge_plan_core';
 import type { HeartKitPlacement } from './heart_kit_core';
 import { heartHash, heartPropBase } from './heart_plan_core';
+import { HEART_RIVER_LIFT, planHeartRiver } from './heart_rivers_core';
 
 /** The two stairs the kit draws step by step (their field tops are omitted
  *  once the kit has landed). */
@@ -273,7 +275,7 @@ export function planRingStairSteps(surfaceId: string): RingStairStep[] {
   const s = SMITH_HEART_FIELD.surfaces.find((x) => x.id === surfaceId) as
     | FieldPathSurface
     | undefined;
-  if (!s || s.kind !== 'path') return [];
+  if (s?.kind !== 'path') return [];
   const out: RingStairStep[] = [];
   for (let i = 0; i + 1 < s.points.length; i++) {
     let a = s.points[i];
@@ -532,9 +534,126 @@ export function planRingMouths(): HeartKitPlacement[] {
 }
 
 /** The kit's whole static plan (the seal and the spires are heart_seal.ts's). */
+/** The rivers whose light crosses the open chasm to the dais and so runs in
+ *  a conduit (the team's review of 2026-11-17: "the ley line is just
+ *  floating"): the Quench's from the east, the Heat's from the west. The
+ *  Breath's and the Hammer's ride the two stairs' chutes. */
+export const RING_CONDUIT_VEINS = ['quench', 'heat'] as const;
+/** A conduit's measures: a span module's length at stretch 1, how far a
+ *  conduit tucks under the floors at its two ends, the keel's depth under the
+ *  bed (a pier's top), where along it its piers stand. */
+export const RING_CONDUIT_SIZES = {
+  span: 6,
+  tuck: 0.5,
+  keel: 3.65,
+  piers: [0.33, 0.68] as readonly number[],
+} as const;
+
+/** The field's floor at (x, z), or null over the void (the rivers' own read). */
+function riverFloorAt(x: number, z: number): number | null {
+  return authoredFieldSurfaceAt(SMITH_HEART_FIELD, x, z)
+    ? authoredFieldHeight(SMITH_HEART_FIELD, x, z)
+    : null;
+}
+
+/** One conduit's line: where its river leaves the floor and lands again, the
+ *  bed's height at each end (the river's own bridged line, its lift off). */
+export interface RingConduitLine {
+  ax: number;
+  az: number;
+  ay: number;
+  bx: number;
+  bz: number;
+  by: number;
+}
+
+/** The conduits' lines, one per RING_CONDUIT_VEINS river: its longest run
+ *  over the void, from the last floored point before it to the first after. */
+export function ringConduitLines(): RingConduitLine[] {
+  const out: RingConduitLine[] = [];
+  for (const vein of RING_CONDUIT_VEINS) {
+    const strip = planHeartRiver(LIGHT_RIVERS[vein], riverFloorAt);
+    const pts = strip.points;
+    let best: RingConduitLine | null = null;
+    let bestLen = 0;
+    let i = 0;
+    while (i < pts.length) {
+      if (riverFloorAt(pts[i].x, pts[i].z) !== null) {
+        i++;
+        continue;
+      }
+      let j = i;
+      while (j < pts.length && riverFloorAt(pts[j].x, pts[j].z) === null) j++;
+      const a = pts[Math.max(0, i - 1)];
+      const b = pts[Math.min(pts.length - 1, j)];
+      const len = Math.hypot(b.x - a.x, b.z - a.z);
+      if (len > bestLen) {
+        bestLen = len;
+        best = {
+          ax: a.x,
+          az: a.z,
+          ay: a.y - HEART_RIVER_LIFT,
+          bx: b.x,
+          bz: b.z,
+          by: b.y - HEART_RIVER_LIFT,
+        };
+      }
+      i = j;
+    }
+    if (best) out.push(best);
+  }
+  return out;
+}
+
+/** The conduits: span modules along each line (a few to fit it, stretched
+ *  and sheared down its slope, tucked under the floors at both ends), and
+ *  its piers under the keel, falling into the chasm. */
+export function planRingConduits(): HeartKitPlacement[] {
+  const Z = RING_CONDUIT_SIZES;
+  const out: HeartKitPlacement[] = [];
+  for (const l of ringConduitLines()) {
+    const dx = l.bx - l.ax;
+    const dz = l.bz - l.az;
+    const len = Math.hypot(dx, dz);
+    if (len < 1) continue;
+    const ux = dx / len;
+    const uz = dz / len;
+    const slope = (l.by - l.ay) / len;
+    const rot = Math.atan2(-dz, dx);
+    const from = -Z.tuck;
+    const run = len + 2 * Z.tuck;
+    const m = Math.max(1, Math.ceil(run / Z.span));
+    const piece = run / m;
+    for (let k = 0; k < m; k++) {
+      const s = from + (k + 0.5) * piece;
+      out.push({
+        piece: 'Kit_ConduitSpan',
+        x: l.ax + ux * s,
+        y: l.ay + slope * s,
+        z: l.az + uz * s,
+        rot,
+        stretch: (piece + 0.04) / Z.span,
+        shear: slope,
+      });
+    }
+    for (const t of Z.piers) {
+      const s = len * t;
+      out.push({
+        piece: 'Kit_ConduitPier',
+        x: l.ax + ux * s,
+        y: l.ay + slope * s - Z.keel,
+        z: l.az + uz * s,
+        rot,
+      });
+    }
+  }
+  return out;
+}
+
 export function planRingKit(): HeartKitPlacement[] {
   return [
     ...planRingPaving(),
+    ...planRingConduits(),
     ...planRingChannels(),
     ...planRingEdges(),
     ...planRingStairs(),

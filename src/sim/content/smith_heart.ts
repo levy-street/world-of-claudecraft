@@ -62,7 +62,6 @@ import {
   QUENCH,
   QUENCH_BLADE_SPOTS,
   RING_PACK_DEGREES,
-  ringPoint,
   SLAB,
   SMITH_HEART_ANCHORS,
   SMITH_HEART_BOSS_SPOTS,
@@ -654,10 +653,7 @@ function toward(x: number, z: number, tx: number, tz: number): number {
  *  layout's, where their cairns stand too). */
 export { RING_PACK_DEGREES };
 
-const RING_PACK_IDS = RING_PACK_DEGREES.map((_, i) => `r${i + 1}`);
-
 const HAMMER_TRIO = ['heart_hammer_warder', 'heart_hammer_warder', 'heart_hammer_warder'];
-const RING_TRIO = ['heart_ring_warder', 'heart_ring_warder', 'heart_ring_warder'];
 const BREATH_TRIO = ['heart_breath_warder', 'heart_breath_caller', 'heart_breath_warder'];
 const QUENCH_TRIO = ['heart_quench_warder', 'heart_quench_caller', 'heart_quench_warder'];
 const HEAT_TRIO = ['heart_heat_warder', 'heart_heat_caller', 'heart_heat_warder'];
@@ -701,11 +697,8 @@ export const SMITH_HEART_SPAWNS: DungeonSpawn[] = [
   ...pack('h3', G.h3.x, G.h3.z, HAMMER_TRIO, toward(G.h3.x, G.h3.z, G.h2.x, G.h2.z)),
   // The Hammer Council: one authored pack, so pulling one pulls both.
   ...councilSpawns(),
-  // ---- The Ring: two packs between each pair of vein mouths -------------------------
-  ...RING_PACK_DEGREES.flatMap((deg, i) => {
-    const p = ringPoint(deg);
-    return pack(RING_PACK_IDS[i], p.x, p.z, RING_TRIO, toward(p.x, p.z, 0, 0));
-  }),
+  // ---- The Ring: no packs (the team's review of 2026-11-17: "there is enough
+  // to fight without them"); the Ring's cairns still mark where they stood.
   // ---- The Breath (north) ------------------------------------------------------------
   ...pack('b1', BREATH.b1.x, BREATH.b1.z, BREATH_TRIO, Math.PI),
   ...pack('b2', BREATH.b2.x, BREATH.b2.z, BREATH_TRIO, toward(-64, 112, 0, 104)),
@@ -732,7 +725,7 @@ export const SMITH_HEART_SPAWNS: DungeonSpawn[] = [
 /** Every pack, in route order (the Ring's eight after the Hammer). */
 export const SMITH_HEART_PACKS = {
   hammer: ['h1', 'h2', 'h3'],
-  ring: RING_PACK_IDS,
+  ring: [] as readonly string[],
   breath: ['b1', 'b2', 'b3'],
   quench: ['q1', 'q2', 'q3'],
   heat: ['f1', 'f2', 'f3'],

@@ -289,3 +289,24 @@ export function heartAreaBlend(current: number, inHeart: boolean, dt: number): n
   const step = HEART_AREA_BLEND_RATE * Math.max(0, dt);
   return current < target ? Math.min(target, current + step) : Math.max(target, current - step);
 }
+
+/** The Heart's exit portal (the team's review of 2026-11-17: the way out once
+ *  the final boss falls): the return portal's rig, a size larger so it reads
+ *  across the platform. */
+export const HEART_EXIT_SIZE = {
+  vortexR: 4.6,
+  funnelHeight: 14,
+  funnelFoot: 1.8,
+  funnelTop: 4.2,
+} as const;
+/** Seconds the exit portal takes to whirl open after the fall. */
+export const HEART_EXIT_OPEN_SECONDS = 2.5;
+
+/** How open the exit portal stands (0 shut, 1 whole) `since` seconds after
+ *  the final boss fell (-1: still standing): eased out, a portal first seen
+ *  already open (a late arrival) whole at once. Pure. */
+export function heartExitOpen(since: number): number {
+  if (since < 0) return 0;
+  const t = Math.min(1, since / HEART_EXIT_OPEN_SECONDS);
+  return 1 - (1 - t) * (1 - t);
+}

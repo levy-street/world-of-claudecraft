@@ -1568,6 +1568,8 @@ const baseEnTable = {
     "The seal's light pulls you down into the heart of the mountain.",
   'log.smithHeartPortalReturn':
     'The light carries you back up to the heart seal.',
+  'log.smithHeartPortalExit':
+    "The heart's light carries you back to the mouth of the mountain.",
   'log.smithHeartHammerLit':
     'An ochre light runs down from the Quarry toward the heart seal.',
   'log.smithHeartBreathLit':

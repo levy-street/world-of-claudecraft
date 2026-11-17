@@ -5,7 +5,9 @@
 // Heart's Arrival Terrace, a separate area of the same slot no floor joins
 // to the main map. The return portal on the terrace walks the raid back to
 // the dais at any time (a wipe's walk back, a corpse run's way out); it can
-// only be reached through the open portal anyway.
+// only be reached through the open portal anyway. Once the Masterless
+// Strength falls, an exit portal opens on the platform's far side and walks
+// the raid back to the entrance beside Warden Collier (the way out).
 //
 // A corpse run needs nothing more: a released spirit rises at the raid's
 // entrance (instances/dungeons.ts), walks the main map to the dais and steps
@@ -16,6 +18,8 @@
 
 import {
   HEART_ARRIVAL,
+  HEART_EXIT_LANDING,
+  HEART_EXIT_PORTAL,
   HEART_RETURN_PORTAL,
   RING_PORTAL,
   RING_PORTAL_LANDING,
@@ -32,13 +36,24 @@ export const SMITH_HEART_PORTAL_HOP_TEXT =
   "The seal's light pulls you down into the heart of the mountain.";
 /** ... and stepping through the return portal. */
 export const SMITH_HEART_PORTAL_RETURN_TEXT = 'The light carries you back up to the heart seal.';
+/** ... and stepping through the Heart's exit portal once the final boss has
+ *  fallen (the team's review of 2026-11-17). */
+export const SMITH_HEART_PORTAL_EXIT_TEXT =
+  "The heart's light carries you back to the mouth of the mountain.";
 
 /**
  * One tick of one claim's portals: every living player standing in the
  * Ring's portal (while `ringOpen`) crosses to the Heart; every one standing
- * in the return portal crosses back to the dais.
+ * in the return portal crosses back to the dais; every one standing in the
+ * Heart's exit portal (while `exitOpen`: the final boss fallen) crosses to
+ * the raid's entrance beside Warden Collier.
  */
-export function tickSmithHeartPortal(ctx: SimContext, inst: InstanceSlot, ringOpen: boolean): void {
+export function tickSmithHeartPortal(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  ringOpen: boolean,
+  exitOpen = false,
+): void {
   const dungeon = DUNGEONS[inst.dungeonId];
   if (!dungeon) return;
   const o = instanceOrigin(dungeon.index, inst.slot);
@@ -55,6 +70,20 @@ export function tickSmithHeartPortal(ctx: SimContext, inst: InstanceSlot, ringOp
         e,
         { x: o.x + HEART_ARRIVAL.x, z: o.z + HEART_ARRIVAL.z, facing: HEART_ARRIVAL.facing },
         SMITH_HEART_PORTAL_HOP_TEXT,
+      );
+    } else if (
+      exitOpen &&
+      Math.hypot(lx - HEART_EXIT_PORTAL.x, lz - HEART_EXIT_PORTAL.z) < HEART_EXIT_PORTAL.r
+    ) {
+      displacePlayer(
+        ctx,
+        e,
+        {
+          x: o.x + HEART_EXIT_LANDING.x,
+          z: o.z + HEART_EXIT_LANDING.z,
+          facing: HEART_EXIT_LANDING.facing,
+        },
+        SMITH_HEART_PORTAL_EXIT_TEXT,
       );
     } else if (
       Math.hypot(lx - HEART_RETURN_PORTAL.x, lz - HEART_RETURN_PORTAL.z) < HEART_RETURN_PORTAL.r

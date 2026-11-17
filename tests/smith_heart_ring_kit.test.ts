@@ -57,6 +57,7 @@ import {
 } from '../src/render/smith_heart/heart_seal_core';
 import {
   planRingChannels,
+  planRingConduits,
   planRingEdges,
   planRingKit,
   planRingMouths,
@@ -65,6 +66,7 @@ import {
   planRingStairSteps,
   planRingStairs,
   RING_CHANNEL_BEARINGS,
+  RING_CONDUIT_SIZES,
   RING_KIT_FASCIA_DEPTH,
   RING_KIT_FASCIA_SURFACES,
   RING_KIT_KINDS,
@@ -72,6 +74,7 @@ import {
   RING_KIT_SIZES,
   RING_KIT_STAIRS,
   RING_MOUTHS,
+  ringConduitLines,
   ringSpireSpots,
 } from '../src/render/smith_heart/ring_kit_plan_core';
 import { SEAL_SHAKE_REACH, sealShakeFalloff } from '../src/render/smith_heart_fx/seal_shake';
@@ -627,4 +630,66 @@ describe('the seal and the portal: the moments', () => {
       6,
     );
   });
+});
+
+// The team's review of 2026-11-17: the Quench's and the Heat's light-rivers
+// crossed the chasm to the dais floating on nothing; each now runs in a stone
+// conduit carried on piers.
+describe('ring_kit_plan_core: the conduits over the chasm', () => {
+  it('lays one conduit under each floating river, from the Ring to the dais', () => {
+    const lines = ringConduitLines();
+    expect(lines.length).toBe(2);
+    const xs = lines.map((l) => Math.sign(l.ax)).sort();
+    expect(xs).toEqual([-1, 1]);
+    for (const l of lines) {
+      // From the Ring's inner lip down to the dais.
+      expect(Math.hypot(l.ax, l.az)).toBeGreaterThan(RING.innerR - 2);
+      expect(Math.hypot(l.bx, l.bz)).toBeLessThan(SEAL_DAIS.r + 2);
+      expect(l.ay).toBeGreaterThan(l.by);
+    }
+  });
+
+  it('covers every floating stretch of the two rivers with span modules, piers beneath', () => {
+    const placed = planRingConduits();
+    const spans = placed.filter((p) => p.piece === 'Kit_ConduitSpan');
+    const piers = placed.filter((p) => p.piece === 'Kit_ConduitPier');
+    expect(piers.length).toBe(2 * RING_CONDUIT_SIZES.piers.length);
+    for (const l of ringConduitLines()) {
+      const len = Math.hypot(l.bx - l.ax, l.bz - l.az);
+      // Every yard of the line lies within a span's reach.
+      for (let s = 0; s <= len; s += 1) {
+        const x = l.ax + ((l.bx - l.ax) * s) / len;
+        const z = l.az + ((l.bz - l.az) * s) / len;
+        const covered = spans.some(
+          (p) =>
+            Math.hypot(p.x - x, p.z - z) <= (RING_CONDUIT_SIZES.span * (p.stretch ?? 1)) / 2 + 0.05,
+        );
+        expect(covered, `${x.toFixed(1)},${z.toFixed(1)}`).toBe(true);
+      }
+    }
+    // The bed follows the river's slope, the piers stand under the keel.
+    for (const p of spans) expect(p.shear ?? 0).toBeLessThan(0);
+    for (const p of piers) {
+      const under = spans.reduce((a, b) =>
+        Math.hypot(b.x - p.x, b.z - p.z) < Math.hypot(a.x - p.x, a.z - p.z) ? b : a,
+      );
+      expect(p.y).toBeLessThan(under.y - RING_CONDUIT_SIZES.keel + 1);
+    }
+  });
+
+  it.skipIf(!haveKit)(
+    'ships the conduit pieces: stone with crystal, under budget, the span on its bed',
+    () => {
+      for (const name of ['Kit_ConduitSpan', 'Kit_ConduitPier']) {
+        const s = shape(name);
+        expect(s.materials.has('KitStone'), name).toBe(true);
+        expect(s.materials.has('KitGlow'), name).toBe(true);
+      }
+      const span = shape('Kit_ConduitSpan');
+      // Its lips under a hand over the bed (the river lies on it), its keel under.
+      expect(span.max[1]).toBeLessThan(0.3);
+      expect(span.min[1]).toBeLessThan(-RING_CONDUIT_SIZES.keel + 0.2);
+      expect(shape('Kit_ConduitPier').min[1]).toBeLessThan(-30);
+    },
+  );
 });

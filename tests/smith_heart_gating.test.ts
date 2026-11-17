@@ -154,8 +154,9 @@ describe("the Smith's Heart gating", () => {
       expect(smithHeartSealMaskOf(smithHeartSealTemplate(m))).toBe(m);
     }
     expect(smithHeartSealMaskOf('sanctum_story_3')).toBeNull();
-    // 32 is the arrival's bit (smith_heart_arrival.test.ts); nothing past it.
-    expect(smithHeartSealMaskOf('smith_heart_seal_64')).toBeNull();
+    // 32 is the arrival's bit (smith_heart_arrival.test.ts), 64 the exit's
+    // (smith_heart_exit_portal.test.ts); nothing past it.
+    expect(smithHeartSealMaskOf('smith_heart_seal_128')).toBeNull();
     expect(smithHeartPortalBitSet(SMITH_HEART_SEAL_FULL)).toBe(false);
     expect(smithHeartPortalBitSet(SMITH_HEART_SEAL_FULL | SMITH_HEART_PORTAL_BIT)).toBe(true);
     // The portal bit never reads as a lit vein.
@@ -184,7 +185,7 @@ describe("the Smith's Heart gating", () => {
       mask: 0,
       slabOpen: false,
       sealLit: false,
-      ringClear: false,
+      ringClear: true,
       portalOpen: false,
     });
   });
@@ -230,7 +231,9 @@ describe("the Smith's Heart gating", () => {
         kill(sim, inst, [SMITH_HEART_GUARDIANS[v]]);
         const events = sim.tick();
         mask |= SMITH_HEART_VEIN_BITS[v];
-        expect(markers(sim, inst).every((m) => m === mask)).toBe(true);
+        // The fourth opens the portal with it (the Ring holds no packs).
+        const shown = mask === SMITH_HEART_SEAL_FULL ? mask | SMITH_HEART_PORTAL_BIT : mask;
+        expect(markers(sim, inst).every((m) => m === shown)).toBe(true);
         expect(logs(events, pid)).toContain(SMITH_HEART_VEIN_LIT_LOG[v]);
       }
       expect(mask).toBe(SMITH_HEART_SEAL_FULL);
@@ -238,18 +241,22 @@ describe("the Smith's Heart gating", () => {
     }
   });
 
-  it('the seal opens into the portal only with all four lit and the Ring clear', () => {
+  it('the seal opens into the portal once all four are lit (the Ring holds no packs)', () => {
+    // The team's review of 2026-11-17 took the Ring's packs out.
+    expect(SMITH_HEART_PACKS.ring).toEqual([]);
+    expect(SPAWNS.some((s) => s.mobId === 'heart_ring_warder')).toBe(false);
     const { sim, pid, inst } = setup();
-    kill(sim, inst, Object.values(SMITH_HEART_GUARDIANS));
+    kill(
+      sim,
+      inst,
+      Object.values(SMITH_HEART_GUARDIANS).filter((g) => g !== SMITH_HEART_GUARDIANS.heat),
+    );
     sim.tick();
-    expect(smithHeartProgress(sim.ctx, inst).sealLit).toBe(true);
+    expect(smithHeartProgress(sim.ctx, inst).sealLit).toBe(false);
     expect(smithHeartProgress(sim.ctx, inst).portalOpen).toBe(false);
-    expect(markers(sim, inst).every((m) => m === SMITH_HEART_SEAL_FULL)).toBe(true);
-    kill(sim, inst, SMITH_HEART_PACKS.ring.slice(0, 7));
-    sim.tick();
-    expect(smithHeartProgress(sim.ctx, inst).portalOpen).toBe(false);
-    kill(sim, inst, SMITH_HEART_PACKS.ring);
+    kill(sim, inst, [SMITH_HEART_GUARDIANS.heat]);
     const events = sim.tick();
+    expect(smithHeartProgress(sim.ctx, inst).sealLit).toBe(true);
     expect(smithHeartProgress(sim.ctx, inst).portalOpen).toBe(true);
     expect(
       markers(sim, inst).every((m) => m === (SMITH_HEART_SEAL_FULL | SMITH_HEART_PORTAL_BIT)),
@@ -318,7 +325,9 @@ describe("the Smith's Heart gating", () => {
     const { sim, pid, inst } = setup();
     kill(sim, inst, Object.values(SMITH_HEART_GUARDIANS));
     sim.tick();
-    expect(markers(sim, inst).every((m) => m === SMITH_HEART_SEAL_FULL)).toBe(true);
+    expect(
+      markers(sim, inst).every((m) => m === (SMITH_HEART_SEAL_FULL | SMITH_HEART_PORTAL_BIT)),
+    ).toBe(true);
     freeInstance(sim.ctx, inst);
     expect(enterDungeon(sim.ctx, 'smith_heart', pid)).toBe(true);
     const again = sim.ctx.instances.find(

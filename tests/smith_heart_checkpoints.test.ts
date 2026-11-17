@@ -224,11 +224,13 @@ describe("the Smith's Heart death checkpoints", () => {
     expectAt(runBack(sim, pid, inst), 'final');
   });
 
-  it('all four down but the portal shut (the Ring alive): the last guardian instead', () => {
+  it('the portal still shut (a vein unlit): the last guardian instead', () => {
+    // The Ring holds no packs since the team's review of 2026-11-17, so only
+    // an unlit vein keeps the portal shut.
     const { sim, pid, inst } = setup();
-    for (const v of ['hammer', 'heat', 'breath', 'quench'] as const) win(sim, pid, inst, v);
+    for (const v of ['hammer', 'heat', 'breath'] as const) win(sim, pid, inst, v);
     expect(smithHeartProgress(sim.ctx, inst).portalOpen).toBe(false);
-    expectAt(runBack(sim, pid, inst), 'quench');
+    expectAt(runBack(sim, pid, inst), 'breath');
   });
 
   it('a hostile body on the latest point gives way to the kill before it', () => {
@@ -239,7 +241,7 @@ describe("the Smith's Heart death checkpoints", () => {
     const ringMob = placed(
       sim,
       inst,
-      (i) => (DUNGEON.spawns[i].packId ?? '') === SMITH_HEART_PACKS.ring[0],
+      (i) => (DUNGEON.spawns[i].packId ?? '') === SMITH_HEART_PACKS.heat[0],
     )[0];
     const o = instanceOrigin(DUNGEON.index, inst.slot);
     ringMob.pos = sim.ctx.groundPos(o.x + P.quench.pos.x + 3, o.z + P.quench.pos.z);

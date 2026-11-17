@@ -46,6 +46,10 @@ export const SMITH_HEART_RING_KIT_PIECES = [
   'StairChute',
   'StairParapetA',
   'StairParapetB',
+  // The conduits carrying the Quench's and the Heat's rivers over the chasm
+  // to the dais (the team's review of 2026-11-17).
+  'ConduitSpan',
+  'ConduitPier',
   // The seal and its dais (the quarters, the heart and the shards move).
   'SealDais',
   'SealQuarter',

@@ -91,6 +91,7 @@ export * from './heat_intro_plan';
 export type { HeatFightState } from './heat_state';
 export { HEAT_LINES, heatLineKey } from './heat_voice';
 export {
+  SMITH_HEART_PORTAL_EXIT_TEXT,
   SMITH_HEART_PORTAL_HOP_TEXT,
   SMITH_HEART_PORTAL_RETURN_TEXT,
   tickSmithHeartPortal,
@@ -122,6 +123,7 @@ export {
   replaySmithHeartArrivalForDev,
   SMITH_HEART_ARRIVAL_REPLAY_HOLD,
   SMITH_HEART_AWAKE_BIT,
+  SMITH_HEART_EXIT_BIT,
   SMITH_HEART_PORTAL_BIT,
   SMITH_HEART_PORTAL_OPEN_LOG,
   SMITH_HEART_SEAL_FULL,
@@ -131,6 +133,7 @@ export {
   setSmithHeartPortalDevOpen,
   smithHeartAwakeBitSet,
   smithHeartEarnedMask,
+  smithHeartExitBitSet,
   smithHeartLitCount,
   smithHeartPlayerInHeart,
   smithHeartPortalBitSet,

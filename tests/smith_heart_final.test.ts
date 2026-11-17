@@ -325,8 +325,10 @@ describe('the Heat quarter', () => {
       f.put(f.players[3], at.x, at.z);
       struck += hits(f.tick(1), FINAL_NAMES.whirl, f.pids[3]).length;
     }
+    // About one strike a second (the whirl's run decides a tick either way;
+    // the claim's spawn list, and so its roll order, changed on 2026-11-17).
     expect(struck).toBeGreaterThanOrEqual(2);
-    expect(struck).toBeLessThanOrEqual(3);
+    expect(struck).toBeLessThanOrEqual(4);
   });
 
   it('Heroic: Ember Marks on the ranged drop smouldering pools at their feet', () => {

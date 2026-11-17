@@ -12,6 +12,8 @@
 //   the seal: each guardian's death lights its vein's colour on the seal;
 //   the portal: with all four lit AND the Ring's eight packs dead, the seal
 //     opens into the portal to the Heart (portal.ts walks the raid through);
+//   the exit (2026-11-17): the Masterless Strength fallen, the Heart's exit
+//     portal opens and walks the raid back to the entrance (portal.ts);
 //   the arrival (phase 2J): the first tick a living player stands in the
 //     Heart, the heart wakes (the renderer's arrival scene: the heart crystal
 //     rises and binds the room's rocks into the Masterless Strength's body).
@@ -35,6 +37,7 @@
 import {
   SMITH_HEART_COUNCIL,
   SMITH_HEART_DUNGEON,
+  SMITH_HEART_FINAL_BOSS,
   SMITH_HEART_GUARDIANS,
   SMITH_HEART_PACKS,
   SMITH_HEART_SEAL_PREFIX,
@@ -72,8 +75,13 @@ export const SMITH_HEART_PORTAL_BIT = 16;
 /** The arrival's bit (phase 2J): a living player has stood in the Heart.
  *  Kept by the markers for the claim's life once set. */
 export const SMITH_HEART_AWAKE_BIT = 32;
+/** The exit's bit (the team's review of 2026-11-17): the Masterless
+ *  Strength has fallen, so the Heart's exit portal stands open (portal.ts).
+ *  Derived every tick like the veins. */
+export const SMITH_HEART_EXIT_BIT = 64;
 /** Every bit a marker can carry. */
-const MARKER_BITS = SMITH_HEART_SEAL_FULL | SMITH_HEART_PORTAL_BIT | SMITH_HEART_AWAKE_BIT;
+const MARKER_BITS =
+  SMITH_HEART_SEAL_FULL | SMITH_HEART_PORTAL_BIT | SMITH_HEART_AWAKE_BIT | SMITH_HEART_EXIT_BIT;
 
 /** The seal marker template id for a marker value (lit veins plus the
  *  portal bit). */
@@ -103,6 +111,11 @@ export function smithHeartPortalBitSet(mask: number): boolean {
 /** Does a marker value say the heart is awake (the raid has arrived)? Pure. */
 export function smithHeartAwakeBitSet(mask: number): boolean {
   return (mask & SMITH_HEART_AWAKE_BIT) !== 0;
+}
+
+/** Does a marker value say the Heart's exit portal is open? Pure. */
+export function smithHeartExitBitSet(mask: number): boolean {
+  return (mask & SMITH_HEART_EXIT_BIT) !== 0;
 }
 
 /** How many veins `mask` lights. Pure. */
@@ -269,8 +282,12 @@ export function tickSmithHeartSeal(ctx: SimContext, inst: InstanceSlot): number 
   // The arrival: kept once set, unless a dev replay holds the heart asleep.
   const asleep = devHeldAsleep(ctx, inst);
   const awake = !asleep && (smithHeartAwakeBitSet(before) || smithHeartPlayerInHeart(ctx, inst));
+  const exit = dungeonPlacedBossDead(ctx, inst, SMITH_HEART_FINAL_BOSS);
   const value =
-    p.mask | (p.portalOpen ? SMITH_HEART_PORTAL_BIT : 0) | (awake ? SMITH_HEART_AWAKE_BIT : 0);
+    p.mask |
+    (p.portalOpen ? SMITH_HEART_PORTAL_BIT : 0) |
+    (awake ? SMITH_HEART_AWAKE_BIT : 0) |
+    (exit ? SMITH_HEART_EXIT_BIT : 0);
   if (value === before) return value;
   const template = smithHeartSealTemplate(value);
   for (const id of inst.objectIds) {
@@ -309,7 +326,8 @@ export function tickSmithHeart(ctx: SimContext): void {
     // markers' value carries the earned veins, the same mask the seal lit.
     const mask = value !== null ? value & SMITH_HEART_SEAL_FULL : smithHeartEarnedMask(ctx, inst);
     noteSmithHeartKills(inst, mask, SMITH_HEART_VEIN_BITS);
-    if (value !== null) tickSmithHeartPortal(ctx, inst, smithHeartPortalBitSet(value));
+    if (value !== null)
+      tickSmithHeartPortal(ctx, inst, smithHeartPortalBitSet(value), smithHeartExitBitSet(value));
     stepArrivalVoice(ctx, inst, finalBoss(ctx, inst));
   }
 }

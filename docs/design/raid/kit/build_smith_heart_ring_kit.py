@@ -57,6 +57,9 @@ BUILDERS = {
     'StairChute': rp.stair_chute,
     'StairParapetA': lambda: rp.stair_parapet('A'),
     'StairParapetB': lambda: rp.stair_parapet('B'),
+    # The conduits carrying the Quench's and the Heat's rivers over the chasm.
+    'ConduitSpan': rp.conduit_span,
+    'ConduitPier': rp.conduit_pier,
     # The seal and its dais.
     'SealDais': lambda: rs.seal_dais(bpy),
     'SealQuarter': lambda: rs.seal_quarter(bpy),

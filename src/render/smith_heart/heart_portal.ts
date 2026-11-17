@@ -6,7 +6,9 @@
 //     arcs feeding it);
 //   - in the Heart: the return portal on the Arrival Terrace (a smaller
 //     vortex and funnel, always open: the Heart is only ever reached through
-//     the open seal);
+//     the open seal), and the exit portal on the platform's far side (a size
+//     larger, whirling open once the final boss falls: the way out to the
+//     raid's entrance, the team's review of 2026-11-17);
 //   - the hop: an arrival burst at the landing (a column, a floor ring and
 //     the four colours whirling up round the arrival) and a brief white-gold
 //     wash over the view.
@@ -17,6 +19,7 @@
 
 import * as THREE from 'three';
 import {
+  HEART_EXIT_PORTAL,
   HEART_RETURN_PORTAL,
   HEART_SEAL,
   HEART_TERRACE,
@@ -34,12 +37,14 @@ import {
   heartVortexMaterial,
 } from './heart_fx_materials';
 import {
+  HEART_EXIT_SIZE,
   HEART_PORTAL_RING_REACH,
   HEART_PORTAL_SIZE,
   HEART_PORTAL_SKY_BEAM,
   HEART_RETURN_SIZE,
   type HeartHopStage,
   type HeartPortalStage,
+  heartExitOpen,
   heartHopSpot,
   heartPortalMoteCount,
 } from './heart_portal_core';
@@ -162,8 +167,14 @@ function hopRig(group: THREE.Group, side: 'heart' | 'ring', y: number): HopRig {
 
 export interface HeartPortals {
   group: THREE.Group;
-  /** Advance to the seal portal's opening stage and the hop's burst. */
-  update(portal: HeartPortalStage, hop: HeartHopStage, hopSide: 'heart' | 'ring' | null): void;
+  /** Advance to the seal portal's opening stage, the hop's burst and the
+   *  exit portal (`exitSince`: seconds since the final boss fell, -1 alive). */
+  update(
+    portal: HeartPortalStage,
+    hop: HeartHopStage,
+    hopSide: 'heart' | 'ring' | null,
+    exitSince?: number,
+  ): void;
   /** Place the view wash at the camera (instance-local) at `k` (0 to 1). */
   wash(k: number, camera: { x: number; y: number; z: number }): void;
 }
@@ -268,6 +279,26 @@ export function buildHeartPortals(
   ret.funnel.uniforms.uK.value = 0.85;
   ret.motes.uniforms.uK.value = 1;
 
+  // ---- the Heart's exit portal (open once the final boss falls) ---------------------
+  const exitY = ground(HEART_EXIT_PORTAL.x, HEART_EXIT_PORTAL.z);
+  const exitFrom = group.children.length;
+  const exit = portalRig(
+    group,
+    'exit',
+    { x: HEART_EXIT_PORTAL.x, y: exitY, z: HEART_EXIT_PORTAL.z },
+    HEART_EXIT_SIZE,
+    Math.round(moteCount / 2),
+  );
+  exit.vortex.uniforms.uSpin.value = 1.4;
+  // A white-gold beam over it so the way out reads from the whole platform.
+  const exitBeamMat = heartBeamMaterial(WHITE_GOLD, 'smithHeartExitBeam', 1.6);
+  const exitBeam = new THREE.Mesh(sleeve(1.2, 0.6, 60, 14), exitBeamMat);
+  exitBeam.position.set(HEART_EXIT_PORTAL.x, exitY, HEART_EXIT_PORTAL.z);
+  exitBeam.name = 'portalExitBeam';
+  group.add(exitBeam);
+  const exitMeshes = group.children.slice(exitFrom);
+  for (const m of exitMeshes) m.visible = false;
+
   // ---- the hop ----------------------------------------------------------------------
   const hops = {
     heart: hopRig(group, 'heart', HEART_TERRACE.h),
@@ -296,9 +327,20 @@ export function buildHeartPortals(
   let lastRing = -1;
   let lastCharge = -1;
   let lastHop = -1;
+  let lastExit = -1;
   return {
     group,
-    update(portal, hop, hopSide) {
+    update(portal, hop, hopSide, exitSince = -1) {
+      // The way out whirls open once the final boss has fallen.
+      const ex = Math.round(heartExitOpen(exitSince) * 100) / 100;
+      if (ex !== lastExit) {
+        lastExit = ex;
+        for (const m of exitMeshes) m.visible = ex > 0;
+        exit.vortex.uniforms.uK.value = ex;
+        exit.funnel.uniforms.uK.value = ex * 0.9;
+        exit.motes.uniforms.uK.value = ex;
+        exitBeamMat.uniforms.uK.value = ex * 0.7;
+      }
       // The living portal grows out of the parted seal.
       const swirl = Math.round(portal.swirl * 100) / 100;
       if (swirl !== lastSwirl) {

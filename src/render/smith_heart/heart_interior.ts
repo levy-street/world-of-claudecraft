@@ -446,7 +446,7 @@ export async function buildSmithHeartInterior(
       rivers.update(view);
       ringSet.update(view);
       seal.update(view, stage, view.portalSince);
-      portals.update(stage, hop, hopSide);
+      portals.update(stage, hop, hopSide, view.exitSince);
       portals.wash(hop.flash, local);
       gates.update();
     },

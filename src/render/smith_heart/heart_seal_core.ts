@@ -29,6 +29,7 @@ import { DUNGEONS, instanceOrigin, instanceSlotForZ } from '../../sim/data';
 import {
   SMITH_HEART_SEAL_FULL,
   smithHeartAwakeBitSet,
+  smithHeartExitBitSet,
   smithHeartPortalBitSet,
   smithHeartSealMaskOf,
   smithHeartVeinLit,
@@ -50,6 +51,9 @@ interface SlotMemory {
   /** When the heart woke (the raid's first arrival), render seconds, or
    *  Infinity while it sleeps. */
   awakeAt: number;
+  /** When the Heart's exit portal opened (the final boss fallen), render
+   *  seconds, or Infinity while shut. */
+  exitAt: number;
 }
 
 const memory = new Map<string, SlotMemory>();
@@ -65,6 +69,7 @@ function fresh(mask: number, now: number): SlotMemory {
     litAt: SMITH_HEART_VEINS.map((v) => (smithHeartVeinLit(mask, v) ? now - SNAPPED : Infinity)),
     portalAt: smithHeartPortalBitSet(mask) ? now - SNAPPED : Infinity,
     awakeAt: smithHeartAwakeBitSet(mask) ? now - SNAPPED : Infinity,
+    exitAt: smithHeartExitBitSet(mask) ? now - SNAPPED : Infinity,
   };
 }
 
@@ -84,6 +89,7 @@ export function observeHeartSealMask(key: string, mask: number, now: number): vo
   });
   if (smithHeartPortalBitSet(mask) && !smithHeartPortalBitSet(m.mask)) m.portalAt = now;
   if (smithHeartAwakeBitSet(mask) && !smithHeartAwakeBitSet(m.mask)) m.awakeAt = now;
+  if (smithHeartExitBitSet(mask) && !smithHeartExitBitSet(m.mask)) m.exitAt = now;
   m.mask = mask;
 }
 
@@ -119,10 +125,19 @@ export interface HeartSealView {
   /** Seconds since the heart woke (the arrival), -1 while it sleeps (a
    *  heart first seen awake reads as long awake). */
   awakeSince: number;
+  /** Seconds since the Heart's exit portal opened (the final boss fallen),
+   *  -1 while shut. */
+  exitSince: number;
 }
 
 export function newHeartSealView(): HeartSealView {
-  return { mask: 0, since: SMITH_HEART_VEINS.map(() => -1), portalSince: -1, awakeSince: -1 };
+  return {
+    mask: 0,
+    since: SMITH_HEART_VEINS.map(() => -1),
+    portalSince: -1,
+    awakeSince: -1,
+    exitSince: -1,
+  };
 }
 
 /** The slot's seal at `now`, written into `out` (allocation-free: the frame
@@ -140,6 +155,7 @@ export function heartSealView(
   }
   out.portalSince = m && Number.isFinite(m.portalAt) ? now - m.portalAt : -1;
   out.awakeSince = m && Number.isFinite(m.awakeAt) ? now - m.awakeAt : -1;
+  out.exitSince = m && Number.isFinite(m.exitAt) ? now - m.exitAt : -1;
   return out;
 }
 

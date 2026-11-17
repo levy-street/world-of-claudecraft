@@ -592,3 +592,105 @@ def ring_sill():
             x += length
         prism_top(p, [(-3.0, -0.05), (3.0, -0.05), (3.0, 0.05), (-3.0, 0.05)], -0.02, -0.3, GRIT, bevel=0.0)
     return p
+
+
+# ---- the conduits (the team's review of 2026-11-17) ------------------------------------
+# The Quench's and the Heat's light-rivers cross the open chasm from the Ring to
+# the Seal Dais: each runs in a stone conduit, an aqueduct of the Ring's own
+# dressed granite carried on piers rising out of the dark (never walked: the
+# Ring's curb keeps its lip, the conduit hangs below the walk).
+CONDUIT_GLOW = (0.86, 0.9, 0.96)
+
+
+def conduit_span():
+    """A 6 yd module of a conduit (along X at stretch 1, sheared by the
+    runtime down its slope): the river's polished bed between two carved lips
+    (the bed's top at z -0.04, like the stairs' chute: origin on the river's
+    line), the trunk under it in two courses of dressed blocks with a moulded
+    string course, a basalt keel, and a small crystal set in each flank where
+    the vein's light shows through."""
+    p = SP('ConduitSpan', seed=2471, ao=0.5, ao_dist=0.8)
+    rng = p.rng
+    L = 3.0
+    with p.as_kind(DRESSED):
+        # The bed and its lips (the chute's section, wider lips).
+        x = -L
+        while x < L - 1e-6:
+            length = min(L - x, rng.uniform(1.2, 1.9))
+            prism_top(p, [(x + 0.015, -0.86), (x + length - 0.015, -0.86), (x + length - 0.015, 0.86),
+                          (x + 0.015, 0.86)], -0.04, -0.8, p.vary(CHANNEL, 0.04), bevel=0.025)
+            x += length
+        for side in (-1, 1):
+            x = -L
+            while x < L - 1e-6:
+                length = min(L - x, rng.uniform(0.9, 1.6))
+                y0, y1 = sorted((side * 0.88, side * 1.3))
+                prism_top(p, [(x + 0.02, y0), (x + length - 0.02, y0), (x + length - 0.02, y1), (x + 0.02, y1)],
+                          rng.uniform(0.18, 0.22), -0.8, p.vary(CHANNEL_LIP, 0.05), bevel=0.06)
+                x += length
+        # The trunk: two courses of dressed blocks, joints staggered.
+        z = -0.8
+        for h in (1.15, 1.05):
+            x = -L - rng.uniform(0.0, 0.9)
+            while x < L:
+                length = rng.uniform(1.3, 2.3)
+                a, b = max(-L, x), min(L, x + length)
+                if b - a > 0.25:
+                    slab(p, ((a + b) / 2, 0.0, z - h / 2), (b - a - 0.05, 2.5, h - 0.05),
+                         p.vary(FASCIA if rng.random() < 0.6 else FASCIA_DARK, 0.05), chamfer=0.1, jitter=0.05)
+                x += length
+            z -= h
+        # The string course under the lips, rounded, proud of both flanks.
+        x = -L
+        while x < L - 1e-6:
+            length = min(L - x, rng.uniform(1.6, 2.6))
+            slab(p, (x + length / 2, 0.0, -0.92), (length - 0.04, 2.9, 0.26), p.vary(CURB, 0.04),
+                 chamfer=0.22, jitter=0.04)
+            x += length
+        # The keel: a narrower course of basalt under the trunk.
+        x = -L
+        while x < L - 1e-6:
+            length = min(L - x, rng.uniform(1.8, 3.0))
+            slab(p, (x + length / 2, 0.0, -3.3), (length - 0.05, 1.6, 0.7), p.vary(BASALT_WORN, 0.05),
+                 chamfer=0.35, jitter=0.05)
+            x += length
+    # A crystal in each flank, mid module: the vein's light showing through.
+    for side in (-1, 1):
+        crystal(p, (rng.uniform(-0.4, 0.4), side * 1.26, -1.55), (0.42, 0.34, 0.62), p.vary(CONDUIT_GLOW, 0.03),
+                n=12, boxy=0.5, mat=GLOW)
+    return p
+
+
+def conduit_pier():
+    """A conduit's pier (origin at its top's centre, under the keel; the span
+    along X): a corbelled capital, then a shaft of dressed blocks widening as
+    it falls 34 yd into the chasm's dark, a band of crystal under the capital
+    where the light runs down into the mountain."""
+    p = SP('ConduitPier', seed=2489, ao=0.6, ao_dist=1.2)
+    rng = p.rng
+    with p.as_kind(DRESSED):
+        # The capital: two corbels, the wider on top.
+        slab(p, (0.0, 0.0, -0.3), (3.6, 2.6, 0.6), p.vary(CURB, 0.04), chamfer=0.25, jitter=0.04)
+        slab(p, (0.0, 0.0, -0.95), (3.0, 2.2, 0.7), p.vary(FASCIA, 0.04), chamfer=0.2, jitter=0.04)
+        # The shaft: courses, each a pair of blocks split along X, widening
+        # as it falls.
+        z = -1.3
+        k = 0
+        while z > -34.0:
+            h = rng.uniform(1.4, 1.9)
+            t = min(1.0, -z / 34.0)
+            wx = 2.4 + 1.4 * t
+            wy = 1.8 + 1.1 * t
+            split = rng.uniform(-0.35, 0.35) * wx
+            for (a, b) in ((-wx / 2, split), (split, wx / 2)):
+                col = FASCIA if rng.random() < 0.55 else FASCIA_DARK
+                if k % 5 == 3:
+                    col = BASALT_WORN
+                slab(p, ((a + b) / 2, 0.0, z - h / 2), (b - a - 0.06, wy, h - 0.05), p.vary(col, 0.05),
+                     chamfer=0.12, jitter=0.06)
+            z -= h
+            k += 1
+    # The crystal band: four crystals round the shaft under the capital.
+    for (cx, cy) in ((1.25, 0.0), (-1.25, 0.0), (0.0, 0.95), (0.0, -0.95)):
+        crystal(p, (cx, cy, -2.3), (0.5, 0.5, 0.9), p.vary(CONDUIT_GLOW, 0.03), n=12, boxy=0.5, mat=GLOW)
+    return p

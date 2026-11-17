@@ -81,7 +81,9 @@ describe("the Smith's Heart's arrival", () => {
       expect(smithHeartSealMaskOf(smithHeartSealTemplate(m))).toBe(m);
       expect(smithHeartAwakeBitSet(m)).toBe(m >= 32);
     }
-    expect(smithHeartSealMaskOf(`${SMITH_HEART_SEAL_PREFIX}64`)).toBeNull();
+    // 64 is the exit's bit (smith_heart_exit_portal.test.ts); nothing past it.
+    expect(smithHeartSealMaskOf(`${SMITH_HEART_SEAL_PREFIX}64`)).toBe(64);
+    expect(smithHeartSealMaskOf(`${SMITH_HEART_SEAL_PREFIX}128`)).toBeNull();
   });
 
   it('a fresh claim sleeps; the first living player in the Heart wakes it, and it stays awake', () => {
