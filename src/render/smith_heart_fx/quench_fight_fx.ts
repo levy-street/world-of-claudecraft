@@ -57,6 +57,7 @@ import { getFlameTex } from '../ignivar_fire_vfx';
 import { setRenderCategory } from '../renderer_diagnostics';
 import { heartKitSlotMaterial } from '../smith_heart/heart_kit';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
+import { CouncilRushArrow } from './council_rush_arrow';
 import { QUENCH_TELEGRAPH_GLOW_STEP, type QuenchTelegraphKind } from './painted_telegraph_core';
 import { QuenchTelegraphs } from './painted_telegraphs';
 import {
@@ -81,6 +82,15 @@ import {
 } from './quench_fight_fx_core';
 import { QUENCH_FLOOR, quenchParticleSteps } from './quench_floor_ladder_core';
 import { QuenchFrostFx } from './quench_frost_fx';
+import {
+  HOLE_DISC_SCALE,
+  HOLE_MIST_RATE,
+  HOLE_SHARDS,
+  type HoleShard,
+  holeHeave,
+  holeShard,
+} from './quench_hole_core';
+import { HOLE_FRAG, HOLE_VERT } from './quench_hole_glsl';
 import { QUENCH_RIME_POOLS as RIME_POOLS } from './quench_rime_core';
 import { QuenchRimeFx } from './quench_rime_fx';
 
@@ -97,6 +107,12 @@ const _frost: FrostLook = { cover: 0, height: 0, crystals: 0, pulse: 0 };
 const _crystal = { a: 0, r: 0, y: 0, size: 0, lean: 0 };
 const _shard = { x: 0, z: 0, h: 0, w: 0, lean: 0, yaw: 0 };
 const _zero = new THREE.Matrix4().makeScale(0, 0, 0);
+const _hs: HoleShard = { x: 0, z: 0, h: 0, w: 0, lean: 0, yaw: 0 };
+const _q2 = new THREE.Quaternion();
+const _xAxis = new THREE.Vector3(1, 0, 0);
+
+/** The most players a round of slashes marks at once (Mythic's four). */
+const QUENCH_MARK_ARROWS = 4;
 
 // ---- shaders ---------------------------------------------------------------------------
 
@@ -111,61 +127,6 @@ void main() {
   // Camera-relative (world x ~ 119000: see quench_floor_ladder_core.ts).
   vec4 wp = modelMatrix * instanceMatrix * vec4(position, 1.0);
   gl_Position = projectionMatrix * wocCamRelView(wp.xyz);
-}
-`;
-/** A hole of freezing water (vP: churn, fresh, seed): a thin broken lip of
- *  ice with jagged teeth, the lake's own ice showing round it (never a ring
- *  painted over it), an inner wall of ice falling away into the water so the
- *  hole has depth, dark deep water under a slow swell, slush and torn floes
- *  drifting near the lip (never square), glints of the sky (audit point 14). */
-const HOLE_FRAG = /* glsl */ `
-uniform float uTime;
-uniform vec3 uDeep;
-uniform vec3 uLit;
-uniform vec3 uRim;
-varying vec2 vXY;
-varying vec3 vP;
-float h(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-float n(vec2 p) {
-  vec2 i = floor(p);
-  vec2 f = fract(p);
-  f = f * f * (3.0 - 2.0 * f);
-  return mix(mix(h(i), h(i + vec2(1, 0)), f.x), mix(h(i + vec2(0, 1)), h(i + vec2(1, 1)), f.x), f.y);
-}
-void main() {
-  float r = length(vXY);
-  float a = atan(vXY.y, vXY.x);
-  float seed = vP.z * 37.0;
-  // The break: a ragged outline, teeth of ice reaching in from it.
-  float edge = 0.9 + 0.06 * n(vec2(a * 6.0 + seed, seed)) + 0.03 * n(vec2(a * 21.0 - seed, seed * 2.0));
-  float teeth = 0.07 * smoothstep(0.55, 0.9, n(vec2(a * 15.0 + seed * 3.0, 7.0)));
-  float lipIn = edge - teeth;
-  // Past the break the lake's own ice shows.
-  float outside = smoothstep(edge, edge + 0.03, r);
-  if (r > 1.0 || outside >= 1.0) discard;
-  float lip = smoothstep(lipIn - 0.025, lipIn, r);
-  float t = uTime;
-  vec2 q = vXY * 5.0 + vec2(seed);
-  float swell = n(q + vec2(t * 0.3, -t * 0.22)) * 0.6 + n(q * 2.3 - vec2(t * 0.5, t * 0.4)) * 0.4;
-  vec3 water = mix(uDeep * 0.8, uLit * 0.85, swell * 0.35 + (1.0 - r) * 0.08);
-  // Slush churned by the break, torn floes drifting near the lip.
-  float slush = smoothstep(0.62, 0.9, n(q * 1.7 + vec2(t * 0.15, t * 0.1))) * vP.x;
-  water = mix(water, uRim * 0.7, slush * 0.3);
-  vec2 drift = vec2(sin(t * 0.2 + seed), cos(t * 0.17 + seed)) * 0.25;
-  float floe = smoothstep(0.7, 0.735, n(vXY * 3.6 + vec2(seed * 0.4) + drift)) * smoothstep(0.35, 0.7, r);
-  water = mix(water, uRim * 0.82, floe * 0.9);
-  // Glints of the sky on the dark water.
-  float glint = max(0.0, n(q * 3.1 + vec2(t * 0.8, -t * 0.6)) - 0.62) * 2.6;
-  water += uLit * glint * glint * glint * 0.7;
-  // The inner wall of ice falling away into the water: lit at its top under
-  // the lip, lost in the dark at the waterline.
-  float wallW = 0.16;
-  float wall = smoothstep(lipIn - wallW, lipIn - 0.01, r) * (1.0 - lip);
-  vec3 wallCol = mix(uDeep * 0.45, uLit * 1.05, smoothstep(lipIn - wallW, lipIn, r));
-  water = mix(water, wallCol, wall * 0.85);
-  vec3 col = mix(water, uRim, lip * (0.82 + 0.18 * vP.y));
-  gl_FragColor = vec4(col, 0.97 * (1.0 - outside));
-  #include <colorspace_fragment>
 }
 `;
 /** A web of cracks racing out under a lingering huddle (vP: spread, light,
@@ -308,6 +269,7 @@ export class QuenchFightFx {
   private readonly density: number;
   private readonly particles: EngineParticles;
   private readonly kit: TelegraphKit;
+  private readonly markArrows: CouncilRushArrow;
   private readonly geometries: THREE.BufferGeometry[] = [];
   private readonly materials: THREE.Material[] = [];
   private readonly audio = new QuenchAudio(sfx);
@@ -325,6 +287,9 @@ export class QuenchFightFx {
   private readonly cracks: THREE.InstancedMesh;
   private readonly rimes: THREE.InstancedMesh;
   private readonly crystals: THREE.InstancedMesh;
+  private readonly holeShards: THREE.InstancedMesh;
+  /** The players already in the water (a new one plunges: the big splash). */
+  private readonly plunged = new Set<number>();
   private readonly warms: THREE.InstancedMesh;
   private readonly links: THREE.InstancedMesh;
   private readonly collars: THREE.InstancedMesh;
@@ -380,6 +345,17 @@ export class QuenchFightFx {
       quenchParticleSteps('quench_fight_fx'),
     );
     this.kit = new TelegraphKit(this.root, this.detail);
+    // The blades' marks: the Rush's red arrow over each marked player (the
+    // owner's heroic run of 2026-11-17: a mark needed a call over the head
+    // that the whole raid sees), up to a round's whole count.
+    this.markArrows = new CouncilRushArrow(
+      this.root,
+      this.uTime,
+      this.geometries,
+      this.materials,
+      QUENCH_AURAS.marked,
+      QUENCH_MARK_ARROWS,
+    );
     this.frost = new QuenchFrostFx(
       this.root,
       this.uTime,
@@ -442,11 +418,12 @@ export class QuenchFightFx {
       frag: string,
       uniforms: Record<string, THREE.IUniform>,
       additive: boolean,
+      vert: string = DISC_VERT,
     ) => {
       const m = new THREE.ShaderMaterial({
         name,
         uniforms: { uTime: this.uTime, ...uniforms },
-        vertexShader: DISC_VERT,
+        vertexShader: vert,
         fragmentShader: frag,
         transparent: true,
         depthWrite: false,
@@ -493,6 +470,7 @@ export class QuenchFightFx {
           uRim: { value: new THREE.Color(0.86, 0.94, 1.0) },
         },
         false,
+        HOLE_VERT,
       ),
       P.holes,
       'smithHeartQuenchHoles',
@@ -561,6 +539,28 @@ export class QuenchFightFx {
     this.crystals.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     for (let i = 0; i < P.bodies * P.crystalsPer; i++) this.crystals.setMatrixAt(i, _zero);
     this.root.add(this.crystals);
+    // The broken ice heaved up round each hole's lip (quench_hole_core.ts):
+    // faceted shards of lake ice, opaque (no floor rung to fight).
+    const holeShardGeo = new THREE.ConeGeometry(0.5, 1, 4, 1).translate(0, 0.5, 0);
+    {
+      const pos = holeShardGeo.getAttribute('position') as THREE.BufferAttribute;
+      const col = new Float32Array(pos.count * 3);
+      for (let i = 0; i < pos.count; i++) {
+        const k = Math.min(1, Math.max(0, pos.getY(i)));
+        col.set([0.5 + 0.45 * k, 0.7 + 0.28 * k, 0.88 + 0.12 * k], i * 3);
+      }
+      holeShardGeo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+      holeShardGeo.computeVertexNormals();
+    }
+    this.geometries.push(holeShardGeo);
+    this.holeShards = new THREE.InstancedMesh(holeShardGeo, iceMat, P.holes * HOLE_SHARDS);
+    this.holeShards.name = 'smithHeartQuenchHoleShards';
+    this.holeShards.frustumCulled = false;
+    this.holeShards.castShadow = false;
+    this.holeShards.visible = false;
+    this.holeShards.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    for (let i = 0; i < P.holes * HOLE_SHARDS; i++) this.holeShards.setMatrixAt(i, _zero);
+    this.root.add(this.holeShards);
     const linkGeo = new THREE.CylinderGeometry(1, 1, 1, 6, 1, true).translate(0, 0.5, 0);
     this.geometries.push(linkGeo);
     const linkMat = new THREE.MeshBasicMaterial({
@@ -712,11 +712,12 @@ export class QuenchFightFx {
       this.particles.update(this.clock);
       return;
     }
-    this.paintObjects(world);
+    this.paintObjects(world, dt);
     this.paintBodies(world, dt);
     this.frost.frame(world, this, dt, this.clock);
     this.rime.frame(world, this.rimeIds, this.clock);
     this.paintRim(world);
+    this.markArrows.update(world.entities, this.clock, this.reducedMotion());
     this.particles.update(this.clock);
     const guardian = this.guardianId >= 0 ? (world.entities.get(this.guardianId) ?? null) : null;
     const me = world.entities.get(world.playerId) ?? null;
@@ -757,6 +758,7 @@ export class QuenchFightFx {
     this.trappedIds.length = 0;
     this.rimeIds.length = 0;
     this.guardianId = -1;
+    this.markArrows.beginScan();
     for (let i = 0; i < this.candidateIds.length; i++) {
       const e = world.entities.get(this.candidateIds[i]);
       if (!e) continue;
@@ -776,9 +778,11 @@ export class QuenchFightFx {
             this.trappedIds.push(e.id);
           else if (a.id === QUENCH_AURAS.rime && this.rimeIds.length < RIME_POOLS.carriers)
             this.rimeIds.push(e.id);
+          else if (a.id === QUENCH_AURAS.marked) this.markArrows.see(e.id);
         }
       }
     }
+    this.markArrows.endScan();
     for (const id of this.frozenSince.keys())
       if (!this.frozenIds.includes(id)) this.frozenSince.delete(id);
     for (const id of this.frozenIds)
@@ -845,6 +849,7 @@ export class QuenchFightFx {
         if (slot && slot.id !== id) {
           slot.id = id;
           slot.born = this.clock;
+          slot.template = '';
         }
       } else if (kind === 'rim' || kind === 'rimRise') {
         const slot = slotFor(this.rimSlots, id);
@@ -868,6 +873,8 @@ export class QuenchFightFx {
 
   private leave(): void {
     this.origin = null;
+    this.markArrows.beginScan();
+    this.markArrows.endScan();
     this.rosterSeen = Number.NaN;
     this.candidateIds.length = 0;
     for (const s of [...this.crackFans, ...this.splashFans]) {
@@ -904,7 +911,7 @@ export class QuenchFightFx {
 
   // ---- the fight's objects --------------------------------------------------------------
 
-  private paintObjects(world: IWorld): void {
+  private paintObjects(world: IWorld, dt: number): void {
     // The cracks: the hole's footprint filling, its web racing out.
     let n = 0;
     for (const s of this.crackFans) {
@@ -949,14 +956,50 @@ export class QuenchFightFx {
     for (const s of this.holeSlots) {
       const e = s.id >= 0 ? world.entities.get(s.id) : undefined;
       if (!e) continue;
-      const look = holeLook(this.clock - s.born);
+      const age = this.clock - s.born;
+      const look = holeLook(age);
       const r = e.scale > 0 ? e.scale : T.holeR;
-      _v.set(e.pos.x, this.groundY(e.pos.x, e.pos.z) + 0.035, e.pos.z);
-      _s.set(r, 1, r);
+      const gy = this.groundY(e.pos.x, e.pos.z);
+      _v.set(e.pos.x, gy + 0.035, e.pos.z);
+      _s.set(r * HOLE_DISC_SCALE, 1, r * HOLE_DISC_SCALE);
       this.holes.setMatrixAt(h, _m.compose(_v, _q.identity(), _s));
       this.holes.setColorAt(h, _c.setRGB(look.churn, look.fresh, fightHash(e.id, 7)));
+      // The shards heaved up round its lip, bursting up as it breaks.
+      const heave = holeHeave(age);
+      const seed = fightHash(e.id, 11) * 1e6;
+      for (let k = 0; k < HOLE_SHARDS; k++) {
+        holeShard(seed, k, r, _hs);
+        _v.set(e.pos.x + _hs.x, gy - 0.25 * (1 - heave), e.pos.z + _hs.z);
+        _q.setFromAxisAngle(_up, _hs.yaw);
+        _q2.setFromAxisAngle(_xAxis, _hs.lean * heave);
+        _q.multiply(_q2);
+        _s.set(_hs.w, _hs.h * (0.2 + 0.8 * heave), _hs.w * 0.7);
+        this.holeShards.setMatrixAt(h * HOLE_SHARDS + k, _m.compose(_v, _q, _s));
+      }
+      // The break: ice bursting up and a white boil of spray the moment it opens.
+      if (s.template !== 'broke') {
+        s.template = 'broke';
+        this.breakHole(e.pos.x, e.pos.z, r);
+      }
+      // Cold mist breathing off the open water.
+      if (this.rand() < dt * HOLE_MIST_RATE * this.density) {
+        const a = this.rand() * Math.PI * 2;
+        const d = r * 0.7 * Math.sqrt(this.rand());
+        this.particles.puff(e.pos.x + Math.sin(a) * d, gy + 0.1, e.pos.z + Math.cos(a) * d, 1, {
+          speed: 0.3,
+          up: 0.9,
+          life: 2.4,
+          size: [0.9, 2.4],
+          color: C.mist,
+          alpha: 0.32,
+        });
+      }
       h++;
     }
+    for (let i = h * HOLE_SHARDS; i < P.holes * HOLE_SHARDS; i++)
+      this.holeShards.setMatrixAt(i, _zero);
+    this.holeShards.instanceMatrix.needsUpdate = true;
+    this.holeShards.visible = h > 0;
     for (let i = h; i < P.holes; i++) this.holes.setMatrixAt(i, _zero);
     this.holes.instanceMatrix.needsUpdate = true;
     this.holes.visible = h > 0;
@@ -1125,10 +1168,16 @@ export class QuenchFightFx {
     for (let i = bi; i < P.frozen; i++) this.splashFans[i].fan.group.visible = false;
     // The water: a churning collar round each trapped body's waist.
     let wa = 0;
+    for (const id of this.plunged) if (!this.trappedIds.includes(id)) this.plunged.delete(id);
     for (const id of this.trappedIds) {
       const e = world.entities.get(id);
       if (!e || e.dead) continue;
       const eAt = fxAnchor(e);
+      // A body just gone through the ice: the plunge's big splash.
+      if (!this.plunged.has(id)) {
+        this.plunged.add(id);
+        this.plunge(eAt.x, eAt.z);
+      }
       const floor = this.groundY(eAt.x, eAt.z);
       _v.set(eAt.x, floor - 0.25, eAt.z);
       _s.set(1, 1, 1);
@@ -1324,6 +1373,41 @@ export class QuenchFightFx {
     });
     this.particles.shockRing(x, z, 0xe0f4ff, r * 1.6, 0.5);
     this.shakeNear(x, z, 0.35, 30);
+  }
+
+  /** The ice breaking open: shards and spray burst up, a ring of white water. */
+  private breakHole(x: number, z: number, r: number): void {
+    const y = this.groundY(x, z);
+    this.particles.shockRing(x, z, 0xdff4ff, r * 1.4, 0.6);
+    this.particles.puff(x, y + 0.2, z, Math.round(18 * this.density) + 4, {
+      speed: 4,
+      up: 5,
+      life: 0.9,
+      size: [0.32, 0.08],
+      color: C.shard,
+      alpha: 1,
+      pool: 'glow',
+      gravity: 14,
+      radius: r * 0.8,
+    });
+    this.splash(x, z, 0.8);
+  }
+
+  /** A body plunging through the ice: a tall burst of water and a ring. */
+  private plunge(x: number, z: number): void {
+    const y = this.groundY(x, z);
+    this.particles.shockRing(x, z, 0xbfe6ff, 2.4, 0.7);
+    this.particles.puff(x, y + 0.2, z, Math.round(26 * this.density) + 6, {
+      speed: 3.2,
+      up: 7.5,
+      life: 1.1,
+      size: [0.36, 0.1],
+      color: [0.8, 0.92, 1.0],
+      alpha: 1,
+      gravity: 16,
+      radius: 0.5,
+    });
+    this.splash(x, z, 1);
   }
 
   private splash(x: number, z: number, size: number): void {

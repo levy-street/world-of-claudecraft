@@ -149,12 +149,21 @@ export const QUENCH_MARK_SOUNDS: Readonly<Record<string, HeartMarkSound>> = {
   [QUENCH_AURAS.rime]: HEART_MARK.frost,
 };
 
+/** A blade's slash mark's alarm in the marked player's own ear, over the
+ *  frost's sting: the Rush's war horn (smith_heart_council_audio_core.ts
+ *  RUSH_MARK_ALARM), so the mark is heard as a call to lead the line clear
+ *  (the owner's heroic run of 2026-11-17). */
+export const QUENCH_MARK_ALARM: Readonly<Record<string, HeartMarkSound>> = {
+  [QUENCH_AURAS.marked]: { key: 'ui_aura_blaring_horn', gain: 1, rate: 1 },
+};
+
 /** Every sample the fight plays, for preloading once. */
 export const QUENCH_SFX_KEYS: readonly string[] = [
   ...new Set([
     ...Object.values(QUENCH_CUE_SOUNDS).map((s) => s.key),
     ...Object.values(QUENCH_BAR_SOUNDS).map((s) => s.key),
     ...Object.values(QUENCH_MARK_SOUNDS).map((s) => s.key),
+    ...Object.values(QUENCH_MARK_ALARM).map((s) => s.key),
     QUENCH_CRACK_SOUND.key,
     QUENCH_COLD_SOUNDS.warn.key,
     QUENCH_COLD_SOUNDS.danger.key,

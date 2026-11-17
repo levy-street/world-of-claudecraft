@@ -1249,6 +1249,7 @@ const RENDER_PURE_CORES = [
   // telegraphs' looks.
   'src/render/smith_heart_fx/heat_floor_ladder_core.ts',
   'src/render/smith_heart_fx/quench_floor_ladder_core.ts',
+  'src/render/smith_heart_fx/quench_hole_core.ts',
   'src/render/smith_heart_fx/heat_telegraph_core.ts',
   'src/render/smith_heart_fx/final_telegraph_core.ts',
   'src/render/smith_heart_fx/painted_telegraph_core.ts',

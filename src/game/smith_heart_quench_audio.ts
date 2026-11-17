@@ -15,6 +15,7 @@ import {
   QUENCH_CRACK_SOUND,
   QUENCH_CUE_SOUNDS,
   QUENCH_HUNT_SOUNDS,
+  QUENCH_MARK_ALARM,
   QUENCH_MARK_SOUNDS,
   QUENCH_SFX_KEYS,
   QUENCH_SLASH_SOUNDS,
@@ -52,6 +53,8 @@ export class QuenchAudio {
   private cold = 0;
   private hunting = false;
   private readonly marks = new HeartMarkEar(QUENCH_MARK_SOUNDS);
+  /** A slash mark's alarm over its sting (QUENCH_MARK_ALARM). */
+  private readonly alarm = new HeartMarkEar(QUENCH_MARK_ALARM);
   /** Per painter line slot: the line it last heard, and whether its lock sounded. */
   private readonly lineIds: number[] = new Array(MAX_LINES).fill(-1);
   private readonly lineLocked: boolean[] = new Array(MAX_LINES).fill(false);
@@ -211,6 +214,7 @@ export class QuenchAudio {
     }
     this.cold = c;
     this.marks.update(me, this.sink);
+    this.alarm.update(me, this.sink);
   }
 
   dispose(): void {

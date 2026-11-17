@@ -11,6 +11,10 @@
 // ruby rim, a fill heating from a deep red tail to a white-hot tip, a shine climbing it,
 // and a red glow round it that breathes with the pulse.
 //
+// The Guardian of the Quench's blades reuse it whole (quench_fight_fx.ts, the
+// owner's heroic run of 2026-11-17): the arrow over each player a blade has marked
+// for a slash, on the slash mark's aura (`auraId`, a pool sized to its marks).
+//
 // Actionable, so it draws on EVERY tier, the static preset included, and never through
 // the FPS governor; reduced motion holds the bob, pulse and shine (the arrow stays, lit full).
 // It draws over the world (no depth test, the transparent pass's top render order), so a
@@ -114,11 +118,10 @@ interface ArrowSlot {
 
 const _look: RushArrowLook = { y: 0, glow: 1, scale: 1 };
 
-function markOf(e: Entity | undefined) {
+function markOf(e: Entity | undefined, auraId: string) {
   if (!e || e.dead) return null;
   const auras = e.auras;
-  for (let i = 0; i < auras.length; i++)
-    if (auras[i].id === COUNCIL_AURAS.rushMark) return auras[i];
+  for (let i = 0; i < auras.length; i++) if (auras[i].id === auraId) return auras[i];
   return null;
 }
 
@@ -134,11 +137,14 @@ export class CouncilRushArrow {
     uTime: { value: number },
     geometries: THREE.BufferGeometry[],
     materials: THREE.Material[],
+    /** The mark aura it rides (the Rush's by default) and how many at once. */
+    private readonly auraId: string = COUNCIL_AURAS.rushMark,
+    pool: number = POOL,
   ) {
     // One quad; the vertex shader lays it out in view space from its uvs.
     const quad = new THREE.PlaneGeometry(1, 1, 1, 1);
     geometries.push(quad);
-    for (let i = 0; i < POOL; i++) {
+    for (let i = 0; i < pool; i++) {
       const mat = new THREE.ShaderMaterial({
         name: 'smithHeartRushArrow',
         uniforms: {
@@ -203,7 +209,7 @@ export class CouncilRushArrow {
     for (const s of this.slots) {
       if (s.playerId < 0) continue;
       const p = entities.get(s.playerId);
-      const mark = markOf(p);
+      const mark = markOf(p, this.auraId);
       if (!p || !mark) {
         this.free(s);
         continue;
