@@ -11,6 +11,7 @@ import {
 import { directoryArt } from './directory_art.js';
 import { layoutDirectory } from './directory_layout.js';
 import { mountWikiTooltips } from './hover_tooltip.js';
+import { markZoomable, mountImageViewer } from './image_viewer.js';
 import { enhanceItemTables } from './item_table.js';
 import { renderMath, renderScale } from './math.js';
 import { mountRelatedPages, relatedPageIndex } from './related_pages.js';
@@ -243,6 +244,7 @@ export async function openReader({ seedUrl, packed, cardsUrl, packedCards, asset
   const view = document.querySelector('#view'),
     input = document.querySelector('#lookup'),
     nav = document.querySelector('#navigation');
+  mountImageViewer(view, () => view.querySelector('.article-heading h1')?.textContent ?? '');
   const cover = assetUrl('/website-hero-eastbrook-v1.webp');
   const mapUrl = (id) => assetUrl('/map_bg/' + id + '.webp');
   const image = (path, className) =>
@@ -590,6 +592,7 @@ export async function openReader({ seedUrl, packed, cardsUrl, packedCards, asset
         );
       enhanceItemTables(view);
       if (current !== 'All Pages') mountRelatedPages(view, page, related, pages);
+      markZoomable(view);
       loadArt();
       for (const a of view.querySelectorAll('[data-part]')) {
         a.addEventListener('click', (e) => {

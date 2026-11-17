@@ -1692,3 +1692,205 @@ body[data-woc-site] #view table.item-table {
 #view .wiki-box-art .article-art[data-quality="legendary"] {
   border-color: #ff8000;
 }
+
+/* Mechanics: one card per attack (mechanic_cards.js), its snapshot beside its name, text
+   and labelled numbers; bare traits gather into one row of tags under the cards. */
+#view article ul.mechanic-list {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0 18px;
+  padding: 0;
+  list-style: none;
+}
+#view article ul.mechanic-list > li {
+  margin: 0;
+}
+#view article li.mechanic-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold-dim);
+  border-radius: 5px;
+  background: var(--panel);
+}
+#view article li.mechanic-card.has-shot {
+  grid-template-columns: 192px minmax(0, 1fr);
+  align-items: start;
+}
+#view .mechanic-name {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--gold);
+  font-size: 1.02rem;
+  letter-spacing: 0.02em;
+}
+#view .mechanic-text {
+  margin: 0;
+}
+#view .mechanic-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0 0;
+}
+#view .mechanic-stats > div {
+  display: flex;
+  gap: 5px;
+  padding: 3px 8px;
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  background: var(--bg-2);
+  font-size: 0.86rem;
+  line-height: 1.4;
+}
+#view .mechanic-stats dt {
+  color: var(--text-dim);
+}
+#view .mechanic-stats dt::first-letter {
+  text-transform: uppercase;
+}
+#view .mechanic-stats dd {
+  margin: 0;
+  color: var(--text);
+  font-weight: 600;
+}
+#view article li.mechanic-traits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+#view article li.mechanic-traits > span {
+  padding: 3px 10px;
+  border: 1px solid var(--gold-dim);
+  border-radius: 999px;
+  color: var(--gold);
+  font-size: 0.86rem;
+}
+#view article li.mechanic-note {
+  padding: 8px 14px;
+  border-left: 3px solid var(--border);
+  color: var(--text-dim);
+}
+@media (max-width: 640px) {
+  #view article li.mechanic-card.has-shot {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  #view article li.mechanic-card .attack-shot {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+/* Any wiki picture can be opened larger (image_viewer.js). */
+#view img.attack-shot,
+#view .wiki-box-art img,
+#view .wiki-prose img.woc-page-art {
+  cursor: zoom-in;
+}
+.image-viewer {
+  max-width: min(96vw, 1100px);
+  max-height: 94vh;
+  padding: 0;
+  border: 1px solid var(--gold-dim);
+  border-radius: 8px;
+  background: var(--bg-2);
+  color: var(--text);
+  overflow: hidden;
+}
+.image-viewer::backdrop {
+  background: rgb(0 0 0 / 78%);
+}
+.image-viewer figure {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 12px;
+}
+.image-viewer img {
+  display: block;
+  width: min(calc(96vw - 24px), 900px);
+  height: auto;
+  max-height: calc(94vh - 80px);
+  margin: 0 auto;
+  object-fit: contain;
+  cursor: zoom-out;
+}
+.image-viewer figcaption {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  text-align: center;
+}
+.image-viewer-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--panel);
+  color: var(--text);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* Journal flags beside an attack's name, and role tips with their role up front. */
+#view .mechanic-flag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 7px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-dim);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: 2px;
+}
+#view .mechanic-flag.flag-deadly {
+  border-color: var(--bad);
+  color: var(--bad);
+}
+#view .mechanic-flag.flag-important {
+  border-color: var(--gold-dim);
+  color: var(--gold);
+}
+#view .mechanic-flag.flag-interruptible,
+#view .mechanic-flag.flag-cleansable {
+  border-color: var(--good);
+  color: var(--good);
+}
+#view article li.mechanic-tip {
+  display: grid;
+  grid-template-columns: 86px minmax(0, 1fr);
+  gap: 12px;
+  align-items: baseline;
+  padding: 10px 14px;
+  border: 1px solid var(--border-soft);
+  border-radius: 5px;
+  background: var(--bg-2);
+}
+#view .mechanic-role {
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--panel);
+  color: var(--gold);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-align: center;
+  text-transform: uppercase;
+}
+@media (max-width: 640px) {
+  #view article li.mechanic-tip {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+  #view .mechanic-role {
+    justify-self: start;
+  }
+}

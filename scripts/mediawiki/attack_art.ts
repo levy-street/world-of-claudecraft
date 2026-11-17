@@ -38,7 +38,7 @@ export function withAttackShots(text: string, shots: Map<string, string>): strin
       if (!line.startsWith('* ') || line.startsWith('* <woc-art')) return line;
       const body = line.slice(2);
       for (const [name, path] of shots)
-        if (body.startsWith(name + '.'))
+        if (body.startsWith(name + '.') || (/[!?]$/.test(name) && body.startsWith(name + ' ')))
           return '* <woc-art path="' + path + '" size="attack" /> ' + body;
       return line;
     })

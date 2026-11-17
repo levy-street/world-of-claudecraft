@@ -1,5 +1,6 @@
 import { hideSpoilers, organizeReferenceDetails } from './article_disclosures.js';
 import { layoutLoot } from './loot_tabs.js';
+import { layoutMechanics } from './mechanic_cards.js';
 
 // Arrange the rendered wikitext without reinterpreting game values or their links.
 const factSections = {
@@ -232,6 +233,7 @@ export function layoutArticle(view, page, wide, zoneName) {
   }
   layoutLoot(article);
   hideSpoilers(article, page);
+  layoutMechanics(article);
   organizeReferenceDetails(article);
   const toc = contents(article, page.title, wide);
   const front = element('div', 'wiki-opening');

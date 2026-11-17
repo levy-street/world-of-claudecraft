@@ -36,6 +36,14 @@ describe('Encyclopedia boss attack snapshots', () => {
     expect(out).toBe('* Maul Arcade. Not this one.');
   });
 
+  it('matches a name that ends in its own punctuation', () => {
+    const heel = new Map([['Heel!', '/encyclopedia-attacks/beastmaster__heel.webp']]);
+    expect(withAttackShots('* Heel! The hounds return.', heel)).toBe(
+      '* <woc-art path="/encyclopedia-attacks/beastmaster__heel.webp" size="attack" /> Heel! The hounds return.',
+    );
+    expect(withAttackShots('* Heeled. Not this one.', heel)).toBe('* Heeled. Not this one.');
+  });
+
   it('is idempotent', () => {
     const once = withAttackShots('* Maul Arc. Cleave.', shots);
     expect(withAttackShots(once, shots)).toBe(once);

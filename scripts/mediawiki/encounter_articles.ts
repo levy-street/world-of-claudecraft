@@ -20,6 +20,11 @@ function prose(
     ),
   );
 }
+/** Ends a name or clause with one stop: "Heel!" and "How many?" keep their own. */
+export function sentence(text: string): string {
+  return /[.!?]$/.test(text.trim()) ? text.trim() : text.trim() + '.';
+}
+
 export function journalArticles(w: ArticleTools): Map<string, string> {
   const result = new Map<string, string>();
   for (const source of [...DUNGEON_JOURNALS.map(dungeonJournalSource), RAID_JOURNAL_SOURCE]) {
@@ -36,7 +41,7 @@ export function journalArticles(w: ArticleTools): Map<string, string> {
             w.bullets(
               phase.mechanics.map((m) =>
                 [
-                  prose(m.nameKey, m.values, m.percentValues) + '.',
+                  sentence(prose(m.nameKey, m.values, m.percentValues)),
                   prose(m.summaryKey, m.values, m.percentValues),
                   prose(m.responseKey, m.values, m.percentValues),
                   ...(m.flags.length ? ['(' + m.flags.join(', ') + ')'] : []),
@@ -58,10 +63,10 @@ export function journalArticles(w: ArticleTools): Map<string, string> {
             w.bullets(
               view.choices.map((c) =>
                 [
-                  t(c.nameKey),
-                  prose(c.gainKey, c.values, c.percentValues),
-                  prose(c.riskKey, c.values, c.percentValues),
-                ].join('. '),
+                  sentence(t(c.nameKey)),
+                  sentence(prose(c.gainKey, c.values, c.percentValues)),
+                  sentence(prose(c.riskKey, c.values, c.percentValues)),
+                ].join(' '),
               ),
             ),
           );
