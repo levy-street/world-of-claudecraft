@@ -69,6 +69,7 @@ import {
   frostLook,
   holeLook,
   laneDrawnYaw,
+  laneTargetIndex,
   QUENCH_FIGHT_POOLS as P,
   QUENCH_FIGHT_REACH,
   QUENCH_LAKE_CENTRE,
@@ -274,8 +275,13 @@ export class QuenchFightFx {
   /** The marked players this scan, and their sim and drawn spots this frame
    *  (laneDrawnYaw reads them; filled once a frame on the first line). */
   private readonly markedIds: number[] = [];
-  private readonly markedSpots: { simX: number; simZ: number; drawnX: number; drawnZ: number }[] =
-    [];
+  private readonly markedSpots: {
+    id: number;
+    simX: number;
+    simZ: number;
+    drawnX: number;
+    drawnZ: number;
+  }[] = [];
   private markedSeen = false;
   private readonly geometries: THREE.BufferGeometry[] = [];
   private readonly materials: THREE.Material[] = [];
@@ -1029,7 +1035,12 @@ export class QuenchFightFx {
       }
       // Its warning as it is drawn and its lock, at the blade (the sound's).
       const ly = this.groundY(lane.pos.x, lane.pos.z);
-      this.audio.line(li, l.id, lane.pos.x, ly, lane.pos.z, this.clock - l.born, lof.seconds);
+      // Its sound in the marked player's own ear only (the line and the arrow
+      // over them are the raid's).
+      const marked = this.markedAt(world);
+      const target = laneTargetIndex(lane.pos.x, lane.pos.z, lane.facing, marked);
+      const mine = target >= 0 && marked[target].id === world.playerId;
+      this.audio.line(li, l.id, lane.pos.x, ly, lane.pos.z, this.clock - l.born, lof.seconds, mine);
       this.kit.drapeLane(
         l.lane,
         this.groundY,
@@ -1391,6 +1402,7 @@ export class QuenchFightFx {
   /** The marked players' sim and drawn spots this frame (allocation-free
    *  after the first frames). */
   private markedAt(world: IWorld): readonly {
+    id: number;
     simX: number;
     simZ: number;
     drawnX: number;
@@ -1404,8 +1416,9 @@ export class QuenchFightFx {
       if (!e || e.dead) continue;
       const at = fxAnchor(e);
       if (n >= this.markedSpots.length)
-        this.markedSpots.push({ simX: 0, simZ: 0, drawnX: 0, drawnZ: 0 });
+        this.markedSpots.push({ id: -1, simX: 0, simZ: 0, drawnX: 0, drawnZ: 0 });
       const m = this.markedSpots[n++];
+      m.id = id;
       m.simX = e.pos.x;
       m.simZ = e.pos.z;
       m.drawnX = at.x;

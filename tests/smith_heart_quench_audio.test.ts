@@ -196,20 +196,34 @@ describe('smith_heart_quench_audio', () => {
     const audio = new QuenchAudio(sink);
     const g = body(9, 0, 0);
     audio.update(g, null, null);
-    audio.line(0, 77, 5, 0, 6, 0, 3);
-    audio.line(0, 77, 5, 0, 6, 1, 3);
+    audio.line(0, 77, 5, 0, 6, 0, 3, true);
+    audio.line(0, 77, 5, 0, 6, 1, 3, true);
     expect(plays.map((p) => p.key)).toEqual([QUENCH_SLASH_SOUNDS.warn.key]);
     expect(plays[0]).toMatchObject({ x: 5, z: 6 });
-    audio.line(0, 77, 5, 0, 6, 2.3, 3);
-    audio.line(0, 77, 5, 0, 6, 2.6, 3);
+    audio.line(0, 77, 5, 0, 6, 2.3, 3, true);
+    audio.line(0, 77, 5, 0, 6, 2.6, 3, true);
     expect(plays.map((p) => p.key)).toEqual([
       QUENCH_SLASH_SOUNDS.warn.key,
       QUENCH_SLASH_SOUNDS.lock.key,
     ]);
     // A new line in the same slot warns again; a line first seen locked never does.
-    audio.line(0, 78, 5, 0, 6, 0, 3);
-    audio.line(1, 79, 5, 0, 6, 2.9, 3);
+    audio.line(0, 78, 5, 0, 6, 0, 3, true);
+    audio.line(1, 79, 5, 0, 6, 2.9, 3, true);
     expect(plays.filter((p) => p.key === QUENCH_SLASH_SOUNDS.warn.key)).toHaveLength(2);
+  });
+
+  it("sounds a line's warning and lock only for the player it is aimed at", () => {
+    // The owner's online run of 2026-11-17: the raid sees the line and the
+    // arrow, the marked alone hears the call (the Rush's mark is the same).
+    const { sink, plays } = fakeSink();
+    const audio = new QuenchAudio(sink);
+    audio.update(body(9, 0, 0), null, null);
+    audio.line(0, 81, 5, 0, 6, 0, 3, false);
+    audio.line(0, 81, 5, 0, 6, 1, 3, false);
+    audio.line(0, 81, 5, 0, 6, 2.6, 3, false);
+    expect(plays).toHaveLength(0);
+    audio.line(1, 82, 5, 0, 6, 0, 3, true);
+    expect(plays.map((p) => p.key)).toEqual([QUENCH_SLASH_SOUNDS.warn.key]);
   });
 
   it('runs The Blades Hunt as a loop through its bar, its own lines quiet', () => {
@@ -220,8 +234,8 @@ describe('smith_heart_quench_audio', () => {
     audio.update(hunt, null, null);
     expect(plays.filter((p) => p.key === QUENCH_HUNT_SOUNDS.start.key)).toHaveLength(1);
     expect([...loops.values()]).toEqual([QUENCH_HUNT_SOUNDS.loop.key]);
-    audio.line(0, 90, 1, 0, 1, 0, 1);
-    audio.line(0, 90, 1, 0, 1, 0.5, 1);
+    audio.line(0, 90, 1, 0, 1, 0, 1, true);
+    audio.line(0, 90, 1, 0, 1, 0.5, 1, true);
     expect(plays.some((p) => p.key === QUENCH_SLASH_SOUNDS.warn.key)).toBe(false);
     expect(plays.some((p) => p.key === QUENCH_SLASH_SOUNDS.lock.key)).toBe(false);
     audio.update(body(9, 0, 0), null, null);
@@ -237,5 +251,20 @@ describe('smith_heart_quench_audio', () => {
       });
     for (const on of [false, true, true, false, true]) audio.update(body(9, 0, 0), marked(on), 0);
     expect(plays.filter((p) => p.key === 'heart_mark_frost')).toHaveLength(2);
+  });
+
+  it("sounds the war horn with the mark, in the marked player's ear only (as the Rush)", () => {
+    const { sink, plays } = fakeSink();
+    const audio = new QuenchAudio(sink);
+    const me = (on: boolean) =>
+      body(1, 4, 5, {
+        auras: (on ? [{ id: QUENCH_AURAS.marked }] : []) as unknown as Entity['auras'],
+      });
+    // Someone else marked (the local player not): silence, the arrow alone.
+    audio.update(body(9, 0, 0), me(false), 0);
+    expect(plays).toHaveLength(0);
+    audio.update(body(9, 0, 0), me(true), 0);
+    expect(plays.map((p) => p.key).sort()).toEqual(['heart_mark_frost', 'ui_aura_blaring_horn']);
+    expect(plays.every((p) => p.x === 4 && p.z === 5)).toBe(true);
   });
 });

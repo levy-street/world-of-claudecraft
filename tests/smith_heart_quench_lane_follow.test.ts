@@ -47,3 +47,21 @@ describe('the slash line follows the drawn body', () => {
     expect(src).toMatch(/markedAt\(world: IWorld\)[\s\S]*fxAnchor\(e\)/);
   });
 });
+
+describe("the slash line's sound: the marked player's alone", () => {
+  it('names the marked player the line is aimed at', async () => {
+    const { laneTargetIndex } = await import('../src/render/smith_heart_fx/quench_fight_fx_core');
+    const marks = [
+      { simX: 0, simZ: 20 },
+      { simX: 20, simZ: 0 },
+    ];
+    expect(laneTargetIndex(0, 0, Math.atan2(20, 0), marks)).toBe(1);
+    expect(laneTargetIndex(0, 0, 0.02, marks)).toBe(0);
+    expect(laneTargetIndex(0, 0, 0, [])).toBe(-1);
+  });
+
+  it('the fight passes `mine` from the local player being that target', () => {
+    const src = readFileSync('src/render/smith_heart_fx/quench_fight_fx.ts', 'utf8');
+    expect(src).toContain('marked[target].id === world.playerId');
+  });
+});

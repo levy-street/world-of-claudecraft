@@ -113,8 +113,11 @@ export class QuenchAudio {
   /**
    * A slash's line in painter slot `slot` this frame: its object `id` at its
    * blade (x, y, z), `elapsed` seconds into its `seconds` of warning. Its
-   * warning sounds as it is drawn, its lock as it locks. The Blades Hunt's own
-   * lines stay quiet here (its loop is their warning).
+   * warning sounds as it is drawn, its lock as it locks, in the ear of the
+   * player it is aimed at ONLY (`mine`): the raid sees the line and the arrow
+   * over the marked, the marked alone hears the call (the owner's online run
+   * of 2026-11-17; the Rush's mark is the same). The Blades Hunt's own lines
+   * stay quiet here (its loop is their warning).
    */
   line(
     slot: number,
@@ -124,12 +127,13 @@ export class QuenchAudio {
     z: number,
     elapsed: number,
     seconds: number,
+    mine = false,
   ): void {
     if (slot < 0 || slot >= MAX_LINES) return;
     if (this.lineIds[slot] !== id) {
       this.lineIds[slot] = id;
       this.lineLocked[slot] = slashLocked(elapsed, seconds);
-      if (!this.hunting && !this.lineLocked[slot]) {
+      if (mine && !this.hunting && !this.lineLocked[slot]) {
         this.preload();
         const s = QUENCH_SLASH_SOUNDS.warn;
         this.sink.playAt(s.key, x, y + 2, z, {
@@ -143,7 +147,7 @@ export class QuenchAudio {
     }
     if (this.lineLocked[slot] || !slashLocked(elapsed, seconds)) return;
     this.lineLocked[slot] = true;
-    if (this.hunting) return;
+    if (this.hunting || !mine) return;
     const s = QUENCH_SLASH_SOUNDS.lock;
     this.sink.playAt(s.key, x, y + 2, z, {
       gain: s.gain,

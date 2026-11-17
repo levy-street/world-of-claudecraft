@@ -455,3 +455,28 @@ export function laneDrawnYaw(
   if (dx * dx + dz * dz < 1e-4) return simYaw;
   return Math.atan2(dx, dz);
 }
+
+/** Which of `marks` a slash line at (laneX, laneZ) with sim yaw `simYaw` is
+ *  aimed at: the one whose sim spot lies nearest its line's bearing, or -1
+ *  with none (its warning's sound is that player's alone). Pure. */
+export function laneTargetIndex(
+  laneX: number,
+  laneZ: number,
+  simYaw: number,
+  marks: readonly { simX: number; simZ: number }[],
+): number {
+  let best = -1;
+  let bestDiff = Number.POSITIVE_INFINITY;
+  for (let i = 0; i < marks.length; i++) {
+    const dx = marks[i].simX - laneX;
+    const dz = marks[i].simZ - laneZ;
+    if (dx * dx + dz * dz < 1e-4) continue;
+    const yaw = Math.atan2(dx, dz);
+    const diff = Math.abs(Math.atan2(Math.sin(yaw - simYaw), Math.cos(yaw - simYaw)));
+    if (diff < bestDiff) {
+      bestDiff = diff;
+      best = i;
+    }
+  }
+  return best;
+}
