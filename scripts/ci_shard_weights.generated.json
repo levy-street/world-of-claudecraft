@@ -2,8 +2,8 @@
   "__provenance": {
     "run": "40304367651",
     "harvested": "2026-10-26",
-    "files": 6161,
-    "harvestedFiles": 6161,
+    "files": 6160,
+    "harvestedFiles": 6160,
     "carried": {}
   },
   "tests/_debug_i18n.test.ts": 142,
@@ -4282,7 +4282,6 @@
   "tests/reputation_tab_html.test.ts": 23,
   "tests/reputation_view.test.ts": 9,
   "tests/required_views_core.test.ts": 6,
-  "tests/reserved_elemental_arms.test.ts": 2182,
   "tests/reserved_singleton_entity_ids.test.ts": 2223,
   "tests/reset_cooldown_policy.test.ts": 8,
   "tests/reset_day_guard.test.ts": 1958,
