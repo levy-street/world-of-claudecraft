@@ -110,7 +110,7 @@ import {
 } from './heat_wellspawn';
 import { startWheel, stepWheel } from './heat_wheel';
 import { clearZones, startZones, stepZones } from './heat_zones';
-import { applyTierHealth, restoreTierHealth, tierPoolMult } from './tier_health';
+import { applyTierHealth, restoreTierHealth, showTierHealth, tierPoolMult } from './tier_health';
 import { applyTierSwing, restoreTierSwing } from './tier_swing';
 import { freshSlainWatch } from './voice_slain';
 
@@ -513,6 +513,9 @@ export function tickHeatGuardian(ctx: SimContext, inst: InstanceSlot): void {
     if (st0 && !st0.finished) finishHeat(ctx, inst, boss, st0);
     return;
   }
+  // At rest: the tier's real pool on show from the start (tier_health.ts).
+  if (!st0 && !fighting(boss))
+    showTierHealth(boss, tierPoolMult(inst, HEAT_DIFFICULTY[heatDifficulty(inst)].healthMult));
   // Its entrance holds it out of reach until the scene ends.
   if (stepHeatIntro(ctx, inst, boss, fighting(boss))) return;
   if (!fighting(boss)) {

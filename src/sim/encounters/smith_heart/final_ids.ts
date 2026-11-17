@@ -278,6 +278,9 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     damageMult: 1.15,
     punishMult: 1,
     swingMult: 1.15,
+    // The pools of 2026-11-17 (real parses: a human raid of ten deals about
+    // 1,400 DPS; Normal about 4 to 4.5 minutes of uptime, Heroic about 5,
+    // Mythic about 7, the fight's own downtime counted; smith_heart.md).
     healthMult: 1,
     burstTier: 'survivable',
     switchShock: false,
@@ -305,7 +308,10 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     damageMult: 1.1,
     punishMult: 1.1,
     swingMult: 1,
-    healthMult: 2.28,
+    // The pools of 2026-11-17 (real parses: a human raid of ten deals about
+    // 1,400 DPS; Normal about 4 to 4.5 minutes of uptime, Heroic about 5,
+    // Mythic about 7, the fight's own downtime counted; smith_heart.md).
+    healthMult: 1.14,
     burstTier: 'heavy',
     switchShock: true,
     embers: true,
@@ -328,7 +334,10 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     damageMult: 1.3,
     punishMult: 1.3,
     swingMult: 1,
-    healthMult: 2.28,
+    // The pools of 2026-11-17 (real parses: a human raid of ten deals about
+    // 1,400 DPS; Normal about 4 to 4.5 minutes of uptime, Heroic about 5,
+    // Mythic about 7, the fight's own downtime counted; smith_heart.md).
+    healthMult: 1.35,
     burstTier: 'lethal',
     switchShock: true,
     embers: true,

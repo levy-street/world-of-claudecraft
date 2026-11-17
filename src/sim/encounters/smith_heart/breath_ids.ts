@@ -385,6 +385,9 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
     damageMult: 1.15,
     punishMult: 1,
     swingMult: 1.15,
+    // The pools of 2026-11-17 (real parses: a human raid of ten deals about
+    // 1,400 DPS; Normal about 4 to 4.5 minutes of uptime, Heroic about 5,
+    // Mythic about 7, the fight's own downtime counted; smith_heart.md).
     healthMult: 1,
     addHealthMult: 1.2,
     calmSpent: false,
@@ -417,7 +420,10 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
     damageMult: 1.5625,
     punishMult: 1.25,
     swingMult: 1.25,
-    healthMult: 1.79,
+    // The pools of 2026-11-17 (real parses: a human raid of ten deals about
+    // 1,400 DPS; Normal about 4 to 4.5 minutes of uptime, Heroic about 5,
+    // Mythic about 7, the fight's own downtime counted; smith_heart.md).
+    healthMult: 1.09,
     addHealthMult: 1.625,
     calmSpent: true,
     looseGales: true,
@@ -450,7 +456,10 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
     damageMult: 1.5625,
     punishMult: 1.25,
     swingMult: 1.25,
-    healthMult: 1.79,
+    // The pools of 2026-11-17 (real parses: a human raid of ten deals about
+    // 1,400 DPS; Normal about 4 to 4.5 minutes of uptime, Heroic about 5,
+    // Mythic about 7, the fight's own downtime counted; smith_heart.md).
+    healthMult: 1.61,
     addHealthMult: 1.625,
     calmSpent: true,
     looseGales: true,

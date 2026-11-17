@@ -132,7 +132,7 @@ import {
 } from './council_wrath';
 import { breakFeat, COUNCIL_FEAT_FALL_WINDOW, countFeat } from './feat_attempt';
 import { settleSmithHeartFeat } from './feats';
-import { applyTierHealth, restoreTierHealth, tierPoolMult } from './tier_health';
+import { applyTierHealth, restoreTierHealth, showTierHealth, tierPoolMult } from './tier_health';
 import { applyTierSwing, restoreTierSwing } from './tier_swing';
 import { freshSlainWatch } from './voice_slain';
 
@@ -576,6 +576,14 @@ export function tickHammerCouncil(ctx: SimContext, inst: InstanceSlot): void {
     return;
   }
   const engaged = alive.some((r) => fighting(bodies[r]));
+  // At rest: the tier's real pools on show from the start (tier_health.ts).
+  if (!st0 && !engaged) {
+    const mult = tierPoolMult(inst, COUNCIL_DIFFICULTY[councilDifficulty(inst)].healthMult);
+    for (const r of alive) {
+      const b = bodies[r];
+      if (b) showTierHealth(b, mult);
+    }
+  }
   // The entrance holds both out of reach until the scene ends.
   if (stepCouncilIntro(ctx, inst, bodies, engaged)) return;
   if (!engaged) {

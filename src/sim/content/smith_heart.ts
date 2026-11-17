@@ -337,7 +337,7 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // Rush). Hammerfall, its
   // frontal arc, stays: it reads well and keeps the raid off the tank's side.
   heart_hammer_guardian: {
-    ...boss('heart_hammer_guardian', 'Guardian of the Hammer', 64800, 0x8a6430, 3.2),
+    ...boss('heart_hammer_guardian', 'Guardian of the Hammer', 83800, 0x8a6430, 3.2),
     ccImmune: true,
     slowImmune: true,
     arcCleave: { every: 3, arcDeg: 110, range: 9, mult: 0.7, name: 'Hammerfall' },
@@ -354,7 +354,7 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // pressure is her bars. She carries the heir's Wrath declaration (the
   // Guardian fallen, she takes the Wrath).
   heart_seam_singer: {
-    ...boss('heart_seam_singer', 'The Seam Singer', 55200, 0xd8a24a, 2.0),
+    ...boss('heart_seam_singer', 'The Seam Singer', 71400, 0xd8a24a, 2.0),
     ccImmune: true,
     slowImmune: true,
     dmgBase: 24,
@@ -380,7 +380,7 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // record stays the look's numbers: the whole Cornice, the throw). Storm
   // Lance stays the trash kit's own line, on its own clock.
   heart_breath_guardian: {
-    ...boss('heart_breath_guardian', 'Guardian of the Breath', 96000, 0x5ab8e8, 3.4),
+    ...boss('heart_breath_guardian', 'Guardian of the Breath', 140000, 0x5ab8e8, 3.4),
     ccImmune: true,
     slowImmune: true,
     // Its own model stands some eighteen yards tall: melee strikes the body of
@@ -430,7 +430,7 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // Breath is encounter-driven (the fight starts and lands it on its own
   // clock; the record keeps the look's numbers).
   heart_quench_guardian: {
-    ...boss('heart_quench_guardian', 'Guardian of the Quench', 134400, 0x9ad8ff, 3),
+    ...boss('heart_quench_guardian', 'Guardian of the Quench', 155200, 0x9ad8ff, 3),
     ccImmune: true,
     slowImmune: true,
     // Her own model stands some eleven yards tall: her fists settle the tank
@@ -474,7 +474,7 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // stacking burn on every landed swing (the stackPoison seam), so the tanks
   // swap; every other mechanic is the encounter's.
   heart_heat_guardian: {
-    ...boss('heart_heat_guardian', 'Guardian of the Heat', 92400, 0xffe6a0, HEAT_GUARDIAN_SCALE),
+    ...boss('heart_heat_guardian', 'Guardian of the Heat', 124350, 0xffe6a0, HEAT_GUARDIAN_SCALE),
     ccImmune: true,
     slowImmune: true,
     bodyRadius: HEARTH_WELL.r,
@@ -612,7 +612,7 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
     },
   },
   heart_masterless_strength: {
-    ...boss('heart_masterless_strength', 'The Masterless Strength', 86400, 0xd8c8a0, 3.6),
+    ...boss('heart_masterless_strength', 'The Masterless Strength', 138250, 0xd8c8a0, 3.6),
     // Its essence flees at its fall; the remnant it leaves is a personal quest drop for
     // everyone on the entrance's essence quest (content/smith_heart_rewards.ts).
     loot: [{ itemId: SMITH_HEART_ESSENCE_ITEM, chance: 1, questId: SMITH_HEART_ESSENCE_QUEST }],

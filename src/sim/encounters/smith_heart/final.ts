@@ -131,7 +131,7 @@ import {
 } from './final_scope';
 import type { FinalFightState, FinalKitClocks } from './final_state';
 import { finalSay, freshFinalVoice, stepFinalVoice } from './final_voice';
-import { applyTierHealth, restoreTierHealth, tierPoolMult } from './tier_health';
+import { applyTierHealth, restoreTierHealth, showTierHealth, tierPoolMult } from './tier_health';
 import { applyTierSwing, restoreTierSwing } from './tier_swing';
 
 // ---- the dev difficulty switch ------------------------------------------------------------
@@ -441,6 +441,9 @@ export function tickFinalBoss(ctx: SimContext, inst: InstanceSlot): void {
     if (st0 && !st0.finished) finishFinal(ctx, inst, boss, st0);
     return;
   }
+  // At rest: the tier's real pool on show from the start (tier_health.ts).
+  if (!st0 && !fighting(boss))
+    showTierHealth(boss, tierPoolMult(inst, FINAL_DIFFICULTY[finalDifficulty(inst)].healthMult));
   if (!fighting(boss)) {
     if (st0) {
       // The raid lies still on the Anvil: it says so.

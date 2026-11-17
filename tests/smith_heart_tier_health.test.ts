@@ -57,56 +57,40 @@ describe("Smith's Heart: a boss's pool per tier", () => {
     }
   });
 
-  it('the parse-calibrated pass of 2026-11-16: every pool per tier', () => {
+  it('the pass of 2026-11-17 (a 1,400 DPS raid): every pool per tier', () => {
     const hp = (id: string) => SMITH_HEART_MOBS[id].hpBase;
-    // Normal: the template bases, each +20 percent over the 2026-11-12 pass.
-    const normal: Record<string, [number, number]> = {
-      heart_hammer_guardian: [54000, 64800],
-      heart_seam_singer: [46000, 55200],
-      heart_breath_guardian: [80000, 96000],
-      heart_quench_guardian: [112000, 134400],
-      heart_heat_guardian: [77000, 92400],
-      heart_masterless_strength: [72000, 86400],
+    // Normal: the template bases (smith_heart_pools_1117.test.ts checks the clock).
+    expect({
+      heart_hammer_guardian: hp('heart_hammer_guardian'),
+      heart_seam_singer: hp('heart_seam_singer'),
+      heart_breath_guardian: hp('heart_breath_guardian'),
+      heart_quench_guardian: hp('heart_quench_guardian'),
+      heart_heat_guardian: hp('heart_heat_guardian'),
+      heart_masterless_strength: hp('heart_masterless_strength'),
+    }).toEqual({
+      heart_hammer_guardian: 83800,
+      heart_seam_singer: 71400,
+      heart_breath_guardian: 140000,
+      heart_quench_guardian: 155200,
+      heart_heat_guardian: 124350,
+      heart_masterless_strength: 138250,
+    });
+    const rows = {
+      council: COUNCIL_DIFFICULTY,
+      breath: BREATH_DIFFICULTY,
+      quench: QUENCH_DIFFICULTY,
+      heat: HEAT_DIFFICULTY,
+      final: FINAL_DIFFICULTY,
     };
-    for (const [id, [was, now]] of Object.entries(normal)) {
-      expect(hp(id), id).toBe(now);
-      expect(now / was, id).toBeCloseTo(1.2, 6);
-    }
-    // Heroic: +30 percent over the old Heroic pool (the base's +20 percent
-    // times the multiplier's 1.30/1.20), within a hundredth.
-    const heroic: [string, readonly string[], number, number][] = [
-      [
-        'council',
-        ['heart_hammer_guardian', 'heart_seam_singer'],
-        1.85,
-        COUNCIL_DIFFICULTY.heroic.healthMult,
-      ],
-      ['breath', ['heart_breath_guardian'], 1.65, BREATH_DIFFICULTY.heroic.healthMult],
-      ['quench', ['heart_quench_guardian'], 2.0, QUENCH_DIFFICULTY.heroic.healthMult],
-      ['heat', ['heart_heat_guardian'], 1.2, HEAT_DIFFICULTY.heroic.healthMult],
-      ['final', ['heart_masterless_strength'], 2.1, FINAL_DIFFICULTY.heroic.healthMult],
-    ];
-    expect(heroic.map(([k, , , m]) => [k, m])).toEqual([
-      ['council', 2.0],
-      ['breath', 1.79],
-      ['quench', 2.17],
-      ['heat', 1.3],
-      ['final', 2.28],
+    expect(
+      Object.entries(rows).map(([k, r]) => [k, r.heroic.healthMult, r.mythic.healthMult]),
+    ).toEqual([
+      ['council', 1.18, 1.65],
+      ['breath', 1.09, 1.61],
+      ['quench', 1.18, 1.65],
+      ['heat', 1.22, 1.81],
+      ['final', 1.14, 1.35],
     ]);
-    for (const [key, ids, oldMult, mult] of heroic) {
-      const was = ids.reduce((sum, id) => sum + normal[id][0], 0) * oldMult;
-      const now = ids.reduce((sum, id) => sum + normal[id][1], 0) * mult;
-      expect(Math.abs(now / was - 1.3), key).toBeLessThan(0.01);
-    }
-    // Mythic: Heroic's pool on every boss.
-    for (const rows of [
-      COUNCIL_DIFFICULTY,
-      BREATH_DIFFICULTY,
-      QUENCH_DIFFICULTY,
-      HEAT_DIFFICULTY,
-      FINAL_DIFFICULTY,
-    ])
-      expect(rows.mythic.healthMult).toBe(rows.heroic.healthMult);
     // The adds whose health is the tier's: the Splinters and the isles' adds.
     expect(FINAL_PHASE_DIFFICULTY.normal.addHealth).toBe(6000);
     expect(FINAL_PHASE_DIFFICULTY.heroic.addHealth).toBe(7150);
@@ -127,8 +111,9 @@ describe("Smith's Heart: a boss's pool per tier", () => {
     for (const p of f.players) f.sim.ctx.handleDeath(p, f.boss());
     f.tick(60, false);
     expect(f.state()).toBeNull();
-    expect(f.boss().maxHp).toBe(base);
-    expect(f.boss().hp).toBe(base);
+    // At rest again it shows its tier's real pool, whole (showTierHealth).
+    expect(f.boss().maxHp).toBe(Math.round(base * QUENCH_DIFFICULTY.heroic.healthMult));
+    expect(f.boss().hp).toBe(f.boss().maxHp);
   });
 
   it('the dev pool scale (the bot raid human-equivalent check) multiplies the tier pool, and 1 clears it', () => {
@@ -141,7 +126,7 @@ describe("Smith's Heart: a boss's pool per tier", () => {
     expect(f.boss().maxHp).toBe(Math.round(base * QUENCH_DIFFICULTY.heroic.healthMult * 0.65));
     for (const p of f.players) f.sim.ctx.handleDeath(p, f.boss());
     f.tick(60, false);
-    expect(f.boss().maxHp).toBe(base);
+    expect(f.boss().maxHp).toBe(Math.round(base * QUENCH_DIFFICULTY.heroic.healthMult * 0.65));
     expect(f.dev('/dev heart pool 1')).toBe(true);
   });
 

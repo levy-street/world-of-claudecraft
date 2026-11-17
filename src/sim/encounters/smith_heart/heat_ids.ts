@@ -246,6 +246,9 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     damageMult: 1.15,
     punishMult: 1,
     swingMult: 1.15,
+    // The pools of 2026-11-17 (real parses: a human raid of ten deals about
+    // 1,400 DPS; Normal about 4 to 4.5 minutes of uptime, Heroic about 5,
+    // Mythic about 7, the fight's own downtime counted; smith_heart.md).
     healthMult: 1,
     overflowAdds: false,
     seedHatch: false,
@@ -266,7 +269,10 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     swingMult: 1.15,
     // 1.45 to 1.2 with the base raised to 77,000 (2026-11-12): the Heroic
     // pool stays about where it was (92,800 to 92,400 base).
-    healthMult: 1.3,
+    // The pools of 2026-11-17 (real parses: a human raid of ten deals about
+    // 1,400 DPS; Normal about 4 to 4.5 minutes of uptime, Heroic about 5,
+    // Mythic about 7, the fight's own downtime counted; smith_heart.md).
+    healthMult: 1.22,
     overflowAdds: true,
     seedHatch: true,
     bolts: 3,
@@ -281,7 +287,10 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     damageMult: 1.4375,
     punishMult: 1.25,
     swingMult: 1.15,
-    healthMult: 1.3,
+    // The pools of 2026-11-17 (real parses: a human raid of ten deals about
+    // 1,400 DPS; Normal about 4 to 4.5 minutes of uptime, Heroic about 5,
+    // Mythic about 7, the fight's own downtime counted; smith_heart.md).
+    healthMult: 1.81,
     overflowAdds: true,
     seedHatch: true,
     bolts: 3,

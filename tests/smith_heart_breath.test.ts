@@ -828,7 +828,12 @@ describe('Guardian of the Breath: heroic', () => {
       ...BREATH_DIFFICULTY.heroic,
       stormHeart: BREATH_DIFFICULTY.mythic.stormHeart,
       windwornSeconds: 150,
+      // Its own pool since 2026-11-17 (about 7 minutes, Heroic about 5).
+      healthMult: BREATH_DIFFICULTY.mythic.healthMult,
     });
+    expect(BREATH_DIFFICULTY.mythic.healthMult).toBeGreaterThan(
+      BREATH_DIFFICULTY.heroic.healthMult,
+    );
     // Heroic carries the Knotted Gale too (2026-11-08), a different row; Normal none.
     expect(BREATH_DIFFICULTY.heroic.stormHeart).not.toBeNull();
     expect(BREATH_DIFFICULTY.heroic.stormHeart).not.toEqual(BREATH_DIFFICULTY.mythic.stormHeart);

@@ -118,7 +118,7 @@ import type { QuenchFightState } from './quench_state';
 import { watchStrikeWindup } from './quench_strike_windup';
 import { watchTemperingStrike } from './quench_temper';
 import { quenchSay, watchQuenchSlain } from './quench_voice';
-import { applyTierHealth, restoreTierHealth, tierPoolMult } from './tier_health';
+import { applyTierHealth, restoreTierHealth, showTierHealth, tierPoolMult } from './tier_health';
 import { applyTierSwing, restoreTierSwing } from './tier_swing';
 import { freshSlainWatch } from './voice_slain';
 
@@ -387,6 +387,9 @@ export function tickQuenchGuardian(ctx: SimContext, inst: InstanceSlot): void {
     if (st0 && !st0.finished) finishQuench(ctx, inst, boss, st0);
     return;
   }
+  // At rest: the tier's real pool on show from the start (tier_health.ts).
+  if (!st0 && !fighting(boss))
+    showTierHealth(boss, tierPoolMult(inst, QUENCH_DIFFICULTY[quenchDifficulty(inst)].healthMult));
   // Her entrance holds her out of reach until the scene ends.
   if (stepQuenchIntro(ctx, inst, boss, fighting(boss))) return;
   if (!fighting(boss)) {

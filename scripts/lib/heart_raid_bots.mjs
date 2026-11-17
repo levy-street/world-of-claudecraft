@@ -61,9 +61,12 @@ export const LOG_DIR = process.env.LOG_DIR ?? 'tmp/heart_raid';
 /** A key mechanic the raid ignores on purpose (the proof that it matters). */
 export const IGNORE = (process.env.IGNORE ?? '').toLowerCase();
 export const HEROIC_PLUS = DIFF !== 'normal';
-/** POOL=0.65: every boss pool of the run times 0.65 (`/dev heart pool`), the
- *  human-equivalent check: the bots deal about 65 percent of a decent human
- *  raid's damage, so the fight then runs on a human raid's clock. */
+/** POOL=k: every boss pool of the run times k (`/dev heart pool`), the
+ *  human-equivalent check. The pools of 2026-11-17 are set for a human raid of
+ *  ten at about 1,400 DPS (the Varkhul parses): Normal about 4 to 4.5 minutes,
+ *  Heroic about 5, Mythic about 7 (smith_heart.md). Set k to the bots' own
+ *  raid DPS over 1,400 (read it off a run's log) and the fight runs on a human
+ *  raid's clock; 0.65 was the old guess against the assumed 1,170. */
 export const POOL = Number(process.env.POOL ?? 1);
 let seed = Number(process.env.SEED ?? Date.now()) >>> 0;
 /** mulberry32: the script's own rolls (kick fumbles, reaction times, slips). */

@@ -259,6 +259,9 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
     // (1.75 x 0.657).
     damageMult: 1.75,
     swingMult: 1.75,
+    // The pools of 2026-11-17 (real parses: a human raid of ten deals about
+    // 1,400 DPS; Normal about 4 to 4.5 minutes of uptime, Heroic about 5,
+    // Mythic about 7, the fight's own downtime counted; smith_heart.md).
     healthMult: 1,
     shatterMult: 1.15 / 1.75,
     splashR: 6,
@@ -290,7 +293,10 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
     swingMult: 1.75,
     // 2.2 to 2.0 with the base raised to 112,000 (the balance pass of
     // 2026-11-12): about 6 to 7 minutes at human pace.
-    healthMult: 2.17,
+    // The pools of 2026-11-17 (real parses: a human raid of ten deals about
+    // 1,400 DPS; Normal about 4 to 4.5 minutes of uptime, Heroic about 5,
+    // Mythic about 7, the fight's own downtime counted; smith_heart.md).
+    healthMult: 1.18,
     shatterMult: 2.5 / 1.75,
     splashR: 10,
     splashCold: 55,
@@ -320,7 +326,10 @@ export const QUENCH_DIFFICULTY: Readonly<Record<QuenchDifficulty, QuenchDifficul
     // Heroic's numbers of 2026-11-16 (the heroic row whole).
     damageMult: 1.75,
     swingMult: 1.75,
-    healthMult: 2.17,
+    // The pools of 2026-11-17 (real parses: a human raid of ten deals about
+    // 1,400 DPS; Normal about 4 to 4.5 minutes of uptime, Heroic about 5,
+    // Mythic about 7, the fight's own downtime counted; smith_heart.md).
+    healthMult: 1.65,
     // Heroic's doubled shatter (never softer than Heroic, 2026-11-12).
     shatterMult: 2.5 / 1.75,
     splashR: 10,

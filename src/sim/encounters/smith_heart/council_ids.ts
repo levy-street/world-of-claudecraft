@@ -361,6 +361,9 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     damageMult: 1.15,
     punishMult: 1,
     swingMult: 1.15,
+    // The pools of 2026-11-17 (real parses: a human raid of ten deals about
+    // 1,400 DPS; Normal about 4 to 4.5 minutes of uptime, Heroic about 5,
+    // Mythic about 7, the fight's own downtime counted; smith_heart.md).
     healthMult: 1,
     wrathMult: 1,
     heirWrathMult: 1,
@@ -390,7 +393,10 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     damageMult: 1.25,
     punishMult: 1.25,
     swingMult: 1,
-    healthMult: 2.0,
+    // The pools of 2026-11-17 (real parses: a human raid of ten deals about
+    // 1,400 DPS; Normal about 4 to 4.5 minutes of uptime, Heroic about 5,
+    // Mythic about 7, the fight's own downtime counted; smith_heart.md).
+    healthMult: 1.18,
     wrathMult: 6.3,
     heirWrathMult: 2,
     crowdShare: 0.2,
@@ -420,7 +426,10 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     damageMult: 1.25,
     punishMult: 1.25,
     swingMult: 1,
-    healthMult: 2.0,
+    // The pools of 2026-11-17 (real parses: a human raid of ten deals about
+    // 1,400 DPS; Normal about 4 to 4.5 minutes of uptime, Heroic about 5,
+    // Mythic about 7, the fight's own downtime counted; smith_heart.md).
+    healthMult: 1.65,
     wrathMult: 6.3,
     heirWrathMult: 2,
     crowdShare: 0.2,

@@ -123,7 +123,7 @@ import { breathSay, THESSALY_PULL_DELAY, watchBreathSlain } from './breath_voice
 import { stepOverLip, stepVoidDeaths, tetherGuardian } from './breath_void';
 import { breakFeat } from './feat_attempt';
 import { settleSmithHeartFeat } from './feats';
-import { applyTierHealth, restoreTierHealth, tierPoolMult } from './tier_health';
+import { applyTierHealth, restoreTierHealth, showTierHealth, tierPoolMult } from './tier_health';
 import { applyTierSwing, restoreTierSwing } from './tier_swing';
 import { freshSlainWatch } from './voice_slain';
 
@@ -403,6 +403,9 @@ export function tickBreathGuardian(ctx: SimContext, inst: InstanceSlot): void {
     if (st0 && !st0.finished) finishBreath(ctx, inst, boss, st0);
     return;
   }
+  // At rest: the tier's real pool on show from the start (tier_health.ts).
+  if (!st0 && !fighting(boss))
+    showTierHealth(boss, tierPoolMult(inst, BREATH_DIFFICULTY[breathDifficulty(inst)].healthMult));
   // The entrance holds it out of reach until the scene ends.
   if (stepBreathIntro(ctx, inst, boss, fighting(boss))) return;
   if (!fighting(boss)) {

@@ -1,5 +1,6 @@
 // A Smith's Heart boss's health pool per tier: each encounter's difficulty
-// row carries a `healthMult` (Normal 1); the pull scales the body's pool by it
+// row carries a `healthMult` (Normal 1); a body at rest shows that pool from
+// the start (showTierHealth), the pull scales the body's pool by it
 // (its current share kept, so a pull that already landed a hit keeps that
 // share) and remembers the pool it had, and the fight's end (a wipe's reset)
 // gives that pool back. The raid has no heroic tier of its own yet (no
@@ -37,14 +38,44 @@ export function applyDevAddPool(inst: InstanceSlot, e: Entity): void {
   e.hp = e.maxHp;
 }
 
-/** Scale `e`'s pool by `mult` for the fight; returns the pool to restore. */
+/** Each boss body's template pool, seen once (the pool its claim spawned
+ *  it with), so showing the tier's pool before the pull and scaling it at
+ *  the pull never compound. */
+const basePools = new WeakMap<Entity, number>();
+
+function baseOf(e: Entity): number {
+  let b = basePools.get(e);
+  if (b === undefined) {
+    b = e.maxHp;
+    basePools.set(e, b);
+  }
+  return b;
+}
+
+/** Scale `e`'s pool to its tier's (`mult` times its template pool) for the
+ *  fight, its current share kept; returns the pool to restore. */
 export function applyTierHealth(e: Entity, mult: number): number {
-  const base = e.maxHp;
-  if (mult === 1 || e.dead) return base;
+  const base = baseOf(e);
+  if (e.dead) return base;
+  const target = Math.max(1, Math.round(base * mult));
+  if (target === e.maxHp) return base;
   const share = e.maxHp > 0 ? e.hp / e.maxHp : 1;
-  e.maxHp = Math.round(base * mult);
+  e.maxHp = target;
   e.hp = Math.max(1, Math.round(e.maxHp * share));
   return base;
+}
+
+/** Before the pull (no fight, the body whole and out of combat): show the
+ *  tier's real pool from the start, so a raid inspecting the boss reads the
+ *  pool it will fight (the owner's run of 2026-11-17 saw a Heroic Quench
+ *  read 309,000 until the pull, then 670,000: the template's Normal pool
+ *  until the pull scaled it). */
+export function showTierHealth(e: Entity, mult: number): void {
+  if (e.dead || e.inCombat) return;
+  const target = Math.max(1, Math.round(baseOf(e) * mult));
+  if (e.maxHp === target && e.hp === target) return;
+  e.maxHp = target;
+  e.hp = target;
 }
 
 /** Give `e` back the pool it had before the tier's (a living body comes back whole). */
