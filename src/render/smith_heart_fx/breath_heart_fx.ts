@@ -1,6 +1,8 @@
 // The Knotted Gale (encounters/smith_heart/breath_heart.ts), a part of BreathFightFx,
 // on EVERY tier (the raid acts on all of it): the ball, a Storm Orb wound in a knot of
-// wind, growing and more violent to its end, on a floor ring that shrinks as its timer;
+// wind, growing and more violent to its end;
+// a column of light over it while it lies loose (seen from across the Cornice) and its
+// floor ring a fuse dial draining round like a clock (the owner's call of 2026-11-17);
 // the portals told apart at a glance (teal A, violet B, a funnel of wind each, the
 // letter on the floor) with a link of light between them; phase 2's second pair a
 // family of its own (spring-green C, rose D: three arms turning the other way inside
@@ -40,6 +42,7 @@ import {
   type HeartObjectKind,
   type HeartPortalSide,
   heartObjectKind,
+  KNOT_BEAM,
   KNOT_CARRY_Y,
   KNOT_FLOAT_Y,
   knotLook,
@@ -63,6 +66,8 @@ import {
   FLOOR_LETTER_FRAG,
   HEART_RING_FRAG,
   HEART_UV_VERT,
+  KNOT_BEAM_FRAG,
+  KNOT_FUSE_FRAG,
   PORTAL_DISC_FRAG,
   PORTAL_FUNNEL_FRAG,
   PORTAL_LINK_FRAG,
@@ -178,9 +183,13 @@ interface KnotSlot {
   wind: THREE.Mesh;
   ring: THREE.Mesh;
   load: THREE.Mesh;
+  /** The column of light over it while it lies loose. */
+  beam: THREE.Mesh;
   crackle: { value: number };
   ringColor: THREE.Color;
   ringAlpha: { value: number };
+  /** The fuse dial's lit share. */
+  arc: { value: number };
   id: number;
   template: string;
   changedAt: number;
@@ -327,6 +336,7 @@ export class BreathHeartFx {
       const u = { uTime: h.uTime, uCrackle: crackle, uStorm: { value: color(C.storm) } };
       const ringColor = color(C.storm);
       const ringAlpha = { value: 1 };
+      const arc = { value: 1 };
       this.knots.push({
         shell: mk('smithHeartKnot', orb, shader('smithHeartKnotShell', u, KIT_UV_VERT, ORB_FRAG)),
         core: mk(
@@ -343,13 +353,24 @@ export class BreathHeartFx {
             {
               uColor: { value: ringColor },
               uAlpha: ringAlpha,
-              uFill: { value: 0 },
+              uArc: arc,
               uTime: h.uTime,
             },
             HEART_UV_VERT,
-            HEART_RING_FRAG,
+            KNOT_FUSE_FRAG,
           ),
           HEART_FLOOR.ring,
+        ),
+        beam: mk(
+          'smithHeartKnotBeam',
+          wall,
+          shader(
+            'smithHeartKnotBeam',
+            { uColor: { value: ringColor }, uAlpha: ringAlpha, uTime: h.uTime },
+            HEART_UV_VERT,
+            KNOT_BEAM_FRAG,
+            { side: THREE.DoubleSide },
+          ),
         ),
         load: mk(
           'smithHeartKnotLoad',
@@ -370,6 +391,7 @@ export class BreathHeartFx {
         crackle,
         ringColor,
         ringAlpha,
+        arc,
         id: -1,
         template: '',
         changedAt: 0,
@@ -618,6 +640,7 @@ export class BreathHeartFx {
       k.wind.visible = false;
       k.ring.visible = false;
       k.load.visible = false;
+      k.beam.visible = false;
     }
     for (const p of this.portals) {
       p.disc.visible = false;
@@ -743,6 +766,7 @@ export class BreathHeartFx {
         k.wind.visible = false;
         k.ring.visible = false;
         k.load.visible = false;
+        k.beam.visible = false;
         continue;
       }
       if (k.template !== e.templateId) {
@@ -783,6 +807,13 @@ export class BreathHeartFx {
       k.ring.visible = true;
       k.ringColor.setHex(C.storm).lerp(_danger, look.danger);
       k.ringAlpha.value = 0.75 + 0.25 * look.throb * Math.sin(now * 14);
+      k.arc.value = look.arc;
+      // A column of light where it lies loose, seen from across the Cornice.
+      k.beam.visible = !held;
+      if (!held) {
+        k.beam.position.set(eAt.x, floor, eAt.z);
+        k.beam.scale.set(KNOT_BEAM.radius, KNOT_BEAM.height, KNOT_BEAM.radius);
+      }
       k.load.visible = held;
       if (held) {
         k.load.position.set(eAt.x, floor + 0.12, eAt.z);

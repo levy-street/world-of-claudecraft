@@ -1359,13 +1359,12 @@ export class BreathFightFx {
         for (const a of e.auras) {
           if (a.id === BREATH_AURAS.anchor) this.anchorMarks.take(e.id);
           else if (a.id === BREATH_AURAS.pinned) this.pinnedMarks.take(e.id);
-          else if (a.id === BREATH_AURAS.drawn) {
-            this.drawnMarks.take(e.id);
-            this.auraArrows.see(e.id);
-          } else if (a.id === BREATH_AURAS.skyMark) this.auraArrows.see(e.id);
+          else if (a.id === BREATH_AURAS.drawn) this.drawnMarks.take(e.id);
           else if (a.id === BREATH_AURAS.cradled) this.cradledIds.push(e.id);
           else if (!this.isles.takeAura(e, a.id)) this.heart.takeAura(e, a.id);
         }
+        // The arrow over every player a mark singles out (breath_arrow_core.ts).
+        if (breathArrowMark(e)) this.auraArrows.see(e.id);
       }
     }
     this.heart.endScan();

@@ -122,6 +122,8 @@ const _look: RushArrowLook = { y: 0, glow: 1, scale: 1 };
 export interface ArrowMark {
   remaining: number;
   duration: number;
+  /** Yards more above the head (a carried load rides there). */
+  lift?: number;
 }
 
 /** What marks a player for an arrow: an aura on them (its clock), or any
@@ -231,7 +233,7 @@ export class CouncilRushArrow {
       rushArrowLook(mark.remaining, mark.duration, clock, reducedMotion, _look);
       const at = fxAnchor(p);
       // The mesh's origin is the tip, over the player's drawn feet.
-      s.card.position.set(at.x, at.y + _look.y, at.z);
+      s.card.position.set(at.x, at.y + _look.y + (mark.lift ?? 0), at.z);
       s.card.scale.setScalar(_look.scale);
       s.mat.uniforms.uGlow.value = _look.glow;
       s.mat.uniforms.uMotion.value = reducedMotion ? 0 : 1;

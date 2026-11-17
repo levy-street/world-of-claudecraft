@@ -49,12 +49,16 @@ describe('Knotted Gale: the look', () => {
     expect(heartObjectKind(BREATH_OBJECTS.vortex)).toBeNull();
   });
 
-  it('the ring shrinks to the pick-up as the ball grows and rages, over every tier fuse', () => {
+  it('the fuse dial drains round as the ball grows and rages, over every tier fuse', () => {
     for (const { fuse: F } of [BREATH_KNOT.heroic, BREATH_KNOT.mythic]) {
       const full = knotLook(F, F);
       const end = knotLook(0, F);
-      expect(end.ringR).toBeCloseTo(T.heartPickR, 5);
-      expect(full.ringR).toBeGreaterThan(end.ringR + 4);
+      // The owner's call of 2026-11-17: the ring holds its size, its lit arc
+      // drains (a clock read at a glance).
+      expect(end.ringR).toBe(full.ringR);
+      expect(full.ringR).toBeGreaterThan(T.heartPickR);
+      expect(full.arc).toBe(1);
+      expect(end.arc).toBe(0);
       expect(end.radius).toBeGreaterThan(full.radius);
       expect(end.crackle).toBeGreaterThan(full.crackle);
       expect(end.spin).toBeGreaterThan(full.spin);
@@ -68,7 +72,7 @@ describe('Knotted Gale: the look', () => {
       expect(knotLook(KNOT_THROB_AT - 0.5, F).throb).toBeGreaterThan(0);
       let last = Number.POSITIVE_INFINITY;
       for (let f = F; f >= 0; f -= 1) {
-        const r = knotLook(f, F).ringR;
+        const r = knotLook(f, F).arc;
         expect(r).toBeLessThan(last);
         last = r;
       }

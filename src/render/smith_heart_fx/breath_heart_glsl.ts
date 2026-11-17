@@ -200,6 +200,49 @@ void main() {
 }
 `;
 
+/** The Knotted Gale's fuse dial on the floor (the owner's call of
+ *  2026-11-17: readable at a glance): a thick ring whose lit arc drains
+ *  clockwise from the top as the fuse runs (uArc the share left), the spent
+ *  part a faint ghost, a bright tick at the arc's end. */
+export const KNOT_FUSE_FRAG = /* glsl */ `
+uniform vec3 uColor;
+uniform float uAlpha;
+uniform float uArc;
+uniform float uTime;
+varying vec2 vUv;
+void main() {
+  vec2 p = vUv * 2.0 - 1.0;
+  float r = length(p);
+  if (r > 1.0) discard;
+  float band = smoothstep(0.74, 0.8, r) * (1.0 - smoothstep(0.95, 1.0, r));
+  // 0 at the top (the floor's -z), growing clockwise seen from above.
+  float a = fract(atan(p.x, -p.y) / 6.2831853 + 1.0);
+  float lit = 1.0 - smoothstep(uArc - 0.004, uArc + 0.004, a);
+  float tip = (1.0 - smoothstep(0.0, 0.018, abs(a - uArc))) * step(0.001, uArc);
+  float shimmer = 0.85 + 0.15 * sin(a * 40.0 - uTime * 6.0);
+  float inner = (1.0 - smoothstep(0.0, 0.78, r)) * 0.08;
+  vec3 col = uColor * (band * (lit * 1.2 * shimmer + 0.12) + inner) + vec3(1.0) * tip * band * 1.4;
+  gl_FragColor = vec4(col, (band * (lit * 0.95 + 0.12) + tip * band + inner) * uAlpha);
+}
+`;
+
+/** The beam of light over a loose Knotted Gale: a tall column on an open
+ *  cylinder (vUv.y up), brightest at its foot and its core, streaks of wind
+ *  climbing it, seen from far away. */
+export const KNOT_BEAM_FRAG = /* glsl */ `
+uniform vec3 uColor;
+uniform float uAlpha;
+uniform float uTime;
+varying vec2 vUv;
+void main() {
+  float fade = pow(max(1.0 - vUv.y, 0.0), 1.6);
+  float climb = 0.6 + 0.4 * sin(vUv.y * 40.0 - uTime * 7.0 + vUv.x * 12.566);
+  float foot = 1.0 - smoothstep(0.0, 0.06, vUv.y);
+  vec3 col = uColor * (0.7 * climb + 0.9 * foot) + vec3(1.0) * foot * 0.35;
+  gl_FragColor = vec4(col, (0.55 * climb * fade + 0.5 * foot) * uAlpha);
+}
+`;
+
 /** The burst's wall of storm: a torn shell, brightest at its edge. */
 export const BURST_FRAG = /* glsl */ `
 uniform float uTime;

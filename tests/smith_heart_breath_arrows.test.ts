@@ -8,19 +8,29 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   BREATH_BAR_ALARM,
+  BREATH_KNOT_ALARM,
   BREATH_MARK_ALARM,
   BREATH_SFX_KEYS,
   barAlarmDue,
+  knotAlarmDue,
 } from '../src/game/smith_heart_breath_audio_core';
 import { RUSH_MARK_ALARM } from '../src/game/smith_heart_council_audio_core';
 import {
   BREATH_ARROW_AURAS,
+  BREATH_ARROWS,
   breathArrowMark,
   breathTargetedBar,
+  LADEN_ARROW_LIFT,
 } from '../src/render/smith_heart_fx/breath_arrow_core';
+import {
+  KNOT_BEAM,
+  KNOT_CARRY_Y,
+  knotLook,
+} from '../src/render/smith_heart_fx/breath_heart_fx_core';
 import {
   BREATH_AURAS,
   BREATH_CASTS,
+  BREATH_CUES,
   BREATH_OBJECTS,
   BREATH_TUNING as T,
 } from '../src/sim/encounters/smith_heart';
@@ -59,12 +69,41 @@ describe("the Breath's marks: the arrow and the alarm", () => {
   });
 
   it('raises the arrow on a sky mark and on Drawn Lightning, never on another aura', () => {
-    expect(BREATH_ARROW_AURAS).toEqual([BREATH_AURAS.skyMark, BREATH_AURAS.drawn]);
+    expect(BREATH_ARROW_AURAS).toEqual([
+      BREATH_AURAS.skyMark,
+      BREATH_AURAS.drawn,
+      BREATH_AURAS.portalA,
+      BREATH_AURAS.portalB,
+      BREATH_AURAS.portalC,
+      BREATH_AURAS.portalD,
+      BREATH_AURAS.laden,
+    ]);
     const with_ = (id: string) =>
       ({ auras: [{ id, remaining: 1, duration: 2 }] }) as unknown as Pick<Entity, 'auras'>;
     expect(breathArrowMark(with_(BREATH_AURAS.skyMark))).not.toBeNull();
     expect(breathArrowMark(with_(BREATH_AURAS.drawn))).not.toBeNull();
     expect(breathArrowMark(with_(BREATH_AURAS.anchor))).toBeNull();
+  });
+
+  it("raises it over the Knotted Gale's portal-marked players and its carrier, over the ball", () => {
+    const with_ = (id: string) =>
+      ({ auras: [{ id, remaining: 3, duration: 5 }] }) as unknown as Pick<Entity, 'auras'>;
+    for (const id of [
+      BREATH_AURAS.portalA,
+      BREATH_AURAS.portalB,
+      BREATH_AURAS.portalC,
+      BREATH_AURAS.portalD,
+    ]) {
+      const m = breathArrowMark(with_(id));
+      expect(m, id).not.toBeNull();
+      expect(m?.lift ?? 0).toBe(0);
+    }
+    const carrier = breathArrowMark(with_(BREATH_AURAS.laden));
+    expect(carrier?.remaining).toBe(3);
+    expect(carrier?.lift).toBe(LADEN_ARROW_LIFT);
+    // Over the ball riding over their head, not through it.
+    expect(LADEN_ARROW_LIFT).toBeGreaterThan(KNOT_CARRY_Y - 2);
+    expect(BREATH_ARROWS).toBeGreaterThanOrEqual(8);
   });
 
   it('raises it over the target of Storm Lance and Leaping Bolt', () => {
@@ -84,6 +123,33 @@ describe("the Breath's marks: the arrow and the alarm", () => {
     expect(barAlarmDue(BREATH_CASTS.lance, 8, 7)).toBe(false);
     expect(barAlarmDue(BREATH_CASTS.inhale, 7, 7)).toBe(false);
     expect(barAlarmDue(BREATH_CASTS.fork, 7, null)).toBe(false);
+  });
+
+  it('a falling Knotted Gale sounds a gong for everyone in the fight', () => {
+    expect(BREATH_SFX_KEYS).toContain(BREATH_KNOT_ALARM.key);
+    expect(BREATH_KNOT_ALARM.key).not.toBe(horn.key);
+    expect(knotAlarmDue(BREATH_CUES.knotLand, true)).toBe(true);
+    expect(knotAlarmDue(BREATH_CUES.knotLand, false)).toBe(false);
+    expect(knotAlarmDue(BREATH_CUES.knotTake, true)).toBe(false);
+    const src = readFileSync('src/game/smith_heart_breath_audio.ts', 'utf8');
+    // In the listener's own ear (the local player's position), at full.
+    expect(src).toMatch(/knotAlarmDue\(ev\.ability, this\.inFight\)/);
+    expect(src).toContain('me.pos.x, me.pos.y + 1.6, me.pos.z');
+  });
+
+  it("the Knotted Gale's fuse drains round its ring, and a column of light marks it loose", () => {
+    const fresh = knotLook(15, 15);
+    const half = knotLook(7.5, 15);
+    const end = knotLook(0, 15);
+    expect(fresh.arc).toBe(1);
+    expect(half.arc).toBeCloseTo(0.5, 6);
+    expect(end.arc).toBe(0);
+    // The dial holds its size: the fuse reads in its arc alone.
+    expect(half.ringR).toBe(fresh.ringR);
+    expect(KNOT_BEAM.height).toBeGreaterThan(30);
+    const src = readFileSync('src/render/smith_heart_fx/breath_heart_fx.ts', 'utf8');
+    expect(src).toContain('k.arc.value = look.arc;');
+    expect(src).toContain('k.beam.visible = !held;');
   });
 
   it('the fight draws both arrow sets every frame', () => {

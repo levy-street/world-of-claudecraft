@@ -199,6 +199,17 @@ export const BREATH_MARK_ALARM: Readonly<Record<string, HeartMarkSound>> = {
  *  begins at the local player, in their ear alone. */
 export const BREATH_BAR_ALARM: HeartMarkSound = { key: 'ui_aura_blaring_horn', gain: 1, rate: 1 };
 
+/** A Knotted Gale falls: a gong EVERYONE on the Cornice hears at full, in
+ *  their own ear, wherever the ball lands (the owner's call of 2026-11-17:
+ *  the ball's own landing sound was only heard near it). */
+export const BREATH_KNOT_ALARM: HeartMarkSound = { key: 'ui_aura_temple_gong', gain: 1, rate: 1 };
+
+/** Does this fight cue sound the raid-wide gong (a ball's landing), for a
+ *  listener on the Cornice? */
+export function knotAlarmDue(ability: string | undefined, onCornice: boolean): boolean {
+  return onCornice && ability === BREATH_CUES.knotLand;
+}
+
 /** Is the bar `bar` (just begun, aimed at `targetId`) the local player's
  *  (`meId`) alarm? Pure. */
 export function barAlarmDue(bar: string, targetId: number | null, meId: number | null): boolean {
@@ -213,6 +224,7 @@ export const BREATH_SFX_KEYS: readonly string[] = [
     ...Object.values(BREATH_WIND_SOUNDS).map((s) => s.key),
     ...Object.values(BREATH_MARK_SOUNDS).map((s) => s.key),
     BREATH_BAR_ALARM.key,
+    BREATH_KNOT_ALARM.key,
     BREATH_KNOT_SOUNDS.carry.key,
     BREATH_KNOT_SOUNDS.fuse.key,
     BREATH_RIDE_LOOP.key,

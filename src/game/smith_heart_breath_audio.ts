@@ -11,6 +11,7 @@ import {
   BREATH_BAR_ALARM,
   BREATH_BAR_SOUNDS,
   BREATH_CUE_SOUNDS,
+  BREATH_KNOT_ALARM,
   BREATH_KNOT_SOUNDS,
   BREATH_MARK_ALARM,
   BREATH_MARK_SOUNDS,
@@ -20,6 +21,7 @@ import {
   BREATH_WIND_SOUNDS,
   barAlarmDue,
   breathBarRate,
+  knotAlarmDue,
   knotFuseWarnDue,
   windPhaseSound,
 } from './smith_heart_breath_audio_core';
@@ -79,6 +81,10 @@ export class BreathAudio {
   /** A mark's alarm over its sting (BREATH_MARK_ALARM). */
   private readonly alarm = new HeartMarkEar(BREATH_MARK_ALARM);
 
+  /** The local player and whether they stand in the fight (last frame). */
+  private me: Entity | null = null;
+  private inFight = false;
+
   constructor(private readonly sink: BreathAudioSink) {}
 
   private preload(): void {
@@ -97,6 +103,15 @@ export class BreathAudio {
     const layers = ev.ability ? BREATH_CUE_SOUNDS[ev.ability] : undefined;
     if (!layers) return false;
     this.preload();
+    const me = this.me;
+    if (me && !me.dead && knotAlarmDue(ev.ability, this.inFight)) {
+      const a = BREATH_KNOT_ALARM;
+      this.sink.playAt(a.key, me.pos.x, me.pos.y + 1.6, me.pos.z, {
+        gain: a.gain,
+        rate: a.rate,
+        priority: true,
+      });
+    }
     for (const sound of layers) {
       let x: number;
       let y: number;
@@ -136,6 +151,8 @@ export class BreathAudio {
     knot: BreathKnotHeard | null = null,
   ): void {
     if (phase !== null || guardian !== null) this.preload();
+    this.me = me;
+    this.inFight = phase !== null;
     const change = windPhaseSound(this.phase, phase);
     if (change.oneShot && windAt) {
       const s = BREATH_WIND_SOUNDS[change.oneShot];

@@ -143,15 +143,23 @@ export interface KnotLook {
   crackle: number;
   /** The knot of wind round it: its turn in radians a second. */
   spin: number;
-  /** The timer's ring on the floor: its radius (at the pick-up's own when it ends). */
+  /** The timer's ring on the floor: its radius (held whole: the fuse reads
+   *  in its arc, the owner's call of 2026-11-17). */
   ringR: number;
+  /** The share of the fuse dial still lit (1 a fresh ball, 0 its burst):
+   *  the ring drains round like a clock. */
+  arc: number;
   /** How far the ring has turned from the storm's colour to the lethal red. */
   danger: number;
   /** How hard it throbs (0 to 1), in the last seconds. */
   throb: number;
 }
 
-const RING_START = 9;
+const RING_START = 7;
+
+/** The beam of light over a loose ball, seen from across the Cornice and
+ *  beyond (yards high, yards wide). */
+export const KNOT_BEAM = { height: 48, radius: 0.9 } as const;
 /** The fuse left (seconds) from which the ball throbs. */
 export const KNOT_THROB_AT = 3;
 
@@ -165,7 +173,8 @@ export function knotLook(fuse: number, full: number): KnotLook {
     radius: 0.85 + 0.75 * urge * urge,
     crackle: 0.3 + 0.7 * urge,
     spin: 1.2 + 7 * urge * urge,
-    ringR: T.heartPickR + (RING_START - T.heartPickR) * left,
+    ringR: RING_START,
+    arc: left,
     danger: Math.max(0, Math.min(1, (urge - 0.5) * 2)),
     // The last 3 s on every tier (since Mythic's fuse was halved to 10 s,
     // 2026-11-07: 5 s throbbed from the moment the portals opened).
