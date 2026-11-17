@@ -61,8 +61,17 @@ describe('quench_floor_ladder_core: one untied rung per Quench floor layer', () 
     expect(QUENCH_FLOOR.throwChar.step).toBeLessThan(QUENCH_FLOOR.throwGlow.step);
     expect(QUENCH_FLOOR.strikeCrackChar.step).toBeLessThan(QUENCH_FLOOR.strikeCrackGlow.step);
     expect(QUENCH_TELEGRAPH_GLOW_STEP).toBe(QUENCH_FLOOR.telegraphGlow.step);
+    // The open water over every glow crossing it: a hole reads dark from any
+    // camera (the owner's review of 2026-11-17).
+    expect(QUENCH_FLOOR.holes.step).toBeGreaterThan(QUENCH_FLOOR.telegraphGlow.step);
     for (const [name, r] of Object.entries(QUENCH_FLOOR)) {
-      if (name.startsWith('telegraph') || name.endsWith('Smoke') || name === 'sparks') continue;
+      if (
+        name.startsWith('telegraph') ||
+        name.endsWith('Smoke') ||
+        name === 'sparks' ||
+        name === 'holes'
+      )
+        continue;
       expect(r.step, name).toBeLessThan(QUENCH_FLOOR.telegraphChar.step);
     }
   });

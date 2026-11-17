@@ -981,17 +981,17 @@ export class QuenchFightFx {
         s.template = 'broke';
         this.breakHole(e.pos.x, e.pos.z, r);
       }
-      // Cold mist breathing off the open water.
+      // Cold mist breathing up over the lip (never over the open middle).
       if (this.rand() < dt * HOLE_MIST_RATE * this.density) {
         const a = this.rand() * Math.PI * 2;
-        const d = r * 0.7 * Math.sqrt(this.rand());
+        const d = r * (0.95 + 0.25 * this.rand());
         this.particles.puff(e.pos.x + Math.sin(a) * d, gy + 0.1, e.pos.z + Math.cos(a) * d, 1, {
-          speed: 0.3,
-          up: 0.9,
-          life: 2.4,
-          size: [0.9, 2.4],
+          speed: 0.15,
+          up: 1.4,
+          life: 2.2,
+          size: [0.6, 1.6],
           color: C.mist,
-          alpha: 0.32,
+          alpha: 0.26,
         });
       }
       h++;
@@ -1390,7 +1390,6 @@ export class QuenchFightFx {
       gravity: 14,
       radius: r * 0.8,
     });
-    this.splash(x, z, 0.8);
   }
 
   /** A body plunging through the ice: a tall burst of water and a ring. */
@@ -1428,7 +1427,7 @@ export class QuenchFightFx {
       life: 1.2,
       size: [0.8, 1.8 * size],
       color: C.mist,
-      alpha: 0.4,
+      alpha: 0.22,
     });
   }
 

@@ -70,10 +70,9 @@ const rung = (
 
 /** Every Quench floor layer's rung on the encounter band, bottom to top. */
 export const QUENCH_FLOOR = {
-  // What lies in the ice: the rime under the guardian's skirt, the holes, the
+  // What lies in the ice: the rime under the guardian's skirt, the
   // blades' four sockets (apart round the lake: they never overlap).
   rimeSteps: rung(0, 'quench_rime_steps', 'normal', false),
-  holes: rung(1, 'quench_fight_fx', 'normal', false),
   bladeSockets: rung(2, 'quench_blades_fx', 'normal', false),
   // The pools that can cross: their chars, then (below) their glows.
   frostChar: rung(3, 'quench_fx', 'multiply', true),
@@ -95,14 +94,18 @@ export const QUENCH_FLOOR = {
   // cone: one rung, they commute), then every telegraph's glow.
   telegraphChar: rung(16, 'quench_fight_fx', 'multiply', true),
   telegraphGlow: rung(17, 'quench_fight_fx', 'additive', true),
+  // The holes in the ice over every mark and warning (one draw): open water
+  // reads dark from any camera, never washed pale by a glow crossing it (the
+  // owner's review of 2026-11-17). A warning over a hole is the hole itself.
+  holes: rung(18, 'quench_fight_fx', 'normal', false),
   // The particles over the floor: each owner's smoke (a normal blend, one
   // draw) on its own rung, then every owner's rings, flames and sparks
   // (additive) together.
-  fightSmoke: rung(18, 'quench_fight_fx', 'normal', false),
-  breathSmoke: rung(19, 'quench_fx', 'normal', false),
-  bodySmoke: rung(20, 'quench_body', 'normal', false),
-  bladesSmoke: rung(21, 'quench_blades_fx', 'normal', false),
-  sparks: rung(22, 'quench_fight_fx', 'additive', true),
+  fightSmoke: rung(19, 'quench_fight_fx', 'normal', false),
+  breathSmoke: rung(20, 'quench_fx', 'normal', false),
+  bodySmoke: rung(21, 'quench_body', 'normal', false),
+  bladesSmoke: rung(22, 'quench_blades_fx', 'normal', false),
+  sparks: rung(23, 'quench_fight_fx', 'additive', true),
 } as const satisfies Record<string, QuenchFloorRung>;
 
 export type QuenchFloorLayer = keyof typeof QUENCH_FLOOR;

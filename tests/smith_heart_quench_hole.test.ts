@@ -58,6 +58,9 @@ describe('quench_hole_glsl: a hole with depth, without a flicker', () => {
     expect(HOLE_VERT).not.toMatch(/modelViewMatrix \* instanceMatrix/);
     expect(HOLE_FRAG).toContain('cameraPosition');
     expect(HOLE_FRAG).toContain(HOLE_DEPTH.toFixed(4));
+    // Blue-black water (linear, near black), no mist over the middle.
+    expect(HOLE_FRAG).toContain('abyss');
+    expect(HOLE_FRAG).toContain('lipMist');
     // GLSL reserves `out`: never a variable of that name.
     expect(HOLE_FRAG).not.toMatch(/float out\b/);
   });

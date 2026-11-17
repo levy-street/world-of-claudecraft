@@ -98,41 +98,44 @@ void main() {
     float B = dot(p0, d);
     float Cc = dot(p0, p0) - R * R;
     float tc = A > 1e-6 ? (-B + sqrt(max(B * B - A * Cc, 0.0))) / A : 1e9;
+    // The deep water's colours, linear (the colorspace chunk lifts them): a
+    // blue-black, near black at the bottom (the owner's review of 2026-11-17:
+    // it must read as a hole from above and from a grazing angle alike).
+    vec3 abyss = vec3(0.0012, 0.0028, 0.0065);
+    vec3 deepBlue = vec3(0.004, 0.012, 0.03);
     if (tc < tw) {
-      // The ice wall, its height below the lip.
+      // The ice wall, its height below the lip: a thin lit band under the lip,
+      // falling fast into the dark.
       float hgt = clamp(tc * down / depth, 0.0, 1.0);
       vec2 hit = p0 + d * tc;
       float wa = atan(hit.y, hit.x);
       float strata = n(vec2(wa * 7.0 + seed, hgt * 9.0)) * 0.5 + n(vec2(wa * 23.0, hgt * 30.0)) * 0.2;
-      vec3 top = uLit * 1.1;
-      vec3 low = uDeep * 0.4;
-      col = mix(top, low, smoothstep(0.0, 0.85, hgt));
-      col *= 0.75 + 0.45 * strata;
-      // Wet and dark at the waterline, a pale rime frill at the top.
-      col = mix(col, uDeep * 0.35, smoothstep(0.75, 1.0, hgt));
-      col += uRim * 0.45 * (1.0 - smoothstep(0.0, 0.08, hgt));
+      col = mix(uLit * 0.55, deepBlue, smoothstep(0.0, 0.35, hgt));
+      col *= 0.8 + 0.4 * strata;
+      col = mix(col, abyss, smoothstep(0.5, 1.0, hgt));
+      // A pale rime frill right under the lip.
+      col += uRim * 0.35 * (1.0 - smoothstep(0.0, 0.05, hgt));
     } else {
-      // The water, deep and black, moving.
+      // The water: deep, blue-black, darkest in the middle (the depth under
+      // it), a slow swell and faint glints of the sky.
       vec2 hit = p0 + d * tw;
+      float toEdge = clamp(length(hit) / max(R, 0.001), 0.0, 1.0);
       vec2 q = hit * 1.6 + vec2(seed);
       float swell = n(q + vec2(t * 0.35, -t * 0.25)) * 0.6 + n(q * 2.3 - vec2(t * 0.55, t * 0.42)) * 0.4;
-      vec3 water = mix(uDeep * 0.35, uLit * 0.45, swell * 0.3);
-      // The fresh break boils white, then settles to slush and floes.
+      vec3 water = mix(abyss, deepBlue, smoothstep(0.0, 1.0, toEdge) * (0.6 + 0.4 * swell));
+      // The fresh break churns for a moment (dark slush, never white).
       float churn = vP.x;
-      float slush = smoothstep(0.6, 0.9, n(q * 1.4 + vec2(t * 0.6, t * 0.4))) * churn;
-      water = mix(water, uRim * 0.7, slush * 0.35);
-      vec2 drift = vec2(sin(t * 0.2 + seed), cos(t * 0.17 + seed)) * 0.4;
-      float floe = smoothstep(0.8, 0.83, n(hit * 1.1 + vec2(seed * 0.4) + drift));
-      water = mix(water, uRim * 0.6, floe * 0.7);
-      float glint = max(0.0, n(q * 3.1 + vec2(t * 0.8, -t * 0.6)) - 0.6) * 2.6;
-      water += uLit * glint * glint * glint * 0.6;
-      // The wall's shadow on the water near the edge.
-      float nearWall = smoothstep(R * 0.55, R, length(hit));
-      col = water * (1.0 - 0.45 * nearWall);
+      float slush = smoothstep(0.65, 0.9, n(q * 1.4 + vec2(t * 0.6, t * 0.4))) * churn;
+      water = mix(water, deepBlue * 3.0, slush * 0.3);
+      float glint = max(0.0, n(q * 3.1 + vec2(t * 0.8, -t * 0.6)) - 0.66) * 2.9;
+      water += uLit * 0.18 * glint * glint * glint;
+      col = water;
     }
-    // Cold mist hanging in the hole, thicker in the fresh break.
-    float mist = n(vXY * 4.0 + vec2(t * 0.25, -t * 0.18)) * (0.06 + 0.12 * vP.y);
-    col = mix(col, uRim * 0.8, mist);
+    // Cold mist only round the lip (rising out of the hole over its edge),
+    // never over the middle.
+    float lipMist = smoothstep(0.7, 1.0, r / max(edge, 0.001));
+    float mist = n(vXY * 4.0 + vec2(t * 0.25, -t * 0.18)) * lipMist * (0.12 + 0.12 * vP.y);
+    col = mix(col, uRim * 0.6, mist);
     alpha = 1.0;
   }
   gl_FragColor = vec4(col, alpha);
