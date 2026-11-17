@@ -31,6 +31,7 @@ import {
   smithHeartAwakeBitSet,
   smithHeartExitBitSet,
   smithHeartPortalBitSet,
+  smithHeartReadyBitSet,
   smithHeartSealMaskOf,
   smithHeartVeinLit,
 } from '../../sim/encounters/smith_heart/seal';
@@ -72,13 +73,13 @@ function fresh(mask: number, now: number): SlotMemory {
     litAt: SMITH_HEART_VEINS.map((v) => (smithHeartVeinLit(mask, v) ? now - SNAPPED : Infinity)),
     portalAt: smithHeartPortalBitSet(mask) ? now - SNAPPED : Infinity,
     awakeAt: smithHeartAwakeBitSet(mask) ? now - SNAPPED : Infinity,
-    readyAt: Infinity,
+    readyAt: smithHeartReadyBitSet(mask) ? now - SNAPPED : Infinity,
     exitAt: smithHeartExitBitSet(mask) ? now - SNAPPED : Infinity,
   };
 }
 
-/** Record a seal value (lit veins plus the portal bit) seen for slot `key`
- *  at render time `now`. */
+/** Record a seal value (the lit veins plus the ready, portal, arrival and exit
+ *  bits) seen for slot `key` at render time `now`. */
 export function observeHeartSealMask(key: string, mask: number, now: number): void {
   const m = memory.get(key);
   // A vein or the portal going dark is a fresh claim (or a dev reset):
@@ -92,6 +93,7 @@ export function observeHeartSealMask(key: string, mask: number, now: number): vo
     if (smithHeartVeinLit(mask, v) && !smithHeartVeinLit(m.mask, v)) m.litAt[i] = now;
   });
   if (smithHeartPortalBitSet(mask) && !smithHeartPortalBitSet(m.mask)) m.portalAt = now;
+  if (smithHeartReadyBitSet(mask) && !smithHeartReadyBitSet(m.mask)) m.readyAt = now;
   if (smithHeartAwakeBitSet(mask) && !smithHeartAwakeBitSet(m.mask)) m.awakeAt = now;
   if (smithHeartExitBitSet(mask) && !smithHeartExitBitSet(m.mask)) m.exitAt = now;
   m.mask = mask;

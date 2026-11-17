@@ -20,12 +20,28 @@
 // Pure and Three-free (the clock is passed in, render seconds).
 
 import { HEART_PORTAL_OPEN, heartPortalStage } from './heart_portal_core';
-import { heartSealQuarterFill, heartSealQuarterLevel } from './heart_seal_core';
+import {
+  HEART_SEAL_ARRIVAL,
+  HEART_SEAL_FILL_SECONDS,
+  heartSealQuarterFill,
+  heartSealQuarterLevel,
+} from './heart_seal_core';
 
 /** The model's size (yards): its height and its plinth's reach (the Blender build's `--reach`
  *  puts the widest shard on the seal's inner circle, 8.6 yd; the plinth's stones stand at
  *  8.47). Pinned against the shipped GLB by tests/smith_heart_ring_crystal.test.ts. */
 export const RING_CRYSTAL = { height: 18.85, plinthR: 8.47 } as const;
+
+/** The crystal's click volume (ring_crystal_pick.ts): a frustum as wide as the plinth at
+ *  its foot and narrowing toward the tip, so a click anywhere on the crystal's silhouette
+ *  is a click on its entity (the sim's press, encounters/smith_heart/seal_burst.ts), and
+ *  the height its entity's overhead label hangs at. */
+export const RING_CRYSTAL_CLICK = {
+  baseR: 8,
+  topR: 4.5,
+  height: RING_CRYSTAL.height,
+  labelHeight: 8,
+} as const;
 
 /** The weights' channel order in the model's `_weights` (SMITH_HEART_VEINS order). */
 export const RING_CRYSTAL_ELEMENTS = 4;
@@ -80,15 +96,26 @@ export function ringCrystalState(
   out: RingCrystalState = newRingCrystalState(),
 ): RingCrystalState {
   let fillSum = 0;
+  // Seconds since the slowest element finished filling its crystals (negative while one
+  // is still climbing or dark).
+  let settled = Number.POSITIVE_INFINITY;
   for (let i = 0; i < RING_CRYSTAL_ELEMENTS; i++) {
     const s = since[i] ?? -1;
     const fill = s < 0 ? 0 : heartSealQuarterFill(s);
     out.fill[i] = fill;
     out.level[i] = s < 0 ? 0 : heartSealQuarterLevel(s);
     fillSum += fill;
+    settled = Math.min(
+      settled,
+      s < 0 ? Number.NEGATIVE_INFINITY : s - HEART_SEAL_ARRIVAL - HEART_SEAL_FILL_SECONDS,
+    );
   }
   const burst = portalSince >= 0;
-  out.ready = burst || readySince < 0 ? 0 : ease(readySince / RING_CRYSTAL_READY_RISE);
+  // The swell waits for the last element's light: the sim's ready bit can come with the
+  // fourth vein (the Ring already clear), seconds before that vein's river has reached
+  // the seal, and a crystal still taking its light must not already pulse as ready.
+  const readyFor = readySince < 0 ? -1 : Math.min(readySince, settled);
+  out.ready = burst || readyFor < 0 ? 0 : ease(readyFor / RING_CRYSTAL_READY_RISE);
   out.crown = (fillSum / RING_CRYSTAL_ELEMENTS) * CROWN_FULL + out.ready * CROWN_READY;
   out.charge = burst ? heartPortalStage(portalSince).charge : 0;
   // The shatter lands as the overload ends.

@@ -488,6 +488,30 @@ describe('heart_seal_core: the seal memory from the mirrored markers', () => {
     expect(heartSealView(key, 60).portalSince).toBe(-1);
   });
 
+  it('times the ready bit, snaps one met set, and a lost one is a fresh claim', () => {
+    observeHeartSealMarker(marker(15), 10);
+    expect(heartSealView(key, 11).readySince).toBe(-1);
+    // The charge arrives (all four lit, the Ring clear): the view reads it as its own moment,
+    // and the lit-vein mask stays the four veins alone.
+    observeHeartSealMarker(marker(15 | 128), 20);
+    const v = heartSealView(key, 22);
+    expect(v.mask).toBe(15);
+    expect(v.readySince).toBeCloseTo(2);
+    expect(v.portalSince).toBe(-1);
+    // A raid arriving at a charged seal sees it charged at once, no replay.
+    clearHeartSealForTest();
+    observeHeartSealMarker(marker(15 | 128), 50);
+    expect(heartSealView(key, 50).readySince).toBeGreaterThan(100);
+    // The burst keeps the charge (the bit stays set after it, the portal bit joins it).
+    observeHeartSealMarker(marker(15 | 128 | 16), 60);
+    const burst = heartSealView(key, 61);
+    expect(burst.portalSince).toBeCloseTo(1);
+    expect(burst.readySince).toBeGreaterThan(100);
+    // A charge that goes dark again is a fresh claim (a dev reset): the slot starts over.
+    observeHeartSealMarker(marker(15), 70);
+    expect(heartSealView(key, 70).readySince).toBe(-1);
+  });
+
   it('is fed through the gate-object seam: a seal marker view is an empty anchor that reports', () => {
     const plan = gateObjectPlan({ ...marker(2) });
     expect(plan).toEqual({ encounterAnchor: true, height: 2 });

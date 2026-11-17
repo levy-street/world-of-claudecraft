@@ -17,6 +17,7 @@ import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
 import * as THREE from 'three';
 import { beforeAll, describe, expect, it } from 'vitest';
+import { buildGateObject, gateObjectPlan } from '../src/render/gate_objects';
 import { HEART_PORTAL_OPEN } from '../src/render/smith_heart/heart_portal_core';
 import {
   HEART_SEAL_ARRIVAL,
@@ -26,6 +27,7 @@ import {
   newRingCrystalPiecePose,
   newRingCrystalState,
   RING_CRYSTAL,
+  RING_CRYSTAL_CLICK,
   RING_CRYSTAL_READY_RISE,
   type RingCrystalPieceKind,
   ringCrystalKey,
@@ -35,6 +37,8 @@ import {
   ringCrystalTremble,
 } from '../src/render/smith_heart/ring_crystal_core';
 import { ringCrystalMaterial } from '../src/render/smith_heart/ring_crystal_material';
+import { buildRingCrystalClickBody } from '../src/render/smith_heart/ring_crystal_pick';
+import { SMITH_HEART_SEAL_CRYSTAL_TEMPLATE } from '../src/sim/content/smith_heart';
 import {
   HEART_SEAL,
   SMITH_HEART_VEIN_COLORS,
@@ -91,6 +95,22 @@ describe('the crystal: the state the seal shows', () => {
     // A crystal that is ready but whose seal is not lit is never ready (the sim derives it
     // from both; a stale bit never swells a dark crystal's heart past its fill).
     expect(ringCrystalState(DARK, -1, -1).ready).toBe(0);
+    expect(ringCrystalState(DARK, 999, -1).ready).toBe(0);
+  });
+
+  it('waits for the last element to finish filling before it swells, ready bit or not', () => {
+    const done = HEART_SEAL_ARRIVAL + HEART_SEAL_FILL_SECONDS;
+    // The ready bit arrived with the fourth vein (the Ring was already clear): its light has
+    // only just reached the seal, so nothing swells yet.
+    const arriving = HEART_SEAL_ARRIVAL + 0.1;
+    expect(ringCrystalState([999, 999, 999, arriving], arriving, -1).ready).toBe(0);
+    expect(ringCrystalState([999, 999, 999, done - 0.01], done - 0.01, -1).ready).toBe(0);
+    // Then the swell rises over its own rise time, counted from the fill's end (ease(1/2)).
+    const half = done + RING_CRYSTAL_READY_RISE / 2;
+    expect(ringCrystalState([999, 999, 999, half], half, -1).ready).toBeCloseTo(0.5, 6);
+    // A Ring cleared long after the fills finished swells from the clearing, not before it.
+    const cleared = RING_CRYSTAL_READY_RISE / 2;
+    expect(ringCrystalState(LIT, cleared, -1).ready).toBeCloseTo(0.5, 6);
   });
 
   it('overloads for the charge, then shatters: every element at its full, the swell gone', () => {
@@ -385,5 +405,68 @@ describe('the crystal: the shipped GLB', () => {
     expect(materialSlots[0]).toEqual({ base: true, normal: false, mr: false });
     expect(textureMime).toEqual(['image/ktx2']);
     expect(extensionsUsed).toContain('KHR_texture_basisu');
+  });
+});
+
+describe("the crystal's entity: an empty anchor with a click volume, never the generic object", () => {
+  const entity = (templateId: string) => ({
+    templateId,
+    dungeonId: 'smith_heart',
+    pos: { x: 0, z: 0 },
+  });
+
+  it('plans the pressable crystal as its own anchor, and leaves the markers to theirs', () => {
+    const plan = gateObjectPlan(entity(SMITH_HEART_SEAL_CRYSTAL_TEMPLATE));
+    expect(plan).toEqual({ heartSealCrystal: true, height: RING_CRYSTAL_CLICK.labelHeight });
+    // A marker is still the markers' empty reporting anchor, not the crystal's click body.
+    expect(gateObjectPlan(entity('smith_heart_seal_15'))).toEqual({
+      encounterAnchor: true,
+      height: 2,
+    });
+  });
+
+  it('is clickable over the whole silhouette and only there, though it draws nothing', () => {
+    const plan = gateObjectPlan(entity(SMITH_HEART_SEAL_CRYSTAL_TEMPLATE));
+    if (!plan) throw new Error('no plan');
+    const body = buildGateObject(plan);
+    body.updateMatrixWorld(true);
+    const meshes: THREE.Mesh[] = [];
+    body.traverse((o) => {
+      if (o instanceof THREE.Mesh) meshes.push(o);
+    });
+    expect(meshes).toHaveLength(1);
+    expect(meshes[0].visible).toBe(false);
+    const hit = (from: [number, number, number], to: [number, number, number]) => {
+      const dir = new THREE.Vector3(...to).sub(new THREE.Vector3(...from)).normalize();
+      return new THREE.Raycaster(new THREE.Vector3(...from), dir, 0, 200).intersectObject(
+        body,
+        true,
+      ).length;
+    };
+    // A ray along the ground-level run from the south, at the foot, mid-height and near the tip.
+    for (const y of [0.5, 6, RING_CRYSTAL_CLICK.height - 1]) {
+      expect(hit([0, y, -40], [0, y, 0]), `y ${y}`).toBeGreaterThan(0);
+    }
+    // Past the foot's radius, over the tip and under the floor: a miss.
+    expect(hit([RING_CRYSTAL_CLICK.baseR + 2, 3, -40], [RING_CRYSTAL_CLICK.baseR + 2, 3, 0])).toBe(
+      0,
+    );
+    expect(
+      hit([0, RING_CRYSTAL_CLICK.height + 2, -40], [0, RING_CRYSTAL_CLICK.height + 2, 0]),
+    ).toBe(0);
+    // The volume is shared (process lifetime), so a second view never owns its geometry.
+    const again = buildRingCrystalClickBody();
+    const geometries = new Set<THREE.BufferGeometry>();
+    again.traverse((o) => {
+      if (o instanceof THREE.Mesh) geometries.add(o.geometry);
+    });
+    expect(geometries.has(meshes[0].geometry)).toBe(true);
+    expect(meshes[0].geometry.userData.sharedRendererResource).toBe(true);
+  });
+
+  it('keeps the volume inside the plinth and as tall as the crystal', () => {
+    expect(RING_CRYSTAL_CLICK.baseR).toBeLessThanOrEqual(RING_CRYSTAL.plinthR);
+    expect(RING_CRYSTAL_CLICK.topR).toBeLessThan(RING_CRYSTAL_CLICK.baseR);
+    expect(RING_CRYSTAL_CLICK.height).toBe(RING_CRYSTAL.height);
   });
 });

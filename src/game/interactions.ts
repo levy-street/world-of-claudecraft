@@ -5,6 +5,10 @@ import { isInvestigationNpc } from '../sim/content/world_quest_investigation';
 import { isShadowNpc, SHADOW_NPC_ID } from '../sim/content/world_quest_shadow';
 import { isLootableBody } from '../sim/corpse_loot_state';
 import { ESCORTS } from '../sim/data';
+import {
+  isSealCrystalTemplate,
+  SEAL_CRYSTAL_REACH,
+} from '../sim/encounters/smith_heart/seal_crystal';
 import { corpseLootApproachPoint, corpseLootDistance } from '../sim/loot/corpse_loot_reach';
 import { kitUsableNow } from '../sim/mob/trash_kit/encounter_use';
 import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
@@ -187,6 +191,9 @@ export function hoverCursorKind(
   if (e.kind === 'object' && e.templateId === MUSTER_RACK_TEMPLATE_ID && e.lootable) {
     return 'friendly';
   }
+  // A charged heart seal crystal is there to be pressed (the sim keeps it lootable only
+  // while it is: encounters/smith_heart/seal_crystal.ts).
+  if (e.kind === 'object' && isSealCrystalTemplate(e.templateId) && e.lootable) return 'friendly';
   // A standing Gurglegreen Cauldron is there to be drunk from (seasonal/toy_cauldron.ts).
   if (e.kind === 'object' && e.objectItemId === GURGLEGREEN_CAULDRON_ID) return 'friendly';
   if (e.kind === 'player' && e.id !== playerId) return 'friendly';
@@ -208,6 +215,10 @@ export function objectInteractionRange(entity: Pick<Entity, 'templateId'>): numb
   if (entity.templateId === REALM_BUILDER_MONUMENT_TEMPLATE_ID) {
     return REALM_BUILDER_MONUMENT_INTERACT_RADIUS;
   }
+  // The Smith's Heart's heart seal crystal is pressed from beside its plinth: the
+  // sim measures its reach from the crystal's edge (seal_crystal.ts), so a click
+  // or the interact key from there reaches it instead of drawing a refusal.
+  if (isSealCrystalTemplate(entity.templateId)) return SEAL_CRYSTAL_REACH;
   return INTERACT_RANGE;
 }
 
