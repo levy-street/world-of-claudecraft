@@ -5,9 +5,9 @@
 // joined), then the painting to KTX2 (scripts/assets/compress_glb_textures.mjs). Recipe and
 // source records: docs/design/raid/kit/ring_crystal_src/README.md.
 //
-//   node scripts/assets/smith_heart_hammer_colossi/split_views.mjs docs/design/raid/kit/ring_crystal_src/sheets/rc_sheet_crystal.webp tmp/ring_crystal/crystal/views 4
-//   node scripts/assets/smith_heart_hammer_colossi/tripo_views.mjs tmp/ring_crystal/crystal 10000 2048
-//   "<blender>" -b --factory-startup --python docs/design/raid/kit/build_smith_heart_ring_crystal.py -- --src tmp/ring_crystal/crystal/raw.glb --out tmp/ring_crystal/smith_heart_ring_crystal_src.glb
+//   node scripts/assets/smith_heart_hammer_colossi/split_views.mjs docs/design/raid/kit/ring_crystal_src/sheets/ring_crystal_sheet_v4.webp tmp/ring_crystal/crystal/views 4
+//   node scripts/assets/smith_heart_hammer_colossi/tripo_views.mjs tmp/ring_crystal/crystal 14000 2048
+//   "<blender>" -b --factory-startup --python docs/design/raid/kit/build_smith_heart_ring_crystal.py -- --src tmp/ring_crystal/crystal/raw.glb --out tmp/ring_crystal/smith_heart_ring_crystal_src.glb --reach 8.6 --clusters 14 --crown-r 0.15 --crown-z 0.4
 //   node scripts/assets/smith_heart_ring_crystal/build.mjs
 //   node scripts/assets/compress_glb_textures.mjs public/models/props/smith_heart_ring_crystal.glb
 //   node scripts/build_media_manifest.mjs generate

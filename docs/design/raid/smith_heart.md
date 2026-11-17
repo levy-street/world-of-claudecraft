@@ -165,8 +165,9 @@ rather than repeating numbers that would rot.
 | The Slab, the Balcony | stair from the Quarry up to the Balcony | `SLAB`, `BALCONY` |
 | The Grand Stair | one broad stair (16 yd) from the Balcony's tip down across the chasm to the dais | `GRAND_STAIR` |
 | The North Stair | the dais's second way in (phase 2C): a broad stair (16 yd) from the Ring's inner edge at its north (the Breath's mouth) straight down across the chasm to the dais, a gentle fall from the Ring to the dais | `NORTH_STAIR` |
+| The East and West Stairs | the dais's third and fourth ways in (the owner's review of 2026-11-18): the North Stair turned a quarter each way, a broad stair (16 yd) from the Ring's inner edge at its east (the Quench's mouth) and at its west (the Heat's mouth) straight down across the chasm to the dais, walkable, carrying those two rivers down their chutes | `EAST_STAIR`, `WEST_STAIR` |
 | The Ring | flat annulus sector round the seal, two curved stairs to the Balcony | `RING`, `RING_ARC` |
-| The Seal Dais | a round island a little below the Ring, floating over the chasm; the seal at its centre, the portal over the seal | `SEAL_DAIS`, `HEART_SEAL`, `RING_PORTAL` |
+| The Seal Dais | a round island a little below the Ring, floating over the chasm; the seal's crystal at its centre (footprint 8.5 yd, `SEAL_CRYSTAL`), the portal under it | `SEAL_DAIS`, `HEART_SEAL`, `SEAL_CRYSTAL`, `RING_PORTAL` |
 | The Breath | b1, the chimney, b2, the Wind Bridge, b3, the climb | `BREATH`, `WIND_BRIDGE` |
 | The Storm Cornice (Breath arena) | a cracked plateau about 100 by 80 yd at the very top of the mountain (its shoulders fall away into a sea of cloud on every open bearing), its rim cut by six wind channels; the whole rim is an open lip to the void, on every difficulty (the west, where the climb comes up, keeps its wall); two floating isles hang high over its south rim (`BREATH_ISLES`) | `BREATH.cornice`, `CORNICE_CHANNELS`, `CORNICE_GAPS` (field `lipOpenings`) |
 | The Quench | q1, q2, the Singing Ice, the lake descent | `QUENCH` |
@@ -430,7 +431,7 @@ newly lit vein sends its line from `SMITH_HEART_VEIN_LIT_LOG`.
 **The crystal** (`seal_crystal.ts`) is one claim object, template
 `smith_heart_seal_crystal` (`SMITH_HEART_SEAL_CRYSTAL_TEMPLATE`), named "The Heart Seal
 Crystal", at the dais centre (`SEAL_CRYSTAL`: instance-local (0, 0), footprint radius
-3.6 yd), appended LAST to the dungeon's objects (object order feeds entity ids). The
+8.5 yd, the plinth's reach), appended LAST to the dungeon's objects (object order feeds entity ids). The
 tick keeps it honest: `lootable` is true only while the seal is READY and it has not
 burst (a dark crystal offers no press to the clients), and its `respawnTimer` is held at
 infinity so the generic object sweep never re-arms it. While it stands it is SOLID: a
@@ -446,17 +447,21 @@ death checkpoint, landing or dev anchor stands inside it (pinned).
 `interaction.ts` `pickUpObject` routes the crystal to `pressSmithHeartSealCrystal`, ahead
 of its item-payload gate). The press needs the player alive (a corpse or a released
 spirit is turned away by `pickUpObject`'s own rule), inside the crystal's claim and
-within `INTERACT_RANGE` of the crystal's EDGE (`INTERACT_RANGE + SEAL_CRYSTAL.r` from its
-centre), and the seal READY and not burst. Not ready answers
-`SMITH_HEART_SEAL_DARK_TEXT` (reachable only from a direct pickup command, since a dark
-crystal is not lootable and so not clickable); out of reach answers "Too far away.".
+within `INTERACT_RANGE` of the crystal's EDGE (`SEAL_CRYSTAL_REACH`, `INTERACT_RANGE +
+SEAL_CRYSTAL.r` from its centre), and the seal READY and not burst. The generic interact
+press (`interaction.ts` `interact`) asks `trySealCrystalInteract` first, because its scan's
+plain range stops short of a plinth this wide: a living player within reach presses the
+crystal, charged or dark. Not ready answers `SMITH_HEART_SEAL_DARK_TEXT` (from the interact
+key within reach or a direct pickup command, since a dark crystal is not lootable and so
+not clickable); out of reach answers "Too far away.".
 On success `burstSmithHeartSeal` (the same function `/dev heart portal` calls, a forced
 burst): (1) writes the PORTAL bit onto every marker AT ONCE, so the same tick's portal
 hop already finds the way open; (2) retires the crystal: its wall goes the same tick and
 the entity is DROPPED from the claim (the online mirror's wall leaves with the entity
 one snapshot later, the pillars' contract), so the portal's trigger at the dais centre is
-reachable (a body standing against the wall is 4.1 yd from the centre, just outside the
-portal's 4 yd trigger: one step in after the burst); (3) sends `SMITH_HEART_PORTAL_OPEN_LOG` once to the claim's players
+reachable (the portal's whole 4 yd trigger stands under the crystal and a body standing
+against the wall is about 9 yd from the centre, so nobody reaches the portal before the
+burst and it is a short run in after it); (3) sends `SMITH_HEART_PORTAL_OPEN_LOG` once to the claim's players
 (re-localized by `src/ui/sim_i18n.ts`). The bit is kept for the claim's life: a second
 press finds no crystal, and a guardian that stands up again (a dev reset) darkens the
 veins and the charge but never closes the portal. A fresh claim (the markers back at
@@ -688,18 +693,18 @@ crystal, no metal, no machinery (the raid's line against Varkhul's).
 | Piece | Look | Where |
 |---|---|---|
 | The Ring's walk | Dressed granite flags in nine courses round the seal, every course's joints staggered at the modules' ends, a band of dark basalt running the whole circle, worn arrises, chipped corners, a crack here and there, grit in the joints; a 6 degree module each, Start and End closing the arc square | `Kit_RingPave*`, `planRingPaving` |
-| The Ring's edges | Over the chasm a curb under a hand on a carved fascia three lifts deep (none where the Quench's and the Heat's light leap); against the mountain a gutter of setts and the scree and fallen blocks heaped at the rock's foot | `Kit_RingCurb*`, `Kit_RingFoot*`, `planRingEdges` |
-| The light-rivers | A channel inlaid where each river crosses the Ring (two carved lips, a polished dark bed the ribbon burns on), the dais's four channels from its rim to the seal's notches, a chute down the middle of both stairs | `Kit_RingChannel`, `Kit_SealDais`, `Kit_StairChute` |
-| The two stairs | The Grand Stair and the North Stair laid tread by tread: two or three blocks a tread, worn hollow, nosings rounded and chipped; every tread's top on the walked ramp at its middle (half a riser either way), short treads on the Grand Stair, long low ones on the gentle North Stair; carved stringers three lifts deep and a low coped parapet (0.8, with newels) down both sides of every stair to the seal (the Balcony Stairs keep their field ramp and take the parapets) | `Kit_StairTread*`, `Kit_StairParapet*`, `planRingStairs`, `planRingStairSteps` |
-| The Seal Dais | Its walk in courses round the seal (the seal's basalt ring first), the two stairs' landings out to their first treads, a rim of carved face and a low coped parapet open where the stairs land and where the Quench's and the Heat's light leap on; under it an inverted mountain some 46 yards deep, ledged and fissured, the four veins' crystal breaking out of it under each channel and crystal hanging from its root | `Kit_SealDais` |
-| The seal | Four quarters of raw granite, each a rough rim (notched where its channel runs in), ribs along its sides and a bed of crystal cells; a crystal boss at the middle. The crystal is the runtime's own shader (`heartCrystalMaterial`): smoky and dark until its vein lights | `Kit_SealQuarter`, `Kit_SealHeart`, `heart_seal.ts` |
-| The spires | The four bronze tines became four crystal spires (`sh_portal_tine`, collider 1.6): a banded drum of rough granite and a cluster of great crystal leaning in over the seal, the tallest's tip 16 yards up; each burns for its vein. The southern two stand a breath off the diagonals (`RING_SPIRE_BEARINGS`) so the Ring's two ends see past them to the portal | `Kit_SealSpire`, `ringSpireSpots` |
+| The Ring's edges | Over the chasm a curb under a hand on a carved fascia three lifts deep; against the mountain a gutter of setts and the scree and fallen blocks heaped at the rock's foot | `Kit_RingCurb*`, `Kit_RingFoot*`, `planRingEdges` |
+| The light-rivers | A channel inlaid where each river crosses the Ring (two carved lips, a polished dark bed the ribbon burns on), the dais's four channels from its rim to the seal's notches, a chute down the middle of every stair | `Kit_RingChannel`, `Kit_SealDais`, `Kit_StairChute` |
+| The four stairs | The Grand Stair, the North Stair and, since the owner's review of 2026-11-18 ("the bridges are too thin, lets have the same bridges as the other two"), the East and West Stairs (`EAST_STAIR`, `WEST_STAIR`: the North Stair turned a quarter each way, walkable like it, carrying the Quench's and the Heat's rivers where thin conduit spans crossed the chasm before) laid tread by tread: two or three blocks a tread, worn hollow, nosings rounded and chipped; every tread's top on the walked ramp at its middle (half a riser either way), short treads on the Grand Stair, long low ones on the three gentle Ring stairs (16 yd broad each); carved stringers three lifts deep and a low coped parapet (0.8, with newels) down both sides of every stair to the seal (the Balcony Stairs keep their field ramp and take the parapets) | `Kit_StairTread*`, `Kit_StairParapet*`, `planRingStairs`, `planRingStairSteps` |
+| The Seal Dais | Its walk in courses round the seal (the seal's basalt ring first), the four stairs' landings out to their first treads, a rim of carved face and a low coped parapet open where the stairs land; under it an inverted mountain some 46 yards deep, ledged and fissured, the four veins' crystal breaking out of it under each channel and crystal hanging from its root | `Kit_SealDais` |
+| The crystal | One crystal at the dais's centre that holds all four elements (the owner's ask of 2026-11-18, replacing the four granite quarters and the four spires): a white-gold heart shaft standing straight up, the Hammer's chunky amber prisms south, the Quench's ice east, the Breath's storm north and the Heat's flame-horns west grown round it, on a broad plinth of dark slabs spread to the seal's inner circle (8.5 yd, 18.85 yd tall). It is the Tripo build of the owner's approved ChatGPT sheet (`public/models/props/smith_heart_ring_crystal.glb`, sources `docs/design/raid/kit/ring_crystal_src/`), cut along its own shells into a plinth and fourteen clusters, every vertex carrying its element weights and light path. One unlit material (`ring_crystal_material.ts`, the look in `RING_CRYSTAL_LOOK`): dormant is the painting dimmed and cooled, each element lights as its river arrives and climbs its own crystals behind a white-hot front, the heart glows with the four, ready makes the whole crystal breathe, and the painting's four colours are kept throughout | `ring_crystal.ts`, `ring_crystal_core.ts`, `ring_crystal_material.ts`, `heart_seal.ts` |
+| Its click volume | The crystal is also a claim object the sim keeps pressable once all four veins burn and the Ring is clear (section 5.2): its entity's view is an empty anchor with a hidden click frustum as wide as the plinth, so a click anywhere on it is a click on it; the interact key's scan, a click's range and the hover cursor read its reach from the plinth's edge (`SEAL_CRYSTAL_REACH`) | `ring_crystal_pick.ts`, `gate_objects.ts`, `src/game/interactions.ts` |
 | The pack spots | A cairn at the rim behind each of the eight packs (`sh_ring_cairn`, collider 2): a block fallen from the mountain with a crystal lamp in a rock cradle, or a toppled standing stone broken in two with its lamp in the break, rubble round both | `Kit_RingCairn*` |
 | The standing stones | The forge pillars became rough-hewn standing stones, chevrons carved in a band, a warm crystal lamp in the cleft of each one's head; the one that stood on the east Balcony Stair's edge is gone | `Kit_RingMonolith` |
 | The vein mouths | A threshold of dark stones flush across each mouth and a pair of standing stones flanking it, each its vein's: the Breath's slender, twisted and holed by the gale, a pale teal crystal in its crown; the Quench's squat, frost-cracked, ice crystal growing out of its seams; the Heat's dark and sooted, split by seams of white-gold fire, a crystal ember at its head; the Hammer's (`sh_hammer_jamb`, on colliders at the Grand Stair's head on the Balcony) broad and heavy with ochre geodes broken open in it | `Kit_Jamb*`, `Kit_RingSill`, `planRingMouths` |
 
 **How it sits on the field.** The field keeps every floor the sim walks; the kit
-draws over it. The Ring's, the dais's and the two stairs' field tops are left out once
+draws over it. The Ring's, the dais's and the four stairs' field tops are left out once
 the kit has landed (`RING_KIT_OMIT_TOPS`, the field terrain's `omitTops`: neither drawn
 nor cutting the ground under them), so the paving's joints show its own grit and the
 treads never fight a ramp; the paving lies a breath over the walk, the curbs and
@@ -724,16 +729,17 @@ beds (`Kit_RockNeedle*`, `planHeartNeedles`) on the deepest points of the mounta
 round the Ring, 60 to 100 yards tall. A band piece whose body would reach over a walk
 behind it is never placed (`backOverFloor`).
 
-**The moments (VFX).** Every material is built with the interior (the seal's late
-pieces carry hidden carriers of their crystal, plain and instanced), nothing reads a
-texture, no light is added; all draw on every tier but the shards (fewer on the low
-tier, `heartShardCount`) and the shake (reduced motion).
+**The moments (VFX).** Every material is built with the interior (the crystal's pieces
+share one material whose painting uploads with the interior's gate; a crystal that lands
+after the interior was built arrives under the same group through the live compile gate),
+no light is added; all draw on every tier but the shake (reduced motion).
 
 | Moment | Look | Where |
 |---|---|---|
-| A colour arrives | the river's ribbon flows toward the seal with a white-hot surge riding the light's front (`heartRiverSurgeHead`); the spire of its vein ignites foot to tip with a white flare (`heartSpireIgnite`); the quarter's crystal fills rim to centre under a flush light; its column stands up; a shockwave of its colour runs out across the chasm and the whole Ring (`heartSealArrivalWave`); the camera thuds | `heart_rivers.ts`, `heart_seal.ts`, `seal_shake.ts` |
-| The seal splits | the four spires flare, the tines' arcs blaze from their crystal tips, a beam stands up out of the seal to the sky (`HEART_PORTAL_SKY_BEAM`), the bloom, the quarters part like petals (`heartQuarterPose`), the boss bursts into shards that lift out of the seams tumbling (`heartShardPose`), a four-colour ring wave and a wall of light ride out across the whole Ring, the camera trembles, jolts on the flash and shakes again as the shards lift (`HEART_PORTAL_SHAKES`) | `heart_portal.ts`, `heart_seal.ts`, `seal_shake.ts` |
-| The living portal | the vortex and the funnel in the four colours, a slower wider sleeve round them, the shards turning round the funnel for good over every head, the four spires burning, a thin beam to the sky marking it from the whole main map | `heart_portal.ts`, `heart_seal.ts` |
+| A colour arrives | the river's ribbon flows toward the seal with a white-hot surge riding the light's front (`heartRiverSurgeHead`); its element's crystals light foot to tip behind a white-hot front (`ringCrystalState`, from `heartSealQuarterFill`), the heart glowing a little more; its column stands up; a shockwave of its colour runs out across the chasm and the whole Ring (`heartSealArrivalWave`); the camera thuds | `heart_rivers.ts`, `ring_crystal.ts`, `heart_seal.ts`, `seal_shake.ts` |
+| The crystal is ready | all four lit and the Ring clear (the markers' ready bit): once the slowest element has finished filling the whole crystal breathes with a thin white-gold rim, the sign that a press will break it | `ring_crystal_core.ts` (`ringCrystalState`), `ring_crystal_material.ts` |
+| The crystal bursts | a player presses it (section 5.2): it overloads and whitens (`HEART_PORTAL_OPEN.charge`), then shatters into a blinding pillar standing up off the seal (`flash`), a beam stands up out of the seal to the sky (`HEART_PORTAL_SKY_BEAM`), the crystal's pieces fly outward tumbling (`ringCrystalPiecePose`), the grey core of rock under them (the one body piece wider than any cluster, `RING_CRYSTAL_CORE_RADIUS`) goes in the flash and the plinth's slabs crack apart and sink into the dais, a four-colour ring wave and a wall of light ride out across the whole Ring, the camera trembles, jolts on the flash and shakes again as the pieces climb (`HEART_PORTAL_SHAKES`) | `heart_portal.ts`, `ring_crystal.ts`, `seal_shake.ts` |
+| The living portal | the vortex and the funnel in the four colours, a slower wider sleeve round them, the crystal's pieces settling into a slow orbit round the funnel for good over every head, a thin beam to the sky marking it from the whole main map | `heart_portal.ts`, `ring_crystal.ts` |
 | The hop | the arrival's column and ring, and the four colours whirling up round whoever arrives | `heart_portal.ts` |
 
 ### 5.14 The Breath vein (phase 2G)
