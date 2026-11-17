@@ -1,8 +1,8 @@
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { articleArt } from '../scripts/mediawiki/article_art';
-import { ABILITIES, ITEMS, MOBS } from '../src/sim/data';
+import { articleArt, modelStills } from '../scripts/mediawiki/article_art';
+import { ABILITIES, ITEMS, MOBS, NPCS } from '../src/sim/data';
 import { targetPortraitUrl } from '../src/ui/target_portrait_view';
 
 describe('Encyclopedia game artwork', () => {
@@ -46,5 +46,33 @@ describe('Encyclopedia game artwork', () => {
       expect(art.get('mob/' + id), id).toBe(targetPortraitUrl(id, true));
     for (const path of new Set(art.values()))
       expect(existsSync(join('public', path.slice(1))), path).toBe(true);
+  });
+  it('gives creature pages a shipped model render, never a borrowed character body', () => {
+    const map = (records: Record<string, unknown>, prefix: string) =>
+      new Map(Object.keys(records).map((id) => [id, prefix + id]));
+    const models = modelStills({ mob: map(MOBS, 'mob/'), npc: map(NPCS, 'npc/') });
+    expect(models.size).toBeGreaterThan(100);
+    for (const [title, path] of models) {
+      expect(path, title).toMatch(/^\/encyclopedia-stills\/[\w.-]+\.webp$/);
+      expect(existsSync(join('public', path.slice(1))), path).toBe(true);
+      // A player or NPC rig would draw a generic class body, not the creature.
+      expect(path, title).not.toMatch(/\/(?:player|npc)_/);
+    }
+    // NPCs wear authored looks this renderer cannot draw, so they keep their icon.
+    expect([...models.keys()].some((title) => title.startsWith('npc/'))).toBe(false);
+    expect(models.get('mob/rift_boss_frost')).toBe(
+      '/encyclopedia-stills/mob_hoard_hoarfrost_warden.webp',
+    );
+  });
+});
+
+describe('Encyclopedia reader model art', () => {
+  it('lifts the model line into the info box instead of printing it', () => {
+    const reader = readFileSync('mediawiki/reader/reader.js', 'utf8');
+    expect(reader).toContain("image(page.model, 'article-art model')");
+    const seed = readFileSync('mediawiki/seed/pages.xml', 'utf8');
+    expect(seed).toMatch(
+      /&lt;woc-art path=&quot;\/encyclopedia-stills\/[\w.-]+\.webp&quot; size=&quot;model&quot; \/&gt;/,
+    );
   });
 });

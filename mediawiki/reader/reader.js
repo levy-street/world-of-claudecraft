@@ -276,9 +276,22 @@ export async function openReader({ seedUrl, packed, cardsUrl, packedCards, asset
         /^<woc-art path="(\/(?:ui|map_bg|textures\/loading)\/[\w/-]+\.(?:webp|png|jpg))" \/>\n/,
       );
       const art = artwork?.[1] || directoryArt(title);
-      const text = artwork ? source.slice(artwork[0].length) : source;
+      let text = artwork ? source.slice(artwork[0].length) : source;
+      // The large model render, when a creature or NPC has one.
+      const modelLine = text.match(
+        /^<woc-art path="(\/encyclopedia-stills\/[\w.-]+\.webp)" size="model" \/>\n/m,
+      );
+      const model = modelLine?.[1] ?? '';
+      if (modelLine) text = text.replace(modelLine[0], '');
       const categories = [...text.matchAll(/\[\[Category:([^\]]+)\]\]/g)].map((m) => m[1]);
-      pages.set(title, { title, text, art, categories, sort: title.toLocaleLowerCase('en') });
+      pages.set(title, {
+        title,
+        text,
+        art,
+        model,
+        categories,
+        sort: title.toLocaleLowerCase('en'),
+      });
     }
     const all = [...pages.values()].sort((a, b) => a.title.localeCompare(b.title, 'en'));
     const groups = subjects.map(([name, entries]) => [
@@ -512,10 +525,12 @@ export async function openReader({ seedUrl, packed, cardsUrl, packedCards, asset
         link('Main Page', 'Encyclopedia') +
         parents.map(({ title, label }) => ' / ' + link(title, label)).join('') +
         '</div><div class="article-heading">' +
-        image(
-          page.art,
-          /^\/(?:map_bg|textures\/loading)/.test(page.art) ? 'article-art wide' : 'article-art',
-        ) +
+        (page.model
+          ? image(page.model, 'article-art model')
+          : image(
+              page.art,
+              /^\/(?:map_bg|textures\/loading)/.test(page.art) ? 'article-art wide' : 'article-art',
+            )) +
         '<h1>' +
         escapeHtml(displayTitle(current)) +
         '</h1></div><div class="tags">' +

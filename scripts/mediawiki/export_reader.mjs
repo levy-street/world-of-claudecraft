@@ -28,7 +28,9 @@ const paths = new Set([
     (m) => '/map_bg/' + m[1] + '.webp',
   ),
   ...Array.from(
-    body.matchAll(/&lt;woc-art path=&quot;([^&]+)&quot;(?: size=&quot;icon&quot;)? \/&gt;/g),
+    body.matchAll(
+      /&lt;woc-art path=&quot;([^&]+)&quot;(?: size=&quot;(?:icon|model)&quot;)? \/&gt;/g,
+    ),
     (m) => m[1],
   ),
 ]);

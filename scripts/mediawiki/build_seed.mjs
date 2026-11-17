@@ -36,7 +36,7 @@ import { addZoneAndClassHubs } from '../../scripts/mediawiki/hub_portals';
 import { addQuestDirectory } from '../../scripts/mediawiki/quest_directory';
 import { subjects } from '../../mediawiki/reader/browse';
 import { abilityIndexGroup } from '../../scripts/mediawiki/ability_access';
-import { articleArt } from '../../scripts/mediawiki/article_art';
+import { articleArt, modelStills } from '../../scripts/mediawiki/article_art';
 import { classAbilitySections } from '../../scripts/mediawiki/class_ability_sections';
 import { abilityArticle } from '../../scripts/mediawiki/ability_article';
 import { addTalentPages } from '../../scripts/mediawiki/talent_articles';
@@ -228,7 +228,11 @@ for (const page of pages.filter(p=>!p.title.startsWith('MediaWiki:')).sort((a,b)
 add('All Pages',[...letters].map(([letter,titles])=>section(letter,bullets(titles))).join(''),['Wiki']);
 
 const illustrations = articleArt(titleBy);
+const models = modelStills(titleBy);
 for(const page of pages) {
+  // A large model render rides second, after the icon line the lists and tiles use.
+  const model = models.get(page.title);
+  if(model) page.text = '<woc-art path="' + model + '" size="model" />\\n' + page.text;
   const path = illustrations.get(page.title);
   if(path) page.text = '<woc-art path="' + path + '" />\\n' + page.text;
 }

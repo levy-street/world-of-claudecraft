@@ -645,3 +645,12 @@ body {
   margin-right: 8px;
   vertical-align: middle;
 }
+
+/* A creature's or NPC's model render. */
+.woc-model-art {
+  float: right;
+  width: 260px;
+  max-width: 45%;
+  height: auto;
+  margin: 0 0 12px 16px;
+}

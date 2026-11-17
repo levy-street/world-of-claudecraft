@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { BUDDIES } from '../../src/sim/content/buddies';
 import { ROW_TREES, TALENTS } from '../../src/sim/content/talents';
@@ -64,6 +64,27 @@ export function mobArtPath(id: string): string {
     existsSync(join('public', path.slice(1)))
     ? path
     : '';
+}
+
+/** Large renders of each creature's and NPC's model, written by
+ *  scripts/mediawiki/render_entity_stills.mjs. Keyed by page title. */
+export function modelStills(titleBy: TitleMaps): Map<string, string> {
+  const file = join('scripts', 'mediawiki', 'entity_stills.json');
+  const stills: Record<string, string> = existsSync(file)
+    ? JSON.parse(readFileSync(file, 'utf8'))
+    : {};
+  const byTitle = new Map<string, string>();
+  for (const kind of ['mob', 'npc'] as const)
+    for (const [id, title] of titleBy[kind] ?? []) {
+      const path = stills[kind + '/' + id];
+      if (
+        path &&
+        /^\/encyclopedia-stills\/[\w.-]+\.webp$/.test(path) &&
+        existsSync(join('public', path.slice(1)))
+      )
+        byTitle.set(title, path);
+    }
+  return byTitle;
 }
 
 export function articleArt(titleBy: TitleMaps): Map<string, string> {

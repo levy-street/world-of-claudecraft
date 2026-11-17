@@ -1616,3 +1616,19 @@ body[data-woc-site] #view table.item-table {
 #view table.item-table tr[hidden] {
   display: none;
 }
+
+/* A creature's or NPC's model render fills the info box instead of a small icon. */
+#view .wiki-box-art .article-art.model {
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: contain;
+  background: radial-gradient(circle at 50% 55%, var(--panel), var(--bg-2) 70%);
+  border-radius: 4px;
+}
+#view .article-heading .article-art.model {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+}

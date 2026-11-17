@@ -15,6 +15,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import * as esbuild from 'esbuild';
 import { assertFamiliesKnown } from './family_guard.mjs';
+import { modelSpecFor } from './model_spec.mjs';
 import { stillUrl } from './still_key.mjs';
 import { patternChannelSets, recipeAcquisitionChannel } from './vendor_channel.mjs';
 
@@ -268,36 +269,7 @@ function modelKeyFor(visualKey) {
   const def = VISUALS[visualKey];
   if (!def) return null;
   if (!MODELS[visualKey]) {
-    const spec = { url: def.url, idle: def.clips?.idle ?? null, height: def.height };
-    if (def.yaw) spec.yaw = def.yaw;
-    if (def.hover) spec.hover = def.hover;
-    if (def.show) spec.show = def.show;
-    if (def.attach) {
-      // swapOnly entries are pure swap-slot bases the game never renders (an
-      // offhandSlot points at them; empty hands skip the entry), so the guide
-      // figures must not showcase them either: without this filter the
-      // caster classes would wear the warlock's fixed spellbook. The shield
-      // classes' offhand bases are deliberately unflagged and keep their
-      // showcase kit (the paladin still renders axe and shield).
-      const attach = def.attach.filter((a) => !a.swapOnly);
-      if (attach.length > 0) {
-        spec.attach = attach.map((a) => {
-          const o = { url: a.url, bone: a.bone };
-          if (a.position) o.position = a.position;
-          if (a.rotationY) o.rotationY = a.rotationY;
-          if (a.gripRef) o.gripRef = a.gripRef;
-          if (a.size !== undefined && a.size !== 1) o.size = a.size;
-          return o;
-        });
-      }
-    }
-    if (def.weaponFix) spec.weaponFix = def.weaponFix;
-    if (def.tint !== undefined) spec.tintStrength = def.tintStrength ?? 0.4;
-    if (def.wocCharacter) {
-      if (def.animUrls?.length) spec.animUrls = [...def.animUrls];
-      const sets = [...new Set(Object.values(def.wocCharacter.items).map((item) => item.set))];
-      spec.armor = sets.map((set) => wocArmorPackUrl(def.wocCharacter.fit, set, 'medium'));
-    }
+    const spec = modelSpecFor(def, wocArmorPackUrl);
     MODELS[visualKey] = spec;
   }
   return visualKey;

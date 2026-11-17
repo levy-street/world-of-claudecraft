@@ -9,6 +9,7 @@ COPY mediawiki/theme/Common.css /var/www/html/resources/assets/woc-mediawiki.css
 COPY public/map_bg/ /var/www/html/resources/assets/game/map_bg/
 COPY public/ui/ /var/www/html/resources/assets/game/ui/
 COPY public/textures/loading/ /var/www/html/resources/assets/game/textures/loading/
+COPY public/encyclopedia-stills/ /var/www/html/resources/assets/game/encyclopedia-stills/
 COPY public/loading-screen.jpg /var/www/html/resources/assets/woc-loading-screen.jpg
 COPY public/woc_logo_square.webp /var/www/html/resources/assets/woc-logo-square.webp
 COPY public/worldofclaudecraft-logo.png /var/www/html/resources/assets/worldofclaudecraft-logo.png
