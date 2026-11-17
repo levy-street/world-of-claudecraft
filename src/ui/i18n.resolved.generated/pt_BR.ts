@@ -17452,6 +17452,10 @@ export const pt_BR: EnTranslations = {
         "name": "Mensageiro",
         "description": "Invoque um burro voador para levar itens entre suas bolsas e o banco mais próximo. Cada viagem leva até 15 segundos até o banco e até 15 segundos de volta, voando mais rápido nas rotas longas. Escolha até 24 pilhas por viagem. Os itens devolvidos transbordam as bolsas cheias; depois o mensageiro desaparece até ser invocado de novo. A volta pausa enquanto você está morto ou em uma instância. É necessária assinatura para iniciar uma nova viagem."
       },
+      "use_trinket": {
+        "name": "Trinket",
+        "description": "Use the trinket you are wearing. This button takes that trinket's icon, effect and cooldown, and changes when you equip a different trinket. It does nothing while you wear no trinket, or one with no use effect."
+      },
       "sport_kick": {
         "name": "Chute",
         "description": "Empurre a bola rente ao chão em direção ao ponto de mira."

@@ -17452,6 +17452,10 @@ export const sv_SE: EnTranslations = {
         "name": "Kurir",
         "description": "Frammana en flygande åsna som bär föremål mellan dina väskor och närmaste bank. Varje resa tar upp till 15 sekunder till banken och upp till 15 sekunder tillbaka, med snabbare flygning på längre sträckor. Välj upp till 24 staplar per resa. Återlämnade föremål får plats även i fulla väskor, sedan försvinner kuriren tills den frammanas igen. Återresan pausas medan du är död eller inne i en instans. Medlemskap krävs för att påbörja en ny resa."
       },
+      "use_trinket": {
+        "name": "Trinket",
+        "description": "Use the trinket you are wearing. This button takes that trinket's icon, effect and cooldown, and changes when you equip a different trinket. It does nothing while you wear no trinket, or one with no use effect."
+      },
       "sport_kick": {
         "name": "Spark",
         "description": "Peta bollen längs marken mot siktpunkten."

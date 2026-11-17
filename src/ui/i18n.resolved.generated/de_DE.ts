@@ -17452,6 +17452,10 @@ export const de_DE: EnTranslations = {
         "name": "Kurier",
         "description": "Beschwöre einen fliegenden Esel, der Gegenstände zwischen deinen Taschen und der nächsten Bank transportiert. Jede Reise dauert bis zu 15 Sekunden zur Bank und bis zu 15 Sekunden zurück; auf längeren Strecken fliegt er schneller. Wähle bis zu 24 Stapel je Reise. Zurückgebrachte Gegenstände landen bei vollen Taschen im Überlauf; dann verschwindet der Kurier bis zur nächsten Beschwörung. Die Rückreise pausiert, solange du tot oder in einer Instanz bist. Eine Mitgliedschaft ist zum Start einer neuen Reise erforderlich."
       },
+      "use_trinket": {
+        "name": "Trinket",
+        "description": "Use the trinket you are wearing. This button takes that trinket's icon, effect and cooldown, and changes when you equip a different trinket. It does nothing while you wear no trinket, or one with no use effect."
+      },
       "sport_kick": {
         "name": "Tritt",
         "description": "Stoß den Ball flach über den Boden zum Zielpunkt."

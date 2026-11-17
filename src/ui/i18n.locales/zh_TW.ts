@@ -24369,4 +24369,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'seasonal.thatchgrin.wakeYell': '夜幕降臨南瓜田！誰敢踏進我的田地？',
   'seasonal.thatchgrin.sleepYell': '太陽出來了。回到木樁上，繼續看守。',
   'seasonal.pumpkins.progress': '{label}：{current}/{total}',
+  // The Trinket spell: same-change non-Latin coverage (M16).
+  'entities.abilities.use_trinket.name': '飾品',
+  'entities.abilities.use_trinket.description':
+    '使用您配戴的飾品。此按鈕會採用該飾品的圖示、效果和冷卻時間，並在您裝備其他飾品時隨之改變。未配戴飾品，或所配戴的飾品沒有使用效果時，按下不會有任何作用。',
 };

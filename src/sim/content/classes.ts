@@ -39,6 +39,7 @@ import { PRIEST_ABILITIES } from './priest';
 import { MENDING_WATERS_MANA_COST, TIDECALL_MANA_COST } from './shaman_tuning';
 import { TALENT_ABILITIES_V2 } from './talent_abilities_v2';
 import type { TalentModifiers } from './talents';
+import { TRINKET_SPELL, TRINKET_SPELL_ID } from './trinket_spell';
 
 // ---------------------------------------------------------------------------
 // Player classes — per-level base stats follow classic-era growth curves.
@@ -654,6 +655,7 @@ export const MAGE_MASS_BARRIER_SPELL_POWER_COEFF = 0.25;
 
 export const ABILITIES: Record<string, AbilityDef> = {
   courier: COURIER_ABILITY,
+  [TRINKET_SPELL_ID]: TRINKET_SPELL,
   ...PALADIN_CORE_ABILITIES,
   // ====================== WARRIOR ======================
   heroic_strike: {

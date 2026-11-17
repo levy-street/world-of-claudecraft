@@ -11,6 +11,7 @@ import { computeCharacterModifiers } from '../sim/set_bonus_mods';
 import { mergeAugmentMods } from '../sim/social/fiesta';
 import { parseTalentAllocation } from '../sim/talent_allocation_input';
 import { repairTalentLoadouts } from '../sim/talent_loadouts';
+import { withTrinketSpell } from '../sim/trinket_spell';
 import type { EquipSlot, PlayerClass } from '../sim/types';
 
 interface PresentationState {
@@ -56,7 +57,7 @@ export function buildClientAbilityPresentation(
     activeLoadout,
     mods,
     known: membershipAbilities(
-      abilitiesKnownAt(cls, level, mods, current.questsDone),
+      withTrinketSpell(abilitiesKnownAt(cls, level, mods, current.questsDone)),
       membershipActive,
     ),
   };

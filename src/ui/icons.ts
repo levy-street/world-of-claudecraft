@@ -3754,6 +3754,9 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   clockwork_shock_bomb: r('storm', 'sky', ['gear', { p: 'lightning', ...BR }], ['arcs', 'glow']),
   // Membership Courier: the flying donkey that ferries bag stacks to the bank.
   courier: r('nature', 'sky', ['sack', { p: 'wing', ...TR }], ['motion']),
+  // The Trinket spell with nothing to use: a plain set gem. Worn trinkets draw
+  // their own item art instead (src/ui/hud/action_bar/trinket_spell_core.ts).
+  use_trinket: r('arcane', 'gold', ['gem'], ['sparkle', 'glow']),
 };
 
 const ITEM_RECIPES: Record<string, IconRecipe> = {
@@ -5283,7 +5286,7 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
 // abilities). The painted-census guards (tests/missing_painted_icons_wave,
 // tests/release_v039_icon_art) treat these as parked, never as painted, and
 // reject a stale entry once art lands.
-export const ABILITY_ART_PENDING = new Set<string>(['scratch']);
+export const ABILITY_ART_PENDING = new Set<string>(['scratch', 'use_trinket']);
 
 /** Static URL of an ability's image icon, or null if it uses a recipe. */
 export function abilityImageUrl(id: string): string | null {

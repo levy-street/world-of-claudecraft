@@ -17,6 +17,7 @@ import { specBaselineFor } from '../../../sim/content/spec_baselines';
 import { rowTreeFor } from '../../../sim/content/talent_rows';
 import type { TalentEffect } from '../../../sim/content/talents';
 import { specSignatureIds, talentsFor } from '../../../sim/content/talents';
+import { TRINKET_SPELL_ID } from '../../../sim/content/trinket_spell';
 import type { PlayerClass } from '../../../sim/types';
 
 /** Whether an ability is a spell a player can press: known to the content, not
@@ -52,6 +53,9 @@ export function cooldownClassAbilityIds(cls: PlayerClass): readonly string[] {
   for (const row of rowTreeFor(cls) ?? []) {
     for (const option of row.options) addEffect(option.effect);
   }
+  // The Trinket spell: known by every class, outside every kit
+  // (src/sim/trinket_spell.ts). Tracked, it shows the worn trinket's cooldown.
+  add(TRINKET_SPELL_ID);
   allCache.set(cls, out);
   return out;
 }

@@ -33,12 +33,14 @@ import { ITEMS, MOBS } from '../data';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { duelJustEndedBetween } from '../social/duel';
+import { trinketSpellItemId } from '../trinket_spell';
 import { type Aura, type Entity, MELEE_RANGE } from '../types';
 import { meleeSwing } from './auto_attack';
 import { isForemanShaped, useBalgathTrinket } from './balgath_trinkets';
 import { isUnbreakableControlAura } from './cc';
 import { applyHeal } from './heal';
 import { relocateSwept } from './heroic_leap';
+import { endPlayDead } from './hunter_play_dead';
 import {
   applyHarvest,
   applyQuench,
@@ -128,6 +130,21 @@ function marker(e: Entity, id: string, name: string, duration: number, value = 0
 }
 
 // ---- using the trinket --------------------------------------------------------
+
+/** The Trinket spell (content/trinket_spell.ts), handed here by castAbility
+ *  before any cast-path rule runs: use the trinket the player wears, exactly as
+ *  clicking it does (useItem's worn-trinket arm), so its own gates and cooldown
+ *  answer. Wearing nothing to use says so. */
+export function castTrinketSpell(ctx: SimContext, meta: PlayerMeta, p: Entity): boolean {
+  const itemId = trinketSpellItemId(meta.equipment.trinket);
+  if (!itemId) {
+    ctx.error(meta.entityId, 'You are not wearing a trinket you can use.');
+    return false;
+  }
+  // Using an item is acting: a hunter playing dead stands up first (useItem).
+  endPlayDead(ctx, p);
+  return useWornTrinket(ctx, meta, p, itemId);
+}
 
 /** Whether `itemId` is the trinket the player wears (useItem routes it here). */
 export function isWornTrinket(meta: PlayerMeta, itemId: string): boolean {

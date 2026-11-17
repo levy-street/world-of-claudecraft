@@ -25677,4 +25677,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'seasonal.thatchgrin.wakeYell': '밭에 밤이 내린다! 누가 내 밭을 걷느냐?',
   'seasonal.thatchgrin.sleepYell': '해가 떴군. 기둥으로 돌아가 다시 지켜봐야지.',
   'seasonal.pumpkins.progress': '{label}: {current}/{total}',
+  // The Trinket spell: same-change non-Latin coverage (M16).
+  'entities.abilities.use_trinket.name': '장신구',
+  'entities.abilities.use_trinket.description':
+    '착용 중인 장신구를 사용합니다. 이 버튼은 해당 장신구의 아이콘, 효과, 재사용 대기시간을 그대로 따르며, 다른 장신구를 착용하면 바뀝니다. 장신구를 착용하지 않았거나 사용 효과가 없는 장신구라면 아무 일도 일어나지 않습니다.',
 };

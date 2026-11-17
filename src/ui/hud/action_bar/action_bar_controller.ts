@@ -5,6 +5,7 @@ import {
   classTalentChoiceAbilityGroups,
   type TalentAllocation,
 } from '../../../sim/content/talents';
+import { TRINKET_SPELL_ID } from '../../../sim/content/trinket_spell';
 import { ABILITIES, ITEMS } from '../../../sim/data';
 import type { PlayerClass } from '../../../sim/types';
 import {
@@ -443,6 +444,9 @@ export class ActionBarController {
       // Warrior stances and Paladin auras live on the dedicated #stancebar,
       // never the action bar, so learning one must not consume an action slot.
       if (isStanceBarAbilityGroup(ABILITIES[id]?.exclusiveGroup)) return;
+      // The Trinket spell is opt-in (the spellbook's add button): every
+      // character knows it from level 1, most with no trinket to use yet.
+      if (id === TRINKET_SPELL_ID) return;
       if (this.shouldAutoPlaceOnForm(id, this.activeFormState)) autoPlaceAbilityIds.add(id);
     };
     if (this.knownAbilityIdsAtLastSync === null) {

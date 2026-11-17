@@ -17452,6 +17452,10 @@ export const it_IT: EnTranslations = {
         "name": "Corriere",
         "description": "Evoca un asino volante che trasporta oggetti tra le tue borse e la banca più vicina. Ogni viaggio richiede fino a 15 secondi per raggiungere la banca e fino a 15 secondi per tornare, volando più velocemente sui percorsi più lunghi. Scegli fino a 24 pile per viaggio. Gli oggetti restituiti possono superare la capienza delle borse piene, poi il corriere scompare finché non viene evocato di nuovo. Il viaggio di ritorno si interrompe mentre sei morto o all'interno di un'istanza. Per iniziare un nuovo viaggio serve un abbonamento."
       },
+      "use_trinket": {
+        "name": "Trinket",
+        "description": "Use the trinket you are wearing. This button takes that trinket's icon, effect and cooldown, and changes when you equip a different trinket. It does nothing while you wear no trinket, or one with no use effect."
+      },
       "sport_kick": {
         "name": "Calcio",
         "description": "Spingi la palla rasoterra verso il punto mirato."

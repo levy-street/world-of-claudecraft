@@ -554,7 +554,10 @@ const MONOLITHS: MonolithRow[] = [
     // Honor and companions. Measured after recovery integration, zero slack.
     // Main ce21c7a66f5 sync: parent pins 18043 (Halloween) and 17733 (main).
     // Exact combined count; the three seasonal wiring lines are preserved.
-    ceiling: 17736,
+    // LOWERED 17736 -> 17713 by the Trinket spell: its tooltip hand-off costs
+    // three lines, paid for by moving the action-bar world input refresh out to
+    // src/ui/hud/action_bar/action_bar_world_input.ts. Exact count (wc -l).
+    ceiling: 17713,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

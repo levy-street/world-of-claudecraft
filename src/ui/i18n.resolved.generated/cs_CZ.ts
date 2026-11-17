@@ -17452,6 +17452,10 @@ export const cs_CZ: EnTranslations = {
         "name": "Kurýr",
         "description": "Přivolej létajícího osla, který přenáší předměty mezi tvými brašnami a nejbližší bankou. Každá cesta trvá až 15 sekund do banky a až 15 sekund zpět, na delších trasách letí rychleji. Vyber až 24 stohů na cestu. Při plných brašnách se vrácené předměty uloží do přetečení a kurýr zmizí do dalšího přivolání. Zpáteční cesta se pozastaví, když jsi mrtvý nebo uvnitř instance. Zahájení nové cesty vyžaduje členství."
       },
+      "use_trinket": {
+        "name": "Trinket",
+        "description": "Use the trinket you are wearing. This button takes that trinket's icon, effect and cooldown, and changes when you equip a different trinket. It does nothing while you wear no trinket, or one with no use effect."
+      },
       "sport_kick": {
         "name": "Kop",
         "description": "Pošli míč po zemi směrem k zaměřovanému bodu."

@@ -3,6 +3,7 @@ import { membershipActive } from '../membership';
 import { membershipAbilities } from '../membership_abilities';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
+import { withTrinketSpell } from '../trinket_spell';
 
 /** Rebuild class and entitlement grants through the same progression seam. */
 export function refreshKnownAbilities(ctx: SimContext, meta: PlayerMeta, announce: boolean): void {
@@ -10,7 +11,7 @@ export function refreshKnownAbilities(ctx: SimContext, meta: PlayerMeta, announc
   if (!e) return;
   const before = new Map(meta.known.map((k) => [k.def.id, k.rank]));
   meta.known = membershipAbilities(
-    abilitiesKnownAt(meta.cls, e.level, meta.talentMods, meta.questsDone),
+    withTrinketSpell(abilitiesKnownAt(meta.cls, e.level, meta.talentMods, meta.questsDone)),
     membershipActive(meta, ctx.time),
   );
   if (!announce) return;

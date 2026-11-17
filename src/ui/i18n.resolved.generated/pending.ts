@@ -9,25 +9,70 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "entities.abilities.use_trinket.description",
+    "entities.abilities.use_trinket.name"
+  ],
+  "es_ES": [
+    "entities.abilities.use_trinket.description",
+    "entities.abilities.use_trinket.name"
+  ],
+  "fr_FR": [
+    "entities.abilities.use_trinket.description",
+    "entities.abilities.use_trinket.name"
+  ],
+  "fr_CA": [
+    "entities.abilities.use_trinket.description",
+    "entities.abilities.use_trinket.name"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "entities.abilities.use_trinket.description",
+    "entities.abilities.use_trinket.name"
+  ],
+  "de_DE": [
+    "entities.abilities.use_trinket.description",
+    "entities.abilities.use_trinket.name"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "entities.abilities.use_trinket.description",
+    "entities.abilities.use_trinket.name"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "entities.abilities.use_trinket.description",
+    "entities.abilities.use_trinket.name"
+  ],
+  "nl_NL": [
+    "entities.abilities.use_trinket.description",
+    "entities.abilities.use_trinket.name"
+  ],
+  "pl_PL": [
+    "entities.abilities.use_trinket.description",
+    "entities.abilities.use_trinket.name"
+  ],
+  "id_ID": [
+    "entities.abilities.use_trinket.description",
+    "entities.abilities.use_trinket.name"
+  ],
+  "tr_TR": [
+    "entities.abilities.use_trinket.description",
+    "entities.abilities.use_trinket.name"
+  ],
+  "sv_SE": [
+    "entities.abilities.use_trinket.description",
+    "entities.abilities.use_trinket.name"
+  ],
+  "vi_VN": [
+    "entities.abilities.use_trinket.description",
+    "entities.abilities.use_trinket.name"
+  ],
+  "da_DK": [
+    "entities.abilities.use_trinket.description",
+    "entities.abilities.use_trinket.name"
+  ]
 };

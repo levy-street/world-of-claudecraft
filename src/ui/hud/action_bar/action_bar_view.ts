@@ -73,6 +73,7 @@ import { flowStateDiscountedCost } from '../../../sim/combat/shaman_talents';
 import { thundercallPayoffGlowActive } from '../../../sim/combat/shaman_thundercall';
 import { leavingRestrictedToggle } from '../../../sim/combat/toggle_buff';
 import { getItemCooldownDuration } from '../../../sim/content/item_cooldowns';
+import { TRINKET_SPELL_ID } from '../../../sim/content/trinket_spell';
 import { countRawInSlots } from '../../../sim/item_lock';
 import { isAscensionEmpoweredAbility } from '../../../sim/paladin_devotion';
 import {
@@ -100,6 +101,7 @@ import {
   petSlotUsable,
 } from './pet_slot_core';
 import { trinketSlotState } from './trinket_slot_core';
+import { trinketSpellItem } from './trinket_spell_core';
 
 // The five slot kinds (a discriminated tag the painter maps to DOM classes).
 export type ActionBarSlotKind = 'attack' | 'empty' | 'item' | 'ability' | 'pet';
@@ -713,8 +715,14 @@ export function createActionBarView(
           continue;
         }
 
-        const item = sd.item();
         const ability = sd.ability();
+        // The Trinket spell presents as the trinket it would use: the slot takes
+        // the worn trinket's icon, name and cooldown through the item arm below
+        // (trinket_spell_core.ts) while staying an ability slot, so a press still
+        // casts the spell and the cooldown manager still tracks it. With nothing
+        // to use it falls through to the ability arm.
+        const ownItem = sd.item();
+        const item = ownItem ?? trinketSpellItem(ability?.def.id, world.wornTrinketId);
 
         if (ability === null && item === null) {
           slot.kind = 'empty';
@@ -763,9 +771,9 @@ export function createActionBarView(
               : baseCd > 0
                 ? baseCd
                 : itemCd;
-          slot.kind = 'item';
-          slot.abilityId = null;
-          slot.itemId = item.id;
+          slot.kind = ownItem ? 'item' : 'ability';
+          slot.abilityId = ownItem ? null : (ability?.def.id ?? null);
+          slot.itemId = ownItem ? item.id : null;
           slot.petCommand = null;
           slot.iconKey = `${ITEM_ICON_PREFIX}${item.id}`;
           slot.cooldownRemaining = itemCd;
@@ -818,7 +826,9 @@ export function createActionBarView(
         // (the freed Attack slot only, see ActionBarAbility.known): paint the icon
         // dimmed and unusable instead of running the live cost/cooldown/proc math,
         // which has no meaning for an ability the player cannot press right now.
-        if (ability.known === false) {
+        // The Trinket spell reaches here only with no trinket to use (the item
+        // arm above took it otherwise), so it paints the same way.
+        if (ability.known === false || ability.def.id === TRINKET_SPELL_ID) {
           slot.kind = 'ability';
           slot.abilityId = ability.def.id;
           slot.itemId = null;

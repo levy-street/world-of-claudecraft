@@ -1839,6 +1839,7 @@ const baseEnTable = {
   'aura.trinketRetaliation': 'Retaliation',
   'error.trinketNotReady': 'That item is not ready yet.',
   'error.trinketIncapacitated': "Can't do that while incapacitated.",
+  'error.trinketNoneUsable': 'You are not wearing a trinket you can use.',
   'error.trinketHourglassEmpty': 'The hourglass is empty.',
   'error.trinketNoTallyMarks': 'You have no tally marks to spend.',
   'error.trinketJarEmpty': 'The jar holds no charge.',

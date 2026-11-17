@@ -17452,6 +17452,10 @@ export const da_DK: EnTranslations = {
         "name": "Kurer",
         "description": "Fremkald et flyvende æsel til at bære genstande mellem dine tasker og den nærmeste bank. Hver rejse tager op til 15 sekunder til banken og op til 15 sekunder tilbage, med hurtigere flyvning på længere ruter. Vælg op til 24 stakke pr. tur. Returnerede genstande opbevares som overskud i fulde tasker, og kureren forsvinder så, indtil den fremkaldes igen. Hjemrejsen sættes på pause, mens du er død eller inde i en instans. Medlemskab kræves for at starte en ny tur."
       },
+      "use_trinket": {
+        "name": "Trinket",
+        "description": "Use the trinket you are wearing. This button takes that trinket's icon, effect and cooldown, and changes when you equip a different trinket. It does nothing while you wear no trinket, or one with no use effect."
+      },
       "sport_kick": {
         "name": "Spark",
         "description": "Spark bolden langs jorden mod sigtepunktet."

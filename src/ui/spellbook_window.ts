@@ -51,6 +51,7 @@
 // tests/spellbook_tick_repaint.test.ts.
 
 import { audio } from '../game/audio';
+import { TRINKET_SPELL_ID } from '../sim/content/trinket_spell';
 import { ABILITIES, CLASSES } from '../sim/data';
 import type { ResolvedAbility } from '../sim/sim';
 import type { AbilityDef } from '../sim/types';
@@ -66,6 +67,7 @@ import {
   type HotbarAction,
   isAbilityActionBarEligible,
 } from './hud/action_bar/hotbar';
+import { trinketSpellItem } from './hud/action_bar/trinket_spell_core';
 import { formatNumber, t } from './i18n';
 import { iconDataUrl } from './icons';
 import { buildSpellbookView, type SpellbookRow } from './spellbook_view';
@@ -176,6 +178,10 @@ export class SpellbookWindow {
   // re-opening re-renders anyway).
   private attackToggle: HTMLButtonElement | null = null;
   private readonly rowToggles: RowToggle[] = [];
+  // The Trinket spell row's icon and the worn trinket it was painted for
+  // (refreshTrinketIconIfChanged); collected at build like the toggles.
+  private trinketIcon: HTMLElement | null = null;
+  private trinketIconWorn: string | undefined;
   // The action-bar state those toggles were painted from. Everything the refresh
   // writes is a function of exactly these three, so an unchanged frame has nothing
   // to paint; see takeControlChange.
@@ -287,6 +293,19 @@ export class SpellbookWindow {
       return;
     }
     this.refreshHotbarControlsIfChanged();
+    this.refreshTrinketIconIfChanged();
+  }
+
+  // The Trinket spell's icon follows the worn trinket, which the character
+  // sheet can change while the book stays open. One id compare per frame, and
+  // only while that row exists; a changed trinket rewrites just the icon.
+  private refreshTrinketIconIfChanged(): void {
+    const icon = this.trinketIcon;
+    if (!icon) return;
+    const worn = this.deps.world().equipment.trinket;
+    if (worn === this.trinketIconWorn) return;
+    this.trinketIconWorn = worn;
+    icon.style.backgroundImage = `url(${this.rowIconUrl(TRINKET_SPELL_ID)})`;
   }
 
   /**
@@ -548,6 +567,7 @@ export class SpellbookWindow {
   private forgetToggles(): void {
     this.attackToggle = null;
     this.rowToggles.length = 0;
+    this.trinketIcon = null;
   }
 
   // The pinned basic Attack row, first in the list (classic spellbooks lead with
@@ -660,9 +680,13 @@ export class SpellbookWindow {
           })
         : t('abilityUi.spellbook.unlearnedAbilityAria', { name, level: learnLevel }),
     );
-    el.innerHTML = `<div class="spell-icon ui-socket ui-socket--bag" style="background-image:url(${iconDataUrl('ability', row.abilityId)})"></div>
+    el.innerHTML = `<div class="spell-icon ui-socket ui-socket--bag" style="background-image:url(${this.rowIconUrl(row.abilityId)})"></div>
         <div class="spell-text"><div class="spell-name">${esc(name)}${known && known.rank > 1 ? ` <span class="spell-rank">${esc(t('abilityUi.tooltip.rank', { rank: this.formatAbilityNumber(known.rank) }))}</span>` : ''}</div>
         <div class="spell-sub">${locked ? esc(t('abilityUi.spellbook.trainableAtLevel', { level: learnLevel })) : esc(summary)}</div></div>`;
+    if (row.abilityId === TRINKET_SPELL_ID) {
+      this.trinketIcon = el.querySelector<HTMLElement>('.spell-icon');
+      this.trinketIconWorn = this.deps.world().equipment.trinket;
+    }
     if (known && isAbilityActionBarEligible(def)) {
       const toggle = document.createElement('button');
       toggle.type = 'button';
@@ -774,6 +798,14 @@ export class SpellbookWindow {
     if (!dt) return;
     dt.setData(HOTBAR_ACTION_MIME, encodeHotbarAction(action));
     dt.setData('text/plain', action.id);
+  }
+
+  // The Trinket spell draws the trinket a press would use (trinket_spell_core.ts);
+  // every other row, and the Trinket spell with nothing to use, its own icon.
+  private rowIconUrl(abilityId: string): string {
+    if (abilityId !== TRINKET_SPELL_ID) return iconDataUrl('ability', abilityId);
+    const trinket = trinketSpellItem(abilityId, this.deps.world().equipment.trinket);
+    return trinket ? iconDataUrl('item', trinket.id) : iconDataUrl('ability', abilityId);
   }
 
   private abilityName(def: AbilityDef): string {
