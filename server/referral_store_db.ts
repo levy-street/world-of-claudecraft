@@ -410,7 +410,9 @@ export class PgReferralStore {
     });
   }
 
-  async summon(linkId: number, accountId: number): Promise<boolean> {
+  /** Books this side's summon cooldown. Returns the booked instant as an opaque
+   *  token for `refundSummon`, or null when the summon may not be booked. */
+  async summon(linkId: number, accountId: number): Promise<string | null> {
     return this.transaction(async (tx) => {
       const referral = await tx.query<{ referrer_account_id: number }>(
         `SELECT referrer_account_id FROM referrals
@@ -420,24 +422,40 @@ export class PgReferralStore {
           (account_id=referee_account_id AND blocked_account_id=referrer_account_id))`,
         [linkId, accountId],
       );
-      if (!referral.rows[0]) return false;
+      if (!referral.rows[0]) return null;
       const inviter = referral.rows[0].referrer_account_id;
       await tx.query(
         `INSERT INTO referral_cards(link_id,inviter_account_id,state) VALUES($1,$2,$3::jsonb)
         ON CONFLICT DO NOTHING`,
         [linkId, inviter, JSON.stringify(createReferralCard(linkId, inviter, linkId))],
       );
-      const result = await tx.query(
+      const result = await tx.query<{ booked: string }>(
         `UPDATE referral_cards c SET
           inviter_summon_at = CASE WHEN inviter_account_id=$2 THEN now() ELSE inviter_summon_at END,
           invitee_summon_at = CASE WHEN link_id=$2 THEN now() ELSE invitee_summon_at END
         WHERE link_id=$1 AND (inviter_account_id=$2 OR link_id=$2)
           AND COALESCE(CASE WHEN inviter_account_id=$2 THEN inviter_summon_at ELSE invitee_summon_at END,
             '-infinity'::timestamptz) <= now() - interval '30 minutes'
-        RETURNING link_id`,
+        RETURNING (CASE WHEN inviter_account_id=$2 THEN inviter_summon_at ELSE invitee_summon_at END)::text AS booked`,
         [linkId, accountId],
       );
-      return !!result.rowCount;
+      return result.rows[0]?.booked ?? null;
+    });
+  }
+  /** Hands back the cooldown `summon` booked for this side when the teleport
+   *  never happened. It clears only the exact booking named by the token, so a
+   *  late or repeated refund can never erase a different summon's cooldown. */
+  async refundSummon(linkId: number, accountId: number, booked: string): Promise<void> {
+    return this.transaction(async (tx) => {
+      await tx.query(
+        `UPDATE referral_cards SET
+          inviter_summon_at = CASE WHEN inviter_account_id=$2 THEN NULL ELSE inviter_summon_at END,
+          invitee_summon_at = CASE WHEN link_id=$2 THEN NULL ELSE invitee_summon_at END
+        WHERE link_id=$1 AND (inviter_account_id=$2 OR link_id=$2)
+          AND CASE WHEN inviter_account_id=$2 THEN inviter_summon_at ELSE invitee_summon_at END
+            = $3::timestamptz`,
+        [linkId, accountId, booked],
+      );
     });
   }
   private async lockLease(tx: DbTransactionDeadline, save: CharacterSaveArgs): Promise<void> {

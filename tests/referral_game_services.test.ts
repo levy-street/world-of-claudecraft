@@ -13,6 +13,8 @@ import {
 import { createReferralCard, type ReferralCardContext } from '../src/sim/referral_cards';
 import type { ReferralCardsSnapshot } from '../src/sim/referral_contract';
 
+const BOOKED = '2026-01-01 00:00:00.123456+00';
+
 const services: ReferralGameServices[] = [];
 afterEach(async () => {
   for (const service of services) await service.stop();
@@ -92,7 +94,7 @@ function setup() {
   });
   const store: Pick<
     PgReferralStore,
-    'page' | 'pairs' | 'mutate' | 'summon' | 'acknowledgeCompletion'
+    'page' | 'pairs' | 'mutate' | 'summon' | 'refundSummon' | 'acknowledgeCompletion'
   > = {
     acknowledgeCompletion: async () => {},
     page: vi.fn(async () => page()),
@@ -102,7 +104,8 @@ function setup() {
       card = result.state;
       return { result, saves: [] };
     }),
-    summon: vi.fn(async () => true),
+    summon: vi.fn(async (): Promise<string | null> => BOOKED),
+    refundSummon: vi.fn(async () => {}),
   };
   const service = new ReferralGameServices(host, store);
   services.push(service);
@@ -321,6 +324,101 @@ describe('referral game host', () => {
       accept: true,
     });
     expect(h.host.summon).toHaveBeenCalledOnce();
+  });
+  it('keeps the booked cooldown when the summon lands', async () => {
+    const h = setup();
+    await flush();
+    await h.service.command(h.a, { type: 'summon', linkId: 20, expectedRevision: 0 });
+    const request = h.frames.get(200)!.notices.at(-1)!;
+    if (request.type !== 'summon') throw new Error('missing request');
+    await h.service.command(h.b, {
+      type: 'answerSummon',
+      requestId: request.requestId,
+      accept: true,
+    });
+    expect(h.host.summon).toHaveBeenCalledOnce();
+    expect(h.store.refundSummon).not.toHaveBeenCalled();
+  });
+  it.each([
+    [
+      'the teleport is refused',
+      (h: ReturnType<typeof setup>) => vi.mocked(h.host.summon).mockReturnValue(false),
+    ],
+    [
+      'eligibility is lost while the cooldown is booking',
+      (h: ReturnType<typeof setup>) =>
+        vi.mocked(h.store.summon).mockImplementation(async () => {
+          h.host.canSummon = () => false;
+          return BOOKED;
+        }),
+    ],
+  ])('refunds the booked cooldown when %s', async (_name, arrange) => {
+    const h = setup();
+    await flush();
+    await h.service.command(h.a, { type: 'summon', linkId: 20, expectedRevision: 0 });
+    const request = h.frames.get(200)!.notices.at(-1)!;
+    if (request.type !== 'summon') throw new Error('missing request');
+    arrange(h);
+    await h.service.command(h.b, {
+      type: 'answerSummon',
+      requestId: request.requestId,
+      accept: true,
+    });
+    expect(h.store.summon).toHaveBeenCalledWith(20, 10);
+    expect(h.store.refundSummon).toHaveBeenCalledExactlyOnceWith(20, 10, BOOKED);
+    expect(h.frames.get(100)?.notices.at(-1)).toMatchObject({ reason: 'unavailable' });
+  });
+  it('refunds even when the summoner has other referral work queued behind the booking', async () => {
+    const h = setup();
+    await flush();
+    await h.service.command(h.a, { type: 'summon', linkId: 20, expectedRevision: 0 });
+    const request = h.frames.get(200)!.notices.at(-1)!;
+    if (request.type !== 'summon') throw new Error('missing request');
+    vi.mocked(h.host.summon).mockReturnValue(false);
+    // A page reload asked for mid-booking is deferred behind the summoner's busy
+    // slot and would otherwise claim that slot ahead of the refund.
+    vi.mocked(h.store.summon).mockImplementation(async () => {
+      void h.service.page(h.a);
+      return BOOKED;
+    });
+    await h.service.command(h.b, {
+      type: 'answerSummon',
+      requestId: request.requestId,
+      accept: true,
+    });
+    expect(h.store.refundSummon).toHaveBeenCalledExactlyOnceWith(20, 10, BOOKED);
+  });
+  it('still tells the summoner when the refund cannot be written', async () => {
+    const h = setup();
+    await flush();
+    await h.service.command(h.a, { type: 'summon', linkId: 20, expectedRevision: 0 });
+    const request = h.frames.get(200)!.notices.at(-1)!;
+    if (request.type !== 'summon') throw new Error('missing request');
+    vi.mocked(h.host.summon).mockReturnValue(false);
+    const failure = new Error('refund failed');
+    vi.mocked(h.store.refundSummon).mockRejectedValue(failure);
+    await h.service.command(h.b, {
+      type: 'answerSummon',
+      requestId: request.requestId,
+      accept: true,
+    });
+    expect(h.host.onError).toHaveBeenCalledWith(failure);
+    expect(h.frames.get(100)?.notices.at(-1)).toMatchObject({ reason: 'unavailable' });
+  });
+  it('never refunds a cooldown the store declined to book', async () => {
+    const h = setup();
+    await flush();
+    await h.service.command(h.a, { type: 'summon', linkId: 20, expectedRevision: 0 });
+    const request = h.frames.get(200)!.notices.at(-1)!;
+    if (request.type !== 'summon') throw new Error('missing request');
+    vi.mocked(h.store.summon).mockResolvedValue(null);
+    await h.service.command(h.b, {
+      type: 'answerSummon',
+      requestId: request.requestId,
+      accept: true,
+    });
+    expect(h.host.summon).not.toHaveBeenCalled();
+    expect(h.store.refundSummon).not.toHaveBeenCalled();
   });
   it('does not summon across a changed session or restricted destination', async () => {
     const h = setup();
