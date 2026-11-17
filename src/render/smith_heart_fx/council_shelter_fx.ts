@@ -1,15 +1,18 @@
-// The Hammer Council's safe shadows (plan: council_fx_core.ts coverShadow,
-// docs/design/raid/smith_heart.md 5.18), a part of CouncilFx: while Mountain's
-// Wrath's bar or a soul pillar's Echo of Wrath runs, the REAL shadow behind
-// every pillar that covers from it (between the two tangents from the source,
-// from the pillar's far face out to the blast's reach, drawn a hair inside the
-// sim's own cover: SHELTER_PAD), so a player at ground level reads exactly
-// where they are safe:
-//   - a strong dark wedge on the floor (the blast's red ring around it stays
-//     bright: the safe floor is the dark), its two edges and its foot lined
-//     with a bright pale rim;
-//   - a faint curtain of light standing along its two edges, so the line is
-//     read from a third-person camera behind a player, never only from above.
+// The Hammer Council's safe floor (plan: council_fx_core.ts coverShadow and
+// shelterRingPoint, docs/design/raid/smith_heart.md 5.18), a part of CouncilFx:
+// while a soul pillar's Echo of Wrath runs, the REAL shadow behind every pillar
+// that covers from it (between the two tangents from the source, from the
+// pillar's far face out to the blast's reach); while Mountain's Wrath's bar
+// runs, the FIXED ring round every pillar (the sim's inCouncilShelter, the
+// team's review of 2026-11-17: never the caster's spot). Each drawn a hair
+// inside the sim's own cover (SHELTER_PAD), so a player at ground level reads
+// exactly where they are safe:
+//   - a strong dark wedge (or ring) on the floor (the blast's red ring around
+//     it stays bright: the safe floor is the dark), its edges lined with a
+//     bright pale rim;
+//   - a faint curtain of light standing along its edges (a ring's whole
+//     round), so the line is read from a third-person camera behind a player,
+//     never only from above.
 // Every tier draws the wedge and its rim (a safe zone is actionable); the low
 // tier sheds the curtains and the hatch's drift. Built in the constructor under
 // the host's root (one gated attach), fixed pools, no light, no per-frame
@@ -25,14 +28,17 @@ import {
   COUNCIL_FX_POOLS as POOLS,
   SHELTER_PAD,
   shadowPoint,
+  shelterRingPoint,
+  wrathRingRadius,
 } from './council_fx_core';
 import type { CouncilFxHost, CouncilPillarsFx } from './council_pillars_fx';
 
 /** Which blast a set of shelters is for. */
 export type ShelterKind = 'wrath' | 'echo';
 
-/** Stations across a wedge (tangent to tangent) and along it. */
-const ACROSS = 16;
+/** Stations across a wedge (tangent to tangent, or once round a ring) and
+ *  along it. */
+const ACROSS = 32;
 const ALONG = 6;
 /** Stations along a curtain, and its height (yards). */
 const CURTAIN_SEG = 10;
@@ -57,6 +63,7 @@ const FLOOR_FRAG = /* glsl */ `
 uniform float uTime;
 uniform float uAlpha;
 uniform float uDrift;
+uniform float uRing;
 uniform vec3 uDark;
 uniform vec3 uRim;
 varying vec2 vUv;
@@ -67,8 +74,12 @@ void main() {
   float rimSide = 1.0 - smoothstep(0.0, edgeW, side);
   float rimFoot = 1.0 - smoothstep(0.0, fwidth(vUv.y) * 2.5 + 0.02, vUv.y);
   float rim = max(rimSide, rimFoot * 0.85);
+  // A ring: no seam down its sides, its bright rim the outer edge (where the
+  // safe floor ends), a soft one at the pillar's face, no fade.
+  float rimOuter = 1.0 - smoothstep(0.0, fwidth(vUv.y) * 2.5 + 0.04, 1.0 - vUv.y);
+  rim = mix(rim, max(rimOuter, rimFoot * 0.4), uRing);
   float hatch = step(0.5, fract((vXZ.x + vXZ.y) * 0.55 - uTime * 0.3 * uDrift));
-  float fade = 1.0 - smoothstep(0.86, 1.0, vUv.y);
+  float fade = mix(1.0 - smoothstep(0.86, 1.0, vUv.y), 1.0, uRing);
   vec3 col = mix(uDark, uRim, rim);
   float a = uAlpha * fade * mix(0.82 + 0.06 * hatch, 1.0, rim);
   gl_FragColor = vec4(col, a);
@@ -89,11 +100,12 @@ void main() {
 const CURTAIN_FRAG = /* glsl */ `
 uniform float uTime;
 uniform float uAlpha;
+uniform float uRing;
 uniform vec3 uRim;
 varying vec2 vUv;
 void main() {
   float up = pow(max(1.0 - vUv.y, 0.0), 1.8);
-  float along = 1.0 - smoothstep(0.55, 1.0, vUv.x);
+  float along = mix(1.0 - smoothstep(0.55, 1.0, vUv.x), 1.0, uRing);
   float shimmer = 0.75 + 0.25 * sin(vUv.x * 40.0 - uTime * 2.6 + vUv.y * 3.0);
   gl_FragColor = vec4(uRim, uAlpha * up * along * shimmer * 0.42);
   #include <colorspace_fragment>
@@ -135,6 +147,7 @@ export class CouncilShelters {
         uTime: this.h.uTime,
         uAlpha: { value: 0 },
         uDrift: { value: this.h.detail ? 1 : 0 },
+        uRing: { value: kind === 'wrath' ? 1 : 0 },
         uDark: { value: new THREE.Color(ECHO_SPEC.shelter) },
         uRim: { value: new THREE.Color(ECHO_SPEC.shelterRim) },
       },
@@ -149,6 +162,7 @@ export class CouncilShelters {
       uniforms: {
         uTime: this.h.uTime,
         uAlpha: { value: 0 },
+        uRing: { value: kind === 'wrath' ? 1 : 0 },
         uRim: { value: new THREE.Color(ECHO_SPEC.shelterRim) },
       },
       vertexShader: CURTAIN_VERT,
@@ -247,6 +261,47 @@ export class CouncilShelters {
         for (let e = 0; e < 2; e++)
           for (let s = 0; s <= CURTAIN_SEG; s++) {
             shadowPoint(_sh, e, s / CURTAIN_SEG, _pt);
+            const y = this.h.groundY(_pt.x, _pt.z);
+            const v = (e * (CURTAIN_SEG + 1) + s) * 2;
+            w.curtainPos.setXYZ(v, _pt.x, y + 0.05, _pt.z);
+            w.curtainPos.setXYZ(v + 1, _pt.x, y + CURTAIN_H, _pt.z);
+          }
+        w.curtainPos.needsUpdate = true;
+        w.curtain.visible = true;
+      }
+    }
+    set.used = k;
+    return k;
+  }
+
+  /** Lay Mountain's Wrath's shelters: the FIXED ring round every soulless
+   *  standing pillar (the sim's inCouncilShelter), whatever the caster's
+   *  spot. Returns how many. */
+  layRings(): number {
+    const set = this.sets.wrath;
+    this.hideWedges(set);
+    const n = this.pillars.shelters(_covers);
+    const curtains = this.h.density > 0.5;
+    let k = 0;
+    for (let i = 0; i < n && k < set.wedges.length; i++) {
+      const c = _covers[i];
+      // shelters() hands the wall plus the sight breath; the ring is the
+      // wall's own fixed reach.
+      const wall = c.r - 0.35;
+      const outer = wrathRingRadius(wall);
+      const w = set.wedges[k++];
+      for (let a = 0; a <= ACROSS; a++)
+        for (let b = 0; b <= ALONG; b++) {
+          shelterRingPoint(c.x, c.z, wall, outer, a / ACROSS, b / ALONG, _pt);
+          w.floorPos.setXYZ(a * (ALONG + 1) + b, _pt.x, this.h.groundY(_pt.x, _pt.z) + 0.1, _pt.z);
+        }
+      w.floorPos.needsUpdate = true;
+      w.floor.visible = true;
+      if (curtains) {
+        // The two curtains share the ring's round, a half each.
+        for (let e = 0; e < 2; e++)
+          for (let s = 0; s <= CURTAIN_SEG; s++) {
+            shelterRingPoint(c.x, c.z, wall, outer, (e + s / CURTAIN_SEG) / 2, 1, _pt);
             const y = this.h.groundY(_pt.x, _pt.z);
             const v = (e * (CURTAIN_SEG + 1) + s) * 2;
             w.curtainPos.setXYZ(v, _pt.x, y + 0.05, _pt.z);

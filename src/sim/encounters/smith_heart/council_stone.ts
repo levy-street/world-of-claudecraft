@@ -52,7 +52,7 @@ import {
   fallingRockShare,
   COUNCIL_TUNING as T,
 } from './council_ids';
-import { councilPillars, crackPillar, raisePillar } from './council_pillars';
+import { collapsePillar, councilPillars, raisePillar } from './council_pillars';
 import {
   beginBar,
   type CouncilScope,
@@ -63,7 +63,6 @@ import {
   pickMarks,
   punishMult,
   punishRoll,
-  roll,
 } from './council_scope';
 import { strikeSoulPip } from './council_soul';
 import { councilSay } from './council_voice';
@@ -273,15 +272,17 @@ export function stepRock(s: CouncilScope): number {
       );
     }
   }
-  // Every pillar within the blow loses a piece (a soul pillar, a pip).
+  // Every pillar within the blow falls at once, a carved column as surely as
+  // a risen one (the team's review of 2026-11-17); a soul pillar loses a pip,
+  // the cursed one only the Rush or a Wrath breaks.
   for (const pl of councilPillars(s.ctx, s.inst)) {
     const d = Math.hypot(pl.e.pos.x - at.x, pl.e.pos.z - at.z) - pl.r;
     if (pl.soul) {
       if (d <= T.soulRockReach) strikeSoulPip(s, pl, 'rock');
       continue;
     }
-    if (d > T.rockRadius) continue;
-    crackPillar(s.ctx, s.inst, s.st, pl);
+    if (pl.cursed || d > T.rockRadius) continue;
+    collapsePillar(s.ctx, s.inst, s.st, pl);
   }
   return under.length;
 }

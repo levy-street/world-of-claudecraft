@@ -34,6 +34,7 @@ import {
 import type { EngineParticles } from '../trash_engine_fx/engine_particles';
 import {
   COUNCIL_FX_COLORS as C,
+  COVER_BREATH,
   CURSED_COLORS,
   crackFlash,
   cursedPillarLook,
@@ -488,7 +489,7 @@ export class CouncilPillarsFx {
       out[n].z = s.z;
       // The sim's own cover (its wall's radius plus the sight test's breath:
       // council_pillars.ts pillarBetween), never the model's.
-      out[n].r = councilPillarRadius(s.risen) + 0.35;
+      out[n].r = councilPillarRadius(s.risen) + COVER_BREATH;
       n++;
     }
     return n;

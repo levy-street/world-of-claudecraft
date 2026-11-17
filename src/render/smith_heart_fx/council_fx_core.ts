@@ -24,8 +24,10 @@ import {
   councilPillarOf,
   councilRiseSpotSeconds,
   councilRoleOf,
+  councilShelterRadius,
   councilSoulOf,
   endlessSongMult,
+  inCouncilShelter,
   COUNCIL_TUNING as T,
 } from '../../sim/encounters/smith_heart/council_ids';
 import { rushReach } from '../../sim/encounters/smith_heart/council_rush_reach';
@@ -521,10 +523,16 @@ export const ECHO_SPEC = {
 
 /** How far inside the sim's own cover a drawn shelter's edge stands: the
  *  Echo's cover is `pillarBetween` (the wall's radius plus a 0.35 breath,
- *  council_pillars.ts), Mountain's Wrath's the sight line against the wall
- *  itself (ctx.hasLineOfSight). Drawn a hair inside each, so a player whose
- *  feet are in the dark is ALWAYS covered. */
-export const SHELTER_PAD = { echo: 0.25, wrath: -0.05 } as const;
+ *  council_pillars.ts), Mountain's Wrath's the fixed ring (council_ids.ts
+ *  inCouncilShelter). Drawn a hair inside each, so a player whose feet are in
+ *  the dark is ALWAYS covered. */
+export const SHELTER_PAD = { echo: 0.25, wrath: -0.1 } as const;
+
+/** The Wrath's drawn ring round a pillar of wall radius `r` (yards from its
+ *  centre): the sim's shelter, a hair inside. */
+export function wrathRingRadius(r: number): number {
+  return councilShelterRadius(r) + SHELTER_PAD.wrath;
+}
 
 /** The real shadow a round cover (centre p, radius r) casts from a point
  *  source s out to `reach` from s: the floor between the two tangents from
@@ -626,12 +634,17 @@ export function shelterRunes(count: number, limit: number): { lit: number; over:
   return { lit: Math.min(count, limit), over: count > limit };
 }
 
-/** How many of `nPlayers` hide behind each of `nPillars` from a blast at (sx, sz):
- *  each counts for the nearest pillar on its line, the sim's own test
- *  (council_pillars.ts pillarBetween; `r` already holds its breath). Fills `out`. */
+/** The sight test's breath the pillars' cover radius carries past the wall
+ *  (council_pillars.ts pillarBetween): CouncilPillarsFx.shelters hands it. */
+export const COVER_BREATH = 0.35;
+
+/** How many of `nPlayers` shelter at each of `nPillars` from Mountain's Wrath:
+ *  the sim's FIXED ring round each pillar (council_ids.ts inCouncilShelter,
+ *  whatever the caster's spot), a player inside two overlapping rings counted
+ *  at BOTH (the team's review of 2026-11-17). Each pillar's `r` is the cover
+ *  radius CouncilPillarsFx.shelters hands (the wall plus COVER_BREATH). Fills
+ *  `out`. */
 export function pillarShelterCounts(
-  sx: number,
-  sz: number,
   players: readonly { x: number; z: number }[],
   nPlayers: number,
   pillars: readonly { x: number; z: number; r: number }[],
@@ -640,25 +653,28 @@ export function pillarShelterCounts(
 ): void {
   for (let i = 0; i < nPillars; i++) out[i] = 0;
   for (let k = 0; k < nPlayers; k++) {
-    const dx = players[k].x - sx;
-    const dz = players[k].z - sz;
-    const len2 = dx * dx + dz * dz;
-    if (len2 < 1e-9) continue;
-    let best = -1;
-    let bestT = Number.POSITIVE_INFINITY;
     for (let i = 0; i < nPillars; i++) {
-      const px = pillars[i].x - sx;
-      const pz = pillars[i].z - sz;
-      const t = (px * dx + pz * dz) / len2;
-      if (t <= 0 || t >= 1) continue;
-      const cx = px - dx * t;
-      const cz = pz - dz * t;
-      if (cx * cx + cz * cz > pillars[i].r * pillars[i].r) continue;
-      if (t < bestT) {
-        bestT = t;
-        best = i;
-      }
+      const pl = pillars[i];
+      if (inCouncilShelter(pl.x, pl.z, pl.r - COVER_BREATH, players[k].x, players[k].z)) out[i]++;
     }
-    if (best >= 0) out[best]++;
   }
+}
+
+/** A point of the Wrath's fixed shelter ring round a pillar at (cx, cz):
+ *  `across` 0 to 1 once round, `along` 0 at the pillar's face (`inner`) to 1
+ *  at the ring's edge (`outer`). Fills `out`. Pure. */
+export function shelterRingPoint(
+  cx: number,
+  cz: number,
+  inner: number,
+  outer: number,
+  across: number,
+  along: number,
+  out: { x: number; z: number },
+): { x: number; z: number } {
+  const th = Math.max(0, Math.min(1, across)) * Math.PI * 2;
+  const k = inner + (outer - inner) * Math.max(0, Math.min(1, along));
+  out.x = cx + Math.sin(th) * k;
+  out.z = cz + Math.cos(th) * k;
+  return out;
 }

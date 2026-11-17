@@ -1738,7 +1738,7 @@ export class CouncilFx {
     }
     if (this.wrathLaidAt < 0 || this.clock - this.wrathLaidAt > 0.25) {
       this.wrathLaidAt = this.clock;
-      this.shelters.lay('wrath', e.pos.x, e.pos.z, T.wrathRadius);
+      this.shelters.layRings();
       this.layLimit(world, e);
     }
     const fill = Math.max(0, Math.min(1, 1 - e.castRemaining / e.castTotal));

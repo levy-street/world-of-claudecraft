@@ -454,6 +454,11 @@ export const COUNCIL_TUNING = {
   /** A carved column's radius and a risen pillar's (the combat wall rows). */
   columnR: 2.6,
   risenR: 2.2,
+  /** Mountain's Wrath's shelter (the team's review of 2026-11-17): a FIXED
+   *  ring this far past a pillar's face, whatever the caster's spot, so a
+   *  player reads the safe floor round a pillar without tracking the boss.
+   *  Two rings that overlap shelter (and count) a player in both. */
+  shelterReach: 4,
   /** Rubble: its radius past the pillar's, how long it lies, its bite. */
   rubblePad: 1.6,
   rubbleSeconds: 8,
@@ -662,6 +667,19 @@ export function councilPillarOf(templateId: string): { integrity: number; risen:
 /** A pillar's footprint radius by kind. */
 export function councilPillarRadius(risen: boolean): number {
   return risen ? COUNCIL_TUNING.risenR : COUNCIL_TUNING.columnR;
+}
+
+/** The fixed shelter's reach from a pillar's centre (its footprint plus
+ *  `shelterReach`). */
+export function councilShelterRadius(r: number): number {
+  return r + COUNCIL_TUNING.shelterReach;
+}
+
+/** Does a pillar centred at (px, pz) with footprint `r` shelter a body at
+ *  (x, z) from Mountain's Wrath? Pure: the sim's rule and the client's
+ *  gems read the same test. */
+export function inCouncilShelter(px: number, pz: number, r: number, x: number, z: number): boolean {
+  return Math.hypot(x - px, z - pz) <= councilShelterRadius(r) + 1e-6;
 }
 
 /** Seconds the Wrath's energy takes to fill, by holder and Wraths landed

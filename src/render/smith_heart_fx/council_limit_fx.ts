@@ -94,7 +94,7 @@ export class CouncilLimitFx {
     const count = this.pillarsFx.shelters(this.pillars);
     while (this.players.length < n) this.players.push({ x: 0, z: 0 });
     for (let i = 0; i < n; i++) playerAt(i, this.players[i]);
-    pillarShelterCounts(sx, sz, this.players, n, this.pillars, count, this.counts);
+    pillarShelterCounts(this.players, n, this.pillars, count, this.counts);
     let g = 0;
     let crowded = 0;
     for (let i = 0; i < count; i++) {

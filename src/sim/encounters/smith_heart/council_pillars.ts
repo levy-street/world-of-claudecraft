@@ -21,8 +21,12 @@
 //                takes whole leaves rubble that only looks the part (it never
 //                bites the players it just hid).
 //   Reset        a wipe stands the five columns whole again and the risen ones
-//                go; the council's fall sinks the risen ones and stands the
-//                columns back in their sockets (the Quarry as it was built).
+//                go; the council's fall sinks the risen ones and leaves the
+//                broken columns broken (they never stand again on a kill).
+//   Shelter      Mountain's Wrath spares whoever stands inside a FIXED ring
+//                round a pillar (council_ids.ts inCouncilShelter), whatever
+//                the caster's spot; two rings that overlap count a player in
+//                both.
 //
 // Zero rng in every pick (distance and roster order); the only draws are the
 // damage rolls of the rise's shove and the rubble, in claim-player order.
@@ -196,8 +200,9 @@ export function restorePillars(ctx: SimContext, inst: InstanceSlot): void {
 }
 
 /** The council's fall: the risen pillars sink back into the floor (the walk
- *  to the Slab is the quarry's own again) and the carved columns the Wraths
- *  shattered stand in their sockets again. */
+ *  to the Slab is the quarry's own again). The carved columns the fight broke
+ *  stay broken (the team's review of 2026-11-17: they stood again on the
+ *  kill); only a wipe (restorePillars) stands them back up. */
 export function settlePillars(ctx: SimContext, inst: InstanceSlot): void {
   for (const p of councilPillars(ctx, inst)) {
     if (!p.risen) continue;
@@ -212,7 +217,7 @@ export function settlePillars(ctx: SimContext, inst: InstanceSlot): void {
     });
     dropKitObject(ctx, inst, p.e.id);
   }
-  restorePillars(ctx, inst);
+  syncPillarWalls(ctx, inst);
 }
 
 /** Drop every rubble patch (a reset or the council's fall). */

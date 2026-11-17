@@ -4,8 +4,8 @@
 //   Energy            0 to 100, full in about 55 s, shown as the holder's
 //                     energy bar (its resource: the target frame draws it, and
 //                     it rides the snapshot like any mob's resource).
-//   Mountain's Wrath  at 100: a 4 s bar, then everyone in the Quarry with no
-//                     pillar between them and the caster is struck (Normal
+//   Mountain's Wrath  at 100: a 4 s bar, then everyone in the Quarry outside
+//                     every pillar's shelter ring is struck (Normal
 //                     440 to 520; Heroic and Mythic about 3,500 to 4,100:
 //                     only a tank under a strong defensive or an immunity
 //                     lives through it), and then
@@ -22,10 +22,10 @@
 //                     bar); Hammer's Weight and Mountain's Rush die with the
 //                     Guardian.
 //
-// The Wrath's readable telegraph is the trash engine's sight field (its
-// declaration is the templates' encounter-driven `trashKit.nova`); the hit is
-// the sim's own sight line (ctx.hasLineOfSight), the pillars being combat
-// walls. Zero rng in every pick; the draws are the damage rolls.
+// The Wrath's shelter is a FIXED ring round every pillar (council_ids.ts
+// inCouncilShelter: the footprint plus `shelterReach`), whatever the caster's
+// spot (the team's review of 2026-11-17; it was the sight line before). Zero
+// rng in every pick; the draws are the damage rolls.
 
 import { DT, type Entity } from '../../types';
 import { clearCastIf, dropAuraById, heavySwing } from '../sunken_bastion/claim';
@@ -36,9 +36,10 @@ import {
   COUNCIL_NAMES,
   COUNCIL_ROLES,
   councilFillSeconds,
+  inCouncilShelter,
   COUNCIL_TUNING as T,
 } from './council_ids';
-import { collapsePillar, councilPillars, pillarBetween } from './council_pillars';
+import { collapsePillar, councilPillars } from './council_pillars';
 import { breakCursed } from './council_rush';
 import {
   beginBar,
@@ -47,7 +48,6 @@ import {
   living,
   memberFree,
   punishRoll,
-  roll,
 } from './council_scope';
 import { councilSay } from './council_voice';
 
@@ -166,56 +166,54 @@ export function landWrath(s: CouncilScope, caster: Entity, heir: boolean): numbe
     ability: COUNCIL_CASTS.wrath,
   });
   const all = councilPillars(ctx, inst);
-  // A soul pillar (mythic, council_soul.ts) and the cursed pillar
-  // (council_rush.ts) shield nobody: their walls still stand in the sight
-  // line, so a player one of them alone hides is struck anyway.
-  const bare = (p: (typeof all)[number]) => p.soul !== null || p.cursed;
-  const pillars = all.some(bare) ? all.filter((p) => !bare(p)) : all;
-  const souls = pillars === all ? null : all.filter(bare);
+  // The shelter is a FIXED ring round each pillar (council_ids.ts
+  // inCouncilShelter, the team's review of 2026-11-17), never the shadow from
+  // the caster's spot. A soul pillar (mythic, council_soul.ts) and the cursed
+  // pillar (council_rush.ts) shield nobody.
+  const pillars = all.filter((p) => p.soul === null && !p.cursed);
+  // Who shelters at which pillar: a player inside two overlapping rings counts
+  // for BOTH (Narrow Shelter's census), never only the first.
   const shields = new Map<number, Entity[]>();
+  const sheltered: { p: Entity; at: number[] }[] = [];
   let struck = 0;
   for (const p of s.players) {
     if (p.dead) continue;
     if (Math.hypot(p.pos.x - caster.pos.x, p.pos.z - caster.pos.z) > T.wrathRadius) continue;
-    const seen =
-      ctx.hasLineOfSight(caster, p) ||
-      (souls !== null &&
-        pillarBetween(pillars, caster.pos, p.pos) === null &&
-        pillarBetween(souls, caster.pos, p.pos) !== null);
-    if (seen) {
-      const amount = wrathRoll(s, caster, heir);
-      ctx.dealDamage(caster, p, amount, false, 'physical', COUNCIL_NAMES.wrath, 'hit', true);
-      struck++;
+    const at: number[] = [];
+    for (const pl of pillars) {
+      if (!inCouncilShelter(pl.e.pos.x, pl.e.pos.z, pl.r, p.pos.x, p.pos.z)) continue;
+      at.push(pl.e.id);
+      const behind = shields.get(pl.e.id);
+      if (behind) behind.push(p);
+      else shields.set(pl.e.id, [p]);
+    }
+    if (at.length > 0) {
+      sheltered.push({ p, at });
       continue;
     }
-    const cover = pillarBetween(pillars, caster.pos, p.pos);
-    if (cover) {
-      const behind = shields.get(cover.e.id);
-      if (behind) behind.push(p);
-      else shields.set(cover.e.id, [p]);
-    }
+    const amount = wrathRoll(s, caster, heir);
+    ctx.dealDamage(caster, p, amount, false, 'physical', COUNCIL_NAMES.wrath, 'hit', true);
+    struck++;
   }
-  // One too many behind a pillar (Narrow Shelter) and each of them takes the
-  // tier's share of the blast (it hurts; on its own it never wipes).
+  // One too many at a pillar (Narrow Shelter) and each of them takes the
+  // tier's share of the blast (it hurts; on its own it never wipes). A player
+  // counted at two pillars takes it once, when either is crowded.
   const limit = s.rules.pillarLimit;
-  for (const pl of pillars) {
-    const behind = shields.get(pl.e.id);
-    if (!behind) continue;
-    if (limit !== null && behind.length > limit) {
-      for (const p of behind) {
-        const amount = wrathRoll(s, caster, heir);
-        ctx.dealDamage(
-          caster,
-          p,
-          Math.round(amount * s.rules.crowdShare),
-          false,
-          'physical',
-          COUNCIL_NAMES.wrath,
-          'hit',
-          true,
-        );
-        struck++;
-      }
+  if (limit !== null) {
+    for (const { p, at } of sheltered) {
+      if (!at.some((id) => (shields.get(id)?.length ?? 0) > limit)) continue;
+      const amount = wrathRoll(s, caster, heir);
+      ctx.dealDamage(
+        caster,
+        p,
+        Math.round(amount * s.rules.crowdShare),
+        false,
+        'physical',
+        COUNCIL_NAMES.wrath,
+        'hit',
+        true,
+      );
+      struck++;
     }
   }
   // Then the mountain's anger brings every pillar down, the cursed one too (a

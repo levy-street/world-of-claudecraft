@@ -32,7 +32,7 @@ import {
 } from '../src/sim/encounters/smith_heart';
 import { COMBAT_WALL_SHAPES, combatWallsAt } from '../src/sim/instances/combat_wall_state';
 import { dungeonGateState } from '../src/sim/instances/dungeon_gates';
-import type { Entity, SimEvent } from '../src/sim/types';
+import type { Entity } from '../src/sim/types';
 import { type CouncilFight, councilFight, hitsOf } from './helpers/council_fight';
 
 /** Park every council clock so one mechanic can be watched alone. */
@@ -325,7 +325,7 @@ describe('Hammer Council: the pillars', () => {
 });
 
 describe('Hammer Council: the Falling Rock', () => {
-  it('splits the blow between the soakers, cracks the pillars in reach, punishes a thin soak', () => {
+  it('splits the blow between the soakers, breaks the pillars in reach in one blow, punishes a thin soak', () => {
     expect(fallingRockShare(3, 1350)).toEqual({ each: 450, tremor: false });
     expect(fallingRockShare(5, 1350)).toEqual({ each: 270, tremor: false });
     expect(fallingRockShare(2, 1350).tremor).toBe(true);
@@ -357,10 +357,15 @@ describe('Hammer Council: the Falling Rock', () => {
     for (const p of [tank, far].filter((q) => !soakers.includes(q)))
       expect(hitsOf(ev, COUNCIL_NAMES.rock, p.id)).toEqual([]);
     expect(hitsOf(ev, COUNCIL_NAMES.rockTremor).length).toBe(0);
+    // One blow takes a whole carved column (the team's review of 2026-11-17),
+    // as it always took a risen pillar; the far columns stand untouched.
     const p3 = f
       .pillars()
       .find((p) => Math.hypot(f.local(p.e).x - col.x, f.local(p.e).z - col.z) < 0.5);
-    expect(p3?.integrity).toBe(councilPillarFull(false) - 1);
+    expect(p3).toBeUndefined();
+    expect(f.pillars().length).toBe(QUARRY_PILLAR_SPOTS.length - 1);
+    expect(f.pillars().every((p) => p.integrity === councilPillarFull(false))).toBe(true);
+    expect(f.st.rubble.length).toBe(1);
   });
 });
 
@@ -433,11 +438,15 @@ describe('Hammer Council: the stone remembers', () => {
     f.tick(20 * 6);
     f.dev('/dev heart council wake');
     expect(c.castingAbility).toBe(COUNCIL_CASTS.wake);
+    const columns = f.pillars().filter((p) => !p.risen).length;
     kill(f, 'singer');
     expect(f.state()?.finished).toBe(true);
     expect(f.pillars().some((p) => p.risen)).toBe(false);
-    // The council's fall stands the carved columns back in their sockets.
-    expect(f.pillars().length).toBe(5);
+    // The council's fall leaves the broken columns broken (the team's review
+    // of 2026-11-17: they stood again on the kill).
+    expect(f.pillars().length).toBe(columns);
+    f.tick(20 * 5);
+    expect(f.pillars().length).toBe(columns);
   });
 
   it('the Singer first: the Guardian gains Memory and raises the pillars itself, less often, on random players', () => {

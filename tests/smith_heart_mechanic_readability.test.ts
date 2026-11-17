@@ -121,8 +121,9 @@ describe('Smith Heart readability: Narrow Shelter', () => {
   });
 
   it('turns a crowded row blood red, never the lit ochre', () => {
+    // Inside the first pillar's fixed shelter ring (the review of 2026-11-17).
     const { root, fx } = host();
-    const players = [0, 1, 2, 3].map((k) => ({ x: (k - 1.5) * 0.4, z: 14 + k * 0.5 }));
+    const players = [0, 1, 2, 3].map((k) => ({ x: (k - 1.5) * 0.4, z: 12.5 + k * 0.5 }));
     fx.lay(0, 0, 3, players.length, (i, out) => {
       out.x = players[i].x;
       out.z = players[i].z;
