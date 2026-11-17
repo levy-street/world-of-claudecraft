@@ -391,6 +391,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/quest/dungeon_guide_dialog_core.ts',
   'src/ui/hud/dungeon/dungeon_guide_speech_view.ts',
   'src/ui/hud/action_bar/trinket_slot_core.ts',
+  'src/ui/hud/action_bar/trinket_spell_core.ts',
   'src/ui/hud/action_bar/action_bar_item_core.ts',
   'src/ui/hud/quest/prof_intro_hint_core.ts',
   'src/ui/hud/quest/clue_step_row_view.ts',

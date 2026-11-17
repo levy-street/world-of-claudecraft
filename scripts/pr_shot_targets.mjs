@@ -4598,6 +4598,89 @@ export const TARGETS = [
     },
   },
   {
+    key: 'trinket-spell',
+    // The Trinket spell (src/sim/content/trinket_spell.ts): its bar button and
+    // spellbook row take the worn trinket's icon, tooltip and cooldown. Each
+    // variant wears a different trinket (or none) with the spell on the first
+    // assignable slot, and opens the spellbook scrolled to the row with the bar
+    // button hovered; one variant uses the trinket so its cooldown swipe shows. A base that predates the spell shoots the same
+    // screens without it, so the recipe never throws on a missing ability.
+    label: 'Trinket spell: follows the worn trinket',
+    when: [
+      'src/sim/content/trinket_spell.ts',
+      'src/sim/trinket_spell.ts',
+      'src/ui/hud/action_bar/trinket_spell_core.ts',
+      'trinket-spell',
+    ],
+    variants: [
+      {
+        key: 'lodestone-desktop',
+        charClass: 'warrior',
+        charName: 'Thorgar',
+        trinket: 'wayfarers_lodestone',
+      },
+      {
+        key: 'lens-desktop',
+        charClass: 'warrior',
+        charName: 'Thorgar',
+        trinket: 'echoing_lens',
+        use: true,
+      },
+      { key: 'none-desktop', charClass: 'warrior', charName: 'Thorgar', trinket: null },
+      {
+        key: 'lodestone-mobile',
+        charClass: 'warrior',
+        charName: 'Thorgar',
+        trinket: 'wayfarers_lodestone',
+        mobile: true,
+      },
+    ],
+    async capture(page, variant) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+      });
+      await dismissArrivalGreeting(page);
+      await page.evaluate((shot) => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!sim || !player) return;
+        sim.setPlayerLevel?.(20, player.id);
+        if (shot.trinket) {
+          sim.addItem(shot.trinket, 1, player.id);
+          sim.equipItem(shot.trinket);
+          // Skip the on-equip lockout so the press below is the trinket's own use.
+          player.cooldowns.delete(`trinket:${shot.trinket}`);
+        }
+        game.hud.hotbarActions[0] = { type: 'ability', id: 'use_trinket' };
+        game.hud.saveSlotMap?.();
+        // One variant uses it, so the trinket's own cooldown swipe is on the button.
+        if (shot.use) sim.castAbility?.('use_trinket', player.id);
+        game.hud.toggleSpellbook?.();
+      }, variant);
+      await pollForSize(page, '#spellbook', 20, 250);
+      await page.evaluate(() => {
+        document
+          .querySelector('.spell-row[data-ability-id="use_trinket"]')
+          ?.scrollIntoView({ block: 'center' });
+      });
+      // Hover the bar button so its tooltip (the worn trinket's own) is in frame.
+      if (!variant.mobile) {
+        const at = await page.evaluate(() => {
+          const r = document.querySelectorAll('#actionbar .action-btn')[1]?.getBoundingClientRect();
+          return r ? { x: r.x + r.width / 2, y: r.y + r.height / 2 } : null;
+        });
+        if (at) {
+          await page.mouse.move(at.x - 40, at.y - 40);
+          await page.mouse.move(at.x, at.y, { steps: 4 });
+        }
+      }
+      await wait(700);
+      return {};
+    },
+  },
+  {
     key: 'buff-vfx-mounted',
     // The body-attached buff visuals (the pooled absorb shell, the Ascension
     // crown) must ride the saddle with a mounted player instead of staying at

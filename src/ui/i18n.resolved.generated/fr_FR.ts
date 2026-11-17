@@ -17452,6 +17452,10 @@ export const fr_FR: EnTranslations = {
         "name": "Messager",
         "description": "Invoquez un âne volant pour transporter des objets entre vos sacs et la banque la plus proche. Chaque trajet prend jusqu'à 15 secondes vers la banque et jusqu'à 15 secondes au retour, avec un vol plus rapide sur les longs parcours. Choisissez jusqu'à 24 piles par voyage. Les objets rapportés débordent des sacs pleins, puis le messager disparaît jusqu'à sa prochaine invocation. Le retour est suspendu quand vous êtes mort ou dans une instance. Un abonnement est nécessaire pour commencer un nouveau trajet."
       },
+      "use_trinket": {
+        "name": "Trinket",
+        "description": "Use the trinket you are wearing. This button takes that trinket's icon, effect and cooldown, and changes when you equip a different trinket. It does nothing while you wear no trinket, or one with no use effect."
+      },
       "sport_kick": {
         "name": "Coup de pied",
         "description": "Poussez le ballon au sol vers le point visé."

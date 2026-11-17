@@ -17452,6 +17452,10 @@ export const tr_TR: EnTranslations = {
         "name": "Kurye",
         "description": "Çantalarınla en yakın banka arasında eşya taşımak için uçan eşek çağır. Her yolculuk bankaya en fazla 15 saniye, dönüşte en fazla 15 saniye sürer; uzun rotalarda daha hızlı uçar. Sefer başına en fazla 24 yığın seç. Çantalar doluysa dönen eşyalar taşan eşyalara gider; ardından kurye yeniden çağrılana kadar kaybolur. Ölü veya bir örnek alanın içindeyken dönüş yolculuğu duraklar. Yeni sefer başlatmak üyelik gerektirir."
       },
+      "use_trinket": {
+        "name": "Trinket",
+        "description": "Use the trinket you are wearing. This button takes that trinket's icon, effect and cooldown, and changes when you equip a different trinket. It does nothing while you wear no trinket, or one with no use effect."
+      },
       "sport_kick": {
         "name": "Vuruş",
         "description": "Topu yerden nişan noktasına doğru gönder."

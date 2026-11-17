@@ -391,6 +391,7 @@ import {
   createActionBarView,
 } from './hud/action_bar/action_bar_view';
 import type { ActionBarVisibility } from './hud/action_bar/action_bar_visibility_core';
+import { syncActionBarWorldInput } from './hud/action_bar/action_bar_world_input';
 import {
   confirmPendingAutoAttackEngage,
   deferAutoAttackUntilCastEnd,
@@ -453,6 +454,7 @@ import { petSlotText } from './hud/action_bar/pet_slot_core';
 import { playerStealthed } from './hud/action_bar/player_stealthed';
 import { RADIAL_DIRECTIONS, type RadialDirection } from './hud/action_bar/radial_action_core';
 import { slotEditHintLines } from './hud/action_bar/slot_edit_hints_core';
+import { trinketSpellItem } from './hud/action_bar/trinket_spell_core';
 import { AuraTrackFamily } from './hud/aura_tracks';
 import {
   BattlegroundKillFeed,
@@ -6032,6 +6034,7 @@ export class Hud {
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
     hideTooltip: () => this.hideTooltip(),
     barActions: () => this.hotbarActions,
+    wornTrinketId: () => this.sim.equipment.trinket,
     sourceSlotCount: () => MOBILE_ACTION_SOURCE_SLOT_COUNT,
     editAllowed: () => isActionBarEditAllowed(this.actionBarsLocked(), 'drop'),
     placeAbility: (abilityId, slot) => {
@@ -6930,6 +6933,8 @@ export class Hud {
   }
 
   private abilityTooltip(res: ResolvedAbility): string {
+    const trinket = trinketSpellItem(res.def.id, this.sim.equipment.trinket);
+    if (trinket) return this.itemTooltip(trinket) + itemInBagsLine(0, true);
     const a = res.def;
     const scaling = abilityScalingOf(this.sim.player);
     const damageText = abilityEffectText(res, scaling);
@@ -9018,33 +9023,16 @@ export class Hud {
     // this stays correct on both hosts. Shared by every action-bar-family view
     // below (desktop bar, mobile ring, consumables quick bar).
     const stealthed = playerStealthed(p.auras);
-    let actionBarWorld = this.actionBarWorldInput;
-    if (actionBarWorld) {
-      actionBarWorld.player = p;
-      actionBarWorld.target = target ?? null;
-      actionBarWorld.inventory = sim.inventory;
-      actionBarWorld.wornTrinketId = sim.equipment.trinket;
-      actionBarWorld.stealthed = stealthed;
-      actionBarWorld.paladinSpec = sim.talentSpec;
-      actionBarWorld.playerClass = sim.cfg.playerClass;
-      actionBarWorld.fateThreads = fateThreads;
-      actionBarWorld.entities = sim.entities.values();
-      actionBarWorld.activeAimSlot = this.groundAim.activeSlot();
-    } else {
-      actionBarWorld = {
-        player: p,
-        target: target ?? null,
-        inventory: sim.inventory,
-        wornTrinketId: sim.equipment.trinket,
-        stealthed,
-        paladinSpec: sim.talentSpec,
-        playerClass: sim.cfg.playerClass,
-        fateThreads,
-        entities: sim.entities.values(),
-        activeAimSlot: this.groundAim.activeSlot(),
-      };
-      this.actionBarWorldInput = actionBarWorld;
-    }
+    const actionBarWorld = syncActionBarWorldInput(
+      this.actionBarWorldInput,
+      sim,
+      p,
+      target ?? null,
+      stealthed,
+      fateThreads,
+      this.groundAim.activeSlot(),
+    );
+    this.actionBarWorldInput = actionBarWorld;
     actionBarWorld.pet = this.renderPetBar(pet);
     this.cooldownManager.paint(actionBarWorld);
     this.shardpikeBar.paint(p.dead);

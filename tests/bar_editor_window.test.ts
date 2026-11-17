@@ -51,7 +51,11 @@ interface Harness {
 }
 
 function harness(
-  options: { hideTooltip?: () => void; sourceSlotCount?: () => number } = {},
+  options: {
+    hideTooltip?: () => void;
+    sourceSlotCount?: () => number;
+    wornTrinketId?: () => string | null | undefined;
+  } = {},
 ): Harness {
   document.body.innerHTML = '<div id="bar-editor" class="window panel"></div>';
   const root = document.getElementById('bar-editor') as HTMLElement;
@@ -71,6 +75,7 @@ function harness(
     onVisibilityChange: () => {},
     hideTooltip: options.hideTooltip ?? (() => {}),
     barActions: () => bar,
+    wornTrinketId: options.wornTrinketId,
     sourceSlotCount: options.sourceSlotCount ?? (() => ACTION_BAR_ABILITY_SLOTS),
     editAllowed: () => !locked.value,
     placeAbility: (abilityId, slot) => {
@@ -132,6 +137,22 @@ describe('bar editor window: what a player sees', () => {
       expect(cell.tagName).toBe('BUTTON');
       expect(cell.type).toBe('button');
     }
+  });
+
+  it('shows a Trinket spell cell as the worn trinket, like the live bar', () => {
+    let worn: string | null = 'wayfarers_lodestone';
+    const t = harness({ wornTrinketId: () => worn });
+    t.bar[0] = { type: 'ability', id: 'use_trinket' };
+    t.window.open();
+    const wornHtml = t.cells()[0].innerHTML;
+    expect(t.cells()[0].getAttribute('aria-label')).toContain('Lodestone');
+    // Nothing worn: the spell's own name and icon stand in.
+    worn = null;
+    t.window.close();
+    t.window.open();
+    expect(t.cells()[0].getAttribute('aria-label')).toContain('Trinket');
+    expect(t.cells()[0].getAttribute('aria-label')).not.toContain('Lodestone');
+    expect(t.cells()[0].innerHTML).not.toBe(wornHtml);
   });
 
   it('names each cell by its button and direction, and shows what it holds', () => {

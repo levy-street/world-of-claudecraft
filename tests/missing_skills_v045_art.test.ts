@@ -14,7 +14,9 @@ describe('integration 45 missing skill art', () => {
   it('resolves every former fallback through the action-bar icon route', () => {
     // The release's new Scratch ability remains explicitly pending; this wave
     // completed the four integration icons listed below.
-    expect([...ABILITY_ART_PENDING]).toEqual(['scratch']);
+    // The Trinket spell (use_trinket) parks on its glyph too: worn trinkets
+    // draw their own item art, so the glyph only shows with nothing to use.
+    expect([...ABILITY_ART_PENDING]).toEqual(['scratch', 'use_trinket']);
     for (const [id, cls] of expected) {
       const url = `/ui/skills/${cls}/${id}.webp`;
       expect(abilityImageUrl(id)).toBe(url);

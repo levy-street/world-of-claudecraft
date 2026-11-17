@@ -17452,6 +17452,10 @@ export const pl_PL: EnTranslations = {
         "name": "Kurier",
         "description": "Przywołaj latającego osła, który przenosi przedmioty między twoimi torbami a najbliższym bankiem. Każda podróż trwa do 15 sekund do banku i do 15 sekund z powrotem, z szybszym lotem na dłuższych trasach. Wybierz do 24 stosów na podróż. Zwrócone przedmioty trafiają do nadmiaru, jeśli torby są pełne, a kurier znika do ponownego przywołania. Powrót zatrzymuje się, gdy nie żyjesz lub jesteś w instancji. Rozpoczęcie nowej podróży wymaga członkostwa."
       },
+      "use_trinket": {
+        "name": "Trinket",
+        "description": "Use the trinket you are wearing. This button takes that trinket's icon, effect and cooldown, and changes when you equip a different trinket. It does nothing while you wear no trinket, or one with no use effect."
+      },
       "sport_kick": {
         "name": "Kopnięcie",
         "description": "Zagraj piłkę po ziemi w stronę punktu celowania."

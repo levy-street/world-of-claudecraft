@@ -7,6 +7,7 @@ import {
   type SavedLoadout,
   type TalentAllocation,
 } from './content/talents';
+import { TRINKET_SPELL_ID } from './content/trinket_spell';
 import { cloneGearSet } from './loadout_gear';
 import type { CharacterState } from './sim';
 import { repairTalentLoadouts } from './talent_loadouts';
@@ -81,15 +82,14 @@ function migrateLoadoutBar(
 ): (string | null)[] {
   const fullMods = computeTalentModifiers(cls, allocation, level);
   const known = new Set(abilitiesKnownAt(cls, level, fullMods).map((entry) => entry.def.id));
+  // The Trinket spell is known by every class, outside every kit: a player who
+  // put it on a saved bar keeps it there (it is never seeded below).
+  const keeps = (abilityId: string): boolean =>
+    abilityId === TRINKET_SPELL_ID || (known.has(abilityId) && isMainBarAbility(cls, abilityId));
   const seen = new Set<string>();
   const bar = Array.from({ length: SAVED_LOADOUT_BAR_SLOTS }, (_, index) => {
     const abilityId = value[index];
-    if (
-      typeof abilityId !== 'string' ||
-      !known.has(abilityId) ||
-      !isMainBarAbility(cls, abilityId) ||
-      seen.has(abilityId)
-    ) {
+    if (typeof abilityId !== 'string' || !keeps(abilityId) || seen.has(abilityId)) {
       return null;
     }
     seen.add(abilityId);

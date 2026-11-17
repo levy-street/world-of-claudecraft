@@ -17452,6 +17452,10 @@ export const id_ID: EnTranslations = {
         "name": "Kurir",
         "description": "Panggil keledai terbang untuk membawa barang antara tasmu dan bank terdekat. Setiap perjalanan memerlukan hingga 15 detik ke bank dan hingga 15 detik kembali, terbang lebih cepat pada rute panjang. Pilih hingga 24 tumpukan per perjalanan. Barang yang kembali meluap jika tas penuh, lalu kurir menghilang sampai dipanggil lagi. Perjalanan kembali dijeda saat kamu mati atau berada dalam instans. Keanggotaan diperlukan untuk memulai perjalanan baru."
       },
+      "use_trinket": {
+        "name": "Trinket",
+        "description": "Use the trinket you are wearing. This button takes that trinket's icon, effect and cooldown, and changes when you equip a different trinket. It does nothing while you wear no trinket, or one with no use effect."
+      },
       "sport_kick": {
         "name": "Tendang",
         "description": "Tendang bola menyusur tanah ke arah titik bidik."

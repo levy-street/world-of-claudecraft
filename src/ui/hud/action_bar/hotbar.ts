@@ -4,6 +4,7 @@ import {
   type TalentAllocation,
 } from '../../../sim/content/talents';
 import { abilitiesKnownAt } from '../../../sim/data';
+import { withTrinketSpell } from '../../../sim/trinket_spell';
 import type { AbilityDef, PlayerClass } from '../../../sim/types';
 import type { PetCommand } from '../../../world_api/pet';
 import { isPetSlotCommand } from './pet_slot_core';
@@ -402,8 +403,10 @@ export function loadoutKnownAbilityIds(
   level: number,
 ): Set<string> {
   const mods = computeTalentModifiers(cls, alloc, level);
+  // withTrinketSpell: the Trinket spell is known under every build, so a
+  // loadout switch keeps it where the saved bar put it.
   return new Set(
-    abilitiesKnownAt(cls, level, mods)
+    withTrinketSpell(abilitiesKnownAt(cls, level, mods))
       .filter((known) => isAbilityActionBarEligible(known.def))
       .map((known) => known.def.id),
   );

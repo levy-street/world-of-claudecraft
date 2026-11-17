@@ -25677,4 +25677,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'seasonal.thatchgrin.wakeYell': '夜が畑に降りたぞ！ わしの畑を歩くのは誰だ？',
   'seasonal.thatchgrin.sleepYell': '日が昇った。柱に戻って、また見張りだ。',
   'seasonal.pumpkins.progress': '{label}：{current}/{total}',
+  // The Trinket spell: same-change non-Latin coverage (M16).
+  'entities.abilities.use_trinket.name': '装飾品',
+  'entities.abilities.use_trinket.description':
+    '装備中の装飾品を使用します。このボタンはその装飾品のアイコン、効果、クールダウンを引き継ぎ、別の装飾品を装備すると切り替わります。装飾品を装備していない場合や、使用効果のない装飾品の場合は何も起こりません。',
 };

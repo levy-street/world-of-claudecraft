@@ -4878,6 +4878,8 @@ export type TranslationKeyFlat =
   | 'entities.abilities.unleash_beast.name'
   | 'entities.abilities.unleash_weapon.description'
   | 'entities.abilities.unleash_weapon.name'
+  | 'entities.abilities.use_trinket.description'
+  | 'entities.abilities.use_trinket.name'
   | 'entities.abilities.valkyrs_calling.description'
   | 'entities.abilities.valkyrs_calling.name'
   | 'entities.abilities.vampiric_touch.description'

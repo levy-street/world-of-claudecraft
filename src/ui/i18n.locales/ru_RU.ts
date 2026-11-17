@@ -26144,4 +26144,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'seasonal.thatchgrin.sleepYell': 'Солнце встало. Обратно на шест, снова сторожить.',
   'seasonal.pumpkins.progress': "{label}: {current}/{total}",
 
+  // The Trinket spell: same-change non-Latin coverage (M16).
+  'entities.abilities.use_trinket.name': 'Аксессуар',
+  'entities.abilities.use_trinket.description':
+    'Использует надетый аксессуар. Кнопка перенимает значок, эффект и время восстановления этого аксессуара и меняется, когда вы надеваете другой. Ничего не делает, если аксессуар не надет или у него нет эффекта при использовании.',
 };

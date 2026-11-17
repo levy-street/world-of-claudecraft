@@ -17452,6 +17452,10 @@ export const vi_VN: EnTranslations = {
         "name": "Người Chuyển Đồ",
         "description": "Triệu hồi lừa bay chở đồ giữa túi và ngân hàng gần nhất. Mỗi chuyến mất tối đa 15 giây tới ngân hàng và tối đa 15 giây về, bay nhanh hơn trên tuyến dài. Chọn tối đa 24 chồng mỗi chuyến. Đồ trả về tràn nếu túi đầy, rồi người chuyển đồ biến mất tới khi triệu hồi lại. Chuyến về tạm dừng khi bạn chết hoặc trong phụ bản. Cần tư cách thành viên để bắt đầu chuyến mới."
       },
+      "use_trinket": {
+        "name": "Trinket",
+        "description": "Use the trinket you are wearing. This button takes that trinket's icon, effect and cooldown, and changes when you equip a different trinket. It does nothing while you wear no trinket, or one with no use effect."
+      },
       "sport_kick": {
         "name": "Đá Bóng",
         "description": "Đẩy bóng lăn sệt trên mặt đất về phía điểm ngắm."

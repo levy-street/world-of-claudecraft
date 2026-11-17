@@ -39,6 +39,7 @@ import { consumeRequiredAura, hasRequiredAura } from './required_aura';
 import { isDispellableAura } from '../aura_classify';
 import { nearestAttackerId } from '../auto_acquire_target';
 import { completeAlliedHearthstoneCast } from '../content/faction_rewards';
+import { TRINKET_SPELL_ID } from '../content/trinket_spell';
 import { ITEMS, isDelvePos, MOBS, zoneAt } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { instanceInfoAt } from '../instances/dungeons';
@@ -264,6 +265,7 @@ import {
 import { resolveHostileSpellResist } from './spell_resist';
 import { onCastCompleted } from './talent_procs';
 import { isToggleBuff, leavingRestrictedToggle } from './toggle_buff';
+import { castTrinketSpell } from './trinkets';
 import { emitRainOfFireStop } from './warlock_meteor_events';
 import {
   armForbiddenReflection,
@@ -1081,6 +1083,14 @@ export function castAbility(
   let res = ctx.resolvedAbility(abilityId, p.id);
   if (!res) {
     ctx.error(p.id, 'You do not know that ability.');
+    return;
+  }
+  // The Trinket spell is a click on the worn trinket, not a spell: the trinket
+  // system owns every gate and the cooldown (trinkets.ts castTrinketSpell).
+  // Handing it over here keeps the cast path's own rules (the GCD, the busy and
+  // silence guards) off it, as they are off a trinket clicked on the bar.
+  if (res.def.id === TRINKET_SPELL_ID) {
+    castTrinketSpell(ctx, meta, p);
     return;
   }
   if (p.dead) return;

@@ -17452,6 +17452,10 @@ export const nl_NL: EnTranslations = {
         "name": "Koerier",
         "description": "Roep een vliegende ezel op om voorwerpen tussen je tassen en de dichtstbijzijnde bank te vervoeren. Elke reis duurt maximaal 15 seconden naar de bank en maximaal 15 seconden terug. Op langere routes vliegt hij sneller. Kies maximaal 24 stapels per reis. Teruggebrachte voorwerpen mogen volle tassen laten overlopen, waarna de koerier verdwijnt totdat je hem opnieuw oproept. De terugreis pauzeert terwijl je dood bent of in een instantie bent. Je hebt een lidmaatschap nodig om een nieuwe reis te starten."
       },
+      "use_trinket": {
+        "name": "Trinket",
+        "description": "Use the trinket you are wearing. This button takes that trinket's icon, effect and cooldown, and changes when you equip a different trinket. It does nothing while you wear no trinket, or one with no use effect."
+      },
       "sport_kick": {
         "name": "Trap",
         "description": "Trap de bal over de grond richting het richtpunt."
