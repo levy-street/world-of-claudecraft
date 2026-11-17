@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { GLIDER_QUEST_ID } from '../src/sim/content/world_quest_glider';
 import { BUILTIN_WORLD } from '../src/sim/data';
+import { createGliderFlightState } from '../src/sim/minigames/glider_flight';
 import {
   petFollow,
   petPickTarget,
@@ -579,6 +581,57 @@ describe('pet proximity pull: a pet drags idle wild mobs like its owner', () => 
     }
     expect(boss.aiState).not.toBe('idle');
     expect(boss.threat.has(pet.id)).toBe(true);
+  });
+
+  it('never pulls or picks a target while the owner is on a glider run', () => {
+    // Field report: a hunter's glider daily reset around the 4th or 5th ring on every
+    // attempt with the pet out, and flew clean with it dismissed. The pet heels along
+    // the ground under the course, body-pulled a camp there, and its fight flagged the
+    // airborne owner in combat, which aborts the flight (world_quest_glider.ts).
+    const { sim, pid, owner } = world();
+    const pet = adopt(sim, pid);
+    const mob = wildHostile(sim, [pet.id]);
+    mob.level = 10;
+    pet.level = 10;
+    mob.aiState = 'idle';
+    mob.aggroTargetId = null;
+    mob.inCombat = false;
+    isolate(sim, [owner.id, pet.id, mob.id]);
+    place(owner, 100, 100);
+    place(pet, 100, 100);
+    place(mob, 103, 100);
+    syncGrid(sim);
+    const meta = expectDefined(sim.players.get(pid));
+    meta.lastActiveTick = sim.tickCount;
+
+    for (const phase of ['countdown', 'flying'] as const) {
+      meta.worldQuestLog.set(GLIDER_QUEST_ID, {
+        questId: GLIDER_QUEST_ID,
+        count: 0,
+        state: 'active',
+        glider: { ...createGliderFlightState(false), phase },
+      });
+      updatePet(sim.ctx, pet);
+      expect(mob.aiState).toBe('idle');
+      expect(mob.aggroTargetId).toBeNull();
+      expect(pet.aggroTargetId).toBeNull();
+      expect(pet.inCombat).toBe(false);
+      // Even the opt-in aggressive stance stands down for the length of the run.
+      pet.petMode = 'aggressive';
+      expect(petPickTarget(sim.ctx, pet, owner)).toBeNull();
+      pet.petMode = 'defensive';
+    }
+
+    // Control: once the run is over (landed), the same pet in the same spot pulls again.
+    meta.worldQuestLog.set(GLIDER_QUEST_ID, {
+      questId: GLIDER_QUEST_ID,
+      count: 0,
+      state: 'active',
+      glider: { ...createGliderFlightState(false), phase: 'won' },
+    });
+    updatePet(sim.ctx, pet);
+    expect(mob.aggroTargetId).toBe(pet.id);
+    expect(mob.aiState).not.toBe('idle');
   });
 });
 
