@@ -7958,7 +7958,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // same day: the Phoenix Trance window is meant to chain free Pyroblasts).
     effects: [{ type: 'selfBuff', kind: 'combustion', value: 0, duration: 10 }],
     description:
-      'Combust: for 10 sec your Fire spells always critically strike, including bolts already in flight. Off the global cooldown. These crits build Hot Streak like any other, and casting it finishes the Cinderfall charge currently recharging. (Fire signature)',
+      'Combust: for 10 sec your Fire spells always critically strike, including bolts already in flight. Off the global cooldown. These crits build Hot Streak like any other, and casting it finishes the Cinderfall charge currently recharging. Against other players and their pets, Pyrelance and Flamestrike are not forced to crit. (Fire signature)',
   },
   cone_of_cold: {
     id: 'cone_of_cold',

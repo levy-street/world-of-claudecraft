@@ -2619,11 +2619,21 @@ export function runEffects(
         // streak counter nothing), outcome overridable by Combustion. Every
         // struck enemy crits together, mirroring the owner rule that a single
         // Flamestrike is a single crit toward Hot Streak however many it hits.
+        // The caster's selected target stands in as the target, so Phoenix
+        // Trance's PvP spender rule (combat/fire_mage.ts) applies only while
+        // the mage is targeting another player or their pet or summon; a
+        // Flamestrike aimed while targeting a creature keeps the forced crit.
         const aoeCrit =
           (eff.canCrit ?? false) &&
           aoeTargets.length > 0 &&
           (ctx.rng.chance(ctx.spellCrit(p)) ||
-            fireGuaranteedCrit(ctx, p, ability.id, ability.school, null));
+            fireGuaranteedCrit(
+              ctx,
+              p,
+              ability.id,
+              ability.school,
+              p.targetId !== null ? (ctx.entities.get(p.targetId) ?? null) : null,
+            ));
         let sunVerdictHit: { target: Entity; mark: Aura } | null = null;
         for (const m of aoeTargets) {
           const sunVerdictMark = ability.id === DAWNFALL_ID ? sunVerdictMarkForHit(m, p.id) : null;
