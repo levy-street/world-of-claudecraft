@@ -88,7 +88,8 @@ export const QUARTERED_ISLE_STORY_NPCS: Record<string, NpcDef> = {
     title: "Challengers' Leader",
     ...stand(RIVALMOOT_THESSALY_NPC_ID),
     color: 0x3a5a9a,
-    questIds: [],
+    // the Keeper's first quest is handed in to her
+    questIds: ['q_qi_the_moot_rolls'],
     dynamic: true,
     greeting:
       'The council has sat on that peak unchallenged for longer than anyone remembers. My challengers mean to change that. Prove yourself on the scars first, $N.',

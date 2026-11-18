@@ -59,6 +59,9 @@ describe('The Moot Rolls', () => {
       expect(q.minLevel).toBe(20);
       expect(q.requiresQuest).toBe(i === 0 ? undefined : QUARTERED_ISLE_QUEST_ORDER[i - 1]);
       expect(NPCS[q.turnInNpcId], id).toBeDefined();
+      // both ends of every quest list it, or it cannot be offered or handed in
+      expect(NPCS[q.giverNpcId].questIds, `${id} giver`).toContain(id);
+      expect(NPCS[q.turnInNpcId].questIds, `${id} turn-in`).toContain(id);
     });
   });
 
