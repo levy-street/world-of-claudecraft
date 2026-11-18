@@ -9,8 +9,11 @@
 // hazard footprint; the Guardian's cursed pillar (a risen needle whose cracks
 // and sheath burn crimson-magenta, no pips: it shelters nobody), its pulse
 // and its break; the Masterless Strength's pillars (Wake the Stone, the
-// rework of 2026-11-18: risen needles with no pips, they break whole), and a
-// Storm-Charged one burning violet-white in the cursed pillar's frame. Every
+// rework of 2026-11-18: risen needles with no pips, they break whole; a
+// Crossing Blade bursts one into flying stone), and a Storm-Charged one: the
+// solid stone kept (no sheath of light over it, the coordinator's review of
+// 2026-11-18: the sheath read as a flat violet pane), its seams burning
+// violet-white like runes and flaring on each pulse. Every
 // shell, pip, lean and footprint draws on every tier;
 // the dust, grit and debris thin with the host's density.
 
@@ -911,7 +914,7 @@ export class CouncilPillarsFx {
   }
 
   /** A pillar fell (its object is gone): the nearest standing slot falls. */
-  collapseAt(x: number, z: number, r: number): void {
+  collapseAt(x: number, z: number, r: number, burst = false): void {
     let best: PillarSlot | null = null;
     let bestD = 1.5;
     for (const s of this.pillars) {
@@ -923,24 +926,30 @@ export class CouncilPillarsFx {
       }
     }
     const y = this.h.groundY(x, z);
+    const height = best ? best.height : 10;
     if (best) {
-      best.state = 'falling';
-      best.endAt = this.h.now();
-      best.id = -1;
+      if (burst) this.retirePillar(best);
+      else {
+        best.state = 'falling';
+        best.endAt = this.h.now();
+        best.id = -1;
+      }
     }
-    const n = Math.round(54 * this.h.density * (this.h.reducedMotion() ? 0.5 : 1));
+    // Burst (a Crossing Blade through it): the whole stone flies apart at
+    // once, bigger and faster pieces; else it topples and sheds them.
+    const n = Math.round((burst ? 90 : 54) * this.h.density * (this.h.reducedMotion() ? 0.5 : 1));
     for (let i = 0; i < n; i++) {
       const a = this.h.rand() * Math.PI * 2;
-      const h = this.h.rand() * (best ? best.height : 10);
-      const sp = 2 + this.h.rand() * 7;
+      const h = this.h.rand() * height;
+      const sp = burst ? 6 + this.h.rand() * 12 : 2 + this.h.rand() * 7;
       this.h.debris.throw(
         x + Math.sin(a) * r * 0.5,
         y + h,
         z + Math.cos(a) * r * 0.5,
         Math.sin(a) * sp,
-        1 + this.h.rand() * 5,
+        (burst ? 3 : 1) + this.h.rand() * (burst ? 9 : 5),
         Math.cos(a) * sp,
-        0.3 + this.h.rand() * 0.9,
+        (burst ? 0.5 : 0.3) + this.h.rand() * (burst ? 1.3 : 0.9),
       );
     }
     this.h.particles.puff(x, y + 2, z, 30, {
@@ -1172,7 +1181,14 @@ export class CouncilPillarsFx {
     s.shellMat.uniforms.uHeat.value = look.heat;
     s.shellMat.uniforms.uFlash.value = 0;
     s.shell.visible = s.body !== null;
-    s.soulGlow.visible = true;
+    if (s.final) {
+      // A Storm-Charged pillar of the Masterless Strength: the stone stays
+      // solid, its seams burn like runes and flare white on each pulse.
+      const since = now - s.pulseAt;
+      s.shellMat.uniforms.uCrack.value = 0.55;
+      s.shellMat.uniforms.uFlash.value = since >= 0 && since < 0.5 ? 1 - since / 0.5 : 0;
+      s.soulGlow.visible = false;
+    } else s.soulGlow.visible = true;
     s.soulGlow.scale.set(s.radius * 1.12, s.height * 1.02, s.radius * 1.12);
     s.soulGlowMat.uniforms.uAlpha.value = look.glow;
     s.pips.visible = false;

@@ -4,15 +4,21 @@
 // and the footprints at the sim's exact radii, and hands them in as the
 // host). Read from IWorld through the kit (the fight's objects, the marks, the
 // cues), so offline and online look the same:
-//   - a Crossing Blade: the Smith's great sword of ice hovering upright at its
-//     rise on the rim, its point down, turning to its line and burning
-//     brighter as the line locks, then flying the line point first on the
-//     sim's own eased curve with a wake of frost and shards; its line on the
-//     floor (the shared telegraph's lane, filling off its mark's own aura,
-//     turning the lethal red as it locks), a frost scar left a moment after;
-//   - a Sky Strike: the charge gathering in the air over its spot through the
-//     warning, then a bolt out of the sky (a white-hot trunk and its fork,
-//     a re-strike flicker), the floor flash and the sparks;
+//   - a Crossing Blade: the Quench guardian's own great sword of ice (the
+//     painted Env_IceSword once its kit has landed, else its crystal
+//     stand-in), towering, lying level along its line over the rim with its
+//     broad face to the sky (read whole from any camera, never end-on), its
+//     point at the arena, burning brighter as the line aims, drawn back and
+//     blazing as it locks, then flying the line point first, low over the
+//     floor, on the sim's own eased curve with a wake of frost and shards; its
+//     line on the floor (the shared telegraph's lane in the ice's own cold
+//     blue-white, the coordinator's call of 2026-11-18: never the fire's
+//     orange, so it is never read as the Heat's), a frost scar after;
+//   - a Sky Strike: a storm cloud gathering over its spot through the
+//     warning, flickering inside, then a bolt out of the sky (its leader
+//     racing down from the cloud, a thick white-hot trunk and its forks, a
+//     re-strike flicker), the flash and the floor's impact ring and sparks;
+//     a strike laid by a pillar is drawn onto the pillar's crown;
 //   - Arcing Stone: through the warning the ring's edge crackles and sparks
 //     climb the pillar; as it lands a ring of lightning races out round the
 //     pillar to its whole reach, bolts forking from the pillar to the ring;
@@ -35,6 +41,12 @@ import { finalLaneOf } from '../../sim/encounters/smith_heart/final_ids';
 import type { Entity } from '../../sim/types';
 import type { TelegraphKit, TelegraphLane, TelegraphStyle } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
+import {
+  onQuenchEnvKitLanded,
+  quenchEnvKitReady,
+  quenchEnvMaterial,
+  quenchEnvPieceParts,
+} from '../smith_heart/quench_env_kit';
 import type { EngineParticles } from '../trash_engine_fx/engine_particles';
 import { KIT_UV_VERT } from './final_kit_glsl';
 import {
@@ -58,6 +70,7 @@ import {
   STAR_RING_VERT,
 } from './final_stars_glsl';
 import { ICE_SWORD_BLADE, iceSwordGeometry } from './final_stars_shapes';
+import { BLADE_KIT_LEAN } from './quench_blade_tip_core';
 
 /** What FinalKitFx lends its stars' painter. */
 export interface FinalStarsHost {
@@ -129,6 +142,8 @@ interface Blade {
   holder: THREE.Group;
   sword: THREE.Mesh;
   halo: THREE.Mesh;
+  /** The guardian's painted sword (null until its kit lands). */
+  painted: THREE.Group | null;
   glow: { value: number };
   lane: TelegraphLane;
   /** The line it flies (from its lane), and its flight's start (-1 aiming). */
@@ -159,12 +174,27 @@ const _v = new THREE.Vector3();
 const _v2 = new THREE.Vector3();
 const _s = new THREE.Vector3();
 const UP = new THREE.Vector3(0, 1, 0);
-const _pose: BladePose = { along: 0, tilt: 0, lift: 0, glow: 0 };
-const BOLT_LIFE = 0.6;
+const _pose: BladePose = { along: 0, pitch: 0, lift: 0, glow: 0 };
+const BOLT_LIFE = 0.75;
+/** Seconds a sky bolt's leader takes to race down from the cloud. */
+const BOLT_LEADER = 0.07;
+/** How high the storm cloud gathers over a strike (yards). */
+const CLOUD_Y = 22;
 const SCAR_SECONDS = 0.8;
-/** The sword's drawn size over its geometry: a great sword the height of
- *  the guardian's own blades of ice, towering over the raid. */
-const SWORD_SCALE = 1.8;
+/** The sword's drawn size over its geometry: its blade some 20 yd, towering
+ *  over the raid (the coordinator's review of 2026-11-18: the first cut read
+ *  as a sliver). */
+const SWORD_SCALE = 2.4;
+/** The crystal stand-in's extra breadth (its section is slimmer than the
+ *  painted sword's). */
+const STAND_IN_BREADTH = 1.6;
+/** The painted Env_IceSword (quench_env_kit.ts, build_smith_heart_quench_env_kit.py):
+ *  16 yd point to crown, its point ENV_SWORD_TIP under its origin, its guard
+ *  about ENV_SWORD_GUARD over it; fitted so its guard sits on the stand-in's
+ *  and its blade runs the stand-in's length. */
+const ENV_SWORD_TIP = 3.2;
+const ENV_SWORD_GUARD = 8.3;
+const ENV_SWORD_FIT = ICE_SWORD_BLADE / (ENV_SWORD_TIP + ENV_SWORD_GUARD);
 
 export class FinalStarsFx {
   private readonly bolts: Bolt[] = [];
@@ -178,6 +208,8 @@ export class FinalStarsFx {
   private markFill = 0;
   private markDuration = 0;
   private clock = 0;
+  private readonly fullerMat: THREE.MeshBasicMaterial;
+  private stopWaitingForPaint: (() => void) | null = null;
 
   constructor(private readonly h: FinalStarsHost) {
     // ---- the bolts: a white-hot core and a wide storm glow, instanced ----
@@ -301,9 +333,10 @@ export class FinalStarsFx {
       const sword = new THREE.Mesh(swordGeo, swordMat);
       sword.name = 'smithHeartStarIceSword';
       sword.castShadow = h.detail;
+      sword.scale.set(STAND_IN_BREADTH, 1, STAND_IN_BREADTH);
       const halo = new THREE.Mesh(swordGeo, haloMat);
       halo.name = 'smithHeartStarIceHalo';
-      halo.scale.set(1.35, 1.03, 1.9);
+      halo.scale.set(1.35 * STAND_IN_BREADTH, 1.03, 1.9 * STAND_IN_BREADTH);
       holder.add(sword, halo);
       holder.scale.setScalar(SWORD_SCALE);
       h.root.add(holder);
@@ -314,6 +347,7 @@ export class FinalStarsFx {
         holder,
         sword,
         halo,
+        painted: null,
         glow,
         lane,
         laneId: -1,
@@ -328,6 +362,20 @@ export class FinalStarsFx {
         lastZ: 0,
       });
     }
+    // The painted sword's fuller light (its own, built now: the painted
+    // stone's materials are the lake kit's, already linked by the Quench's
+    // room and its blades).
+    this.fullerMat = new THREE.MeshBasicMaterial({
+      name: 'smithHeartStarIceFuller',
+      color: new THREE.Color(...C.iceCore),
+      transparent: true,
+      opacity: 0.9,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      toneMapped: false,
+    });
+    h.materials.push(this.fullerMat);
+    this.stopWaitingForPaint = onQuenchEnvKitLanded(() => this.fitPainted());
     // ---- the wake columns ----
     const colGeo = new THREE.CylinderGeometry(6, 9, 1, 40, 8, true).translate(0, 0.5, 0);
     h.geometries.push(colGeo);
@@ -408,31 +456,46 @@ export class FinalStarsFx {
     }
   }
 
-  /** The charge gathering over a Sky Strike's spot (`fill` 0..1). */
+  /** The storm gathering over a Sky Strike's spot (`fill` 0..1): a dark
+   *  cloud rolling in, flickering inside as it fills, the hair-raising
+   *  sparks off the floor at the end. Never a ball of light (the
+   *  coordinator's review of 2026-11-18: the first cut's glow puffs read as
+   *  yellow orbs over the raid). */
   strikeCharge(x: number, y: number, z: number, fill: number): void {
     const H = this.h;
-    if (H.rand() < (0.35 + fill * 1.2) * H.density)
-      H.particles.puff(
-        x + (H.rand() - 0.5) * 3,
-        y + 16 + H.rand() * 10,
-        z + (H.rand() - 0.5) * 3,
-        2,
-        {
-          speed: 6,
-          life: 0.22,
-          size: [0.8, 0.12],
-          color: C.boltCore,
-          alpha: 0.9,
-          pool: 'glow',
-        },
+    const top = y + CLOUD_Y;
+    if (H.rand() < (0.5 + fill) * H.density)
+      H.particles.puff(x + (H.rand() - 0.5) * 6, top + H.rand() * 3, z + (H.rand() - 0.5) * 6, 1, {
+        speed: 1.2,
+        up: -0.3,
+        life: 1.2,
+        size: [3.5, 7],
+        color: [0.16, 0.15, 0.24],
+        alpha: 0.55,
+        radius: 2,
+        drag: 1,
+      });
+    // Lightning flickering inside the cloud as the charge builds.
+    if (fill > 0.3 && H.rand() < fill * 0.35) {
+      const a = H.rand() * Math.PI * 2;
+      this.leap(
+        x + Math.cos(a) * 3,
+        top + H.rand() * 2,
+        z + Math.sin(a) * 3,
+        x - Math.cos(a) * 3,
+        top + H.rand() * 2,
+        z - Math.sin(a) * 3,
+        0.09,
+        1.1,
       );
-    if (fill > 0.55 && H.rand() < fill * 0.5 * H.density)
+    }
+    if (fill > 0.6 && H.rand() < fill * 0.5 * H.density)
       H.particles.puff(x, y + 0.3, z, 1, {
-        speed: 2,
+        speed: 1.5,
         up: 2.5,
-        life: 0.35,
-        size: [0.35, 0.06],
-        color: C.boltGlow,
+        life: 0.3,
+        size: [0.22, 0.04],
+        color: C.boltCore,
         alpha: 1,
         pool: 'glow',
         radius: 2.5,
@@ -474,27 +537,44 @@ export class FinalStarsFx {
   chargedPillar(e: Entity): void {
     const H = this.h;
     const y0 = H.groundY(e.pos.x, e.pos.z);
-    for (let k = 0; k < 2; k++) {
+    // Arcs climbing the stone: from low on its face up and round it.
+    for (let k = 0; k < 3; k++) {
       const arc = chargedArc(this.clock, e.id, k);
       if (!arc.on) continue;
-      if (H.rand() > 0.5) continue;
-      const r = 2.3;
+      if (H.rand() > 0.6) continue;
+      const r = 2.5;
       const ax = e.pos.x + Math.cos(arc.angle) * r;
       const az = e.pos.z + Math.sin(arc.angle) * r;
-      const bx = e.pos.x + Math.cos(arc.angle + 0.7) * r;
-      const bz = e.pos.z + Math.sin(arc.angle + 0.7) * r;
-      this.leap(ax, y0 + 10 * arc.from, az, bx, y0 + 10 * arc.to, bz, 0.16, 0.6);
+      const bx = e.pos.x + Math.cos(arc.angle + 0.9) * r;
+      const bz = e.pos.z + Math.sin(arc.angle + 0.9) * r;
+      this.leap(ax, y0 + 10 * arc.from, az, bx, y0 + 10 * arc.to, bz, 0.16, 0.7);
     }
-    if (H.rand() < 0.5 * H.density)
-      H.particles.puff(e.pos.x, y0 + 0.5 + H.rand() * 10, e.pos.z, 1, {
-        speed: 3,
-        life: 0.25,
-        size: [0.45, 0.06],
+    // Sparks spitting off its face, a crackle at its crown.
+    if (H.rand() < 0.8 * H.density)
+      H.particles.puff(e.pos.x, y0 + 0.5 + H.rand() * 10, e.pos.z, 2, {
+        speed: 4,
+        up: 1.5,
+        life: 0.3,
+        size: [0.4, 0.05],
         color: C.charged,
         alpha: 1,
         pool: 'glow',
-        radius: 2.4,
+        radius: 2.5,
+        gravity: 6,
       });
+    if (H.rand() < 0.12) {
+      const a = H.rand() * Math.PI * 2;
+      this.leap(
+        e.pos.x,
+        y0 + 10.2,
+        e.pos.z,
+        e.pos.x + Math.cos(a) * 2.6,
+        y0 + 11.5 + H.rand() * 2,
+        e.pos.z + Math.sin(a) * 2.6,
+        0.12,
+        0.6,
+      );
+    }
   }
 
   /** The frame ends: the blades and their lines, the bolts, the rings and
@@ -508,14 +588,26 @@ export class FinalStarsFx {
 
   // ---- the cues --------------------------------------------------------------------------
 
-  /** A Sky Strike falls at (x, z). */
+  /** A Sky Strike falls at (x, z): the bolt out of the cloud, the flash,
+   *  the impact. */
   boltAt(x: number, z: number, r: number): void {
     const H = this.h;
     const y = H.groundY(x, z);
-    this.fall(x, y, z, 42);
-    this.fall(x + 0.6, y, z - 0.4, 38);
-    this.ring(x, z, r * 1.8, 0.6, C.strikeHex, 0.9, 0.9);
-    H.particles.shockRing(x, z, C.strikeHex, r * 1.4, 0.5);
+    this.fall(x, y, z, CLOUD_Y + 2);
+    this.fall(x + 0.8, y, z - 0.5, CLOUD_Y - 2);
+    this.impact(x, y, z, r);
+  }
+
+  /** A bolt's landing: the white flash, the floor's ring and scorch, the
+   *  sparks and the thud. */
+  private impact(x: number, y: number, z: number, r: number): void {
+    const H = this.h;
+    this.ring(x, z, r * 1.8, 0.6, C.strikeHex, 0.9, 1.1);
+    H.particles.shockRing(x, z, C.strikeHex, r * 1.6, 0.5);
+    // The flash is the floor's own (a hot white ring racing out under the
+    // bolt): never a sprite ball over the spot (the coordinator's review of
+    // 2026-11-18 read the glow sprites as yellow orbs).
+    this.ring(x, z, r * 1.1, 0.25, C.strikeHex, 0, 2.2);
     H.particles.puff(x, y + 0.6, z, Math.round(26 * H.density) + 6, {
       speed: 11,
       up: 7,
@@ -527,7 +619,18 @@ export class FinalStarsFx {
       radius: 0.8,
       drag: 1.2,
     });
-    H.shake(x, z, 0.35, 45);
+    // The scorched smoke off the floor.
+    H.particles.puff(x, y + 0.4, z, Math.round(6 * H.density) + 2, {
+      speed: 2,
+      up: 2,
+      life: 1.4,
+      size: [1.4, 3.6],
+      color: [0.2, 0.19, 0.22],
+      alpha: 0.4,
+      radius: r * 0.5,
+      drag: 1,
+    });
+    H.shake(x, z, 0.4, 45);
   }
 
   /** Arcing Stone rings out round the pillar at (x, z) to `r`. */
@@ -551,7 +654,20 @@ export class FinalStarsFx {
         1,
       );
     }
-    this.fall(x, y + 10, z, 40);
+    // The lightning sought the stone: a bolt out of the cloud onto its crown,
+    // the flash on it.
+    this.fall(x, y + 10, z, CLOUD_Y - 8);
+    this.fall(x - 0.5, y + 10, z + 0.4, CLOUD_Y - 10);
+    H.particles.puff(x, y + 10, z, Math.round(14 * H.density) + 4, {
+      speed: 7,
+      up: 3,
+      life: 0.35,
+      size: [0.45, 0.06],
+      color: C.charged,
+      alpha: 1,
+      pool: 'glow',
+      radius: 1.2,
+    });
     H.particles.puff(x, y + 1, z, Math.round(40 * H.density) + 8, {
       speed: 14,
       up: 4,
@@ -575,7 +691,9 @@ export class FinalStarsFx {
       const t = targets[i];
       this.leap(pillar.pos.x, y + 9.5, pillar.pos.z, t.x, t.y + 1.3, t.z, 0.3, 0.75);
     }
-    H.particles.shockRing(pillar.pos.x, pillar.pos.z, C.chargedHex, 7, 0.45);
+    H.particles.shockRing(pillar.pos.x, pillar.pos.z, C.chargedHex, 9, 0.5);
+    // The pulse rolling out over the floor (it reaches the whole raid).
+    this.ring(pillar.pos.x, pillar.pos.z, 16, 0.9, C.arcHex, 1, 1.3);
   }
 
   /** A pillar shattered by a blade: frost and stone bursting out. */
@@ -595,6 +713,36 @@ export class FinalStarsFx {
     c.mesh.position.set(x, this.h.groundY(x, z) - 0.2, z);
     c.mesh.visible = true;
     this.ring(x, z, 22, 1.1, color, 0.3, 0.9);
+  }
+
+  /** The guardian's painted sword in every blade once the lake's kit has
+   *  landed (the crystal stand-in until then): its lean taken out, its point
+   *  turned to the blade's +y, its guard on the stand-in's. */
+  private fitPainted(): void {
+    if (!quenchEnvKitReady()) return;
+    const parts = quenchEnvPieceParts('Env_IceSword');
+    if (!parts) return;
+    for (const b of this.blades) {
+      if (b.painted) continue;
+      const wrap = new THREE.Group();
+      wrap.name = 'smithHeartStarPaintedSword';
+      const upright = new THREE.Group();
+      upright.rotation.z = BLADE_KIT_LEAN;
+      for (const [painting, geo] of parts) {
+        const glow = painting === 'glow';
+        const m = new THREE.Mesh(geo, glow ? this.fullerMat : quenchEnvMaterial(painting));
+        m.name = `Env_IceSword:${painting}`;
+        m.castShadow = !glow && this.h.detail;
+        upright.add(m);
+      }
+      wrap.add(upright);
+      wrap.rotation.x = Math.PI;
+      wrap.scale.setScalar(ENV_SWORD_FIT);
+      wrap.position.y = ENV_SWORD_GUARD * ENV_SWORD_FIT;
+      b.holder.add(wrap);
+      b.painted = wrap;
+      b.sword.visible = false;
+    }
   }
 
   /** Everything hidden (out of the Heart). */
@@ -756,7 +904,11 @@ export class FinalStarsFx {
       // A sky bolt re-jags as it flickers (the same seed's next path).
       if (!b.leap && Math.floor(age * 30) % 3 === 0)
         boltPath(b.seed + Math.floor(age * 30), b.top, b.pts, 10, 4, 2.4);
-      const w = (b.leap ? 0.09 : 0.24) * (0.55 + 0.45 * k);
+      const w = (b.leap ? 0.1 : 0.42) * (0.55 + 0.45 * k);
+      // A sky bolt's leader races down from the cloud before it lights whole.
+      const shown = b.leap
+        ? b.trunk
+        : Math.max(2, Math.ceil(b.trunk * Math.min(1, age / BOLT_LEADER)));
       const add = (i0: number, i1: number) => {
         if (n >= cap) return;
         const ox = b.leap ? 0 : b.x;
@@ -772,12 +924,12 @@ export class FinalStarsFx {
         _q.setFromUnitVectors(UP, _v);
         _m.compose(_v2.set(ax, ay, az), _q, _s.set(w, len, w));
         this.coreMesh.setMatrixAt(n, _m);
-        _m.compose(_v2, _q, _s.set(w * 6, len, w * 6));
+        _m.compose(_v2, _q, _s.set(w * (b.leap ? 6 : 4.5), len, w * (b.leap ? 6 : 4.5)));
         this.glowMesh.setMatrixAt(n, _m);
         n++;
       };
-      for (let i = 0; i + 1 < b.trunk; i++) add(i, i + 1);
-      if (!b.leap) {
+      for (let i = 0; i + 1 < shown; i++) add(i, i + 1);
+      if (!b.leap && shown >= b.trunk) {
         const from = Math.max(1, Math.floor(b.trunk / 3));
         add(from, b.trunk);
         for (let i = b.trunk; i + 1 < b.count; i++) add(i, i + 1);
@@ -852,26 +1004,33 @@ export class FinalStarsFx {
       bladeFlight(this.clock, flying, aim, b.laneState === 'lock', fly, _pose);
       const dx = Math.sin(b.facing);
       const dz = Math.cos(b.facing);
-      const along = _pose.along * b.length;
-      const x = b.fromX + dx * along;
-      const z = b.fromZ + dz * along;
-      const y = H.groundY(x, z) + _pose.lift;
+      // It hovers astride the rim as it aims (its guard out over the edge,
+      // half its blade over the floor, seen from the raid), then its point
+      // runs the line to the far rim.
+      const reach = ICE_SWORD_BLADE * SWORD_SCALE;
+      const along = _pose.along * b.length + reach * 0.5;
+      const x = b.fromX + dx * (along - reach);
+      const z = b.fromZ + dz * (along - reach);
+      const tipX = b.fromX + dx * along;
+      const tipZ = b.fromZ + dz * along;
+      const y = H.groundY(tipX, tipZ) + _pose.lift;
       b.holder.position.set(x, y, z);
-      // Upright, point down (the blade's +y down), tipping to fly point first.
+      // Level along its line, broad face up (the blade's +y laid on the
+      // line, its nose a little down), rocking gently as it hovers.
       b.holder.rotation.set(0, b.facing, 0, 'YXZ');
-      b.holder.rotateX(Math.PI - _pose.tilt * (Math.PI / 2));
-      if (!flying) b.holder.rotateY(Math.sin(this.clock * 1.3 + b.id) * 0.08);
-      b.holder.position.y += flying ? 1.2 : ICE_SWORD_BLADE * SWORD_SCALE * 0.45 * (1 - _pose.tilt);
+      b.holder.rotateX(Math.PI / 2 + _pose.pitch);
+      if (!flying) b.holder.rotateY(Math.sin(this.clock * 1.3 + b.id) * 0.1);
       b.glow.value = _pose.glow;
+      this.fullerMat.opacity = 0.45 + 0.55 * _pose.glow;
       // The wake of its flight: frost and shards along what it crossed.
       if (flying && fly <= 1.05) {
         // A cold streak along its whole sweep and ice shards thrown off it.
         const n = Math.round(30 * H.density) + 4;
         const swept = Math.max(4, along);
         for (let i = 0; i < n; i++) {
-          const back = H.rand() * Math.min(swept, 18);
-          const px = x - dx * back;
-          const pz = z - dz * back;
+          const back = H.rand() * Math.min(swept, 24);
+          const px = tipX - dx * back;
+          const pz = tipZ - dz * back;
           H.particles.puff(px, H.groundY(px, pz) + 0.8 + H.rand() * 3, pz, 1, {
             speed: 3,
             up: 2.5,
@@ -885,7 +1044,7 @@ export class FinalStarsFx {
           });
         }
         if (H.rand() < 0.8 * H.density)
-          H.particles.puff(x, y, z, 3, {
+          H.particles.puff(tipX, y, tipZ, 3, {
             speed: 7,
             up: 5,
             life: 0.9,
@@ -895,8 +1054,10 @@ export class FinalStarsFx {
             radius: 1.2,
             gravity: 20,
           });
-      } else if (!flying && H.rand() < 0.6 * H.density) {
-        H.particles.puff(x, y - 2 + H.rand() * 6, z, 1, {
+      } else if (!flying && H.rand() < 0.9 * H.density) {
+        // Rime falling off the hovering blade.
+        const k = H.rand() * reach;
+        H.particles.puff(x + dx * k, y - 0.5, z + dz * k, 1, {
           speed: 0.8,
           up: -0.5,
           life: 1.2,
@@ -964,6 +1125,8 @@ export class FinalStarsFx {
   }
 
   dispose(): void {
+    this.stopWaitingForPaint?.();
+    this.stopWaitingForPaint = null;
     this.coreMesh.dispose();
     this.glowMesh.dispose();
   }

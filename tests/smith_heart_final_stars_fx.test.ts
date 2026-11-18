@@ -11,13 +11,20 @@
 //     fills, the floor throbs, the wall erupts from three quarters.
 
 import { describe, expect, it } from 'vitest';
+import { SMITH_HEART_BOSS_LOOKS } from '../src/render/characters/smith_heart_boss_looks';
+import { FINAL_BODY_GESTURES } from '../src/render/smith_heart_fx/final_body_core';
+import { tornadoDebris, tornadoProfile } from '../src/render/smith_heart_fx/final_kit_fx_core';
 import {
   eruptLevel,
   eruptStarts,
   floorThrob,
   strainLook,
+  strainPulse,
 } from '../src/render/smith_heart_fx/final_overload_core';
 import {
+  BLADE_DRAW_BACK,
+  BLADE_FLY_LIFT,
+  BLADE_HOVER_LIFT,
   bladeEase,
   bladeFlight,
   boltFlash,
@@ -56,20 +63,24 @@ describe("the stars' look", () => {
     expect(ringWave(0.5, 9, 0.5).alpha).toBe(0);
   });
 
-  it('a blade hovers upright, tips as its line locks, and flies point first', () => {
-    const pose = { along: 0, tilt: 0, lift: 0, glow: 0 };
+  it('a blade hovers level over the rim, draws back as its line locks, and flies its line low', () => {
+    const pose = { along: 0, pitch: 0, lift: 0, glow: 0 };
     bladeFlight(0, false, 0, false, 0, pose);
     expect(pose.along).toBe(0);
-    expect(pose.tilt).toBeLessThan(0.2);
+    // Lying along its line (a small nose-down pitch), high over the rim.
+    expect(pose.pitch).toBeLessThan(0.3);
+    expect(pose.lift).toBeGreaterThan(BLADE_HOVER_LIFT - 0.5);
     const quiet = pose.glow;
     bladeFlight(0, false, 1, true, 0, pose);
-    expect(pose.tilt).toBeGreaterThan(0.2);
+    expect(pose.along).toBeCloseTo(-BLADE_DRAW_BACK, 9);
     expect(pose.glow).toBeGreaterThan(quiet);
+    bladeFlight(0, true, 1, true, 0, pose);
+    expect(pose.along).toBeCloseTo(-BLADE_DRAW_BACK, 9);
     bladeFlight(0, true, 1, true, 0.5, pose);
-    expect(pose.tilt).toBe(1);
-    expect(pose.along).toBeCloseTo(bladeEase(0.5), 9);
+    expect(pose.along).toBeCloseTo(-BLADE_DRAW_BACK + (1 + BLADE_DRAW_BACK) * bladeEase(0.5), 9);
+    expect(pose.lift).toBeCloseTo(BLADE_FLY_LIFT, 9);
     bladeFlight(0, true, 1, true, 1, pose);
-    expect(pose.along).toBe(1);
+    expect(pose.along).toBeCloseTo(1, 9);
   });
 
   it("a line fills off its mark's own aura, whole once it locks", () => {
@@ -91,6 +102,26 @@ describe("the stars' look", () => {
   });
 });
 
+describe('the fire tornado', () => {
+  it('is a funnel: a narrow throat on the floor flaring wide at its top', () => {
+    expect(tornadoProfile(0)).toBeLessThan(0.25);
+    expect(tornadoProfile(1)).toBeCloseTo(1, 9);
+    for (let h = 0.1; h <= 1; h += 0.1)
+      expect(tornadoProfile(h)).toBeGreaterThan(tornadoProfile(h - 0.1));
+  });
+
+  it('whirls its rocks round and up the funnel, each its own place', () => {
+    const a = { ...tornadoDebris(3, 0, 10, 1) };
+    const b = { ...tornadoDebris(3, 5, 10, 1) };
+    expect(a.height).toBeGreaterThanOrEqual(0);
+    expect(a.height).toBeLessThan(1);
+    expect(a.angle).not.toBeCloseTo(b.angle, 3);
+    // They climb as time runs.
+    const later = tornadoDebris(3.5, 0, 10, 1);
+    expect((later.height - a.height + 1) % 1).toBeGreaterThan(0);
+  });
+});
+
 describe('the Overload in the world', () => {
   it('the strain swells and burns hotter as the bar fills; nothing at an empty bar', () => {
     expect(strainLook(0, 1).crack).toBe(0);
@@ -99,6 +130,24 @@ describe('the Overload in the world', () => {
     expect(full.crack).toBeGreaterThan(half.crack);
     expect(full.swell).toBeGreaterThan(half.swell);
     expect(half.swell).toBeGreaterThan(1);
+  });
+
+  it("the body's own cracks throb in three steps, quicker as the bar fills", () => {
+    expect(strainPulse(0.2).level).toBe(0);
+    const low = strainPulse(0.3);
+    const mid = strainPulse(0.6);
+    const high = strainPulse(0.95);
+    expect([low.level, mid.level, high.level]).toEqual([1, 2, 3]);
+    expect(high.every).toBeLessThan(mid.every);
+    expect(mid.every).toBeLessThan(low.every);
+    // Each step is a glow pulse on the rig itself, each brighter than the last.
+    const pulses = SMITH_HEART_BOSS_LOOKS.smith_heart_masterless_strength.glowPulses?.pulses ?? [];
+    const peaks = FINAL_BODY_GESTURES.strain.map(
+      (g) => pulses.find((p) => p.gesture === g)?.peak ?? 0,
+    );
+    expect(peaks[0]).toBeGreaterThan(1);
+    expect(peaks[1]).toBeGreaterThan(peaks[0]);
+    expect(peaks[2]).toBeGreaterThan(peaks[1]);
   });
 
   it('the floor throbs from a third, the wall erupts from three quarters', () => {
