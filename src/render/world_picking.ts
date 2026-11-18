@@ -13,7 +13,7 @@ import type { PlacedAssetsView } from './placed_assets';
 import type { MoverHit } from './placed_movers';
 import type { EntityView } from './renderer';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
-import { resolveWorldDirectPick } from './world_direct_pick';
+import { resolveWorldDirectPick, takesNoClick } from './world_direct_pick';
 
 /** What picking reads from the renderer. */
 export interface WorldPickingHost {
@@ -143,6 +143,9 @@ export class WorldPicking {
           // click-pickable either (the capsule proxy ignores `visible`): skip it
           // unless the local player is a released spirit.
           if (e?.templateId === 'spirit_healer' && !sim.player?.ghost) break;
+          // A fight's telegraph object takes no click: the ray passes on to
+          // what stands behind it (world_direct_pick.ts takesNoClick).
+          if (e && takesNoClick(e)) break;
           directHitIds.push(id);
           break;
         }

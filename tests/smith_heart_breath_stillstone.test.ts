@@ -8,6 +8,7 @@
 //     the stone say it), and a click on the crystal in reach starts the
 //     channel by itself.
 
+import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import {
   handlePickedEntity,
@@ -15,7 +16,7 @@ import {
   type PickInteractionHud,
   type PickInteractionWorld,
 } from '../src/game/interactions';
-import { isUseOnlyBody } from '../src/render/world_direct_pick';
+import { isUseOnlyBody, takesNoClick } from '../src/render/world_direct_pick';
 import { MOBS } from '../src/sim/data';
 import {
   cornicePads,
@@ -23,9 +24,11 @@ import {
   isleSpots,
 } from '../src/sim/encounters/smith_heart/breath_isle_geometry';
 import {
+  closingTemplate,
   ISLE_CASTS,
   ISLE_MOBS,
   ISLE_TUNING as IT,
+  padTemplate,
 } from '../src/sim/encounters/smith_heart/breath_isle_ids';
 import { KIT_USE_SPENT_AURA, kitUsableNow } from '../src/sim/mob/trash_kit/encounter_use';
 import { DT, type Entity } from '../src/sim/types';
@@ -265,5 +268,18 @@ describe('the isles dev kill', () => {
     f.tick(2);
     expect(f.state()?.isles.isles[2].cleared).toBe(true);
     expect(f.state()?.isles.isles[2].stoneId).not.toBeNull();
+  });
+});
+
+describe("the isles' telegraph objects take no click", () => {
+  it('a Closing Storm, an Updraft or any Breath object lets the pick ray pass to the stone', () => {
+    expect(takesNoClick({ kind: 'object', templateId: closingTemplate(2, 40, 50) })).toBe(true);
+    expect(takesNoClick({ kind: 'object', templateId: padTemplate(1, 2) })).toBe(true);
+    expect(takesNoClick({ kind: 'object', templateId: 'sh_breath_vortex' })).toBe(true);
+    expect(takesNoClick({ kind: 'mob', templateId: ISLE_MOBS.stillstone })).toBe(false);
+    expect(takesNoClick({ kind: 'object', templateId: 'dungeon_door' })).toBe(false);
+    expect(takesNoClick({ kind: 'object', templateId: 'sh_council_pillar_0' })).toBe(false);
+    const src = readFileSync('src/render/world_picking.ts', 'utf8');
+    expect(src).toContain('if (e && takesNoClick(e)) break;');
   });
 });
