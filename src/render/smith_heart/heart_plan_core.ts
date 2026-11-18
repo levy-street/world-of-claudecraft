@@ -221,17 +221,6 @@ export const HEART_PROP_RECIPES: Readonly<Record<string, readonly HeartPart[]>> 
     part('box', 'stone', 'hammer', [2.6, 8.6, 2.2], [0, 4.3, 0]),
     part('gem', 'glow', 'hammer', [0.9, 1.4, 0.9], [0, 9.2, 0]),
   ],
-  // One of the four bronze tines crowning the Seal Dais: a shaft rising off
-  // the dais, its head bent in over the seal, a glowing tip the portal's
-  // light runs from.
-  sh_portal_tine: [
-    part('cyl', 'dark', 'ring', [2, 1.2, 1.8], [0, 0.6, 0]),
-    part('cyl', 'bronze', 'ring', [1.3, 11, 0.8], [0, 6.7, 0]),
-    part('cyl', 'glow', 'ring', [1.4, 0.3, 1.4], [0, 4, 0]),
-    part('cyl', 'glow', 'ring', [1.2, 0.3, 1.2], [0, 8.6, 0]),
-    part('box', 'bronze', 'ring', [0.8, 5, 0.8], [0, 13.6, -1.4], { tiltX: -0.6 }),
-    part('gem', 'glow', 'ring', [1.1, 2, 1.1], [0, 16, -3]),
-  ],
   // The Breath: the bridge's wind shelters (the Cornice stands bare).
   sh_wind_shelter: [
     part('box', 'stone', 'breath', [4.8, 2, 1.4], [0, 1, 0]),

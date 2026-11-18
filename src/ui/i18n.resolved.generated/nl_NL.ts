@@ -31634,6 +31634,7 @@ export const nl_NL: EnTranslations = {
     "noticeboardName": "Mededelingenbord",
     "farmPatchName": "Tuinbedden",
     "realmBuilderMonumentName": "Rijksbouwer Monument",
-    "musterRackName": "Verzamelwapenrek"
+    "musterRackName": "Verzamelwapenrek",
+    "heartSealCrystalName": "The Heart Seal Crystal"
   }
 };

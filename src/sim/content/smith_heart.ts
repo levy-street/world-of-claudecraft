@@ -62,6 +62,7 @@ import {
   QUENCH,
   QUENCH_BLADE_SPOTS,
   RING_PACK_DEGREES,
+  SEAL_CRYSTAL,
   SLAB,
   SMITH_HEART_ANCHORS,
   SMITH_HEART_BOSS_SPOTS,
@@ -944,6 +945,25 @@ export const SMITH_HEART_SEAL_OBJECTS: DungeonObjectSpawn[] = SMITH_HEART_SEAL_M
   lootable: false,
 }));
 
+/** The heart seal crystal's template id (encounters/smith_heart/seal_crystal.ts).
+ *  Its tail never parses as a marker value, so no marker reader mistakes it. */
+export const SMITH_HEART_SEAL_CRYSTAL_TEMPLATE = 'smith_heart_seal_crystal' as const;
+
+/** The heart seal crystal at the Ring's dais centre: one object per claim,
+ *  APPENDED LAST to the dungeon's objects (object order feeds entity ids).
+ *  Never lootable (seal_crystal.ts holds it so): there is no press, a living
+ *  player stepping onto the dais once the seal is READY bursts it (seal.ts);
+ *  a solid wall until then. */
+export const SMITH_HEART_SEAL_CRYSTAL_OBJECT: DungeonObjectSpawn = {
+  itemId: '',
+  name: 'The Heart Seal Crystal',
+  x: SEAL_CRYSTAL.x,
+  z: SEAL_CRYSTAL.z,
+  templateId: SMITH_HEART_SEAL_CRYSTAL_TEMPLATE,
+  dungeonId: SMITH_HEART_DUNGEON,
+  lootable: false,
+};
+
 /** The Storm Cornice's wind (encounters/smith_heart/breath_gale.ts): one
  *  inert object at the plateau's middle whose template id carries the wind's
  *  phase, bearing and length; still until the guardian is pulled. */
@@ -1049,6 +1069,8 @@ export const SMITH_HEART_DUNGEON_DEFS: Record<string, DungeonDef> = {
       SMITH_HEART_WIND_OBJECT,
       ...SMITH_HEART_BLADE_OBJECTS,
       SMITH_HEART_WELL_OBJECT,
+      // Appended last: object order feeds entity ids.
+      SMITH_HEART_SEAL_CRYSTAL_OBJECT,
     ],
     // Captain Thessaly at her post on the Cornice's climb (breath_thessaly.ts),
     // facing the guardian.

@@ -31634,6 +31634,7 @@ export const it_IT: EnTranslations = {
     "noticeboardName": "Bacheca degli annunci",
     "farmPatchName": "Aiuole da Giardino",
     "realmBuilderMonumentName": "Monumento al costruttore di regni",
-    "musterRackName": "Rastrelliera d'armi dell'adunata"
+    "musterRackName": "Rastrelliera d'armi dell'adunata",
+    "heartSealCrystalName": "The Heart Seal Crystal"
   }
 };

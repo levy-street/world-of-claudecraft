@@ -31634,6 +31634,7 @@ export const tr_TR: EnTranslations = {
     "noticeboardName": "İlan Tahtası",
     "farmPatchName": "Bahçe Yatakları",
     "realmBuilderMonumentName": "Bölge Oluşturucu Anıtı",
-    "musterRackName": "Toplanma Silah Rafı"
+    "musterRackName": "Toplanma Silah Rafı",
+    "heartSealCrystalName": "The Heart Seal Crystal"
   }
 };

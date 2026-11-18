@@ -1,9 +1,10 @@
 // /dev heart (src/sim/dev/smith_heart_dev.ts): the Smith's Heart's playtest
 // helpers over a REAL Sim. Enter lands at the Cleft inside a claim; every tp
 // area (the Heart's terrace included) lands on walkable floor at the field's
-// height; kills credit so the gates, the heart seal and the portal follow on
-// the next tick; `portal` forces the seal's portal open and the hop then
-// works; reset hands back a fresh, dark, shut claim. Without devCommands
+// height; kills credit so the gates and the heart seal follow on the next
+// tick (the four guardians CHARGE the heart seal crystal, never open the
+// portal); `portal` is a forced burst of that crystal and the hop then works;
+// reset hands back a fresh, dark, shut claim. Without devCommands
 // neither the command nor the door lets anyone in.
 
 import { describe, expect, it } from 'vitest';
@@ -27,8 +28,10 @@ import {
 } from '../src/sim/dev/smith_heart_dev';
 import {
   breathGuardian,
+  sealCrystalOf,
   smithHeartPortalBitSet,
   smithHeartProgress,
+  smithHeartSealMaskOf,
 } from '../src/sim/encounters/smith_heart';
 import { authoredFieldHeight } from '../src/sim/instances/authored_field';
 import { dungeonGateState } from '../src/sim/instances/dungeon_gates';
@@ -61,11 +64,14 @@ function devSim(devCommands = true) {
   return { sim, dev, claim };
 }
 
+/** The markers' template ids. The heart seal crystal shares their prefix
+ *  (`smith_heart_seal_crystal`) but carries no value, so a marker is told by
+ *  its parse, never by the prefix alone. */
 function sealMasks(sim: Sim, inst: InstanceSlot): string[] {
   const out: string[] = [];
   for (const id of inst.objectIds) {
     const e = sim.ctx.entities.get(id);
-    if (e?.templateId.startsWith(SMITH_HEART_SEAL_PREFIX)) out.push(e.templateId);
+    if (e && smithHeartSealMaskOf(e.templateId) !== null) out.push(e.templateId);
   }
   return out;
 }
@@ -119,7 +125,7 @@ describe('/dev heart', () => {
     expect(sim.player.pos.x - o.x).toBeCloseTo(SMITH_HEART_ANCHORS.forge.x, 3);
   });
 
-  it('kill hammer opens the Slab on the next tick; guardians light the seal and open the portal', () => {
+  it('kill hammer opens the Slab on the next tick; guardians light the seal and charge the crystal', () => {
     const { sim, dev, claim } = devSim();
     dev('/dev heart enter');
     const inst = claim();
@@ -138,17 +144,19 @@ describe('/dev heart', () => {
     dev('/dev heart kill guardians');
     sim.tick();
     // The Ring holds no packs since the team's review of 2026-11-17: the four
-    // veins alone open the portal.
+    // veins alone charge the crystal (15 | the charge bit 128), and the portal
+    // waits for a raider on the dais.
     const masks = sealMasks(sim, inst);
     expect(masks.length).toBeGreaterThan(0);
-    expect(masks.every((t) => t === 'smith_heart_seal_31')).toBe(true);
+    expect(masks.every((t) => t === 'smith_heart_seal_143')).toBe(true);
     const p = smithHeartProgress(sim.ctx, inst);
     expect(p.sealLit).toBe(true);
     expect(p.ringClear).toBe(true);
-    expect(p.portalOpen).toBe(true);
+    expect(p.ready).toBe(true);
+    expect(p.portalOpen).toBe(false);
   });
 
-  it('portal forces the seal open for the run, and the hop then works', () => {
+  it('portal bursts the crystal for the run (a forced burst), and the hop then works', () => {
     const { sim, dev, claim } = devSim();
     dev('/dev heart enter');
     const inst = claim();
@@ -156,8 +164,19 @@ describe('/dev heart', () => {
     if (!inst) return;
     sim.tick();
     expect(smithHeartProgress(sim.ctx, inst).portalOpen).toBe(false);
+    expect(sealCrystalOf(sim.ctx, inst)).not.toBeNull();
     dev('/dev heart portal');
-    sim.tick();
+    // At once: the markers carry the bit and the crystal (and its wall) is gone.
+    expect(smithHeartProgress(sim.ctx, inst).portalOpen).toBe(true);
+    expect(sealCrystalOf(sim.ctx, inst)).toBeNull();
+    const first = logs(sim.tick()).filter((t) => t.startsWith('[dev] The heart seal'));
+    expect(first).toEqual(["[dev] The heart seal's portal is forced open for this run."]);
+    // A second verb finds the crystal already burst and says so (never "forced open" again).
+    dev('/dev heart portal');
+    const second = logs(sim.tick()).filter((t) => t.startsWith('[dev] The heart seal'));
+    expect(second).toEqual([
+      '[dev] The heart seal crystal has already burst: the portal is open for this run.',
+    ]);
     expect(smithHeartProgress(sim.ctx, inst).portalOpen).toBe(true);
     expect(smithHeartProgress(sim.ctx, inst).sealLit).toBe(false);
     expect(sealMasks(sim, inst).every((t) => smithHeartPortalBitSet(Number(t.slice(17))))).toBe(
@@ -207,12 +226,18 @@ describe('/dev heart', () => {
     dev('/dev heart seal');
     const lines = logs(sim.tick()).filter((t) => t.startsWith('[dev] Heart seal'));
     expect(lines).toEqual([
-      '[dev] Heart seal: mask 0, slabOpen false, sealLit false, ringClear true, portalOpen false, awake false.',
+      '[dev] Heart seal: mask 0, slabOpen false, sealLit false, ringClear true, ready false, portalOpen false, burst false, awake false.',
     ]);
     dev('/dev heart kill all');
     sim.tick();
+    // Charged, not burst.
     expect(smithHeartSealReadout(sim.ctx, inst)).toBe(
-      '[dev] Heart seal: mask 15, slabOpen true, sealLit true, ringClear true, portalOpen true, awake false.',
+      '[dev] Heart seal: mask 15, slabOpen true, sealLit true, ringClear true, ready true, portalOpen false, burst false, awake false.',
+    );
+    dev('/dev heart portal');
+    sim.tick();
+    expect(smithHeartSealReadout(sim.ctx, inst)).toBe(
+      '[dev] Heart seal: mask 15, slabOpen true, sealLit true, ringClear true, ready true, portalOpen true, burst true, awake false.',
     );
   });
 
@@ -238,6 +263,8 @@ describe('/dev heart', () => {
     if (!first) return;
     dev('/dev heart kill all');
     sim.tick();
+    expect(smithHeartProgress(sim.ctx, first).ready).toBe(true);
+    dev('/dev heart portal');
     expect(smithHeartProgress(sim.ctx, first).portalOpen).toBe(true);
 
     dev('/dev heart reset');
@@ -251,6 +278,7 @@ describe('/dev heart', () => {
       slabOpen: false,
       sealLit: false,
       ringClear: true,
+      ready: false,
       portalOpen: false,
     });
     expect(sealMasks(sim, fresh).every((t) => t === `${SMITH_HEART_SEAL_PREFIX}0`)).toBe(true);

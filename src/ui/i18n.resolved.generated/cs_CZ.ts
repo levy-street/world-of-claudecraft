@@ -31634,6 +31634,7 @@ export const cs_CZ: EnTranslations = {
     "noticeboardName": "Vývěska",
     "farmPatchName": "Zahradní políčka",
     "realmBuilderMonumentName": "Památník Realm Builder",
-    "musterRackName": "Stojan se zbraněmi pro odvod"
+    "musterRackName": "Stojan se zbraněmi pro odvod",
+    "heartSealCrystalName": "The Heart Seal Crystal"
   }
 };

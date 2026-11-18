@@ -153,11 +153,12 @@ describe("the Smith's Heart's exit portal", () => {
     expect(near(local(sim, pid, inst), HEART_EXIT_PORTAL, 1.5)).toBe(true);
   });
 
-  it('the exit bit is its own (never a vein, the portal or the arrival) and its line is localized', () => {
+  it('the exit bit is its own (never a vein, the portal, the arrival or the charge) and its line is localized', () => {
     expect(SMITH_HEART_EXIT_BIT).toBe(64);
     expect(smithHeartExitBitSet(SMITH_HEART_EXIT_BIT)).toBe(true);
-    expect(smithHeartExitBitSet(15 | 16 | 32)).toBe(false);
+    expect(smithHeartExitBitSet(15 | 16 | 32 | 128)).toBe(false);
     expect(smithHeartSealMaskOf(`smith_heart_seal_${15 | 16 | 32 | 64}`)).toBe(127);
+    expect(smithHeartSealMaskOf(`smith_heart_seal_${15 | 16 | 32 | 64 | 128}`)).toBe(255);
     expect(localizeSimText(SMITH_HEART_PORTAL_EXIT_TEXT)).not.toBeNull();
   });
 });

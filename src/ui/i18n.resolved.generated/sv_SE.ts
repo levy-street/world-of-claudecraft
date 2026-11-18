@@ -31634,6 +31634,7 @@ export const sv_SE: EnTranslations = {
     "noticeboardName": "Anslagstavla",
     "farmPatchName": "Trädgårdsbäddar",
     "realmBuilderMonumentName": "Riksbyggarmonument",
-    "musterRackName": "Uppbådets vapenställ"
+    "musterRackName": "Uppbådets vapenställ",
+    "heartSealCrystalName": "The Heart Seal Crystal"
   }
 };

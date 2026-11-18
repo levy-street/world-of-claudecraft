@@ -31634,6 +31634,7 @@ export const vi_VN: EnTranslations = {
     "noticeboardName": "Bảng Thông Báo",
     "farmPatchName": "Luống Vườn",
     "realmBuilderMonumentName": "Đài tưởng niệm người xây dựng vương quốc",
-    "musterRackName": "Giá Vũ Khí Tập Kết"
+    "musterRackName": "Giá Vũ Khí Tập Kết",
+    "heartSealCrystalName": "The Heart Seal Crystal"
   }
 };

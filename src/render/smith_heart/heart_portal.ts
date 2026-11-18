@@ -1,9 +1,9 @@
 // The Smith's Heart's portals (heart_portal_core.ts plans them):
-//   - on the Seal Dais: the opening's one-shot burst (the tines' arcs, the
-//     flash pillar, the shockwave racing out across the chasm to the Ring)
-//     and then the living portal (the floor vortex in the four colours, the
-//     funnel of light standing over it, the motes riding up it, the tines'
-//     arcs feeding it);
+//   - on the Seal Dais: the opening's one-shot burst (the flash pillar and the
+//     shockwave racing out across the chasm to the Ring, as the ring crystal
+//     shatters: heart_seal.ts) and then the living portal (the floor vortex in
+//     the four colours, the funnel of light standing over it, the motes riding
+//     up it);
 //   - in the Heart: the return portal on the Arrival Terrace (a smaller
 //     vortex and funnel, always open: the Heart is only ever reached through
 //     the open seal), and the exit portal on the platform's far side (a size
@@ -23,7 +23,6 @@ import {
   HEART_RETURN_PORTAL,
   HEART_SEAL,
   HEART_TERRACE,
-  RING_SPIRE_BEARINGS,
   SEAL_DAIS,
 } from '../../sim/content/smith_heart_layout';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
@@ -50,15 +49,6 @@ import {
 } from './heart_portal_core';
 
 const WHITE_GOLD = 0xfff0d0;
-/** Where the spires' crystal tips stand (bearing, radius, height over the
- *  dais): each leans 3.2 yd in over its 16 (the Ring kit's Kit_SealSpire). */
-const TINE_TIPS = RING_SPIRE_BEARINGS.map((deg) => {
-  const a = (deg * Math.PI) / 180;
-  return { x: Math.sin(a) * 12.3, z: Math.cos(a) * 12.3, y: 16 };
-});
-/** Where the arcs meet over the seal (height over the dais). */
-const ARC_EYE_Y = 9;
-
 let discGeometry: THREE.BufferGeometry | null = null;
 
 function disc(): THREE.BufferGeometry {
@@ -76,21 +66,6 @@ function floorDisc(material: THREE.Material, r: number, order: number): THREE.Me
   const m = new THREE.Mesh(disc(), material);
   m.scale.set(r, 1, r);
   m.renderOrder = order;
-  return m;
-}
-
-/** A beam from `a` to `b` on a unit sleeve (uv.y 0 at `a`). */
-function beamBetween(
-  a: THREE.Vector3,
-  b: THREE.Vector3,
-  radius: number,
-  material: THREE.Material,
-): THREE.Mesh {
-  const len = a.distanceTo(b);
-  const g = sleeve(radius, radius * 0.6, len, 10);
-  const m = new THREE.Mesh(g, material);
-  m.position.copy(a);
-  m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), b.clone().sub(a).normalize());
   return m;
 }
 
@@ -195,26 +170,10 @@ export function buildHeartPortals(
   const liveMeshes = group.children.slice();
   for (const m of liveMeshes) m.visible = false;
 
-  // The tines' arcs: from each tip to the eye over the seal.
-  const arcMat = heartBeamMaterial(WHITE_GOLD, 'smithHeartTineArc', -1.6);
-  const eye = new THREE.Vector3(seal.x, y + ARC_EYE_Y, seal.z);
-  const arcs = TINE_TIPS.map((t) => {
-    const m = beamBetween(
-      new THREE.Vector3(seal.x + t.x, y + t.y, seal.z + t.z),
-      eye,
-      0.35,
-      arcMat,
-    );
-    m.name = 'tineArc';
-    m.visible = false;
-    group.add(m);
-    return m;
-  });
-
   // The opening: the flash pillar and the shockwave (inner on the dais, outer
   // at the Ring's level, racing across the chasm).
   const flashMat = heartBeamMaterial(WHITE_GOLD, 'smithHeartPortalFlash');
-  const flash = new THREE.Mesh(sleeve(9, 3, 110, 32), flashMat);
+  const flash = new THREE.Mesh(sleeve(7, 2.2, 110, 32), flashMat);
   flash.position.set(seal.x, y, seal.z);
   flash.name = 'portalFlash';
   flash.visible = false;
@@ -325,7 +284,6 @@ export function buildHeartPortals(
   let lastSky = -1;
   let lastFlash = -1;
   let lastRing = -1;
-  let lastCharge = -1;
   let lastHop = -1;
   let lastExit = -1;
   return {
@@ -352,26 +310,19 @@ export function buildHeartPortals(
         outerFunnel.visible = swirl > 0;
         outerMat.uniforms.uK.value = swirl * 0.45;
       }
-      // The tines' arcs: blazing through the charge, then a steady feed.
-      const charge = Math.round(Math.max(portal.charge, swirl * 0.35) * 100) / 100;
-      if (charge !== lastCharge) {
-        lastCharge = charge;
-        for (const a of arcs) a.visible = charge > 0;
-        arcMat.uniforms.uK.value = charge * 2.2;
-      }
       const f = Math.round(portal.flash * 100) / 100;
       if (f !== lastFlash || swirl !== lastSky) {
         lastFlash = f;
         lastSky = swirl;
         flash.visible = f > 0;
-        flashMat.uniforms.uK.value = f * 4;
+        flashMat.uniforms.uK.value = f * 2.6;
         bloom.visible = f > 0;
-        bloomMat.uniforms.uK.value = f * 1.6;
+        bloomMat.uniforms.uK.value = f * 0.9;
         // The sky beam: the burst's flash, then a steady thin shaft.
-        const sky = Math.max(f * 5, swirl * 0.55);
+        const sky = Math.max(f * 3, swirl * 0.55);
         skyBeam.visible = sky > 0;
         skyMat.uniforms.uK.value = sky;
-        skyBeam.scale.set(1 + f * 2.2, 1, 1 + f * 2.2);
+        skyBeam.scale.set(1 + f * 0.9, 1, 1 + f * 0.9);
       }
       const ring = Math.round(portal.ring * 400) / 400;
       if (ring !== lastRing) {

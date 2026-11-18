@@ -7,9 +7,11 @@
 //   nothing else orders the other three;
 // - the Breath, the Quench and the Heat light in any order, each with its own
 //   line to the raid, each once;
-// - the seal opens into the portal only with all four lit AND the Ring
-//   clear, says so once, and stays open; the portal walks a living player to
-//   the Heart's arrival and the return portal walks them back to the dais;
+// - all four lit AND the Ring clear CHARGE the heart seal crystal (the READY
+//   bit) and nothing more: the portal stays shut until a living player steps
+//   onto the dais and the crystal bursts (smith_heart_seal_crystal.test.ts
+//   owns the trigger); once open the portal walks a living player to the
+//   Heart's arrival and the return portal walks them back to the dais;
 // - the Heart Bridge seals behind the raid while the final boss fights;
 // - a reset (a fresh claim) starts dark and shut again;
 // - the raid is dev-only while it is a blockout.
@@ -25,8 +27,10 @@ import {
 import {
   HEART_ARRIVAL,
   HEART_RETURN_PORTAL,
+  RING,
   RING_PORTAL,
   RING_PORTAL_LANDING,
+  SEAL_CRYSTAL,
   SMITH_HEART_VEINS,
   type SmithHeartVein,
 } from '../src/sim/content/smith_heart_layout';
@@ -38,12 +42,15 @@ import {
   SMITH_HEART_PORTAL_HOP_TEXT,
   SMITH_HEART_PORTAL_OPEN_LOG,
   SMITH_HEART_PORTAL_RETURN_TEXT,
+  SMITH_HEART_READY_BIT,
   SMITH_HEART_SEAL_FULL,
   SMITH_HEART_VEIN_BITS,
   SMITH_HEART_VEIN_LIT_LOG,
+  sealCrystalOf,
   smithHeartLitCount,
   smithHeartPortalBitSet,
   smithHeartProgress,
+  smithHeartReadyBitSet,
   smithHeartSealMaskOf,
   smithHeartSealTemplate,
   smithHeartVeinLit,
@@ -150,18 +157,25 @@ describe("the Smith's Heart gating", () => {
   afterEach(() => clearDungeonGateStateForTest());
 
   it('the seal mask round-trips through the marker template id', () => {
-    for (let m = 0; m <= (SMITH_HEART_SEAL_FULL | SMITH_HEART_PORTAL_BIT); m++) {
+    // Every value a marker can carry: the four veins and the portal, arrival,
+    // exit and charge bits.
+    for (let m = 0; m <= 255; m++) {
       expect(smithHeartSealMaskOf(smithHeartSealTemplate(m))).toBe(m);
     }
     expect(smithHeartSealMaskOf('sanctum_story_3')).toBeNull();
     // 32 is the arrival's bit (smith_heart_arrival.test.ts), 64 the exit's
-    // (smith_heart_exit_portal.test.ts); nothing past it.
-    expect(smithHeartSealMaskOf('smith_heart_seal_128')).toBeNull();
+    // (smith_heart_exit_portal.test.ts), 128 the charge's
+    // (smith_heart_seal_crystal.test.ts); nothing past it.
+    expect(smithHeartSealMaskOf('smith_heart_seal_128')).toBe(128);
+    expect(smithHeartSealMaskOf('smith_heart_seal_256')).toBeNull();
     expect(smithHeartPortalBitSet(SMITH_HEART_SEAL_FULL)).toBe(false);
     expect(smithHeartPortalBitSet(SMITH_HEART_SEAL_FULL | SMITH_HEART_PORTAL_BIT)).toBe(true);
-    // The portal bit never reads as a lit vein.
+    expect(smithHeartReadyBitSet(SMITH_HEART_SEAL_FULL)).toBe(false);
+    expect(smithHeartReadyBitSet(SMITH_HEART_SEAL_FULL | SMITH_HEART_READY_BIT)).toBe(true);
+    // Neither the portal bit nor the charge bit ever reads as a lit vein.
     for (const v of SMITH_HEART_VEINS) {
       expect(smithHeartVeinLit(SMITH_HEART_PORTAL_BIT, v)).toBe(false);
+      expect(smithHeartVeinLit(SMITH_HEART_READY_BIT, v)).toBe(false);
     }
     expect(smithHeartLitCount(SMITH_HEART_SEAL_FULL)).toBe(4);
     expect(smithHeartVeinLit(SMITH_HEART_VEIN_BITS.quench, 'quench')).toBe(true);
@@ -186,6 +200,7 @@ describe("the Smith's Heart gating", () => {
       slabOpen: false,
       sealLit: false,
       ringClear: true,
+      ready: false,
       portalOpen: false,
     });
   });
@@ -231,8 +246,9 @@ describe("the Smith's Heart gating", () => {
         kill(sim, inst, [SMITH_HEART_GUARDIANS[v]]);
         const events = sim.tick();
         mask |= SMITH_HEART_VEIN_BITS[v];
-        // The fourth opens the portal with it (the Ring holds no packs).
-        const shown = mask === SMITH_HEART_SEAL_FULL ? mask | SMITH_HEART_PORTAL_BIT : mask;
+        // The fourth charges the crystal with it (the Ring holds no packs);
+        // the portal waits for a raider on the dais.
+        const shown = mask === SMITH_HEART_SEAL_FULL ? mask | SMITH_HEART_READY_BIT : mask;
         expect(markers(sim, inst).every((m) => m === shown)).toBe(true);
         expect(logs(events, pid)).toContain(SMITH_HEART_VEIN_LIT_LOG[v]);
       }
@@ -241,7 +257,7 @@ describe("the Smith's Heart gating", () => {
     }
   });
 
-  it('the seal opens into the portal once all four are lit (the Ring holds no packs)', () => {
+  it('the fourth vein charges the crystal (the Ring holds no packs) and the portal stays shut', () => {
     // The team's review of 2026-11-17 took the Ring's packs out.
     expect(SMITH_HEART_PACKS.ring).toEqual([]);
     expect(SPAWNS.some((s) => s.mobId === 'heart_ring_warder')).toBe(false);
@@ -253,38 +269,57 @@ describe("the Smith's Heart gating", () => {
     );
     sim.tick();
     expect(smithHeartProgress(sim.ctx, inst).sealLit).toBe(false);
+    expect(smithHeartProgress(sim.ctx, inst).ready).toBe(false);
     expect(smithHeartProgress(sim.ctx, inst).portalOpen).toBe(false);
     kill(sim, inst, [SMITH_HEART_GUARDIANS.heat]);
     const events = sim.tick();
     expect(smithHeartProgress(sim.ctx, inst).sealLit).toBe(true);
-    expect(smithHeartProgress(sim.ctx, inst).portalOpen).toBe(true);
+    expect(smithHeartProgress(sim.ctx, inst).ready).toBe(true);
+    // Charged, not open: only a raider on the dais opens it (smith_heart_seal_crystal.test.ts).
+    expect(smithHeartProgress(sim.ctx, inst).portalOpen).toBe(false);
     expect(
-      markers(sim, inst).every((m) => m === (SMITH_HEART_SEAL_FULL | SMITH_HEART_PORTAL_BIT)),
+      markers(sim, inst).every((m) => m === (SMITH_HEART_SEAL_FULL | SMITH_HEART_READY_BIT)),
     ).toBe(true);
-    expect(logs(events, pid)).toContain(SMITH_HEART_PORTAL_OPEN_LOG);
-    // Said once, and it stays open.
+    expect(logs(events, pid)).not.toContain(SMITH_HEART_PORTAL_OPEN_LOG);
+    // However long it waits, it stays shut and says nothing.
     for (let i = 0; i < 5; i++) {
       expect(logs(sim.tick(), pid)).not.toContain(SMITH_HEART_PORTAL_OPEN_LOG);
-      expect(smithHeartPortalBitSet(markers(sim, inst)[0])).toBe(true);
+      expect(smithHeartPortalBitSet(markers(sim, inst)[0])).toBe(false);
+      expect(smithHeartReadyBitSet(markers(sim, inst)[0])).toBe(true);
     }
-    // Ring clear but a guardian alive: still shut.
+    // Ring clear but a guardian alive: not even charged.
     const fresh = setup(23);
     kill(fresh.sim, fresh.inst, [
       ...SMITH_HEART_PACKS.ring,
       ...SMITH_HEART_VEINS.slice(0, 3).map((v) => SMITH_HEART_GUARDIANS[v]),
     ]);
     fresh.sim.tick();
+    expect(smithHeartProgress(fresh.sim.ctx, fresh.inst).ready).toBe(false);
     expect(smithHeartProgress(fresh.sim.ctx, fresh.inst).portalOpen).toBe(false);
+    expect(markers(fresh.sim, fresh.inst).every((m) => !smithHeartReadyBitSet(m))).toBe(true);
     expect(markers(fresh.sim, fresh.inst).every((m) => !smithHeartPortalBitSet(m))).toBe(true);
   });
 
-  it('the portal walks a living player to the Heart, and the return portal back', () => {
+  it('stepping onto the dais once charged opens the portal, which walks a living player to the Heart, and the return portal back', () => {
     const { sim, pid, inst } = setup();
     // Shut: standing in the seal goes nowhere.
     put(sim, pid, inst, RING_PORTAL.x + 1, RING_PORTAL.z);
     sim.tick();
     expect(near(local(sim, pid, inst), { x: RING_PORTAL.x + 1, z: RING_PORTAL.z }, 1)).toBe(true);
+    // Charged with the raid up on the Ring: still shut, the crystal waits for them.
+    put(sim, pid, inst, 0, RING.R);
     kill(sim, inst, [...Object.values(SMITH_HEART_GUARDIANS), ...SMITH_HEART_PACKS.ring]);
+    sim.tick();
+    expect(smithHeartProgress(sim.ctx, inst).ready).toBe(true);
+    expect(smithHeartProgress(sim.ctx, inst).portalOpen).toBe(false);
+    expect(sealCrystalOf(sim.ctx, inst)).not.toBeNull();
+    // Down onto the dais, beside the crystal: it bursts that tick.
+    put(sim, pid, inst, 0, -(SEAL_CRYSTAL.r + 2));
+    const burst = sim.tick();
+    expect(logs(burst, pid)).toContain(SMITH_HEART_PORTAL_OPEN_LOG);
+    expect(sealCrystalOf(sim.ctx, inst)).toBeNull();
+    // Into the portal where it stood: the hop sets the player down in the Heart.
+    put(sim, pid, inst, RING_PORTAL.x + 1, RING_PORTAL.z);
     const events = sim.tick();
     expect(near(local(sim, pid, inst), HEART_ARRIVAL, 0.5)).toBe(true);
     expect(logs(events, pid)).toContain(SMITH_HEART_PORTAL_HOP_TEXT);
@@ -326,7 +361,15 @@ describe("the Smith's Heart gating", () => {
     kill(sim, inst, Object.values(SMITH_HEART_GUARDIANS));
     sim.tick();
     expect(
-      markers(sim, inst).every((m) => m === (SMITH_HEART_SEAL_FULL | SMITH_HEART_PORTAL_BIT)),
+      markers(sim, inst).every((m) => m === (SMITH_HEART_SEAL_FULL | SMITH_HEART_READY_BIT)),
+    ).toBe(true);
+    // Burst open too (a raider on the dais): the burst is a run's fact, and a reset forgets it.
+    put(sim, pid, inst, RING_PORTAL_LANDING.x, RING_PORTAL_LANDING.z);
+    sim.tick();
+    expect(
+      markers(sim, inst).every(
+        (m) => m === (SMITH_HEART_SEAL_FULL | SMITH_HEART_READY_BIT | SMITH_HEART_PORTAL_BIT),
+      ),
     ).toBe(true);
     freeInstance(sim.ctx, inst);
     expect(enterDungeon(sim.ctx, 'smith_heart', pid)).toBe(true);

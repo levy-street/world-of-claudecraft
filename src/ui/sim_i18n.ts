@@ -1563,7 +1563,7 @@ const baseEnTable = {
   'log.smithHeartSlabOpen':
     'The living stone splits from end to end. Beyond the Slab, the heart of the mountain lies open.',
   'log.smithHeartPortalOpen':
-    'Four colours burn on the heart seal. It splits open, and a way down into the heart of the mountain whirls in its place.',
+    'The heart seal crystal shatters, and a way down into the heart of the mountain whirls open in its place.',
   'log.smithHeartPortalHop':
     "The seal's light pulls you down into the heart of the mountain.",
   'log.smithHeartPortalReturn':

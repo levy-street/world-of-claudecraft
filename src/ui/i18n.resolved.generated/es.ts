@@ -31634,6 +31634,7 @@ export const es: EnTranslations = {
     "noticeboardName": "Tablón de anuncios",
     "farmPatchName": "Bancales de jardín",
     "realmBuilderMonumentName": "Monumento al constructor de reinos",
-    "musterRackName": "Armero de la leva"
+    "musterRackName": "Armero de la leva",
+    "heartSealCrystalName": "The Heart Seal Crystal"
   }
 };

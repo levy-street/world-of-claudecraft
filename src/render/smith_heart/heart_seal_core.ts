@@ -18,9 +18,9 @@
 // snapped.
 //
 // The fill: a vein's light runs down its river for HEART_RIVER_RUN_SECONDS;
-// when it reaches the seal its quarter fills from the rim inward
+// when it reaches the seal its element's crystal fills from the plinth up
 // (HEART_SEAL_FILL_SECONDS) behind a white-hot front and a column of its
-// colour stands up off the quarter, then the quarter burns steady.
+// colour stands up off the plinth's channel, then the crystal burns steady.
 //
 // Pure and Three-free (the clock is passed in, render seconds).
 
@@ -31,6 +31,7 @@ import {
   smithHeartAwakeBitSet,
   smithHeartExitBitSet,
   smithHeartPortalBitSet,
+  smithHeartReadyBitSet,
   smithHeartSealMaskOf,
   smithHeartVeinLit,
 } from '../../sim/encounters/smith_heart/seal';
@@ -51,6 +52,9 @@ interface SlotMemory {
   /** When the heart woke (the raid's first arrival), render seconds, or
    *  Infinity while it sleeps. */
   awakeAt: number;
+  /** When the crystal became ready to break (all four veins lit and the Ring
+   *  clear), render seconds, or Infinity while it is not. */
+  readyAt: number;
   /** When the Heart's exit portal opened (the final boss fallen), render
    *  seconds, or Infinity while shut. */
   exitAt: number;
@@ -69,12 +73,13 @@ function fresh(mask: number, now: number): SlotMemory {
     litAt: SMITH_HEART_VEINS.map((v) => (smithHeartVeinLit(mask, v) ? now - SNAPPED : Infinity)),
     portalAt: smithHeartPortalBitSet(mask) ? now - SNAPPED : Infinity,
     awakeAt: smithHeartAwakeBitSet(mask) ? now - SNAPPED : Infinity,
+    readyAt: smithHeartReadyBitSet(mask) ? now - SNAPPED : Infinity,
     exitAt: smithHeartExitBitSet(mask) ? now - SNAPPED : Infinity,
   };
 }
 
-/** Record a seal value (lit veins plus the portal bit) seen for slot `key`
- *  at render time `now`. */
+/** Record a seal value (the lit veins plus the ready, portal, arrival and exit
+ *  bits) seen for slot `key` at render time `now`. */
 export function observeHeartSealMask(key: string, mask: number, now: number): void {
   const m = memory.get(key);
   // A vein or the portal going dark is a fresh claim (or a dev reset):
@@ -88,6 +93,7 @@ export function observeHeartSealMask(key: string, mask: number, now: number): vo
     if (smithHeartVeinLit(mask, v) && !smithHeartVeinLit(m.mask, v)) m.litAt[i] = now;
   });
   if (smithHeartPortalBitSet(mask) && !smithHeartPortalBitSet(m.mask)) m.portalAt = now;
+  if (smithHeartReadyBitSet(mask) && !smithHeartReadyBitSet(m.mask)) m.readyAt = now;
   if (smithHeartAwakeBitSet(mask) && !smithHeartAwakeBitSet(m.mask)) m.awakeAt = now;
   if (smithHeartExitBitSet(mask) && !smithHeartExitBitSet(m.mask)) m.exitAt = now;
   m.mask = mask;
@@ -125,6 +131,8 @@ export interface HeartSealView {
   /** Seconds since the heart woke (the arrival), -1 while it sleeps (a
    *  heart first seen awake reads as long awake). */
   awakeSince: number;
+  /** Seconds since the crystal became ready to break (-1 while it is not). */
+  readySince: number;
   /** Seconds since the Heart's exit portal opened (the final boss fallen),
    *  -1 while shut. */
   exitSince: number;
@@ -136,6 +144,7 @@ export function newHeartSealView(): HeartSealView {
     since: SMITH_HEART_VEINS.map(() => -1),
     portalSince: -1,
     awakeSince: -1,
+    readySince: -1,
     exitSince: -1,
   };
 }
@@ -155,6 +164,7 @@ export function heartSealView(
   }
   out.portalSince = m && Number.isFinite(m.portalAt) ? now - m.portalAt : -1;
   out.awakeSince = m && Number.isFinite(m.awakeAt) ? now - m.awakeAt : -1;
+  out.readySince = m && Number.isFinite(m.readyAt) ? now - m.readyAt : -1;
   out.exitSince = m && Number.isFinite(m.exitAt) ? now - m.exitAt : -1;
   return out;
 }
@@ -207,29 +217,10 @@ export function heartSealArrivalWave(since: number): number {
   return Math.max(0.001, 1 - (1 - t) * (1 - t));
 }
 
-/** A spire igniting with its vein (phase 2F): `fill` how far up the light
- *  has climbed (0 to 1, from just before the river reaches the seal), and
- *  `flare` a white flash as it reaches the tip, fading. */
-export function heartSpireIgnite(
-  since: number,
-  out: { fill: number; flare: number } = { fill: 0, flare: 0 },
-): { fill: number; flare: number } {
-  const t = since - (HEART_SEAL_ARRIVAL - 0.25);
-  if (since < 0 || t < 0) {
-    out.fill = 0;
-    out.flare = 0;
-    return out;
-  }
-  out.fill = Math.min(1, t / 0.9);
-  const after = t - 0.9;
-  out.flare = after < 0 ? 0 : Math.max(0, 1 - after / 0.8) ** 2;
-  return out;
-}
-
-/** The seal's four quarters: each vein's, centred on the bearing (degrees
- *  clockwise from north) its light-river arrives from: the Breath from the
- *  north, the Quench from the east, the Hammer down the Grand Stair from the
- *  south, the Heat from the west. */
+/** The seal's four elements: each vein's, on the bearing (degrees clockwise
+ *  from north) its light-river arrives from: the Breath from the north, the
+ *  Quench from the east, the Hammer down the Grand Stair from the south, the
+ *  Heat from the west (the ring crystal's own sides: ring_crystal_core.ts). */
 export const HEART_SEAL_QUARTERS: readonly { vein: SmithHeartVein; bearingDeg: number }[] = [
   { vein: 'hammer', bearingDeg: 180 },
   { vein: 'breath', bearingDeg: 0 },

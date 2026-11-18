@@ -15,7 +15,8 @@ Cleft, the four guardian rooms round the Ring, the heart seal on its dais) and t
 Heart (the final room). Five boss fights: the Hammer Council (the Guardian of the Hammer and
 the Seam Singer, section 7.1) always first, then the
 Breath, Quench and Heat guardians in any order; with all four lit and the Ring clear
-the seal opens into a portal to the Heart and the final boss. Twenty mandatory trash
+the heart seal crystal on the dais is charged, and the first raider to step onto the
+dais bursts it into a portal to the Heart and the final boss. Twenty mandatory trash
 packs. Target clear: 90 to 120 minutes on normal.
 
 Sources of truth, in order:
@@ -30,7 +31,8 @@ Sources of truth, in order:
 |---|---|
 | Field: coordinates, heights, surfaces, props, anchors, light rivers, vein colours | `src/sim/content/smith_heart_layout.ts` (`SMITH_HEART_FIELD`, `SMITH_HEART_HEIGHTS`, `SMITH_HEART_ANCHORS`, `LIGHT_RIVERS`, `SMITH_HEART_VEIN_COLORS`) |
 | Mobs (sketch kits), spawns, packs, gates, seal markers, `DungeonDef`, door | `src/sim/content/smith_heart.ts` (`SMITH_HEART_MOBS`, `SMITH_HEART_SPAWNS`, `SMITH_HEART_PACKS`, `SMITH_HEART_GATES`, `SMITH_HEART_SEAL_MARKERS`, `SMITH_HEART_DUNGEON_DEFS`, `SMITH_HEART_DOOR_POS`) |
-| Gating readout, the heart seal and the portal's state | `src/sim/encounters/smith_heart/seal.ts` (`smithHeartProgress`, `tickSmithHeart`, `SMITH_HEART_PORTAL_BIT`) |
+| Gating readout, the heart seal's veins, charge and portal bit | `src/sim/encounters/smith_heart/seal.ts` (`smithHeartProgress`, `tickSmithHeart`, `SMITH_HEART_PORTAL_BIT`, `SMITH_HEART_READY_BIT`) |
+| The heart seal crystal: the object, its wall, the trigger and the burst | `src/sim/encounters/smith_heart/seal_crystal.ts` (the claim object, held inert, the wall, the middle-circle trigger `sealCrystalTriggered`), `seal.ts` (the burst in the seal's tick), `seal_burst.ts` (`burstSmithHeartSeal`, the forced burst); `SEAL_CRYSTAL` and `SEAL_DAIS` in the layout, `SMITH_HEART_SEAL_CRYSTAL_TEMPLATE` in `content/smith_heart.ts` |
 | The portal hop (both ways) | `src/sim/encounters/smith_heart/portal.ts` (`tickSmithHeartPortal`) |
 | Areas (score, fog, sky) | `smithHeartAreaAt` in the layout; `src/game/smith_heart_music.ts`; `src/render/smith_heart/heart_environment.ts` |
 | Dev-only entry | `src/sim/encounters/smith_heart/entry.ts` (`SMITH_HEART_PLAYABLE`, `smithHeartEntryOpen`) |
@@ -163,8 +165,9 @@ rather than repeating numbers that would rot.
 | The Slab, the Balcony | stair from the Quarry up to the Balcony | `SLAB`, `BALCONY` |
 | The Grand Stair | one broad stair (16 yd) from the Balcony's tip down across the chasm to the dais | `GRAND_STAIR` |
 | The North Stair | the dais's second way in (phase 2C): a broad stair (16 yd) from the Ring's inner edge at its north (the Breath's mouth) straight down across the chasm to the dais, a gentle fall from the Ring to the dais | `NORTH_STAIR` |
+| The East and West Stairs | the dais's third and fourth ways in (the owner's review of 2026-11-18): the North Stair turned a quarter each way, a broad stair (16 yd) from the Ring's inner edge at its east (the Quench's mouth) and at its west (the Heat's mouth) straight down across the chasm to the dais, walkable, carrying those two rivers down their chutes | `EAST_STAIR`, `WEST_STAIR` |
 | The Ring | flat annulus sector round the seal, two curved stairs to the Balcony | `RING`, `RING_ARC` |
-| The Seal Dais | a round island a little below the Ring, floating over the chasm; the seal at its centre, the portal over the seal | `SEAL_DAIS`, `HEART_SEAL`, `RING_PORTAL` |
+| The Seal Dais | a round island a little below the Ring, floating over the chasm; the seal's crystal at its centre (footprint 8.5 yd, `SEAL_CRYSTAL`), the portal under it | `SEAL_DAIS`, `HEART_SEAL`, `SEAL_CRYSTAL`, `RING_PORTAL` |
 | The Breath | b1, the chimney, b2, the Wind Bridge, b3, the climb | `BREATH`, `WIND_BRIDGE` |
 | The Storm Cornice (Breath arena) | a cracked plateau about 100 by 80 yd at the very top of the mountain (its shoulders fall away into a sea of cloud on every open bearing), its rim cut by six wind channels; the whole rim is an open lip to the void, on every difficulty (the west, where the climb comes up, keeps its wall); two floating isles hang high over its south rim (`BREATH_ISLES`) | `BREATH.cornice`, `CORNICE_CHANNELS`, `CORNICE_GAPS` (field `lipOpenings`) |
 | The Quench | q1, q2, the Singing Ice, the lake descent | `QUENCH` |
@@ -220,10 +223,13 @@ than the veins' rock, and no line of sight crosses from any main-map eye into th
    **Breath** (to the Storm Cornice), the **Quench** (to the Quench Basin) and the
    **Heat** (to the Hearth), each behind its own three packs.
 4. Each guardian's death lights its vein's **light river**; the river runs to the seal
-   and its quarter fills. With all four lit and the Ring clear, the seal **opens into
-   the portal**.
-5. Down the Grand Stair (or the North Stair, from the Ring's north) to the dais, into
-   the portal: the raid lands on the Heart's
+   and its quarter fills. With all four lit and the Ring clear, the **heart seal
+   crystal** is charged (the Ring holds no packs since 2026-11-17, so the four veins
+   alone charge it).
+5. Down the Grand Stair (or the North, East or West Stair, from the Ring) to the dais:
+   the first tick a living player stands on it (the middle circle, the dais's own
+   radius) the charged crystal **bursts into the portal**; there is nothing to press
+   (the owner's call of 2026-11-18). Into the portal: the raid lands on the Heart's
    **Arrival Terrace**, crosses the **Heart Bridge** to the **Anvil of the World** and
    the final boss. The exit portal opens there when it dies.
 
@@ -231,8 +237,10 @@ Corpse run: a released spirit rises at the graveyard outside (the instance death
 model), runs back and walks in through the raid's door, which resurrects it,
 penalty-free, at the raid's **death checkpoint** (section 3.3.1). Before any guardian
 falls that is the entrance: from there it walks the main map (Gallery, Quarry, Slab,
-Balcony, Grand Stair) to the portal, which stays open for the claim's life, and steps
-through. The return portal walks the raid back to the dais at any time.
+Balcony, Grand Stair) to the dais and steps through the portal, which stays open for
+the claim's life once the crystal has burst (a raid whose crystal is charged but still
+standing bursts it on the way, by stepping onto the dais). The return portal walks the
+raid back to the dais at any time.
 
 #### 3.3.1 Death and the run back: the checkpoints
 
@@ -244,8 +252,10 @@ and "the deepest room cleared" means nothing here:
 - **One or more down:** the room of the guardian the raid killed **last** (the most
   recent kill in this claim). The Hammer counts once the whole council has fallen.
 - **All four down** (only the Masterless Strength left, or the raid cleared): the
-  Heart's **Arrival Terrace**, but only while the seal's portal stands open (all four
-  lit AND the Ring clear); with the Ring still alive it is the last guardian's room.
+  Heart's **Arrival Terrace**, but only once the heart seal crystal has burst and the
+  portal stands open (`smithHeartProgress().portalOpen`, the markers' kept bit): all four
+  lit and the seal charged is not enough, so a raid whose crystal still stands gets the
+  last guardian's room.
 - The point is the claim's, shared by the whole raid, never a player's own.
 - A point is offered only while it is safe, by the same door-side rules as the
   five-mans: every gate on the walk from the Cleft to it is open, no idle mob could
@@ -276,7 +286,10 @@ route on the real colliders, and the same result through the server).
 To try it in a dev build: `/dev heart enter`, `/dev heart kill trash`,
 `/dev heart kill hammer`, then any guardians in any order (`/dev heart kill breath`,
 `quench`, `heat`), then `/dev die`, release the spirit, and `/dev heart enter` again
-(the dev door stands in for the walk back while the raid is a blockout).
+(the dev door stands in for the walk back while the raid is a blockout). With all four
+down, add `/dev heart portal` (a forced burst of the heart seal crystal) before dying
+for the Heart's terrace (or step onto the dais): unburst, the spirit rises in the last
+guardian's room.
 
 ### 3.4 Heights
 
@@ -300,10 +313,10 @@ no walked step exceeds `MAX_STEP_HEIGHT` or `cliffStep` on either area.
   mouths. The rivers already lit cross the chasm to the seal.
 - **The seal from the Ring.** The dais floats in an open chasm a little below the Ring:
   nothing stands between any Ring point and the seal or the portal's eye; the tines
-  stand on the diagonals, between the rivers and clear of every ray (pinned). The two
-  stairs that cross the chasm (the Grand Stair from the Balcony, the North Stair from
-  the Ring's north) fall gently enough to stay under every Ring eye's line to the seal
-  (pinned in `tests/smith_heart_walls.test.ts`).
+  stand on the diagonals, between the rivers and clear of every ray (pinned). The four
+  stairs that cross the chasm (the Grand Stair from the Balcony; the North, East and West
+  Stairs from the Ring) fall gently enough to stay under every Ring eye's line to the
+  seal (pinned in `tests/smith_heart_walls.test.ts`).
 - **The portal opening.** Seen from anywhere on the Ring and from the Balcony: the
   tines charge, a pillar of light stands up, a four-colour shockwave races across the
   chasm to the Ring, and the vortex and its funnel grow out of the parted seal.
@@ -395,30 +408,77 @@ Hearth alike, and drawn the same on every tier.
 ### 5.2 The heart seal and the portal
 
 The seal is a lit-vein mask, one bit per dead guardian (`SMITH_HEART_VEIN_BITS`):
-Hammer 1, Breath 2, Quench 4, Heat 8; `SMITH_HEART_SEAL_FULL` is 15. The portal is one
-more bit, `SMITH_HEART_PORTAL_BIT` (16): set when the mask is full AND the Ring's eight
-packs are dead (or forced by `/dev heart portal`). Both are derived every tick from the
-claim's roster (`smithHeartProgress`), never a timer and never stored, so a lit vein
-stays lit and the open portal stays open for the claim's life. `tickSmithHeartSeal`
-writes the value into the template id of every seal marker (`smithHeartSealTemplate`,
-prefix `smith_heart_seal_`), so every client mirrors the seal and the portal with no
-wire change; the renderer reads it back with `smithHeartSealMaskOf`. The markers
-(`SMITH_HEART_SEAL_MARKERS`) are spread so every floor of both areas stands within the
-client's interest radius of at least one (pinned). Each newly lit vein sends its line
-from `SMITH_HEART_VEIN_LIT_LOG`, and the opening sends `SMITH_HEART_PORTAL_OPEN_LOG`
-(re-localized by `src/ui/sim_i18n.ts`).
+Hammer 1, Breath 2, Quench 4, Heat 8; `SMITH_HEART_SEAL_FULL` is 15. Four more bits ride
+the same value:
+
+| Bit | Value | Meaning | Kept or derived |
+|---|---|---|---|
+| `SMITH_HEART_PORTAL_BIT` | 16 | the heart seal crystal has burst: the portal to the Heart stands open | KEPT (sticky): set only by a burst, never by the veins and the Ring |
+| `SMITH_HEART_AWAKE_BIT` | 32 | a living player has stood in the Heart (the arrival scene, section 5.17) | KEPT |
+| `SMITH_HEART_EXIT_BIT` | 64 | the Masterless Strength has fallen: the Heart's exit portal is open | derived |
+| `SMITH_HEART_READY_BIT` | 128 | all four veins are lit AND the Ring is clear: the crystal is charged and can be burst | derived (like the veins), so it stays set after the burst |
+
+The veins, the charge and the exit are derived every tick from the claim's roster
+(`smithHeartProgress`), never a timer; a lit vein stays lit because dead instance mobs
+stay dead. `tickSmithHeartSeal` writes the value into the template id of every seal
+marker (`smithHeartSealTemplate`, prefix `smith_heart_seal_`), so every client mirrors
+the seal, the charge and the portal with no wire change; the renderer reads it back
+with `smithHeartSealMaskOf` (a marker is told by that parse, never by the prefix alone:
+the crystal shares the prefix). The markers (`SMITH_HEART_SEAL_MARKERS`) are spread so
+every floor of both areas stands within the client's interest radius of at least one
+(pinned), and they are held non-lootable: inert anchors nobody presses or clicks. Each
+newly lit vein sends its line from `SMITH_HEART_VEIN_LIT_LOG`.
+
+**The crystal** (`seal_crystal.ts`) is one claim object, template
+`smith_heart_seal_crystal` (`SMITH_HEART_SEAL_CRYSTAL_TEMPLATE`), named "The Heart Seal
+Crystal", at the dais centre (`SEAL_CRYSTAL`: instance-local (0, 0), footprint radius
+8.5 yd, the plinth's reach), appended LAST to the dungeon's objects (object order feeds entity ids). The
+tick keeps it inert: never `lootable` (there is no press, so no client offers it a click
+or the interact key), and its `respawnTimer` is held at infinity so the generic object
+sweep never re-arms it. While it stands it is SOLID: a
+round combat wall (`instances/combat_wall_state.ts`, the same mechanism as the Hammer
+Council's pillars: the wall state is given to the object once and the trash engine
+publishes it each tick; the online client rebuilds the wall from the mirrored entity,
+`net/combat_wall_wire.ts`). A body that finds itself inside the circle (a dev jump, the
+first tick of a claim) is pushed out by the ordinary depenetration, never held in it; no
+death checkpoint, landing or dev anchor stands inside it (pinned).
+
+**The burst** (the owner's call of 2026-11-18: no press, the raid arriving in the middle
+sets it off). Once the crystal is charged, the first tick a living player stands in the
+middle circle bursts it: the dais itself, `SEAL_CRYSTAL_TRIGGER_R` (= `SEAL_DAIS.r`, 19 yd
+from the centre, inclusive), where all four stairs land, so stepping off any stair onto
+the dais is the trigger (`seal_crystal.ts` `sealCrystalTriggered`, read by `seal.ts`
+`tickSmithHeartSeal` only while the crystal is charged and standing). A corpse and a
+released spirit never count; the circle is each claim's own (claims stand hundreds of
+yards apart); a raider already standing on the dais when the last vein lights bursts it
+on that very tick; the pickup command and the interact key do nothing to it. The tick
+then (1) writes the PORTAL bit onto every marker, so the same tick's portal hop already
+finds the way open; (2) retires the crystal: its wall goes the same tick and
+the entity is DROPPED from the claim (the online mirror's wall leaves with the entity
+one snapshot later, the pillars' contract), so the portal's trigger at the dais centre is
+reachable (the portal's whole 4 yd trigger stands under the crystal and a body standing
+against the wall is about 9 yd from the centre, so nobody reaches the portal before the
+burst and it is a short run in after it); (3) sends `SMITH_HEART_PORTAL_OPEN_LOG` once to the claim's players
+(re-localized by `src/ui/sim_i18n.ts`). `/dev heart portal` is the same outcome forced
+(`seal_burst.ts` `burstSmithHeartSeal`, which writes the bit and retires the crystal at
+once, charged or not). The bit is kept for the claim's life: walking off the dais and
+back finds no crystal, and a guardian that stands up again (a dev reset) darkens the
+veins and the charge but never closes the portal. A fresh claim (the markers back at
+`smith_heart_seal_0`, a new crystal) starts shut again. Nothing here draws rng.
 
 ### 5.3 The portal hop
 
 `tickSmithHeartPortal` (`src/sim/encounters/smith_heart/portal.ts`), once a tick per
 live claim, draws no rng and uses the shared displacement recipe (`displacePlayer`):
-a living player standing in the Ring's portal (`RING_PORTAL`) while it is open is set
-down at `HEART_ARRIVAL`, facing the platform, far outside the final boss's reach; a
-player standing in the return portal (`HEART_RETURN_PORTAL`) is set down at
-`RING_PORTAL_LANDING` on the dais, facing the Grand Stair, clear of the portal. The
-return portal always works (the Heart is only ever reached through the open portal).
-A corpse never crosses. Each crossing sends its own line
-(`SMITH_HEART_PORTAL_HOP_TEXT`, `SMITH_HEART_PORTAL_RETURN_TEXT`).
+a living player standing in the Ring's portal (`RING_PORTAL`) once the crystal has
+burst (the PORTAL bit) is set down at `HEART_ARRIVAL`, facing the platform, far outside
+the final boss's reach; a player standing in the return portal (`HEART_RETURN_PORTAL`)
+is set down at `RING_PORTAL_LANDING` on the dais, facing the Grand Stair, clear of the
+portal. The return portal always works (the Heart is only ever reached through the open
+portal). A corpse never crosses. Each crossing sends its own line
+(`SMITH_HEART_PORTAL_HOP_TEXT`, `SMITH_HEART_PORTAL_RETURN_TEXT`). The corpse run needs
+nothing more: a released spirit walks the main map to the dais and steps through, because
+a burst crystal never stands again.
 
 ### 5.4 The derived readout
 
@@ -429,13 +489,18 @@ A corpse never crosses. Each crossing sends its own line
 | `mask` | lit-vein mask |
 | `slabOpen` | Hammer bit lit: the Slab is split, the Ring and the three veins open |
 | `sealLit` | mask is full: all four colours burn |
-| `ringClear` | packs r1 to r8 are dead |
-| `portalOpen` | `sealLit` and `ringClear` (or forced by `/dev heart portal`): the seal is a portal |
+| `ringClear` | packs r1 to r8 are dead (the Ring holds none since 2026-11-17, so this is always true today) |
+| `ready` | `sealLit` and `ringClear`: the heart seal crystal is charged (the markers' `SMITH_HEART_READY_BIT`, 128) and a living player stepping onto the dais bursts it |
+| `portalOpen` | the crystal has burst: the markers' kept `SMITH_HEART_PORTAL_BIT` (16), read off the claim's markers so every consumer sees the sticky value (the death checkpoints' Heart point included); set only by the burst (a living player on the dais while charged) or by `/dev heart portal` (a forced burst), never by `sealLit` and `ringClear` alone |
+
+The marker values that matter to a reader: all four veins lit and the Ring clear but the
+crystal still standing is 143 (15 and 128); burst is 159 (15, 128 and 16); the arrival adds 32
+and the exit 64 (255 at most).
 
 ### 5.5 Free order, proved
 
-- Only `the_slab` lists a guardian among the gates, and only the Hammer. The portal
-  waits on all four. No gate orders the Breath, Quench and Heat against each other.
+- Only `the_slab` lists a guardian among the gates, and only the Hammer. The crystal's
+  charge waits on all four. No gate orders the Breath, Quench and Heat against each other.
 - Each arena mouth waits only on its own vein's three packs, and those packs stand on
   floor reachable from the Ring once the Slab is open.
 - Pinned by `tests/smith_heart_route.test.ts`, "the Slab open: the Ring, the dais and
@@ -443,9 +508,10 @@ A corpse never crosses. Each crossing sends its own line
 
 ### 5.6 Reset
 
-Dead instance mobs stay dead for the claim's life, so a lit vein stays lit, the portal
-stays open and an opened gate stays open (a corpse run always has a path). A fresh
-claim respawns everything: every gate closes and the markers start at
+Dead instance mobs stay dead for the claim's life, so a lit vein stays lit, a burst
+crystal stays burst (the portal stays open, its bit being kept) and an opened gate stays
+open (a corpse run always has a path). A fresh claim respawns everything: every gate
+closes, a new crystal stands dark and solid, and the markers start at
 `smith_heart_seal_0`. The dungeon is in `RAID_REQUIRED_DUNGEON_IDS`, so a replacement
 claim skips the five-minute reset cooldown; the raid lockout is the rate limit (wired
 later, see the Shipping checklist).
@@ -626,18 +692,18 @@ crystal, no metal, no machinery (the raid's line against Varkhul's).
 | Piece | Look | Where |
 |---|---|---|
 | The Ring's walk | Dressed granite flags in nine courses round the seal, every course's joints staggered at the modules' ends, a band of dark basalt running the whole circle, worn arrises, chipped corners, a crack here and there, grit in the joints; a 6 degree module each, Start and End closing the arc square | `Kit_RingPave*`, `planRingPaving` |
-| The Ring's edges | Over the chasm a curb under a hand on a carved fascia three lifts deep (none where the Quench's and the Heat's light leap); against the mountain a gutter of setts and the scree and fallen blocks heaped at the rock's foot | `Kit_RingCurb*`, `Kit_RingFoot*`, `planRingEdges` |
-| The light-rivers | A channel inlaid where each river crosses the Ring (two carved lips, a polished dark bed the ribbon burns on), the dais's four channels from its rim to the seal's notches, a chute down the middle of both stairs | `Kit_RingChannel`, `Kit_SealDais`, `Kit_StairChute` |
-| The two stairs | The Grand Stair and the North Stair laid tread by tread: two or three blocks a tread, worn hollow, nosings rounded and chipped; every tread's top on the walked ramp at its middle (half a riser either way), short treads on the Grand Stair, long low ones on the gentle North Stair; carved stringers three lifts deep and a low coped parapet (0.8, with newels) down both sides of every stair to the seal (the Balcony Stairs keep their field ramp and take the parapets) | `Kit_StairTread*`, `Kit_StairParapet*`, `planRingStairs`, `planRingStairSteps` |
-| The Seal Dais | Its walk in courses round the seal (the seal's basalt ring first), the two stairs' landings out to their first treads, a rim of carved face and a low coped parapet open where the stairs land and where the Quench's and the Heat's light leap on; under it an inverted mountain some 46 yards deep, ledged and fissured, the four veins' crystal breaking out of it under each channel and crystal hanging from its root | `Kit_SealDais` |
-| The seal | Four quarters of raw granite, each a rough rim (notched where its channel runs in), ribs along its sides and a bed of crystal cells; a crystal boss at the middle. The crystal is the runtime's own shader (`heartCrystalMaterial`): smoky and dark until its vein lights | `Kit_SealQuarter`, `Kit_SealHeart`, `heart_seal.ts` |
-| The spires | The four bronze tines became four crystal spires (`sh_portal_tine`, collider 1.6): a banded drum of rough granite and a cluster of great crystal leaning in over the seal, the tallest's tip 16 yards up; each burns for its vein. The southern two stand a breath off the diagonals (`RING_SPIRE_BEARINGS`) so the Ring's two ends see past them to the portal | `Kit_SealSpire`, `ringSpireSpots` |
+| The Ring's edges | Over the chasm a curb under a hand on a carved fascia three lifts deep; against the mountain a gutter of setts and the scree and fallen blocks heaped at the rock's foot | `Kit_RingCurb*`, `Kit_RingFoot*`, `planRingEdges` |
+| The light-rivers | A channel inlaid where each river crosses the Ring (two carved lips, a polished dark bed the ribbon burns on), the dais's four channels from its rim to the seal's notches, a chute down the middle of every stair | `Kit_RingChannel`, `Kit_SealDais`, `Kit_StairChute` |
+| The four stairs | The Grand Stair, the North Stair and, since the owner's review of 2026-11-18 ("the bridges are too thin, lets have the same bridges as the other two"), the East and West Stairs (`EAST_STAIR`, `WEST_STAIR`: the North Stair turned a quarter each way, walkable like it, carrying the Quench's and the Heat's rivers where thin conduit spans crossed the chasm before) laid tread by tread: two or three blocks a tread, worn hollow, nosings rounded and chipped; every tread's top on the walked ramp at its middle (half a riser either way), short treads on the Grand Stair, long low ones on the three gentle Ring stairs (16 yd broad each); carved stringers three lifts deep and a low coped parapet (0.8, with newels) down both sides of every stair to the seal (the Balcony Stairs keep their field ramp and take the parapets) | `Kit_StairTread*`, `Kit_StairParapet*`, `planRingStairs`, `planRingStairSteps` |
+| The Seal Dais | Its walk in courses round the seal (the seal's basalt ring first), the four stairs' landings out to their first treads, a rim of carved face and a low coped parapet open where the stairs land; under it an inverted mountain some 46 yards deep, ledged and fissured, the four veins' crystal breaking out of it under each channel and crystal hanging from its root | `Kit_SealDais` |
+| The crystal | One crystal at the dais's centre that holds all four elements (the owner's ask of 2026-11-18, replacing the four granite quarters and the four spires): a white-gold heart shaft standing straight up, the Hammer's chunky amber prisms south, the Quench's ice east, the Breath's storm north and the Heat's flame-horns west grown round it, on a broad plinth of dark slabs spread to the seal's inner circle (8.5 yd, 18.85 yd tall). It is the Tripo build of the owner's approved ChatGPT sheet (`public/models/props/smith_heart_ring_crystal.glb`, sources `docs/design/raid/kit/ring_crystal_src/`), cut into the plinth's six sectors, the heart's shaft and the crystal's own prisms, each its element's (Tripo's thousand shells are its UV seams: welded, the model is a dozen solids whose skin parts into prisms at the inward folds where one meets the next, each prism keeping its painted faces and only its base capped), every vertex carrying its element weights and light path. One unlit material (`ring_crystal_material.ts`, the look in `RING_CRYSTAL_LOOK`): dormant is the painting dimmed and cooled, each element lights as its river arrives and climbs its own crystals behind a white-hot front, the heart glows with the four, ready makes the whole crystal breathe, and the painting's four colours are kept throughout | `ring_crystal.ts`, `ring_crystal_core.ts`, `ring_crystal_material.ts`, `heart_seal.ts` |
+| Its entity | The crystal is also a claim object (section 5.2), never lootable: there is nothing to press or click, so its entity's view is the empty reporting anchor the seal markers use (the trash-engine arm of `gate_objects.ts`), and the ring kit paints the crystal itself | `gate_objects.ts` |
 | The pack spots | A cairn at the rim behind each of the eight packs (`sh_ring_cairn`, collider 2): a block fallen from the mountain with a crystal lamp in a rock cradle, or a toppled standing stone broken in two with its lamp in the break, rubble round both | `Kit_RingCairn*` |
 | The standing stones | The forge pillars became rough-hewn standing stones, chevrons carved in a band, a warm crystal lamp in the cleft of each one's head; the one that stood on the east Balcony Stair's edge is gone | `Kit_RingMonolith` |
 | The vein mouths | A threshold of dark stones flush across each mouth and a pair of standing stones flanking it, each its vein's: the Breath's slender, twisted and holed by the gale, a pale teal crystal in its crown; the Quench's squat, frost-cracked, ice crystal growing out of its seams; the Heat's dark and sooted, split by seams of white-gold fire, a crystal ember at its head; the Hammer's (`sh_hammer_jamb`, on colliders at the Grand Stair's head on the Balcony) broad and heavy with ochre geodes broken open in it | `Kit_Jamb*`, `Kit_RingSill`, `planRingMouths` |
 
 **How it sits on the field.** The field keeps every floor the sim walks; the kit
-draws over it. The Ring's, the dais's and the two stairs' field tops are left out once
+draws over it. The Ring's, the dais's and the four stairs' field tops are left out once
 the kit has landed (`RING_KIT_OMIT_TOPS`, the field terrain's `omitTops`: neither drawn
 nor cutting the ground under them), so the paving's joints show its own grit and the
 treads never fight a ramp; the paving lies a breath over the walk, the curbs and
@@ -662,16 +728,17 @@ beds (`Kit_RockNeedle*`, `planHeartNeedles`) on the deepest points of the mounta
 round the Ring, 60 to 100 yards tall. A band piece whose body would reach over a walk
 behind it is never placed (`backOverFloor`).
 
-**The moments (VFX).** Every material is built with the interior (the seal's late
-pieces carry hidden carriers of their crystal, plain and instanced), nothing reads a
-texture, no light is added; all draw on every tier but the shards (fewer on the low
-tier, `heartShardCount`) and the shake (reduced motion).
+**The moments (VFX).** Every material is built with the interior (the crystal's pieces
+share one material whose painting uploads with the interior's gate; a crystal that lands
+after the interior was built arrives under the same group through the live compile gate),
+no light is added; all draw on every tier but the shake (reduced motion).
 
 | Moment | Look | Where |
 |---|---|---|
-| A colour arrives | the river's ribbon flows toward the seal with a white-hot surge riding the light's front (`heartRiverSurgeHead`); the spire of its vein ignites foot to tip with a white flare (`heartSpireIgnite`); the quarter's crystal fills rim to centre under a flush light; its column stands up; a shockwave of its colour runs out across the chasm and the whole Ring (`heartSealArrivalWave`); the camera thuds | `heart_rivers.ts`, `heart_seal.ts`, `seal_shake.ts` |
-| The seal splits | the four spires flare, the tines' arcs blaze from their crystal tips, a beam stands up out of the seal to the sky (`HEART_PORTAL_SKY_BEAM`), the bloom, the quarters part like petals (`heartQuarterPose`), the boss bursts into shards that lift out of the seams tumbling (`heartShardPose`), a four-colour ring wave and a wall of light ride out across the whole Ring, the camera trembles, jolts on the flash and shakes again as the shards lift (`HEART_PORTAL_SHAKES`) | `heart_portal.ts`, `heart_seal.ts`, `seal_shake.ts` |
-| The living portal | the vortex and the funnel in the four colours, a slower wider sleeve round them, the shards turning round the funnel for good over every head, the four spires burning, a thin beam to the sky marking it from the whole main map | `heart_portal.ts`, `heart_seal.ts` |
+| A colour arrives | the river's ribbon flows toward the seal with a white-hot surge riding the light's front (`heartRiverSurgeHead`); its element's crystals light foot to tip behind a white-hot front (`ringCrystalState`, from `heartSealQuarterFill`), the heart glowing a little more; its column stands up; a shockwave of its colour runs out across the chasm and the whole Ring (`heartSealArrivalWave`); the camera thuds | `heart_rivers.ts`, `ring_crystal.ts`, `heart_seal.ts`, `seal_shake.ts` |
+| The crystal is ready | all four lit and the Ring clear (the markers' ready bit): once the slowest element has finished filling the whole crystal breathes with a thin white-gold rim, the sign that the first raider onto the dais will break it | `ring_crystal_core.ts` (`ringCrystalState`), `ring_crystal_material.ts` |
+| The crystal bursts | a living player steps onto the dais once it is charged (section 5.2): it overloads and whitens (`HEART_PORTAL_OPEN.charge`), then shatters into a blinding pillar standing up off the seal (`flash`), a beam stands up out of the seal to the sky (`HEART_PORTAL_SKY_BEAM`), the crystal's pieces fly outward tumbling (`ringCrystalPiecePose`) and the plinth's slabs crack apart and sink into the dais, a four-colour ring wave and a wall of light ride out across the whole Ring, the camera trembles, jolts on the flash and shakes again as the pieces climb (`HEART_PORTAL_SHAKES`) | `heart_portal.ts`, `ring_crystal.ts`, `seal_shake.ts` |
+| The living portal | the vortex and the funnel in the four colours, a slower wider sleeve round them, the crystal's pieces settling over every head for good: each element's prisms hang together in its own vein's quarter round the funnel (the owner's calls of 2026-11-18: chunks of each element's crystal floating, solid crystals, not random pieces or flat faces), upright, their outer faces outward, the whole formation turning slowly as one, the white-gold heart upright on the axis crowning the funnel (`ringCrystalOrbitSlot`); a thin beam to the sky marking it from the whole main map | `heart_portal.ts`, `ring_crystal.ts` |
 | The hop | the arrival's column and ring, and the four colours whirling up round whoever arrives | `heart_portal.ts` |
 
 ### 5.14 The Breath vein (phase 2G)
@@ -2811,7 +2878,7 @@ IP-checked in `docs/design/naming-audit.md`). Cosmetic only, like every deed rew
   (`isBlocked`): the main-map walk with every gate open (to the portal), the Heart's
   walk from its arrival (to the boss, the altars and the exit), the two areas never
   joined by floor, the Heart Bridge sealed, a fresh claim held in the Gallery, the Pit
-  Mouth versus the Slab, free order of the three veins, the dais reached by either
+  Mouth versus the Slab, free order of the three veins, the dais reached by any one
   stair alone and by nothing else, the North Stair's short walk from the Breath's
   mouth, no step over
   `MAX_STEP_HEIGHT`, 12 yd paths and gates, every floor within interest range of a
@@ -2825,8 +2892,8 @@ IP-checked in `docs/design/naming-audit.md`). Cosmetic only, like every deed rew
   the portal only with all four lit and the Ring clear (said once, staying open), the
   hop both ways (and never for a corpse), the Heart Bridge's seal.
 - `tests/smith_heart_walls.test.ts`: the drawn terrain against the walked floor on both
-  areas, the Grand Stair and the North Stair alone across the chasm, both under every
-  Ring eye's line to the seal.
+  areas, the four stairs alone across the chasm, all four under every Ring eye's line to
+  the seal.
 - `tests/smith_heart_render_core.test.ts`: the mountain (clear of every floor, open air
   kept, tall crowns, the Cornice low, the Heart deepest) and no main-map eye seeing
   into the Heart; the rivers; the seal memory and fill; the portal, hop and area-blend
@@ -2904,8 +2971,21 @@ IP-checked in `docs/design/naming-audit.md`). Cosmetic only, like every deed rew
   every cast and damage name re-localized.
 - `tests/smith_heart_council_fx.test.ts` and `tests/smith_heart_council_bodies.test.ts`: the
   look's pure plans and both painters over a fake world.
-- `tests/smith_heart_dev.test.ts`: the `/dev heart` family (the portal forcing and the
+- `tests/smith_heart_dev.test.ts`: the `/dev heart` family (the forced burst and the
   hop included) and the dev-only door.
+- `tests/smith_heart_seal_crystal.test.ts`: the heart seal crystal over a real claim:
+  its template, layout footprint and combat-wall row pinned, READY deriving from four
+  veins and a clear Ring and only then, never lootable, the portal bit shut until a
+  living player steps into the middle circle and kept for the claim afterwards, every
+  trigger case (dark, the circle's rim inclusive, a corpse, a released spirit, another
+  claim's player, a raider already on the dais when the charge lands, a walk back out and
+  in, the pickup command and the interact key doing nothing), a walk down the Grand Stair
+  bursting it at the rim and on into the portal, the wall (a walking body stopped at the
+  rim, a body inside pushed out, sight blocked, gone the tick it bursts, the online
+  mirror's rebuild), the clearance of every point a body is set down at, no rng,
+  determinism. `tests/smith_heart_seal_crystal_wire.test.ts`: the crystal through the
+  real server into the online mirror, the pickup command refused and the server's tick
+  bursting it when the raider steps onto the dais.
 - `tests/smith_heart_breath.test.ts` (on `tests/helpers/breath_fight.ts`): the Guardian of
   the Breath over a real claim: the blow cycle and its turns, the calm shortening, the push
   and the walk against it, a gap killing (blown and walked), the wall pinning, Thessaly's
@@ -2954,8 +3034,8 @@ IP-checked in `docs/design/naming-audit.md`). Cosmetic only, like every deed rew
 | `/dev heart tp <area or boss>` | jump inside the run (enters first): cleft, gallery, pit, balcony, ring, ringse, ringsw, breath, bridge, cornice, quench, ice, lake, heat, forge, anvil, heart or portal (the Seal Dais beside the portal), heartroom or final (the Heart's Arrival Terrace); a guardian's name (hammer, breathboss, quenchboss, heatboss) lands beside it |
 | `/dev heart kill <what>` | kill a vein's fight (hammer: the whole Hammer Council; breath, quench, heat), the final boss (final), all four guardians (guardians), one pack (`pack h1` and so on), every pack (trash), or all; kills credit through the normal death path, so gates and seal follow on the next tick |
 | `/dev heart gates` | open every gate of the run |
-| `/dev heart portal` | force the seal's portal open for the run (the hop then works) |
-| `/dev heart seal` | print the `smithHeartProgress` readout (and whether the heart is awake) |
+| `/dev heart portal` | burst the heart seal crystal now, whatever the veins say (a forced burst, the same outcome as a raider stepping onto the charged dais: the portal bit, the wall and the crystal gone, the line once; the hop then works) |
+| `/dev heart seal` | print the `smithHeartProgress` readout (mask, slabOpen, sealLit, ringClear, ready, portalOpen), whether the crystal has burst, and whether the heart is awake |
 | `/dev heart arrival` | replay the arrival scene: the heart sleeps a moment and wakes again with a living player in the Heart |
 | `/dev heart breath heart [2]` | a Knotted Gale and the marks now (`2`: the tier's phase-2 round: Mythic's two balls and two pairs of portals, Heroic's one ball and one pair); switches a Normal run to mythic, a Heroic run keeps Heroic's row |
 | `/dev heart breath heart portal a`, `portal b`, `portal c`, `portal d` | open that portal at your feet now (a mark in the way ends, its player may carry); `c` and `d` only in a two-pair round |
