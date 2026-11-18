@@ -888,10 +888,10 @@ describe('the boss-room seal delay: every sealing gate of every dungeon', () => 
     // Every file under src/sim/encounters that assigns a spawnPos. Each was
     // read for this suite: only korzul_emerge.ts moves a SEALING boss's home
     // (covered above); the rest re-home adds, shackles and raid bosses that
-    // have no sealing gate. The Smith's Heart's four: breath_isles.ts,
-    // final_adds.ts and heat_scope.ts home freshly raised adds (the Breath
-    // isles' Gale Sentinels and Menders, the Splinters, the Heat's adds) where
-    // they rise; final.ts reHome
+    // have no sealing gate. The Smith's Heart's five: breath_isle_adds.ts,
+    // breath_isles.ts, final_adds.ts and heat_scope.ts home freshly raised
+    // bodies (the Breath isles' adds and its Stillstones, the Splinters, the
+    // Heat's adds) where they rise; final.ts reHome
     // sets the sealing final boss's home back to its authored spawn (HEART_ROOM,
     // the spawn the check above already reads), never a new spot. A file that
     // joins this list has not been read yet.
@@ -915,6 +915,7 @@ describe('the boss-room seal delay: every sealing gate of every dungeon', () => 
       'hollow_crypt/knellwyrm.ts',
       'ignivar.ts',
       'nythraxis.ts',
+      'smith_heart/breath_isle_adds.ts',
       'smith_heart/breath_isles.ts',
       'smith_heart/final.ts',
       'smith_heart/final_adds.ts',

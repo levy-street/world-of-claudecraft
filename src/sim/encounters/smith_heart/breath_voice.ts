@@ -42,6 +42,8 @@ export type BreathMoment =
   | 'death'
   | 'isles'
   | 'bulwark'
+  | 'updraft'
+  | 'stone'
   | 'victory'
   | 'roar'
   | 'knot'
@@ -61,8 +63,8 @@ export const BREATH_LINES: Readonly<Record<BreathSpeaker, Partial<Record<BreathM
       storm: 'Enough breath. Now the storm!',
       cradle: 'Rise, little one. Let them catch you.',
       drawn: 'The sky has chosen you. Run, and it follows.',
-      isles: 'Winds, wall me in! The isles will keep my breath whole.',
-      bulwark: 'My shield... torn open. Then feel the gale again!',
+      isles: 'Wrap me in the gale! When I breathe out, the sky ends.',
+      bulwark: 'My cocoon... torn open. Then feel the storm!',
       roar: 'Hear the summit roar!',
       knot: 'Hold my storm, if your arms can bear it.',
       slay_a: 'Another one given to the wind.',
@@ -74,7 +76,9 @@ export const BREATH_LINES: Readonly<Record<BreathSpeaker, Partial<Record<BreathM
     thessaly: {
       pull: 'Highwatch stands with you! There is no wall up here: the wind will throw you off the edge!',
       isles:
-        'Its shield feeds on the isles! Ride the gale out there, cut the menders down and come back!',
+        'It is gathering a nova! Two stones out on the isles can still it: split in two and ride my updrafts!',
+      updraft: 'Isle clear! The next updraft is up, go!',
+      stone: 'The stone is awake! Channel it, and let nothing strike you!',
       circle_a: 'Into my calm, quickly! It holds three, no more!',
       circle_b: 'Here! Stand with me and let the wind break on us!',
       circle_c: 'Calm on the stone! Three of you, now!',
@@ -103,6 +107,7 @@ const REPEATING: ReadonlySet<BreathMoment> = new Set([
   'cradle',
   'isles',
   'bulwark',
+  'updraft',
   'drawn',
   'circle_a',
   'circle_b',

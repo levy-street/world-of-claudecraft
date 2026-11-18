@@ -263,26 +263,79 @@ export const CORNICE_OPEN_RIM: readonly { x: number; z: number; r: number }[] = 
   return out;
 })();
 
-/** The Islands of the Wind (the Guardian of the Breath, design doc 7.2): two
- *  floating islets off the Cornice's south rim (south-east and south-west,
- *  out in the open air the summit's falling shoulders and its cap leave
- *  round it (render/smith_heart/heart_walls_core.ts heartSummitOpen,
- *  heartSummitCap: the third pass of 2026-11-03), clear of the wind
- *  channels' notches and of the climb's head; inside the field's bounds and
- *  the instance slot's band (local z under 250: past it a body is another
- *  slot's), clear of the Heart's area and in a seal marker's reach), high
- *  over the Cornice (seen from it against the sky over every far ridge,
- *  their crags hanging over the void), reached only on a scripted
- *  ride of the wind (encounters/smith_heart/breath_isles.ts). Each is a
- *  hidden field surface (walkable; drawn by the fight's own floating rock,
- *  render/smith_heart_fx/breath_isles_fx.ts) with an organic outline and a
- *  ledge or two (smith_heart_isle_floor.ts ISLE_FLOOR_SPECS), its lip open
+/** The Islands of the Wind (the Guardian of the Breath, design doc 7.2; the
+ *  team's 50 percent phase of 2026-11-18): six floating islets round the
+ *  Cornice's southern rim, three a side, each chain climbing as it reaches
+ *  round (east: E1 to E3, west: W1 to W3, `side` 0 east and 1 west, `step` 0
+ *  to 2 along it; the last of each side holds a Stillstone). Out in the open
+ *  air the summit's falling shoulders and its cap leave round it
+ *  (render/smith_heart/heart_walls_core.ts heartSummitOpen, heartSummitCap;
+ *  every isle carves its own sky out of the rock, heartOpenAir), inside the
+ *  field's bounds and the instance slot's band (local z under 250), reached
+ *  only on a scripted ride of the wind (encounters/smith_heart/
+ *  breath_isles.ts). Each is a hidden field surface (walkable; drawn by the
+ *  fight's own floating rock, render/smith_heart_fx/breath_isles_fx.ts) with
+ *  an organic outline and a ledge or two, one of the two authored floors
+ *  (`spec`: smith_heart_isle_floor.ts ISLE_FLOOR_SPECS, each the Breath
+ *  kit's Kit_WindIsleA or B sculpt turned to face the Cornice), its lip open
  *  (BREATH_ISLE_LIPS: a body that walks off falls). `h` is its floor's
  *  height, `r` its nominal reach (the rim swells past it and bites in). */
-export const BREATH_ISLES: readonly { id: string; x: number; z: number; r: number; h: number }[] = [
-  { id: 'breath_isle_southeast', x: 31, z: 139, r: 9, h: H.cornice + 26 },
-  { id: 'breath_isle_southwest', x: -28, z: 142, r: 9, h: H.cornice + 30 },
+export interface BreathIsle {
+  id: string;
+  x: number;
+  z: number;
+  r: number;
+  h: number;
+  /** The authored floor (and kit sculpt) it wears. */
+  spec: 'breath_isle_southeast' | 'breath_isle_southwest';
+  /** 0 east, 1 west. */
+  side: 0 | 1;
+  /** Its place along its side's chain (0 nearest the Cornice). */
+  step: 0 | 1 | 2;
+}
+
+/** An isle on the Cornice's compass: `deg` from its centre, `R` yards out. */
+function isleAtBearing(
+  id: string,
+  deg: number,
+  R: number,
+  rise: number,
+  spec: BreathIsle['spec'],
+  side: 0 | 1,
+  step: 0 | 1 | 2,
+): BreathIsle {
+  const a = (deg * Math.PI) / 180;
+  const C = BREATH.cornice;
+  return {
+    id,
+    x: Math.round((C.x + Math.sin(a) * R) * 10) / 10,
+    z: Math.round((C.z + Math.cos(a) * R) * 10) / 10,
+    r: 9,
+    h: H.cornice + rise,
+    spec,
+    side,
+    step,
+  };
+}
+
+export const BREATH_ISLES: readonly BreathIsle[] = [
+  // The east chain leaves the rim and heads out over the southern void (the
+  // Heart's crown and its area close the east rim); the west one curls
+  // round the open south-west rim toward the climb's head (clear of the
+  // climb's floors and the Wind Bridge's air). Every isle at least 28 yd
+  // from every other (each reaches about 13), each ride about 30 yd.
+  isleAtBearing('breath_isle_e1', 160, 56, 22, 'breath_isle_southeast', 0, 0),
+  isleAtBearing('breath_isle_e2', 147.5, 84, 29, 'breath_isle_southwest', 0, 1),
+  isleAtBearing('breath_isle_e3', 160, 106, 36, 'breath_isle_southeast', 0, 2),
+  isleAtBearing('breath_isle_w1', 190, 58, 22, 'breath_isle_southwest', 1, 0),
+  isleAtBearing('breath_isle_w2', 215, 66, 29, 'breath_isle_southeast', 1, 1),
+  isleAtBearing('breath_isle_w3', 240, 74, 36, 'breath_isle_southwest', 1, 2),
 ];
+
+/** The isle of `side` at `step` (its BREATH_ISLES index). */
+export function breathIsleIndex(side: 0 | 1, step: number): number {
+  return side * 3 + step;
+}
 
 // ---- the main map: the Quench (east, low) -------------------------------------------
 

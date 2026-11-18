@@ -68,6 +68,7 @@ import {
   knotTemplate,
   BREATH_TUNING as T,
 } from './breath_ids';
+import { ISLE_TUNING } from './breath_isle_ids';
 import {
   auraOf,
   type BreathScope,
@@ -542,8 +543,9 @@ function stepLive(s: BreathScope, rules: BreathKnotRules, heart: BreathHeart): v
 /** Phase 1's clock: never into the indrawn breath, nor so near it that a whole
  *  fuse would run into it. */
 function windClear(st: BreathFightState, rules: BreathKnotRules): boolean {
-  // Never while the Islands of the Wind are up (the raid split to the isles).
-  if (st.isles.round) return false;
+  // Never once the Islands of the Wind are due (the guardian at half
+  // health: the phase waits for a ball in play, never meets a new one).
+  if (st.isles.stage !== 'idle') return false;
   const ph = st.wind.phase;
   if (ph === 'inhale' || ph === 'exhale') return false;
   return st.inhaleTimer > rules.fuse + 1 && st.heartRuns < rules.windRuns;
@@ -561,13 +563,15 @@ export function stepHeart(s: BreathScope): void {
   }
   if (st.heart) stepLive(s, rules, st.heart);
   // The storm's break and its barrage hold the clock at its phase-2 start.
-  if (st.half === 'break' || st.barrage) {
+  if (st.half === 'isles' || st.half === 'break' || st.barrage) {
     st.heartTimer = T.heartStormFirst;
     return;
   }
   st.heartTimer -= DT;
   if (st.heart || st.heartTimer > 1e-9) return;
   if (st.half === 'wind') {
+    // At half health the phase is due: no new ball.
+    if (s.boss.hp <= s.boss.maxHp * ISLE_TUNING.at + 1e-9) return;
     if (windClear(st, rules) && startHeart(s, 1)) st.heartTimer = T.heartEvery;
   } else if (startHeart(s, rules.stormBalls)) st.heartTimer = T.heartStormEvery;
 }

@@ -22681,12 +22681,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '裂けて雷の体となった：息吹の守護者が倒れるまで続く、戦いの嵐の後半。',
   'hudChrome.auraEffect.breathGuardian.swell':
     '{every}秒ごとに膨れ上がる嵐が岩棚の全員に{min}から{max}のダメージを与え、前の脈動ごとに{growth}%ずつ強くなる：これまでに{stacks}回。ヒロイック・ミシック：{heroicMin}から{heroicMax}のダメージ、前の脈動ごとに{heroicGrowth}%ずつ強くなる。',
-  'hudChrome.auraEffect.breathGuardian.bulwark':
-    '風の盾があと{left}のダメージを吸収する。浮島の疾風の哨兵か疾風の癒し手が一体でも生きている間、毎秒その全体の{regrow}%が回復し、癒しの疾風のたびに{mend}%回復する。疾風の道に乗って浮島へ渡り、彼らを倒せ。{max}秒保たれると、岩棚の上で炸裂し{bmin}から{bmax}のダメージを与える。ヒロイック・ミシック：{heroicMin}から{heroicMax}のダメージ。',
   'hudChrome.auraEffect.breathGuardian.riding':
     '風が決まった道筋で虚空の上をあなたを運んでいる：降ろされるまで行動できない。',
-  'hudChrome.auraEffect.breathGuardian.windworn':
-    '風に疲れ果てた：これが切れるまで、疾風の道はあなたを浮島へ運ばない。',
   'hudChrome.auraEffect.breathGuardian.thrown': '頂の咆哮に吹き飛ばされた：着地するまで動けない。',
   'hudChrome.auraEffect.breathGuardian.tossed':
     '吹きすさぶ旋風に吹き飛ばされた：突風が収まるまで動けない。',
@@ -25838,7 +25834,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_final_gale_pounce': '疾風の飛びかかり',
   'abilityUi.cast.heart_final_rime_toll': '霧氷の鐘',
   'abilityUi.cast.heart_breath_cradle_channel': '雷のゆりかご',
-  'abilityUi.cast.heart_breath_gale_bulwark': '疾風の防壁',
   'abilityUi.cast.heart_breath_mending_gale': '癒しの疾風',
   'entities.mobs.heart_final_splinter_heat.name': '熱の欠片',
   'entities.mobs.heart_final_splinter_quench.name': '焼き入れの欠片',
@@ -26078,6 +26073,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'seasonal.pumpkins.progress': '{label}：{current}/{total}',
   'entities.mobs.heart_gale_sentinel.name': '疾風の哨兵',
   'entities.mobs.heart_gale_mender.name': '疾風の癒し手',
+  'hudChrome.auraEffect.breathGuardian.cocoon': "ガーディアンはスカイレンド・ノヴァを詠唱している間、ダメージを受けない。詠唱が終わると、ノヴァが全員に最大HPの{share}%のダメージを与える（ヒロイックとミシック：致死）。テッサリー隊長の上昇気流に乗って東と西の浮遊島へ渡り、2つの静風石を詠唱して止めること：{stilled}/2 鎮静済み。",
+  'hudChrome.auraEffect.breathGuardian.ward': "正面{arc}度以内からの攻撃のダメージを{cut}%そらす。ターゲットがこれを向こうに向けている間に背後を攻撃すること。ヒロイックとミシック：{heroicCut}%。",
+  'hudChrome.breathGuardian.say.thessaly_updraft': "島は片付いた！次の上昇気流が出たぞ、行け！",
+  'hudChrome.breathGuardian.say.thessaly_stone': "石が目覚めた！詠唱しろ、何にも当たるな！",
+  'abilityUi.cast.heart_breath_skyrend_nova': "スカイレンド・ノヴァ",
+  'abilityUi.cast.heart_breath_shoving_gale': "突き飛ばす疾風",
+  'abilityUi.cast.kituse_heart_still_the_gale': "疾風を鎮める",
+  'entities.mobs.heart_gust_herald.name': "突風の先触れ",
+  'entities.mobs.heart_riven_squall.name': "裂けたスコール",
+  'entities.mobs.heart_squall_fragment.name': "スコールの欠片",
+  'entities.mobs.heart_squall_shieldbearer.name': "スコールの盾持ち",
+  'entities.mobs.heart_breath_stillstone.name': "静風石",
   'hudChrome.knotAlert.aTitle': 'あなたはポータルA！',
   'hudChrome.knotAlert.bTitle': 'あなたはポータルB！',
   'hudChrome.knotAlert.cTitle': 'あなたはポータルC！',

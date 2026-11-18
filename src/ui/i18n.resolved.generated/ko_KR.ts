@@ -4781,9 +4781,9 @@ export const ko_KR: EnTranslations = {
         "spent": "닻이 다했습니다: 이것이 끝날 때까지 테살리 대장의 고요의 원은 당신을 다시 붙잡을 수 없습니다.",
         "drawn": "{every}초마다 당신이 선 곳에 번개가 떨어집니다: {warn}초 뒤 {radius}야드 안의 모두에게 {min}~{max}의 피해를 주고, {charged}초 동안 매초 {cmin}~{cmax}의 피해를 주는 대전된 땅을 남깁니다. 계속 움직이며 낙뢰를 공격대에서 먼 가장자리로 유도하세요. 영웅·신화: 각각 {heroicMin}에서 {heroicMax}, {heroicCMin}에서 {heroicCMax}의 피해.",
         "cradled": "폭풍 속으로 들어 올려져, 수호자가 요람을 유지하는 {hold}초 동안 붙잡힙니다. 그동안 수호자는 다른 것을 시전하지 않습니다. 이후 방전이 {total}의 피해를 주며, 당신과 아래 {radius}야드 안의 모두가 나눠 받습니다. 나눠 받는 인원이 {soakers}명 미만이면 각자 {penalty}% 더 받고 벼랑 위의 모두가 {bmin}~{bmax}의 피해를 받습니다. 영웅: {heroicCount}명이 한꺼번에 들어 올려지며, 각 방전은 {heroicTotal}이고 {heroicSoakers}명이 필요하니 공격대가 나뉘어 받아야 합니다. 영웅·신화: 반동 피해는 {heroicBMin}에서 {heroicBMax}입니다.",
-        "bulwark": "바람의 방패가 피해를 {left} 더 흡수합니다. 떠 있는 섬의 질풍 파수병이나 질풍 치유사가 하나라도 살아 있으면 매초 전체의 {regrow}%가 다시 차오르고, 치유의 질풍마다 {mend}%가 회복됩니다. 질풍의 길을 타고 섬으로 건너가 그들을 쓰러뜨리세요. {max}초 동안 유지되면 벼랑 위에서 터져 {bmin}~{bmax}의 피해를 줍니다. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.",
+        "cocoon": "수호자는 하늘가름 회오리를 정신 집중하는 동안 피해를 입지 않습니다. 정신 집중이 끝나면 회오리가 모두에게 최대 생명력의 {share}%에 해당하는 피해를 줍니다(영웅 및 신화: 치명적). 테살리 대장의 상승 기류를 타고 동쪽과 서쪽의 떠 있는 섬으로 건너가 고요석 두 개를 정신 집중해 끊으십시오: {stilled}/2 잠재움.",
         "riding": "바람이 정해진 길을 따라 공허 위로 당신을 실어 갑니다: 내려놓을 때까지 행동할 수 없습니다.",
-        "windworn": "바람에 지쳤습니다: 이 효과가 끝날 때까지 질풍의 길이 당신을 섬으로 데려가지 않습니다.",
+        "ward": "정면 {arc}도 안에서 들어오는 공격의 피해를 {cut}% 흘려냅니다. 대상이 이것을 돌려세운 동안 등을 공격하십시오. 영웅 및 신화: {heroicCut}%.",
         "thrown": "정상의 포효에 날아갔습니다: 착지할 때까지 움직일 수 없습니다.",
         "blast": "정상의 포효의 돌풍이 당신을 수호자에게서 밀어냅니다: 입 앞에서는 초당 {speed}미터, 멀어질수록 약해지며 모두 {seconds}초 동안 지속됩니다. 즉시 바람을 거슬러 곧장 돌아가거나 세살리의 닻에 서세요. 그러지 않으면 처마 밖으로 날려갑니다.",
         "tossed": "떠도는 돌풍에 날아갔습니다: 돌풍이 내려놓을 때까지 움직일 수 없습니다.",
@@ -7392,6 +7392,8 @@ export const ko_KR: EnTranslations = {
         "guardian_death": "숨결은... 산으로... 돌아간다...",
         "thessaly_pull": "하이워치가 함께한다! 여기엔 벽이 없어, 바람이 너희를 가장자리 밖으로 날려 버릴 거야!",
         "thessaly_isles": "저 방패는 섬들에서 힘을 얻고 있어! 바람을 타고 건너가 치유사들을 쓰러뜨리고 돌아와!",
+        "thessaly_updraft": "섬 정리 완료! 다음 상승 기류가 떴다, 가라!",
+        "thessaly_stone": "돌이 깨어났다! 정신 집중해, 아무것에도 맞지 마!",
         "thessaly_circle_a": "어서 제 고요 속으로! 셋까지만, 그 이상은 안 됩니다!",
         "thessaly_circle_b": "여기요! 제 곁에 서서 바람을 함께 받아 냅시다!",
         "thessaly_circle_c": "돌 위에 고요를! 셋, 지금 당장!",
@@ -16943,8 +16945,10 @@ export const ko_KR: EnTranslations = {
       "heart_breath_cradle_channel": "천둥의 요람",
       "heart_breath_bellows_blow": "풀무 강타",
       "heart_breath_thunder_lash": "천둥 채찍",
-      "heart_breath_gale_bulwark": "질풍의 방벽",
+      "heart_breath_skyrend_nova": "하늘가름 회오리",
       "heart_breath_mending_gale": "치유의 질풍",
+      "heart_breath_shoving_gale": "밀쳐내는 돌풍",
+      "kituse_heart_still_the_gale": "돌풍 잠재우기",
       "heart_quench_blades_wake": "검의 각성",
       "heart_quench_blades_hunt": "칼날의 사냥",
       "heart_heat_fist": "현무암 주먹",
@@ -26907,6 +26911,21 @@ export const ko_KR: EnTranslations = {
       },
       "heart_gale_mender": {
         "name": "질풍 치유사"
+      },
+      "heart_gust_herald": {
+        "name": "돌풍 전령"
+      },
+      "heart_riven_squall": {
+        "name": "갈라진 스콜"
+      },
+      "heart_squall_fragment": {
+        "name": "스콜 파편"
+      },
+      "heart_squall_shieldbearer": {
+        "name": "스콜 방패병"
+      },
+      "heart_breath_stillstone": {
+        "name": "고요석"
       },
       "heart_quench_warder": {
         "name": "담금질 광맥 파수꾼"

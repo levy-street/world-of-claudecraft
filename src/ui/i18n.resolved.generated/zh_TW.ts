@@ -4781,9 +4781,9 @@ export const zh_TW: EnTranslations = {
         "spent": "你的錨定已經耗盡：在此效果結束前，瑟薩莉隊長的寧靜之環無法再次錨定你。",
         "drawn": "每{every}秒會有一道閃電落在你所站之處：{warn}秒後對{radius}碼內的所有人造成{min}到{max}點傷害，並留下帶電的地面，在{charged}秒內每秒造成{cmin}到{cmax}點傷害。保持移動，把落雷引向遠離團隊的邊緣。英雄和傳奇難度：分別為{heroicMin}到{heroicMax}點和{heroicCMin}到{heroicCMax}點傷害。",
         "cradled": "被舉入風暴，在守護者引導搖籃的{hold}秒內被定住；其間守護者不會施放其他任何技能。隨後的放電造成{total}點傷害，由你和你下方{radius}碼內的所有人分擔。分擔人數少於{soakers}人時，每人多承受{penalty}%，且崖台上的所有人受到{bmin}到{bmax}點傷害。英雄難度：同時舉起{heroicCount}名玩家，每次放電{heroicTotal}點，需要{heroicSoakers}人分擔，團隊要分頭承受。英雄和傳奇難度：反衝造成{heroicBMin}到{heroicBMax}點傷害。",
-        "bulwark": "風之護盾還能吸收{left}點傷害。只要浮島上還有任一狂風哨兵或狂風癒者存活，它每秒恢復總量的{regrow}%，每次癒合之風恢復{mend}%。乘狂風之路飛往浮島，消滅它們。維持{max}秒後，它會在崖台上爆裂，造成{bmin}到{bmax}點傷害。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。",
+        "cocoon": "守護者引導天裂新星時無法受到傷害。若引導完成，新星對所有人造成最大生命值{share}%的傷害（英雄和傳奇難度：致命）。乘上賽薩莉隊長的上升氣流前往東西兩側的浮空島，引導兩塊靜風石來打斷它：已平息 {stilled}/2。",
         "riding": "風沿著固定的路線帶你越過虛空：在被放下之前你無法行動。",
-        "windworn": "被風耗盡了力氣：效果結束前，狂風之路不會帶你前往浮島。",
+        "ward": "偏轉來自其正面{arc}度以內攻擊的{cut}%傷害。在其目標將它轉開時攻擊它的背後。英雄和傳奇難度：{heroicCut}%。",
         "thrown": "被巔峰咆哮掀飛：落地之前無法移動。",
         "blast": "巔峰咆哮的狂風將你吹離守護者：在其口前每秒{speed}碼，越遠越弱，共持續{seconds}秒。立刻逆風直奔回去，或站進塞薩莉的錨點，否則會被吹下飛簷。",
         "tossed": "被遊蕩狂風掀飛：狂風放下你之前無法移動。",
@@ -7392,6 +7392,8 @@ export const zh_TW: EnTranslations = {
         "guardian_death": "氣息……回歸……群山……",
         "thessaly_pull": "高望與你們同在！這上面沒有牆：風會把你們從邊緣吹下去！",
         "thessaly_isles": "它的護盾靠浮島供能！乘風飛過去，解決癒者再回來！",
+        "thessaly_updraft": "島嶼已肅清！下一道上升氣流已經升起，快走！",
+        "thessaly_stone": "石頭醒了！引導它，別讓任何東西打到你！",
         "thessaly_circle_a": "快進我的寧靜之中！最多三人，不能再多！",
         "thessaly_circle_b": "這裡！站在我身邊，讓風撞碎在我們身上！",
         "thessaly_circle_c": "石上的寧靜！三個人，現在就來！",
@@ -16943,8 +16945,10 @@ export const zh_TW: EnTranslations = {
       "heart_breath_cradle_channel": "雷霆搖籃",
       "heart_breath_bellows_blow": "風箱重擊",
       "heart_breath_thunder_lash": "雷霆鞭笞",
-      "heart_breath_gale_bulwark": "狂風壁壘",
+      "heart_breath_skyrend_nova": "天裂新星",
       "heart_breath_mending_gale": "癒合之風",
+      "heart_breath_shoving_gale": "推搡狂風",
+      "kituse_heart_still_the_gale": "平息狂風",
       "heart_quench_blades_wake": "諸刃甦醒",
       "heart_quench_blades_hunt": "利刃狩獵",
       "heart_heat_fist": "玄武岩之拳",
@@ -26907,6 +26911,21 @@ export const zh_TW: EnTranslations = {
       },
       "heart_gale_mender": {
         "name": "狂風癒者"
+      },
+      "heart_gust_herald": {
+        "name": "陣風使者"
+      },
+      "heart_riven_squall": {
+        "name": "裂空颮"
+      },
+      "heart_squall_fragment": {
+        "name": "颮之碎片"
+      },
+      "heart_squall_shieldbearer": {
+        "name": "颮之持盾者"
+      },
+      "heart_breath_stillstone": {
+        "name": "靜風石"
       },
       "heart_quench_warder": {
         "name": "淬脈守衛"

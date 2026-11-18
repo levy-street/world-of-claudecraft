@@ -17,8 +17,8 @@ import { BREATH } from '../src/sim/content/smith_heart_layout';
 import {
   BREATH_AURAS,
   BREATH_CUES,
+  cornicePads,
   ISLE_TUNING as IT,
-  isleSpots,
   BREATH_TUNING as T,
 } from '../src/sim/encounters/smith_heart';
 import { DT } from '../src/sim/types';
@@ -69,15 +69,14 @@ describe('the Breath moves bodies the online client can draw', () => {
   it('the gale ride out holds the override the whole arc: one epoch edge, never one a tick', () => {
     const f = pulled(4);
     const b = f.boss();
-    b.hp = Math.floor(b.maxHp * 0.7) - 1;
-    for (let i = 0; i < ticks(3) && !f.state()?.isles.round; i++) f.tick();
-    const i = f.state()?.isles.round?.isles[0] as number;
+    b.hp = Math.floor(b.maxHp * 0.5) - 1;
+    for (let i = 0; i < ticks(3) && f.state()?.isles.stage !== 'nova'; i++) f.tick();
     const p = f.players[2];
     const s = sessionOf(f, p.id);
     const w = watch(f, s);
     w.tick();
     const e0 = s.movementOverrideEpoch;
-    f.put(p, isleSpots()[i].path.x, isleSpots()[i].path.z);
+    f.put(p, cornicePads()[0].x, cornicePads()[0].z);
     w.tick();
     expect(p.carriedBy).toBeDefined();
     const startEpoch = s.movementOverrideEpoch;
@@ -93,9 +92,8 @@ describe('the Breath moves bodies the online client can draw', () => {
   it("an anchored player rides too, the override held the whole arc (Thessaly's calm never blocks it)", () => {
     const f = pulled(4);
     const b = f.boss();
-    b.hp = Math.floor(b.maxHp * 0.7) - 1;
-    for (let i = 0; i < ticks(3) && !f.state()?.isles.round; i++) f.tick();
-    const i = f.state()?.isles.round?.isles[0] as number;
+    b.hp = Math.floor(b.maxHp * 0.5) - 1;
+    for (let i = 0; i < ticks(3) && f.state()?.isles.stage !== 'nova'; i++) f.tick();
     const p = f.players[2];
     p.auras.push({
       id: BREATH_AURAS.anchor,
@@ -110,7 +108,7 @@ describe('the Breath moves bodies the online client can draw', () => {
     const s = sessionOf(f, p.id);
     const w = watch(f, s);
     w.tick();
-    f.put(p, isleSpots()[i].path.x, isleSpots()[i].path.z);
+    f.put(p, cornicePads()[0].x, cornicePads()[0].z);
     w.tick();
     expect(p.carriedBy).toBeDefined();
     const startEpoch = s.movementOverrideEpoch;

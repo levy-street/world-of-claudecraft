@@ -75,7 +75,7 @@
 //                                    run's fight), phase2 (the storm breaks
 //                                    now), blow [deg|n|ne|e|se|s|sw|w|nw],
 //                                    calm, circle (Thessaly's), inhale (or roar),
-//                                    isles [0|1] (the Gale Bulwark and its isles),
+//                                    isles (the Islands of the Wind at half health),
 //                                    ride [0|1] and home (ride the gale now),
 //                                    killisle, bulwark (break it), windworn off,
 //                                    chain,

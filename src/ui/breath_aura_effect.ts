@@ -17,7 +17,7 @@ import {
   BREATH_KNOT,
   BREATH_TUNING as T,
 } from '../sim/encounters/smith_heart/breath_ids';
-import { ISLE_AURAS, ISLE_TUNING as IT } from '../sim/encounters/smith_heart/breath_isle_ids';
+import { ISLE_AURAS, ISLE_TIERS } from '../sim/encounters/smith_heart/breath_isle_ids';
 import { WIND_BLAST_AURA, WIND_DRIFT_AURA, WIND_PULL_AURA } from '../sim/wind_drift';
 import type { AuraEffectDescriptor, AuraEffectInput } from './aura_effect';
 import { tierRange, tierValue } from './heart_tier_damage';
@@ -149,23 +149,25 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
           ...tierRange('heroicB', T.backlashMin, T.backlashMax, HM),
         },
       };
-    case ISLE_AURAS.bulwark:
+    case ISLE_AURAS.cocoon:
       return {
-        key: `${KEY}.bulwark`,
+        key: `${KEY}.cocoon`,
         nums: {
-          left: Math.max(0, Math.round(a.value ?? 0)),
-          regrow: pct(IT.regrowShare),
-          mend: pct(IT.mendShare),
-          max: IT.bulwarkMax,
-          bmin: tierValue(IT.burstMin, NM),
-          bmax: tierValue(IT.burstMax, NM),
-          ...tierRange('heroic', IT.burstMin, IT.burstMax, HM),
+          share: pct(ISLE_TIERS.normal.novaShare),
+          stilled: Math.max(0, Math.round(a.value ?? 0)),
         },
       };
     case ISLE_AURAS.riding:
       return { key: `${KEY}.riding` };
-    case ISLE_AURAS.windworn:
-      return { key: `${KEY}.windworn` };
+    case ISLE_AURAS.ward:
+      return {
+        key: `${KEY}.ward`,
+        nums: {
+          cut: pct(ISLE_TIERS.normal.wardCut),
+          arc: ISLE_TIERS.normal.wardHalfDeg,
+          heroicCut: pct(ISLE_TIERS.heroic.wardCut),
+        },
+      };
     case BREATH_AURAS.thrown:
       return { key: `${KEY}.thrown` };
     case BREATH_AURAS.blown:

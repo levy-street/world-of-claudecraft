@@ -4160,7 +4160,7 @@ export const DEEDS: Record<string, DeedDef> = {
   [SMITH_HEART_FEAT_DEEDS.breath]: {
     id: SMITH_HEART_FEAT_DEEDS.breath,
     name: 'Keep Your Feet',
-    desc: 'Defeat the Guardian of the Breath without any raider falling from the Storm Cornice or an Island of the Wind during the fight, and with every Gale Bulwark broken by the raid before it bursts on its own.',
+    desc: 'Defeat the Guardian of the Breath without any raider falling from the Storm Cornice or an Island of the Wind during the fight, and with both Stillstones stilled before Skyrend Nova is unleashed.',
     category: 'dungeon',
     renown: 25,
     trigger: { kind: 'manual' },

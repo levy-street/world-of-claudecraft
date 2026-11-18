@@ -1,82 +1,112 @@
-// The Islands of the Wind (the Guardian of the Breath, docs/design/raid/
-// smith_heart.md section 7.2; the owner's idea, approved with the team's
-// feedback of 2026-11-03). Every number is breath_isle_ids.ts ISLE_TUNING and
-// the tier's row (BREATH_DIFFICULTY `isleAt`, `isleCount`, `windwornSeconds`).
+// The Islands of the Wind, the Guardian of the Breath's 50 percent phase
+// (docs/design/raid/smith_heart.md section 7.2; the team's design of
+// 2026-11-17, replacing the Gale Bulwark's rounds). Every number is
+// breath_isle_ids.ts ISLE_TUNING and the tier's ISLE_TIERS row.
 //
-//   The round      in the Wind half, at each of the tier's health marks (70
-//                  on normal; 80 and 60 on heroic and mythic) the guardian
-//                  stops where it stands and raises its Gale Bulwark: an
-//                  absorb as big as 7 percent of its health, held by a
-//                  channel bar (no swing, no other bar; the wind keeps its
-//                  own cycle, Thessaly keeps planting). Normal wakes one isle
-//                  (hashed), heroic and mythic both.
-//   The isles      each woken isle raises a Gale Sentinel and a Gale Mender.
-//                  While ANY of the round's adds lives the Bulwark regrows (5
-//                  percent of its whole a second), and every 9 s the Mender
-//                  channels Mending Gale into it (a third of its whole back):
-//                  a player interrupt cuts it.
-//   The ride       a Gale Path stands on the Cornice by the rim facing each
-//                  woken isle while its adds live: step in and the wind
-//                  carries you on a FIXED scripted arc to the isle (stunned,
-//                  carried; no physics, no wind on the way). When the last add
-//                  of an isle falls, a Homeward Gale rises on it and carries
-//                  whoever steps in back to the Cornice, beside the path.
-//                  Heroic: the same group may ride again (to the other isle,
-//                  or at the next mark). Mythic: a rider set down home is
-//                  Windworn for 150 s (past the next mark) and no Gale Path takes them: two groups.
-//   The end        the Bulwark broken, the round ends: any add still standing
-//                  dissolves, the paths go, the guardian fights on. Held for
-//                  75 s it bursts by itself (a heavy blow on the whole Cornice)
-//                  and the round ends the same way: the fight never stalls
-//                  (the raid bots do not ride).
-//   A wipe         every body on an isle (alive or not) is set back on the
-//                  Cornice; nothing of the round stays.
+//   The lock      at half health nothing takes the guardian lower: it is
+//                 untouchable from the moment it crosses (a Knotted Gale in
+//                 play is thrown or bursts first: the ball and the phase never
+//                 meet), then it closes its Gale Cocoon and channels Skyrend
+//                 Nova (the tier's `novaSeconds`): if the bar ends, the nova
+//                 strikes every player for `novaShare` of their whole health
+//                 (Normal: nine tenths; Heroic: a wipe).
+//   The isles     Captain Thessaly raises two Updrafts on the Cornice, east
+//                 and west: step in and the wind carries you to the first
+//                 isle of that side; the raid splits in two. Three isles a
+//                 side, climbing round the rim, one way and the other. Each
+//                 isle's adds rise as its Updraft opens (breath_isle_adds.ts:
+//                 a different fight on each); once they have all fallen,
+//                 Thessaly raises the Updraft on to the next.
+//   The storm     each isle's Closing Storm (a ring on its floor, closing)
+//                 starts as its first rider lands: when it runs out, Sky's
+//                 Reckoning rains strikes on everyone on the isle (each under
+//                 a player, on a short warning: keep moving) until the isle
+//                 is done.
+//   The stones    the last isle of each side holds a Stillstone, woken when
+//                 that isle's adds have fallen (Heroic: two Squall Fragments
+//                 rise to guard it): a player targets it and channels Still
+//                 the Gale (a 5 s use any landed hit breaks). Both stilled:
+//                 the cocoon shatters, the nova is cut, the wind carries every
+//                 player on the isles home and the storm breaks (phase 2).
+//   A wipe        every body on an isle (alive or not) is set back on the
+//                 Cornice; nothing of the phase stays.
 //
-// Deterministic: the isle pick is hashed, the riders and the adds are in id
-// order; the only rng draws are the damage rolls. Every visible state rides
-// existing fields (breath_isle_ids.ts says which): no wire or IWorld change.
+// Deterministic: the riders and the adds are in id order; the only rng draws
+// are the damage rolls. Every visible state rides existing fields
+// (breath_isle_ids.ts says which): no wire or IWorld change.
 
 import { carryBody, setDownBody } from '../../carried_body';
 import { carriesLoad } from '../../combat/carried_load';
-import { isSilenced } from '../../combat/cc';
 import { BREATH_ISLES } from '../../content/smith_heart_layout';
 import { MOBS } from '../../data';
 import { createMob } from '../../entity';
-import { applyDungeonMobTuning, mobTemplateForDungeonDifficulty } from '../../instances/difficulty';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { DT, type Entity } from '../../types';
 import { clearCastIf, dropEncounterBody, startBar } from '../sunken_bastion/claim';
-import { thessalyOf } from './breath_gale';
-import { breathHash } from './breath_geometry';
-import { isleAt, isleSpots, rideArc } from './breath_isle_geometry';
+import { clearGales, clearWindAuras, setWind, thessalyOf } from './breath_gale';
+import { BREATH_AURAS, BREATH_CASTS, BREATH_OBJECTS, timedTemplate } from './breath_ids';
+import {
+  isleRoles,
+  isleTier,
+  livingIsleAdds,
+  playersOnIsle,
+  raiseIsleAdd,
+  stepIsleAdds,
+} from './breath_isle_adds';
+import { cornicePads, isleAt, isleSpots, rideArc } from './breath_isle_geometry';
 import { holdIsleAdds } from './breath_isle_hold';
 import {
-  galePathTemplate,
-  homeGaleTemplate,
+  closingTemplate,
   ISLE_AURAS,
   ISLE_CASTS,
   ISLE_CUES,
   ISLE_MOBS,
   ISLE_NAMES,
+  padTemplate,
   rideTemplate,
   ISLE_TUNING as T,
 } from './breath_isle_ids';
 import {
   type BreathScope,
+  corniceListeners,
   dropAura,
   dropBreathObject,
-  guardianFree,
-  livePlayers,
   living,
   local,
-  roll,
+  putMarker,
   spawnBreathObject,
 } from './breath_scope';
-import type { BreathFightState, BreathIsleAdd, BreathRide } from './breath_state';
+import { clearShoves } from './breath_shove';
+import type { BreathFightState, BreathIsles, BreathRide } from './breath_state';
+import { clearCalm } from './breath_thessaly';
 import { breathSay } from './breath_voice';
 import { breakFeat } from './feat_attempt';
-import { applyDevAddPool } from './tier_health';
+
+/** A fresh phase (the pull's state). */
+export function freshIsles(): BreathIsles {
+  return {
+    stage: 'idle',
+    elapsed: 0,
+    at: null,
+    burst: false,
+    isles: BREATH_ISLES.map(() => ({
+      woken: false,
+      cleared: false,
+      closing: null,
+      closingId: null,
+      reckon: 0,
+      stoneId: null,
+      stilled: false,
+    })),
+    adds: [],
+    pads: [],
+    rides: [],
+    strikes: [],
+    shoves: [],
+    grace: {},
+  };
+}
 
 // ---- who stands where -----------------------------------------------------------------------
 
@@ -95,308 +125,420 @@ export function islePlayers(ctx: SimContext, inst: InstanceSlot): { p: Entity; i
   return out.sort((a, b) => a.p.id - b.p.id);
 }
 
-/** The round's living adds on isle `i`. */
-function livingAdds(s: Pick<BreathScope, 'ctx' | 'st'>, isle?: number): Entity[] {
-  const out: Entity[] = [];
-  for (const a of s.st.isles.adds) {
-    if (isle !== undefined && a.isle !== isle) continue;
-    const e = s.ctx.entities.get(a.id);
-    if (living(e)) out.push(e);
-  }
-  return out;
+// ---- the lock and the start ------------------------------------------------------------------
+
+/** Has the guardian reached the phase (half health in the Wind half, not
+ *  yet run)? From that moment it is untouchable. */
+export function islesReached(s: BreathScope): boolean {
+  return (
+    s.st.half === 'wind' && s.st.isles.stage === 'idle' && s.boss.hp <= s.boss.maxHp * T.at + 1e-9
+  );
 }
 
-function bulwarkOf(b: Entity) {
-  return b.auras.find((a) => a.id === ISLE_AURAS.bulwark) ?? null;
+/** The lock: at half health the guardian is held there, untouchable, until
+ *  the phase is over. Returns true when the phase may begin this tick (no
+ *  Knotted Gale in play: the ball is thrown or bursts first). */
+export function lockForIsles(s: BreathScope): boolean {
+  if (!islesReached(s)) return false;
+  const b = s.boss;
+  b.damageImmune = true;
+  b.hp = Math.max(b.hp, Math.min(b.maxHp, Math.ceil(b.maxHp * T.at) - 1));
+  return !s.st.heart;
 }
 
-// ---- the round ------------------------------------------------------------------------------
-
-/** Is a round due now (a mark crossed in the Wind half, the guardian free,
- *  no indrawn breath running, and no Knotted Gale in play: the round waits
- *  for the ball to be thrown or to burst, the owner's call of 2026-11-17)? */
-export function islesDue(s: BreathScope): boolean {
-  const st = s.st;
-  const marks = s.rules.isleAt;
-  if (st.half !== 'wind' || st.isles.round || st.isles.next >= marks.length) return false;
-  if (st.heart) return false;
-  if (st.wind.phase === 'inhale' || st.wind.phase === 'exhale') return false;
-  return s.boss.hp <= s.boss.maxHp * marks[st.isles.next] && guardianFree(s);
-}
-
-/** The guardian raises its Bulwark and wakes the round's isles. Exported for
- *  the dev trigger (`only`: one isle by index). */
-export function startIsles(s: BreathScope, only?: number): boolean {
+/** The guardian closes its Gale Cocoon and begins Skyrend Nova; Thessaly
+ *  raises the two Updrafts. Exported for the dev trigger and the tests. */
+export function startIsles(s: BreathScope): boolean {
   const st = s.st;
   const b = s.boss;
-  if (st.isles.round || st.half !== 'wind' || !living(b)) return false;
-  const frac = b.hp / b.maxHp;
-  // Every mark already crossed is spent by this one round.
-  const marks = s.rules.isleAt;
-  while (st.isles.next < marks.length && frac <= marks[st.isles.next]) st.isles.next++;
-  st.casts++;
-  const n = BREATH_ISLES.length;
-  let isles: number[];
-  if (only !== undefined) isles = [((only % n) + n) % n];
-  else if (s.rules.isleCount >= n) isles = BREATH_ISLES.map((_, i) => i);
-  else isles = [breathHash(b.id, st.casts) % n];
-  const whole = Math.round(b.maxHp * T.bulwarkShare);
-  st.isles.round = { isles, whole, elapsed: 0, at: { ...b.pos } };
-  s.ctx.applyAura(b, {
-    id: ISLE_AURAS.bulwark,
-    name: ISLE_NAMES.bulwark,
-    kind: 'absorb',
-    remaining: T.bulwarkMax + 5,
-    duration: T.bulwarkMax + 5,
-    value: whole,
-    value2: whole,
-    sourceId: b.id,
-    school: 'nature',
-    undispellable: true,
+  if (st.half !== 'wind' || st.isles.stage !== 'idle' || !living(b)) return false;
+  st.half = 'isles';
+  const isl = st.isles;
+  isl.stage = 'nova';
+  isl.elapsed = 0;
+  isl.at = { ...b.pos };
+  b.damageImmune = true;
+  b.hp = Math.min(b.hp, Math.max(1, Math.ceil(b.maxHp * T.at) - 1));
+  // Whatever the Wind half had in flight goes: its bar, the blow, the
+  // circle, the vortex, the roar's throws, the loose gales.
+  if (st.bar) {
+    clearCastIf(b, st.bar.castId);
+    st.bar = null;
+  }
+  clearCastIf(b, ...Object.values(BREATH_CASTS));
+  st.gap = 0;
+  clearWindAuras(s.ctx, s.inst, b.id);
+  clearCalm(s.ctx, s.inst, st);
+  clearGales(s.ctx, s.inst, st);
+  dropBreathObject(s.ctx, s.inst, st.vortex?.objectId ?? null);
+  st.vortex = null;
+  if (st.roar) clearShoves(s, st.roar.slides);
+  st.roar = null;
+  for (const p of corniceListeners(s.ctx, s.inst)) dropAura(p, BREATH_AURAS.blowMark);
+  setWind(s, 'calm', 0, st.wind.bearing);
+  const tier = isleTier(s);
+  putMarker(b, ISLE_AURAS.cocoon, ISLE_NAMES.cocoon, tier.novaSeconds + 30, b.id, {
+    value: 0,
+    value2: 2,
   });
-  startBar(b, ISLE_CASTS.bulwark, T.bulwarkMax, null, true);
   // Held where it stands: a root of its own (its control immunity lets its
   // own aura in), so the chase's stall clock never walks it home.
   s.ctx.applyAura(b, {
     id: ISLE_AURAS.hold,
-    name: ISLE_NAMES.bulwark,
+    name: ISLE_NAMES.cocoon,
     kind: 'root',
-    remaining: T.bulwarkMax + 5,
-    duration: T.bulwarkMax + 5,
+    remaining: tier.novaSeconds + 30,
+    duration: tier.novaSeconds + 30,
     value: 0,
     sourceId: b.id,
     school: 'nature',
     unbreakableControl: true,
     undispellable: true,
   });
+  startBar(b, ISLE_CASTS.nova, tier.novaSeconds, null, true);
   s.ctx.emit({
     type: 'spellfx',
     sourceId: b.id,
     targetId: b.id,
     school: 'nature',
     fx: 'nova',
-    ability: ISLE_CUES.bulwarkUp,
+    ability: ISLE_CUES.cocoonUp,
   });
-  for (const i of isles) wakeIsle(s, i);
+  openPad(s, -1, 0);
+  openPad(s, -1, 3);
   breathSay(s, b, 'guardian', 'isles');
   breathSay(s, thessalyOf(s.ctx, s.inst), 'thessaly', 'isles');
   return true;
 }
 
-/** An isle's adds rise; its Gale Path opens on the Cornice. */
-function wakeIsle(s: BreathScope, i: number): void {
-  const { ctx, inst } = s;
-  const spots = isleSpots()[i];
-  const o = ctx.instanceOriginOf(inst);
-  const difficulty = inst.difficulty ?? 'normal';
-  const hpMult = s.rules.addHealthMult;
-  (['sentinel', 'mender'] as const).forEach((role, k) => {
-    const template = MOBS[ISLE_MOBS[role]];
-    if (!template) return;
-    const at = spots.adds[k];
-    const tuned = mobTemplateForDungeonDifficulty(template, inst.dungeonId, difficulty);
-    const e = createMob(ctx.nextId++, tuned, tuned.maxLevel, ctx.groundPos(o.x + at.x, o.z + at.z));
-    applyDungeonMobTuning(e, inst.dungeonId, difficulty);
-    const hp = Math.round((role === 'sentinel' ? T.sentinelHealth : T.menderHealth) * hpMult);
-    e.maxHp = hp;
-    e.hp = hp;
-    applyDevAddPool(inst, e);
-    e.spawnPos = { ...e.pos };
-    e.prevPos = { ...e.pos };
-    e.facing = Math.atan2(spots.land.x - at.x, spots.land.z - at.z);
-    e.prevFacing = e.facing;
-    e.summonedAdd = true;
-    e.tappedById = s.boss.tappedById;
-    ctx.addEntity(e);
-    inst.mobIds.push(e.id);
-    s.boss.summonedIds.push(e.id);
-    s.st.isles.adds.push({
-      id: e.id,
-      isle: i,
-      role,
-      next: T.mendFirst,
-      at: null,
-      floor: { x: e.pos.x, y: e.pos.y, z: e.pos.z },
-    });
-  });
+/** Thessaly raises the Updraft from `from` (-1 the Cornice) to isle `to`,
+ *  and that isle's adds rise. */
+function openPad(s: BreathScope, from: number, to: number): void {
+  const isl = s.st.isles;
+  if (isl.pads.some((p) => p.to === to)) return;
+  const spots = isleSpots();
+  const at = from < 0 ? cornicePads()[spots[to].side] : spots[from].pad;
+  if (!at) return;
+  const e = spawnBreathObject(
+    s.ctx,
+    s.inst,
+    padTemplate(from, to),
+    ISLE_NAMES.pad,
+    at.x,
+    at.z,
+    T.padR,
+  );
+  isl.pads.push({ from, to, objectId: e.id });
+  const o = s.ctx.instanceOriginOf(s.inst);
   s.ctx.emit({
     type: 'spellfxAt',
-    x: o.x + spots.x,
-    z: o.z + spots.z,
+    x: o.x + at.x,
+    z: o.z + at.z,
     school: 'nature',
     fx: 'burst',
-    radius: spots.r,
+    radius: T.padR,
+    ability: ISLE_CUES.padUp,
+  });
+  wakeIsle(s, to);
+}
+
+/** An isle's adds rise. */
+function wakeIsle(s: BreathScope, i: number): void {
+  const state = s.st.isles.isles[i];
+  if (state.woken) return;
+  state.woken = true;
+  const sp = isleSpots()[i];
+  isleRoles(sp.step).forEach((role, k) => {
+    const at = sp.adds[k % sp.adds.length];
+    raiseIsleAdd(s, i, role, at.x, at.z);
+  });
+  const o = s.ctx.instanceOriginOf(s.inst);
+  s.ctx.emit({
+    type: 'spellfxAt',
+    x: o.x + sp.x,
+    z: o.z + sp.z,
+    school: 'nature',
+    fx: 'burst',
+    radius: sp.r,
     ability: ISLE_CUES.isleWake,
   });
-  const path = spawnBreathObject(
-    ctx,
-    inst,
-    galePathTemplate(i),
-    ISLE_NAMES.path,
-    spots.path.x,
-    spots.path.z,
-    T.circleR,
+}
+
+// ---- the isles' progress ---------------------------------------------------------------------
+
+/** An isle's adds have all fallen: on to the next (or the stone wakes). */
+function stepClears(s: BreathScope): void {
+  const isl = s.st.isles;
+  const spots = isleSpots();
+  for (let i = 0; i < isl.isles.length; i++) {
+    const st = isl.isles[i];
+    if (!st.woken || st.cleared) continue;
+    if (livingIsleAdds(s, i).length > 0) continue;
+    st.cleared = true;
+    if (spots[i].step < 2) openPad(s, i, i + 1);
+    else wakeStone(s, i);
+    if (spots[i].step < 2) {
+      // The isle is done: its storm stands down.
+      endClosing(s, i);
+      breathSay(s, thessalyOf(s.ctx, s.inst), 'thessaly', 'updraft');
+    }
+  }
+}
+
+/** The last isle's Stillstone wakes (Heroic: two Squall Fragments rise to
+ *  guard it). */
+function wakeStone(s: BreathScope, i: number): void {
+  const st = s.st.isles.isles[i];
+  if (st.stoneId !== null) return;
+  const sp = isleSpots()[i];
+  const stone = sp.stone;
+  if (!stone) return;
+  const e = raiseStone(s, stone.x, stone.z);
+  if (e) st.stoneId = e.id;
+  if (s.st.difficulty !== 'normal') {
+    const on = playersOnIsle(s, i);
+    for (const k of [0, 1]) {
+      const at = sp.adds[k];
+      const f = raiseIsleAdd(s, i, 'fragment', at.x, at.z);
+      if (f && on.length > 0) s.ctx.aggroMob(f, on[k % on.length], false);
+    }
+  }
+  breathSay(s, thessalyOf(s.ctx, s.inst), 'thessaly', 'stone');
+}
+
+/** The Stillstone's usable body (the G3 use's body): held by the
+ *  encounter, untouchable, never hostile. */
+function raiseStone(s: BreathScope, x: number, z: number): Entity | null {
+  const template = MOBS[ISLE_MOBS.stillstone];
+  if (!template) return null;
+  const o = s.ctx.instanceOriginOf(s.inst);
+  const e = createMob(
+    s.ctx.nextId++,
+    template,
+    template.maxLevel,
+    s.ctx.groundPos(o.x + x, o.z + z),
   );
-  s.st.isles.paths.push({ isle: i, objectId: path.id });
+  e.spawnPos = { ...e.pos };
+  e.prevPos = { ...e.pos };
+  e.encounterHeld = true;
+  e.damageImmune = true;
+  e.hostile = false;
+  s.ctx.addEntity(e);
+  s.inst.mobIds.push(e.id);
+  s.boss.summonedIds.push(e.id);
+  return e;
 }
 
-/** One tick of the round: the guardian held, the Bulwark regrowing while
- *  any add lives, the Menders' channels, the break and the burst. */
-function stepRound(s: BreathScope): void {
-  const st = s.st;
-  const round = st.isles.round;
-  if (!round) return;
-  const b = s.boss;
-  round.elapsed += DT;
-  const shield = bulwarkOf(b);
-  if (!shield) {
-    // Broken: the raid struck it down.
-    s.ctx.emit({
-      type: 'spellfx',
-      sourceId: b.id,
-      targetId: b.id,
-      school: 'nature',
-      fx: 'nova',
-      ability: ISLE_CUES.bulwarkBreak,
-    });
-    breathSay(s, b, 'guardian', 'bulwark');
-    endRound(s);
-    return;
-  }
-  if (round.elapsed + 1e-9 >= T.bulwarkMax) {
-    burstBulwark(s);
-    return;
-  }
-  // Held where it raised it, channeling, no swing.
-  if (b.pos.x !== round.at.x || b.pos.z !== round.at.z) {
-    b.pos.x = round.at.x;
-    b.pos.y = round.at.y;
-    b.pos.z = round.at.z;
-    s.ctx.rebucket(b);
-  }
-  b.swingTimer = Math.max(b.swingTimer, 0.6);
-  if (b.castingAbility !== ISLE_CASTS.bulwark)
-    startBar(b, ISLE_CASTS.bulwark, T.bulwarkMax, null, true);
-  b.castRemaining = Math.max(0, T.bulwarkMax - round.elapsed);
-  b.castTotal = T.bulwarkMax;
-  const alive = livingAdds(s);
-  if (alive.length > 0)
-    shield.value = Math.min(round.whole, shield.value + round.whole * T.regrowShare * DT);
-  stepMenders(s, shield);
-}
-
-/** The Menders' channels into the Bulwark (a kick cuts one). */
-function stepMenders(s: BreathScope, shield: { value: number }): void {
-  const round = s.st.isles.round;
-  if (!round) return;
-  for (const a of s.st.isles.adds) {
-    if (a.role !== 'mender') continue;
-    const e = s.ctx.entities.get(a.id);
-    if (!living(e)) continue;
-    if (a.at) {
-      const held = s.ctx.isStunned(e) || isSilenced(e);
-      if (e.castingAbility !== ISLE_CASTS.mending || held) {
-        // Cut (a player interrupt, a stun, a silence): it starts over.
-        if (e.castingAbility === ISLE_CASTS.mending) clearCastIf(e, ISLE_CASTS.mending);
-        e.channeling = false;
-        a.at = null;
-        a.next = T.mendEvery;
-        continue;
-      }
-      if (e.pos.x !== a.at.x || e.pos.z !== a.at.z) {
-        e.pos.x = a.at.x;
-        e.pos.y = a.at.y;
-        e.pos.z = a.at.z;
-        s.ctx.rebucket(e);
-      }
-      e.swingTimer = Math.max(e.swingTimer, 0.6);
-      e.castRemaining = Math.max(0, e.castRemaining - DT);
-      if (e.castRemaining > 1e-9) continue;
-      e.castingAbility = null;
-      e.castRemaining = 0;
-      e.castTotal = 0;
-      e.castTargetId = null;
-      e.channeling = false;
-      a.at = null;
-      a.next = T.mendEvery;
-      shield.value = Math.min(round.whole, shield.value + round.whole * T.mendShare);
-      s.ctx.emit({
-        type: 'spellfx',
-        sourceId: e.id,
-        targetId: s.boss.id,
-        school: 'nature',
-        fx: 'beam',
-        ability: ISLE_CUES.mended,
-      });
+/** A stilled stone: its use completed by a player. */
+function stepStones(s: BreathScope): void {
+  const isl = s.st.isles;
+  let stilled = 0;
+  for (let i = 0; i < isl.isles.length; i++) {
+    const st = isl.isles[i];
+    if (st.stilled) {
+      stilled++;
       continue;
     }
-    a.next -= DT;
-    if (a.next > 1e-9 || e.castingAbility !== null) continue;
-    if (s.ctx.isStunned(e) || isSilenced(e)) continue;
-    startBar(e, ISLE_CASTS.mending, T.mendCast, s.boss.id, true);
-    a.at = { ...e.pos };
+    if (st.stoneId === null) continue;
+    const body = s.ctx.entities.get(st.stoneId);
+    if (!body || body.kitUseCompletedBy === undefined) continue;
+    body.kitUseCompletedBy = undefined;
+    st.stilled = true;
+    stilled++;
+    putMarker(body, ISLE_AURAS.cocoon, ISLE_NAMES.still, 3600, s.boss.id, { permanent: true });
+    s.ctx.emit({
+      type: 'spellfx',
+      sourceId: body.id,
+      targetId: s.boss.id,
+      school: 'nature',
+      fx: 'beam',
+      ability: ISLE_CUES.stilled,
+    });
+    endClosing(s, i);
+  }
+  const cocoon = s.boss.auras.find((a) => a.id === ISLE_AURAS.cocoon);
+  if (cocoon) cocoon.value = stilled;
+  if (stilled >= 2) endNova(s, false);
+}
+
+// ---- the Closing Storm and Sky's Reckoning ---------------------------------------------------
+
+/** The isle's storm begins (its first rider landed). */
+function beginClosing(s: BreathScope, i: number): void {
+  const st = s.st.isles.isles[i];
+  if (st.closing !== null || st.cleared || st.stilled || s.st.isles.stage !== 'nova') return;
+  const whole = isleTier(s).closingSeconds;
+  st.closing = whole;
+  st.reckon = 0;
+  const sp = isleSpots()[i];
+  const e = spawnBreathObject(
+    s.ctx,
+    s.inst,
+    closingTemplate(i, whole, whole),
+    ISLE_NAMES.closing,
+    sp.x,
+    sp.z,
+    sp.r,
+  );
+  st.closingId = e.id;
+}
+
+/** The isle is done: its ring goes (its strikes still landing run out). */
+function endClosing(s: BreathScope, i: number): void {
+  const st = s.st.isles.isles[i];
+  dropBreathObject(s.ctx, s.inst, st.closingId);
+  st.closingId = null;
+}
+
+function stepClosing(s: BreathScope): void {
+  const isl = s.st.isles;
+  const tier = isleTier(s);
+  for (let i = 0; i < isl.isles.length; i++) {
+    const st = isl.isles[i];
+    if (st.closing === null || st.closingId === null) continue;
+    const before = Math.ceil(st.closing - 1e-9);
+    st.closing = Math.max(0, st.closing - DT);
+    const obj = s.ctx.entities.get(st.closingId);
+    if (obj && Math.ceil(st.closing - 1e-9) !== before)
+      obj.templateId = closingTemplate(i, st.closing, tier.closingSeconds);
+    if (st.closing > 1e-9) continue;
+    if (st.reckon === 0)
+      s.ctx.emit({
+        type: 'spellfxAt',
+        x: obj?.pos.x ?? 0,
+        z: obj?.pos.z ?? 0,
+        school: 'nature',
+        fx: 'burst',
+        radius: isleSpots()[i].r,
+        ability: ISLE_CUES.reckoning,
+      });
+    st.reckon -= DT;
+    if (st.reckon > 1e-9) continue;
+    st.reckon = tier.reckonEvery;
+    // A strike under every player on the isle (where they stand now).
+    for (const p of playersOnIsle(s, i)) {
+      const at = local(s.ctx, s.inst, p);
+      const e = spawnBreathObject(
+        s.ctx,
+        s.inst,
+        timedTemplate(BREATH_OBJECTS.strikePrefix, T.reckonWarn),
+        ISLE_NAMES.reckoning,
+        at.x,
+        at.z,
+        T.reckonR,
+      );
+      isl.strikes.push({ objectId: e.id, isle: i, x: at.x, z: at.z, remaining: T.reckonWarn });
+    }
   }
 }
 
-/** Held too long: the Bulwark bursts over the Cornice, the round ends. */
-function burstBulwark(s: BreathScope): void {
+function stepStrikes(s: BreathScope): void {
+  const isl = s.st.isles;
+  if (isl.strikes.length === 0) return;
+  const share = isleTier(s).reckonShare;
+  const keep = [];
+  for (const k of isl.strikes) {
+    k.remaining -= DT;
+    if (k.remaining > 1e-9) {
+      keep.push(k);
+      continue;
+    }
+    dropBreathObject(s.ctx, s.inst, k.objectId);
+    for (const p of playersOnIsle(s, k.isle)) {
+      const at = local(s.ctx, s.inst, p);
+      if (Math.hypot(at.x - k.x, at.z - k.z) > T.reckonR) continue;
+      s.ctx.dealDamage(
+        s.boss,
+        p,
+        Math.round(p.maxHp * share),
+        false,
+        'nature',
+        ISLE_NAMES.reckoning,
+        'hit',
+        true,
+      );
+    }
+  }
+  isl.strikes = keep;
+}
+
+// ---- the nova and the way home ---------------------------------------------------------------
+
+/** The nova's end: cut by the stones (`burst` false) or run out. Every
+ *  player on the isles rides home; the storm breaks once they are down. */
+function endNova(s: BreathScope, burst: boolean): void {
+  const isl = s.st.isles;
   const b = s.boss;
-  // The feat asks every Bulwark broken by the raid, never one that bursts by itself.
-  breakFeat(s.st);
+  if (isl.stage !== 'nova') return;
+  isl.stage = 'home';
+  isl.elapsed = 0;
+  isl.burst = burst;
+  clearCastIf(b, ISLE_CASTS.nova);
+  b.channeling = false;
+  dropAura(b, ISLE_AURAS.cocoon);
+  dropAura(b, ISLE_AURAS.hold);
   s.ctx.emit({
     type: 'spellfx',
     sourceId: b.id,
     targetId: b.id,
     school: 'nature',
     fx: 'nova',
-    ability: ISLE_CUES.bulwarkBurst,
+    ability: burst ? ISLE_CUES.novaBurst : ISLE_CUES.cocoonBreak,
   });
-  for (const p of livePlayers(s))
-    s.ctx.dealDamage(
-      b,
-      p,
-      roll(s, T.burstMin, T.burstMax),
-      false,
-      'nature',
-      ISLE_NAMES.burst,
-      'hit',
-      true,
-    );
-  endRound(s);
+  if (burst) {
+    breakFeat(s.st);
+    const share = isleTier(s).novaShare;
+    for (const p of corniceListeners(s.ctx, s.inst)) {
+      if (p.dead || p.ghost) continue;
+      s.ctx.dealDamage(
+        b,
+        p,
+        Math.round(p.maxHp * share),
+        false,
+        'nature',
+        ISLE_NAMES.nova,
+        'hit',
+        true,
+      );
+    }
+  } else breathSay(s, b, 'guardian', 'bulwark');
+  // The adds and the pads go; everyone out on the isles rides home.
+  for (const a of isl.adds) dropEncounterBody(s.ctx, s.inst, b, a.id);
+  isl.adds = [];
+  for (const p of isl.pads) dropBreathObject(s.ctx, s.inst, p.objectId);
+  isl.pads = [];
+  for (let i = 0; i < isl.isles.length; i++) endClosing(s, i);
+  clearShoves(s, isl.shoves);
+  for (const { p, isle } of islePlayers(s.ctx, s.inst)) startRide(s, p, isle, 'home');
 }
 
-/** The round ends: the Bulwark, the guardian's channel, any add still up and
- *  the Gale Paths go. Riders already on an isle find their Homeward Gale. */
-export function endRound(s: Pick<BreathScope, 'ctx' | 'inst' | 'st' | 'boss'>): void {
-  const st = s.st;
-  dropAura(s.boss, ISLE_AURAS.bulwark);
-  dropAura(s.boss, ISLE_AURAS.hold);
-  clearCastIf(s.boss, ISLE_CASTS.bulwark);
-  s.boss.channeling = false;
-  for (const a of st.isles.adds) {
-    const e = s.ctx.entities.get(a.id);
-    if (e) dropEncounterBody(s.ctx, s.inst, s.boss, a.id);
+/** The way home over: the storm breaks (phase 2). */
+function finishIsles(s: BreathScope, startStorm: (s: BreathScope) => boolean): void {
+  const isl = s.st.isles;
+  isl.stage = 'done';
+  s.boss.damageImmune = false;
+  // The dead left out there are laid on the Cornice by their isle.
+  homeTheStranded(s.ctx, s.inst, s.st);
+  for (const k of isl.strikes) dropBreathObject(s.ctx, s.inst, k.objectId);
+  isl.strikes = [];
+  for (const st of isl.isles) {
+    if (st.stoneId !== null) dropEncounterBody(s.ctx, s.inst, s.boss, st.stoneId);
+    st.stoneId = null;
   }
-  st.isles.adds = [];
-  for (const p of st.isles.paths) dropBreathObject(s.ctx, s.inst, p.objectId);
-  st.isles.paths = [];
-  st.isles.round = null;
+  s.st.half = 'wind';
+  startStorm(s);
 }
 
-// ---- the circles and the rides --------------------------------------------------------------
+// ---- the pads and the rides ------------------------------------------------------------------
 
-/** May `p` take a ride now (alive, free, out of its grace, not worn)? */
+/** May `p` take a ride now (alive, free, out of its grace)? */
 function mayRide(st: BreathFightState, p: Entity): boolean {
-  // The Knotted Gale's carrier stays on the Cornice. Thessaly's anchor
-  // never does: it holds a body against the wind, the pull, the blast and
-  // the throws, and the ride is the encounter's own scripted flight (Jose's
-  // playtest of 2026-11-04: anchored, the Gale Path would not take him).
   if (p.dead || p.carriedBy !== undefined || carriesLoad(p)) return false;
   if ((st.isles.grace[p.id] ?? -1) > st.clock) return false;
   return !st.isles.rides.some((r) => r.playerId === p.id);
 }
 
-/** Set `p` riding the gale out to isle `i` or home from it. Exported for
+/** Set `p` riding the gale to isle `i` (out) or home from it. Exported for
  *  the dev trigger and the tests. */
 export function startRide(
   s: Pick<BreathScope, 'ctx' | 'inst' | 'st' | 'boss'>,
@@ -408,7 +550,10 @@ export function startRide(
   const spots = isleSpots()[i];
   const o = s.ctx.instanceOriginOf(s.inst);
   const at = local(s.ctx, s.inst, p);
-  const end = dir === 'out' ? spots.land : spots.back;
+  // Home: fanned round the side's landing so a group never lands in a heap.
+  const fan = (p.id % 5) - 2;
+  const end =
+    dir === 'out' ? spots.land : { x: spots.back.x + fan * 1.2, z: spots.back.z - fan * 0.6 };
   const from = { x: at.x, y: p.pos.y, z: at.z };
   const to = { x: end.x, y: s.ctx.groundPos(o.x + end.x, o.z + end.z).y, z: end.z };
   const obj = spawnBreathObject(
@@ -450,7 +595,7 @@ export function startRide(
     z: p.pos.z,
     school: 'nature',
     fx: 'burst',
-    radius: T.circleR,
+    radius: T.padR,
     ability: ISLE_CUES.rideUp,
   });
   return true;
@@ -466,12 +611,10 @@ function stepRides(s: BreathScope): void {
     const p = s.ctx.entities.get(r.playerId);
     const obj = s.ctx.entities.get(r.objectId);
     if (p?.dead && obj && p.carriedBy === r.objectId) {
-      // Died in the air: the body is set down where the ride was bound.
       landRide(s, p, r, true);
       continue;
     }
     if (!p || !obj || p.carriedBy !== r.objectId) {
-      // Let go some other way (a reset took the carrier, a death).
       if (p) dropAura(p, ISLE_AURAS.riding);
       dropBreathObject(s.ctx, s.inst, r.objectId);
       continue;
@@ -514,103 +657,80 @@ function landRide(s: BreathScope, p: Entity, r: BreathRide, dead = false): void 
     radius: 3,
     ability: ISLE_CUES.rideDown,
   });
-  if (dead) return;
-  if (r.dir === 'out') {
-    // The isle's wardens turn on whoever the wind set down among them.
-    for (const e of livingAdds(s, r.isle)) s.ctx.aggroMob(e, p, false);
-    return;
-  }
-  if (s.rules.windwornSeconds > 0)
-    s.ctx.applyAura(p, {
-      id: ISLE_AURAS.windworn,
-      name: ISLE_NAMES.windworn,
-      kind: 'vulnerability',
-      remaining: s.rules.windwornSeconds,
-      duration: s.rules.windwornSeconds,
-      value: 0,
-      sourceId: s.boss.id,
-      school: 'nature',
-      undispellable: true,
-    });
+  if (dead || r.dir !== 'out') return;
+  beginClosing(s, r.isle);
+  // The isle's adds turn on whoever the wind set down among them.
+  for (const e of livingIsleAdds(s, r.isle)) if (!e.inCombat) s.ctx.aggroMob(e, p, false);
 }
 
-/** The Gale Paths take whoever steps in; the Homeward Gales stand on every
- *  isle that has riders and no living add, and take them home. */
-function stepCircles(s: BreathScope): void {
-  const st = s.st;
+/** The Updrafts take whoever steps in. */
+function stepPads(s: BreathScope): void {
+  const isl = s.st.isles;
+  if (isl.stage !== 'nova') return;
   const spots = isleSpots();
-  // Paths: only while their isle's adds live (the round's).
-  for (const path of [...st.isles.paths]) {
-    if (livingAdds(s, path.isle).length === 0) {
-      dropBreathObject(s.ctx, s.inst, path.objectId);
-      st.isles.paths = st.isles.paths.filter((q) => q !== path);
-      continue;
-    }
-    const c = spots[path.isle].path;
-    for (const p of livePlayers(s)) {
-      if (!mayRide(st, p)) continue;
-      if (p.auras.some((a) => a.id === ISLE_AURAS.windworn)) continue;
+  const pads = cornicePads();
+  for (const pad of isl.pads) {
+    const c = pad.from < 0 ? pads[spots[pad.to].side] : spots[pad.from].pad;
+    if (!c) continue;
+    const who = pad.from < 0 ? s.players : playersOnIsle(s, pad.from);
+    for (const p of who) {
+      if (!mayRide(s.st, p)) continue;
       const at = local(s.ctx, s.inst, p);
-      if (Math.hypot(at.x - c.x, at.z - c.z) > T.circleR) continue;
-      startRide(s, p, path.isle, 'out');
-    }
-  }
-  // Homes: an isle with riders on it and no add left.
-  const onIsles = islePlayers(s.ctx, s.inst);
-  for (let i = 0; i < spots.length; i++) {
-    const riders = onIsles.filter((q) => q.isle === i).map((q) => q.p);
-    const want = riders.length > 0 && livingAdds(s, i).length === 0;
-    const have = st.isles.homes.find((h) => h.isle === i);
-    if (want && !have) {
-      const e = spawnBreathObject(
-        s.ctx,
-        s.inst,
-        homeGaleTemplate(i),
-        ISLE_NAMES.home,
-        spots[i].home.x,
-        spots[i].home.z,
-        T.circleR,
-      );
-      st.isles.homes.push({ isle: i, objectId: e.id });
-    } else if (!want && have) {
-      dropBreathObject(s.ctx, s.inst, have.objectId);
-      st.isles.homes = st.isles.homes.filter((h) => h !== have);
-    }
-    if (!want) continue;
-    const c = spots[i].home;
-    for (const p of riders) {
-      if (!mayRide(st, p)) continue;
-      const at = local(s.ctx, s.inst, p);
-      if (Math.hypot(at.x - c.x, at.z - c.z) > T.circleR) continue;
-      startRide(s, p, i, 'home');
+      if (Math.hypot(at.x - c.x, at.z - c.z) > T.padR) continue;
+      startRide(s, p, pad.to, 'out');
     }
   }
 }
 
 // ---- the tick and the wipe ------------------------------------------------------------------
 
-/** One tick of the isles (rides and homes in any half: a rider in flight or
- *  stranded is always brought back). */
-export function stepIsles(s: BreathScope): void {
+/** One tick of the phase (rides in any half: a rider in flight is always
+ *  brought down). `startStorm` breaks the storm at its end (breath_storm.ts,
+ *  passed in to keep the import one way). */
+export function stepIsles(s: BreathScope, startStorm: (s: BreathScope) => boolean): void {
+  const isl = s.st.isles;
   holdIsleAdds(s.ctx, s.inst, s.st);
-  stepRound(s);
   stepRides(s);
-  stepCircles(s);
+  if (isl.stage === 'nova') {
+    isl.elapsed += DT;
+    const b = s.boss;
+    b.damageImmune = true;
+    // Held where it closed its cocoon, channeling, no swing.
+    if (isl.at && (b.pos.x !== isl.at.x || b.pos.z !== isl.at.z)) {
+      b.pos.x = isl.at.x;
+      b.pos.y = isl.at.y;
+      b.pos.z = isl.at.z;
+      s.ctx.rebucket(b);
+    }
+    b.swingTimer = Math.max(b.swingTimer, 0.6);
+    const whole = isleTier(s).novaSeconds;
+    if (b.castingAbility !== ISLE_CASTS.nova) startBar(b, ISLE_CASTS.nova, whole, null, true);
+    b.castRemaining = Math.max(0, whole - isl.elapsed);
+    b.castTotal = whole;
+    stepIsleAdds(s);
+    stepClears(s);
+    stepStones(s);
+    stepPads(s);
+    stepClosing(s);
+    if (isl.stage === 'nova' && isl.elapsed + 1e-9 >= whole) endNova(s, true);
+  } else if (isl.stage === 'home') {
+    isl.elapsed += DT;
+    s.boss.damageImmune = true;
+    if (isl.elapsed + 1e-9 >= T.homeSeconds && isl.rides.length === 0) finishIsles(s, startStorm);
+  }
+  stepStrikes(s);
 }
 
-/** Every add, circle, ride and the Bulwark go; every body on an isle (alive
- *  or dead) and every rider is set back on the Cornice by its isle's path
- *  (a wipe, a reset, the end). */
-export function clearIsles(
-  ctx: SimContext,
-  inst: InstanceSlot,
-  st: BreathFightState,
-  boss: Entity,
-): void {
-  endRound({ ctx, inst, st, boss });
+/** Every body left on an isle (alive or dead) is set back on the Cornice by
+ *  its side's landing. */
+function homeTheStranded(ctx: SimContext, inst: InstanceSlot, st: BreathFightState): void {
   const o = ctx.instanceOriginOf(inst);
   const spots = isleSpots();
-  const home = (p: Entity, i: number) => {
+  for (const meta of ctx.players.values()) {
+    const p = ctx.entities.get(meta.entityId);
+    if (!p) continue;
+    const i = isleAt(p.pos.x - o.x, p.pos.z - o.z);
+    if (i < 0 || Math.abs(p.pos.y - BREATH_ISLES[i].h) >= 6) continue;
     const back = spots[i].back;
     const at = ctx.groundPos(o.x + back.x, o.z + back.z);
     if (p.carriedBy !== undefined) setDownBody(p, at.y);
@@ -618,29 +738,58 @@ export function clearIsles(
     p.prevPos = { ...at };
     p.onGround = true;
     ctx.rebucket(p);
-  };
-  for (const r of st.isles.rides) {
-    const p = ctx.entities.get(r.playerId);
-    if (p) {
-      dropAura(p, ISLE_AURAS.riding);
-      home(p, r.isle);
-    }
-    dropBreathObject(ctx, inst, r.objectId);
-  }
-  st.isles.rides = [];
-  for (const h of st.isles.homes) dropBreathObject(ctx, inst, h.objectId);
-  st.isles.homes = [];
-  for (const meta of ctx.players.values()) {
-    const p = ctx.entities.get(meta.entityId);
-    if (!p) continue;
-    dropAura(p, ISLE_AURAS.windworn);
-    const i = isleAt(p.pos.x - o.x, p.pos.z - o.z);
-    if (i >= 0 && Math.abs(p.pos.y - BREATH_ISLES[i].h) < 6) home(p, i);
   }
   st.isles.grace = {};
 }
 
-/** The adds of a round (dev readout, tests). */
-export function isleAdds(st: BreathFightState): readonly BreathIsleAdd[] {
+/** Every add, pad, ride, strike and the cocoon go; every body on an isle
+ *  (alive or dead) and every rider is set back on the Cornice (a wipe, a
+ *  reset, the end). */
+export function clearIsles(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  st: BreathFightState,
+  boss: Entity,
+): void {
+  const isl = st.isles;
+  dropAura(boss, ISLE_AURAS.cocoon);
+  dropAura(boss, ISLE_AURAS.hold);
+  clearCastIf(boss, ISLE_CASTS.nova);
+  if (isl.stage === 'nova' || isl.stage === 'home') boss.damageImmune = false;
+  for (const a of isl.adds) dropEncounterBody(ctx, inst, boss, a.id);
+  isl.adds = [];
+  for (const p of isl.pads) dropBreathObject(ctx, inst, p.objectId);
+  isl.pads = [];
+  for (const k of isl.strikes) dropBreathObject(ctx, inst, k.objectId);
+  isl.strikes = [];
+  for (const s of isl.isles) {
+    dropBreathObject(ctx, inst, s.closingId);
+    s.closingId = null;
+    if (s.stoneId !== null) dropEncounterBody(ctx, inst, boss, s.stoneId);
+    s.stoneId = null;
+  }
+  clearShoves({ ctx }, isl.shoves);
+  const o = ctx.instanceOriginOf(inst);
+  for (const r of isl.rides) {
+    const p = ctx.entities.get(r.playerId);
+    if (p) {
+      // A rider in the air is set down on the Cornice by its side's landing.
+      dropAura(p, ISLE_AURAS.riding);
+      const back = isleSpots()[r.isle].back;
+      const at = ctx.groundPos(o.x + back.x, o.z + back.z);
+      if (p.carriedBy !== undefined) setDownBody(p, at.y);
+      p.pos = at;
+      p.prevPos = { ...at };
+      p.onGround = true;
+      ctx.rebucket(p);
+    }
+    dropBreathObject(ctx, inst, r.objectId);
+  }
+  isl.rides = [];
+  homeTheStranded(ctx, inst, st);
+}
+
+/** The adds of the phase (dev readout, tests). */
+export function isleAdds(st: BreathFightState) {
   return st.isles.adds;
 }

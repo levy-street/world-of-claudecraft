@@ -249,8 +249,8 @@ describe('smith_heart_breath_audio_core', () => {
       BREATH_CUES.roarHit,
       ISLE_CUES.rideUp,
       ISLE_CUES.rideDown,
-      ISLE_CUES.bulwarkUp,
-      ISLE_CUES.bulwarkBreak,
+      ISLE_CUES.cocoonUp,
+      ISLE_CUES.cocoonBreak,
     ])
       expect(BREATH_CUE_SOUNDS[cue][0].key, cue).toMatch(
         /heart_breath_(knot|portal|roar|ride|bulwark)_/,

@@ -49,6 +49,14 @@ function rows(
 export const SMITH_HEART_VOICE_PENDING: ReadonlySet<string> = new Set([
   // The Breath's entrance line (the owner's run of 2026-11-17).
   'breath.intro',
+  // The Islands of the Wind's 50 percent phase (2026-11-18): new and reworded
+  // lines, unvoiced until the owner's next voice pass (no ElevenLabs render
+  // was made for them).
+  'breath.isles',
+  'breath.bulwark',
+  'thessaly.isles',
+  'thessaly.updraft',
+  'thessaly.stone',
 ]);
 
 export const SMITH_HEART_VOICE_LINES: readonly SmithHeartVoiceLine[] = [

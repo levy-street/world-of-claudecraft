@@ -24845,9 +24845,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Разорван и обращён в тело из молний: штормовая половина боя, пока Страж Дыхания не падёт.',
   'hudChrome.auraEffect.breathGuardian.swell':
     'Каждые {every} сек. разрастающаяся буря наносит от {min} до {max} урона всем на Карнизе, на {growth}% больше за каждый предыдущий импульс: уже {stacks}. Героический и мифический режимы: от {heroicMin} до {heroicMax} урона, на {heroicGrowth}% больше за каждый предыдущий импульс.',
-  'hudChrome.auraEffect.breathGuardian.bulwark': 'Щит ветра поглотит ещё {left} урона. Пока жив хоть один Часовой шквала или Целитель шквала на парящих островах, он восстанавливает {regrow}% своей прочности в секунду, а каждый Целящий шквал возвращает {mend}%. Летите по Пути шквала на острова и сразите их. Если щит продержится {max} сек., он взорвётся над Карнизом, нанеся от {bmin} до {bmax} урона. Героический и мифический режимы: от {heroicMin} до {heroicMax} урона.',
   'hudChrome.auraEffect.breathGuardian.riding': 'Ветер несёт вас над пустотой по заданному пути: вы не можете действовать, пока он вас не опустит.',
-  'hudChrome.auraEffect.breathGuardian.windworn': 'Измотан ветром: пока эффект не закончится, Путь шквала не перенесёт вас на острова.',
   'hudChrome.auraEffect.breathGuardian.thrown':
     'Отброшен Рёвом вершины: вы не можете двигаться, пока не приземлитесь.',
   'hudChrome.auraEffect.breathGuardian.tossed':
@@ -26282,7 +26280,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_final_gale_pounce': 'Прыжок шквала',
   'abilityUi.cast.heart_final_rime_toll': 'Звон инея',
   'abilityUi.cast.heart_breath_cradle_channel': 'Колыбель грома',
-  'abilityUi.cast.heart_breath_gale_bulwark': 'Бастион бури',
   'abilityUi.cast.heart_breath_mending_gale': 'Целящий шквал',
   'entities.mobs.heart_final_splinter_heat.name': 'Осколок Жара',
   'entities.mobs.heart_final_splinter_quench.name': 'Осколок Закалки',
@@ -26515,6 +26512,18 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
 
   'entities.mobs.heart_gale_sentinel.name': 'Часовой шквала',
   'entities.mobs.heart_gale_mender.name': 'Целитель шквала',
+  'hudChrome.auraEffect.breathGuardian.cocoon': "Страж неуязвим, пока поддерживает Небесный разрыв. Если заклинание завершится, разрыв нанесёт всем урон в размере {share}% от максимального запаса здоровья (героический и эпохальный режимы: смертельно). Летите восходящими потоками капитана Тессали на парящие острова на востоке и западе и поддерживайте оба Камня затишья, чтобы прервать его: усмирено {stilled} из 2.",
+  'hudChrome.auraEffect.breathGuardian.ward': "Отводит {cut}% урона от атак, нанесённых в пределах {arc} градусов перед ним. Бейте в спину, пока его цель отворачивает его. Героический и эпохальный режимы: {heroicCut}%.",
+  'hudChrome.breathGuardian.say.thessaly_updraft': "Остров чист! Следующий восходящий поток готов, вперёд!",
+  'hudChrome.breathGuardian.say.thessaly_stone': "Камень проснулся! Направьте на него силу, и пусть ничто вас не ударит!",
+  'abilityUi.cast.heart_breath_skyrend_nova': "Небесный разрыв",
+  'abilityUi.cast.heart_breath_shoving_gale': "Толкающий шквал",
+  'abilityUi.cast.kituse_heart_still_the_gale': "Усмирить шквал",
+  'entities.mobs.heart_gust_herald.name': "Вестник порывов",
+  'entities.mobs.heart_riven_squall.name': "Расколотый шквал",
+  'entities.mobs.heart_squall_fragment.name': "Осколок шквала",
+  'entities.mobs.heart_squall_shieldbearer.name': "Щитоносец шквала",
+  'entities.mobs.heart_breath_stillstone.name': "Камень затишья",
   'hudChrome.knotAlert.aTitle': 'Вы Портал A!',
   'hudChrome.knotAlert.bTitle': 'Вы Портал B!',
   'hudChrome.knotAlert.cTitle': 'Вы Портал C!',

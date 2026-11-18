@@ -252,7 +252,7 @@ function breathClips(storm: boolean): ClipMap {
       [BREATH_CASTS.gust]: 'Roar',
       [BREATH_CASTS.storm]: 'StormBreaks',
       [BREATH_CASTS.cradleHold]: channel,
-      [ISLE_CASTS.bulwark]: channel,
+      [ISLE_CASTS.nova]: channel,
       ...Object.fromEntries(BREATH_BOLT_CASTS.map((c) => [c, cast])),
     },
     castTimeScaleByAbility: {

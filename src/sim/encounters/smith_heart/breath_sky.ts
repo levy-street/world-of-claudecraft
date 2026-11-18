@@ -45,7 +45,7 @@ export function startSkyVolley(s: BreathScope): number {
 /** One tick of the sky's clock: a volley when it runs out, in either half. */
 export function stepSky(s: BreathScope): void {
   const st = s.st;
-  if (st.half === 'break' || st.barrage) return;
+  if (st.half === 'isles' || st.half === 'break' || st.barrage) return;
   st.skyTimer -= DT;
   if (st.skyTimer > 1e-9) return;
   startSkyVolley(s);

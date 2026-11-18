@@ -22657,12 +22657,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '찢어져 번개의 몸이 되었습니다: 숨결의 수호자가 쓰러질 때까지 이어지는 전투의 폭풍 후반부.',
   'hudChrome.auraEffect.breathGuardian.swell':
     '{every}초마다 부풀어 오르는 폭풍이 벼랑 위의 모두에게 {min}~{max}의 피해를 주며, 앞선 맥동마다 {growth}%씩 강해집니다: 지금까지 {stacks}번. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해, 앞선 맥동마다 {heroicGrowth}%씩 강해집니다.',
-  'hudChrome.auraEffect.breathGuardian.bulwark':
-    '바람의 방패가 피해를 {left} 더 흡수합니다. 떠 있는 섬의 질풍 파수병이나 질풍 치유사가 하나라도 살아 있으면 매초 전체의 {regrow}%가 다시 차오르고, 치유의 질풍마다 {mend}%가 회복됩니다. 질풍의 길을 타고 섬으로 건너가 그들을 쓰러뜨리세요. {max}초 동안 유지되면 벼랑 위에서 터져 {bmin}~{bmax}의 피해를 줍니다. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.',
   'hudChrome.auraEffect.breathGuardian.riding':
     '바람이 정해진 길을 따라 공허 위로 당신을 실어 갑니다: 내려놓을 때까지 행동할 수 없습니다.',
-  'hudChrome.auraEffect.breathGuardian.windworn':
-    '바람에 지쳤습니다: 이 효과가 끝날 때까지 질풍의 길이 당신을 섬으로 데려가지 않습니다.',
   'hudChrome.auraEffect.breathGuardian.thrown':
     '정상의 포효에 날아갔습니다: 착지할 때까지 움직일 수 없습니다.',
   'hudChrome.auraEffect.breathGuardian.tossed':
@@ -25843,7 +25839,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_final_gale_pounce': '돌풍 덮치기',
   'abilityUi.cast.heart_final_rime_toll': '서리 종소리',
   'abilityUi.cast.heart_breath_cradle_channel': '천둥의 요람',
-  'abilityUi.cast.heart_breath_gale_bulwark': '질풍의 방벽',
   'abilityUi.cast.heart_breath_mending_gale': '치유의 질풍',
   'entities.mobs.heart_final_splinter_heat.name': '열기의 파편',
   'entities.mobs.heart_final_splinter_quench.name': '담금질의 파편',
@@ -26087,6 +26082,18 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'seasonal.pumpkins.progress': '{label}: {current}/{total}',
   'entities.mobs.heart_gale_sentinel.name': '질풍 파수병',
   'entities.mobs.heart_gale_mender.name': '질풍 치유사',
+  'hudChrome.auraEffect.breathGuardian.cocoon': "수호자는 하늘가름 회오리를 정신 집중하는 동안 피해를 입지 않습니다. 정신 집중이 끝나면 회오리가 모두에게 최대 생명력의 {share}%에 해당하는 피해를 줍니다(영웅 및 신화: 치명적). 테살리 대장의 상승 기류를 타고 동쪽과 서쪽의 떠 있는 섬으로 건너가 고요석 두 개를 정신 집중해 끊으십시오: {stilled}/2 잠재움.",
+  'hudChrome.auraEffect.breathGuardian.ward': "정면 {arc}도 안에서 들어오는 공격의 피해를 {cut}% 흘려냅니다. 대상이 이것을 돌려세운 동안 등을 공격하십시오. 영웅 및 신화: {heroicCut}%.",
+  'hudChrome.breathGuardian.say.thessaly_updraft': "섬 정리 완료! 다음 상승 기류가 떴다, 가라!",
+  'hudChrome.breathGuardian.say.thessaly_stone': "돌이 깨어났다! 정신 집중해, 아무것에도 맞지 마!",
+  'abilityUi.cast.heart_breath_skyrend_nova': "하늘가름 회오리",
+  'abilityUi.cast.heart_breath_shoving_gale': "밀쳐내는 돌풍",
+  'abilityUi.cast.kituse_heart_still_the_gale': "돌풍 잠재우기",
+  'entities.mobs.heart_gust_herald.name': "돌풍 전령",
+  'entities.mobs.heart_riven_squall.name': "갈라진 스콜",
+  'entities.mobs.heart_squall_fragment.name': "스콜 파편",
+  'entities.mobs.heart_squall_shieldbearer.name': "스콜 방패병",
+  'entities.mobs.heart_breath_stillstone.name': "고요석",
   'hudChrome.knotAlert.aTitle': '당신은 포털 A!',
   'hudChrome.knotAlert.bTitle': '당신은 포털 B!',
   'hudChrome.knotAlert.cTitle': '당신은 포털 C!',

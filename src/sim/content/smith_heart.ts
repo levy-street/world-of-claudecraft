@@ -20,7 +20,7 @@ import {
   BREATH_TUNING,
   breathWindTemplate,
 } from '../encounters/smith_heart/breath_ids';
-import { ISLE_MOBS } from '../encounters/smith_heart/breath_isle_ids';
+import { ISLE_CASTS, ISLE_MOBS } from '../encounters/smith_heart/breath_isle_ids';
 import { COUNCIL_TUNING } from '../encounters/smith_heart/council_ids';
 import {
   FINAL_ADD_MOBS,
@@ -284,9 +284,10 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
     'nature',
     0x5ab8e8,
   ),
-  // The Islands of the Wind's adds (encounters/smith_heart/breath_isles.ts):
-  // a warden and a caster on each woken isle; their health is set as they
-  // rise (ISLE_TUNING), the Mender's Mending Gale is encounter-driven.
+  // The Islands of the Wind's adds (encounters/smith_heart/breath_isles.ts,
+  // breath_isle_adds.ts; the 50 percent phase): their health is set as they
+  // rise (ISLE_TIERS), every bar of theirs is encounter-driven. The first
+  // isle: a warden and a mender (Mending Gale, kickable).
   [ISLE_MOBS.sentinel]: {
     ...warder(ISLE_MOBS.sentinel, 'Gale Sentinel', 'Gale Sweep', 0x4f9fc8, 1.9),
     aggroRadius: 10,
@@ -297,6 +298,73 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 10,
     xpMult: 0,
     scale: 1.6,
+  },
+  // The second isle: the Gust Herald (Shoving Gale, a line of wind that
+  // throws toward the rim) and the Riven Squall (it splits in two as it falls).
+  [ISLE_MOBS.herald]: {
+    ...caster(ISLE_MOBS.herald, 'Gust Herald', C.galeBolt, 'Gale Bolt', 'nature', 0x7fc8f0),
+    aggroRadius: 10,
+    xpMult: 0,
+    scale: 1.75,
+  },
+  [ISLE_MOBS.squall]: {
+    ...warder(ISLE_MOBS.squall, 'Riven Squall', 'Squall Rake', 0x6ab0d8, 1.75),
+    aggroRadius: 10,
+    xpMult: 0,
+  },
+  [ISLE_MOBS.fragment]: {
+    ...warder(ISLE_MOBS.fragment, 'Squall Fragment', 'Squall Rake', 0x8cc8e8, 1.15),
+    aggroRadius: 14,
+    xpMult: 0,
+    moveSpeed: 8,
+    arcCleave: undefined,
+  },
+  // The third isle: the Squall Shieldbearer, its Squall Ward turning aside
+  // every blow from the front (the encounter lays it: combat/front_ward.ts).
+  [ISLE_MOBS.shieldbearer]: {
+    ...warder(ISLE_MOBS.shieldbearer, 'Squall Shieldbearer', 'Shield Sweep', 0x3f86b8, 2.2),
+    aggroRadius: 10,
+    xpMult: 0,
+    moveSpeed: 6,
+  },
+  // The Stillstone (the last isle of each side): the stone Captain Thessaly's
+  // calm is bound into. Never hostile, never fights (the encounter holds it
+  // and nothing can strike it); a player targets it and presses interact to
+  // still the gale through it, the G3 use (mob/trash_kit/encounter_use.ts): a
+  // 5 s channel a landed hit breaks. Its literals are breath_isle_ids.ts
+  // ISLE_MOBS.stillstone and ISLE_CASTS.still. The crystal is drawn by the
+  // fight's own painter (render/smith_heart_fx/breath_isles_fx.ts).
+  [ISLE_MOBS.stillstone]: {
+    id: ISLE_MOBS.stillstone,
+    name: 'Stillstone',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'elemental',
+    untameable: true,
+    ccImmune: true,
+    slowImmune: true,
+    hpBase: 50,
+    hpPerLevel: 0,
+    dmgBase: 1,
+    dmgPerLevel: 0,
+    attackSpeed: 30,
+    armorPerLevel: 0,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    idleStationary: true,
+    xpMult: 0,
+    trashKit: {
+      usable: {
+        castId: ISLE_CASTS.still,
+        name: 'Still the Gale',
+        channel: 5,
+        range: 5,
+        effect: { kind: 'relight', school: 'nature' },
+      },
+    },
+    loot: [],
+    scale: 1,
+    color: 0xbfefff,
   },
   heart_quench_warder: warder(
     'heart_quench_warder',
@@ -840,6 +908,8 @@ export const SMITH_HEART_SEAL_MARKERS: readonly { x: number; z: number }[] = [
   { x: -40, z: 110 },
   { x: -100, z: 165 },
   { x: 0, z: 196 },
+  // The Islands of the Wind's east chain, out over the southern void.
+  { x: 32, z: 112 },
   // The Quench, the Singing Ice, the Basin.
   { x: 116, z: -26 },
   { x: 166, z: -76 },

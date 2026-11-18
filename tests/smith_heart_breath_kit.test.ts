@@ -374,7 +374,7 @@ describe('Smith Heart Breath kit: the Islands of the Wind', () => {
     "lays each isle's turf walk exactly on the sim's floors, nothing standing on it",
     () => {
       BREATH_ISLES.forEach((_, i) => {
-        const v = 'AB'[i];
+        const v = ISLE_KIT[i].piece.slice('Kit_WindIsle'.length);
         const s = shape(`Kit_WindIsle${v}`);
         const floors = isleFloors(i);
         const walk = floors[0].poly;

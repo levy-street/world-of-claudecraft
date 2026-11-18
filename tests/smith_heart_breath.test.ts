@@ -478,14 +478,19 @@ describe('Guardian of the Breath: the indrawn breath and Bellows Gust', () => {
   });
 });
 
-describe('Guardian of the Breath: the storm breaks at half health', () => {
+describe('Guardian of the Breath: the storm breaks after the isles', () => {
   it('draws the wind in, freezes on its bar, tears open, and strikes fall on telegraphed spots', () => {
     const f = pulled(4);
     const boss = f.boss();
     f.dev('/dev heart breath blow 90');
     f.tick(10);
     boss.hp = Math.floor(boss.maxHp * 0.49);
-    const ev = until(f, () => boss.castingAbility === BREATH_CASTS.storm, 3);
+    // At half health the Islands of the Wind come first (breath_isles.ts);
+    // both stones stilled, the raid home, then the storm breaks.
+    until(f, () => f.state()?.isles.stage === 'nova', 3);
+    expect(f.state()?.half).toBe('isles');
+    f.dev('/dev heart breath still');
+    const ev = until(f, () => boss.castingAbility === BREATH_CASTS.storm, 8);
     expect(f.state()?.half).toBe('break');
     expect(f.wind()?.phase).toBe('break');
     f.tick(1);

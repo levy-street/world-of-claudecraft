@@ -31,7 +31,7 @@ import {
   ISLE_AURAS,
   ISLE_CUES,
   ISLE_MOBS,
-  isleCircleOf,
+  padOf,
 } from '../../sim/encounters/smith_heart/breath_isle_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
@@ -54,6 +54,7 @@ import {
   driftStone,
   ISLE_KIT,
   ISLE_LIFE,
+  ISLE_PADS,
   ISLE_SHARD,
   type IsleMote,
   isleBob,
@@ -63,6 +64,7 @@ import {
   isleObjectKind,
   isleRuneRing,
   ISLE_POOLS as P,
+  padSpot,
   ISLE_RGB as RGB,
   RIDE,
 } from './breath_isles_fx_core';
@@ -91,8 +93,8 @@ export interface BreathIslesHost {
 }
 
 interface CircleSlot {
-  isle: number;
-  kind: 'path' | 'home';
+  from: number;
+  to: number;
   group: THREE.Group;
   disc: THREE.ShaderMaterial;
   column: THREE.ShaderMaterial;
@@ -225,12 +227,14 @@ export class BreathIslesFx {
     colGeo.translate(0, 0.5, 0);
     h.geometries.push(discGeo, colGeo);
     const spots = isleSpots();
-    BREATH_ISLES.forEach((isle, i) => {
-      for (const kind of ['path', 'home'] as const) {
-        const color = kind === 'path' ? C.path : C.home;
-        const core = kind === 'path' ? C.pathCore : C.homeCore;
-        const at = kind === 'path' ? spots[i].path : spots[i].home;
-        const y = (kind === 'path' ? CORNICE_FLOOR_H : isle.h) + 0.08;
+    void spots;
+    for (const pad of ISLE_PADS) {
+      {
+        const color = C.path;
+        const core = C.pathCore;
+        const spot = padSpot(pad.from, pad.to, CORNICE_FLOOR_H);
+        const at = { x: spot.x, z: spot.z };
+        const y = spot.y + 0.08;
         const group = new THREE.Group();
         group.visible = false;
         const disc = new THREE.ShaderMaterial({
@@ -277,7 +281,7 @@ export class BreathIslesFx {
         colMesh.position.set(at.x, y, at.z);
         group.add(colMesh);
         // The route: two crossed ribbons along the ride's own arc.
-        const pts = circleRoute(i, kind, 48, { cornice: CORNICE_FLOOR_H + 1.1 });
+        const pts = circleRoute(pad.from, pad.to, 48, { cornice: CORNICE_FLOOR_H + 1.1 });
         const route = new THREE.ShaderMaterial({
           name: 'smithHeartBreathGaleRoute',
           uniforms: {
@@ -305,9 +309,18 @@ export class BreathIslesFx {
         }
         h.materials.push(disc, column, route);
         h.local.add(group);
-        this.circles.push({ isle: i, kind, group, disc, column, route, id: -1, born: 0 });
+        this.circles.push({
+          from: pad.from,
+          to: pad.to,
+          group,
+          disc,
+          column,
+          route,
+          id: -1,
+          born: 0,
+        });
       }
-    });
+    }
 
     // ---- the Bulwark and the Menders' beams, the ride (every tier) ----
     this.bulwark = new BreathBulwarkFx(h);
@@ -382,9 +395,10 @@ export class BreathIslesFx {
     let whole = 0;
     if (!e.dead)
       for (const a of e.auras)
-        if (a.id === ISLE_AURAS.bulwark) {
-          left = a.value;
-          whole = a.value2 ?? a.value;
+        if (a.id === ISLE_AURAS.cocoon) {
+          // The cocoon stands whole until both stones are stilled.
+          whole = 2;
+          left = Math.max(0.4, 2 - (a.value ?? 0));
         }
     this.bulwarkLeft = left;
     this.bulwarkWhole = whole;
@@ -392,7 +406,16 @@ export class BreathIslesFx {
 
   /** A mob of the claim: the isles' adds (true). */
   takeMob(e: Entity): boolean {
-    if (e.templateId !== ISLE_MOBS.mender && e.templateId !== ISLE_MOBS.sentinel) return false;
+    const t = e.templateId;
+    if (
+      t !== ISLE_MOBS.mender &&
+      t !== ISLE_MOBS.sentinel &&
+      t !== ISLE_MOBS.herald &&
+      t !== ISLE_MOBS.squall &&
+      t !== ISLE_MOBS.fragment &&
+      t !== ISLE_MOBS.shieldbearer
+    )
+      return false;
     if (e.dead) return true;
     this.isleMobs.push(e.id);
     if (e.templateId === ISLE_MOBS.mender) this.menders.push(e.id);
@@ -401,7 +424,7 @@ export class BreathIslesFx {
 
   /** A player's aura: the ride's (true). */
   takeAura(e: Entity, id: string): boolean {
-    if (id !== ISLE_AURAS.riding) return id === ISLE_AURAS.windworn;
+    if (id !== ISLE_AURAS.riding) return false;
     this.seenRiders.push(e.id);
     return true;
   }
@@ -412,8 +435,8 @@ export class BreathIslesFx {
       let found = -1;
       for (const id of this.seenCircles) {
         const e = world.entities.get(id);
-        const k = e ? isleCircleOf(e.templateId) : null;
-        if (k && k.isle === c.isle && k.kind === c.kind) found = id;
+        const k = e ? padOf(e.templateId) : null;
+        if (k && k.from === c.from && k.to === c.to) found = id;
       }
       if (found !== c.id) {
         c.id = found;
@@ -437,7 +460,7 @@ export class BreathIslesFx {
         this.held[i] = 1;
       }
     }
-    for (const c of this.circles) if (c.id >= 0) this.held[c.isle] = 1;
+    for (const c of this.circles) if (c.id >= 0) this.held[c.to] = 1;
     if (this.seenRiders.length > 0) this.held.fill(1);
   }
 
@@ -508,11 +531,10 @@ export class BreathIslesFx {
       c.route.uniforms.uGlow.value = 0.85 * look.open * look.glow;
       // A few motes drawn up the column (cosmetic).
       if (this.rand() < dt * 10 * this.h.density) {
-        const spots = isleSpots()[c.isle];
-        const at = c.kind === 'path' ? spots.path : spots.home;
+        const at = padSpot(c.from, c.to, CORNICE_FLOOR_H);
         const o = this.h.local.position;
         const a = this.rand() * Math.PI * 2;
-        const y = o.y + (c.kind === 'path' ? CORNICE_FLOOR_H : BREATH_ISLES[c.isle].h);
+        const y = o.y + at.y;
         this.h.particles.puff(
           o.x + at.x + Math.sin(a) * 2,
           y + 0.2,
@@ -523,7 +545,7 @@ export class BreathIslesFx {
             up: 6,
             life: 1.2,
             size: [0.25, 0.08],
-            color: c.kind === 'path' ? RGB.pathCore : RGB.homeCore,
+            color: RGB.pathCore,
             alpha: 0.85,
             pool: 'glow',
           },
@@ -613,7 +635,7 @@ export class BreathIslesFx {
     }
     if (ev.type !== 'spellfx') return false;
     const src = world.entities.get(ev.sourceId);
-    if (ev.ability === ISLE_CUES.bulwarkUp && src) {
+    if (ev.ability === ISLE_CUES.cocoonUp && src) {
       const a = src.pos;
       this.bulwark.flashShell(1.2);
       this.h.particles.shockRing(a.x, a.z, C.bulwark, 16, 0.9);
@@ -621,9 +643,9 @@ export class BreathIslesFx {
       this.h.shakeNear(a.x, a.z, 0.3, 40);
       return true;
     }
-    if ((ev.ability === ISLE_CUES.bulwarkBreak || ev.ability === ISLE_CUES.bulwarkBurst) && src) {
+    if ((ev.ability === ISLE_CUES.cocoonBreak || ev.ability === ISLE_CUES.novaBurst) && src) {
       const a = src.pos;
-      const burst = ev.ability === ISLE_CUES.bulwarkBurst;
+      const burst = ev.ability === ISLE_CUES.novaBurst;
       this.h.particles.shockRing(
         a.x,
         a.z,

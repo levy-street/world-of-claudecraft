@@ -4781,9 +4781,9 @@ export const ja_JP: EnTranslations = {
         "spent": "錨の効果が切れた：これが消えるまで、テサリー隊長の凪の円はあなたを再び支えられない。",
         "drawn": "{every}秒ごとに足元へ雷が落ちる：{warn}秒後、{radius}ヤード以内の全員に{min}から{max}のダメージを与え、{charged}秒間毎秒{cmin}から{cmax}のダメージを与える帯電した地面を残す。動き続け、落雷を味方から離れた縁へ導こう。ヒロイック・ミシック：それぞれ{heroicMin}から{heroicMax}、{heroicCMin}から{heroicCMax}のダメージ。",
         "cradled": "嵐の中へ持ち上げられ、守護者がゆりかごを維持する{hold}秒間拘束される。その間、守護者は他に何も唱えない。その後の放電は{total}のダメージで、あなたと真下{radius}ヤード以内の全員で分け合う。分け合う人数が{soakers}人未満だと各自が{penalty}%多く受け、岩棚の全員が{bmin}から{bmax}を受ける。ヒロイック：{heroicCount}人が同時に持ち上げられ、各放電は{heroicTotal}で{heroicSoakers}人を必要とする。レイドは分かれて受け止めよう。ヒロイック・ミシック：反動のダメージは{heroicBMin}から{heroicBMax}。",
-        "bulwark": "風の盾があと{left}のダメージを吸収する。浮島の疾風の哨兵か疾風の癒し手が一体でも生きている間、毎秒その全体の{regrow}%が回復し、癒しの疾風のたびに{mend}%回復する。疾風の道に乗って浮島へ渡り、彼らを倒せ。{max}秒保たれると、岩棚の上で炸裂し{bmin}から{bmax}のダメージを与える。ヒロイック・ミシック：{heroicMin}から{heroicMax}のダメージ。",
+        "cocoon": "ガーディアンはスカイレンド・ノヴァを詠唱している間、ダメージを受けない。詠唱が終わると、ノヴァが全員に最大HPの{share}%のダメージを与える（ヒロイックとミシック：致死）。テッサリー隊長の上昇気流に乗って東と西の浮遊島へ渡り、2つの静風石を詠唱して止めること：{stilled}/2 鎮静済み。",
         "riding": "風が決まった道筋で虚空の上をあなたを運んでいる：降ろされるまで行動できない。",
-        "windworn": "風に疲れ果てた：これが切れるまで、疾風の道はあなたを浮島へ運ばない。",
+        "ward": "正面{arc}度以内からの攻撃のダメージを{cut}%そらす。ターゲットがこれを向こうに向けている間に背後を攻撃すること。ヒロイックとミシック：{heroicCut}%。",
         "thrown": "頂の咆哮に吹き飛ばされた：着地するまで動けない。",
         "blast": "サミットロアの突風があなたをガーディアンから吹き飛ばす：口元では毎秒{speed}ヤード、離れるほど弱まり、合計{seconds}秒続く。すぐに風に逆らってまっすぐ戻るか、セサリーの錨に立つこと。さもなければコーニスから吹き落とされる。",
         "tossed": "吹きすさぶ旋風に吹き飛ばされた：突風が収まるまで動けない。",
@@ -7392,6 +7392,8 @@ export const ja_JP: EnTranslations = {
         "guardian_death": "息吹は……山へ……還る……",
         "thessaly_pull": "ハイウォッチはお前たちと共にある！ ここには壁がない、風に縁から放り出されるぞ！",
         "thessaly_isles": "あの盾は浮島から力を得ている！ 風に乗って渡り、癒し手を倒して戻ってこい！",
+        "thessaly_updraft": "島は片付いた！次の上昇気流が出たぞ、行け！",
+        "thessaly_stone": "石が目覚めた！詠唱しろ、何にも当たるな！",
         "thessaly_circle_a": "急げ、私の凪の中へ！入れるのは三人までだ！",
         "thessaly_circle_b": "ここだ！私と並べ、風をこの身で受け止める！",
         "thessaly_circle_c": "石の上に凪を！三人、今すぐ！",
@@ -16943,8 +16945,10 @@ export const ja_JP: EnTranslations = {
       "heart_breath_cradle_channel": "雷のゆりかご",
       "heart_breath_bellows_blow": "ふいごの一撃",
       "heart_breath_thunder_lash": "雷の鞭",
-      "heart_breath_gale_bulwark": "疾風の防壁",
+      "heart_breath_skyrend_nova": "スカイレンド・ノヴァ",
       "heart_breath_mending_gale": "癒しの疾風",
+      "heart_breath_shoving_gale": "突き飛ばす疾風",
+      "kituse_heart_still_the_gale": "疾風を鎮める",
       "heart_quench_blades_wake": "剣の目覚め",
       "heart_quench_blades_hunt": "剣の狩り",
       "heart_heat_fist": "玄武岩の拳",
@@ -26907,6 +26911,21 @@ export const ja_JP: EnTranslations = {
       },
       "heart_gale_mender": {
         "name": "疾風の癒し手"
+      },
+      "heart_gust_herald": {
+        "name": "突風の先触れ"
+      },
+      "heart_riven_squall": {
+        "name": "裂けたスコール"
+      },
+      "heart_squall_fragment": {
+        "name": "スコールの欠片"
+      },
+      "heart_squall_shieldbearer": {
+        "name": "スコールの盾持ち"
+      },
+      "heart_breath_stillstone": {
+        "name": "静風石"
       },
       "heart_quench_warder": {
         "name": "焼き入れ脈の番人"

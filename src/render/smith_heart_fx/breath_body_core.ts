@@ -126,8 +126,8 @@ export const BREATH_SYNCED_CASTS: Readonly<Record<string, number>> = {
 };
 
 /** The held channels (both arms raised, looping): the Thunder's Cradle's
- *  hold and the Gale Bulwark. */
-export const BREATH_CHANNELS: readonly string[] = [BREATH_CASTS.cradleHold, ISLE_CASTS.bulwark];
+ *  hold and Skyrend Nova inside the Gale Cocoon. */
+export const BREATH_CHANNELS: readonly string[] = [BREATH_CASTS.cradleHold, ISLE_CASTS.nova];
 
 // ---- the sockets: points on the model at rest, carried by their bones -------------------
 

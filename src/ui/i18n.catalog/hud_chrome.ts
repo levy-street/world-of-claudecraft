@@ -5985,11 +5985,11 @@ export const hudChromeStrings = {
         'A lightning strike falls where you stand every {every} sec: after {warn} sec it deals {min} to {max} damage to everyone within {radius} yd and leaves charged ground that deals {cmin} to {cmax} every second for {charged} sec. Keep moving, and lead the strikes to the edge, away from the raid. Heroic and Mythic: {heroicMin} to {heroicMax} and {heroicCMin} to {heroicCMax} damage respectively.',
       cradled:
         'Lifted into the storm and held for {hold} sec while the Guardian channels the cradle; it casts nothing else meanwhile. Then the discharge deals {total} damage, split between you and everyone within {radius} yd beneath you. With fewer than {soakers} sharing it, each takes {penalty}% more and everyone on the Cornice takes {bmin} to {bmax}. Heroic: {heroicCount} players are lifted at once, each discharge {heroicTotal} wanting {heroicSoakers}, so the raid splits between them. Heroic and Mythic: the backlash deals {heroicBMin} to {heroicBMax} damage.',
-      bulwark:
-        'A shield of wind absorbs {left} more damage. While any Gale Sentinel or Gale Mender on the floating isles lives, it regrows {regrow}% of its whole every second, and each Mending Gale restores {mend}%. Ride a Gale Path to the isles and cut them down. Held for {max} sec, it bursts over the Cornice for {bmin} to {bmax} damage. Heroic and Mythic: {heroicMin} to {heroicMax} damage.',
+      cocoon:
+        "The Guardian cannot be harmed while it channels Skyrend Nova. If the channel ends, the nova deals {share}% of maximum health to everyone (Heroic and Mythic: lethal). Ride Captain Thessaly's Updrafts out to the floating isles, east and west, and channel both Stillstones to cut it: {stilled} of 2 stilled.",
       riding:
         'The wind carries you over the void on a fixed path: you cannot act until it sets you down.',
-      windworn: 'Worn out by the wind: no Gale Path will carry you to the isles until this ends.',
+      ward: 'Turns aside {cut}% of the damage from attacks made within {arc} degrees of where it faces. Attack its back while its target turns it away. Heroic and Mythic: {heroicCut}%.',
       thrown: 'Thrown by the Summit Roar: you cannot move until the throw sets you down.',
       blast:
         "The Summit Roar's blast drives you away from the Guardian, {speed} yd a second at its mouth, easing farther out, for {seconds} sec in all. Run straight back against it, or stand in Thessaly's anchor, or it carries you off the Cornice.",
@@ -10372,8 +10372,8 @@ export const hudChromeStrings = {
       guardian_storm: 'Enough breath. Now the storm!',
       guardian_cradle: 'Rise, little one. Let them catch you.',
       guardian_drawn: 'The sky has chosen you. Run, and it follows.',
-      guardian_isles: 'Winds, wall me in! The isles will keep my breath whole.',
-      guardian_bulwark: 'My shield... torn open. Then feel the gale again!',
+      guardian_isles: 'Wrap me in the gale! When I breathe out, the sky ends.',
+      guardian_bulwark: 'My cocoon... torn open. Then feel the storm!',
       guardian_roar: 'Hear the summit roar!',
       guardian_knot: 'Hold my storm, if your arms can bear it.',
       guardian_slay_a: 'Another one given to the wind.',
@@ -10384,7 +10384,9 @@ export const hudChromeStrings = {
       thessaly_pull:
         'Highwatch stands with you! There is no wall up here: the wind will throw you off the edge!',
       thessaly_isles:
-        'Its shield feeds on the isles! Ride the gale out there, cut the menders down and come back!',
+        'It is gathering a nova! Two stones out on the isles can still it: split in two and ride my updrafts!',
+      thessaly_updraft: 'Isle clear! The next updraft is up, go!',
+      thessaly_stone: 'The stone is awake! Channel it, and let nothing strike you!',
       thessaly_circle_a: 'Into my calm, quickly! It holds three, no more!',
       thessaly_circle_b: 'Here! Stand with me and let the wind break on us!',
       thessaly_circle_c: 'Calm on the stone! Three of you, now!',

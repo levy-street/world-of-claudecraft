@@ -132,6 +132,7 @@ import {
   PERSONAL_BARRIER_IDS,
 } from './fire_mage';
 import { formAutoRageMult } from './form_swing';
+import { frontWardAmount } from './front_ward';
 import { clearFieldcraftState } from './hunter_fieldcraft';
 import { lonelySoulDamageMult, lonelySoulPetFloor } from './hunter_lonely_soul';
 import { clearPacklordState } from './hunter_packlord';
@@ -456,6 +457,10 @@ export function dealDamage(
     for (const a of target.auras) if (a.kind === 'vulnerability') vuln += a.value;
     if (vuln > 0) amount = Math.round(amount * (1 + vuln));
   }
+
+  // A frontal ward (combat/front_ward.ts: the Breath's Squall Shieldbearer)
+  // turns aside a share of a blow struck from inside its front arc.
+  if (!resolvedHpLoss && source && amount > 0) amount = frontWardAmount(target, source, amount);
 
   // Breachmaker only sharpens the originating Warrior's attacks. It must not
   // become a raid-wide vulnerability when another attacker hits the target.

@@ -23185,12 +23185,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '撕裂为闪电之躯：战斗的风暴后半段，直到气息守护者倒下。',
   'hudChrome.auraEffect.breathGuardian.swell':
     '每{every}秒，膨胀的风暴对崖台上的所有人造成{min}到{max}点伤害，之前每次脉动使其增强{growth}%：目前已有{stacks}次。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害，之前每次脉动增强{heroicGrowth}%。',
-  'hudChrome.auraEffect.breathGuardian.bulwark':
-    '风之护盾还能吸收{left}点伤害。只要浮岛上还有任一狂风哨兵或狂风愈者存活，它每秒恢复总量的{regrow}%，每次愈合之风恢复{mend}%。乘狂风之路飞往浮岛，消灭它们。维持{max}秒后，它会在崖台上爆裂，造成{bmin}到{bmax}点伤害。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。',
   'hudChrome.auraEffect.breathGuardian.riding':
     '风沿着固定的路线带你越过虚空：在被放下之前你无法行动。',
-  'hudChrome.auraEffect.breathGuardian.windworn':
-    '被风耗尽了力气：效果结束前，狂风之路不会带你前往浮岛。',
   'hudChrome.auraEffect.breathGuardian.thrown': '被巅峰咆哮掀飞：落地之前无法移动。',
   'hudChrome.auraEffect.breathGuardian.tossed': '被游荡狂风掀飞：狂风放下你之前无法移动。',
   'hudChrome.auraEffect.breathGuardian.portalA':
@@ -24500,7 +24496,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_final_gale_pounce': '疾风扑击',
   'abilityUi.cast.heart_final_rime_toll': '霜凇钟鸣',
   'abilityUi.cast.heart_breath_cradle_channel': '雷霆摇篮',
-  'abilityUi.cast.heart_breath_gale_bulwark': '狂风壁垒',
   'abilityUi.cast.heart_breath_mending_gale': '愈合之风',
   'entities.mobs.heart_final_splinter_heat.name': '炽热碎片',
   'entities.mobs.heart_final_splinter_quench.name': '淬火碎片',
@@ -24736,6 +24731,18 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'seasonal.pumpkins.progress': '{label}：{current}/{total}',
   'entities.mobs.heart_gale_sentinel.name': '狂风哨兵',
   'entities.mobs.heart_gale_mender.name': '狂风愈者',
+  'hudChrome.auraEffect.breathGuardian.cocoon': "守护者引导天裂新星时无法受到伤害。若引导完成，新星对所有人造成最大生命值{share}%的伤害（英雄和史诗难度：致命）。乘上塞萨莉队长的上升气流前往东西两侧的浮空岛，引导两块静风石来打断它：已平息 {stilled}/2。",
+  'hudChrome.auraEffect.breathGuardian.ward': "偏转来自其正面{arc}度以内攻击的{cut}%伤害。在其目标将它转开时攻击它的背后。英雄和史诗难度：{heroicCut}%。",
+  'hudChrome.breathGuardian.say.thessaly_updraft': "岛屿已肃清！下一道上升气流已经升起，快走！",
+  'hudChrome.breathGuardian.say.thessaly_stone': "石头醒了！引导它，别让任何东西打到你！",
+  'abilityUi.cast.heart_breath_skyrend_nova': "天裂新星",
+  'abilityUi.cast.heart_breath_shoving_gale': "推搡狂风",
+  'abilityUi.cast.kituse_heart_still_the_gale': "平息狂风",
+  'entities.mobs.heart_gust_herald.name': "阵风使者",
+  'entities.mobs.heart_riven_squall.name': "裂空飑",
+  'entities.mobs.heart_squall_fragment.name': "飑之碎片",
+  'entities.mobs.heart_squall_shieldbearer.name': "飑之持盾者",
+  'entities.mobs.heart_breath_stillstone.name': "静风石",
   'hudChrome.knotAlert.aTitle': '你是传送门A！',
   'hudChrome.knotAlert.bTitle': '你是传送门B！',
   'hudChrome.knotAlert.cTitle': '你是传送门C！',
