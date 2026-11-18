@@ -3,7 +3,7 @@
 // instances/dungeon_checkpoints.ts): a spirit that walks back in rises in the
 // room of the guardian the raid killed LAST, or on the Heart's Arrival Terrace
 // once all four guardians are down AND the heart seal crystal has burst into
-// the portal (lit and charged is not enough: the press opens it), or at the
+// the portal (lit and charged is not enough: a raider on the dais opens it), or at the
 // entrance before any kill. Each point stands at its room's door, off the
 // fight's floor and clear of its hazards, behind exactly the gates it lists;
 // the rule is per claim, reset with it, and the same through the server.
@@ -223,7 +223,7 @@ describe("the Smith's Heart death checkpoints", () => {
     for (const v of ['hammer', 'heat', 'quench', 'breath'] as const) win(sim, pid, inst, v);
     killPacks(sim, pid, inst, SMITH_HEART_PACKS.ring);
     sim.tick();
-    // Lit and charged, never pressed: the portal is shut and the Heart's way in
+    // Lit and charged, nobody on the dais: the portal is shut and the Heart's way in
     // is not offered, so the last guardian's room is.
     expect(smithHeartProgress(sim.ctx, inst).ready).toBe(true);
     expect(smithHeartProgress(sim.ctx, inst).portalOpen).toBe(false);

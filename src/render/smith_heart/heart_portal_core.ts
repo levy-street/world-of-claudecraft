@@ -30,8 +30,8 @@ import { HEART_SEAL_ARRIVAL } from './heart_seal_core';
 
 /** The opening's timeline (seconds from the portal bit's first sighting). */
 export const HEART_PORTAL_OPEN = {
-  /** The crystal overloads and whitens (short: the player broke it by hand and
-   *  the shatter must answer the press). */
+  /** The crystal overloads and whitens (short: a raider has just stepped onto the
+   *  dais, and the shatter must answer their arrival). */
   charge: 0.55,
   /** The flash pillar's fade, from the charge's end (short: the shatter must read
    *  through it). */

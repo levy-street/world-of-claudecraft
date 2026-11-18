@@ -247,7 +247,7 @@ describe("the Smith's Heart gating", () => {
         const events = sim.tick();
         mask |= SMITH_HEART_VEIN_BITS[v];
         // The fourth charges the crystal with it (the Ring holds no packs);
-        // the portal waits for the press.
+        // the portal waits for a raider on the dais.
         const shown = mask === SMITH_HEART_SEAL_FULL ? mask | SMITH_HEART_READY_BIT : mask;
         expect(markers(sim, inst).every((m) => m === shown)).toBe(true);
         expect(logs(events, pid)).toContain(SMITH_HEART_VEIN_LIT_LOG[v]);
@@ -275,7 +275,7 @@ describe("the Smith's Heart gating", () => {
     const events = sim.tick();
     expect(smithHeartProgress(sim.ctx, inst).sealLit).toBe(true);
     expect(smithHeartProgress(sim.ctx, inst).ready).toBe(true);
-    // Charged, not open: only a press opens it (smith_heart_seal_crystal.test.ts).
+    // Charged, not open: only a raider on the dais opens it (smith_heart_seal_crystal.test.ts).
     expect(smithHeartProgress(sim.ctx, inst).portalOpen).toBe(false);
     expect(
       markers(sim, inst).every((m) => m === (SMITH_HEART_SEAL_FULL | SMITH_HEART_READY_BIT)),

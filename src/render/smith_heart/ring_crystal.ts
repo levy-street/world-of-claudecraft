@@ -22,9 +22,9 @@
 // (bounding spheres set at bake: a piece's flight moves the sphere with its matrix).
 //
 // Stand-in: none. A crystal that has not landed (a model that failed, or a link slower than
-// the interior's wait and the live gate) leaves the dais without it: the rivers' columns, the
-// label and the press itself still carry the progress and the way, and the entity's click
-// volume only matters once the model draws.
+// the interior's wait and the live gate) leaves the dais without it: the rivers' columns and
+// the label still carry the progress, a raider stepping onto the dais still opens the way, and
+// the crystal's entity is the markers' empty anchor either way.
 
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';

@@ -145,7 +145,7 @@ describe('/dev heart', () => {
     sim.tick();
     // The Ring holds no packs since the team's review of 2026-11-17: the four
     // veins alone charge the crystal (15 | the charge bit 128), and the portal
-    // waits for the press.
+    // waits for a raider on the dais.
     const masks = sealMasks(sim, inst);
     expect(masks.length).toBeGreaterThan(0);
     expect(masks.every((t) => t === 'smith_heart_seal_143')).toBe(true);

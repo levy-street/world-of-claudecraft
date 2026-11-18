@@ -6385,7 +6385,7 @@ export interface DungeonObjectSpawn {
     | 'smith_heart_seal_0'
     // The Smith's Heart's heart seal crystal on the Ring's dais
     // (encounters/smith_heart/seal_crystal.ts): one object per claim, a
-    // combat wall until the press that bursts it.
+    // combat wall until a raider stepping onto the dais bursts it.
     | 'smith_heart_seal_crystal'
     // The Smith's Heart's quarry columns, the Hammer Council's starting
     // pillars (encounters/smith_heart/council_pillars.ts): the integrity left
