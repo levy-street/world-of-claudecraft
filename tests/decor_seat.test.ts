@@ -4,6 +4,7 @@ import { decorPropPlacements } from '../src/editor/world_prop_placements';
 import { PROP_NATURAL_SIZE } from '../src/render/prop_natural_size.generated';
 import { PROP_ASSET_DEFS } from '../src/render/props';
 import { DECOR_FOOTPRINTS } from '../src/sim/content/decor_footprints';
+import { SPIRE_RELOCATIONS } from '../src/sim/content/quartered_spires';
 import { PROPS } from '../src/sim/data';
 import { buildDecorPropColliders } from '../src/sim/decor_prop_colliders';
 import { DECOR_SEAT_MAX_TILT, decorSeat, seatedOnFootprint } from '../src/sim/decor_seat';
@@ -173,6 +174,19 @@ describe('the Quartered Isle decor sits on its footprint', () => {
         new THREE.Euler(p.rotX ?? 0, p.rotY, p.rotZ ?? 0, 'XYZ'),
       );
       expect(Math.abs(got.dot(want)), `${d.key} at (${d.x}, ${d.z})`).toBeCloseTo(1, 6);
+    }
+  });
+
+  it('moves the slab the bearing search laid across a heave onto flat ground', () => {
+    for (const m of SPIRE_RELOCATIONS) {
+      const here = (p: { x: number; z: number }) =>
+        isle.filter((d) => d.key === m.key && d.x === p.x && d.z === p.z);
+      expect(here(m.from), `${m.key} still at (${m.from.x}, ${m.from.z})`).toHaveLength(0);
+      const [moved] = here(m.to);
+      expect(moved, `${m.key} at (${m.to.x}, ${m.to.z})`).toBeDefined();
+      // it sits on its ground instead of sinking from sight: its centre sinks under 60% of its height
+      const seat = decorSeat(moved, heightAt);
+      expect(seat.sink).toBeLessThan(DECOR_FOOTPRINTS[m.key].y * (moved.scale ?? 1) * 0.6);
     }
   });
 

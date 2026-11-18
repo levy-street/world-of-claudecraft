@@ -205,6 +205,30 @@ function buildLandmarkStone(): DecorProp[] {
   return out;
 }
 
+/** Fallen pieces the bearing search set down across a steep heave, each moved to flat
+ *  ground round the same centrepiece. The search reads only plates and cracks (the
+ *  terrain itself depends on these props), so it cannot see a heave from a plate's
+ *  own relief: the Heavestone slab east of its stack sat on ground rising 10 yd under
+ *  its footprint, and seating it on that footprint (decor_seat.ts) sank it from sight.
+ *  Matched by key and rounded position; a move only lands where roomFor holds. */
+export const SPIRE_RELOCATIONS: readonly {
+  key: KitKey;
+  from: { x: number; z: number };
+  to: { x: number; z: number };
+}[] = [
+  { key: 'heaveStrataRubble', from: { x: -115.27, z: 2231.46 }, to: { x: -149.14, z: 2217.11 } },
+];
+
+function relocated(rows: DecorProp[]): DecorProp[] {
+  return rows.map((d) => {
+    const move = SPIRE_RELOCATIONS.find(
+      (m) => m.key === d.key && m.from.x === d.x && m.from.z === d.z,
+    );
+    if (!move || !roomFor(move.to.x, move.to.z, d.r ?? 1)) return d;
+    return { ...d, x: move.to.x, z: move.to.z };
+  });
+}
+
 /** Needles keep this far from the Gyre's centre: past the outermost turn's face and the scree
  *  that fades out beyond it, yards. */
 export const GYRE_NEEDLE_CLEAR_R = GYRE_PEAK.startR + GYRE_PEAK.pathW / 2 + 8;
@@ -359,7 +383,7 @@ function buildFrost(): DecorProp[] {
 /** The isle's standing stone, built once at load (a pure function of the
  *  tables). */
 export const QUARTERED_ISLE_SPIRES: readonly DecorProp[] = [
-  ...buildLandmarkStone(),
+  ...relocated(buildLandmarkStone()),
   ...buildWindNeedles(),
   ...buildLavaVents(),
   ...buildFrost(),
