@@ -816,7 +816,9 @@ is session-only and never persisted.
 ### Bounties (owner spec, 2026-10-02)
 
 A world kill while the hill stands risen, with the victim or the player who
-landed the killing blow inside the circle, is a HILL kill (`hill_bounty.ts`).
+landed the killing blow anywhere in the hill's zone (the ground its bar and
+bounty badges show on, not just the circle; widened 2026-11-18), is a HILL
+kill (`hill_bounty.ts`).
 It pays the victim's bounty in place of the plain 10 Honor world kill, split
 between contributors as usual. A bounty follows League of Legends' pre-2024
 champion bounty, scaled from its 300 gold base to 10 Honor
@@ -833,7 +835,7 @@ champion bounty, scaled from its 300 gold base to 10 Honor
 League documents only the death-streak floor (a third of the base), so the
 steps between are this game's own. Streaks last the life of the hill: a hill
 kill adds one and ends the killer's death streak; ANY death while the hill
-stands (a hill kill, a kill away from the circle, a mob, a fall) ends the
+stands (a hill kill, a kill outside the hill's zone, a mob, a fall) ends the
 victim's kill streak, and a hill death also adds one death. Only a paid
 killing blow builds a streak (a grey or raid kill does not). Hill Honor ignores the hourly
 100/50/25/0 repeat decay: each contributor is paid in full for the first five

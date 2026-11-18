@@ -18,7 +18,7 @@ vi.mock('../server/db', () => ({
 import { writeEntityPresenceBits } from '../server/entity_presence_wire';
 import { wireEntity } from '../server/game';
 import { applyEntityPresenceBits } from '../src/net/entity_presence_wire';
-import { BUILTIN_WORLD, PLAYER_START } from '../src/sim/data';
+import { BUILTIN_WORLD, PLAYER_START, zoneContaining } from '../src/sim/data';
 import {
   endHillNow,
   HILL_BOUNTY_REPEAT_CAP,
@@ -83,6 +83,17 @@ function hillFight(names: string[]): { sim: Sim; pids: number[] } {
   tickSeconds(sim, 1);
   for (const pid of pids) expect(ent(sim, pid).pvpFlag, 'the circle flags').toBe(true);
   return { sim, pids };
+}
+
+/** Move a fight off the hill's ground: the Frostveil Reach is free-for-all
+ *  like the Drakelands, so the pair stays hostile, but it is another zone. */
+function leaveHillZone(sim: Sim, a: number, b: number): void {
+  const x = -30;
+  const z = 1620;
+  expect(zoneContaining(x, z)?.id).toBe('frostveil');
+  expect(sim.hillState.active?.zoneId).not.toBe('frostveil');
+  place(sim, a, x, z);
+  place(sim, b, x + 3, z);
 }
 
 /** Stand the victim back up, land a live hit (clears the paid-death guard), then kill. */
@@ -166,10 +177,23 @@ describe('hill kills in the Sim', () => {
       sim,
       pids: [a, b],
     } = hillFight(['Aleph', 'Bet']);
-    const hill = sim.hillState.active!;
+    leaveHillZone(sim, a, b);
+    expect([kill(sim, a, b), kill(sim, a, b), kill(sim, a, b)]).toEqual([10, 5, 2]);
+  });
+
+  it('pays a kill outside the circle but in the hill zone as a hill kill', () => {
+    const {
+      sim,
+      pids: [a, b],
+    } = hillFight(['Aleph', 'Bet']);
+    const hill = sim.hillState.active as NonNullable<typeof sim.hillState.active>;
+    // The approach: both well outside the circle, still on the hill's ground.
     place(sim, a, hill.x + hill.radius + 20, hill.z);
     place(sim, b, hill.x + hill.radius + 23, hill.z);
-    expect([kill(sim, a, b), kill(sim, a, b), kill(sim, a, b)]).toEqual([10, 5, 2]);
+    expect(zoneContaining(hill.x + hill.radius + 23, hill.z)?.id).toBe(hill.zoneId);
+    // The hill's bounty and repeat cap, never the hourly 10/5/2 decay.
+    const paid = Array.from({ length: HILL_BOUNTY_REPEAT_CAP + 1 }, () => kill(sim, a, b));
+    expect(paid).toEqual([10, 10, 9, 7, 6, 0]);
   });
   it('pays the victim bounty, builds a streak, badges it, and a shut down pays it out', () => {
     const {
@@ -211,9 +235,7 @@ describe('hill kills in the Sim', () => {
     expect(paid).toEqual([10, 10, 9, 7, 6, 0]);
 
     // Five hill kills also earn a world bounty: off-hill payouts use its 15/10/5 curve.
-    const hill = sim.hillState.active as { x: number; z: number; radius: number };
-    place(sim, a, hill.x + hill.radius + 20, hill.z);
-    place(sim, b, hill.x + hill.radius + 23, hill.z);
+    leaveHillZone(sim, a, b);
     sim.worldPvpBooks.killsByPair.clear();
     expect([kill(sim, a, b), kill(sim, a, b), kill(sim, a, b)]).toEqual([15, 10, 5]);
   });
