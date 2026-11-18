@@ -2544,6 +2544,81 @@ the rules `final_rules.ts`, one module per quarter (`final_heat.ts`, `final_quen
 third landed swing), is its frontal; the sketch's Forge Wrath and Forge Pour are gone. It
 cannot be controlled or slowed: only its own Taking Root holds it.
 
+
+**The rework of 2026-11-18 (the team's review of 2026-11-17, the owner's design).**
+The team read the old fight as "every mechanic a buff on its bar", the Quench's
+cold as a mechanic of the ice quarter alone and the Breath's push as blowing the
+wrong way, and asked for the guardians' best mechanics on the final boss,
+interacting. What changed:
+
+- **Its own, all fight:** Forge Fist (its swing cleave, the frontal) and Weight
+  of the Anvil (the fight's ONLY group soak, now on one clock all fight
+  wherever it stands: every 60 s on Normal, 36 on Heroic, 32 on Mythic, the first 30 s in; Heroic's Crushed and Mythic's turning Anvil kept).
+- **The woken stars** (`final_stars.ts`): the first time it enters a quarter, that
+  quarter's guardian's star mechanic WAKES and stays awake for the rest of the
+  fight, in the order the raid drags it round. The star of the quarter it stands
+  in runs at full pace, the others at `reducedPace` (0.5: their clocks count down
+  at half speed); in the ring all run reduced.
+
+| Star | Quarter | Full pace (Normal) | Heroic | Mythic |
+|---|---|---|---|---|
+| Wake the Stone (`final_pillars.ts`) | Hammer | every 18 s a volley: a 2 s warning spot under 1 hashed player in the quarters (never the ring), then a pillar bursts out (250 to 290 and a throw to whoever stays). Pillars are round combat walls (bodies and sight) and STAY until a Crossing Blade shatters them. Cap 8 standing; a volley that finds the cap met rings Stone Thrum through every pillar onto the raid (330 to 370) | 3 a volley, cap 7, Thrum 520 to 580 | 3, cap 6, Thrum 640 to 700 |
+| Sky Strike (`final_sky.ts`) | Breath | every 13 s: a strike under 1 hashed player (their own alarm); 2.2 s, 3.5 yd, 300 to 340 | 3 marks, plus 1 laid beside the pillar nearest the boss (the lightning seeks the stone) | 3 marks + 2 |
+| Crossing Blade (`final_blades.ts`) | Quench | every 15 s a round of 1 blade: a sword of ice rises on the rim beside its mark (30 to 70 degrees round from the mark's bearing, within its online reach) and its line runs from it through the mark to the far rim, following the mark for 4 s and locking 0.8 s before it flies (0.5 s). Everyone on it 300 to 350; it SHATTERS every pillar its line crosses | 2 blades a round, 3.5 s aim | 2 blades, 3 s aim |
+| Fire Whirl (`final_heat.ts`) | Heat | every 15 s, 2 tall turning columns of fire (4 yd, 2 s rise, 10 s run, 300 to 340 at most once a second) | 3 | 3 |
+
+- **The interactions** (the team's ask): a Sky Strike whose spot falls within 6.5 yd
+  of a standing pillar runs into it: Arcing Stone, a 9 yd ring of lightning round
+  the pillar on the floor from the moment the strike is laid, lands with it (380 to
+  420), and the pillar is left **Storm-Charged** (the owner's call of 2026-11-18):
+  while it stands it pulses the WHOLE raid every 4 s, summed per charged pillar
+  (Normal 26 to 30 a pillar before the tier's x1.15: one or two are healed through,
+  four or more press; Heroic 56 to 64; Mythic 66 to 74). A Crossing Blade shatters
+  every pillar its line crosses (the marked player leads the line through them, the
+  charged first). So the order of the quarters is the strategy: wake the Quench (the
+  blades) before the storm, or the pillars charge with nothing to break them.
+  Proposed, not built (it would want a clean tell): a Fire Whirl passing through a
+  charged pillar's ring could take its charge and become a storm-whirl.
+- **Removed** (the owner's call of 2026-11-18, point 5 amended the same day): the
+  Quench's cold (Quenching Cold, Encased in Rime) and the Breath's wind (Bellows
+  Wind, Pressed to the Rim). Every other quarter mechanic stays, still only while
+  the boss stands in its quarter: Basalt Fist and its Molten Swells, Ember Mark
+  (Heroic), Forge Fire (Mythic), Groaning Ice (Heroic), Numbing Frost (Mythic),
+  Leaping Bolt (now every 14 s, was 11: the strikes share the quarter), Drawn
+  Lightning (Heroic), Storm Orbs (Mythic), Tremor Cracks (now every 13 s, was 10:
+  the rises share the floor), Stone Shell (Heroic). The Fire Whirls moved out of the
+  Heat kit into its star. Leaping Bolt and Sky Strike read apart: the bolt is a bar
+  on the boss and a violet reach round its target, a strike a colder white spot on
+  the floor with a bolt out of the sky.
+- **Poured elements** (part 2): a Splinter alive at its call's end pours its
+  quarter's star in: woken if it slept, at full pace wherever the boss stands.
+- **The final phase** (15 percent): all four stars wake and run at once at
+  `finalPace` (0.75) with their interactions; the mix of one ability in turn is
+  gone; the Anvil keeps its own clock; Masterless Fury as before.
+- **Overload in the world** (`render/smith_heart_fx/final_overload_fx.ts`): as the
+  bar of the quarter it drinks fills, a shell of strain swells and cracks round the
+  body in the quarter's colour, the quarter's floor cracks throb harder, and from
+  three quarters full (`FINAL_OVERLOAD.eruptAt`) the quarter's wall landmark erupts
+  (its light flares, its element is thrown up off it); the burst is the wave of
+  light out of the body. The HUD panel stays.
+- **Mythic, ideas only** (not built): blades that chain from where the last ended
+  (the Quench guardian's own Mythic), a charged pillar's pulse that also arcs to a
+  neighbouring pillar, whirls that split when they cross a strike.
+
+Every number lives in `FINAL_TUNING` and `FINAL_DIFFICULTY` (`final_ids.ts`). Names:
+Wake the Stone and Stone Thrum are the Hammer Council's, Sky Strike and Breaking
+Storm the Breath's, Crossing Blade the Quench's, Fire Whirl the final's own; Arcing
+Stone and Storm-Charged were IP-checked on 18 Nov 2026 (exact phrase on the game
+wikis and a general search: no game use; plain English). Tests:
+`tests/smith_heart_final_stars.test.ts` (each star, the pace, the pillars and their
+cap, strike plus pillar, blade plus pillar, the charged pulse, the pours, the final
+phase, each tier, determinism, the wipe) and
+`tests/smith_heart_final_stars_wire.test.ts` (the online mirror).
+
+The sections below describe the fight as built before the rework where they still
+hold; where they disagree (the cold, the wind, the poured elements, the final
+phase's mix), the rework above wins.
+
 | Rule | How it works (Normal unless said) | Where |
 |---|---|---|
 | Overload | One bar per quarter (every number in one table, `FINAL_OVERLOAD`). The bar of the quarter it stands in fills (empty to full in 60 s, slowed from 40 after Jose's playtest of 28 Oct 2026) and pulses the raid every 4 s, harder the fuller it is (35 to 40 at empty; at full 80 to 91 on Normal, 105 to 120 on Heroic and Mythic before their factor, each tier's `pulseRise`, 45 and 70, since 2026-11-12; 60 to 70 and up to 370 until the bot raid of 2026-11-04, whose pulses alone outran two healers and wiped a raid that moved the boss on time); full, it bursts on everyone and empties: 700 to 800 on Normal (survivable with healing), 1,050 to 1,200 on Heroic (heavy), 4,500 to 5,200 on Mythic (lethal: only a big personal defensive lives, effectively a wipe). The tooltip says which; the Overload panel turns a bar three quarters full hostile (no banner since 2026-11-09). Away from its quarter a bar drains at a third of the fill speed; in the ring nothing fills. Bouncing between two quarters bursts within about two and a half minutes; a rotation through four never passes one visit's fill | `final_ids.ts` `FINAL_OVERLOAD`, `final_rules.ts` |
@@ -2555,10 +2630,10 @@ cannot be controlled or slowed: only its own Taking Root holds it.
 
 | Quarter | Normal | Heroic adds | Mythic adds |
 |---|---|---|---|
-| Heat (dodge and place) | Basalt Fist every 16 s: a 3 s bar on a hashed player's spot (6 yd, 2,200 to 2,400), then three Molten Swells roll out of it (the Heat guardian's own objects, lanes and numbers, 32 yd or to the Anvil's rim; 11 yd wide and 5 deep since its pass 5, shared on purpose so both read alike). Fire Whirls every 13 s: three rise by hashed players (1.5 s of warning) and run 9 s across the floor, turning back off the rim (300 to 340, once a second at most) | Ember Mark every 22 s: up to three ranged players (12 yd or more from it, never the tank); 6 s later embers drop at their feet and smoulder 30 s (5 yd, 150 to 170 a second): stack the marks in one corner, then move out | Forge Fire: its frontal leaves a pool of fire (4 yd, 20 s) where it struck |
-| Quench (stack, no split) | Quenching Cold: anyone with fewer than two other players within 10 yd grows cold (a bar, full in 5 s alone; it falls when huddled); full, Encased in Rime (stunned 4 s, 300 to 340). The cold goes once it leaves the quarter | Groaning Ice every 18 s: the floor cracks under two hashed players (4 yd); 3 s later it breaks and whoever stands on it falls Under the Ice (600 to 680, stunned 3 s) | Numbing Frost: its frontal slows everyone it strikes by 75 percent for 6 s |
-| Breath (spread) | Bellows Wind every 20 s: 2 s of gathering, then 8 s of gale toward a hashed bearing, carrying everyone 3.5 yd a second (the wind kernel's aura: both hosts step it, the online client predicts it); within 5 yd of the rim while it blows, Pressed to the Rim (220 to 260 a second). Leaping Bolt every 11 s: a 2 s bar on a hashed player; it leaps to every player within 6 yd of anyone struck, each leap half again as hard (300 to 340 first) | Drawn Lightning every 22 s: two marked players for 6 s; every second it arcs to everyone within 8 yd of them (200 to 230) | Storm Orbs every 25 s: three orbs round it; each must be stepped on within 8 s (one player: 250 to 280; two or more on it: each twice that), or it bursts on the whole raid (450 to 500) |
-| Hammer (the only group soak) | Tremor Cracks every 10 s: under three hashed players (4 yd), erupting 2.5 s later (500 to 560). Weight of the Anvil every 25 s: a 6 s bar, a 6 yd mark where a hashed player stood; 6,600 split between everyone under it (5,600 on Normal since the bot raid of 2026-11-12, `anvilTotal` per tier) (half as much again each with fewer than three); nobody under it: 1,000 to 1,100 to everyone on Normal, 1,500 to 1,600 on Heroic and Mythic (each tier's `anvilMissMin`/`anvilMissMax`; 1,500 to 1,600 everywhere until 2026-11-12). The total was 9,000 until the bot raid of 2026-11-11: 900 a body with all ten under it, 70 to 77 percent of a fresh cloth pool, killed the cloth whenever one raider was missing; 660 is the raid's soak band, about 55 percent | Stone Shell every 20 s: three hashed players absorb their next 600 healing. Crushed: everyone who shared the Anvil for 30 s; a Crushed player under the next Anvil takes their share three times over (two groups rotate). Four Tremor Cracks | The turning Anvil: its mark turns round the boss through its bar (11 yd out, 25 degrees a second) |
+| Heat (dodge and place) | Basalt Fist every 16 s: a 3 s bar on a hashed player's spot (6 yd, 2,200 to 2,400), then three Molten Swells roll out of it (the Heat guardian's own objects, lanes and numbers, 32 yd or to the Anvil's rim; 11 yd wide and 5 deep since its pass 5, shared on purpose so both read alike). (Fire Whirls moved to the Heat's star on 2026-11-18: see the rework above) | Ember Mark every 22 s: up to three ranged players (12 yd or more from it, never the tank); 6 s later embers drop at their feet and smoulder 30 s (5 yd, 150 to 170 a second): stack the marks in one corner, then move out | Forge Fire: its frontal leaves a pool of fire (4 yd, 20 s) where it struck |
+| Quench | (its cold removed on 2026-11-18; its star is Crossing Blade) | Groaning Ice every 18 s: the floor cracks under two hashed players (4 yd); 3 s later it breaks and whoever stands on it falls Under the Ice (600 to 680, stunned 3 s) | Numbing Frost: its frontal slows everyone it strikes by 75 percent for 6 s |
+| Breath (spread) | (its wind removed on 2026-11-18; its star is Sky Strike) Leaping Bolt every 14 s (11 until the rework): a 2 s bar on a hashed player; it leaps to every player within 6 yd of anyone struck, each leap half again as hard (300 to 340 first) | Drawn Lightning every 22 s: two marked players for 6 s; every second it arcs to everyone within 8 yd of them (200 to 230) | Storm Orbs every 25 s: three orbs round it; each must be stepped on within 8 s (one player: 250 to 280; two or more on it: each twice that), or it bursts on the whole raid (450 to 500) |
+| Hammer | Tremor Cracks every 13 s (10 until the rework): under three hashed players (4 yd), erupting 2.5 s later (500 to 560). Weight of the Anvil (the boss's own since 2026-11-18: all fight, wherever it stands, every 60 s on Normal, 36 on Heroic, 32 on Mythic; every 25 s in the Hammer only until then): a 6 s bar, a 6 yd mark where a hashed player stood; 6,600 split between everyone under it (5,600 on Normal since the bot raid of 2026-11-12, `anvilTotal` per tier) (half as much again each with fewer than three); nobody under it: 1,000 to 1,100 to everyone on Normal, 1,500 to 1,600 on Heroic and Mythic (each tier's `anvilMissMin`/`anvilMissMax`; 1,500 to 1,600 everywhere until 2026-11-12). The total was 9,000 until the bot raid of 2026-11-11: 900 a body with all ten under it, 70 to 77 percent of a fresh cloth pool, killed the cloth whenever one raider was missing; 660 is the raid's soak band, about 55 percent | Stone Shell every 20 s: three hashed players absorb their next 600 healing. Crushed: everyone who shared the Anvil for 30 s; a Crushed player under the next Anvil takes their share three times over (two groups rotate). Four Tremor Cracks | The turning Anvil: its mark turns round the boss through its bar (11 yd out, 25 degrees a second) |
 
 Difficulty multiplies every mechanic's damage (Normal 1, Heroic 1.1, 1.2 until the bot raid's Heroic pass of 2026-11-05, Mythic 1.3); Mythic
 carries every Heroic rule. A new tier is one `FINAL_DIFFICULTY` row, never a branch on a
@@ -3008,7 +3083,13 @@ IP-checked in `docs/design/naming-audit.md`). Cosmetic only, like every deed rew
 | `/dev heart final quarter <zone>` (in a fight) | a quarter change: the boss lets go of its root and its bar and stands in that quarter (it roots again; Heroic shocks the raid) |
 | `/dev heart final fill [breath, quench, hammer, heat, all] [pct]` | set an Overload bar (95 by default; 99 bursts within a second in its quarter) |
 | `/dev heart final burst`, `shock`, `root`, `unroot` | the active bar bursts, a Vein Shock, Taking Root now, the root lets go |
-| `/dev heart final <ability>` | one ability now, on any tier: `fist` (on you), `whirl`, `embers`, `freeze` (you), `cold <n>`, `ice`, `wind [deg]`, `bolt`, `drawn`, `orbs`, `tremor`, `anvil` (on you), `shell` |
+| `/dev heart final <ability>` | one ability now, on any tier: `fist` (on you), `whirl` or `tornado`, `embers`, `ice`, `bolt`, `drawn`, `orbs`, `tremor`, `anvil` (on you), `shell` |
+| `/dev heart final wake <quarter>` | that quarter's star wakes for the rest of the fight (the rework of 2026-11-18) |
+| `/dev heart final star <quarter>` | that quarter's star (waking it) fires now |
+| `/dev heart final pillars [n]`, `pillars here` | n volleys of Wake the Stone now (or one pillar where you stand, in 2 s) |
+| `/dev heart final sky`, `sky here` | a Sky Strike volley now (or one strike on you); a strike by a pillar lays its Arcing Stone ring |
+| `/dev heart final blades`, `blades me` | a round of Crossing Blades now (or one line through you) |
+| `/dev heart final charge`, `chargedpulse`, `thrum`, `shatter` | every pillar Storm-Charged; a charged pulse now; Stone Thrum now; every pillar shatters |
 | `/dev heart reset` | free the run and claim a fresh one |
 | `/dev heart council` | the Hammer Council's readout (difficulty, each member's health, energy, Wraths, the fallen in order) |
 | `/dev heart council pull` | pull both onto you |
