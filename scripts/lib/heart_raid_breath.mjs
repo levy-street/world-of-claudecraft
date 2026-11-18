@@ -2,8 +2,12 @@
 // BOSS=breath; the plumbing is scripts/lib/heart_raid_bots.mjs). The raid holds
 // the guardian in the Cornice's middle and stands on its walled west side,
 // walks against the blows and off the open rim, takes Thessaly's circle,
-// faces the Summit Roar on a bearing whose throw lands on the floor, rides the
-// Gale Paths to the Islands of the Wind and kills the adds, then in the storm
+// faces the Summit Roar on a bearing whose throw lands on the floor; at half
+// health (the Islands of the Wind, 2026-11-18) splits in two (one side east,
+// one west), rides Thessaly's Updrafts isle to isle, kills each isle's adds
+// (kicks the Mender, steps out of the Herald's gale, strikes the
+// Shieldbearer's back, out of Sky's Reckoning's strikes) and channels the
+// Stillstone at the end of each chain; then in the storm
 // spreads for the Leaping Bolt, gathers under Thunder's Cradle, leads Drawn
 // Lightning away and dodges the strikes. Heroic and Mythic: the Knotted Gale's
 // portal marks stand by the ball and at a lip, a third player carries it to the
@@ -15,7 +19,7 @@
 // IGNORE=knot   heroic and mythic: nobody carries the Knotted Gale
 
 import { BODY_EDGE_MELEE_REACH } from '../../src/sim/combat/player_attack_reach';
-import { BREATH, BREATH_ISLES } from '../../src/sim/content/smith_heart_layout';
+import { BREATH } from '../../src/sim/content/smith_heart_layout';
 import {
   edgeWalk,
   inBreathArena,
@@ -35,12 +39,13 @@ import {
   calmOf,
   knotOf,
 } from '../../src/sim/encounters/smith_heart/breath_ids';
+import { inShoveLine } from '../../src/sim/encounters/smith_heart/breath_isle_adds';
 import { isleAt, isleSpots } from '../../src/sim/encounters/smith_heart/breath_isle_geometry';
 import {
   ISLE_AURAS,
   ISLE_CASTS,
   ISLE_MOBS,
-  isleCircleOf,
+  padOf,
 } from '../../src/sim/encounters/smith_heart/breath_isle_ids';
 import { BLAST_FALLOFF, WIND_BLAST_AURA } from '../../src/sim/wind_drift';
 import {
@@ -55,6 +60,7 @@ import {
   IGNORE,
   log,
   segDist,
+  tankAssign,
   unit,
 } from './heart_raid_bots.mjs';
 
@@ -77,10 +83,47 @@ const MARK = {
   D: BREATH_AURAS.portalD,
 };
 const PARTNER = { A: 'B', B: 'A', C: 'D', D: 'C' };
-/** Who rides to which isle, in preference order (never a tank or the priest). */
-const RIDERS = [
-  ['h2', 'rogue', 'mage', 'hunter', 'lock', 'ele', 'arms', 'h1'],
-  ['h1', 'arms', 'lock', 'ele', 'rogue', 'mage', 'hunter', 'h2'],
+/** The raid's split at half health: a tank, a healer, a melee and two ranged
+ *  a side (0 east, 1 west). A player not listed (a human) takes the side with
+ *  fewer. */
+const SIDES = {
+  mt: 0,
+  h1: 0,
+  rogue: 0,
+  mage: 0,
+  hunter: 0,
+  ot: 1,
+  h2: 1,
+  arms: 1,
+  lock: 1,
+  ele: 1,
+};
+/** The isles' adds (living ones are the isle fights). */
+const ISLE_ADD_TIDS = new Set([
+  ISLE_MOBS.sentinel,
+  ISLE_MOBS.mender,
+  ISLE_MOBS.herald,
+  ISLE_MOBS.squall,
+  ISLE_MOBS.fragment,
+  ISLE_MOBS.shieldbearer,
+]);
+/** Which add the damage dealers burn first on an isle. */
+const KILL_ORDER = [
+  ISLE_MOBS.mender,
+  ISLE_MOBS.herald,
+  ISLE_MOBS.fragment,
+  ISLE_MOBS.squall,
+  ISLE_MOBS.sentinel,
+  ISLE_MOBS.shieldbearer,
+];
+/** What the tank holds first on an isle (the melee hitters). */
+const TANK_ORDER = [
+  ISLE_MOBS.shieldbearer,
+  ISLE_MOBS.sentinel,
+  ISLE_MOBS.squall,
+  ISLE_MOBS.fragment,
+  ISLE_MOBS.herald,
+  ISLE_MOBS.mender,
 ];
 
 // ---- coordinates --------------------------------------------------------------------
@@ -142,10 +185,16 @@ export const breath = {
       cradles: [],
       knots: [],
       portals: {},
-      paths: {},
-      homes: {},
+      pads: [],
     };
-    for (const e of world.obs.ents.values()) {
+    // Every bot's view merged (the leader's first): split over the isles the
+    // raid is wider than one player's interest radius, so the far side's pads,
+    // adds and stones are only seen by the bots out there.
+    const all = new Map();
+    for (const b of world.bots) for (const [id, e] of b.ents ?? []) all.set(id, e);
+    for (const [id, e] of world.obs.ents) all.set(id, e);
+    world.allEnts = all;
+    for (const e of all.values()) {
       if (e.k !== 'object' || typeof e.tid !== 'string') continue;
       const t = e.tid;
       const at = { x: e.x, z: e.z, r: e.sc ?? 3, id: e.id };
@@ -159,15 +208,16 @@ export const breath = {
       else if (t.startsWith(BREATH_OBJECTS.knotPrefix)) o.knots.push({ ...at, ...knotOf(t) });
       else if (PORTAL_TIDS[t]) o.portals[PORTAL_TIDS[t]] = at;
       else {
-        const c = isleCircleOf(t);
-        if (c?.kind === 'path') o.paths[c.isle] = at;
-        else if (c?.kind === 'home') o.homes[c.isle] = at;
+        const pad = padOf(t);
+        if (pad) o.pads.push({ ...at, ...pad });
       }
     }
     world.o = o;
-    world.isleAdds = [...world.obs.ents.values()].filter(
-      (e) =>
-        e.k === 'mob' && (e.tid === ISLE_MOBS.sentinel || e.tid === ISLE_MOBS.mender) && alive(e),
+    world.isleAdds = [...all.values()].filter(
+      (e) => e.k === 'mob' && ISLE_ADD_TIDS.has(e.tid) && alive(e),
+    );
+    world.stones = [...all.values()].filter(
+      (e) => e.k === 'mob' && e.tid === ISLE_MOBS.stillstone && !e.dead,
     );
   },
 
@@ -184,7 +234,24 @@ export const breath = {
     return world.tankSpot;
   },
   tankAdd(a) {
-    return a.tid !== ISLE_MOBS.sentinel && a.tid !== ISLE_MOBS.mender;
+    return !ISLE_ADD_TIDS.has(a.tid);
+  },
+  // On an isle the tank holds that isle's melee hitters; elsewhere the raid's own.
+  tankAssign(world, st, b, me) {
+    const isle = isleOf(world, me);
+    if (isle >= 0) {
+      const mine = world.isleAdds.filter((m) => isleOf(world, m) === isle);
+      if (mine.length > 0) {
+        const loose = mine.filter((m) => m.aggro !== b.pid);
+        const pick = (loose.length > 0 ? loose : mine)
+          .slice()
+          .sort((x, y) => TANK_ORDER.indexOf(x.tid) - TANK_ORDER.indexOf(y.tid))[0];
+        b.tankTarget = pick.id;
+        b.loose = null;
+        return;
+      }
+    }
+    return tankAssign(world, st, b, me);
   },
   // Melee reaches the guardian's body from its edge (its template's
   // bodyRadius plus a melee reach, as the sim measures it).
@@ -196,6 +263,8 @@ export const breath = {
     const isle = me ? isleOf(world, me) : -1;
     if (isle >= 0) return isleTarget(world, isle, me);
     const g = world.mobs.guardian;
+    // Inside its cocoon it cannot be harmed: nobody wastes a cast on it.
+    if (g && hasAura(g, ISLE_AURAS.cocoon)) return null;
     return g?.hostile === false ? null : g;
   },
   kickables(world) {
@@ -269,7 +338,9 @@ export const breath = {
       `Falls into the void: ${st.falls.length} (${st.falls.map((f) => `${fmtSec(f.t)} ${f.who}`).join(', ') || 'none'})`,
     );
     note(`Summit Roars: ${st.roars}; circles of calm taken: ${st.anchors}`);
-    note(`Isle rounds: ${st.isleRounds}; rides out ${st.ridesOut}, home ${st.ridesHome}`);
+    note(
+      `Islands of the Wind: ${st.isleRounds ? 'reached' : 'not reached'}; rides out ${st.ridesOut}, home ${st.ridesHome}; stones stilled ${st.stilled}${st.phaseSec ? `; phase ${st.phaseSec.toFixed(0)} s` : ''}`,
+    );
     if (st.knots.dropped)
       note(
         `Knotted Gales: ${st.knots.dropped} dropped, ${st.knots.thrown} gone over a lip, ${st.knots.bursts} burst`,
@@ -293,6 +364,9 @@ function init(st) {
     isleRounds: 0,
     ridesOut: 0,
     ridesHome: 0,
+    stilled: 0,
+    phaseAt: 0,
+    phaseSec: 0,
     knots: { dropped: 0, thrown: 0, bursts: 0, seen: new Set() },
     prevDead: new Map(),
     prevCast: null,
@@ -313,8 +387,28 @@ function isleOf(world, p) {
 
 function isleTarget(world, isle, me) {
   const mine = world.isleAdds.filter((m) => isleOf(world, m) === isle);
-  const mender = mine.find((m) => m.tid === ISLE_MOBS.mender);
-  return mender ?? mine[0] ?? null;
+  mine.sort((x, y) => KILL_ORDER.indexOf(x.tid) - KILL_ORDER.indexOf(y.tid) || x.hp - y.hp);
+  return mine[0] ?? null;
+}
+
+/** A bot's side of the split (0 east, 1 west). */
+function sideOf(st, b) {
+  st.side ??= new Map();
+  if (st.side.has(b.pid)) return st.side.get(b.pid);
+  let side = SIDES[b.spec?.key];
+  if (side === undefined) {
+    const n = [0, 0];
+    for (const v of st.side.values()) n[v]++;
+    side = n[0] <= n[1] ? 0 : 1;
+  }
+  st.side.set(b.pid, side);
+  return side;
+}
+
+/** The phase is on: the guardian channels Skyrend Nova in its cocoon. */
+function islesOn(world) {
+  const g = world.mobs.guardian;
+  return !!g && (g.cast === ISLE_CASTS.nova || hasAura(g, ISLE_AURAS.cocoon));
 }
 
 function track(world, st) {
@@ -340,9 +434,14 @@ function track(world, st) {
       log(`THUNDER'S CRADLE at ${world.players.get(g.castTgt)?.name ?? '?'}`);
     else if (cur === BREATH_CASTS.drawn)
       log(`DRAWN LIGHTNING at ${world.players.get(g.castTgt)?.name ?? '?'}`);
-    else if (cur === ISLE_CASTS.bulwark) {
+    else if (cur === ISLE_CASTS.nova) {
       st.isleRounds++;
-      log('GALE BULWARK: the isles wake');
+      st.phaseAt = fightSec();
+      log('GALE COCOON: Skyrend Nova gathers; the raid splits to the isles');
+    }
+    if (st.prevCast === ISLE_CASTS.nova && cur !== ISLE_CASTS.nova) {
+      st.phaseSec = fightSec() - st.phaseAt;
+      log(`ISLANDS OF THE WIND over after ${st.phaseSec.toFixed(0)} s`);
     }
     st.prevCast = cur;
   }
@@ -373,6 +472,13 @@ function track(world, st) {
       log(`KNOTTED GALE: ${p.name} takes up a ball`);
     st.prevAuras.set(p.pid, now);
   }
+  st.stillSeen ??= new Set();
+  for (const e of world.stones ?? [])
+    if (hasAura(e, ISLE_AURAS.cocoon) && !st.stillSeen.has(e.id)) {
+      st.stillSeen.add(e.id);
+      st.stilled++;
+      log(`STILLSTONE stilled (${st.stilled} of 2)`);
+    }
   for (const c of world.o.cradles) {
     const under = world.living().filter((p) => hypot(p, c) <= c.r).length;
     st.cradleUnder ??= new Map();
@@ -412,39 +518,6 @@ function track(world, st) {
 function plan(world, st) {
   init(st);
   const o = world.o;
-  // The isles: a group per woken isle, the riders kept until home.
-  for (const isle of Object.keys(o.paths).map(Number)) {
-    if (st.riders.has(isle)) continue;
-    const taken = new Set([...st.riders.values()].flat());
-    const group = [];
-    for (const key of RIDERS[isle % 2]) {
-      const b = world.bots.find((x) => x.spec.key === key);
-      const p = b && world.players.get(b.pid);
-      if (!p || p.dead || taken.has(b.pid) || hasAura(p, ISLE_AURAS.windworn)) continue;
-      if (Object.values(MARK).some((m) => hasAura(p, m))) continue;
-      group.push(b.pid);
-      if (group.length >= 4) break;
-    }
-    // No healer or too few to kill the adds: the isle is left to burst.
-    const healer = group.some((pid) => world.players.get(pid)?.healer);
-    // Normal: the raid stays on the Cornice and lets the Bulwark burst (the
-    // design's way for a raid that never rides; the bots' isle groups died
-    // to the Sentinel more often than not).
-    if (DIFF === 'normal' || group.length < 4 || !healer) {
-      st.riders.set(isle, []);
-      log(`ISLE ${isle}: nobody rides (no healer or too few free)`);
-      continue;
-    }
-    st.riders.set(isle, group);
-    log(`ISLE ${isle}: ${group.map((pid) => world.players.get(pid)?.name).join(', ')} ride out`);
-  }
-  for (const [isle, group] of st.riders) {
-    const still = group.some((pid) => {
-      const p = world.players.get(pid);
-      return p && !p.dead && isleOf(world, p) === isle;
-    });
-    if (!o.paths[isle] && !o.homes[isle] && !still) st.riders.delete(isle);
-  }
   // The Knotted Gale: a carrier per free ball.
   if (IGNORE !== 'knot') {
     for (const k of o.knots) {
@@ -503,9 +576,11 @@ function duty(world, st, b, me) {
     return { goal: me, hold: true, duty: 'carried' };
   const isle = isleOf(world, me);
   if (isle >= 0) return isleDuty(world, st, b, me, isle);
-  for (const [i, group] of st.riders) {
-    if (group.includes(b.pid) && o.paths[i] && !hasAura(me, ISLE_AURAS.windworn))
-      return { goal: o.paths[i], tol: 0.8, duty: 'ride' };
+  if (islesOn(world)) {
+    // On the Cornice: into the side's Updraft (the whole raid goes).
+    const side = sideOf(st, b);
+    const pad = o.pads.find((p) => p.from < 0 && p.to === side * 3);
+    if (pad) return { goal: pad, tol: 0.8, duty: 'ride' };
   }
   const knot = knotDuty(world, st, b, me);
   if (knot) return knot;
@@ -669,20 +744,88 @@ function drawnDuty(world, st, b, me) {
 
 function isleDuty(world, st, b, me, isle) {
   const o = world.o;
-  const t = isleTarget(world, isle, me);
   const spots = isleSpots()[isle];
   const land = W(world, spots.land);
-  if (!t) {
-    if (o.homes[isle]) return { goal: o.homes[isle], tol: 0.8, duty: 'ride home' };
-    return { goal: land, tol: 1.0, duty: 'isle wait' };
-  }
-  if (b.spec.melee || b.spec.role === 'tank') {
-    // In reach of the add, never past the isle's own floor.
-    const at = add(t, unit(t, me), 2);
+  const onIsle = (at) => {
     const l = L(world, at);
-    return { goal: isleAt(l.x, l.z) === isle ? at : land, tol: 1.2, duty: 'isle fight' };
+    return isleAt(l.x, l.z) === isle;
+  };
+  // Sky's Reckoning: out of any strike laid on the isle.
+  for (const k of o.strikes) {
+    if (hypot(k, me) > k.r + 1) continue;
+    const away = unit(k, me);
+    for (const d of [4.5, 3, 6]) {
+      const at = add(k, hypot(k, me) < 0.3 ? unit(me, land) : away, k.r + d - 2);
+      if (onIsle(at)) return { goal: at, tol: 0.6, duty: 'isle dodge' };
+    }
+    return { goal: land, tol: 0.8, duty: 'isle dodge' };
   }
-  return { goal: land, tol: 1.5, duty: 'isle fight' };
+  const mine = world.isleAdds.filter((m) => isleOf(world, m) === isle);
+  // The Herald's gale: out of its line, sideways, while its bar runs.
+  for (const h of mine) {
+    if (h.tid !== ISLE_MOBS.herald || h.cast !== ISLE_CASTS.shove) continue;
+    const dir = { ux: Math.sin(h.f ?? 0), uz: Math.cos(h.f ?? 0) };
+    if (!inShoveLine({ x: h.x, z: h.z }, dir, me.x, me.z)) continue;
+    const side = { x: -dir.uz, z: dir.ux };
+    const s1 = (me.x - h.x) * side.x + (me.z - h.z) * side.z >= 0 ? 1 : -1;
+    for (const sg of [s1, -s1]) {
+      const at = add(me, { x: side.x * sg, z: side.z * sg }, 4.5);
+      if (onIsle(at)) return { goal: at, tol: 0.5, duty: 'isle gale' };
+    }
+  }
+  if (mine.length > 0) {
+    if (me.tank) {
+      const t = world.allEnts?.get(b.tankTarget) ?? mine[0];
+      const at = add(t, unit(t, me), 2.2);
+      return { goal: onIsle(at) ? at : land, tol: 1.2, duty: 'isle tank' };
+    }
+    const t = isleTarget(world, isle, me);
+    if (!t) return { goal: land, tol: 1.5, duty: 'isle wait' };
+    // The Shieldbearer: strike its back (its ward turns aside the front).
+    if (t.tid === ISLE_MOBS.shieldbearer) {
+      const back = { x: -Math.sin(t.f ?? 0), z: -Math.cos(t.f ?? 0) };
+      const r = b.spec.melee ? 2.5 : 8;
+      for (const turn of [0, 0.5, -0.5, 0.9, -0.9]) {
+        const c = Math.cos(turn);
+        const sn = Math.sin(turn);
+        const d = { x: back.x * c - back.z * sn, z: back.x * sn + back.z * c };
+        const at = add(t, d, r);
+        if (onIsle(at)) return { goal: at, tol: 1.0, duty: 'isle back' };
+      }
+    }
+    if (b.spec.melee) {
+      const at = add(t, unit(t, me), 2);
+      return { goal: onIsle(at) ? at : land, tol: 1.2, duty: 'isle fight' };
+    }
+    return { goal: land, tol: 2.0, duty: 'isle fight' };
+  }
+  // Cleared: on to the next isle.
+  const pad = o.pads.find((p) => p.from === isle);
+  if (pad) return { goal: pad, tol: 0.8, duty: 'ride on' };
+  // The chain's end: the stone, channeled by one damage dealer (the rest
+  // stand clear of it so no hit lands on the channeler).
+  const stone = world.stones.find((e) => isleOf(world, e) === isle);
+  if (stone && islesOn(world)) {
+    const team = world
+      .living()
+      .filter((p) => p.bot && isleOf(world, p) === isle && !p.tank && !p.healer)
+      .sort((x, y) => x.pid - y.pid);
+    const who = team[0] ?? world.living().find((p) => p.bot && isleOf(world, p) === isle);
+    if (who?.pid === b.pid) {
+      if (hypot(me, stone) > 3.2)
+        return { goal: add(stone, unit(stone, me), 2), tol: 0.6, duty: 'stone' };
+      const press = (bot) => {
+        if (bot.self.cast === ISLE_CASTS.still) return true;
+        if (Date.now() - (bot.lastPress ?? 0) < 700) return true;
+        bot.lastPress = Date.now();
+        if (bot.self.target !== stone.id) bot.cmd({ cmd: 'target', id: stone.id });
+        else bot.cmd({ cmd: 'interact' });
+        return true;
+      };
+      return { goal: me, hold: true, duty: 'stone', cast: press };
+    }
+  }
+  return { goal: land, tol: 1.5, duty: 'isle wait' };
 }
 
 // ---- the Knotted Gale (Heroic and Mythic) -------------------------------------------

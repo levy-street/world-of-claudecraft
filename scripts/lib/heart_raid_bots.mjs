@@ -1130,7 +1130,9 @@ function combatTarget(world, st, b, boss) {
     const tt = b.tankTarget;
     const m =
       typeof tt === 'number'
-        ? (world.obs.ents.get(tt) ?? null)
+        ? // The observer's view, else the tank's own (a raid split out of
+          // one player's interest radius: the Breath's isles).
+          (world.obs.ents.get(tt) ?? b.ents?.get(tt) ?? null)
         : typeof tt === 'string'
           ? world.mobs[tt]
           : null;
@@ -1459,7 +1461,7 @@ function kickCoordinator(world, st, bots, boss) {
   const bars = boss.kickables?.(world) ?? [];
   const k = st.kick;
   if (k && !k.done) {
-    const mob = world.obs.ents.get(k.mobId);
+    const mob = world.obs.ents.get(k.mobId) ?? world.allEnts?.get(k.mobId);
     const cur = alive(mob) ? (mob.cast ?? null) : null;
     if (k.sent && hasAura(mob, `${k.ability}_lockout`)) {
       k.done = true;
@@ -1562,7 +1564,7 @@ function pickKicker(world, st, bots, s, exclude = null) {
 
 function doKick(world, st, b) {
   const k = st.kick;
-  const s = world.obs.ents.get(k.mobId);
+  const s = world.obs.ents.get(k.mobId) ?? world.allEnts?.get(k.mobId);
   k.sent = true;
   k.sentAt = Date.now();
   if (k.fumble || !alive(s) || !s.cast) return;
