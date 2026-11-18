@@ -5909,6 +5909,12 @@ export const hudChromeStrings = {
       knellAirborne:
         'On the wing over the Rite Ring, out of reach. It marks half of the ring for {mark} sec, then pours ghost fire over that half: {min} to {max} Fire damage to everyone in it. It burns {breaths} halves each flight, then lands.',
     },
+    // The Quartered Isle's own auras (src/ui/quartered_aura_effect.ts).
+    // Wordy (M16): non-Latin fills in the overlays.
+    quartered: {
+      galeLane:
+        "The gale carries you up the road to the Gyre's summit, even standing still: up to {speed} yd/sec, easing to {summit} yd/sec as you near the top. It keeps you on the road through every bend and jump. Strafe to cross the road, or move down it to walk against the wind. Casting is interrupted while it carries you. Lasts up to {linger} sec after you leave a gale lane, carrying you across the gaps between lanes.",
+    },
     // The Gravewyrm Sanctum's boss auras (src/ui/sanctum_aura_effect.ts).
     sanctum: {
       lockbound:

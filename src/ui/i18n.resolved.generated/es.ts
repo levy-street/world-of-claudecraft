@@ -4732,6 +4732,9 @@ export const es: EnTranslations = {
         "graspRoot": "Sujeto por las manos de la tumba: no puedes moverte durante {seconds} s.",
         "knellAirborne": "Vuela sobre el Círculo Ritual, fuera de alcance. Marca la mitad del círculo durante {mark} s y luego vierte fuego fantasmal sobre esa mitad: de {min} a {max} de daño de Fuego a todos los que estén dentro. Quema {breaths} mitades en cada vuelo y luego aterriza."
       },
+      "quartered": {
+        "galeLane": "The gale carries you up the road to the Gyre's summit, even standing still: up to {speed} yd/sec, easing to {summit} yd/sec as you near the top. It keeps you on the road through every bend and jump. Strafe to cross the road, or move down it to walk against the wind. Casting is interrupted while it carries you. Lasts up to {linger} sec after you leave a gale lane, carrying you across the gaps between lanes."
+      },
       "sanctum": {
         "lockbound": "Recibe un {pct}% menos de daño: {per}% por cada una de sus cadenas que sigue intacta. Rompe un Grillete del sello para soltar su cadena.",
         "enrage": "Inflige un {pct}% más de daño.",

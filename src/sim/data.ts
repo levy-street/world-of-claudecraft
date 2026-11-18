@@ -371,6 +371,7 @@ import {
   ZONE3_ROADS,
   ZONE3_ZONE,
 } from './content/zone3';
+import { seatedOnFootprint } from './decor_seat';
 import { DUNGEON_WALL_HW, DUNGEON_WALL_X } from './dungeon_layout';
 import { EASTBROOK_LAYOUT } from './eastbrook_layout';
 import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
@@ -990,10 +991,15 @@ export const PROPS: ZonePropsDef = mergeProps([
   FARSHORE_PROPS,
   PROVING_SHORE_PROPS,
   // the isle's spires and ruins join its props here, after the zone module has
-  // loaded: they are placed against its roads (content/quartered_spires.ts)
+  // loaded: they are placed against its roads (content/quartered_spires.ts). The
+  // isle is shattered ground, so every piece sits on its whole footprint, never on
+  // the height at its centre alone (decor_seat.ts)
   {
     ...QUARTERED_ISLE_PROPS,
-    decorProps: [...(QUARTERED_ISLE_PROPS.decorProps ?? []), ...QUARTERED_ISLE_SPIRES],
+    decorProps: seatedOnFootprint([
+      ...(QUARTERED_ISLE_PROPS.decorProps ?? []),
+      ...QUARTERED_ISLE_SPIRES,
+    ]),
   },
 ]);
 

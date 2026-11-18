@@ -4732,6 +4732,9 @@ export const vi_VN: EnTranslations = {
         "graspRoot": "Bị bàn tay mộ phần giữ: không di chuyển được trong {seconds} giây.",
         "knellAirborne": "Đang bay trên Vòng Nghi Lễ, ngoài tầm với. Nó đánh dấu nửa vòng trong {mark} giây rồi trút lửa ma lên nửa đó: {min} đến {max} sát thương Lửa cho mọi người bên trong. Nó đốt {breaths} nửa mỗi chuyến bay rồi đáp xuống."
       },
+      "quartered": {
+        "galeLane": "The gale carries you up the road to the Gyre's summit, even standing still: up to {speed} yd/sec, easing to {summit} yd/sec as you near the top. It keeps you on the road through every bend and jump. Strafe to cross the road, or move down it to walk against the wind. Casting is interrupted while it carries you. Lasts up to {linger} sec after you leave a gale lane, carrying you across the gaps between lanes."
+      },
       "sanctum": {
         "lockbound": "Chịu ít hơn {pct}% sát thương: {per}% mỗi sợi xích còn giữ hắn. Phá Xiềng Phong Ấn để thả xích.",
         "enrage": "Gây thêm {pct}% sát thương.",

@@ -4732,6 +4732,9 @@ export const cs_CZ: EnTranslations = {
         "graspRoot": "Držen rukama hrobu: nemůže se pohybovat {seconds} s.",
         "knellAirborne": "Létá nad Obřadním kruhem mimo dosah. Na {mark} s označí polovinu kruhu a pak ji zalije přízračným ohněm: všichni v ní utrpí {min} až {max} ohnivého poškození. Při každém letu spálí {breaths} polovin a potom přistane."
       },
+      "quartered": {
+        "galeLane": "The gale carries you up the road to the Gyre's summit, even standing still: up to {speed} yd/sec, easing to {summit} yd/sec as you near the top. It keeps you on the road through every bend and jump. Strafe to cross the road, or move down it to walk against the wind. Casting is interrupted while it carries you. Lasts up to {linger} sec after you leave a gale lane, carrying you across the gaps between lanes."
+      },
       "sanctum": {
         "lockbound": "Utrpí o {pct}% méně poškození: {per}% za každý dosud držící řetěz. Rozbijte Pečetní okov a shodíte jeho řetěz.",
         "enrage": "Způsobuje o {pct}% více poškození.",

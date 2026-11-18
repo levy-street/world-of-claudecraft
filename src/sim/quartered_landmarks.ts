@@ -145,6 +145,23 @@ export function gyrePathPoint(t: number): { x: number; z: number; y: number } {
   return { x: GYRE_PEAK.x + Math.cos(a) * r, z: GYRE_PEAK.z + Math.sin(a) * r, y: gyrePathY(phi) };
 }
 
+/** Where (x, z) stands on the Gyre's path: how far along it (`t`, 0 at the foot to 1 at the crown)
+ *  and how far outboard of its centre line (`off`, yards, positive toward the outer lip), or
+ *  null off the path (on a face between the turns, past the outermost one, or on the crown). */
+export function gyrePathAt(x: number, z: number): { t: number; off: number } | null {
+  const g = GYRE_PEAK;
+  const dx = x - g.x;
+  const dz = z - g.z;
+  const r = Math.hypot(dx, dz);
+  const half = g.pathW / 2;
+  if (r > g.startR + half || r < g.endR - half) return null;
+  const phi = gyreTurnOutside(Math.atan2(dz, dx), r);
+  if (phi === null) return null;
+  const off = r - gyrePathR(phi);
+  if (Math.abs(off) > half) return null;
+  return { t: phi / GYRE_SPAN, off };
+}
+
 /** The approach to the path's start: a ramp running south down the north
  *  road from the path's foot, as wide as the path with walkable shoulders,
  *  so the road climbs onto the Gyre square-on from the town whatever the
@@ -586,6 +603,60 @@ export interface QuarteredLandmarkTint {
   basalt: number;
   /** Rivalmoot's paved top: worn flagstone laid over the rise */
   moot: number;
+  /** the Gyre's storm granite: its body and the foot it stands on */
+  gyreRock: number;
+  /** the Gyre's switchback path: pale worn flagstone through the granite */
+  gyreWay: number;
+  /** the Gyre's wind-scoured crown: the granite gone pale and silver toward the top */
+  gyreCap: number;
+}
+
+/** The Gyre's rock reaches this far past the outermost turn's outer edge before it has faded
+ *  into the plain's own ground, yards: a spread of scree round the foot, so the crags standing
+ *  on it sit in their own rock. */
+const GYRE_FOOT_START = 1.5;
+const GYRE_FOOT_END = 11;
+/** The path's flagstone fades out over this band at its edges, yards (inside, outside the lip). */
+const GYRE_WAY_EDGE_IN = 0.8;
+const GYRE_WAY_EDGE_OUT = 0.4;
+/** The scoured cap: full on the crown, gone by this radius from the peak's centre, yards. The
+ *  line wanders with the bearing so it never reads as a drawn ring. */
+const GYRE_CAP_FULL_R = 11;
+const GYRE_CAP_END_R = 25;
+const GYRE_CAP_STRENGTH = 0.75;
+
+/** The Gyre's ground channels at (x, z), written into `out` (zero off the peak and its foot). */
+export function gyreGroundAt(
+  x: number,
+  z: number,
+  out: Pick<QuarteredLandmarkTint, 'gyreRock' | 'gyreWay' | 'gyreCap'>,
+): void {
+  out.gyreRock = 0;
+  out.gyreWay = 0;
+  out.gyreCap = 0;
+  const g = GYRE_PEAK;
+  const dx = x - g.x;
+  const dz = z - g.z;
+  const r = Math.hypot(dx, dz);
+  const half = g.pathW / 2;
+  if (r > g.startR + half + GYRE_FOOT_END) return;
+  const theta = Math.atan2(dz, dx);
+  // the outermost turn's outer edge at this bearing: the body of the peak ends there, and the
+  // foot's scree fades out past it
+  let base = (theta - GYRE_START_ANGLE) % (Math.PI * 2);
+  if (base < 0) base += Math.PI * 2;
+  const edge = gyrePathR(base) + half;
+  out.gyreRock = 1 - smoothstep(edge + GYRE_FOOT_START, edge + GYRE_FOOT_END, r);
+  const phi = gyreTurnOutside(theta, r);
+  if (phi !== null) {
+    const d = Math.abs(r - gyrePathR(phi));
+    out.gyreWay = 1 - smoothstep(half - GYRE_WAY_EDGE_IN, half + GYRE_WAY_EDGE_OUT, d);
+  }
+  const wobble = 2.2 * Math.sin(theta * 3 + 0.9) + 1.3 * Math.sin(theta * 7 + 2.1);
+  out.gyreCap =
+    GYRE_CAP_STRENGTH *
+    (1 - smoothstep(GYRE_CAP_FULL_R + wobble, GYRE_CAP_END_R + wobble, r)) *
+    out.gyreRock;
 }
 
 export function quarteredLandmarkTint(x: number, z: number, out: QuarteredLandmarkTint): void {
@@ -616,6 +687,7 @@ export function quarteredLandmarkTint(x: number, z: number, out: QuarteredLandma
   // the one place on the isle the four hold in common
   const moot = Math.hypot(x - RIVALMOOT_HILL.x, z - RIVALMOOT_HILL.z);
   out.moot = 1 - smoothstep(RIVALMOOT_PAVING.fullR, RIVALMOOT_PAVING.endR, moot);
+  gyreGroundAt(x, z, out);
 }
 
 /** True where scatter (trees, rocks, grass tufts) must not grow: the Gyre's

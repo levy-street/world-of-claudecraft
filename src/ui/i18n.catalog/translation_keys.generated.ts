@@ -12830,6 +12830,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.auraEffect.polymorph'
   | 'hudChrome.auraEffect.powerEchoNext'
   | 'hudChrome.auraEffect.pyreGuardian'
+  | 'hudChrome.auraEffect.quartered.galeLane'
   | 'hudChrome.auraEffect.radiantResonance'
   | 'hudChrome.auraEffect.rageGen'
   | 'hudChrome.auraEffect.reckless'

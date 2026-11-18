@@ -9,6 +9,7 @@ import {
   arenaQuarterWeights,
   blendQuarterGround,
   FISSURE_GROUND_PALETTES,
+  GYRE_CLIFF_HEX,
   LANDMARK_GROUND_PALETTES,
   makeQuarterGroundLinear,
   QUARTER_CLIFF_HEX,
@@ -65,6 +66,25 @@ describe('quartered ground palette', () => {
     for (const q of QUARTERS) {
       const c = QUARTER_CENTERS[q];
       quarteredGroundAt(c.x, c.z, out);
+      if (q === 'wind') {
+        // the wind's heart IS the Gyre, which wears its own storm granite and pale scoured cap
+        // (tests/quartered_gyre_ground.test.ts): the crown's ground lies between the two tones
+        const rock = quarterHexToLinear(LANDMARK_GROUND_PALETTES.gyreRock.grass);
+        const cap = quarterHexToLinear(LANDMARK_GROUND_PALETTES.gyreCap.grass);
+        const ab = cap.map((v, i) => v - rock[i]);
+        const ap = out.grass.map((v, i) => v - rock[i]);
+        const u = Math.max(
+          0,
+          Math.min(
+            1,
+            (ap[0] * ab[0] + ap[1] * ab[1] + ap[2] * ab[2]) /
+              (ab[0] ** 2 + ab[1] ** 2 + ab[2] ** 2),
+          ),
+        );
+        const nearest = rock.map((v, i) => v + ab[i] * u);
+        expect(dist(out.grass, nearest), 'the Gyre crown').toBeLessThan(1e-6);
+        continue;
+      }
       const own = dist(out.grass, quarterHexToLinear(QUARTER_GROUND_PALETTES[q].grass));
       for (const other of QUARTERS) {
         if (other === q) continue;
@@ -173,7 +193,18 @@ describe('quartered ground palette', () => {
     expect(b).toBeGreaterThanOrEqual(r);
     // and away from every landmark and fissure the ground is the plain
     // quarter blend (found by search: the shattering covers most of the isle)
-    const tint = { fissure: 0, ice: 0, ember: 0, glass: 0, stone: 0, basalt: 0, moot: 0 };
+    const tint = {
+      fissure: 0,
+      ice: 0,
+      ember: 0,
+      glass: 0,
+      stone: 0,
+      basalt: 0,
+      moot: 0,
+      gyreRock: 0,
+      gyreWay: 0,
+      gyreCap: 0,
+    };
     let spot: [number, number] | null = null;
     for (let x = -200; x <= 200 && !spot; x += 7) {
       for (let z = 2000; z <= 2380 && !spot; z += 7) {
@@ -246,7 +277,8 @@ describe('the quartered cliff stone', () => {
     for (const q of ['ice', 'fire', 'earth', 'wind'] as const) {
       const c = QUARTER_CENTERS[q];
       quarteredCliffAt(c.x, c.z, out);
-      const own = quarterHexToLinear(QUARTER_CLIFF_HEX[q]);
+      // the wind's heart is the Gyre, whose faces wear the Gyre's own crag stone
+      const own = quarterHexToLinear(q === 'wind' ? GYRE_CLIFF_HEX : QUARTER_CLIFF_HEX[q]);
       const d = Math.hypot(out[0] - own[0], out[1] - own[1], out[2] - own[2]);
       expect(d, q).toBeLessThan(0.08);
     }
@@ -337,7 +369,18 @@ describe("the Challenger's Ring floor", () => {
   });
 
   it('leaves the floor clear of the basalt the walls wear', () => {
-    const tint = { fissure: 0, ice: 0, ember: 0, glass: 0, stone: 0, basalt: 0, moot: 0 };
+    const tint = {
+      fissure: 0,
+      ice: 0,
+      ember: 0,
+      glass: 0,
+      stone: 0,
+      basalt: 0,
+      moot: 0,
+      gyreRock: 0,
+      gyreWay: 0,
+      gyreCap: 0,
+    };
     quarteredLandmarkTint(a.x + 20, a.z + 5, tint);
     expect(tint.basalt).toBe(0);
     quarteredLandmarkTint(a.x + a.wallR, a.z, tint);

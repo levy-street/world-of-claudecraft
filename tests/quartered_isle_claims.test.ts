@@ -6,12 +6,12 @@ import { describe, expect, it } from 'vitest';
 import { liveWorldBaseline } from '../src/editor/live_world_core';
 import { emberDressingSpots } from '../src/render/ember_features';
 import { ALL_BIOME_IDS } from '../src/sim/biome_ids';
-import { RIVALMOOT_GRAVEYARD_ID } from '../src/sim/content/graveyards';
+import { GYREFOOT_GRAVEYARD_ID, RIVALMOOT_GRAVEYARD_ID } from '../src/sim/content/graveyards';
 import { OVERWORLD_GRAVEYARDS, ZONES, zoneAt } from '../src/sim/data';
 import { emberLilySpots, emberScatterClear } from '../src/sim/ember_lilies';
 import { sanitizeMapDoc } from '../src/sim/map_doc';
 import { CHALLENGERS_RING } from '../src/sim/quartered_isle_terrain';
-import { QUARTERED_FROZEN_LAKES } from '../src/sim/quartered_landmarks';
+import { GYRE_PEAK, gyrePathPoint, QUARTERED_FROZEN_LAKES } from '../src/sim/quartered_landmarks';
 import { nearestOverworldGraveyard } from '../src/sim/spirit';
 import { groundHeight, WATER_LEVEL, ALL_BIOME_IDS as WORLD_BIOME_IDS } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
@@ -105,25 +105,49 @@ describe('Drakelands ember scatter on ground the isle claims', () => {
 describe('deaths on the isle', () => {
   const rivalmoot = OVERWORLD_GRAVEYARDS.find((g) => g.id === RIVALMOOT_GRAVEYARD_ID);
   if (!rivalmoot) throw new Error('Rivalmoot graveyard missing');
+  const gyrefoot = OVERWORLD_GRAVEYARDS.find((g) => g.id === GYREFOOT_GRAVEYARD_ID);
+  if (!gyrefoot) throw new Error('Gyrefoot graveyard missing');
+  const isleYards = [rivalmoot, gyrefoot];
 
-  it('release at Rivalmoot from every dry cell, even where a mainland yard is closer', () => {
+  it('release at the nearer of the isle yards from every dry cell, even where a mainland yard is closer', () => {
     let dry = 0;
     let mainlandCloser = 0;
+    let atGyrefoot = 0;
     for (let x = -246; x <= 246; x += 6) {
       for (let z = 1966; z <= 2416; z += 6) {
         if (!onIsle({ x, z }) || groundHeight(x, z, WORLD_SEED) <= WATER_LEVEL) continue;
         dry++;
         const got = nearestOverworldGraveyard(x, z);
-        expect(got, `${x},${z}`).toEqual({ x: rivalmoot.x, z: rivalmoot.z });
+        const near = isleYards.reduce((a, b) =>
+          Math.hypot(b.x - x, b.z - z) < Math.hypot(a.x - x, a.z - z) ? b : a,
+        );
+        expect(got, `${x},${z}`).toEqual({ x: near.x, z: near.z });
+        if (near === gyrefoot) atGyrefoot++;
         const plain = OVERWORLD_GRAVEYARDS.reduce((a, b) =>
           Math.hypot(b.x - x, b.z - z) < Math.hypot(a.x - x, a.z - z) ? b : a,
         );
-        if (plain !== rivalmoot) mainlandCloser++;
+        if (!isleYards.includes(plain)) mainlandCloser++;
       }
     }
     expect(dry).toBeGreaterThan(1000);
     // the rule is load-bearing: a real share of the isle is nearer a mainland yard
     expect(mainlandCloser).toBeGreaterThan(dry * 0.1);
+    // and Gyrefoot Rest takes the isle's north, round the storm peak
+    expect(atGyrefoot).toBeGreaterThan(dry * 0.1);
+  });
+
+  it('releases a fall anywhere on the Gyre, or at the gate on its crown, at Gyrefoot Rest', () => {
+    for (const t of [0, 0.25, 0.5, 0.75, 1]) {
+      const p = gyrePathPoint(t);
+      expect(nearestOverworldGraveyard(p.x, p.z), `path ${t}`).toEqual({
+        x: gyrefoot.x,
+        z: gyrefoot.z,
+      });
+    }
+    expect(nearestOverworldGraveyard(GYRE_PEAK.x, GYRE_PEAK.z)).toEqual({
+      x: gyrefoot.x,
+      z: gyrefoot.z,
+    });
   });
 
   it('covers the outer frozen lakes and the arena by name', () => {

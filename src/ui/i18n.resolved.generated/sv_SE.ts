@@ -4732,6 +4732,9 @@ export const sv_SE: EnTranslations = {
         "graspRoot": "Fasthållen av gravens händer: kan inte röra dig i {seconds} sek.",
         "knellAirborne": "Flyger ovanför ritringen, utom räckhåll. Den markerar halva ringen i {mark} sek och öser sedan spökeld över den halvan: {min} till {max} eldskada på alla där. Den bränner {breaths} halvor under varje flygning och landar sedan."
       },
+      "quartered": {
+        "galeLane": "The gale carries you up the road to the Gyre's summit, even standing still: up to {speed} yd/sec, easing to {summit} yd/sec as you near the top. It keeps you on the road through every bend and jump. Strafe to cross the road, or move down it to walk against the wind. Casting is interrupted while it carries you. Lasts up to {linger} sec after you leave a gale lane, carrying you across the gaps between lanes."
+      },
       "sanctum": {
         "lockbound": "Tar {pct}% mindre skada: {per}% för varje kedja som fortfarande håller honom. Bryt en sigillboja för att släppa dess kedja.",
         "enrage": "Gör {pct}% mer skada.",

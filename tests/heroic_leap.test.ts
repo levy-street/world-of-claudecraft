@@ -7,6 +7,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { handleDeath } from '../src/sim/combat/damage';
+import { advanceHeroicLeap } from '../src/sim/combat/heroic_leap';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -197,6 +198,43 @@ describe('Vaulting Charge: lifecycle resets', () => {
     expect(p.leap).toBeNull(); // dropped, not flown
     expect(Math.hypot(p.pos.x - landing.x, p.pos.z - landing.z)).toBeGreaterThan(3);
     expect(Math.hypot(p.pos.x - ghostPos.x, p.pos.z - ghostPos.z)).toBeLessThan(3);
+  });
+
+  it('drops a flight marked for a released spirit while the body is still a corpse', () => {
+    const { sim, p, landing } = armLeap(23);
+    handleDeath(sim.ctx, p, null);
+    // dead, not yet a ghost: a spirit's flight hand-armed on the corpse is dropped, never flown
+    p.leap = {
+      from: { ...p.pos },
+      to: { x: landing.x, y: 0, z: landing.z },
+      elapsed: 0,
+      duration: 0.6,
+      apex: 5,
+      landingAoe: { min: 0, max: 0, radius: 0 },
+      abilityName: 'Gale Lift',
+      abilityId: 'gyre_gale_launch',
+      school: 'nature',
+      spiritFlight: true,
+    };
+    const corpse = { ...p.pos };
+    // a corpse never advances its movement, so the arc is never flown
+    for (let i = 0; i < 20; i++) sim.tick();
+    expect(p.ghost).toBe(false);
+    expect(Math.hypot(p.pos.x - corpse.x, p.pos.z - corpse.z)).toBeLessThan(0.5);
+    // and the flight step itself refuses it: the mark is a ghost's, not a corpse's
+    expect(advanceHeroicLeap(sim.ctx, p)).toBe(false);
+    expect(p.leap ?? null).toBeNull();
+    expect(Math.hypot(p.pos.x - corpse.x, p.pos.z - corpse.z)).toBeLessThan(0.5);
+  });
+
+  it('flies a flight marked for a released spirit as any other while the body lives', () => {
+    const { sim, p, landing } = armLeap(29);
+    const leap = p.leap;
+    if (!leap) throw new Error('leap did not arm');
+    leap.spiritFlight = true;
+    for (let i = 0; i < 40 && p.leap; i++) sim.tick();
+    expect(p.leap).toBeNull();
+    expect(Math.hypot(p.pos.x - landing.x, p.pos.z - landing.z)).toBeLessThan(1);
   });
 
   it('arena fighter reset clears an in-flight leap', () => {

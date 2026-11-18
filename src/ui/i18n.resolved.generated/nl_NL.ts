@@ -4732,6 +4732,9 @@ export const nl_NL: EnTranslations = {
         "graspRoot": "Vastgehouden door de handen van het graf: kan {seconds} sec niet bewegen.",
         "knellAirborne": "Vliegt boven de Ritueelring, buiten bereik. Markeert de helft van de ring {mark} sec en stort dan spookvuur over die helft: {min} tot {max} vuurschade aan iedereen erin. Verbrandt {breaths} helften per vlucht en landt daarna."
       },
+      "quartered": {
+        "galeLane": "The gale carries you up the road to the Gyre's summit, even standing still: up to {speed} yd/sec, easing to {summit} yd/sec as you near the top. It keeps you on the road through every bend and jump. Strafe to cross the road, or move down it to walk against the wind. Casting is interrupted while it carries you. Lasts up to {linger} sec after you leave a gale lane, carrying you across the gaps between lanes."
+      },
       "sanctum": {
         "lockbound": "Krijgt {pct}% minder schade: {per}% per ketting die nog houdt. Breek een zegelboei om de ketting te laten vallen.",
         "enrage": "Doet {pct}% meer schade.",

@@ -4732,6 +4732,9 @@ export const id_ID: EnTranslations = {
         "graspRoot": "Ditahan tangan kubur: tidak dapat bergerak selama {seconds} dtk.",
         "knellAirborne": "Terbang di atas Lingkar Ritus, di luar jangkauan. Ia menandai separuh lingkaran selama {mark} dtk, lalu menyiram separuh itu dengan api arwah: {min} hingga {max} kerusakan Api kepada semua orang di dalamnya. Ia membakar {breaths} bagian setiap penerbangan, lalu mendarat."
       },
+      "quartered": {
+        "galeLane": "The gale carries you up the road to the Gyre's summit, even standing still: up to {speed} yd/sec, easing to {summit} yd/sec as you near the top. It keeps you on the road through every bend and jump. Strafe to cross the road, or move down it to walk against the wind. Casting is interrupted while it carries you. Lasts up to {linger} sec after you leave a gale lane, carrying you across the gaps between lanes."
+      },
       "sanctum": {
         "lockbound": "Menerima {pct}% lebih sedikit kerusakan: {per}% untuk setiap rantainya yang masih utuh. Hancurkan Belenggu Segel untuk menjatuhkan rantainya.",
         "enrage": "Memberikan {pct}% lebih banyak kerusakan.",

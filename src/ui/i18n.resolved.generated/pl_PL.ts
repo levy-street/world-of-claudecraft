@@ -4732,6 +4732,9 @@ export const pl_PL: EnTranslations = {
         "graspRoot": "Trzymany przez dłonie grobu: nie może się poruszać przez {seconds} s.",
         "knellAirborne": "Leci nad Kręgiem Rytuału, poza zasięgiem. Zaznacza połowę kręgu na {mark} s, potem zalewa ją widmowym ogniem: {min} do {max} obrażeń ognia dla każdego w środku. Podczas każdego lotu pali {breaths} połówek, a potem ląduje."
       },
+      "quartered": {
+        "galeLane": "The gale carries you up the road to the Gyre's summit, even standing still: up to {speed} yd/sec, easing to {summit} yd/sec as you near the top. It keeps you on the road through every bend and jump. Strafe to cross the road, or move down it to walk against the wind. Casting is interrupted while it carries you. Lasts up to {linger} sec after you leave a gale lane, carrying you across the gaps between lanes."
+      },
       "sanctum": {
         "lockbound": "Otrzymuje o {pct}% mniej obrażeń: {per}% za każdy wciąż trzymający łańcuch. Rozbij Kajdany Pieczęci, aby zrzucić ich łańcuch.",
         "enrage": "Zadaje o {pct}% więcej obrażeń.",

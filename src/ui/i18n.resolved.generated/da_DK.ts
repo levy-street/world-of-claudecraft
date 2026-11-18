@@ -4732,6 +4732,9 @@ export const da_DK: EnTranslations = {
         "graspRoot": "Holdt af gravens hænder: kan ikke bevæge dig i {seconds} sek.",
         "knellAirborne": "Flyver over ritualringen, uden for rækkevidde. Den markerer halvdelen af ringen i {mark} sek. og hælder så spøgelsesild over den halvdel: {min} til {max} ildskade på alle i den. Den brænder {breaths} halvdele på hver flyvning og lander så."
       },
+      "quartered": {
+        "galeLane": "The gale carries you up the road to the Gyre's summit, even standing still: up to {speed} yd/sec, easing to {summit} yd/sec as you near the top. It keeps you on the road through every bend and jump. Strafe to cross the road, or move down it to walk against the wind. Casting is interrupted while it carries you. Lasts up to {linger} sec after you leave a gale lane, carrying you across the gaps between lanes."
+      },
       "sanctum": {
         "lockbound": "Tager {pct}% mindre skade: {per}% for hver af hans kæder, der stadig holder. Bryd en segllænke for at frigøre dens kæde.",
         "enrage": "Gør {pct}% mere skade.",

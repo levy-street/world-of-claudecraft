@@ -16,7 +16,8 @@
 // fades in over the dusk ramp with its emissive rather than existing as new
 // daylight geometry, which would be a world-content change nobody asked for.
 import * as THREE from 'three';
-import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../sim/data';
+import { isBuiltinWorldActive, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../sim/data';
+import { quarteredLandmarkClears } from '../sim/quartered_landmarks';
 import { hash2 } from '../sim/rng';
 import type { BiomeId } from '../sim/types';
 import { roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
@@ -147,6 +148,8 @@ export function buildNightAccents(seed = 0): NightAccentsView {
     excluded: (x: number, z: number, groundY: number): boolean => {
       if (groundY < WATER_LEVEL + FLORA_WATER_CLEAR) return true;
       if (Math.abs(x) > WORLD_MAX_X - 6 || z < WORLD_MIN_Z + 6 || z > WORLD_MAX_Z - 6) return true;
+      // nor on the Quartered Isle's landmarks: the Gyre's path and crown, the rift's bed ...
+      if (isBuiltinWorldActive() && quarteredLandmarkClears(x, z)) return true;
       return roadDistance(x, z) < FLORA_ROAD_CLEAR;
     },
   };

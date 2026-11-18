@@ -22279,6 +22279,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '次の花嫁の哀歌で受けるダメージが{pct}%増加：1スタックごとに{per}%、最大{max}スタック。次はランタンの光の中で受けること。',
   'hudChrome.auraEffect.crypt.slippery':
     'すべりやすい氷の上：速度は毎秒最大{grip}ヤード/秒しか変わらないため、走り出しが遅く、止まっても滑り続け、曲がると大きく膨らむ。氷から降りれば足場が戻る。',
+  'hudChrome.auraEffect.quartered.galeLane':
+    '突風が旋風の峰の頂上へ続く道に沿って体を押し上げる。立ち止まっていても運ばれ、速度は最大{speed}ヤード/秒、頂上に近づくにつれて{summit}ヤード/秒まで緩やかに落ちる。カーブでもジャンプ中でも道から外れない。平行移動で道を横切り、道を下る方向へ進めば風に逆らって歩ける。風に運ばれている間は詠唱が中断される。風の道を離れてから最大{linger}秒続き、風の道の切れ目を越えて運んでくれる。',
   'hudChrome.auraEffect.crypt.harmony':
     '受けるダメージが{pct}%減少：生きている聖歌隊員1人ごとに{per}%。聖歌隊員を先に倒すこと。',
   'hudChrome.auraEffect.crypt.crescendo':

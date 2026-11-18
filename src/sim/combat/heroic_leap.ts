@@ -234,7 +234,11 @@ export function armHeroicLeap(
 export function advanceHeroicLeap(ctx: SimContext, entity: Entity): boolean {
   const flight = entity.leap;
   if (!flight) return false;
-  if (entity.dead || hasUnbreakableMovementLock(entity) || wasExternallyRelocated(entity)) {
+  // A dead body drops out of its flight: one that dies in the air, and any arc left on it from
+  // before the death. The one exception is a flight a released spirit took on purpose (the Gyre's
+  // wind pads, quartered_gyre_pads.ts), which a ghost flies to its end.
+  const fallen = entity.dead && !(entity.ghost && flight.spiritFlight === true);
+  if (fallen || hasUnbreakableMovementLock(entity) || wasExternallyRelocated(entity)) {
     entity.leap = null;
     // Stopped before it ever left the ground: the leap never happened, so it
     // costs no cooldown. One stopped mid-air was a real leap and keeps it.
