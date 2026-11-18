@@ -1248,6 +1248,9 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart_fx/breath_entrance_core.ts',
   'src/render/smith_heart_fx/heat_fight_fx_core.ts',
   'src/render/smith_heart_fx/heat_lava_wall_core.ts',
+  // The Wheel of the Hearth on screen: its slices' warning, eruption and
+  // scorch, its vents' layout and the low tier's share.
+  'src/render/smith_heart_fx/heat_wheel_fx_core.ts',
   // The Heat's floor ladder (every floor layer's unique rung) and its molten
   // telegraphs' looks.
   'src/render/smith_heart_fx/heat_floor_ladder_core.ts',

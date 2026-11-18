@@ -416,6 +416,10 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // ladder; the sheets, tongues, embers and haze stand in the air and take
   // bare orders over every floor band (WALL_AIR_ORDER), so not strict.
   { file: 'src/render/smith_heart_fx/heat_lava_wall_fx.ts', layer: 'encounter', strict: false },
+  // The Wheel of the Hearth's slices: each floor decal on Wakefire's commuting
+  // rungs (heat_molten_decal.ts); its vents (shimmer, geysers, the flame
+  // sheet) stand in the air on the lava wall's WALL_AIR_ORDER, so not strict.
+  { file: 'src/render/smith_heart_fx/heat_wheel_fx.ts', layer: 'encounter', strict: false },
   { file: 'src/render/smith_heart_fx/heat_cinder_fx.ts', layer: 'encounter', strict: true },
   { file: 'src/render/smith_heart_fx/heat_molten_decal.ts', layer: 'encounter', strict: true },
   { file: 'src/render/smith_heart_fx/heat_telegraph.ts', layer: 'encounter', strict: true },
