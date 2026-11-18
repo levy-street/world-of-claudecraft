@@ -555,8 +555,7 @@ Moving from one of these rooms into another (walked, or the hop into the Heart) 
 snaps: the fog, the key and fill lights, the sky's reflection, the rim and the key's
 direction crossfade over a second from the look the scene showed
 (`src/render/fog_scene_fade_core.ts`, the owner's ask of 2026-11-19), about the time the
-sky's own area blend takes; the way into the raid and out of it still cuts. Frames:
-`docs/screenshots/smith-heart-room-light-fade/`.
+sky's own area blend takes; the way into the raid and out of it still cuts.
 
 ### 5.9 The Hammer vein dressed (phase 2B)
 
