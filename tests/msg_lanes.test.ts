@@ -148,8 +148,9 @@ describe('classifyMsgLane mirrors the dispatch switch', () => {
     expect(classifyMsgLane({ t: 'cmd', cmd: 'chat', text: 'hello' })).toBe('chat');
   });
 
-  it('exempts logout, telemetry, and challengeResponse', () => {
+  it('exempts logout, leaving, telemetry, and challengeResponse', () => {
     expect(classifyMsgLane({ t: 'logout' })).toBe('exempt');
+    expect(classifyMsgLane({ t: 'leaving' })).toBe('exempt');
     expect(classifyMsgLane({ t: 'cmd', cmd: 'telemetry' })).toBe('exempt');
     expect(classifyMsgLane({ t: 'cmd', cmd: 'challengeResponse' })).toBe('exempt');
   });

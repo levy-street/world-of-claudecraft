@@ -22,6 +22,7 @@
 //   throttle and messaging; the ladder's cooldown copy still fires on the
 //   subset the lane passes.
 // - exempt, never lane-checked: t 'logout' (a clean leave always processes),
+//   t 'leaving' (the page-close forfeit signal, one frame per page),
 //   cmd 'telemetry', and cmd 'challengeResponse'. Defense-in-depth token
 //   accounting: beats and challenge replies never compete for command-lane
 //   tokens, and never spend or refill lane state at all.
@@ -121,7 +122,7 @@ function isNameScreenCommand(record: Record<string, unknown>): boolean {
 export function classifyMsgLane(msg: unknown): MsgLaneClass {
   if (typeof msg !== 'object' || msg === null || Array.isArray(msg)) return 'command';
   const record = msg as Record<string, unknown>;
-  if (record.t === 'logout') return 'exempt';
+  if (record.t === 'logout' || record.t === 'leaving') return 'exempt';
   if (record.t === 'input') return 'movement';
   if (record.t !== 'cmd') return 'command';
   if (record.cmd === 'chat') return 'chat';
