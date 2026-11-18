@@ -335,7 +335,7 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/smith_heart_fx/heat_swell_fx.ts': 1,
   'src/render/smith_heart_fx/heat_telegraph_glsl.ts': 1,
   'src/render/smith_heart_fx/heat_well_fx.ts': 1,
-  'src/render/smith_heart_fx/heat_wheel_glsl.ts': 2,
+  'src/render/smith_heart_fx/heat_wheel_glsl.ts': 3,
   'src/render/smith_heart_fx/quench_encase_fx.ts': 1,
   'src/render/smith_heart_fx/quench_fight_fx.ts': 2,
   'src/render/smith_heart_fx/quench_frost_fx.ts': 1,

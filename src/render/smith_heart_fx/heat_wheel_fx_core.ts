@@ -23,16 +23,23 @@ export const WHEEL_FX = {
   slots: 14,
   /** Geysers laid in the widest slice; a narrower one shows its share (few
    *  and big: a scatter of small flames read as confetti). */
-  vents: 12,
+  vents: 16,
   /** Every `geyserEvery`th vent is a geyser (every one since the second
    *  polish pass). */
   geyserEvery: 1,
   /** Each geyser's planes: three crossed (a volume from any side) and a
    *  camera-facing burst at its foot (round from straight above). */
   planes: 4,
-  /** Seconds the last round's fire takes to die on the next round's safe
-   *  slice (cosmetic). */
+  /** Seconds the big geysers take to drop on a burning slice the next round
+   *  marks safe (the clutter goes; the danger read stays: `danger`, `low`). */
   quench: 0.35,
+  /** While the sim still burns a slice its floor never reads cooler than
+   *  this fire (0..1) and its low flames stand (graphics fairness: no
+   *  invisible damage); once the sim drops it, both go over `out`. */
+  danger: 0.4,
+  out: 0.3,
+  /** A low flame's height (yards, min to max). */
+  low: [2.6, 4] as const,
   /** The vents' reach out from the lip (yards; the floor clips them). */
   ventInner: HEARTH_WELL.r + 2.5,
   ventOuter: 50,
@@ -42,7 +49,7 @@ export const WHEEL_FX = {
   /** The eruption runs out from the lip to the far wall over this long. */
   ripple: 0.32,
   /** A geyser's height (yards, min to max). */
-  geyser: [9, 15] as const,
+  geyser: [20, 32] as const,
   /** The scorch cools this long after the sim drops the slice. */
   fade: 2.6,
 } as const;
@@ -150,5 +157,42 @@ export function wheelVentAt(
   if (Math.min(a - from, to - a) * r < WHEEL_FX.ventEdge) return null;
   out[0] = Math.sin(a) * r;
   out[1] = Math.cos(a) * r;
+  return out;
+}
+
+/** What a burnt slice shows over its fire: the floor's fire (0..1), the big
+ *  geysers' share (0..1) and the low flames' (0..1). */
+export interface WheelFireLook {
+  floor: number;
+  geysers: number;
+  low: number;
+}
+
+/**
+ * A burnt slice's fire `look` (wheelEruptLook) while the sim still burns it
+ * (`burning`: its object stands) or `since` seconds after the sim dropped it,
+ * its geysers `quench`ed (0..1) once the next round marks it safe. While it
+ * burns it always reads as fire: the floor at least `danger`, the low flames
+ * up (the geysers may drop to cut the clutter, never the danger); after the
+ * drop both go over `out`.
+ */
+export function wheelFireLook(
+  look: WheelLook,
+  burning: boolean,
+  since: number,
+  quench: number,
+  out: WheelFireLook,
+): WheelFireLook {
+  const q = clamp01(quench);
+  if (burning) {
+    out.floor = Math.max(look.burn, WHEEL_FX.danger);
+    out.geysers = 1 - q;
+    out.low = 1;
+    return out;
+  }
+  const k = 1 - smooth(since / WHEEL_FX.out);
+  out.floor = Math.max(look.burn, WHEEL_FX.danger) * k;
+  out.geysers = (1 - q) * k;
+  out.low = k;
   return out;
 }

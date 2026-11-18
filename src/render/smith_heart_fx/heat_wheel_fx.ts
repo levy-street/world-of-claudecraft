@@ -35,9 +35,11 @@ import { moltenDecal } from './heat_molten_decal';
 import { floorRingGeometry } from './heat_shapes';
 import {
   WHEEL_FX,
+  type WheelFireLook,
   type WheelLook,
   wheelEruptLook,
   wheelEruptSpan,
+  wheelFireLook,
   wheelVentAt,
   wheelVentCount,
   wheelVents,
@@ -118,6 +120,8 @@ interface Slot {
    *  cosmetic, once the next round's safe slice lies on it. */
   slice: number;
   quench: number;
+  /** When the sim dropped it (the clock; its burn's real end). */
+  dropped: number;
   /** The wellspring's centre on the floor (world yards). */
   x: number;
   y: number;
@@ -129,6 +133,7 @@ interface Slot {
 }
 
 const _look: WheelLook = { build: 0, throb: 0, erupt: -1, burn: 0, scorch: 0 };
+const _fire: WheelFireLook = { floor: 0, geysers: 0, low: 0 };
 const _at: [number, number] = [0, 0];
 
 export class HeatWheelFx {
@@ -193,6 +198,7 @@ export class HeatWheelFx {
         uClip: { value: this.clip },
         uArc: { value: arc },
         uSafe: { value: 0 },
+        uPending: { value: 0 },
       };
       // Wakefire's two rungs: a char and a glow pool commute, so a crossing of
       // slices (two rounds) and bands composes the same from every angle.
@@ -221,7 +227,8 @@ export class HeatWheelFx {
         uBuild: floorU.uBuild,
         uErupt: floorU.uErupt,
         uBurn: floorU.uBurn,
-        uQuench: { value: 0 },
+        uGeysers: { value: 1 },
+        uLow: { value: 0 },
       };
       const ventMat = new THREE.ShaderMaterial({
         name: 'smithHeartHeatWheelVents',
@@ -255,6 +262,7 @@ export class HeatWheelFx {
         count: 0,
         slice: 0,
         quench: 0,
+        dropped: 0,
         x: 0,
         y: 0,
         z: 0,
@@ -295,8 +303,10 @@ export class HeatWheelFx {
     for (const s of this.slots) {
       if (s.id < 0 || ids.includes(s.id)) continue;
       s.id = -1;
-      if (s.phase === 'burn') s.phase = 'gone';
-      else this.free(s);
+      if (s.phase === 'burn') {
+        s.phase = 'gone';
+        s.dropped = clock;
+      } else this.free(s);
     }
     for (const id of ids) {
       const e = world.entities.get(id);
@@ -333,13 +343,21 @@ export class HeatWheelFx {
         if (of.state === 'burn') this.erupt(s);
       }
     }
-    // The next round's safe slice stays clean: the last round's fire on it
-    // dies fast (cosmetic; the sim's burn is unchanged).
+    // A slice the next round marks safe while the last round still burns it:
+    // its big geysers drop (the clutter), its fire floor and low flames stay
+    // until the sim's burn really ends, and the safe sheet waits, its rim
+    // only, until then (graphics fairness: no invisible damage).
     let safeMask = 0;
-    for (const s of this.slots) if (s.phase === 'safe') safeMask |= 1 << s.slice;
-    for (const s of this.slots)
+    let burnMask = 0;
+    for (const s of this.slots) {
+      if (s.phase === 'safe') safeMask |= 1 << s.slice;
+      if (s.phase === 'burn') burnMask |= 1 << s.slice;
+    }
+    for (const s of this.slots) {
       if ((s.phase === 'burn' || s.phase === 'gone') && safeMask & (1 << s.slice))
         s.quench = Math.min(1, s.quench + dt / WHEEL_FX.quench);
+      s.floorU.uPending.value = s.phase === 'safe' && burnMask & (1 << s.slice) ? 1 : 0;
+    }
     this.shown = false;
     for (const s of this.slots) {
       if (s.phase === null) continue;
@@ -375,10 +393,14 @@ export class HeatWheelFx {
     u.uBuild.value = look ? look.build : 0;
     u.uThrob.value = look ? look.throb : 0;
     u.uErupt.value = look ? look.erupt : -1;
-    const keep = 1 - s.quench;
-    u.uBurn.value = look ? look.burn * keep : 0;
-    u.uScorch.value = look ? look.scorch * keep : 0;
-    s.ventU.uQuench.value = s.quench;
+    const fire =
+      look && (s.phase === 'burn' || s.phase === 'gone')
+        ? wheelFireLook(look, s.phase === 'burn', clock - s.dropped, s.quench, _fire)
+        : null;
+    u.uBurn.value = fire ? fire.floor : 0;
+    u.uScorch.value = look ? look.scorch : 0;
+    s.ventU.uGeysers.value = fire ? fire.geysers : 1;
+    s.ventU.uLow.value = fire ? fire.low : 0;
     s.floor.position.set(s.x, s.y + 0.1, s.z);
     s.floor.scale.set(T.wheelOuter, 1, T.wheelOuter);
     s.floor.visible = true;
@@ -393,7 +415,7 @@ export class HeatWheelFx {
       s.phase === 'warn'
         ? 10 * look.build * look.build
         : s.phase === 'burn'
-          ? 14 * look.burn * (1 - s.quench)
+          ? 14 * (fire ? fire.floor : 0)
           : 0;
     let n = rate * dt * h.density;
     while (n > 0) {

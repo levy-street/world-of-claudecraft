@@ -19,6 +19,7 @@ import {
   type WheelLook,
   wheelEruptLook,
   wheelEruptSpan,
+  wheelFireLook,
   wheelVentAt,
   wheelVentCount,
   wheelVents,
@@ -72,6 +73,28 @@ describe('heat_wheel_fx_core: a slice warns, erupts and cools', () => {
     expect(wheelEruptLook(burn + WHEEL_FX.fade * 0.5, burn, look()).scorch).toBeGreaterThan(0.2);
     expect(wheelEruptLook(wheelEruptSpan(burn), burn, look()).scorch).toBe(0);
     expect(wheelEruptSpan(burn)).toBeCloseTo(burn + WHEEL_FX.fade, 5);
+  });
+
+  it('reads as fire for at least as long as the sim burns, quenched or not', () => {
+    const burn = T.wheelBurn;
+    const fire = { floor: 0, geysers: 0, low: 0 };
+    // The visual danger window covers the damage window: every instant the
+    // sim still burns the slice, the floor is at least the danger fire and
+    // the low flames stand, whether or not the next round marks it safe.
+    for (const quench of [0, 0.5, 1])
+      for (let t = 0.05; t <= burn + 1e-9; t += 0.05) {
+        wheelFireLook(wheelEruptLook(t, burn, look()), true, 0, quench, fire);
+        expect(fire.floor).toBeGreaterThanOrEqual(WHEEL_FX.danger);
+        expect(fire.low).toBe(1);
+        expect(fire.geysers).toBeCloseTo(1 - quench, 9);
+      }
+    // Once the sim drops it, it goes within WHEEL_FX.out.
+    const late = wheelEruptLook(burn + 0.1, burn, look());
+    wheelFireLook(late, false, 0, 0, fire);
+    expect(fire.floor).toBeGreaterThan(0);
+    wheelFireLook(late, false, WHEEL_FX.out, 0, fire);
+    expect(fire.floor).toBe(0);
+    expect(fire.low).toBe(0);
   });
 
   it('spreads the vents over a slice by its share, thins them on the low tier, keeps its edges clear', () => {
@@ -231,7 +254,7 @@ describe('the Wheel inside HeatFightFx over a fake world', () => {
     fx.dispose();
   });
 
-  it("puts out the last round's fire on the next round's safe slice, fast (cosmetic)", () => {
+  it("keeps the last round's fire reading as danger for as long as the sim burns it", () => {
     const entities = new Map<number, Entity>();
     const add = (e: Entity) => {
       entities.set(e.id, e);
@@ -259,20 +282,71 @@ describe('the Wheel inside HeatFightFx over a fake world', () => {
     const bump = () => {
       (world as unknown as { entityRosterVersion: number }).entityRosterVersion++;
     };
+    type Shown = { burn: number; scorch: number; geysers: number; low: number; pending: number };
+    /** Each visible slice's look, by its slice (from its arc's start). */
+    const looks = () => {
+      const out = new Map<string, Shown>();
+      scene.traverse((c) => {
+        const m = (c as THREE.Mesh).material as THREE.ShaderMaterial | undefined;
+        if (c.name !== 'smithHeartHeatWheel' || !c.visible || !m?.uniforms) return;
+        const vents = c.parent?.children.find(
+          (v) =>
+            v.name === 'smithHeartHeatWheelVents' &&
+            ((v as THREE.Mesh).material as THREE.ShaderMaterial).uniforms.uArc.value ===
+              m.uniforms.uArc.value,
+        ) as THREE.Mesh | undefined;
+        const vu = (vents?.material as THREE.ShaderMaterial | undefined)?.uniforms;
+        const key = `${(m.uniforms.uArc.value as THREE.Vector4).z.toFixed(3)}:${m.uniforms.uSafe.value}`;
+        out.set(key, {
+          burn: m.uniforms.uBurn.value as number,
+          scorch: m.uniforms.uScorch.value as number,
+          geysers: (vu?.uGeysers.value as number) ?? 1,
+          low: (vu?.uLow.value as number) ?? 0,
+          pending: m.uniforms.uPending.value as number,
+        });
+      });
+      return out;
+    };
+    const a0 = wheelArc(0).from.toFixed(3);
+    const a1 = wheelArc(1).from.toFixed(3);
     // Slices 0 and 1 burning; the next round's safe slice lies on slice 0.
-    add(entity('object', wheelTemplate(0, 'burn', T.wheelBurn), HEARTH_WELL.x, HEARTH_WELL.z));
-    add(entity('object', wheelTemplate(1, 'burn', T.wheelBurn), HEARTH_WELL.x, HEARTH_WELL.z));
+    const b0 = add(
+      entity('object', wheelTemplate(0, 'burn', T.wheelBurn), HEARTH_WELL.x, HEARTH_WELL.z),
+    );
+    const b1 = add(
+      entity('object', wheelTemplate(1, 'burn', T.wheelBurn), HEARTH_WELL.x, HEARTH_WELL.z),
+    );
     add(entity('object', wheelTemplate(0, 'safe', 5), HEARTH_WELL.x, HEARTH_WELL.z));
     bump();
-    run(3 + Math.ceil(WHEEL_FX.quench * 20) + 2);
-    const quench: number[] = [];
-    scene.traverse((c) => {
-      const m = (c as THREE.Mesh).material as THREE.ShaderMaterial | undefined;
-      if (c.name === 'smithHeartHeatWheelVents' && c.visible && m?.uniforms)
-        quench.push(m.uniforms.uQuench.value as number);
-    });
-    // Slice 0's fire is out; slice 1 still burns.
-    expect(quench.sort()).toEqual([0, 1]);
+    // Through the sim's whole burn window, the burning slice under the next
+    // safe one reads as fire: its floor at least the danger level, its low
+    // flames up, the safe sheet only its rim; its big geysers dropped.
+    const ticks = Math.round(T.wheelBurn * 20);
+    for (let i = 0; i < ticks; i++) {
+      run(1);
+      if (i < 4) continue;
+      const l = looks();
+      const fire = l.get(`${a0}:0`);
+      expect(fire, `tick ${i}`).toBeDefined();
+      expect(fire?.burn).toBeGreaterThanOrEqual(WHEEL_FX.danger);
+      expect(fire?.low).toBe(1);
+      expect(l.get(`${a0}:1`)?.pending).toBe(1);
+      expect(l.get(`${a1}:0`)?.burn).toBeGreaterThanOrEqual(WHEEL_FX.danger);
+      if (i > 4 + WHEEL_FX.quench * 20) {
+        expect(fire?.geysers).toBe(0);
+        expect(l.get(`${a1}:0`)?.geysers).toBe(1);
+      }
+    }
+    // The sim's burn ends: the safe sheet fills at once, the fire goes fast.
+    entities.delete(b0.id);
+    entities.delete(b1.id);
+    bump();
+    run(3);
+    expect(looks().get(`${a0}:1`)?.pending).toBe(0);
+    run(Math.ceil(WHEEL_FX.out * 20) + 1);
+    const after = looks().get(`${a0}:0`);
+    expect(after?.burn ?? 0).toBe(0);
+    expect(after?.low ?? 0).toBe(0);
     fx.dispose();
   });
 

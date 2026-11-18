@@ -43,6 +43,7 @@ uniform vec3 uRim;
 uniform vec4 uClip;
 uniform vec4 uArc;
 uniform float uSafe;
+uniform float uPending;
 varying vec2 vUv;
 varying vec3 vW;
 ${noise}
@@ -72,6 +73,9 @@ void main() {
     sheet = mix(sheet, vec3(0.66, 0.88, 1.0), 0.4 * rime + 0.25 * mist);
     vec3 cool = mix(sheet, vec3(0.86, 0.97, 1.0), clamp(hard, 0.0, 1.0));
     float ca = max(hard * 0.98, 0.5 + 0.08 * soft + 0.06 * mist + 0.03 * breathe);
+    // Still burning under it (the last round's fire): only the cold rim shows,
+    // the fire reads through until the sim's burn ends.
+    ca = mix(ca, hard * 0.98, uPending);
     gl_FragColor = vec4(cool * (1.0 + 0.5 * clamp(hard, 0.0, 1.0)), clamp(ca, 0.0, 0.97));
     #include <colorspace_fragment>
     return;
@@ -162,7 +166,8 @@ uniform float uCount;
 uniform float uBuild;
 uniform float uErupt;
 uniform float uBurn;
-uniform float uQuench;
+uniform float uGeysers;
+uniform float uLow;
 attribute vec4 aVent;
 attribute float aIndex;
 attribute float aPlane;
@@ -171,6 +176,7 @@ varying float vSeed;
 varying float vFire;
 varying float vHaze;
 varying float vBurst;
+varying float vLowK;
 ${WALL_COMMON_GLSL}
 ${CAMERA_RELATIVE_GLSL}
 void main() {
@@ -188,6 +194,7 @@ void main() {
   float hgt = 0.0;
   vFire = 0.0;
   vHaze = 0.0;
+  vLowK = 0.0;
   vec3 base = vec3(xz.x, uCenter.y - 0.15, xz.y);
   vec3 toCam = normalize(cameraPosition - base);
   float overhead = smoothstep(0.6, 0.95, toCam.y);
@@ -200,18 +207,24 @@ void main() {
   } else {
     // In step with the flash running out from the lip, a beat apart each.
     float lt = uErupt - aVent.y * ${WHEEL_FX.ripple.toFixed(2)} - fract(s * 7.13) * 0.1;
-    float rise = smoothstep(0.0, 0.14, lt);
-    float hold = 0.85 + 0.45 * s;
-    float fall = 1.0 - smoothstep(hold, hold + 0.6, lt);
-    float tail = max(fall, 0.35 * clamp(uBurn * 1.6, 0.0, 1.0));
-    vFire = rise * tail * (1.0 - uQuench);
-    hgt = mix(${WHEEL_FX.geyser[0].toFixed(2)}, ${WHEEL_FX.geyser[1].toFixed(2)}, fract(s * 3.7))
-      * rise * (0.35 + 0.65 * tail) * (1.0 + 0.25 * (1.0 - smoothstep(0.0, 0.35, lt)));
-    // Crossed planes go edge-on from straight above: the burst carries it there.
+    float rise = smoothstep(0.0, 0.2, lt);
+    float hold = 0.8 + 0.4 * s;
+    float fall = 1.0 - smoothstep(hold, hold + 0.5, lt);
+    // The column (staggered heights), then low flames while the sim burns.
+    float col = rise * fall * uGeysers;
+    float low = smoothstep(0.0, 0.25, lt) * uLow * (1.0 - col);
+    float colH = mix(${WHEEL_FX.geyser[0].toFixed(2)}, ${WHEEL_FX.geyser[1].toFixed(2)}, fract(s * 3.7))
+      * (0.25 + 0.75 * rise) * (0.6 + 0.4 * fall);
+    float lowH = mix(${WHEEL_FX.low[0].toFixed(2)}, ${WHEEL_FX.low[1].toFixed(2)}, fract(s * 5.3))
+      * (0.85 + 0.15 * sin(uTime * 9.0 + s * 41.0));
+    vFire = max(col, low);
+    hgt = col >= low ? colH : lowH;
+    vLowK = col >= low ? 0.0 : 1.0;
     // The burst is the bang at the foot; it gives way to the column (from
     // straight above it stays: the crossed planes go edge-on there).
-    float bang = 1.0 - smoothstep(0.2, 0.75, lt) * (1.0 - 0.6 * overhead);
-    vFire *= vBurst > 0.5 ? bang * mix(0.75, 1.0, overhead) : 1.0 - 0.6 * overhead;
+    float bang = (1.0 - smoothstep(0.2, 0.75, lt) * (1.0 - 0.6 * overhead)) * col;
+    if (vBurst > 0.5) vFire = bang * mix(0.75, 1.0, overhead);
+    else vFire *= 1.0 - 0.6 * overhead * (1.0 - vLowK);
   }
   if (inside < 0.5 || (vFire + vHaze) < 0.003 || hgt < 0.05) {
     gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
@@ -222,7 +235,7 @@ void main() {
     // The burst at the foot: a ball of fire facing the camera.
     vec3 right = vec3(viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]);
     vec3 camUp = vec3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]);
-    float size = hgt * 0.5;
+    float size = min(hgt * 0.32, 8.0);
     vec3 c = base + vec3(0.0, size * 0.5, 0.0);
     gl_Position = projectionMatrix * wocCamRelView(c + right * position.x * size + camUp * position.y * size);
     return;
@@ -240,7 +253,9 @@ void main() {
   float bend = sin(v * 4.2 - uTime * 3.4 + s * 40.0 + aPlane) * (0.5 + 0.5 * sin(uTime * 1.3 + s * 17.0));
   vec3 lean = vec3(cos(s * 31.0), 0.0, sin(s * 31.0)) * 0.12 * v * v * hgt;
   vec3 spine = base + up * v + side * bend * 0.08 * v * hgt + lean;
-  float width = hgt * (vHaze > 0.0 ? 0.3 : 0.5) * (0.85 + 0.3 * fract(s * 9.1 + aPlane * 0.37));
+  // A column a third as wide as it is tall (its foot wider: the fragment
+  // tapers it); a low flame squat and broad.
+  float width = hgt * (vHaze > 0.0 ? 0.3 : mix(0.36, 0.9, vLowK)) * (0.85 + 0.3 * fract(s * 9.1 + aPlane * 0.37));
   gl_Position = projectionMatrix * wocCamRelView(spine + side * position.x * width);
 }
 `;
@@ -256,6 +271,7 @@ varying float vSeed;
 varying float vFire;
 varying float vHaze;
 varying float vBurst;
+varying float vLowK;
 ${VENT_NOISE}
 ${rampGlsl}
 void main() {
@@ -288,16 +304,17 @@ void main() {
     gl_FragColor = vec4(col, smoothstep(0.03, 0.3, I) * vFire * 0.9 * foot);
     return;
   }
-  vec2 q = vec2(uv.x * 1.6 + s, uv.y * 1.35 - t * 2.4);
+  // Long columns stretch their flow; low flames keep it squat.
+  vec2 q = vec2(uv.x * 1.6 + s, uv.y * mix(3.2, 1.35, vLowK) - t * 2.6);
   vec2 warp = vec2(kfbm(q * 0.8 + vec2(0.0, -t * 0.5)), kfbm(q * 0.8 + vec2(5.2, 1.3 - t * 0.5))) - 0.5;
   float n = kfbm(q * 1.9 + warp * 1.7 + vec2(0.0, -t * 1.2));
   // Tongues of uneven height across the column, rising and breaking.
   float x = (uv.x - 0.5) * 2.0 + warp.x * 1.4 * uv.y;
   float r1 = 1.0 - abs(2.0 * kn(vec2(uv.x * 3.1 + s, t * 0.9)) - 1.0);
-  float top = 0.55 + 0.4 * r1 * r1;
+  float top = mix(0.72 + 0.26 * r1 * r1, 0.55 + 0.4 * r1 * r1, vLowK);
   float yy = uv.y / top;
   // Rounded where it boils out of the ground, widest low, tapering to licks.
-  float halfW = mix(0.8, 0.2, clamp(yy, 0.0, 1.0)) * (0.8 + 0.4 * n)
+  float halfW = mix(0.9, mix(0.42, 0.2, vLowK), pow(clamp(yy, 0.0, 1.0), mix(1.6, 1.0, vLowK))) * (0.8 + 0.4 * n)
     * (0.55 + 0.45 * smoothstep(0.0, 0.16, uv.y));
   float shape = 1.0 - smoothstep(halfW * 0.25, halfW, abs(x));
   float I = shape * ((1.0 - yy) * 1.1 + (n - 0.5) * 1.3);
@@ -305,8 +322,8 @@ void main() {
   I += (1.0 - smoothstep(0.0, 0.14, uv.y)) * 0.35 * shape;
   I = clamp(I * 1.35, 0.0, 1.0);
   // White-yellow at the foot, orange through the body, dark red at the tips.
-  float h = I * (1.0 - 0.55 * smoothstep(0.0, 1.0, yy));
-  vec3 col = fireRamp(h) * 1.1;
+  float h = I * (1.0 - 0.55 * smoothstep(0.0, 1.0, yy)) * mix(0.88, 1.0, vLowK);
+  vec3 col = fireRamp(h) * mix(0.95, 1.1, vLowK);
   float a = smoothstep(0.04, 0.28, I) * vFire * smoothstep(0.0, 0.12, uv.y);
   gl_FragColor = vec4(col, a);
 }
