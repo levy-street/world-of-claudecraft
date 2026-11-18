@@ -45,11 +45,23 @@ const PORT = Number(process.env.ATTACK_PORT || 5241);
 const RETRY_REJECTED = Boolean(process.env.RETRY_REJECTED);
 const only = process.env.ONLY ? new Set(process.env.ONLY.split(',')) : null;
 const TICK_HZ = 20;
-const VIEW = { width: 960, height: 640, deviceScaleFactor: 1 };
+// The page renders at SCALE x the 960 x 640 layout the stages were tuned on (same aspect, so
+// the same framing), so the 660 x 500 crop is a real 1320 x 1000 render: the full-size
+// image is downscaled from it, never upscaled.
+const SCALE = 2;
+const VIEW = { width: 960 * SCALE, height: 640 * SCALE, deviceScaleFactor: 1 };
 // The square-ish centre of the frame the camera rig below aims the fight into.
-const CLIP = { x: 150, y: 30, width: 660, height: 500 };
+const CLIP = { x: 150 * SCALE, y: 30 * SCALE, width: 660 * SCALE, height: 500 * SCALE };
+const FULL_PX = Number(process.env.ATTACK_FULL_PX || 1024);
+// MANIFEST_ONLY=1 recaptures only the attacks the manifest already ships (a re-shoot).
+const MANIFEST_ONLY = Boolean(process.env.MANIFEST_ONLY);
+// STAGE_TO=<dir> writes captures (thumb plus full/) there instead of public/ and leaves
+// the manifest alone, so a re-shoot can be reviewed against the shipped frames first.
+const STAGE_TO = process.env.STAGE_TO ? path.resolve(process.env.STAGE_TO) : null;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-mkdirSync(outDir, { recursive: true });
+const thumbDir = STAGE_TO ?? outDir;
+const fullDir = path.join(thumbDir, 'full');
+mkdirSync(fullDir, { recursive: true });
 if (process.env.KEEP_RAW) mkdirSync(rawDir, { recursive: true });
 
 export const attackKey = (name) =>
@@ -150,6 +162,15 @@ try {
       '#ui, #nameplates, #gpu-notice, #perf-nudge, #tutorial-greeting, #loot-settings-window, #options-menu, .camera-prompt-backdrop, .toast, .fct { display: none !important; }',
   });
   await page.evaluate(probeSource);
+  // The real render size (a graphics tier can render below the page size): the full-size
+  // file is only honest when the drawing buffer is at least the viewport.
+  console.log(
+    'drawing buffer',
+    await page.evaluate(() => {
+      const c = window.__game.renderer.renderer?.domElement ?? document.querySelector('canvas');
+      return `${c.width}x${c.height} for ${innerWidth}x${innerHeight}`;
+    }),
+  );
   // The client's own cast-label resolver, so a bar label folds to the name the wiki prints.
   await page.evaluate(async () => {
     const m = await import('/src/ui/cast_display_name.ts');
@@ -282,14 +303,25 @@ try {
     const file = `${boss.mobId}__${attackKey(name)}.webp`;
     if (process.env.KEEP_RAW)
       writeFileSync(path.join(rawDir, file.replace(/\.webp$/, '.png')), png);
+    // Two files from the same frame: the page thumbnail and the click-to-enlarge full size
+    // (the wiki derives /full/ from the thumbnail's path).
     const webp = await sharp(png)
       .resize({ width: OUT_PX })
       .webp({ quality: 82, effort: 6 })
       .toBuffer();
-    writeFileSync(path.join(outDir, file), webp);
-    manifest[boss.mobId] ??= {};
-    manifest[boss.mobId][name] = `/${OUT_DIR}/${file}`;
-    console.log(`  ok ${file} (${(webp.length / 1024).toFixed(1)} KB)`);
+    const full = await sharp(png)
+      .resize({ width: FULL_PX })
+      .webp({ quality: 82, effort: 6 })
+      .toBuffer();
+    writeFileSync(path.join(thumbDir, file), webp);
+    writeFileSync(path.join(fullDir, file), full);
+    if (!STAGE_TO) {
+      manifest[boss.mobId] ??= {};
+      manifest[boss.mobId][name] = `/${OUT_DIR}/${file}`;
+    }
+    console.log(
+      `  ok ${file} (${(webp.length / 1024).toFixed(1)} KB, full ${(full.length / 1024).toFixed(1)} KB)`,
+    );
   };
 
   /** Arm the generic watcher and fight for `seconds`, capturing every attack it catches. */
@@ -334,7 +366,9 @@ try {
     }
     const wantedNames = boss.attacks
       .map((a) => a.name)
-      .filter((n) => REJECTED.has(`${boss.mobId}|${n}`) === RETRY_REJECTED);
+      .filter((n) => REJECTED.has(`${boss.mobId}|${n}`) === RETRY_REJECTED)
+      .filter((n) => !MANIFEST_ONLY || Boolean(manifest[boss.mobId]?.[n]));
+    if (MANIFEST_ONLY && wantedNames.length === 0) continue;
     const bossStart = Date.now();
     console.log(`\n${boss.mobId} (${boss.mobName}): ${wantedNames.length} attacks`);
     const row = { mobId: boss.mobId, total: boss.attacks.length, got: [], missed: [], why: '' };
@@ -497,6 +531,9 @@ for (const [mobId, attacks] of Object.entries(manifest)) {
     const rejected = REJECTED.has(`${mobId}|${name}`) && !RETRY_REJECTED;
     if (!rejected && (STAGES[mobId] || process.env.UNSTAGED)) continue;
     rmSync(path.join(root, 'public', url), { force: true });
+    rmSync(path.join(root, 'public', url.replace(`/${OUT_DIR}/`, `/${OUT_DIR}/full/`)), {
+      force: true,
+    });
     delete attacks[name];
   }
   if (Object.keys(attacks).length === 0) delete manifest[mobId];

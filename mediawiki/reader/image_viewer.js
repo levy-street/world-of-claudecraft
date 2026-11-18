@@ -3,10 +3,18 @@
 
 const ZOOMABLE = 'img.attack-shot, .wiki-box-art img, .wiki-prose img.woc-page-art';
 
+/** An attack snapshot's full-size frame (scripts/wiki/render_attack_snapshots.mjs writes
+ *  it under full/), or null for a picture without one. */
+export function fullSizeUrl(src) {
+  const match = /^(.*\/encyclopedia-attacks\/)(?!full\/)([\w.-]+\.webp)(\?.*)?$/.exec(src);
+  return match ? match[1] + 'full/' + match[2] : null;
+}
+
 /** The caption for a picture: the attack it shows, or the article it heads. */
 export function imageCaption(img, pageTitle) {
   const card = img.closest('.mechanic-card');
-  const name = card?.querySelector('.mechanic-name')?.textContent;
+  // The name's own text, without the Deadly / Important tags beside it.
+  const name = card?.querySelector('.mechanic-name')?.firstChild?.textContent?.trim();
   if (name) return name;
   const line = img.closest('li')?.textContent.trim().split('. ')[0];
   return line || pageTitle || '';
@@ -29,7 +37,15 @@ export function mountImageViewer(view, titleOf = () => document.title) {
     }
     const big = dialog.querySelector('figure img');
     const caption = imageCaption(img, titleOf());
-    big.src = src;
+    // Open the full-size frame when there is one; fall back to the picture itself.
+    const full = fullSizeUrl(src);
+    big.onerror = full
+      ? () => {
+          big.onerror = null;
+          big.src = src;
+        }
+      : null;
+    big.src = full ?? src;
     big.alt = caption;
     dialog.querySelector('figcaption').textContent = caption;
     dialog.showModal();
