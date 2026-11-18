@@ -2245,44 +2245,24 @@ export const pending: Record<string, readonly string[]> = {
   "zh_CN": [
     "abilityUi.cast.heart_gale_bolt",
     "abilityUi.cast.heart_rime_bolt",
-    "hudChrome.auraEffect.finalBoss.bladeMark",
-    "hudChrome.auraEffect.finalBoss.skyMark",
-    "hudChrome.finalAlert.bladeLockedTitle",
-    "hudChrome.finalAlert.bladeTitle",
-    "hudChrome.finalAlert.skyTitle",
     "hudChrome.finalOverload.heat",
     "hudChrome.quenchAlert.secondsBar"
   ],
   "zh_TW": [
     "abilityUi.cast.heart_gale_bolt",
     "abilityUi.cast.heart_rime_bolt",
-    "hudChrome.auraEffect.finalBoss.bladeMark",
-    "hudChrome.auraEffect.finalBoss.skyMark",
-    "hudChrome.finalAlert.bladeLockedTitle",
-    "hudChrome.finalAlert.bladeTitle",
-    "hudChrome.finalAlert.skyTitle",
     "hudChrome.finalOverload.heat",
     "hudChrome.quenchAlert.secondsBar"
   ],
   "ko_KR": [
     "abilityUi.cast.heart_gale_bolt",
     "abilityUi.cast.heart_rime_bolt",
-    "hudChrome.auraEffect.finalBoss.bladeMark",
-    "hudChrome.auraEffect.finalBoss.skyMark",
-    "hudChrome.finalAlert.bladeLockedTitle",
-    "hudChrome.finalAlert.bladeTitle",
-    "hudChrome.finalAlert.skyTitle",
     "hudChrome.finalOverload.heat",
     "hudChrome.quenchAlert.secondsBar"
   ],
   "ja_JP": [
     "abilityUi.cast.heart_gale_bolt",
     "abilityUi.cast.heart_rime_bolt",
-    "hudChrome.auraEffect.finalBoss.bladeMark",
-    "hudChrome.auraEffect.finalBoss.skyMark",
-    "hudChrome.finalAlert.bladeLockedTitle",
-    "hudChrome.finalAlert.bladeTitle",
-    "hudChrome.finalAlert.skyTitle",
     "hudChrome.finalOverload.heat",
     "hudChrome.quenchAlert.secondsBar"
   ],
@@ -2661,11 +2641,6 @@ export const pending: Record<string, readonly string[]> = {
   "ru_RU": [
     "abilityUi.cast.heart_gale_bolt",
     "abilityUi.cast.heart_rime_bolt",
-    "hudChrome.auraEffect.finalBoss.bladeMark",
-    "hudChrome.auraEffect.finalBoss.skyMark",
-    "hudChrome.finalAlert.bladeLockedTitle",
-    "hudChrome.finalAlert.bladeTitle",
-    "hudChrome.finalAlert.skyTitle",
     "hudChrome.finalOverload.heat",
     "hudChrome.quenchAlert.secondsBar"
   ],
