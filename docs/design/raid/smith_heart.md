@@ -1934,6 +1934,74 @@ Stone, Echo of Wrath and Endless Song returned no game use (CLEAR; the nearest w
 
 ### 7.2 Guardian of the Breath
 
+**The Islands of the Wind, the 50 percent phase (the team's design of 2026-11-17, built
+2026-11-18).** Where it and anything below disagree (the Gale Bulwark rounds, the Gale Paths,
+the Homeward Gales, Windworn, the storm breaking on the mark), this block wins: those are gone.
+Every number is a SKETCH; the tier rows are `ISLE_TIERS` and the shared ones `ISLE_TUNING`
+(`breath_isle_ids.ts`).
+
+- **The lock.** At half health nothing takes the guardian lower: from the mark it is
+  untouchable (`lockForIsles`). A Knotted Gale in play is thrown or bursts first, and no new
+  ball falls once the mark is reached: the ball and the phase never meet. Then it closes its
+  **Gale Cocoon** (an aura: the Stillstones stilled, of 2) and channels **Skyrend Nova**, a
+  long bar that is the phase's clock (Normal 150 s, Heroic and Mythic 125 s). The wind falls
+  still, Thessaly's circle, the gales, the sky strikes and the tank swap stop (the fight's
+  `half` is `isles`). If the bar ends, the nova strikes everyone for 90 percent of their health
+  on Normal and kills on Heroic and Mythic, the feat breaks, and the fight goes on (the raid is
+  carried home, the storm breaks).
+- **The split.** Captain Thessaly raises two **Updrafts** on the Cornice (east and west): step
+  in and the wind carries you on the fixed ride (3.2 s, stunned, `rideArc`) to the first isle
+  of that side. Six floating isles (`BREATH_ISLES`), three a side, each a stride higher than
+  the last: the east chain leaves the rim and heads out over the southern void (the Heart's
+  crown and its area close the east rim), the west one curls round the open south-west rim.
+  The two authored isle floors are worn three times each, turned to face the Cornice (the
+  Breath kit's sculpts turned with them, `ISLE_KIT`).
+- **The isles.** Each isle's adds rise as its Updraft opens; once they are all down Thessaly
+  raises the Updraft on to the next isle. A different fight on each (`breath_isle_adds.ts`):
+  1. the Gale Sentinel (melee) and the Gale Mender, whose Mending Gale (3 s, every 10 s,
+     kickable) mends every add of its isle (20 percent of their health on Normal, 30 on
+     Heroic): kick it;
+  2. the Gust Herald, whose Shoving Gale (a 2.5 s bar every 9 s at a player who is not its
+     tank, the line locked as it begins: 26 yd long, 5 wide) throws everyone in it along the
+     line toward the rim (12 yd on Normal, held short of the lip; 20 on Heroic, off it into the
+     void): step out of the line; and the Riven Squall, which splits into two Squall Fragments
+     as it falls;
+  3. the Squall Shieldbearer, whose Squall Ward turns aside 85 percent (Heroic 90) of every
+     blow struck from inside its front arc (60 degrees each side, Heroic 70;
+     `combat/front_ward.ts`): its tank turns it away, the raid strikes its back.
+  Add health (before the tier's add multiplier, x1.2 Normal, x1.625 Heroic; set by the bot
+  passes of 2026-11-18 at POOL 0.65, the human clock: Normal's first numbers were cleared in
+  59 to 85 s of the nova's 150 and Heroic's in 56 s of 125, so Normal's went up about 1.9 times
+  and Heroic's 2.6 times; Heroic's last pass: 92 s of 125, no deaths):
+
+  | | Sentinel | Mender | Herald | Squall | Fragment | Shieldbearer |
+  |---|---|---|---|---|---|---|
+  | Normal | 4,350 | 2,450 | 2,850 | 3,250 | 1,250 | 5,700 |
+  | Heroic and Mythic | 6,000 | 3,400 | 3,900 | 4,400 | 1,700 | 7,800 |
+- **The Closing Storm.** Each isle's storm starts as its first rider lands: a ring closing on
+  its floor (Normal 50 s, Heroic 38 s). When it runs out, **Sky's Reckoning** rains a strike
+  under every player on that isle every 2.5 s (Heroic 2 s) on a 1.3 s warning, each 16 percent
+  of the struck one's health (Heroic 30): keep moving, finish the isle. Painful, never an
+  instant wipe on Normal.
+- **The Stillstones.** The last isle of each side holds one, woken when that isle's adds are
+  down (Heroic: two Squall Fragments rise to guard it). A player targets it and presses
+  interact: Still the Gale, a 5 s channel any landed hit breaks (the trash engine's G3 use).
+  Both stilled: the cocoon shatters, the nova is cut, the adds and pads go, every player on the
+  isles rides home, and 4 s later the storm breaks (phase 2, as before).
+- **A wipe** brings every body on an isle or in the air back to the Cornice; nothing of the
+  phase stays. **Mythic** is Heroic whole for now; ideas for it: a third chain (three groups),
+  Windworn back (one ride per player, so the groups cannot merge), the Shieldbearer's ward
+  turning on its own, the stones needing two channellers at once, the nova pulsing damage
+  that grows as it gathers.
+- **What the raid reads.** No banner: the nova's bar and growing light, the pads and their
+  routes, each isle's closing ring, the Herald's line, the ward's shield, the stone's glow and
+  beam (`render/smith_heart_fx/breath_isles_fx.ts`), Thessaly's lines (`isles`, `updraft`,
+  `stone`; unvoiced until the next voice pass) and the aura tooltips.
+- Code: `breath_isles.ts` (the phase), `breath_isle_adds.ts`, `breath_isle_geometry.ts`,
+  `breath_isle_ids.ts`, `breath_isle_hold.ts`, `breath_isle_dev.ts`. Tests:
+  `tests/smith_heart_breath_isles.test.ts` (the phase), `tests/smith_heart_breath_isle_floor.test.ts`
+  (the floors), `tests/smith_heart_breath_kit.test.ts` (the sculpts on the floors).
+
 **The rework of 2026-11-03 (the team's feedback, approved by the owner).** Where it and the
 table below disagree, this block wins. Every number stays a SKETCH (unmeasured).
 
@@ -2087,14 +2155,14 @@ the bots to reuse later).
 | The indrawn breath | About every 45 s (first at 38), only between blows: a 5 s bar, planted, the guardian turned toward the raid (the tank aside). The wind turns and draws everyone toward it at 5.5 yd a second (the kernel's pull aura, stopping 3.5 yd short); a vortex 7 yd before its mouth (4.5 yd) bites 90 to 110 every half second. Then the Summit Roar (Bellows Gust's id), a 1.5 s bar, then its wave leaves the maw at 30 yd a second: each player it reaches takes 160 to 200 and, since the owner's call of 2026-11-17, its blast (`BREATH_DIFFICULTY` `blastSpeed`, `blastSeconds`: 12 yd a second at the maw for 5 s, 14 for 6 s on heroic and mythic, easing outward to a floor): run straight back against it at once and you hold some 12 (17) yd out, stand and you are carried off the Cornice (`gustThrow` is 0 on every tier: no slid throw; the anchored keep their feet). The wind then comes back from a calm | `breath_gale.ts`, `breath_roar.ts` |
 | Storm Lance | Kept, unchanged: the trash kit's own line (34 yd, 2.5 yd half width, every 11 s, 240 to 280), in both halves; the fight's bars wait for it | content `trashKit.line` |
 | Bellows Blow (the tank swap, the Wind) | The owner's brief of 2026-11-16: the second tank had nothing to do here. Every 10 s (first at 8) a 1.5 s bar at the tank (planted, the lowest of its bars: a due one waits for a free guardian). While it runs a narrow wedge on the floor runs from the tank straight away from the guardian, as long as the throw (`BREATH_AURAS.blowMark`: its `value` the yards, the lethal tone when it goes off the Cornice). It lands for 200 to 240 Nature and throws the tank straight away from the guardian, a slide like the Summit Roar's (its own hold aura `blown`, the same hop), then one stack of Wind-Battered (25 s, refreshed by each blow, so the stacks fall off a tank the guardian stops striking). The throw by the stacks already on: Heroic and Mythic 6, 10, 15, 22 yd, then the fifth blow (four on) goes 4 yd past the floor's edge on its line, slowly, so the body falls by the Cornice and the void kills it: swap at 3. Normal 3, 5, 7, 9, 10, 11 yd, always stopped 3 yd in from any lip (`safeThrowReach`): it displaces, never kills; swap at 4. Thessaly's anchor (and the Knotted Gale's load) keeps the tank's feet: the blow lands and stacks, the throw does not. The storm breaking spends every stack | `breath_blow.ts` |
-| The storm breaks | At half health, the guardian free: a 4 s bar, planted. The wind stops at once (no blow, pull or circle; the anchors already given run out), the guardian draws it in and freezes, then tears open into its body of lightning (`heart_breath_storm_unbound` on it). For 10 s a volley of strikes every 0.8 s: one on a player where they stand, one hashed over the floor (never at a gap), each a 1.6 s warning, then 320 to 380 within 3.5 yd (Breaking Storm) | `breath_storm.ts` |
+| The storm breaks | Once the Islands of the Wind are over (2026-11-18; before, at half health), the guardian free: a 4 s bar, planted. The wind stops at once (no blow, pull or circle; the anchors already given run out), the guardian draws it in and freezes, then tears open into its body of lightning (`heart_breath_storm_unbound` on it). For 10 s a volley of strikes every 0.8 s: one on a player where they stand, one hashed over the floor (never at a gap), each a 1.6 s warning, then 320 to 380 within 3.5 yd (Breaking Storm) | `breath_storm.ts` |
 | Leaping Bolt | Phase 2, every 22 s: a 2.5 s bar at a hashed non-tank, then 240 to 280 on them, jumping to the nearest player not yet struck within 8 yd, again and again (up to nine jumps): spread | `breath_storm.ts` (`forkPath`) |
 | Thunder's Cradle | Phase 2, every 40 s: a 1.5 s bar at a hashed non-tank; they are lifted 5 yd into the storm (carried, an unbreakable stun) over a 6 yd gather circle. 6 s on, the discharge: 2,600 split between everyone under it, the lifted included. Fewer than 4 under it (on heroic and mythic three circles of 1,900 at once, fewer than 3 under each): each share 60 percent heavier and everyone on the Cornice takes 180 to 220 (Cradle Backlash): lethal for one or two. Then they are set down | `breath_storm.ts` (`cradleShare`) |
 | Drawn Lightning | Phase 2, every 30 s: a 1 s bar at a hashed non-tank; for 10 s a strike falls where they stand every 2 s (a 1.2 s warning, 280 to 320 within 3 yd), each leaving charged ground (3 yd, 60 to 75 every second for 18 s): they walk the edge to keep the floor clean | `breath_storm.ts` |
 | Thunder Lash (the tank swap, the Storm) | The same bar and cadence after the barrage (first 6 s after it): a beam from the guardian to the tank for 220 to 260 Nature and one stack of Thunder-Laden (25 s, refreshed): each stack is more Nature and other magic damage taken (a `spellvuln`: every hit of the Storm is Nature), 20 percent on Heroic and Mythic (at most 8), 8 percent on Normal (at most 6). From `thunderDraw` stacks (3 on Heroic and Mythic, 4 on Normal) every Leaping Bolt, after its own path, leaps on to every Thunder-Laden player it missed, one leg each from the last struck (the bolt's path and its pick untouched). Swap at 3 (Normal 4) | `breath_blow.ts` (`drawBolts`, called by `breath_storm.ts` `landFork`) |
 | The swelling storm | After the barrage, every 5 s: 35 to 42 nature to everyone on the Cornice, each pulse 8 percent harder than the first on Normal, 4 percent on Heroic and Mythic (each tier's `swellGrowth`, since 2026-11-12), without end (a stack of `heart_breath_swelling_storm` on the guardian): the soft enrage | `breath_storm.ts` (`swellMult`) |
 | Heroic | Every number 25 percent higher (the tank swap above has its own rows per tier), the wind 4.4 yd a second and the Roar's throw 30 yd, the Cradle three circles of 1,900 that want 3 each, the swelling storm half as steep (4 percent a pulse), plus: Calm Spent (an anchor that ran out leaves its player unable to take another for 60 s: the raid rotates them); loose gales (three wander the Cornice on deterministic paths for 20 s after each exhale, 120 to 150 and an 11 yd toss to whoever they touch, once per player per gale in 2 s; a toss can carry a body out through a gap); storm gusts (in phase 2, every 24 s: a 2 s telegraph, then a 3.5 s gust toward a bearing, pushing like a blow, no circles). The raid has no heroic tier yet, so a dev run switches it on (`/dev heart breath heroic`); and the Knotted Gale (2026-11-08), softer than Mythic's: a 15 s fuse, the carrier at 70 percent, one pair of portals, two balls in phase 1 and one at a time in phase 2 (its row below) | `breath_ids.ts` (`BREATH_DIFFICULTY`) |
-| Mythic | Heroic whole with its own harder Knotted Gale (next row) and Windworn, behind its own dev switch (`/dev heart breath mythic`). |
+| Mythic | Heroic whole with its own harder Knotted Gale (next row), behind its own dev switch (`/dev heart breath mythic`); the Islands of the Wind are Heroic's for now (ideas in the 50 percent block above). |
 | The Knotted Gale (Heroic and Mythic, `breath_heart.ts`; each tier one `BREATH_KNOT` row, Normal none, so Normal never changes by one rng draw) | A ball of compressed storm drops far from the gaps with a fuse (Heroic 15 s, Mythic 10 s); out of time it kills the whole raid on the Cornice, whatever shields them. Two non-tanks are marked Portal A and Portal B; after 5 s each portal opens exactly where its player stands (one who fell through a gap opens it at the lip they left). A third player steps on the ball and carries it: Heroic 70 percent of a run, Mythic half (2026-11-07), and no wind, pull, blast or throw moves them. No rule gates the throw on a portal (2026-11-08): the carrier may walk it to any lip inside the fuse, and the portals are a shortcut. Anyone who walks into a portal comes out at its partner, ball or no ball, once per walk in: one portal by the ball and one by a gap lets the carrier go out empty-handed and come back with it (the owner's change of 2026-11-01). The throw is the interact press within 2 yd of a gap's edge (Jose's playtest of 2026-11-02 cut it from 4: the carrier must stand right at the lip). A dead carrier drops it where they fell, still ticking, free to anyone but the marked; a carrier who goes over a lip takes it along, which counts as thrown. Phase 1: from 12 s, about every 45 s, three at most (Heroic two), a start waiting out the indrawn breath and any spell too short for a whole fuse before it. Phase 2 on Mythic: two balls and two pairs of portals (the owner's change of 2026-11-02), 15 s after the barrage and then about every 60 s, never during it: four non-tanks are marked, Portal A and Portal B (the first pair, the storm's teal and violet, four arms in the mouth and a soft beam between them) and Portal C and Portal D (the second pair, spring green and rose, three arms turning the other way inside a doubled rim and a braid of two twisting strands between them, riding higher); each opens at its player's feet after the same 5 s, A links to B only and C to D only, never across the pairs, so the raid works both balls at once. Each marked player's own alert names their letter. Phase 1 keeps its one pair; Heroic's phase 2 drops one ball at a time with the one pair, A and B, on the same clock. A group too small for every mark (only a dev run meets it) still plays: a missing Portal B opens at the lip nearest A; a missing Portal D at the lip nearest C (passing over a lip a portal already holds); with nobody for C either, C opens where the second ball fell. The marked never carry while anyone else is free. A ball alive when the storm breaks keeps ticking. Thessaly's circles do not change. |
 | One wipe | The fight ends when the guardian stops fighting: the wind still, every circle, anchor, spent mark, pin, vortex, Roar's wave, gale, strike, patch and cradle gone, the lifted set down, the stone body back. Thessaly stays at her post; the gaps are the Cornice's, they stay | `breath.ts` (`resetBreath`) |
 
@@ -2568,7 +2636,7 @@ IP-checked in `docs/design/naming-audit.md`). Cosmetic only, like every deed rew
 | Deed | Rule (any difficulty) | Pays |
 |---|---|---|
 | Charge Through the Curse | Every Mountain's Rush that lands shatters the cursed pillar (at least one), no Rush strikes anyone on its way (the marked player too), and the two members fall within 15 s of each other (the fight's clock, `COUNCIL_FEAT_FALL_WINDOW`) | Seamcaller (the maul) |
-| Keep Your Feet | No raider falls into the void during the fight, every Gale Bulwark is broken by the raid (one that bursts by itself fails it), and the storm broke | Squallcrest |
+| Keep Your Feet | No raider falls into the void during the fight, both Stillstones are stilled before Skyrend Nova runs out, and the storm broke | Squallcrest |
 | No One Left in the Cold | No raider Encased in Rime (a full bar, a splash chain or an unhealed Living Rime), no ice blade's slash strikes anyone (Mythic's flurry too), and the second half began | the Rimelight Staff |
 | Turn Back the Cinders | No Rolling Cinder reaches its quarry, and at least one was called | Hearthbrand |
 | Kept From the Brim | No Overload bar bursts, no raider dies at any point in the fight, and both intermissions were fought | the Heartmeld Staff |
@@ -2812,11 +2880,11 @@ IP-checked in `docs/design/naming-audit.md`). Cosmetic only, like every deed rew
 | `/dev heart breath calm` | the wind falls calm now |
 | `/dev heart breath circle` | Captain Thessaly plants a circle of calm now (refused once the storm has broken) |
 | `/dev heart breath inhale` (`roar`) | the indrawn breath now (then the Summit Roar) |
-| `/dev heart breath isles [0, 1]` | the Gale Bulwark and the tier's isles now (`0` the south-east isle alone, `1` the south-west) |
-| `/dev heart breath ride [0, 1]`, `home` | you ride the gale to that isle now, or home from the isle you stand on |
-| `/dev heart breath killisle` | every add of the round falls (the Homeward Gales rise) |
-| `/dev heart breath bulwark` | the Gale Bulwark breaks now (the round ends) |
-| `/dev heart breath windworn off` | your Windworn goes |
+| `/dev heart breath isles` | the guardian drops to half health and the Islands of the Wind begin now |
+| `/dev heart breath ride <0..5>`, `home` | you ride the gale to that isle now (0 to 2 the east chain, 3 to 5 the west), or home from the isle you stand on |
+| `/dev heart breath killisle [i]` | every add of isle `i` (or of every woken isle) falls |
+| `/dev heart breath still [0, 1]` | that side's Stillstone (both without one) is stilled now |
+| `/dev heart breath nova` | Skyrend Nova runs out now |
 | `/dev heart breath tornado` (`gale`) | three loose gales now, on any tier |
 | `/dev heart breath gust [deg]` | a phase-2 storm gust now, on any tier; in the Wind half it plays (telegraph, gust), then the blow cycle resumes from a calm without spending a turn |
 | `/dev heart breath chain` (`fork`), `eye` (`cradle`), `conductor` (`drawn`) | the Leaping Bolt, the Thunder's Cradle or Drawn Lightning now, on a hashed player |

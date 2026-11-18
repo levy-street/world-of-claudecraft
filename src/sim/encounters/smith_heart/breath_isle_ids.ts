@@ -155,6 +155,13 @@ export interface IsleTier {
   mendShare: number;
 }
 
+// The bot passes of 2026-11-18 (POOL 0.65, the human clock): with the first
+// numbers Normal's two chains were done in 85 s of the nova's 150 and
+// Heroic's (best-in-slot gear) in 56 s of 125: the adds' health went up 40
+// percent on Normal and doubled on Heroic and Mythic; a second Heroic pass
+// (81 s of 125, no deaths) raised Heroic's another 30 percent, and a full Normal run (59 s of 150)
+// Normal's another 60; a Normal raid that came in six strong then ran the
+// nova out (one stone in 120 s), so Normal came back down 15 percent.
 export const ISLE_TIERS: Readonly<Record<'normal' | 'heroic' | 'mythic', IsleTier>> = {
   normal: {
     novaSeconds: 150,
@@ -162,12 +169,12 @@ export const ISLE_TIERS: Readonly<Record<'normal' | 'heroic' | 'mythic', IsleTie
     closingSeconds: 50,
     reckonEvery: 2.5,
     reckonShare: 0.16,
-    sentinelHealth: 2300,
-    menderHealth: 1300,
-    heraldHealth: 1500,
-    squallHealth: 1700,
-    fragmentHealth: 650,
-    shieldHealth: 3000,
+    sentinelHealth: 4350,
+    menderHealth: 2450,
+    heraldHealth: 2850,
+    squallHealth: 3250,
+    fragmentHealth: 1250,
+    shieldHealth: 5700,
     wardCut: 0.85,
     wardHalfDeg: 60,
     shoveYards: 12,
@@ -180,12 +187,12 @@ export const ISLE_TIERS: Readonly<Record<'normal' | 'heroic' | 'mythic', IsleTie
     closingSeconds: 38,
     reckonEvery: 2,
     reckonShare: 0.3,
-    sentinelHealth: 2300,
-    menderHealth: 1300,
-    heraldHealth: 1500,
-    squallHealth: 1700,
-    fragmentHealth: 650,
-    shieldHealth: 3000,
+    sentinelHealth: 6000,
+    menderHealth: 3400,
+    heraldHealth: 3900,
+    squallHealth: 4400,
+    fragmentHealth: 1700,
+    shieldHealth: 7800,
     wardCut: 0.9,
     wardHalfDeg: 70,
     shoveYards: 20,
@@ -199,12 +206,12 @@ export const ISLE_TIERS: Readonly<Record<'normal' | 'heroic' | 'mythic', IsleTie
     closingSeconds: 38,
     reckonEvery: 2,
     reckonShare: 0.3,
-    sentinelHealth: 2300,
-    menderHealth: 1300,
-    heraldHealth: 1500,
-    squallHealth: 1700,
-    fragmentHealth: 650,
-    shieldHealth: 3000,
+    sentinelHealth: 6000,
+    menderHealth: 3400,
+    heraldHealth: 3900,
+    squallHealth: 4400,
+    fragmentHealth: 1700,
+    shieldHealth: 7800,
     wardCut: 0.9,
     wardHalfDeg: 70,
     shoveYards: 20,

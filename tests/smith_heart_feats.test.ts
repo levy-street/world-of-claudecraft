@@ -653,7 +653,7 @@ describe('the feat rules and the meta', () => {
     const desc = (e: keyof typeof SMITH_HEART_FEAT_DEEDS) => DEEDS[SMITH_HEART_FEAT_DEEDS[e]].desc;
     expect(desc('hammer_council')).toContain(`within ${COUNCIL_FEAT_FALL_WINDOW} seconds`);
     expect(desc('hammer_council')).toContain('striking no raider');
-    expect(desc('breath')).toContain('every Gale Bulwark broken by the raid');
+    expect(desc('breath')).toContain('both Stillstones stilled before Skyrend Nova is unleashed');
     expect(desc('quench')).toContain('without any ice blade striking a raider');
     expect(desc('masterless')).toContain('without any raider dying');
   });
