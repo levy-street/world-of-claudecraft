@@ -494,3 +494,19 @@ describe('the Islands of the Wind: the stones and the end', () => {
     expect(T.stormAt).toBe(IT.at);
   });
 });
+
+describe('the sky strikes wait out the indrawn breath and the Roar', () => {
+  it('no volley lands on a raid pulled in or blasted; it falls once the wind is back', () => {
+    const f = pulled(6);
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    st.wind.phase = 'inhale';
+    st.wind.remaining = 9999;
+    st.skyTimer = 0;
+    f.tick(ticks(1));
+    expect(f.objects(BREATH_OBJECTS.strikePrefix)).toHaveLength(0);
+    st.wind.phase = 'calm';
+    f.tick(ticks(1));
+    expect(f.objects(BREATH_OBJECTS.strikePrefix).length).toBeGreaterThan(0);
+  });
+});
