@@ -146,16 +146,11 @@ export {
   tickSmithHeart,
   tickSmithHeartSeal,
 } from './seal';
+export { burstSmithHeartSeal } from './seal_burst';
 export {
-  burstSmithHeartSeal,
-  pressSmithHeartSealCrystal,
-  SMITH_HEART_SEAL_DARK_TEXT,
-  trySealCrystalInteract,
-} from './seal_burst';
-export {
-  inSealCrystalReach,
   isSealCrystalTemplate,
-  SEAL_CRYSTAL_REACH,
+  SEAL_CRYSTAL_TRIGGER_R,
   sealCrystalBurst,
   sealCrystalOf,
+  sealCrystalTriggered,
 } from './seal_crystal';

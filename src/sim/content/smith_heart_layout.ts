@@ -136,7 +136,8 @@ export const HEART_SEAL = { x: 0, z: 0, r: 9 } as const;
  *  seal's inner circle, render/smith_heart/ring_crystal_core.ts RING_CRYSTAL
  *  .plinthR, pinned equal by tests/smith_heart_ring_crystal.test.ts). It
  *  stands as a solid circle (a combat wall, instances/combat_wall_state.ts)
- *  until a player presses it once all four veins burn, and the portal waits
+ *  until a living player steps onto the dais (SEAL_DAIS, the trigger's circle)
+ *  once all four veins burn, and the portal waits
  *  inside it: the portal's whole trigger (RING_PORTAL) sits under the crystal,
  *  so nobody reaches it before the burst. */
 export const SEAL_CRYSTAL = { x: 0, z: 0, r: 8.5 } as const;
@@ -793,7 +794,7 @@ const AUTHORED_SURFACES: FieldSurface[] = [
     ],
     { stairs: true, edge: 'balustrade', halfWidth: GRAND_STAIR.halfWidth },
   ),
-  // --- The Ring, its two stairs and the Seal Dais -------------------------------------
+  // --- The Ring, its three stairs and the Seal Dais -----------------------------------
   ringSector(),
   path(
     'north_stair',

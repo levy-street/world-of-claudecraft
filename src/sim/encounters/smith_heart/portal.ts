@@ -1,7 +1,7 @@
 // The Smith's Heart's portal hop (docs/design/raid/smith_heart.md, "The
 // portal"): the heart seal crystal on the Ring's dais, charged once all four
-// veins burn and the Ring is clear, bursts when a player presses it
-// (seal_burst.ts) and the portal stands in its place (the markers' sticky
+// veins burn and the Ring is clear, bursts when a living player steps onto
+// the dais (seal.ts) and the portal stands in its place (the markers' sticky
 // portal bit, seal.ts); walking into it sets a living player down on the
 // Heart's Arrival Terrace, a separate area of the same slot no floor joins
 // to the main map. The return portal on the terrace walks the raid back to

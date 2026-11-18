@@ -31622,7 +31622,6 @@ export const nl_NL: EnTranslations = {
     "farmPatchName": "Tuinbedden",
     "realmBuilderMonumentName": "Rijksbouwer Monument",
     "musterRackName": "Verzamelwapenrek",
-    "heartSealCrystalName": "The Heart Seal Crystal",
-    "heartSealCrystalInteract": "The Heart Seal Crystal: interact to break it"
+    "heartSealCrystalName": "The Heart Seal Crystal"
   }
 };

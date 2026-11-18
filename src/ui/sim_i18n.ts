@@ -1564,8 +1564,6 @@ const baseEnTable = {
     'The living stone splits from end to end. Beyond the Slab, the heart of the mountain lies open.',
   'log.smithHeartPortalOpen':
     'The heart seal crystal shatters, and a way down into the heart of the mountain whirls open in its place.',
-  'error.smithHeartSealDark':
-    'The heart seal crystal is dark. Light all four veins and clear the Ring first.',
   'log.smithHeartPortalHop':
     "The seal's light pulls you down into the heart of the mountain.",
   'log.smithHeartPortalReturn':

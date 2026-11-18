@@ -44,11 +44,6 @@ import {
   tryStartNythraxisWardChannel,
 } from './encounters/nythraxis';
 import { tryThrowKnot } from './encounters/smith_heart/breath_heart';
-import {
-  pressSmithHeartSealCrystal,
-  trySealCrystalInteract,
-} from './encounters/smith_heart/seal_burst';
-import { isSealCrystalTemplate } from './encounters/smith_heart/seal_crystal';
 import { tryCageStruggle } from './encounters/sunken_bastion/turnkey';
 import { trySpearWrench } from './encounters/wildheart_basin/zulgar_spear';
 import { tryStartEscort } from './escort';
@@ -343,12 +338,6 @@ export function pickUpObject(
     return false;
   }
   const obj = ctx.entities.get(objId);
-  // The Smith's Heart's heart seal crystal answers every press, charged or
-  // dark (it is lootable only while charged, so a dark one reaches here only
-  // by a direct pickup command): the press bursts it (seal_burst.ts).
-  if (obj?.kind === 'object' && isSealCrystalTemplate(obj.templateId)) {
-    return pressSmithHeartSealCrystal(ctx, obj, p, meta.entityId);
-  }
   if (obj?.kind !== 'object' || !obj.lootable) return false;
   // The hoard reward chest holds no ground item, but it IS what the interact
   // key and a click on it reach (both arrive here, offline and over the wire).
@@ -742,11 +731,6 @@ export function interact(
     pickUpObject(ctx, obj.id, p.id, noticeboardDefinitions);
     return;
   }
-  // Beside the Smith's Heart's heart seal crystal: the press is the crystal's (its plinth
-  // is wider than this scan's plain interact range, seal_burst.ts). Asked after a targeted
-  // body, a corpse and an object in plain reach have answered, so it never takes a press
-  // meant for something nearer, and before the NPC talk arms.
-  if (trySealCrystalInteract(ctx, p, r.meta.entityId)) return;
   if (questEntity && talkToWeeklyKeeper(ctx, questEntity, p)) return;
   if (questEntity && ctx.bankerIds.includes(questEntity.id)) {
     // Opening the bank window counts as banker business for the NPC ledger.

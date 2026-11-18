@@ -31622,7 +31622,6 @@ export const cs_CZ: EnTranslations = {
     "farmPatchName": "Zahradní políčka",
     "realmBuilderMonumentName": "Památník Realm Builder",
     "musterRackName": "Stojan se zbraněmi pro odvod",
-    "heartSealCrystalName": "The Heart Seal Crystal",
-    "heartSealCrystalInteract": "The Heart Seal Crystal: interact to break it"
+    "heartSealCrystalName": "The Heart Seal Crystal"
   }
 };

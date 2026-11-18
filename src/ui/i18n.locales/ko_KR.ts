@@ -20078,7 +20078,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'worldContent.realmBuilderMonumentName': '왕국 건설자 기념비',
   'worldContent.musterRackName': '소집대 무기 거치대',
   'worldContent.heartSealCrystalName': '심장 봉인 수정',
-  'worldContent.heartSealCrystalInteract': '심장 봉인 수정: 상호작용하여 부수기',
   'hudChrome.talkingHead.label': '대화',
   'hudChrome.hubLesson.target': '먼저 허수아비를 대상으로 삼으세요.',
   'hudChrome.hubLesson.openWindow': '{meters}을(를) 여세요.',

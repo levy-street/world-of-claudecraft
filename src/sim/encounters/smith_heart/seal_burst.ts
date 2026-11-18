@@ -1,47 +1,31 @@
-// The burst of the heart seal crystal (docs/design/raid/smith_heart.md, "The
-// heart seal"): the press that opens the portal to the Heart. Once all four
-// veins burn and the Ring is clear the seal is READY (seal.ts: the markers'
-// charge bit, which also makes the crystal pressable, seal_crystal.ts); a
-// living player standing within reach presses it (the existing `pickup`
-// command: interaction.ts pickUpObject routes the crystal here) and it bursts:
+// The forced burst of the heart seal crystal (docs/design/raid/smith_heart.md,
+// "The heart seal"): `/dev heart portal`. In play the crystal bursts on its own
+// (seal.ts tickSmithHeartSeal: once all four veins burn and the Ring is clear, the
+// first tick a living player of the claim stands in the middle circle,
+// seal_crystal.ts sealCrystalTriggered); this is the same outcome, forced:
 //   - the PORTAL bit goes onto every seal marker AT ONCE (the same template
-//     rewrite the seal's tick does), so this very tick's portal hop
-//     (portal.ts) already finds the way open and every client mirrors it;
+//     rewrite the seal's tick does), so this very tick's portal hop (portal.ts)
+//     already finds the way open and every client mirrors it;
 //   - the crystal leaves the claim and its wall goes (seal_crystal.ts), so the
 //     portal's trigger at the dais centre is reachable;
 //   - the raid reads one line.
-// The bit is sticky (seal.ts keeps it for the claim's life), so a second press
-// has nothing to burst, and a fresh claim starts shut again. A press on a
-// crystal that is not charged answers with its own line and changes nothing.
-// `/dev heart portal` is a forced burst through the same function.
+// The bit is sticky (seal.ts keeps it for the claim's life), so a second call has
+// nothing to burst, and a fresh claim starts shut again.
 //
-// Sits above seal.ts and seal_crystal.ts (it imports both; neither imports
-// it). Draws NO rng.
+// Sits above seal.ts and seal_crystal.ts (it imports both; neither imports it).
+// Draws NO rng.
 
-import { SMITH_HEART_DUNGEON } from '../../content/smith_heart';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
-import type { Entity } from '../../types';
 import {
   announce,
   markerMask,
   SMITH_HEART_PORTAL_BIT,
   SMITH_HEART_PORTAL_OPEN_LOG,
   smithHeartPortalBitSet,
-  smithHeartReadyBitSet,
   writeSealMarkers,
 } from './seal';
-import {
-  inSealCrystalReach,
-  retireSealCrystal,
-  sealCrystalClaim,
-  sealCrystalOf,
-} from './seal_crystal';
-
-/** The English line a press on a crystal that is not charged answers with
- *  (re-localized by src/ui/sim_i18n.ts, EXACT matcher). */
-export const SMITH_HEART_SEAL_DARK_TEXT =
-  'The heart seal crystal is dark. Light all four veins and clear the Ring first.';
+import { retireSealCrystal } from './seal_crystal';
 
 /**
  * Burst the claim's crystal: the portal bit onto every marker, the crystal
@@ -56,49 +40,4 @@ export function burstSmithHeartSeal(ctx: SimContext, inst: InstanceSlot): boolea
   retireSealCrystal(ctx, inst);
   announce(ctx, inst, SMITH_HEART_PORTAL_OPEN_LOG);
   return true;
-}
-
-/**
- * A living player's press on the crystal (`crystal` is the entity pressed,
- * `body` the player's own, `pid` the id errors go to): out of reach, a dark
- * crystal and a burst one each refuse; a charged crystal within reach bursts.
- * The caller (pickUpObject) has already turned the dead and the ghosts away.
- */
-export function pressSmithHeartSealCrystal(
-  ctx: SimContext,
-  crystal: Entity,
-  body: Entity,
-  pid: number,
-): boolean {
-  const inst = sealCrystalClaim(ctx, crystal);
-  if (!inst || !inSealCrystalReach(ctx, inst, crystal, body)) {
-    ctx.error(pid, 'Too far away.');
-    return false;
-  }
-  const value = markerMask(ctx, inst);
-  if (value === null || smithHeartPortalBitSet(value)) return false;
-  if (!smithHeartReadyBitSet(value)) {
-    ctx.error(pid, SMITH_HEART_SEAL_DARK_TEXT);
-    return false;
-  }
-  return burstSmithHeartSeal(ctx, inst);
-}
-
-/**
- * The generic interact press (interaction.ts `interact`, asked before its scan):
- * a living player within reach of a claim's crystal presses it, charged or dark,
- * because the scan's plain interact range stops short of a plinth this wide. True
- * when the press was the crystal's (it burst, or it answered with its line); false
- * for a player out of every crystal's reach, whose press goes on to the scan. The
- * caller has already turned the dead away.
- */
-export function trySealCrystalInteract(ctx: SimContext, body: Entity, pid: number): boolean {
-  for (const inst of ctx.instances) {
-    if (inst.partyKey === null || inst.dungeonId !== SMITH_HEART_DUNGEON) continue;
-    const crystal = sealCrystalOf(ctx, inst);
-    if (!crystal || !inSealCrystalReach(ctx, inst, crystal, body)) continue;
-    pressSmithHeartSealCrystal(ctx, crystal, body, pid);
-    return true;
-  }
-  return false;
 }

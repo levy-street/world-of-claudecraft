@@ -8,10 +8,10 @@
 // - the Breath, the Quench and the Heat light in any order, each with its own
 //   line to the raid, each once;
 // - all four lit AND the Ring clear CHARGE the heart seal crystal (the READY
-//   bit) and nothing more: the portal stays shut until a press bursts the
-//   crystal (smith_heart_seal_crystal.test.ts owns the press); once open the
-//   portal walks a living player to the Heart's arrival and the return portal
-//   walks them back to the dais;
+//   bit) and nothing more: the portal stays shut until a living player steps
+//   onto the dais and the crystal bursts (smith_heart_seal_crystal.test.ts
+//   owns the trigger); once open the portal walks a living player to the
+//   Heart's arrival and the return portal walks them back to the dais;
 // - the Heart Bridge seals behind the raid while the final boss fights;
 // - a reset (a fresh claim) starts dark and shut again;
 // - the raid is dev-only while it is a blockout.
@@ -27,8 +27,10 @@ import {
 import {
   HEART_ARRIVAL,
   HEART_RETURN_PORTAL,
+  RING,
   RING_PORTAL,
   RING_PORTAL_LANDING,
+  SEAL_CRYSTAL,
   SMITH_HEART_VEINS,
   type SmithHeartVein,
 } from '../src/sim/content/smith_heart_layout';
@@ -41,7 +43,6 @@ import {
   SMITH_HEART_PORTAL_OPEN_LOG,
   SMITH_HEART_PORTAL_RETURN_TEXT,
   SMITH_HEART_READY_BIT,
-  SMITH_HEART_SEAL_DARK_TEXT,
   SMITH_HEART_SEAL_FULL,
   SMITH_HEART_VEIN_BITS,
   SMITH_HEART_VEIN_LIT_LOG,
@@ -299,19 +300,26 @@ describe("the Smith's Heart gating", () => {
     expect(markers(fresh.sim, fresh.inst).every((m) => !smithHeartPortalBitSet(m))).toBe(true);
   });
 
-  it('the press opens the portal, which walks a living player to the Heart, and the return portal back', () => {
+  it('stepping onto the dais once charged opens the portal, which walks a living player to the Heart, and the return portal back', () => {
     const { sim, pid, inst } = setup();
     // Shut: standing in the seal goes nowhere.
     put(sim, pid, inst, RING_PORTAL.x + 1, RING_PORTAL.z);
     sim.tick();
     expect(near(local(sim, pid, inst), { x: RING_PORTAL.x + 1, z: RING_PORTAL.z }, 1)).toBe(true);
+    // Charged with the raid up on the Ring: still shut, the crystal waits for them.
+    put(sim, pid, inst, 0, RING.R);
     kill(sim, inst, [...Object.values(SMITH_HEART_GUARDIANS), ...SMITH_HEART_PACKS.ring]);
-    // Charged and still shut: the crystal waits for its press.
     sim.tick();
-    expect(near(local(sim, pid, inst), { x: RING_PORTAL.x + 1, z: RING_PORTAL.z }, 1)).toBe(true);
-    // The press bursts it; the very next tick's hop sets the player down in the Heart.
-    const crystal = sealCrystalOf(sim.ctx, inst) as Entity;
-    expect(sim.pickUpObject(crystal.id, pid)).toBe(true);
+    expect(smithHeartProgress(sim.ctx, inst).ready).toBe(true);
+    expect(smithHeartProgress(sim.ctx, inst).portalOpen).toBe(false);
+    expect(sealCrystalOf(sim.ctx, inst)).not.toBeNull();
+    // Down onto the dais, beside the crystal: it bursts that tick.
+    put(sim, pid, inst, 0, -(SEAL_CRYSTAL.r + 2));
+    const burst = sim.tick();
+    expect(logs(burst, pid)).toContain(SMITH_HEART_PORTAL_OPEN_LOG);
+    expect(sealCrystalOf(sim.ctx, inst)).toBeNull();
+    // Into the portal where it stood: the hop sets the player down in the Heart.
+    put(sim, pid, inst, RING_PORTAL.x + 1, RING_PORTAL.z);
     const events = sim.tick();
     expect(near(local(sim, pid, inst), HEART_ARRIVAL, 0.5)).toBe(true);
     expect(logs(events, pid)).toContain(SMITH_HEART_PORTAL_HOP_TEXT);
@@ -355,9 +363,9 @@ describe("the Smith's Heart gating", () => {
     expect(
       markers(sim, inst).every((m) => m === (SMITH_HEART_SEAL_FULL | SMITH_HEART_READY_BIT)),
     ).toBe(true);
-    // Pressed open too: the burst is a run's fact, and a reset forgets it.
-    put(sim, pid, inst, RING_PORTAL.x, RING_PORTAL.z - 6);
-    expect(sim.pickUpObject((sealCrystalOf(sim.ctx, inst) as Entity).id, pid)).toBe(true);
+    // Burst open too (a raider on the dais): the burst is a run's fact, and a reset forgets it.
+    put(sim, pid, inst, RING_PORTAL_LANDING.x, RING_PORTAL_LANDING.z);
+    sim.tick();
     expect(
       markers(sim, inst).every(
         (m) => m === (SMITH_HEART_SEAL_FULL | SMITH_HEART_READY_BIT | SMITH_HEART_PORTAL_BIT),
@@ -389,7 +397,6 @@ describe("the Smith's Heart gating", () => {
       ...Object.values(SMITH_HEART_VEIN_LIT_LOG),
       SMITH_HEART_CLOSED_TEXT,
       SMITH_HEART_PORTAL_OPEN_LOG,
-      SMITH_HEART_SEAL_DARK_TEXT,
       SMITH_HEART_PORTAL_HOP_TEXT,
       SMITH_HEART_PORTAL_RETURN_TEXT,
     ]) {

@@ -58,15 +58,9 @@ export function objectDisplayName(entity: Entity): string {
   if (entity.templateId === MUSTER_RACK_TEMPLATE_ID) {
     return t('worldContent.musterRackName');
   }
-  // The Smith's Heart's heart seal crystal: the name while it is dark, the call to action
-  // while it is charged (the sim keeps it lootable only then, seal_crystal.ts).
-  if (isSealCrystalTemplate(entity.templateId)) {
-    return t(
-      entity.lootable
-        ? 'worldContent.heartSealCrystalInteract'
-        : 'worldContent.heartSealCrystalName',
-    );
-  }
+  // The Smith's Heart's heart seal crystal (an inert claim object: it bursts on its own
+  // once the raid reaches the middle, encounters/smith_heart/seal_crystal.ts).
+  if (isSealCrystalTemplate(entity.templateId)) return t('worldContent.heartSealCrystalName');
   if (entity.templateId === 'soulwell') {
     return tEntity({ kind: 'ability', id: 'soulwell', field: 'name' });
   }

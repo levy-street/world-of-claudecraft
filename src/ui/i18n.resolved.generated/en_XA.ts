@@ -31622,7 +31622,6 @@ export const en_XA: EnTranslations = {
     "farmPatchName": "[Ĝáŕðéñ Ɓéðš]",
     "realmBuilderMonumentName": "[Ŕéáļɱ Ɓúíļðéŕ Ɱóñúɱéñţ]",
     "musterRackName": "[Ɱúšţéŕ Ŵéáþóñ Ŕáçķ]",
-    "heartSealCrystalName": "[Ţĥé Ĥéáŕţ Šéáļ Çŕýšţáļ]",
-    "heartSealCrystalInteract": "[Ţĥé Ĥéáŕţ Šéáļ Çŕýšţáļ: íñţéŕáçţ ţó ƀŕéáķ íţ]"
+    "heartSealCrystalName": "[Ţĥé Ĥéáŕţ Šéáļ Çŕýšţáļ]"
   }
 };

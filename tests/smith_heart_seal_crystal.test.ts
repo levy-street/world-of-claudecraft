@@ -1,20 +1,21 @@
 // The heart seal crystal (src/sim/encounters/smith_heart/seal_crystal.ts, the
-// object; seal_burst.ts, the press and the burst; seal.ts, the charge and the
-// kept portal bit), driven through a real Sim claim. The ONE crystal at the
-// Ring's dais centre replaces the old auto-opening seal:
+// object and the trigger; seal.ts, the charge, the burst and the kept portal
+// bit; seal_burst.ts, the forced burst), driven through a real Sim claim. The
+// ONE crystal at the Ring's dais centre replaces the old auto-opening seal:
 // - a fresh claim holds one crystal, appended last to the dungeon's objects,
 //   dark, pinned to the layout's footprint and to its combat wall;
 // - READY (the markers' charge bit, 128) derives from all four veins lit AND
-//   the Ring clear, and only then; the crystal is lootable exactly while READY
-//   and never re-armed by the generic object sweep;
-// - the PORTAL bit (16) stays 0 with the seal lit and the Ring clear, however
-//   long it waits: only a successful press (or `/dev heart portal`, a forced
-//   burst) sets it, at once, on every marker, and it is KEPT for the claim's
-//   life; a fresh claim is shut again;
-// - the press: not ready, out of reach, ready in reach, the dead, a released
-//   spirit, a player of another claim and a second press each answer as they
-//   should, and the F key's nearest-object scan reaches the crystal (the
-//   markers sharing its spot are held out of the press);
+//   the Ring clear, and only then; the crystal is never lootable (there is no
+//   press, the owner's call of 2026-11-18) and never re-armed by the generic
+//   object sweep;
+// - the PORTAL bit (16) stays 0 with the seal charged while nobody comes down
+//   to the dais, however long it waits: the first tick a living player stands
+//   in the middle circle (the dais, SEAL_CRYSTAL_TRIGGER_R) bursts it, or
+//   `/dev heart portal` forces it; it lands at once on every marker and is KEPT
+//   for the claim's life; a fresh claim is shut again;
+// - the trigger: the circle's edge (inclusive), the dead, a released spirit, a
+//   player of another claim, a raider already standing there when the charge
+//   lands, and the pickup command each answer as they should;
 // - while it stands the crystal is a solid wall (a round combat wall, offline
 //   and in the online mirror), removed the very tick it bursts so the portal
 //   at the centre is reachable; no body is ever held inside the circle;
@@ -33,32 +34,36 @@ import {
 } from '../src/sim/content/smith_heart';
 import { SMITH_HEART_CHECKPOINTS } from '../src/sim/content/smith_heart_checkpoints';
 import {
+  EAST_STAIR,
+  GRAND_STAIR,
   HEART_ARRIVAL,
+  NORTH_STAIR,
+  RING,
   RING_PORTAL,
   RING_PORTAL_LANDING,
   SEAL_CRYSTAL,
+  SEAL_DAIS,
   SMITH_HEART_ANCHORS,
   SMITH_HEART_VEINS,
   type SmithHeartVein,
+  WEST_STAIR,
 } from '../src/sim/content/smith_heart_layout';
 import { BUILTIN_WORLD, DUNGEONS, instanceOrigin } from '../src/sim/data';
 import { displacePlayerForDev } from '../src/sim/dev/dev_displace';
 import { handleSmithHeartDevChat } from '../src/sim/dev/smith_heart_dev';
 import {
   burstSmithHeartSeal,
-  inSealCrystalReach,
   isSealCrystalTemplate,
-  pressSmithHeartSealCrystal,
-  SEAL_CRYSTAL_REACH,
+  SEAL_CRYSTAL_TRIGGER_R,
   SMITH_HEART_PORTAL_BIT,
   SMITH_HEART_PORTAL_HOP_TEXT,
   SMITH_HEART_PORTAL_OPEN_LOG,
   SMITH_HEART_READY_BIT,
-  SMITH_HEART_SEAL_DARK_TEXT,
   SMITH_HEART_SEAL_FULL,
   SMITH_HEART_VEIN_BITS,
   sealCrystalBurst,
   sealCrystalOf,
+  sealCrystalTriggered,
   smithHeartPortalBitSet,
   smithHeartProgress,
   smithHeartReadyBitSet,
@@ -67,7 +72,6 @@ import {
   tickSmithHeartSeal,
 } from '../src/sim/encounters/smith_heart';
 import { writeSealMarkers } from '../src/sim/encounters/smith_heart/seal';
-import { createGroundObject } from '../src/sim/entity';
 import {
   COMBAT_WALL_SHAPES,
   clearCombatWallStateForTest,
@@ -81,12 +85,14 @@ import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
 import type { Rng } from '../src/sim/rng';
 import type { InstanceSlot } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
-import { type Entity, INTERACT_RANGE, type SimEvent, type WorldContent } from '../src/sim/types';
+import type { Entity, SimEvent, WorldContent } from '../src/sim/types';
 import { localizeSimText } from '../src/ui/sim_i18n';
 
-/** A spot a body can stand and press from: outside the wall (the rim and a body's
- *  width), well inside the press's reach (a press counts from the crystal's edge). */
-const PRESS_Z = -(SEAL_CRYSTAL.r + PLAYER_BODY_RADIUS + 1.5);
+/** A spot on the dais, in the middle circle: outside the wall (the rim and a
+ *  body's width), well inside the trigger's circle. */
+const DAIS_Z = -(SEAL_CRYSTAL.r + PLAYER_BODY_RADIUS + 1.5);
+/** A spot on the Ring itself, far from the dais (its north, inside the claim). */
+const RING_Z = RING.R;
 
 const WORLD: WorldContent = { ...BUILTIN_WORLD, camps: [], npcs: {}, groundObjects: [] };
 const DUNGEON = DUNGEONS[SMITH_HEART_DUNGEON];
@@ -105,6 +111,7 @@ function claimsOf(sim: Sim): InstanceSlot[] {
   );
 }
 
+/** A claim with one raider at its entry, far from the dais. */
 function setup(seed = 17): { sim: Sim; pid: number; inst: InstanceSlot } {
   const sim = makeSim(seed);
   const pid = sim.addPlayer('warrior', 'Heartwalker');
@@ -162,6 +169,12 @@ function markers(sim: Sim, inst: InstanceSlot): number[] {
   return out;
 }
 
+/** Every marker of the claim carries exactly `value` (and there are several). */
+function allAt(sim: Sim, inst: InstanceSlot, value: number): boolean {
+  const all = markers(sim, inst);
+  return all.length > 1 && all.every((m) => m === value);
+}
+
 function crystal(sim: Sim, inst: InstanceSlot): Entity {
   const c = sealCrystalOf(sim.ctx, inst);
   if (!c) throw new Error('no crystal');
@@ -196,8 +209,8 @@ function logs(events: SimEvent[], pid: number): string[] {
   return events.flatMap((e) => (e.type === 'log' && e.pid === pid ? [e.text] : []));
 }
 
-function errors(events: SimEvent[], pid: number): string[] {
-  return events.flatMap((e) => (e.type === 'error' && e.pid === pid ? [e.text] : []));
+function opened(events: SimEvent[], pid: number): number {
+  return logs(events, pid).filter((t) => t === SMITH_HEART_PORTAL_OPEN_LOG).length;
 }
 
 afterEach(() => {
@@ -241,6 +254,20 @@ describe('the crystal object', () => {
     expect(row.height).toBeGreaterThanOrEqual(18.85);
   });
 
+  it('the trigger is the middle circle: the dais the four stairs land on, round the wall', () => {
+    expect(SEAL_CRYSTAL_TRIGGER_R).toBe(19);
+    expect(SEAL_CRYSTAL_TRIGGER_R).toBe(SEAL_DAIS.r);
+    // Every stair's foot is the dais's rim, so walking down any of them lands in it.
+    for (const foot of [-GRAND_STAIR.foot, NORTH_STAIR.foot, EAST_STAIR.foot, WEST_STAIR.foot]) {
+      expect(foot).toBe(SEAL_CRYSTAL_TRIGGER_R);
+    }
+    // A body pressed against the wall stands well inside it, and so does the dais spot here.
+    expect(SEAL_CRYSTAL.r + PLAYER_BODY_RADIUS).toBeLessThan(SEAL_CRYSTAL_TRIGGER_R - 5);
+    expect(-DAIS_Z).toBeLessThan(SEAL_CRYSTAL_TRIGGER_R);
+    // The Ring itself is nowhere near it.
+    expect(RING.innerR).toBeGreaterThan(SEAL_CRYSTAL_TRIGGER_R * 3);
+  });
+
   it('the charge is its own bit, past every other', () => {
     expect(SMITH_HEART_READY_BIT).toBe(128);
     expect(SMITH_HEART_PORTAL_BIT).toBe(16);
@@ -251,7 +278,7 @@ describe('the crystal object', () => {
     expect(smithHeartSealMaskOf('smith_heart_seal_256')).toBeNull();
   });
 
-  it('a fresh claim holds one dark, unpressable crystal and its wall, and the markers are inert', () => {
+  it('a fresh claim holds one dark, inert crystal and its wall, and the markers are inert', () => {
     const { sim, inst } = setup();
     const c = crystal(sim, inst);
     const o = originOf(inst);
@@ -270,7 +297,7 @@ describe('the crystal object', () => {
       z: SEAL_CRYSTAL.z,
       r: SEAL_CRYSTAL.r,
     });
-    // The markers (one stands at this very spot) never offer a press.
+    // The markers (one stands at this very spot) are inert anchors.
     const marks = inst.objectIds
       .map((id) => sim.ctx.entities.get(id) as Entity)
       .filter((e) => smithHeartSealMaskOf(e.templateId) !== null);
@@ -294,11 +321,11 @@ describe('READY derives from four veins and a clear Ring, and only then', () => 
       winVeins(sim, inst, others);
       expect(smithHeartProgress(sim.ctx, inst).ready, `without ${last}`).toBe(false);
       expect(markers(sim, inst).every((m) => !smithHeartReadyBitSet(m))).toBe(true);
-      expect(crystal(sim, inst).lootable).toBe(false);
       winVeins(sim, inst, [last]);
       expect(smithHeartProgress(sim.ctx, inst).ready, `with ${last}`).toBe(true);
-      expect(markers(sim, inst).every((m) => m === FULL_READY)).toBe(true);
-      expect(crystal(sim, inst).lootable).toBe(true);
+      expect(allAt(sim, inst, FULL_READY)).toBe(true);
+      // Charged, never lootable: there is nothing to press.
+      expect(crystal(sim, inst).lootable).toBe(false);
       clearCombatWallStateForTest();
     }
   });
@@ -313,98 +340,100 @@ describe('READY derives from four veins and a clear Ring, and only then', () => 
     expect(p.sealLit).toBe(true);
     expect(p.ringClear).toBe(false);
     expect(p.ready).toBe(false);
-    expect(crystal(sim, inst).lootable).toBe(false);
-    expect(markers(sim, inst).every((m) => m === SMITH_HEART_SEAL_FULL)).toBe(true);
+    expect(allAt(sim, inst, SMITH_HEART_SEAL_FULL)).toBe(true);
     kill(sim, inst, ['h1']);
     sim.tick();
     expect(smithHeartProgress(sim.ctx, inst).ringClear).toBe(true);
     expect(smithHeartProgress(sim.ctx, inst).ready).toBe(true);
-    expect(crystal(sim, inst).lootable).toBe(true);
-    expect(markers(sim, inst).every((m) => m === FULL_READY)).toBe(true);
+    expect(allAt(sim, inst, FULL_READY)).toBe(true);
+    expect(crystal(sim, inst).lootable).toBe(false);
   });
 
   it('is derived like a vein: a fight that begins again darkens the crystal, a kill relights it', () => {
     const { sim, inst } = setup();
     winVeins(sim, inst, SMITH_HEART_VEINS);
-    expect(crystal(sim, inst).lootable).toBe(true);
+    expect(smithHeartProgress(sim.ctx, inst).ready).toBe(true);
     revive(sim, inst, veinKills('heat'));
     sim.tick();
     expect(smithHeartProgress(sim.ctx, inst).ready).toBe(false);
-    expect(crystal(sim, inst).lootable).toBe(false);
-    expect(
-      markers(sim, inst).every((m) => m === (SMITH_HEART_SEAL_FULL & ~SMITH_HEART_VEIN_BITS.heat)),
-    ).toBe(true);
+    expect(allAt(sim, inst, SMITH_HEART_SEAL_FULL & ~SMITH_HEART_VEIN_BITS.heat)).toBe(true);
     kill(sim, inst, veinKills('heat'));
     sim.tick();
-    expect(crystal(sim, inst).lootable).toBe(true);
-    expect(markers(sim, inst).every((m) => m === FULL_READY)).toBe(true);
+    expect(allAt(sim, inst, FULL_READY)).toBe(true);
+    expect(sealCrystalOf(sim.ctx, inst)).not.toBeNull();
   });
 });
 
 describe('the portal bit is kept, and only a burst sets it', () => {
-  it('stays shut with the seal lit and the Ring clear, however long it waits', () => {
+  it('stays shut with the seal charged while nobody comes down to the dais, however long it waits', () => {
     const { sim, pid, inst } = setup();
-    // A body already standing in the portal's trigger: shut, so nobody hops.
-    put(sim, pid, inst, RING_PORTAL.x + 1, RING_PORTAL.z);
+    // On the Ring, looking down on the dais: charged, and nobody in the circle.
+    put(sim, pid, inst, 0, RING_Z);
     winVeins(sim, inst, SMITH_HEART_VEINS);
-    let said: string[] = [];
-    for (let i = 0; i < 100; i++) said = said.concat(logs(sim.tick(), pid));
+    let said = 0;
+    for (let i = 0; i < 100; i++) said += opened(sim.tick(), pid);
     expect(smithHeartProgress(sim.ctx, inst).ready).toBe(true);
     expect(smithHeartProgress(sim.ctx, inst).portalOpen).toBe(false);
-    expect(markers(sim, inst).every((m) => m === FULL_READY)).toBe(true);
-    expect(said).not.toContain(SMITH_HEART_PORTAL_OPEN_LOG);
-    expect(local(sim, pid, inst).x).toBeCloseTo(RING_PORTAL.x + 1, 3);
-    expect(crystal(sim, inst).lootable).toBe(true);
+    expect(allAt(sim, inst, FULL_READY)).toBe(true);
+    expect(said).toBe(0);
+    expect(sealCrystalOf(sim.ctx, inst)).not.toBeNull();
+    expect(crystalWall(inst)).toBeDefined();
+    // At the foot of the Grand Stair, a step short of the dais's rim: still shut.
+    put(sim, pid, inst, 0, -(SEAL_CRYSTAL_TRIGGER_R + 0.5));
+    for (let i = 0; i < 5; i++) said += opened(sim.tick(), pid);
+    expect(said).toBe(0);
+    expect(allAt(sim, inst, FULL_READY)).toBe(true);
   });
 
-  it('the press sets it at once on every marker, announces it once, and drops the crystal and its wall', () => {
+  it('a living player stepping into the middle circle bursts it that tick: every marker, one line, the crystal and its wall gone', () => {
     const { sim, pid, inst } = setup();
     winVeins(sim, inst, SMITH_HEART_VEINS);
-    put(sim, pid, inst, 0, PRESS_Z);
-    const wallsBefore = combatWallsAt(originOf(inst).x, originOf(inst).z).length;
+    const o = originOf(inst);
+    const wallsBefore = combatWallsAt(o.x, o.z).length;
     const c = crystal(sim, inst);
     expect(crystalWall(inst)).toBeDefined();
-    expect(sim.pickUpObject(c.id, pid)).toBe(true);
-    // At once: before any tick, on every marker.
-    expect(markers(sim, inst).length).toBeGreaterThan(1);
-    expect(markers(sim, inst).every((m) => m === BURST)).toBe(true);
+    put(sim, pid, inst, 0, DAIS_Z);
+    // Nothing happens until the seal's tick sees them there.
+    expect(allAt(sim, inst, FULL_READY)).toBe(true);
+    const events = sim.tick();
+    expect(allAt(sim, inst, BURST)).toBe(true);
     expect(smithHeartProgress(sim.ctx, inst).portalOpen).toBe(true);
     expect(sealCrystalOf(sim.ctx, inst)).toBeNull();
     expect(sealCrystalBurst(sim.ctx, inst)).toBe(true);
     expect(sim.ctx.entities.has(c.id)).toBe(false);
     expect(inst.objectIds).not.toContain(c.id);
-    // The wall went the same moment (no tick has run).
+    // The wall went the same tick.
     expect(crystalWall(inst)).toBeUndefined();
-    expect(combatWallsAt(originOf(inst).x, originOf(inst).z)).toHaveLength(wallsBefore - 1);
+    expect(combatWallsAt(o.x, o.z)).toHaveLength(wallsBefore - 1);
     // One line, once, to the raid.
-    const events = sim.tick();
-    expect(logs(events, pid).filter((t) => t === SMITH_HEART_PORTAL_OPEN_LOG)).toHaveLength(1);
-    for (let i = 0; i < 20; i++)
-      expect(logs(sim.tick(), pid)).not.toContain(SMITH_HEART_PORTAL_OPEN_LOG);
+    expect(opened(events, pid)).toBe(1);
+    for (let i = 0; i < 20; i++) expect(opened(sim.tick(), pid)).toBe(0);
   });
 
-  it('is kept for the claim: later ticks, a fight that begins again, a kill again', () => {
+  it('is kept for the claim: later ticks, a walk back out, a fight that begins again, a kill again', () => {
     const { sim, pid, inst } = setup();
     winVeins(sim, inst, SMITH_HEART_VEINS);
-    put(sim, pid, inst, 0, PRESS_Z);
-    expect(sim.pickUpObject(crystal(sim, inst).id, pid)).toBe(true);
+    put(sim, pid, inst, 0, DAIS_Z);
+    sim.tick();
+    expect(allAt(sim, inst, BURST)).toBe(true);
+    put(sim, pid, inst, 0, RING_Z);
     for (let i = 0; i < 100; i++) sim.tick();
-    expect(markers(sim, inst).every((m) => m === BURST)).toBe(true);
+    expect(allAt(sim, inst, BURST)).toBe(true);
     // The veins and the charge are derived and follow the roster; the kept bit does not.
     revive(sim, inst, veinKills('quench'));
     sim.tick();
-    const lost = markers(sim, inst);
     expect(
-      lost.every(
-        (m) =>
-          m === ((SMITH_HEART_SEAL_FULL & ~SMITH_HEART_VEIN_BITS.quench) | SMITH_HEART_PORTAL_BIT),
+      allAt(
+        sim,
+        inst,
+        (SMITH_HEART_SEAL_FULL & ~SMITH_HEART_VEIN_BITS.quench) | SMITH_HEART_PORTAL_BIT,
       ),
     ).toBe(true);
     expect(smithHeartProgress(sim.ctx, inst).portalOpen).toBe(true);
     kill(sim, inst, veinKills('quench'));
     sim.tick();
-    expect(markers(sim, inst).every((m) => m === BURST)).toBe(true);
-    // The crystal never stands again, nor does it ever offer a press.
+    expect(allAt(sim, inst, BURST)).toBe(true);
+    // The crystal never stands again.
     expect(sealCrystalOf(sim.ctx, inst)).toBeNull();
   });
 
@@ -418,20 +447,21 @@ describe('the portal bit is kept, and only a burst sets it', () => {
     expect(sealCrystalOf(sim.ctx, inst)).toBeNull();
     expect(sim.ctx.entities.has(c.id)).toBe(false);
     expect(crystalWall(inst)).toBeUndefined();
-    expect(markers(sim, inst).every((m) => m === SMITH_HEART_PORTAL_BIT)).toBe(true);
+    expect(allAt(sim, inst, SMITH_HEART_PORTAL_BIT)).toBe(true);
   });
 
   it('a fresh claim is shut again', () => {
     const { sim, pid, inst } = setup();
     winVeins(sim, inst, SMITH_HEART_VEINS);
-    put(sim, pid, inst, 0, PRESS_Z);
-    expect(sim.pickUpObject(crystal(sim, inst).id, pid)).toBe(true);
+    put(sim, pid, inst, 0, DAIS_Z);
+    sim.tick();
+    expect(allAt(sim, inst, BURST)).toBe(true);
     freeInstance(sim.ctx, inst);
     sim.tick();
     expect(enterDungeon(sim.ctx, SMITH_HEART_DUNGEON, pid)).toBe(true);
     const [again] = claimsOf(sim);
     sim.tick();
-    expect(markers(sim, again).every((m) => m === 0)).toBe(true);
+    expect(allAt(sim, again, 0)).toBe(true);
     expect(smithHeartProgress(sim.ctx, again).portalOpen).toBe(false);
     const c = crystal(sim, again);
     expect(c.lootable).toBe(false);
@@ -446,15 +476,14 @@ describe('the portal bit is kept, and only a burst sets it', () => {
     expect(crystalWall(inst)).toBeDefined();
     expect(handleSmithHeartDevChat(sim.ctx, '/dev heart portal', pid)).toBe(true);
     expect(smithHeartProgress(sim.ctx, inst).portalOpen).toBe(true);
-    expect(markers(sim, inst).every((m) => m === SMITH_HEART_PORTAL_BIT)).toBe(true);
+    expect(allAt(sim, inst, SMITH_HEART_PORTAL_BIT)).toBe(true);
     expect(sealCrystalOf(sim.ctx, inst)).toBeNull();
     expect(crystalWall(inst)).toBeUndefined();
     expect(combatWallsAt(o.x, o.z)).toHaveLength(walls - 1);
     // The line went out once; a second verb has nothing left to burst.
-    const first = logs(sim.tick(), pid);
-    expect(first.filter((t) => t === SMITH_HEART_PORTAL_OPEN_LOG)).toHaveLength(1);
+    expect(opened(sim.tick(), pid)).toBe(1);
     expect(handleSmithHeartDevChat(sim.ctx, '/dev heart portal', pid)).toBe(true);
-    expect(logs(sim.tick(), pid)).not.toContain(SMITH_HEART_PORTAL_OPEN_LOG);
+    expect(opened(sim.tick(), pid)).toBe(0);
     expect(burstSmithHeartSeal(sim.ctx, inst)).toBe(false);
     // The kept bit survives every later tick.
     for (let i = 0; i < 20; i++) sim.tick();
@@ -462,71 +491,75 @@ describe('the portal bit is kept, and only a burst sets it', () => {
   });
 });
 
-describe('the press', () => {
-  it('a dark crystal answers with its line and changes nothing', () => {
+describe('the trigger', () => {
+  it('a dark crystal never bursts, however long a raider stands in the circle', () => {
     const { sim, pid, inst } = setup();
-    put(sim, pid, inst, 0, PRESS_Z);
-    const c = crystal(sim, inst);
-    // A non-lootable crystal is not clickable, so this is the direct pickup command.
-    expect(sim.pickUpObject(c.id, pid)).toBe(false);
-    const events = sim.tick();
-    expect(errors(events, pid)).toContain(SMITH_HEART_SEAL_DARK_TEXT);
-    expect(markers(sim, inst).every((m) => m === 0)).toBe(true);
-    expect(sealCrystalOf(sim.ctx, inst)).toBe(c);
-    expect(crystalWall(inst)).toBeDefined();
+    put(sim, pid, inst, 0, DAIS_Z);
+    let said = 0;
+    for (let i = 0; i < 40; i++) said += opened(sim.tick(), pid);
     // Three of the four veins is still dark.
     winVeins(sim, inst, ['hammer', 'breath', 'quench']);
-    expect(sim.pickUpObject(c.id, pid)).toBe(false);
-    expect(errors(sim.tick(), pid)).toContain(SMITH_HEART_SEAL_DARK_TEXT);
+    for (let i = 0; i < 40; i++) said += opened(sim.tick(), pid);
+    expect(said).toBe(0);
+    expect(local(sim, pid, inst).z).toBeCloseTo(DAIS_Z, 3);
     expect(smithHeartProgress(sim.ctx, inst).portalOpen).toBe(false);
+    expect(sealCrystalOf(sim.ctx, inst)).not.toBeNull();
+    expect(crystalWall(inst)).toBeDefined();
   });
 
-  it('a charged crystal out of reach refuses, one in reach bursts (reach is from its edge)', () => {
+  it('the circle is inclusive at its rim and not a hair past it', () => {
     const { sim, pid, inst } = setup();
     winVeins(sim, inst, SMITH_HEART_VEINS);
     const c = crystal(sim, inst);
-    const reach = INTERACT_RANGE + SEAL_CRYSTAL.r;
-    expect(reach).toBeCloseTo(13.5, 9);
-    expect(SEAL_CRYSTAL_REACH).toBe(reach);
-    // Far away on the Ring: too far, and nothing changes.
-    put(sim, pid, inst, 0, 70);
-    expect(sim.pickUpObject(c.id, pid)).toBe(false);
-    expect(errors(sim.tick(), pid)).toContain('Too far away.');
-    // Just outside the reach.
-    put(sim, pid, inst, 0, -(reach + 0.1));
-    expect(sim.pickUpObject(c.id, pid)).toBe(false);
-    expect(errors(sim.tick(), pid)).toContain('Too far away.');
-    expect(markers(sim, inst).every((m) => m === FULL_READY)).toBe(true);
-    expect(sealCrystalOf(sim.ctx, inst)).toBe(c);
-    // Just inside it (well past the plain interact range of the centre).
-    put(sim, pid, inst, 0, -(reach - 0.1));
-    expect(reach - 0.1).toBeGreaterThan(INTERACT_RANGE);
-    expect(sim.pickUpObject(c.id, pid)).toBe(true);
-    expect(markers(sim, inst).every((m) => m === BURST)).toBe(true);
+    put(sim, pid, inst, 0, -(SEAL_CRYSTAL_TRIGGER_R + 0.001));
+    expect(sealCrystalTriggered(sim.ctx, c)).toBe(false);
+    put(sim, pid, inst, 0, -SEAL_CRYSTAL_TRIGGER_R);
+    expect(sealCrystalTriggered(sim.ctx, c)).toBe(true);
+    // Round, not square: a diagonal step past the rim is outside it.
+    const d = (SEAL_CRYSTAL_TRIGGER_R + 0.05) / Math.SQRT2;
+    put(sim, pid, inst, d, -d);
+    expect(sealCrystalTriggered(sim.ctx, c)).toBe(false);
+    // Through the tick: a step short holds, the rim bursts.
+    put(sim, pid, inst, 0, -(SEAL_CRYSTAL_TRIGGER_R + 0.5));
+    sim.tick();
+    expect(allAt(sim, inst, FULL_READY)).toBe(true);
+    put(sim, pid, inst, 0, -(SEAL_CRYSTAL_TRIGGER_R - 0.5));
+    sim.tick();
+    expect(allAt(sim, inst, BURST)).toBe(true);
   });
 
-  it('needs a living player: a corpse and a released spirit are turned away', () => {
+  it('needs a living player: a corpse and a released spirit in the circle burst nothing', () => {
     const { sim, pid, inst } = setup();
     winVeins(sim, inst, SMITH_HEART_VEINS);
     const c = crystal(sim, inst);
     const body = sim.ctx.entities.get(pid) as Entity;
-    put(sim, pid, inst, 0, PRESS_Z);
+    put(sim, pid, inst, 0, DAIS_Z);
     body.dead = true;
-    expect(sim.pickUpObject(c.id, pid)).toBe(false);
-    expect(errors(sim.tick(), pid)).toContain("You can't do that while dead.");
+    body.hp = 0;
+    expect(sealCrystalTriggered(sim.ctx, c)).toBe(false);
+    sim.tick();
+    expect(allAt(sim, inst, FULL_READY)).toBe(true);
+    // The released spirit, set back in the circle.
     sim.releaseSpirit(pid);
     expect(body.ghost).toBe(true);
-    expect(sim.pickUpObject(c.id, pid)).toBe(false);
-    expect(errors(sim.tick(), pid)).toContain("You can't do that while dead.");
-    expect(markers(sim, inst).every((m) => m === FULL_READY)).toBe(true);
+    put(sim, pid, inst, 0, DAIS_Z);
+    expect(sealCrystalTriggered(sim.ctx, c)).toBe(false);
+    sim.tick();
+    expect(allAt(sim, inst, FULL_READY)).toBe(true);
     expect(sealCrystalOf(sim.ctx, inst)).toBe(c);
-    expect(smithHeartProgress(sim.ctx, inst).portalOpen).toBe(false);
+    // The same body living again, on the same spot: it bursts (the gate is life, nothing else).
+    body.dead = false;
+    body.ghost = false;
+    body.hp = body.maxHp;
+    put(sim, pid, inst, 0, DAIS_Z);
+    sim.tick();
+    expect(allAt(sim, inst, BURST)).toBe(true);
   });
 
-  it('a player of another claim presses nothing of this one', () => {
+  it("each claim's circle is its own: a stranger at their dais bursts nothing of ours, and ours leaves theirs shut", () => {
     const { sim, pid, inst } = setup();
     winVeins(sim, inst, SMITH_HEART_VEINS);
-    put(sim, pid, inst, 0, PRESS_Z);
+    put(sim, pid, inst, 0, RING_Z);
     // A stranger's own claim, one slot over, with its own crystal.
     const stranger = sim.addPlayer('mage', 'Stranger');
     expect(enterDungeon(sim.ctx, SMITH_HEART_DUNGEON, stranger)).toBe(true);
@@ -537,124 +570,71 @@ describe('the press', () => {
     const mine = crystal(sim, inst);
     const strangers = crystal(sim, theirs);
     expect(mine.id).not.toBe(strangers.id);
-    // Standing at THEIR dais they cannot press OUR crystal ...
-    put(sim, stranger, theirs, 0, -6);
-    expect(sim.pickUpObject(mine.id, stranger)).toBe(false);
-    expect(errors(sim.tick(), stranger)).toContain('Too far away.');
-    expect(markers(sim, inst).every((m) => m === FULL_READY)).toBe(true);
+    // Standing in THEIR circle they set off nothing of OURS (charged as ours is) ...
+    put(sim, stranger, theirs, 0, DAIS_Z);
+    expect(sealCrystalTriggered(sim.ctx, mine)).toBe(false);
+    for (let i = 0; i < 5; i++) sim.tick();
+    expect(allAt(sim, inst, FULL_READY)).toBe(true);
     // ... and their own is dark, whatever our raid has done.
-    expect(sim.pickUpObject(strangers.id, stranger)).toBe(false);
-    expect(errors(sim.tick(), stranger)).toContain(SMITH_HEART_SEAL_DARK_TEXT);
+    expect(allAt(sim, theirs, 0)).toBe(true);
     // Our burst leaves theirs shut and tells only us.
-    expect(sim.pickUpObject(mine.id, pid)).toBe(true);
+    put(sim, pid, inst, 0, DAIS_Z);
     const events = sim.tick();
-    expect(logs(events, pid)).toContain(SMITH_HEART_PORTAL_OPEN_LOG);
-    expect(logs(events, stranger)).not.toContain(SMITH_HEART_PORTAL_OPEN_LOG);
-    expect(markers(sim, theirs).every((m) => m === 0)).toBe(true);
+    expect(allAt(sim, inst, BURST)).toBe(true);
+    expect(opened(events, pid)).toBe(1);
+    expect(opened(events, stranger)).toBe(0);
+    expect(allAt(sim, theirs, 0)).toBe(true);
     expect(sealCrystalOf(sim.ctx, theirs)).toBe(strangers);
-    // The stranger's reach is checked against the claim, too, in the pure.
-    expect(
-      inSealCrystalReach(sim.ctx, theirs, strangers, sim.ctx.entities.get(pid) as Entity),
-    ).toBe(false);
   });
 
-  it('a second press has nothing left to burst: no state change, no second line', () => {
+  it('a raider already standing in the circle when the last vein lights bursts it on that tick', () => {
     const { sim, pid, inst } = setup();
-    winVeins(sim, inst, SMITH_HEART_VEINS);
-    put(sim, pid, inst, 0, PRESS_Z);
-    const c = crystal(sim, inst);
-    expect(sim.pickUpObject(c.id, pid)).toBe(true);
-    sim.tick();
-    expect(sim.pickUpObject(c.id, pid)).toBe(false);
+    winVeins(sim, inst, ['hammer', 'breath', 'quench']);
+    put(sim, pid, inst, 0, DAIS_Z);
+    for (let i = 0; i < 10; i++) sim.tick();
+    expect(smithHeartProgress(sim.ctx, inst).portalOpen).toBe(false);
+    kill(sim, inst, veinKills('heat'));
     const events = sim.tick();
-    expect(logs(events, pid)).not.toContain(SMITH_HEART_PORTAL_OPEN_LOG);
-    expect(errors(events, pid)).toEqual([]);
-    expect(markers(sim, inst).every((m) => m === BURST)).toBe(true);
-    // The pure press on a claim that burst already (the entity kept by a caller) is a no-op too.
-    expect(pressSmithHeartSealCrystal(sim.ctx, c, sim.ctx.entities.get(pid) as Entity, pid)).toBe(
-      false,
-    );
-    expect(logs(sim.tick(), pid)).not.toContain(SMITH_HEART_PORTAL_OPEN_LOG);
-  });
-
-  it('the interact key reaches it: the markers that share its spot never take the press', () => {
-    const { sim, pid, inst } = setup();
-    winVeins(sim, inst, SMITH_HEART_VEINS);
-    // Beside the wall, well inside the plain interact range of the centre, with
-    // nothing targeted: the nearest lootable object is the crystal.
-    put(sim, pid, inst, 0, -(SEAL_CRYSTAL.r + PLAYER_BODY_RADIUS + 0.2));
-    sim.interact(pid);
-    expect(markers(sim, inst).every((m) => m === BURST)).toBe(true);
+    expect(allAt(sim, inst, BURST)).toBe(true);
     expect(sealCrystalOf(sim.ctx, inst)).toBeNull();
-    expect(logs(sim.tick(), pid)).toContain(SMITH_HEART_PORTAL_OPEN_LOG);
+    expect(opened(events, pid)).toBe(1);
   });
 
-  it('never takes a press meant for something nearer: an object in plain reach answers first', () => {
+  it('a burst crystal is gone for good: walking out and back in sets off nothing more', () => {
     const { sim, pid, inst } = setup();
     winVeins(sim, inst, SMITH_HEART_VEINS);
-    put(sim, pid, inst, 0, PRESS_Z);
-    const body = sim.ctx.entities.get(pid) as Entity;
-    // A mailbox a yard from the player: the scan's ordinary object arm answers it with an event.
-    const mailbox = createGroundObject(sim.ctx.nextId++, '', 'Mailbox', {
-      x: body.pos.x + 1,
-      y: body.pos.y,
-      z: body.pos.z,
-    });
-    mailbox.templateId = 'mailbox';
-    sim.ctx.addEntity(mailbox);
-    sim.interact(pid);
-    const evs = sim.tick();
-    expect(evs.some((e) => e.type === 'mailbox' && e.pid === pid)).toBe(true);
-    // The crystal was not pressed: it still stands, charged.
-    expect(markers(sim, inst).every((m) => m === FULL_READY)).toBe(true);
-    expect(sealCrystalOf(sim.ctx, inst)).not.toBeNull();
-    // With nothing nearer in reach the same press is the crystal's.
-    sim.ctx.dropEntity(mailbox.id);
-    sim.interact(pid);
-    expect(markers(sim, inst).every((m) => m === BURST)).toBe(true);
+    put(sim, pid, inst, 0, DAIS_Z);
+    expect(opened(sim.tick(), pid)).toBe(1);
+    let said = 0;
+    for (let round = 0; round < 3; round++) {
+      put(sim, pid, inst, 0, RING_Z);
+      for (let i = 0; i < 5; i++) said += opened(sim.tick(), pid);
+      put(sim, pid, inst, 0, DAIS_Z);
+      for (let i = 0; i < 5; i++) said += opened(sim.tick(), pid);
+    }
+    expect(said).toBe(0);
+    expect(allAt(sim, inst, BURST)).toBe(true);
+    expect(sealCrystalOf(sim.ctx, inst)).toBeNull();
   });
 
-  it('presses from exactly its reach (the gate is inclusive) and not a hair past', () => {
+  it('the burst is the tick, never a press: the pickup command and the interact key do nothing to it', () => {
     const { sim, pid, inst } = setup();
     winVeins(sim, inst, SMITH_HEART_VEINS);
     const c = crystal(sim, inst);
-    put(sim, pid, inst, 0, -(SEAL_CRYSTAL_REACH + 0.001));
+    // In the circle, charged, before the seal's tick has seen them.
+    put(sim, pid, inst, 0, DAIS_Z);
     expect(sim.pickUpObject(c.id, pid)).toBe(false);
-    expect(markers(sim, inst).every((m) => m === FULL_READY)).toBe(true);
-    put(sim, pid, inst, 0, -SEAL_CRYSTAL_REACH);
-    expect(sim.pickUpObject(c.id, pid)).toBe(true);
-    expect(markers(sim, inst).every((m) => m === BURST)).toBe(true);
-  });
-
-  it('the interact key beside a dark crystal answers with its line and presses nothing', () => {
-    const { sim, pid, inst } = setup();
-    // A fresh claim: nothing lit, the markers back at smith_heart_seal_0.
-    put(sim, pid, inst, 0, PRESS_Z);
     sim.interact(pid);
-    expect(errors(sim.tick(), pid)).toContain(SMITH_HEART_SEAL_DARK_TEXT);
-    expect(markers(sim, inst).every((m) => m === 0)).toBe(true);
-    expect(sealCrystalOf(sim.ctx, inst)).not.toBeNull();
+    expect(allAt(sim, inst, FULL_READY)).toBe(true);
+    expect(sealCrystalOf(sim.ctx, inst)).toBe(c);
+    // The tick is what bursts it.
+    sim.tick();
+    expect(allAt(sim, inst, BURST)).toBe(true);
   });
 
-  it("the interact key out of the crystal's reach is not the crystal's: no line, nothing pressed", () => {
+  it('draws no rng, in the trigger or in the tick', () => {
     const { sim, pid, inst } = setup();
     winVeins(sim, inst, SMITH_HEART_VEINS);
-    // On the Ring's north, 70 yd from the dais centre and inside the claim.
-    put(sim, pid, inst, 0, 70);
-    sim.interact(pid);
-    expect(errors(sim.tick(), pid)).toEqual([]);
-    expect(markers(sim, inst).every((m) => m === FULL_READY)).toBe(true);
-    expect(sealCrystalOf(sim.ctx, inst)).not.toBeNull();
-    // And the same press a step inside the reach is the crystal's (the gate is the distance).
-    put(sim, pid, inst, 0, -(SEAL_CRYSTAL_REACH - 0.5));
-    sim.interact(pid);
-    expect(markers(sim, inst).every((m) => m === BURST)).toBe(true);
-  });
-
-  it('draws no rng, in the press or in the tick', () => {
-    const { sim, pid, inst } = setup();
-    winVeins(sim, inst, SMITH_HEART_VEINS);
-    put(sim, pid, inst, 0, PRESS_Z);
     let draws = 0;
     const rng = sim.ctx.rng as Rng;
     rng.setObserver(() => {
@@ -662,7 +642,8 @@ describe('the press', () => {
     });
     try {
       expect(tickSmithHeartSeal(sim.ctx, inst)).toBe(FULL_READY);
-      expect(sim.pickUpObject(crystal(sim, inst).id, pid)).toBe(true);
+      put(sim, pid, inst, 0, DAIS_Z);
+      expect(tickSmithHeartSeal(sim.ctx, inst)).toBe(BURST);
       expect(tickSmithHeartSeal(sim.ctx, inst)).toBe(BURST);
     } finally {
       rng.setObserver(null);
@@ -719,8 +700,9 @@ describe('the wall', () => {
     expect(Math.hypot(inside.x - o.x, inside.z - o.z)).toBeGreaterThanOrEqual(
       SEAL_CRYSTAL.r + PLAYER_BODY_RADIUS - 1e-6,
     );
-    put(sim, pid, inst, 0, PRESS_Z);
-    expect(sim.pickUpObject(crystal(sim, inst).id, pid)).toBe(true);
+    put(sim, pid, inst, 0, DAIS_Z);
+    sim.tick();
+    expect(allAt(sim, inst, BURST)).toBe(true);
     const clear = resolvePosition(seed, o.x + 1, o.z + 0.5, PLAYER_BODY_RADIUS);
     expect(clear.x).toBeCloseTo(o.x + 1, 9);
     expect(clear.z).toBeCloseTo(o.z + 0.5, 9);
@@ -735,35 +717,43 @@ describe('the wall', () => {
       ({ ...a, pos: { ...a.pos, z: a.pos.z + 2 * (SEAL_CRYSTAL.r + 3) } }) as Entity;
     put(sim, pid, inst, 0, -(SEAL_CRYSTAL.r + 3));
     expect(entityLineOfSightClear(sim.cfg.seed, a, across())).toBe(false);
-    expect(sim.pickUpObject(crystal(sim, inst).id, pid)).toBe(true);
+    // Standing in the circle, the next tick bursts it.
+    sim.tick();
+    expect(allAt(sim, inst, BURST)).toBe(true);
     expect(entityLineOfSightClear(sim.cfg.seed, a, across())).toBe(true);
   });
 
-  it('after the burst the portal at the centre is reachable on foot, and it hops the walker', () => {
+  it('walking down the Grand Stair bursts it at the rim, before the wall, and walks on into the portal', () => {
     const { sim, pid, inst } = setup();
     winVeins(sim, inst, SMITH_HEART_VEINS);
     const o = originOf(inst);
     const e = sim.ctx.entities.get(pid) as Entity;
     const meta = sim.meta(pid);
     if (!meta) throw new Error('no meta');
-    put(sim, pid, inst, 0, -(SEAL_CRYSTAL.r + 4));
+    // At the Grand Stair's foot, outside the circle, walking north onto the dais.
+    put(sim, pid, inst, 0, -(SEAL_CRYSTAL_TRIGGER_R + 4));
     e.facing = 0;
     e.prevFacing = 0;
     meta.moveInput.forward = true;
-    for (let i = 0; i < 60; i++) sim.tick();
-    // Pressed against the wall: outside the portal's trigger, in reach of the press.
-    expect(Math.hypot(e.pos.x - o.x, e.pos.z - o.z)).toBeGreaterThan(RING_PORTAL.r);
-    expect(sim.pickUpObject(crystal(sim, inst).id, pid)).toBe(true);
+    let burstAt = Number.NaN;
     let hopped = false;
-    let hop: string[] = [];
-    for (let i = 0; i < 60 && !hopped; i++) {
-      hop = hop.concat(logs(sim.tick(), pid));
+    let said: string[] = [];
+    for (let i = 0; i < 200 && !hopped; i++) {
+      said = said.concat(logs(sim.tick(), pid));
+      if (Number.isNaN(burstAt) && smithHeartProgress(sim.ctx, inst).portalOpen) {
+        burstAt = Math.hypot(e.pos.x - o.x, e.pos.z - o.z);
+      }
       const at = local(sim, pid, inst);
       hopped = Math.hypot(at.x - HEART_ARRIVAL.x, at.z - HEART_ARRIVAL.z) < 1;
     }
     meta.moveInput.forward = false;
+    // It burst as the walker crossed the rim, never needing them to reach the wall.
+    expect(burstAt).toBeLessThanOrEqual(SEAL_CRYSTAL_TRIGGER_R);
+    expect(burstAt).toBeGreaterThan(SEAL_CRYSTAL_TRIGGER_R - 1);
+    expect(said.filter((t) => t === SMITH_HEART_PORTAL_OPEN_LOG)).toHaveLength(1);
+    // The wall was gone by then, so the same walk carried them into the portal.
     expect(hopped).toBe(true);
-    expect(hop).toContain(SMITH_HEART_PORTAL_HOP_TEXT);
+    expect(said).toContain(SMITH_HEART_PORTAL_HOP_TEXT);
   });
 
   it('is mirrored by the online client from the entity alone, and leaves with it', () => {
@@ -826,8 +816,7 @@ describe('determinism and text', () => {
       if (t === 10) kill(sim, inst, veinKills('breath'));
       if (t === 15) kill(sim, inst, veinKills('quench'));
       if (t === 20) kill(sim, inst, veinKills('heat'));
-      if (t === 25) put(sim, pid, inst, 0, PRESS_Z);
-      if (t === 30) sim.pickUpObject(crystal(sim, inst).id, pid);
+      if (t === 30) put(sim, pid, inst, 0, DAIS_Z);
       if (t === 40) revive(sim, inst, veinKills('breath'));
       sim.tick();
       note(t);
@@ -845,20 +834,18 @@ describe('determinism and text', () => {
     expect(values).toContain(0);
     expect(values).toContain(FULL_READY);
     expect(values).toContain(BURST);
+    expect(values[29]).toBe(FULL_READY);
+    expect(values[30]).toBe(BURST);
   });
 
-  it('both lines are English the client re-localizes (exact rows)', () => {
+  it('the burst line is English the client re-localizes (an exact row)', () => {
     expect(SMITH_HEART_PORTAL_OPEN_LOG).toBe(
       'The heart seal crystal shatters, and a way down into the heart of the mountain whirls open in its place.',
     );
-    expect(SMITH_HEART_SEAL_DARK_TEXT).toBe(
-      'The heart seal crystal is dark. Light all four veins and clear the Ring first.',
-    );
-    for (const text of [SMITH_HEART_PORTAL_OPEN_LOG, SMITH_HEART_SEAL_DARK_TEXT]) {
-      expect(localizeSimText(text), text).not.toBeNull();
-      // The house rule: no en or em dash in player text.
-      for (const code of [0x2013, 0x2014])
-        expect(text.includes(String.fromCharCode(code))).toBe(false);
+    expect(localizeSimText(SMITH_HEART_PORTAL_OPEN_LOG)).not.toBeNull();
+    // The house rule: no en or em dash in player text.
+    for (const code of [0x2013, 0x2014]) {
+      expect(SMITH_HEART_PORTAL_OPEN_LOG.includes(String.fromCharCode(code))).toBe(false);
     }
   });
 });

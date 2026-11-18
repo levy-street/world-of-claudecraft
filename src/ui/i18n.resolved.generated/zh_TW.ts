@@ -31622,7 +31622,6 @@ export const zh_TW: EnTranslations = {
     "farmPatchName": "菜畦",
     "realmBuilderMonumentName": "王國建造者紀念碑",
     "musterRackName": "徵召兵器架",
-    "heartSealCrystalName": "心之封印水晶",
-    "heartSealCrystalInteract": "心之封印水晶：互動以擊碎"
+    "heartSealCrystalName": "心之封印水晶"
   }
 };

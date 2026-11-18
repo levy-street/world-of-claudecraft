@@ -11,11 +11,11 @@
 //     (the same fill timeline the quarters had: heartSealQuarterFill/Level); the heart
 //     (white-gold) glows as the four fill;
 //   ready (all four lit and the Ring clear, the READY bit): the whole crystal swells and
-//     pulses, the sign that it can be shattered by hand;
-//   the burst (the seal markers' portal bit, set when a player breaks it): the crystal
-//     overloads for `HEART_PORTAL_OPEN.charge`, then shatters; its pieces (the model's
-//     own shells, grouped) fly out, the crystal's pieces tumbling on into an orbit round
-//     the portal funnel for good, the plinth's stones falling away.
+//     pulses, the sign that the first raider onto the dais will break it;
+//   the burst (the seal markers' portal bit, set when a raider steps onto the dais): the
+//     crystal overloads for `HEART_PORTAL_OPEN.charge`, then shatters; its pieces (the
+//     model's own shells, grouped) fly out, the crystal's pieces tumbling on into an orbit
+//     round the portal funnel for good, the plinth's stones falling away.
 //
 // Pure and Three-free (the clock is passed in, render seconds).
 
@@ -31,17 +31,6 @@ import {
  *  puts the widest shard on the seal's inner circle, 8.6 yd; the plinth's stones stand at
  *  8.47). Pinned against the shipped GLB by tests/smith_heart_ring_crystal.test.ts. */
 export const RING_CRYSTAL = { height: 18.85, plinthR: 8.47 } as const;
-
-/** The crystal's click volume (ring_crystal_pick.ts): a frustum as wide as the plinth at
- *  its foot and narrowing toward the tip, so a click anywhere on the crystal's silhouette
- *  is a click on its entity (the sim's press, encounters/smith_heart/seal_burst.ts), and
- *  the height its entity's overhead label hangs at. */
-export const RING_CRYSTAL_CLICK = {
-  baseR: 8,
-  topR: 4.5,
-  height: RING_CRYSTAL.height,
-  labelHeight: 8,
-} as const;
 
 /** The crystal's look (ring_crystal_material.ts reads it as three uniforms). The painting is
  *  the owner's approved concept, so every number here keeps its four colours: nothing adds a

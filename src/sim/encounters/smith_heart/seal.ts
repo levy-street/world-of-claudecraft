@@ -12,11 +12,13 @@
 //     vein's three packs);
 //   the seal: each guardian's death lights its vein's colour on the seal;
 //   the charge (READY): with all four lit AND the Ring clear, the heart seal
-//     crystal is charged and a player can press it (seal_crystal.ts);
-//   the portal: the press BURSTS the crystal (seal_burst.ts) and the portal
-//     to the Heart stands open (portal.ts walks the raid through). It is
-//     sticky, a bit the markers keep rather than derive, and set only by a
-//     burst: a seal lit and charged but never pressed stays shut;
+//     crystal is charged (seal_crystal.ts);
+//   the portal: the first tick a living player stands in the middle circle
+//     (the dais) once the crystal is charged, it BURSTS (seal_crystal.ts
+//     sealCrystalTriggered; `/dev heart portal` forces it, seal_burst.ts) and
+//     the portal to the Heart stands open (portal.ts walks the raid through).
+//     It is sticky, a bit the markers keep rather than derive, and set only by
+//     a burst: a seal charged while nobody comes down to the dais stays shut;
 //   the exit (2026-11-17): the Masterless Strength fallen, the Heart's exit
 //     portal opens and walks the raid back to the entrance (portal.ts);
 //   the arrival (phase 2J): the first tick a living player stands in the
@@ -65,7 +67,12 @@ import { beginArrivalVoice, stepArrivalVoice } from './final_voice';
 import { tickHeatGuardian } from './heat';
 import { tickSmithHeartPortal } from './portal';
 import { tickQuenchGuardian } from './quench';
-import { holdSealMarkerInert, tickSealCrystal } from './seal_crystal';
+import {
+  holdSealMarkerInert,
+  sealCrystalOf,
+  sealCrystalTriggered,
+  tickSealCrystal,
+} from './seal_crystal';
 
 /** Each vein's bit in the seal mask (the template id's number). */
 export const SMITH_HEART_VEIN_BITS: Readonly<Record<SmithHeartVein, number>> = {
@@ -78,8 +85,9 @@ export const SMITH_HEART_VEIN_BITS: Readonly<Record<SmithHeartVein, number>> = {
 export const SMITH_HEART_SEAL_FULL = 15;
 /** The portal's bit: the heart seal crystal has burst and the portal to the
  *  Heart stands open. STICKY (kept by the markers, never derived): set only by
- *  a burst (seal_burst.ts: the press, or `/dev heart portal`), so a seal lit
- *  and charged but never pressed keeps the portal shut. */
+ *  a burst (a living player stepping into the middle circle while the crystal
+ *  is charged, or `/dev heart portal`), so a seal charged while nobody comes
+ *  down to the dais keeps the portal shut. */
 export const SMITH_HEART_PORTAL_BIT = 16;
 /** The arrival's bit (phase 2J): a living player has stood in the Heart.
  *  Kept by the markers for the claim's life once set. */
@@ -89,8 +97,8 @@ export const SMITH_HEART_AWAKE_BIT = 32;
  *  Derived every tick like the veins. */
 export const SMITH_HEART_EXIT_BIT = 64;
 /** The charge's bit: all four veins are lit AND the Ring is clear, so the heart
- *  seal crystal is charged and a press bursts it. Derived every tick like the
- *  veins, so it stays set after the burst. */
+ *  seal crystal is charged and a player in the middle circle bursts it.
+ *  Derived every tick like the veins, so it stays set after the burst. */
 export const SMITH_HEART_READY_BIT = 128;
 /** Every bit a marker can carry. */
 const MARKER_BITS =
@@ -227,7 +235,8 @@ export interface SmithHeartProgress {
   /** The Ring's eight packs are dead. */
   ringClear: boolean;
   /** The heart seal crystal is charged: all four veins lit and the Ring clear
-   *  (the markers' READY bit, derived every tick). A press bursts it. */
+   *  (the markers' READY bit, derived every tick). A player in the middle
+   *  circle bursts it. */
   ready: boolean;
   /** The crystal has burst and the portal to the Heart stands open: the
    *  markers' STICKY portal bit, set only by a burst (seal_burst.ts), never by
@@ -286,7 +295,7 @@ export function announce(ctx: SimContext, inst: InstanceSlot, text: string): voi
 }
 
 /** Write `value` onto every seal marker of the claim (their template id
- *  carries it) and keep each marker out of the press (seal_crystal.ts). */
+ *  carries it) and keep each marker inert (seal_crystal.ts). */
 export function writeSealMarkers(ctx: SimContext, inst: InstanceSlot, value: number): void {
   const template = smithHeartSealTemplate(value);
   for (const id of inst.objectIds) {
@@ -302,7 +311,8 @@ export function writeSealMarkers(ctx: SimContext, inst: InstanceSlot, value: num
  * the charge, the kept portal and arrival bits, the exit) onto every marker,
  * keep the crystal honest, and tell the raid about each vein that lit since
  * the last tick. The portal bit is carried over from the markers, never
- * derived: only a burst sets it (seal_burst.ts). Returns the claim's current
+ * derived: only a burst sets it (a living player in the middle circle while the
+ * crystal is charged, here, or the forced burst, seal_burst.ts). Returns the claim's current
  * marker value, or null for a claim without markers.
  */
 export function tickSmithHeartSeal(ctx: SimContext, inst: InstanceSlot): number | null {
@@ -313,19 +323,28 @@ export function tickSmithHeartSeal(ctx: SimContext, inst: InstanceSlot): number 
   const asleep = devHeldAsleep(ctx, inst);
   const awake = !asleep && (smithHeartAwakeBitSet(before) || smithHeartPlayerInHeart(ctx, inst));
   const exit = dungeonPlacedBossDead(ctx, inst, SMITH_HEART_FINAL_BOSS);
+  // The burst: once the crystal is charged, the first tick a living player stands
+  // in the middle circle sets the portal bit, kept from then on.
+  const crystal = p.ready && !p.portalOpen ? sealCrystalOf(ctx, inst) : null;
+  const portal = p.portalOpen || (crystal !== null && sealCrystalTriggered(ctx, crystal));
   const value =
     p.mask |
     (p.ready ? SMITH_HEART_READY_BIT : 0) |
-    (p.portalOpen ? SMITH_HEART_PORTAL_BIT : 0) |
+    (portal ? SMITH_HEART_PORTAL_BIT : 0) |
     (awake ? SMITH_HEART_AWAKE_BIT : 0) |
     (exit ? SMITH_HEART_EXIT_BIT : 0);
   writeSealMarkers(ctx, inst, value);
-  tickSealCrystal(ctx, inst, p.ready, p.portalOpen);
+  tickSealCrystal(ctx, inst, portal);
   if (value === before) return value;
   for (const v of SMITH_HEART_VEINS) {
     if (smithHeartVeinLit(value, v) && !smithHeartVeinLit(before, v)) {
       announce(ctx, inst, SMITH_HEART_VEIN_LIT_LOG[v]);
     }
+  }
+  // The crystal burst this tick: the raid reads its line once (a forced burst,
+  // burstSmithHeartSeal, announces itself and writes the bit before this tick).
+  if (smithHeartPortalBitSet(value) && !smithHeartPortalBitSet(before)) {
+    announce(ctx, inst, SMITH_HEART_PORTAL_OPEN_LOG);
   }
   // The heart wakes: its arrival lines follow over the scene.
   if (smithHeartAwakeBitSet(value) && !smithHeartAwakeBitSet(before)) beginArrivalVoice(ctx, inst);

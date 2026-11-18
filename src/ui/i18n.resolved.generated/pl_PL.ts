@@ -31622,7 +31622,6 @@ export const pl_PL: EnTranslations = {
     "farmPatchName": "Grządki ogrodowe",
     "realmBuilderMonumentName": "Pomnik Budowniczego Królestw",
     "musterRackName": "Stojak na broń dla rekrutów",
-    "heartSealCrystalName": "The Heart Seal Crystal",
-    "heartSealCrystalInteract": "The Heart Seal Crystal: interact to break it"
+    "heartSealCrystalName": "The Heart Seal Crystal"
   }
 };

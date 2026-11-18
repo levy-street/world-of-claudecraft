@@ -870,8 +870,9 @@ export const SMITH_HEART_SEAL_CRYSTAL_TEMPLATE = 'smith_heart_seal_crystal' as c
 
 /** The heart seal crystal at the Ring's dais centre: one object per claim,
  *  APPENDED LAST to the dungeon's objects (object order feeds entity ids).
- *  Pressable only while the seal is READY (seal_crystal.ts keeps `lootable`
- *  honest); a solid wall until the press bursts it. */
+ *  Never lootable (seal_crystal.ts holds it so): there is no press, a living
+ *  player stepping onto the dais once the seal is READY bursts it (seal.ts);
+ *  a solid wall until then. */
 export const SMITH_HEART_SEAL_CRYSTAL_OBJECT: DungeonObjectSpawn = {
   itemId: '',
   name: 'The Heart Seal Crystal',

@@ -31622,7 +31622,6 @@ export const da_DK: EnTranslations = {
     "farmPatchName": "Havebede",
     "realmBuilderMonumentName": "Rigsbygger-monument",
     "musterRackName": "Opbuddets våbenstativ",
-    "heartSealCrystalName": "The Heart Seal Crystal",
-    "heartSealCrystalInteract": "The Heart Seal Crystal: interact to break it"
+    "heartSealCrystalName": "The Heart Seal Crystal"
   }
 };

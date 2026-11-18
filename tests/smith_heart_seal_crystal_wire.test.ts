@@ -2,16 +2,17 @@ import { describe, expect, it, vi } from 'vitest';
 
 // The heart seal crystal (src/sim/encounters/smith_heart/seal_crystal.ts) over
 // the wire: no wire change, no IWorld change. The crystal is an ordinary
-// object entity (its template id, its name, and the `loot` flag that means
-// "lootable", which the sim holds true only while the seal is charged); the
-// seal markers carry the charge and the burst in their template ids; the press
-// is the existing `pickup` command; and the online client's wall follows the
-// mirrored entity (net/combat_wall_wire.ts), so it leaves with the entity the
-// snapshot after the burst. This drives the REAL server snapshot path into the
-// real online mirror (ClientWorld) and checks each. The collision view is one
-// process-wide table the in-process server ALSO writes, so the client's wall is
-// read only after the shared table is cleared and the client alone publishes. Db is mocked so no
-// Postgres runs (mirrors smith_heart_council_soul_wire.test.ts).
+// object entity (its template id, its name, and a `loot` flag the sim holds
+// false: there is no press); the seal markers carry the charge and the burst
+// in their template ids; the burst is the server's own tick, the first one a
+// living raider stands on the dais once the crystal is charged; and the online
+// client's wall follows the mirrored entity (net/combat_wall_wire.ts), so it
+// leaves with the entity the snapshot after the burst. This drives the REAL
+// server snapshot path into the real online mirror (ClientWorld) and checks
+// each. The collision view is one process-wide table the in-process server ALSO
+// writes, so the client's wall is read only after the shared table is cleared
+// and the client alone publishes. Db is mocked so no Postgres runs (mirrors
+// smith_heart_council_soul_wire.test.ts).
 vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
@@ -35,10 +36,10 @@ import { SEAL_CRYSTAL } from '../src/sim/content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import { displacePlayerForDev } from '../src/sim/dev/dev_displace';
 import {
+  SEAL_CRYSTAL_TRIGGER_R,
   SMITH_HEART_PORTAL_BIT,
   SMITH_HEART_PORTAL_OPEN_LOG,
   SMITH_HEART_READY_BIT,
-  SMITH_HEART_SEAL_DARK_TEXT,
   SMITH_HEART_SEAL_FULL,
   sealCrystalOf,
   smithHeartSealMaskOf,
@@ -51,7 +52,7 @@ import { bareClient, broadcast, fakeWs, joinServer } from './helpers/bare_client
 type Any = any;
 
 describe('the heart seal crystal over the wire', () => {
-  it('reaches the online mirror, takes the existing pickup command, and its wall follows the entity', () => {
+  it('reaches the online mirror, bursts on the server tick a raider steps onto the dais, and its wall follows the entity', () => {
     const saved = process.env.ALLOW_DEV_COMMANDS;
     process.env.ALLOW_DEV_COMMANDS = '1';
     let server: GameServer;
@@ -133,29 +134,30 @@ describe('the heart seal crystal over the wire', () => {
     expect(mirroredMarkers().every((m) => m === 0)).toBe(true);
     expect(clientWall()).toBeDefined();
 
-    // Beside the wall. A direct pickup on the dark crystal is refused with its line.
-    displacePlayerForDev(sim.ctx, sim.entities.get(pid) as Entity, o.x, o.z - 6);
-    run(2);
-    press(server0.id, 11);
-    run(1);
-    expect(outcomes(11)).toEqual([{ t: 'commandOutcome', rid: 11, ok: false }]);
-    expect(eventTexts('error')).toContain(SMITH_HEART_SEAL_DARK_TEXT);
-    expect(mirroredMarkers().every((m) => m === 0)).toBe(true);
-
-    // Four veins lit and the Ring clear: the mirrored crystal is now lootable, the markers charged.
+    // At the Grand Stair's foot, a few steps short of the dais (the markers in
+    // range are the ones mirrored so far): four veins lit and the Ring clear
+    // charge the markers, and the crystal stays as it was (no press to offer).
+    const offDais = SEAL_CRYSTAL_TRIGGER_R + 6;
+    displacePlayerForDev(sim.ctx, sim.entities.get(pid) as Entity, o.x, o.z - offDais);
     sim.chat('/dev heart kill guardians', pid);
     run(3);
-    expect(mirroredCrystal()?.lootable).toBe(true);
     expect(
       mirroredMarkers().every((m) => m === (SMITH_HEART_SEAL_FULL | SMITH_HEART_READY_BIT)),
     ).toBe(true);
+    expect(mirroredCrystal()?.lootable).toBe(false);
     expect(clientWall()).toBeDefined();
+    expect(eventTexts('log')).not.toContain(SMITH_HEART_PORTAL_OPEN_LOG);
 
-    // The press is the existing pickup command and bursts it.
+    // The old press is gone over the wire too: a pickup on the charged crystal is refused.
     press(server0.id, 12);
+    run(2);
+    expect(outcomes(12)).toEqual([{ t: 'commandOutcome', rid: 12, ok: false }]);
+    expect(mirroredCrystal()?.id).toBe(server0.id);
+
+    // Down onto the dais, beside the wall: the server's tick bursts it.
+    displacePlayerForDev(sim.ctx, sim.entities.get(pid) as Entity, o.x, o.z - (SEAL_CRYSTAL.r + 2));
     run(3);
-    expect(outcomes(12)).toEqual([{ t: 'commandOutcome', rid: 12, ok: true }]);
-    expect(eventTexts('log')).toContain(SMITH_HEART_PORTAL_OPEN_LOG);
+    expect(eventTexts('log').filter((t) => t === SMITH_HEART_PORTAL_OPEN_LOG)).toHaveLength(1);
     // The entity left the mirror, the markers carry the burst, the client's wall left with it.
     expect(mirroredCrystal()).toBeUndefined();
     expect(client.entities.has(server0.id)).toBe(false);
@@ -166,10 +168,9 @@ describe('the heart seal crystal over the wire', () => {
     ).toBe(true);
     expect(clientWall()).toBeUndefined();
 
-    // A second press has nothing to burst.
-    press(server0.id, 13);
-    run(1);
-    expect(outcomes(13)).toEqual([{ t: 'commandOutcome', rid: 13, ok: false }]);
+    // Nothing is left to burst: the line never comes again.
+    run(10);
+    expect(eventTexts('log').filter((t) => t === SMITH_HEART_PORTAL_OPEN_LOG)).toHaveLength(1);
     clearCombatWallStateForTest();
   });
 });

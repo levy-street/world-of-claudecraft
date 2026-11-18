@@ -31622,7 +31622,6 @@ export const id_ID: EnTranslations = {
     "farmPatchName": "Petak Kebun",
     "realmBuilderMonumentName": "Monumen Pembangun Alam",
     "musterRackName": "Rak Senjata Pasukan",
-    "heartSealCrystalName": "The Heart Seal Crystal",
-    "heartSealCrystalInteract": "The Heart Seal Crystal: interact to break it"
+    "heartSealCrystalName": "The Heart Seal Crystal"
   }
 };

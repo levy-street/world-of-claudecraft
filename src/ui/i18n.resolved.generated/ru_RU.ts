@@ -31622,7 +31622,6 @@ export const ru_RU: EnTranslations = {
     "farmPatchName": "Грядки",
     "realmBuilderMonumentName": "Памятник зодчим королевства",
     "musterRackName": "Оружейная стойка ополчения",
-    "heartSealCrystalName": "Кристалл печати сердца",
-    "heartSealCrystalInteract": "Кристалл печати сердца: взаимодействуйте, чтобы разбить"
+    "heartSealCrystalName": "Кристалл печати сердца"
   }
 };

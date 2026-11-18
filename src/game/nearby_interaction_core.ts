@@ -110,10 +110,7 @@ export function resolveNearbyInteractionCandidate(
   let bestCorpse: Entity | null = null;
   let bestCorpseDistance = Number.POSITIVE_INFINITY;
   let bestObject: Entity | null = null;
-  // Nearest-wins among objects; each is gated on its own reach below, so the
-  // accumulator starts open (an object reaching past INTERACT_RANGE, the heart seal
-  // crystal, must not be cut off by the plain range it would otherwise start at).
-  let bestObjectDistance = Number.POSITIVE_INFINITY;
+  let bestObjectDistance = INTERACT_RANGE;
   let bestNpc: Entity | null = null;
   let bestNpcDistance = INTERACT_RANGE + 1;
   let bestDelve: Entity | null = null;
@@ -189,9 +186,6 @@ export function resolveNearbyInteractionCandidate(
         : !isQuestGatedGroundObjectHidden(entity, world.questLog) &&
           !isObjectOpenedByViewer(entity, world.questLog, world.worldQuestLog)) &&
       distance <= objectInteractionRange(entity) &&
-      // An ordinary object stays strictly inside the plain range, as it always was; a wider
-      // reach (the heart seal crystal's) is inclusive, as the sim's press gate is.
-      (objectInteractionRange(entity) > INTERACT_RANGE || distance < INTERACT_RANGE) &&
       distance < bestObjectDistance
     ) {
       bestObject = entity;

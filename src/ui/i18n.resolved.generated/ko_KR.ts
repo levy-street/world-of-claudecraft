@@ -31622,7 +31622,6 @@ export const ko_KR: EnTranslations = {
     "farmPatchName": "텃밭",
     "realmBuilderMonumentName": "왕국 건설자 기념비",
     "musterRackName": "소집대 무기 거치대",
-    "heartSealCrystalName": "심장 봉인 수정",
-    "heartSealCrystalInteract": "심장 봉인 수정: 상호작용하여 부수기"
+    "heartSealCrystalName": "심장 봉인 수정"
   }
 };

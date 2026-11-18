@@ -15,7 +15,6 @@ import { DUNGEONS, instanceOrigin, instanceSlotForZ } from '../sim/data';
 import { TEMPLE_OBJECT_TEMPLATES } from '../sim/encounters/drowned_temple/ids';
 import { SANCTUM_OBJECT_TEMPLATES } from '../sim/encounters/gravewyrm_sanctum/ids';
 import { CRYPT_OBJECT_TEMPLATES } from '../sim/encounters/hollow_crypt/ids';
-import { isSealCrystalTemplate } from '../sim/encounters/smith_heart/seal_crystal';
 import { BASTION_OBJECT_TEMPLATES } from '../sim/encounters/sunken_bastion/ids';
 import { dungeonGateAt, dungeonGateStateOf } from '../sim/instances/dungeon_gates';
 import { DEATH_BURST_RING } from '../sim/mob/trash_kit/death_burst';
@@ -29,8 +28,6 @@ import {
   ignivarRaidGatePlan,
 } from './ignivar_raid_gate';
 import { isHeartSealMarker, observeHeartSealMarker } from './smith_heart/heart_seal_core';
-import { RING_CRYSTAL_CLICK } from './smith_heart/ring_crystal_core';
-import { buildRingCrystalClickBody } from './smith_heart/ring_crystal_pick';
 import { breathObjectKind } from './smith_heart_fx/breath_fight_fx_core';
 import { heatObjectKind } from './smith_heart_fx/heat_fight_fx_core';
 import { quenchObjectKind } from './smith_heart_fx/quench_fight_fx_core';
@@ -51,19 +48,7 @@ export interface EncounterAnchorPlan {
   height: number;
 }
 
-/** The Smith's Heart's heart seal crystal entity (the sim's pressable claim object): the seal
- *  draws the crystal itself, so its view is an empty anchor with an invisible click volume
- *  (smith_heart/ring_crystal_pick.ts), never the generic ground object and its sparkle. */
-export interface HeartSealCrystalPlan {
-  heartSealCrystal: true;
-  height: number;
-}
-
-export type GateObjectPlan =
-  | IgnivarRaidGatePlan
-  | DungeonGateAnchorPlan
-  | EncounterAnchorPlan
-  | HeartSealCrystalPlan;
+export type GateObjectPlan = IgnivarRaidGatePlan | DungeonGateAnchorPlan | EncounterAnchorPlan;
 
 interface GateEntityLike {
   templateId: string;
@@ -80,12 +65,6 @@ export function gateObjectPlan(e: GateEntityLike): GateObjectPlan | null {
   if (CRYPT_OBJECT_TEMPLATES.has(e.templateId)) return { encounterAnchor: true, height: 2 };
   // A trash-kit death burst's ring: drawn from the world (death_burst_fx.ts).
   if (e.templateId === DEATH_BURST_RING) return { encounterAnchor: true, height: 2 };
-  // The heart seal crystal itself (the pressable object, not the markers): drawn by the
-  // seal. Asked BEFORE the trash engine's objects below, because it is also a combat wall
-  // (a collider with its own look, never the engine's ice slab).
-  if (isSealCrystalTemplate(e.templateId)) {
-    return { heartSealCrystal: true, height: RING_CRYSTAL_CLICK.labelHeight };
-  }
   // The trash engine's objects (hazard pools, combat walls, walker orbs): drawn
   // from the world by ./trash_engine_fx, which builds the wall to its collider.
   if (isTrashEngineObject(e.templateId)) return { encounterAnchor: true, height: 2 };
@@ -145,7 +124,6 @@ export function isStableObjectTransition(from: string, to: string): boolean {
 
 /** Build the view body for a gate plan. */
 export function buildGateObject(plan: GateObjectPlan): THREE.Group {
-  if ('heartSealCrystal' in plan) return buildRingCrystalClickBody();
   if ('encounterAnchor' in plan) {
     const anchor = new THREE.Group();
     anchor.name = 'encounterObjectAnchor';

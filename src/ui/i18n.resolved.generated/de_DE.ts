@@ -31622,7 +31622,6 @@ export const de_DE: EnTranslations = {
     "farmPatchName": "Gartenbeete",
     "realmBuilderMonumentName": "Reichsbauer-Denkmal",
     "musterRackName": "Waffenständer des Aufgebots",
-    "heartSealCrystalName": "The Heart Seal Crystal",
-    "heartSealCrystalInteract": "The Heart Seal Crystal: interact to break it"
+    "heartSealCrystalName": "The Heart Seal Crystal"
   }
 };

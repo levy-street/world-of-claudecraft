@@ -31622,7 +31622,6 @@ export const ja_JP: EnTranslations = {
     "farmPatchName": "菜園",
     "realmBuilderMonumentName": "王国建設者の記念碑",
     "musterRackName": "召集兵団の武器棚",
-    "heartSealCrystalName": "心臓の封印水晶",
-    "heartSealCrystalInteract": "心臓の封印水晶：調べて砕く"
+    "heartSealCrystalName": "心臓の封印水晶"
   }
 };

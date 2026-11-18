@@ -4,19 +4,19 @@
 // the dungeon's objects) that stands for the seal. It lights as each guardian
 // falls (the render side reads the veins off the seal markers), it is CHARGED
 // once all four veins burn and the Ring is clear (the markers' READY bit,
-// seal.ts), and a player's press then bursts it (seal_burst.ts): the portal to
-// the Heart stands in its place.
+// seal.ts), and the first tick a living player of the claim then stands in the
+// middle circle (the dais, `SEAL_CRYSTAL_TRIGGER_R`) it bursts (seal.ts
+// tickSmithHeartSeal): the portal to the Heart stands in its place. The owner's
+// call of 2026-11-18: no press, the raid arriving in the middle sets it off.
 //
 // This module is the crystal as an OBJECT, and a leaf under seal.ts (it
 // imports nothing of the seal, so seal.ts can drive it every tick without a
-// cycle; seal_burst.ts, the press and the burst, sits above both):
-//   Pressable  `lootable` is true ONLY while the seal is READY and the crystal
-//              has not burst: the clients' interact press and click take
-//              lootable objects only, so a dark crystal offers no press. The
-//              generic object sweep (sim.ts) re-arms any non-lootable object
-//              once its `respawnTimer` runs out (it is 0 on a fresh claim
-//              object), so the crystal's is held at Infinity and it never
-//              re-arms by itself (the battleground flag's precedent).
+// cycle; seal_burst.ts, the forced burst, sits above both):
+//   Inert      never lootable, so no client offers it a press or a click, and
+//              its `respawnTimer` is held at Infinity: the generic object sweep
+//              (sim.ts) re-arms any non-lootable object once its timer runs out
+//              (it is 0 on a fresh claim object; the battleground flag's
+//              precedent).
 //   Solid      while it stands it is a combat wall (instances/
 //              combat_wall_state.ts, a round row the size of SEAL_CRYSTAL.r):
 //              bodies and sight lines stop at it, offline and online alike
@@ -26,40 +26,36 @@
 //              and the trash engine publishes it every tick. A body that finds
 //              itself inside the circle is pushed out of it by the ordinary
 //              depenetration, never held in it.
+//   Trigger    `sealCrystalTriggered`: a living player of the claim inside the
+//              middle circle (the dead and released spirits never count).
 //   Burst      the crystal LEAVES the claim (`retireSealCrystal`): its wall
 //              goes the same tick and the entity is dropped, so the online
 //              mirror's wall leaves with the entity one snapshot later (the
 //              pillars' contract). That a crystal has burst is the PORTAL bit
 //              of the seal markers, never anything kept here.
-//   Markers    the seal's 14 markers are inert anchors, one of them at the
-//              same spot as the crystal. They are held non-lootable the same
-//              way (`holdSealMarkerInert`), or a marker could tie the crystal
-//              in the interact scan and take the press.
+//   Markers    the seal's 14 markers are inert anchors, held non-lootable the
+//              same way (`holdSealMarkerInert`).
 //
 // Draws NO rng and reads no clock. Its per-tick cost is one walk of the claim's
 // authored objects (the dungeon's `objects` list, a content-bounded few dozen),
-// never a collection that grows with the realm's age.
+// and, only while the crystal is charged and whole, one walk of the players.
 
 import { SMITH_HEART_SEAL_CRYSTAL_TEMPLATE } from '../../content/smith_heart';
-import { SEAL_CRYSTAL } from '../../content/smith_heart_layout';
-import { instanceHalfWidthOf } from '../../instances/instance_footprint';
+import { SEAL_DAIS } from '../../content/smith_heart_layout';
 import { syncCombatWallCollision } from '../../mob/trash_kit/combat_walls';
 import { dropKitObject, kitObjectsOf } from '../../mob/trash_kit/kit_objects';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
-import { dist2d, type Entity, INTERACT_RANGE } from '../../types';
+import type { Entity } from '../../types';
 
 /** How long the crystal's wall stands: the claim's, never a clock's (the
  *  trash engine counts a wall down every tick, combat_walls.ts stepCombatWall,
  *  so it is given a lifetime no claim outlives). */
 const CRYSTAL_WALL_LIFE = 1e9;
 
-/** How far (yards, from its centre) a body can stand and still press the crystal:
- *  the classic interact range measured from the crystal's EDGE (its wall keeps a
- *  body a body's width off the rim, so a press from beside it counts). The sim's
- *  press gate and the client's scan and click reach both read it
- *  (src/game/interactions.ts objectInteractionRange). */
-export const SEAL_CRYSTAL_REACH = INTERACT_RANGE + SEAL_CRYSTAL.r;
+/** The middle circle (yards from the crystal): the dais the four stairs land on. A living
+ *  player of the claim standing in it once the crystal is charged bursts it. */
+export const SEAL_CRYSTAL_TRIGGER_R = SEAL_DAIS.r;
 
 /** Is `templateId` the heart seal crystal's? */
 export function isSealCrystalTemplate(templateId: string): boolean {
@@ -91,28 +87,25 @@ export function sealCrystalClaim(ctx: SimContext, crystal: Entity): InstanceSlot
   return null;
 }
 
-/** Is `body` inside the crystal's claim and within reach of the crystal
- *  (`SEAL_CRYSTAL_REACH`)? */
-export function inSealCrystalReach(
-  ctx: SimContext,
-  inst: InstanceSlot,
-  crystal: Entity,
-  body: Entity,
-): boolean {
-  const o = ctx.instanceOriginOf(inst);
-  // The claim's envelope: the dungeon's half width in x and the slot's 250 yd
-  // half depth in z (the same shape instances/dungeons.ts instanceContains
-  // and the seal's own announce read).
-  if (
-    Math.abs(body.pos.x - o.x) >= instanceHalfWidthOf(inst.dungeonId) ||
-    Math.abs(body.pos.z - o.z) >= 250
-  )
-    return false;
-  return dist2d(body.pos, crystal.pos) <= SEAL_CRYSTAL_REACH;
+/** Does a living player stand in the middle circle round `crystal`? The circle is
+ *  the claim's own (claims stand hundreds of yards apart, so it reaches nobody of
+ *  another); the dead and released spirits never count. The dais is the only floor
+ *  over that circle, so no height band is asked (the intros' band is for stacked
+ *  floors). */
+export function sealCrystalTriggered(ctx: SimContext, crystal: Entity): boolean {
+  const r2 = SEAL_CRYSTAL_TRIGGER_R * SEAL_CRYSTAL_TRIGGER_R;
+  for (const meta of ctx.players.values()) {
+    const e = ctx.entities.get(meta.entityId);
+    if (!e || e.dead || e.ghost) continue;
+    const dx = e.pos.x - crystal.pos.x;
+    const dz = e.pos.z - crystal.pos.z;
+    if (dx * dx + dz * dz <= r2) return true;
+  }
+  return false;
 }
 
-/** Keep a seal marker (an inert anchor) out of the press: never lootable,
- *  never re-armed by the generic object sweep. */
+/** Keep a seal marker (an inert anchor) inert: never lootable, never re-armed by the
+ *  generic object sweep. */
 export function holdSealMarkerInert(marker: Entity): void {
   if (marker.lootable) marker.lootable = false;
   marker.respawnTimer = Number.POSITIVE_INFINITY;
@@ -120,23 +113,18 @@ export function holdSealMarkerInert(marker: Entity): void {
 
 /**
  * One tick of the claim's crystal, after the seal derived this tick's value:
- * while it has not burst it is pressable exactly while the seal is `ready`
- * (never re-armed by the sweep) and stands as a wall; once `burst` it leaves
- * the claim. A claim with no crystal left costs one walk of its objects.
+ * while it has not burst it stays inert (never lootable, never re-armed by the
+ * sweep) and stands as a wall; once `burst` it leaves the claim. A claim with no
+ * crystal left costs one walk of its objects.
  */
-export function tickSealCrystal(
-  ctx: SimContext,
-  inst: InstanceSlot,
-  ready: boolean,
-  burst: boolean,
-): void {
+export function tickSealCrystal(ctx: SimContext, inst: InstanceSlot, burst: boolean): void {
   const crystal = sealCrystalOf(ctx, inst);
   if (!crystal) return;
   if (burst) {
     retireSealCrystal(ctx, inst);
     return;
   }
-  crystal.lootable = ready;
+  if (crystal.lootable) crystal.lootable = false;
   crystal.respawnTimer = Number.POSITIVE_INFINITY;
   if (!crystal.kitObject) {
     crystal.kitObject = { kind: 'wall', remaining: CRYSTAL_WALL_LIFE };

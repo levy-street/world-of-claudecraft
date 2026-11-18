@@ -374,7 +374,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.skins.seamcaller_maul.name",
     "hudChrome.wocStore.skins.squallcrest_sword.look",
     "hudChrome.wocStore.skins.squallcrest_sword.lore",
-    "worldContent.heartSealCrystalInteract",
     "worldContent.heartSealCrystalName"
   ],
   "es_ES": [
@@ -742,7 +741,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.skins.seamcaller_maul.name",
     "hudChrome.wocStore.skins.squallcrest_sword.look",
     "hudChrome.wocStore.skins.squallcrest_sword.lore",
-    "worldContent.heartSealCrystalInteract",
     "worldContent.heartSealCrystalName"
   ],
   "fr_FR": [
@@ -1110,7 +1108,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.skins.seamcaller_maul.name",
     "hudChrome.wocStore.skins.squallcrest_sword.look",
     "hudChrome.wocStore.skins.squallcrest_sword.lore",
-    "worldContent.heartSealCrystalInteract",
     "worldContent.heartSealCrystalName"
   ],
   "fr_CA": [
@@ -1478,7 +1475,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.skins.seamcaller_maul.name",
     "hudChrome.wocStore.skins.squallcrest_sword.look",
     "hudChrome.wocStore.skins.squallcrest_sword.lore",
-    "worldContent.heartSealCrystalInteract",
     "worldContent.heartSealCrystalName"
   ],
   "en_CA": [],
@@ -1847,7 +1843,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.skins.seamcaller_maul.name",
     "hudChrome.wocStore.skins.squallcrest_sword.look",
     "hudChrome.wocStore.skins.squallcrest_sword.lore",
-    "worldContent.heartSealCrystalInteract",
     "worldContent.heartSealCrystalName"
   ],
   "de_DE": [
@@ -2215,7 +2210,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.skins.seamcaller_maul.name",
     "hudChrome.wocStore.skins.squallcrest_sword.look",
     "hudChrome.wocStore.skins.squallcrest_sword.lore",
-    "worldContent.heartSealCrystalInteract",
     "worldContent.heartSealCrystalName"
   ],
   "zh_CN": [
@@ -2607,7 +2601,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.skins.seamcaller_maul.name",
     "hudChrome.wocStore.skins.squallcrest_sword.look",
     "hudChrome.wocStore.skins.squallcrest_sword.lore",
-    "worldContent.heartSealCrystalInteract",
     "worldContent.heartSealCrystalName"
   ],
   "ru_RU": [
@@ -2981,7 +2974,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.skins.seamcaller_maul.name",
     "hudChrome.wocStore.skins.squallcrest_sword.look",
     "hudChrome.wocStore.skins.squallcrest_sword.lore",
-    "worldContent.heartSealCrystalInteract",
     "worldContent.heartSealCrystalName"
   ],
   "nl_NL": [
@@ -3349,7 +3341,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.skins.seamcaller_maul.name",
     "hudChrome.wocStore.skins.squallcrest_sword.look",
     "hudChrome.wocStore.skins.squallcrest_sword.lore",
-    "worldContent.heartSealCrystalInteract",
     "worldContent.heartSealCrystalName"
   ],
   "pl_PL": [
@@ -3717,7 +3708,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.skins.seamcaller_maul.name",
     "hudChrome.wocStore.skins.squallcrest_sword.look",
     "hudChrome.wocStore.skins.squallcrest_sword.lore",
-    "worldContent.heartSealCrystalInteract",
     "worldContent.heartSealCrystalName"
   ],
   "id_ID": [
@@ -4085,7 +4075,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.skins.seamcaller_maul.name",
     "hudChrome.wocStore.skins.squallcrest_sword.look",
     "hudChrome.wocStore.skins.squallcrest_sword.lore",
-    "worldContent.heartSealCrystalInteract",
     "worldContent.heartSealCrystalName"
   ],
   "tr_TR": [
@@ -4453,7 +4442,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.skins.seamcaller_maul.name",
     "hudChrome.wocStore.skins.squallcrest_sword.look",
     "hudChrome.wocStore.skins.squallcrest_sword.lore",
-    "worldContent.heartSealCrystalInteract",
     "worldContent.heartSealCrystalName"
   ],
   "sv_SE": [
@@ -4821,7 +4809,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.skins.seamcaller_maul.name",
     "hudChrome.wocStore.skins.squallcrest_sword.look",
     "hudChrome.wocStore.skins.squallcrest_sword.lore",
-    "worldContent.heartSealCrystalInteract",
     "worldContent.heartSealCrystalName"
   ],
   "vi_VN": [
@@ -5189,7 +5176,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.skins.seamcaller_maul.name",
     "hudChrome.wocStore.skins.squallcrest_sword.look",
     "hudChrome.wocStore.skins.squallcrest_sword.lore",
-    "worldContent.heartSealCrystalInteract",
     "worldContent.heartSealCrystalName"
   ],
   "da_DK": [
@@ -5557,7 +5543,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.skins.seamcaller_maul.name",
     "hudChrome.wocStore.skins.squallcrest_sword.look",
     "hudChrome.wocStore.skins.squallcrest_sword.lore",
-    "worldContent.heartSealCrystalInteract",
     "worldContent.heartSealCrystalName"
   ]
 };

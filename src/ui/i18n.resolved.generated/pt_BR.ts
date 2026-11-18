@@ -31622,7 +31622,6 @@ export const pt_BR: EnTranslations = {
     "farmPatchName": "Canteiros de Jardim",
     "realmBuilderMonumentName": "Monumento ao Construtor de Reino",
     "musterRackName": "Suporte de Armas da Convocação",
-    "heartSealCrystalName": "The Heart Seal Crystal",
-    "heartSealCrystalInteract": "The Heart Seal Crystal: interact to break it"
+    "heartSealCrystalName": "The Heart Seal Crystal"
   }
 };

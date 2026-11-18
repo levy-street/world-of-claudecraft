@@ -31622,7 +31622,6 @@ export const it_IT: EnTranslations = {
     "farmPatchName": "Aiuole da Giardino",
     "realmBuilderMonumentName": "Monumento al costruttore di regni",
     "musterRackName": "Rastrelliera d'armi dell'adunata",
-    "heartSealCrystalName": "The Heart Seal Crystal",
-    "heartSealCrystalInteract": "The Heart Seal Crystal: interact to break it"
+    "heartSealCrystalName": "The Heart Seal Crystal"
   }
 };

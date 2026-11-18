@@ -31622,7 +31622,6 @@ export const vi_VN: EnTranslations = {
     "farmPatchName": "Luống Vườn",
     "realmBuilderMonumentName": "Đài tưởng niệm người xây dựng vương quốc",
     "musterRackName": "Giá Vũ Khí Tập Kết",
-    "heartSealCrystalName": "The Heart Seal Crystal",
-    "heartSealCrystalInteract": "The Heart Seal Crystal: interact to break it"
+    "heartSealCrystalName": "The Heart Seal Crystal"
   }
 };

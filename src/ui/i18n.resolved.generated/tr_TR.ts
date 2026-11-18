@@ -31622,7 +31622,6 @@ export const tr_TR: EnTranslations = {
     "farmPatchName": "Bahçe Yatakları",
     "realmBuilderMonumentName": "Bölge Oluşturucu Anıtı",
     "musterRackName": "Toplanma Silah Rafı",
-    "heartSealCrystalName": "The Heart Seal Crystal",
-    "heartSealCrystalInteract": "The Heart Seal Crystal: interact to break it"
+    "heartSealCrystalName": "The Heart Seal Crystal"
   }
 };
