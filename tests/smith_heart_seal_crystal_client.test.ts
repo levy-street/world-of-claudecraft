@@ -70,6 +70,11 @@ describe("the crystal's reach on the client", () => {
     expect(objectInteractionRange({ templateId: SMITH_HEART_SEAL_CRYSTAL_TEMPLATE })).toBe(
       SEAL_CRYSTAL_REACH,
     );
+    // The literal too (the sim suite pins the same 13.5), so this file stands on its own.
+    expect(objectInteractionRange({ templateId: SMITH_HEART_SEAL_CRYSTAL_TEMPLATE })).toBeCloseTo(
+      13.5,
+      9,
+    );
     // Every other object keeps the plain range.
     expect(objectInteractionRange({ templateId: 'supply_crate' })).toBe(INTERACT_RANGE);
   });
@@ -101,6 +106,11 @@ describe("the interact key's scan", () => {
       id: 40,
     });
     expect(resolveNearbyInteractionCandidate(scan(SEAL_CRYSTAL_REACH + 0.1, [c]))).toBeNull();
+    // Inclusive at exactly the reach, as the sim's press gate is.
+    expect(resolveNearbyInteractionCandidate(scan(SEAL_CRYSTAL_REACH, [c]))).toMatchObject({
+      kind: 'object',
+      id: 40,
+    });
   });
 
   it('offers nothing while it is dark (the sim keeps it unlootable until charged)', () => {

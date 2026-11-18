@@ -236,6 +236,9 @@ describe('the crystal object', () => {
     expect(row.ownLook).toBe(true);
     expect(row.hw).toBe(SEAL_CRYSTAL.r);
     expect(row.hd).toBe(SEAL_CRYSTAL.r);
+    // As tall as the crystal stands (18.85 yd, render/smith_heart/ring_crystal_core.ts), so a
+    // cast across the dais is stopped by it, not slipped over it.
+    expect(row.height).toBeGreaterThanOrEqual(18.85);
   });
 
   it('the charge is its own bit, past every other', () => {
@@ -607,6 +610,43 @@ describe('the press', () => {
     expect(sealCrystalOf(sim.ctx, inst)).not.toBeNull();
     // With nothing nearer in reach the same press is the crystal's.
     sim.ctx.dropEntity(mailbox.id);
+    sim.interact(pid);
+    expect(markers(sim, inst).every((m) => m === BURST)).toBe(true);
+  });
+
+  it('presses from exactly its reach (the gate is inclusive) and not a hair past', () => {
+    const { sim, pid, inst } = setup();
+    winVeins(sim, inst, SMITH_HEART_VEINS);
+    const c = crystal(sim, inst);
+    put(sim, pid, inst, 0, -(SEAL_CRYSTAL_REACH + 0.001));
+    expect(sim.pickUpObject(c.id, pid)).toBe(false);
+    expect(markers(sim, inst).every((m) => m === FULL_READY)).toBe(true);
+    put(sim, pid, inst, 0, -SEAL_CRYSTAL_REACH);
+    expect(sim.pickUpObject(c.id, pid)).toBe(true);
+    expect(markers(sim, inst).every((m) => m === BURST)).toBe(true);
+  });
+
+  it('the interact key beside a dark crystal answers with its line and presses nothing', () => {
+    const { sim, pid, inst } = setup();
+    // A fresh claim: nothing lit, the markers back at smith_heart_seal_0.
+    put(sim, pid, inst, 0, PRESS_Z);
+    sim.interact(pid);
+    expect(errors(sim.tick(), pid)).toContain(SMITH_HEART_SEAL_DARK_TEXT);
+    expect(markers(sim, inst).every((m) => m === 0)).toBe(true);
+    expect(sealCrystalOf(sim.ctx, inst)).not.toBeNull();
+  });
+
+  it("the interact key out of the crystal's reach is not the crystal's: no line, nothing pressed", () => {
+    const { sim, pid, inst } = setup();
+    winVeins(sim, inst, SMITH_HEART_VEINS);
+    // On the Ring's north, 70 yd from the dais centre and inside the claim.
+    put(sim, pid, inst, 0, 70);
+    sim.interact(pid);
+    expect(errors(sim.tick(), pid)).toEqual([]);
+    expect(markers(sim, inst).every((m) => m === FULL_READY)).toBe(true);
+    expect(sealCrystalOf(sim.ctx, inst)).not.toBeNull();
+    // And the same press a step inside the reach is the crystal's (the gate is the distance).
+    put(sim, pid, inst, 0, -(SEAL_CRYSTAL_REACH - 0.5));
     sim.interact(pid);
     expect(markers(sim, inst).every((m) => m === BURST)).toBe(true);
   });
