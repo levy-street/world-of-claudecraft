@@ -22,18 +22,22 @@ import {
   COCOON_ENDS,
   closingLook,
   closingParts,
+  END_RING,
   endLook,
+  endRing,
   NOVA_SHAPE,
   novaCharge,
   novaLook,
   RECKONING_SECONDS,
   reckoningBolts,
+  SHARDS,
   SHOVE_LANE,
   STILLSTONE,
   STILLSTONE_ISLES,
   sealArc,
   sealEnd,
   sealLives,
+  shardAt,
   stepClosingClock,
   stoneLook,
   stoneState,
@@ -121,10 +125,31 @@ describe('breath_isle_phase_core: the cocoon and the nova', () => {
     const s = endLook(COCOON_ENDS.shatter * 0.99, false);
     const b = endLook(COCOON_ENDS.blast * 0.99, true);
     expect(b.wave).toBeGreaterThan(s.wave * 2);
-    expect(endLook(0.08, true).flash).toBeCloseTo(1, 6);
+    expect(endLook(0.06, true).flash).toBeCloseTo(1, 6);
     expect(endLook(2, false).flash).toBe(0);
     expect(endLook(1, false).left).toBe(0);
     expect(endLook(0, true).sky).toBeGreaterThan(0.5);
+  });
+
+  it("flings the shatter's shards on falling arcs and races a ring over the floor", () => {
+    const o = { x: 0, y: 0, z: 0, spin: 0, size: 0, life: 0 };
+    for (let j = 0; j < SHARDS.count; j++) {
+      const a = { ...shardAt(j, 0.2, o) };
+      const b = { ...shardAt(j, 1.6, o) };
+      // Outward over time, and coming down again (gravity), then gone.
+      expect(Math.hypot(b.x, b.z)).toBeGreaterThan(Math.hypot(a.x, a.z));
+      let peak = Number.NEGATIVE_INFINITY;
+      for (let t = 0; t < SHARDS.seconds; t += 0.05) peak = Math.max(peak, shardAt(j, t, o).y);
+      expect(shardAt(j, SHARDS.seconds - 0.01, o).y).toBeLessThan(peak - 1);
+      expect(shardAt(j, SHARDS.seconds, o).life).toBe(0);
+    }
+    // A fast ring: it reaches its end in its seconds and fades out.
+    expect(endRing(END_RING.blast.seconds, true).r).toBeCloseTo(END_RING.blast.reach, 6);
+    expect(endRing(END_RING.blast.seconds, true).glow).toBe(0);
+    expect(END_RING.blast.reach).toBeGreaterThan(END_RING.shatter.reach * 2);
+    // The blast's flash is short: gone within half a second.
+    expect(endLook(0.5, true).flash).toBe(0);
+    expect(endLook(COCOON_ENDS.blast * 0.7, true).sky).toBeLessThan(0.1);
   });
 
   it('hums the nova in every ear, rising with it, from a sample the catalog holds', () => {

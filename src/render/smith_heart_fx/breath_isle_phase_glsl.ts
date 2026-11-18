@@ -125,13 +125,24 @@ void main() {
   float lon = atan(p.z, p.x);
   vec3 q = vec3(cos(lon - t * 0.3 + p.y * 2.2), p.y * 2.0, sin(lon - t * 0.3 + p.y * 2.2));
   float cloud = pfbm3(q * 2.0 + vec3(0.0, t * 0.15, 0.0));
-  // The light inside: where the cloud thins, more of it as the nova gathers.
-  float thin = smoothstep(0.75 - 0.55 * uCharge, 0.95 - 0.35 * uCharge, 1.0 - cloud);
-  float heart = pow(facing, 2.0) * smoothstep(0.2, 1.0, uCharge);
-  // Never a flat disc of light: the cloud keeps its shape over the heart.
-  float light = clamp(thin * (0.45 + 0.55 * facing) + heart * (0.45 + 0.3 * uThrob) * (1.1 - cloud * 0.8), 0.0, 0.85);
-  vec3 lit = mix(mix(uColor, uHot, uHotK), uCore, heart * 0.7);
-  vec3 col = mix(uStorm * (0.6 + 0.8 * cloud), lit * (1.1 + uThrob * 0.3), light);
+  // Depth: a second, deeper layer seen through the first along the view
+  // (parallax), turning the other way, so the ball reads as a volume.
+  vec3 v = normalize(vView);
+  vec3 deep = p - v * 0.45;
+  float lon2 = atan(deep.z, deep.x);
+  float cloud2 = pfbm3(vec3(cos(lon2 + t * 0.22), deep.y * 2.4, sin(lon2 + t * 0.22)) * 2.6 - vec3(0.0, t * 0.2, 0.0));
+  // The light inside: where both layers thin, more of it as it gathers;
+  // ridged storm bands always cross the heart, so it never goes flat.
+  float gap = (1.0 - cloud) * 0.6 + (1.0 - cloud2) * 0.4;
+  float thin = smoothstep(0.62 - 0.25 * uCharge, 0.9 - 0.15 * uCharge, gap);
+  float bands = abs(cloud2 - 0.5) * 2.0;
+  float heart = pow(facing, 3.0) * smoothstep(0.2, 1.0, uCharge) * smoothstep(0.15, 0.6, bands);
+  float light = clamp(thin * (0.35 + 0.45 * facing) + heart * (0.4 + 0.25 * uThrob), 0.0, 0.7);
+  // The rim catches the storm's light (the ball's edge stays read).
+  float rim = pow(1.0 - facing, 2.5);
+  vec3 lit = mix(mix(uColor, uHot, uHotK), uCore, heart * 0.6);
+  vec3 col = mix(uStorm * (0.45 + 0.9 * cloud * cloud2 * 1.6), lit * (1.05 + uThrob * 0.3), light);
+  col += mix(uColor, uHot, uHotK) * rim * (0.35 + 0.4 * uCharge);
   float a = mix(0.92, 0.75, uCharge);
   gl_FragColor = vec4(col, a * uFade);
   #include <colorspace_fragment>
@@ -358,5 +369,88 @@ varying vec3 vLocal;
 void main() {
   vLocal = position;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}
+`;
+
+/** The cocoon's flung shards (instanced): each instance turned and placed by
+ *  its matrix. */
+export const SHARD_VERT = /* glsl */ `
+varying vec3 vN;
+varying vec3 vView;
+void main() {
+  vec4 p = vec4(position, 1.0);
+  vec3 n = normal;
+  #ifdef USE_INSTANCING
+    p = instanceMatrix * p;
+    n = mat3(instanceMatrix) * n;
+  #endif
+  vec4 mv = modelViewMatrix * p;
+  vN = normalize(normalMatrix * n);
+  vView = normalize(-mv.xyz);
+  gl_Position = projectionMatrix * mv;
+}
+`;
+
+/** A shard of wind-glass: clear at its face, its edges catching a hard
+ *  white light (fresnel), a cold tint between. Additive. */
+export const GLASS_FRAG = /* glsl */ `
+uniform vec3 uColor;
+uniform float uGlow;
+varying vec3 vN;
+varying vec3 vView;
+void main() {
+  float facing = abs(dot(normalize(vN), normalize(vView)));
+  float fres = pow(1.0 - facing, 1.6);
+  vec3 col = mix(uColor, vec3(1.0), fres);
+  gl_FragColor = vec4(col * (1.0 + fres), clamp((0.25 + fres * 1.2) * uGlow, 0.0, 1.0));
+  #include <colorspace_fragment>
+}
+`;
+
+/** A shockwave racing over the floor (a disc, vUv its planar uv): a bright
+ *  crest at its edge, a fading wake of wind behind it. Additive. */
+export const SHOCK_FLOOR_FRAG = /* glsl */ `
+uniform float uTime;
+uniform vec3 uColor;
+uniform float uGlow;
+varying vec2 vUv;
+${NOISE}
+void main() {
+  vec2 p = vUv * 2.0 - 1.0;
+  float r = length(p);
+  if (r > 1.0) discard;
+  float crest = smoothstep(0.86, 0.97, r) * (1.0 - smoothstep(0.97, 1.0, r));
+  float a = atan(p.y, p.x);
+  float streak = smoothstep(0.5, 0.9, pnoise(vec2(a * 18.0, r * 4.0 - uTime * 3.0)));
+  float wake = smoothstep(0.35, 0.95, r) * (0.25 + 0.5 * streak);
+  float k = (crest * 1.6 + wake * 0.45) * uGlow;
+  vec3 col = mix(uColor, vec3(1.0), crest * 0.6);
+  gl_FragColor = vec4(col * (1.0 + 0.5 * k), clamp(k, 0.0, 1.0));
+  #include <colorspace_fragment>
+}
+`;
+
+/** Shoving Gale's wind inside its lane (a strip, vUv.x across, vUv.y along
+ *  from the Herald): streaks of wind racing down it, bright where the bar
+ *  has filled (uFill), a crisp front at the fill, faint beyond it. */
+export const LANE_WIND_FRAG = /* glsl */ `
+uniform float uTime;
+uniform vec3 uColor;
+uniform float uFill;
+uniform float uGlow;
+varying vec2 vUv;
+${NOISE}
+void main() {
+  float across = abs(vUv.x * 2.0 - 1.0);
+  float side = 1.0 - smoothstep(0.75, 1.0, across);
+  float streak = smoothstep(0.55, 0.92, pnoise(vec2(vUv.x * 9.0, vUv.y * 7.0 - uTime * 3.2)));
+  float fine = smoothstep(0.7, 0.98, pnoise(vec2(vUv.x * 23.0 + 3.0, vUv.y * 18.0 - uTime * 5.5)));
+  float filled = 1.0 - smoothstep(uFill - 0.01, uFill + 0.01, vUv.y);
+  float front = (1.0 - smoothstep(0.0, 0.025, abs(vUv.y - uFill))) * step(0.02, uFill);
+  float chevron = smoothstep(0.6, 0.95, fract(vUv.y * 9.0 - across * 0.35 - uTime * 1.6));
+  float k = ((streak * 0.9 + fine * 0.6 + chevron * 0.35) * (0.25 + 0.75 * filled) + front * 1.4) * side * uGlow;
+  vec3 col = mix(uColor, vec3(1.0), clamp(fine + front, 0.0, 1.0));
+  gl_FragColor = vec4(col * (1.0 + 0.4 * k), clamp(k, 0.0, 0.95));
+  #include <colorspace_fragment>
 }
 `;

@@ -35,20 +35,27 @@ import {
   cocoonRadius,
   type EndLook,
   endLook,
+  endRing,
   type NovaLook,
   novaCharge,
   novaLook,
   PHASE_COLORS as PC,
   phaseRgb,
+  SHARDS,
   SKY_DOME_R,
   sealArc,
   sealEnd,
   sealLives,
+  shardAt,
 } from './breath_isle_phase_core';
 import {
+  GLASS_FRAG,
   NOVA_CORE_FRAG,
   NOVA_FRAG,
   PHASE_SHELL_VERT,
+  PHASE_UV_VERT,
+  SHARD_VERT,
+  SHOCK_FLOOR_FRAG,
   SKY_DOME_FRAG,
   SKY_DOME_VERT,
 } from './breath_isle_phase_glsl';
@@ -105,6 +112,7 @@ const _look: NovaLook = {
 };
 const _end: EndLook = { flash: 0, wave: 0, waveGlow: 0, left: 0, sky: 0 };
 const _lives: [number, number] = [1, 1];
+const _shard = { x: 0, y: 0, z: 0, spin: 0, size: 0, life: 0 };
 
 export class BreathCocoonFx {
   private readonly group = new THREE.Group();
@@ -121,8 +129,13 @@ export class BreathCocoonFx {
   private readonly haloMat: THREE.SpriteMaterial;
   private readonly flare: THREE.Sprite;
   private readonly flareMat: THREE.SpriteMaterial;
-  private readonly wave: THREE.Mesh;
-  private readonly waveMat: THREE.ShaderMaterial;
+  private readonly ring: THREE.Mesh;
+  private readonly ringMat: THREE.ShaderMaterial;
+  private readonly glass: THREE.InstancedMesh;
+  private readonly glassMat: THREE.ShaderMaterial;
+  private readonly rock: THREE.InstancedMesh;
+  /** The floor under the ending (world y). */
+  private endFloor = 0;
   private readonly dome: THREE.Mesh;
   private readonly domeMat: THREE.ShaderMaterial;
   private readonly bolts: BreathEntranceBolts;
@@ -352,32 +365,59 @@ export class BreathCocoonFx {
     this.flare = new THREE.Sprite(this.flareMat);
     this.flare.visible = false;
     h.root.add(this.flare);
-    // The ending's shockwave: the cocoon's shell flung out (its own material).
-    this.waveMat = new THREE.ShaderMaterial({
-      name: 'smithHeartBreathCocoonWave',
+    // The ending's shockwave racing over the floor (the ladder).
+    this.ringMat = new THREE.ShaderMaterial({
+      name: 'smithHeartBreathCocoonShock',
       uniforms: {
         uTime: h.uTime,
         uColor: { value: new THREE.Color(PC.cocoon) },
-        uEdge: { value: new THREE.Color(PC.cocoonEdge) },
-        uSolid: { value: 1 },
-        uCrack: { value: 1 },
-        uSpin: { value: 3 },
-        uFlash: { value: 0 },
+        uGlow: { value: 0 },
       },
-      vertexShader: BULWARK_VERT,
-      fragmentShader: BULWARK_FRAG,
+      vertexShader: PHASE_UV_VERT,
+      fragmentShader: SHOCK_FLOOR_FRAG,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      polygonOffset: true,
+      polygonOffsetFactor: -3,
+      polygonOffsetUnits: -3,
+    });
+    h.materials.push(this.ringMat);
+    const ringGeo = new THREE.CircleGeometry(1, 96);
+    ringGeo.rotateX(-Math.PI / 2);
+    h.geometries.push(ringGeo);
+    this.ring = new THREE.Mesh(ringGeo, this.ringMat);
+    this.ring.name = 'smithHeartBreathCocoonShock';
+    this.ring.renderOrder = floorVfxRenderOrder('encounter', 11);
+    this.ring.frustumCulled = false;
+    this.ring.visible = false;
+    h.root.add(this.ring);
+    // The shatter's shards: wind-glass and the cocoon's granite, flung out
+    // on their arcs (instanced: the even ones glass, the odd ones stone).
+    this.glassMat = new THREE.ShaderMaterial({
+      name: 'smithHeartBreathCocoonGlass',
+      uniforms: { uColor: { value: new THREE.Color(PC.cocoon) }, uGlow: { value: 1 } },
+      vertexShader: SHARD_VERT,
+      fragmentShader: GLASS_FRAG,
       transparent: true,
       depthWrite: false,
       side: THREE.DoubleSide,
       blending: THREE.AdditiveBlending,
     });
-    h.materials.push(this.waveMat);
-    const waveGeo = new THREE.SphereGeometry(1, 40, 20);
-    h.geometries.push(waveGeo);
-    this.wave = new THREE.Mesh(waveGeo, this.waveMat);
-    this.wave.frustumCulled = false;
-    this.wave.visible = false;
-    h.root.add(this.wave);
+    h.materials.push(this.glassMat);
+    const glassGeo = new THREE.OctahedronGeometry(1, 0);
+    glassGeo.scale(0.55, 1.6, 0.3);
+    h.geometries.push(glassGeo);
+    this.glass = new THREE.InstancedMesh(glassGeo, this.glassMat, SHARDS.count / 2);
+    this.glass.name = 'smithHeartBreathCocoonGlass';
+    this.rock = new THREE.InstancedMesh(stone, heartKitSlotMaterial('stone'), SHARDS.count / 2);
+    this.rock.name = 'smithHeartBreathCocoonRock';
+    for (const m of [this.glass, this.rock]) {
+      m.frustumCulled = false;
+      m.visible = false;
+      m.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+      h.root.add(m);
+    }
     // ---- the storm sky round the Cornice ----
     this.domeMat = new THREE.ShaderMaterial({
       name: 'smithHeartBreathNovaSky',
@@ -454,6 +494,7 @@ export class BreathCocoonFx {
       }
     }
     this.endR = this.R;
+    this.endFloor = g ? g.pos.y : this.foot.y;
     const p = this.h.particles;
     const E = this.endPos;
     const dens = this.h.density;
@@ -565,25 +606,28 @@ export class BreathCocoonFx {
       const T = blast ? COCOON_ENDS.blast : COCOON_ENDS.shatter;
       if (age > T) {
         this.ending = null;
-        this.wave.visible = false;
+        this.ring.visible = false;
         this.flare.visible = false;
+        this.glass.visible = false;
+        this.rock.visible = false;
       } else {
         const L = endLook(age, blast, _end);
         const E = this.endPos;
-        this.wave.visible = true;
-        this.wave.position.set(E.x, E.y, E.z);
-        this.wave.scale.setScalar(this.endR * L.wave);
-        const wu = this.waveMat.uniforms;
-        wu.uSolid.value = 0.3 * L.waveGlow;
-        wu.uFlash.value = L.waveGlow * (blast ? 0.7 : 0.5);
-        wu.uCrack.value = blast ? 0.2 : 0.55;
-        (wu.uColor.value as THREE.Color).setHex(blast ? PC.novaHot : PC.cocoon);
+        // The fast ring over the floor.
+        const ring = endRing(age, blast);
+        this.ring.visible = ring.glow > 0.01;
+        this.ring.position.set(E.x, this.endFloor + 0.12, E.z);
+        this.ring.scale.setScalar(ring.r);
+        this.ringMat.uniforms.uGlow.value = ring.glow * (blast ? 1.3 : 1.1);
+        (this.ringMat.uniforms.uColor.value as THREE.Color).setHex(blast ? PC.novaHot : PC.cocoon);
+        // A short flash on the burst, never a wash over the sky.
         this.flare.visible = L.flash > 0.01;
         this.flare.position.set(E.x, E.y, E.z);
-        this.flare.scale.setScalar(this.endR * (blast ? 14 : 6) * (0.6 + 0.4 * L.flash));
-        this.flareMat.opacity = L.flash;
+        this.flare.scale.setScalar(this.endR * (blast ? 7 : 4.5) * (0.6 + 0.4 * L.flash));
+        this.flareMat.opacity = 0.85 * L.flash;
+        if (!blast) this.paintShards(age);
         sky = Math.max(sky, L.sky);
-        flashSky = Math.max(flashSky, L.flash);
+        flashSky = Math.max(flashSky, 0.5 * L.flash);
         // The nova's sphere going off (the blast) or folding in (the shatter).
         if (L.left > 0) {
           this.nova.visible = true;
@@ -621,6 +665,34 @@ export class BreathCocoonFx {
     this.domeMat.uniforms.uFlash.value = flashSky;
     this.bolts.end();
     this.sealBolts.end();
+  }
+
+  /** The shatter's shards `age` seconds in, on their arcs. */
+  private paintShards(age: number): void {
+    const n = this.h.density < 0.5 ? SHARDS.count / 2 : SHARDS.count;
+    const E = this.endPos;
+    const R = this.endR;
+    for (let j = 0; j < SHARDS.count; j++) {
+      const s = shardAt(j, age, _shard);
+      const mesh = j % 2 === 0 ? this.glass : this.rock;
+      const slot = j >> 1;
+      if (j >= n || s.life <= 0) {
+        mesh.setMatrixAt(slot, _m.makeScale(0, 0, 0));
+        continue;
+      }
+      _e.set(s.spin, s.spin * 0.6, s.spin * 0.3);
+      _q.setFromEuler(_e);
+      const size = s.size * R * s.life;
+      // Never under the floor it was flung over.
+      const y = Math.max(this.endFloor + size, E.y + (s.y - 0.8) * R);
+      _m.compose(_p.set(E.x + s.x * R, y, E.z + s.z * R), _q, _s.set(size, size, size));
+      mesh.setMatrixAt(slot, _m);
+    }
+    this.glass.visible = true;
+    this.rock.visible = true;
+    this.glass.instanceMatrix.needsUpdate = true;
+    this.rock.instanceMatrix.needsUpdate = true;
+    this.glassMat.uniforms.uGlow.value = 1.2 * Math.max(0, 1 - age / SHARDS.seconds);
   }
 
   private paintCocoon(t: number, look: NovaLook, dt: number): void {
@@ -709,12 +781,12 @@ export class BreathCocoonFx {
     cu.uFade.value = 1;
     this.halo.visible = true;
     this.halo.position.copy(this.nova.position);
-    this.halo.scale.setScalar(r * (3.2 + 0.8 * look.throb));
+    this.halo.scale.setScalar(r * (2.5 + 0.4 * look.throb));
     this.haloMat.color.setHex(look.hot > 0.5 ? PC.novaHot : PC.nova);
-    this.haloMat.opacity = 0.35 + 0.45 * this.charge + 0.1 * look.throb;
+    this.haloMat.opacity = 0.22 + 0.22 * this.charge + 0.08 * look.throb;
     // The lightning crawling over it (arcs from its surface out and back).
     this.crackle += dt * look.crackle;
-    const arcs = Math.min(7, 2 + Math.floor(this.charge * 6));
+    const arcs = Math.min(6, 2 + Math.floor(this.charge * 5));
     const step = Math.floor(this.h.uTime.value * 12);
     for (let k = 0; k < arcs; k++) {
       const a0 = phaseHashAngle(k, step);
@@ -734,6 +806,28 @@ export class BreathCocoonFx {
         0.3,
         0.35 + 0.35 * this.charge,
         0.6 + 0.8 * this.charge,
+      );
+    }
+    // Inner arcs: chords of lightning deep inside the ball (between points
+    // on a smaller sphere), dimmer, more of them as it gathers.
+    const inner = 1 + Math.floor(this.charge * 4);
+    for (let k = 0; k < inner; k++) {
+      const a0 = phaseHashAngle(k + 40, step);
+      const a1 = a0 + Math.PI * (0.6 + 0.5 * (phaseHashAngle(k + 41, step) / (Math.PI * 2)));
+      const y0 = Math.sin(phaseHashAngle(k + 43, step)) * 0.5;
+      const y1 = Math.sin(phaseHashAngle(k + 45, step)) * 0.5;
+      const ri = r * 0.62;
+      this.bolts.draw(
+        step * 11 + k + 50,
+        this.novaAt.x + Math.sin(a0) * ri,
+        this.novaAt.y + y0 * ri,
+        this.novaAt.z + Math.cos(a0) * ri,
+        this.novaAt.x + Math.sin(a1) * ri,
+        this.novaAt.y + y1 * ri,
+        this.novaAt.z + Math.cos(a1) * ri,
+        0.35,
+        0.25 + 0.3 * this.charge,
+        0.35 + 0.5 * this.charge,
       );
     }
     // A bolt down onto the guardian now and then, more as it grows.
@@ -866,8 +960,10 @@ export class BreathCocoonFx {
     this.group.visible = false;
     this.nova.visible = false;
     this.halo.visible = false;
-    this.wave.visible = false;
+    this.ring.visible = false;
     this.flare.visible = false;
+    this.glass.visible = false;
+    this.rock.visible = false;
     this.dome.visible = false;
     this.sealBolts.hide();
     this.sky = 0;

@@ -40,6 +40,7 @@ import {
 import { CRYSTAL_FRAG, PHASE_SHELL_VERT } from './breath_isle_phase_glsl';
 import type { BreathIslesHost } from './breath_isles_fx';
 import { ISLE_RIBBON_FRAG, ISLE_RUNE_FRAG, ISLE_UV_VERT } from './breath_isles_glsl';
+import { ribbonGeometry } from './breath_ride_fx';
 
 interface StoneSlot {
   isle: number;
@@ -106,7 +107,24 @@ export class BreathStillstoneFx {
     const crystalGeo = crystalGeometry();
     const shardGeo = new THREE.OctahedronGeometry(0.4, 0);
     shardGeo.computeVertexNormals();
-    const ringGeo = new THREE.TorusGeometry(1, 0.035, 6, 96);
+    // The cage of wind: ribbons wrapping the crystal, each a helix bulging
+    // round its waist and drawn in at its tips, turning its own way.
+    const wraps: THREE.BufferGeometry[] = [];
+    for (let k = 0; k < STILLSTONE.rings; k++) {
+      const pts: { x: number; y: number; z: number }[] = [];
+      const turns = 1.4 + 0.35 * k;
+      for (let i = 0; i <= 72; i++) {
+        const f = i / 72;
+        const a = f * Math.PI * 2 * turns + (k * Math.PI * 2) / STILLSTONE.rings;
+        const r = 1.15 + 1.05 * Math.sin(f * Math.PI) + 0.12 * k;
+        pts.push({
+          x: Math.sin(a) * r,
+          y: (f - 0.5) * (STILLSTONE.height + 1.6),
+          z: Math.cos(a) * r,
+        });
+      }
+      wraps.push(ribbonGeometry(pts, 0.16, true));
+    }
     const runeGeo = new THREE.RingGeometry(2.4, 3.1, 64, 1);
     const pos = runeGeo.getAttribute('position');
     const uv = runeGeo.getAttribute('uv') as THREE.BufferAttribute;
@@ -117,7 +135,7 @@ export class BreathStillstoneFx {
     }
     runeGeo.rotateX(-Math.PI / 2);
     runeGeo.translate(0, 0.1, 0);
-    h.geometries.push(crystalGeo, shardGeo, ringGeo, runeGeo);
+    h.geometries.push(crystalGeo, shardGeo, runeGeo, ...wraps);
     for (const i of STILLSTONE_ISLES) {
       const sp = isleSpots()[i];
       const at = sp.stone ?? { x: sp.x, z: sp.z };
@@ -176,9 +194,8 @@ export class BreathStillstoneFx {
       h.materials.push(ringMat);
       const rings: THREE.Mesh[] = [];
       for (let k = 0; k < STILLSTONE.rings; k++) {
-        const r = new THREE.Mesh(ringGeo, ringMat);
-        r.scale.setScalar(2.4 + k * 0.35);
-        r.rotation.set(0.5 + k * 0.9, k * 1.3, 0.3 * k);
+        const r = new THREE.Mesh(wraps[k], ringMat);
+        r.frustumCulled = false;
         group.add(r);
         rings.push(r);
       }
@@ -358,13 +375,12 @@ export class BreathStillstoneFx {
       u.uGlow.value = L.glow + s.flare;
       u.uGoldK.value = L.gold;
       u.uPulse.value = L.pulse;
-      s.ringMat.uniforms.uGlow.value = L.cage * 0.7;
+      s.ringMat.uniforms.uGlow.value = L.cage * 1.1;
       s.ringMat.uniforms.uFlow.value = L.cageSpin;
       for (let k = 0; k < s.rings.length; k++) {
         const r = s.rings[k];
         r.visible = L.cage > 0.02;
-        r.rotation.y += dt * L.cageSpin * (k % 2 === 0 ? 1 : -1) * 0.6;
-        r.rotation.x += dt * 0.25 * (k + 1);
+        r.rotation.y += dt * L.cageSpin * (k % 2 === 0 ? 1 : -0.7) * 0.8;
       }
       s.runeMat.uniforms.uWake.value =
         s.state === 'dormant' ? 0 : s.state === 'stilled' ? 0.4 : 0.8 + 0.6 * channel;

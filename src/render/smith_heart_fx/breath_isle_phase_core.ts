@@ -82,7 +82,7 @@ export function cocoonRadius(scale: number): number {
 /** The nova's sphere: its smallest and largest radius (in cocoon radii) and
  *  the height its middle hangs at over the guardian's feet (cocoon radii),
  *  so the sphere never swallows the guardian or its cocoon. */
-export const NOVA_SHAPE = { r0: 0.3, r1: 1.6, base: 2.1 } as const;
+export const NOVA_SHAPE = { r0: 0.3, r1: 1.15, base: 1.75 } as const;
 
 export interface NovaLook {
   /** The sphere's radius (cocoon radii). */
@@ -121,7 +121,7 @@ export function novaLook(charge: number, t: number, out?: NovaLook): NovaLook {
     tremble: 0,
   };
   o.radius = NOVA_SHAPE.r0 + (NOVA_SHAPE.r1 - NOVA_SHAPE.r0) * c ** 0.8;
-  o.lift = NOVA_SHAPE.base + o.radius * 0.85;
+  o.lift = NOVA_SHAPE.base + o.radius * 0.6;
   const rate = 1.2 + 5.5 * c * c;
   o.throb = 0.5 + 0.5 * Math.sin(t * rate * Math.PI * 2);
   o.glow = 0.75 + 1.35 * c + 0.25 * c * o.throb;
@@ -200,14 +200,54 @@ export function endLook(age: number, blast: boolean, out?: EndLook): EndLook {
   const o = out ?? { flash: 0, wave: 0, waveGlow: 0, left: 0, sky: 0 };
   const T = blast ? COCOON_ENDS.blast : COCOON_ENDS.shatter;
   const t = Math.max(0, age);
-  o.flash = t < 0.08 ? t / 0.08 : Math.max(0, 1 - (t - 0.08) / (blast ? 0.9 : 0.6));
+  o.flash = t < 0.06 ? t / 0.06 : Math.max(0, 1 - (t - 0.06) / (blast ? 0.4 : 0.3));
   const k = clamp01(t / T);
   const reach = blast ? 14 : 4;
   o.wave = 1 + reach * (1 - (1 - k) ** 2.4);
   o.waveGlow = Math.max(0, 1 - k) ** 1.4;
   o.left = Math.max(0, 1 - t / (blast ? 0.25 : 0.45));
-  o.sky = blast ? 0.85 * Math.max(0, 1 - k) ** 0.6 : 0.8 * Math.max(0, 1 - k * 1.4);
+  // The sky: a short flash, never a wash; the storm clears behind it.
+  o.sky = blast ? 0.7 * Math.max(0, 1 - k * 1.6) : 0.7 * Math.max(0, 1 - k * 1.4);
   return o;
+}
+
+/** The endings' floor shockwave: how far it races (yards) and how fast
+ *  (seconds), a fast ring on the floor ladder. */
+export const END_RING = {
+  shatter: { reach: 34, seconds: 0.9 },
+  blast: { reach: 95, seconds: 1.3 },
+} as const;
+
+/** A floor shockwave `age` seconds in: its radius (yards) and light. */
+export function endRing(age: number, blast: boolean): { r: number; glow: number } {
+  const R = blast ? END_RING.blast : END_RING.shatter;
+  const k = clamp01(age / R.seconds);
+  return { r: 1 + (R.reach - 1) * (1 - (1 - k) ** 3), glow: (1 - k) ** 1.2 };
+}
+
+/** The cocoon's shards: how many fly (the low tier halves them), and the
+ *  flight of shard `j` `age` seconds after the shatter (cocoon radii from
+ *  its middle, y up): thrown out and up on a ballistic arc, tumbling.
+ *  Even shards are wind-glass, odd ones granite. */
+export const SHARDS = { count: 48, gravity: 6, seconds: 2.4 } as const;
+export function shardAt(
+  j: number,
+  age: number,
+  out: { x: number; y: number; z: number; spin: number; size: number; life: number },
+): { x: number; y: number; z: number; spin: number; size: number; life: number } {
+  const a = phaseHash(j, 701) * Math.PI * 2;
+  const up = 0.35 + phaseHash(j, 703) * 1.1;
+  const speed = 2.2 + phaseHash(j, 705) * 3.2;
+  const t = Math.max(0, age);
+  const r0 = 0.6 + phaseHash(j, 707) * 0.5;
+  const h0 = 0.4 + phaseHash(j, 709) * 1.4;
+  out.x = Math.sin(a) * (r0 + speed * t);
+  out.z = Math.cos(a) * (r0 + speed * t);
+  out.y = h0 + up * speed * t - 0.5 * SHARDS.gravity * t * t;
+  out.spin = t * (3 + phaseHash(j, 711) * 7);
+  out.size = (j % 2 === 0 ? 0.09 : 0.07) + phaseHash(j, 713) * 0.08;
+  out.life = t >= SHARDS.seconds ? 0 : 1 - (t / SHARDS.seconds) ** 3;
+  return out;
 }
 
 /** The sky dome round the Cornice (yards: past the farthest isle and its

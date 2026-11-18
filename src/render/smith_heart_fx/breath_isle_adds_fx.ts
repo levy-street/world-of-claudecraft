@@ -43,6 +43,7 @@ import {
   wardHalfArc,
 } from './breath_isle_phase_core';
 import {
+  LANE_WIND_FRAG,
   PHASE_SHELL_VERT,
   PHASE_UV_VERT,
   WARD_FLOOR_FRAG,
@@ -63,6 +64,9 @@ export interface IsleAddsKit {
 interface LaneSlot {
   lane: TelegraphLane;
   painted: PaintedFan<BreathTelegraphKind>;
+  /** The wind flowing down it, filling with the bar. */
+  wind: THREE.Mesh;
+  windMat: THREE.ShaderMaterial;
   id: number;
 }
 
@@ -93,7 +97,7 @@ const WARD_STONES = 7;
 /** A Mending Gale's arch over the yards between its ends: high enough to
  *  read over two bodies standing side by side, never a wall over the isle. */
 function beamLift(d: number): number {
-  return Math.min(6, 3 + d * 0.2);
+  return Math.min(7, 4.5 + d * 0.2);
 }
 const MEND_RGB = phaseRgb(0xd8fff2);
 const GRIT_RGB = [0.5, 0.52, 0.58] as const;
@@ -127,10 +131,40 @@ export class BreathIsleAddsFx {
     private readonly h: BreathIslesHost,
     private readonly t: IsleAddsKit,
   ) {
+    // The lane's wind: a strip from the Herald (z 0) to the lane's end (z 1).
+    const windGeo = new THREE.PlaneGeometry(1, 1, 1, 1);
+    windGeo.rotateX(Math.PI / 2);
+    windGeo.translate(0, 0, 0.5);
+    h.geometries.push(windGeo);
     for (let k = 0; k < P.lanes; k++) {
       const lane = t.kit.lane(13);
       const painted = t.paints.dress(lane, 'gust');
-      this.lanes.push({ lane, painted, id: -1 });
+      const windMat = new THREE.ShaderMaterial({
+        name: 'smithHeartBreathShoveWind',
+        uniforms: {
+          uTime: h.uTime,
+          uColor: { value: new THREE.Color(PC.ward) },
+          uFill: { value: 0 },
+          uGlow: { value: 1 },
+        },
+        vertexShader: PHASE_UV_VERT,
+        fragmentShader: LANE_WIND_FRAG,
+        transparent: true,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+        blending: THREE.AdditiveBlending,
+        polygonOffset: true,
+        polygonOffsetFactor: -4,
+        polygonOffsetUnits: -4,
+      });
+      h.materials.push(windMat);
+      const wind = new THREE.Mesh(windGeo, windMat);
+      wind.name = 'smithHeartBreathShoveWind';
+      wind.renderOrder = floorVfxRenderOrder('encounter', 14);
+      wind.frustumCulled = false;
+      wind.visible = false;
+      h.root.add(wind);
+      this.lanes.push({ lane, painted, wind, windMat, id: -1 });
     }
     const shieldGeo = new THREE.SphereGeometry(
       1,
@@ -244,7 +278,10 @@ export class BreathIsleAddsFx {
   endScan(): void {
     this.lanes.forEach((l, k) => {
       l.id = k < this.heralds.length ? this.heralds[k] : -1;
-      if (l.id < 0) l.lane.group.visible = false;
+      if (l.id < 0) {
+        l.lane.group.visible = false;
+        l.wind.visible = false;
+      }
     });
     this.wards.forEach((w, k) => {
       w.id = k < this.shields.length ? this.shields[k] : -1;
@@ -260,6 +297,7 @@ export class BreathIsleAddsFx {
       const e = l.id >= 0 ? world.entities.get(l.id) : undefined;
       if (!e || e.dead || e.castingAbility !== ISLE_CASTS.shove) {
         l.lane.group.visible = false;
+        l.wind.visible = false;
         continue;
       }
       const a = fxAnchor(e);
@@ -278,6 +316,13 @@ export class BreathIsleAddsFx {
         { color: TELEGRAPH_THREAT_COLORS.control, accent: PC.ward },
       );
       this.t.kit.paintLane(l.lane, { fill, clock: this.clock, range: SHOVE_LANE.length });
+      // Its wind streaming down it, bright where the bar has filled.
+      l.wind.visible = true;
+      l.wind.position.set(a.x, this.laneGround(a.x, a.z) + 0.16, a.z);
+      l.wind.rotation.y = e.facing;
+      l.wind.scale.set(SHOVE_LANE.half * 2, 1, SHOVE_LANE.length);
+      l.windMat.uniforms.uFill.value = fill;
+      l.windMat.uniforms.uGlow.value = 0.9 + 0.5 * fill;
       // Wind gathering at the Herald's hands, drawn down the lane (cosmetic).
       if (this.rand() < dt * 18 * this.h.density) {
         const along = this.rand() * SHOVE_LANE.length * fill;
@@ -405,9 +450,20 @@ export class BreathIsleAddsFx {
         continue;
       }
       const d = Math.hypot(_to.x - _from.x, _to.z - _from.z);
-      b.beam.lay(_from, _to, 0.9, beamLift(d), 0.3, t);
+      b.beam.lay(_from, _to, 1.25, beamLift(d), 0.3, t);
       if (cutLook) b.beam.paint(1.6 * cutLook.glow, cutLook.cut);
-      else b.beam.paint((b.live ? 1.4 + 0.35 * Math.sin(t * 11) : 0) + b.flare * 2.2, 0);
+      else b.beam.paint((b.live ? 2 + 0.4 * Math.sin(t * 11) : 0) + b.flare * 2.4, 0);
+      // The mint wind gathering in the Mender's raised hands.
+      if (b.live && this.rand() < dt * 16 * (0.5 + 0.5 * this.h.density))
+        this.h.particles.puff(_from.x, _from.y, _from.z, 2, {
+          speed: 1.5,
+          life: 0.45,
+          size: [1.1, 0.2],
+          color: MEND_RGB,
+          alpha: 1,
+          pool: 'glow',
+          floor: -1e6,
+        });
       if (b.live && this.rand() < dt * 14 * (0.5 + 0.5 * this.h.density)) {
         const p = IsleBeam.point(_from, _to, this.rand(), beamLift(d), 0.3, t);
         this.h.particles.puff(p.x, p.y, p.z, 1, {
@@ -566,6 +622,7 @@ export class BreathIsleAddsFx {
     for (const l of this.lanes) {
       l.id = -1;
       l.lane.group.visible = false;
+      l.wind.visible = false;
     }
     for (const w of this.wards) {
       w.id = -1;
