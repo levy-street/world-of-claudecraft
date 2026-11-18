@@ -82,7 +82,7 @@ ${NOISE}
 void main() {
   vec3 n = normalize(vN);
   float facing = max(dot(n, normalize(vView)), 0.0);
-  float rim = pow(1.0 - facing, 3.0);
+  float rim = pow(clamp(1.0 - facing, 0.0, 1.0), 3.0);
   vec3 p = normalize(vLocal);
   float t = uTime;
   float lon = atan(p.z, p.x);
@@ -136,10 +136,10 @@ void main() {
   float gap = (1.0 - cloud) * 0.6 + (1.0 - cloud2) * 0.4;
   float thin = smoothstep(0.62 - 0.25 * uCharge, 0.9 - 0.15 * uCharge, gap);
   float bands = abs(cloud2 - 0.5) * 2.0;
-  float heart = pow(facing, 3.0) * smoothstep(0.2, 1.0, uCharge) * smoothstep(0.15, 0.6, bands);
+  float heart = pow(clamp(facing, 0.0, 1.0), 3.0) * smoothstep(0.2, 1.0, uCharge) * smoothstep(0.15, 0.6, bands);
   float light = clamp(thin * (0.35 + 0.45 * facing) + heart * (0.4 + 0.25 * uThrob), 0.0, 0.7);
   // The rim catches the storm's light (the ball's edge stays read).
-  float rim = pow(1.0 - facing, 2.5);
+  float rim = pow(clamp(1.0 - facing, 0.0, 1.0), 2.5);
   vec3 lit = mix(mix(uColor, uHot, uHotK), uCore, heart * 0.6);
   vec3 col = mix(uStorm * (0.45 + 0.9 * cloud * cloud2 * 1.6), lit * (1.05 + uThrob * 0.3), light);
   col += mix(uColor, uHot, uHotK) * rim * (0.35 + 0.4 * uCharge);
@@ -284,9 +284,9 @@ ${NOISE}
 void main() {
   vec3 n = normalize(vN);
   float facing = max(dot(n, normalize(vView)), 0.0);
-  float rim = pow(1.0 - facing, 2.0);
+  float rim = pow(clamp(1.0 - facing, 0.0, 1.0), 2.0);
   float facet = pnoise3(floor(n * 3.5) + 0.5);
-  float heart = pow(facing, 2.0) * (0.5 + 0.5 * uPulse);
+  float heart = pow(clamp(facing, 0.0, 1.0), 2.0) * (0.5 + 0.5 * uPulse);
   float swirl = pfbm3(vLocal * 1.6 + vec3(0.0, uTime * 0.4, 0.0));
   vec3 tint = mix(uColor, uGold, uGoldK);
   vec3 dark = tint * 0.06 + vec3(0.015, 0.02, 0.04);
@@ -318,7 +318,7 @@ void main() {
   if (abs(ang) > uHalf) discard;
   float u = ang / uHalf * 0.5 + 0.5;
   float facing = abs(dot(normalize(vN), normalize(vView)));
-  float fres = pow(1.0 - facing, 1.8);
+  float fres = pow(clamp(1.0 - facing, 0.0, 1.0), 1.8);
   float streak = smoothstep(0.55, 0.95, pnoise(vec2(u * 14.0 - uTime * 3.2, vUv.y * 9.0)));
   float ends = 1.0 - smoothstep(0.0, 0.06, min(u, 1.0 - u));
   float y = 1.0 - vUv.y;
@@ -400,7 +400,7 @@ varying vec3 vN;
 varying vec3 vView;
 void main() {
   float facing = abs(dot(normalize(vN), normalize(vView)));
-  float fres = pow(1.0 - facing, 1.6);
+  float fres = pow(clamp(1.0 - facing, 0.0, 1.0), 1.6);
   vec3 col = mix(uColor, vec3(1.0), fres);
   gl_FragColor = vec4(col * (1.0 + fres), clamp((0.25 + fres * 1.2) * uGlow, 0.0, 1.0));
   #include <colorspace_fragment>
