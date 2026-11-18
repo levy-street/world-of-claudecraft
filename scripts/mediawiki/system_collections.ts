@@ -34,6 +34,7 @@ import { clueStrings } from '../../src/ui/i18n.catalog/clues';
 import { guideStrings } from '../../src/ui/i18n.catalog/guide';
 import { companionBossSources, companionRollText } from './companion_sources';
 import { deedLead, deedRequirements } from './deed_requirements';
+import { hoardMaterialsText } from './item_contents';
 import { retiredDeedActivity } from './system_availability';
 import { heading, list, percent, type SystemWriter, words } from './system_writer';
 
@@ -63,7 +64,7 @@ export function addExpeditionCollections(w: SystemWriter) {
       'Mounts and riding',
       m.name,
       'Mount',
-      `A ${m.rarity} mount look. How fast it goes depends only on your riding training.`,
+      `${/^[aeiou]/.test(m.rarity) ? 'An' : 'A'} ${m.rarity} mount look. How fast it goes depends only on your riding training.`,
       riding,
       list(reins.map((r) => `Reins: ${item(r.id)}`)),
     );
@@ -400,9 +401,9 @@ export function addExpeditionCollections(w: SystemWriter) {
           '. Chance of gear for a guest: ' +
           percent(VAULT_GUEST_GEAR_CHANCE[rarity]) +
           '.',
+        // Names the material pool, from the same helper the map item pages use.
+        hoardMaterialsText({ item, cls: (cls) => cls }, rarity),
         'Gives ' +
-          v.materials +
-          ' materials and ' +
           percent(v.copperMult) +
           ' of the casket copper for your level, before the owner bonus is added.',
         `${percent(v.markChance)} chance for ${v.marks} Heroic Marks.`,

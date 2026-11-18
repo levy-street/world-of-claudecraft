@@ -55,7 +55,10 @@ describe('catalog portals', () => {
           expect(listed.length, child).toBeGreaterThan(1);
           // A gear page also links the narrower pages under it (type, quality); those are
           // directories, not destinations.
-          return listed.filter((title) => title !== root && !pages.has(title));
+          // The equipment set groups page lists set articles, not items.
+          return listed.filter(
+            (title) => title !== root && !pages.has(title) && !title.endsWith(' (Equipment set)'),
+          );
         }),
       );
       // Enemies lists only hostile creatures; companions, pets, dummies and escorts are

@@ -22,6 +22,8 @@ import { type ClassAbilityGroup, classAbilityGroup } from './class_ability_secti
 import { creatureRole, FRIENDLY_GROUPS, ROLE_SECTIONS } from './creature_role';
 import { raidName, raidRooms } from './dungeon_catalog';
 import { type ArticleTools, words } from './entity_format';
+import { addInstanceLootPages } from './instance_loot';
+import { addItemBrowseViews, BY_QUALITY, BY_WEAPON_TYPE, MORE_WAYS } from './item_browse_views';
 import { itemPlacement, offhandSection } from './item_catalog_groups';
 import { addGearPages } from './item_tables';
 import { homeZones } from './npc_article';
@@ -30,6 +32,7 @@ import { wikiItemKind } from './wiki_item_kind';
 
 type Writer = Pick<ArticleTools, 'add' | 'section' | 'bullets' | 'link' | 'titleBy'> & {
   reserve(title: string): string;
+  usedTitles?: Set<string>;
 };
 type Root = 'Items' | 'Mobs' | 'Abilities' | 'NPCs';
 type Member = { title: string; name: string; section: string; key?: string; id?: string };
@@ -49,7 +52,12 @@ function catalog(w: Writer, root: Root, intro: string, order: string[] = []) {
   };
   const groups = new Map<string, Map<string, Map<string, Member>>>();
   const builders = new Map<string, Builder>();
+  const labelOrder = new Map<string, string[]>();
   return {
+    /** Lists a section's groups in this order instead of A to Z. */
+    order(facet: string, labels: string[]) {
+      labelOrder.set(facet, labels);
+    },
     /** Lets one group write its own page (and pages under it) instead of a plain list. */
     build(facet: string, label: string, builder: Builder) {
       builders.set(facet + '|' + label, builder);
@@ -65,7 +73,12 @@ function catalog(w: Writer, root: Root, intro: string, order: string[] = []) {
       const parts = [intro];
       for (const [facet, buckets] of [...groups].sort(([a], [b]) => rank(a) - rank(b))) {
         const children: string[] = [];
-        for (const [label, members] of [...buckets].sort(([a], [b]) => collate(a, b))) {
+        const labels = labelOrder.get(facet) ?? [];
+        const at = (label: string) =>
+          labels.includes(label) ? labels.indexOf(label) : Number.MAX_SAFE_INTEGER;
+        for (const [label, members] of [...buckets].sort(
+          ([a], [b]) => at(a) - at(b) || collate(a, b),
+        )) {
           const title = w.reserve(label + ' (' + rootLabel(root) + ' index)');
           const custom = builders.get(facet + '|' + label);
           if (custom) {
@@ -125,6 +138,7 @@ function itemPortal(w: Writer) {
     [
       'Weapons',
       'Armor, jewelry and off-hands',
+      BY_WEAPON_TYPE,
       'Consumables',
       'Professions and supplies',
       'Currencies and tokens',
@@ -132,6 +146,10 @@ function itemPortal(w: Writer) {
       'Bags and travel',
       'Adventure and trade',
       'Ingredients by profession',
+      // After the existing sections, so an item keeps its slot or kind page as its
+      // breadcrumb even when a quality page also lists it.
+      BY_QUALITY,
+      MORE_WAYS,
     ],
   );
   const ingredients = new Map<string, Set<string>>();
@@ -194,6 +212,8 @@ function itemPortal(w: Writer) {
     gear('Armor, jewelry and off-hands', slot, false);
   for (const hands of ['Main-hand weapons', 'One-handed weapons', 'Two-handed weapons'])
     gear('Weapons', hands, true);
+  // Cross-slot views: by quality, weapon type, source and equipment set group.
+  addItemBrowseViews(w, c);
   c.publish();
 }
 
@@ -387,6 +407,8 @@ function npcPortal(w: Writer) {
 
 export function addCatalogPortals(w: Writer) {
   itemPortal(w);
+  // Linked from the Dungeons and raids hub and from each dungeon and raid page.
+  addInstanceLootPages(w);
   enemyPortal(w);
   abilityPortal(w);
   npcPortal(w);

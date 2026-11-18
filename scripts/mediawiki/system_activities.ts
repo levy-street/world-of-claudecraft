@@ -22,7 +22,7 @@ import {
 import { MOUNT_RACE_COURSE, MOUNT_RACE_START_PLATFORM } from '../../src/sim/content/mounts';
 import { COURIER_MAX_LEG_SECONDS } from '../../src/sim/courier/motion';
 import { COURIER_CAPACITY } from '../../src/sim/courier/types';
-import { ITEMS } from '../../src/sim/data';
+import { CLASSES, DELVES, DUNGEONS, ITEMS, MOBS } from '../../src/sim/data';
 import {
   VAULT_BASE_CAP,
   VAULT_UPGRADE_PRICES,
@@ -96,11 +96,19 @@ import {
 } from '../../src/sim/social/yumi';
 import { DELVE_COMPANION_HEAL_INTERVAL } from '../../src/sim/types';
 import { WEEKLY_THRESHOLDS } from '../../src/sim/weekly_rewards';
+import { delveChestTables, hoardPayoutTables } from './item_contents';
 import { addReferralGuide } from './referral_guide';
 import { heading, list, percent, type SystemWriter } from './system_writer';
+import { type WeeklyLinks, weeklyVaultChoices } from './weekly_vault_choices';
 
 export function addActivityRules(w: SystemWriter) {
   const item = (id: string) => w.entity('item', id, ITEMS[id]?.name);
+  const links: WeeklyLinks = {
+    item,
+    cls: (cls) => CLASSES[cls].name,
+    mob: (id) => w.entity('mob', id, MOBS[id]?.name),
+    dungeon: (id) => w.entity('dungeon', id, DUNGEONS[id]?.name),
+  };
   w.describe(
     'Banking',
     'Your personal bank starts with ' +
@@ -155,7 +163,33 @@ export function addActivityRules(w: SystemWriter) {
         WEEKLY_THRESHOLDS.pvp.join(', ') +
         '. Ranked arena wins and rated battleground wins count. Winners of [[King of the Hill]] who meet its rules also get credit.',
     ]),
+    heading('What the choices can be', weeklyVaultChoices(links)),
   );
+  // Delves and Buried hoards get more prose from later builders (system_collections.ts),
+  // so these blocks use bold titles, not headings: a heading here would swallow that prose.
+  w.describe(
+    'Delves',
+    "'''What each reward chest holds.''' The gear in the final chest depends on your class and on how well you did. Each row is the chance that this piece is in the chest. One chest can hold more than one piece. Coins and Delve Marks come on top of this.",
+    'In ' +
+      DELVES.collapsed_reliquary.name +
+      ', the lock ante you pick sets the best loot you can win. If every try fails, you get low loot. A Bountiful Coffer gives its own rewards only on the premium path. See [[Lockpicking]].',
+    delveChestTables(links, false, DELVES.collapsed_reliquary.name),
+    'In ' +
+      DELVES.drowned_litany.name +
+      ', how hard you set the rite sets the best loot you can win. Each player in the party gets their own roll, based on their class.',
+    delveChestTables(links, true, DELVES.drowned_litany.name),
+  );
+  w.describe(
+    'Lockpicking',
+    heading(
+      'What each chest holds',
+      'In ' +
+        DELVES.collapsed_reliquary.name +
+        ', the loot tier you win sets the gear in the chest. The gear goes to the player who picks the lock, based on their class. Each row is the chance that this piece is in the chest.\n\n' +
+        delveChestTables(links, false),
+    ),
+  );
+  w.describe('Buried hoards', "'''What a hoard gives.''' " + hoardPayoutTables(links));
   w.describe(
     'Bank courier',
     'The courier carries whole stacks between your bags and your own storage. You need an active membership to send a new delivery. Pick up to ' +

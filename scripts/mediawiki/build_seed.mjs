@@ -194,13 +194,9 @@ const zoneDirectories = addQuestDirectory({ ...writer, reserve });
 addZoneAndClassHubs({ ...writer, reserve });
 const raidParents = addDungeonCatalog({ ...writer, reserve });
 
-for (const zone of ZONES) {
-  const npcs = Object.keys(NPCS).filter((id) => homeZones(id).some((z) => z.id === zone.id)).map((id) => titleBy.npc.get(id));
-  const quests = Object.keys(QUESTS).filter((id) => !QUESTS[id].seasonalEvent && zoneForQuest(id) === zone.name).map((id) => titleBy.quest.get(id));
-  add(titleBy.zone.get(zone.id), section('Overview', zone.welcome) + section('Facts', table([
-    ['Level range', zone.levelRange[0] === zone.levelRange[1] ? String(zone.levelRange[0]) : zone.levelRange[0] + '-' + zone.levelRange[1]], ['Hub', zone.hub.name], ['Graveyard', zone.graveyard.x + ', ' + zone.graveyard.z],
-  ])) + section('Points of interest', bullets(zone.pois.map((poi) => poi.label))) + section('NPCs', bullets(npcs.map((title) => link(title)))) + section('Quests starting here', (zoneDirectories.has(zone.name) ? link(zoneDirectories.get(zone.name), 'See all quests in ' + zone.name) + '\\n\\n' : '') + bullets(quests.map((title) => link(title)))), ['Zones', zone.biome]);
-}
+// Zone articles, the Vendors and enemies-by-zone directories, and mount routes (world_directories.ts).
+const { addWorldDirectories } = await import('../../scripts/mediawiki/world_directories');
+addWorldDirectories({ ...writer, money, reserve, raidParents, zoneDirectories, pages });
 
 for (const [id, cls] of Object.entries(CLASSES)) {
   add(titleBy.class.get(id), section('Overview', cls.name + ' is a class you can play. It uses ' + cls.resourceType + ' to power its abilities. A new character of this class starts with ' + link(titleBy.item.get(cls.startWeapon), ITEMS[cls.startWeapon]?.name ?? cls.startWeapon) + '.') + section('Starting statistics', table(Object.entries(cls.baseStats).map(([k, v]) => [({ str: 'Strength', agi: 'Agility', sta: 'Stamina', int: 'Intellect', spi: 'Spirit', armor: 'Armor' })[k] ?? k, String(v)]))) + classSpecSections(id, writer) + section('Talents', 'At each of these levels you pick one talent from the row. See every class side by side on ' + link('Talent choices') + '.\\n\\n' + talentGrid(id, writer)) + classAbilitySections(id, writer, ['Specialization abilities', 'Talent choices']), ['Classes']);

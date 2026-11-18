@@ -76,6 +76,8 @@ import {
 import { indexActivityItems } from './activity_item_sources';
 import { type ArticleTools, append, lines, pct, recipeLabel, ref } from './entity_format';
 import { itemAcquisitionArticle, itemAcquisitionIndex } from './item_acquisition';
+import { articleLinks, casketGearNames, itemContentsSection } from './item_contents';
+import { currencySpendIndex, whatItBuysSection } from './item_spends';
 import { type DropSource, dropSourceTable } from './loot_table';
 import { indexSpecialItemSources } from './special_item_sources';
 import { vendorOfferText } from './vendor_offer';
@@ -351,7 +353,9 @@ function effects(w: ArticleTools, item: ItemDef): string[] {
             CASKET_MATERIAL_POOL.map((id) => ref(w, 'item', id)).join(', ') +
             '. Then each of these extras is rolled on its own: ' +
             pct(CASKET_GEAR_CHANCE) +
-            ' chance of a low-tier delve gear piece, ' +
+            ' chance of a low-tier delve gear piece (' +
+            casketGearNames(articleLinks(w)) +
+            '), ' +
             pct(CASKET_HEROIC_MARK_CHANCE) +
             ' chance of ' +
             CASKET_HEROIC_MARKS +
@@ -444,7 +448,7 @@ function effects(w: ArticleTools, item: ItemDef): string[] {
           out.push(
             'Open it to get ' +
               EMISSARY_CACHE_MARKS +
-              ' Heroic Marks and one piece of epic gear from a Normal raid. Every piece your class can get from it is equally likely.',
+              ' Heroic Marks and one piece of epic gear from a Normal raid. Every piece your class can get from it is equally likely. The list for each class is under What is inside.',
           );
           break;
         }
@@ -486,6 +490,7 @@ export function addItemArticles(
   drops: Map<string, DropSource[]> = new Map(),
 ) {
   const acquisition = itemAcquisitionIndex(w);
+  const spends = currencySpendIndex(w);
   const vendorStock = new Set(
     Object.values(NPCS)
       .filter((n) => !n.devVendor)
@@ -752,6 +757,8 @@ export function addItemArticles(
             )
           : '') +
         lines(w, 'Equipment and use', effects(w, item)) +
+        itemContentsSection(w, item) +
+        whatItBuysSection(w, item.id, spends) +
         lines(w, 'Sources', ways) +
         lines(w, 'Used for', Array.from(uses.get(item.id) ?? [])),
       ['Items', kind, quality],

@@ -20,6 +20,7 @@ import { RIFT_RANK_BASE_LEVEL } from '../../src/sim/rift/ranks';
 import type { DungeonDef } from '../../src/sim/types';
 import { activitySceneUrl } from '../../src/ui/dungeon_activity_art';
 import type { ArticleTools } from './entity_format';
+import { instanceLootPage, instanceLootPages } from './instance_loot';
 import { questMap, type RoutePoint } from './quest_map';
 import { entranceRoute } from './rotating_routes';
 
@@ -59,6 +60,12 @@ export function raidRooms(activity: FinderActivity): DungeonDef[] {
   return [...rooms.values()];
 }
 
+const lootLine = (dungeonId: string) => {
+  const page = instanceLootPage(dungeonId);
+  return page
+    ? '\n\nSee every item it drops on [[' + page.title + '|' + page.name + ' loot]].'
+    : '';
+};
 const band = (a: FinderActivity) =>
   a.minLevel === a.maxLevel ? String(a.minLevel) : a.minLevel + ' to ' + a.maxLevel;
 const tier = (a: FinderActivity) => (a.difficulty === 'heroic' ? 'Heroic' : 'Normal');
@@ -208,7 +215,8 @@ export function addDungeonCatalog(w: Writer): Map<string, string> {
           'Each boss page lists what it drops. Click an item to see exactly how to get it. Normal and Heroic rewards can be different. See [[Party loot]] for how loot is shared, and [[Weekly Vault]] for weekly rewards.\n\n' +
             (activity.lockout === 'weekly'
               ? 'In the Crucible, each boss room has its own lockout. It lasts until the weekly reset. Beating the first boss does not count as beating the second.'
-              : 'Nythraxis has a daily lockout that starts when you defeat the final boss. Check your saved run before you plan another clear.'),
+              : 'Nythraxis has a daily lockout that starts when you defeat the final boss. Check your saved run before you plan another clear.') +
+            lootLine(activity.dungeonId),
         ) +
         questMap({ points }, 'system', [
           'Boss markers show where each boss starts. After the fight, loot the boss where its body lies.',
@@ -272,6 +280,15 @@ export function addDungeonCatalog(w: Writer): Map<string, string> {
               ' players.',
           ),
         ),
+      ) +
+      w.section(
+        'Loot by dungeon and raid',
+        'Every item each dungeon and raid can drop, on Normal and on Heroic, in one table you can sort.\n\n' +
+          w.bullets(
+            instanceLootPages().map(
+              (p) => w.link(p.title, p.name) + ' · ' + p.kind.toLowerCase().replace(/s$/, ''),
+            ),
+          ),
       ) +
       w.section(
         'Delves',

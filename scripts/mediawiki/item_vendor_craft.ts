@@ -1,3 +1,4 @@
+import { HEROIC_MARK_CURRENCY_ID } from '../../src/sim/content/dungeon_difficulty';
 import { GOURDLIGHT_KEEPER_NPC_ID } from '../../src/sim/content/gourdlight_eve';
 import { HEROIC_VENDOR_NPC_ID, HEROIC_VENDOR_STOCK } from '../../src/sim/content/heroic_vendor';
 import { CRUCIBLE_VENDOR_NPC_ID, CRUCIBLE_VENDOR_STOCK } from '../../src/sim/content/ignivar_loot';
@@ -18,7 +19,9 @@ import { MARKET_HOUSE_STOCK } from '../../src/sim/market';
 import { craftCastDurationSec } from '../../src/sim/professions/craft_cast_duration';
 import { trainingFeeFor, trainingStationTypeFor } from '../../src/sim/professions/training';
 import { TIER_SKILL_STEP, tierForSkill } from '../../src/sim/professions/wheel';
+import type { ItemDef, NpcDef } from '../../src/sim/types';
 import { buyPurchaseTotals } from '../../src/sim/vendor_buy_stack';
+import { vendorTokenPrice } from '../../src/sim/vendor_token_price';
 import { type ArticleTools, ref, words } from './entity_format';
 import { addAcquisition, type ItemAcquisition } from './item_acquisition_types';
 import { addDisenchantAcquisitions } from './item_disenchant';
@@ -34,6 +37,90 @@ function location(points: RoutePoint[]): string {
       return place + ' (x ' + Number(p.x.toFixed(2)) + ', z ' + Number(p.z.toFixed(2)) + ')';
     })
     .join(' or ');
+}
+
+/** Every live (non-developer) vendor and the items it stocks, in the active world. */
+export function liveVendorStock(): { npc: NpcDef; items: ItemDef[] }[] {
+  return Object.values(NPCS).flatMap((original) => {
+    const npc = getActiveWorldContent().npcs[original.id] ?? original;
+    if (npc.devVendor || !npc.vendorItems?.length) return [];
+    return [
+      {
+        npc,
+        items: npc.vendorItems.map((id) => {
+          const item = ITEMS[id];
+          if (!item) throw new Error('Unknown vendor item ' + id);
+          return item;
+        }),
+      },
+    ];
+  });
+}
+
+/** One way to spend a currency item: what you get, how many it costs, and where. */
+export interface CurrencySpend {
+  /** Wikitext for what you get. */
+  buys: string;
+  /** How many of the currency one purchase costs. */
+  cost: number;
+  /** Wikitext for where you spend it. */
+  where: string;
+  notes: string;
+}
+
+/**
+ * The reverse side of the shop routes above: for each item a shop takes as payment, what
+ * it buys. Reads the same stock tables (vendor token prices, the Heroic Quartermaster, the
+ * Crucible sigil exchange), so the two sides cannot disagree.
+ */
+export function vendorCurrencySpends(w: ArticleTools): Map<string, CurrencySpend[]> {
+  const index = new Map<string, CurrencySpend[]>();
+  const add = (currency: string, spend: CurrencySpend) =>
+    index.set(currency, [...(index.get(currency) ?? []), spend]);
+  for (const { npc, items } of liveVendorStock())
+    for (const item of items) {
+      const token = vendorTokenPrice(item);
+      if (!token) continue;
+      const units = buyPurchaseTotals(item, item.buyValue ?? 0, item.priceHonor ?? 0, 1)?.units;
+      // The offer text opens with the price. When the token is the whole price, the Cost
+      // column already says it, so keep only the conditions after it.
+      const offer = vendorOfferText(w, npc, item);
+      const tokenOnly =
+        (units === 1 ? 'One' : 'Stack of ' + units) +
+        ' for ' +
+        token.count +
+        ' ' +
+        ref(w, 'item', token.itemId) +
+        '.';
+      add(token.itemId, {
+        buys: (units && units > 1 ? units + ' × ' : '') + ref(w, 'item', item.id),
+        cost: token.count,
+        where: ref(w, 'npc', npc.id),
+        notes: [
+          offer.startsWith(tokenOnly) ? offer.slice(tokenOnly.length).trim() : offer,
+          npc.id === GOURDLIGHT_KEEPER_NPC_ID || item.seasonalEvent
+            ? 'You can only buy this while its seasonal event is on.'
+            : '',
+        ]
+          .filter(Boolean)
+          .join(' '),
+      });
+    }
+  for (const offer of HEROIC_VENDOR_STOCK)
+    add(HEROIC_MARK_CURRENCY_ID, {
+      buys: ref(w, 'item', offer.itemId),
+      cost: offer.marks,
+      where: ref(w, 'npc', HEROIC_VENDOR_NPC_ID),
+      notes: 'Marks come out of your Heroic Mark total.',
+    });
+  for (const offer of CRUCIBLE_VENDOR_STOCK)
+    add(offer.sigilId, {
+      buys: ref(w, 'item', offer.itemId),
+      cost: 1,
+      where: ref(w, 'npc', CRUCIBLE_VENDOR_NPC_ID),
+      notes: 'Pick a piece your class can wear.',
+    });
+  return index;
 }
 
 export function vendorCraftAcquisitions(w: ArticleTools): Map<string, ItemAcquisition[]> {
@@ -70,14 +157,11 @@ export function vendorCraftAcquisitions(w: ArticleTools): Map<string, ItemAcquis
       ]),
     });
   }
-  for (const original of Object.values(NPCS)) {
-    const npc = getActiveWorldContent().npcs[original.id] ?? original;
-    if (npc.devVendor) continue;
+  for (const { npc, items } of liveVendorStock()) {
     const positions = itemNpcPoints('Reward', npc.id);
     const where = location(positions);
-    for (const id of npc.vendorItems ?? []) {
-      const item = ITEMS[id];
-      if (!item) throw new Error('Unknown vendor item ' + id);
+    for (const item of items) {
+      const id = item.id;
       const units =
         buyPurchaseTotals(item, item.buyValue ?? 0, item.priceHonor ?? 0, 1)?.units ?? 1;
       addAcquisition(index, id, {

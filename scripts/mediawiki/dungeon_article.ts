@@ -1,6 +1,7 @@
 import { HEROIC_DUNGEON_TUNING } from '../../src/sim/content/dungeon_difficulty';
 import { FINDER_ACTIVITIES } from '../../src/sim/content/dungeon_finder';
 import type { DungeonDef } from '../../src/sim/types';
+import { instanceLootPage } from './instance_loot';
 
 interface Writer {
   section(name: string, text: string): string;
@@ -133,6 +134,18 @@ export function dungeonDetails(dungeon: DungeonDef, { section, bullets, table, m
             .join(', '),
         ]),
       ]),
+    );
+  const loot = instanceLootPage(dungeon.id);
+  if (loot)
+    text += section(
+      'Loot',
+      'Every item that drops in ' +
+        loot.name +
+        ', on Normal and on Heroic, is listed on [[' +
+        loot.title +
+        '|' +
+        loot.name +
+        ' loot]].',
     );
   return text;
 }

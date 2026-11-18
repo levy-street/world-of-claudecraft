@@ -3,12 +3,11 @@ import { TUG_HONOR_OFFER } from '../../src/sim/content/buddy_offers';
 import { HEROIC_VENDOR_STOCK } from '../../src/sim/content/heroic_vendor';
 import { CRUCIBLE_VENDOR_STOCK } from '../../src/sim/content/ignivar_loot';
 import { BUILTIN_WORLD, ITEMS, NPCS, QUESTS, zoneContaining } from '../../src/sim/data';
-import { npcRoleFor } from '../../src/sim/npc_role';
 import { type NpcDef, questTurnInNpcIds } from '../../src/sim/types';
 import { npcDisplayTitle } from '../../src/ui/entity_display_core';
 import { type ArticleTools, ref } from './entity_format';
 import { itemNpcPoints } from './item_npc_route';
-import { npcServiceLabel } from './npc_service';
+import { npcServices, npcTrainingSection } from './npc_service';
 import { vendorOfferText } from './vendor_offer';
 
 /**
@@ -56,12 +55,13 @@ export function npcArticle(template: NpcDef, w: ArticleTools) {
           .join(' and ') +
         '.'
       : 'Appears during its activity.';
-  const role = npcRoleFor(n);
+  const services = npcServices(n, w);
   const facts: [string, string][] = [
     ['Title', npcDisplayTitle(n.id)],
     ['Where to find them', place],
   ];
-  if (role) facts.push(['Service', npcServiceLabel(role)]);
+  if (services.length) facts.push(['Service', services.map((s) => s.label).join(', ')]);
+  const duties = services.map((s) => s.text).filter(Boolean);
   const links = (ids: string[]) => w.bullets(ids.map((id) => ref(w, 'quest', id)));
   const offers = Object.values(QUESTS)
     .filter((q) => q.giverNpcId === n.id)
@@ -92,6 +92,8 @@ export function npcArticle(template: NpcDef, w: ArticleTools) {
   return (
     w.section('Greeting', n.greeting) +
     w.section('Details', w.table(facts)) +
+    (duties.length ? w.section('What they do', duties.join('\n\n')) : '') +
+    npcTrainingSection(n.id, w) +
     (offers.length ? w.section('Quests offered', links(offers)) : '') +
     (turnins.length ? w.section('Quest hand-ins', links(turnins)) : '') +
     (stock.length ? w.section('Vendor stock', w.bullets(stock)) : '')
