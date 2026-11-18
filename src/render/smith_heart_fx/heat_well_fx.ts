@@ -1,5 +1,5 @@
-// The first wellspring and the overflow's rivers (plan: heat_fight_fx_core.ts
-// wellLook, riverLook; the pool's flow and bubbles heat_well_core.ts;
+// The first wellspring (plan: heat_fight_fx_core.ts wellLook; the pool's
+// flow and bubbles heat_well_core.ts;
 // docs/design/raid/smith_heart.md section 7.4), a part of HeatFightFx over
 // its root, particles and floor telegraph kit:
 //  - the pool: a molten wellspring at the claim object's spot and the sim's
@@ -12,13 +12,10 @@
 //    their joints, heat shimmer standing over the lip, a glow breathing with
 //    the fight; whiter and boiling harder as the fight deepens; heaving over
 //    its lip in slow swells, the crust broken, the glow throbbing, while the
-//    guardian is under and the Hearth overflows;
-//  - the rivers: each lane at its exact length and half width (the shared
-//    floor telegraph, danger, every tier) filling over its warning, then a
-//    river of the first flame racing out of the pool down it and burning,
-//    flames licking off it.
-// The pool (crust, lava, bubbles), its lip, rim and glow and every river
-// (lane and fire) draw on every tier; the shimmer goes, and the embers, the
+//    guardian is under and the Hearth overflows (its rings of lava are
+//    heat_lava_wall_fx.ts's).
+// The pool (crust, lava, bubbles), its lip, rim and glow draw on every
+// tier; the shimmer goes, and the embers, the
 // haze, the bubbles' count and sparks and the flames thin, on the low tier.
 //
 // Built in the constructor under the host's root (one gated attach), fixed
@@ -26,19 +23,9 @@
 
 import * as THREE from 'three';
 import { HEARTH_WELL } from '../../sim/content/smith_heart_layout';
-import { floorReach } from '../../sim/encounters/smith_heart/heat_geometry';
-import {
-  HEAT_AURAS,
-  type HeatWellState,
-  HEAT_TUNING as T,
-} from '../../sim/encounters/smith_heart/heat_ids';
+import { HEAT_AURAS, type HeatWellState } from '../../sim/encounters/smith_heart/heat_ids';
 import type { Entity } from '../../sim/types';
 import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
-import {
-  TELEGRAPH_THREAT_COLORS,
-  type TelegraphLane,
-  type TelegraphPaint,
-} from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { heartKitSlotMaterial } from '../smith_heart/heart_kit';
 import { HEAT_BODY_COLORS } from './heat_body_core';
@@ -47,18 +34,13 @@ import { heatEntranceFor } from './heat_entrance_state';
 import {
   HEAT_FIGHT_COLORS as C,
   HEAT_WELL,
-  HEAT_FIGHT_POOLS as P,
-  type RiverLook,
-  riverLook,
-  riverOfCached,
   type WellLook,
   wellLook,
   wellOfCached,
 } from './heat_fight_fx_core';
 import { HEAT_FLOOR } from './heat_floor_ladder_core';
 import type { HeatFxHost } from './heat_fx_host';
-import { HEAT_LAVA_GLSL, HEAT_MOLTEN_GLSL, HEAT_NOISE_GLSL } from './heat_lava_glsl';
-import { moltenDecal } from './heat_molten_decal';
+import { HEAT_MOLTEN_GLSL, HEAT_NOISE_GLSL } from './heat_lava_glsl';
 import { basaltColumn } from './heat_shapes';
 import {
   stepWellBubbles,
@@ -72,11 +54,8 @@ import { HeatWellShore } from './heat_well_shore';
 
 /** The lip's stumps: as many as the first well's 26 per its 8 yd of lip. */
 const LIP_STUMPS = Math.round((26 * HEARTH_WELL.r) / 8);
-const RIVER_STYLE = { color: TELEGRAPH_THREAT_COLORS.danger, accent: C.accent };
-const PAINT: TelegraphPaint = { fill: 0, clock: 0, range: 0 };
 const _well: WellLook = { heat: 0, surge: 0, boil: 0, pulse: 0 };
 const _bubble = { radius: 0, pop: 0 };
-const _river: RiverLook = { fill: 0, lane: false, front: 0, heat: 0 };
 const _m = new THREE.Matrix4();
 const _q = new THREE.Quaternion();
 const _v = new THREE.Vector3();
@@ -126,16 +105,6 @@ const SPILL = {
   dir: SPILL_DIR,
   spread: 0.3,
   gravity: 7,
-};
-const RIVER_FLAME = {
-  speed: 0.6,
-  up: 3.4,
-  life: 0.6,
-  size: [1.4, 0.3] as [number, number],
-  color: C.gold,
-  alpha: 0.9,
-  pool: 'glow' as const,
-  radius: 1,
 };
 
 const UV_VERT = /* glsl */ `
@@ -269,32 +238,6 @@ void main() {
   #include <colorspace_fragment>
 }
 `;
-/** A river of the first flame racing down its lane out of the pool. */
-const RIVER_FRAG = /* glsl */ `
-uniform float uTime;
-uniform float uFront;
-uniform float uHeat;
-uniform float uLen;
-varying vec2 vUv;
-varying vec3 vW;
-${HEAT_NOISE_GLSL}
-${HEAT_MOLTEN_GLSL}
-${HEAT_LAVA_GLSL}
-void main() {
-  float along = vUv.y;
-  float across = abs(vUv.x - 0.5) * 2.0;
-  float y = along * uLen;
-  float rag = vn(vec2(y * 0.5, vUv.x * 4.0)) * 0.22;
-  if (across > 1.0 - rag || along > uFront) discard;
-  float lvl = lavaLevel(vec2(vUv.x * 6.0, y), vec2(0.0, 5.0), uTime, 1.1);
-  float lead = smoothstep(uFront - 0.06, uFront, along) * step(uFront, 0.995);
-  float m = clamp((lvl * 0.85 + 0.25 + lead * 0.5) * uHeat, 0.0, 1.0);
-  vec3 col = molten(m);
-  float alpha = (0.75 + 0.25 * uHeat) * (1.0 - smoothstep(0.7, 1.0, across + rag));
-  gl_FragColor = vec4(col, alpha);
-  #include <colorspace_fragment>
-}
-`;
 /** The glow ring along the pool's lip. */
 const RIM_FRAG = /* glsl */ `
 uniform float uHeat;
@@ -332,18 +275,6 @@ void main() {
 }
 `;
 
-interface RiverSlot {
-  id: number;
-  born: number;
-  state: 'warn' | 'flow' | null;
-  facing: number;
-  /** Its drawn length (to the floor's edge). */
-  length: number;
-  lane: TelegraphLane;
-  mesh: THREE.Mesh;
-  mat: THREE.ShaderMaterial;
-}
-
 export class HeatWellFx {
   private readonly pool: THREE.Mesh;
   private readonly poolMat: THREE.ShaderMaterial;
@@ -373,7 +304,6 @@ export class HeatWellFx {
       BUBBLE_POP,
     );
   };
-  private readonly rivers: RiverSlot[] = [];
   private placedFor = -1;
   private state: HeatWellState = 'calm';
   private x = 0;
@@ -491,37 +421,6 @@ export class HeatWellFx {
     this.shimmer.visible = false;
     this.shimmer.renderOrder = floorVfxRenderOrder('encounter', HEAT_FLOOR.wellShimmer.step);
     host.root.add(this.shimmer);
-
-    // The rivers.
-    const ribbon = new THREE.PlaneGeometry(1, 1, 1, 1).rotateX(-Math.PI / 2).translate(0, 0, 0.5);
-    const buv = ribbon.getAttribute('uv') as THREE.BufferAttribute;
-    const bpos = ribbon.getAttribute('position') as THREE.BufferAttribute;
-    for (let i = 0; i < buv.count; i++) buv.setY(i, bpos.getZ(i));
-    g.push(ribbon);
-    for (let i = 0; i < P.rivers; i++) {
-      const lane = host.telegraphs.lane('river');
-      lane.group.visible = false;
-      // Char and glow passes: rivers meet at the lip and cross the lanes.
-      const { mesh, mat } = moltenDecal(
-        {
-          name: 'smithHeartHeatRiver',
-          geometry: ribbon,
-          vertexShader: UV_VERT,
-          fragmentShader: RIVER_FRAG,
-          uniforms: {
-            uTime: host.uTime,
-            uFront: { value: 0 },
-            uHeat: { value: 0 },
-            uLen: { value: T.riverLength },
-          },
-          charStep: HEAT_FLOOR.riverChar.step,
-          glowStep: HEAT_FLOOR.riverGlow.step,
-        },
-        host.materials,
-      );
-      host.root.add(mesh);
-      this.rivers.push({ id: -1, born: 0, state: null, facing: 0, length: 1, lane, mesh, mat });
-    }
   }
 
   /** Lay the pool and its lip at the well object's spot (once per object). */
@@ -557,14 +456,8 @@ export class HeatWellFx {
   }
 
   /** One frame: the pool (`wellId` its claim object, `guardian` for its
-   *  phase) and the rivers (`riverIds`). */
-  update(
-    wellId: number,
-    guardian: Entity | null,
-    riverIds: readonly number[],
-    clock: number,
-    dt: number,
-  ): void {
+   *  phase). */
+  update(wellId: number, guardian: Entity | null, clock: number, dt: number): void {
     const world = this.host.world;
     if (!world) return;
     const w = wellId >= 0 ? world.entities.get(wellId) : undefined;
@@ -599,7 +492,6 @@ export class HeatWellFx {
     this.glowMat.opacity = Math.min(0.7, 0.2 + 0.2 * look.heat + 0.15 * look.pulse);
     this.paintBubbles(look, dt);
     this.cosmetics(look, dt);
-    this.paintRivers(riverIds, clock, dt);
   }
 
   private cosmetics(look: WellLook, dt: number): void {
@@ -645,83 +537,6 @@ export class HeatWellFx {
     }
   }
 
-  private paintRivers(riverIds: readonly number[], clock: number, dt: number): void {
-    const world = this.host.world;
-    if (!world) return;
-    for (const s of this.rivers)
-      if (s.id >= 0 && !riverIds.includes(s.id)) {
-        s.id = -1;
-        s.state = null;
-        s.lane.group.visible = false;
-        s.mesh.visible = false;
-      }
-    for (const id of riverIds) {
-      const e = world.entities.get(id);
-      const of = e ? riverOfCached(e.templateId) : null;
-      if (!e || !of) continue;
-      let s = this.rivers.find((r) => r.id === id);
-      if (!s) {
-        s = this.rivers.find((r) => r.id < 0);
-        if (!s) continue;
-        s.id = id;
-        s.facing = e.facing;
-        s.state = null;
-        const half = e.scale || T.riverHalf;
-        // From the pool's lip out across the shore, to the floor's edge.
-        const sx = this.x + Math.sin(e.facing) * this.r;
-        const sz = this.z + Math.cos(e.facing) * this.r;
-        s.length = floorReach(
-          HEARTH_WELL.x + Math.sin(e.facing) * this.r,
-          HEARTH_WELL.z + Math.cos(e.facing) * this.r,
-          e.facing,
-          T.riverLength - this.r,
-        );
-        this.host.kit.drapeLane(
-          s.lane,
-          this.host.groundY,
-          sx,
-          this.host.groundY(sx, sz),
-          sz,
-          e.facing,
-          s.length,
-          half,
-          RIVER_STYLE,
-        );
-        s.mesh.position.set(sx, this.host.groundY(sx, sz) + 0.07, sz);
-        s.mesh.rotation.y = e.facing;
-        s.mesh.scale.set(half * 2.1, 1, s.length);
-        s.mat.uniforms.uLen.value = s.length;
-      }
-      if (s.state !== of.state) {
-        s.state = of.state;
-        s.born = clock;
-      }
-      const look = riverLook(of.state, clock - s.born, of.seconds, _river);
-      PAINT.fill = look.fill;
-      PAINT.clock = clock;
-      PAINT.range = T.riverLength;
-      PAINT.front = of.state === 'flow' ? 0 : undefined;
-      PAINT.fade = of.state === 'flow' ? 0.55 + 0.45 * look.heat : undefined;
-      this.host.kit.paintLane(s.lane, PAINT);
-      s.lane.group.visible = look.lane;
-      const flowing = of.state === 'flow' && look.heat > 0.01;
-      s.mesh.visible = flowing;
-      s.mat.uniforms.uFront.value = look.front;
-      s.mat.uniforms.uHeat.value = look.heat;
-      if (flowing && this.host.rand() < dt * 26 * this.host.density) {
-        const t = this.host.rand() * look.front * s.length;
-        const k = (this.host.rand() - 0.5) * (e.scale || T.riverHalf) * 1.4;
-        this.host.particles.puff(
-          s.mesh.position.x + Math.sin(s.facing) * t + Math.cos(s.facing) * k,
-          s.mesh.position.y + 0.3,
-          s.mesh.position.z + Math.cos(s.facing) * t - Math.sin(s.facing) * k,
-          1,
-          RIVER_FLAME,
-        );
-      }
-    }
-  }
-
   hide(): void {
     this.placedFor = -1;
     this.pool.visible = false;
@@ -730,12 +545,6 @@ export class HeatWellFx {
     this.shore.hide();
     this.glow.visible = false;
     this.shimmer.visible = false;
-    for (const s of this.rivers) {
-      s.id = -1;
-      s.state = null;
-      s.lane.group.visible = false;
-      s.mesh.visible = false;
-    }
   }
 
   dispose(): void {

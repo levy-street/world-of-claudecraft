@@ -66,7 +66,7 @@ describe('smith_heart_heat_audio', () => {
     // The fist lands with weight: its own take, layered.
     expect(HEAT_CUE_SOUNDS[HEAT_CUES.fist].length).toBeGreaterThanOrEqual(2);
     // The repeating small cues stay soft (they fire every few seconds).
-    for (const cue of [HEAT_CUES.bolt, HEAT_CUES.river])
+    for (const cue of [HEAT_CUES.bolt, HEAT_CUES.ring])
       for (const s of HEAT_CUE_SOUNDS[cue]) expect(s.gain, cue).toBeLessThanOrEqual(0.5);
   });
 

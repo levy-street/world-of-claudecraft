@@ -92,6 +92,17 @@ describe('Guardian of the Heat: tooltips and names', () => {
     expect(state(4, HEAT_STAGES.fight)).toBe(p3);
     for (const stage of [HEAT_STAGES.sinking, HEAT_STAGES.under, HEAT_STAGES.rising])
       expect(state(1, stage)).toContain('cannot be attacked');
+    // Under: the lava waves, their resolved strike on Normal and Heroic.
+    const under = state(1, HEAT_STAGES.under);
+    expect(under).toContain('Rings of lava');
+    const nm = HEAT_DIFFICULTY.normal.damageMult;
+    const hc = HEAT_DIFFICULTY.heroic.damageMult;
+    expect(under).toContain(
+      `take ${Math.round(T.ringMin * nm)} to ${Math.round(T.ringMax * nm)} Fire`,
+    );
+    expect(under).toContain(
+      `(${Math.round(T.ringMin * hc)} to ${Math.round(T.ringMax * hc)} on Heroic)`,
+    );
   });
 
   it('each mark says its rule with the live numbers', () => {

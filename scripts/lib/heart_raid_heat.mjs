@@ -23,7 +23,6 @@ import {
   HEAT_MOBS,
   HEAT_OBJECTS,
   HEAT_TUNING,
-  riverOf,
   swellLaneOf,
   WHEEL_ARCS_DEG,
   wheelOf,
@@ -101,7 +100,6 @@ export const heat = {
       fist: [],
       lanes: [],
       waves: [],
-      rivers: [],
       spots: [],
       seeds: [],
       zones: [],
@@ -114,7 +112,6 @@ export const heat = {
       if (t.startsWith(HEAT_OBJECTS.fistPrefix)) o.fist.push({ ...at, r: T.fistR + 1.5 });
       else if (swellLaneOf(t)) o.lanes.push(lane(at, T.laneLength, T.laneHalf + 1));
       else if (t === HEAT_OBJECTS.wave) o.waves.push({ ...at, r: T.laneHalf + 2.5 });
-      else if (riverOf(t)) o.rivers.push(lane(at, T.riverLength, (e.sc ?? T.riverHalf) + 1));
       else if (
         t.startsWith(HEAT_OBJECTS.fallPrefix) ||
         t.startsWith(HEAT_OBJECTS.scorchPrefix) ||
@@ -257,8 +254,7 @@ function inDanger(world, at, st) {
   const d = wellDistance(l.x, l.z);
   if (d < HEARTH_WELL.r + 1) return true;
   for (const h of [...o.fist, ...o.waves, ...o.spots]) if (hypot(h, at) < h.r) return true;
-  for (const ln of [...o.lanes, ...o.rivers])
-    if (segDist(at, ln.from, ln.to) < ln.half) return true;
+  for (const ln of o.lanes) if (segDist(at, ln.from, ln.to) < ln.half) return true;
   if (IGNORE !== 'wakefire')
     for (const z of o.zones)
       if (

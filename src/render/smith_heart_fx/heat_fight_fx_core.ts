@@ -1,12 +1,12 @@
 // Pure plan of the Guardian of the Heat's fight effects (heat_fight_fx.ts and
 // its parts paint them; docs/design/raid/smith_heart.md section 7.4, "the
 // well of the first flame"): the first wellspring (calm, overflowing),
-// the overflow's rivers of the first flame, the Hearthseeds throbbing toward
+// the overflow's rings of lava (heat_lava_wall_core.ts), the Hearthseeds throbbing toward
 // their burst, Wakefire's bands building and igniting, a Rolling Cinder's
 // fall, and the burning patches (a cinder's scorch, a Cinder Trail).
 // The sim's numbers are read (heat_ids.ts, the layout), never tuned here.
 //
-// Readability (binding): every footprint (a river's lane, a seed's core and
+// Readability (binding): every footprint (a ring's wall and corridors, a seed's core and
 // its reach, every Wakefire band, a cinder's landing, every burning patch)
 // draws at its exact size on EVERY tier; only sparks, embers, haze, smoke
 // and spray thin, the shakes go under reduced motion.
@@ -17,13 +17,13 @@
 
 import { HEARTH_WELL } from '../../sim/content/smith_heart_layout';
 import {
+  gapOf,
   HEAT_CUES,
   HEAT_OBJECTS,
-  type HeatRiverState,
   type HeatWellState,
   type HeatZoneState,
   heatTimedOf,
-  riverOf,
+  ringOf,
   swellLaneOf,
   HEAT_TUNING as T,
   WHEEL_ARCS_DEG,
@@ -79,7 +79,8 @@ export type HeatObjectKind =
   | 'fist'
   | 'lane'
   | 'wave'
-  | 'river'
+  | 'ring'
+  | 'gap'
   | 'seed'
   | 'zone'
   | 'fall'
@@ -95,7 +96,8 @@ export function heatObjectKind(templateId: string): HeatObjectKind | null {
   if (wellOf(templateId) !== null) return 'well';
   if (templateId === O.wave) return 'wave';
   if (swellLaneOf(templateId) !== null) return 'lane';
-  if (riverOf(templateId) !== null) return 'river';
+  if (ringOf(templateId) !== null) return 'ring';
+  if (gapOf(templateId) !== null) return 'gap';
   if (zoneOf(templateId) !== null) return 'zone';
   if (heatTimedOf(O.fistPrefix, templateId) !== null) return 'fist';
   if (heatTimedOf(O.seedPrefix, templateId) !== null) return 'seed';
@@ -151,40 +153,6 @@ export function wellLook(
     // Each swell a throb of the glow, on the heave's own clock.
     out.pulse = 0.55 + 0.45 * (0.5 + 0.5 * Math.sin(t * 1.7));
   }
-  return out;
-}
-
-// ---- the overflow's rivers ---------------------------------------------------------------
-
-export interface RiverLook {
-  /** The lane telegraph's fill (warn), whether it shows. */
-  fill: number;
-  lane: boolean;
-  /** How far down its length the fire has run (0..1), and its heat. */
-  front: number;
-  heat: number;
-}
-
-/** A river in `state`, `age` seconds into it (that state's `seconds`). */
-export function riverLook(
-  state: HeatRiverState,
-  age: number,
-  seconds: number,
-  out: RiverLook = { fill: 0, lane: false, front: 0, heat: 0 },
-): RiverLook {
-  const span = Math.max(0.1, seconds);
-  if (state === 'warn') {
-    out.fill = clamp01(age / span);
-    out.lane = true;
-    out.front = 0;
-    // The pool's lip lights toward it as it brims.
-    out.heat = 0.3 * out.fill;
-    return out;
-  }
-  out.fill = 1;
-  out.front = smooth(age / 0.7);
-  out.heat = clamp01((span - age) / 0.6);
-  out.lane = out.heat > 0;
   return out;
 }
 
@@ -305,8 +273,9 @@ function memo<T>(decode: (id: string) => T): (id: string) => T {
   };
 }
 
-/** riverOf, zoneOf and heatTimedOf for the painters' frame paths. */
-export const riverOfCached = memo(riverOf);
+/** ringOf, zoneOf and heatTimedOf for the painters' frame paths. */
+export const ringOfCached = memo(ringOf);
+export const gapOfCached = memo(gapOf);
 export const zoneOfCached = memo(zoneOf);
 export const wheelOfCached = memo(wheelOf);
 export const wellOfCached = memo(wellOf);
@@ -330,7 +299,11 @@ export function heatFightHash(a: number, b: number): number {
 
 /** Pools at full density (the sim's own caps; ten raiders). */
 export const HEAT_FIGHT_POOLS = {
-  rivers: T.riverCount * 2,
+  /** Rings on the floor at once: a slow ring rolls 5.5 s and the quickest
+   *  ones leave the lip every 3.4 s, so two, and one spare. */
+  rings: 3,
+  /** The next ring's corridors. */
+  gaps: 2,
   seeds: T.seedCap,
   zones: ZONE_BANDS.length,
   falls: T.cinderCap,

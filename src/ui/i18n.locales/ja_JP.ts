@@ -22545,7 +22545,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.heatGuardian.intro':
     '湧泉の中で冷えきっている：レイドが近づいて目覚め、燃え上がるまで、攻撃もダメージも受けない。',
   'hudChrome.auraEffect.heatGuardian.stateUnder':
-    '湧泉に沈んでいる：炉床があふれている間は攻撃もダメージも受けない。あふれが終わると再び浮かび上がる。',
+    '湧泉に沈んでいる：炉床があふれている間は攻撃もダメージも受けない。溶岩の輪が次々と湧泉から広がり、どの輪にも炎が割れる隙間が二つある。次の輪の隙間は、輪が来る前に床の上で光る。輪が通り過ぎるときは隙間に立つこと。さもなくば{min}～{max}の火炎ダメージを受ける（ヒロイックでは{heroicMin}～{heroicMax}）。二度目のあふれでは輪がより速く来て、隙間も狭くなる。最後の輪が通り過ぎると再び浮かび上がる。',
   'hudChrome.auraEffect.heatGuardian.scorched':
     '受ける火炎・冷気・自然・闇・秘術ダメージが{pct}%増加。{every}秒ごとに、炉床の閃火が湧泉から{reach}ヤードより遠くにいる全員を撃ち、この効果を更新する。',
   'hudChrome.auraEffect.heatGuardian.grip':

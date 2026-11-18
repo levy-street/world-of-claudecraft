@@ -19,7 +19,7 @@ import {
   HEAT_TUNING as T,
 } from '../sim/encounters/smith_heart/heat_ids';
 import type { AuraEffectDescriptor, AuraEffectInput } from './aura_effect';
-import { tierRange } from './heart_tier_damage';
+import { tierRange, tierValue } from './heart_tier_damage';
 
 const KEY = 'hudChrome.auraEffect.heatGuardian';
 
@@ -33,7 +33,14 @@ const HEROIC_PCT = pct(HEAT_DIFFICULTY.heroic.damageMult / NM - 1);
 function stateDescriptor(a: AuraEffectInput): AuraEffectDescriptor {
   const stage = a.value2 ?? HEAT_STAGES.fight;
   if (stage === HEAT_STAGES.sinking || stage === HEAT_STAGES.under || stage === HEAT_STAGES.rising)
-    return { key: `${KEY}.stateUnder`, nums: {} };
+    return {
+      key: `${KEY}.stateUnder`,
+      nums: {
+        min: tierValue(T.ringMin, NM),
+        max: tierValue(T.ringMax, NM),
+        ...tierRange('heroic', T.ringMin, T.ringMax, HEAT_DIFFICULTY.heroic.damageMult),
+      },
+    };
   const phase = Math.max(1, Math.min(3, Math.round(a.value ?? 1)));
   return {
     key: `${KEY}.statePhase${phase}`,

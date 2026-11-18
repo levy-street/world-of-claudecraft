@@ -22,7 +22,8 @@
 //     its bar (the cast id below);
 //   - the wellspring: a claim object whose template carries its state;
 //   - every footprint (the fist's spot, the swell lanes and their waves, the
-//     overflow's rivers, the seeds, the zones, a cinder's fall and scorch,
+//     overflow's rings of lava and their corridors, the seeds, the zones, a
+//     cinder's fall and scorch,
 //     the trails): objects, a radius or
 //     a half width in `scale`, a direction in `facing`, a state and its
 //     length in the template;
@@ -87,9 +88,15 @@ export const HEAT_OBJECTS = {
   /** A Molten Swell's wave rolling down its lane (it moves; along `facing`,
    *  its half width in `scale`). */
   wave: 'sh_heat_wave',
-  /** An overflow river from the wellspring: `<prefix><warn|flow>_<tenths>`,
-   *  along `facing`, its half width in `scale`, HEAT_TUNING.riverLength long. */
-  riverPrefix: 'sh_heat_river_',
+  /** An overflow's ring of lava rolling out of the wellspring (heat_waves.ts):
+   *  `<prefix><gap>_<gap>` (each corridor's bearing in whole degrees, sim
+   *  facing), on its first corridor's line `front` yards out (it moves), its
+   *  corridors' half width in `scale`. */
+  ringPrefix: 'sh_heat_ring_',
+  /** The next ring's corridor, glowing ahead of it: `<prefix><tenths>` to
+   *  its launch, at the wellspring, its line in `facing`, its half width in
+   *  `scale`. */
+  gapPrefix: 'sh_heat_gap_',
   /** A Hearthseed: `<prefix><tenths>` to its burst, its burst reach in `scale`. */
   seedPrefix: 'sh_heat_seed_',
   /** Wakefire: `<prefix><band>_<warn|burn>_<tenths>` (bands round the well). */
@@ -124,8 +131,9 @@ export const HEAT_CUES = {
   sink: 'heart_heat_sink',
   /** It rises again (spellfx 'nova' on it). */
   rise: 'heart_heat_rise',
-  /** An overflow river starts to flow (spellfxAt at its head). */
-  river: 'heart_heat_river',
+  /** An overflow's ring of lava leaves the wellspring's lip (spellfxAt at
+   *  the wellspring, the lip as the radius). */
+  ring: 'heart_heat_ring',
   /** A Falling Cinder strikes a player (spellfx 'burst' on them). */
   bolt: 'heart_heat_bolt',
   /** A Wellspawn climbs out at the room's edge (spellfxAt). */
@@ -183,7 +191,7 @@ export const HEAT_NAMES = {
   flare: 'Hearth Flare',
   scorched: 'Flare-Scorched',
   grip: 'Cinder Grip',
-  river: 'Wellspring Overflow',
+  overflow: 'Wellspring Overflow',
   bolt: 'Falling Cinder',
   feed: 'Fed Flame',
   kindling: 'Kindling Mark',
@@ -240,6 +248,25 @@ export interface HeatDifficultyRules {
    *  stands). */
   cinderLateAfter: number;
   cinderLateEvery: number;
+  /** The overflows' lava waves (heat_waves.ts): the first (70 percent), then
+   *  the second (40 percent, quicker and narrower). */
+  waves: readonly [HeatWaveRule, HeatWaveRule];
+}
+
+/** One overflow's lava waves (seconds, yards; heat_waves.ts). */
+export interface HeatWaveRule {
+  /** Rings in the overflow. */
+  count: number;
+  /** The first ring leaves the lip this long after the guardian is under
+   *  (its corridors glow all the while), each next one `every` after the last. */
+  lead: number;
+  every: number;
+  /** Yards a second a ring rolls out (a player runs 7). */
+  speed: number;
+  /** Corridors in each ring (evenly round the wellspring). */
+  gaps: number;
+  /** A corridor's half width. */
+  gapHalf: number;
 }
 
 /** One tier's Wheel of the Hearth (seconds; heat_wheel.ts). */
@@ -249,6 +276,13 @@ export interface HeatWheelRules {
   warn: number;
   rounds: number;
 }
+
+/** Heroic's (and Mythic's) lava waves: quicker rings, narrower corridors,
+ *  the Wellspawn walking all the while. */
+const HEROIC_WAVES: HeatDifficultyRules['waves'] = [
+  { count: 5, lead: 3, every: 4, speed: 9.5, gaps: 2, gapHalf: 3.5 },
+  { count: 6, lead: 3, every: 3.4, speed: 10.5, gaps: 2, gapHalf: 3 },
+];
 
 export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRules>> = {
   normal: {
@@ -271,6 +305,12 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     // raid running well past the 4 to 5 minute target feels it.
     cinderLateAfter: 180,
     cinderLateEvery: 20,
+    // The rework of 2026-11-18: slow rings, wide corridors, the longest
+    // warning; the second overflow a little quicker and narrower.
+    waves: [
+      { count: 4, lead: 3.5, every: 4.5, speed: 8, gaps: 2, gapHalf: 4.5 },
+      { count: 5, lead: 3.5, every: 4, speed: 9, gaps: 2, gapHalf: 3.75 },
+    ],
   },
   heroic: {
     // The pass of 2026-11-16 (no Heroic parse yet: Normal's call): the
@@ -293,6 +333,7 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     wheel: { first: 10, every: 30, warn: 3.5, rounds: 3 },
     cinderLateAfter: 240,
     cinderLateEvery: 20,
+    waves: HEROIC_WAVES,
   },
   // Heroic whole, its Wheel quicker and a round longer.
   mythic: {
@@ -313,6 +354,7 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     wheel: { first: 10, every: 28, warn: 3, rounds: 4 },
     cinderLateAfter: 240,
     cinderLateEvery: 20,
+    waves: HEROIC_WAVES,
   },
 };
 
@@ -361,11 +403,6 @@ export const HEAT_TUNING = {
   // The overflows.
   sinkSeconds: 2.5,
   riseSeconds: 3,
-  /** Normal: the Hearth overflows this long. */
-  overflowSeconds: 20,
-  /** Heroic: until the adds are gone, at least this long, at most overflowMax. */
-  overflowMin: 8,
-  overflowMax: 45,
   // The wellspring: whoever stands in it burns.
   wellTick: 0.5,
   wellMin: 120,
@@ -404,22 +441,18 @@ export const HEAT_TUNING = {
   gripPerTick: 9,
   gripSeconds: 15,
   gripMaxStacks: 10,
-  // The overflow's rivers and Falling Cinders.
-  riverEvery: 4.5,
-  riverFirst: 1,
-  riverCount: 3,
-  riverWarn: 2.5,
-  riverFlow: 3,
-  riverHalf: 3,
-  riverLength: 60,
-  riverTick: 0.5,
-  riverMin: 180,
-  riverMax: 220,
-  /** The rivers' bearings: this many, evenly from riverFrom to riverTo
-   *  degrees (sim facing: 0 is +z, 90 east toward the door). */
-  riverBearings: 9,
-  riverFrom: 15,
-  riverTo: 165,
+  // The overflows' lava waves (heat_waves.ts; their pace per tier,
+  // HEAT_DIFFICULTY `waves`): a ring leaves the wellspring's lip and rolls
+  // out past the Hearth's farthest wall (the floor reaches about 52 yd from
+  // the well's middle), its wall `ringDepth` deep; one strike to whoever it
+  // rolls over outside a corridor (about 40 percent of a cloth wearer's
+  // health on Normal, 55 on Heroic).
+  ringStart: HEAT_WELL_R,
+  ringEnd: 54,
+  ringDepth: 2.5,
+  ringMin: 420,
+  ringMax: 460,
+  // The overflows' Falling Cinders.
   boltEvery: 3,
   boltFirst: 2,
   boltMin: 140,
@@ -591,14 +624,6 @@ export function wheelOf(
   return Number.isInteger(n) && n >= 0 ? { slice, state, seconds: n / 10 } : null;
 }
 
-/** The overflow rivers' bearing `i` (sim facing, radians). */
-export function riverBearing(i: number): number {
-  const T = HEAT_TUNING;
-  const n = T.riverBearings;
-  const deg = T.riverFrom + ((T.riverTo - T.riverFrom) * i) / Math.max(1, n - 1);
-  return (deg * Math.PI) / 180;
-}
-
 // ---- object templates (pure) ----------------------------------------------------------
 
 const tenthsOf = (seconds: number): number => Math.max(0, Math.round(seconds * 10));
@@ -651,12 +676,32 @@ export function swellLaneOf(templateId: string): { state: HeatLaneState; seconds
   return stateOf(HEAT_OBJECTS.lanePrefix, ['warn', 'roll'] as const, templateId);
 }
 
-export type HeatRiverState = 'warn' | 'flow';
-export function riverTemplate(state: HeatRiverState, seconds: number): string {
-  return stateTemplate(HEAT_OBJECTS.riverPrefix, state, seconds);
+/** A ring's template: its corridors' bearings (radians) in whole degrees. */
+export function ringTemplate(gaps: readonly number[]): string {
+  const deg = gaps.map((g) => {
+    const d = Math.round((g * 180) / Math.PI) % 360;
+    return d < 0 ? d + 360 : d;
+  });
+  return `${HEAT_OBJECTS.ringPrefix}${deg.join('_')}`;
 }
-export function riverOf(templateId: string): { state: HeatRiverState; seconds: number } | null {
-  return stateOf(HEAT_OBJECTS.riverPrefix, ['warn', 'flow'] as const, templateId);
+/** A ring's corridors' bearings (radians), or null when the template is not one. */
+export function ringOf(templateId: string): { gaps: number[] } | null {
+  if (!templateId.startsWith(HEAT_OBJECTS.ringPrefix)) return null;
+  const parts = templateId.slice(HEAT_OBJECTS.ringPrefix.length).split('_');
+  const gaps: number[] = [];
+  for (const p of parts) {
+    const d = Number(p);
+    if (p === '' || !Number.isInteger(d) || d < 0 || d >= 360) return null;
+    gaps.push((d * Math.PI) / 180);
+  }
+  return gaps.length > 0 ? { gaps } : null;
+}
+/** A corridor warning's template: its seconds to the launch. */
+export function gapTemplate(seconds: number): string {
+  return heatTimed(HEAT_OBJECTS.gapPrefix, seconds);
+}
+export function gapOf(templateId: string): number | null {
+  return heatTimedOf(HEAT_OBJECTS.gapPrefix, templateId);
 }
 
 export type HeatZoneState = 'warn' | 'burn';

@@ -23058,7 +23058,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.heatGuardian.intro':
     '在涌泉中冰冷沉寂：在团队靠近、它苏醒燃起之前，无法被攻击或伤害。',
   'hudChrome.auraEffect.heatGuardian.stateUnder':
-    '沉入涌泉之中：炉心满溢期间无法被攻击或伤害。满溢结束后它会再次升起。',
+    '沉入涌泉之中：炉心满溢期间无法被攻击或伤害。熔岩之环一圈接一圈地从涌泉中涌出，每一圈都有两处火焰分开的缺口；下一圈的缺口会在它到来之前在地面上发光。熔岩环经过时站进缺口里，否则会受到{min}到{max}点火焰伤害（英雄难度{heroicMin}到{heroicMax}点）。第二次满溢的熔岩环来得更快，缺口也更窄。最后一圈过去后它会再次升起。',
   'hudChrome.auraEffect.heatGuardian.scorched':
     '受到的火焰、冰霜、自然、暗影和奥术伤害提高{pct}%。每{every}秒，炉心闪焰会击中所有距离涌泉超过{reach}码的人并刷新此效果。',
   'hudChrome.auraEffect.heatGuardian.grip':

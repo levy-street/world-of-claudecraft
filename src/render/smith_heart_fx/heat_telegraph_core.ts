@@ -21,7 +21,6 @@
 export type HeatTelegraphKind =
   | 'fist'
   | 'swell'
-  | 'river'
   | 'seedCore'
   | 'seedReach'
   | 'fall'
@@ -64,7 +63,6 @@ const look = (
 export const HEAT_TELEGRAPH_LOOKS: Readonly<Record<HeatTelegraphKind, HeatTelegraphLook>> = {
   fist: look(0.62, 1, 0, 0.5, 1),
   swell: look(0.5, 0.9, 0, 0.55, 0.95),
-  river: look(0.45, 0.9, 0, 0.5, 0.95),
   seedCore: look(0.5, 0.85, 0, 0.7, 1),
   seedReach: look(0.22, 0, 1, 0.45, 0.7, 0.55, false),
   fall: look(0.55, 1, 0, 0.9, 1),
@@ -74,9 +72,9 @@ export const HEAT_TELEGRAPH_LOOKS: Readonly<Record<HeatTelegraphKind, HeatTelegr
 
 /**
  * Whether a mark has LANDED: its bar full and no front left (a rolling
- * swell's lane, a flowing river's lane, the hunted's ring held at full). A
+ * swell's lane, the hunted's ring held at full). A
  * landed mark keeps its edge and cracks but lets its flow and most of its
- * char go, so the fire it warned of (the wave's wake, the river) shows
+ * char go, so the fire it warned of (the wave's wake) shows
  * through. Mirrors the shader's `landed` (heat_telegraph_glsl.ts).
  */
 export function heatTelegraphLanded(fill: number, front: number): boolean {

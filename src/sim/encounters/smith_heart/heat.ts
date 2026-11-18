@@ -12,9 +12,11 @@
 //                      (heat_flare.ts), Cinder Grip on the tank (the
 //                      template's own stacking burn).
 //   The overflows      at 70 and at 40 percent it sinks into the wellspring
-//                      and the Hearth overflows: rivers of fire and Falling
-//                      Cinders (heat_overflow.ts); heroic's Wellspawn walk to
-//                      the wellspring, and at 40 its Wellkeepers mark players
+//                      and the Hearth overflows: rings of lava roll out of it,
+//                      each parting in two corridors the raid stands in as
+//                      it passes (heat_waves.ts), and Falling Cinders
+//                      (heat_overflow.ts); heroic's Wellspawn walk to the
+//                      wellspring, and at 40 its Wellkeepers mark players
 //                      who trail fire (heat_wellspawn.ts). Then it rises.
 //   Phase 2 (70-40)    Hearthseeds (heat_seeds.ts; heroic hatches
 //                      Seedflames), Wakefire (heat_zones.ts), the fist.
@@ -84,7 +86,7 @@ import {
   spendHeatIntro,
   stepHeatIntro,
 } from './heat_intro';
-import { clearRivers, freshOverflow, stepFlood } from './heat_overflow';
+import { beginFlood, clearFlood, floodDone, freshOverflow, stepFlood } from './heat_overflow';
 import {
   auraOf,
   cueOnBoss,
@@ -104,7 +106,6 @@ import { heatSay, watchHeatSlain } from './heat_voice';
 import {
   clearOverflowAdds,
   endOverflowAdds,
-  overflowAddsGone,
   raiseKeepers,
   raiseWellspawn,
   stepKeepers,
@@ -333,6 +334,7 @@ function stepOverflow(s: HeatScope): void {
     if (st.stageLeft > 1e-9) return;
     st.stage = 'under';
     st.stageLeft = 0;
+    beginFlood(s, o);
     if (s.rules.overflowAdds) {
       raiseWellspawn(s);
       if (o.n === 2) raiseKeepers(s);
@@ -341,12 +343,11 @@ function stepOverflow(s: HeatScope): void {
   }
   if (st.stage === 'under') {
     stepFlood(s, o);
-    const done = s.rules.overflowAdds
-      ? (o.clock >= T.overflowMin - 1e-9 && overflowAddsGone(s)) || o.clock >= T.overflowMax - 1e-9
-      : o.clock >= T.overflowSeconds - 1e-9;
-    if (!done) return;
+    // As long as its lava waves (heat_waves.ts): the Wellspawn still walking
+    // then dive in and feed it.
+    if (!floodDone(o)) return;
     endOverflowAdds(s);
-    clearRivers(s, o);
+    clearFlood(s, o);
     st.stage = 'rising';
     st.stageLeft = T.riseSeconds;
     cueOnBoss(s, HEAT_CUES.rise);
@@ -488,7 +489,7 @@ function clearFight(
     clearSeeds(s);
     clearCinders(s);
     clearOverflowAdds(s);
-    clearRivers(s, st.overflow);
+    clearFlood(s, st.overflow);
   }
   // Every add the fight raised, dead or alive.
   for (const id of [...boss.summonedIds]) {
@@ -606,7 +607,7 @@ function jumpToPhase(s: HeatScope, phase: number): string | null {
   const b = s.boss;
   clearFist(s);
   clearZones(s);
-  clearRivers(s, s.st.overflow);
+  clearFlood(s, s.st.overflow);
   if (s.st.overflow) endOverflowAdds(s);
   s.st.bar = null;
   const top = {

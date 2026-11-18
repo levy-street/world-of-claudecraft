@@ -22515,7 +22515,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.heatGuardian.intro':
     '샘 속에서 차갑게 식어 있다: 공격대가 다가와 깨어나 불타오를 때까지 공격하거나 피해를 줄 수 없다.',
   'hudChrome.auraEffect.heatGuardian.stateUnder':
-    '샘에 가라앉아 있습니다: 화로가 넘쳐흐르는 동안에는 공격하거나 피해를 줄 수 없습니다. 넘침이 끝나면 다시 떠오릅니다.',
+    '샘에 가라앉아 있습니다: 화로가 넘쳐흐르는 동안에는 공격하거나 피해를 줄 수 없습니다. 용암 고리가 샘에서 차례로 퍼져 나오며, 고리마다 불길이 갈라지는 틈이 두 곳 있습니다. 다음 고리의 틈은 고리가 오기 전에 바닥에서 빛납니다. 고리가 지나갈 때 틈 안에 서 있지 않으면 화염 피해를 {min}~{max} 입습니다(영웅 난이도 {heroicMin}~{heroicMax}). 두 번째 넘침의 고리는 더 빨리 오고 틈도 더 좁습니다. 마지막 고리가 지나가면 다시 떠오릅니다.',
   'hudChrome.auraEffect.heatGuardian.scorched':
     '받는 화염, 냉기, 자연, 암흑, 비전 피해가 {pct}% 증가합니다. {every}초마다 화로의 섬광이 샘에서 {reach}미터보다 멀리 있는 모두를 치고 이 효과를 갱신합니다.',
   'hudChrome.auraEffect.heatGuardian.grip':

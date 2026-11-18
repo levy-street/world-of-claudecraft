@@ -6048,7 +6048,7 @@ export const hudChromeStrings = {
       intro:
         'Cold in its wellspring: it cannot be attacked or harmed until the raid comes near and it wakes, burning.',
       stateUnder:
-        'Sunk in its wellspring: it cannot be attacked or harmed while the Hearth overflows. It rises again when the overflow ends.',
+        "Sunk in its wellspring: it cannot be attacked or harmed while the Hearth overflows. Rings of lava roll out of the wellspring one after another, each with two gaps where its flames part; the next ring's gaps glow on the floor before it comes. Stand in a gap as a ring passes, or take {min} to {max} Fire damage ({heroicMin} to {heroicMax} on Heroic). The second overflow's rings come quicker and their gaps are narrower. It rises again once the last ring has passed.",
       scorched:
         'Takes {pct}% more Fire, Frost, Nature, Shadow and Arcane damage. Every {every} sec, Hearth Flare strikes everyone farther than {reach} yd from the wellspring and renews this.',
       grip: "Takes {total} Fire damage every second ({per} for each of your {stacks} stacks). Each of the guardian's landed swings adds a stack, up to {most}, and lasts {seconds} sec: swap tanks before it grows too heavy.",

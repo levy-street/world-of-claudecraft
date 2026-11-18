@@ -236,9 +236,10 @@ describe('the built Heat roots: no camera-sorted tie on the encounter band', () 
         expect(blendOf(glow?.material as THREE.Material)).toBe('additive');
         expect(glow?.geometry).toBe((o as THREE.Mesh).geometry);
       });
-    // Two fists and six lanes; six river lanes, six falls, six cinders'
-    // reaches, twelve hunted rings (the seeds draw as one field, below).
-    expect(dressed).toBe(2 + 6 + 6 + 6 + 6 + 12);
+    // Two fists and six lanes; six falls, six cinders' reaches, twelve
+    // hunted rings (the seeds draw as one field, below; the lava waves' rings
+    // and corridors are their own wall, heat_lava_wall_fx.ts).
+    expect(dressed).toBe(2 + 6 + 6 + 6 + 12);
   });
 
   it("draws every seed's footprint as ONE field on the fight's warning rungs, char then glow", () => {
@@ -372,7 +373,7 @@ describe('heat_telegraph: the kit footprint in the molten paint, shape and timin
 describe('heat_telegraph_core: the looks per kind', () => {
   it('chars deeper where swept and in the warning, a third of it once landed', () => {
     const kinds = Object.keys(HEAT_TELEGRAPH_LOOKS) as HeatTelegraphKind[];
-    expect(kinds).toHaveLength(8);
+    expect(kinds).toHaveLength(7);
     for (const k of kinds) {
       const ahead = heatTelegraphChar(k, 0, 0, false);
       const swept = heatTelegraphChar(k, 1, 0, false);

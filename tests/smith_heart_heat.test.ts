@@ -41,6 +41,7 @@ import {
   swellLaneTemplate,
   HEAT_TUNING as T,
   WELLSPAWN_SPOTS,
+  wavesSeconds,
   wellDistance,
   wellOf,
   wellTemplate,
@@ -369,7 +370,7 @@ describe('Guardian of the Heat: phase 1', () => {
 });
 
 describe('Guardian of the Heat: the overflows', () => {
-  it('normal: holds at 70 percent, sinks out of reach, overflows 20 s with no adds, rises into phase 2', () => {
+  it('normal: holds at 70 percent, sinks out of reach, overflows as long as its lava waves with no adds, rises into phase 2', () => {
     const f = pulled(4);
     const b = f.boss();
     // A burst cannot skip the threshold.
@@ -387,37 +388,50 @@ describe('Guardian of the Heat: the overflows', () => {
     ev = f.tick(ticks(10));
     expect(st.stage).toBe('under');
     expect(adds(f, HEAT_MOBS.spawn)).toEqual([]);
-    expect(cues(ev, HEAT_CUES.river).length).toBeGreaterThan(0);
+    expect(cues(ev, HEAT_CUES.ring).length).toBeGreaterThan(0);
     expect(cues(ev, HEAT_CUES.bolt).length).toBeGreaterThanOrEqual(HEAT_DIFFICULTY.normal.bolts);
     // The guardian itself takes nothing while under.
     const hp = b.hp;
     f.sim.ctx.dealDamage(f.players[0], b, 500, false, 'physical', 'test', 'hit');
     expect(b.hp).toBe(hp);
-    until(f, () => st.phase === 2, 20);
+    // Kept whole: the rings strike whoever stands in their walls.
+    for (let i = 0; i < ticks(30) && st.phase !== 2; i++) {
+      f.tick(1);
+      for (const p of f.players) p.hp = p.maxHp;
+    }
     expect(st.phase).toBe(2);
     expect(st.stage).toBe('fight');
     expect(st.overflow).toBeNull();
     expect(b.hostile).toBe(true);
     expect(b.damageImmune).toBe(false);
-    expect(st.clock).toBeGreaterThan(T.sinkSeconds + T.overflowSeconds + T.riseSeconds);
-    expect(f.objects(HEAT_OBJECTS.riverPrefix)).toEqual([]);
+    expect(st.clock).toBeGreaterThan(
+      T.sinkSeconds + wavesSeconds(HEAT_DIFFICULTY.normal.waves[0]) + T.riseSeconds,
+    );
+    expect(f.objects(HEAT_OBJECTS.ringPrefix)).toEqual([]);
+    expect(f.objects(HEAT_OBJECTS.gapPrefix)).toEqual([]);
+    // The rivers are gone (the rework of 2026-11-18).
+    expect(f.objects('sh_heat_river_')).toEqual([]);
     expect(b.damageFloorHp).toBe(Math.ceil(b.maxHp * T.overflowTwoAt));
   });
 
-  it('a river strikes those on its lane while it flows', () => {
-    const f = pulled(2);
+  it('a ring of lava strikes those in its wall once, never those in its corridors', () => {
+    const f = pulled(3);
     setHp(f, 0.69);
     f.tick(ticks(T.sinkSeconds + 0.1));
     const st = f.state();
-    if (!st?.overflow) throw new Error('no overflow');
-    // The next surge, and a player stood down its first river.
-    st.overflow.riverIn = 0.05;
-    f.tick(2);
-    const r = st.overflow.rivers[0];
-    const p = f.players[1];
-    f.put(p, HEARTH_WELL.x + Math.sin(r.facing) * 14, HEARTH_WELL.z + Math.cos(r.facing) * 14);
-    const ev = f.tick(ticks(T.riverWarn + 1));
-    expect(hitsOf(ev, HEAT_NAMES.river, p.id).length).toBeGreaterThanOrEqual(1);
+    if (!st?.overflow?.next) throw new Error('no overflow');
+    const gaps = st.overflow.next.gaps;
+    const [, inGap, inWall] = f.players;
+    const off = gaps[0] + Math.PI / 4;
+    f.put(inGap, HEARTH_WELL.x + Math.sin(gaps[0]) * 16, HEARTH_WELL.z + Math.cos(gaps[0]) * 16);
+    f.put(inWall, HEARTH_WELL.x + Math.sin(off) * 16, HEARTH_WELL.z + Math.cos(off) * 16);
+    const rule = HEAT_DIFFICULTY.normal.waves[0];
+    // Through the first ring's launch and its roll past them.
+    const ev = f.tick(ticks(rule.lead + (16 - T.ringStart) / rule.speed + 0.5));
+    expect(hitsOf(ev, HEAT_NAMES.overflow, inGap.id)).toEqual([]);
+    const hits = hitsOf(ev, HEAT_NAMES.overflow, inWall.id);
+    expect(hits.length).toBe(1);
+    expect(hits[0]).toBeGreaterThanOrEqual(T.ringMin);
   });
 
   it('heroic: the Wellspawn walk to the wellspring, slowing as they lose health', () => {
@@ -475,42 +489,39 @@ describe('Guardian of the Heat: the overflows', () => {
     expect(f.sim.ctx.entities.has(kid.id)).toBe(false);
   });
 
-  it('heroic: the overflow ends once the adds are dead (never before 8 s), or at 45 s', () => {
-    const f = pulled(3, 31, true);
-    setHp(f, 0.69);
-    f.tick(ticks(T.sinkSeconds + 0.2));
-    const st = f.state();
-    if (!st) throw new Error('no fight');
-    for (const k of adds(f, HEAT_MOBS.spawn)) f.sim.ctx.handleDeath(k, f.players[0]);
-    f.tick(ticks(2));
-    expect(st.stage).toBe('under');
-    until(f, () => st.stage !== 'under', 10);
-    expect(st.stage).toBe('rising');
-    expect(st.overflow?.clock ?? 0).toBeGreaterThanOrEqual(T.overflowMin - 0.05);
-    expect(st.overflow?.clock ?? 99).toBeLessThan(T.overflowMin + 0.5);
-
-    // Left alone, the survivors dive in at the cap.
-    const g = pulled(3, 31, true);
-    setHp(g, 0.69);
-    g.tick(ticks(T.sinkSeconds + 0.2));
-    const kids = adds(g, HEAT_MOBS.spawn);
-    for (const k of kids) {
-      k.auras.push({
-        id: 'test_stun',
-        name: 'Stun',
-        kind: 'stun',
-        remaining: 999,
-        duration: 999,
-        value: 0,
-        sourceId: g.players[0].id,
-        school: 'physical',
-      });
+  it('heroic: the overflow lasts as long as its waves, dead adds or not, and the survivors dive in', () => {
+    const rule = HEAT_DIFFICULTY.heroic.waves[0];
+    for (const kill of [true, false]) {
+      const f = pulled(3, 31, true);
+      setHp(f, 0.69);
+      f.tick(ticks(T.sinkSeconds + 0.2));
+      const st = f.state();
+      if (!st) throw new Error('no fight');
+      const kids = adds(f, HEAT_MOBS.spawn);
+      expect(kids.length).toBe(4);
+      for (const k of kids) {
+        if (kill) f.sim.ctx.handleDeath(k, f.players[0]);
+        else
+          k.auras.push({
+            id: 'test_stun',
+            name: 'Stun',
+            kind: 'stun',
+            remaining: 999,
+            duration: 999,
+            value: 0,
+            sourceId: f.players[0].id,
+            school: 'physical',
+          });
+      }
+      for (let i = 0; i < ticks(40) && st.stage === 'under'; i++) {
+        f.tick(1);
+        for (const p of f.players) p.hp = p.maxHp;
+      }
+      expect(st.stage).toBe('rising');
+      expect(st.overflow?.clock ?? 0).toBeGreaterThanOrEqual(wavesSeconds(rule) - 0.1);
+      expect(st.overflow?.clock ?? 99).toBeLessThan(wavesSeconds(rule) + 0.2);
+      expect(st.feeds).toBe(kill ? 0 : kids.length);
     }
-    const gst = g.state();
-    if (!gst) throw new Error('no fight');
-    until(g, () => gst.stage !== 'under', T.overflowMax + 2);
-    expect(gst.overflow?.clock ?? 0).toBeGreaterThanOrEqual(T.overflowMax - 0.05);
-    expect(gst.feeds).toBe(kids.length);
   });
 
   it("heroic's second overflow: two Wellkeepers mark a player whose trail heals the Wellspawn", () => {

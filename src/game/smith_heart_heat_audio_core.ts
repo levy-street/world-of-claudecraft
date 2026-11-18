@@ -67,7 +67,7 @@ export const HEAT_CUE_SOUNDS: Readonly<Record<string, readonly HeatSound[]>> = {
   [HEAT_CUES.sink]: [S('heart_heat_sink', 1, 'source', 1, 1)],
   [HEAT_CUES.rise]: [S('heart_heat_rise', 1, 'source', 1, 1)],
   // A river of the first flame starts to flow (soft: three at a time).
-  [HEAT_CUES.river]: [S('heart_heat_river', 0.45, 'point', 1, 0.6)],
+  [HEAT_CUES.ring]: [S('heart_heat_river', 0.45, 'point', 1, 0.6)],
   // A Falling Cinder strikes (soft and short: one every few seconds).
   [HEAT_CUES.bolt]: [S('heart_heat_bolt', 0.4, 'target', 1, 0.15)],
   // A Wellspawn climbs out; one feeds the wellspring (a blast on the raid).

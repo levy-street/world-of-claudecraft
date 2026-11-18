@@ -6,8 +6,7 @@
 // auras, the cues), so offline and online look the same. It owns one gated
 // root, the particles and the floor telegraph kit, and lends them to its
 // parts:
-//  - heat_well_fx.ts: the first wellspring (calm, overflowing) and the
-//    overflow's rivers;
+//  - heat_well_fx.ts: the first wellspring (calm, overflowing);
 //  - heat_cinder_fx.ts: a Rolling Cinder's fall and the cinder itself, the
 //    hunted's marks, the adds' fire;
 // and paints itself:
@@ -111,7 +110,8 @@ const _up = new THREE.Vector3(0, 1, 0);
 const _zero = new THREE.Matrix4().makeScale(0, 0, 0);
 const KINDS: readonly HeatObjectKind[] = [
   'well',
-  'river',
+  'ring',
+  'gap',
   'seed',
   'zone',
   'wheel',
@@ -747,7 +747,7 @@ export class HeatFightFx implements HeatFxHost {
   private burstAt(ability: string, x: number, z: number, r: number): void {
     const y = this.groundY(x, z);
     switch (ability) {
-      case HEAT_CUES.river:
+      case HEAT_CUES.ring:
         this.particles.puff(x, y + 1, z, 16, { ...SPARK, radius: 3 });
         break;
       case HEAT_CUES.spawn:
@@ -829,7 +829,7 @@ export class HeatFightFx implements HeatFxHost {
     const guardian = this.guardianId >= 0 ? (world.entities.get(this.guardianId) ?? null) : null;
     const list = (k: HeatObjectKind) => this.ids.get(k) ?? [];
     const wellIds = list('well');
-    this.well.update(wellIds.length > 0 ? wellIds[0] : -1, guardian, list('river'), this.clock, dt);
+    this.well.update(wellIds.length > 0 ? wellIds[0] : -1, guardian, this.clock, dt);
     this.cinder.update(list('fall'), this.cinderIds, this.addIds, this.huntedIds, this.clock, dt);
     this.paintSeeds(world, dt);
     this.meteors.update(guardian, dt);

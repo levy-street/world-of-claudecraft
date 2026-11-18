@@ -5,13 +5,7 @@
 // objects (heat_ids.ts says which).
 
 import type { SmithHeartFeatAttempt } from './feat_attempt';
-import type {
-  HeatDifficulty,
-  HeatPhase,
-  HeatRiverState,
-  HeatStage,
-  HeatZoneState,
-} from './heat_ids';
+import type { HeatDifficulty, HeatPhase, HeatStage, HeatZoneState } from './heat_ids';
 import type { TierSwingBase } from './tier_swing';
 import type { SlainWatch } from './voice_slain';
 
@@ -47,28 +41,41 @@ export interface HeatSwell {
   struck: number[];
 }
 
-/** An overflow river from the wellspring. */
-export interface HeatRiver {
+/** A ring of lava rolling out of the wellspring (heat_waves.ts). */
+export interface HeatRing {
   objectId: number;
-  facing: number;
-  state: HeatRiverState;
-  remaining: number;
-  tick: number;
+  /** Its corridors' bearings (sim facing, radians). */
+  gaps: number[];
+  /** Yards from the wellspring's middle its wall's front has rolled. */
+  front: number;
+  /** The players its wall already struck. */
+  struck: number[];
 }
 
-/** One overflow (at 70 and at 40 percent). */
+/** The next ring: its corridors glowing on the floor until it leaves the lip. */
+export interface HeatRingPlan {
+  gaps: number[];
+  /** The corridors' warning objects. */
+  gapIds: number[];
+  launchIn: number;
+}
+
+/** One overflow (at 70 and at 40 percent): its lava waves and Falling Cinders. */
 export interface HeatOverflow {
   /** First (70 percent) or second (40 percent). */
   n: 1 | 2;
   /** Seconds the Hearth has overflowed (the `under` stage's own clock). */
   clock: number;
-  riverIn: number;
   boltIn: number;
-  /** Surges so far (the rivers' hashed salt). */
-  surges: number;
   /** Volleys so far (the bolts' hashed salt). */
   volleys: number;
-  rivers: HeatRiver[];
+  /** Rings planned and launched so far (the corridors' hashed salt). */
+  planned: number;
+  launched: number;
+  /** The rings rolling out, and the next one's warning (null once the last
+   *  has left the lip, and before the guardian is under). */
+  rings: HeatRing[];
+  next: HeatRingPlan | null;
 }
 
 /** A Hearthseed on the floor. */
