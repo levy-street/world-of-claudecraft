@@ -6,8 +6,12 @@ import {
   type TalentEffect,
 } from '../../src/sim/content/talents';
 import { ABILITIES, CLASSES } from '../../src/sim/data';
+import type { PlayerClass } from '../../src/sim/types';
+import { specIconUrl } from '../../src/ui/spec_icon_art';
 import { specBaselineDescription } from '../../src/ui/talent_i18n';
 import { renameSpecTags } from './ability_description';
+import { talentArtPath } from './article_art';
+import { specAbilityLines } from './class_ability_sections';
 
 export interface AbilityPageTools {
   titleBy: {
@@ -38,22 +42,90 @@ export function affectedAbilities(effect: TalentEffect): string[] {
   ];
 }
 
-export function addTalentPages({
-  titleBy,
-  link,
-  section,
-  bullets,
-  table,
-  add,
-  usedTitles,
-  unique,
-}: TalentPageTools): void {
+const ROLE_NAMES = { dps: 'Damage', tank: 'Tank', healer: 'Healer' } as const;
+
+/** The first sentence of a talent's effect, short enough for a grid cell. */
+export function talentSummary(description: string): string {
+  const flat = description.replace(/\s+/g, ' ').trim();
+  const first = flat.match(/^.*?[.!?](?=\s|$)/)?.[0] ?? flat;
+  return first.length > 150 ? first.slice(0, 147).replace(/\s+\S*$/, '') + '...' : first;
+}
+
+/** A class's talent rows as a grid: one row per unlock level, its choices side by side,
+ *  each with the game's icon, a link to the talent and the first line of its effect. */
+export function talentGrid(cls: PlayerClass, { titleBy, link }: AbilityPageTools): string {
+  const rows = ROW_TREES[cls];
+  const width = Math.max(...rows.map((row) => row.options.length));
+  const grid = [
+    ['Level', ...Array.from({ length: width }, (_, i) => 'Choice ' + (i + 1))],
+    ...rows.map((row) => [
+      'Level ' + row.level,
+      ...row.options.map((option) => {
+        const icon = talentArtPath(option);
+        const page = titleBy.talent?.get(cls + '/' + option.id);
+        // The summary rides in italics so the reader can set it under the name.
+        return (
+          (icon ? '<woc-art path="' + icon + '" size="icon" /> ' : '') +
+          (page ? link(page, option.name) : option.name) +
+          " ''" +
+          talentSummary(renameSpecTags(option.description, cls)) +
+          "''"
+        );
+      }),
+    ]),
+  ];
+  const [head, ...body] = grid;
+  return [
+    '{| class="wikitable talent-grid"',
+    '|-',
+    '! ' + head.join(' !! '),
+    ...body.flatMap((cells) => ['|-', '| ' + cells.join(' || ')]),
+    '|}',
+  ].join('\n');
+}
+
+/** Every specialization of a class, written into the class page: its role, what it does,
+ *  its mastery, the abilities it grants on the pick, and the rest of its kit. */
+export function classSpecSections(cls: PlayerClass, tools: AbilityPageTools): string {
+  const { titleBy, link, section, bullets } = tools;
+  const abilityLink = (id: string) =>
+    titleBy.ability.has(id) ? link(titleBy.ability.get(id)!, ABILITIES[id].name) : '';
+  const blocks = TALENTS[cls].specs.map((spec) => {
+    const icon = specIconUrl(spec);
+    const page = titleBy.spec?.get(cls + '/' + spec.id);
+    const signature = specSignatureIds(spec).map(abilityLink).filter(Boolean);
+    const kit = specAbilityLines(cls, spec.id, tools);
+    return [
+      '=== ' + spec.name + ' ===',
+      (icon ? '<woc-art path="' + icon + '" size="icon" /> ' : '') +
+        "'''" +
+        ROLE_NAMES[spec.role as keyof typeof ROLE_NAMES] +
+        "''' · " +
+        spec.description,
+      "'''Mastery: " + spec.mastery.name + ".''' " + spec.mastery.description,
+      signature.length ? "'''Granted on the pick:''' " + signature.join(' · ') : '',
+      kit.length ? bullets(kit) : '',
+      page ? link(page, 'Full ' + spec.name + ' page') : '',
+    ]
+      .filter(Boolean)
+      .join('\n\n');
+  });
+  return section(
+    'Specializations',
+    'At level ' +
+      SPEC_UNLOCK_LEVEL +
+      ' you choose one of three specializations. It sets your role in a group and adds its own abilities.\n\n' +
+      blocks.join('\n\n'),
+  );
+}
+
+export function addTalentPages(tools: TalentPageTools): void {
+  const { titleBy, link, section, bullets, table, add, usedTitles, unique } = tools;
   const specs = new Map<string, string>(),
     talents = new Map<string, string>();
   titleBy.spec = specs;
   titleBy.talent = talents;
-  const specIndex: string[][] = [],
-    talentIndex: string[][] = [];
+  const specIndex: string[][] = [];
   const abilityLink = (id: string) =>
     titleBy.ability.has(id) ? link(titleBy.ability.get(id)!, ABILITIES[id].name) : '';
   for (const cls of Object.values(TALENTS)) {
@@ -79,7 +151,6 @@ export function addTalentPages({
       'Level ' + row.level,
       row.options.map(choiceLink).join(' · '),
     ]);
-    for (const [level, list] of choices) talentIndex.push([classLink + ' · ' + level, list]);
     for (const spec of cls.specs) {
       const baseline = specBaselineDescription(spec);
       const signatureIds = specSignatureIds(spec);
@@ -155,7 +226,24 @@ export function addTalentPages({
   add('Specializations', section('Choose a specialization', table(specIndex)), [
     'Character progression',
   ]);
-  add('Talent choices', section('Talents by class and level', table(talentIndex)), [
-    'Character progression',
-  ]);
+  add(
+    'Talent choices',
+    section(
+      'How talents work',
+      'Each class unlocks a row of talent choices at levels ' +
+        ROW_TREES.warrior.map((row) => row.level).join(', ') +
+        '. In each row you pick one talent. The rows are the same for every specialization of the class.',
+    ) +
+      Object.values(TALENTS)
+        .map((cls) =>
+          section(
+            CLASSES[cls.class].name,
+            link(titleBy.class.get(cls.class)!, 'Open the ' + CLASSES[cls.class].name + ' page') +
+              '\n\n' +
+              talentGrid(cls.class, tools),
+          ),
+        )
+        .join(''),
+    ['Character progression'],
+  );
 }

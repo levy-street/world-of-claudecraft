@@ -1988,3 +1988,112 @@ body[data-woc-site] #view table.item-table {
 #view .mechanic-role.role-damage {
   color: var(--bad);
 }
+
+/* A class page: one card per specialization, and the talent rows as a grid. */
+#view .spec-card {
+  margin: 14px 0;
+  padding: 16px 18px 6px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: linear-gradient(180deg, var(--panel), var(--bg-2));
+}
+#view .spec-card > h3 {
+  margin: 0 0 10px;
+  color: var(--gold);
+  font: 600 1.3rem / 1.3 var(--font-display);
+  letter-spacing: 0.03em;
+}
+#view .wiki-prose .spec-card > p {
+  max-width: none;
+}
+#view .wiki-prose .spec-card > p.encounter-summary {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  color: var(--text);
+}
+#view .spec-card > p.encounter-summary > .ability-icon {
+  width: 48px;
+  height: 48px;
+}
+#view .spec-card > ul {
+  margin-top: 8px;
+}
+#view table.talent-grid {
+  width: 100%;
+  table-layout: fixed;
+}
+#view table.talent-grid th:first-child,
+#view table.talent-grid td:first-child {
+  width: 82px;
+  color: var(--gold);
+  font-weight: 600;
+  white-space: nowrap;
+}
+#view table.talent-grid td {
+  vertical-align: top;
+  padding: 10px 12px;
+  line-height: 1.5;
+}
+#view table.talent-grid td > .ability-icon {
+  float: left;
+  width: 36px;
+  height: 36px;
+  margin: 0 10px 0 0;
+}
+#view table.talent-grid td strong a {
+  color: var(--gold);
+}
+@media (max-width: 760px) {
+  #view table.talent-grid,
+  #view table.talent-grid tbody,
+  #view table.talent-grid tr,
+  #view table.talent-grid td {
+    display: block;
+    width: auto;
+  }
+  #view table.talent-grid tr:first-child {
+    display: none;
+  }
+  #view table.talent-grid tr {
+    margin: 0 0 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+  #view table.talent-grid td:first-child {
+    width: auto;
+    padding-bottom: 0;
+  }
+}
+#view table.talent-grid td,
+#view table.talent-grid td > span {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+#view table.talent-grid td > span {
+  display: block;
+}
+#view table.talent-grid td > span > a:first-child {
+  color: var(--gold);
+  font-weight: 700;
+}
+#view table.talent-grid td > span > em {
+  display: block;
+  margin-top: 4px;
+  font-style: normal;
+  color: var(--text-dim);
+}
+#view .wiki-prose table.talent-grid td:nth-child(n) {
+  color: var(--text);
+  font-weight: 400;
+  white-space: normal;
+  vertical-align: top;
+}
+#view .wiki-prose table.talent-grid td:first-child {
+  color: var(--gold);
+  font-weight: 600;
+}
+#view .wiki-prose table.talent-grid td:nth-child(n) > span > em {
+  color: var(--text-dim);
+  font-weight: 400;
+}

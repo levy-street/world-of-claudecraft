@@ -40,7 +40,7 @@ import { articleArt, modelStills } from '../../scripts/mediawiki/article_art';
 import { attackShots, withAttackShots } from '../../scripts/mediawiki/attack_art';
 import { classAbilitySections } from '../../scripts/mediawiki/class_ability_sections';
 import { abilityArticle } from '../../scripts/mediawiki/ability_article';
-import { addTalentPages } from '../../scripts/mediawiki/talent_articles';
+import { addTalentPages, classSpecSections, talentGrid } from '../../scripts/mediawiki/talent_articles';
 import { addSystemArticles } from '../../scripts/mediawiki/system_articles';
 import { addEntityArticles, questZoneName } from '../../scripts/mediawiki/entity_articles';
 import { homeZones, npcArticle } from '../../scripts/mediawiki/npc_article';
@@ -203,7 +203,7 @@ for (const zone of ZONES) {
 }
 
 for (const [id, cls] of Object.entries(CLASSES)) {
-  add(titleBy.class.get(id), section('Overview', cls.name + ' is a class you can play. It uses ' + cls.resourceType + ' to power its abilities. A new character of this class starts with ' + link(titleBy.item.get(cls.startWeapon), ITEMS[cls.startWeapon]?.name ?? cls.startWeapon) + '.') + section('Build choices', link('Specializations') + ' · ' + link('Talent choices')) + section('Starting statistics', table(Object.entries(cls.baseStats).map(([k, v]) => [({ str: 'Strength', agi: 'Agility', sta: 'Stamina', int: 'Intellect', spi: 'Spirit', armor: 'Armor' })[k] ?? k, String(v)]))) + classAbilitySections(id, writer), ['Classes']);
+  add(titleBy.class.get(id), section('Overview', cls.name + ' is a class you can play. It uses ' + cls.resourceType + ' to power its abilities. A new character of this class starts with ' + link(titleBy.item.get(cls.startWeapon), ITEMS[cls.startWeapon]?.name ?? cls.startWeapon) + '.') + section('Starting statistics', table(Object.entries(cls.baseStats).map(([k, v]) => [({ str: 'Strength', agi: 'Agility', sta: 'Stamina', int: 'Intellect', spi: 'Spirit', armor: 'Armor' })[k] ?? k, String(v)]))) + classSpecSections(id, writer) + section('Talents', 'At each of these levels you pick one talent from the row. See every class side by side on ' + link('Talent choices') + '.\\n\\n' + talentGrid(id, writer)) + classAbilitySections(id, writer, ['Specialization abilities', 'Talent choices']), ['Classes']);
 }
 
 for (const dungeon of DUNGEON_LIST) {

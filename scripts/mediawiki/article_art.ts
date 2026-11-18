@@ -56,6 +56,22 @@ export function itemArtPath(id: string): string {
     : '';
 }
 
+/** The icon a talent row option shows in the game's talent window, or '' when none ships. */
+export function talentArtPath(option: Parameters<typeof talentRowOptionIconRef>[0]): string {
+  const art = talentRowOptionIconRef(option);
+  const path =
+    art.kind === 'image'
+      ? art.url
+      : art.kind === 'ability'
+        ? wikiAbilityArtPath(art.id)
+        : crestIconUrl(art.id);
+  return path &&
+    /^\/ui\/[A-Za-z0-9_/-]+\.webp$/.test(path) &&
+    existsSync(join('public', path.slice(1)))
+    ? path
+    : '';
+}
+
 /** The packaged portrait for a creature, or '' when it has none. */
 export function mobArtPath(id: string): string {
   const path = targetPortraitUrl(id, true);
@@ -145,16 +161,7 @@ export function articleArt(titleBy: TitleMaps): Map<string, string> {
     for (const spec of cls.specs) add('spec', cls.class + '/' + spec.id, specIconUrl(spec));
     for (const row of ROW_TREES[cls.class])
       for (const option of row.options) {
-        const art = talentRowOptionIconRef(option);
-        add(
-          'talent',
-          cls.class + '/' + option.id,
-          art.kind === 'image'
-            ? art.url
-            : art.kind === 'ability'
-              ? wikiAbilityArtPath(art.id)
-              : crestIconUrl(art.id),
-        );
+        add('talent', cls.class + '/' + option.id, talentArtPath(option));
       }
   }
   for (const quest of WORLD_QUESTS) {

@@ -70,10 +70,11 @@ function glance(def: AbilityDef): string {
   return ' · ' + cost + ' · ' + cast + (def.cooldown ? ' · ' + def.cooldown + ' sec cooldown' : '');
 }
 
-export function classAbilitySections(
+/** Each class ability's spellbook line, grouped by the section it belongs in. */
+function classAbilityEntries(
   cls: PlayerClass,
-  { section, bullets, link, titleBy }: AbilityPageTools,
-) {
+  { link, titleBy }: AbilityPageTools,
+): Map<Group, Entry[]> {
   const groups = new Map<Group, Entry[]>();
   const specs = TALENTS[cls].specs;
   for (const [id, title] of titleBy.ability) {
@@ -121,11 +122,30 @@ export function classAbilitySections(
     });
     groups.set(group, entries);
   }
+  for (const entries of groups.values())
+    entries.sort((a, b) => a.level - b.level || a.name.localeCompare(b.name, 'en'));
+  return groups;
+}
+
+/** A specialization's own abilities as spellbook lines (icon, link, cost and cast). */
+export function specAbilityLines(cls: PlayerClass, specId: string, tools: AbilityPageTools) {
+  return (classAbilityEntries(cls, tools).get('Specialization abilities') ?? [])
+    .filter((entry) => entry.specIds.includes(specId))
+    .map((entry) => entry.line);
+}
+
+export function classAbilitySections(
+  cls: PlayerClass,
+  tools: AbilityPageTools,
+  omit: readonly ClassAbilityGroup[] = [],
+) {
+  const { section, bullets, link, titleBy } = tools;
+  const groups = classAbilityEntries(cls, tools);
+  const specs = TALENTS[cls].specs;
   return sectionOrder
-    .filter((group) => groups.has(group))
+    .filter((group) => groups.has(group) && !omit.includes(group))
     .map((group) => {
       const entries = groups.get(group)!;
-      entries.sort((a, b) => a.level - b.level || a.name.localeCompare(b.name, 'en'));
       if (group === 'Specialization abilities') {
         const subsections = specs.flatMap((spec) => {
           const lines = entries

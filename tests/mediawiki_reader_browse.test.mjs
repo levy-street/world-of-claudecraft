@@ -36,15 +36,23 @@ describe('encyclopedia directory navigation', () => {
     expect(paths.has('A sword')).toBe(false);
   });
 
-  it('reaches pages indexed by a table hub and the rooms of a raid', () => {
+  it('reaches pages indexed by a table hub, a class page and the rooms of a raid', () => {
     const pages = new Map();
     const add = (title, text, categories) => pages.set(title, { title, text, categories });
     add(
-      'Specializations',
-      ['{|', '! [[Mage]]', '| [[Pyromancy (Specialization)|Pyromancy]]', '|}'].join('\n'),
+      'Talent choices',
+      ['{|', '! Level', '| Level 5 || [[Ice Floes (Talent)|Ice Floes]]', '|}'].join('\n'),
       ['Character progression'],
     );
-    add('Pyromancy (Specialization)', 'Article', ['Specializations']);
+    add('Ice Floes (Talent)', 'Article', ['Talent choices', 'Mage']);
+    // A specialization lives on its class page, so it browses Classes > Mage.
+    add('Classes', '* [[Mage]] · Resource: Mana', ['Portals']);
+    add(
+      'Mage',
+      ['=== Pyromancy ===', '[[Pyromancy (Specialization)|Full Pyromancy page]]'].join('\n'),
+      ['Classes'],
+    );
+    add('Pyromancy (Specialization)', 'Article', ['Specializations', 'Mage']);
     add('Dungeons', '* [[Big Raid (Raid)]] · 10 players', ['Portals']);
     add(
       'Big Raid (Raid)',
@@ -55,8 +63,10 @@ describe('encyclopedia directory navigation', () => {
     add('Boss (Mob)', 'Article', ['Mobs']);
     const paths = browseTrails(pages);
     expect(paths.get('Pyromancy (Specialization)').map((e) => e.title)).toEqual([
-      'Specializations',
+      'Classes',
+      'Mage',
     ]);
+    expect(paths.get('Ice Floes (Talent)').map((e) => e.title)).toEqual(['Talent choices']);
     expect(paths.get('Inner Room').map((e) => e.title)).toEqual(['Dungeons', 'Big Raid (Raid)']);
     expect(paths.has('Boss (Mob)')).toBe(false);
   });

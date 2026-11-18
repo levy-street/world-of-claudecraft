@@ -20,15 +20,13 @@ function sectionBody(heading) {
 }
 
 /** The lead paragraphs stay as the overview; each h3 opens a phase block. */
-export function groupPhases(nodes) {
+export function groupPhases(nodes, blockClass = 'encounter-phase') {
   const out = [];
   let block = null;
   for (const node of nodes) {
     if (node.tagName === 'H3') {
       block = document.createElement('section');
-      block.className = EXTRAS.has(node.textContent)
-        ? 'encounter-phase encounter-extra'
-        : 'encounter-phase';
+      block.className = EXTRAS.has(node.textContent) ? blockClass + ' encounter-extra' : blockClass;
       block.append(node);
       out.push(block);
     } else if (block) {
@@ -41,6 +39,16 @@ export function groupPhases(nodes) {
     }
   }
   return out;
+}
+
+/** A class page's specializations: one card per spec (its h3 and everything under it). */
+export function layoutSpecCards(article) {
+  const heading = [...article.children].find(
+    (n) => n.tagName === 'H2' && n.textContent === 'Specializations',
+  );
+  if (!heading) return;
+  const nodes = groupPhases(sectionBody(heading), 'spec-card');
+  heading.after(...nodes);
 }
 
 export function layoutEncounter(article) {

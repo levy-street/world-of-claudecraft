@@ -21,9 +21,8 @@ export const subjects = [
   [
     'Characters and combat',
     [
-      ['Classes', 'Classes', 'Starting stats and class kits'],
+      ['Classes', 'Classes', 'Specializations, talents and class kits'],
       ['Abilities', 'Abilities', 'Costs, ranks and scaling by class'],
-      ['Specializations', 'Specializations', 'Masteries and build choices'],
       ['Talent choices', 'Talent choices', 'Options at each level'],
     ],
   ],
@@ -100,7 +99,6 @@ export function browseTrails(pages) {
     'Zones',
     'Dungeons',
     'Classes',
-    'Specializations',
     'Talent choices',
     'Book of Deeds',
     'Mounts and riding',
@@ -108,6 +106,9 @@ export function browseTrails(pages) {
     'Gameplay Systems',
   ];
   const isRaid = (page) => page?.categories.includes('Raids');
+  // A class page holds its specializations and talent rows, so they browse under it.
+  const isClass = (page) => page?.categories.includes('Classes');
+  const CLASS_CHILD = / \((?:Specialization|Talent)\)(?: \(\d+\))?$/;
   const childLinks = (page) => {
     const links = [];
     for (const line of page.text.split('\n')) {
@@ -118,6 +119,9 @@ export function browseTrails(pages) {
         // A directory can list its entries as table rows; the first cell names the entry.
         const child = directoryLink(line.slice(2).replace(/^<woc-art [^>]*\/> /, ''));
         if (child) links.push(child);
+      } else if (isClass(page)) {
+        for (const m of line.matchAll(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g))
+          if (CLASS_CHILD.test(m[1])) links.push({ title: m[1], label: m[2] ?? m[1] });
       } else if (TABLE_HUBS.has(page.title) && /^[|!]/.test(line)) {
         for (const m of line.matchAll(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g))
           links.push({ title: m[1], label: m[2] ?? m[1] });
@@ -145,7 +149,7 @@ export function browseTrails(pages) {
         // A raid page is an article, but its room list is the only way into its rooms.
         if (isRaid(page) && !target.categories.includes('Dungeons')) continue;
         if (!trails.has(child.title)) trails.set(child.title, trail);
-        if (isDirectory(target) || isRaid(target)) queue.push([...trail, child]);
+        if (isDirectory(target) || isRaid(target) || isClass(target)) queue.push([...trail, child]);
       }
     }
   }

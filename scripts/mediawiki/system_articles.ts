@@ -329,7 +329,7 @@ export function addSystemArticles(ctx: SystemWikiContext): string[] {
   w.describe(
     'Specialization and talents',
     guide.talentsPage.whatBody,
-    'See [[Specializations]] and [[Talent choices]] for each class.',
+    'Each class page in [[Classes]] lists its specializations and talent rows. [[Talent choices]] compares every class.',
     talentLoadoutGuide(),
   );
   w.describe(
