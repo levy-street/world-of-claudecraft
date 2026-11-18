@@ -3,12 +3,14 @@
 // (public/models/props/smith_heart_ring_crystal.glb, the Tripo build of the owner's
 // ChatGPT sheet, docs/design/raid/kit/ring_crystal_src/README.md).
 //
-// The model is a heap of pieces (the Blender build cut it along the Tripo shells:
-// `Piece_NN_<plinth|body|heart>`). Whole, it draws as ONE merged mesh in the crystal's
+// The model is a heap of pieces (the Blender build cut it: `Piece_NN_plinth`, each
+// element's chunks `Piece_NN_body_<element>`, `Piece_NN_heart`). Whole, it draws as ONE
+// merged mesh in the crystal's
 // own frame (y up, its plinth centred on the origin); at the shatter the whole hides and
 // the pieces take its place and fly (each its own mesh on one shared material, the matrix
 // written by hand about the piece's centre, since the geometry stays in the crystal's frame
-// for the shader's height and weights). Fetched with the raid's kits on the deferred lane
+// for the shader's height and weights); each element's chunks, and the heart, settle into
+// the slots `ringCrystalOrbitSlot` gives them. Fetched with the raid's kits on the deferred lane
 // (never at boot); a crystal that has not landed when the seal is built lands under the
 // same group through the live compile gate, and a model that fails to load costs the seal
 // its centrepiece, never the player the raid (the portal and the rivers stand).
@@ -35,9 +37,12 @@ import {
   newRingCrystalLast,
   newRingCrystalPiecePose,
   newRingCrystalState,
+  type RingCrystalOrbitSlot,
   type RingCrystalPieceKind,
   type RingCrystalState,
   ringCrystalChanged,
+  ringCrystalOrbitSlot,
+  ringCrystalPieceElement,
   ringCrystalPieceKind,
   ringCrystalPiecePose,
   ringCrystalPieceRole,
@@ -55,6 +60,8 @@ interface CrystalPiece {
   kind: RingCrystalPieceKind;
   centre: THREE.Vector3;
   geometry: THREE.BufferGeometry;
+  /** Where it hangs once the burst settles (an element's chunk, the heart), or null. */
+  slot: RingCrystalOrbitSlot | null;
 }
 
 interface CrystalModel {
@@ -95,7 +102,11 @@ const ATTRIBUTES = ['position', 'normal', 'uv', '_weights', '_path'] as const;
 
 function bakeModel(scene: THREE.Object3D): CrystalModel | null {
   scene.updateMatrixWorld(true);
-  const parts: { kind: RingCrystalPieceKind; geometry: THREE.BufferGeometry }[] = [];
+  const parts: {
+    kind: RingCrystalPieceKind;
+    element: number;
+    geometry: THREE.BufferGeometry;
+  }[] = [];
   let map: THREE.Texture | null = null;
   scene.traverse((node) => {
     if (!(node instanceof THREE.Mesh)) return;
@@ -103,7 +114,7 @@ function bakeModel(scene: THREE.Object3D): CrystalModel | null {
     if (!kind) return;
     const material = Array.isArray(node.material) ? node.material[0] : node.material;
     map ??= (material as THREE.MeshStandardMaterial | undefined)?.map ?? null;
-    parts.push({ kind, geometry: bakePiece(node) });
+    parts.push({ kind, element: ringCrystalPieceElement(node.name), geometry: bakePiece(node) });
   });
   if (!map || parts.length === 0) return null;
   // The whole crystal, the pieces merged in their node order (a piece's index seeds its flight).
@@ -117,6 +128,10 @@ function bakeModel(scene: THREE.Object3D): CrystalModel | null {
   if (!index) return null;
   whole.computeBoundingSphere();
   const spans = ringCrystalPieceSpans(parts.map((p) => p.geometry.getIndex()?.count ?? 0));
+  // Each element's chunks, in node order, take their element's slots side by side.
+  const counts = [0, 0, 0, 0];
+  for (const part of parts) if (part.element >= 0) counts[part.element]++;
+  const ranks = [0, 0, 0, 0];
   const pieces = parts.map((part, i): CrystalPiece => {
     // The piece's centre, how far its vertices reach round it (flat, and in all three
     // dimensions: its bounding sphere, which keeps culling on while it flies).
@@ -154,8 +169,15 @@ function bakeModel(scene: THREE.Object3D): CrystalModel | null {
     view.setDrawRange(spans[i].start, spans[i].count);
     view.boundingSphere = new THREE.Sphere(centre.clone(), Math.sqrt(round2));
     markSharedGeometry(view);
-    // The widest body piece is the grey core under the crystals (it vanishes at the burst).
-    return { kind: ringCrystalPieceRole(part.kind, Math.sqrt(flat2)), centre, geometry: view };
+    // A wide body piece naming no element is the grey core (it vanishes at the burst).
+    const kind = ringCrystalPieceRole(part.kind, Math.sqrt(flat2), part.element);
+    const slot =
+      part.element >= 0
+        ? ringCrystalOrbitSlot(part.element, ranks[part.element]++, counts[part.element])
+        : kind === 'heart'
+          ? ringCrystalOrbitSlot(-1, 0, 1)
+          : null;
+    return { kind, centre, geometry: view, slot };
   });
   return { pieces, whole, map };
 }
@@ -299,7 +321,7 @@ export function buildRingCrystal(): RingCrystal {
       b.whole.position.set(0, 0, 0);
       for (let i = 0; i < b.pieces.length; i++) {
         const { mesh, piece } = b.pieces[i];
-        ringCrystalPiecePose(i, piece.kind, piece.centre, want.burstT, pose);
+        ringCrystalPiecePose(i, piece.kind, piece.centre, want.burstT, pose, piece.slot);
         mesh.visible = pose.visible;
         if (!pose.visible) continue;
         p4.set(piece.centre.x + pose.dx, piece.centre.y + pose.dy, piece.centre.z + pose.dz);

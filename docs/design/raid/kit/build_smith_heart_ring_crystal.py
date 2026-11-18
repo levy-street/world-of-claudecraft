@@ -19,11 +19,15 @@ README.md) and writes the shipping source GLB:
     weights follow the PAINTING (an amber crystal is the Hammer's wherever Tripo stood it:
     its side clusters do not keep to their own compass side), and the compass only where the
     painting has no hue to read (the plain stone plinth: each quarter lights its own channel);
-  - cut into pieces along the model's own shells (Tripo builds a heap of separate crystals,
-    never one solid): the plinth's stones and the crystals grouped into balanced clusters,
-    each piece its own node with its centre as the node's translation, the pieces the burst
-    throws apart. Their union is the crystal; the renderer merges them for the whole
-    crystal's one draw.
+  - cut into the pieces the burst throws apart, each its own node with its centre as the
+    node's translation: the plinth in six sectors, the white-gold heart's shaft, and each
+    element's crystals as a few WHOLE chunks of that element (two to five, by its share of
+    the crystal; `--chunks` over the whole; the owner's call of 2026-11-18: chunks of each
+    element's crystal floating, not random pieces). Tripo's thousand "shells" are only its UV seams:
+    welded, the crystal is a dozen solids, and the pieces are cut from those, so a chunk is
+    whole wherever it is not cut and every cut (and every hole Tripo left) is capped in one
+    colour of the painting round it. Their union is the crystal; the renderer merges them
+    for the whole crystal's one draw.
 
 Run (one Blender process; the glTF importer and exporter are Blender's own):
 
@@ -50,7 +54,7 @@ ap.add_argument('--src', required=True)
 ap.add_argument('--out', required=True)
 ap.add_argument('--reach', type=float, default=8.6)
 ap.add_argument('--squash', type=float, default=1.0)
-ap.add_argument('--clusters', type=int, default=14)
+ap.add_argument('--chunks', type=int, default=12)
 ap.add_argument('--crown-r', type=float, default=0.15)
 ap.add_argument('--crown-z', type=float, default=0.4)
 ap.add_argument('--debug-dir', default='')
@@ -60,6 +64,7 @@ args = ap.parse_args(argv)
 # arrives from the south, the Breath's from the north, the Quench's from the east, the Heat's
 # from the west (heart_seal_core.ts HEART_SEAL_QUARTERS). The weights' channel order.
 VEIN_BEARINGS = (('hammer', 180.0), ('breath', 0.0), ('quench', 90.0), ('heat', 270.0))
+ELEMENTS = [name for name, _ in VEIN_BEARINGS]
 
 # In Blender's frame (z up) the exporter writes (x, y, z) as glTF (x, z, -y): east is +x and
 # SOUTH is +y (glTF -z), so north is -y.
@@ -172,8 +177,12 @@ print(f'crystal: height {height:.3f} yd, reach {reach:.3f} yd, plinth {plinth_r:
 low_reach = max(math.hypot(v.co.x, v.co.y) for v in bm.verts if v.co.z < 2.4)
 print(f'footprint under two yards high: {low_reach:.3f} yd')
 
-# ---- the shells and their pieces ----------------------------------------------------------
+# ---- the solids ---------------------------------------------------------------------------
 
+# Tripo writes its UV seams as separate shells (over a thousand of them); welded, the crystal is
+# a dozen solids: the plinth's slab, the heart's shaft, a few fused formations of crystals and
+# the loose crystals round them. The UVs stay on the face corners, so the painting is untouched.
+bmesh.ops.remove_doubles(bm, verts=bm.verts[:], dist=1e-4 * height)
 bm.faces.ensure_lookup_table()
 bm.faces.index_update()
 bm.verts.ensure_lookup_table()
@@ -210,26 +219,28 @@ def shell_top(comp):
     return max(v.co.z for f in comp for v in f.verts)
 
 
+# The plinth: the low slab every crystal stands on. The heart: the tall shaft on the axis.
+# Everything else is crystal, each face given to an element below.
 plinth_ids, heart_ids, body_ids = [], [], []
 for i, (c, _) in enumerate(infos):
     r = math.hypot(c.x, c.y)
-    if c.z < 0.1 * height and r > 0.45 * reach:
+    top = shell_top(shells[i])
+    if top < 0.12 * height:
         plinth_ids.append(i)
-    elif r <= args.crown_r * reach * 2.6 and shell_top(shells[i]) >= 0.72 * height:
-        # The heart: the tall shells on the axis (Tripo builds its shaft as a few of them).
+    elif max(math.hypot(v.co.x, v.co.y) for f in shells[i] for v in f.verts) <= 0.4 * reach and top >= 0.72 * height:
+        # The heart: a tall solid that never leaves the axis (a formation of crystals can
+        # stand its centre near the axis too, but it spreads to the plinth's rim).
         heart_ids.append(i)
     else:
         body_ids.append(i)
 heart_verts = {v.index for i in heart_ids for f in shells[i] for v in f.verts}
-print('shells:', len(shells), 'plinth', len(plinth_ids), 'heart', len(heart_ids), 'body', len(body_ids))
+print('solids:', len(shells), 'plinth', len(plinth_ids), 'heart', len(heart_ids), 'crystal', len(body_ids))
 if args.debug_dir:
-    near = sorted(range(len(infos)), key=lambda i: -infos[i][1])
-    for i in near[:14]:
+    for i in sorted(range(len(infos)), key=lambda i: -infos[i][1]):
         c, a = infos[i]
         zs = [v.co.z for f in shells[i] for v in f.verts]
         rs = [math.hypot(v.co.x, v.co.y) for f in shells[i] for v in f.verts]
-        print(f'  shell {i}: area {a:.1f} centre r {math.hypot(c.x, c.y):.2f} z {c.z:.1f} z-span {min(zs):.1f}-{max(zs):.1f} max r {max(rs):.2f}')
-
+        print(f'  solid {i}: area {a:.1f} faces {len(shells[i])} centre r {math.hypot(c.x, c.y):.2f} z {c.z:.1f} z-span {min(zs):.1f}-{max(zs):.1f} max r {max(rs):.2f}')
 
 
 # ---- the weights and the path (custom attributes) -----------------------------------------
@@ -339,27 +350,27 @@ def space(c):
     return Vector((c.x / reach, c.y / reach, 1.4 * c.z / height))
 
 
-def kmeans(ids, k, iters=60):
-    """Deterministic, area-weighted k-means over the shells' centres (farthest-point start)."""
-    if len(ids) <= k:
-        return [[i] for i in ids]
-    pts = {i: space(infos[i][0]) for i in ids}
-    first = max(ids, key=lambda i: infos[i][1])
+def kmeans(items, k, centre_of, area_of, iters=60):
+    """Deterministic, area-weighted k-means (farthest-point start) over any items."""
+    if len(items) <= k:
+        return [[i] for i in items]
+    pts = {i: space(centre_of(i)) for i in items}
+    first = max(items, key=area_of)
     centres = [pts[first]]
     while len(centres) < k:
-        far = max(ids, key=lambda i: min((pts[i] - c).length for c in centres))
+        far = max(items, key=lambda i: min((pts[i] - c).length for c in centres))
         centres.append(pts[far])
     groups = [[] for _ in centres]
     for _ in range(iters):
         groups = [[] for _ in centres]
-        for i in ids:
+        for i in items:
             groups[min(range(len(centres)), key=lambda j: (pts[i] - centres[j]).length)].append(i)
         moved = False
         for j, g in enumerate(groups):
             if not g:
                 continue
-            tot = sum(infos[i][1] for i in g) or 1.0
-            c = sum((pts[i] * infos[i][1] for i in g), Vector((0, 0, 0))) / tot
+            tot = sum(area_of(i) for i in g) or 1.0
+            c = sum((pts[i] * area_of(i) for i in g), Vector((0, 0, 0))) / tot
             if (c - centres[j]).length > 1e-6:
                 moved = True
             centres[j] = c
@@ -368,12 +379,118 @@ def kmeans(ids, k, iters=60):
     return [g for g in groups if g]
 
 
-plinth_groups = kmeans(plinth_ids, 6)
-body_groups = kmeans(body_ids, args.clusters)
-groups = [('plinth', g) for g in plinth_groups] + [('body', g) for g in body_groups]
-if heart_ids:
-    groups.append(('heart', heart_ids))
-print('pieces:', [(kind, len(g)) for kind, g in groups])
+# ---- the pieces: the plinth's sectors, the heart, each element's chunks ---------------------
+
+bm.faces.ensure_lookup_table()
+face_area = {f.index: f.calc_area() for f in bm.faces}
+face_centre = {f.index: f.calc_center_median() for f in bm.faces}
+
+# Every crystal face's element: the one its corners weigh most (the painting's hue where it
+# carries one, its side of the compass where it does not, so a pale frosted ice crystal on the
+# east is still the Quench's).
+body_faces = [f for i in body_ids for f in shells[i]]
+label = {}
+for f in body_faces:
+    w = [0.0, 0.0, 0.0, 0.0]
+    for v in f.verts:
+        wv = v[wlayer]
+        for k in range(4):
+            w[k] += wv[k]
+    label[f.index] = max(range(4), key=lambda k: w[k])
+# Speckle out: a face takes the element most of its neighbours carry (its own counts twice).
+for _ in range(4):
+    nxt = {}
+    for f in body_faces:
+        votes = [0, 0, 0, 0]
+        votes[label[f.index]] += 2
+        for e in f.edges:
+            for g in e.link_faces:
+                if g is not f and g.index in label:
+                    votes[label[g.index]] += 1
+        nxt[f.index] = max(range(4), key=lambda k: votes[k])
+    label = nxt
+if args.debug_dir:
+    for i in body_ids:
+        hist = [0, 0, 0, 0]
+        for f in shells[i]:
+            hist[label[f.index]] += 1
+        print(f'  solid {i} faces per element hammer/breath/quench/heat: {hist}')
+
+
+def angle_about(c, mean):
+    """A face centre's bearing round the axis, relative to `mean` (degrees, -180 to 180)."""
+    return (bearing_of(c.x, c.y) - mean + 180.0) % 360.0 - 180.0
+
+
+def chunks_of(faces, k):
+    """`faces` as `k` whole chunks: an area-weighted k-means over the face centres, started from
+    k equal-area slices round the axis (so the chunks stand side by side, not a far fleck on its
+    own), a chunk under a third of its share merged into the nearest one."""
+    area = sum(face_area[fi] for fi in faces)
+    if k <= 1 or len(faces) <= k:
+        return [faces]
+    sx = sum(math.sin(math.radians(bearing_of(face_centre[fi].x, face_centre[fi].y))) * face_area[fi] for fi in faces)
+    cy_ = sum(math.cos(math.radians(bearing_of(face_centre[fi].x, face_centre[fi].y))) * face_area[fi] for fi in faces)
+    mean = math.degrees(math.atan2(sx, cy_))
+    order = sorted(faces, key=lambda fi: (angle_about(face_centre[fi], mean), fi))
+    slices = [[] for _ in range(k)]
+    run = 0.0
+    for fi in order:
+        slices[min(k - 1, int(run / area * k))].append(fi)
+        run += face_area[fi]
+    pts = {fi: space(face_centre[fi]) for fi in faces}
+
+    def centroid(g):
+        tot = sum(face_area[fi] for fi in g) or 1.0
+        return sum((pts[fi] * face_area[fi] for fi in g), Vector((0, 0, 0))) / tot
+
+    centres = [centroid(g) for g in slices if g]
+    groups = slices
+    for _ in range(60):
+        groups = [[] for _ in centres]
+        for fi in faces:
+            groups[min(range(len(centres)), key=lambda j: (pts[fi] - centres[j]).length)].append(fi)
+        groups = [g for g in groups if g]
+        new_c = [centroid(g) for g in groups]
+        if len(new_c) == len(centres) and all((a - b).length < 1e-7 for a, b in zip(new_c, centres)):
+            break
+        centres = new_c
+    # A sliver of a chunk joins its nearest neighbour.
+    share = area / k
+    while len(groups) > 1:
+        small = min(range(len(groups)), key=lambda j: sum(face_area[fi] for fi in groups[j]))
+        if sum(face_area[fi] for fi in groups[small]) >= share / 3:
+            break
+        c = centroid(groups[small])
+        to = min((j for j in range(len(groups)) if j != small), key=lambda j: (centroid(groups[j]) - c).length)
+        groups[to] = groups[to] + groups[small]
+        del groups[small]
+    return groups
+
+
+groups = []
+# The plinth in six sectors round the axis.
+plinth_faces = [f.index for i in plinth_ids for f in shells[i]]
+for k in range(6):
+    sector = [fi for fi in plinth_faces if int(((bearing_of(face_centre[fi].x, face_centre[fi].y) + 30.0) % 360.0) // 60.0) == k]
+    if sector:
+        groups.append(('plinth', None, sector))
+# Each element's crystal as whole chunks of that element, as many as its share of the crystal
+# makes (`--chunks` over the whole crystal, two to five an element).
+element_faces = [[fi for fi in label if label[fi] == lab] for lab in range(4)]
+crystal_area = sum(face_area[fi] for fi in label) or 1.0
+for lab in range(4):
+    faces = sorted(element_faces[lab])
+    if not faces:
+        continue
+    share = sum(face_area[fi] for fi in faces) / crystal_area
+    k = max(2, min(5, round(share * args.chunks)))
+    for ch in chunks_of(faces, k):
+        groups.append(('body', ELEMENTS[lab], ch))
+heart = [f.index for i in heart_ids for f in shells[i]]
+if heart:
+    groups.append(('heart', None, heart))
+print('pieces:', [(kind, el, len(g), round(sum(face_area[fi] for fi in g), 1)) for kind, el, g in groups])
 
 # ---- the material: the painting alone -----------------------------------------------------
 
@@ -402,27 +519,113 @@ tex.image = paint
 mat.node_tree.links.new(tex.outputs['Color'], bsdf.inputs['Base Color'])
 mat.node_tree.links.new(bsdf.outputs['BSDF'], out_node.inputs['Surface'])
 
-# ---- one object per piece -----------------------------------------------------------------
+# ---- one object per piece, every opening capped ------------------------------------------
+
+
+def paint_at(uv):
+    px = min(pw - 1, max(0, int(uv.x * pw)))
+    py = min(ph - 1, max(0, int(uv.y * ph)))
+    return blur[py, px]
+
+
+def cap(piece):
+    """Close every opening of a piece (its cuts, and the holes Tripo left) so it reads as a
+    solid once it flies: each run of open edges is walked into a loop and fanned from a new
+    vertex at its middle (Tripo's mesh carries non-manifold edges, so the openings are not
+    always clean loops; a run that dead-ends is fanned as it stands). A cap is one colour: the
+    texel round its rim nearest the rim's mean colour (a broken crystal shows its own colour
+    inside); its middle vertex carries the rim's mean weights and path. Returns (caps made,
+    open edges left)."""
+    uvl = piece.loops.layers.uv.active
+    wl = piece.verts.layers.float_color['_weights']
+    pl = piece.verts.layers.float['_path']
+    open_edges = {e for e in piece.edges if len(e.link_faces) == 1}
+    if not open_edges:
+        return 0, 0
+    at = {}
+    for e in open_edges:
+        for v in e.verts:
+            at.setdefault(v, []).append(e)
+    used = set()
+    caps = 0
+    for start_e in sorted(open_edges, key=lambda e: e.index):
+        if start_e in used:
+            continue
+        # Walk a run of open edges: at each vertex take an unused open edge, until the run
+        # closes or dead-ends.
+        used.add(start_e)
+        a, b = start_e.verts
+        ring = [a, b]
+        cur = b
+        while True:
+            nxt = [e for e in at[cur] if e not in used]
+            if not nxt:
+                break
+            e = min(nxt, key=lambda e: e.index)
+            used.add(e)
+            cur = e.other_vert(cur)
+            if cur is ring[0]:
+                break
+            ring.append(cur)
+        if len(ring) < 3:
+            continue
+        mid = Vector((0, 0, 0))
+        for v in ring:
+            mid += v.co
+        mid /= len(ring)
+        uvs = []
+        for v in ring:
+            for lo in v.link_loops:
+                uvs.append(lo[uvl].uv.copy())
+                break
+        cols = [paint_at(uv) for uv in uvs]
+        mean_col = sum(cols) / len(cols)
+        uv = uvs[min(range(len(uvs)), key=lambda j: float(((cols[j] - mean_col) ** 2).sum()))]
+        c = piece.verts.new(mid)
+        wsum = [0.0, 0.0, 0.0, 0.0]
+        psum = 0.0
+        for v in ring:
+            for k in range(4):
+                wsum[k] += v[wl][k]
+            psum += v[pl]
+        c[wl] = tuple(x / len(ring) for x in wsum)
+        c[pl] = psum / len(ring)
+        closed = ring[0] in [e.other_vert(ring[-1]) for e in at[ring[-1]]]
+        pairs = list(zip(ring, ring[1:])) + ([(ring[-1], ring[0])] if closed else [])
+        for p, q in pairs:
+            try:
+                f = piece.faces.new((c, q, p))
+            except ValueError:
+                continue
+            for lo in f.loops:
+                lo[uvl].uv = uv
+        caps += 1
+    return caps, sum(1 for e in piece.edges if len(e.link_faces) == 1)
+
 
 bpy.ops.object.select_all(action='DESELECT')
 bpy.data.objects.remove(src_obj, do_unlink=True)
 root = bpy.data.objects.new('SmithHeartRingCrystal', None)
 bpy.context.scene.collection.objects.link(root)
 made = []
-for i, (kind, ids) in enumerate(groups):
-    keep = {f.index for k in ids for f in shells[k]}
+open_left = 0
+for i, (kind, element, keep_ids) in enumerate(groups):
+    keep = set(keep_ids)
     piece = bm.copy()
     piece.faces.ensure_lookup_table()
     drop = [f for f in piece.faces if f.index not in keep]
     bmesh.ops.delete(piece, geom=drop, context='FACES')
     loose = [v for v in piece.verts if not v.link_faces]
     bmesh.ops.delete(piece, geom=loose, context='VERTS')
+    caps, left = cap(piece)
+    open_left += left
     centre = Vector((0, 0, 0))
     for v in piece.verts:
         centre += v.co
     centre /= max(1, len(piece.verts))
     piece.transform(Matrix.Translation(-centre))
-    me = bpy.data.meshes.new(f'Piece_{i:02d}_{kind}')
+    name = f'Piece_{i:02d}_{kind}' + (f'_{element}' if element else '')
+    me = bpy.data.meshes.new(name)
     piece.to_mesh(me)
     piece.free()
     me.materials.append(mat)
@@ -430,12 +633,14 @@ for i, (kind, ids) in enumerate(groups):
     # rebuilds them from the geometry.
     if 'custom_normal' in me.attributes:
         me.attributes.remove(me.attributes['custom_normal'])
-    ob = bpy.data.objects.new(f'Piece_{i:02d}_{kind}', me)
+    ob = bpy.data.objects.new(name, me)
     ob.location = centre
     ob.parent = root
     bpy.context.scene.collection.objects.link(ob)
     made.append(ob)
+    print(f'  {name}: {len(me.polygons)} faces, {caps} caps, {left} open edges left')
 bm.free()
+print('open edges left over all pieces:', open_left)
 
 # Shading: smooth where the facets are shallow, sharp across the crystal's edges.
 for ob in made:

@@ -1809,7 +1809,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/smith_heart_heat_kit.glb": "/media/models/props/smith_heart_heat_kit.eeef5246ab45.glb",
   "models/props/smith_heart_quench_env_kit.glb": "/media/models/props/smith_heart_quench_env_kit.20adc4ecfe08.glb",
   "models/props/smith_heart_quench_kit.glb": "/media/models/props/smith_heart_quench_kit.b81f811fa753.glb",
-  "models/props/smith_heart_ring_crystal.glb": "/media/models/props/smith_heart_ring_crystal.10f66d048020.glb",
+  "models/props/smith_heart_ring_crystal.glb": "/media/models/props/smith_heart_ring_crystal.417cd7b38a0e.glb",
   "models/props/smith_heart_ring_kit.glb": "/media/models/props/smith_heart_ring_kit.96dd994e4681.glb",
   "models/props/smith_heart_rock_kit.glb": "/media/models/props/smith_heart_rock_kit.7f0fc03dbf47.glb",
   "models/props/spore_burster.glb": "/media/models/props/spore_burster.dc83392e0d05.glb",

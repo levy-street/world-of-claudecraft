@@ -13,9 +13,12 @@
 //   ready (all four lit and the Ring clear, the READY bit): the whole crystal swells and
 //     pulses, the sign that the first raider onto the dais will break it;
 //   the burst (the seal markers' portal bit, set when a raider steps onto the dais): the
-//     crystal overloads for `HEART_PORTAL_OPEN.charge`, then shatters; its pieces (the
-//     model's own shells, grouped) fly out, the crystal's pieces tumbling on into an orbit
-//     round the portal funnel for good, the plinth's stones falling away.
+//     crystal overloads for `HEART_PORTAL_OPEN.charge`, then shatters; its pieces (each
+//     element's crystal as a few whole chunks, the heart's shaft, the plinth in sectors)
+//     fly out, each element's chunks settling together into its own vein's quarter of an
+//     orbit round the portal funnel (the owner's call of 2026-11-18: chunks of each
+//     element floating, not random pieces), the heart hovering over the funnel, the
+//     plinth's stones falling away.
 //
 // Pure and Three-free (the clock is passed in, render seconds).
 
@@ -23,6 +26,7 @@ import { HEART_PORTAL_OPEN, heartPortalStage } from './heart_portal_core';
 import {
   HEART_SEAL_ARRIVAL,
   HEART_SEAL_FILL_SECONDS,
+  HEART_SEAL_QUARTERS,
   heartSealQuarterFill,
   heartSealQuarterLevel,
 } from './heart_seal_core';
@@ -217,12 +221,53 @@ export const RING_CRYSTAL_CORE_RADIUS = 6;
 const CORE_VANISH_SECONDS = 0.35;
 
 /** The motion a piece takes: its node's kind, or `core` for a body piece wider than
- *  `RING_CRYSTAL_CORE_RADIUS`. */
+ *  `RING_CRYSTAL_CORE_RADIUS` that names no element (a chunk of one element's crystal is
+ *  never the core, however wide). */
 export function ringCrystalPieceRole(
   kind: RingCrystalPieceKind,
   radius: number,
+  element = -1,
 ): RingCrystalPieceKind {
-  return kind === 'body' && radius > RING_CRYSTAL_CORE_RADIUS ? 'core' : kind;
+  return kind === 'body' && element < 0 && radius > RING_CRYSTAL_CORE_RADIUS ? 'core' : kind;
+}
+
+/** Where a piece hovers once the burst has settled: its bearing round the funnel (radians
+ *  from north, toward east), its distance from the axis and its height over the dais
+ *  (yards), and its scale there. */
+export interface RingCrystalOrbitSlot {
+  angle: number;
+  radius: number;
+  height: number;
+  scale: number;
+}
+
+/** How fast the settled pieces turn round the funnel, all together (radians a second), so
+ *  each element's chunks keep their quarter. */
+const ORBIT_TURN = 0.11;
+/** How far an element's chunks spread round its bearing (radians between neighbours). */
+const ORBIT_SPREAD = 0.38;
+/** The heart's hover: upright on the axis, crowning the portal's funnel (26 yd tall). */
+const HEART_SLOT: RingCrystalOrbitSlot = { angle: 0, radius: 0, height: 22, scale: 0.55 };
+
+/** The settled place of chunk `rank` of `count` of element `element` (SMITH_HEART_VEINS
+ *  order: the Hammer, the Breath, the Quench, the Heat): the element's chunks hang together
+ *  in its own vein's quarter (the Hammer south, the Breath north, the Quench east, the Heat
+ *  west), side by side round its bearing, at heights that step so none hides another. The
+ *  heart (`element` -1) hovers high over the funnel. */
+export function ringCrystalOrbitSlot(
+  element: number,
+  rank: number,
+  count: number,
+): RingCrystalOrbitSlot {
+  const quarter = HEART_SEAL_QUARTERS[element];
+  if (!quarter) return HEART_SLOT;
+  const spread = (rank - (Math.max(1, count) - 1) / 2) * ORBIT_SPREAD;
+  return {
+    angle: (quarter.bearingDeg * Math.PI) / 180 + spread,
+    radius: 9 + (rank % 2) * 2.2,
+    height: 9 + 4.5 * ((rank + element) % 3),
+    scale: 0.7,
+  };
 }
 
 /** A piece's displacement from its assembled place (yards), its turn (radians) and its
@@ -267,13 +312,16 @@ function h01(i: number, k: number): number {
  *  seconds after the shatter (-1: whole, nothing moves). The pieces fly outward from the
  *  axis and up (the heart's shaft straight up), tumbling; the crystal's pieces settle
  *  into a slow orbit round the portal's funnel (7 to 21 yd over the dais, always over a
- *  body's head), the plinth's fall away. */
+ *  body's head), the plinth's fall away. A piece given its `slot` (an element's chunk, the
+ *  heart: `ringCrystalOrbitSlot`) settles THERE, rights itself and turns with the whole
+ *  formation, its outer face kept outward; one without drifts on its own. */
 export function ringCrystalPiecePose(
   i: number,
   kind: RingCrystalPieceKind,
   c: { x: number; y: number; z: number },
   t: number,
   out: RingCrystalPiecePose = newRingCrystalPiecePose(),
+  slot: RingCrystalOrbitSlot | null = null,
 ): RingCrystalPiecePose {
   if (t < 0) {
     out.dx = 0;
@@ -324,13 +372,18 @@ export function ringCrystalPiecePose(
   let scale = 1 + 0.06 * Math.max(0, 1 - t / 0.12);
   const tumble = 0.8 + 2.4 * h01(i, 10);
   let spin = 1;
+  let settle = 0;
+  let a1 = 0;
   if (kind !== 'plinth') {
     const e = ease((t - ORBIT_FROM) / ORBIT_SECONDS);
-    // Where it settles: a ring round the funnel, its own height and radius, turning
-    // slowly (a spin per piece, either way round).
-    const a1 = ang0 + (0.1 + h01(i, 6) * 0.08) * (i % 2 ? 1 : -1) * t;
-    const r1 = 6.5 + h01(i, 5) * 5.5;
-    const y1 = 7 + h01(i, 7) * 14;
+    // Where it settles: its slot in the formation, turning with the rest; or, with no
+    // slot, a ring round the funnel at its own height and radius, turning slowly (a spin
+    // per piece, either way round).
+    a1 = slot
+      ? slot.angle + ORBIT_TURN * t
+      : ang0 + (0.1 + h01(i, 6) * 0.08) * (i % 2 ? 1 : -1) * t;
+    const r1 = slot ? slot.radius : 6.5 + h01(i, 5) * 5.5;
+    const y1 = slot ? slot.height : 7 + h01(i, 7) * 14;
     const tx = Math.sin(a1) * r1 - c.x;
     const tz = Math.cos(a1) * r1 - c.z;
     const ty = y1 + Math.sin(t * (0.7 + h01(i, 9) * 0.5) + i) * 0.45 * e - c.y;
@@ -338,8 +391,9 @@ export function ringCrystalPiecePose(
     dz = dz * (1 - e) + tz * e;
     // The blast overshoots up, then sinks into the orbit.
     dy = dy * (1 - e) + ty * e;
-    scale *= 1 - (1 - ORBIT_SCALE) * e;
+    scale *= 1 - (1 - (slot ? slot.scale : ORBIT_SCALE)) * e;
     spin = 1 - 0.75 * e;
+    if (slot) settle = e;
   } else if (t > PLINTH_GONE_FROM) {
     scale *= Math.max(0, 1 - (t - PLINTH_GONE_FROM) / PLINTH_GONE_SECONDS);
   }
@@ -349,13 +403,32 @@ export function ringCrystalPiecePose(
   out.rx = t * tumble * (0.6 + h01(i, 11)) * spin + h01(i, 12) * 0.4;
   out.ry = t * tumble * (0.3 + h01(i, 13)) * spin;
   out.rz = t * tumble * (0.5 + h01(i, 14)) * spin;
+  if (settle > 0) {
+    // A slotted piece rights itself as it settles: upright with a gentle rock, its outer
+    // face turned to where it now hangs (the heart, on the axis, turns slowly in place).
+    const yaw =
+      slot && slot.radius > 0 ? a1 - Math.atan2(c.x, c.z) : 0.25 * t + h01(i, 15) * Math.PI;
+    out.rx = out.rx * (1 - settle) + 0.06 * Math.sin(t * 0.6 + i) * settle;
+    out.ry = out.ry * (1 - settle) + yaw * settle;
+    out.rz = out.rz * (1 - settle) + 0.06 * Math.cos(t * 0.5 + i) * settle;
+  }
   out.scale = scale;
   out.visible = scale > 0.001;
   return out;
 }
 
-/** The pieces' kind from the model's node name (`Piece_07_body`). */
+const PIECE_NAME = /^Piece_\d+_(plinth|body|heart)(?:_(hammer|breath|quench|heat))?$/;
+
+/** The pieces' kind from the model's node name (`Piece_07_body_quench`, `Piece_17_heart`). */
 export function ringCrystalPieceKind(nodeName: string): RingCrystalPieceKind | null {
-  const m = /^Piece_\d+_(plinth|body|heart)$/.exec(nodeName);
+  const m = PIECE_NAME.exec(nodeName);
   return m ? (m[1] as RingCrystalPieceKind) : null;
+}
+
+/** The element a piece's node name gives it (a chunk of one element's crystal,
+ *  `Piece_07_body_quench`), in SMITH_HEART_VEINS order, or -1. */
+export function ringCrystalPieceElement(nodeName: string): number {
+  const m = PIECE_NAME.exec(nodeName);
+  if (!m?.[2]) return -1;
+  return HEART_SEAL_QUARTERS.findIndex((q) => q.vein === m[2]);
 }

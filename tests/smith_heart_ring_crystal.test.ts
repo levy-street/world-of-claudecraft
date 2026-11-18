@@ -34,6 +34,8 @@ import {
   type RingCrystalPieceKind,
   type RingCrystalState,
   ringCrystalChanged,
+  ringCrystalOrbitSlot,
+  ringCrystalPieceElement,
   ringCrystalPieceKind,
   ringCrystalPiecePose,
   ringCrystalPieceRole,
@@ -294,12 +296,88 @@ describe('the crystal: the pieces fly', () => {
     expect(a).toEqual(b);
   });
 
-  it("reads a piece's kind off its node name only", () => {
+  it("reads a piece's kind and element off its node name only", () => {
     expect(ringCrystalPieceKind('Piece_07_body')).toBe('body');
+    expect(ringCrystalPieceKind('Piece_07_body_quench')).toBe('body');
     expect(ringCrystalPieceKind('Piece_00_plinth')).toBe('plinth');
     expect(ringCrystalPieceKind('Piece_17_heart')).toBe('heart');
+    expect(ringCrystalPieceKind('Piece_07_body_ember')).toBeNull();
     expect(ringCrystalPieceKind('Icosphere')).toBeNull();
     expect(ringCrystalPieceKind('SmithHeartRingCrystal')).toBeNull();
+    // The element, in SMITH_HEART_VEINS order.
+    for (const [e, vein] of SMITH_HEART_VEINS.entries())
+      expect(ringCrystalPieceElement(`Piece_09_body_${vein}`)).toBe(e);
+    expect(ringCrystalPieceElement('Piece_07_body')).toBe(-1);
+    expect(ringCrystalPieceElement('Piece_17_heart')).toBe(-1);
+  });
+
+  it('never takes a chunk of one element for the grey core, however wide', () => {
+    expect(ringCrystalPieceRole('body', RING_CRYSTAL_CORE_RADIUS + 3, 2)).toBe('body');
+    expect(ringCrystalPieceRole('body', RING_CRYSTAL_CORE_RADIUS + 3)).toBe('core');
+  });
+
+  it("settles each element's chunks together in its own vein's quarter, turning as one", () => {
+    const bearing = (x: number, z: number): number => Math.atan2(x, z);
+    const wrap = (a: number): number => Math.atan2(Math.sin(a), Math.cos(a));
+    // A chunk's assembled centre on its element's side (the formation is the slots', not this).
+    const restOf = (e: number) => {
+      const b = (([180, 0, 90, 270][e] ?? 0) * Math.PI) / 180;
+      return { x: Math.sin(b) * 3, y: 5, z: Math.cos(b) * 3 };
+    };
+    const at = (e: number, r: number, n: number, t: number) => {
+      const c = restOf(e);
+      const slot = ringCrystalOrbitSlot(e, r, n);
+      const p = ringCrystalPiecePose(10 + e * 5 + r, 'body', c, t, undefined, slot);
+      return { x: c.x + p.dx, y: c.y + p.dy, z: c.z + p.dz, pose: p, slot, c };
+    };
+    const T = 40;
+    const ref = at(0, 1, 3, T);
+    const turn = wrap(bearing(ref.x, ref.z) - ref.slot.angle);
+    const later = at(0, 1, 3, T + 5);
+    const step = wrap(bearing(later.x, later.z) - bearing(ref.x, ref.z));
+    expect(Math.abs(step)).toBeGreaterThan(0.2);
+    for (let e = 0; e < 4; e++) {
+      const quarter = ([180, 0, 90, 270][e] * Math.PI) / 180;
+      for (let r = 0; r < 5; r++) {
+        const now = at(e, r, 5, T);
+        // In its slot, the whole formation turned by the same angle...
+        expect(
+          Math.abs(wrap(bearing(now.x, now.z) - turn - now.slot.angle)),
+          `${e} ${r}`,
+        ).toBeLessThan(0.02);
+        // ... the slot inside its own vein's quarter ...
+        expect(Math.abs(wrap(now.slot.angle - quarter)), `${e} ${r}`).toBeLessThan(
+          Math.PI / 4 + 0.01,
+        );
+        // ... over every head, under the funnel's top, and turning with the rest.
+        expect(Math.hypot(now.x, now.z)).toBeGreaterThan(6);
+        expect(Math.hypot(now.x, now.z)).toBeLessThan(12.1);
+        expect(now.y).toBeGreaterThan(6.5);
+        expect(now.y).toBeLessThan(21.6);
+        const next = at(e, r, 5, T + 5);
+        expect(Math.abs(wrap(bearing(next.x, next.z) - bearing(now.x, now.z) - step))).toBeLessThan(
+          0.02,
+        );
+        // Upright, its outer face turned to where it hangs.
+        expect(Math.abs(now.pose.rx)).toBeLessThan(0.07);
+        expect(Math.abs(now.pose.rz)).toBeLessThan(0.07);
+        expect(
+          Math.abs(wrap(now.pose.ry - (bearing(now.x, now.z) - bearing(now.c.x, now.c.z)))),
+        ).toBeLessThan(0.02);
+        expect(now.pose.scale).toBeGreaterThan(0.6);
+      }
+    }
+  });
+
+  it('hangs the heart upright on the axis, crowning the funnel', () => {
+    const c = { x: 0, y: 11.5, z: 0 };
+    const p = ringCrystalPiecePose(17, 'heart', c, 30, undefined, ringCrystalOrbitSlot(-1, 0, 1));
+    expect(Math.hypot(c.x + p.dx, c.z + p.dz)).toBeLessThan(0.01);
+    expect(c.y + p.dy).toBeGreaterThan(20);
+    expect(c.y + p.dy).toBeLessThan(24);
+    expect(Math.abs(p.rx)).toBeLessThan(0.07);
+    expect(Math.abs(p.rz)).toBeLessThan(0.07);
+    expect(p.visible).toBe(true);
   });
 });
 
@@ -352,6 +430,9 @@ interface Piece {
   triangles: number;
   /** Per vertex: world position and weights. */
   verts: { p: [number, number, number]; w: [number, number, number, number] }[];
+  /** Edges only one triangle uses, counted over positions (the file splits its vertices at
+   *  UV seams and hard normals, which are no openings). */
+  openEdges: number;
 }
 
 const pieces: Piece[] = [];
@@ -382,11 +463,28 @@ beforeAll(async () => {
     const m = node.getWorldMatrix();
     const verts: Piece['verts'] = [];
     let triangles = 0;
+    const edgeUses = new Map<string, number>();
     for (const prim of mesh.listPrimitives()) {
       const pos = prim.getAttribute('POSITION');
       const weights = prim.getAttribute('_WEIGHTS');
       if (!pos) continue;
       triangles += (prim.getIndices()?.getCount() ?? pos.getCount()) / 3;
+      const key = (i: number): string => {
+        const e: number[] = [];
+        pos.getElement(i, e);
+        return e.map((x) => Math.round(x * 1000)).join(',');
+      };
+      const idx = prim.getIndices();
+      const count = idx?.getCount() ?? pos.getCount();
+      for (let k = 0; k < count; k += 3) {
+        const tri = [0, 1, 2].map((j) => key(idx ? idx.getScalar(k + j) : k + j));
+        for (let j = 0; j < 3; j++) {
+          const [a, b] = [tri[j], tri[(j + 1) % 3]].sort();
+          if (a === b) continue;
+          const edge = `${a}|${b}`;
+          edgeUses.set(edge, (edgeUses.get(edge) ?? 0) + 1);
+        }
+      }
       const e: number[] = [];
       const w: number[] = [];
       for (let i = 0; i < pos.getCount(); i++) {
@@ -402,28 +500,59 @@ beforeAll(async () => {
         });
       }
     }
-    pieces.push({ name: node.getName(), triangles, verts });
+    let openEdges = 0;
+    for (const uses of edgeUses.values()) if (uses === 1) openEdges++;
+    pieces.push({ name: node.getName(), triangles, verts, openEdges });
   }
 });
 
 describe('the crystal: the shipped GLB', () => {
   it.skipIf(!haveModel)(
-    'is the Tripo build cut into pieces along its own shells, inside its budget',
+    "is cut into the plinth's sectors, whole chunks of each element and the heart, in budget",
     () => {
-      // Six sectors of the plinth, fourteen clusters of crystals, the heart's shaft.
-      expect(pieces.map((p) => p.name).sort()).toEqual(
-        Array.from({ length: 21 }, (_, i) => {
-          const kind = i < 6 ? 'plinth' : i < 20 ? 'body' : 'heart';
-          return `Piece_${String(i).padStart(2, '0')}_${kind}`;
-        }),
+      // Six sectors of the plinth, then each element's chunks (two to five, by its share of
+      // the crystal), then the heart's shaft; every name read by the painter.
+      const names = pieces.map((p) => p.name);
+      const kinds = names.map((n) => ringCrystalPieceKind(n));
+      expect(kinds.every((k) => k !== null)).toBe(true);
+      expect(kinds.filter((k) => k === 'plinth')).toHaveLength(6);
+      expect(kinds.filter((k) => k === 'heart')).toHaveLength(1);
+      const chunks = SMITH_HEART_VEINS.map(
+        (_, e) => names.filter((n) => ringCrystalPieceElement(n) === e).length,
       );
-      for (const p of pieces) expect(ringCrystalPieceKind(p.name), p.name).not.toBeNull();
+      for (const [e, n] of chunks.entries()) {
+        expect(n, SMITH_HEART_VEINS[e]).toBeGreaterThanOrEqual(1);
+        expect(n, SMITH_HEART_VEINS[e]).toBeLessThanOrEqual(5);
+      }
+      // Every crystal piece names its element: no untagged cluster is left.
+      expect(kinds.filter((k) => k === 'body')).toHaveLength(chunks.reduce((a, n) => a + n, 0));
       const tris = pieces.reduce((n, p) => n + p.triangles, 0);
-      expect(tris).toBeLessThanOrEqual(16_000);
+      expect(tris).toBeLessThanOrEqual(20_000);
       expect(tris).toBeGreaterThan(10_000);
       expect(extras.authoring).toBeTruthy();
     },
   );
+
+  it.skipIf(!haveModel)('makes each crystal chunk one element, by its own weights', () => {
+    for (const p of pieces) {
+      const element = ringCrystalPieceElement(p.name);
+      if (element < 0) continue;
+      const mean = [0, 0, 0, 0];
+      for (const v of p.verts) for (let k = 0; k < 4; k++) mean[k] += v.w[k] / p.verts.length;
+      for (let k = 0; k < 4; k++) {
+        if (k !== element) expect(mean[element], `${p.name} over ${k}`).toBeGreaterThan(mean[k]);
+      }
+    }
+  });
+
+  it.skipIf(!haveModel)('closes every piece: its cuts and holes capped but for a few slits', () => {
+    // The Tripo heap was over eleven thousand open edges, the k-means clusters more; the
+    // capped pieces leave only the slits where a cut ran into one of the model's own
+    // non-manifold edges.
+    const open = pieces.reduce((n, p) => n + p.openEdges, 0);
+    expect(open).toBeLessThan(300);
+    for (const p of pieces) expect(p.openEdges, p.name).toBeLessThan(60);
+  });
 
   it.skipIf(!haveModel)(
     "stands the size the sim and the plan read: its foot on the dais, its plinth the wall's",
@@ -459,20 +588,23 @@ describe('the crystal: the shipped GLB', () => {
             cx[k] += v.w[k] * v.p[0];
             cz[k] += v.w[k] * v.p[2];
           }
-      const mean = (k: number): [number, number] => [cx[k] / sum[k], cz[k] / sum[k]];
-      const [hx, hz] = mean(SMITH_HEART_VEINS.indexOf('hammer'));
-      const [bx, bz] = mean(SMITH_HEART_VEINS.indexOf('breath'));
-      const [qx, qz] = mean(SMITH_HEART_VEINS.indexOf('quench'));
-      const [fx, fz] = mean(SMITH_HEART_VEINS.indexOf('heat'));
-      // The Grand Stair comes down from the south (-z), the North Stair from the north.
-      expect(hz).toBeLessThan(-0.8);
-      expect(Math.abs(hx)).toBeLessThan(0.5);
-      expect(bz).toBeGreaterThan(0.8);
-      expect(Math.abs(bx)).toBeLessThan(0.5);
-      expect(qx).toBeGreaterThan(0.8);
-      expect(Math.abs(qz)).toBeLessThan(0.5);
-      expect(fx).toBeLessThan(-0.8);
-      expect(Math.abs(fz)).toBeLessThan(0.5);
+      // Each element's weight centre stands out on its own vein's side (the Grand Stair comes
+      // down from the south, -z; the North Stair from the north): away from the axis and
+      // within 20 degrees of its vein's bearing (degrees clockwise from north, +z).
+      const wrap = (d: number): number => ((d + 540) % 360) - 180;
+      for (const [vein, bearingDeg] of [
+        ['hammer', 180],
+        ['breath', 0],
+        ['quench', 90],
+        ['heat', 270],
+      ] as const) {
+        const k = SMITH_HEART_VEINS.indexOf(vein);
+        const x = cx[k] / sum[k];
+        const z = cz[k] / sum[k];
+        expect(Math.hypot(x, z), vein).toBeGreaterThan(1.5);
+        const at = (Math.atan2(x, z) * 180) / Math.PI;
+        expect(Math.abs(wrap(at - bearingDeg)), vein).toBeLessThan(20);
+      }
     },
   );
 
@@ -502,10 +634,9 @@ describe('the crystal: the shipped GLB', () => {
     },
   );
 
-  it.skipIf(!haveModel)('has one grey core wider than any cluster, and nothing else is', () => {
-    // The painter classes a body piece by how far its vertices reach from its centre
-    // (ring_crystal.ts bakeModel): the mass of dark rock under the crystals is the one piece
-    // the burst must not throw as a plate sixteen yards wide.
+  it.skipIf(!haveModel)('has no grey core: every piece flies as its own kind', () => {
+    // The painter classes a wide body piece naming no element as the grey core (it vanishes
+    // in the flash, ring_crystal.ts bakeModel); every crystal piece is an element's chunk now.
     const radiusOf = (p: Piece): number => {
       const n = p.verts.length;
       const cx = p.verts.reduce((a, v) => a + v.p[0], 0) / n;
@@ -515,11 +646,10 @@ describe('the crystal: the shipped GLB', () => {
     const roles = pieces.map((p) => {
       const kind = ringCrystalPieceKind(p.name);
       if (!kind) throw new Error(p.name);
-      return ringCrystalPieceRole(kind, radiusOf(p));
+      return ringCrystalPieceRole(kind, radiusOf(p), ringCrystalPieceElement(p.name));
     });
-    expect(roles.filter((r) => r === 'core')).toHaveLength(1);
+    expect(roles.filter((r) => r === 'core')).toHaveLength(0);
     expect(roles.filter((r) => r === 'plinth')).toHaveLength(6);
-    expect(roles.filter((r) => r === 'body')).toHaveLength(13);
     expect(roles.filter((r) => r === 'heart')).toHaveLength(1);
   });
 

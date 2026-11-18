@@ -24,10 +24,16 @@ One crystal on a broad plinth of dark granite slabs spread to the seal's inner c
 straight up, with the Hammer's amber (south), the Quench's ice (east), the Breath's storm (north)
 and the Heat's fire (west) grown round it. The sheet's chirality is the mirror of the Ring's
 compass, so the build turns and mirrors it to put each element on its own vein's side, in the
-game's frame (north +z). Tripo builds a heap of separate shells (over a thousand), never one
-solid, so the build cuts them into pieces: the plinth's stones and fourteen balanced clusters of
-crystals, each its own node. The renderer draws the whole crystal as one merged mesh and, at the
-burst, lets the pieces fly.
+game's frame (north +z). Tripo writes a heap of over a thousand separate shells, but they are
+only its UV seams: welded, the model is a dozen solids (the plinth, the heart's shaft, a few fused
+formations and the loose crystals round them). The build cuts those into the pieces the burst
+throws, each its own node: the plinth in six sectors, the heart's shaft, and each element's
+crystal as two to five WHOLE chunks of that element (by its share of the crystal; every face
+goes to the element its weights favour, so a chunk is one colour family), every cut and every
+hole Tripo left capped in one colour of the painting round it (the owner's call of 2026-11-18:
+chunks of each element's crystal floating, with no holes in them). The renderer draws the whole
+crystal as one merged mesh and, at the burst, lets the pieces fly; each element's chunks settle
+together in its own vein's quarter round the portal.
 
 Every vertex carries two custom attributes (glTF `_WEIGHTS` and `_PATH`): the four element
 weights (assigned from each crystal's own painted hue; the white-gold heart is what is left of 1)
@@ -49,7 +55,7 @@ in its `job.json` and never pays twice), then cut and weigh it in Blender and sh
 
 ```bash
 node scripts/assets/smith_heart_hammer_colossi/tripo_views.mjs tmp/ring_crystal/crystal 14000 2048
-"<blender>" -b --factory-startup --python docs/design/raid/kit/build_smith_heart_ring_crystal.py -- --src tmp/ring_crystal/crystal/raw.glb --out tmp/ring_crystal/smith_heart_ring_crystal_src.glb --reach 8.6 --clusters 14 --crown-r 0.15 --crown-z 0.4
+"<blender>" -b --factory-startup --python docs/design/raid/kit/build_smith_heart_ring_crystal.py -- --src tmp/ring_crystal/crystal/raw.glb --out tmp/ring_crystal/smith_heart_ring_crystal_src.glb --reach 8.6 --chunks 12 --crown-r 0.15 --crown-z 0.4
 node scripts/assets/smith_heart_ring_crystal/build.mjs
 node scripts/assets/compress_glb_textures.mjs public/models/props/smith_heart_ring_crystal.glb
 node scripts/build_media_manifest.mjs generate
