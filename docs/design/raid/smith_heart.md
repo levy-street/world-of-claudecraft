@@ -1996,9 +1996,16 @@ Every number is a SKETCH; the tier rows are `ISLE_TIERS` and the shared ones `IS
   any hit breaks would be hopeless once the storm closed); the neighbours' strikes still
   reach them.
 - **The Stillstones.** The last isle of each side holds one, woken when that isle's adds are
-  down (Heroic: two Squall Fragments rise to guard it). A player clicks it (or targets it and
-  presses interact): Still the Gale, a 5 s channel any landed hit breaks (the trash engine's G3
-  use). Jose's playtest of 2026-11-18: no use prompt at all (`promptless`; the cast bar says it),
+  down (Heroic: two Squall Fragments rise to guard it, and it stays locked, caged in its wind,
+  until they fall: `KIT_USE_LOCKED_AURA`). Every player on its isle may click it (or target it
+  and press interact) at once: Still the Gale, ONE shared channel per stone (Jose's design
+  change of 2026-11-18, `breath_isles.ts` `stepStones`). It fills at `stoneRate(n)` = n^0.8 of
+  one player's pace (`ISLE_TIERS` `stoneSoloSeconds`: 15 s alone on Normal, 18 s on Heroic and
+  Mythic; five together about 4.1 and 5 s), every channeler's own bar showing the shared share
+  and the time left at this pace, the stone's crystal turning gold with it (its
+  `ISLE_AURAS.stoneCharge`, every client's). A landed hit breaks only that player's channel
+  (they click again); the shared progress is kept and never decays (a stone half filled before
+  a wipe of its channelers is still half filled). Full: stilled once, every channel on it cut. Jose's playtest of 2026-11-18: no use prompt at all (`promptless`; the cast bar says it),
   the Breath's telegraph objects let the click through (`world_direct_pick.ts` `takesNoClick`),
   a stilled stone is spent (`KIT_USE_SPENT_AURA`: no second channel), and from its stilling a
   beam of gold calm and lightning pours from it into the nova until the cocoon ends

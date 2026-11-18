@@ -27,6 +27,7 @@ import {
   ISLE_OBJECTS,
   ISLE_TUNING as IT,
 } from '../../sim/encounters/smith_heart/breath_isle_ids';
+import { KIT_USE_LOCKED_AURA } from '../../sim/mob/trash_kit/encounter_use';
 
 /** The phase's palette: the storm's white blue, the closing's violet, the
  *  Stillstone's calm teal and its stilled gold, the ward's grey wind. */
@@ -359,11 +360,13 @@ export function stoneLook(state: StoneState, t: number, channel = 0, out?: Stone
     o.cageSpin = 2.4;
     o.spin = 0.15;
   } else if (state === 'awake') {
-    o.glow = 0.9 + 0.5 * o.pulse;
-    o.gold = 0;
-    o.cage = 0.55;
-    o.cageSpin = 1.6;
-    o.spin = 0.4;
+    // Its shared charge kept while nobody channels (it never decays): the
+    // gold already won stays in it, the cage loosened as far.
+    o.glow = 0.9 + 0.5 * o.pulse + 0.5 * c;
+    o.gold = 0.6 * c;
+    o.cage = 0.55 * (1 - c);
+    o.cageSpin = 1.6 * (1 - c * 0.8);
+    o.spin = 0.4 + 0.6 * c;
   } else if (state === 'channel') {
     o.glow = 1.2 + 0.8 * c + 0.2 * Math.sin(t * 14);
     o.gold = 0.6 * c;
@@ -388,6 +391,8 @@ export function stoneState(
 ): StoneState {
   if (!body) return 'dormant';
   if (body.auras.some((a) => a.id === ISLE_AURAS.cocoon)) return 'stilled';
+  // Locked while its isle's adds stand (Heroic's guard): caged as it slept.
+  if (body.auras.some((a) => a.id === KIT_USE_LOCKED_AURA)) return 'dormant';
   return channelling ? 'channel' : 'awake';
 }
 
@@ -419,7 +424,9 @@ export const PHASE_POOLS = {
   /** Mending Gale beams at once (a Mender to each ally). */
   mendBeams: 6,
   /** Channellers on the stones at once. */
-  channels: 4,
+  /** Channellers on the stones at once (every player on both last isles:
+   *  the shared channel of 2026-11-18). */
+  channels: 10,
 } as const;
 
 /** A stilled Stillstone's choke on the nova (Jose's playtest of 2026-11-18:

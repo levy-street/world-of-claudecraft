@@ -329,10 +329,12 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   },
   // The Stillstone (the last isle of each side): the stone Captain Thessaly's
   // calm is bound into. Never hostile, never fights (the encounter holds it
-  // and nothing can strike it); a player clicks it (or targets it and
-  // presses interact) to still the gale through it, the G3 use (mob/
-  // trash_kit/encounter_use.ts): a 5 s channel a landed hit breaks, ONCE (a
-  // stilled stone wears KIT_USE_SPENT_AURA). Its literals are breath_isle_ids.ts
+  // and nothing can strike it); every player on its isle may click it (or
+  // target it and press interact) to still the gale through it together, the
+  // G3 use (mob/trash_kit/encounter_use.ts): ONE shared channel filling
+  // faster the more channel it, a landed hit breaking only that player's
+  // channel, locked while its isle's adds stand (KIT_USE_LOCKED_AURA), stilled
+  // ONCE (KIT_USE_SPENT_AURA). Its literals are breath_isle_ids.ts
   // ISLE_MOBS.stillstone and ISLE_CASTS.still. The crystal is drawn by the
   // fight's own painter (render/smith_heart_fx/breath_isles_fx.ts).
   [ISLE_MOBS.stillstone]: {
@@ -358,7 +360,10 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
       usable: {
         castId: ISLE_CASTS.still,
         name: 'Still the Gale',
-        channel: 5,
+        // Its bar is the stone's ONE shared channel (breath_isles.ts
+        // stepStones keeps every channeler's bar on it: Normal 15 s alone,
+        // faster with more); this is only the bar's first length.
+        channel: 15,
         range: 5,
         effect: { kind: 'relight', school: 'nature' },
         // No prompt: a click on the crystal starts the channel; its cast bar

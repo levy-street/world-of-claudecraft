@@ -27,6 +27,7 @@ import {
   closingTemplate,
   ISLE_CASTS,
   ISLE_MOBS,
+  ISLE_TIERS,
   ISLE_TUNING as IT,
   padTemplate,
 } from '../src/sim/encounters/smith_heart/breath_isle_ids';
@@ -116,7 +117,7 @@ describe('a stilled Stillstone is spent', () => {
     a.targetId = stone.id;
     f.sim.interact(a.id);
     expect(a.castingAbility).toBe(ISLE_CASTS.still);
-    f.tick(ticks(5.3));
+    f.tick(ticks(ISLE_TIERS.normal.stoneSoloSeconds + 0.3));
     expect(f.state()?.isles.isles[2].stilled).toBe(true);
     // Spent: no longer usable, on either host (the marker rides the wire).
     expect(stone.auras.some((x) => x.id === KIT_USE_SPENT_AURA)).toBe(true);
@@ -130,7 +131,7 @@ describe('a stilled Stillstone is spent', () => {
     expect(a.castingAbility).toBeNull();
   });
 
-  it('cuts a second channel already running when the first one lands', () => {
+  it('two channel it together; when it stills, both channels end', () => {
     const f = pulled();
     const [, a, b] = f.players;
     const stone = eastStone(f, a, b);
@@ -142,7 +143,7 @@ describe('a stilled Stillstone is spent', () => {
     b.targetId = stone.id;
     f.sim.interact(b.id);
     expect(b.castingAbility).toBe(ISLE_CASTS.still);
-    f.tick(ticks(4.4));
+    f.tick(ticks(ISLE_TIERS.normal.stoneSoloSeconds / 2 ** 0.8 + 0.5));
     expect(f.state()?.isles.isles[2].stilled).toBe(true);
     f.tick(2);
     expect(b.castingAbility).toBeNull();
@@ -213,7 +214,7 @@ describe('the Stillstone shows no prompt; a click channels it', () => {
     expect(handlePickedEntity(world, hud, stone.id, 0, 0, 0)).toBe(true);
     expect(a.castingAbility).toBe(ISLE_CASTS.still);
     expect(a.castTargetId).toBe(stone.id);
-    f.tick(ticks(5.3));
+    f.tick(ticks(ISLE_TIERS.normal.stoneSoloSeconds + 0.3));
     expect(f.state()?.isles.isles[2].stilled).toBe(true);
     // Spent: the click only targets, the cursor says nothing, no channel.
     expect(hoverCursorKind(stone, a.id, new Set())).toBe('default');

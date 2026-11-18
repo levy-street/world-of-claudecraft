@@ -31,6 +31,7 @@ import {
   NOVA_SHAPE,
   novaCharge,
   novaLook,
+  PHASE_POOLS,
   RECKONING_SECONDS,
   reckoningBolts,
   SHARDS,
@@ -60,6 +61,7 @@ import {
   ISLE_TUNING,
   padTemplate,
 } from '../src/sim/encounters/smith_heart/breath_isle_ids';
+import { KIT_USE_LOCKED_AURA } from '../src/sim/mob/trash_kit/encounter_use';
 import type { Entity, SimEvent } from '../src/sim/types';
 import type { IWorld } from '../src/world_api';
 
@@ -481,5 +483,17 @@ describe('breath_isle_phase_core: the choke', () => {
     }
     // It flares as it first bites.
     expect(chokeLook(CHOKE.rise, 0).glow).toBeGreaterThan(chokeLook(CHOKE.rise + 3, 0).glow);
+  });
+});
+
+describe('breath_isle_phase_core: the shared Stillstone', () => {
+  it('reads a locked stone caged, and keeps the shared charge in an idle one', () => {
+    expect(stoneState({ auras: [{ id: KIT_USE_LOCKED_AURA }] }, false)).toBe('dormant');
+    expect(stoneState({ auras: [] }, false)).toBe('awake');
+    const idle = stoneLook('awake', 1, 0);
+    const half = stoneLook('awake', 1, 0.5);
+    expect(half.gold).toBeGreaterThan(idle.gold);
+    expect(half.cage).toBeLessThan(idle.cage);
+    expect(PHASE_POOLS.channels).toBeGreaterThanOrEqual(10);
   });
 });

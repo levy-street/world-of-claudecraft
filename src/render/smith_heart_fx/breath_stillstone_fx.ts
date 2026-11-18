@@ -7,9 +7,11 @@
 //    racing round it) until its body rises once the isle's adds are dead;
 //    awake (bright, pulsing, its cage loosened, a rune circle burning under
 //    it, motes drawn to it: it calls the raid);
-//  - channelled (ISLE_CASTS.still, castTargetId the stone): a beam of calm
-//    from the channeller's hands into the crystal, the cage unwinding and
-//    the crystal turning gold as the bar fills;
+//  - channelled (ISLE_CASTS.still, castTargetId the stone; every player on
+//    the isle at once since 2026-11-18): a beam of calm from each
+//    channeller's hands into the crystal, the cage unwinding and the crystal
+//    turning gold with the ONE shared charge (ISLE_AURAS.stoneCharge, kept
+//    while nobody channels); locked while its isle's adds stand (caged);
 //  - stilled (its body wears the cocoon marker, ISLE_CUES.stilled): a burst
 //    of gold, the seal's bolt racing home to the guardian (breath_cocoon_fx.ts),
 //    then a calm gold crystal turning slowly with no cage.
@@ -20,7 +22,7 @@
 import * as THREE from 'three';
 import { BREATH_ISLES } from '../../sim/content/smith_heart_layout';
 import { isleSpots } from '../../sim/encounters/smith_heart/breath_isle_geometry';
-import { ISLE_CASTS } from '../../sim/encounters/smith_heart/breath_isle_ids';
+import { ISLE_CASTS, stoneProgressOf } from '../../sim/encounters/smith_heart/breath_isle_ids';
 import type { Entity } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { fxAnchor } from '../attached_fx_anchor';
@@ -356,15 +358,15 @@ export class BreathStillstoneFx {
     const t = this.h.uTime.value;
     for (const s of this.stones) {
       const body = s.bodyId >= 0 ? (world.entities.get(s.bodyId) ?? null) : null;
-      let channel = 0;
+      // The ONE shared charge (the stone's own aura, every client's): the
+      // gold, the glow and the cage read it whoever channels.
+      const channel = body ? stoneProgressOf(body) : 0;
       let channelling = false;
       for (const c of this.channels) {
         if (c.id < 0 || !body) continue;
         const p = world.entities.get(c.id);
-        if (p && p.castingAbility === ISLE_CASTS.still && p.castTargetId === body.id) {
+        if (p && p.castingAbility === ISLE_CASTS.still && p.castTargetId === body.id)
           channelling = true;
-          channel = Math.max(channel, 1 - p.castRemaining / Math.max(0.01, p.castTotal));
-        }
       }
       s.state = stoneState(body, channelling);
       s.flare = Math.max(0, s.flare - dt * 1.2);
@@ -432,7 +434,9 @@ export class BreathStillstoneFx {
       _to.x = _wp.x;
       _to.y = _wp.y;
       _to.z = _wp.z;
-      const k = 1 - p.castRemaining / Math.max(0.01, p.castTotal);
+      // Each channeler's thread brightens with the shared charge.
+      const stone = world.entities.get(p.castTargetId ?? -1);
+      const k = stone ? stoneProgressOf(stone) : 1 - p.castRemaining / Math.max(0.01, p.castTotal);
       c.beam.lay(_from, _to, 0.5 + 0.4 * k, 1.2, 0.15, t);
       c.beam.paint(1.2 + 1.2 * k + 0.3 * Math.sin(t * 13), 0);
       (c.beam.mat.uniforms.uColor.value as THREE.Color).copy(_teal).lerp(_gold, k * 0.7);

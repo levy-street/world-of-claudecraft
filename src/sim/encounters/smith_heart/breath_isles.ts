@@ -40,7 +40,7 @@ import { carriesLoad } from '../../combat/carried_load';
 import { BREATH_ISLES } from '../../content/smith_heart_layout';
 import { MOBS } from '../../data';
 import { createMob } from '../../entity';
-import { KIT_USE_SPENT_AURA } from '../../mob/trash_kit/encounter_use';
+import { KIT_USE_LOCKED_AURA, KIT_USE_SPENT_AURA } from '../../mob/trash_kit/encounter_use';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { DT, type Entity } from '../../types';
@@ -66,6 +66,7 @@ import {
   ISLE_NAMES,
   padTemplate,
   rideTemplate,
+  stoneRate,
   ISLE_TUNING as T,
 } from './breath_isle_ids';
 import {
@@ -99,6 +100,7 @@ export function freshIsles(): BreathIsles {
       reckon: 0,
       stoneId: null,
       stilled: false,
+      stoneProgress: 0,
     })),
     adds: [],
     pads: [],
@@ -330,9 +332,62 @@ function raiseStone(s: BreathScope, x: number, z: number): Entity | null {
   return e;
 }
 
-/** A stilled stone: its use completed by a player. */
+/** A body channeling Still the Gale on `stoneId` (a cut channel is none). */
+function channels(p: Entity | undefined, stoneId: number): p is Entity {
+  return !!p && !p.dead && p.castingAbility === ISLE_CASTS.still && p.castTargetId === stoneId;
+}
+
+/** The players channeling `stoneId` this tick (entity-id order). */
+function stoneChannelers(s: BreathScope, stoneId: number): Entity[] {
+  const out: Entity[] = [];
+  for (const meta of s.ctx.players.values()) {
+    const p = s.ctx.entities.get(meta.entityId);
+    if (channels(p, stoneId)) out.push(p);
+  }
+  return out.sort((a, b) => a.id - b.id);
+}
+
+/** Keep a stone's shared charge aura in step (value: progress, value2: how
+ *  many channel), written only when it changes. */
+function showCharge(s: BreathScope, body: Entity, progress: number, n: number): void {
+  const a = body.auras.find((x) => x.id === ISLE_AURAS.stoneCharge);
+  if (a) {
+    a.value = progress;
+    a.value2 = n;
+    return;
+  }
+  putMarker(body, ISLE_AURAS.stoneCharge, ISLE_NAMES.still, 3600, s.boss.id, {
+    permanent: true,
+    value: progress,
+    value2: n,
+  });
+}
+
+/** Lock a stone while its isle has adds standing (Heroic's Fragments rise to
+ *  guard it), unlock it once they fall. Returns whether it is locked. */
+function lockStone(s: BreathScope, i: number, body: Entity): boolean {
+  const locked = livingIsleAdds(s, i).length > 0;
+  const has = body.auras.some((a) => a.id === KIT_USE_LOCKED_AURA);
+  if (locked && !has)
+    putMarker(body, KIT_USE_LOCKED_AURA, ISLE_NAMES.still, 3600, s.boss.id, { permanent: true });
+  else if (!locked && has) dropAura(body, KIT_USE_LOCKED_AURA);
+  return locked;
+}
+
+/** The least a channeler's bar may show left, so the cast never completes by
+ *  itself (the shared bar, below, decides the stilling). */
+const BAR_FLOOR = 0.2;
+
+/** The Stillstones' ONE shared channel each (Jose's design change of
+ *  2026-11-18): every player on the isle may channel at once, the shared
+ *  progress filling at stoneRate(n) of one's pace (the tier's
+ *  stoneSoloSeconds alone); each channeler's own bar shows the shared share
+ *  and the time left at this pace. A hit cuts one channel (the trash
+ *  engine's G3 rule), never the bar, which never decays. Locked while its
+ *  isle's adds stand. Full: stilled once, every channel on it cut. */
 function stepStones(s: BreathScope): void {
   const isl = s.st.isles;
+  const tier = isleTier(s);
   let stilled = 0;
   for (let i = 0; i < isl.isles.length; i++) {
     const st = isl.isles[i];
@@ -342,14 +397,30 @@ function stepStones(s: BreathScope): void {
     }
     if (st.stoneId === null) continue;
     const body = s.ctx.entities.get(st.stoneId);
-    if (!body || body.kitUseCompletedBy === undefined) continue;
+    if (!body) continue;
+    const locked = lockStone(s, i, body);
+    const chan = locked ? [] : stoneChannelers(s, body.id);
+    if (locked) for (const p of stoneChannelers(s, body.id)) clearCastIf(p, ISLE_CASTS.still);
+    const n = chan.length;
+    st.stoneProgress = Math.min(1, st.stoneProgress + (DT * stoneRate(n)) / tier.stoneSoloSeconds);
+    const full = st.stoneProgress >= 1 - 1e-9 || body.kitUseCompletedBy !== undefined;
     body.kitUseCompletedBy = undefined;
+    showCharge(s, body, full ? 1 : st.stoneProgress, n);
+    if (!full) {
+      // Each one's bar: the shared share, its seconds the time left at this pace.
+      const whole = n > 0 ? tier.stoneSoloSeconds / stoneRate(n) : tier.stoneSoloSeconds;
+      for (const p of chan) {
+        p.castTotal = whole;
+        p.castRemaining = Math.max(BAR_FLOOR, (1 - st.stoneProgress) * whole);
+      }
+      continue;
+    }
+    for (const p of chan) clearCastIf(p, ISLE_CASTS.still);
     st.stilled = true;
     stilled++;
     putMarker(body, ISLE_AURAS.cocoon, ISLE_NAMES.still, 3600, s.boss.id, { permanent: true });
     // Spent: no press, click or channel takes it again (Jose's playtest of
-    // 2026-11-18: "it lets me light the crystal many times"); a second
-    // channel already running is cut on its next recheck.
+    // 2026-11-18: "it lets me light the crystal many times").
     putMarker(body, KIT_USE_SPENT_AURA, ISLE_NAMES.still, 3600, s.boss.id, { permanent: true });
     s.ctx.emit({
       type: 'spellfx',

@@ -48,6 +48,7 @@ import {
   ISLE_MOBS,
   padOf,
 } from '../../src/sim/encounters/smith_heart/breath_isle_ids';
+import { KIT_USE_LOCKED_AURA } from '../../src/sim/mob/trash_kit/encounter_use';
 import { BLAST_FALLOFF, WIND_BLAST_AURA } from '../../src/sim/wind_drift';
 import {
   add,
@@ -836,28 +837,23 @@ function isleDuty(world, st, b, me, isle) {
   // Cleared: on to the next isle.
   const pad = o.pads.find((p) => p.from === isle);
   if (pad) return { goal: pad, tol: 0.8, duty: 'ride on' };
-  // The chain's end: the stone, channeled by one damage dealer (the rest
-  // stand clear of it so no hit lands on the channeler).
+  // The chain's end: the stone, ONE shared channel every player on the isle
+  // fills together (the design change of 2026-11-18: faster the more channel
+  // it). Every bot on the isle stands round it and channels; a hit cuts one
+  // channel, the bar keeps its progress, so a cut bot presses again.
   const stone = world.stones.find((e) => isleOf(world, e) === isle);
-  if (stone && islesOn(world)) {
-    const team = world
-      .living()
-      .filter((p) => p.bot && isleOf(world, p) === isle && !p.tank && !p.healer)
-      .sort((x, y) => x.pid - y.pid);
-    const who = team[0] ?? world.living().find((p) => p.bot && isleOf(world, p) === isle);
-    if (who?.pid === b.pid) {
-      if (hypot(me, stone) > 3.2)
-        return { goal: add(stone, unit(stone, me), 2), tol: 0.6, duty: 'stone' };
-      const press = (bot) => {
-        if (bot.self.cast === ISLE_CASTS.still) return true;
-        if (Date.now() - (bot.lastPress ?? 0) < 700) return true;
-        bot.lastPress = Date.now();
-        if (bot.self.target !== stone.id) bot.cmd({ cmd: 'target', id: stone.id });
-        else bot.cmd({ cmd: 'interact' });
-        return true;
-      };
-      return { goal: me, hold: true, duty: 'stone', cast: press };
-    }
+  if (stone && islesOn(world) && !hasAura(stone, KIT_USE_LOCKED_AURA)) {
+    if (hypot(me, stone) > 3.6)
+      return { goal: add(stone, unit(stone, me), 2.4), tol: 0.6, duty: 'stone' };
+    const press = (bot) => {
+      if (bot.self.cast === ISLE_CASTS.still) return true;
+      if (Date.now() - (bot.lastPress ?? 0) < 700) return true;
+      bot.lastPress = Date.now();
+      if (bot.self.target !== stone.id) bot.cmd({ cmd: 'target', id: stone.id });
+      else bot.cmd({ cmd: 'interact' });
+      return true;
+    };
+    return { goal: me, hold: true, duty: 'stone', cast: press };
   }
   return { goal: land, tol: 1.5, duty: 'isle wait' };
 }

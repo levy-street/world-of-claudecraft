@@ -71,6 +71,9 @@ export const ISLE_AURAS = {
   riding: 'heart_breath_riding_gale',
   /** On the Shieldbearer: its frontal ward (combat/front_ward.ts). */
   ward: 'heart_breath_squall_ward',
+  /** On a Stillstone: its ONE shared channel (value: the share stilled, 0
+   *  to 1; value2: how many channel it now), every client's to draw. */
+  stoneCharge: 'heart_breath_stone_charge',
 } as const;
 
 export const ISLE_OBJECTS = {
@@ -153,6 +156,9 @@ export interface IsleTier {
   shoveSafe: boolean;
   /** Mending Gale: the share of each mended add's whole it restores. */
   mendShare: number;
+  /** The Stillstone's shared channel: seconds one player alone takes (more
+   *  fill it faster, stoneRate). */
+  stoneSoloSeconds: number;
 }
 
 // The bot passes of 2026-11-18 (POOL 0.65, the human clock): with the first
@@ -186,6 +192,7 @@ export const ISLE_TIERS: Readonly<Record<'normal' | 'heroic' | 'mythic', IsleTie
     shoveYards: 12,
     shoveSafe: true,
     mendShare: 0.2,
+    stoneSoloSeconds: 15,
   },
   heroic: {
     novaSeconds: 125,
@@ -204,6 +211,7 @@ export const ISLE_TIERS: Readonly<Record<'normal' | 'heroic' | 'mythic', IsleTie
     shoveYards: 20,
     shoveSafe: false,
     mendShare: 0.3,
+    stoneSoloSeconds: 18,
   },
   // Heroic whole for now (the mythic ideas are in the design doc).
   mythic: {
@@ -223,6 +231,7 @@ export const ISLE_TIERS: Readonly<Record<'normal' | 'heroic' | 'mythic', IsleTie
     shoveYards: 20,
     shoveSafe: false,
     mendShare: 0.3,
+    stoneSoloSeconds: 18,
   },
 };
 
@@ -230,6 +239,12 @@ export const ISLE_TUNING = {
   /** The guardian's health the phase begins at (a share of its whole):
    *  nothing takes it under this until the phase is over. */
   at: 0.5,
+  /** The Stillstone's shared channel: n channeling fill it at n to this
+   *  power of one's pace (Jose's design change of 2026-11-18: the more the
+   *  faster, with mild diminishing returns; five together about 4 s on
+   *  Normal, 5 s on Heroic, against 15 and 18 s alone). Its progress never
+   *  decays while nobody channels (a hit cuts one channel, never the bar). */
+  stoneExponent: 0.8,
   /** The Mender's channel: first after it rises, then this often, how long. */
   mendFirst: 5,
   mendEvery: 10,
@@ -306,4 +321,17 @@ export function closingOf(
   const [a, b, c] = templateId.slice(ISLE_OBJECTS.closingPrefix.length).split('_').map(Number);
   if (![a, b, c].every((n) => Number.isInteger(n) && n >= 0) || c < 1) return null;
   return { isle: a, left: b, whole: c };
+}
+
+/** How fast `n` channeling fill a Stillstone, in solo paces (0 for nobody). */
+export function stoneRate(n: number): number {
+  return n > 0 ? n ** ISLE_TUNING.stoneExponent : 0;
+}
+
+/** A Stillstone's shared progress (0 to 1) off its body (ISLE_AURAS.stoneCharge). */
+export function stoneProgressOf(body: {
+  auras: readonly { id: string; value?: number }[];
+}): number {
+  for (const a of body.auras) if (a.id === ISLE_AURAS.stoneCharge) return a.value ?? 0;
+  return 0;
 }

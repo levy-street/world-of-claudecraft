@@ -135,6 +135,8 @@ export interface BreathIsleState {
   /** The Stillstone's body (the last isles), and whether it is stilled. */
   stoneId: number | null;
   stilled: boolean;
+  /** Its shared channel's progress (0 to 1; never decays). */
+  stoneProgress: number;
 }
 
 /** Sky's Reckoning's strike on an isle (instance-local spot). */

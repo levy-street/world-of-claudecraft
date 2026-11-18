@@ -42,6 +42,11 @@ import { kitOf } from './kit_of';
  *  the body's auras over the wire like any other (an `internal_cd`, quiet). */
 export const KIT_USE_SPENT_AURA = 'kit_use_spent';
 
+/** A body wearing this marker is LOCKED for now: its dungeon module bars its
+ *  use until a condition holds (the Breath's Stillstone while its isle's adds
+ *  stand), then takes the marker off. Not usable meanwhile, on either host. */
+export const KIT_USE_LOCKED_AURA = 'kit_use_locked';
+
 /** The use a body carries, or null (a mob template's kit `usable`). */
 export function kitUseOf(e: Entity | undefined | null): KitUseDef | null {
   if (!e || e.kind !== 'mob') return null;
@@ -61,14 +66,15 @@ export function kitUseHoldsThroughHits(ctx: SimContext, p: Entity): boolean {
   return !!def && def.castId === p.castingAbility && def.holdsThroughHits === true;
 }
 
-/** Is `body` usable right now by anyone (alive, in the world, not spent)? */
+/** Is `body` usable right now by anyone (alive, in the world, neither spent
+ *  nor locked)? */
 export function kitUsableNow(body: Entity | undefined | null): boolean {
   return (
     !!body &&
     !body.dead &&
     body.hp > 0 &&
     kitUseOf(body) !== null &&
-    !body.auras.some((a) => a.id === KIT_USE_SPENT_AURA)
+    !body.auras.some((a) => a.id === KIT_USE_SPENT_AURA || a.id === KIT_USE_LOCKED_AURA)
   );
 }
 

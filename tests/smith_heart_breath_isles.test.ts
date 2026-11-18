@@ -410,7 +410,7 @@ describe('the Islands of the Wind: the stones and the end', () => {
     east.targetId = stone.id;
     f.sim.interact(east.id);
     expect(east.castingAbility).toBe(ISLE_CASTS.still);
-    f.tick(ticks(5.3));
+    f.tick(ticks(ISLE_TIERS.normal.stoneSoloSeconds + 0.3));
     expect(st.isles.isles[2].stilled).toBe(true);
     expect(st.isles.stage).toBe('nova');
     expect(b.auras.find((a) => a.id === ISLE_AURAS.cocoon)?.value).toBe(1);
