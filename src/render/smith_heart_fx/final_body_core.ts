@@ -72,6 +72,13 @@ export const FINAL_BODY_GESTURES = {
   dormant: 'smith_heart_final_body_dormant',
   rise: 'smith_heart_final_body_rise',
   dark: 'smith_heart_final_body_dark',
+  /** The Overload in its own body (final_overload_core.ts strainPulse): its
+   *  cracks throbbing brighter, three steps as the bar fills. */
+  strain: [
+    'smith_heart_final_body_strain_1',
+    'smith_heart_final_body_strain_2',
+    'smith_heart_final_body_strain_3',
+  ] as const,
 } as const;
 
 /** The clips' beats, seconds at 1x (30 fps authoring, work/bl/anim.py). */

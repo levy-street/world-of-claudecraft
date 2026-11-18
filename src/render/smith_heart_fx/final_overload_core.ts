@@ -3,9 +3,11 @@
 // on the boss or the arena"; final_overload_fx.ts paints it, the room's floor
 // and wall the interior through heart_quarters_core.ts `strain`). As the bar
 // of the quarter it drinks fills:
-//   - the boss swells and cracks in the quarter's colour: a shell of strain
-//     round its body, its cracks opening wider and burning hotter, pulsing
-//     faster as it nears full (`strainLook`);
+//   - the boss's own cracks burn brighter as it fills: its body's glow
+//     throbbing in steps, harder and faster as it nears full (`strainPulse`,
+//     the rig's glow pulses: light in the body itself, never a cage round it,
+//     the coordinator's review of 2026-11-18), light bleeding off it in
+//     sparks (`strainLook`);
 //   - the quarter's floor cracks throb harder (`floorThrob`);
 //   - at three quarters (FINAL_OVERLOAD.eruptAt) the quarter's wall erupts
 //     (`eruptLevel`: the landmark's own light flaring past its lit level and
@@ -49,6 +51,17 @@ export function strainLook(
   out.heat = s * (0.55 + 0.45 * throb);
   out.throb = throb;
   return out;
+}
+
+/** The body's own cracks throbbing at bar `fill` (0..1): which of the
+ *  three strain pulses to send (0 none, under a quarter of a bar; 3 the
+ *  brightest, past three quarters) and how often (seconds: about every 1.5 s
+ *  at a quarter, quickening to three a second at full). */
+export function strainPulse(fill: number): { level: 0 | 1 | 2 | 3; every: number } {
+  if (fill < 0.25) return { level: 0, every: 0 };
+  const level: 1 | 2 | 3 = fill < 0.5 ? 1 : fill < FINAL_OVERLOAD.eruptAt ? 2 : 3;
+  const s = smooth(0.25, 1, fill);
+  return { level, every: 1.5 - 1.17 * s };
 }
 
 /** The quarter's floor cracks' extra light at bar `fill`, render time `t`

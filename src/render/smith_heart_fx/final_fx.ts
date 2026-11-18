@@ -493,15 +493,12 @@ export class FinalFx {
     };
     this.bodyFx = new FinalBodyFx(this.root, host, playGesture);
     this.overloadFx = new FinalOverloadFx({
-      root: this.root,
-      uTime: this.uTime,
       particles: this.particles,
       groundY: (x, z) => this.groundY(x, z),
       rand: () => this.rand(),
       density: this.density,
       shakeNear: (x, z, amount) => this.shakeNear(x, z, amount),
-      geometries: this.geometries,
-      materials: this.materials,
+      pulseBody: (gesture) => this.bodyFx.pulse(gesture),
     });
     this.arrival = new FinalArrivalBeam(this.root, host);
     this.death = new FinalDeathFx(this.root, {

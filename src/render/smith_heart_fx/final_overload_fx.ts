@@ -3,40 +3,37 @@
 // of FinalFx (final_fx.ts, which reads the boss and hands its frame in). As
 // the bar of the quarter it drinks fills, every tier sees it on the boss and
 // the arena, never only on the HUD:
-//   - a shell of strain round the body in the quarter's colour: it swells,
-//     its cracks open wider and burn hotter, throbbing faster as it nears
-//     full, light bleeding off it in sparks;
+//   - the boss's own cracks throbbing brighter in the quarter's element (the
+//     rig's glow pulses, three steps, quicker as it fills: the light is in its
+//     body, never a cage round it; the coordinator's review of 2026-11-18),
+//     light bleeding off its body in sparks;
 //   - at three quarters the quarter's wall erupts: its landmark throws its
 //     element up (the Heat's lava, the Quench's shards and mist, the
 //     Breath's sparks, the Hammer's stone and gold), with a thud as it
 //     starts (the landmark's own light flaring and the floor's cracks
 //     throbbing are the interior's, through heart_quarters_core.ts `strain`);
 //   - the burst itself is FinalFx's wave of light out of the body.
-// The shell draws on every tier; the sparks and the eruption's particles thin
-// with the host's density; the thud goes under reduced motion.
+// The body's throb draws on every tier; the sparks and the eruption's
+// particles thin with the host's density; the thud goes under reduced motion.
 //
-// Rules (src/render/CLAUDE.md): every material is built in the constructor
-// under the host's root (FinalFx's gated attach); no light; no per-frame
+// Rules (src/render/CLAUDE.md): no material, no light; no per-frame
 // allocation.
 
-import * as THREE from 'three';
 import { HEART_ROOM, type SmithHeartVein } from '../../sim/content/smith_heart_layout';
 import { heartLandmarkSpots } from '../smith_heart/heart_landmarks_core';
 import type { EngineParticles } from '../trash_engine_fx/engine_particles';
-import { KIT_NOISE, KIT_UV_VERT } from './final_kit_glsl';
-import { eruptLevel, eruptStarts, strainLook } from './final_overload_core';
+import { FINAL_BODY_GESTURES } from './final_body_core';
+import { eruptLevel, eruptStarts, strainLook, strainPulse } from './final_overload_core';
 
 /** What FinalFx lends. */
 export interface FinalOverloadHost {
-  root: THREE.Group;
-  uTime: { value: number };
   particles: EngineParticles;
   groundY: (x: number, z: number) => number;
   rand: () => number;
   density: number;
   shakeNear: (x: number, z: number, amount: number) => void;
-  geometries: THREE.BufferGeometry[];
-  materials: THREE.Material[];
+  /** A glow pulse on the boss's own rig (FinalBodyFx). */
+  pulseBody: (gesture: string) => void;
 }
 
 /** One frame of the boss as FinalFx saw it. */
@@ -59,94 +56,35 @@ export interface FinalOverloadFrame {
   dt: number;
 }
 
-const STRAIN_FRAG = /* glsl */ `
-uniform float uTime;
-uniform float uCrack;
-uniform float uHeat;
-uniform vec3 uColor;
-varying vec2 vUv;
-varying vec3 vObj;
-varying vec3 vN;
-varying vec3 vView;
-${KIT_NOISE}
-void main() {
-  float fres = pow(max(1.0 - abs(dot(normalize(vN), normalize(vView))), 0.0), 1.7);
-  // The cracks: ridged noise on the shell's own points, opening wider as
-  // the strain grows, crawling slowly.
-  vec2 q = vec2(atan(vObj.z, vObj.x) * 2.2, vObj.y * 3.0);
-  float r1 = kridge(q * 1.6 + vec2(uTime * 0.07, 0.0));
-  float r2 = kridge(q * 3.3 - vec2(0.0, uTime * 0.11));
-  // Thin veins of light only (no filled shell: the body stays seen through
-  // it), a faint rim as it nears full.
-  float lines = pow(max(r1, r2 * 0.85), mix(54.0, 26.0, uCrack));
-  float glow = min(1.0, lines) * (0.4 + 0.9 * uHeat) + pow(fres, 3.0) * 0.18 * uHeat;
-  vec3 col = uColor * glow + vec3(1.0, 0.97, 0.9) * min(1.0, lines) * uHeat * 0.25;
-  gl_FragColor = vec4(col * uCrack * 0.85, 1.0);
-}
-`;
-
 const _look = { swell: 1, crack: 0, heat: 0, throb: 0 };
 const _rgb: [number, number, number] = [1, 1, 1];
 
 export class FinalOverloadFx {
-  private readonly shell: THREE.Mesh;
-  private readonly u: {
-    uCrack: { value: number };
-    uHeat: { value: number };
-    uColor: { value: THREE.Color };
-  };
   private lastFill = 0;
   private lastVein: SmithHeartVein | null = null;
   private sparkOwed = 0;
   private eruptOwed = 0;
+  private pulsedAt = -99;
 
-  constructor(private readonly h: FinalOverloadHost) {
-    const geo = new THREE.SphereGeometry(1, 48, 32);
-    h.geometries.push(geo);
-    this.u = {
-      uCrack: { value: 0 },
-      uHeat: { value: 0 },
-      uColor: { value: new THREE.Color(1, 1, 1) },
-    };
-    const mat = new THREE.ShaderMaterial({
-      name: 'smithHeartFinalStrain',
-      uniforms: { uTime: h.uTime, ...this.u },
-      vertexShader: KIT_UV_VERT,
-      fragmentShader: STRAIN_FRAG,
-      transparent: true,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      side: THREE.DoubleSide,
-      toneMapped: false,
-    });
-    h.materials.push(mat);
-    this.shell = new THREE.Mesh(geo, mat);
-    this.shell.name = 'smithHeartFinalStrain';
-    this.shell.frustumCulled = false;
-    this.shell.visible = false;
-    h.root.add(this.shell);
-  }
+  constructor(private readonly h: FinalOverloadHost) {}
 
   update(f: FinalOverloadFrame): void {
     const H = this.h;
     const fill = f.vein ? f.fill : 0;
+    // Its own cracks throbbing brighter (the rig's glow pulses).
+    const pulse = strainPulse(fill);
+    if (pulse.level > 0 && f.clock - this.pulsedAt >= pulse.every) {
+      this.pulsedAt = f.clock;
+      H.pulseBody(FINAL_BODY_GESTURES.strain[pulse.level - 1]);
+    }
     const look = strainLook(fill, f.clock, _look);
-    if (look.crack <= 0.001) {
-      this.shell.visible = false;
-    } else {
-      this.shell.visible = true;
-      const r = f.height * 0.22 * look.swell;
-      this.shell.scale.set(r, f.height * 0.5 * look.swell, r);
-      this.shell.position.set(f.x, f.y + f.height * 0.5, f.z);
-      this.u.uCrack.value = look.crack;
-      this.u.uHeat.value = look.heat;
-      this.u.uColor.value.setHex(f.color);
-      // Light bleeding off the strained shell.
+    if (look.crack > 0.001) {
+      // Light bleeding off the strained body.
       this.sparkOwed += f.dt * 30 * look.crack * look.crack * H.density;
-      const c = this.u.uColor.value;
-      _rgb[0] = c.r;
-      _rgb[1] = c.g;
-      _rgb[2] = c.b;
+      _rgb[0] = ((f.color >> 16) & 255) / 255;
+      _rgb[1] = ((f.color >> 8) & 255) / 255;
+      _rgb[2] = (f.color & 255) / 255;
+      const r = f.height * 0.16;
       while (this.sparkOwed >= 1) {
         this.sparkOwed -= 1;
         const a = H.rand() * Math.PI * 2;
@@ -263,7 +201,6 @@ export class FinalOverloadFx {
   }
 
   hide(): void {
-    this.shell.visible = false;
     this.lastFill = 0;
     this.lastVein = null;
   }
