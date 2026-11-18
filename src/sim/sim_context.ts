@@ -81,6 +81,7 @@ import type {
   PullTimer,
   QuestProgress,
   ReadyCheck,
+  RootBreakRule,
   SetProc,
   SimConfig,
   SimEvent,
@@ -680,7 +681,7 @@ export interface SimContextCallbacks {
     id: string,
     duration: number,
     school: Aura['school'],
-    breakThreshold?: number,
+    breakRule?: RootBreakRule,
   ): void;
   applyKnockback(source: Entity, target: Entity, distance: number): number;
   isIceBlocked(target: Entity): boolean;

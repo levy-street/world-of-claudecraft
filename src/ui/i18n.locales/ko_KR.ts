@@ -6012,7 +6012,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '적을 최대 {duration}초 동안 두꺼비로 변이시킵니다. 두꺼비는 돌아다니며 빠르게 회복합니다. 피해를 받으면 효과가 해제됩니다. 야수와 인간형에게만 사용할 수 있습니다.',
   'entities.abilities.frost_nova.name': '얼음 속박',
   'entities.abilities.frost_nova.description':
-    '주위 모든 적을 최대 8초 동안 제자리에 얼리고 {damage}의 냉기 피해를 입힙니다. 이동 불가 효과는 대상 최대 생명력의 15%에 해당하는 누적 피해를 받으면 해제되며, 피해 기준은 최소 20, 최대 60입니다.',
+    '주위 모든 적을 최대 8초 동안 제자리에 얼리고 {damage}의 냉기 피해를 입힙니다. 이동 불가 효과는 대상 최대 생명력의 10%에 해당하는 누적 피해를 받으면 해제됩니다. 지속 피해, 소환수의 공격, 첫 번째 바스라지는 파멸 적중은 포함되지 않습니다.',
   'entities.abilities.arcane_explosion.name': '에테르 폭발',
   'entities.abilities.arcane_explosion.description':
     '비전 에너지 폭발이 주위 모든 적에게 {damage}의 비전 피해를 입힙니다.',

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { armShatterPass, disarmShatterPass } from '../src/sim/combat/cc';
 import { ABILITIES, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -30,7 +31,12 @@ function icebindRoot(target: Entity): Aura | undefined {
   return target.auras.find((aura) => aura.id === 'frost_nova_root' && aura.kind === 'root');
 }
 
-function dealDamage(sim: Sim, target: Entity, amount: number): void {
+function dealDamage(
+  sim: Sim,
+  target: Entity,
+  amount: number,
+  opts: { source?: Entity | null; direct?: boolean } = {},
+): void {
   (
     sim as unknown as {
       ctx: {
@@ -42,16 +48,30 @@ function dealDamage(sim: Sim, target: Entity, amount: number): void {
           school: string,
           ability: string | null,
           kind: string,
+          noRage?: boolean,
+          threatOpts?: undefined,
+          direct?: boolean,
         ): void;
       };
     }
-  ).ctx.dealDamage(null, target, amount, false, 'physical', null, 'hit');
+  ).ctx.dealDamage(
+    opts.source ?? null,
+    target,
+    amount,
+    false,
+    'physical',
+    null,
+    'hit',
+    false,
+    undefined,
+    opts.direct ?? true,
+  );
 }
 
 describe('Icebind damage break', () => {
   it('tells players the exact cumulative damage budget', async () => {
     const description =
-      "Freezes all nearby enemies in place for up to 8 sec, dealing $d Frost damage. The root breaks after cumulative damage equal to 15% of the target's maximum health, with a minimum of 20 and a maximum of 60 damage.";
+      "Freezes all nearby enemies in place for up to 8 sec, dealing $d Frost damage. The root breaks after cumulative damage equal to 10% of the target's maximum health. Damage over time, pet attacks and the first Brittle Ruin hit do not count.";
 
     expect(ABILITIES.frost_nova.description).toBe(description);
     expect(
@@ -74,15 +94,15 @@ describe('Icebind damage break', () => {
           values: { damage: '6 a 7' },
         }),
       ).toBe(
-        'Congela a todos los enemigos cercanos en el sitio durante hasta 8 s e inflige 6 a 7 de daño de Escarcha. El enraizamiento se rompe tras recibir daño acumulado equivalente al 15 % de la salud máxima del objetivo, con un mínimo de 20 y un máximo de 60 de daño.',
+        'Congela a todos los enemigos cercanos en el sitio durante hasta 8 s e inflige 6 a 7 de daño de Escarcha. El enraizamiento se rompe tras recibir daño acumulado equivalente al 10 % de la salud máxima del objetivo. El daño periódico, los ataques de mascotas y el primer golpe de Ruina Quebradiza no cuentan.',
       );
     } finally {
       setLanguage('en');
     }
   });
 
-  it('breaks after cumulative damage equal to 15% max health', () => {
-    const { sim, target } = icebindRig(152);
+  it('breaks after cumulative damage equal to 10% max health', () => {
+    const { sim, target } = icebindRig(230);
     const root = icebindRoot(target);
 
     expect(root?.breaksOnDamage).toBe(true);
@@ -96,13 +116,63 @@ describe('Icebind damage break', () => {
     expect(icebindRoot(target)).toBeUndefined();
   });
 
-  it('clamps the damage budget between 20 and 60', () => {
-    expect(icebindRoot(icebindRig(100).target)?.breakThreshold).toBe(20);
-    expect(icebindRoot(icebindRig(1_000).target)?.breakThreshold).toBe(60);
+  it('keeps scaling with max health, with no damage cap', () => {
+    expect(icebindRoot(icebindRig(1_000).target)?.breakThreshold).toBe(100);
+    expect(icebindRoot(icebindRig(5_000).target)?.breakThreshold).toBe(500);
   });
 
   it('retains the same break rule on rank 2', () => {
-    expect(icebindRoot(icebindRig(152, 16).target)?.breakThreshold).toBe(23);
+    const root = icebindRoot(icebindRig(230, 16).target);
+    expect(root?.breakThreshold).toBe(23);
+    expect(root?.breakIgnoresIncidental).toBe(true);
+    expect(root?.shatterPass).toBe('ready');
+  });
+
+  it('ignores damage over time ticks and other non-direct damage', () => {
+    const { sim, target } = icebindRig(230);
+
+    dealDamage(sim, target, 200, { direct: false });
+    expect(icebindRoot(target)?.breakThreshold).toBe(23);
+
+    dealDamage(sim, target, 23);
+    expect(icebindRoot(target)).toBeUndefined();
+  });
+
+  it('ignores damage from pets and other owned summons', () => {
+    const { sim, target } = icebindRig(230);
+    const pet = createMob(98_812, MOBS.forest_wolf, 7, { ...sim.player.pos });
+    pet.ownerId = sim.player.id;
+
+    dealDamage(sim, target, 200, { source: pet });
+    expect(icebindRoot(target)?.breakThreshold).toBe(23);
+
+    dealDamage(sim, target, 23);
+    expect(icebindRoot(target)).toBeUndefined();
+  });
+
+  it('lets the first Shatter hit through, then counts the next one', () => {
+    const { sim, target } = icebindRig(230);
+
+    const armed = armShatterPass(target);
+    expect(armed).toBe(icebindRoot(target));
+    dealDamage(sim, target, 200);
+    disarmShatterPass(armed);
+    const root = icebindRoot(target);
+    expect(root?.breakThreshold).toBe(23);
+    expect(root?.shatterPass).toBeUndefined();
+
+    // The pass is spent: a second Shatter hit spends the budget like any hit.
+    expect(armShatterPass(target)).toBeNull();
+    dealDamage(sim, target, 23);
+    expect(icebindRoot(target)).toBeUndefined();
+  });
+
+  it('hands the Shatter pass back when the hit never reached the root', () => {
+    const { target } = icebindRig(230);
+
+    const armed = armShatterPass(target);
+    disarmShatterPass(armed);
+    expect(icebindRoot(target)?.shatterPass).toBe('ready');
   });
 
   it('does not make other roots break on damage', () => {

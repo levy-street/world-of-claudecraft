@@ -102,10 +102,12 @@ import {
 import { absorbAuraId, buffTargetAuraId, selfBuffAuraId } from './aura_ids';
 import { resetSwingTimer } from './auto_attack';
 import {
-  damageBreakThreshold,
+  armShatterPass,
+  disarmShatterPass,
   hasUnbreakableMovementLock,
   isRootedOrChilled,
   isUnbreakableControlAura,
+  rootBreakRule,
 } from './cc';
 import {
   ARCANE_SURGE_ID,
@@ -982,6 +984,11 @@ export function runEffects(
         const finalDamage = Math.round(dmg * primaryDamageMult);
         lastDirectDamage = finalDamage;
         const targetHpBefore = target.hp;
+        // Icebind's Shatter pass (combat/cc.ts): the first Shatter hit on an
+        // Icebound target does not spend the root's damage budget. Armed only
+        // for this one call; a hit that never reached the break check (fully
+        // absorbed, immune) hands the pass back.
+        const shatterPassAura = isSpell && frozen.treatAsFrozen ? armShatterPass(target) : null;
         const resolvedDamage = ctx.dealDamage(
           p,
           target,
@@ -998,6 +1005,7 @@ export function runEffects(
           ability.id,
           false,
         );
+        disarmShatterPass(shatterPassAura);
         // Read before the hunter/shaman follow-up hooks below, which can deal their
         // own damage: this must stay the damage THIS ability landed.
         const effectiveDamage = Math.max(0, targetHpBefore - target.hp);
@@ -3634,7 +3642,7 @@ export function runEffects(
                 `${ability.id}_root`,
                 eff.duration,
                 ability.school,
-                eff.breakOnDamage ? damageBreakThreshold(m.maxHp, eff.breakOnDamage) : undefined,
+                eff.breakOnDamage ? rootBreakRule(m.maxHp, eff.breakOnDamage) : undefined,
               );
               if (ability.id === 'earthbind') {
                 ctx.applyAura(m, {

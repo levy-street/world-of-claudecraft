@@ -2150,8 +2150,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Transforms the enemy into a toad for up to $t sec. The toad wanders and heals rapidly. Any damage breaks the effect. Beasts and humanoids only.',
   },
-  // One meaningful follow-up breaks Icebind, while tiny incidental ticks do not.
-  // The cap prevents high-health targets from gaining a stronger root.
+  // Icebind breaks after cumulative damage worth 10% of the target's max health,
+  // uncapped so it holds as well at max level as it does early (PvP tuning).
+  // Damage over time ticks, reflects and pet or summon hits never spend the budget,
+  // and the first Shatter hit passes through free, so the Shatter follow-up the
+  // Frost kit is built around no longer ends its own root.
   // Frost Nova deals its own damage before applying the root, so that packet is excluded.
   // Keep this data on every rank because resolved ranks replace the full effects array.
   // Values are cumulative post-mitigation damage.
@@ -2173,7 +2176,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         radius: 10,
         min: 6,
         max: 7,
-        breakOnDamage: { maxHpPct: 0.15, min: 20, max: 60 },
+        breakOnDamage: { maxHpPct: 0.1, min: 1, ignoreIncidental: true, shatterPass: true },
       },
     ],
     ranks: [
@@ -2188,13 +2191,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
             radius: 10,
             min: 12,
             max: 14,
-            breakOnDamage: { maxHpPct: 0.15, min: 20, max: 60 },
+            breakOnDamage: { maxHpPct: 0.1, min: 1, ignoreIncidental: true, shatterPass: true },
           },
         ],
       },
     ],
     description:
-      "Freezes all nearby enemies in place for up to 8 sec, dealing $d Frost damage. The root breaks after cumulative damage equal to 15% of the target's maximum health, with a minimum of 20 and a maximum of 60 damage.",
+      "Freezes all nearby enemies in place for up to 8 sec, dealing $d Frost damage. The root breaks after cumulative damage equal to 10% of the target's maximum health. Damage over time, pet attacks and the first Brittle Ruin hit do not count.",
   },
   arcane_explosion: {
     id: 'arcane_explosion',

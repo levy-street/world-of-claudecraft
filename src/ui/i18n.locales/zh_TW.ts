@@ -7433,7 +7433,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '將敵人變成蟾蜍，最多持續 {duration} 秒。蟾蜍會四處遊蕩並快速恢復。任何傷害都會打破效果。僅限野獸和人型生物。',
   'entities.abilities.frost_nova.name': '縛冰術',
   'entities.abilities.frost_nova.description':
-    '將附近所有敵人凍結在原地，最多持續 8 秒，並造成 {damage} 點冰霜傷害。定身效果會在累計受到相當於目標最大生命值15%的傷害後解除，傷害門檻最低為20點，最高為60點。',
+    '將附近所有敵人凍結在原地，最多持續 8 秒，並造成 {damage} 點冰霜傷害。定身效果會在累計受到相當於目標最大生命值10%的傷害後解除。持續傷害、寵物攻擊和第一次脆碎之殤命中不計入。',
   'entities.abilities.arcane_explosion.name': '乙太爆發',
   'entities.abilities.arcane_explosion.description':
     '秘法能量爆發，對附近所有敵人造成 {damage} 點秘法傷害。',

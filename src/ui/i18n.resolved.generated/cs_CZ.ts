@@ -17774,7 +17774,7 @@ export const cs_CZ: EnTranslations = {
       },
       "frost_nova": {
         "name": "Ledové spoutání",
-        "description": "Zmrazí všechny blízké nepřátele na místě až na 8 s a způsobí {damage} mrazového poškození. Znehybnění se zruší po obdržení celkového poškození ve výši 15 % maximálního zdraví cíle, nejméně však 20 a nejvýše 60 poškození."
+        "description": "Zmrazí všechny blízké nepřátele na místě až na 8 s a způsobí {damage} mrazového poškození. Znehybnění se zruší po obdržení celkového poškození ve výši 10 % maximálního zdraví cíle. Poškození v čase, útoky mazlíčků a první zásah Drcení mrazem se nezapočítávají."
       },
       "arcane_explosion": {
         "name": "Éterický výbuch",

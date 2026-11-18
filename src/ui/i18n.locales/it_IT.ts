@@ -9449,7 +9449,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Trasforma il nemico in un rospo per un massimo di {duration} sec. Il rospo vaga e guarisce rapidamente. Qualsiasi danno interrompe l'effetto. Solo bestie e umanoidi.",
   'entities.abilities.frost_nova.name': 'Vincolo di Ghiaccio',
   'entities.abilities.frost_nova.description':
-    'Congela sul posto tutti i nemici vicini per un massimo di 8 s e infligge {damage} danni da Gelo. L’immobilizzazione si interrompe dopo aver subito danni cumulativi pari al 15% della salute massima del bersaglio, con un minimo di 20 e un massimo di 60 danni.',
+    'Congela sul posto tutti i nemici vicini per un massimo di 8 s e infligge {damage} danni da Gelo. L’immobilizzazione si interrompe dopo aver subito danni cumulativi pari al 10% della salute massima del bersaglio. I danni periodici, gli attacchi dei famigli e il primo colpo di Rovina Fragile non contano.',
   'entities.abilities.arcane_explosion.name': "Scoppio d'Etere",
   'entities.abilities.arcane_explosion.description':
     "Un'esplosione di energia Arcana colpisce tutti i nemici vicini per {damage} danni Arcani.",

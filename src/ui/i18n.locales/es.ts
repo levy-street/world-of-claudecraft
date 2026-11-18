@@ -9309,7 +9309,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Transforma al enemigo en sapo durante hasta {duration} s. El sapo deambula y se cura rápidamente. Cualquier daño rompe el efecto. Solo bestias y humanoides.',
   'entities.abilities.frost_nova.name': 'Atadura de Hielo',
   'entities.abilities.frost_nova.description':
-    'Congela a todos los enemigos cercanos en el sitio durante hasta 8 s e inflige {damage} de daño de Escarcha. El enraizamiento se rompe tras recibir daño acumulado equivalente al 15 % de la salud máxima del objetivo, con un mínimo de 20 y un máximo de 60 de daño.',
+    'Congela a todos los enemigos cercanos en el sitio durante hasta 8 s e inflige {damage} de daño de Escarcha. El enraizamiento se rompe tras recibir daño acumulado equivalente al 10 % de la salud máxima del objetivo. El daño periódico, los ataques de mascotas y el primer golpe de Ruina Quebradiza no cuentan.',
   'entities.abilities.arcane_explosion.name': 'Estallido de Éter',
   'entities.abilities.arcane_explosion.description':
     'Una explosión de energía Arcana golpea a todos los enemigos cercanos por {damage} de daño Arcano.',

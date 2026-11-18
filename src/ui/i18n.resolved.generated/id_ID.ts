@@ -17774,7 +17774,7 @@ export const id_ID: EnTranslations = {
       },
       "frost_nova": {
         "name": "Belenggu Es",
-        "description": "Membekukan semua musuh di sekitar di tempatnya hingga 8 detik, memberi {damage} kerusakan Beku. Efek pengakaran berakhir setelah menerima total kerusakan sebesar 15% kesehatan maksimum target, dengan minimal 20 dan maksimal 60 kerusakan."
+        "description": "Membekukan semua musuh di sekitar di tempatnya hingga 8 detik, memberi {damage} kerusakan Beku. Efek pengakaran berakhir setelah menerima total kerusakan sebesar 10% kesehatan maksimum target. Kerusakan berkala, serangan peliharaan, dan serangan Kehancuran Rapuh pertama tidak dihitung."
       },
       "arcane_explosion": {
         "name": "Ledakan Aether",

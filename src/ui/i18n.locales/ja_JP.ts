@@ -6059,7 +6059,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '敵を最大{duration}秒間ヒキガエルに変えます。ヒキガエルは歩き回り、急速に回復します。ダメージを受けると効果が切れます。獣と人型のみ。',
   'entities.abilities.frost_nova.name': '氷縛',
   'entities.abilities.frost_nova.description':
-    '周囲の敵すべてを最大8秒間その場に凍結させ、{damage} の冷気ダメージを与えます。移動不能効果は、対象の最大体力の15%に相当する累積ダメージを受けると解除されます。解除に必要なダメージは最低20、最大60です。',
+    '周囲の敵すべてを最大8秒間その場に凍結させ、{damage} の冷気ダメージを与えます。移動不能効果は、対象の最大体力の10%に相当する累積ダメージを受けると解除されます。継続ダメージ、ペットの攻撃、最初の脆き破滅の一撃はカウントされません。',
   'entities.abilities.arcane_explosion.name': 'エーテルバースト',
   'entities.abilities.arcane_explosion.description':
     '秘術エネルギーの爆発が周囲の敵すべてに {damage} の秘術ダメージを与えます。',

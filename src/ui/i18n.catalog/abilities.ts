@@ -498,7 +498,7 @@ const classAbilityNamesEn = {
       [
         'frost_nova',
         'Icebind',
-        "Freezes all nearby enemies in place for up to 8 sec, dealing {damage} Frost damage. The root breaks after cumulative damage equal to 15% of the target's maximum health, with a minimum of 20 and a maximum of 60 damage.",
+        "Freezes all nearby enemies in place for up to 8 sec, dealing {damage} Frost damage. The root breaks after cumulative damage equal to 10% of the target's maximum health. Damage over time, pet attacks and the first Brittle Ruin hit do not count.",
       ],
       [
         'arcane_explosion',

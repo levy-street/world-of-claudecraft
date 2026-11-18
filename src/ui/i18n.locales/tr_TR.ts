@@ -8009,7 +8009,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Seni buzla sarar ve zırhını 30 dakika boyunca {buff} artırır.',
   'entities.abilities.frost_armor.name': 'Kırağı Pelerini',
   'entities.abilities.frost_nova.description':
-    'Yakındaki tüm düşmanları 8 saniyeye kadar yerinde dondurur ve {damage} Ayaz hasarı verir. Köklenme etkisi, hedefin azami sağlığının %15’ine eşit toplam hasar aldıktan sonra kırılır; bu değer en az 20, en fazla 60 hasardır.',
+    'Yakındaki tüm düşmanları 8 saniyeye kadar yerinde dondurur ve {damage} Ayaz hasarı verir. Köklenme etkisi, hedefin azami sağlığının %10’una eşit toplam hasar aldıktan sonra kırılır. Zamanla verilen hasar, evcil hayvan saldırıları ve ilk Kırılgan Yıkım vuruşu sayılmaz.',
   'entities.abilities.frost_nova.name': 'Buz Bağı',
   'entities.abilities.frost_shock.description':
     '{damage} Buz hasarı verir ve hedefi 8 sn boyunca %50 yavaşlatır. Hasar Büyü Gücü ile artar.',

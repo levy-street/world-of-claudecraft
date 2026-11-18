@@ -8101,7 +8101,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menyelubungimu dengan embun beku, meningkatkan zirah sebesar {buff} selama 30 menit.',
   'entities.abilities.frost_armor.name': 'Mantel Embun Beku',
   'entities.abilities.frost_nova.description':
-    'Membekukan semua musuh di sekitar di tempatnya hingga 8 detik, memberi {damage} kerusakan Beku. Efek pengakaran berakhir setelah menerima total kerusakan sebesar 15% kesehatan maksimum target, dengan minimal 20 dan maksimal 60 kerusakan.',
+    'Membekukan semua musuh di sekitar di tempatnya hingga 8 detik, memberi {damage} kerusakan Beku. Efek pengakaran berakhir setelah menerima total kerusakan sebesar 10% kesehatan maksimum target. Kerusakan berkala, serangan peliharaan, dan serangan Kehancuran Rapuh pertama tidak dihitung.',
   'entities.abilities.frost_nova.name': 'Belenggu Es',
   'entities.abilities.frost_shock.description':
     'Memberi {damage} kerusakan Es dan memperlambat sasaran 50% selama 8 dtk. Kerusakan meningkat dengan Kekuatan Mantra.',
