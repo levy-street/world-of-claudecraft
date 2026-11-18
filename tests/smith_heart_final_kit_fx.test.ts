@@ -91,10 +91,23 @@ describe("the final kits' plan", () => {
     expect(FINAL_REACH.rise).toBe(T.riseKnockR);
     // A Sky Strike reads apart from Leaping Bolt's reach: a whiter accent.
     expect(FINAL_FOOTPRINTS.strike.accent).not.toBe(FINAL_FOOTPRINTS.bolt.accent);
-    // Arcing Stone's ring and a locked line are lethal-edged.
+    // Arcing Stone's ring is lethal-edged.
     expect(FINAL_FOOTPRINTS.arcRing.color).toBe(TELEGRAPH_THREAT_COLORS.lethal);
-    expect(FINAL_FOOTPRINTS.laneLocked.color).toBe(TELEGRAPH_THREAT_COLORS.lethal);
-    const allowed = new Set([...Object.values(TELEGRAPH_THREAT_COLORS), FINAL_KIT_COLORS.soak]);
+    // A Crossing Blade's line is the ice's cold, never a fire's orange or red
+    // (the coordinator's call of 2026-11-18: it read as the Heat's), brighter
+    // once locked.
+    expect(FINAL_FOOTPRINTS.lane.color).toBe(FINAL_KIT_COLORS.iceLine);
+    expect(FINAL_FOOTPRINTS.laneLocked.color).toBe(FINAL_KIT_COLORS.iceLineLocked);
+    for (const c of [FINAL_KIT_COLORS.iceLine, FINAL_KIT_COLORS.iceLineLocked]) {
+      expect(c & 0xff).toBeGreaterThan((c >> 16) & 0xff);
+      expect(c).not.toBe(TELEGRAPH_THREAT_COLORS.danger);
+    }
+    const allowed = new Set([
+      ...Object.values(TELEGRAPH_THREAT_COLORS),
+      FINAL_KIT_COLORS.soak,
+      FINAL_KIT_COLORS.iceLine,
+      FINAL_KIT_COLORS.iceLineLocked,
+    ]);
     for (const [k, f] of Object.entries(FINAL_FOOTPRINTS))
       expect(allowed.has(f.color), k).toBe(true);
     expect(FINAL_FOOTPRINTS.anvil.color).toBe(FINAL_KIT_COLORS.soak);

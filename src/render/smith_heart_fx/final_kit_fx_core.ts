@@ -109,6 +109,10 @@ export const FINAL_KIT_COLORS = {
   breath: SMITH_HEART_VEIN_COLORS.breath,
   hammer: SMITH_HEART_VEIN_COLORS.hammer,
   soak: 0xffc94a,
+  /** A Crossing Blade's line: the ice's own cold as it aims, white-hot ice
+   *  locked (never the fire's orange: the coordinator's call of 2026-11-18). */
+  iceLine: 0x58b8ff,
+  iceLineLocked: 0xc8eeff,
   fire: [1.0, 0.62, 0.22] as const,
   fireCore: [1.0, 0.9, 0.62] as const,
   frost: [0.72, 0.9, 1.0] as const,
@@ -138,8 +142,11 @@ export const FINAL_FOOTPRINTS = {
   rise: { color: TELEGRAPH_THREAT_COLORS.danger, accent: 0xe8c070 },
   strike: { color: TELEGRAPH_THREAT_COLORS.danger, accent: 0xeef4ff },
   arcRing: { color: TELEGRAPH_THREAT_COLORS.lethal, accent: 0xd8c8ff },
-  lane: { color: TELEGRAPH_THREAT_COLORS.danger, accent: 0xbfe6ff },
-  laneLocked: { color: TELEGRAPH_THREAT_COLORS.lethal, accent: 0xe6f6ff },
+  // A Crossing Blade's line in the ice's own cold (the coordinator's call of
+  // 2026-11-18, over the threat palette: the orange read as the Heat's fire):
+  // an ice blue as it aims, a white-hot ice as it locks.
+  lane: { color: FINAL_KIT_COLORS.iceLine, accent: 0xd8f2ff },
+  laneLocked: { color: FINAL_KIT_COLORS.iceLineLocked, accent: 0xffffff },
   /** Crushed: you must stay out of the next Anvil. */
   crushed: { color: TELEGRAPH_THREAT_COLORS.danger, accent: 0xe8c070 },
 } as const;
@@ -173,10 +180,36 @@ export function timedFill(age: number, seconds: number): number {
 
 /** A Fire Whirl's turn (radians) and its height at render time `t`, its
  *  warning `warn` 0..1 (it rises out of the floor as the warning runs: a
- *  tall turning column of fire since the rework of 2026-11-18, three times a
- *  player's height and more). */
+ *  fire tornado since the rework of 2026-11-18, some ten players tall). */
 export function whirlSpin(t: number, warn: number): { angle: number; height: number } {
-  return { angle: t * 7, height: 2 + 14 * smooth(warn) };
+  return { angle: t * 7, height: 3 + 19 * smooth(warn) };
+}
+
+/** A fire tornado's funnel radius (a share of its lip's) at `h` 0..1 of its
+ *  height: a narrow throat at the floor flaring wide at the top (the
+ *  coordinator's review of 2026-11-18: the column read as loose tongues). */
+export function tornadoProfile(h: number): number {
+  const t = clamp01(h);
+  return 0.16 + 0.84 * t ** 1.8;
+}
+
+/** The rocks and burning debris torn up and whirled round a tornado: piece
+ *  `k` of `n` at render time `t` climbs the funnel round and round, flung out
+ *  at its lip and dropped back to the foot. Its angle (radians), its height
+ *  (0..1 of the funnel) and its spin. Fills `out`. */
+export function tornadoDebris(
+  t: number,
+  k: number,
+  n: number,
+  seed: number,
+  out: { angle: number; height: number; spin: number } = { angle: 0, height: 0, spin: 0 },
+): { angle: number; height: number; spin: number } {
+  const phase = k / Math.max(1, n);
+  const climb = (t * (0.22 + 0.05 * ((k * 7) % 3)) + phase + seed * 0.13) % 1;
+  out.height = climb;
+  out.angle = t * (3.2 - 1.6 * climb) + phase * Math.PI * 2 + seed;
+  out.spin = t * (2 + (k % 4));
+  return out;
 }
 
 /** A Storm Orb's bob and crackle at render time `t`, `left` 0..1 of its

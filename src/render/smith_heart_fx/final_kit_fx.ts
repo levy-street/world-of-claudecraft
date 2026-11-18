@@ -63,7 +63,7 @@ import { fxAnchor } from '../attached_fx_anchor';
 import { TelegraphKit, type TelegraphStyle, telegraphFillOf } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { attachSceneGroupGated } from '../gated_scene_attach';
-import { GFX } from '../gfx';
+import { GFX, surfaceMat } from '../gfx';
 import { getFlameTex } from '../ignivar_fire_vfx';
 import { setRenderCategory } from '../renderer_diagnostics';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
@@ -83,6 +83,8 @@ import {
   rootRise,
   shockWave,
   timedFill,
+  tornadoDebris,
+  tornadoProfile,
   whirlSpin,
 } from './final_kit_fx_core';
 import {
@@ -138,6 +140,15 @@ interface Arc {
   seed: number;
 }
 
+/** Rocks whirled round each fire tornado. */
+const TORNADO_ROCKS = 10;
+const _deb = { angle: 0, height: 0, spin: 0 };
+const _tm = new THREE.Matrix4();
+const _tq = new THREE.Quaternion();
+const _te = new THREE.Euler();
+const _tp = new THREE.Vector3();
+const _ts = new THREE.Vector3();
+
 interface WhirlBody {
   smoke: THREE.Mesh;
   outer: THREE.Mesh;
@@ -172,6 +183,7 @@ export class FinalKitFx {
   private readonly geometries: THREE.BufferGeometry[] = [];
   private readonly materials: THREE.Material[] = [];
   private readonly whirls: WhirlBody[] = [];
+  private readonly tornadoRocks: THREE.InstancedMesh;
   private readonly orbs: OrbBody[] = [];
   private readonly ice: THREE.Mesh[] = [];
   private readonly shells: THREE.Mesh[] = [];
@@ -282,14 +294,34 @@ export class FinalKitFx {
       this.root.add(m);
       return m;
     };
-    // The whirls (the Heat's star since the rework of 2026-11-18): a tall
-    // turning column of fire, a funnel of flame twisting up (narrow at the
-    // floor, flared at its lip) round a white-hot core, under a sheath of
-    // smoke-dark fire that rolls off its top; each its own seed.
-    const funnel = new THREE.CylinderGeometry(1.35, 0.42, 1, 36, 28, true).translate(0, 0.5, 0);
-    const coreGeo = new THREE.CylinderGeometry(0.62, 0.2, 1, 24, 22, true).translate(0, 0.5, 0);
-    const smokeGeo = new THREE.CylinderGeometry(1.7, 0.6, 1, 32, 20, true).translate(0, 0.5, 0);
+    // The whirls (the Heat's star since the rework of 2026-11-18): a fire
+    // TORNADO (the coordinator's review of 2026-11-18): a funnel narrow at
+    // its throat on the floor and flaring wide at its top (tornadoProfile),
+    // streaks of flame winding up it round a white-hot core, a dark sheath of
+    // smoke and dust dragged round its outside, a ring of fire at its foot,
+    // embers spiralling up it and rocks whirled round it; each its own seed.
+    const lathe = (rings: number, around: number) => {
+      const pts: THREE.Vector2[] = [];
+      for (let j = 0; j <= rings; j++)
+        pts.push(new THREE.Vector2(tornadoProfile(j / rings), j / rings));
+      return new THREE.LatheGeometry(pts, around);
+    };
+    const funnel = lathe(28, 40);
+    const coreGeo = lathe(22, 28);
+    const smokeGeo = lathe(20, 36);
     this.geometries.push(funnel, coreGeo, smokeGeo);
+    const rockGeo = new THREE.DodecahedronGeometry(0.55, 0);
+    this.geometries.push(rockGeo);
+    const rockMat = surfaceMat({ color: 0x5a4636, roughness: 0.95, flatShading: true });
+    this.materials.push(rockMat);
+    this.tornadoRocks = new THREE.InstancedMesh(rockGeo, rockMat, P.whirls * TORNADO_ROCKS);
+    this.tornadoRocks.name = 'smithHeartFinalTornadoRocks';
+    this.tornadoRocks.frustumCulled = false;
+    this.tornadoRocks.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    for (let i = 0; i < P.whirls * TORNADO_ROCKS; i++)
+      this.tornadoRocks.setMatrixAt(i, _tm.makeScale(0, 0, 0));
+    this.tornadoRocks.visible = false;
+    this.root.add(this.tornadoRocks);
     for (let i = 0; i < P.whirls; i++) {
       const seedU = { value: fxHash(i, 5) * 20 };
       const outerU = {
@@ -833,6 +865,7 @@ export class FinalKitFx {
 
   private paintObjects(world: IWorld): void {
     let whirl = 0;
+    let rocksUsed = 0;
     let orb = 0;
     for (const id of this.objectIds) {
       const e = world.entities.get(id);
@@ -854,33 +887,67 @@ export class FinalKitFx {
           if (w) {
             const spin = whirlSpin(this.clock, warn);
             const live = kind === 'whirl' ? 1 : 0.35 + 0.5 * warn;
+            const height = spin.height;
+            const lip = R.whirl * 2;
             w.smoke.position.set(x, y, z);
-            w.smoke.scale.set(R.whirl * 0.9, spin.height * 1.08, R.whirl * 0.9);
+            w.smoke.scale.set(lip * 1.2, height * 1.06, lip * 1.2);
             w.outer.position.set(x, y, z);
-            w.outer.scale.set(R.whirl * 0.8, spin.height, R.whirl * 0.8);
+            w.outer.scale.set(lip, height, lip);
             w.core.position.set(x, y, z);
-            w.core.scale.set(R.whirl * 0.62, spin.height * 0.9, R.whirl * 0.62);
+            w.core.scale.set(lip * 0.5, height * 0.94, lip * 0.5);
             w.smokeU.uAlpha.value = live;
             w.outerU.uAlpha.value = live;
             w.coreU.uAlpha.value = live;
             w.smoke.visible = true;
             w.outer.visible = true;
             w.core.visible = true;
-            // Embers spiralling up the column, and the grit it tears up at its
-            // foot.
+            // Rocks torn up and whirled round its funnel.
+            const base = (whirl - 1) * TORNADO_ROCKS;
+            for (let k = 0; k < TORNADO_ROCKS; k++) {
+              const d = tornadoDebris(this.clock, k, TORNADO_ROCKS, (id % 97) * 0.37, _deb);
+              const r = lip * tornadoProfile(d.height) * 1.08 + 0.4;
+              const s = (0.6 + ((k * 13) % 7) * 0.12) * live;
+              _tp.set(
+                x + Math.cos(d.angle) * r,
+                y + d.height * height * 0.9 + 0.3,
+                z + Math.sin(d.angle) * r,
+              );
+              _tq.setFromEuler(_te.set(d.spin, d.spin * 0.7, 0));
+              this.tornadoRocks.setMatrixAt(base + k, _tm.compose(_tp, _tq, _ts.set(s, s, s)));
+            }
+            rocksUsed = whirl;
+            // Its foot: a ring of fire licking up where it tears the floor.
             if (this.rand() < (kind === 'whirl' ? 1 : warn) * this.density) {
+              const a = this.rand() * Math.PI * 2;
+              const rr = R.whirl * (0.4 + 0.6 * this.rand());
+              this.particles.puff(x + Math.cos(a) * rr, y + 0.2, z + Math.sin(a) * rr, 1, {
+                speed: 1.5,
+                up: 4 + this.rand() * 3,
+                life: 0.7,
+                size: [1.6, 0.5],
+                color: C.fire,
+                alpha: 1,
+                pool: 'pyre',
+                dir: [-Math.sin(a), 0.4, Math.cos(a)],
+                spread: 0.3,
+              });
+            }
+            // Embers spiralling up the funnel, flung out at its lip.
+            for (let e2 = 0; e2 < 2; e2++) {
+              if (this.rand() > (kind === 'whirl' ? 1 : warn) * this.density) continue;
               const a = this.clock * 7 + this.rand() * Math.PI * 2;
-              const rr = R.whirl * (0.35 + 0.5 * this.rand());
-              this.particles.puff(x + Math.cos(a) * rr, y + 0.6, z + Math.sin(a) * rr, 2, {
-                speed: 2,
+              const hh = this.rand() * 0.5;
+              const rr = lip * tornadoProfile(hh);
+              this.particles.puff(x + Math.cos(a) * rr, y + hh * height, z + Math.sin(a) * rr, 1, {
+                speed: 5,
                 up: 9 + this.rand() * 6,
-                life: 1.3,
-                size: [0.55, 0.1],
+                life: 1.4,
+                size: [0.5, 0.1],
                 color: C.fire,
                 alpha: 1,
                 pool: 'glow',
-                dir: [-Math.sin(a), 0.6, Math.cos(a)],
-                spread: 0.2,
+                dir: [-Math.sin(a), 0.5, Math.cos(a)],
+                spread: 0.15,
               });
             }
             if (kind === 'whirl' && this.rand() < 0.5 * this.density) {
@@ -1046,6 +1113,10 @@ export class FinalKitFx {
         default:
       }
     }
+    for (let i = rocksUsed * TORNADO_ROCKS; i < this.whirls.length * TORNADO_ROCKS; i++)
+      this.tornadoRocks.setMatrixAt(i, _tm.makeScale(0, 0, 0));
+    this.tornadoRocks.instanceMatrix.needsUpdate = true;
+    this.tornadoRocks.visible = rocksUsed > 0;
     for (let i = whirl; i < this.whirls.length; i++) {
       this.whirls[i].smoke.visible = false;
       this.whirls[i].outer.visible = false;
@@ -1254,6 +1325,7 @@ export class FinalKitFx {
       w.outer.visible = false;
       w.core.visible = false;
     }
+    this.tornadoRocks.visible = false;
     for (const ob of this.orbs) {
       ob.shell.visible = false;
       ob.core.visible = false;
