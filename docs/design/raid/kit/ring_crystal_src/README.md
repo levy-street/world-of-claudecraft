@@ -93,7 +93,11 @@ The lit crystal keeps the painting's four colours (`RING_CRYSTAL_LOOK` in
 the painting at full and a touch more saturated with its cores burning deeper, the white-gold
 heart takes a share of the glow so it does not bloom into a beam, and ready is a breath of
 brightness with a thin rim, never a tint. An early cut added white-gold vein light over everything
-and washed the four elements out to one colour.
+and washed the four elements out to one colour. Lit against dark is about eight to one (the
+owner's call of 2026-11-18: under three to one, a lit element barely read against a dark one); the
+gap is taken from the dark side, which keeps its four hues at low value, because pushing the lit
+side higher washes the ice and the storm out to white. Pinned in
+`tests/smith_heart_ring_crystal.test.ts`.
 
 ## Follow-ups
 

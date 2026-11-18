@@ -37,7 +37,10 @@ export const RING_CRYSTAL = { height: 18.85, plinthR: 8.47 } as const;
  *  light of one colour over the crystal (the first cut washed the four elements out to
  *  white-gold). Dormant is the painting dimmed and cooled, its hues still readable; lit is the
  *  painting at full and over, its saturated cores burning deeper and only its brightest facets
- *  going white-hot; ready makes the whole crystal breathe, never tints it.
+ *  going white-hot; ready makes the whole crystal breathe, never tints it. The owner's call of
+ *  2026-11-18: a lit element must read far brighter than a dark one, so the gap comes from the
+ *  dark side (a lit pixel is about eight times a dormant one; it was under three); pushing
+ *  the lit side higher instead washes the ice and the storm out to white.
  *    dormantBright / dormantSat   the unlit painting's value and how much of its colour stays
  *    litBright / glowGain         a lit pixel's value, and what the element's glow adds on top
  *    coreBurn / whiteHot          the painting squared (deeper colour) and the white in the
@@ -48,10 +51,10 @@ export const RING_CRYSTAL = { height: 18.85, plinthR: 8.47 } as const;
  *                                 is the brightest thing on the dais; at full it blooms into
  *                                 a beam and loses its facets) */
 export const RING_CRYSTAL_LOOK = {
-  dormantBright: 0.42,
-  dormantSat: 0.55,
-  litBright: 1.0,
-  glowGain: 0.28,
+  dormantBright: 0.13,
+  dormantSat: 0.7,
+  litBright: 1.08,
+  glowGain: 0.36,
   coreBurn: 0.35,
   whiteHot: 0.12,
   readyPulse: 0.08,

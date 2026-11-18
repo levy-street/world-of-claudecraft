@@ -29,6 +29,7 @@ import {
   newRingCrystalState,
   RING_CRYSTAL,
   RING_CRYSTAL_CORE_RADIUS,
+  RING_CRYSTAL_LOOK,
   RING_CRYSTAL_READY_RISE,
   type RingCrystalPieceKind,
   type RingCrystalState,
@@ -320,6 +321,23 @@ describe('the crystal: the material', () => {
     expect(m.vertexShader).toContain('attribute float _path;');
     // The world's lights are not read: no program depends on the light census.
     expect(m.lights).toBe(false);
+  });
+
+  it('reads a lit element far brighter than a dark one, and the dark keeps its hues', () => {
+    const look = RING_CRYSTAL_LOOK;
+    // The owner's call of 2026-11-18: lit against dark was under three to one, too close.
+    expect(look.litBright / look.dormantBright).toBeGreaterThanOrEqual(6);
+    // Dark, the four colours still read (the painting is the approved concept).
+    expect(look.dormantSat).toBeGreaterThanOrEqual(0.6);
+    expect(look.dormantBright).toBeGreaterThan(0.05);
+    // The material carries exactly these numbers, in its uniform's order.
+    const u = ringCrystalMaterial(new THREE.Texture()).uniforms;
+    expect(u.uLookA.value.toArray()).toEqual([
+      look.dormantBright,
+      look.dormantSat,
+      look.litBright,
+      look.glowGain,
+    ]);
   });
 });
 
