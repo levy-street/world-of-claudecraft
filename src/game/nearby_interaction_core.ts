@@ -189,8 +189,9 @@ export function resolveNearbyInteractionCandidate(
         : !isQuestGatedGroundObjectHidden(entity, world.questLog) &&
           !isObjectOpenedByViewer(entity, world.questLog, world.worldQuestLog)) &&
       distance <= objectInteractionRange(entity) &&
-      // An ordinary object stays strictly inside the plain range, as it always was.
-      distance < Math.max(INTERACT_RANGE, objectInteractionRange(entity)) &&
+      // An ordinary object stays strictly inside the plain range, as it always was; a wider
+      // reach (the heart seal crystal's) is inclusive, as the sim's press gate is.
+      (objectInteractionRange(entity) > INTERACT_RANGE || distance < INTERACT_RANGE) &&
       distance < bestObjectDistance
     ) {
       bestObject = entity;

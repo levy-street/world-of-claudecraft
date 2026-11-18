@@ -37,9 +37,9 @@
 //
 // Engine limit: ONE floor height per point (authored_field/CLAUDE.md), so the
 // Balcony replaces the Ring's south arc and the Ring loops over it by the two
-// stairs. The void between the Ring and the dais is open air but for the two
-// stairs down to the dais (south and north), both below every Ring eye's line
-// to the seal: the seal is in sight from every point of the Ring. The whole field stays inside one slot of
+// stairs. The void between the Ring and the dais is open air but for the four
+// stairs down to the dais (south, north, east and west), all below every Ring eye's
+// line to the seal: the seal is in sight from every point of the Ring. The whole field stays inside one slot of
 // the instance band (|x| < 300, |z| < 250).
 //
 // Pure data: the sim (height, collision, spawns, gates, the portal hop) and

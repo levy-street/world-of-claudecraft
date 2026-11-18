@@ -67,6 +67,7 @@ import {
   tickSmithHeartSeal,
 } from '../src/sim/encounters/smith_heart';
 import { writeSealMarkers } from '../src/sim/encounters/smith_heart/seal';
+import { createGroundObject } from '../src/sim/entity';
 import {
   COMBAT_WALL_SHAPES,
   clearCombatWallStateForTest,
@@ -583,6 +584,31 @@ describe('the press', () => {
     expect(markers(sim, inst).every((m) => m === BURST)).toBe(true);
     expect(sealCrystalOf(sim.ctx, inst)).toBeNull();
     expect(logs(sim.tick(), pid)).toContain(SMITH_HEART_PORTAL_OPEN_LOG);
+  });
+
+  it('never takes a press meant for something nearer: an object in plain reach answers first', () => {
+    const { sim, pid, inst } = setup();
+    winVeins(sim, inst, SMITH_HEART_VEINS);
+    put(sim, pid, inst, 0, PRESS_Z);
+    const body = sim.ctx.entities.get(pid) as Entity;
+    // A mailbox a yard from the player: the scan's ordinary object arm answers it with an event.
+    const mailbox = createGroundObject(sim.ctx.nextId++, '', 'Mailbox', {
+      x: body.pos.x + 1,
+      y: body.pos.y,
+      z: body.pos.z,
+    });
+    mailbox.templateId = 'mailbox';
+    sim.ctx.addEntity(mailbox);
+    sim.interact(pid);
+    const evs = sim.tick();
+    expect(evs.some((e) => e.type === 'mailbox' && e.pid === pid)).toBe(true);
+    // The crystal was not pressed: it still stands, charged.
+    expect(markers(sim, inst).every((m) => m === FULL_READY)).toBe(true);
+    expect(sealCrystalOf(sim.ctx, inst)).not.toBeNull();
+    // With nothing nearer in reach the same press is the crystal's.
+    sim.ctx.dropEntity(mailbox.id);
+    sim.interact(pid);
+    expect(markers(sim, inst).every((m) => m === BURST)).toBe(true);
   });
 
   it('draws no rng, in the press or in the tick', () => {

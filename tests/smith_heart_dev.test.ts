@@ -169,7 +169,14 @@ describe('/dev heart', () => {
     // At once: the markers carry the bit and the crystal (and its wall) is gone.
     expect(smithHeartProgress(sim.ctx, inst).portalOpen).toBe(true);
     expect(sealCrystalOf(sim.ctx, inst)).toBeNull();
-    sim.tick();
+    const first = logs(sim.tick()).filter((t) => t.startsWith('[dev] The heart seal'));
+    expect(first).toEqual(["[dev] The heart seal's portal is forced open for this run."]);
+    // A second verb finds the crystal already burst and says so (never "forced open" again).
+    dev('/dev heart portal');
+    const second = logs(sim.tick()).filter((t) => t.startsWith('[dev] The heart seal'));
+    expect(second).toEqual([
+      '[dev] The heart seal crystal has already burst: the portal is open for this run.',
+    ]);
     expect(smithHeartProgress(sim.ctx, inst).portalOpen).toBe(true);
     expect(smithHeartProgress(sim.ctx, inst).sealLit).toBe(false);
     expect(sealMasks(sim, inst).every((t) => smithHeartPortalBitSet(Number(t.slice(17))))).toBe(

@@ -543,9 +543,6 @@ export function interact(
   if (trySpearWrench(ctx, p)) return;
   // Carrying a Knotted Gale: the press is the throw (at the lip of a gap).
   if (tryThrowKnot(ctx, p)) return;
-  // Beside the Smith's Heart's heart seal crystal: the press is the crystal's (its
-  // plinth is wider than the scan's plain interact range, seal_burst.ts).
-  if (trySealCrystalInteract(ctx, p, r.meta.entityId)) return;
   if (p.targetId !== null) {
     const target = ctx.entities.get(p.targetId);
     // A lootable body answers the press measured as its loot is (corpseLootDistance:
@@ -745,6 +742,11 @@ export function interact(
     pickUpObject(ctx, obj.id, p.id, noticeboardDefinitions);
     return;
   }
+  // Beside the Smith's Heart's heart seal crystal: the press is the crystal's (its plinth
+  // is wider than this scan's plain interact range, seal_burst.ts). Asked after a targeted
+  // body, a corpse and an object in plain reach have answered, so it never takes a press
+  // meant for something nearer, and before the NPC talk arms.
+  if (trySealCrystalInteract(ctx, p, r.meta.entityId)) return;
   if (questEntity && talkToWeeklyKeeper(ctx, questEntity, p)) return;
   if (questEntity && ctx.bankerIds.includes(questEntity.id)) {
     // Opening the bank window counts as banker business for the NPC ledger.

@@ -430,8 +430,14 @@ export function handleSmithHeartDevChat(ctx: SimContext, raw: string, pid: numbe
   if (verb === 'portal') {
     const inst = ensureInside(ctx, pid);
     if (!inst) return true;
-    burstSmithHeartSeal(ctx, inst);
-    log(ctx, pid, "[dev] The heart seal's portal is forced open for this run.");
+    const burst = burstSmithHeartSeal(ctx, inst);
+    log(
+      ctx,
+      pid,
+      burst
+        ? "[dev] The heart seal's portal is forced open for this run."
+        : '[dev] The heart seal crystal has already burst: the portal is open for this run.',
+    );
     return true;
   }
   if (verb === 'seal') {
