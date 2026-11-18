@@ -12,6 +12,15 @@
 //     long before it would sink into that rock or drift out of the claim.
 
 import { describe, expect, it } from 'vitest';
+import {
+  BREATH_ENV_ROCK,
+  breathEnvOwnsHorizon,
+  breathEnvOwnsRock,
+} from '../src/render/smith_heart/breath_env_plan_core';
+import {
+  HEART_ISLE_GAP,
+  planHeartCrownSpires,
+} from '../src/render/smith_heart/heart_crown_ridge_core';
 import { heartMountainHeight } from '../src/render/smith_heart/heart_mountain_core';
 import {
   heartRockSolids,
@@ -30,6 +39,7 @@ import {
   BREATH_ISLE_REACH,
   BREATH_ISLES,
   HEART_ROOM,
+  HEART_ROOM_CHASM_R,
 } from '../src/sim/content/smith_heart_layout';
 import {
   fellFromIsle,
@@ -191,5 +201,45 @@ describe('the ride home sets every body down clear of the edge', () => {
       expect(gapAt(s.back.x, s.back.z)).toBeNull();
       expect(lipDistance(s.back.x, s.back.z)).toBeGreaterThanOrEqual(HOME_LIP_CLEAR);
     }
+  });
+});
+
+describe("the crown ridge wears the Breath's own crags", () => {
+  it('stands staggered storm spires and bluffs on it, facing the Cornice, clear of every isle', () => {
+    const spires = planHeartCrownSpires();
+    expect(spires.length).toBeGreaterThanOrEqual(14);
+    const tops = new Set<number>();
+    for (const p of spires) {
+      expect(['Env_StormSpire', 'Env_StormBluff']).toContain(p.piece);
+      const m = BREATH_ENV_ROCK[p.piece];
+      const k = p.scale ?? 1;
+      tops.add(Math.round(p.y + m.h * k * (p.rise ?? 1)));
+      // Faced toward the Cornice (within a quarter turn).
+      const toC = Math.atan2(C.x - p.x, C.z - p.z);
+      expect(Math.cos(p.rot - toC)).toBeGreaterThan(0.7);
+      // Out of the Heart's chasm, beside the isles, never under one.
+      expect(Math.hypot(p.x - HEART_ROOM.x, p.z - HEART_ROOM.z)).toBeGreaterThan(
+        HEART_ROOM_CHASM_R,
+      );
+      BREATH_ISLES.forEach((isle, i) => {
+        if (!heartIsleOverCrown(i)) return;
+        expect(Math.hypot(p.x - isle.x, p.z - isle.z), isle.id).toBeGreaterThan(
+          BREATH_ISLE_REACH[i] + HEART_ISLE_GAP,
+        );
+      });
+    }
+    // A broken skyline, never one height.
+    expect(tops.size).toBeGreaterThan(spires.length * 0.7);
+  });
+
+  it('paints the far horizon over the east isles as storm rock', () => {
+    expect(breathEnvOwnsHorizon({ x: 122, z: 297, piece: 'Kit_RockMassBFar' })).toBe(true);
+    expect(breathEnvOwnsHorizon({ x: 122, z: 297, piece: 'Kit_RockMassB' })).toBe(false);
+    expect(breathEnvOwnsHorizon({ x: 0, z: 0, piece: 'Kit_RockMassBFar' })).toBe(false);
+    // Its far pieces round the Heart's north too (the Breath's quarter of the crown);
+    // the Heart's near rock keeps its own.
+    expect(breathEnvOwnsRock({ x: 144, z: 278, piece: 'Kit_RockWallBFar' })).toBe(true);
+    expect(breathEnvOwnsRock({ x: 188, z: 100, piece: 'Kit_RockWallBFar' })).toBe(false);
+    expect(breathEnvOwnsRock({ x: 122, z: 297, piece: 'Kit_RockMassBFar' })).toBe(true);
   });
 });

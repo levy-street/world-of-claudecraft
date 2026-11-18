@@ -1154,6 +1154,7 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart/heart_root_look_core.ts',
   'src/render/smith_heart_fx/breath_fx_core.ts',
   'src/render/smith_heart_fx/boss_far_lod_core.ts',
+  'src/render/smith_heart/heart_crown_ridge_core.ts',
   'src/render/smith_heart_fx/breath_roar_fx_core.ts',
   // which players the Breath's red arrows ride (breath_fight_fx.ts)
   'src/render/smith_heart_fx/breath_arrow_core.ts',

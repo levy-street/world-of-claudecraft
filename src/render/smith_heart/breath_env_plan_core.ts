@@ -58,8 +58,9 @@ const ROCK_SWAPS: Readonly<Record<string, readonly string[]>> = {
 /** Does this rock placement belong to the Breath? Everything in its area, and
  *  whatever a neighbour's area holds that faces the Breath's own floors; never what
  *  the Hammer's painted rebuild already takes (`hammerEnvOwnsRock`), never the Heart. */
-export function breathEnvOwnsRock(p: { x: number; z: number }): boolean {
+export function breathEnvOwnsRock(p: { x: number; z: number; piece?: string }): boolean {
   if (hammerEnvOwnsRock(p)) return false;
+  if (breathEnvOwnsHorizon(p)) return true;
   const area = smithHeartAreaAt(p.x, p.z);
   if (area === 'heart') return false;
   if (area === 'breath') return true;
@@ -68,6 +69,22 @@ export function breathEnvOwnsRock(p: { x: number; z: number }): boolean {
   // The floor it faces: on past the clearance's own margin, onto the walk.
   const reach = c.d + 4;
   return smithHeartAreaAt(p.x + c.toX * reach, p.z + c.toZ * reach) === 'breath';
+}
+
+/** The far horizon past the Heart's crown, north-east of the Cornice (instance-local
+ *  box): the skyline the raid sees over the east isles (the review of 2026-11-18: the
+ *  old kit's far masses stood there as flat grey slabs behind the guardian). Its far
+ *  pieces round the Heart's north stand in the Breath's quarter of the Heart's crown
+ *  (heart_crown_core.ts heartCrownQuarter: north the Breath), so the storm's rock is
+ *  right seen from the Heart too. */
+export const BREATH_ENV_HORIZON = { x0: 80, x1: 330, z0: 236, z1: 330 } as const;
+
+/** A far horizon piece over the east isles: the storm's spires and bluffs wear it, the
+ *  same painting as every Breath cliff (the old far kit stood there as slabs). */
+export function breathEnvOwnsHorizon(p: { x: number; z: number; piece?: string }): boolean {
+  if (!p.piece?.endsWith('Far') || p.piece.startsWith('Kit_Needle')) return false;
+  const H = BREATH_ENV_HORIZON;
+  return p.x >= H.x0 && p.x <= H.x1 && p.z >= H.z0 && p.z <= H.z1;
 }
 
 /** Pick the piece standing in for an old rock placement (a far build for a far one). */

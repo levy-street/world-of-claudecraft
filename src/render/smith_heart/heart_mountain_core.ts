@@ -146,11 +146,13 @@ export function heartCrownRidge(x: number, z: number): number {
   if (off >= R.half) return Number.NEGATIVE_INFINITY;
   const along = Math.cos(((off / R.half) * Math.PI) / 2);
   const across = Math.sin((d / R.width) * Math.PI);
+  // A broken crest, never one height: broad buttresses and gullies round the
+  // rim (a slow noise along the bearing), and a fine jag across them. The
+  // painted spires stand over it (heart_crown_ridge_core.ts).
+  const buttress = heartRidgeNoise(deg * 0.21 + 13, d * 0.05 - 41);
   const jag = heartRidgeNoise(x * 1.9 + 31, z * 1.9 - 77);
-  return (
-    HEART_ROOM.h +
-    (R.top - HEART_ROOM.h) * Math.sqrt(along) * (0.55 + 0.45 * across) * (0.9 + 0.1 * jag)
-  );
+  const crest = 0.86 + 0.1 * buttress + 0.04 * jag;
+  return HEART_ROOM.h + (R.top - HEART_ROOM.h) * Math.sqrt(along) * (0.55 + 0.45 * across) * crest;
 }
 
 function heartMountainRaw(x: number, z: number): number {
