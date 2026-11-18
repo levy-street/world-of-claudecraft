@@ -10,9 +10,13 @@ import {
   latchStaticFarMesh,
 } from './far_lod_latch_core';
 import { POS_EXTRAPOLATION_CAP } from './net_interp_core';
-import { keepsArticulatedRig } from './smith_heart_fx/boss_far_lod_core';
+import {
+  keepsArticulatedRig,
+  noteScriptedGesture,
+  scriptedPoseHidden,
+} from './smith_heart_fx/boss_far_lod_core';
 
-export { keepsArticulatedRig };
+export { keepsArticulatedRig, noteScriptedGesture, scriptedPoseHidden };
 
 const latches = new WeakMap<object, FarLodLatchState>();
 

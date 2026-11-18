@@ -380,7 +380,12 @@ import {
 import { EvilEyeMarkers } from './evil_eye_markers';
 import { enableAndWatchRendererExtensions } from './extension_drift_sentinel';
 import { advanceSelfFacing, releaseSelfFacing, wrapAngle } from './facing_smooth';
-import { keepsArticulatedRig, latchFarLod } from './far_lod_latch';
+import {
+  keepsArticulatedRig,
+  latchFarLod,
+  noteScriptedGesture,
+  scriptedPoseHidden,
+} from './far_lod_latch';
 import {
   buildFarTerrain,
   FAR_VISTA_ENTRY_MAX_WAIT_MS,
@@ -8555,6 +8560,7 @@ export class Renderer {
     const v = this.views.get(entityId);
     const visual = v ? this.activeVisual(v) : null;
     if (!visual) return 0;
+    noteScriptedGesture(visual, this.time); // a boss's scripted pose reached this rig
     this.attackTriggerCount++;
     if (!gestureOnly)
       playSkinSwingTrail(this.abilityVfxFx, entityId, this.sim.entities.get(entityId), kind);
@@ -9804,7 +9810,10 @@ export class Renderer {
         // Per-frame visibility follows the create/destroy hysteresis above so
         // rigs at the draw edge do not flicker. The object branch below may
         // still re-hide loot.
-        v.group.visible = raidEncounterViewVisibleDuringCompile(e, v.compilePending);
+        // A boss awaiting its scripted (entrance) pose: hidden until it arrives.
+        v.group.visible =
+          raidEncounterViewVisibleDuringCompile(e, v.compilePending) &&
+          !scriptedPoseHidden(this.activeVisual(v) ?? v, e, this.time);
         // The graveyard resurrection angel is present only to a released spirit: hide
         // it from the living local player. It stays in the sim for the ghost and for
         // server-side resurrect-range checks, and other ghosts still see it. The
