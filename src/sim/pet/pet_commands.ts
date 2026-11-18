@@ -468,7 +468,7 @@ export function createDemonPet(
     ctx.groundPos(owner.pos.x + 2, owner.pos.z + 1),
   );
   pet.scale = warlockPetScaleAtLevel(template, owner.level);
-  pet.name = template.name;
+  pet.name = ctx.players.get(owner.id)?.demonNames?.[mobId] ?? template.name;
   pet.ownerId = owner.id;
   pet.petMode = 'defensive';
   pet.petTauntTimer = 0;
@@ -622,6 +622,11 @@ export function renamePet(ctx: SimContext, name: string, pid?: number): void {
     return;
   }
   pet.name = clean;
+  // A demon is rebuilt from its template on every summon, so its name is
+  // remembered per demon on the owner (pet/demon_names.ts).
+  if (MOBS[pet.templateId]?.family === 'demon') {
+    r.meta.demonNames = { ...r.meta.demonNames, [pet.templateId]: clean };
+  }
   ctx.emit({ type: 'log', text: `Your pet is now named ${clean}.`, color: '#8f8', pid: r.e.id });
 }
 

@@ -64,6 +64,7 @@ import {
 } from './instances/difficulty_selection';
 import type { ItemCopyAnchor } from './item_copy_anchor';
 import * as membershipMod from './membership';
+import { type DemonNames, demonNamesSaveFragment, normalizeDemonNames } from './pet/demon_names';
 import { refreshKnownAbilities } from './progression/known_abilities';
 import { setPlayerLevel as setPlayerLevelImpl } from './progression/level';
 import { savedQuestProgress } from './quests/quest_progress_save';
@@ -1601,6 +1602,9 @@ export interface PlayerMeta
   alliedHearthstoneReadyAt?: number;
   alliedHearthstoneAttunement?: FactionId;
   riftGliderReadyAt?: number;
+  // Custom names per summoned demon, keyed by template id (pet/demon_names.ts).
+  // Persisted (character_state.ts `demonNames`); absent until the first rename.
+  demonNames?: DemonNames;
   targetDummyReadyAt?: number;
   dawnStandardReadyAt?: number;
   dawnStandardSeconds?: number;
@@ -3359,6 +3363,9 @@ export class Sim {
       // The buddy collection restores beside the Book (buddies.ts): owned
       // companions and pending boss reveals.
       meta.buddies = buddiesMod.restoreBuddyCollection(s.buddies);
+      // Demon nicknames restore beside the buddies (pet/demon_names.ts).
+      const demonNames = normalizeDemonNames(s.demonNames);
+      if (Object.keys(demonNames).length > 0) meta.demonNames = demonNames;
       // Resume with the weapon sheathed exactly as saved (absent = drawn).
       if (s.weaponStowed) player.weaponStowed = true;
       if (s.helmHidden) player.helmHidden = true;
@@ -4048,6 +4055,8 @@ export class Sim {
         const buddies = buddiesMod.serializeBuddyCollection(meta.buddies);
         return buddies ? { buddies } : {};
       })(),
+      // Demon nicknames: absent while empty, same zero-default omission.
+      ...demonNamesSaveFragment(meta.demonNames),
     };
     // Expired party-trade markers retire at this persistence boundary, never by tick sweep.
     return sanitizeRemovedZone1Content(retirePartyTradeOnSave(state, this.lockoutNowMs())).state;

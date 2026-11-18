@@ -172,6 +172,8 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   'referralInviterRewards',
   // The buddy collection (src/sim/buddies.ts): owned, last and custom names.
   'buddies',
+  // Custom names per warlock demon (src/sim/pet/demon_names.ts).
+  'demonNames',
   // Written by the SERVER, not by serializeCharacter: server/game.ts stamps
   // state.jail onto the serialized blob before persisting, so no sim fixture
   // can arm it and the source scrape below cannot see it either. Classified

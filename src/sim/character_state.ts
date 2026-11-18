@@ -424,6 +424,10 @@ export interface CharacterState extends ReferralRewardState {
   // to. A present-but-malformed value refuses the load rather than regenerating
   // a different id (readPersistedLocalIdentity).
   materialGathererIdentity?: LocalGathererIdentity;
+  // Custom names per warlock demon, keyed by template id (src/sim/pet/demon_names.ts).
+  // Demons are never saved, so this is what makes a rename survive a resummon
+  // or a relog. Optional, written only when non-empty; re-validated on load.
+  demonNames?: Record<string, string>;
 }
 
 export interface PetState {
