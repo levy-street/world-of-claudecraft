@@ -31623,6 +31623,6 @@ export const da_DK: EnTranslations = {
     "realmBuilderMonumentName": "Rigsbygger-monument",
     "musterRackName": "Opbuddets våbenstativ",
     "heartSealCrystalName": "The Heart Seal Crystal",
-    "heartSealCrystalInteract": "The Heart Seal Crystal: Press F to break it"
+    "heartSealCrystalInteract": "The Heart Seal Crystal: interact to break it"
   }
 };

@@ -31623,6 +31623,6 @@ export const pl_PL: EnTranslations = {
     "realmBuilderMonumentName": "Pomnik Budowniczego Królestw",
     "musterRackName": "Stojak na broń dla rekrutów",
     "heartSealCrystalName": "The Heart Seal Crystal",
-    "heartSealCrystalInteract": "The Heart Seal Crystal: Press F to break it"
+    "heartSealCrystalInteract": "The Heart Seal Crystal: interact to break it"
   }
 };

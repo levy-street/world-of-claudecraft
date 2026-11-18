@@ -31623,6 +31623,6 @@ export const zh_TW: EnTranslations = {
     "realmBuilderMonumentName": "王國建造者紀念碑",
     "musterRackName": "徵召兵器架",
     "heartSealCrystalName": "心之封印水晶",
-    "heartSealCrystalInteract": "心之封印水晶：按 F 擊碎"
+    "heartSealCrystalInteract": "心之封印水晶：互動以擊碎"
   }
 };

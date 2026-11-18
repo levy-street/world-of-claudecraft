@@ -31623,6 +31623,6 @@ export const de_DE: EnTranslations = {
     "realmBuilderMonumentName": "Reichsbauer-Denkmal",
     "musterRackName": "Waffenständer des Aufgebots",
     "heartSealCrystalName": "The Heart Seal Crystal",
-    "heartSealCrystalInteract": "The Heart Seal Crystal: Press F to break it"
+    "heartSealCrystalInteract": "The Heart Seal Crystal: interact to break it"
   }
 };

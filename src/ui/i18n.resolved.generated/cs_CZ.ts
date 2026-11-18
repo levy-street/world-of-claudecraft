@@ -31623,6 +31623,6 @@ export const cs_CZ: EnTranslations = {
     "realmBuilderMonumentName": "Památník Realm Builder",
     "musterRackName": "Stojan se zbraněmi pro odvod",
     "heartSealCrystalName": "The Heart Seal Crystal",
-    "heartSealCrystalInteract": "The Heart Seal Crystal: Press F to break it"
+    "heartSealCrystalInteract": "The Heart Seal Crystal: interact to break it"
   }
 };

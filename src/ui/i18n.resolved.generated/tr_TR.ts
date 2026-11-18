@@ -31623,6 +31623,6 @@ export const tr_TR: EnTranslations = {
     "realmBuilderMonumentName": "Bölge Oluşturucu Anıtı",
     "musterRackName": "Toplanma Silah Rafı",
     "heartSealCrystalName": "The Heart Seal Crystal",
-    "heartSealCrystalInteract": "The Heart Seal Crystal: Press F to break it"
+    "heartSealCrystalInteract": "The Heart Seal Crystal: interact to break it"
   }
 };

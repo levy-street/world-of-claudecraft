@@ -31623,6 +31623,6 @@ export const ru_RU: EnTranslations = {
     "realmBuilderMonumentName": "Памятник зодчим королевства",
     "musterRackName": "Оружейная стойка ополчения",
     "heartSealCrystalName": "Кристалл печати сердца",
-    "heartSealCrystalInteract": "Кристалл печати сердца: нажмите F, чтобы разбить"
+    "heartSealCrystalInteract": "Кристалл печати сердца: взаимодействуйте, чтобы разбить"
   }
 };

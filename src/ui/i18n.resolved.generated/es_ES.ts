@@ -31623,6 +31623,6 @@ export const es_ES: EnTranslations = {
     "realmBuilderMonumentName": "Monumento al constructor de reinos",
     "musterRackName": "Armero de la leva",
     "heartSealCrystalName": "The Heart Seal Crystal",
-    "heartSealCrystalInteract": "The Heart Seal Crystal: Press F to break it"
+    "heartSealCrystalInteract": "The Heart Seal Crystal: interact to break it"
   }
 };

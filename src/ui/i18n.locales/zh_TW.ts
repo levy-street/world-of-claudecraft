@@ -20785,7 +20785,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'worldContent.realmBuilderMonumentName': '王國建造者紀念碑',
   'worldContent.musterRackName': '徵召兵器架',
   'worldContent.heartSealCrystalName': '心之封印水晶',
-  'worldContent.heartSealCrystalInteract': '心之封印水晶：按 F 擊碎',
+  'worldContent.heartSealCrystalInteract': '心之封印水晶：互動以擊碎',
   'hudChrome.talkingHead.label': '對話',
   'hudChrome.hubLesson.target': '先將假人設為目標。',
   'hudChrome.hubLesson.openWindow': '打開{meters}。',

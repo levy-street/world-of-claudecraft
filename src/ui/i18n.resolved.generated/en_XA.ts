@@ -31623,6 +31623,6 @@ export const en_XA: EnTranslations = {
     "realmBuilderMonumentName": "[Ŕéáļɱ Ɓúíļðéŕ Ɱóñúɱéñţ]",
     "musterRackName": "[Ɱúšţéŕ Ŵéáþóñ Ŕáçķ]",
     "heartSealCrystalName": "[Ţĥé Ĥéáŕţ Šéáļ Çŕýšţáļ]",
-    "heartSealCrystalInteract": "[Ţĥé Ĥéáŕţ Šéáļ Çŕýšţáļ: Þŕéšš Ƒ ţó ƀŕéáķ íţ]"
+    "heartSealCrystalInteract": "[Ţĥé Ĥéáŕţ Šéáļ Çŕýšţáļ: íñţéŕáçţ ţó ƀŕéáķ íţ]"
   }
 };

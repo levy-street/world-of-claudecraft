@@ -31623,6 +31623,6 @@ export const id_ID: EnTranslations = {
     "realmBuilderMonumentName": "Monumen Pembangun Alam",
     "musterRackName": "Rak Senjata Pasukan",
     "heartSealCrystalName": "The Heart Seal Crystal",
-    "heartSealCrystalInteract": "The Heart Seal Crystal: Press F to break it"
+    "heartSealCrystalInteract": "The Heart Seal Crystal: interact to break it"
   }
 };

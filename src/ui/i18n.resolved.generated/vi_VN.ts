@@ -31623,6 +31623,6 @@ export const vi_VN: EnTranslations = {
     "realmBuilderMonumentName": "Đài tưởng niệm người xây dựng vương quốc",
     "musterRackName": "Giá Vũ Khí Tập Kết",
     "heartSealCrystalName": "The Heart Seal Crystal",
-    "heartSealCrystalInteract": "The Heart Seal Crystal: Press F to break it"
+    "heartSealCrystalInteract": "The Heart Seal Crystal: interact to break it"
   }
 };
