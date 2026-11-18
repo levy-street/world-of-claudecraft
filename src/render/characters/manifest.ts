@@ -5150,6 +5150,10 @@ export const VISUALS: Record<string, VisualDef> = {
     },
     bodyless: true,
     clickRadius: 2.4,
+    // A click AIMED at the crystal (its hover band, 1 to 6 yd up) wins over
+    // a player or an add standing before it: the click is its use now
+    // (promptless, Jose's call of 2026-11-18; world_direct_pick.ts).
+    aimCore: { back: 0, radius: 1.7, height: 6.2 },
   },
   // A Remembrance Candle's usable body (crypt_remembrance_candle, Morthen's
   // Rite: encounters/hollow_crypt/morthen_candles.ts) stands at its pillar's

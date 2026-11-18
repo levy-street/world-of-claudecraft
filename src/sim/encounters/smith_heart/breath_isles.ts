@@ -40,6 +40,7 @@ import { carriesLoad } from '../../combat/carried_load';
 import { BREATH_ISLES } from '../../content/smith_heart_layout';
 import { MOBS } from '../../data';
 import { createMob } from '../../entity';
+import { KIT_USE_SPENT_AURA } from '../../mob/trash_kit/encounter_use';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { DT, type Entity } from '../../types';
@@ -346,6 +347,10 @@ function stepStones(s: BreathScope): void {
     st.stilled = true;
     stilled++;
     putMarker(body, ISLE_AURAS.cocoon, ISLE_NAMES.still, 3600, s.boss.id, { permanent: true });
+    // Spent: no press, click or channel takes it again (Jose's playtest of
+    // 2026-11-18: "it lets me light the crystal many times"); a second
+    // channel already running is cut on its next recheck.
+    putMarker(body, KIT_USE_SPENT_AURA, ISLE_NAMES.still, 3600, s.boss.id, { permanent: true });
     s.ctx.emit({
       type: 'spellfx',
       sourceId: body.id,

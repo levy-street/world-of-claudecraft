@@ -36,6 +36,12 @@ import { type Aura, dist2d, type Entity, isKitUseCast, type KitUseDef } from '..
 import { spawnKitHazard } from './kit_hazard';
 import { kitOf } from './kit_of';
 
+/** A body wearing this marker is SPENT: its use completed and its dungeon
+ *  module will take no other (the Breath's stilled Stillstone). Not usable,
+ *  by the press, the click or the cursor, on either host: the marker rides
+ *  the body's auras over the wire like any other (an `internal_cd`, quiet). */
+export const KIT_USE_SPENT_AURA = 'kit_use_spent';
+
 /** The use a body carries, or null (a mob template's kit `usable`). */
 export function kitUseOf(e: Entity | undefined | null): KitUseDef | null {
   if (!e || e.kind !== 'mob') return null;
@@ -55,9 +61,15 @@ export function kitUseHoldsThroughHits(ctx: SimContext, p: Entity): boolean {
   return !!def && def.castId === p.castingAbility && def.holdsThroughHits === true;
 }
 
-/** Is `body` usable right now by anyone (alive, in the world)? */
+/** Is `body` usable right now by anyone (alive, in the world, not spent)? */
 export function kitUsableNow(body: Entity | undefined | null): boolean {
-  return !!body && !body.dead && body.hp > 0 && kitUseOf(body) !== null;
+  return (
+    !!body &&
+    !body.dead &&
+    body.hp > 0 &&
+    kitUseOf(body) !== null &&
+    !body.auras.some((a) => a.id === KIT_USE_SPENT_AURA)
+  );
 }
 
 /** Why a press on a usable body is refused (null: it may start). The words
@@ -86,7 +98,7 @@ export function kitUseRefusal(
  */
 export function tryStartKitUse(ctx: SimContext, body: Entity, p: Entity): boolean {
   const def = kitUseOf(body);
-  if (!def || body.dead || body.hp <= 0) return false;
+  if (!def || !kitUsableNow(body)) return false;
   const refusal = kitUseRefusal(ctx, p, body, def);
   if (refusal) {
     ctx.error(p.id, refusal);

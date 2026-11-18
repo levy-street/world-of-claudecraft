@@ -329,9 +329,10 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   },
   // The Stillstone (the last isle of each side): the stone Captain Thessaly's
   // calm is bound into. Never hostile, never fights (the encounter holds it
-  // and nothing can strike it); a player targets it and presses interact to
-  // still the gale through it, the G3 use (mob/trash_kit/encounter_use.ts): a
-  // 5 s channel a landed hit breaks. Its literals are breath_isle_ids.ts
+  // and nothing can strike it); a player clicks it (or targets it and
+  // presses interact) to still the gale through it, the G3 use (mob/
+  // trash_kit/encounter_use.ts): a 5 s channel a landed hit breaks, ONCE (a
+  // stilled stone wears KIT_USE_SPENT_AURA). Its literals are breath_isle_ids.ts
   // ISLE_MOBS.stillstone and ISLE_CASTS.still. The crystal is drawn by the
   // fight's own painter (render/smith_heart_fx/breath_isles_fx.ts).
   [ISLE_MOBS.stillstone]: {
@@ -360,6 +361,9 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
         channel: 5,
         range: 5,
         effect: { kind: 'relight', school: 'nature' },
+        // No prompt: a click on the crystal starts the channel; its cast bar
+        // and the beam it fires say the rest (Jose's call of 2026-11-18).
+        promptless: true,
       },
     },
     loot: [],

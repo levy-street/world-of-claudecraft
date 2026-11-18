@@ -5455,6 +5455,11 @@ export interface KitUseDef {
    *  death or drifting out of reach still break it): the candle's channel
    *  drains its lighter's health and the healer heals them through it. */
   holdsThroughHits?: boolean;
+  /** No HUD use prompt (ui/hud/dungeon/kit_use_prompt_view.ts): a click on
+   *  the body within its `range` starts the use (game/interactions.ts), the
+   *  interact press still does, and the player's own cast bar is all that
+   *  shows while it runs (the Breath's Stillstone, Jose's call of 2026-11-18). */
+  promptless?: boolean;
 }
 
 /** A G5 walker (TrashKitDef.walker). */
