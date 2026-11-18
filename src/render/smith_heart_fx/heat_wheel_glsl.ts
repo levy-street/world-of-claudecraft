@@ -168,6 +168,7 @@ uniform float uErupt;
 uniform float uBurn;
 uniform float uGeysers;
 uniform float uLow;
+uniform vec3 uMe;
 attribute vec4 aVent;
 attribute float aIndex;
 attribute float aPlane;
@@ -207,9 +208,11 @@ void main() {
   } else {
     // In step with the flash running out from the lip, a beat apart each.
     float lt = uErupt - aVent.y * ${WHEEL_FX.ripple.toFixed(2)} - fract(s * 7.13) * 0.1;
-    float rise = smoothstep(0.0, 0.2, lt);
-    float hold = 0.8 + 0.4 * s;
-    float fall = 1.0 - smoothstep(hold, hold + 0.5, lt);
+    // A burst: up fast, a peak of about a second, then a fast collapse into
+    // the low flames that carry the danger read.
+    float rise = smoothstep(0.0, 0.18, lt);
+    float hold = 0.75 + 0.3 * s;
+    float fall = 1.0 - smoothstep(hold, hold + 0.22, lt);
     // The column (staggered heights), then low flames while the sim burns.
     float col = rise * fall * uGeysers;
     float low = smoothstep(0.0, 0.25, lt) * uLow * (1.0 - col);
@@ -220,11 +223,24 @@ void main() {
     vFire = max(col, low);
     hgt = col >= low ? colH : lowH;
     vLowK = col >= low ? 0.0 : 1.0;
+    // Never between the camera and your own character, never in your face:
+    // a column near the camera, or near the line from it to the local
+    // player (short of the player), fades out.
+    vec2 cam = cameraPosition.xz;
+    vec2 seg = uMe.xz - cam;
+    float sl2 = max(dot(seg, seg), 1e-4);
+    float k = clamp(dot(xz - cam, seg) / sl2, 0.0, 1.0);
+    float off = length(cam + seg * k - xz);
+    float clear = ${WHEEL_FX.clear.toFixed(1)} + hgt * 0.18;
+    float block = (1.0 - smoothstep(clear, clear + 3.0, off)) * step(k, 0.98);
+    float near = 1.0 - smoothstep(clear, clear + 4.0, length(xz - cam));
+    float occl = 1.0 - (1.0 - vLowK) * max(block, near);
     // The burst is the bang at the foot; it gives way to the column (from
     // straight above it stays: the crossed planes go edge-on there).
     float bang = (1.0 - smoothstep(0.2, 0.75, lt) * (1.0 - 0.6 * overhead)) * col;
     if (vBurst > 0.5) vFire = bang * mix(0.75, 1.0, overhead);
     else vFire *= 1.0 - 0.6 * overhead * (1.0 - vLowK);
+    vFire *= vBurst > 0.5 ? 1.0 - max(block, near) : occl;
   }
   if (inside < 0.5 || (vFire + vHaze) < 0.003 || hgt < 0.05) {
     gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
@@ -310,21 +326,25 @@ void main() {
   float n = kfbm(q * 1.9 + warp * 1.7 + vec2(0.0, -t * 1.2));
   // Tongues of uneven height across the column, rising and breaking.
   float x = (uv.x - 0.5) * 2.0 + warp.x * 1.4 * uv.y;
-  float r1 = 1.0 - abs(2.0 * kn(vec2(uv.x * 3.1 + s, t * 0.9)) - 1.0);
+  float r1 = 1.0 - abs(2.0 * kn(vec2(uv.x * 4.3 + s, t * 1.1)) - 1.0);
   float top = mix(0.72 + 0.26 * r1 * r1, 0.55 + 0.4 * r1 * r1, vLowK);
   float yy = uv.y / top;
   // Rounded where it boils out of the ground, widest low, tapering to licks.
   float halfW = mix(0.9, mix(0.42, 0.2, vLowK), pow(clamp(yy, 0.0, 1.0), mix(1.6, 1.0, vLowK))) * (0.8 + 0.4 * n)
     * (0.55 + 0.45 * smoothstep(0.0, 0.16, uv.y));
-  float shape = 1.0 - smoothstep(halfW * 0.25, halfW, abs(x));
+  // Crisp edges: the body cut sharp, the tongues their own shapes.
+  float shape = 1.0 - smoothstep(halfW * mix(0.7, 0.25, vLowK), halfW, abs(x));
   float I = shape * ((1.0 - yy) * 1.1 + (n - 0.5) * 1.3);
   I -= smoothstep(0.4, 1.05, yy) * (1.0 - n) * 0.8;
   I += (1.0 - smoothstep(0.0, 0.14, uv.y)) * 0.35 * shape;
   I = clamp(I * 1.35, 0.0, 1.0);
   // White-yellow at the foot, orange through the body, dark red at the tips.
-  float h = I * (1.0 - 0.55 * smoothstep(0.0, 1.0, yy)) * mix(0.88, 1.0, vLowK);
-  vec3 col = fireRamp(h) * mix(0.95, 1.1, vLowK);
-  float a = smoothstep(0.04, 0.28, I) * vFire * smoothstep(0.0, 0.12, uv.y);
+  float h = I * (1.0 - 0.55 * smoothstep(0.0, 1.0, yy)) * mix(0.85, 1.0, vLowK);
+  vec3 col = fireRamp(h) * mix(0.8, 1.1, vLowK);
+  // Sharp-edged and see-through enough for the arena to show (columns),
+  // never a soft additive wash.
+  float a = smoothstep(mix(0.14, 0.04, vLowK), mix(0.24, 0.28, vLowK), I) * vFire
+    * smoothstep(0.0, 0.12, uv.y) * mix(0.62, 1.0, vLowK);
   gl_FragColor = vec4(col, a);
 }
 `;

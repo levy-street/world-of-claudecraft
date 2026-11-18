@@ -214,6 +214,9 @@ describe('the Wheel inside HeatFightFx over a fake world', () => {
       WHEEL_FX.vents * WHEEL_FX.planes,
     );
     expect(WHEEL_FX.vents).toBeLessThanOrEqual(16);
+    // Columns a burst of fire, not a wall: 12 to 18 yd.
+    expect(WHEEL_FX.geyser[0]).toBeGreaterThanOrEqual(12);
+    expect(WHEEL_FX.geyser[1]).toBeLessThanOrEqual(18);
     // A round: three red slices and the safe one.
     const warn = HEAT_DIFFICULTY.normal.wheel.warn;
     const safe = 2;
@@ -232,6 +235,10 @@ describe('the Wheel inside HeatFightFx over a fake world', () => {
     bump();
     run(4);
     expect(shown('smithHeartHeatWheel')).toBe(4);
+    // The columns know the local player (they fade off the line to it).
+    const ventU = (vents[0].material as THREE.ShaderMaterial).uniforms;
+    expect((ventU.uMe.value as THREE.Vector3).x).toBeCloseTo(me.pos.x, 6);
+    expect((ventU.uMe.value as THREE.Vector3).z).toBeCloseTo(me.pos.z, 6);
     // The doomed slices' vents shimmer; the safe slice has none.
     expect(shown('smithHeartHeatWheelVents')).toBe(3);
     // The eruption: the reds burn, the safe slice leaves the floor.

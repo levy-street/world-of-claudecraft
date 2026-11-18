@@ -49,7 +49,11 @@ export const WHEEL_FX = {
   /** The eruption runs out from the lip to the far wall over this long. */
   ripple: 0.32,
   /** A geyser's height (yards, min to max). */
-  geyser: [20, 32] as const,
+  geyser: [12, 18] as const,
+  /** A column fades out when its axis comes this close (yards) to the
+   *  camera, or to the line from the camera to the local player (it never
+   *  hides your own character). */
+  clear: 4,
   /** The scorch cools this long after the sim drops the slice. */
   fade: 2.6,
 } as const;

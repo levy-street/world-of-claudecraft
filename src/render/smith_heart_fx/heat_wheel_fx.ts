@@ -145,6 +145,8 @@ export class HeatWheelFx {
   );
   private readonly polyFor = { x: Number.NaN, z: Number.NaN };
   private readonly centre = new THREE.Vector3();
+  /** The local player (world): a column never stands between it and the camera. */
+  private readonly me = new THREE.Vector3(1e6, 0, 1e6);
   private readonly clip = new THREE.Vector4(-1e9, 1e9, -1e9, 1e9);
   private shown = false;
 
@@ -228,6 +230,7 @@ export class HeatWheelFx {
         uErupt: floorU.uErupt,
         uBurn: floorU.uBurn,
         uGeysers: { value: 1 },
+        uMe: { value: this.me },
         uLow: { value: 0 },
       };
       const ventMat = new THREE.ShaderMaterial({
@@ -299,6 +302,8 @@ export class HeatWheelFx {
     dt: number,
   ): void {
     this.place(origin);
+    const mine = world.entities.get(world.playerId);
+    if (mine) this.me.set(mine.pos.x, mine.pos.y, mine.pos.z);
     // A slice the sim has dropped: an erupted one cools, any other goes.
     for (const s of this.slots) {
       if (s.id < 0 || ids.includes(s.id)) continue;
