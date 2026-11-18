@@ -13,6 +13,7 @@
 // Pure dispatch over breath_isles.ts; no rng.
 
 import { BREATH_ISLES } from '../../content/smith_heart_layout';
+import type { Entity } from '../../types';
 import { livingIsleAdds } from './breath_isle_adds';
 import { isleAt } from './breath_isle_geometry';
 import { ISLE_TUNING } from './breath_isle_ids';
@@ -20,6 +21,13 @@ import { islePlayers, startIsles, startRide } from './breath_isles';
 import { type BreathScope, local } from './breath_scope';
 
 /** The verbs this module answers. */
+/** A dev hit that fells an isle add through anything that turns a blow
+ *  aside (the Squall Shieldbearer's ward takes up to 90 percent off the
+ *  front, so a bare `hp + 1` left it standing and its isle never cleared). */
+function devKill(e: Entity): number {
+  return e.hp * 20 + 1;
+}
+
 export const ISLE_DEV_VERBS: ReadonlySet<string> = new Set([
   'isles',
   'isle',
@@ -67,7 +75,7 @@ export function isleDevTrigger(
     const only = arg === undefined ? undefined : Number(arg);
     let k = 0;
     for (const e of livingIsleAdds(s, only)) {
-      s.ctx.dealDamage(s.boss, e, e.hp + 1, false, 'nature', 'Dev', 'hit', true);
+      s.ctx.dealDamage(s.boss, e, devKill(e), false, 'nature', 'Dev', 'hit', true);
       k++;
     }
     return `${k} isle adds fall.`;
@@ -82,7 +90,7 @@ export function isleDevTrigger(
       if (!st.woken || !st.cleared) {
         st.woken = true;
         for (const e of livingIsleAdds(s, i))
-          s.ctx.dealDamage(s.boss, e, e.hp + 1, false, 'nature', 'Dev', 'hit', true);
+          s.ctx.dealDamage(s.boss, e, devKill(e), false, 'nature', 'Dev', 'hit', true);
       }
       const body = st.stoneId !== null ? s.ctx.entities.get(st.stoneId) : undefined;
       if (body && me) body.kitUseCompletedBy = me.id;

@@ -243,3 +243,27 @@ describe('the Stillstone shows no prompt; a click channels it', () => {
     expect(showError).not.toHaveBeenCalled();
   });
 });
+
+describe('the isles dev kill', () => {
+  it('fells a warded Squall Shieldbearer too (its isle clears, the stone wakes)', () => {
+    const f = pulled();
+    const [, a] = f.players;
+    ride(f, a, -1, 0);
+    killIsle(f, 0);
+    ride(f, a, 0, 1);
+    killIsle(f, 1);
+    killIsle(f, 1);
+    ride(f, a, 1, 2);
+    // The Shieldbearer turned to the guardian: the dev hit lands on its ward.
+    const b = f.boss();
+    for (const r of f.state()?.isles.adds ?? []) {
+      const e = f.sim.ctx.entities.get(r.id);
+      if (r.isle !== 2 || !e || e.templateId !== ISLE_MOBS.shieldbearer) continue;
+      e.facing = Math.atan2(b.pos.x - e.pos.x, b.pos.z - e.pos.z);
+    }
+    f.dev('/dev heart breath killisle 2', a.id);
+    f.tick(2);
+    expect(f.state()?.isles.isles[2].cleared).toBe(true);
+    expect(f.state()?.isles.isles[2].stoneId).not.toBeNull();
+  });
+});
