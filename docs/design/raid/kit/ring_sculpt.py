@@ -183,11 +183,19 @@ def _apron(p, rng, bearing, tones):
     """A stair's landing between the dais's rim and the stair's first tread
     (the stair's walk, |lateral| <= 8, from the rim's circle out to 23 yd):
     courses across the stair, the course nearest the dais cut to the rim's
-    circle, the channel's gap down its middle."""
-    s = -1.0 if bearing == 0.0 else 1.0      # Blender y of the outward side
+    circle, the channel's gap down its middle. One at each of the four
+    stairs (the East and West Stairs since the owner's review of 2026-11-18);
+    the north and south keep their old frame, so their courses are as before."""
+    if bearing in (0.0, 180.0):
+        s = -1.0 if bearing == 0.0 else 1.0      # Blender y of the outward side
 
-    def to_xy(lat, out):
-        return (lat, s * out)
+        def to_xy(lat, out):
+            return (lat, s * out)
+    else:
+        s = 1.0 if bearing == 90.0 else -1.0     # Blender x of the outward side (east +x)
+
+        def to_xy(lat, out):
+            return (s * out, lat)
 
     rows = [(APRON_END, 21.7), (21.7, 20.35), (20.35, None)]
     for (o0, o1) in rows:
@@ -329,9 +337,9 @@ def dais_keel(bpy, p, seed=3101):
 def seal_dais(bpy):
     """The Seal Dais (see the module doc): the seal's dark basalt ring, the
     courses of dressed flags out to the rim, the four channels from the
-    rim to the seal's notches, the rim's low parapet (open where the two
-    stairs land and where the Quench's and the Heat's light leap onto it),
-    the rim's carved face, and the keel."""
+    rim to the seal's notches, the four stairs' landings, the rim's low
+    parapet (open where the four stairs land), the rim's carved face, and
+    the keel."""
     p = SP('SealDais', seed=3001, ao=0.4, ao_dist=0.6, dust=0.6)
     rng = p.rng
     gaps = [(b, 1.34) for b in CHANNELS]
@@ -365,14 +373,16 @@ def seal_dais(bpy):
     tones = lambda: (FLAG, FLAG_COOL, FLAG_WARM, FLAG_PALE)[rng.randrange(4)]  # noqa: E731
     for (r0, r1) in ((11.1, 12.8), (12.8, 14.6), (14.6, 16.35), (16.35, 17.95), (17.95, DAIS_R)):
         _flags_round(p, rng, r0, r1, tones, gaps)
-    # The two stairs' landings out over the void (north and south, to the
-    # stairs' first treads at 23 yd), paved in courses across the stair.
-    for b in (0.0, 180.0):
+    # The four stairs' landings out over the void (to the stairs' first treads
+    # at 23 yd), paved in courses across the stair. The north and south first,
+    # in their old order, then the East and West Stairs' (the owner's review
+    # of 2026-11-18: they replaced the thin conduits the Quench's and the
+    # Heat's light crossed on).
+    for b in (0.0, 180.0, 90.0, 270.0):
         _apron(p, rng, b, tones)
-    # The channels, from the rim (the landings' ends north and south) to the
-    # seal's notch.
+    # The channels, from the rim (the landings' ends) to the seal's notch.
     for b in CHANNELS:
-        _channel_radial(p, rng, b, SEAL_RIM - 0.35, APRON_END if b in (0.0, 180.0) else DAIS_R + 0.55)
+        _channel_radial(p, rng, b, SEAL_RIM - 0.35, APRON_END)
     # The rim: a carved face down to the keel, and the low parapet on it.
     with p.as_kind(DRESSED):
         for lift, (z0, z1) in enumerate(((-1.4, 0.0), (-2.95, -1.4))):
@@ -388,8 +398,8 @@ def seal_dais(bpy):
                 prism_top(p, outline, z1 - 0.02, z0, p.vary(FASCIA if rng.random() < 0.7 else FASCIA_DARK, 0.05),
                           bevel=0.07)
                 a = b
-        # The parapet: open over the stairs (N, S) and the leaps (E, W).
-        opens = [(0.0, 27.5), (180.0, 27.5), (90.0, 4.8), (270.0, 4.8)]
+        # The parapet: open over the four stairs.
+        opens = [(0.0, 27.5), (180.0, 27.5), (90.0, 27.5), (270.0, 27.5)]
         a = 0.0
         while a < 360.0 - 1e-6:
             step = rng.uniform(4.5, 7.0)
