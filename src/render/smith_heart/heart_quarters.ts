@@ -47,6 +47,7 @@ import {
 } from '../../sim/content/smith_heart_quarters';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { sharedUniforms } from '../gfx';
+import { eruptLevel, floorThrob } from '../smith_heart_fx/final_overload_core';
 import { type HeartAirV3, type HeartAirV4, heartQuadGeometry } from './heart_air_quads';
 import { buildHeartCollapse } from './heart_collapse';
 import {
@@ -906,13 +907,17 @@ export function buildHeartQuarters(
         const whole = fallT >= 0 ? 0 : 1;
         if (r.shadeMesh.visible !== (whole === 1)) r.shadeMesh.visible = whole === 1;
         if (r.washMesh.visible !== (whole === 1)) r.washMesh.visible = whole === 1;
-        set(r.glow.uniforms.uBase, q.base);
+        // The Overload in the world: the quarter it drinks throbs as its bar
+        // fills (final_overload_core.ts floorThrob), every tier.
+        const throb =
+          state.mode === 'quarter' && state.zone === vein ? floorThrob(boss?.strain ?? 0, now) : 0;
+        set(r.glow.uniforms.uBase, q.base + throb);
         // The quarter's idle life (the Heat's smoulder) wakes with the room.
         set(r.glow.uniforms.uIdle, awakeRoom ? P[vein].idle * (1 - dark) : 0);
         set(r.glow.uniforms.uAwake, q.awake);
         set(r.glow.uniforms.uFront, q.front, 100);
         set(r.glow.uniforms.uDark, dark);
-        set(r.wash.uniforms.uAwake, q.awake * whole);
+        set(r.wash.uniforms.uAwake, q.awake * whole * (1 + throb));
         set(r.wash.uniforms.uFront, q.front, 100);
         set(r.wash.uniforms.uDark, dark);
         const shadeLevel = state.mode === 'rest' || state.mode === 'asleep' ? 0.88 : P[vein].shade;
@@ -926,10 +931,14 @@ export function buildHeartQuarters(
         }
         // Its wall landmark: a quiet glow of its tint, erupting as its
         // flood reaches the wall.
+        // From three quarters full it erupts: its light flares past its lit
+        // level, throbbing (its element thrown up off it is FinalFx's).
+        const erupt =
+          state.mode === 'quarter' && state.zone === vein ? eruptLevel(boss?.strain ?? 0) : 0;
         landmarks.set(
           vein,
           q.base * 4 + (awakeRoom ? P[vein].idle * 0.5 : 0),
-          heartLandmarkLit(q) * whole,
+          heartLandmarkLit(q) * whole * (1 + erupt * (0.6 + 0.5 * Math.sin(now * 14))),
           dark,
         );
         const lf = heartLandmarkFall(fallT);

@@ -54,6 +54,10 @@ export interface HeartQuarterBoss {
   /** Part 2: the quarters awake through an intermission's call (its living
    *  Splinters', final_phase_ids.ts `quarterBit`), 0 or absent none. */
   mask?: number;
+  /** The Overload in the world (the rework of 2026-11-18): the bar of the
+   *  quarter it stands in, 0..1 (the floor's cracks throb, the wall erupts
+   *  from three quarters: final_overload_core.ts). */
+  strain?: number;
 }
 
 const memory = new Map<string, HeartQuarterBoss>();
@@ -68,6 +72,7 @@ export function noteHeartQuarterBoss(
   awake: boolean,
   final = false,
   mask = 0,
+  strain = 0,
 ): void {
   if (!awake) {
     memory.delete(key);
@@ -80,7 +85,8 @@ export function noteHeartQuarterBoss(
     m.engaged = engaged;
     m.final = final;
     m.mask = mask;
-  } else memory.set(key, { x, z, engaged, final, mask });
+    m.strain = strain;
+  } else memory.set(key, { x, z, engaged, final, mask, strain });
 }
 
 /** The slot's final boss as last seen, or null. */
