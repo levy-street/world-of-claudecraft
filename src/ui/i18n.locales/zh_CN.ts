@@ -23050,11 +23050,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_storm_lance': '风暴长枪',
   'abilityUi.cast.heart_quenching_breath': '淬火吐息',
   'hudChrome.auraEffect.heatGuardian.statePhase1':
-    '半身沉在涌泉之中，从不移动。玄武岩之拳砸向岸上的一点，三道熔岩涌浪从那里滚滚而出；炉心闪焰会击中所有距离涌泉超过{reach}码的人。生命值降到70%时它会沉下，炉心随之满溢。英雄难度下伤害提高{heroicPct}%。',
+    '半身沉在涌泉之中，从不移动。炉心之轮把岸边切成四块：三块发红并在{warn}秒后爆发（英雄难度{heroicWarn}秒），一块保持黑暗、安全；每一轮爆发时，下一轮的安全区会出现在别处。玄武岩之拳砸向岸上的一点，三道熔岩涌浪从那里滚滚而出；炉心闪焰会击中所有距离涌泉超过{reach}码的人。生命值降到70%时它会沉下，炉心随之满溢。英雄难度下伤害提高{heroicPct}%。',
   'hudChrome.auraEffect.heatGuardian.statePhase2':
-    '半身沉在涌泉之中，从不移动。玄武岩之拳仍在继续；炉心火种落在团队脚下，片刻后爆裂，苏醒之火将涌泉周围的地面一圈接一圈地点燃。生命值降到40%时它会再次沉下，炉心再度满溢。英雄难度下伤害提高{heroicPct}%。',
+    '半身沉在涌泉之中，从不移动。炉心之轮与玄武岩之拳仍在继续；炉心火种落在团队脚下，片刻后爆裂，苏醒之火将涌泉周围的地面一圈接一圈地点燃。生命值降到40%时它会再次沉下，炉心再度满溢。英雄难度下伤害提高{heroicPct}%。',
   'hudChrome.auraEffect.heatGuardian.statePhase3':
-    '半身沉在涌泉之中，从不移动。玄武岩之拳与苏醒之火仍在继续，滚动余烬会坠落并追逐玩家：击中它就能把它打退。英雄难度下伤害提高{heroicPct}%。',
+    '半身沉在涌泉之中，从不移动。炉心之轮、玄武岩之拳与苏醒之火仍在继续，滚动余烬会坠落并追逐玩家：击中它就能把它打退。英雄难度下伤害提高{heroicPct}%。',
   'hudChrome.auraEffect.heatGuardian.intro':
     '在涌泉中冰冷沉寂：在团队靠近、它苏醒燃起之前，无法被攻击或伤害。',
   'hudChrome.auraEffect.heatGuardian.stateUnder':

@@ -37,7 +37,12 @@ function stateDescriptor(a: AuraEffectInput): AuraEffectDescriptor {
   const phase = Math.max(1, Math.min(3, Math.round(a.value ?? 1)));
   return {
     key: `${KEY}.statePhase${phase}`,
-    nums: { reach: T.flareReach, heroicPct: HEROIC_PCT },
+    nums: {
+      reach: T.flareReach,
+      heroicPct: HEROIC_PCT,
+      warn: HEAT_DIFFICULTY.normal.wheel.warn,
+      heroicWarn: HEAT_DIFFICULTY.heroic.wheel.warn,
+    },
   };
 }
 

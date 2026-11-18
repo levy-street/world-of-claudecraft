@@ -23066,11 +23066,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_storm_lance': '風暴長槍',
   'abilityUi.cast.heart_quenching_breath': '淬火吐息',
   'hudChrome.auraEffect.heatGuardian.statePhase1':
-    '半身沉在湧泉之中，從不移動。玄武岩之拳砸向岸上的一點，三道熔岩湧浪從那裡滾滾而出；爐心閃焰會擊中所有距離湧泉超過{reach}碼的人。生命值降到70%時它會沉下，爐心隨之滿溢。英雄難度下傷害提高{heroicPct}%。',
+    '半身沉在湧泉之中，從不移動。爐心之輪把岸邊切成四塊：三塊發紅並在{warn}秒後爆發（英雄難度{heroicWarn}秒），一塊保持黑暗、安全；每一輪爆發時，下一輪的安全區會出現在別處。玄武岩之拳砸向岸上的一點，三道熔岩湧浪從那裡滾滾而出；爐心閃焰會擊中所有距離湧泉超過{reach}碼的人。生命值降到70%時它會沉下，爐心隨之滿溢。英雄難度下傷害提高{heroicPct}%。',
   'hudChrome.auraEffect.heatGuardian.statePhase2':
-    '半身沉在湧泉之中，從不移動。玄武岩之拳仍在繼續；爐心火種落在團隊腳下，片刻後爆裂，甦醒之火將湧泉周圍的地面一圈接一圈地點燃。生命值降到40%時它會再次沉下，爐心再度滿溢。英雄難度下傷害提高{heroicPct}%。',
+    '半身沉在湧泉之中，從不移動。爐心之輪與玄武岩之拳仍在繼續；爐心火種落在團隊腳下，片刻後爆裂，甦醒之火將湧泉周圍的地面一圈接一圈地點燃。生命值降到40%時它會再次沉下，爐心再度滿溢。英雄難度下傷害提高{heroicPct}%。',
   'hudChrome.auraEffect.heatGuardian.statePhase3':
-    '半身沉在湧泉之中，從不移動。玄武岩之拳與甦醒之火仍在繼續，滾動餘燼會墜落並追逐玩家：擊中它就能把它打退。英雄難度下傷害提高{heroicPct}%。',
+    '半身沉在湧泉之中，從不移動。爐心之輪、玄武岩之拳與甦醒之火仍在繼續，滾動餘燼會墜落並追逐玩家：擊中它就能把它打退。英雄難度下傷害提高{heroicPct}%。',
   'hudChrome.auraEffect.heatGuardian.intro':
     '在湧泉中冰冷沉寂：在團隊靠近、它甦醒燃起之前，無法被攻擊或傷害。',
   'hudChrome.auraEffect.heatGuardian.stateUnder':

@@ -1,17 +1,20 @@
-// The Wheel of the Hearth over a REAL Sim claim: Mythic only, four slices round the
-// wellspring, three erupt and one stays safe, three rounds back to back with the next
-// safe slice shown as the last erupts, deterministic, and a wipe clears it. Plus the
-// slices' geometry, the template ids and the shader's arcs.
+// The Wheel of the Hearth over a REAL Sim claim: every tier and every fighting phase
+// since the rework of 2026-11-18 (Normal slowest with the longest warning, Heroic
+// quicker, Mythic quicker still and a round longer), four slices round the wellspring,
+// three erupt and one stays safe, the tier's rounds back to back with the next safe
+// slice shown as the last erupts, never over Wakefire, deterministic, and a wipe clears
+// it. Plus the slices' geometry, the template ids and the shader's arcs.
 
 import { describe, expect, it } from 'vitest';
 import { wheelArc } from '../src/render/smith_heart_fx/heat_fight_fx_core';
 import { HEARTH_WELL } from '../src/sim/content/smith_heart_layout';
 import {
+  FIST_SPAN,
   HEAT_DIFFICULTY,
   HEAT_NAMES,
   HEAT_OBJECTS,
+  HEAT_PHASE_KIT,
   HEAT_TUNING as T,
-  WHEEL_ROUNDS,
   WHEEL_SLICES,
   wheelOf,
   wheelSliceAt,
@@ -25,12 +28,19 @@ import { hitsOf } from './helpers/council_fight';
 import { type HeatFight, heatFight } from './helpers/heat_fight';
 
 const ticks = (s: number) => Math.round(s * 20);
+const DT_S = 1 / 20;
+const M = HEAT_DIFFICULTY.mythic.wheel;
 
 function mythic(n = 4): HeatFight {
+  return tier('mythic', n);
+}
+
+/** A pulled fight on `tierName` in `phase`, every clock held. */
+function tier(tierName: 'normal' | 'heroic' | 'mythic', n = 4, phase = 2): HeatFight {
   const f = heatFight(n, 31);
   f.dev('/dev heart heat pull');
-  f.dev('/dev heart heat mythic');
-  f.dev('/dev heart heat phase 2');
+  if (tierName !== 'normal') f.dev(`/dev heart heat ${tierName}`);
+  f.dev(`/dev heart heat phase ${phase}`);
   const st = f.state();
   if (!st) throw new Error('no fight');
   st.seedTimer = 999;
@@ -48,10 +58,16 @@ function spot(slice: number, r = 22) {
 }
 
 describe('Guardian of the Heat: the Wheel of the Hearth', () => {
-  it('is Mythic only', () => {
-    expect(HEAT_DIFFICULTY.normal.wheel).toBe(false);
-    expect(HEAT_DIFFICULTY.heroic.wheel).toBe(false);
-    expect(HEAT_DIFFICULTY.mythic.wheel).toBe(true);
+  it('turns on every tier and in every fighting phase: Normal slowest, Mythic quickest and longest', () => {
+    for (const phase of [1, 2, 3] as const) expect(HEAT_PHASE_KIT[phase].wheel).toBe(true);
+    const n = HEAT_DIFFICULTY.normal.wheel;
+    const h = HEAT_DIFFICULTY.heroic.wheel;
+    expect(n.warn).toBeGreaterThan(h.warn);
+    expect(h.warn).toBeGreaterThan(M.warn);
+    expect(n.every).toBeGreaterThan(h.every);
+    expect(n.rounds).toBe(3);
+    expect(h.rounds).toBe(3);
+    expect(M.rounds).toBe(4);
   });
 
   it('the slices: four round the shore, every bearing in exactly one', () => {
@@ -76,8 +92,8 @@ describe('Guardian of the Heat: the Wheel of the Hearth', () => {
 
   it('the safe slices: hashed, never the same twice running, one or two apart', () => {
     for (let run = 0; run < 40; run++) {
-      const safes = wheelSafes(run);
-      expect(safes.length).toBe(WHEEL_ROUNDS);
+      const safes = wheelSafes(run, M.rounds);
+      expect(safes.length).toBe(M.rounds);
       for (let i = 0; i < safes.length; i++) {
         expect(safes[i]).toBeGreaterThanOrEqual(0);
         expect(safes[i]).toBeLessThan(WHEEL_SLICES);
@@ -86,7 +102,8 @@ describe('Guardian of the Heat: the Wheel of the Hearth', () => {
         expect(gap === 1 || gap === 2).toBe(true);
       }
     }
-    expect(wheelSafes(5)).toEqual(wheelSafes(5));
+    expect(wheelSafes(5, 3)).toEqual(wheelSafes(5, 3));
+    expect(wheelSafes(5, 4).slice(0, 3)).toEqual(wheelSafes(5, 3));
   });
 
   it('the templates read back', () => {
@@ -110,7 +127,7 @@ describe('Guardian of the Heat: the Wheel of the Hearth', () => {
     const rp = spot(red);
     f.put(a, sp.x, sp.z);
     f.put(b, rp.x, rp.z);
-    const ev = f.tick(ticks(T.wheelWarn) + 1);
+    const ev = f.tick(ticks(M.warn) + 1);
     expect(hitsOf(ev, HEAT_NAMES.wheel, a.id)).toEqual([]);
     expect(hitsOf(ev, HEAT_NAMES.wheel, b.id).length).toBeGreaterThanOrEqual(1);
     expect(hitsOf(ev, HEAT_NAMES.wheel, b.id)[0]).toBeGreaterThanOrEqual(T.wheelMin);
@@ -122,14 +139,14 @@ describe('Guardian of the Heat: the Wheel of the Hearth', () => {
     const st = f.state();
     if (!st) throw new Error('no fight');
     const safes = [...st.wheelSafes];
-    expect(safes.length).toBe(3);
-    f.tick(ticks(T.wheelWarn) + 1);
+    expect(safes.length).toBe(M.rounds);
+    f.tick(ticks(M.warn) + 1);
     const shown = f
       .objects(HEAT_OBJECTS.wheelPrefix)
       .map((e) => wheelOf(e.templateId))
       .filter((o) => o?.state === 'safe');
     expect(shown.map((o) => o?.slice)).toEqual([safes[1]]);
-    f.tick(ticks(T.wheelWarn) * 2 + ticks(T.wheelBurn) + 4);
+    f.tick(ticks(M.warn) * (M.rounds - 1) + ticks(T.wheelBurn) + 4);
     expect(st.wheelRounds).toEqual([]);
     expect(f.objects(HEAT_OBJECTS.wheelPrefix)).toEqual([]);
   });
@@ -148,24 +165,53 @@ describe('Guardian of the Heat: the Wheel of the Hearth', () => {
       const sp = spot(safe);
       f.put(a, sp.x, sp.z);
       // Rests on this round's safe slice until its eruption and its burn pass.
-      count(f.tick(ticks(T.wheelWarn) + 1));
+      count(f.tick(ticks(M.warn) + 1));
     }
-    expect(hits).toBeLessThanOrEqual(WHEEL_ROUNDS * Math.ceil(T.wheelBurn / T.wheelTick));
-    expect(st.wheelSafes.length).toBe(3);
+    expect(hits).toBeLessThanOrEqual(M.rounds * Math.ceil(T.wheelBurn / T.wheelTick));
+    expect(st.wheelSafes.length).toBe(M.rounds);
   });
 
-  it('does not start on Heroic by the clock, and a reset clears it', () => {
-    const f = heatFight(2, 31);
-    f.dev('/dev heart heat pull');
-    f.dev('/dev heart heat heroic');
-    f.dev('/dev heart heat phase 2');
-    f.tick(ticks(T.wheelFirst + 2));
-    expect(f.objects(HEAT_OBJECTS.wheelPrefix)).toEqual([]);
-    const m = mythic(2);
-    m.dev('/dev heart heat wheel');
-    expect(m.objects(HEAT_OBJECTS.wheelPrefix).length).toBe(4);
-    m.dev('/dev heart heat reset');
-    expect(m.objects(HEAT_OBJECTS.wheelPrefix)).toEqual([]);
+  it("starts by each tier's own clock in phase 1, warns its own time, and a reset clears it", () => {
+    for (const name of ['normal', 'heroic', 'mythic'] as const) {
+      const w = HEAT_DIFFICULTY[name].wheel;
+      const f = tier(name, 2, 1);
+      const st = f.state();
+      if (!st) throw new Error('no fight');
+      st.wheelTimer = w.first;
+      f.tick(ticks(w.first) - 2);
+      expect(f.objects(HEAT_OBJECTS.wheelPrefix)).toEqual([]);
+      f.tick(3);
+      const slices = f.objects(HEAT_OBJECTS.wheelPrefix).map((e) => wheelOf(e.templateId));
+      expect(slices.length).toBe(WHEEL_SLICES);
+      for (const o of slices) expect(o?.seconds).toBe(w.warn);
+      expect(st.wheelSafes.length).toBe(w.rounds);
+      // The next run waits its tier's gap.
+      expect(st.wheelTimer).toBeCloseTo(w.every - DT_S, 6);
+      f.dev('/dev heart heat reset');
+      expect(f.objects(HEAT_OBJECTS.wheelPrefix)).toEqual([]);
+    }
+  });
+
+  it('never shares the floor with Wakefire: a due Wheel waits out the run and room for a fist, then turns', () => {
+    const f = tier('normal', 2, 2);
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    st.zoneTimer = 0.01;
+    st.wheelTimer = 0.5;
+    let wheelAt = -1;
+    for (let i = 0; i < ticks(30) && wheelAt < 0; i++) {
+      f.tick(1);
+      for (const p of f.players) p.hp = p.maxHp;
+      if (st.wheelRounds.length > 0) {
+        wheelAt = i / 20;
+        expect(st.zones).toEqual([]);
+        expect(st.zoneRun).toBeNull();
+      }
+    }
+    // The run's start spaces the Wheel past the run and a fist's whole span.
+    const after = 2 * T.zoneStep + T.zoneWarn + T.zoneBurn + FIST_SPAN + 2;
+    expect(wheelAt).toBeGreaterThan(after - 0.2);
+    expect(wheelAt).toBeLessThan(after + 0.5);
   });
 
   it('names itself; the guardian calls it, no banner does', () => {

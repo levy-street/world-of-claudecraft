@@ -94,7 +94,7 @@ export const HEAT_OBJECTS = {
   seedPrefix: 'sh_heat_seed_',
   /** Wakefire: `<prefix><band>_<warn|burn>_<tenths>` (bands round the well). */
   zonePrefix: 'sh_heat_zone_',
-  /** Mythic: a slice of the Wheel of the Hearth (wheelTemplate). */
+  /** A slice of the Wheel of the Hearth (wheelTemplate). */
   wheelPrefix: 'sh_heat_wheel_',
   /** Where a Rolling Cinder will land: `<prefix><tenths>`. */
   fallPrefix: 'sh_heat_fall_',
@@ -201,8 +201,8 @@ export const HEAT_NAMES = {
 
 /** The fight's difficulty. Each tier is one HEAT_DIFFICULTY row; mythic is a
  *  dev-switched prototype (heat.ts setHeatDevTier) and, for now, the heroic
- *  row whole: its mythic-only mechanic is the `wheel` field and its
- *  own module, never a branch on a tier's name. */
+ *  row with a harder Wheel (its `wheel` field), never a branch on a tier's
+ *  name. */
 export type HeatDifficulty = 'normal' | 'heroic' | 'mythic';
 
 export interface HeatDifficultyRules {
@@ -229,14 +229,25 @@ export interface HeatDifficultyRules {
   bolts: number;
   /** A Rolling Cinder's speed (yards a second; a player runs 7). */
   cinderSpeed: number;
-  /** The Wheel of the Hearth (heat_wheel.ts). */
-  wheel: boolean;
+  /** The Wheel of the Hearth (heat_wheel.ts), every tier since the rework of
+   *  2026-11-18 (Duallam's playtest: on Normal nobody had to move): its
+   *  first run into a phase, the gap between runs, a round's warning and how
+   *  many rounds a run turns. */
+  wheel: HeatWheelRules;
   /** The fight's soft enrage (heat_cinders.ts cinderInterval): this long
    *  into phase 3 (seconds on the fight clock), the Rolling Cinders fall
    *  every `cinderLateEvery` instead of HEAT_TUNING.cinderEvery (the cap
    *  stands). */
   cinderLateAfter: number;
   cinderLateEvery: number;
+}
+
+/** One tier's Wheel of the Hearth (seconds; heat_wheel.ts). */
+export interface HeatWheelRules {
+  first: number;
+  every: number;
+  warn: number;
+  rounds: number;
 }
 
 export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRules>> = {
@@ -254,7 +265,8 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     seedHatch: false,
     bolts: 2,
     cinderSpeed: 3.2,
-    wheel: false,
+    // Slower, with the longest warning: three rounds of 5 s.
+    wheel: { first: 12, every: 34, warn: 5, rounds: 3 },
     // Three minutes into phase 3 (the balance pass of 2026-11-12): only a
     // raid running well past the 4 to 5 minute target feels it.
     cinderLateAfter: 180,
@@ -278,11 +290,11 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     seedHatch: true,
     bolts: 3,
     cinderSpeed: 4.4,
-    wheel: false,
+    wheel: { first: 10, every: 30, warn: 3.5, rounds: 3 },
     cinderLateAfter: 240,
     cinderLateEvery: 20,
   },
-  // Heroic whole, plus the Wheel of the Hearth.
+  // Heroic whole, its Wheel quicker and a round longer.
   mythic: {
     // Heroic's numbers of 2026-11-16 (the heroic row whole).
     damageMult: 1.4375,
@@ -297,7 +309,8 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     seedHatch: true,
     bolts: 3,
     cinderSpeed: 4.4,
-    wheel: true,
+    // Mythic's extra: a fourth round, each one quicker.
+    wheel: { first: 10, every: 28, warn: 3, rounds: 4 },
     cinderLateAfter: 240,
     cinderLateEvery: 20,
   },
@@ -312,13 +325,16 @@ export interface HeatPhaseKit {
   flare: boolean;
   seeds: boolean;
   zones: boolean;
+  /** The Wheel of the Hearth: in every fighting phase, so no phase is a
+   *  stand-still (the rework of 2026-11-18). */
+  wheel: boolean;
   cinders: boolean;
 }
 
 export const HEAT_PHASE_KIT: Readonly<Record<HeatPhase, HeatPhaseKit>> = {
-  1: { fist: true, flare: true, seeds: false, zones: false, cinders: false },
-  2: { fist: true, flare: false, seeds: true, zones: true, cinders: false },
-  3: { fist: true, flare: false, seeds: false, zones: true, cinders: true },
+  1: { fist: true, flare: true, seeds: false, zones: false, wheel: true, cinders: false },
+  2: { fist: true, flare: false, seeds: true, zones: true, wheel: true, cinders: false },
+  3: { fist: true, flare: false, seeds: false, zones: true, wheel: true, cinders: true },
 };
 
 // ---- the wellspring's size -------------------------------------------------------------
@@ -452,11 +468,9 @@ export const HEAT_TUNING = {
   // Wakefire (phases 2 and 3).
   zoneFirst: 16,
   zoneEvery: 34,
-  // The Wheel of the Hearth (Mythic): its clock, a round's warning, its burn and
-  // bite (the same order as Wakefire's), how far out its slices reach.
-  wheelFirst: 24,
-  wheelEvery: 40,
-  wheelWarn: 4,
+  // The Wheel of the Hearth (every tier; its clock and warning per tier,
+  // HEAT_DIFFICULTY `wheel`): its burn and bite (the same order as
+  // Wakefire's), how far out its slices reach.
   wheelBurn: 1.5,
   wheelTick: 0.5,
   wheelMin: 900,
@@ -545,9 +559,9 @@ export const ZONE_BANDS: readonly (readonly [number, number])[] = [
   [HEAT_WELL_R + 23, 70],
 ];
 
-/** The Wheel of the Hearth: how many slices, and how many rounds in a run. */
+/** The Wheel of the Hearth: how many slices (its rounds per run are the
+ *  tier's, HEAT_DIFFICULTY `wheel.rounds`). */
 export const WHEEL_SLICES = 4;
-export const WHEEL_ROUNDS = 3;
 
 /** A slice's bearings round the wellspring (sim facing, degrees): 45 degrees each
  *  over the shore, the two ends taking in the floor behind it. */

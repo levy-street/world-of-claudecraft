@@ -78,9 +78,16 @@ describe('Guardian of the Heat: tooltips and names', () => {
     expect(p1).toContain(`farther than ${T.flareReach} yd`);
     expect(p1).toContain('70%');
     expect(p1).toContain(`${heroicPct}% more damage`);
-    expect(state(2, HEAT_STAGES.fight)).toContain('40%');
+    // The Wheel of the Hearth on every tier: its own warning per tier.
+    expect(p1).toContain('Wheel of the Hearth');
+    expect(p1).toContain(`erupt after ${HEAT_DIFFICULTY.normal.wheel.warn} sec`);
+    expect(p1).toContain(`(${HEAT_DIFFICULTY.heroic.wheel.warn} sec on Heroic)`);
+    const p2 = state(2, HEAT_STAGES.fight);
+    expect(p2).toContain('40%');
+    expect(p2).toContain('Wheel of the Hearth');
     const p3 = state(3, HEAT_STAGES.fight);
     expect(p3).toContain('Rolling Cinders');
+    expect(p3).toContain('Wheel of the Hearth');
     // A phase past the third reads as the third: there is no fourth.
     expect(state(4, HEAT_STAGES.fight)).toBe(p3);
     for (const stage of [HEAT_STAGES.sinking, HEAT_STAGES.under, HEAT_STAGES.rising])

@@ -15,7 +15,8 @@
 //                  the gaps between the lanes (the side toward the guardian
 //                  is always clear).
 //   Held           (pass 5, the owner's call) the fist never comes while
-//                  Wakefire warns or burns, nor when its swells would still
+//                  Wakefire warns or burns or the Wheel of the Hearth turns
+//                  (since 2026-11-18), nor when its swells would still
 //                  roll as the next run begins: its due cast waits for the
 //                  run to end (at most one run and the lookahead, so it is
 //                  never starved), and the next comes that much sooner (never
@@ -59,16 +60,18 @@ import { heatSay } from './heat_voice';
  *  swells' delay and their roll to the lane's end and past it. */
 export const FIST_SPAN = T.fistCast + T.waveDelay + (T.laneLength + T.waveDepth) / T.waveSpeed;
 
-/** Does Wakefire hold a due Basalt Fist back? While a run is laying its
- *  bands or any band warns or burns, and (where the phase runs Wakefire,
- *  `zonesOn`) when the next run would begin before the fist's swells are
- *  done, so the raid never dodges a lane and a band at once. */
-export function wakefireHoldsFist(
-  st: Pick<HeatFightState, 'zoneRun' | 'zones' | 'zoneTimer'>,
-  zonesOn: boolean,
+/** Does the floor hold a due Basalt Fist back? While a Wakefire run is laying
+ *  its bands or any band warns or burns, while a Wheel of the Hearth turns,
+ *  and (where the phase runs them, `kit`) when the next Wakefire run or Wheel
+ *  would begin before the fist's swells are done, so the raid never dodges a
+ *  lane and a band or a slice at once. */
+export function floorHoldsFist(
+  st: Pick<HeatFightState, 'zoneRun' | 'zones' | 'zoneTimer' | 'wheelRounds' | 'wheelTimer'>,
+  kit: { zones: boolean; wheel: boolean },
 ): boolean {
-  if (st.zoneRun || st.zones.length > 0) return true;
-  return zonesOn && st.zoneTimer < FIST_SPAN;
+  if (st.zoneRun || st.zones.length > 0 || st.wheelRounds.length > 0) return true;
+  if (kit.zones && st.zoneTimer < FIST_SPAN) return true;
+  return kit.wheel && st.wheelTimer < FIST_SPAN;
 }
 
 /** Where the fist comes down for a player standing at `p`: their spot,
@@ -93,7 +96,7 @@ export function startFist(s: HeatScope, forced?: HPoint): boolean {
     aim = at(s, victim);
   }
   st.fists++;
-  // Time spent waiting out Wakefire comes off the next one's wait.
+  // Time spent waiting out Wakefire or the Wheel comes off the next one's wait.
   st.fistTimer = Math.max(T.fistEvery / 2, T.fistEvery - st.fistHeld);
   st.fistHeld = 0;
   const spot = fistSpot(aim);

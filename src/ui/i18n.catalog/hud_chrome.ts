@@ -6040,11 +6040,11 @@ export const hudChromeStrings = {
     // The Smith's Heart's Guardian of the Heat (src/ui/heat_aura_effect.ts).
     heatGuardian: {
       statePhase1:
-        'Half sunk in its wellspring: it never moves. Basalt Fist slams a spot on the shore and three Molten Swells roll out from it, and Hearth Flare strikes everyone farther than {reach} yd from the wellspring. At 70% health it sinks and the Hearth overflows. Heroic deals {heroicPct}% more damage.',
+        'Half sunk in its wellspring: it never moves. The Wheel of the Hearth cuts the shore into four slices: three glow red and erupt after {warn} sec ({heroicWarn} sec on Heroic), one stays dark and safe, and as one round erupts the next round shows its safe slice somewhere else. Basalt Fist slams a spot on the shore and three Molten Swells roll out from it, and Hearth Flare strikes everyone farther than {reach} yd from the wellspring. At 70% health it sinks and the Hearth overflows. Heroic deals {heroicPct}% more damage.',
       statePhase2:
-        'Half sunk in its wellspring: it never moves. Basalt Fist goes on; Hearthseeds fall under the raid and burst after a while, and Wakefire ignites the floor round the wellspring band by band. At 40% health it sinks and the Hearth overflows again. Heroic deals {heroicPct}% more damage.',
+        'Half sunk in its wellspring: it never moves. The Wheel of the Hearth and Basalt Fist go on; Hearthseeds fall under the raid and burst after a while, and Wakefire ignites the floor round the wellspring band by band. At 40% health it sinks and the Hearth overflows again. Heroic deals {heroicPct}% more damage.',
       statePhase3:
-        'Half sunk in its wellspring: it never moves. Basalt Fist and Wakefire go on, and Rolling Cinders fall and hunt players: strike one to knock it back. Heroic deals {heroicPct}% more damage.',
+        'Half sunk in its wellspring: it never moves. The Wheel of the Hearth, Basalt Fist and Wakefire go on, and Rolling Cinders fall and hunt players: strike one to knock it back. Heroic deals {heroicPct}% more damage.',
       intro:
         'Cold in its wellspring: it cannot be attacked or harmed until the raid comes near and it wakes, burning.',
       stateUnder:
