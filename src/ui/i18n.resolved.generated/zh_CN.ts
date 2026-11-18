@@ -7347,14 +7347,6 @@ export const zh_CN: EnTranslations = {
         "singer_soul": "听啊。在岩石之中，我的歌永不终结。",
         "singer_wipe": "嘘。矿脉已归于寂静。",
         "singer_defeat": "最后一个音……消散了。"
-      },
-      "alert": {
-        "wakeTitle": "唤醒岩石！",
-        "rockTitle": "落石！",
-        "resonanceTitle": "共鸣",
-        "rushTitle": "山岳冲锋！",
-        "weightTitle": "重锤之压",
-        "timeAria": "剩余{seconds}秒"
       }
     },
     "knotAlert": {

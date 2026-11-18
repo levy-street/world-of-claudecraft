@@ -1,4 +1,4 @@
-// The Council's, the Quench's and the Breath's personal alerts read the
+// The Quench's and the Breath's personal alerts read the
 // player's auras the same off the offline Sim (full Aura records) and off the
 // online ClientWorld mirror, whose decoded auras can lack the optional fields
 // (no duration on a timer-less aura, no value2/value3 when the wire sent none).
@@ -7,9 +7,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { BREATH_AURAS } from '../src/sim/encounters/smith_heart/breath_ids';
-import { COUNCIL_AURAS } from '../src/sim/encounters/smith_heart/council_ids';
 import { QUENCH_AURAS } from '../src/sim/encounters/smith_heart/quench_ids';
-import { buildCouncilAlertView } from '../src/ui/hud/dungeon/council_alert_view';
 import { buildKnotAlertView } from '../src/ui/hud/dungeon/knot_alert_view';
 import { buildQuenchAlertView } from '../src/ui/hud/dungeon/quench_alert_view';
 import { setLanguage } from '../src/ui/i18n';
@@ -43,21 +41,6 @@ const full = (id: string, extra: Record<string, number> = {}) => ({
 const sparse = (id: string) => ({ id, remaining: 2.5 });
 
 describe("the Smith's Heart alerts read a mirror-shaped aura like a Sim one", () => {
-  it('the Council', () => {
-    for (const id of [
-      COUNCIL_AURAS.rushMark,
-      COUNCIL_AURAS.rockMark,
-      COUNCIL_AURAS.wakeMark,
-      COUNCIL_AURAS.resonance,
-    ]) {
-      const a = buildCouncilAlertView({ auras: [full(id)] }) as unknown as View;
-      const b = buildCouncilAlertView({ auras: [sparse(id)] }) as unknown as View;
-      sane(a);
-      sane(b);
-      expect(b.kind, id).toBe(a.kind);
-    }
-  });
-
   it('the Quench', () => {
     for (const id of [QUENCH_AURAS.frozen, QUENCH_AURAS.trapped, QUENCH_AURAS.marked]) {
       const a = buildQuenchAlertView({

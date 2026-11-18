@@ -10301,9 +10301,9 @@ export const hudChromeStrings = {
       'The stone jaguar is about to breathe over this half of the terrace. Cross to the other half',
   },
   // The Smith's Heart's Hammer Council (encounters/smith_heart/council*.ts):
-  // what its members say (boss yells) and the personal alert's short titles
-  // (src/ui/hud/dungeon/council_alert_view.ts). The fight calls no raid
-  // warnings: its mechanics read in the world.
+  // what its members say (boss yells). The fight paints nothing on the
+  // screen of its own (no raid warning, no personal alert since the team's
+  // feedback of 2026-11-17): its mechanics read in the world.
   council: {
     // What the two members SAY (boss yells, encounters/smith_heart/
     // council_voice.ts COUNCIL_LINES, the same English).
@@ -10331,14 +10331,6 @@ export const hudChromeStrings = {
       singer_soul: 'Listen. In the stone, my song never ends.',
       singer_wipe: 'Hush now. The seam is still.',
       singer_defeat: 'The last note... fades.',
-    },
-    alert: {
-      wakeTitle: 'Wake the Stone!',
-      rockTitle: 'Falling Rock!',
-      resonanceTitle: 'Resonance',
-      rushTitle: "Mountain's Rush!",
-      weightTitle: "Hammer's Weight",
-      timeAria: '{seconds} seconds left',
     },
   },
   // The Smith's Heart's Guardian of the Breath (encounters/smith_heart/

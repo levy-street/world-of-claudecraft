@@ -20,6 +20,7 @@ import {
   MORTHEN_GRASP_TEMPLATE,
   MORTHEN_GRAVE_CHILL,
 } from '../src/sim/encounters/hollow_crypt';
+import { COUNCIL_AURAS } from '../src/sim/encounters/smith_heart/council_ids';
 import {
   OLEN_SENTENCED,
   OSSICK_SHACKLED,
@@ -54,7 +55,6 @@ const ALL_IDS: DungeonPromptId[] = [
   'wildheart',
   'sanctum',
   'crypt',
-  'council',
   'quench',
   'final',
   'knot',
@@ -74,7 +74,6 @@ describe('dungeon prompt policy: what the hints setting governs', () => {
       wildheart: true,
       sanctum: true,
       crypt: true,
-      council: true,
       quench: false,
       final: false,
       knot: false,
@@ -93,7 +92,6 @@ describe('dungeon prompt policy: what the hints setting governs', () => {
     expect(dungeonPromptEnabled('wildheart', false)).toBe(false);
     expect(dungeonPromptEnabled('sanctum', false)).toBe(false);
     expect(dungeonPromptEnabled('crypt', false)).toBe(false);
-    expect(dungeonPromptEnabled('council', false)).toBe(false);
     expect(dungeonPromptEnabled('temple', false)).toBe(false);
     // The prompts a player presses or steers by are never governed by it.
     expect(dungeonPromptEnabled('cage', false)).toBe(true);
@@ -114,7 +112,6 @@ describe('dungeon prompt policy: the shared slot', () => {
     wildheart: false,
     sanctum: false,
     crypt: false,
-    council: false,
     quench: false,
     final: false,
     knot: false,
@@ -135,7 +132,6 @@ describe('dungeon prompt policy: the shared slot', () => {
       'wildheart',
       'sanctum',
       'crypt',
-      'council',
       'quench',
       'final',
       'temple',
@@ -526,6 +522,43 @@ describe('DungeonPrompts: the Hunting Spear', () => {
       .querySelector<HTMLElement>('#kit-use-prompt')
       ?.dispatchEvent(new Event('pointerdown', { cancelable: true }));
     expect(r.calls).toEqual(['target:52', 'interact']);
+    r.prompts.dispose();
+  });
+});
+
+describe('DungeonPrompts: the Hammer Council paints nothing on the screen', () => {
+  // The team's feedback of 2026-11-17 ("too many abilities have on-screen
+  // markers"): every council mark reads in the world only (its floor ring, the
+  // Rush's lane and red arrow, the rock's boulder, the Wake's ghost pillar).
+  it('no council mark mounts or shows a prompt, with the hints on or off, nor frees the slot', () => {
+    const marks: Auras = [
+      COUNCIL_AURAS.rushMark,
+      COUNCIL_AURAS.rockMark,
+      COUNCIL_AURAS.wakeMark,
+      COUNCIL_AURAS.weight,
+      COUNCIL_AURAS.resonance,
+    ].map((id) => ({ id, remaining: 2, duration: 5, value: 0 }));
+    for (const hints of [true, false]) {
+      for (const mark of marks) {
+        const r = rig();
+        r.prompts.paint(r.frame(hints, [mark]));
+        expect(r.layer.querySelector('[id*="council"]'), mark.id).toBeNull();
+        expect(r.layer.querySelector('[class*="council"]'), mark.id).toBeNull();
+        const showing = [...r.layer.querySelectorAll<HTMLElement>('[id]')].filter(
+          (el) => el.style.display !== 'none',
+        );
+        expect(
+          showing.map((el) => el.id),
+          mark.id,
+        ).toEqual([]);
+        r.prompts.dispose();
+      }
+    }
+    // A mark on the player never takes the use prompt's slot from a brazier.
+    const r = rig();
+    r.add(brazier());
+    r.prompts.paint(r.frame(true, marks));
+    expect(r.shown('kit-use-prompt')).toBe(true);
     r.prompts.dispose();
   });
 });

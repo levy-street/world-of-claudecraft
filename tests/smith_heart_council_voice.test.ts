@@ -25,7 +25,6 @@ import {
 } from '../src/sim/encounters/smith_heart/council_voice';
 import type { Entity, SimEvent } from '../src/sim/types';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
-import { buildCouncilAlertView } from '../src/ui/hud/dungeon/council_alert_view';
 import { t } from '../src/ui/i18n';
 import { type CouncilFight, councilFight } from './helpers/council_fight';
 
@@ -189,17 +188,5 @@ describe('Hammer Council mythic in the player text', () => {
     const resText = t(res?.key as never, res?.nums as never);
     expect(resText).not.toContain('soul pip');
     expect(resText).not.toMatch(/\{\w+\}/);
-  });
-
-  it('the alert stays a short title over its bar whether or not a soul pillar stands', () => {
-    // The soul pillar's second duty (break its soul pips) is the Falling Rock
-    // tooltip's (above) and the world's (the pips on the pillar): the alert
-    // carries no sentence (the owner's rule of 2026-11-03, kept on 2026-11-09).
-    const mark = (id: string) => ({ id, remaining: 3, duration: 5 });
-    for (const id of [COUNCIL_AURAS.rockMark, COUNCIL_AURAS.resonance]) {
-      const v = buildCouncilAlertView({ auras: [mark(id)] });
-      expect(v.visible && v.line, id).toBe('');
-      expect(v.visible && v.barLabel, id).toBe('3s');
-    }
   });
 });

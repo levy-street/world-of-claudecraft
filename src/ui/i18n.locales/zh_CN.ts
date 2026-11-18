@@ -23091,11 +23091,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_falling_rock': '落石',
   'abilityUi.cast.heart_seam_bolt': '矿脉箭',
   'abilityUi.cast.heart_song_of_the_seam': '矿脉之歌',
-  'hudChrome.council.alert.wakeTitle': '唤醒岩石！',
-  'hudChrome.council.alert.rockTitle': '落石！',
-  'hudChrome.council.alert.resonanceTitle': '共鸣',
-  'hudChrome.council.alert.weightTitle': '重锤之压',
-  'hudChrome.council.alert.timeAria': '剩余{seconds}秒',
   'hudChrome.auraEffect.breathGuardian.intro': '沉睡中：在风暴将它放下之前，无法被攻击或伤害。',
   'hudChrome.auraEffect.council.intro': '沉睡中：在议会苏醒之前，无法被攻击或伤害。',
   'hudChrome.auraEffect.council.wakeMark':
@@ -23134,7 +23129,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '采石场正在坍塌：每{every}秒，你每层受到{min}到{max}点伤害，且每次增加一层。诅咒石柱碎裂时结束。',
   'hudChrome.auraEffect.council.pillarLimit':
     '每根石柱最多只能为{limit}名玩家挡住山岳之怒。躲在后面的人更多时，每人承受冲击的{share}%。未躲藏者在普通难度受到{min}到{max}点伤害，英雄难度{heroicMin}到{heroicMax}点，史诗难度{mythicMin}到{mythicMax}点。',
-  'hudChrome.council.alert.rushTitle': '山岳冲锋！',
   'hudChrome.council.say.guardian_rush': '那就站在我的路上吧。群山从不绕行。',
   'hudChrome.council.say.singer_wake': '醒来吧，沉睡的岩石。在他们脚下升起！',
   'hudChrome.council.say.singer_rock': '抬头看，小家伙们！山要塌下来了！',

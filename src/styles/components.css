@@ -18616,7 +18616,6 @@
   #wildheart-alert,
   #sanctum-alert,
   #crypt-alert,
-  #heart-council-alert,
   #heart-quench-alert,
   #heart-final-alert,
   #heart-knot-alert,
@@ -18630,7 +18629,6 @@
   body.show-actionbar3 #wildheart-alert,
   body.show-actionbar3 #sanctum-alert,
   body.show-actionbar3 #crypt-alert,
-  body.show-actionbar3 #heart-council-alert,
   body.show-actionbar3 #heart-quench-alert,
   body.show-actionbar3 #heart-final-alert,
   body.show-actionbar3 #heart-knot-alert,
@@ -18644,7 +18642,6 @@
   body.mobile-touch #wildheart-alert,
   body.mobile-touch #sanctum-alert,
   body.mobile-touch #crypt-alert,
-  body.mobile-touch #heart-council-alert,
   body.mobile-touch #heart-quench-alert,
   body.mobile-touch #heart-final-alert,
   body.mobile-touch #heart-knot-alert,
@@ -19068,138 +19065,6 @@
     min-width: min(420px, calc(100vw - 32px));
   }
 
-  /* ---------- The Smith's Heart's Hammer Council alert (the rock, the wake, the Weight, Resonance) ---------- */
-  /* Self-mounted by the shared encounter alert painter
-     (encounter_alert_painter.ts) under its own id, from src/ui/hud/dungeon/council_alert_view.ts.
-     It never takes the pointer. The state is carried by the text too: the
-     rock to share throbs in the soak gold, the wake sits in the vein's ochre,
-     the Weight in the hostile tone, a climbing crack in the hostile tone. */
-  #heart-council-alert {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    z-index: 30;
-    min-width: 340px;
-    max-width: calc(100vw - 32px);
-    padding: 10px 18px 12px;
-    pointer-events: none;
-    user-select: none;
-    text-align: center;
-    font: inherit;
-    color: var(--color-text-light);
-    border: 2px solid var(--color-gold);
-  }
-  #heart-council-alert .fa-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--color-gold);
-  }
-  #heart-council-alert .fa-line {
-    font-size: 14px;
-  }
-  #heart-council-alert .fa-hint {
-    display: none;
-  }
-  #heart-council-alert .fa-bar {
-    --bar-h: 12px;
-    --bar-color: var(--color-gold);
-    width: 100%;
-  }
-  #heart-council-alert .fa-fill {
-    width: 0;
-    transition: width 80ms linear;
-  }
-  #heart-council-alert.is-rock {
-    animation: bce-throb 0.9s ease-in-out infinite alternate;
-  }
-  #heart-council-alert.is-weight,
-  #heart-council-alert.is-rush {
-    border-color: var(--color-hostile);
-  }
-  #heart-council-alert.is-weight .fa-title,
-  #heart-council-alert.is-rush .fa-title,
-  #heart-council-alert.is-weight .fa-fill,
-  #heart-council-alert.is-rush .fa-fill {
-    color: var(--color-hostile);
-    --bar-color: var(--color-hostile);
-  }
-  #heart-council-alert.is-resonance {
-    border-color: var(--color-energy);
-  }
-  #heart-council-alert.is-resonance .fa-title,
-  #heart-council-alert.is-resonance .fa-fill {
-    color: var(--color-energy);
-    --bar-color: var(--color-energy);
-  }
-  /* Mountain's Rush on YOU: the one mark that kills, so it leaves the slot for the
-     screen's upper middle, big, red and throbbing for the whole bar (the owner's
-     playtest of 2026-11-12: the slot's panel went unnoticed). The raid sees the
-     red arrow over the marked player (council_rush_arrow.ts); this is the marked
-     player's own call, on every graphics tier. */
-  #heart-council-alert.is-rush,
-  body.show-actionbar3 #heart-council-alert.is-rush,
-  body.mobile-touch #heart-council-alert.is-rush {
-    top: 22%;
-    bottom: auto;
-    min-width: min(560px, calc(100vw - 32px));
-    padding: 14px 28px 16px;
-    border-width: 3px;
-    background: color-mix(in srgb, var(--color-hostile-rim) 55%, transparent);
-    animation: heart-rush-throb 0.55s ease-in-out infinite alternate;
-  }
-  #heart-council-alert.is-rush .fa-title {
-    font-size: 44px;
-    line-height: 1.05;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    text-shadow:
-      0 0 14px color-mix(in srgb, var(--color-hostile) 85%, transparent),
-      0 2px 0 var(--color-hostile-rim);
-  }
-  #heart-council-alert.is-rush .fa-bar {
-    --bar-h: 16px;
-  }
-  #heart-council-alert.is-rush .fa-bar-label {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--color-hostile);
-  }
-  body.mobile-touch #heart-council-alert.is-rush .fa-title {
-    font-size: 30px;
-  }
-  @keyframes heart-rush-throb {
-    from {
-      transform: translateX(-50%) scale(1);
-      box-shadow: 0 0 10px color-mix(in srgb, var(--color-hostile) 45%, transparent);
-    }
-    to {
-      transform: translateX(-50%) scale(1.06);
-      box-shadow: 0 0 36px color-mix(in srgb, var(--color-hostile) 90%, transparent);
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    #heart-council-alert {
-      animation: none;
-    }
-    #heart-council-alert.is-rush,
-    body.show-actionbar3 #heart-council-alert.is-rush,
-    body.mobile-touch #heart-council-alert.is-rush {
-      animation: none;
-      box-shadow: 0 0 28px color-mix(in srgb, var(--color-hostile) 80%, transparent);
-    }
-  }
-  /* The in-game Reduce Motion setting holds the throb too. */
-  body.reduce-motion #heart-council-alert.is-rush,
-  body.reduce-motion.show-actionbar3 #heart-council-alert.is-rush,
-  body.reduce-motion.mobile-touch #heart-council-alert.is-rush {
-    animation: none;
-    box-shadow: 0 0 28px color-mix(in srgb, var(--color-hostile) 80%, transparent);
-  }
-
   /* ---------- The Smith's Heart's Guardian of the Quench cold bar ---------- */
   /* Self-mounted by the shared encounter alert painter
      (encounter_alert_painter.ts) under its own id, from
@@ -19412,9 +19277,6 @@
       animation: none;
     }
   }
-  body.mobile-touch #heart-council-alert {
-    min-width: min(420px, calc(100vw - 32px));
-  }
 
   /* ---------- The Smith's Heart's Masterless Strength alert (the cold, the ember, the lightning, Crushed) ---------- */
   /* Self-mounted by the shared encounter alert painter
@@ -19526,7 +19388,6 @@
   /* The Smith's Heart's short alerts (2026-11-09): a title over the bar and
      its number, no sentence under it. The number (the seconds left, or a
      gauge's value) sits under the bar, in steady-width digits. */
-  #heart-council-alert .fa-bar-label,
   #heart-final-alert .fa-bar-label,
   #heart-knot-alert .fa-bar-label {
     font-size: 13px;

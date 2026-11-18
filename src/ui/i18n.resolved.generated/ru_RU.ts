@@ -7347,14 +7347,6 @@ export const ru_RU: EnTranslations = {
         "singer_soul": "Слушайте. В камне моя песнь не кончается.",
         "singer_wipe": "Тише. Жила умолкла.",
         "singer_defeat": "Последняя нота... тает."
-      },
-      "alert": {
-        "wakeTitle": "Пробуждение камня!",
-        "rockTitle": "Камнепад!",
-        "resonanceTitle": "Резонанс",
-        "rushTitle": "Натиск горы!",
-        "weightTitle": "Тяжесть Молота",
-        "timeAria": "Осталось {seconds} с"
       }
     },
     "knotAlert": {

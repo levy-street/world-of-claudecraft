@@ -24743,11 +24743,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_falling_rock': 'Камнепад',
   'abilityUi.cast.heart_seam_bolt': 'Стрела жилы',
   'abilityUi.cast.heart_song_of_the_seam': 'Песнь жилы',
-  'hudChrome.council.alert.wakeTitle': 'Пробуждение камня!',
-  'hudChrome.council.alert.rockTitle': 'Камнепад!',
-  'hudChrome.council.alert.resonanceTitle': 'Резонанс',
-  'hudChrome.council.alert.weightTitle': 'Тяжесть Молота',
-  'hudChrome.council.alert.timeAria': 'Осталось {seconds} с',
   'hudChrome.auraEffect.breathGuardian.intro':
     'Спит: нельзя атаковать или ранить, пока буря не опустит его на землю.',
   'hudChrome.auraEffect.council.intro':
@@ -24791,7 +24786,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.council.collapse':
     'Каменоломня обрушивается: каждые {every} с вы получаете от {min} до {max} урона за каждый заряд, и каждый раз добавляется новый заряд. Эффект закончится, когда Проклятая колонна разрушится.',
   'hudChrome.auraEffect.council.pillarLimit': 'Каждая колонна защищает от Гнева горы не больше {limit} игроков. Если за ней больше, каждый из них получает {share}% удара. Тот, кто не укрылся, получает от {min} до {max} урона в обычном режиме, от {heroicMin} до {heroicMax} в героическом и от {mythicMin} до {mythicMax} в мифическом.',
-  'hudChrome.council.alert.rushTitle': 'Натиск горы!',
   'hudChrome.council.say.guardian_rush': 'Что ж, стойте у меня на пути. Гора не сворачивает.',
   'hudChrome.council.say.singer_wake': 'Проснись, спящий камень. Восстань там, где они стоят!',
   'hudChrome.council.say.singer_rock': 'Посмотрите наверх, малыши! Гора падает!',

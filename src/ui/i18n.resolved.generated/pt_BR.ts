@@ -7347,14 +7347,6 @@ export const pt_BR: EnTranslations = {
         "singer_soul": "Listen. In the stone, my song never ends.",
         "singer_wipe": "Hush now. The seam is still.",
         "singer_defeat": "The last note... fades."
-      },
-      "alert": {
-        "wakeTitle": "Wake the Stone!",
-        "rockTitle": "Falling Rock!",
-        "resonanceTitle": "Resonance",
-        "rushTitle": "Mountain's Rush!",
-        "weightTitle": "Hammer's Weight",
-        "timeAria": "{seconds} seconds left"
       }
     },
     "knotAlert": {

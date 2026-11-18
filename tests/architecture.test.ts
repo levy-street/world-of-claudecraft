@@ -728,9 +728,8 @@ const UI_PURE_CORES = [
   // Zulgar's breath, spear, Sunstruck window and sun glyphs) and its scene scan.
   'src/ui/hud/dungeon/wildheart_alert_view.ts',
   'src/ui/hud/dungeon/wildheart_alert_scene_core.ts',
-  // The Smith's Heart's alerts: the Hammer Council and the Guardian of the
-  // Quench's cold bar.
-  'src/ui/hud/dungeon/council_alert_view.ts',
+  // The Smith's Heart's alerts: the Guardian of the Quench's cold bar, the
+  // final's, the Knotted Gale's (the Hammer Council has none since 2026-11-17).
   'src/ui/hud/dungeon/quench_alert_view.ts',
   'src/ui/hud/dungeon/final_alert_view.ts',
   'src/ui/hud/dungeon/knot_alert_view.ts',

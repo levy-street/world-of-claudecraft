@@ -7347,14 +7347,6 @@ export const en_XA: EnTranslations = {
         "singer_soul": "[Ļíšţéñ. Íñ ţĥé šţóñé, ɱý šóñĝ ñéʋéŕ éñðš.]",
         "singer_wipe": "[Ĥúšĥ ñóŵ. Ţĥé šéáɱ íš šţíļļ.]",
         "singer_defeat": "[Ţĥé ļášţ ñóţé... ƒáðéš.]"
-      },
-      "alert": {
-        "wakeTitle": "[Ŵáķé ţĥé Šţóñé!]",
-        "rockTitle": "[Ƒáļļíñĝ Ŕóçķ!]",
-        "resonanceTitle": "[Ŕéšóñáñçé]",
-        "rushTitle": "[Ɱóúñţáíñ'š Ŕúšĥ!]",
-        "weightTitle": "[Ĥáɱɱéŕ'š Ŵéíĝĥţ]",
-        "timeAria": "[{seconds} šéçóñðš ļéƒţ]"
       }
     },
     "knotAlert": {

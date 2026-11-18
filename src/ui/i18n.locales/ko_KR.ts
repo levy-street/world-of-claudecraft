@@ -22549,11 +22549,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_falling_rock': '낙석',
   'abilityUi.cast.heart_seam_bolt': '광맥 화살',
   'abilityUi.cast.heart_song_of_the_seam': '광맥의 노래',
-  'hudChrome.council.alert.wakeTitle': '돌 깨우기!',
-  'hudChrome.council.alert.rockTitle': '낙석!',
-  'hudChrome.council.alert.resonanceTitle': '공명',
-  'hudChrome.council.alert.weightTitle': '망치의 무게',
-  'hudChrome.council.alert.timeAria': '{seconds}초 남음',
   'hudChrome.auraEffect.breathGuardian.intro':
     '잠들어 있다: 폭풍이 그를 내려놓을 때까지 공격할 수도, 피해를 줄 수도 없다.',
   'hudChrome.auraEffect.council.intro':
@@ -22598,7 +22593,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '채석장이 무너지고 있습니다: {every}초마다 중첩 하나당 {min}에서 {max}의 피해를 받으며, 매번 중첩이 하나씩 쌓입니다. 저주받은 기둥이 부서지면 끝납니다.',
   'hudChrome.auraEffect.council.pillarLimit':
     '기둥 하나는 산의 분노로부터 최대 {limit}명만 지켜 줍니다. 그보다 많이 숨으면 모두가 폭발의 {share}%를 받습니다. 숨지 않은 대상은 일반에서 {min}에서 {max}, 영웅에서 {heroicMin}에서 {heroicMax}, 신화에서 {mythicMin}에서 {mythicMax}의 피해를 받습니다.',
-  'hudChrome.council.alert.rushTitle': '산의 돌진!',
   'hudChrome.council.say.guardian_rush': '그렇다면 내 길을 막아 보아라. 산은 비켜 가지 않는다.',
   'hudChrome.council.say.singer_wake': '깨어나라, 잠든 돌이여. 그들이 선 곳에서 솟아올라라!',
   'hudChrome.council.say.singer_rock': '위를 봐요, 꼬마들! 산이 무너지고 있어요!',

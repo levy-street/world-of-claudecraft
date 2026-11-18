@@ -1,9 +1,11 @@
-// The Hammer Council's player text: no raid warning banner (the mechanics
-// read in the world; the yells stay), the personal alert's priorities, the marks' tooltips from the live tuning, and
+// The Hammer Council's player text: no raid warning banner and no on-screen
+// marker at all (the mechanics read in the world; the yells stay), the floor
+// telegraphs every mark keeps, the marks' tooltips from the live tuning, and
 // every cast and damage name re-localized.
 
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { COUNCIL_MARK_SPECS, rushLane } from '../src/render/smith_heart_fx/council_fx_core';
 import {
   COUNCIL_AURAS,
   COUNCIL_CASTS,
@@ -12,8 +14,7 @@ import {
 } from '../src/sim/encounters/smith_heart/council_ids';
 import type { SimEvent } from '../src/sim/types';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
-import { buildCouncilAlertView, councilRushMarked } from '../src/ui/hud/dungeon/council_alert_view';
-import { dungeonPromptEnabled } from '../src/ui/hud/dungeon/dungeon_prompt_policy_core';
+import { DUNGEON_PROMPT_ADVISORY } from '../src/ui/hud/dungeon/dungeon_prompt_policy_core';
 import { t } from '../src/ui/i18n';
 import { localizeSimAuraName } from '../src/ui/sim_i18n';
 import { councilFight } from './helpers/council_fight';
@@ -44,98 +45,43 @@ describe('Hammer Council raid warnings', () => {
   });
 });
 
-describe('Hammer Council alert', () => {
-  const a = (id: string, remaining = 3, duration = 5, value = 0) => ({
-    id,
-    remaining,
-    duration,
-    value,
-  });
-
-  it('the Rush over the rock over the wake over the Weight over Resonance', () => {
-    const all = [
-      a(COUNCIL_AURAS.resonance, 4, 6),
-      a(COUNCIL_AURAS.weight, 20, 25),
-      a(COUNCIL_AURAS.wakeMark),
-      a(COUNCIL_AURAS.rockMark),
-      a(COUNCIL_AURAS.rushMark, 2, 3),
-    ];
-    const kind = (auras: typeof all) => {
-      const v = buildCouncilAlertView({ auras });
-      return v.visible ? v.kind : null;
-    };
-    expect(kind(all)).toBe('rush');
-    expect(kind(all.slice(0, 4))).toBe('rock');
-    expect(kind(all.slice(0, 3))).toBe('wake');
-    expect(kind(all.slice(0, 2))).toBe('weight');
-    expect(kind(all.slice(0, 1))).toBe('resonance');
-    expect(kind([])).toBeNull();
-    const res = buildCouncilAlertView({ auras: [a(COUNCIL_AURAS.resonance, 4, 6)] });
-    expect(res.visible && res.title).toBe(t('hudChrome.council.alert.resonanceTitle'));
-    const v = buildCouncilAlertView({ auras: [a(COUNCIL_AURAS.rockMark, 2.5, 5)] });
-    expect(v.visible && v.progress).toBeCloseTo(0.5);
-    expect(v.visible && v.title).toBe(t('hudChrome.council.alert.rockTitle'));
-    // A short title over the bar and its seconds, no sentence under it (the
-    // owner's rule of 2026-11-03, kept on 2026-11-09): what a mark asks is
-    // its tooltip's.
-    for (const id of Object.values({
-      rush: COUNCIL_AURAS.rushMark,
-      rock: COUNCIL_AURAS.rockMark,
-      wake: COUNCIL_AURAS.wakeMark,
-      weight: COUNCIL_AURAS.weight,
-      resonance: COUNCIL_AURAS.resonance,
-    })) {
-      const m = buildCouncilAlertView({ auras: [a(id, 2.5, 5)] });
-      expect(m.visible && m.line, id).toBe('');
-      expect(m.visible && m.barLabel, id).toBe('3s');
-      if (m.visible) expect(m.title.split(' ').length, id).toBeLessThanOrEqual(4);
-    }
-  });
-});
-
-describe("Hammer Council alert: Mountain's Rush on you", () => {
-  it('the Rush mark is the one council mark the hints setting never hides', () => {
-    const mark = { id: COUNCIL_AURAS.rushMark, remaining: 4, duration: 5 };
-    expect(councilRushMarked([mark])).toBe(true);
-    for (const id of [
-      COUNCIL_AURAS.rockMark,
-      COUNCIL_AURAS.wakeMark,
-      COUNCIL_AURAS.weight,
-      COUNCIL_AURAS.resonance,
-    ])
-      expect(councilRushMarked([{ id, remaining: 4, duration: 5 }]), id).toBe(false);
-    const v = buildCouncilAlertView({ auras: [mark] });
-    expect(v.visible && v.kind).toBe('rush');
-    expect(v.visible && v.title).toBe(t('hudChrome.council.alert.rushTitle'));
-  });
-
-  it('paints big and red in the upper middle, throbbing, on every tier', () => {
+describe('Hammer Council: no on-screen markers, the world tells it all', () => {
+  // The team's feedback of 2026-11-17: "Too many abilities have on-screen
+  // markers, remove the UI for all of these". The personal alert (the Rush big
+  // and red in the screen's upper middle, the rock, the wake, the Weight,
+  // Resonance) is gone; the floor and the bodies carry every mark.
+  it('the personal alert is gone: no view, no CSS, no strings, no prompt id', () => {
+    expect(existsSync('src/ui/hud/dungeon/council_alert_view.ts')).toBe(false);
     const css = readFileSync('src/styles/components.css', 'utf8');
-    const rule = css.slice(css.indexOf('#heart-council-alert.is-rush,'));
-    expect(rule).toContain('top: 22%;');
-    expect(rule).toContain('animation: heart-rush-throb');
-    expect(css).toMatch(/#heart-council-alert\.is-rush \.fa-title \{\s*font-size: 44px;/);
-    expect(css).toContain('@keyframes heart-rush-throb');
-    // Reduced motion (the OS's and the game's own setting) holds the throb.
-    const reduced = css.slice(
-      css.indexOf('@media (prefers-reduced-motion: reduce) {', css.indexOf('heart-rush-throb')),
-    );
-    expect(reduced.slice(0, 600)).toMatch(
-      /body\.mobile-touch #heart-council-alert\.is-rush \{\s*animation: none;/,
-    );
-    expect(css).toMatch(
-      /body\.reduce-motion\.mobile-touch #heart-council-alert\.is-rush \{\s*animation: none;/,
-    );
+    expect(css).not.toContain('heart-council-alert');
+    expect(css).not.toContain('heart-rush-throb');
+    const prompts = readFileSync('src/ui/hud/dungeon/dungeon_prompts.ts', 'utf8');
+    expect(prompts).not.toMatch(/council_alert_view|COUNCIL_ALERT_KINDS|heart-council-alert/);
+    expect(Object.keys(DUNGEON_PROMPT_ADVISORY)).not.toContain('council');
+    const keys = readFileSync('src/ui/i18n.catalog/translation_keys.generated.ts', 'utf8');
+    expect(keys).not.toContain("'hudChrome.council.alert.");
+    expect(keys).toContain("'hudChrome.council.say.guardian_rush'");
   });
 
-  it('with the hints off the Rush mark still shows; the other council marks do not', () => {
-    expect(dungeonPromptEnabled('council', false)).toBe(false);
-    expect(
-      dungeonPromptEnabled('council', false, councilRushMarked([{ id: COUNCIL_AURAS.rushMark }])),
-    ).toBe(true);
-    expect(
-      dungeonPromptEnabled('council', false, councilRushMarked([{ id: COUNCIL_AURAS.rockMark }])),
-    ).toBe(false);
+  it('every mark a player wears keeps its floor telegraph, in the sim radius', () => {
+    // The floor rings (council_fx.ts seeMark), each at the mechanic's own reach.
+    expect(COUNCIL_MARK_SPECS[COUNCIL_AURAS.rushMark].radius).toBe(T.rushHalfWidth);
+    expect(COUNCIL_MARK_SPECS[COUNCIL_AURAS.wakeMark].radius).toBe(T.riseKnockRadius);
+    expect(COUNCIL_MARK_SPECS[COUNCIL_AURAS.rockMark].radius).toBe(T.rockRadius);
+    expect(COUNCIL_MARK_SPECS[COUNCIL_AURAS.resonance].radius).toBe(T.resonanceRadius);
+    // The Rush's lane from the Guardian through its mark, at the hit's width.
+    const lane = rushLane(0, 0, 10, 0, 0, { yaw: 0, length: 0, half: 0 });
+    expect(lane?.half).toBe(T.rushHalfWidth + T.rushBody);
+    expect(lane?.length).toBe(10);
+    // The painters still read every mark off the mirrored auras: the floor ring
+    // and the Weight's ring at the tank's feet (council_fx.ts), the red arrow
+    // over the Rush's mark (council_rush_arrow.ts, a world billboard).
+    const fx = readFileSync('src/render/smith_heart_fx/council_fx.ts', 'utf8');
+    for (const id of ['rockMark', 'resonance', 'weight', 'rushMark', 'wakeMark'])
+      expect(fx, id).toContain(`COUNCIL_AURAS.${id}`);
+    expect(fx).toContain('smithHeartWeightRing');
+    const arrow = readFileSync('src/render/smith_heart_fx/council_rush_arrow.ts', 'utf8');
+    expect(arrow).toContain('COUNCIL_AURAS.rushMark');
   });
 });
 

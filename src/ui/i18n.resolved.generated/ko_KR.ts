@@ -7347,14 +7347,6 @@ export const ko_KR: EnTranslations = {
         "singer_soul": "들어 봐요. 돌 속에서 나의 노래는 끝나지 않아요.",
         "singer_wipe": "쉿. 광맥이 잠잠해졌어요.",
         "singer_defeat": "마지막 음이... 사라져요."
-      },
-      "alert": {
-        "wakeTitle": "돌 깨우기!",
-        "rockTitle": "낙석!",
-        "resonanceTitle": "공명",
-        "rushTitle": "산의 돌진!",
-        "weightTitle": "망치의 무게",
-        "timeAria": "{seconds}초 남음"
       }
     },
     "knotAlert": {

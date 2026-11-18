@@ -22579,11 +22579,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_falling_rock': '落石',
   'abilityUi.cast.heart_seam_bolt': '鉱脈の矢',
   'abilityUi.cast.heart_song_of_the_seam': '鉱脈の歌',
-  'hudChrome.council.alert.wakeTitle': '石の目覚め！',
-  'hudChrome.council.alert.rockTitle': '落石！',
-  'hudChrome.council.alert.resonanceTitle': '共鳴',
-  'hudChrome.council.alert.weightTitle': '槌の重み',
-  'hudChrome.council.alert.timeAria': '残り{seconds}秒',
   'hudChrome.auraEffect.breathGuardian.intro':
     '眠っている：嵐がその身を降ろすまで、攻撃もダメージも受けない。',
   'hudChrome.auraEffect.council.intro':
@@ -22626,7 +22621,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '採石場が崩落している：{every}秒ごとにスタック1つにつき{min}から{max}のダメージを受け、そのたびにスタックが1つ増える。呪われた柱が砕けると終わる。',
   'hudChrome.auraEffect.council.pillarLimit':
     '各柱が山の怒りから守れるのは最大{limit}人まで。それより多く隠れると、全員が爆発の{share}%を受ける。隠れていない者は、ノーマルで{min}から{max}、ヒロイックで{heroicMin}から{heroicMax}、ミシックで{mythicMin}から{mythicMax}のダメージを受ける。',
-  'hudChrome.council.alert.rushTitle': '山の突進！',
   'hudChrome.council.say.guardian_rush': 'ならば我が道に立つがいい。山は道を譲らぬ。',
   'hudChrome.council.say.singer_wake': '目覚めなさい、眠れる石よ。彼らの足元から立ち上がれ！',
   'hudChrome.council.say.singer_rock': '上を見て、おちびさんたち！山が落ちてくるわ！',

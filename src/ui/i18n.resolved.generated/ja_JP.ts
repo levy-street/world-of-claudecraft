@@ -7347,14 +7347,6 @@ export const ja_JP: EnTranslations = {
         "singer_soul": "聞いて。石の中で、私の歌は終わらない。",
         "singer_wipe": "静かに。鉱脈は眠ったわ。",
         "singer_defeat": "最後の音が……消えていく。"
-      },
-      "alert": {
-        "wakeTitle": "石の目覚め！",
-        "rockTitle": "落石！",
-        "resonanceTitle": "共鳴",
-        "rushTitle": "山の突進！",
-        "weightTitle": "槌の重み",
-        "timeAria": "残り{seconds}秒"
       }
     },
     "knotAlert": {
