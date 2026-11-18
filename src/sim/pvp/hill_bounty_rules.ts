@@ -24,7 +24,8 @@ export const HILL_BOUNTY_BASE_HONOR = HILL_BOUNTY_KILL_STREAK_HONOR[0];
 
 /** Full Honor for the first this-many kills of one victim by one contributor
  *  on one hill; nothing after (the hill's replacement for the world's hourly
- *  100/50/25/0 decay, so the fight over the circle is never worthless). */
+ *  100/50/25/0 decay, so the fight over the hill, anywhere in its zone, is never
+ *  worthless). */
 export const HILL_BOUNTY_REPEAT_CAP = 5;
 
 /** A victim on at least this kill streak is "shut down" when killed. */

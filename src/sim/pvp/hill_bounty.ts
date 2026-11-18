@@ -11,7 +11,10 @@
 //
 // A hill kill: a hostile world kill (world_pvp.ts worldPvpOnPlayerDeath, which
 // calls in here) while the hill stands risen, with the victim or the player
-// who landed the killing blow inside the circle. The books key a character by
+// who landed the killing blow anywhere in the hill's zone, the same ground the
+// bar and the bounty badge show on: a fight on the approach, or a victim caught
+// running back from the graveyard, is still the fight over the hill and must
+// not fall back to the hourly decay. The books key a character by
 // its stable identity (pvp_identity.ts), never the entity id a relog replaces,
 // so a relog resets neither a streak nor the repeat cap. Everything is session
 // state on the ActiveHill and dies with it (clearHillBounties at every way a
@@ -35,7 +38,6 @@ import {
   hillRepeatHonorMultiplier,
   hillStreakCallout,
 } from './hill_bounty_rules';
-import { hillContains } from './hill_rules';
 import { pvpIdentityOf } from './pvp_identity';
 
 interface Streak {
@@ -79,6 +81,12 @@ function pairKey(contributor: PlayerMeta, victim: PlayerMeta): string {
   return `${pvpIdentityOf(contributor)}>${pvpIdentityOf(victim)}`;
 }
 
+/** Is this entity standing in the hill's zone? Strict containment
+ *  (`zoneContaining`), so the instance plane never reads as the hill's ground. */
+function inHillZone(hill: ActiveHill, e: Entity): boolean {
+  return zoneContaining(e.pos.x, e.pos.z)?.id === hill.zoneId;
+}
+
 /** The hill kill this death is, or null for an ordinary world kill. */
 export function hillKillFor(
   ctx: SimContext,
@@ -88,11 +96,7 @@ export function hillKillFor(
 ): HillKill | null {
   const hill = ctx.hillState.active;
   if (!hill || hill.phase !== 'active') return null;
-  if (
-    !hillContains(hill, victim.pos.x, victim.pos.z) &&
-    !hillContains(hill, killer.pos.x, killer.pos.z)
-  )
-    return null;
+  if (!inHillZone(hill, victim) && !inHillZone(hill, killer)) return null;
   const s = hill.bounty?.streaks.get(pvpIdentityOf(victimMeta));
   return {
     hill,
@@ -118,7 +122,7 @@ export function hillKillHonorMultiplier(
  *  bounty is collected on), otherwise none. A death streak is not advertised. */
 function syncBadge(hill: ActiveHill, e: Entity, s: Streak | undefined): void {
   const bounty = s ? hillBountyHonor(s.kills, s.deaths) : HILL_BOUNTY_BASE_HONOR;
-  const inZone = zoneContaining(e.pos.x, e.pos.z)?.id === hill.zoneId;
+  const inZone = inHillZone(hill, e);
   if (inZone && bounty > HILL_BOUNTY_BASE_HONOR) e.hillBounty = bounty;
   else if (e.hillBounty !== undefined) delete e.hillBounty;
 }
