@@ -580,7 +580,14 @@ export class PartyMachine {
         pid: mPid,
       });
     }
-    emitReferralPartyEvidence(this.ctx, party.members);
+    // Everyone joined this group except a premade base party's own members, who were
+    // already together (merged premades and solo queuers are new to it).
+    emitReferralPartyEvidence(
+      this.ctx,
+      party.members,
+      false,
+      units.flatMap((unit) => (unit === baseUnit && unit.partyId !== null ? [] : unit.members)),
+    );
     return party;
   }
 
