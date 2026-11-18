@@ -17,6 +17,7 @@
 //
 // IGNORE=roar   the raid stands anywhere for the Summit Roar (the key mechanic)
 // IGNORE=knot   heroic and mythic: nobody carries the Knotted Gale
+// BREATH_AT=isles  the leader starts the Islands of the Wind 8 s after the pull
 
 import { BODY_EDGE_MELEE_REACH } from '../../src/sim/combat/player_attack_reach';
 import { BREATH } from '../../src/sim/content/smith_heart_layout';
@@ -65,6 +66,7 @@ import {
 } from './heart_raid_bots.mjs';
 
 const RULES = BREATH_DIFFICULTY[DIFF];
+const BREATH_AT = (process.env.BREATH_AT ?? '').toLowerCase();
 // How far out the Roar leaves a body that runs straight back against its
 // blast at once (its throw, 0 since 2026-11-17, and where the blast falls
 // to a run: wind_drift.ts), plus a margin for the bots' late start.
@@ -518,6 +520,14 @@ function track(world, st) {
 function plan(world, st) {
   init(st);
   const o = world.o;
+  // BREATH_AT=isles: the leader starts the Islands of the Wind 8 s after the
+  // pull (`/dev heart breath isles`), so a run tests the phase on its own
+  // (Heroic's Knotted Gale wipes a bot raid in phase 1 more often than not).
+  if (BREATH_AT === 'isles' && st.engagedAt && !st.skipSent && Date.now() - st.engagedAt > 8000) {
+    st.skipSent = true;
+    world.leader.chat('/dev heart breath isles');
+    log('BREATH_AT=isles: the leader starts the Islands of the Wind');
+  }
   // The Knotted Gale: a carrier per free ball.
   if (IGNORE !== 'knot') {
     for (const k of o.knots) {
@@ -761,16 +771,37 @@ function isleDuty(world, st, b, me, isle) {
     return { goal: land, tol: 0.8, duty: 'isle dodge' };
   }
   const mine = world.isleAdds.filter((m) => isleOf(world, m) === isle);
-  // The Herald's gale: out of its line, sideways, while its bar runs.
+  // The Herald's gale: out of its line, sideways, and held there while its
+  // bar runs (back to the fight only once it has landed: never a step back
+  // into the line).
+  st.galeDodge ??= new Map();
+  const kept = st.galeDodge.get(b.pid);
+  if (kept) {
+    const h = mine.find((m) => m.id === kept.herald);
+    if (h && h.cast === ISLE_CASTS.shove) return { goal: kept.at, tol: 0.5, duty: 'isle gale' };
+    st.galeDodge.delete(b.pid);
+  }
   for (const h of mine) {
     if (h.tid !== ISLE_MOBS.herald || h.cast !== ISLE_CASTS.shove) continue;
     const dir = { ux: Math.sin(h.f ?? 0), uz: Math.cos(h.f ?? 0) };
     if (!inShoveLine({ x: h.x, z: h.z }, dir, me.x, me.z)) continue;
-    const side = { x: -dir.uz, z: dir.ux };
-    const s1 = (me.x - h.x) * side.x + (me.z - h.z) * side.z >= 0 ? 1 : -1;
-    for (const sg of [s1, -s1]) {
-      const at = add(me, { x: side.x * sg, z: side.z * sg }, 4.5);
-      if (onIsle(at)) return { goal: at, tol: 0.5, duty: 'isle gale' };
+    // The nearest spot on the isle clear of the line (with a yard to spare).
+    const mid = W(world, spots);
+    let best = null;
+    for (const r of [0, 2, 4, 6, 8])
+      for (let k = 0; k < 16; k++) {
+        const a = (k / 16) * Math.PI * 2;
+        const at = { x: mid.x + Math.sin(a) * r, z: mid.z + Math.cos(a) * r };
+        if (!onIsle(at)) continue;
+        const clear = [-1.5, 0, 1.5].every(
+          (o) => !inShoveLine({ x: h.x, z: h.z }, dir, at.x - dir.uz * o, at.z + dir.ux * o),
+        );
+        if (!clear) continue;
+        if (!best || hypot(me, at) < hypot(me, best)) best = at;
+      }
+    if (best) {
+      st.galeDodge.set(b.pid, { herald: h.id, at: best });
+      return { goal: best, tol: 0.5, duty: 'isle gale' };
     }
   }
   if (mine.length > 0) {
