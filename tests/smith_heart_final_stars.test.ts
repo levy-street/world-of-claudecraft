@@ -119,8 +119,8 @@ describe('the pure rules', () => {
     const H = FINAL_DIFFICULTY.heroic;
     // Two charged on Normal: under a tenth of a level-20 cloth pool a pulse.
     expect(chargedPulse(2, N.chargedMin, N.chargedMax)[1] * N.damageMult).toBeLessThan(113);
-    // Four press: more than an empty Overload pulse every four seconds.
-    expect(chargedPulse(4, N.chargedMin, N.chargedMax)[0]).toBeGreaterThan(130);
+    // Four press: more than two empty Overload pulses every four seconds.
+    expect(chargedPulse(4, N.chargedMin, N.chargedMax)[0] * N.damageMult).toBeGreaterThan(80);
     expect(H.chargedMin).toBeGreaterThan(N.chargedMin);
   });
 
@@ -233,9 +233,12 @@ describe('the Anvil holds the stars', () => {
     expect(st.anvil).not.toBeNull();
     st.stars.clock.hammer = 0.05;
     st.stars.clock.breath = 0.05;
+    st.kit.tremor = 0.05;
     f.tick(sec(2));
     expect(f.objects(FINAL_OBJECTS.risePrefix).length).toBe(0);
     expect(f.objects(FINAL_OBJECTS.strikePrefix).length).toBe(0);
+    // The quarter's own kit holds too (no Tremor Crack under the stack).
+    expect(f.objects(FINAL_OBJECTS.tremorPrefix).length).toBe(0);
     // Once it has fallen, both come.
     f.tick(sec(T.anvilCast));
     expect(st.anvil).toBeNull();

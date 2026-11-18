@@ -390,10 +390,14 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     pillarCap: 8,
     thrumMin: 330,
     thrumMax: 370,
-    chargedMin: 34,
-    chargedMax: 40,
+    // 26 to 30 a pillar (34 to 40 until the bot raids of 2026-11-18: four
+    // charged pillars outran two healers on top of the Overload pulses), and
+    // no strike seeks the stone on Normal: a pillar charges only when a
+    // marked player stands by it.
+    chargedMin: 26,
+    chargedMax: 30,
     skyMarks: 1,
-    skyPillarSpots: 1,
+    skyPillarSpots: 0,
     bladeMarks: 1,
     bladeAim: 4,
     whirlCount: 2,

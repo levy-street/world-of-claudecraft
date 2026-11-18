@@ -330,6 +330,10 @@ function due(s: FinalScope, key: keyof FinalKitClocks, needsBar = false): boolea
 /** The active quarter's kit, each mechanic on its clock. */
 function runKit(s: FinalScope): void {
   const r = s.rules;
+  // Through Weight of the Anvil's bar the quarter's kit holds its clocks too
+  // (the bot raids of 2026-11-18: Tremor Cracks laid under the stacked
+  // soakers killed the stack): the raid gathers, then the kit comes back.
+  if (s.st.anvil) return;
   switch (s.st.zone) {
     case 'heat':
       if (due(s, 'fist', true)) startFist(s);
