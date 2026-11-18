@@ -101,35 +101,28 @@ varying float vH;
 ${KIT_NOISE}
 void main() {
   float core = max(uCoreK, 0.0);
-  float speed = mix(2.6, 4.6, core);
-  // Helical tongues: bands winding up the column (around x, up y).
-  float helix = sin(vUv.x * 6.2832 * 3.0 + vUv.y * 14.0 - uTime * 9.0 + uSeed);
-  vec2 q = vec2(vUv.x * 6.0 + vUv.y * 3.0 + uSeed, vUv.y * 3.2 - uTime * speed);
-  float f = kfbm(q) * 0.7 + kn(q * 3.3 + 2.0) * 0.25 + helix * 0.32;
+  // Streaks winding up the funnel, torn by noise: the tornado's turn.
+  float n = kfbm(vec2(vUv.x * 8.0 + uSeed, vUv.y * 4.0 - uTime * 2.2));
+  float wind = vUv.x * 4.0 + vUv.y * (1.6 + core) - uTime * (1.1 + 0.8 * core) + uSeed;
+  float s = fract(wind + (n - 0.5) * 0.6);
+  float streak = smoothstep(0.0, 0.12, s) * (1.0 - smoothstep(0.35, 0.75, s));
+  float lip = 1.0 - smoothstep(0.82, 1.0, vUv.y + (n - 0.5) * 0.2);
+  float foot = smoothstep(0.0, 0.04, vUv.y);
   if (uCoreK < 0.0) {
-    // The smoke-dark sheath: thin at the foot, rolling thick off the top,
-    // a dull ember glow in its folds.
-    float up = smoothstep(0.25, 0.85, vUv.y);
-    float fold = smoothstep(0.35, 0.75, f);
-    float lipS = 1.0 - smoothstep(0.88, 1.0, vUv.y + (f - 0.5) * 0.3);
-    float a = fold * up * lipS * 0.85;
-    vec3 smoke = mix(vec3(0.05, 0.035, 0.03), uFire * vec3(0.55, 0.16, 0.04), smoothstep(0.6, 0.95, f) * (1.0 - up * 0.7));
-    gl_FragColor = vec4(smoke, a * uAlpha);
+    // The dark sheath of smoke and dust it drags round its outside, thick
+    // up the flare, an ember glow low in its folds.
+    float a = (0.35 + 0.65 * streak) * smoothstep(0.05, 0.55, vUv.y) * lip * 0.8;
+    vec3 c = mix(vec3(0.07, 0.05, 0.04), uFire * vec3(0.5, 0.17, 0.05), (1.0 - vUv.y) * 0.6 * streak);
+    gl_FragColor = vec4(c, a * uAlpha);
     return;
   }
-  // Tongues licking up: bright bands, a ragged lip at the top.
-  float lip = 1.0 - smoothstep(0.7, 1.0, vUv.y + (f - 0.5) * 0.45);
-  float foot = smoothstep(0.0, 0.05, vUv.y);
-  // The helix carves dark gaps between its tongues: the column reads as
-  // turning, never a solid flare.
-  float body = smoothstep(0.38, 0.72, f) * lip * foot * (0.55 + 0.45 * smoothstep(-0.4, 0.6, helix));
-  // Hottest at its foot (where it tears at the floor) and in its tongues.
-  float heat = clamp(f * 0.95 + (1.0 - vUv.y) * 0.35 + core * 0.18, 0.0, 1.0);
-  // Deep orange-red at its ragged edges, amber in the body, gold only in
-  // the hottest tongues: fire, never a white blob under the bloom.
-  vec3 col = mix(uFire * vec3(0.8, 0.22, 0.05), uFire * vec3(1.0, 0.62, 0.3), smoothstep(0.3, 0.75, heat));
-  col = mix(col, uCore, smoothstep(0.86, 1.0, heat) * mix(0.35, 0.7, core));
-  gl_FragColor = vec4(col * (0.45 + 0.4 * heat), body * uAlpha * mix(0.75, 0.42, core));
+  // Fire: hottest at the throat where it tears the floor, deep red up the
+  // flare, gold only in the core's streaks.
+  float heat = clamp((1.0 - vUv.y) * 0.9 + streak * 0.4 + core * 0.3, 0.0, 1.0);
+  vec3 col = mix(uFire * vec3(0.75, 0.18, 0.04), uFire * vec3(1.0, 0.6, 0.25), smoothstep(0.25, 0.7, heat));
+  col = mix(col, uCore, smoothstep(0.8, 1.0, heat) * mix(0.3, 0.7, core));
+  float body = (0.25 + 0.75 * streak) * lip * foot;
+  gl_FragColor = vec4(col * (0.55 + 0.45 * heat), body * uAlpha * mix(0.85, 0.6, core));
 }
 `;
 
