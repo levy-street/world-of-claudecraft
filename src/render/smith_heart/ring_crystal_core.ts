@@ -161,18 +161,51 @@ export function ringCrystalState(
   return out;
 }
 
-/** The quantized state's key, so a steady crystal writes nothing: every number rounded
- *  to what a frame can show (the painter compares it to its last). */
-export function ringCrystalKey(s: RingCrystalState): number {
-  let k = 0;
+/** The fields a frame can show, in the order `ringCrystalChanged` reads them. */
+export const RING_CRYSTAL_FIELDS = 2 * RING_CRYSTAL_ELEMENTS + 3;
+
+/** A fresh record of the last quantized state written (nothing written yet: every field
+ *  reads as changed). */
+export function newRingCrystalLast(): Float64Array {
+  return new Float64Array(RING_CRYSTAL_FIELDS).fill(Number.NaN);
+}
+
+function stepField(last: Float64Array, n: number, v: number): boolean {
+  if (last[n] === v) return false;
+  last[n] = v;
+  return true;
+}
+
+/** Has any field moved by what a frame can show since `last`, the quantized state the
+ *  painter wrote? Updates `last` and answers whether to write the material again. Field by
+ *  field, never one packed number: a hash of eleven fields outruns a double's precision and
+ *  swallows one-step changes (the overload's whitening advanced in four jumps). */
+export function ringCrystalChanged(s: RingCrystalState, last: Float64Array): boolean {
+  let changed = false;
+  let n = 0;
   for (let i = 0; i < RING_CRYSTAL_ELEMENTS; i++) {
-    k = k * 31 + Math.round(s.fill[i] * 128);
-    k = k * 31 + Math.round(s.level[i] * 64);
+    if (stepField(last, n++, Math.round(s.fill[i] * 128))) changed = true;
+    if (stepField(last, n++, Math.round(s.level[i] * 64))) changed = true;
   }
-  k = k * 31 + Math.round(s.crown * 64);
-  k = k * 31 + Math.round(s.ready * 64);
-  k = k * 31 + Math.round(s.charge * 64);
-  return k % 2147483647;
+  if (stepField(last, n++, Math.round(s.crown * 64))) changed = true;
+  if (stepField(last, n++, Math.round(s.ready * 64))) changed = true;
+  if (stepField(last, n++, Math.round(s.charge * 64))) changed = true;
+  return changed;
+}
+
+/** Where each piece's triangles sit in the merged crystal's index (the painter draws a
+ *  piece as a window over the whole's own buffers, so the burst uploads nothing): the
+ *  prefix sums of the pieces' index counts, in node order. */
+export function ringCrystalPieceSpans(
+  indexCounts: readonly number[],
+): { start: number; count: number }[] {
+  const out: { start: number; count: number }[] = [];
+  let start = 0;
+  for (const count of indexCounts) {
+    out.push({ start, count });
+    start += count;
+  }
+  return out;
 }
 
 /** How hard the crystal trembles through its overload (yards of sway at the tip). */

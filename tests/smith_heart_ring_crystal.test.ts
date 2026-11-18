@@ -24,6 +24,7 @@ import {
   HEART_SEAL_FILL_SECONDS,
 } from '../src/render/smith_heart/heart_seal_core';
 import {
+  newRingCrystalLast,
   newRingCrystalPiecePose,
   newRingCrystalState,
   RING_CRYSTAL,
@@ -31,10 +32,12 @@ import {
   RING_CRYSTAL_CORE_RADIUS,
   RING_CRYSTAL_READY_RISE,
   type RingCrystalPieceKind,
-  ringCrystalKey,
+  type RingCrystalState,
+  ringCrystalChanged,
   ringCrystalPieceKind,
   ringCrystalPiecePose,
   ringCrystalPieceRole,
+  ringCrystalPieceSpans,
   ringCrystalState,
   ringCrystalTremble,
 } from '../src/render/smith_heart/ring_crystal_core';
@@ -134,12 +137,57 @@ describe('the crystal: the state the seal shows', () => {
     expect(old.burstT).toBeGreaterThan(900);
   });
 
-  it('keys a steady crystal the same and a moving one differently', () => {
-    const a = ringCrystalKey(ringCrystalState(LIT, 999, -1));
-    expect(ringCrystalKey(ringCrystalState(LIT, 999, -1))).toBe(a);
-    expect(ringCrystalKey(ringCrystalState([999, 999, 999, -1], 999, -1))).not.toBe(a);
-    expect(ringCrystalKey(ringCrystalState(LIT, 0.5, -1))).not.toBe(a);
-    expect(ringCrystalKey(ringCrystalState(LIT, 999, 0.3))).not.toBe(a);
+  it('writes the material for a moving crystal and not for a steady one', () => {
+    const last = newRingCrystalLast();
+    expect(ringCrystalChanged(ringCrystalState(LIT, 999, -1), last)).toBe(true);
+    expect(ringCrystalChanged(ringCrystalState(LIT, 999, -1), last)).toBe(false);
+    expect(ringCrystalChanged(ringCrystalState([999, 999, 999, -1], 999, -1), last)).toBe(true);
+    expect(ringCrystalChanged(ringCrystalState(LIT, 0.5, -1), last)).toBe(true);
+    expect(ringCrystalChanged(ringCrystalState(LIT, 999, 0.3), last)).toBe(true);
+  });
+
+  it('notices a one-step move in every field, with every element lit (no packed hash)', () => {
+    // The first cut packed the fields into one double: past about 1e16 a double steps by
+    // 16, so most one-step changes of the late fields (the overload's whitening) vanished.
+    const base = (): RingCrystalState => {
+      const s = ringCrystalState(LIT, 999, -1);
+      s.charge = 0.5;
+      return s;
+    };
+    const moves: [string, (s: RingCrystalState) => void][] = [
+      ['crown', (s) => (s.crown += 1 / 64)],
+      ['ready', (s) => (s.ready += 1 / 64)],
+      ['charge', (s) => (s.charge += 1 / 64)],
+      ...[0, 1, 2, 3].flatMap((i): [string, (s: RingCrystalState) => void][] => [
+        [`fill ${i}`, (s) => (s.fill[i] -= 1 / 128)],
+        [`level ${i}`, (s) => (s.level[i] += 1 / 64)],
+      ]),
+    ];
+    for (const [name, move] of moves) {
+      const last = newRingCrystalLast();
+      ringCrystalChanged(base(), last);
+      const next = base();
+      move(next);
+      expect(ringCrystalChanged(next, last), name).toBe(true);
+    }
+    // And every one-step charge change along the whole overload reads as a change.
+    const last = newRingCrystalLast();
+    ringCrystalChanged(base(), last);
+    for (let q = 33; q <= 64; q++) {
+      const s = base();
+      s.charge = q / 64;
+      expect(ringCrystalChanged(s, last), `charge ${q}`).toBe(true);
+    }
+  });
+
+  it("windows each piece over the whole's index: prefix spans, in node order", () => {
+    expect(ringCrystalPieceSpans([])).toEqual([]);
+    expect(ringCrystalPieceSpans([6, 0, 9, 3])).toEqual([
+      { start: 0, count: 6 },
+      { start: 6, count: 0 },
+      { start: 6, count: 9 },
+      { start: 15, count: 3 },
+    ]);
   });
 
   it('trembles only through the overload, writing into a caller-owned state', () => {

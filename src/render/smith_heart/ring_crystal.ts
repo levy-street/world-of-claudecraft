@@ -15,6 +15,14 @@
 //
 // GPU preparation: the material is the slot's (built with the interior, its programs and
 // its painting linked and uploaded by the interior's gate; the pieces share its program).
+// The pieces are windows (draw ranges) over the whole's own attribute buffers, so the burst's
+// first draw of a piece uploads no vertex data, and every mesh keeps frustum culling on
+// (bounding spheres set at bake: a piece's flight moves the sphere with its matrix).
+//
+// Stand-in: none. A crystal that has not landed (a model that failed, or a link slower than
+// the interior's wait and the live gate) leaves the dais without it: the rivers' columns, the
+// label and the press itself still carry the progress and the way, and the entity's click
+// volume only matters once the model draws.
 
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
@@ -24,19 +32,21 @@ import { sharedUniforms } from '../gfx';
 import { markSharedGeometry } from '../shared_resource';
 import { heartKitCompileGate } from './heart_kit';
 import {
+  newRingCrystalLast,
   newRingCrystalPiecePose,
   newRingCrystalState,
   type RingCrystalPieceKind,
   type RingCrystalState,
-  ringCrystalKey,
+  ringCrystalChanged,
   ringCrystalPieceKind,
   ringCrystalPiecePose,
   ringCrystalPieceRole,
+  ringCrystalPieceSpans,
   ringCrystalTremble,
 } from './ring_crystal_core';
 import { ringCrystalMaterial } from './ring_crystal_material';
 
-export const SMITH_HEART_RING_CRYSTAL_URL = '/models/props/smith_heart_ring_crystal.glb';
+const SMITH_HEART_RING_CRYSTAL_URL = '/models/props/smith_heart_ring_crystal.glb';
 
 /** How long the interior waits for the model before it builds without it. */
 const WAIT_MS = 8000;
@@ -80,9 +90,12 @@ function bakePiece(mesh: THREE.Mesh): THREE.BufferGeometry {
   return out;
 }
 
+/** The attributes the crystal reads (the pieces' windows share the whole's buffers). */
+const ATTRIBUTES = ['position', 'normal', 'uv', '_weights', '_path'] as const;
+
 function bakeModel(scene: THREE.Object3D): CrystalModel | null {
   scene.updateMatrixWorld(true);
-  const pieces: CrystalPiece[] = [];
+  const parts: { kind: RingCrystalPieceKind; geometry: THREE.BufferGeometry }[] = [];
   let map: THREE.Texture | null = null;
   scene.traverse((node) => {
     if (!(node instanceof THREE.Mesh)) return;
@@ -90,25 +103,60 @@ function bakeModel(scene: THREE.Object3D): CrystalModel | null {
     if (!kind) return;
     const material = Array.isArray(node.material) ? node.material[0] : node.material;
     map ??= (material as THREE.MeshStandardMaterial | undefined)?.map ?? null;
-    const geometry = markSharedGeometry(bakePiece(node));
-    const pos = geometry.getAttribute('position');
-    const centre = new THREE.Vector3();
-    for (let i = 0; i < pos.count; i++) centre.add(new THREE.Vector3().fromBufferAttribute(pos, i));
-    centre.divideScalar(Math.max(1, pos.count));
-    // The widest body piece is the grey core under the crystals (it vanishes at the burst).
-    let radius = 0;
-    for (let i = 0; i < pos.count; i++)
-      radius = Math.max(radius, Math.hypot(pos.getX(i) - centre.x, pos.getZ(i) - centre.z));
-    pieces.push({ kind: ringCrystalPieceRole(kind, radius), centre, geometry });
+    parts.push({ kind, geometry: bakePiece(node) });
   });
-  if (!map || pieces.length === 0) return null;
-  // The pieces in their node order (a piece's index seeds its flight).
+  if (!map || parts.length === 0) return null;
+  // The whole crystal, the pieces merged in their node order (a piece's index seeds its flight).
   const whole = markSharedGeometry(
     mergeGeometries(
-      pieces.map((p) => p.geometry),
+      parts.map((p) => p.geometry),
       false,
     ),
   );
+  const index = whole.getIndex();
+  if (!index) return null;
+  whole.computeBoundingSphere();
+  const spans = ringCrystalPieceSpans(parts.map((p) => p.geometry.getIndex()?.count ?? 0));
+  const pieces = parts.map((part, i): CrystalPiece => {
+    // The piece's centre, how far its vertices reach round it (flat, and in all three
+    // dimensions: its bounding sphere, which keeps culling on while it flies).
+    const xyz = part.geometry.getAttribute('position').array as Float32Array;
+    const n = Math.max(1, xyz.length / 3);
+    let cx = 0;
+    let cy = 0;
+    let cz = 0;
+    for (let k = 0; k < xyz.length; k += 3) {
+      cx += xyz[k];
+      cy += xyz[k + 1];
+      cz += xyz[k + 2];
+    }
+    cx /= n;
+    cy /= n;
+    cz /= n;
+    let flat2 = 0;
+    let round2 = 0;
+    for (let k = 0; k < xyz.length; k += 3) {
+      const dx = xyz[k] - cx;
+      const dy = xyz[k + 1] - cy;
+      const dz = xyz[k + 2] - cz;
+      flat2 = Math.max(flat2, dx * dx + dz * dz);
+      round2 = Math.max(round2, dx * dx + dy * dy + dz * dz);
+    }
+    const centre = new THREE.Vector3(cx, cy, cz);
+    // A window over the whole's own attribute objects and index: three tracks buffers per
+    // attribute object, so the burst's first draw of a piece uploads no vertex data.
+    const view = new THREE.BufferGeometry();
+    for (const name of ATTRIBUTES) {
+      const attr = whole.getAttribute(name);
+      if (attr) view.setAttribute(name, attr);
+    }
+    view.setIndex(index);
+    view.setDrawRange(spans[i].start, spans[i].count);
+    view.boundingSphere = new THREE.Sphere(centre.clone(), Math.sqrt(round2));
+    markSharedGeometry(view);
+    // The widest body piece is the grey core under the crystals (it vanishes at the burst).
+    return { kind: ringCrystalPieceRole(part.kind, Math.sqrt(flat2)), centre, geometry: view };
+  });
   return { pieces, whole, map };
 }
 
@@ -137,10 +185,6 @@ export function ensureRingCrystal(): Promise<void> {
   return Promise.race([startLoad(), new Promise<void>((resolve) => setTimeout(resolve, WAIT_MS))]);
 }
 
-export function ringCrystalLoaded(): boolean {
-  return loaded && model !== null;
-}
-
 export interface RingCrystal {
   group: THREE.Group;
   /** Write the crystal's state (the seal's lit elements, the ready swell, the burst). */
@@ -160,13 +204,11 @@ function buildMeshes(m: CrystalModel): Built {
   root.name = 'ringCrystal';
   const whole = new THREE.Mesh(m.whole, material);
   whole.name = 'ringCrystal:whole';
-  whole.frustumCulled = false;
   root.add(whole);
   const pieces = m.pieces.map((piece, i) => {
     const mesh = new THREE.Mesh(piece.geometry, material);
     mesh.name = `ringCrystal:piece${i}`;
     mesh.matrixAutoUpdate = false;
-    mesh.frustumCulled = false;
     mesh.visible = false;
     root.add(mesh);
     return { mesh, piece };
@@ -180,7 +222,7 @@ export function buildRingCrystal(): RingCrystal {
   group.name = 'smithHeartRingCrystal';
   let built: Built | null = null;
   let want: RingCrystalState = newRingCrystalState();
-  let lastKey = -1;
+  const last = newRingCrystalLast();
   let lastBurst = -2;
   const pose = newRingCrystalPiecePose();
   const m4 = new THREE.Matrix4();
@@ -192,7 +234,7 @@ export function buildRingCrystal(): RingCrystal {
 
   const adopt = (b: Built): void => {
     built = b;
-    lastKey = -1;
+    last.fill(Number.NaN);
     lastBurst = -2;
   };
   if (model) {
@@ -227,9 +269,7 @@ export function buildRingCrystal(): RingCrystal {
       const b = built;
       if (!b) return;
       const burst = want.burstT >= 0;
-      const keyed = ringCrystalKey(want);
-      if (keyed !== lastKey) {
-        lastKey = keyed;
+      if (ringCrystalChanged(want, last)) {
         const u = b.material.uniforms;
         u.uFill.value.set(want.fill[0], want.fill[1], want.fill[2], want.fill[3]);
         u.uLevel.value.set(want.level[0], want.level[1], want.level[2], want.level[3]);
