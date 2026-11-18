@@ -1988,8 +1988,15 @@ Every number is a SKETCH; the tier rows are `ISLE_TIERS` and the shared ones `IS
   any hit breaks would be hopeless once the storm closed); the neighbours' strikes still
   reach them.
 - **The Stillstones.** The last isle of each side holds one, woken when that isle's adds are
-  down (Heroic: two Squall Fragments rise to guard it). A player targets it and presses
-  interact: Still the Gale, a 5 s channel any landed hit breaks (the trash engine's G3 use).
+  down (Heroic: two Squall Fragments rise to guard it). A player clicks it (or targets it and
+  presses interact): Still the Gale, a 5 s channel any landed hit breaks (the trash engine's G3
+  use). Jose's playtest of 2026-11-18: no use prompt at all (`promptless`; the cast bar says it),
+  the Breath's telegraph objects let the click through (`world_direct_pick.ts` `takesNoClick`),
+  a stilled stone is spent (`KIT_USE_SPENT_AURA`: no second channel), and from its stilling a
+  beam of gold calm and lightning pours from it into the nova until the cocoon ends
+  (`breath_seal_choke_fx.ts`). Over-head arrows (`breath_arrow_core.ts`) rise only for a
+  player chosen for a role of their own (Drawn Lightning, the Knotted Gale's marks and carrier,
+  Leaping Bolt's target), never for a sky strike or Storm Lance.
   The last isle's adds rise on its near side, clear of the stone. Both stilled: the cocoon shatters, the nova is cut, the adds and pads go, every player on the
   isles rides home, and 4 s later the storm breaks (phase 2, as before).
 - **A wipe** brings every body on an isle or in the air back to the Cornice; nothing of the
