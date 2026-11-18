@@ -6728,6 +6728,10 @@ export interface ZonePropsDef {
     key: string;
     /** Small dressing seated on verified existing ground may opt out of terrain flattening. */
     terrainCalm?: false;
+    /** 'footprint': seat the piece on the ground under its whole footprint (a low piece
+     *  leans with it, every piece sinks to its lowest point) instead of on the height at
+     *  its centre (decor_seat.ts). Absent: the centre height, as ever. */
+    seat?: 'footprint';
     x: number;
     z: number;
     rot?: number;
