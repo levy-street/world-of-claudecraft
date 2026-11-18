@@ -29,7 +29,13 @@ const PRESET = Number(process.env.SHOT_PRESET ?? 4);
 const WHAT = process.env.SHOT_WHAT ?? 'anvil';
 const VIEW = process.env.SHOT_VIEW ?? 'raid';
 const TAG = process.env.SHOT_TAG ?? `${WHAT}_${VIEW}`;
-const SECONDS = Number(process.env.SHOT_SECONDS ?? { anvil: 9.5, wrath: 7, rush: 10 }[WHAT] ?? 9);
+const SECONDS = Number(
+  process.env.SHOT_SECONDS ??
+    { anvil: 9.5, wrath: 7, rush: 10, pillars: 5, storm: 9, blade: 6, tornado: 8, overload: 8 }[
+      WHAT
+    ] ??
+    9,
+);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /** Per mechanic: the area to enter, the root that says its fx are built,
@@ -56,6 +62,121 @@ const PLANS = {
     ],
     pre: ['/dev heart final root'],
     trigger: '/dev heart final anvil',
+  },
+  // The Masterless Strength's woken stars (the rework of 2026-11-18): the
+  // Hammer's pillars rising, a Sky Strike by them (Arcing Stone, the pillar
+  // Storm-Charged and pulsing), a Crossing Blade through the witness, the
+  // Heat's Fire Whirls, and the Overload in the world (the body's strain, the
+  // quarter's floor and wall erupting).
+  pillars: {
+    tp: 'final',
+    fxRoot: 'smith-heart-final-kit-fx',
+    anchor: { x: 128.25, z: 112.25 },
+    toward: { x: 188, z: 172 },
+    bossTemplate: 'heart_masterless_strength',
+    standOff: 18,
+    raid: 4,
+    raidSpread: 6,
+    setup: [
+      '/dev heart final reset',
+      '/dev heart final quarter hammer',
+      '/dev heart final pull',
+      '/dev heart final root',
+    ],
+    trigger: ['/dev heart final pillars 3'],
+  },
+  storm: {
+    tp: 'final',
+    fxRoot: 'smith-heart-final-kit-fx',
+    anchor: { x: 128.25, z: 112.25 },
+    toward: { x: 188, z: 172 },
+    bossTemplate: 'heart_masterless_strength',
+    standOff: 18,
+    raid: 4,
+    raidSpread: 6,
+    setup: [
+      '/dev heart final reset',
+      '/dev heart final quarter hammer',
+      '/dev heart final pull',
+      '/dev heart final root',
+      '/dev heart final pillars 2',
+    ],
+    trigger: ['/dev heart final wake breath', '/dev heart final sky'],
+  },
+  arc: {
+    tp: 'final',
+    fxRoot: 'smith-heart-final-kit-fx',
+    anchor: { x: 128.25, z: 112.25 },
+    toward: { x: 188, z: 172 },
+    bossTemplate: 'heart_masterless_strength',
+    standOff: 20,
+    raid: 4,
+    raidSpread: 9,
+    setup: [
+      '/dev heart final reset',
+      '/dev heart final quarter hammer',
+      '/dev heart final pull',
+      '/dev heart final root',
+      '/dev heart final pillars 2',
+    ],
+    trigger: [['/dev heart final sky pillar', 2600], '/dev heart final sky pillar'],
+  },
+  blade: {
+    tp: 'final',
+    fxRoot: 'smith-heart-final-kit-fx',
+    anchor: { x: 128.25, z: 112.25 },
+    toward: { x: 188, z: 172 },
+    bossTemplate: 'heart_masterless_strength',
+    standOff: 24,
+    raid: 4,
+    raidSpread: 8,
+    setup: [
+      '/dev heart final reset',
+      '/dev heart final quarter hammer',
+      '/dev heart final pull',
+      '/dev heart final root',
+      '/dev heart final pillars 3',
+      '/dev heart final charge',
+      '/dev heart final root',
+    ],
+    trigger: ['/dev heart final blades me'],
+    // The whole line from its blade on the rim across the room.
+    views: { high: [0.0, 1.05, 78], raid: [1.15, 0.2, 55] },
+  },
+  tornado: {
+    tp: 'final',
+    fxRoot: 'smith-heart-final-kit-fx',
+    anchor: { x: 128.25, z: 112.25 },
+    toward: { x: 188, z: 172 },
+    bossTemplate: 'heart_masterless_strength',
+    standOff: 22,
+    raid: 4,
+    raidSpread: 7,
+    setup: [
+      '/dev heart final reset',
+      '/dev heart final quarter heat',
+      '/dev heart final pull',
+      '/dev heart final root',
+    ],
+    trigger: ['/dev heart final tornado'],
+  },
+  overload: {
+    tp: 'final',
+    fxRoot: 'smith-heart-final-kit-fx',
+    anchor: { x: 128.25, z: 112.25 },
+    toward: { x: 188, z: 172 },
+    bossTemplate: 'heart_masterless_strength',
+    standOff: 26,
+    raid: 4,
+    raidSpread: 4,
+    setup: [
+      '/dev heart final reset',
+      '/dev heart final quarter heat',
+      '/dev heart final pull',
+      '/dev heart final root',
+      '/dev heart final fill heat 60',
+    ],
+    trigger: ['/dev heart final fill heat 82'],
   },
   wrath: {
     tp: 'gallery',
@@ -235,7 +356,10 @@ try {
   await place();
   fs.mkdirSync(OUT, { recursive: true });
   for (const c of plan.pre ?? []) await chat(c, 100);
-  await chat(plan.trigger, 0);
+  // A trigger is one line, or a list of lines (a [line, ms] pair waits after it).
+  for (const c of Array.isArray(plan.trigger) ? plan.trigger : [plan.trigger])
+    if (Array.isArray(c)) await chat(c[0], c[1]);
+    else await chat(c, 0);
   const t0 = Date.now();
   const frames = [];
   while (Date.now() - t0 < SECONDS * 1000) {
@@ -250,10 +374,10 @@ try {
     if (process.env.SHOT_PROBE === '1' && frames.length === 30)
       console.log(
         'PROBE',
-        await page.evaluate(() => {
+        await page.evaluate((re) => {
           const out = [];
           window.__game.renderer.scene.traverse((o) => {
-            if (!/Strike|Anvil/.test(o.name)) return;
+            if (!new RegExp(re).test(o.name)) return;
             let v = true;
             for (let p = o; p; p = p.parent) if (!p.visible) v = false;
             const w = o.getWorldPosition(o.position.clone());
@@ -262,7 +386,7 @@ try {
             );
           });
           return out.join(' | ');
-        }),
+        }, process.env.SHOT_PROBE_RE ?? 'Strike|Anvil'),
       );
   }
   console.log('frames', frames.length);

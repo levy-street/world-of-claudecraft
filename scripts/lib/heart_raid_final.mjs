@@ -4,9 +4,15 @@
 // in each new quarter; it is moved on once its bar fills past two thirds,
 // toward the emptier neighbour, never parked in the ring), the raid follows it
 // and plays each quarter's kit: out of Basalt Fist's spot and lanes, the Fire
-// Whirls, the pools and the cracks, huddled in the Quench quarter, spread for
-// the Leaping Bolt, one player on each Storm Orb, everyone under Weight of the
-// Anvil (the Crushed aside on Heroic). In the intermissions the damage dealers
+// Whirls, the pools and the cracks, spread for the Leaping Bolt, one player on
+// each Storm Orb, everyone under Weight of the Anvil (the Crushed aside on
+// Heroic). The woken stars (the rework of 2026-11-18): out of every pillar's
+// rise, Sky Strike and Arcing Stone ring, never in a Crossing Blade's line;
+// the pillars are walls (walked round, no sight through them); a bot marked
+// for a blade leads its line through the pillars, the Storm-Charged ones
+// first (their pulse on the whole raid is the clock), then steps off it once
+// it locks; and the drag prefers waking the Quench (the blades) once pillars
+// stand. In the intermissions the damage dealers
 // burn the Splinters (Rime Toll kicked); in the final phase everyone stays in
 // the ring; on Mythic's hidden phase nobody stands on a fallen or falling
 // quarter. Reads only what the server sends; the geometry is the sim's own
@@ -22,7 +28,6 @@ import { HEART_ROOM } from '../../src/sim/content/smith_heart_layout';
 import {
   HEART_QUARTER_ORDER,
   HEART_QUARTERS,
-  heartQuarterAt,
   heartQuarterSpot,
 } from '../../src/sim/content/smith_heart_quarters';
 import {
@@ -30,6 +35,8 @@ import {
   FINAL_CASTS,
   FINAL_OBJECTS,
   FINAL_TUNING,
+  finalLaneOf,
+  finalPillarOf,
   finalZoneOf,
   overloadAuraId,
 } from '../../src/sim/encounters/smith_heart/final_ids';
@@ -38,6 +45,8 @@ import {
   FINAL_PHASE_AURAS,
   FINAL_PHASE_CASTS,
   hiddenFallenAt,
+  FINAL_PHASE_AURAS as PA,
+  quarterBit,
 } from '../../src/sim/encounters/smith_heart/final_phase_ids';
 import {
   HEAT_OBJECTS,
@@ -48,7 +57,6 @@ import {
   add,
   alive,
   auraOf,
-  DIFF,
   fightSec,
   fmtSec,
   HEROIC_PLUS,
@@ -100,12 +108,46 @@ export const final = {
   },
 
   read(world) {
-    const o = { danger: [], lanes: [], orbs: [], anvils: [], ice: [] };
+    const o = {
+      danger: [],
+      lanes: [],
+      orbs: [],
+      anvils: [],
+      ice: [],
+      pillars: [],
+      blades: [],
+      bladeLanes: [],
+    };
     for (const e of world.obs.ents.values()) {
       if (e.k !== 'object' || typeof e.tid !== 'string') continue;
       const t = e.tid;
       const at = { x: e.x, z: e.z, r: e.sc ?? 3, f: e.f ?? 0, id: e.id };
-      if (t.startsWith(FINAL_OBJECTS.orbPrefix)) o.orbs.push(at);
+      const pillar = finalPillarOf(t);
+      if (pillar) {
+        o.pillars.push({ ...at, r: T.pillarR, charged: pillar === 'charged' });
+        continue;
+      }
+      if (t.startsWith(FINAL_OBJECTS.bladePrefix)) {
+        o.blades.push(at);
+        continue;
+      }
+      const lane = finalLaneOf(t);
+      if (lane) {
+        // The line's object stands at its middle (final_blades.ts laneMiddle).
+        const d = { x: Math.sin(at.f), z: Math.cos(at.f) };
+        const from = add(at, d, -lane.length / 2);
+        o.bladeLanes.push({
+          from,
+          to: add(at, d, lane.length / 2),
+          half: T.bladeHalf + 1.2,
+          state: lane.state,
+        });
+        continue;
+      }
+      if (t.startsWith(FINAL_OBJECTS.risePrefix)) o.danger.push({ ...at, r: T.riseKnockR + 1.2 });
+      else if (t.startsWith(FINAL_OBJECTS.strikePrefix)) o.danger.push({ ...at, r: T.skyR + 1.2 });
+      else if (t.startsWith(FINAL_OBJECTS.arcPrefix)) o.danger.push({ ...at, r: T.arcR + 1.5 });
+      else if (t.startsWith(FINAL_OBJECTS.orbPrefix)) o.orbs.push(at);
       else if (t.startsWith(FINAL_OBJECTS.anvilPrefix))
         o.anvils.push({ ...at, r: at.r || T.anvilR });
       else if (t.startsWith(FINAL_OBJECTS.crackPrefix)) o.ice.push({ ...at, r: at.r + 1.2 });
@@ -170,6 +212,15 @@ export const final = {
   },
   meleeReach() {
     return 7;
+  },
+  // The pillars are walls: walked round, and no sight line through them.
+  obstacles(world) {
+    return (world.o?.pillars ?? []).map((p) => ({ x: p.x, z: p.z, r: p.r + 0.8 }));
+  },
+  blocksLine(world, a, b) {
+    for (const p of world.o?.pillars ?? [])
+      if (segDist(p, a, b) < p.r + 0.3 && hypot(a, p) > p.r && hypot(b, p) > p.r) return true;
+    return false;
   },
   // The healers stand between the ring and the boss's quarter (14 yd out on
   // its bearing, a little apart): every tank and the raid round the boss in
@@ -236,6 +287,8 @@ export const final = {
     if (!final.onFloor(world, at)) return true;
     for (const h of [...o.danger, ...o.ice]) if (hypot(h, at) < h.r) return true;
     for (const ln of o.lanes) if (segDist(at, ln.from, ln.to) < ln.half) return true;
+    for (const ln of o.bladeLanes) if (segDist(at, ln.from, ln.to) < ln.half) return true;
+    for (const p of o.pillars) if (hypot(p, at) < p.r + 1) return true;
     const b = world.mobs.boss;
     const hid = b ? auraOf(b, FINAL_PHASE_AURAS.hidden) : null;
     if (hid) {
@@ -303,12 +356,17 @@ export const final = {
         `Staged: the pull jumped to ${START === '15' ? 'the final phase' : 'the 40 percent call'} (START=${START})`,
       );
     note(`Anvils: ${st.anvils ?? 0} (under each: ${(st.anvilUnder ?? []).join(', ') || '-'})`);
+    note(
+      `Stars: pillars risen ${st.pillarsSeen ?? 0}, most standing ${st.pillarsMax ?? 0}, most charged ${st.chargedMax ?? 0}, shattered ${st.shattered ?? 0} (charged ${st.chargedShattered ?? 0}), blades ${st.bladesSeen ?? 0}`,
+    );
   },
   row(world, st) {
     init(st);
     return [
       ['Quarters', String(st.zones.length)],
       ['Bursts', String(st.bursts)],
+      ['Pillars', `${st.pillarsSeen ?? 0}/${st.shattered ?? 0}`],
+      ['Charged', String(st.chargedMax ?? 0)],
     ];
   },
 };
@@ -386,6 +444,17 @@ function dragSpot(world, st) {
     const a = HEART_QUARTER_ORDER[(i + 1) % n];
     const c = HEART_QUARTER_ORDER[(i + n - 1) % n];
     target = bar(world, a) <= bar(world, c) ? a : c;
+    // Pillars standing and the blades still asleep: wake the Quench next if
+    // it neighbours (its blades are the only way to break them), and never
+    // wake the storm over them first.
+    const pillars = world.o?.pillars.length ?? 0;
+    const mask = auraOf(b, PA.phase)?.value2 ?? 0;
+    const awake = (v) => (mask & quarterBit(v)) !== 0;
+    if (pillars >= 2 && !awake('quench') && (a === 'quench' || c === 'quench')) target = 'quench';
+    else if (pillars >= 2 && !awake('breath') && target === 'breath') {
+      const other = target === a ? c : a;
+      if (bar(world, other) < 70) target = other;
+    }
     st.next = target;
     log(`DRAG: ${z} bar at ${Math.round(bar(world, z))}, on to ${target}`);
   }
@@ -434,6 +503,26 @@ function track(world, st) {
     st.anvilUnder = [...(st.anvilUnder ?? []), under.length];
   }
   st.anvilSeen = anvil ? { x: anvil.x, z: anvil.z } : null;
+  // The stars: pillars risen and shattered (the charged ones counted), blades.
+  const ps = world.o?.pillars ?? [];
+  const ids = new Set(ps.map((p) => p.id));
+  const charged = ps.filter((p) => p.charged).length;
+  for (const p of ps) if (!st.pillarIds?.has(p.id)) st.pillarsSeen = (st.pillarsSeen ?? 0) + 1;
+  for (const [id, wasCharged] of st.pillarCharged ?? new Map()) {
+    if (ids.has(id)) continue;
+    st.shattered = (st.shattered ?? 0) + 1;
+    if (wasCharged) st.chargedShattered = (st.chargedShattered ?? 0) + 1;
+    log(`PILLAR shattered${wasCharged ? ' (it was Storm-Charged)' : ''}`);
+  }
+  st.pillarIds = ids;
+  st.pillarCharged = new Map(ps.map((p) => [p.id, p.charged]));
+  st.pillarsMax = Math.max(st.pillarsMax ?? 0, ps.length);
+  if (charged > (st.chargedNow ?? 0)) log(`STORM-CHARGED: ${charged} pillars charged`);
+  st.chargedNow = charged;
+  st.chargedMax = Math.max(st.chargedMax ?? 0, charged);
+  const bladeIds = new Set((world.o?.blades ?? []).map((x) => x.id));
+  for (const id of bladeIds) if (!st.bladeIds?.has(id)) st.bladesSeen = (st.bladesSeen ?? 0) + 1;
+  st.bladeIds = bladeIds;
   const z = zoneOfBoss(world);
   if (z !== st.prevZone && world.mobs.boss?.aggro != null) {
     st.zones.push({ t: fightSec(), zone: z });
@@ -472,7 +561,8 @@ function duty(world, st, b, me) {
   // Every body under it, the off-tank too: the share is the total over the
   // soakers. The main tank comes only when the mark lies clear of the ring
   // (the boss follows him, and in the ring Heart Unbound strikes the raid).
-  const mainTank = me.tank && me.pid === st.mainTankPid;
+  // The bot holding the boss (its aggro): the one who may stay out.
+  const mainTank = me.tank && (boss?.aggro === me.pid || me.pid === st.mainTankPid);
   const ringClear = !!anvil && hypot(anvil, world.center) > HEART_QUARTERS.ringR + T.anvilR + 3;
   if (anvil && (!mainTank || ringClear) && !hasAura(me, FINAL_AURAS.crushed)) {
     const i = world.bots.indexOf(b);
@@ -481,6 +571,49 @@ function duty(world, st, b, me) {
       tol: 0.8,
       duty: 'anvil',
     };
+  }
+  // Marked for a Crossing Blade: lead the line through the pillars (the
+  // Storm-Charged first), then step off it as it locks.
+  const bm = auraOf(me, FINAL_AURAS.bladeMark);
+  if (bm) {
+    const blade = o.blades.slice().sort((x, y) => hypot(x, me) - hypot(y, me))[0];
+    if (blade) {
+      if ((bm.value ?? 1) >= 2) {
+        // Locked: off the line, sideways.
+        const ln = o.bladeLanes
+          .slice()
+          .sort((x, y) => segDist(me, x.from, x.to) - segDist(me, y.from, y.to))[0];
+        if (ln) {
+          const d = unit(ln.from, ln.to);
+          for (const side of [1, -1]) {
+            const at = add(me, { x: -d.z * side, z: d.x * side }, T.bladeHalf + 3.5);
+            if (!final.bad(world, st, at) || segDist(at, ln.from, ln.to) > ln.half)
+              return { goal: at, tol: 0.6, duty: 'off the blade' };
+          }
+        }
+      } else {
+        const ps = o.pillars
+          .slice()
+          .sort(
+            (x, y) => Number(y.charged) - Number(x.charged) || hypot(x, blade) - hypot(y, blade),
+          );
+        for (const p of ps) {
+          // Stand just past the pillar on the ray from the blade through it.
+          const d = unit(blade, p);
+          const at = add(p, d, p.r + 4);
+          if (!final.onFloor(world, at)) continue;
+          if (st.bladeLed !== blade.id) {
+            st.bladeLed = blade.id;
+            log(`BLADE: ${me.name} leads the line through a ${p.charged ? 'charged ' : ''}pillar`);
+          }
+          return {
+            goal: at,
+            tol: 1.2,
+            duty: p.charged ? 'blade: charged pillar' : 'blade: pillar',
+          };
+        }
+      }
+    }
   }
   // A Storm Orb each: the nearest free bot steps on it.
   if (o.orbs.length && !me.tank) {
@@ -527,13 +660,6 @@ function duty(world, st, b, me) {
       HEART_QUARTERS.rimR - 8,
     );
     return { goal: far, tol: 1.5, duty: 'ember' };
-  }
-  // In the Quench quarter the ranged huddle tight round the boss's back.
-  if (zoneOfBoss(world) === 'quench' && !me.tank && b.spec.role !== 'tank' && alive(boss)) {
-    const back = add(boss, unit(world.center, boss), 7);
-    const i = world.bots.indexOf(b);
-    const at = add(back, { x: Math.sin(i), z: Math.cos(i) }, 2.5);
-    if (!final.bad(world, st, at)) return { goal: at, tol: 1.5, duty: 'huddle' };
   }
   if (final.bad(world, st, me)) {
     const spot = spread(world, st, me, 0);
