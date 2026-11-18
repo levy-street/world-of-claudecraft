@@ -13461,6 +13461,10 @@ export const TARGETS = [
       'ui/ability_imbue_text',
       // The Thundercall rework's new kit and reworded vent copy.
       'sim/combat/shaman_thundercall',
+      // The mage spec engines own Icebind's break rules and Phoenix Trance's
+      // crit rules, whose copy is the tooltip a player reads.
+      'sim/combat/fire_mage',
+      'sim/combat/frost_mage',
     ],
     variants: [
       // Every variant enters as the class that OWNS the ability: the standalone
@@ -13554,6 +13558,23 @@ export const TARGETS = [
         beforeLoad: lowGraphicsSeed,
         mobile: true,
       },
+      // Mage PvP pass: Icebind's damage-break copy as a Frost mage, Phoenix
+      // Trance's PvP spender line as a Fire mage, desktop and mobile.
+      ...[
+        ['icebind', 'frost_nova', 'frost'],
+        ['phoenix-trance', 'combustion', 'fire'],
+      ].flatMap(([key, abilityId, spec]) =>
+        [false, true].map((mobile) => ({
+          key: `mage-${key}${mobile ? '-mobile' : ''}`,
+          charClass: 'mage',
+          charName: 'Frostweave',
+          abilityId,
+          spec,
+          talentRow: {},
+          beforeLoad: lowGraphicsSeed,
+          ...(mobile ? { mobile: true } : {}),
+        })),
+      ),
     ],
     async capture(page, variant) {
       await page.keyboard.press('Escape');
