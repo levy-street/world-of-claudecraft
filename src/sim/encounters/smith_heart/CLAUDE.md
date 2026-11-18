@@ -15,7 +15,7 @@ Quench's, then the Heat's, then the Masterless Strength's, then the seal and the
 | `checkpoint.ts` | The death checkpoints' candidates for `instances/dungeon_checkpoints.ts` (its `ORDERED_CHECKPOINTS`): the rooms in that order, the points (`content/smith_heart_checkpoints.ts`), the Heart only while the portal is open. |
 | `council_ids.ts` | Leaf: the council's template, cast, aura, object and cue ids, the per-difficulty rules (`COUNCIL_DIFFICULTY`: the mythic seam), the SKETCH tuning (`COUNCIL_TUNING`), the pillar template helpers, the soak's pure split. The content, the renderer, the HUD and the tests key on it; it imports nothing. |
 | `council_state.ts` | Type-only: `CouncilFightState`, ONE object shared by the two members as `Entity.smithHeartFight`. |
-| `council_scope.ts` | The per-tick scope (claim, state, bodies, players on the Quarry floor, rules) and the plumbing every member module shares: the job holder (`jobHolder`: a member's own job, else its first living heir), the bars, the hashed marks, the damage rolls. The council calls NO raid warning banner (the owner's rule of 2026-11-03: its mechanics read in the world; the yells and the personal alert stay). |
+| `council_scope.ts` | The per-tick scope (claim, state, bodies, players on the Quarry floor, rules) and the plumbing every member module shares: the job holder (`jobHolder`: a member's own job, else its first living heir), the bars, the hashed marks, the damage rolls. The council calls NO raid warning banner (the owner's rule of 2026-11-03: its mechanics read in the world; the yells stay, and since the team's feedback of 2026-11-17 no personal alert either). |
 | `council_pillars.ts` | The pillars: the five columns (claim objects) and the risen ones as combat walls, their integrity, the rise (nudged to a clear spot, the throw), the cracks, the fall into rubble, the wipe's restore, the fall's settle, the Wrath's cover test (`pillarBetween`), the heroic pulse. |
 | `council_wrath.ts` | The Guardian's job: the energy (the holder's resource), Mountain's Wrath (whoever no pillar hides is struck, then EVERY pillar but a soul's shatters; the first Wrath takes the carved columns, which crumble in the world; on Heroic and Mythic its row's `wrathMult` kills anyone unhidden but a tank under a strong defensive, the heir's lighter `heirWrathMult` never a full cloth body), Narrow Shelter (each tier's `crowdShare`), Hammer's Weight. |
 | `council_risen_pulse.ts` | Stone Thrum (the owner's review of 2026-11-09): every risen pillar standing (the Singer's Wake or the Guardian's heir rises; never a carved column, never the cursed pillar) rings on the whole raid every 2 s, per pillar (the row's `risenPulseMin/Max`), one summed hit a player, a cue on each ringing pillar; so kicking a Wake is a choice. |
@@ -135,7 +135,9 @@ Rules:
   `COUNCIL_DIFFICULTY` row, never a branch on a tier's name.
 - Player text: no fight of the raid calls a raid warning banner (the owner's rule of 2026-11-03, made
   whole on 2026-11-09: its mechanics read in the world; the yells carry the `*.say.*` keys and the
-  marked player's own short alert sits over the action bar); the
+  marked player's own short alert sits over the action bar, except the Hammer Council's: since
+  the team's feedback of 2026-11-17 it paints nothing on the screen at all, every mark reading on
+  the floor and the bodies); the
   damage and aura names are matched by `src/ui/sim_i18n.ts`.
 - Tests: `tests/smith_heart_checkpoints.test.ts` (the death checkpoints);
   `tests/smith_heart_council.test.ts` (on `tests/helpers/council_fight.ts`),
