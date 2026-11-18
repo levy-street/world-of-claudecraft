@@ -101,7 +101,7 @@ describe("the Masterless Strength's stars over the wire", () => {
     ).toBeGreaterThan(0);
     // A pillar where Bet stands, off the boss.
     const serverB = sim.entities.get(b.pid);
-    serverB.pos = { ...serverBoss.pos, x: serverBoss.pos.x + 8 };
+    serverB.pos = { ...serverBoss.pos, x: serverBoss.pos.x + 12 };
     serverB.prevPos = { ...serverB.pos };
     sim.ctx.rebucket(serverB);
     sim.chat('/dev heart final pillars here', b.pid);
