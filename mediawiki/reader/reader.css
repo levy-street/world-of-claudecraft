@@ -2097,3 +2097,17 @@ body[data-woc-site] #view table.item-table {
   color: var(--text-dim);
   font-weight: 400;
 }
+
+/* Per-class tabs (heading_tabs.js): many short names, so the row wraps and names stay whole. */
+#view .heading-tabs {
+  flex-wrap: wrap;
+  row-gap: 6px;
+}
+#view .heading-tab {
+  white-space: nowrap;
+  overflow-wrap: normal;
+  word-break: keep-all;
+}
+#view .heading-panel {
+  padding-top: 12px;
+}

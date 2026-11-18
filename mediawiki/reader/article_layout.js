@@ -1,5 +1,6 @@
 import { hideSpoilers, organizeReferenceDetails } from './article_disclosures.js';
 import { layoutEncounter, layoutSpecCards } from './encounter_layout.js';
+import { layoutHeadingTabs } from './heading_tabs.js';
 import { layoutLoot } from './loot_tabs.js';
 import { layoutMechanics } from './mechanic_cards.js';
 
@@ -233,6 +234,7 @@ export function layoutArticle(view, page, wide, zoneName) {
     }
   }
   layoutLoot(article);
+  layoutHeadingTabs(article);
   layoutEncounter(article);
   if (kind === 'Classes') layoutSpecCards(article);
   hideSpoilers(article, page);
