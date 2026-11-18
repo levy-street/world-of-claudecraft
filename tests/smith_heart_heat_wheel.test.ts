@@ -68,6 +68,10 @@ describe('Guardian of the Heat: the Wheel of the Hearth', () => {
     expect(n.rounds).toBe(3);
     expect(h.rounds).toBe(3);
     expect(M.rounds).toBe(4);
+    // Normal: a heavy hit, never a death on its own; Heroic and Mythic the full blow.
+    expect(n.hit).toBeLessThan(0.7);
+    expect(h.hit).toBe(1);
+    expect(M.hit).toBe(1);
   });
 
   it('the slices: four round the shore, every bearing in exactly one', () => {
@@ -212,6 +216,25 @@ describe('Guardian of the Heat: the Wheel of the Hearth', () => {
     const after = 2 * T.zoneStep + T.zoneWarn + T.zoneBurn + FIST_SPAN + 2;
     expect(wheelAt).toBeGreaterThan(after - 0.2);
     expect(wheelAt).toBeLessThan(after + 0.5);
+  });
+
+  it('waits out the Hearthseeds (the raid runs from them first), then turns', () => {
+    const f = tier('normal', 3, 2);
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    f.dev('/dev heart heat seeds');
+    expect(st.seeds.length).toBeGreaterThan(0);
+    st.wheelTimer = 0.05;
+    let wheelAt = -1;
+    for (let i = 0; i < ticks(20) && wheelAt < 0; i++) {
+      f.tick(1);
+      for (const p of f.players) p.hp = p.maxHp;
+      if (st.wheelRounds.length > 0) {
+        wheelAt = i / 20;
+        expect(st.seeds).toEqual([]);
+      }
+    }
+    expect(wheelAt).toBeGreaterThan(T.seedLife - 0.5);
   });
 
   it('names itself; the guardian calls it, no banner does', () => {

@@ -289,6 +289,21 @@ describe('Guardian of the Heat: the lava waves (the fight)', () => {
     expect(seen(31).length).toBeGreaterThanOrEqual(2);
   });
 
+  it('Hearthseeds still on the floor go out as the guardian sinks', () => {
+    const f = heatFight(3, 31);
+    f.dev('/dev heart heat pull');
+    f.boss().threat.set(f.players[0].id, 1e6);
+    f.dev('/dev heart heat phase 2');
+    f.dev('/dev heart heat seeds');
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    expect(st.seeds.length).toBeGreaterThan(0);
+    f.dev('/dev heart heat overflow');
+    expect(st.seeds).toEqual([]);
+    expect(f.objects(HEAT_OBJECTS.seedPrefix)).toEqual([]);
+    expect(st.stage).toBe('sinking');
+  });
+
   it('a wipe clears every ring and corridor', () => {
     const f = overflowing();
     run(f, HEAT_DIFFICULTY.normal.waves[0].lead + 1);

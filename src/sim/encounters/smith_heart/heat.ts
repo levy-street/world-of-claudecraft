@@ -50,6 +50,7 @@ import { clearThreat } from '../../threat';
 import { DT, type Entity } from '../../types';
 import { claimBoss, clearCastIf } from '../sunken_bastion/claim';
 import { settleSmithHeartFeat } from './feats';
+import { dropFightObject } from './fight_kit';
 import {
   callCinder,
   clearCinders,
@@ -299,6 +300,10 @@ export function beginOverflow(s: HeatScope, n: 1 | 2): void {
   const st = s.st;
   clearFist(s);
   clearZones(s);
+  // Hearthseeds still throbbing go out as it sinks: a burst over the lava
+  // waves would hide the corridors (the bot pass of 2026-11-18).
+  for (const seed of st.seeds) dropFightObject(s.ctx, s.inst, seed.objectId);
+  st.seeds = [];
   st.bar = null;
   st.stage = 'sinking';
   st.stageLeft = T.sinkSeconds;
@@ -426,7 +431,8 @@ function spaceRuns(s: HeatScope, began: 'wheel' | 'zones'): void {
 /** The phase's mechanics, each on its clock. Wakefire and the Wheel of the
  *  Hearth never share the floor: a due one waits out the other (its clock
  *  held at zero), each start spaces the other (spaceRuns), and the
- *  Hearthseeds wait out both. */
+ *  Hearthseeds wait out both and both wait out the Hearthseeds (the raid
+ *  runs from them first; since 2026-11-18). */
 function startMechanics(s: HeatScope): void {
   const st = s.st;
   const kit = HEAT_PHASE_KIT[st.phase];
@@ -439,14 +445,15 @@ function startMechanics(s: HeatScope): void {
   }
   if (kit.wheel) {
     st.wheelTimer = Math.max(0, st.wheelTimer - DT);
-    if (st.wheelTimer <= 1e-9 && !zonesBusy(st) && !wheelBusy(st)) {
+    // The Wheel also waits out the Hearthseeds (the raid runs from them).
+    if (st.wheelTimer <= 1e-9 && !zonesBusy(st) && !wheelBusy(st) && st.seeds.length === 0) {
       startWheel(s);
       if (kit.zones) spaceRuns(s, 'wheel');
     }
   }
   if (kit.zones) {
     st.zoneTimer = Math.max(0, st.zoneTimer - DT);
-    if (st.zoneTimer <= 1e-9 && !zonesBusy(st) && !wheelBusy(st)) {
+    if (st.zoneTimer <= 1e-9 && !zonesBusy(st) && !wheelBusy(st) && st.seeds.length === 0) {
       startZones(s);
       if (kit.wheel) spaceRuns(s, 'zones');
     }

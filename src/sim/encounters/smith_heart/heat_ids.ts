@@ -275,6 +275,9 @@ export interface HeatWheelRules {
   every: number;
   warn: number;
   rounds: number;
+  /** The eruption's and the burn's share of their tuned blow (Normal a
+   *  heavy hit, never a death on its own; Heroic and Mythic the full one). */
+  hit: number;
 }
 
 /** Heroic's (and Mythic's) lava waves: quicker rings, narrower corridors,
@@ -300,7 +303,7 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     bolts: 2,
     cinderSpeed: 3.2,
     // Slower, with the longest warning: three rounds of 5 s.
-    wheel: { first: 12, every: 34, warn: 5, rounds: 3 },
+    wheel: { first: 12, every: 34, warn: 5, rounds: 3, hit: 0.55 },
     // Three minutes into phase 3 (the balance pass of 2026-11-12): only a
     // raid running well past the 4 to 5 minute target feels it.
     cinderLateAfter: 180,
@@ -330,7 +333,7 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     seedHatch: true,
     bolts: 3,
     cinderSpeed: 4.4,
-    wheel: { first: 10, every: 30, warn: 3.5, rounds: 3 },
+    wheel: { first: 10, every: 30, warn: 3.5, rounds: 3, hit: 1 },
     cinderLateAfter: 240,
     cinderLateEvery: 20,
     waves: HEROIC_WAVES,
@@ -351,7 +354,7 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     bolts: 3,
     cinderSpeed: 4.4,
     // Mythic's extra: a fourth round, each one quicker.
-    wheel: { first: 10, every: 28, warn: 3, rounds: 4 },
+    wheel: { first: 10, every: 28, warn: 3, rounds: 4, hit: 1 },
     cinderLateAfter: 240,
     cinderLateEvery: 20,
     waves: HEROIC_WAVES,
