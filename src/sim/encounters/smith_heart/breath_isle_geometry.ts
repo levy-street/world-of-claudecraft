@@ -218,10 +218,26 @@ export function isleSafeReach(
   return Math.min(ok, yards);
 }
 
+/** A ride's shape (shares of its seconds): the body climbs to its peak over
+ *  the first `up` while it barely leaves its spot (the glide runs from
+ *  `glide[0]` to `glide[1]`), crosses on high, and only then comes down onto
+ *  its landing from above over the last `down`. Jose's playtest of
+ *  2026-11-18: the old single parabola rose and fell with the glide, so a
+ *  ride up to an isle high over the Cornice (the east chain, 37 to 51 yd up)
+ *  climbed along the isle's flank through its rock, and a ride home dropped
+ *  through its lip. */
+export const RIDE_SHAPE = { up: 0.35, glide: [0.25, 0.8], down: 0.3 } as const;
+
+const ease = (t: number) => {
+  const u = Math.max(0, Math.min(1, t));
+  return u * u * (3 - 2 * u);
+};
+
 /** A ride's arc: from `a` to `b` (instance-local, y the floor height at
- *  each end) at `k` (0 to 1) of its seconds: eased along the ground, lifted
- *  on a parabola `apex` yards over the higher end. Pure, the same on every
- *  host. */
+ *  each end) at `k` (0 to 1) of its seconds: up to `apex` yards over the
+ *  higher end first, across on high, then down onto `b` from above
+ *  (RIDE_SHAPE). Pure, the same on every host (the sim moves the rider on
+ *  it, the renderer draws the route from it). */
 export function rideArc(
   a: { x: number; y: number; z: number },
   b: { x: number; y: number; z: number },
@@ -229,14 +245,17 @@ export function rideArc(
   apex: number = T.rideApex,
 ): { x: number; y: number; z: number } {
   const t = Math.max(0, Math.min(1, k));
-  // Ease in and out along the ground (a slow lift, a fast glide, a soft set
-  // down), a little quicker off the ground than onto it.
-  const e = t * t * (3 - 2 * t);
-  const y0 = a.y + (b.y - a.y) * e;
-  const lift = Math.max(a.y, b.y) - y0 + apex;
+  const R = RIDE_SHAPE;
+  const peak = Math.max(a.y, b.y) + apex;
+  const e = ease((t - R.glide[0]) / (R.glide[1] - R.glide[0]));
+  const fallAt = 1 - R.down;
+  const y =
+    t < fallAt
+      ? a.y + (peak - a.y) * ease(t / R.up)
+      : peak + (b.y - peak) * ease((t - fallAt) / R.down);
   return {
     x: a.x + (b.x - a.x) * e,
-    y: y0 + lift * 4 * t * (1 - t),
+    y,
     z: a.z + (b.z - a.z) * e,
   };
 }

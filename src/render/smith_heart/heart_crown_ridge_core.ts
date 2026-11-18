@@ -72,10 +72,10 @@ function plan(row: Row, kind: 'crest' | 'shoulder'): HeartKitPlacement[] {
     const piece = kind === 'crest' || h2 < 0.55 ? 'Env_StormSpire' : 'Env_StormBluff';
     const m = BREATH_ENV_ROCK[piece];
     let scale = row.scale[0] + (row.scale[1] - row.scale[0]) * h2;
-    // Faced toward the Cornice, its depth runs toward the isles: that is
-    // the reach that must stay clear.
-    while (scale > 0.55 && !clearOfIsles(x, z, (m.d * scale) / 2)) scale *= 0.85;
-    if (!clearOfIsles(x, z, (m.d * scale) / 2)) continue;
+    // Its whole footprint (front, back and both shoulders) round its middle.
+    const reach = (k: number) => (Math.hypot(m.w * (0.85 + 0.3 * h3), m.d) * k) / 2;
+    while (scale > 0.45 && !clearOfIsles(x, z, reach(scale))) scale *= 0.85;
+    if (!clearOfIsles(x, z, reach(scale))) continue;
     const ground = heartMountainHeight(x, z);
     const foot = Math.max(C.h - 4, ground) - row.sink;
     const top = C.h + row.top[0] + (row.top[1] - row.top[0]) * h1;
