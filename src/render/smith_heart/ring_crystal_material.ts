@@ -80,7 +80,7 @@ void main() {
   float pulse = 1.0 + 0.05 * sin(uTime * 1.7 - vPath * 7.0);
   vec3 burn = vivid * (uLookA.z + uLookA.w * glow) * pulse;
   burn += vivid * vivid * (uLookB.x * glow);
-  burn += mix(vivid, vec3(1.0), 0.5) * pow(lum, 3.0) * uLookB.y * glow;
+  burn += mix(vivid, vec3(1.0), 0.5) * pow(max(lum, 0.0), 3.0) * uLookB.y * glow;
   burn += mix(vivid, qCol, 0.3) * rim * uLookC.y * glow;
   vec3 col = mix(dormant, burn, lit);
   // The climbing front: white-hot, in the colour it is climbing through.
