@@ -45,8 +45,13 @@ import {
   FINAL_PHASE_AURAS,
   FINAL_PHASE_CASTS,
   hiddenFallenAt,
+  inRingGap,
   FINAL_PHASE_AURAS as PA,
+  QUENCH_RING_LIFE,
   quarterBit,
+  quenchRingFront,
+  quenchRingGaps,
+  quenchRingOf,
 } from '../../src/sim/encounters/smith_heart/final_phase_ids';
 import {
   HEAT_OBJECTS,
@@ -117,11 +122,29 @@ export const final = {
       pillars: [],
       blades: [],
       bladeLanes: [],
+      rings: [],
     };
+    // A Quenching Ring's age is ours to keep (its object carries its gaps,
+    // not its age): first seen, it was just raised.
+    world.ringBorn ??= new Map();
+    const seenRings = new Set();
     for (const e of world.obs.ents.values()) {
       if (e.k !== 'object' || typeof e.tid !== 'string') continue;
       const t = e.tid;
       const at = { x: e.x, z: e.z, r: e.sc ?? 3, f: e.f ?? 0, id: e.id };
+      const ring = quenchRingOf(t);
+      if (ring) {
+        seenRings.add(e.id);
+        if (!world.ringBorn.has(e.id)) world.ringBorn.set(e.id, Date.now());
+        const age = (Date.now() - world.ringBorn.get(e.id)) / 1000;
+        if (age < QUENCH_RING_LIFE)
+          o.rings.push({
+            ...at,
+            front: quenchRingFront(age),
+            gaps: quenchRingGaps(ring.seed, ring.gaps),
+          });
+        continue;
+      }
       const pillar = finalPillarOf(t);
       if (pillar) {
         o.pillars.push({ ...at, r: T.pillarR, charged: pillar === 'charged' });
@@ -151,7 +174,13 @@ export const final = {
       else if (t.startsWith(FINAL_OBJECTS.anvilPrefix))
         o.anvils.push({ ...at, r: at.r || T.anvilR });
       else if (t.startsWith(FINAL_OBJECTS.crackPrefix)) o.ice.push({ ...at, r: at.r + 1.2 });
-      else if (
+      else if (t.startsWith(FINAL_OBJECTS.whirlPrefix)) {
+        // A tornado rolls on at 4.5 yd a second: keep clear of where it
+        // will be, not only where it is (the Heroic bot raids of 2026-11-18).
+        const r = at.r + 2;
+        const d = { x: Math.sin(at.f), z: Math.cos(at.f) };
+        o.danger.push({ ...at, r }, { ...add(at, d, 4), r }, { ...add(at, d, 8), r: r - 1 });
+      } else if (
         t.startsWith(FINAL_OBJECTS.whirlPrefix) ||
         t.startsWith(FINAL_OBJECTS.poolPrefix) ||
         t.startsWith(FINAL_OBJECTS.tremorPrefix) ||
@@ -175,6 +204,8 @@ export const final = {
         });
       }
     }
+    for (const id of world.ringBorn.keys()) if (!seenRings.has(id)) world.ringBorn.delete(id);
+
     world.o = o;
     const b = world.mobs.boss;
     world.anchor = alive(b) ? b : world.center;
@@ -554,6 +585,27 @@ function duty(world, st, b, me) {
   init(st);
   const o = world.o;
   const boss = world.mobs.boss;
+  // A Quenching Ring riding out at me: into its nearest gap at my distance
+  // (outside a gap its front chills and hurts; the healers died to it in the
+  // Heroic bot raids of 2026-11-18, the bots never read it before).
+  for (const r of o.rings ?? []) {
+    const d = hypot(me, r);
+    if (d < r.front - 0.5 || d > r.front + 16) continue;
+    const bearing = Math.atan2(me.x - r.x, me.z - r.z);
+    if (inRingGap(bearing, r.gaps, 18)) continue;
+    const g = r.gaps
+      .slice()
+      .sort(
+        (x, y) =>
+          Math.abs(Math.atan2(Math.sin(x - bearing), Math.cos(x - bearing))) -
+          Math.abs(Math.atan2(Math.sin(y - bearing), Math.cos(y - bearing))),
+      )[0];
+    const at = {
+      x: r.x + Math.sin(g) * Math.max(d, r.front + 2),
+      z: r.z + Math.cos(g) * Math.max(d, r.front + 2),
+    };
+    if (final.onFloor(world, at)) return { goal: at, tol: 0.8, duty: 'ring gap' };
+  }
   // Weight of the Anvil: everyone under it (the Crushed, on Heroic, aside).
   const anvil = o.anvils[0];
   // The off-tank soaks too, and the main tank when the mark lies at the
@@ -598,10 +650,18 @@ function duty(world, st, b, me) {
             (x, y) => Number(y.charged) - Number(x.charged) || hypot(x, blade) - hypot(y, blade),
           );
         for (const p of ps) {
-          // Stand just past the pillar on the ray from the blade through it.
+          // Stand on the ray from the blade through the pillar: just before
+          // it or just past it, whichever is nearer (the line runs on through
+          // the mark to the far rim, so either side breaks it; the near side
+          // never walks round the wall).
           const d = unit(blade, p);
-          const at = add(p, d, p.r + 4);
-          if (!final.onFloor(world, at)) continue;
+          const past = add(p, d, p.r + 4);
+          const before = add(p, d, -(p.r + 3));
+          const spots = [past, before]
+            .filter((q) => final.onFloor(world, q) && !final.bad(world, st, q))
+            .sort((x, y) => hypot(x, me) - hypot(y, me));
+          const at = spots[0];
+          if (!at) continue;
           if (st.bladeLed !== blade.id) {
             st.bladeLed = blade.id;
             log(`BLADE: ${me.name} leads the line through a ${p.charged ? 'charged ' : ''}pillar`);

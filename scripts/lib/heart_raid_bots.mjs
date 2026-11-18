@@ -1157,9 +1157,11 @@ function threatOk(world, b, mob) {
   // is everyone's to kill, threat or not.
   if (tankHate <= 0) return true;
   const mine = thr.find(([id]) => id === b.pid)?.[1] ?? 0;
-  // A decent raid rides the threat meter just under the switch (110 percent in
-  // melee, 130 at range).
-  return mine < tankHate * (b.spec.melee ? 1.0 : 1.2) ? true : holdThreat(b);
+  // A decent raid rides the threat meter under the switch (110 percent in
+  // melee, 130 at range) with a margin for a crit: a ranged bot pulling the
+  // final boss through the ring at 0:10 wiped a Heroic run to Heart Unbound
+  // (2026-11-18).
+  return mine < tankHate * (b.spec.melee ? 1.0 : 1.1) ? true : holdThreat(b);
 }
 function holdThreat(b) {
   b.threatHolds = (b.threatHolds ?? 0) + 1;

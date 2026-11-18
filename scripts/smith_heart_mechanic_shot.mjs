@@ -101,7 +101,13 @@ const PLANS = {
       '/dev heart final root',
       '/dev heart final pillars 2',
     ],
-    trigger: ['/dev heart final wake breath', '/dev heart final sky'],
+    trigger: [
+      '/dev heart final wake breath',
+      ['/dev heart final sky', 3000],
+      '/dev heart final sky pillar',
+    ],
+    // In the Hammer's quarter (never the ring, where no pillar rises).
+    spot: { x: 198.9, z: 139.8 },
   },
   arc: {
     tp: 'final',
@@ -120,6 +126,7 @@ const PLANS = {
       '/dev heart final pillars 2',
     ],
     trigger: [['/dev heart final sky pillar', 2600], '/dev heart final sky pillar'],
+    spot: { x: 198.9, z: 139.8 },
   },
   blade: {
     tp: 'final',
@@ -140,8 +147,11 @@ const PLANS = {
       '/dev heart final root',
     ],
     trigger: ['/dev heart final blades me'],
+    // The witness leads its line through the nearest pillar (as the bots do),
+    // so the flight is seen shattering it.
+    steer: 'bladeThroughPillar',
     // The whole line from its blade on the rim across the room.
-    views: { high: [0.0, 1.05, 78], raid: [1.15, 0.2, 55] },
+    views: { high: [0.0, 1.05, 78], raid: [0.7, 0.32, 36] },
   },
   tornado: {
     tp: 'final',
@@ -360,6 +370,43 @@ try {
   for (const c of Array.isArray(plan.trigger) ? plan.trigger : [plan.trigger])
     if (Array.isArray(c)) await chat(c[0], c[1]);
     else await chat(c, 0);
+  if (plan.steer === 'bladeThroughPillar')
+    await page.evaluate(() => {
+      const w = window.__game.world;
+      const p = w.player;
+      const until = Date.now() + 5000;
+      const step = () => {
+        if (Date.now() > until) return;
+        let blade = null;
+        for (const e of w.entities.values())
+          if (e.kind === 'object' && e.templateId.startsWith('sh_final_blade_')) blade = e;
+        if (!blade || blade.templateId.endsWith('fly')) {
+          if (Date.now() < until) setTimeout(step, 100);
+          return;
+        }
+        let best = null;
+        let bestD = 1e9;
+        for (const e of w.entities.values()) {
+          if (e.kind !== 'object' || !e.templateId.startsWith('sh_final_pillar_')) continue;
+          const d = Math.hypot(e.pos.x - p.pos.x, e.pos.z - p.pos.z);
+          if (d < bestD) {
+            bestD = d;
+            best = e;
+          }
+        }
+        if (best) {
+          const dx = best.pos.x - blade.pos.x;
+          const dz = best.pos.z - blade.pos.z;
+          const L = Math.hypot(dx, dz) || 1;
+          const g = w.ctx.groundPos(best.pos.x + (dx / L) * 6, best.pos.z + (dz / L) * 6);
+          p.pos = { ...g };
+          p.prevPos = { ...g };
+          w.ctx.rebucket(p);
+        }
+        setTimeout(step, 100);
+      };
+      step();
+    });
   const t0 = Date.now();
   const frames = [];
   while (Date.now() - t0 < SECONDS * 1000) {
