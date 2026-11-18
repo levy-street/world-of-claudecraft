@@ -349,6 +349,43 @@ try {
       await sleep(1200);
       await shoot('07_rueda_normal');
     },
+    // The wall lighting the raid (heat_lava_wall_light.ts): the camera in
+    // front of the raid as a wall comes on, then the same frame with the
+    // wall's lights cut (their reach shrunk to nothing) for the comparison.
+    async '09_luz_en_la_banda'() {
+      await overflow();
+      const s = await ringAt(15);
+      const g = s.rings[0].gaps[0] + Math.PI / 2;
+      for (let i = 1; i < 6; i++) {
+        const [x, z] = out(g + (i - 3) * 0.06, 21 + (i % 2) * 1.5);
+        await raider(i, x, z);
+      }
+      await place(out(g, 24), out(g, 10), 1.35, 0.1, 11);
+      await ringAt(17);
+      await freeze(true);
+      await sleep(700);
+      await shoot('09_luz_en_la_banda');
+      const n = await page.evaluate(() => {
+        let n = 0;
+        window.__game.renderer.scene.traverse((o) => {
+          if (o.isPointLight && o.name.startsWith('smithHeartHeatWallLight')) {
+            o.userData.__shotDistance = o.distance;
+            o.distance = 0.001;
+            n++;
+          }
+        });
+        return n;
+      });
+      console.log('wall lights', n);
+      await sleep(500);
+      await shoot('09b_sin_luz_del_muro');
+      await page.evaluate(() => {
+        window.__game.renderer.scene.traverse((o) => {
+          if (o.isPointLight && o.userData.__shotDistance) o.distance = o.userData.__shotDistance;
+        });
+      });
+      await freeze(false);
+    },
     // A video's frames: the raid at the shore, two rings rolling past.
     async v01_olas() {
       if (!FRAMES) return;

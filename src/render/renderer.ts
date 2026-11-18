@@ -3058,7 +3058,7 @@ export class Renderer {
         this.scene,
         this.groundSample,
         this.worldCompileGate(),
-        this.sim, (amount) => this.addShake(amount), () => this.reducedMotion(), (id, gesture) => this.triggerAttack(id, gesture), (id) => this.views.get(id)?.group.position,
+        this.sim, (amount) => this.addShake(amount), () => this.reducedMotion(), (id, gesture) => this.triggerAttack(id, gesture), (id) => this.views.get(id)?.group.position, this.budgetLights,
       );
     });
     this.hillRingVisuals = new HillRingVisuals(this.scene, gate, (x, z) =>

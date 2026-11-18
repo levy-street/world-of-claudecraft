@@ -26,7 +26,9 @@
 // Rules (src/render/CLAUDE.md): every geometry and material is built in the
 // constructor under the host's root (one gated attach, so every program links
 // before the first ring); fixed pools (LAVA_WALL_POOLS); no per-frame
-// allocation; no light. The wall stands in the air, so its sheets, tongues,
+// allocation; its one light is the budgeted glow on the raid near a wall
+// (heat_lava_wall_light.ts, a dynamic source of the renderer's point-light
+// budget, handed down by RiftDeathZoneVisuals). The wall stands in the air, so its sheets, tongues,
 // embers and haze are drawn after every floor mark (WALL_AIR_ORDER, above the
 // floor ladder's bands: no floor mark paints over its foot); its foot and the
 // corridors are on the ladder.
@@ -37,6 +39,7 @@ import { HEAT_TUNING as T } from '../../sim/encounters/smith_heart/heat_ids';
 import type { Entity } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
+import type { BudgetPointLightRegistry } from '../point_light_budget';
 import { gapOfCached, ringOfCached } from './heat_fight_fx_core';
 import { fireRampGlsl } from './heat_flame_core';
 import { HEAT_FLOOR } from './heat_floor_ladder_core';
@@ -71,6 +74,7 @@ import {
   wallFireFrag,
   wallTongueFrag,
 } from './heat_lava_wall_glsl';
+import { HeatWallLights, type WallLightRing } from './heat_lava_wall_light';
 import { moltenDecal } from './heat_molten_decal';
 
 /** The wall's in-air layers' order: after the floor ladder's every band
@@ -204,7 +208,15 @@ export class HeatLavaWallFx {
   private nextSeconds = 1;
   private shown = false;
 
-  constructor(private readonly host: HeatFxHost) {
+  /** The wall lighting the raid (one budgeted light per ring). */
+  readonly lights: HeatWallLights;
+  private readonly lightRings: WallLightRing[] = [];
+
+  constructor(
+    private readonly host: HeatFxHost,
+    pointLights: BudgetPointLightRegistry | null = null,
+  ) {
+    this.lights = new HeatWallLights(host.root, LAVA_WALL_POOLS.rings, pointLights);
     const budget = wallBudget(host.detail);
     const all: readonly (readonly [number, number])[] = [
       [0, 0.13],
@@ -560,6 +572,23 @@ export class HeatLavaWallFx {
       }
     for (; c < this.corridors.length; c++) this.corridors[c].mesh.visible = false;
     this.shown = this.live.length > 0 || spans > 0;
+    // ---- the light on the raid ----
+    this.lightRings.length = 0;
+    for (const s of this.rings)
+      if (s.id >= 0)
+        this.lightRings.push({
+          front: s.front,
+          gaps: s.gaps,
+          half: s.half,
+          rise: s.uniforms.uRise.value as number,
+        });
+    this.lights.update(
+      this.lightRings,
+      me && !me.dead ? { x: me.pos.x - origin.x, z: me.pos.z - origin.z } : null,
+      origin,
+      this.center.y,
+      clock,
+    );
     // ---- the roar ----
     if (!me || this.live.length === 0) return null;
     const roar = wallRoar(this.live, me.pos.x - origin.x, me.pos.z - origin.z);
@@ -585,5 +614,11 @@ export class HeatLavaWallFx {
     for (const s of this.rings) this.freeRing(s);
     for (const c of this.corridors) c.mesh.visible = false;
     this.gapSeen.clear();
+    this.lights.hide();
+  }
+
+  /** Terminal: the wall's lights out of the budget. */
+  dispose(): void {
+    this.lights.dispose();
   }
 }

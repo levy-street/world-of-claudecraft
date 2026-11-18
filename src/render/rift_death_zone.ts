@@ -47,6 +47,7 @@ import { CryptFinaleFx } from './hollow_crypt/crypt_finale_fx';
 import { CryptTrashFx } from './hollow_crypt/crypt_trash_fx';
 import { MorthenFx } from './hollow_crypt/morthen_fx';
 import { MorthenRiteFx } from './hollow_crypt/morthen_rite_fx';
+import type { BudgetPointLightRegistry } from './point_light_budget';
 import {
   deathZonePlan,
   deathZonePulseSpeed,
@@ -278,6 +279,7 @@ export class RiftDeathZoneVisuals {
     private readonly reducedMotion?: () => boolean,
     private readonly playGesture?: (entityId: number, gesture: string) => void,
     drawnPositions?: DrawnPositionLookup,
+    pointLights: BudgetPointLightRegistry | null = null,
   ) {
     // Effects pinned to a unit ride its drawn pose (attached_fx_anchor.ts).
     if (drawnPositions) this.uninstallDrawnPositions = installDrawnPositions(drawnPositions);
@@ -370,7 +372,15 @@ export class RiftDeathZoneVisuals {
       shake,
       playGesture,
     );
-    this.heatFight = new HeatFightFx(scene, groundY, world, compileGate, reducedMotion, shake);
+    this.heatFight = new HeatFightFx(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+      shake,
+      pointLights,
+    );
     this.heatBody = new HeatBody(
       scene,
       groundY,

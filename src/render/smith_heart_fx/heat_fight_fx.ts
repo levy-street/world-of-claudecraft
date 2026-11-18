@@ -29,7 +29,8 @@
 //
 // Rules (src/render/CLAUDE.md): every geometry and material is built in the
 // constructor under one root attached through `attachSceneGroupGated`; fixed
-// pools, no per-frame allocation, no light. Feeds
+// pools, no per-frame allocation, no light of its own (the lava wall's
+// budgeted glow on the raid is its part's, heat_lava_wall_light.ts). Feeds
 // ../../game/smith_heart_heat_audio.ts.
 
 import * as THREE from 'three';
@@ -54,6 +55,7 @@ import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
 import { getFlameTex } from '../ignivar_fire_vfx';
+import type { BudgetPointLightRegistry } from '../point_light_budget';
 import { setRenderCategory } from '../renderer_diagnostics';
 import { heartKitProgramWarmers } from '../smith_heart/heart_kit';
 import { heartVeinGlowMaterial } from '../smith_heart/heart_room_kit';
@@ -394,6 +396,8 @@ export class HeatFightFx implements HeatFxHost {
     compileGate?: (target: THREE.Object3D) => Promise<unknown>,
     private readonly reducedMotion: () => boolean = () => false,
     private readonly shakeSink?: (amount: number) => void,
+    /** The renderer's point-light budget (the lava wall's light on the raid). */
+    pointLights: BudgetPointLightRegistry | null = null,
   ) {
     this.root.name = 'smith-heart-heat-fight-fx';
     setRenderCategory(this.root, 'ui3d');
@@ -429,7 +433,7 @@ export class HeatFightFx implements HeatFxHost {
     for (const k of KINDS) this.ids.set(k, []);
 
     this.well = new HeatWellFx(this);
-    this.wall = new HeatLavaWallFx(this);
+    this.wall = new HeatLavaWallFx(this, pointLights);
     this.cinder = new HeatCinderFx(this);
     this.meteors = new HeatMeteorFx(this);
     this.wheel = new HeatWheelFx(this, (state, x, y, z) => this.audio.wheel(state, x, y, z));
@@ -1133,6 +1137,7 @@ export class HeatFightFx implements HeatFxHost {
     this.particles.dispose();
     this.kit.dispose();
     this.well.dispose();
+    this.wall.dispose();
     this.cinder.dispose();
     this.seedOrbs.dispose();
     this.meteors.dispose();

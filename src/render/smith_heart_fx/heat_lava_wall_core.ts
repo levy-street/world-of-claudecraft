@@ -225,3 +225,52 @@ export function wallRoar(
   }
   return best;
 }
+
+// ---- the wall's light on the raid -----------------------------------------------------------
+
+/** The wall's light on the players near it (heat_lava_wall_light.ts): one
+ *  budgeted point light per standing ring, riding the ring at the local
+ *  player's bearing. Cosmetic (the budget may shed it); its colour the
+ *  wall's fire. */
+export const WALL_LIGHT = {
+  color: 0xff7a2a,
+  /** Its reach and falloff (three's PointLight distance and decay). */
+  distance: 26,
+  decay: 1.6,
+  /** Its intensity with the wall full height and on the player. */
+  peak: 36,
+  /** How far off the wall (yards) its light still reaches the player. */
+  reach: 20,
+  /** Its height over the floor (the flames' middle). */
+  lift: 2.6,
+  /** It stands this far out of the wall toward the player (the side facing
+   *  the fire is the one lit). */
+  toward: 1.5,
+} as const;
+
+/**
+ * A ring's light for a player at (x, z), local yards: on the ring at the
+ * player's bearing, strongest as the wall reaches them, dimmer (never dark)
+ * in a corridor, where the flames either side still light them. `rise` is the
+ * wall's rise (0..1). Fills `out`; `out.k` 0 means no light.
+ */
+export function wallLightAt(
+  ring: { front: number; gaps: readonly number[]; half: number },
+  rise: number,
+  x: number,
+  z: number,
+  out: { x: number; z: number; k: number },
+): { x: number; z: number; k: number } {
+  const d = ringFront(x, z);
+  const a = Math.atan2(x - HEARTH_WELL.x, z - HEARTH_WELL.z);
+  let open = 1;
+  for (const g of ring.gaps)
+    open = Math.min(open, wallOpen(acrossGap(a, g, ring.front), ring.half));
+  const near = clamp01(1 - Math.abs(ring.front - d) / WALL_LIGHT.reach);
+  const r =
+    ring.front + Math.sign(d - ring.front) * Math.min(WALL_LIGHT.toward, Math.abs(d - ring.front));
+  out.x = HEARTH_WELL.x + Math.sin(a) * r;
+  out.z = HEARTH_WELL.z + Math.cos(a) * r;
+  out.k = clamp01(rise) * near * (0.45 + 0.55 * open);
+  return out;
+}

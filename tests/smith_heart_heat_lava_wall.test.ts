@@ -14,6 +14,7 @@ import {
   wallRoarGain,
 } from '../src/game/smith_heart_heat_audio_core';
 import { FLOOR_VFX_LAYER_BASE, FLOOR_VFX_LAYER_SPAN } from '../src/render/floor_vfx_layer_core';
+import { POINT_LIGHT_SOURCE_MASK } from '../src/render/point_light_carriers_core';
 import { HeatFightFx } from '../src/render/smith_heart_fx';
 import { HEAT_FLOOR } from '../src/render/smith_heart_fx/heat_floor_ladder_core';
 import {
@@ -24,12 +25,15 @@ import {
   LAVA_WALL,
   LAVA_WALL_POOLS,
   ringFront,
+  WALL_LIGHT,
   wallBudget,
+  wallLightAt,
   wallLook,
   wallOpen,
   wallRoar,
 } from '../src/render/smith_heart_fx/heat_lava_wall_core';
 import { WALL_AIR_ORDER } from '../src/render/smith_heart_fx/heat_lava_wall_fx';
+import { HeatWallLights } from '../src/render/smith_heart_fx/heat_lava_wall_light';
 import { HEARTH_WELL } from '../src/sim/content/smith_heart_layout';
 import {
   HEAT_DIFFICULTY,
@@ -186,5 +190,64 @@ describe('the wall on screen: its layers and orders', () => {
       expect(m.blending).toBe(THREE.AdditiveBlending);
     }
     fx.dispose();
+  });
+});
+
+describe("the wall's light on the raid", () => {
+  const out = { x: 0, z: 0, k: 0 };
+  const ring = { front: 20, gaps: [0, Math.PI], half: 3.5 };
+  // A player on the bearing a quarter turn off both corridors.
+  const at = (r: number, a = Math.PI / 2) =>
+    [HEARTH_WELL.x + Math.sin(a) * r, HEARTH_WELL.z + Math.cos(a) * r] as const;
+
+  it('rides the ring at the player, strongest as the wall reaches them, gone far from it', () => {
+    const [x, z] = at(24);
+    wallLightAt(ring, 1, x, z, out);
+    // On the ring, stepped out of it toward the player (the lit side faces the fire).
+    expect(Math.hypot(out.x - HEARTH_WELL.x, out.z - HEARTH_WELL.z)).toBeCloseTo(
+      ring.front + WALL_LIGHT.toward,
+      6,
+    );
+    const near = wallLightAt(ring, 1, ...at(21), { x: 0, z: 0, k: 0 }).k;
+    const mid = wallLightAt(ring, 1, ...at(30), { x: 0, z: 0, k: 0 }).k;
+    const far = wallLightAt(ring, 1, ...at(20 + WALL_LIGHT.reach + 1), { x: 0, z: 0, k: 0 }).k;
+    expect(near).toBeGreaterThan(mid);
+    expect(mid).toBeGreaterThan(0);
+    expect(far).toBe(0);
+    // Not risen yet: dark.
+    expect(wallLightAt(ring, 0, ...at(21), { x: 0, z: 0, k: 0 }).k).toBe(0);
+    // In a corridor: dimmer, never dark (the flames either side still light it).
+    const inGap = wallLightAt(ring, 1, ...at(21, 0), { x: 0, z: 0, k: 0 }).k;
+    expect(inGap).toBeGreaterThan(0.2 * near);
+    expect(inGap).toBeLessThan(near);
+  });
+
+  it('lights through the budget only, one holder per ring, released on dispose', () => {
+    const registered: THREE.PointLight[] = [];
+    const released: THREE.PointLight[] = [];
+    const registry = {
+      register: (l: THREE.PointLight) => registered.push(l),
+      release: (l: THREE.PointLight) => released.push(l),
+    };
+    const root = new THREE.Group();
+    const lights = new HeatWallLights(root, LAVA_WALL_POOLS.rings, registry);
+    expect(registered).toHaveLength(LAVA_WALL_POOLS.rings);
+    for (const l of lights.all) {
+      expect(l.layers.mask).toBe(POINT_LIGHT_SOURCE_MASK);
+      expect(l.userData.budgetDynamic).toBe(true);
+      expect(l.parent?.visible).toBe(false);
+    }
+    const [x, z] = at(22);
+    lights.update([{ ...ring, rise: 1 }], { x, z }, { x: 0, z: 0 }, 0, 1);
+    expect(lights.anyLit).toBe(true);
+    expect(lights.all[0].parent?.visible).toBe(true);
+    expect(lights.all[0].intensity).toBeGreaterThan(0);
+    expect(lights.all[1].parent?.visible).toBe(false);
+    // No player: every holder hidden.
+    lights.update([{ ...ring, rise: 1 }], null, { x: 0, z: 0 }, 0, 1);
+    expect(lights.anyLit).toBe(false);
+    lights.dispose();
+    expect(released).toHaveLength(LAVA_WALL_POOLS.rings);
+    expect(root.children).toHaveLength(0);
   });
 });
