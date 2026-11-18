@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Input } from '../src/game/input';
 import { stopAutorunForInteraction } from '../src/game/interaction_autorun';
 import { Keybinds } from '../src/game/keybinds';
+import { dropLatchedMovement } from '../src/game/latched_movement';
 import { LookDeltaGuard } from '../src/game/pointer_look_delta';
 
 // Pointer-lock tests keep explicit coordinates so the held-lock behavior stays
@@ -377,6 +378,38 @@ describe('Input wheel bindings', () => {
 });
 
 describe('Input autorun', () => {
+  // A raider on autorun for the whole corpse run is revived at the boss room
+  // door still moving, and walks into the boss's aggro radius before they can
+  // react. Latched intent must not survive a dungeon arrival; a held key does.
+  it('dropLatchedMovement stops autorun and click-to-move but keeps a held key', () => {
+    const { input, windowListeners } = makeInput();
+    const syncAutorun = vi.fn();
+    input.toggleAutorun();
+    input.setClickMoveTarget({ x: 4, z: 2 }, 0.5);
+    dropLatchedMovement(input, { syncAutorun });
+    expect(input.autorun).toBe(false);
+    expect(input.readMoveInput().forward).toBe(false);
+    expect(input.clickMoveTarget).toBeNull();
+    expect(syncAutorun).toHaveBeenCalledWith(false);
+
+    windowListeners.get('keydown')!({ code: 'KeyW', repeat: false });
+    dropLatchedMovement(input, { syncAutorun });
+    expect(input.readMoveInput().forward).toBe(true);
+  });
+
+  it('main.ts drops latched movement on every dungeon arrival', () => {
+    // The drop lives in the one function every arrival path runs through, so
+    // the online snapshot path cannot be missed (its player entity carries no
+    // entry sequence, only the forced landing facing).
+    expect(mainSource).toMatch(
+      /const alignTeleportCameraFacing = \([^)]*\): number => \{\s*if \(arrival === 'dungeon'\) dropLatchedMovement\(input, mobileControls\);/,
+    );
+    // Online snapshot, offline tick, and the zone-warm check.
+    expect(mainSource).toContain("alignTeleportCameraFacing('dungeon', dungeonEntryFacing)");
+    expect(mainSource).toContain('alignTeleportCameraFacing(tickArrival, tickPlayer.facing)');
+    expect(mainSource).toContain('alignTeleportCameraFacing(cameraArrival, player.facing)');
+  });
+
   it('toggleAutorun flips state and feeds forward into readMoveInput', () => {
     const { input } = makeInput();
     expect(input.autorun).toBe(false);

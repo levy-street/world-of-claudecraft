@@ -164,6 +164,7 @@ import { applyMobileKeyboardViewport } from './game/keyboard_viewport_applier';
 import { createKtx2RestoreUploadQueueCoordinator } from './game/ktx2_restore_upload_queue';
 import { shouldUseStaticBackdrop } from './game/landing_backdrop';
 import { createLandingThemeAudio } from './game/landing_theme';
+import { dropLatchedMovement } from './game/latched_movement';
 import {
   activePreviewPanel,
   createLauncherPreview,
@@ -3651,6 +3652,7 @@ async function startGame(
     arrival: Exclude<TeleportCameraArrival, null>,
     landedFacing: number,
   ): number => {
+    if (arrival === 'dungeon') dropLatchedMovement(input, mobileControls);
     const next = teleportCameraFacingState(arrival, landedFacing, {
       camYaw: input.camYaw,
       lastInterpFacing,

@@ -1,5 +1,10 @@
 # Unreleased
 
+- Entering a dungeon or raid room now stops autorun and click-to-move. A raider who
+  autoran the whole corpse run was revived at the Ignivar door still moving and walked
+  into his aggro radius about a second and a half later, which read as the boss pulling
+  the moment someone came through the portal after a wipe. A held movement key is
+  unaffected.
 - Materials Vault: ten upgrades instead of five, each adding 100 per material (up to
   1000), priced 2g, 4g, 7g, 12g, 20g, 32g, 50g, 75g, 110g, 160g (472g total). Existing
   upgrades keep their count, so a vault with five upgrades now holds 500 of each material.
