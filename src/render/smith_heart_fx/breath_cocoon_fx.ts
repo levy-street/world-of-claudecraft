@@ -12,7 +12,9 @@
 //    darkening into storm, a tremble in its last seconds;
 //  - its two seals: a crackling tether from the nova out to each Stillstone
 //    over the void (the road the raid follows), broken as each stone is
-//    stilled; the stilling's bolt of calm racing home along it;
+//    stilled; the stilling's bolt of calm racing home along it, then the
+//    stone's choke: a beam of gold calm and lightning from the crystal into
+//    the nova for as long as the cocoon stands (breath_seal_choke_fx.ts);
 //  - the endings: the cocoon SHATTERING (both stones stilled: its shell
 //    flung out in shards, a white flash, a shockwave, the sky clearing, a
 //    hard shake) and the NOVA's blast (it ran out: a white sun going off, a
@@ -76,6 +78,7 @@ import {
   ISLE_RUNE_FRAG,
   ISLE_UV_VERT,
 } from './breath_isles_glsl';
+import { SealChokeFx } from './breath_seal_choke_fx';
 
 /** The cocoon's bands' light (the Bulwark's whole vortex washed white over
  *  a body this big: the wind reads in ropes, the guardian through them). */
@@ -148,6 +151,22 @@ export class BreathCocoonFx {
   private R = 3.4;
   /** The nova's middle and the cocoon's foot last frame (world). */
   private readonly novaAt = { x: 0, y: 0, z: 0 };
+  /** The stilled stones' beams into the nova (breath_seal_choke_fx.ts). */
+  private readonly choke: SealChokeFx;
+  private chokeShown = false;
+  private readonly chokeOn: [boolean, boolean] = [false, false];
+  /** A seal's stone end (world), for the choke. */
+  private readonly stoneAt = (
+    k: 0 | 1,
+    out: { x: number; y: number; z: number },
+  ): { x: number; y: number; z: number } => {
+    const o = this.h.local.position;
+    const e = sealEnd(k);
+    out.x = o.x + e.x;
+    out.y = o.y + e.y;
+    out.z = o.z + e.z;
+    return out;
+  };
   private readonly foot = { x: 0, y: 0, z: 0 };
   private shown = false;
   private charge = 0;
@@ -450,6 +469,7 @@ export class BreathCocoonFx {
     // The lightning: the seals, the arcs over the nova, the endings' bolts.
     this.bolts = new BreathEntranceBolts(h.root, h);
     this.sealBolts = new BreathEntranceBolts(h.root, h);
+    this.choke = new SealChokeFx(h);
   }
 
   /** The cocoon's flash (it rose, a stone was stilled). */
@@ -584,6 +604,11 @@ export class BreathCocoonFx {
       this.paintCocoon(t, look, dt);
       this.paintNova(look, dt);
       this.paintSeals(stilled, seen, t);
+      // A stilled stone chokes the nova for as long as the cocoon stands.
+      this.chokeOn[0] = this.sealLife[0] === 0;
+      this.chokeOn[1] = this.sealLife[1] === 0;
+      this.choke.update(this.chokeOn, this.stoneAt, this.novaAt, this.R * look.radius, t, dt);
+      this.chokeShown = true;
       sky = look.sky;
       flashSky = Math.min(1, look.crackle / 24) * (Math.sin(t * 23) > 0.6 ? 1 : 0.2);
       this.hum = look.hum;
@@ -598,6 +623,10 @@ export class BreathCocoonFx {
       }
       this.hum = 0;
       if (!this.ending) this.charge = 0;
+      if (this.chokeShown) {
+        this.choke.hide();
+        this.chokeShown = false;
+      }
     }
     // The ending.
     if (this.ending) {

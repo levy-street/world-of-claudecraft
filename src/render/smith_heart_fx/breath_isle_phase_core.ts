@@ -421,3 +421,44 @@ export const PHASE_POOLS = {
   /** Channellers on the stones at once. */
   channels: 4,
 } as const;
+
+/** A stilled Stillstone's choke on the nova (Jose's playtest of 2026-11-18:
+ *  "when the crystal lights up it should channel lightning"): from the
+ *  moment its stone is stilled until the cocoon ends, a beam of gold calm
+ *  pours from the crystal into the nova, lightning crawling along it and
+ *  forking over the nova where it bites, so the two stones visibly strangle
+ *  it. `rise` seconds to full (it follows the stilling's bolt home), the
+ *  beam's half width at the stone (yards), how often its lightning re-forms
+ *  (a second), the forks over the nova where it lands. */
+export const CHOKE = { rise: 0.7, half: 1.7, flicker: 14, forks: 3 } as const;
+
+export interface ChokeLook {
+  /** The beam's half width at the stone (yards) and its light. */
+  half: number;
+  glow: number;
+  /** Its lightning's light and width (yards). */
+  bolt: number;
+  boltWidth: number;
+  /** The bite on the nova: the glow's size in nova radii. */
+  bite: number;
+}
+
+/** The choke's look `age` seconds after its stone was stilled, at clock `t`:
+ *  surging in, then a steady throb (never dark while the stone holds). */
+export function chokeLook(
+  age: number,
+  t: number,
+  out: ChokeLook = { half: 0, glow: 0, bolt: 0, boltWidth: 0, bite: 0 },
+): ChokeLook {
+  const rise = clamp01(age / CHOKE.rise);
+  const surge = rise * rise * (3 - 2 * rise);
+  // A flare as it first bites, settling to its throb.
+  const flare = Math.max(0, 1 - Math.abs(age - CHOKE.rise) / 0.5);
+  const throb = 0.85 + 0.15 * Math.sin(t * 5.3) + 0.06 * Math.sin(t * 17.1);
+  out.half = CHOKE.half * surge * (1 + 0.35 * flare);
+  out.glow = surge * (1.5 * throb + 1.2 * flare);
+  out.bolt = surge * (1.1 + 0.9 * flare) * (0.8 + 0.2 * Math.sin(t * 31));
+  out.boltWidth = 0.9 + 0.6 * flare;
+  out.bite = surge * (0.9 + 0.25 * throb + 0.6 * flare);
+  return out;
+}

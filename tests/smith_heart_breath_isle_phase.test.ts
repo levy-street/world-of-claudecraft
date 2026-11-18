@@ -19,8 +19,10 @@ import {
 import { BreathFightFx } from '../src/render/smith_heart_fx/breath_fight_fx';
 import { beamHalf, beamLift } from '../src/render/smith_heart_fx/breath_isle_adds_fx';
 import {
+  CHOKE,
   CLOSING_MIN,
   COCOON_ENDS,
+  chokeLook,
   closingLook,
   closingParts,
   END_RING,
@@ -398,5 +400,86 @@ describe('BreathIslesFx: the 50 percent phase on a fake world', () => {
     fx.update(0.2);
     expect(shown(root, 'smithHeartBreathNova')).toHaveLength(0);
     fx.dispose();
+  });
+
+  it('a stilled stone chokes the nova: a gold beam and lightning into it while the cocoon stands', () => {
+    const entities = new Map<number, Entity>();
+    const me = entity(1, 'player', 'warrior', C.x - 8, C.z - 6);
+    const boss = entity(10, 'mob', BREATH_GUARDIAN, C.x, C.z + 2);
+    const cocoon = { id: ISLE_AURAS.cocoon, value: 0, value2: 2 } as Entity['auras'][number];
+    boss.auras.push(cocoon);
+    boss.castingAbility = ISLE_CASTS.nova;
+    boss.castTotal = 150;
+    boss.castRemaining = 90;
+    const e2 = isleSpots()[2];
+    const stone = entity(21, 'mob', ISLE_MOBS.stillstone, e2.stone?.x ?? 0, e2.stone?.z ?? 0, e2.h);
+    for (const e of [me, boss, stone]) entities.set(e.id, e);
+    const world = {
+      entities,
+      entityRosterVersion: 1,
+      player: me,
+      playerId: me.id,
+    } as unknown as IWorld & { entityRosterVersion: number };
+    const scene = new THREE.Scene();
+    const fx = new BreathFightFx(scene, () => C.h, world);
+    const root = scene.getObjectByName('smith-heart-breath-fight-fx') as THREE.Object3D;
+    for (let i = 0; i < 8; i++) fx.update(1 / 20);
+    // Awake, not stilled: no choke.
+    expect(shown(root, 'smithHeartBreathSealChokeEast')).toHaveLength(0);
+    // Stilled (the east stone): its beam pours into the nova and holds.
+    stone.auras.push({ id: ISLE_AURAS.cocoon, value: 0 } as Entity['auras'][number]);
+    cocoon.value = 1;
+    fx.handleEvent({
+      type: 'spellfx',
+      sourceId: stone.id,
+      targetId: boss.id,
+      school: 'nature',
+      fx: 'beam',
+      ability: ISLE_CUES.stilled,
+    } as unknown as SimEvent);
+    for (let i = 0; i < 60; i++) fx.update(1 / 20);
+    const beam = shown(root, 'smithHeartBreathSealChokeEast')[0] as THREE.Mesh;
+    expect(beam).toBeDefined();
+    expect(shown(root, 'smithHeartBreathSealChokeWest')).toHaveLength(0);
+    const glow = (beam.material as THREE.ShaderMaterial).uniforms.uGlow.value;
+    expect(glow).toBeGreaterThan(1);
+    // Its far end bites the nova (within its sphere's reach of the guardian).
+    const pos = beam.geometry.getAttribute('position');
+    const nova = shown(root, 'smithHeartBreathNova')[0] as THREE.Mesh;
+    let nearest = Number.POSITIVE_INFINITY;
+    for (let i = 0; i < pos.count; i++)
+      nearest = Math.min(
+        nearest,
+        Math.hypot(
+          pos.getX(i) - nova.position.x,
+          pos.getY(i) - nova.position.y,
+          pos.getZ(i) - nova.position.z,
+        ),
+      );
+    expect(nearest).toBeLessThan(nova.scale.x * 1.2);
+    // Still there many seconds on (it holds while the stone does).
+    for (let i = 0; i < 200; i++) fx.update(1 / 20);
+    expect(shown(root, 'smithHeartBreathSealChokeEast')).toHaveLength(1);
+    // The cocoon gone: the beam goes with it.
+    boss.auras.length = 0;
+    boss.castingAbility = null;
+    for (let i = 0; i < 4; i++) fx.update(1 / 20);
+    expect(shown(root, 'smithHeartBreathSealChokeEast')).toHaveLength(0);
+    fx.dispose();
+  });
+});
+
+describe('breath_isle_phase_core: the choke', () => {
+  it('surges in from nothing and never goes dark while the stone holds', () => {
+    expect(chokeLook(0, 0).glow).toBe(0);
+    expect(chokeLook(0, 0).half).toBe(0);
+    for (let t = 0; t < 30; t += 0.37) {
+      const L = chokeLook(CHOKE.rise + 2 + t, t);
+      expect(L.glow).toBeGreaterThan(1);
+      expect(L.half).toBeGreaterThan(1);
+      expect(L.bolt).toBeGreaterThan(0.6);
+    }
+    // It flares as it first bites.
+    expect(chokeLook(CHOKE.rise, 0).glow).toBeGreaterThan(chokeLook(CHOKE.rise + 3, 0).glow);
   });
 });
