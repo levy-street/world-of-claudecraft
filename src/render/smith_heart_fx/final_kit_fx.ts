@@ -8,22 +8,27 @@
 //     telegraph on EVERY tier, dressed in its quarter's element at the Heat
 //     telegraph's bar (final_telegraphs.ts): a Fire Whirl's, a burning
 //     pool's and an Ember Mark's in the molten basalt; a Groaning Ice crack
-//     (lethal, frost creeping in to its break) and your own cold's reach in
-//     frost; a Storm Orb (the soak's gold), Drawn Lightning's reach and
-//     Leaping Bolt's leap in storm; a Tremor Crack, Weight of the Anvil's
-//     mark (the soak's gold, turning on Mythic) and Crushed in granite; and
-//     the gale's rim band (a ragged storm edge where the safe floor ends);
-//   - the reaction and the impact, cosmetic over them: the whirls' twisting
-//     funnels of fire with their white-hot cores, the pools' flames, frost at
-//     a crack, the gale's streaks and dust, lightning leaping between bodies,
+//     (lethal, frost creeping in to its break) in frost; a Storm Orb (the
+//     soak's gold), Drawn Lightning's reach and Leaping Bolt's leap in storm;
+//     a Tremor Crack, Weight of the Anvil's mark (the soak's gold, turning on
+//     Mythic) and Crushed in granite; and the woken stars' (the rework of
+//     2026-11-18): a pillar's rise in granite, a Sky Strike's white storm
+//     spot (colder and whiter than Leaping Bolt's violet reach, so the two
+//     Breath mechanics read apart) and Arcing Stone's big ring round its
+//     pillar (the lethal edge);
+//   - the reaction and the impact, cosmetic over them: the whirls' tall
+//     turning columns of fire (a smoke-dark sheath over a flame funnel round a
+//     white-hot core, embers spiralling up them), the pools' flames, frost at
+//     a crack, lightning leaping between bodies, the stars' swords of ice,
+//     bolts, rings and columns (final_stars_fx.ts),
 //     the orbs (a crackling fresnel shell, a pulsing core, a turning ring),
 //     the great anvil of carved stone and gold crystal hanging over its mark
 //     and dropping onto it, the granite shells, the ice round a frozen
 //     player, Taking Root's spikes, Heart Unbound's blazing ring of the four
 //     veins, the switch's shockwave racing over the floor in the four veins'
 //     bands.
-// The footprints, the rim band, the ice, the shells, the anvil, the root's
-// spikes, the centre's ring and the shockwave draw on every tier; the
+// The footprints, the ice, the shells, the anvil, the root's spikes, the
+// centre's ring, the shockwave and the stars draw on every tier; the
 // footprints' rime, streaks and glints and the particles thin on the low
 // tier and the shakes go under reduced motion.
 //
@@ -37,7 +42,12 @@ import * as THREE from 'three';
 import { sfx } from '../../game/sfx';
 import { FinalAudio } from '../../game/smith_heart_final_audio';
 import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
-import { HEART_ROOM, inSmithHeartRoom } from '../../sim/content/smith_heart_layout';
+import {
+  HEART_ROOM,
+  inSmithHeartRoom,
+  SMITH_HEART_VEIN_COLORS,
+} from '../../sim/content/smith_heart_layout';
+import { heartQuarterAt } from '../../sim/content/smith_heart_quarters';
 import { DUNGEONS, instanceOrigin, instanceSlotForZ } from '../../sim/data';
 import {
   FINAL_AURAS,
@@ -57,8 +67,6 @@ import { GFX } from '../gfx';
 import { getFlameTex } from '../ignivar_fire_vfx';
 import { setRenderCategory } from '../renderer_diagnostics';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
-import { type WindFieldLook, windFieldLook } from './breath_fight_fx_core';
-import { BreathWindStreaks } from './breath_wind_streaks';
 import { anvilUnder } from './final_anvil_core';
 import { FinalAnvilFx } from './final_anvil_fx';
 import {
@@ -82,7 +90,6 @@ import {
   KIT_UV_VERT,
   ORB_CORE_FRAG,
   ORB_FRAG,
-  RIM_FRAG,
   RIM_VERT,
   SHELL_FRAG,
   SHOCK_FRAG,
@@ -91,8 +98,8 @@ import {
   WHIRL_VERT,
 } from './final_kit_glsl';
 import { iceCrust, shellStone } from './final_kit_shapes';
+import { FinalStarsFx } from './final_stars_fx';
 import {
-  coldReachFill,
   FINAL_TELEGRAPH_POOLS,
   type FinalElement,
   type FinalTelegraphKind,
@@ -132,8 +139,10 @@ interface Arc {
 }
 
 interface WhirlBody {
+  smoke: THREE.Mesh;
   outer: THREE.Mesh;
   core: THREE.Mesh;
+  smokeU: { uAlpha: { value: number } };
   outerU: { uAlpha: { value: number } };
   coreU: { uAlpha: { value: number } };
 }
@@ -174,8 +183,6 @@ export class FinalKitFx {
   /** The players' places this frame for the Anvil's count (pooled). */
   private readonly underPool: { x: number; z: number; dead: boolean }[] = [];
   private readonly underPts: { x: number; z: number; dead: boolean }[] = [];
-  private readonly rim: THREE.Mesh;
-  private readonly rimMat: THREE.ShaderMaterial;
   private readonly unboundRing: THREE.Mesh;
   private readonly unboundK = { value: 0 };
   private readonly shock: THREE.Mesh;
@@ -193,8 +200,10 @@ export class FinalKitFx {
   private readonly lookup = (id: number): Entity | undefined => this.world?.entities.get(id);
   private readonly groundAt = (x: number, z: number): number => this.groundY(x, z);
   private readonly centre = { x: 0, y: 0, z: 0 };
-  private readonly galeAt = { x: 0, y: 0, z: 0 };
-  private galeBlowing = false;
+  /** The woken stars' swords, lines, bolts, rings and columns. */
+  private readonly stars: FinalStarsFx;
+  /** The bodies a charged pillar's pulse leaps to (pooled). */
+  private readonly near: { x: number; y: number; z: number; d: number }[] = [];
   private rosterSeen = Number.NaN;
   private scanTimer = 0;
   private bossId = -1;
@@ -204,29 +213,6 @@ export class FinalKitFx {
   private disposed = false;
   private originX = 0;
   private originZ = 0;
-  private windHeading = 0;
-  /** Bellows Wind over the WHOLE Anvil (the team's review of 2026-11-17: it
-   *  carries everyone, so it reads everywhere, never only in the Breath's
-   *  quarter): the Breath guardian's own streaks of wind, under an
-   *  instance-local group placed at the slot's origin. */
-  private readonly windLocal = new THREE.Group();
-  private readonly windStreaks: BreathWindStreaks;
-  private readonly windLook: WindFieldLook = {
-    dust: 0,
-    strength: 0,
-    debris: 0,
-    speed: 0,
-    front: -1,
-    inward: false,
-  };
-  private readonly windDir = { x: 0, z: 1 };
-  private readonly windFocus = new THREE.Vector2();
-  private windTemplate = '';
-  private windSince = 0;
-  private windFlow = 0;
-  private windStrength = 0;
-  private windWasOn = false;
-
   constructor(
     scene: THREE.Scene,
     private readonly groundY: (x: number, z: number) => number,
@@ -296,11 +282,14 @@ export class FinalKitFx {
       this.root.add(m);
       return m;
     };
-    // The whirls: a funnel of flame twisting up (narrow at the floor, wide at
-    // its lip) round a white-hot core, each its own seed.
-    const funnel = new THREE.CylinderGeometry(1.25, 0.32, 1, 28, 18, true).translate(0, 0.5, 0);
-    const coreGeo = new THREE.CylinderGeometry(0.5, 0.14, 1, 18, 14, true).translate(0, 0.5, 0);
-    this.geometries.push(funnel, coreGeo);
+    // The whirls (the Heat's star since the rework of 2026-11-18): a tall
+    // turning column of fire, a funnel of flame twisting up (narrow at the
+    // floor, flared at its lip) round a white-hot core, under a sheath of
+    // smoke-dark fire that rolls off its top; each its own seed.
+    const funnel = new THREE.CylinderGeometry(1.35, 0.42, 1, 36, 28, true).translate(0, 0.5, 0);
+    const coreGeo = new THREE.CylinderGeometry(0.62, 0.2, 1, 24, 22, true).translate(0, 0.5, 0);
+    const smokeGeo = new THREE.CylinderGeometry(1.7, 0.6, 1, 32, 20, true).translate(0, 0.5, 0);
+    this.geometries.push(funnel, coreGeo, smokeGeo);
     for (let i = 0; i < P.whirls; i++) {
       const seedU = { value: fxHash(i, 5) * 20 };
       const outerU = {
@@ -318,7 +307,20 @@ export class FinalKitFx {
         uCoreK: { value: 1 },
         uTwist: { value: 2.6 },
       };
+      const smokeU = {
+        ...outerU,
+        uAlpha: { value: 1 },
+        uCoreK: { value: -1 },
+        uTwist: { value: 1.2 },
+      };
       const extra = { side: THREE.DoubleSide, blending: THREE.AdditiveBlending } as const;
+      const smoke = mesh(
+        smokeGeo,
+        shader('smithHeartFinalWhirlSmoke', smokeU, WHIRL_VERT, WHIRL_FRAG, {
+          side: THREE.DoubleSide,
+        }),
+        'smithHeartFinalWhirlSmoke',
+      );
       const outer = mesh(
         funnel,
         shader('smithHeartFinalWhirl', outerU, WHIRL_VERT, WHIRL_FRAG, extra),
@@ -329,7 +331,7 @@ export class FinalKitFx {
         shader('smithHeartFinalWhirlCore', coreU, WHIRL_VERT, WHIRL_FRAG, extra),
         'smithHeartFinalWhirlCore',
       );
-      this.whirls.push({ outer, core, outerU, coreU });
+      this.whirls.push({ smoke, outer, core, smokeU, outerU, coreU });
     }
     // The Storm Orbs: a fresnel shell of storm light, a pulsing core, a ring
     // turning round it.
@@ -438,40 +440,6 @@ export class FinalKitFx {
       this.uTime,
     );
     this.root.add(this.anvilFx.group);
-    // The gale's rim band (every tier): a flat ring from just inside the
-    // band's edge to the rim, on its own floor rung.
-    const rimGeo = new THREE.RingGeometry(R.rimInner - 2, R.rimOuter, 200, 2).rotateX(-Math.PI / 2);
-    this.geometries.push(rimGeo);
-    this.rimMat = shader(
-      'smithHeartFinalRimBand',
-      {
-        uTime: this.uTime,
-        uAlpha: { value: 0 },
-        uHeading: { value: 0 },
-        uInner: { value: R.rimInner },
-        uOuter: { value: R.rimOuter },
-        uDetail: { value: detail ? 1 : 0 },
-        uColor: { value: new THREE.Color(FINAL_FOOTPRINTS.rim.color) },
-        uStorm: col(C.storm),
-      },
-      RIM_VERT,
-      RIM_FRAG,
-      { side: THREE.DoubleSide, blending: THREE.AdditiveBlending },
-    );
-    this.rim = mesh(rimGeo, this.rimMat, 'smithHeartFinalRimBand');
-    this.rim.renderOrder = floorVfxRenderOrder('encounter', F.rim);
-    // The gale's streaks over the whole platform (built here with the root,
-    // so its one gated attach links them; floor height set as the wind shows).
-    this.windLocal.name = 'smithHeartFinalWind';
-    this.root.add(this.windLocal);
-    this.windStreaks = new BreathWindStreaks(
-      this.windLocal,
-      this.uTime,
-      detail,
-      0,
-      { x: HEART_ROOM.x, z: HEART_ROOM.z, rx: HEART_ROOM.r, rz: HEART_ROOM.r },
-      'smithHeartFinalWindStreaks',
-    );
     const veins = {
       uHeat: { value: new THREE.Color(C.heat) },
       uQuench: { value: new THREE.Color(C.quench) },
@@ -508,6 +476,28 @@ export class FinalKitFx {
       'smithHeartFinalShock',
     );
     this.shock.renderOrder = floorVfxRenderOrder('encounter', F.shock);
+    // The woken stars (the rework of 2026-11-18): their swords, lines, bolts,
+    // rings and columns, under this root.
+    this.stars = new FinalStarsFx({
+      root: this.root,
+      uTime: this.uTime,
+      particles: this.particles,
+      kit: this.kit,
+      groundY: (x, z) => this.groundY(x, z),
+      rand: () => this.rand(),
+      density: this.density,
+      detail,
+      reducedMotion: () => this.reducedMotion(),
+      shake: (x, z, amount, reach) => this.shake(x, z, amount, reach),
+      geometries: this.geometries,
+      materials: this.materials,
+      laneRung: F.lane,
+      ringRung: F.marks,
+      laneStyle: FINAL_FOOTPRINTS.lane,
+      laneLockedStyle: FINAL_FOOTPRINTS.laneLocked,
+      bladeFly: T.bladeFly,
+      bladeHalf: T.bladeHalf,
+    });
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})
       .catch(() => {});
@@ -547,11 +537,17 @@ export class FinalKitFx {
       const x = fxAnchor(target).x;
       const z = fxAnchor(target).z;
       if (ev.ability === FINAL_CUES.whirl) this.sparkAt(x, z, C.fire, 14, 1.4);
-      else if (ev.ability === FINAL_CUES.freeze) {
-        this.sparkAt(x, z, C.frost, 22, 1.6);
-        this.particles.shockRing(x, z, 0xbfe6ff, 4, 0.5);
-      } else if (ev.ability === FINAL_CUES.shell) this.dustAt(x, z, 10, 1.4);
-      else if (ev.ability === FINAL_CUES.root) {
+      else if (ev.ability === FINAL_CUES.shell) this.dustAt(x, z, 10, 1.4);
+      else if (ev.ability === FINAL_CUES.charged) this.chargedPulse(target);
+      else if (ev.ability === FINAL_CUES.rise) {
+        this.dustAt(x, z, 30, 3.5);
+        this.particles.shockRing(x, z, 0xe8c070, R.rise * 1.6, 0.5);
+        this.shake(x, z, 0.35, 45);
+      } else if (ev.ability === FINAL_CUES.thrum) {
+        this.dustAt(x, z, 14, 2.6);
+        this.particles.shockRing(x, z, 0xe8c070, 9, 0.6);
+        this.shake(x, z, 0.2, 60);
+      } else if (ev.ability === FINAL_CUES.root) {
         this.dustAt(x, z, 26, 5);
         this.particles.shockRing(x, z, 0xe8c070, 7, 0.6);
         this.shake(x, z, 0.25);
@@ -615,6 +611,21 @@ export class FinalKitFx {
       case FINAL_CUES.anvil:
         this.anvilFx.land(x, z, ev.radius ?? R.anvil);
         break;
+      case FINAL_CUES.strike:
+        this.stars.boltAt(x, z, ev.radius ?? R.strike);
+        break;
+      case FINAL_CUES.arcingStone:
+        this.stars.arcingAt(x, z, ev.radius ?? R.arc);
+        break;
+      case FINAL_CUES.shatter:
+        this.stars.shatterAt(x, z, ev.radius ?? 3.7);
+        break;
+      case FINAL_CUES.wake: {
+        const zone = heartQuarterAt(x - this.originX, z - this.originZ);
+        const color = zone === 'ring' ? 0xffe2a0 : SMITH_HEART_VEIN_COLORS[zone];
+        this.stars.wakeAt(x, z, color);
+        break;
+      }
       default:
     }
     return true;
@@ -669,6 +680,25 @@ export class FinalKitFx {
     this.shake(x, z, 0.7, 120);
   }
 
+  /** A Storm-Charged pillar pulses the raid: its bolts leap to the nearest
+   *  bodies (four at most). */
+  private chargedPulse(pillar: Entity): void {
+    const world = this.world;
+    if (!world) return;
+    const near = this.near;
+    near.length = 0;
+    for (const pid of this.playerIds) {
+      const p = world.entities.get(pid);
+      if (!p || p.dead) continue;
+      const a = fxAnchor(p);
+      const d = Math.hypot(a.x - pillar.pos.x, a.z - pillar.pos.z);
+      if (d > 40) continue;
+      near.push({ x: a.x, y: this.groundY(a.x, a.z), z: a.z, d });
+    }
+    near.sort((a, b) => a.d - b.d);
+    this.stars.chargedPulse(pillar, near);
+  }
+
   private addArc(from: number, to: number): void {
     let slot = this.arcs.find((a) => this.clock - a.born > 0.4);
     if (!slot) {
@@ -705,7 +735,7 @@ export class FinalKitFx {
     }
     if (!inHeart) {
       if (this.active) this.leave();
-      this.audio.update(null, this.splinterIds, this.lookup, null, null, null);
+      this.audio.update(null, this.splinterIds, this.lookup, null, null);
       this.particles.update(this.clock);
       return;
     }
@@ -713,9 +743,11 @@ export class FinalKitFx {
     this.scan(world, dt);
     for (const el of ELEMENTS) for (const s of this.pools[el]) s.seen = false;
     this.anvilFx.begin(this.clock, dt);
-    this.paintObjects(world, dt);
+    this.stars.begin(this.clock);
+    this.paintObjects(world);
     this.anvilFx.end();
     this.paintMarks(world);
+    this.stars.end();
     this.paintBoss(world);
     for (const el of ELEMENTS)
       for (const s of this.pools[el])
@@ -731,14 +763,7 @@ export class FinalKitFx {
     this.centre.x = this.originX + HEART_ROOM.x;
     this.centre.z = this.originZ + HEART_ROOM.z;
     this.centre.y = this.groundY(this.centre.x, this.centre.z);
-    this.audio.update(
-      boss,
-      this.splinterIds,
-      this.lookup,
-      this.galeBlowing ? this.galeAt : null,
-      me ?? null,
-      this.centre,
-    );
+    this.audio.update(boss, this.splinterIds, this.lookup, me ?? null, this.centre);
   }
 
   private scan(world: IWorld, dt: number): void {
@@ -762,8 +787,8 @@ export class FinalKitFx {
         this.objectIds.push(e.id);
         if (!this.seen.has(e.id)) {
           this.seen.set(e.id, { born: this.clock, kind });
-          // A footprint appearing: its warning (a whirl rising, the gale
-          // gathering, the ice groaning, an orb, a tremor crack).
+          // A footprint appearing: its warning (a whirl rising, the ice
+          // groaning, an orb, a tremor crack).
           this.audio.footprint(kind, e.pos.x, this.groundY(e.pos.x, e.pos.z), e.pos.z);
         }
       }
@@ -806,11 +831,9 @@ export class FinalKitFx {
     s.d.fan.group.visible = true;
   }
 
-  private paintObjects(world: IWorld, dt: number): void {
+  private paintObjects(world: IWorld): void {
     let whirl = 0;
     let orb = 0;
-    let wind: Entity | null = null;
-    let blowing = false;
     for (const id of this.objectIds) {
       const e = world.entities.get(id);
       const info = this.seen.get(id);
@@ -831,26 +854,55 @@ export class FinalKitFx {
           if (w) {
             const spin = whirlSpin(this.clock, warn);
             const live = kind === 'whirl' ? 1 : 0.35 + 0.5 * warn;
+            w.smoke.position.set(x, y, z);
+            w.smoke.scale.set(R.whirl * 0.9, spin.height * 1.08, R.whirl * 0.9);
             w.outer.position.set(x, y, z);
-            w.outer.scale.set(R.whirl * 0.95, spin.height, R.whirl * 0.95);
+            w.outer.scale.set(R.whirl * 0.8, spin.height, R.whirl * 0.8);
             w.core.position.set(x, y, z);
-            w.core.scale.set(R.whirl * 0.8, spin.height * 0.92, R.whirl * 0.8);
+            w.core.scale.set(R.whirl * 0.62, spin.height * 0.9, R.whirl * 0.62);
+            w.smokeU.uAlpha.value = live;
             w.outerU.uAlpha.value = live;
             w.coreU.uAlpha.value = live;
+            w.smoke.visible = true;
             w.outer.visible = true;
             w.core.visible = true;
+            // Embers spiralling up the column, and the grit it tears up at its
+            // foot.
+            if (this.rand() < (kind === 'whirl' ? 1 : warn) * this.density) {
+              const a = this.clock * 7 + this.rand() * Math.PI * 2;
+              const rr = R.whirl * (0.35 + 0.5 * this.rand());
+              this.particles.puff(x + Math.cos(a) * rr, y + 0.6, z + Math.sin(a) * rr, 2, {
+                speed: 2,
+                up: 9 + this.rand() * 6,
+                life: 1.3,
+                size: [0.55, 0.1],
+                color: C.fire,
+                alpha: 1,
+                pool: 'glow',
+                dir: [-Math.sin(a), 0.6, Math.cos(a)],
+                spread: 0.2,
+              });
+            }
+            if (kind === 'whirl' && this.rand() < 0.5 * this.density) {
+              const a = this.rand() * Math.PI * 2;
+              this.particles.puff(
+                x + Math.cos(a) * R.whirl,
+                y + 0.3,
+                z + Math.sin(a) * R.whirl,
+                1,
+                {
+                  speed: 4,
+                  up: 2,
+                  life: 0.9,
+                  size: [1.0, 2.6],
+                  color: C.dust,
+                  alpha: 0.35,
+                  dir: [-Math.sin(a), 0.2, Math.cos(a)],
+                  spread: 0.3,
+                },
+              );
+            }
           }
-          if (kind === 'whirl' && this.rand() < 0.8 * this.density)
-            this.particles.puff(x, y + 1, z, 2, {
-              speed: 3,
-              up: 6,
-              life: 0.9,
-              size: [0.5, 0.1],
-              color: C.fire,
-              alpha: 1,
-              pool: 'glow',
-              radius: R.whirl * 0.6,
-            });
           break;
         }
         case 'emberPool':
@@ -953,20 +1005,49 @@ export class FinalKitFx {
           this.anvilFx.hang(id, x, y, z, fill, anvilUnder(pts, x, z, r), r);
           break;
         }
-        case 'windWarn':
-        case 'windBlow':
-          wind = e;
-          if (kind === 'windBlow') {
-            blowing = true;
-            this.galeAt.x = x;
-            this.galeAt.y = y;
-            this.galeAt.z = z;
-          }
+        // ---- the woken stars ----
+        case 'rise': {
+          const fill = timedFill(age, finalObjectSeconds(e.templateId) || T.pillarWarn);
+          this.foot(id, 'rise', FINAL_FOOTPRINTS.rise, x, z, r, fill, false);
+          if (this.rand() < fill * this.density)
+            this.particles.puff(x, y + 0.2, z, 1, {
+              speed: 1.5,
+              up: 3,
+              life: 0.7,
+              size: [0.35, 0.25],
+              color: C.stone,
+              alpha: 1,
+              radius: r * 0.8,
+              gravity: 12,
+            });
+          break;
+        }
+        case 'strike': {
+          const fill = timedFill(age, finalObjectSeconds(e.templateId) || T.skyWarn);
+          this.foot(id, 'strike', FINAL_FOOTPRINTS.strike, x, z, r, fill, false);
+          this.stars.strikeCharge(x, y, z, fill);
+          break;
+        }
+        case 'arcRing': {
+          const fill = timedFill(age, finalObjectSeconds(e.templateId) || T.skyWarn);
+          this.foot(id, 'arcRing', FINAL_FOOTPRINTS.arcRing, x, z, r, fill, false);
+          this.stars.arcWarn(x, y, z, r, fill);
+          break;
+        }
+        case 'blade':
+          this.stars.seeBlade(e);
+          break;
+        case 'lane':
+          this.stars.seeLane(e);
+          break;
+        case 'pillarCharged':
+          this.stars.chargedPillar(e);
           break;
         default:
       }
     }
     for (let i = whirl; i < this.whirls.length; i++) {
+      this.whirls[i].smoke.visible = false;
       this.whirls[i].outer.visible = false;
       this.whirls[i].core.visible = false;
     }
@@ -976,86 +1057,6 @@ export class FinalKitFx {
       ob.core.visible = false;
       ob.ring.visible = false;
     }
-    this.galeBlowing = blowing;
-    this.paintWind(wind, dt);
-  }
-
-  /** The gale: its rim band (every tier) and its streaks racing the way it
-   *  blows. */
-  private paintWind(wind: Entity | null, dt = 0): void {
-    if (!wind) {
-      this.rim.visible = false;
-      if (this.windWasOn) {
-        this.windWasOn = false;
-        this.windStrength = 0;
-        this.windStreaks.paint(0, this.windDir, false, this.windFocus, this.windFlow, -1);
-      }
-      return;
-    }
-    const blowing = finalObjectKind(wind.templateId) === 'windBlow';
-    this.windHeading = wind.facing;
-    const cx = this.originX + HEART_ROOM.x;
-    const cz = this.originZ + HEART_ROOM.z;
-    // The streaks: the coming wind gathering behind a front rolling over the
-    // whole floor from upwind, then the blow racing across all of it, the
-    // way the kernel pushes (sim convention: toward (sin h, cos h)).
-    if (wind.templateId !== this.windTemplate) {
-      this.windTemplate = wind.templateId;
-      this.windSince = this.clock;
-    }
-    const secs = finalObjectSeconds(wind.templateId);
-    const fill = secs > 0 ? Math.min(1, (this.clock - this.windSince) / secs) : 1;
-    const look = windFieldLook(blowing ? 'blow' : 'gather', fill, this.windLook);
-    this.windDir.x = Math.sin(this.windHeading);
-    this.windDir.z = Math.cos(this.windHeading);
-    this.windFlow = (this.windFlow + look.speed * dt) % 9000;
-    this.windStrength += (look.strength - this.windStrength) * Math.min(1, dt * 4);
-    this.windLocal.position.set(this.originX, this.groundY(cx, cz) + 0.1, this.originZ);
-    this.windStreaks.paint(
-      Math.max(0.35, this.windStrength),
-      this.windDir,
-      false,
-      this.windFocus,
-      this.windFlow,
-      look.front,
-    );
-    this.windWasOn = true;
-    this.rim.position.set(cx, this.groundY(cx, cz) + 0.08, cz);
-    this.rimMat.uniforms.uHeading.value = this.windHeading;
-    this.rimMat.uniforms.uAlpha.value = blowing ? 1 : 0.45 + 0.25 * Math.sin(this.clock * 8);
-    this.rim.visible = true;
-    // The dust: over the whole platform, thick through the blow, a first
-    // stir through the gather.
-    const n = blowing ? 14 : 4;
-    const sx = Math.sin(this.windHeading);
-    const sz = Math.cos(this.windHeading);
-    for (let i = 0; i < n; i++) {
-      if (this.rand() > this.density) continue;
-      const a = this.rand() * Math.PI * 2;
-      const r = Math.sqrt(this.rand()) * HEART_ROOM.r;
-      const x = cx + Math.cos(a) * r;
-      const z = cz + Math.sin(a) * r;
-      this.particles.puff(x, this.groundY(x, z) + 0.6 + this.rand() * 3, z, 1, {
-        speed: blowing ? 20 : 4,
-        life: 0.9,
-        size: [0.25, 0.08],
-        color: C.storm,
-        alpha: 0.8,
-        pool: 'glow',
-        dir: [sx, 0, sz],
-        spread: 0.05,
-      });
-      if (blowing && this.rand() < 0.5)
-        this.particles.puff(x, this.groundY(x, z) + 0.3, z, 1, {
-          speed: 9,
-          life: 1.4,
-          size: [1.2, 3],
-          color: C.dust,
-          alpha: 0.3,
-          dir: [sx, 0.05, sz],
-          spread: 0.15,
-        });
-    }
   }
 
   /** The players' marks: the ember's ring, the lightning's reach, the ice,
@@ -1063,6 +1064,8 @@ export class FinalKitFx {
   private paintMarks(world: IWorld): void {
     let ice = 0;
     let shell = 0;
+    let bladeLeft = 0;
+    let bladeTotal = 0;
     for (const pid of this.playerIds) {
       const p = world.entities.get(pid);
       if (!p || p.dead) continue;
@@ -1088,7 +1091,10 @@ export class FinalKitFx {
         } else if (a.id === FINAL_AURAS.drawn) {
           this.foot(-(pid * 8 + 2), 'drawn', FINAL_FOOTPRINTS.drawn, x, z, R.drawn, 0, true);
           if (this.rand() < 0.6 * this.density) this.sparkAt(x, z, C.storm, 1, 0.6);
-        } else if (a.id === FINAL_AURAS.frozen || a.id === FINAL_AURAS.underIce) {
+        } else if (a.id === FINAL_AURAS.bladeMark) {
+          bladeLeft = a.remaining;
+          bladeTotal = a.duration;
+        } else if (a.id === FINAL_AURAS.underIce) {
           const m = this.ice[ice++];
           if (m) {
             m.position.set(x, y, z);
@@ -1114,14 +1120,10 @@ export class FinalKitFx {
             fill,
             true,
           );
-        } else if (a.id === FINAL_AURAS.cold && pid === world.playerId && (a.value ?? 0) > 0) {
-          // Your own cold's reach: the ring your two allies must stand in,
-          // frost closing in as the cold rises.
-          const fill = coldReachFill(a.value ?? 0);
-          this.foot(-(pid * 8 + 5), 'cold', FINAL_FOOTPRINTS.cold, x, z, R.cold, fill, true);
         }
       }
     }
+    this.stars.bladeMark(bladeLeft, bladeTotal);
     for (let i = ice; i < this.ice.length; i++) this.ice[i].visible = false;
     for (let i = shell; i < this.shells.length; i++) this.shells[i].visible = false;
   }
@@ -1239,7 +1241,7 @@ export class FinalKitFx {
   private leave(): void {
     this.active = false;
     this.rosterSeen = Number.NaN;
-    this.paintWind(null);
+    this.stars.hide();
     for (const el of ELEMENTS)
       for (const s of this.pools[el]) {
         s.key = 0;
@@ -1248,6 +1250,7 @@ export class FinalKitFx {
     this.slotByKey.clear();
     this.seen.clear();
     for (const w of this.whirls) {
+      w.smoke.visible = false;
       w.outer.visible = false;
       w.core.visible = false;
     }
@@ -1259,7 +1262,6 @@ export class FinalKitFx {
     for (const m of [...this.ice, ...this.shells]) m.visible = false;
     this.shock.visible = false;
     this.anvilFx.hide();
-    this.rim.visible = false;
     this.spikes.visible = false;
     this.unboundRing.visible = false;
     this.arcsMesh.visible = false;
@@ -1271,7 +1273,7 @@ export class FinalKitFx {
     this.audio.dispose();
     this.root.removeFromParent();
     this.particles.dispose();
-    this.windStreaks.dispose();
+    this.stars.dispose();
     this.anvilFx.dispose();
     this.kit.dispose();
     this.arcsMesh.dispose();

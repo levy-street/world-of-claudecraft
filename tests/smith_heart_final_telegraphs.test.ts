@@ -24,7 +24,6 @@ import { floorVfxRenderOrder } from '../src/render/floor_vfx_layer';
 import { FINAL_KIT_FLOOR, shockWave } from '../src/render/smith_heart_fx/final_kit_fx_core';
 import {
   ORB_FRAG,
-  RIM_FRAG,
   SHOCK_FRAG,
   UNBOUND_FRAG,
   WHIRL_VERT,
@@ -38,7 +37,6 @@ import {
   shellStone,
 } from '../src/render/smith_heart_fx/final_kit_shapes';
 import {
-  coldReachFill,
   FINAL_ELEMENT_TINTS,
   FINAL_TELEGRAPH_LOOKS,
   FINAL_TELEGRAPH_POOLS,
@@ -56,13 +54,16 @@ describe("the final kits' element telegraphs", () => {
       pool: 'fire',
       ember: 'fire',
       crack: 'frost',
-      cold: 'frost',
       drawn: 'storm',
       bolt: 'storm',
       orb: 'storm',
       tremor: 'stone',
       anvil: 'stone',
       crushed: 'stone',
+      // The woken stars (the rework of 2026-11-18).
+      rise: 'stone',
+      strike: 'storm',
+      arcRing: 'storm',
       // Part 2: each Splinter's frontal in its own element.
       shearFire: 'fire',
       shearFrost: 'frost',
@@ -79,7 +80,7 @@ describe("the final kits' element telegraphs", () => {
     expect(FINAL_TELEGRAPH_LOOKS.tremor.inward).toBe(0);
     expect(FINAL_TELEGRAPH_LOOKS.bolt.inward).toBe(0);
     // A mark riding a body never carries a curtain (it would jitter).
-    for (const k of ['whirl', 'ember', 'cold', 'drawn', 'bolt', 'crushed'] as const)
+    for (const k of ['whirl', 'ember', 'drawn', 'bolt', 'crushed'] as const)
       expect(FINAL_TELEGRAPH_LOOKS[k].curtain, k).toBe(false);
     // Every look is drawn on every tier: a real char and a real line.
     for (const [k, L] of Object.entries(FINAL_TELEGRAPH_LOOKS)) {
@@ -103,15 +104,15 @@ describe("the final kits' element telegraphs", () => {
   it('keeps enough fans per element for every footprint at once', () => {
     // Fire: six whirls, the pool cap, three ember marks.
     expect(FINAL_TELEGRAPH_POOLS.fire).toBeGreaterThanOrEqual(6 + T.poolCap + T.emberMarks);
-    // Frost: the cracks and the local player's reach.
-    expect(FINAL_TELEGRAPH_POOLS.frost).toBeGreaterThanOrEqual(T.iceMarks * 2 + 1);
-    // Storm: the orbs, the drawn marks, the bolt's target.
-    expect(FINAL_TELEGRAPH_POOLS.storm).toBeGreaterThanOrEqual(T.orbCount * 2 + T.drawnMarks + 1);
-    // Stone: the tremors, the Anvil, the Crushed.
-    expect(FINAL_TELEGRAPH_POOLS.stone).toBeGreaterThanOrEqual(4 + 1 + 8);
-    expect(coldReachFill(0)).toBe(0);
-    expect(coldReachFill(50)).toBeCloseTo(0.5, 9);
-    expect(coldReachFill(140)).toBe(1);
+    // Frost: the cracks.
+    expect(FINAL_TELEGRAPH_POOLS.frost).toBeGreaterThanOrEqual(T.iceMarks * 2);
+    // Storm: the orbs, the drawn marks, the bolt's target, two volleys of
+    // Sky Strikes (Mythic's marks and pillar spots) and their rings.
+    expect(FINAL_TELEGRAPH_POOLS.storm).toBeGreaterThanOrEqual(
+      T.orbCount * 2 + T.drawnMarks + 1 + 2 * (3 + 2) + 2,
+    );
+    // Stone: the tremors, the Anvil, the Crushed, a volley of rises.
+    expect(FINAL_TELEGRAPH_POOLS.stone).toBeGreaterThanOrEqual(4 + 1 + 8 + 3);
   });
 
   it("dresses a fan's char and glow passes per element on the kit's rungs", () => {
@@ -164,8 +165,7 @@ describe("the final kits' element telegraphs", () => {
       expect(v).toContain('modelViewMatrix');
       expect(v).not.toMatch(/viewMatrix \*/);
     }
-    for (const f of [ORB_FRAG, RIM_FRAG, SHOCK_FRAG, UNBOUND_FRAG])
-      expect(f).toContain('gl_FragColor');
+    for (const f of [ORB_FRAG, SHOCK_FRAG, UNBOUND_FRAG]) expect(f).toContain('gl_FragColor');
   });
 });
 

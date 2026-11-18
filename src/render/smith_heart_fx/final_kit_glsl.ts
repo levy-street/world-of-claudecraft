@@ -4,10 +4,13 @@
 // (camera-relative: the Heart sits in an instance band far from the
 // world's origin); every noise runs on the mesh's own coordinates.
 //
-//   WHIRL       a Fire Whirl: a funnel of flame twisting up on itself (the
-//               vertex stage twists and swells it), bands of fire climbing,
-//               ragged at its lip; the same source draws its white-hot core
-//               (`uCoreK` 1).
+//   WHIRL       a Fire Whirl, the Heat's star (a tall turning column since the
+//               rework of 2026-11-18): a funnel of flame twisting up on itself
+//               (the vertex stage twists it, swells it in bands climbing the
+//               column and sways its top in an S), helical tongues of fire
+//               winding up it, ragged at its lip; the same source draws its
+//               white-hot core (`uCoreK` 1) and its sheath of smoke-dark fire
+//               rolling off the top (`uCoreK` -1, normal blending).
 //   ORB         a Storm Orb's shell: a fresnel rim of violet storm light and
 //               forks of white crawling over it (noise on the sphere's own
 //               points, so no seam), harder as it nears its burst.
@@ -16,16 +19,15 @@
 //               between them, a fresnel rim so the body inside still reads.
 //   ICE         Encased in Rime: rime-white facets, a bright fresnel edge,
 //               glints sliding over it.
-//   RIM         the gale's rim band: storm streaks racing round with the
-//               wind, forks, a ragged inner edge carrying the threat's hot
-//               line (the safe floor ends there).
+//   RIM_VERT    a flat floor band's local position (Heart Unbound's ring, the
+//               switch's shockwave).
 //   UNBOUND     Heart Unbound's centre aura: a blazing ring of the four
 //               veins' light, ragged flames licking in and out, hotter with
 //               its stacks.
 //   SHOCK       the switch's shockwave on the floor: four bands of the veins'
 //               light racing out together, ragged, fading as they spread.
 
-const NOISE = /* glsl */ `
+export const KIT_NOISE = /* glsl */ `
 float kh(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float kn(vec2 p) {
   vec2 i = floor(p);
@@ -67,18 +69,22 @@ uniform float uTime;
 uniform float uTwist;
 uniform float uSeed;
 varying vec2 vUv;
+varying float vH;
 void main() {
   vUv = uv;
   vec3 p = position;
+  vH = p.y;
   // Twist round the axis with the height and the time, and swell in bands
   // climbing the column.
-  float a = p.y * uTwist + uTime * 5.5 + uSeed;
+  float a = p.y * uTwist * 2.2 + uTime * 6.0 + uSeed;
   float c = cos(a);
   float s = sin(a);
-  float swell = 1.0 + 0.16 * sin(p.y * 9.0 - uTime * 7.0 + uSeed) + 0.08 * sin(p.y * 23.0 - uTime * 13.0);
+  float swell = 1.0 + 0.18 * sin(p.y * 11.0 - uTime * 8.0 + uSeed) + 0.09 * sin(p.y * 27.0 - uTime * 15.0);
   p.xz = mat2(c, -s, s, c) * p.xz * swell;
-  // The column leans and sways a little at its top.
-  p.x += sin(uTime * 1.7 + uSeed) * 0.12 * p.y * p.y;
+  // The column sways in an S: its middle one way, its top the other.
+  float sway = sin(uTime * 1.3 + uSeed);
+  p.x += sway * 0.35 * sin(p.y * 3.14159) + sin(uTime * 2.1 + uSeed * 1.7) * 0.22 * p.y * p.y;
+  p.z += cos(uTime * 1.1 + uSeed) * 0.25 * sin(p.y * 3.14159);
   gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
 }
 `;
@@ -91,21 +97,39 @@ uniform float uSeed;
 uniform vec3 uCore;
 uniform vec3 uFire;
 varying vec2 vUv;
-${NOISE}
+varying float vH;
+${KIT_NOISE}
 void main() {
-  float speed = mix(2.4, 4.2, uCoreK);
-  vec2 q = vec2(vUv.x * 5.0 + vUv.y * 2.5 + uSeed, vUv.y * 2.6 - uTime * speed);
-  float f = kfbm(q) * 0.8 + kn(q * 3.1 + 2.0) * 0.3;
+  float core = max(uCoreK, 0.0);
+  float speed = mix(2.6, 4.6, core);
+  // Helical tongues: bands winding up the column (around x, up y).
+  float helix = sin(vUv.x * 6.2832 * 3.0 + vUv.y * 14.0 - uTime * 9.0 + uSeed);
+  vec2 q = vec2(vUv.x * 6.0 + vUv.y * 3.0 + uSeed, vUv.y * 3.2 - uTime * speed);
+  float f = kfbm(q) * 0.7 + kn(q * 3.3 + 2.0) * 0.25 + helix * 0.32;
+  if (uCoreK < 0.0) {
+    // The smoke-dark sheath: thin at the foot, rolling thick off the top,
+    // a dull ember glow in its folds.
+    float up = smoothstep(0.25, 0.85, vUv.y);
+    float fold = smoothstep(0.35, 0.75, f);
+    float lipS = 1.0 - smoothstep(0.88, 1.0, vUv.y + (f - 0.5) * 0.3);
+    float a = fold * up * lipS * 0.85;
+    vec3 smoke = mix(vec3(0.05, 0.035, 0.03), uFire * vec3(0.55, 0.16, 0.04), smoothstep(0.6, 0.95, f) * (1.0 - up * 0.7));
+    gl_FragColor = vec4(smoke, a * uAlpha);
+    return;
+  }
   // Tongues licking up: bright bands, a ragged lip at the top.
-  float lip = 1.0 - smoothstep(0.62, 1.0, vUv.y + (f - 0.5) * 0.5);
-  float foot = smoothstep(0.0, 0.08, vUv.y);
-  float body = smoothstep(0.32, 0.72, f) * lip * foot;
-  float heat = clamp(f * 0.95 + (1.0 - vUv.y) * 0.25 + uCoreK * 0.15, 0.0, 1.0);
+  float lip = 1.0 - smoothstep(0.7, 1.0, vUv.y + (f - 0.5) * 0.45);
+  float foot = smoothstep(0.0, 0.05, vUv.y);
+  // The helix carves dark gaps between its tongues: the column reads as
+  // turning, never a solid flare.
+  float body = smoothstep(0.38, 0.72, f) * lip * foot * (0.55 + 0.45 * smoothstep(-0.4, 0.6, helix));
+  // Hottest at its foot (where it tears at the floor) and in its tongues.
+  float heat = clamp(f * 0.95 + (1.0 - vUv.y) * 0.35 + core * 0.18, 0.0, 1.0);
   // Deep orange-red at its ragged edges, amber in the body, gold only in
   // the hottest tongues: fire, never a white blob under the bloom.
-  vec3 col = mix(uFire * vec3(0.85, 0.32, 0.1), uFire, smoothstep(0.25, 0.7, heat));
-  col = mix(col, uCore, smoothstep(0.82, 1.0, heat) * mix(0.5, 0.8, uCoreK));
-  gl_FragColor = vec4(col * (0.55 + 0.45 * heat), body * uAlpha * mix(0.75, 0.55, uCoreK));
+  vec3 col = mix(uFire * vec3(0.8, 0.22, 0.05), uFire * vec3(1.0, 0.62, 0.3), smoothstep(0.3, 0.75, heat));
+  col = mix(col, uCore, smoothstep(0.86, 1.0, heat) * mix(0.35, 0.7, core));
+  gl_FragColor = vec4(col * (0.45 + 0.4 * heat), body * uAlpha * mix(0.75, 0.42, core));
 }
 `;
 
@@ -116,7 +140,7 @@ uniform vec3 uStorm;
 varying vec3 vObj;
 varying vec3 vN;
 varying vec3 vView;
-${NOISE}
+${KIT_NOISE}
 void main() {
   vec3 n = normalize(vObj);
   float fres = pow(max(1.0 - abs(dot(normalize(vN), normalize(vView))), 0.0), 2.2);
@@ -154,7 +178,7 @@ uniform vec3 uGold;
 varying vec3 vObj;
 varying vec3 vN;
 varying vec3 vView;
-${NOISE}
+${KIT_NOISE}
 float cellE(vec2 p) {
   vec2 i = floor(p);
   vec2 f = fract(p);
@@ -207,40 +231,6 @@ void main() {
 }
 `;
 
-export const RIM_FRAG = /* glsl */ `
-uniform float uTime;
-uniform float uAlpha;
-uniform float uHeading;
-uniform float uInner;
-uniform float uOuter;
-uniform float uDetail;
-uniform vec3 uColor;
-uniform vec3 uStorm;
-varying vec3 vLocal;
-${NOISE}
-void main() {
-  float r = length(vLocal.xz);
-  float a = atan(vLocal.x, vLocal.z);
-  // Ragged inner edge: where the safe floor ends.
-  float rag = (kn(vec2(a * 18.0, uTime * 0.8)) - 0.5) * 1.1;
-  float d = r - (uInner + rag);
-  if (d < -0.6) discard;
-  float band = clamp(d / max(uOuter - uInner, 0.1), 0.0, 1.0);
-  float facing = 0.4 + 0.6 * max(0.0, cos(a - uHeading));
-  // Streaks racing round with the wind, forks flickering through them.
-  float streak = smoothstep(0.35, 1.0, sin(a * 60.0 - uTime * 10.0 + kn(vec2(a * 8.0, r)) * 4.0));
-  float t = floor(uTime * 9.0);
-  float fork = pow(max(kridge(vec2(a * 14.0 + t * 1.7, r * 0.9)), 0.0), 20.0);
-  float edgeLine = 1.0 - smoothstep(0.0, 0.35, abs(d));
-  float halo = 1.0 - smoothstep(0.0, 2.0, abs(d));
-  vec3 col = uColor * (edgeLine * 1.4 + halo * 0.25) + mix(uColor, vec3(1.0), 0.35) * edgeLine * 0.4;
-  col += uStorm * band * (0.18 + 0.4 * streak * uDetail) * facing;
-  col += vec3(0.92, 0.9, 1.0) * fork * band * 0.8 * uDetail;
-  col += uColor * smoothstep(0.85, 1.0, band) * 0.5;
-  gl_FragColor = vec4(col * uAlpha * step(-0.6, d), 1.0);
-}
-`;
-
 export const UNBOUND_FRAG = /* glsl */ `
 uniform float uTime;
 uniform float uK;
@@ -249,7 +239,7 @@ uniform vec3 uQuench;
 uniform vec3 uBreath;
 uniform vec3 uHammer;
 varying vec3 vLocal;
-${NOISE}
+${KIT_NOISE}
 void main() {
   float r = length(vLocal.xz);
   float a = atan(vLocal.x, vLocal.z);
@@ -280,7 +270,7 @@ uniform vec3 uQuench;
 uniform vec3 uBreath;
 uniform vec3 uHammer;
 varying vec3 vLocal;
-${NOISE}
+${KIT_NOISE}
 void main() {
   float r = length(vLocal.xz);
   float a = atan(vLocal.x, vLocal.z);

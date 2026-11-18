@@ -31,6 +31,7 @@ import {
   COUNCIL_TUNING as T,
 } from '../../sim/encounters/smith_heart/council_ids';
 import { rushReach } from '../../sim/encounters/smith_heart/council_rush_reach';
+import { FINAL_DIFFICULTY } from '../../sim/encounters/smith_heart/final_ids';
 import { TELEGRAPH_THREAT_COLORS } from '../floor_telegraph/telegraph_look_core';
 import { fxHash } from './hammer_fx_core';
 
@@ -90,8 +91,11 @@ export function inSmithHeartClaim(x: number, z: number): boolean {
 }
 
 export const COUNCIL_FX_POOLS = {
-  /** Every standing pillar plus as many still falling (a Wrath can break all). */
-  pillars: T.pillarCap * 2,
+  /** Every standing pillar plus as many still falling (a Wrath can break all),
+   *  and the Masterless Strength's own (Wake the Stone, the rework of
+   *  2026-11-18: its biggest cap, in the Heart while the quarry's columns
+   *  stand far off in the claim). */
+  pillars: T.pillarCap * 2 + FINAL_DIFFICULTY.normal.pillarCap,
   fallen: 4,
   /** Rubble lies 8 s: room for every pillar breaking inside that window. */
   rubble: T.pillarCap + 2,
@@ -391,6 +395,17 @@ export const CURSED_COLORS = {
   core: [1.0, 0.6, 0.82] as const,
   edge: [0.78, 0.06, 0.4] as const,
   hex: 0xd8327e,
+} as const;
+
+/** A Storm-Charged pillar's light (the Masterless Strength's Wake the Stone
+ *  pillars a Sky Strike ran into, the rework of 2026-11-18): violet-white,
+ *  told from the cursed pillar's crimson at a glance. Its frame is the cursed
+ *  pillar's (cracks open and burning, the sheath breathing, a flare on each
+ *  pulse) in this light. */
+export const CHARGED_COLORS = {
+  core: [0.95, 0.92, 1.0] as const,
+  edge: [0.55, 0.4, 1.0] as const,
+  hex: 0xc8b4ff,
 } as const;
 
 /** The cursed pillar's look: its cracks always open, its heat and sheath

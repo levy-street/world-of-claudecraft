@@ -8,7 +8,10 @@
 // the rise, a lost piece, the fall into rubble, the sinking; the rubble's
 // hazard footprint; the Guardian's cursed pillar (a risen needle whose cracks
 // and sheath burn crimson-magenta, no pips: it shelters nobody), its pulse
-// and its break. Every shell, pip, lean and footprint draws on every tier;
+// and its break; the Masterless Strength's pillars (Wake the Stone, the
+// rework of 2026-11-18: risen needles with no pips, they break whole), and a
+// Storm-Charged one burning violet-white in the cursed pillar's frame. Every
+// shell, pip, lean and footprint draws on every tier;
 // the dust, grit and debris thin with the host's density.
 
 import * as THREE from 'three';
@@ -34,6 +37,7 @@ import {
 import type { EngineParticles } from '../trash_engine_fx/engine_particles';
 import {
   COUNCIL_FX_COLORS as C,
+  CHARGED_COLORS,
   COVER_BREATH,
   CURSED_COLORS,
   crackFlash,
@@ -77,6 +81,7 @@ function hexRgb(hex: number): readonly [number, number, number] {
   return [((hex >> 16) & 255) / 255, ((hex >> 8) & 255) / 255, (hex & 255) / 255];
 }
 const CURSED_RGB = hexRgb(CURSED_COLORS.hex);
+const CHARGED_RGB = hexRgb(CHARGED_COLORS.hex);
 const _soulMote = {
   speed: 0.5,
   up: 2.2,
@@ -266,6 +271,10 @@ interface PillarSlot {
   cursed: boolean;
   /** When the cursed pillar last pulsed (the host clock). */
   pulseAt: number;
+  /** The Masterless Strength's pillar (no pips, no shelter). */
+  final: boolean;
+  /** A lit pillar's light: the cursed crimson or Storm-Charged violet. */
+  light: 'cursed' | 'charged';
   soulGlow: THREE.Mesh;
   soulGlowMat: THREE.ShaderMaterial;
   /** Seconds of motes owed (a soul's light rising off its cracks). */
@@ -430,6 +439,8 @@ export class CouncilPillarsFx {
         soul: null,
         cursed: false,
         pulseAt: -99,
+        final: false,
+        light: 'cursed',
         soulGlow,
         soulGlowMat,
         motes: 0,
@@ -483,7 +494,7 @@ export class CouncilPillarsFx {
   shelters(out: { x: number; z: number; r: number }[]): number {
     let n = 0;
     for (const s of this.pillars) {
-      if (s.state !== 'standing' || s.soul || s.cursed) continue;
+      if (s.state !== 'standing' || s.soul || s.cursed || s.final) continue;
       if (n >= out.length) out.push({ x: 0, z: 0, r: 0 });
       out[n].x = s.x;
       out[n].z = s.z;
@@ -642,13 +653,18 @@ export class CouncilPillarsFx {
     risen: boolean,
     soul: CouncilRole | null = null,
     cursed = false,
+    /** The Masterless Strength's pillar, and whether it is Storm-Charged. */
+    final = false,
+    charged = false,
   ): void {
     let s = this.pillars.find((p) => p.id === e.id && p.state === 'standing');
     if (!s) {
       s = this.pillars.find((p) => p.state === 'idle');
       if (!s) return;
       s.id = e.id;
+      s.light = 'cursed';
       this.setSoul(s, null);
+      s.final = final;
       s.pulseAt = -99;
       s.state = 'standing';
       s.risen = risen;
@@ -681,7 +697,14 @@ export class CouncilPillarsFx {
     }
     s.seen = true;
     s.integrity = integrity;
-    if (s.soul !== soul || s.cursed !== cursed) this.setSoul(s, soul, cursed);
+    const lit = cursed || charged;
+    const light = charged ? 'charged' : 'cursed';
+    if (s.soul !== soul || s.cursed !== lit || (lit && s.light !== light)) {
+      // Charged: it flares as the lightning runs in.
+      if (charged && !(s.cursed && s.light === 'charged')) s.pulseAt = this.h.now();
+      s.light = light;
+      this.setSoul(s, soul, lit);
+    }
     this.dressPillar(s);
   }
 
@@ -693,7 +716,7 @@ export class CouncilPillarsFx {
     const u = s.shellMat.uniforms;
     const pu = s.pipsMat.uniforms;
     if (soul || s.cursed) {
-      const c = soul ? SOUL_COLORS[soul] : CURSED_COLORS;
+      const c = soul ? SOUL_COLORS[soul] : s.light === 'charged' ? CHARGED_COLORS : CURSED_COLORS;
       (u.uCore.value as THREE.Color).setRGB(c.core[0], c.core[1], c.core[2]);
       (u.uEdge.value as THREE.Color).setRGB(c.edge[0], c.edge[1], c.edge[2]);
       (pu.uOn.value as THREE.Color).setHex(c.hex);
@@ -990,14 +1013,17 @@ export class CouncilPillarsFx {
         s.pipsMat.uniforms.uLit.value = pillarPips(s.integrity, s.risen);
         s.pipsMat.uniforms.uSlots.value = pillarPipSlots(s.risen);
         s.pipsMat.uniforms.uFlash.value = flash;
-        s.pips.visible = true;
-        this.paintSockets(
-          s,
-          pillarPipSlots(s.risen),
-          pillarPips(s.integrity, s.risen),
-          C.pipLit,
-          flash,
-        );
+        // The Masterless Strength's pillars have no pips (they break whole).
+        s.pips.visible = !s.final;
+        if (s.final) this.sockets.hide(s.index);
+        else
+          this.paintSockets(
+            s,
+            pillarPipSlots(s.risen),
+            pillarPips(s.integrity, s.risen),
+            C.pipLit,
+            flash,
+          );
         // Grit off a cracked pillar.
         if (look.grit > 0 && this.h.density > 0.5) {
           s.grit += dt * look.grit;
@@ -1078,6 +1104,8 @@ export class CouncilPillarsFx {
     s.id = -1;
     s.holder.visible = false;
     s.shell.visible = false;
+    s.final = false;
+    s.light = 'cursed';
     this.setSoul(s, null);
   }
 
@@ -1151,7 +1179,7 @@ export class CouncilPillarsFx {
     this.sockets.hide(s.index);
     if (this.h.density > 0.5) {
       s.motes += dt * 8;
-      _soulMote.color = CURSED_RGB;
+      _soulMote.color = s.light === 'charged' ? CHARGED_RGB : CURSED_RGB;
       _soulMote.up = 1.6;
       _soulMote.life = 1.8;
       while (s.motes >= 1) {
@@ -1182,13 +1210,20 @@ export class CouncilPillarsFx {
     const s = this.pillars.find((p) => p.id === id && p.state === 'standing');
     if (!s?.cursed) return;
     s.pulseAt = this.h.now();
-    this.h.particles.shockRing(s.x, s.z, CURSED_COLORS.hex, s.radius + 9, 0.7);
+    const charged = s.light === 'charged';
+    this.h.particles.shockRing(
+      s.x,
+      s.z,
+      charged ? CHARGED_COLORS.hex : CURSED_COLORS.hex,
+      s.radius + 9,
+      0.7,
+    );
     this.h.particles.puff(s.x, s.y + s.height * 0.5, s.z, 10, {
       speed: 3,
       up: 1,
       life: 0.7,
       size: [1.2, 3],
-      color: CURSED_RGB,
+      color: charged ? CHARGED_RGB : CURSED_RGB,
       alpha: 0.7,
       pool: 'glow',
       radius: s.radius,
