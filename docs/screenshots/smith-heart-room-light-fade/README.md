@@ -3,9 +3,16 @@
 Walking from one of the raid's rooms into the next (a vein into the Ring, the Ring into
 a vein, the hop into the Heart), the room's light used to change in one frame: its fog,
 the key and fill lights' colours and strengths, the rim and the key light's direction all
-snapped to the new room's while the raid's own sky took about a second to blend. Now the
-whole look crossfades over one second (smoothstep), the key light swinging round over the
-top so the shadows turn with it. The way into the raid and out of it still cuts.
+snapped to the new room's while the raid's own sky took about a second to blend. Now every
+room shares one sun (`SMITH_HEART_KEY_DIRECTION`, low in the south-east), so no shadow
+ever moves between rooms, and the rest of the look (fog, the light's colours and
+strengths, the rim) crossfades over one second (smoothstep). The way into the raid and
+out of it still cuts.
+
+The frames and the measurements below were taken on the first version of the fade, when
+each room still had its own sun: their fog and colours are as now, but the Ring's
+shadows in them still fall the Ring's old way and the key swung round. Re-shoot them
+before this goes up.
 
 ## Frames
 
@@ -43,4 +50,7 @@ fade only rewrites uniforms the settle already wrote, on the one sun and hemisph
   old one back and steps toward the new one each frame. `tests/fog_scene_fade.test.ts`,
   which also pins the renderer's wiring.
 - `src/render/renderer.ts`: the settle edge routes through the fade, steps it each frame,
-  turns the key light through it, and drops it on the rift's per-frame rig.
+  turns the key light through it (a no-op inside the raid now), and drops it on the rift's
+  per-frame rig.
+- `src/render/smith_heart/heart_environment.ts`: `SMITH_HEART_KEY_DIRECTION`, the one sun
+  every room's rig reads; pinned in `tests/fog_scene_fade_core.test.ts`.

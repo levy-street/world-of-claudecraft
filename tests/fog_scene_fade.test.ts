@@ -207,32 +207,50 @@ describe('FogSceneFade between two of the raid rooms', () => {
     expect(shown(r)).toEqual(painted(0.2));
   });
 
-  it('turns the key light from the old room toward the new one, ending on it', () => {
+  it('never moves the key light (so no shadow) on a crossing: the rooms share one sun', () => {
     const r = makeRig();
     const dir = new THREE.Vector3();
-    const ringDir = new THREE.Vector3();
-    const quenchDir = new THREE.Vector3();
-    interiorKeyLightDirection('smithHeartRing', ringDir);
-    interiorKeyLightDirection('smithHeartQuench', quenchDir);
-    // The renderer's key light each frame: the state's direction, then the turn.
+    const sun = new THREE.Vector3();
+    interiorKeyLightDirection('smithHeartRing', sun);
+    // The renderer's key light each frame: the state's direction, then the fade's turn.
     const frame = (state: FogSceneState) => {
       interiorKeyLightDirection(state, dir);
       r.fade.keyDirection(dir);
     };
     r.fade.settle('smith_heart', dir, () => applyState(r, 'smithHeartRing'));
     frame('smithHeartRing');
-    expect(dir.equals(ringDir)).toBe(true);
+    expect(dir.equals(sun)).toBe(true);
     r.fade.settle('smith_heart', dir, () => applyState(r, 'smithHeartQuench'));
-    frame('smithHeartQuench');
-    expect(dir.distanceTo(ringDir)).toBeLessThan(1e-9);
+    for (const dt of [0, 0.25, 0.25, 0.25, 0.3]) {
+      r.fade.step(dt);
+      frame('smithHeartQuench');
+      expect(dir.distanceTo(sun)).toBeLessThan(1e-9);
+    }
+  });
+
+  it('turns a key that does differ from the drawn one to the new one, on the look eased curve', () => {
+    const r = makeRig();
+    const from = new THREE.Vector3(0.32, 0.6, 0.73).normalize();
+    const to = new THREE.Vector3(0.56, 0.56, -0.6).normalize();
+    const dir = new THREE.Vector3();
+    const frame = () => {
+      dir.copy(to);
+      r.fade.keyDirection(dir);
+    };
+    r.fade.settle('smith_heart', from, () => paint(r, 0.2));
+    r.fade.settle('smith_heart', from, () => paint(r, 0.6));
+    frame();
+    expect(dir.distanceTo(from)).toBeLessThan(1e-9);
+    // A quarter of the way in time is smoothstep(0.25) of the way round.
+    r.fade.step(0.25);
+    frame();
+    expect(dir.distanceTo(from.clone().lerp(to, 0.15625).normalize())).toBeLessThan(1e-9);
+    r.fade.step(0.25);
+    frame();
+    expect(dir.angleTo(from)).toBeCloseTo(dir.angleTo(to), 9);
     r.fade.step(0.5);
-    frame('smithHeartQuench');
-    expect(dir.length()).toBeCloseTo(1, 9);
-    expect(dir.angleTo(ringDir)).toBeCloseTo(dir.angleTo(quenchDir), 9);
-    expect(dir.angleTo(ringDir)).toBeGreaterThan(0.3);
-    r.fade.step(0.5);
-    frame('smithHeartQuench');
-    expect(dir.equals(quenchDir)).toBe(true);
+    frame();
+    expect(dir.equals(to)).toBe(true);
   });
 });
 

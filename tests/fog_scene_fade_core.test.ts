@@ -25,6 +25,7 @@ import {
   SMITH_HEART_CORE_LIGHT,
   SMITH_HEART_HAMMER_LIGHT,
   SMITH_HEART_HEAT_LIGHT,
+  SMITH_HEART_KEY_DIRECTION,
   SMITH_HEART_QUENCH_LIGHT,
   SMITH_HEART_RING_LIGHT,
 } from '../src/render/smith_heart/heart_environment';
@@ -156,6 +157,10 @@ describe('sceneFadeEase', () => {
     expect(sceneFadeEase(0.5)).toBe(0.5);
     expect(sceneFadeEase(-2)).toBe(0);
     expect(sceneFadeEase(3)).toBe(1);
+    // The smoothstep itself, not just its shape (a smootherstep or a sine
+    // ease would pass every shape check).
+    expect(sceneFadeEase(0.25)).toBe(0.15625);
+    expect(sceneFadeEase(0.75)).toBe(0.84375);
     expect(sceneFadeEase(0.25)).toBeLessThan(0.25);
     expect(sceneFadeEase(0.75)).toBeGreaterThan(0.75);
     let last = 0;
@@ -203,10 +208,12 @@ describe('blendSceneLookInto', () => {
 });
 
 describe('blendKeyDirectionInto', () => {
-  const ring = unit(SMITH_HEART_RING_LIGHT.keyDirection);
-  const quench = unit(SMITH_HEART_QUENCH_LIGHT.keyDirection);
+  // Two keys a quarter turn apart (every raid room now shares one sun, so the
+  // turn is exercised on keys of its own).
+  const ring = unit([0.32, 0.6, 0.73]);
+  const quench = unit([0.56, 0.56, -0.6]);
 
-  it('starts on the old room key, ends exactly on the new one, and turns evenly between', () => {
+  it('starts on the old key, ends exactly on the new one, and turns evenly between', () => {
     const out = { x: 0, y: 0, z: 0 };
     blendKeyDirectionInto(out, ring, quench, 0);
     expect(out.x).toBeCloseTo(ring.x, 12);
@@ -233,28 +240,28 @@ describe('blendKeyDirectionInto', () => {
     const down = { x: 0, y: -1, z: 0 };
     expect(blendKeyDirectionInto({ x: 0, y: 0, z: 0 }, up, down, 0.5)).toEqual(down);
   });
+});
 
-  it('keeps the key above the horizon the whole way between any two of the raid rooms', () => {
-    // A key that dipped under the floor mid-fade would light the room from
-    // below and throw every shadow up the walls for a moment.
-    const keys = [
+describe('the raid sun', () => {
+  it('lights every raid room from one sun, so walking between them never moves a shadow', () => {
+    // The owner's call of 2026-11-19: the light changes between rooms, never
+    // the shadows' direction. Every room's rig reads the one constant.
+    for (const light of [
       SMITH_HEART_CORE_LIGHT,
       SMITH_HEART_HAMMER_LIGHT,
       SMITH_HEART_RING_LIGHT,
       SMITH_HEART_BREATH_LIGHT,
       SMITH_HEART_QUENCH_LIGHT,
       SMITH_HEART_HEAT_LIGHT,
-    ].map((l) => unit(l.keyDirection));
-    const out = { x: 0, y: 0, z: 0 };
-    for (const from of keys) {
-      for (const to of keys) {
-        for (let k = 0; k <= 1.0001; k += 0.05) {
-          blendKeyDirectionInto(out, from, to, k);
-          expect(Math.hypot(out.x, out.y, out.z)).toBeCloseTo(1, 9);
-          expect(out.y).toBeGreaterThan(0.5);
-        }
-      }
+    ]) {
+      expect(light.keyDirection).toBe(SMITH_HEART_KEY_DIRECTION);
     }
+    // Low in the south-east (the Quench's and the Heat's own angle), well
+    // above the floor so no shadow is thrown up a wall.
+    const sun = unit(SMITH_HEART_KEY_DIRECTION);
+    expect(sun.x).toBeGreaterThan(0.3);
+    expect(sun.z).toBeLessThan(-0.3);
+    expect(sun.y).toBeGreaterThan(0.5);
   });
 });
 
@@ -268,7 +275,7 @@ describe('the fade clock', () => {
     // A walk into the next room fades.
     expect(beginSceneFade(fade, 'smith_heart')).toBe(1);
     expect(sceneFadeProgress(fade)).toBe(0);
-    expect(stepSceneFade(fade, 0.25)).toBeCloseTo(sceneFadeEase(0.25), 12);
+    expect(stepSceneFade(fade, 0.25)).toBeCloseTo(0.15625, 12);
     expect(stepSceneFade(fade, 0.25)).toBeCloseTo(0.5, 12);
     // A backwards or empty frame never runs the clock back.
     expect(stepSceneFade(fade, -1)).toBeCloseTo(0.5, 12);

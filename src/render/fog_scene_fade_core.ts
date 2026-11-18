@@ -3,9 +3,11 @@
 // lands at once everywhere except between the Smith's Heart's rooms, where the
 // look the scene showed fades into the new room's over a second: the fog's
 // colour and reach, the key and fill lights' colours and strengths, the sky's
-// reflection, the rim, and the key light's direction (so the shadows swing
-// round with it). The owner's ask of 2026-11-19: walking from a vein into the
-// Ring snapped the whole room's light in one frame while its sky blended.
+// reflection, the rim, and the key light's direction should two rooms ever
+// differ (every room shares one sun, smith_heart/heart_environment.ts
+// `SMITH_HEART_KEY_DIRECTION`, so inside the raid no shadow moves). The owner's
+// ask of 2026-11-19: walking from a vein into the Ring snapped the whole room's
+// light in one frame while its sky blended.
 //
 // This module owns which settles fade, how long they take, and the blend; the
 // painter (fog_scene_fade.ts) reads and writes the scene.
