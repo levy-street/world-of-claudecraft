@@ -26,9 +26,9 @@ export const QUARTERED_ISLE_MOBS: Record<string, MobTemplate> = {
     hpPerLevel: 34,
     dmgBase: 17,
     dmgPerLevel: 3.0,
-    attackSpeed: 2.6, // a slow, heavy stone fist
-    armorPerLevel: 19, // dressed granite over raw rock
-    moveSpeed: 7,
+    attackSpeed: 2.3,
+    armorPerLevel: 17, // dressed granite over raw rock
+    moveSpeed: 8,
     aggroRadius: 14, // it still watches the ground the council gave it
     elite: true,
     loot: [{ copper: 100, chance: 1 }],

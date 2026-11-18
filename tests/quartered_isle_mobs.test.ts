@@ -40,6 +40,13 @@ describe('the Remnant of the First Colossus', () => {
     expect(m.elite).toBe(true);
     expect(m.family).toBe('elemental');
     expect([m.hpBase, m.hpPerLevel, m.dmgBase, m.dmgPerLevel]).toEqual([155, 34, 17, 3.0]);
+    // the band's swing, armour and pace too (the Wreck Warden, the Pale Huntsman, the
+    // Topiary Bull): 2.2 to 2.3 s, 17 armour a level, 8 to 8.5 yd/s
+    expect(m.attackSpeed).toBeGreaterThanOrEqual(2.2);
+    expect(m.attackSpeed).toBeLessThanOrEqual(2.3);
+    expect(m.armorPerLevel).toBe(17);
+    expect(m.moveSpeed).toBeGreaterThanOrEqual(8);
+    expect(m.moveSpeed).toBeLessThanOrEqual(8.5);
     expect(MOBS.the_wreck_warden.hpBase).toBe(m.hpBase);
     expect(m.bodyRadius).toBeGreaterThan(1);
   });
