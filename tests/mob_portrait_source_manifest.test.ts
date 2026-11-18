@@ -114,7 +114,8 @@ describe('mob portrait source manifest', () => {
     // teammate pulls out, wildheart_hunting_spear).
     // 361: plus the Quartered Isle's first mob, the Heavestone named elite
     // (remnant_first_colossus).
-    expect(liveIds).toHaveLength(361);
+    // 370: plus the isle's other nine mobs (content/quartered_isle_mobs.ts).
+    expect(liveIds).toHaveLength(370);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);

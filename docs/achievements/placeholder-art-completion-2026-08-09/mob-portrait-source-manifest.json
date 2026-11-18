@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "bfbf929fca05df488b81491ff7d2642d467b38fa5c0cc997929cb64dcfc3c971",
+  "rendererFingerprint": "a37658d7b7ea0a6fef22cb09f7a8b4b854d402e1dcff228b9a9021433bdcf16a",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "linux",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6954498,
-      "sha256": "a4bb67f65d8b5590b032ae0844cd1ce08199259672d5b47552c422b618482fe6",
+      "bytes": 6975598,
+      "sha256": "aa8f477e4f514750ad501c37020f524ffda0fa825c22a7a95260b9573f0b9990",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 361,
+  "portraitCount": 370,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -1353,6 +1353,40 @@
         "path": "public/ui/mobs/choirmother_selthe.webp",
         "bytes": 2460,
         "sha256": "265d4e38a9442cf7b49d870c8aa9a9583bfa44085c6679357d8291671aaca1ac"
+      }
+    },
+    {
+      "id": "cinderscar_caller",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_hoard_ember_fiend",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/hoard_ember_fiend.glb",
+          "path": "public/models/creatures/hoard_ember_fiend.glb",
+          "bytes": 1972996,
+          "sha256": "8713146041d0ec6eb3d0dff3ff7bdbe127b385205c8f1cdf4a1d86c1856c677a"
+        },
+        "idle": "Idle",
+        "height": 2.9,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "808f8858f6744d274cdf131e52c4997fc4b9a41d6c7f5cd0fbae627dbebccf65",
+      "output": {
+        "path": "public/ui/mobs/cinderscar_caller.webp",
+        "bytes": 2306,
+        "sha256": "089cc290e93bf10a3f7acc3c6903778320f2cd121dc656eb845d42488e22a8cd"
       }
     },
     {
@@ -3161,6 +3195,40 @@
         "path": "public/ui/mobs/edda_reedhand.webp",
         "bytes": 2974,
         "sha256": "48e27d74baa0e46429c281ec4da02a7314b6ebcfbd90e9198ee707f0971b3c88"
+      }
+    },
+    {
+      "id": "ember_hound",
+      "family": "beast",
+      "finderEncounter": false,
+      "visualKey": "mob_wolf",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/wolf_basic.glb",
+          "path": "public/models/creatures/wolf_basic.glb",
+          "bytes": 369180,
+          "sha256": "1d8c3c652467f2e4ba8b9746f926eda43254adf5ddaaca722dce582ec629d381"
+        },
+        "idle": "Idle",
+        "height": 1.47,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.35
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#3a2a24",
+        "strength": 0.35
+      },
+      "sourceFingerprint": "e8775327c5d15f4b20af690790b5a06fa8bde68679b48c39910a6a495bbb0a7d",
+      "output": {
+        "path": "public/ui/mobs/ember_hound.webp",
+        "bytes": 1984,
+        "sha256": "70f49a551a7082d58ac73654a939c52e6db77446b89f0136b2eb0d4e53b017eb"
       }
     },
     {
@@ -5088,6 +5156,74 @@
         "path": "public/ui/mobs/healing_dummy_tank.webp",
         "bytes": 1762,
         "sha256": "d2c2d550dbb31b97be04cc46277cc9aa7f8fe13f3094b515bef89a1dec68284c"
+      }
+    },
+    {
+      "id": "heatsworn_ember",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_emberkin",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/emberkin.glb",
+          "path": "public/models/creatures/emberkin.glb",
+          "bytes": 1415428,
+          "sha256": "845af8ccbc2eee155ec3149f95a8309b8f4a61d43bd1ebb9ab822d258e912993"
+        },
+        "idle": "Idle",
+        "height": 2.1,
+        "yaw": -1.5707963267948966,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "67141ec3a8be93179edd31d8e6a5ea1529534def8b213246cc24baed19c618eb",
+      "output": {
+        "path": "public/ui/mobs/heatsworn_ember.webp",
+        "bytes": 2028,
+        "sha256": "507b1388afd128d2d66d9b3ef200efa911b8cbe3908c3844c09b3e5bfcbca5de"
+      }
+    },
+    {
+      "id": "heaved_shardling",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_elemental",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/golelingevolved.glb",
+          "path": "public/models/creatures/golelingevolved.glb",
+          "bytes": 85588,
+          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+        },
+        "idle": "Flying_Idle",
+        "height": 2.2,
+        "yaw": null,
+        "hover": 0.3,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.4
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#c8903c",
+        "strength": 0.4
+      },
+      "sourceFingerprint": "93e3863b5046de8577945024bf2323c56f1f1895c9c6d1a0fc53d65514e5ba9a",
+      "output": {
+        "path": "public/ui/mobs/heaved_shardling.webp",
+        "bytes": 2436,
+        "sha256": "f68ff12e797a886b99bc5dfa0c451bf752d0256f09b1ee08c4f4b3c6a53d92ce"
       }
     },
     {
@@ -8563,6 +8699,40 @@
       }
     },
     {
+      "id": "quench_shardling",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_hoard_rime_elemental",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/hoard_rime_elemental.glb",
+          "path": "public/models/creatures/hoard_rime_elemental.glb",
+          "bytes": 794868,
+          "sha256": "d358238863159c91c58b8e81086b1954c8ad6f4d0f3931358acb825599259c5e"
+        },
+        "idle": "Idle",
+        "height": 3.9,
+        "yaw": -1.5707963267948966,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.35
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#9fd8ff",
+        "strength": 0.35
+      },
+      "sourceFingerprint": "cc8733f7728f0c98c964df45b8dcac918404b9331a14287fee6af6bec73ee681",
+      "output": {
+        "path": "public/ui/mobs/quench_shardling.webp",
+        "bytes": 2196,
+        "sha256": "bf0d5023a22644ad6660b9023314d31fab4a0dd1fcf868c66432055457f47d8f"
+      }
+    },
+    {
       "id": "raised_bonewalker",
       "family": "undead",
       "finderEncounter": false,
@@ -10209,6 +10379,40 @@
       }
     },
     {
+      "id": "rimeglass_bear",
+      "family": "beast",
+      "finderEncounter": false,
+      "visualKey": "mob_bear",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/yetialt.glb",
+          "path": "public/models/creatures/yetialt.glb",
+          "bytes": 149784,
+          "sha256": "6c14f370c2aff231186aee084902113e58823e1cd97f5dd9958417c4a9288767"
+        },
+        "idle": "Idle",
+        "height": 2.2,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.5
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#5a4030",
+        "resolved": "#5a4030",
+        "strength": 0.5
+      },
+      "sourceFingerprint": "9d9c62362e9d5d894cef31ff20e661aadb53eb987384a937bc29d47032e0e75e",
+      "output": {
+        "path": "public/ui/mobs/rimeglass_bear.webp",
+        "bytes": 1930,
+        "sha256": "d493492ccfde4e608bde39b32bd88c4737912c32a5584370363eafc8bf362fc0"
+      }
+    },
+    {
       "id": "rimeweb",
       "family": "undead",
       "finderEncounter": true,
@@ -11422,6 +11626,40 @@
         "path": "public/ui/mobs/terrace_howler.webp",
         "bytes": 2096,
         "sha256": "1ce995526b30ad083de71a27de243701617f6e89619966ea1bdbce4c56afb620"
+      }
+    },
+    {
+      "id": "the_glassfield_brute",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_hoard_magma_brute",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/hoard_magma_brute.glb",
+          "path": "public/models/creatures/hoard_magma_brute.glb",
+          "bytes": 1944796,
+          "sha256": "474f4608e3358a67d4c307c868a320d29fc0fa55360b50763c6ea660d5bdd3c5"
+        },
+        "idle": "Idle",
+        "height": 4.1,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "3fae7fdf5ebaba1420fef5c34e2f8d2297047d1c246c0127f30bebffa19c118d",
+      "output": {
+        "path": "public/ui/mobs/the_glassfield_brute.webp",
+        "bytes": 2724,
+        "sha256": "47ed0023ffb30b7dfc10c21397b8729059c72ef08cb4dceb394e8a2120652665"
       }
     },
     {
@@ -13350,6 +13588,40 @@
       }
     },
     {
+      "id": "veinback_burrower",
+      "family": "beast",
+      "finderEncounter": false,
+      "visualKey": "mob_grubjaw",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/grubjaw.glb",
+          "path": "public/models/creatures/grubjaw.glb",
+          "bytes": 318432,
+          "sha256": "6d109e187a9938231950a2997924bf66f095ed060d8a6eea77fc9cd871a06bd9"
+        },
+        "idle": "Idle",
+        "height": 2.9,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.04
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#b08a5a",
+        "strength": 0.04
+      },
+      "sourceFingerprint": "e41f3007f35490eed30a61d6b1fd6e039f016481419e0b7ea5cfcf7c91de93ab",
+      "output": {
+        "path": "public/ui/mobs/veinback_burrower.webp",
+        "bytes": 2472,
+        "sha256": "3b2e1c7645367b39f90f858e85653591703b540b42b0bb18f31392aeaccb0845"
+      }
+    },
+    {
       "id": "vine_lasher",
       "family": "elemental",
       "finderEncounter": false,
@@ -13731,6 +14003,40 @@
         "path": "public/ui/mobs/waking_warden.webp",
         "bytes": 2822,
         "sha256": "0e6bd28dda80c284c50d64743333b719e206b8179b3b84ff44f643e1c6bcc3c7"
+      }
+    },
+    {
+      "id": "warden_of_the_quench",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_hoard_hoarfrost_warden",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/hoard_hoarfrost_warden.glb",
+          "path": "public/models/creatures/hoard_hoarfrost_warden.glb",
+          "bytes": 1934580,
+          "sha256": "12746142e61c4e7c8accba47f7a8ae05a4feb02157482f4865a271a5d09e760e"
+        },
+        "idle": "Idle",
+        "height": 2.6,
+        "yaw": -1.5707963267948966,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "98c0d39ed4109f257401f9c03ae465267dbdceac305bdce809d51599d9ecf354",
+      "output": {
+        "path": "public/ui/mobs/warden_of_the_quench.webp",
+        "bytes": 3568,
+        "sha256": "e17c12177c1d984f89f3bd27fcb0f95a3ad7b3d5c035c09bd80fb5381ff64b8f"
       }
     },
     {

@@ -85,3 +85,73 @@ describe('the Remnant of the First Colossus', () => {
     }
   });
 });
+
+describe('every Quartered Isle camp', () => {
+  const quarterOf: Record<string, string> = {
+    quench_shardling: 'ice',
+    rimeglass_bear: 'ice',
+    warden_of_the_quench: 'ice',
+    heatsworn_ember: 'fire',
+    cinderscar_caller: 'fire',
+    ember_hound: 'fire',
+    the_glassfield_brute: 'fire',
+    heaved_shardling: 'earth',
+    veinback_burrower: 'earth',
+    remnant_first_colossus: 'earth',
+  };
+
+  it('puts every isle mob in a camp of its own quarter, named elites alone', () => {
+    expect(Object.keys(quarterOf).sort()).toEqual(Object.keys(QUARTERED_ISLE_MOBS).sort());
+    for (const id of Object.keys(QUARTERED_ISLE_MOBS)) {
+      const camps = QUARTERED_ISLE_CAMPS.filter((c) => c.mobId === id);
+      expect(camps.length, id).toBeGreaterThan(0);
+      for (const c of camps) {
+        expect(dominantQuarterAt(c.center.x, c.center.z), `${id} at ${c.center.x}`).toBe(
+          quarterOf[id],
+        );
+        if (QUARTERED_ISLE_MOBS[id].elite) expect(c.count, id).toBe(1);
+      }
+    }
+  });
+
+  it('stands on dry plate ground, off the crater ring and the town', () => {
+    const hub = QUARTERED_ISLE_ZONE.hub;
+    for (const c of QUARTERED_ISLE_CAMPS) {
+      const { x, z } = c.center;
+      const at = `${c.mobId} at (${x}, ${z})`;
+      expect(zoneAt(x, z).id, at).toBe('quartered_isle');
+      expect(groundHeight(x, z, WORLD_SEED), at).toBeGreaterThan(WATER_LEVEL + 1);
+      expect(isleFissureAt(x, z, 1), at).toBe(0);
+      // clear of the Challengers' Ring (the King of the Hill arena) and of Rivalmoot
+      expect(Math.hypot(x, z - 2122), at).toBeGreaterThan(70);
+      expect(Math.hypot(x - hub.x, z - hub.z), at).toBeGreaterThan(40);
+    }
+  });
+
+  it('draws every mob through a shipped body', () => {
+    for (const id of Object.keys(QUARTERED_ISLE_MOBS)) {
+      const def = VISUALS[mobVisualKey(id)];
+      expect(def, id).toBeDefined();
+      const file = resolve(__dirname, '../public', def.url.replace(/^\//, ''));
+      expect(existsSync(file), id).toBe(true);
+    }
+  });
+
+  it('keeps regulars on the open-ground band and named elites on the named band', () => {
+    for (const mob of Object.values(QUARTERED_ISLE_MOBS)) {
+      if (mob.elite) {
+        expect([mob.hpBase, mob.hpPerLevel, mob.dmgBase, mob.dmgPerLevel], mob.id).toEqual([
+          155, 34, 17, 3.0,
+        ]);
+        continue;
+      }
+      expect(mob.hpBase, mob.id).toBeGreaterThanOrEqual(52);
+      expect(mob.hpBase, mob.id).toBeLessThanOrEqual(58);
+      expect(mob.hpPerLevel, mob.id).toBeGreaterThanOrEqual(18);
+      expect(mob.hpPerLevel, mob.id).toBeLessThanOrEqual(19);
+      expect(mob.dmgBase, mob.id).toBeGreaterThanOrEqual(11);
+      expect(mob.dmgBase, mob.id).toBeLessThanOrEqual(12);
+      expect(mob.loot, mob.id).toEqual([{ copper: 105, chance: 1 }]);
+    }
+  });
+});

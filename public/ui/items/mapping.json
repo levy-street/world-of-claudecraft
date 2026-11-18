@@ -8602,6 +8602,23 @@
         "gurglegreen_cauldron"
       ],
       "commonPrompt": "Not a text-to-image prompt: a 512px Eevee render of the modelled subject, then scripts/convert_item_icons_webp.mjs to the 128px WebP."
+    },
+    {
+      "batchId": "quartered-isle-moot-rolls-icons-2026-11-19",
+      "source": "OpenAI gpt-image-2 image edit, one painting per item, two shipped quest-object icons as style references",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "sprung_trap.webp and hearth_ember_cache.webp, attached as style references only",
+      "commonPrompt": "Opaque near-black painted ground, warm rim light, one complete centred carved-stone object with safe padding, tactile weathered stone, no text or frame. Exact per-item prompts retained in provenance.",
+      "provenanceRecord": "docs/achievements/quartered-isle-moot-rolls-icons-2026-11-19/accepted-art.json",
+      "itemIds": [
+        "council_inscription",
+        "colossus_makers_mark"
+      ]
     }
   ]
 }

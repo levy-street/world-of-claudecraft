@@ -6720,6 +6720,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.wyrmfang_greatblade.name': 'ワーム牙の大剣',
   'entities.items.staff_of_the_gravewyrm.name': '墓ワームの杖',
   'entities.items.fang_of_korzul.name': 'コルズルの牙',
+  'entities.items.council_inscription.name': '評議会の碑文',
+  'entities.items.colossus_makers_mark.name': '巨像の作り手の刻印',
   'entities.items.trail_hardtack.name': 'ハイウォッチの旅堅パン',
   'entities.items.meltwater_flask.name': '雪解け水のフラスコ',
   'entities.items.roast_mountain_goat.name': '焼き山羊肉',
@@ -7813,6 +7815,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.shoal_scuttler.name': 'ショールスカトラー',
   'entities.mobs.the_wreck_warden.name': 'レックウォーデン',
   'entities.mobs.remnant_first_colossus.name': '最初の巨像の残骸',
+  'entities.mobs.quench_shardling.name': 'クエンチ・シャードリング',
+  'entities.mobs.rimeglass_bear.name': '霧氷鏡の熊',
+  'entities.mobs.warden_of_the_quench.name': 'クエンチの番人',
+  'entities.mobs.heatsworn_ember.name': '熱誓の残り火',
+  'entities.mobs.cinderscar_caller.name': '燼の傷跡の呼び手',
+  'entities.mobs.ember_hound.name': '残り火の猟犬',
+  'entities.mobs.the_glassfield_brute.name': '玻璃の原の暴れ者',
+  'entities.mobs.heaved_shardling.name': '隆起のシャードリング',
+  'entities.mobs.veinback_burrower.name': '鉱脈背の穴掘り',
   'entities.mobs.downs_bandit.name': '丘陵の盗賊',
   'entities.mobs.wreck_thief.name': '難破船の盗人',
   'entities.mobs.glimmerwisp.name': 'グリマーウィスプ',
@@ -8428,6 +8439,46 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gc_the_wreck_warden.completion':
     '奴が倒れた瞬間、浜が静まり返った、{playerName}。この岸で働いて十年、初めて聞く静けさだった。船員たちはもうただの骨だ。休んでいる骨だよ。ほら、山のてっぺんのマントをお取り。もともと、生きた背中にこそ似合うものだったのさ。',
   'entities.quests.q_gc_the_wreck_warden.objectives.0.label': 'レックウォーデンを打ち倒した',
+  'entities.quests.q_qi_the_moot_rolls.title': 'ムートの名簿',
+  'entities.quests.q_qi_the_moot_rolls.text':
+    'ライバルムートには、評議会に挑みに来たすべての挑戦者の名簿がある、{playerName}。なのに、なぜ評議会が挑むに値するのかは一行も書かれていない。私はその歴史を書くつもりだ。まずは広間のそばにいる隊長テサリーを訪ねてくれ。彼女の挑戦者たちはこの島のすべての地を歩いてきたし、兵士は学者の見落とすものを覚えているものだ。',
+  'entities.quests.q_qi_the_moot_rolls.completion':
+    'アンセルがあなたを？ようやく正しい相手に尋ねる気になったのですね。私の挑戦者たちは、どの地でもこの町より古い、文字の刻まれた石を見つけています。ここでは誰も読めません。そう彼に伝えてください。',
+  'entities.quests.q_qi_the_moot_rolls.objectives.0.label': '隊長テサリーと話した',
+  'entities.quests.q_qi_words_in_stone.title': '石に刻まれた言葉',
+  'entities.quests.q_qi_words_in_stone.text':
+    'テサリーの言う石は、評議会自身の碑文だ、{playerName}。名簿を賭けてもいい。三つが、戦争がもっとも深く大地を傷つけた場所に立っている。霜の岩棚に一つ、炎氷の裂け目のそばに一つ、鎚の切り通しの下に一つ。一つずつ読んで、一語残らず持ち帰ってくれ。',
+  'entities.quests.q_qi_words_in_stone.completion':
+    '氷、炎、岩。それぞれがこの島を自らの術のものだと主張し、三つとも同じ手で署名されている。評議会は四人の他人などではなかったのだ、{playerName}。自らと争う一つの評議会だったのだよ。',
+  'entities.quests.q_qi_words_in_stone.objectives.0.label': '評議会の碑文を読んだ',
+  'entities.quests.q_qi_servants_at_their_posts.title': '持ち場を守る僕たち',
+  'entities.quests.q_qi_servants_at_their_posts.text':
+    '碑文には評議会の僕たちのことが記されている。主が戻るまで各地を守ると誓った者たちだ。主は二度と戻らず、僕たちは守ることをやめなかった。数を減らしてくれ、{playerName}。霜の岩棚のクエンチ・シャードリングを六体、焦熱の水路の熱誓の残り火を六体、隆起した岩盤の隆起のシャードリングを六体だ。',
+  'entities.quests.q_qi_servants_at_their_posts.completion':
+    'それぞれ六体、おかげで各地が少し静かになった。奴らの核には碑文と同じ印が刻まれていた。僕たちを造った者が、石も造ったのだ。',
+  'entities.quests.q_qi_servants_at_their_posts.objectives.0.label':
+    'クエンチ・シャードリングを倒した',
+  'entities.quests.q_qi_servants_at_their_posts.objectives.1.label': '熱誓の残り火を倒した',
+  'entities.quests.q_qi_servants_at_their_posts.objectives.2.label': '隆起のシャードリングを倒した',
+  'entities.quests.q_qi_wardens_of_the_arts.title': '術の番人',
+  'entities.quests.q_qi_wardens_of_the_arts.text':
+    '評議会の番人のうち二体がまだ立っている。一体は霜の岩棚のクレバス群に、もう一体は燼の傷跡の玻璃の原に沈んでいる。碑文はそれらを各々の術の秘密の守り手と呼んでいて、素直に明かしはしないだろう、{playerName}。クエンチの番人と玻璃の原の暴れ者を倒してくれ。',
+  'entities.quests.q_qi_wardens_of_the_arts.completion':
+    '番人は二体とも砕けた。どちらも巨人の輪郭が刻まれた封印石を持っていた。評議会は結局、何かを共に造っていたのだ。彼らの誰よりも大きなものを。すべての印が隆起岩の荒野を指している。',
+  'entities.quests.q_qi_wardens_of_the_arts.objectives.0.label': 'クエンチの番人を倒した',
+  'entities.quests.q_qi_wardens_of_the_arts.objectives.1.label': '玻璃の原の暴れ者を倒した',
+  'entities.quests.q_qi_the_fallen_giant.title': '倒れた巨人',
+  'entities.quests.q_qi_the_fallen_giant.text':
+    '隆起岩の荒野、倒れた巨人が倒れた場所に、家ほどもある石の頭が横たわっている。挑戦者たちは像だと言う。私は、封印石が指しているのはあれだと思う。その上の作り手の刻印を見つけてくれ、{playerName}。そして誰の手が刻んだのか教えてほしい。',
+  'entities.quests.q_qi_the_fallen_giant.completion':
+    '四つの術のルーンが並んで、一つの刻印になっている。評議会は共に巨人を造ったのだ。彼らが初めて一つになって働いたときに。それはコルズルを押さえるためのもので、完成する前に倒れた。その一部が、今も自分の頭のそばで見張りに立っている。',
+  'entities.quests.q_qi_the_fallen_giant.objectives.0.label': '巨像の作り手の刻印を見つけた',
+  'entities.quests.q_qi_the_first_colossus.title': '最初の巨像',
+  'entities.quests.q_qi_the_first_colossus.text':
+    '最初の巨像は、あの獣を押さえることはなかった。それは倒れ、評議会は押さえきるもう一体を造った。だが最初の一体の残りは、今も倒れた巨人のそばで持ち場を守っている。半ばしか彫られず、長く忘れられ、近づく者を誰であれ打ち倒しながら。眠らせてやってくれ、{playerName}。この島の歴史を、戦争が終わったことを知らないままの番兵で終わらせるべきではない。',
+  'entities.quests.q_qi_the_first_colossus.completion':
+    'では残骸は眠りについた。そして名簿に初めて本当の章ができた。何一つ意見の合わなかった四人の好敵手が、ある日、共に巨人を造らねばならなくなるまでの話だ。ライバルムートはその歴史の一行をあなたに負っている、{playerName}。私が自ら書こう。',
+  'entities.quests.q_qi_the_first_colossus.objectives.0.label': '最初の巨像の残骸を倒した',
   'entities.quests.q_hub_know_your_numbers.title': '己の数字を知れ',
   'entities.quests.q_hub_know_your_numbers.text':
     '測れない力は伸ばせない力だ、{playerName}。訓練用人形を標的にして、ダメージメーターを開け。それから十回当てろ、剣でも呪文でも構わん。打ちながら窓を見ていろ、与えたダメージを数えてくれる。十回入ったら戻ってきて、その数字を教えろ。',
@@ -13817,6 +13868,22 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.bursar_maud_ashby.title': '金張りの金庫',
   'entities.npcs.bursar_maud_ashby.greeting':
     '金張りの金庫は、この島でもあなたの品を安全にお預かりします。',
+  'entities.npcs.keeper_ansel_morrow.name': '名簿番アンセル・モロウ',
+  'entities.npcs.keeper_ansel_morrow.title': 'ムート名簿の番人',
+  'entities.npcs.keeper_ansel_morrow.greeting':
+    'この丘を登ってくる挑戦者は、誰もが評議会に勝ちたがる、{playerName}。私が知りたいのは、なぜ評議会が打ち負かすに値するのかだ。',
+  'entities.npcs.innkeeper_bettany_quell.name': 'ベタニー・クエル',
+  'entities.npcs.innkeeper_bettany_quell.title': '宿屋の女将',
+  'entities.npcs.innkeeper_bettany_quell.greeting':
+    '扉のそばのブーツに気をつけてね。霜の岩棚のみぞれはどこにでも入り込むから。火は熾してあるし、シチューも温かいよ。今日負けた挑戦者だって、ちゃんと食べさせてあげる。',
+  'entities.npcs.outfitter_harl_bracken.name': 'ハール・ブラッケン',
+  'entities.npcs.outfitter_harl_bracken.title': '道具屋',
+  'entities.npcs.outfitter_harl_bracken.greeting':
+    '軟膏に強壮薬、それに旅の野営道具一式だ。ほかの物はこの四つの地がみんな壊しちまう、道具は自分で持ってきな。',
+  'entities.npcs.captain_thessaly_rivalmoot.name': '隊長テサリー',
+  'entities.npcs.captain_thessaly_rivalmoot.title': '挑戦者の長',
+  'entities.npcs.captain_thessaly_rivalmoot.greeting':
+    '評議会はあの峰に、誰も覚えていないほど長く、挑まれることなく座ってきました。私の挑戦者たちはそれを変えるつもりです。まずは傷跡の地で力を示してください、{playerName}。',
   'entities.items.furyforged_warhelm.name': '憤怒鋳りの戦兜',
   'entities.items.furyforged_warspaulders.name': '憤怒鋳りの戦肩当て',
   'entities.items.furyforged_warplate.name': '憤怒鋳りの戦鎧',

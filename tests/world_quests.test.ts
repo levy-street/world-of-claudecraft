@@ -221,10 +221,9 @@ describe('world quest content', () => {
     });
     expect(new Set(WORLD_QUESTS.map((quest) => quest.id)).size).toBe(WORLD_QUESTS.length);
     // Every shipped map carries a world quest except the Proving Shore tutorial
-    // island, which teaches the basics and offers none, and the Quartered Isle,
-    // whose mobs land in phase 2 (docs/prd/quartered-isle-zone.md): no live
-    // targets yet, so no objective may be authored over them.
-    const WORLD_QUEST_FREE_ZONES = new Set(['proving_shore', 'quartered_isle']);
+    // island, which teaches the basics and offers none. The Quartered Isle's mobs
+    // have landed (content/quartered_isle_mobs.ts), and its four zone hunts with them.
+    const WORLD_QUEST_FREE_ZONES = new Set(['proving_shore']);
     expect(new Set(WORLD_QUESTS.map((quest) => quest.zoneId))).toEqual(
       new Set(ZONES.map((zone) => zone.id).filter((id) => !WORLD_QUEST_FREE_ZONES.has(id))),
     );
@@ -750,10 +749,11 @@ describe('world quest lifecycle', () => {
 
     const firstQuests = activeWorldQuestsForCycle(firstCycle);
     const nextQuests = activeWorldQuestsForCycle(nextCycle);
-    expect(firstQuests).toHaveLength(16);
-    expect(new Set(firstQuests.map((quest) => quest.id)).size).toBe(16);
-    expect(nextQuests).toHaveLength(16);
-    expect(new Set(nextQuests.map((quest) => quest.id)).size).toBe(16);
+    // 17 boards a day with the Quartered Isle's.
+    expect(firstQuests).toHaveLength(17);
+    expect(new Set(firstQuests.map((quest) => quest.id)).size).toBe(17);
+    expect(nextQuests).toHaveLength(17);
+    expect(new Set(nextQuests.map((quest) => quest.id)).size).toBe(17);
     expect(nextQuests).not.toEqual(firstQuests);
     expect(activeWorldQuestsForCycle(firstCycle).map((quest) => quest.id)).toEqual(
       firstQuests.map((quest) => quest.id),
@@ -793,8 +793,8 @@ describe('world quest lifecycle', () => {
     for (let cycle = 0; cycle < 84; cycle++) {
       const cycleId = `wq1_${cycle}`;
       const roster = activeWorldQuestsForCycle(cycleId);
-      expect(roster).toHaveLength(16);
-      expect(new Set(roster.map((quest) => quest.id)).size).toBe(16);
+      expect(roster).toHaveLength(17);
+      expect(new Set(roster.map((quest) => quest.id)).size).toBe(17);
       expect(
         roster.filter((quest) => quest.zoneId === 'galecrest').map((quest) => quest.id),
       ).toEqual(['wq_galecrest_wisps', 'wq_galecrest_slalom']);

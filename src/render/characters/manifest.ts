@@ -8369,6 +8369,17 @@ const MOB_KEYS: Record<string, string> = {
   gloomshade: 'mob_gloomshade',
   pyre_colossus: 'mob_pyre_colossus',
   remnant_first_colossus: 'mob_remnant_first_colossus',
+  // The rest of the Quartered Isle's mobs reuse shipped bodies, recoloured by their
+  // template colour where the body takes an entity tint (content/quartered_isle_mobs.ts).
+  quench_shardling: 'mob_hoard_rime_elemental',
+  rimeglass_bear: 'mob_bear',
+  warden_of_the_quench: 'mob_hoard_hoarfrost_warden',
+  heatsworn_ember: 'mob_emberkin',
+  cinderscar_caller: 'mob_hoard_ember_fiend',
+  ember_hound: 'mob_wolf',
+  the_glassfield_brute: 'mob_hoard_magma_brute',
+  heaved_shardling: 'mob_elemental',
+  veinback_burrower: 'mob_grubjaw',
   water_elemental: 'mob_water_elemental',
   warlock_imp: 'mob_demon_flying',
   warlock_voidwalker: 'mob_demonalt',

@@ -245,6 +245,13 @@ import {
   QUARTERED_ISLE_ZONE,
 } from './content/quartered_isle';
 import { QUARTERED_ISLE_CAMPS, QUARTERED_ISLE_MOBS } from './content/quartered_isle_mobs';
+import {
+  QUARTERED_ISLE_OBJECTS,
+  QUARTERED_ISLE_QUEST_ORDER,
+  QUARTERED_ISLE_STORY_ITEMS,
+  QUARTERED_ISLE_STORY_NPCS,
+  QUARTERED_ISLE_STORY_QUESTS,
+} from './content/quartered_isle_story';
 import { QUARTERED_ISLE_SPIRES } from './content/quartered_spires';
 import { QUEST_CHOICE_REWARDS } from './content/quest_choice_rewards';
 import { QUEST_LEVELING_GEAR_ITEMS } from './content/quest_leveling_gear';
@@ -499,6 +506,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   GOURDLIGHT_EVE_ITEMS,
   GOURDLIGHT_SCARECROW_ITEMS,
   GOURDLIGHT_DAILY_ITEMS,
+  QUARTERED_ISLE_STORY_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
@@ -621,6 +629,8 @@ export const NPCS: Record<string, NpcDef> = {
   // Rivalmoot's townsfolk on the Quartered Isle (content/quartered_isle.ts):
   // dynamic singletons under reserved ids (sim/rivalmoot_keepers.ts).
   ...QUARTERED_ISLE_NPCS,
+  // ...and the Moot Rolls' townsfolk (content/quartered_isle_story.ts), the same way.
+  ...QUARTERED_ISLE_STORY_NPCS,
 };
 
 // Graveyards + the Spirit Healer: re-exported so the Sim and spirit.ts import the
@@ -656,6 +666,7 @@ export const QUESTS: Record<string, QuestDef> = {
   ...HUB_PRACTICE_QUESTS,
   ...GOURDLIGHT_EVE_QUESTS,
   ...GOURDLIGHT_DAILY_QUESTS,
+  ...QUARTERED_ISLE_STORY_QUESTS,
 };
 
 // The choose-one leveling gear rides on the quest records (QuestDef.choiceRewards),
@@ -687,6 +698,7 @@ export const QUEST_ORDER: string[] = [
   // the seasonal events' quests (open only while their event runs)
   ...Object.keys(GOURDLIGHT_EVE_QUESTS),
   ...Object.keys(GOURDLIGHT_DAILY_QUESTS),
+  ...QUARTERED_ISLE_QUEST_ORDER,
 ];
 
 // The Book of Deeds catalog (content/deeds.ts) is deliberately NOT re-exported
@@ -792,6 +804,9 @@ export const GROUND_OBJECTS: GroundObjectDef[] = [
   ...FARSHORE_OBJECTS,
   ...PROVING_SHORE_OBJECTS,
   ...WORLD_QUEST_OBJECTS,
+  // The Moot Rolls' inscriptions (content/quartered_isle_story.ts), appended last so
+  // every earlier ground object keeps its entity id.
+  ...QUARTERED_ISLE_OBJECTS,
 ];
 
 // The content table itself (deep-frozen there), so every reader resolves a

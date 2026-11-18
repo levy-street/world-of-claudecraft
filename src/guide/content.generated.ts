@@ -2564,7 +2564,10 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "The Fallen Giant"
     ],
     "welcome": "An old rivalry shattered this island four ways. Rivalmoot keeps the foot of the Gyre, above the crater where the war was fought.",
-    "families": []
+    "families": [
+      "beast",
+      "elemental"
+    ]
   }
 ];
 
@@ -2815,6 +2818,17 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "still": "/guide-stills/mob_wolf__9db4c8__s35.webp"
       },
       {
+        "name": "Ember Hound",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "ember_hound",
+        "model": "mob_wolf",
+        "tint": "#3a2a24",
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_wolf__3a2a24__s35.webp"
+      },
+      {
         "name": "Moonfleece Grazer",
         "min": 20,
         "max": 20,
@@ -2835,6 +2849,17 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "tint": "#d8d0c0",
         "tintStrength": 0.3,
         "still": "/guide-stills/mob_alpaca__d8d0c0__s30.webp"
+      },
+      {
+        "name": "Rimeglass Bear",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "rimeglass_bear",
+        "model": "mob_bear",
+        "tint": "#5a4030",
+        "tintStrength": 0.5,
+        "still": "/guide-stills/mob_bear__5a4030__s50.webp"
       },
       {
         "name": "Shoal Scuttler",
@@ -2890,6 +2915,17 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "tint": "#4a8a4e",
         "tintStrength": 0.35,
         "still": "/guide-stills/mob_wolf__4a8a4e__s35.webp"
+      },
+      {
+        "name": "Veinback Burrower",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "veinback_burrower",
+        "model": "mob_grubjaw",
+        "tint": "#b08a5a",
+        "tintStrength": 0.04,
+        "still": "/guide-stills/mob_grubjaw__b08a5a__s4.webp"
       }
     ]
   },
@@ -3440,6 +3476,15 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "still": "/guide-stills/mob_ghost__d0f2c8__s55.webp"
       },
       {
+        "name": "Cinderscar Caller",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "cinderscar_caller",
+        "model": "mob_hoard_ember_fiend",
+        "still": "/guide-stills/mob_hoard_ember_fiend.webp"
+      },
+      {
         "name": "Gale Wisp",
         "min": 20,
         "max": 20,
@@ -3471,6 +3516,37 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "tint": "#4e4a3a",
         "tintStrength": 0.72,
         "still": "/guide-stills/mob_treant__4e4a3a__s72.webp"
+      },
+      {
+        "name": "Heatsworn Ember",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "heatsworn_ember",
+        "model": "mob_emberkin",
+        "still": "/guide-stills/mob_emberkin.webp"
+      },
+      {
+        "name": "Heaved Shardling",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "heaved_shardling",
+        "model": "mob_elemental",
+        "tint": "#c8903c",
+        "tintStrength": 0.4,
+        "still": "/guide-stills/mob_elemental__c8903c.webp"
+      },
+      {
+        "name": "Quench Shardling",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "quench_shardling",
+        "model": "mob_hoard_rime_elemental",
+        "tint": "#9fd8ff",
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_hoard_rime_elemental__9fd8ff__s35.webp"
       },
       {
         "name": "Wood Wraith",
@@ -22740,5 +22816,23 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "idle": "Idle",
     "height": 2.1,
     "tintStrength": 0.35
+  },
+  "mob_hoard_rime_elemental": {
+    "url": "models/creatures/hoard_rime_elemental.glb",
+    "idle": "Idle",
+    "height": 3.9,
+    "yaw": -1.5707963267948966,
+    "tintStrength": 0.35
+  },
+  "mob_bear": {
+    "url": "models/creatures/yetialt.glb",
+    "idle": "Idle",
+    "height": 2.2,
+    "tintStrength": 0.5
+  },
+  "mob_hoard_ember_fiend": {
+    "url": "models/creatures/hoard_ember_fiend.glb",
+    "idle": "Idle",
+    "height": 2.9
   }
 };

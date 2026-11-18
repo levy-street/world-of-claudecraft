@@ -1,14 +1,14 @@
 {
   "version": 2,
   "meta": {
-    "id": "live-48b81-d404bf91-ca736021-157d-421e9565-e4972e75",
+    "id": "live-49a83-a152197e-b8e81d2e-157d-421e9565-e4972e75",
     "name": "Live world",
     "description": "",
     "createdAt": 0,
     "updatedAt": 0,
     "seed": 20061,
     "parentId": "",
-    "overworldBase": "48b81-d404bf91-ca736021",
+    "overworldBase": "49a83-a152197e-b8e81d2e",
     "overworldRevision": "157d-421e9565-e4972e75"
   },
   "content": {
@@ -3547,6 +3547,177 @@
         },
         "radius": 5,
         "count": 1
+      },
+      {
+        "mobId": "quench_shardling",
+        "center": {
+          "x": -78,
+          "z": 2034
+        },
+        "radius": 7,
+        "count": 3
+      },
+      {
+        "mobId": "quench_shardling",
+        "center": {
+          "x": -112,
+          "z": 2000
+        },
+        "radius": 7,
+        "count": 3
+      },
+      {
+        "mobId": "quench_shardling",
+        "center": {
+          "x": -126,
+          "z": 2064
+        },
+        "radius": 7,
+        "count": 3
+      },
+      {
+        "mobId": "rimeglass_bear",
+        "center": {
+          "x": 32,
+          "z": 2016
+        },
+        "radius": 8,
+        "count": 2
+      },
+      {
+        "mobId": "rimeglass_bear",
+        "center": {
+          "x": 4,
+          "z": 1996
+        },
+        "radius": 8,
+        "count": 2
+      },
+      {
+        "mobId": "warden_of_the_quench",
+        "center": {
+          "x": 62,
+          "z": 2036
+        },
+        "radius": 5,
+        "count": 1
+      },
+      {
+        "mobId": "heatsworn_ember",
+        "center": {
+          "x": 184,
+          "z": 2248
+        },
+        "radius": 7,
+        "count": 3
+      },
+      {
+        "mobId": "heatsworn_ember",
+        "center": {
+          "x": 218,
+          "z": 2246
+        },
+        "radius": 7,
+        "count": 3
+      },
+      {
+        "mobId": "heatsworn_ember",
+        "center": {
+          "x": 202,
+          "z": 2270
+        },
+        "radius": 7,
+        "count": 3
+      },
+      {
+        "mobId": "cinderscar_caller",
+        "center": {
+          "x": 172,
+          "z": 2202
+        },
+        "radius": 6,
+        "count": 2
+      },
+      {
+        "mobId": "cinderscar_caller",
+        "center": {
+          "x": 194,
+          "z": 2188
+        },
+        "radius": 6,
+        "count": 2
+      },
+      {
+        "mobId": "ember_hound",
+        "center": {
+          "x": 128,
+          "z": 2164
+        },
+        "radius": 8,
+        "count": 3
+      },
+      {
+        "mobId": "ember_hound",
+        "center": {
+          "x": 146,
+          "z": 2136
+        },
+        "radius": 8,
+        "count": 3
+      },
+      {
+        "mobId": "the_glassfield_brute",
+        "center": {
+          "x": 128,
+          "z": 2284
+        },
+        "radius": 5,
+        "count": 1
+      },
+      {
+        "mobId": "heaved_shardling",
+        "center": {
+          "x": -212,
+          "z": 2210
+        },
+        "radius": 7,
+        "count": 3
+      },
+      {
+        "mobId": "heaved_shardling",
+        "center": {
+          "x": -174,
+          "z": 2208
+        },
+        "radius": 7,
+        "count": 3
+      },
+      {
+        "mobId": "heaved_shardling",
+        "center": {
+          "x": -184,
+          "z": 2246
+        },
+        "radius": 7,
+        "count": 3
+      },
+      {
+        "mobId": "veinback_burrower",
+        "center": {
+          "x": -144,
+          "z": 2182
+        },
+        "radius": 7,
+        "count": 3
+      },
+      {
+        "mobId": "veinback_burrower",
+        "center": {
+          "x": -148,
+          "z": 2136
+        },
+        "radius": 7,
+        "count": 3
       }
     ],
     "npcs": {
@@ -6103,6 +6274,71 @@
         "greeting": "The Gilded Strongbox keeps your goods safe, even on the isle.",
         "banker": true,
         "dynamic": true
+      },
+      "keeper_ansel_morrow": {
+        "id": "keeper_ansel_morrow",
+        "name": "Keeper Ansel Morrow",
+        "title": "Keeper of the Moot Rolls",
+        "pos": {
+          "x": 19.2,
+          "z": 2251.7999999999997
+        },
+        "facing": 3.141592653589793,
+        "color": 5925514,
+        "questIds": [
+          "q_qi_the_moot_rolls",
+          "q_qi_words_in_stone",
+          "q_qi_servants_at_their_posts",
+          "q_qi_wardens_of_the_arts",
+          "q_qi_the_fallen_giant",
+          "q_qi_the_first_colossus"
+        ],
+        "greeting": "Every challenger who climbs this hill wants to beat the council, $N. I want to know why they are worth beating.",
+        "dynamic": true
+      },
+      "innkeeper_bettany_quell": {
+        "id": "innkeeper_bettany_quell",
+        "name": "Bettany Quell",
+        "title": "Innkeeper",
+        "pos": {
+          "x": -8.299999999999999,
+          "z": 2269.2
+        },
+        "facing": 1.5707963267948966,
+        "color": 10111546,
+        "questIds": [],
+        "greeting": "Mind the boots by the door, the Hoarshelf sleet gets into everything. The fire is lit and the stew is hot, and a challenger who lost today still gets fed.",
+        "vendorItems": ["trail_hardtack", "roast_mountain_goat", "meltwater_flask", "glacier_melt"],
+        "dynamic": true
+      },
+      "outfitter_harl_bracken": {
+        "id": "outfitter_harl_bracken",
+        "name": "Harl Bracken",
+        "title": "Outfitter",
+        "pos": {
+          "x": -17.6,
+          "z": 2239.4
+        },
+        "facing": 0,
+        "color": 6969914,
+        "questIds": [],
+        "greeting": "Salves, tonics and a field kit for the road. The quarters break everything else, so carry your own tools.",
+        "vendorItems": ["healing_potion", "mana_potion", "field_kit"],
+        "dynamic": true
+      },
+      "captain_thessaly_rivalmoot": {
+        "id": "captain_thessaly_rivalmoot",
+        "name": "Captain Thessaly",
+        "title": "Challengers' Leader",
+        "pos": {
+          "x": 12.6,
+          "z": 2251
+        },
+        "facing": 3.141592653589793,
+        "color": 3824282,
+        "questIds": [],
+        "greeting": "The council has sat on that peak unchallenged for longer than anyone remembers. My challengers mean to change that. Prove yourself on the scars first, $N.",
+        "dynamic": true
       }
     },
     "objects": [
@@ -7080,6 +7316,34 @@
             "y": -4.5,
             "facing": 4.71238898038469,
             "scale": 2
+          }
+        ]
+      },
+      {
+        "itemId": "council_inscription",
+        "name": "Council Inscription",
+        "positions": [
+          {
+            "x": -64,
+            "z": 2056
+          },
+          {
+            "x": 170,
+            "z": 2126
+          },
+          {
+            "x": -140,
+            "z": 2206
+          }
+        ]
+      },
+      {
+        "itemId": "colossus_makers_mark",
+        "name": "Colossus Maker's Mark",
+        "positions": [
+          {
+            "x": -112,
+            "z": 2310
           }
         ]
       }

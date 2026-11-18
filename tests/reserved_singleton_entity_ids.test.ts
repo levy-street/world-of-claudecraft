@@ -21,6 +21,7 @@ import {
   RIVALMOOT_BURSAR_ENTITY_ID,
   RIVALMOOT_BURSAR_NPC_ID,
 } from '../src/sim/content/quartered_isle';
+import { RIVALMOOT_TOWNSFOLK_ENTITY_IDS } from '../src/sim/content/quartered_isle_story';
 import { HARBOR_HOUSE_KEEPER_ENTITY_ID } from '../src/sim/content/wyrmwatch_harbor_house';
 import { WARFARE_QUARTERMASTER_ENTITY_ID } from '../src/sim/pvp/warfare_quartermaster';
 import { Sim } from '../src/sim/sim';
@@ -51,6 +52,9 @@ const RESERVED: Record<string, number> = {
   RIVALMOOT_SPIRIT_HEALER_ENTITY_ID,
   RIVALMOOT_BURSAR_ENTITY_ID,
   GYREFOOT_SPIRIT_HEALER_ENTITY_ID,
+  ...Object.fromEntries(
+    Object.entries(RIVALMOOT_TOWNSFOLK_ENTITY_IDS).map(([id, n]) => [`RIVALMOOT:${id}`, n]),
+  ),
   ...Object.fromEntries(
     Object.entries(HEALING_TRAINING_ENTITY_IDS).map(([id, n]) => [`HEALING_TRAINING:${id}`, n]),
   ),

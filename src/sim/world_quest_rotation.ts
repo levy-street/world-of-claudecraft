@@ -23,6 +23,9 @@ export const WORLD_QUEST_ZONES: readonly string[] = Object.freeze([
   'evergarden',
   'galecrest',
   'farshore_isle',
+  // appended last, so every earlier zone keeps its board slot (world_quest_item_slots.ts
+  // mixes the zone's position)
+  'quartered_isle',
 ]);
 
 export const WORLD_QUESTS_BY_ZONE: Readonly<Record<string, readonly string[]>> = Object.freeze({
@@ -124,6 +127,13 @@ export const WORLD_QUESTS_BY_ZONE: Readonly<Record<string, readonly string[]>> =
     'wq_farshore_wretches',
     'wq_farshore_riftspawn',
     'wq_farshore_stalkers',
+  ]),
+  // the Quartered Isle: its four zone hunts, four deep
+  quartered_isle: Object.freeze([
+    'wq_quartered_quench_shardlings',
+    'wq_quartered_heatsworn_embers',
+    'wq_quartered_heaved_shardlings',
+    'wq_quartered_ember_hounds',
   ]),
 });
 

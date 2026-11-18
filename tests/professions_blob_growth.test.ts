@@ -2053,11 +2053,13 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // Advanced riding adds the sparse ridingTier scalar (+15, PR 4390).
     // +166 with the Quartered Isle's six starter-kit node cooldowns.
     // (+235 with the Quartered Isle's three deeds in the maximal book)
-    expect(baselineBytes).toBe(261881);
+    // +197 with the Moot Rolls (content/quartered_isle_story.ts): its six quest ids in
+    // the maximal quest log and its two quest objects.
+    expect(baselineBytes).toBe(262078);
     expect(bytes - baselineBytes).toBe(8284);
     // 266,699 -> 266,721 with Wobbles the Slime's reins (+22, kept).
     // +166 with the Quartered Isle's six starter-kit node cooldowns.
-    expect(bytes).toBe(270165);
+    expect(bytes).toBe(270362);
     // Keep the warning threshold unchanged: saves above it remain whole.
     expect(bytes).toBeGreaterThan(CHARACTER_BLOB_WARN_BYTES);
     process.stdout.write(
@@ -2449,7 +2451,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // Advanced riding adds the sparse ridingTier scalar (+15, PR 4390).
     // +166 with the Quartered Isle's six starter-kit node cooldowns.
     // (+235 with the Quartered Isle's three deeds in the maximal book)
-    expect(beforeReferralBytes).toBe(251316);
+    // +197 with the Moot Rolls' quests and quest objects, as above.
+    expect(beforeReferralBytes).toBe(251513);
     expect(bytes - gourdlightEveBytes - stampCardBytes - beforeReferralBytes).toBe(122);
     expect(
       fieldBytes(beforeStampCards, 'deedStats') - fieldBytes(withoutReferral, 'deedStats'),
@@ -2476,7 +2479,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     const beforeMembershipBytes = Buffer.byteLength(JSON.stringify(withoutMembership), 'utf8');
     // 249,810 -> 249,832 with Wobbles the Slime's reins (+22, kept).
     // +166 with the Quartered Isle's six starter-kit node cooldowns.
-    expect(beforeMembershipBytes).toBe(251142);
+    expect(beforeMembershipBytes).toBe(251339);
     expect(beforeReferralBytes - beforeMembershipBytes).toBe(174);
     expect(
       fieldBytes(withoutReferral, 'deedStats') - fieldBytes(withoutMembership, 'deedStats'),
@@ -3009,7 +3012,12 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // Plus 235 for the Quartered Isle's three deeds this maximal fixture
         // earns: the gatherer and first-cast chronicle pair, the four-branch
         // Gilded Strongbox tour, and the marks they wait on. MEASURED.
-        235,
+        235 +
+        // Plus 197 for the Moot Rolls (content/quartered_isle_story.ts): its six quest
+        // ids in the completed-quest row (134 characters plus 6 x 3 = 152) and its two
+        // quest objects in deedStats.itemsDiscovered (`"council_inscription",` +22 and
+        // `"colossus_makers_mark",` +23). MEASURED.
+        197,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -3046,8 +3054,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // terms the settled-ceiling equation above names. deedStats 889 + 324
       // and reliquary 80 -> 892 at the trinket slot (PR 4173): the 18 trinket
       // item ids and the 17 trinket Reliquary pages (+324 and +812 of the
-      // +1,136 above).
-      questsDone: 100,
+      // +1,136 above). questsDone 100 -> 252 with the Moot Rolls' six quest ids (the
+      // +152 of the +197 above).
+      questsDone: 252,
       knownRecipes: 411,
       // deeds 672 -> 708 and deedStats 5,861 -> 5,979 at the fourth
       // release/v0.44.0 base merge: the ferry deed and its four visit marks
@@ -3073,7 +3082,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // Then -> 21,354: the 36 legacy buddy item ids add 706 discovery bytes.
       // Then -> 21,373 with the Staff of Changing's discovery id (+19, PR 4281).
       // +18 for the sprite buddy's whistle id in itemsDiscovered: 21373 -> 21436.
-      deedStats: 21190,
+      // 21,190 -> 21,235 with the Moot Rolls' two quest objects (the +45 of the +197 above).
+      deedStats: 21235,
       reliquary: 14565,
     });
     // Removing field_kit AND the Bramblehide release content reproduces the
@@ -3125,7 +3135,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // Advanced riding contributes 15 bytes for the armed ridingTier scalar.
       // The Quartered Isle's six starter-kit node cooldowns add 166.
       // Its three deeds and their marks add 235 (248,446), kept here.
-    ).toBe(248446);
+      // The Moot Rolls' six quest ids and two quest objects add 197 (248,643).
+    ).toBe(248643);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -3168,7 +3179,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // reins_wobbles_slime adds 22 (249,994).
       // Advanced riding contributes the same 15 bytes here.
       // +166 with the Quartered Isle's six starter-kit node cooldowns.
-    ).toBe(251304);
+      // +197 with the Moot Rolls' six quest ids and two quest objects.
+    ).toBe(251501);
     const priorContent = withoutCrucibleContent(withoutReferral);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -3323,8 +3335,12 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // four-branch Gilded Strongbox tour) and the marks they wait on: 251,438
     // bytes, up exactly 235 (deeds +125, deedStats +110). Floor at measurement
     // minus 380, edge at measurement plus one: 251058..251439.
-    expect(bytes - gourdlightEveBytes - stampCardBytes, reMint).toBeGreaterThan(251058);
-    expect(bytes - gourdlightEveBytes - stampCardBytes, reMint).toBeLessThan(251439);
+    // RE-BASED for the Moot Rolls (content/quartered_isle_story.ts): 251,635 bytes, up
+    // exactly 197 (questsDone +152 for its six quest ids, deedStats +45 for its two
+    // quest objects). Floor at measurement minus 380, edge at measurement plus one:
+    // 251255..251636.
+    expect(bytes - gourdlightEveBytes - stampCardBytes, reMint).toBeGreaterThan(251255);
+    expect(bytes - gourdlightEveBytes - stampCardBytes, reMint).toBeLessThan(251636);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

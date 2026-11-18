@@ -8080,6 +8080,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.wyrmfang_greatblade.name': '龍牙巨刃',
   'entities.items.staff_of_the_gravewyrm.name': '墓龍法杖',
   'entities.items.fang_of_korzul.name': '科祖爾之牙',
+  'entities.items.council_inscription.name': '議會銘文',
+  'entities.items.colossus_makers_mark.name': '巨像工匠印記',
   'entities.items.trail_hardtack.name': '高望行軍硬餅',
   'entities.items.meltwater_flask.name': '融雪水瓶',
   'entities.items.roast_mountain_goat.name': '烤山羊',
@@ -9141,6 +9143,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.shoal_scuttler.name': '淺灘蟹',
   'entities.mobs.the_wreck_warden.name': '沉船守衛',
   'entities.mobs.remnant_first_colossus.name': '初代巨像殘骸',
+  'entities.mobs.quench_shardling.name': '淬冰碎晶',
+  'entities.mobs.rimeglass_bear.name': '霜鏡熊',
+  'entities.mobs.warden_of_the_quench.name': '淬冰守衛',
+  'entities.mobs.heatsworn_ember.name': '誓炎餘燼',
+  'entities.mobs.cinderscar_caller.name': '燼痕召喚者',
+  'entities.mobs.ember_hound.name': '餘燼獵犬',
+  'entities.mobs.the_glassfield_brute.name': '琉璃原蠻獸',
+  'entities.mobs.heaved_shardling.name': '隆起碎晶',
+  'entities.mobs.veinback_burrower.name': '脈背掘地者',
   'entities.mobs.downs_bandit.name': '丘陵強盜',
   'entities.mobs.wreck_thief.name': '沉船竊賊',
   'entities.mobs.glimmerwisp.name': '微光靈',
@@ -9759,6 +9770,45 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gc_the_wreck_warden.completion':
     '它倒下的那一刻，海灘瞬間沒了聲息，{playerName}。在這片岸上幹了十年，這是我聽見的頭一次寂靜。船員們如今只是骸骨了，安息的骸骨。把財寶頂上那件披風拿去吧，它本來就更合一副活人的肩背。',
   'entities.quests.q_gc_the_wreck_warden.objectives.0.label': '已擊倒沉船守衛',
+  'entities.quests.q_qi_the_moot_rolls.title': '爭鋒名冊',
+  'entities.quests.q_qi_the_moot_rolls.text':
+    '爭鋒鎮有一份名冊，記下了每一位前來挑戰議會的人，{playerName}，卻沒有一行寫到議會為何值得挑戰。我打算把這段歷史寫出來。先去大廳旁找瑟薩莉隊長：她的挑戰者們走遍了這座島的每一塊地域，士兵記得學者遺漏的東西。',
+  'entities.quests.q_qi_the_moot_rolls.completion':
+    '安塞爾派你來的？那他總算問對人了。我的挑戰者們在每一塊地域都找到了刻字的石頭，比這座鎮子還古老，這裡沒人讀得懂。把這話帶回去給他。',
+  'entities.quests.q_qi_the_moot_rolls.objectives.0.label': '與瑟薩莉隊長交談',
+  'entities.quests.q_qi_words_in_stone.title': '石中之言',
+  'entities.quests.q_qi_words_in_stone.text':
+    '瑟薩莉說的那些石頭，正是議會親手留下的銘文，{playerName}，我敢拿我的名冊打賭。有三塊立在戰爭傷地最深的地方：一塊在白霜冰架，一塊在火冰裂谷旁，一塊在鐵鎚峽下方。逐一讀過，把每個字都帶回來給我。',
+  'entities.quests.q_qi_words_in_stone.completion':
+    '冰、火、岩，各自宣稱這座島屬於自己的技藝，而三塊都由同一隻手署名。議會從來不是四個陌生人，{playerName}。它是一個與自己交戰的議會。',
+  'entities.quests.q_qi_words_in_stone.objectives.0.label': '已閱讀議會銘文',
+  'entities.quests.q_qi_servants_at_their_posts.title': '堅守崗位的僕從',
+  'entities.quests.q_qi_servants_at_their_posts.text':
+    '銘文裡記著議會的僕從，它們立誓守住每一塊地域，直到主人歸來。主人再也沒有回來，僕從也從未停止堅守。去削減它們的數量吧，{playerName}：白霜冰架上的六隻淬冰碎晶、焚流渠裡的六隻誓炎餘燼，以及隆起石板上的六隻隆起碎晶。',
+  'entities.quests.q_qi_servants_at_their_posts.completion':
+    '每種六隻，這幾塊地域也因此安靜了些。它們的核心上刻著和銘文相同的印記。造出這些僕從的人，也造了那些石頭。',
+  'entities.quests.q_qi_servants_at_their_posts.objectives.0.label': '已擊倒淬冰碎晶',
+  'entities.quests.q_qi_servants_at_their_posts.objectives.1.label': '已擊倒誓炎餘燼',
+  'entities.quests.q_qi_servants_at_their_posts.objectives.2.label': '已擊倒隆起碎晶',
+  'entities.quests.q_qi_wardens_of_the_arts.title': '技藝守衛',
+  'entities.quests.q_qi_wardens_of_the_arts.text':
+    '議會的守衛還有兩個屹立未倒，一個在白霜冰架的冰隙群裡，一個陷在燼痕的琉璃原中。銘文稱它們為各自技藝祕密的守護者，它們不會心甘情願地交出祕密，{playerName}。去打倒淬冰守衛和琉璃原蠻獸。',
+  'entities.quests.q_qi_wardens_of_the_arts.completion':
+    '兩個守衛都已被擊碎，而且各自帶著一塊刻有巨人輪廓的封印石。議會終究還是一起造過東西，比他們任何一個都要龐大。每一個印記都指向隆岩荒野。',
+  'entities.quests.q_qi_wardens_of_the_arts.objectives.0.label': '已擊倒淬冰守衛',
+  'entities.quests.q_qi_wardens_of_the_arts.objectives.1.label': '已擊倒琉璃原蠻獸',
+  'entities.quests.q_qi_the_fallen_giant.title': '倒下的巨人',
+  'entities.quests.q_qi_the_fallen_giant.text':
+    '隆岩荒野裡躺著一顆房子大小的石頭頭顱，就在倒下的巨人倒下的地方。挑戰者們說那是座雕像。我認為封印石指的就是它。去找到上面的工匠印記，{playerName}，告訴我是誰的手刻下的。',
+  'entities.quests.q_qi_the_fallen_giant.completion':
+    '四門技藝的符文，並排刻成了一個印記。議會一同造出了這個巨人，那是他們第一次同心協力。它本該用來鎮住科祖爾，卻在完工之前就倒下了。它的某一部分至今仍守在自己的頭顱旁。',
+  'entities.quests.q_qi_the_fallen_giant.objectives.0.label': '已找到巨像工匠印記',
+  'entities.quests.q_qi_the_first_colossus.title': '初代巨像',
+  'entities.quests.q_qi_the_first_colossus.text':
+    '初代巨像從未鎮住那頭巨獸。它倒下了，議會又造了另一座，那一座做到了。但初代留下的殘軀至今仍守在倒下的巨人旁的崗位上，只雕了一半，早已被遺忘，擊倒任何靠近的人。讓它安息吧，{playerName}。這座島的歷史不該以一個從不知道戰爭已經結束的守衛作結。',
+  'entities.quests.q_qi_the_first_colossus.completion':
+    '那麼殘骸安息了，名冊也有了第一個真正的篇章：四個什麼都談不攏的對手，直到那一天，他們不得不一起建造一個巨人。爭鋒鎮欠你一行歷史，{playerName}，我會親手寫下。',
+  'entities.quests.q_qi_the_first_colossus.objectives.0.label': '已擊倒初代巨像殘骸',
   'entities.quests.q_hub_know_your_numbers.title': '認清你的數字',
   'entities.quests.q_hub_know_your_numbers.text':
     '量不出的力量，就是提不高的力量，{playerName}。把訓練假人設為目標，打開你的傷害統計，往它身上打滿十擊，揮砍或施法都算，邊打邊看著視窗記錄你造成的傷害。打滿十擊後回來，把那個數字告訴我。',
@@ -14782,6 +14832,22 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.bursar_maud_ashby.name': '司庫莫德·艾許比',
   'entities.npcs.bursar_maud_ashby.title': '鍍金保險箱',
   'entities.npcs.bursar_maud_ashby.greeting': '鍍金保險箱會妥善保管你的財物，在這座島上也一樣。',
+  'entities.npcs.keeper_ansel_morrow.name': '守卷人安塞爾·莫羅',
+  'entities.npcs.keeper_ansel_morrow.title': '爭鋒名冊守卷人',
+  'entities.npcs.keeper_ansel_morrow.greeting':
+    '每個登上這座山丘的挑戰者都想擊敗議會，{playerName}。我想知道的是，他們為什麼值得去擊敗。',
+  'entities.npcs.innkeeper_bettany_quell.name': '貝塔妮·奎爾',
+  'entities.npcs.innkeeper_bettany_quell.title': '旅店老闆',
+  'entities.npcs.innkeeper_bettany_quell.greeting':
+    '靴子放門邊，白霜冰架的凍雨什麼都能鑽進去。爐火正旺，燉菜正熱，今天輸了的挑戰者也照樣有飯吃。',
+  'entities.npcs.outfitter_harl_bracken.name': '哈爾·布拉肯',
+  'entities.npcs.outfitter_harl_bracken.title': '裝備商',
+  'entities.npcs.outfitter_harl_bracken.greeting':
+    '藥膏、補劑，再加一套路上用的野外工具包。別的東西這幾塊地域都會給你弄壞，所以工具得自己帶。',
+  'entities.npcs.captain_thessaly_rivalmoot.name': '瑟薩莉隊長',
+  'entities.npcs.captain_thessaly_rivalmoot.title': '挑戰者首領',
+  'entities.npcs.captain_thessaly_rivalmoot.greeting':
+    '議會高坐那座山峰，從無人挑戰，久到沒人記得有多久了。我的挑戰者們要改變這一點。先在那幾片傷痕之地證明你自己吧，{playerName}。',
   'entities.items.furyforged_warhelm.name': '怒鑄戰盔',
   'entities.items.furyforged_warspaulders.name': '怒鑄戰肩',
   'entities.items.furyforged_warplate.name': '怒鑄戰甲',

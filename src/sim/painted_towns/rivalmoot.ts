@@ -81,9 +81,22 @@ const BURSAR_STAND = localToWorld(BANK.frontStandingPoint, BANK.rotation, 3.4, -
 
 const BUILDINGS = [INN, HALL, SHOP, BANK] as const;
 
+// The townsfolk (content/quartered_isle_story.ts), each a few strides out from their
+// own door and beside its line, so no one blocks a doorway: the innkeeper at the inn,
+// the outfitter at the shop, the Keeper of the Moot Rolls at the Moot Hall, and Captain
+// Thessaly across the hall's step from him, where his first quest sends a player.
+const INNKEEPER_STAND = localToWorld(INN.frontStandingPoint, INN.rotation, 3.2, -1.4);
+const OUTFITTER_STAND = localToWorld(SHOP.frontStandingPoint, SHOP.rotation, 3.2, -1.4);
+const KEEPER_STAND = localToWorld(HALL.frontStandingPoint, HALL.rotation, 3.2, -1.4);
+const THESSALY_STAND = localToWorld(HALL.frontStandingPoint, HALL.rotation, -3.4, -2.2);
+
 const NPCS = [
   // the bursar before the counting house door, looking out at the east road
   makeTownNpc('bursar_maud_ashby', BURSAR_STAND, BANK.frontFacing, BANK.id),
+  makeTownNpc('innkeeper_bettany_quell', INNKEEPER_STAND, INN.frontFacing, INN.id),
+  makeTownNpc('outfitter_harl_bracken', OUTFITTER_STAND, SHOP.frontFacing, SHOP.id),
+  makeTownNpc('keeper_ansel_morrow', KEEPER_STAND, HALL.frontFacing, HALL.id),
+  makeTownNpc('captain_thessaly_rivalmoot', THESSALY_STAND, HALL.frontFacing, HALL.id),
 ] as const;
 
 const GROUND: readonly TownGround[] = [

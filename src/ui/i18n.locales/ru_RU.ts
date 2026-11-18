@@ -8546,6 +8546,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.wyrmfang_greatblade.name': 'Великий клинок Клык Вирма',
   'entities.items.staff_of_the_gravewyrm.name': 'Посох Могильного Вирма',
   'entities.items.fang_of_korzul.name': 'Клык Корзула',
+  'entities.items.council_inscription.name': 'Надпись Совета',
+  'entities.items.colossus_makers_mark.name': 'Клеймо мастера Колосса',
   'entities.items.trail_hardtack.name': 'Походный сухарь Хайвотча',
   'entities.items.meltwater_flask.name': 'Фляга талой воды',
   'entities.items.roast_mountain_goat.name': 'Жареный горный козел',
@@ -9642,6 +9644,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.shoal_scuttler.name': 'Отмельный краб',
   'entities.mobs.the_wreck_warden.name': 'Страж Кораблекрушений',
   'entities.mobs.remnant_first_colossus.name': 'Остаток Первого Колосса',
+  'entities.mobs.quench_shardling.name': 'Осколыш Закалки',
+  'entities.mobs.rimeglass_bear.name': 'Медведь Иневого Зерцала',
+  'entities.mobs.warden_of_the_quench.name': 'Страж Закалки',
+  'entities.mobs.heatsworn_ember.name': 'Огнеприсяжный уголёк',
+  'entities.mobs.cinderscar_caller.name': 'Призыватель Пепельного шрама',
+  'entities.mobs.ember_hound.name': 'Угольная гончая',
+  'entities.mobs.the_glassfield_brute.name': 'Громила Стеклянного поля',
+  'entities.mobs.heaved_shardling.name': 'Вздыбленный осколыш',
+  'entities.mobs.veinback_burrower.name': 'Жилоспинный землерой',
   'entities.mobs.downs_bandit.name': 'Бандит с холмов',
   'entities.mobs.wreck_thief.name': 'Расхититель кораблекрушений',
   'entities.mobs.glimmerwisp.name': 'Мерцающий огонёк',
@@ -10277,6 +10288,46 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gc_the_wreck_warden.completion':
     'Берег умолк в тот самый миг, когда он пал, {playerName}. Первая тишина на этом берегу за десять лет моей работы. Команды теперь просто кости — упокоенные кости. Возьми мантию с верхушки клада: живой спине она всегда была впору больше.',
   'entities.quests.q_gc_the_wreck_warden.objectives.0.label': 'Страж Кораблекрушений повержен',
+  'entities.quests.q_qi_the_moot_rolls.title': 'Списки Ривалмута',
+  'entities.quests.q_qi_the_moot_rolls.text':
+    'Ривалмут хранит список каждого претендента, что приходил испытать совет, {playerName}, и ни строчки о том, почему совет стоит испытывать. Я хочу написать эту историю. Начни с капитана Тессали у зала: её претенденты обошли каждый край этого острова, а солдаты помнят то, что упускают учёные.',
+  'entities.quests.q_qi_the_moot_rolls.completion':
+    'Тебя прислал Ансель? Значит, он наконец спрашивает тех, кого нужно. Мои претенденты нашли в каждом краю резные камни, что старше этого города, и никто здесь не может их прочесть. Передай ему это.',
+  'entities.quests.q_qi_the_moot_rolls.objectives.0.label': 'Поговорите с капитаном Тессали',
+  'entities.quests.q_qi_words_in_stone.title': 'Слова в камне',
+  'entities.quests.q_qi_words_in_stone.text':
+    'Камни Тессали и есть надписи самого совета, {playerName}, ставлю на это свои списки. Три стоят там, где война изранила землю сильнее всего: одна на Иневом шельфе, одна у Огнеледяного разлома и одна под Разрезом Молота. Прочти каждую и принеси мне всё до последнего слова.',
+  'entities.quests.q_qi_words_in_stone.completion':
+    'Лёд, огонь и камень, каждый объявляет остров владением своего искусства, и все три подписаны одной рукой. Совет никогда не был четырьмя чужаками, {playerName}. Это был один совет, воевавший сам с собой.',
+  'entities.quests.q_qi_words_in_stone.objectives.0.label': 'Надпись Совета прочитана',
+  'entities.quests.q_qi_servants_at_their_posts.title': 'Слуги на своих постах',
+  'entities.quests.q_qi_servants_at_their_posts.text':
+    'Надписи называют слуг совета, поклявшихся удерживать каждый край, пока не вернутся их хозяева. Хозяева так и не вернулись, а слуги так и не перестали держать оборону. Прореди их, {playerName}: шесть Осколышей Закалки на Иневом шельфе, шесть Огнеприсяжных угольков в Огненных руслах и шесть Вздыбленных осколышей на Вздыбленных плитах.',
+  'entities.quests.q_qi_servants_at_their_posts.completion':
+    'По шесть каждого, и в краях стало чуть тише. Их ядра вырезаны с тем же знаком, что и надписи. Кто сделал слуг, тот сделал и камни.',
+  'entities.quests.q_qi_servants_at_their_posts.objectives.0.label': 'Осколыш Закалки убит',
+  'entities.quests.q_qi_servants_at_their_posts.objectives.1.label': 'Огнеприсяжный уголёк убит',
+  'entities.quests.q_qi_servants_at_their_posts.objectives.2.label': 'Вздыбленный осколыш убит',
+  'entities.quests.q_qi_wardens_of_the_arts.title': 'Стражи искусств',
+  'entities.quests.q_qi_wardens_of_the_arts.text':
+    'Двое стражей совета всё ещё стоят: один в Трещинах Иневого шельфа, другой погружён в Стеклянное поле Пепельного шрама. Надписи зовут их хранителями тайн своих искусств, и добром они эти тайны не отдадут, {playerName}. Повергни Стража Закалки и Громилу Стеклянного поля.',
+  'entities.quests.q_qi_wardens_of_the_arts.completion':
+    'Оба стража сломлены, и каждый нёс печатный камень с вырезанным силуэтом великана. Значит, совет всё-таки строил что-то вместе, нечто большее, чем любой из них. Все знаки указывают на Дебри Вздыбленного камня.',
+  'entities.quests.q_qi_wardens_of_the_arts.objectives.0.label': 'Страж Закалки повержен',
+  'entities.quests.q_qi_wardens_of_the_arts.objectives.1.label':
+    'Громила Стеклянного поля повержен',
+  'entities.quests.q_qi_the_fallen_giant.title': 'Павший великан',
+  'entities.quests.q_qi_the_fallen_giant.text':
+    'В Дебрях Вздыбленного камня, там, где пал Павший великан, лежит каменная голова размером с дом. Претенденты зовут её статуей. Я думаю, на неё и указывают печатные камни. Найди на ней клеймо мастера, {playerName}, и скажи мне, чья рука его вырезала.',
+  'entities.quests.q_qi_the_fallen_giant.completion':
+    'Руны четырёх искусств, вырезанные бок о бок в одно клеймо. Совет создал великана вместе, впервые действуя как одно целое. Он должен был сдержать Корзула и пал, так и не будучи завершён. Что-то от него до сих пор стоит на страже рядом с собственной головой.',
+  'entities.quests.q_qi_the_fallen_giant.objectives.0.label': 'Клеймо мастера Колосса найдено',
+  'entities.quests.q_qi_the_first_colossus.title': 'Первый Колосс',
+  'entities.quests.q_qi_the_first_colossus.text':
+    'Первый колосс так и не сдержал зверя. Он пал, и совет построил другого, которому это удалось. Но то, что осталось от первого, до сих пор несёт свой пост у Павшего великана, наполовину вытесанное и давно забытое, сражая всякого, кто подойдёт. Упокой его, {playerName}. История этого острова не должна кончаться стражем, который так и не узнал, что война окончена.',
+  'entities.quests.q_qi_the_first_colossus.completion':
+    'Значит, Остаток упокоен, и у списков появилась первая настоящая глава: четыре соперника, что ни в чём не могли договориться, пока не настал день, когда им пришлось вместе строить великана. Ривалмут обязан тебе строкой в своей истории, {playerName}, и я напишу её сам.',
+  'entities.quests.q_qi_the_first_colossus.objectives.0.label': 'Остаток Первого Колосса повержен',
   'entities.quests.q_hub_know_your_numbers.title': 'Знай свои числа',
   'entities.quests.q_hub_know_your_numbers.text':
     'Сила, которую нельзя измерить, это сила, которую нельзя улучшить, {playerName}. Возьми в цель тренировочный манекен, открой счетчики урона и нанеси по нему десять ударов, оружием или заклинаниями, следя за тем, как окно считает нанесенный урон. Когда все десять будут нанесены, возвращайся и назови мне число.',
@@ -15774,6 +15825,22 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.bursar_maud_ashby.title': 'Золочёный сундук',
   'entities.npcs.bursar_maud_ashby.greeting':
     'Золочёный сундук сохранит ваше добро даже на этом острове.',
+  'entities.npcs.keeper_ansel_morrow.name': 'Хранитель Ансель Морроу',
+  'entities.npcs.keeper_ansel_morrow.title': 'Хранитель списков Ривалмута',
+  'entities.npcs.keeper_ansel_morrow.greeting':
+    'Каждый претендент, что поднимается на этот холм, хочет одолеть совет, {playerName}. А я хочу знать, почему его стоит одолевать.',
+  'entities.npcs.innkeeper_bettany_quell.name': 'Беттани Квелл',
+  'entities.npcs.innkeeper_bettany_quell.title': 'Хозяйка таверны',
+  'entities.npcs.innkeeper_bettany_quell.greeting':
+    'Осторожнее с сапогами у двери, мокрый снег с Иневого шельфа пробирается всюду. Огонь горит, похлёбка горячая, и даже претендента, что сегодня проиграл, здесь накормят.',
+  'entities.npcs.outfitter_harl_bracken.name': 'Харл Бракен',
+  'entities.npcs.outfitter_harl_bracken.title': 'Торговец снаряжением',
+  'entities.npcs.outfitter_harl_bracken.greeting':
+    'Мази, тоники и походный набор в дорогу. Всё остальное здешние края всё равно сломают, так что инструменты носи свои.',
+  'entities.npcs.captain_thessaly_rivalmoot.name': 'Капитан Тессали',
+  'entities.npcs.captain_thessaly_rivalmoot.title': 'Предводительница претендентов',
+  'entities.npcs.captain_thessaly_rivalmoot.greeting':
+    'Совет сидит на той вершине без единого вызова дольше, чем кто-либо помнит. Мои претенденты намерены это изменить. Но сначала докажи себя на шрамах, {playerName}.',
   'entities.items.furyforged_warhelm.name': 'Боевой шлем яростной ковки',
   'entities.items.furyforged_warspaulders.name': 'Боевые наплечники яростной ковки',
   'entities.items.furyforged_warplate.name': 'Боевой панцирь яростной ковки',

@@ -48,6 +48,8 @@ describe('the item zones', () => {
       'palmreach',
       'evergarden',
       'farshore_isle',
+      // the Quartered Isle, appended last so every earlier zone keeps its position
+      'quartered_isle',
     ]);
   });
 
@@ -86,20 +88,22 @@ describe('the item zones', () => {
   it('pins the first cycles, so a seed, mix or ordering change is a deliberate re-pin and never a silent reshuffle', () => {
     // A reshuffle across a deploy has an old client previewing one piece while
     // the server grants another; these literals make that a visible change.
+    // Re-pinned when the Quartered Isle joined the rotation: the draw now runs over
+    // fourteen item zones instead of thirteen.
     expect(worldQuestItemZonesForCycle('wq1_0')).toEqual([
       'thornpeak_heights',
-      'wraithwood',
-      'amberfall',
+      'palmreach',
+      'willowfen',
     ]);
     expect(worldQuestItemZonesForCycle('wq1_1')).toEqual([
-      'amberfall',
+      'willowfen',
       'drakelands',
       'eastbrook_vale',
     ]);
     expect(worldQuestItemZonesForCycle('wq1_2')).toEqual([
-      'wraithwood',
+      'palmreach',
       'veiled_hollow',
-      'drakelands',
+      'frostveil',
     ]);
     const perClass = Object.fromEntries(
       ALL_CLASSES.map((cls) => [cls, worldQuestItemRewardFor('wq1_0', 'thornpeak_heights', cls)]),

@@ -41,8 +41,9 @@ function rotatingPool(zone: string): readonly string[] {
 }
 
 describe('world quest zone hunts', () => {
-  it('ships 39 hunts, every one a kill quest with a unique id in the merged catalog', () => {
-    expect(WORLD_QUEST_ZONE_HUNTS).toHaveLength(39);
+  it('ships 43 hunts, every one a kill quest with a unique id in the merged catalog', () => {
+    // 39, plus the Quartered Isle's four (content/world_quest_zone_hunts.ts).
+    expect(WORLD_QUEST_ZONE_HUNTS).toHaveLength(43);
     const ids = new Set<string>();
     for (const quest of WORLD_QUEST_ZONE_HUNTS) {
       expect(quest.objective.type).toBe('kill');

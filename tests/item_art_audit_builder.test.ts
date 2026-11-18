@@ -903,11 +903,12 @@ describe('item-art audit builder', () => {
       // + the sprite buddy's whistle render: 2186 / 2215, re-measured with --verify-only.
       // Release adds five painted owners; measured with --verify-only on the combined tree.
       // Restored feral staff and eight jewelry paintings; measured with --verify-only.
-      catalogSha256: '5ef9cee82541194673dc4768027c5f0b6f0667b11c63f251501db76473f75b58',
-      catalogBytes: 1196985,
+      // + the Quartered Isle's two Moot Rolls quest objects, re-measured with --verify-only.
+      catalogSha256: '8f9bc703999c992bb69f63bc4ea441ad5519907b165f66cab765539b6a46fda2',
+      catalogBytes: 1198027,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 2191,
-      liveItemCount: 2220,
+      catalogCount: 2193,
+      liveItemCount: 2222,
       generatedHeroicDefinitions: 116,
       heroicDefinitionsWithOwnWebp: 86,
       heroicWeaponArtAliases: 30,
@@ -925,7 +926,7 @@ describe('item-art audit builder', () => {
         identity: 45,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '1ce5db8bb37fa5ce649ebbe18dfc23033f71c30674578a65291856e750195d0b',
+      shippingCatalogSha256: '46e8614755cf6362619ecb73d739a637bde1988360d5473576fab1f1fd69003c',
       machineChecksPassed: true,
       verdict: null,
     });

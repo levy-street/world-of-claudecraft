@@ -3970,6 +3970,9 @@ const ITEM_ENTITY_IDS = [
   'thatchgrin_patch_pumpkin',
   'cursed_candle_stub',
   'gourdlight_crow_feather',
+  // the Quartered Isle's Moot Rolls (content/quartered_isle_story.ts)
+  'council_inscription',
+  'colossus_makers_mark',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -5459,6 +5462,8 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   vanguard_pendant_of_precision: "Vanguard's Pendant of Precision",
   vanguard_pendant_of_focus: "Vanguard's Pendant of Focus",
   vanguard_pendant_of_mending: "Vanguard's Pendant of Mending",
+  council_inscription: 'Council Inscription',
+  colossus_makers_mark: "Colossus Maker's Mark",
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

@@ -1087,6 +1087,14 @@ export const VOICE_ALIAS = {
   // Rivalmoot's bursar on the Quartered Isle borrows the Fenbridge branch's
   // performance (the same house, the same register) until her own is rendered.
   bursar_maud_ashby: 'bursar_petra_vell',
+  // Rivalmoot's townsfolk (content/quartered_isle_story.ts), cast by role the same way
+  // until their own voices are rendered: Captain Thessaly is the Highwatch captain
+  // herself; the innkeeper takes the Mirefen hearthkeeper's warm register, the outfitter
+  // the trader's, and the Keeper of the Moot Rolls the Galecrest keeper's measured one.
+  captain_thessaly_rivalmoot: 'captain_thessaly',
+  innkeeper_bettany_quell: 'hearthkeeper_maeve',
+  outfitter_harl_bracken: 'trader_wilkes',
+  keeper_ansel_morrow: 'keeper_bram',
   glider_instructor: 'trader_wilkes',
   glider_apprentice: 'apprentice_wren',
   // Valerie borrows the existing scout performance for this covert operation.

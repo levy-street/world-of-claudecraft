@@ -681,10 +681,8 @@ describe('Guide bestiary completeness', () => {
 
   it('gives every zone a non-empty resident family list drawn from the bestiary', () => {
     const familyNames = new Set(GUIDE_FAMILIES.map((f) => f.family));
-    // The Quartered Isle's first pass is its land, town and arena; its
-    // quarters' foes arrive in the next content pass (docs/prd/quartered-isle-zone.md).
-    // Remove it from this list the moment it gains its first camp.
-    const UNSETTLED = new Set(['quartered_isle']);
+    // The Quartered Isle's mobs landed (content/quartered_isle_mobs.ts): no zone is unsettled.
+    const UNSETTLED = new Set<string>();
     for (const z of GUIDE_ZONES) {
       if (UNSETTLED.has(z.id)) {
         expect(z.families, `zone ${z.id} has residents now: drop it from UNSETTLED`).toEqual([]);

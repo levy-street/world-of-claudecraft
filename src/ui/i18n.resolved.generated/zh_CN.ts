@@ -24528,6 +24528,12 @@ export const zh_CN: EnTranslations = {
       "gourdlight_crow_feather": {
         "name": "南瓜灯乌鸦羽毛"
       },
+      "council_inscription": {
+        "name": "议会铭文"
+      },
+      "colossus_makers_mark": {
+        "name": "巨像工匠印记"
+      },
       "membership_staff": {
         "name": "万变法杖"
       },
@@ -26648,6 +26654,33 @@ export const zh_CN: EnTranslations = {
       "buddy_phantom": {
         "name": "幻魂"
       },
+      "quench_shardling": {
+        "name": "淬冰碎晶"
+      },
+      "rimeglass_bear": {
+        "name": "霜镜熊"
+      },
+      "warden_of_the_quench": {
+        "name": "淬冰守卫"
+      },
+      "heatsworn_ember": {
+        "name": "誓炎余烬"
+      },
+      "cinderscar_caller": {
+        "name": "烬痕召唤者"
+      },
+      "ember_hound": {
+        "name": "余烬猎犬"
+      },
+      "the_glassfield_brute": {
+        "name": "琉璃原蛮兽"
+      },
+      "heaved_shardling": {
+        "name": "隆起碎晶"
+      },
+      "veinback_burrower": {
+        "name": "脉背掘地者"
+      },
       "ironvein_foreman": {
         "name": "铁脉工头"
       },
@@ -27505,6 +27538,26 @@ export const zh_CN: EnTranslations = {
         "name": "拉弗洛克",
         "title": "苍白唱诗班最后的领唱",
         "greeting": "我曾是苍白唱诗班里最年轻的声音。仪式那夜，我没有喝，我逃了。从那以后，每逢满月，我都听见他们在水下歌唱。我必须在死前亲眼见到她。让我跟在你们身后吧。我不会战斗，也不会拖累你们。"
+      },
+      "keeper_ansel_morrow": {
+        "name": "守卷人安塞尔·莫罗",
+        "title": "争锋名册守卷人",
+        "greeting": "每个登上这座山丘的挑战者都想击败议会，{playerName}。我想知道的是，他们为什么值得去击败。"
+      },
+      "innkeeper_bettany_quell": {
+        "name": "贝塔妮·奎尔",
+        "title": "旅店老板",
+        "greeting": "靴子放门边，白霜冰架的冻雨什么都能钻进去。炉火正旺，炖菜正热，今天输了的挑战者也照样有饭吃。"
+      },
+      "outfitter_harl_bracken": {
+        "name": "哈尔·布拉肯",
+        "title": "装备商",
+        "greeting": "药膏、补剂，再加一套路上用的野外工具包。别的东西这几块地域都会给你弄坏，所以工具得自己带。"
+      },
+      "captain_thessaly_rivalmoot": {
+        "name": "瑟萨莉队长",
+        "title": "挑战者首领",
+        "greeting": "议会高坐那座山峰，从无人挑战，久到没人记得有多久了。我的挑战者们要改变这一点。先在那几片伤痕之地证明你自己吧，{playerName}。"
       },
       "tidewatcher_ondrel": {
         "name": "翁德雷尔·凡恩",
@@ -29899,6 +29952,75 @@ export const zh_CN: EnTranslations = {
           },
           "2": {
             "label": "交给Loremaster Caddis的篮子"
+          }
+        }
+      },
+      "q_qi_the_moot_rolls": {
+        "title": "争锋名册",
+        "text": "争锋镇有一份名册，记下了每一位前来挑战议会的人，{playerName}，却没有一行写到议会为何值得挑战。我打算把这段历史写出来。先去大厅旁找瑟萨莉队长：她的挑战者们走遍了这座岛的每一块地域，士兵记得学者遗漏的东西。",
+        "completion": "安塞尔派你来的？那他总算问对人了。我的挑战者们在每一块地域都找到了刻字的石头，比这座镇子还古老，这里没人读得懂。把这话带回去给他。",
+        "objectives": {
+          "0": {
+            "label": "与瑟萨莉队长交谈"
+          }
+        }
+      },
+      "q_qi_words_in_stone": {
+        "title": "石中之言",
+        "text": "瑟萨莉说的那些石头，正是议会亲手留下的铭文，{playerName}，我敢拿我的名册打赌。有三块立在战争伤地最深的地方：一块在白霜冰架，一块在火冰裂谷旁，一块在铁锤峡下方。逐一读过，把每个字都带回来给我。",
+        "completion": "冰、火、岩，各自宣称这座岛属于自己的技艺，而三块都由同一只手署名。议会从来不是四个陌生人，{playerName}。它是一个与自己交战的议会。",
+        "objectives": {
+          "0": {
+            "label": "已阅读议会铭文"
+          }
+        }
+      },
+      "q_qi_servants_at_their_posts": {
+        "title": "坚守岗位的仆从",
+        "text": "铭文里记着议会的仆从，它们立誓守住每一块地域，直到主人归来。主人再也没有回来，仆从也从未停止坚守。去削减它们的数量吧，{playerName}：白霜冰架上的六只淬冰碎晶、焚流渠里的六只誓炎余烬，以及隆起石板上的六只隆起碎晶。",
+        "completion": "每种六只，这几块地域也因此安静了些。它们的核心上刻着和铭文相同的印记。造出这些仆从的人，也造了那些石头。",
+        "objectives": {
+          "0": {
+            "label": "已击倒淬冰碎晶"
+          },
+          "1": {
+            "label": "已击倒誓炎余烬"
+          },
+          "2": {
+            "label": "已击倒隆起碎晶"
+          }
+        }
+      },
+      "q_qi_wardens_of_the_arts": {
+        "title": "技艺守卫",
+        "text": "议会的守卫还有两个屹立未倒，一个在白霜冰架的冰隙群里，一个陷在烬痕的琉璃原中。铭文称它们为各自技艺秘密的守护者，它们不会心甘情愿地交出秘密，{playerName}。去打倒淬冰守卫和琉璃原蛮兽。",
+        "completion": "两个守卫都已被击碎，而且各自带着一块刻有巨人轮廓的封印石。议会终究还是一起造过东西，比他们任何一个都要庞大。每一个印记都指向隆岩荒野。",
+        "objectives": {
+          "0": {
+            "label": "已击倒淬冰守卫"
+          },
+          "1": {
+            "label": "已击倒琉璃原蛮兽"
+          }
+        }
+      },
+      "q_qi_the_fallen_giant": {
+        "title": "倒下的巨人",
+        "text": "隆岩荒野里躺着一颗房子大小的石头头颅，就在倒下的巨人倒下的地方。挑战者们说那是座雕像。我认为封印石指的就是它。去找到上面的工匠印记，{playerName}，告诉我是谁的手刻下的。",
+        "completion": "四门技艺的符文，并排刻成了一个印记。议会一同造出了这个巨人，那是他们第一次同心协力。它本该用来镇住科祖尔，却在完工之前就倒下了。它的某一部分至今仍守在自己的头颅旁。",
+        "objectives": {
+          "0": {
+            "label": "已找到巨像工匠印记"
+          }
+        }
+      },
+      "q_qi_the_first_colossus": {
+        "title": "初代巨像",
+        "text": "初代巨像从未镇住那头巨兽。它倒下了，议会又造了另一座，那一座做到了。但初代留下的残躯至今仍守在倒下的巨人旁的岗位上，只雕了一半，早已被遗忘，击倒任何靠近的人。让它安息吧，{playerName}。这座岛的历史不该以一个从不知道战争已经结束的守卫作结。",
+        "completion": "那么残骸安息了，名册也有了第一个真正的篇章：四个什么都谈不拢的对手，直到那一天，他们不得不一起建造一个巨人。争锋镇欠你一行历史，{playerName}，我会亲手写下。",
+        "objectives": {
+          "0": {
+            "label": "已击倒初代巨像残骸"
           }
         }
       },
