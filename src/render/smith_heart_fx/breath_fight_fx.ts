@@ -57,6 +57,10 @@ import {
   timedOf,
 } from '../../sim/encounters/smith_heart/breath_ids';
 import { ISLE_MOBS } from '../../sim/encounters/smith_heart/breath_isle_ids';
+
+/** Every mob of the Islands of the Wind (its adds and its Stillstones). */
+const ISLE_MOB_IDS: ReadonlySet<string> = new Set(Object.values(ISLE_MOBS));
+
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { fxAnchor } from '../attached_fx_anchor';
@@ -1053,6 +1057,8 @@ export class BreathFightFx {
       materials: this.materials,
       groundY: (x, z) => this.groundY(x, z),
       shakeNear: (x, z, amount, reach) => this.shakeNear(x, z, amount, reach),
+      kit: this.kit,
+      paints: this.paints,
     });
     this.inhale = new BreathInhaleStreams({
       root: this.root,
@@ -1239,6 +1245,7 @@ export class BreathFightFx {
     }
     if (!this.origin) {
       this.audio.update(null, null, null, null);
+      this.audio.nova(0, null);
       this.particles.update(this.clock);
       this.updateBolts();
       return;
@@ -1277,6 +1284,7 @@ export class BreathFightFx {
         gale = e.pos;
       }
     }
+    this.audio.nova(this.isles.novaHum, meE ?? null);
     this.audio.update(
       this.windPhase,
       wind ? wind.pos : null,
@@ -1356,6 +1364,7 @@ export class BreathFightFx {
       } else if (e.kind === 'player' && !e.dead) {
         // Players move: the claim's box is checked on every pass.
         if (Math.abs(e.pos.x - origin.x) > 300 || Math.abs(e.pos.z - origin.z) > 260) continue;
+        this.isles.takePlayer(e);
         for (const a of e.auras) {
           if (a.id === BREATH_AURAS.anchor) this.anchorMarks.take(e.id);
           else if (a.id === BREATH_AURAS.pinned) this.pinnedMarks.take(e.id);
@@ -1395,9 +1404,7 @@ export class BreathFightFx {
       if (
         e.kind === 'object' ||
         (e.kind === 'mob' &&
-          (e.templateId === BREATH_GUARDIAN ||
-            e.templateId === ISLE_MOBS.sentinel ||
-            e.templateId === ISLE_MOBS.mender)) ||
+          (e.templateId === BREATH_GUARDIAN || ISLE_MOB_IDS.has(e.templateId))) ||
         (e.kind === 'npc' && e.templateId === BREATH_THESSALY_NPC)
       )
         ids.push(e.id);

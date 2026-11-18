@@ -430,6 +430,17 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // The Breath's Summit Roar: its blast ring and wake on the encounter rung;
   // its whole-screen frost veil is a camera overlay (order 9990), so not strict.
   { file: 'src/render/smith_heart_fx/breath_roar_fx.ts', layer: 'encounter', strict: false },
+  // The Breath's Islands of the Wind (its 50 percent phase): the isles' rune
+  // rings and the Updrafts' wind discs; each isle's Closing Storm ring; the
+  // Stillstones' rune circles; the Squall Ward's arc on the floor; the cocoon's
+  // rune ring at the guardian's foot (its storm sky is drawn first of the
+  // see-through things and the nova's storm core under its light: two bare
+  // orders off the floor, so not strict).
+  { file: 'src/render/smith_heart_fx/breath_isles_fx.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/smith_heart_fx/breath_isle_storm_fx.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/smith_heart_fx/breath_stillstone_fx.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/smith_heart_fx/breath_isle_adds_fx.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/smith_heart_fx/breath_cocoon_fx.ts', layer: 'encounter', strict: false },
   // Its element telegraphs (the Quench's frost, the Breath's storm, the
   // Hammer's granite, the Heat's molten basalt): char, glow and curtain on
   // the kit's own rungs (FINAL_KIT_FLOOR).

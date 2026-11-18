@@ -8,12 +8,17 @@
 //    slow bob that eases all but still while the round is on; a ring of wind
 //    runes on each walk (awake, they burn and race), mist under them, and
 //    the kit's stones drifting round them in the open air;
-//  - on EVERY tier (the raid acts on them): the Gale Path on the Cornice (a
-//    wheeling wind disc, a column of wind over it, and the route of wind it
-//    will carry you on, drawn along the ride's own arc to the isle), the
-//    Homeward Gale on an isle (the same in the way home's pale gold);
-//  - the Gale Bulwark and the Menders' beams (breath_bulwark_fx.ts) and the
-//    ride itself, its launch and its landing (breath_ride_fx.ts);
+//  - on EVERY tier (the raid acts on them): Thessaly's Updrafts on the
+//    Cornice and on each isle (a wheeling wind disc on the floor, a column
+//    of wind over it with two ribbons spiralling up round a bright core, and
+//    the route of wind it will carry you on, drawn along the ride's own arc
+//    to the next isle); its rising (ISLE_CUES.padUp) a burst of wind;
+//  - the 50 percent phase's parts: the Gale Cocoon and Skyrend Nova with
+//    their seals (breath_cocoon_fx.ts), each isle's Closing Storm and Sky's
+//    Reckoning (breath_isle_storm_fx.ts), the Stillstones
+//    (breath_stillstone_fx.ts), the adds' lane, ward, beams and split
+//    (breath_isle_adds_fx.ts), and the ride itself, its launch and its
+//    landing (breath_ride_fx.ts);
 //  - cosmetic (thinned on the low tier): the drifting stones' count, the
 //    motes, the isles' life (mist streaming off each hang and away on the
 //    wind, grit falling from under the turf's lip, dust sifting off the
@@ -26,7 +31,6 @@
 
 import * as THREE from 'three';
 import { BREATH_ISLES } from '../../sim/content/smith_heart_layout';
-import { isleSpots } from '../../sim/encounters/smith_heart/breath_isle_geometry';
 import {
   ISLE_AURAS,
   ISLE_CUES,
@@ -35,6 +39,7 @@ import {
 } from '../../sim/encounters/smith_heart/breath_isle_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import type { TelegraphKit } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import {
   HEART_KIT_SLOTS,
@@ -45,8 +50,10 @@ import {
 } from '../smith_heart/heart_kit';
 import { radialGlowTexture } from '../textures';
 import type { EngineParticles } from '../trash_engine_fx/engine_particles';
-import { BreathBulwarkFx } from './breath_bulwark_fx';
+import { BreathCocoonFx } from './breath_cocoon_fx';
 import { CORNICE_FLOOR_H } from './breath_fight_fx_core';
+import { BreathIsleAddsFx } from './breath_isle_adds_fx';
+import { BreathIsleStormFx } from './breath_isle_storm_fx';
 import {
   ISLE_COLORS as C,
   circleLook,
@@ -76,6 +83,8 @@ import {
   ISLE_UV_VERT,
 } from './breath_isles_glsl';
 import { BreathRideFx, ribbonGeometry } from './breath_ride_fx';
+import { BreathStillstoneFx } from './breath_stillstone_fx';
+import type { BreathTelegraphs } from './painted_telegraphs';
 
 /** What BreathFightFx lends this part (a type-only seam). */
 export interface BreathIslesHost {
@@ -90,6 +99,10 @@ export interface BreathIslesHost {
   readonly materials: THREE.Material[];
   groundY(x: number, z: number): number;
   shakeNear(x: number, z: number, amount: number, reach?: number): void;
+  /** The fight's floor telegraph kit and the Breath's paints (the Herald's
+   *  lane wears the wind's). */
+  readonly kit: TelegraphKit;
+  readonly paints: BreathTelegraphs;
 }
 
 interface CircleSlot {
@@ -99,6 +112,9 @@ interface CircleSlot {
   disc: THREE.ShaderMaterial;
   column: THREE.ShaderMaterial;
   route: THREE.ShaderMaterial;
+  helix: THREE.ShaderMaterial;
+  core: THREE.Mesh;
+  helixGroup: THREE.Group;
   id: number;
   born: number;
 }
@@ -112,6 +128,9 @@ const _stone = { x: 0, y: 0, z: 0, spin: 0, size: 0 };
 const _bob = { y: 0, rx: 0, rz: 0 };
 const _mote: IsleMote = { x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0 };
 const MIST_RGB = [0.86, 0.9, 0.95] as const;
+/** An Updraft's column (yards): tall enough to read from the next isle. */
+const PAD_HEIGHT = 16;
+const _stilled: [boolean, boolean] = [false, false];
 const GRIT_RGB = [0.36, 0.34, 0.33] as const;
 const DUST_RGB = [0.74, 0.72, 0.68] as const;
 
@@ -132,15 +151,17 @@ export class BreathIslesFx {
   /** The mist's soft disc (none without a DOM: a headless test host). */
   private readonly glow: THREE.Texture | null =
     typeof document !== 'undefined' ? radialGlowTexture() : null;
-  private readonly bulwark: BreathBulwarkFx;
+  private readonly cocoon: BreathCocoonFx;
+  private readonly storm: BreathIsleStormFx;
+  private readonly stillstones: BreathStillstoneFx;
+  private readonly adds: BreathIsleAddsFx;
   private readonly ride: BreathRideFx;
   // The scan's findings (reused).
   private guardianId = -1;
-  private bulwarkLeft = 0;
-  private bulwarkWhole = 0;
+  private cocoonUp = false;
+  private cocoonStilled = 0;
   private readonly seenCircles: number[] = [];
   private readonly seenRiders: number[] = [];
-  private readonly menders: number[] = [];
   private readonly isleMobs: number[] = [];
   private clock = 0;
   private seed = 0x7a31;
@@ -223,11 +244,24 @@ export class BreathIslesFx {
     // ---- the circles and their routes (every tier) ----
     const discGeo = new THREE.PlaneGeometry(1, 1);
     discGeo.rotateX(-Math.PI / 2);
-    const colGeo = new THREE.CylinderGeometry(1, 1.15, 1, 28, 1, true);
+    const colGeo = new THREE.CylinderGeometry(0.8, 1.15, 1, 28, 1, true);
     colGeo.translate(0, 0.5, 0);
-    h.geometries.push(discGeo, colGeo);
-    const spots = isleSpots();
-    void spots;
+    const coreGeo = new THREE.CylinderGeometry(0.18, 0.4, 1, 12, 1, true);
+    coreGeo.translate(0, 0.5, 0);
+    // The two ribbons spiralling up the column (unit radius, unit height).
+    const helixGeos: THREE.BufferGeometry[] = [];
+    for (let k = 0; k < 2; k++) {
+      const pts: { x: number; y: number; z: number }[] = [];
+      for (let i = 0; i <= 64; i++) {
+        const f = i / 64;
+        const a = f * Math.PI * 2 * 2.25 + k * Math.PI;
+        const r = 1 - 0.35 * f;
+        pts.push({ x: Math.sin(a) * r, y: f, z: Math.cos(a) * r });
+      }
+      const g = ribbonGeometry(pts, 0.022, true);
+      helixGeos.push(g);
+    }
+    h.geometries.push(discGeo, colGeo, coreGeo, ...helixGeos);
     for (const pad of ISLE_PADS) {
       {
         const color = C.path;
@@ -277,9 +311,41 @@ export class BreathIslesFx {
           blending: THREE.AdditiveBlending,
         });
         const colMesh = new THREE.Mesh(colGeo, column);
-        colMesh.scale.set(RIDE.circleR * 0.95, 9, RIDE.circleR * 0.95);
+        colMesh.scale.set(RIDE.circleR * 0.95, PAD_HEIGHT, RIDE.circleR * 0.95);
         colMesh.position.set(at.x, y, at.z);
         group.add(colMesh);
+        // The bright core of the updraft, and its two spiralling ribbons.
+        const coreMesh = new THREE.Mesh(coreGeo, column);
+        coreMesh.scale.set(1, PAD_HEIGHT * 1.25, 1);
+        coreMesh.position.set(at.x, y, at.z);
+        group.add(coreMesh);
+        const helix = new THREE.ShaderMaterial({
+          name: 'smithHeartBreathUpdraftHelix',
+          uniforms: {
+            uTime: h.uTime,
+            uColor: { value: new THREE.Color(color) },
+            uCore: { value: new THREE.Color(C.pathCore) },
+            uGlow: { value: 0 },
+            uFlow: { value: 2.2 },
+            uDash: { value: 4 },
+            uFade: { value: 0.12 },
+          },
+          vertexShader: ISLE_UV_VERT,
+          fragmentShader: ISLE_RIBBON_FRAG,
+          transparent: true,
+          depthWrite: false,
+          side: THREE.DoubleSide,
+          blending: THREE.AdditiveBlending,
+        });
+        const helixGroup = new THREE.Group();
+        helixGroup.position.set(at.x, y + 0.2, at.z);
+        helixGroup.scale.set(RIDE.circleR * 1.05, PAD_HEIGHT * 0.95, RIDE.circleR * 1.05);
+        for (const g of helixGeos) {
+          const hm = new THREE.Mesh(g, helix);
+          hm.frustumCulled = false;
+          helixGroup.add(hm);
+        }
+        group.add(helixGroup);
         // The route: two crossed ribbons along the ride's own arc.
         const pts = circleRoute(pad.from, pad.to, 48, { cornice: CORNICE_FLOOR_H + 1.1 });
         const route = new THREE.ShaderMaterial({
@@ -307,7 +373,7 @@ export class BreathIslesFx {
           rm.frustumCulled = false;
           group.add(rm);
         }
-        h.materials.push(disc, column, route);
+        h.materials.push(disc, column, route, helix);
         h.local.add(group);
         this.circles.push({
           from: pad.from,
@@ -316,14 +382,20 @@ export class BreathIslesFx {
           disc,
           column,
           route,
+          helix,
+          core: coreMesh,
+          helixGroup,
           id: -1,
           born: 0,
         });
       }
     }
 
-    // ---- the Bulwark and the Menders' beams, the ride (every tier) ----
-    this.bulwark = new BreathBulwarkFx(h);
+    // ---- the phase's parts, the ride (every tier) ----
+    this.cocoon = new BreathCocoonFx(h, this.glow);
+    this.storm = new BreathIsleStormFx(h, this.isles);
+    this.stillstones = new BreathStillstoneFx(h, this.isles, this.glow);
+    this.adds = new BreathIsleAddsFx(h, { kit: h.kit, paints: h.paints });
     this.ride = new BreathRideFx(h);
   }
 
@@ -374,39 +446,43 @@ export class BreathIslesFx {
   beginScan(): void {
     this.seenCircles.length = 0;
     this.seenRiders.length = 0;
-    this.menders.length = 0;
     this.isleMobs.length = 0;
     this.guardianId = -1;
+    this.storm.beginScan();
+    this.stillstones.beginScan();
+    this.adds.beginScan();
   }
 
-  /** An object of the claim: a Gale Path, a Homeward Gale or a ride's
-   *  carrier is this part's (true). */
+  /** An object of the claim: an Updraft, a ride's carrier or a Closing
+   *  Storm is this part's (true). */
   takeObject(e: Entity): boolean {
+    if (this.storm.takeObject(e)) return true;
     const kind = isleObjectKind(e.templateId);
     if (!kind) return false;
     if (kind !== 'ride') this.seenCircles.push(e.id);
     return true;
   }
 
-  /** The guardian: its Bulwark (absorb left and whole). */
+  /** The guardian: its Gale Cocoon (up, and the stones it counts stilled). */
   takeGuardian(e: Entity): void {
     this.guardianId = e.id;
-    let left = 0;
-    let whole = 0;
+    this.cocoonUp = false;
+    this.cocoonStilled = 0;
     if (!e.dead)
       for (const a of e.auras)
         if (a.id === ISLE_AURAS.cocoon) {
-          // The cocoon stands whole until both stones are stilled.
-          whole = 2;
-          left = Math.max(0.4, 2 - (a.value ?? 0));
+          this.cocoonUp = true;
+          this.cocoonStilled = a.value ?? 0;
         }
-    this.bulwarkLeft = left;
-    this.bulwarkWhole = whole;
   }
 
-  /** A mob of the claim: the isles' adds (true). */
+  /** A mob of the claim: the isles' adds and the Stillstones (true). */
   takeMob(e: Entity): boolean {
     const t = e.templateId;
+    if (t === ISLE_MOBS.stillstone) {
+      this.stillstones.takeStone(e);
+      return true;
+    }
     if (
       t !== ISLE_MOBS.mender &&
       t !== ISLE_MOBS.sentinel &&
@@ -418,8 +494,13 @@ export class BreathIslesFx {
       return false;
     if (e.dead) return true;
     this.isleMobs.push(e.id);
-    if (e.templateId === ISLE_MOBS.mender) this.menders.push(e.id);
+    this.adds.takeMob(e);
     return true;
+  }
+
+  /** A living player of the claim (a Stillstone's channeller?). */
+  takePlayer(e: Entity): void {
+    this.stillstones.takePlayer(e);
   }
 
   /** A player's aura: the ride's (true). */
@@ -445,7 +526,9 @@ export class BreathIslesFx {
       }
     }
     this.ride.setRiders(this.seenRiders);
-    this.bulwark.setMenders(this.menders);
+    this.storm.endScan();
+    this.stillstones.endScan(world);
+    this.adds.endScan();
     // The isles wake while their adds live; they hold still while the round
     // is on (its adds, its circles: someone may stand on them).
     for (let i = 0; i < this.wake.length; i++) {
@@ -461,7 +544,7 @@ export class BreathIslesFx {
       }
     }
     for (const c of this.circles) if (c.id >= 0) this.held[c.to] = 1;
-    if (this.seenRiders.length > 0) this.held.fill(1);
+    if (this.seenRiders.length > 0 || this.cocoonUp) this.held.fill(1);
   }
 
   /** The isle an entity stands on (by its local spot), or -1. */
@@ -527,8 +610,10 @@ export class BreathIslesFx {
       c.disc.uniforms.uGlow.value = look.glow;
       c.disc.uniforms.uSpin.value = look.spin;
       c.column.uniforms.uOpen.value = look.open;
-      c.column.uniforms.uGlow.value = 0.8 * look.glow;
+      c.column.uniforms.uGlow.value = 0.42 * look.glow;
       c.route.uniforms.uGlow.value = 0.85 * look.open * look.glow;
+      c.helix.uniforms.uGlow.value = 0.5 * look.open * look.glow;
+      c.helixGroup.rotation.y = t * 2.1;
       // A few motes drawn up the column (cosmetic).
       if (this.rand() < dt * 10 * this.h.density) {
         const at = padSpot(c.from, c.to, CORNICE_FLOOR_H);
@@ -554,7 +639,16 @@ export class BreathIslesFx {
     }
     this.ride.update(world, dt);
     const g = this.guardianId >= 0 ? world.entities.get(this.guardianId) : undefined;
-    this.bulwark.update(world, g, this.bulwarkLeft, this.bulwarkWhole, dt);
+    const seen = this.stillstones.stilledSides(world, _stilled);
+    this.cocoon.update(g, this.cocoonUp, this.cocoonStilled, seen, dt);
+    this.storm.update(this.isles, dt);
+    this.stillstones.update(world, dt);
+    this.adds.update(world, dt);
+  }
+
+  /** Skyrend Nova's hum this frame (0: none; the fight's audio plays it). */
+  get novaHum(): number {
+    return this.cocoon.hum;
   }
 
   /** The isles' life (cosmetic, thinned by the tier's density): mist off
@@ -631,58 +725,88 @@ export class BreathIslesFx {
         this.h.particles.shockRing(ev.x, ev.z, C.rune, (ev.radius ?? 9) + 3, 1.1);
         return true;
       }
+      if (ev.ability === ISLE_CUES.padUp) {
+        this.padUp(ev.x, ev.z);
+        return true;
+      }
+      if (ev.ability === ISLE_CUES.reckoning) {
+        this.storm.reckoning(ev.x, ev.z);
+        return true;
+      }
+      if (ev.ability === ISLE_CUES.split) {
+        this.adds.split(ev.x, ev.z);
+        return true;
+      }
       return false;
     }
     if (ev.type !== 'spellfx') return false;
     const src = world.entities.get(ev.sourceId);
     if (ev.ability === ISLE_CUES.cocoonUp && src) {
       const a = src.pos;
-      this.bulwark.flashShell(1.2);
+      this.cocoon.flashShell(1.2);
       this.h.particles.shockRing(a.x, a.z, C.bulwark, 16, 0.9);
       this.h.particles.shockRing(a.x, a.z, 0xffffff, 9, 0.5);
       this.h.shakeNear(a.x, a.z, 0.3, 40);
       return true;
     }
-    if ((ev.ability === ISLE_CUES.cocoonBreak || ev.ability === ISLE_CUES.novaBurst) && src) {
-      const a = src.pos;
-      const burst = ev.ability === ISLE_CUES.novaBurst;
-      this.h.particles.shockRing(
-        a.x,
-        a.z,
-        burst ? 0xffffff : C.bulwark,
-        burst ? 50 : 22,
-        burst ? 1.4 : 0.9,
-      );
-      const n = Math.round((burst ? 60 : 40) * this.h.density);
-      for (let i = 0; i < n; i++) {
-        const ang = this.rand() * Math.PI * 2;
-        const up = this.rand() * 0.8 - 0.1;
-        this.h.particles.puff(
-          a.x + Math.sin(ang) * 3,
-          src.pos.y + 3 + this.rand() * 5,
-          a.z + Math.cos(ang) * 3,
-          1,
-          {
-            speed: 16 + this.rand() * 10,
-            life: 0.9,
-            size: [0.6, 0.15],
-            color: RGB.bulwarkEdge,
-            alpha: 0.9,
-            pool: 'glow',
-            dir: [Math.sin(ang), up, Math.cos(ang)],
-            spread: 0.2,
-            drag: 1,
-          },
-        );
-      }
-      this.h.shakeNear(a.x, a.z, burst ? 0.7 : 0.4, burst ? 90 : 50);
+    if (ev.ability === ISLE_CUES.cocoonBreak || ev.ability === ISLE_CUES.novaBurst) {
+      this.cocoon.end(ev.ability === ISLE_CUES.novaBurst, src);
+      return true;
+    }
+    if (ev.ability === ISLE_CUES.stilled) {
+      if (src) this.cocoon.stilled(src.pos.x, src.pos.z);
+      this.stillstones.stilled(world, ev.sourceId);
       return true;
     }
     if (ev.ability === ISLE_CUES.mended) {
-      this.bulwark.mended(ev.sourceId);
+      this.adds.mended(world, ev.sourceId, ev.targetId);
+      return true;
+    }
+    if (ev.ability === ISLE_CUES.shoved) {
+      this.adds.shoved(world, ev.sourceId);
       return true;
     }
     return false;
+  }
+
+  /** Thessaly raises an Updraft at (x, z) (world): her wind rising out of
+   *  the stone, a column flaring up, rings, grit and motes. */
+  private padUp(x: number, z: number): void {
+    const y = this.h.groundY(x, z);
+    const p = this.h.particles;
+    p.shockRing(x, z, C.path, RIDE.circleR * 4, 0.9, { wake: 0.8, crest: 0.14, strength: 1.2 });
+    p.shockRing(x, z, 0xffffff, RIDE.circleR * 2.2, 0.5);
+    const n = Math.round(50 * (0.4 + 0.6 * this.h.density));
+    for (let i = 0; i < n; i++) {
+      const a = this.rand() * Math.PI * 2;
+      const r = this.rand() * RIDE.circleR;
+      p.puff(x + Math.sin(a) * r, y + 0.3, z + Math.cos(a) * r, 1, {
+        speed: 10 + this.rand() * 14,
+        life: 1.3,
+        size: [0.55, 0.1],
+        color: this.rand() < 0.5 ? RGB.pathCore : RGB.path,
+        alpha: 1,
+        pool: 'glow',
+        dir: [Math.cos(a) * 0.25, 1, -Math.sin(a) * 0.25],
+        spread: 0.15,
+        drag: 0.7,
+      });
+    }
+    for (let i = 0; i < Math.round(18 * this.h.density); i++) {
+      const a = this.rand() * Math.PI * 2;
+      p.puff(x, y + 0.3, z, 1, {
+        speed: 7,
+        life: 1.2,
+        size: [0.6, 2.2],
+        color: [0.78, 0.8, 0.82],
+        alpha: 0.5,
+        dir: [Math.sin(a), 0.25, Math.cos(a)],
+        spread: 0.2,
+        drag: 1.2,
+      });
+    }
+    this.ride.rideUp(x, z);
+    this.h.shakeNear(x, z, 0.2, 24);
   }
 
   /** The textures and pools this part owns (the host frees its geometries
@@ -690,7 +814,8 @@ export class BreathIslesFx {
   dispose(): void {
     this.glow?.dispose();
     for (const inst of this.stones) inst.dispose();
-    this.bulwark.dispose();
+    this.cocoon.dispose();
+    this.adds.dispose();
   }
 
   /** The fight's claim is out of view: hide what moves. */
@@ -700,7 +825,10 @@ export class BreathIslesFx {
       c.group.visible = false;
     }
     this.ride.leave();
-    this.bulwark.leave();
+    this.cocoon.leave();
+    this.storm.leave();
+    this.stillstones.leave();
+    this.adds.leave();
     this.guardianId = -1;
   }
 
