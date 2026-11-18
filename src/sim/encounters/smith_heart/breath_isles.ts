@@ -415,8 +415,13 @@ function stepClosing(s: BreathScope): void {
     st.reckon -= DT;
     if (st.reckon > 1e-9) continue;
     st.reckon = tier.reckonEvery;
-    // A strike under every player on the isle (where they stand now).
+    // A strike under every player on the isle (where they stand now), but
+    // never under one channeling its Stillstone: the storm will not strike
+    // the stone's calm (a channel any hit breaks would be hopeless once the
+    // storm closed; the bot passes of 2026-11-18). Their neighbours' strikes
+    // still reach them.
     for (const p of playersOnIsle(s, i)) {
+      if (p.castingAbility === ISLE_CASTS.still) continue;
       const at = local(s.ctx, s.inst, p);
       const e = spawnBreathObject(
         s.ctx,

@@ -135,7 +135,9 @@ function build(i: number): IsleSpots {
     }
   }
   const far = isleReach(i, fx, fz);
-  const mid = Math.max(2, far * 0.35);
+  // The last isle's adds stand on the middle's near side, clear of the
+  // Stillstone on the far side (they never rise on top of it).
+  const mid = step === 2 ? -Math.max(1.5, far * 0.15) : Math.max(2, far * 0.35);
   const px = -fz;
   const pz = fx;
   // Each drawn in toward the middle until a melee ring round it stays on

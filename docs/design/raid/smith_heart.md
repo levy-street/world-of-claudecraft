@@ -1969,24 +1969,27 @@ Every number is a SKETCH; the tier rows are `ISLE_TIERS` and the shared ones `IS
   3. the Squall Shieldbearer, whose Squall Ward turns aside 85 percent (Heroic 90) of every
      blow struck from inside its front arc (60 degrees each side, Heroic 70;
      `combat/front_ward.ts`): its tank turns it away, the raid strikes its back.
-  Add health (before the tier's add multiplier, x1.2 Normal, x1.625 Heroic; set by the bot
-  passes of 2026-11-18 at POOL 0.65, the human clock: Normal's first numbers were cleared in
-  59 to 85 s of the nova's 150 and Heroic's in 56 s of 125, so Normal's went up about 1.9 times
-  and Heroic's 2.6 times; Heroic's last pass: 92 s of 125, no deaths):
+  Add health (before the tier's add multiplier, x1.2 Normal, x1.625 Heroic), set by the bot
+  passes of 2026-11-18 on the human clock (`POOL` = the bots' DPS over 1,400: about 0.35 on
+  Normal, 0.5 on Heroic; the first passes at 0.65 overstated it): Normal's two chains cleared
+  in 79 s of the nova's 150 (and the boss killed in 3:58, no deaths); Heroic's in 96 s of 125
+  (the slower side lost two to Sky's Reckoning; a tight Heroic, as asked):
 
   | | Sentinel | Mender | Herald | Squall | Fragment | Shieldbearer |
   |---|---|---|---|---|---|---|
-  | Normal | 4,350 | 2,450 | 2,850 | 3,250 | 1,250 | 5,700 |
-  | Heroic and Mythic | 6,000 | 3,400 | 3,900 | 4,400 | 1,700 | 7,800 |
+  | Normal | 8,050 | 4,550 | 5,250 | 6,000 | 2,300 | 10,550 |
+  | Heroic and Mythic | 5,650 | 3,200 | 3,650 | 4,100 | 1,550 | 7,350 |
 - **The Closing Storm.** Each isle's storm starts as its first rider lands: a ring closing on
   its floor (Normal 50 s, Heroic 38 s). When it runs out, **Sky's Reckoning** rains a strike
   under every player on that isle every 2.5 s (Heroic 2 s) on a 1.3 s warning, each 16 percent
   of the struck one's health (Heroic 30): keep moving, finish the isle. Painful, never an
-  instant wipe on Normal.
+  instant wipe on Normal. No strike is laid under a player channeling a Stillstone (a channel
+  any hit breaks would be hopeless once the storm closed); the neighbours' strikes still
+  reach them.
 - **The Stillstones.** The last isle of each side holds one, woken when that isle's adds are
   down (Heroic: two Squall Fragments rise to guard it). A player targets it and presses
   interact: Still the Gale, a 5 s channel any landed hit breaks (the trash engine's G3 use).
-  Both stilled: the cocoon shatters, the nova is cut, the adds and pads go, every player on the
+  The last isle's adds rise on its near side, clear of the stone. Both stilled: the cocoon shatters, the nova is cut, the adds and pads go, every player on the
   isles rides home, and 4 s later the storm breaks (phase 2, as before).
 - **A wipe** brings every body on an isle or in the air back to the Cornice; nothing of the
   phase stays. **Mythic** is Heroic whole for now; ideas for it: a third chain (three groups),

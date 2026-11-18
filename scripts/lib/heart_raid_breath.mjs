@@ -760,6 +760,9 @@ function isleDuty(world, st, b, me, isle) {
     const l = L(world, at);
     return isleAt(l.x, l.z) === isle;
   };
+  // Channeling the Stillstone: hold still (no strike is laid under the
+  // channeler; a step would break it).
+  if (b.self?.cast === ISLE_CASTS.still) return { goal: me, hold: true, duty: 'stone' };
   // Sky's Reckoning: out of any strike laid on the isle.
   for (const k of o.strikes) {
     if (hypot(k, me) > k.r + 1) continue;

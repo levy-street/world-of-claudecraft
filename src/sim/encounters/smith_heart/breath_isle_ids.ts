@@ -161,7 +161,13 @@ export interface IsleTier {
 // percent on Normal and doubled on Heroic and Mythic; a second Heroic pass
 // (81 s of 125, no deaths) raised Heroic's another 30 percent, and a full Normal run (59 s of 150)
 // Normal's another 60; a Normal raid that came in six strong then ran the
-// nova out (one stone in 120 s), so Normal came back down 15 percent.
+// nova out (one stone in 120 s), so Normal came back down 15 percent. Those passes ran at POOL 0.65, but
+// the pools of 2026-11-17 are set for a human raid of 1,400 DPS: the bots'
+// own clock is POOL = their DPS / 1,400 (Normal about 0.35, Heroic about
+// 0.5), so the adds went up again by 0.65 / that (x1.85 Normal, x1.3
+// Heroic) to keep the same clear on the human clock; Heroic then lost a side to the
+// stone's guard (one stone in 89 s, the nova ran out) and came down 15 percent,
+// then 15 more (the slower side, east, still lost the race by about 20 s).
 export const ISLE_TIERS: Readonly<Record<'normal' | 'heroic' | 'mythic', IsleTier>> = {
   normal: {
     novaSeconds: 150,
@@ -169,12 +175,12 @@ export const ISLE_TIERS: Readonly<Record<'normal' | 'heroic' | 'mythic', IsleTie
     closingSeconds: 50,
     reckonEvery: 2.5,
     reckonShare: 0.16,
-    sentinelHealth: 4350,
-    menderHealth: 2450,
-    heraldHealth: 2850,
-    squallHealth: 3250,
-    fragmentHealth: 1250,
-    shieldHealth: 5700,
+    sentinelHealth: 8050,
+    menderHealth: 4550,
+    heraldHealth: 5250,
+    squallHealth: 6000,
+    fragmentHealth: 2300,
+    shieldHealth: 10550,
     wardCut: 0.85,
     wardHalfDeg: 60,
     shoveYards: 12,
@@ -187,12 +193,12 @@ export const ISLE_TIERS: Readonly<Record<'normal' | 'heroic' | 'mythic', IsleTie
     closingSeconds: 38,
     reckonEvery: 2,
     reckonShare: 0.3,
-    sentinelHealth: 6000,
-    menderHealth: 3400,
-    heraldHealth: 3900,
-    squallHealth: 4400,
-    fragmentHealth: 1700,
-    shieldHealth: 7800,
+    sentinelHealth: 5650,
+    menderHealth: 3200,
+    heraldHealth: 3650,
+    squallHealth: 4100,
+    fragmentHealth: 1550,
+    shieldHealth: 7350,
     wardCut: 0.9,
     wardHalfDeg: 70,
     shoveYards: 20,
@@ -206,12 +212,12 @@ export const ISLE_TIERS: Readonly<Record<'normal' | 'heroic' | 'mythic', IsleTie
     closingSeconds: 38,
     reckonEvery: 2,
     reckonShare: 0.3,
-    sentinelHealth: 6000,
-    menderHealth: 3400,
-    heraldHealth: 3900,
-    squallHealth: 4400,
-    fragmentHealth: 1700,
-    shieldHealth: 7800,
+    sentinelHealth: 5650,
+    menderHealth: 3200,
+    heraldHealth: 3650,
+    squallHealth: 4100,
+    fragmentHealth: 1550,
+    shieldHealth: 7350,
     wardCut: 0.9,
     wardHalfDeg: 70,
     shoveYards: 20,

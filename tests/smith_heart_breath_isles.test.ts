@@ -510,3 +510,37 @@ describe('the sky strikes wait out the indrawn breath and the Roar', () => {
     expect(f.objects(BREATH_OBJECTS.strikePrefix).length).toBeGreaterThan(0);
   });
 });
+
+describe("Sky's Reckoning spares the Stillstone's channeler", () => {
+  it('lays no strike under a player channeling Still the Gale, one under everyone else', () => {
+    const f = pulled(6);
+    toIsles(f);
+    const [, a, c] = f.players;
+    ride(f, a, -1, 0);
+    killIsle(f, 0);
+    ride(f, a, 0, 1);
+    killIsle(f, 1);
+    killIsle(f, 1);
+    ride(f, a, 1, 2);
+    killIsle(f, 2);
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    const stone = f.sim.ctx.entities.get(st.isles.isles[2].stoneId ?? -1);
+    if (!stone) throw new Error('no stone');
+    const sp = isleSpots()[2].stone;
+    if (!sp) throw new Error('no stone spot');
+    f.put(a, sp.x + 1.5, sp.z);
+    f.put(c, isleSpots()[2].land.x, isleSpots()[2].land.z);
+    a.targetId = stone.id;
+    f.sim.interact(a.id);
+    expect(a.castingAbility).toBe(ISLE_CASTS.still);
+    st.isles.isles[2].closing = 0.05;
+    f.tick(2);
+    expect(a.castingAbility).toBe(ISLE_CASTS.still);
+    const strikes = st.isles.strikes.filter((k) => k.isle === 2);
+    const near = (p: Entity) =>
+      strikes.some((k) => Math.hypot(k.x - f.local(p).x, k.z - f.local(p).z) < 0.5);
+    expect(near(a)).toBe(false);
+    expect(near(c)).toBe(true);
+  });
+});
