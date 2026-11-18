@@ -56,8 +56,13 @@ describe('catalog portals', () => {
           // A gear page also links the narrower pages under it (type, quality); those are
           // directories, not destinations.
           // The equipment set groups page lists set articles, not items.
+          // The Vendors directory also links the guide and the token items a shop takes.
           return listed.filter(
-            (title) => title !== root && !pages.has(title) && !title.endsWith(' (Equipment set)'),
+            (title) =>
+              title !== root &&
+              !pages.has(title) &&
+              !title.endsWith(' (Equipment set)') &&
+              !(child === 'reserved/Vendors' && !title.startsWith('npc/')),
           );
         }),
       );

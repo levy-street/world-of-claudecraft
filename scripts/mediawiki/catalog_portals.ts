@@ -9,24 +9,33 @@ import {
   MOBS,
   NPCS,
   QUESTS,
+  ZONES,
   zoneContaining,
 } from '../../src/sim/data';
 import { weaponHand } from '../../src/sim/equipment_rules';
 import { npcRoleFor } from '../../src/sim/npc_role';
 import { WORLD_PVP_SKULL_BAG_ITEM_ID } from '../../src/sim/pvp/world_pvp_trophy';
-import { type ItemDef, type MobFamily, questTurnInNpcIds } from '../../src/sim/types';
+import {
+  type ItemDef,
+  type MobFamily,
+  type PlayerClass,
+  questTurnInNpcIds,
+} from '../../src/sim/types';
 import { craftNameKey, craftNameText } from '../../src/ui/hud/professions/craft_name_view';
 import { abilityIndexGroup, MEMBERSHIP_GROUP } from './ability_access';
 import { hoardBosses, riftBosses } from './boss_groups';
 import { type ClassAbilityGroup, classAbilityGroup } from './class_ability_sections';
+import { addClassGearViews, BY_CLASS } from './class_gear';
 import { creatureRole, FRIENDLY_GROUPS, ROLE_SECTIONS } from './creature_role';
 import { raidName, raidRooms } from './dungeon_catalog';
 import { type ArticleTools, words } from './entity_format';
+import { addEnemyZoneIndexes, addVendorDirectory } from './hub_directories';
 import { addInstanceLootPages } from './instance_loot';
 import { addItemBrowseViews, BY_QUALITY, BY_WEAPON_TYPE, MORE_WAYS } from './item_browse_views';
 import { itemPlacement, offhandSection } from './item_catalog_groups';
 import { addGearPages } from './item_tables';
 import { homeZones } from './npc_article';
+import { npcHubServices } from './npc_hub_services';
 import { npcServiceLabel } from './npc_service';
 import { wikiItemKind } from './wiki_item_kind';
 
@@ -53,7 +62,12 @@ function catalog(w: Writer, root: Root, intro: string, order: string[] = []) {
   const groups = new Map<string, Map<string, Map<string, Member>>>();
   const builders = new Map<string, Builder>();
   const labelOrder = new Map<string, string[]>();
+  const extras = new Map<string, () => string[]>();
   return {
+    /** A section of ready-made links to pages written elsewhere, made when the hub is. */
+    extra(facet: string, lines: () => string[]) {
+      extras.set(facet, lines);
+    },
     /** Lists a section's groups in this order instead of A to Z. */
     order(facet: string, labels: string[]) {
       labelOrder.set(facet, labels);
@@ -71,7 +85,15 @@ function catalog(w: Writer, root: Root, intro: string, order: string[] = []) {
     },
     publish() {
       const parts = [intro];
-      for (const [facet, buckets] of [...groups].sort(([a], [b]) => rank(a) - rank(b))) {
+      const facets = [...new Set([...groups.keys(), ...extras.keys()])];
+      for (const facet of facets.sort((a, b) => rank(a) - rank(b))) {
+        const made = extras.get(facet);
+        if (made) {
+          const lines = made();
+          if (lines.length) parts.push(w.section(facet, w.bullets(lines)));
+          continue;
+        }
+        const buckets = groups.get(facet)!;
         const children: string[] = [];
         const labels = labelOrder.get(facet) ?? [];
         const at = (label: string) =>
@@ -148,6 +170,7 @@ function itemPortal(w: Writer) {
       'Ingredients by profession',
       // After the existing sections, so an item keeps its slot or kind page as its
       // breadcrumb even when a quality page also lists it.
+      BY_CLASS,
       BY_QUALITY,
       MORE_WAYS,
     ],
@@ -214,7 +237,9 @@ function itemPortal(w: Writer) {
     gear('Weapons', hands, true);
   // Cross-slot views: by quality, weapon type, source and equipment set group.
   addItemBrowseViews(w, c);
+  const classGear = addClassGearViews(w, c);
   c.publish();
+  return classGear;
 }
 
 const families: Record<MobFamily, string> = {
@@ -242,6 +267,8 @@ function enemyPortal(w: Writer) {
       'Rift and hoard bosses',
       'Dungeon spawn lists',
       'Raid spawn lists',
+      // Last, so an enemy keeps its family page as its breadcrumb.
+      'By zone',
     ],
   );
   // A raid's rooms are one place to a player; list their spawns under the raid.
@@ -315,7 +342,15 @@ function enemyPortal(w: Writer) {
         key: title + '@' + d.id,
       });
     }
+  const zones = new Map<string, string>();
+  c.extra('By zone', () =>
+    [...addEnemyZoneIndexes(w)].map(([id, z]) => {
+      zones.set(id, z.title);
+      return w.link(z.title, ZONES.find((zone) => zone.id === id)!.name) + ' (' + z.count + ')';
+    }),
+  );
   c.publish();
+  return zones;
 }
 
 // Index headings for spellbook entries outside the base kit; same split as the class page.
@@ -368,6 +403,8 @@ function npcPortal(w: Writer) {
       'Services',
       'Quest contacts',
       'Friendly creatures',
+      // Last, so an NPC keeps its zone page as its breadcrumb.
+      'Shops',
     ],
   );
   const givers = new Set(Object.values(QUESTS).map((q) => q.giverNpcId));
@@ -376,6 +413,7 @@ function npcPortal(w: Writer) {
     const n = BUILTIN_WORLD.npcs[id] ?? NPCS[id];
     const role = npcRoleFor(n);
     const service = role ? npcServiceLabel(role) : 'Other residents';
+    const services = npcHubServices(n);
     // A system-spawned NPC still stands at its authored post. The origin is the
     // placeholder for NPCs with no post (raid walk-ins, the spirit healer).
     // The same zones the NPC's own page names, so the index and the page always agree.
@@ -389,7 +427,7 @@ function npcPortal(w: Writer) {
     for (const room of rooms) c.file('Dungeons and raids', room, { ...entry, section: service });
     if (!zone && !rooms.length)
       c.file('Other locations', 'Events and activities', { ...entry, section: service });
-    if (role) c.file('Services', service, entry);
+    for (const label of services) c.file('Services', label, entry);
     if (givers.has(id)) c.file('Quest contacts', 'Quest givers', entry);
     if (recipients.has(id)) c.file('Quest contacts', 'Quest hand-ins', entry);
   }
@@ -402,14 +440,23 @@ function npcPortal(w: Writer) {
       section: ROLE_SECTIONS[role],
     });
   }
+  c.extra('Shops', () => {
+    const vendors = addVendorDirectory(w);
+    return [w.link(vendors.title, 'All vendors') + ' (' + vendors.count + ')'];
+  });
   c.publish();
 }
 
-export function addCatalogPortals(w: Writer) {
-  itemPortal(w);
+/** Writes the hubs. Returns the pages other builders link: class gear and enemies by zone. */
+export function addCatalogPortals(w: Writer): {
+  classGear: Map<PlayerClass, string>;
+  enemyIndex: Map<string, string>;
+} {
+  const classGear = itemPortal(w);
   // Linked from the Dungeons and raids hub and from each dungeon and raid page.
   addInstanceLootPages(w);
-  enemyPortal(w);
+  const enemyIndex = enemyPortal(w);
   abilityPortal(w);
   npcPortal(w);
+  return { classGear, enemyIndex };
 }

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import type { ArticleKind, ArticleTools } from '../scripts/mediawiki/entity_format';
 import {
-  addHubDirectories,
-  appendHubSection,
+  addEnemyZoneIndexes,
+  addVendorDirectory,
   type SeedPage,
   vendorCurrencies,
   vendorNpcs,
@@ -118,16 +118,12 @@ describe('zone articles', () => {
   });
 });
 
+// The NPCs and Enemies hubs link these from their own sections; see
+// tests/mediawiki_class_quest_views.test.ts.
 describe('vendors and enemies-by-zone directories', () => {
-  const hubs = (): SeedPage[] => [
-    { title: 'NPCs', text: 'intro\n\n== Services ==\n* x\n\n[[Category:Portals]]\n' },
-    { title: 'Mobs', text: 'intro\n\n== Creature families ==\n* y\n\n[[Category:Portals]]\n' },
-  ];
-
-  it('lists every NPC with a shop, with its stock size and currency, and links it from the NPCs hub', () => {
+  it('lists every NPC with a shop, with its stock size and currency', () => {
     const { w, added } = tools();
-    const pages = hubs();
-    addHubDirectories(w, pages);
+    expect(addVendorDirectory(w)).toEqual({ title: 'Vendors', count: vendorNpcs().length });
     const vendors = added.get('Vendors')!;
     expect(vendors.startsWith('[[NPCs|Browse NPCs]]')).toBe(true);
     for (const n of Object.values(NPCS).filter((n) => n.vendorItems?.length))
@@ -140,10 +136,6 @@ describe('vendors and enemies-by-zone directories', () => {
     expect(vendors).toMatch(
       /\[\[npc\/heroic_quartermaster\|[^\]]+\]\] · Stock: \d+ items · Pays with: Heroic Marks/,
     );
-    const npcs = pages[0].text;
-    expect(npcs).toContain('== Shops ==\n* [[Vendors|All vendors]] (' + vendorNpcs().length + ')');
-    expect(npcs.trimEnd().endsWith('[[Category:Portals]]')).toBe(true);
-    expect(npcs.indexOf('== Shops ==')).toBeGreaterThan(npcs.indexOf('== Services =='));
   });
 
   it('names Honor for a Warfare quartermaster', () => {
@@ -151,26 +143,14 @@ describe('vendors and enemies-by-zone directories', () => {
     expect(vendorCurrencies(warfare, (id) => id)).toContain('Honor');
   });
 
-  it('writes one enemies page per zone, by rank, and links each from the Enemies hub', () => {
+  it('writes one enemies page per zone, by rank', () => {
     const { w, added } = tools();
-    const pages = hubs();
-    const index = addHubDirectories(w, pages);
-    const eastbrook = added.get(index.get('eastbrook_vale')!)!;
-    expect(index.get('eastbrook_vale')).toBe('Eastbrook Vale (Enemies index)');
+    const index = addEnemyZoneIndexes(w);
+    expect(index.get('eastbrook_vale')!.title).toBe('Eastbrook Vale (Enemies index)');
+    const eastbrook = added.get(index.get('eastbrook_vale')!.title)!;
     expect(eastbrook.startsWith('[[Mobs|Browse enemies]]')).toBe(true);
     expect(eastbrook).toContain('== Normal enemies ==');
     expect(eastbrook).toMatch(/\* \[\[mob\/forest_wolf\|Forest Wolf\]\] · Level \d/);
-    const mobs = pages[1].text;
-    expect(mobs).toContain('== By zone ==\n* [[');
-    expect(mobs).toContain('[[Eastbrook Vale (Enemies index)|Eastbrook Vale]] (');
-    expect(mobs.trimEnd().endsWith('[[Category:Portals]]')).toBe(true);
-  });
-
-  it('adds a section before a hub page category lines and reports a missing hub', () => {
-    const pages: SeedPage[] = [{ title: 'Hub', text: 'body\n\n[[Category:A]]\n[[Category:B]]\n' }];
-    expect(appendHubSection(pages, 'Hub', '== New ==\n* z')).toBe(true);
-    expect(pages[0].text).toBe('body\n\n== New ==\n* z\n\n[[Category:A]]\n[[Category:B]]\n');
-    expect(appendHubSection(pages, 'Nope', '== New ==')).toBe(false);
   });
 });
 

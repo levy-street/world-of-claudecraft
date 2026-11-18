@@ -39,6 +39,7 @@ import { abilityIndexGroup } from '../../scripts/mediawiki/ability_access';
 import { articleArt, modelStills } from '../../scripts/mediawiki/article_art';
 import { attackShots, withAttackShots } from '../../scripts/mediawiki/attack_art';
 import { classAbilitySections } from '../../scripts/mediawiki/class_ability_sections';
+import { classGearSection } from '../../scripts/mediawiki/class_gear';
 import { abilityArticle } from '../../scripts/mediawiki/ability_article';
 import { addTalentPages, classSpecSections, talentGrid } from '../../scripts/mediawiki/talent_articles';
 import { addSystemArticles } from '../../scripts/mediawiki/system_articles';
@@ -188,18 +189,18 @@ add('Sources Used', section('Game mechanics', bullets([
 addTalentPages(writer);
 addSystemArticles({ add, unique: reserve, titleBy });
 addRotatingQuests({ ...writer, reserve });
-addCatalogPortals({ ...writer, reserve });
+const { classGear, enemyIndex } = addCatalogPortals({ ...writer, reserve });
 const zoneDirectories = addQuestDirectory({ ...writer, reserve });
 
 addZoneAndClassHubs({ ...writer, reserve });
 const raidParents = addDungeonCatalog({ ...writer, reserve });
 
-// Zone articles, the Vendors and enemies-by-zone directories, and mount routes (world_directories.ts).
+// Zone articles and mount routes (world_directories.ts).
 const { addWorldDirectories } = await import('../../scripts/mediawiki/world_directories');
-addWorldDirectories({ ...writer, money, reserve, raidParents, zoneDirectories, pages });
+addWorldDirectories({ ...writer, money, reserve, raidParents, zoneDirectories, enemyIndex, pages });
 
 for (const [id, cls] of Object.entries(CLASSES)) {
-  add(titleBy.class.get(id), section('Overview', cls.name + ' is a class you can play. It uses ' + cls.resourceType + ' to power its abilities. A new character of this class starts with ' + link(titleBy.item.get(cls.startWeapon), ITEMS[cls.startWeapon]?.name ?? cls.startWeapon) + '.') + section('Starting statistics', table(Object.entries(cls.baseStats).map(([k, v]) => [({ str: 'Strength', agi: 'Agility', sta: 'Stamina', int: 'Intellect', spi: 'Spirit', armor: 'Armor' })[k] ?? k, String(v)]))) + classSpecSections(id, writer) + section('Talents', 'At each of these levels you pick one talent from the row. See every class side by side on ' + link('Talent choices') + '.\\n\\n' + talentGrid(id, writer)) + classAbilitySections(id, writer, ['Specialization abilities', 'Talent choices']), ['Classes']);
+  add(titleBy.class.get(id), section('Overview', cls.name + ' is a class you can play. It uses ' + cls.resourceType + ' to power its abilities. A new character of this class starts with ' + link(titleBy.item.get(cls.startWeapon), ITEMS[cls.startWeapon]?.name ?? cls.startWeapon) + '.') + section('Starting statistics', table(Object.entries(cls.baseStats).map(([k, v]) => [({ str: 'Strength', agi: 'Agility', sta: 'Stamina', int: 'Intellect', spi: 'Spirit', armor: 'Armor' })[k] ?? k, String(v)]))) + classGearSection(id, classGear, writer) + classSpecSections(id, writer) + section('Talents', 'At each of these levels you pick one talent from the row. See every class side by side on ' + link('Talent choices') + '.\\n\\n' + talentGrid(id, writer)) + classAbilitySections(id, writer, ['Specialization abilities', 'Talent choices']), ['Classes']);
 }
 
 for (const dungeon of DUNGEON_LIST) {

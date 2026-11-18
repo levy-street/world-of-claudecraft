@@ -28,6 +28,7 @@ export interface ArticleTools {
     companion?: Map<string, string>;
     worldQuest?: Map<string, string>;
     weekly?: Map<string, string>;
+    enchant?: Map<string, string>;
   };
   add(title: string, body: string, categories: string[]): void;
   section(title: string, body: string): string;

@@ -1621,6 +1621,30 @@ body[data-woc-site] #view table.item-table {
   display: none;
 }
 
+/* A craft's recipe table: a narrow skill column, then the recipe with its icon. */
+body[data-woc-site] #view table.recipe-table {
+  table-layout: auto;
+}
+#view .wiki-prose table.recipe-table td:first-child {
+  width: 4em;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+#view .wiki-prose table.recipe-table td:nth-child(2) {
+  font-weight: 600;
+  white-space: normal;
+}
+#view .wiki-prose table.recipe-table td:nth-child(3) {
+  color: inherit;
+  font-weight: 400;
+  white-space: normal;
+}
+#view .wiki-prose table.recipe-table td:nth-child(n + 4) {
+  color: var(--text-dim);
+  font-size: 15px;
+}
+
 /* A creature's or NPC's model render fills the info box instead of a small icon. */
 #view .wiki-box-art .article-art.model {
   display: block;
@@ -2110,4 +2134,32 @@ body[data-woc-site] #view table.item-table {
 }
 #view .heading-panel {
   padding-top: 12px;
+}
+
+/* Recipe tables: fixed columns so the long Materials and Learned from cells get room. */
+#view .wiki-prose table.recipe-table:has(tr:first-child th + th) {
+  width: 100%;
+  table-layout: fixed;
+}
+#view .wiki-prose table.recipe-table:has(tr:first-child th + th) :is(th, td):nth-child(n) {
+  width: auto;
+  white-space: normal;
+  overflow-wrap: break-word;
+  vertical-align: top;
+}
+#view .wiki-prose table.recipe-table:has(tr:first-child th + th) tr:first-child th:nth-child(1) {
+  width: 5.5em;
+  white-space: nowrap;
+}
+#view .wiki-prose table.recipe-table:has(tr:first-child th + th) tr:first-child th:nth-child(2),
+#view .wiki-prose table.recipe-table:has(tr:first-child th + th) tr:first-child th:nth-child(3) {
+  width: 21%;
+}
+#view .wiki-prose table.recipe-table:has(tr:first-child th + th) tr:first-child th:nth-child(5) {
+  width: 20%;
+}
+@media (max-width: 760px) {
+  #view .wiki-prose table.recipe-table:has(tr:first-child th + th) {
+    table-layout: auto;
+  }
 }

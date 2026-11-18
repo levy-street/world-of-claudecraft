@@ -1,7 +1,9 @@
-import { CLASSES, DUNGEONS, NPCS, QUEST_ORDER, QUESTS, ZONES } from '../../src/sim/data';
+import { CLASSES, NPCS, QUEST_ORDER, QUESTS, ZONES } from '../../src/sim/data';
 import type { QuestDef } from '../../src/sim/types';
 import type { ArticleTools } from './entity_format';
 import { questZoneName } from './quest_articles';
+import { questClosed } from './quest_closed';
+import { addQuestLevelViews } from './quest_level_views';
 
 type Writer = Pick<ArticleTools, 'add' | 'titleBy' | 'link' | 'bullets' | 'section'> & {
   reserve(title: string): string;
@@ -52,9 +54,7 @@ function groupBy(entries: Entry[], key: (e: Entry) => string) {
   return groups;
 }
 
-function unavailable(q: QuestDef) {
-  return q.retired || (q.gatedWithDungeon && DUNGEONS[q.gatedWithDungeon]?.guideVisible === false);
-}
+const unavailable = questClosed;
 
 function professionQuest(q: QuestDef) {
   // The q_prof_ family includes material-delivery work orders as well as hands-on lessons.
@@ -172,6 +172,7 @@ export function addQuestDirectory(w: Writer) {
     if (items.length)
       activityLinks.push(counted(page(label, items, intro, 'zone'), label, items.length));
   }
+  const more = addQuestLevelViews(w);
   w.add(
     'Quests',
     'Pick a zone to follow its quest chains, or look at quests by type. Open a quest to see what to do, a map of where to go, who to turn it in to and what you get.\n\n' +
@@ -183,7 +184,8 @@ export function addQuestDirectory(w: Writer) {
           w.link('World quests') + ' · Daily world rotation',
           w.link('Weekly quests') + ' · Emissary charges',
         ]),
-      ),
+      ) +
+      w.section('More ways to browse', w.bullets(more)),
     ['Portals'],
   );
   return zoneTitles;

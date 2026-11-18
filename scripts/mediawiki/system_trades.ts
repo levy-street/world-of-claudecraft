@@ -13,13 +13,13 @@ import {
   STATION_RADIUS,
   STATIONS,
 } from '../../src/sim/content/professions';
-import { ALL_RECIPES, ITEMS, QUESTS } from '../../src/sim/data';
+import { ALL_RECIPES, ITEMS, NPCS, QUESTS } from '../../src/sim/data';
 import { craftCastDurationSec } from '../../src/sim/professions/craft_cast_duration';
 import {
   FARM_SURVIVAL_BAND_SPAN,
   farmSurvivalChance,
 } from '../../src/sim/professions/farm_projection';
-import { trainingFeeFor, trainingStationTypeFor } from '../../src/sim/professions/training';
+import { trainingFeeFor } from '../../src/sim/professions/training';
 import {
   MINIMAL_TIER_MULTIPLIER,
   REDUCED_TIER_MULTIPLIER,
@@ -27,6 +27,8 @@ import {
   tierForSkill,
 } from '../../src/sim/professions/wheel';
 import { itemSlotLabel } from '../../src/ui/item_slot_labels';
+import { RECIPE_PATTERN_ITEMS, recipeTrainerStation } from './recipe_sources';
+import { professionRecipes, recipeTable } from './recipe_table';
 import { heading, list, percent, type SystemWriter, words } from './system_writer';
 import { titleWords } from './wiki_item_kind';
 
@@ -43,22 +45,11 @@ export function addTradeSkills(w: SystemWriter) {
     const round = (n: number) => Math.round(n * 10) / 10;
     return `${location?.hub ?? w.entity('zone', station.zoneId)}, x ${round(station.pos.x)}, z ${round(station.pos.z)}`;
   };
-  const patterns = new Map<string, string[]>();
-  for (const definition of Object.values(ITEMS)) {
-    if (definition.kind !== 'recipe') continue;
-    for (const id of definition.teachesRecipeIds ?? [definition.teachesRecipeId]) {
-      const entries = patterns.get(id) ?? [];
-      entries.push(item(definition.id));
-      patterns.set(id, entries);
-    }
-  }
   for (const r of ALL_RECIPES) {
     const guide = recipeNames.get(r.id);
     const combo = r.comboRequirement;
-    const trainer = r.acquisition?.includes('trainer')
-      ? STATIONS.find((s) => s.type === trainingStationTypeFor(r))
-      : undefined;
-    const patternNames = patterns.get(r.id);
+    const trainer = recipeTrainerStation(r);
+    const patternNames = RECIPE_PATTERN_ITEMS.get(r.id)?.map(item);
     const cap = craftMaxSkillFor(r.professionId);
     const tier = tierForSkill(r.skillReq);
     const gains = [1, REDUCED_TIER_MULTIPLIER, MINIMAL_TIER_MULTIPLIER, 0].flatMap((gain, i) => {
@@ -147,10 +138,28 @@ export function addTradeSkills(w: SystemWriter) {
     recipeTitles.set(r.id, articleTitle);
     w.registerArt('recipe', r.id, articleTitle);
   }
+  const recipeName = (r: (typeof ALL_RECIPES)[number]) =>
+    recipeNames.get(r.id)?.name ?? ITEMS[r.resultItemId].name;
+  const tableLinks = {
+    item,
+    npc: (id: string) => w.entity('npc', id, NPCS[id]?.name),
+    quest: (id: string) => w.entity('quest', id, QUESTS[id]?.name),
+    recipe: (r: (typeof ALL_RECIPES)[number]) => `[[${recipeTitles.get(r.id)}|${recipeName(r)}]]`,
+  };
+  w.describe(
+    'Crafting recipes',
+    heading(
+      'Recipe tables by craft',
+      'Each craft page has a table of all its recipes, lowest skill first, with what each one makes, its materials and where to learn it: ' +
+        GUIDE_PROF_CRAFTS.map((c) => c.name)
+          .sort((a, b) => a.localeCompare(b, 'en'))
+          .map((name) => `[[${name}]]`)
+          .join(', ') +
+        '.',
+    ).trimStart(),
+  );
   for (const c of GUIDE_PROF_CRAFTS) {
-    const craftRecipes = ALL_RECIPES.filter((r) => r.professionId === c.id).sort(
-      (a, b) => a.skillReq - b.skillReq || a.id.localeCompare(b.id, 'en'),
-    );
+    const craftRecipes = professionRecipes(c.id, recipeName);
     w.describe(
       c.name,
       c.name +
@@ -168,13 +177,11 @@ export function addTradeSkills(w: SystemWriter) {
         '% fewer of the materials the discount covers. The amount is rounded down, but you always need at least 1 of each material. Raid cores always cost the full amount.',
       craftRecipes.length
         ? heading(
-            'Recipes by listed skill',
-            list(
-              craftRecipes.map(
-                (r) =>
-                  `Skill ${r.skillReq}: [[${recipeTitles.get(r.id)}|${recipeNames.get(r.id)?.name ?? ITEMS[r.resultItemId].name}]]`,
-              ),
-            ),
+            'Recipes by skill',
+            'Every ' +
+              c.name +
+              ' recipe, lowest listed skill first. Materials are the base amounts, before any discount.\n\n' +
+              recipeTable(craftRecipes, tableLinks),
           )
         : '',
     );
@@ -334,7 +341,7 @@ export function addTradeSkills(w: SystemWriter) {
     armor: 'Armor',
   };
   for (const e of Object.values(ENCHANTS)) {
-    w.article(
+    const enchantTitle = w.article(
       'Equipment enchants',
       e.name,
       'Enchant',
@@ -366,6 +373,7 @@ export function addTradeSkills(w: SystemWriter) {
         : []),
       heading('Reagents', reagents(e.reagents)),
     );
+    w.registerArt('enchant', e.id, enchantTitle);
   }
   const orders = GUIDE_PROF_ECONOMY.workOrders;
   w.describe(

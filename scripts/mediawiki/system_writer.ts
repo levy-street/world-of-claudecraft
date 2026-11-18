@@ -9,7 +9,7 @@ export interface SystemWikiContext {
   add(title: string, text: string, categories: string[]): void;
   unique(title: string, hint?: string): string;
   titleBy: Record<'item' | 'npc' | 'mob' | 'zone' | 'dungeon', Map<string, string>> &
-    Partial<Record<'recipe' | 'deed' | 'companion' | 'quest', Map<string, string>>>;
+    Partial<Record<'recipe' | 'deed' | 'companion' | 'quest' | 'enchant', Map<string, string>>>;
 }
 
 export function words(id: string): string {
@@ -50,7 +50,7 @@ export function systemWriter(ctx: SystemWikiContext) {
     describe(name: string, ...paragraphs: string[]) {
       group(name).body += `${paragraphs.filter(Boolean).join('\n\n')}\n\n`;
     },
-    registerArt(kind: 'recipe' | 'deed' | 'companion', id: string, title: string) {
+    registerArt(kind: 'recipe' | 'deed' | 'companion' | 'enchant', id: string, title: string) {
       ctx.titleBy[kind] ??= new Map();
       ctx.titleBy[kind].set(id, title);
     },

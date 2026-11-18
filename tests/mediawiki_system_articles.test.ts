@@ -106,7 +106,12 @@ describe('system encyclopedia', () => {
   });
   it('links each profession to its recipes and separates listed skill from the ability to craft', () => {
     const pick = 'Osmium Mining Pick (Recipe)';
-    expect(pages.get('Engineering')).toContain(`Skill 75: [[${pick}|`);
+    expect(pages.get('Engineering')).toMatch(
+      new RegExp(
+        `^\\| 75 \\|\\| (?:<woc-art [^>]*/> )?\\[\\[${pick.replace(/[()]/g, '\\$&')}\\|`,
+        'm',
+      ),
+    );
     expect(pages.get(pick)).toContain('attempt it below its listed skill of 75');
     expect(pages.get(pick)).toContain('From skill 100 until 125: 0.5 skill per craft');
     expect(pages.get('Crafting stations')).toContain('x 7, z 660');

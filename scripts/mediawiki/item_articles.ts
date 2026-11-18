@@ -11,6 +11,7 @@ import {
   CASKET_MOUNT_REINS_ITEM_ID,
 } from '../../src/sim/clue_casket';
 import { BUDDIES } from '../../src/sim/content/buddies';
+import { ENCHANTS } from '../../src/sim/content/enchants';
 import { FACTION_VENDOR_GATES } from '../../src/sim/content/faction_vendors';
 import { RETIRED_HEROIC_ITEMS } from '../../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_NPC_ID, HEROIC_VENDOR_STOCK } from '../../src/sim/content/heroic_vendor';
@@ -79,6 +80,7 @@ import { itemAcquisitionArticle, itemAcquisitionIndex } from './item_acquisition
 import { articleLinks, casketGearNames, itemContentsSection } from './item_contents';
 import { currencySpendIndex, whatItBuysSection } from './item_spends';
 import { type DropSource, dropSourceTable } from './loot_table';
+import { materialUses } from './material_uses';
 import { indexSpecialItemSources } from './special_item_sources';
 import { vendorOfferText } from './vendor_offer';
 import {
@@ -587,6 +589,16 @@ export function addItemArticles(
     for (const a of r.reagents)
       append(uses, a.itemId, a.count + ' for each craft of ' + recipe + ', before any discounts.');
   }
+  for (const [id, entries] of materialUses({
+    item: (itemId) => ref(w, 'item', itemId),
+    enchant: (enchantId) => {
+      const title = w.titleBy.enchant?.get(enchantId);
+      const name = ENCHANTS[enchantId]?.name ?? enchantId;
+      return title ? w.link(title, name) : name;
+    },
+    page: (title) => w.link(title),
+  }))
+    for (const line of entries) append(uses, id, line);
 
   for (const p of RELIQUARY_PAGES)
     for (const r of p.relics)
