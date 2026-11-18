@@ -7,8 +7,9 @@
 //     (`boltPath`), and its flicker (`boltFlash`);
 //   - a ring of light racing out over the floor (`ringWave`: Arcing Stone's
 //     ring, the strike's flash, the shatter's frost);
-//   - a Crossing Blade's pose: hovering upright at its rise, turning to its
-//     line, then flying it point first on an eased curve (`bladeFlight`);
+//   - a Crossing Blade's pose: lying level along its line over the rim (its
+//     broad face to the sky), drawing back as the line locks, then flying it
+//     point first, low, on an eased curve (`bladeFlight`);
 //   - a line's warning fill off its mark's own aura (`laneFill`);
 //   - a Storm-Charged pillar's crawling arcs (`chargedArc`);
 //   - the palette and the fixed pools.
@@ -120,17 +121,27 @@ export function ringWave(
 
 // ---- the blade ------------------------------------------------------------------------
 
-/** How long a flight is drawn over (the sim's own bladeFly). */
+/** A blade's pose this frame. The sword lies along its line, its broad face
+ *  to the sky (read whole from any camera, never end-on): it hovers over the
+ *  rim, its point at the arena, draws back as its line locks, then flies the
+ *  line point first, low over the floor. */
 export interface BladePose {
-  /** Along its line, 0 (at its rise) to 1 (the far rim). */
+  /** Along its line, 0 (its point at the rise) to 1 (its point at the far
+   *  rim); a little under 0 as it draws back on the lock. */
   along: number;
-  /** 0 upright (point down, hovering) to 1 flat (point first along the line). */
-  tilt: number;
-  /** Height of its middle over the floor. */
+  /** Its nose-down pitch (radians). */
+  pitch: number;
+  /** Height of its guard over the floor. */
   lift: number;
   /** Its glow, 0..1. */
   glow: number;
 }
+
+/** The hover's height over the rim, the flight's over the floor (yards). */
+export const BLADE_HOVER_LIFT = 6.5;
+export const BLADE_FLY_LIFT = 2.2;
+/** How far back (a share of its line) it draws as its line locks. */
+export const BLADE_DRAW_BACK = 0.035;
 
 /** The sim's own eased flight (off its mark, fastest mid-line, settling). */
 export function bladeEase(k: number): number {
@@ -149,17 +160,18 @@ export function bladeFlight(
   out: BladePose,
 ): BladePose {
   if (!flying) {
-    out.along = 0;
-    // It tips toward its line as the lock nears.
-    out.tilt = locked ? 0.35 : 0.12 * clamp01(aim);
-    out.lift = 4.6 + 0.35 * Math.sin(t * 2.2);
-    out.glow = locked ? 0.85 + 0.15 * Math.sin(t * 40) : 0.35 + 0.4 * clamp01(aim);
+    // Hovering over the rim, bobbing; drawn back and blazing once locked.
+    out.along = locked ? -BLADE_DRAW_BACK : 0;
+    out.pitch = locked ? 0.16 : 0.08 + 0.05 * clamp01(aim);
+    out.lift = BLADE_HOVER_LIFT + (locked ? 0.6 : 0.45 * Math.sin(t * 1.9));
+    out.glow = locked ? 0.85 + 0.15 * Math.sin(t * 40) : 0.35 + 0.45 * clamp01(aim);
     return out;
   }
   const k = clamp01(fly);
-  out.along = bladeEase(k);
-  out.tilt = 1;
-  out.lift = 2.4;
+  out.along = -BLADE_DRAW_BACK + (1 + BLADE_DRAW_BACK) * bladeEase(k);
+  out.pitch = 0.05;
+  // Diving off the hover to skim the floor.
+  out.lift = BLADE_FLY_LIFT + (BLADE_HOVER_LIFT - BLADE_FLY_LIFT) * (1 - clamp01(k * 3)) ** 2;
   out.glow = 1;
   return out;
 }

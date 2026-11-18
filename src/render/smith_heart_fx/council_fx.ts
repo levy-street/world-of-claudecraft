@@ -815,7 +815,7 @@ export class CouncilFx {
     else if (ev.type === 'spellfx' && ev.ability === FINAL_CUES.charged)
       this.pillarsFx.cursedPulse(ev.sourceId);
     else if (ev.type === 'spellfxAt' && ev.ability === FINAL_CUES.shatter)
-      this.pillarsFx.collapseAt(ev.x, ev.z, ev.radius ?? 3.7);
+      this.pillarsFx.collapseAt(ev.x, ev.z, ev.radius ?? 3.7, true);
     if (ev.type === 'spellfxAt') {
       if (!councilClaims(ev.ability)) return false;
       if (ev.ability === COUNCIL_CUES.collapse) {
