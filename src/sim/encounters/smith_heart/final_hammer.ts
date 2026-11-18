@@ -1,10 +1,13 @@
-// The Masterless Strength's Hammer quarter (design doc 7.5): the fight's only
-// group soak.
+// The Masterless Strength's Hammer quarter (design doc 7.5) and the boss's own
+// Weight of the Anvil, the fight's only group soak. (The quarter's star, Wake
+// the Stone, is final_pillars.ts.)
 //
-//   Tremor Crack         every 10 s (first 4 s into the quarter) the floor
+//   Tremor Crack         every 13 s (first 6 s into the quarter) the floor
 //                        cracks under three hashed players (four on Heroic);
 //                        2.5 s later each crack erupts (4 yd): step out.
-//   Weight of the Anvil  every 25 s (first 10 s in) a 6 s bar, planted: a
+//   Weight of the Anvil  the boss's OWN since the rework of 2026-11-18: all
+//                        fight (each tier's anvilEvery, first 30 s in), wherever it stands
+//                        (its clock is the coordinator's), a 6 s bar, planted: a
 //                        6 yd mark where a hashed player stood. When it lands
 //                        its whole blow is split between everyone under it
 //                        (half as much again each with fewer than three); with
@@ -119,7 +122,7 @@ function orbitSpot(s: FinalScope, angle: number): FPoint {
  *  Exported for the dev trigger. */
 export function startAnvil(s: FinalScope, forced?: FPoint): boolean {
   const st = s.st;
-  st.kit.anvil = T.anvilEvery;
+  st.anvilClock = s.rules.anvilEvery;
   let aim: FPoint | null = forced ?? null;
   if (!aim) {
     const [victim] = pickPlayers(s, 1, st.casts + 1001);

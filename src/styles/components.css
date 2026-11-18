@@ -19430,8 +19430,13 @@
   #heart-final-alert.is-tether {
     --final-alert-tone: var(--color-debuff-frost);
   }
-  #heart-final-alert.is-freezing,
-  #heart-final-alert.is-frozen {
+  #heart-final-alert.is-blade {
+    --final-alert-tone: var(--color-debuff-frost);
+  }
+  #heart-final-alert.is-sky {
+    --final-alert-tone: var(--color-debuff-nature);
+  }
+  #heart-final-alert.is-bladeLocked {
     --final-alert-tone: var(--color-hostile);
   }
   #heart-final-alert {
@@ -19457,7 +19462,8 @@
     width: 0;
     transition: width 80ms linear;
   }
-  #heart-final-alert.is-freezing,
+  #heart-final-alert.is-bladeLocked,
+  #heart-final-alert.is-sky,
   #heart-final-alert.is-ember,
   #heart-final-alert.is-drawn,
   #heart-final-alert.is-coal,

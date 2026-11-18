@@ -7,9 +7,11 @@
 //                   spot's lethal blow, then three Molten Swells roll out
 //                   of it (away from the boss and to either side), the Heat
 //                   guardian's own objects, lanes and numbers.
-//   Fire Whirl      every 13 s (first 8 s in) three whirls of fire rise by
-//                   hashed players (1.5 s of warning), then run straight
-//                   across the floor for 9 s, turning back off the rim: each
+//   Fire Whirl      the Heat's STAR since the rework of 2026-11-18 (woken
+//                   for the rest of the fight; final_stars.ts runs its
+//                   clock): the tier's count of tall columns of fire rise by
+//                   hashed players (2 s of warning), then run straight
+//                   across the floor for 10 s, turning back off the rim: each
 //                   strikes a player it touches at most once a second.
 //   Ember Mark      Heroic, every 22 s (first 10 s in): up to three ranged
 //                   players (12 yd or more from the boss) are marked; 6 s
@@ -205,11 +207,10 @@ export function stepSwells(s: FinalScope): void {
 
 // ---- Fire Whirls ---------------------------------------------------------------------------
 
-/** Three Fire Whirls rise by hashed players. Returns how many. */
+/** The tier's Fire Whirls rise by hashed players. Returns how many. */
 export function raiseWhirls(s: FinalScope): number {
   const st = s.st;
-  st.kit.whirl = T.whirlEvery;
-  const victims = pickPlayers(s, T.whirlCount, st.casts + 401);
+  const victims = pickPlayers(s, s.rules.whirlCount, st.casts + 401);
   let n = 0;
   victims.forEach((v, i) => {
     const h = finalHash(s.boss.id, st.casts * 13 + i);

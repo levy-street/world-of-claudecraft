@@ -18,6 +18,7 @@ import { MOBS } from '../src/sim/data';
 import {
   FINAL_AURAS,
   FINAL_CASTS,
+  FINAL_CUES,
   FINAL_NAMES,
   FINAL_OBJECTS,
   overloadAuraId,
@@ -27,7 +28,6 @@ import {
   ALL_QUARTERS_MASK,
   FINAL_PHASE_CASTS as C,
   FINAL_ADD_MOBS,
-  FINAL_MIX,
   FINAL_PHASE_DIFFICULTY,
   FINAL_PHASE_OBJECTS,
   FINAL_STAGE_CODES,
@@ -460,50 +460,26 @@ describe('the final phase', () => {
     for (const v of HEART_QUARTER_ORDER) expect(st?.overload[v]).toBe(0);
   });
 
-  it('mixes one ability of each element in turn, never two at once', () => {
+  it('all four stars run at once (the rework of 2026-11-18): pillars, strikes, blades, whirls', () => {
     const f = finalFight(8);
     f.pullIn('heat');
     f.dev('/dev heart final last');
     f.tick(sec(3.5));
     const b = f.boss();
     const c = f.local(b);
-    f.gather(c.x, c.z, 9);
-    const seen: string[] = [];
+    f.gather(c.x + 22, c.z, 9);
+    const seen = new Set<string>();
     let whirls = 0;
-    let cracks = 0;
-    for (let t = 0; t < sec(30); t++) {
-      const w = f.objects(FINAL_OBJECTS.whirlPrefix).length;
-      const k = f.objects(FINAL_OBJECTS.crackPrefix).length;
-      if (w > whirls && !seen.includes('heat')) seen.push('heat');
-      if (k > cracks && !seen.includes('quench')) seen.push('quench');
-      if (b.castingAbility === FINAL_CASTS.bolt && !seen.includes('breath')) seen.push('breath');
-      if (b.castingAbility === FINAL_CASTS.anvil && !seen.includes('hammer')) seen.push('hammer');
-      whirls = w;
-      cracks = k;
-      f.tick(1);
+    for (let t = 0; t < sec(40); t++) {
+      for (const e of f.tick(1))
+        if (e.type === 'spellfxAt' || e.type === 'spellfx') seen.add(String(e.ability));
+      whirls = Math.max(whirls, f.objects(FINAL_OBJECTS.whirlPrefix).length);
     }
-    expect(seen).toEqual([...FINAL_MIX]);
-  });
-
-  it("tells each turn of the mix with the room's cue, in the turn's element", () => {
-    const f = finalFight(8);
-    f.pullIn('heat');
-    f.dev('/dev heart final last');
-    f.tick(sec(3.5));
-    const b = f.boss();
-    const c = f.local(b);
-    f.gather(c.x, c.z, 9);
-    const turns = f
-      .tick(sec(30))
-      .filter((e) => e.type === 'spellfxAt' && e.ability === Q.mixTurn) as Extract<
-      SimEvent,
-      { type: 'spellfxAt' }
-    >[];
-    // One cue a turn, in the mix's order, each in its element's school.
-    expect(turns.length).toBeGreaterThanOrEqual(FINAL_MIX.length);
-    expect(turns.slice(0, FINAL_MIX.length).map((e) => e.school)).toEqual(
-      FINAL_MIX.map((v) => FINAL_VEIN_SCHOOL[v]),
-    );
+    expect(whirls).toBeGreaterThan(0);
+    for (const cue of [FINAL_CUES.rise, FINAL_CUES.strike, FINAL_CUES.blade])
+      expect(seen, cue).toContain(cue);
+    // Its own Weight of the Anvil keeps its clock in the centre.
+    expect(seen).toContain(FINAL_CUES.anvil);
   });
 
   it('two minutes in, Masterless Fury pulses harder and harder (its voice warns first)', () => {
@@ -533,7 +509,7 @@ describe('the final phase', () => {
 });
 
 describe('the poured elements', () => {
-  it('a poured Heat keeps raising Fire Whirls wherever it stands, painful but slower', () => {
+  it('a poured Heat keeps its star, Fire Whirl, at full pace wherever it stands', () => {
     const f = finalFight(6);
     toCall(f, 'hammer');
     f.dev('/dev heart final killadds');
@@ -542,34 +518,22 @@ describe('the poured elements', () => {
     f.dev('/dev heart final endcall');
     f.tick(1);
     expect(aura(f.boss(), pouredAuraId('heat'))?.stacks).toBe(1);
-    // In the Hammer quarter now: still Fire Whirls.
+    expect(f.state()?.stars.awake).toContain('heat');
+    // In the Hammer quarter now: still Fire Whirls, at full pace.
     f.dev('/dev heart final quarter hammer');
     const spot = heartQuarterSpot('hammer');
     f.gather(spot.x, spot.z, 6);
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    const before = st.stars.clock.heat;
+    f.tick(sec(2));
+    expect(before - st.stars.clock.heat).toBeCloseTo(2, 1);
     let whirls = 0;
     for (let t = 0; t < sec(30); t++) {
       if (f.objects(FINAL_OBJECTS.whirlPrefix).length > 0) whirls++;
       f.tick(1);
     }
     expect(whirls).toBeGreaterThan(0);
-  });
-
-  it('a poured Quench chills everywhere: alone, the cold rises at half its pace', () => {
-    const f = finalFight(6);
-    toCall(f, 'hammer');
-    f.dev('/dev heart final killadds');
-    f.dev('/dev heart final splinter quench');
-    f.tick(sec(3));
-    f.dev('/dev heart final endcall');
-    f.dev('/dev heart final quarter breath');
-    const spot = heartQuarterSpot('breath');
-    f.players.forEach((p, i) => {
-      f.put(p, spot.x + (i - 3) * 14, spot.z);
-    });
-    f.tick(sec(2));
-    const cold = f.state()?.cold[f.players[5].id] ?? 0;
-    expect(cold).toBeGreaterThan(10);
-    expect(cold).toBeLessThan(30);
   });
 });
 

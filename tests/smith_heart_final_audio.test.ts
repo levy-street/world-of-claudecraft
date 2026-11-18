@@ -20,7 +20,6 @@ import {
   FINAL_REBUILD_SOUND,
   FINAL_SFX_KEYS,
   finalSoundClaims,
-  MIX_TURN_STING,
   overloadPulseSound,
   rebuildDue,
 } from '../src/game/smith_heart_final_audio_core';
@@ -193,19 +192,17 @@ describe('smith_heart_final_audio: the adapter', () => {
       () => 0,
     );
     expect(plays[0].gain).toBe(overloadPulseSound(1).gain);
-    const turn = {
+    // A quarter's star waking: the old mix's boom, once.
+    const wake = {
       type: 'spellfxAt',
       x: 0,
       z: 0,
-      school: 'frost',
+      school: 'arcane',
       fx: 'burst',
-      ability: FINAL_PHASE_CUES.mixTurn,
+      ability: FINAL_CUES.wake,
     } as unknown as SimEvent;
-    audio.event(turn, none, () => 0);
-    expect(plays.slice(1).map((p) => p.key)).toEqual([
-      'heart_final_mix_turn',
-      MIX_TURN_STING.frost.key,
-    ]);
+    audio.event(wake, none, () => 0);
+    expect(plays.slice(1).map((p) => p.key)).toEqual(['heart_final_mix_turn']);
   });
 
   it('warns once per bar on the boss and on a Splinter, never a bar already running', () => {
@@ -217,16 +214,16 @@ describe('smith_heart_final_audio: the adapter', () => {
     // First heard mid-bar: never replayed late.
     boss.castingAbility = FINAL_CASTS.anvil;
     boss.castTotal = 6;
-    audio.update(boss, [5], of, null, null, null);
+    audio.update(boss, [5], of, null, null);
     expect(plays).toHaveLength(0);
     boss.castingAbility = null;
-    audio.update(boss, [5], of, null, null, null);
+    audio.update(boss, [5], of, null, null);
     boss.castingAbility = FINAL_CASTS.bolt;
     boss.castTotal = 2;
     splinter.castingAbility = FINAL_PHASE_CASTS.shear;
     splinter.castTotal = 2;
-    audio.update(boss, [5], of, null, null, null);
-    audio.update(boss, [5], of, null, null, null);
+    audio.update(boss, [5], of, null, null);
+    audio.update(boss, [5], of, null, null);
     expect(plays.map((p) => p.key).sort()).toEqual(
       [
         FINAL_BAR_SOUNDS[FINAL_CASTS.bolt].key,
@@ -241,8 +238,7 @@ describe('smith_heart_final_audio: the adapter', () => {
     const audio = new FinalAudio(sink);
     const at = (v: number) =>
       withAuras(body(1, 0, 0), [{ id: overloadAuraId('quench'), value: v }]);
-    for (const v of [10, 50, 74, 76, 90, 70, 80, 40, 80])
-      audio.update(at(v), [], none, null, null, null);
+    for (const v of [10, 50, 74, 76, 90, 70, 80, 40, 80]) audio.update(at(v), [], none, null, null);
     expect(plays.filter((p) => p.key === FINAL_OVERLOAD_RISING.key)).toHaveLength(2);
   });
 
@@ -255,40 +251,44 @@ describe('smith_heart_final_audio: the adapter', () => {
         { id: FINAL_PHASE_AURAS.phase, value: FINAL_STAGE_CODES.collapse },
         { id: FINAL_PHASE_AURAS.hidden, value: fallen },
       ]);
-    audio.update(collapse(0), [], none, null, null, centre);
-    audio.update(collapse(1), [], none, null, null, centre);
-    audio.update(collapse(3), [], none, null, null, centre);
+    audio.update(collapse(0), [], none, null, centre);
+    audio.update(collapse(1), [], none, null, centre);
+    audio.update(collapse(3), [], none, null, centre);
     expect(plays).toHaveLength(0);
-    audio.update(body(1, 0, 0), [], none, null, null, centre);
-    audio.update(body(1, 0, 0), [], none, null, null, centre);
+    audio.update(body(1, 0, 0), [], none, null, centre);
+    audio.update(body(1, 0, 0), [], none, null, centre);
     expect(plays.filter((p) => p.key === FINAL_REBUILD_SOUND.key)).toHaveLength(1);
     expect(plays[0]).toMatchObject({ x: 7, z: 9 });
   });
 
-  it('greets a footprint with its warning, loops the gale while it blows', () => {
-    const { sink, plays, loops } = fakeSink();
+  it('greets a footprint with its warning', () => {
+    const { sink, plays } = fakeSink();
     const audio = new FinalAudio(sink);
     audio.footprint('tremor', 1, 0, 2);
     audio.footprint('emberPool', 1, 0, 2);
     expect(plays.map((p) => p.key)).toEqual(['heart_final_tremor_warn']);
-    audio.update(null, [], none, { x: 0, y: 0, z: 0 }, null, null);
-    expect(loops.size).toBe(1);
-    audio.update(null, [], none, null, null, null);
-    expect(loops.size).toBe(0);
   });
 
-  it('rings my marks and my cold in my ear', () => {
+  it("plays the stars' interactions with their guardians' own samples", () => {
+    const { sink, plays } = fakeSink();
+    const audio = new FinalAudio(sink);
+    for (const ability of [FINAL_CUES.arcingStone, FINAL_CUES.blade, FINAL_CUES.shatter]) {
+      const ev = { type: 'spellfxAt', x: 0, z: 0, school: 'nature', fx: 'burst', ability };
+      audio.event(ev as unknown as SimEvent, none, () => 0);
+    }
+    const keys = plays.map((p) => p.key);
+    expect(keys).toContain('heart_breath_discharge');
+    expect(keys).toContain('heart_quench_slash');
+    expect(keys).toContain('heart_council_pillar_collapse');
+  });
+
+  it('rings my marks in my ear', () => {
     const { sink, plays } = fakeSink();
     const audio = new FinalAudio(sink);
     const me = (auras: AuraStub[]) => withAuras(body(9, 2, 3), auras);
-    audio.update(null, [], none, null, me([]), null);
-    audio.update(null, [], none, null, me([{ id: FINAL_AURAS.ember }]), null);
-    audio.update(null, [], none, null, me([{ id: FINAL_AURAS.cold, value: 60 }]), null);
-    audio.update(null, [], none, null, me([{ id: FINAL_AURAS.cold, value: 90 }]), null);
-    expect(plays.map((p) => p.key)).toEqual([
-      'heart_mark_fire',
-      'heart_quench_cold_warn',
-      'heart_quench_cold_danger',
-    ]);
+    audio.update(null, [], none, me([]), null);
+    audio.update(null, [], none, me([{ id: FINAL_AURAS.ember }]), null);
+    audio.update(null, [], none, me([{ id: FINAL_AURAS.skyMark }]), null);
+    expect(plays.map((p) => p.key)).toEqual(['heart_mark_fire', 'heart_mark_storm']);
   });
 });

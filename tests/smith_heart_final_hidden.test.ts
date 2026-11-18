@@ -138,13 +138,15 @@ describe('the stop at 1 percent and the scene', () => {
 
   it('every ability stops in the scene: no footprint, no bar, no hit from it', () => {
     const f = toFinal();
-    onRing(f, sec(P.mixFirst + P.mixEvery * 2));
+    // Long enough for the final phase's stars to lay something.
+    onRing(f, sec(12));
     strike(f, f.boss().maxHp * 2);
     f.tick(1);
     expect(f.state()?.phase.stage).toBe('kneel');
     expect(f.boss().castingAbility).toBeNull();
+    // (The pillars Wake the Stone raised stand on as the room's stone.)
     for (const prefix of Object.values(FINAL_OBJECTS))
-      expect(f.objects(prefix).length, prefix).toBe(0);
+      if (prefix !== FINAL_OBJECTS.pillarPrefix) expect(f.objects(prefix).length, prefix).toBe(0);
     const ev = onRing(f, sec(P.kneelSeconds));
     expect(ev.filter((e) => e.type === 'damage' && e.sourceId === f.boss().id).length).toBe(0);
   });

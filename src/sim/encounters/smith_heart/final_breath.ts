@@ -1,14 +1,11 @@
 // The Masterless Strength's Breath quarter (design doc 7.5): spread. The
-// Guardian of the Breath's wind and bolt, compressed.
+// Guardian of the Breath's bolt, compressed.
 //
-//   Bellows Wind     every 20 s (first 4 s into the quarter) the wind gathers
-//                    (2 s, its heading shown), then blows 8 s toward a hashed
-//                    bearing: the wind kernel carries everyone on the Anvil
-//                    3.5 yd a second (src/sim/wind_drift.ts: both hosts step
-//                    it, the online client predicts it). Within 5 yd of the
-//                    rim while it blows the storm strikes every second
-//                    (Pressed to the Rim): walk into the wind.
-//   Leaping Bolt     every 11 s (first 6 s in) a 2 s bar on a hashed player;
+//   (Bellows Wind and Pressed to the Rim went with the rework of 2026-11-18:
+//   the team read the push as blowing the wrong way; the quarter's star, Sky
+//   Strike, is final_sky.ts, told apart from Leaping Bolt by its sky-white
+//   column and its spot on the floor.)
+//   Leaping Bolt     every 14 s (first 8 s in) a 2 s bar on a hashed player;
 //                    it strikes them, then leaps to every player within 6 yd
 //                    of anyone struck, each leap half again as hard: spread.
 //   Drawn Lightning  Heroic, every 22 s (first 12 s in): two marked players
@@ -23,9 +20,7 @@
 // walks the struck in order, the others in id order; the only rng draws are
 // the damage rolls.
 
-import { HEART_ROOM } from '../../content/smith_heart_layout';
 import { DT, type Entity } from '../../types';
-import { WIND_DRIFT_AURA } from '../../wind_drift';
 import {
   boltScale,
   FINAL_AURAS,
@@ -36,11 +31,9 @@ import {
   finalHash,
   finalTimed,
   FINAL_TUNING as T,
-  windTemplate,
 } from './final_ids';
 import {
   at,
-  auraOf,
   beamCue,
   beginBar,
   cueAt,
@@ -49,7 +42,6 @@ import {
   type FinalScope,
   type FPoint,
   facingTo,
-  fromCentre,
   hit,
   livePlayers,
   local,
@@ -60,81 +52,6 @@ import {
   spawnFightObject,
   standingSpot,
 } from './final_scope';
-
-/** The tag the final's wind carries in its `value3` (the kernel ignores it
- *  on a steady wind): its tooltip is the final's, not the guardian's. */
-export const FINAL_WIND_TAG = 7;
-
-// ---- the wind ------------------------------------------------------------------------------
-
-/** The wind gathers toward a hashed bearing (or `forced`, radians). Exported
- *  for the dev trigger. */
-export function gatherWind(s: FinalScope, forced?: number): void {
-  const st = s.st;
-  st.kit.wind = T.windEvery;
-  if (st.wind) dropFightObject(s.ctx, s.inst, st.wind.objectId);
-  const heading = forced ?? ((finalHash(s.boss.id, st.casts * 31 + 7) % 8) * Math.PI) / 4;
-  st.casts++;
-  const obj = spawnFightObject(
-    s.ctx,
-    s.inst,
-    windTemplate('warn', T.windWarn),
-    FINAL_NAMES.wind,
-    HEART_ROOM.x,
-    HEART_ROOM.z,
-    HEART_ROOM.r,
-  );
-  obj.facing = heading;
-  st.wind = { objectId: obj.id, heading, warn: T.windWarn, blow: T.windBlow, rimTick: T.rimTick };
-}
-
-function keepWindOn(s: FinalScope, p: Entity, heading: number): void {
-  const a = auraOf(p, WIND_DRIFT_AURA);
-  if (a && a.value === heading && a.value2 === T.windSpeed && a.value3 === FINAL_WIND_TAG) {
-    if (a.remaining < 1.5) a.remaining = 3;
-    return;
-  }
-  putMarker(p, WIND_DRIFT_AURA, FINAL_NAMES.wind, 3, s.boss.id, {
-    value: heading,
-    value2: T.windSpeed,
-    value3: FINAL_WIND_TAG,
-  });
-}
-
-function dropWind(s: FinalScope): void {
-  for (const p of s.players) {
-    const a = auraOf(p, WIND_DRIFT_AURA);
-    if (a && a.sourceId === s.boss.id) dropAura(p, WIND_DRIFT_AURA);
-  }
-}
-
-/** One tick of the wind: the warning, the blow (the kernel's push on
- *  everyone, the rim's strikes), the calm. */
-export function stepWind(s: FinalScope): void {
-  const w = s.st.wind;
-  if (!w) return;
-  const obj = s.ctx.entities.get(w.objectId);
-  if (w.warn > 0) {
-    w.warn -= DT;
-    if (w.warn <= 1e-9 && obj) obj.templateId = windTemplate('blow', T.windBlow);
-    return;
-  }
-  w.blow -= DT;
-  if (w.blow <= 1e-9) {
-    dropWind(s);
-    dropFightObject(s.ctx, s.inst, w.objectId);
-    s.st.wind = null;
-    return;
-  }
-  for (const p of livePlayers(s)) keepWindOn(s, p, w.heading);
-  w.rimTick -= DT;
-  if (w.rimTick > 1e-9) return;
-  w.rimTick = T.rimTick;
-  for (const p of livePlayers(s)) {
-    if (fromCentre(at(s, p)) < HEART_ROOM.r - T.rimBand) continue;
-    hit(s, p, roll(s, T.rimMin, T.rimMax), FINAL_NAMES.rim, 'nature');
-  }
-}
 
 // ---- Leaping Bolt --------------------------------------------------------------------------
 
@@ -303,15 +220,9 @@ export function clearBreath(
   players: readonly Entity[],
 ): void {
   const st = s.st;
-  if (st.wind) dropFightObject(s.ctx, s.inst, st.wind.objectId);
-  st.wind = null;
   for (const o of st.orbs) dropFightObject(s.ctx, s.inst, o.objectId);
   st.orbs = [];
   st.drawn = [];
   st.boltTarget = null;
-  for (const p of players) {
-    const a = auraOf(p, WIND_DRIFT_AURA);
-    if (a && a.sourceId === s.boss.id) dropAura(p, WIND_DRIFT_AURA);
-    dropAura(p, FINAL_AURAS.drawn);
-  }
+  for (const p of players) dropAura(p, FINAL_AURAS.drawn);
 }

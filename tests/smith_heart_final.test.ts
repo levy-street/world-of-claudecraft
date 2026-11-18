@@ -1,9 +1,11 @@
 // The Masterless Strength, part 1 (encounters/smith_heart/final*.ts, design
 // doc 7.5) over a REAL Sim: the four quarter rules (Overload, Vein Shock,
 // Taking Root, Heart Unbound, the base form), the boss following its tank
-// across a ridge, each quarter's kit on Normal, Heroic and Mythic, the
-// difficulty gating, the dev verbs, determinism and a headless full-fight
-// smoke run on every tier.
+// across a ridge, each quarter's kit on Normal, Heroic and Mythic (the
+// Quench's cold and the Breath's wind are gone since the rework of
+// 2026-11-18; the woken stars are tests/smith_heart_final_stars.test.ts),
+// the difficulty gating, the dev verbs, determinism and a headless
+// full-fight smoke run on every tier.
 
 import { describe, expect, it } from 'vitest';
 import type { SmithHeartVein } from '../src/sim/content/smith_heart_layout';
@@ -28,7 +30,6 @@ import {
 } from '../src/sim/encounters/smith_heart/final_ids';
 import { HEAT_OBJECTS } from '../src/sim/encounters/smith_heart/heat_ids';
 import type { Entity, SimEvent } from '../src/sim/types';
-import { WIND_DRIFT_AURA } from '../src/sim/wind_drift';
 import { type FinalFight, finalFight } from './helpers/final_fight';
 
 type Damage = Extract<SimEvent, { type: 'damage' }>;
@@ -311,7 +312,7 @@ describe('the Heat quarter', () => {
     f.pullIn('heat');
     f.dev('/dev heart final whirl');
     const whirls = f.objects(FINAL_OBJECTS.whirlPrefix);
-    expect(whirls.length).toBe(3);
+    expect(whirls.length).toBe(FINAL_DIFFICULTY.normal.whirlCount);
     expect(whirls[0].templateId).toBe(`${FINAL_OBJECTS.whirlPrefix}warn`);
     f.tick(sec(T.whirlWarn + 0.1));
     expect(f.objects(FINAL_OBJECTS.whirlPrefix)[0].templateId).toBe(
@@ -358,31 +359,6 @@ describe('the Heat quarter', () => {
 });
 
 describe('the Quench quarter', () => {
-  it('alone you freeze; together the cold falls', () => {
-    const f = finalFight(5);
-    f.pullIn('quench');
-    const c = heartQuarterSpot('quench');
-    // Two stand apart, three huddle.
-    f.put(f.players[1], c.x + 15, c.z);
-    f.put(f.players[2], c.x - 15, c.z);
-    f.put(f.players[3], c.x, c.z + 2);
-    f.put(f.players[4], c.x + 1, c.z + 2);
-    f.put(f.players[0], c.x - 1, c.z + 2);
-    const ev = f.tick(sec(T.coldMax / T.coldRise + 0.2));
-    expect(aura(f.players[1], FINAL_AURAS.frozen)?.kind).toBe('stun');
-    expect(hits(ev, FINAL_NAMES.frozen, f.pids[1]).length).toBe(1);
-    expect(aura(f.players[3], FINAL_AURAS.frozen)).toBeUndefined();
-    expect(aura(f.players[3], FINAL_AURAS.cold)?.value ?? 0).toBe(0);
-  });
-
-  it("the cold is the Quench quarter's: elsewhere nobody grows cold", () => {
-    const f = finalFight(5);
-    f.pullIn('hammer');
-    spread(f, 'hammer');
-    f.tick(sec(6));
-    for (const p of f.players) expect(aura(p, FINAL_AURAS.frozen)).toBeUndefined();
-  });
-
   it('Heroic: Groaning Ice breaks under the marked; who stays falls Under the Ice', () => {
     const f = finalFight(5);
     f.dev('/dev heart final heroic');
@@ -411,22 +387,6 @@ describe('the Quench quarter', () => {
 });
 
 describe('the Breath quarter', () => {
-  it('Bellows Wind blows everyone toward one side, the rim strikes', () => {
-    const f = finalFight(5);
-    f.pullIn('breath');
-    f.dev('/dev heart final wind 90');
-    f.tick(sec(T.windWarn + 0.2));
-    const w = aura(f.players[1], WIND_DRIFT_AURA);
-    expect(w?.value).toBeCloseTo(Math.PI / 2, 5);
-    expect(w?.value2).toBe(T.windSpeed);
-    // One stands against the rim.
-    f.put(f.players[2], 188 + 58, 172);
-    const ev = f.tick(sec(2.1));
-    expect(hits(ev, FINAL_NAMES.rim, f.pids[2]).length).toBeGreaterThanOrEqual(2);
-    f.tick(sec(T.windBlow));
-    expect(aura(f.players[1], WIND_DRIFT_AURA)).toBeUndefined();
-  });
-
   it('Leaping Bolt leaps through a stack and spares a spread raid', () => {
     const stacked = finalFight(5);
     stacked.pullIn('breath');
@@ -586,7 +546,12 @@ describe('difficulty gating', () => {
     for (const [k, v] of Object.entries(FINAL_DIFFICULTY.heroic))
       if (typeof v === 'boolean' && v)
         expect(FINAL_DIFFICULTY.mythic[k as keyof typeof v], k).toBe(true);
-    expect(run('mythic', 'breath', 16).f.objects(FINAL_OBJECTS.orbPrefix).length).toBe(T.orbCount);
+    // Every orb raised, standing or already taken by someone spread on it.
+    const m = run('mythic', 'breath', 16);
+    const taken = m.ev.filter(
+      (e) => e.type === 'spellfxAt' && e.ability === 'heart_final_orb_taken',
+    ).length;
+    expect(m.f.objects(FINAL_OBJECTS.orbPrefix).length + taken).toBe(T.orbCount);
   });
 });
 
@@ -664,8 +629,7 @@ describe('the headless full fight', () => {
         expect(f.objects(prefix).length, prefix).toBe(0);
       expect(f.objects(HEAT_OBJECTS.fistPrefix).length).toBe(0);
       for (const p of f.players)
-        for (const id of Object.values(FINAL_AURAS))
-          if (id !== WIND_DRIFT_AURA) expect(aura(p, id), id).toBeUndefined();
+        for (const id of Object.values(FINAL_AURAS)) expect(aura(p, id), id).toBeUndefined();
     });
 
   it('a wipe resets the fight: every footprint, mark and bar gone', () => {
@@ -707,16 +671,23 @@ describe('the dev verbs', () => {
       'fist',
       'whirl',
       'embers',
-      'freeze',
-      'cold 40',
       'ice',
-      'wind 45',
       'bolt',
       'drawn',
       'orbs',
       'tremor',
       'anvil',
       'shell',
+      'wake hammer',
+      'star breath',
+      'pillars 3',
+      'thrum',
+      'charge',
+      'chargedpulse',
+      'sky',
+      'blades',
+      'shatter',
+      'tornado',
     ])
       say(`/dev heart final ${v}`);
     say('/dev heart final');

@@ -16,9 +16,15 @@
 //                               it pulls the boss onto you)
 //   final fill [vein|all] [pct] set an Overload bar (95 by default)
 //   final burst|shock|root|unroot   the rules now
-//   final <mechanic>            one ability now: fist, whirl, embers, freeze,
-//                               cold <n>, ice, wind [deg], bolt, drawn, orbs,
-//                               tremor, anvil, shell
+//   final <mechanic>            one ability now: fist, whirl (tornado), embers,
+//                               ice, bolt, drawn, orbs, tremor, anvil, shell
+//   final wake|star <vein>      a quarter's star wakes (for the rest of the
+//                               fight) / fires now (the rework of 2026-11-18)
+//   final pillars [n|here]      Wake the Stone: n volleys, or one where you stand
+//   final sky [here]            a Sky Strike volley, or one strike on you
+//   final blades [me]           a round of Crossing Blades, or one through you
+//   final charge|chargedpulse|thrum|shatter   every pillar Storm-Charged / a
+//                               charged pulse / Stone Thrum / every pillar breaks
 //   final inter70|inter40       part 2: an intermission now
 //   final splinter <vein>       one Splinter rises out of that quarter now
 //   final killadds | endcall    every Splinter dies / the call ends (they pour)

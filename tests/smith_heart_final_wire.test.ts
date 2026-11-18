@@ -141,20 +141,12 @@ describe('the Masterless Strength over the wire', () => {
     ])
       expect(objects(prefix).length, prefix).toBeGreaterThan(0);
     expect(boss().castingAbility).toBe(FINAL_CASTS.anvil);
-    // The marks on Bet: Drawn Lightning, the cold, the gale.
-    sim.chat('/dev heart final wind 90', a.pid);
-    run(2.6);
-    expect(aura(client.entities.get(b.pid), 'wind_drift')).toBeDefined();
-    expect(objects(FINAL_OBJECTS.windPrefix).length).toBe(1);
     sim.chat('/dev heart final quarter quench', a.pid);
     run(1);
     expect(aura(boss(), FINAL_AURAS.state)?.value).toBe(FINAL_ZONE_CODES.quench);
     // Mythic: the switch's mark rides the state aura.
     expect(aura(boss(), FINAL_AURAS.state)?.value3).toBeGreaterThan(0);
     expect(aura(client.entities.get(b.pid), FINAL_AURAS.shaken)).toBeDefined();
-    sim.chat('/dev heart final freeze', b.pid);
-    run(0.3);
-    expect(aura(client.entities.get(b.pid), FINAL_AURAS.frozen)).toBeDefined();
     // The ring: Heart Unbound's stacks.
     sim.chat('/dev heart final quarter ring', a.pid);
     for (const p of [serverA, serverB]) {

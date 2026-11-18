@@ -36,7 +36,6 @@ import { clearHammer } from './final_hammer';
 import { clearHeat } from './final_heat';
 import { FINAL_AURAS } from './final_ids';
 import { dropShield, dropWhatItHeld, pinCentre, shareHp } from './final_intermission';
-import { stepMix } from './final_last';
 import {
   FINAL_PHASE_AURAS as A,
   FINAL_PHASE_CASTS as C,
@@ -60,6 +59,7 @@ import {
   overTheVoid,
   putMarker,
 } from './final_scope';
+import { clearStarsInFlight } from './final_stars';
 
 const SCHOOL: Readonly<Record<SmithHeartVein, 'fire' | 'frost' | 'nature' | 'physical'>> = {
   heat: 'fire',
@@ -96,6 +96,7 @@ export function beginKneel(s: FinalScope): void {
   clearQuench(s, players);
   clearBreath(s, players);
   clearHammer(s, players);
+  clearStarsInFlight(s, players);
   clearCastIf(s.boss, C.call);
   dropShield(s);
   dropAura(s.boss, A.fury);
@@ -138,8 +139,6 @@ export function beginCollapse(s: FinalScope): void {
   const ph = s.st.phase;
   const b = s.boss;
   ph.stage = 'collapse';
-  ph.mixTurn = 0;
-  ph.mixTimer = P.mixFirst;
   b.damageImmune = false;
   b.damageFloorHp = undefined;
   b.hostile = true;
@@ -202,7 +201,6 @@ function stepCollapse(s: FinalScope): void {
   if (!h) return;
   if (!s.st.bar) pinCentre(s);
   h.clock += DT;
-  stepMix(s);
   if (h.fallen < h.order.length) {
     const when = fallAt(h.fallen);
     const vein = h.order[h.fallen];

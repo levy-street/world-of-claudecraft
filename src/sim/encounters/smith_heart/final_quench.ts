@@ -1,13 +1,7 @@
-// The Masterless Strength's Quench quarter (design doc 7.5): stack, with no
-// damage split. The Guardian of the Quench's cold, compressed.
-//
-//   Quenching Cold  while the boss stands in the Quench quarter, everyone
-//                   with fewer than two other players within 10 yd grows
-//                   cold (a bar, 0 to 100: full in 5 s alone); within reach
-//                   of two or more it falls again. Full, the player is
-//                   Encased in Rime (an unbreakable stun, 4 s) and struck;
-//                   the bar starts over. Away from the quarter the cold
-//                   falls and goes.
+// The Masterless Strength's Quench quarter (design doc 7.5). Its cold
+// (Quenching Cold, Encased in Rime) went with the rework of 2026-11-18 (the
+// team's review: it read as a mechanic of the ice quarter alone); the
+// quarter's star, Crossing Blade, is final_blades.ts.
 //   Groaning Ice    Heroic, every 18 s (first 7 s in): the floor under two
 //                   hashed players cracks (4 yd); 3 s later it breaks, and
 //                   whoever still stands on it falls Under the Ice (a heavy
@@ -30,104 +24,16 @@ import {
 } from './final_ids';
 import {
   at,
-  auraOf,
   cueAt,
-  cueOn,
   dropAura,
   dropFightObject,
   type FinalScope,
   hit,
   livePlayers,
   pickPlayers,
-  putMarker,
   roll,
   spawnFightObject,
 } from './final_scope';
-
-/** How many other living players stand within `reach` of `p`. */
-export function alliesNear(s: FinalScope, p: Entity, reach = T.coldReach): number {
-  const q = at(s, p);
-  let n = 0;
-  for (const o of livePlayers(s)) {
-    if (o.id === p.id) continue;
-    const r = at(s, o);
-    if (Math.hypot(r.x - q.x, r.z - q.z) <= reach) n++;
-  }
-  return n;
-}
-
-function showCold(s: FinalScope, p: Entity, cold: number, trend: number): void {
-  const v = Math.round(cold);
-  const a = auraOf(p, FINAL_AURAS.cold);
-  if (!a) {
-    putMarker(p, FINAL_AURAS.cold, FINAL_NAMES.cold, 3600, s.boss.id, {
-      permanent: true,
-      value: v,
-      value2: trend,
-      school: 'frost',
-    });
-    return;
-  }
-  if (a.value !== v) a.value = v;
-  if (a.value2 !== trend) a.value2 = trend;
-}
-
-/** Encase `p` in rime: the stun, the hit, the bar starting over. Exported
- *  for the dev trigger. */
-export function encase(s: FinalScope, p: Entity): void {
-  s.st.cold[p.id] = 0;
-  s.st.frozen[p.id] = T.freezeSeconds;
-  s.ctx.applyAura(p, {
-    id: FINAL_AURAS.frozen,
-    name: FINAL_NAMES.frozen,
-    kind: 'stun',
-    remaining: T.freezeSeconds,
-    duration: T.freezeSeconds,
-    value: 0,
-    sourceId: s.boss.id,
-    school: 'frost',
-    unbreakableControl: true,
-    undispellable: true,
-  });
-  hit(s, p, roll(s, T.freezeMin, T.freezeMax), FINAL_NAMES.frozen, 'frost');
-  cueOn(s, p, FINAL_CUES.freeze, 'frost');
-  showCold(s, p, 0, 0);
-}
-
-/** One tick of the cold on every player (`active`: the boss is in the
- *  Quench quarter, or the Quench poured into it; `rate` its rise's share:
- *  a poured Quench's is slower, part 2). */
-export function stepCold(s: FinalScope, active: boolean, rate = 1): void {
-  const st = s.st;
-  for (const id of Object.keys(st.frozen)) {
-    const k = Number(id);
-    st.frozen[k] -= DT;
-    if (st.frozen[k] <= 1e-9) delete st.frozen[k];
-  }
-  for (const p of livePlayers(s)) {
-    const was = st.cold[p.id] ?? 0;
-    if (!active && was <= 0) {
-      if (auraOf(p, FINAL_AURAS.cold)) dropAura(p, FINAL_AURAS.cold);
-      continue;
-    }
-    if (st.frozen[p.id] !== undefined) continue;
-    const alone = active && alliesNear(s, p) < T.coldAllies;
-    const next = alone
-      ? Math.min(T.coldMax, was + T.coldRise * rate * DT)
-      : Math.max(0, was - T.coldFall * DT);
-    st.cold[p.id] = next;
-    if (alone && next >= T.coldMax - 1e-9) {
-      encase(s, p);
-      continue;
-    }
-    if (!active && next <= 0) {
-      delete st.cold[p.id];
-      dropAura(p, FINAL_AURAS.cold);
-      continue;
-    }
-    showCold(s, p, next, alone ? 1 : -1);
-  }
-}
 
 /** Heroic: the floor under two hashed players cracks. Returns who. */
 export function crackIce(s: FinalScope): Entity[] {
@@ -235,7 +141,5 @@ export function clearQuench(
 ): void {
   for (const c of s.st.cracks) dropFightObject(s.ctx, s.inst, c.objectId);
   s.st.cracks = [];
-  s.st.cold = {};
-  s.st.frozen = {};
-  for (const p of players) dropAura(p, FINAL_AURAS.cold);
+  for (const p of players) dropAura(p, FINAL_AURAS.numbing);
 }

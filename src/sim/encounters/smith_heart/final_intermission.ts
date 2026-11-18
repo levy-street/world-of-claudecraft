@@ -64,6 +64,7 @@ import {
   putMarker,
   roll,
 } from './final_scope';
+import { starMask, wakeStar } from './final_stars';
 import type { FinalPhaseState } from './final_state';
 
 /** A fresh part-2 state (the pull's). */
@@ -79,11 +80,8 @@ export function freshPhase(): FinalPhaseState {
     rings: [],
     coals: [],
     poured: { breath: 0, quench: 0, hammer: 0, heat: 0 },
-    pouredClock: { breath: 0, quench: 0, hammer: 0, heat: 0 },
     unboundGrace: 0,
     finalClock: 0,
-    mixTurn: 0,
-    mixTimer: 0,
     fury: 0,
     furyTimer: 0,
     furyWarned: false,
@@ -281,7 +279,8 @@ export function endCall(s: FinalScope): SmithHeartVein[] {
       ability: Q.pour,
     });
     ph.poured[a.vein]++;
-    ph.pouredClock[a.vein] = 0;
+    // Its quarter's star, woken and at full pace for the rest of the fight.
+    wakeStar(s, a.vein);
     poured.push(a.vein);
     dropAdd(s, a);
   }
@@ -339,11 +338,12 @@ export function holdShaken(s: FinalScope): void {
 // ---- what every client reads --------------------------------------------------------------
 
 /** The awake quarters now: the living Splinters' through a call, all four in
- *  the final phase, none else. */
+ *  the final phase, else the woken stars' (the rework of 2026-11-18). */
 export function awakeMask(s: Pick<FinalScope, 'ctx' | 'st'>): number {
   const ph = s.st.phase;
   if (ph.stage === 'final') return ALL_QUARTERS_MASK;
   if (ph.stage === 'collapse') return ALL_QUARTERS_MASK & ~ph.fallenMask;
+  if (ph.stage === 'fight') return starMask(s, quarterBit);
   let m = 0;
   for (const a of ph.adds) if (addBody(s, a)) m |= quarterBit(a.vein);
   return m;
