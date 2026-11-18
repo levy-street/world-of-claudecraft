@@ -220,6 +220,44 @@ describe('HeatFightFx over a fake world', () => {
     well.templateId = wellTemplate('over');
     bump();
     run(4);
+    // The lava waves: the next ring's corridors glow (two strips from the lip);
+    // a ring rolling out stands as a wall of fire on its molten foot, its
+    // corridors ahead of it and the next ring's behind it.
+    expect(shown('smithHeartHeatWallFire')).toBe(0);
+    const gapA = add(entity('object', gapTemplate(3.5), HEARTH_WELL.x, HEARTH_WELL.z, 4.5));
+    gapA.facing = 0.4;
+    const gapB = add(entity('object', gapTemplate(3.5), HEARTH_WELL.x, HEARTH_WELL.z, 4.5));
+    gapB.facing = 0.4 + Math.PI;
+    bump();
+    run(4);
+    expect(shown('smithHeartHeatWallCorridor')).toBe(2);
+    const ring = add(
+      entity(
+        'object',
+        ringTemplate([1.2, 1.2 + Math.PI]),
+        HEARTH_WELL.x + Math.sin(1.2) * 20,
+        HEARTH_WELL.z + Math.cos(1.2) * 20,
+        4.5,
+      ),
+    );
+    bump();
+    run(4);
+    for (const name of [
+      'smithHeartHeatWallFire',
+      'smithHeartHeatWallTongues',
+      'smithHeartHeatWallEmbers',
+      'smithHeartHeatWallFoot',
+    ])
+      expect(shown(name), name).toBe(1);
+    expect(shown('smithHeartHeatWallCorridor')).toBe(4);
+    // The ring and the warning gone: nothing of the wall stays.
+    entities.delete(ring.id);
+    entities.delete(gapA.id);
+    entities.delete(gapB.id);
+    bump();
+    run(4);
+    expect(shown('smithHeartHeatWallFire')).toBe(0);
+    expect(shown('smithHeartHeatWallCorridor')).toBe(0);
     // The melee's shore terrace lies round the pool.
     expect(shown('smithHeartHeatWellShore')).toBe(1);
     // The guardian throws the seeds: a meteor per seed, in the air until the

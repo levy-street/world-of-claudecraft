@@ -412,6 +412,10 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // ladder (heat_floor_ladder_core.ts, pinned untied in
   // tests/smith_heart_heat_floor.test.ts).
   { file: 'src/render/smith_heart_fx/heat_well_fx.ts', layer: 'encounter', strict: true },
+  // The lava waves' walls of fire: the foot and the corridors on the Heat's
+  // ladder; the sheets, tongues, embers and haze stand in the air and take
+  // bare orders over every floor band (WALL_AIR_ORDER), so not strict.
+  { file: 'src/render/smith_heart_fx/heat_lava_wall_fx.ts', layer: 'encounter', strict: false },
   { file: 'src/render/smith_heart_fx/heat_cinder_fx.ts', layer: 'encounter', strict: true },
   { file: 'src/render/smith_heart_fx/heat_molten_decal.ts', layer: 'encounter', strict: true },
   { file: 'src/render/smith_heart_fx/heat_telegraph.ts', layer: 'encounter', strict: true },

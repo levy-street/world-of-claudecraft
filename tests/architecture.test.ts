@@ -1248,6 +1248,7 @@ const RENDER_PURE_CORES = [
   // beats, stone, strikes and bolts.
   'src/render/smith_heart_fx/breath_entrance_core.ts',
   'src/render/smith_heart_fx/heat_fight_fx_core.ts',
+  'src/render/smith_heart_fx/heat_lava_wall_core.ts',
   // The Heat's floor ladder (every floor layer's unique rung) and its molten
   // telegraphs' looks.
   'src/render/smith_heart_fx/heat_floor_ladder_core.ts',

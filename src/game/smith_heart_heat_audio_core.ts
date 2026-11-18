@@ -19,6 +19,9 @@
 //                each new stack of Cinder Grip on a tank (louder at the swap)
 //   the Wheel    (mythic) its red slices heating (a WARNING) and erupting
 //   the cinder   a Rolling Cinder's roll, a loop at the nearest one
+//   the waves    the overflows' walls of fire: a roar looped at the nearest
+//                burning point of the nearest wall, louder as it comes, and a
+//                rush as a wall rolls past the local player
 //
 // Every sample is the fight's own (`heart_heat_*`, scripts/sfx/
 // smith_heart_mechanic_sfx.mjs; until 2026-11-05 every cue was borrowed from
@@ -67,7 +70,11 @@ export const HEAT_CUE_SOUNDS: Readonly<Record<string, readonly HeatSound[]>> = {
   [HEAT_CUES.sink]: [S('heart_heat_sink', 1, 'source', 1, 1)],
   [HEAT_CUES.rise]: [S('heart_heat_rise', 1, 'source', 1, 1)],
   // A river of the first flame starts to flow (soft: three at a time).
-  [HEAT_CUES.ring]: [S('heart_heat_river', 0.45, 'point', 1, 0.6)],
+  // A ring of lava heaved out over the lip: its rush and an ignition's bite.
+  [HEAT_CUES.ring]: [
+    S('heart_heat_river', 0.5, 'point', 0.85, 0.6),
+    S('heart_heat_ignite', 0.35, 'point', 1.15, 0.6),
+  ],
   // A Falling Cinder strikes (soft and short: one every few seconds).
   [HEAT_CUES.bolt]: [S('heart_heat_bolt', 0.4, 'target', 1, 0.15)],
   // A Wellspawn climbs out; one feeds the wellspring (a blast on the raid).
@@ -137,6 +144,22 @@ export const HEAT_CINDER_LOOP = {
   fadeOut: 0.6,
 } as const;
 
+/** The overflows' walls of fire: the roar looped at the nearest wall (its
+ *  gain from `quiet` far off to `gain` on it) and the rush as one passes you. */
+export const HEAT_WALL_LOOP = {
+  key: 'heart_heat_cinder_roll',
+  gain: 1,
+  quiet: 0.3,
+  fadeOut: 0.9,
+} as const;
+export const HEAT_WALL_PASS = { key: 'heart_heat_swell', gain: 0.9, rate: 0.8 } as const;
+
+/** The roar's gain for a wall `near` (0 far, 1 on it). */
+export function wallRoarGain(near: number): number {
+  const k = Math.max(0, Math.min(1, near));
+  return HEAT_WALL_LOOP.quiet + (HEAT_WALL_LOOP.gain - HEAT_WALL_LOOP.quiet) * k * k;
+}
+
 /** The marks in the local player's ear: one landing on them, so a player
  *  always hears that the mechanic chose them. */
 export const HEAT_MARK_SOUNDS: Readonly<Record<string, HeartMarkSound>> = {
@@ -164,6 +187,8 @@ export const HEAT_SFX_KEYS: readonly string[] = [
     HEAT_WHEEL_SOUNDS.warn.key,
     HEAT_WHEEL_SOUNDS.burn.key,
     HEAT_CINDER_LOOP.key,
+    HEAT_WALL_LOOP.key,
+    HEAT_WALL_PASS.key,
     HEAT_GRIP_SOUND.key,
   ]),
 ].sort();

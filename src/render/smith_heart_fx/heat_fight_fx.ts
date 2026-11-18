@@ -7,6 +7,8 @@
 // root, the particles and the floor telegraph kit, and lends them to its
 // parts:
 //  - heat_well_fx.ts: the first wellspring (calm, overflowing);
+//  - heat_lava_wall_fx.ts: the overflows' lava waves, each ring a wall of fire
+//    parting at its corridors, and the corridors glowing on the floor;
 //  - heat_cinder_fx.ts: a Rolling Cinder's fall and the cinder itself, the
 //    hunted's marks, the adds' fire;
 // and paints itself:
@@ -83,6 +85,7 @@ import {
 import { HEAT_FLOOR, heatParticleSteps } from './heat_floor_ladder_core';
 import type { HeatFxHost } from './heat_fx_host';
 import { HEAT_LAVA_GLSL, HEAT_MOLTEN_GLSL, HEAT_NOISE_GLSL } from './heat_lava_glsl';
+import { HeatLavaWallFx } from './heat_lava_wall_fx';
 import { HeatMeteorFx } from './heat_meteor_fx';
 import { moltenDecal } from './heat_molten_decal';
 import { HeatSeedField } from './heat_seed_field';
@@ -419,6 +422,10 @@ export class HeatFightFx implements HeatFxHost {
   /** The floor's height (bound: the parts pass it on to the kit). */
   readonly groundY = (x: number, z: number): number => this.groundFn(x, z);
   private readonly well: HeatWellFx;
+  /** The overflows' lava waves (their walls of fire and corridors). */
+  private readonly wall: HeatLavaWallFx;
+  private readonly onWallPass = (x: number, y: number, z: number): void =>
+    this.audio.wallPass(x, y, z);
   private readonly cinder: HeatCinderFx;
   /** The thrown Hearthseeds' meteors (the seeds themselves in the air). */
   private readonly meteors: HeatMeteorFx;
@@ -501,6 +508,7 @@ export class HeatFightFx implements HeatFxHost {
     for (const k of KINDS) this.ids.set(k, []);
 
     this.well = new HeatWellFx(this);
+    this.wall = new HeatLavaWallFx(this);
     this.cinder = new HeatCinderFx(this);
     this.meteors = new HeatMeteorFx(this);
 
@@ -748,7 +756,10 @@ export class HeatFightFx implements HeatFxHost {
     const y = this.groundY(x, z);
     switch (ability) {
       case HEAT_CUES.ring:
-        this.particles.puff(x, y + 1, z, 16, { ...SPARK, radius: 3 });
+        // A ring leaves the lip: the wellspring heaves it out in a burst of
+        // sparks and a hot ring at the lip.
+        this.particles.puff(x, y + 1, z, 40, { ...SPARK, speed: 12, up: 7, radius: r });
+        this.particles.shockRing(x, z, C.ringGold, r + 2, 0.5);
         break;
       case HEAT_CUES.spawn:
       case HEAT_CUES.hatch:
@@ -840,6 +851,17 @@ export class HeatFightFx implements HeatFxHost {
     this.paintSigils(world);
     this.particles.update(this.clock);
     const me = world.entities.get(world.playerId) ?? null;
+    // The lava waves: their walls, their corridors, the nearest wall's roar.
+    const roar = this.wall.update(
+      world,
+      list('ring'),
+      list('gap'),
+      this.origin,
+      this.clock,
+      me,
+      this.onWallPass,
+    );
+    this.audio.wall(roar);
     // The nearest Rolling Cinder rolls in the sound's loop.
     let cinder: Entity | null = null;
     let best = Number.POSITIVE_INFINITY;
@@ -973,6 +995,8 @@ export class HeatFightFx implements HeatFxHost {
     this.rosterSeen = Number.NaN;
     this.candidateIds.length = 0;
     this.well.hide();
+    this.wall.hide();
+    this.audio.wall(null);
     this.cinder.hide();
     this.meteors.hide();
     for (const s of this.seeds) {
