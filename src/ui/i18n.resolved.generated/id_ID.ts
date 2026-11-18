@@ -31632,6 +31632,7 @@ export const id_ID: EnTranslations = {
     "noticeboardName": "Papan Pengumuman",
     "farmPatchName": "Petak Kebun",
     "realmBuilderMonumentName": "Monumen Pembangun Alam",
-    "musterRackName": "Rak Senjata Pasukan"
+    "musterRackName": "Rak Senjata Pasukan",
+    "heartSealCrystalName": "The Heart Seal Crystal"
   }
 };

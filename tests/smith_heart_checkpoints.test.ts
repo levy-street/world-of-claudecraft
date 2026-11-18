@@ -2,7 +2,8 @@
 // encounters/smith_heart/checkpoint_order.ts and checkpoint.ts, applied by
 // instances/dungeon_checkpoints.ts): a spirit that walks back in rises in the
 // room of the guardian the raid killed LAST, or on the Heart's Arrival Terrace
-// once all four guardians are down (and the seal's portal is open), or at the
+// once all four guardians are down AND the heart seal crystal has burst into
+// the portal (lit and charged is not enough: a raider on the dais opens it), or at the
 // entrance before any kill. Each point stands at its room's door, off the
 // fight's floor and clear of its hazards, behind exactly the gates it lists;
 // the rule is per claim, reset with it, and the same through the server.
@@ -46,6 +47,7 @@ import {
   type SmithHeartVein,
 } from '../src/sim/content/smith_heart_layout';
 import { BUILTIN_WORLD, DUNGEONS, instanceOrigin } from '../src/sim/data';
+import { handleSmithHeartDevChat } from '../src/sim/dev/smith_heart_dev';
 import {
   inBreathArena,
   inHearthFloor,
@@ -59,6 +61,7 @@ import {
 import { COUNCIL_ARENA_R } from '../src/sim/encounters/smith_heart/council_scope';
 import { onAnvil } from '../src/sim/encounters/smith_heart/final_scope';
 import { SMITH_HEART_VEIN_BITS, smithHeartProgress } from '../src/sim/encounters/smith_heart/seal';
+import { burstSmithHeartSeal } from '../src/sim/encounters/smith_heart/seal_burst';
 import { dungeonReentryPoint } from '../src/sim/instances/dungeon_checkpoints';
 import {
   clearDungeonGateStateForTest,
@@ -215,10 +218,18 @@ describe("the Smith's Heart death checkpoints", () => {
     expectAt(runBack(sim, pid, inst), 'quench');
   });
 
-  it('all four down and the portal open: rises on the Heart terrace', () => {
+  it('all four down and the crystal burst: rises on the Heart terrace', () => {
     const { sim, pid, inst } = setup();
     for (const v of ['hammer', 'heat', 'quench', 'breath'] as const) win(sim, pid, inst, v);
     killPacks(sim, pid, inst, SMITH_HEART_PACKS.ring);
+    sim.tick();
+    // Lit and charged, nobody on the dais: the portal is shut and the Heart's way in
+    // is not offered, so the last guardian's room is.
+    expect(smithHeartProgress(sim.ctx, inst).ready).toBe(true);
+    expect(smithHeartProgress(sim.ctx, inst).portalOpen).toBe(false);
+    expectAt(runBack(sim, pid, inst), 'breath');
+    // The burst opens the Heart's way in.
+    expect(burstSmithHeartSeal(sim.ctx, inst)).toBe(true);
     sim.tick();
     expect(smithHeartProgress(sim.ctx, inst).portalOpen).toBe(true);
     expectAt(runBack(sim, pid, inst), 'final');
@@ -380,6 +391,7 @@ describe('each point stands at its door, clear of the fight', () => {
     const { sim, pid, inst } = setup();
     for (const v of SMITH_HEART_VEINS) win(sim, pid, inst, v);
     killPacks(sim, pid, inst, SMITH_HEART_PACKS.ring);
+    expect(burstSmithHeartSeal(sim.ctx, inst)).toBe(true);
     sim.tick();
     expectAt(runBack(sim, pid, inst), 'final');
     const player = sim.entities.get(pid) as Entity;
@@ -451,7 +463,7 @@ describe('each point stands at its door, clear of the fight', () => {
 });
 
 describe('the same through the server', () => {
-  function serverRun(order: readonly SmithHeartVein[]) {
+  function serverRun(order: readonly SmithHeartVein[], portal: boolean) {
     const saved = process.env.ALLOW_DEV_COMMANDS;
     process.env.ALLOW_DEV_COMMANDS = '1';
     let server: Any;
@@ -466,18 +478,26 @@ describe('the same through the server', () => {
     const session = server.join(ws, 1, 1, 'Heartwalker', 'warrior', null, false, {});
     if ('error' in session) throw new Error(session.error);
     const pid = session.pid as number;
-    return { sim, pid, at: devRun(sim, pid, order) };
+    return { sim, pid, at: devRun(sim, pid, order, portal) };
   }
 
   /** The in-game recipe (the report's playtest steps): enter, clear the
-   *  trash, kill the guardians in order, die, release, walk back in. */
-  function devRun(sim: Any, pid: number, order: readonly SmithHeartVein[]) {
+   *  trash, kill the guardians in order, open the portal when asked (the dev
+   *  verb is a forced burst of the heart seal crystal), die, release, walk
+   *  back in. */
+  function devRun(sim: Any, pid: number, order: readonly SmithHeartVein[], portal: boolean) {
     sim.chat('/dev heart enter', pid);
     sim.tick();
     sim.chat('/dev heart kill trash', pid);
     sim.tick();
     for (const v of order) {
       sim.chat(`/dev heart kill ${v}`, pid);
+      sim.tick();
+    }
+    if (portal) {
+      // Straight to the handler: the chat seam's rate limit would drop the
+      // run's last line once this one is added to the burst.
+      expect(handleSmithHeartDevChat(sim.ctx, '/dev heart portal', pid)).toBe(true);
       sim.tick();
     }
     sim.chat('/dev die', pid);
@@ -495,20 +515,25 @@ describe('the same through the server', () => {
   }
 
   it.each([
-    [['hammer', 'breath', 'quench'], 'quench'],
-    [['hammer', 'quench', 'breath'], 'breath'],
-    [['hammer', 'heat', 'quench', 'breath'], 'final'],
-  ] as const)('after %j the server raises the spirit in %s, as offline does', (order, room) => {
-    const online = serverRun(order);
-    expectAt(online.at, room);
-    const offline = new Sim({
-      seed: 17,
-      playerClass: 'warrior',
-      noPlayer: true,
-      world: WORLD,
-      devCommands: true,
-    });
-    const pid = offline.addPlayer('warrior', 'Heartwalker');
-    expect(devRun(offline, pid, order)).toEqual(online.at);
-  });
+    [['hammer', 'breath', 'quench'], false, 'quench'],
+    [['hammer', 'quench', 'breath'], false, 'breath'],
+    // All four down but the crystal never burst: the last guardian's room.
+    [['hammer', 'heat', 'quench', 'breath'], false, 'breath'],
+    [['hammer', 'heat', 'quench', 'breath'], true, 'final'],
+  ] as const)(
+    'after %j (portal forced: %s) the server raises the spirit in %s, as offline does',
+    (order, portal, room) => {
+      const online = serverRun(order, portal);
+      expectAt(online.at, room);
+      const offline = new Sim({
+        seed: 17,
+        playerClass: 'warrior',
+        noPlayer: true,
+        world: WORLD,
+        devCommands: true,
+      });
+      const pid = offline.addPlayer('warrior', 'Heartwalker');
+      expect(devRun(offline, pid, order, portal)).toEqual(online.at);
+    },
+  );
 });

@@ -31632,6 +31632,7 @@ export const ja_JP: EnTranslations = {
     "noticeboardName": "掲示板",
     "farmPatchName": "菜園",
     "realmBuilderMonumentName": "王国建設者の記念碑",
-    "musterRackName": "召集兵団の武器棚"
+    "musterRackName": "召集兵団の武器棚",
+    "heartSealCrystalName": "心臓の封印水晶"
   }
 };

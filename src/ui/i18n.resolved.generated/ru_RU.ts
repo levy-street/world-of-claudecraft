@@ -31632,6 +31632,7 @@ export const ru_RU: EnTranslations = {
     "noticeboardName": "Доска объявлений",
     "farmPatchName": "Грядки",
     "realmBuilderMonumentName": "Памятник зодчим королевства",
-    "musterRackName": "Оружейная стойка ополчения"
+    "musterRackName": "Оружейная стойка ополчения",
+    "heartSealCrystalName": "Кристалл печати сердца"
   }
 };

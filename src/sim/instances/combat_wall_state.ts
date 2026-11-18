@@ -113,6 +113,13 @@ export const COMBAT_WALL_SHAPES: Readonly<Record<string, CombatWallShape>> = {
   sh_quench_blade_wake: { hw: 1.3, hd: 1.3, height: 12, round: true, ownLook: true },
   sh_quench_blade_float: { hw: 1.3, hd: 1.3, height: 12, round: true, ownLook: true },
   sh_quench_rim: { hw: 4.4, hd: 0.7, height: 3.2, ownLook: true },
+  // The Smith's Heart's heart seal crystal on the Ring's dais
+  // (encounters/smith_heart/seal_crystal.ts): a round wall the size of its
+  // plinth (content/smith_heart_layout.ts SEAL_CRYSTAL.r, pinned by
+  // tests/smith_heart_seal_crystal.test.ts), as tall as the crystal stands,
+  // until it bursts (a player on the dais once charged) and the object leaves
+  // the claim. Its look is the seal's own.
+  smith_heart_seal_crystal: { hw: 8.5, hd: 8.5, height: 19, round: true, ownLook: true },
 };
 
 /** The soul pillars' rows: `sh_council_soul_<role>_<c|r>_<pips>`. */

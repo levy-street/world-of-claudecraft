@@ -15,7 +15,7 @@
 // tick its fight is won (seal.ts smithHeartVeinWon: the Hammer's waits on all
 // three of the council), in vein order within one tick, and leaves it if its
 // fight stands up again (a dev reset). Keyed by the claim's identity and its
-// exit (the devPortal idiom of seal.ts), so a fresh claim (a reset) starts
+// exit (the devAsleep idiom of seal.ts), so a fresh claim (a reset) starts
 // empty and a recycled slot never inherits a run's order. Draws no rng, reads
 // no clock: the same kills on the same ticks give the same order on every host.
 // Imports nothing of the fight, so seal.ts can feed it without a cycle.

@@ -31632,6 +31632,7 @@ export const en: EnTranslations = {
     "noticeboardName": "Notice Board",
     "farmPatchName": "Garden Beds",
     "realmBuilderMonumentName": "Realm Builder Monument",
-    "musterRackName": "Muster Weapon Rack"
+    "musterRackName": "Muster Weapon Rack",
+    "heartSealCrystalName": "The Heart Seal Crystal"
   }
 };

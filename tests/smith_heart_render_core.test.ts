@@ -410,26 +410,16 @@ describe('heart_rivers_core: the floor light-rivers', () => {
       }
     });
   }
-  it('the Hammer and the Breath run down their stairs; the other two leap the chasm onto the dais', () => {
-    // The Hammer down the Grand Stair, the Breath down the North Stair: on
-    // the floor all the way.
-    for (const vein of ['hammer', 'breath'] as const) {
+  it('every river runs down its own stair to the dais, on the floor all the way', () => {
+    // The Hammer down the Grand Stair, the Breath down the North Stair, the Quench
+    // down the East Stair and the Heat down the West Stair (the owner's review of
+    // 2026-11-18: no river crosses the chasm on a thin bridge).
+    for (const vein of SMITH_HEART_VEINS) {
       const strip = planHeartRiver(LIGHT_RIVERS[vein], floorAt);
       expect(
         strip.points.every((q) => floorAt(q.x, q.z) !== null),
         vein,
       ).toBe(true);
-    }
-    for (const vein of ['quench', 'heat'] as const) {
-      const strip = planHeartRiver(LIGHT_RIVERS[vein], floorAt);
-      let bridged = 0;
-      for (const { x, y, z } of strip.points) {
-        if (floorAt(x, z) !== null) continue;
-        bridged++;
-        expect(y, vein).toBeGreaterThan(SEAL_DAIS.h);
-        expect(y, vein).toBeLessThan(RING.h + 1);
-      }
-      expect(bridged, vein).toBeGreaterThan(5);
     }
   });
   it('the light runs arena to seal on its own clock, whole when met already lit', () => {
@@ -488,6 +478,30 @@ describe('heart_seal_core: the seal memory from the mirrored markers', () => {
     expect(heartSealView(key, 60).portalSince).toBe(-1);
   });
 
+  it('times the ready bit, snaps one met set, and a lost one is a fresh claim', () => {
+    observeHeartSealMarker(marker(15), 10);
+    expect(heartSealView(key, 11).readySince).toBe(-1);
+    // The charge arrives (all four lit, the Ring clear): the view reads it as its own moment,
+    // and the lit-vein mask stays the four veins alone.
+    observeHeartSealMarker(marker(15 | 128), 20);
+    const v = heartSealView(key, 22);
+    expect(v.mask).toBe(15);
+    expect(v.readySince).toBeCloseTo(2);
+    expect(v.portalSince).toBe(-1);
+    // A raid arriving at a charged seal sees it charged at once, no replay.
+    clearHeartSealForTest();
+    observeHeartSealMarker(marker(15 | 128), 50);
+    expect(heartSealView(key, 50).readySince).toBeGreaterThan(100);
+    // The burst keeps the charge (the bit stays set after it, the portal bit joins it).
+    observeHeartSealMarker(marker(15 | 128 | 16), 60);
+    const burst = heartSealView(key, 61);
+    expect(burst.portalSince).toBeCloseTo(1);
+    expect(burst.readySince).toBeGreaterThan(100);
+    // A charge that goes dark again is a fresh claim (a dev reset): the slot starts over.
+    observeHeartSealMarker(marker(15), 70);
+    expect(heartSealView(key, 70).readySince).toBe(-1);
+  });
+
   it('is fed through the gate-object seam: a seal marker view is an empty anchor that reports', () => {
     const plan = gateObjectPlan({ ...marker(2) });
     expect(plan).toEqual({ encounterAnchor: true, height: 2 });
@@ -523,37 +537,31 @@ describe('heart_seal_core: the seal memory from the mirrored markers', () => {
 
 describe('heart_portal_core: the opening, the hop, the area blend', () => {
   it('is dark while shut and whole, without a burst, when met long open', () => {
-    expect(heartPortalStage(-1)).toEqual({ charge: 0, flash: 0, split: 0, ring: 0, swirl: 0 });
+    expect(heartPortalStage(-1)).toEqual({ charge: 0, flash: 0, ring: 0, swirl: 0 });
     const old = heartPortalStage(999);
-    expect(old.split).toBe(1);
     expect(old.swirl).toBe(1);
     expect(old.flash).toBe(0);
     expect(old.ring).toBe(0);
     expect(old.charge).toBe(0);
   });
-  it('charges, then flashes, splits, rings out and grows the vortex, in that order', () => {
+  it('overloads, then flashes, rings out and grows the vortex, in that order', () => {
     const O = HEART_PORTAL_OPEN;
     const mid = heartPortalStage(O.charge * 0.5);
     expect(mid.charge).toBeGreaterThan(0.2);
     expect(mid.flash).toBe(0);
-    expect(mid.split).toBe(0);
     expect(mid.swirl).toBe(0);
     const burst = heartPortalStage(O.charge + 0.1);
     expect(burst.flash).toBeGreaterThan(0.6);
     expect(burst.ring).toBeGreaterThan(0);
     const later = heartPortalStage(O.charge + 1.2);
-    expect(later.split).toBeGreaterThan(0.9);
     expect(later.ring).toBeGreaterThan(burst.ring);
     expect(later.swirl).toBeGreaterThan(0.3);
     expect(heartPortalStage(O.charge + O.ring + 0.1).ring).toBe(0);
-    // Monotone growth of the split and the swirl.
-    let split = 0;
+    // Monotone growth of the swirl.
     let swirl = 0;
     for (let t = 0; t < 6; t += 0.05) {
       const s = heartPortalStage(t);
-      expect(s.split).toBeGreaterThanOrEqual(split);
       expect(s.swirl).toBeGreaterThanOrEqual(swirl);
-      split = s.split;
       swirl = s.swirl;
     }
   });
@@ -751,16 +759,6 @@ describe('heart_sightline_core: the raid sees the seal and the portal', () => {
     expect(
       heartSightlineHits({ x: g.x + 3, y: low, z: g.z }, { x: g.x - 3, y: low, z: g.z }, solids),
     ).toContain('anvil_mouth:sill');
-    // A tine does stand on the dais (the rays pass between them).
-    const tine = F.props.find((p) => p.kind === 'sh_portal_tine');
-    if (!tine) throw new Error('no tine');
-    expect(
-      heartSightlineHits(
-        { x: tine.x - 3, y: SEAL_DAIS.h + 6, z: tine.z },
-        { x: tine.x + 3, y: SEAL_DAIS.h + 6, z: tine.z },
-        solids,
-      ),
-    ).toContain('sh_portal_tine');
   });
 
   it('every point of the Ring sees the seal and the portal over every gate, prop and rock', () => {
@@ -873,7 +871,6 @@ describe('heart_plan_core: the props and the lights', () => {
     expect(tallest('sh_sunk_blade')).toBeGreaterThan(10);
     expect(tallest('sh_great_hearth')).toBeGreaterThan(20);
     expect(tallest('sh_giant_anvil')).toBeGreaterThan(8);
-    expect(tallest('sh_portal_tine')).toBeGreaterThan(14);
     // The Heat is smith fire, never a volcano: no lava-red anywhere in it.
     expect(SMITH_HEART_VEIN_COLORS.heat).toBe(0xffe6a0);
     // The giant anvil stands in the Smith's Forge, before the hearth.

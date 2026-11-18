@@ -37,9 +37,9 @@
 //
 // Engine limit: ONE floor height per point (authored_field/CLAUDE.md), so the
 // Balcony replaces the Ring's south arc and the Ring loops over it by the two
-// stairs. The void between the Ring and the dais is open air but for the two
-// stairs down to the dais (south and north), both below every Ring eye's line
-// to the seal: the seal is in sight from every point of the Ring. The whole field stays inside one slot of
+// stairs. The void between the Ring and the dais is open air but for the four
+// stairs down to the dais (south, north, east and west), all below every Ring eye's
+// line to the seal: the seal is in sight from every point of the Ring. The whole field stays inside one slot of
 // the instance band (|x| < 300, |z| < 250).
 //
 // Pure data: the sim (height, collision, spawns, gates, the portal hop) and
@@ -131,6 +131,16 @@ export const RING_ARC = { fromDeg: 222, toDeg: 498 } as const;
 export const SEAL_DAIS = { x: 0, z: 0, r: 19, h: H.dais } as const;
 /** The seal at the dais's centre (render: the four-colour progress disc). */
 export const HEART_SEAL = { x: 0, z: 0, r: 9 } as const;
+/** The heart seal crystal at the dais's centre (encounters/smith_heart/
+ *  seal_crystal.ts): `r` is its footprint in yards, the plinth's reach (the
+ *  seal's inner circle, render/smith_heart/ring_crystal_core.ts RING_CRYSTAL
+ *  .plinthR, pinned equal by tests/smith_heart_ring_crystal.test.ts). It
+ *  stands as a solid circle (a combat wall, instances/combat_wall_state.ts)
+ *  until a living player steps onto the dais (SEAL_DAIS, the trigger's circle)
+ *  once all four veins burn, and the portal waits
+ *  inside it: the portal's whole trigger (RING_PORTAL) sits under the crystal,
+ *  so nobody reaches it before the burst. */
+export const SEAL_CRYSTAL = { x: 0, z: 0, r: 8.5 } as const;
 /** The portal the seal opens into (its walk-in trigger radius). */
 export const RING_PORTAL = { x: 0, z: 0, r: 4 } as const;
 /** Where the Heart's return portal sets the raid down: on the dais, facing
@@ -187,6 +197,16 @@ export const GRAND_STAIR = { halfWidth: 8, top: -58, foot: -SEAL_DAIS.r } as con
  *  walking round the Ring. Its fall is gentle (the Ring at 0 to the dais at
  *  -4 over the chasm), so it stays under every Ring eye's line to the seal. */
 export const NORTH_STAIR = { halfWidth: 8, top: RING.innerR, foot: SEAL_DAIS.r } as const;
+/** The East and West Stairs (the owner's review of 2026-11-18: "the bridges are too
+ *  thin, lets have the same bridges as the other two"): the dais's third and fourth
+ *  ways in, straight down from the Ring's inner edge at its east (the Quench's mouth)
+ *  and its west (the Heat's) to the dais, as broad as the Grand Stair and built the
+ *  same way (the Ring kit's stair modules). Each carries its vein's light-river down
+ *  its chute, as the North Stair carries the Breath's, where those two rivers used to
+ *  leap the open chasm along a thin conduit. A raid finishing in the east or the west
+ *  reaches the portal without walking round the Ring. */
+export const EAST_STAIR = { halfWidth: 8, top: RING.innerR, foot: SEAL_DAIS.r } as const;
+export const WEST_STAIR = { halfWidth: 8, top: RING.innerR, foot: SEAL_DAIS.r } as const;
 
 // ---- the main map: the Breath (north, high) -----------------------------------------
 
@@ -839,7 +859,7 @@ const AUTHORED_SURFACES: FieldSurface[] = [
     ],
     { stairs: true, edge: 'balustrade', halfWidth: GRAND_STAIR.halfWidth },
   ),
-  // --- The Ring, its two stairs and the Seal Dais -------------------------------------
+  // --- The Ring, its three stairs and the Seal Dais -----------------------------------
   ringSector(),
   path(
     'north_stair',
@@ -850,6 +870,27 @@ const AUTHORED_SURFACES: FieldSurface[] = [
       [0, NORTH_STAIR.foot - 4, H.dais],
     ],
     { stairs: true, edge: 'balustrade', halfWidth: NORTH_STAIR.halfWidth },
+  ),
+  // The East and West Stairs: the North Stair turned a quarter each way (x east, z north).
+  path(
+    'east_stair',
+    [
+      [EAST_STAIR.top + 4, 0, H.ring],
+      [EAST_STAIR.top, 0, H.ring],
+      [EAST_STAIR.foot + 4, 0, H.dais],
+      [EAST_STAIR.foot - 4, 0, H.dais],
+    ],
+    { stairs: true, edge: 'balustrade', halfWidth: EAST_STAIR.halfWidth },
+  ),
+  path(
+    'west_stair',
+    [
+      [-(WEST_STAIR.top + 4), 0, H.ring],
+      [-WEST_STAIR.top, 0, H.ring],
+      [-(WEST_STAIR.foot + 4), 0, H.dais],
+      [-(WEST_STAIR.foot - 4), 0, H.dais],
+    ],
+    { stairs: true, edge: 'balustrade', halfWidth: WEST_STAIR.halfWidth },
   ),
   balconyStair('balcony_stair_east', 172, 142),
   balconyStair('balcony_stair_west', 188, 218),
@@ -1058,11 +1099,6 @@ const PIT_COLUMNS: FieldProp[] = QUARRY_PILLAR_SPOTS.map((p) => ({
  *  steps above, so the whole figure reads from the pit floor's camera. */
 export const QUARRY_COLOSSUS_OUT = 12;
 
-/** The four crystal spires on the Seal Dais (bearings, degrees): on the
- *  diagonals, the two southern ones turned a breath off them so the Ring's
- *  two ends (its arc's feet at 138 and 222) see past them to the portal. */
-export const RING_SPIRE_BEARINGS = [45, 134, 226, 315] as const;
-
 /** How far out from the Ring's centre the pack spots' cairns stand (on the
  *  walk, against its outer rim). */
 export const RING_CAIRN_R = 75.6;
@@ -1259,13 +1295,8 @@ const PROPS: FieldProp[] = [
     r: 1.5,
     h: 10,
   })),
-  // The Seal Dais: the four crystal spires of the portal's crown, on the
-  // diagonals (clear of the four rivers and the two stairs), each lighting
-  // with its vein.
-  ...RING_SPIRE_BEARINGS.map((deg) => {
-    const p = ringPoint(deg, 15.5);
-    return { kind: 'sh_portal_tine', x: p.x, z: p.z, rot: (deg * Math.PI) / 180, r: 1.6, h: 16 };
-  }),
+  // The Seal Dais: the ring crystal at its centre is the renderer's (its footprint is the
+  // sim's `SEAL_CRYSTAL` wall); the seal's own placeholder prop stands at the middle.
   { kind: 'sh_heart_seal', x: HEART_SEAL.x, z: HEART_SEAL.z, rot: 0 },
   // The Breath: wind shelters on the bridge's windward edge (phase 2 gusts
   // push the raid against them, never off the arch). The Cornice itself is

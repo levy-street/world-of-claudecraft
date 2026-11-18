@@ -21014,6 +21014,7 @@ export type TranslationKeyFlat =
   | 'worldContent.dungeonInstanceBusy'
   | 'worldContent.dungeonPartyWarning'
   | 'worldContent.farmPatchName'
+  | 'worldContent.heartSealCrystalName'
   | 'worldContent.mailboxName'
   | 'worldContent.musterRackName'
   | 'worldContent.noticeboardName'

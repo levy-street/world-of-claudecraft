@@ -24,6 +24,7 @@ import { isBlocked } from '../src/sim/colliders';
 import { SMITH_HEART_GATES } from '../src/sim/content/smith_heart';
 import {
   BALCONY,
+  EAST_STAIR,
   GRAND_STAIR,
   HEART_ARRIVAL,
   HEART_ROOM,
@@ -35,6 +36,7 @@ import {
   SEAL_DAIS,
   SMITH_HEART_BOSS_SPOTS,
   SMITH_HEART_FIELD,
+  WEST_STAIR,
 } from '../src/sim/content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import {
@@ -314,13 +316,15 @@ describe("the Smith's Heart: the drawn walls and the walked floor agree", () => 
     expect(authoredFieldHeight(FIELD, 0, -SEAL_DAIS.r + 2)).toBe(SEAL_DAIS.h);
   });
 
-  it('nothing walkable stands between the Ring and the dais but the two stairs', () => {
+  it('nothing walkable stands between the Ring and the dais but the four stairs', () => {
     // Off the stairs, the annulus between the dais's rim and the Ring's inner
     // edge is open air at every bearing, and the Ring looks DOWN onto the seal.
     expect(SEAL_DAIS.h).toBeLessThan(RING.h);
     for (let d = 0; d < 360; d += 5) {
       if (d >= 160 && d <= 200) continue; // the Grand Stair's band
       if (d <= 25 || d >= 335) continue; // the North Stair's band
+      if (d >= 65 && d <= 115) continue; // the East Stair's band
+      if (d >= 245 && d <= 295) continue; // the West Stair's band
       for (let r = SEAL_DAIS.r + 1; r < RING.innerR - 1; r += 2) {
         const p = ringPoint(d, r);
         expect(authoredFieldHeight(FIELD, p.x, p.z), `${d} deg r ${r}`).toBe(VOID);
@@ -355,7 +359,32 @@ describe("the Smith's Heart: the drawn walls and the walked floor agree", () => 
     expect(authoredFieldHeight(FIELD, 0, NORTH_STAIR.foot - 2)).toBe(SEAL_DAIS.h);
   });
 
-  it("both stairs stay under every Ring eye's line to the seal", () => {
+  it('the East and West Stairs cross to the dais as the North Stair does: broad, gentle, alone', () => {
+    for (const [name, sign, stair] of [
+      ['East', 1, EAST_STAIR],
+      ['West', -1, WEST_STAIR],
+    ] as const) {
+      // Either side of it, from the Ring's inner edge to the dais's rim, only the void;
+      // along it, as broad as the Grand Stair and the floor only ever falls toward the dais.
+      for (let d = stair.top - 2; d > stair.foot + 1; d--) {
+        const x = sign * d;
+        for (const z of [-stair.halfWidth - 3, stair.halfWidth + 3]) {
+          expect(authoredFieldHeight(FIELD, x, z), `${name} ${x}, ${z}`).toBe(VOID);
+        }
+        for (const z of [-stair.halfWidth + 0.5, 0, stair.halfWidth - 0.5]) {
+          expect(authoredFieldHeight(FIELD, x, z), `${name} ${x}, ${z}`).toBeGreaterThan(VOID);
+        }
+        expect(authoredFieldHeight(FIELD, sign * (d - 1), 0)).toBeLessThanOrEqual(
+          authoredFieldHeight(FIELD, x, 0) + 1e-6,
+        );
+      }
+      expect(stair.halfWidth * 2).toBeGreaterThanOrEqual(12);
+      expect(authoredFieldHeight(FIELD, sign * (stair.top + 1), 0), name).toBe(RING.h);
+      expect(authoredFieldHeight(FIELD, sign * (stair.foot - 2), 0), name).toBe(SEAL_DAIS.h);
+    }
+  });
+
+  it("all four stairs stay under every Ring eye's line to the seal", () => {
     // A walked floor is not a render solid, so the sightline pin
     // (smith_heart_render_core) does not see it: this does. From every 2
     // degrees of the Ring's walked arc, the line from a body's eye to the

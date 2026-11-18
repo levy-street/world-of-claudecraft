@@ -31632,6 +31632,7 @@ export const zh_TW: EnTranslations = {
     "noticeboardName": "告示板",
     "farmPatchName": "菜畦",
     "realmBuilderMonumentName": "王國建造者紀念碑",
-    "musterRackName": "徵召兵器架"
+    "musterRackName": "徵召兵器架",
+    "heartSealCrystalName": "心之封印水晶"
   }
 };

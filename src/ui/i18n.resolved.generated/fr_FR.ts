@@ -31632,6 +31632,7 @@ export const fr_FR: EnTranslations = {
     "noticeboardName": "Panneau d'affichage",
     "farmPatchName": "Parcelles de jardin",
     "realmBuilderMonumentName": "Monument du bâtisseur de royaume",
-    "musterRackName": "Râtelier d'armes du rassemblement"
+    "musterRackName": "Râtelier d'armes du rassemblement",
+    "heartSealCrystalName": "The Heart Seal Crystal"
   }
 };

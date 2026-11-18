@@ -46,7 +46,7 @@ import {
   QUENCH_ENV_ROCK,
   quenchEnvOwnsRock,
 } from './quench_env_plan_core';
-import { planRingEdges, planRingMouths, ringSpireSpots } from './ring_kit_plan_core';
+import { planRingEdges, planRingMouths } from './ring_kit_plan_core';
 
 /** An upright cylinder (y0 to y1, radius r) or a box turned by `yaw` about
  *  its centre (three's rotation.y), half extents hw x hh x hd. */
@@ -439,8 +439,8 @@ export function heatEnvSolids(): HeartSolid[] {
 
 /** The Ring kit's render-only solids (phase 2F; its standing stones, cairns
  *  and the Hammer's jambs are layout props, `heartPropSolids`): the vein
- *  mouths' jambs, the spires' crystal leaning in over the seal (three
- *  lifts, each at the lean's reach there), the stairs' parapets. */
+ *  mouths' jambs and the stairs' parapets. The ring crystal at the seal is
+ *  what those sightlines look AT, never a solid in them. */
 export function heartRingSolids(): HeartSolid[] {
   const out: HeartSolid[] = [];
   for (const p of planRingMouths()) {
@@ -454,25 +454,6 @@ export function heartRingSolids(): HeartSolid[] {
       y1: p.y + 10.5,
       what: `jamb ${p.piece}`,
     });
-  }
-  for (const s of ringSpireSpots()) {
-    // The crystal leans 3.2 yd in over its 16: three lifts up the lean.
-    for (const [y0, y1, r] of [
-      [2.2, 7, 1.0],
-      [7, 11.5, 0.8],
-      [11.5, 16, 0.55],
-    ] as const) {
-      const inward = (((y0 + y1) / 2 - 2.2) / 13.8) * 3.2;
-      out.push({
-        kind: 'cyl',
-        x: s.x - Math.sin(s.rot) * inward,
-        z: s.z - Math.cos(s.rot) * inward,
-        r,
-        y0: s.y + y0,
-        y1: s.y + y1,
-        what: `spire ${s.vein}`,
-      });
-    }
   }
   // A parapet (0.8 over its walk, past the lip) in three boxes along its
   // run, each at the stair's slope there.
