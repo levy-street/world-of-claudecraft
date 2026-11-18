@@ -3,7 +3,10 @@
 // every radius, timer and reach is read off the sim's own tuning and the
 // objects' templates (encounters/smith_heart/final_ids.ts), never tuned here.
 //
-//   - which of the fight's objects a template is (`finalObjectKind`);
+//   - which of the fight's objects a template is (`finalObjectKind`; the
+//     woken stars' rises, strikes, Arcing Stone rings, blades and lines are
+//     kinds too, painted with final_stars_fx.ts; the pillars themselves are
+//     CouncilFx's, the council's own pillars);
 //   - each footprint's look on the shared floor telegraph (`FINAL_FOOTPRINTS`:
 //     its threat colour and its element accent, on every tier);
 //   - the timed footprints' fill (`timedFill`) and the whirls', orbs' and
@@ -17,15 +20,17 @@
 //
 // Three-free, DOM-free, deterministic.
 
-import { HEART_ROOM, SMITH_HEART_VEIN_COLORS } from '../../sim/content/smith_heart_layout';
+import { SMITH_HEART_VEIN_COLORS } from '../../sim/content/smith_heart_layout';
 import {
   FINAL_CUES,
   FINAL_OBJECTS,
+  finalBladeOf,
+  finalLaneOf,
+  finalPillarOf,
   finalTimedOf,
   poolOf,
   FINAL_TUNING as T,
   whirlOf,
-  windOf,
 } from '../../sim/encounters/smith_heart/final_ids';
 import { TELEGRAPH_THREAT_COLORS } from '../floor_telegraph';
 import { ENGINE_PARTICLE_STEPS } from '../trash_engine_fx/engine_particles';
@@ -44,11 +49,17 @@ export type FinalObjectKind =
   | 'emberPool'
   | 'forgePool'
   | 'crack'
-  | 'windWarn'
-  | 'windBlow'
   | 'orb'
   | 'tremor'
-  | 'anvil';
+  | 'anvil'
+  // The woken stars (the rework of 2026-11-18).
+  | 'rise'
+  | 'strike'
+  | 'arcRing'
+  | 'blade'
+  | 'lane'
+  | 'pillar'
+  | 'pillarCharged';
 
 /** Which of the final's objects a template is, or null. */
 export function finalObjectKind(templateId: string): FinalObjectKind | null {
@@ -57,8 +68,13 @@ export function finalObjectKind(templateId: string): FinalObjectKind | null {
   if (w) return w === 'warn' ? 'whirlWarn' : 'whirl';
   const p = poolOf(templateId);
   if (p) return p === 'ember' ? 'emberPool' : 'forgePool';
-  const wind = windOf(templateId);
-  if (wind) return wind.state === 'warn' ? 'windWarn' : 'windBlow';
+  const pillar = finalPillarOf(templateId);
+  if (pillar) return pillar === 'charged' ? 'pillarCharged' : 'pillar';
+  if (finalBladeOf(templateId)) return 'blade';
+  if (finalLaneOf(templateId)) return 'lane';
+  if (finalTimedOf(FINAL_OBJECTS.risePrefix, templateId) !== null) return 'rise';
+  if (finalTimedOf(FINAL_OBJECTS.strikePrefix, templateId) !== null) return 'strike';
+  if (finalTimedOf(FINAL_OBJECTS.arcPrefix, templateId) !== null) return 'arcRing';
   if (finalTimedOf(FINAL_OBJECTS.crackPrefix, templateId) !== null) return 'crack';
   if (finalTimedOf(FINAL_OBJECTS.orbPrefix, templateId) !== null) return 'orb';
   if (finalTimedOf(FINAL_OBJECTS.tremorPrefix, templateId) !== null) return 'tremor';
@@ -73,11 +89,14 @@ export function finalObjectSeconds(templateId: string): number {
     FINAL_OBJECTS.orbPrefix,
     FINAL_OBJECTS.tremorPrefix,
     FINAL_OBJECTS.anvilPrefix,
+    FINAL_OBJECTS.risePrefix,
+    FINAL_OBJECTS.strikePrefix,
+    FINAL_OBJECTS.arcPrefix,
   ]) {
     const s = finalTimedOf(prefix, templateId);
     if (s !== null) return s;
   }
-  return windOf(templateId)?.seconds ?? 0;
+  return 0;
 }
 
 // ---- the palette ----------------------------------------------------------------------
@@ -112,10 +131,15 @@ export const FINAL_FOOTPRINTS = {
   ember: { color: TELEGRAPH_THREAT_COLORS.danger, accent: 0xff9a3a },
   drawn: { color: TELEGRAPH_THREAT_COLORS.danger, accent: 0xc8b8ff },
   bolt: { color: TELEGRAPH_THREAT_COLORS.danger, accent: 0xc8b8ff },
-  rim: { color: TELEGRAPH_THREAT_COLORS.danger, accent: 0xc8b8ff },
-  /** Your own cold's reach in the Quench (crowd control: alone you freeze):
-   *  the ring the two allies must stand in. */
-  cold: { color: TELEGRAPH_THREAT_COLORS.control, accent: 0xbfe6ff },
+  /** The stars: a pillar's rise (step off), a Sky Strike (its storm-white
+   *  spot, told from Leaping Bolt's violet reach by its colder white),
+   *  Arcing Stone round a pillar (lethal-red edge: the big ring), a Crossing
+   *  Blade's line (its frost). */
+  rise: { color: TELEGRAPH_THREAT_COLORS.danger, accent: 0xe8c070 },
+  strike: { color: TELEGRAPH_THREAT_COLORS.danger, accent: 0xeef4ff },
+  arcRing: { color: TELEGRAPH_THREAT_COLORS.lethal, accent: 0xd8c8ff },
+  lane: { color: TELEGRAPH_THREAT_COLORS.danger, accent: 0xbfe6ff },
+  laneLocked: { color: TELEGRAPH_THREAT_COLORS.lethal, accent: 0xe6f6ff },
   /** Crushed: you must stay out of the next Anvil. */
   crushed: { color: TELEGRAPH_THREAT_COLORS.danger, accent: 0xe8c070 },
 } as const;
@@ -131,13 +155,13 @@ export const FINAL_REACH = {
   anvil: T.anvilR,
   drawn: T.drawnReach,
   bolt: T.boltJump,
-  cold: T.coldReach,
+  rise: T.riseKnockR,
+  strike: T.skyR,
+  arc: T.arcR,
+  bladeHalf: T.bladeHalf,
   /** Crushed's mark under its player (a body's width: it marks who, not
    *  where). */
   crushed: 1.6,
-  /** The rim's band the gale strikes in: from here to the rim. */
-  rimInner: HEART_ROOM.r - T.rimBand,
-  rimOuter: HEART_ROOM.r,
 } as const;
 
 // ---- the timelines -------------------------------------------------------------------
@@ -148,9 +172,11 @@ export function timedFill(age: number, seconds: number): number {
 }
 
 /** A Fire Whirl's turn (radians) and its height at render time `t`, its
- *  warning `warn` 0..1 (it rises out of the floor as the warning runs). */
+ *  warning `warn` 0..1 (it rises out of the floor as the warning runs: a
+ *  tall turning column of fire since the rework of 2026-11-18, three times a
+ *  player's height and more). */
 export function whirlSpin(t: number, warn: number): { angle: number; height: number } {
-  return { angle: t * 7, height: 1.5 + 6.5 * smooth(warn) };
+  return { angle: t * 7, height: 2 + 14 * smooth(warn) };
 }
 
 /** A Storm Orb's bob and crackle at render time `t`, `left` 0..1 of its
@@ -191,8 +217,10 @@ export function finalKitClaims(ability: string | null | undefined): boolean {
 
 /** The kit's encounter rungs on the Anvil: the element telegraphs' char
  *  (every multiply on one rung: they commute), their glows, their curtains,
- *  the switch's floor shockwave, the gale's rim band, the particles, the
- *  marks over everything; clear of FinalFx's engine particles
+ *  the switch's floor shockwave, a Crossing Blade's line (the shared lane:
+ *  its curtain stands two rungs over, on the particles' ring rung, a wall
+ *  off the floor, both additive), the particles, the marks over everything
+ *  (the stars' floor rings ride the marks' rung); clear of FinalFx's engine particles
  *  (ENGINE_PARTICLE_STEPS) and of HeatFx's fist and lanes (the Heat's
  *  ladder: 4, 5, 8, 9, 12, 14, 16, 18, 21), which draw on the same floor.
  *  The chars sit under every glow but the Heat crater's, so a mark of one
@@ -202,7 +230,7 @@ export const FINAL_KIT_FLOOR = {
   telegraphGlow: 15,
   telegraphCurtain: 17,
   shock: 20,
-  rim: 22,
+  lane: 22,
   particles: { ring: 24, smoke: 26, fire: 27, glow: 28 },
   marks: 29,
 } as const;
@@ -215,7 +243,7 @@ export function finalKitRungs(): number[] {
     F.telegraphGlow,
     F.telegraphCurtain,
     F.shock,
-    F.rim,
+    F.lane,
     ...Object.values(F.particles),
     F.marks,
   ];

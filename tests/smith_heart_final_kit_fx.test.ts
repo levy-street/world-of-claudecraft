@@ -39,11 +39,13 @@ import {
   FINAL_CASTS,
   FINAL_CUES,
   FINAL_OBJECTS,
+  finalBladeTemplate,
+  finalLaneTemplate,
+  finalPillarTemplate,
   finalTimed,
   poolTemplate,
   FINAL_TUNING as T,
   whirlTemplate,
-  windTemplate,
 } from '../src/sim/encounters/smith_heart/final_ids';
 import { laneReach } from '../src/sim/encounters/smith_heart/heat_geometry';
 import { HEAT_TUNING } from '../src/sim/encounters/smith_heart/heat_ids';
@@ -56,8 +58,15 @@ describe("the final kits' plan", () => {
     expect(finalObjectKind(whirlTemplate('live'))).toBe('whirl');
     expect(finalObjectKind(poolTemplate('ember'))).toBe('emberPool');
     expect(finalObjectKind(poolTemplate('forge'))).toBe('forgePool');
-    expect(finalObjectKind(windTemplate('warn', 2))).toBe('windWarn');
-    expect(finalObjectKind(windTemplate('blow', 8))).toBe('windBlow');
+    // The woken stars (the rework of 2026-11-18).
+    expect(finalObjectKind(finalTimed(FINAL_OBJECTS.risePrefix, T.pillarWarn))).toBe('rise');
+    expect(finalObjectKind(finalTimed(FINAL_OBJECTS.strikePrefix, T.skyWarn))).toBe('strike');
+    expect(finalObjectKind(finalTimed(FINAL_OBJECTS.arcPrefix, T.skyWarn))).toBe('arcRing');
+    expect(finalObjectKind(finalBladeTemplate('aim'))).toBe('blade');
+    expect(finalObjectKind(finalLaneTemplate('lock', 60))).toBe('lane');
+    expect(finalObjectKind(finalPillarTemplate('plain'))).toBe('pillar');
+    expect(finalObjectKind(finalPillarTemplate('charged'))).toBe('pillarCharged');
+    expect(finalObjectSeconds(finalTimed(FINAL_OBJECTS.strikePrefix, T.skyWarn))).toBe(T.skyWarn);
     expect(finalObjectKind(finalTimed(FINAL_OBJECTS.crackPrefix, T.iceWarn))).toBe('crack');
     expect(finalObjectKind(finalTimed(FINAL_OBJECTS.orbPrefix, T.orbLife))).toBe('orb');
     expect(finalObjectKind(finalTimed(FINAL_OBJECTS.tremorPrefix, T.tremorWarn))).toBe('tremor');
@@ -77,7 +86,14 @@ describe("the final kits' plan", () => {
     expect(FINAL_REACH.anvil).toBe(T.anvilR);
     expect(FINAL_REACH.drawn).toBe(T.drawnReach);
     expect(FINAL_REACH.bolt).toBe(T.boltJump);
-    expect(FINAL_REACH.rimOuter - FINAL_REACH.rimInner).toBe(T.rimBand);
+    expect(FINAL_REACH.strike).toBe(T.skyR);
+    expect(FINAL_REACH.arc).toBe(T.arcR);
+    expect(FINAL_REACH.rise).toBe(T.riseKnockR);
+    // A Sky Strike reads apart from Leaping Bolt's reach: a whiter accent.
+    expect(FINAL_FOOTPRINTS.strike.accent).not.toBe(FINAL_FOOTPRINTS.bolt.accent);
+    // Arcing Stone's ring and a locked line are lethal-edged.
+    expect(FINAL_FOOTPRINTS.arcRing.color).toBe(TELEGRAPH_THREAT_COLORS.lethal);
+    expect(FINAL_FOOTPRINTS.laneLocked.color).toBe(TELEGRAPH_THREAT_COLORS.lethal);
     const allowed = new Set([...Object.values(TELEGRAPH_THREAT_COLORS), FINAL_KIT_COLORS.soak]);
     for (const [k, f] of Object.entries(FINAL_FOOTPRINTS))
       expect(allowed.has(f.color), k).toBe(true);
@@ -230,7 +246,7 @@ describe('FinalKitFx over a fake world', () => {
     const frozen = entity(3, 'player', 'mage', p2.x, p2.z, {
       auras: [
         {
-          id: FINAL_AURAS.frozen,
+          id: FINAL_AURAS.underIce,
           name: 'x',
           kind: 'stun',
           remaining: 2,
@@ -294,7 +310,14 @@ describe('FinalKitFx over a fake world', () => {
     obj(13, finalTimed(FINAL_OBJECTS.orbPrefix, T.orbLife), -15, 15, T.orbR);
     obj(14, finalTimed(FINAL_OBJECTS.tremorPrefix, T.tremorWarn), 20, 0, T.tremorR);
     obj(15, finalTimed(FINAL_OBJECTS.anvilPrefix, T.anvilCast), 0, 30, T.anvilR);
-    obj(16, windTemplate('blow', T.windBlow), 0, 0, HEART_ROOM.r, Math.PI / 2);
+    // The woken stars: a rise, a strike, a ring round a pillar, a charged
+    // pillar, a blade and its line (the line's object at its middle).
+    obj(16, finalTimed(FINAL_OBJECTS.risePrefix, T.pillarWarn), -30, -10, T.riseKnockR);
+    obj(17, finalTimed(FINAL_OBJECTS.strikePrefix, T.skyWarn), 28, 14, T.skyR);
+    obj(18, finalTimed(FINAL_OBJECTS.arcPrefix, T.skyWarn), 32, 18, T.arcR);
+    obj(19, finalPillarTemplate('charged'), 32, 18, 1);
+    obj(20, finalBladeTemplate('aim'), -40, 0, 1, Math.PI / 2);
+    obj(21, finalLaneTemplate('warn', 60), -10, 0, 1, Math.PI / 2);
     const world = {
       entities,
       player: me,
@@ -316,29 +339,37 @@ describe('FinalKitFx over a fake world', () => {
     const root = scene.getObjectByName('smith-heart-final-kit-fx');
     expect(root).toBeDefined();
     for (let i = 0; i < 10; i++) fx.update(1 / 30);
-    // Six object footprints, the ember's ring, the lightning's reach and the
-    // bolt's target ring: every tier.
-    expect(footprintsShown(root)).toBe(9);
+    // Nine object footprints, the ember's ring, the lightning's reach, the
+    // bolt's target ring and the blade's line: every tier.
+    expect(footprintsShown(root)).toBe(13);
     expect(visibleNamed(root, 'smithHeartFinalWhirl')).toBe(1);
     expect(visibleNamed(root, 'smithHeartFinalWhirlCore')).toBe(1);
+    expect(visibleNamed(root, 'smithHeartFinalWhirlSmoke')).toBe(1);
+    // The blade hovers at its rise, its line on the floor.
+    expect(visibleNamed(root, 'smithHeartStarBlade')).toBe(1);
     expect(visibleNamed(root, 'smithHeartFinalOrb')).toBe(1);
     expect(visibleNamed(root, 'smithHeartFinalOrbCore')).toBe(1);
     expect(visibleNamed(root, 'smithHeartFinalOrbRing')).toBe(1);
     expect(visibleNamed(root, 'smithHeartFinalIce')).toBe(1);
     expect(visibleNamed(root, 'smithHeartFinalShell')).toBe(1);
     expect(visibleNamed(root, 'smithHeartFinalAnvil')).toBe(1);
-    expect(visibleNamed(root, 'smithHeartFinalRimBand')).toBe(1);
-    // Bellows Wind's streaks over the WHOLE platform (the team's review of
-    // 2026-11-17), running the way the kernel pushes: east for a facing of
-    // pi/2 (sim convention: toward (sin h, cos h)), over the Anvil's disc.
-    expect(visibleNamed(root, 'smithHeartFinalWindStreaks')).toBe(1);
-    const streaks = root?.getObjectByName('smithHeartFinalWindStreaks') as THREE.Mesh;
-    const su = (streaks.material as THREE.ShaderMaterial).uniforms;
-    expect((su.uDir.value as THREE.Vector2).x).toBeCloseTo(1, 5);
-    expect((su.uDir.value as THREE.Vector2).y).toBeCloseTo(0, 5);
-    expect((su.uRadii.value as THREE.Vector2).x).toBe(HEART_ROOM.r);
-    expect((su.uCentre.value as THREE.Vector2).x).toBe(HEART_ROOM.x);
-    expect(su.uStrength.value).toBeGreaterThan(0.3);
+    // A Sky Strike lands: a bolt out of the sky; Arcing Stone rings out.
+    const strike = {
+      type: 'spellfxAt',
+      x: at(28, 14).x,
+      z: at(28, 14).z,
+      school: 'nature',
+      fx: 'burst',
+      radius: T.skyR,
+      ability: FINAL_CUES.strike,
+    } as SimEvent;
+    expect(fx.handleEvent(strike)).toBe(true);
+    expect(
+      fx.handleEvent({ ...strike, ability: FINAL_CUES.arcingStone, radius: T.arcR } as SimEvent),
+    ).toBe(true);
+    fx.update(1 / 30);
+    expect(visibleNamed(root, 'smithHeartStarBolts')).toBe(1);
+    expect(visibleNamed(root, 'smithHeartStarRing')).toBeGreaterThanOrEqual(2);
     expect(visibleNamed(root, 'smithHeartFinalRootSpikes')).toBe(1);
     expect(visibleNamed(root, 'smithHeartFinalUnbound')).toBe(1);
     // A leap of lightning on its cue, claimed.
@@ -376,7 +407,7 @@ describe('FinalKitFx over a fake world', () => {
     (world as { entityRosterVersion: number }).entityRosterVersion = 2;
     for (let i = 0; i < 12; i++) fx.update(1 / 30);
     expect(visibleNamed(root, 'smithHeartFinalWhirl')).toBe(0);
-    expect(footprintsShown(root)).toBe(8);
+    expect(footprintsShown(root)).toBe(12);
     // Out of the Heart: everything hides.
     me.pos = { x: o.x - 200, y: 0, z: o.z };
     fx.update(1 / 30);
