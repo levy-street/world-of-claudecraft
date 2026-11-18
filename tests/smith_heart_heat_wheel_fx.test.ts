@@ -186,7 +186,11 @@ describe('the Wheel inside HeatFightFx over a fake world', () => {
     expect(vents).toHaveLength(WHEEL_FX.slots);
     for (const v of vents) expect(v.renderOrder).toBe(WALL_AIR_ORDER.fire);
     expect(vents[0].geometry).toBeInstanceOf(THREE.InstancedBufferGeometry);
-    expect((vents[0].geometry as THREE.InstancedBufferGeometry).instanceCount).toBe(WHEEL_FX.vents);
+    // Few, big geysers, each its crossed planes and its burst.
+    expect((vents[0].geometry as THREE.InstancedBufferGeometry).instanceCount).toBe(
+      WHEEL_FX.vents * WHEEL_FX.planes,
+    );
+    expect(WHEEL_FX.vents).toBeLessThanOrEqual(16);
     // A round: three red slices and the safe one.
     const warn = HEAT_DIFFICULTY.normal.wheel.warn;
     const safe = 2;
@@ -224,6 +228,51 @@ describe('the Wheel inside HeatFightFx over a fake world', () => {
     run(Math.ceil(wheelEruptSpan(T.wheelBurn) * 20) + 4);
     expect(shown('smithHeartHeatWheel')).toBe(0);
     expect(shown('smithHeartHeatWheelVents')).toBe(0);
+    fx.dispose();
+  });
+
+  it("puts out the last round's fire on the next round's safe slice, fast (cosmetic)", () => {
+    const entities = new Map<number, Entity>();
+    const add = (e: Entity) => {
+      entities.set(e.id, e);
+      return e;
+    };
+    const me = add(entity('player', 'warrior', -206, 2));
+    const world = {
+      entities,
+      player: me,
+      playerId: me.id,
+      entityRosterVersion: 1,
+    } as unknown as IWorld;
+    const scene = new THREE.Scene();
+    const fx = new HeatFightFx(
+      scene,
+      () => 0,
+      world,
+      undefined,
+      () => false,
+      () => {},
+    );
+    const run = (n: number) => {
+      for (let i = 0; i < n; i++) fx.update(1 / 20);
+    };
+    const bump = () => {
+      (world as unknown as { entityRosterVersion: number }).entityRosterVersion++;
+    };
+    // Slices 0 and 1 burning; the next round's safe slice lies on slice 0.
+    add(entity('object', wheelTemplate(0, 'burn', T.wheelBurn), HEARTH_WELL.x, HEARTH_WELL.z));
+    add(entity('object', wheelTemplate(1, 'burn', T.wheelBurn), HEARTH_WELL.x, HEARTH_WELL.z));
+    add(entity('object', wheelTemplate(0, 'safe', 5), HEARTH_WELL.x, HEARTH_WELL.z));
+    bump();
+    run(3 + Math.ceil(WHEEL_FX.quench * 20) + 2);
+    const quench: number[] = [];
+    scene.traverse((c) => {
+      const m = (c as THREE.Mesh).material as THREE.ShaderMaterial | undefined;
+      if (c.name === 'smithHeartHeatWheelVents' && c.visible && m?.uniforms)
+        quench.push(m.uniforms.uQuench.value as number);
+    });
+    // Slice 0's fire is out; slice 1 still burns.
+    expect(quench.sort()).toEqual([0, 1]);
     fx.dispose();
   });
 

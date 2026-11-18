@@ -6,9 +6,10 @@
 //    hotter, the whole slice throbbing quicker to its eruption, heat shimmer
 //    rising off its vents;
 //  - the safe slice: calm, cool, still (every tier);
-//  - the ERUPTION: a flash running out from the lip, geysers of fire and a low
-//    sheet of flame over the slice, embers and smoke, then the scorch cooling
-//    after the sim has dropped the slice (`fade` seconds).
+//  - the ERUPTION: a flash running out from the lip, a few big geysers of fire
+//    bursting in step with it over the burning ground, embers and smoke, then
+//    the scorch cooling after the sim has dropped the slice (`fade` seconds);
+//    a burnt slice the next round marks safe is put out fast (`quench`).
 // Every slice's footprint (the floor decal, the actionable part) draws on every
 // tier; the low tier thins the vents (wheelBudget). The sim's numbers are read
 // (heat_ids.ts), never tuned here. Three-free, DOM-free, deterministic.
@@ -20,20 +21,28 @@ export const WHEEL_FX = {
   /** Floor slots: a round warning (four slices) over the last one burning
    *  (three) and the one before cooling (three), and spares. */
   slots: 14,
-  /** Vents laid in the widest slice; a narrower one shows its share. */
-  vents: 60,
-  /** Every `geyserEvery`th vent is a tall geyser; the rest a low flame. */
-  geyserEvery: 4,
+  /** Geysers laid in the widest slice; a narrower one shows its share (few
+   *  and big: a scatter of small flames read as confetti). */
+  vents: 12,
+  /** Every `geyserEvery`th vent is a geyser (every one since the second
+   *  polish pass). */
+  geyserEvery: 1,
+  /** Each geyser's planes: three crossed (a volume from any side) and a
+   *  camera-facing burst at its foot (round from straight above). */
+  planes: 4,
+  /** Seconds the last round's fire takes to die on the next round's safe
+   *  slice (cosmetic). */
+  quench: 0.35,
   /** The vents' reach out from the lip (yards; the floor clips them). */
   ventInner: HEARTH_WELL.r + 2.5,
   ventOuter: 50,
-  /** No vent this close to a slice's straight edge (the safe slice stays clear). */
-  ventEdge: 2.5,
+  /** No geyser this close to a slice's straight edge (its fire is several
+   *  yards wide: the safe slice stays clear). */
+  ventEdge: 5.5,
   /** The eruption runs out from the lip to the far wall over this long. */
   ripple: 0.32,
-  /** A geyser's height and a low flame's (yards, min to max). */
-  geyser: [7, 13] as const,
-  flame: [2.4, 4.8] as const,
+  /** A geyser's height (yards, min to max). */
+  geyser: [9, 15] as const,
   /** The scorch cools this long after the sim drops the slice. */
   fade: 2.6,
 } as const;
@@ -108,7 +117,7 @@ export function wheelVentCount(from: number, to: number, detail: boolean): numbe
 /**
  * The laid vents, one row of four per vent: the bearing's share across the
  * slice (0..1), the radius's share from the lip out (0..1, area-even), a seed
- * (0..1) and 1 for a geyser (0 a low flame). A low-discrepancy layout, so any
+ * (0..1) and 1 for a geyser. A low-discrepancy layout, so any
  * prefix (a narrow slice's, the low tier's) still covers the slice evenly.
  */
 export function wheelVents(count: number = WHEEL_FX.vents): Float32Array {

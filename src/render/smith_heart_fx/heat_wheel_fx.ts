@@ -81,14 +81,14 @@ const SPARK = {
   radius: 0.8,
 };
 const FLAME = {
-  speed: 0.9,
-  up: 5,
-  life: 0.55,
-  size: [2.2, 0.5] as [number, number],
+  speed: 1.2,
+  up: 6,
+  life: 0.6,
+  size: [3.2, 0.8] as [number, number],
   color: C.gold,
-  alpha: 0.9,
+  alpha: 0.85,
   pool: 'glow' as const,
-  radius: 1.6,
+  radius: 1.4,
 };
 const SMOKE = {
   speed: 1.1,
@@ -114,6 +114,10 @@ interface Slot {
   from: number;
   to: number;
   count: number;
+  /** Its slice (WHEEL_ARCS_DEG), and how far its fire is put out (0..1):
+   *  cosmetic, once the next round's safe slice lies on it. */
+  slice: number;
+  quench: number;
   /** The wellspring's centre on the floor (world yards). */
   x: number;
   y: number;
@@ -151,15 +155,27 @@ export class HeatWheelFx {
   ) {
     const floorGeo = floorRingGeometry(HEARTH_WELL.r / T.wheelOuter, 96);
     const quad = new THREE.PlaneGeometry(1, 1, 1, 8);
+    // A geyser is WHEEL_FX.planes instances: its crossed planes and its burst.
+    const P = WHEEL_FX.planes;
+    const n = WHEEL_FX.vents * P;
+    const vent = new Float32Array(n * 4);
+    const index = new Float32Array(n);
+    const plane = new Float32Array(n);
+    for (let i = 0; i < WHEEL_FX.vents; i++)
+      for (let k = 0; k < P; k++) {
+        const j = i * P + k;
+        vent.set(this.layout.subarray(i * 4, i * 4 + 4), j * 4);
+        index[j] = i;
+        plane[j] = k;
+      }
     const vents = new THREE.InstancedBufferGeometry();
     vents.index = quad.index;
     vents.setAttribute('position', quad.getAttribute('position'));
     vents.setAttribute('uv', quad.getAttribute('uv'));
-    vents.setAttribute('aVent', new THREE.InstancedBufferAttribute(this.layout, 4));
-    const index = new Float32Array(WHEEL_FX.vents);
-    for (let i = 0; i < index.length; i++) index[i] = i;
+    vents.setAttribute('aVent', new THREE.InstancedBufferAttribute(vent, 4));
     vents.setAttribute('aIndex', new THREE.InstancedBufferAttribute(index, 1));
-    vents.instanceCount = WHEEL_FX.vents;
+    vents.setAttribute('aPlane', new THREE.InstancedBufferAttribute(plane, 1));
+    vents.instanceCount = n;
     host.geometries.push(floorGeo, quad, vents);
     const floorFrag = wheelFloorFrag(HEAT_NOISE_GLSL, HEAT_MOLTEN_GLSL, HEAT_LAVA_GLSL);
     const ventFrag = wheelVentFrag(fireRampGlsl('fireRamp'));
@@ -205,6 +221,7 @@ export class HeatWheelFx {
         uBuild: floorU.uBuild,
         uErupt: floorU.uErupt,
         uBurn: floorU.uBurn,
+        uQuench: { value: 0 },
       };
       const ventMat = new THREE.ShaderMaterial({
         name: 'smithHeartHeatWheelVents',
@@ -236,6 +253,8 @@ export class HeatWheelFx {
         from: 0,
         to: 0,
         count: 0,
+        slice: 0,
+        quench: 0,
         x: 0,
         y: 0,
         z: 0,
@@ -300,7 +319,9 @@ export class HeatWheelFx {
         if (of.state === 'burn') {
           s.erupted = clock;
           s.burnSeconds = of.seconds;
+          s.quench = 0;
         }
+        s.slice = of.slice;
         const arc = wheelArc(of.slice);
         s.from = arc.from;
         s.to = arc.to;
@@ -312,6 +333,13 @@ export class HeatWheelFx {
         if (of.state === 'burn') this.erupt(s);
       }
     }
+    // The next round's safe slice stays clean: the last round's fire on it
+    // dies fast (cosmetic; the sim's burn is unchanged).
+    let safeMask = 0;
+    for (const s of this.slots) if (s.phase === 'safe') safeMask |= 1 << s.slice;
+    for (const s of this.slots)
+      if ((s.phase === 'burn' || s.phase === 'gone') && safeMask & (1 << s.slice))
+        s.quench = Math.min(1, s.quench + dt / WHEEL_FX.quench);
     this.shown = false;
     for (const s of this.slots) {
       if (s.phase === null) continue;
@@ -347,8 +375,10 @@ export class HeatWheelFx {
     u.uBuild.value = look ? look.build : 0;
     u.uThrob.value = look ? look.throb : 0;
     u.uErupt.value = look ? look.erupt : -1;
-    u.uBurn.value = look ? look.burn : 0;
-    u.uScorch.value = look ? look.scorch : 0;
+    const keep = 1 - s.quench;
+    u.uBurn.value = look ? look.burn * keep : 0;
+    u.uScorch.value = look ? look.scorch * keep : 0;
+    s.ventU.uQuench.value = s.quench;
     s.floor.position.set(s.x, s.y + 0.1, s.z);
     s.floor.scale.set(T.wheelOuter, 1, T.wheelOuter);
     s.floor.visible = true;
@@ -360,7 +390,11 @@ export class HeatWheelFx {
     // embers off the burning ground.
     const h = this.host;
     const rate =
-      s.phase === 'warn' ? 10 * look.build * look.build : s.phase === 'burn' ? 26 * look.burn : 0;
+      s.phase === 'warn'
+        ? 10 * look.build * look.build
+        : s.phase === 'burn'
+          ? 14 * look.burn * (1 - s.quench)
+          : 0;
     let n = rate * dt * h.density;
     while (n > 0) {
       if (h.rand() >= n) break;
@@ -370,8 +404,9 @@ export class HeatWheelFx {
       const x = s.x + _at[0];
       const z = s.z + _at[1];
       if (!this.onFloor(x, z)) continue;
-      h.particles.puff(x, s.y + 0.2, z, 1, s.phase === 'warn' ? EMBER : FLAME);
-      if (s.phase === 'burn' && h.rand() < 0.3) h.particles.puff(x, s.y + 1.2, z, 1, SMOKE);
+      // Embers off the cracks and the burning ground; smoke over the fire.
+      h.particles.puff(x, s.y + 0.4, z, 1, EMBER);
+      if (s.phase === 'burn' && h.rand() < 0.5) h.particles.puff(x, s.y + 2.5, z, 1, SMOKE);
     }
   }
 
@@ -383,10 +418,10 @@ export class HeatWheelFx {
       const x = s.x + _at[0];
       const z = s.z + _at[1];
       if (!this.onFloor(x, z)) continue;
-      const geyser = this.layout[i * 4 + 3] > 0.5;
-      h.particles.puff(x, s.y + 0.4, z, geyser ? 7 : 2, SPARK);
-      h.particles.puff(x, s.y + 0.3, z, geyser ? 3 : 1, FLAME);
-      if (geyser || i % 4 === 1) h.particles.puff(x, s.y + 1.5, z, 1, SMOKE);
+      h.particles.puff(x, s.y + 0.4, z, 10, SPARK);
+      h.particles.puff(x, s.y + 0.3, z, 2, FLAME);
+      h.particles.puff(x, s.y + 3, z, 3, SMOKE);
+      h.particles.puff(x, s.y + 0.5, z, 4, EMBER);
     }
     const mid = (s.from + s.to) / 2;
     h.shakeNear(s.x + Math.sin(mid) * 24, s.z + Math.cos(mid) * 24, 0.45, 40);

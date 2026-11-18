@@ -7,10 +7,10 @@
 //    the lip, burns as broken molten ground, then cools to a dark scorch with
 //    dying red seams. The safe slice is the one cool thing on the floor: frost
 //    blue, bright cold rims, slow mist drifting over it;
-//  - the vents over a slice (camera-facing ribbons, one instanced draw a
-//    slice): heat shimmer wavering up off a doomed slice's vents with their
-//    feet glowing while it warns, then geysers of fire and a low sheet of
-//    flame when it erupts.
+//  - the geysers over a slice (one instanced draw a slice, three crossed
+//    planes and a camera-facing burst each): heat shimmer wavering up off a
+//    doomed slice's vents while it warns, then big columns of fire bursting
+//    out from the lip in step with the flash when it erupts.
 // Strings only.
 
 import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
@@ -149,29 +149,34 @@ float kfbm(vec2 p) {
 }
 `;
 
-/** A vent over a slice: a camera-facing ribbon at its laid spot (aVent: the
- *  bearing's share, the radius's share, a seed, geyser or low flame), shimmer
- *  while the slice warns, fire when it erupts; clipped to the Hearth's floor
- *  (WALL_COMMON_GLSL's polygon, its uCenter the wellspring on the floor). */
+/** A geyser over a slice (aVent: the bearing's share, the radius's share, a
+ *  seed, 1; aPlane: which of its planes). Each geyser is three crossed
+ *  vertical planes of fire (a volume from any side) and a camera-facing burst
+ *  at its foot (round from straight above); while the slice warns only its
+ *  first plane stands, as heat shimmer. It erupts in step with the flash
+ *  running out from the lip. Clipped to the Hearth's floor (WALL_COMMON_GLSL's
+ *  polygon, its uCenter the wellspring on the floor). */
 export const WHEEL_VENT_VERT = /* glsl */ `
 uniform vec4 uArc;
 uniform float uCount;
 uniform float uBuild;
 uniform float uErupt;
 uniform float uBurn;
+uniform float uQuench;
 attribute vec4 aVent;
 attribute float aIndex;
+attribute float aPlane;
 varying vec2 vUv;
 varying float vSeed;
 varying float vFire;
 varying float vHaze;
-varying float vKind;
+varying float vBurst;
 ${WALL_COMMON_GLSL}
 ${CAMERA_RELATIVE_GLSL}
 void main() {
   vUv = vec2(position.x + 0.5, position.y + 0.5);
   vSeed = aVent.z;
-  vKind = aVent.w;
+  vBurst = step(2.5, aPlane);
   float a = mix(uArc.z, uArc.w, aVent.x);
   float r = mix(${WHEEL_FX.ventInner.toFixed(2)}, ${WHEEL_FX.ventOuter.toFixed(2)}, aVent.y);
   vec2 dir = vec2(sin(a), cos(a));
@@ -183,48 +188,66 @@ void main() {
   float hgt = 0.0;
   vFire = 0.0;
   vHaze = 0.0;
+  vec3 base = vec3(xz.x, uCenter.y - 0.15, xz.y);
+  vec3 toCam = normalize(cameraPosition - base);
+  float overhead = smoothstep(0.6, 0.95, toCam.y);
   if (uErupt < 0.0) {
-    // Warning: shimmer standing over the geysers' vents, rising with the heat.
-    if (aVent.w > 0.5) {
+    // Warning: shimmer over the vent, rising with the heat (one plane).
+    if (aPlane < 0.5) {
       vHaze = smoothstep(0.08, 0.9, uBuild) * (0.75 + 0.25 * sin(uTime * 3.0 + s * 30.0));
       hgt = 4.5 + 3.0 * s;
     }
   } else {
-    float lt = uErupt - aVent.y * ${WHEEL_FX.ripple.toFixed(2)} - fract(s * 7.13) * 0.12;
-    float rise = smoothstep(0.0, aVent.w > 0.5 ? 0.12 : 0.2, lt);
-    if (aVent.w > 0.5) {
-      float hold = 0.5 + 0.45 * s;
-      float fall = 1.0 - smoothstep(hold, hold + 0.65, lt);
-      vFire = rise * fall;
-      hgt = mix(${WHEEL_FX.geyser[0].toFixed(2)}, ${WHEEL_FX.geyser[1].toFixed(2)}, fract(s * 3.7)) * rise * (0.3 + 0.7 * fall);
-    } else {
-      vFire = rise * clamp(uBurn * 1.5, 0.0, 1.0);
-      float flick = 0.8 + 0.2 * sin(uTime * 11.0 + s * 41.0);
-      hgt = mix(${WHEEL_FX.flame[0].toFixed(2)}, ${WHEEL_FX.flame[1].toFixed(2)}, fract(s * 5.3)) * (0.4 + 0.6 * vFire) * flick;
-    }
+    // In step with the flash running out from the lip, a beat apart each.
+    float lt = uErupt - aVent.y * ${WHEEL_FX.ripple.toFixed(2)} - fract(s * 7.13) * 0.1;
+    float rise = smoothstep(0.0, 0.14, lt);
+    float hold = 0.85 + 0.45 * s;
+    float fall = 1.0 - smoothstep(hold, hold + 0.6, lt);
+    float tail = max(fall, 0.35 * clamp(uBurn * 1.6, 0.0, 1.0));
+    vFire = rise * tail * (1.0 - uQuench);
+    hgt = mix(${WHEEL_FX.geyser[0].toFixed(2)}, ${WHEEL_FX.geyser[1].toFixed(2)}, fract(s * 3.7))
+      * rise * (0.35 + 0.65 * tail) * (1.0 + 0.25 * (1.0 - smoothstep(0.0, 0.35, lt)));
+    // Crossed planes go edge-on from straight above: the burst carries it there.
+    // The burst is the bang at the foot; it gives way to the column (from
+    // straight above it stays: the crossed planes go edge-on there).
+    float bang = 1.0 - smoothstep(0.2, 0.75, lt) * (1.0 - 0.6 * overhead);
+    vFire *= vBurst > 0.5 ? bang * mix(0.75, 1.0, overhead) : 1.0 - 0.6 * overhead;
   }
-  // Seen from straight above a ribbon is a sliver: the floor's fire carries it.
-  float overhead = smoothstep(0.75, 0.97, normalize(cameraPosition - vec3(xz.x, uCenter.y, xz.y)).y);
-  vFire *= 1.0 - 0.5 * overhead;
   if (inside < 0.5 || (vFire + vHaze) < 0.003 || hgt < 0.05) {
     gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
     return;
   }
   float v = vUv.y;
-  vec3 base = vec3(xz.x, uCenter.y - 0.15, xz.y);
+  if (vBurst > 0.5) {
+    // The burst at the foot: a ball of fire facing the camera.
+    vec3 right = vec3(viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]);
+    vec3 camUp = vec3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]);
+    float size = hgt * 0.5;
+    vec3 c = base + vec3(0.0, size * 0.5, 0.0);
+    gl_Position = projectionMatrix * wocCamRelView(c + right * position.x * size + camUp * position.y * size);
+    return;
+  }
+  vec3 side;
+  if (vHaze > 0.0) {
+    side = cross(vec3(0.0, 1.0, 0.0), toCam);
+    float sl = length(side);
+    side = sl > 1e-4 ? side / sl : vec3(1.0, 0.0, 0.0);
+  } else {
+    float ang = aPlane * 1.0471976 + s * 6.2831853;
+    side = vec3(cos(ang), 0.0, sin(ang));
+  }
   vec3 up = vec3(0.0, hgt, 0.0);
-  vec3 toCam = normalize(cameraPosition - (base + up * 0.5));
-  vec3 side = cross(vec3(0.0, 1.0, 0.0), toCam);
-  float sl = length(side);
-  side = sl > 1e-4 ? side / sl : vec3(1.0, 0.0, 0.0);
-  float bend = sin(v * 4.6 - uTime * 3.4 + s * 40.0) * (0.5 + 0.5 * sin(uTime * 1.3 + s * 17.0));
-  vec3 spine = base + up * v + side * bend * 0.1 * v * hgt;
-  float width = hgt * (aVent.w > 0.5 ? (vHaze > 0.0 ? 0.3 : 0.55) : 1.5) * (0.85 + 0.3 * fract(s * 9.1));
+  float bend = sin(v * 4.2 - uTime * 3.4 + s * 40.0 + aPlane) * (0.5 + 0.5 * sin(uTime * 1.3 + s * 17.0));
+  vec3 lean = vec3(cos(s * 31.0), 0.0, sin(s * 31.0)) * 0.12 * v * v * hgt;
+  vec3 spine = base + up * v + side * bend * 0.08 * v * hgt + lean;
+  float width = hgt * (vHaze > 0.0 ? 0.3 : 0.5) * (0.85 + 0.3 * fract(s * 9.1 + aPlane * 0.37));
   gl_Position = projectionMatrix * wocCamRelView(spine + side * position.x * width);
 }
 `;
 
-/** The vent's fire (the Hearth's fire ramp) or its shimmer. Additive. */
+/** The geyser's fire (the Hearth's fire ramp, the wall's family: a boiling
+ *  white-yellow foot, tongues rising and breaking into dark red tips), its
+ *  burst ball, or its shimmer. Additive. */
 export function wheelVentFrag(rampGlsl: string): string {
   return /* glsl */ `
 uniform float uTime;
@@ -232,7 +255,7 @@ varying vec2 vUv;
 varying float vSeed;
 varying float vFire;
 varying float vHaze;
-varying float vKind;
+varying float vBurst;
 ${VENT_NOISE}
 ${rampGlsl}
 void main() {
@@ -252,22 +275,39 @@ void main() {
     return;
   }
   float t = uTime * (1.0 + 0.3 * vSeed);
-  vec2 q = vec2(uv.x * 2.0 + s, uv.y * (vKind > 0.5 ? 1.4 : 1.9) - t * (vKind > 0.5 ? 2.6 : 1.9));
+  if (vBurst > 0.5) {
+    // A boiling ball of fire, ragged at its edge, hottest at its heart.
+    vec2 p = (uv - 0.5) * 2.0;
+    float ang = atan(p.y, p.x);
+    float n = kfbm(vec2(ang * 1.6 + s, length(p) * 2.5 - t * 2.4));
+    float rr = length(p) / (0.6 + 0.4 * n);
+    float I = clamp((1.0 - rr) * 1.6 + (n - 0.5) * 0.6, 0.0, 1.0);
+    vec3 col = fireRamp(I * 0.95) * 1.1;
+    // Soft where it meets the floor, never a cut edge.
+    float foot = smoothstep(0.0, 0.25, uv.y);
+    gl_FragColor = vec4(col, smoothstep(0.03, 0.3, I) * vFire * 0.9 * foot);
+    return;
+  }
+  vec2 q = vec2(uv.x * 1.6 + s, uv.y * 1.35 - t * 2.4);
   vec2 warp = vec2(kfbm(q * 0.8 + vec2(0.0, -t * 0.5)), kfbm(q * 0.8 + vec2(5.2, 1.3 - t * 0.5))) - 0.5;
   float n = kfbm(q * 1.9 + warp * 1.7 + vec2(0.0, -t * 1.2));
-  // A column of fire, never a cone: wide and boiling at the foot, its body
-  // torn by the rising flow, its top breaking into licks.
-  float x = (uv.x - 0.5) * 2.0 + warp.x * 1.3 * uv.y;
-  float halfW = mix(0.72, 0.26, clamp(uv.y, 0.0, 1.0)) * (0.8 + 0.4 * n);
+  // Tongues of uneven height across the column, rising and breaking.
+  float x = (uv.x - 0.5) * 2.0 + warp.x * 1.4 * uv.y;
+  float r1 = 1.0 - abs(2.0 * kn(vec2(uv.x * 3.1 + s, t * 0.9)) - 1.0);
+  float top = 0.55 + 0.4 * r1 * r1;
+  float yy = uv.y / top;
+  // Rounded where it boils out of the ground, widest low, tapering to licks.
+  float halfW = mix(0.8, 0.2, clamp(yy, 0.0, 1.0)) * (0.8 + 0.4 * n)
+    * (0.55 + 0.45 * smoothstep(0.0, 0.16, uv.y));
   float shape = 1.0 - smoothstep(halfW * 0.25, halfW, abs(x));
-  float I = shape * (0.55 + 0.75 * n) - uv.y * 0.5;
-  I -= smoothstep(0.3, 1.0, uv.y) * (1.0 - n) * 0.75;
-  I += (1.0 - smoothstep(0.0, 0.15, uv.y)) * 0.3 * shape;
-  I = clamp(I * 1.4, 0.0, 1.0);
-  float h = I * (0.7 + 0.25 * vFire) * (1.0 - 0.45 * uv.y);
-  vec3 col = fireRamp(h) * 1.15;
-  // Soft at the foot (it boils out of the ground) and gone before the top.
-  float a = smoothstep(0.04, 0.26, I) * vFire * smoothstep(0.0, 0.07, uv.y) * (1.0 - smoothstep(0.72, 0.98, uv.y));
+  float I = shape * ((1.0 - yy) * 1.1 + (n - 0.5) * 1.3);
+  I -= smoothstep(0.4, 1.05, yy) * (1.0 - n) * 0.8;
+  I += (1.0 - smoothstep(0.0, 0.14, uv.y)) * 0.35 * shape;
+  I = clamp(I * 1.35, 0.0, 1.0);
+  // White-yellow at the foot, orange through the body, dark red at the tips.
+  float h = I * (1.0 - 0.55 * smoothstep(0.0, 1.0, yy));
+  vec3 col = fireRamp(h) * 1.1;
+  float a = smoothstep(0.04, 0.28, I) * vFire * smoothstep(0.0, 0.12, uv.y);
   gl_FragColor = vec4(col, a);
 }
 `;
