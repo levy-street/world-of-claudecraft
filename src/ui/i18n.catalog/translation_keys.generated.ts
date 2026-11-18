@@ -7713,6 +7713,7 @@ export type TranslationKeyFlat =
   | 'entities.mobs.reliquary_gravecall_acolyte.name'
   | 'entities.mobs.reliquary_ledger_wraith.name'
   | 'entities.mobs.reliquary_saintless_effigy.name'
+  | 'entities.mobs.remnant_first_colossus.name'
   | 'entities.mobs.restless_bones.name'
   | 'entities.mobs.ridge_stalker.name'
   | 'entities.mobs.rift_boneclad.name'

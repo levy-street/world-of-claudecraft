@@ -26420,6 +26420,9 @@ export const tr_TR: EnTranslations = {
       "drowned_deckhand": {
         "name": "Boğulmuş Gemici"
       },
+      "remnant_first_colossus": {
+        "name": "Remnant of the First Colossus"
+      },
       "riftspawn": {
         "name": "Yarık Doğumu"
       },

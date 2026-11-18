@@ -26420,6 +26420,9 @@ export const vi_VN: EnTranslations = {
       "drowned_deckhand": {
         "name": "Thủy Thủ Chết Đuối"
       },
+      "remnant_first_colossus": {
+        "name": "Remnant of the First Colossus"
+      },
       "riftspawn": {
         "name": "Quái Sinh Rạn Nứt"
       },

@@ -26420,6 +26420,9 @@ export const ru_RU: EnTranslations = {
       "drowned_deckhand": {
         "name": "Утонувший матрос"
       },
+      "remnant_first_colossus": {
+        "name": "Остаток Первого Колосса"
+      },
       "riftspawn": {
         "name": "Порождение разлома"
       },

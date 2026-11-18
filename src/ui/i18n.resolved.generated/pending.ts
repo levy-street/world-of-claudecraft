@@ -10,6 +10,7 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "entities.mobs.remnant_first_colossus.name",
     "entities.npcs.bursar_maud_ashby.greeting",
     "entities.npcs.bursar_maud_ashby.name",
     "entities.npcs.bursar_maud_ashby.title",
@@ -43,6 +44,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.quartered.galeLane"
   ],
   "es_ES": [
+    "entities.mobs.remnant_first_colossus.name",
     "entities.npcs.bursar_maud_ashby.greeting",
     "entities.npcs.bursar_maud_ashby.name",
     "entities.npcs.bursar_maud_ashby.title",
@@ -76,6 +78,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.quartered.galeLane"
   ],
   "fr_FR": [
+    "entities.mobs.remnant_first_colossus.name",
     "entities.npcs.bursar_maud_ashby.greeting",
     "entities.npcs.bursar_maud_ashby.name",
     "entities.npcs.bursar_maud_ashby.title",
@@ -109,6 +112,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.quartered.galeLane"
   ],
   "fr_CA": [
+    "entities.mobs.remnant_first_colossus.name",
     "entities.npcs.bursar_maud_ashby.greeting",
     "entities.npcs.bursar_maud_ashby.name",
     "entities.npcs.bursar_maud_ashby.title",
@@ -143,6 +147,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "entities.mobs.remnant_first_colossus.name",
     "entities.npcs.bursar_maud_ashby.greeting",
     "entities.npcs.bursar_maud_ashby.name",
     "entities.npcs.bursar_maud_ashby.title",
@@ -176,6 +181,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.quartered.galeLane"
   ],
   "de_DE": [
+    "entities.mobs.remnant_first_colossus.name",
     "entities.npcs.bursar_maud_ashby.greeting",
     "entities.npcs.bursar_maud_ashby.name",
     "entities.npcs.bursar_maud_ashby.title",
@@ -213,6 +219,7 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "entities.mobs.remnant_first_colossus.name",
     "entities.npcs.bursar_maud_ashby.greeting",
     "entities.npcs.bursar_maud_ashby.name",
     "entities.npcs.bursar_maud_ashby.title",
@@ -247,6 +254,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "entities.mobs.remnant_first_colossus.name",
     "entities.npcs.bursar_maud_ashby.greeting",
     "entities.npcs.bursar_maud_ashby.name",
     "entities.npcs.bursar_maud_ashby.title",
@@ -280,6 +288,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.quartered.galeLane"
   ],
   "nl_NL": [
+    "entities.mobs.remnant_first_colossus.name",
     "entities.npcs.bursar_maud_ashby.greeting",
     "entities.npcs.bursar_maud_ashby.name",
     "entities.npcs.bursar_maud_ashby.title",
@@ -313,6 +322,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.quartered.galeLane"
   ],
   "pl_PL": [
+    "entities.mobs.remnant_first_colossus.name",
     "entities.npcs.bursar_maud_ashby.greeting",
     "entities.npcs.bursar_maud_ashby.name",
     "entities.npcs.bursar_maud_ashby.title",
@@ -346,6 +356,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.quartered.galeLane"
   ],
   "id_ID": [
+    "entities.mobs.remnant_first_colossus.name",
     "entities.npcs.bursar_maud_ashby.greeting",
     "entities.npcs.bursar_maud_ashby.name",
     "entities.npcs.bursar_maud_ashby.title",
@@ -379,6 +390,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.quartered.galeLane"
   ],
   "tr_TR": [
+    "entities.mobs.remnant_first_colossus.name",
     "entities.npcs.bursar_maud_ashby.greeting",
     "entities.npcs.bursar_maud_ashby.name",
     "entities.npcs.bursar_maud_ashby.title",
@@ -412,6 +424,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.quartered.galeLane"
   ],
   "sv_SE": [
+    "entities.mobs.remnant_first_colossus.name",
     "entities.npcs.bursar_maud_ashby.greeting",
     "entities.npcs.bursar_maud_ashby.name",
     "entities.npcs.bursar_maud_ashby.title",
@@ -445,6 +458,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.quartered.galeLane"
   ],
   "vi_VN": [
+    "entities.mobs.remnant_first_colossus.name",
     "entities.npcs.bursar_maud_ashby.greeting",
     "entities.npcs.bursar_maud_ashby.name",
     "entities.npcs.bursar_maud_ashby.title",
@@ -478,6 +492,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.quartered.galeLane"
   ],
   "da_DK": [
+    "entities.mobs.remnant_first_colossus.name",
     "entities.npcs.bursar_maud_ashby.greeting",
     "entities.npcs.bursar_maud_ashby.name",
     "entities.npcs.bursar_maud_ashby.title",

@@ -26420,6 +26420,9 @@ export const da_DK: EnTranslations = {
       "drowned_deckhand": {
         "name": "Druknet Dæksmand"
       },
+      "remnant_first_colossus": {
+        "name": "Remnant of the First Colossus"
+      },
       "riftspawn": {
         "name": "Riftafkom"
       },

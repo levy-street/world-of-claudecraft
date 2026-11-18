@@ -6,17 +6,17 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "532fc34f78cc7e81214d84272c92ef971055f56c64167c72f31472e31e43ed34",
+  "rendererFingerprint": "bfbf929fca05df488b81491ff7d2642d467b38fa5c0cc997929cb64dcfc3c971",
   "renderEnv": {
     "schemaVersion": 1,
-    "platform": "darwin",
-    "arch": "arm64",
+    "platform": "linux",
+    "arch": "x64",
     "gpuVendor": "Google Inc. (Google)",
-    "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
-    "browserMajor": "156",
-    "browserVersion": "Chrome/156.0.8078.48",
+    "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "browserMajor": "157",
+    "browserVersion": "Chrome/157.0.8103.78",
     "requestedBackend": "swiftshader",
-    "fingerprint": "9d557a3eb124d4b56ba598134261e432742c42c2c3e6c918df522c59de3d290d"
+    "fingerprint": "a867aeff7650451e26484c170f7e638f50415323704c3b9050104db84b656f00"
   },
   "renderer": {
     "trackedFiles": [
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6838630,
-      "sha256": "4c29a199cbeb82ff592f4067d793ffb6f810e7708ddbe97b8f663f44810f4c22",
+      "bytes": 6954498,
+      "sha256": "a4bb67f65d8b5590b032ae0844cd1ce08199259672d5b47552c422b618482fe6",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 360,
+  "portraitCount": 361,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -8883,6 +8883,40 @@
         "path": "public/ui/mobs/reliquary_saintless_effigy.webp",
         "bytes": 2268,
         "sha256": "b96f59f1d4ceaf545b79ce1bbf92abdca50ec731307781d1a0c35ac0641a043f"
+      }
+    },
+    {
+      "id": "remnant_first_colossus",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_remnant_first_colossus",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/remnant_first_colossus.glb",
+          "path": "public/models/creatures/remnant_first_colossus.glb",
+          "bytes": 1739920,
+          "sha256": "1a0c9f5e3f9a9d34aaab7322f9c479e6d7dcf31672f2c573e5cb72a578c4a78d"
+        },
+        "idle": "Idle",
+        "height": 6.2,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "92680710974f244265a508d6d5471a02e833b3129366fd1ab1729a78a845f255",
+      "output": {
+        "path": "public/ui/mobs/remnant_first_colossus.webp",
+        "bytes": 3256,
+        "sha256": "0e35d98a13fea65c6feab4112a506a552464160f26d54a2e9d57c78b88db7843"
       }
     },
     {

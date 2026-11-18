@@ -360,6 +360,7 @@ const MOB_IDS = [
   'wreck_thief',
   'the_wreck_warden',
   'drowned_deckhand',
+  'remnant_first_colossus',
   'riftspawn',
   'breach_wretch',
   'void_stalker',

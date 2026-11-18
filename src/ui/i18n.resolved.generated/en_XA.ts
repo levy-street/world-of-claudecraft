@@ -26420,6 +26420,9 @@ export const en_XA: EnTranslations = {
       "drowned_deckhand": {
         "name": "[Ðŕóŵñéð Ðéçķĥáñð]"
       },
+      "remnant_first_colossus": {
+        "name": "[Ŕéɱñáñţ óƒ ţĥé Ƒíŕšţ Çóļóššúš]"
+      },
       "riftspawn": {
         "name": "[Ŕíƒţšþáŵñ]"
       },

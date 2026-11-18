@@ -26420,6 +26420,9 @@ export const ja_JP: EnTranslations = {
       "drowned_deckhand": {
         "name": "溺れた甲板員"
       },
+      "remnant_first_colossus": {
+        "name": "最初の巨像の残骸"
+      },
       "riftspawn": {
         "name": "裂け目の落とし子"
       },

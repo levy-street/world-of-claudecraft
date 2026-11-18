@@ -26420,6 +26420,9 @@ export const es: EnTranslations = {
       "drowned_deckhand": {
         "name": "Marinero Ahogado"
       },
+      "remnant_first_colossus": {
+        "name": "Remnant of the First Colossus"
+      },
       "riftspawn": {
         "name": "Engendro de la Brecha"
       },

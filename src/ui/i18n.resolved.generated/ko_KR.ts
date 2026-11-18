@@ -26420,6 +26420,9 @@ export const ko_KR: EnTranslations = {
       "drowned_deckhand": {
         "name": "익사한 갑판원"
       },
+      "remnant_first_colossus": {
+        "name": "최초의 거상 잔해"
+      },
       "riftspawn": {
         "name": "균열의 산물"
       },

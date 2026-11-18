@@ -26420,6 +26420,9 @@ export const de_DE: EnTranslations = {
       "drowned_deckhand": {
         "name": "Ertrunkener Decksmann"
       },
+      "remnant_first_colossus": {
+        "name": "Remnant of the First Colossus"
+      },
       "riftspawn": {
         "name": "Rissbrut"
       },

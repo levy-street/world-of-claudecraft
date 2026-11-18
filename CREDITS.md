@@ -557,6 +557,7 @@ something this file marks as restricted, ask first: tony@levystreet.com.
 | Generated prop model (gyre_storm_wall_b) | World of ClaudeCraft | Project-generated: cut from the Smith's Heart raid's painted Breath vein kit (public/models/props/smith_heart_breath_env_kit.glb), whose textures and three-view turnaround sheets were made with OpenAI image generation and whose models were reconstructed with Tripo P2 under the paid-plan license; the second low wall module of the vein, stretched taller as a railing and carrying one shared texture | Project asset | With the project only |
 | Gyre painted textures (gyre_cliff.ktx2, gyre_slab.ktx2) | World of ClaudeCraft | Project-generated: the Smith's Heart raid's Breath vein painting set (bv_cliff and bv_slab, made with OpenAI image generation), graded lighter and made seamless by a local script, KTX2 encoded | Project asset | With the project only |
 | Stone, snow and sandstone detail baked into the Quartered Isle props above (textures rock_face, rock_face_03, dark_rock_02, snow_02, sandstone_cracks) | Poly Haven | https://polyhaven.com | CC0 | Baked in Blender over the generated textures |
+| Generated creature model + animations (remnant_first_colossus) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (gpt-image-2 concept, Tripo AI 3D multiview, auto-rig + preset retargets; texture projected from the concept and skin weights cleaned in Blender) | Project asset | With the project only |
 
 ### Orbital Lightning
 

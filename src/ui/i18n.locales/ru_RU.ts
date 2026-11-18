@@ -9641,6 +9641,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gale_wisp.name': 'Штормовой дух',
   'entities.mobs.shoal_scuttler.name': 'Отмельный краб',
   'entities.mobs.the_wreck_warden.name': 'Страж Кораблекрушений',
+  'entities.mobs.remnant_first_colossus.name': 'Остаток Первого Колосса',
   'entities.mobs.downs_bandit.name': 'Бандит с холмов',
   'entities.mobs.wreck_thief.name': 'Расхититель кораблекрушений',
   'entities.mobs.glimmerwisp.name': 'Мерцающий огонёк',

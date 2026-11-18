@@ -4569,6 +4569,27 @@ export const VISUALS: Record<string, VisualDef> = {
       jump: 'Jump',
     },
   },
+  // The Remnant of the First Colossus, the Heavestone Wilds' named elite at the Fallen
+  // Giant (content/quartered_isle_mobs.ts): a Tripo P2 multiview build of a weathered,
+  // half-finished Ring Forge Warder (concept sheets and review on the asset job), its
+  // base colour projected from the concept in Blender, the Tripo biped rig with its
+  // hand-to-thigh weights cleaned, and the pipeline's eight retargeted biped clips.
+  // Faces +Z as built; drawn about two and a half players tall.
+  mob_remnant_first_colossus: {
+    url: `${CREATURES}/remnant_first_colossus.glb`,
+    height: 6.2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      jump: 'Jump',
+    },
+    authoredAtlas: true,
+  },
   // Shared fallback rig for the remaining warlock demons. The entity colour
   // and the mob template's scale distinguish their silhouettes.
   mob_demon: {
@@ -8347,6 +8368,7 @@ const MOB_KEYS: Record<string, string> = {
   emberkin: 'mob_emberkin',
   gloomshade: 'mob_gloomshade',
   pyre_colossus: 'mob_pyre_colossus',
+  remnant_first_colossus: 'mob_remnant_first_colossus',
   water_elemental: 'mob_water_elemental',
   warlock_imp: 'mob_demon_flying',
   warlock_voidwalker: 'mob_demonalt',

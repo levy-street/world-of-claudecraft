@@ -244,6 +244,7 @@ import {
   QUARTERED_ISLE_ROADS,
   QUARTERED_ISLE_ZONE,
 } from './content/quartered_isle';
+import { QUARTERED_ISLE_CAMPS, QUARTERED_ISLE_MOBS } from './content/quartered_isle_mobs';
 import { QUARTERED_ISLE_SPIRES } from './content/quartered_spires';
 import { QUEST_CHOICE_REWARDS } from './content/quest_choice_rewards';
 import { QUEST_LEVELING_GEAR_ITEMS } from './content/quest_leveling_gear';
@@ -544,6 +545,8 @@ export const MOBS: Record<string, MobTemplate> = {
   // Gourdlight Eve's field boss and his adds (raised only while the event runs,
   // seasonal/scarecrow.ts; in no camp and no world-boss slot). Appended last.
   ...GOURDLIGHT_SCARECROW_MOBS,
+  // The Quartered Isle's creatures (content/quartered_isle_mobs.ts).
+  ...QUARTERED_ISLE_MOBS,
 };
 
 // Heroic upgraded drop variants: generated from the base item + mob loot tables and
@@ -746,6 +749,9 @@ export const CAMPS: CampDef[] = [
   // private streams (mob/idle_rng.ts) move: a content append like this one
   // legitimately re-mints the parity goldens without touching a draw digest.
   ...PROVING_SHORE_CAMPS,
+  // The Quartered Isle's camps (content/quartered_isle_mobs.ts) follow, offStream
+  // like the Proving Shore's and appended last by the same rule.
+  ...QUARTERED_ISLE_CAMPS,
   // The Eastbrook hub dummy is NOT a camp: it spawns with its sparring master
   // after the player (sim/hub_practice.ts), so it consumes only trailing ids.
 ];

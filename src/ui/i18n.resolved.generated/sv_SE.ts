@@ -26420,6 +26420,9 @@ export const sv_SE: EnTranslations = {
       "drowned_deckhand": {
         "name": "Drunknad däcksman"
       },
+      "remnant_first_colossus": {
+        "name": "Remnant of the First Colossus"
+      },
       "riftspawn": {
         "name": "Revavkomma"
       },

@@ -26420,6 +26420,9 @@ export const zh_TW: EnTranslations = {
       "drowned_deckhand": {
         "name": "溺亡水手"
       },
+      "remnant_first_colossus": {
+        "name": "初代巨像殘骸"
+      },
       "riftspawn": {
         "name": "裂隙孽生"
       },

@@ -9140,6 +9140,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gale_wisp.name': '疾風精',
   'entities.mobs.shoal_scuttler.name': '淺灘蟹',
   'entities.mobs.the_wreck_warden.name': '沉船守衛',
+  'entities.mobs.remnant_first_colossus.name': '初代巨像殘骸',
   'entities.mobs.downs_bandit.name': '丘陵強盜',
   'entities.mobs.wreck_thief.name': '沉船竊賊',
   'entities.mobs.glimmerwisp.name': '微光靈',

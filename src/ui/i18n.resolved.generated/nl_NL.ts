@@ -26420,6 +26420,9 @@ export const nl_NL: EnTranslations = {
       "drowned_deckhand": {
         "name": "Verdronken Matroos"
       },
+      "remnant_first_colossus": {
+        "name": "Remnant of the First Colossus"
+      },
       "riftspawn": {
         "name": "Riftgebroed"
       },

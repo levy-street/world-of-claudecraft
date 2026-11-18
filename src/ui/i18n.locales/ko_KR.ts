@@ -7767,6 +7767,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gale_wisp.name': '돌풍 정령',
   'entities.mobs.shoal_scuttler.name': '여울 게',
   'entities.mobs.the_wreck_warden.name': '난파선 감시자',
+  'entities.mobs.remnant_first_colossus.name': '최초의 거상 잔해',
   'entities.mobs.downs_bandit.name': '구릉 도적',
   'entities.mobs.wreck_thief.name': '난파선 도둑',
   'entities.mobs.glimmerwisp.name': '미광 위습',

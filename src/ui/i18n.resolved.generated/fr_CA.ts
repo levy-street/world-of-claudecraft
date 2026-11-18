@@ -26420,6 +26420,9 @@ export const fr_CA: EnTranslations = {
       "drowned_deckhand": {
         "name": "Matelot noyé"
       },
+      "remnant_first_colossus": {
+        "name": "Remnant of the First Colossus"
+      },
       "riftspawn": {
         "name": "Engeance de faille"
       },

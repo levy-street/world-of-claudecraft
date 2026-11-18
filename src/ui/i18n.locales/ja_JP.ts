@@ -7812,6 +7812,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gale_wisp.name': 'ゲイルウィスプ',
   'entities.mobs.shoal_scuttler.name': 'ショールスカトラー',
   'entities.mobs.the_wreck_warden.name': 'レックウォーデン',
+  'entities.mobs.remnant_first_colossus.name': '最初の巨像の残骸',
   'entities.mobs.downs_bandit.name': '丘陵の盗賊',
   'entities.mobs.wreck_thief.name': '難破船の盗人',
   'entities.mobs.glimmerwisp.name': 'グリマーウィスプ',
