@@ -10,21 +10,22 @@
 //   a cue          a positioned one-shot, one or more layers: the quarter
 //                  change (it takes root; Vein Shock on Heroic), the Overload's
 //                  pulse (louder and deeper as the bar fills) and burst, each
-//                  quarter's kit, the intermissions, the final phase and each
-//                  turn of its mix, Masterless Fury, Mythic's hidden phase (the
+//                  quarter's kit, the woken stars (a star waking, a pillar
+//                  rising, ringing and shattering, a Sky Strike, Arcing Stone,
+//                  a charged pillar's pulse, a Crossing Blade), the
+//                  intermissions, the final phase, Masterless Fury, Mythic's hidden phase (the
 //                  kneel, the rebirth, a quarter cracking and falling, a body
 //                  falling with it, the ring)
 //   a bar          its WARNING fitted to it: Basalt Fist, Leaping Bolt, Weight
 //                  of the Anvil on the boss; Shearing Blow, Rime Toll and Gale
 //                  Pounce on a Splinter
-//   a footprint    its WARNING as it appears: a Fire Whirl rising, Bellows Wind
-//                  gathering (its gale a loop while it blows), Groaning Ice, a
-//                  Storm Orb, a Tremor Crack
+//   a footprint    its WARNING as it appears: a Fire Whirl rising, Groaning
+//                  Ice, a Storm Orb, a Tremor Crack
 //   the Overload   the active bar passing three quarters: a crystal straining
 //   the floor      Mythic's broken Anvil rising back whole after a kill or wipe
-//   the marks      a mark on the local player (Ember Mark, Drawn Lightning,
-//                  Crushed, Bursting Coal, Wind-Tethered), and their own cold
-//                  past half and four fifths, in their own ear
+//   the marks      a mark on the local player (Sky Strike, Crossing Blade,
+//                  Ember Mark, Drawn Lightning, Crushed, Bursting Coal,
+//                  Wind-Tethered), in their own ear
 //
 // Every sample is the raid's own (`heart_final_*` in scripts/sfx/
 // smith_heart_mechanic_sfx.mjs, and the guardians' takes where a quarter
@@ -43,7 +44,6 @@ import {
   FINAL_PHASE_CUES,
 } from '../sim/encounters/smith_heart/final_phase_ids';
 import { HEART_MARK, type HeartMarkSound, markSound } from './smith_heart_mark_audio';
-import { QUENCH_COLD_SOUNDS } from './smith_heart_quench_audio_core';
 
 export interface FinalSound {
   key: string;
@@ -86,7 +86,6 @@ export const FINAL_CUE_SOUNDS: Readonly<Record<string, readonly FinalSound[]>> =
   [FINAL_CUES.embers]: [S('heart_heat_seed_burst', 0.7, 'point', 1.15, 0.15)],
   [FINAL_CUES.forgeFire]: [S('heart_heat_ignite', 0.6, 'point', 1.2, 0.3)],
   // ---- the Quench quarter ----
-  [FINAL_CUES.freeze]: [S('heart_quench_freeze', 0.9, 'target', 1, 0.15)],
   [FINAL_CUES.iceBreak]: [S('heart_quench_hole', 1, 'point', 1, 0.2)],
   // ---- the Breath quarter ----
   [FINAL_CUES.bolt]: [S('heart_breath_fork', 0.85, 'target', 1, 0.07)],
@@ -101,6 +100,20 @@ export const FINAL_CUE_SOUNDS: Readonly<Record<string, readonly FinalSound[]>> =
   ],
   [FINAL_CUES.shell]: [S(F('stone_shell'), 0.8, 'target', 1, 0.2)],
   [FINAL_CUES.settle]: [S(F('kneel'), 0.8, 'source', 0.9, 1)],
+  // ---- the woken stars (the rework of 2026-11-18): each the guardian's own
+  // sample for the same mechanic, so the star sounds like its guardian ----
+  // A quarter's star wakes: the final phase's old mix boom, its quarter's.
+  [FINAL_CUES.wake]: [S(F('mix_turn'), 0.9, 'point', 1, 1)],
+  [FINAL_CUES.rise]: [S('heart_council_pillar_rise', 0.95, 'source', 1, 0.2)],
+  [FINAL_CUES.thrum]: [S('heart_council_pillar_pulse', 0.8, 'source', 0.9, 1)],
+  [FINAL_CUES.shatter]: [S('heart_council_pillar_collapse', 1, 'point', 1.05, 0.15)],
+  [FINAL_CUES.strike]: [S('heart_breath_strike', 0.9, 'point', 1, 0.18)],
+  [FINAL_CUES.arcingStone]: [
+    S('heart_breath_discharge', 1, 'point', 1.1, 0.3),
+    S('heart_breath_fork', 0.6, 'point', 0.85, 0.3),
+  ],
+  [FINAL_CUES.charged]: [S('heart_breath_fork', 0.45, 'source', 0.8, 0.9)],
+  [FINAL_CUES.blade]: [S('heart_quench_slash', 1, 'point', 1, 0.15)],
   // ---- the intermissions ----
   [FINAL_PHASE_CUES.leap]: [S(F('stride'), 1, 'point', 1, 1)],
   [FINAL_PHASE_CUES.shield]: [S(F('shield_up'), 1, 'source', 1, 1)],
@@ -123,9 +136,6 @@ export const FINAL_CUE_SOUNDS: Readonly<Record<string, readonly FinalSound[]>> =
   [FINAL_PHASE_CUES.release]: [S(F('shield_break'), 1, 'source', 1, 1)],
   // ---- the final phase ----
   [FINAL_PHASE_CUES.awaken]: [S(F('awaken'), 1, 'point', 1, 1)],
-  // Each turn of the mix: the anvil's boom (the element's sting rides with it:
-  // mixTurnSting).
-  [FINAL_PHASE_CUES.mixTurn]: [S(F('mix_turn'), 0.9, 'point', 1, 1)],
   [FINAL_PHASE_CUES.fury]: [S(F('fury'), 0.8, 'source', 1, 1)],
   // ---- Mythic's hidden phase ----
   [FINAL_PHASE_CUES.kneel]: [S(F('kneel'), 1, 'point', 1, 1)],
@@ -157,16 +167,6 @@ export function overloadPulseSound(fill: number): { gain: number; rate: number }
   return { gain: 0.5 + 0.5 * f, rate: 1.06 - 0.16 * f };
 }
 
-/** The element's sting under a turn of the final phase's mix, by the cue's
- *  school (fire the whirls, frost the ice, nature the bolt, physical the
- *  Anvil). */
-export const MIX_TURN_STING: Readonly<Record<string, HeartMarkSound>> = {
-  fire: markSound(HEART_MARK.fire, 0.7),
-  frost: markSound(HEART_MARK.frost, 0.7),
-  nature: markSound(HEART_MARK.storm, 0.7),
-  physical: markSound(HEART_MARK.stone, 0.7),
-};
-
 /** A bar's warning: its sample and the sample's own length in seconds. */
 export interface FinalBarSound {
   key: string;
@@ -197,8 +197,6 @@ export type FinalFootprintKind =
   | 'whirl'
   | 'emberPool'
   | 'forgePool'
-  | 'windWarn'
-  | 'windBlow'
   | 'crack'
   | 'orb'
   | 'tremor'
@@ -209,14 +207,10 @@ export const FINAL_FOOTPRINT_SOUNDS: Readonly<
   Partial<Record<FinalFootprintKind, { key: string; gain: number; rate: number }>>
 > = {
   whirlWarn: { key: 'heart_heat_spawn', gain: 0.75, rate: 1.1 },
-  windWarn: { key: 'heart_breath_gather', gain: 0.85, rate: 1 },
   crack: { key: 'heart_quench_crack', gain: 0.85, rate: 1 },
   orb: { key: 'heart_breath_knot_spawn', gain: 0.7, rate: 1.25 },
   tremor: { key: F('tremor_warn'), gain: 0.9, rate: 1 },
 };
-
-/** Bellows Wind's gale, a loop while it blows. */
-export const FINAL_GALE_LOOP = { key: 'heart_breath_blow_loop', gain: 0.65, fadeOut: 1 } as const;
 
 /** The Overload's WARNING: the active bar passing `at` percent (rearmed once
  *  it drains under `rearm`). */
@@ -246,6 +240,8 @@ export const FINAL_MARK_SOUNDS: Readonly<Record<string, HeartMarkSound>> = {
   [FINAL_AURAS.ember]: HEART_MARK.fire,
   [FINAL_AURAS.drawn]: HEART_MARK.storm,
   [FINAL_AURAS.crushed]: markSound(HEART_MARK.stone, 0.9, 0.85),
+  [FINAL_AURAS.skyMark]: markSound(HEART_MARK.storm, 1, 1.1),
+  [FINAL_AURAS.bladeMark]: HEART_MARK.frost,
   [FINAL_PHASE_AURAS.coal]: markSound(HEART_MARK.fire, 1, 0.85),
   [FINAL_PHASE_AURAS.tether]: markSound(HEART_MARK.storm, 1, 0.85),
 };
@@ -256,12 +252,8 @@ export const FINAL_SFX_KEYS: readonly string[] = [
     ...Object.values(FINAL_CUE_SOUNDS).flatMap((list) => list.map((s) => s.key)),
     ...Object.values(FINAL_BAR_SOUNDS).map((s) => s.key),
     ...Object.values(FINAL_FOOTPRINT_SOUNDS).map((s) => s?.key ?? ''),
-    ...Object.values(MIX_TURN_STING).map((s) => s.key),
     ...Object.values(FINAL_MARK_SOUNDS).map((s) => s.key),
-    FINAL_GALE_LOOP.key,
     FINAL_OVERLOAD_RISING.key,
-    QUENCH_COLD_SOUNDS.warn.key,
-    QUENCH_COLD_SOUNDS.danger.key,
     FINAL_REBUILD_SOUND.key,
   ]),
 ]

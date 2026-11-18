@@ -109,7 +109,9 @@ describe('dragging the Masterless Strength (offline, the raid walking)', () => {
         // Promptly: about its walk over (it runs as fast as its tank), plus
         // the one bar it may already have had in flight, plus a breath.
         expect(res.seconds, 'never followed').toBeGreaterThanOrEqual(0);
-        expect(res.seconds).toBeLessThan(path / 7 + T.fistCast + 3);
+        // (Weight of the Anvil, its own all fight since 2026-11-18, is the
+        // longest bar that may be in flight: 6 s.)
+        expect(res.seconds).toBeLessThan(path / 7 + Math.max(T.fistCast, T.anvilCast) + 3);
         expect(res.stuck).toBeLessThan(0.5);
         expect(res.barsWhileDragged).toBe(0);
         // And it took root in the new quarter.
@@ -141,7 +143,7 @@ describe('dragging the Masterless Strength (offline, the raid walking)', () => {
         if (st) {
           st.kit.fist = 0.05;
           st.kit.bolt = 0.05;
-          st.kit.anvil = 0.05;
+          st.anvilClock = 0.05;
           st.bar = null;
           st.gap = 0;
           f.boss().castingAbility = null;
@@ -159,8 +161,13 @@ describe('dragging the Masterless Strength (offline, the raid walking)', () => {
   it('a dip into the ring and back out into the same quarter never roots it again', () => {
     const f = finalFight(5, 45);
     f.pullIn('heat');
+    // Its own Weight of the Anvil (all fight since 2026-11-18) held off: this
+    // pins the root, not a bar planted in the ring.
+    const st0 = f.state();
+    if (st0) st0.anvilClock = 1e9;
     waitRoot(f);
     const clocks = { ...f.state()?.kit };
+    const firstFist = clocks.fist;
     // Into the ring...
     const centre = { x: HEART_ROOM.x - 4, z: HEART_ROOM.z };
     let inRing = false;
@@ -178,7 +185,7 @@ describe('dragging the Masterless Strength (offline, the raid walking)', () => {
     expect(st?.rootLeft).toBe(0);
     expect(f.boss().auras.some((a) => a.id === FINAL_AURAS.root)).toBe(false);
     // Its kit kept counting (no fresh clocks for the same quarter).
-    expect(st?.kit.whirl).not.toBe(clocks.whirl === undefined ? -1 : T.whirlFirst);
+    expect(st?.kit.fist).not.toBe(firstFist === undefined ? -1 : T.fistFirst);
   });
 
   it('dragged from a quarter through the ring into the opposite one, it follows all the way', () => {

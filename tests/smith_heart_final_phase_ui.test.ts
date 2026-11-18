@@ -17,6 +17,7 @@ import {
   FINAL_BOSS,
   FINAL_ZONE_CODES,
   overloadAuraId,
+  FINAL_TUNING as T,
 } from '../src/sim/encounters/smith_heart/final_ids';
 import {
   FINAL_PHASE_AURAS as A,
@@ -121,7 +122,7 @@ describe('part 2: tooltips', () => {
     const nm = (v: number) => Math.round(v * 1.15);
     expect(call).toContain(`${nm(P.splinterMin)} to ${nm(P.splinterMax)}`);
     const fin = say({ id: A.phase, kind: 'internal_cd', value: FINAL_STAGE_CODES.final });
-    expect(fin).toContain(`one every ${P.mixEvery} sec`);
+    expect(fin).toContain(`all four stars run at once at ${Math.round(T.finalPace * 100)}% pace`);
     expect(fin).toContain(`After ${P.enrageAfter} sec`);
     expect(say({ id: A.shield, kind: 'internal_cd' })).toContain('immune');
     expect(say({ id: A.fury, kind: 'internal_cd', value: 1 })).toContain(
@@ -133,21 +134,18 @@ describe('part 2: tooltips', () => {
     expect(fight).toContain('At 15%');
   });
 
-  it('each poured element says its cadence, faster for each pour', () => {
+  it('each poured element says its star and its full pace', () => {
     expect(say({ id: pouredAuraId('heat'), kind: 'internal_cd', value: 1 })).toContain(
-      `every ${P.pouredHeatEvery} sec`,
-    );
-    expect(say({ id: pouredAuraId('heat'), kind: 'internal_cd', value: 2 })).toContain(
-      `every ${P.pouredHeatEvery / 2} sec`,
+      `Fire Whirls rise every ${T.whirlEvery} sec`,
     );
     expect(say({ id: pouredAuraId('quench'), kind: 'internal_cd', value: 1 })).toContain(
-      `${P.pouredColdShare * 100}%`,
+      `Crossing Blades sweep the room every ${T.bladeEvery} sec`,
     );
     expect(say({ id: pouredAuraId('breath'), kind: 'internal_cd', value: 1 })).toContain(
-      'Leaping Bolt',
+      `Sky Strikes fall every ${T.skyEvery} sec`,
     );
     expect(say({ id: pouredAuraId('hammer'), kind: 'internal_cd', value: 1 })).toContain(
-      'Tremor Cracks',
+      `pillars rise every ${T.pillarEvery} sec`,
     );
   });
 
@@ -245,7 +243,7 @@ describe('part 2: the personal alert', () => {
   it('Bursting Coal first, then Wind-Tethered, then the rest', () => {
     const coal = { id: A.coal, remaining: 4, duration: 6 };
     const tether = { id: A.tether, remaining: 6, duration: 9.5 };
-    const frozen = { id: FINAL_AURAS.frozen, remaining: 2, duration: 4 };
+    const frozen = { id: FINAL_AURAS.bladeMark, remaining: 2, duration: 4, value: 1 };
     const v = buildFinalAlertView({ auras: [frozen, tether, coal] });
     expect(v.visible && v.kind).toBe('coal');
     const w = buildFinalAlertView({ auras: [frozen, tether] });
@@ -256,7 +254,8 @@ describe('part 2: the personal alert', () => {
     for (const id of [
       A.coal,
       A.tether,
-      FINAL_AURAS.frozen,
+      FINAL_AURAS.bladeMark,
+      FINAL_AURAS.skyMark,
       FINAL_AURAS.ember,
       FINAL_AURAS.drawn,
       FINAL_AURAS.crushed,

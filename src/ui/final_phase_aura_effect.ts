@@ -36,7 +36,6 @@ const tiers = (min: number, max: number, h = 'heroic', m = 'mythic'): Record<str
 
 /** The part-2 aura's descriptor, or null when `a` is not one of them. */
 export function finalPhaseAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor | null {
-  const times = Math.max(1, Math.round(a.value || a.stacks || 1));
   switch (a.id) {
     case A.phase: {
       const stage = finalStageOf(a.value);
@@ -63,7 +62,7 @@ export function finalPhaseAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDe
       if (stage === 'final' || stage === 'finalLeap')
         return {
           key: `${KEY}.phaseFinal`,
-          nums: { every: P.mixEvery, enrage: P.enrageAfter },
+          nums: { pace: Math.round(T.finalPace * 100), enrage: P.enrageAfter },
         };
       return {
         key: `${KEY}.phaseFight`,
@@ -83,30 +82,13 @@ export function finalPhaseAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDe
     case A.rising:
       return { key: `${KEY}.shield`, nums: {} };
     case pouredAuraId('heat'):
-      return {
-        key: `${KEY}.pouredHeat`,
-        nums: { every: Math.round(P.pouredHeatEvery / times), times },
-      };
+      return { key: `${KEY}.pouredHeat`, nums: { every: T.whirlEvery } };
     case pouredAuraId('quench'):
-      return {
-        key: `${KEY}.pouredQuench`,
-        nums: {
-          share: pct(Math.min(1, P.pouredColdShare * times)),
-          allies: T.coldAllies,
-          reach: T.coldReach,
-          times,
-        },
-      };
+      return { key: `${KEY}.pouredQuench`, nums: { every: T.bladeEvery } };
     case pouredAuraId('breath'):
-      return {
-        key: `${KEY}.pouredBreath`,
-        nums: { every: Math.round(P.pouredBreathEvery / times), jump: T.boltJump, times },
-      };
+      return { key: `${KEY}.pouredBreath`, nums: { every: T.skyEvery } };
     case pouredAuraId('hammer'):
-      return {
-        key: `${KEY}.pouredHammer`,
-        nums: { every: Math.round(P.pouredHammerEvery / times), times },
-      };
+      return { key: `${KEY}.pouredHammer`, nums: { every: T.pillarEvery } };
     case A.fury: {
       const stacks = Math.max(1, Math.round(a.value || a.stacks || 1));
       return {

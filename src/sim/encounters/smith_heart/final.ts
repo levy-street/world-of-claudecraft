@@ -5,16 +5,24 @@
 //
 //   The rules     the Overload bars, Vein Shock (Heroic), Taking Root, Heart
 //                 Unbound in the centre, the base form (final_rules.ts).
-//   The Heat      dodge and place: Basalt Fist and its Molten Swells, Fire
-//                 Whirls; Heroic's Ember Marks; Mythic's Forge Fire
-//                 (final_heat.ts).
-//   The Quench    stack: Quenching Cold, Encased in Rime; Heroic's Groaning
-//                 Ice; Mythic's Numbing Frost (final_quench.ts).
-//   The Breath    spread: Bellows Wind toward the rim, Leaping Bolt;
-//                 Heroic's Drawn Lightning; Mythic's Storm Orbs
-//                 (final_breath.ts).
-//   The Hammer    the only group soak: Tremor Cracks, Weight of the Anvil;
-//                 Heroic's Stone Shell and Crushed; Mythic's turning Anvil
+//   Its own       all fight, wherever it stands: Forge Fist (its swing
+//                 cleave, the frontal) and Weight of the Anvil, the fight's
+//                 only group soak (Heroic's Crushed, Mythic's turning Anvil;
+//                 final_hammer.ts).
+//   The stars     the rework of 2026-11-18: the first time it enters a
+//                 quarter that quarter's guardian's star wakes for the rest
+//                 of the fight (final_stars.ts): Wake the Stone's pillars,
+//                 Sky Strike, Crossing Blade, Fire Whirl; full pace in the
+//                 quarter it stands in, reduced in the others. They interact
+//                 (a strike by a pillar charges it, a blade shatters it).
+//   The Heat      while it stands there: Basalt Fist and its Molten Swells;
+//                 Heroic's Ember Marks; Mythic's Forge Fire (final_heat.ts).
+//   The Quench    while it stands there: Heroic's Groaning Ice; Mythic's
+//                 Numbing Frost (final_quench.ts; its cold is gone).
+//   The Breath    while it stands there: Leaping Bolt; Heroic's Drawn
+//                 Lightning; Mythic's Storm Orbs (final_breath.ts; its wind
+//                 is gone).
+//   The Hammer    while it stands there: Tremor Cracks; Heroic's Stone Shell
 //                 (final_hammer.ts).
 //   One wipe      the fight ends when the boss stops fighting: every bar,
 //                 footprint and mark gone.
@@ -43,16 +51,15 @@ import { claimBoss, clearCastIf } from '../sunken_bastion/claim';
 import { watchFeatDeaths } from './feat_attempt';
 import { settleSmithHeartFeat } from './feats';
 import { clearAdds, stepAdds, stepCoals, stepRings } from './final_adds';
+import { startBlades } from './final_blades';
 import {
   clearBreath,
   drawLightning,
-  gatherWind,
   landBolt,
   raiseOrbs,
   startBolt,
   stepDrawn,
   stepOrbs,
-  stepWind,
 } from './final_breath';
 import {
   clearHammer,
@@ -99,10 +106,18 @@ import {
   stepStride,
   watchThresholds,
 } from './final_intermission';
-import { beginFinalPhase, pouredColdRate, stepFinal, stepPoured } from './final_last';
+import { beginFinalPhase, stepFinal } from './final_last';
 import { finalPhaseDev, finalPhaseReadout } from './final_phase_dev';
+import {
+  chargePillar,
+  pillarSpotClear,
+  pulseCharged,
+  raisePillars,
+  shatterPillar,
+  stoneThrum,
+} from './final_pillars';
 import { clearPlunges } from './final_plunge';
-import { clearQuench, crackIce, encase, numbingFrost, stepCold, stepCracks } from './final_quench';
+import { clearQuench, crackIce, numbingFrost, stepCracks } from './final_quench';
 import {
   bossZone,
   burstBar,
@@ -129,6 +144,16 @@ import {
   holdPlanted,
   living,
 } from './final_scope';
+import { skyAtPillar, skyVolley } from './final_sky';
+import {
+  clearStars,
+  fireStar,
+  freshStars,
+  starPace,
+  stepStarClocks,
+  stepStarFloor,
+  wakeStar,
+} from './final_stars';
 import type { FinalFightState, FinalKitClocks } from './final_state';
 import { finalSay, freshFinalVoice, stepFinalVoice } from './final_voice';
 import { applyTierHealth, restoreTierHealth, showTierHealth, tierPoolMult } from './tier_health';
@@ -175,15 +200,12 @@ function fighting(e: Entity): boolean {
 export function freshKit(): FinalKitClocks {
   return {
     fist: T.fistFirst,
-    whirl: T.whirlFirst,
     ember: T.emberFirst,
     ice: T.iceFirst,
-    wind: T.windFirst,
     bolt: T.boltFirst,
     drawn: T.drawnFirst,
     orb: T.orbFirst,
     tremor: T.tremorFirst,
-    anvil: T.anvilFirst,
     shell: T.shellFirst,
   };
 }
@@ -217,16 +239,15 @@ function freshState(difficulty: FinalDifficulty): FinalFightState {
     embers: [],
     pools: [],
     poolTick: T.poolTick,
-    cold: {},
-    frozen: {},
     cracks: [],
-    wind: null,
     boltTarget: null,
     drawn: [],
     drawnTick: T.drawnTick,
     orbs: [],
     tremors: [],
     anvil: null,
+    anvilClock: T.anvilFirst,
+    stars: freshStars(),
     cleaveSeen: 0,
     phase: freshPhase(),
     voice: freshFinalVoice(),
@@ -259,6 +280,8 @@ function watchZone(s: FinalScope, first: boolean): void {
   if (!first && zone === s.st.zone) return;
   if (zone !== 'ring' && zone !== s.st.lastQuarter) s.st.kit = freshKit();
   enterZone(s, zone);
+  // Its quarter's star wakes for the rest of the fight (final_stars.ts).
+  if (zone !== 'ring') wakeStar(s, zone);
 }
 
 // ---- the bar ------------------------------------------------------------------------------
@@ -310,25 +333,35 @@ function runKit(s: FinalScope): void {
   switch (s.st.zone) {
     case 'heat':
       if (due(s, 'fist', true)) startFist(s);
-      if (due(s, 'whirl')) raiseWhirls(s);
       if (r.embers && due(s, 'ember')) markEmbers(s);
       return;
     case 'quench':
       if (r.breakingIce && due(s, 'ice')) crackIce(s);
       return;
     case 'breath':
-      if (due(s, 'wind')) gatherWind(s);
       if (due(s, 'bolt', true)) startBolt(s);
       if (r.drawnLightning && due(s, 'drawn')) drawLightning(s);
       if (r.stormOrbs && due(s, 'orb')) raiseOrbs(s);
       return;
     case 'hammer':
       if (due(s, 'tremor')) crackTremors(s);
-      if (due(s, 'anvil', true)) startAnvil(s);
       if (r.stoneShell && due(s, 'shell')) stoneShell(s);
       return;
     default:
   }
+}
+
+/** Weight of the Anvil, its own, all fight wherever it stands (the quarter
+ *  fight and the final phase): a bar, so it waits for the boss to be free. */
+function runAnvil(s: FinalScope): void {
+  const st = s.st;
+  st.anvilClock -= DT;
+  if (st.anvilClock > 1e-9) return;
+  if (!bossFree(s)) {
+    st.anvilClock = 0;
+    return;
+  }
+  startAnvil(s);
 }
 
 /** Mythic's watch on the frontal (Forge Fist, the swing cleave): a reset of
@@ -347,8 +380,9 @@ function watchFrontal(s: FinalScope): void {
 /** The player marks the fight lays (cleared at its end). */
 const PLAYER_MARKS = [
   FINAL_AURAS.shaken,
-  FINAL_AURAS.cold,
   FINAL_AURAS.numbing,
+  FINAL_AURAS.skyMark,
+  FINAL_AURAS.bladeMark,
   FINAL_AURAS.ember,
   FINAL_AURAS.drawn,
   FINAL_AURAS.crushed,
@@ -370,6 +404,7 @@ function clearFight(
     clearQuench(s, players);
     clearBreath(s, players);
     clearHammer(s, players);
+    clearStars(s, players);
   }
   for (const p of players) for (const id of PLAYER_MARKS) dropAura(p, id);
   clearCastIf(boss, FINAL_CASTS.fist, FINAL_CASTS.bolt, FINAL_CASTS.anvil);
@@ -470,11 +505,9 @@ export function tickFinalBoss(ctx: SimContext, inst: InstanceSlot): void {
   stepWhirls(s);
   stepEmbersAndPools(s);
   const live = ph.stage === 'fight' || ph.stage === 'final' || ph.stage === 'collapse';
-  const poured = live ? pouredColdRate(s) : 0;
-  const coldHere = ph.stage === 'fight' && st.zone === 'quench';
-  stepCold(s, coldHere || poured > 0, coldHere ? 1 : poured);
+  stepStarClocks(s, live);
+  stepStarFloor(s, live);
   stepCracks(s);
-  stepWind(s);
   stepDrawn(s);
   stepOrbs(s);
   stepTremors(s);
@@ -485,7 +518,7 @@ export function tickFinalBoss(ctx: SimContext, inst: InstanceSlot): void {
   watchFrontal(s);
   if (ph.stage === 'fight') runKit(s);
   else if (ph.stage === 'final') stepFinal(s);
-  if (live) stepPoured(s);
+  if (ph.stage === 'fight' || ph.stage === 'final') runAnvil(s);
   watchHidden(s);
   watchThresholds(s);
   holdThreshold(s);
@@ -618,25 +651,76 @@ export function finalDevMechanic(
       return startFist(s, here) ? 'Basalt Fist: it comes down where you stand in 3 s.' : null;
     case 'whirl':
     case 'whirls':
+    case 'tornado':
       return `${raiseWhirls(s)} Fire Whirls rise.`;
+    case 'wake': {
+      const v = HEART_QUARTER_ORDER.find((x) => x === arg);
+      if (!v) return null;
+      return wakeStar(s, v)
+        ? `The ${v} quarter's star wakes for the rest of the fight.`
+        : `The ${v} quarter's star is already awake.`;
+    }
+    case 'star': {
+      const v = HEART_QUARTER_ORDER.find((x) => x === arg);
+      if (!v) return null;
+      wakeStar(s, v);
+      return `The ${v} star fires: ${fireStar(s, v)} laid.`;
+    }
+    case 'pillar':
+    case 'pillars': {
+      if (arg === 'here' && here) {
+        if (
+          !pillarSpotClear(here, st.stars.pillars, { x: s.boss.pos.x - o.x, z: s.boss.pos.z - o.z })
+        )
+          return 'No pillar can rise where you stand (too near the ring, the rim, the boss or a pillar).';
+        return `Wake the Stone: ${raisePillars(s, here)} pillar rises where you stand in 2 s.`;
+      }
+      const n = Number(arg);
+      let laid = 0;
+      for (let k = 0; k < (Number.isFinite(n) && n > 0 ? Math.min(12, n) : 1); k++)
+        laid += raisePillars(s);
+      return `Wake the Stone: ${laid} pillars rise (${st.stars.pillars.length} standing).`;
+    }
+    case 'thrum':
+      return `Stone Thrum: ${stoneThrum(s).length} struck.`;
+    case 'charge': {
+      let n = 0;
+      for (const p of st.stars.pillars) {
+        if (p.charged) continue;
+        chargePillar(s, p);
+        n++;
+      }
+      return `${n} pillars Storm-Charged (${st.stars.pillars.filter((p) => p.charged).length} in all).`;
+    }
+    case 'chargedpulse':
+      return `Storm-Charged pulse: ${pulseCharged(s).length} struck.`;
+    case 'shatter': {
+      const all = [...st.stars.pillars];
+      for (const p of all) shatterPillar(s, p);
+      return `${all.length} pillars shatter.`;
+    }
+    case 'sky':
+    case 'strike':
+    case 'lightning':
+      if (arg === 'pillar' && here)
+        return skyAtPillar(s, here)
+          ? 'Sky Strike: one strike beside the pillar nearest you (Arcing Stone).'
+          : 'No pillar stands.';
+      return arg === 'here' && here
+        ? `Sky Strike: ${skyVolley(s, here)} strike on you.`
+        : `Sky Strike: ${skyVolley(s)} strikes.`;
+    case 'blade':
+    case 'blades': {
+      const marks = arg === 'me' && me ? startBlades(s, me) : startBlades(s);
+      return marks.length > 0
+        ? `Crossing Blade: ${marks.length} lines (the first through ${marks[0].name}).`
+        : 'A round of blades is already flying.';
+    }
     case 'embers':
     case 'ember':
       return `Ember Mark on ${markEmbers(s).length} ranged players.`;
-    case 'freeze':
-      if (!me) return null;
-      encase(s, me);
-      return 'Encased in Rime.';
-    case 'cold':
-      if (!me) return null;
-      st.cold[me.id] = Math.max(0, Math.min(T.coldMax - 1, Number(arg) || 0));
-      return `Your cold set to ${Math.round(st.cold[me.id])}.`;
     case 'ice':
       return `Groaning Ice under ${crackIce(s).length} players.`;
-    case 'wind': {
-      const deg = Number(arg);
-      gatherWind(s, Number.isFinite(deg) ? (deg * Math.PI) / 180 : undefined);
-      return 'Bellows Wind gathers.';
-    }
     case 'bolt':
       clearBar();
       return startBolt(s) ? 'Leaping Bolt: 2 s.' : null;
@@ -668,5 +752,8 @@ export function finalReadout(ctx: SimContext, inst: InstanceSlot): string {
   const bars = HEART_QUARTER_ORDER.map((v) => `${v} ${Math.round(st.overload[v] * 100)}`).join(
     ', ',
   );
-  return `${head}; in ${st.zone} (base ${st.baseForm ?? 'none'}), root ${st.rootLeft.toFixed(0)} s, shaken ${st.shakenLeft.toFixed(0)} s, unbound ${st.unbound}; Overload ${bars}; switches ${st.switches}, bursts ${st.bursts}; ${finalPhaseReadout(ctx, st)}.`;
+  const stars = st.stars.awake.map((v) => `${v} x${starPace({ st }, v)}`).join(', ');
+  const charged = st.stars.pillars.filter((p) => p.charged).length;
+  const pillars = `${st.stars.pillars.length} pillars (${charged} charged), ${st.stars.shattered} shattered, ${st.stars.thrums} thrums`;
+  return `${head}; in ${st.zone} (base ${st.baseForm ?? 'none'}), stars ${stars || 'none'}, ${pillars}, root ${st.rootLeft.toFixed(0)} s, shaken ${st.shakenLeft.toFixed(0)} s, unbound ${st.unbound}; Overload ${bars}; switches ${st.switches}, bursts ${st.bursts}; ${finalPhaseReadout(ctx, st)}.`;
 }

@@ -24434,15 +24434,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_final_leaping_bolt': '跳跃雷击',
   'abilityUi.cast.heart_final_anvil': '铁砧之重',
   'hudChrome.auraEffect.finalBoss.stateHeat':
-    '饮下炽热：玄武岩之拳砸向一名玩家所在的位置，三道熔岩涌浪从那里滚滚而出，火焰旋风在地面上穿行。英雄难度下，余烬印记会在远程玩家脚下落下火焰；史诗难度下，它的正面攻击会留下熔炉之火。',
+    '饮下炽热：玄武之拳砸向玩家所站之处，三道熔岩涌浪从那里滚出。它的星辰火焰旋风苏醒并持续到战斗结束：高耸的火柱在地面上疾驰。英雄难度下，余烬印记会把火焰落在远程玩家脚下；史诗难度下，它的正面攻击会留下锻炉之火。',
   'hudChrome.auraEffect.finalBoss.stateQuench':
-    '饮下淬火：{reach}码内其他玩家少于{allies}名的人会越来越冷并被冻结。英雄难度下，被标记玩家脚下的冰面会碎裂；史诗难度下，它的正面攻击会减速{slow}%。',
+    '饮下淬火。它的星辰交错之刃苏醒并持续到战斗结束：一把冰剑沿着穿过被标记玩家的直线横扫，击碎线上的所有石柱。英雄难度下，被标记玩家脚下的冰会碎裂；史诗难度下，它的正面攻击使移动速度降低{slow}%。',
   'hudChrome.auraEffect.finalBoss.stateBreath':
-    '饮下吐息：狂风把团队推向边缘，跳跃雷击会在彼此相距{jump}码以内的玩家之间跳跃。英雄难度下，引雷会标记玩家；史诗难度下，每个风暴宝珠都必须由一名玩家拾取。',
+    '饮下吐息：跳跃闪电在彼此相距{jump}码以内的玩家之间跳跃。它的星辰天落雷击苏醒并持续到战斗结束：闪电劈向玩家脚下，落在石柱旁的闪电会环绕石柱形成电弧并使其带电。英雄难度下，牵引闪电会标记玩家；史诗难度下，每颗风暴宝珠都必须由一名玩家接下。',
   'hudChrome.auraEffect.finalBoss.stateHammer':
-    '饮下重锤：震颤裂痕在玩家脚下爆发，铁砧之重把伤害分摊给标记内的所有人。英雄难度下，石壳会吸收治疗，铁砧的分摊者会被粉碎；史诗难度下，铁砧的标记会绕着它旋转。',
+    '饮下重锤：震颤裂痕在玩家脚下爆发。它的星辰石之苏醒苏醒并持续到战斗结束：石柱从地面冲出，直到被交错之刃击碎前都会一直矗立。英雄难度下，石壳会吸收治疗。',
   'hudChrome.auraEffect.finalBoss.stateRing':
-    '身处中央圆环时，它不饮下任何一角的力量。生命值高于{pct}%时，它在那里每秒获得一层心之脱缚。',
+    '身处中央圆环时，它不饮下任何一角的力量：所有已苏醒的星辰都以{pace}%的速度运转。生命值高于{pct}%时，它在那里每秒获得一层心之脱缚。',
   'hudChrome.auraEffect.finalBoss.overloadHeat':
     '炽热过载，已满{value}%。首领站在炽热区域时它会充能（从空到满需{fill}秒），并每{every}秒对团队造成脉冲伤害：空时{min}点，满时最高{max}点。即将充满时会警告团队。充满时会爆发，对整个团队造成伤害并清空：普通难度{normalMin}至{normalMax}点（靠治疗可以撑过），英雄难度{heroicMin}至{heroicMax}点（很重：先抬满血并使用减伤技能），史诗难度{mythicMin}至{mythicMax}点（致命：只有强力的个人减伤才能存活）。首领离开该区域后，它以三分之一的速度消退。其脉冲在英雄难度造成{heroicPulseMin}到{heroicPulseMax}点伤害，在史诗难度造成{mythicPulseMin}到{mythicPulseMax}点伤害。',
   'hudChrome.auraEffect.finalBoss.overloadQuench':
@@ -24457,16 +24457,20 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '每层每秒对整个团队造成{per}点伤害（当前{total}点）；站在中央圆环内时每秒获得一层。把它拖出圆环即可结束。英雄难度：每层{heroicPer}点。史诗难度：每层{mythicPer}点。',
   'hudChrome.auraEffect.finalBoss.shaken':
     '持续期间，切换区域对你造成的伤害提高至{mult}倍（{min}至{max}点，而非{baseMin}至{baseMax}点）。每次切换都会将其刷新为{seconds}秒。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。',
-  'hudChrome.auraEffect.finalBoss.cold':
-    '寒冷值{value}/100。{reach}码内其他玩家少于{allies}名时每秒上升{rise}点，达到人数后下降。达到100时你会被霜封住：昏迷{freeze}秒并受到{min}至{max}点冰霜伤害。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。',
-  'hudChrome.auraEffect.finalBoss.frozen':
-    '昏迷。你因独自站立而被冻结：在它饮下淬火时，保持在{allies}名或更多其他玩家的{reach}码内。',
+  'hudChrome.auraEffect.finalBoss.skyMark':
+    '{seconds}秒后闪电会劈在你所站之处：对{radius}码内的所有人造成{min}到{max}点自然伤害。快离开。落在石柱{arcReach}码内的闪电会环绕石柱形成电弧，使其被风暴充能。英雄：{heroicMin}到{heroicMax}点伤害。史诗：{mythicMin}到{mythicMax}点伤害。',
+  'hudChrome.auraEffect.finalBoss.bladeMark':
+    '一把交错之刃把它的直线瞄准了你：直线会跟随你，并在飞出前{lock}秒锁定。把直线引过石柱将其击碎，然后离开直线。直线上的所有人受到{min}到{max}点冰霜伤害。英雄：{heroicMin}到{heroicMax}点伤害。史诗：{mythicMin}到{mythicMax}点伤害。',
+  'hudChrome.finalAlert.bladeTitle':
+    '交错之刃：引导它',
+  'hudChrome.finalAlert.bladeLockedTitle':
+    '冰刃已锁定：快离开！',
+  'hudChrome.finalAlert.skyTitle':
+    '天落雷击瞄准了你！',
   'hudChrome.auraEffect.finalBoss.underIce': '昏迷：你从碎裂的冰面掉了下去。',
   'hudChrome.auraEffect.finalBoss.numbing': '被它的正面攻击减速{pct}%，持续{seconds}秒。',
   'hudChrome.auraEffect.finalBoss.ember':
     '{seconds}秒后余烬会落在你的脚下，在{radius}码的范围内阴燃{life}秒，每秒对其中的任何人造成{min}至{max}点火焰伤害。与其他被标记的玩家站到同一个角落，然后离开。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。',
-  'hudChrome.auraEffect.finalBoss.wind':
-    '狂风每秒把你朝它吹的方向推动{speed}码；顶着风走才能站稳（不会打断施法）。狂风吹拂时，处于边缘{band}码以内会每秒受到{min}至{max}点自然伤害。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。',
   'hudChrome.auraEffect.finalBoss.drawn':
     '在{seconds}秒内，它每秒从你身上跳向{reach}码内的其他每名玩家，对每人造成{min}至{max}点自然伤害。与所有人保持{reach}码距离。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。',
   'hudChrome.auraEffect.finalBoss.shell': '吸收你受到的下{value}点治疗。',
@@ -24509,16 +24513,16 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.finalBoss.unmade':
     '每{every}秒铁砧的一整块区域坠落，过载条最满的区域最先，坠落前有{warn}秒裂纹警告。站在其上的人会一同坠落并死亡。最后一块区域坠落{ring}秒后，中央圆环破碎，所有人死亡。',
   'hudChrome.auraEffect.finalBoss.phaseFinal':
-    '四个角已全部苏醒：它停留在中央圆环，每{every}秒依次施放一种技能：火焰旋风、呻吟之冰、跳跃闪电、铁砧之重。{enrage}秒后它将失去一切克制（无主之怒）。',
+    '四个角已全部苏醒：它停留在中央圆环，四颗星辰同时以{pace}%的速度运转，石柱、闪电、冰刃与旋风一齐袭来。{enrage}秒后它将失去一切克制（无主之怒）。',
   'hudChrome.auraEffect.finalBoss.shield': '聚集之力：免疫所有伤害，且无法被选为目标。',
   'hudChrome.auraEffect.finalBoss.pouredHeat':
-    '炽热注入其中：直到战斗结束，无论它站在哪里，每{every}秒都会掀起火焰旋风（已注入{times}次）。',
+    '炽热注入其中：直到战斗结束，无论它站在哪里，每{every}秒都会升起火焰旋风。',
   'hudChrome.auraEffect.finalBoss.pouredQuench':
-    '淬火注入其中：直到战斗结束，{reach}码内其他玩家少于{allies}名的人在任何地方都会变冷，速度为淬火之角的{share}%（已注入{times}次）。',
+    '淬火注入其中：直到战斗结束，无论它站在哪里，每{every}秒都会有交错之刃横扫大厅。',
   'hudChrome.auraEffect.finalBoss.pouredBreath':
-    '吐息注入其中：直到战斗结束，无论它站在哪里，每{every}秒都会施放跳跃闪电，在彼此相距{jump}码内的玩家之间跳跃（已注入{times}次）。',
+    '吐息注入其中：直到战斗结束，无论它站在哪里，每{every}秒都会落下天落雷击。',
   'hudChrome.auraEffect.finalBoss.pouredHammer':
-    '重锤注入其中：直到战斗结束，无论它站在哪里，每{every}秒都会在玩家脚下迸发震颤裂隙（已注入{times}次）。',
+    '重锤注入其中：直到战斗结束，无论它站在哪里，每{every}秒都会有石柱冲出。',
   'hudChrome.auraEffect.finalBoss.fury':
     '无主之怒：每{every}秒对整个团队造成{min}到{max}点伤害，每次脉动提高{rise}%。立刻击杀它。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。',
   'hudChrome.auraEffect.finalBoss.coal':

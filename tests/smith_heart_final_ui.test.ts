@@ -2,7 +2,7 @@
 // The Masterless Strength's player text and raid HUD:
 //   - every raid warning resolves its key to the very English the sim sent;
 //   - every aura's tooltip says its rule with the live numbers (no token left
-//     unfilled), the final's wind told from the Guardian of the Breath's;
+//     unfilled), the stars' marks (Sky Strike, Crossing Blade) included;
 //   - every damage and aura name re-localizes;
 //   - the Overload bars' view (heart_overload_view.ts) reads the boss's
 //     mirrored auras the same off a Sim-shaped and a ClientWorld-shaped body,
@@ -12,7 +12,6 @@
 //   - the painter writes nothing on a still frame.
 
 import { describe, expect, it } from 'vitest';
-import { FINAL_WIND_TAG } from '../src/sim/encounters/smith_heart/final_breath';
 import {
   FINAL_AURAS,
   FINAL_BOSS,
@@ -24,7 +23,6 @@ import {
   FINAL_TUNING as T,
 } from '../src/sim/encounters/smith_heart/final_ids';
 import type { Aura, SimEvent } from '../src/sim/types';
-import { WIND_DRIFT_AURA } from '../src/sim/wind_drift';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import { castDisplayName } from '../src/ui/cast_display_name';
 import { buildFinalAlertView } from '../src/ui/hud/dungeon/final_alert_view';
@@ -56,7 +54,7 @@ describe('The Masterless Strength: what the raid reads', () => {
     f.put(f.players[2], b.x + 20, b.z);
     f.put(f.players[3], b.x - 20, b.z);
     events.push(...f.tick(2));
-    for (const verb of ['embers', 'wind', 'drawn', 'orbs', 'ice', 'anvil']) {
+    for (const verb of ['embers', 'drawn', 'orbs', 'ice', 'anvil', 'sky', 'blades', 'pillars 2']) {
       f.dev(`/dev heart final ${verb}`);
       events.push(...f.tick(2));
     }
@@ -91,9 +89,9 @@ describe('The Masterless Strength: what the raid reads', () => {
   });
 
   it('every damage and aura name re-localizes', () => {
-    // Groaning Ice names only the crack's object (never a hit or an aura).
+    // Groaning Ice and the Pillar name only objects (never a hit or an aura).
     for (const [k, name] of Object.entries(FINAL_NAMES))
-      if (k !== 'crack') expect(localizeSimAuraName(name), name).not.toBeNull();
+      if (k !== 'crack' && k !== 'pillar') expect(localizeSimAuraName(name), name).not.toBeNull();
   });
 });
 
@@ -110,11 +108,14 @@ describe('The Masterless Strength: tooltips', () => {
     const st = (zone: keyof typeof FINAL_ZONE_CODES) =>
       say({ id: FINAL_AURAS.state, kind: 'internal_cd', value: FINAL_ZONE_CODES[zone] });
     expect(st('heat')).toContain('Basalt Fist');
-    expect(st('quench')).toContain(`within ${T.coldReach} yd`);
+    expect(st('heat')).toContain('Fire Whirl');
+    expect(st('quench')).toContain('Crossing Blade');
     expect(st('quench')).toContain(`${Math.round((1 - T.numbingSlow) * 100)}%`);
     expect(st('breath')).toContain(`within ${T.boltJump} yd`);
-    expect(st('hammer')).toContain('Weight of the Anvil');
+    expect(st('breath')).toContain('Sky Strike');
+    expect(st('hammer')).toContain('Wake the Stone');
     expect(st('ring')).toContain('15%');
+    expect(st('ring')).toContain(`${Math.round(T.reducedPace * 100)}% pace`);
   });
 
   it('each bar, mark and the root say their rule with the live numbers', () => {
@@ -134,8 +135,13 @@ describe('The Masterless Strength: tooltips', () => {
       `(${Math.round(T.unboundPerStack * 1.15) * 3} now)`,
     );
     expect(say({ id: FINAL_AURAS.shaken, kind: 'internal_cd' })).toContain(`${T.shakenMult} times`);
-    expect(say({ id: FINAL_AURAS.cold, kind: 'internal_cd', value: 55 })).toContain('Cold 55');
-    expect(say({ id: FINAL_AURAS.frozen, kind: 'stun' })).toContain(`${T.coldReach} yd`);
+    const sky = say({ id: FINAL_AURAS.skyMark, kind: 'internal_cd' });
+    expect(sky).toContain(`${T.skyR} yd`);
+    expect(sky).toContain(`${T.arcReach} yd of a pillar`);
+    expect(sky).toContain(`${Math.round(T.skyMin * 1.15)} to ${Math.round(T.skyMax * 1.15)}`);
+    const blade = say({ id: FINAL_AURAS.bladeMark, kind: 'internal_cd' });
+    expect(blade).toContain(`${T.bladeLock} sec`);
+    expect(blade).toContain('pillars');
     expect(say({ id: FINAL_AURAS.underIce, kind: 'stun' })).toContain('breaking ice');
     expect(say({ id: FINAL_AURAS.numbing, kind: 'slow', value: T.numbingSlow })).toContain(
       `${Math.round((1 - T.numbingSlow) * 100)}%`,
@@ -148,19 +154,6 @@ describe('The Masterless Strength: tooltips', () => {
     expect(say({ id: FINAL_AURAS.crushed, kind: 'internal_cd' })).toContain(
       `${T.crushedMult} times`,
     );
-  });
-
-  it("the final's wind says its rim, the guardian's keeps its own", () => {
-    const mine = say({
-      id: WIND_DRIFT_AURA,
-      kind: 'internal_cd',
-      value: 0,
-      value2: T.windSpeed,
-      value3: FINAL_WIND_TAG,
-    });
-    expect(mine).toContain(`Within ${T.rimBand} yd of the rim`);
-    const theirs = say({ id: WIND_DRIFT_AURA, kind: 'internal_cd', value: 0, value2: 4 });
-    expect(theirs).toContain('Guardian of the Breath');
   });
 });
 
@@ -293,23 +286,24 @@ describe('The Masterless Strength: the Overload bars', () => {
 
 describe('The Masterless Strength: the personal alert', () => {
   const mark = (id: string, remaining = 3, duration = 6) => ({ id, remaining, duration });
-  it('frozen first, then the ember, the lightning, the cold, Crushed', () => {
+  it('the blade first, then the strike, the ember, the lightning, Crushed', () => {
     const all = [
       mark(FINAL_AURAS.crushed),
-      { id: FINAL_AURAS.cold, value: 80, value2: 1 },
       mark(FINAL_AURAS.drawn),
       mark(FINAL_AURAS.ember),
-      mark(FINAL_AURAS.frozen),
+      mark(FINAL_AURAS.skyMark),
+      { ...mark(FINAL_AURAS.bladeMark), value: 1 },
     ];
     const kinds: string[] = [];
     for (let i = all.length; i > 0; i--) {
       const v = buildFinalAlertView({ auras: all.slice(0, i) });
       kinds.push(v.visible ? v.kind : 'none');
     }
-    expect(kinds).toEqual(['frozen', 'ember', 'drawn', 'freezing', 'crushed']);
-    expect(
-      buildFinalAlertView({ auras: [{ id: FINAL_AURAS.cold, value: 0, value2: -1 }] }).visible,
-    ).toBe(false);
+    expect(kinds).toEqual(['blade', 'sky', 'ember', 'drawn', 'crushed']);
+    // Locked, the blade says step off.
+    const locked = buildFinalAlertView({ auras: [{ ...mark(FINAL_AURAS.bladeMark), value: 2 }] });
+    expect(locked.visible && locked.kind).toBe('bladeLocked');
+    expect(locked.visible && locked.title).toBe(t('hudChrome.finalAlert.bladeLockedTitle'));
     expect(buildFinalAlertView({ auras: all, dead: true }).visible).toBe(false);
   });
 });

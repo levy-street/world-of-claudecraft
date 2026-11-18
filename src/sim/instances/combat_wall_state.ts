@@ -113,6 +113,12 @@ export const COMBAT_WALL_SHAPES: Readonly<Record<string, CombatWallShape>> = {
   sh_quench_blade_wake: { hw: 1.3, hd: 1.3, height: 12, round: true, ownLook: true },
   sh_quench_blade_float: { hw: 1.3, hd: 1.3, height: 12, round: true, ownLook: true },
   sh_quench_rim: { hw: 4.4, hd: 0.7, height: 3.2, ownLook: true },
+  // The Masterless Strength's Hammer star (encounters/smith_heart/
+  // final_pillars.ts): the pillars Wake the Stone raises on the Anvil of the
+  // World, plain or Storm-Charged; a council risen pillar's size
+  // (FINAL_TUNING.pillarR).
+  sh_final_pillar_plain: { hw: 2.2, hd: 2.2, height: 10, round: true, ownLook: true },
+  sh_final_pillar_charged: { hw: 2.2, hd: 2.2, height: 10, round: true, ownLook: true },
 };
 
 /** The soul pillars' rows: `sh_council_soul_<role>_<c|r>_<pips>`. */

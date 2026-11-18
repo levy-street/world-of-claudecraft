@@ -25772,15 +25772,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_final_leaping_bolt': '跳ねる雷撃',
   'abilityUi.cast.heart_final_anvil': '金床の重み',
   'hudChrome.auraEffect.finalBoss.stateHeat':
-    '熱を飲む：玄武岩の拳がプレイヤーの立つ場所を打ち砕き、そこから溶岩のうねりが三方へ広がり、炎の旋風が床を横切る。ヒロイックでは燠火の印が遠隔のプレイヤーの足元に炎を落とし、ミシックでは正面攻撃が炉の火を残す。',
+    '熱を飲む：玄武岩の拳がプレイヤーの立つ場所を打ち砕き、そこから溶岩のうねりが三方へ広がる。その星、炎の旋風が目覚めて戦闘終了まで続く：そびえ立つ炎の柱が床を駆け抜ける。ヒロイックでは燠火の印が遠隔のプレイヤーの足元に炎を落とし、ミシックでは正面攻撃が炉の火を残す。',
   'hudChrome.auraEffect.finalBoss.stateQuench':
-    '焼き入れを飲む：{reach}ヤード以内に他のプレイヤーが{allies}人未満の者は冷え続け、凍りつく。ヒロイックでは印を受けたプレイヤーの足元の氷が割れ、ミシックでは正面攻撃が移動速度を{slow}%下げる。',
+    '焼き入れを飲む。その星、交差する刃が目覚めて戦闘終了まで続く：氷の剣が印を受けたプレイヤーを貫く線を薙ぎ払い、線上の柱をすべて砕く。ヒロイックでは印を受けたプレイヤーの足元の氷が割れ、ミシックでは正面攻撃が移動速度を{slow}%下げる。',
   'hudChrome.auraEffect.finalBoss.stateBreath':
-    '息吹を飲む：強風がレイドを縁へ押しやり、跳ねる雷撃が互いに{jump}ヤード以内にいるプレイヤーの間を跳ぶ。ヒロイックでは招雷がプレイヤーに印をつけ、ミシックでは嵐の宝珠をそれぞれ1人で取らねばならない。',
+    '息吹を飲む：跳ねる雷撃が互いに{jump}ヤード以内にいるプレイヤーの間を跳ぶ。その星、天の一撃が目覚めて戦闘終了まで続く：雷がプレイヤーの足元に落ち、柱のそばに落ちた雷は柱の周りに弧を描いて柱を帯電させる。ヒロイックでは招雷がプレイヤーに印をつけ、ミシックでは嵐の宝珠をそれぞれ1人で取らねばならない。',
   'hudChrome.auraEffect.finalBoss.stateHammer':
-    '槌を飲む：震えの亀裂がプレイヤーの足元で噴き出し、金床の重みが印の中にいる全員に打撃を分け合わせる。ヒロイックでは石の殻が回復を吸収し、金床を分け合った者は押し潰される。ミシックでは金床の印がボスの周りを回る。',
+    '槌を飲む：震えの亀裂がプレイヤーの足元で噴き出す。その星、石の目覚めが目覚めて戦闘終了まで続く：柱が床から突き出し、交差する刃に砕かれるまで残り続ける。ヒロイックでは石の殻が回復を吸収する。',
   'hudChrome.auraEffect.finalBoss.stateRing':
-    '中央の円環ではどの区画も飲まない。体力{pct}%を超えている間、そこで毎秒「解き放たれし心」が1つ増える。',
+    '中央の円環ではどの区画も飲まない：目覚めた星はすべて{pace}%の速さで動く。体力{pct}%を超えている間、そこで毎秒「解き放たれし心」が1つ増える。',
   'hudChrome.auraEffect.finalBoss.overloadHeat':
     '熱の過負荷、{value}%。ボスが熱の区画に立つ間に溜まり（空から満タンまで{fill}秒）、{every}秒ごとにレイドへ脈動ダメージを与える：空で{min}、満タンで最大{max}。満タン間近になるとレイドに警告する。満タンになると破裂してレイド全体にダメージを与え、空になる：ノーマルで{normalMin}～{normalMax}（回復で耐えられる）、ヒロイックで{heroicMin}～{heroicMax}（重い：回復して防御スキルを使う）、ミシックで{mythicMin}～{mythicMax}（致命的：強力な個人防御スキルがなければ生き残れない）。区画を離れると3分の1の速さで減っていく。脈動のダメージはヒロイックで{heroicPulseMin}から{heroicPulseMax}、ミシックで{mythicPulseMin}から{mythicPulseMax}。',
   'hudChrome.auraEffect.finalBoss.overloadQuench':
@@ -25795,16 +25795,20 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'スタック1つごとに毎秒レイド全体へ{per}のダメージ（現在{total}）。中央の円環に立つ間、毎秒スタックが増える。円環から引きずり出せば終わる。ヒロイック：1スタックごとに{heroicPer}。ミシック：1スタックごとに{mythicPer}。',
   'hudChrome.auraEffect.finalBoss.shaken':
     'この効果の間、区画の切り替えで受けるダメージが{mult}倍になる（{baseMin}～{baseMax}ではなく{min}～{max}）。切り替えのたびに{seconds}秒に更新される。ヒロイック：{heroicMin}から{heroicMax}のダメージ。ミシック：{mythicMin}から{mythicMax}のダメージ。',
-  'hudChrome.auraEffect.finalBoss.cold':
-    '冷気{value}/100。{reach}ヤード以内に他のプレイヤーが{allies}人未満の間は毎秒{rise}上がり、そろえば下がる。100で霜に閉ざされ、{freeze}秒間スタンし、{min}～{max}の冷気ダメージを受ける。ヒロイック：{heroicMin}から{heroicMax}のダメージ。ミシック：{mythicMin}から{mythicMax}のダメージ。',
-  'hudChrome.auraEffect.finalBoss.frozen':
-    'スタン中。一人で立っていたため凍りついた：焼き入れを飲んでいる間は、{allies}人以上の他のプレイヤーの{reach}ヤード以内にいること。',
+  'hudChrome.auraEffect.finalBoss.skyMark':
+    '{seconds}秒後、あなたの立つ場所に雷が落ちる：{radius}ヤード以内の全員に{min}～{max}の自然ダメージ。その場を離れること。柱から{arcReach}ヤード以内に落ちた雷は柱の周りに弧を描き、柱を嵐に帯電させる。ヒロイック：{heroicMin}から{heroicMax}のダメージ。ミシック：{mythicMin}から{mythicMax}のダメージ。',
+  'hudChrome.auraEffect.finalBoss.bladeMark':
+    '交差する刃があなたを貫く線を狙っている：線はあなたを追い、飛ぶ{lock}秒前に固定される。線を柱に通して砕き、それから線から離れること。線上の全員が{min}～{max}の冷気ダメージを受ける。ヒロイック：{heroicMin}から{heroicMax}のダメージ。ミシック：{mythicMin}から{mythicMax}のダメージ。',
+  'hudChrome.finalAlert.bladeTitle':
+    '交差する刃：導け',
+  'hudChrome.finalAlert.bladeLockedTitle':
+    '刃が固定：離れろ！',
+  'hudChrome.finalAlert.skyTitle':
+    '天の一撃があなたに！',
   'hudChrome.auraEffect.finalBoss.underIce': 'スタン中：割れた氷から落ちた。',
   'hudChrome.auraEffect.finalBoss.numbing': '正面攻撃により、{seconds}秒間移動速度が{pct}%低下。',
   'hudChrome.auraEffect.finalBoss.ember':
     '{seconds}秒後、足元に燠火が落ち、半径{radius}ヤードの溜まりとして{life}秒間くすぶり、中にいる者に毎秒{min}～{max}の火炎ダメージを与える。印を受けた他のプレイヤーと同じ隅に集まり、それから離れよ。ヒロイック：{heroicMin}から{heroicMax}のダメージ。ミシック：{mythicMin}から{mythicMax}のダメージ。',
-  'hudChrome.auraEffect.finalBoss.wind':
-    '強風が吹く方向へ毎秒{speed}ヤード押し流される。風に向かって歩けば踏みとどまれる（詠唱は中断されない）。吹いている間、縁から{band}ヤード以内にいると毎秒{min}～{max}の自然ダメージを受ける。ヒロイック：{heroicMin}から{heroicMax}のダメージ。ミシック：{mythicMin}から{mythicMax}のダメージ。',
   'hudChrome.auraEffect.finalBoss.drawn':
     '{seconds}秒間、毎秒あなたから{reach}ヤード以内の他の全プレイヤーへ雷が跳び、それぞれに{min}～{max}の自然ダメージを与える。全員から{reach}ヤード離れよ。ヒロイック：{heroicMin}から{heroicMax}のダメージ。ミシック：{mythicMin}から{mythicMax}のダメージ。',
   'hudChrome.auraEffect.finalBoss.shell': '次に受ける回復{value}を吸収する。',
@@ -25847,17 +25851,17 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.finalBoss.unmade':
     '{every}秒ごとに金床の区画がまるごと崩れ落ちる。オーバーロードのバーが最も満ちていた区画から順に、{warn}秒のひび割れの警告の後に落ちる。その上に立つ者は落ちて死ぬ。最後の区画の{ring}秒後に中央の環が砕け、全員が死ぬ。',
   'hudChrome.auraEffect.finalBoss.phaseFinal':
-    '四つの区画すべてが目覚めた：中央の円環に留まり、炎の旋風、軋む氷、跳ねる雷撃、金床の重みを{every}秒ごとに1つずつ順に放つ。{enrage}秒後、あらゆる抑えを失う（主なき憤怒）。',
+    '四つの区画すべてが目覚めた：中央の円環に留まり、四つの星すべてが{pace}%の速さで同時に動く。柱、雷、刃、旋風が一斉に襲う。{enrage}秒後、あらゆる抑えを失う（主なき憤怒）。',
   'hudChrome.auraEffect.finalBoss.shield':
     '集めし剛力：あらゆるダメージを受けず、対象にもできない。',
   'hudChrome.auraEffect.finalBoss.pouredHeat':
-    '熱が注ぎ込まれた：戦闘終了まで、どこにいても{every}秒ごとに炎の旋風を起こす（{times}回注がれた）。',
+    '熱が注ぎ込まれた：戦闘終了まで、どこにいても{every}秒ごとに炎の旋風が起こる。',
   'hudChrome.auraEffect.finalBoss.pouredQuench':
-    '焼き入れが注ぎ込まれた：戦闘終了まで、{reach}ヤード以内に他のプレイヤーが{allies}人未満の者はどこでも冷え続ける。速さは焼き入れの区画の{share}%（{times}回注がれた）。',
+    '焼き入れが注ぎ込まれた：戦闘終了まで、どこにいても{every}秒ごとに交差する刃が部屋を薙ぎ払う。',
   'hudChrome.auraEffect.finalBoss.pouredBreath':
-    '息吹が注ぎ込まれた：戦闘終了まで、どこにいても{every}秒ごとに跳ねる雷撃を放ち、互いに{jump}ヤード以内のプレイヤーの間を跳ぶ（{times}回注がれた）。',
+    '息吹が注ぎ込まれた：戦闘終了まで、どこにいても{every}秒ごとに天の一撃が落ちる。',
   'hudChrome.auraEffect.finalBoss.pouredHammer':
-    '槌が注ぎ込まれた：戦闘終了まで、どこにいても{every}秒ごとにプレイヤーの足元で震えの亀裂が噴き出す（{times}回注がれた）。',
+    '槌が注ぎ込まれた：戦闘終了まで、どこにいても{every}秒ごとに柱が突き出す。',
   'hudChrome.auraEffect.finalBoss.fury':
     '主なき憤怒：{every}秒ごとにレイド全体へ{min}～{max}のダメージを与え、脈動のたびに{rise}%ずつ強くなる。今すぐ倒せ。ヒロイック：{heroicMin}から{heroicMax}のダメージ。ミシック：{mythicMin}から{mythicMax}のダメージ。',
   'hudChrome.auraEffect.finalBoss.coal':

@@ -1731,6 +1731,10 @@ const baseEnTable = {
   'mechanic.heartTremorCrack': 'Tremor Crack',
   'mechanic.heartWeightOfTheAnvil': 'Weight of the Anvil',
   'aura.heartStoneShell': 'Stone Shell',
+  // The rework of 2026-11-18: its stars' interactions (the stars' own names
+  // are the guardians' keys).
+  'mechanic.heartArcingStone': 'Arcing Stone',
+  'mechanic.heartStormCharged': 'Storm-Charged',
   // Its part 2 (final_phase_ids.ts FINAL_PHASE_NAMES; Cinder Trail and Storm
   // Orb are the raid's own keys).
   'aura.heartCallOfTheQuarters': 'Call of the Quarters',
@@ -27277,6 +27281,8 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Tremor Crack': 'mechanic.heartTremorCrack',
   'Weight of the Anvil': 'mechanic.heartWeightOfTheAnvil',
   'Stone Shell': 'aura.heartStoneShell',
+  'Arcing Stone': 'mechanic.heartArcingStone',
+  'Storm-Charged': 'mechanic.heartStormCharged',
   'Call of the Quarters': 'aura.heartCallOfTheQuarters',
   'Gathered Strength': 'aura.heartGatheredStrength',
   'Splintered Strength': 'mechanic.heartSplinteredStrength',
