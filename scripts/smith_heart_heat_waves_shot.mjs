@@ -337,6 +337,18 @@ try {
       await shoot('06_cenital_dos_anillos');
       await freeze(false);
     },
+    // The Wheel of the Hearth on Normal in phase 1 (every tier since the
+    // rework): three slices red, the safe one cool.
+    async '07_rueda_normal'() {
+      await freeze(false);
+      await chat('/dev heart heat reset', 800);
+      await chat(`/dev heart heat heroic ${HEROIC ? 'on' : 'off'}`, 300);
+      await chat('/dev heart heat phase 1', 600);
+      await chat('/dev heart heat wheel', 1800);
+      await place([-190, 6], [-220, 0], 0, 0.6, 30);
+      await sleep(1200);
+      await shoot('07_rueda_normal');
+    },
     // A video's frames: the raid at the shore, two rings rolling past.
     async v01_olas() {
       if (!FRAMES) return;
