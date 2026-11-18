@@ -384,13 +384,15 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     anvilMissMin: 1000,
     anvilMissMax: 1100,
     anvilTotal: 5600,
-    pillarCount: 2,
+    // One a volley on Normal (two until the bot raids of 2026-11-18: the
+    // walls crowded the Hammer's soak).
+    pillarCount: 1,
     pillarCap: 8,
     thrumMin: 330,
     thrumMax: 370,
     chargedMin: 34,
     chargedMax: 40,
-    skyMarks: 2,
+    skyMarks: 1,
     skyPillarSpots: 1,
     bladeMarks: 1,
     bladeAim: 4,
