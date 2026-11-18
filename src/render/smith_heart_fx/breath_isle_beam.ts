@@ -20,6 +20,8 @@ export interface IsleBeamHost {
 }
 
 const _p = { x: 0, y: 0, z: 0 };
+/** The arc's points as laid (x, y, z per step), reused. */
+const _pts = new Float32Array((STEPS + 1) * 3);
 
 export class IsleBeam {
   readonly mesh: THREE.Mesh;
@@ -108,11 +110,46 @@ export class IsleBeam {
     const n = STEPS + 1;
     for (let i = 0; i <= STEPS; i++) {
       const p = IsleBeam.point(a, b, i / STEPS, lift, wob, t);
+      _pts[i * 3] = p.x;
+      _pts[i * 3 + 1] = p.y;
+      _pts[i * 3 + 2] = p.z;
+    }
+    for (let i = 0; i <= STEPS; i++) {
+      // The two strips stand across the arc's own direction here (a steep
+      // stretch, two bodies close together, never collapses into a slab).
+      const i0 = Math.max(0, i - 1) * 3;
+      const i1 = Math.min(STEPS, i + 1) * 3;
+      const tx = _pts[i1] - _pts[i0];
+      const ty = _pts[i1 + 1] - _pts[i0 + 1];
+      const tz = _pts[i1 + 2] - _pts[i0 + 2];
+      const tl = Math.hypot(tx, ty, tz) || 1;
+      // Across: level and square to the arc (tangent x up), else the chord's.
+      let sx = -tz;
+      let sz = tx;
+      let sl = Math.hypot(sx, sz);
+      if (sl < 1e-4 * tl) {
+        sx = ax;
+        sz = az;
+        sl = 1;
+      }
+      sx /= sl;
+      sz /= sl;
+      // Up: square to both (across x tangent).
+      let ux = (sz * ty) / tl;
+      let uy = (-sz * tx + sx * tz) / tl;
+      let uz = (-sx * ty) / tl;
+      const ul = Math.hypot(ux, uy, uz) || 1;
+      ux /= ul;
+      uy /= ul;
+      uz /= ul;
       const w = half * (1 - 0.3 * (i / STEPS));
-      this.pos.setXYZ(i * 2, p.x, p.y - w, p.z);
-      this.pos.setXYZ(i * 2 + 1, p.x, p.y + w, p.z);
-      this.pos.setXYZ(n * 2 + i * 2, p.x - ax * w, p.y, p.z - az * w);
-      this.pos.setXYZ(n * 2 + i * 2 + 1, p.x + ax * w, p.y, p.z + az * w);
+      const px = _pts[i * 3];
+      const py = _pts[i * 3 + 1];
+      const pz = _pts[i * 3 + 2];
+      this.pos.setXYZ(i * 2, px - ux * w, py - uy * w, pz - uz * w);
+      this.pos.setXYZ(i * 2 + 1, px + ux * w, py + uy * w, pz + uz * w);
+      this.pos.setXYZ(n * 2 + i * 2, px - sx * w, py, pz - sz * w);
+      this.pos.setXYZ(n * 2 + i * 2 + 1, px + sx * w, py, pz + sz * w);
     }
     this.pos.needsUpdate = true;
     this.mesh.visible = true;

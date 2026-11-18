@@ -91,10 +91,14 @@ void main() {
   // Lightning veins: thin ridges of a second noise, re-struck in steps.
   float v = abs(pfbm3(p * 4.0 + vec3(floor(t * 6.0) * 1.7, 0.0, t * 0.2)) - 0.5);
   float vein = (1.0 - smoothstep(0.0, 0.018 + 0.02 * uCharge, v));
-  float k = (rim * 1.4 + band * 0.35 + vein * (0.7 + 1.6 * uCharge)) * uGlow * (0.8 + 0.4 * uThrob);
+  // As it gathers the soft bands give way to the veins (a pale wash read as
+  // weak at full charge): saturated storm light, white only in the veins'
+  // hearts, a hard bright rim.
+  float k = (rim * 1.4 + band * 0.35 * (1.0 - 0.7 * uCharge) + vein * (0.7 + 1.9 * uCharge)) * uGlow * (0.8 + 0.4 * uThrob);
   vec3 base = mix(uColor, uHot, uHotK);
-  vec3 col = mix(base, uCore, clamp(vein * 0.8 + rim * 0.2, 0.0, 1.0));
-  gl_FragColor = vec4(col * (1.0 + 0.4 * k), clamp(k * 0.8, 0.0, 1.0) * uFade);
+  float hotVein = vein * (1.0 - smoothstep(0.0, 0.012, v));
+  vec3 col = mix(base * (1.0 + 0.6 * uCharge), uCore, clamp(hotVein * 0.9 + rim * 0.15, 0.0, 1.0));
+  gl_FragColor = vec4(col * (1.0 + 0.25 * k), clamp(k * mix(0.8, 0.6, uCharge), 0.0, 0.92) * uFade);
   #include <colorspace_fragment>
 }
 `;
@@ -137,13 +141,15 @@ void main() {
   float thin = smoothstep(0.62 - 0.25 * uCharge, 0.9 - 0.15 * uCharge, gap);
   float bands = abs(cloud2 - 0.5) * 2.0;
   float heart = pow(clamp(facing, 0.0, 1.0), 3.0) * smoothstep(0.2, 1.0, uCharge) * smoothstep(0.15, 0.6, bands);
-  float light = clamp(thin * (0.35 + 0.45 * facing) + heart * (0.4 + 0.25 * uThrob), 0.0, 0.7);
+  float light = clamp(thin * (0.35 + 0.45 * facing) * (1.0 - 0.35 * uCharge) + heart * (0.45 + 0.35 * uThrob), 0.0, 0.75);
   // The rim catches the storm's light (the ball's edge stays read).
   float rim = pow(clamp(1.0 - facing, 0.0, 1.0), 2.5);
-  vec3 lit = mix(mix(uColor, uHot, uHotK), uCore, heart * 0.6);
-  vec3 col = mix(uStorm * (0.45 + 0.9 * cloud * cloud2 * 1.6), lit * (1.05 + uThrob * 0.3), light);
+  // Menace as it gathers: the storm darkens round a saturated, throbbing light.
+  vec3 lit = mix(mix(uColor, uHot, uHotK) * (1.0 + 0.5 * uCharge), uCore, heart * 0.4);
+  vec3 storm = uStorm * (0.45 + 0.9 * cloud * cloud2 * 1.6) * (1.0 - 0.5 * uCharge);
+  vec3 col = mix(storm, lit * (1.1 + uThrob * 0.45), light);
   col += mix(uColor, uHot, uHotK) * rim * (0.35 + 0.4 * uCharge);
-  float a = mix(0.92, 0.75, uCharge);
+  float a = mix(0.92, 0.88, uCharge);
   gl_FragColor = vec4(col, a * uFade);
   #include <colorspace_fragment>
 }
@@ -448,8 +454,14 @@ void main() {
   float filled = 1.0 - smoothstep(uFill - 0.01, uFill + 0.01, vUv.y);
   float front = (1.0 - smoothstep(0.0, 0.025, abs(vUv.y - uFill))) * step(0.02, uFill);
   float chevron = smoothstep(0.6, 0.95, fract(vUv.y * 9.0 - across * 0.35 - uTime * 1.6));
-  float k = ((streak * 0.9 + fine * 0.6 + chevron * 0.35) * (0.25 + 0.75 * filled) + front * 1.4) * side * uGlow;
-  vec3 col = mix(uColor, vec3(1.0), clamp(fine + front, 0.0, 1.0));
+  // Read from straight above too: a saturated body of wind down the whole
+  // lane (stronger where the bar has filled), bright rails along both sides.
+  float rails = smoothstep(0.82, 0.93, across) * (1.0 - smoothstep(0.96, 1.0, across));
+  float body = (0.3 + 0.5 * filled) * side;
+  float k = ((streak * 0.9 + fine * 0.6 + chevron * 0.6) * (0.3 + 0.7 * filled) + front * 1.6) * side;
+  k = (k + body * 0.55 + rails * (0.9 + 0.5 * filled)) * uGlow;
+  vec3 wind = mix(vec3(0.3, 0.72, 1.0), uColor, 0.35);
+  vec3 col = mix(wind, vec3(1.0), clamp(fine * 0.6 + front + rails * 0.7, 0.0, 1.0));
   gl_FragColor = vec4(col * (1.0 + 0.4 * k), clamp(k, 0.0, 0.95));
   #include <colorspace_fragment>
 }

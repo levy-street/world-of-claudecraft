@@ -35,7 +35,7 @@ export const PHASE_COLORS = {
   cocoonEdge: 0xffffff,
   nova: 0x9fe6ff,
   novaCore: 0xffffff,
-  novaHot: 0xc9a2ff,
+  novaHot: 0x8f3dff,
   storm: 0x241e3a,
   calm: 0xcfefff,
   angry: 0x9b3dff,
@@ -245,7 +245,9 @@ export function shardAt(
   out.z = Math.cos(a) * (r0 + speed * t);
   out.y = h0 + up * speed * t - 0.5 * SHARDS.gravity * t * t;
   out.spin = t * (3 + phaseHash(j, 711) * 7);
-  out.size = (j % 2 === 0 ? 0.09 : 0.07) + phaseHash(j, 713) * 0.08;
+  // Splinters and chips against the guardian's size, never boulders (the
+  // cocoon's radius scales them: a 0.17 share flew yard-and-a-half rocks).
+  out.size = j % 2 === 0 ? 0.05 + phaseHash(j, 713) * 0.05 : 0.03 + phaseHash(j, 713) * 0.035;
   out.life = t >= SHARDS.seconds ? 0 : 1 - (t / SHARDS.seconds) ** 3;
   return out;
 }

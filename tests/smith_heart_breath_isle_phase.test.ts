@@ -17,6 +17,7 @@ import {
   novaHumGain,
 } from '../src/game/smith_heart_breath_audio_core';
 import { BreathFightFx } from '../src/render/smith_heart_fx/breath_fight_fx';
+import { beamHalf, beamLift } from '../src/render/smith_heart_fx/breath_isle_adds_fx';
 import {
   CLOSING_MIN,
   COCOON_ENDS,
@@ -131,6 +132,19 @@ describe('breath_isle_phase_core: the cocoon and the nova', () => {
     expect(endLook(0, true).sky).toBeGreaterThan(0.5);
   });
 
+  it('bows Mending Gale low and slim between bodies side by side, high only across the isle', () => {
+    // Shoulder to shoulder: a low bow, never the tall loop of a fixed lift.
+    expect(beamLift(1)).toBeLessThan(1.5);
+    expect(beamHalf(1)).toBeLessThan(0.6);
+    // Across the isle: the high arch, capped.
+    expect(beamLift(12)).toBe(7);
+    expect(beamHalf(12)).toBe(1.25);
+    for (let d = 0; d < 20; d += 0.5) {
+      expect(beamLift(d + 0.5)).toBeGreaterThanOrEqual(beamLift(d));
+      expect(beamHalf(d + 0.5)).toBeGreaterThanOrEqual(beamHalf(d));
+    }
+  });
+
   it("flings the shatter's shards on falling arcs and races a ring over the floor", () => {
     const o = { x: 0, y: 0, z: 0, spin: 0, size: 0, life: 0 };
     for (let j = 0; j < SHARDS.count; j++) {
@@ -142,6 +156,9 @@ describe('breath_isle_phase_core: the cocoon and the nova', () => {
       for (let t = 0; t < SHARDS.seconds; t += 0.05) peak = Math.max(peak, shardAt(j, t, o).y);
       expect(shardAt(j, SHARDS.seconds - 0.01, o).y).toBeLessThan(peak - 1);
       expect(shardAt(j, SHARDS.seconds, o).life).toBe(0);
+      // Splinters and chips, never boulders (sizes are cocoon radii).
+      expect(a.size).toBeGreaterThan(0);
+      expect(a.size).toBeLessThanOrEqual(j % 2 === 0 ? 0.1 : 0.065);
     }
     // A fast ring: it reaches its end in its seconds and fades out.
     expect(endRing(END_RING.blast.seconds, true).r).toBeCloseTo(END_RING.blast.reach, 6);

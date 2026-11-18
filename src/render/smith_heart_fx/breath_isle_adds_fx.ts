@@ -94,10 +94,16 @@ interface BeamSlot {
 
 const WARD_STONES = 7;
 
-/** A Mending Gale's arch over the yards between its ends: high enough to
- *  read over two bodies standing side by side, never a wall over the isle. */
-function beamLift(d: number): number {
-  return Math.min(7, 4.5 + d * 0.2);
+/** A Mending Gale's arch over the yards between its ends: a gentle bow
+ *  between two bodies side by side (a fixed 4.5 yd lift stood the beam up
+ *  as a tall loop there), up to a high arch across the isle. */
+export function beamLift(d: number): number {
+  return Math.min(7, 0.4 + d * 0.75);
+}
+
+/** The beam's half width at its start: slim between bodies close together. */
+export function beamHalf(d: number): number {
+  return Math.min(1.25, 0.35 + d * 0.18);
 }
 const MEND_RGB = phaseRgb(0xd8fff2);
 const GRIT_RGB = [0.5, 0.52, 0.58] as const;
@@ -450,7 +456,7 @@ export class BreathIsleAddsFx {
         continue;
       }
       const d = Math.hypot(_to.x - _from.x, _to.z - _from.z);
-      b.beam.lay(_from, _to, 1.25, beamLift(d), 0.3, t);
+      b.beam.lay(_from, _to, beamHalf(d), beamLift(d), 0.3 * Math.min(1, d / 4), t);
       if (cutLook) b.beam.paint(1.6 * cutLook.glow, cutLook.cut);
       else b.beam.paint((b.live ? 2 + 0.4 * Math.sin(t * 11) : 0) + b.flare * 2.4, 0);
       // The mint wind gathering in the Mender's raised hands.
