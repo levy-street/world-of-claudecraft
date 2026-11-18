@@ -71,7 +71,7 @@ void main() {
     vec3 sheet = mix(vec3(0.08, 0.26, 0.42), vec3(0.36, 0.72, 0.92), 0.35 * frost + 0.45 * soft);
     sheet = mix(sheet, vec3(0.66, 0.88, 1.0), 0.4 * rime + 0.25 * mist);
     vec3 cool = mix(sheet, vec3(0.86, 0.97, 1.0), clamp(hard, 0.0, 1.0));
-    float ca = max(hard * 0.98, 0.42 + 0.14 * soft + 0.1 * mist + 0.04 * breathe);
+    float ca = max(hard * 0.98, 0.5 + 0.08 * soft + 0.06 * mist + 0.03 * breathe);
     gl_FragColor = vec4(cool * (1.0 + 0.5 * clamp(hard, 0.0, 1.0)), clamp(ca, 0.0, 0.97));
     #include <colorspace_fragment>
     return;

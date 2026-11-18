@@ -20,9 +20,12 @@ import type {
 const src = (p: string) => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');
 
 describe('Smith Heart readability: the Wheel of the Hearth', () => {
-  const fx = src('src/render/smith_heart_fx/heat_fight_fx.ts');
-  const at = fx.indexOf('const WHEEL_FRAG');
-  const wheel = fx.slice(at, fx.indexOf('/** A flare', at));
+  // The slices' painter and their floor shader (heat_wheel_fx.ts and
+  // heat_wheel_glsl.ts since the polish pass of 2026-11-18).
+  const fx = src('src/render/smith_heart_fx/heat_wheel_fx.ts');
+  const glsl = src('src/render/smith_heart_fx/heat_wheel_glsl.ts');
+  const at = glsl.indexOf('export function wheelFloorFrag');
+  const wheel = glsl.slice(at, glsl.indexOf('const VENT_NOISE', at));
 
   it('draws the safe slice as its own cool sheet, rimmed in cold light', () => {
     expect(wheel).toMatch(/uniform float uSafe;/);
@@ -37,11 +40,11 @@ describe('Smith Heart readability: the Wheel of the Hearth', () => {
       expect(b).toBeGreaterThan(g * 0.95);
     }
     // Opaque enough to read over a glowing floor from any height.
-    expect(safe).toMatch(/max\(rims \* 0\.98, 0\.5/);
+    expect(safe).toMatch(/max\(hard \* 0\.98, 0\.5/);
   });
 
   it('washes the red slices in the lethal crimson, the painter marking the safe one', () => {
-    expect(fx).toMatch(/setHex\(safe \? WHEEL_SAFE_RIM : TELEGRAPH_THREAT_COLORS\.lethal\)/);
+    expect(fx).toMatch(/setHex\(safe \? SAFE_RIM : TELEGRAPH_THREAT_COLORS\.lethal\)/);
     expect(fx).toMatch(/u\.uSafe\.value = safe \? 1 : 0;/);
     expect(fx).toMatch(/uSafe: \{ value: 0 \}/);
   });
