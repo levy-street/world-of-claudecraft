@@ -1193,6 +1193,9 @@ async function startGame(
   // sim, so a stored player preference must be re-pushed on every world entry
   // (offline sim or online server), not just when the Options toggle changes.
   world.setStopAutoAttackOnTargetSwitch(settings.get('stopAutoAttackOnTargetSwitch'));
+  // "Tab Target Priority" is authoritative on the sim too: re-push it on every
+  // world entry, the same way.
+  world.setTabTargetPriority(settings.get('tabTargetPriority') >= 1 ? 'facing' : 'nearest');
   // First-run graphics default: until a device default has been applied (the dedicated
   // graphicsDefaultApplied marker, NOT the graphicsPreset key, which save() def-fills the moment
   // any unrelated setting is stored), probe the device (GPU name, memory, cores, touch) and
@@ -2334,6 +2337,13 @@ async function startGame(
       // No live subsystem to update: the HUD reads these settings at ability-cast
       // time (see hud.castSlot). Persist the choice and we are done.
       settings.set(key, !!value);
+      return;
+    }
+    if (key === 'tabTargetPriority') {
+      // Authoritative on the sim: persist locally AND mirror the live value onto
+      // the player, so the very next Tab press honors it.
+      const v = settings.set('tabTargetPriority', Number(value) >= 1 ? 1 : 0);
+      world.setTabTargetPriority(v >= 1 ? 'facing' : 'nearest');
       return;
     }
     if (key === 'stopAutoAttackOnTargetSwitch') {

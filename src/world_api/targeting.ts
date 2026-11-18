@@ -13,4 +13,8 @@ export interface IWorldTargeting {
   // preference toggle wired like any other player setting, not a client-only
   // decision.
   setStopAutoAttackOnTargetSwitch(enabled: boolean): void;
+  // Mirrors the client's "Tab Target Priority" setting onto the authoritative
+  // sim (src/sim/tab_target.ts TabPriority): 'nearest' cycles the closest
+  // enemy in a tier first, 'facing' the one closest to straight ahead.
+  setTabTargetPriority(priority: 'nearest' | 'facing'): void;
 }

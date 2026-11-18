@@ -1009,6 +1009,11 @@ export const COMMAND_NAMES = [
   'guild_buy_cosmetic',
   // Say trick or treat to an NPC (IWorldSeasonal.trickOrTreat; src/sim/seasonal/).
   'trick_or_treat',
+  // "Tab Target Priority" QoL preference: mirrors the client setting onto the
+  // authoritative Targeting slice (Sim.setTabTargetPriority via
+  // src/sim/targeting.ts). Appended at the END because wire tokens are never
+  // reordered.
+  'tabTargetPriority',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -1144,6 +1149,7 @@ export const COMMAND_FACETS = {
   targetNearestFriendly: 'IWorldTargeting',
   tabFriendly: 'IWorldTargeting',
   stopAutoAttackOnTargetSwitch: 'IWorldTargeting',
+  tabTargetPriority: 'IWorldTargeting',
   // IWorldLoot: need-greed roll submit.
   lootRoll: 'IWorldLoot',
   // IWorldInventory: non-fungible Rift gear progression. These mutate the

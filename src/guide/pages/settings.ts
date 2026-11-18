@@ -433,6 +433,10 @@ const INTERFACE_TABS: InterfaceTabBlock[] = [
         body: 'guide.settingsPage.ifStopAutoAttack',
       },
       {
+        setting: 'hudChrome.options.tabTargetPriority',
+        body: 'guide.settingsPage.ifTabTargetPriority',
+      },
+      {
         setting: 'hudChrome.options.showAttackButton',
         body: 'guide.settingsPage.ifShowAttackButton',
       },

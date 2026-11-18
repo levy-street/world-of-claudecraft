@@ -31,7 +31,14 @@ import { gmHiddenFrom } from './gm_presence';
 import { isBuddyMob } from './pet/buddy_ai';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import { orderTabTargets, stepTabTarget, TAB_QUERY_RADIUS, type TabStep } from './tab_target';
+import {
+  orderTabTargets,
+  stepTabTarget,
+  TAB_QUERY_RADIUS,
+  type TabPriority,
+  type TabStep,
+  tabIdleRadiusFor,
+} from './tab_target';
 import type { Entity } from './types';
 
 export class Targeting {
@@ -56,6 +63,28 @@ export class Targeting {
     r.meta.stopAutoAttackOnTargetSwitch = enabled;
   }
 
+  // The client's "Tab Target Priority" setting, mirrored onto the authoritative
+  // PlayerMeta the same way: 'nearest' (the default) cycles the closest enemy
+  // in a tier first, 'facing' the one closest to straight ahead. Session-only.
+  setTabTargetPriority(priority: TabPriority, pid?: number): void {
+    const r = this.ctx.resolve(pid);
+    if (!r) return;
+    r.meta.tabTargetPriority = priority;
+  }
+  // Idle-mob Tab radius for this player: the longest range among the
+  // enemy-targeted abilities they know (tab_target.ts tabIdleRadiusFor), so an
+  // idle mob a 30 yd spell or a 35 yd shot reaches is tabbable. Melee-only kits
+  // keep the 20 yd floor. Reads authored ranges (no talent changes range); a
+  // pure scan of the known list, no rng.
+  private idleTabRadius(meta: PlayerMeta): number {
+    let longest = 0;
+    for (const k of meta.known) {
+      const def = k.def;
+      if (!def.requiresTarget || def.targetType === 'friendly') continue;
+      if (def.range > longest) longest = def.range;
+    }
+    return tabIdleRadiusFor(longest);
+  }
   // Whether a switch to `nextTargetId` should disengage auto-attack under the
   // player's `stopAutoAttackOnTargetSwitch` preference: only when the setting is
   // on, auto-attack is currently running, and the switch is actually a CHANGE
@@ -122,6 +151,8 @@ export class Targeting {
         isPlayer: c.e.kind === 'player',
       })),
       p.facing,
+      this.idleTabRadius(r.meta),
+      r.meta.tabTargetPriority ?? 'nearest',
     );
     if (order.ids.length === 0) return;
     const nextId = stepTabTarget(order, order.ids.indexOf(p.targetId ?? -1), step);

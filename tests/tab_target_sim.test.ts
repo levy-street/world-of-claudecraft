@@ -321,3 +321,54 @@ describe('Sim.tabTargetPrev backward cycling', () => {
     expect(p.autoAttack).toBe(false);
   });
 });
+
+describe('Sim.tabTarget idle reach follows the attack range', () => {
+  function clearWorld(sim: Sim): void {
+    const internals = sim as unknown as { dropEntity(id: number): void };
+    for (const id of [...sim.entities.keys()]) {
+      if (id !== sim.playerId) internals.dropEntity(id);
+    }
+  }
+
+  it('lets a level 20 mage Tab an idle mob at 28 yards that a melee kit cannot', () => {
+    const mage = new Sim({ seed: SEED, playerClass: 'mage', world: WORLD_WITHOUT_HUB_YARD });
+    mage.setPlayerLevel(20);
+    mage.player.facing = 0;
+    mage.rebucket(mage.player);
+    clearWorld(mage);
+    const far = spawnMob(mage, 900301, 0, 28);
+    mage.tabTarget();
+    expect(mage.player.targetId).toBe(far.id);
+
+    // A fresh level 1 warrior knows only melee attacks: the 20 yd floor holds.
+    const warrior = new Sim({ seed: SEED, playerClass: 'warrior', world: WORLD_WITHOUT_HUB_YARD });
+    warrior.player.facing = 0;
+    warrior.rebucket(warrior.player);
+    clearWorld(warrior);
+    spawnMob(warrior, 900302, 0, 28);
+    warrior.tabTarget();
+    expect(warrior.player.targetId).toBeNull();
+  });
+
+  it('cycles the mob straight ahead first once the facing priority is set', () => {
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior', world: WORLD_WITHOUT_HUB_YARD });
+    const p = sim.player;
+    p.facing = 0;
+    sim.rebucket(p);
+    clearWorld(sim);
+    // Idle and in the cone: one near but 35 degrees off, one farther dead ahead.
+    const r = (35 * Math.PI) / 180;
+    const offNear = spawnMob(sim, 900303, Math.sin(r) * 8, Math.cos(r) * 8);
+    const ahead = spawnMob(sim, 900304, 0, 16);
+
+    sim.tabTarget();
+    expect(p.targetId).toBe(offNear.id);
+
+    p.targetId = null;
+    sim.setTabTargetPriority('facing');
+    sim.tabTarget();
+    expect(p.targetId).toBe(ahead.id);
+    sim.tabTarget();
+    expect(p.targetId).toBe(offNear.id);
+  });
+});

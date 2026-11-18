@@ -4147,6 +4147,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.clickFeedback': 'クリックマーカー',
   'hudChrome.options.startAttackOnAbility': 'アビリティ使用時に自動攻撃',
   'hudChrome.options.stopAutoAttackOnTargetSwitch': 'ターゲット切り替え時に自動攻撃を停止',
+  'hudChrome.options.tabTargetPriority': 'Tab ターゲットの優先順位',
+  'hudChrome.options.tabTargetPriorityNearest': '近い順',
+  'hudChrome.options.tabTargetPriorityFacing': '正面優先',
   'hudChrome.options.walkByAutoloot': '通りがかり自動ルート',
   'hudChrome.options.lockCursorOnRotate': '回転中はカーソルを固定',
   'hudChrome.options.keybindHelpLockCursorOnRotate':
@@ -18460,6 +18463,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '何もない地面をクリックしても、現在のターゲットを解除せずに保ちます。',
   'guide.settingsPage.ifStopAutoAttack':
     'ターゲットを切り替えたときに攻撃の手を止めるかどうかです。初期設定はオフなので、攻撃は新しいターゲットへ引き継がれます。',
+  'guide.settingsPage.ifTabTargetPriority':
+    '前方の敵のうち Tab で最初に選ぶ相手です。最も近い敵（初期設定）か、最も正面に近い敵を選びます。',
   'guide.settingsPage.ifTargetFrameScale': 'ターゲットフレームの大きさです。',
   'guide.settingsPage.ifTargetOfTarget':
     'ターゲットが誰を狙っているかを表示します。タンクがまだ抱えているかを確かめる、昔ながらの手立てです。',

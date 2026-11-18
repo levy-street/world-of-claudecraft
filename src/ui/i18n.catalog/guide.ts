@@ -614,6 +614,8 @@ export const guideStrings = {
       'Whether using an ability also starts your auto-attack. On by default, and the classic behavior most players expect.',
     ifStopAutoAttack:
       'Whether switching targets stops your swing. Off by default, so your attack carries over to the new target.',
+    ifTabTargetPriority:
+      'Which enemy in front of you Tab picks first: the nearest one (the default), or the one closest to straight ahead.',
     ifShowAttackButton: 'Puts an explicit Attack button on your action bar.',
     ifWalkByAutoloot: 'Scoops the loot from your own kills as you walk past them. Off by default.',
     ifGroundReticle: 'Shows the ground circle while you are aiming a placed spell.',

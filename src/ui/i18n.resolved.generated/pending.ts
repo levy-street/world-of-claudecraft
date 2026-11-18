@@ -9,25 +9,100 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "guide.settingsPage.ifTabTargetPriority",
+    "hudChrome.options.tabTargetPriority",
+    "hudChrome.options.tabTargetPriorityFacing",
+    "hudChrome.options.tabTargetPriorityNearest"
+  ],
+  "es_ES": [
+    "guide.settingsPage.ifTabTargetPriority",
+    "hudChrome.options.tabTargetPriority",
+    "hudChrome.options.tabTargetPriorityFacing",
+    "hudChrome.options.tabTargetPriorityNearest"
+  ],
+  "fr_FR": [
+    "guide.settingsPage.ifTabTargetPriority",
+    "hudChrome.options.tabTargetPriority",
+    "hudChrome.options.tabTargetPriorityFacing",
+    "hudChrome.options.tabTargetPriorityNearest"
+  ],
+  "fr_CA": [
+    "guide.settingsPage.ifTabTargetPriority",
+    "hudChrome.options.tabTargetPriority",
+    "hudChrome.options.tabTargetPriorityFacing",
+    "hudChrome.options.tabTargetPriorityNearest"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "guide.settingsPage.ifTabTargetPriority",
+    "hudChrome.options.tabTargetPriority",
+    "hudChrome.options.tabTargetPriorityFacing",
+    "hudChrome.options.tabTargetPriorityNearest"
+  ],
+  "de_DE": [
+    "guide.settingsPage.ifTabTargetPriority",
+    "hudChrome.options.tabTargetPriority",
+    "hudChrome.options.tabTargetPriorityFacing",
+    "hudChrome.options.tabTargetPriorityNearest"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "guide.settingsPage.ifTabTargetPriority",
+    "hudChrome.options.tabTargetPriority",
+    "hudChrome.options.tabTargetPriorityFacing",
+    "hudChrome.options.tabTargetPriorityNearest"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "guide.settingsPage.ifTabTargetPriority",
+    "hudChrome.options.tabTargetPriority",
+    "hudChrome.options.tabTargetPriorityFacing",
+    "hudChrome.options.tabTargetPriorityNearest"
+  ],
+  "nl_NL": [
+    "guide.settingsPage.ifTabTargetPriority",
+    "hudChrome.options.tabTargetPriority",
+    "hudChrome.options.tabTargetPriorityFacing",
+    "hudChrome.options.tabTargetPriorityNearest"
+  ],
+  "pl_PL": [
+    "guide.settingsPage.ifTabTargetPriority",
+    "hudChrome.options.tabTargetPriority",
+    "hudChrome.options.tabTargetPriorityFacing",
+    "hudChrome.options.tabTargetPriorityNearest"
+  ],
+  "id_ID": [
+    "guide.settingsPage.ifTabTargetPriority",
+    "hudChrome.options.tabTargetPriority",
+    "hudChrome.options.tabTargetPriorityFacing",
+    "hudChrome.options.tabTargetPriorityNearest"
+  ],
+  "tr_TR": [
+    "guide.settingsPage.ifTabTargetPriority",
+    "hudChrome.options.tabTargetPriority",
+    "hudChrome.options.tabTargetPriorityFacing",
+    "hudChrome.options.tabTargetPriorityNearest"
+  ],
+  "sv_SE": [
+    "guide.settingsPage.ifTabTargetPriority",
+    "hudChrome.options.tabTargetPriority",
+    "hudChrome.options.tabTargetPriorityFacing",
+    "hudChrome.options.tabTargetPriorityNearest"
+  ],
+  "vi_VN": [
+    "guide.settingsPage.ifTabTargetPriority",
+    "hudChrome.options.tabTargetPriority",
+    "hudChrome.options.tabTargetPriorityFacing",
+    "hudChrome.options.tabTargetPriorityNearest"
+  ],
+  "da_DK": [
+    "guide.settingsPage.ifTabTargetPriority",
+    "hudChrome.options.tabTargetPriority",
+    "hudChrome.options.tabTargetPriorityFacing",
+    "hudChrome.options.tabTargetPriorityNearest"
+  ]
 };

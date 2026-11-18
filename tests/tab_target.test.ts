@@ -1,9 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import {
+  isTabPriority,
   orderTabTargets,
   stepTabTarget,
+  TAB_NEAR_RADIUS,
+  TAB_QUERY_RADIUS,
   type TabCandidate,
   type TabOrder,
+  tabConeHalfAt,
+  tabIdleRadiusFor,
 } from '../src/sim/tab_target';
 
 // Player faces +Z (facing 0): forward is (sin 0, cos 0) = (0, 1).
@@ -112,17 +117,61 @@ describe('orderTabTargets', () => {
     expect(stepTabTarget(approached, 1, 1)).toBe(closer.id);
   });
 
-  it('flares with distance: the same screen angle is out close but in far away', () => {
-    // Both enemies sit at ~50 degrees off forward (facing north, so cos = dz/d).
-    // The cone half-angle is ~48 deg at 6 yd (excludes them) but ~59 deg at 28 yd
-    // (includes them), so the near one falls back while the far one is cluster.
-    const COS50 = Math.cos((50 * Math.PI) / 180);
-    const SIN50 = Math.sin((50 * Math.PI) / 180);
-    const near: TabCandidate = { id: 1, dx: SIN50 * 6, dz: COS50 * 6, d: 6, engaged: false };
-    const far: TabCandidate = { id: 2, dx: SIN50 * 28, dz: COS50 * 28, d: 28, engaged: true };
-    const order = orderTabTargets([near, far], FACING_NORTH);
-    expect(order.ids).toEqual([2, 1]);
-    expect(order.primaryCount).toBe(1);
+  it('holds the cone at 45 degrees each side at every distance', () => {
+    for (const d of [0, 6, 15, 28, 40]) expect(tabConeHalfAt(d)).toBeCloseTo(Math.PI / 4, 12);
+    // ~50 degrees off forward is outside the cone up close AND far away (it used
+    // to flare in by 28 yd); ~40 degrees is inside at both distances.
+    const at = (id: number, deg: number, d: number): TabCandidate => {
+      const r = (deg * Math.PI) / 180;
+      return { id, dx: Math.sin(r) * d, dz: Math.cos(r) * d, d, engaged: true };
+    };
+    const order = orderTabTargets(
+      [at(1, 50, 6), at(2, 50, 28), at(3, 40, 6), at(4, 40, 28)],
+      FACING_NORTH,
+    );
+    expect(order.ids.slice(0, order.primaryCount)).toEqual([3, 4]);
+    expect(order.ids.slice(order.primaryCount)).toEqual([1, 2]);
+  });
+
+  it('admits idle enemies out to the idle radius it is given', () => {
+    const near: TabCandidate = { id: 1, dx: 0, dz: 10, d: 10, engaged: false };
+    const at28: TabCandidate = { id: 2, dx: 0, dz: 28, d: 28, engaged: false };
+    const at32: TabCandidate = { id: 3, dx: 0, dz: 32, d: 32, engaged: false };
+    // A caster's 30 yd reach admits the 28 yd mob; the 32 yd one stays out.
+    expect(orderTabTargets([near, at28, at32], FACING_NORTH, 30).ids).toEqual([1, 2]);
+    // A hunter's 35 yd reach admits both.
+    expect(orderTabTargets([near, at28, at32], FACING_NORTH, 35).ids).toEqual([1, 2, 3]);
+  });
+
+  it('cycles the enemy closest to straight ahead first under the facing priority', () => {
+    // Same tier (idle, in the cone): a near mob 35 degrees off, a farther one dead ahead.
+    const r = (35 * Math.PI) / 180;
+    const offNear: TabCandidate = {
+      id: 1,
+      dx: Math.sin(r) * 8,
+      dz: Math.cos(r) * 8,
+      d: 8,
+      engaged: false,
+    };
+    const aheadFar: TabCandidate = { id: 2, dx: 0, dz: 18, d: 18, engaged: false };
+    expect(orderTabTargets([offNear, aheadFar], FACING_NORTH).ids).toEqual([1, 2]);
+    expect(orderTabTargets([offNear, aheadFar], FACING_NORTH, 20, 'nearest').ids).toEqual([1, 2]);
+    expect(orderTabTargets([offNear, aheadFar], FACING_NORTH, 20, 'facing').ids).toEqual([2, 1]);
+  });
+
+  it('keeps tiers above the facing priority: an engaged enemy still comes first', () => {
+    const r = (40 * Math.PI) / 180;
+    const engagedOff: TabCandidate = {
+      id: 1,
+      dx: Math.sin(r) * 15,
+      dz: Math.cos(r) * 15,
+      d: 15,
+      engaged: true,
+    };
+    const idleAhead: TabCandidate = { id: 2, dx: 0, dz: 10, d: 10, engaged: false };
+    expect(orderTabTargets([idleAhead, engagedOff], FACING_NORTH, 20, 'facing').ids).toEqual([
+      1, 2,
+    ]);
   });
 
   it('keeps a distant enemy engaged with the player inside the cluster', () => {
@@ -217,5 +266,27 @@ describe('stepTabTarget', () => {
     // Backward off that head wraps within the cluster instead of returning to 9.
     expect(stepTabTarget(o, 0, -1)).toBe(8);
     expect(stepTabTarget(o, 0, -1)).not.toBe(9);
+  });
+});
+
+describe('tabIdleRadiusFor', () => {
+  it('follows the longest attack range, clamped to the floor and the query edge', () => {
+    expect(tabIdleRadiusFor(0)).toBe(TAB_NEAR_RADIUS);
+    expect(tabIdleRadiusFor(8)).toBe(TAB_NEAR_RADIUS);
+    expect(tabIdleRadiusFor(25)).toBe(25);
+    expect(tabIdleRadiusFor(30)).toBe(30);
+    expect(tabIdleRadiusFor(35)).toBe(35);
+    expect(tabIdleRadiusFor(60)).toBe(TAB_QUERY_RADIUS);
+    expect(tabIdleRadiusFor(Number.NaN)).toBe(TAB_NEAR_RADIUS);
+  });
+});
+
+describe('isTabPriority', () => {
+  it('accepts only the two known orders', () => {
+    expect(isTabPriority('nearest')).toBe(true);
+    expect(isTabPriority('facing')).toBe(true);
+    for (const v of ['', 'Nearest', 'angle', 1, null, undefined, {}]) {
+      expect(isTabPriority(v)).toBe(false);
+    }
   });
 });

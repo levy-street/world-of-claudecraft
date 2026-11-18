@@ -64,6 +64,7 @@ import type { CharacterState, InstanceSlot, MailSave, PetState, PlayerMeta } fro
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
 import { drainBgOutcomes } from '../src/sim/social/battleground_outcomes';
 import { RAID_MAX } from '../src/sim/social/party';
+import { isTabPriority } from '../src/sim/tab_target';
 import {
   parseTalentAllocation,
   parseTalentLoadoutIndex,
@@ -6180,6 +6181,10 @@ export class GameServer {
         break;
       case 'stopAutoAttackOnTargetSwitch':
         sim.setStopAutoAttackOnTargetSwitch(!!msg.enabled, pid);
+        break;
+      case 'tabTargetPriority':
+        // Only the two known orders; anything else is ignored, not coerced.
+        if (isTabPriority(msg.priority)) sim.setTabTargetPriority(msg.priority, pid);
         break;
       case 'attack':
         sim.startAutoAttack(pid);
