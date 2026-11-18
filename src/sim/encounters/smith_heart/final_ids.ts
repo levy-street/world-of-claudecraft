@@ -401,7 +401,7 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     bladeMarks: 1,
     bladeAim: 4,
     whirlCount: 2,
-    anvilEvery: 45,
+    anvilEvery: 60,
   },
   heroic: {
     // 1.2 until the Heroic pass of 2026-11-05: the bot raid in the previous
