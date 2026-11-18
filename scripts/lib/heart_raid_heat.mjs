@@ -20,12 +20,12 @@ import {
   wheelSliceAt,
 } from '../../src/sim/encounters/smith_heart/heat_geometry';
 import {
+  gapOf,
   HEAT_AURAS,
   HEAT_CASTS,
   HEAT_MOBS,
   HEAT_OBJECTS,
   HEAT_TUNING,
-  gapOf,
   ringOf,
   swellLaneOf,
   WHEEL_ARCS_DEG,
@@ -444,7 +444,7 @@ function waveGoal(world, me) {
   const a = Math.atan2(l.x - HEARTH_WELL.x, l.z - HEARTH_WELL.z);
   let best = null;
   for (const g of gaps) {
-    let da = Math.abs(((a - g + Math.PI * 3) % (Math.PI * 2)) - Math.PI);
+    const da = Math.abs(((a - g + Math.PI * 3) % (Math.PI * 2)) - Math.PI);
     if (!best || da < best.da) best = { g, da };
   }
   if (!best) return null;
