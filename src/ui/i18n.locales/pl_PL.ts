@@ -8122,7 +8122,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Otacza cię szronem, zwiększając pancerz o {buff} na 30 min.',
   'entities.abilities.frost_armor.name': 'Płaszcz szronu',
   'entities.abilities.frost_nova.description':
-    'Zamraża wszystkich pobliskich wrogów w miejscu na nawet 8 sek, zadając {damage} obrażeń od mrozu. Unieruchomienie zostaje przerwane po otrzymaniu łącznych obrażeń równych 15% maksymalnego zdrowia celu, nie mniej niż 20 i nie więcej niż 60 obrażeń.',
+    'Zamraża wszystkich pobliskich wrogów w miejscu na nawet 8 sek, zadając {damage} obrażeń od mrozu. Unieruchomienie zostaje przerwane po otrzymaniu łącznych obrażeń równych 10% maksymalnego zdrowia celu. Obrażenia okresowe, ataki chowańców i pierwsze trafienie Kruchej ruiny nie są liczone.',
   'entities.abilities.frost_nova.name': 'Lodowe okowy',
   'entities.abilities.frost_shock.description':
     'Zadaje {damage} obrażeń od mrozu i spowalnia cel o 50% na 8 s. Obrażenia rosną z mocą zaklęć.',

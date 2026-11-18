@@ -855,6 +855,12 @@ export interface Aura {
   // Lingering Dread lets a break-on-damage fear absorb this much damage before
   // breaking. Undefined retains the normal break-on-any-damage behavior.
   breakThreshold?: number;
+  // Icebind (combat/cc.ts rootBreakIgnoresHit): damage over time ticks,
+  // reflects and pet or summon damage never spend breakThreshold.
+  breakIgnoresIncidental?: true;
+  // Icebind's one Shatter pass: 'ready' until the first Shatter hit, 'armed'
+  // only for the length of that hit's dealDamage call, cleared once it lands.
+  shatterPass?: 'ready' | 'armed';
   // Fear-family break model (combat/damage.ts): each damage event breaks the
   // aura with probability min(1, amount / (breakChanceScale * maxHp)), so a
   // hit for breakChanceScale of max health always breaks it and a dot tick
@@ -915,7 +921,21 @@ export interface Aura {
 export interface DamageBreakBudget {
   maxHpPct: number;
   min: number;
-  max: number;
+  // Optional ceiling. Undefined lets the budget keep scaling with max health.
+  max?: number;
+  // Damage over time ticks (any non-direct damage) and damage from pets or
+  // other owned summons never spend the budget.
+  ignoreIncidental?: boolean;
+  // The first Shatter hit (a frost mage spell treating the target as frozen)
+  // does not spend the budget.
+  shatterPass?: boolean;
+}
+
+/** The damage-break rule a root carries onto its aura (Sim.applyRootAura). */
+export interface RootBreakRule {
+  threshold: number;
+  ignoreIncidental?: boolean;
+  shatterPass?: boolean;
 }
 
 export type CrowdControlDrCategory =

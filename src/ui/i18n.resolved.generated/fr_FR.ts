@@ -17774,7 +17774,7 @@ export const fr_FR: EnTranslations = {
       },
       "frost_nova": {
         "name": "Entrave de glace",
-        "description": "Gèle tous les ennemis proches sur place pendant un maximum de 8 s et inflige {damage} points de dégâts de Givre. L’immobilisation prend fin après avoir subi un total de dégâts égal à 15 % des points de vie maximum de la cible, avec un minimum de 20 et un maximum de 60 points de dégâts."
+        "description": "Gèle tous les ennemis proches sur place pendant un maximum de 8 s et inflige {damage} points de dégâts de Givre. L’immobilisation prend fin après avoir subi un total de dégâts égal à 10 % des points de vie maximum de la cible. Les dégâts sur la durée, les attaques des familiers et le premier coup de Ruine fragile ne comptent pas."
       },
       "arcane_explosion": {
         "name": "Explosion d'Aether",

@@ -17774,7 +17774,7 @@ export const da_DK: EnTranslations = {
       },
       "frost_nova": {
         "name": "Isbinding",
-        "description": "Fryser alle nærliggende fjender fast i op til 8 sek og volder {damage} frostskade. Fastfrysningen brydes efter samlet skade svarende til 15 % af målets maksimale helbred, dog mindst 20 og højst 60 skade."
+        "description": "Fryser alle nærliggende fjender fast i op til 8 sek og volder {damage} frostskade. Fastfrysningen brydes efter samlet skade svarende til 10 % af målets maksimale helbred. Skade over tid, kæledyrsangreb og det første træf fra Skrøbelig Undergang tæller ikke med."
       },
       "arcane_explosion": {
         "name": "Æterudbrud",

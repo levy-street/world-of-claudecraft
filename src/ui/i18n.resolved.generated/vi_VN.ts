@@ -17774,7 +17774,7 @@ export const vi_VN: EnTranslations = {
       },
       "frost_nova": {
         "name": "Trói Băng",
-        "description": "Đóng băng tất cả kẻ địch xung quanh tại chỗ trong tối đa 8 giây, gây {damage} sát thương Băng. Hiệu ứng trói chân bị phá vỡ sau khi nhận tổng sát thương bằng 15% máu tối đa của mục tiêu, tối thiểu 20 và tối đa 60 sát thương."
+        "description": "Đóng băng tất cả kẻ địch xung quanh tại chỗ trong tối đa 8 giây, gây {damage} sát thương Băng. Hiệu ứng trói chân bị phá vỡ sau khi nhận tổng sát thương bằng 10% máu tối đa của mục tiêu. Sát thương theo thời gian, đòn đánh của thú cưng và đòn Hủy Diệt Giòn Tan đầu tiên không được tính."
       },
       "arcane_explosion": {
         "name": "Nổ Ê-te",

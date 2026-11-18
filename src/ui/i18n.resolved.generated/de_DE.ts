@@ -17774,7 +17774,7 @@ export const de_DE: EnTranslations = {
       },
       "frost_nova": {
         "name": "Eisfessel",
-        "description": "Friert alle nahen Gegner bis zu 8 Sek. lang fest und verursacht {damage} Frostschaden. Der Festhalteeffekt endet nach kumulativem Schaden in Höhe von 15 % der maximalen Gesundheit des Ziels, mindestens jedoch 20 und höchstens 60 Schaden."
+        "description": "Friert alle nahen Gegner bis zu 8 Sek. lang fest und verursacht {damage} Frostschaden. Der Festhalteeffekt endet nach kumulativem Schaden in Höhe von 10 % der maximalen Gesundheit des Ziels. Schaden über Zeit, Angriffe von Begleitern und der erste Treffer von Sprödes Verderben zählen nicht."
       },
       "arcane_explosion": {
         "name": "Ätherexplosion",

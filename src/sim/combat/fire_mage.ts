@@ -98,6 +98,23 @@ function fireSpecMods(ctx: SimContext, p: Entity) {
   return mods.spec === 'fire' ? mods : null;
 }
 
+/** Is this a hostile player-vs-player hit? Both sides resolve to the player
+ *  who controls them (a pet, guardian or totem resolves to its owner), the
+ *  two players differ, and the source is hostile to the target. The same test
+ *  the WARFARE multiplier in combat/damage.ts applies (and Tank Toll's
+ *  `hostilePvpHit`), so it covers open-world /pvp, free-for-all ground,
+ *  battlegrounds, arenas and duels, and never a creature no player controls. */
+export function isHostilePvpHit(ctx: SimContext, source: Entity, target: Entity): boolean {
+  const sourcePlayer = ctx.pvpController(source);
+  const targetPlayer = ctx.pvpController(target);
+  return (
+    !!sourcePlayer &&
+    !!targetPlayer &&
+    sourcePlayer.id !== targetPlayer.id &&
+    ctx.isHostileTo(source, target)
+  );
+}
+
 /** Guaranteed-crit override for the fire spec, read at the spell-crit roll
  *  sites (the roll is still drawn; only the outcome is overridden). */
 export function fireGuaranteedCrit(
@@ -109,7 +126,20 @@ export function fireGuaranteedCrit(
 ): boolean {
   if (school !== 'fire') return false;
   if (!fireSpecMods(ctx, p)) return false;
-  if (p.auras.some((a) => a.kind === 'combustion')) return true;
+  // PvP tuning: when the target is another, hostile player or their pet,
+  // guardian or totem, Phoenix Trance does not force the Hot Streak spenders
+  // (Pyrelance, Flamestrike) to crit. `target` is the bolt's target, or for
+  // Flamestrike the caster's selected target (combat/effect_dispatch.ts). Forced spender crits
+  // half-built the next streak on their own, so one Trance chained four or
+  // five free, instant, guaranteed-crit Pyrelances with no cast to interrupt.
+  // The spenders still crit on their own roll, the builders keep the forced
+  // crit, and every creature no player controls is untouched (PvE unchanged).
+  if (
+    p.auras.some((a) => a.kind === 'combustion') &&
+    !(target && HOT_STREAK_SPENDERS.includes(abilityId) && isHostilePvpHit(ctx, p, target))
+  ) {
+    return true;
+  }
   if (abilityId === 'fire_blast') return true;
   // Pyroclast 2pc: the Scald execute threshold rises 0.3 -> 0.5 at this SOLE
   // functional reader. Only the OUTCOME override moves; the crit roll is

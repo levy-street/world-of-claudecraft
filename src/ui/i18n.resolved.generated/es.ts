@@ -17774,7 +17774,7 @@ export const es: EnTranslations = {
       },
       "frost_nova": {
         "name": "Atadura de Hielo",
-        "description": "Congela a todos los enemigos cercanos en el sitio durante hasta 8 s e inflige {damage} de daño de Escarcha. El enraizamiento se rompe tras recibir daño acumulado equivalente al 15 % de la salud máxima del objetivo, con un mínimo de 20 y un máximo de 60 de daño."
+        "description": "Congela a todos los enemigos cercanos en el sitio durante hasta 8 s e inflige {damage} de daño de Escarcha. El enraizamiento se rompe tras recibir daño acumulado equivalente al 10 % de la salud máxima del objetivo. El daño periódico, los ataques de mascotas y el primer golpe de Ruina Quebradiza no cuentan."
       },
       "arcane_explosion": {
         "name": "Estallido de Éter",

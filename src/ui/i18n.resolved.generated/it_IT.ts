@@ -17774,7 +17774,7 @@ export const it_IT: EnTranslations = {
       },
       "frost_nova": {
         "name": "Vincolo di Ghiaccio",
-        "description": "Congela sul posto tutti i nemici vicini per un massimo di 8 s e infligge {damage} danni da Gelo. L’immobilizzazione si interrompe dopo aver subito danni cumulativi pari al 15% della salute massima del bersaglio, con un minimo di 20 e un massimo di 60 danni."
+        "description": "Congela sul posto tutti i nemici vicini per un massimo di 8 s e infligge {damage} danni da Gelo. L’immobilizzazione si interrompe dopo aver subito danni cumulativi pari al 10% della salute massima del bersaglio. I danni periodici, gli attacchi dei famigli e il primo colpo di Rovina Fragile non contano."
       },
       "arcane_explosion": {
         "name": "Scoppio d'Etere",

@@ -8097,7 +8097,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Bao bọc bạn trong băng giá, tăng giáp thêm {buff} trong 30 phút.',
   'entities.abilities.frost_armor.name': 'Áo Choàng Sương Giá',
   'entities.abilities.frost_nova.description':
-    'Đóng băng tất cả kẻ địch xung quanh tại chỗ trong tối đa 8 giây, gây {damage} sát thương Băng. Hiệu ứng trói chân bị phá vỡ sau khi nhận tổng sát thương bằng 15% máu tối đa của mục tiêu, tối thiểu 20 và tối đa 60 sát thương.',
+    'Đóng băng tất cả kẻ địch xung quanh tại chỗ trong tối đa 8 giây, gây {damage} sát thương Băng. Hiệu ứng trói chân bị phá vỡ sau khi nhận tổng sát thương bằng 10% máu tối đa của mục tiêu. Sát thương theo thời gian, đòn đánh của thú cưng và đòn Hủy Diệt Giòn Tan đầu tiên không được tính.',
   'entities.abilities.frost_nova.name': 'Trói Băng',
   'entities.abilities.frost_shock.description':
     'Gây {damage} sát thương Băng và làm chậm mục tiêu 50% trong 8 giây. Sát thương tăng theo Sức Mạnh Phép Thuật.',

@@ -11,6 +11,7 @@ import { computeTalentModifiers, emptyAllocation, TALENTS } from '../src/sim/con
 import { ABILITIES, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
+import type { SimContext } from '../src/sim/sim_context';
 import type { Entity, SimEvent } from '../src/sim/types';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
@@ -674,5 +675,68 @@ describe('Water Elemental', () => {
     }
     expect(channelStarted).toBe(true);
     expect(channelTicks).toBe(3);
+  });
+});
+
+describe('Phoenix Trance PvP spender rule', () => {
+  // A fire mage (sim.player) in a live duel with a warrior, Trance worn.
+  function playerEntity(sim: Sim, pid: number): Entity {
+    const e = sim.entities.get(pid);
+    if (!e) throw new Error(`player ${pid} missing`);
+    return e;
+  }
+
+  function duelState(sim: Sim, pid: number): string | undefined {
+    return (sim as unknown as { duels: Map<number, { state: string }> }).duels.get(pid)?.state;
+  }
+
+  function tranceDuel() {
+    const { sim, p } = mageWithSpec('fire');
+    const foeId = sim.addPlayer('warrior', 'Bet', { autoEquip: true });
+    const foe = playerEntity(sim, foeId);
+    foe.pos = { x: p.pos.x + 4, y: p.pos.y, z: p.pos.z };
+    foe.prevPos = { ...foe.pos };
+    (sim as unknown as { rebucket(e: Entity): void }).rebucket(foe);
+    sim.duelRequest(foeId, p.id);
+    sim.duelAccept(foeId);
+    for (let i = 0; i < 20 * 4; i++) {
+      sim.tick();
+      if (duelState(sim, p.id) === 'active') break;
+    }
+    expect(duelState(sim, p.id)).toBe('active');
+    p.resource = p.maxResource;
+    sim.castAbility('combustion');
+    expect(p.auras.some((a) => a.kind === 'combustion')).toBe(true);
+    const ctx = (sim as unknown as { ctx: SimContext }).ctx;
+    return { sim, p, foe, ctx };
+  }
+
+  it('does not force Pyrelance or Flamestrike to crit on a hostile player', () => {
+    const { p, foe, ctx } = tranceDuel();
+    expect(fireGuaranteedCrit(ctx, p, 'pyroblast', 'fire', foe)).toBe(false);
+    expect(fireGuaranteedCrit(ctx, p, 'flamestrike', 'fire', foe)).toBe(false);
+    // Builders keep the forced crit, so the window still lights Hot Streak.
+    expect(fireGuaranteedCrit(ctx, p, 'fireball', 'fire', foe)).toBe(true);
+    expect(fireGuaranteedCrit(ctx, p, 'scorch', 'fire', foe)).toBe(true);
+  });
+
+  it("covers the hostile player's pet too", () => {
+    const { sim, p, foe, ctx } = tranceDuel();
+    const pet = createMob(9401, MOBS.forest_wolf, 20, { ...foe.pos });
+    pet.ownerId = foe.id;
+    pet.hostile = false;
+    (sim as unknown as { addEntity(e: Entity): void }).addEntity(pet);
+    expect(fireGuaranteedCrit(ctx, p, 'pyroblast', 'fire', pet)).toBe(false);
+  });
+
+  it('keeps the forced spender crit against creatures and non-hostile players', () => {
+    const { sim, p, ctx } = tranceDuel();
+    const dummy = addDummy(sim);
+    expect(fireGuaranteedCrit(ctx, p, 'pyroblast', 'fire', dummy)).toBe(true);
+    expect(fireGuaranteedCrit(ctx, p, 'flamestrike', 'fire', null)).toBe(true);
+    // A bystander outside the duel is not hostile: no PvP, no rule.
+    const bystanderId = sim.addPlayer('warrior', 'Gimel', { autoEquip: true });
+    const bystander = playerEntity(sim, bystanderId);
+    expect(fireGuaranteedCrit(ctx, p, 'pyroblast', 'fire', bystander)).toBe(true);
   });
 });

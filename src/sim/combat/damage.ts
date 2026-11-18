@@ -113,7 +113,7 @@ import {
   onAfflictionDamage,
 } from './affliction';
 import { barrowstoneSave } from './balgath_trinkets';
-import { isUnbreakableControlAura } from './cc';
+import { isUnbreakableControlAura, rootBreakIgnoresHit } from './cc';
 import { stopChannelVisual } from './channel_visuals';
 import { chronomancyConvertArcaneDamage, stripTemporalEchoes } from './chronomancy';
 import {
@@ -1112,6 +1112,9 @@ export function dealDamage(
         if (foulPlayGuardsBreak(ctx, source, breakable.kind, breakable.sourceId, direct)) {
           continue;
         }
+        // Icebind: damage over time ticks, reflects, pet hits and the first
+        // Shatter hit leave the root and its damage budget untouched.
+        if (rootBreakIgnoresHit(breakable, source, direct)) continue;
         if (breakable.breakThreshold !== undefined && breakable.breakThreshold > amount) {
           breakable.breakThreshold -= amount;
           continue;

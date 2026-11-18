@@ -17774,7 +17774,7 @@ export const nl_NL: EnTranslations = {
       },
       "frost_nova": {
         "name": "IJsboei",
-        "description": "Bevriest alle nabije vijanden ter plaatse gedurende maximaal 8 sec en brengt {damage} Vorstschade toe. Het worteleffect breekt na cumulatieve schade gelijk aan 15% van de maximale gezondheid van het doelwit, met een minimum van 20 en een maximum van 60 schade."
+        "description": "Bevriest alle nabije vijanden ter plaatse gedurende maximaal 8 sec en brengt {damage} Vorstschade toe. Het worteleffect breekt na cumulatieve schade gelijk aan 10% van de maximale gezondheid van het doelwit. Schade over tijd, aanvallen van huisdieren en de eerste treffer van Broze Ondergang tellen niet mee."
       },
       "arcane_explosion": {
         "name": "Aetherbarst",

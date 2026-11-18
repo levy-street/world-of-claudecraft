@@ -8197,7 +8197,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Omhult je in vorst en verhoogt het pantser met {buff} gedurende 30 min.',
   'entities.abilities.frost_armor.name': 'Rijpmantel',
   'entities.abilities.frost_nova.description':
-    'Bevriest alle nabije vijanden ter plaatse gedurende maximaal 8 sec en brengt {damage} Vorstschade toe. Het worteleffect breekt na cumulatieve schade gelijk aan 15% van de maximale gezondheid van het doelwit, met een minimum van 20 en een maximum van 60 schade.',
+    'Bevriest alle nabije vijanden ter plaatse gedurende maximaal 8 sec en brengt {damage} Vorstschade toe. Het worteleffect breekt na cumulatieve schade gelijk aan 10% van de maximale gezondheid van het doelwit. Schade over tijd, aanvallen van huisdieren en de eerste treffer van Broze Ondergang tellen niet mee.',
   'entities.abilities.frost_nova.name': 'IJsboei',
   'entities.abilities.frost_shock.description':
     'Brengt {damage} Vorstschade toe en vertraagt het doelwit 8 sec lang met 50%. De schade stijgt met de Spreukkracht.',

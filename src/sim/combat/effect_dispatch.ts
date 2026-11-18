@@ -102,10 +102,12 @@ import {
 import { absorbAuraId, buffTargetAuraId, selfBuffAuraId } from './aura_ids';
 import { resetSwingTimer } from './auto_attack';
 import {
-  damageBreakThreshold,
+  armShatterPass,
+  disarmShatterPass,
   hasUnbreakableMovementLock,
   isRootedOrChilled,
   isUnbreakableControlAura,
+  rootBreakRule,
 } from './cc';
 import {
   ARCANE_SURGE_ID,
@@ -982,6 +984,11 @@ export function runEffects(
         const finalDamage = Math.round(dmg * primaryDamageMult);
         lastDirectDamage = finalDamage;
         const targetHpBefore = target.hp;
+        // Icebind's Shatter pass (combat/cc.ts): the first Shatter hit on an
+        // Icebound target does not spend the root's damage budget. Armed only
+        // for this one call; a hit that never reached the break check (fully
+        // absorbed, immune) hands the pass back.
+        const shatterPassAura = isSpell && frozen.treatAsFrozen ? armShatterPass(target) : null;
         const resolvedDamage = ctx.dealDamage(
           p,
           target,
@@ -998,6 +1005,7 @@ export function runEffects(
           ability.id,
           false,
         );
+        disarmShatterPass(shatterPassAura);
         // Read before the hunter/shaman follow-up hooks below, which can deal their
         // own damage: this must stay the damage THIS ability landed.
         const effectiveDamage = Math.max(0, targetHpBefore - target.hp);
@@ -2611,11 +2619,21 @@ export function runEffects(
         // streak counter nothing), outcome overridable by Combustion. Every
         // struck enemy crits together, mirroring the owner rule that a single
         // Flamestrike is a single crit toward Hot Streak however many it hits.
+        // The caster's selected target stands in as the target, so Phoenix
+        // Trance's PvP spender rule (combat/fire_mage.ts) applies only while
+        // the mage is targeting another player or their pet or summon; a
+        // Flamestrike aimed while targeting a creature keeps the forced crit.
         const aoeCrit =
           (eff.canCrit ?? false) &&
           aoeTargets.length > 0 &&
           (ctx.rng.chance(ctx.spellCrit(p)) ||
-            fireGuaranteedCrit(ctx, p, ability.id, ability.school, null));
+            fireGuaranteedCrit(
+              ctx,
+              p,
+              ability.id,
+              ability.school,
+              p.targetId !== null ? (ctx.entities.get(p.targetId) ?? null) : null,
+            ));
         let sunVerdictHit: { target: Entity; mark: Aura } | null = null;
         for (const m of aoeTargets) {
           const sunVerdictMark = ability.id === DAWNFALL_ID ? sunVerdictMarkForHit(m, p.id) : null;
@@ -3634,7 +3652,7 @@ export function runEffects(
                 `${ability.id}_root`,
                 eff.duration,
                 ability.school,
-                eff.breakOnDamage ? damageBreakThreshold(m.maxHp, eff.breakOnDamage) : undefined,
+                eff.breakOnDamage ? rootBreakRule(m.maxHp, eff.breakOnDamage) : undefined,
               );
               if (ability.id === 'earthbind') {
                 ctx.applyAura(m, {

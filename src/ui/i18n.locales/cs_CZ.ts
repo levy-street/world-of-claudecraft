@@ -10478,7 +10478,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frost_armor.description': 'Obalí tě mrazem a zvýší zbroj o {buff} na 30 min.',
   'entities.abilities.frost_armor.name': 'Plášť jinovatky',
   'entities.abilities.frost_nova.description':
-    'Zmrazí všechny blízké nepřátele na místě až na 8 s a způsobí {damage} mrazového poškození. Znehybnění se zruší po obdržení celkového poškození ve výši 15 % maximálního zdraví cíle, nejméně však 20 a nejvýše 60 poškození.',
+    'Zmrazí všechny blízké nepřátele na místě až na 8 s a způsobí {damage} mrazového poškození. Znehybnění se zruší po obdržení celkového poškození ve výši 10 % maximálního zdraví cíle. Poškození v čase, útoky mazlíčků a první zásah Drcení mrazem se nezapočítávají.',
   'entities.abilities.frost_nova.name': 'Ledové spoutání',
   'entities.abilities.frost_shock.description':
     'Způsobí {damage} mrazivého poškození a zpomalí cíl o 50 % na 8 s. Poškození roste se silou kouzel.',

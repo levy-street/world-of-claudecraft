@@ -9,7 +9,7 @@
 // `src/sim`-pure: imports only sibling sim types (no DOM/Three/render/ui/game/net,
 // no Math.random/Date.now), enforced by tests/architecture.test.ts.
 
-import type { Aura, DamageBreakBudget, Entity } from '../types';
+import type { Aura, DamageBreakBudget, Entity, RootBreakRule } from '../types';
 import { isVeilboundMarchActive } from './paladin_veilbound_state';
 
 // Some scripted encounter control is part of the encounter timeline rather
@@ -45,7 +45,53 @@ export function hasUnbreakableMovementLock(
 }
 
 export function damageBreakThreshold(maxHp: number, budget: DamageBreakBudget): number {
-  return Math.min(budget.max, Math.max(budget.min, Math.round(maxHp * budget.maxHpPct)));
+  return Math.min(
+    budget.max ?? Number.POSITIVE_INFINITY,
+    Math.max(budget.min, Math.round(maxHp * budget.maxHpPct)),
+  );
+}
+
+/** The aura-side break rule an aoeRoot with a damage budget applies. */
+export function rootBreakRule(maxHp: number, budget: DamageBreakBudget): RootBreakRule {
+  return {
+    threshold: damageBreakThreshold(maxHp, budget),
+    ...(budget.ignoreIncidental ? { ignoreIncidental: true } : {}),
+    ...(budget.shatterPass ? { shatterPass: true } : {}),
+  };
+}
+
+/** True when this damage event must leave a damage-budget root untouched
+ *  (combat/damage.ts break loop): an incidental hit (a damage over time tick or
+ *  reflect, `direct` false, or a pet or owned summon as the source) against an
+ *  aura that ignores those, or the one Shatter hit the aura's pass is armed
+ *  for. Spends the armed pass. Pure field reads, no rng. */
+export function rootBreakIgnoresHit(
+  aura: Aura,
+  source: Pick<Entity, 'kind' | 'ownerId'> | null,
+  direct: boolean,
+): boolean {
+  if (aura.shatterPass === 'armed') {
+    aura.shatterPass = undefined;
+    return true;
+  }
+  if (!aura.breakIgnoresIncidental) return false;
+  if (!direct) return true;
+  return source !== null && source.kind === 'mob' && source.ownerId !== null;
+}
+
+/** Arm the target's Shatter pass for one Shatter hit (any frost mage's spell
+ *  that treats the target as frozen). Returns the armed aura so the caller can disarm it if the hit never landed
+ *  (combat/effect_dispatch.ts directDamage). Null when no pass is ready. */
+export function armShatterPass(target: Entity): Aura | null {
+  const aura = target.auras.find((a) => a.shatterPass === 'ready');
+  if (!aura) return null;
+  aura.shatterPass = 'armed';
+  return aura;
+}
+
+/** Put back a pass the hit did not spend (blocked, fully absorbed, missed). */
+export function disarmShatterPass(aura: Aura | null): void {
+  if (aura?.shatterPass === 'armed') aura.shatterPass = 'ready';
 }
 
 // A stun freezes everything: movement, casts, melee, abilities. Stasis,
