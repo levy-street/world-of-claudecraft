@@ -3073,6 +3073,10 @@ export const hudChromeStrings = {
     // switches, instead of the classic default of carrying the swing over to
     // the new target (off by default; issue #1358).
     stopAutoAttackOnTargetSwitch: 'Stop Auto-Attack on Target Switch',
+    // Interface choice: which enemy in front of you Tab picks first.
+    tabTargetPriority: 'Tab Target Priority',
+    tabTargetPriorityNearest: 'Nearest First',
+    tabTargetPriorityFacing: 'In Front First',
     // Interface panel toggle: loot corpses by walking past them (off by default).
     walkByAutoloot: 'Walk-by Autoloot',
     groundReticle: 'Ground-Targeting Reticle',

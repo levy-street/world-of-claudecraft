@@ -12215,6 +12215,44 @@ export const TARGETS = [
     },
   },
   {
+    // Interface > Combat: the Tab Target Priority choice row (which enemy in
+    // front of you Tab picks first), centered with its neighbors. On a base
+    // without the row, the Stop Auto-Attack on Target Switch row above it is
+    // centered instead, so before/after frames show the same stretch.
+    key: 'interface-options-tab-target-priority',
+    label: 'Interface options panel: Tab Target Priority row',
+    when: ['sim/tab_target', 'sim/targeting'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        const hud = window.__game?.hud;
+        if (!hud) return;
+        document.getElementById('tutorial-greeting')?.remove();
+        const win = document.querySelector('#options-menu');
+        if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
+        hud.toggleOptionsMenu();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="interface"]')?.click();
+      });
+      let open = await pollForSize(page, '#options-menu .set-rows');
+      if (!open) return {};
+      // Combat is the fourth tab of the Interface strip (INTERFACE_TAB_ORDER).
+      await page.evaluate(() => {
+        const tabs = Array.from(document.querySelectorAll('#options-menu .opt-tab'));
+        tabs[3]?.click();
+      });
+      open = await pollForSize(page, '[data-focus-key="stopAutoAttackOnTargetSwitch"]');
+      if (!open) return {};
+      await page.evaluate(() => {
+        document.getElementById('tutorial-greeting')?.remove();
+        const row =
+          document.querySelector('[data-focus-key="tabTargetPriority:0"]') ??
+          document.querySelector('[data-focus-key="stopAutoAttackOnTargetSwitch"]');
+        row?.closest('.set-row')?.scrollIntoView({ block: 'center' });
+      });
+      return { clip: '#options-menu' };
+    },
+  },
+  {
     // Interface > Frames: the Player / Target Health Text choice rows (and the
     // fifth "Current / Max (Percent)" mode) the unit frames now share with the
     // party frames.

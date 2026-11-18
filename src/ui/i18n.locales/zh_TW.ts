@@ -5622,6 +5622,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.clickFeedback': '點擊標記',
   'hudChrome.options.startAttackOnAbility': '使用技能時自動攻擊',
   'hudChrome.options.stopAutoAttackOnTargetSwitch': '切換目標時停止自動攻擊',
+  'hudChrome.options.tabTargetPriority': 'Tab 目標優先順序',
+  'hudChrome.options.tabTargetPriorityNearest': '最近優先',
+  'hudChrome.options.tabTargetPriorityFacing': '正前方優先',
   'hudChrome.options.walkByAutoloot': '路過自動拾取',
   'hudChrome.options.lockCursorOnRotate': '旋轉時鎖定游標',
   'hudChrome.options.keybindHelpLockCursorOnRotate':
@@ -19233,6 +19236,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifStickyTarget': '當你點擊空地時保留目前的目標，而不是把它清掉。',
   'guide.settingsPage.ifStopAutoAttack':
     '切換目標時是否停下你的揮擊。預設關閉，因此你的攻擊會延續到新目標身上。',
+  'guide.settingsPage.ifTabTargetPriority':
+    'Tab 在你前方的敵人中優先選中哪一個：最近的那個（預設），或最接近正前方的那個。',
   'guide.settingsPage.ifTargetFrameScale': '你的目標框的大小。',
   'guide.settingsPage.ifTargetOfTarget':
     '顯示你的目標正在攻擊誰，這是判斷坦克有沒有拉穩的經典方式。',

@@ -874,6 +874,7 @@ import * as readyCheckMod from './social/ready_check';
 import { SpatialGrid } from './spatial';
 import { spawnProbeStandsOnFloor } from './spawn_footing';
 import { diminishedCrowdControlDuration as diminishedCrowdControlDurationImpl } from './stun_dr';
+import type { TabPriority } from './tab_target';
 import { Targeting } from './targeting';
 import { addThreat, TAUNT_FORCE_SECONDS, topThreatValue } from './threat';
 import {
@@ -1403,6 +1404,11 @@ export interface PlayerMeta
   // never persisted, and absent/false preserves the classic follow-through
   // default.
   stopAutoAttackOnTargetSwitch?: boolean;
+  // Optional QoL preference: the order Tab cycles a priority tier in.
+  // 'nearest' (absent = default) cycles the closest enemy first, 'facing' the
+  // one closest to straight ahead. Session-only, mirrored from the client's
+  // `tabTargetPriority` setting via setTabTargetPriority; never persisted.
+  tabTargetPriority?: TabPriority;
   // PBE boost kit version already applied to this character (server/
   // pbe_boost.ts, PBE_BOOST_ACCOUNTS=1 only). Optional and absent outside the
   // PBE so live saves round-trip byte-equal; the world-join top-up re-kits
@@ -7804,6 +7810,10 @@ export class Sim {
 
   setStopAutoAttackOnTargetSwitch(enabled: boolean, pid?: number): void {
     this.targeting.setStopAutoAttackOnTargetSwitch(enabled, pid);
+  }
+
+  setTabTargetPriority(priority: TabPriority, pid?: number): void {
+    this.targeting.setTabTargetPriority(priority, pid);
   }
 
   // -------------------------------------------------------------------------

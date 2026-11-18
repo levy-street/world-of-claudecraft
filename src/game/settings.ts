@@ -95,6 +95,10 @@ export const SETTING_RANGES = {
   viewDistance: { min: 0, max: 2, def: 1 },
   waterQuality: { min: 0, max: 2, def: 1 },
   characterDetail: { min: 0, max: 1, def: 1 },
+  // Tab Target Priority: the order Tab cycles the enemies in front of you.
+  // 0 = nearest first (the classic default), 1 = most in front first. Mirrored
+  // onto the authoritative sim via setTabTargetPriority (src/sim/targeting.ts).
+  tabTargetPriority: { min: 0, max: 1, def: 0 },
   dynamicLights: { min: 0, max: 1, def: 1 },
   particleEffects: { min: 0, max: 1, def: 1 },
   // How a structure between the camera and the player is seen through: 0 drops

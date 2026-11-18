@@ -1157,6 +1157,11 @@ export function buildInterfaceControls(
         'stopAutoAttackOnTargetSwitch',
         'hudChrome.options.stopAutoAttackOnTargetSwitch',
       ),
+      // Which enemy in front of you Tab picks first (src/sim/tab_target.ts).
+      choice(s, 'tabTargetPriority', 'hudChrome.options.tabTargetPriority', [
+        { value: 0, labelKey: 'hudChrome.options.tabTargetPriorityNearest' },
+        { value: 1, labelKey: 'hudChrome.options.tabTargetPriorityFacing' },
+      ]),
       boolToggle(s, 'showAttackButton', 'hudChrome.options.showAttackButton'),
       boolToggle(s, 'walkByAutoloot', 'hudChrome.options.walkByAutoloot'),
       boolToggle(s, 'groundReticle', 'hudChrome.options.groundReticle'),

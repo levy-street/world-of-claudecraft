@@ -40,7 +40,10 @@ function makeCtx() {
   // pid -> meta, kept STABLE across resolve() calls (mirrors the real Sim,
   // where PlayerMeta is a long-lived per-player record), so a mutation one
   // call makes (e.g. setStopAutoAttackOnTargetSwitch) is visible on the next.
-  const metas = new Map<number, { entityId: number; stopAutoAttackOnTargetSwitch?: boolean }>();
+  const metas = new Map<
+    number,
+    { entityId: number; known: never[]; stopAutoAttackOnTargetSwitch?: boolean }
+  >();
   const error = vi.fn();
   const stopFollow = vi.fn();
   const ctx = {
@@ -54,7 +57,7 @@ function makeCtx() {
       if (!e) return null;
       let meta = metas.get(pid as number);
       if (!meta) {
-        meta = { entityId: pid as number };
+        meta = { entityId: pid as number, known: [] };
         metas.set(pid as number, meta);
       }
       return { e, meta };

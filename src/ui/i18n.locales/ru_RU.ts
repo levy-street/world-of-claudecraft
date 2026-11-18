@@ -5955,6 +5955,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.clickFeedback': 'Метка клика',
   'hudChrome.options.startAttackOnAbility': 'Автоатака при использовании способности',
   'hudChrome.options.stopAutoAttackOnTargetSwitch': 'Останавливать автоатаку при смене цели',
+  'hudChrome.options.tabTargetPriority': 'Приоритет цели по Tab',
+  'hudChrome.options.tabTargetPriorityNearest': 'Сначала ближайшие',
+  'hudChrome.options.tabTargetPriorityFacing': 'Сначала прямо перед вами',
   'hudChrome.options.walkByAutoloot': 'Автосбор добычи при проходе',
   'hudChrome.options.lockCursorOnRotate': 'Блокировать курсор при вращении',
   'hudChrome.options.keybindHelpLockCursorOnRotate':
@@ -20526,6 +20529,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Сохраняет вашу текущую цель, когда вы щёлкаете по пустой земле, вместо того чтобы сбросить её.',
   'guide.settingsPage.ifStopAutoAttack':
     'Прекращает ли смена цели ваши удары. По умолчанию выключено, так что атака переносится на новую цель.',
+  'guide.settingsPage.ifTabTargetPriority':
+    'Какого врага перед вами Tab выбирает первым: ближайшего (по умолчанию) или того, кто ближе всего к направлению взгляда.',
   'guide.settingsPage.ifTargetFrameScale': 'Размер рамки вашей цели.',
   'guide.settingsPage.ifTargetOfTarget':
     'Показывает, кого держит целью ваша цель, — классический способ понять, удерживает ли её ещё танк.',

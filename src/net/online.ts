@@ -1598,6 +1598,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // client is genuinely able to send commands again (see the hello handler):
   // null means "never set this session", so nothing is re-sent on reconnect.
   private lastStopAutoAttackOnTargetSwitch: boolean | null = null;
+  // Last value passed to setTabTargetPriority, re-pushed the same way.
+  private lastTabTargetPriority: 'nearest' | 'facing' | null = null;
   private reconnectAttempts = 0;
   // consecutive 'character already in world' rejections during a reconnect;
   // see src/net/reconnect_policy.ts for why these are tolerated (bounded)
@@ -3466,6 +3468,10 @@ export class ClientWorld extends ReconWireState implements IWorld {
     this.lastStopAutoAttackOnTargetSwitch = enabled;
     this.cmd({ cmd: 'stopAutoAttackOnTargetSwitch', enabled });
   }
+  setTabTargetPriority(priority: 'nearest' | 'facing'): void {
+    this.lastTabTargetPriority = priority;
+    this.cmd({ cmd: 'tabTargetPriority', priority });
+  }
 
   // Re-sends every session preference this class remembers, called once the
   // client is actually able to send commands again: right after `connected`
@@ -3481,6 +3487,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
         cmd: 'stopAutoAttackOnTargetSwitch',
         enabled: this.lastStopAutoAttackOnTargetSwitch,
       });
+    }
+    if (this.lastTabTargetPriority === 'nearest' || this.lastTabTargetPriority === 'facing') {
+      this.cmd({ cmd: 'tabTargetPriority', priority: this.lastTabTargetPriority });
     }
     this.actionBarUploader?.flush(); // a layout save the dead socket refused goes out now
   }

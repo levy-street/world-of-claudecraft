@@ -194,6 +194,7 @@ export const IWORLD_MEMBERS = [
   { name: 'targetNearestFriendly', kind: 'method' },
   { name: 'friendlyTabTarget', kind: 'method' },
   { name: 'setStopAutoAttackOnTargetSwitch', kind: 'method' },
+  { name: 'setTabTargetPriority', kind: 'method' },
   { name: 'startAutoAttack', kind: 'method' },
   { name: 'stopAutoAttack', kind: 'method' },
   { name: 'interact', kind: 'method' },
@@ -1031,9 +1032,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // Riding ranks (PR 4390) add one method over the release: 466/140/329.
     // The portrait menu's unappliedDungeonDifficulty (method, PR 4625) adds one
     // more: 471/140/331.
-    expect(IWORLD_MEMBERS.length).toBe(471);
+    expect(IWORLD_MEMBERS.length).toBe(472);
     expect(DATA_MEMBERS.length).toBe(140);
-    expect(METHOD_MEMBERS.length).toBe(331);
+    expect(METHOD_MEMBERS.length).toBe(332);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -1431,6 +1432,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setPetMode',
       'setSpec',
       'setStopAutoAttackOnTargetSwitch',
+      'setTabTargetPriority',
       'setTownFocus',
       'setWeeklyLootSpec',
       'setWorldPvpFlag',
@@ -1940,6 +1942,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setPetMode',
       'setSpec',
       'setStopAutoAttackOnTargetSwitch',
+      'setTabTargetPriority',
       'setTownFocus',
       'setWeeklyLootSpec',
       'setWorldPvpFlag',
@@ -2135,6 +2138,7 @@ const FACET_TARGETING = [
   'targetNearestFriendly',
   'friendlyTabTarget',
   'setStopAutoAttackOnTargetSwitch',
+  'setTabTargetPriority',
 ] as const satisfies readonly (keyof IWorldTargeting)[];
 type _ExhaustTargeting = AssertNever<
   Exclude<keyof IWorldTargeting, (typeof FACET_TARGETING)[number]>
@@ -2887,8 +2891,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // adds resting (data) and sitOnSeat (the seating facet's method).
     // Plus Lantern Hall's guildContracts and buyGuildCosmetic, the riding
     // ranks method (PR 4390) and unappliedDungeonDifficulty (PR 4625).
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(471);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(471);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(472);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(472);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

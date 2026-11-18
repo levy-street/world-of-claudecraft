@@ -4121,6 +4121,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.clickFeedback': '클릭 표시',
   'hudChrome.options.startAttackOnAbility': '스킬 사용 시 자동 공격',
   'hudChrome.options.stopAutoAttackOnTargetSwitch': '대상 전환 시 자동 공격 중지',
+  'hudChrome.options.tabTargetPriority': 'Tab 대상 우선순위',
+  'hudChrome.options.tabTargetPriorityNearest': '가까운 순',
+  'hudChrome.options.tabTargetPriorityFacing': '정면 우선',
   'hudChrome.options.walkByAutoloot': '지나가며 자동 획득',
   'hudChrome.options.lockCursorOnRotate': '회전 중 커서 고정',
   'hudChrome.options.keybindHelpLockCursorOnRotate':
@@ -18409,6 +18412,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifStickyTarget': '빈 땅을 클릭해도 현재 대상을 풀지 않고 그대로 유지합니다.',
   'guide.settingsPage.ifStopAutoAttack':
     '대상을 바꿀 때 공격을 멈출지 정합니다. 기본값은 꺼짐이라, 공격이 새 대상으로 그대로 이어집니다.',
+  'guide.settingsPage.ifTabTargetPriority':
+    '앞에 있는 적 중 Tab이 먼저 고르는 대상입니다. 가장 가까운 적(기본값) 또는 가장 정면에 가까운 적을 고릅니다.',
   'guide.settingsPage.ifTargetFrameScale': '대상 프레임의 크기입니다.',
   'guide.settingsPage.ifTargetOfTarget':
     '내 대상이 누구를 노리고 있는지 보여 줍니다. 탱커가 아직 붙잡고 있는지 확인하는 클래식한 방법입니다.',

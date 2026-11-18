@@ -943,6 +943,8 @@ const COMBAT_KEYS = [
   'note:hudChrome.options.showDungeonHintsNote',
   'startAttackOnAbilityUse',
   'stopAutoAttackOnTargetSwitch',
+  // Which enemy in front of you Tab picks first.
+  'tabTargetPriority',
   'showAttackButton',
   'walkByAutoloot',
   'groundReticle',
