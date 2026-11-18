@@ -476,7 +476,11 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     cursedPulseMin: 48,
     cursedPulseMax: 56,
     missCollapse: true,
-    griefHeal: 0.3,
+    // A fifth of a pool already 1.65 times Normal's is still the largest heal
+    // (about 45 to 50 s of a 1,500 DPS raid); 0.3 cost 64 to 75 s, all of it
+    // past Mythic's soft enrage, a wipe for a raid 3 percent short of an even
+    // kill (the headless calibration of 2026-11-19, smith_heart.md 7.1).
+    griefHeal: 0.2,
     enrageHaste: 0.4,
     enrageDamage: 0.4,
   },

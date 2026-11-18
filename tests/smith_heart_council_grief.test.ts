@@ -300,10 +300,19 @@ describe('Grief of the Stone: the tooltip and the tiers', () => {
   it('each tier is stronger than the last, and carries its own damage share', () => {
     const rows = TIERS.map((tier) => COUNCIL_DIFFICULTY[tier]);
     for (let i = 1; i < rows.length; i++) {
-      expect(rows[i].griefHeal).toBeGreaterThan(rows[i - 1].griefHeal);
+      // The heal in health (its share of a pool each tier grows): Mythic's
+      // fifth of a pool 1.65 times Normal's is still the largest (the
+      // calibration of 2026-11-19 took it down from 0.3).
+      expect(rows[i].griefHeal * rows[i].healthMult).toBeGreaterThan(
+        rows[i - 1].griefHeal * rows[i - 1].healthMult,
+      );
       expect(rows[i].enrageHaste).toBeGreaterThan(rows[i - 1].enrageHaste);
       expect(rows[i].enrageDamage).toBeGreaterThan(rows[i - 1].enrageDamage);
     }
+    // Mythic's heal costs a raid at most about 50 s of its damage, never the
+    // whole fight past its soft enrage (0.3 cost up to 75 s).
+    const m = COUNCIL_DIFFICULTY.mythic;
+    expect(m.griefHeal).toBeLessThanOrEqual(0.2);
     // The tooltip reads the tier (and its heal) off the aura's damage share.
     expect(new Set(rows.map((r) => r.enrageDamage)).size).toBe(rows.length);
   });
