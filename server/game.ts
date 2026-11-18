@@ -3656,8 +3656,12 @@ export class GameServer {
     session.linkdead = true;
     session.graceUntil = Date.now() + LINKDEAD_GRACE_MS;
     this.botDetector.setTrackingConnection(session.botTrackingContext, false);
-    // Forfeit a live world fight, then stop held movement (a linkdead body can still die).
-    forfeitWorldPvpFightOnSessionDeparture(this.sim, session.pid, !session.escrowQuarantined);
+    // A dropped socket never forfeits a world fight: it cannot be told apart
+    // from a network blip, a missed keepalive or a backpressure cut, and the
+    // client usually resumes within seconds. The body stays in the world for
+    // the grace and can still be killed like any other. A deliberate exit
+    // (Logout, or a closed window/tab: the client's t:'leaving' frame) is what
+    // forfeits. Stop held movement so the linkdead body stands still.
     stopDisconnectedPlayerInput(this.sim, session.pid);
     // Safety flush so a process crash during the grace window loses nothing.
     void this.saveCharacter(session, { withMarket: opts.withMarket ?? true }).catch((err) =>
@@ -5969,6 +5973,16 @@ export class GameServer {
     // tab. Either path marks the session, so the page reload's close is a socketClosed() no-op.
     if (msg.t === 'logout') {
       if (!holdWorldFightSession(this, session)) void this.leave(session, 'logout');
+      return;
+    }
+    // The client's page is going away on purpose (Alt+F4, closing the window or
+    // tab, Quit, a reload): pagehide sends this just before the socket closes.
+    // Forfeit a live world fight now, while the session is still live; the
+    // close that follows only starts the linkdead grace (socketClosed).
+    if (msg.t === 'leaving') {
+      if (!session.left && !session.linkdead) {
+        forfeitWorldPvpFightOnSessionDeparture(this.sim, pid, !session.escrowQuarantined);
+      }
       return;
     }
     if (msg.t === 'input') {

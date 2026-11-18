@@ -1,8 +1,9 @@
 // The server half of the World PvP forfeit (server/world_pvp_departure.ts):
-// every departure the player controls, or cannot be told apart from one, runs
-// the sim's forfeit hook BEFORE the departure's save. Drives the real
-// GameServer session lifecycle: a dropped socket (a closed client or a lost
-// connection), a deliberate t:'logout', and a takeover from another login.
+// every departure the player chooses runs the sim's forfeit hook BEFORE the
+// departure's save. Drives the real GameServer session lifecycle: the
+// page-close t:'leaving' frame (Alt+F4, a closed window, Quit), a deliberate
+// t:'logout', a kick and a takeover from another login. A dropped socket (a
+// network blip, a missed keepalive, a backpressure cut) never forfeits.
 // The rule itself is pinned in tests/world_pvp_forfeit.test.ts.
 import { describe, expect, it, vi } from 'vitest';
 
@@ -91,22 +92,72 @@ function midFight() {
 }
 
 describe('a departure mid world fight forfeits it on the server', () => {
-  it('a dropped socket: the linkdead body dies to the opponent before the grace begins', async () => {
+  it('a dropped socket does not forfeit: the linkdead body stays alive and killable', async () => {
     const { server, sim, winner, leaver, leaverWs } = midFight();
     leaverWs.readyState = 3;
     expect(server.socketClosed(leaver, leaverWs)).toBe(true);
     expect(leaver.linkdead).toBe(true);
+    const body = sim.entities.get(leaver.pid)!;
+    expect(body.dead).toBe(false);
+    expect(sim.meta(winner.pid)!.honor).toBe(0);
+    expect(sim.worldPvpInfoFor(winner.pid)).toMatchObject({ kills: 0 });
+    expect(sim.meta(leaver.pid)!.copper).toBe(20_000);
+    // The safety flush saves the living body with its purse intact.
+    await vi.waitFor(() => expect(savedBlobs(102).length).toBeGreaterThan(0));
+    expect(savedBlobs(102)[0]).toMatchObject({ dead: false, copper: 20_000 });
+    // The held body still dies to the opponent the ordinary way.
+    sim.ctx.dealDamage(
+      sim.entities.get(winner.pid)!,
+      body,
+      body.hp + 1,
+      false,
+      'physical',
+      'Slam',
+      'hit',
+    );
+    expect(body.dead).toBe(true);
+    expect(sim.worldPvpInfoFor(winner.pid)).toMatchObject({ kills: 1 });
+  });
+
+  it('a server-side keepalive reap is a dropped socket too: no forfeit', () => {
+    const { server, sim, winner, leaver } = midFight();
+    // The client missed a whole ping interval (a black-holed socket) and this
+    // sweep runs on time, so the server terminates it into the linkdead grace.
+    leaver.awaitingPong = true;
+    (server as any).lastKeepaliveSweepAt = Date.now();
+    server.pingLiveSessions();
+    expect(leaver.linkdead).toBe(true);
+    expect(sim.entities.get(leaver.pid)!.dead).toBe(false);
+    expect(sim.worldPvpInfoFor(winner.pid)).toMatchObject({ kills: 0 });
+  });
+
+  it("the page-close t:'leaving' frame (Alt+F4, a closed window, Quit) forfeits", async () => {
+    const { server, sim, winner, leaver, leaverWs } = midFight();
+    server.handleMessage(leaver, JSON.stringify({ t: 'leaving' }));
     expect(sim.entities.get(leaver.pid)!.dead).toBe(true);
     expect(sim.meta(winner.pid)!.honor).toBe(WORLD_PVP_KILL_HONOR);
     expect(sim.worldPvpInfoFor(winner.pid)).toMatchObject({ kills: 1 });
     expect(sim.worldPvpInfoFor(leaver.pid)).toMatchObject({ deaths: 1 });
-    // The linkdead safety flush already carries the death and the debit.
+    // The close that follows only starts the grace; it resolves nothing twice.
+    leaverWs.readyState = 3;
+    expect(server.socketClosed(leaver, leaverWs)).toBe(true);
+    expect(sim.worldPvpInfoFor(winner.pid)).toMatchObject({ kills: 1 });
     await vi.waitFor(() => expect(savedBlobs(102).length).toBeGreaterThan(0));
     expect(savedBlobs(102)[0]).toMatchObject({
       dead: true,
       copper: 18_000,
       worldPvp: { deaths: 1 },
     });
+  });
+
+  it("a t:'leaving' frame outside any fight changes nothing", () => {
+    const server = new GameServer();
+    const ws = fakeWs();
+    const session = expectJoined(server.join(ws, 11, 101, 'Calm', 'warrior', null));
+    server.handleMessage(session, JSON.stringify({ t: 'leaving' }));
+    expect(server.sim.entities.get(session.pid)!.dead).toBe(false);
+    expect(session.left).toBe(false);
+    expect(session.linkdead).toBe(false);
   });
 
   it("a deliberate t:'logout': the forfeit resolves before the leave", async () => {

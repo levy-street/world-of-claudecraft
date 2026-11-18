@@ -1707,6 +1707,11 @@ export class ClientWorld extends ReconWireState implements IWorld {
     if (typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }
+    // A page leaving on purpose (Alt+F4, the window or tab closed, Quit, a
+    // reload) forfeits a live world PvP fight; see sendLeaving.
+    if (typeof window !== 'undefined') {
+      window.addEventListener('pagehide', this.handlePageHide);
+    }
     // Inside a Capacitor WebView, document.visibilitychange above is the ONLY
     // signal driving the zombie-socket recovery below, but it is an indirect
     // one the WebView itself must derive and forward: real-world Android/iOS
@@ -1759,6 +1764,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // explicitly: a no-op difference now, but it means a future third state
   // would also flush on entering it, matching the "flush on anything not
   // foregrounded" intent instead of silently skipping the flush.
+  private readonly handlePageHide = (): void => {
+    this.sendLeaving();
+  };
   private readonly handleVisibilityChange = (): void => {
     this.handleForegroundBackground(document.visibilityState === 'visible');
   };
@@ -1892,6 +1900,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
     if (typeof document !== 'undefined') {
       document.removeEventListener('visibilitychange', this.handleVisibilityChange);
     }
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('pagehide', this.handlePageHide);
+    }
     // If the App.addListener promise in the constructor has not resolved yet,
     // its .then() callback checks sessionEnded itself and removes the handle
     // as soon as it lands; this covers the already-resolved case.
@@ -1916,6 +1927,17 @@ export class ClientWorld extends ReconWireState implements IWorld {
     if (this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify({ t: 'logout' }));
     }
+  }
+
+  // The page is going away on purpose (pagehide: Alt+F4, a closed window or
+  // tab, Quit, a reload). Tells the server so a live world PvP fight is
+  // forfeited, which a bare socket drop no longer does (a network blip must
+  // not kill a player who is still playing). Best effort and idempotent: a
+  // no-op once the session ended (sendLogout already said goodbye) or when the
+  // socket is not open.
+  sendLeaving(): void {
+    if (this.sessionEnded || this.ws.readyState !== WebSocket.OPEN) return;
+    this.ws.send(JSON.stringify({ t: 'leaving' }));
   }
 
   get player(): Entity {
