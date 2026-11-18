@@ -90,7 +90,7 @@ function addsOn(f: BreathFight, isle: number): Entity[] {
 
 function killIsle(f: BreathFight, isle: number): void {
   for (const e of addsOn(f, isle))
-    f.sim.ctx.dealDamage(f.boss(), e, e.hp + 1, false, 'nature', 'Test', 'hit', true);
+    f.sim.ctx.dealDamage(f.boss(), e, e.hp * 20 + 1, false, 'nature', 'Test', 'hit', true); // through a ward
   f.tick(2);
 }
 

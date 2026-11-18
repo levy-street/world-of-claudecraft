@@ -912,7 +912,9 @@ export const SMITH_HEART_SEAL_MARKERS: readonly { x: number; z: number }[] = [
   { x: -40, z: 110 },
   { x: -100, z: 165 },
   { x: 0, z: 196 },
-  // The Islands of the Wind's east chain, out over the southern void.
+  // The southern void under the Cornice (the Islands of the Wind's south-west
+  // chain and the old east chain's air; the east chain over the crown since
+  // 2026-11-18 stands within the Cornice's own marker's reach).
   { x: 32, z: 112 },
   // The Quench, the Singing Ice, the Basin.
   { x: 116, z: -26 },

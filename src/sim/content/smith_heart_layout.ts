@@ -264,13 +264,14 @@ export const CORNICE_OPEN_RIM: readonly { x: number; z: number; r: number }[] = 
 })();
 
 /** The Islands of the Wind (the Guardian of the Breath, design doc 7.2; the
- *  team's 50 percent phase of 2026-11-18): six floating islets round the
- *  Cornice's southern rim, three a side, each chain climbing as it reaches
+ *  team's 50 percent phase of 2026-11-18): six floating islets, three a
+ *  side, the east chain over the Heart's crown along the east edge and the
+ *  west one round the south-west rim, each chain climbing as it reaches
  *  round (east: E1 to E3, west: W1 to W3, `side` 0 east and 1 west, `step` 0
  *  to 2 along it; the last of each side holds a Stillstone). Out in the open
  *  air the summit's falling shoulders and its cap leave round it
  *  (render/smith_heart/heart_walls_core.ts heartSummitOpen, heartSummitCap;
- *  every isle carves its own sky out of the rock, heartOpenAir), inside the
+ *  every isle off the crown carves its own sky out of the rock, heartOpenAir), inside the
  *  field's bounds and the instance slot's band (local z under 250), reached
  *  only on a scripted ride of the wind (encounters/smith_heart/
  *  breath_isles.ts). Each is a hidden field surface (walkable; drawn by the
@@ -319,14 +320,21 @@ function isleAtBearing(
 }
 
 export const BREATH_ISLES: readonly BreathIsle[] = [
-  // The east chain leaves the rim and heads out over the southern void (the
-  // Heart's crown and its area close the east rim); the west one curls
-  // round the open south-west rim toward the climb's head (clear of the
-  // climb's floors and the Wind Bridge's air). Every isle at least 28 yd
-  // from every other (each reaches about 13), each ride about 30 yd.
-  isleAtBearing('breath_isle_e1', 160, 56, 22, 'breath_isle_southeast', 0, 0),
-  isleAtBearing('breath_isle_e2', 147.5, 84, 29, 'breath_isle_southwest', 0, 1),
-  isleAtBearing('breath_isle_e3', 160, 106, 36, 'breath_isle_southeast', 0, 2),
+  // Two groups across the Cornice from each other, the guardian between
+  // (Jose's call of 2026-11-18). The east chain hugs the east edge over the
+  // Heart's crown, climbing north to south, each isle some fifteen yards
+  // higher than the old chain's (render/smith_heart/heart_walls_core.ts
+  // heartIsleOverCrown: it carves no sky out of the crown, the rock under it
+  // capped below its crag and a crown ridge on the chamber's rim keeping the
+  // Heart out of sight, tests/smith_heart_breath_isle_crown.test.ts; a body
+  // walked off one is the void's under its floor, breath_geometry.ts
+  // fellFromIsle). The west one curls round the open south-west rim toward
+  // the climb's head (clear of the climb's floors and the Wind Bridge's air).
+  // Every isle at least 28 yd from every other (each reaches about 13), each
+  // ride about 30 yd.
+  isleAtBearing('breath_isle_e1', 75, 64, 37, 'breath_isle_southwest', 0, 0),
+  isleAtBearing('breath_isle_e2', 100, 66, 44, 'breath_isle_southeast', 0, 1),
+  isleAtBearing('breath_isle_e3', 125, 66, 51, 'breath_isle_southwest', 0, 2),
   isleAtBearing('breath_isle_w1', 190, 58, 22, 'breath_isle_southwest', 1, 0),
   isleAtBearing('breath_isle_w2', 215, 66, 29, 'breath_isle_southeast', 1, 1),
   isleAtBearing('breath_isle_w3', 240, 74, 36, 'breath_isle_southwest', 1, 2),
@@ -454,9 +462,13 @@ export const HEART_EXIT_PORTAL = {
 /** The Heart Bridge's gate: sealed behind the raid while the final boss fights. */
 export const HEART_BRIDGE_GATE = { ...towardHeart(22), dx: TU.x, dz: TU.z } as const;
 
-/** Is (x, z) in the Heart (the separate final room)? Instance-local. */
+/** Is (x, z) in the Heart (the separate final room)? Instance-local. The
+ *  Breath's east isles float over the Heart's crown inside this reach (Jose's
+ *  call of 2026-11-18): their air is the Breath's, never the Heart's. */
 export function inSmithHeartRoom(x: number, z: number): boolean {
-  return Math.hypot(x - HEART_ROOM.x, z - HEART_ROOM.z) < HEART_ROOM_AREA_R;
+  if (Math.hypot(x - HEART_ROOM.x, z - HEART_ROOM.z) >= HEART_ROOM_AREA_R) return false;
+  for (const lip of BREATH_ISLE_LIPS) if (Math.hypot(x - lip.x, z - lip.z) <= lip.r) return false;
+  return true;
 }
 
 /** The named areas (music, fog, sky): the main map's veins and the Heart. */

@@ -68,7 +68,7 @@ function killIsle(f: BreathFight, isle: number): void {
     if (a.isle !== isle) continue;
     const e = f.sim.ctx.entities.get(a.id);
     if (e && !e.dead)
-      f.sim.ctx.dealDamage(f.boss(), e, e.hp + 1, false, 'nature', 'Test', 'hit', true);
+      f.sim.ctx.dealDamage(f.boss(), e, e.hp * 20 + 1, false, 'nature', 'Test', 'hit', true); // through a ward
   }
   f.tick(2);
 }

@@ -1953,8 +1953,16 @@ Every number is a SKETCH; the tier rows are `ISLE_TIERS` and the shared ones `IS
 - **The split.** Captain Thessaly raises two **Updrafts** on the Cornice (east and west): step
   in and the wind carries you on the fixed ride (3.2 s, stunned, `rideArc`) to the first isle
   of that side. Six floating isles (`BREATH_ISLES`), three a side, each a stride higher than
-  the last: the east chain leaves the rim and heads out over the southern void (the Heart's
-  crown and its area close the east rim), the west one curls round the open south-west rim.
+  the last, the two groups across the Cornice from each other with the guardian between
+  (Jose's call of 2026-11-18): the east chain hugs the east edge over the Heart's crown (bearings
+  75, 100 and 125 from the Cornice's middle, 37, 44 and 51 yd over its floor), the west one curls
+  round the open south-west rim. Over the crown no isle carves sky out of the rock: the rock
+  under each is capped below its crag (`heartIsleRockCap`) and the crown climbs into a ridge
+  on the Heart chamber's rim (`heartCrownRidge`), so no isle, ride or rim spot sees into the
+  chamber (`tests/smith_heart_breath_isle_crown.test.ts`); a body walked off an isle is the
+  void's in a band under its floor (`breath_geometry.ts` `fellFromIsle`), long before the rock.
+  (The north, where the open sky is, has no room: the Cornice's north rim stands 14 yd from
+  the edge of the raid's instance slot.)
   The two authored isle floors are worn three times each, turned to face the Cornice (the
   Breath kit's sculpts turned with them, `ISLE_KIT`).
 - **The isles.** Each isle's adds rise as its Updraft opens; once they are all down Thessaly

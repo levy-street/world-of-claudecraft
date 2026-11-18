@@ -10,7 +10,7 @@
 import { isIsleFloorOf } from '../../content/smith_heart_isle_floor';
 import { BREATH, BREATH_ISLES, SMITH_HEART_FIELD } from '../../content/smith_heart_layout';
 import { authoredFieldSurfaceAt } from '../../instances/authored_field';
-import { inBreathArena } from './breath_geometry';
+import { gapAt, inBreathArena, lipDistance } from './breath_geometry';
 import { ISLE_TUNING as T } from './breath_isle_ids';
 
 const C = BREATH.cornice;
@@ -104,6 +104,24 @@ export function cornicePads(): readonly { x: number; z: number }[] {
   return padCache;
 }
 
+/** How far in from every open lip (and out of every gap's throat) a ride
+ *  home sets a body down (yards): a body set down in a gap was carried off by
+ *  the storm breaking a breath later (the bot pass of 2026-11-18). */
+export const HOME_LIP_CLEAR = 5;
+
+/** (x, z) drawn in toward the Cornice's middle until it stands on its floor,
+ *  out of every gap and HOME_LIP_CLEAR in from every open lip. */
+function clearOfLips(x: number, z: number): { x: number; z: number } {
+  const d = Math.hypot(C.x - x, C.z - z) || 1;
+  for (let t = 0; t <= d; t += 0.5) {
+    const px = x + ((C.x - x) / d) * t;
+    const pz = z + ((C.z - z) / d) * t;
+    if (inBreathArena(px, pz) && !gapAt(px, pz) && lipDistance(px, pz) >= HOME_LIP_CLEAR)
+      return { x: px, z: pz };
+  }
+  return { x: C.x, z: C.z };
+}
+
 function build(i: number): IsleSpots {
   const isle = BREATH_ISLES[i];
   const side = isle.side;
@@ -154,10 +172,10 @@ function build(i: number): IsleSpots {
   const cp = cornicePads()[side];
   const toMid = unit(cp.x, cp.z, C.x, C.z);
   const fan = (step - 1) * 3.2;
-  const back = {
-    x: cp.x + toMid.ux * 6 - toMid.uz * fan,
-    z: cp.z + toMid.uz * 6 + toMid.ux * fan,
-  };
+  const back = clearOfLips(
+    cp.x + toMid.ux * 6 - toMid.uz * fan,
+    cp.z + toMid.uz * 6 + toMid.ux * fan,
+  );
   return { x: isle.x, z: isle.z, h: isle.h, r: isle.r, side, step, land, pad, adds, stone, back };
 }
 

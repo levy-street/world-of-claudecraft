@@ -315,7 +315,10 @@ describe('the Islands of the Wind: standing on the new floor', () => {
       f.tick(1, false);
       expect(p.dead, isle.id).toBe(true);
       const back = f.local(p);
-      expect(Math.hypot((back.x - C.x) / C.rx, (back.z - C.z) / C.rz)).toBeLessThan(1);
+      expect(
+        Math.hypot((back.x - C.x) / C.rx, (back.z - C.z) / C.rz),
+        `${isle.id} ${JSON.stringify(back)} ${p.pos.y}`,
+      ).toBeLessThan(1);
       expect(p.pos.y).toBeGreaterThan(C.h - 3);
     });
   });

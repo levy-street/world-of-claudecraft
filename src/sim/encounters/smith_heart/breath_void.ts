@@ -47,6 +47,7 @@ import type { Entity } from '../../types';
 import { thessalyOf } from './breath_gale';
 import {
   fellFromCornice,
+  fellFromIsle,
   inBreathArena,
   inClaimBand,
   lipDistance,
@@ -103,7 +104,9 @@ export function stepVoidDeaths(ctx: SimContext, inst: InstanceSlot): number {
     if (p.ghost) continue;
     const lx = p.pos.x - o.x;
     const lz = p.pos.z - o.z;
-    if (!fellFromCornice(lx, lz, p.pos.y, p.onGround)) continue;
+    // Off an isle: the void's once well under its floor (a rider is carried).
+    const offIsle = !p.dead && p.carriedBy === undefined && fellFromIsle(lx, lz, p.pos.y);
+    if (!offIsle && !fellFromCornice(lx, lz, p.pos.y, p.onGround)) continue;
     const back = voidCorpseSpot(lx, lz);
     if (p.dead) {
       // The landing's own hit killed it first (a fall from an isle, high

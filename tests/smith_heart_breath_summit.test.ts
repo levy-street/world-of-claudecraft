@@ -24,6 +24,7 @@ import {
   HEART_ISLE_AIR,
   HEART_SUMMIT_CAP,
   heartFloorClearance,
+  heartIsleOverCrown,
   heartOpenAir,
   heartSummitCap,
   heartSummitOpen,
@@ -65,7 +66,14 @@ describe('the Storm Cornice: an open summit', () => {
 
   it('hangs each isle in open air, inside the bounds and the slot band', () => {
     const b = SMITH_HEART_FIELD.bounds;
-    for (const isle of BREATH_ISLES) {
+    BREATH_ISLES.forEach((isle, i) => {
+      // An isle over the Heart's crown floats over its capped rock instead
+      // (tests/smith_heart_breath_isle_crown.test.ts pins that rule).
+      if (heartIsleOverCrown(i)) {
+        expect(heartOpenAir(isle.x, isle.z, 0), isle.id).toBe(false);
+        expect(isle.z + isle.r).toBeLessThan(240);
+        return;
+      }
       expect(heartOpenAir(isle.x, isle.z, isle.r + HEART_ISLE_AIR - 1), isle.id).toBe(true);
       expect(heartMountainHeight(isle.x, isle.z), isle.id).toBe(HEART_MOUNTAIN_CHASM);
       for (let k = 0; k < 8; k++) {
@@ -81,7 +89,7 @@ describe('the Storm Cornice: an open summit', () => {
       expect(isle.x - isle.r).toBeGreaterThanOrEqual(b.minX);
       // High over the Cornice (seen against the sky from it).
       expect(isle.h).toBeGreaterThan(C.h + 20);
-    }
+    });
   });
 
   it('lays the cloud sea under every walk it covers, the far peaks far out', () => {
