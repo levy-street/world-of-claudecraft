@@ -95,11 +95,13 @@ export const BREATH_CUE_SOUNDS: Readonly<Record<string, readonly BreathSound[]>>
   [ISLE_CUES.cocoonBreak]: [
     S('bulwark_break', 1, 'source', 0.9, 0.5),
     S('discharge', 0.6, 'source', 0.8, 0.5),
+    S('tear', 0.7, 'source', 1.1, 0.5),
   ],
   // The nova run out: the break, deeper, and a blast.
   [ISLE_CUES.novaBurst]: [
     S('bulwark_break', 1, 'source', 0.7, 0.5),
     S('knot_burst', 0.9, 'source', 0.8, 0.5),
+    S('summit_roar', 0.8, 'source', 0.75, 0.5),
   ],
   [ISLE_CUES.padUp]: [S('ride_up', 0.7, 'point', 0.85, 0.3)],
   [ISLE_CUES.stilled]: [
@@ -108,7 +110,10 @@ export const BREATH_CUE_SOUNDS: Readonly<Record<string, readonly BreathSound[]>>
   ],
   [ISLE_CUES.split]: [S('knot_burst', 0.6, 'point', 1.3, 0.3)],
   [ISLE_CUES.shoved]: [S('ride_up', 0.8, 'source', 1.2, 0.3)],
-  [ISLE_CUES.reckoning]: [S('discharge', 0.9, 'point', 0.9, 0.4)],
+  [ISLE_CUES.reckoning]: [
+    S('discharge', 0.9, 'point', 0.9, 0.4),
+    S('strike', 0.8, 'point', 0.8, 0.4),
+  ],
   [ISLE_CUES.mended]: [S('calm_land', 0.45, 'target', 1.2, 0.6)],
   [ISLE_CUES.rideUp]: [S('ride_up', 1, 'point', 1, 0.3)],
   [ISLE_CUES.rideDown]: [S('ride_down', 0.9, 'point', 1, 0.3)],
@@ -195,6 +200,21 @@ export const BREATH_MARK_SOUNDS: Readonly<Record<string, HeartMarkSound>> = {
   [BREATH_AURAS.portalD]: markSound(HEART_MARK.storm, 0.85, 0.9),
 };
 
+/** Skyrend Nova's hum while it gathers (the Islands of the Wind): the storm
+ *  churning, in every listener's ears wherever they stand (the clock reads
+ *  by ear from the farthest isle), rising with the nova's charge. */
+export const BREATH_NOVA_HUM = {
+  key: 'heart_breath_knot_carry_loop',
+  gain: 0.75,
+  fadeOut: 1.4,
+} as const;
+
+/** The hum's gain at the painter's `hum` (0..1; 0 silent). */
+export function novaHumGain(hum: number): number {
+  if (!(hum > 0)) return 0;
+  return BREATH_NOVA_HUM.gain * Math.min(1, hum);
+}
+
 /** The aura a rider wears through the ride (its loop in their ears). */
 export const BREATH_RIDING_AURA = ISLE_AURAS.riding;
 
@@ -239,5 +259,6 @@ export const BREATH_SFX_KEYS: readonly string[] = [
     BREATH_KNOT_SOUNDS.carry.key,
     BREATH_KNOT_SOUNDS.fuse.key,
     BREATH_RIDE_LOOP.key,
+    BREATH_NOVA_HUM.key,
   ]),
 ].sort();
