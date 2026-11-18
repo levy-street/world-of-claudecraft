@@ -416,6 +416,7 @@ import { FirstPersonRig } from './first_person_camera';
 import { buildFish, type FishView } from './fish';
 import { FishingBobberVisual } from './fishing_bobber';
 import { applyFloorVfxLayer } from './floor_vfx_layer';
+import { FogSceneFade } from './fog_scene_fade';
 import { applyFogScenePreset, resolveFogScene } from './fog_scene_state';
 import {
   buildFoliage,
@@ -2482,6 +2483,7 @@ export class Renderer {
     this.sunDir.copy(SUN_DIR);
     // The boot rig, captured for the editor lighting override to restore.
     this.lightRig = { sun: this.sun, hemi: this.hemi, sunDir: this.sunDir };
+    this.sceneFade = new FogSceneFade(this.scene, this.sun, this.hemi);
     this.authoredLighting.capture(this.lightRig, this.envOutdoorIntensity);
     // A map with authored lighting (the editor's Lighting tab, saved into the
     // document and projected onto WorldContent) applies it from boot: playtest
@@ -8667,6 +8669,8 @@ export class Renderer {
   private riftFogAuthored = false;
   /** Read by scenery eligibility; atmosphere updates remain owned here. */
   fogState: FogSceneState = 'outdoor';
+  /** How a settle lands: the raid's rooms crossfade (fog_scene_fade.ts). */
+  private sceneFade!: FogSceneFade;
 
   /** Drop a retired interior's scene nodes, registries, and owned resources. */
   private retireInteriorGroup(group: THREE.Group): void {
@@ -9051,20 +9055,25 @@ export class Renderer {
         fog.far = style.fog.far;
       }
       this.fogState = 'rift';
+      this.sceneFade.cancel();
       this.applyStateLightRig('rift');
       return;
     }
     this.riftFogKey = null;
     if (desired !== this.fogState) {
       this.fogState = desired;
-      applyFogScenePreset(desired, fog, () => valley?.fog ?? this.outdoorFogPreset());
-      // interiors must not leak daylight: drop sun + sky ambient + IBL
-      // underground so the torch point lights own the scene; restore outside.
-      // The rim glow cranks up instead, silhouettes must split from the murk.
-      // Which numbers each state means is interior_light_rig.ts's to own.
-      this.applyStateLightRig(desired);
+      this.sceneFade.settle(fogScene.interior, this.lightDir, () => {
+        applyFogScenePreset(desired, fog, () => valley?.fog ?? this.outdoorFogPreset());
+        // interiors must not leak daylight: drop sun + sky ambient + IBL
+        // underground so the torch point lights own the scene; restore outside.
+        // The rim glow cranks up instead, silhouettes must split from the murk.
+        // Which numbers each state means is interior_light_rig.ts's to own;
+        // how the settle lands (the raid's rooms crossfade) fog_scene_fade.ts's.
+        this.applyStateLightRig(desired);
+      });
       return;
     }
+    this.sceneFade.step(dt);
     // Outdoors, fog is also the residency boundary. Pull it inward immediately
     // before an unloaded zone can become visible; once that zone has been
     // loaded by the boundary transition, ease the view distance back out.
@@ -9338,6 +9347,7 @@ export class Renderer {
     const blend = t * t * (3 - 2 * t);
     this.lightDir.copy(this.sunDir).lerp(this.moonDir, blend).normalize();
     interiorKeyLightDirection(this.fogState, this.lightDir);
+    this.sceneFade.keyDirection(this.lightDir);
     setWaterSunDirection(this.lightDir);
     setWaterDayNight(this.dnGrade.fog);
     setFarTerrainNightGrade(this.dnGrade.nightAmt);

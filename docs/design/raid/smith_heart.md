@@ -551,6 +551,12 @@ Hammer vein, `smithHeartHammer` (phase 2B: a warm quarry dusk, the key low from 
 south-west raking the terraces, the realm's blue sky light all but off), the Ring
 (`smithHeartRing`, phase 2F), the Breath (`smithHeartBreath`, phase 2G) and the Quench
 (`smithHeartQuench`, phase 2H), and so does the Heat (`smithHeartHeat`, phase 2I).
+Moving from one of these rooms into another (walked, or the hop into the Heart) never
+snaps: the fog, the key and fill lights, the sky's reflection, the rim and the key's
+direction crossfade over a second from the look the scene showed
+(`src/render/fog_scene_fade_core.ts`, the owner's ask of 2026-11-19), about the time the
+sky's own area blend takes; the way into the raid and out of it still cuts. Frames:
+`docs/screenshots/smith-heart-room-light-fade/`.
 
 ### 5.9 The Hammer vein dressed (phase 2B)
 

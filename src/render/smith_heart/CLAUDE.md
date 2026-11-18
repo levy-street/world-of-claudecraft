@@ -112,7 +112,9 @@ Rules:
   the Breath's and the Quench's too (`smithHeartRing`, `smithHeartBreath`,
   `smithHeartQuench`) and the Heat's (`smithHeartHeat`, phase 2I: a warm key from the
   Hearth's side over a cool slate fill, never a warm wash); whatever no vein's light holds
-  keeps the borrowed `sunkenBastion` state.
+  keeps the borrowed `sunkenBastion` state. A settle from one of these rooms to another
+  crossfades over a second, the key's direction with it (`../fog_scene_fade_core.ts`,
+  painted by `../fog_scene_fade.ts`); the way into the raid and out of it still cuts.
 - The Heart (phase 2J) has no metal either: its platform is held by four roots of the
   mountain (the chains are gone), its altars are each its vein's stone, its gates are
   carved stone with a curtain of crystal light. The arrival scene is presentation only,

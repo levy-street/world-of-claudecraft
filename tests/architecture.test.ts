@@ -1583,6 +1583,8 @@ const RENDER_PURE_CORES = [
   'src/render/terrain_detail_shed_core.ts',
   'src/render/frost_ice_fields_core.ts',
   'src/render/frost_sky_fade_core.ts',
+  // the fog scene's crossfade between the Smith's Heart's rooms (fog_scene_fade.ts)
+  'src/render/fog_scene_fade_core.ts',
   'src/render/gfx_aa_policy_core.ts',
   'src/render/gfx_override_core.ts',
   'src/render/goblin_rocket_sled_fx_core.ts',
