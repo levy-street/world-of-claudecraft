@@ -380,7 +380,7 @@ import {
 import { EvilEyeMarkers } from './evil_eye_markers';
 import { enableAndWatchRendererExtensions } from './extension_drift_sentinel';
 import { advanceSelfFacing, releaseSelfFacing, wrapAngle } from './facing_smooth';
-import { latchFarLod } from './far_lod_latch';
+import { keepsArticulatedRig, latchFarLod } from './far_lod_latch';
 import {
   buildFarTerrain,
   FAR_VISTA_ENTRY_MAX_WAIT_MS,
@@ -9818,7 +9818,7 @@ export class Renderer {
         }
         if (shadowsEnabled) {
           // mid-distance rigs keep rendering but leave the shadow pass
-          wantShadow = d2 < shadowRangeSq;
+          wantShadow = d2 < shadowRangeSq || keepsArticulatedRig(e.templateId);
           inProxyBand = d2 < ENTITY_PROXY_SHADOW_RANGE_SQ;
           v.visual?.setShadow(wantShadow);
           // past the articulated gate the static-pose proxy carries the

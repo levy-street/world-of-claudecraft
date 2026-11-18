@@ -10,6 +10,9 @@ import {
   latchStaticFarMesh,
 } from './far_lod_latch_core';
 import { POS_EXTRAPOLATION_CAP } from './net_interp_core';
+import { keepsArticulatedRig } from './smith_heart_fx/boss_far_lod_core';
+
+export { keepsArticulatedRig };
 
 const latches = new WeakMap<object, FarLodLatchState>();
 
@@ -21,6 +24,8 @@ export interface FarLodEntity {
   netInterval?: number;
   vx: number;
   vz: number;
+  /** A scripted-pose boss never takes the far mesh (boss_far_lod_core.ts). */
+  templateId?: string;
 }
 
 /**
@@ -37,6 +42,9 @@ export function latchFarLod(
   actionable: boolean,
   nowSec: number,
 ): boolean {
+  // A Smith's Heart boss holds its scripted pose (an entrance's dormant clip)
+  // at every distance: its stock-pose far bake stood it up in the open.
+  if (keepsArticulatedRig(e.templateId)) return false;
   const remote = !isSelf && e.netUpdatedAt !== undefined && e.netInterval !== undefined;
   const moving = movingHoldoutActive(
     e.pos,
