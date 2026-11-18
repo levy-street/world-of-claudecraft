@@ -95,6 +95,7 @@ import {
   GALE_CORE,
   gapLips,
   gapThreat,
+  INHALE_SWIRL,
   BREATH_FIGHT_POOLS as P,
   PINNED_MARK,
   STRIKE_BOLT_SECONDS,
@@ -146,6 +147,7 @@ uniform vec2 uDir;
 uniform vec2 uFocus;
 uniform vec2 uCentre;
 uniform float uInward;
+uniform float uSwirl;
 uniform float uStrength;
 uniform float uDust;
 uniform float uFlowT;
@@ -173,7 +175,9 @@ void main() {
     vec2 off = vLocal - uFocus;
     float r = length(off);
     along = -r;
-    across = atan(off.y, off.x) * 9.0;
+    // Each lane curls round it on the whirl's log spiral (INHALE_SWIRL): one
+    // vortex, the dust spiralling in, never spokes.
+    across = (atan(off.y, off.x) - uSwirl * log(max(r, 1.0))) * 9.0;
     laneW = 0.9;
   }
   float a = along - uFlowT;
@@ -689,6 +693,7 @@ export class BreathFightFx {
         uFocus: { value: new THREE.Vector2(0, 196) },
         uCentre: { value: new THREE.Vector2(0, 196) },
         uInward: { value: 0 },
+        uSwirl: { value: INHALE_SWIRL.twist },
         uStrength: { value: 0 },
         uDust: { value: 0 },
         uFlowT: { value: 0 },

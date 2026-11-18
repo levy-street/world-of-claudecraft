@@ -158,11 +158,13 @@ export function windFieldLook(
       break;
     case 'inhale':
     case 'break':
-      out.dust = 0.55 + 0.45 * smooth(f * 1.4);
-      out.strength = 0.4 + 0.6 * smooth(f);
-      // Drawn in: the dust and the streaks run to its mouth; no leaves.
+      // Drawn in (Jose's playtest of 2026-11-18: the pull is a real threat
+      // now, and reads as one): the dust and the streaks spiral in to its
+      // mouth from the first instant, hard and fast; no leaves.
+      out.dust = 0.75 + 0.25 * smooth(f * 1.4);
+      out.strength = 0.6 + 0.4 * smooth(f);
       out.debris = 0;
-      out.speed = 9 + 8 * f;
+      out.speed = 12 + 10 * f;
       out.inward = true;
       break;
     case 'exhale':
@@ -175,6 +177,19 @@ export function windFieldLook(
       break;
   }
   return out;
+}
+
+/** The indrawn breath's whirl: every inward stream (the floor's dust, the
+ *  air's streaks, the ropes of wind into the maw) bends along one log
+ *  spiral round the guardian, `twist` radians more round it for each e-fold
+ *  nearer (so it curls tighter as it closes in), all turning the same way:
+ *  one vortex, never radial spokes. */
+export const INHALE_SWIRL = { twist: 0.85 } as const;
+
+/** The angle (radians) an inward stream that left `angle0` at `reach` yards
+ *  out has turned to at `r` yards from the maw (the log spiral above). */
+export function inhaleSwirlAngle(angle0: number, reach: number, r: number): number {
+  return angle0 + INHALE_SWIRL.twist * Math.log(Math.max(1, reach) / Math.max(1, r));
 }
 
 /** The streaks of wind in the air over the Cornice: how many on each tier

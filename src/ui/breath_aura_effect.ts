@@ -68,7 +68,7 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
       return {
         key: `${KEY}.draw`,
         nums: {
-          speed: a.value3 ?? T.pullSpeed,
+          speed: a.value3 ?? BREATH_DIFFICULTY.normal.pullSpeed,
           min: tierValue(T.vortexMin, NM),
           max: tierValue(T.vortexMax, NM),
           tick: T.vortexTick,
