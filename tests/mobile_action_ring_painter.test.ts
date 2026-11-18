@@ -951,7 +951,7 @@ describe('Hud.buildMobileActionRing wiring (source scan)', () => {
 
   it('leaves the primary attack slot with no painted background (the crisp data-icon SVG shows through instead)', () => {
     expect(ring).toContain(
-      "(iconKey) => (iconKey === ATTACK_ICON_KEY ? '' : deps.iconBackground(iconKey)),",
+      "slot === 0 && iconKey === ATTACK_ICON_KEY ? '' : deps.iconBackground(iconKey),",
     );
   });
 

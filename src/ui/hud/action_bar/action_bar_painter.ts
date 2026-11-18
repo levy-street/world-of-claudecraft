@@ -83,7 +83,9 @@ export class ActionBarPainter {
   constructor(
     private readonly writers: PainterHostWriters,
     private readonly descriptor: ActionBarPaintDescriptor,
-    private readonly resolveBackgroundImage: (iconKey: string) => string,
+    // `slotIndex` lets a host treat one slot's key differently (the touch ring's
+    // fixed Attack button draws its own glyph); most resolvers ignore it.
+    private readonly resolveBackgroundImage: (iconKey: string, slotIndex: number) => string,
   ) {
     this.lastIcon = descriptor.slots.map(() => null);
   }
@@ -101,7 +103,7 @@ export class ActionBarPainter {
         this.writers.setStyleProp(
           el.label,
           BACKGROUND_IMAGE_PROP,
-          this.resolveBackgroundImage(s.iconKey),
+          this.resolveBackgroundImage(s.iconKey, i),
         );
       }
 

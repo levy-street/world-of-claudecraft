@@ -60,6 +60,7 @@ import { markDialogRoot } from './dialog_root';
 import { classDisplayName, tEntity } from './entity_i18n';
 import { esc } from './esc';
 import {
+  ATTACK_HOTBAR_ACTION,
   encodeHotbarAction,
   HOTBAR_ACTION_MIME,
   HOTBAR_ATTACK_MIME,
@@ -118,7 +119,7 @@ export interface SpellbookWindowDeps {
   hasFormBars(): boolean;
   /** Reset the active form bar to its default kit. */
   resetFormBar(): void;
-  setDragAction(action: { type: 'ability'; id: string } | null): void;
+  setDragAction(action: { type: 'ability'; id: string } | typeof ATTACK_HOTBAR_ACTION | null): void;
   clearActionDropTargets(): void;
   /** Open the touch bar editor with this spell armed for the next tap. Touch has
    *  no drag onto the bar, and the +/- toggle only reaches the FIRST free slot,
@@ -593,21 +594,24 @@ export class SpellbookWindow {
     // data-attack-toggle marker on every frame.
     this.attackToggle = toggle;
     el.appendChild(toggle);
-    // Attack drags onto the action bar like any ability row. It has no ability/item
-    // id, so it cannot ride the HotbarAction path: the dragstart carries the dedicated
-    // Attack marker MIME, which the action bar accepts by turning showAttackButton back
-    // on (restoring Attack to slot 0). The +/- toggle above stays for touch/keyboard.
+    // Attack drags onto the action bar like any ability row. Dropped on any slot it
+    // places the Attack action there, so auto-attack rides that slot's key. Slot 0
+    // reads the extra marker MIME instead and turns showAttackButton back on
+    // (restoring the fixed Attack button). The +/- toggle above stays for touch/keyboard.
     el.draggable = true;
     el.addEventListener('dragstart', (e) => {
       this.dragActive = true;
+      this.deps.setDragAction(ATTACK_HOTBAR_ACTION);
       if (e.dataTransfer) {
         e.dataTransfer.setData(HOTBAR_ATTACK_MIME, '1');
-        e.dataTransfer.effectAllowed = 'move';
+        this.writeDraggedAction(e.dataTransfer, ATTACK_HOTBAR_ACTION);
+        e.dataTransfer.effectAllowed = 'copyMove';
       }
       this.deps.hideTooltip();
     });
     el.addEventListener('dragend', () => {
       this.dragActive = false;
+      this.deps.setDragAction(null);
       this.deps.clearActionDropTargets();
       this.flushDeferredRender();
     });
@@ -769,7 +773,7 @@ export class SpellbookWindow {
   // the HUD via the deps (mirrors bags_window).
   private writeDraggedAction(
     dt: DataTransfer | null,
-    action: { type: 'ability'; id: string },
+    action: { type: 'ability'; id: string } | typeof ATTACK_HOTBAR_ACTION,
   ): void {
     if (!dt) return;
     dt.setData(HOTBAR_ACTION_MIME, encodeHotbarAction(action));

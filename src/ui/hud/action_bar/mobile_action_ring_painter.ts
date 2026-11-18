@@ -46,7 +46,7 @@ export class MobileActionRingPainter {
   constructor(
     private readonly writers: PainterHostWriters,
     private readonly descriptor: MobileActionRingPaintDescriptor,
-    resolveBackgroundImage: (iconKey: string) => string,
+    resolveBackgroundImage: (iconKey: string, slotIndex: number) => string,
     private readonly t: (key: TranslationKey, values?: InterpolationValues) => string,
     private readonly petals?: MobileActionRingPetals,
   ) {

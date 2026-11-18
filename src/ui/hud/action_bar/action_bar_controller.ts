@@ -624,6 +624,7 @@ export class ActionBarController {
   isAssignableAction(action: Exclude<HotbarAction, null>): boolean {
     if (action.type === 'item') return this.isHotbarItemId(action.id);
     if (action.type === 'pet') return isPetSlotCommand(action.id);
+    if (action.type === 'attack') return true;
     return (
       this.deps.knownAbilityIds().includes(action.id) && this.isAbilityPlacementAllowed(action.id)
     );

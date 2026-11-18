@@ -233,7 +233,8 @@ export function buildMobileActionRing(deps: MobileActionRingDeps): MobileActionR
         },
         ...Array.from({ length: MOBILE_ACTION_BUTTONS }, (_, i) => ({
           slotIndex: i + 1,
-          isAttack: () => false,
+          // A page slot holding the placed Attack paints (and presses) as Attack.
+          isAttack: () => deps.actionForSlot(deps.sourceSlot(i, 'center'))?.type === 'attack',
           hasAction: () => deps.actionForSlot(deps.sourceSlot(i, 'center')) !== null,
           ability: () => deps.abilityForSlot(deps.sourceSlot(i, 'center')),
           item: () => deps.itemForSlot(deps.sourceSlot(i, 'center')),
@@ -261,8 +262,10 @@ export function buildMobileActionRing(deps: MobileActionRingDeps): MobileActionR
     // ability-icon background desktop's attack toggle uses: an empty background
     // here leaves the inline SVG hydrateIcons() already inserted into
     // #mobile-action-attack's markup visible underneath. Every other slot still
-    // resolves through iconBackground exactly like desktop.
-    (iconKey) => (iconKey === ATTACK_ICON_KEY ? '' : deps.iconBackground(iconKey)),
+    // resolves through iconBackground exactly like desktop, including a page slot
+    // holding the placed Attack (it has no inline SVG, so it needs the painted icon).
+    (iconKey, slot) =>
+      slot === 0 && iconKey === ATTACK_ICON_KEY ? '' : deps.iconBackground(iconKey),
     t,
     petals?.ring,
   );
@@ -340,7 +343,10 @@ function buildRadialPetals(
     {
       slots: RADIAL_PETAL_DIRECTIONS.map((direction, i) => ({
         slotIndex: i,
-        isAttack: () => false,
+        isAttack: () => {
+          const slot = petalSlot(deps, gesture, direction);
+          return slot !== null && deps.actionForSlot(slot)?.type === 'attack';
+        },
         hasAction: () => petalSlot(deps, gesture, direction) !== null,
         ability: () => {
           const slot = petalSlot(deps, gesture, direction);

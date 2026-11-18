@@ -418,6 +418,7 @@ import {
 import {
   assignAttackSlotAction,
   attackDragDisposition,
+  barSlotRunsAttack,
   clearHotbarSlot,
   type FreedAttackSlotAbility,
   freedAttackSlotDisplayAbility,
@@ -425,8 +426,8 @@ import {
   hotbarPetCommand,
   isAbilityActionBarEligible,
   placeAbilityOnSlot,
+  placeCopiedActionOnSlot,
   placeItemOnSlot,
-  placePetOnSlot,
   swapHotbarSlots,
   writeHotbarDragData,
 } from './hud/action_bar/hotbar';
@@ -7098,6 +7099,10 @@ export class Hud {
     return this.actionBarController.isAttackSlotFixed();
   }
 
+  private slotRunsAttack(slot: number): boolean {
+    return barSlotRunsAttack(slot === 0 && this.attackSlotIsAttack(), this.actionForSlot(slot));
+  }
+
   private saveAttackSlotAction(): void {
     this.actionBarController.saveAttackAction();
   }
@@ -7229,10 +7234,10 @@ export class Hud {
     return this.groundAim.commitAt();
   }
 
-  private activateFixedAttackSlot(): void {
+  private activateFixedAttackSlot(barSlot = 0): void {
     if (this.sim.player.autoAttack) this.sim.stopAutoAttack();
     else this.sim.startAutoAttack();
-    this.flashActionSlot(0);
+    this.flashActionSlot(barSlot);
   }
 
   // Pad press edge for a cross hotbar cell. Routed through pressSlot when the bar holds the action.
@@ -7333,8 +7338,8 @@ export class Hud {
       }
       this.cancelGroundAim();
     }
-    if (barSlot === 0 && this.attackSlotIsAttack()) {
-      this.activateFixedAttackSlot();
+    if (this.slotRunsAttack(barSlot)) {
+      this.activateFixedAttackSlot(barSlot);
       return;
     }
     const action = this.actionForSlot(barSlot);
@@ -7567,11 +7572,12 @@ export class Hud {
       this.attachTooltip(
         btn,
         () => {
-          if (slot === 0 && this.attackSlotIsAttack()) {
-            return `<div class="tt-title">${esc(t('abilityUi.actionBar.attackName'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackTooltip'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackRemoveHint'))}</div>`;
+          const clearHint = slotEditHintLines();
+          if (this.slotRunsAttack(slot)) {
+            const hint = slot === 0 && this.attackSlotIsAttack();
+            return `<div class="tt-title">${esc(t('abilityUi.actionBar.attackName'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackTooltip'))}</div>${hint ? `<div class="tt-sub">${esc(t('abilityUi.actionBar.attackRemoveHint'))}</div>` : clearHint}`;
           }
           const known = this.abilityForSlot(slot);
-          const clearHint = slotEditHintLines();
           if (known) return this.abilityTooltip(known) + clearHint;
           const freed = slot === 0 && this.freedAttackSlotAbility();
           if (freed)
@@ -7592,8 +7598,7 @@ export class Hud {
           }
           return `<div class="tt-sub">${esc(t('abilityUi.actionBar.emptySlot'))}<br>${esc(t('abilityUi.actionBar.clearHint'))}</div>`;
         },
-        () =>
-          this.actionForSlot(slot)?.type === 'ability' || (slot === 0 && this.attackSlotIsAttack()),
+        () => this.actionForSlot(slot)?.type === 'ability' || this.slotRunsAttack(slot),
       );
       if (slot >= 1) {
         // drag an action onto another slot to place or swap it;
@@ -7665,8 +7670,8 @@ export class Hud {
             this.hotbarActions = placeAbilityOnSlot(this.hotbarActions, action.id, slot - 1);
           } else if (action.type === 'item' && this.isHotbarItemId(action.id)) {
             this.hotbarActions = placeItemOnSlot(this.hotbarActions, action.id, slot - 1);
-          } else if (action.type === 'pet') {
-            this.hotbarActions = placePetOnSlot(this.hotbarActions, action.id, slot - 1);
+          } else if (action.type === 'pet' || action.type === 'attack') {
+            this.hotbarActions = placeCopiedActionOnSlot(this.hotbarActions, action, slot - 1);
           }
           if (dragged.sourceAttackSlot) {
             this.attackSlotAction = null;
@@ -7799,7 +7804,7 @@ export class Hud {
             ownsAimSlot: (activeAimSlot: number) => activeAimSlot === i,
             // Live accessor: slot 0 stops being the Attack toggle when the player
             // removes it (Interface option showAttackButton off / right-click).
-            isAttack: () => i === 0 && this.attackSlotIsAttack(),
+            isAttack: () => this.slotRunsAttack(i),
             // Raw binding presence (any assigned slot, even one whose ability is
             // unlearned or item id is unknown): the many-spells count source, kept
             // byte-identical to the former hotbarActions.filter(a => a !== null).
@@ -8011,6 +8016,7 @@ export class Hud {
   // -------------------------------------------------------------------------
 
   private slotActionName(slot: number): string | null {
+    if (this.actionForSlot(slot)?.type === 'attack') return t('abilityUi.actionBar.attackName');
     const ability = this.abilityForSlot(slot);
     if (ability) return abilityDisplayName(ability.def);
     const item = this.itemForSlot(slot);
