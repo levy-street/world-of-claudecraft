@@ -189,7 +189,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Kullanım: Seni 6 sn. boyunca gizlilik içinde gizler. (2 dk. bekleme)',
   'hudChrome.factionRewards.manaElixirUse': 'Kullanım: Ruh değerini 1 saat boyunca 6 artırır.',
   'hudChrome.factionRewards.riftGliderUse':
-    'Kullanım: Planörü açar, 30 sn. boyunca düşüş hızını azaltır. İniş veya hasar alma etkiyi iptal eder. (2 dk. bekleme)',
+    'Kullanım: Planörü açar, 30 sn. boyunca düşüş hızını azaltır. Savaşta kullanılabilir. Etkiyi yalnızca iniş iptal eder. (2 dk. bekleme)',
   'hudChrome.factionRewards.sharpeningStoneUse':
     'Kullanım: Ana silahını taharuz eder, 30 dk. boyunca Saldırı Gücünü 6 artırır.',
   'hudChrome.factionRewards.shockBombUse':

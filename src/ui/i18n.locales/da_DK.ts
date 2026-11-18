@@ -180,7 +180,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Brug: Omgiver dig med slimhed i 6 sek. (2 min nedetid)',
   'hudChrome.factionRewards.manaElixirUse': 'Brug: Øger Ånd med 6 i 1 time.',
   'hudChrome.factionRewards.riftGliderUse':
-    'Brug: Folder glidedragten ud, sænker faldende hastighed i 30 sek. Landing eller skade annullerer effekten. (2 min nedetid)',
+    'Brug: Folder glidedragten ud, sænker faldende hastighed i 30 sek. Kan bruges i kamp. Kun landing annullerer effekten. (2 min nedetid)',
   'hudChrome.factionRewards.sharpeningStoneUse':
     'Brug: Slår dit hovedhånds våben, øger Angrebskraft med 6 i 30 min.',
   'hudChrome.factionRewards.shockBombUse':

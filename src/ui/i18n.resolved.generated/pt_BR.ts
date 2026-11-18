@@ -6346,7 +6346,7 @@ export const pt_BR: EnTranslations = {
       "hub_rift_watch": "Drifthaven (A Vigília das Fissuras)",
       "hub_church_order": "Vale de Eastbrook (A Ordem da Igreja)",
       "hub_automatons": "Wyrmwatch (Autômatos)",
-      "riftGliderUse": "Usar: Desdobra o planador, diminuindo a velocidade de queda por 30 s. Pousar ou tomar dano cancela o efeito. (2 min de recarga)",
+      "riftGliderUse": "Usar: Desdobra o planador, diminuindo a velocidade de queda por 30 s. Pode ser usado em combate. Apenas pousar cancela o efeito. (2 min de recarga)",
       "targetDummyUse": "Usar: Implanta um boneco de treinamento mecânico no mundo aberto por 2 minutos para praticar habilidades de combate. (5 min de recarga)",
       "battleStandardUse": "Usar: finca o Estandarte de Batalha da Alvorada Consagrada por 5 min. Jogadores fora de combate a até 15 jardas regeneram 10% mais vida; usuários de mana também recuperam mana igual a 5% do Espírito a cada 2 s. Permanecer perto por 10 s concede Bênção da Alvorada, aumentando Força, Agilidade, Vigor, Intelecto e Espírito em 5% por 30 min. (Recarga de 5 min)",
       "shockBombUse": "Usar: Lança uma bomba de choque até 30 metros de distância, causando 120 a 160 de dano de Natureza para todos os inimigos dentro de 5 metros. (1 min de recarga)",

@@ -220,7 +220,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Usar: Envolve você em furtividade por 6 s. (2 min de recarga)',
   'hudChrome.factionRewards.manaElixirUse': 'Usar: Aumenta Espírito em 6 por 1 hora.',
   'hudChrome.factionRewards.riftGliderUse':
-    'Usar: Desdobra o planador, diminuindo a velocidade de queda por 30 s. Pousar ou tomar dano cancela o efeito. (2 min de recarga)',
+    'Usar: Desdobra o planador, diminuindo a velocidade de queda por 30 s. Pode ser usado em combate. Apenas pousar cancela o efeito. (2 min de recarga)',
   'hudChrome.factionRewards.sharpeningStoneUse':
     'Usar: Afila sua arma de mão principal, aumentando Poder de Ataque em 6 por 30 min.',
   'hudChrome.factionRewards.shockBombUse':

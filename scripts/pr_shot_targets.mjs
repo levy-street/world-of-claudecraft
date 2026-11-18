@@ -7142,6 +7142,59 @@ export const TARGETS = [
     },
   },
   {
+    key: 'rift-glider-tooltip',
+    label: 'Rift Feather Glider tooltip with its Use line',
+    when: ['ui/hud/faction_reward_tooltip_view', 'sim/content/faction_rewards'],
+    // Desktop only, the elixir-use-tooltip rationale: the synthetic hover
+    // path does not raise #tooltip on the touch layout.
+    async capture(page) {
+      await page.waitForFunction(() => window.__game?.sim?.player, { timeout: 90000 });
+      await dismissEntryOverlays(page);
+      await page.evaluate(() => {
+        try {
+          window.__game?.sim?.addItem('rift_feather_glider', 1);
+        } catch {}
+        const el = document.querySelector('#bags');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.toggleBags?.();
+      });
+      await pollForSize(page, '#bags');
+      await page.evaluate(() => {
+        const cells = [...document.querySelectorAll('#bags *')];
+        const el = cells.find((c) => {
+          const bg = c instanceof HTMLElement ? c.style.backgroundImage : '';
+          const img = c.querySelector?.('img');
+          const aria = c.getAttribute?.('aria-label') ?? '';
+          return (
+            bg?.includes('rift_feather_glider') ||
+            img?.getAttribute('src')?.includes('rift_feather_glider') ||
+            aria.startsWith('Rift Feather Glider')
+          );
+        });
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        for (const type of [
+          'pointerenter',
+          'pointerover',
+          'mouseenter',
+          'mouseover',
+          'pointermove',
+          'mousemove',
+        ]) {
+          el.dispatchEvent(
+            new MouseEvent(type, {
+              bubbles: true,
+              clientX: r.left + r.width / 2,
+              clientY: r.top + r.height / 2,
+            }),
+          );
+        }
+      });
+      await wait(600);
+      return { clip: '#ui' };
+    },
+  },
+  {
     key: 'elixir-use-tooltip',
     label: 'Elixir of the Boar tooltip with its Use line',
     when: ['ui/hud/professions/elixir_tooltip_view'],

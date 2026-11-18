@@ -197,7 +197,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Användning: Höljer dig i smyg för 6 sek. (2 min väntetid)',
   'hudChrome.factionRewards.manaElixirUse': 'Användning: Ökar anden med 6 för 1 timme.',
   'hudChrome.factionRewards.riftGliderUse':
-    'Användning: Fäller ut glidaren, saktar fallhastigheten för 30 sek. Landning eller skada avbryter effekten. (2 min väntetid)',
+    'Användning: Fäller ut glidaren, saktar fallhastigheten för 30 sek. Kan användas i strid. Endast landning avbryter effekten. (2 min väntetid)',
   'hudChrome.factionRewards.sharpeningStoneUse':
     'Användning: Skärper ditt huvudhandsväpen, ökar attackkraft med 6 för 30 min.',
   'hudChrome.factionRewards.shockBombUse':

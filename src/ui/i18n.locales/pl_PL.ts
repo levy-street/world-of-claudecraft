@@ -185,7 +185,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Użycie: Okrywam cię niewidzialności na 6 sek. (2 min odpoczynku)',
   'hudChrome.factionRewards.manaElixirUse': 'Użycie: Zwiększa Ducha o 6 na 1 godzinę.',
   'hudChrome.factionRewards.riftGliderUse':
-    'Użycie: Rozsuwa szybowiec, spowalniając prędkość spadania na 30 sek. Lądowanie lub zadanie obrażeń anuluje efekt. (2 min odpoczynku)',
+    'Użycie: Rozsuwa szybowiec, spowalniając prędkość spadania na 30 sek. Można użyć w walce. Tylko lądowanie anuluje efekt. (2 min odpoczynku)',
   'hudChrome.factionRewards.sharpeningStoneUse':
     'Użycie: Ostrzy twoją główną broń, zwiększając Moc Ataku o 6 na 30 min.',
   'hudChrome.factionRewards.shockBombUse':

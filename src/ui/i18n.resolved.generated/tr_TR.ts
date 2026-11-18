@@ -6346,7 +6346,7 @@ export const tr_TR: EnTranslations = {
       "hub_rift_watch": "Drifthaven (Yarık İzleyicileri)",
       "hub_church_order": "Doğudere Vadisi (Kilise Düzeni)",
       "hub_automatons": "Wyrmwatch (Otomatlar)",
-      "riftGliderUse": "Kullanım: Planörü açar, 30 sn. boyunca düşüş hızını azaltır. İniş veya hasar alma etkiyi iptal eder. (2 dk. bekleme)",
+      "riftGliderUse": "Kullanım: Planörü açar, 30 sn. boyunca düşüş hızını azaltır. Savaşta kullanılabilir. Etkiyi yalnızca iniş iptal eder. (2 dk. bekleme)",
       "targetDummyUse": "Kullanım: Açık dünyaya 2 dakika boyunca savaş becerilerine pratik yapmak için mekanik bir hedef kukla yerleştirir. (5 dk. bekleme)",
       "battleStandardUse": "Kullanım: Kutsal Şafak Savaş Bayrağını 5 dk. boyunca diker. 15 yard içindeki savaş dışındaki oyuncular %10 daha fazla sağlık yeniler; mana kullananlar ayrıca her 2 sn. Ruhlarının %5’i kadar mana kazanır. Yakınında 10 sn. kalmak, Güç, Çeviklik, Dayanıklılık, Zekâ ve Ruhu 30 dk. boyunca %5 artıran Şafağın Kutsamasını verir. (5 dk. bekleme süresi)",
       "shockBombUse": "Kullanım: 30 metre uzaklıkta bir şok bombası fırlatır, 5 metre içindeki tüm düşmanlara 120 ile 160 Doğa hasarı verir. (1 dk. bekleme)",

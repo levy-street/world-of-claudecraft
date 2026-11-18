@@ -6346,7 +6346,7 @@ export const de_DE: EnTranslations = {
       "hub_rift_watch": "Drifthaven (Die Risswacht)",
       "hub_church_order": "Eastbrook-Tal (Der Kirchenorden)",
       "hub_automatons": "Wyrmwatch (Automaten)",
-      "riftGliderUse": "Einsatz: Entfaltet den Gleitschirm und verringert die Fallgeschwindigkeit für 30 Sekunden. Das Landen oder Schadensaufnahme bricht den Effekt ab. (2 Min. Abklingzeit)",
+      "riftGliderUse": "Einsatz: Entfaltet den Gleitschirm und verringert die Fallgeschwindigkeit für 30 Sekunden. Im Kampf einsetzbar. Nur das Landen bricht den Effekt ab. (2 Min. Abklingzeit)",
       "targetDummyUse": "Einsatz: Stellt in der freien Welt ein mechanisches Zieltrainingspuppe für 2 Minuten auf, um Kampffähigkeiten zu trainieren. (5 Min. Abklingzeit)",
       "battleStandardUse": "Benutzen: Stellt die Morgenröte-Kriegsflagge für 5 Min. auf. Spieler außerhalb des Kampfes im Umkreis von 15 Yards regenerieren 10% mehr Gesundheit; Mananutzer erhalten außerdem alle 2 Sek. Mana in Höhe von 5% ihrer Willenskraft. Nach 10 Sek. in ihrer Nähe erhältst du Segen der Morgenröte: Stärke, Beweglichkeit, Ausdauer, Intelligenz und Willenskraft steigen 30 Min. lang um 5%. (5 Min. Abklingzeit)",
       "shockBombUse": "Einsatz: Wirft eine Schockbombe bis zu 30 Yard entfernt und verursacht 120 bis 160 Naturschaden an allen Feinden im Umkreis von 5 Yards. (1 Min. Abklingzeit)",

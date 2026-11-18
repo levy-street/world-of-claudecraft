@@ -6346,7 +6346,7 @@ export const it_IT: EnTranslations = {
       "hub_rift_watch": "Drifthaven (La Guardia dei Rifti)",
       "hub_church_order": "Valle di Eastbrook (L'Ordine della Chiesa)",
       "hub_automatons": "Wyrmwatch (Automi)",
-      "riftGliderUse": "Uso: Dispone il deltaplano, rallentando la caduta per 30 sec. L'atterraggio o il danno cancella l'effetto. (2 min di recupero)",
+      "riftGliderUse": "Uso: Dispone il deltaplano, rallentando la caduta per 30 sec. Utilizzabile in combattimento. Solo l'atterraggio annulla l'effetto. (2 min di recupero)",
       "targetDummyUse": "Uso: Dispone un bersaglio meccanico nel mondo aperto per 2 minuti per praticare le abilità di combattimento. (5 min di recupero)",
       "battleStandardUse": "Uso: pianta lo Stendardo da Battaglia dell’Alba Consacrata per 5 min. I giocatori fuori dal combattimento entro 15 iarde rigenerano il 10% di salute in più; chi usa mana recupera inoltre mana pari al 5% del proprio Spirito ogni 2 s. Restare vicino per 10 s conferisce Benedizione dell’Alba, aumentando Forza, Agilità, Tempra, Intelletto e Spirito del 5% per 30 min. (Recupero: 5 min)",
       "shockBombUse": "Uso: Lancia una bomba a shock fino a 30 yard, infliggendo 120 a 160 danni da Natura a tutti i nemici entro 5 yard. (1 min di recupero)",

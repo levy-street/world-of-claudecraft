@@ -899,7 +899,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '사용: 6초 동안 은신 상태가 됩니다. (재사용 대기시간 2분)',
   'hudChrome.factionRewards.manaElixirUse': '사용: 1시간 동안 정신력이 6 증가합니다.',
   'hudChrome.factionRewards.riftGliderUse':
-    '사용: 글라이더를 펼쳐 30초 동안 낙하 속도를 늦춥니다. 착지하거나 피해를 입으면 효과가 취소됩니다. (재사용 대기시간 2분)',
+    '사용: 글라이더를 펼쳐 30초 동안 낙하 속도를 늦춥니다. 전투 중에도 사용할 수 있습니다. 착지할 때만 효과가 취소됩니다. (재사용 대기시간 2분)',
   'hudChrome.factionRewards.sharpeningStoneUse':
     '사용: 주 무기를 연마하여 30분 동안 전투력이 6 증가합니다.',
   'hudChrome.factionRewards.shockBombUse':

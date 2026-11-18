@@ -8654,7 +8654,7 @@ export const hudChromeStrings = {
     hub_church_order: 'Eastbrook Vale (The Church Order)',
     hub_automatons: 'Wyrmwatch (The Automatons)',
     riftGliderUse:
-      'Use: Unfolds the glider, slowing falling speed for 30 sec. Landing or taking damage cancels the effect. (2 min cooldown)',
+      'Use: Unfolds the glider, slowing falling speed for 30 sec. Usable in combat. Only landing cancels the effect. (2 min cooldown)',
     targetDummyUse:
       'Use: Deploys a mechanical target dummy in the open world for 2 minutes to practice combat abilities. (5 min cooldown)',
     battleStandardUse:

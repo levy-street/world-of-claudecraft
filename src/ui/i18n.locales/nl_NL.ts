@@ -196,7 +196,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Gebruik: Bedekt je in sluipschakering voor 6 sec. (2 min cooldown)',
   'hudChrome.factionRewards.manaElixirUse': 'Gebruik: Verhoogt Geest met 6 voor 1 uur.',
   'hudChrome.factionRewards.riftGliderUse':
-    'Gebruik: Ontvouwt de zweefvliegtuig, vertraagt valsnelheid voor 30 sec. Landen of schade nemen kan het effect annuleren. (2 min cooldown)',
+    'Gebruik: Ontvouwt de zweefvliegtuig, vertraagt valsnelheid voor 30 sec. Bruikbaar in gevecht. Alleen landen annuleert het effect. (2 min cooldown)',
   'hudChrome.factionRewards.sharpeningStoneUse':
     'Gebruik: Slijpt je hoofdhand wapen, verhoogt Aanvalssterkte met 6 voor 30 min.',
   'hudChrome.factionRewards.shockBombUse':

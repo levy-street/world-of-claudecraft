@@ -6346,7 +6346,7 @@ export const es_ES: EnTranslations = {
       "hub_rift_watch": "Refugio de la Brecha (La Guardia de la Brecha)",
       "hub_church_order": "Valle de Arroyo Este (La Orden de la Iglesia)",
       "hub_automatons": "Wyrmwatch (Autómatas)",
-      "riftGliderUse": "Uso: Despliega el planeador, ralentizando la caída durante 30 s. Aterrizar o recibir daño cancela el efecto. (2 min de reutilización)",
+      "riftGliderUse": "Uso: Despliega el planeador, ralentizando la caída durante 30 s. Se puede usar en combate. Solo aterrizar cancela el efecto. (2 min de reutilización)",
       "targetDummyUse": "Uso: Despliega un muñeco mecánico de entrenamiento en el mundo abierto durante 2 minutos para practicar combate. (5 min de reutilización)",
       "battleStandardUse": "Uso: Clava el estandarte de batalla del Alba Consagrada durante 5 min. Los jugadores fuera de combate a 15 yardas o menos regeneran un 10% más de salud; quienes usan maná recuperan además maná equivalente al 5% de su Espíritu cada 2 s. Permanecer cerca durante 10 s otorga Bendición del Alba, que aumenta Fuerza, Agilidad, Aguante, Intelecto y Espíritu un 5% durante 30 min. (5 min de reutilización)",
       "shockBombUse": "Uso: Lanza una bomba de choque mecánica hasta a 30 m, infligiendo de 120 a 160 p. de daño de Naturaleza a los enemigos en un radio de 5 m. (1 min de reutilización)",

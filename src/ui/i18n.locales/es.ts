@@ -578,7 +578,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.factionRewards.hub_church_order': 'Valle de Arroyo Este (La Orden de la Iglesia)',
   'hudChrome.factionRewards.hub_automatons': 'Wyrmwatch (Autómatas)',
   'hudChrome.factionRewards.riftGliderUse':
-    'Uso: Despliega el planeador, ralentizando la caída durante 30 s. Aterrizar o recibir daño cancela el efecto. (2 min de reutilización)',
+    'Uso: Despliega el planeador, ralentizando la caída durante 30 s. Se puede usar en combate. Solo aterrizar cancela el efecto. (2 min de reutilización)',
   'hudChrome.factionRewards.targetDummyUse':
     'Uso: Despliega un muñeco mecánico de entrenamiento en el mundo abierto durante 2 minutos para practicar combate. (5 min de reutilización)',
   'hudChrome.factionRewards.battleStandardUse':

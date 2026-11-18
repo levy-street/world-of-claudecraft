@@ -6346,7 +6346,7 @@ export const nl_NL: EnTranslations = {
       "hub_rift_watch": "Drifthaven (De Rift-wacht)",
       "hub_church_order": "Oostbeekdal (De Kerkorde)",
       "hub_automatons": "Wyrmwatch (Automatons)",
-      "riftGliderUse": "Gebruik: Ontvouwt de zweefvliegtuig, vertraagt valsnelheid voor 30 sec. Landen of schade nemen kan het effect annuleren. (2 min cooldown)",
+      "riftGliderUse": "Gebruik: Ontvouwt de zweefvliegtuig, vertraagt valsnelheid voor 30 sec. Bruikbaar in gevecht. Alleen landen annuleert het effect. (2 min cooldown)",
       "targetDummyUse": "Gebruik: Plaatst een mechanisch doel in de open wereld voor 2 minuten om gevechtsvaardigheden te oefenen. (5 min cooldown)",
       "battleStandardUse": "Gebruik: plant de strijdstandaard van de Gewijde Dageraad voor 5 min. Spelers buiten gevecht binnen 15 yards herstellen 10% meer gezondheid; managebruikers herstellen bovendien elke 2 sec. mana gelijk aan 5% van hun Geest. Blijf 10 sec. in de buurt voor Zegen van de Dageraad, die Kracht, Behendigheid, Uithoudingsvermogen, Intellect en Geest 30 min. lang met 5% verhoogt. (5 min. afkoeltijd)",
       "shockBombUse": "Gebruik: Gooit een schokbom tot 30 meter, brengt 120 tot 160 Natuurschade toe aan alle vijanden binnen 5 meter. (1 min cooldown)",

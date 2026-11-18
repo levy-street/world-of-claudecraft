@@ -184,7 +184,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Gunakan: Membungkus Anda dalam ketapian selama 6 detik. (Waktu tunggu 2 menit)',
   'hudChrome.factionRewards.manaElixirUse': 'Gunakan: Meningkatkan Roh sebesar 6 selama 1 jam.',
   'hudChrome.factionRewards.riftGliderUse':
-    'Gunakan: Membuka peluncur, memperlambat kecepatan jatuh Anda selama 10 detik. (Tidak dapat digunakan dalam pertempuran)',
+    'Gunakan: Membuka peluncur, memperlambat kecepatan jatuh selama 30 detik. Dapat digunakan dalam pertempuran. Hanya mendarat yang membatalkan efeknya. (Cooldown 2 menit)',
   'hudChrome.factionRewards.sharpeningStoneUse':
     'Gunakan: Menajamkan senjata tangan Anda, meningkatkan Kekuatan Serangan sebesar 25 selama 1 jam.',
   'hudChrome.factionRewards.shockBombUse':

@@ -6346,7 +6346,7 @@ export const da_DK: EnTranslations = {
       "hub_rift_watch": "Drifthaven (Rift-vagten)",
       "hub_church_order": "Østbæk Dal (Kirkeordenen)",
       "hub_automatons": "Wyrmwatch (Automatoner)",
-      "riftGliderUse": "Brug: Folder glidedragten ud, sænker faldende hastighed i 30 sek. Landing eller skade annullerer effekten. (2 min nedetid)",
+      "riftGliderUse": "Brug: Folder glidedragten ud, sænker faldende hastighed i 30 sek. Kan bruges i kamp. Kun landing annullerer effekten. (2 min nedetid)",
       "targetDummyUse": "Brug: Udrulles en mekanisk mål dummy i den åbne verden i 2 minutter for at øve kampeviljer. (5 min nedetid)",
       "battleStandardUse": "Brug: Planter Velsignede Dagsmorgens kampstandard i 5 min. Spillere uden for kamp inden for 15 yards genvinder 10% mere liv, og manabrugere genvinder også mana svarende til 5% af deres Ånd hvert 2. sek. Efter 10 sek. i nærheden får du Velsignelse af Dagsmorgen, som øger Styrke, Smidighed, Udholdenhed, Intellekt og Ånd med 5% i 30 min. (5 min. nedkøling)",
       "shockBombUse": "Brug: Kaster en chokbombe op til 30 yards, handler 120 til 160 Natur skade til alle fjender inden for 5 yards. (1 min nedetid)",
