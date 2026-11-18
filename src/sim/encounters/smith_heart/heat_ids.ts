@@ -461,7 +461,10 @@ export const HEAT_TUNING = {
   boltMin: 140,
   boltMax: 170,
   // Heroic: the Wellspawn.
-  spawnSpeed: 3,
+  // 3 until the rework of 2026-11-18: the overflow no longer waits for them
+  // (it lasts as long as its lava waves), and the raid walks the corridors
+  // while it burns them, so they walk a little slower.
+  spawnSpeed: 2.4,
   /** Their speed factor at full health, falling to spawnMinFactor at
    *  spawnSlowAt of their health and below ("fully slowed"). */
   spawnMinFactor: 0.15,
