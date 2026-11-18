@@ -323,6 +323,11 @@ export class FinalBodyFx {
     this.paintBolts(f.clock);
   }
 
+  /** A presentation gesture on the boss's own rig (the Overload's strain). */
+  pulse(gesture: string): void {
+    this.send(gesture);
+  }
+
   private send(gesture: string): void {
     if (this.bossId >= 0) this.playGesture?.(this.bossId, gesture);
   }

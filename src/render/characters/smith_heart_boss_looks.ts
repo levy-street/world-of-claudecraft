@@ -741,6 +741,11 @@ export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
       // colour and light filling back over the fall once it stops.
       pulses: [
         { gesture: FINAL_BODY_GESTURES.charge, rise: 0.6, hold: 0.1, fall: 0.6, peak: 1.8 },
+        // The Overload straining its body (final_overload_core.ts strainPulse):
+        // its own cracks throbbing brighter in three steps as the bar fills.
+        { gesture: FINAL_BODY_GESTURES.strain[0], rise: 0.15, hold: 0.1, fall: 0.6, peak: 1.8 },
+        { gesture: FINAL_BODY_GESTURES.strain[1], rise: 0.12, hold: 0.1, fall: 0.45, peak: 2.8 },
+        { gesture: FINAL_BODY_GESTURES.strain[2], rise: 0.1, hold: 0.12, fall: 0.3, peak: 4.2 },
         {
           gesture: FINAL_BODY_GESTURES.dark,
           rise: 0,
