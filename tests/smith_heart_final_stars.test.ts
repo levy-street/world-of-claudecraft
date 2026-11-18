@@ -244,6 +244,42 @@ describe('the Anvil holds the stars', () => {
     expect(st.anvil).toBeNull();
     expect(f.state()?.stars.volleys ?? 0).toBeGreaterThanOrEqual(2);
   });
+
+  it("a fire tornado veers off the Anvil's mark through its bar, never into the stack", () => {
+    const f = finalFight(6);
+    f.pullIn('heat');
+    still(f);
+    f.dev('/dev heart final tornado');
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    expect(st.whirls.length).toBeGreaterThan(0);
+    const at = inQuarter('heat', 34, 30);
+    f.put(f.players[2], at.x, at.z);
+    f.dev('/dev heart final anvil', f.pids[2]);
+    const anvil = st.anvil;
+    if (!anvil) throw new Error('no anvil');
+    // Every tornado set rolling straight at the mark from just outside it.
+    const clear = T.anvilR + T.whirlR;
+    st.whirls.forEach((w, i) => {
+      w.warn = 0;
+      w.life = 30;
+      const obj = f.sim.entities.get(w.objectId) as Entity;
+      const a = (i / st.whirls.length) * Math.PI * 2;
+      f.put(obj, anvil.x + Math.sin(a) * (clear + 2), anvil.z + Math.cos(a) * (clear + 2));
+      w.heading = a + Math.PI;
+    });
+    let nearest = Number.POSITIVE_INFINITY;
+    for (let t = 0; t < sec(T.anvilCast - 0.5); t++) {
+      f.tick(1);
+      for (const w of st.whirls) {
+        const obj = f.sim.entities.get(w.objectId);
+        if (!obj) continue;
+        const q = f.local(obj);
+        nearest = Math.min(nearest, Math.hypot(q.x - anvil.x, q.z - anvil.z));
+      }
+    }
+    expect(nearest).toBeGreaterThanOrEqual(clear - 0.01);
+  });
 });
 
 describe('Wake the Stone', () => {

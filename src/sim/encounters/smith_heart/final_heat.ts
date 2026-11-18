@@ -281,6 +281,15 @@ export function stepWhirls(s: FinalScope): void {
       obj.facing = w.heading;
       next = p;
     }
+    // Through Weight of the Anvil's bar it veers off the mark (the Heroic bot
+    // raids of 2026-11-18: tornadoes rolling into the stacked soakers): the
+    // raid's one gather is never a tornado's.
+    const anvil = st.anvil;
+    if (anvil && Math.hypot(next.x - anvil.x, next.z - anvil.z) < T.anvilR + T.whirlR) {
+      w.heading = facingTo(anvil, p);
+      obj.facing = w.heading;
+      next = p;
+    }
     moveFightObject(s.ctx, s.inst, obj, next.x, next.z);
     for (const id of Object.keys(w.cooldown)) {
       const k = Number(id);

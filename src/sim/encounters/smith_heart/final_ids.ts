@@ -433,18 +433,28 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     anvilMissMin: 1500,
     anvilMissMax: 1600,
     anvilTotal: 6600,
-    pillarCount: 3,
+    // Two a volley (three until the Heroic bot raids of 2026-11-18: seven
+    // standing at once outran the blades that break them).
+    pillarCount: 2,
     pillarCap: 7,
     thrumMin: 520,
     thrumMax: 580,
-    chargedMin: 56,
-    chargedMax: 64,
+    // 32 to 36 a pillar (56 to 64 until the Heroic bot raids of 2026-11-18:
+    // three or four charged at once outran the healers on top of the Anvil).
+    chargedMin: 32,
+    chargedMax: 36,
     skyMarks: 3,
-    skyPillarSpots: 1,
+    // None seeks the stone on Heroic either (one until the same raids): a
+    // pillar charges when a marked player brings the strike to it; Mythic's
+    // lightning still seeks it.
+    skyPillarSpots: 0,
     bladeMarks: 2,
     bladeAim: 3.5,
-    whirlCount: 3,
-    anvilEvery: 36,
+    // Two a volley (three until the same raids: tornadoes caught the raid on
+    // its way to the Anvil once all four stars were awake).
+    whirlCount: 2,
+    // 45 s (36 until the same raids: two Anvils a minute on top of the stars).
+    anvilEvery: 45,
   },
   mythic: {
     // Its pool Heroic's (x2.28 since 2026-11-16); its damage unchanged.
