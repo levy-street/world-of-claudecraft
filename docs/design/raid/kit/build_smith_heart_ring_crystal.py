@@ -20,14 +20,15 @@ README.md) and writes the shipping source GLB:
     its side clusters do not keep to their own compass side), and the compass only where the
     painting has no hue to read (the plain stone plinth: each quarter lights its own channel);
   - cut into the pieces the burst throws apart, each its own node with its centre as the
-    node's translation: the plinth in six sectors, the white-gold heart's shaft, and each
-    element's crystals as a few WHOLE chunks of that element (two to five, by its share of
-    the crystal; `--chunks` over the whole; the owner's call of 2026-11-18: chunks of each
-    element's crystal floating, not random pieces). Tripo's thousand "shells" are only its UV seams:
-    welded, the crystal is a dozen solids, and the pieces are cut from those, so a chunk is
-    whole wherever it is not cut and every cut (and every hole Tripo left) is capped in one
-    colour of the painting round it. Their union is the crystal; the renderer merges them
-    for the whole crystal's one draw.
+    node's translation: the plinth in six sectors, the white-gold heart's shaft, and the
+    crystal's own PRISMS, each the element its faces mostly carry (the owner's calls of
+    2026-11-18: chunks of each element's crystal floating, and solid crystals, not flat poly
+    faces). Tripo's thousand "shells" are only its UV seams: welded, the crystal is a dozen
+    solids, and its skin parts into prisms at the inward folds where one prism meets the next
+    (`--seam-deg`), so each piece keeps its painted faces and only its base, where it joined
+    the rest, is capped (in one colour of the painting round it, as is every hole Tripo
+    left). Their union is the crystal; the renderer merges them for the whole crystal's one
+    draw.
 
 Run (one Blender process; the glTF importer and exporter are Blender's own):
 
@@ -54,7 +55,10 @@ ap.add_argument('--src', required=True)
 ap.add_argument('--out', required=True)
 ap.add_argument('--reach', type=float, default=8.6)
 ap.add_argument('--squash', type=float, default=1.0)
-ap.add_argument('--chunks', type=int, default=12)
+ap.add_argument('--seam-deg', type=float, default=14.0)
+ap.add_argument('--paint-size', type=int, default=1024)
+ap.add_argument('--min-prism', type=float, default=4.0)
+ap.add_argument('--probe-segments', default='')
 ap.add_argument('--crown-r', type=float, default=0.15)
 ap.add_argument('--crown-z', type=float, default=0.4)
 ap.add_argument('--debug-dir', default='')
@@ -346,40 +350,7 @@ if args.debug_dir:
             bpy.ops.render.render(write_still=True)
     bpy.data.objects.remove(dob, do_unlink=True)
 
-def space(c):
-    return Vector((c.x / reach, c.y / reach, 1.4 * c.z / height))
-
-
-def kmeans(items, k, centre_of, area_of, iters=60):
-    """Deterministic, area-weighted k-means (farthest-point start) over any items."""
-    if len(items) <= k:
-        return [[i] for i in items]
-    pts = {i: space(centre_of(i)) for i in items}
-    first = max(items, key=area_of)
-    centres = [pts[first]]
-    while len(centres) < k:
-        far = max(items, key=lambda i: min((pts[i] - c).length for c in centres))
-        centres.append(pts[far])
-    groups = [[] for _ in centres]
-    for _ in range(iters):
-        groups = [[] for _ in centres]
-        for i in items:
-            groups[min(range(len(centres)), key=lambda j: (pts[i] - centres[j]).length)].append(i)
-        moved = False
-        for j, g in enumerate(groups):
-            if not g:
-                continue
-            tot = sum(area_of(i) for i in g) or 1.0
-            c = sum((pts[i] * area_of(i) for i in g), Vector((0, 0, 0))) / tot
-            if (c - centres[j]).length > 1e-6:
-                moved = True
-            centres[j] = c
-        if not moved:
-            break
-    return [g for g in groups if g]
-
-
-# ---- the pieces: the plinth's sectors, the heart, each element's chunks ---------------------
+# ---- the pieces: the plinth's sectors, the heart, each element's prisms ---------------------
 
 bm.faces.ensure_lookup_table()
 face_area = {f.index: f.calc_area() for f in bm.faces}
@@ -422,51 +393,134 @@ def angle_about(c, mean):
     return (bearing_of(c.x, c.y) - mean + 180.0) % 360.0 - 180.0
 
 
-def chunks_of(faces, k):
-    """`faces` as `k` whole chunks: an area-weighted k-means over the face centres, started from
-    k equal-area slices round the axis (so the chunks stand side by side, not a far fleck on its
-    own), a chunk under a third of its share merged into the nearest one."""
-    area = sum(face_area[fi] for fi in faces)
-    if k <= 1 or len(faces) <= k:
-        return [faces]
-    sx = sum(math.sin(math.radians(bearing_of(face_centre[fi].x, face_centre[fi].y))) * face_area[fi] for fi in faces)
-    cy_ = sum(math.cos(math.radians(bearing_of(face_centre[fi].x, face_centre[fi].y))) * face_area[fi] for fi in faces)
-    mean = math.degrees(math.atan2(sx, cy_))
-    order = sorted(faces, key=lambda fi: (angle_about(face_centre[fi], mean), fi))
-    slices = [[] for _ in range(k)]
-    run = 0.0
-    for fi in order:
-        slices[min(k - 1, int(run / area * k))].append(fi)
-        run += face_area[fi]
-    pts = {fi: space(face_centre[fi]) for fi in faces}
+# ---- the crystal's prisms: its skin split at the folds ---------------------------------------
+# Tripo paints its crystals as one skin (a fused formation is one surface over many prisms),
+# so a chunk cut along colour reads as a jagged flat sheet once it flies (the owner's review of
+# 2026-11-18). The burst's chunks are cut along the crystal's own FOLDS instead: an edge whose
+# neighbour face stands in front of it (an inward crease, sharper than `--seam-deg`) is where
+# one prism meets the next, so the skin floods into its prisms across every other edge.
+bm.normal_update()
+seam_cos = math.cos(math.radians(args.seam_deg))
 
-    def centroid(g):
-        tot = sum(face_area[fi] for fi in g) or 1.0
-        return sum((pts[fi] * face_area[fi] for fi in g), Vector((0, 0, 0))) / tot
 
-    centres = [centroid(g) for g in slices if g]
-    groups = slices
-    for _ in range(60):
-        groups = [[] for _ in centres]
-        for fi in faces:
-            groups[min(range(len(centres)), key=lambda j: (pts[fi] - centres[j]).length)].append(fi)
-        groups = [g for g in groups if g]
-        new_c = [centroid(g) for g in groups]
-        if len(new_c) == len(centres) and all((a - b).length < 1e-7 for a, b in zip(new_c, centres)):
-            break
-        centres = new_c
-    # A sliver of a chunk joins its nearest neighbour.
-    share = area / k
-    while len(groups) > 1:
-        small = min(range(len(groups)), key=lambda j: sum(face_area[fi] for fi in groups[j]))
-        if sum(face_area[fi] for fi in groups[small]) >= share / 3:
-            break
-        c = centroid(groups[small])
-        to = min((j for j in range(len(groups)) if j != small), key=lambda j: (centroid(groups[j]) - c).length)
-        groups[to] = groups[to] + groups[small]
-        del groups[small]
-    return groups
+def fold(e):
+    if len(e.link_faces) != 2:
+        return True
+    f1, f2 = e.link_faces
+    if f1.index not in label or f2.index not in label:
+        return True
+    if f1.normal.dot(f2.normal) > seam_cos:
+        return False
+    return f1.normal.dot(face_centre[f2.index] - face_centre[f1.index]) > 1e-6
 
+
+seg_of = {}
+segments = []
+for f in body_faces:
+    if f.index in seg_of:
+        continue
+    stack = [f]
+    comp = []
+    while stack:
+        a = stack.pop()
+        if a.index in seg_of:
+            continue
+        seg_of[a.index] = len(segments)
+        comp.append(a.index)
+        for e in a.edges:
+            if fold(e):
+                continue
+            for g in e.link_faces:
+                if g.index in label and g.index not in seg_of:
+                    stack.append(g)
+    segments.append(comp)
+# A shard too small to fly alone (a sliver, or a few big flat faces that would read as a lone
+# polygon) joins the neighbour it shares the most edge with.
+for _ in range(60):
+    area_of = [sum(face_area[fi] for fi in comp) for comp in segments]
+    small = [n for n in range(len(segments)) if segments[n] and (area_of[n] < args.min_prism or len(segments[n]) < 24)]
+    if not small:
+        break
+    moved = False
+    for n in small:
+        if not segments[n]:
+            continue
+        border = {}
+        for fi in segments[n]:
+            for e in bm.faces[fi].edges:
+                for g in e.link_faces:
+                    m = seg_of.get(g.index)
+                    if m is not None and m != n and segments[m]:
+                        border[m] = border.get(m, 0) + 1
+        if not border:
+            continue
+        to = max(border, key=lambda m: (border[m], -m))
+        for fi in segments[n]:
+            seg_of[fi] = to
+        segments[to] = segments[to] + segments[n]
+        segments[n] = []
+        moved = True
+    if not moved:
+        break
+segments = [comp for comp in segments if comp]
+seg_of = {fi: n for n, comp in enumerate(segments) for fi in comp}
+seg_area = [sum(face_area[fi] for fi in comp) for comp in segments]
+print('prisms:', len(segments), 'areas', sorted((round(a, 1) for a in seg_area), reverse=True)[:30])
+
+if args.probe_segments:
+    # The prisms pulled apart, each its own flat colour (Workbench), from four sides.
+    os.makedirs(args.probe_segments, exist_ok=True)
+    pm = bpy.data.meshes.new('probe')
+    pb = bmesh.new()
+    pcol = pb.loops.layers.float_color.new('seg')
+    vmap = {}
+    for n, comp in enumerate(segments):
+        cen = sum((face_centre[fi] * face_area[fi] for fi in comp), Vector((0, 0, 0))) / max(1e-9, seg_area[n])
+        flat = Vector((cen.x, cen.y, 0.0))
+        off = flat.normalized() * 4.0 if flat.length > 0.1 else Vector((0, 0, 0))
+        off.z = 0.25 * cen.z
+        rgb = colorsys.hsv_to_rgb((n * 0.61803) % 1.0, 0.75, 0.95)
+        for fi in comp:
+            f = bm.faces[fi]
+            vs = []
+            for v in f.verts:
+                key = (n, v.index)
+                if key not in vmap:
+                    vmap[key] = pb.verts.new(v.co + off)
+                vs.append(vmap[key])
+            try:
+                nf = pb.faces.new(vs)
+            except ValueError:
+                continue
+            for lo in nf.loops:
+                lo[pcol] = (rgb[0], rgb[1], rgb[2], 1.0)
+    pb.to_mesh(pm)
+    pm.color_attributes.active_color = pm.color_attributes['seg']
+    pm.color_attributes.render_color_index = list(pm.color_attributes.keys()).index('seg')
+    pob = bpy.data.objects.new('probe', pm)
+    bpy.context.scene.collection.objects.link(pob)
+    sc = bpy.context.scene
+    sc.render.engine = 'BLENDER_WORKBENCH'
+    sc.display.shading.light = 'STUDIO'
+    sc.display.shading.color_type = 'VERTEX'
+    sc.display.shading.show_backface_culling = False
+    sc.render.resolution_x = 800
+    sc.render.resolution_y = 640
+    sc.world = bpy.data.worlds.new('w')
+    sc.world.color = (0.02, 0.02, 0.05)
+    cd = bpy.data.cameras.new('cam')
+    cd.type = 'ORTHO'
+    cd.ortho_scale = 34
+    cam = bpy.data.objects.new('cam', cd)
+    sc.collection.objects.link(cam)
+    sc.camera = cam
+    mid = Vector((0, 0, 8))
+    for view, d in (('S', (0, 1)), ('E', (1, 0)), ('N', (0, -1)), ('W', (-1, 0))):
+        cam.location = mid + Vector((d[0] * 60, d[1] * 60, 18))
+        cam.rotation_euler = (mid - cam.location).to_track_quat('-Z', 'Y').to_euler()
+        sc.render.filepath = os.path.join(args.probe_segments, f'{view}.png')
+        bpy.ops.render.render(write_still=True)
+    sys.exit(0)
 
 groups = []
 # The plinth in six sectors round the axis.
@@ -475,18 +529,20 @@ for k in range(6):
     sector = [fi for fi in plinth_faces if int(((bearing_of(face_centre[fi].x, face_centre[fi].y) + 30.0) % 360.0) // 60.0) == k]
     if sector:
         groups.append(('plinth', None, sector))
-# Each element's crystal as whole chunks of that element, as many as its share of the crystal
-# makes (`--chunks` over the whole crystal, two to five an element).
-element_faces = [[fi for fi in label if label[fi] == lab] for lab in range(4)]
-crystal_area = sum(face_area[fi] for fi in label) or 1.0
-for lab in range(4):
-    faces = sorted(element_faces[lab])
-    if not faces:
-        continue
-    share = sum(face_area[fi] for fi in faces) / crystal_area
-    k = max(2, min(5, round(share * args.chunks)))
-    for ch in chunks_of(faces, k):
-        groups.append(('body', ELEMENTS[lab], ch))
+# Each prism is one piece of the burst, the element its faces mostly carry; an element's prisms
+# in order round its own bearing (so they keep their places side by side as they settle).
+bearings = {name: deg for name, deg in VEIN_BEARINGS}
+prisms = []
+for comp in segments:
+    votes = [0.0, 0.0, 0.0, 0.0]
+    for fi in comp:
+        votes[label[fi]] += face_area[fi]
+    lab = max(range(4), key=lambda k: votes[k])
+    area = sum(face_area[fi] for fi in comp)
+    cen = sum((face_centre[fi] * face_area[fi] for fi in comp), Vector((0, 0, 0))) / max(1e-9, area)
+    prisms.append((lab, angle_about(cen, bearings[ELEMENTS[lab]]), comp))
+for lab, _, comp in sorted(prisms, key=lambda p: (p[0], p[1])):
+    groups.append(('body', ELEMENTS[lab], comp))
 heart = [f.index for i in heart_ids for f in shells[i]]
 if heart:
     groups.append(('heart', None, heart))
@@ -656,6 +712,12 @@ for ob in made:
 print('pieces made', len(made), 'triangles', sum(len(o.data.polygons) for o in made))
 
 # ---- export -------------------------------------------------------------------------------
+
+# The painting ships at `--paint-size` (1024: the owner's call of 2026-11-18, a 2048 painting
+# on one centrepiece was half its megabyte); the weights and the caps read it at full size above.
+if paint and max(paint.size) > args.paint_size:
+    paint.scale(args.paint_size, args.paint_size)
+    print('painting scaled to', tuple(paint.size))
 
 os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
 kw = dict(filepath=args.out, export_format='GLB', use_selection=False, export_apply=False,

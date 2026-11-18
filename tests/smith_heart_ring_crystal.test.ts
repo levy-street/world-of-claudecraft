@@ -11,7 +11,7 @@
 //     its own vein's side of the Ring), the heart the remainder, the painting alone in KTX2.
 // The glTF frame is the game's (y up, north +z, east +x).
 
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
@@ -316,7 +316,7 @@ describe('the crystal: the pieces fly', () => {
     expect(ringCrystalPieceRole('body', RING_CRYSTAL_CORE_RADIUS + 3)).toBe('core');
   });
 
-  it("settles each element's chunks together in its own vein's quarter, turning as one", () => {
+  it("settles each element's prisms together in its own vein's quarter, turning as one", () => {
     const bearing = (x: number, z: number): number => Math.atan2(x, z);
     const wrap = (a: number): number => Math.atan2(Math.sin(a), Math.cos(a));
     // A chunk's assembled centre on its element's side (the formation is the slots', not this).
@@ -338,8 +338,8 @@ describe('the crystal: the pieces fly', () => {
     expect(Math.abs(step)).toBeGreaterThan(0.2);
     for (let e = 0; e < 4; e++) {
       const quarter = ([180, 0, 90, 270][e] * Math.PI) / 180;
-      for (let r = 0; r < 5; r++) {
-        const now = at(e, r, 5, T);
+      for (let r = 0; r < 9; r++) {
+        const now = at(e, r, 9, T);
         // In its slot, the whole formation turned by the same angle...
         expect(
           Math.abs(wrap(bearing(now.x, now.z) - turn - now.slot.angle)),
@@ -354,7 +354,7 @@ describe('the crystal: the pieces fly', () => {
         expect(Math.hypot(now.x, now.z)).toBeLessThan(12.1);
         expect(now.y).toBeGreaterThan(6.5);
         expect(now.y).toBeLessThan(21.6);
-        const next = at(e, r, 5, T + 5);
+        const next = at(e, r, 9, T + 5);
         expect(Math.abs(wrap(bearing(next.x, next.z) - bearing(now.x, now.z) - step))).toBeLessThan(
           0.02,
         );
@@ -440,6 +440,9 @@ let textureMime: string[] = [];
 let extensionsUsed: string[] = [];
 let materialSlots: { base: boolean; normal: boolean; mr: boolean }[] = [];
 let extras: Record<string, unknown> = {};
+/** The painting's size (KTX2 header) and the custom attributes' component types. */
+let textureSize: [number, number] = [0, 0];
+const customTypes: Record<string, string> = {};
 
 beforeAll(async () => {
   if (!haveModel) return;
@@ -451,6 +454,11 @@ beforeAll(async () => {
   const root = doc.getRoot();
   extras = (root.getExtras() ?? {}) as Record<string, unknown>;
   textureMime = root.listTextures().map((t) => t.getMimeType());
+  const ktx = root.listTextures()[0]?.getImage();
+  if (ktx) {
+    const view = new DataView(ktx.buffer, ktx.byteOffset, ktx.byteLength);
+    textureSize = [view.getUint32(20, true), view.getUint32(24, true)];
+  }
   extensionsUsed = root.listExtensionsUsed().map((e) => e.extensionName);
   materialSlots = root.listMaterials().map((m) => ({
     base: !!m.getBaseColorTexture(),
@@ -467,6 +475,12 @@ beforeAll(async () => {
     for (const prim of mesh.listPrimitives()) {
       const pos = prim.getAttribute('POSITION');
       const weights = prim.getAttribute('_WEIGHTS');
+      for (const name of ['_WEIGHTS', '_PATH']) {
+        const a = prim.getAttribute(name);
+        if (a)
+          customTypes[name] =
+            a.getComponentType() === 5121 ? 'UNSIGNED_BYTE' : String(a.getComponentType());
+      }
       if (!pos) continue;
       triangles += (prim.getIndices()?.getCount() ?? pos.getCount()) / 3;
       const key = (i: number): string => {
@@ -508,10 +522,10 @@ beforeAll(async () => {
 
 describe('the crystal: the shipped GLB', () => {
   it.skipIf(!haveModel)(
-    "is cut into the plinth's sectors, whole chunks of each element and the heart, in budget",
+    "is cut into the plinth's sectors, the crystal's own prisms and the heart, in budget",
     () => {
-      // Six sectors of the plinth, then each element's chunks (two to five, by its share of
-      // the crystal), then the heart's shaft; every name read by the painter.
+      // Six sectors of the plinth, then the crystal's prisms (each its element's, split where
+      // one prism folds into the next), then the heart's shaft; every name read by the painter.
       const names = pieces.map((p) => p.name);
       const kinds = names.map((n) => ringCrystalPieceKind(n));
       expect(kinds.every((k) => k !== null)).toBe(true);
@@ -520,10 +534,14 @@ describe('the crystal: the shipped GLB', () => {
       const chunks = SMITH_HEART_VEINS.map(
         (_, e) => names.filter((n) => ringCrystalPieceElement(n) === e).length,
       );
-      for (const [e, n] of chunks.entries()) {
+      for (const [e, n] of chunks.entries())
         expect(n, SMITH_HEART_VEINS[e]).toBeGreaterThanOrEqual(1);
-        expect(n, SMITH_HEART_VEINS[e]).toBeLessThanOrEqual(5);
-      }
+      const prisms = chunks.reduce((a, n) => a + n, 0);
+      expect(prisms).toBeGreaterThanOrEqual(12);
+      expect(prisms).toBeLessThanOrEqual(30);
+      // A prism is a solid of its own, never a lone polygon or a sliver.
+      for (const p of pieces)
+        if (ringCrystalPieceElement(p.name) >= 0) expect(p.triangles, p.name).toBeGreaterThan(40);
       // Every crystal piece names its element: no untagged cluster is left.
       expect(kinds.filter((k) => k === 'body')).toHaveLength(chunks.reduce((a, n) => a + n, 0));
       const tris = pieces.reduce((n, p) => n + p.triangles, 0);
@@ -533,7 +551,7 @@ describe('the crystal: the shipped GLB', () => {
     },
   );
 
-  it.skipIf(!haveModel)('makes each crystal chunk one element, by its own weights', () => {
+  it.skipIf(!haveModel)('makes each prism its element, by its own weights', () => {
     for (const p of pieces) {
       const element = ringCrystalPieceElement(p.name);
       if (element < 0) continue;
@@ -620,7 +638,8 @@ describe('the crystal: the shipped GLB', () => {
             expect(x).toBeGreaterThanOrEqual(-1e-4);
           }
           const total = v.w[0] + v.w[1] + v.w[2] + v.w[3];
-          expect(total, p.name).toBeLessThanOrEqual(1.0001);
+          // Stored as 8-bit normalized integers: each weight can round up half a 255th.
+          expect(total, p.name).toBeLessThanOrEqual(1 + 2 / 255);
           if (1 - total > 0.5) {
             hearts++;
             // The heart's shaft stands on the axis (its shells' centres within a third of the
@@ -659,6 +678,19 @@ describe('the crystal: the shipped GLB', () => {
     expect(textureMime).toEqual(['image/ktx2']);
     expect(extensionsUsed).toContain('KHR_texture_basisu');
   });
+
+  it.skipIf(!haveModel)(
+    'stays under a megabyte: a 1024 painting, its light attributes in bytes',
+    () => {
+      // The owner's budget of 2026-11-18 (a 2048 painting and float weights were over it).
+      expect(statSync(MODEL).size).toBeLessThan(1_000_000);
+      expect(textureSize[0]).toBeLessThanOrEqual(1024);
+      expect(textureSize[1]).toBeLessThanOrEqual(1024);
+      // The element weights and the light path ride as normalized bytes, never floats.
+      expect(customTypes._WEIGHTS).toBe('UNSIGNED_BYTE');
+      expect(customTypes._PATH).toBe('UNSIGNED_BYTE');
+    },
+  );
 });
 
 describe("the crystal's entity: the empty anchor the markers use, nothing to click", () => {

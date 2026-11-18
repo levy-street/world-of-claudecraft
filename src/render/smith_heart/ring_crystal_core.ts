@@ -13,12 +13,12 @@
 //   ready (all four lit and the Ring clear, the READY bit): the whole crystal swells and
 //     pulses, the sign that the first raider onto the dais will break it;
 //   the burst (the seal markers' portal bit, set when a raider steps onto the dais): the
-//     crystal overloads for `HEART_PORTAL_OPEN.charge`, then shatters; its pieces (each
-//     element's crystal as a few whole chunks, the heart's shaft, the plinth in sectors)
-//     fly out, each element's chunks settling together into its own vein's quarter of an
-//     orbit round the portal funnel (the owner's call of 2026-11-18: chunks of each
-//     element floating, not random pieces), the heart hovering over the funnel, the
-//     plinth's stones falling away.
+//     crystal overloads for `HEART_PORTAL_OPEN.charge`, then shatters; its pieces (the
+//     crystal's own prisms, each its element's, the heart's shaft, the plinth in sectors)
+//     fly out, each element's prisms settling together into its own vein's quarter of an
+//     orbit round the portal funnel (the owner's calls of 2026-11-18: chunks of each
+//     element floating, solid crystals, not random pieces or flat faces), the heart
+//     hovering over the funnel, the plinth's stones falling away.
 //
 // Pure and Three-free (the clock is passed in, render seconds).
 
@@ -242,18 +242,22 @@ export interface RingCrystalOrbitSlot {
 }
 
 /** How fast the settled pieces turn round the funnel, all together (radians a second), so
- *  each element's chunks keep their quarter. */
+ *  each element's prisms keep their quarter. */
 const ORBIT_TURN = 0.11;
-/** How far an element's chunks spread round its bearing (radians between neighbours). */
+/** How far apart an element's prisms hang round its bearing (radians between neighbours),
+ *  closed up so the widest element still keeps inside its own quarter. */
 const ORBIT_SPREAD = 0.38;
+/** The most an element's prisms spread either side of its bearing (radians, inside the
+ *  quarter's 45 degrees). */
+const ORBIT_HALF_ARC = 0.7;
 /** The heart's hover: upright on the axis, crowning the portal's funnel (26 yd tall). */
 const HEART_SLOT: RingCrystalOrbitSlot = { angle: 0, radius: 0, height: 22, scale: 0.55 };
 
-/** The settled place of chunk `rank` of `count` of element `element` (SMITH_HEART_VEINS
- *  order: the Hammer, the Breath, the Quench, the Heat): the element's chunks hang together
+/** The settled place of prism `rank` of `count` of element `element` (SMITH_HEART_VEINS
+ *  order: the Hammer, the Breath, the Quench, the Heat): the element's prisms hang together
  *  in its own vein's quarter (the Hammer south, the Breath north, the Quench east, the Heat
- *  west), side by side round its bearing, at heights that step so none hides another. The
- *  heart (`element` -1) hovers high over the funnel. */
+ *  west), side by side round its bearing, at radii and heights that step so none hides
+ *  another. The heart (`element` -1) hovers high over the funnel. */
 export function ringCrystalOrbitSlot(
   element: number,
   rank: number,
@@ -261,10 +265,11 @@ export function ringCrystalOrbitSlot(
 ): RingCrystalOrbitSlot {
   const quarter = HEART_SEAL_QUARTERS[element];
   if (!quarter) return HEART_SLOT;
-  const spread = (rank - (Math.max(1, count) - 1) / 2) * ORBIT_SPREAD;
+  const n = Math.max(1, count);
+  const step = n > 1 ? Math.min(ORBIT_SPREAD, (2 * ORBIT_HALF_ARC) / (n - 1)) : 0;
   return {
-    angle: (quarter.bearingDeg * Math.PI) / 180 + spread,
-    radius: 9 + (rank % 2) * 2.2,
+    angle: (quarter.bearingDeg * Math.PI) / 180 + (rank - (n - 1) / 2) * step,
+    radius: 9 + (rank % 2) * 2.4,
     height: 9 + 4.5 * ((rank + element) % 3),
     scale: 0.7,
   };

@@ -27,19 +27,23 @@ compass, so the build turns and mirrors it to put each element on its own vein's
 game's frame (north +z). Tripo writes a heap of over a thousand separate shells, but they are
 only its UV seams: welded, the model is a dozen solids (the plinth, the heart's shaft, a few fused
 formations and the loose crystals round them). The build cuts those into the pieces the burst
-throws, each its own node: the plinth in six sectors, the heart's shaft, and each element's
-crystal as two to five WHOLE chunks of that element (by its share of the crystal; every face
-goes to the element its weights favour, so a chunk is one colour family), every cut and every
-hole Tripo left capped in one colour of the painting round it (the owner's call of 2026-11-18:
-chunks of each element's crystal floating, with no holes in them). The renderer draws the whole
-crystal as one merged mesh and, at the burst, lets the pieces fly; each element's chunks settle
-together in its own vein's quarter round the portal.
+throws, each its own node: the plinth in six sectors, the heart's shaft, and the crystal's own
+PRISMS: the skin parts at the inward folds where one prism meets the next (`--seam-deg`), so
+each prism keeps its painted faces and only its base, where it joined the rest, is capped (in
+one colour of the painting round it, as is every hole Tripo left); a sliver or a lone big face
+joins its neighbour, and a prism belongs to the element most of its faces carry (the owner's
+calls of 2026-11-18: chunks of each element's crystal floating, solid crystals, not random
+pieces or flat faces). The renderer draws the whole crystal as one merged mesh and, at the
+burst, lets the pieces fly; each element's prisms settle together in its own vein's quarter
+round the portal.
 
 Every vertex carries two custom attributes (glTF `_WEIGHTS` and `_PATH`): the four element
 weights (assigned from each crystal's own painted hue; the white-gold heart is what is left of 1)
 and the element's path (0 at the plinth's rim where its river arrives, 1 at the far tips), so each
-element lights, and its light climbs, on its own crystals. The painting is the only texture
-(KTX2); the material is the runtime's own shader (`ring_crystal_material.ts`).
+element lights, and its light climbs, on its own crystals. The painting is the only texture,
+shipped at 1024 (KTX2; the build's `--paint-size`), and the two attributes ride as 8-bit
+normalized integers (the ship step quantizes them), so the file stays well under the owner's
+one megabyte budget (pinned); the material is the runtime's own shader (`ring_crystal_material.ts`).
 
 ## Rebuild
 
@@ -55,7 +59,7 @@ in its `job.json` and never pays twice), then cut and weigh it in Blender and sh
 
 ```bash
 node scripts/assets/smith_heart_hammer_colossi/tripo_views.mjs tmp/ring_crystal/crystal 14000 2048
-"<blender>" -b --factory-startup --python docs/design/raid/kit/build_smith_heart_ring_crystal.py -- --src tmp/ring_crystal/crystal/raw.glb --out tmp/ring_crystal/smith_heart_ring_crystal_src.glb --reach 8.6 --chunks 12 --crown-r 0.15 --crown-z 0.4
+"<blender>" -b --factory-startup --python docs/design/raid/kit/build_smith_heart_ring_crystal.py -- --src tmp/ring_crystal/crystal/raw.glb --out tmp/ring_crystal/smith_heart_ring_crystal_src.glb --reach 8.6 --crown-r 0.15 --crown-z 0.4
 node scripts/assets/smith_heart_ring_crystal/build.mjs
 node scripts/assets/compress_glb_textures.mjs public/models/props/smith_heart_ring_crystal.glb
 node scripts/build_media_manifest.mjs generate

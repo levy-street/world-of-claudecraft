@@ -4,12 +4,12 @@
 // ChatGPT sheet, docs/design/raid/kit/ring_crystal_src/README.md).
 //
 // The model is a heap of pieces (the Blender build cut it: `Piece_NN_plinth`, each
-// element's chunks `Piece_NN_body_<element>`, `Piece_NN_heart`). Whole, it draws as ONE
+// prism of the crystal `Piece_NN_body_<element>`, `Piece_NN_heart`). Whole, it draws as ONE
 // merged mesh in the crystal's
 // own frame (y up, its plinth centred on the origin); at the shatter the whole hides and
 // the pieces take its place and fly (each its own mesh on one shared material, the matrix
 // written by hand about the piece's centre, since the geometry stays in the crystal's frame
-// for the shader's height and weights); each element's chunks, and the heart, settle into
+// for the shader's height and weights); each element's prisms, and the heart, settle into
 // the slots `ringCrystalOrbitSlot` gives them. Fetched with the raid's kits on the deferred lane
 // (never at boot); a crystal that has not landed when the seal is built lands under the
 // same group through the live compile gate, and a model that fails to load costs the seal
@@ -128,7 +128,7 @@ function bakeModel(scene: THREE.Object3D): CrystalModel | null {
   if (!index) return null;
   whole.computeBoundingSphere();
   const spans = ringCrystalPieceSpans(parts.map((p) => p.geometry.getIndex()?.count ?? 0));
-  // Each element's chunks, in node order, take their element's slots side by side.
+  // Each element's prisms, in node order, take their element's slots side by side.
   const counts = [0, 0, 0, 0];
   for (const part of parts) if (part.element >= 0) counts[part.element]++;
   const ranks = [0, 0, 0, 0];

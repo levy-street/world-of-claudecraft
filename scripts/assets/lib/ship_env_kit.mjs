@@ -16,8 +16,10 @@ import { MeshoptDecoder, MeshoptEncoder } from 'meshoptimizer';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 
 /** Read `source` (the Blender build, repo-relative) and write the shipping GLB to `target`
- *  (repo-relative); prints and returns its size and sha256. */
-export async function shipEnvKit({ source, target }) {
+ *  (repo-relative); prints and returns its size and sha256. `transforms` run after prune and
+ *  dedup, before meshopt (whose own quantize leaves application attributes, `_*`, as floats:
+ *  a kit that ships one quantizes it here). */
+export async function shipEnvKit({ source, target, transforms = [] }) {
   await Promise.all([MeshoptEncoder.ready, MeshoptDecoder.ready]);
   const io = new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({
     'meshopt.encoder': MeshoptEncoder,
@@ -37,6 +39,7 @@ export async function shipEnvKit({ source, target }) {
   await doc.transform(
     prune({ keepExtras: true }),
     dedup(),
+    ...transforms,
     meshopt({ encoder: MeshoptEncoder, level: 'high' }),
   );
   const bytes = await io.writeBinary(doc);
