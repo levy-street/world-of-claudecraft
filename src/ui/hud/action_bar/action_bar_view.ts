@@ -196,9 +196,10 @@ export interface ActionBarAuraInput {
 export interface ActionBarSlotDescriptor {
   /** 0-based slot index; slot 0 is the Attack toggle by default. */
   slotIndex: number;
-  /** Whether the slot currently renders the fixed Attack toggle. An accessor (like
-   *  ability()/item()) because the desktop bar's slot 0 can be switched to a normal
-   *  assignable slot live via the "Show Attack Button" Interface option. */
+  /** Whether the slot currently renders the Attack toggle: the fixed button on slot
+   *  0, or any slot holding the placed Attack action. An accessor (like
+   *  ability()/item()) because both change live (the "Show Attack Button" option,
+   *  a drag). */
   isAttack(): boolean;
   /** Whether the slot has ANY raw binding assigned (even one whose ability is
    *  unlearned or item id is unknown). The many-spells count source: kept distinct
@@ -625,7 +626,8 @@ export function createActionBarView(
         const slotLabel = deps.slotLabel(sd.slotIndex);
         slot.aiming = i === aimingSlotIndex;
 
-        // many-spells counts RAW assigned slots (the attack slot reports no action),
+        // many-spells counts RAW assigned slots (the fixed attack slot reports no
+        // action; a placed Attack is a binding and counts),
         // byte-identical to the former hotbarActions.filter(a => a !== null).length.
         if (
           sd.hasAction() &&

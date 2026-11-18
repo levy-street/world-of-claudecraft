@@ -8,12 +8,18 @@ import type { AbilityDef, PlayerClass } from '../../../sim/types';
 import type { PetCommand } from '../../../world_api/pet';
 import { isPetSlotCommand } from './pet_slot_core';
 
-// A 'pet' slot runs one of the pet-bar commands (pet_slot_core.ts).
+// A 'pet' slot runs one of the pet-bar commands (pet_slot_core.ts). An 'attack'
+// slot is the basic Attack (start or stop auto-attack), placed on any slot so it
+// can ride any key; its id is always ATTACK_HOTBAR_ACTION_ID.
 export type HotbarAction =
   | { type: 'ability'; id: string }
   | { type: 'item'; id: string }
   | { type: 'pet'; id: PetCommand }
+  | { type: 'attack'; id: typeof ATTACK_HOTBAR_ACTION_ID }
   | null;
+
+export const ATTACK_HOTBAR_ACTION_ID = 'attack';
+export const ATTACK_HOTBAR_ACTION = { type: 'attack', id: ATTACK_HOTBAR_ACTION_ID } as const;
 
 export interface HotbarStorage {
   getItem(key: string): string | null;
@@ -23,12 +29,10 @@ export interface HotbarStorage {
 
 export const HOTBAR_ACTION_MIME = 'application/x-woc-hotbar-action';
 
-// The basic Attack is not a HotbarAction (it has no ability/item id): it is the
-// fixed slot-0 button gated by the Interface showAttackButton setting. So a drag of
-// the spellbook Attack row carries its OWN marker MIME rather than an encoded action,
-// and dropping it anywhere on the action bar just turns showAttackButton back on
-// (which restores Attack to slot 0). Kept distinct from HOTBAR_ACTION_MIME so the
-// normal ability/item drop path never mistakes it for an assignable action.
+// The spellbook Attack row's drag carries this marker MIME next to the encoded
+// ATTACK_HOTBAR_ACTION. The marker keeps slot 0's own drop: it turns the
+// showAttackButton setting back on (restoring the fixed Attack button there). Every
+// other slot ignores the marker and places the encoded action like any binding.
 export const HOTBAR_ATTACK_MIME = 'application/x-woc-hotbar-attack';
 
 // True when an in-progress drag carries the Attack marker. Reads DataTransfer.types
@@ -49,6 +53,14 @@ export function attackDragDisposition(
   if (!dragCarriesAttack(types) || slot !== 0) return 'ignore';
   if (phase === 'drop') return 'restore';
   return 'highlight';
+}
+
+/** True when pressing this bar slot toggles auto-attack: the fixed Attack button on
+ *  slot 0 (`fixedAttackSlot0`: slot 0 with showAttackButton on), or any slot holding
+ *  the placed Attack. Takes a plain flag, not a callback: it runs per slot per frame
+ *  from the bar view's isAttack accessor, which must not allocate. */
+export function barSlotRunsAttack(fixedAttackSlot0: boolean, action: HotbarAction): boolean {
+  return fixedAttackSlot0 || action?.type === 'attack';
 }
 
 /** One rule for every action-bar entry point: passive abilities are informational only. */
@@ -112,6 +124,8 @@ export function parseHotbarAction(
     return { type: 'ability', id: action.id };
   if (action.type === 'item' && itemExists(action.id)) return { type: 'item', id: action.id };
   if (action.type === 'pet' && isPetSlotCommand(action.id)) return { type: 'pet', id: action.id };
+  if (action.type === 'attack' && action.id === ATTACK_HOTBAR_ACTION_ID)
+    return ATTACK_HOTBAR_ACTION;
   return null;
 }
 
@@ -304,9 +318,19 @@ export function placePetOnSlot(
   command: PetCommand,
   targetIndex: number,
 ): HotbarAction[] {
+  return placeCopiedActionOnSlot(actions, { type: 'pet', id: command }, targetIndex);
+}
+
+// A copy-placed action (an item, a pet command, Attack) lands on the slot without
+// leaving its source: the same action may sit on more than one slot.
+export function placeCopiedActionOnSlot(
+  actions: readonly HotbarAction[],
+  action: Exclude<HotbarAction, null>,
+  targetIndex: number,
+): HotbarAction[] {
   const next = actions.slice();
   if (targetIndex < 0 || targetIndex >= next.length) return next;
-  next[targetIndex] = { type: 'pet', id: command };
+  next[targetIndex] = action;
   return next;
 }
 
@@ -463,9 +487,11 @@ export function applyLoadoutBar(
     if (i >= normalizedBar.length) return current[i] ?? null;
     const v = normalizedBar[i];
     if (typeof v === 'string' && abilityExists(v)) return { type: 'ability' as const, id: v };
-    // A pet command is not an ability either, so it survives the switch the same way.
+    // A pet command or Attack is not an ability either, so it survives the switch the same way.
     const existing = current[i];
-    return existing?.type === 'item' || existing?.type === 'pet' ? existing : null;
+    return existing !== null && existing !== undefined && existing.type !== 'ability'
+      ? existing
+      : null;
   });
 }
 

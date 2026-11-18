@@ -378,6 +378,7 @@ export class BarEditorWindow {
       return item ? itemDisplayName(item) : null;
     }
     if (action.type === 'pet') return t(petSlotText(action.id).name);
+    if (action.type === 'attack') return t('abilityUi.actionBar.attackName');
     const def = ABILITIES[action.id];
     return def ? abilityDisplayName(def) : null;
   }
@@ -385,6 +386,8 @@ export class BarEditorWindow {
   private iconBackground(action: HotbarAction): string {
     if (action === null) return '';
     if (action.type === 'pet') return `url(${iconDataUrl('ability', petSlotIconId(action.id))})`;
+    // The same Attack icon the fixed button and the spellbook row show.
+    if (action.type === 'attack') return `url(${iconDataUrl('ability', 'attack')})`;
     return `url(${iconDataUrl(action.type === 'item' ? 'item' : 'ability', action.id)})`;
   }
 }

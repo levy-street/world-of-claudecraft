@@ -48,7 +48,7 @@ function harness() {
     hasFree: true,
     attackOnBar: true,
   };
-  let dragAction: { type: 'ability'; id: string } | null = null;
+  let dragAction: { type: 'ability' | 'attack'; id: string } | null = null;
   const noop = (): void => {};
   const deps: SpellbookWindowDeps = {
     root: () => root,
@@ -153,12 +153,15 @@ describe('SpellbookWindow.render defers a rebuild that would tear out a live dra
     expect(attackRow?.className).toContain('spell-row');
 
     attackRow?.dispatchEvent(new Event('dragstart'));
+    // The drag hands the bar the placeable Attack action (any slot takes it).
+    expect(h.dragAction()).toEqual({ type: 'attack', id: 'attack' });
     h.setCooldown('heroic_strike', 5);
     h.win.render();
     expect(h.root.querySelector('.spell-list')).toBe(listBefore);
     expect(attackRow?.isConnected).toBe(true);
 
     attackRow?.dispatchEvent(new Event('dragend'));
+    expect(h.dragAction()).toBeNull();
     expect(h.root.querySelector('.spell-list')).not.toBe(listBefore);
   });
 

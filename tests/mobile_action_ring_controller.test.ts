@@ -123,3 +123,60 @@ describe('buildMobileActionRing aiming ownership', () => {
     expect(ring?.view.tick(world(activeAimSlot)).slots.every((slot) => !slot.aiming)).toBe(true);
   });
 });
+
+describe('buildMobileActionRing placed Attack', () => {
+  it('paints a page slot holding the placed Attack as the Attack toggle', () => {
+    // Source slot 2 (the second ring button on page 0) holds Attack; the rest hold
+    // the test ability. The fixed Attack button (view slot 0) stays Attack too.
+    const attackSlot = sourceSlotForMobileButton(0, 1, 'center');
+    const ring = buildMobileActionRing({
+      writers,
+      iconBackground: (key) => `icon:${key}`,
+      sourceSlot: (buttonIndex, direction) => sourceSlotForMobileButton(0, buttonIndex, direction),
+      hasSourceSlot: (buttonIndex, direction) =>
+        mobileButtonHasSourceSlot(0, buttonIndex, undefined, direction),
+      aimOwnsButton: () => false,
+      cancelAim: vi.fn(),
+      actionForSlot: (slot) =>
+        slot === attackSlot
+          ? { type: 'attack', id: 'attack' }
+          : { type: 'ability', id: ability.def.id },
+      abilityForSlot: (slot) => (slot === attackSlot ? null : ability),
+      itemForSlot: () => null,
+      empoweredAbilityIdForSlot: () => null,
+      bindModeActive: () => false,
+      takeSuppressedClick: () => false,
+      castSlot: vi.fn(),
+      cyclePage: vi.fn(),
+      activateFixedAttackSlot: vi.fn(),
+      attackNearest: null,
+      attackTapState: () => ({ autoAttack: false, hasLiveHostileTarget: false }),
+      hideTooltip: vi.fn(),
+      consumePeekGuard: vi.fn(),
+      bindEmpoweredHold: vi.fn(),
+    });
+    const state = ring!.view.tick(world(null));
+    expect(state.slots.map((slot) => slot.kind)).toEqual([
+      'attack',
+      'ability',
+      'attack',
+      'ability',
+      'ability',
+    ]);
+
+    // Paint it: the fixed button keeps its blank background (its inline SVG shows
+    // through), but the page slot holding Attack gets the painted Attack icon.
+    const setStyleProp = writers.setStyleProp as ReturnType<typeof vi.fn>;
+    setStyleProp.mockClear();
+    ring!.painter.paint(state, 0, 2, 8, true);
+    const labels = [
+      document.querySelector('#mobile-action-attack .icon-label'),
+      ...document.querySelectorAll('.mobile-action-slot .icon-label'),
+    ];
+    const background = (label: Element | null) =>
+      setStyleProp.mock.calls.find((c) => c[0] === label && c[1] === 'background-image')?.[2];
+    expect(background(labels[0])).toBe('');
+    expect(background(labels[2])).toBe(`icon:${state.slots[2].iconKey}`);
+    expect(state.slots[2].iconKey).toBe(state.slots[0].iconKey);
+  });
+});
