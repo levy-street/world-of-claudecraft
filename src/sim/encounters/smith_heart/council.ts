@@ -29,6 +29,12 @@
 //                  fallen, the Singer casts a shorter, lighter Wrath; the
 //                  Singer fallen, the Guardian raises the pillars itself, less
 //                  often, under random players on a 2 s warning.
+//   The stone grieves
+//                  the fallen one's strength streams into the survivor, and
+//                  as it lands (council_grief.ts) the survivor is healed,
+//                  Enraged (faster, harder blows and stone) and takes up one
+//                  more of the fallen one's moves: the Guardian the rock, the
+//                  Singer Hammer's Weight. Every tier, each its own numbers.
 //
 // Difficulty: the claim's (heroic: Resonance, the Wake and the Rush may overlap
 // the Wrath, three Wake marks, the pillars pulse), with a dev switch for a run
@@ -54,6 +60,7 @@ import { regrowHead } from '../drowned_temple/hydra_regrowth';
 import { claimBoss, dropAuraById } from '../sunken_bastion/claim';
 import { clearBond, stepBond } from './council_bond';
 import { carryWrathHold, startFloorMechanics } from './council_floor';
+import { beginGrief, clearGrief, griefAtPull, griefReadout, stepGrief } from './council_grief';
 import {
   COUNCIL_AURAS,
   COUNCIL_CASTS,
@@ -322,6 +329,9 @@ function noteFallen(s: CouncilScope, role: CouncilRole, dead: Entity): void {
   // Mythic: its soul takes the most intact pillar (council_soul.ts).
   const soul = survivor && s.rules.soulInTheStone ? takeSoul(s, role, dead) !== null : false;
   if (survivor) sayFallen(s, role, soul);
+  // Its strength sets out for the survivor (council_grief.ts): healed and
+  // enraged when it lands, unless the survivor falls first.
+  beginGrief(s, role);
 }
 
 // ---- the bars -----------------------------------------------------------------------------
@@ -481,6 +491,8 @@ function resetCouncil(ctx: SimContext, inst: InstanceSlot, bodies: CouncilBodies
     clearSong(s);
     clearRush(s);
     clearBond(s);
+    // The enrage lifts, the survivor's own weapon back before the tier's.
+    clearGrief(s);
     clearRubble(ctx, inst, st);
     // The tank keeps no Weight past the fight.
     dropClaimWeight(ctx, inst);
@@ -525,6 +537,7 @@ function finishCouncil(
   clearSong(s);
   clearRush(s);
   clearBond(s);
+  clearGrief(s);
   clearRubble(ctx, inst, st);
   clearBars(bodies);
   dropClaimWeight(ctx, inst);
@@ -552,9 +565,11 @@ function beginCouncil(
     st.basePools[r] = applyTierHealth(b, mult);
     st.baseSwings[r] = applyTierSwing(b, swing);
   }
-  // A member already down when the pull began (a dev kill) has fallen.
+  // A member already down when the pull began (a dev kill) has fallen, and
+  // the survivor's grief is owed at once.
   for (const r of COUNCIL_ROLES) if (bodies[r] && !living(bodies[r])) st.fallen.push(r);
   if (st.fallen.length > 0) st.firstFallAt = 0;
+  griefAtPull(st, bodies);
   // Straight after the entrance a pull line it has just said would repeat.
   for (const r of COUNCIL_ROLES)
     if (councilIntroJustSpoke(ctx, bodies, r)) st.said[`${r}_pull`] = 0;
@@ -607,6 +622,7 @@ export function tickHammerCouncil(ctx: SimContext, inst: InstanceSlot): void {
     if (b && !living(b) && !st.fallen.includes(r)) noteFallen(s, r, b);
   }
   syncMemory(s);
+  stepGrief(s);
   stepCouncilVoice(s);
   watchCouncilSlain(s);
   stepBars(s);
@@ -724,8 +740,10 @@ export function councilDevTrigger(
     return startWrath(s) ? "Mountain's Wrath." : 'No council member can cast it.';
   }
   if (verb === 'weight') {
-    cut('guardian');
-    return startWeight(s) ? "Hammer's Weight." : 'The Guardian has no tank, or has fallen.';
+    for (const r of COUNCIL_ROLES) cut(r);
+    return startWeight(s)
+      ? "Hammer's Weight."
+      : 'Nobody can bring it down (the Guardian fallen and the Singer not yet enraged, or no tank).';
   }
   if (verb === 'wake') {
     for (const r of COUNCIL_ROLES) cut(r);
@@ -777,5 +795,5 @@ export function councilReadout(ctx: SimContext, inst: InstanceSlot): string {
   const head = `[dev] Council (${councilDifficulty(inst)}): ${COUNCIL_ROLES.map(part).join(', ')}`;
   if (!st) return `${head}; not fighting (${councilIntroReadout(bodies)}).`;
   const souls = st.souls.length > 0 ? `, souls ${soulReadout({ ctx, inst, st })}` : '';
-  return `${head}; energy ${Math.round(st.energy)}, wraths ${st.wraths}, fallen ${st.fallen.join(' > ') || 'none'}${souls}.`;
+  return `${head}; energy ${Math.round(st.energy)}, wraths ${st.wraths}, fallen ${st.fallen.join(' > ') || 'none'}${griefReadout(st)}${souls}.`;
 }

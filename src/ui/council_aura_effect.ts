@@ -48,6 +48,17 @@ function crowdShareFor(limit: number | undefined): number {
   return COUNCIL_DIFFICULTY.normal.crowdShare;
 }
 
+/** Grief of the Stone's tier, read off the Enraged aura: it carries its
+ *  tier's damage share (value2) and every tier's share is its own (pinned in
+ *  tests/smith_heart_council_grief.test.ts), so the share names the row and
+ *  with it the heal the grief brought; an unknown one says Normal's. */
+function griefRowFor(damage: number | undefined) {
+  for (const tier of ['normal', 'heroic', 'mythic'] as const) {
+    if (COUNCIL_DIFFICULTY[tier].enrageDamage === damage) return COUNCIL_DIFFICULTY[tier];
+  }
+  return COUNCIL_DIFFICULTY.normal;
+}
+
 /** The council aura's descriptor, or null when `a` is not one of them. */
 export function councilAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor | null {
   switch (a.id) {
@@ -132,6 +143,18 @@ export function councilAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescr
       return {
         key: `${KEY}.memory`,
         nums: { pct: pct(a.value), per: pct(T.memoryPerFallen) },
+      };
+    // Grief of the Stone (council_grief.ts): the swing's multiplier rides
+    // value, the blows' and abilities' share value2; the Wraths and the rock
+    // keep their own numbers (council_scope.ts punishMult).
+    case COUNCIL_AURAS.enraged:
+      return {
+        key: `${KEY}.enraged`,
+        nums: {
+          heal: pct(griefRowFor(a.value2).griefHeal),
+          haste: pct(a.value - 1),
+          dmg: pct(a.value2 ?? 0),
+        },
       };
     case COUNCIL_AURAS.pillarLimit:
       return {
