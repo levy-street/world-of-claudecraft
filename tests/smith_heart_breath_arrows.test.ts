@@ -1,8 +1,9 @@
 // The Guardian of the Breath singles a player out to move: the Rush's red
 // arrow over them for the whole raid, the alarm in their ear alone (the
-// owner's run of 2026-11-17). A sky strike's mark (BREATH_AURAS.skyMark) and
-// Drawn Lightning by their auras; Storm Lance and Leaping Bolt by the bar's
-// target.
+// owner's run of 2026-11-17). Jose's playtest of 2026-11-18 trimmed the arrow
+// to the marks that choose ONE player for a role of their own (Drawn
+// Lightning, the Knotted Gale's portal marks and carrier, Leaping Bolt's
+// target): never a sky strike or Storm Lance, whose floor telegraph says it.
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
@@ -34,6 +35,7 @@ import {
   BREATH_OBJECTS,
   BREATH_TUNING as T,
 } from '../src/sim/encounters/smith_heart';
+import { ISLE_AURAS, ISLE_CASTS } from '../src/sim/encounters/smith_heart/breath_isle_ids';
 import type { Entity } from '../src/sim/types';
 import { breathFight } from './helpers/breath_fight';
 
@@ -68,9 +70,8 @@ describe("the Breath's marks: the arrow and the alarm", () => {
     expect(f.players.some((p) => p.auras.some((a) => a.id === BREATH_AURAS.skyMark))).toBe(false);
   });
 
-  it('raises the arrow on a sky mark and on Drawn Lightning, never on another aura', () => {
+  it('raises the arrow on Drawn Lightning, never on a sky mark or another aura', () => {
     expect(BREATH_ARROW_AURAS).toEqual([
-      BREATH_AURAS.skyMark,
       BREATH_AURAS.drawn,
       BREATH_AURAS.portalA,
       BREATH_AURAS.portalB,
@@ -80,9 +81,12 @@ describe("the Breath's marks: the arrow and the alarm", () => {
     ]);
     const with_ = (id: string) =>
       ({ auras: [{ id, remaining: 1, duration: 2 }] }) as unknown as Pick<Entity, 'auras'>;
-    expect(breathArrowMark(with_(BREATH_AURAS.skyMark))).not.toBeNull();
     expect(breathArrowMark(with_(BREATH_AURAS.drawn))).not.toBeNull();
+    // A sky strike's ring on the floor is its telegraph: no arrow (Jose, 2026-11-18).
+    expect(breathArrowMark(with_(BREATH_AURAS.skyMark))).toBeNull();
     expect(breathArrowMark(with_(BREATH_AURAS.anchor))).toBeNull();
+    // Nor any mark of the isles (their lane, storm and strikes are all on the floor).
+    for (const id of Object.values(ISLE_AURAS)) expect(breathArrowMark(with_(id)), id).toBeNull();
   });
 
   it("raises it over the Knotted Gale's portal-marked players and its carrier, over the ball", () => {
@@ -106,9 +110,14 @@ describe("the Breath's marks: the arrow and the alarm", () => {
     expect(BREATH_ARROWS).toBeGreaterThanOrEqual(8);
   });
 
-  it('raises it over the target of Storm Lance and Leaping Bolt', () => {
-    expect(breathTargetedBar({ castingAbility: BREATH_CASTS.lance })).toBe(BREATH_CASTS.lance);
+  it("raises it over Leaping Bolt's target, never over a frontal's (Storm Lance)", () => {
     expect(breathTargetedBar({ castingAbility: BREATH_CASTS.fork })).toBe(BREATH_CASTS.fork);
+    // The frontal line is drawn on the floor: no arrow (Jose, 2026-11-18).
+    expect(breathTargetedBar({ castingAbility: BREATH_CASTS.lance })).toBeNull();
+    expect(breathTargetedBar({ castingAbility: BREATH_CASTS.blow })).toBeNull();
+    expect(breathTargetedBar({ castingAbility: BREATH_CASTS.thunder })).toBeNull();
+    for (const id of Object.values(ISLE_CASTS))
+      expect(breathTargetedBar({ castingAbility: id }), id).toBeNull();
     expect(breathTargetedBar({ castingAbility: BREATH_CASTS.inhale })).toBeNull();
     expect(breathTargetedBar({ castingAbility: null })).toBeNull();
   });

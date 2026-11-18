@@ -514,10 +514,10 @@ export class BreathFightFx {
   private readonly geometries: THREE.BufferGeometry[] = [];
   private readonly materials: THREE.Material[] = [];
   private readonly audio = new BreathAudio(sfx);
-  /** The Rush's red arrow over each player a mechanic has singled out to
-   *  move (the owner's run of 2026-11-17): a sky strike's mark and Drawn
-   *  Lightning (auras), and the target of a bar aimed at one player (Storm
-   *  Lance, Leaping Bolt). Built in the constructor with the root. */
+  /** The Rush's red arrow over each player a mechanic has chosen personally
+   *  (breath_arrow_core.ts: Drawn Lightning and the Knotted Gale's marks by
+   *  their auras, Leaping Bolt's target by the bar; never a sky strike or
+   *  Storm Lance, whose floor says it). Built in the constructor with the root. */
   private auraArrows!: CouncilRushArrow;
   private barArrows!: CouncilRushArrow;
   private readonly glowTex: THREE.Texture | null;
@@ -1382,7 +1382,7 @@ export class BreathFightFx {
     this.pinnedMarks.end();
     this.drawnMarks.end();
     this.auraArrows.endScan();
-    // A bar aimed at one player (Storm Lance, Leaping Bolt): its target.
+    // A bar aimed at one player who must move (Leaping Bolt): its target.
     const g = this.guardianId >= 0 ? world.entities.get(this.guardianId) : undefined;
     if (g && breathTargetedBar(g) !== null && g.castTargetId !== null)
       this.barArrows.see(g.castTargetId);
