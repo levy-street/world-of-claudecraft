@@ -222,6 +222,27 @@ describe('the stars wake and stay', () => {
   });
 });
 
+describe('the Anvil holds the stars', () => {
+  it("a star due through Weight of the Anvil's bar waits for it to fall", () => {
+    const f = finalFight(6);
+    f.pullIn('hammer');
+    f.dev('/dev heart final wake breath');
+    f.dev('/dev heart final anvil', f.pids[2]);
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    expect(st.anvil).not.toBeNull();
+    st.stars.clock.hammer = 0.05;
+    st.stars.clock.breath = 0.05;
+    f.tick(sec(2));
+    expect(f.objects(FINAL_OBJECTS.risePrefix).length).toBe(0);
+    expect(f.objects(FINAL_OBJECTS.strikePrefix).length).toBe(0);
+    // Once it has fallen, both come.
+    f.tick(sec(T.anvilCast));
+    expect(st.anvil).toBeNull();
+    expect(f.state()?.stars.volleys ?? 0).toBeGreaterThanOrEqual(2);
+  });
+});
+
 describe('Wake the Stone', () => {
   it('pillars rise under players, throw them back, and stand as walls for the rest of the fight', () => {
     const f = finalFight(6);

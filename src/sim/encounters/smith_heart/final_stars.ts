@@ -10,7 +10,8 @@
 // The star of the quarter it stands in runs at full pace; the others at
 // FINAL_TUNING.reducedPace (their clocks count down slower); a quarter a
 // Splinter poured in (it survived its call) runs at full pace for good; the
-// final phase runs all four at FINAL_TUNING.finalPace (quarterPace). Through
+// final phase runs all four at FINAL_TUNING.finalPace (quarterPace). A star
+// due through Weight of the Anvil's bar waits for it to fall. Through
 // a stride and a call every star holds still (what is already on the floor
 // runs out; the charged pillars hold their pulse).
 //
@@ -104,6 +105,13 @@ export function stepStarClocks(s: FinalScope, running: boolean): void {
     if (pace <= 0) continue;
     st.clock[vein] -= DT * pace;
     if (st.clock[vein] > 1e-9) continue;
+    // Through Weight of the Anvil's bar the stars hold their next fall (the
+    // bot raid of 2026-11-18: a strike, a whirl, a line or a pillar laid on
+    // the stacked soakers killed them): the raid gathers, then it comes.
+    if (s.st.anvil) {
+      st.clock[vein] = 0;
+      continue;
+    }
     // A round of blades still flying waits for its last line.
     if (FINAL_STARS[vein] === 'blades' && (st.blade || st.bladeQueue.length > 0)) {
       st.clock[vein] = 0;
