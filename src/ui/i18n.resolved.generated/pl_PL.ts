@@ -6346,7 +6346,7 @@ export const pl_PL: EnTranslations = {
       "hub_rift_watch": "Drifthaven (Straż Szczelin)",
       "hub_church_order": "Dolina Wschodniego Strumienia (Zakon Kościoła)",
       "hub_automatons": "Wyrmwatch (Automaty)",
-      "riftGliderUse": "Użycie: Rozsuwa szybowiec, spowalniając prędkość spadania na 30 sek. Lądowanie lub zadanie obrażeń anuluje efekt. (2 min odpoczynku)",
+      "riftGliderUse": "Użycie: Rozsuwa szybowiec, spowalniając prędkość spadania na 30 sek. Można użyć w walce. Tylko lądowanie anuluje efekt. (2 min odpoczynku)",
       "targetDummyUse": "Użycie: Rozmieszcza mechaniczną tarczę treningową na otwartym świecie na 2 minuty do ćwiczenia zdolności bojowych. (5 min odpoczynku)",
       "battleStandardUse": "Użycie: wbija Sztandar Bojowy Uświęconego Świtu na 5 min. Gracze poza walką w promieniu 15 jardów regenerują o 10% więcej zdrowia, a korzystający z many odzyskują dodatkowo manę równą 5% Ducha co 2 s. Pozostanie w pobliżu przez 10 s zapewnia Błogosławieństwo Świtu, zwiększające Siłę, Zręczność, Wytrzymałość, Intelekt i Ducha o 5% na 30 min. (Odnowienie: 5 min)",
       "shockBombUse": "Użycie: Rzuca bombę szokową do 30 jardów, zadając 120 do 160 obrażeń Przyrody wszystkim wrogom w promieniu 5 jardów. (1 min odpoczynku)",

@@ -6346,7 +6346,7 @@ export const id_ID: EnTranslations = {
       "hub_rift_watch": "Drifthaven (Pengawas Celah)",
       "hub_church_order": "Lembah Eastbrook (Tatanan Gereja)",
       "hub_automatons": "Wyrmwatch (Automatons)",
-      "riftGliderUse": "Gunakan: Membuka peluncur, memperlambat kecepatan jatuh Anda selama 10 detik. (Tidak dapat digunakan dalam pertempuran)",
+      "riftGliderUse": "Gunakan: Membuka peluncur, memperlambat kecepatan jatuh selama 30 detik. Dapat digunakan dalam pertempuran. Hanya mendarat yang membatalkan efeknya. (Cooldown 2 menit)",
       "targetDummyUse": "Gunakan: Menerapkan boneka target mekanis di area terbuka untuk 1 menit. Punya 50 kesehatan.",
       "battleStandardUse": "Gunakan: Menancapkan Bendera Pertempuran Fajar yang Ditahbiskan selama 5 mnt. Pemain di luar pertempuran dalam jarak 15 yard memulihkan kesehatan 10% lebih banyak; pengguna mana juga memulihkan mana sebesar 5% Roh mereka setiap 2 dtk. Berada di dekatnya selama 10 dtk memberikan Berkat Fajar, meningkatkan Kekuatan, Kelincahan, Stamina, Intelek, dan Roh sebesar 5% selama 30 mnt. (Jeda 5 mnt)",
       "shockBombUse": "Gunakan: Melempar bom kejut hingga 30 yard, menimbulkan 150 kerusakan Alam dan melumpuhkan target selama 3 detik. (Waktu tunggu 30 detik)",

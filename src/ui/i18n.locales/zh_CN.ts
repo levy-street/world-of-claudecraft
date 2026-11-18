@@ -2504,7 +2504,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.factionRewards.invisibilityUse': '使用：使你进入潜行状态，持续 6 秒。（冷却 2 分钟）',
   'hudChrome.factionRewards.manaElixirUse': '使用：精神提高 6 点，持续 1 小时。',
   'hudChrome.factionRewards.riftGliderUse':
-    '使用：展开滑翔翼，降低下落速度，持续 30 秒。着陆或受到伤害会取消该效果。（冷却 2 分钟）',
+    '使用：展开滑翔翼，降低下落速度，持续 30 秒。战斗中可用。只有着陆才会取消该效果。（冷却 2 分钟）',
   'hudChrome.factionRewards.sharpeningStoneUse':
     '使用：打磨你的主手武器，使攻击强度提高 6 点，持续 30 分钟。',
   'hudChrome.factionRewards.shockBombUse':

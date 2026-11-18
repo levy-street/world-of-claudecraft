@@ -5,6 +5,7 @@ import { DUNGEON_X_THRESHOLD, ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { tryMobMeleeSwingInRange } from '../src/sim/mob/combat_profile';
 import { Sim } from '../src/sim/sim';
+import { groundHeight } from '../src/sim/world';
 
 describe('Allied Faction World Quest Rewards & Toys', () => {
   describe('Allied Hearthstone (allied_hearthstone)', () => {
@@ -145,7 +146,7 @@ describe('Allied Faction World Quest Rewards & Toys', () => {
   });
 
   describe('Rift Feather Glider (rift_feather_glider)', () => {
-    it('grants slow fall aura, clamps downward motion, and cancels on landing or combat', () => {
+    it('grants slow fall aura, clamps downward motion, and cancels on landing only', () => {
       const sim = new Sim({ seed: 104, playerClass: 'rogue', autoEquip: false });
       const meta = sim.meta(sim.playerId)!;
       sim.addItem('rift_feather_glider', 1);
@@ -170,16 +171,31 @@ describe('Allied Faction World Quest Rewards & Toys', () => {
       sim.tick();
       expect(sim.player.auras.some((a) => a.id === 'rift_feather_glider')).toBe(false);
 
-      // Combat cancels glider aura
+      // Combat and damage no longer cancel it: it is a PvP escape tool.
       sim.time += 121;
-      sim.player.pos.y = 50;
+      sim.player.pos.y += 50;
       sim.player.onGround = false;
       sim.useItem('rift_feather_glider');
       expect(sim.player.auras.some((a) => a.id === 'rift_feather_glider')).toBe(true);
 
       sim.player.inCombat = true;
       sim.tick();
-      expect(sim.player.auras.some((a) => a.id === 'rift_feather_glider')).toBe(false);
+      expect(sim.player.auras.some((a) => a.id === 'rift_feather_glider')).toBe(true);
+      sim.ctx.dealDamage(null, sim.player, 5, false, 'physical', 'Slam', 'hit');
+      sim.tick();
+      expect(sim.player.auras.some((a) => a.id === 'rift_feather_glider')).toBe(true);
+    });
+
+    it('can be unfolded while in combat', () => {
+      const sim = new Sim({ seed: 104, playerClass: 'rogue', autoEquip: false });
+      sim.addItem('rift_feather_glider', 1);
+      sim.player.pos.y = groundHeight(sim.player.pos.x, sim.player.pos.z, sim.cfg.seed) + 50;
+      sim.player.onGround = false;
+      sim.player.inCombat = true;
+      sim.drainEvents();
+      sim.useItem('rift_feather_glider');
+      expect(sim.player.auras.some((a) => a.id === 'rift_feather_glider')).toBe(true);
+      expect(sim.drainEvents().some((e) => e.type === 'error')).toBe(false);
     });
 
     it('exempts gliding players from mob aggro scans and blocks ground mob melee swings in the air (#4244)', () => {

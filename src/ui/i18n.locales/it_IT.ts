@@ -214,7 +214,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Uso: Ti avvolge nell'invisibilità per 6 sec. (2 min di recupero)",
   'hudChrome.factionRewards.manaElixirUse': 'Uso: Aumenta lo Spirito di 6 per 1 ora.',
   'hudChrome.factionRewards.riftGliderUse':
-    "Uso: Dispone il deltaplano, rallentando la caduta per 30 sec. L'atterraggio o il danno cancella l'effetto. (2 min di recupero)",
+    "Uso: Dispone il deltaplano, rallentando la caduta per 30 sec. Utilizzabile in combattimento. Solo l'atterraggio annulla l'effetto. (2 min di recupero)",
   'hudChrome.factionRewards.sharpeningStoneUse':
     "Uso: Affila la tua arma in mano principale, aumentando la Potenza d'Attacco di 6 per 30 min.",
   'hudChrome.factionRewards.shockBombUse':

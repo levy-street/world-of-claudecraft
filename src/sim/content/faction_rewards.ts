@@ -160,14 +160,13 @@ function setAlliedHearthstoneAttunement(
   });
 }
 
-/** Deploy the Rift Feather Glider to slow fall gracefully. */
+/**
+ * Deploy the Rift Feather Glider to slow fall gracefully. Usable in combat,
+ * and only landing (or water) ends it: damage and entering combat do not.
+ */
 export function useRiftFeatherGlider(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   if (p.dead || p.ghost) {
     ctx.error(meta.entityId, "You can't do that while dead.");
-    return;
-  }
-  if (p.inCombat) {
-    ctx.error(meta.entityId, "You can't do that while in combat.");
     return;
   }
   const readyAt = meta.riftGliderReadyAt ?? 0;

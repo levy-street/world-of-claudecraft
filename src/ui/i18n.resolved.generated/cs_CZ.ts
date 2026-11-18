@@ -6346,7 +6346,7 @@ export const cs_CZ: EnTranslations = {
       "hub_rift_watch": "Drifthaven (Hlídka trhlin)",
       "hub_church_order": "Eastbrookské údolí (Církevní řád)",
       "hub_automatons": "Wyrmwatch (Automati)",
-      "riftGliderUse": "Použití: Otevře kluzák, zpomaluje padající rychlost na 30 sekund. Přistání nebo zranění efekt zruší. (2 minuty cooldown)",
+      "riftGliderUse": "Použití: Otevře kluzák, zpomaluje padající rychlost na 30 sekund. Lze použít v boji. Efekt zruší pouze přistání. (2 minuty cooldown)",
       "targetDummyUse": "Použití: Rozmístí mechanickou terčovou figurínu v otevřeném světě na 2 minuty k tréninku bojových schopností. (5 minut cooldown)",
       "battleStandardUse": "Použití: Na 5 min zasadí prapor prvního úsvitu. Hráči mimo boj do 15 yardů od něj regenerují o 10% více zdraví a uživatelům many se navíc každé 2 s obnoví mana ve výši 5% jejich ducha. Po 10 s v jeho blízkosti získáš požehnání úsvitu, které na 30 min zvýší sílu, obratnost, výdrž, intelekt a ducha o 5%. (Doba obnovy 5 min)",
       "shockBombUse": "Použití: Hodí šokovou bombu až 30 yardů daleko, způsobuje 120 až 160 arciduchovo poškození všem nepřátelům do 5 yardů. (1 minuta cooldown)",

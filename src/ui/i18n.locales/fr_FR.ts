@@ -216,7 +216,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Utilisation : Vous enveloppe dans la furtivité pendant 6 sec. (2 min de délai)',
   'hudChrome.factionRewards.manaElixirUse': "Utilisation : Augmente l'Esprit de 6 pendant 1 heure.",
   'hudChrome.factionRewards.riftGliderUse':
-    "Utilisation : Déplie le planeur, ralentissant la vitesse de chute pendant 30 sec. L'atterrissage ou les dégâts annulent l'effet. (2 min de délai)",
+    "Utilisation : Déplie le planeur, ralentissant la vitesse de chute pendant 30 sec. Utilisable en combat. Seul l'atterrissage annule l'effet. (2 min de délai)",
   'hudChrome.factionRewards.sharpeningStoneUse':
     "Utilisation : Aiguise votre arme principale, augmentant la Puissance d'attaque de 6 pendant 30 min.",
   'hudChrome.factionRewards.shockBombUse':

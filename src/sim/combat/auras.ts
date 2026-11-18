@@ -299,7 +299,8 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
     e.stealthed = e.auras.some((a) => a.kind === 'stealth');
     return;
   }
-  if (e.inCombat || e.onGround) {
+  // The Rift Feather Glider ends on landing only; combat and damage keep it.
+  if (e.onGround) {
     const gIdx = e.auras.findIndex((a) => a.id === 'rift_feather_glider');
     if (gIdx >= 0) {
       const removed = e.auras.splice(gIdx, 1)[0];

@@ -211,7 +211,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Einsatz: Hüllt dich für 6 Sekunden in Heimlichkeit. (2 Min. Abklingzeit)',
   'hudChrome.factionRewards.manaElixirUse': 'Einsatz: Erhöht Geist um 6 für 1 Stunde.',
   'hudChrome.factionRewards.riftGliderUse':
-    'Einsatz: Entfaltet den Gleitschirm und verringert die Fallgeschwindigkeit für 30 Sekunden. Das Landen oder Schadensaufnahme bricht den Effekt ab. (2 Min. Abklingzeit)',
+    'Einsatz: Entfaltet den Gleitschirm und verringert die Fallgeschwindigkeit für 30 Sekunden. Im Kampf einsetzbar. Nur das Landen bricht den Effekt ab. (2 Min. Abklingzeit)',
   'hudChrome.factionRewards.sharpeningStoneUse':
     'Einsatz: Schärft deine Haupthandwaffe und erhöht Angriffskraft um 6 für 30 Minuten.',
   'hudChrome.factionRewards.shockBombUse':

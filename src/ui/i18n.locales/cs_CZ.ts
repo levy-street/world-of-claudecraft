@@ -198,7 +198,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Použití: Skrývá tě v skrytosti na 6 sekund. (2 minuty cooldown)',
   'hudChrome.factionRewards.manaElixirUse': 'Použití: Zvyšuje duch o 6 na 1 hodinu.',
   'hudChrome.factionRewards.riftGliderUse':
-    'Použití: Otevře kluzák, zpomaluje padající rychlost na 30 sekund. Přistání nebo zranění efekt zruší. (2 minuty cooldown)',
+    'Použití: Otevře kluzák, zpomaluje padající rychlost na 30 sekund. Lze použít v boji. Efekt zruší pouze přistání. (2 minuty cooldown)',
   'hudChrome.factionRewards.sharpeningStoneUse':
     'Použití: Nabrousí tvou zbraň v hlavní ruce, zvyšuje útočnou moc o 6 na 30 minut.',
   'hudChrome.factionRewards.shockBombUse':

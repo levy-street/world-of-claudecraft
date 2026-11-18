@@ -6346,7 +6346,7 @@ export const fr_CA: EnTranslations = {
       "hub_rift_watch": "Drifthaven (La Vigie des Failles)",
       "hub_church_order": "Val d'Eastbrook (L'Ordre de l'Église)",
       "hub_automatons": "Wyrmwatch (Automates)",
-      "riftGliderUse": "Utilisation : Déplie le planeur, ralentissant la vitesse de chute pendant 30 sec. L'atterrissage ou les dégâts annulent l'effet. (2 min de délai)",
+      "riftGliderUse": "Utilisation : Déplie le planeur, ralentissant la vitesse de chute pendant 30 sec. Utilisable en combat. Seul l'atterrissage annule l'effet. (2 min de délai)",
       "targetDummyUse": "Utilisation : Déploie une cible d'entraînement mécanique dans le monde ouvert pendant 2 minutes pour pratiquer les capacités de combat. (5 min de délai)",
       "battleStandardUse": "Utilisation : plante l’Étendard du Combat de l’Aube pendant 5 min. Les joueurs hors combat dans un rayon de 15 yards régénèrent 10% de vie supplémentaire ; les utilisateurs de mana récupèrent aussi un montant de mana égal à 5% de leur Esprit toutes les 2 s. Rester à proximité pendant 10 s confère Bénédiction de l’Aube, augmentant Force, Agilité, Endurance, Intelligence et Esprit de 5% pendant 30 min. (Recharge : 5 min)",
       "shockBombUse": "Utilisation : Lance une bombe à choc jusqu'à 30 mètres, infligeant 120 à 160 points de dégâts de Nature à tous les ennemis à 5 mètres. (1 min de délai)",

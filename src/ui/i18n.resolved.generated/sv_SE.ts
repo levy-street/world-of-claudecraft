@@ -6346,7 +6346,7 @@ export const sv_SE: EnTranslations = {
       "hub_rift_watch": "Driftvik (Riftvakten)",
       "hub_church_order": "Östbäcksdalen (Kyrkoorden)",
       "hub_automatons": "Wyrmwatch (Automater)",
-      "riftGliderUse": "Användning: Fäller ut glidaren, saktar fallhastigheten för 30 sek. Landning eller skada avbryter effekten. (2 min väntetid)",
+      "riftGliderUse": "Användning: Fäller ut glidaren, saktar fallhastigheten för 30 sek. Kan användas i strid. Endast landning avbryter effekten. (2 min väntetid)",
       "targetDummyUse": "Användning: Distribuerar en mekanisk måldumy i den öppna världen för 2 minuter för att träna stridsförmågor. (5 min väntetid)",
       "battleStandardUse": "Användning: placerar Vigda gryningens stridsfana i 5 min. Spelare utanför strid inom 15 yards återhämtar 10% mer hälsa, och manaanvändare återfår dessutom mana motsvarande 5% av sin Ande varannan sek. Stanna nära i 10 sek. för att få Gryningens välsignelse, som ökar Styrka, Smidighet, Uthållighet, Intellekt och Ande med 5% i 30 min. (5 min. nedkylning)",
       "shockBombUse": "Användning: Kastar en chockbomb upp till 30 meter, orsakar 120 till 160 naturskada för alla fiender inom 5 meter. (1 min väntetid)",

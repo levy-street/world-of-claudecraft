@@ -911,7 +911,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '使用: 6 秒間ステルス状態になります。（クールダウン 2 分）',
   'hudChrome.factionRewards.manaElixirUse': '使用: 1 時間精神が 6 上昇します。',
   'hudChrome.factionRewards.riftGliderUse':
-    '使用: グライダーを広げ、30 秒間落下速度を下げます。着地するかダメージを受けると効果が解除されます。（クールダウン 2 分）',
+    '使用: グライダーを広げ、30 秒間落下速度を下げます。戦闘中も使用できます。着地した場合のみ効果が解除されます。（クールダウン 2 分）',
   'hudChrome.factionRewards.sharpeningStoneUse':
     '使用: メインハンド武器を研ぎ、30 分間攻撃力が 6 上昇します。',
   'hudChrome.factionRewards.shockBombUse':
