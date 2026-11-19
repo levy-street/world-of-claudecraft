@@ -57,7 +57,7 @@ import {
   heartRootFall,
 } from './heart_collapse_core';
 import type { HeartFallAltar } from './heart_collapse_rig';
-import { heartFloorMaterial, setHeartFloorQuarter } from './heart_floor';
+import { heartFloorMaterial, sampleHeartFloorSockets, setHeartFloorQuarter } from './heart_floor';
 import {
   heartKitMeshes,
   heartKitPiece,
@@ -848,6 +848,14 @@ export function buildHeartQuarters(
   // ---- the wall landmarks (phase 2M) ----------------------------------------------------------
   const landmarks = buildHeartLandmarks(lowGfx, centre);
   group.add(landmarks.group);
+
+  // The arrival's sockets laid flush outside the rite wear the sheet's own
+  // paint round them (heart_floor_rite_core.ts).
+  sampleHeartFloorSockets(
+    HEART_QUARTER_ORDER.map(
+      (v) => heartKitPiece(SMITH_HEART_HEART_KIT_URL, HEART_QUARTER_PIECES[v])?.stone,
+    ),
+  );
 
   // ---- the Anvil falling apart (Mythic's hidden phase) --------------------------------------
   const collapse = buildHeartCollapse(
