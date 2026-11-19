@@ -80,7 +80,8 @@ function openWrath(
     p.hp = pools[i];
   });
   expect(f.dev('/dev heart council wrath')).toBe(true);
-  const cast = caster === 'guardian' ? T.wrathCast : T.heirWrathCast;
+  // The Singer casts it hastened by Grieving Fury (the full bar over 1 + haste).
+  const cast = T.wrathCast;
   const ev: SimEvent[] = [];
   for (let i = 0; i < ticks(cast) + 2; i++) ev.push(...f.sim.tick());
   return { ev, open };
@@ -88,30 +89,27 @@ function openWrath(
 
 function killGuardianFirst(f: CouncilFight): void {
   f.sim.ctx.handleDeath(f.bodies().guardian as Entity, f.players[3]);
-  f.tick();
+  // His soul lands on the Singer: Grieving Fury hands her his Wrath.
+  f.tick(Math.ceil(T.furyArrive * 20) + 2);
 }
 
 describe("Mountain's Wrath: Heroic and Mythic kill whoever no pillar hides", () => {
   it('the rows: Heroic and Mythic share the factor, Normal keeps 1', () => {
     expect(COUNCIL_DIFFICULTY.normal.wrathMult).toBe(1);
-    expect(COUNCIL_DIFFICULTY.normal.heirWrathMult).toBe(1);
     expect(COUNCIL_DIFFICULTY.normal.crowdShare).toBe(0.5);
     // Mythic at least as hard as Heroic (it was weaker before the review).
     expect(COUNCIL_DIFFICULTY.mythic.wrathMult).toBeGreaterThanOrEqual(
       COUNCIL_DIFFICULTY.heroic.wrathMult,
     );
-    expect(COUNCIL_DIFFICULTY.mythic.heirWrathMult).toBeGreaterThanOrEqual(
-      COUNCIL_DIFFICULTY.heroic.heirWrathMult,
-    );
     // An undefended tank in Defensive Stance (10 percent less) still dies to
-    // the lowest roll; the highest, with Memory of Stone, under a 40 percent
-    // cut in stance, leaves the tank standing.
+    // the lowest roll; the highest (the two standing, no Grieving Fury yet)
+    // under a 40 percent cut in stance leaves the tank standing.
     for (const tier of ['heroic', 'mythic'] as const) {
       const r = COUNCIL_DIFFICULTY[tier];
       const lo = T.wrathMin * r.damageMult * r.wrathMult;
       const hi = T.wrathMax * r.damageMult * r.wrathMult;
       expect(lo * 0.9, tier).toBeGreaterThan(TANK);
-      expect(hi * (1 + T.memoryPerFallen) * 0.9 * 0.6, tier).toBeLessThan(TANK * 0.95);
+      expect(hi * 0.9 * 0.6, tier).toBeLessThan(TANK * 0.95);
     }
   });
 
@@ -173,28 +171,35 @@ describe("Mountain's Wrath: Heroic and Mythic kill whoever no pillar hides", () 
     }
   });
 
-  it("heroic: with the Guardian fallen, the Singer's Wrath is a must-shelter, never a sure kill", () => {
-    for (const seed of [17, 23, 41, 59]) {
+  it("heroic: with the Guardian fallen, the Singer casts his full Wrath, Grieving Fury's damage on top", () => {
+    for (const seed of [17, 23, 41]) {
       const f = council('heroic', seed);
       killGuardianFirst(f);
-      const { ev, open } = openWrath(f, [CLOTH, CLOTH, CLOTH], () => {}, 'singer');
+      const { ev, open } = openWrath(f, [CLOTH, LEATHER, CLOTH], () => {}, 'singer');
       for (const p of open) {
         const [hit] = hitsOf(ev, COUNCIL_NAMES.wrath, p.id);
-        // Memory of Stone included: over 70 percent of the body, never all.
-        expect(hit, `seed ${seed}`).toBeGreaterThan(CLOTH * 0.7);
-        // (Her melee swing may land on her target in the same breath: the
-        // Wrath's own blow is the claim.)
-        expect(hit, `seed ${seed}`).toBeLessThan(CLOTH);
+        // The Guardian's own roll, times Memory of Stone: past his lowest.
+        expect(hit, `seed ${seed}`).toBeGreaterThanOrEqual(
+          Math.floor(
+            T.wrathMin *
+              COUNCIL_DIFFICULTY.heroic.punishMult *
+              COUNCIL_DIFFICULTY.heroic.wrathMult *
+              (1 + COUNCIL_DIFFICULTY.heroic.furyDamage) *
+              0.98,
+          ),
+        );
+        expect(p.dead, `seed ${seed}`).toBe(true);
       }
     }
   });
 
-  it('mythic: the heir is at least as hard as heroic', () => {
+  it('mythic: the fury is at least as hard as heroic', () => {
     const h = COUNCIL_DIFFICULTY.heroic;
     const m = COUNCIL_DIFFICULTY.mythic;
-    expect(m.damageMult * m.heirWrathMult).toBeGreaterThanOrEqual(h.damageMult * h.heirWrathMult);
-    expect(T.heirWrathMax * m.damageMult * m.heirWrathMult * (1 + T.memoryPerFallen)).toBeLessThan(
-      CLOTH,
+    expect(m.wrathMult * (1 + m.furyDamage)).toBeGreaterThanOrEqual(
+      h.wrathMult * (1 + h.furyDamage),
     );
+    expect(m.furyHaste).toBeGreaterThanOrEqual(h.furyHaste);
+    expect(m.furyHealPct).toBeGreaterThanOrEqual(h.furyHealPct);
   });
 });

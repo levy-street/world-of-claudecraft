@@ -121,7 +121,8 @@ describe('Hammer Council sounds: the plan', () => {
   it('a bar charge fits its bar within a breath of its pitch', () => {
     const wrath = COUNCIL_BAR_SOUNDS[COUNCIL_CASTS.wrath];
     expect(barSoundRate(wrath, T.wrathCast)).toBe(1);
-    expect(barSoundRate(wrath, T.heirWrathCast)).toBeCloseTo(1.2);
+    // Grieving Fury's hastened Wrath (a 30 percent haste) charges a breath quicker.
+    expect(barSoundRate(wrath, T.wrathCast / 1.3)).toBeGreaterThan(1);
     expect(barSoundRate(COUNCIL_BAR_SOUNDS[COUNCIL_CASTS.echo], T.echoCast)).toBe(1);
     expect(barSoundRate(COUNCIL_BAR_SOUNDS[COUNCIL_CASTS.song], T.songCast)).toBe(1);
     expect(barSoundRate(wrath, 0)).toBe(1);

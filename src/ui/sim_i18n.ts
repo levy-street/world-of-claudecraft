@@ -1622,6 +1622,8 @@ const baseEnTable = {
   'mechanic.heartQuarryCollapse': 'Quarry Collapse',
   'aura.heartResonance': 'Resonance',
   'aura.heartMemoryOfStone': 'Memory of Stone',
+  // Grieving Fury: the council's survivor (encounters/smith_heart/council_fury.ts).
+  'aura.heartGrievingFury': 'Grieving Fury',
   'aura.heartNarrowShelter': 'Narrow Shelter',
   'aura.heartBondOfTheStone': 'Bond of the Stone',
   'aura.heartShatteredCharge': 'Shattered Charge',
@@ -27190,6 +27192,7 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Quarry Collapse': 'mechanic.heartQuarryCollapse',
   Resonance: 'aura.heartResonance',
   'Memory of Stone': 'aura.heartMemoryOfStone',
+  'Grieving Fury': 'aura.heartGrievingFury',
   'Narrow Shelter': 'aura.heartNarrowShelter',
   'Bond of the Stone': 'aura.heartBondOfTheStone',
   'Shattered Charge': 'aura.heartShatteredCharge',

@@ -16,7 +16,11 @@ import {
   councilBodyKindOf,
 } from '../src/render/smith_heart_fx/council_bodies_core';
 import { MOBS } from '../src/sim/data';
-import { COUNCIL_CASTS, COUNCIL_TUNING } from '../src/sim/encounters/smith_heart/council_ids';
+import {
+  COUNCIL_CASTS,
+  COUNCIL_DIFFICULTY,
+  COUNCIL_TUNING,
+} from '../src/sim/encounters/smith_heart/council_ids';
 import type { Entity } from '../src/sim/types';
 
 const MOB = 'heart_seam_singer';
@@ -86,7 +90,13 @@ describe('the Seam Singer body', () => {
     const bars: [string, string, number][] = [
       [COUNCIL_CASTS.bolt, 'CastBolt', COUNCIL_TUNING.boltCast],
       [COUNCIL_CASTS.song, 'CastSong', COUNCIL_TUNING.songCast],
-      [COUNCIL_CASTS.wrath, 'CastWrath', COUNCIL_TUNING.heirWrathCast],
+      // His Wrath, hastened by Grieving Fury on the gentlest tier (the
+      // longest bar she ever casts it in).
+      [
+        COUNCIL_CASTS.wrath,
+        'CastWrath',
+        COUNCIL_TUNING.wrathCast / (1 + COUNCIL_DIFFICULTY.normal.furyHaste),
+      ],
     ];
     for (const [id, clip, bar] of bars) {
       expect(by[id], id).toBe(clip);

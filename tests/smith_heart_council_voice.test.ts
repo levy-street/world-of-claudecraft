@@ -75,6 +75,11 @@ function kill(f: CouncilFight, role: CouncilRole): SimEvent[] {
   return f.tick();
 }
 
+/** The fallen one's soul reaching the survivor (Grieving Fury's landing). */
+function land(f: CouncilFight): SimEvent[] {
+  return f.tick(Math.ceil(T.furyArrive * 20) + 1);
+}
+
 describe('Hammer Council lines', () => {
   it('every line is its catalog key, with the same English', () => {
     let n = 0;
@@ -124,6 +129,7 @@ describe('Hammer Council lines', () => {
     const { f, st } = pulled();
     f.tick(20 * 6);
     kill(f, 'guardian');
+    land(f);
     quiet(st);
     st.energy = T.energyMax;
     const heard = keysOf(yells(f, f.tick(4)));
@@ -131,11 +137,11 @@ describe('Hammer Council lines', () => {
     expect(heard.some((k) => k?.endsWith('_wrath'))).toBe(false);
   });
 
-  it("a fall: its death line and the first survivor's memory; the last says its defeat", () => {
+  it("a fall: its death line, then the survivor's memory as the soul lands; the last says its defeat", () => {
     const { f } = pulled();
     f.tick(20 * 6);
-    expect(keysOf(yells(f, kill(f, 'singer')))).toEqual([
-      'hudChrome.council.say.singer_death',
+    expect(keysOf(yells(f, kill(f, 'singer')))).toEqual(['hudChrome.council.say.singer_death']);
+    expect(keysOf(yells(f, land(f))).filter((k) => k?.endsWith('_remember'))).toEqual([
       'hudChrome.council.say.guardian_remember',
     ]);
     // The second fall is the last: its defeat line.
@@ -147,8 +153,8 @@ describe('Hammer Council lines', () => {
   it('on mythic a fallen member speaks as its soul takes the stone', () => {
     const { f } = pulled('mythic');
     f.tick(20 * 6);
-    expect(keysOf(yells(f, kill(f, 'singer')))).toEqual([
-      'hudChrome.council.say.singer_soul',
+    expect(keysOf(yells(f, kill(f, 'singer')))).toEqual(['hudChrome.council.say.singer_soul']);
+    expect(keysOf(yells(f, land(f))).filter((k) => k?.endsWith('_remember'))).toEqual([
       'hudChrome.council.say.guardian_remember',
     ]);
   });

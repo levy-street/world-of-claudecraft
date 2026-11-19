@@ -16,13 +16,20 @@ export interface CouncilMark {
   remaining: number;
 }
 
-/** An heir's pillar rising on a locked spot (instance-local). */
-export interface CouncilRiseSpot {
-  x: number;
-  z: number;
-  remaining: number;
-  /** The rise-spot object the client draws. */
-  objectId: number;
+/** Grieving Fury (council_fury.ts): the fallen one's soul on its way to the
+ *  survivor, then the survivor mending and enraged. */
+export interface CouncilFury {
+  /** The member that lives on, and the one whose soul it takes. */
+  survivor: CouncilRole;
+  fallen: CouncilRole;
+  /** Seconds until the soul lands (0 once it has). */
+  arriveIn: number;
+  arrived: boolean;
+  /** Health still to mend, and how much each beat mends. */
+  healLeft: number;
+  healEach: number;
+  /** Seconds to the next mend beat. */
+  mendTimer: number;
 }
 
 /** One player under Resonance (a spread): its time left and the seconds to
@@ -51,7 +58,7 @@ export interface CouncilBar {
   castId: string;
   /** Where its feet were planted when it began (world). */
   at: { x: number; y: number; z: number };
-  /** Run as an heir (the shorter Wrath, the unbroken song). */
+  /** Run as an heir (the survivor's inherited job: full strength). */
   heir: boolean;
   targetId: number | null;
 }
@@ -137,12 +144,13 @@ export interface CouncilFightState {
   /** The Singer's kickable bar in flight (a cut bar is a kick). */
   kickable: string | null;
   wakeMarks: CouncilMark[];
-  riseSpots: CouncilRiseSpot[];
   rock: CouncilMark | null;
   resonance: CouncilResonance[];
   rubble: CouncilRubble[];
   /** The fallen, in the order they fell. */
   fallen: CouncilRole[];
+  /** Grieving Fury after the first fall, else null. */
+  fury: CouncilFury | null;
   /** Lines said this pull (each once). */
   lines: string[];
   /** The members' spoken lines (council_voice.ts): `<role>_<moment>` to the

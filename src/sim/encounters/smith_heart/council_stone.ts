@@ -19,13 +19,11 @@
 //                   each takes half as much again and the whole raid feels the
 //                   tremor), and every pillar within 6 yd loses a piece, so the
 //                   raid soaks AWAY from its cover.
-//   Heir            the Singer fallen, the Guardian raises the pillars itself,
-//                   less often (its own 45 s clock; a Wrath's landing still
-//                   brings one due), under RANDOM players with only a 2 s
-//                   warning on a locked spot (nobody chooses, nobody kicks;
-//                   they ring Stone Thrum like hers);
-//                   the rock stops with her. Mythic: a 1.5 s warning, and the
-//                   Guardian keeps the rock too (it is all that breaks a soul
+//   Heir            the Singer fallen, once her soul reaches him the Guardian
+//                   casts the SAME Wake the Stone (Grieving Fury,
+//                   council_fury.ts: the kickable bar, the marks, the clock,
+//                   all hastened). The rock stops with her, but on mythic the
+//                   Guardian keeps it too (it is all that breaks a soul
 //                   pillar).
 //   Soul pillars    a rock landing within 6 yd of one strikes a soul pip off
 //                   (council_soul.ts) instead of a piece.
@@ -37,8 +35,6 @@ import { DT, type Entity } from '../../types';
 import {
   clearCastIf,
   dropAuraById,
-  dropEncounterObject,
-  spawnEncounterObject,
 } from '../sunken_bastion/claim';
 import { stampFloor } from './council_floor_gap';
 import {
@@ -48,7 +44,6 @@ import {
   COUNCIL_NAMES,
   COUNCIL_ROLES,
   type CouncilRole,
-  councilRiseSpotTemplate,
   fallingRockShare,
   COUNCIL_TUNING as T,
 } from './council_ids';
@@ -70,51 +65,25 @@ import { councilSay } from './council_voice';
 /** Free pillar places under the cap (marks never outnumber them). */
 function freePlaces(s: CouncilScope): number {
   const standing = councilPillars(s.ctx, s.inst).filter((p) => !p.cursed).length;
-  const coming = s.st.wakeMarks.length + s.st.riseSpots.length;
+  const coming = s.st.wakeMarks.length;
   return Math.max(0, T.pillarCap - standing - coming);
 }
 
-/** Wake the Stone comes due: the Singer's kickable bar, or the heir's locked
- *  spots. Exported for the dev trigger. */
+/** Wake the Stone comes due: the kickable bar of whoever holds the pillars
+ *  (the Singer, or the Guardian after her). Exported for the dev trigger. */
 export function startWake(s: CouncilScope): boolean {
   const holder = jobHolder(s, 'pillars');
   if (!holder) return false;
   const count = Math.min(s.rules.wakeMarks, freePlaces(s));
   if (count <= 0) return false;
-  if (!holder.heir) {
-    if (!memberFree(s, holder.role)) return false;
-    // A kick's silence and lockout hold her Wake too.
-    if (s.st.quiet > 0 || isLockedOut(holder.body, 'nature')) return false;
-    s.st.wakeTimer = T.wakeEvery;
-    stampFloor(s.st);
-    beginBar(s, holder.role, COUNCIL_CASTS.wake, T.wakeCast, null, false);
-    s.st.kickable = COUNCIL_CASTS.wake;
-    councilSay(s, holder.role, 'wake');
-    return true;
-  }
-  // The heir: no bar, no choice. The spots lock under random players now.
-  const marked = pickMarks(s, holder.body, count);
-  if (marked.length === 0) return false;
-  s.st.wakeTimer = T.heirWakeEvery;
+  if (!memberFree(s, holder.role)) return false;
+  // A kick's silence and lockout hold the Wake too.
+  if (s.st.quiet > 0 || isLockedOut(holder.body, 'nature')) return false;
+  s.st.wakeTimer = T.wakeEvery;
   stampFloor(s.st);
-  s.st.casts++;
-  const o = s.ctx.instanceOriginOf(s.inst);
-  for (const p of marked) {
-    const lx = p.pos.x - o.x;
-    const lz = p.pos.z - o.z;
-    const obj = spawnEncounterObject(
-      s.ctx,
-      s.inst,
-      councilRiseSpotTemplate(s.rules.heirRiseWarn),
-      'Rising Stone',
-      lx,
-      lz,
-      0,
-      T.riseKnockRadius,
-    );
-    obj.dungeonId = s.inst.dungeonId;
-    s.st.riseSpots.push({ x: lx, z: lz, remaining: s.rules.heirRiseWarn, objectId: obj.id });
-  }
+  beginBar(s, holder.role, COUNCIL_CASTS.wake, T.wakeCast, null, holder.heir);
+  s.st.kickable = COUNCIL_CASTS.wake;
+  if (!holder.heir) councilSay(s, holder.role, 'wake');
   return true;
 }
 
@@ -140,12 +109,14 @@ export function landWake(s: CouncilScope, caster: Entity): void {
   }
 }
 
-/** The marks and the heir's spots count down; each rises when its time is up.
+/** The marks count down; each rises when its time is up.
  *  A mark whose player left the Quarry rises nowhere (no clear floor there);
  *  a mark on a player who fell raises nothing (never on a corpse). */
 export function stepRises(s: CouncilScope): void {
-  const holder = jobHolder(s, 'pillars');
-  const source = holder?.body ?? null;
+  // The pillars' holder raises them; between the Singer's fall and her soul
+  // reaching the Guardian, he does (her marks still rise).
+  const source =
+    jobHolder(s, 'pillars')?.body ?? COUNCIL_ROLES.map((r) => s.bodies[r]).find(living) ?? null;
   const bodies = COUNCIL_ROLES.map((r) => s.bodies[r]).filter((b): b is Entity => b !== null);
   const o = s.ctx.instanceOriginOf(s.inst);
   if (s.st.wakeMarks.length > 0) {
@@ -169,18 +140,6 @@ export function stepRises(s: CouncilScope): void {
           p.pos.z - o.z,
           damageMult(s, source),
         );
-      }
-    }
-  }
-  if (s.st.riseSpots.length > 0) {
-    for (const r of s.st.riseSpots) r.remaining -= DT;
-    const due = s.st.riseSpots.filter((r) => r.remaining <= 1e-9);
-    if (due.length > 0) {
-      s.st.riseSpots = s.st.riseSpots.filter((r) => r.remaining > 1e-9);
-      for (const r of due) {
-        dropEncounterObject(s.ctx, s.inst, r.objectId);
-        if (source)
-          raisePillar(s.ctx, s.inst, source, bodies, s.players, r.x, r.z, damageMult(s, source));
       }
     }
   }
@@ -287,15 +246,13 @@ export function stepRock(s: CouncilScope): number {
   return under.length;
 }
 
-/** Drop every mark, spot and the rock (a reset, the council's fall). */
+/** Drop every mark and the rock (a reset, the council's fall). */
 export function clearStone(s: CouncilScope): void {
   for (const m of s.st.wakeMarks) {
     const p = s.ctx.entities.get(m.playerId);
     if (p) dropAuraById(p, COUNCIL_AURAS.wakeMark);
   }
   s.st.wakeMarks = [];
-  for (const r of s.st.riseSpots) dropEncounterObject(s.ctx, s.inst, r.objectId);
-  s.st.riseSpots = [];
   if (s.st.rock) {
     const p = s.ctx.entities.get(s.st.rock.playerId);
     if (p) dropAuraById(p, COUNCIL_AURAS.rockMark);

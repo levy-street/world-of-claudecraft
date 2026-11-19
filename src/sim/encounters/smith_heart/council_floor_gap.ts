@@ -5,7 +5,7 @@
 // the Echo and the Rush's lane never land on the floor at once.
 //
 //   The list      Mountain's Wrath (its sight field), the Echo of Wrath (its
-//                 ring), Wake the Stone (its circles; an heir's rise spots),
+//                 ring), Wake the Stone (its circles),
 //                 Mountain's Rush (its lane and mark) and Falling Rock (its
 //                 soak circle). Seam Bolt, the song and Hammer's Weight paint
 //                 no floor and keep their own clocks untouched.

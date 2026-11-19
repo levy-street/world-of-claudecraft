@@ -844,7 +844,9 @@ export class RiftDeathZoneVisuals {
   /** The drawn scale multiplier of a body (a fed Bastion Barnacle Crawler
    *  swells; 1 for every other body). O(1); the renderer asks it per body. */
   bodySwell(id: number): number {
-    return this.bastionFx.bodySwell(id);
+    // The Sunken Bastion's swelling bodies and the Hammer Council's survivor
+    // under Grieving Fury (council_fury_fx.ts).
+    return this.bastionFx.bodySwell(id) * this.councilFx.bodySwell(id);
   }
 
   /** True when a dungeon effect claimed the event outright (the renderer

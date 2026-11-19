@@ -70,6 +70,7 @@ import { radialGlowTexture } from '../textures';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
 import { COUNCIL_GROW } from './council_bodies_core';
 import { CouncilBondFx } from './council_bond_fx';
+import { CouncilFuryFx } from './council_fury_fx';
 import {
   BOLT_SECONDS,
   COUNCIL_FX_COLORS as C,
@@ -258,6 +259,9 @@ interface StreamSlot {
   acc: number;
   /** Mythic: a soul flowing into its pillar (its colour, its arrival). */
   soul: CouncilRole | null;
+  /** The stream's colour: the soul's, or the fallen member's whose soul
+   *  flies to the survivor (Grieving Fury), else the vein's ochre. */
+  tint: CouncilRole | null;
 }
 
 interface DropSlot {
@@ -400,6 +404,8 @@ export class CouncilFx {
   private readonly soak: CouncilSoakFx;
   /** Bond of the Stone's thread between the two members. */
   private readonly bond: CouncilBondFx;
+  /** Grieving Fury on the survivor (council_fury_fx.ts). */
+  private readonly fury: CouncilFuryFx;
   /** Mountain's Rush's lane and impact, the Quarry Collapse's blows. */
   private readonly rush: CouncilRushFx;
   /** The Wrath's and the Rush's gather and release (council_strike_fx.ts). */
@@ -512,6 +518,7 @@ export class CouncilFx {
     this.soak = new CouncilSoakFx(this.root, this.uTime, this.geometries, this.materials);
     this.arrow = new CouncilRushArrow(this.root, this.uTime, this.geometries, this.materials);
     this.bond = new CouncilBondFx(host);
+    this.fury = new CouncilFuryFx(host);
     this.rush = new CouncilRushFx(host, playGesture);
     this.strike = new CouncilStrikeFx(
       host,
@@ -702,6 +709,7 @@ export class CouncilFx {
         from: new THREE.Vector3(),
         acc: 0,
         soul: null,
+        tint: null,
       });
     }
     // ---- the Wrath holder's gathering energy ----
@@ -855,8 +863,12 @@ export class CouncilFx {
     else if (ability === COUNCIL_CUES.pulse) this.pillarsFx.pulse(ev.sourceId);
     else if (ability === COUNCIL_CUES.risenPulse) this.pillarsFx.stoneThrum(ev.sourceId);
     else if (ability === COUNCIL_CUES.inherit) {
-      this.startStream(ev.sourceId, ev.targetId, null);
-    } else if (ability === COUNCIL_CUES.soulTake) {
+      // The fallen one's soul, in its own colour, on its way to the survivor.
+      const src = this.world.entities.get(ev.sourceId);
+      this.startStream(ev.sourceId, ev.targetId, null, src ? councilRoleOf(src.templateId) : null);
+    } else if (ability === COUNCIL_CUES.furyWake) this.fury.wake(ev.sourceId);
+    else if (ability === COUNCIL_CUES.furyMend) this.fury.mend(ev.sourceId);
+    else if (ability === COUNCIL_CUES.soulTake) {
       const src = this.world.entities.get(ev.sourceId);
       const role = src ? councilRoleOf(src.templateId) : null;
       this.startStream(ev.sourceId, ev.targetId, role ?? 'guardian');
@@ -897,6 +909,7 @@ export class CouncilFx {
     this.updateEnergy(world, dt);
     this.updateWrathShelters(world);
     this.bond.update(dt);
+    this.fury.update(dt);
     this.rush.update(dt);
     this.strike.update(dt);
     this.arrow.update(world.entities, this.clock, this.reducedMotion());
@@ -921,6 +934,7 @@ export class CouncilFx {
     this.pillarsFx.beginScan();
     this.soulFx.beginScan();
     this.bond.beginScan();
+    this.fury.beginScan();
     this.rush.beginScan();
     this.strike.beginScan();
     this.arrow.beginScan();
@@ -940,6 +954,7 @@ export class CouncilFx {
           if (role !== null) {
             this.audio.see(e, 'member');
             this.bond.see(e);
+            this.fury.see(e);
             if (role === 'guardian') this.rush.seeGuardian(e);
             this.strike.see(e, role);
           }
@@ -986,6 +1001,7 @@ export class CouncilFx {
     this.pillarsFx.endScan();
     this.soulFx.endScan();
     this.bond.endScan();
+    this.fury.endScan();
     this.rush.endScan();
     this.strike.endScan();
     this.arrow.endScan();
@@ -1561,7 +1577,18 @@ export class CouncilFx {
 
   // ---- the stone remembers ------------------------------------------------------------------------
 
-  private startStream(sourceId: number, targetId: number, soul: CouncilRole | null): void {
+  /** The survivor's display scale under Grieving Fury (1 for any other
+   *  body): the renderer multiplies it in (rift_death_zone.ts bodySwell). */
+  bodySwell(id: number): number {
+    return this.disposed ? 1 : this.fury.bodySwell(id);
+  }
+
+  private startStream(
+    sourceId: number,
+    targetId: number,
+    soul: CouncilRole | null,
+    tint: CouncilRole | null = soul,
+  ): void {
     const src = this.world?.entities.get(sourceId);
     if (!src) return;
     const s = this.streams.find((q) => !q.alive) ?? this.streams[0];
@@ -1571,24 +1598,25 @@ export class CouncilFx {
     s.targetId = targetId;
     s.acc = 0;
     s.soul = soul;
+    s.tint = tint;
     const at = fxAnchor(src);
     s.from.set(at.x, this.groundY(at.x, at.z) + 2.5, at.z);
     // The beads take the stream's colour (one write per stream, not a frame).
-    _beadColor.setHex(soul ? SOUL_COLORS[soul].hex : 0xffc070);
+    _beadColor.setHex(tint ? SOUL_COLORS[tint].hex : 0xffc070);
     const base = this.streams.indexOf(s) * BEADS;
     for (let i = 0; i < BEADS; i++) this.beads.setColorAt(base + i, _beadColor);
     if (this.beads.instanceColor) this.beads.instanceColor.needsUpdate = true;
     // The fallen gives up its light (a soul tears free: brighter, its colour).
-    this.particles.puff(s.from.x, s.from.y, s.from.z, soul ? 30 : 16, {
-      speed: soul ? 5 : 3,
+    this.particles.puff(s.from.x, s.from.y, s.from.z, tint ? 30 : 16, {
+      speed: tint ? 5 : 3,
       up: 2,
       life: 1,
       size: [1.6, 3.6],
-      color: soul ? _soulRgb(soul) : C.flash,
+      color: tint ? _soulRgb(tint) : C.flash,
       alpha: 0.7,
       pool: 'glow',
     });
-    this.particles.shockRing(s.from.x, s.from.z, soul ? SOUL_COLORS[soul].hex : C.ochre, 6, 0.7);
+    this.particles.shockRing(s.from.x, s.from.z, tint ? SOUL_COLORS[tint].hex : C.ochre, 6, 0.7);
   }
 
   private updateStreams(world: IWorld, dt: number): void {
@@ -1604,7 +1632,8 @@ export class CouncilFx {
           // The soul arrives: its stone wakes.
           this.pillarsFx.soulAwake(s.targetId, s.soul);
         } else if (s.alive && target) {
-          // It arrives: the survivor flares with the fallen one's light.
+          // It arrives: the survivor flares with the fallen one's light (the
+          // fury's own wake, council_fury_fx.ts, lands on the same beat).
           const at = fxAnchor(target);
           const y = this.groundY(at.x, at.z) + 3;
           this.particles.puff(at.x, y, at.z, 24, {
@@ -1612,7 +1641,7 @@ export class CouncilFx {
             up: 1,
             life: 0.8,
             size: [2, 5],
-            color: [1, 0.76, 0.38],
+            color: s.tint ? _soulRgb(s.tint) : [1, 0.76, 0.38],
             alpha: 0.85,
             pool: 'glow',
           });
@@ -1649,8 +1678,8 @@ export class CouncilFx {
         const arc = inheritArc(Math.min(1, Math.max(0, head - this.rand() * 0.4)), _arc);
         _v.lerpVectors(s.from, _v2, arc.along);
         _v.y += arc.lift;
-        if (s.soul) {
-          const c = _soulRgb(s.soul);
+        if (s.tint) {
+          const c = _soulRgb(s.tint);
           _moteColor[0] = c[0];
           _moteColor[1] = c[1];
           _moteColor[2] = c[2];
@@ -1764,6 +1793,7 @@ export class CouncilFx {
     if (this.disposed) return;
     this.disposed = true;
     this.bond.dispose();
+    this.fury.dispose();
     this.strike.dispose();
     this.root.removeFromParent();
     this.particles.dispose();

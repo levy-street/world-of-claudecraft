@@ -22,13 +22,15 @@
 //                  seal's Hammer vein and every credit wait on both
 //                  (content/smith_heart.ts gate, seal.ts). The risen pillars
 //                  sink back into the floor and the columns stand again.
-//   The stone remembers
-//                  when one falls, the survivor gains Memory of Stone (more
-//                  damage dealt) and takes up the fallen one's signature in a
-//                  weaker form (council_scope.ts jobHolder): the Guardian
-//                  fallen, the Singer casts a shorter, lighter Wrath; the
-//                  Singer fallen, the Guardian raises the pillars itself, less
-//                  often, under random players on a 2 s warning.
+//   Grieving Fury  when one falls, its soul flies to the survivor and lands
+//                  3 s later (council_fury.ts): the survivor mends a share of
+//                  its health, deals more damage (Memory of Stone), swings,
+//                  casts and runs its clocks faster (Grieving Fury), and takes
+//                  up the fallen one's kit at FULL strength (council_scope.ts
+//                  jobHolder): the Guardian fallen, the Singer casts his very
+//                  Wrath (and his Weight on Heroic); the Singer fallen, the
+//                  Guardian casts her Wake the Stone and her song (and her
+//                  bolt on Heroic). The two must fall together.
 //
 // Difficulty: the claim's (heroic: Resonance, the Wake and the Rush may overlap
 // the Wrath, three Wake marks, the pillars pulse), with a dev switch for a run
@@ -54,12 +56,11 @@ import { regrowHead } from '../drowned_temple/hydra_regrowth';
 import { claimBoss, dropAuraById } from '../sunken_bastion/claim';
 import { clearBond, stepBond } from './council_bond';
 import { carryWrathHold, startFloorMechanics } from './council_floor';
+import { beginFury, clearFury, stepFury } from './council_fury';
 import {
   COUNCIL_AURAS,
   COUNCIL_CASTS,
-  COUNCIL_CUES,
   COUNCIL_DIFFICULTY,
-  COUNCIL_NAMES,
   COUNCIL_ROLES,
   COUNCIL_TEMPLATES,
   type CouncilDifficulty,
@@ -85,6 +86,7 @@ import { stepRisenPulse } from './council_risen_pulse';
 import { clearRush, landRush, startRush, stepCursed, stepRush } from './council_rush';
 import {
   type CouncilScope,
+  councilHaste,
   damageMult,
   holdPlantedAt,
   living,
@@ -227,11 +229,11 @@ function freshState(difficulty: CouncilDifficulty): CouncilFightState {
     gaps: { guardian: 0, singer: 0 },
     kickable: null,
     wakeMarks: [],
-    riseSpots: [],
     rock: null,
     resonance: [],
     rubble: [],
     fallen: [],
+    fury: null,
     lines: [],
     said: {},
     slain: freshSlainWatch(),
@@ -259,66 +261,24 @@ function scopeOf(
   };
 }
 
-// ---- the stone remembers ----------------------------------------------------------------
+// ---- Grieving Fury ------------------------------------------------------------------------
 
-/** Memory of Stone on the living member: one stack per fallen member. */
-function syncMemory(s: CouncilScope): void {
-  const fallen = s.st.fallen.length;
-  for (const r of COUNCIL_ROLES) {
-    const b = s.bodies[r];
-    if (!living(b)) continue;
-    const have = b.auras.find((a) => a.id === COUNCIL_AURAS.memory);
-    if (fallen === 0) {
-      if (have) dropAuraById(b, COUNCIL_AURAS.memory);
-      continue;
-    }
-    const value = T.memoryPerFallen * fallen;
-    if (have && have.stacks === fallen) continue;
-    if (have) dropAuraById(b, COUNCIL_AURAS.memory);
-    s.ctx.applyAura(b, {
-      id: COUNCIL_AURAS.memory,
-      name: COUNCIL_NAMES.memory,
-      kind: 'buff_dmg_done',
-      remaining: 3600,
-      duration: 3600,
-      permanent: true,
-      value,
-      stacks: fallen,
-      sourceId: b.id,
-      school: 'physical',
-      undispellable: true,
-    });
-  }
-}
-
-/** A member fell this tick: the light flows from it into each survivor. */
+/** A member fell this tick: its soul sets out for the survivor (it lands and
+ *  wakes the fury in council_fury.ts stepFury). */
 function noteFallen(s: CouncilScope, role: CouncilRole, dead: Entity): void {
   s.st.fallen.push(role);
   s.st.firstFallAt ??= s.st.clock;
-  // Its own bars and the marks it alone was running go with it.
+  // Its own bars go with it (a kickable one too).
+  const bar = s.st.bars[role];
   delete s.st.bars[role];
-  if (s.st.kickable !== null && role === 'singer') s.st.kickable = null;
-  for (const r of COUNCIL_ROLES) {
-    const b = s.bodies[r];
-    if (!living(b)) continue;
-    s.ctx.emit({
-      type: 'spellfx',
-      sourceId: dead.id,
-      targetId: b.id,
-      school: 'physical',
-      fx: 'beam',
-      ability: COUNCIL_CUES.inherit,
-    });
-  }
+  if (bar && s.st.kickable === bar.castId) s.st.kickable = null;
   const survivor = COUNCIL_ROLES.map((r) => s.bodies[r]).find(living);
-  // The Wrath's heir starts its own (shorter) fill from empty; the Rush dies
-  // with the Guardian.
-  if (role === 'guardian') {
-    s.st.energy = 0;
-    clearRush(s);
-  }
+  // The Rush dies with the Guardian; his energy waits for the Singer where he
+  // left it (she takes it up when his soul reaches her).
+  if (role === 'guardian') clearRush(s);
   // No bond with the fallen: the survivor's ward lifts now.
   clearBond(s);
+  if (survivor) beginFury(s, role, dead);
   // Mythic: its soul takes the most intact pillar (council_soul.ts).
   const soul = survivor && s.rules.soulInTheStone ? takeSoul(s, role, dead) !== null : false;
   if (survivor) sayFallen(s, role, soul);
@@ -334,8 +294,8 @@ function landBar(s: CouncilScope, role: CouncilRole, body: Entity): void {
   if (s.st.kickable === bar.castId) s.st.kickable = null;
   switch (bar.castId) {
     case COUNCIL_CASTS.wrath:
-      landWrath(s, body, bar.heir);
-      carryWrathHold(s.st, bar.heir, s.rules.heirFillSeconds, s.rules.enrageAfterWraths);
+      landWrath(s, body);
+      carryWrathHold(s.st, s.rules.enrageAfterWraths, councilHaste(s));
       return;
     case COUNCIL_CASTS.weight:
       landWeight(s, body, bar.targetId);
@@ -396,13 +356,15 @@ function stepBars(s: CouncilScope): void {
 /** Begin whatever each member has due, the most dangerous first. */
 function startBars(s: CouncilScope): void {
   const st = s.st;
-  st.weightTimer -= DT;
-  st.wakeTimer -= DT;
-  st.rockTimer -= DT;
-  st.rushTimer -= DT;
-  st.boltTimer -= DT;
-  st.songTimer -= DT;
-  if (st.songDue !== null) st.songDue -= DT;
+  // Grieving Fury runs every clock faster.
+  const dt = DT * councilHaste(s);
+  st.weightTimer -= dt;
+  st.wakeTimer -= dt;
+  st.rockTimer -= dt;
+  st.rushTimer -= dt;
+  st.boltTimer -= dt;
+  st.songTimer -= dt;
+  if (st.songDue !== null) st.songDue -= dt;
   // An owed song that could not start soon after its Wrath is dropped (sung
   // late it would run into the next one).
   if (st.songDue !== null && st.songDue < -T.songLateDrop) st.songDue = null;
@@ -481,6 +443,7 @@ function resetCouncil(ctx: SimContext, inst: InstanceSlot, bodies: CouncilBodies
     clearSong(s);
     clearRush(s);
     clearBond(s);
+    clearFury(s);
     clearRubble(ctx, inst, st);
     // The tank keeps no Weight past the fight.
     dropClaimWeight(ctx, inst);
@@ -491,6 +454,7 @@ function resetCouncil(ctx: SimContext, inst: InstanceSlot, bodies: CouncilBodies
     const b = bodies[r];
     if (!b) continue;
     dropAuraById(b, COUNCIL_AURAS.memory);
+    dropAuraById(b, COUNCIL_AURAS.fury);
     // The Rush's reel (its stun, the extra damage) never outlives the fight.
     dropAuraById(b, COUNCIL_AURAS.rushStunned);
     dropAuraById(b, COUNCIL_AURAS.rushExposed);
@@ -552,9 +516,19 @@ function beginCouncil(
     st.basePools[r] = applyTierHealth(b, mult);
     st.baseSwings[r] = applyTierSwing(b, swing);
   }
-  // A member already down when the pull began (a dev kill) has fallen.
+  // A member already down when the pull began (a dev kill) has fallen, and
+  // its soul is already in the survivor (no mend: it fell before the pull).
   for (const r of COUNCIL_ROLES) if (bodies[r] && !living(bodies[r])) st.fallen.push(r);
   if (st.fallen.length > 0) st.firstFallAt = 0;
+  const fallen = st.fallen.length === 1 ? st.fallen[0] : null;
+  const dead = fallen ? bodies[fallen] : null;
+  if (fallen && dead) {
+    const fury = beginFury(scopeOf(ctx, inst, st, bodies), fallen, dead);
+    if (fury) {
+      fury.arriveIn = 0;
+      fury.healLeft = 0;
+    }
+  }
   // Straight after the entrance a pull line it has just said would repeat.
   for (const r of COUNCIL_ROLES)
     if (councilIntroJustSpoke(ctx, bodies, r)) st.said[`${r}_pull`] = 0;
@@ -606,7 +580,7 @@ export function tickHammerCouncil(ctx: SimContext, inst: InstanceSlot): void {
     const b = bodies[r];
     if (b && !living(b) && !st.fallen.includes(r)) noteFallen(s, r, b);
   }
-  syncMemory(s);
+  stepFury(s);
   stepCouncilVoice(s);
   watchCouncilSlain(s);
   stepBars(s);
@@ -682,6 +656,23 @@ export function councilDevTrigger(
       return 'The Hammer Council sleeps again in the rock and the crystal; the quarry wakes as the raid comes down.';
     }
     return 'The Hammer Council stands whole again, the five columns with it.';
+  }
+  if (verb === 'hp') {
+    // `/dev heart council hp <guardian|singer|both> <pct>`: set a member's
+    // health (to try a near-together kill and Grieving Fury's window).
+    const [, who, pctArg] = what.trim().split(/\s+/);
+    const pct = Number(pctArg);
+    const bodies = councilBodies(ctx, inst);
+    if (!bodies) return 'This run holds no council.';
+    if (!Number.isFinite(pct) || pct <= 0 || pct > 100)
+      return 'Name a member and a share: /dev heart council hp both 5.';
+    const roles = who === 'both' ? COUNCIL_ROLES : COUNCIL_ROLES.filter((r) => r === who);
+    if (roles.length === 0) return 'Name guardian, singer or both.';
+    for (const r of roles) {
+      const b = bodies[r];
+      if (living(b)) b.hp = Math.max(1, Math.round((b.maxHp * pct) / 100));
+    }
+    return `Health set to ${pct}% (${roles.join(', ')}).`;
   }
   if (verb === 'heroic' || verb === 'mythic') {
     const on = arg !== 'off';
@@ -777,5 +768,11 @@ export function councilReadout(ctx: SimContext, inst: InstanceSlot): string {
   const head = `[dev] Council (${councilDifficulty(inst)}): ${COUNCIL_ROLES.map(part).join(', ')}`;
   if (!st) return `${head}; not fighting (${councilIntroReadout(bodies)}).`;
   const souls = st.souls.length > 0 ? `, souls ${soulReadout({ ctx, inst, st })}` : '';
-  return `${head}; energy ${Math.round(st.energy)}, wraths ${st.wraths}, fallen ${st.fallen.join(' > ') || 'none'}${souls}.`;
+  const f = st.fury;
+  const fury = f
+    ? f.arrived
+      ? `, ${f.survivor} in Grieving Fury (${Math.max(0, Math.round(f.healLeft))} still to mend)`
+      : `, ${f.fallen}'s soul lands on the ${f.survivor} in ${f.arriveIn.toFixed(1)} s`
+    : '';
+  return `${head}; energy ${Math.round(st.energy)}, wraths ${st.wraths}, fallen ${st.fallen.join(' > ') || 'none'}${fury}${souls}.`;
 }

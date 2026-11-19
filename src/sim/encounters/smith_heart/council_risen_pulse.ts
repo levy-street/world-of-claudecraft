@@ -1,7 +1,7 @@
 // Stone Thrum, the Hammer Council's price on cover (docs/design/raid/
 // smith_heart.md section 7.1; the owner's review of 2026-11-09): every pillar
-// Wake the Stone raised (the Seam Singer's, or the Guardian's own rise as her
-// heir) that still stands rings on the WHOLE raid every 2 s, per pillar, on
+// Wake the Stone raised (the Seam Singer's, or the Guardian's after her: Grieving
+// Fury) that still stands rings on the WHOLE raid every 2 s, per pillar, on
 // every tier. The five carved columns never ring, the cursed pillar keeps its
 // own pulse (council_rush.ts), and a soul pillar that was a risen one keeps
 // ringing (the soul adds its own behaviour, council_soul.ts; it takes nothing
@@ -12,7 +12,7 @@
 // damage roll, one draw a living player in claim-player order, and none at
 // all while no risen pillar stands; no pick draws. One cue on each ringing
 // pillar so the floor shows where the hum comes from. The blow is the Seam
-// Singer's while she lives (the Wake is hers), else the Guardian's (her heir
+// Singer's while she lives (the Wake is hers), else the Guardian's (his fury
 // raising them), so it scales with that body's own factor and Memory.
 
 import { DT } from '../../types';

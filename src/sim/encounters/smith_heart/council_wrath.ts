@@ -17,10 +17,11 @@
 //                     After the 4th Wrath the energy fills much faster.
 //   Hammer's Weight   every 18 s: a 1.5 s bar at the tank, a heavy blow and
 //                     +100 percent physical damage taken for 25 s (swap).
-//   Heir              the Guardian fallen, the Seam Singer takes the energy
-//                     and casts a shorter, lighter Wrath (fills in 35 s, a 3 s
-//                     bar); Hammer's Weight and Mountain's Rush die with the
-//                     Guardian.
+//   Heir              the Guardian fallen, once his soul reaches her the Seam
+//                     Singer takes the energy where he left it and casts the
+//                     SAME Wrath (Grieving Fury, council_fury.ts: its fill
+//                     and bar hastened); on Heroic and Mythic she takes up
+//                     Hammer's Weight too. Mountain's Rush dies with him.
 //
 // The Wrath's shelter is a FIXED ring round every pillar (council_ids.ts
 // inCouncilShelter: the footprint plus `shelterReach`), whatever the caster's
@@ -44,8 +45,8 @@ import { breakCursed } from './council_rush';
 import {
   beginBar,
   type CouncilScope,
+  councilHaste,
   jobHolder,
-  living,
   memberFree,
   punishRoll,
 } from './council_scope';
@@ -70,13 +71,7 @@ export function fillEnergy(s: CouncilScope): void {
   if (!holder) return;
   if (s.st.bars[holder.role]?.castId === COUNCIL_CASTS.wrath) return;
   const per =
-    T.energyMax /
-    councilFillSeconds(
-      holder.heir,
-      s.st.wraths,
-      s.rules.heirFillSeconds,
-      s.rules.enrageAfterWraths,
-    );
+    T.energyMax / councilFillSeconds(s.st.wraths, s.rules.enrageAfterWraths, councilHaste(s));
   s.st.energy = Math.min(T.energyMax, s.st.energy + per * DT);
 }
 
@@ -85,16 +80,9 @@ export function fillEnergy(s: CouncilScope): void {
 export function secondsToNextWrath(s: CouncilScope): number {
   const holder = jobHolder(s, 'wrath');
   if (!holder) return Number.POSITIVE_INFINITY;
-  const per =
-    T.energyMax /
-    councilFillSeconds(
-      holder.heir,
-      s.st.wraths,
-      s.rules.heirFillSeconds,
-      s.rules.enrageAfterWraths,
-    );
-  const cast = holder.heir ? T.heirWrathCast : T.wrathCast;
-  return Math.max(0, T.energyMax - s.st.energy) / per + cast;
+  const haste = councilHaste(s);
+  const per = T.energyMax / councilFillSeconds(s.st.wraths, s.rules.enrageAfterWraths, haste);
+  return Math.max(0, T.energyMax - s.st.energy) / per + T.wrathCast / haste;
 }
 
 /** Start the Wrath when the energy is full and its holder is free. Exported
@@ -104,14 +92,7 @@ export function startWrath(s: CouncilScope): boolean {
   if (!holder || s.st.energy < T.energyMax - 1e-6) return false;
   if (!memberFree(s, holder.role)) return false;
   stampFloor(s.st);
-  beginBar(
-    s,
-    holder.role,
-    COUNCIL_CASTS.wrath,
-    holder.heir ? T.heirWrathCast : T.wrathCast,
-    null,
-    holder.heir,
-  );
+  beginBar(s, holder.role, COUNCIL_CASTS.wrath, T.wrathCast, null, holder.heir);
   wearPillarLimit(s, holder.body);
   if (!holder.heir) councilSay(s, holder.role, 'wrath');
   return true;
@@ -138,21 +119,17 @@ function wearPillarLimit(s: CouncilScope, caster: Entity): void {
   });
 }
 
-/** One Wrath hit's roll: the heir's shorter one or the Guardian's, times the
- *  tier's Wrath factor (Heroic's and Mythic's kill anyone unhidden but a
- *  tank under a strong defensive; an immunity still takes none, the damage
- *  pipeline's own rule) or its heir's lighter one. */
-function wrathRoll(s: CouncilScope, caster: Entity, heir: boolean): number {
-  const amount = heir
-    ? punishRoll(s, caster, T.heirWrathMin, T.heirWrathMax)
-    : punishRoll(s, caster, T.wrathMin, T.wrathMax);
-  return Math.round(amount * (heir ? s.rules.heirWrathMult : s.rules.wrathMult));
+/** One Wrath hit's roll, whoever casts it, times the tier's Wrath factor
+ *  (Heroic's and Mythic's kill anyone unhidden but a tank under a strong
+ *  defensive; an immunity still takes none, the damage pipeline's own rule). */
+function wrathRoll(s: CouncilScope, caster: Entity): number {
+  return Math.round(punishRoll(s, caster, T.wrathMin, T.wrathMax) * s.rules.wrathMult);
 }
 
 /** The Wrath lands: who it strikes (whoever no pillar hides), then every
  *  pillar but a soul's shatters. Returns how many it struck (the tests read
  *  it). */
-export function landWrath(s: CouncilScope, caster: Entity, heir: boolean): number {
+export function landWrath(s: CouncilScope, caster: Entity): number {
   const { ctx, inst, st } = s;
   st.energy = 0;
   st.wraths++;
@@ -191,7 +168,7 @@ export function landWrath(s: CouncilScope, caster: Entity, heir: boolean): numbe
       sheltered.push({ p, at });
       continue;
     }
-    const amount = wrathRoll(s, caster, heir);
+    const amount = wrathRoll(s, caster);
     ctx.dealDamage(caster, p, amount, false, 'physical', COUNCIL_NAMES.wrath, 'hit', true);
     struck++;
   }
@@ -202,7 +179,7 @@ export function landWrath(s: CouncilScope, caster: Entity, heir: boolean): numbe
   if (limit !== null) {
     for (const { p, at } of sheltered) {
       if (!at.some((id) => (shields.get(id)?.length ?? 0) > limit)) continue;
-      const amount = wrathRoll(s, caster, heir);
+      const amount = wrathRoll(s, caster);
       ctx.dealDamage(
         caster,
         p,
@@ -231,14 +208,16 @@ export function landWrath(s: CouncilScope, caster: Entity, heir: boolean): numbe
   return struck;
 }
 
-/** Hammer's Weight: the Guardian's own (it dies with it). */
+/** Hammer's Weight: the Guardian's own; on Heroic and Mythic the Singer
+ *  takes it up once his soul reaches her (jobHolder 'weight'). */
 export function startWeight(s: CouncilScope): boolean {
-  const g = s.bodies.guardian;
-  if (!living(g) || !memberFree(s, 'guardian')) return false;
+  const holder = jobHolder(s, 'weight');
+  if (!holder || !memberFree(s, holder.role)) return false;
+  const g = holder.body;
   const tank = g.aggroTargetId !== null ? s.ctx.entities.get(g.aggroTargetId) : undefined;
   if (!tank || tank.dead) return false;
   s.st.weightTimer = T.weightEvery;
-  beginBar(s, 'guardian', COUNCIL_CASTS.weight, T.weightCast, tank.id, false);
+  beginBar(s, holder.role, COUNCIL_CASTS.weight, T.weightCast, tank.id, holder.heir);
   return true;
 }
 
