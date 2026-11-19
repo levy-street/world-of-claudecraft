@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { resolveNearbyInteractionCandidate } from '../src/game/nearby_interaction_core';
 import { ESCORTS } from '../src/sim/data';
+import { KIT_USE_LOCKED_AURA, KIT_USE_SPENT_AURA } from '../src/sim/mob/trash_kit/encounter_use';
 import { feastTemplateIds } from '../src/sim/professions/feast';
 import type { Entity, GatherNodeDef, QuestProgress } from '../src/sim/types';
 import type { FarmPatchDef } from '../src/world_api/farming';
@@ -40,6 +41,9 @@ function entity(overrides: Partial<Entity> & Pick<Entity, 'id' | 'kind'>): Entit
     loot: null,
     harvestClaimedBy: null,
     dungeonId: null,
+    // Every live entity carries an aura list (src/net/blank_entity.ts mints
+    // one empty): the usable-body check reads it for the spent/locked markers.
+    auras: [],
     ...overrides,
   } as Entity;
 }
@@ -360,6 +364,13 @@ describe('resolveNearbyInteractionCandidate: the usable encounter body', () => {
     const dead = scan([brazier()]);
     dead.world.player.dead = true;
     expect(resolveNearbyInteractionCandidate(dead.world)).toBeNull();
+  });
+
+  it('is no candidate while it wears the spent or the locked marker', () => {
+    for (const id of [KIT_USE_SPENT_AURA, KIT_USE_LOCKED_AURA]) {
+      const marked = brazier({ auras: [{ id } as Entity['auras'][number]] });
+      expect(resolveNearbyInteractionCandidate(scan([marked]).world)).toBeNull();
+    }
   });
 
   it('a mob with no usable kit is never a use', () => {
