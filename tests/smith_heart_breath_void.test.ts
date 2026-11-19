@@ -138,7 +138,11 @@ describe('the tether over a real Sim', () => {
     const c = lowClimb();
     f.put(onClimb, c.x, c.z);
     boss.threat.set(onClimb.id, 5);
-    f.put(fallen, C.x + C.rx + 25, C.z);
+    // Out past the south rim, over no floor at all (an isle hangs past the
+    // east rim: a body set under one stands on its floor, never in the void).
+    const out = { x: C.x + 30, z: C.z - C.rz - 25 };
+    expect(authoredFieldSurfaceAt(SMITH_HEART_FIELD, out.x, out.z)).toBeFalsy();
+    f.put(fallen, out.x, out.z);
     fallen.pos.y = SMITH_HEART_FIELD.voidHeight;
     boss.threat.set(fallen.id, 5);
     f.tick(1, false);
