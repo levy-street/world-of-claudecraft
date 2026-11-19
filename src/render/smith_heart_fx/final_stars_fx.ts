@@ -603,9 +603,14 @@ export class FinalStarsFx {
     // edge ring, arcs crawling over it, a flicker), bolts leaping out over the
     // floor from the pillar's foot to the edge, the edge spitting.
     if (zoneR > 0) {
+      // Its own field, else the first free one.
       let f: (typeof this.fields)[number] | null = null;
-      for (const k of this.fields) if (k.id === e.id) f = k;
-      if (!f) for (const k of this.fields) if (!f && k.id < 0) f = k;
+      let free: (typeof this.fields)[number] | null = null;
+      for (const k of this.fields) {
+        if (k.id === e.id) f = k;
+        else if (free === null && k.id < 0) free = k;
+      }
+      f ??= free;
       if (f) {
         f.id = e.id;
         f.seen = true;
